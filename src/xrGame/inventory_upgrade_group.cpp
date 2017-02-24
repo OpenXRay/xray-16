@@ -14,14 +14,8 @@ namespace inventory
 {
 namespace upgrade
 {
-Group::Group()
-{
-}
-
-Group::~Group()
-{
-}
-
+Group::Group() {}
+Group::~Group() {}
 void Group::construct(const shared_str& group_id, UpgradeBase& parent_upgrade, Manager& manager_r)
 {
     m_id._set(group_id);
@@ -45,7 +39,8 @@ void Group::construct(const shared_str& group_id, UpgradeBase& parent_upgrade, M
 
 void Group::add_parent_upgrade(UpgradeBase& parent_upgrade)
 {
-    if (std::find(m_parent_upgrades.begin(), m_parent_upgrades.end(), &parent_upgrade) == m_parent_upgrades.end()) {
+    if (std::find(m_parent_upgrades.begin(), m_parent_upgrades.end(), &parent_upgrade) == m_parent_upgrades.end())
+    {
         m_parent_upgrades.push_back(&parent_upgrade);
     }
 }
@@ -68,7 +63,7 @@ void Group::log_hierarchy(LPCSTR nest)
     }
 }
 
-#endif  // DEBUG
+#endif // DEBUG
 
 void Group::fill_root(Root* root)
 {
@@ -86,15 +81,19 @@ UpgradeStateResult Group::can_install(CInventoryItem& item, UpgradeBase& test_up
     Upgrades_type::iterator ie = m_parent_upgrades.end();
     for (; ib != ie; ++ib)
     {
-        if ((*ib)->is_root()) {
+        if ((*ib)->is_root())
+        {
             continue;
         }
         //		if ( !item.has_upgrade( (*ib)->id() ) )
         Upgrade* U = smart_cast<Upgrade*>(*ib);
-        if (!item.has_upgrade_group(U->parent_group_id())) {
-            if (loading) {
-                FATAL(make_string("Loading item: Upgrade <%s> of inventory item [%s] (id = %d) can`t be installed! "
-                                  "Error = result_e_parents",
+        if (!item.has_upgrade_group(U->parent_group_id()))
+        {
+            if (loading)
+            {
+                FATAL(make_string(
+                    "Loading item: Upgrade <%s> of inventory item [%s] (id = %d) can`t be installed! Error = "
+                    "result_e_parents",
                     test_upgrade.id_str(), item.m_section_id.c_str(), item.object_id())
                           .c_str());
             }
@@ -106,13 +105,17 @@ UpgradeStateResult Group::can_install(CInventoryItem& item, UpgradeBase& test_up
     ie = m_included_upgrades.end();
     for (; ib != ie; ++ib)
     {
-        if ((*ib) == &test_upgrade) {
+        if ((*ib) == &test_upgrade)
+        {
             continue;
         }
-        if (item.has_upgrade((*ib)->id())) {
-            if (loading) {
-                FATAL(make_string("Loading item: Upgrade <%s> of inventory item [%s] (id = %d) can`t be installed! "
-                                  "Error = result_e_group",
+        if (item.has_upgrade((*ib)->id()))
+        {
+            if (loading)
+            {
+                FATAL(make_string(
+                    "Loading item: Upgrade <%s> of inventory item [%s] (id = %d) can`t be installed! Error = "
+                    "result_e_group",
                     test_upgrade.id_str(), item.m_section_id.c_str(), item.object_id())
                           .c_str());
             }
@@ -143,5 +146,5 @@ void Group::highlight_down()
     }
 }
 
-}  // namespace upgrade
-}  // namespace inventory
+} // namespace upgrade
+} // namespace inventory

@@ -61,15 +61,13 @@ manager::~manager()
     WeatherCycles.clear();
     WeatherFXs.clear();
 
-    if (!Device.editor()) return;
+    if (!Device.editor())
+        return;
 
     ::ide().destroy(m_property_holder);
 }
 
-void manager::load()
-{
-}
-
+void manager::load() {}
 void manager::load_internal()
 {
     m_thunderbolts->load();
@@ -126,7 +124,8 @@ void manager::load_weathers()
 
 manager::shader_ids_type const& manager::shader_ids() const
 {
-    if (!m_shader_ids.empty()) return (m_shader_ids);
+    if (!m_shader_ids.empty())
+        return (m_shader_ids);
 
     string_path path;
     FS.update_path(path, "$game_data$", "shaders.xr");
@@ -155,7 +154,8 @@ manager::shader_ids_type const& manager::shader_ids() const
 
 manager::particle_ids_type const& manager::particle_ids() const
 {
-    if (!m_particle_ids.empty()) return (m_particle_ids);
+    if (!m_particle_ids.empty())
+        return (m_particle_ids);
 
     library_interface const& library = m_pRender->particles_systems_library();
     PS::CPGDef const* const* i = library.particles_group_begin();
@@ -169,7 +169,8 @@ manager::particle_ids_type const& manager::particle_ids() const
 
 manager::light_animator_ids_type const& manager::light_animator_ids() const
 {
-    if (!m_light_animator_ids.empty()) return (m_light_animator_ids);
+    if (!m_light_animator_ids.empty())
+        return (m_light_animator_ids);
 
     typedef LAItemVec container_type;
     container_type const& light_animators = LALib.Objects();
@@ -202,11 +203,7 @@ void manager::unload()
     Ambients.clear();
 }
 
-CEnvAmbient* manager::AppendEnvAmb(const shared_str& sect)
-{
-    return (m_ambients->get_ambient(sect));
-}
-
+CEnvAmbient* manager::AppendEnvAmb(const shared_str& sect) { return (m_ambients->get_ambient(sect)); }
 SThunderboltDesc* manager::thunderbolt_description(CInifile& config, shared_str const& section)
 {
     return (m_thunderbolts->description(config, section));
@@ -237,9 +234,9 @@ CLensFlareDescriptor* manager::add_flare(xr_vector<CLensFlareDescriptor*>& colle
     NODEFAULT;
 #ifdef DEBUG
     return (0);
-#endif  // #ifdef DEBUG
-#endif  // #if 0
+#endif // #ifdef DEBUG
+#endif // #if 0
     return (inherited::add_flare(collection, id));
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

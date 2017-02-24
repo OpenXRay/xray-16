@@ -38,19 +38,22 @@ AnsiString& GetTokenNameFromVal_EQ(u32 val, AnsiString& res, const xr_token* tok
 {
     bool bRes = false;
     for (u32 i = 0; token_list[i].name; i++)
-        if (token_list[i].id == int(val)) {
+        if (token_list[i].id == int(val))
+        {
             res = token_list[i].name;
             bRes = true;
             break;
         }
-    if (!bRes) res = "";
+    if (!bRes)
+        res = "";
     return res;
 }
 
 u32 GetTokenValFromName(const LPCSTR val, const xr_token* token_list)
 {
     for (int i = 0; token_list[i].name; i++)
-        if (!stricmp(val, token_list[i].name)) return token_list[i].id;
+        if (!stricmp(val, token_list[i].name))
+            return token_list[i].id;
     return 0;
 }
 
@@ -117,7 +120,8 @@ void __fastcall TfrmShaderFunction::DrawGraph()
 //---------------------------------------------------------------------------
 void __fastcall TfrmShaderFunction::FormKeyDown(TObject* Sender, WORD& Key, TShiftState Shift)
 {
-    if (Key == VK_ESCAPE) ebCancel->Click();
+    if (Key == VK_ESCAPE)
+        ebCancel->Click();
 }
 
 //----------------------------------------------------
@@ -170,7 +174,8 @@ void __fastcall TfrmShaderFunction::stFunctionMouseDown(
 
 void __fastcall TfrmShaderFunction::stFunctionClick(TObject* Sender)
 {
-    if (temp_text) temp_text->Caption = ((TMenuItem*)Sender)->Caption;
+    if (temp_text)
+        temp_text->Caption = ((TMenuItem*)Sender)->Caption;
     temp_text = 0;
     UpdateFuncData();
 }
@@ -191,7 +196,8 @@ void TfrmShaderFunction::GetFuncData()
 
 void TfrmShaderFunction::UpdateFuncData()
 {
-    if (bLoadMode) return;
+    if (bLoadMode)
+        return;
     m_CurFunc->F = (WaveForm::EFunction)GetTokenValFromName(stFunction->Caption.c_str(), function_token);
     m_CurFunc->arg[0] = seArg1->Value;
     m_CurFunc->arg[1] = seArg2->Value;
@@ -213,23 +219,16 @@ void TfrmShaderFunction::UpdateFuncData()
     DrawGraph();
 }
 
-void __fastcall TfrmShaderFunction::seArgExit(TObject* Sender)
-{
-    UpdateFuncData();
-}
-
+void __fastcall TfrmShaderFunction::seArgExit(TObject* Sender) { UpdateFuncData(); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmShaderFunction::seArgLWChange(TObject* Sender, int Val)
-{
-    UpdateFuncData();
-}
-
+void __fastcall TfrmShaderFunction::seArgLWChange(TObject* Sender, int Val) { UpdateFuncData(); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfrmShaderFunction::seArgKeyDown(TObject* Sender, WORD& Key, TShiftState Shift)
 {
-    if (Key == VK_RETURN) UpdateFuncData();
+    if (Key == VK_RETURN)
+        UpdateFuncData();
 }
 
 //---------------------------------------------------------------------------

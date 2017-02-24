@@ -27,7 +27,8 @@ public:
         VERIFY(c);
         VERIFY(callback != c);
 
-        if (next) {
+        if (next)
+        {
             next->Add(c);
         }
         else
@@ -40,18 +41,21 @@ public:
         for (CObjectContactCallback* i = this; i; i = i->next)
         {
             VERIFY(i->callback);
-            if (c == i->callback) return true;
+            if (c == i->callback)
+                return true;
         }
         return false;
     }
 
     static void RemoveCallback(CObjectContactCallback*& callbacks, ObjectContactCallbackFun* c)
     {
-        if (!callbacks) return;
+        if (!callbacks)
+            return;
         VERIFY(c);
         VERIFY(callbacks->callback);
 
-        if (c == callbacks->callback) {
+        if (c == callbacks->callback)
+        {
             CObjectContactCallback* del = callbacks;
             callbacks = callbacks->next;
             del->next = NULL;
@@ -66,7 +70,8 @@ public:
                 VERIFY(i->callback);
                 VERIFY(i);
                 VERIFY(p);
-                if (c == i->callback) {
+                if (c == i->callback)
+                {
                     CObjectContactCallback* del = i;
                     p->next = i->next;
                     del->next = NULL;
@@ -122,11 +127,7 @@ struct dxGeomUserData
     //	};
 };
 
-IC dxGeomUserData* dGeomGetUserData(dxGeom* geom)
-{
-    return (dxGeomUserData*)dGeomGetData(geom);
-}
-
+IC dxGeomUserData* dGeomGetUserData(dxGeom* geom) { return (dxGeomUserData*)dGeomGetData(geom); }
 IC dGeomID retrieveGeom(dGeomID geom)
 {
     if (dGeomGetClass(geom) == dGeomTransformClass)
@@ -146,7 +147,8 @@ IC dxGeomUserData* retrieveGeomUserData(dGeomID geom)
 
 IC void get_user_data(dxGeomUserData*& gd1, dxGeomUserData*& gd2, bool bo1, const dContactGeom& geom)
 {
-    if (bo1) {
+    if (bo1)
+    {
         gd1 = retrieveGeomUserData(geom.g1);
         gd2 = retrieveGeomUserData(geom.g2);
     }
@@ -167,7 +169,8 @@ IC CPhysicsShellHolder* retrieveRefObject(dGeomID geom)
 }
 IC void dGeomCreateUserData(dxGeom* geom)
 {
-    if (!geom) return;
+    if (!geom)
+        return;
     dGeomSetData(geom, xr_new<dxGeomUserData>());
     (dGeomGetUserData(geom))->pushing_neg = false;
     (dGeomGetUserData(geom))->pushing_b_neg = false;
@@ -193,9 +196,11 @@ IC void dGeomCreateUserData(dxGeom* geom)
 
 IC void dGeomDestroyUserData(dxGeom* geom)
 {
-    if (!geom) return;
+    if (!geom)
+        return;
     dxGeomUserData* P = dGeomGetUserData(geom);
-    if (P) {
+    if (P)
+    {
 #ifdef DEBUG
         dbg_total_saved_tries -= P->cashed_tries.size();
 #endif
@@ -206,15 +211,8 @@ IC void dGeomDestroyUserData(dxGeom* geom)
     dGeomSetData(geom, 0);
 }
 
-IC void dGeomUserDataSetCallbackData(dxGeom* geom, void* cd)
-{
-    (dGeomGetUserData(geom))->callback_data = cd;
-}
-IC void dGeomUserDataSetPhObject(dxGeom* geom, CPHObject* phObject)
-{
-    (dGeomGetUserData(geom))->ph_object = phObject;
-}
-
+IC void dGeomUserDataSetCallbackData(dxGeom* geom, void* cd) { (dGeomGetUserData(geom))->callback_data = cd; }
+IC void dGeomUserDataSetPhObject(dxGeom* geom, CPHObject* phObject) { (dGeomGetUserData(geom))->ph_object = phObject; }
 IC void dGeomUserDataSetPhysicsRefObject(dxGeom* geom, CPhysicsShellHolder* phRefObject)
 {
     (dGeomGetUserData(geom))->ph_ref_object = phRefObject;
@@ -228,12 +226,14 @@ IC void dGeomUserDataSetContactCallback(dxGeom* geom, ContactCallbackFun* callba
 IC void dGeomUserDataSetObjectContactCallback(dxGeom* geom, ObjectContactCallbackFun* obj_callback)
 {
     xr_delete((dGeomGetUserData(geom))->object_callbacks);
-    if (obj_callback) (dGeomGetUserData(geom))->object_callbacks = xr_new<CObjectContactCallback>(obj_callback);
+    if (obj_callback)
+        (dGeomGetUserData(geom))->object_callbacks = xr_new<CObjectContactCallback>(obj_callback);
 }
 
 IC void dGeomUserDataAddObjectContactCallback(dxGeom* geom, ObjectContactCallbackFun* obj_callback)
 {
-    if ((dGeomGetUserData(geom))->object_callbacks) {
+    if ((dGeomGetUserData(geom))->object_callbacks)
+    {
         (dGeomGetUserData(geom))->object_callbacks->Add(obj_callback);
     }
     else
@@ -253,14 +253,8 @@ IC bool dGeomUserDataHasCallback(dxGeom* geom, ObjectContactCallbackFun* obj_cal
     else
         return false;
 }
-IC void dGeomUserDataSetElementPosition(dxGeom* geom, u16 e_pos)
-{
-    (dGeomGetUserData(geom))->element_position = e_pos;
-}
-IC void dGeomUserDataSetBoneId(dxGeom* geom, u16 bone_id)
-{
-    (dGeomGetUserData(geom))->bone_id = bone_id;
-}
+IC void dGeomUserDataSetElementPosition(dxGeom* geom, u16 e_pos) { (dGeomGetUserData(geom))->element_position = e_pos; }
+IC void dGeomUserDataSetBoneId(dxGeom* geom, u16 bone_id) { (dGeomGetUserData(geom))->bone_id = bone_id; }
 IC void dGeomUserDataResetLastPos(dxGeom* geom)
 {
     (dGeomGetUserData(geom))->last_pos[0] = -dInfinity;

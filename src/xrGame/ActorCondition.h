@@ -70,7 +70,6 @@ public:
     IC void BoostTelepaticProtection(const float value);
     IC void BoostChemicalBurnProtection(const float value);
     BOOSTER_MAP GetCurBoosterInfluences() { return m_booster_influences; };
-
     // хромание при потере сил и здоровья
     virtual bool IsLimping() const;
     virtual bool IsCantWalk() const;
@@ -79,17 +78,14 @@ public:
 
     void PowerHit(float power, bool apply_outfit);
     float GetPower() const { return m_fPower; }
-
     void ConditionJump(float weight);
     void ConditionWalk(float weight, bool accel, bool sprint);
     void ConditionStand(float weight);
     IC float MaxWalkWeight() const { return m_MaxWalkWeight; }
-
     float xr_stdcall GetAlcohol() { return m_fAlcohol; }
     float xr_stdcall GetPsy() { return 1.0f - GetPsyHealth(); }
     float GetSatiety() { return m_fSatiety; }
     IC float GetSatietyPower() const { return m_fV_SatietyPower * m_fSatiety; };
-
     void AffectDamage_InjuriousMaterialAndMonstersInfluence();
     float GetInjuriousMaterialDamage();
 
@@ -109,7 +105,6 @@ public:
     IC float const& V_SatietyPower() { return m_fV_SatietyPower; }
     IC float const& V_SatietyHealth() { return m_fV_SatietyHealth; }
     IC float const& SatietyCritical() { return m_fSatietyCritical; }
-
     float GetZoneMaxPower(ALife::EInfluenceType type) const;
     float GetZoneMaxPower(ALife::EHitType hit_type) const;
 
@@ -121,7 +116,6 @@ public:
     float GetMaxPowerRestoreSpeed() { return m_max_power_restore_speed; };
     float GetMaxWoundProtection() { return m_max_wound_protection; };
     float GetMaxFireWoundProtection() { return m_max_fire_wound_protection; };
-
 protected:
     SMedicineInfluenceValues m_curr_medicine_influence;
     float m_fAlcohol;
@@ -184,7 +178,7 @@ class CActorDeathEffector
     void xr_stdcall OnPPEffectorReleased();
 
 public:
-    CActorDeathEffector(CActorCondition* parent, LPCSTR sect);  // -((
+    CActorDeathEffector(CActorCondition* parent, LPCSTR sect); // -((
     ~CActorDeathEffector();
     void UpdateCL();
     IC bool IsActual() { return m_b_actual; }

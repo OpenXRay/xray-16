@@ -131,19 +131,18 @@ CObjectPropertyEvaluatorQueue::_value_type CObjectPropertyEvaluatorQueue::evalua
 // CObjectPropertyEvaluatorNoItems
 //////////////////////////////////////////////////////////////////////////
 
-CObjectPropertyEvaluatorNoItems::CObjectPropertyEvaluatorNoItems(CAI_Stalker* owner)
-{
-    m_object = owner;
-}
-
+CObjectPropertyEvaluatorNoItems::CObjectPropertyEvaluatorNoItems(CAI_Stalker* owner) { m_object = owner; }
 CObjectPropertyEvaluatorNoItems::_value_type CObjectPropertyEvaluatorNoItems::evaluate()
 {
     PIItem I = object().inventory().ActiveItem();
-    if (!I) return (true);
+    if (!I)
+        return (true);
 
-    if (!I->cast_hud_item() || I->cast_hud_item()->IsHidden()) return (true);
+    if (!I->cast_hud_item() || I->cast_hud_item()->IsHidden())
+        return (true);
 
-    if (I->cast_hud_item() && I->cast_hud_item()->IsShowing()) return (true);
+    if (I->cast_hud_item() && I->cast_hud_item()->IsShowing())
+        return (true);
 
     return (false);
 }
@@ -176,7 +175,8 @@ CObjectPropertyEvaluatorMissileStarted::CObjectPropertyEvaluatorMissileStarted(C
 CObjectPropertyEvaluatorMissileStarted::_value_type CObjectPropertyEvaluatorMissileStarted::evaluate()
 {
     VERIFY(m_item);
-    if (m_item->GetState() != CMissile::eThrow) return (false);
+    if (m_item->GetState() != CMissile::eThrow)
+        return (false);
 
     return (true);
 }
@@ -194,13 +194,17 @@ CObjectPropertyEvaluatorMissileHidden::_value_type CObjectPropertyEvaluatorMissi
 {
     VERIFY(m_item);
 
-    if (!object().inventory().ActiveItem()) return (true);
+    if (!object().inventory().ActiveItem())
+        return (true);
 
-    if (object().inventory().ActiveItem() != m_item) return (true);
+    if (object().inventory().ActiveItem() != m_item)
+        return (true);
 
-    if (m_item->GetState() == CMissile::eHidden) return (true);
+    if (m_item->GetState() == CMissile::eHidden)
+        return (true);
 
-    if (m_item->GetState() == CMissile::eShowing) return (true);
+    if (m_item->GetState() == CMissile::eShowing)
+        return (true);
 
     return (false);
 }

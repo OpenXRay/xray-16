@@ -8,15 +8,8 @@
 
 #pragma once
 
-IC CTradeBoolParameters::CTradeBoolParameters()
-{
-}
-
-IC void CTradeBoolParameters::clear()
-{
-    m_sections.clear();
-}
-
+IC CTradeBoolParameters::CTradeBoolParameters() {}
+IC void CTradeBoolParameters::clear() { m_sections.clear(); }
 IC void CTradeBoolParameters::disable(const shared_str& section)
 {
     SECTIONS::iterator I = std::find(m_sections.begin(), m_sections.end(), section);

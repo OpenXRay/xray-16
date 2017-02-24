@@ -18,7 +18,7 @@ LPCSTR GameTypeToString(EGameIDs gt, bool bShort);
 
 game_cl_GameState::game_cl_GameState()
 {
-    local_player = createPlayerState(NULL);  // initializing account info
+    local_player = createPlayerState(NULL); // initializing account info
     m_WeaponUsageStatistic = NULL;
 
     m_game_type_name = 0;
@@ -62,7 +62,8 @@ void game_cl_GameState::net_import_GameTime(NET_Packet& P)
 
     u64 OldTime = Level().GetEnvironmentGameTime();
     Level().SetEnvironmentGameTimeFactor(GameEnvironmentTime, EnvironmentTimeFactor);
-    if (OldTime > GameEnvironmentTime) GamePersistent().Environment().Invalidate();
+    if (OldTime > GameEnvironmentTime)
+        GamePersistent().Environment().Invalidate();
 }
 
 struct not_exsiting_clients_deleter
@@ -80,12 +81,14 @@ struct not_exsiting_clients_deleter
     {
         VERIFY(exist_clients);
         existing_clients_vector_t::iterator tmp_iter = std::find(exist_clients->begin(), exist_clients->end(),
-            value.first  // key
+            value.first // key
             );
 
-        if (tmp_iter != exist_clients->end()) return false;
+        if (tmp_iter != exist_clients->end())
+            return false;
 
-        if (*local_player == value.second) return false;
+        if (*local_player == value.second)
+            return false;
         // 			*local_player	=	NULL;
         // 			*client_id		=	0;
         // 		}
@@ -93,7 +96,7 @@ struct not_exsiting_clients_deleter
         xr_delete(value.second);
         return true;
     }
-};  // not_present_clients_deleter
+}; // not_present_clients_deleter
 
 void game_cl_GameState::net_import_state(NET_Packet& P)
 {
@@ -104,7 +107,8 @@ void game_cl_GameState::net_import_state(NET_Packet& P)
     u16 ph;
     P.r_u16(ph);
 
-    if (Phase() != ph) switch_Phase(ph);
+    if (Phase() != ph)
+        switch_Phase(ph);
 
     P.r_s32(m_round);
     P.r_u32(m_start_time);
@@ -126,7 +130,8 @@ void game_cl_GameState::net_import_state(NET_Packet& P)
 
         game_PlayerState* IP;
         PLAYERS_MAP_IT I = players.find(ID);
-        if (I != players.end()) {
+        if (I != players.end())
+        {
             IP = I->second;
             //***********************************************
             u16 OldFlags = IP->flags__;
@@ -135,22 +140,25 @@ void game_cl_GameState::net_import_state(NET_Packet& P)
             IP->net_Import(P);
             //-----------------------------------------------
             if (OldFlags != IP->flags__)
-                if (Type() != eGameIDSingle) OnPlayerFlagsChanged(IP);
-            if (OldVote != IP->m_bCurrentVoteAgreed) OnPlayerVoted(IP);
+                if (Type() != eGameIDSingle)
+                    OnPlayerFlagsChanged(IP);
+            if (OldVote != IP->m_bCurrentVoteAgreed)
+                OnPlayerVoted(IP);
             //***********************************************
             valid_players.push_back(ID);
         }
         else
         {
-            if (ID == local_svdpnid)  // Level().GetClientID())
+            if (ID == local_svdpnid) // Level().GetClientID())
             {
-                game_PlayerState::skip_Import(P);  // this mean that local_player not created yet ..
+                game_PlayerState::skip_Import(P); // this mean that local_player not created yet ..
                 continue;
             }
 
             IP = createPlayerState(&P);
 
-            if (Type() != eGameIDSingle) OnPlayerFlagsChanged(IP);
+            if (Type() != eGameIDSingle)
+                OnPlayerFlagsChanged(IP);
 
             players.insert(mk_pair(ID, IP));
             valid_players.push_back(ID);
@@ -173,7 +181,8 @@ void game_cl_GameState::net_import_update(NET_Packet& P)
     PLAYERS_MAP_IT I = players.find(ID);
     /*VERIFY2(I != players.end(),
         make_string("Player ClientID = %d not found in players map", ID.value()).c_str());*/
-    if (players.end() != I) {
+    if (players.end() != I)
+    {
         game_PlayerState* IP = I->second;
         //		CopyMemory	(&IP,&PS,sizeof(PS));
         //***********************************************
@@ -183,8 +192,10 @@ void game_cl_GameState::net_import_update(NET_Packet& P)
         IP->net_Import(P);
         //-----------------------------------------------
         if (OldFlags != IP->flags__)
-            if (Type() != eGameIDSingle) OnPlayerFlagsChanged(IP);
-        if (OldVote != IP->m_bCurrentVoteAgreed) OnPlayerVoted(IP);
+            if (Type() != eGameIDSingle)
+                OnPlayerFlagsChanged(IP);
+        if (OldVote != IP->m_bCurrentVoteAgreed)
+            OnPlayerVoted(IP);
         //***********************************************
     }
     else
@@ -198,10 +209,7 @@ void game_cl_GameState::net_import_update(NET_Packet& P)
     net_import_GameTime(P);
 }
 
-void game_cl_GameState::net_signal(NET_Packet& P)
-{
-}
-
+void game_cl_GameState::net_signal(NET_Packet& P) {}
 void game_cl_GameState::TranslateGameMessage(u32 msg, NET_Packet& P)
 {
     CStringTable st;
@@ -217,7 +225,8 @@ void game_cl_GameState::TranslateGameMessage(u32 msg, NET_Packet& P)
         ClientID newClientId;
         P.r_clientID(newClientId);
         game_PlayerState* PS = NULL;
-        if (newClientId == local_svdpnid) {
+        if (newClientId == local_svdpnid)
+        {
             PS = local_player;
         }
         else
@@ -226,12 +235,14 @@ void game_cl_GameState::TranslateGameMessage(u32 msg, NET_Packet& P)
         }
         VERIFY2(PS, "failed to create player state");
 
-        if (Type() != eGameIDSingle) {
+        if (Type() != eGameIDSingle)
+        {
             players.insert(mk_pair(newClientId, PS));
             OnNewPlayerConnected(newClientId);
         }
         xr_sprintf(Text, "%s%s %s%s", Color_Teams[0], PS->getName(), Color_Main, *st.translate("mp_connected"));
-        if (CurrentGameUI()) CurrentGameUI()->CommonMessageOut(Text);
+        if (CurrentGameUI())
+            CurrentGameUI()->CommonMessageOut(Text);
         //---------------------------------------
         Msg("%s connected", PS->getName());
     }
@@ -242,7 +253,8 @@ void game_cl_GameState::TranslateGameMessage(u32 msg, NET_Packet& P)
         P.r_stringZ(PlayerName);
 
         xr_sprintf(Text, "%s%s %s%s", Color_Teams[0], PlayerName, Color_Main, *st.translate("mp_disconnected"));
-        if (CurrentGameUI()) CurrentGameUI()->CommonMessageOut(Text);
+        if (CurrentGameUI())
+            CurrentGameUI()->CommonMessageOut(Text);
         //---------------------------------------
         Msg("%s disconnected", PlayerName);
     }
@@ -253,7 +265,8 @@ void game_cl_GameState::TranslateGameMessage(u32 msg, NET_Packet& P)
         P.r_stringZ(PlayerName);
 
         xr_sprintf(Text, "%s%s %s%s", Color_Teams[0], PlayerName, Color_Main, *st.translate("mp_entered_game"));
-        if (CurrentGameUI()) CurrentGameUI()->CommonMessageOut(Text);
+        if (CurrentGameUI())
+            CurrentGameUI()->CommonMessageOut(Text);
     }
     break;
     default: { R_ASSERT2(0, "Unknown Game Message");
@@ -274,7 +287,8 @@ void game_cl_GameState::OnGameMessage(NET_Packet& P)
 game_PlayerState* game_cl_GameState::lookat_player()
 {
     IGameObject* current_entity = Level().CurrentEntity();
-    if (current_entity) {
+    if (current_entity)
+    {
         return GetPlayerByGameID(current_entity->ID());
     }
     return NULL;
@@ -288,7 +302,8 @@ game_PlayerState* game_cl_GameState::GetPlayerByGameID(u32 GameID)
     for (; I != E; ++I)
     {
         game_PlayerState* P = I->second;
-        if (P->GameID == GameID) return P;
+        if (P->GameID == GameID)
+            return P;
     };
     return NULL;
 };
@@ -312,15 +327,18 @@ void game_cl_GameState::shedule_Update(u32 dt)
 {
     ScheduledBase::shedule_Update(dt);
 
-    if (!m_game_ui_custom) {
-        if (CurrentGameUI()) m_game_ui_custom = CurrentGameUI();
+    if (!m_game_ui_custom)
+    {
+        if (CurrentGameUI())
+            m_game_ui_custom = CurrentGameUI();
     }
     //---------------------------------------
     switch (Phase())
     {
     case GAME_PHASE_INPROGRESS:
     {
-        if (!IsGameTypeSingle()) m_WeaponUsageStatistic->Update();
+        if (!IsGameTypeSingle())
+            m_WeaponUsageStatistic->Update();
     }
     break;
     default: {
@@ -334,14 +352,10 @@ void game_cl_GameState::sv_GameEventGen(NET_Packet& P)
     P.w_begin(M_EVENT);
     P.w_u32(Level().timeServer());
     P.w_u16(u16(GE_GAME_EVENT & 0xffff));
-    P.w_u16(0);  // dest==0
+    P.w_u16(0); // dest==0
 }
 
-void game_cl_GameState::sv_EventSend(NET_Packet& P)
-{
-    Level().Send(P, net_flags(TRUE, TRUE));
-}
-
+void game_cl_GameState::sv_EventSend(NET_Packet& P) { Level().Send(P, net_flags(TRUE, TRUE)); }
 bool game_cl_GameState::OnKeyboardPress(int dik)
 {
     if (!local_player || local_player->IsSkip())
@@ -366,11 +380,7 @@ void game_cl_GameState::u_EventGen(NET_Packet& P, u16 type, u16 dest)
     P.w_u16(dest);
 }
 
-void game_cl_GameState::u_EventSend(NET_Packet& P)
-{
-    Level().Send(P, net_flags(TRUE, TRUE));
-}
-
+void game_cl_GameState::u_EventSend(NET_Packet& P) { Level().Send(P, net_flags(TRUE, TRUE)); }
 void game_cl_GameState::OnSwitchPhase(u32 old_phase, u32 new_phase)
 {
     switch (old_phase)
@@ -409,13 +419,11 @@ void game_cl_GameState::set_type_name(LPCSTR s)
 {
     EGameIDs gid = ParseStringToGameType(s);
     m_game_type_name = GameTypeToString(gid, false);
-    if (OnClient()) {
+    if (OnClient())
+    {
         xr_strcpy(g_pGamePersistent->m_game_params.m_game_type, m_game_type_name.c_str());
         g_pGamePersistent->OnGameStart();
     }
 };
 
-void game_cl_GameState::OnConnected()
-{
-    m_game_ui_custom = CurrentGameUI();
-}
+void game_cl_GameState::OnConnected() { m_game_ui_custom = CurrentGameUI(); }

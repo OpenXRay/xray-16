@@ -21,7 +21,8 @@ namespace memory_monitor
 LPCSTR inline file_name()
 {
     static string_path file = " ";
-    if (file[0] == ' ') {
+    if (file[0] == ' ')
+    {
         _mkdir(output_folder);
 
         __time64_t long_time;
@@ -39,7 +40,8 @@ STATIC inline FILE* file()
 {
     static FILE* m_file = 0;
     static char buffer[buffer_size];
-    if (!m_file) {
+    if (!m_file)
+    {
         m_file = fopen(file_name(), "wb");
         VERIFY(m_file);
         setvbuf(m_file, buffer, _IOFBF, buffer_size);
@@ -58,18 +60,17 @@ union _allocation_size
     u32 allocation_size;
 };
 
-STATIC bool use_monitor()
-{
-    return (!!strstr(GetCommandLine(), "-memory_monitor"));
-}
+STATIC bool use_monitor() { return (!!strstr(GetCommandLine(), "-memory_monitor")); }
 }
 
 void memory_monitor::flush_each_time(const bool& value)
 {
-    if (!use_monitor()) return;
+    if (!use_monitor())
+        return;
 
     detaching = value;
-    if (detaching) fflush(file());
+    if (detaching)
+        fflush(file());
 }
 
 namespace memory_monitor
@@ -92,9 +93,11 @@ void memory_monitor::monitor_alloc(
     //{
     // int d = 65+56;
     //}
-    if (!use_monitor()) return;
+    if (!use_monitor())
+        return;
     static bool initialized = false;
-    if (!initialized) {
+    if (!initialized)
+    {
         initialized = true;
         initialize();
     }
@@ -121,12 +124,14 @@ void memory_monitor::monitor_free(const void* deallocation_address)
 {
     counter++;
     counter_free++;
-    if (!use_monitor()) return;
+    if (!use_monitor())
+        return;
 
     // if (!detaching)
     EnterCriticalSection(&critical_section);
 
-    if (deallocation_address) {
+    if (deallocation_address)
+    {
         _allocation_size temp;
         temp.allocation_size = 0;
         fwrite(&temp, sizeof(temp), 1, file());
@@ -152,4 +157,4 @@ void memory_monitor::make_checkpoint(LPCSTR checkpoint_name)
     Msg("Done");
 }
 
-#endif  // USE_MEMORY_MONITOR
+#endif // USE_MEMORY_MONITOR

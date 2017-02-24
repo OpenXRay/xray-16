@@ -17,7 +17,7 @@ class CUIMessageBoxEx;
 namespace award_system
 {
 class reward_manager;
-}  // namespace award_system
+} // namespace award_system
 
 struct SND_Message
 {
@@ -43,7 +43,7 @@ struct SND_Message
 
 struct cl_TeamStruct
 {
-    shared_str caSection;  // имя секции комманды
+    shared_str caSection; // имя секции комманды
     //-----------------------------------
     ui_shader IndicatorShader;
     ui_shader InvincibleShader;
@@ -246,7 +246,6 @@ public:
 
     virtual u8 GetTeamCount() { return 0; };
     virtual s16 ModifyTeam(s16 Team) { return Team; };
-
     virtual bool Is_Spectator_TeamCamera_Allowed() { return m_bSpectator_TeamCamera && !Level().IsDemoPlay(); };
     virtual bool Is_Spectator_Camera_Allowed(CSpectator::EActorCameras Camera);
     virtual bool Is_Rewarding_Allowed() const = 0;
@@ -260,7 +259,6 @@ public:
     mp_anticheat::configs_verifyer cd_verifyer;
 
     award_system::reward_event_generator* get_reward_generator() const { return m_reward_generator; };
-
     void AddRewardTask(u32 const award_id);
 
     void AddSoundMessage(LPCSTR sound_name, u32 const sound_priority, u32 const soundID);
@@ -307,8 +305,8 @@ public:
         shared_str m_file_name;
         string256 m_diff;
         u32 m_detect_time;
-        static u32 const max_showing_time = 10000;  // 10 seconds
-    };                                              // struct detected_cheater_t
+        static u32 const max_showing_time = 10000; // 10 seconds
+    }; // struct detected_cheater_t
     void add_detected_cheater(shared_str const& file_name, string256 diff);
 
 private:
@@ -320,7 +318,6 @@ private:
 public:
     bool is_buy_menu_ready() const { return m_ready_to_open_buy_menu; };
     void set_buy_menu_not_ready() { m_ready_to_open_buy_menu = false; };
-
     void decompress_and_save_screenshot(LPCSTR file_name, u8* data, u32 data_size, u32 file_size);
     void decompress_and_process_config(LPCSTR file_name, u8* data, u32 data_size, u32 file_size);
 

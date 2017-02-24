@@ -142,7 +142,4 @@ IC void CScriptSoundAction::SetSoundType(const ESoundTypes sound_type)
     m_bStartedToPlay = false;
 }
 
-IC void CScriptSoundAction::initialize()
-{
-    m_bStartedToPlay = false;
-}
+IC void CScriptSoundAction::initialize() { m_bStartedToPlay = false; }

@@ -74,7 +74,8 @@ void CUIMpTradeWnd::Init(const shared_str& sectionName, const shared_str& sectio
     {
         CUIDragDropListEx* lst = new CUIDragDropListEx();
         m_list[idx] = lst;
-        if (idx != e_shop) {
+        if (idx != e_shop)
+        {
             AttachChild(lst);
             lst->SetAutoDelete(true);
         }
@@ -98,13 +99,13 @@ void CUIMpTradeWnd::Init(const shared_str& sectionName, const shared_str& sectio
     m_btn_reset = UIHelper::Create3tButton(xml_doc, "btn_reset", this);
     m_btn_sell = UIHelper::Create3tButton(xml_doc, "btn_sell", this);
 
-    m_btn_pistol_ammo = NULL;  // UIHelper::Create3tButton( xml_doc, "btn_pistol_ammo",		this );
+    m_btn_pistol_ammo = NULL; // UIHelper::Create3tButton( xml_doc, "btn_pistol_ammo",		this );
     m_btn_pistol_silencer = UIHelper::Create3tButton(xml_doc, "btn_pistol_silencer", this);
-    m_btn_rifle_ammo = NULL;  // UIHelper::Create3tButton( xml_doc, "btn_rifle_ammo",		this );
+    m_btn_rifle_ammo = NULL; // UIHelper::Create3tButton( xml_doc, "btn_rifle_ammo",		this );
     m_btn_rifle_silencer = UIHelper::Create3tButton(xml_doc, "btn_rifle_silencer", this);
     m_btn_rifle_scope = UIHelper::Create3tButton(xml_doc, "btn_rifle_scope", this);
     m_btn_rifle_glauncher = UIHelper::Create3tButton(xml_doc, "btn_rifle_glauncher", this);
-    m_btn_rifle_ammo2 = NULL;  // UIHelper::Create3tButton( xml_doc, "btn_rifle_ammo2",		this );
+    m_btn_rifle_ammo2 = NULL; // UIHelper::Create3tButton( xml_doc, "btn_rifle_ammo2",		this );
 
     Register(m_btn_ok);
     Register(m_btn_cancel);
@@ -158,11 +159,13 @@ void CUIMpTradeWnd::Init(const shared_str& sectionName, const shared_str& sectio
     AddCallback(m_btn_reset, BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUIMpTradeWnd::OnBtnResetClicked));
     AddCallback(m_btn_sell, BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUIMpTradeWnd::OnBtnSellClicked));
 
-    //	AddCallback							("btn_pistol_ammo",	BUTTON_CLICKED,		CUIWndCallback::void_function	(this,
+    //	AddCallback							("btn_pistol_ammo",	BUTTON_CLICKED,		CUIWndCallback::void_function
+    //(this,
     //&CUIMpTradeWnd::OnBtnPistolAmmoClicked		));
     AddCallback(m_btn_pistol_silencer, BUTTON_CLICKED,
         CUIWndCallback::void_function(this, &CUIMpTradeWnd::OnBtnPistolSilencerClicked));
-    //	AddCallback							("btn_rifle_ammo",	BUTTON_CLICKED,		CUIWndCallback::void_function	(this,
+    //	AddCallback							("btn_rifle_ammo",	BUTTON_CLICKED,		CUIWndCallback::void_function
+    //(this,
     //&CUIMpTradeWnd::OnBtnRifleAmmoClicked		));
     AddCallback(m_btn_rifle_silencer, BUTTON_CLICKED,
         CUIWndCallback::void_function(this, &CUIMpTradeWnd::OnBtnRifleSilencerClicked));
@@ -170,7 +173,8 @@ void CUIMpTradeWnd::Init(const shared_str& sectionName, const shared_str& sectio
         m_btn_rifle_scope, BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUIMpTradeWnd::OnBtnRifleScopeClicked));
     AddCallback(m_btn_rifle_glauncher, BUTTON_CLICKED,
         CUIWndCallback::void_function(this, &CUIMpTradeWnd::OnBtnRifleGLClicked));
-    //	AddCallback							("btn_rifle_ammo2",	BUTTON_CLICKED,		CUIWndCallback::void_function	(this,
+    //	AddCallback							("btn_rifle_ammo2",	BUTTON_CLICKED,		CUIWndCallback::void_function
+    //(this,
     //&CUIMpTradeWnd::OnBtnRifleAmmo2Clicked		));
 
     m_static_player_money = UIHelper::CreateTextWnd(xml_doc, "static_player_money", this);
@@ -207,7 +211,7 @@ void CUIMpTradeWnd::Init(const shared_str& sectionName, const shared_str& sectio
     m_item_mngr->Load(sectionPrice);
 #ifndef MASTER_GOLD
     m_item_mngr->Dump();
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
     SetRank(0);
     UpdateShop();
     SetCurrentItem(NULL);

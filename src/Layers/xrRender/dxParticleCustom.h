@@ -13,9 +13,8 @@ public:
 
 public:
     virtual ~dxParticleCustom() { ; }
-
     virtual IParticleCustom* dcast_ParticleCustom() { return this; }
 };
 
 //---------------------------------------------------------------------------
-#endif  // ParticleCustomH
+#endif // ParticleCustomH

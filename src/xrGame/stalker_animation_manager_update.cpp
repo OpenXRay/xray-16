@@ -16,36 +16,42 @@
 
 IC void CStalkerAnimationManager::play_delayed_callbacks()
 {
-    if (m_call_script_callback) {
+    if (m_call_script_callback)
+    {
         m_call_script_callback = false;
         object().callback(GameObject::eScriptAnimation)();
         return;
     }
 
-    if (m_call_global_callback) {
+    if (m_call_global_callback)
+    {
         m_call_global_callback = false;
-        if (m_global_callback) m_global_callback();
+        if (m_global_callback)
+            m_global_callback();
         return;
     }
 }
 
 IC bool CStalkerAnimationManager::script_callback() const
 {
-    if (script_animations().empty()) return (false);
+    if (script_animations().empty())
+        return (false);
 
     return (object().callback(GameObject::eScriptAnimation));
 }
 
 IC bool CStalkerAnimationManager::need_update() const
 {
-    if (script_callback()) return (true);
+    if (script_callback())
+        return (true);
 
     return (non_script_need_update());
 }
 
 IC void CStalkerAnimationManager::update_tracks()
 {
-    if (!need_update()) return;
+    if (!need_update())
+        return;
 
     m_skeleton_animated->UpdateTracks();
 }
@@ -60,11 +66,14 @@ IC void CStalkerAnimationManager::play_script_impl()
 
     const CStalkerAnimationScript& selected = assign_script_animation();
     script().animation(selected.animation());
-    if (selected.use_movement_controller()) {
+    if (selected.use_movement_controller())
+    {
         script().target_matrix(selected.transform(object()));
-        if (m_start_new_script_animation) {
+        if (m_start_new_script_animation)
+        {
             m_start_new_script_animation = false;
-            if (selected.has_transform() && object().animation_movement()) object().destroy_anim_mov_ctrl();
+            if (selected.has_transform() && object().animation_movement())
+                object().destroy_anim_mov_ctrl();
         }
     }
 
@@ -74,7 +83,7 @@ IC void CStalkerAnimationManager::play_script_impl()
     head().animation(assign_head_animation());
     head().play(m_skeleton_animated, head_play_callback, false, false);
 }
-#else   // USE_HEAD_BONE_PART_FAKE
+#else // USE_HEAD_BONE_PART_FAKE
 IC void CStalkerAnimationManager::play_script_impl()
 {
     clear_unsafe_callbacks();
@@ -88,11 +97,12 @@ IC void CStalkerAnimationManager::play_script_impl()
     script().play(m_skeleton_animated, script_play_callback, selected.use_movement_controller(),
         selected.local_animation(), false, m_script_bone_part_mask);
 }
-#endif  // USE_HEAD_BONE_PART_FAKE
+#endif // USE_HEAD_BONE_PART_FAKE
 
 bool CStalkerAnimationManager::play_script()
 {
-    if (script_animations().empty()) {
+    if (script_animations().empty())
+    {
         m_start_new_script_animation = false;
         script().reset();
         return (false);
@@ -113,12 +123,13 @@ IC void CStalkerAnimationManager::play_global_impl(const MotionID& animation, bo
     global().play(m_skeleton_animated, global_play_callback, animation_movement_controller, true, false,
         m_script_bone_part_mask, true);
 
-    if (m_global_modifier) m_global_modifier(global().blend());
+    if (m_global_modifier)
+        m_global_modifier(global().blend());
 
     head().animation(assign_head_animation());
     head().play(m_skeleton_animated, head_play_callback, false, false);
 }
-#else   // USE_HEAD_BONE_PART_FAKE
+#else // USE_HEAD_BONE_PART_FAKE
 IC void CStalkerAnimationManager::play_global_impl(const MotionID& animation, bool const& animation_movement_controller)
 {
     head().reset();
@@ -128,13 +139,14 @@ IC void CStalkerAnimationManager::play_global_impl(const MotionID& animation, bo
     global().animation(animation);
     global().play(m_skeleton_animated, global_play_callback, false, false, false);
 }
-#endif  // USE_HEAD_BONE_PART_FAKE
+#endif // USE_HEAD_BONE_PART_FAKE
 
 bool CStalkerAnimationManager::play_global()
 {
     bool animation_movement_controller = false;
     const MotionID& global_animation = assign_global_animation(animation_movement_controller);
-    if (!global_animation) {
+    if (!global_animation)
+    {
         clear_unsafe_callbacks();
         global().reset();
         return (false);
@@ -163,35 +175,42 @@ void CStalkerAnimationManager::play_legs()
     bool first_time = !legs().animation();
     bool result = legs().animation(assign_legs_animation());
 
-    if (!first_time && !result && legs().blend()) {
+    if (!first_time && !result && legs().blend())
+    {
         float amount = legs().blend()->blendAmount;
         m_previous_speed = (m_target_speed - m_previous_speed) * amount + m_previous_speed;
     }
 
     legs().play(m_skeleton_animated, legs_play_callback, false, false, !fis_zero(m_target_speed));
 
-    if (result && legs().blend()) {
+    if (result && legs().blend())
+    {
         float amount = legs().blend()->blendAmount;
         speed = (m_target_speed - m_previous_speed) * amount + m_previous_speed;
     }
 
-    if (fis_zero(speed)) return;
+    if (fis_zero(speed))
+        return;
 
-    if (!legs().blend()) return;
+    if (!legs().blend())
+        return;
 
     object().movement().setup_speed_from_animation(speed);
 }
 
 void CStalkerAnimationManager::update_impl()
 {
-    if (!object().g_Alive()) return;
+    if (!object().g_Alive())
+        return;
 
     update_tracks();
     play_delayed_callbacks();
 
-    if (play_script()) return;
+    if (play_script())
+        return;
 
-    if (play_global()) return;
+    if (play_global())
+        return;
 
     play_head();
     play_torso();

@@ -29,7 +29,6 @@ public:
     const Fvector& get_corpse_position() { return position; }
     u32 get_corpse_vertex() { return vertex; }
     TTime get_corpse_time_last_seen() { return time_last_seen; }
-
     void reinit();
     void remove_links(IGameObject* O);
 };

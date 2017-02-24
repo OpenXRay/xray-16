@@ -60,7 +60,8 @@ public:
 
 IC void get_intervals(u32 max_threads, u32 num_items, u32& threads, u32& stride, u32& rest)
 {
-    if (max_threads <= num_items) {
+    if (max_threads <= num_items)
+    {
         threads = max_threads;
         stride = num_items / max_threads;
         rest = num_items % max_threads;

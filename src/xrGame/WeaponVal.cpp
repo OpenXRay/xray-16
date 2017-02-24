@@ -2,14 +2,8 @@
 #include "weaponval.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-CWeaponVal::CWeaponVal(void) : CWeaponMagazined(SOUND_TYPE_WEAPON_SUBMACHINEGUN)
-{
-}
-
-CWeaponVal::~CWeaponVal(void)
-{
-}
-
+CWeaponVal::CWeaponVal(void) : CWeaponMagazined(SOUND_TYPE_WEAPON_SUBMACHINEGUN) {}
+CWeaponVal::~CWeaponVal(void) {}
 using namespace luabind;
 
 SCRIPT_EXPORT(CWeaponVal, (CGameObject),

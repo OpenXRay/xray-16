@@ -22,8 +22,10 @@ CSector* CPortalUtils::GetSelectedSector()
 {
     ObjectList lst;
     Scene->GetQueryObjects(lst, OBJCLASS_SECTOR, 1, 1, 0);
-    if (lst.size() == 0) return 0;
-    if (lst.size() > 1) {
+    if (lst.size() == 0)
+        return 0;
+    if (lst.size() > 1)
+    {
         ELog.DlgMsg(mtError, "Please select only one sector.");
         return 0;
     }
@@ -41,7 +43,8 @@ void CPortalUtils::RemoveSectorPortal(CSector* S)
     for (; _I != _E; _I++)
     {
         CPortal* P = (CPortal*)(*_I);
-        if ((P->m_SectorFront == S) || (P->m_SectorBack == S)) xr_delete(*_I);
+        if ((P->m_SectorFront == S) || (P->m_SectorBack == S))
+            xr_delete(*_I);
     }
     _I = remove(lst.begin(), lst.end(), (CCustomObject*)0);
     lst.erase(_I, lst.end());
@@ -50,11 +53,13 @@ void CPortalUtils::RemoveSectorPortal(CSector* S)
 int CPortalUtils::CalculateSelectedPortals()
 {
     int iPCount = 0;
-    if (Validate(false)) {
+    if (Validate(false))
+    {
         // get selected sectors
         ObjectList s_lst;
         int s_cnt = Scene->GetQueryObjects(s_lst, OBJCLASS_SECTOR, 1, 1, -1);
-        if (s_cnt < 2) {
+        if (s_cnt < 2)
+        {
             ELog.DlgMsg(mtError, "Select at least 2 sectors.");
             return 0;
         }
@@ -98,12 +103,14 @@ void CPortalUtils::RemoveAllPortals()
 bool CPortalUtils::CreateDefaultSector()
 {
     Fbox box;
-    if (Scene->GetBox(box, OBJCLASS_SCENEOBJECT)) {
+    if (Scene->GetBox(box, OBJCLASS_SCENEOBJECT))
+    {
         CSector* sector_def = new CSector((LPVOID)0, DEFAULT_SECTOR_NAME);
         sector_def->sector_color.set(1, 0, 0, 0);
         sector_def->m_bDefault = true;
         sector_def->CaptureAllUnusedMeshes();
-        if (!sector_def->IsEmpty()) {
+        if (!sector_def->IsEmpty())
+        {
             Scene->AppendObject(sector_def, true);
             return true;
         }
@@ -118,7 +125,8 @@ bool CPortalUtils::CreateDefaultSector()
 bool CPortalUtils::RemoveDefaultSector()
 {
     CCustomObject* O = Scene->FindObjectByName(DEFAULT_SECTOR_NAME, OBJCLASS_SECTOR);
-    if (O) {
+    if (O)
+    {
         Scene->RemoveObject(O, false, true);
         xr_delete(O);
         Scene->UndoSave();
@@ -168,7 +176,8 @@ CSector* CPortalUtils::FindSector(CSceneObject* o, CEditableMesh* m)
     ObjectIt _F = Scene->FirstObj(OBJCLASS_SECTOR);
     ObjectIt _E = Scene->LastObj(OBJCLASS_SECTOR);
     for (; _F != _E; _F++)
-        if (((CSector*)(*_F))->Contains(o, m)) return (CSector*)(*_F);
+        if (((CSector*)(*_F))->Contains(o, m))
+            return (CSector*)(*_F);
     return 0;
 }
 
@@ -176,14 +185,17 @@ bool CPortalUtils::Validate(bool bMsg)
 {
     Fbox box;
     bool bResult = false;
-    if (Scene->GetBox(box, OBJCLASS_SCENEOBJECT)) {
+    if (Scene->GetBox(box, OBJCLASS_SCENEOBJECT))
+    {
         bResult = true;
         CSector* sector_def = new CSector((LPVOID)0, DEFAULT_SECTOR_NAME);
         sector_def->CaptureAllUnusedMeshes();
         int f_cnt;
         sector_def->GetCounts(0, 0, &f_cnt);
-        if (f_cnt != 0) {
-            if (bMsg) {
+        if (f_cnt != 0)
+        {
+            if (bMsg)
+            {
                 ELog.DlgMsg(mtError, "*ERROR: Scene has '%d' non associated face!", f_cnt);
                 for (SItemIt it = sector_def->sector_items.begin(); it != sector_def->sector_items.end(); it++)
                     Msg("! - scene object: '%s' [O:'%s', M:'%s']", it->object->Name, it->object->RefName(),
@@ -196,11 +208,13 @@ bool CPortalUtils::Validate(bool bMsg)
         // verify sectors
         ObjectList& s_lst = Scene->ListObj(OBJCLASS_SECTOR);
         for (ObjectIt _F = s_lst.begin(); _F != s_lst.end(); _F++)
-            if (!((CSector*)(*_F))->Validate(bMsg)) bResult = false;
+            if (!((CSector*)(*_F))->Validate(bMsg))
+                bResult = false;
     }
     else
     {
-        if (bMsg) ELog.DlgMsg(mtInformation, "Validation failed! Can't compute bbox.");
+        if (bMsg)
+            ELog.DlgMsg(mtInformation, "Validation failed! Can't compute bbox.");
     }
     return bResult;
 }
@@ -234,13 +248,16 @@ class sCollector
         u32 dummy;
 
         sEdge() { used = false; }
-
         static bool c_less(const sEdge& E1, const sEdge& E2)
         {
-            if (E1.s[0] < E2.s[0]) return true;
-            if (E1.s[1] < E2.s[1]) return true;
-            if (E1.v[0] < E2.v[0]) return true;
-            if (E1.v[1] < E2.v[1]) return true;
+            if (E1.s[0] < E2.s[0])
+                return true;
+            if (E1.s[1] < E2.s[1])
+                return true;
+            if (E1.v[0] < E2.v[0])
+                return true;
+            if (E1.v[1] < E2.v[1])
+                return true;
             return false;
         }
 
@@ -263,7 +280,7 @@ class sCollector
     DEFINE_VECTOR(sEdge, sEdgeVec, sEdgeIt);
     DEFINE_VECTOR(sPortal, sPortalVec, sPortalIt);
 
-  public:
+public:
     sVertVec verts;
     sFaceVec faces;
     sEdgeVec edges;
@@ -292,13 +309,15 @@ class sCollector
             for (; it != it_e; ++it)
             {
                 //              if(verts[*it].similar(V) )
-                if ((*(verts_begin + *it)).similar(V)) {
+                if ((*(verts_begin + *it)).similar(V))
+                {
                     P = *it;
                     break;
                 }
             }
         }
-        if (0xffffffff == P) {
+        if (0xffffffff == P)
+        {
             P = verts.size();
             sVert sV;
             sV.set(V);
@@ -313,19 +332,26 @@ class sCollector
 
             R_ASSERT(ixE <= clpMX && iyE <= clpMY && izE <= clpMZ);
 
-            if (ixE != ix) VM[ixE][iy][iz].push_back(P);
+            if (ixE != ix)
+                VM[ixE][iy][iz].push_back(P);
 
-            if (iyE != iy) VM[ix][iyE][iz].push_back(P);
+            if (iyE != iy)
+                VM[ix][iyE][iz].push_back(P);
 
-            if (izE != iz) VM[ix][iy][izE].push_back(P);
+            if (izE != iz)
+                VM[ix][iy][izE].push_back(P);
 
-            if ((ixE != ix) && (iyE != iy)) VM[ixE][iyE][iz].push_back(P);
+            if ((ixE != ix) && (iyE != iy))
+                VM[ixE][iyE][iz].push_back(P);
 
-            if ((ixE != ix) && (izE != iz)) VM[ixE][iy][izE].push_back(P);
+            if ((ixE != ix) && (izE != iz))
+                VM[ixE][iy][izE].push_back(P);
 
-            if ((iyE != iy) && (izE != iz)) VM[ix][iyE][izE].push_back(P);
+            if ((iyE != iy) && (izE != iz))
+                VM[ix][iyE][izE].push_back(P);
 
-            if ((ixE != ix) && (iyE != iy) && (izE != iz)) VM[ixE][iyE][izE].push_back(P);
+            if ((ixE != ix) && (iyE != iy) && (izE != iz))
+                VM[ixE][iyE][izE].push_back(P);
         }
         return P;
     }
@@ -340,7 +366,7 @@ class sCollector
         VMeps.z = (VMeps.z < EPS_L) ? VMeps.z : EPS_L;
     }
 
-    void add_face(Fvector& v0,  // vertices
+    void add_face(Fvector& v0, // vertices
         Fvector& v1, Fvector& v2, CSector* sector)
     {
         sFace T;
@@ -375,12 +401,15 @@ class sCollector
             // 1 pair (0-1)
             for (a_it = v0.adj.begin(); a_it != v0.adj.end(); a_it++)
             {
-                if (*a_it == i) continue;
+                if (*a_it == i)
+                    continue;
 
                 sFace& T = faces[*a_it];
-                if (T.sector == F.sector) continue;
+                if (T.sector == F.sector)
+                    continue;
 
-                if (!T.hasVertex(F.v[1])) continue;
+                if (!T.hasVertex(F.v[1]))
+                    continue;
 
                 sEdge E;
                 E.v[0] = F.v[0];
@@ -392,12 +421,15 @@ class sCollector
             // 2 pair (1-2)
             for (a_it = v1.adj.begin(); a_it != v1.adj.end(); a_it++)
             {
-                if (*a_it == i) continue;
+                if (*a_it == i)
+                    continue;
 
                 sFace& T = faces[*a_it];
-                if (T.sector == F.sector) continue;
+                if (T.sector == F.sector)
+                    continue;
 
-                if (!T.hasVertex(F.v[2])) continue;
+                if (!T.hasVertex(F.v[2]))
+                    continue;
 
                 sEdge E;
                 E.v[0] = F.v[1];
@@ -409,12 +441,15 @@ class sCollector
             // 3 pair (2-0)
             for (a_it = v2.adj.begin(); a_it != v2.adj.end(); a_it++)
             {
-                if (*a_it == i) continue;
+                if (*a_it == i)
+                    continue;
 
                 sFace& T = faces[*a_it];
-                if (T.sector == F.sector) continue;
+                if (T.sector == F.sector)
+                    continue;
 
-                if (!T.hasVertex(F.v[0])) continue;
+                if (!T.hasVertex(F.v[0]))
+                    continue;
 
                 sEdge E;
                 E.v[0] = F.v[2];
@@ -442,8 +477,10 @@ class sCollector
         for (u32 i = 0; i < edges.size(); i++)
         {
             sEdge& E = edges[i];
-            if (E.v[0] > E.v[1]) std::swap(E.v[0], E.v[1]);
-            if (E.s[0] > E.s[1]) std::swap(E.s[0], E.s[1]);
+            if (E.v[0] > E.v[1])
+                std::swap(E.v[0], E.v[1]);
+            if (E.s[0] > E.s[1])
+                std::swap(E.s[0], E.s[1]);
         }
 
         // remove equal
@@ -457,7 +494,8 @@ class sCollector
     {
         for (u32 e_it = 0; e_it < edges.size(); e_it++)
         {
-            if (edges[e_it].used) continue;
+            if (edges[e_it].used)
+                continue;
 
             sPortal current;
             current.e.push_back(e_it);
@@ -475,38 +513,46 @@ class sCollector
                 for (u32 i = 0; i < edges.size(); i++)
                 {
                     sEdge& E = edges[i];
-                    if (E.used) continue;
-                    if (E.s[0] != current.s[0]) continue;
-                    if (E.s[1] != current.s[1]) continue;
+                    if (E.used)
+                        continue;
+                    if (E.s[0] != current.s[0])
+                        continue;
+                    if (E.s[1] != current.s[1])
+                        continue;
 
-                    if (vLast == E.v[0]) {
+                    if (vLast == E.v[0])
+                    {
                         E.used = true;
                         current.e.push_back(i);
                         bFound = true;
                         break;
                     }
-                    if (vLast == E.v[1]) {
+                    if (vLast == E.v[1])
+                    {
                         E.used = true;
                         std::swap(E.v[0], E.v[1]);
                         current.e.push_back(i);
                         bFound = true;
                         break;
                     }
-                    if (vFirst == E.v[0]) {
+                    if (vFirst == E.v[0])
+                    {
                         E.used = true;
                         std::swap(E.v[0], E.v[1]);
                         current.e.push_front(i);
                         bFound = true;
                         break;
                     }
-                    if (vFirst == E.v[1]) {
+                    if (vFirst == E.v[1])
+                    {
                         E.used = true;
                         current.e.push_front(i);
                         bFound = true;
                         break;
                     }
                 }
-                if (!bFound) break;
+                if (!bFound)
+                    break;
             }
             portals.push_back(current);
         }
@@ -519,7 +565,8 @@ class sCollector
         int curr = 0;
         for (sPortalIt p_it = portals.begin(); p_it != portals.end(); ++p_it, ++curr)
         {
-            if (p_it->e.size() > 1) {
+            if (p_it->e.size() > 1)
+            {
                 Msg("portal %d of %d", curr, ps);
                 // build vert-list
                 xr_vector<int> vlist;
@@ -543,7 +590,8 @@ class sCollector
                 }
                 _O->SetSectors(p_it->s[0], p_it->s[1]);
                 _O->Update();
-                if (_O->Valid()) {
+                if (_O->Valid())
+                {
                     Scene->AppendObject(_O, false);
                 }
                 else
@@ -585,7 +633,8 @@ int CPortalUtils::CalculateSelectedPortals(ObjectList& sectors)
         CSector* S = (CSector*)(*s_it);
         for (SItemIt s_it = S->sector_items.begin(); s_it != S->sector_items.end(); s_it++)
         {
-            if (s_it->object->IsMUStatic()) continue;
+            if (s_it->object->IsMUStatic())
+                continue;
             s_it->GetTransform(T);
             Fvector* m_verts = s_it->mesh->m_Vertices;
             for (u32 f_id = 0; f_id < s_it->mesh->GetFCount(); f_id++)
@@ -627,7 +676,8 @@ int CPortalUtils::CalculateSelectedPortals(ObjectList& sectors)
 int CPortalUtils::CalculateAllPortals()
 {
     int iPCount = 0;
-    if (Validate(false)) {
+    if (Validate(false))
+    {
         UI->SetStatus("Prepare...");
         RemoveAllPortals();
         ObjectList& s_lst = Scene->ListObj(OBJCLASS_SECTOR);
@@ -645,7 +695,8 @@ int CPortalUtils::CalculateAllPortals()
 int CPortalUtils::CalculatePortals(CSector* SF, CSector* SB)
 {
     int iPCount = 0;
-    if (Validate(false)) {
+    if (Validate(false))
+    {
         UI->SetStatus("Prepare...");
         RemoveAllPortals();
         // transfer from list to vector

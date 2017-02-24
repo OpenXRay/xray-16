@@ -39,11 +39,7 @@
 #ifndef _TRIGH
 #define _TRIGH
 
-inline float iszero(float x)
-{
-    return x * x < 1e-6;
-}
-
+inline float iszero(float x) { return x * x < 1e-6; }
 #if 0
 //
 // Normalize an angle to to range -Pi..Pi

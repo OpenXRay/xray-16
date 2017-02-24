@@ -17,7 +17,8 @@ namespace lc_net
 static void AddImpImplicitNetTask(u32 from, u32 to)
 {
     // tmanager.start		(new ImplicitThread (thID,&defl,thID*stride,thID*stride+stride));
-    if (from == to) return;
+    if (from == to)
+        return;
     R_ASSERT(from < to);
     ImplicitExecute exec(from, to);
 
@@ -50,7 +51,8 @@ void RunImplicitnet(ImplicitDeflector& defl, const xr_vector<u32>& exept)
     AddImpImplicitNetTask(num_tasks * stride, defl.Height());
 
     exec_pool* pool = get_task_manager().run("Net Implicit Lighting");
-    if (pool) pool->wait();
+    if (pool)
+        pool->wait();
 
     // get_task_manager().wait_all();
     globals().get<gl_implicit_cl_data>().cleanup();

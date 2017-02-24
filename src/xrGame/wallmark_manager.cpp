@@ -8,25 +8,17 @@
 #include "phdebug.h"
 #endif
 
-CWalmarkManager::CWalmarkManager()
-{
-}
-CWalmarkManager::~CWalmarkManager()
-{
-    Clear();
-}
-void CWalmarkManager::Clear()
-{
-    m_wallmarks->clear();
-}
-
+CWalmarkManager::CWalmarkManager() {}
+CWalmarkManager::~CWalmarkManager() { Clear(); }
+void CWalmarkManager::Clear() { m_wallmarks->clear(); }
 void CWalmarkManager::AddWallmark(const Fvector& dir, const Fvector& start_pos, float range, float wallmark_size,
     IWallMarkArray& wallmarks_vector, int t)
 {
-    CDB::TRI* pTri = Level().ObjectSpace.GetStaticTris() + t;  // result.element;
+    CDB::TRI* pTri = Level().ObjectSpace.GetStaticTris() + t; // result.element;
     SGameMtl* pMaterial = GMLib.GetMaterialByIdx(pTri->material);
 
-    if (pMaterial->Flags.is(SGameMtl::flBloodmark)) {
+    if (pMaterial->Flags.is(SGameMtl::flBloodmark))
+    {
         //вычислить нормаль к пораженной поверхности
         Fvector* pVerts = Level().ObjectSpace.GetStaticVerts();
 
@@ -35,7 +27,8 @@ void CWalmarkManager::AddWallmark(const Fvector& dir, const Fvector& start_pos, 
         end_point.set(0, 0, 0);
         end_point.mad(start_pos, dir, range);
 
-        if (!wallmarks_vector.empty()) {
+        if (!wallmarks_vector.empty())
+        {
             GlobalEnv.Render->add_StaticWallmark(&wallmarks_vector, end_point, wallmark_size, pTri, pVerts);
         }
 
@@ -126,7 +119,8 @@ void CWalmarkManager::StartWorkflow()
     {
         //.		DBG_DrawTri(Res, color_xrgb(0,255,0) );
 
-        if (wm_count >= max_wallmarks_count) break;
+        if (wm_count >= max_wallmarks_count)
+            break;
 
         //.		Triangle					tri;
         Fvector end_point;
@@ -156,18 +150,22 @@ void CWalmarkManager::StartWorkflow()
         */
         float test = dist - EPS_L;
 
-        if (test > 0.f) {
-            if (Level().ObjectSpace.RayTest(m_pos, pdir, test, collide::rqtStatic, NULL, m_owner)) {
+        if (test > 0.f)
+        {
+            if (Level().ObjectSpace.RayTest(m_pos, pdir, test, collide::rqtStatic, NULL, m_owner))
+            {
                 ++_ray_test;
                 continue;
             }
         }
-        if (fis_zero(pfSParam) || fis_zero(pfTParam) || fsimilar(pfSParam, 1.0f) || fsimilar(pfTParam, 1.0f)) {
+        if (fis_zero(pfSParam) || fis_zero(pfTParam) || fsimilar(pfSParam, 1.0f) || fsimilar(pfTParam, 1.0f))
+        {
             ++_tri_not_plane;
             continue;
         }
 
-        if (dist <= m_trace_dist) {
+        if (dist <= m_trace_dist)
+        {
             GlobalEnv.Render->add_StaticWallmark(&*m_wallmarks, end_point, m_wallmark_size, _t, V_array);
             ++wm_count;
         }
@@ -201,12 +199,12 @@ float Distance(
 {
     //.    Fvector kDiff = rkTri.Origin() - rkPoint;
     Fvector kDiff;
-    kDiff.sub(rkTri[0], rkPoint);  //
+    kDiff.sub(rkTri[0], rkPoint); //
 
     Fvector Edge0;
-    Edge0.sub(rkTri[1], rkTri[0]);  //
+    Edge0.sub(rkTri[1], rkTri[0]); //
     Fvector Edge1;
-    Edge1.sub(rkTri[2], rkTri[0]);  //
+    Edge1.sub(rkTri[2], rkTri[0]); //
 
     //.    float fA00 = rkTri.Edge0().SquaredLength();
     float fA00 = Edge0.square_magnitude();
@@ -232,13 +230,17 @@ float Distance(
     float fT = fA01 * fB0 - fA00 * fB1;
     float fSqrDist;
 
-    if (fS + fT <= fDet) {
-        if (fS < 0.0f) {
-            if (fT < 0.0f)  // region 4
+    if (fS + fT <= fDet)
+    {
+        if (fS < 0.0f)
+        {
+            if (fT < 0.0f) // region 4
             {
-                if (fB0 < 0.0f) {
+                if (fB0 < 0.0f)
+                {
                     fT = 0.0f;
-                    if (-fB0 >= fA00) {
+                    if (-fB0 >= fA00)
+                    {
                         fS = 1.0f;
                         fSqrDist = fA00 + 2.0f * fB0 + fC;
                     }
@@ -251,7 +253,8 @@ float Distance(
                 else
                 {
                     fS = 0.0f;
-                    if (fB1 >= 0.0f) {
+                    if (fB1 >= 0.0f)
+                    {
                         fT = 0.0f;
                         fSqrDist = fC;
                     }
@@ -267,10 +270,11 @@ float Distance(
                     }
                 }
             }
-            else  // region 3
+            else // region 3
             {
                 fS = 0.0f;
-                if (fB1 >= 0.0f) {
+                if (fB1 >= 0.0f)
+                {
                     fT = 0.0f;
                     fSqrDist = fC;
                 }
@@ -286,10 +290,11 @@ float Distance(
                 }
             }
         }
-        else if (fT < 0.0f)  // region 5
+        else if (fT < 0.0f) // region 5
         {
             fT = 0.0f;
-            if (fB0 >= 0.0f) {
+            if (fB0 >= 0.0f)
+            {
                 fS = 0.0f;
                 fSqrDist = fC;
             }
@@ -304,7 +309,7 @@ float Distance(
                 fSqrDist = fB0 * fS + fC;
             }
         }
-        else  // region 0
+        else // region 0
         {
             // minimum at interior point
             float fInvDet = 1.0f / fDet;
@@ -317,14 +322,16 @@ float Distance(
     {
         float fTmp0, fTmp1, fNumer, fDenom;
 
-        if (fS < 0.0f)  // region 2
+        if (fS < 0.0f) // region 2
         {
             fTmp0 = fA01 + fB0;
             fTmp1 = fA11 + fB1;
-            if (fTmp1 > fTmp0) {
+            if (fTmp1 > fTmp0)
+            {
                 fNumer = fTmp1 - fTmp0;
                 fDenom = fA00 - 2.0f * fA01 + fA11;
-                if (fNumer >= fDenom) {
+                if (fNumer >= fDenom)
+                {
                     fS = 1.0f;
                     fT = 0.0f;
                     fSqrDist = fA00 + 2.0f * fB0 + fC;
@@ -340,7 +347,8 @@ float Distance(
             else
             {
                 fS = 0.0f;
-                if (fTmp1 <= 0.0f) {
+                if (fTmp1 <= 0.0f)
+                {
                     fT = 1.0f;
                     fSqrDist = fA11 + 2.0f * fB1 + fC;
                 }
@@ -356,14 +364,16 @@ float Distance(
                 }
             }
         }
-        else if (fT < 0.0f)  // region 6
+        else if (fT < 0.0f) // region 6
         {
             fTmp0 = fA01 + fB1;
             fTmp1 = fA00 + fB0;
-            if (fTmp1 > fTmp0) {
+            if (fTmp1 > fTmp0)
+            {
                 fNumer = fTmp1 - fTmp0;
                 fDenom = fA00 - 2.0f * fA01 + fA11;
-                if (fNumer >= fDenom) {
+                if (fNumer >= fDenom)
+                {
                     fT = 1.0f;
                     fS = 0.0f;
                     fSqrDist = fA11 + 2.0f * fB1 + fC;
@@ -379,7 +389,8 @@ float Distance(
             else
             {
                 fT = 0.0f;
-                if (fTmp1 <= 0.0f) {
+                if (fTmp1 <= 0.0f)
+                {
                     fS = 1.0f;
                     fSqrDist = fA00 + 2.0f * fB0 + fC;
                 }
@@ -395,10 +406,11 @@ float Distance(
                 }
             }
         }
-        else  // region 1
+        else // region 1
         {
             fNumer = fA11 + fB1 - fA01 - fB0;
-            if (fNumer <= 0.0f) {
+            if (fNumer <= 0.0f)
+            {
                 fS = 0.0f;
                 fT = 1.0f;
                 fSqrDist = fA11 + 2.0f * fB1 + fC;
@@ -406,7 +418,8 @@ float Distance(
             else
             {
                 fDenom = fA00 - 2.0f * fA01 + fA11;
-                if (fNumer >= fDenom) {
+                if (fNumer >= fDenom)
+                {
                     fS = 1.0f;
                     fT = 0.0f;
                     fSqrDist = fA00 + 2.0f * fB0 + fC;

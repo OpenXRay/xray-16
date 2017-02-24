@@ -17,11 +17,13 @@ __fastcall TUI_ControlSpawnAdd::TUI_ControlSpawnAdd(int st, int act, ESceneToolB
 bool __fastcall TUI_ControlSpawnAdd::AppendCallback(SBeforeAppendCallbackParams* p)
 {
     LPCSTR ref_name = ((TfraSpawn*)parent_tool->pFrame)->Current();
-    if (!ref_name) {
+    if (!ref_name)
+    {
         ELog.DlgMsg(mtInformation, "Nothing selected.");
         return false;
     }
-    if (Scene->LevelPrefix().c_str()) {
+    if (Scene->LevelPrefix().c_str())
+    {
         p->name_prefix = Scene->LevelPrefix().c_str();
         p->name_prefix += "_";
     }
@@ -33,10 +35,12 @@ bool __fastcall TUI_ControlSpawnAdd::AppendCallback(SBeforeAppendCallbackParams*
 bool __fastcall TUI_ControlSpawnAdd::Start(TShiftState Shift)
 {
     TfraSpawn* F = (TfraSpawn*)parent_tool->pFrame;
-    if (F->ebAttachObject->Down) {
+    if (F->ebAttachObject->Down)
+    {
         CCustomObject* from =
             Scene->RayPickObject(UI->ZFar(), UI->m_CurrentRStart, UI->m_CurrentRDir, OBJCLASS_DUMMY, 0, 0);
-        if (from->ClassID != OBJCLASS_SPAWNPOINT) {
+        if (from->ClassID != OBJCLASS_SPAWNPOINT)
+        {
             ObjectList lst;
             int cnt = Scene->GetQueryObjects(lst, OBJCLASS_SPAWNPOINT, 1, 1, 0);
             if (1 != cnt)
@@ -45,8 +49,10 @@ bool __fastcall TUI_ControlSpawnAdd::Start(TShiftState Shift)
             {
                 CSpawnPoint* base = dynamic_cast<CSpawnPoint*>(lst.back());
                 R_ASSERT(base);
-                if (base->AttachObject(from)) {
-                    if (!Shift.Contains(ssAlt)) {
+                if (base->AttachObject(from))
+                {
+                    if (!Shift.Contains(ssAlt))
+                    {
                         F->ebAttachObject->Down = false;
                         ResetActionToSelect();
                     }

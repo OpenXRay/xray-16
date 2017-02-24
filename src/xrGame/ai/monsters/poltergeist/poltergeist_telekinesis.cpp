@@ -4,14 +4,8 @@
 #include "Level.h"
 #include "Actor.h"
 #include "xrPhysics/icolisiondamageinfo.h"
-CPolterTele::CPolterTele(CPoltergeist* polter) : inherited(polter), m_pmt_object_collision_damage(0.5f)
-{
-}
-
-CPolterTele::~CPolterTele()
-{
-}
-
+CPolterTele::CPolterTele(CPoltergeist* polter) : inherited(polter), m_pmt_object_collision_damage(0.5f) {}
+CPolterTele::~CPolterTele() {}
 void CPolterTele::load(LPCSTR section)
 {
     inherited::load(section);
@@ -39,11 +33,7 @@ void CPolterTele::load(LPCSTR section)
     m_time_next = 0;
 }
 
-void CPolterTele::update_frame()
-{
-    inherited::update_frame();
-}
-
+void CPolterTele::update_frame() { inherited::update_frame(); }
 void CPolterTele::update_schedule()
 {
     inherited::update_schedule();
@@ -51,25 +41,32 @@ void CPolterTele::update_schedule()
     Fvector const actor_pos = Actor()->Position();
     float const dist2actor = actor_pos.distance_to(m_object->Position());
 
-    if (dist2actor > m_pmt_distance) return;
+    if (dist2actor > m_pmt_distance)
+        return;
 
-    if (m_object->get_current_detection_level() < m_object->get_detection_success_level()) return;
+    if (m_object->get_current_detection_level() < m_object->get_detection_success_level())
+        return;
 
-    if (m_object->get_actor_ignore()) return;
+    if (m_object->get_actor_ignore())
+        return;
 
     switch (m_state)
     {
     case eStartRaiseObjects:
-        if (m_time + m_time_next < time()) {
-            if (!tele_raise_objects()) m_state = eRaisingObjects;
+        if (m_time + m_time_next < time())
+        {
+            if (!tele_raise_objects())
+                m_state = eRaisingObjects;
 
             m_time = time();
             m_time_next =
                 m_pmt_raise_time_to_wait_in_objects / 2 + Random.randI(m_pmt_raise_time_to_wait_in_objects / 2);
         }
 
-        if (m_state == eStartRaiseObjects) {
-            if (m_object->CTelekinesis::get_objects_count() >= m_pmt_object_count) {
+        if (m_state == eStartRaiseObjects)
+        {
+            if (m_object->CTelekinesis::get_objects_count() >= m_pmt_object_count)
+            {
                 m_state = eRaisingObjects;
                 m_time = time();
             }
@@ -77,26 +74,30 @@ void CPolterTele::update_schedule()
 
         break;
     case eRaisingObjects:
-        if (m_time + m_pmt_time_to_hold > time()) break;
+        if (m_time + m_pmt_time_to_hold > time())
+            break;
 
         m_time = time();
         m_time_next = 0;
         m_state = eFireObjects;
     case eFireObjects:
-        if (m_time + m_time_next < time()) {
+        if (m_time + m_time_next < time())
+        {
             tele_fire_objects();
 
             m_time = time();
             m_time_next = m_pmt_time_to_wait_in_objects / 2 + Random.randI(m_pmt_time_to_wait_in_objects / 2);
         }
 
-        if (m_object->CTelekinesis::get_objects_count() == 0) {
+        if (m_object->CTelekinesis::get_objects_count() == 0)
+        {
             m_state = eWait;
             m_time = time();
         }
         break;
     case eWait:
-        if (m_time + m_pmt_time_to_wait < time()) {
+        if (m_time + m_pmt_time_to_wait < time())
+        {
             m_time_next = 0;
             m_state = eStartRaiseObjects;
         }
@@ -164,13 +165,16 @@ bool CPolterTele::trace_object(IGameObject* obj, const Fvector& target)
     dir.sub(target, trace_from);
 
     range = dir.magnitude();
-    if (range < 0.0001f) return false;
+    if (range < 0.0001f)
+        return false;
 
     dir.normalize();
 
     collide::rq_result l_rq;
-    if (Level().ObjectSpace.RayPick(trace_from, dir, range, collide::rqtBoth, l_rq, obj)) {
-        if (l_rq.O == Actor()) return true;
+    if (Level().ObjectSpace.RayPick(trace_from, dir, range, collide::rqtBoth, l_rq, obj))
+    {
+        if (l_rq.O == Actor())
+            return true;
     }
 
     return false;
@@ -195,7 +199,8 @@ void CPolterTele::tele_find_objects(xr_vector<IGameObject*>& objects, const Fvec
         Fvector center;
         Actor()->Center(center);
 
-        if (trace_object(obj, center) || trace_object(obj, get_head_position(Actor()))) objects.push_back(obj);
+        if (trace_object(obj, center) || trace_object(obj, get_head_position(Actor())))
+            objects.push_back(obj);
     }
 }
 
@@ -239,10 +244,11 @@ bool CPolterTele::tele_raise_objects()
     //	bool	rotate = false;
 
     //	CTelekinesis::activate		(obj, m_pmt_tele_raise_speed, m_pmt_tele_object_height, m_pmt_tele_time_object_keep,
-    //rotate);
+    // rotate);
     //}
 
-    if (!tele_objects.empty()) {
+    if (!tele_objects.empty())
+    {
         CPhysicsShellHolder* obj = smart_cast<CPhysicsShellHolder*>(tele_objects[0]);
 
         // применить телекинез на объект
@@ -271,10 +277,11 @@ struct SCollisionHitCallback : public ICollisionHitCallback
     }
     void call(IPhysicsShellHolder* obj, float min_cs, float max_cs, float& cs, float& hl, ICollisionDamageInfo* di)
     {
-        if (cs > min_cs * 0.5f) hl = m_pmt_object_collision_damage;
+        if (cs > min_cs * 0.5f)
+            hl = m_pmt_object_collision_damage;
         VERIFY(m_object);
         di->SetInitiated();
-        m_object->set_collision_hit_callback(0);  // delete this!!
+        m_object->set_collision_hit_callback(0); // delete this!!
     }
 };
 
@@ -284,7 +291,8 @@ void CPolterTele::tele_fire_objects()
     {
         CTelekineticObject tele_object = m_object->CTelekinesis::get_object_by_index(i);
         // if (tele_object.get_state() != TS_Fire) {
-        if ((tele_object.get_state() == TS_Raise) || (tele_object.get_state() == TS_Keep)) {
+        if ((tele_object.get_state() == TS_Raise) || (tele_object.get_state() == TS_Keep))
+        {
             Fvector enemy_pos;
             enemy_pos = get_head_position(Actor());
             CPhysicsShellHolder* hobj = tele_object.get_object();

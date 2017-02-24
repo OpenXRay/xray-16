@@ -70,16 +70,13 @@ public:
     void xr_stdcall OnCDKey_Validation(int LocalID, int res, char* errormsg);
     void xr_stdcall OnCDKey_ReValidation(int LocalID, int hint, char* challenge);
     CGameSpy_QR2* QR2() { return &m_QR2; };
-
     CGameSpy_GCD_Server* GCD_Server() { return &m_GCDServer; }
-
     virtual bool HasPassword();
     virtual bool HasProtected();
 
     virtual void Assign_ServerType(string512& res);
     virtual void GetServerInfo(CServerInfo* si);
     bool IsPublicServer() const { return m_iReportToMasterServer != 0; };
-
 public:
     xrGameSpyServer();
     virtual ~xrGameSpyServer();
@@ -92,6 +89,6 @@ public:
     virtual IClient* client_Create();
 
     virtual u32 OnMessage(
-        NET_Packet& P, ClientID /*DPNID*/ sender);  // Non-Zero means broadcasting with "flags" as returned
+        NET_Packet& P, ClientID /*DPNID*/ sender); // Non-Zero means broadcasting with "flags" as returned
     virtual void OnError_Add(qr2_error_t error){};
 };

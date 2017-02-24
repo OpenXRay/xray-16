@@ -21,7 +21,7 @@ namespace upgrade
 class Upgrade;
 class Property;
 }
-}  // namespace upgrade, inventory
+} // namespace upgrade, inventory
 
 class CUIStatic;
 class CUIInventoryUpgradeWnd;
@@ -121,7 +121,6 @@ public:
     IC ButtonState get_button_state() const { return m_button_state; }
     void set_button_state(ButtonState state) { m_button_state = state; }
     IC Ivector2 const& get_scheme_index() const { return m_scheme_index; }
-
     Upgrade_type* get_upgrade();
     CUIInventoryUpgradeWnd* get_upgrade_window() { return m_parent_wnd; }
     void attach_point(CUIUpgradePoint* point);
@@ -145,4 +144,4 @@ public:
     virtual void OnFocusLost();
 };
 
-#endif  // UI_INVENTORY_UPGRADE_H_INCLUDED
+#endif // UI_INVENTORY_UPGRADE_H_INCLUDED

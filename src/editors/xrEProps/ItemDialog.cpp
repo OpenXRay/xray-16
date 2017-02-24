@@ -10,15 +10,13 @@ TfrmItemDialog* TfrmItemDialog::form = 0;
 int TfrmItemDialog::res = -1;
 
 //---------------------------------------------------------------------------
-__fastcall TfrmItemDialog::TfrmItemDialog(TComponent* Owner) : TForm(Owner)
-{
-    res = -1;
-}
+__fastcall TfrmItemDialog::TfrmItemDialog(TComponent* Owner) : TForm(Owner) { res = -1; }
 //---------------------------------------------------------------------------
 
 void __fastcall TfrmItemDialog::FormKeyDown(TObject* Sender, WORD& Key, TShiftState Shift)
 {
-    if (Key == VK_ESCAPE) ModalResult = -1;
+    if (Key == VK_ESCAPE)
+        ModalResult = -1;
 }
 
 //----------------------------------------------------
@@ -55,8 +53,5 @@ int __fastcall TfrmItemDialog::Run(LPCSTR caption, LPCSTR msg, LPCSTR buttons)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmItemDialog::FormClose(TObject* Sender, TCloseAction& Action)
-{
-    Action = caFree;
-}
+void __fastcall TfrmItemDialog::FormClose(TObject* Sender, TCloseAction& Action) { Action = caFree; }
 //---------------------------------------------------------------------------

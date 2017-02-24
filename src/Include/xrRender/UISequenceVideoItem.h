@@ -17,4 +17,4 @@ public:
     virtual void video_Stop() = 0;
 };
 
-#endif  //	UISequenceVideoItem_included
+#endif //	UISequenceVideoItem_included

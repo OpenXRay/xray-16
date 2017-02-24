@@ -13,7 +13,8 @@ void xrServer::Perform_transfer(
     u32 time = Device.dwTimeGlobal;
 
     // 1. Perform migration if need it
-    if (from->owner != to->owner) PerformMigration(what, from->owner, to->owner);
+    if (from->owner != to->owner)
+        PerformMigration(what, from->owner, to->owner);
     // Log						("B");
 
     // 2. Detach "FROM"

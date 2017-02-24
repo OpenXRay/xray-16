@@ -29,16 +29,14 @@ property_container::property_container(property_holder* holder, property_contain
     SetValue += gcnew PropertySpecEventHandler(this, &property_container::set_value_handler);
 }
 
-property_container::~property_container()
-{
-    this->!property_container();
-}
-
+property_container::~property_container() { this->!property_container(); }
 property_container::!property_container()
 {
-    if (!m_holder) return;
+    if (!m_holder)
+        return;
 
-    if (!g_ide) return;
+    if (!g_ide)
+        return;
 
     property_holder* holder = dynamic_cast<property_holder*>(m_holder);
     VERIFY(holder);
@@ -61,11 +59,13 @@ property_container_holder % property_container::container_holder()
 bool property_container::equal_category(String ^ new_category, String ^ old_category)
 {
     VERIFY(!new_category->Length || (new_category[0] != '\t'));
-    if (!old_category->Length || (old_category[0] != '\t')) return (new_category == old_category);
+    if (!old_category->Length || (old_category[0] != '\t'))
+        return (new_category == old_category);
 
     for (u32 i = 0, n = old_category->Length; i < n; ++i)
     {
-        if (old_category[i] == '\t') continue;
+        if (old_category[i] == '\t')
+            continue;
 
         return (new_category == old_category->Substring(i, n - i));
     }
@@ -73,7 +73,7 @@ bool property_container::equal_category(String ^ new_category, String ^ old_cate
     NODEFAULT;
 #ifdef DEBUG
     return (false);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 }
 
 String ^ property_container::update_categories(String ^ new_category)
@@ -82,7 +82,8 @@ String ^ property_container::update_categories(String ^ new_category)
         each(PropertySpec ^ i in m_ordered_properties)
         {
             String ^ category = i->Category;
-            if (!equal_category(new_category, category)) continue;
+            if (!equal_category(new_category, category))
+                continue;
 
             return (category);
         }
@@ -100,8 +101,10 @@ void property_container::try_update_name(PropertySpec ^ description, String ^ na
 
     String ^ description_name = description->Name;
     VERIFY(!!description_name->Length);
-    if (description_name[0] != '\t') {
-        if (name != description_name) return;
+    if (description_name[0] != '\t')
+    {
+        if (name != description_name)
+            return;
 
         description->Name = "\t" + description_name;
         return;
@@ -109,9 +112,11 @@ void property_container::try_update_name(PropertySpec ^ description, String ^ na
 
     for (u32 i = 0, n = description_name->Length; i < n; ++i)
     {
-        if (description_name[i] == '\t') continue;
+        if (description_name[i] == '\t')
+            continue;
 
-        if (name != description_name->Substring(i, n - i)) return;
+        if (name != description_name->Substring(i, n - i))
+            return;
 
         description->Name = "\t" + description->Name;
         return;
@@ -126,13 +131,15 @@ void property_container::update_names(String ^ name)
     for
         each(PropertySpec ^ i in m_ordered_properties)
         {
-            if (i->Name != name) continue;
+            if (i->Name != name)
+                continue;
 
             found = true;
             break;
         }
 
-    if (!found) return;
+    if (!found)
+        return;
 
     for
         each(PropertySpec ^ i in m_ordered_properties) try_update_name(i, name);

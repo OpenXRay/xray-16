@@ -45,24 +45,17 @@ void TfraTopBar::OnTimer()
     for (int j = 0; j < ComponentCount; j++)
     {
         TComponent* temp = Components[j];
-        if (dynamic_cast<TExtBtn*>(temp) != NULL) ((TExtBtn*)temp)->UpdateMouseInControl();
+        if (dynamic_cast<TExtBtn*>(temp) != NULL)
+            ((TExtBtn*)temp)->UpdateMouseInControl();
     }
 }
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraTopBar::ebEditUndoClick(TObject* Sender)
-{
-    ExecCommand(COMMAND_UNDO);
-}
-
+void __fastcall TfraTopBar::ebEditUndoClick(TObject* Sender) { ExecCommand(COMMAND_UNDO); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraTopBar::ebEditRedoClick(TObject* Sender)
-{
-    ExecCommand(COMMAND_REDO);
-}
-
+void __fastcall TfraTopBar::ebEditRedoClick(TObject* Sender) { ExecCommand(COMMAND_REDO); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfraTopBar::ActionClick(TObject* Sender)
@@ -95,14 +88,22 @@ void __fastcall TfraTopBar::ebSettingsClick(TObject* Sender)
 void __fastcall TfraTopBar::ebViewClick(TObject* Sender)
 {
     TExtBtn* btn = dynamic_cast<TExtBtn*>(Sender);
-    if (btn) {
-        if (btn == ebViewFront) EDevice.m_Camera.ViewFront();
-        if (btn == ebViewBack) EDevice.m_Camera.ViewBack();
-        if (btn == ebViewLeft) EDevice.m_Camera.ViewLeft();
-        if (btn == ebViewRight) EDevice.m_Camera.ViewRight();
-        if (btn == ebViewTop) EDevice.m_Camera.ViewTop();
-        if (btn == ebViewBottom) EDevice.m_Camera.ViewBottom();
-        if (btn == ebViewReset) EDevice.m_Camera.ViewReset();
+    if (btn)
+    {
+        if (btn == ebViewFront)
+            EDevice.m_Camera.ViewFront();
+        if (btn == ebViewBack)
+            EDevice.m_Camera.ViewBack();
+        if (btn == ebViewLeft)
+            EDevice.m_Camera.ViewLeft();
+        if (btn == ebViewRight)
+            EDevice.m_Camera.ViewRight();
+        if (btn == ebViewTop)
+            EDevice.m_Camera.ViewTop();
+        if (btn == ebViewBottom)
+            EDevice.m_Camera.ViewBottom();
+        if (btn == ebViewReset)
+            EDevice.m_Camera.ViewReset();
     }
     UI->RedrawScene();
 }
@@ -133,7 +134,8 @@ void __fastcall TfraTopBar::RefreshBar()
     case etAxisUndefined: btn = NULL; break;
     default: THROW;
     }
-    if (btn) btn->Down = true;
+    if (btn)
+        btn->Down = true;
     // settings
     ebCSParent->Down = Tools->GetSettings(etfCSParent);
     ebNUScale->Down = Tools->GetSettings(etfNUScale);
@@ -150,18 +152,10 @@ void __fastcall TfraTopBar::RefreshBar()
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraTopBar::ebZoomExtentsClick(TObject* Sender)
-{
-    ExecCommand(COMMAND_ZOOM_EXTENTS, FALSE);
-}
-
+void __fastcall TfraTopBar::ebZoomExtentsClick(TObject* Sender) { ExecCommand(COMMAND_ZOOM_EXTENTS, FALSE); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraTopBar::ebZoomExtentsSelectedClick(TObject* Sender)
-{
-    ExecCommand(COMMAND_ZOOM_EXTENTS, TRUE);
-}
-
+void __fastcall TfraTopBar::ebZoomExtentsSelectedClick(TObject* Sender) { ExecCommand(COMMAND_ZOOM_EXTENTS, TRUE); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfraTopBar::ebCameraStyleClick(TObject* Sender)

@@ -14,20 +14,20 @@
 public
 ref class property_integer : public XRay::SdkControls::IProperty
 {
-  public:
+public:
     typedef editor::property_holder::integer_getter_type integer_getter_type;
     typedef editor::property_holder::integer_setter_type integer_setter_type;
 
-  public:
+public:
     property_integer(integer_getter_type const& getter, integer_setter_type const& setter);
     virtual ~property_integer();
     !property_integer();
     virtual System::Object ^ GetValue();
     virtual void SetValue(System::Object ^ object);
 
-  private:
+private:
     integer_getter_type* m_getter;
     integer_setter_type* m_setter;
-};  // ref class property_integer
+}; // ref class property_integer
 
-#endif  // ifndef PROPERTY_INTEGER_HPP_INCLUDED
+#endif // ifndef PROPERTY_INTEGER_HPP_INCLUDED

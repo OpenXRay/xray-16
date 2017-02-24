@@ -17,12 +17,11 @@ class IPHWorld : public iphysics_scripted_class
 public:
     struct PHWorldStatistics
     {
-        CStatTimer Collision;     // collision
-        CStatTimer Core;          // integrate
-        CStatTimer MovCollision;  // movement+collision
+        CStatTimer Collision; // collision
+        CStatTimer Core; // integrate
+        CStatTimer MovCollision; // movement+collision
 
         PHWorldStatistics() { FrameStart(); }
-
         void FrameStart()
         {
             Collision.FrameStart();

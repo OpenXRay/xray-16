@@ -1,6 +1,6 @@
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -24,12 +24,14 @@ void CStateMonsterHideFromPointAbstract::execute()
     object->path().set_retreat_from_point(data.point);
     object->path().set_generic_parameters();
 
-    if (data.accelerated) {
+    if (data.accelerated)
+    {
         object->anim().accel_activate(EAccelType(data.accel_type));
         object->anim().accel_set_braking(data.braking);
     }
 
-    if (data.action.sound_type != u32(-1)) {
+    if (data.action.sound_type != u32(-1))
+    {
         object->set_state_sound(data.action.sound_type, data.action.sound_delay == u32(-1));
     }
 }
@@ -37,8 +39,10 @@ void CStateMonsterHideFromPointAbstract::execute()
 TEMPLATE_SPECIALIZATION
 bool CStateMonsterHideFromPointAbstract::check_completion()
 {
-    if (data.action.time_out != 0) {
-        if (time_state_started + data.action.time_out < Device.dwTimeGlobal) return true;
+    if (data.action.time_out != 0)
+    {
+        if (time_state_started + data.action.time_out < Device.dwTimeGlobal)
+            return true;
     }
 
     // if (!fis_zero(data.distance)) {

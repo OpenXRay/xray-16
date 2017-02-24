@@ -10,9 +10,9 @@ class FTreeVisual : public dxRender_Visual, public IRender_Mesh
 private:
     struct _5color
     {
-        Fvector rgb;  // - all static lighting
-        float hemi;   // - hemisphere
-        float sun;    // - sun
+        Fvector rgb; // - all static lighting
+        float hemi; // - hemisphere
+        float sun; // - sun
     };
 
 protected:
@@ -21,7 +21,7 @@ protected:
     Fmatrix xform;
 
 public:
-    virtual void Render(float LOD);  // LOD - Level Of Detail  [0.0f - min, 1.0f - max], Ignored
+    virtual void Render(float LOD); // LOD - Level Of Detail  [0.0f - min, 1.0f - max], Ignored
     virtual void Load(LPCSTR N, IReader* data, u32 dwFlags);
     virtual void Copy(dxRender_Visual* pFrom);
     virtual void Release();
@@ -38,7 +38,7 @@ public:
     FTreeVisual_ST(void);
     virtual ~FTreeVisual_ST(void);
 
-    virtual void Render(float LOD);  // LOD - Level Of Detail  [0.0f - min, 1.0f - max], Ignored
+    virtual void Render(float LOD); // LOD - Level Of Detail  [0.0f - min, 1.0f - max], Ignored
     virtual void Load(LPCSTR N, IReader* data, u32 dwFlags);
     virtual void Copy(dxRender_Visual* pFrom);
     virtual void Release();
@@ -60,7 +60,7 @@ public:
     FTreeVisual_PM(void);
     virtual ~FTreeVisual_PM(void);
 
-    virtual void Render(float LOD);  // LOD - Level Of Detail  [0.0f - min, 1.0f - max], Ignored
+    virtual void Render(float LOD); // LOD - Level Of Detail  [0.0f - min, 1.0f - max], Ignored
     virtual void Load(LPCSTR N, IReader* data, u32 dwFlags);
     virtual void Copy(dxRender_Visual* pFrom);
     virtual void Release();

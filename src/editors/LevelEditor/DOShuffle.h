@@ -28,8 +28,8 @@ class EDetailManager;
 class TfrmDOShuffle : public TForm
 {
     friend class TfrmOneColor;
-    __published :  // IDE-managed Components
-                   TPanel* paTools;
+    __published : // IDE-managed Components
+                  TPanel* paTools;
     TFormStorage* fsStorage;
     TPanel* Panel3;
     TScrollBox* sbDO;
@@ -71,7 +71,7 @@ class TfrmDOShuffle : public TForm
     void __fastcall fsStorageRestorePlacement(TObject* Sender);
     void __fastcall fsStorageSavePlacement(TObject* Sender);
 
-  private:  // User declarations
+private: // User declarations
     static TfrmDOShuffle* form;
     TElTreeItem* FDragItem;
 
@@ -98,16 +98,15 @@ class TfrmDOShuffle : public TForm
     bool bTHMLockRepaint;
     bool bLockFocused;
 
-  public:
+public:
     void OnItemFocused(TElTree* tv);
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TfrmDOShuffle(TComponent* Owner, EDetailManager* dm_tools);
     // static function
     static bool __fastcall Run();
 
     static bool __fastcall Visible() { return !!form; }
-
     static void __fastcall RemoveColorIndex(TfrmOneColor* p);
 
     static TfrmDOShuffle* __fastcall Form() { return form; }

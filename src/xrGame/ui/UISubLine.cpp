@@ -28,9 +28,7 @@ void dump_list_sublines()
         Msg("--leak detected ---- SubLine = %d", (*_it).num);
 }
 #else
-void dump_list_sublines()
-{
-}
+void dump_list_sublines() {}
 #endif
 
 CUISubLine::CUISubLine(const CUISubLine& other)
@@ -74,13 +72,15 @@ CUISubLine::~CUISubLine()
     bool bOK = false;
     for (; _it != dbg_list_sublines.end(); ++_it)
     {
-        if ((*_it).wnd == this) {
+        if ((*_it).wnd == this)
+        {
             bOK = true;
             dbg_list_sublines.erase(_it);
             break;
         }
     }
-    if (!bOK) Msg("CUISubLine::~CUISubLine()!!!!!!!!!!!!!!!!!!!!!!! cannot find window in list");
+    if (!bOK)
+        Msg("CUISubLine::~CUISubLine()!!!!!!!!!!!!!!!!!!!!!!! cannot find window in list");
 #endif
 }
 
@@ -89,7 +89,8 @@ const CUISubLine* CUISubLine::Cut2Pos(int i)
     R_ASSERT2(i < (int)m_text.size(),
         make_string("CUISubLine::Cut2Pos - invalid parameter [%d][%d]", i, m_text.size()).c_str());
 
-    if (!m_pTempLine) m_pTempLine = new CUISubLine();
+    if (!m_pTempLine)
+        m_pTempLine = new CUISubLine();
     m_pTempLine->m_color = m_color;
     m_pTempLine->m_text.assign(m_text, 0, i + 1);
     m_text.replace(0, i + 1, "");

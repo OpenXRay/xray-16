@@ -126,7 +126,8 @@ void _destroy_item_data_vector_cont(T_VECTOR* vec)
     for (; it != it_e; ++it)
     {
         xr_vector<CUIXml*>::iterator it_f = std::find(_tmp.begin(), _tmp.end(), (*it)._xml);
-        if (it_f == _tmp.end()) _tmp.push_back((*it)._xml);
+        if (it_f == _tmp.end())
+            _tmp.push_back((*it)._xml);
     }
     delete_data(_tmp);
 }

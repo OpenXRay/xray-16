@@ -12,11 +12,7 @@ CUIMessageBoxEx::CUIMessageBoxEx()
     AttachChild(m_pMessageBox);
 }
 
-CUIMessageBoxEx::~CUIMessageBoxEx()
-{
-    xr_delete(m_pMessageBox);
-}
-
+CUIMessageBoxEx::~CUIMessageBoxEx() { xr_delete(m_pMessageBox); }
 void CUIMessageBoxEx::InitMessageBox(LPCSTR xml_template)
 {
     // CUIDialogWnd::SetWndRect(Frect().set(0.0f,0.0f,1024.0f,768.0f));
@@ -37,32 +33,27 @@ void CUIMessageBoxEx::InitMessageBox(LPCSTR xml_template)
 
 void CUIMessageBoxEx::OnOKClicked(CUIWindow* w, void* d)
 {
-    if (!func_on_ok.empty()) {
+    if (!func_on_ok.empty())
+    {
         func_on_ok(w, d);
     }
 }
 
 void CUIMessageBoxEx::OnNOClicked(CUIWindow* w, void* d)
 {
-    if (!func_on_no.empty()) {
+    if (!func_on_no.empty())
+    {
         func_on_no(w, d);
     }
 }
 
-void CUIMessageBoxEx::SetText(LPCSTR text)
-{
-    m_pMessageBox->SetText(text);
-}
-
-LPCSTR CUIMessageBoxEx::GetText()
-{
-    return m_pMessageBox->GetText();
-}
-
+void CUIMessageBoxEx::SetText(LPCSTR text) { m_pMessageBox->SetText(text); }
+LPCSTR CUIMessageBoxEx::GetText() { return m_pMessageBox->GetText(); }
 void CUIMessageBoxEx::SendMessage(CUIWindow* pWnd, s16 msg, void* pData /* = NULL */)
 {
     CUIWndCallback::OnEvent(pWnd, msg, pData);
-    if (pWnd == m_pMessageBox) {
+    if (pWnd == m_pMessageBox)
+    {
         switch (msg)
         {
         case MESSAGE_BOX_OK_CLICKED:
@@ -74,24 +65,19 @@ void CUIMessageBoxEx::SendMessage(CUIWindow* pWnd, s16 msg, void* pData /* = NUL
         default: break;
         }
 
-        if (GetMessageTarget()) GetMessageTarget()->SendMessage(this, msg, pData);
+        if (GetMessageTarget())
+            GetMessageTarget()->SendMessage(this, msg, pData);
     }
 }
 
-LPCSTR CUIMessageBoxEx::GetHost()
-{
-    return m_pMessageBox->GetHost();
-}
-
-LPCSTR CUIMessageBoxEx::GetPassword()
-{
-    return m_pMessageBox->GetPassword();
-}
-
+LPCSTR CUIMessageBoxEx::GetHost() { return m_pMessageBox->GetHost(); }
+LPCSTR CUIMessageBoxEx::GetPassword() { return m_pMessageBox->GetPassword(); }
 bool CUIMessageBoxEx::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (keyboard_action == WINDOW_KEY_PRESSED) {
-        if (dik == DIK_NUMPADENTER || dik == DIK_RETURN || dik == DIK_SPACE) {
+    if (keyboard_action == WINDOW_KEY_PRESSED)
+    {
+        if (dik == DIK_NUMPADENTER || dik == DIK_RETURN || dik == DIK_SPACE)
+        {
             m_pMessageBox->OnYesOk();
             return true;
             /*
@@ -110,12 +96,5 @@ bool CUIMessageBoxEx::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return CUIDialogWnd::OnKeyboardAction(dik, keyboard_action);
 }
 
-void CUIMessageBoxEx::SetTextEditURL(LPCSTR text)
-{
-    m_pMessageBox->SetTextEditURL(text);
-}
-
-LPCSTR CUIMessageBoxEx::GetTextEditURL()
-{
-    return m_pMessageBox->GetTextEditURL();
-}
+void CUIMessageBoxEx::SetTextEditURL(LPCSTR text) { m_pMessageBox->SetTextEditURL(text); }
+LPCSTR CUIMessageBoxEx::GetTextEditURL() { return m_pMessageBox->GetTextEditURL(); }

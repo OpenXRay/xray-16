@@ -10,7 +10,7 @@ class ESceneSectorTool : public ESceneCustomOTool
     typedef ESceneCustomOTool inherited;
     friend class CSector;
 
-  protected:
+protected:
     enum
     {
         flDrawSolid = (1 << 31),
@@ -21,14 +21,11 @@ class ESceneSectorTool : public ESceneCustomOTool
     virtual void CreateControls();
     virtual void RemoveControls();
 
-  public:
+public:
     ESceneSectorTool() : ESceneCustomOTool(OBJCLASS_SECTOR) { m_Flags.zero(); }
-
     // definition
     IC LPCSTR ClassName() { return "sector"; }
-
     IC LPCSTR ClassDesc() { return "Sector"; }
-
     IC
 
         int
@@ -51,7 +48,6 @@ class ESceneSectorTool : public ESceneCustomOTool
 
     // IO
     virtual bool IsNeedSave() { return true; }
-
     virtual bool LoadStream(IReader&);
     virtual bool LoadLTX(CInifile&);
     virtual void SaveStream(IWriter&);

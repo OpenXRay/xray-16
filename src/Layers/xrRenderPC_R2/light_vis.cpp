@@ -10,7 +10,8 @@ const u32 cullfragments = 4;
 
 void light::vis_prepare()
 {
-    if (int(indirect_photons) != ps_r2_GI_photons) gi_generate();
+    if (int(indirect_photons) != ps_r2_GI_photons)
+        gi_generate();
 
     //	. test is sheduled for future	= keep old result
     //	. test time comes :)
@@ -18,7 +19,8 @@ void light::vis_prepare()
     //		. perform testing				= ???,		pending
 
     u32 frame = Device.dwFrame;
-    if (frame < vis.frame2test) return;
+    if (frame < vis.frame2test)
+        return;
 
     float safe_area = VIEWPORT_NEAR;
     {
@@ -33,11 +35,13 @@ void light::vis_prepare()
     // Msg	("sc[%f,%f,%f]/c[%f,%f,%f] - sr[%f]/r[%f]",VPUSH(spatial.center),VPUSH(position),spatial.radius,range);
     // Msg	("dist:%f, sa:%f",Device.vCameraPosition.distance_to(spatial.center),safe_area);
     bool skiptest = false;
-    if (ps_r2_ls_flags.test(R2FLAG_EXP_DONT_TEST_UNSHADOWED) && !flags.bShadow) skiptest = true;
-    if (ps_r2_ls_flags.test(R2FLAG_EXP_DONT_TEST_SHADOWED) && flags.bShadow) skiptest = true;
+    if (ps_r2_ls_flags.test(R2FLAG_EXP_DONT_TEST_UNSHADOWED) && !flags.bShadow)
+        skiptest = true;
+    if (ps_r2_ls_flags.test(R2FLAG_EXP_DONT_TEST_SHADOWED) && flags.bShadow)
+        skiptest = true;
 
     if (skiptest || Device.vCameraPosition.distance_to(spatial.sphere.P) <= (spatial.sphere.R * 1.01f + safe_area))
-    {  // small error
+    { // small error
         vis.visible = true;
         vis.pending = false;
         vis.frame2test = frame + ::Random.randI(delay_small_min, delay_small_max);
@@ -68,14 +72,16 @@ void light::vis_update()
     //	. test-result:	invisible:
     //		. shedule for 'next-frame' interval
 
-    if (!vis.pending) return;
+    if (!vis.pending)
+        return;
 
     u32 frame = Device.dwFrame;
     u32 fragments = RImplementation.occq_get(vis.query_id);
     // Log					("",fragments);
     vis.visible = (fragments > cullfragments);
     vis.pending = false;
-    if (vis.visible) {
+    if (vis.visible)
+    {
         vis.frame2test = frame + ::Random.randI(delay_large_min, delay_large_max);
     }
     else

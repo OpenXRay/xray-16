@@ -15,4 +15,4 @@ public:
     virtual ~CWeaponFN2000();
 };
 
-#endif  //__XR_WEAPON_FN2000_H__
+#endif //__XR_WEAPON_FN2000_H__

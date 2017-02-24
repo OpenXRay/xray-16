@@ -47,11 +47,7 @@ Fvector vunpack(s32 x, s32 y, s32 z)
     return pck;
 }
 
-Fvector vunpack(Ivector src)
-{
-    return vunpack(src.x, src.y, src.z);
-}
-
+Fvector vunpack(Ivector src) { return vunpack(src.x, src.y, src.z); }
 Ivector vpack(Fvector src)
 {
     src.normalize();
@@ -72,12 +68,14 @@ Ivector vpack(Fvector src)
                 _v = vunpack(x, y, z);
                 float m = _v.magnitude();
                 float me = _abs(m - 1.f);
-                if (me > 0.03f) {
+                if (me > 0.03f)
+                {
                     continue;
                 }
                 _v.div(m);
                 float e = _abs(src.dotproduct(_v) - 1.f);
-                if (e < e_best) {
+                if (e < e_best)
+                {
                     e_best = e;
                     r = x, g = y, b = z;
                 }
@@ -145,7 +143,7 @@ void ConvertAlphaToNormalMap_4x(NVI_Image* pSrc, float scale, bool wrap)
     //	0	1/2		0
     //	0	0		0
     //	0	-1/2	0
-    int numelem = 2;  // num elements in each kernel
+    int numelem = 2; // num elements in each kernel
     ConvolutionKernelElement du_elem[] = {{-1, 0, -1.0f / 2.0f}, {1, 0, 1.0f / 2.0f}};
     ConvolutionKernelElement dv_elem[] = {{0, 1, 1.0f / 2.0f}, {0, -1, -1.0f / 2.0f}};
     int num_kernels = 2;
@@ -164,7 +162,7 @@ void ConvertAlphaToNormalMap_3x3(NVI_Image* pSrc, float scale, bool wrap)
     //		height + kernel heigh - 1 ) to make wrap code easy for arbitrary
     //		kernels.  Edge texels are duplicated into the border regions or
     //      copied from the other side of the source image if wrapping is on.
-    int numelem = 6;  // num elements in each kernel
+    int numelem = 6; // num elements in each kernel
     float wt = 1.0f / 6.0f;
     // Kernel for change of height in u axis:
     //  -1/6	0	1/6
@@ -195,7 +193,7 @@ void ConvertAlphaToNormalMap_5x5(NVI_Image* pSrc, float scale, bool wrap)
     //		height + kernel heigh - 1 ) to make wrap code easy for arbitrary
     //		kernels.  Edge texels are duplicated into the border regions or
     //      copied from the other side of the source image if wrapping is on.
-    int numelem;  // num elements in each kernel
+    int numelem; // num elements in each kernel
     float wt1 = 1.0f / 6.0f;
     float wt2 = 1.0f / 48.0f;
     /*
@@ -315,7 +313,8 @@ void RotateArrayCCW(float* pInArray, int num_x, int num_y, float* pOutArray)
     assert(pInArray != NULL);
     float* pSrc;
     // If arrays are same, copy source to new temp array
-    if (pInArray == pOutArray) {
+    if (pInArray == pOutArray)
+    {
         pSrc = new float[num_x * num_y];
         assert(pSrc != NULL);
         for (int i = 0; i < num_x * num_y; i++)
@@ -337,7 +336,8 @@ void RotateArrayCCW(float* pInArray, int num_x, int num_y, float* pOutArray)
             pOutArray[newi + newj * num_y] = pSrc[i + j * num_x];
         }
     }
-    if (pInArray == pOutArray) {
+    if (pInArray == pOutArray)
+    {
         SAFE_ARRAY_DELETE(pSrc);
     }
 }
@@ -349,7 +349,7 @@ void ConvertAlphaToNormalMap_7x7(NVI_Image* pSrc, float scale, bool wrap)
     //      height + kernel heigh - 1 ) to make wrap code easy for arbitrary
     //      kernels.  Edge texels are duplicated into the border regions or
     //      copied from the other side of the source image if wrapping is on.
-    int numelem;  // num elements in each kernel
+    int numelem; // num elements in each kernel
     // Kernel for change of height in u axis:
     // A Sobel filter kernel
     numelem = 49;
@@ -390,7 +390,7 @@ void ConvertAlphaToNormalMap_9x9(NVI_Image* pSrc, float scale, bool wrap)
     //		height + kernel heigh - 1 ) to make wrap code easy for arbitrary
     //		kernels.  Edge texels are duplicated into the border regions or
     //      copied from the other side of the source image if wrapping is on.
-    int numelem;  // num elements in each kernel
+    int numelem; // num elements in each kernel
     // Kernel for change of height in u axis:
     // A Sobel filter kernel
     numelem = 81;
@@ -450,18 +450,18 @@ IC u32 it_gloss_rev(u32 d, u32 s)
 
 IC u32 it_difference(u32 d, u32 orig, u32 ucomp)
 {
-    return color_rgba(128 + 2 * (int(color_get_R(orig)) - int(color_get_R(ucomp))) / 3,  // R-error
-        128 + 2 * (int(color_get_G(orig)) - int(color_get_G(ucomp))) / 3,                // G-error
-        128 + 2 * (int(color_get_B(orig)) - int(color_get_B(ucomp))) / 3,                // B-error
-        128 + 2 * (int(color_get_A(orig)) - int(color_get_A(ucomp))) / 3);               // A-error
+    return color_rgba(128 + 2 * (int(color_get_R(orig)) - int(color_get_R(ucomp))) / 3, // R-error
+        128 + 2 * (int(color_get_G(orig)) - int(color_get_G(ucomp))) / 3, // G-error
+        128 + 2 * (int(color_get_B(orig)) - int(color_get_B(ucomp))) / 3, // B-error
+        128 + 2 * (int(color_get_A(orig)) - int(color_get_A(ucomp))) / 3); // A-error
 }
 
 IC u32 it_height_rev(u32 d, u32 s)
 {
-    return color_rgba(color_get_A(d),  // diff x
-        color_get_B(d),                // diff y
-        color_get_G(d),                // diff z
-        color_get_R(s));               // height
+    return color_rgba(color_get_A(d), // diff x
+        color_get_B(d), // diff y
+        color_get_G(d), // diff z
+        color_get_R(s)); // height
 }
 
 template <class _It>
@@ -495,11 +495,13 @@ IC void TW_Iterate_2OP(u32 width, u32 height, u32 pitch, u8* dst, u8* src0, u8* 
 
 u32 hsample(s32 w, s32 h, s32 p, s32 x, s32 y, u8* src)
 {
-    if (x < 0) {
+    if (x < 0)
+    {
         x += w;
     }
     x %= w;
-    if (y < 0) {
+    if (y < 0)
+    {
         y += h;
     }
     y %= h;
@@ -525,7 +527,8 @@ int DXTCompressBump(
         .Create(w, h, T_height_gloss, ImageFormat::RGBA8)
         .SaveTGA(XR_DXT_DBG_BUMP_STAGES_DIR "\\0-height-gloss.tga", true);
 #endif
-    if (T_normal_map) {
+    if (T_normal_map)
+    {
         u8* ext_nm = pSrc->GetImageDataPointer();
         CopyMemory(ext_nm, T_normal_map, w * h * sizeof(u32));
     }
@@ -550,10 +553,12 @@ int DXTCompressBump(
     fmt0.fmt = STextureParams::tfDXT5;
     int res = DXTCompressImage(out_name, T_normal_1, w, h, pitch, &fmt0, depth);
     // stage 1
-    if (res == 1) {
+    if (res == 1)
+    {
         // Decompress (back)
         Image_DXTC* img = new Image_DXTC();
-        if (img->LoadFromFile(out_name)) {
+        if (img->LoadFromFile(out_name))
+        {
             VERIFY(w == img->Width() && h == img->Height());
             img->Decompress();
             u8* T_normal_1U = img->GetDecompDataPointer();
@@ -571,8 +576,9 @@ int DXTCompressBump(
                 .SaveTGA(XR_DXT_DBG_BUMP_STAGES_DIR "\\4-normal_1D.tga", true);
 #endif
             // Rescale by virtual height
-            float h_scale = powf(fmt->bump_virtual_height / 0.05f, 0.75f);  // move towards 1.0f
-            if (h_scale > 1.f) {
+            float h_scale = powf(fmt->bump_virtual_height / 0.05f, 0.75f); // move towards 1.0f
+            if (h_scale > 1.f)
+            {
                 h_scale = _sqrt(h_scale);
             }
             for (u32 y = 0; y < h; y++)
@@ -580,7 +586,7 @@ int DXTCompressBump(
                 for (u32 x = 0; x < w; x++)
                 {
                     u32& sh = *((u32*)(T_height_gloss + y * pitch) + x);
-                    u32 h = color_get_R(sh);  // height -> R-channel
+                    u32 h = color_get_R(sh); // height -> R-channel
                     h = iFloor(float(h) * h_scale + EPS_S);
                     sh = color_rgba(h, color_get_G(sh), color_get_B(sh), color_get_A(sh));
                 }
@@ -593,12 +599,14 @@ int DXTCompressBump(
                     for (u32 x = 0; x < w; x++)
                     {
                         u32 sh = *((u32*)(T_height_gloss + y * pitch) + x);
-                        u32 h = color_get_R(sh);  // height -> R-channel
+                        u32 h = color_get_R(sh); // height -> R-channel
                         h_average += h;
-                        if (h < h_min) {
+                        if (h < h_min)
+                        {
                             h_min = h;
                         }
-                        if (h > h_max) {
+                        if (h > h_max)
+                        {
                             h_max = h;
                         }
                     }
@@ -609,7 +617,7 @@ int DXTCompressBump(
             h_median /= 10;
             s32 h_correction = s32(127) - s32(h_median);
             // Calculate filtered and corrected height
-            u8* T_height_pf = (u8*)calloc(w * h, sizeof(u32));  // filtered for parallax
+            u8* T_height_pf = (u8*)calloc(w * h, sizeof(u32)); // filtered for parallax
             for (s32 y = 0; y < s32(h); y++)
             {
                 u32 p = pitch;
@@ -619,10 +627,10 @@ int DXTCompressBump(
                     u32& dst = *((u32*)(T_height_pf + y * pitch) + x);
 #ifdef XR_DXT_BUMP_FILTERING
                     u32 val = hsample(w, h, p, x - 1, y - 1, T) + hsample(w, h, p, x + 0, y - 1, T) +
-                              hsample(w, h, p, x + 1, y - 1, T) + hsample(w, h, p, x - 1, y + 0, T) +
-                              hsample(w, h, p, x + 0, y + 0, T) + hsample(w, h, p, x + 1, y + 0, T) +
-                              hsample(w, h, p, x - 1, y + 1, T) + hsample(w, h, p, x + 0, y + 1, T) +
-                              hsample(w, h, p, x + 1, y + 1, T);
+                        hsample(w, h, p, x + 1, y - 1, T) + hsample(w, h, p, x - 1, y + 0, T) +
+                        hsample(w, h, p, x + 0, y + 0, T) + hsample(w, h, p, x + 1, y + 0, T) +
+                        hsample(w, h, p, x - 1, y + 1, T) + hsample(w, h, p, x + 0, y + 1, T) +
+                        hsample(w, h, p, x + 1, y + 1, T);
                     val /= 9;
 #else
                     u32 val = hsample(w, h, p, x + 0, y + 0, T);
@@ -645,7 +653,8 @@ int DXTCompressBump(
             fmt0.fmt = STextureParams::tfDXT5;
             string256 out_name1;
             strcpy(out_name1, out_name);
-            if (strext(out_name1)) {
+            if (strext(out_name1))
+            {
                 *strext(out_name1) = 0;
             }
             strcat(out_name1, "#.dds");
@@ -660,7 +669,8 @@ int DXTCompressBump(
         delete img;
     }
     delete pSrc;
-    if (gloss_power < 0.1f) {
+    if (gloss_power < 0.1f)
+    {
         res = -1000;
     }
     return res;

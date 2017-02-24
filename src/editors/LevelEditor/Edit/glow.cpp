@@ -23,11 +23,7 @@
 
 #define VIS_RADIUS 0.25f
 
-CGlow::CGlow(LPVOID data, LPCSTR name) : CCustomObject(data, name)
-{
-    Construct(data);
-}
-
+CGlow::CGlow(LPVOID data, LPCSTR name) : CCustomObject(data, name) { Construct(data); }
 void CGlow::Construct(LPVOID data)
 {
     ClassID = OBJCLASS_GLOW;
@@ -38,16 +34,14 @@ void CGlow::Construct(LPVOID data)
     m_ShaderName = "effects\\glow";
 }
 
-CGlow::~CGlow()
-{
-    OnDeviceDestroy();
-}
-
+CGlow::~CGlow() { OnDeviceDestroy(); }
 void CGlow::OnDeviceCreate()
 {
-    if (m_bDefLoad) return;
+    if (m_bDefLoad)
+        return;
     // создать заново shaders
-    if (m_TexName.size() && m_ShaderName.size()) m_GShader.create(*m_ShaderName, *m_TexName);
+    if (m_TexName.size() && m_ShaderName.size())
+        m_GShader.create(*m_ShaderName, *m_TexName);
     m_bDefLoad = true;
 }
 
@@ -58,11 +52,7 @@ void CGlow::OnDeviceDestroy()
     m_GShader.destroy();
 }
 
-void CGlow::ShaderChange(PropValue* value)
-{
-    OnDeviceDestroy();
-}
-
+void CGlow::ShaderChange(PropValue* value) { OnDeviceDestroy(); }
 bool CGlow::GetBox(Fbox& box) const
 {
     box.set(PPosition, PPosition);
@@ -73,18 +63,23 @@ bool CGlow::GetBox(Fbox& box) const
 
 void CGlow::Render(int priority, bool strictB2F)
 {
-    if ((1 == priority) && (true == strictB2F)) {
-        if (!m_bDefLoad) OnDeviceCreate();
+    if ((1 == priority) && (true == strictB2F))
+    {
+        if (!m_bDefLoad)
+            OnDeviceCreate();
         ESceneGlowTool* gt = dynamic_cast<ESceneGlowTool*>(ParentTool);
         VERIFY(gt);
         RCache.set_xform_world(Fidentity);
 
-        if (gt->m_Flags.is(ESceneGlowTool::flTestVisibility)) {
+        if (gt->m_Flags.is(ESceneGlowTool::flTestVisibility))
+        {
             Fvector D;
             D.sub(EDevice.vCameraPosition, PPosition);
             float dist = D.normalize_magn();
-            if (!Scene->RayPickObject(dist, PPosition, D, OBJCLASS_SCENEOBJECT, 0, 0)) {
-                if (m_GShader) {
+            if (!Scene->RayPickObject(dist, PPosition, D, OBJCLASS_SCENEOBJECT, 0, 0))
+            {
+                if (m_GShader)
+                {
                     EDevice.SetShader(m_GShader);
                 }
                 else
@@ -103,7 +98,8 @@ void CGlow::Render(int priority, bool strictB2F)
         }
         else
         {
-            if (m_GShader) {
+            if (m_GShader)
+            {
                 EDevice.SetShader(m_GShader);
             }
             else
@@ -112,13 +108,15 @@ void CGlow::Render(int priority, bool strictB2F)
             }
             m_RenderSprite.Render(PPosition, m_fRadius, m_Flags.is(gfFixedSize));
         }
-        if (Selected()) {
+        if (Selected())
+        {
             Fbox bb;
             GetBox(bb);
             u32 clr = 0xFFFFFFFF;
             EDevice.SetShader(EDevice.m_WireShader);
             DU_impl.DrawSelectionBoxB(bb, &clr);
-            if (gt->m_Flags.is(ESceneGlowTool::flDrawCross)) {
+            if (gt->m_Flags.is(ESceneGlowTool::flDrawCross))
+            {
                 Fvector sz;
                 bb.getradius(sz);
                 DU_impl.DrawCross(PPosition, sz.x, sz.y, sz.z, sz.x, sz.y, sz.z, 0xFFFFFFFF, false);
@@ -138,10 +136,13 @@ bool CGlow::RayPick(float& distance, const Fvector& start, const Fvector& direct
     ray2.sub(PPosition, start);
 
     float d = ray2.dotproduct(direction);
-    if (d > 0) {
+    if (d > 0)
+    {
         float d2 = ray2.magnitude();
-        if (((d2 * d2 - d * d) < (m_fRadius * m_fRadius)) && (d > m_fRadius)) {
-            if (d < distance) {
+        if (((d2 * d2 - d * d) < (m_fRadius * m_fRadius)) && (d > m_fRadius))
+        {
+            if (d < distance)
+            {
                 distance = d;
                 return true;
             }
@@ -154,7 +155,8 @@ bool CGlow::LoadLTX(CInifile& ini, LPCSTR sect_name)
 {
     u32 version = ini.r_u32(sect_name, "version");
 
-    if (version != GLOW_VERSION) {
+    if (version != GLOW_VERSION)
+    {
         ELog.DlgMsg(mtError, "CGlow: Unsupported version.");
         return false;
     }
@@ -192,14 +194,16 @@ bool CGlow::LoadStream(IReader& F)
     u16 version = 0;
 
     R_ASSERT(F.r_chunk(GLOW_CHUNK_VERSION, &version));
-    if ((version != 0x0011) && (version != GLOW_VERSION)) {
+    if ((version != 0x0011) && (version != GLOW_VERSION))
+    {
         ELog.DlgMsg(mtError, "CGlow: Unsupported version.");
         return false;
     }
 
     CCustomObject::LoadStream(F);
 
-    if (F.find_chunk(GLOW_CHUNK_SHADER)) {
+    if (F.find_chunk(GLOW_CHUNK_SHADER))
+    {
         F.r_stringZ(m_ShaderName);
     }
 
@@ -208,12 +212,14 @@ bool CGlow::LoadStream(IReader& F)
 
     R_ASSERT(F.find_chunk(GLOW_CHUNK_PARAMS));
     m_fRadius = F.r_float();
-    if (version == 0x0011) {
+    if (version == 0x0011)
+    {
         F.r_fvector3(FPosition);
         UpdateTransform();
     }
 
-    if (F.find_chunk(GLOW_CHUNK_FLAGS)) m_Flags.assign(F.r_u16());
+    if (F.find_chunk(GLOW_CHUNK_FLAGS))
+        m_Flags.assign(F.r_u16());
 
     return true;
 }

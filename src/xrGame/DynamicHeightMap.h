@@ -7,9 +7,9 @@
 #pragma once
 
 const int dhm_line = 4;
-const int dhm_matrix = (dhm_line + 1 + dhm_line);  // 9x9 array
-const float dhm_size = 4.f;                        // 4m per slot
-const int dhm_precision = 16;                      // 32x32 subdivs per slot
+const int dhm_matrix = (dhm_line + 1 + dhm_line); // 9x9 array
+const float dhm_size = 4.f; // 4m per slot
+const int dhm_precision = 16; // 32x32 subdivs per slot
 const int dhm_total = dhm_matrix * dhm_matrix;
 
 //
@@ -45,15 +45,15 @@ class CHM_Static
         Fvector v[3];
     };
 
-    Slot pool[dhm_matrix * dhm_matrix];  // pool
-    Slot* data[dhm_matrix][dhm_matrix];  // database
-    int c_x, c_z;                        // center of heighmap
+    Slot pool[dhm_matrix * dhm_matrix]; // pool
+    Slot* data[dhm_matrix][dhm_matrix]; // database
+    int c_x, c_z; // center of heighmap
     svector<Slot*, dhm_total> task;
     xr_vector<Poly> polys;
 
 public:
     void Update();
-    float Query(float x, float z);  // 2D query
+    float Query(float x, float z); // 2D query
 
     CHM_Static();
 };
@@ -63,7 +63,7 @@ class CHM_Dynamic
 {
 public:
     void Update();
-    float Query(float x, float z);  // 2D query
+    float Query(float x, float z); // 2D query
 };
 
 //
@@ -74,8 +74,8 @@ class CHeightMap
     u32 dwFrame;
 
 public:
-    float Query(float x, float z);              // 2D query
-    Fvector Query(Fvector& pos, Fvector& dir);  // 3D ray-query
+    float Query(float x, float z); // 2D query
+    Fvector Query(Fvector& pos, Fvector& dir); // 3D ray-query
 };
 
-#endif  // !defined(AFX_DYNAMICHEIGHTMAP_H__5A5BD0B8_1FC7_4067_A5A4_D40422E8B6D1__INCLUDED_)
+#endif // !defined(AFX_DYNAMICHEIGHTMAP_H__5A5BD0B8_1FC7_4067_A5A4_D40422E8B6D1__INCLUDED_)

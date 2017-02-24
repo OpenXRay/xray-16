@@ -2,16 +2,8 @@
 #include "UIStaticItem.h"
 #include "ui_base.h"
 
-void CreateUIGeom()
-{
-    GlobalEnv.UIRender->CreateUIGeom();
-}
-
-void DestroyUIGeom()
-{
-    GlobalEnv.UIRender->DestroyUIGeom();
-}
-
+void CreateUIGeom() { GlobalEnv.UIRender->CreateUIGeom(); }
+void DestroyUIGeom() { GlobalEnv.UIRender->DestroyUIGeom(); }
 CUIStaticItem::CUIStaticItem()
 {
     uFlags.zero();
@@ -49,9 +41,11 @@ void CUIStaticItem::RenderInternal(const Fvector2& in_pos)
     Fvector2 ts;
     GlobalEnv.UIRender->GetActiveTextureResolution(ts);
 
-    if (!uFlags.test(flValidSize)) SetSize(ts);
+    if (!uFlags.test(flValidSize))
+        SetSize(ts);
 
-    if (!uFlags.test(flValidTextureRect)) SetTextureRect(Frect().set(0, 0, ts.x, ts.y));
+    if (!uFlags.test(flValidTextureRect))
+        SetTextureRect(Frect().set(0, 0, ts.x, ts.y));
 
     Fvector2 LTp, RBp;
     Fvector2 LTt, RBt;
@@ -66,7 +60,8 @@ void CUIStaticItem::RenderInternal(const Fvector2& in_pos)
     RBt.set(TextureRect.x2 / ts.x, TextureRect.y2 / ts.y);
 
     float offset = -0.5f;
-    if (UI().m_currentPointType == IUIRender::pttLIT) offset = 0.0f;
+    if (UI().m_currentPointType == IUIRender::pttLIT)
+        offset = 0.0f;
 
     // clip poly
     sPoly2D S;
@@ -77,10 +72,10 @@ void CUIStaticItem::RenderInternal(const Fvector2& in_pos)
     RBp.x += offset;
     RBp.y += offset;
 
-    S[0].set(LTp.x, LTp.y, LTt.x, LTt.y);  // LT
-    S[1].set(RBp.x, LTp.y, RBt.x, LTt.y);  // RT
-    S[2].set(RBp.x, RBp.y, RBt.x, RBt.y);  // RB
-    S[3].set(LTp.x, RBp.y, LTt.x, RBt.y);  // LB
+    S[0].set(LTp.x, LTp.y, LTt.x, LTt.y); // LT
+    S[1].set(RBp.x, LTp.y, RBt.x, LTt.y); // RT
+    S[2].set(RBp.x, RBp.y, RBt.x, RBt.y); // RB
+    S[3].set(LTp.x, RBp.y, LTt.x, RBt.y); // LB
 
     sPoly2D D;
     sPoly2D* R = NULL;
@@ -92,7 +87,8 @@ void CUIStaticItem::RenderInternal(const Fvector2& in_pos)
         R = UI().ScreenFrustumLIT().ClipPoly(S, D);
     }
 
-    if (R && R->size()) {
+    if (R && R->size())
+    {
         for (u32 k = 0; k < R->size() - 2; ++k)
         {
             GlobalEnv.UIRender->PushPoint(
@@ -113,9 +109,11 @@ void CUIStaticItem::RenderInternal(float angle)
     GlobalEnv.UIRender->GetActiveTextureResolution(ts);
     hp.set(0.5f / ts.x, 0.5f / ts.y);
 
-    if (!uFlags.test(flValidSize)) SetSize(ts);
+    if (!uFlags.test(flValidSize))
+        SetSize(ts);
 
-    if (!uFlags.test(flValidTextureRect)) SetTextureRect(Frect().set(0, 0, ts.x, ts.y));
+    if (!uFlags.test(flValidTextureRect))
+        SetTextureRect(Frect().set(0, 0, ts.x, ts.y));
 
     Fvector2 pivot, offset, SZ;
     SZ.set(vSize);
@@ -164,7 +162,8 @@ void CUIStaticItem::RenderInternal(float angle)
 
     sPoly2D D;
     sPoly2D* R = UI().ScreenFrustum().ClipPoly(S, D);
-    if (R && R->size()) {
+    if (R && R->size())
+    {
         for (u32 k = 0; k < R->size() - 2; k++)
         {
             GlobalEnv.UIRender->PushPoint(

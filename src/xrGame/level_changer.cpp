@@ -23,25 +23,15 @@
 
 xr_vector<CLevelChanger*> g_lchangers;
 
-CLevelChanger::~CLevelChanger()
-{
-}
-
-void CLevelChanger::Center(Fvector& C) const
-{
-    XFORM().transform_tiny(C, GetCForm()->getSphere().P);
-}
-
-float CLevelChanger::Radius() const
-{
-    return GetCForm()->getRadius();
-}
-
+CLevelChanger::~CLevelChanger() {}
+void CLevelChanger::Center(Fvector& C) const { XFORM().transform_tiny(C, GetCForm()->getSphere().P); }
+float CLevelChanger::Radius() const { return GetCForm()->getRadius(); }
 void CLevelChanger::net_Destroy()
 {
     inherited::net_Destroy();
     xr_vector<CLevelChanger*>::iterator it = std::find(g_lchangers.begin(), g_lchangers.end(), this);
-    if (it != g_lchangers.end()) g_lchangers.erase(it);
+    if (it != g_lchangers.end())
+        g_lchangers.erase(it);
 }
 #define DEF_INVITATION "level_changer_invitation"
 
@@ -63,7 +53,8 @@ BOOL CLevelChanger::net_Spawn(CSE_Abstract* DC)
     m_angles = l_tpALifeLevelChanger->m_tAngles;
 
     m_bSilentMode = !!l_tpALifeLevelChanger->m_bSilentMode;
-    if (ai().get_level_graph()) {
+    if (ai().get_level_graph())
+    {
         //. this information should be computed in xrAI
         ai_location().level_vertex(ai().level_graph().vertex(u32(-1), Position()));
         ai_location().game_vertex(ai().cross_table().vertex(ai_location().level_vertex_id()).game_vertex_id());
@@ -90,7 +81,8 @@ BOOL CLevelChanger::net_Spawn(CSE_Abstract* DC)
     }
 
     BOOL bOk = inherited::net_Spawn(DC);
-    if (bOk) {
+    if (bOk)
+    {
         l_pShape->ComputeBounds();
         Fvector P;
         XFORM().transform_tiny(P, GetCForm()->getSphere().P);
@@ -117,9 +109,11 @@ void CLevelChanger::feel_touch_new(IGameObject* tpObject)
 {
     CActor* l_tpActor = smart_cast<CActor*>(tpObject);
     VERIFY(l_tpActor);
-    if (!l_tpActor->g_Alive()) return;
+    if (!l_tpActor->g_Alive())
+        return;
 
-    if (m_bSilentMode) {
+    if (m_bSilentMode)
+    {
         NET_Packet p;
         p.w_begin(M_CHANGE_LEVEL);
         p.w(&m_game_vertex_id, sizeof(m_game_vertex_id));
@@ -147,7 +141,8 @@ bool CLevelChanger::get_reject_pos(Fvector& p, Fvector& r)
     //--		local dir = patrol("t_look"):point(0):sub(patrol("t_way"):point(0))
     //--		db.actor:set_actor_direction(-dir:getH())
 
-    if (m_ini_file && m_ini_file->section_exist("pt_move_if_reject")) {
+    if (m_ini_file && m_ini_file->section_exist("pt_move_if_reject"))
+    {
         LPCSTR p_name = m_ini_file->r_string("pt_move_if_reject", "path");
         const CPatrolPath* patrol_path = ai().patrol_paths().path(p_name);
         VERIFY(patrol_path);
@@ -174,7 +169,8 @@ bool CLevelChanger::feel_touch_contact(IGameObject* object)
 
 void CLevelChanger::update_actor_invitation()
 {
-    if (m_bSilentMode) return;
+    if (m_bSilentMode)
+        return;
     xr_vector<IGameObject*>::iterator it = feel_touch.begin();
     xr_vector<IGameObject*>::iterator it_e = feel_touch.end();
 
@@ -183,9 +179,11 @@ void CLevelChanger::update_actor_invitation()
         CActor* l_tpActor = smart_cast<CActor*>(*it);
         VERIFY(l_tpActor);
 
-        if (!l_tpActor->g_Alive()) continue;
+        if (!l_tpActor->g_Alive())
+            continue;
 
-        if (m_entrance_time + 5.0f < Device.fTimeGlobal) {
+        if (m_entrance_time + 5.0f < Device.fTimeGlobal)
+        {
             CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(CurrentGameUI());
             Fvector p, r;
             bool b = get_reject_pos(p, r);

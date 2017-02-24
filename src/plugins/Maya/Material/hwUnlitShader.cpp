@@ -38,7 +38,7 @@
 using namespace std;
 
 #ifdef WIN32
-#pragma warning(disable : 4786)  // Disable stupid STL warnings.
+#pragma warning(disable : 4786) // Disable stupid STL warnings.
 #endif
 
 #include "hwUnlitShader.h"
@@ -66,23 +66,19 @@ MObject CXRayMtl::transparencyR;
 MObject CXRayMtl::transparencyG;
 MObject CXRayMtl::transparencyB;
 
-#define MAKE_INPUT(attr)                                                                                               \
-    CHECK_MSTATUS(attr.setKeyable(true));                                                                              \
-    CHECK_MSTATUS(attr.setStorable(true));                                                                             \
-    CHECK_MSTATUS(attr.setReadable(true));                                                                             \
+#define MAKE_INPUT(attr)                   \
+    CHECK_MSTATUS(attr.setKeyable(true));  \
+    CHECK_MSTATUS(attr.setStorable(true)); \
+    CHECK_MSTATUS(attr.setReadable(true)); \
     CHECK_MSTATUS(attr.setWritable(true));
 
-#define MAKE_OUTPUT(attr)                                                                                              \
-    CHECK_MSTATUS(attr.setKeyable(false));                                                                             \
-    CHECK_MSTATUS(attr.setStorable(false));                                                                            \
-    CHECK_MSTATUS(attr.setReadable(true));                                                                             \
+#define MAKE_OUTPUT(attr)                   \
+    CHECK_MSTATUS(attr.setKeyable(false));  \
+    CHECK_MSTATUS(attr.setStorable(false)); \
+    CHECK_MSTATUS(attr.setReadable(true));  \
     CHECK_MSTATUS(attr.setWritable(false));
 
-void CXRayMtl::postConstructor()
-{
-    setMPSafe(false);
-}
-
+void CXRayMtl::postConstructor() { setMPSafe(false); }
 CXRayMtl::CXRayMtl()
 {
     m_pTextureCache = MTextureCache::instance();
@@ -90,11 +86,7 @@ CXRayMtl::CXRayMtl()
     attachSceneCallbacks();
 }
 
-CXRayMtl::~CXRayMtl()
-{
-    detachSceneCallbacks();
-}
-
+CXRayMtl::~CXRayMtl() { detachSceneCallbacks(); }
 void CXRayMtl::releaseEverything()
 {
     // Clean the texture cache, through refcounting.
@@ -118,10 +110,14 @@ void CXRayMtl::releaseCallback(void* clientData)
 
 void CXRayMtl::detachSceneCallbacks()
 {
-    if (fBeforeNewCB) MMessage::removeCallback(fBeforeNewCB);
-    if (fBeforeOpenCB) MMessage::removeCallback(fBeforeOpenCB);
-    if (fBeforeRemoveReferenceCB) MMessage::removeCallback(fBeforeRemoveReferenceCB);
-    if (fMayaExitingCB) MMessage::removeCallback(fMayaExitingCB);
+    if (fBeforeNewCB)
+        MMessage::removeCallback(fBeforeNewCB);
+    if (fBeforeOpenCB)
+        MMessage::removeCallback(fBeforeOpenCB);
+    if (fBeforeRemoveReferenceCB)
+        MMessage::removeCallback(fBeforeRemoveReferenceCB);
+    if (fMayaExitingCB)
+        MMessage::removeCallback(fMayaExitingCB);
 
     fBeforeNewCB = 0;
     fBeforeOpenCB = 0;
@@ -129,11 +125,7 @@ void CXRayMtl::detachSceneCallbacks()
     fMayaExitingCB = 0;
 }
 
-void* CXRayMtl::creator()
-{
-    return xr_new<CXRayMtl>();
-}
-
+void* CXRayMtl::creator() { return xr_new<CXRayMtl>(); }
 MStatus initializePlugin(MObject obj)
 {
     MStatus status;
@@ -143,7 +135,8 @@ MStatus initializePlugin(MObject obj)
     MFnPlugin plugin(obj, "GSC Game World", "1.0.0", "Any");
     status = plugin.registerNode(
         "XRayMtl", CXRayMtl::id, CXRayMtl::creator, CXRayMtl::initialize, MPxNode::kHwShaderNode, &UserClassify);
-    if (!status) {
+    if (!status)
+    {
         status.perror("registerNode");
         return status;
     }
@@ -158,7 +151,8 @@ MStatus uninitializePlugin(MObject obj)
     MFnPlugin plugin(obj);
 
     plugin.deregisterNode(CXRayMtl::id);
-    if (!status) {
+    if (!status)
+    {
         status.perror("deregisterNode");
         return status;
     }
@@ -175,7 +169,7 @@ MStatus CXRayMtl::initialize()
 
     MFnNumericAttribute nAttr;
     MStatus status;
-    MFnTypedAttribute sAttr;  // For string attributes
+    MFnTypedAttribute sAttr; // For string attributes
     MFnEnumAttribute eAttr;
 
     // Create COLOR input attributes
@@ -197,7 +191,7 @@ MStatus CXRayMtl::initialize()
     color = nAttr.create("color", "c", colorR, colorG, colorB);
     nAttr.setStorable(true);
     nAttr.setKeyable(true);
-    nAttr.setDefault(1.0f, 0.5f, 0.5f);  // ugly pink-salmon color. You can't miss it.
+    nAttr.setDefault(1.0f, 0.5f, 0.5f); // ugly pink-salmon color. You can't miss it.
     nAttr.setUsedAsColor(true);
 
     // Create TRANSPARENCY input attributes
@@ -219,7 +213,7 @@ MStatus CXRayMtl::initialize()
     transparency = nAttr.create("transparency", "it", transparencyR, transparencyG, transparencyB);
     nAttr.setStorable(true);
     nAttr.setKeyable(true);
-    nAttr.setDefault(0.0001f, 0.0001f, 0.0001f);  // very light gray.
+    nAttr.setDefault(0.0001f, 0.0001f, 0.0001f); // very light gray.
     nAttr.setUsedAsColor(true);
 
     // Add the attributes here
@@ -322,19 +316,22 @@ MStatus CXRayMtl::getFloat3(MObject attr, float value[3])
     MObject object;
 
     MStatus status = plug.getValue(object);
-    if (!status) {
+    if (!status)
+    {
         status.perror("CXRayMtl::bind plug.getValue.");
         return status;
     }
 
     MFnNumericData data(object, &status);
-    if (!status) {
+    if (!status)
+    {
         status.perror("CXRayMtl::bind construct data.");
         return status;
     }
 
     status = data.getData(value[0], value[1], value[2]);
-    if (!status) {
+    if (!status)
+    {
         status.perror("CXRayMtl::bind get values.");
         return status;
     }
@@ -357,13 +354,14 @@ void CXRayMtl::updateTransparencyFlags(MString objectPath)
     // because it would involve multiplying alpha values of two texture maps...
     MString transparencyName = "";
     ShadingConnection transparencyConnection(thisMObject(), objectPath, "transparency");
-    if (transparencyConnection.type() == ShadingConnection::CONSTANT_COLOR) {
+    if (transparencyConnection.type() == ShadingConnection::CONSTANT_COLOR)
+    {
         // transparency = average of r,g,b transparency channels.
         MColor tc = transparencyConnection.constantColor();
         fConstantTransparency = (tc.r + tc.g + tc.b) / 3.0f;
     }
     else
-        fConstantTransparency = 0.0f;  // will result in alpha=1.
+        fConstantTransparency = 0.0f; // will result in alpha=1.
 }
 
 /* virtual */
@@ -386,12 +384,14 @@ MStatus CXRayMtl::bind(const MDrawRequest& request, M3dView& view)
 
     // If the color attribute is ultimately connected to a file texture, find its filename.
     // otherwise use the default color texture.
-    if (colorConnection.type() == ShadingConnection::TEXTURE && colorConnection.texture().hasFn(MFn::kFileTexture)) {
+    if (colorConnection.type() == ShadingConnection::TEXTURE && colorConnection.texture().hasFn(MFn::kFileTexture))
+    {
         // Get the filename of the texture.
         MFnDependencyNode textureNode(colorConnection.texture());
         MPlug filenamePlug(colorConnection.texture(), textureNode.attribute(MString("fileTextureName")));
         filenamePlug.getValue(decalName);
-        if (decalName == "") getFloat3(color, bgColor);
+        if (decalName == "")
+            getFloat3(color, bgColor);
     }
     else
     {
@@ -419,7 +419,8 @@ MStatus CXRayMtl::bind(const MDrawRequest& request, M3dView& view)
     glColor4f(bgColor[0], bgColor[1], bgColor[2], alpha);
 
     // If the shader is textured...
-    if (decalName.length() != 0) {
+    if (decalName.length() != 0)
+    {
         // Enable 2D texturing.
         glEnable(GL_TEXTURE_2D);
 
@@ -473,7 +474,8 @@ MStatus CXRayMtl::geometry(const MDrawRequest& request, M3dView& view, int prim,
     glVertexPointer(3, GL_FLOAT, 0, vertexArray);
     glEnableClientState(GL_VERTEX_ARRAY);
 
-    if (normalCount > 0) {
+    if (normalCount > 0)
+    {
         // Technically, we don't need the normals for this example. But
         // most of the 3rd party plug-ins will probably want the normal,
         // which is why the following lines were kept.
@@ -481,7 +483,8 @@ MStatus CXRayMtl::geometry(const MDrawRequest& request, M3dView& view, int prim,
         glEnableClientState(GL_NORMAL_ARRAY);
     }
 
-    if (texCoordCount > 0) {
+    if (texCoordCount > 0)
+    {
         glTexCoordPointer(2, GL_FLOAT, 0, texCoordArrays[0]);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     }
@@ -501,11 +504,7 @@ int CXRayMtl::normalsPerVertex()
 }
 
 /* virtual */
-int CXRayMtl::texCoordsPerVertex()
-{
-    return 1;
-}
-
+int CXRayMtl::texCoordsPerVertex() { return 1; }
 /* virtual */
 bool CXRayMtl::hasTransparency()
 {

@@ -50,10 +50,7 @@ CCustomPreferences::CCustomPreferences()
 
 //---------------------------------------------------------------------------
 
-CCustomPreferences::~CCustomPreferences()
-{
-}
-
+CCustomPreferences::~CCustomPreferences() {}
 void CCustomPreferences::ApplyValues()
 {
     Tools->m_MoveSnap = snap_move;
@@ -75,11 +72,7 @@ void CCustomPreferences::ApplyValues()
 
 //---------------------------------------------------------------------------
 
-void __stdcall CCustomPreferences::OnClose()
-{
-    ApplyValues();
-}
-
+void __stdcall CCustomPreferences::OnClose() { ApplyValues(); }
 //---------------------------------------------------------------------------
 
 void CheckValidate(ShortcutValue*, const xr_shortcut& new_val, bool& result)
@@ -89,12 +82,14 @@ void CheckValidate(ShortcutValue*, const xr_shortcut& new_val, bool& result)
     for (u32 cmd_idx = 0; cmd_idx < cmds.size(); cmd_idx++)
     {
         SECommand*& CMD = cmds[cmd_idx];
-        if (CMD && CMD->editable) {
+        if (CMD && CMD->editable)
+        {
             VERIFY(!CMD->sub_commands.empty());
             for (u32 sub_cmd_idx = 0; sub_cmd_idx < CMD->sub_commands.size(); sub_cmd_idx++)
             {
                 SESubCommand*& SUB_CMD = CMD->sub_commands[sub_cmd_idx];
-                if (SUB_CMD->shortcut.similar(new_val)) {
+                if (SUB_CMD->shortcut.similar(new_val))
+                {
                     result = false;
                     return;
                 }
@@ -110,7 +105,8 @@ void CCustomPreferences::OnKeyboardCommonFileClick(ButtonValue* B, bool& bModif,
     switch (B->btn_num)
     {
     case 0:
-        if (EFS.GetOpenName("$import$", fn, false, NULL, 6)) {
+        if (EFS.GetOpenName("$import$", fn, false, NULL, 6))
+        {
             CInifile* I = new CInifile(fn.c_str(), TRUE, TRUE, TRUE);
             LoadShortcuts(I);
             xr_delete(I);
@@ -118,7 +114,8 @@ void CCustomPreferences::OnKeyboardCommonFileClick(ButtonValue* B, bool& bModif,
         }
         break;
     case 1:
-        if (EFS.GetSaveName("$import$", fn, NULL, 6)) {
+        if (EFS.GetSaveName("$import$", fn, NULL, 6))
+        {
             CInifile* I = new CInifile(fn.c_str(), FALSE, TRUE, TRUE);
             SaveShortcuts(I);
             xr_delete(I);
@@ -176,7 +173,8 @@ void CCustomPreferences::FillProp(PropItemVec& props)
     for (u32 cmd_idx = 0; cmd_idx < cmds.size(); cmd_idx++)
     {
         SECommand*& CMD = cmds[cmd_idx];
-        if (CMD && CMD->editable) {
+        if (CMD && CMD->editable)
+        {
             VERIFY(!CMD->sub_commands.empty());
             for (u32 sub_cmd_idx = 0; sub_cmd_idx < CMD->sub_commands.size(); sub_cmd_idx++)
             {
@@ -254,9 +252,11 @@ void CCustomPreferences::Load(CInifile* I)
     {
         shared_str fn =
             R_STRING_SAFE("editor_prefs", AnsiString().sprintf("recent_files_%d", i).c_str(), shared_str(""));
-        if (fn.size()) {
+        if (fn.size())
+        {
             AStringIt it = std::find(scene_recent_list.begin(), scene_recent_list.end(), fn.c_str());
-            if (it == scene_recent_list.end()) scene_recent_list.push_back(*fn);
+            if (it == scene_recent_list.end())
+                scene_recent_list.push_back(*fn);
         }
     }
     sWeather = R_STRING_SAFE("editor_prefs", "weather", shared_str(""));
@@ -345,7 +345,8 @@ void CCustomPreferences::AppendRecentFile(LPCSTR name)
 {
     for (AStringIt it = scene_recent_list.begin(); it != scene_recent_list.end(); it++)
     {
-        if (*it == name) {
+        if (*it == name)
+        {
             scene_recent_list.erase(it);
             break;
         }
@@ -364,9 +365,8 @@ void CCustomPreferences::OnCreate()
     Load();
     m_ItemProps = TProperties::CreateModalForm("Editor Preferences", false, 0, 0,
         TOnCloseEvent(this, &CCustomPreferences::OnClose),
-        TProperties::plItemFolders |
-            TProperties::plFullSort);  // TProperties::plFullExpand TProperties::plFullSort
-                                       // TProperties::plNoClearStore|TProperties::plFolderStore|
+        TProperties::plItemFolders | TProperties::plFullSort); // TProperties::plFullExpand TProperties::plFullSort
+    // TProperties::plNoClearStore|TProperties::plFolderStore|
 }
 
 //---------------------------------------------------------------------------

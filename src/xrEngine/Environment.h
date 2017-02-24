@@ -25,9 +25,9 @@ class CLensFlareDescriptor;
 
 #ifdef INGAME_EDITOR
 #define INGAME_EDITOR_VIRTUAL virtual
-#else  // #ifdef INGAME_EDITOR
+#else // #ifdef INGAME_EDITOR
 #define INGAME_EDITOR_VIRTUAL
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
 // t-defs
 class ENGINE_API CEnvModifier
@@ -91,7 +91,6 @@ public:
         }
         INGAME_EDITOR_VIRTUAL ~SSndChannel() {}
         inline INGAME_EDITOR_VIRTUAL sounds_type& sounds() { return m_sounds; }
-
     protected:
         xr_vector<ref_sound> m_sounds;
     };
@@ -109,12 +108,10 @@ protected:
 public:
     IC const shared_str& name() { return m_load_section; }
     IC const shared_str& get_ambients_config_filename() { return m_ambients_config_filename; }
-
     INGAME_EDITOR_VIRTUAL void load(CInifile& ambients_config, CInifile& sound_channels_config,
         CInifile& effects_config, const shared_str& section);
     IC SEffect* get_rnd_effect() { return effects().empty() ? 0 : effects()[Random.randI(effects().size())]; }
     IC u32 get_rnd_effect_time() { return Random.randI(m_effect_period.x, m_effect_period.y); }
-
     INGAME_EDITOR_VIRTUAL SEffect* create_effect(CInifile& config, LPCSTR id);
     INGAME_EDITOR_VIRTUAL SSndChannel* create_sound_channel(CInifile& config, LPCSTR id);
     INGAME_EDITOR_VIRTUAL ~CEnvAmbient();
@@ -162,7 +159,7 @@ public:
     float wind_direction;
 
     Fvector3 ambient;
-    Fvector4 hemi_color;  // w = R2 correction
+    Fvector4 hemi_color; // w = R2 correction
     Fvector3 sun_color;
     Fvector3 sun_dir;
     float m_fSunShaftsIntensity;
@@ -341,13 +338,13 @@ public:
 public:
     void ED_Reload();
     float GetGameTime() { return fGameTime; }
-#else  // #ifdef _EDITOR
+#else // #ifdef _EDITOR
 #ifdef INGAME_EDITOR
     float GetGameTime() { return fGameTime; }
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
     bool m_paused;
-#endif  // #ifdef _EDITOR
+#endif // #ifdef _EDITOR
 
     CInifile* m_ambients_config;
     CInifile* m_sound_channels_config;
@@ -390,4 +387,4 @@ public:
 ENGINE_API extern Flags32 psEnvFlags;
 ENGINE_API extern float psVisDistance;
 
-#endif  // EnvironmentH
+#endif // EnvironmentH

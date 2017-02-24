@@ -18,7 +18,7 @@ const float Math<float>::EPSILON = FLT_EPSILON;
 template <>
 const float Math<float>::ZERO_TOLERANCE = 1e-06f;
 template <>
-const float Math<float>::MAX_REAL = flt_max;  //.FLT_MAX;
+const float Math<float>::MAX_REAL = flt_max; //.FLT_MAX;
 template <>
 const float Math<float>::_PI = (float)(4.0 * atan(1.0));
 template <>

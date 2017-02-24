@@ -77,8 +77,10 @@ void compute_bbox(Vec& min, Vec& max, const List& items)
         const Vec& v = *i;
         for (int j = 0; j < Vec::dim(); j++)
         {
-            if (v[j] < min[j]) min[j] = v[j];
-            if (v[j] > max[j]) max[j] = v[j];
+            if (v[j] < min[j])
+                min[j] = v[j];
+            if (v[j] > max[j])
+                max[j] = v[j];
         }
     }
 }
@@ -87,7 +89,8 @@ template <class Vec>
 bool is_inside_bbox(const Vec& p, const Vec& min, Vec& max)
 {
     for (int i = 0; i < Vec::dim(); i++)
-        if (p[i] < min[i] || p[i] > max[i]) return false;
+        if (p[i] < min[i] || p[i] > max[i])
+            return false;
 
     return true;
 }

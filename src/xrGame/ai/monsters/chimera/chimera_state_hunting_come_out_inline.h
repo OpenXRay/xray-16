@@ -1,28 +1,17 @@
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
 #define CStateChimeraHuntingMoveToCoverAbstract CStateChimeraHuntingMoveToCover<_Object>
 
 TEMPLATE_SPECIALIZATION
-CStateChimeraHuntingMoveToCoverAbstract::CStateChimeraHuntingMoveToCover(_Object* obj) : inherited(obj)
-{
-}
-
+CStateChimeraHuntingMoveToCoverAbstract::CStateChimeraHuntingMoveToCover(_Object* obj) : inherited(obj) {}
 TEMPLATE_SPECIALIZATION
-bool CStateChimeraHuntingMoveToCoverAbstract::check_start_conditions()
-{
-    return true;
-}
-
+bool CStateChimeraHuntingMoveToCoverAbstract::check_start_conditions() { return true; }
 TEMPLATE_SPECIALIZATION
-bool CStateChimeraHuntingMoveToCoverAbstract::check_completion()
-{
-    return false;
-}
-
+bool CStateChimeraHuntingMoveToCoverAbstract::check_completion() { return false; }
 TEMPLATE_SPECIALIZATION
 void CStateChimeraHuntingMoveToCoverAbstract::reselect_state()
 {

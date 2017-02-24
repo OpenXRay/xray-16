@@ -107,7 +107,8 @@ void MinimizeN<Real>::GetMinimum(const Real* afT0, const Real* afT1, const Real*
 
         const Real fEpsilon = (Real)1e-06;
         fLength = Math<Real>::Sqrt(fLength);
-        if (fLength < fEpsilon) {
+        if (fLength < fEpsilon)
+        {
             // New position did not change significantly from old one.
             // Should there be a better convergence criterion here?
             break;
@@ -148,28 +149,35 @@ void MinimizeN<Real>::ComputeDomain(const Real* afT0, const Real* afT1, Real& rf
         Real fB0 = afT0[i] - m_afTCurr[i];
         Real fB1 = afT1[i] - m_afTCurr[i];
         Real fInv;
-        if (m_afDCurr[i] > (Real)0.0) {
+        if (m_afDCurr[i] > (Real)0.0)
+        {
             // valid t-interval is [B0,B1]
             fInv = ((Real)1.0) / m_afDCurr[i];
             fB0 *= fInv;
-            if (fB0 > rfL0) rfL0 = fB0;
+            if (fB0 > rfL0)
+                rfL0 = fB0;
             fB1 *= fInv;
-            if (fB1 < rfL1) rfL1 = fB1;
+            if (fB1 < rfL1)
+                rfL1 = fB1;
         }
         else if (m_afDCurr[i] < (Real)0.0)
         {
             // valid t-interval is [B1,B0]
             fInv = ((Real)1.0) / m_afDCurr[i];
             fB0 *= fInv;
-            if (fB0 < rfL1) rfL1 = fB0;
+            if (fB0 < rfL1)
+                rfL1 = fB0;
             fB1 *= fInv;
-            if (fB1 > rfL0) rfL0 = fB1;
+            if (fB1 > rfL0)
+                rfL0 = fB1;
         }
     }
 
     // correction if numerical errors lead to values nearly zero
-    if (rfL0 > (Real)0.0) rfL0 = (Real)0.0;
-    if (rfL1 < (Real)0.0) rfL1 = (Real)0.0;
+    if (rfL0 > (Real)0.0)
+        rfL0 = (Real)0.0;
+    if (rfL1 < (Real)0.0)
+        rfL1 = (Real)0.0;
 }
 //----------------------------------------------------------------------------
 template <class Real>

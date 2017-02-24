@@ -11,21 +11,13 @@
 #include "Common/object_broker.h"
 #include "Include/xrRender/Kinematics.h"
 
-CStalkerAnimationState::CStalkerAnimationState()
-{
-    m_in_place = new IN_PLACE_ANIMATIONS();
-}
-
+CStalkerAnimationState::CStalkerAnimationState() { m_in_place = new IN_PLACE_ANIMATIONS(); }
 CStalkerAnimationState::CStalkerAnimationState(const CStalkerAnimationState& stalker_animation_state)
 {
     clone(stalker_animation_state.m_in_place, m_in_place);
 }
 
-CStalkerAnimationState::~CStalkerAnimationState()
-{
-    xr_delete(m_in_place);
-}
-
+CStalkerAnimationState::~CStalkerAnimationState() { xr_delete(m_in_place); }
 void CStalkerAnimationState::Load(IKinematicsAnimated* kinematics, LPCSTR base_name)
 {
     string256 S;

@@ -18,14 +18,10 @@ CHitMarker::CHitMarker()
     InitShader_Grenade(pSettings->r_string("hud_hitmark", "grenade_mark_texture"));
 }
 
-void CHitMarker::InitShader(LPCSTR tex_name)
-{
-    hShader2->create("hud\\default", tex_name);
-}
-
+void CHitMarker::InitShader(LPCSTR tex_name) { hShader2->create("hud\\default", tex_name); }
 void CHitMarker::InitShader_Grenade(LPCSTR tex_name)
 {
-    hShader_Grenade->create("hud\\default", tex_name);  // "hud\\default2"
+    hShader_Grenade->create("hud\\default", tex_name); // "hud\\default2"
 }
 
 //--------------------------------------------------------------------
@@ -87,7 +83,8 @@ void CHitMarker::Hit(const Fvector& dir)
 
 bool CHitMarker::AddGrenade_ForMark(CGrenade* grn)
 {
-    if (!grn) return false;
+    if (!grn)
+        return false;
     u16 new_id = grn->ID();
 
     GRENADEMARKS::iterator it_b = m_GrenadeMarks.begin();
@@ -95,8 +92,10 @@ bool CHitMarker::AddGrenade_ForMark(CGrenade* grn)
 
     for (; it_b != it_e; ++it_b)
     {
-        if ((*it_b)->removed_grenade) continue;
-        if ((*it_b)->p_grenade->ID() == new_id) return false;
+        if ((*it_b)->removed_grenade)
+            continue;
+        if ((*it_b)->p_grenade->ID() == new_id)
+            return false;
     }
 
     m_GrenadeMarks.push_back(new SGrenadeMark(hShader_Grenade, grn));
@@ -111,10 +110,12 @@ void CHitMarker::Update_GrenadeView(Fvector& pos_actor)
 
     for (; it_b != it_e; ++it_b)
     {
-        if ((*it_b)->removed_grenade) continue;
+        if ((*it_b)->removed_grenade)
+            continue;
 
         CGrenade* grn = (*it_b)->p_grenade;
-        if (grn->IsExploding()) {
+        if (grn->IsExploding())
+        {
             (*it_b)->removed_grenade = true;
             continue;
         }
@@ -139,13 +140,15 @@ void CHitMarker::net_Relcase(IGameObject* obj)
 
     for (; it_b != it_e; ++it_b)
     {
-        if ((*it_b)->removed_grenade) continue;
+        if ((*it_b)->removed_grenade)
+            continue;
 
-        if ((*it_b)->p_grenade->ID() == remove_id) {
+        if ((*it_b)->p_grenade->ID() == remove_id)
+        {
             (*it_b)->removed_grenade = true;
             // break;
         }
-    }  // for
+    } // for
 }
 
 //==========================================================================================
@@ -161,16 +164,8 @@ SHitMark::SHitMark(const ui_shader& sh, const Fvector& dir)
     m_UIStaticItem->SetSize(Fvector2().set(512.0f, 512.0f));
 }
 
-SHitMark::~SHitMark()
-{
-    xr_delete(m_UIStaticItem);
-}
-
-bool SHitMark::IsActive()
-{
-    return ((Device.fTimeGlobal - m_StartTime) < m_lanim->Length_sec());
-}
-
+SHitMark::~SHitMark() { xr_delete(m_UIStaticItem); }
+bool SHitMark::IsActive() { return ((Device.fTimeGlobal - m_StartTime) < m_lanim->Length_sec()); }
 void SHitMark::Draw(float cam_dir)
 {
     int frame;
@@ -198,22 +193,14 @@ SGrenadeMark::SGrenadeMark(const ui_shader& sh, CGrenade* grn)
     m_UIStaticItem->SetSize(Fvector2().set(xs, ys));
 }
 
-SGrenadeMark::~SGrenadeMark()
-{
-    xr_delete(m_UIStaticItem);
-}
-
+SGrenadeMark::~SGrenadeMark() { xr_delete(m_UIStaticItem); }
 void SGrenadeMark::Update(float angle)
 {
     m_Angle = angle;
     m_LastTime = Device.fTimeGlobal;
 }
 
-bool SGrenadeMark::IsActive() const
-{
-    return (2.0f * (Device.fTimeGlobal - m_LastTime) < m_LightAnim->Length_sec());
-}
-
+bool SGrenadeMark::IsActive() const { return (2.0f * (Device.fTimeGlobal - m_LastTime) < m_LightAnim->Length_sec()); }
 void SGrenadeMark::Draw(float cam_dir)
 {
     int frame;

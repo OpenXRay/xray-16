@@ -60,10 +60,7 @@ CUIChangeMap::CUIChangeMap()
     AttachChild(btn_cancel);
 }
 
-CUIChangeMap::~CUIChangeMap()
-{
-}
-
+CUIChangeMap::~CUIChangeMap() {}
 void CUIChangeMap::InitChangeMap(CUIXml& xml_doc)
 {
     CUIXmlInit::InitWindow(xml_doc, "change_map", 0, this);
@@ -84,7 +81,8 @@ void CUIChangeMap::InitChangeMap(CUIXml& xml_doc)
 #include <dinput.h>
 bool CUIChangeMap::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (dik == DIK_ESCAPE) {
+    if (dik == DIK_ESCAPE)
+    {
         OnBtnCancel();
         return true;
     }
@@ -93,7 +91,8 @@ bool CUIChangeMap::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 
 void CUIChangeMap::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
-    if (LIST_ITEM_SELECT == msg && pWnd == lst) {
+    if (LIST_ITEM_SELECT == msg && pWnd == lst)
+    {
         OnItemSelect();
     }
     else if (BUTTON_CLICKED == msg)
@@ -108,7 +107,8 @@ void CUIChangeMap::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 void CUIChangeMap::OnItemSelect()
 {
     u32 idx = lst->GetSelectedIDX();
-    if (idx == u32(-1)) return;
+    if (idx == u32(-1))
+        return;
 
     const SGameTypeMaps& M = gMapListHelper.GetMapListFor((EGameIDs)GameID());
     const shared_str& name = M.m_map_names[idx].map_name;
@@ -132,7 +132,8 @@ void CUIChangeMap::OnBtnOk()
 {
     u32 idx = lst->GetSelectedIDX();
     const SGameTypeMaps& M = gMapListHelper.GetMapListFor((EGameIDs)GameID());
-    if (idx >= 0 && idx < M.m_map_names.size()) {
+    if (idx >= 0 && idx < M.m_map_names.size())
+    {
         const shared_str& name = M.m_map_names[idx].map_name;
         const shared_str& ver = M.m_map_names[idx].map_ver;
 
@@ -152,11 +153,8 @@ void CUIChangeMap::FillUpList()
     for (u32 i = 0; i < cnt; ++i)
     {
         CUIListBoxItem* itm = lst->AddTextItem(CStringTable().translate(M.m_map_names[i].map_name).c_str());
-        itm->Enable(true);  // m_pExtraContentFilter->IsDataEnabled(M.m_map_names[i].map_name.c_str()));
+        itm->Enable(true); // m_pExtraContentFilter->IsDataEnabled(M.m_map_names[i].map_name.c_str()));
     }
 }
 
-void CUIChangeMap::OnBtnCancel()
-{
-    HideDialog();
-}
+void CUIChangeMap::OnBtnCancel() { HideDialog(); }

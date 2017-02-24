@@ -26,12 +26,16 @@ void lwFreePoints(lwPointList* point)
 {
     int i;
 
-    if (point) {
-        if (point->pt) {
+    if (point)
+    {
+        if (point->pt)
+        {
             for (i = 0; i < point->count; i++)
             {
-                if (point->pt[i].pol) free(point->pt[i].pol);
-                if (point->pt[i].vm) free(point->pt[i].vm);
+                if (point->pt[i].pol)
+                    free(point->pt[i].pol);
+                if (point->pt[i].vm)
+                    free(point->pt[i].vm);
             }
             free(point->pt);
         }
@@ -50,16 +54,21 @@ void lwFreePolygons(lwPolygonList* plist)
 {
     int i, j;
 
-    if (plist) {
-        if (plist->pol) {
+    if (plist)
+    {
+        if (plist->pol)
+        {
             for (i = 0; i < plist->count; i++)
             {
-                if (plist->pol[i].v) {
+                if (plist->pol[i].v)
+                {
                     for (j = 0; j < plist->pol[i].nverts; j++)
-                        if (plist->pol[i].v[j].vm) free(plist->pol[i].v[j].vm);
+                        if (plist->pol[i].v[j].vm)
+                            free(plist->pol[i].v[j].vm);
                 }
             }
-            if (plist->pol[0].v) free(plist->pol[0].v);
+            if (plist->pol[0].v)
+                free(plist->pol[0].v);
             free(plist->pol);
         }
         memset(plist, 0, sizeof(lwPolygonList));
@@ -79,7 +88,8 @@ int lwGetPoints(FILE* fp, int cksize, lwPointList* point)
     float* f;
     int np, i, j;
 
-    if (cksize == 1) return 1;
+    if (cksize == 1)
+        return 1;
 
     /* extend the point array to hold the new points */
 
@@ -87,13 +97,15 @@ int lwGetPoints(FILE* fp, int cksize, lwPointList* point)
     point->offset = point->count;
     point->count += np;
     point->pt = realloc(point->pt, point->count * sizeof(lwPoint));
-    if (!point->pt) return 0;
+    if (!point->pt)
+        return 0;
     memset(&point->pt[point->offset], 0, np * sizeof(lwPoint));
 
     /* read the whole chunk */
 
     f = (float*)getbytes(fp, cksize);
-    if (!f) return 0;
+    if (!f)
+        return 0;
     revbytes(f, 4, np * 3);
 
     /* assign position values */
@@ -121,10 +133,12 @@ void lwGetBoundingBox(lwPointList* point, float bbox[])
 {
     int i, j;
 
-    if (point->count == 0) return;
+    if (point->count == 0)
+        return;
 
     for (i = 0; i < 6; i++)
-        if (bbox[i] != 0.0f) return;
+        if (bbox[i] != 0.0f)
+            return;
 
     bbox[0] = bbox[1] = bbox[2] = 1e20f;
     bbox[3] = bbox[4] = bbox[5] = -1e20f;
@@ -132,8 +146,10 @@ void lwGetBoundingBox(lwPointList* point, float bbox[])
     {
         for (j = 0; j < 3; j++)
         {
-            if (bbox[j] > point->pt[i].pos[j]) bbox[j] = point->pt[i].pos[j];
-            if (bbox[j + 3] < point->pt[i].pos[j]) bbox[j + 3] = point->pt[i].pos[j];
+            if (bbox[j] > point->pt[i].pos[j])
+                bbox[j] = point->pt[i].pos[j];
+            if (bbox[j + 3] < point->pt[i].pos[j])
+                bbox[j + 3] = point->pt[i].pos[j];
         }
     }
 }
@@ -152,13 +168,15 @@ int lwAllocPolygons(lwPolygonList* plist, int npols, int nverts)
     plist->offset = plist->count;
     plist->count += npols;
     plist->pol = realloc(plist->pol, plist->count * sizeof(lwPolygon));
-    if (!plist->pol) return 0;
+    if (!plist->pol)
+        return 0;
     memset(plist->pol + plist->offset, 0, npols * sizeof(lwPolygon));
 
     plist->voffset = plist->vcount;
     plist->vcount += nverts;
     plist->pol[0].v = realloc(plist->pol[0].v, plist->vcount * sizeof(lwPolVert));
-    if (!plist->pol[0].v) return 0;
+    if (!plist->pol[0].v)
+        return 0;
     memset(plist->pol[0].v + plist->voffset, 0, nverts * sizeof(lwPolVert));
 
     /* fix up the old vertex pointers */
@@ -185,14 +203,16 @@ int lwGetPolygons(FILE* fp, int cksize, lwPolygonList* plist, int ptoffset)
     int i, j, flags, nv, nverts, npols;
     unsigned int type;
 
-    if (cksize == 0) return 1;
+    if (cksize == 0)
+        return 1;
 
     /* read the whole chunk */
 
     set_flen(0);
     type = getU4(fp);
     buf = getbytes(fp, cksize - 4);
-    if (cksize != get_flen()) goto Fail;
+    if (cksize != get_flen())
+        goto Fail;
 
     /* count the polygons and vertices */
 
@@ -210,7 +230,8 @@ int lwGetPolygons(FILE* fp, int cksize, lwPolygonList* plist, int ptoffset)
             j = sgetVX(&bp);
     }
 
-    if (!lwAllocPolygons(plist, npols, nverts)) goto Fail;
+    if (!lwAllocPolygons(plist, npols, nverts))
+        goto Fail;
 
     /* fill in the new polygons */
 
@@ -227,7 +248,8 @@ int lwGetPolygons(FILE* fp, int cksize, lwPolygonList* plist, int ptoffset)
         pp->nverts = nv;
         pp->flags = flags;
         pp->type = type;
-        if (!pp->v) pp->v = pv;
+        if (!pp->v)
+            pp->v = pv;
         for (j = 0; j < nv; j++)
             pp->v[j].index = sgetVX(&bp) + ptoffset;
 
@@ -239,7 +261,8 @@ int lwGetPolygons(FILE* fp, int cksize, lwPolygonList* plist, int ptoffset)
     return 1;
 
 Fail:
-    if (buf) free(buf);
+    if (buf)
+        free(buf);
     lwFreePolygons(plist);
     return 0;
 }
@@ -260,7 +283,8 @@ void lwGetPolyNormals(lwPointList* point, lwPolygonList* polygon)
 
     for (i = 0; i < polygon->count; i++)
     {
-        if (polygon->pol[i].nverts < 3) continue;
+        if (polygon->pol[i].nverts < 3)
+            continue;
         for (j = 0; j < 3; j++)
         {
             p1[j] = point->pt[polygon->pol[i].v[0].index].pos[j];
@@ -302,9 +326,11 @@ int lwGetPointPolygons(lwPointList* point, lwPolygonList* polygon)
 
     for (i = 0; i < point->count; i++)
     {
-        if (point->pt[i].npols == 0) continue;
+        if (point->pt[i].npols == 0)
+            continue;
         point->pt[i].pol = calloc(point->pt[i].npols, sizeof(int));
-        if (!point->pt[i].pol) return 0;
+        if (!point->pt[i].pol)
+            return 0;
         point->pt[i].npols = 0;
     }
 
@@ -337,17 +363,20 @@ int lwResolvePolySurfaces(lwPolygonList* polygon, lwTagList* tlist, lwSurface** 
     lwSurface **s, *st;
     int i, index;
 
-    if (tlist->count == 0) return 1;
+    if (tlist->count == 0)
+        return 1;
 
     s = calloc(tlist->count, sizeof(lwSurface*));
-    if (!s) return 0;
+    if (!s)
+        return 0;
 
     for (i = 0; i < tlist->count; i++)
     {
         st = *surf;
         while (st)
         {
-            if (!strcmp(st->name, tlist->tag[i])) {
+            if (!strcmp(st->name, tlist->tag[i]))
+            {
                 s[i] = st;
                 break;
             }
@@ -358,12 +387,16 @@ int lwResolvePolySurfaces(lwPolygonList* polygon, lwTagList* tlist, lwSurface** 
     for (i = 0; i < polygon->count; i++)
     {
         index = (int)polygon->pol[i].surf;
-        if (index < 0 || index > tlist->count) return 0;
-        if (!s[index]) {
+        if (index < 0 || index > tlist->count)
+            return 0;
+        if (!s[index])
+        {
             s[index] = lwDefaultSurface();
-            if (!s[index]) return 0;
+            if (!s[index])
+                return 0;
             s[index]->name = malloc(strlen(tlist->tag[index]) + 1);
-            if (!s[index]->name) return 0;
+            if (!s[index]->name)
+                return 0;
             strcpy(s[index]->name, tlist->tag[index]);
             lwListAdd(surf, s[index]);
             *nsurfs = *nsurfs + 1;
@@ -402,18 +435,22 @@ void lwGetVertNormals(lwPointList* point, lwPolygonList* polygon)
             for (k = 0; k < 3; k++)
                 polygon->pol[j].v[n].norm[k] = polygon->pol[j].norm[k];
 
-            if (polygon->pol[j].surf->smooth <= 0) continue;
+            if (polygon->pol[j].surf->smooth <= 0)
+                continue;
 
             p = polygon->pol[j].v[n].index;
 
             for (g = 0; g < point->pt[p].npols; g++)
             {
                 h = point->pt[p].pol[g];
-                if (h == j) continue;
+                if (h == j)
+                    continue;
 
-                if (polygon->pol[j].smoothgrp != polygon->pol[h].smoothgrp) continue;
+                if (polygon->pol[j].smoothgrp != polygon->pol[h].smoothgrp)
+                    continue;
                 a = vecangle(polygon->pol[j].norm, polygon->pol[h].norm);
-                if (a > polygon->pol[j].surf->smooth) continue;
+                if (a > polygon->pol[j].surf->smooth)
+                    continue;
 
                 for (k = 0; k < 3; k++)
                     polygon->pol[j].v[n].norm[k] += polygon->pol[h].norm[k];
@@ -435,10 +472,13 @@ void lwFreeTags(lwTagList* tlist)
 {
     int i;
 
-    if (tlist) {
-        if (tlist->tag) {
+    if (tlist)
+    {
+        if (tlist->tag)
+        {
             for (i = 0; i < tlist->count; i++)
-                if (tlist->tag[i]) free(tlist->tag[i]);
+                if (tlist->tag[i])
+                    free(tlist->tag[i]);
             free(tlist->tag);
         }
         memset(tlist, 0, sizeof(lwTagList));
@@ -458,13 +498,15 @@ int lwGetTags(FILE* fp, int cksize, lwTagList* tlist)
     char *buf, *bp;
     int i, len, ntags;
 
-    if (cksize == 0) return 1;
+    if (cksize == 0)
+        return 1;
 
     /* read the whole chunk */
 
     set_flen(0);
     buf = getbytes(fp, cksize);
-    if (!buf) return 0;
+    if (!buf)
+        return 0;
 
     /* count the strings */
 
@@ -483,7 +525,8 @@ int lwGetTags(FILE* fp, int cksize, lwTagList* tlist)
     tlist->offset = tlist->count;
     tlist->count += ntags;
     tlist->tag = realloc(tlist->tag, tlist->count * sizeof(char*));
-    if (!tlist->tag) goto Fail;
+    if (!tlist->tag)
+        goto Fail;
     memset(&tlist->tag[tlist->offset], 0, ntags * sizeof(char*));
 
     /* copy the new tags to the tag array */
@@ -496,7 +539,8 @@ int lwGetTags(FILE* fp, int cksize, lwTagList* tlist)
     return 1;
 
 Fail:
-    if (buf) free(buf);
+    if (buf)
+        free(buf);
     return 0;
 }
 
@@ -515,9 +559,11 @@ int lwGetPolygonTags(FILE* fp, int cksize, lwTagList* tlist, lwPolygonList* plis
     set_flen(0);
     type = getU4(fp);
     rlen = get_flen();
-    if (rlen < 0) return 0;
+    if (rlen < 0)
+        return 0;
 
-    if (type != ID_SURF && type != ID_PART && type != ID_SMGP) {
+    if (type != ID_SURF && type != ID_PART && type != ID_SMGP)
+    {
         fseek(fp, cksize - 4, SEEK_CUR);
         return 1;
     }
@@ -527,7 +573,8 @@ int lwGetPolygonTags(FILE* fp, int cksize, lwTagList* tlist, lwPolygonList* plis
         i = getVX(fp) + plist->offset;
         j = getVX(fp) + tlist->offset;
         rlen = get_flen();
-        if (rlen < 0 || rlen > cksize) return 0;
+        if (rlen < 0 || rlen > cksize)
+            return 0;
 
         switch (type)
         {

@@ -78,7 +78,8 @@ void CEditableMesh::UnloadCForm()
 void CEditableMesh::UnloadFNormals(bool force)
 {
     m_FNormalsRefs--;
-    if (force || m_FNormalsRefs <= 0) {
+    if (force || m_FNormalsRefs <= 0)
+    {
         xr_free(m_FaceNormals);
         m_FNormalsRefs = 0;
     }
@@ -87,7 +88,8 @@ void CEditableMesh::UnloadFNormals(bool force)
 void CEditableMesh::UnloadVNormals(bool force)
 {
     m_VNormalsRefs--;
-    if (force || m_VNormalsRefs <= 0) {
+    if (force || m_VNormalsRefs <= 0)
+    {
         xr_free(m_VertexNormals);
         m_VNormalsRefs = 0;
     }
@@ -96,7 +98,8 @@ void CEditableMesh::UnloadVNormals(bool force)
 void CEditableMesh::UnloadSVertices(bool force)
 {
     m_SVertRefs--;
-    if (force || m_SVertRefs <= 0) {
+    if (force || m_SVertRefs <= 0)
+    {
         xr_free(m_SVertices);
         m_SVertRefs = 0;
     }
@@ -105,7 +108,8 @@ void CEditableMesh::UnloadSVertices(bool force)
 void CEditableMesh::UnloadAdjacency(bool force)
 {
     m_AdjsRefs--;
-    if (force || m_AdjsRefs <= 0) {
+    if (force || m_AdjsRefs <= 0)
+    {
         xr_delete(m_Adjs);
         m_AdjsRefs = 0;
     }
@@ -113,7 +117,8 @@ void CEditableMesh::UnloadAdjacency(bool force)
 
 void CEditableMesh::RecomputeBBox()
 {
-    if (0 == m_VertCount) {
+    if (0 == m_VertCount)
+    {
         m_Box.set(0, 0, 0, 0, 0, 0);
         return;
     }
@@ -125,7 +130,8 @@ void CEditableMesh::RecomputeBBox()
 void CEditableMesh::GenerateFNormals()
 {
     m_FNormalsRefs++;
-    if (m_FaceNormals) return;
+    if (m_FaceNormals)
+        return;
     m_FaceNormals = xr_alloc<Fvector>(m_FaceCount);
 
     // face normals
@@ -139,7 +145,8 @@ BOOL CEditableMesh::m_bDraftMeshMode = FALSE;
 void CEditableMesh::GenerateVNormals(const Fmatrix* parent_xform)
 {
     m_VNormalsRefs++;
-    if (m_VertexNormals) return;
+    if (m_VertexNormals)
+        return;
     m_VertexNormals = xr_alloc<Fvector>(m_FaceCount * 3);
 
     // gen req
@@ -157,13 +164,15 @@ void CEditableMesh::GenerateVNormals(const Fmatrix* parent_xform)
             VERIFY(face_adj_it != a_lst.end());
             //
             N.set(m_FaceNormals[a_lst.front()]);
-            if (m_bDraftMeshMode) continue;
+            if (m_bDraftMeshMode)
+                continue;
 
             typedef itterate_adjacents<itterate_adjacents_params_dynamic<st_FaceVert>> iterate_adj;
             iterate_adj::recurse_tri_params p(N, m_SmoothGroups, m_FaceNormals, a_lst, m_Faces, m_FaceCount);
             iterate_adj::RecurseTri(face_adj_it - a_lst.begin(), p);
             float len = N.magnitude();
-            if (len > EPS_S) {
+            if (len > EPS_S)
+            {
                 N.div(len);
             }
             else
@@ -172,7 +181,8 @@ void CEditableMesh::GenerateVNormals(const Fmatrix* parent_xform)
 //%3.2f]",m_Parent->GetName(),VPUSH(m_Vertices[m_Faces[f_i].pv[k].pindex]));
 
 #ifdef _EDITOR
-                if (parent_xform) {
+                if (parent_xform)
+                {
                     Fvector p0;
                     parent_xform->transform_tiny(p0, m_Vertices[m_Faces[f_i].pv[k].pindex]);
                     Tools->m_DebugDraw.AppendPoint(p0, 0xffff0000, true, true, "invalid vNORMAL");
@@ -317,11 +327,14 @@ void CEditableMesh::GenerateVNormals(const Fmatrix* parent_xform)
 */
 void CEditableMesh::GenerateSVertices(u32 influence)
 {
-    if (!m_Parent->IsSkeleton()) return;
+    if (!m_Parent->IsSkeleton())
+        return;
 
     m_SVertRefs++;
-    if (m_SVertInfl != influence) UnloadSVertices(true);
-    if (m_SVertices) return;
+    if (m_SVertInfl != influence)
+        UnloadSVertices(true);
+    if (m_SVertices)
+        return;
     m_SVertices = xr_alloc<st_SVert>(m_FaceCount * 3);
     m_SVertInfl = influence;
 
@@ -349,11 +362,13 @@ void CEditableMesh::GenerateSVertices(u32 influence)
             for (u8 vmpt_id = 0; vmpt_id != vmpt_lst.count; ++vmpt_id)
             {
                 const st_VMap& VM = *m_VMaps[vmpt_lst.pts[vmpt_id].vmap_index];
-                if (VM.type == vmtWeight) {
+                if (VM.type == vmtWeight)
+                {
                     wb.push_back(
                         st_WB(m_Parent->GetBoneIndexByWMap(VM.name.c_str()), VM.getW(vmpt_lst.pts[vmpt_id].index)));
 
-                    if (wb.back().bone == BI_NONE) {
+                    if (wb.back().bone == BI_NONE)
+                    {
                         ELog.DlgMsg(mtError, "Can't find bone assigned to weight map %s", *VM.name);
                         FATAL("Editor crashed.");
                         return;
@@ -386,7 +401,8 @@ void CEditableMesh::GenerateSVertices(u32 influence)
 void CEditableMesh::GenerateAdjacency()
 {
     m_AdjsRefs++;
-    if (m_Adjs) return;
+    if (m_Adjs)
+        return;
     m_Adjs = new AdjVec();
     VERIFY(m_Faces);
     m_Adjs->resize(m_VertCount);
@@ -403,7 +419,8 @@ CSurface* CEditableMesh::GetSurfaceByFaceID(u32 fid)
     {
         IntVec& face_lst = sp_it->second;
         IntIt f_it = std::lower_bound(face_lst.begin(), face_lst.end(), (int)fid);
-        if ((f_it != face_lst.end()) && (*f_it == (int)fid)) return sp_it->first;
+        if ((f_it != face_lst.end()) && (*f_it == (int)fid))
+            return sp_it->first;
         //.		if (std::find(face_lst.begin(),face_lst.end(),fid)!=face_lst.end()) return sp_it->first;
     }
     return 0;
@@ -435,9 +452,11 @@ int CEditableMesh::GetFaceCount(bool bMatch2Sided, bool bIgnoreOCC)
     for (SurfFacesPairIt sp_it = m_SurfFaces.begin(); sp_it != m_SurfFaces.end(); sp_it++)
     {
         CSurface* S = sp_it->first;
-        if (S->m_GameMtlName == "materials\\occ" && bIgnoreOCC) continue;
+        if (S->m_GameMtlName == "materials\\occ" && bIgnoreOCC)
+            continue;
 
-        if (bMatch2Sided) {
+        if (bMatch2Sided)
+        {
             if (S->m_Flags.is(CSurface::sf2Sided))
                 f_cnt += sp_it->second.size() * 2;
             else
@@ -454,7 +473,8 @@ int CEditableMesh::GetFaceCount(bool bMatch2Sided, bool bIgnoreOCC)
 float CEditableMesh::CalculateSurfaceArea(CSurface* surf, bool bMatch2Sided)
 {
     SurfFacesPairIt sp_it = m_SurfFaces.find(surf);
-    if (sp_it == m_SurfFaces.end()) return 0;
+    if (sp_it == m_SurfFaces.end())
+        return 0;
     float area = 0;
     IntVec& pol_lst = sp_it->second;
     for (int k = 0; k < int(pol_lst.size()); k++)
@@ -465,14 +485,16 @@ float CEditableMesh::CalculateSurfaceArea(CSurface* surf, bool bMatch2Sided)
         e02.sub(m_Vertices[F.pv[2].pindex], m_Vertices[F.pv[0].pindex]);
         area += c.crossproduct(e01, e02).magnitude() / 2.f;
     }
-    if (bMatch2Sided && sp_it->first->m_Flags.is(CSurface::sf2Sided)) area *= 2;
+    if (bMatch2Sided && sp_it->first->m_Flags.is(CSurface::sf2Sided))
+        area *= 2;
     return area;
 }
 
 float CEditableMesh::CalculateSurfacePixelArea(CSurface* surf, bool bMatch2Sided)
 {
     SurfFacesPairIt sp_it = m_SurfFaces.find(surf);
-    if (sp_it == m_SurfFaces.end()) return 0;
+    if (sp_it == m_SurfFaces.end())
+        return 0;
     float area = 0;
     IntVec& pol_lst = sp_it->second;
     for (int k = 0; k < int(pol_lst.size()); k++)
@@ -485,16 +507,19 @@ float CEditableMesh::CalculateSurfacePixelArea(CSurface* surf, bool bMatch2Sided
         e02.sub(Fvector().set(tc[2]->x, tc[2]->y, 0), Fvector().set(tc[0]->x, tc[0]->y, 0));
         area += c.crossproduct(e01, e02).magnitude() / 2.f;
     }
-    if (bMatch2Sided && sp_it->first->m_Flags.is(CSurface::sf2Sided)) area *= 2;
+    if (bMatch2Sided && sp_it->first->m_Flags.is(CSurface::sf2Sided))
+        area *= 2;
     return area;
 }
 
 int CEditableMesh::GetSurfFaceCount(CSurface* surf, bool bMatch2Sided)
 {
     SurfFacesPairIt sp_it = m_SurfFaces.find(surf);
-    if (sp_it == m_SurfFaces.end()) return 0;
+    if (sp_it == m_SurfFaces.end())
+        return 0;
     int f_cnt = sp_it->second.size();
-    if (bMatch2Sided && sp_it->first->m_Flags.is(CSurface::sf2Sided)) f_cnt *= 2;
+    if (bMatch2Sided && sp_it->first->m_Flags.is(CSurface::sf2Sided))
+        f_cnt *= 2;
     return f_cnt;
 }
 
@@ -526,9 +551,5 @@ int CEditableMesh::FindVMapByName(VMapVec& vmaps, const char* name, u8 t, bool p
 
 //----------------------------------------------------------------------------
 
-bool CEditableMesh::Validate()
-{
-    return true;
-}
-
+bool CEditableMesh::Validate() { return true; }
 //----------------------------------------------------------------------------

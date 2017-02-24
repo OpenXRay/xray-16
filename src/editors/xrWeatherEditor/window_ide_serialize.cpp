@@ -22,7 +22,8 @@ template <typename T>
 inline static T registry_value(RegistryKey ^ key, String ^ value_id, const T& default_value)
 {
     array<String ^> ^ names = key->GetValueNames();
-    if (names->IndexOf(names, value_id) >= 0) return ((T)key->GetValue(value_id));
+    if (names->IndexOf(names, value_id) >= 0)
+        return ((T)key->GetValue(value_id));
 
     return (default_value);
 }
@@ -33,12 +34,14 @@ RegistryKey ^ window_ide::base_registry_key()
     VERIFY(software);
 
     RegistryKey ^ company = software->OpenSubKey(COMPANY_NAME, true);
-    if (!company) company = software->CreateSubKey(COMPANY_NAME);
+    if (!company)
+        company = software->CreateSubKey(COMPANY_NAME);
     VERIFY(company);
     software->Close();
 
     RegistryKey ^ product = company->OpenSubKey(PRODUCT_NAME, true);
-    if (!product) product = company->CreateSubKey(PRODUCT_NAME);
+    if (!product)
+        product = company->CreateSubKey(PRODUCT_NAME);
 
     VERIFY(product);
     company->Close();
@@ -93,13 +96,17 @@ void window_ide::save_on_exit()
 
 WeifenLuo::WinFormsUI::IDockContent ^ window_ide::reload_content(System::String ^ persist_string)
 {
-    if (persist_string == "editor.window_view") return (m_view);
+    if (persist_string == "editor.window_view")
+        return (m_view);
 
-    if (persist_string == "editor.window_levels") return (m_levels);
+    if (persist_string == "editor.window_levels")
+        return (m_levels);
 
-    if (persist_string == "editor.window_weather") return (m_weather);
+    if (persist_string == "editor.window_weather")
+        return (m_weather);
 
-    if (persist_string == "editor.window_weather_editor") return (m_weather_editor);
+    if (persist_string == "editor.window_weather_editor")
+        return (m_weather_editor);
 
     return (nullptr);
 }
@@ -115,13 +122,16 @@ void window_ide::load_on_create()
     VERIFY(product);
 
     RegistryKey ^ windows = product->OpenSubKey("windows");
-    if (windows) {
+    if (windows)
+    {
         //		m_weather_editor->load	(windows);
 
         RegistryKey ^ ide = windows->OpenSubKey("ide");
-        if (ide) {
+        if (ide)
+        {
             RegistryKey ^ position = ide->OpenSubKey("position");
-            if (position) {
+            if (position)
+            {
                 Left = (int)registry_value(position, "left", Left);
                 Top = (int)registry_value(position, "top", Top);
                 Width = (int)registry_value(position, "width", Width);
@@ -151,7 +161,8 @@ void window_ide::load_on_create()
 
         Object ^ temp = windows->GetValue("editor");
 
-        if (temp) {
+        if (temp)
+        {
             System::Array ^ object = safe_cast<System::Array ^>(windows->GetValue("editor"));
 
             windows->Close();

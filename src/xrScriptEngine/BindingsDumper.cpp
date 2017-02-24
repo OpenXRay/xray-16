@@ -2,21 +2,9 @@
 #include "BindingsDumper.hpp"
 #include <regex>
 
-int BindingsDumper::GetIdentSize() const
-{
-    return options.ShiftWidth * shiftLevel;
-}
-
-void BindingsDumper::Print(const char* s)
-{
-    writer->w(s, xr_strlen(s));
-}
-
-void BindingsDumper::Print(const char* s, int len)
-{
-    writer->w(s, len);
-}
-
+int BindingsDumper::GetIdentSize() const { return options.ShiftWidth * shiftLevel; }
+void BindingsDumper::Print(const char* s) { writer->w(s, xr_strlen(s)); }
+void BindingsDumper::Print(const char* s, int len) { writer->w(s, len); }
 void BindingsDumper::Printf(const char* format, ...)
 {
     va_list args;
@@ -27,8 +15,9 @@ void BindingsDumper::Printf(const char* format, ...)
 
 void BindingsDumper::PrintIndented(const char* s)
 {
-    writer->w_printf("%*s"
-                     "%s",
+    writer->w_printf(
+        "%*s"
+        "%s",
         GetIdentSize(), "", s);
 }
 
@@ -47,15 +36,19 @@ luabind::detail::function_object* get_upvalue_function(lua_State* ls, int n)
 {
     using namespace luabind::detail;
     function_object* f = nullptr;
-    if (lua_getupvalue(ls, -1, n)) {
+    if (lua_getupvalue(ls, -1, n))
+    {
         int ltype = lua_type(ls, -1);
-        if (ltype == LUA_TFUNCTION) {
-            if (lua_getupvalue(ls, -1, 1)) {
-                if (lua_type(ls, -1) == LUA_TUSERDATA) f = *static_cast<function_object**>(lua_touserdata(ls, -1));
-                lua_pop(ls, 1);  // upvalue
+        if (ltype == LUA_TFUNCTION)
+        {
+            if (lua_getupvalue(ls, -1, 1))
+            {
+                if (lua_type(ls, -1) == LUA_TUSERDATA)
+                    f = *static_cast<function_object**>(lua_touserdata(ls, -1));
+                lua_pop(ls, 1); // upvalue
             }
         }
-        lua_pop(ls, 1);  // upvalue
+        lua_pop(ls, 1); // upvalue
     }
     return f;
 }
@@ -71,7 +64,8 @@ int StripArg(lua_State* ls, int argIndex, bool commaOnly = true)
     int removed = 1;
     lua_remove(ls, argIndex);
     const char* comma = lua_tostring(ls, argIndex + 1);
-    if (!commaOnly || !xr_strcmp(comma, ",")) {
+    if (!commaOnly || !xr_strcmp(comma, ","))
+    {
         lua_remove(ls, argIndex + 1);
         removed++;
     }
@@ -86,11 +80,15 @@ void BindingsDumper::PrintFunction(SignatureFormatter formatter, const void* fco
     int cfunc = lua_iscfunction(ls, -1);
     int luabindFunc = is_luabind_function(ls, -1);
     bool hasupvalue = lua_getupvalue(ls, -1, 1) != nullptr;
-    if (hasupvalue) {
-        if (luabindFunc) {
-            if (lua_type(ls, -1) == LUA_TUSERDATA) {
+    if (hasupvalue)
+    {
+        if (luabindFunc)
+        {
+            if (lua_type(ls, -1) == LUA_TUSERDATA)
+            {
                 auto fobj = *static_cast<function_object**>(lua_touserdata(ls, -1));
-                if (formatter) {
+                if (formatter)
+                {
                     SignatureFormatterParams params;
                     params.Function = fobj;
                     params.Context = fcontext;
@@ -106,9 +104,9 @@ void BindingsDumper::PrintFunction(SignatureFormatter formatter, const void* fco
                 done = true;
             }
         }
-        lua_pop(ls, 1);  // pop upvalue
+        lua_pop(ls, 1); // pop upvalue
     }
-    if (cfunc && !done && hasupvalue)  // property
+    if (cfunc && !done && hasupvalue) // property
     {
         const char* propName = lua_tostring(ls, -2);
         function_object* getter = get_upvalue_function(ls, 1);
@@ -120,7 +118,8 @@ void BindingsDumper::PrintFunction(SignatureFormatter formatter, const void* fco
         PrintIndented("");
         Print(signature, typeLen);
         Printf(" %s { get;", propName);
-        if (setter) Print(" set;");
+        if (setter)
+            Print(" set;");
         Print(" }\n");
         lua_pop(ls, signatureLen);
     }
@@ -136,25 +135,23 @@ void BindingsDumper::FormatStaticFunction(const SignatureFormatterParams& params
     lua_pop(ls, signatureLen);
 };
 
-void BindingsDumper::PrintStaticFunction()
-{
-    PrintFunction(&BindingsDumper::FormatStaticFunction);
-}
-
+void BindingsDumper::PrintStaticFunction() { PrintFunction(&BindingsDumper::FormatStaticFunction); }
 void BindingsDumper::FormatMemberFunction(const SignatureFormatterParams& params)
 {
     auto refClassName = static_cast<const char*>(params.Context);
-    bool stripReturnValue = false;  // for constructors and operators
+    bool stripReturnValue = false; // for constructors and operators
     xr_string funcName;
     auto refFuncName = params.Function->name;
-    if (refFuncName == "__init") {
+    if (refFuncName == "__init")
+    {
         funcName = refClassName;
         stripReturnValue = true;
     }
-    else  // check operators
+    else // check operators
     {
         auto it = operatorSubst.find(refFuncName);
-        if (it != operatorSubst.end()) {
+        if (it != operatorSubst.end())
+        {
             funcName = it->second;
             stripReturnValue = true;
         }
@@ -163,13 +160,15 @@ void BindingsDumper::FormatMemberFunction(const SignatureFormatterParams& params
     }
     bool concat = !(options.IgnoreDerived || options.StripThis || stripReturnValue);
     int signLen = params.Function->format_signature(ls, funcName.c_str(), concat);
-    if (!concat) {
+    if (!concat)
+    {
         int argCount = (signLen - 4) / 2;
         R_ASSERT(argCount > 0);
         //      -n+0   -n+1  -n+2    -n+3 -n+4              -1
         // [return_type][ ][func_name][(][arg1][,][arg2]...[)]
         int offset = 0;
-        if (stripReturnValue) {
+        if (stripReturnValue)
+        {
             offset = StripArg(ls, -signLen, false);
             signLen -= offset;
         }
@@ -178,24 +177,26 @@ void BindingsDumper::FormatMemberFunction(const SignatureFormatterParams& params
         xr_string className = refClassName;
         // check if arg matches 'className[ const]{*|&}'
         std::regex matcher(className + "( const)?(\\*|&)$");
-        if (std::regex_match(arg, matcher))  // non-derived member function
+        if (std::regex_match(arg, matcher)) // non-derived member function
         {
-            if (options.StripThis) signLen -= StripArg(ls, argIndex);
+            if (options.StripThis)
+                signLen -= StripArg(ls, argIndex);
         }
         else
         {
             // check special cases: opertators and constructors
             // void __tostring(lua_State*, ClassName&); // operator
             // void __init(luabind::argument const&, int); // constructor
-            if (arg == "lua_State*" && argCount > 1)  // operator?
+            if (arg == "lua_State*" && argCount > 1) // operator?
             {
                 // 1] check next argument:
                 int nextArgIndex = argIndex + 2;
                 const char* nextArg = lua_tostring(ls, nextArgIndex);
-                if (className.append("&") != nextArg)  // derived?
+                if (className.append("&") != nextArg) // derived?
                 {
                     // if next!=className && ignoreDerived => ignore
-                    if (options.IgnoreDerived) {
+                    if (options.IgnoreDerived)
+                    {
                         lua_pop(ls, signLen);
                         return;
                     }
@@ -205,22 +206,24 @@ void BindingsDumper::FormatMemberFunction(const SignatureFormatterParams& params
                 // 3] if stripThis => remove next
                 argIndex = nextArgIndex;
             }
-            else if (arg == "luabind::argument const&")  // constructor?
+            else if (arg == "luabind::argument const&") // constructor?
             {
-                if (!options.StripThis) ReplaceArg(ls, argIndex, className.append("&").c_str());
+                if (!options.StripThis)
+                    ReplaceArg(ls, argIndex, className.append("&").c_str());
             }
-            else if (options.IgnoreDerived)  // some derived function, ignore?
+            else if (options.IgnoreDerived) // some derived function, ignore?
             {
                 lua_pop(ls, signLen);
                 return;
             }
-            if (options.StripThis) signLen -= StripArg(ls, argIndex);
+            if (options.StripThis)
+                signLen -= StripArg(ls, argIndex);
         }
         lua_concat(ls, signLen);
     }
     const char* signature = lua_tostring(ls, -1);
     PrintfIndented("%s;\n", signature);
-    lua_pop(ls, 1);  // pop concatenated signature
+    lua_pop(ls, 1); // pop concatenated signature
 };
 
 void BindingsDumper::PrintMemberFunction(const char* className)
@@ -228,11 +231,7 @@ void BindingsDumper::PrintMemberFunction(const char* className)
     PrintFunction(&BindingsDumper::FormatMemberFunction, className);
 }
 
-void BindingsDumper::PrintFunction()
-{
-    PrintFunction(nullptr);
-}
-
+void BindingsDumper::PrintFunction() { PrintFunction(nullptr); }
 void BindingsDumper::PrintIntConstant(const char* name, int value)
 {
     PrintfIndented("const int %s = %d;\n", name, value);
@@ -248,12 +247,15 @@ void BindingsDumper::PrintClass()
     PrintfIndented("class %s", crep->name());
     const auto& bases = crep->bases();
     size_t baseCount = bases.size();
-    if (baseCount) Print(" : ");
+    if (baseCount)
+        Print(" : ");
     for (size_t i = 0; i < baseCount; i++)
     {
-        if (i) Print(", ");
+        if (i)
+            Print(", ");
         const char* baseName = bases[i].base->name();
-        if (!*baseName) baseName = "<unknown>";
+        if (!*baseName)
+            baseName = "<unknown>";
         Print(baseName);
     }
     Print("\n");
@@ -274,7 +276,7 @@ void BindingsDumper::PrintClass()
         lua_pop(ls, 1);
         R_ASSERT(lua_gettop(ls) == prev);
     }
-    lua_pop(ls, 1);  // pop default table
+    lua_pop(ls, 1); // pop default table
     // print constants
     auto& constants = crep->static_constants();
     for (auto& c : constants)
@@ -288,12 +290,12 @@ void BindingsDumper::PrintClass()
         int prev = lua_gettop(ls);
         proxy.push(ls);
         int ltype = luabind::type(proxy);
-        if (ltype == LUA_TFUNCTION)  // XXX: print class members in reverse order
+        if (ltype == LUA_TFUNCTION) // XXX: print class members in reverse order
             PrintMemberFunction(crep->name());
         lua_pop(ls, 1);
         R_ASSERT(lua_gettop(ls) == prev);
     }
-    lua_pop(ls, 1);  // pop table
+    lua_pop(ls, 1); // pop table
     shiftLevel--;
     PrintIndented("}\n");
 }
@@ -309,15 +311,15 @@ void BindingsDumper::PrintNamespace(luabind::object& namesp)
         int ltype = luabind::type(proxy);
         switch (ltype)
         {
-        case LUA_TFUNCTION:  // free function
+        case LUA_TFUNCTION: // free function
             scopeFunctions++;
             functions.push(it);
             break;
-        case LUA_TUSERDATA:  // class
+        case LUA_TUSERDATA: // class
             scopeClasses++;
             classes.push(it);
             break;
-        case LUA_TTABLE:  // namespace
+        case LUA_TTABLE: // namespace
             scopeNamespaces++;
             namespaces.push(it);
             break;
@@ -337,7 +339,8 @@ void BindingsDumper::PrintNamespace(luabind::object& namesp)
         auto proxy = *classes.top();
         classes.pop();
         proxy.push(ls);
-        if (is_class_rep(ls, -1)) PrintClass();
+        if (is_class_rep(ls, -1))
+            PrintClass();
         lua_pop(ls, 1);
     }
     for (int i = 0; i < scopeNamespaces; i++)

@@ -3,7 +3,7 @@
 #include "xrCore/FMesh.hpp"
 #include "xrCore/fs.h"
 
-static const u32 c_VB_maxSize = 4096 * 1024;  // bytes
+static const u32 c_VB_maxSize = 4096 * 1024; // bytes
 // Vertex containers
 class VBContainer
 {
@@ -17,7 +17,6 @@ class VBContainer
 public:
     // Constructor & destructor
     VBContainer() { R_DCL.clear(); }
-
     // Methods
     bool is_empty() const { return vDcl.empty() && vContainers.empty() && R_DCL.empty() && R_DATA.empty(); }
     void Begin(u32 dwFVF)
@@ -51,12 +50,15 @@ public:
         u32 vertices_collected = bytes_collected / dwSize;
         for (u32 CID = 0; CID < vDcl.size(); CID++)
         {
-            if (!vDcl[CID].equal(R_DCL)) continue;
+            if (!vDcl[CID].equal(R_DCL))
+                continue;
 
             u32 bytes_already = (u32)vContainers[CID].size();
-            if ((bytes_already + bytes_collected) > c_VB_maxSize) continue;
+            if ((bytes_already + bytes_collected) > c_VB_maxSize)
+                continue;
             u32 vertices_already = bytes_already / dwSize;
-            if ((vertices_already + vertices_collected) > c_VB_maxVertices) continue;
+            if ((vertices_already + vertices_collected) > c_VB_maxVertices)
+                continue;
 
             // If we get here - container CID can take the data
             *dwContainerID = CID;
@@ -89,8 +91,8 @@ public:
 
             R_ASSERT(dwVertCount * dwOneSize == dwTotalSize);
 
-            fs.w(vDcl[i].begin(), vDcl[i].size() * sizeof(D3DVERTEXELEMENT9));  // Vertex format
-            fs.w_u32(dwVertCount);                                              // Number of vertices
+            fs.w(vDcl[i].begin(), vDcl[i].size() * sizeof(D3DVERTEXELEMENT9)); // Vertex format
+            fs.w_u32(dwVertCount); // Number of vertices
             fs.w(&*vContainers[i].begin(), dwTotalSize);
         }
         vDcl.clear();
@@ -115,7 +117,8 @@ public:
         //
         for (u32 ID = 0; ID < data.size(); ID++)
         {
-            if ((data[ID].size() + size) < LIMIT) {
+            if ((data[ID].size() + size) < LIMIT)
+            {
                 *dwContainerID = ID;
                 *dwStart = (u32)data[ID].size();
                 data[ID].insert(data[ID].end(), begin, end);

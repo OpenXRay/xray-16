@@ -17,15 +17,8 @@
 
 //////////////////////////////////////////////////////////////////////////
 
-SRelation::SRelation()
-{
-    m_iGoodwill = NEUTRAL_GOODWILL;
-}
-
-SRelation::~SRelation()
-{
-}
-
+SRelation::SRelation() { m_iGoodwill = NEUTRAL_GOODWILL; }
+SRelation::~SRelation() {}
 //////////////////////////////////////////////////////////////////////////
 
 void RELATION_DATA::clear()
@@ -65,21 +58,16 @@ RELATION_REGISTRY::RELATION_MAP_SPOTS* RELATION_REGISTRY::m_spot_names = NULL;
 
 //////////////////////////////////////////////////////////////////////////
 
-RELATION_REGISTRY::RELATION_REGISTRY()
-{
-}
-
-RELATION_REGISTRY::~RELATION_REGISTRY()
-{
-}
-
+RELATION_REGISTRY::RELATION_REGISTRY() {}
+RELATION_REGISTRY::~RELATION_REGISTRY() {}
 //////////////////////////////////////////////////////////////////////////
 
 extern void load_attack_goodwill();
 extern bool IsGameTypeSingle();
 CRelationRegistryWrapper& RELATION_REGISTRY::relation_registry()
 {
-    if (!m_relation_registry) {
+    if (!m_relation_registry)
+    {
         VERIFY(IsGameTypeSingle());
 
         m_relation_registry = new CRelationRegistryWrapper();
@@ -91,7 +79,8 @@ CRelationRegistryWrapper& RELATION_REGISTRY::relation_registry()
 
 RELATION_REGISTRY::FIGHT_VECTOR& RELATION_REGISTRY::fight_registry()
 {
-    if (!m_fight_registry) m_fight_registry = new FIGHT_VECTOR();
+    if (!m_fight_registry)
+        m_fight_registry = new FIGHT_VECTOR();
 
     return *m_fight_registry;
 }
@@ -105,7 +94,8 @@ void RELATION_REGISTRY::clear_relation_registry()
 
 const shared_str& RELATION_REGISTRY::GetSpotName(ALife::ERelationType& type)
 {
-    if (!m_spot_names) m_spot_names = new RELATION_MAP_SPOTS();
+    if (!m_spot_names)
+        m_spot_names = new RELATION_MAP_SPOTS();
     return m_spot_names->GetSpotName(type);
 }
 
@@ -114,7 +104,8 @@ const shared_str& RELATION_REGISTRY::GetSpotName(ALife::ERelationType& type)
 void RELATION_REGISTRY::ClearRelations(u16 person_id)
 {
     const RELATION_DATA* relation_data = relation_registry().registry().objects_ptr(person_id);
-    if (relation_data) {
+    if (relation_data)
+    {
         relation_registry().registry().objects(person_id).clear();
     }
 }
@@ -124,9 +115,11 @@ CHARACTER_GOODWILL RELATION_REGISTRY::GetGoodwill(u16 from, u16 to) const
 {
     const RELATION_DATA* relation_data = relation_registry().registry().objects_ptr(from);
 
-    if (relation_data) {
+    if (relation_data)
+    {
         PERSONAL_RELATION_MAP::const_iterator it = relation_data->personal.find(to);
-        if (relation_data->personal.end() != it) {
+        if (relation_data->personal.end() != it)
+        {
             const SRelation& relation = (*it).second;
             return relation.Goodwill();
         }
@@ -152,7 +145,8 @@ void RELATION_REGISTRY::ForceSetGoodwill(u16 from, u16 to, CHARACTER_GOODWILL go
     CSE_ALifeTraderAbstract* from_obj = smart_cast<CSE_ALifeTraderAbstract*>(ai().alife().objects().object(from));
     CSE_ALifeTraderAbstract* to_obj = smart_cast<CSE_ALifeTraderAbstract*>(ai().alife().objects().object(to));
 
-    if (!from_obj || !to_obj) {
+    if (!from_obj || !to_obj)
+    {
         ai().script_engine().script_log(LuaMessageType::Error,
             "RELATION_REGISTRY::ForceSetGoodwill  : cannot convert obj to CSE_ALifeTraderAbstract!");
         return;
@@ -176,9 +170,11 @@ CHARACTER_GOODWILL RELATION_REGISTRY::GetCommunityGoodwill(
 {
     const RELATION_DATA* relation_data = relation_registry().registry().objects_ptr(to_character);
 
-    if (relation_data) {
+    if (relation_data)
+    {
         COMMUNITY_RELATION_MAP::const_iterator it = relation_data->communities.find(from_community);
-        if (relation_data->communities.end() != it) {
+        if (relation_data->communities.end() != it)
+        {
             const SRelation& relation = (*it).second;
             return relation.Goodwill();
         }

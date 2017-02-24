@@ -1,31 +1,29 @@
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
 #define CMonsterStateManagerAbstract CMonsterStateManager<_Object>
 
 TEMPLATE_SPECIALIZATION
-void CMonsterStateManagerAbstract::reinit()
-{
-    inherited::reinit();
-}
-
+void CMonsterStateManagerAbstract::reinit() { inherited::reinit(); }
 namespace detail
-{  // helper function implemented in file alife_simulator.cpp
+{ // helper function implemented in file alife_simulator.cpp
 bool object_exists_in_alife_registry(u32 id);
-}  // namespace detail
+} // namespace detail
 
 TEMPLATE_SPECIALIZATION
 void CMonsterStateManagerAbstract::update()
 {
     // Lain: added
-    if (!detail::object_exists_in_alife_registry(object->ID())) {
+    if (!detail::object_exists_in_alife_registry(object->ID()))
+    {
         return;
     }
 
-    if (!object->g_Alive()) {
+    if (!object->g_Alive())
+    {
         return;
     }
 
@@ -49,7 +47,8 @@ void CMonsterStateManagerAbstract::execute_script_state()
 TEMPLATE_SPECIALIZATION
 bool CMonsterStateManagerAbstract::can_eat()
 {
-    if (!object->CorpseMan.get_corpse()) return false;
+    if (!object->CorpseMan.get_corpse())
+        return false;
 
     return check_state(eStateEat);
 }
@@ -57,37 +56,28 @@ bool CMonsterStateManagerAbstract::can_eat()
 TEMPLATE_SPECIALIZATION
 bool CMonsterStateManagerAbstract::check_state(u32 state_id)
 {
-    if (prev_substate == state_id) {
-        if (!get_state_current()->check_completion()) return true;
+    if (prev_substate == state_id)
+    {
+        if (!get_state_current()->check_completion())
+            return true;
     }
     else
     {
-        if (get_state(state_id)->check_start_conditions()) return true;
+        if (get_state(state_id)->check_start_conditions())
+            return true;
     }
 
     return false;
 }
 
 TEMPLATE_SPECIALIZATION
-void CMonsterStateManagerAbstract::critical_finalize()
-{
-    inherited::critical_finalize();
-}
-
+void CMonsterStateManagerAbstract::critical_finalize() { inherited::critical_finalize(); }
 TEMPLATE_SPECIALIZATION
-EMonsterState CMonsterStateManagerAbstract::get_state_type()
-{
-    return inherited::get_state_type();
-}
-
+EMonsterState CMonsterStateManagerAbstract::get_state_type() { return inherited::get_state_type(); }
 #ifdef DEBUG
 
 TEMPLATE_SPECIALIZATION
-void CMonsterStateManagerAbstract::add_debug_info(debug::text_tree& root_s)
-{
-    CState<_Object>::add_debug_info(root_s);
-}
-
+void CMonsterStateManagerAbstract::add_debug_info(debug::text_tree& root_s) { CState<_Object>::add_debug_info(root_s); }
 #endif
 
 #undef CMonsterStateManagerAbstract

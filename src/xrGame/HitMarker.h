@@ -69,4 +69,4 @@ public:
     void net_Relcase(IGameObject* obj);
 };
 
-#endif  // __XR_HITMARKER_H__
+#endif // __XR_HITMARKER_H__

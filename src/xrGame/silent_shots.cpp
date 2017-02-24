@@ -21,22 +21,28 @@ void silent_shots::reset_game()
 
 void silent_shots::OnWeapon_Fire(u16 sender, u16 sender_weapon_id)
 {
-    if (m_last_shoot_weapon == sender_weapon_id) return;
+    if (m_last_shoot_weapon == sender_weapon_id)
+        return;
 
     game_PlayerState* tmp_local_player = m_owner->get_local_player();
-    if (!tmp_local_player) return;
+    if (!tmp_local_player)
+        return;
 
-    if (sender != tmp_local_player->GameID) return;
+    if (sender != tmp_local_player->GameID)
+        return;
 
     CWeapon* shoot_weapon = m_owner->get_active_weapon(tmp_local_player);
-    if (!shoot_weapon || (sender_weapon_id != shoot_weapon->ID())) return;
+    if (!shoot_weapon || (sender_weapon_id != shoot_weapon->ID()))
+        return;
 
-    if (shoot_weapon->IsSilencerAttached()) {
+    if (shoot_weapon->IsSilencerAttached())
+    {
         m_last_shoot_weapon = sender_weapon_id;
         return;
     }
 
-    if (smart_cast<CWeaponKnife*>(shoot_weapon)) {
+    if (smart_cast<CWeaponKnife*>(shoot_weapon))
+    {
         m_last_shoot_weapon = sender_weapon_id;
         return;
     }
@@ -44,4 +50,4 @@ void silent_shots::OnWeapon_Fire(u16 sender, u16 sender_weapon_id)
     ++m_thunder_count;
 }
 
-}  // namespace award_system
+} // namespace award_system

@@ -8,19 +8,16 @@
 
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _DataStorage, typename _dist_type, typename _index_type, typename _iteration_type>
 
-#define CNearestVertexPathManager                                                                                      \
-    CPathManager<CLevelGraph, _DataStorage, SNearestVertex<_dist_type, _index_type, _iteration_type>, _dist_type,      \
+#define CNearestVertexPathManager                                                                                 \
+    CPathManager<CLevelGraph, _DataStorage, SNearestVertex<_dist_type, _index_type, _iteration_type>, _dist_type, \
         _index_type, _iteration_type\
 >
 
 TEMPLATE_SPECIALIZATION
-CNearestVertexPathManager::~CPathManager()
-{
-}
-
+CNearestVertexPathManager::~CPathManager() {}
 TEMPLATE_SPECIALIZATION
 IC void CNearestVertexPathManager::setup(const _Graph* _graph, _DataStorage* _data_storage,
     xr_vector<_index_type>* _path, const _index_type& _start_node_index, const _index_type& _goal_node_index,
@@ -45,7 +42,8 @@ IC bool CNearestVertexPathManager::is_goal_reached(const _index_type& node_index
     best_node = graph->vertex(node_index);
 
     float current_distance = m_target_position.distance_to_xz_sqr(graph->vertex_position(best_node));
-    if (current_distance < m_best_distance_to_target) {
+    if (current_distance < m_best_distance_to_target)
+    {
         m_best_distance_to_target = current_distance;
         path->clear();
         path->push_back(node_index);
@@ -72,7 +70,8 @@ IC _dist_type CNearestVertexPathManager::estimate(const _index_type& node_index)
 TEMPLATE_SPECIALIZATION
 IC bool CNearestVertexPathManager::is_accessible(const _index_type& vertex_id) const
 {
-    if (!inherited::is_accessible(vertex_id)) return (false);
+    if (!inherited::is_accessible(vertex_id))
+        return (false);
 
     int x4, y4;
     graph->unpack_xz(graph->vertex(vertex_id), x4, y4);

@@ -3,7 +3,7 @@
 #include "ai/Monsters/ai_monster_squad.h"
 #include "ai/Monsters/ai_monster_squad_manager.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -43,12 +43,14 @@ void CStateMonsterAttackRunAbstract::execute()
     object->path().set_use_dest_orient(false);
 
     CMonsterSquad* squad = monster_squad().get_squad(object);
-    if (squad && squad->SquadActive()) {
+    if (squad && squad->SquadActive())
+    {
         // Получить команду
         SSquadCommand command;
         squad->GetCommand(object, command);
 
-        if (command.type == SC_ATTACK) {
+        if (command.type == SC_ATTACK)
+        {
             object->path().set_use_dest_orient(true);
             object->path().set_dest_direction(command.direction);
         }
@@ -75,7 +77,8 @@ bool CStateMonsterAttackRunAbstract::check_completion()
     float m_fDistMin = object->MeleeChecker.get_min_distance();
     float dist = object->MeleeChecker.distance_to_enemy(object->EnemyMan.get_enemy());
 
-    if (dist < m_fDistMin) return true;
+    if (dist < m_fDistMin)
+        return true;
 
     return false;
 }
@@ -86,7 +89,8 @@ bool CStateMonsterAttackRunAbstract::check_start_conditions()
     float m_fDistMax = object->MeleeChecker.get_max_distance();
     float dist = object->MeleeChecker.distance_to_enemy(object->EnemyMan.get_enemy());
 
-    if (dist > m_fDistMax) return true;
+    if (dist > m_fDistMax)
+        return true;
 
     return false;
 }

@@ -9,10 +9,7 @@ CUIDebugFonts::CUIDebugFonts()
     InitDebugFonts(Frect().set(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT));
 }
 
-CUIDebugFonts::~CUIDebugFonts()
-{
-}
-
+CUIDebugFonts::~CUIDebugFonts() {}
 void CUIDebugFonts::InitDebugFonts(Frect r)
 {
     CUIDialogWnd::SetWndRect(r);
@@ -25,9 +22,11 @@ void CUIDebugFonts::InitDebugFonts(Frect r)
 
 bool CUIDebugFonts::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (DIK_ESCAPE == dik) HideDialog();
+    if (DIK_ESCAPE == dik)
+        HideDialog();
 
-    if (DIK_F12 == dik) return false;
+    if (DIK_F12 == dik)
+        return false;
 
     return true;
 }

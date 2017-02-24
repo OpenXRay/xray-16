@@ -24,5 +24,6 @@
    <markus@oberhumer.com>
  */
 
+
 #define LZO1Z
 #include "lzo1x_9x.c"

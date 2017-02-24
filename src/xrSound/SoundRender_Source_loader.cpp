@@ -27,15 +27,8 @@ size_t ov_read_func(void* ptr, size_t size, size_t nmemb, void* datasource)
     F->r(ptr, (int)(read_block * size));
     return read_block;
 }
-int ov_close_func(void* datasource)
-{
-    return 0;
-}
-long ov_tell_func(void* datasource)
-{
-    return ((IReader*)datasource)->tell();
-}
-
+int ov_close_func(void* datasource) { return 0; }
+long ov_tell_func(void* datasource) { return ((IReader*)datasource)->tell(); }
 void CSoundRender_Source::decompress(u32 line, OggVorbis_File* ovf)
 {
     VERIFY(ovf);
@@ -48,7 +41,8 @@ void CSoundRender_Source::decompress(u32 line, OggVorbis_File* ovf)
 
     // seek
     u32 cur_pos = u32(ov_pcm_tell(ovf));
-    if (cur_pos != buf_offs) ov_pcm_seek(ovf, buf_offs);
+    if (cur_pos != buf_offs)
+        ov_pcm_seek(ovf, buf_offs);
 
     // decompress
     i_decompress_fr(ovf, dest, left);
@@ -71,14 +65,15 @@ void CSoundRender_Source::LoadWave(LPCSTR pName)
     R_ASSERT3(ovi->rate == 44100, "Invalid source rate:", pName);
 
 #ifdef DEBUG
-    if (ovi->channels == 2) {
+    if (ovi->channels == 2)
+    {
         Msg("stereo sound source [%s]", pName);
     }
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     ZeroMemory(&m_wformat, sizeof(WAVEFORMATEX));
 
-    m_wformat.nSamplesPerSec = (ovi->rate);  // 44100;
+    m_wformat.nSamplesPerSec = (ovi->rate); // 44100;
     m_wformat.wFormatTag = WAVE_FORMAT_PCM;
     m_wformat.nChannels = u16(ovi->channels);
     m_wformat.wBitsPerSample = 16;
@@ -91,10 +86,12 @@ void CSoundRender_Source::LoadWave(LPCSTR pName)
     fTimeTotal = s_f_def_source_footer + dwBytesTotal / float(m_wformat.nAvgBytesPerSec);
 
     vorbis_comment* ovm = ov_comment(&ovf, -1);
-    if (ovm->comments) {
+    if (ovm->comments)
+    {
         IReader F(ovm->user_comments[0], ovm->comment_lengths[0]);
         u32 vers = F.r_u32();
-        if (vers == 0x0001) {
+        if (vers == 0x0001)
+        {
             m_fMinDist = F.r_float();
             m_fMaxDist = F.r_float();
             m_fBaseVolume = 1.f;
@@ -137,15 +134,18 @@ void CSoundRender_Source::load(LPCSTR name)
     string_path fn, N;
     xr_strcpy(N, name);
     strlwr(N);
-    if (strext(N)) *strext(N) = 0;
+    if (strext(N))
+        *strext(N) = 0;
 
     fname = N;
 
     strconcat(sizeof(fn), fn, N, ".ogg");
-    if (!FS.exist("$level$", fn)) FS.update_path(fn, "$game_sounds$", fn);
+    if (!FS.exist("$level$", fn))
+        FS.update_path(fn, "$game_sounds$", fn);
 
 #ifdef _EDITOR
-    if (!FS.exist(fn)) {
+    if (!FS.exist(fn))
+    {
         FS.update_path(fn, "$game_sounds$", "$no_sound.ogg");
     }
 #endif

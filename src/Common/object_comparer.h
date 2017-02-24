@@ -1,9 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////
-//	Module 		: object_comparer.h
-//	Created 	: 13.07.2004
-//  Modified 	: 13.07.2004
-//	Author		: Dmitriy Iassenev
-//	Description : Object equality checker
+//  Module      : object_comparer.h
+//  Created     : 13.07.2004
+//  Modified    : 13.07.2004
+//  Author      : Dmitriy Iassenev
+//  Description : Object equality checker
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -28,11 +28,8 @@ struct CComparer
     };
 
     IC static bool compare(LPCSTR _1, LPCSTR _2, const P& p) { return (p(_1, _2)); }
-
     IC static bool compare(LPSTR _1, LPSTR _2, const P& p) { return (p(_1, _2)); }
-
     IC static bool compare(const shared_str& _1, const shared_str& _2, const P& p) { return (p(_1, _2)); }
-
     template <typename T1, typename T2>
     IC static bool compare(const std::pair<T1, T2>& _1, const std::pair<T1, T2>& _2, const P& p)
     {
@@ -42,12 +39,14 @@ struct CComparer
     template <typename T, int size>
     IC static bool compare(const svector<T, size>& _1, const svector<T, size>& _2, const P& p)
     {
-        if (_1.size() != _2.size()) return (p());
+        if (_1.size() != _2.size())
+            return (p());
 
         svector<T, size>::const_iterator I = _1.begin(), J = _2.begin();
         svector<T, size>::const_iterator E = _1.end();
         for (; I != E; ++I, ++J)
-            if (!compare(*I, *J, p)) return (false);
+            if (!compare(*I, *J, p))
+                return (false);
         return (true);
     }
 
@@ -57,10 +56,12 @@ struct CComparer
         std::queue<T1, T2> _1 = __1;
         std::queue<T1, T2> _2 = __2;
 
-        if (_1.size() != _2.size()) return (p());
+        if (_1.size() != _2.size())
+            return (p());
 
         for (; !_1.empty(); _1.pop(), _2.pop())
-            if (!compare(_1.front(), _2.front(), p)) return (false);
+            if (!compare(_1.front(), _2.front(), p))
+                return (false);
         return (true);
     }
 
@@ -70,10 +71,12 @@ struct CComparer
         T1<T2, T3> _1 = __1;
         T1<T2, T3> _2 = __2;
 
-        if (_1.size() != _2.size()) return (p());
+        if (_1.size() != _2.size())
+            return (p());
 
         for (; !_1.empty(); _1.pop(), _2.pop())
-            if (!compare(_1.top(), _2.top(), p)) return (false);
+            if (!compare(_1.top(), _2.top(), p))
+                return (false);
         return (true);
     }
 
@@ -83,10 +86,12 @@ struct CComparer
         T1<T2, T3, T4> _1 = __1;
         T1<T2, T3, T4> _2 = __2;
 
-        if (_1.size() != _2.size()) return (p());
+        if (_1.size() != _2.size())
+            return (p());
 
         for (; !_1.empty(); _1.pop(), _2.pop())
-            if (!compare(_1.top(), _2.top(), p)) return (false);
+            if (!compare(_1.top(), _2.top(), p))
+                return (false);
         return (true);
     }
 
@@ -108,12 +113,14 @@ struct CComparer
         template <typename T>
         IC static bool compare(const T& _1, const T& _2, const P& p)
         {
-            if (_1.size() != _2.size()) return (p());
+            if (_1.size() != _2.size())
+                return (p());
 
             T::const_iterator I = _1.begin(), J = _2.begin();
             T::const_iterator E = _1.end();
             for (; I != E; ++I, ++J)
-                if (!CComparer::compare(*I, *J, p)) return (false);
+                if (!CComparer::compare(*I, *J, p))
+                    return (false);
             return (true);
         }
     };
@@ -180,12 +187,10 @@ struct comparer
 };
 };
 
-#define declare_comparer(a, b)                                                                                         \
-    template <typename T1, typename T2>                                                                                \
-    IC bool a(const T1& p0, const T2& p1)                                                                              \
-    {                                                                                                                  \
-        return (compare(p0, p1, object_comparer::detail::comparer<b>()));                                              \
-    }
+#define declare_comparer(a, b)\
+    template <typename T1, typename T2>\
+    IC bool a(const T1& p0, const T2& p1)\
+    { return (compare(p0, p1, object_comparer::detail::comparer<b>())); }
 
 declare_comparer(equal, std::equal_to);
 declare_comparer(greater_equal, std::greater_equal);

@@ -79,7 +79,8 @@ void CRender::create()
         o.distortion = TRUE;
     else
         o.distortion = FALSE;
-    if (strstr(Core.Params, "-nodistort")) o.distortion = FALSE;
+    if (strstr(Core.Params, "-nodistort"))
+        o.distortion = FALSE;
     Msg("* distortion: %s, dev(%d),need(%d)", o.distortion ? "used" : "unavailable", v_dev, v_need);
 
     //	Color mapping
@@ -87,7 +88,8 @@ void CRender::create()
         o.color_mapping = TRUE;
     else
         o.color_mapping = FALSE;
-    if (strstr(Core.Params, "-nocolormap")) o.color_mapping = FALSE;
+    if (strstr(Core.Params, "-nocolormap"))
+        o.color_mapping = FALSE;
     Msg("* color_mapping: %s, dev(%d),need(%d)", o.color_mapping ? "used" : "unavailable", v_dev, v_need);
 
     m_skinning = -1;
@@ -141,39 +143,21 @@ void CRender::reset_end()
     xrRender_apply_tf();
     //.	HWOCC.occq_create			(occq_size);
     Target = new CRenderTarget();
-    if (L_Projector) L_Projector->invalidate();
+    if (L_Projector)
+        L_Projector->invalidate();
 
     // Set this flag true to skip the first render frame,
     // that some data is not ready in the first frame (for example device camera position)
     m_bFirstFrameAfterReset = true;
 }
 
-void CRender::OnFrame()
-{
-    Models->DeleteQueue();
-}
-
+void CRender::OnFrame() { Models->DeleteQueue(); }
 // Implementation
-IRender_ObjectSpecific* CRender::ros_create(IRenderable* parent)
-{
-    return new CROS_impl();
-}
-void CRender::ros_destroy(IRender_ObjectSpecific*& p)
-{
-    xr_delete(p);
-}
-IRenderVisual* CRender::model_Create(LPCSTR name, IReader* data)
-{
-    return Models->Create(name, data);
-}
-IRenderVisual* CRender::model_CreateChild(LPCSTR name, IReader* data)
-{
-    return Models->CreateChild(name, data);
-}
-IRenderVisual* CRender::model_Duplicate(IRenderVisual* V)
-{
-    return Models->Instance_Duplicate((dxRender_Visual*)V);
-}
+IRender_ObjectSpecific* CRender::ros_create(IRenderable* parent) { return new CROS_impl(); }
+void CRender::ros_destroy(IRender_ObjectSpecific*& p) { xr_delete(p); }
+IRenderVisual* CRender::model_Create(LPCSTR name, IReader* data) { return Models->Create(name, data); }
+IRenderVisual* CRender::model_CreateChild(LPCSTR name, IReader* data) { return Models->CreateChild(name, data); }
+IRenderVisual* CRender::model_Duplicate(IRenderVisual* V) { return Models->Instance_Duplicate((dxRender_Visual*)V); }
 void CRender::model_Delete(IRenderVisual*& V, BOOL bDiscard)
 {
     dxRender_Visual* pVisual = (dxRender_Visual*)V;
@@ -188,7 +172,8 @@ IRender_DetailModel* CRender::model_CreateDM(IReader* F)
 }
 void CRender::model_Delete(IRender_DetailModel*& F)
 {
-    if (F) {
+    if (F)
+    {
         CDetail* D = (CDetail*)F;
         D->Unload();
         xr_delete(D);
@@ -214,15 +199,8 @@ IRenderVisual* CRender::model_CreateParticles(LPCSTR name)
         return Models->CreatePG(SG);
     }
 }
-void CRender::models_Prefetch()
-{
-    Models->Prefetch();
-}
-void CRender::models_Clear(BOOL b_complete)
-{
-    Models->ClearPool(b_complete);
-}
-
+void CRender::models_Prefetch() { Models->Prefetch(); }
+void CRender::models_Clear(BOOL b_complete) { Models->ClearPool(b_complete); }
 ref_shader CRender::getShader(int id)
 {
     VERIFY(id < int(Shaders.size()));
@@ -238,10 +216,7 @@ IRender_Sector* CRender::getSector(int id)
     VERIFY(id < int(Sectors.size()));
     return Sectors[id];
 }
-IRender_Sector* CRender::getSectorActive()
-{
-    return pLastSector;
-}
+IRender_Sector* CRender::getSectorActive() { return pLastSector; }
 IRenderVisual* CRender::getVisual(int id)
 {
     VERIFY(id < int(Visuals.size()));
@@ -262,56 +237,30 @@ IDirect3DIndexBuffer9* CRender::getIB(int id)
     VERIFY(id < int(IB.size()));
     return IB[id];
 }
-IRender_Target* CRender::getTarget()
-{
-    return Target;
-}
+IRender_Target* CRender::getTarget() { return Target; }
 FSlideWindowItem* CRender::getSWI(int id)
 {
     VERIFY(id < int(SWIs.size()));
     return &SWIs[id];
 }
 
-IRender_Light* CRender::light_create()
-{
-    return L_DB->Create();
-}
-
-IRender_Glow* CRender::glow_create()
-{
-    return new CGlow();
-}
-
-void CRender::flush()
-{
-    r_dsgraph_render_graph(0);
-}
-
-BOOL CRender::occ_visible(vis_data& P)
-{
-    return HOM.visible(P);
-}
-BOOL CRender::occ_visible(sPoly& P)
-{
-    return HOM.visible(P);
-}
-BOOL CRender::occ_visible(Fbox& P)
-{
-    return HOM.visible(P);
-}
+IRender_Light* CRender::light_create() { return L_DB->Create(); }
+IRender_Glow* CRender::glow_create() { return new CGlow(); }
+void CRender::flush() { r_dsgraph_render_graph(0); }
+BOOL CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
+BOOL CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
+BOOL CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
 ENGINE_API extern BOOL g_bRendering;
 void CRender::add_Visual(IRenderVisual* V)
 {
     VERIFY(g_bRendering);
     add_leafs_Dynamic((dxRender_Visual*)V);
 }
-void CRender::add_Geometry(IRenderVisual* V)
-{
-    add_Static((dxRender_Visual*)V, View->getMask());
-}
+void CRender::add_Geometry(IRenderVisual* V) { add_Static((dxRender_Visual*)V, View->getMask()); }
 void CRender::add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* verts)
 {
-    if (T->suppress_wm) return;
+    if (T->suppress_wm)
+        return;
     VERIFY2(_valid(P) && _valid(s) && T && verts && (s > EPS_L), "Invalid static wallmark params");
     Wallmarks->AddStaticWallmark(T, verts, P, &*S, s);
 }
@@ -320,7 +269,8 @@ void CRender::add_StaticWallmark(IWallMarkArray* pArray, const Fvector& P, float
 {
     dxWallMarkArray* pWMA = (dxWallMarkArray*)pArray;
     ref_shader* pShader = pWMA->dxGenerateWallmark();
-    if (pShader) add_StaticWallmark(*pShader, P, s, T, V);
+    if (pShader)
+        add_StaticWallmark(*pShader, P, s, T, V);
 }
 
 void CRender::add_StaticWallmark(const wm_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V)
@@ -331,13 +281,11 @@ void CRender::add_StaticWallmark(const wm_shader& S, const Fvector& P, float s, 
 
 void CRender::clear_static_wallmarks()
 {
-    if (Wallmarks) Wallmarks->clear();
+    if (Wallmarks)
+        Wallmarks->clear();
 }
 
-void CRender::add_SkeletonWallmark(intrusive_ptr<CSkeletonWallmark> wm)
-{
-    Wallmarks->AddSkeletonWallmark(wm);
-}
+void CRender::add_SkeletonWallmark(intrusive_ptr<CSkeletonWallmark> wm) { Wallmarks->AddSkeletonWallmark(wm); }
 void CRender::add_SkeletonWallmark(
     const Fmatrix* xf, CKinematics* obj, ref_shader& sh, const Fvector& start, const Fvector& dir, float size)
 {
@@ -348,7 +296,8 @@ void CRender::add_SkeletonWallmark(
 {
     dxWallMarkArray* pWMA = (dxWallMarkArray*)pArray;
     ref_shader* pShader = pWMA->dxGenerateWallmark();
-    if (pShader) add_SkeletonWallmark(xf, (CKinematics*)obj, *pShader, start, dir, size);
+    if (pShader)
+        add_SkeletonWallmark(xf, (CKinematics*)obj, *pShader, start, dir, size);
 }
 void CRender::add_Occluder(Fbox2& bb_screenspace)
 {
@@ -360,29 +309,38 @@ void CRender::add_Occluder(Fbox2& bb_screenspace)
 void CRender::set_Object(IRenderable* O)
 {
     VERIFY(g_bRendering);
-    val_pObject = O;  // NULL is OK, trust me :)
-    if (val_pObject) {
+    val_pObject = O; // NULL is OK, trust me :)
+    if (val_pObject)
+    {
         VERIFY(dynamic_cast<IGameObject*>(O) || dynamic_cast<CPS_Instance*>(O));
-        if (O->GetRenderData().pROS) {
+        if (O->GetRenderData().pROS)
+        {
             VERIFY(dynamic_cast<CROS_impl*>(O->GetRenderData().pROS));
         }
     }
-    if (PHASE_NORMAL == phase) {
-        if (L_Shadows) L_Shadows->set_object(O);
+    if (PHASE_NORMAL == phase)
+    {
+        if (L_Shadows)
+            L_Shadows->set_object(O);
 
-        if (L_Projector) L_Projector->set_object(O);
+        if (L_Projector)
+            L_Projector->set_object(O);
     }
     else
     {
-        if (L_Shadows) L_Shadows->set_object(0);
+        if (L_Shadows)
+            L_Shadows->set_object(0);
 
-        if (L_Projector) L_Projector->set_object(0);
+        if (L_Projector)
+            L_Projector->set_object(0);
     }
 }
 void CRender::apply_object(IRenderable* O)
 {
-    if (0 == O) return;
-    if (PHASE_NORMAL == phase && O->renderable_ROS()) {
+    if (0 == O)
+        return;
+    if (PHASE_NORMAL == phase && O->renderable_ROS())
+    {
         CROS_impl& LT = *((CROS_impl*)O->GetRenderData().pROS);
         VERIFY(dynamic_cast<IGameObject*>(O) || dynamic_cast<CPS_Instance*>(O));
         VERIFY(dynamic_cast<CROS_impl*>(O->GetRenderData().pROS));
@@ -401,7 +359,8 @@ static BOOL gm_Nearer = 0;
 
 IC void gm_SetNearer(BOOL bNearer)
 {
-    if (bNearer != gm_Nearer) {
+    if (bNearer != gm_Nearer)
+    {
         gm_Nearer = bNearer;
         if (gm_Nearer)
             RImplementation.rmNear();
@@ -413,14 +372,8 @@ IC void gm_SetNearer(BOOL bNearer)
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-CRender::CRender() : m_bFirstFrameAfterReset(false), Sectors_xrc("render")
-{
-}
-
-CRender::~CRender()
-{
-}
-
+CRender::CRender() : m_bFirstFrameAfterReset(false), Sectors_xrc("render") {}
+CRender::~CRender() {}
 extern float r_ssaDISCARD;
 extern float r_ssaDONTSORT;
 extern float r_ssaLOD_A, r_ssaLOD_B;
@@ -438,7 +391,7 @@ void CRender::Calculate()
 {
 #ifdef _GPA_ENABLED
     TAL_SCOPED_TASK_NAMED("CRender::Calculate()");
-#endif  // _GPA_ENABLED
+#endif // _GPA_ENABLED
 
     BasicStats.Culling.Begin();
 
@@ -463,17 +416,21 @@ void CRender::Calculate()
     phase = PHASE_NORMAL;
 
     // Detect camera-sector
-    if (!vLastCameraPos.similar(Device.vCameraPosition, EPS_S)) {
+    if (!vLastCameraPos.similar(Device.vCameraPosition, EPS_S))
+    {
         CSector* pSector = (CSector*)detectSector(Device.vCameraPosition);
-        if (pSector && (pSector != pLastSector)) g_pGamePersistent->OnSectorChanged(translateSector(pSector));
+        if (pSector && (pSector != pLastSector))
+            g_pGamePersistent->OnSectorChanged(translateSector(pSector));
 
-        if (0 == pSector) pSector = pLastSector;
+        if (0 == pSector)
+            pSector = pLastSector;
         pLastSector = pSector;
         vLastCameraPos.set(Device.vCameraPosition);
     }
 
     // Check if camera is too near to some portal - if so force DualRender
-    if (rmPortals) {
+    if (rmPortals)
+    {
         Fvector box_radius;
         box_radius.set(EPS_L * 2, EPS_L * 2, EPS_L * 2);
         Sectors_xrc.box_options(CDB::OPT_FULL_TEST);
@@ -485,17 +442,20 @@ void CRender::Calculate()
         }
     }
     //
-    if (L_DB) L_DB->Update();
+    if (L_DB)
+        L_DB->Update();
 
     // Main process
     marker++;
-    if (pLastSector) {
+    if (pLastSector)
+    {
         // Traverse sector/portal structure
         PortalTraverser.traverse(pLastSector, ViewBase, Device.vCameraPosition, Device.mFullTransform,
             CPortalTraverser::VQ_HOM + CPortalTraverser::VQ_SSA + CPortalTraverser::VQ_FADE);
 
         // Determine visibility for static geometry hierrarhy
-        if (psDeviceFlags.test(rsDrawStatic)) {
+        if (psDeviceFlags.test(rsDrawStatic))
+        {
             for (u32 s_it = 0; s_it < PortalTraverser.r_sectors.size(); s_it++)
             {
                 CSector* sector = (CSector*)PortalTraverser.r_sectors[s_it];
@@ -509,7 +469,8 @@ void CRender::Calculate()
         }
 
         // Traverse object database
-        if (psDeviceFlags.test(rsDrawDynamic)) {
+        if (psDeviceFlags.test(rsDrawDynamic))
+        {
             g_SpatialSpace->q_frustum(
                 lstRenderables, ISpatial_DB::O_ORDERED, STYPE_RENDERABLE + STYPE_LIGHTSOURCE, ViewBase);
 
@@ -518,18 +479,22 @@ void CRender::Calculate()
 
             // Determine visibility for dynamic part of scene
             set_Object(0);
-            g_hud->Render_First();  // R1 shadows
+            g_hud->Render_First(); // R1 shadows
             g_hud->Render_Last();
             u32 uID_LTRACK = 0xffffffff;
-            if (phase == PHASE_NORMAL) {
+            if (phase == PHASE_NORMAL)
+            {
                 uLastLTRACK++;
-                if (lstRenderables.size()) uID_LTRACK = uLastLTRACK % lstRenderables.size();
+                if (lstRenderables.size())
+                    uID_LTRACK = uLastLTRACK % lstRenderables.size();
 
                 // update light-vis for current entity / actor
                 IGameObject* O = g_pGameLevel->CurrentViewEntity();
-                if (O) {
+                if (O)
+                {
                     CROS_impl* R = (CROS_impl*)O->ROS();
-                    if (R) R->update(O);
+                    if (R)
+                        R->update(O);
                 }
             }
             for (u32 o_it = 0; o_it < lstRenderables.size(); o_it++)
@@ -537,13 +502,15 @@ void CRender::Calculate()
                 ISpatial* spatial = lstRenderables[o_it];
                 spatial->spatial_updatesector();
                 CSector* sector = (CSector*)spatial->GetSpatialData().sector;
-                if (0 == sector) continue;  // disassociated from S/P structure
+                if (0 == sector)
+                    continue; // disassociated from S/P structure
 
                 // Filter only not light spatial
                 if (PortalTraverser.i_marker != sector->r_marker && (spatial->GetSpatialData().type & STYPE_RENDERABLE))
-                    continue;  // inactive (untouched) sector
+                    continue; // inactive (untouched) sector
 
-                if (spatial->GetSpatialData().type & STYPE_RENDERABLE) {
+                if (spatial->GetSpatialData().type & STYPE_RENDERABLE)
+                {
                     for (u32 v_it = 0; v_it < sector->r_frustums.size(); v_it++)
                     {
                         set_Frustum(&(sector->r_frustums[v_it]));
@@ -553,7 +520,8 @@ void CRender::Calculate()
                             continue;
                         // renderable
                         IRenderable* renderable = spatial->dcast_Renderable();
-                        if (0 == renderable) {
+                        if (0 == renderable)
+                        {
                             // It may be an glow
                             CGlow* glow = dynamic_cast<CGlow*>(spatial);
                             VERIFY(glow);
@@ -576,19 +544,21 @@ void CRender::Calculate()
                             v_orig.marker = v_copy.marker;
                             v_orig.hom_frame = v_copy.hom_frame;
                             v_orig.hom_tested = v_copy.hom_tested;
-                            if (!bVisible) break;  // exit loop on frustums
+                            if (!bVisible)
+                                break; // exit loop on frustums
 
                             // rendering
-                            if (o_it == uID_LTRACK && renderable->renderable_ROS()) {
+                            if (o_it == uID_LTRACK && renderable->renderable_ROS())
+                            {
                                 // track lighting environment
                                 CROS_impl* T = (CROS_impl*)renderable->renderable_ROS();
                                 T->update(renderable);
                             }
                             set_Object(renderable);
                             renderable->renderable_Render();
-                            set_Object(0);  //? is it needed at all
+                            set_Object(0); //? is it needed at all
                         }
-                        break;  // exit loop on frustums
+                        break; // exit loop on frustums
                     }
                 }
                 else
@@ -600,9 +570,11 @@ void CRender::Calculate()
                         // lightsource
                         light* L = (light*)spatial->dcast_Light();
                         VERIFY(L);
-                        if (L->spatial.sector) {
+                        if (L->spatial.sector)
+                        {
                             vis_data& vis = L->get_homdata();
-                            if (HOM.visible(vis)) L_DB->add_light(L);
+                            if (HOM.visible(vis))
+                                L_DB->add_light(L);
                         }
                     }
                 }
@@ -650,9 +622,10 @@ void CRender::Render()
 {
 #ifdef _GPA_ENABLED
     TAL_SCOPED_TASK_NAMED("CRender::Render()");
-#endif  // _GPA_ENABLED
+#endif // _GPA_ENABLED
 
-    if (m_bFirstFrameAfterReset) {
+    if (m_bFirstFrameAfterReset)
+    {
         m_bFirstFrameAfterReset = false;
         return;
     }
@@ -663,39 +636,43 @@ void CRender::Render()
     Target->Begin();
     o.vis_intersect = FALSE;
     phase = PHASE_NORMAL;
-    r_dsgraph_render_hud();              // hud
-    r_dsgraph_render_graph(0);           // normal level
-    if (Details) Details->Render();      // grass / details
-    r_dsgraph_render_lods(true, false);  // lods - FB
+    r_dsgraph_render_hud(); // hud
+    r_dsgraph_render_graph(0); // normal level
+    if (Details)
+        Details->Render(); // grass / details
+    r_dsgraph_render_lods(true, false); // lods - FB
 
-    g_pGamePersistent->Environment().RenderSky();     // sky / sun
-    g_pGamePersistent->Environment().RenderClouds();  // clouds
+    g_pGamePersistent->Environment().RenderSky(); // sky / sun
+    g_pGamePersistent->Environment().RenderClouds(); // clouds
 
-    r_pmask(true, false);  // disable priority "1"
+    r_pmask(true, false); // disable priority "1"
     o.vis_intersect = TRUE;
     HOM.Disable();
-    L_Dynamic->render(0);  // addititional light sources
-    if (Wallmarks) {
+    L_Dynamic->render(0); // addititional light sources
+    if (Wallmarks)
+    {
         g_r = 0;
-        Wallmarks->Render();  // wallmarks has priority as normal geometry
+        Wallmarks->Render(); // wallmarks has priority as normal geometry
     }
     HOM.Enable();
     o.vis_intersect = FALSE;
     phase = PHASE_NORMAL;
-    r_pmask(true, true);  // enable priority "0" and "1"
+    r_pmask(true, true); // enable priority "0" and "1"
     BasicStats.ShadowsRender.Begin();
-    if (L_Shadows) L_Shadows->render();  // ... and shadows
+    if (L_Shadows)
+        L_Shadows->render(); // ... and shadows
     BasicStats.ShadowsRender.End();
-    r_dsgraph_render_lods(false, true);  // lods - FB
-    r_dsgraph_render_graph(1);           // normal level, secondary priority
-    L_Dynamic->render(1);                // addititional light sources, secondary priority
-    PortalTraverser.fade_render();       // faded-portals
-    r_dsgraph_render_sorted();           // strict-sorted geoms
+    r_dsgraph_render_lods(false, true); // lods - FB
+    r_dsgraph_render_graph(1); // normal level, secondary priority
+    L_Dynamic->render(1); // addititional light sources, secondary priority
+    PortalTraverser.fade_render(); // faded-portals
+    r_dsgraph_render_sorted(); // strict-sorted geoms
     BasicStats.Glows.Begin();
-    if (L_Glows) L_Glows->Render();  // glows
+    if (L_Glows)
+        L_Glows->Render(); // glows
     BasicStats.Glows.End();
-    g_pGamePersistent->Environment().RenderFlares();  // lens-flares
-    g_pGamePersistent->Environment().RenderLast();    // rain/thunder-bolts
+    g_pGamePersistent->Environment().RenderFlares(); // lens-flares
+    g_pGamePersistent->Environment().RenderLast(); // rain/thunder-bolts
 
 #if DEBUG
     for (int _priority = 0; _priority < 2; ++_priority)
@@ -710,7 +687,8 @@ void CRender::Render()
 #endif
     // Postprocess, if necessary
     Target->End();
-    if (L_Projector) L_Projector->finalize();
+    if (L_Projector)
+        L_Projector->finalize();
 
     // HUD
     BasicStats.Primitives.End();
@@ -780,10 +758,12 @@ public:
         string_path pname;
         strconcat(sizeof(pname), pname, GlobalEnv.Render->getShaderPath(), pFileName);
         IReader* R = FS.r_open("$game_shaders$", pname);
-        if (0 == R) {
+        if (0 == R)
+        {
             // possibly in shared directory or somewhere else - open directly
             R = FS.r_open("$game_shaders$", pFileName);
-            if (0 == R) return E_FAIL;
+            if (0 == R)
+                return E_FAIL;
         }
 
         // duplicate and zero-terminate
@@ -808,10 +788,12 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     void*& result, bool const disasm)
 {
     HRESULT _result = E_FAIL;
-    if (pTarget[0] == 'p') {
+    if (pTarget[0] == 'p')
+    {
         SPS* sps_result = (SPS*)result;
         _result = HW.pDevice->CreatePixelShader(buffer, &sps_result->ps);
-        if (!SUCCEEDED(_result)) {
+        if (!SUCCEEDED(_result))
+        {
             Log("! PS: ", file_name);
             Msg("! CreatePixelShader hr == 0x%08x", _result);
             return E_FAIL;
@@ -819,7 +801,8 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
 
         LPCVOID data = NULL;
         _result = D3DXFindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, NULL);
-        if (SUCCEEDED(_result) && data) {
+        if (SUCCEEDED(_result) && data)
+        {
             LPD3DXSHADER_CONSTANTTABLE pConstants = LPD3DXSHADER_CONSTANTTABLE(data);
             sps_result->constants.parse(pConstants, 0x1);
         }
@@ -833,7 +816,8 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     {
         SVS* svs_result = (SVS*)result;
         _result = HW.pDevice->CreateVertexShader(buffer, &svs_result->vs);
-        if (!SUCCEEDED(_result)) {
+        if (!SUCCEEDED(_result))
+        {
             Log("! VS: ", file_name);
             Msg("! CreatePixelShader hr == 0x%08x", _result);
             return E_FAIL;
@@ -841,7 +825,8 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
 
         LPCVOID data = NULL;
         _result = D3DXFindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, NULL);
-        if (SUCCEEDED(_result) && data) {
+        if (SUCCEEDED(_result) && data)
+        {
             LPD3DXSHADER_CONSTANTTABLE pConstants = LPD3DXSHADER_CONSTANTTABLE(data);
             svs_result->constants.parse(pConstants, 0x2);
         }
@@ -852,7 +837,8 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
         }
     }
 
-    if (disasm) {
+    if (disasm)
+    {
         ID3DXBuffer* disasm = 0;
         D3DXDisassembleShader(LPDWORD(buffer), FALSE, 0, &disasm);
         string_path dname;
@@ -876,7 +862,8 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
     u32 len = 0;
 
     // options
-    if (o.forceskinw) {
+    if (o.forceskinw)
+    {
         defines[def_it].Name = "SKIN_COLOR";
         defines[def_it].Definition = "1";
         def_it++;
@@ -884,7 +871,8 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
     sh_name[len] = '0' + char(o.forceskinw);
     ++len;
 
-    if (m_skinning < 0) {
+    if (m_skinning < 0)
+    {
         defines[def_it].Name = "SKIN_NONE";
         defines[def_it].Definition = "1";
         def_it++;
@@ -897,7 +885,8 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
         ++len;
     }
 
-    if (0 == m_skinning) {
+    if (0 == m_skinning)
+    {
         defines[def_it].Name = "SKIN_0";
         defines[def_it].Definition = "1";
         def_it++;
@@ -905,7 +894,8 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
     sh_name[len] = '0' + char(0 == m_skinning);
     ++len;
 
-    if (1 == m_skinning) {
+    if (1 == m_skinning)
+    {
         defines[def_it].Name = "SKIN_1";
         defines[def_it].Definition = "1";
         def_it++;
@@ -913,7 +903,8 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
     sh_name[len] = '0' + char(1 == m_skinning);
     ++len;
 
-    if (2 == m_skinning) {
+    if (2 == m_skinning)
+    {
         defines[def_it].Name = "SKIN_2";
         defines[def_it].Definition = "1";
         def_it++;
@@ -921,7 +912,8 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
     sh_name[len] = '0' + char(2 == m_skinning);
     ++len;
 
-    if (3 == m_skinning) {
+    if (3 == m_skinning)
+    {
         defines[def_it].Name = "SKIN_3";
         defines[def_it].Definition = "1";
         def_it++;
@@ -929,7 +921,8 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
     sh_name[len] = '0' + char(3 == m_skinning);
     ++len;
 
-    if (4 == m_skinning) {
+    if (4 == m_skinning)
+    {
         defines[def_it].Name = "SKIN_4";
         defines[def_it].Definition = "1";
         def_it++;
@@ -961,7 +954,8 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
     FS.file_list(m_file_set, folder_name, FS_ListFiles | FS_RootOnly, "*");
 
     string_path temp_file_name, file_name;
-    if (!match_shader_id(name, sh_name, m_file_set, temp_file_name)) {
+    if (!match_shader_id(name, sh_name, m_file_set, temp_file_name))
+    {
         string_path file;
         xr_strcpy(file, "shaders_cache\\r1\\");
         xr_strcat(file, name);
@@ -977,9 +971,11 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
         xr_strcat(file_name, temp_file_name);
     }
 
-    if (FS.exist(file_name)) {
+    if (FS.exist(file_name))
+    {
         IReader* file = FS.r_open(file_name);
-        if (file->length() > 4) {
+        if (file->length() > 4)
+        {
             u32 crc = file->r_u32();
             u32 crcComp = crc32(file->pointer(), file->elapsed());
             if (crcComp == crc)
@@ -988,7 +984,8 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
         file->close();
     }
 
-    if (FAILED(_result)) {
+    if (FAILED(_result))
+    {
         includer Includer;
         LPD3DXBUFFER pShaderBuf = NULL;
         LPD3DXBUFFER pErrorBuf = NULL;
@@ -997,7 +994,8 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
 
         _result = D3DXCompileShader((LPCSTR)pSrcData, SrcDataLen, defines, pInclude, pFunctionName, pTarget,
             Flags | D3DXSHADER_USE_LEGACY_D3DX9_31_DLL, &pShaderBuf, &pErrorBuf, &pConstants);
-        if (SUCCEEDED(_result)) {
+        if (SUCCEEDED(_result))
+        {
             IWriter* file = FS.w_open(file_name);
             u32 crc = crc32(pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize());
             file->w_u32(crc);
@@ -1031,9 +1029,11 @@ static inline bool match_shader(
     char const* j = mask;
     for (; i != e; ++i, ++j)
     {
-        if (*i == *j) continue;
+        if (*i == *j)
+            continue;
 
-        if (*j == '_') continue;
+        if (*j == '_')
+            continue;
 
         return false;
     }
@@ -1047,7 +1047,7 @@ static inline bool match_shader_id(
 #if 0
 	strcpy_s					( result, "" );
 	return						false;
-#else  // #if 1
+#else // #if 1
 #ifdef DEBUG
     LPCSTR temp = "";
     bool found = false;
@@ -1055,7 +1055,8 @@ static inline bool match_shader_id(
     FS_FileSet::const_iterator const e = file_set.end();
     for (; i != e; ++i)
     {
-        if (match_shader(debug_shader_id, full_shader_id, (*i).name.c_str(), (*i).name.size())) {
+        if (match_shader(debug_shader_id, full_shader_id, (*i).name.c_str(), (*i).name.size()))
+        {
             VERIFY(!found);
             found = true;
             temp = (*i).name.c_str();
@@ -1064,18 +1065,19 @@ static inline bool match_shader_id(
 
     xr_strcpy(result, temp);
     return found;
-#else   // #ifdef DEBUG
+#else // #ifdef DEBUG
     FS_FileSet::const_iterator i = file_set.begin();
     FS_FileSet::const_iterator const e = file_set.end();
     for (; i != e; ++i)
     {
-        if (match_shader(debug_shader_id, full_shader_id, (*i).name.c_str(), (*i).name.size())) {
+        if (match_shader(debug_shader_id, full_shader_id, (*i).name.c_str(), (*i).name.size()))
+        {
             xr_strcpy(result, (*i).name.c_str());
             return true;
         }
     }
 
     return false;
-#endif  // #ifdef DEBUG
-#endif  // #if 1
+#endif // #ifdef DEBUG
+#endif // #if 1
 }

@@ -24,8 +24,8 @@ class TfrmDOShuffle;
 
 class TfrmOneColor : public TForm
 {
-    __published :  // IDE-managed Components
-                   TBevel* Bevel1;
+    __published : // IDE-managed Components
+                  TBevel* Bevel1;
     TBevel* Bevel2;
     TMultiObjColor* mcColor;
     TExtBtn* ebMultiRemove;
@@ -38,14 +38,14 @@ class TfrmOneColor : public TForm
     void __fastcall tvDOListStartDrag(TObject* Sender, TDragObject*& DragObject);
     void __fastcall tvDOListItemFocused(TObject* Sender);
 
-  private:  // User declarations
+private: // User declarations
     TfrmDOShuffle* m_Parent;
 
-  public:
+public:
     bool bLoadMode;
     TElTreeItem* FDragItem;
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TfrmOneColor(TComponent* Owner);
     void __fastcall ShowIndex(TfrmDOShuffle* parent);
     void __fastcall HideIndex();

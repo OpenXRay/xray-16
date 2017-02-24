@@ -30,11 +30,7 @@ LPCSTR _INVALID_SPAWN_STORY_ID = "INVALID_SPAWN_STORY_ID";
 STORY_PAIRS story_ids;
 SPAWN_STORY_PAIRS spawn_story_ids;
 
-CALifeSimulator* alife()
-{
-    return (const_cast<CALifeSimulator*>(ai().get_alife()));
-}
-
+CALifeSimulator* alife() { return (const_cast<CALifeSimulator*>(ai().get_alife())); }
 CSE_ALifeDynamicObject* alife_object(const CALifeSimulator* self, ALife::_OBJECT_ID object_id)
 {
     VERIFY(self);
@@ -56,12 +52,13 @@ CSE_ALifeDynamicObject* alife_object(const CALifeSimulator* self, LPCSTR name)
          it != self->objects().objects().end(); it++)
     {
         CSE_ALifeDynamicObject* obj = it->second;
-        if (xr_strcmp(obj->name_replace(), name) == 0) return (it->second);
+        if (xr_strcmp(obj->name_replace(), name) == 0)
+            return (it->second);
     }
 
     return (0);
 }
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
 CSE_ALifeDynamicObject* alife_object(const CALifeSimulator* self, ALife::_OBJECT_ID id, bool no_assert)
 {
@@ -136,11 +133,7 @@ void remove_out_restriction(CALifeSimulator* alife, CSE_ALifeMonsterAbstract* mo
     alife->remove_restriction(monster->ID, id, RestrictionSpace::eRestrictorTypeOut);
 }
 
-u32 get_level_id(CALifeSimulator* self)
-{
-    return (self->graph().level().level_id());
-}
-
+u32 get_level_id(CALifeSimulator* self) { return (self->graph().level().level_id()); }
 CSE_ALifeDynamicObject* CALifeSimulator__create(CALifeSimulator* self, ALife::_SPAWN_ID spawn_id)
 {
     const CALifeSpawnRegistry::SPAWN_GRAPH::CVertex* vertex = ai().alife().spawns().spawns().vertex(spawn_id);
@@ -169,12 +162,14 @@ CSE_Abstract* CALifeSimulator__spawn_item2(CALifeSimulator* self, LPCSTR section
         return (self->spawn_item(section, position, level_vertex_id, game_vertex_id, id_parent));
 
     CSE_ALifeDynamicObject* object = ai().alife().objects().object(id_parent, true);
-    if (!object) {
+    if (!object)
+    {
         Msg("! invalid parent id [%d] specified", id_parent);
         return (0);
     }
 
-    if (!object->m_bOnline) return (self->spawn_item(section, position, level_vertex_id, game_vertex_id, id_parent));
+    if (!object->m_bOnline)
+        return (self->spawn_item(section, position, level_vertex_id, game_vertex_id, id_parent));
 
     NET_Packet packet;
     packet.w_begin(M_SPAWN);
@@ -200,15 +195,18 @@ CSE_Abstract* CALifeSimulator__spawn_ammo(CALifeSimulator* self, LPCSTR section,
     //	if (id_parent == ALife::_OBJECT_ID(-1))
     //		return (self->spawn_item(section,position,level_vertex_id,game_vertex_id,id_parent));
     CSE_ALifeDynamicObject* object = 0;
-    if (id_parent != ALife::_OBJECT_ID(-1)) {
+    if (id_parent != ALife::_OBJECT_ID(-1))
+    {
         object = ai().alife().objects().object(id_parent, true);
-        if (!object) {
+        if (!object)
+        {
             Msg("! invalid parent id [%d] specified", id_parent);
             return (0);
         }
     }
 
-    if (!object || !object->m_bOnline) {
+    if (!object || !object->m_bOnline)
+    {
         CSE_Abstract* item = self->spawn_item(section, position, level_vertex_id, game_vertex_id, id_parent);
 
         CSE_ALifeItemAmmo* ammo = smart_cast<CSE_ALifeItemAmmo*>(item);
@@ -256,7 +254,8 @@ void CALifeSimulator__release(CALifeSimulator* self, CSE_Abstract* object, bool)
     THROW(object);
     CSE_ALifeObject* alife_object = smart_cast<CSE_ALifeObject*>(object);
     THROW(alife_object);
-    if (!alife_object->m_bOnline) {
+    if (!alife_object->m_bOnline)
+    {
         self->release(object, true);
         return;
     }
@@ -291,7 +290,8 @@ KNOWN_INFO_VECTOR* registry(const CALifeSimulator* self, const ALife::_OBJECT_ID
 bool has_info(const CALifeSimulator* self, const ALife::_OBJECT_ID& id, LPCSTR info_id)
 {
     const KNOWN_INFO_VECTOR* known_info = registry(self, id);
-    if (!known_info) return (false);
+    if (!known_info)
+        return (false);
 
     if (std::find_if(known_info->begin(), known_info->end(), CFindByIDPred(info_id)) == known_info->end())
         return (false);
@@ -393,7 +393,7 @@ SCRIPT_EXPORT(CALifeSimulator, (), {
     }
 });
 
-#if 0   // def DEBUG
+#if 0 // def DEBUG
 struct dummy {
     int count;
     lua_State* state;
@@ -426,4 +426,4 @@ void CALifeSimulator::validate			()
 		);
 	}
 }
-#endif  // DEBUG
+#endif // DEBUG

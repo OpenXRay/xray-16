@@ -15,11 +15,7 @@
 #include "Level.h"
 #include "xrEngine/cameramanager.h"
 
-bool CCar::HUDView() const
-{
-    return active_camera->tag == ectFirst;
-}
-
+bool CCar::HUDView() const { return active_camera->tag == ectFirst; }
 void CCar::cam_Update(float dt, float fov)
 {
     VERIFY(!physics_world()->Processing());
@@ -33,8 +29,10 @@ void CCar::cam_Update(float dt, float fov)
     {
     case ectFirst:
         // rotate head
-        if (OwnerActor()) OwnerActor()->Orientation().yaw = -active_camera->yaw;
-        if (OwnerActor()) OwnerActor()->Orientation().pitch = -active_camera->pitch;
+        if (OwnerActor())
+            OwnerActor()->Orientation().yaw = -active_camera->yaw;
+        if (OwnerActor())
+            OwnerActor()->Orientation().pitch = -active_camera->pitch;
         break;
     case ectChase: break;
     case ectFree: break;
@@ -46,8 +44,10 @@ void CCar::cam_Update(float dt, float fov)
 
 void CCar::OnCameraChange(int type)
 {
-    if (Owner()) {
-        if (type == ectFirst) {
+    if (Owner())
+    {
+        if (type == ectFirst)
+        {
             Owner()->setVisible(FALSE);
         }
         else if (active_camera->tag == ectFirst)
@@ -56,9 +56,11 @@ void CCar::OnCameraChange(int type)
         }
     }
 
-    if (!active_camera || active_camera->tag != type) {
+    if (!active_camera || active_camera->tag != type)
+    {
         active_camera = camera[type];
-        if (ectFree == type) {
+        if (ectFree == type)
+        {
             Fvector xyz;
             XFORM().getXYZi(xyz);
             active_camera->yaw = xyz.y;

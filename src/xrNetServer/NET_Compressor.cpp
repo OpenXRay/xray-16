@@ -13,25 +13,25 @@
 #pragma warning(disable : 4995)
 #include <malloc.h>
 #pragma warning(pop)
-#endif  // DEBUG
+#endif // DEBUG
 
 #if NET_USE_LZO_COMPRESSION
 #define ENCODE rtc9_compress
 #define DECODE rtc9_decompress
-#else  // NET_USE_LZO_COMPRESSION
+#else // NET_USE_LZO_COMPRESSION
 #include "xrCore/ppmd_compressor.h"
 #define ENCODE ppmd_compress
 #define DECODE ppmd_decompress
-#endif  // NET_USE_LZO_COMPRESSION
+#endif // NET_USE_LZO_COMPRESSION
 
-#endif  // NET_USE_COMPRESSION
+#endif // NET_USE_COMPRESSION
 
-#if 1  // def DEBUG
+#if 1 // def DEBUG
 // static FILE*    OriginalTrafficDump     = NULL;
 // static FILE*    CompressedTrafficDump   = NULL;
 static FILE* RawTrafficDump = NULL;
 static FILE* CompressionDump = NULL;
-#endif  // DEBUG
+#endif // DEBUG
 
 #define NOWARN
 
@@ -253,27 +253,29 @@ void NET_Compressor::done_decoding		( )
 NET_Compressor::NET_Compressor()
 #ifdef CONFIG_PROFILE_LOCKS
     : CS(MUTEX_PROFILE_ID(NET_Compressor))
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
 {
 }
 
 NET_Compressor::~NET_Compressor()
 {
-#if 1  // def DEBUG
+#if 1 // def DEBUG
     //	if( strstr(Core.Params,"-dump_traffic") )
     //	{
     //		fclose( OriginalTrafficDump );
     //		fclose( CompressedTrafficDump );
     //	}
-    if (CompressionDump) {
+    if (CompressionDump)
+    {
         fclose(CompressionDump);
         CompressionDump = NULL;
     }
-    if (RawTrafficDump) {
+    if (RawTrafficDump)
+    {
         fclose(RawTrafficDump);
         RawTrafficDump = NULL;
     }
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 /*
@@ -298,9 +300,9 @@ u16 NET_Compressor::compressed_size(const u32& count)
 
 #if NET_USE_LZO_COMPRESSION
     u32 result = rtc_csize(count) + 1;
-#else   // NET_USE_LZO_COMPRESSION
+#else // NET_USE_LZO_COMPRESSION
     u32 result = 64 + (count / 8 + 1) * 10;
-#endif  // NET_USE_LZO_COMPRESSION
+#endif // NET_USE_LZO_COMPRESSION
 
     R_ASSERT(result <= u32(u16(-1)));
 
@@ -310,7 +312,7 @@ u16 NET_Compressor::compressed_size(const u32& count)
 
     return ((u16)count);
 
-#endif  // #if NET_USE_COMPRESSION
+#endif // #if NET_USE_COMPRESSION
 }
 
 XRNETSERVER_API BOOL g_net_compressor_enabled = FALSE;
@@ -320,7 +322,8 @@ u16 NET_Compressor::Compress(BYTE* dest, const u32& dest_size, BYTE* src, const 
 {
     SCompressorStats::SStatPacket* _p = NULL;
     bool b_compress_packet = (count > 36);
-    if (g_net_compressor_gather_stats && b_compress_packet) {
+    if (g_net_compressor_gather_stats && b_compress_packet)
+    {
         _p = m_stats.get(count);
         _p->hit_count += 1;
         m_stats.total_uncompressed_bytes += count;
@@ -330,19 +333,20 @@ u16 NET_Compressor::Compress(BYTE* dest, const u32& dest_size, BYTE* src, const 
     VERIFY(src);
     VERIFY(count);
 
-#if 1  // def DEBUG
-    if (strstr(Core.Params, "-dump_traffic")) {
+#if 1 // def DEBUG
+    if (strstr(Core.Params, "-dump_traffic"))
+    {
         //		fwrite( src,count,1,OriginalTrafficDump );
         //		fflush( OriginalTrafficDump );
     }
-#endif  // DEBUG
+#endif // DEBUG
 
 #if !NET_USE_COMPRESSION
 
     CopyMemory(dest, src, count);
     return (u16(count));
 
-#else  // !NET_USE_COMPRESSION
+#else // !NET_USE_COMPRESSION
 
     R_ASSERT(dest_size >= compressed_size(count));
 
@@ -351,24 +355,27 @@ u16 NET_Compressor::Compress(BYTE* dest, const u32& dest_size, BYTE* src, const 
 
 #if NET_USE_COMPRESSION_CRC
     offset += sizeof(u32);
-#endif  // NET_USE_COMPRESSION_CRC
+#endif // NET_USE_COMPRESSION_CRC
 
-    if (!psNET_direct_connect && g_net_compressor_enabled && b_compress_packet) {
+    if (!psNET_direct_connect && g_net_compressor_enabled && b_compress_packet)
+    {
         CS.Enter();
         compressed_size = offset + ENCODE(dest + offset, dest_size - offset, src, count);
 
-        if (g_net_compressor_gather_stats) m_stats.total_compressed_bytes += compressed_size;
+        if (g_net_compressor_gather_stats)
+            m_stats.total_compressed_bytes += compressed_size;
 
         CS.Leave();
     }
 
-    if (compressed_size < count) {
+    if (compressed_size < count)
+    {
         *dest = NET_TAG_COMPRESSED;
 
 #if NET_USE_COMPRESSION_CRC
         u32 crc = crc32(dest + offset, compressed_size);
         *((u32*)(dest + 1)) = crc;
-#endif  // NET_USE_COMPRESSION_CRC
+#endif // NET_USE_COMPRESSION_CRC
 
 #if NET_LOG_COMPRESSION
         Msg("#compress %u->%u  %02X (%08X)", count, compressed_size, *dest, *((u32*)(src + 1)));
@@ -380,15 +387,17 @@ u16 NET_Compressor::Compress(BYTE* dest, const u32& dest_size, BYTE* src, const 
         static const char* compressor_name = "PPMd";
 #endif
 
-        if (!CompressionDump) CompressionDump = fopen("net-compression.log", "w+b");
+        if (!CompressionDump)
+            CompressionDump = fopen("net-compression.log", "w+b");
 
         fprintf(CompressionDump, "%s compress %2.0f%% %u->%u\r\n", compressor_name,
             100.0f * float(compressed_size) / float(count), count, compressed_size);
-#endif  // NET_DUMP_COMPRESSION
+#endif // NET_DUMP_COMPRESSION
     }
     else
     {
-        if (g_net_compressor_gather_stats && b_compress_packet) _p->unlucky_attempts += 1;
+        if (g_net_compressor_gather_stats && b_compress_packet)
+            _p->unlucky_attempts += 1;
 
         *dest = NET_TAG_NONCOMPRESSED;
 
@@ -399,15 +408,16 @@ u16 NET_Compressor::Compress(BYTE* dest, const u32& dest_size, BYTE* src, const 
         Msg("#compress/as-is %u->%u  %02X", count, compressed_size, *dest);
 #endif
     }
-    if (g_net_compressor_gather_stats && b_compress_packet) _p->compressed_size += compressed_size;
+    if (g_net_compressor_gather_stats && b_compress_packet)
+        _p->compressed_size += compressed_size;
 
-#if 1   // def DEBUG
+#if 1 // def DEBUG
 //	if( strstr(Core.Params,"-dump_traffic"))
 //	{
 //		fwrite(dest,compressed_size,1,CompressedTrafficDump);
 //		fflush(CompressedTrafficDump);
 //	}
-#endif  // DEBUG
+#endif // DEBUG
 
 #ifdef DEBUG
 /*
@@ -421,11 +431,11 @@ u16 NET_Compressor::Compress(BYTE* dest, const u32& dest_size, BYTE* src, const 
 
 */
 //	CS.Leave		();
-#endif  // DEBUG
+#endif // DEBUG
 
     return (u16(compressed_size));
 
-#endif  // if !NET_USE_COMPRESSION
+#endif // if !NET_USE_COMPRESSION
 }
 
 u16 NET_Compressor::Decompress(BYTE* dest, const u32& dest_size, BYTE* src, const u32& count)
@@ -439,7 +449,8 @@ u16 NET_Compressor::Decompress(BYTE* dest, const u32& dest_size, BYTE* src, cons
 #endif
 
 #if NET_USE_COMPRESSSION
-    if (src[0] != NET_TAG_COMPRESSED && src[0] != NET_TAG_NONCOMPRESSED) {
+    if (src[0] != NET_TAG_COMPRESSED && src[0] != NET_TAG_NONCOMPRESSED)
+    {
         Msg("! invalid compression-tag %02X", src[0]);
         DEBUG_BREAK;
     }
@@ -453,8 +464,10 @@ u16 NET_Compressor::Decompress(BYTE* dest, const u32& dest_size, BYTE* src, cons
 
 #else
 
-    if (*src != NET_TAG_COMPRESSED) {
-        if (count) {
+    if (*src != NET_TAG_COMPRESSED)
+    {
+        if (count)
+        {
             CopyMemory(dest, src + 1, count - 1);
             return (u16(count - 1));
         }
@@ -466,15 +479,16 @@ u16 NET_Compressor::Decompress(BYTE* dest, const u32& dest_size, BYTE* src, cons
 
 #if NET_USE_COMPRESSION_CRC
     offset += sizeof(u32);
-#endif  // NET_USE_COMPRESSION_CRC
+#endif // NET_USE_COMPRESSION_CRC
 
 #if NET_USE_COMPRESSION_CRC
     u32 crc = crc32(src + offset, count);
     //	Msg					("decompressed %d -> ? [0x%08x]",count,crc);
-    if (crc != *((u32*)(src + 1))) Msg("!CRC mismatch");
+    if (crc != *((u32*)(src + 1)))
+        Msg("!CRC mismatch");
 
     R_ASSERT2(crc == *((u32*)(src + 1)), make_string("crc is different! (0x%08x != 0x%08x)", crc, *((u32*)(src + 1))));
-#endif  // NET_USE_COMPRESSION_CRC
+#endif // NET_USE_COMPRESSION_CRC
 
     CS.Enter();
     u32 uncompressed_size = DECODE(dest, dest_size, src + offset, count - offset);
@@ -482,7 +496,7 @@ u16 NET_Compressor::Decompress(BYTE* dest, const u32& dest_size, BYTE* src, cons
 
     return (u16(uncompressed_size));
 
-#endif  // !NET_USE_COMPRESSION
+#endif // !NET_USE_COMPRESSION
 }
 
 void NET_Compressor::DumpStats(bool brief)
@@ -504,7 +518,8 @@ void NET_Compressor::DumpStats(bool brief)
     {
         total_hits += it->second.hit_count;
         unlucky_hits += it->second.unlucky_attempts;
-        if (!brief) {
+        if (!brief)
+        {
             Msg("size[%d] count[%d] unlucky[%d] avg_c[%d]", it->first, it->second.hit_count,
                 it->second.unlucky_attempts, iFloor(float(it->second.compressed_size) / float(it->second.hit_count)));
         }

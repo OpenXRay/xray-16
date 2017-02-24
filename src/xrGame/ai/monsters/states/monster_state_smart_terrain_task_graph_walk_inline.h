@@ -1,6 +1,6 @@
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -28,11 +28,13 @@ bool CStateMonsterSmartTerrainTaskGraphWalkAbstract::check_start_conditions()
         smart_cast<CSE_ALifeMonsterAbstract*>(ai().alife().objects().object(object->ID()));
     VERIFY(monster);
 
-    if (monster->m_smart_terrain_id == 0xffff) return false;
+    if (monster->m_smart_terrain_id == 0xffff)
+        return false;
 
     m_task = monster->brain().smart_terrain().task(monster);
     VERIFY3(m_task, "Smart terrain selected, but task was not set for monster ", *object->cName());
-    if (object->ai_location().game_vertex_id() == m_task->game_vertex_id()) return false;
+    if (object->ai_location().game_vertex_id() == m_task->game_vertex_id())
+        return false;
 
     return true;
 }
@@ -41,7 +43,8 @@ TEMPLATE_SPECIALIZATION
 bool CStateMonsterSmartTerrainTaskGraphWalkAbstract::check_completion()
 {
     // if we get to the graph point - work complete
-    if (object->ai_location().game_vertex_id() == m_task->game_vertex_id()) return true;
+    if (object->ai_location().game_vertex_id() == m_task->game_vertex_id())
+        return true;
     return false;
 }
 

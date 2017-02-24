@@ -23,19 +23,12 @@ using System::Windows::Forms::ColorDialog;
 typedef Flobbster::Windows::Forms::PropertyBag PropertyBag;
 typedef PropertyBag::PropertySpecDescriptor PropertySpecDescriptor;
 
-static int convert_color(float color)
-{
-    return ((int)(Math::Min(color, 1.f) * 255.f + .5f));
-}
-
-bool property_editor_color::GetPaintValueSupported(ITypeDescriptorContext ^ context)
-{
-    return (true);
-}
-
+static int convert_color(float color) { return ((int)(Math::Min(color, 1.f) * 255.f + .5f)); }
+bool property_editor_color::GetPaintValueSupported(ITypeDescriptorContext ^ context) { return (true); }
 void property_editor_color::PaintValue(PaintValueEventArgs ^ arguments)
 {
-    if (!arguments->Value) return;
+    if (!arguments->Value)
+        return;
 
     property_container ^ container = safe_cast<property_container ^>(arguments->Value);
     editor::color color = safe_cast<property_color_base %>(container->container_holder()).get_value_raw();
@@ -51,20 +44,23 @@ void property_editor_color::PaintValue(PaintValueEventArgs ^ arguments)
 
 UITypeEditorEditStyle property_editor_color::GetEditStyle(ITypeDescriptorContext ^ context)
 {
-    if (context) return (UITypeEditorEditStyle::Modal);
+    if (context)
+        return (UITypeEditorEditStyle::Modal);
 
     return (inherited::GetEditStyle(context));
 }
 
 Object ^ property_editor_color::EditValue(ITypeDescriptorContext ^ context, IServiceProvider ^ provider, Object ^ value)
 {
-    if (!context || !provider) return (inherited::EditValue(context, provider, value));
+    if (!context || !provider)
+        return (inherited::EditValue(context, provider, value));
 
     typedef System::Windows::Forms::Design::IWindowsFormsEditorService IWindowsFormsEditorService;
     IWindowsFormsEditorService ^ service =
         dynamic_cast<IWindowsFormsEditorService ^>(provider->GetService(IWindowsFormsEditorService::typeid));
 
-    if (!service) return (inherited::EditValue(context, provider, value));
+    if (!service)
+        return (inherited::EditValue(context, provider, value));
 
     property_container ^ container = safe_cast<property_container ^>(context->Instance);
     PropertySpecDescriptor ^ descriptor = safe_cast<PropertySpecDescriptor ^>(context->PropertyDescriptor);

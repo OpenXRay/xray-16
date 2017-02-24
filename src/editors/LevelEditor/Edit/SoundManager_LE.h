@@ -14,17 +14,14 @@ class CLevelSoundManager : public CSoundManager
     void RealRefreshEnvGeometry();
     void MakeGameSound(ESoundThumbnail* THM, LPCSTR src_name, LPCSTR game_name);
 
-  public:
+public:
     CLevelSoundManager() { bNeedRefreshEnvGeom = false; }
-
     ~CLevelSoundManager() {}
-
     virtual void OnFrame();
 
     void RefreshEnvLibrary();
 
     void RefreshEnvGeometry() { bNeedRefreshEnvGeom = true; }
-
     //        bool MakeEnvGeometry(CMemoryWriter& F, bool bErrMsg=false);
 
     bool Validate();

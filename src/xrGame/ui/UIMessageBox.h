@@ -38,7 +38,6 @@ public:
     void SetUserPasswordMode(bool);
     void SetPasswordMode(bool);
     E_MESSAGEBOX_STYLE GetBoxStyle() { return m_eMessageBoxStyle; };
-
     void SetTextEditURL(LPCSTR text);
     LPCSTR GetTextEditURL();
 

@@ -22,4 +22,4 @@ public:
     void load_settings();
 };
 
-#endif  //#ifndef STATISTICS_COLLECTOR
+#endif //#ifndef STATISTICS_COLLECTOR

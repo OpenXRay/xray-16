@@ -10,9 +10,11 @@ void base_lighting::select(xr_vector<R_Light>& dest, xr_vector<R_Light>& src, Fv
     R_Light* L = &*src.begin();
     for (; L != &*src.end(); L++)
     {
-        if (L->type == LT_POINT) {
+        if (L->type == LT_POINT)
+        {
             float dist = Sphere.P.distance_to(L->position);
-            if (dist > (Sphere.R + L->range)) continue;
+            if (dist > (Sphere.R + L->range))
+                continue;
         }
         dest.push_back(*L);
     }

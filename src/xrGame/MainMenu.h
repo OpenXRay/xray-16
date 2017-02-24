@@ -21,12 +21,12 @@ namespace gamespy_gp
 class account_manager;
 class login_manager;
 
-}  // namespace gamespy_gp
+} // namespace gamespy_gp
 namespace gamespy_profile
 {
 class profile_store;
 class stats_submitter;
-}  // namespace gamespy_profile
+} // namespace gamespy_profile
 
 class atlas_submit_queue;
 
@@ -115,7 +115,6 @@ public:
     gamespy_profile::profile_store* GetProfileStore() { return m_profile_store; };
     gamespy_profile::stats_submitter* GetStatsSubmitter() { return m_stats_submitter; };
     atlas_submit_queue* GetSubmitQueue() { return m_atlas_submit_queue; };
-
 protected:
     EErrorDlg m_NeedErrDialog;
     u32 m_start_time;
@@ -141,7 +140,6 @@ public:
     virtual bool CanSkipSceneRendering();
 
     virtual bool IgnorePause() { return true; }
-
     virtual void IR_OnMousePress(int btn);
     virtual void IR_OnMouseRelease(int btn);
     virtual void IR_OnMouseHold(int btn);
@@ -162,7 +160,6 @@ public:
     virtual void OnFrame(void);
 
     virtual bool UseIndicators() { return false; }
-
     void OnDeviceCreate();
 
     void Screenshot(IRender::ScreenshotMode mode = IRender::SM_NORMAL, LPCSTR name = 0);

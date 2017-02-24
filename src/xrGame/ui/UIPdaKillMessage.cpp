@@ -38,11 +38,12 @@ void CUIPdaKillMessage::Init(KillMessageStruct& msg, CGameFont* F)
 
 float CUIPdaKillMessage::InitText(CUITextWnd& refStatic, float x, ColoredName& info)
 {
-    if (0 == xr_strlen(info.m_name)) return 0.0f;
+    if (0 == xr_strlen(info.m_name))
+        return 0.0f;
 
     CGameFont* pFont = refStatic.GetFont();
     float _eps = pFont->SizeOf_(' ');
-    UI().ClientToScreenScaledWidth(_eps);  // add one letter
+    UI().ClientToScreenScaledWidth(_eps); // add one letter
 
     float height = pFont->CurrentHeight_();
     float y = (GetHeight() - height) / 2;
@@ -60,9 +61,11 @@ float CUIPdaKillMessage::InitText(CUITextWnd& refStatic, float x, ColoredName& i
 
 float CUIPdaKillMessage::InitIcon(CUIStatic& refStatic, float x, IconInfo& info)
 {
-    if (0 == info.m_rect.width()) return 0;
+    if (0 == info.m_rect.width())
+        return 0;
 
-    if (!info.m_shader->inited()) return 0;
+    if (!info.m_shader->inited())
+        return 0;
 
     float y = 0;
     float selfHeight = GetHeight();
@@ -73,7 +76,8 @@ float CUIPdaKillMessage::InitIcon(CUIStatic& refStatic, float x, IconInfo& info)
     float height = rect.height();
 
     scale = selfHeight / height;
-    if (scale > 1) scale = 1;
+    if (scale > 1)
+        scale = 1;
     width = width * scale;
     height = height * scale;
     y = (selfHeight - height) / 2;

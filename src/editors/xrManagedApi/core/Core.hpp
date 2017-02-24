@@ -16,7 +16,7 @@ ref class Core abstract sealed
 {
     internal : static LogCallback ^ ManagedLogCallback;
 
-  public:
+public:
     static void Initialize(String ^ appName, LogCallback ^ logCallback, bool initFs, String ^ fsFileName);
     static void Initialize(String ^ appName, LogCallback ^ logCallback, bool initFs);
     static void Initialize(String ^ appName, LogCallback ^ logCallback);

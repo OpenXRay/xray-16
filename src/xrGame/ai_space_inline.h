@@ -20,11 +20,7 @@ IC const CALifeSimulator& CAI_Space::alife() const
     return (*m_alife_simulator);
 }
 
-IC const CALifeSimulator* CAI_Space::get_alife() const
-{
-    return (m_alife_simulator);
-}
-
+IC const CALifeSimulator* CAI_Space::get_alife() const { return (m_alife_simulator); }
 IC const CCoverManager& CAI_Space::cover_manager() const
 {
     VERIFY(m_cover_manager);
@@ -51,7 +47,8 @@ IC doors::manager& CAI_Space::doors() const
 
 IC CAI_Space& ai()
 {
-    if (!g_ai_space) {
+    if (!g_ai_space)
+    {
         g_ai_space = new CAI_Space();
         g_ai_space->init();
     }

@@ -6,7 +6,7 @@ struct SMonsterSettings
     // float speed factors
 
     float m_fDistToCorpse;
-    float m_fDamagedThreshold;  // порог здоровья, ниже которого устанавливается флаг m_bDamaged
+    float m_fDamagedThreshold; // порог здоровья, ниже которого устанавливается флаг m_bDamaged
 
     // -------------------------------------------------------
 

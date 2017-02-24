@@ -31,9 +31,11 @@ static LPCSTR s_exit_loophole_id = "<__EXIT__>";
 
 shared_str transform_vertex(shared_str const& vertex_id, bool const& in)
 {
-    if (*vertex_id.c_str()) return (vertex_id);
+    if (*vertex_id.c_str())
+        return (vertex_id);
 
-    if (in) return (s_enter_loophole_id);
+    if (in)
+        return (s_enter_loophole_id);
 
     return (s_exit_loophole_id);
 }
@@ -42,7 +44,7 @@ shared_str parse_vertex(luabind::object const& table, LPCSTR identifier, bool co
 {
     return (transform_vertex(parse_string(table, identifier), in));
 }
-}  // namespace smart_cover
+} // namespace smart_cover
 
 class id_predicate
 {
@@ -50,7 +52,6 @@ class id_predicate
 
 public:
     IC id_predicate(loophole const& loophole) : m_loophole(&loophole) {}
-
     IC bool operator()(loophole* const& loophole) const
     {
         VERIFY(loophole);
@@ -109,7 +110,8 @@ void description::load_loopholes(shared_str const& table_id)
     for (luabind::iterator I(loopholes), E; I != E; ++I)
     {
         luabind::object table = *I;
-        if (luabind::type(table) != LUA_TTABLE) {
+        if (luabind::type(table) != LUA_TTABLE)
+        {
             VERIFY(luabind::type(table) != LUA_TNIL);
             continue;
         }
@@ -156,7 +158,8 @@ void description::load_transitions(shared_str const& table_id)
     for (luabind::iterator I(transitions), E; I != E; ++I)
     {
         luabind::object table = *I;
-        if (luabind::type(table) != LUA_TTABLE) {
+        if (luabind::type(table) != LUA_TTABLE)
+        {
             VERIFY(luabind::type(table) != LUA_TNIL);
             continue;
         }
@@ -165,9 +168,11 @@ void description::load_transitions(shared_str const& table_id)
         shared_str vertex_1_id = parse_vertex(table, "vertex1", false);
         float weight = parse_float(table, "weight");
 
-        if (!m_transitions.vertex(vertex_0_id)) m_transitions.add_vertex(Loki::EmptyType(), vertex_0_id);
+        if (!m_transitions.vertex(vertex_0_id))
+            m_transitions.add_vertex(Loki::EmptyType(), vertex_0_id);
 
-        if (!m_transitions.vertex(vertex_1_id)) m_transitions.add_vertex(Loki::EmptyType(), vertex_1_id);
+        if (!m_transitions.vertex(vertex_1_id))
+            m_transitions.add_vertex(Loki::EmptyType(), vertex_1_id);
 
         m_transitions.add_edge(vertex_0_id, vertex_1_id, weight);
         TransitionGraph::CEdge* edge = m_transitions.edge(vertex_0_id, vertex_1_id);
@@ -227,7 +232,6 @@ loophole const* description::loophole(shared_str const& loophole_id) const
 
     public:
         IC id_predicate(shared_str const& id) : m_id(id) {}
-
         IC bool operator()(smart_cover::loophole const* loophole) const
         {
             return (m_id._get() == loophole->id()._get());
@@ -235,7 +239,8 @@ loophole const* description::loophole(shared_str const& loophole_id) const
     };
 
     Loopholes::const_iterator found = std::find_if(m_loopholes.begin(), m_loopholes.end(), id_predicate(loophole_id));
-    if (found != m_loopholes.end()) return (*found);
+    if (found != m_loopholes.end())
+        return (*found);
 
     return (0);
 }

@@ -42,17 +42,17 @@ public:
 private:
     // these functions are all used to iterate across geometry, filling data structures
     MStatus gotoBindPose(void);
-    MStatus getBones(void);                       // loads geometry from scene
-    MStatus getBoneData(const MMatrix& locator);  // loads bone position per animation frame
-    MStatus setUpBoneMap(MObject* pSkinObject);   // creates data structure to store data
+    MStatus getBones(void); // loads geometry from scene
+    MStatus getBoneData(const MMatrix& locator); // loads bone position per animation frame
+    MStatus setUpBoneMap(MObject* pSkinObject); // creates data structure to store data
     void parseMesh(MObject& mesh, MDagPath path);
     MStatus parseBoneGeometry();
     MStatus parseShape(MDagPath path);
     MStatus parsePolySet(MItMeshPolygon& meshPoly, MObjectArray& rgShaders, MIntArray texMap, int weight);
     MStatus CalculateTriangleVertex(
         int vt, MVector& pt, float& u, float& v, WBVec& weights, MItMeshPolygon& meshPoly, PtLookupMap& ptMap);
-    void clearData(void);  // call inbetween function calls
-                           //	MStatus			GetShaderFileName		(MString &filename, MObject &set);
+    void clearData(void); // call inbetween function calls
+    //	MStatus			GetShaderFileName		(MString &filename, MObject &set);
     int AppendVertex(MPoint pt, float u, float v, const WBVec& wb);
 
     // Edge lookup methods
@@ -87,17 +87,17 @@ private:
     SmdBoneVec m_boneList;
     SmdTriVec m_triList;
     SmdVertVec m_vertList;
-    MDagPath m_skinPath;     // path to the mesh we discover
-    MDagPathArray m_rgInfs;  // array of paths to the bones we discover
+    MDagPath m_skinPath; // path to the mesh we discover
+    MDagPathArray m_rgInfs; // array of paths to the bones we discover
 
-    VWBVec* m_rgWeights;    // for each vertex, store index of influence joint
-    MString m_strFilename;  // filename for file
+    VWBVec* m_rgWeights; // for each vertex, store index of influence joint
+    MString m_strFilename; // filename for file
 
     // options used to drive export behavior
-    bool m_bReferenceFile;  // true for a reference file, false for an animation file
-    bool m_fSkinCluster;    // true if we should only export the cluster named by "m_strSkinCluster"
+    bool m_bReferenceFile; // true for a reference file, false for an animation file
+    bool m_fSkinCluster; // true if we should only export the cluster named by "m_strSkinCluster"
     MString
-        m_strSkinCluster;  // name of skin cluster selected by user to be exported. if empty, use first cluster in list
+        m_strSkinCluster; // name of skin cluster selected by user to be exported. if empty, use first cluster in list
 };
 
-#endif  // SmdMayaH
+#endif // SmdMayaH

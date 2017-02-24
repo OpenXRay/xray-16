@@ -10,7 +10,7 @@
 #include "patrol_path_params.h"
 #include "patrol_path_storage.h"
 #include "xrScriptEngine/script_engine.hpp"
-#include "xrScriptEngine/DebugMacros.hpp"  // for THROW3 // XXX: move debug macros to xrCore
+#include "xrScriptEngine/DebugMacros.hpp" // for THROW3 // XXX: move debug macros to xrCore
 #include "AISpaceBase.hpp"
 #include "Include/xrAPI/xrAPI.h"
 
@@ -28,10 +28,7 @@ CPatrolPathParams::CPatrolPathParams(LPCSTR caPatrolPathToGo, EPatrolStartType t
     m_previous_index = index;
 }
 
-CPatrolPathParams::~CPatrolPathParams()
-{
-}
-
+CPatrolPathParams::~CPatrolPathParams() {}
 u32 CPatrolPathParams::count() const
 {
     VERIFY(m_path);
@@ -42,7 +39,8 @@ const Fvector& CPatrolPathParams::point(u32 index) const
 {
     VERIFY(m_path);
     VERIFY(!m_path->vertices().empty());
-    if (!m_path->vertex(index)) {
+    if (!m_path->vertex(index))
+    {
         GlobalEnv.ScriptEngine->script_log(LuaMessageType::Error,
             "Can't get information about patrol point number %d in the patrol way %s", index, *m_path_name);
         index = (*m_path->vertices().begin()).second->vertex_id();
@@ -65,15 +63,12 @@ GameGraph::_GRAPH_ID CPatrolPathParams::game_vertex_id(u32 index) const
 
 u32 CPatrolPathParams::point(LPCSTR name) const
 {
-    if (m_path->point(name)) return (m_path->point(name)->vertex_id());
+    if (m_path->point(name))
+        return (m_path->point(name)->vertex_id());
     return (u32(-1));
 }
 
-u32 CPatrolPathParams::point(const Fvector& point) const
-{
-    return (m_path->point(point)->vertex_id());
-}
-
+u32 CPatrolPathParams::point(const Fvector& point) const { return (m_path->point(point)->vertex_id()); }
 bool CPatrolPathParams::flag(u32 index, u8 flag_index) const
 {
     VERIFY(m_path->vertex(index));

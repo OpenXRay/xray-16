@@ -92,9 +92,11 @@ public:
     IC void append_mtx(const Fmatrix& parent, CDB::RESULT* R, CEditableObject* obj, CEditableMesh* mesh)
     {
         SResult D(parent, R, obj, mesh);
-        if (m_Flags.is(CDB::OPT_ONLYNEAREST) && !results.empty()) {
+        if (m_Flags.is(CDB::OPT_ONLYNEAREST) && !results.empty())
+        {
             SResult& S = results.back();
-            if (D.range < S.range) S = D;
+            if (D.range < S.range)
+                S = D;
         }
         else
             results.push_back(D);
@@ -102,9 +104,11 @@ public:
     IC void append(CDB::RESULT* R, CEditableObject* obj, CEditableMesh* mesh)
     {
         SResult D(R, obj, mesh);
-        if (m_Flags.is(CDB::OPT_ONLYNEAREST) && !results.empty()) {
+        if (m_Flags.is(CDB::OPT_ONLYNEAREST) && !results.empty())
+        {
             SResult& S = results.back();
-            if (D.range < S.range) S = D;
+            if (D.range < S.range)
+                S = D;
         }
         else
             results.push_back(D);

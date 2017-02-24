@@ -17,23 +17,12 @@ property_color::property_color(
 {
 }
 
-property_color::~property_color()
-{
-    this->!property_color();
-}
-
+property_color::~property_color() { this->!property_color(); }
 property_color::!property_color()
 {
     delete (m_getter);
     delete (m_setter);
 }
 
-color property_color::get_value_raw()
-{
-    return ((*m_getter)());
-}
-
-void property_color::set_value_raw(color value)
-{
-    (*m_setter)(value);
-}
+color property_color::get_value_raw() { return ((*m_getter)()); }
+void property_color::set_value_raw(color value) { (*m_setter)(value); }

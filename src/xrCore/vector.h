@@ -25,7 +25,7 @@ const float EPS = 0.0000100f;
 const float EPS_L = 0.0010000f;
 
 #undef M_SQRT1_2
-const float M_SQRT1_2 = 0.7071067811865475244008443621048f;  // 490;
+const float M_SQRT1_2 = 0.7071067811865475244008443621048f; // 490;
 
 const float M_PI = 3.1415926535897932384626433832795f;
 const float PI = 3.1415926535897932384626433832795f;
@@ -67,24 +67,10 @@ const float PI_DIV_8 = 0.3926990816987241548078304229099f;
 #include "_std_extensions.h"
 
 // comparisions
-IC BOOL fsimilar(float a, float b, float cmp = EPS)
-{
-    return _abs(a - b) < cmp;
-}
-IC BOOL dsimilar(double a, double b, double cmp = EPS)
-{
-    return _abs(a - b) < cmp;
-}
-
-IC BOOL fis_zero(float val, float cmp = EPS_S)
-{
-    return _abs(val) < cmp;
-}
-IC BOOL dis_zero(double val, double cmp = EPS_S)
-{
-    return _abs(val) < cmp;
-}
-
+IC BOOL fsimilar(float a, float b, float cmp = EPS) { return _abs(a - b) < cmp; }
+IC BOOL dsimilar(double a, double b, double cmp = EPS) { return _abs(a - b) < cmp; }
+IC BOOL fis_zero(float val, float cmp = EPS_S) { return _abs(val) < cmp; }
+IC BOOL dis_zero(double val, double cmp = EPS_S) { return _abs(val) < cmp; }
 // degree 2 radians and vice-versa
 namespace implement
 {
@@ -99,23 +85,10 @@ ICF T rad2deg(T val)
     return (val * T(180) / T(M_PI));
 };
 };
-ICF float deg2rad(float val)
-{
-    return implement::deg2rad(val);
-}
-ICF double deg2rad(double val)
-{
-    return implement::deg2rad(val);
-}
-ICF float rad2deg(float val)
-{
-    return implement::rad2deg(val);
-}
-ICF double rad2deg(double val)
-{
-    return implement::rad2deg(val);
-}
-
+ICF float deg2rad(float val) { return implement::deg2rad(val); }
+ICF double deg2rad(double val) { return implement::deg2rad(val); }
+ICF float rad2deg(float val) { return implement::rad2deg(val); }
+ICF double rad2deg(double val) { return implement::rad2deg(val); }
 // clamping/snapping
 template <class T>
 IC void clamp(T& val, const T& _low, const T& _high)
@@ -137,7 +110,8 @@ IC T clampr(const T& val, const T& _low, const T& _high)
 };
 IC float snapto(float value, float snap)
 {
-    if (snap <= 0.f) return value;
+    if (snap <= 0.f)
+        return value;
     return float(iFloor((value + (snap * 0.5f)) / snap)) * snap;
 };
 
@@ -179,7 +153,8 @@ ICF float angle_normalize_always(float a)
     float div = a / PI_MUL_2;
     int rnd = (div > 0) ? iFloor(div) : iCeil(div);
     float frac = div - rnd;
-    if (frac < 0) frac += 1.f;
+    if (frac < 0)
+        frac += 1.f;
     return frac * PI_MUL_2;
 }
 
@@ -195,9 +170,11 @@ ICF float angle_normalize(float a)
 // -PI .. +PI
 ICF float angle_normalize_signed(float a)
 {
-    if (a >= (-PI) && a <= PI) return a;
+    if (a >= (-PI) && a <= PI)
+        return a;
     float angle = angle_normalize_always(a);
-    if (angle > PI) angle -= PI_MUL_2;
+    if (angle > PI)
+        angle -= PI_MUL_2;
     return angle;
 }
 
@@ -205,57 +182,60 @@ ICF float angle_normalize_signed(float a)
 ICF float angle_difference_signed(float a, float b)
 {
     float diff = angle_normalize_signed(a) - angle_normalize_signed(b);
-    if (diff > 0) {
-        if (diff > PI) diff -= PI_MUL_2;
+    if (diff > 0)
+    {
+        if (diff > PI)
+            diff -= PI_MUL_2;
     }
     else
     {
-        if (diff < -PI) diff += PI_MUL_2;
+        if (diff < -PI)
+            diff += PI_MUL_2;
     }
     return diff;
 }
 
 // 0..PI
-ICF float angle_difference(float a, float b)
-{
-    return _abs(angle_difference_signed(a, b));
-}
-
+ICF float angle_difference(float a, float b) { return _abs(angle_difference_signed(a, b)); }
 IC bool are_ordered(float const value0, float const value1, float const value2)
 {
-    if ((value1 >= value0) && (value1 <= value2)) return true;
+    if ((value1 >= value0) && (value1 <= value2))
+        return true;
 
-    if ((value1 <= value0) && (value1 >= value2)) return true;
+    if ((value1 <= value0) && (value1 >= value2))
+        return true;
 
     return false;
 }
 
-IC bool is_between(float const value, float const left, float const right)
-{
-    return are_ordered(left, value, right);
-}
-
+IC bool is_between(float const value, float const left, float const right) { return are_ordered(left, value, right); }
 // c=current, t=target, s=speed, dt=dt
 IC bool angle_lerp(float& c, float t, float s, float dt)
 {
     float const before = c;
     float diff = t - c;
-    if (diff > 0) {
-        if (diff > PI) diff -= PI_MUL_2;
+    if (diff > 0)
+    {
+        if (diff > PI)
+            diff -= PI_MUL_2;
     }
     else
     {
-        if (diff < -PI) diff += PI_MUL_2;
+        if (diff < -PI)
+            diff += PI_MUL_2;
     }
     float diff_a = _abs(diff);
 
-    if (diff_a < EPS_S) return true;
+    if (diff_a < EPS_S)
+        return true;
 
     float mot = s * dt;
-    if (mot > diff_a) mot = diff_a;
+    if (mot > diff_a)
+        mot = diff_a;
     c += (diff / diff_a) * mot;
 
-    if (is_between(c, before, t)) return false;
+    if (is_between(c, before, t))
+        return false;
 
     if (c < 0)
         c += PI_MUL_2;
@@ -372,7 +352,8 @@ IC _quaternion<T>& _quaternion<T>::set(const _matrix<T>& M)
     float trace, s;
 
     trace = M._11 + M._22 + M._33;
-    if (trace > 0.0f) {
+    if (trace > 0.0f)
+    {
         s = _sqrt(trace + 1.0f);
         w = s * 0.5f;
         s = 0.5f / s;
@@ -390,7 +371,8 @@ IC _quaternion<T>& _quaternion<T>::set(const _matrix<T>& M)
             E,
             I
         };
-        if (M._11 > M._22) {
+        if (M._11 > M._22)
+        {
             if (M._33 > M._11)
                 biggest = I;
             else
@@ -409,7 +391,8 @@ IC _quaternion<T>& _quaternion<T>::set(const _matrix<T>& M)
         {
         case A:
             s = _sqrt(M._11 - (M._22 + M._33) + 1.0f);
-            if (s > TRACE_QZERO_TOLERANCE) {
+            if (s > TRACE_QZERO_TOLERANCE)
+            {
                 x = s * 0.5f;
                 s = 0.5f / s;
                 w = (M._32 - M._23) * s;
@@ -419,7 +402,8 @@ IC _quaternion<T>& _quaternion<T>::set(const _matrix<T>& M)
             }
             // I
             s = _sqrt(M._33 - (M._11 + M._22) + 1.0f);
-            if (s > TRACE_QZERO_TOLERANCE) {
+            if (s > TRACE_QZERO_TOLERANCE)
+            {
                 z = s * 0.5f;
                 s = 0.5f / s;
                 w = (M._21 - M._12) * s;
@@ -429,7 +413,8 @@ IC _quaternion<T>& _quaternion<T>::set(const _matrix<T>& M)
             }
             // E
             s = _sqrt(M._22 - (M._33 + M._11) + 1.0f);
-            if (s > TRACE_QZERO_TOLERANCE) {
+            if (s > TRACE_QZERO_TOLERANCE)
+            {
                 y = s * 0.5f;
                 s = 0.5f / s;
                 w = (M._13 - M._31) * s;
@@ -440,7 +425,8 @@ IC _quaternion<T>& _quaternion<T>::set(const _matrix<T>& M)
             break;
         case E:
             s = _sqrt(M._22 - (M._33 + M._11) + 1.0f);
-            if (s > TRACE_QZERO_TOLERANCE) {
+            if (s > TRACE_QZERO_TOLERANCE)
+            {
                 y = s * 0.5f;
                 s = 0.5f / s;
                 w = (M._13 - M._31) * s;
@@ -450,7 +436,8 @@ IC _quaternion<T>& _quaternion<T>::set(const _matrix<T>& M)
             }
             // I
             s = _sqrt(M._33 - (M._11 + M._22) + 1.0f);
-            if (s > TRACE_QZERO_TOLERANCE) {
+            if (s > TRACE_QZERO_TOLERANCE)
+            {
                 z = s * 0.5f;
                 s = 0.5f / s;
                 w = (M._21 - M._12) * s;
@@ -460,7 +447,8 @@ IC _quaternion<T>& _quaternion<T>::set(const _matrix<T>& M)
             }
             // A
             s = _sqrt(M._11 - (M._22 + M._33) + 1.0f);
-            if (s > TRACE_QZERO_TOLERANCE) {
+            if (s > TRACE_QZERO_TOLERANCE)
+            {
                 x = s * 0.5f;
                 s = 0.5f / s;
                 w = (M._32 - M._23) * s;
@@ -471,7 +459,8 @@ IC _quaternion<T>& _quaternion<T>::set(const _matrix<T>& M)
             break;
         case I:
             s = _sqrt(M._33 - (M._11 + M._22) + 1.0f);
-            if (s > TRACE_QZERO_TOLERANCE) {
+            if (s > TRACE_QZERO_TOLERANCE)
+            {
                 z = s * 0.5f;
                 s = 0.5f / s;
                 w = (M._21 - M._12) * s;
@@ -481,7 +470,8 @@ IC _quaternion<T>& _quaternion<T>::set(const _matrix<T>& M)
             }
             // A
             s = _sqrt(M._11 - (M._22 + M._33) + 1.0f);
-            if (s > TRACE_QZERO_TOLERANCE) {
+            if (s > TRACE_QZERO_TOLERANCE)
+            {
                 x = s * 0.5f;
                 s = 0.5f / s;
                 w = (M._32 - M._23) * s;
@@ -491,7 +481,8 @@ IC _quaternion<T>& _quaternion<T>::set(const _matrix<T>& M)
             }
             // E
             s = _sqrt(M._22 - (M._33 + M._11) + 1.0f);
-            if (s > TRACE_QZERO_TOLERANCE) {
+            if (s > TRACE_QZERO_TOLERANCE)
+            {
                 y = s * 0.5f;
                 s = 0.5f / s;
                 w = (M._13 - M._31) * s;

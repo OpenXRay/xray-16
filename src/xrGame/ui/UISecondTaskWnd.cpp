@@ -28,15 +28,8 @@
 #include "GametaskManager.h"
 #include "Actor.h"
 
-UITaskListWnd::UITaskListWnd()
-{
-    hint_wnd = NULL;
-}
-
-UITaskListWnd::~UITaskListWnd()
-{
-}
-
+UITaskListWnd::UITaskListWnd() { hint_wnd = NULL; }
+UITaskListWnd::~UITaskListWnd() {}
 void UITaskListWnd::init_from_xml(CUIXml& xml, LPCSTR path)
 {
     VERIFY(hint_wnd);
@@ -68,7 +61,8 @@ void UITaskListWnd::init_from_xml(CUIXml& xml, LPCSTR path)
 
 bool UITaskListWnd::OnMouseAction(float x, float y, EUIMessages mouse_action)
 {
-    if (inherited::OnMouseAction(x, y, mouse_action)) {
+    if (inherited::OnMouseAction(x, y, mouse_action))
+    {
         return true;
     }
     return true;
@@ -85,7 +79,8 @@ void UITaskListWnd::Show(bool status)
 {
     inherited::Show(status);
     GetMessageTarget()->SendMessage(this, PDA_TASK_HIDE_HINT, NULL);
-    if (status) UpdateList();
+    if (status)
+        UpdateList();
 }
 
 void UITaskListWnd::OnFocusReceive()
@@ -116,7 +111,8 @@ void UITaskListWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 void UITaskListWnd::OnBtnClose(CUIWindow* w, void* d)
 {
     CUITaskWnd* wnd = smart_cast<CUITaskWnd*>(GetParent()->GetParent());
-    if (wnd) wnd->Show_TaskListWnd(false);
+    if (wnd)
+        wnd->Show_TaskListWnd(false);
     //	Show( false );
     m_bt_close->SetButtonState(CUIButton::BUTTON_NORMAL);
 }
@@ -134,14 +130,16 @@ void UITaskListWnd::UpdateList()
     for (; itb != ite; ++itb)
     {
         CGameTask* task = (*itb).game_task;
-        if (task && task->GetTaskState() == eTaskStateInProgress) {
+        if (task && task->GetTaskState() == eTaskStateInProgress)
+        {
             UITaskListWndItem* item = new UITaskListWndItem();
-            if (item->init_task(task, this)) {
+            if (item->init_task(task, this))
+            {
                 m_list->AddWindow(item, true);
                 ++count_for_check;
             }
         }
-    }  // for
+    } // for
     m_list->SetScrollPos(prev_scroll_pos);
 }
 
@@ -176,10 +174,7 @@ UITaskListWndItem::UITaskListWndItem()
     m_color_states[2] = (u32)(-1);
 }
 
-UITaskListWndItem::~UITaskListWndItem()
-{
-}
-
+UITaskListWndItem::~UITaskListWndItem() {}
 IC u32 UITaskListWndItem::get_priority_task() const
 {
     VERIFY(m_task);
@@ -189,7 +184,8 @@ IC u32 UITaskListWndItem::get_priority_task() const
 bool UITaskListWndItem::init_task(CGameTask* task, UITaskListWnd* parent)
 {
     VERIFY(task);
-    if (!task) {
+    if (!task)
+    {
         return false;
     }
     m_task = task;
@@ -224,8 +220,10 @@ void UITaskListWndItem::Update()
     inherited::Update();
     update_view();
 
-    if (m_task && m_name->CursorOverWindow() && show_hint_can) {
-        if (Device.dwTimeGlobal > (m_name->FocusReceiveTime() + 700)) {
+    if (m_task && m_name->CursorOverWindow() && show_hint_can)
+    {
+        if (Device.dwTimeGlobal > (m_name->FocusReceiveTime() + 700))
+        {
             show_hint = true;
             GetMessageTarget()->SendMessage(this, PDA_TASK_SHOW_HINT, (void*)m_task);
             return;
@@ -255,7 +253,8 @@ void UITaskListWndItem::update_view()
 
     CGameTask* activ_task = Level().GameTaskManager().ActiveTask();
 
-    if (m_task == activ_task) {
+    if (m_task == activ_task)
+    {
         m_name->SetStateTextColor(m_color_states[stt_activ], S_Enabled);
     }
     else if (m_task->m_read)
@@ -270,8 +269,10 @@ void UITaskListWndItem::update_view()
 
 void UITaskListWndItem::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
-    if (pWnd == m_bt_focus) {
-        if (msg == BUTTON_DOWN) {
+    if (pWnd == m_bt_focus)
+    {
+        if (msg == BUTTON_DOWN)
+        {
             GetMessageTarget()->SendMessage(this, PDA_TASK_SET_TARGET_MAP, (void*)m_task);
         }
     }
@@ -292,13 +293,16 @@ void UITaskListWndItem::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
             }
         }
     */
-    if (pWnd == m_name) {
-        if (msg == BUTTON_DOWN) {
+    if (pWnd == m_name)
+    {
+        if (msg == BUTTON_DOWN)
+        {
             Level().GameTaskManager().SetActiveTask(m_task);
             return;
         }
 
-        if (msg == WINDOW_LBUTTON_DB_CLICK) {
+        if (msg == WINDOW_LBUTTON_DB_CLICK)
+        {
             GetMessageTarget()->SendMessage(this, PDA_TASK_SET_TARGET_MAP, (void*)m_task);
         }
     }
@@ -308,7 +312,8 @@ void UITaskListWndItem::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 
 bool UITaskListWndItem::OnMouseAction(float x, float y, EUIMessages mouse_action)
 {
-    if (inherited::OnMouseAction(x, y, mouse_action)) {
+    if (inherited::OnMouseAction(x, y, mouse_action))
+    {
         // return true;
     }
 
@@ -321,7 +326,7 @@ bool UITaskListWndItem::OnMouseAction(float x, float y, EUIMessages mouse_action
         hide_hint();
         break;
     }
-    }  // switch
+    } // switch
 
     return true;
 }

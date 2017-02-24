@@ -19,20 +19,9 @@
 #include "debug_renderer.h"
 #endif
 
-CSpaceRestrictor::~CSpaceRestrictor()
-{
-}
-
-void CSpaceRestrictor::Center(Fvector& C) const
-{
-    XFORM().transform_tiny(C, GetCForm()->getSphere().P);
-}
-
-float CSpaceRestrictor::Radius() const
-{
-    return (GetCForm()->getRadius());
-}
-
+CSpaceRestrictor::~CSpaceRestrictor() {}
+void CSpaceRestrictor::Center(Fvector& C) const { XFORM().transform_tiny(C, GetCForm()->getSphere().P); }
+float CSpaceRestrictor::Radius() const { return (GetCForm()->getRadius()); }
 BOOL CSpaceRestrictor::net_Spawn(CSE_Abstract* data)
 {
     actual(false);
@@ -68,7 +57,8 @@ BOOL CSpaceRestrictor::net_Spawn(CSE_Abstract* data)
 
     BOOL result = inherited::net_Spawn(data);
 
-    if (!result) return (FALSE);
+    if (!result)
+        return (FALSE);
 
     spatial.type &= ~STYPE_VISIBLEFORAI;
 
@@ -89,27 +79,27 @@ void CSpaceRestrictor::net_Destroy()
 {
     inherited::net_Destroy();
 
-    if (!ai().get_level_graph()) return;
+    if (!ai().get_level_graph())
+        return;
 
-    if (RestrictionSpace::ERestrictorTypes(m_space_restrictor_type) == RestrictionSpace::eRestrictorTypeNone) return;
+    if (RestrictionSpace::ERestrictorTypes(m_space_restrictor_type) == RestrictionSpace::eRestrictorTypeNone)
+        return;
 
     Level().space_restriction_manager().unregister_restrictor(this);
 }
 
 bool CSpaceRestrictor::inside(const Fsphere& sphere) const
 {
-    if (!actual()) prepare();
+    if (!actual())
+        prepare();
 
-    if (!m_selfbounds.intersect(sphere)) return (false);
+    if (!m_selfbounds.intersect(sphere))
+        return (false);
 
     return (prepared_inside(sphere));
 }
 
-BOOL CSpaceRestrictor::UsedAI_Locations()
-{
-    return (FALSE);
-}
-
+BOOL CSpaceRestrictor::UsedAI_Locations() { return (FALSE); }
 void CSpaceRestrictor::spatial_move()
 {
     inherited::spatial_move();
@@ -135,7 +125,7 @@ void CSpaceRestrictor::prepare() const
         switch ((*I).type)
         {
         case 0:
-        {  // sphere
+        { // sphere
             Fsphere temp;
             const Fsphere& sphere = (*I).data.sphere;
             XFORM().transform_tiny(temp.P, sphere.P);
@@ -144,7 +134,7 @@ void CSpaceRestrictor::prepare() const
             break;
         }
         case 1:
-        {  // box
+        { // box
             Fmatrix sphere;
             const Fmatrix& box = (*I).data.box;
             sphere.mul_43(XFORM(), box);
@@ -195,7 +185,8 @@ bool CSpaceRestrictor::prepared_inside(const Fsphere& sphere) const
         SPHERES::const_iterator I = m_spheres.begin();
         SPHERES::const_iterator E = m_spheres.end();
         for (; I != E; ++I)
-            if (sphere.intersect(*I)) return (true);
+            if (sphere.intersect(*I))
+                return (true);
     }
 
     {
@@ -204,7 +195,8 @@ bool CSpaceRestrictor::prepared_inside(const Fsphere& sphere) const
         for (; I != E; ++I)
         {
             for (u32 i = 0; i < PLANE_COUNT; ++i)
-                if ((*I).m_planes[i].classify(sphere.P) > sphere.R) goto continue_loop;
+                if ((*I).m_planes[i].classify(sphere.P) > sphere.R)
+                    goto continue_loop;
             return (true);
         continue_loop:
             continue;
@@ -222,8 +214,10 @@ extern Flags32 dbg_net_Draw_Flags;
 
 void CSpaceRestrictor::OnRender()
 {
-    if (!bDebug) return;
-    if (!(dbg_net_Draw_Flags.is_any(dbg_draw_customzone))) return;
+    if (!bDebug)
+        return;
+    if (!(dbg_net_Draw_Flags.is_any(dbg_draw_customzone)))
+        return;
     // RCache.OnFrameEnd();
     GlobalEnv.DRender->OnFrameEnd();
     Fvector l_half;
@@ -265,7 +259,8 @@ void CSpaceRestrictor::OnRender()
         }
     }
 
-    if (Level().CurrentViewEntity()->Position().distance_to(XFORM().c) < 100.0f) {
+    if (Level().CurrentViewEntity()->Position().distance_to(XFORM().c) < 100.0f)
+    {
         // DRAW name
 
         Fmatrix res;
@@ -284,8 +279,10 @@ void CSpaceRestrictor::OnRender()
         res.transform(v_res, shift);
 
         // check if the object in sight
-        if (v_res.z < 0 || v_res.w < 0) return;
-        if (v_res.x < -1.f || v_res.x > 1.f || v_res.y < -1.f || v_res.y > 1.f) return;
+        if (v_res.z < 0 || v_res.w < 0)
+            return;
+        if (v_res.x < -1.f || v_res.x > 1.f || v_res.y < -1.f || v_res.y > 1.f)
+            return;
 
         // get real (x,y)
         float x = (1.f + v_res.x) / 2.f * (Device.dwWidth);
@@ -295,7 +292,8 @@ void CSpaceRestrictor::OnRender()
         UI().Font().pFontMedium->OutSet(x, y -= delta_height);
         UI().Font().pFontMedium->OutNext(Name());
         CCustomZone* z = smart_cast<CCustomZone*>(this);
-        if (z) {
+        if (z)
+        {
             string64 str;
             switch (z->ZoneState())
             {

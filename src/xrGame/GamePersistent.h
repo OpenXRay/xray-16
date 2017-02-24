@@ -13,7 +13,7 @@ class CGamePersistent : public IGame_Persistent, public IEventReceiver
 {
     // ambient particles
     CParticlesObject* ambient_particles;
-    u32 ambient_sound_next_time[20];  // max snd channels
+    u32 ambient_sound_next_time[20]; // max snd channels
     u32 ambient_effect_next_time;
     u32 ambient_effect_stop_time;
 
@@ -27,7 +27,7 @@ class CGamePersistent : public IGame_Persistent, public IEventReceiver
 
     CUISequencer* m_intro;
     EVENT eQuickLoad;
-    Fvector m_dof[4];  // 0-dest 1-current 2-from 3-original
+    Fvector m_dof[4]; // 0-dest 1-current 2-from 3-original
 
     fastdelegate::FastDelegate0<> m_intro_event;
 
@@ -94,9 +94,5 @@ public:
     virtual void OnAssetsChanged();
 };
 
-IC CGamePersistent& GamePersistent()
-{
-    return *((CGamePersistent*)g_pGamePersistent);
-}
-
-#endif  // GamePersistentH
+IC CGamePersistent& GamePersistent() { return *((CGamePersistent*)g_pGamePersistent); }
+#endif // GamePersistentH

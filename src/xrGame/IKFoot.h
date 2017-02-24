@@ -66,7 +66,6 @@ private:
 
 public:
     IC IKinematics* Kinematics() const { return m_K; }
-
 private:
     IKinematics* m_K;
 

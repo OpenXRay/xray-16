@@ -22,16 +22,8 @@ IC CLevelSpawnConstructor::CLevelSpawnConstructor(
     m_graph_engine = 0;
 }
 
-IC CSE_ALifeCreatureActor* CLevelSpawnConstructor::actor() const
-{
-    return (m_actor);
-}
-
-IC const CGameGraph::SLevel& CLevelSpawnConstructor::level() const
-{
-    return (m_level);
-}
-
+IC CSE_ALifeCreatureActor* CLevelSpawnConstructor::actor() const { return (m_actor); }
+IC const CGameGraph::SLevel& CLevelSpawnConstructor::level() const { return (m_level); }
 IC CGameSpawnConstructor& CLevelSpawnConstructor::game_spawn_constructor() const
 {
     VERIFY(m_game_spawn_constructor);

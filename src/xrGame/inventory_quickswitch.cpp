@@ -23,24 +23,31 @@ public:
 
     void operator()(PIItem const& item)
     {
-        if (!item) return;
+        if (!item)
+            return;
 
         CGameObject* tmp_obj = item->cast_game_object();
-        if (!tmp_obj) return;
+        if (!tmp_obj)
+            return;
 
-        if (m_except_set.find(item) != m_except_set.end()) return;
+        if (m_except_set.find(item) != m_except_set.end())
+            return;
 
-        if (!m_prior_group.is_item_in_group(tmp_obj->cNameSect())) return;
+        if (!m_prior_group.is_item_in_group(tmp_obj->cNameSect()))
+            return;
 
         CWeapon* tmp_weapon = smart_cast<CWeapon*>(tmp_obj);
-        if (!tmp_weapon) return;
+        if (!tmp_weapon)
+            return;
 
         u32 tmp_ammo_count = tmp_weapon->GetAmmoElapsed();
         u32 tmp_cost = tmp_weapon->Cost();
 
-        if (!tmp_ammo_count && !m_ignore_ammo) return;
+        if (!tmp_ammo_count && !m_ignore_ammo)
+            return;
 
-        if (!m_best_fit) {
+        if (!m_best_fit)
+        {
             m_best_fit = item;
             m_best_fit_cost = tmp_weapon->Cost();
             m_best_fit_ammo_elapsed = tmp_weapon->GetAmmoElapsed();
@@ -65,12 +72,13 @@ private:
     u32 m_best_fit_cost;
     u32 m_best_fit_ammo_elapsed;
     bool m_ignore_ammo;
-};  // class next_weapon_searcher
+}; // class next_weapon_searcher
 
-static u32 const exception_items_clear_time = 2000;  // 2 seconds
+static u32 const exception_items_clear_time = 2000; // 2 seconds
 PIItem CInventory::GetNextItemInActiveSlot(u8 const priority_value, bool ignore_ammo)
 {
-    if (m_next_item_iteration_time + exception_items_clear_time <= Device.dwTimeGlobal) {
+    if (m_next_item_iteration_time + exception_items_clear_time <= Device.dwTimeGlobal)
+    {
         m_next_items_exceptions.clear();
         m_next_items_exceptions.insert(ActiveItem());
     }
@@ -79,15 +87,18 @@ PIItem CInventory::GetNextItemInActiveSlot(u8 const priority_value, bool ignore_
     next_weapon_searcher tmp_predicate(tmp_prior_group, best_fit, m_next_items_exceptions, ignore_ammo);
 
     std::for_each(m_ruck.begin(), m_ruck.end(), tmp_predicate);
-    if (best_fit) {
+    if (best_fit)
+    {
         m_next_items_exceptions.insert(best_fit);
         m_next_item_iteration_time = Device.dwTimeGlobal;
         return best_fit;
     }
 
     u8 next_priority_group = priority_value + 1;
-    if (next_priority_group == qs_priorities_count) {
-        if (ignore_ammo) {
+    if (next_priority_group == qs_priorities_count)
+    {
+        if (ignore_ammo)
+        {
             m_next_items_exceptions.clear();
             m_next_items_exceptions.insert(ActiveItem());
             return NULL;
@@ -99,19 +110,22 @@ PIItem CInventory::GetNextItemInActiveSlot(u8 const priority_value, bool ignore_
 
 bool CInventory::ActivateNextItemInActiveSlot()
 {
-    if (m_iActiveSlot == NO_ACTIVE_SLOT) {
+    if (m_iActiveSlot == NO_ACTIVE_SLOT)
+    {
         return false;
     }
 
     IGameObject* pActor_owner = smart_cast<IGameObject*>(m_pOwner);
-    if (Level().CurrentViewEntity() != pActor_owner) {
+    if (Level().CurrentViewEntity() != pActor_owner)
+    {
         return false;
     }
 
     PIItem new_item = GetNextItemInActiveSlot(0, false);
 
-    if (new_item == NULL) {
-        return false;  // only 1 item for this slot
+    if (new_item == NULL)
+    {
+        return false; // only 1 item for this slot
     }
 
     m_activ_last_items.push_back(new_item);
@@ -119,7 +133,8 @@ bool CInventory::ActivateNextItemInActiveSlot()
 
     NET_Packet P;
     bool res;
-    if (current_item) {
+    if (current_item)
+    {
         res = Ruck(current_item);
         R_ASSERT(res);
         current_item->object().u_EventGen(P, GEG_PLAYER_ITEM2RUCK, current_item->object().H_Parent()->ID());
@@ -146,7 +161,8 @@ bool CInventory::ActivateNextItemInActiveSlot()
 priority_group& CInventory::GetPriorityGroup(u8 const priority_value, u16 slot)
 {
     R_ASSERT(priority_value < qs_priorities_count);
-    if (slot == INV_SLOT_2) {
+    if (slot == INV_SLOT_2)
+    {
         VERIFY(m_slot2_priorities[priority_value]);
         return *m_slot2_priorities[priority_value];
     }
@@ -177,7 +193,7 @@ u32 g_slot2_assault_switch_priority = 2;
 u32 g_slot2_sniper_switch_priority = 4;
 u32 g_slot2_heavy_switch_priority = 3;
 
-u32 g_slot3_pistol_switch_priority = 4;  // not switch
+u32 g_slot3_pistol_switch_priority = 4; // not switch
 u32 g_slot3_shotgun_switch_priority = 2;
 u32 g_slot3_assault_switch_priority = 0;
 u32 g_slot3_sniper_switch_priority = 1;
@@ -199,17 +215,14 @@ void CInventory::InitPriorityGroupsForQSwitch()
     m_slot2_priorities[g_slot2_sniper_switch_priority] = &m_groups[epg_sniper_rifels];
     m_slot2_priorities[g_slot2_heavy_switch_priority] = &m_groups[epg_heavy_weapons];
 
-    m_slot3_priorities[g_slot3_pistol_switch_priority] = &m_groups[epg_assault];  //&m_groups[epg_pistols];
+    m_slot3_priorities[g_slot3_pistol_switch_priority] = &m_groups[epg_assault]; //&m_groups[epg_pistols];
     m_slot3_priorities[g_slot3_shotgun_switch_priority] = &m_groups[epg_shotgun];
     m_slot3_priorities[g_slot3_assault_switch_priority] = &m_groups[epg_assault];
     m_slot3_priorities[g_slot3_sniper_switch_priority] = &m_groups[epg_sniper_rifels];
     m_slot3_priorities[g_slot3_heavy_switch_priority] = &m_groups[epg_heavy_weapons];
 }
 
-priority_group::priority_group()
-{
-}
-
+priority_group::priority_group() {}
 void priority_group::init_group(shared_str const& game_section, shared_str const& line)
 {
     shared_str tmp_string = pSettings->r_string(game_section, line.c_str());

@@ -21,10 +21,10 @@ class game_cl_Deathmatch : public game_cl_mp
 public:
     game_cl_Deathmatch();
     virtual ~game_cl_Deathmatch();
-    s32 m_s32FragLimit;  // dm,tdm,ah
-    s32 m_s32TimeLimit;  // dm
+    s32 m_s32FragLimit; // dm,tdm,ah
+    s32 m_s32TimeLimit; // dm
     bool m_bDamageBlockIndicators;
-    xr_vector<game_TeamState> teams;  // dm,tdm,ah
+    xr_vector<game_TeamState> teams; // dm,tdm,ah
     u32 m_u32ForceRespawn;
 
     u32 m_cl_dwWarmUp_Time;
@@ -39,7 +39,6 @@ public:
     virtual void LoadSndMessages();
 
     virtual bool Is_Rewarding_Allowed() const { return m_cl_dwWarmUp_Time == 0; };
-
 protected:
     struct PresetItem
     {
@@ -120,7 +119,7 @@ public:
 
     virtual char* getTeamSection(int Team);
     virtual void SetCurrentBuyMenu();
-    virtual void SetCurrentSkinMenu();  //	{pCurSkinMenu = pSkinMenuTeam0; };
+    virtual void SetCurrentSkinMenu(); //	{pCurSkinMenu = pSkinMenuTeam0; };
 
     virtual void OnSpectatorSelect();
 
@@ -135,7 +134,6 @@ public:
 
     virtual CUIDialogWnd* GetBuyWnd() { return (CUIDialogWnd*)pCurBuyMenu; };
     virtual CUIDialogWnd* GetSkinWnd() { return (CUIDialogWnd*)pCurSkinMenu; };
-
     virtual void OnVoteStart(NET_Packet& P);
     virtual void OnVoteStop(NET_Packet& P);
     virtual void OnVoteEnd(NET_Packet& P);
@@ -158,7 +156,6 @@ public:
     virtual void OnSwitchPhase_InProgress();
 
     virtual u8 GetTeamCount() { return 1; };
-
     virtual void OnPlayerFlagsChanged(game_PlayerState* ps);
     virtual void SendPickUpEvent(u16 ID_who, u16 ID_what);
 

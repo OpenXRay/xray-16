@@ -6,7 +6,7 @@ class IWallMarkArray;
 
 #ifdef DEBUG
 class IObjectSpaceRender;
-#endif  // DEBUG
+#endif // DEBUG
 
 class IFontRender;
 class IApplicationRender;
@@ -32,11 +32,9 @@ class IConsoleRender;
 class IUIShader;
 class IUISequenceVideoItem;
 
-#define RENDER_FACTORY_INTERFACE(Class)                                                                                \
-    \
-virtual I##Class* Create##Class() = 0;                                                                                 \
-    \
-virtual void Destroy##Class(I##Class* pObject) = 0;
+#define RENDER_FACTORY_INTERFACE(Class)\
+    virtual I##Class* Create##Class() = 0;\
+    virtual void Destroy##Class(I##Class* pObject) = 0;
 
 class IRenderFactory
 {
@@ -52,10 +50,10 @@ public:
     RENDER_FACTORY_INTERFACE(ConsoleRender)
 #ifdef DEBUG
     RENDER_FACTORY_INTERFACE(ObjectSpaceRender)
-#endif  // DEBUG
+#endif // DEBUG
     RENDER_FACTORY_INTERFACE(ApplicationRender)
     RENDER_FACTORY_INTERFACE(WallMarkArray)
-#endif  // _EDITOR
+#endif // _EDITOR
 
 #ifndef _EDITOR
     RENDER_FACTORY_INTERFACE(EnvironmentRender)
@@ -66,11 +64,11 @@ public:
     RENDER_FACTORY_INTERFACE(ThunderboltRender)
     RENDER_FACTORY_INTERFACE(ThunderboltDescRender)
     RENDER_FACTORY_INTERFACE(FlareRender)
-#endif  // _EDITOR
+#endif // _EDITOR
     RENDER_FACTORY_INTERFACE(FontRender)
 protected:
     // virtual IEnvDescriptorRender *CreateEnvDescriptorRender() = 0;
     // virtual void DestroyEnvDescriptorRender(IEnvDescriptorRender *pObject) = 0;
 };
 
-#endif  //	RenderFactory_included
+#endif // RenderFactory_included

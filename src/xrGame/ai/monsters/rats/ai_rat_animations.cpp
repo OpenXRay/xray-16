@@ -46,15 +46,18 @@ void CAI_Rat::SelectAnimation(const Fvector& /**_view/**/, const Fvector& /**_mo
     IKinematicsAnimated* tpVisualObject = smart_cast<IKinematicsAnimated*>(Visual());
     MotionID tpGlobalAnimation;
 
-    if (!g_Alive()) {
+    if (!g_Alive())
+    {
         for (int i = 0; i < 2; ++i)
         {
-            if (m_tRatAnimations.tNormal.tGlobal.tpaDeath[i] == m_tpCurrentGlobalAnimation) {
+            if (m_tRatAnimations.tNormal.tGlobal.tpaDeath[i] == m_tpCurrentGlobalAnimation)
+            {
                 tpGlobalAnimation = m_tpCurrentGlobalAnimation;
                 break;
             }
         }
-        if (!tpGlobalAnimation) {
+        if (!tpGlobalAnimation)
+        {
             if (m_tpCurrentGlobalAnimation == m_tRatAnimations.tNormal.tGlobal.tpaIdle[1])
                 tpGlobalAnimation = m_tRatAnimations.tNormal.tGlobal.tpaDeath[0];
             else
@@ -66,7 +69,8 @@ void CAI_Rat::SelectAnimation(const Fvector& /**_view/**/, const Fvector& /**_mo
         if (m_bFiring)
             tpGlobalAnimation = m_tRatAnimations.tNormal.tGlobal.tpaAttack[2];
         else if (angle_difference(movement().m_body.target.yaw, movement().m_body.current.yaw) <= MIN_TURN_ANGLE)
-            if (m_fSpeed < 0.2f) {
+            if (m_fSpeed < 0.2f)
+            {
                 if (m_bStanding)
                     tpGlobalAnimation = m_tRatAnimations.tNormal.tGlobal.tpaIdle[1];
                 else
@@ -93,7 +97,8 @@ void CAI_Rat::SelectAnimation(const Fvector& /**_view/**/, const Fvector& /**_mo
         m_tpCurrentGlobalBlend = tpVisualObject->PlayCycle(m_tpCurrentGlobalAnimation = tpGlobalAnimation);
 
 #ifdef DEBUG
-    if (psAI_Flags.is(aiAnimation)) {
+    if (psAI_Flags.is(aiAnimation))
+    {
         IKinematicsAnimated* skeleton_animated = smart_cast<IKinematicsAnimated*>(Visual());
         Msg("%6d %s animation : %s (%f,%f)", Device.dwTimeGlobal, "Global",
             skeleton_animated->LL_MotionDefName_dbg(m_tpCurrentGlobalAnimation), movement().m_body.current.yaw,

@@ -44,11 +44,11 @@ public:
     typedef LevelGraph::ELineIntersections ELineIntersections;
 
 private:
-    IReader* m_reader;  // level graph virtual storage
-    CHeader* m_header;  // level graph header
-    CVertex* m_nodes;   // nodes array
+    IReader* m_reader; // level graph virtual storage
+    CHeader* m_header; // level graph header
+    CVertex* m_nodes; // nodes array
     xr_vector<bool> m_access_mask;
-    GameGraph::_LEVEL_ID m_level_id;  // unique level identifier
+    GameGraph::_LEVEL_ID m_level_id; // unique level identifier
     u32 m_row_length;
     u32 m_column_length;
     u32 m_max_x;
@@ -70,7 +70,6 @@ public:
     struct vertex
     {
         static IC bool predicate(const u32& value, const CVertex& vertex) { return (value < vertex.position().xz()); }
-
         static IC bool predicate2(const CVertex& vertex, const u32& value) { return (vertex.position().xz() < value); }
     };
 

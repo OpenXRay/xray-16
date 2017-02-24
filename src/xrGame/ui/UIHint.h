@@ -26,10 +26,8 @@ public:
 
     IC void set_visible(bool status = true) { m_visible = status; }
     IC bool is_visible() const { return m_visible; }
-
     IC void set_rect(Frect const& rect) { m_rect.set(rect); }
     IC Frect const& get_rect() const { return m_rect; }
-
     void init_from_xml(CUIXml& xml, LPCSTR path);
 
     void set_text(LPCSTR text);
@@ -45,7 +43,7 @@ protected:
     bool m_visible;
     float m_border;
     Frect m_rect;
-};  // class UIHint
+}; // class UIHint
 
 // =================================================================================================
 // UIHintWindow = Owner of UIHint
@@ -64,10 +62,8 @@ public:
 
     IC void set_hint_wnd(UIHint* hint_wnd) { m_hint_wnd = hint_wnd; }
     IC UIHint* get_hint_wnd() const { return m_hint_wnd; }
-
     IC void set_hint_delay(u32 delay) { m_hint_delay = delay; }
     IC u32 get_hint_delay() const { return m_hint_delay; }
-
     void disable_hint();
     void set_hint_text(shared_str const& text);
     void set_hint_text_ST(shared_str const& text);
@@ -78,6 +74,6 @@ private:
     u32 m_hint_delay;
     shared_str m_hint_text;
     bool m_enable;
-};  // class UIHintWindow
+}; // class UIHintWindow
 
-#endif  // UI_HINT_H_INCLUDED
+#endif // UI_HINT_H_INCLUDED

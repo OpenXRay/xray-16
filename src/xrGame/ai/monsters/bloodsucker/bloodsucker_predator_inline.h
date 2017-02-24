@@ -11,7 +11,7 @@
 #include "actor_memory.h"
 #include "visual_memory_manager.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -26,11 +26,7 @@ CStateBloodsuckerPredatorAbstract::CStateBloodsuckerPredator(_Object* obj) : inh
 }
 
 TEMPLATE_SPECIALIZATION
-void CStateBloodsuckerPredatorAbstract::reinit()
-{
-    inherited::reinit();
-}
-
+void CStateBloodsuckerPredatorAbstract::reinit() { inherited::reinit(); }
 TEMPLATE_SPECIALIZATION
 void CStateBloodsuckerPredatorAbstract::initialize()
 {
@@ -44,17 +40,20 @@ void CStateBloodsuckerPredatorAbstract::initialize()
 TEMPLATE_SPECIALIZATION
 void CStateBloodsuckerPredatorAbstract::reselect_state()
 {
-    if (prev_substate == u32(-1)) {
+    if (prev_substate == u32(-1))
+    {
         select_state(eStatePredator_MoveToCover);
         return;
     }
 
-    if (prev_substate == eStatePredator_MoveToCover) {
+    if (prev_substate == eStatePredator_MoveToCover)
+    {
         select_state(eStatePredator_LookOpenPlace);
         return;
     }
 
-    if (prev_substate == eStatePredator_LookOpenPlace) {
+    if (prev_substate == eStatePredator_LookOpenPlace)
+    {
         select_state(eStatePredator_Camp);
         return;
     }
@@ -89,14 +88,16 @@ void CStateBloodsuckerPredatorAbstract::critical_finalize()
 TEMPLATE_SPECIALIZATION
 bool CStateBloodsuckerPredatorAbstract::check_start_conditions()
 {
-    if (Actor()->memory().visual().visible_now(object)) return false;
+    if (Actor()->memory().visual().visible_now(object))
+        return false;
     return true;
 }
 
 TEMPLATE_SPECIALIZATION
 bool CStateBloodsuckerPredatorAbstract::check_completion()
 {
-    if (object->HitMemory.get_last_hit_time() > time_state_started) return true;
+    if (object->HitMemory.get_last_hit_time() > time_state_started)
+        return true;
     if (object->EnemyMan.get_enemy() && object->EnemyMan.see_enemy_now() &&
         (object->Position().distance_to(object->EnemyMan.get_enemy()->Position()) < 4.f))
         return true;
@@ -109,7 +110,8 @@ void CStateBloodsuckerPredatorAbstract::setup_substates()
 {
     state_ptr state = get_state_current();
 
-    if (current_substate == eStatePredator_Camp) {
+    if (current_substate == eStatePredator_Camp)
+    {
         object->predator_freeze();
         m_time_start_camp = time();
     }
@@ -118,15 +120,16 @@ void CStateBloodsuckerPredatorAbstract::setup_substates()
         object->predator_unfreeze();
     }
 
-    if (current_substate == eStatePredator_MoveToCover) {
+    if (current_substate == eStatePredator_MoveToCover)
+    {
         SStateDataMoveToPointEx data;
 
         data.vertex = m_target_node;
         data.point = ai().level_graph().vertex_position(data.vertex);
         data.action.action = ACT_RUN;
-        data.action.time_out = 0;    // do not use time out
-        data.completion_dist = 0.f;  // get exactly to the point
-        data.time_to_rebuild = 0;    // do not rebuild
+        data.action.time_out = 0; // do not use time out
+        data.completion_dist = 0.f; // get exactly to the point
+        data.time_to_rebuild = 0; // do not rebuild
         data.accelerated = true;
         data.braking = true;
         data.accel_type = eAT_Aggressive;
@@ -137,7 +140,8 @@ void CStateBloodsuckerPredatorAbstract::setup_substates()
         return;
     }
 
-    if (current_substate == eStatePredator_LookOpenPlace) {
+    if (current_substate == eStatePredator_LookOpenPlace)
+    {
         SStateDataLookToPoint data;
 
         Fvector dir;
@@ -154,11 +158,12 @@ void CStateBloodsuckerPredatorAbstract::setup_substates()
         return;
     }
 
-    if (current_substate == eStatePredator_Camp) {
+    if (current_substate == eStatePredator_Camp)
+    {
         SStateDataAction data;
 
         data.action = ACT_STAND_IDLE;
-        data.time_out = 0;  // do not use time out
+        data.time_out = 0; // do not use time out
         data.sound_type = MonsterSound::eMonsterSoundIdle;
         data.sound_delay = object->db().m_dwIdleSndDelay;
 
@@ -173,8 +178,10 @@ void CStateBloodsuckerPredatorAbstract::setup_substates()
 TEMPLATE_SPECIALIZATION
 void CStateBloodsuckerPredatorAbstract::check_force_state()
 {
-    if ((current_substate == eStatePredator_Camp) && (m_time_start_camp + TIME_TO_RESELECT_CAMP < time())) {
-        if (current_substate != u32(-1)) get_state_current()->critical_finalize();
+    if ((current_substate == eStatePredator_Camp) && (m_time_start_camp + TIME_TO_RESELECT_CAMP < time()))
+    {
+        if (current_substate != u32(-1))
+            get_state_current()->critical_finalize();
 
         prev_substate = u32(-1);
         current_substate = u32(-1);
@@ -190,21 +197,26 @@ TEMPLATE_SPECIALIZATION
 void CStateBloodsuckerPredatorAbstract::select_camp_point()
 {
     m_target_node = u32(-1);
-    if (object->Home->has_home()) {
+    if (object->Home->has_home())
+    {
         m_target_node = object->Home->get_place_in_cover();
-        if (m_target_node == u32(-1)) {
+        if (m_target_node == u32(-1))
+        {
             m_target_node = object->Home->get_place();
         }
     }
 
-    if (m_target_node == u32(-1)) {
+    if (m_target_node == u32(-1))
+    {
         const CCoverPoint* point = object->CoverMan->find_cover(object->Position(), 10.f, 30.f);
-        if (point) {
+        if (point)
+        {
             m_target_node = point->level_vertex_id();
         }
     }
 
-    if (m_target_node == u32(-1)) m_target_node = object->ai_location().level_vertex_id();
+    if (m_target_node == u32(-1))
+        m_target_node = object->ai_location().level_vertex_id();
 
     CMonsterSquad* squad = monster_squad().get_squad(object);
     squad->lock_cover(m_target_node);

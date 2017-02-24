@@ -16,10 +16,7 @@ CSector::CSector(u32 ID)
     TreeRoot = 0;
 }
 
-CSector::~CSector()
-{
-}
-
+CSector::~CSector() {}
 IC BOOL ValidateMerge(Fbox& bb_base, Fbox& bb, float& volume, float SLimit)
 {
     // Size
@@ -28,9 +25,12 @@ IC BOOL ValidateMerge(Fbox& bb_base, Fbox& bb, float& volume, float SLimit)
     Fvector sz;
     merge.getsize(sz);
     sz.add(EPS_L);
-    if (sz.x > SLimit) return FALSE;  // Don't exceed limits (4/3 GEOM)
-    if (sz.y > SLimit) return FALSE;
-    if (sz.z > SLimit) return FALSE;
+    if (sz.x > SLimit)
+        return FALSE; // Don't exceed limits (4/3 GEOM)
+    if (sz.y > SLimit)
+        return FALSE;
+    if (sz.z > SLimit)
+        return FALSE;
 
     // Volume
     volume = merge.getvolume();
@@ -59,8 +59,10 @@ void CSector::BuildHierrarhy()
 
     int iLevel = 2;
     float SizeLimit = c_SS_maxsize / 4.f;
-    if (SizeLimit < 4.f) SizeLimit = 4.f;
-    if (delimiter <= SizeLimit) delimiter *= 2;  // just very small level
+    if (SizeLimit < 4.f)
+        SizeLimit = 4.f;
+    if (delimiter <= SizeLimit)
+        delimiter *= 2; // just very small level
 
     for (; SizeLimit <= delimiter; SizeLimit *= 2)
     {
@@ -68,8 +70,10 @@ void CSector::BuildHierrarhy()
 
         for (int I = 0; I < iSize; I++)
         {
-            if (g_tree[I]->bConnected) continue;
-            if (g_tree[I]->Sector != SelfID) continue;
+            if (g_tree[I]->bConnected)
+                continue;
+            if (g_tree[I]->Sector != SelfID)
+                continue;
 
             OGF_Node* pNode = new OGF_Node(iLevel, u16(SelfID));
             pNode->AddChield(I);
@@ -84,12 +88,16 @@ void CSector::BuildHierrarhy()
                 for (int J = 0; J < iSize; J++)
                 {
                     OGF_Base* candidate = g_tree[J];
-                    if (candidate->bConnected) continue;
-                    if (candidate->Sector != SelfID) continue;
+                    if (candidate->bConnected)
+                        continue;
+                    if (candidate->Sector != SelfID)
+                        continue;
 
                     float V;
-                    if (ValidateMerge(pNode->bbox, candidate->bbox, V, SizeLimit)) {
-                        if (V < best_volume) {
+                    if (ValidateMerge(pNode->bbox, candidate->bbox, V, SizeLimit))
+                    {
+                        if (V < best_volume)
+                        {
                             best_volume = V;
                             best_id = J;
                         }
@@ -97,11 +105,13 @@ void CSector::BuildHierrarhy()
                 }
 
                 // Analyze
-                if (best_id < 0) break;
+                if (best_id < 0)
+                    break;
                 pNode->AddChield(best_id);
             }
 
-            if (pNode->chields.size() > 1) {
+            if (pNode->chields.size() > 1)
+            {
                 pNode->CalcBounds();
                 g_tree.push_back(pNode);
                 bAnyNode = TRUE;
@@ -113,7 +123,8 @@ void CSector::BuildHierrarhy()
             }
         }
 
-        if (iSize != (int)g_tree.size()) iLevel++;
+        if (iSize != (int)g_tree.size())
+            iLevel++;
     }
     TreeRoot = 0;
     if (bAnyNode)
@@ -122,13 +133,16 @@ void CSector::BuildHierrarhy()
     {
         for (u32 I = 0; I < g_tree.size(); I++)
         {
-            if (g_tree[I]->bConnected) continue;
-            if (g_tree[I]->Sector != SelfID) continue;
+            if (g_tree[I]->bConnected)
+                continue;
+            if (g_tree[I]->Sector != SelfID)
+                continue;
             R_ASSERT(0 == TreeRoot);
             TreeRoot = g_tree[I];
         }
     }
-    if (0 == TreeRoot) {
+    if (0 == TreeRoot)
+    {
         Logger.clMsg("Can't build hierrarhy for sector #%d", SelfID);
     }
 }

@@ -22,10 +22,7 @@ CDetailPathManager::CDetailPathManager(CRestrictedObject* object)
     m_dest_vertex_id = u32(-1);
 }
 
-CDetailPathManager::~CDetailPathManager()
-{
-}
-
+CDetailPathManager::~CDetailPathManager() {}
 void CDetailPathManager::reinit()
 {
     m_actuality = false;
@@ -58,14 +55,11 @@ bool CDetailPathManager::valid() const
     return (b);
 }
 
-bool CDetailPathManager::valid(const Fvector& position) const
-{
-    return (!!_valid(position));
-}
-
+bool CDetailPathManager::valid(const Fvector& position) const { return (!!_valid(position)); }
 Fvector CDetailPathManager::direction() const
 {
-    if ((m_path.size() < 2) || (m_path.size() <= m_current_travel_point + 1)) return (Fvector().set(0, 0, 1));
+    if ((m_path.size() < 2) || (m_path.size() <= m_current_travel_point + 1))
+        return (Fvector().set(0, 0, 1));
 
     Fvector direction;
     direction.sub(m_path[m_current_travel_point + 1].position, m_path[m_current_travel_point].position);
@@ -80,7 +74,8 @@ Fvector CDetailPathManager::direction() const
 
 bool CDetailPathManager::try_get_direction(Fvector& direction) const
 {
-    if ((m_path.size() < 2) || (m_path.size() <= m_current_travel_point + 1)) return false;
+    if ((m_path.size() < 2) || (m_path.size() <= m_current_travel_point + 1))
+        return false;
 
     direction.sub(m_path[m_current_travel_point + 1].position, m_path[m_current_travel_point].position);
 
@@ -94,7 +89,8 @@ bool CDetailPathManager::try_get_direction(Fvector& direction) const
 
 void CDetailPathManager::build_path(const xr_vector<u32>& level_path, u32 intermediate_index)
 {
-    if (valid(m_start_position) && valid(m_dest_position)) {
+    if (valid(m_start_position) && valid(m_dest_position))
+    {
         switch (m_path_type)
         {
         case eDetailPathTypeSmooth:
@@ -114,12 +110,13 @@ void CDetailPathManager::build_path(const xr_vector<u32>& level_path, u32 interm
         }
         default: NODEFAULT;
         }
-        if (failed()) {
+        if (failed())
+        {
 #ifndef MASTER_GOLD
             Msg("! DetailPathManager has failed : from [%f,%f,%f] to [%f,%f,%f]",
                 VPUSH(ai().level_graph().vertex_position(level_path.front())),
                 VPUSH(ai().level_graph().vertex_position(level_path.back())));
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 #ifdef DEBUG
             Msg("! DetailPathManager has failed for object %s : from [%f,%f,%f] to [%f,%f,%f]",
                 m_restricted_object ? *m_restricted_object->object().cName() : "unknown",
@@ -136,7 +133,8 @@ void CDetailPathManager::build_path(const xr_vector<u32>& level_path, u32 interm
 #endif
         }
 
-        if (valid()) {
+        if (valid())
+        {
             m_actuality = true;
             m_current_travel_point = 0;
             m_time_path_built = Device.dwTimeGlobal;
@@ -149,11 +147,14 @@ void CDetailPathManager::update_distance_to_target()
     m_distance_to_target_actual = true;
     m_distance_to_target = 0.f;
 
-    if (!actual()) return;
+    if (!actual())
+        return;
 
-    if (path().empty()) return;
+    if (path().empty())
+        return;
 
-    if (curr_travel_point_index() >= path().size() - 1) return;
+    if (curr_travel_point_index() >= path().size() - 1)
+        return;
 
     xr_vector<STravelPathPoint>::const_iterator I = path().begin() + curr_travel_point_index() + 1;
     xr_vector<STravelPathPoint>::const_iterator E = path().end();
@@ -172,11 +173,14 @@ u32 CDetailPathManager::location_on_path(const CGameObject* object, float distan
     VERIFY(m_restricted_object);
     result = object->Position();
     u32 vertex_result = object->ai_location().level_vertex_id();
-    if (!actual()) return (vertex_result);
+    if (!actual())
+        return (vertex_result);
 
-    if (path().empty()) return (vertex_result);
+    if (path().empty())
+        return (vertex_result);
 
-    if (curr_travel_point_index() >= path().size() - 1) return (vertex_result);
+    if (curr_travel_point_index() >= path().size() - 1)
+        return (vertex_result);
 
     float current_distance = 0.f;
     xr_vector<STravelPathPoint>::const_iterator I = path().begin() + curr_travel_point_index() + 1;
@@ -184,7 +188,8 @@ u32 CDetailPathManager::location_on_path(const CGameObject* object, float distan
     for (; I != E; ++I)
     {
         float next = (*(I - 1)).position.distance_to((*I).position);
-        if (current_distance + next > distance) {
+        if (current_distance + next > distance)
+        {
             result = (*I).position;
             return ((*I).vertex_id);
         }

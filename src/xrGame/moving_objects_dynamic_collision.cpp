@@ -33,7 +33,8 @@ IC MagicBox3& moving_objects::continuous_box(
     object->object().Center(result.Center());
     result.Center().add(Fvector().sub(position, object->position()));
 
-    if (use_box_enlargement && (object->action() != moving_object::action_move)) {
+    if (use_box_enlargement && (object->action() != moving_object::action_move))
+    {
         result.Extent(0) *= wait_radius_factor;
         result.Extent(2) *= wait_radius_factor;
     }
@@ -46,13 +47,14 @@ struct collision_predicate
     const moving_objects::COLLISION* m_collision;
 
     IC collision_predicate(const moving_objects::COLLISION& collision) : m_collision(&collision) {}
-
     IC bool operator()(const moving_objects::COLLISION_TIME& collision_time) const
     {
         const moving_objects::COLLISION& object = collision_time.second.second;
-        if (m_collision->first != object.first) return (false);
+        if (m_collision->first != object.first)
+            return (false);
 
-        if (m_collision->second != object.second) return (false);
+        if (m_collision->second != object.second)
+            return (false);
 
         return (true);
     }
@@ -75,37 +77,43 @@ void moving_objects::resolve_collision_first(
     continuous_box(object0, object0->target_position(), target._0, false);
     continuous_box(object1, object1->target_position(), target._1, false);
 
-    if (target._0.intersects(start._1)) {
+    if (target._0.intersects(start._1))
+    {
         MSG("%6d [t0s1] [%s][%s]", Device.dwFrame, *object0->object().cName(), *object1->object().cName());
         action = possible_action_1_can_wait_2;
         return;
     }
 
-    if (target._1.intersects(start._0)) {
+    if (target._1.intersects(start._0))
+    {
         MSG("%6d [t1s0] [%s][%s]", Device.dwFrame, *object0->object().cName(), *object1->object().cName());
         action = possible_action_2_can_wait_1;
         return;
     }
 
-    if (start._0.intersects(current._1)) {
+    if (start._0.intersects(current._1))
+    {
         MSG("%6d [s0c1] [%s][%s]", Device.dwFrame, *object0->object().cName(), *object1->object().cName());
         action = possible_action_2_can_wait_1;
         return;
     }
 
-    if (start._1.intersects(current._0)) {
+    if (start._1.intersects(current._0))
+    {
         MSG("%6d [s1c0] [%s][%s]", Device.dwFrame, *object0->object().cName(), *object1->object().cName());
         action = possible_action_1_can_wait_2;
         return;
     }
 
-    if (current._0.intersects(target._1)) {
+    if (current._0.intersects(target._1))
+    {
         MSG("%6d [c0t1] [%s][%s]", Device.dwFrame, *object0->object().cName(), *object1->object().cName());
         action = possible_action_2_can_wait_1;
         return;
     }
 
-    if (current._1.intersects(target._0)) {
+    if (current._1.intersects(target._0))
+    {
         MSG("%6d [c1t0] [%s][%s]", Device.dwFrame, *object0->object().cName(), *object1->object().cName());
         action = possible_action_1_can_wait_2;
         return;
@@ -126,34 +134,41 @@ void moving_objects::resolve_collision_previous(
     continuous_box(object1, object1->target_position(), target._1, true);
 
     action = possible_action_1_can_wait_2;
-    if (target._0.intersects(start._1)) {
+    if (target._0.intersects(start._1))
+    {
         MSG("%6d [t0s1] [%s][%s]", Device.dwFrame, *object0->object().cName(), *object1->object().cName());
         return;
     }
 
-    if (start._1.intersects(current._0)) {
+    if (start._1.intersects(current._0))
+    {
         MSG("%6d [s1c0] [%s][%s]", Device.dwFrame, *object0->object().cName(), *object1->object().cName());
         return;
     }
 
-    if (current._1.intersects(target._0)) {
+    if (current._1.intersects(target._0))
+    {
         MSG("%6d [c1t0] [%s][%s]", Device.dwFrame, *object0->object().cName(), *object1->object().cName());
         return;
     }
 
     action = possible_action_2_can_wait_1;
-    if (action == possible_action_2_can_wait_1) {
-        if (target._1.intersects(start._0)) {
+    if (action == possible_action_2_can_wait_1)
+    {
+        if (target._1.intersects(start._0))
+        {
             MSG("%6d [t1s0] [%s][%s]", Device.dwFrame, *object0->object().cName(), *object1->object().cName());
             return;
         }
 
-        if (start._0.intersects(current._1)) {
+        if (start._0.intersects(current._1))
+        {
             MSG("%6d [s0c1] [%s][%s]", Device.dwFrame, *object0->object().cName(), *object1->object().cName());
             return;
         }
 
-        if (current._0.intersects(target._1)) {
+        if (current._0.intersects(target._1))
+        {
             MSG("%6d [c0t1] [%s][%s]", Device.dwFrame, *object0->object().cName(), *object1->object().cName());
             return;
         }
@@ -194,7 +209,7 @@ void moving_objects::resolve_collision(boxes& current, moving_object* object0, c
 		}
 		Msg						("%6d Eng of \"Oooooooops\"",Device.dwFrame);
 	}
-#endif  // 0
+#endif // 0
     VERIFY2(
         object0->action_frame() != Device.dwFrame, make_string("%d %s", Device.dwFrame, *object0->object().cName()));
     VERIFY2(object0->action_frame() < Device.dwFrame, make_string("%d %s", Device.dwFrame, *object0->object().cName()));
@@ -206,17 +221,20 @@ void moving_objects::resolve_collision(boxes& current, moving_object* object0, c
     bool first_time = (std::find_if(m_previous_collisions.begin(), m_previous_collisions.end(),
                            collision_predicate(std::make_pair(object0, object1))) == m_previous_collisions.end());
 
-    if (first_time) {
+    if (first_time)
+    {
         resolve_collision_first(current, object0, object1, action);
         return;
     }
 
-    if (object0->action() == moving_object::action_wait) {
+    if (object0->action() == moving_object::action_wait)
+    {
         resolve_collision_previous(current, object0, object1, action);
         return;
     }
 
-    if (object1->action() == moving_object::action_wait) {
+    if (object1->action() == moving_object::action_wait)
+    {
         resolve_collision_previous(current, object1, object0, action);
         action = possible_actions(action ^ (possible_action_1_can_wait_2 | possible_action_2_can_wait_1));
         return;
@@ -251,10 +269,11 @@ bool moving_objects::collided_dynamic(moving_object* object0, const Fvector& pos
         VERIFY(!already_wait(object0));
         VERIFY(!already_wait(object1));
     }
-#endif  // DEBUG
+#endif // DEBUG
 
     boxes current;
-    if (!collided_dynamic(object0, position0, object1, position1, current)) return (false);
+    if (!collided_dynamic(object0, position0, object1, position1, current))
+        return (false);
 
     resolve_collision(current, object0, position0, object1, position1, action);
     return (true);

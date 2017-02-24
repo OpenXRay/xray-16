@@ -42,7 +42,6 @@ private:
 public:
     enum_table();
     const xr_vector<e_net_globals>& get_globals(e et) const { return *gl_table[et]; }
-
 private:
 };
 typedef enum_table<execution_types> execution_globals_reg;

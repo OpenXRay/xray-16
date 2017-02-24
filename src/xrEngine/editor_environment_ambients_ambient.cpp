@@ -71,7 +71,8 @@ ambient::~ambient()
     delete_data(m_sound_channels_ids);
     xr_delete(m_sounds_collection);
 
-    if (!Device.editor()) return;
+    if (!Device.editor())
+        return;
 
     ::ide().destroy(m_property_holder);
 }
@@ -121,7 +122,8 @@ void ambient::save(CInifile& config)
         *temp = 0;
         for (i = b; i != e; ++i)
         {
-            if (i == b) {
+            if (i == b)
+            {
                 xr_strcpy(temp, count, (*i)->id().c_str());
                 continue;
             }
@@ -146,7 +148,8 @@ void ambient::save(CInifile& config)
         *temp = 0;
         for (i = b; i != e; ++i)
         {
-            if (i == b) {
+            if (i == b)
+            {
                 xr_strcpy(temp, count, (*i)->id().c_str());
                 continue;
             }
@@ -158,15 +161,12 @@ void ambient::save(CInifile& config)
     config.w_string(m_load_section.c_str(), "effects", temp);
 }
 
-LPCSTR ambient::id_getter() const
-{
-    return (m_load_section.c_str());
-}
-
+LPCSTR ambient::id_getter() const { return (m_load_section.c_str()); }
 void ambient::id_setter(LPCSTR value_)
 {
     shared_str value = value_;
-    if (m_load_section._get() == value._get()) return;
+    if (m_load_section._get() == value._get())
+        return;
 
     m_load_section = m_manager.unique_id(value);
 }
@@ -196,11 +196,7 @@ void ambient::fill(editor::property_holder_collection* collection)
         "sound channels", "sounds", "this option is resposible for sound channels", m_sounds_collection);
 }
 
-ambient::property_holder_type* ambient::object()
-{
-    return (m_property_holder);
-}
-
+ambient::property_holder_type* ambient::object() { return (m_property_holder); }
 ::editor::environment::effects::manager const& ambient::effects_manager() const
 {
     return (m_manager.effects_manager());
@@ -227,14 +223,6 @@ ambient::SSndChannel* ambient::create_sound_channel(CInifile& config, LPCSTR id)
     return (result);
 }
 
-CEnvAmbient::EffectVec& ambient::effects()
-{
-    return (inherited::effects());
-}
-
-CEnvAmbient::SSndChannelVec& ambient::get_snd_channels()
-{
-    return (inherited::get_snd_channels());
-}
-
-#endif  // #ifdef INGAME_EDITOR
+CEnvAmbient::EffectVec& ambient::effects() { return (inherited::effects()); }
+CEnvAmbient::SSndChannelVec& ambient::get_snd_channels() { return (inherited::get_snd_channels()); }
+#endif // #ifdef INGAME_EDITOR

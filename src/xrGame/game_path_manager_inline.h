@@ -8,23 +8,16 @@
 
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _VertexEvaluator, typename _vertex_id_type, typename _index_type\
 >
 
 #define CGameManagerTemplate CBasePathManager<CGameGraph, _VertexEvaluator, _vertex_id_type, _index_type>
 
 TEMPLATE_SPECIALIZATION
-IC CGameManagerTemplate::CBasePathManager(CRestrictedObject* object) : inherited(object)
-{
-}
-
+IC CGameManagerTemplate::CBasePathManager(CRestrictedObject* object) : inherited(object) {}
 TEMPLATE_SPECIALIZATION
-IC void CGameManagerTemplate::reinit(const CGameGraph* graph)
-{
-    inherited::reinit(graph);
-}
-
+IC void CGameManagerTemplate::reinit(const CGameGraph* graph) { inherited::reinit(graph); }
 TEMPLATE_SPECIALIZATION
 IC bool CGameManagerTemplate::actual() const
 {
@@ -37,14 +30,12 @@ IC void CGameManagerTemplate::before_search(const _vertex_id_type start_vertex_i
 }
 
 TEMPLATE_SPECIALIZATION
-IC void CGameManagerTemplate::after_search()
-{
-}
-
+IC void CGameManagerTemplate::after_search() {}
 TEMPLATE_SPECIALIZATION
 IC bool CGameManagerTemplate::completed() const
 {
-    if (path().empty() || (m_intermediate_index >= (_vertex_id_type)path().size() - 1)) return (inherited::completed());
+    if (path().empty() || (m_intermediate_index >= (_vertex_id_type)path().size() - 1))
+        return (inherited::completed());
     return (false);
 }
 

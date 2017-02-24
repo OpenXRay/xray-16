@@ -41,22 +41,29 @@ struct TPHCharacterRestrictor : public SPHCharacterRestrictor
         do_colide = false;
         dBodyID b1 = dGeomGetBody(c.geom.g1);
         dBodyID b2 = dGeomGetBody(c.geom.g2);
-        if (!(b1 && b2)) return;
+        if (!(b1 && b2))
+            return;
         dxGeomUserData* ud1 = retrieveGeomUserData(c.geom.g1);
         dxGeomUserData* ud2 = retrieveGeomUserData(c.geom.g2);
-        if (!(ud1 && ud2)) return;
+        if (!(ud1 && ud2))
+            return;
 
         CPHObject* o1 = NULL;
-        if (ud1) o1 = ud1->ph_object;
+        if (ud1)
+            o1 = ud1->ph_object;
         CPHObject* o2 = NULL;
-        if (ud2) o2 = ud2->ph_object;
-        if (!(o1 && o2)) return;
-        if (o1->CastType() != CPHObject::tpCharacter || o2->CastType() != CPHObject::tpCharacter) return;
+        if (ud2)
+            o2 = ud2->ph_object;
+        if (!(o1 && o2))
+            return;
+        if (o1->CastType() != CPHObject::tpCharacter || o2->CastType() != CPHObject::tpCharacter)
+            return;
 
         CPHCharacter* ch1 = static_cast<CPHCharacter*>(o1);
         CPHCharacter* ch2 = static_cast<CPHCharacter*>(o2);
 
-        if (bo1) {
+        if (bo1)
+        {
             ch1->ChooseRestrictionType(Ttype, c.geom.depth, ch2);
             do_colide = ch2->TouchRestrictor(Ttype);
         }

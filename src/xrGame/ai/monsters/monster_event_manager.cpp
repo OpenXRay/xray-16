@@ -1,19 +1,13 @@
 #include "stdafx.h"
 #include "monster_event_manager.h"
 
-CMonsterEventManager::CMonsterEventManager()
-{
-}
-
-CMonsterEventManager::~CMonsterEventManager()
-{
-    clear();
-}
-
+CMonsterEventManager::CMonsterEventManager() {}
+CMonsterEventManager::~CMonsterEventManager() { clear(); }
 void CMonsterEventManager::add_delegate(EEventType event, typeEvent delegate)
 {
     EVENT_MAP_IT it = m_event_storage.find(event);
-    if (it == m_event_storage.end()) {
+    if (it == m_event_storage.end())
+    {
         std::pair<EVENT_MAP_IT, bool> res;
         res = m_event_storage.insert(mk_pair(event, EVENT_VECTOR()));
         it = res.first;
@@ -25,22 +19,26 @@ void CMonsterEventManager::add_delegate(EEventType event, typeEvent delegate)
 void CMonsterEventManager::remove_delegate(EEventType event, typeEvent delegate)
 {
     EVENT_MAP_IT it = m_event_storage.find(event);
-    if (it == m_event_storage.end()) return;
+    if (it == m_event_storage.end())
+        return;
 
     for (EVENT_VECTOR_IT it_del = it->second.begin(); it_del != it->second.end(); ++it_del)
     {
-        if (it_del->delegate == delegate) it_del->need_remove = true;
+        if (it_del->delegate == delegate)
+            it_del->need_remove = true;
     }
 }
 
 void CMonsterEventManager::raise(EEventType event, IEventData* data)
 {
     EVENT_MAP_IT it = m_event_storage.find(event);
-    if (it == m_event_storage.end()) return;
+    if (it == m_event_storage.end())
+        return;
 
     for (EVENT_VECTOR_IT I = it->second.begin(); I != it->second.end(); I++)
     {
-        if (!I->need_remove) (I->delegate)(data);
+        if (!I->need_remove)
+            (I->delegate)(data);
     }
 
     EVENT_VECTOR_IT it_del = std::remove_if(it->second.begin(), it->second.end(), pred_remove());

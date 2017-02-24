@@ -15,20 +15,9 @@ property_string_shared_str::property_string_shared_str(editor::engine* engine, s
 {
 }
 
-property_string_shared_str::~property_string_shared_str()
-{
-    this->!property_string_shared_str();
-}
-
-property_string_shared_str::!property_string_shared_str()
-{
-}
-
-System::Object ^ property_string_shared_str::GetValue()
-{
-    return (to_string(m_engine->value(*m_value)));
-}
-
+property_string_shared_str::~property_string_shared_str() { this->!property_string_shared_str(); }
+property_string_shared_str::!property_string_shared_str() {}
+System::Object ^ property_string_shared_str::GetValue() { return (to_string(m_engine->value(*m_value))); }
 void property_string_shared_str::SetValue(System::Object ^ object)
 {
     LPSTR result = to_string(safe_cast<System::String ^>(object));

@@ -19,15 +19,8 @@ CCustomMotion::CCustomMotion()
     fFPS = 30.f;
 }
 
-CCustomMotion::CCustomMotion(CCustomMotion* source)
-{
-    *this = *source;
-}
-
-CCustomMotion::~CCustomMotion()
-{
-}
-
+CCustomMotion::CCustomMotion(CCustomMotion* source) { *this = *source; }
+CCustomMotion::~CCustomMotion() {}
 void CCustomMotion::Save(IWriter& F)
 {
     F.w_stringZ(name);
@@ -63,11 +56,7 @@ COMotion::COMotion(COMotion* source) : CCustomMotion(source)
         envs[ch] = new CEnvelope(source->envs[ch]);
 }
 
-COMotion::~COMotion()
-{
-    Clear();
-}
-
+COMotion::~COMotion() { Clear(); }
 void COMotion::Clear()
 {
     for (int ch = 0; ch < ctMaxChannel; ch++)
@@ -91,7 +80,8 @@ void COMotion::SaveMotion(const char* buf)
     F.open_chunk(EOBJ_OMOTION);
     Save(F);
     F.close_chunk();
-    if (!F.save_to(buf)) Log("!Can't save object motion:", buf);
+    if (!F.save_to(buf))
+        Log("!Can't save object motion:", buf);
 }
 
 bool COMotion::LoadMotion(const char* buf)
@@ -113,7 +103,8 @@ bool COMotion::Load(IReader& F)
 {
     CCustomMotion::Load(F);
     u16 vers = F.r_u16();
-    if (vers == 0x0003) {
+    if (vers == 0x0003)
+    {
         Clear();
         for (int ch = 0; ch < ctMaxChannel; ch++)
         {
@@ -139,7 +130,8 @@ bool COMotion::Load(IReader& F)
     }
     else
     {
-        if (vers != EOBJ_OMOTION_VERSION) return false;
+        if (vers != EOBJ_OMOTION_VERSION)
+            return false;
         Clear();
         for (int ch = 0; ch < ctMaxChannel; ch++)
         {
@@ -168,10 +160,7 @@ void COMotion::DeleteKey(float t)
     envs[ctRotationP]->DeleteKey(t);
     envs[ctRotationB]->DeleteKey(t);
 }
-int COMotion::KeyCount()
-{
-    return envs[ctPositionX]->keys.size();
-}
+int COMotion::KeyCount() { return envs[ctPositionX]->keys.size(); }
 void COMotion::FindNearestKey(float t, float& mn, float& mx, float eps)
 {
     KeyIt min_k;
@@ -184,19 +173,22 @@ float COMotion::GetLength(float* mn, float* mx)
 {
     float ln, len = 0.f;
     for (int ch = 0; ch < ctMaxChannel; ch++)
-        if ((ln = envs[ch]->GetLength(mn, mx)) > len) len = ln;
+        if ((ln = envs[ch]->GetLength(mn, mx)) > len)
+            len = ln;
     return len;
 }
 BOOL COMotion::ScaleKeys(float from_time, float to_time, float scale_factor)
 {
     BOOL bRes = TRUE;
     for (int ch = 0; ch < ctMaxChannel; ch++)
-        if (FALSE == (bRes = envs[ch]->ScaleKeys(from_time, to_time, scale_factor, 1.f / fFPS))) break;
+        if (FALSE == (bRes = envs[ch]->ScaleKeys(from_time, to_time, scale_factor, 1.f / fFPS)))
+            break;
     return bRes;
 }
 BOOL COMotion::NormalizeKeys(float from_time, float to_time, float speed)
 {
-    if (to_time < from_time) return FALSE;
+    if (to_time < from_time)
+        return FALSE;
     CEnvelope* E = Envelope(ctPositionX);
     float new_tm = 0;
     float t0 = E->keys.front()->time;
@@ -204,8 +196,10 @@ BOOL COMotion::NormalizeKeys(float from_time, float to_time, float speed)
     tms.push_back(t0);
     for (KeyIt it = E->keys.begin() + 1; it != E->keys.end(); it++)
     {
-        if ((*it)->time > from_time) {
-            if ((*it)->time < to_time + EPS) {
+        if ((*it)->time > from_time)
+        {
+            if ((*it)->time < to_time + EPS)
+            {
                 float dist = 0;
                 Fvector PT, T, R;
                 _Evaluate(t0, PT, R);
@@ -274,11 +268,7 @@ CSMotion::CSMotion(CSMotion* source) : CCustomMotion(source)
     }
 }
 
-CSMotion::~CSMotion()
-{
-    Clear();
-}
-
+CSMotion::~CSMotion() { Clear(); }
 void CSMotion::Clear()
 {
     for (BoneMotionIt bm_it = bone_mots.begin(); bm_it != bone_mots.end(); bm_it++)
@@ -292,7 +282,8 @@ void CSMotion::Clear()
 st_BoneMotion* CSMotion::FindBoneMotion(shared_str name)
 {
     for (BoneMotionIt bm_it = bone_mots.begin(); bm_it != bone_mots.end(); bm_it++)
-        if (bm_it->name.equal(name)) return &*bm_it;
+        if (bm_it->name.equal(name))
+            return &*bm_it;
     return 0;
 }
 
@@ -363,7 +354,8 @@ void CSMotion::SaveMotion(const char* buf)
     F.open_chunk(EOBJ_SMOTION);
     Save(F);
     F.close_chunk();
-    if (!F.save_to(buf)) Log("!Can't save skeleton motion:", buf);
+    if (!F.save_to(buf))
+        Log("!Can't save skeleton motion:", buf);
 }
 
 bool CSMotion::LoadMotion(const char* buf)
@@ -402,7 +394,8 @@ bool CSMotion::Load(IReader& F)
 {
     CCustomMotion::Load(F);
     u16 vers = F.r_u16();
-    if (vers == 0x0004) {
+    if (vers == 0x0004)
+    {
         m_BoneOrPart = u16(F.r_u32() & 0xffff);
         m_Flags.set(esmFX, F.r_u8());
         m_Flags.set(esmStopAtEnd, F.r_u8());
@@ -425,7 +418,8 @@ bool CSMotion::Load(IReader& F)
     }
     else
     {
-        if (vers == 0x0005) {
+        if (vers == 0x0005)
+        {
             m_Flags.assign((u8)F.r_u32());
             m_BoneOrPart = u16(F.r_u32() & 0xffff);
             fSpeed = F.r_float();
@@ -448,7 +442,8 @@ bool CSMotion::Load(IReader& F)
         }
         else
         {
-            if (vers >= 0x0006) {
+            if (vers >= 0x0006)
+            {
                 m_Flags.assign(F.r_u8());
                 m_BoneOrPart = F.r_u16();
                 fSpeed = F.r_float();
@@ -471,9 +466,11 @@ bool CSMotion::Load(IReader& F)
             }
         }
     }
-    if (vers >= 0x0007) {
+    if (vers >= 0x0007)
+    {
         u32 sz = F.r_u32();
-        if (sz > 0) {
+        if (sz > 0)
+        {
             marks.resize(sz);
             for (u32 i = 0; i < sz; ++i)
                 marks[i].Load(&F);
@@ -501,7 +498,8 @@ void CSMotion::SortBonesBySkeleton(BoneVec& bones)
     {
         st_BoneMotion* BM = FindBoneMotion((*b_it)->Name());
         // previously there was R_ASSERT(BM) (for use with plugins only)
-        if (!BM) {
+        if (!BM)
+        {
             CBone* B = *(b_it);
             bone_mots.push_back(st_BoneMotion());
             st_BoneMotion& bm0 = bone_mots[0];
@@ -543,15 +541,18 @@ void SAnimParams::Set(CCustomMotion* M)
 }
 void SAnimParams::Update(float dt, float speed, bool loop)
 {
-    if (!bPlay) return;
+    if (!bPlay)
+        return;
     bWrapped = false;
 
     t_current += speed * dt;
     tmp = t_current;
 
-    if (t_current > max_t) {
+    if (t_current > max_t)
+    {
         bWrapped = true;
-        if (loop) {
+        if (loop)
+        {
             float len = max_t - min_t;
             float k = float(iFloor((t_current - min_t) / len));
             t_current = t_current - k * len;
@@ -595,7 +596,8 @@ bool CClip::Load(IReader& F)
 {
     R_ASSERT(F.find_chunk(EOBJ_CLIP_VERSION_CHUNK));
     u16 ver = F.r_u16();
-    if (ver != EOBJ_CLIP_VERSION) return false;
+    if (ver != EOBJ_CLIP_VERSION)
+        return false;
     R_ASSERT(F.find_chunk(EOBJ_CLIP_DATA_CHUNK));
     F.r_stringZ(name);
     for (int k = 0; k < 4; k++)
@@ -613,13 +615,20 @@ bool CClip::Load(IReader& F)
 
 bool CClip::Equal(CClip* c)
 {
-    if (!name.equal(c->name)) return false;
-    if (!cycles[0].equal(c->cycles[0])) return false;
-    if (!cycles[1].equal(c->cycles[1])) return false;
-    if (!cycles[2].equal(c->cycles[2])) return false;
-    if (!cycles[3].equal(c->cycles[3])) return false;
-    if (!fx.equal(c->fx)) return false;
-    if (length != c->length) return false;
+    if (!name.equal(c->name))
+        return false;
+    if (!cycles[0].equal(c->cycles[0]))
+        return false;
+    if (!cycles[1].equal(c->cycles[1]))
+        return false;
+    if (!cycles[2].equal(c->cycles[2]))
+        return false;
+    if (!cycles[3].equal(c->cycles[3]))
+        return false;
+    if (!fx.equal(c->fx))
+        return false;
+    if (length != c->length)
+        return false;
     return true;
 }
 //------------------------------------------------------------------------------

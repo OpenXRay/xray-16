@@ -6,15 +6,8 @@ namespace lc_net
 {
 lc_net::factory execution_factory;
 
-factory::factory()
-{
-    register_all();
-}
-factory::~factory()
-{
-    clear();
-}
-
+factory::factory() { register_all(); }
+factory::~factory() { clear(); }
 // struct sfind_type
 //{
 //	u32 _id;
@@ -54,13 +47,11 @@ net_execution* factory::create_in_pool(u32 type_id)
     return vec_types[type_id]->pool_create();
 }
 
-void factory::destroy(net_execution*& e)
-{
-    destroy_in_pool(e);
-}
+void factory::destroy(net_execution*& e) { destroy_in_pool(e); }
 void factory::destroy_in_pool(net_execution*& e)
 {
-    if (!e) return;
+    if (!e)
+        return;
     type_reg creator = vec_types[e->type()];
     creator->pool_destroy(e);
 }

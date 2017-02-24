@@ -6,34 +6,30 @@
 
 bool event_comparer::operator()(SCallbackInfo* i)
 {
-    if (i->m_event == evt) {
+    if (i->m_event == evt)
+    {
         return (i->m_control_ptr) ? (i->m_control_ptr == pWnd) : (i->m_control_name == pWnd->WindowName());
     }
     else
         return false;
 }
 
-CUIWndCallback::~CUIWndCallback()
-{
-    delete_data(m_callbacks);
-}
-
-void CUIWndCallback::Register(CUIWindow* pChild)
-{
-    pChild->SetMessageTarget(smart_cast<CUIWindow*>(this));
-}
-
+CUIWndCallback::~CUIWndCallback() { delete_data(m_callbacks); }
+void CUIWndCallback::Register(CUIWindow* pChild) { pChild->SetMessageTarget(smart_cast<CUIWindow*>(this)); }
 void CUIWndCallback::OnEvent(CUIWindow* pWnd, s16 msg, void* pData)
 {
-    if (!pWnd) return;
+    if (!pWnd)
+        return;
     event_comparer ec(pWnd, msg);
 
     CALLBACK_IT it = std::find_if(m_callbacks.begin(), m_callbacks.end(), ec);
-    if (it == m_callbacks.end()) return;
+    if (it == m_callbacks.end())
+        return;
 
     (*it)->m_callback();
 
-    if ((*it)->m_cpp_callback) (*it)->m_cpp_callback(pWnd, pData);
+    if ((*it)->m_cpp_callback)
+        (*it)->m_cpp_callback(pWnd, pData);
 }
 
 SCallbackInfo* CUIWndCallback::NewCallback()

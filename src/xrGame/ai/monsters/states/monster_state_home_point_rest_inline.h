@@ -2,7 +2,7 @@
 
 #include "ai/Monsters/monster_home.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -40,7 +40,7 @@ TEMPLATE_SPECIALIZATION
 bool CStateMonsterRestMoveToHomePointAbstract::check_completion()
 {
     return ((object->ai_location().level_vertex_id() == m_target_node) &&
-            !object->control().path_builder().is_moving_on_path());
+        !object->control().path_builder().is_moving_on_path());
 }
 
 #undef TEMPLATE_SPECIALIZATION

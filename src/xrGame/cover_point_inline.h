@@ -13,17 +13,6 @@ IC CCoverPoint::CCoverPoint(Fvector const& point, u32 const& level_vertex_id)
 {
 }
 
-IC Fvector const& CCoverPoint::position() const
-{
-    return (m_position);
-}
-
-IC u32 CCoverPoint::level_vertex_id() const
-{
-    return (m_level_vertex_id);
-}
-
-IC bool CCoverPoint::operator==(CCoverPoint const& point) const
-{
-    return (!!position().similar(point.position()));
-}
+IC Fvector const& CCoverPoint::position() const { return (m_position); }
+IC u32 CCoverPoint::level_vertex_id() const { return (m_level_vertex_id); }
+IC bool CCoverPoint::operator==(CCoverPoint const& point) const { return (!!position().similar(point.position())); }

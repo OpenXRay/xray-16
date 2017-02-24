@@ -3,15 +3,8 @@
 #include "GamePersistent.h"
 #include "UICursor.h"
 
-CUICursor& GetUICursor()
-{
-    return UI().GetUICursor();
-};
-ui_core& UI()
-{
-    return *GamePersistent().m_pUI_core;
-};
-
+CUICursor& GetUICursor() { return UI().GetUICursor(); };
+ui_core& UI() { return *GamePersistent().m_pUI_core; };
 extern ENGINE_API Fvector2 g_current_font_scale;
 
 void S2DVert::rotate_pt(const Fvector2& pivot, const float cosA, const float sinA, const float kx)
@@ -38,7 +31,8 @@ sPoly2D* C2DFrustum::ClipPoly(sPoly2D& S, sPoly2D& D) const
     bool bFullTest = false;
     for (u32 j = 0; j < S.size(); j++)
     {
-        if (!m_rect.in(S[j].pt)) {
+        if (!m_rect.in(S[j].pt))
+        {
             bFullTest = true;
             break;
         }
@@ -46,7 +40,8 @@ sPoly2D* C2DFrustum::ClipPoly(sPoly2D& S, sPoly2D& D) const
 
     sPoly2D* src = &D;
     sPoly2D* dest = &S;
-    if (!bFullTest) return dest;
+    if (!bFullTest)
+        return dest;
 
     for (u32 i = 0; i < planes.size(); i++)
     {
@@ -67,16 +62,20 @@ sPoly2D* C2DFrustum::ClipPoly(sPoly2D& S, sPoly2D& D) const
         float denum, t;
         for (u32 j = 0; j < src->size() - 1; j++)
         {
-            if ((*src)[j].pt.similar((*src)[j + 1].pt, EPS_S)) continue;
-            if (negative(cls[j])) {
+            if ((*src)[j].pt.similar((*src)[j + 1].pt, EPS_S))
+                continue;
+            if (negative(cls[j]))
+            {
                 dest->push_back((*src)[j]);
-                if (positive(cls[j + 1])) {
+                if (positive(cls[j + 1]))
+                {
                     // segment intersects plane
                     dir_pt.sub((*src)[j + 1].pt, (*src)[j].pt);
                     dir_uv.sub((*src)[j + 1].uv, (*src)[j].uv);
                     denum = P.n.dotproduct(dir_pt);
-                    if (denum != 0) {
-                        t = -cls[j] / denum;  // VERIFY(t<=1.f && t>=0);
+                    if (denum != 0)
+                    {
+                        t = -cls[j] / denum; // VERIFY(t<=1.f && t>=0);
                         dest->last().pt.mad((*src)[j].pt, dir_pt, t);
                         dest->last().uv.mad((*src)[j].uv, dir_uv, t);
                         dest->inc();
@@ -86,14 +85,16 @@ sPoly2D* C2DFrustum::ClipPoly(sPoly2D& S, sPoly2D& D) const
             else
             {
                 // J - outside
-                if (negative(cls[j + 1])) {
+                if (negative(cls[j + 1]))
+                {
                     // J+1  - inside
                     // segment intersects plane
                     dir_pt.sub((*src)[j + 1].pt, (*src)[j].pt);
                     dir_uv.sub((*src)[j + 1].uv, (*src)[j].uv);
                     denum = P.n.dotproduct(dir_pt);
-                    if (denum != 0) {
-                        t = -cls[j] / denum;  // VERIFY(t<=1.f && t>=0);
+                    if (denum != 0)
+                    {
+                        t = -cls[j] / denum; // VERIFY(t<=1.f && t>=0);
                         dest->last().pt.mad((*src)[j].pt, dir_pt, t);
                         dest->last().uv.mad((*src)[j].uv, dir_uv, t);
                         dest->inc();
@@ -103,7 +104,8 @@ sPoly2D* C2DFrustum::ClipPoly(sPoly2D& S, sPoly2D& D) const
         }
 
         // here we end up with complete polygon in 'dest' which is inside plane #i
-        if (dest->size() < 3) return 0;
+        if (dest->size() < 3)
+            return 0;
     }
     return dest;
 }
@@ -131,31 +133,38 @@ void ui_core::ClientToScreenScaled(Fvector2& src_and_dest) const
 
 void ui_core::ClientToScreenScaledWidth(float& src_and_dest) const
 {
-    if (m_currentPointType != IUIRender::pttLIT) src_and_dest /= m_current_scale->x;
+    if (m_currentPointType != IUIRender::pttLIT)
+        src_and_dest /= m_current_scale->x;
 }
 
 void ui_core::ClientToScreenScaledHeight(float& src_and_dest) const
 {
-    if (m_currentPointType != IUIRender::pttLIT) src_and_dest /= m_current_scale->y;
+    if (m_currentPointType != IUIRender::pttLIT)
+        src_and_dest /= m_current_scale->y;
 }
 
 void ui_core::AlignPixel(float& src_and_dest) const
 {
-    if (m_currentPointType != IUIRender::pttLIT) src_and_dest = (float)iFloor(src_and_dest);
+    if (m_currentPointType != IUIRender::pttLIT)
+        src_and_dest = (float)iFloor(src_and_dest);
 }
 
 void ui_core::PushScissor(const Frect& r_tgt, bool overlapped)
 {
-    if (UI().m_currentPointType == IUIRender::pttLIT) return;
+    if (UI().m_currentPointType == IUIRender::pttLIT)
+        return;
 
     Frect r_top = {0.0f, 0.0f, UI_BASE_WIDTH, UI_BASE_HEIGHT};
     Frect result = r_tgt;
-    if (!m_Scissors.empty() && !overlapped) {
+    if (!m_Scissors.empty() && !overlapped)
+    {
         r_top = m_Scissors.top();
     }
-    if (!result.intersection(r_top, r_tgt)) result.set(0.0f, 0.0f, 0.0f, 0.0f);
+    if (!result.intersection(r_top, r_tgt))
+        result.set(0.0f, 0.0f, 0.0f, 0.0f);
 
-    if (!(result.x1 >= 0 && result.y1 >= 0 && result.x2 <= UI_BASE_WIDTH && result.y2 <= UI_BASE_HEIGHT)) {
+    if (!(result.x1 >= 0 && result.y1 >= 0 && result.x2 <= UI_BASE_WIDTH && result.y2 <= UI_BASE_HEIGHT))
+    {
         Msg("! r_tgt [%.3f][%.3f][%.3f][%.3f]", r_tgt.x1, r_tgt.y1, r_tgt.x2, r_tgt.y2);
         Msg("! result [%.3f][%.3f][%.3f][%.3f]", result.x1, result.y1, result.x2, result.y2);
         VERIFY(result.x1 >= 0 && result.y1 >= 0 && result.x2 <= UI_BASE_WIDTH && result.y2 <= UI_BASE_HEIGHT);
@@ -177,7 +186,8 @@ void ui_core::PushScissor(const Frect& r_tgt, bool overlapped)
 
 void ui_core::PopScissor()
 {
-    if (UI().m_currentPointType == IUIRender::pttLIT) return;
+    if (UI().m_currentPointType == IUIRender::pttLIT)
+        return;
 
     VERIFY(!m_Scissors.empty());
     m_Scissors.pop();
@@ -199,7 +209,8 @@ void ui_core::PopScissor()
 
 ui_core::ui_core()
 {
-    if (!g_dedicated_server) {
+    if (!g_dedicated_server)
+    {
         m_pUICursor = new CUICursor();
         m_pFontManager = new CFontManager();
     }
@@ -245,11 +256,7 @@ void ui_core::pp_stop()
     g_current_font_scale.set(1.0f, 1.0f);
 }
 
-void ui_core::RenderFont()
-{
-    Font().Render();
-}
-
+void ui_core::RenderFont() { Font().Render(); }
 bool ui_core::is_widescreen()
 {
     return (Device.dwWidth) / float(Device.dwHeight) > (UI_BASE_WIDTH / UI_BASE_HEIGHT + 0.01f);
@@ -267,14 +274,17 @@ float ui_core::get_current_kx()
 shared_str ui_core::get_xml_name(LPCSTR fn)
 {
     string_path str;
-    if (!is_widescreen()) {
+    if (!is_widescreen())
+    {
         xr_sprintf(str, "%s", fn);
-        if (NULL == strext(fn)) xr_strcat(str, ".xml");
+        if (NULL == strext(fn))
+            xr_strcat(str, ".xml");
     }
     else
     {
         string_path str_;
-        if (strext(fn)) {
+        if (strext(fn))
+        {
             xr_strcpy(str, fn);
             *strext(str) = 0;
             xr_strcat(str, "_16.xml");
@@ -282,9 +292,11 @@ shared_str ui_core::get_xml_name(LPCSTR fn)
         else
             xr_sprintf(str, "%s_16", fn);
 
-        if (NULL == FS.exist(str_, "$game_config$", "ui\\", str)) {
+        if (NULL == FS.exist(str_, "$game_config$", "ui\\", str))
+        {
             xr_sprintf(str, "%s", fn);
-            if (NULL == strext(fn)) xr_strcat(str, ".xml");
+            if (NULL == strext(fn))
+                xr_strcat(str, ".xml");
         }
     }
     return str;

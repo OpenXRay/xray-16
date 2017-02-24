@@ -8,19 +8,16 @@ class ESceneWayTool : public ESceneCustomOTool
 {
     typedef ESceneCustomOTool inherited;
 
-  protected:
+protected:
     // controls
     virtual void CreateControls();
     virtual void RemoveControls();
 
-  public:
+public:
     ESceneWayTool() : ESceneCustomOTool(OBJCLASS_WAY) { ; }
-
     // definition
     IC LPCSTR ClassName() { return "way"; }
-
     IC LPCSTR ClassDesc() { return "Way"; }
-
     IC
 
         int
@@ -30,10 +27,8 @@ class ESceneWayTool : public ESceneCustomOTool
     }
 
     virtual void Clear(bool bSpecific = false) { inherited::Clear(bSpecific); }
-
     // IO
     virtual bool IsNeedSave() { return inherited::IsNeedSave(); }
-
     virtual bool LoadStream(IReader&);
     virtual bool LoadLTX(CInifile&);
     virtual void SaveStream(IWriter&);

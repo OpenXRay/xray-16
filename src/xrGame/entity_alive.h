@@ -20,7 +20,6 @@ private:
 
 public:
     virtual CEntityAlive* cast_entity_alive() { return this; }
-
 public:
     bool m_bMobility;
     float m_fAccuracy;
@@ -78,7 +77,6 @@ public:
     virtual float ffGetRange() const = 0;
 
     virtual bool human_being() const { return (false); }
-
 public:
     // IC	CPHMovementControl*					PMovement					()						{return
     // m_PhysicMovementControl;}
@@ -118,7 +116,6 @@ public:
     static void UnloadBloodyWallmarks();
 
     void ClearBloodWounds() { m_BloodWounds.clear(); };
-
 protected:
     virtual void PlaceBloodWallmark(const Fvector& dir, const Fvector& start_pos, float trace_dist, float wallmark_size,
         IWallMarkArray* pwallmarks_vector);
@@ -181,10 +178,10 @@ public:
     virtual u32 ef_detector_type() const;
 
 public:
-    virtual void OnHitHealthLoss(float NewHealth){};  //вызывается если entity теряет здоровье
-    virtual void OnCriticalHitHealthLoss(){};         //вызывается если entity умрет от хита
-    virtual void OnCriticalWoundHealthLoss(){};       //вызывается если entity умрет от потери крови
-    virtual void OnCriticalRadiationHealthLoss(){};   //вызывается если entity умрет от радиации
+    virtual void OnHitHealthLoss(float NewHealth){}; //вызывается если entity теряет здоровье
+    virtual void OnCriticalHitHealthLoss(){}; //вызывается если entity умрет от хита
+    virtual void OnCriticalWoundHealthLoss(){}; //вызывается если entity умрет от потери крови
+    virtual void OnCriticalRadiationHealthLoss(){}; //вызывается если entity умрет от радиации
 
     virtual CVisualMemoryManager* visual_memory() const { return (0); }
     virtual void net_Relcase(IGameObject* O);

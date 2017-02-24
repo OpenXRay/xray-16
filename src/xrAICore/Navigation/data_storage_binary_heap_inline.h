@@ -20,11 +20,7 @@ inline CBinaryHeap::CDataStorage(const u32 vertex_count) : Inherited(vertex_coun
 }
 
 TEMPLATE_SPECIALIZATION
-CBinaryHeap::~CDataStorage()
-{
-    xr_free(m_heap);
-}
-
+CBinaryHeap::~CDataStorage() { xr_free(m_heap); }
 TEMPLATE_SPECIALIZATION
 inline void CBinaryHeap::init()
 {
@@ -44,7 +40,8 @@ inline void CBinaryHeap::add_opened(Vertex& vertex)
 {
     VERIFY(m_heap_head <= m_heap_tail);
     Inherited::add_opened(vertex);
-    if (!*m_heap_head || (*m_heap_head)->f() < vertex.f()) {
+    if (!*m_heap_head || (*m_heap_head)->f() < vertex.f())
+    {
         *m_heap_tail = &vertex;
     }
     else

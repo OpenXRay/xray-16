@@ -11,14 +11,8 @@
 LPCSTR make_time(string64& buf, float fsec);
 #ifdef COLLECT_EXECUTION_STATS
 
-void execute_time_statistics::read(INetReader& r)
-{
-    r_pod(r, *this);
-}
-void execute_time_statistics::write(IWriter& w) const
-{
-    w_pod(w, *this);
-}
+void execute_time_statistics::read(INetReader& r) { r_pod(r, *this); }
+void execute_time_statistics::write(IWriter& w) const { w_pod(w, *this); }
 void execute_time_statistics::log() const
 {
     string64 buf;

@@ -12,7 +12,7 @@ private:
         u32 dwTimeOfLastExecute;
         shared_str scheduled_name;
         ISheduled* Object;
-        u32 dwPadding;  // for align-issues
+        u32 dwPadding; // for align-issues
 
         IC bool operator<(Item& I) { return dwTimeForExecute > I.dwTimeForExecute; }
     };
@@ -29,7 +29,6 @@ private:
         CStatTimer Update;
 
         SchedulerStatistics() { FrameStart(); }
-
         void FrameStart()
         {
             Load = 0.0f;
@@ -66,7 +65,7 @@ public:
 
 #ifdef DEBUG
     bool Registered(ISheduled* object) const;
-#endif  // DEBUG
+#endif // DEBUG
     void Register(ISheduled* A, BOOL RT = FALSE);
     void Unregister(ISheduled* A);
     void EnsureOrder(ISheduled* Before, ISheduled* After);
@@ -81,4 +80,4 @@ public:
     }
 };
 
-#endif  // XRSHEDULER_H_INCLUDED
+#endif // XRSHEDULER_H_INCLUDED

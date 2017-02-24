@@ -21,7 +21,8 @@ void player_blitzkrieg::reset_game()
 void player_blitzkrieg::OnPlayerTakeArtefact(game_PlayerState const* ps)
 {
     game_PlayerState* tmp_local_player = m_owner->get_local_player();
-    if ((m_art_drop_count == 0) && (ps == tmp_local_player)) {
+    if ((m_art_drop_count == 0) && (ps == tmp_local_player))
+    {
         m_take_time = Device.dwTimeGlobal;
     }
     else
@@ -34,10 +35,12 @@ void player_blitzkrieg::OnPlayerTakeArtefact(game_PlayerState const* ps)
 void player_blitzkrieg::OnPlayerDropArtefact(game_PlayerState const* ps)
 {
     game_PlayerState* tmp_local_player = m_owner->get_local_player();
-    if (!tmp_local_player) return;
+    if (!tmp_local_player)
+        return;
 
     // if there was dropping before delivering then, artefacts not on base ..
-    if (ps->team == tmp_local_player->team) {
+    if (ps->team == tmp_local_player->team)
+    {
         ++m_art_drop_count;
     }
 }
@@ -45,7 +48,8 @@ void player_blitzkrieg::OnPlayerDropArtefact(game_PlayerState const* ps)
 void player_blitzkrieg::OnPlayerBringArtefact(game_PlayerState const* ps)
 {
     game_PlayerState* tmp_local_player = m_owner->get_local_player();
-    if ((m_art_drop_count <= 1) && (ps == tmp_local_player)) {
+    if ((m_art_drop_count <= 1) && (ps == tmp_local_player))
+    {
         m_deliver_time = Device.dwTimeGlobal - m_take_time;
     }
     else
@@ -55,9 +59,5 @@ void player_blitzkrieg::OnPlayerBringArtefact(game_PlayerState const* ps)
     m_art_drop_count = 0;
 }
 
-u32 const player_blitzkrieg::get_u32_param()
-{
-    return m_deliver_time;
-};
-
-}  // namespace award_system
+u32 const player_blitzkrieg::get_u32_param() { return m_deliver_time; };
+} // namespace award_system

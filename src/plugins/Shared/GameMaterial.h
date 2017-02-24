@@ -27,19 +27,19 @@
 #define NEWSTDMTL_COLOR_SI (1 << 15)
 #define NEWSTDMTL_FACETED (1 << 16)
 
-#define NEWSTDMTL_ROLLUP0_OPEN (1 << 27)  // shader
-#define NEWSTDMTL_ROLLUP1_OPEN (1 << 28)  // basic
-#define NEWSTDMTL_ROLLUP2_OPEN (1 << 29)  // extra
-#define NEWSTDMTL_ROLLUP3_OPEN (1 << 30)  // maps
-#define NEWSTDMTL_ROLLUP4_OPEN (1 << 26)  // sampling
-#define NEWSTDMTL_ROLLUP5_OPEN (1 << 25)  // dynamics
-#define NEWSTDMTL_ROLLUP6_OPEN (1 << 24)  // effects
+#define NEWSTDMTL_ROLLUP0_OPEN (1 << 27) // shader
+#define NEWSTDMTL_ROLLUP1_OPEN (1 << 28) // basic
+#define NEWSTDMTL_ROLLUP2_OPEN (1 << 29) // extra
+#define NEWSTDMTL_ROLLUP3_OPEN (1 << 30) // maps
+#define NEWSTDMTL_ROLLUP4_OPEN (1 << 26) // sampling
+#define NEWSTDMTL_ROLLUP5_OPEN (1 << 25) // dynamics
+#define NEWSTDMTL_ROLLUP6_OPEN (1 << 24) // effects
 
 // only needed if the constant shader is included in shaders
 #define CONSTClassID (STDSHADERS_CLASS_ID + 1)
 
-#define NEWSTDMTL_ROLLUP_FLAGS                                                                                         \
-    (NEWSTDMTL_ROLLUP0_OPEN | NEWSTDMTL_ROLLUP1_OPEN | NEWSTDMTL_ROLLUP2_OPEN | NEWSTDMTL_ROLLUP3_OPEN |               \
+#define NEWSTDMTL_ROLLUP_FLAGS                                                                           \
+    (NEWSTDMTL_ROLLUP0_OPEN | NEWSTDMTL_ROLLUP1_OPEN | NEWSTDMTL_ROLLUP2_OPEN | NEWSTDMTL_ROLLUP3_OPEN | \
         NEWSTDMTL_ROLLUP4_OPEN | NEWSTDMTL_ROLLUP5_OPEN | NEWSTDMTL_ROLLUP6_OPEN)
 
 class XRayMtlDlg;
@@ -53,15 +53,15 @@ enum
     std_maps,
     std2_dynamics,
     std2_xray
-};  // pblock IDs
+}; // pblock IDs
 enum
 {
     std2_eshader_type,
     std2_cshader_type,
-    std2_eshader_by_name,  // virtual param for accessing shader type by name
-    std2_cshader_by_name,  // virtual param for accessing shader type by name
+    std2_eshader_by_name, // virtual param for accessing shader type by name
+    std2_cshader_by_name, // virtual param for accessing shader type by name
     std2_gamemtl_type,
-    std2_gamemtl_by_name  // virtual param for accessing shader type by name
+    std2_gamemtl_by_name // virtual param for accessing shader type by name
 };
 // std2_shader param IDs
 enum
@@ -71,7 +71,7 @@ enum
     std2_two_sided,
     std2_face_map,
     std2_faceted,
-    std2_shader_by_name  // virtual param for accessing shader type by name
+    std2_shader_by_name // virtual param for accessing shader type by name
 };
 // std2_extended param IDs
 enum
@@ -148,7 +148,7 @@ extern TCHAR* GetString(int id);
 #define NUM_REFS 9
 
 // refs
-#define OLD_PBLOCK_REF 0  // reference number assignments
+#define OLD_PBLOCK_REF 0 // reference number assignments
 #define TEXMAPS_REF 1
 #define SHADER_REF 2
 #define SHADER_PB_REF 3
@@ -176,7 +176,6 @@ private:
 
 public:
     RefmsgKillCounter() : counter(-1) {}
-
     bool DistributeRefmsg() { return counter < 0; }
 };
 
@@ -209,17 +208,17 @@ public:
     static LPSTRVec CShaders;
     static LPSTRVec GameMtls;
 
-    IParamBlock* old_pblock;  // ref 0, for old version loading
-    Texmaps* maps;            // ref 1
+    IParamBlock* old_pblock; // ref 0, for old version loading
+    Texmaps* maps; // ref 1
     Interval ivalid;
-    ReshadeRequirements mReshadeRQ;  // mjm - 06.02.00
-    ReshadeRequirements mInRQ;       // ca - 12/7/00
+    ReshadeRequirements mReshadeRQ; // mjm - 06.02.00
+    ReshadeRequirements mInRQ; // ca - 12/7/00
     ULONG flags;
     int shaderId;
-    Shader* pShader;  // ref 2
+    Shader* pShader; // ref 2
     // new PB2 paramblocks, one per rollout
-    IParamBlock2* pb_xray;    //
-    IParamBlock2* pb_shader;  // ref 3, 4, ...
+    IParamBlock2* pb_xray; //
+    IParamBlock2* pb_shader; // ref 3, 4, ...
     IParamBlock2* pb_extended;
     IParamBlock2* pb_sampling;
     IParamBlock2* pb_maps;
@@ -241,7 +240,7 @@ public:
 
     // sampling
     int samplerId;
-    Sampler* pixelSampler;  // ref 8
+    Sampler* pixelSampler; // ref 8
 
     // composite of shader/mtl channel types
     int channelTypes[STD2_NMAX_TEXMAPS];
@@ -264,7 +263,7 @@ public:
         return (id == OPACITY_PARAM) ? pb_extended->KeyFrameAtTime(std2_opacity, t) : FALSE;
     }
     BOOL AmtKeyAtTime(int i, TimeValue t);
-    int GetMapState(int indx);  // returns 0 = no map, 1 = disable, 2 = mapon
+    int GetMapState(int indx); // returns 0 = no map, 1 = disable, 2 = mapon
     TSTR GetMapName(int indx);
     void SyncADTexLock(BOOL lockOn);
 
@@ -280,29 +279,27 @@ public:
     void SetShinStr(float v, TimeValue t);
     void SetSelfIllum(float v, TimeValue t);
     void SetSoften(BOOL onoff) { SetFlag(NEWSTDMTL_SOFTEN, onoff); }
-
     void SetTexmapAmt(int imap, float amt, TimeValue t);
     void LockAmbDiffTex(BOOL onoff) { SetFlag(NEWSTDMTL_LOCK_ADTEX, onoff); }
-
-    void SetWire(BOOL onoff) { pb_shader->SetValue(std2_wire, 0, (onoff != 0)); }  // SetFlag(NEWSTDMTL_WIRE,onoff); }
+    void SetWire(BOOL onoff) { pb_shader->SetValue(std2_wire, 0, (onoff != 0)); } // SetFlag(NEWSTDMTL_WIRE,onoff); }
     void SetWireSize(float s, TimeValue t);
     void SetWireUnits(BOOL onoff)
     {
         pb_extended->SetValue(std2_wire_units, 0, (onoff != 0));
-    }  // SetFlag(NEWSTDMTL_WIRE_UNITS,onoff); }
+    } // SetFlag(NEWSTDMTL_WIRE_UNITS,onoff); }
 
     void SetFaceMap(BOOL onoff)
     {
         pb_shader->SetValue(std2_face_map, 0, (onoff != 0));
-    }  // SetFlag(NEWSTDMTL_FACEMAP,onoff); }
+    } // SetFlag(NEWSTDMTL_FACEMAP,onoff); }
     void SetTwoSided(BOOL onoff)
     {
         pb_shader->SetValue(std2_two_sided, 0, (onoff != 0));
-    }  // SetFlag(NEWSTDMTL_2SIDE,onoff); }
+    } // SetFlag(NEWSTDMTL_2SIDE,onoff); }
     void SetFalloffOut(BOOL outOn)
     {
         pb_extended->SetValue(std2_falloff_type, 0, (outOn != 0));
-    }  // SetFlag(NEWSTDMTL_FALLOFF_OUT,onoff); }
+    } // SetFlag(NEWSTDMTL_FALLOFF_OUT,onoff); }
     void SetTransparencyType(int type);
 
     void SetFilter(Color c, TimeValue t);
@@ -313,7 +310,6 @@ public:
     void SetDimMult(float v, TimeValue t);
 
     int GetFlag(ULONG f) { return (flags & f) ? 1 : 0; }
-
     // >>>Shaders
 
     // these 3 internal only
@@ -329,7 +325,6 @@ public:
     BOOL SwitchShader(Class_ID shaderId);
     int FindShader(Class_ID& findId, ClassDesc** ppCD = NULL);
     BOOL IsShaderInUI() { return pb_shader && pb_shader->GetMap() && pShader && pShader->GetParamDlg(); }
-
     static void XRayMtl::LoadShaderList();
     static int XRayMtl::NumShaders();
     static ClassDesc* XRayMtl::GetShaderCD(int i);
@@ -346,7 +341,6 @@ public:
     LPCSTR GetEShaderName() { return GetEShader(eshaderId); }
     LPCSTR GetCShaderName() { return GetCShader(cshaderId); }
     LPCSTR GetGameMtlName() { return GetGameMtl(gamemtlId); }
-
     static void XRayMtl::LoadXRayShaderList();
     static void XRayMtl::UnloadXRayShaderList();
     virtual TCHAR* GetEShader(DWORD i);
@@ -358,7 +352,6 @@ public:
 
     BOOL IsFaceted() { return GetFlag(NEWSTDMTL_FACETED); }
     void SetFaceted(BOOL on) { pb_shader->SetValue(std2_faceted, 0, (on != 0)); }
-
     // These utilitys provide R2.5 shaders, ONLY used for Translators
     // Does not & will not work for plug-in shaders
     void SetShading(int s);
@@ -372,7 +365,6 @@ public:
     float GetShinStr(int mtlNum = 0, BOOL backFace = FALSE);
     float GetXParency(int mtlNum = 0, BOOL backFace = FALSE);
     float WireSize(int mtlNum = 0, BOOL backFace = FALSE) { return wireSize; }
-
     // >>>> Self Illumination
     float GetSelfIllum(int mtlNum, BOOL backFace);
     BOOL GetSelfIllumColorOn(int mtlNum, BOOL backFace);
@@ -401,7 +393,6 @@ public:
     BOOL SwitchSampler(Class_ID samplerId);
     int FindSampler(Class_ID findId, ClassDesc** pNewCD = NULL);
     Sampler* GetPixelSampler(int mtlNum = 0, BOOL backFace = FALSE) { return pixelSampler; }
-
     // these 2 internal only
     void SetSamplerIndx(long indx, BOOL update = TRUE);
     long GetSamplerIndx() { return samplerId; }
@@ -417,7 +408,7 @@ public:
     BOOL GetTwoSided() { return GetFlag(NEWSTDMTL_2SIDE); }
     BOOL GetWire() { return GetFlag(NEWSTDMTL_WIRE); }
     BOOL GetWireUnits() { return GetFlag(NEWSTDMTL_WIRE_UNITS); }
-    BOOL GetFalloffOut() { return GetFlag(NEWSTDMTL_FALLOFF_OUT); }  // 1: out, 0: in
+    BOOL GetFalloffOut() { return GetFlag(NEWSTDMTL_FALLOFF_OUT); } // 1: out, 0: in
     BOOL GetAmbDiffTexLock() { return GetFlag(NEWSTDMTL_LOCK_ADTEX); }
     int GetTransparencyType()
     {
@@ -452,7 +443,6 @@ public:
     float GetTexmapAmt(int imap);
     Color GetFilter();
     float GetIOR() { return ioRefract; }
-
     XRayMtl(BOOL loading = FALSE);
     ~XRayMtl() { DiscardTexHandles(); }
     BOOL ParamWndProc(HWND hwndDlg, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -489,11 +479,9 @@ public:
     TSTR GetSubTexmapSlotName(int i);
     int SubTexmapOn(int i) { return MAPACTIVE(i); }
     long StdIDToChannel(long id) { return stdIDToChannel[id]; }
-
     Class_ID ClassID();
     SClass_ID SuperClassID() { return MATERIAL_CLASS_ID; }
     void GetClassName(TSTR& s) { s = GetString(IDS_CLASS_NAME); }
-
     void DeleteThis();
 
     int NumSubs() { return NUM_SUB_ANIMS; }
@@ -521,8 +509,8 @@ public:
     // begin - ke/mjm - 03.16.00 - merge reshading code
     BOOL SupportsRenderElements() { return TRUE; }
     //		BOOL SupportsReShading(ShadeContext& sc);
-    void UpdateReshadeRequirements(RefTargetHandle hTarget, PartID partID);  // mjm - 06.02.00
-    ReshadeRequirements GetReshadeRequirements() { return mReshadeRQ; }      // mjm - 06.02.00
+    void UpdateReshadeRequirements(RefTargetHandle hTarget, PartID partID); // mjm - 06.02.00
+    ReshadeRequirements GetReshadeRequirements() { return mReshadeRQ; } // mjm - 06.02.00
     void PreShade(ShadeContext& sc, IReshadeFragment* pFrag);
     void PostShade(ShadeContext& sc, IReshadeFragment* pFrag, int& nextTexIndex, IllumParams* ip);
 // end - ke/mjm - 03.16.00 - merge reshading code
@@ -560,11 +548,14 @@ public:
 
     float GetEffOpacity(ShadeContext& sc, float opac)
     {
-        if (opac != 1.0f || opfall != 0.0f) {
-            if (opfall != 0.0f) {
+        if (opac != 1.0f || opfall != 0.0f)
+        {
+            if (opfall != 0.0f)
+            {
                 Point3 N = (flags & NEWSTDMTL_FACETED) ? sc.GNormal() : sc.Normal();
                 float d = _abs(DotProd(N, sc.V()));
-                if (flags & NEWSTDMTL_FALLOFF_OUT) d = 1.0f - d;
+                if (flags & NEWSTDMTL_FALLOFF_OUT)
+                    d = 1.0f - d;
                 return opac * (1.0f - opfall * d);
             }
             else
@@ -588,4 +579,4 @@ private:
 
 Mtl* CreateXRayMtl();
 
-#endif  // __GAME_MATERIAL__H
+#endif // __GAME_MATERIAL__H

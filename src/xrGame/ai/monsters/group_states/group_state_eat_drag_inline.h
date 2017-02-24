@@ -4,22 +4,16 @@
 #include "Include/xrRender/Kinematics.h"
 #include "Common/Noncopyable.hpp"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
 #define CStateGroupDragAbstract CStateGroupDrag<_Object>
 
 TEMPLATE_SPECIALIZATION
-CStateGroupDragAbstract::CStateGroupDrag(_Object* obj) : inherited(obj)
-{
-}
-
+CStateGroupDragAbstract::CStateGroupDrag(_Object* obj) : inherited(obj) {}
 TEMPLATE_SPECIALIZATION
-CStateGroupDragAbstract::~CStateGroupDrag()
-{
-}
-
+CStateGroupDragAbstract::~CStateGroupDrag() {}
 TEMPLATE_SPECIALIZATION
 void CStateGroupDragAbstract::initialize()
 {
@@ -29,7 +23,8 @@ void CStateGroupDragAbstract::initialize()
     CInifile* ini = K->LL_UserData();
     VERIFY(ini);
 
-    if (!ini->section_exist("capture_used_bones") || !ini->line_exist("capture_used_bones", "bones")) {
+    if (!ini->section_exist("capture_used_bones") || !ini->line_exist("capture_used_bones", "bones"))
+    {
         m_failed = true;
         return;
     }
@@ -69,7 +64,8 @@ void CStateGroupDragAbstract::initialize()
                 } cmp(bi);
 
                 u16 const* use_bones_end = use_bones + m_bone_number;
-                if (std::find_if(use_bones, use_bones_end, cmp) != use_bones_end) return (true);
+                if (std::find_if(use_bones, use_bones_end, cmp) != use_bones_end)
+                    return (true);
 
                 bi = m_K->LL_GetData(bi).GetParentID();
             }
@@ -83,9 +79,11 @@ void CStateGroupDragAbstract::initialize()
     m_failed = false;
 
     IPHCapture* capture = object->character_physics_support()->movement()->PHCapture();
-    if (capture && !capture->Failed()) {
+    if (capture && !capture->Failed())
+    {
         m_cover_vertex_id = object->Home->get_place_in_min_home();
-        if (m_cover_vertex_id != u32(-1)) {
+        if (m_cover_vertex_id != u32(-1))
+        {
             m_cover_position = ai().level_graph().vertex_position(m_cover_vertex_id);
         }
         else
@@ -95,9 +93,11 @@ void CStateGroupDragAbstract::initialize()
         {
             const CCoverPoint* point =
                 object->CoverMan->find_cover(object->Home->get_home_point(), 1, object->Home->get_min_radius());
-            if (point) {
+            if (point)
+            {
                 m_cover_vertex_id = point->level_vertex_id();
-                if (m_cover_vertex_id != u32(-1)) {
+                if (m_cover_vertex_id != u32(-1))
+                {
                     m_cover_position = ai().level_graph().vertex_position(m_cover_vertex_id);
                 }
             }
@@ -112,13 +112,15 @@ void CStateGroupDragAbstract::initialize()
 TEMPLATE_SPECIALIZATION
 void CStateGroupDragAbstract::execute()
 {
-    if (m_failed) return;
+    if (m_failed)
+        return;
 
     // Установить параметры движения
     object->set_action(ACT_DRAG);
     object->anim().SetSpecParams(ASP_MOVE_BKWD);
 
-    if (m_cover_vertex_id != u32(-1)) {
+    if (m_cover_vertex_id != u32(-1))
+    {
         object->path().set_target_point(m_cover_position, m_cover_vertex_id);
     }
     else
@@ -153,20 +155,25 @@ void CStateGroupDragAbstract::critical_finalize()
 TEMPLATE_SPECIALIZATION
 bool CStateGroupDragAbstract::check_completion()
 {
-    if (m_failed) {
+    if (m_failed)
+    {
         return true;
     }
 
-    if (!object->character_physics_support()->movement()->PHCapture()) {
+    if (!object->character_physics_support()->movement()->PHCapture())
+    {
         return true;
     }
 
-    if (m_cover_vertex_id != u32(-1)) {  // valid vertex so wait path end
-        if (object->Position().distance_to(m_cover_position) < 2.f) return true;
+    if (m_cover_vertex_id != u32(-1))
+    { // valid vertex so wait path end
+        if (object->Position().distance_to(m_cover_position) < 2.f)
+            return true;
     }
     else
-    {  // invalid vertex so check distanced that passed
-        if (m_corpse_start_position.distance_to(object->Position()) > object->Home->get_min_radius()) return true;
+    { // invalid vertex so check distanced that passed
+        if (m_corpse_start_position.distance_to(object->Position()) > object->Home->get_min_radius())
+            return true;
     }
 
     return false;

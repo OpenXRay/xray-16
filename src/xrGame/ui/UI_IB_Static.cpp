@@ -13,11 +13,13 @@
 void CUI_IB_Static::SetTextureOffset(float x, float y)
 {
     for (int i = 0; i < S_Total; ++i)
-        if (m_states[i]) m_states[i]->SetTextureOffset(x, y);
+        if (m_states[i])
+            m_states[i]->SetTextureOffset(x, y);
 }
 
 void CUI_IB_Static::SetStretchTexture(bool stretch_texture)
 {
     for (int i = 0; i < S_Total; ++i)
-        if (m_states[i]) m_states[i]->SetStretchTexture(stretch_texture);
+        if (m_states[i])
+            m_states[i]->SetStretchTexture(stretch_texture);
 }

@@ -37,26 +37,25 @@ IC bool CCoverManager::edge_vertex(u32 index)
 {
     CLevelGraph::CVertex* v = ai().level_graph().vertex(index);
     return ((!ai().level_graph().valid_vertex_id(v->link(0)) && (v->high_cover(0) < MIN_COVER_VALUE)) ||
-            (!ai().level_graph().valid_vertex_id(v->link(1)) && (v->high_cover(1) < MIN_COVER_VALUE)) ||
-            (!ai().level_graph().valid_vertex_id(v->link(2)) && (v->high_cover(2) < MIN_COVER_VALUE)) ||
-            (!ai().level_graph().valid_vertex_id(v->link(3)) && (v->high_cover(3) < MIN_COVER_VALUE)) ||
-            (!ai().level_graph().valid_vertex_id(v->link(0)) && (v->low_cover(0) < MIN_COVER_VALUE)) ||
-            (!ai().level_graph().valid_vertex_id(v->link(1)) && (v->low_cover(1) < MIN_COVER_VALUE)) ||
-            (!ai().level_graph().valid_vertex_id(v->link(2)) && (v->low_cover(2) < MIN_COVER_VALUE)) ||
-            (!ai().level_graph().valid_vertex_id(v->link(3)) && (v->low_cover(3) < MIN_COVER_VALUE)));
+        (!ai().level_graph().valid_vertex_id(v->link(1)) && (v->high_cover(1) < MIN_COVER_VALUE)) ||
+        (!ai().level_graph().valid_vertex_id(v->link(2)) && (v->high_cover(2) < MIN_COVER_VALUE)) ||
+        (!ai().level_graph().valid_vertex_id(v->link(3)) && (v->high_cover(3) < MIN_COVER_VALUE)) ||
+        (!ai().level_graph().valid_vertex_id(v->link(0)) && (v->low_cover(0) < MIN_COVER_VALUE)) ||
+        (!ai().level_graph().valid_vertex_id(v->link(1)) && (v->low_cover(1) < MIN_COVER_VALUE)) ||
+        (!ai().level_graph().valid_vertex_id(v->link(2)) && (v->low_cover(2) < MIN_COVER_VALUE)) ||
+        (!ai().level_graph().valid_vertex_id(v->link(3)) && (v->low_cover(3) < MIN_COVER_VALUE)));
 }
 
 IC bool CCoverManager::cover(CLevelGraph::CVertex* v, u32 index0, u32 index1)
 {
     return (ai().level_graph().valid_vertex_id(v->link(index0)) &&
-            ai().level_graph().valid_vertex_id(ai().level_graph().vertex(v->link(index0))->link(index1)) &&
-            m_temp[ai().level_graph().vertex(v->link(index0))->link(index1)]);
+        ai().level_graph().valid_vertex_id(ai().level_graph().vertex(v->link(index0))->link(index1)) &&
+        m_temp[ai().level_graph().vertex(v->link(index0))->link(index1)]);
 }
 
 IC bool CCoverManager::critical_point(CLevelGraph::CVertex* v, u32 index, u32 index0, u32 index1)
 {
-    return (
-        !ai().level_graph().valid_vertex_id(v->link(index)) &&
+    return (!ai().level_graph().valid_vertex_id(v->link(index)) &&
         (!ai().level_graph().valid_vertex_id(v->link(index0)) || !ai().level_graph().valid_vertex_id(v->link(index1)) ||
             cover(v, index0, index) || cover(v, index1, index)));
 }
@@ -65,7 +64,7 @@ IC bool CCoverManager::critical_cover(u32 index)
 {
     CLevelGraph::CVertex* v = ai().level_graph().vertex(index);
     return (critical_point(v, 0, 1, 3) || critical_point(v, 2, 1, 3) || critical_point(v, 1, 0, 2) ||
-            critical_point(v, 3, 0, 2));
+        critical_point(v, 3, 0, 2));
 }
 
 void CCoverManager::compute_static_cover()
@@ -81,12 +80,14 @@ void CCoverManager::compute_static_cover()
     for (u32 i = 0; i < levelVertexCount; ++i)
     {
         CLevelGraph::CVertex const& vertex = *graph.vertex(i);
-        if (vertex.high_cover(0) + vertex.high_cover(1) + vertex.high_cover(2) + vertex.high_cover(3)) {
+        if (vertex.high_cover(0) + vertex.high_cover(1) + vertex.high_cover(2) + vertex.high_cover(3))
+        {
             m_temp[i] = edge_vertex(i);
             continue;
         }
 
-        if (vertex.low_cover(0) + vertex.low_cover(1) + vertex.low_cover(2) + vertex.low_cover(3)) {
+        if (vertex.low_cover(0) + vertex.low_cover(1) + vertex.low_cover(2) + vertex.low_cover(3))
+        {
             m_temp[i] = edge_vertex(i);
             continue;
         }
@@ -108,7 +109,8 @@ void CCoverManager::clear_covers(PointVector& covers)
     PointVector::iterator E = covers.end();
     for (; I != E; ++I)
     {
-        if (!(*I)->m_is_smart_cover) {
+        if (!(*I)->m_is_smart_cover)
+        {
             xr_delete(*I);
             continue;
         }
@@ -122,7 +124,8 @@ void CCoverManager::clear_covers(PointVector& covers)
 
 void CCoverManager::clear()
 {
-    if (!get_covers()) return;
+    if (!get_covers())
+        return;
 
     covers().all(m_nearest);
     clear_covers(m_nearest);
@@ -138,15 +141,15 @@ struct predicate
     object const* m_object;
 
     IC predicate(object const& object) : m_object(&object) {}
-
     IC bool operator()(CCoverPoint* const& cover) const
     {
-        if (cover->m_is_smart_cover) return (true);
+        if (cover->m_is_smart_cover)
+            return (true);
 
         return (!m_object->inside(cover->position()));
     }
 };
-}  // namespace smart_cover
+} // namespace smart_cover
 
 void CCoverManager::remove_nearby_covers(smart_cover::cover const& cover, smart_cover::object const& object) const
 {
@@ -212,7 +215,8 @@ void CCoverManager::actualize_smart_covers() const
 
 CCoverManager::Cover* CCoverManager::smart_cover(shared_str const& cover_id) const
 {
-    if (!m_smart_covers_actual) actualize_smart_covers();
+    if (!m_smart_covers_actual)
+        actualize_smart_covers();
 
     SmartCovers::iterator found =
         std::lower_bound(m_smart_covers.begin(), m_smart_covers.end(), cover_id, id_predicate_less());

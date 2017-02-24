@@ -22,7 +22,7 @@ struct SBFace
     int bone_id;
     CSurface* surf;
 
-  public:
+public:
     SBFace(CSurface* _surf, const Fvector2* _uv[3]) : surf(_surf), marked(false), bone_id(-1)
     {
         vert_id[0] = -1;
@@ -81,7 +81,7 @@ struct SBPart : public CExportSkeletonCustom
 
     bool m_bValid;
 
-  public:
+public:
     SBPart()
     {
         m_Reference = 0;
@@ -89,7 +89,6 @@ struct SBPart : public CExportSkeletonCustom
     }
 
     bool Valid() { return m_bValid; }
-
     virtual bool Export(IWriter& F, u8 infl);
     void append_face(SBFace* F);
     void use_face(SBFace* F, u32& cnt, u32 bone_id, float& area);
@@ -103,7 +102,7 @@ DEFINE_VECTOR(SBPart*, SBPartVec, SBPartVecIt);
 
 class CGeomPartExtractor
 {
-  protected:
+protected:
     VCPacked* m_Verts;
     SBFaceVec m_Faces;
     SBAdjVec m_Adjs;
@@ -111,11 +110,10 @@ class CGeomPartExtractor
 
     u32 m_PerBoneFaceCountMin;
 
-  public:
+public:
     CGeomPartExtractor();
 
     ~CGeomPartExtractor() { Clear(); }
-
     // init & clean up
     void Initialize(const Fbox& bb, float eps, u32 per_bone_face_count_min);
     void Clear();
@@ -123,9 +121,8 @@ class CGeomPartExtractor
     void AppendFace(CSurface* surf, const Fvector* v, const Fvector* n, const Fvector2* uvs[3]);
 
     SBPartVec& GetParts() { return m_Parts; }
-
     // utilities
     BOOL Process();
 };
 
-#endif  // GeometryPartExtractorH
+#endif // GeometryPartExtractorH

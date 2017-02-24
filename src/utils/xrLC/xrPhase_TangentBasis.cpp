@@ -11,8 +11,10 @@ static u32 find_same_vertex(const xr_vector<u32>& m, const Fvector2& Ftc, const 
     {
         u32 m_id = m[it];
         float tc[2] = {theVerts[m_id].s, theVerts[m_id].t};
-        if (!fsimilar(tc[0], Ftc.x)) continue;
-        if (!fsimilar(tc[1], Ftc.y)) continue;
+        if (!fsimilar(tc[0], Ftc.x))
+            continue;
+        if (!fsimilar(tc[1], Ftc.y))
+            continue;
         return m_id;
     }
     return u32(-1);
@@ -33,14 +35,15 @@ static void add_face(const Face& F, xr_vector<MeshMender::Vertex>& theVerts, xr_
     {
         const Vertex* V = F.v[v];
         u32 ID = u32(std::lower_bound(lc_global_data()->g_vertices().begin(), lc_global_data()->g_vertices().end(), V) -
-                     lc_global_data()->g_vertices().begin());
+            lc_global_data()->g_vertices().begin());
         xr_vector<u32>& m = remap[ID];
         Fvector2 Ftc = F.tc.front().uv[v];
 
         u32 vertex_index = find_same_vertex(m, Ftc, theVerts);
 
         // Register new if not found
-        if (vertex_index == u32(-1)) {
+        if (vertex_index == u32(-1))
+        {
             vertex_index = add_vertex(*V, Ftc, theVerts);
             remap[ID].push_back(vertex_index);
         }
@@ -74,9 +77,9 @@ static void retrive_data_from_mender_otput(
     for (u32 f = 0; f < lc_global_data()->g_faces().size(); f++)
     {
         Face* F = lc_global_data()->g_faces()[f];
-        u32 id0 = theIndices[f * 3 + 0];  // vertex index
-        u32 id1 = theIndices[f * 3 + 1];  // vertex index
-        u32 id2 = theIndices[f * 3 + 2];  // vertex index
+        u32 id0 = theIndices[f * 3 + 0]; // vertex index
+        u32 id1 = theIndices[f * 3 + 1]; // vertex index
+        u32 id2 = theIndices[f * 3 + 2]; // vertex index
         R_ASSERT(id0 < theVerts.size());
         R_ASSERT(id1 < theVerts.size());
         R_ASSERT(id2 < theVerts.size());

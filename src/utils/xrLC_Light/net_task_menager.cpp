@@ -10,23 +10,10 @@
 
 net_task_menager* g_net_task_menager = 0;
 
-net_task_menager* get_net_task_menager()
-{
-    return g_net_task_menager;
-}
-void create_net_task_menager()
-{
-    g_net_task_menager = xr_new<net_task_menager>();
-}
-void destroy_net_task_menager()
-{
-    xr_delete(g_net_task_menager);
-}
-
-net_task_menager::net_task_menager() : thProgress(0)
-{
-}
-
+net_task_menager* get_net_task_menager() { return g_net_task_menager; }
+void create_net_task_menager() { g_net_task_menager = xr_new<net_task_menager>(); }
+void destroy_net_task_menager() { xr_delete(g_net_task_menager); }
+net_task_menager::net_task_menager() : thProgress(0) {}
 void __cdecl Finalize(IGenericStream* outStream)
 {
     VERIFY(g_net_task_menager);
@@ -108,11 +95,13 @@ void net_task_menager::run()
 }
 
 #ifdef _DEBUG
-LPCSTR libraries = "XRLC_LightStab.dll,XRLC_Light.dll,xrCore.dll,xrCDB.dll,DXT.dll,BugTrapD.dll,msvcr80.dll,Microsoft."
-                   "VC80.CRT.manifest";
+LPCSTR libraries =
+    "XRLC_LightStab.dll,XRLC_Light.dll,xrCore.dll,xrCDB.dll,DXT.dll,BugTrapD.dll,msvcr80.dll,Microsoft.VC80.CRT."
+    "manifest";
 #else
-LPCSTR libraries = "XRLC_LightStab.dll,XRLC_Light.dll,xrCore.dll,xrCDB.dll,DXT.dll,BugTrap.dll,msvcr80.dll,Microsoft."
-                   "VC80.CRT.manifest";
+LPCSTR libraries =
+    "XRLC_LightStab.dll,XRLC_Light.dll,xrCore.dll,xrCDB.dll,DXT.dll,BugTrap.dll,msvcr80.dll,Microsoft.VC80.CRT."
+    "manifest";
 #endif
 
 void net_task_menager::send(IGridUser& user, u32 id)
@@ -136,7 +125,8 @@ void net_task_menager::receive(INetReader& r)
     send_receive_data_lock.Enter();
     u32 id = r.r_u32();
     xr_vector<u32>::iterator it = std::find(pool.begin(), pool.end(), id);
-    if (it == pool.end()) return;
+    if (it == pool.end())
+        return;
     pool.erase(it);
     u32 pool_size = pool.size();
     send_receive_data_lock.Leave();
@@ -155,7 +145,8 @@ void net_task_menager::receive(INetReader& r)
     // thProgress+=(1.f/size);
     Progress(1.f - float(pool.size()) / float(size));
     clMsg("num task complited : %d , num task left %d  (task num %d)", size - pool_size, pool_size, size);
-    if (pool.empty()) {
+    if (pool.empty())
+    {
         clMsg("calculation complited");
         clMsg("%f net lightmaps calculation seconds", start_time.GetElapsed_sec());
     }

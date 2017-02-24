@@ -1,6 +1,6 @@
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -10,15 +10,9 @@
 #define CONTROL_PREPARE_TIME 2900
 
 TEMPLATE_SPECIALIZATION
-CStateControllerControlHitAbstract::CStateControlAttack(_Object* obj) : inherited(obj)
-{
-}
-
+CStateControllerControlHitAbstract::CStateControlAttack(_Object* obj) : inherited(obj) {}
 TEMPLATE_SPECIALIZATION
-CStateControllerControlHitAbstract::~CStateControlAttack()
-{
-}
-
+CStateControllerControlHitAbstract::~CStateControlAttack() {}
 TEMPLATE_SPECIALIZATION
 void CStateControllerControlHitAbstract::initialize()
 {
@@ -46,7 +40,8 @@ void CStateControllerControlHitAbstract::execute()
         break;
 
     case eActionWaitTripleEnd:
-        if (!object->com_man().ta_is_active()) {
+        if (!object->com_man().ta_is_active())
+        {
             m_action = eActionCompleted;
         }
 
@@ -63,32 +58,22 @@ TEMPLATE_SPECIALIZATION
 bool CStateControllerControlHitAbstract::check_start_conditions()
 {
     float dist = object->Position().distance_to(object->EnemyMan.get_enemy_position());
-    if (dist < GOOD_DISTANCE_FOR_CONTROL_HIT) return false;
+    if (dist < GOOD_DISTANCE_FOR_CONTROL_HIT)
+        return false;
 
-    if (!object->EnemyMan.see_enemy_now()) return false;
+    if (!object->EnemyMan.see_enemy_now())
+        return false;
 
     // всё ок, можно начать атаку
     return true;
 }
 
 TEMPLATE_SPECIALIZATION
-bool CStateControllerControlHitAbstract::check_completion()
-{
-    return (m_action == eActionCompleted);
-}
-
+bool CStateControllerControlHitAbstract::check_completion() { return (m_action == eActionCompleted); }
 TEMPLATE_SPECIALIZATION
-void CStateControllerControlHitAbstract::finalize()
-{
-    inherited::finalize();
-}
-
+void CStateControllerControlHitAbstract::finalize() { inherited::finalize(); }
 TEMPLATE_SPECIALIZATION
-void CStateControllerControlHitAbstract::critical_finalize()
-{
-    inherited::critical_finalize();
-}
-
+void CStateControllerControlHitAbstract::critical_finalize() { inherited::critical_finalize(); }
 //////////////////////////////////////////////////////////////////////////
 // Processing
 //////////////////////////////////////////////////////////////////////////
@@ -106,7 +91,8 @@ TEMPLATE_SPECIALIZATION
 void CStateControllerControlHitAbstract::execute_hit_continue()
 {
     // проверить на грави удар
-    if (time_control_started + CONTROL_PREPARE_TIME < Device.dwTimeGlobal) {
+    if (time_control_started + CONTROL_PREPARE_TIME < Device.dwTimeGlobal)
+    {
         m_action = eActionFire;
     }
 }
@@ -116,7 +102,8 @@ void CStateControllerControlHitAbstract::execute_hit_fire()
 {
     object->com_man().ta_pointbreak();
 
-    if (object->EnemyMan.see_enemy_now()) object->control_hit();
+    if (object->EnemyMan.see_enemy_now())
+        object->control_hit();
 }
 
 #undef TEMPLATE_SPECIALIZATION

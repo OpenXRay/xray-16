@@ -38,14 +38,8 @@ void stream_write_demostring(IWriter* writer, shared_str const & string_to_write
     writer->w_stringZ	(string_to_write);
 }*/
 
-demo_player_info::demo_player_info()
-{
-}
-
-demo_player_info::~demo_player_info()
-{
-}
-
+demo_player_info::demo_player_info() {}
+demo_player_info::~demo_player_info() {}
 void demo_player_info::read_from_file(CStreamReader* file_to_read)
 {
     file_to_read->r_stringZ(m_name);
@@ -80,11 +74,13 @@ void demo_player_info::load_from_player(game_PlayerState* player_state)
     game_cl_mp* tmp_game = smart_cast<game_cl_mp*>(&Game());
     R_ASSERT(tmp_game);
     s16 tmp_team = tmp_game->ModifyTeam(player_state->team);
-    if (tmp_team < 0) {
-        tmp_team = 2;  // spectator
+    if (tmp_team < 0)
+    {
+        tmp_team = 2; // spectator
     }
-    if ((tmp_game->Type() == eGameIDDeathmatch) && (tmp_team != 2)) {
-        tmp_team = 0;  // in deathmatch if player is not spectator, he is in green team
+    if ((tmp_game->Type() == eGameIDDeathmatch) && (tmp_team != 2))
+    {
+        tmp_team = 0; // in deathmatch if player is not spectator, he is in green team
     }
     m_team = static_cast<u8>(tmp_team);
 }
@@ -92,15 +88,8 @@ void demo_player_info::load_from_player(game_PlayerState* player_state)
 u32 const demo_info::max_demo_info_size =
     (demo_player_info::demo_info_max_size * MAX_PLAYERS_COUNT) + (DEMOSTRING_MAX_SIZE * 5) + sizeof(u32);
 
-demo_info::demo_info()
-{
-}
-
-demo_info::~demo_info()
-{
-    delete_data(m_players);
-}
-
+demo_info::demo_info() {}
+demo_info::~demo_info() { delete_data(m_players); }
 void demo_info::read_from_file(CStreamReader* file_to_read)
 {
     u32 old_pos = file_to_read->tell();
@@ -154,7 +143,8 @@ void demo_info::load_from_game()
     m_game_type = GameTypeToString(tmp_game->Type(), true);
     string32 tmp_score_dest;
     m_game_score = tmp_game->GetGameScore(tmp_score_dest);
-    if (tmp_game->local_player && (xr_strlen(tmp_game->local_player->getName()) > 0)) {
+    if (tmp_game->local_player && (xr_strlen(tmp_game->local_player->getName()) > 0))
+    {
         m_author_name = tmp_game->local_player->getName();
     }
     else

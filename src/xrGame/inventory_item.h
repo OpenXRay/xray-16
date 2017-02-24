@@ -92,7 +92,7 @@ public:
 public:
     virtual void Load(LPCSTR section);
 
-    LPCSTR NameItem();  // remove <virtual> by sea
+    LPCSTR NameItem(); // remove <virtual> by sea
     LPCSTR NameShort();
     shared_str ItemDescription() { return m_Description; }
     virtual bool GetBriefInfo(II_BriefInfo& info)
@@ -103,19 +103,18 @@ public:
 
     virtual void OnEvent(NET_Packet& P, u16 type);
 
-    virtual bool Useful() const;  // !!! Переопределить. (см. в Inventory.cpp)
+    virtual bool Useful() const; // !!! Переопределить. (см. в Inventory.cpp)
     virtual bool Attach(PIItem pIItem, bool b_send_event) { return false; }
     virtual bool Detach(PIItem pIItem) { return false; }
     //при детаче спаунится новая вещь при заданно названии секции
     virtual bool Detach(const char* item_section_name, bool b_spawn_item);
     virtual bool CanAttach(PIItem pIItem) { return false; }
     virtual bool CanDetach(LPCSTR item_section_name) { return false; }
-
     virtual EHandDependence HandDependence() const { return hd1Hand; };
     virtual bool IsSingleHanded() const { return true; };
-    virtual bool ActivateItem();                               // !!! Переопределить. (см. в Inventory.cpp)
-    virtual void DeactivateItem();                             // !!! Переопределить. (см. в Inventory.cpp)
-    virtual bool Action(u16 cmd, u32 flags) { return false; }  // true если известная команда, иначе false
+    virtual bool ActivateItem(); // !!! Переопределить. (см. в Inventory.cpp)
+    virtual void DeactivateItem(); // !!! Переопределить. (см. в Inventory.cpp)
+    virtual bool Action(u16 cmd, u32 flags) { return false; } // true если известная команда, иначе false
     virtual void DiscardState(){};
 
     virtual void OnH_B_Chield();
@@ -126,10 +125,8 @@ public:
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
     virtual BOOL net_SaveRelevant() { return TRUE; }
-
-    virtual void render_item_ui(){};                        // when in slot & query return TRUE
-    virtual bool render_item_ui_query() { return false; };  // when in slot
-
+    virtual void render_item_ui(){}; // when in slot & query return TRUE
+    virtual bool render_item_ui_query() { return false; }; // when in slot
     virtual void UpdateCL();
 
     virtual void Hit(SHit* pHDS);
@@ -143,7 +140,6 @@ public:
     virtual u32 Cost() const { return m_cost; }
     //			u32					Cost				()	const	{ return m_cost; }
     virtual float Weight() const { return m_weight; }
-
 public:
     CInventory* m_pInventory;
     shared_str m_section_id;
@@ -170,21 +166,17 @@ public:
     u16 BaseSlot() const { return m_ItemCurrPlace.base_slot_id; }
     u16 CurrSlot() const { return m_ItemCurrPlace.slot_id; }
     u16 CurrPlace() const { return m_ItemCurrPlace.type; }
-
     bool Belt() { return !!m_flags.test(Fbelt); }
     void Belt(bool on_belt) { m_flags.set(Fbelt, on_belt); }
     bool Ruck() { return !!m_flags.test(Fruck); }
     void Ruck(bool on_ruck) { m_flags.set(Fruck, on_ruck); }
     bool RuckDefault() { return !!m_flags.test(FRuckDefault); }
-
     virtual bool CanTake() const { return !!m_flags.test(FCanTake); }
     bool CanTrade() const;
     void AllowTrade() { m_flags.set(FCanTrade, m_can_trade); };
     void DenyTrade() { m_flags.set(FCanTrade, FALSE); };
-
     virtual bool IsNecessaryItem(CInventoryItem* item);
     virtual bool IsNecessaryItem(const shared_str& item_sect) { return false; };
-
 protected:
     u32 m_cost;
     float m_weight;
@@ -199,15 +191,15 @@ protected:
 
 public:
     virtual void make_Interpolation(){};
-    virtual void PH_B_CrPr();  // actions & operations before physic correction-prediction steps
-    virtual void PH_I_CrPr();  // actions & operations after correction before prediction steps
+    virtual void PH_B_CrPr(); // actions & operations before physic correction-prediction steps
+    virtual void PH_I_CrPr(); // actions & operations after correction before prediction steps
 #ifdef DEBUG
-    virtual void PH_Ch_CrPr();  //
+    virtual void PH_Ch_CrPr(); //
 #endif
-    virtual void PH_A_CrPr();  // actions & operations after phisic correction-prediction steps
+    virtual void PH_A_CrPr(); // actions & operations after phisic correction-prediction steps
 
-    virtual void net_Import(NET_Packet& P);  // import from server
-    virtual void net_Export(NET_Packet& P);  // export to server
+    virtual void net_Import(NET_Packet& P); // import from server
+    virtual void net_Export(NET_Packet& P); // export to server
 
 public:
     virtual void activate_physic_shell();
@@ -217,9 +209,7 @@ public:
     virtual ALife::_TIME_ID TimePassedAfterIndependant() const;
 
     virtual bool IsSprintAllowed() const { return !!m_flags.test(FAllowSprint); };
-
     virtual float GetControlInertionFactor() const { return m_fControlInertionFactor; };
-
     virtual void UpdateXForm();
 
 protected:
@@ -252,7 +242,6 @@ public:
     u16 object_id() const;
     u16 parent_id() const;
     virtual void on_activate_physic_shell() { R_ASSERT2(0, "failed call of virtual function!"); }
-
 protected:
     float m_holder_range_modifier;
     float m_holder_fov_modifier;
@@ -277,7 +266,6 @@ public:
     virtual CHudItem* cast_hud_item() { return 0; }
     virtual CWeaponAmmo* cast_weapon_ammo() { return 0; }
     virtual CGameObject* cast_game_object() { return 0; }
-
     ////////// upgrades //////////////////////////////////////////////////
 public:
     typedef xr_vector<shared_str> Upgrades_type;
@@ -300,7 +288,7 @@ public:
 
 #ifdef DEBUG
     void log_upgrades();
-#endif  // DEBUG
+#endif // DEBUG
 
     IC Upgrades_type const& upgardes() const;
     virtual void Interpolate();
@@ -327,6 +315,6 @@ protected:
 public:
     IC bool is_helper_item() { return !!m_flags.test(FIsHelperItem); }
     IC void set_is_helper(bool is_helper) { m_flags.set(FIsHelperItem, is_helper); }
-};  // class CInventoryItem
+}; // class CInventoryItem
 
 #include "inventory_item_inline.h"

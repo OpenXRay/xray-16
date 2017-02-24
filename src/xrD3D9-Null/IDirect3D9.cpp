@@ -25,7 +25,8 @@ ULONG xrIDirect3D9::Release(void)
 {
     APIDEBUG("xrIDirect3D9::Release");
     m_refCount--;
-    if (m_refCount < 0) {
+    if (m_refCount < 0)
+    {
         delete this;
         return -1;
     }
@@ -35,7 +36,8 @@ ULONG xrIDirect3D9::Release(void)
 HRESULT xrIDirect3D9::QueryInterface(const IID& iid, void FAR* FAR* ppvObj)
 {
     APIDEBUG("xrIDirect3D9::QueryInterface");
-    if (iid == IID_IUnknown || iid == IID_IDirect3D9) {
+    if (iid == IID_IUnknown || iid == IID_IDirect3D9)
+    {
         *ppvObj = this;
         AddRef();
         return NOERROR;
@@ -112,7 +114,8 @@ HRESULT xrIDirect3D9::CheckDeviceFormatConversion(
 HRESULT xrIDirect3D9::GetDeviceCaps(UINT Adapter, D3DDEVTYPE DeviceType, D3DCAPS9* pCaps)
 {
     APIDEBUG("xrIDirect3D9::GetDeviceCaps");
-    if (pCaps) ZeroMemory(pCaps, sizeof(D3DCAPS9));
+    if (pCaps)
+        ZeroMemory(pCaps, sizeof(D3DCAPS9));
     return S_OK;
 };
 HMONITOR xrIDirect3D9::GetAdapterMonitor(UINT Adapter)

@@ -7,7 +7,8 @@ void imotion_velocity::state_start()
 {
     VERIFY(shell);
     inherited::state_start();
-    if (!is_enabled()) return;
+    if (!is_enabled())
+        return;
     shell->set_ApplyByGravity(false);
 
     // s->set_DynamicLimits(default_l_limit,default_w_limit * 5.f);
@@ -23,10 +24,7 @@ void imotion_velocity::state_end()
     shell->set_ApplyByGravity(true);
 }
 
-void imotion_velocity::collide()
-{
-}
-
+void imotion_velocity::collide() {}
 void imotion_velocity::move_update()
 {
     VERIFY(shell);

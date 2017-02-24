@@ -60,7 +60,8 @@ public:
     void Load(LPCSTR name)
     {
         IReader* fs = FS.r_open(name);
-        if (NULL == fs) {
+        if (NULL == fs)
+        {
             string256 inf;
             extern HWND logWindow;
             xr_sprintf(inf, sizeof(inf), "Build failed!\nCan't load shaders library: '%s'", name);
@@ -79,7 +80,8 @@ public:
     bool Save(LPCSTR name)
     {
         IWriter* F = FS.w_open(name);
-        if (F) {
+        if (F)
+        {
             F->w(&*library.begin(), (u32)library.size() * sizeof(Shader_xrLC));
             FS.w_close(F);
             return true;
@@ -93,13 +95,15 @@ public:
     u32 GetID(LPCSTR name) const
     {
         for (Shader_xrLCVec::const_iterator it = library.begin(); it != library.end(); it++)
-            if (0 == stricmp(name, it->Name)) return u32(it - library.begin());
+            if (0 == stricmp(name, it->Name))
+                return u32(it - library.begin());
         return u32(-1);
     }
     Shader_xrLC* Get(LPCSTR name)
     {
         for (Shader_xrLCIt it = library.begin(); it != library.end(); it++)
-            if (0 == stricmp(name, it->Name)) return &(*it);
+            if (0 == stricmp(name, it->Name))
+                return &(*it);
         return NULL;
     }
     IC Shader_xrLC* Get(int id) { return &library[id]; }
@@ -112,13 +116,13 @@ public:
     void Remove(LPCSTR name)
     {
         for (Shader_xrLCIt it = library.begin(); it != library.end(); it++)
-            if (0 == stricmp(name, it->Name)) {
+            if (0 == stricmp(name, it->Name))
+            {
                 library.erase(it);
                 break;
             }
     }
     void Remove(int id) { library.erase(library.begin() + id); }
-
     Shader_xrLCVec& Library() { return library; }
     const Shader_xrLCVec& Library() const { return library; }
 };
@@ -132,7 +136,8 @@ IC void post_process_materials(
     {
         b_material& M = materials[m];
 
-        if (65535 == M.shader_xrlc) {
+        if (65535 == M.shader_xrlc)
+        {
             // No compiler shader
             M.reserved = u16(-1);
             // clMsg    (" *  %20s",shader_render[M.shader].name);
@@ -141,7 +146,8 @@ IC void post_process_materials(
         {
             // clMsg    (" *  %20s / %-20s",shader_render[M.shader].name, shader_compile[M.shader_xrlc].name);
             int id = shaders.GetID(shader_compile[M.shader_xrlc].name);
-            if (id < 0) {
+            if (id < 0)
+            {
                 Logger.clMsg("ERROR: Shader '%s' not found in library", shader_compile[M.shader].name);
                 R_ASSERT(id >= 0);
             }

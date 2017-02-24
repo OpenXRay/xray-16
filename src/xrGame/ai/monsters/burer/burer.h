@@ -50,7 +50,6 @@ public:
         }
 
         void deactivate() { active = false; }
-
     } m_gravi_object;
 
     LPCSTR particle_gravi_wave;
@@ -149,17 +148,14 @@ public:
     void DeactivateShield();
 
     bool need_shotmark() const { return !m_shield_active; }
-
     virtual bool ability_distant_feel() { return true; }
     virtual char* get_monster_class_name() { return "burer"; }
-
 #ifdef DEBUG
     virtual CBaseMonster::SDebugInfo show_debug_info();
 #endif
 
     void set_force_gravi_attack(bool force_gravi) { m_force_gravi_attack = force_gravi; }
     bool get_force_gravi_attack() const { return m_force_gravi_attack; }
-
 private:
     bool m_force_gravi_attack;
 

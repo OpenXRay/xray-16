@@ -7,25 +7,10 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CBlender_ShWorld::CBlender_ShWorld()
-{
-    description.CLS = B_SHADOW_WORLD;
-}
-
-CBlender_ShWorld::~CBlender_ShWorld()
-{
-}
-
-void CBlender_ShWorld::Save(IWriter& fs)
-{
-    IBlender::Save(fs);
-}
-
-void CBlender_ShWorld::Load(IReader& fs, u16 version)
-{
-    IBlender::Load(fs, version);
-}
-
+CBlender_ShWorld::CBlender_ShWorld() { description.CLS = B_SHADOW_WORLD; }
+CBlender_ShWorld::~CBlender_ShWorld() {}
+void CBlender_ShWorld::Save(IWriter& fs) { IBlender::Save(fs); }
+void CBlender_ShWorld::Load(IReader& fs, u16 version) { IBlender::Load(fs, version); }
 void CBlender_ShWorld::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);

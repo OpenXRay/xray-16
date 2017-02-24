@@ -63,28 +63,28 @@ struct DXGI_RGBA;
 #pragma warning(disable : 6001 6221)
 
 //--------------------------------------------------------------------------------------
-#define CHK_ERR_W(hrchk, strOut)                                                                                       \
+#define CHK_ERR_W(hrchk, strOut)\
     case hrchk: return L##strOut;
-#define CHK_ERRA_W(hrchk)                                                                                              \
+#define CHK_ERRA_W(hrchk)\
     case hrchk: return L#hrchk;
-#define CHK_ERR_A(hrchk, strOut)                                                                                       \
+#define CHK_ERR_A(hrchk, strOut)\
     case hrchk: return strOut;
-#define CHK_ERRA_A(hrchk)                                                                                              \
-    case hrchk:                                                                                                        \
+#define CHK_ERRA_A(hrchk)\
+    case hrchk:\
         return #hrchk;
 
-#define HRESULT_FROM_WIN32b(x)                                                                                         \
+#define HRESULT_FROM_WIN32b(x)\
     ((HRESULT)(x) <= 0 ? ((HRESULT)(x)) : ((HRESULT)(((x)&0x0000FFFF) | (FACILITY_WIN32 << 16) | 0x80000000)))
 
-#define CHK_ERR_WIN32A_W(hrchk)                                                                                        \
-    case HRESULT_FROM_WIN32b(hrchk):                                                                                   \
+#define CHK_ERR_WIN32A_W(hrchk)\
+    case HRESULT_FROM_WIN32b(hrchk):\
     case hrchk: return L#hrchk;
-#define CHK_ERR_WIN32_ONLY_W(hrchk, strOut)                                                                            \
+#define CHK_ERR_WIN32_ONLY_W(hrchk, strOut)\
     case HRESULT_FROM_WIN32b(hrchk): return L##strOut;
-#define CHK_ERR_WIN32A_A(hrchk)                                                                                        \
-    case HRESULT_FROM_WIN32b(hrchk):                                                                                   \
+#define CHK_ERR_WIN32A_A(hrchk) \
+    case HRESULT_FROM_WIN32b(hrchk):\
     case hrchk: return #hrchk;
-#define CHK_ERR_WIN32_ONLY_A(hrchk, strOut)                                                                            \
+#define CHK_ERR_WIN32_ONLY_A(hrchk, strOut)\
     case HRESULT_FROM_WIN32b(hrchk): return strOut;
 
 //-----------------------------------------------------
@@ -130,13 +130,13 @@ const CHAR* WINAPI DXGetErrorStringA(_In_ HRESULT hr)
 #undef CHK_ERRA_A
 #undef CHK_ERR_A
 
-#define CHK_ERRA_W(hrchk)                                                                                              \
+#define CHK_ERRA_W(hrchk)\
     case hrchk: wcscpy_s(desc, count, L#hrchk);
-#define CHK_ERR_W(hrchk, strOut)                                                                                       \
+#define CHK_ERR_W(hrchk, strOut)\
     case hrchk: wcscpy_s(desc, count, L##strOut);
-#define CHK_ERRA_A(hrchk)                                                                                              \
+#define CHK_ERRA_A(hrchk)\
     case hrchk: strcpy_s(desc, count, #hrchk);
-#define CHK_ERR_A(hrchk, strOut)                                                                                       \
+#define CHK_ERR_A(hrchk, strOut)\
     case hrchk: strcpy_s(desc, count, strOut);
 
 //--------------------------------------------------------------------------------------
@@ -151,7 +151,8 @@ void WINAPI DXGetErrorDescriptionW(_In_ HRESULT hr, _Out_cap_(count) WCHAR* desc
 #undef CHK_ERR
 }
 
-void WINAPI DXGetErrorDescriptionA(_In_ HRESULT hr, _Out_cap_(count) CHAR* desc, _In_ size_t count){
+void WINAPI DXGetErrorDescriptionA(_In_ HRESULT hr, _Out_cap_(count) CHAR* desc, _In_ size_t count)
+{
 #define CHK_ERRA CHK_ERRA_A
 #define CHK_ERR CHK_ERR_A
 #define DX_FORMATMESSAGE FormatMessageA
@@ -162,8 +163,9 @@ void WINAPI DXGetErrorDescriptionA(_In_ HRESULT hr, _Out_cap_(count) CHAR* desc,
 }
 
 //-----------------------------------------------------------------------------
-HRESULT WINAPI DXTraceW(_In_z_ const WCHAR* strFile, _In_ DWORD dwLine, _In_ HRESULT hr, _In_opt_ const WCHAR* strMsg,
-    _In_ bool bPopMsgBox){
+HRESULT WINAPI DXTraceW(_In_z_ const WCHAR* strFile, _In_ DWORD dwLine, _In_ HRESULT hr,
+    _In_opt_ const WCHAR* strMsg, _In_ bool bPopMsgBox)
+{
 #define DX_STR_WRAP(...) L##__VA_ARGS__
 #define DX_CHAR WCHAR
 #define DX_SPRINTF_S swprintf_s
@@ -185,8 +187,8 @@ HRESULT WINAPI DXTraceW(_In_z_ const WCHAR* strFile, _In_ DWORD dwLine, _In_ HRE
 #undef DX_GETERRORSTRING
 }
 
-HRESULT WINAPI DXTraceA(
-    _In_z_ const CHAR* strFile, _In_ DWORD dwLine, _In_ HRESULT hr, _In_opt_ const CHAR* strMsg, _In_ bool bPopMsgBox)
+HRESULT WINAPI DXTraceA(_In_z_ const CHAR* strFile, _In_ DWORD dwLine, _In_ HRESULT hr,
+    _In_opt_ const CHAR* strMsg, _In_ bool bPopMsgBox)
 {
 #define DX_STR_WRAP(s) s
 #define DX_CHAR CHAR

@@ -23,7 +23,7 @@ CSE_ALifeItemWeapon* CSE_ALifeAnomalousZone::tpfGetBestWeapon(ALife::EHitType& t
 {
     m_tpCurrentBestWeapon = 0;
     m_tTimeID = ai().alife().time_manager().game_time();
-    fHitPower = 1.0f;  // m_maxPower;
+    fHitPower = 1.0f; // m_maxPower;
     tHitType = m_tHitType;
     return (m_tpCurrentBestWeapon);
 }
@@ -34,11 +34,7 @@ ALife::EMeetActionType CSE_ALifeAnomalousZone::tfGetActionType(
     return (ALife::eMeetActionTypeAttack);
 }
 
-bool CSE_ALifeAnomalousZone::bfActive()
-{
-    return (false /*fis_zero(m_maxPower,EPS_L)*/ || !interactive());
-}
-
+bool CSE_ALifeAnomalousZone::bfActive() { return (false /*fis_zero(m_maxPower,EPS_L)*/ || !interactive()); }
 CSE_ALifeDynamicObject* CSE_ALifeAnomalousZone::tpfGetBestDetector()
 {
     VERIFY2(false, "This function shouldn't be called");
@@ -135,7 +131,4 @@ void CSE_ALifeAnomalousZone::on_spawn()
     //	spawn_artefacts			();
 }
 
-bool CSE_ALifeAnomalousZone::keep_saved_data_anyway() const
-{
-    return (true);
-}
+bool CSE_ALifeAnomalousZone::keep_saved_data_anyway() const { return (true); }

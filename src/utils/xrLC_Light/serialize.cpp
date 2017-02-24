@@ -11,7 +11,8 @@ void write(IWriter& w, const b_texture& b)
 
     bool b_surface = !!b.pSurface;
     w.w_u8(u8(b_surface));
-    if (b_surface) {
+    if (b_surface)
+    {
         u32 size = sizeof(u32) * b.dwWidth * b.dwHeight;
         w.w(b.pSurface, size);
     }
@@ -25,7 +26,8 @@ void read(INetReader& r, b_texture& b)
 
     b.pSurface = NULL;
     bool b_surface = !!r.r_u8();
-    if (b_surface) {
+    if (b_surface)
+    {
         u32 size = sizeof(u32) * b.dwWidth * b.dwHeight;
         b.pSurface = (u32*)xr_malloc(size);
         r.r(b.pSurface, size);

@@ -17,19 +17,19 @@
         property_collection_converter::typeid)] public ref class property_collection_getter
     : public property_collection_base
 {
-  public:
+public:
     typedef property_holder::collection_getter_type collection_getter_type;
 
-  public:
+public:
     property_collection_getter(collection_getter_type const& getter);
     virtual ~property_collection_getter();
     !property_collection_getter();
 
-  protected:
+protected:
     virtual collection_type* collection() override;
 
-  private:
+private:
     collection_getter_type* m_getter;
-};  // ref class property_collection
+}; // ref class property_collection
 
-#endif  // ifndef PROPERTY_COLLECTION_GETTER_HPP_INCLUDED
+#endif // ifndef PROPERTY_COLLECTION_GETTER_HPP_INCLUDED

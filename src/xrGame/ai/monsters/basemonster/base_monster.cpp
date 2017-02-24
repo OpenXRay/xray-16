@@ -136,15 +136,17 @@ CBaseMonster::~CBaseMonster()
 
 void CBaseMonster::update_pos_by_grouping_behaviour()
 {
-    if (!m_grouping_behaviour) {
+    if (!m_grouping_behaviour)
+    {
         return;
     }
 
     Fvector acc = get_steer_manager()->calc_acceleration();
 
-    acc.y = 0;  // remove vertical component
+    acc.y = 0; // remove vertical component
 
-    if (!m_last_grouping_behaviour_update_tick) {
+    if (!m_last_grouping_behaviour_update_tick)
+    {
         m_last_grouping_behaviour_update_tick = Device.dwTimeGlobal;
     }
 
@@ -156,7 +158,8 @@ void CBaseMonster::update_pos_by_grouping_behaviour()
     Fvector offs = acc * dt;
     const float offs_mag = magnitude(offs);
 
-    if (offs_mag < 0.000001f) {
+    if (offs_mag < 0.000001f)
+    {
         // too little force applied, ignore it and save cpu
         return;
     }
@@ -164,7 +167,8 @@ void CBaseMonster::update_pos_by_grouping_behaviour()
     // this control maximum offset
     // higher values allow stronger forces, but can lead to jingling
     const float max_offs = 0.005f;
-    if (offs_mag > max_offs) {
+    if (offs_mag > max_offs)
+    {
         offs.set_length(0.005f);
     }
 
@@ -173,7 +177,8 @@ void CBaseMonster::update_pos_by_grouping_behaviour()
     const u32 old_vertex = ai_location().level_vertex_id();
     u32 new_vertex = ai().level_graph().check_position_in_direction(old_vertex, old_pos, new_pos);
 
-    if (!ai().level_graph().valid_vertex_id(new_vertex)) {
+    if (!ai().level_graph().valid_vertex_id(new_vertex))
+    {
         // aiming out of ai-map, ignore
         return;
     }
@@ -181,14 +186,16 @@ void CBaseMonster::update_pos_by_grouping_behaviour()
     // use physics simulation to slide along obstacles
     character_physics_support()->movement()->VirtualMoveTo(new_pos, new_pos);
 
-    if (!ai().level_graph().valid_vertex_position(new_pos)) {
+    if (!ai().level_graph().valid_vertex_position(new_pos))
+    {
         // aiming out of ai-map, ignore
         return;
     }
 
     new_vertex = ai().level_graph().check_position_in_direction(old_vertex, old_pos, new_pos);
 
-    if (!ai().level_graph().valid_vertex_id(new_vertex)) {
+    if (!ai().level_graph().valid_vertex_id(new_vertex))
+    {
         return;
     }
 
@@ -205,7 +212,8 @@ bool accessible_epsilon(CBaseMonster* const object, Fvector const pos, float eps
 
     for (u32 i = 0; i < sizeof(offsets) / sizeof(offsets[0]); ++i)
     {
-        if (object->movement().restrictions().accessible(pos + offsets[i])) return true;
+        if (object->movement().restrictions().accessible(pos + offsets[i]))
+            return true;
     }
 
     return false;
@@ -214,7 +222,8 @@ bool accessible_epsilon(CBaseMonster* const object, Fvector const pos, float eps
 static bool enemy_inaccessible(CBaseMonster* const object)
 {
     CEntityAlive const* enemy = object->EnemyMan.get_enemy();
-    if (!enemy) return false;
+    if (!enemy)
+        return false;
 
     Fvector const enemy_pos = enemy->Position();
     Fvector const enemy_vert_pos = ai().level_graph().vertex_position(enemy->ai_location().level_vertex_id());
@@ -222,31 +231,41 @@ static bool enemy_inaccessible(CBaseMonster* const object)
     float const xz_dist_to_vertex = enemy_vert_pos.distance_to_xz(enemy_pos);
     float const y_dist_to_vertex = _abs(enemy_vert_pos.y - enemy_pos.y);
 
-    if (xz_dist_to_vertex > 0.5f && y_dist_to_vertex > 3.f) return true;
+    if (xz_dist_to_vertex > 0.5f && y_dist_to_vertex > 3.f)
+        return true;
 
-    if (xz_dist_to_vertex > 1.2f) return true;
+    if (xz_dist_to_vertex > 1.2f)
+        return true;
 
-    if (!object->Home->at_home(enemy_pos)) return true;
+    if (!object->Home->at_home(enemy_pos))
+        return true;
 
-    if (!accessible_epsilon(object, enemy_pos, 1.5f)) return true;
+    if (!accessible_epsilon(object, enemy_pos, 1.5f))
+        return true;
 
-    if (!ai().level_graph().valid_vertex_position(enemy_pos)) return true;
+    if (!ai().level_graph().valid_vertex_position(enemy_pos))
+        return true;
 
-    if (!ai().level_graph().valid_vertex_id(enemy->ai_location().level_vertex_id())) return true;
+    if (!ai().level_graph().valid_vertex_id(enemy->ai_location().level_vertex_id()))
+        return true;
 
     return false;
 }
 
 bool CBaseMonster::enemy_accessible()
 {
-    if (!m_first_tick_enemy_inaccessible) return true;
+    if (!m_first_tick_enemy_inaccessible)
+        return true;
 
-    if (EnemyMan.get_enemy()) {
+    if (EnemyMan.get_enemy())
+    {
         u32 const enemy_vertex = EnemyMan.get_enemy()->ai_location().level_vertex_id();
-        if (ai_location().level_vertex_id() == enemy_vertex) return false;
+        if (ai_location().level_vertex_id() == enemy_vertex)
+            return false;
     }
 
-    if (Device.dwTimeGlobal < m_first_tick_enemy_inaccessible + 3000) return true;
+    if (Device.dwTimeGlobal < m_first_tick_enemy_inaccessible + 3000)
+        return true;
 
     return false;
 }
@@ -258,26 +277,32 @@ bool CBaseMonster::at_home()
 
 void CBaseMonster::update_enemy_accessible_and_at_home_info()
 {
-    if (!Home->at_home()) {
-        if (!m_first_tick_object_not_at_home) m_first_tick_object_not_at_home = Device.dwTimeGlobal;
+    if (!Home->at_home())
+    {
+        if (!m_first_tick_object_not_at_home)
+            m_first_tick_object_not_at_home = Device.dwTimeGlobal;
     }
     else
         m_first_tick_object_not_at_home = 0;
 
-    if (!EnemyMan.get_enemy()) {
+    if (!EnemyMan.get_enemy())
+    {
         m_first_tick_enemy_inaccessible = 0;
         m_last_tick_enemy_inaccessible = 0;
         return;
     }
 
-    if (::enemy_inaccessible(this)) {
-        if (!m_first_tick_enemy_inaccessible) m_first_tick_enemy_inaccessible = Device.dwTimeGlobal;
+    if (::enemy_inaccessible(this))
+    {
+        if (!m_first_tick_enemy_inaccessible)
+            m_first_tick_enemy_inaccessible = Device.dwTimeGlobal;
 
         m_last_tick_enemy_inaccessible = Device.dwTimeGlobal;
     }
     else
     {
-        if (m_last_tick_enemy_inaccessible && Device.dwTimeGlobal - m_last_tick_enemy_inaccessible > 3000) {
+        if (m_last_tick_enemy_inaccessible && Device.dwTimeGlobal - m_last_tick_enemy_inaccessible > 3000)
+        {
             m_first_tick_enemy_inaccessible = 0;
             m_last_tick_enemy_inaccessible = 0;
         }
@@ -287,22 +312,26 @@ void CBaseMonster::update_enemy_accessible_and_at_home_info()
 void CBaseMonster::UpdateCL()
 {
 #ifdef DEBUG
-    if (Level().CurrentEntity() == this) {
+    if (Level().CurrentEntity() == this)
+    {
         DBG().get_text_tree().clear();
         add_debug_info(DBG().get_text_tree());
     }
-    if (is_paused()) {
+    if (is_paused())
+    {
         return;
     }
 #endif
 
-    if (EatedCorpse && !CorpseMemory.is_valid_corpse(EatedCorpse)) {
+    if (EatedCorpse && !CorpseMemory.is_valid_corpse(EatedCorpse))
+    {
         EatedCorpse = NULL;
     }
 
     inherited::UpdateCL();
 
-    if (g_Alive()) {
+    if (g_Alive())
+    {
         update_enemy_accessible_and_at_home_info();
         CStepManager::update(false);
 
@@ -317,7 +346,8 @@ void CBaseMonster::UpdateCL()
 void CBaseMonster::shedule_Update(u32 dt)
 {
 #ifdef DEBUG
-    if (is_paused()) {
+    if (is_paused())
+    {
         dbg_update_cl = Device.dwFrame;
         return;
     }
@@ -327,7 +357,8 @@ void CBaseMonster::shedule_Update(u32 dt)
 
     update_eyes_visibility();
 
-    if (m_anti_aim) {
+    if (m_anti_aim)
+    {
         m_anti_aim->update_schedule();
     }
 
@@ -355,14 +386,16 @@ void CBaseMonster::shedule_Update(u32 dt)
 
 void CBaseMonster::Die(IGameObject* who)
 {
-    if (StateMan) StateMan->critical_finalize();
+    if (StateMan)
+        StateMan->critical_finalize();
 
     m_psy_aura.on_monster_death();
     m_radiation_aura.on_monster_death();
     m_fire_aura.on_monster_death();
     m_base_aura.on_monster_death();
 
-    if (m_anti_aim) {
+    if (m_anti_aim)
+    {
         m_anti_aim->on_monster_death();
     }
 
@@ -375,29 +408,37 @@ void CBaseMonster::Die(IGameObject* who)
 
     monster_squad().remove_member((u8)g_Team(), (u8)g_Squad(), (u8)g_Group(), this);
 
-    if (m_grouping_behaviour) {
+    if (m_grouping_behaviour)
+    {
         m_grouping_behaviour->set_squad(NULL);
     }
 
-    if (m_controlled) m_controlled->on_die();
+    if (m_controlled)
+        m_controlled->on_die();
 }
 
 void CBaseMonster::Hit(SHit* pHDS)
 {
-    if (ignore_collision_hit && (pHDS->hit_type == ALife::eHitTypeStrike)) return;
+    if (ignore_collision_hit && (pHDS->hit_type == ALife::eHitTypeStrike))
+        return;
 
-    if (invulnerable()) return;
+    if (invulnerable())
+        return;
 
     if (g_Alive())
-        if (!critically_wounded()) update_critical_wounded(pHDS->boneID, pHDS->power);
+        if (!critically_wounded())
+            update_critical_wounded(pHDS->boneID, pHDS->power);
 
-    if (pHDS->hit_type == ALife::eHitTypeFireWound) {
+    if (pHDS->hit_type == ALife::eHitTypeFireWound)
+    {
         float& hit_power = pHDS->power;
         float ap = pHDS->armor_piercing;
         // пуля пробила шкуру
-        if (!fis_zero(m_fSkinArmor, EPS) && ap > m_fSkinArmor) {
+        if (!fis_zero(m_fSkinArmor, EPS) && ap > m_fSkinArmor)
+        {
             float d_hit_power = (ap - m_fSkinArmor) / ap;
-            if (d_hit_power < m_fHitFracMonster) d_hit_power = m_fHitFracMonster;
+            if (d_hit_power < m_fHitFracMonster)
+                d_hit_power = m_fHitFracMonster;
 
             hit_power *= d_hit_power;
             VERIFY(hit_power >= 0.0f);
@@ -406,26 +447,19 @@ void CBaseMonster::Hit(SHit* pHDS)
         else
         {
             hit_power *= m_fHitFracMonster;
-            pHDS->add_wound = false;  //раны нет
+            pHDS->add_wound = false; //раны нет
         }
     }
     inherited::Hit(pHDS);
 }
 
-void CBaseMonster::PHHit(SHit& H)
-{
-    m_pPhysics_support->in_Hit(H);
-}
-
-CPHDestroyable* CBaseMonster::ph_destroyable()
-{
-    return smart_cast<CPHDestroyable*>(character_physics_support());
-}
-
+void CBaseMonster::PHHit(SHit& H) { m_pPhysics_support->in_Hit(H); }
+CPHDestroyable* CBaseMonster::ph_destroyable() { return smart_cast<CPHDestroyable*>(character_physics_support()); }
 bool CBaseMonster::useful(const CItemManager* manager, const CGameObject* object) const
 {
     const Fvector& object_pos = object->Position();
-    if (!movement().restrictions().accessible(object_pos)) {
+    if (!movement().restrictions().accessible(object_pos))
+    {
         return false;
     }
 
@@ -433,54 +467,58 @@ bool CBaseMonster::useful(const CItemManager* manager, const CGameObject* object
     // sometimes accessible(object->Position())) returns true
     // but accessible(ai_location().level_vertex_id()) crashes
     // because level_vertex_id is not valid, so this code syncs vertex_id with position
-    if (!ai().level_graph().valid_vertex_id(object->ai_location().level_vertex_id())) {
+    if (!ai().level_graph().valid_vertex_id(object->ai_location().level_vertex_id()))
+    {
         u32 vertex_id = ai().level_graph().vertex_id(object_pos);
-        if (!ai().level_graph().valid_vertex_id(vertex_id)) {
+        if (!ai().level_graph().valid_vertex_id(vertex_id))
+        {
             return false;
         }
         object->ai_location().level_vertex(vertex_id);
     }
 
-    if (!movement().restrictions().accessible(object->ai_location().level_vertex_id())) {
+    if (!movement().restrictions().accessible(object->ai_location().level_vertex_id()))
+    {
         return false;
     }
 
     const CEntityAlive* pCorpse = smart_cast<const CEntityAlive*>(object);
-    if (!pCorpse) {
+    if (!pCorpse)
+    {
         return false;
     }
 
-    if (!pCorpse->g_Alive()) {
+    if (!pCorpse->g_Alive())
+    {
         return true;
     }
 
     return false;
 }
 
-float CBaseMonster::evaluate(const CItemManager* manager, const CGameObject* object) const
-{
-    return (0.f);
-}
-
+float CBaseMonster::evaluate(const CItemManager* manager, const CGameObject* object) const { return (0.f); }
 //////////////////////////////////////////////////////////////////////////
 
 void CBaseMonster::ChangeTeam(int team, int squad, int group)
 {
-    if ((team == g_Team()) && (squad == g_Squad()) && (group == g_Group())) return;
+    if ((team == g_Team()) && (squad == g_Squad()) && (group == g_Group()))
+        return;
 
 #ifdef DEBUG
-    if (!g_Alive()) {
+    if (!g_Alive())
+    {
         ai().script_engine().print_stack();
         VERIFY2(g_Alive(), "you are trying to change team of a dead entity");
     }
-#endif  // DEBUG
+#endif // DEBUG
 
     // remove from current team
     monster_squad().remove_member((u8)g_Team(), (u8)g_Squad(), (u8)g_Group(), this);
     inherited::ChangeTeam(team, squad, group);
     monster_squad().register_member((u8)g_Team(), (u8)g_Squad(), (u8)g_Group(), this);
 
-    if (m_grouping_behaviour) {
+    if (m_grouping_behaviour)
+    {
         m_grouping_behaviour->set_squad(monster_squad().get_squad(this));
     }
 }
@@ -492,7 +530,8 @@ void CBaseMonster::SetTurnAnimation(bool turn_left)
 
 void CBaseMonster::set_state_sound(u32 type, bool once)
 {
-    if (once) {
+    if (once)
+    {
         sound().play(type);
     }
     else
@@ -518,7 +557,8 @@ void CBaseMonster::set_state_sound(u32 type, bool once)
             case MonsterSound::eMonsterSoundIdle:
                 // check distance to actor
 
-                if (Actor()->Position().distance_to(Position()) > db().m_fDistantIdleSndRange) {
+                if (Actor()->Position().distance_to(Position()) > db().m_fDistantIdleSndRange)
+                {
                     delay = u32(float(db().m_dwDistantIdleSndDelay) * _sqrt(float(objects_count)));
                     type = MonsterSound::eMonsterSoundIdleDistant;
                 }
@@ -544,11 +584,7 @@ void CBaseMonster::set_state_sound(u32 type, bool once)
     m_prev_sound_type = type;
 }
 
-bool CBaseMonster::feel_touch_on_contact(IGameObject* O)
-{
-    return (inherited::feel_touch_on_contact(O));
-}
-
+bool CBaseMonster::feel_touch_on_contact(IGameObject* O) { return (inherited::feel_touch_on_contact(O)); }
 bool CBaseMonster::feel_touch_contact(IGameObject* O)
 {
     m_anomaly_detector->on_contact(O);
@@ -574,12 +610,14 @@ void CBaseMonster::TranslateActionToPathParams()
     // case ACT_JUMP:
     case ACT_LOOK_AROUND: bEnablePath = false; break;
     case ACT_ATTACK:
-        if (!m_attack_on_move_params.enabled) {
+        if (!m_attack_on_move_params.enabled)
+        {
             bEnablePath = false;
         }
         else
         {
-            if (m_bDamaged) {
+            if (m_bDamaged)
+            {
                 vel_mask = MonsterMovement::eVelocityParamsRunDamaged;
                 des_mask = MonsterMovement::eVelocityParameterRunDamaged;
             }
@@ -601,7 +639,8 @@ void CBaseMonster::TranslateActionToPathParams()
         des_mask = MonsterMovement::eVelocityParameterWalkSmelling;
         break;
     case ACT_WALK_FWD:
-        if (m_bDamaged) {
+        if (m_bDamaged)
+        {
             vel_mask = MonsterMovement::eVelocityParamsWalkDamaged;
             des_mask = MonsterMovement::eVelocityParameterWalkDamaged;
         }
@@ -613,7 +652,8 @@ void CBaseMonster::TranslateActionToPathParams()
         break;
     case ACT_WALK_BKWD: break;
     case ACT_RUN:
-        if (m_bDamaged) {
+        if (m_bDamaged)
+        {
             vel_mask = MonsterMovement::eVelocityParamsRunDamaged;
             des_mask = MonsterMovement::eVelocityParameterRunDamaged;
         }
@@ -636,14 +676,17 @@ void CBaseMonster::TranslateActionToPathParams()
         break;
     }
 
-    if (state_invisible) {
+    if (state_invisible)
+    {
         vel_mask = MonsterMovement::eVelocityParamsInvisible;
         des_mask = MonsterMovement::eVelocityParameterInvisible;
     }
 
-    if (m_force_real_speed) vel_mask = des_mask;
+    if (m_force_real_speed)
+        vel_mask = des_mask;
 
-    if (bEnablePath) {
+    if (bEnablePath)
+    {
         path().set_velocity_mask(vel_mask);
         path().set_desirable_mask(des_mask);
         path().enable_path();
@@ -712,7 +755,8 @@ void CBaseMonster::net_Relcase(IGameObject* O)
     com_man().remove_links(O);
 
     // TODO: do not clear, remove only object O
-    if (g_Alive()) {
+    if (g_Alive())
+    {
         EnemyMemory.remove_links(O);
         SoundMemory.remove_links(O);
         HitMemory.remove_hit_info(O);
@@ -736,11 +780,7 @@ void CBaseMonster::create_base_controls()
     m_dir_base = new CControlDirectionBase();
 }
 
-void CBaseMonster::set_action(EAction action)
-{
-    anim().m_tAction = action;
-}
-
+void CBaseMonster::set_action(EAction action) { anim().m_tAction = action; }
 CParticlesObject* CBaseMonster::PlayParticles(
     const shared_str& name, const Fvector& position, const Fvector& dir, BOOL auto_remove, BOOL xformed)
 {
@@ -764,7 +804,8 @@ void CBaseMonster::on_restrictions_change()
 {
     inherited::on_restrictions_change();
 
-    if (StateMan) StateMan->reinit();
+    if (StateMan)
+        StateMan->reinit();
 }
 
 void CBaseMonster::load_effector(LPCSTR section, LPCSTR line, SAttackEffector& effector)
@@ -798,18 +839,22 @@ void CBaseMonster::load_effector(LPCSTR section, LPCSTR line, SAttackEffector& e
 
 bool CBaseMonster::check_start_conditions(ControlCom::EControlType type)
 {
-    if (!StateMan->check_control_start_conditions(type)) {
+    if (!StateMan->check_control_start_conditions(type))
+    {
         return false;
     }
 
-    if (type == ControlCom::eControlRotationJump) {
+    if (type == ControlCom::eControlRotationJump)
+    {
         EMonsterState state = StateMan->get_state_type();
 
-        if (!is_state(state, eStateAttack_Run) && !is_state(state, eStateAttack_RunAttack)) {
+        if (!is_state(state, eStateAttack_Run) && !is_state(state, eStateAttack_RunAttack))
+        {
             return false;
         }
     }
-    if (type == ControlCom::eControlMeleeJump) {
+    if (type == ControlCom::eControlMeleeJump)
+    {
         EMonsterState state = StateMan->get_state_type();
 
         if (!is_state(state, eStateAttack_Run) && !is_state(state, eStateAttack_Melee) &&
@@ -833,9 +878,11 @@ void CBaseMonster::OnEvent(NET_Packet& P, u16 type)
         P.r_u16(id);
         IGameObject* O = Level().Objects.net_Find(id);
 
-        if (O) {
+        if (O)
+        {
             CEntity* pEntity = smart_cast<CEntity*>(O);
-            if (pEntity) on_kill_enemy(pEntity);
+            if (pEntity)
+                on_kill_enemy(pEntity);
         }
 
         break;
@@ -846,12 +893,15 @@ void CBaseMonster::OnEvent(NET_Packet& P, u16 type)
 bool CBaseMonster::check_eated_corpse_draggable()
 {
     const CEntity* p_corpse = EatedCorpse;
-    if (!p_corpse || !p_corpse->Visual()) {
+    if (!p_corpse || !p_corpse->Visual())
+    {
         return false;
     }
 
-    if (IKinematics* K = p_corpse->Visual()->dcast_PKinematics()) {
-        if (CInifile* ini = K->LL_UserData()) {
+    if (IKinematics* K = p_corpse->Visual()->dcast_PKinematics())
+    {
+        if (CInifile* ini = K->LL_UserData())
+        {
             return ini->section_exist("capture_used_bones") && ini->line_exist("capture_used_bones", "bones");
         }
     }
@@ -863,11 +913,7 @@ bool CBaseMonster::check_eated_corpse_draggable()
 // CBaseMonster's  Atack on Move
 //-------------------------------------------------------------------
 
-bool CBaseMonster::can_attack_on_move()
-{
-    return override_if_debug("aom_enabled", m_attack_on_move_params.enabled);
-}
-
+bool CBaseMonster::can_attack_on_move() { return override_if_debug("aom_enabled", m_attack_on_move_params.enabled); }
 float CBaseMonster::get_attack_on_move_max_go_close_time()
 {
     return override_if_debug("aom_max_go_close_time", m_attack_on_move_params.max_go_close_time);
@@ -905,21 +951,9 @@ float CBaseMonster::get_attack_on_move_prepare_time()
     return override_if_debug("aom_prepare_time", m_attack_on_move_params.prepare_time);
 }
 
-float CBaseMonster::get_psy_influence()
-{
-    return m_psy_aura.calculate();
-}
-
-float CBaseMonster::get_radiation_influence()
-{
-    return m_radiation_aura.calculate();
-}
-
-float CBaseMonster::get_fire_influence()
-{
-    return m_fire_aura.calculate();
-}
-
+float CBaseMonster::get_psy_influence() { return m_psy_aura.calculate(); }
+float CBaseMonster::get_radiation_influence() { return m_radiation_aura.calculate(); }
+float CBaseMonster::get_fire_influence() { return m_fire_aura.calculate(); }
 void CBaseMonster::play_detector_sound()
 {
     m_psy_aura.play_detector_sound();
@@ -927,19 +961,17 @@ void CBaseMonster::play_detector_sound()
     m_fire_aura.play_detector_sound();
 }
 
-bool CBaseMonster::is_jumping()
-{
-    return m_com_manager.is_jumping();
-}
-
+bool CBaseMonster::is_jumping() { return m_com_manager.is_jumping(); }
 void CBaseMonster::update_eyes_visibility()
 {
-    if (!m_left_eye_bone_name) {
+    if (!m_left_eye_bone_name)
+    {
         return;
     }
 
     IKinematics* const skeleton = smart_cast<IKinematics*>(Visual());
-    if (!skeleton) {
+    if (!skeleton)
+    {
         return;
     }
 
@@ -954,7 +986,8 @@ void CBaseMonster::update_eyes_visibility()
     skeleton->LL_SetBoneVisible(left_eye_bone_id, eyes_visible, true);
     skeleton->LL_SetBoneVisible(right_eye_bone_id, eyes_visible, true);
 
-    if (!was_visible && eyes_visible) {
+    if (!was_visible && eyes_visible)
+    {
         skeleton->CalculateBones_Invalidate();
         skeleton->CalculateBones();
     }
@@ -1002,4 +1035,4 @@ bool CBaseMonster::is_paused() const
     return ai_dbg::get_var(id_paused_var_name, monster_result) ? monster_result : monsters_result;
 }
 
-#endif  // DEBUG
+#endif // DEBUG

@@ -97,11 +97,7 @@ struct dummy
     int ref;
 };
 
-static bool ignore_save_incompatibility()
-{
-    return (!!strstr(Core.Params, "-ignore_save_incompatibility"));
-}
-
+static bool ignore_save_incompatibility() { return (!!strstr(Core.Params, "-ignore_save_incompatibility")); }
 void CALifeSpawnRegistry::load(IReader& file_stream, xrGUID* save_guid)
 {
     IReader* chunk;
@@ -227,7 +223,8 @@ void CALifeSpawnRegistry::build_story_spawns()
     {
         CSE_ALifeObject* object = smart_cast<CSE_ALifeObject*>(&(*I).second->data()->object());
         VERIFY(object);
-        if (object->m_spawn_story_id == INVALID_SPAWN_STORY_ID) continue;
+        if (object->m_spawn_story_id == INVALID_SPAWN_STORY_ID)
+            continue;
 
         m_spawn_story_ids.insert(std::make_pair(object->m_spawn_story_id, (*I).first));
     }

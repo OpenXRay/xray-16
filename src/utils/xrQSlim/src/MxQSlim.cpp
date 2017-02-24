@@ -25,8 +25,10 @@ MxQSlim::MxQSlim(MxStdModel* _m) : MxStdSlim(_m), quadrics(_m->vert_count())
 void MxQSlim::initialize()
 {
     collect_quadrics();
-    if (boundary_weight > 0.0) constrain_boundaries();
-    if (object_transform) transform_quadrics(*object_transform);
+    if (boundary_weight > 0.0)
+        constrain_boundaries();
+    if (object_transform)
+        transform_quadrics(*object_transform);
 
     is_initialized = true;
 }
@@ -93,7 +95,8 @@ void MxQSlim::discontinuity_constraint(MxVertexID i, MxVertexID j, MxFaceID f)
     MxQuadric3 Q(n2, -(n2 * org));
     Q *= boundary_weight;
 
-    if (weighting_policy == MX_WEIGHT_AREA || weighting_policy == MX_WEIGHT_AREA_AVG) {
+    if (weighting_policy == MX_WEIGHT_AREA || weighting_policy == MX_WEIGHT_AREA_AVG)
+    {
         Q.set_area(norm2(e));
         Q *= Q.area();
     }
@@ -120,25 +123,19 @@ void MxQSlim::constrain_boundaries()
 
         for (unsigned int j = 0; j < (unsigned int)star.length(); j++)
         {
-            if (i < star(j)) {
+            if (i < star(j))
+            {
                 faces.reset();
                 m->collect_edge_neighbors(i, star(j), faces);
-                if (faces.length() == 1) discontinuity_constraint(i, star(j), faces);
+                if (faces.length() == 1)
+                    discontinuity_constraint(i, star(j), faces);
             }
         }
     }
 }
 
-void MxQSlim::constraint_manual(MxVertexID v0, MxVertexID v1, MxFaceID f)
-{
-    discontinuity_constraint(v0, v1, f);
-}
-
-MxEdgeQSlim::MxEdgeQSlim(MxStdModel* _m) : MxQSlim(_m), edge_links(_m->vert_count())
-{
-    contraction_callback = NULL;
-}
-
+void MxQSlim::constraint_manual(MxVertexID v0, MxVertexID v1, MxFaceID f) { discontinuity_constraint(v0, v1, f); }
+MxEdgeQSlim::MxEdgeQSlim(MxStdModel* _m) : MxQSlim(_m), edge_links(_m->vert_count()) { contraction_callback = NULL; }
 MxEdgeQSlim::~MxEdgeQSlim()
 {
     // Delete everything remaining in the heap
@@ -162,7 +159,8 @@ double MxEdgeQSlim::check_local_compactness(unsigned int v1, unsigned int /*v2*/
     double c_min = 1.0;
 
     for (unsigned int i = 0; i < (unsigned int)N1.length(); i++)
-        if (m->face_mark(N1[i]) == 1) {
+        if (m->face_mark(N1[i]) == 1)
+        {
             const MxFace& f = m->face(N1[i]);
             Vec3 f_after[3];
             for (unsigned int j = 0; j < 3; j++)
@@ -170,7 +168,8 @@ double MxEdgeQSlim::check_local_compactness(unsigned int v1, unsigned int /*v2*/
 
             double c = triangle_compactness(f_after[0], f_after[1], f_after[2]);
 
-            if (c < c_min) c_min = c;
+            if (c < c_min)
+                c_min = c;
         }
 
     return c_min;
@@ -182,7 +181,8 @@ double MxEdgeQSlim::check_local_inversion(unsigned int v1, unsigned int /*v2*/, 
     const MxFaceList& N1 = m->neighbors(v1);
 
     for (unsigned int i = 0; i < (unsigned int)N1.length(); i++)
-        if (m->face_mark(N1[i]) == 1) {
+        if (m->face_mark(N1[i]) == 1)
+        {
             const MxFace& f = m->face(N1[i]);
             Vec3 n_before;
             m->compute_face_normal(N1[i], n_before);
@@ -194,7 +194,8 @@ double MxEdgeQSlim::check_local_inversion(unsigned int v1, unsigned int /*v2*/, 
             Vec3 n_after = triangle_normal(f_after[0], f_after[1], f_after[2]);
             double delta = n_before * n_after;
 
-            if (delta < Nmin) Nmin = delta;
+            if (delta < Nmin)
+                Nmin = delta;
         }
 
     return Nmin;
@@ -209,23 +210,25 @@ unsigned int MxEdgeQSlim::check_local_validity(unsigned int v1, unsigned int /*v
 
     for (i = 0; i < (unsigned int)N1.length(); i++)
     {
-        if (m->face_mark(N1[i]) == 1) {
+        if (m->face_mark(N1[i]) == 1)
+        {
             MxFace& f = m->face(N1[i]);
             unsigned int k = f.find_vertex(v1);
             unsigned int x = f[(k + 1) % 3];
             unsigned int y = f[(k + 2) % 3];
 
             float d_yx[3], d_vx[3], d_vnew[3], f_n[3], n[3];
-            mxv_sub(d_yx, m->vertex(y), m->vertex(x), 3);   // d_yx = y-x
-            mxv_sub(d_vx, m->vertex(v1), m->vertex(x), 3);  // d_vx = v-x
-            mxv_sub(d_vnew, vnew, m->vertex(x), 3);         // d_vnew = vnew-x
+            mxv_sub(d_yx, m->vertex(y), m->vertex(x), 3); // d_yx = y-x
+            mxv_sub(d_vx, m->vertex(v1), m->vertex(x), 3); // d_vx = v-x
+            mxv_sub(d_vnew, vnew, m->vertex(x), 3); // d_vnew = vnew-x
 
             mxv_cross3(f_n, d_yx, d_vx);
-            mxv_cross3(n, f_n, d_yx);  // n = ((y-x)^(v-x))^(y-x)
+            mxv_cross3(n, f_n, d_yx); // n = ((y-x)^(v-x))^(y-x)
             mxv_unitize(n, 3);
 
             // assert( mxv_dot(d_vx, n, 3) > -FEQ_EPS );
-            if (mxv_dot(d_vnew, n, 3) < local_validity_threshold * mxv_dot(d_vx, n, 3)) nfailed++;
+            if (mxv_dot(d_vnew, n, 3) < local_validity_threshold * mxv_dot(d_vx, n, 3))
+                nfailed++;
         }
     }
 
@@ -242,10 +245,12 @@ unsigned int MxEdgeQSlim::check_local_degree(unsigned int v1, unsigned int v2, c
     // Compute the degree of the vertex after contraction
     //
     for (i = 0; i < (unsigned int)N1.length(); i++)
-        if (m->face_mark(N1[i]) == 1) degree++;
+        if (m->face_mark(N1[i]) == 1)
+            degree++;
 
     for (i = 0; i < (unsigned int)N2.length(); i++)
-        if (m->face_mark(N2[i]) == 1) degree++;
+        if (m->face_mark(N2[i]) == 1)
+            degree++;
 
     if (degree > vertex_degree_limit)
         return degree - vertex_degree_limit;
@@ -275,7 +280,8 @@ void MxEdgeQSlim::apply_mesh_penalties(MxQSlimEdge* info)
     // Check for excess over degree bounds.
     //
     unsigned int max_degree = _max(N1.length(), N2.length());
-    if (max_degree > vertex_degree_limit) bias += (max_degree - vertex_degree_limit) * meshing_penalty * 0.001;
+    if (max_degree > vertex_degree_limit)
+        bias += (max_degree - vertex_degree_limit) * meshing_penalty * 0.001;
 
 #if ALTERNATE_DEGREE_BIAS
     // ??BUG:  This code was supposed to be a slight improvement over
@@ -283,25 +289,29 @@ void MxEdgeQSlim::apply_mesh_penalties(MxQSlimEdge* info)
     //         Should check into why sometime.
     //
     unsigned int degree_excess = check_local_degree(info->v1, info->v2, info->vnew);
-    if (degree_excess) bias += degree_excess * meshing_penalty;
+    if (degree_excess)
+        bias += degree_excess * meshing_penalty;
 #endif
 
     // Local validity checks
     //
     unsigned int nfailed = check_local_validity(info->v1, info->v2, info->vnew);
     nfailed += check_local_validity(info->v2, info->v1, info->vnew);
-    if (nfailed) bias += nfailed * meshing_penalty;
+    if (nfailed)
+        bias += nfailed * meshing_penalty;
 
     static u32 a = 0;
     //	if (a)
     {
         double Nmin1 = check_local_inversion(info->v1, info->v2, info->vnew);
         double Nmin2 = check_local_inversion(info->v2, info->v1, info->vnew);
-        if (_min(Nmin1, Nmin2) < 0.0) bias += meshing_penalty;
+        if (_min(Nmin1, Nmin2) < 0.0)
+            bias += meshing_penalty;
     }
 
     float _scale = 1.f;
-    if (compactness_ratio > 0.0) {
+    if (compactness_ratio > 0.0)
+    {
         double c1_min = check_local_compactness(info->v1, info->v2, info->vnew);
         double c2_min = check_local_compactness(info->v2, info->v1, info->vnew);
         double c_min = _min(c1_min, c2_min);
@@ -316,7 +326,8 @@ void MxEdgeQSlim::apply_mesh_penalties(MxQSlimEdge* info)
         //  NOTE: The prior heuristic was
         //        if( ratio*cmin_before > cmin_after ) apply penalty;
         //
-        if (c_min < compactness_ratio) _scale += float((compactness_ratio - c_min) / compactness_ratio);
+        if (c_min < compactness_ratio)
+            _scale += float((compactness_ratio - c_min) / compactness_ratio);
 
         //		if( c_min < compactness_ratio )
         //			bias += (1-c_min);
@@ -325,7 +336,8 @@ void MxEdgeQSlim::apply_mesh_penalties(MxQSlimEdge* info)
 #if USE_OLD_INVERSION_CHECK
     double Nmin1 = check_local_inversion(info->v1, info->v2, info->vnew);
     double Nmin2 = check_local_inversion(info->v2, info->v1, info->vnew);
-    if (_min(Nmin1, Nmin2) < 0.0) bias += meshing_penalty;
+    if (_min(Nmin1, Nmin2) < 0.0)
+        bias += meshing_penalty;
 #endif
 
     info->heap_key(float((base_error - EDGE_BASE_ERROR) * _scale - bias));
@@ -342,7 +354,8 @@ void MxEdgeQSlim::compute_target_placement(MxQSlimEdge* info)
     Q += Qj;
     double e_min;
 
-    if (placement_policy == MX_PLACE_OPTIMAL && Q.optimize(&info->vnew[0], &info->vnew[1], &info->vnew[2])) {
+    if (placement_policy == MX_PLACE_OPTIMAL && Q.optimize(&info->vnew[0], &info->vnew[1], &info->vnew[2]))
+    {
         e_min = Q(info->vnew);
     }
     else
@@ -356,7 +369,8 @@ void MxEdgeQSlim::compute_target_placement(MxQSlimEdge* info)
         {
             double ei = Q(vi), ej = Q(vj);
 
-            if (ei < ej) {
+            if (ei < ej)
+            {
                 e_min = ei;
                 best = vi;
             }
@@ -366,11 +380,13 @@ void MxEdgeQSlim::compute_target_placement(MxQSlimEdge* info)
                 best = vj;
             }
 
-            if (placement_policy >= MX_PLACE_ENDORMID) {
+            if (placement_policy >= MX_PLACE_ENDORMID)
+            {
                 Vec3 mid = (vi + vj) / 2.0;
                 double e_mid = Q(mid);
 
-                if (e_mid < e_min) {
+                if (e_mid < e_min)
+                {
                     e_min = e_mid;
                     best = mid;
                 }
@@ -382,14 +398,16 @@ void MxEdgeQSlim::compute_target_placement(MxQSlimEdge* info)
         info->vnew[2] = (float)best[2];
     }
 
-    if (weighting_policy == MX_WEIGHT_AREA_AVG) e_min /= Q.area();
+    if (weighting_policy == MX_WEIGHT_AREA_AVG)
+        e_min /= Q.area();
 
     info->heap_key(float(-e_min));
 }
 
 void MxEdgeQSlim::finalize_edge_update(MxQSlimEdge* info)
 {
-    if (meshing_penalty > 1.0) apply_mesh_penalties(info);
+    if (meshing_penalty > 1.0)
+        apply_mesh_penalties(info);
 
     if (info->is_in_heap())
         heap.update(info);
@@ -417,11 +435,7 @@ void MxEdgeQSlim::create_edge(MxVertexID i, MxVertexID j)
     compute_edge_info(info);
 }
 
-void MxEdgeQSlim::initialize()
-{
-    MxQSlim::initialize();
-}
-
+void MxEdgeQSlim::initialize() { MxQSlim::initialize(); }
 void MxEdgeQSlim::collect_edges()
 {
     MxVertexList star;
@@ -432,7 +446,7 @@ void MxEdgeQSlim::collect_edges()
         m->collect_vertex_star(i, star);
 
         for (unsigned int j = 0; j < (unsigned int)star.length(); j++)
-            if (i < star(j))  // Only add particular edge once
+            if (i < star(j)) // Only add particular edge once
                 create_edge(i, star(j));
     }
 }
@@ -466,13 +480,15 @@ void MxEdgeQSlim::update_pre_contract(const MxPairContraction& conx)
         VERIFY(e->v1 == v2 || e->v2 == v2);
         VERIFY(u != v2);
 
-        if (u == v1 || varray_find(star, u)) {
+        if (u == v1 || varray_find(star, u))
+        {
             // This is a useless link --- kill it
             bool found = varray_find(edge_links(u), e, &j);
             VERIFY(found);
             edge_links(u).remove(j);
             heap.remove(e);
-            if (u != v1) xr_delete(e);  // (v1,v2) will be deleted later
+            if (u != v1)
+                xr_delete(e); // (v1,v2) will be deleted later
         }
         else
         {
@@ -486,10 +502,7 @@ void MxEdgeQSlim::update_pre_contract(const MxPairContraction& conx)
     edge_links(v2).reset();
 }
 
-void MxEdgeQSlim::update_post_contract(const MxPairContraction& conx)
-{
-}
-
+void MxEdgeQSlim::update_post_contract(const MxPairContraction& conx) {}
 void MxEdgeQSlim::apply_contraction(const MxPairContraction& conx)
 {
     //
@@ -527,10 +540,7 @@ void MxEdgeQSlim::apply_contraction(const MxPairContraction& conx)
         compute_edge_info(*it);
 }
 
-void MxEdgeQSlim::update_pre_expand(const MxPairContraction&)
-{
-}
-
+void MxEdgeQSlim::update_pre_expand(const MxPairContraction&) {}
 void MxEdgeQSlim::update_post_expand(const MxPairContraction& conx)
 {
     MxVertexID v1 = conx.v1, v2 = conx.v2;
@@ -553,8 +563,10 @@ void MxEdgeQSlim::update_post_expand(const MxPairContraction& conx)
         bool v1_linked = varray_find(star, u);
         bool v2_linked = varray_find(star2, u);
 
-        if (v1_linked) {
-            if (v2_linked) create_edge(v2, u);
+        if (v1_linked)
+        {
+            if (v2_linked)
+                create_edge(v2, u);
             i++;
         }
         else
@@ -600,10 +612,12 @@ bool MxEdgeQSlim::decimate(unsigned int target, float max_error, void* cb_params
     while (valid_faces > target)
     {
         MxHeapable* top = heap.top();
-        if (!top) {
+        if (!top)
+        {
             return false;
         }
-        if (-top->heap_key() > max_error) {
+        if (-top->heap_key() > max_error)
+        {
             return true;
         }
 
@@ -611,14 +625,17 @@ bool MxEdgeQSlim::decimate(unsigned int target, float max_error, void* cb_params
         MxVertexID v1 = info->v1;
         MxVertexID v2 = info->v2;
 
-        if (m->vertex_is_valid(v1) && m->vertex_is_valid(v2)) {
+        if (m->vertex_is_valid(v1) && m->vertex_is_valid(v2))
+        {
             MxPairContraction& conx = local_conx;
 
             m->compute_contraction(v1, v2, &conx, info->vnew);
 
-            if (will_join_only && conx.dead_faces.length() > 0) continue;
+            if (will_join_only && conx.dead_faces.length() > 0)
+                continue;
 
-            if (contraction_callback) (*contraction_callback)(conx, -(info->heap_key() + EDGE_BASE_ERROR), cb_params);
+            if (contraction_callback)
+                (*contraction_callback)(conx, -(info->heap_key() + EDGE_BASE_ERROR), cb_params);
 
             apply_contraction(conx);
         }
@@ -646,7 +663,8 @@ void MxFaceQSlim::compute_face_info(MxFaceID f)
     Q += Qj;
     Q += Qk;
 
-    if (placement_policy == MX_PLACE_OPTIMAL && Q.optimize(&info.vnew[0], &info.vnew[1], &info.vnew[2])) {
+    if (placement_policy == MX_PLACE_OPTIMAL && Q.optimize(&info.vnew[0], &info.vnew[1], &info.vnew[2]))
+    {
         info.heap_key(float(-Q(info.vnew)));
     }
     else
@@ -657,7 +675,8 @@ void MxFaceQSlim::compute_face_info(MxFaceID f)
         Vec3 best;
         double e_min;
 
-        if (e1 <= e2 && e1 <= e3) {
+        if (e1 <= e2 && e1 <= e3)
+        {
             e_min = e1;
             best = v1;
         }
@@ -678,7 +697,8 @@ void MxFaceQSlim::compute_face_info(MxFaceID f)
         info.heap_key(float(-e_min));
     }
 
-    if (weighting_policy == MX_WEIGHT_AREA_AVG) info.heap_key(float(info.heap_key() / Q.area()));
+    if (weighting_policy == MX_WEIGHT_AREA_AVG)
+        info.heap_key(float(info.heap_key() / Q.area()));
 
     if (info.is_in_heap())
         heap.update(&info);
@@ -686,10 +706,7 @@ void MxFaceQSlim::compute_face_info(MxFaceID f)
         heap.insert(&info);
 }
 
-MxFaceQSlim::MxFaceQSlim(MxStdModel* _m) : MxQSlim(_m), f_info(_m->face_count())
-{
-}
-
+MxFaceQSlim::MxFaceQSlim(MxStdModel* _m) : MxQSlim(_m), f_info(_m->face_count()) {}
 void MxFaceQSlim::initialize()
 {
     MxQSlim::initialize();
@@ -707,10 +724,12 @@ bool MxFaceQSlim::decimate(unsigned int target, float max_error, void* cb_params
     while (valid_faces > target)
     {
         MxHeapable* top = heap.top();
-        if (!top) {
+        if (!top)
+        {
             return false;
         }
-        if (-top->heap_key() > max_error) {
+        if (-top->heap_key() > max_error)
+        {
             return true;
         }
 
@@ -719,19 +738,21 @@ bool MxFaceQSlim::decimate(unsigned int target, float max_error, void* cb_params
         MxFaceID f = info->f;
         MxVertexID v1 = m->face(f)(0), v2 = m->face(f)(1), v3 = m->face(f)(2);
 
-        if (m->face_is_valid(f)) {
+        if (m->face_is_valid(f))
+        {
             //
             // Perform the actual contractions
             m->contract(v1, v2, v3, info->vnew, changed);
 
-            quadrics(v1) += quadrics(v2);  // update quadric of v1
+            quadrics(v1) += quadrics(v2); // update quadric of v1
             quadrics(v1) += quadrics(v3);
 
             //
             // Update valid counts
             valid_verts -= 2;
             for (i = 0; i < (unsigned int)changed.length(); i++)
-                if (!m->face_is_valid(changed(i))) valid_faces--;
+                if (!m->face_is_valid(changed(i)))
+                    valid_faces--;
 
             for (i = 0; i < (unsigned int)changed.length(); i++)
                 if (m->face_is_valid(changed(i)))

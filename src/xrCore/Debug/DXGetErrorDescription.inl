@@ -1,16 +1,16 @@
 // XXX: don't use strcpy_s/wcscpy_s functions
 #pragma warning(push)
-#pragma warning(disable:4995) // strcpy_s marked as deprecated
-if ( !count )
+#pragma warning(disable : 4995) // strcpy_s marked as deprecated
+if (!count)
     return;
 
 *desc = 0;
 
 // First try to see if FormatMessage knows this hr
-UINT icount = static_cast<UINT>( std::min<size_t>( count, 32767 ) );
+UINT icount = static_cast<UINT>(std::min<size_t>(count, 32767));
 
-DWORD result = DX_FORMATMESSAGE( FORMAT_MESSAGE_FROM_SYSTEM, nullptr, hr,
-                                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), desc, icount, nullptr );
+DWORD result = DX_FORMATMESSAGE(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, hr,
+    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), desc, icount, nullptr);
 
 if (result > 0)
     return;
@@ -21,22 +21,22 @@ switch (hr)
 
 #if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
 
-// -------------------------------------------------------------
-// ddraw.h error codes
-// -------------------------------------------------------------
+    // -------------------------------------------------------------
+    // ddraw.h error codes
+    // -------------------------------------------------------------
     CHK_ERR(DDERR_ALREADYINITIALIZED, "This object is already initialized")
     CHK_ERR(DDERR_CANNOTATTACHSURFACE, "This surface can not be attached to the requested surface.")
     CHK_ERR(DDERR_CANNOTDETACHSURFACE, "This surface can not be detached from the requested surface.")
     CHK_ERR(DDERR_CURRENTLYNOTAVAIL, "Support is currently not available.")
     CHK_ERR(DDERR_EXCEPTION, "An exception was encountered while performing the requested operation")
-//      CHK_ERR(DDERR_GENERIC, "DDERR_GENERIC")
+    //CHK_ERR(DDERR_GENERIC, "DDERR_GENERIC")
     CHK_ERR(DDERR_HEIGHTALIGN, "Height of rectangle provided is not a multiple of reqd alignment")
     CHK_ERR(DDERR_INCOMPATIBLEPRIMARY, "Unable to match primary surface creation request with existing primary surface.")
     CHK_ERR(DDERR_INVALIDCAPS, "One or more of the caps bits passed to the callback are incorrect.")
     CHK_ERR(DDERR_INVALIDCLIPLIST, "DirectDraw does not support provided Cliplist.")
     CHK_ERR(DDERR_INVALIDMODE, "DirectDraw does not support the requested mode")
     CHK_ERR(DDERR_INVALIDOBJECT, "DirectDraw received a pointer that was an invalid DIRECTDRAW object.")
-//        CHK_ERR(DDERR_INVALIDPARAMS, "DDERR_INVALIDPARAMS")
+    //CHK_ERR(DDERR_INVALIDPARAMS, "DDERR_INVALIDPARAMS")
     CHK_ERR(DDERR_INVALIDPIXELFORMAT, "pixel format was invalid as specified")
     CHK_ERR(DDERR_INVALIDRECT, "Rectangle provided was invalid.")
     CHK_ERR(DDERR_LOCKEDSURFACES, "Operation could not be carried out because one or more surfaces are locked")
@@ -68,8 +68,8 @@ switch (hr)
     CHK_ERR(DDERR_NOZBUFFERHW, "Operation could not be carried out because there is no hardware support for zbuffer blting.")
     CHK_ERR(DDERR_NOZOVERLAYHW, "Overlay surfaces could not be z layered based on their BltOrder because the hardware does not support z layering of overlays.")
     CHK_ERR(DDERR_OUTOFCAPS, "The hardware needed for the requested operation has already been allocated.")
-//        CHK_ERR(DDERR_OUTOFMEMORY, "DDERR_OUTOFMEMORY")
-//        CHK_ERR(DDERR_OUTOFVIDEOMEMORY, "DDERR_OUTOFVIDEOMEMORY")
+    //CHK_ERR(DDERR_OUTOFMEMORY, "DDERR_OUTOFMEMORY")
+    //CHK_ERR(DDERR_OUTOFVIDEOMEMORY, "DDERR_OUTOFVIDEOMEMORY")
     CHK_ERR(DDERR_OVERLAYCANTCLIP, "hardware does not support clipped overlays")
     CHK_ERR(DDERR_OVERLAYCOLORKEYONLYONEACTIVE, "Can only have ony color key active at one time for overlays")
     CHK_ERR(DDERR_PALETTEBUSY, "Access to this palette is being refused because the palette is already locked by another thread.")
@@ -84,7 +84,7 @@ switch (hr)
     CHK_ERR(DDERR_TOOBIGHEIGHT, "Height requested by DirectDraw is too large.")
     CHK_ERR(DDERR_TOOBIGSIZE, "Size requested by DirectDraw is too large --  The individual height and width are OK.")
     CHK_ERR(DDERR_TOOBIGWIDTH, "Width requested by DirectDraw is too large.")
-//        CHK_ERR(DDERR_UNSUPPORTED, "DDERR_UNSUPPORTED")
+    //CHK_ERR(DDERR_UNSUPPORTED, "DDERR_UNSUPPORTED")
     CHK_ERR(DDERR_UNSUPPORTEDFORMAT, "Pixel format requested is unsupported by DirectDraw")
     CHK_ERR(DDERR_UNSUPPORTEDMASK, "Bitmask in the pixel format requested is unsupported by DirectDraw")
     CHK_ERR(DDERR_INVALIDSTREAM, "The specified stream contains invalid data")
@@ -144,44 +144,44 @@ switch (hr)
     CHK_ERR(DDERR_DEVICEDOESNTOWNSURFACE, "Surfaces created by one direct draw device cannot be used directly by another direct draw device.")
 
 
-// -------------------------------------------------------------
-// dinput.h error codes
-// -------------------------------------------------------------
-//      CHK_ERR(DI_OK, "DI_OK")
-//      CHK_ERR(DI_NOTATTACHED, "DI_NOTATTACHED")
-//      CHK_ERR(DI_BUFFEROVERFLOW, "DI_BUFFEROVERFLOW")
-//      CHK_ERR(DI_PROPNOEFFECT, "DI_PROPNOEFFECT")
-//      CHK_ERR(DI_NOEFFECT, "DI_NOEFFECT")
-//      CHK_ERR(DI_POLLEDDEVICE, "DI_POLLEDDEVICE")
-//      CHK_ERR(DI_DOWNLOADSKIPPED, "DI_DOWNLOADSKIPPED")
-//      CHK_ERR(DI_EFFECTRESTARTED, "DI_EFFECTRESTARTED")
-//      CHK_ERR(DI_SETTINGSNOTSAVED_ACCESSDENIED, "DI_SETTINGSNOTSAVED_ACCESSDENIED")
-//      CHK_ERR(DI_SETTINGSNOTSAVED_DISKFULL, "DI_SETTINGSNOTSAVED_DISKFULL")
-//      CHK_ERR(DI_TRUNCATED, "DI_TRUNCATED")
-//      CHK_ERR(DI_TRUNCATEDANDRESTARTED, "DI_TRUNCATEDANDRESTARTED")
-//      CHK_ERR(DI_WRITEPROTECT, "DI_WRITEPROTECT")
+    // -------------------------------------------------------------
+    // dinput.h error codes
+    // -------------------------------------------------------------
+    //CHK_ERR(DI_OK, "DI_OK")
+    //CHK_ERR(DI_NOTATTACHED, "DI_NOTATTACHED")
+    //CHK_ERR(DI_BUFFEROVERFLOW, "DI_BUFFEROVERFLOW")
+    //CHK_ERR(DI_PROPNOEFFECT, "DI_PROPNOEFFECT")
+    //CHK_ERR(DI_NOEFFECT, "DI_NOEFFECT")
+    //CHK_ERR(DI_POLLEDDEVICE, "DI_POLLEDDEVICE")
+    //CHK_ERR(DI_DOWNLOADSKIPPED, "DI_DOWNLOADSKIPPED")
+    //CHK_ERR(DI_EFFECTRESTARTED, "DI_EFFECTRESTARTED")
+    //CHK_ERR(DI_SETTINGSNOTSAVED_ACCESSDENIED, "DI_SETTINGSNOTSAVED_ACCESSDENIED")
+    //CHK_ERR(DI_SETTINGSNOTSAVED_DISKFULL, "DI_SETTINGSNOTSAVED_DISKFULL")
+    //CHK_ERR(DI_TRUNCATED, "DI_TRUNCATED")
+    //CHK_ERR(DI_TRUNCATEDANDRESTARTED, "DI_TRUNCATEDANDRESTARTED")
+    //CHK_ERR(DI_WRITEPROTECT, "DI_WRITEPROTECT")
     CHK_ERR(DIERR_OLDDIRECTINPUTVERSION, "The application requires a newer version of DirectInput.")
-//      CHK_ERR(DIERR_GENERIC, "DIERR_GENERIC")
-//      CHK_ERR(DIERR_OLDDIRECTINPUTVERSION, "DIERR_OLDDIRECTINPUTVERSION")
+    //CHK_ERR(DIERR_GENERIC, "DIERR_GENERIC")
+    //CHK_ERR(DIERR_OLDDIRECTINPUTVERSION, "DIERR_OLDDIRECTINPUTVERSION")
     CHK_ERR(DIERR_BETADIRECTINPUTVERSION, "The application was written for an unsupported prerelease version of DirectInput.")
     CHK_ERR(DIERR_BADDRIVERVER, "The object could not be created due to an incompatible driver version or mismatched or incomplete driver components.")
-//      CHK_ERR(DIERR_DEVICENOTREG, "DIERR_DEVICENOTREG")
-//      CHK_ERR(DIERR_NOTFOUND, "The requested object does not exist.")
-//      CHK_ERR(DIERR_OBJECTNOTFOUND, "DIERR_OBJECTNOTFOUND")
-//      CHK_ERR(DIERR_INVALIDPARAM, "DIERR_INVALIDPARAM")
-//      CHK_ERR(DIERR_NOINTERFACE, "DIERR_NOINTERFACE")
-//      CHK_ERR(DIERR_GENERIC, "DIERR_GENERIC")
-//      CHK_ERR(DIERR_OUTOFMEMORY, "DIERR_OUTOFMEMORY")
-//      CHK_ERR(DIERR_UNSUPPORTED, "DIERR_UNSUPPORTED")
+    //CHK_ERR(DIERR_DEVICENOTREG, "DIERR_DEVICENOTREG")
+    //CHK_ERR(DIERR_NOTFOUND, "The requested object does not exist.")
+    //CHK_ERR(DIERR_OBJECTNOTFOUND, "DIERR_OBJECTNOTFOUND")
+    //CHK_ERR(DIERR_INVALIDPARAM, "DIERR_INVALIDPARAM")
+    //CHK_ERR(DIERR_NOINTERFACE, "DIERR_NOINTERFACE")
+    //CHK_ERR(DIERR_GENERIC, "DIERR_GENERIC")
+    //CHK_ERR(DIERR_OUTOFMEMORY, "DIERR_OUTOFMEMORY")
+    //CHK_ERR(DIERR_UNSUPPORTED, "DIERR_UNSUPPORTED")
     CHK_ERR(DIERR_NOTINITIALIZED, "This object has not been initialized")
     CHK_ERR(DIERR_ALREADYINITIALIZED, "This object is already initialized")
-//      CHK_ERR(DIERR_NOAGGREGATION, "DIERR_NOAGGREGATION")
-//      CHK_ERR(DIERR_OTHERAPPHASPRIO, "DIERR_OTHERAPPHASPRIO")
+    //CHK_ERR(DIERR_NOAGGREGATION, "DIERR_NOAGGREGATION")
+    //CHK_ERR(DIERR_OTHERAPPHASPRIO, "DIERR_OTHERAPPHASPRIO")
     CHK_ERR(DIERR_INPUTLOST, "Access to the device has been lost.  It must be re-acquired.")
     CHK_ERR(DIERR_ACQUIRED, "The operation cannot be performed while the device is acquired.")
     CHK_ERR(DIERR_NOTACQUIRED, "The operation cannot be performed unless the device is acquired.")
-//      CHK_ERR(DIERR_READONLY, "DIERR_READONLY")
-//      CHK_ERR(DIERR_HANDLEEXISTS, "DIERR_HANDLEEXISTS")
+    //CHK_ERR(DIERR_READONLY, "DIERR_READONLY")
+    //CHK_ERR(DIERR_HANDLEEXISTS, "DIERR_HANDLEEXISTS")
     CHK_ERR(DIERR_INSUFFICIENTPRIVS, "Unable to IDirectInputJoyConfig_Acquire because the user does not have sufficient privileges to change the joystick configuration. & An invalid media type was specified")
     CHK_ERR(DIERR_DEVICEFULL, "The device is full. & An invalid media subtype was specified.")
     CHK_ERR(DIERR_MOREDATA, "Not all the requested information fit into the buffer. & This object can only be created as an aggregated object.")
@@ -195,9 +195,9 @@ switch (hr)
     CHK_ERR(DIERR_REPORTFULL, "SendDeviceData failed because more information was requested to be sent than can be sent to the device.  Some devices have restrictions on how much data can be sent to them.  (For example, there might be a limit on the number of buttons that can be pressed at once.) & No sample buffer allocator is available.")
     CHK_ERR(DIERR_MAPFILEFAIL, "A mapper file function failed because reading or writing the user or IHV settings file failed. & A run-time error occurred.")
 
-// -------------------------------------------------------------
-// dinputd.h error codes
-// -------------------------------------------------------------
+    // -------------------------------------------------------------
+    // dinputd.h error codes
+    // -------------------------------------------------------------
     CHK_ERR(DIERR_NOMOREITEMS, "No more items.")
     CHK_ERR(DIERR_DRIVERFIRST, "Device driver-specific codes. Unless the specific driver has been precisely identified, no meaning should be attributed to these values other than that the driver originated the error.")
     CHK_ERR(DIERR_DRIVERFIRST+1, "DIERR_DRIVERFIRST+1")
@@ -210,10 +210,10 @@ switch (hr)
     CHK_ERR(DIERR_CANCELLED, "The user cancelled the install operation. & The stream already has allocated samples and the surface doesn't match the sample format.")
     CHK_ERR(DIERR_BADINF, "The INF file for the selected device could not be found or is invalid or is damaged. & The specified purpose ID can't be used for the call.")
 
-// -------------------------------------------------------------
-// d3d9.h error codes
-// -------------------------------------------------------------
-//      CHK_ERR(D3D_OK, "Ok")
+    // -------------------------------------------------------------
+    // d3d9.h error codes
+    // -------------------------------------------------------------
+    //CHK_ERR(D3D_OK, "Ok")
     CHK_ERR(D3DERR_WRONGTEXTUREFORMAT, "Wrong texture format")
     CHK_ERR(D3DERR_UNSUPPORTEDCOLOROPERATION, "Unsupported color operation")
     CHK_ERR(D3DERR_UNSUPPORTEDCOLORARG, "Unsupported color arg")
@@ -238,13 +238,13 @@ switch (hr)
     //CHK_ERR(D3DERR_WASSTILLDRAWING, "Was Still Drawing")
     CHK_ERR(D3DOK_NOAUTOGEN, "The call succeeded but there won't be any mipmaps generated")
 
-	// Extended for Windows Vista
-	CHK_ERR(D3DERR_DEVICEREMOVED, "Hardware device was removed")
-	CHK_ERR(S_NOT_RESIDENT, "Resource not resident in memory")
-	CHK_ERR(S_RESIDENT_IN_SHARED_MEMORY, "Resource resident in shared memory")
-	CHK_ERR(S_PRESENT_MODE_CHANGED, "Desktop display mode has changed")
-	CHK_ERR(S_PRESENT_OCCLUDED, "Client window is occluded (minimized or other fullscreen)")
-	CHK_ERR(D3DERR_DEVICEHUNG, "Hardware adapter reset by OS")
+    // Extended for Windows Vista
+    CHK_ERR(D3DERR_DEVICEREMOVED, "Hardware device was removed")
+    CHK_ERR(S_NOT_RESIDENT, "Resource not resident in memory")
+    CHK_ERR(S_RESIDENT_IN_SHARED_MEMORY, "Resource resident in shared memory")
+    CHK_ERR(S_PRESENT_MODE_CHANGED, "Desktop display mode has changed")
+    CHK_ERR(S_PRESENT_OCCLUDED, "Client window is occluded (minimized or other fullscreen)")
+    CHK_ERR(D3DERR_DEVICEHUNG, "Hardware adapter reset by OS")
 
     // Extended for Windows 7
     CHK_ERR(D3DERR_UNSUPPORTEDOVERLAY, "Overlay is not supported" )
@@ -253,29 +253,28 @@ switch (hr)
     CHK_ERR(D3DERR_UNSUPPORTEDCRYPTO, "Unsupported cryptographic system" )
     CHK_ERR(D3DERR_PRESENT_STATISTICS_DISJOINT, "Presentation statistics are disjoint" )
 
-
-// -------------------------------------------------------------
-// dsound.h error codes
-// -------------------------------------------------------------
-//      CHK_ERR(DS_OK, "")
+    // -------------------------------------------------------------
+    // dsound.h error codes
+    // -------------------------------------------------------------
+    //CHK_ERR(DS_OK, "")
     CHK_ERR(DS_NO_VIRTUALIZATION, "The call succeeded, but we had to substitute the 3D algorithm")
     CHK_ERR(DSERR_ALLOCATED, "The call failed because resources (such as a priority level) were already being used by another caller")
     CHK_ERR(DSERR_CONTROLUNAVAIL, "The control (vol, pan, etc.) requested by the caller is not available")
-//      CHK_ERR(DSERR_INVALIDPARAM, "DSERR_INVALIDPARAM")
+    //CHK_ERR(DSERR_INVALIDPARAM, "DSERR_INVALIDPARAM")
     CHK_ERR(DSERR_INVALIDCALL, "This call is not valid for the current state of this object")
-//      CHK_ERR(DSERR_GENERIC, "DSERR_GENERIC")
+    //CHK_ERR(DSERR_GENERIC, "DSERR_GENERIC")
     CHK_ERR(DSERR_PRIOLEVELNEEDED, "The caller does not have the priority level required for the function to succeed")
-//      CHK_ERR(DSERR_OUTOFMEMORY, "Not enough free memory is available to complete the operation")
+    //CHK_ERR(DSERR_OUTOFMEMORY, "Not enough free memory is available to complete the operation")
     CHK_ERR(DSERR_BADFORMAT, "The specified WAVE format is not supported")
-//      CHK_ERR(DSERR_UNSUPPORTED, "DSERR_UNSUPPORTED")
+    //CHK_ERR(DSERR_UNSUPPORTED, "DSERR_UNSUPPORTED")
     CHK_ERR(DSERR_NODRIVER, "No sound driver is available for use")
     CHK_ERR(DSERR_ALREADYINITIALIZED, "This object is already initialized")
-//      CHK_ERR(DSERR_NOAGGREGATION, "DSERR_NOAGGREGATION")
+    //CHK_ERR(DSERR_NOAGGREGATION, "DSERR_NOAGGREGATION")
     CHK_ERR(DSERR_BUFFERLOST, "The buffer memory has been lost, and must be restored")
     CHK_ERR(DSERR_OTHERAPPHASPRIO, "Another app has a higher priority level, preventing this call from succeeding")
     CHK_ERR(DSERR_UNINITIALIZED, "This object has not been initialized")
-//      CHK_ERR(DSERR_NOINTERFACE, "DSERR_NOINTERFACE")
-//      CHK_ERR(DSERR_ACCESSDENIED, "DSERR_ACCESSDENIED")
+    //CHK_ERR(DSERR_NOINTERFACE, "DSERR_NOINTERFACE")
+    //CHK_ERR(DSERR_ACCESSDENIED, "DSERR_ACCESSDENIED")
     CHK_ERR(DSERR_BUFFERTOOSMALL, "Tried to create a DSBCAPS_CTRLFX buffer shorter than DSBSIZE_FX_MIN milliseconds")
     CHK_ERR(DSERR_DS8_REQUIRED, "Attempt to use DirectSound 8 functionality on an older DirectSound object")
     CHK_ERR(DSERR_SENDLOOP, "A circular loop of send effects was detected")
@@ -286,15 +285,15 @@ switch (hr)
 
 #endif // !WINAPI_FAMILY || WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP
 
-// -------------------------------------------------------------
-// d3d10.h error codes
-// -------------------------------------------------------------
+    // -------------------------------------------------------------
+    // d3d10.h error codes
+    // -------------------------------------------------------------
     CHK_ERR(D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS, "There are too many unique state objects.")
     CHK_ERR(D3D10_ERROR_FILE_NOT_FOUND, "File not found")
 
-// -------------------------------------------------------------
-// dxgi.h error codes
-// -------------------------------------------------------------
+    // -------------------------------------------------------------
+    // dxgi.h error codes
+    // -------------------------------------------------------------
     CHK_ERR(DXGI_STATUS_OCCLUDED, "The target window or output has been occluded. The application should suspend rendering operations if possible.")
     CHK_ERR(DXGI_STATUS_CLIPPED, "Target window is clipped.")
     CHK_ERR(DXGI_STATUS_NO_REDIRECTION, "")
@@ -318,9 +317,9 @@ switch (hr)
     CHK_ERR(DXGI_ERROR_REMOTE_CLIENT_DISCONNECTED, "Remote desktop client disconnected.")
     CHK_ERR(DXGI_ERROR_REMOTE_OUTOFMEMORY, "Remote desktop client is out of memory.")
 
-// -------------------------------------------------------------
-// d3d11.h error codes
-// -------------------------------------------------------------
+    // -------------------------------------------------------------
+    // d3d11.h error codes
+    // -------------------------------------------------------------
     CHK_ERR(D3D11_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS, "There are too many unique state objects.")
     CHK_ERR(D3D11_ERROR_FILE_NOT_FOUND, "File not found")
     CHK_ERR(D3D11_ERROR_TOO_MANY_UNIQUE_VIEW_OBJECTS, "Therea are too many unique view objects.")
@@ -328,11 +327,11 @@ switch (hr)
 
 #if !defined(WINAPI_FAMILY) || WINAPI_FAMILY != WINAPI_FAMILY_PHONE_APP
 
-// -------------------------------------------------------------
-// Direct2D error codes
-// -------------------------------------------------------------
-//        CHK_ERR(D2DERR_UNSUPPORTED_PIXEL_FORMAT, "The pixel format is not supported.")
-//        CHK_ERR(D2DERR_INSUFFICIENT_BUFFER, "The supplied buffer was too small to accomodate the data.")
+    // -------------------------------------------------------------
+    // Direct2D error codes
+    // -------------------------------------------------------------
+    //CHK_ERR(D2DERR_UNSUPPORTED_PIXEL_FORMAT, "The pixel format is not supported.")
+    //CHK_ERR(D2DERR_INSUFFICIENT_BUFFER, "The supplied buffer was too small to accomodate the data.")
     CHK_ERR(D2DERR_WRONG_STATE, "The object was not in the correct state to process the method.")
     CHK_ERR(D2DERR_NOT_INITIALIZED, "The object has not yet been initialized.")
     CHK_ERR(D2DERR_UNSUPPORTED_OPERATION, "The requested opertion is not supported.")
@@ -353,7 +352,7 @@ switch (hr)
     CHK_ERR(D2DERR_WRONG_FACTORY, "Objects used together must be created from the same factory instance.")
     CHK_ERR(D2DERR_LAYER_ALREADY_IN_USE, "A layer resource can only be in use once at any point in time.")
     CHK_ERR(D2DERR_POP_CALL_DID_NOT_MATCH_PUSH, "The pop call did not match the corresponding push call")
-//        CHK_ERR(D2DERR_WRONG_RESOURCE_DOMAIN, "The resource was realized on the wrong render target")
+    //CHK_ERR(D2DERR_WRONG_RESOURCE_DOMAIN, "The resource was realized on the wrong render target")
     CHK_ERR(D2DERR_PUSH_POP_UNBALANCED, "The push and pop calls were unbalanced")
     CHK_ERR(D2DERR_RENDER_TARGET_HAS_LAYER_OR_CLIPRECT, "Attempt to copy from a render target while a layer or clip rect is applied")
     CHK_ERR(D2DERR_INCOMPATIBLE_BRUSH_TYPES, "The brush types are incompatible for the call.")
@@ -361,11 +360,11 @@ switch (hr)
     CHK_ERR(D2DERR_TARGET_NOT_GDI_COMPATIBLE, "The render target is not compatible with GDI")
     CHK_ERR(D2DERR_TEXT_EFFECT_IS_WRONG_TYPE, "A text client drawing effect object is of the wrong type")
     CHK_ERR(D2DERR_TEXT_RENDERER_NOT_RELEASED, "The application is holding a reference to the IDWriteTextRenderer interface after the corresponding DrawText or DrawTextLayout call has returned. The IDWriteTextRenderer instance will be zombied.")
-//        CHK_ERR(D2DERR_EXCEEDS_MAX_BITMAP_SIZE, "The requested size is larger than the guaranteed supported texture size.")
+    //CHK_ERR(D2DERR_EXCEEDS_MAX_BITMAP_SIZE, "The requested size is larger than the guaranteed supported texture size.")
 
-// -------------------------------------------------------------
-// DirectWrite error codes
-// -------------------------------------------------------------
+    // -------------------------------------------------------------
+    // DirectWrite error codes
+    // -------------------------------------------------------------
     CHK_ERR(DWRITE_E_FILEFORMAT, "Indicates an error in an input file such as a font file.")
     CHK_ERR(DWRITE_E_UNEXPECTED, "Indicates an error originating in DirectWrite code, which is not expected to occur but is safe to recover from.")
     CHK_ERR(DWRITE_E_NOFONT, "Indicates the specified font does not exist.")
@@ -374,9 +373,9 @@ switch (hr)
     CHK_ERR(DWRITE_E_FONTCOLLECTIONOBSOLETE, "A font collection is obsolete due to changes in the system.")
     CHK_ERR(DWRITE_E_ALREADYREGISTERED, "The given interface is already registered.")
 
-// -------------------------------------------------------------
-// WIC error codes
-// -------------------------------------------------------------
+    // -------------------------------------------------------------
+    // WIC error codes
+    // -------------------------------------------------------------
     CHK_ERR(WINCODEC_ERR_WRONGSTATE, "WIC object in incorrect state.")
     CHK_ERR(WINCODEC_ERR_VALUEOUTOFRANGE, "WIC Value out of range.")
     CHK_ERR(WINCODEC_ERR_UNKNOWNIMAGEFORMAT, "Encountered unexpected value or setting in WIC image format.")
@@ -420,9 +419,9 @@ switch (hr)
 
 #endif // !WINAPI_FAMILY || WINAPI_FAMILY != WINAPI_FAMILY_PHONE_APP
 
-// -------------------------------------------------------------
-// DXUT error codes
-// -------------------------------------------------------------
+    // -------------------------------------------------------------
+    // DXUT error codes
+    // -------------------------------------------------------------
     CHK_ERR(DXUTERR_NODIRECT3D, "Could not initialize Direct3D.")
     CHK_ERR(DXUTERR_NOCOMPATIBLEDEVICES, "No device could be found with the specified device settings.")
     CHK_ERR(DXUTERR_MEDIANOTFOUND, "A media file could not be found.")
@@ -434,17 +433,17 @@ switch (hr)
     CHK_ERR(DXUTERR_INCORRECTVERSION, "Incorrect version of Direct3D or D3DX.")
     CHK_ERR(DXUTERR_DEVICEREMOVED, "The device was removed.")
 
-// -------------------------------------------------------------
-// xaudio2.h error codes
-// -------------------------------------------------------------
+    // -------------------------------------------------------------
+    // xaudio2.h error codes
+    // -------------------------------------------------------------
     CHK_ERR(XAUDIO2_E_INVALID_CALL, "Invalid XAudio2 API call or arguments")
     CHK_ERR(XAUDIO2_E_XMA_DECODER_ERROR, "Hardware XMA decoder error")
     CHK_ERR(XAUDIO2_E_XAPO_CREATION_FAILED, "Failed to create an audio effect")
     CHK_ERR(XAUDIO2_E_DEVICE_INVALIDATED, "Device invalidated (unplugged, disabled, etc)")
 
-// -------------------------------------------------------------
-// xapo.h error codes
-// -------------------------------------------------------------
+    // -------------------------------------------------------------
+    // xapo.h error codes
+    // -------------------------------------------------------------
     CHK_ERR(XAPO_E_FORMAT_UNSUPPORTED, "Requested audio format unsupported.")
 }
 #pragma warning(pop)

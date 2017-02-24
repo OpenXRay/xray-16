@@ -21,33 +21,38 @@ Tdestroy_entity destroy_entity;
 CEditableObject* ESceneSpawnTool::get_draw_visual(u8 _RP_TeamID, u8 _RP_Type, const GameTypeChooser& _GameType)
 {
     CEditableObject* ret = NULL;
-    if (m_draw_RP_visuals.empty()) {
-        m_draw_RP_visuals.push_back(Lib.CreateEditObject("editor\\artefakt_ah"));         // 0
-        m_draw_RP_visuals.push_back(Lib.CreateEditObject("editor\\artefakt_cta_blue"));   // 1
-        m_draw_RP_visuals.push_back(Lib.CreateEditObject("editor\\artefakt_cta_green"));  // 2
-        m_draw_RP_visuals.push_back(Lib.CreateEditObject("editor\\telo_ah_cta_blue"));    // 3
-        m_draw_RP_visuals.push_back(Lib.CreateEditObject("editor\\telo_ah_cta_green"));   // 4
-        m_draw_RP_visuals.push_back(Lib.CreateEditObject("editor\\telo_dm"));             // 5
-        m_draw_RP_visuals.push_back(Lib.CreateEditObject("editor\\telo_tdm_blue"));       // 6
-        m_draw_RP_visuals.push_back(Lib.CreateEditObject("editor\\telo_tdm_green"));      // 7
-        m_draw_RP_visuals.push_back(Lib.CreateEditObject("editor\\spectator"));           // 8
-        m_draw_RP_visuals.push_back(Lib.CreateEditObject("editor\\item_spawn"));          // 9
+    if (m_draw_RP_visuals.empty())
+    {
+        m_draw_RP_visuals.push_back(Lib.CreateEditObject("editor\\artefakt_ah")); // 0
+        m_draw_RP_visuals.push_back(Lib.CreateEditObject("editor\\artefakt_cta_blue")); // 1
+        m_draw_RP_visuals.push_back(Lib.CreateEditObject("editor\\artefakt_cta_green")); // 2
+        m_draw_RP_visuals.push_back(Lib.CreateEditObject("editor\\telo_ah_cta_blue")); // 3
+        m_draw_RP_visuals.push_back(Lib.CreateEditObject("editor\\telo_ah_cta_green")); // 4
+        m_draw_RP_visuals.push_back(Lib.CreateEditObject("editor\\telo_dm")); // 5
+        m_draw_RP_visuals.push_back(Lib.CreateEditObject("editor\\telo_tdm_blue")); // 6
+        m_draw_RP_visuals.push_back(Lib.CreateEditObject("editor\\telo_tdm_green")); // 7
+        m_draw_RP_visuals.push_back(Lib.CreateEditObject("editor\\spectator")); // 8
+        m_draw_RP_visuals.push_back(Lib.CreateEditObject("editor\\item_spawn")); // 9
     }
     switch (_RP_Type)
     {
-    case rptActorSpawn:  // actor spawn
+    case rptActorSpawn: // actor spawn
     {
-        if (_GameType.MatchType(eGameIDDeathmatch)) {
-            if (_RP_TeamID == 0) ret = m_draw_RP_visuals[5];
+        if (_GameType.MatchType(eGameIDDeathmatch))
+        {
+            if (_RP_TeamID == 0)
+                ret = m_draw_RP_visuals[5];
         };
-        if (_GameType.MatchType(eGameIDTeamDeathmatch)) {
+        if (_GameType.MatchType(eGameIDTeamDeathmatch))
+        {
             if (_RP_TeamID == 2)
                 ret = m_draw_RP_visuals[7];
             else if (_RP_TeamID == 1)
                 ret = m_draw_RP_visuals[6];
         };
 
-        if (_GameType.MatchType(eGameIDCaptureTheArtefact)) {
+        if (_GameType.MatchType(eGameIDCaptureTheArtefact))
+        {
             if (_RP_TeamID == 0)
                 Msg("! incorrect ActorRP teamID [%d] for CTA", _RP_TeamID);
             else if (_RP_TeamID == 1)
@@ -55,9 +60,10 @@ CEditableObject* ESceneSpawnTool::get_draw_visual(u8 _RP_TeamID, u8 _RP_Type, co
             else if (_RP_TeamID == 2)
                 ret = m_draw_RP_visuals[3];
         };
-        if (_GameType.MatchType(eGameIDArtefactHunt)) {
+        if (_GameType.MatchType(eGameIDArtefactHunt))
+        {
             if (_RP_TeamID == 0)
-                ret = m_draw_RP_visuals[8];  // spactator
+                ret = m_draw_RP_visuals[8]; // spactator
             else if (_RP_TeamID == 1)
                 ret = m_draw_RP_visuals[4];
             else if (_RP_TeamID == 2)
@@ -65,9 +71,10 @@ CEditableObject* ESceneSpawnTool::get_draw_visual(u8 _RP_TeamID, u8 _RP_Type, co
         };
     }
     break;
-    case rptArtefactSpawn:  // AF spawn
+    case rptArtefactSpawn: // AF spawn
     {
-        if (_GameType.MatchType(eGameIDCaptureTheArtefact)) {
+        if (_GameType.MatchType(eGameIDCaptureTheArtefact))
+        {
             if (_RP_TeamID == 1)
                 ret = m_draw_RP_visuals[2];
             else if (_RP_TeamID == 2)
@@ -100,7 +107,8 @@ void __stdcall FillSpawnItems(ChooseItemVec& lst, void* param)
     {
         _GetItem(gcs, k, itm);
         for (ObjectIt it = objects.begin(); it != objects.end(); it++)
-            if ((*it)->OnChooseQuery(itm.c_str())) lst.push_back(SChooseItem((*it)->Name, ""));
+            if ((*it)->OnChooseQuery(itm.c_str()))
+                lst.push_back(SChooseItem((*it)->Name, ""));
     }
 }
 
@@ -121,7 +129,8 @@ ESceneSpawnTool::ESceneSpawnTool() : ESceneCustomOTool(OBJCLASS_SPAWNPOINT)
     for (CInifile::RootCIt it = data.begin(); it != data.end(); it++)
     {
         LPCSTR val;
-        if ((*it)->line_exist("$spawn", &val)) {
+        if ((*it)->line_exist("$spawn", &val))
+        {
             CLASS_ID cls_id = pSettings->r_clsid((*it)->Name, "class");
             shared_str v = pSettings->r_string_wb((*it)->Name, "$spawn");
             m_Classes[cls_id].push_back(SChooseItem(*v, *(*it)->Name));
@@ -153,11 +162,7 @@ void ESceneSpawnTool::CreateControls()
 
 //----------------------------------------------------
 
-void ESceneSpawnTool::RemoveControls()
-{
-    inherited::RemoveControls();
-}
-
+void ESceneSpawnTool::RemoveControls() { inherited::RemoveControls(); }
 //----------------------------------------------------
 
 void ESceneSpawnTool::FillProp(LPCSTR pref, PropItemVec& items)
@@ -172,7 +177,8 @@ void ESceneSpawnTool::FillProp(LPCSTR pref, PropItemVec& items)
 ref_shader ESceneSpawnTool::CreateIcon(shared_str name)
 {
     ref_shader S;
-    if (pSettings->line_exist(name, "$ed_icon")) {
+    if (pSettings->line_exist(name, "$ed_icon"))
+    {
         LPCSTR tex_name = pSettings->r_string(name, "$ed_icon");
         S.create("editor\\spawn_icon", tex_name);
         m_Icons[name] = S;
@@ -201,8 +207,10 @@ CCustomObject* ESceneSpawnTool::CreateObject(LPVOID data, LPCSTR name)
     CSpawnPoint* O = new CSpawnPoint(data, name);
     O->ParentTool = this;
 
-    if (data && name) {
-        if (pSettings->line_exist((LPCSTR)data, "$def_sphere")) {
+    if (data && name)
+    {
+        if (pSettings->line_exist((LPCSTR)data, "$def_sphere"))
+        {
             float size = pSettings->r_float((LPCSTR)data, "$def_sphere");
 
             CCustomObject* S = Scene->GetOTool(OBJCLASS_SHAPE)->CreateObject(0, 0);
@@ -227,12 +235,14 @@ int ESceneSpawnTool::MultiRenameObjects()
     for (ObjectIt o_it = m_Objects.begin(); o_it != m_Objects.end(); o_it++)
     {
         CCustomObject* obj = *o_it;
-        if (obj->Selected()) {
+        if (obj->Selected())
+        {
             string256 pref;
             strconcat(sizeof(pref), pref, Scene->LevelPrefix().c_str(), "_", obj->RefName());
             string256 buf;
             Scene->GenObjectName(obj->ClassID, buf, pref);
-            if (obj->Name != buf) {
+            if (obj->Name != buf)
+            {
                 obj->Name = buf;
                 cnt++;
             }

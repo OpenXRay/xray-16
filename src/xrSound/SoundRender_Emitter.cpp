@@ -59,11 +59,13 @@ CSoundRender_Emitter::~CSoundRender_Emitter(void)
 //////////////////////////////////////////////////////////////////////
 void CSoundRender_Emitter::Event_ReleaseOwner()
 {
-    if (!(owner_data)) return;
+    if (!(owner_data))
+        return;
 
     for (u32 it = 0; it < SoundRender->s_events.size(); it++)
     {
-        if (owner_data == SoundRender->s_events[it].first) {
+        if (owner_data == SoundRender->s_events[it].first)
+        {
             SoundRender->s_events.erase(SoundRender->s_events.begin() + it);
             it--;
         }
@@ -73,16 +75,21 @@ void CSoundRender_Emitter::Event_ReleaseOwner()
 void CSoundRender_Emitter::Event_Propagade()
 {
     fTimeToPropagade += ::Random.randF(s_f_def_event_pulse - 0.030f, s_f_def_event_pulse + 0.030f);
-    if (!(owner_data)) return;
-    if (0 == owner_data->g_type) return;
-    if (0 == owner_data->g_object) return;
-    if (0 == SoundRender->Handler) return;
+    if (!(owner_data))
+        return;
+    if (0 == owner_data->g_type)
+        return;
+    if (0 == owner_data->g_object)
+        return;
+    if (0 == SoundRender->Handler)
+        return;
 
     VERIFY(_valid(p_source.volume));
     // Calculate range
     float clip = p_source.max_ai_distance * p_source.volume;
     float range = _min(p_source.max_ai_distance, clip);
-    if (range < 0.1f) return;
+    if (range < 0.1f)
+        return;
 
     // Inform objects
     SoundRender->s_events.push_back(mk_pair(owner_data, range));
@@ -94,11 +101,7 @@ void CSoundRender_Emitter::switch_to_2D()
     set_priority(100.f);
 }
 
-void CSoundRender_Emitter::switch_to_3D()
-{
-    b2D = FALSE;
-}
-
+void CSoundRender_Emitter::switch_to_3D() { b2D = FALSE; }
 u32 CSoundRender_Emitter::play_time()
 {
     if (m_current_state == stPlaying || m_current_state == stPlayingLooped || m_current_state == stSimulating ||
@@ -113,16 +116,19 @@ void CSoundRender_Emitter::set_cursor(u32 p)
 {
     m_stream_cursor = p;
 
-    if (owner_data._get() && owner_data->fn_attached[0].size()) {
+    if (owner_data._get() && owner_data->fn_attached[0].size())
+    {
         u32 bt = ((CSoundRender_Source*)owner_data->handle)->dwBytesTotal;
-        if (m_stream_cursor >= m_cur_handle_cursor + bt) {
+        if (m_stream_cursor >= m_cur_handle_cursor + bt)
+        {
             SoundRender->i_destroy_source((CSoundRender_Source*)owner_data->handle);
             owner_data->handle = SoundRender->i_create_source(owner_data->fn_attached[0].c_str());
             owner_data->fn_attached[0] = owner_data->fn_attached[1];
             owner_data->fn_attached[1] = "";
             m_cur_handle_cursor = get_cursor(true);
 
-            if (target) ((CSoundRender_TargetA*)target)->source_changed();
+            if (target)
+                ((CSoundRender_TargetA*)target)->source_changed();
         }
     }
 }
@@ -138,7 +144,4 @@ u32 CSoundRender_Emitter::get_cursor(bool b_absolute) const
     }
 }
 
-void CSoundRender_Emitter::move_cursor(int offset)
-{
-    set_cursor(get_cursor(true) + offset);
-}
+void CSoundRender_Emitter::move_cursor(int offset) { set_cursor(get_cursor(true) + offset); }

@@ -14,12 +14,9 @@
 #include "xrCore/Animation/Motion.hpp"
 #ifdef DEBUG
 #include "PHDebug.h"
-#endif  // DEBUG
+#endif // DEBUG
 
-CIKLimbsController::CIKLimbsController() : m_object(0), m_legs_blend(0)
-{
-}
-
+CIKLimbsController::CIKLimbsController() : m_object(0), m_legs_blend(0) {}
 void CIKLimbsController::Create(CGameObject* O)
 {
     VERIFY(O);
@@ -29,7 +26,8 @@ void CIKLimbsController::Create(CGameObject* O)
     m_object = O;
     VERIFY(K);
     u16 sz = 2;
-    if (K->LL_UserData() && K->LL_UserData()->section_exist("ik")) sz = K->LL_UserData()->r_u16("ik", "num_limbs");
+    if (K->LL_UserData() && K->LL_UserData()->section_exist("ik"))
+        sz = K->LL_UserData()->r_u16("ik", "num_limbs");
     VERIFY(sz <= max_size);
 
     _bone_chains.reserve(sz);
@@ -38,7 +36,8 @@ void CIKLimbsController::Create(CGameObject* O)
 
     bool already_has_callbacks = !O->visual_callbacks().empty();
     O->add_visual_callback(IKVisualCallback);
-    if (already_has_callbacks) std::swap(*(O->visual_callbacks().begin()), *(O->visual_callbacks().end() - 1));
+    if (already_has_callbacks)
+        std::swap(*(O->visual_callbacks().begin()), *(O->visual_callbacks().end() - 1));
     _pose_extrapolation.init(O->XFORM());
 }
 
@@ -53,9 +52,8 @@ void CIKLimbsController::LimbSetup()
 
 void CIKLimbsController::LimbCalculate(SCalculateData& cd)
 {
-    cd.do_collide =
-        m_legs_blend &&
-        !cd.m_limb->KinematicsAnimated()->LL_GetMotionDef(m_legs_blend->motionID)->marks.empty();  // m_legs_blend->;
+    cd.do_collide = m_legs_blend &&
+        !cd.m_limb->KinematicsAnimated()->LL_GetMotionDef(m_legs_blend->motionID)->marks.empty(); // m_legs_blend->;
     cd.m_limb->ApplyState(cd);
 }
 
@@ -68,14 +66,11 @@ void CIKLimbsController::LimbUpdate(CIKLimb& L)
 
 IC void update_blend(CBlend*& b)
 {
-    if (b && CBlend::eFREE_SLOT == b->blend_state()) b = 0;
+    if (b && CBlend::eFREE_SLOT == b->blend_state())
+        b = 0;
 }
 
-IC float lerp(float t, float a, float b)
-{
-    return (a + t * (b - a));
-}
-
+IC float lerp(float t, float a, float b) { return (a + t * (b - a)); }
 void y_shift_bones(IKinematics* K, float shift)
 {
     u16 bc = K->LL_BoneCount();
@@ -87,9 +82,11 @@ float CIKLimbsController::LegLengthShiftLimit(float current_shift, const SCalcul
     float shift_down = -phInfinity;
     const u16 sz = (u16)_bone_chains.size();
     for (u16 j = 0; sz > j; ++j)
-        if (cd[j].state.foot_step) {
+        if (cd[j].state.foot_step)
+        {
             float s_down = cd[j].m_limb->ObjShiftDown(current_shift, cd[j]);
-            if (shift_down < s_down) shift_down = s_down;
+            if (shift_down < s_down)
+                shift_down = s_down;
         }
     return shift_down;
 }
@@ -102,14 +99,17 @@ float CIKLimbsController::StaticObjectShift(const SCalculateData cd[max_size])
     float shift_up = 0;
     const u16 sz = (u16)_bone_chains.size();
     for (u16 j = 0; sz > j; ++j)
-        if (cd[j].state.foot_step) {
+        if (cd[j].state.foot_step)
+        {
             float s_up = cd[j].cl_shift.y + current_shift;
-            if (0.f < s_up) {
+            if (0.f < s_up)
+            {
                 shift_up += s_up;
                 ++cnt;
             }
         }
-    if (0 < cnt) shift_up /= cnt;
+    if (0 < cnt)
+        shift_up /= cnt;
     float shift_down = LegLengthShiftLimit(current_shift, cd);
     float shift = 0;
     if (shift_down > 0.f)
@@ -135,12 +135,15 @@ bool CIKLimbsController::PredictObjectShift(const SCalculateData cd[max_size])
     const u16 sz = (u16)_bone_chains.size();
     float current_shift = _object_shift.shift();
     for (u16 j = 0; sz > j; ++j)
-        if (!cd[j].state.foot_step) {
+        if (!cd[j].state.foot_step)
+        {
             float time = cd[j].m_limb->time_to_footstep();
 
             float lshift = cd[j].m_limb->footstep_shift();
-            if (lshift < 0.f) {
-                if (time < predict_time_shift_down) {
+            if (lshift < 0.f)
+            {
+                if (time < predict_time_shift_down)
+                {
                     predict_time_shift_down = time;
                     predict_shift_down = lshift;
                     shift_down = true;
@@ -156,7 +159,8 @@ bool CIKLimbsController::PredictObjectShift(const SCalculateData cd[max_size])
     float predict_shift = 0;
     float predict_time_shift = FLT_MAX;
 
-    if (shift_down) {
+    if (shift_down)
+    {
         predict_shift = predict_shift_down;
         predict_time_shift = predict_time_shift_down;
     }
@@ -172,7 +176,8 @@ bool CIKLimbsController::PredictObjectShift(const SCalculateData cd[max_size])
     //	predict_time_shift = Device.fTimeDelta;
     //}
 
-    if (predict_time_shift < EPS_S) predict_time_shift = Device.fTimeDelta;
+    if (predict_time_shift < EPS_S)
+        predict_time_shift = Device.fTimeDelta;
     _object_shift.set_taget(predict_shift, predict_time_shift);
     return true;
 }
@@ -182,14 +187,15 @@ void CIKLimbsController::ObjectShift(float static_shift, const SCalculateData cd
     u16 cnt_in_step = 0;
     const u16 sz = (u16)_bone_chains.size();
     for (u16 j = 0; sz > j; ++j)
-        if (cd[j].m_limb->foot_step()) ++cnt_in_step;
+        if (cd[j].m_limb->foot_step())
+            ++cnt_in_step;
 
     CPhysicsShellHolder* sh = smart_cast<CPhysicsShellHolder*>(m_object);
     VERIFY(sh);
     // CCharacterPhysicsSupport *ch = sh->character_physics_support();
-    _object_shift.freeze(!!Device.Paused());  // ch->interactive_motion() ||
+    _object_shift.freeze(!!Device.Paused()); // ch->interactive_motion() ||
 
-    if (cnt_in_step != sz && PredictObjectShift(cd))  // cnt_in_step > 0 &&
+    if (cnt_in_step != sz && PredictObjectShift(cd)) // cnt_in_step > 0 &&
         return;
     StaticObjectShift(cd);
 }
@@ -210,7 +216,8 @@ void CIKLimbsController::ShiftObject(const SCalculateData cd[max_size])
     for (u16 i = 0; i < bones_count; ++i)
     {
         CBoneInstance& bi = skeleton_animated->LL_GetBoneInstance(i);
-        if (bi.callback()) bi.callback()(&bi);
+        if (bi.callback())
+            bi.callback()(&bi);
         skeleton_animated->LL_GetTransform_R(i).c.y += y_shift;
     }
     //	skeleton_animated->LL_GetTransform(root).c.y += _object_shift.shift();
@@ -246,7 +253,7 @@ void CIKLimbsController::Calculate()
 
     root_bi.set_callback(root_bi.callback_type(), 0, root_bi.callback_param(), TRUE);
 
-    if (ik_shift_object)  //&& ! m_object->animation_movement_controlled( )
+    if (ik_shift_object) //&& ! m_object->animation_movement_controlled( )
     {
         ShiftObject(cd);
     }
@@ -260,7 +267,8 @@ void CIKLimbsController::Calculate()
         cd[j].m_limb->SolveBones(cd[j]);
 
 #ifdef DEBUG
-        if (ph_dbg_draw_mask1.test(phDbgDrawIKPredict)) {
+        if (ph_dbg_draw_mask1.test(phDbgDrawIKPredict))
+        {
             // IKinematics *K = m_object->Visual()->dcast_PKinematics( );
             u16 ref_bone_id = cd[j].m_limb->dbg_ref_bone_id();
             Fmatrix m = Fmatrix().mul(obj, K->LL_GetTransform(ref_bone_id));
@@ -299,7 +307,8 @@ void _stdcall CIKLimbsController::IKVisualCallback(IKinematics* K)
 //	return;
 
 #ifdef DEBUG
-    if (ph_dbg_draw_mask1.test(phDbgIKOff)) return;
+    if (ph_dbg_draw_mask1.test(phDbgIKOff))
+        return;
 #endif
 
     CGameObject* O = ((CGameObject*)K->GetUpdateCallbackParam());
@@ -327,7 +336,8 @@ void CIKLimbsController::PlayLegs(CBlend* b)
 void CIKLimbsController::Update()
 {
 #ifdef DEBUG
-    if (ph_dbg_draw_mask1.test(phDbgIKOff)) return;
+    if (ph_dbg_draw_mask1.test(phDbgIKOff))
+        return;
 #endif
     IKinematicsAnimated* skeleton_animated = m_object->Visual()->dcast_PKinematicsAnimated();
     VERIFY(skeleton_animated);

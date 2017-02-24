@@ -18,10 +18,12 @@ using namespace luabind;
 void CUIActorMenu::TryRepairItem(CUIWindow* w, void* d)
 {
     PIItem item = get_upgrade_item();
-    if (!item) {
+    if (!item)
+    {
         return;
     }
-    if (item->GetCondition() > 0.99f) {
+    if (item->GetCondition() > 0.99f)
+    {
         return;
     }
     LPCSTR item_name = item->m_section_id.c_str();
@@ -37,7 +39,8 @@ void CUIActorMenu::TryRepairItem(CUIWindow* w, void* d)
         make_string("Failed to get functor <inventory_upgrades.question_repair_item>, item = %s", item_name));
     LPCSTR question = funct2(item_name, item->GetCondition(), can_repair, partner);
 
-    if (can_repair) {
+    if (can_repair)
+    {
         m_repair_mode = true;
         CallMessageBoxYesNo(question);
     }
@@ -48,7 +51,8 @@ void CUIActorMenu::TryRepairItem(CUIWindow* w, void* d)
 void CUIActorMenu::RepairEffect_CurItem()
 {
     PIItem item = CurrentIItem();
-    if (!item) {
+    if (!item)
+    {
         return;
     }
     LPCSTR item_name = item->m_section_id.c_str();
@@ -61,7 +65,8 @@ void CUIActorMenu::RepairEffect_CurItem()
     UpdateConditionProgressBars();
     SeparateUpgradeItem();
     CUICellItem* itm = CurrentItem();
-    if (itm) itm->UpdateConditionProgressBar();
+    if (itm)
+        itm->UpdateConditionProgressBar();
 }
 
 bool CUIActorMenu::CanUpgradeItem(PIItem item)

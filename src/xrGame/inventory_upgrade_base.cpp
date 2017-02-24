@@ -19,14 +19,8 @@ namespace inventory
 {
 namespace upgrade
 {
-UpgradeBase::UpgradeBase()
-{
-}
-
-UpgradeBase::~UpgradeBase()
-{
-}
-
+UpgradeBase::UpgradeBase() {}
+UpgradeBase::~UpgradeBase() {}
 void UpgradeBase::construct(const shared_str& upgrade_id, Manager& manager_r)
 {
     m_id._set(upgrade_id);
@@ -44,7 +38,8 @@ void UpgradeBase::add_dependent_groups(LPCSTR groups_str, Manager& manager_r)
     {
         Group* group_p = manager_r.add_group(_GetItem(groups_str, i, temp, buffer_size), *this);
 
-        if (std::find(m_depended_groups.begin(), m_depended_groups.end(), group_p) == m_depended_groups.end()) {
+        if (std::find(m_depended_groups.begin(), m_depended_groups.end(), group_p) == m_depended_groups.end())
+        {
             m_depended_groups.push_back(group_p);
         }
     }
@@ -72,28 +67,20 @@ void UpgradeBase::test_all_upgrades( CInventoryItem& item )
     }
 }
 */
-#endif  // DEBUG
+#endif // DEBUG
 
-bool UpgradeBase::is_root()
-{
-    return false;
-}
-
+bool UpgradeBase::is_root() { return false; }
 bool UpgradeBase::make_known()
 {
     m_known = true;
     return true;
 }
 
-bool UpgradeBase::contain_upgrade(const shared_str& upgrade_id)
-{
-    return (m_id._get() == upgrade_id._get());
-}
-
+bool UpgradeBase::contain_upgrade(const shared_str& upgrade_id) { return (m_id._get() == upgrade_id._get()); }
 void UpgradeBase::fill_root_container(Root* root)
 {
     //!=R_ASSERT2( 0, make_string( "! Can`t fill <%s> in <UpgradeBase::fill_root_container> for root = %s", id_str(),
-    //!root->id_str() ) );
+    //! root->id_str() ) );
     Groups_type::iterator ib = m_depended_groups.begin();
     Groups_type::iterator ie = m_depended_groups.end();
     for (; ib != ie; ++ib)
@@ -104,15 +91,19 @@ void UpgradeBase::fill_root_container(Root* root)
 
 UpgradeStateResult UpgradeBase::can_install(CInventoryItem& item, bool loading)
 {
-    if (!m_known && !loading) {
-        if (g_upgrades_log == 1) {
+    if (!m_known && !loading)
+    {
+        if (g_upgrades_log == 1)
+        {
             Msg("- Upgrade <%s> (id = %d) is in mode <unknown>.", id_str(), item.object_id());
         }
         return result_e_unknown;
     }
 
-    if (item.has_upgrade(m_id)) {
-        if (g_upgrades_log == 1) {
+    if (item.has_upgrade(m_id))
+    {
+        if (g_upgrades_log == 1)
+        {
             Msg("- Upgrade <%s> (id = %d) is installed already.", id_str(), item.object_id());
         }
         /*if ( loading )
@@ -120,10 +111,10 @@ UpgradeStateResult UpgradeBase::can_install(CInventoryItem& item, bool loading)
             FATAL( make_string( "Loading item: Upgrade <%s> (id = %d) is installed already.", id_str(), item.object_id()
         ).c_str() );
         }*/
-        return result_e_installed;  // true
+        return result_e_installed; // true
     }
     return result_ok;
 }
 
-}  // namespace upgrade
-}  // namespace inventory
+} // namespace upgrade
+} // namespace inventory

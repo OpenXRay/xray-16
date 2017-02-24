@@ -15,7 +15,8 @@ static void RecurseBone(LWItemID parent)
     LWItemID bone = g_iteminfo->firstChild(parent);
     while (bone != LWITEM_NULL)
     {
-        if (g_iteminfo->type(bone) == LWI_BONE) {
+        if (g_iteminfo->type(bone) == LWI_BONE)
+        {
             m_Motion->ParseBoneMotion(bone);
             RecurseBone(bone);
         }
@@ -28,7 +29,8 @@ static bool ParseObjectMotion(LWItemID object, int& obj_cnt)
     LWItemID bone, parent;
     bone = g_iteminfo->first(LWI_BONE, object);
 
-    if (!bone) {
+    if (!bone)
+    {
         g_msg->error("Can't find bone.", 0);
         return false;
     }
@@ -36,7 +38,8 @@ static bool ParseObjectMotion(LWItemID object, int& obj_cnt)
     while (true)
     {
         parent = g_iteminfo->parent(bone);
-        if (!parent) {
+        if (!parent)
+        {
             g_msg->error("Can't find root bone.", 0);
             return false;
         }
@@ -46,8 +49,10 @@ static bool ParseObjectMotion(LWItemID object, int& obj_cnt)
             bone = parent;
     }
 
-    if (bone) {
-        if (obj_cnt > 0) {
+    if (bone)
+    {
+        if (obj_cnt > 0)
+        {
             g_msg->error("Can't support multiple objects.", 0);
             return false;
         }
@@ -61,12 +66,14 @@ static bool ParseObjectMotion(LWItemID object, int& obj_cnt)
 
 void ReplaceSpaceAndLowerCase(shared_str& s)
 {
-    if (*s) {
+    if (*s)
+    {
         char* _s = xr_strdup(*s);
         char* lp = _s;
         while (lp[0])
         {
-            if (lp[0] == ' ') lp[0] = '_';
+            if (lp[0] == ' ')
+                lp[0] = '_';
             lp++;
         }
         xr_strlwr(_s);
@@ -90,7 +97,8 @@ void __cdecl SaveSkeletonMotion(GlobalFunc* global)
 
     EFS.GetSaveName("$smotion$", buf);
 
-    if (buf[0]) {
+    if (buf[0])
+    {
         object = g_iteminfo->first(LWI_OBJECT, NULL);
         int obj_cnt = 0;
         _splitpath(buf, 0, 0, name, 0);
@@ -98,14 +106,16 @@ void __cdecl SaveSkeletonMotion(GlobalFunc* global)
         m_Motion->SetName(name);
         while (object)
         {
-            if (g_intinfo->itemFlags(object) & LWITEMF_SELECTED) {
+            if (g_intinfo->itemFlags(object) & LWITEMF_SELECTED)
+            {
                 bErr = !ParseObjectMotion(object, obj_cnt);
                 break;
             }
             object = g_iteminfo->next(object);
         }
 
-        if (!bErr) {
+        if (!bErr)
+        {
             m_Motion->SetParam(g_intinfo->previewStart, g_intinfo->previewEnd, (float)g_lwsi->framesPerSecond);
             m_Motion->SaveMotion(buf);
             g_msg->info("Export successful.", buf);

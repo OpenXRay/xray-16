@@ -50,10 +50,10 @@
 
 enum
 {
-    ZXY = 0,  // left shoulder, ankle, hip
-    YXZ = 1,  // left wrist
-    Yxz = 2,  // right wrist
-    zxY = 3   // right shoulder, ankle, hip
+    ZXY = 0, // left shoulder, ankle, hip
+    YXZ = 1, // left wrist
+    Yxz = 2, // right wrist
+    zxY = 3 // right shoulder, ankle, hip
 };
 
 // Given a matrix find the corresponding euler angles
@@ -65,8 +65,8 @@ void EulerEval(int euler_type, const float t[3], Matrix R);
 class EulerPsiSolver
 {
 private:
-    int euler_type;  // ZXY, YXZ, etc
-    int jt_type;     // simple jt is either sin(theta) or cos(theta)
+    int euler_type; // ZXY, YXZ, etc
+    int jt_type; // simple jt is either sin(theta) or cos(theta)
     // index[0] = index of simple jt, index[1],index[2] indices of complex joints
     short index[3];
 
@@ -81,7 +81,6 @@ public:
     EulerPsiSolver(int etype, const Matrix c, const Matrix s, const Matrix o, const float low[3], const float high[3]);
 
     ~EulerPsiSolver() {}
-
     // Solve for psi ranges that lie in joint limits. Return each
     // family for each joint in psi1[0..2] and psi2[0..2]
     void SolvePsiRanges(AngleIntList psi1[3], AngleIntList psi2[3]) const;

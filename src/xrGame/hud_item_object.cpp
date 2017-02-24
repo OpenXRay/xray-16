@@ -1,14 +1,8 @@
 #include "stdafx.h"
 #include "hud_item_object.h"
 
-CHudItemObject::CHudItemObject()
-{
-}
-
-CHudItemObject::~CHudItemObject()
-{
-}
-
+CHudItemObject::CHudItemObject() {}
+CHudItemObject::~CHudItemObject() {}
 IFactoryObject* CHudItemObject::_construct()
 {
     CInventoryItemObject::_construct();
@@ -24,20 +18,13 @@ void CHudItemObject::Load(LPCSTR section)
 
 bool CHudItemObject::Action(u16 cmd, u32 flags)
 {
-    if (CInventoryItemObject::Action(cmd, flags)) return (true);
+    if (CInventoryItemObject::Action(cmd, flags))
+        return (true);
     return (CHudItem::Action(cmd, flags));
 }
 
-void CHudItemObject::SwitchState(u32 S)
-{
-    CHudItem::SwitchState(S);
-}
-
-void CHudItemObject::OnStateSwitch(u32 S)
-{
-    CHudItem::OnStateSwitch(S);
-}
-
+void CHudItemObject::SwitchState(u32 S) { CHudItem::SwitchState(S); }
+void CHudItemObject::OnStateSwitch(u32 S) { CHudItem::OnStateSwitch(S); }
 void CHudItemObject::OnMoveToRuck(const SInvItemPlace& prev)
 {
     CInventoryItemObject::OnMoveToRuck(prev);
@@ -85,28 +72,13 @@ void CHudItemObject::net_Destroy()
     CInventoryItemObject::net_Destroy();
 }
 
-bool CHudItemObject::ActivateItem()
-{
-    return (CHudItem::ActivateItem());
-}
-
-void CHudItemObject::DeactivateItem()
-{
-    CHudItem::DeactivateItem();
-}
-
+bool CHudItemObject::ActivateItem() { return (CHudItem::ActivateItem()); }
+void CHudItemObject::DeactivateItem() { CHudItem::DeactivateItem(); }
 void CHudItemObject::UpdateCL()
 {
     CInventoryItemObject::UpdateCL();
     CHudItem::UpdateCL();
 }
 
-void CHudItemObject::renderable_Render()
-{
-    CHudItem::renderable_Render();
-}
-
-void CHudItemObject::on_renderable_Render()
-{
-    CInventoryItemObject::renderable_Render();
-}
+void CHudItemObject::renderable_Render() { CHudItem::renderable_Render(); }
+void CHudItemObject::on_renderable_Render() { CInventoryItemObject::renderable_Render(); }

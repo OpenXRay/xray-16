@@ -36,15 +36,13 @@ SLuaWpnParams::SLuaWpnParams()
     VERIFY(functor_exists);
 }
 
-SLuaWpnParams::~SLuaWpnParams()
-{
-}
-
+SLuaWpnParams::~SLuaWpnParams() {}
 SLuaWpnParams* g_lua_wpn_params = NULL;
 
 void destroy_lua_wpn_params()
 {
-    if (g_lua_wpn_params) xr_delete(g_lua_wpn_params);
+    if (g_lua_wpn_params)
+        xr_delete(g_lua_wpn_params);
 }
 
 // =====================================================================
@@ -77,13 +75,11 @@ CUIWpnParams::CUIWpnParams()
     AttachChild(&m_stAmmoType2);
 }
 
-CUIWpnParams::~CUIWpnParams()
-{
-}
-
+CUIWpnParams::~CUIWpnParams() {}
 void CUIWpnParams::InitFromXml(CUIXml& xml_doc)
 {
-    if (!xml_doc.NavigateToNode("wpn_params", 0)) return;
+    if (!xml_doc.NavigateToNode("wpn_params", 0))
+        return;
     CUIXmlInit::InitWindow(xml_doc, "wpn_params", 0, this);
     CUIXmlInit::InitStatic(xml_doc, "wpn_params:prop_line", 0, &m_Prop_line);
 
@@ -102,7 +98,8 @@ void CUIWpnParams::InitFromXml(CUIXml& xml_doc)
     m_progressHandling.InitFromXml(xml_doc, "wpn_params:progress_handling");
     m_progressRPM.InitFromXml(xml_doc, "wpn_params:progress_rpm");
 
-    if (IsGameTypeSingle()) {
+    if (IsGameTypeSingle())
+    {
         CUIXmlInit::InitStatic(xml_doc, "wpn_params:static_ammo", 0, &m_stAmmo);
         CUIXmlInit::InitTextWnd(xml_doc, "wpn_params:cap_ammo_count", 0, &m_textAmmoCount);
         CUIXmlInit::InitTextWnd(xml_doc, "wpn_params:cap_ammo_count2", 0, &m_textAmmoCount2);
@@ -115,7 +112,8 @@ void CUIWpnParams::InitFromXml(CUIXml& xml_doc)
 
 void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
 {
-    if (!g_lua_wpn_params) {
+    if (!g_lua_wpn_params)
+    {
         g_lua_wpn_params = new SLuaWpnParams();
     }
 
@@ -128,15 +126,16 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
     float cur_accur = iFloor(g_lua_wpn_params->m_functorAccuracy(cur_section, str_upgrades) * 53.0f) / 53.0f;
     float cur_hand = iFloor(g_lua_wpn_params->m_functorHandling(cur_section, str_upgrades) * 53.0f) / 53.0f;
     float cur_damage = (GameID() == eGameIDSingle) ?
-                           iFloor(g_lua_wpn_params->m_functorDamage(cur_section, str_upgrades) * 53.0f) / 53.0f :
-                           iFloor(g_lua_wpn_params->m_functorDamageMP(cur_section, str_upgrades) * 53.0f) / 53.0f;
+        iFloor(g_lua_wpn_params->m_functorDamage(cur_section, str_upgrades) * 53.0f) / 53.0f :
+        iFloor(g_lua_wpn_params->m_functorDamageMP(cur_section, str_upgrades) * 53.0f) / 53.0f;
 
     float slot_rpm = cur_rpm;
     float slot_accur = cur_accur;
     float slot_hand = cur_hand;
     float slot_damage = cur_damage;
 
-    if (slot_wpn && (slot_wpn != &cur_wpn)) {
+    if (slot_wpn && (slot_wpn != &cur_wpn))
+    {
         LPCSTR slot_section = slot_wpn->object().cNameSect().c_str();
         str_upgrades[0] = 0;
         slot_wpn->get_upgrades_str(str_upgrades);
@@ -145,8 +144,8 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
         slot_accur = iFloor(g_lua_wpn_params->m_functorAccuracy(slot_section, str_upgrades) * 53.0f) / 53.0f;
         slot_hand = iFloor(g_lua_wpn_params->m_functorHandling(slot_section, str_upgrades) * 53.0f) / 53.0f;
         slot_damage = (GameID() == eGameIDSingle) ?
-                          iFloor(g_lua_wpn_params->m_functorDamage(slot_section, str_upgrades) * 53.0f) / 53.0f :
-                          iFloor(g_lua_wpn_params->m_functorDamageMP(slot_section, str_upgrades) * 53.0f) / 53.0f;
+            iFloor(g_lua_wpn_params->m_functorDamage(slot_section, str_upgrades) * 53.0f) / 53.0f :
+            iFloor(g_lua_wpn_params->m_functorDamageMP(slot_section, str_upgrades) * 53.0f) / 53.0f;
     }
 
     m_progressAccuracy.SetTwoPos(cur_accur, slot_accur);
@@ -154,18 +153,22 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
     m_progressHandling.SetTwoPos(cur_hand, slot_hand);
     m_progressRPM.SetTwoPos(cur_rpm, slot_rpm);
 
-    if (IsGameTypeSingle()) {
+    if (IsGameTypeSingle())
+    {
         xr_vector<shared_str> ammo_types;
 
         CWeapon* weapon = cur_wpn.cast_weapon();
-        if (!weapon) return;
+        if (!weapon)
+            return;
 
         int ammo_count = weapon->GetAmmoMagSize();
         int ammo_count2 = ammo_count;
 
-        if (slot_wpn) {
+        if (slot_wpn)
+        {
             CWeapon* slot_weapon = slot_wpn->cast_weapon();
-            if (slot_weapon) ammo_count2 = slot_weapon->GetAmmoMagSize();
+            if (slot_weapon)
+                ammo_count2 = slot_weapon->GetAmmoMagSize();
         }
 
         if (ammo_count == ammo_count2)
@@ -180,7 +183,8 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
         m_textAmmoCount2.SetText(str);
 
         ammo_types = weapon->m_ammoTypes;
-        if (ammo_types.empty()) return;
+        if (ammo_types.empty())
+            return;
 
         xr_sprintf(str, sizeof(str), "%s", pSettings->r_string(ammo_types[0].c_str(), "inv_name_short"));
         m_textAmmoUsedType.SetTextST(str);
@@ -199,7 +203,8 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
             Fvector2().set((tex_rect.x2 - tex_rect.x1) * UI().get_current_kx(), tex_rect.y2 - tex_rect.y1));
 
         m_stAmmoType2.SetShader(InventoryUtilities::GetEquipmentIconsShader());
-        if (ammo_types.size() == 1) {
+        if (ammo_types.size() == 1)
+        {
             tex_rect.set(0, 0, 1, 1);
         }
         else
@@ -220,10 +225,14 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
 
 bool CUIWpnParams::Check(const shared_str& wpn_section)
 {
-    if (pSettings->line_exist(wpn_section, "fire_dispersion_base")) {
-        if (0 == xr_strcmp(wpn_section, "wpn_addon_silencer")) return false;
-        if (0 == xr_strcmp(wpn_section, "wpn_binoc")) return false;
-        if (0 == xr_strcmp(wpn_section, "mp_wpn_binoc")) return false;
+    if (pSettings->line_exist(wpn_section, "fire_dispersion_base"))
+    {
+        if (0 == xr_strcmp(wpn_section, "wpn_addon_silencer"))
+            return false;
+        if (0 == xr_strcmp(wpn_section, "wpn_binoc"))
+            return false;
+        if (0 == xr_strcmp(wpn_section, "mp_wpn_binoc"))
+            return false;
 
         return true;
     }
@@ -238,13 +247,11 @@ CUIConditionParams::CUIConditionParams()
     AttachChild(&m_text);
 }
 
-CUIConditionParams::~CUIConditionParams()
-{
-}
-
+CUIConditionParams::~CUIConditionParams() {}
 void CUIConditionParams::InitFromXml(CUIXml& xml_doc)
 {
-    if (!xml_doc.NavigateToNode("condition_params", 0)) return;
+    if (!xml_doc.NavigateToNode("condition_params", 0))
+        return;
     CUIXmlInit::InitWindow(xml_doc, "condition_params", 0, this);
     CUIXmlInit::InitStatic(xml_doc, "condition_params:caption", 0, &m_text);
     m_progress.InitFromXml(xml_doc, "condition_params:progress_state");

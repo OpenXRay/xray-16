@@ -56,6 +56,4 @@ IC void CScriptAnimationAction::SetMentalState(MonsterSpace::EMentalState tMenta
     m_use_animation_movement_controller = false;
 }
 
-IC void CScriptAnimationAction::initialize()
-{
-}
+IC void CScriptAnimationAction::initialize() {}

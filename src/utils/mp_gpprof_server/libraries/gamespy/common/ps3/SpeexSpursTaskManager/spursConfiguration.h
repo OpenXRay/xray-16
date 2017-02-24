@@ -10,25 +10,24 @@
 #include <cell/spurs.h>
 
 #ifdef __cplusplus
-extern "C" {
+extern "C" { 
 #endif
 
 #define CELL_SPURS_DEFAULT_SPU_COUNT 1
 
 // "-Wl,--whole-archive -lprof_stub -Wl,--no-whole-archive"
 
-enum CellSpursReturn
-{
-    CELL_SPURS_OK = 0,
-    CELL_SPURS_EBUSY,
-    CELL_SPURS_EINVAL,
-    CELL_SPURS_EMISC
+enum CellSpursReturn {
+	CELL_SPURS_OK=0,
+	CELL_SPURS_EBUSY,
+	CELL_SPURS_EINVAL,
+	CELL_SPURS_EMISC
 };
 
 /**
  * \brief This class controls the SPU usage of SPURS
  *
- * There are three ways to initialize SPU usage.
+ * There are three ways to initialize SPU usage.  
  *
  * The first way is to initialize SPURS yourself, and to pass in a pointer to
  * SPURS as well as priorities for the use of the SPUs, using initWithSpurs.
@@ -62,7 +61,7 @@ enum CellSpursReturn
  * CELL_SPURS_EBUSY if SPU usage has already been initialized
  * CELL_SPURS_EINVAL if the priorities or SPURS pointer is invalid.
  */
-int spursConfiguration_initWithSpurs(CellSpurs* pSpurs, int iSPUCount, uint8_t auiPriorities[8]);
+int spursConfiguration_initWithSpurs(CellSpurs *pSpurs, int iSPUCount, uint8_t auiPriorities[8]);
 
 /**
  * \brief Sets the number of SPUs to be used by a software-initialized SPURS.
@@ -94,4 +93,4 @@ bool spursConfiguration_isSpursInitialized();
 }
 #endif
 
-#endif  //__CELL_SPU_CONFIG
+#endif //__CELL_SPU_CONFIG

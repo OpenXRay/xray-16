@@ -30,20 +30,9 @@ void CStalkerDangerBySoundPlanner::setup(CAI_Stalker* object, CPropertyStorage* 
     add_actions();
 }
 
-void CStalkerDangerBySoundPlanner::initialize()
-{
-    inherited::initialize();
-}
-
-void CStalkerDangerBySoundPlanner::update()
-{
-    inherited::update();
-}
-
-void CStalkerDangerBySoundPlanner::finalize()
-{
-    inherited::finalize();
-}
+void CStalkerDangerBySoundPlanner::initialize() { inherited::initialize(); }
+void CStalkerDangerBySoundPlanner::update() { inherited::update(); }
+void CStalkerDangerBySoundPlanner::finalize() { inherited::finalize(); }
 void CStalkerDangerBySoundPlanner::add_evaluators()
 {
     add_evaluator(eWorldPropertyDanger, new CStalkerPropertyEvaluatorDangers(m_object, "danger"));

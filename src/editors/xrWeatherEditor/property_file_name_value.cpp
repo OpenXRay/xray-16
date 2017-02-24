@@ -19,27 +19,8 @@ property_file_name_value::property_file_name_value(string_getter_type const& get
 {
 }
 
-String ^ property_file_name_value::default_extension()
-{
-    return (DefaultExt);
-}
-
-String ^ property_file_name_value::filter()
-{
-    return (Filter);
-}
-
-String ^ property_file_name_value::initial_directory()
-{
-    return (InitialDirectory);
-}
-
-String ^ property_file_name_value::title()
-{
-    return (Title);
-}
-
-bool property_file_name_value::remove_extension()
-{
-    return (m_remove_extension);
-}
+String ^ property_file_name_value::default_extension() { return (DefaultExt); }
+String ^ property_file_name_value::filter() { return (Filter); }
+String ^ property_file_name_value::initial_directory() { return (InitialDirectory); }
+String ^ property_file_name_value::title() { return (Title); }
+bool property_file_name_value::remove_extension() { return (m_remove_extension); }

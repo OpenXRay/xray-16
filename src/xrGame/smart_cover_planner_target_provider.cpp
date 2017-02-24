@@ -26,11 +26,7 @@ target_provider::target_provider(animation_planner* object, LPCSTR name,
 {
 }
 
-void target_provider::setup(animation_planner* object, CPropertyStorage* storage)
-{
-    inherited::setup(object, storage);
-}
-
+void target_provider::setup(animation_planner* object, CPropertyStorage* storage) { inherited::setup(object, storage); }
 void target_provider::initialize()
 {
     inherited::initialize();
@@ -39,11 +35,7 @@ void target_provider::initialize()
     m_object->decrease_loophole_value(m_loophole_value);
 }
 
-void target_provider::finalize()
-{
-    inherited::finalize();
-}
-
+void target_provider::finalize() { inherited::finalize(); }
 ////////////////////////////////////////////////////////////////////////////
 //	class target_idle
 ////////////////////////////////////////////////////////////////////////////
@@ -58,7 +50,8 @@ void target_idle::execute()
 {
     inherited::execute();
 
-    if (!completed()) return;
+    if (!completed())
+        return;
 
     m_storage->set_property(StalkerDecisionSpace::eWorldPropertyLoopholeTooMuchTimeFiring, false);
 }
@@ -87,14 +80,19 @@ void target_fire::execute()
 {
     inherited::execute();
 
-    if (!m_inertia_time) return;
+    if (!m_inertia_time)
+        return;
 
-    if (!completed()) return;
+    if (!completed())
+        return;
 
-    if (this->m_object->m_object->ready_to_kill()) {
+    if (this->m_object->m_object->ready_to_kill())
+    {
         CWeapon* weapon = smart_cast<CWeapon*>(this->m_object->m_object->m_best_item_to_kill);
-        if (weapon) {
-            if (weapon->GetAmmoElapsed() <= weapon->GetAmmoMagSize() / 6) return;
+        if (weapon)
+        {
+            if (weapon->GetAmmoElapsed() <= weapon->GetAmmoMagSize() / 6)
+                return;
         }
     }
 

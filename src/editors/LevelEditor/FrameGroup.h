@@ -21,8 +21,8 @@ class ESceneGroupTool;
 //---------------------------------------------------------------------------
 class TfraGroup : public TForm
 {
-    __published :  // IDE-managed Components
-                   TPanel* paCommands;
+    __published : // IDE-managed Components
+                  TPanel* paCommands;
     TExtBtn* ExtBtn2;
     TExtBtn* ebUngroup;
     TExtBtn* ebGroup;
@@ -74,12 +74,12 @@ class TfraGroup : public TForm
     void __fastcall ebMakeThumbnailClick(TObject* Sender);
     void __fastcall ExtBtn2Click(TObject* Sender);
 
-  private:  // User declarations
+private: // User declarations
     ESceneGroupTool* ParentTools;
     void SelByRefObject(bool flag);
     void MultiSelByRefObject(bool clear_prev);
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TfraGroup(TComponent* Owner, ESceneGroupTool* gt);
 };
 

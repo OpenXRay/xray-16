@@ -16,17 +16,18 @@
 //---------------------------------------------------------------------------
 class TfrmSplash : public TForm
 {
-    __published :  // IDE-managed Components
-                   TImage* Image1;
+    __published : // IDE-managed Components
+                  TImage* Image1;
     TMxLabel* lbStatus;
 
-  private:  // User declarations
-  public:   // User declarations
+private: // User declarations
+public: // User declarations
     __fastcall TfrmSplash(TComponent* Owner);
 
     void SetStatus(LPSTR log)
     {
-        if (log) {
+        if (log)
+        {
             lbStatus->Caption = log;
             lbStatus->Repaint();
         };

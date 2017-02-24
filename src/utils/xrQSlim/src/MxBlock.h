@@ -1,4 +1,4 @@
-#ifndef MXBLOCK_INCLUDED  // -*- C++ -*-
+#ifndef MXBLOCK_INCLUDED // -*- C++ -*-
 #define MXBLOCK_INCLUDED
 #if !defined(__GNUC__)
 #pragma once
@@ -21,20 +21,14 @@ enum _array_alloc_policy
 {
     ARRAY_ALLOC_INPLACE
 };
-inline void* operator new(size_t, void* p, _array_alloc_policy)
-{
-    return p;
-}
-
+inline void* operator new(size_t, void* p, _array_alloc_policy) { return p; }
 #if _MSC_VER >= 1200
 //
 // This matching delete operator is necessary to avoid warnings in
 // VC++ 6.0.  For some reason, it seems to periodically cause internal
 // compiler errors in some GCC 2.95.x compilers.
 //
-inline void operator delete(void* mem, void* spot, _array_alloc_policy)
-{
-}
+inline void operator delete(void* mem, void* spot, _array_alloc_policy) {}
 #endif
 
 template <class T>
@@ -95,32 +89,28 @@ protected:
 public:
     MxBlock(int n) { init_block(n); }
     ~MxBlock() { free_block(); }
-
     operator const T*() const { return block; }
     operator T*() { return block; }
     int length() const { return N; }
-
     // These parenthesized accessors are included for backwards
     // compatibility.  Their continued use is discouraged.
     //
     T& operator()(int i) { return (*this)[i]; }
     const T& operator()(int i) const { return (*this)[i]; }
-
     // Primitive methods for altering the data block
     //
     void resize(int n) { resize_block(n); }
-    void bitcopy(const T* a, int n)  // copy bits directly
+    void bitcopy(const T* a, int n) // copy bits directly
     {
         CopyMemory(block, a, _min(n, N) * sizeof(T));
     }
-    void copy(const T* a, const int n)  // copy using assignment operator
+    void copy(const T* a, const int n) // copy using assignment operator
     {
         for (int i = 0; i < _min(n, N); i++)
             block[i] = a[i];
     }
     void bitcopy(const MxBlock<T>& b) { bitcopy(b, b.length()); }
     void copy(const MxBlock<T>& b) { copy(b, b.length()); }
-
     // Restricted STL-like interface for interoperability with
     // STL-based code.
     //
@@ -129,7 +119,6 @@ public:
     typedef value_type* const_iterator;
 
     int size() const { return length(); }
-
     iterator begin() { return block; }
     const_iterator begin() const { return block; }
     iterator end() { return begin() + size(); }

@@ -18,7 +18,7 @@ namespace Wml
 template <class Real>
 class WML_ITEM MinimizeN
 {
-  public:
+public:
     typedef Real (*Function)(const Real*, void*);
 
     MinimizeN(
@@ -33,7 +33,7 @@ class WML_ITEM MinimizeN
     // find minimum on Cartesian-product domain
     void GetMinimum(const Real* afT0, const Real* afT1, const Real* afTInitial, Real* afTMin, Real& rfFMin);
 
-  protected:
+protected:
     int m_iDimensions;
     Function m_oFunction;
     int m_iMaxIterations;

@@ -26,12 +26,14 @@ TriObject* CEditableMesh::ExtractTriObject(INode* node, int& deleteIt)
 {
     deleteIt = FALSE;
     Object* obj = node->EvalWorldState(0).obj;
-    if (obj->CanConvertToType(Class_ID(TRIOBJ_CLASS_ID, 0))) {
+    if (obj->CanConvertToType(Class_ID(TRIOBJ_CLASS_ID, 0)))
+    {
         TriObject* tri = (TriObject*)obj->ConvertToType(0, Class_ID(TRIOBJ_CLASS_ID, 0));
         // Note that the TriObject should only be deleted
         // if the pointer to it is not equal to the object
         // pointer that called ConvertToType()
-        if (obj != tri) deleteIt = TRUE;
+        if (obj != tri)
+            deleteIt = TRUE;
         return tri;
     }
     else
@@ -48,24 +50,29 @@ bool CEditableMesh::Convert(INode* node)
     bool bResult = true;
     TriObject* obj = ExtractTriObject(node, bDeleteObj);
 
-    if (!obj) {
+    if (!obj)
+    {
         ELog.Msg(mtError, "%s -> Can't convert to TriObject", node->GetName());
         return false;
     }
 
-    if (obj->mesh.getNumFaces() <= 0) {
+    if (obj->mesh.getNumFaces() <= 0)
+    {
         ELog.Msg(mtError, "%s -> There are no faces ?", node->GetName());
-        if (bDeleteObj) delete (obj);
+        if (bDeleteObj)
+            delete (obj);
         return false;
     }
 
     Mtl* pMtlMain = node->GetMtl();
     DWORD cSubMaterials = 0;
 
-    if (pMtlMain) {
+    if (pMtlMain)
+    {
         // There is at least one material. We're in case 1) or 2)
         cSubMaterials = pMtlMain->NumSubMtls();
-        if (cSubMaterials < 1) {
+        if (cSubMaterials < 1)
+        {
             // Count the material itself as a submaterial.
             cSubMaterials = 1;
         }
@@ -92,17 +99,20 @@ bool CEditableMesh::Convert(INode* node)
     m_SmoothGroups = xr_alloc<u32>(m_FaceCount);
 
     m_VMRefs.reserve(m_FaceCount * 3);
-    if (0 == obj->mesh.mapFaces(1)) {
+    if (0 == obj->mesh.mapFaces(1))
+    {
         bResult = false;
         ELog.Msg(mtError, "'%s' hasn't UV mapping!", node->GetName());
     }
-    if (bResult) {
+    if (bResult)
+    {
         CSurface* surf = 0;
         for (int f_i = 0; f_i < m_FaceCount; ++f_i)
         {
             Face* vf = obj->mesh.faces + f_i;
             TVFace* tf = obj->mesh.mapFaces(1) + f_i;
-            if (!tf) {
+            if (!tf)
+            {
                 bResult = false;
                 ELog.Msg(mtError, "'%s' hasn't UV mapping!", node->GetName());
                 break;
@@ -121,11 +131,14 @@ bool CEditableMesh::Convert(INode* node)
                     vm_lst.pts[vm_i].index = tf->t[k];
                 }
                 m_Faces[f_i].pv[k].vmref = m_VMRefs.size() - 1;
-                if (!bResult) break;
+                if (!bResult)
+                    break;
             }
-            if (pMtlMain) {
+            if (pMtlMain)
+            {
                 int m_id = obj->mesh.getFaceMtlIndex(f_i);
-                if (cSubMaterials == 1) {
+                if (cSubMaterials == 1)
+                {
                     m_id = 0;
                 }
                 else
@@ -135,15 +148,18 @@ bool CEditableMesh::Convert(INode* node)
                     m_id %= cSubMaterials;
                 }
                 surf = m_Parent->CreateSurface(pMtlMain, m_id);
-                if (!surf) bResult = false;
+                if (!surf)
+                    bResult = false;
             }
-            if (!bResult) break;
+            if (!bResult)
+                break;
             m_SurfFaces[surf].push_back(f_i);
         }
     }
 
     // vmaps
-    if (bResult) {
+    if (bResult)
+    {
         int vm_cnt = obj->mesh.getNumTVerts();
         m_VMaps.resize(1);
         st_VMap*& VM = m_VMaps.back();
@@ -155,16 +171,19 @@ bool CEditableMesh::Convert(INode* node)
         }
     }
 
-    if ((GetVertexCount() < 4) || (GetFaceCount() < 2)) {
+    if ((GetVertexCount() < 4) || (GetFaceCount() < 2))
+    {
         ELog.Msg(mtError, "Invalid mesh: '%s'. Faces<2 or Verts<4");
         bResult = false;
     }
 
-    if (bResult) {
+    if (bResult)
+    {
         ELog.Msg(mtInformation, "Model '%s' contains: %d points, %d faces", node->GetName(), m_VertCount, m_FaceCount);
     }
 
-    if (bResult) {
+    if (bResult)
+    {
         RecomputeBBox();
         OptimizeMesh(false);
         RebuildVMaps();
@@ -172,7 +191,8 @@ bool CEditableMesh::Convert(INode* node)
             GetFaceCount());
     }
 
-    if (bDeleteObj) delete (obj);
+    if (bDeleteObj)
+        delete (obj);
     return bResult;
 }
 //----------------------------------------------------------------------------
@@ -244,20 +264,23 @@ bool CEditableMesh::Convert(CExporter* E)
                 vt.vmref = vt.pindex;
             }
             CSurface* surf = m_Parent->CreateSurface(E->m_MtlMain, (*ef_it)->m_id);
-            if (!surf) {
+            if (!surf)
+            {
                 bResult = FALSE;
                 break;
             }
             m_SurfFaces[surf].push_back(f_id);
         }
     }
-    if ((GetVertexCount() < 4) || (GetFaceCount() < 2)) {
+    if ((GetVertexCount() < 4) || (GetFaceCount() < 2))
+    {
         Log("!Invalid mesh: '%s'. Faces<2 or Verts<4", *Name());
         bResult = false;
     }
-    if (bResult) {
+    if (bResult)
+    {
         RecomputeBBox();
-        OptimizeMesh(true);  // false);
+        OptimizeMesh(true); // false);
         RebuildVMaps();
     }
     return bResult;

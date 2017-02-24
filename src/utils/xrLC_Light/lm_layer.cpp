@@ -20,7 +20,7 @@ void lm_layer::Pack(xr_vector<u32>& dest) const
         *W++ = color_rgba(_r, _g, _b, _d);
     }
 }
-void lm_layer::Pack_hemi(xr_vector<u32>& dest) const  //.
+void lm_layer::Pack_hemi(xr_vector<u32>& dest) const //.
 {
     dest.resize(width * height);
     xr_vector<base_color>::const_iterator I = surface.begin();
@@ -77,17 +77,21 @@ bool lm_layer::similar(const lm_layer& layer, float eps /* =EPS*/) const
 {
     // if( mode != layer.mode )
     // return false;
-    if (marker.size() != layer.marker.size()) return false;
+    if (marker.size() != layer.marker.size())
+        return false;
     for (u32 i = 0; i < marker.size(); ++i)
     {
-        if (marker[i] != layer.marker[i]) {
+        if (marker[i] != layer.marker[i])
+        {
             return false;
         }
     }
-    if (surface.size() != layer.surface.size()) return false;
+    if (surface.size() != layer.surface.size())
+        return false;
     for (u32 i = 0; i < surface.size(); ++i)
     {
-        if (!surface[i].similar(layer.surface[i], EPS)) {
+        if (!surface[i].similar(layer.surface[i], EPS))
+        {
             Msg("sufface diff id: %d", i);
             return false;
         }

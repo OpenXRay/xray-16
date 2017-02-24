@@ -23,10 +23,9 @@ class XR_EPROPS_API CFolderHelper
         return N;
     }
 
-  public:
+public:
     IC bool IsFolder(TElTreeItem* node) { return node ? (TYPE_FOLDER == (u32)node->Data) : TYPE_INVALID; }
     IC bool IsObject(TElTreeItem* node) { return node ? (TYPE_OBJECT == (u32)node->Data) : TYPE_INVALID; }
-
     bool MakeFullName(TElTreeItem* begin_item, TElTreeItem* end_item, AnsiString& folder);
     bool MakeName(TElTreeItem* begin_item, TElTreeItem* end_item, AnsiString& folder, bool bOnlyFolder);
     TElTreeItem* FindItemInFolder(TElTree* tv, TElTreeItem* start_folder, const AnsiString& name);

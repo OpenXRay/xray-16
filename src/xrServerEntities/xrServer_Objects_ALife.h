@@ -14,7 +14,7 @@
 #include "xrAICore/Navigation/game_graph_space.h"
 #ifdef XRGAME_EXPORTS
 #include "alife_smart_terrain_task.h"
-#endif  //#ifdef XRGAME_EXPORTS
+#endif //#ifdef XRGAME_EXPORTS
 
 #pragma warning(push)
 #pragma warning(disable : 4005)
@@ -28,7 +28,7 @@ class CSE_ALifeDynamicObject;
 class CSE_ALifeObject;
 #ifdef XRGAME_EXPORTS
 class CALifeSmartTerrainTask;
-#endif  //#ifdef XRGAME_EXPORTS
+#endif //#ifdef XRGAME_EXPORTS
 class CALifeMonsterAbstract;
 
 struct SFillPropData
@@ -99,7 +99,6 @@ public:
     CSE_ALifeGraphPoint(LPCSTR caSection);
     virtual ~CSE_ALifeGraphPoint();
     virtual bool match_configuration() const { return false; }
-
 #ifndef XRGAME_EXPORTS
     virtual void __stdcall on_render(CDUInterface* du, IServerEntityLEOwner* owner, bool bSelected,
         const Fmatrix& parent, int priority, bool strictB2F);
@@ -259,32 +258,23 @@ public:
     }
 
     virtual CSE_Abstract* base() { return (inherited1::base()); }
-
     virtual const CSE_Abstract* base() const { return (inherited1::base()); }
-
 #ifndef XRGAME_EXPORTS
     virtual void FillProps(LPCSTR pref, PropItemVec& items)
     {
         inherited1::FillProps(pref, items);
         inherited2::FillProps(pref, items);
     };
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
     virtual CSE_Abstract* cast_abstract() { return (this); }
-
     virtual CSE_ALifeGroupAbstract* cast_group_abstract() { return (this); }
-
 #ifdef XRGAME_EXPORTS
     virtual void switch_online() { inherited2::switch_online(); }
-
     virtual void switch_offline() { inherited2::switch_offline(); }
-
     virtual bool synchronize_location() { return (inherited2::synchronize_location()); }
-
     virtual void try_switch_online() { inherited2::try_switch_online(); }
-
     virtual void try_switch_offline() { inherited2::try_switch_offline(); }
-
     virtual bool redundant() const { return (inherited2::redundant()); }
 #endif
 };
@@ -354,7 +344,6 @@ public:
     virtual bool used_ai_locations() const;
     virtual void load(NET_Packet& tNetPacket);
     virtual CSE_Abstract* cast_abstract() { return this; }
-
 public:
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
@@ -463,7 +452,7 @@ public:
 private:
     u32 m_freeze_time;
     static const u32 m_freeze_delta_time;
-#ifdef DEBUG  // only for testing interpolation
+#ifdef DEBUG // only for testing interpolation
     u32 m_last_update_time;
     static const u32 m_update_delta_time;
 #endif
@@ -475,7 +464,7 @@ public:
     {
         inventory_item_state_enabled = u8(1) << 0,
         inventory_item_angular_null = u8(1) << 1,
-        inventory_item_linear_null = u8(1) << 2  //,
+        inventory_item_linear_null = u8(1) << 2 //,
         // animated                      = u8(1) << 3
     };
     union mask_num_items
@@ -559,7 +548,7 @@ public:
 #ifndef XRGAME_EXPORTS
     virtual void __stdcall on_render(CDUInterface* du, IServerEntityLEOwner* owner, bool bSelected,
         const Fmatrix& parent, int priority, bool strictB2F);
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
     virtual CSE_Abstract* cast_abstract() { return this; }
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
@@ -598,7 +587,6 @@ public:
     virtual bool used_ai_locations() const;
     virtual CSE_Motion* __stdcall motion();
     virtual CSE_Abstract* cast_abstract() { return this; }
-
     virtual void UPDATE_Read(NET_Packet& P);
     virtual void UPDATE_Write(NET_Packet& P);
     virtual void STATE_Read(NET_Packet& P, u16 size);
@@ -634,7 +622,6 @@ public:
     virtual void load(NET_Packet& tNetPacket);
     virtual bool can_save() const;
     virtual CSE_Abstract* cast_abstract() { return this; }
-
 protected:
     virtual void data_load(NET_Packet& tNetPacket);
     virtual void data_save(NET_Packet& tNetPacket);

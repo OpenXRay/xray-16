@@ -10,15 +10,13 @@
 TfrmPreviewImage* TfrmPreviewImage::form = 0;
 
 //---------------------------------------------------------------------------
-__fastcall TfrmPreviewImage::TfrmPreviewImage(TComponent* Owner) : TForm(Owner)
-{
-}
-
+__fastcall TfrmPreviewImage::TfrmPreviewImage(TComponent* Owner) : TForm(Owner) {}
 //---------------------------------------------------------------------------
 
 void __fastcall TfrmPreviewImage::FormKeyDown(TObject* Sender, WORD& Key, TShiftState Shift)
 {
-    if (Key == VK_ESCAPE) Close();
+    if (Key == VK_ESCAPE)
+        Close();
 }
 
 //----------------------------------------------------
@@ -48,7 +46,8 @@ void __fastcall TfrmPreviewImage::FormClose(TObject* Sender, TCloseAction& Actio
 
 void __fastcall TfrmPreviewImage::pbImagePaint(TObject* Sender)
 {
-    if (tex) {
+    if (tex)
+    {
         int w = paImage->Width - 4;
         int h = paImage->Height - 4;
         RECT r;
@@ -65,16 +64,20 @@ void __fastcall TfrmPreviewImage::pbImagePaint(TObject* Sender)
 void __fastcall TfrmPreviewImage::pbImageMouseDown(
     TObject* Sender, TMouseButton Button, TShiftState Shift, int X, int Y)
 {
-    if (Shift.Contains(ssShift)) {
-        if (Button == mbLeft) {
+    if (Shift.Contains(ssShift))
+    {
+        if (Button == mbLeft)
+        {
             mult *= 2;
         }
         else if (Button == mbRight)
         {
             mult /= 2;
         }
-        if (mult <= 0.0625) mult = 0.0625;
-        if (mult >= 2) mult = 2;
+        if (mult <= 0.0625)
+            mult = 0.0625;
+        if (mult >= 2)
+            mult = 2;
         // S        ClientHeight 	= tex->height()*mult+4;
         // S        ClientWidth 	= tex->width()*mult+4;
     }

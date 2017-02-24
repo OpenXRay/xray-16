@@ -7,9 +7,7 @@ struct PBool
     BOOL val;
 
     PBool() : val(FALSE) {}
-
     PBool(BOOL _val) : val(_val) {}
-
     void set(BOOL v) { val = v; }
 };
 
@@ -27,7 +25,6 @@ struct PFloat
     }
 
     PFloat(float _val, float _mn, float _mx) : val(_val), mn(_mn), mx(_mx) {}
-
     void set(float v) { val = v; }
 };
 
@@ -45,7 +42,6 @@ struct PInt
     }
 
     PInt(int _val, int _mn, int _mx) : val(_val), mn(_mn), mx(_mx) {}
-
     void set(int v) { val = v; }
 };
 
@@ -73,15 +69,13 @@ struct PVector
     }
 
     PVector(EType t, Fvector _val, float _mn, float _mx) : type(t), val(_val), mn(_mn), mx(_mx) {}
-
     void set(const Fvector& v) { val.set(v); }
-
     void set(float x, float y, float z) { val.set(x, y, z); }
 };
 
 struct PDomain
 {
-  public:
+public:
     PAPI::PDomainEnum type;
 
     union
@@ -107,12 +101,11 @@ struct PDomain
     Flags32 flags;
     u32 clr;
 
-  protected:
+protected:
     void __stdcall PDomain::OnTypeChange(PropValue* sender);
 
-  public:
+public:
     PDomain() {}
-
     PDomain(EType et, BOOL renderable, u32 color = 0x00000000, PAPI::PDomainEnum type = PAPI::PDPoint,
         float inA0 = 0.0f, float inA1 = 0.0f, float inA2 = 0.0f, float inA3 = 0.0f, float inA4 = 0.0f,
         float inA5 = 0.0f, float inA6 = 0.0f, float inA7 = 0.0f, float inA8 = 0.0f);
@@ -188,7 +181,7 @@ struct EParticleAction
         type = _type;
     }
 
-  public:
+public:
     void appendFloat(LPCSTR name, float v, float mn, float mx);
     void appendInt(LPCSTR name, int v, int mn = -P_MAXINT, int mx = P_MAXINT);
     void appendVector(
@@ -237,7 +230,7 @@ struct EParticleAction
         return (it != bools.end()) ? &it->second : 0;
     }
 
-  public:
+public:
     virtual void Compile(IWriter& F) = 0;
     virtual void FillProp(PropItemVec& items, LPCSTR pref, u32 clr);
 
@@ -426,7 +419,7 @@ struct EPATurbulence : public EParticleAction
     float*** nval;
     float age;
 
-  public:
+public:
     EPATurbulence();
 
     virtual void Compile(IWriter& F);

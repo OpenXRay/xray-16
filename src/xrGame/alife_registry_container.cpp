@@ -45,9 +45,7 @@ private:
     }
 
     static void LoadHead(TContainer* self, IReader& reader) { LoadHead<isSerializable>(self, reader); }
-
     static void SaveHead(TContainer* self, IWriter& writer) { SaveHead<isSerializable>(self, writer); }
-
     template <typename TListTail>
     static void Load(TContainer* self, IReader& reader)
     {

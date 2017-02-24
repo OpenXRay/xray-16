@@ -41,7 +41,8 @@ void Skin4W_MT(vertRender* dst, vertBoned4W* src, u32 vCount, CBoneInstance* bon
     TAL_SCOPED_TASK_NAMED("Skin4W_MT()");
 #endif
     u32 workerCount = ttapi_GetWorkerCount();
-    if (vCount < workerCount * 64) {
+    if (vCount < workerCount * 64)
+    {
         Skin4W_MTs(dst, src, vCount, bones);
         return;
     }
@@ -61,5 +62,5 @@ void Skin4W_MT(vertRender* dst, vertBoned4W* src, u32 vCount, CBoneInstance* bon
     ttapi_Run();
 }
 
-}  // namespace Util3D
-}  // namespace XRay
+} // namespace Util3D
+} // namespace XRay

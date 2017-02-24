@@ -13,11 +13,7 @@ static void trajectory_get_position(
     result.mad(start_position, velocity, time).mad(gravity, _sqr(time) * .5f);
 }
 
-inline static float trajectory_max_error_time(float t0, float t1)
-{
-    return ((t1 + t0) * .5f);
-}
-
+inline static float trajectory_max_error_time(float t0, float t1) { return ((t1 + t0) * .5f); }
 static float trajectory_pick_error(
     float low, float high, const Fvector& position, const Fvector& velocity, const Fvector& gravity)
 {
@@ -82,7 +78,8 @@ static bool trajectory_check_collision(float low, float high, Fvector const& pos
     Fvector start_to_target = Fvector().sub(target, start);
     float distance = start_to_target.magnitude();
 
-    if (distance < .01f) return (false);
+    if (distance < .01f)
+        return (false);
 
     start_to_target.mul(1.f / distance);
     collide::ray_defs ray_defs(start, start_to_target, distance, CDB::OPT_CULL, collide::rqtBoth);
@@ -93,7 +90,8 @@ static bool trajectory_check_collision(float low, float high, Fvector const& pos
     self_object->setEnabled(FALSE);
 
     BOOL throw_ignore_object_enabled = FALSE;
-    if (ignored_object) {
+    if (ignored_object)
+    {
         throw_ignore_object_enabled = ignored_object->getEnabled();
         ignored_object->setEnabled(FALSE);
     }
@@ -112,7 +110,8 @@ static bool trajectory_check_collision(float low, float high, Fvector const& pos
         Fvector const box_z_axis = start_to_target;
         Fvector box_y_axis;
         Fvector box_x_axis;
-        if (_abs(box_z_axis.x) > epsilon || _abs(box_z_axis.z) > epsilon) {
+        if (_abs(box_z_axis.x) > epsilon || _abs(box_z_axis.z) > epsilon)
+        {
             Fvector const down = {0, -1, 0};
             Fvector box_x_axis;
             box_x_axis.crossproduct(box_z_axis, down);
@@ -126,7 +125,8 @@ static bool trajectory_check_collision(float low, float high, Fvector const& pos
 
         box_size.z = distance;
 
-        if (out_trajectory_picks) {
+        if (out_trajectory_picks)
+        {
             trajectory_pick pick;
             pick.center = box_center;
             pick.sizes = box_size;
@@ -139,13 +139,16 @@ static bool trajectory_check_collision(float low, float high, Fvector const& pos
         box_result = !Level().ObjectSpace.BoxQuery(box_center, box_z_axis, box_y_axis, box_size, out_collide_tris);
     }
 
-    if (ignored_object) ignored_object->setEnabled(throw_ignore_object_enabled);
+    if (ignored_object)
+        ignored_object->setEnabled(throw_ignore_object_enabled);
 
     self_object->setEnabled(previous_enabled);
 
-    if (box_size.magnitude() > epsilon) return box_result;
+    if (box_size.magnitude() > epsilon)
+        return box_result;
 
-    if (range < distance) collide_position.mad(start, start_to_target, range);
+    if (range < distance)
+        collide_position.mad(start, start_to_target, range);
 
     return (range == distance);
 }
@@ -160,9 +163,11 @@ bool trajectory_intersects_geometry(float trajectory_time, Fvector const& trajec
     out_collide_tris;
 
 #ifdef DEBUG
-    if (out_trajectory_picks) out_trajectory_picks->resize(0);
-    if (out_collide_tris) out_collide_tris->resize(0);
-#endif  // #ifdef DEBUG
+    if (out_trajectory_picks)
+        out_trajectory_picks->resize(0);
+    if (out_collide_tris)
+        out_collide_tris->resize(0);
+#endif // #ifdef DEBUG
 
     const Fvector gravity = Fvector().set(0.f, -physics_world()->Gravity(), 0.f);
     const float epsilon = .1f;
@@ -176,12 +181,14 @@ bool trajectory_intersects_geometry(float trajectory_time, Fvector const& trajec
         if (!trajectory_check_collision(low, time, trajectory_start, trajectory_velocity, gravity, self_object,
                 ignored_object, collide_position, temp_rq_results, box_size, out_trajectory_picks, out_collide_tris))
         {
-            if (fsimilar(time, high) && collide_position.similar(trajectory_end, .2f)) break;
+            if (fsimilar(time, high) && collide_position.similar(trajectory_end, .2f))
+                break;
 
             return true;
         }
 
-        if (fsimilar(time, high)) break;
+        if (fsimilar(time, high))
+            break;
 
         low = time;
     }

@@ -11,11 +11,11 @@
 #define AT(rx, ry, rz) (rx * q[0] + ry * q[1] + rz * q[2]);
 #define S_CURVE(t) (t * t * (3.f - 2.f * t))
 #define LERP(t, a, b) (a + t * (b - a))
-#define PN_SETUP(i, b0, b1, r0, r1)                                                                                    \
-    t = vec[i] + 10000.f;                                                                                              \
-    b0 = iFloor(t) & (B - 1);                                                                                          \
-    b1 = (b0 + 1) & (B - 1);                                                                                           \
-    r0 = t - iFloor(t);                                                                                                \
+#define PN_SETUP(i, b0, b1, r0, r1) \
+    t = vec[i] + 10000.f;           \
+    b0 = iFloor(t) & (B - 1);       \
+    b1 = (b0 + 1) & (B - 1);        \
+    r0 = t - iFloor(t);             \
     r1 = r0 - 1.f;
 
 static int start = 1;
@@ -39,7 +39,8 @@ float noise3(const Fvector& vec)
     float a, b, c, d, t, u, v;
     int i, j;
 
-    if (start) {
+    if (start)
+    {
         start = 0;
         noise3Init();
     }

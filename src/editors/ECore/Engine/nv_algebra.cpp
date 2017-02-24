@@ -24,34 +24,12 @@ Comments:
 #define _finite finite
 #endif
 
-mat3::mat3()
-{
-}
-
-mat3::mat3(const nv_scalar* array)
-{
-    Memory.mem_copy(mat_array, array, sizeof(nv_scalar) * 9);
-}
-
-mat3::mat3(const mat3& M)
-{
-    Memory.mem_copy(mat_array, M.mat_array, sizeof(nv_scalar) * 9);
-}
-
-mat4::mat4()
-{
-}
-
-mat4::mat4(const nv_scalar* array)
-{
-    Memory.mem_copy(mat_array, array, sizeof(nv_scalar) * 16);
-}
-
-mat4::mat4(const mat4& M)
-{
-    Memory.mem_copy(mat_array, M.mat_array, sizeof(nv_scalar) * 16);
-}
-
+mat3::mat3() {}
+mat3::mat3(const nv_scalar* array) { Memory.mem_copy(mat_array, array, sizeof(nv_scalar) * 9); }
+mat3::mat3(const mat3& M) { Memory.mem_copy(mat_array, M.mat_array, sizeof(nv_scalar) * 9); }
+mat4::mat4() {}
+mat4::mat4(const nv_scalar* array) { Memory.mem_copy(mat_array, array, sizeof(nv_scalar) * 16); }
+mat4::mat4(const mat4& M) { Memory.mem_copy(mat_array, M.mat_array, sizeof(nv_scalar) * 16); }
 vec3& cross(vec3& u, const vec3& v, const vec3& w)
 {
     u.x = v.y * w.z - v.z * w.y;
@@ -66,44 +44,28 @@ nv_scalar& dot(nv_scalar& u, const vec3& v, const vec3& w)
     return u;
 }
 
-nv_scalar dot(const vec3& v, const vec3& w)
-{
-    return v.x * w.x + v.y * w.y + v.z * w.z;
-}
-
+nv_scalar dot(const vec3& v, const vec3& w) { return v.x * w.x + v.y * w.y + v.z * w.z; }
 nv_scalar& dot(nv_scalar& u, const vec4& v, const vec4& w)
 {
     u = v.x * w.x + v.y * w.y + v.z * w.z + v.w * w.w;
     return u;
 }
 
-nv_scalar dot(const vec4& v, const vec4& w)
-{
-    return v.x * w.x + v.y * w.y + v.z * w.z + v.w * w.w;
-}
-
+nv_scalar dot(const vec4& v, const vec4& w) { return v.x * w.x + v.y * w.y + v.z * w.z + v.w * w.w; }
 nv_scalar& dot(nv_scalar& u, const vec3& v, const vec4& w)
 {
     u = v.x * w.x + v.y * w.y + v.z * w.z;
     return u;
 }
 
-nv_scalar dot(const vec3& v, const vec4& w)
-{
-    return v.x * w.x + v.y * w.y + v.z * w.z;
-}
-
+nv_scalar dot(const vec3& v, const vec4& w) { return v.x * w.x + v.y * w.y + v.z * w.z; }
 nv_scalar& dot(nv_scalar& u, const vec4& v, const vec3& w)
 {
     u = v.x * w.x + v.y * w.y + v.z * w.z;
     return u;
 }
 
-nv_scalar dot(const vec4& v, const vec3& w)
-{
-    return v.x * w.x + v.y * w.y + v.z * w.z;
-}
-
+nv_scalar dot(const vec4& v, const vec3& w) { return v.x * w.x + v.y * w.y + v.z * w.z; }
 vec3& reflect(vec3& r, const vec3& n, const vec3& l)
 {
     nv_scalar n_dot_l;
@@ -490,11 +452,7 @@ mat3& transpose(mat3& B, const mat3& A)
     | b1 b2 |
 
 */
-nv_scalar det2x2(nv_scalar a1, nv_scalar a2, nv_scalar b1, nv_scalar b2)
-{
-    return a1 * b2 - b1 * a2;
-}
-
+nv_scalar det2x2(nv_scalar a1, nv_scalar a2, nv_scalar b1, nv_scalar b2) { return a1 * b2 - b1 * a2; }
 /*
     calculate the determinent of a 3x3 matrix in the from
 
@@ -581,11 +539,7 @@ mat4& invert_rot_trans(mat4& B, const mat4& A)
     return B;
 }
 
-nv_scalar det(const mat3& A)
-{
-    return det3x3(A.a00, A.a01, A.a02, A.a10, A.a11, A.a12, A.a20, A.a21, A.a22);
-}
-
+nv_scalar det(const mat3& A) { return det3x3(A.a00, A.a01, A.a02, A.a10, A.a11, A.a12, A.a20, A.a21, A.a22); }
 mat3& invert(mat3& B, const mat3& A)
 {
     nv_scalar det, oodet;
@@ -737,10 +691,7 @@ mat4& perspective(mat4& M, const nv_scalar fovy, const nv_scalar aspect, const n
 
 const quat quat::Identity(0, 0, 0, 1);
 
-quat::quat(nv_scalar x, nv_scalar y, nv_scalar z, nv_scalar w) : x(x), y(y), z(z), w(w)
-{
-}
-
+quat::quat(nv_scalar x, nv_scalar y, nv_scalar z, nv_scalar w) : x(x), y(y), z(z), w(w) {}
 quat::quat(const quat& quat)
 {
     x = quat.x;
@@ -752,7 +703,8 @@ quat::quat(const quat& quat)
 quat::quat(const vec3& axis, nv_scalar angle)
 {
     nv_scalar len = axis.norm();
-    if (len) {
+    if (len)
+    {
         nv_scalar invLen = 1 / len;
         nv_scalar angle2 = angle / 2;
         nv_scalar scale = _sin(angle2) * invLen;
@@ -763,11 +715,7 @@ quat::quat(const vec3& axis, nv_scalar angle)
     }
 }
 
-quat::quat(const mat3& rot)
-{
-    FromMatrix(rot);
-}
-
+quat::quat(const mat3& rot) { FromMatrix(rot); }
 quat& quat::operator=(const quat& quat)
 {
     x = quat.x;
@@ -777,15 +725,12 @@ quat& quat::operator=(const quat& quat)
     return *this;
 }
 
-quat quat::Inverse()
-{
-    return quat(-x, -y, -z, w);
-}
-
+quat quat::Inverse() { return quat(-x, -y, -z, w); }
 void quat::Normalize()
 {
     nv_scalar len = _sqrt(x * x + y * y + z * z + w * w);
-    if (len > 0) {
+    if (len > 0)
+    {
         nv_scalar invLen = 1 / len;
         x *= invLen;
         y *= invLen;
@@ -797,7 +742,8 @@ void quat::Normalize()
 void quat::FromMatrix(const mat3& mat)
 {
     nv_scalar trace = mat(0, 0) + mat(1, 1) + mat(2, 2);
-    if (trace > 0) {
+    if (trace > 0)
+    {
         nv_scalar scale = _sqrt(trace + 1.0f);
         w = 0.5f * scale;
         scale = 0.5f / scale;
@@ -809,8 +755,10 @@ void quat::FromMatrix(const mat3& mat)
     {
         static int next[] = {1, 2, 0};
         int i = 0;
-        if (mat(1, 1) > mat(0, 0)) i = 1;
-        if (mat(2, 2) > mat(i, i)) i = 2;
+        if (mat(1, 1) > mat(0, 0))
+            i = 1;
+        if (mat(2, 2) > mat(i, i))
+            i = 2;
         int j = next[i];
         int k = next[j];
         nv_scalar scale = _sqrt(mat(i, i) - mat(j, j) - mat(k, k) + 1);
@@ -941,11 +889,7 @@ nv_scalar& dot(nv_scalar& s, const quat& q1, const quat& q2)
     return s;
 }
 
-nv_scalar dot(const quat& q1, const quat& q2)
-{
-    return q1.x * q2.x + q1.y * q2.y + q1.z * q2.z + q1.w * q2.w;
-}
-
+nv_scalar dot(const quat& q1, const quat& q2) { return q1.x * q2.x + q1.y * q2.y + q1.z * q2.z + q1.w * q2.w; }
 #ifndef acosf
 #define acosf acos
 #endif
@@ -958,7 +902,8 @@ quat& slerp_quats(quat& p, nv_scalar s, const quat& q1, const quat& q2)
     else if (cosine > 1)
         cosine = 1;
     nv_scalar angle = (nv_scalar)acosf(cosine);
-    if (_abs(angle) < nv_eps) {
+    if (_abs(angle) < nv_eps)
+    {
         p = q1;
         return p;
     }
@@ -975,11 +920,7 @@ quat& slerp_quats(quat& p, nv_scalar s, const quat& q1, const quat& q2)
 
 const int HALF_RAND = (RAND_MAX / 2);
 
-nv_scalar nv_random()
-{
-    return ((nv_scalar)(rand() - HALF_RAND) / (nv_scalar)HALF_RAND);
-}
-
+nv_scalar nv_random() { return ((nv_scalar)(rand() - HALF_RAND) / (nv_scalar)HALF_RAND); }
 // v is normalized
 // theta in radians
 void mat3::set_rot(const nv_scalar& theta, const vec3& v)
@@ -1165,7 +1106,8 @@ mat3& tangent_basis(mat3& basis, const vec3& v0, const vec3& v1, const vec3& v2,
     vec3 e1(v2.x - v0.x, t2.s - t0.s, t2.t - t0.t);
 
     cross(cp, e0, e1);
-    if (_abs(cp.x) > nv_eps) {
+    if (_abs(cp.x) > nv_eps)
+    {
         basis.a00 = -cp.y / cp.x;
         basis.a10 = -cp.z / cp.x;
     }
@@ -1174,7 +1116,8 @@ mat3& tangent_basis(mat3& basis, const vec3& v0, const vec3& v1, const vec3& v2,
     e1.x = v2.y - v0.y;
 
     cross(cp, e0, e1);
-    if (_abs(cp.x) > nv_eps) {
+    if (_abs(cp.x) > nv_eps)
+    {
         basis.a01 = -cp.y / cp.x;
         basis.a11 = -cp.z / cp.x;
     }
@@ -1183,7 +1126,8 @@ mat3& tangent_basis(mat3& basis, const vec3& v0, const vec3& v1, const vec3& v2,
     e1.x = v2.z - v0.z;
 
     cross(cp, e0, e1);
-    if (_abs(cp.x) > nv_eps) {
+    if (_abs(cp.x) > nv_eps)
+    {
         basis.a02 = -cp.y / cp.x;
         basis.a12 = -cp.z / cp.x;
     }
@@ -1218,7 +1162,8 @@ mat3& tangent_basis(mat3& basis, const vec3& v0, const vec3& v1, const vec3& v2,
     basis.a11 = basis.a22 * basis.a00 - basis.a20 * basis.a02;
     basis.a12 = basis.a20 * basis.a01 - basis.a21 * basis.a00;
 
-    if (basis.a20 * n.x + basis.a21 * n.y + basis.a22 * n.z < nv_zero) {
+    if (basis.a20 * n.x + basis.a21 * n.y + basis.a22 * n.z < nv_zero)
+    {
         basis.a20 = -basis.a20;
         basis.a21 = -basis.a21;
         basis.a22 = -basis.a22;
@@ -1235,7 +1180,8 @@ nv_scalar tb_project_to_sphere(nv_scalar r, nv_scalar x, nv_scalar y)
     nv_scalar d, t, z;
 
     d = _sqrt(x * x + y * y);
-    if (d < r * 0.70710678118654752440) { /* Inside sphere */
+    if (d < r * 0.70710678118654752440)
+    { /* Inside sphere */
         z = _sqrt(r * r - d * d);
     }
     else
@@ -1260,12 +1206,13 @@ nv_scalar tb_project_to_sphere(nv_scalar r, nv_scalar x, nv_scalar y)
  */
 quat& trackball(quat& q, vec2& pt1, vec2& pt2, nv_scalar trackballsize)
 {
-    vec3 a;         // Axis of rotation
-    nv_scalar phi;  // how much to rotate about axis
+    vec3 a; // Axis of rotation
+    nv_scalar phi; // how much to rotate about axis
     vec3 d;
     nv_scalar t;
 
-    if (pt1.x == pt2.x && pt1.y == pt2.y) {
+    if (pt1.x == pt2.x && pt1.y == pt2.y)
+    {
         // Zero rotation
         q = quat_id;
         return q;
@@ -1287,8 +1234,10 @@ quat& trackball(quat& q, vec2& pt1, vec2& pt2, nv_scalar trackballsize)
 
     // Avoid problems with out-of-control values...
 
-    if (t > nv_one) t = nv_one;
-    if (t < -nv_one) t = -nv_one;
+    if (t > nv_one)
+        t = nv_one;
+    if (t < -nv_one)
+        t = -nv_one;
     phi = nv_two * nv_scalar(asin(t));
     axis_to_quat(q, a, phi);
     return q;
@@ -1369,7 +1318,8 @@ nv_scalar nv_find_in_circle(vec3& center, const vec3& v1, const vec3& v2, const 
 {
     nv_scalar area = nv_area(v1, v2, v3);
     // if the area is null
-    if (area < nv_eps) {
+    if (area < nv_eps)
+    {
         center = v1;
         return nv_zero;
     }
@@ -1467,7 +1417,4 @@ void nv_is_valid(const vec3& v)
     assert(!_isnan(v.x) && !_isnan(v.y) && !_isnan(v.z) && _finite(v.x) && _finite(v.y) && _finite(v.z));
 }
 
-void nv_is_valid(nv_scalar lambda)
-{
-    assert(!_isnan(lambda) && _finite(lambda));
-}
+void nv_is_valid(nv_scalar lambda) { assert(!_isnan(lambda) && _finite(lambda)); }

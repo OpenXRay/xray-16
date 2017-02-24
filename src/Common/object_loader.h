@@ -96,13 +96,15 @@ struct CLoader
         template <typename T>
         IC static void load_data(T& data, M& stream, const P& p)
         {
-            if (p.can_clear()) data.clear();
+            if (p.can_clear())
+                data.clear();
             u32 count = stream.r_u32();
             for (u32 i = 0; i < count; ++i)
             {
                 T::value_type temp;
                 CLoader<M, P>::load_data(temp, stream, p);
-                if (p(data, temp)) add(data, temp);
+                if (p(data, temp))
+                    add(data, temp);
             }
         }
     };
@@ -124,7 +126,6 @@ struct CLoader
     };
 
     IC static void load_data(LPCSTR& data, M& stream, const P& p) { NODEFAULT; }
-
     IC static void load_data(LPSTR& data, M& stream, const P& p)
     {
         shared_str S;
@@ -133,7 +134,6 @@ struct CLoader
     }
 
     IC static void load_data(shared_str& data, M& stream, const P& p) { stream.r_stringZ(data); }
-
     IC static void load_data(xr_string& data, M& stream, const P& p)
     {
         shared_str S;
@@ -144,18 +144,21 @@ struct CLoader
     template <typename T1, typename T2>
     IC static void load_data(std::pair<T1, T2>& data, M& stream, const P& p)
     {
-        if (p(data, const_cast<object_type_traits::remove_const<T1>::type&>(data.first), true)) {
+        if (p(data, const_cast<object_type_traits::remove_const<T1>::type&>(data.first), true))
+        {
             const bool value = object_type_traits::is_same<T1, LPCSTR>::value;
             VERIFY(!value);
             load_data(const_cast<object_type_traits::remove_const<T1>::type&>(data.first), stream, p);
         }
-        if (p(data, data.second, false)) load_data(data.second, stream, p);
+        if (p(data, data.second, false))
+            load_data(data.second, stream, p);
         p.after_load(data, stream);
     }
 
     IC static void load_data(xr_vector<bool>& data, M& stream, const P& p)
     {
-        if (p.can_clear()) data.clear();
+        if (p.can_clear())
+            data.clear();
         u32 prev_count = data.size();
         data.resize(prev_count + stream.r_u32());
         xr_vector<bool>::iterator I = data.begin() + prev_count;
@@ -163,7 +166,8 @@ struct CLoader
         u32 mask = 0;
         for (int j = 32; I != E; ++I, ++j)
         {
-            if (j >= 32) {
+            if (j >= 32)
+            {
                 mask = stream.r_u32();
                 j = 0;
             }
@@ -174,20 +178,23 @@ struct CLoader
     template <typename T, int size>
     IC static void load_data(svector<T, size>& data, M& stream, const P& p)
     {
-        if (p.can_clear()) data.clear();
+        if (p.can_clear())
+            data.clear();
         u32 count = stream.r_u32();
         for (u32 i = 0; i < count; ++i)
         {
             svector<T, size>::value_type temp;
             CLoader<M, P>::load_data(temp, stream, p);
-            if (p(data, temp)) data.push_back(temp);
+            if (p(data, temp))
+                data.push_back(temp);
         }
     }
 
     template <typename T1, typename T2>
     IC static void load_data(std::queue<T1, T2>& data, M& stream, const P& p)
     {
-        if (p.can_clear()) {
+        if (p.can_clear())
+        {
             while (!data.empty())
                 data.pop();
         }
@@ -197,7 +204,8 @@ struct CLoader
         {
             std::queue<T1, T2>::value_type t;
             CLoader<M, P>::load_data(t, stream, p);
-            if (p(temp, t)) temp.push(t);
+            if (p(temp, t))
+                temp.push(t);
         }
         for (; !temp.empty(); temp.pop())
             data.push(temp.front());
@@ -206,7 +214,8 @@ struct CLoader
     template <template <typename _1, typename _2> class T1, typename T2, typename T3>
     IC static void load_data(T1<T2, T3>& data, M& stream, const P& p, bool)
     {
-        if (p.can_clear()) {
+        if (p.can_clear())
+        {
             while (!data.empty())
                 data.pop();
         }
@@ -216,7 +225,8 @@ struct CLoader
         {
             T1<T2, T3>::value_type t;
             CLoader<M, P>::load_data(t, stream, p);
-            if (p(temp, t)) temp.push(t);
+            if (p(temp, t))
+                temp.push(t);
         }
         for (; !temp.empty(); temp.pop())
             data.push(temp.top());
@@ -225,7 +235,8 @@ struct CLoader
     template <template <typename _1, typename _2, typename _3> class T1, typename T2, typename T3, typename T4>
     IC static void load_data(T1<T2, T3, T4>& data, M& stream, const P& p, bool)
     {
-        if (p.can_clear()) {
+        if (p.can_clear())
+        {
             while (!data.empty())
                 data.pop();
         }
@@ -235,7 +246,8 @@ struct CLoader
         {
             T1<T2, T3, T4>::value_type t;
             CLoader<M, P>::load_data(t, stream, p);
-            if (p(temp, t)) temp.push(t);
+            if (p(temp, t))
+                temp.push(t);
         }
         for (; !temp.empty(); temp.pop())
             data.push(temp.top());

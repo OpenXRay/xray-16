@@ -21,11 +21,7 @@ CScriptGameObject* not_yet_visible_object(const MemorySpace::CNotYetVisibleObjec
     return (object.m_object->lua_game_object());
 }
 
-int get_sound_type(const CSoundObject& sound_object)
-{
-    return ((int)sound_object.m_sound_type);
-}
-
+int get_sound_type(const CSoundObject& sound_object) { return ((int)sound_object.m_sound_type); }
 template <typename T>
 CScriptGameObject* get_memory_object(const MemorySpace::CMemoryObject<T>& memory_object)
 {
@@ -41,7 +37,8 @@ CScriptGameObject* CDangerObject_object(const CDangerObject* self)
 CScriptGameObject* CDangerObject_dependent_object(const CDangerObject* self)
 {
     VERIFY(self);
-    if (!self->dependent_object()) return (0);
+    if (!self->dependent_object())
+        return (0);
 
     const CGameObject* game_object = smart_cast<const CGameObject*>(self->dependent_object());
     return (game_object ? game_object->lua_game_object() : 0);
@@ -56,7 +53,7 @@ Fvector CDangerObject__position(const CDangerObject* self)
 IC static void CMemoryInfo_Export(lua_State* luaState)
 {
     module(luaState)[
-#if 1  // def USE_ORIENTATION
+#if 1 // def USE_ORIENTATION
         class_<SRotation>("rotation").def_readwrite("yaw", &SRotation::yaw).def_readwrite("pitch", &SRotation::pitch),
 #endif
 

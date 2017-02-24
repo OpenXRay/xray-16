@@ -1,4 +1,4 @@
-#ifndef MXVECTOR_INCLUDED  // -*- C++ -*-
+#ifndef MXVECTOR_INCLUDED // -*- C++ -*-
 #define MXVECTOR_INCLUDED
 #if !defined(__GNUC__)
 #pragma once
@@ -49,9 +49,7 @@ public:
     MxVBlock() {}
     MxVBlock(const MxVBlock<T, N>& v) { mxv_set(elt, v, N); }
     MxVBlock(const T* v) { mxv_set(elt, v, N); }
-
     inline unsigned int dim() const { return N; }
-
     T& operator()(unsigned int i)
     {
         VERIFY(i < N);
@@ -65,7 +63,6 @@ public:
 
     operator T*() { return elt; }
     operator const T*() const { return elt; }
-
     // In-place arithmetic methods
     //
     inline MxVBlock<T, N>& operator=(const MxVBlock<T, N>& v)
@@ -133,7 +130,6 @@ public:
     }
 
     inline T operator*(const MxVBlock<T, N>& v) const { return mxv_dot(elt, v, N); }
-
     // Comparison operators
     inline bool operator==(const MxVBlock<T, N>& v) const { return mxv_equal(elt, v, N); }
     inline bool operator!=(const MxVBlock<T, N>& v) const { return !mxv_equal(elt, v, N); }
@@ -155,7 +151,6 @@ class MxVector : public MxBlock<double>
 public:
     MxVector(unsigned int n) : MxBlock<double>(n) { mxv_set(*this, 0.0, dim()); }
     MxVector(const MxVector& v) : MxBlock<double>(v.length()) { copy(v); }
-
     MxVector& operator=(const MxVector& v)
     {
         copy(v);
@@ -168,7 +163,6 @@ public:
     }
 
     unsigned int dim() const { return length(); }
-
     MxVector& operator+=(const MxVector& v)
     {
         mxv_addinto(*this, v, dim());
@@ -195,18 +189,8 @@ public:
 
 // Convenient wrappers for mixvops functionality
 //
-inline double norm(const MxVector& v)
-{
-    return mxv_norm(v, v.dim());
-}
-inline double norm2(const MxVector& v)
-{
-    return mxv_dot(v, v, v.dim());
-}
-inline double unitize(MxVector& v)
-{
-    return mxv_unitize(v, v.dim());
-}
-
+inline double norm(const MxVector& v) { return mxv_norm(v, v.dim()); }
+inline double norm2(const MxVector& v) { return mxv_dot(v, v, v.dim()); }
+inline double unitize(MxVector& v) { return mxv_unitize(v, v.dim()); }
 // MXVECTOR_INCLUDED
 #endif

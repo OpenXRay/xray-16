@@ -8,7 +8,7 @@
 
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename T\
 >
 
@@ -21,15 +21,9 @@ CAbstractObjectManager::CObjectManager()
 }
 
 TEMPLATE_SPECIALIZATION
-CAbstractObjectManager::~CObjectManager()
-{
-}
-
+CAbstractObjectManager::~CObjectManager() {}
 TEMPLATE_SPECIALIZATION
-void CAbstractObjectManager::Load(LPCSTR section)
-{
-}
-
+void CAbstractObjectManager::Load(LPCSTR section) {}
 TEMPLATE_SPECIALIZATION
 void CAbstractObjectManager::reinit()
 {
@@ -38,10 +32,7 @@ void CAbstractObjectManager::reinit()
 }
 
 TEMPLATE_SPECIALIZATION
-void CAbstractObjectManager::reload(LPCSTR section)
-{
-}
-
+void CAbstractObjectManager::reload(LPCSTR section) {}
 TEMPLATE_SPECIALIZATION
 void CAbstractObjectManager::update()
 {
@@ -52,7 +43,8 @@ void CAbstractObjectManager::update()
     for (; I != E; ++I)
     {
         float value = do_evaluate(*I);
-        if (result > value) {
+        if (result > value)
+        {
             result = value;
             m_selected = *I;
         }
@@ -60,18 +52,16 @@ void CAbstractObjectManager::update()
 }
 
 TEMPLATE_SPECIALIZATION
-float CAbstractObjectManager::do_evaluate(T* object) const
-{
-    return (0.f);
-}
-
+float CAbstractObjectManager::do_evaluate(T* object) const { return (0.f); }
 TEMPLATE_SPECIALIZATION
 bool CAbstractObjectManager::is_useful(T* object) const
 {
     const ISpatial* self = (const ISpatial*)(object);
-    if (!self) return (false);
+    if (!self)
+        return (false);
 
-    if ((object->spatial.type & STYPE_VISIBLEFORAI) != STYPE_VISIBLEFORAI) return (false);
+    if ((object->spatial.type & STYPE_VISIBLEFORAI) != STYPE_VISIBLEFORAI)
+        return (false);
 
     return (true);
 }
@@ -79,10 +69,12 @@ bool CAbstractObjectManager::is_useful(T* object) const
 TEMPLATE_SPECIALIZATION
 bool CAbstractObjectManager::add(T* object)
 {
-    if (!is_useful(object)) return (false);
+    if (!is_useful(object))
+        return (false);
 
     OBJECTS::const_iterator I = std::find(m_objects.begin(), m_objects.end(), object);
-    if (m_objects.end() == I) {
+    if (m_objects.end() == I)
+    {
         m_objects.push_back(object);
         return (true);
     }
@@ -90,22 +82,10 @@ bool CAbstractObjectManager::add(T* object)
 }
 
 TEMPLATE_SPECIALIZATION
-IC T* CAbstractObjectManager::selected() const
-{
-    return (m_selected);
-}
-
+IC T* CAbstractObjectManager::selected() const { return (m_selected); }
 TEMPLATE_SPECIALIZATION
-void CAbstractObjectManager::reset()
-{
-    m_objects.clear();
-}
-
+void CAbstractObjectManager::reset() { m_objects.clear(); }
 TEMPLATE_SPECIALIZATION
-IC const typename CAbstractObjectManager::OBJECTS& CAbstractObjectManager::objects() const
-{
-    return (m_objects);
-}
-
+IC const typename CAbstractObjectManager::OBJECTS& CAbstractObjectManager::objects() const { return (m_objects); }
 #undef TEMPLATE_SPECIALIZATION
 #undef CAbstractObjectManager

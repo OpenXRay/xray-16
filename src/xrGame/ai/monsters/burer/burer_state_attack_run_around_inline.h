@@ -1,6 +1,6 @@
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -9,10 +9,7 @@
 #define DIST_QUANT 10.f
 
 TEMPLATE_SPECIALIZATION
-CStateBurerAttackRunAroundAbstract::CStateBurerAttackRunAround(_Object* obj) : inherited(obj)
-{
-}
-
+CStateBurerAttackRunAroundAbstract::CStateBurerAttackRunAround(_Object* obj) : inherited(obj) {}
 TEMPLATE_SPECIALIZATION
 void CStateBurerAttackRunAroundAbstract::initialize()
 {
@@ -31,17 +28,18 @@ void CStateBurerAttackRunAroundAbstract::initialize()
 
     float dist = object->Position().distance_to(object->EnemyMan.get_enemy()->Position());
 
-    if (dist > 30.f) {  // бежать к врагу
+    if (dist > 30.f)
+    { // бежать к врагу
         selected_point.mad(object->Position(), dir_to_enemy, DIST_QUANT);
     }
     else if ((dist < 20.f) && (dist > 4.f))
-    {  // убегать от врага
+    { // убегать от врага
         selected_point.mad(object->Position(), dir_from_enemy, DIST_QUANT);
         dest_direction.sub(object->EnemyMan.get_enemy()->Position(), selected_point);
         dest_direction.normalize();
     }
     else
-    {  // выбрать случайную позицию
+    { // выбрать случайную позицию
         selected_point = random_position(object->Position(), DIST_QUANT);
         dest_direction.sub(object->EnemyMan.get_enemy()->Position(), selected_point);
         dest_direction.normalize();
@@ -53,7 +51,8 @@ void CStateBurerAttackRunAroundAbstract::initialize()
 TEMPLATE_SPECIALIZATION
 void CStateBurerAttackRunAroundAbstract::execute()
 {
-    if (!fis_zero(dest_direction.square_magnitude())) {
+    if (!fis_zero(dest_direction.square_magnitude()))
+    {
         object->path().set_use_dest_orient(true);
         object->path().set_dest_direction(dest_direction);
     }
@@ -69,11 +68,7 @@ void CStateBurerAttackRunAroundAbstract::execute()
 }
 
 TEMPLATE_SPECIALIZATION
-bool CStateBurerAttackRunAroundAbstract::check_start_conditions()
-{
-    return true;
-}
-
+bool CStateBurerAttackRunAroundAbstract::check_start_conditions() { return true; }
 TEMPLATE_SPECIALIZATION
 bool CStateBurerAttackRunAroundAbstract::check_completion()
 {

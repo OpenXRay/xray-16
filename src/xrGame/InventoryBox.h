@@ -28,13 +28,10 @@ public:
 
     IC void set_in_use(bool status) { m_in_use = status; }
     IC bool in_use() const { return m_in_use; }
-
     void set_can_take(bool status);
     IC bool can_take() const { return m_can_take; }
-
     void set_closed(bool status, LPCSTR reason);
     IC bool closed() const { return m_closed; }
-
 protected:
     void SE_update_status();
 };

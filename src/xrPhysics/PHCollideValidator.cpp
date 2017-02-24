@@ -43,60 +43,26 @@ bool CPHCollideValidator::IsAnimatedObject(const CPHObject& obj)
     return !!obj.collide_class_bits().test(cbClassAnimated);
 }
 
-void CPHCollideValidator::RegisterObjToLastGroup(CPHObject& obj)
-{
-    RegisterObjToGroup(LastGroupRegistred(), obj);
-}
-
-CGID CPHCollideValidator::LastGroupRegistred()
-{
-    return freeGroupID - 1;
-}
-
-void CPHCollideValidator::RestoreGroupObject(const CPHObject& obj)
-{
-}
-
-void CPHCollideValidator::SetStaticNotCollide(CPHObject& obj)
-{
-    obj.collide_class_bits().set(cbNCStatic, TRUE);
-}
-void CPHCollideValidator::SetDynamicNotCollide(CPHObject& obj)
-{
-    obj.collide_class_bits().set(cbNCClassDynamic, TRUE);
-}
-
-void CPHCollideValidator::SetNonDynamicObject(CPHObject& obj)
-{
-    obj.collide_class_bits().set(cbClassDynamic, FALSE);
-}
-
-void CPHCollideValidator::SetCharacterClass(CPHObject& obj)
-{
-    obj.collide_class_bits().set(cbClassCharacter, TRUE);
-}
-
+void CPHCollideValidator::RegisterObjToLastGroup(CPHObject& obj) { RegisterObjToGroup(LastGroupRegistred(), obj); }
+CGID CPHCollideValidator::LastGroupRegistred() { return freeGroupID - 1; }
+void CPHCollideValidator::RestoreGroupObject(const CPHObject& obj) {}
+void CPHCollideValidator::SetStaticNotCollide(CPHObject& obj) { obj.collide_class_bits().set(cbNCStatic, TRUE); }
+void CPHCollideValidator::SetDynamicNotCollide(CPHObject& obj) { obj.collide_class_bits().set(cbNCClassDynamic, TRUE); }
+void CPHCollideValidator::SetNonDynamicObject(CPHObject& obj) { obj.collide_class_bits().set(cbClassDynamic, FALSE); }
+void CPHCollideValidator::SetCharacterClass(CPHObject& obj) { obj.collide_class_bits().set(cbClassCharacter, TRUE); }
 void CPHCollideValidator::SetCharacterClassNotCollide(CPHObject& obj)
 {
     obj.collide_class_bits().set(cbNCClassCharacter, TRUE);
 }
 
-void CPHCollideValidator::SetRagDollClass(CPHObject& obj)
-{
-    obj.collide_class_bits().set(cbClassRagDoll, TRUE);
-}
-
+void CPHCollideValidator::SetRagDollClass(CPHObject& obj) { obj.collide_class_bits().set(cbClassRagDoll, TRUE); }
 void CPHCollideValidator::SetRagDollClassNotCollide(CPHObject& obj)
 {
     obj.collide_class_bits().set(cbNCClassRagDoll, TRUE);
 }
 
 //Относит физический объект к классу анимированных объектов
-void CPHCollideValidator::SetAnimatedClass(CPHObject& obj)
-{
-    obj.collide_class_bits().set(cbClassAnimated, TRUE);
-}
-
+void CPHCollideValidator::SetAnimatedClass(CPHObject& obj) { obj.collide_class_bits().set(cbClassAnimated, TRUE); }
 //Задаёт игнорирование коллизий данного физического
 //объекта с анимированными телами
 void CPHCollideValidator::SetAnimatedClassNotCollide(CPHObject& obj)
@@ -104,16 +70,10 @@ void CPHCollideValidator::SetAnimatedClassNotCollide(CPHObject& obj)
     obj.collide_class_bits().set(cbNCClassAnimated, TRUE);
 }
 
-void CPHCollideValidator::SetClassSmall(CPHObject& obj)
-{
-    obj.collide_class_bits().set(cbClassSmall, TRUE);
-}
+void CPHCollideValidator::SetClassSmall(CPHObject& obj) { obj.collide_class_bits().set(cbClassSmall, TRUE); }
 void CPHCollideValidator::SetClassSmallNotCollide(CPHObject& obj)
 {
     obj.collide_class_bits().set(cbNCClassSmall, TRUE);
 }
 
-CGID RegisterGroup()
-{
-    return CPHCollideValidator::RegisterGroup();
-}
+CGID RegisterGroup() { return CPHCollideValidator::RegisterGroup(); }

@@ -12,17 +12,18 @@ class TfrmObjectList;
 
 //---------------------------------------------------------------------------
 #define estDefault 0
-#define CHECK_SNAP(R, A, C)                                                                                            \
-    {                                                                                                                  \
-        R += A;                                                                                                        \
-        if (fabsf(R) >= C) {                                                                                           \
-            A = snapto(R, C);                                                                                          \
-            R = 0;                                                                                                     \
-        }                                                                                                              \
-        else                                                                                                           \
-        {                                                                                                              \
-            A = 0;                                                                                                     \
-        }                                                                                                              \
+#define CHECK_SNAP(R, A, C)   \
+    {                         \
+        R += A;               \
+        if (fabsf(R) >= C)    \
+        {                     \
+            A = snapto(R, C); \
+            R = 0;            \
+        }                     \
+        else                  \
+        {                     \
+            A = 0;            \
+        }                     \
     }
 
 class CLevelTool : public CToolCustom
@@ -55,7 +56,7 @@ class CLevelTool : public CToolCustom
     void __fastcall SetTargetAction();
 
     void __fastcall RealSetAction(ETAction act);
-    void __fastcall RealSetTarget(ObjClassID tgt, int sub_tgt, bool bForced);  //=false);
+    void __fastcall RealSetTarget(ObjClassID tgt, int sub_tgt, bool bForced); //=false);
 
     TProperties* m_Props;
     void __stdcall OnPropsModified();
@@ -64,17 +65,16 @@ class CLevelTool : public CToolCustom
     void RealUpdateProperties();
     void RealUpdateObjectList();
 
-  public:
+public:
     float fFogness;
     u32 dwFogColor;
     xr_string m_LastSelectionName;
 
-  public:
+public:
     CLevelTool();
     virtual ~CLevelTool();
 
     IC ObjClassID GetTarget() { return target; }
-
     IC
 
         int
@@ -105,23 +105,16 @@ class CLevelTool : public CToolCustom
     virtual bool IsModified();
 
     virtual void Modified() { ; }
-
     virtual LPCSTR GetInfo();
 
     virtual void ZoomObject(BOOL bSelOnly);
 
     virtual bool Load(LPCSTR name) { return true; }
-
     virtual bool Save(LPCSTR name, bool bInternal = false) { return true; }
-
     virtual void Reload() { ; }
-
     virtual void OnDeviceCreate() { ; }
-
     virtual void OnDeviceDestroy() { ; }
-
     virtual void Clear() { inherited::Clear(); }
-
     virtual void OnShowHint(AStringVec& SS);
 
     virtual bool __fastcall MouseStart(TShiftState Shift);
@@ -140,16 +133,17 @@ class CLevelTool : public CToolCustom
     virtual void UpdateProperties(BOOL bForced)
     {
         m_Flags.set(flUpdateProperties | flUpdateObjectList, TRUE);
-        if (bForced) OnFrame();
+        if (bForced)
+            OnFrame();
     }
 
     virtual void RefreshProperties();
 
-  private:
+private:
     virtual void Simulate();
     virtual void UseSimulatePositions();
 
-  public:
+public:
     // specified functions
     void Reset();
 

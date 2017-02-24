@@ -49,17 +49,23 @@ bool CControllerPsyHit::tube_ready() const
 
 bool CControllerPsyHit::check_start_conditions()
 {
-    if (is_active()) return false;
+    if (is_active())
+        return false;
 
-    if (m_man->is_captured_pure()) return false;
+    if (m_man->is_captured_pure())
+        return false;
 
-    if (Actor()->Cameras().GetCamEffector(eCEControllerPsyHit)) return false;
+    if (Actor()->Cameras().GetCamEffector(eCEControllerPsyHit))
+        return false;
 
-    if (!see_enemy()) return false;
+    if (!see_enemy())
+        return false;
 
-    if (!tube_ready()) return false;
+    if (!tube_ready())
+        return false;
 
-    if (m_object->Position().distance_to(Actor()->Position()) < m_min_tube_dist) return false;
+    if (m_object->Position().distance_to(Actor()->Position()) < m_min_tube_dist)
+        return false;
 
     return true;
 }
@@ -93,7 +99,8 @@ void CControllerPsyHit::deactivate()
     m_man->release_pure(this);
     m_man->unsubscribe(this, ControlCom::eventAnimationEnd);
 
-    if (m_blocked) {
+    if (m_blocked)
+    {
         NET_Packet P;
 
         Actor()->u_EventGen(P, GEG_PLAYER_WEAPON_HIDE_STATE, Actor()->ID());
@@ -107,8 +114,10 @@ void CControllerPsyHit::deactivate()
 
 void CControllerPsyHit::on_event(ControlCom::EEventType type, ControlCom::IEventData* data)
 {
-    if (type == ControlCom::eventAnimationEnd) {
-        if (m_current_index < 3) {
+    if (type == ControlCom::eventAnimationEnd)
+    {
+        if (m_current_index < 3)
+        {
             m_current_index++;
             play_anim();
 
@@ -153,7 +162,7 @@ bool check_actor_visibility(const Fvector trace_from, const Fvector trace_to, IG
     return l_rq.O == Actor() || (l_rq.range >= dist - 0.1f);
 }
 
-}  // namespace detail
+} // namespace detail
 
 extern CActor* g_actor;
 
@@ -180,32 +189,39 @@ bool CControllerPsyHit::see_enemy()
 
 bool CControllerPsyHit::check_conditions_final()
 {
-    if (!m_object->g_Alive()) return false;
+    if (!m_object->g_Alive())
+        return false;
 
-    if (!g_actor) return false;
+    if (!g_actor)
+        return false;
 
     // 	if (m_object->EnemyMan.get_enemy() != Actor())
     // 		return false;
 
-    if (!m_object->EnemyMan.is_enemy(Actor())) return false;
+    if (!m_object->EnemyMan.is_enemy(Actor()))
+        return false;
 
-    if (!Actor()->g_Alive()) return false;
+    if (!Actor()->g_Alive())
+        return false;
 
-    if (m_object->Position().distance_to_xz(Actor()->Position()) < m_min_tube_dist - 2) return false;
+    if (m_object->Position().distance_to_xz(Actor()->Position()) < m_min_tube_dist - 2)
+        return false;
 
     return see_enemy();
 }
 
 void CControllerPsyHit::death_glide_start()
 {
-    if (!check_conditions_final()) {
+    if (!check_conditions_final())
+    {
         m_man->deactivate(this);
         return;
     }
 
     HUD().SetRenderable(false);
 
-    if (CController* controller = smart_cast<CController*>(m_object)) {
+    if (CController* controller = smart_cast<CController*>(m_object))
+    {
         controller->CControlledActor::install();
         controller->CControlledActor::dont_need_turn();
     }
@@ -291,29 +307,36 @@ void CControllerPsyHit::update_frame()
 void CControllerPsyHit::set_sound_state(ESoundState state)
 {
     CController* monster = smart_cast<CController*>(m_object);
-    if (state == ePrepare) {
+    if (state == ePrepare)
+    {
         monster->m_sound_tube_prepare.play_at_pos(Actor(), Fvector().set(0.f, 0.f, 0.f), sm_2D);
     }
     else if (state == eStart)
     {
-        if (monster->m_sound_tube_prepare._feedback()) monster->m_sound_tube_prepare.stop();
+        if (monster->m_sound_tube_prepare._feedback())
+            monster->m_sound_tube_prepare.stop();
 
         monster->m_sound_tube_start.play_at_pos(Actor(), Fvector().set(0.f, 0.f, 0.f), sm_2D);
         monster->m_sound_tube_pull.play_at_pos(Actor(), Fvector().set(0.f, 0.f, 0.f), sm_2D);
     }
     else if (state == eHit)
     {
-        if (monster->m_sound_tube_start._feedback()) monster->m_sound_tube_start.stop();
-        if (monster->m_sound_tube_pull._feedback()) monster->m_sound_tube_pull.stop();
+        if (monster->m_sound_tube_start._feedback())
+            monster->m_sound_tube_start.stop();
+        if (monster->m_sound_tube_pull._feedback())
+            monster->m_sound_tube_pull.stop();
 
         // monster->m_sound_tube_hit_left.play_at_pos(Actor(), Fvector().set(-1.f, 0.f, 1.f), sm_2D);
         // monster->m_sound_tube_hit_right.play_at_pos(Actor(), Fvector().set(1.f, 0.f, 1.f), sm_2D);
     }
     else if (state == eNone)
     {
-        if (monster->m_sound_tube_start._feedback()) monster->m_sound_tube_start.stop();
-        if (monster->m_sound_tube_pull._feedback()) monster->m_sound_tube_pull.stop();
-        if (monster->m_sound_tube_prepare._feedback()) monster->m_sound_tube_prepare.stop();
+        if (monster->m_sound_tube_start._feedback())
+            monster->m_sound_tube_start.stop();
+        if (monster->m_sound_tube_pull._feedback())
+            monster->m_sound_tube_pull.stop();
+        if (monster->m_sound_tube_prepare._feedback())
+            monster->m_sound_tube_prepare.stop();
     }
 
     m_sound_state = state;
@@ -332,16 +355,19 @@ void CControllerPsyHit::stop()
     HUD().SetRenderable(true);
 
     if (CController* controller = smart_cast<CController*>(m_object))
-        if (controller->CControlledActor::is_controlling()) controller->CControlledActor::release();
+        if (controller->CControlledActor::is_controlling())
+            controller->CControlledActor::release();
 
     // Stop camera effector
     CEffectorCam* ce = Actor()->Cameras().GetCamEffector(eCEControllerPsyHit);
-    if (ce) Actor()->Cameras().RemoveCamEffector(eCEControllerPsyHit);
+    if (ce)
+        Actor()->Cameras().RemoveCamEffector(eCEControllerPsyHit);
 }
 
 void CControllerPsyHit::on_death()
 {
-    if (!is_active()) return;
+    if (!is_active())
+        return;
 
     stop();
 

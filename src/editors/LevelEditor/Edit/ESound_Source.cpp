@@ -29,11 +29,7 @@
 
 //----------------------------------------------------
 
-ESoundSource::ESoundSource(LPVOID data, LPCSTR name) : CCustomObject(data, name)
-{
-    Construct(data);
-}
-
+ESoundSource::ESoundSource(LPVOID data, LPCSTR name) : CCustomObject(data, name) { Construct(data); }
 void ESoundSource::Construct(LPVOID data)
 {
     ClassID = OBJCLASS_SOUND_SRC;
@@ -57,11 +53,7 @@ void ESoundSource::Construct(LPVOID data)
     m_StopTime = 0;
 }
 
-ESoundSource::~ESoundSource()
-{
-    m_Source.destroy();
-}
-
+ESoundSource::~ESoundSource() { m_Source.destroy(); }
 //----------------------------------------------------
 
 bool ESoundSource::GetBox(Fbox& box) const
@@ -74,12 +66,14 @@ bool ESoundSource::GetBox(Fbox& box) const
 
 void ESoundSource::Render(int priority, bool strictB2F)
 {
-    if ((1 == priority) && (false == strictB2F)) {
+    if ((1 == priority) && (false == strictB2F))
+    {
         RCache.set_xform_world(Fidentity);
         EDevice.SetShader(EDevice.m_WireShader);
         u32 clr0 = Selected() ? SOUND_SEL0_COLOR : SOUND_NORM_COLOR;
         u32 clr1 = Selected() ? SOUND_SEL1_COLOR : SOUND_NORM_COLOR;
-        if (Selected()) {
+        if (Selected())
+        {
             DU_impl.DrawLineSphere(m_Params.position, m_Params.max_distance, clr1, true);
             DU_impl.DrawLineSphere(m_Params.position, m_Params.min_distance, clr0, false);
         }
@@ -101,10 +95,13 @@ bool ESoundSource::RayPick(float& distance, const Fvector& start, const Fvector&
     ray2.sub(m_Params.position, start);
 
     float d = ray2.dotproduct(direction);
-    if (d > 0) {
+    if (d > 0)
+    {
         float d2 = ray2.magnitude();
-        if (((d2 * d2 - d * d) < (VIS_RADIUS * VIS_RADIUS)) && (d > VIS_RADIUS)) {
-            if (d < distance) {
+        if (((d2 * d2 - d * d) < (VIS_RADIUS * VIS_RADIUS)) && (d > VIS_RADIUS))
+        {
+            if (d < distance)
+            {
                 distance = d;
                 return true;
             }
@@ -119,7 +116,8 @@ bool ESoundSource::LoadLTX(CInifile& ini, LPCSTR sect_name)
 {
     u32 version = ini.r_u32(sect_name, "version");
 
-    if (version != SOUND_SOURCE_VERSION) {
+    if (version != SOUND_SOURCE_VERSION)
+    {
         ELog.Msg(mtError, "ESoundSource: Unsupported version.");
         return false;
     }
@@ -148,7 +146,8 @@ bool ESoundSource::LoadLTX(CInifile& ini, LPCSTR sect_name)
     switch (m_Type)
     {
     case stStaticSource:
-        if (m_Flags.is(flPlaying)) Play();
+        if (m_Flags.is(flPlaying))
+            Play();
         //.    	if (m_Flags.is(flSimulating)) 	Simulate();
         break;
     default: THROW;
@@ -184,8 +183,10 @@ bool ESoundSource::LoadStream(IReader& F)
 {
     u16 version = 0;
 
-    if (F.r_chunk(SOUND_CHUNK_VERSION, &version)) {
-        if (version != SOUND_SOURCE_VERSION) {
+    if (F.r_chunk(SOUND_CHUNK_VERSION, &version))
+    {
+        if (version != SOUND_SOURCE_VERSION)
+        {
             ELog.Msg(mtError, "ESoundSource: Unsupported version.");
             return false;
         }
@@ -201,7 +202,8 @@ bool ESoundSource::LoadStream(IReader& F)
     R_ASSERT(F.find_chunk(SOUND_CHUNK_SOURCE_NAME));
     F.r_stringZ(m_WAVName);
 
-    if (F.find_chunk(SOUND_CHUNK_SOURCE_PARAMS3)) {
+    if (F.find_chunk(SOUND_CHUNK_SOURCE_PARAMS3))
+    {
         m_Params.base_volume = 1.f;
         F.r_fvector3(m_Params.position);
         m_Params.volume = F.r_float();
@@ -222,7 +224,8 @@ bool ESoundSource::LoadStream(IReader& F)
     }
     else
     {
-        if (!F.find_chunk(SOUND_CHUNK_SOURCE_PARAMS)) {
+        if (!F.find_chunk(SOUND_CHUNK_SOURCE_PARAMS))
+        {
             ELog.DlgMsg(mtError, "ESoundSource: Can't load Sound Source '%s'. Unsupported version.", *m_WAVName);
             return false;
         }
@@ -235,9 +238,11 @@ bool ESoundSource::LoadStream(IReader& F)
         m_Params.max_ai_distance = m_Params.max_distance;
     }
 
-    if (F.find_chunk(SOUND_CHUNK_SOURCE_FLAGS)) F.r(&m_Flags, sizeof(m_Flags));
+    if (F.find_chunk(SOUND_CHUNK_SOURCE_FLAGS))
+        F.r(&m_Flags, sizeof(m_Flags));
 
-    if (F.find_chunk(SOUND_CHUNK_GAME_PARAMS)) {
+    if (F.find_chunk(SOUND_CHUNK_GAME_PARAMS))
+    {
         F.r_fvector2(m_RandomPause);
         F.r_fvector2(m_ActiveTime);
         F.r_fvector2(m_PlayTime);
@@ -248,7 +253,8 @@ bool ESoundSource::LoadStream(IReader& F)
     switch (m_Type)
     {
     case stStaticSource:
-        if (m_Flags.is(flPlaying)) Play();
+        if (m_Flags.is(flPlaying))
+            Play();
         //.    	if (m_Flags.is(flSimulating)) 	Simulate();
         break;
     default: THROW;
@@ -294,14 +300,11 @@ void ESoundSource::OnChangeWAV(PropValue* prop)
 {
     BOOL bPlay = !!m_Source._feedback();
     ResetSource();
-    if (bPlay) Play();
+    if (bPlay)
+        Play();
 }
 
-void ESoundSource::OnChangeSource(PropValue* prop)
-{
-    m_Source.set_params(&m_Params);
-}
-
+void ESoundSource::OnChangeSource(PropValue* prop) { m_Source.set_params(&m_Params); }
 void ESoundSource::OnControlClick(ButtonValue* V, bool& bModif, bool& bSafe)
 {
     switch (V->btn_num)
@@ -357,7 +360,8 @@ void ESoundSource::FillProp(LPCSTR pref, PropItemVec& values)
 bool ESoundSource::GetSummaryInfo(SSceneSummary* inf)
 {
     inherited::GetSummaryInfo(inf);
-    if (m_WAVName.size()) inf->waves.insert(*m_WAVName);
+    if (m_WAVName.size())
+        inf->waves.insert(*m_WAVName);
     inf->sound_source_cnt++;
     return true;
 }
@@ -431,7 +435,8 @@ void ESoundSource::OnFrame()
 void ESoundSource::ResetSource()
 {
     m_Source.destroy();
-    if (m_WAVName.size()) {
+    if (m_WAVName.size())
+    {
         m_Source.create(*m_WAVName, st_Effect, sg_Undefined);
         CSoundRender_Source* src = (CSoundRender_Source*)m_Source._handle();
         m_Params.min_distance = src->m_fMinDist;

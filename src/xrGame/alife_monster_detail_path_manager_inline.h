@@ -26,11 +26,7 @@ IC const float& CALifeMonsterDetailPathManager::speed() const
     return (m_speed);
 }
 
-IC const CALifeMonsterDetailPathManager::PATH& CALifeMonsterDetailPathManager::path() const
-{
-    return (m_path);
-}
-
+IC const CALifeMonsterDetailPathManager::PATH& CALifeMonsterDetailPathManager::path() const { return (m_path); }
 IC const float& CALifeMonsterDetailPathManager::walked_distance() const
 {
     VERIFY(path().size() > 1);

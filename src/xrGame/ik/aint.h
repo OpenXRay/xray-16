@@ -39,31 +39,11 @@
 #define AINT_EPSILON (1e-5f)
 #define AINT_BIG_EPSILON (.01f)
 
-inline int equal(float x, float y, const float eps = AINT_EPSILON)
-{
-    return (_abs(x - y) < eps);
-}
-
-inline int istwopi(float x, const float eps = AINT_EPSILON)
-{
-    return equal(x, 2.0f * M_PI, eps);
-}
-
-inline int iszero(float x, const float eps = AINT_EPSILON)
-{
-    return _abs(x) < eps;
-}
-
-inline int le(float x, float y, const float eps = AINT_EPSILON)
-{
-    return (x < y) || equal(x, y, eps);
-}
-
-inline int ge(float x, float y, const float eps = AINT_EPSILON)
-{
-    return (x > y) || equal(x, y, eps);
-}
-
+inline int equal(float x, float y, const float eps = AINT_EPSILON) { return (_abs(x - y) < eps); }
+inline int istwopi(float x, const float eps = AINT_EPSILON) { return equal(x, 2.0f * M_PI, eps); }
+inline int iszero(float x, const float eps = AINT_EPSILON) { return _abs(x) < eps; }
+inline int le(float x, float y, const float eps = AINT_EPSILON) { return (x < y) || equal(x, y, eps); }
+inline int ge(float x, float y, const float eps = AINT_EPSILON) { return (x > y) || equal(x, y, eps); }
 //
 // Puts an angle in the range 0..2*PI
 //
@@ -93,7 +73,8 @@ inline float angle_distance(float a1, float a2)
     a1 = angle_normalize(a1);
     a2 = angle_normalize(a2);
 
-    if (a1 > a2) {
+    if (a1 > a2)
+    {
         t1 = 2 * M_PI - a1 + a2;
         t2 = a1 - a2;
     }
@@ -102,8 +83,10 @@ inline float angle_distance(float a1, float a2)
         t1 = 2 * M_PI - a2 + a1;
         t2 = a2 - a1;
     }
-    if (t2 < t1) t1 = t2;
-    if (t1 < AINT_EPSILON) t1 = 0.0;
+    if (t2 < t1)
+        t1 = t2;
+    if (t1 < AINT_EPSILON)
+        t1 = 0.0;
 
     return t1;
 }
@@ -152,9 +135,7 @@ public:
 
     float Low() const { return low; }
     float High() const { return high; }
-
     int IsFullRange(float eps = AINT_BIG_EPSILON) const { return _abs(high - 2 * M_PI) < eps && _abs(low) < eps; }
-
     int IsEmpty(float eps = AINT_BIG_EPSILON) const
     {
         if (low <= high)
@@ -166,7 +147,8 @@ public:
     // returns T if a is in the angle range
     int InRange(float a, float eps = AINT_EPSILON) const
     {
-        if (IsEmpty()) return 0;
+        if (IsEmpty())
+            return 0;
 
         a = angle_normalize(a);
         if (iszero(a) || istwopi(a))
@@ -234,7 +216,6 @@ class AngleIntList
 
 public:
     AngleIntList() : head(0), tail(0) {}
-
     void Clear()
     {
         while (head)
@@ -247,7 +228,6 @@ public:
     }
 
     ~AngleIntList() { Clear(); }
-
     void AddList(AngleIntList& dest, float eps = AINT_BIG_EPSILON) const;
 
     void Copy(AngleIntList& dest) const;
@@ -261,14 +241,14 @@ public:
     }
 
     int IsEmpty() const { return !head; }
-
     AngleInt* Largest() const;
 
     // returns T if a is in the angle range of any of the entries
     int InRange(float a, float eps = AINT_BIG_EPSILON) const
     {
         for (AngleIntListNode* t = head; t; t = t->next)
-            if (t->D.InRange(a, eps)) return 1;
+            if (t->D.InRange(a, eps))
+                return 1;
         return 0;
     }
 
@@ -292,15 +272,13 @@ class AngleIntListIterator
 
 public:
     AngleIntListIterator() { a = 0; }
-
     void Start(const AngleIntList& A) { a = A.head; }
-
     AngleIntListIterator(const AngleIntList& A) { Start(A); }
-
     AngleInt* Next()
     {
         AngleIntListNode* t = a;
-        if (a) a = a->next;
+        if (a)
+            a = a->next;
         return t ? &t->D : 0;
     }
 };

@@ -29,12 +29,18 @@ void CCDA::Open()
 CDA_STATE CCDA::GetState()
 {
     err = mciSendString("status cdaudio mode", retStr, retLen, NULL);
-    if (err == 0) {
-        if (!stricmp(retStr, "not ready")) return CDA_STATE_NOTREADY;
-        if (!stricmp(retStr, "paused")) return CDA_STATE_PAUSE;
-        if (!stricmp(retStr, "playing")) return CDA_STATE_PLAY;
-        if (!stricmp(retStr, "stopped")) return CDA_STATE_STOP;
-        if (!stricmp(retStr, "open")) return CDA_STATE_OPEN;
+    if (err == 0)
+    {
+        if (!stricmp(retStr, "not ready"))
+            return CDA_STATE_NOTREADY;
+        if (!stricmp(retStr, "paused"))
+            return CDA_STATE_PAUSE;
+        if (!stricmp(retStr, "playing"))
+            return CDA_STATE_PLAY;
+        if (!stricmp(retStr, "stopped"))
+            return CDA_STATE_STOP;
+        if (!stricmp(retStr, "open"))
+            return CDA_STATE_OPEN;
     }
     return CDA_STATE_NOTREADY;
 }
@@ -47,7 +53,8 @@ void CCDA::SetTrack(int track)
     sprintf(ch, "status cdaudio length track %d", track);
     ZeroMemory(retStr, sizeof(retStr));
     err = mciSendString(ch, retStr, retLen, NULL);
-    if (err) return;
+    if (err)
+        return;
 
     dwCurTrack = track;
     int mm, ss, msec;
@@ -59,7 +66,8 @@ void CCDA::SetTrack(int track)
 void CCDA::Close()
 {
     CDA_STATE state = GetState();
-    if ((state == CDA_STATE_PAUSE) || (state == CDA_STATE_PLAY)) {
+    if ((state == CDA_STATE_PAUSE) || (state == CDA_STATE_PLAY))
+    {
         mciSendString("stop cdaudio", retStr, retLen, 0);
     }
     mciSendString("close cdaudio", retStr, retLen, 0);
@@ -73,29 +81,36 @@ void CCDA::Play()
     char ch[64];
     bWorking = false;
     CDA_STATE state = GetState();
-    if ((state != CDA_STATE_NOTREADY)) {
-        if (bPaused) {
+    if ((state != CDA_STATE_NOTREADY))
+    {
+        if (bPaused)
+        {
             sprintf(ch, "play cdaudio to %d", dwCurTrack + 1);
             err = mciSendString(ch, retStr, retLen, 0);
-            if (err != 0) {
+            if (err != 0)
+            {
                 sprintf(ch, "play cdaudio");
                 err = mciSendString(ch, retStr, retLen, 0);
             }
-            if (err == 0) {
+            if (err == 0)
+            {
                 bWorking = true;
                 bPaused = false;
             }
             return;
         }
-        if (dwCurTrack) {
+        if (dwCurTrack)
+        {
             lKeepTime = lTotalTime;
             sprintf(ch, "play cdaudio from %d to %d", dwCurTrack, dwCurTrack + 1);
             err = mciSendString(ch, retStr, retLen, 0);
-            if (err != 0) {
+            if (err != 0)
+            {
                 sprintf(ch, "play cdaudio from %d", dwCurTrack);
                 err = mciSendString(ch, retStr, retLen, 0);
             }
-            if (err == 0) {
+            if (err == 0)
+            {
                 lKeepTime = lTotalTime;
                 bWorking = true;
             }
@@ -119,15 +134,20 @@ void CCDA::Pause()
 
 void CCDA::OnMove()
 {
-    if (bWorking) {
-        if (lKeepTime <= 0) {
+    if (bWorking)
+    {
+        if (lKeepTime <= 0)
+        {
             CDA_STATE state = GetState();
-            if (state == CDA_STATE_STOP) Play();
-            if (state != CDA_STATE_STOP) bWorking = false;
+            if (state == CDA_STATE_STOP)
+                Play();
+            if (state != CDA_STATE_STOP)
+                bWorking = false;
         }
         else
         {
-            if (!bPaused) lKeepTime -= u32(Device.fTimeDelta * 1000);
+            if (!bPaused)
+                lKeepTime -= u32(Device.fTimeDelta * 1000);
         }
     }
 }

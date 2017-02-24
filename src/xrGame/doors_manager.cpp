@@ -14,15 +14,8 @@ using doors::actor;
 using doors::manager;
 using doors::door;
 
-manager::manager(Fbox const& bounding_box) : m_doors(bounding_box, 2.f, 512, 2048)
-{
-}
-
-manager::~manager()
-{
-    VERIFY2(m_doors.empty(), make_string("there are %d still registered doors", m_doors.size()));
-}
-
+manager::manager(Fbox const& bounding_box) : m_doors(bounding_box, 2.f, 512, 2048) {}
+manager::~manager() { VERIFY2(m_doors.empty(), make_string("there are %d still registered doors", m_doors.size())); }
 //
 // void manager::check_bug_door		( ) const
 //{
@@ -42,7 +35,7 @@ manager::~manager()
 //	door const* const found	= m_doors.find( game_object->lua_game_object()->m_door->position() );
 //	if ( !found ) {
 //		Msg					( "object[\"shkaf_work_01_door_0000\"] has been unregistered already[0x%08x]?",
-//game_object->lua_game_object()->m_door );
+// game_object->lua_game_object()->m_door );
 //		return;
 //	}
 //
@@ -79,36 +72,21 @@ bool manager::actualize_doors_state(actor& actor, float const average_speed)
     // check_bug_door			( );
     m_doors.nearest(position, radius, m_nearest_doors);
     // check_bug_door			( );
-    if (m_nearest_doors.empty() && !actor.need_update()) return true;
+    if (m_nearest_doors.empty() && !actor.need_update())
+        return true;
 
     return actor.update_doors(m_nearest_doors, average_speed);
 }
 
-void manager::on_door_is_open(door* door)
-{
-    door->on_change_state(door_state_open);
-}
-
-void manager::on_door_is_closed(door* door)
-{
-    door->on_change_state(door_state_closed);
-}
-
+void manager::on_door_is_open(door* door) { door->on_change_state(door_state_open); }
+void manager::on_door_is_closed(door* door) { door->on_change_state(door_state_closed); }
 bool manager::is_door_locked(door const* door) const
 {
     return door->is_locked(doors::door_state_open) || door->is_locked(doors::door_state_closed);
 }
 
-void manager::lock_door(door* const door)
-{
-    door->lock();
-}
-
-void manager::unlock_door(door* const door)
-{
-    door->unlock();
-}
-
+void manager::lock_door(door* const door) { door->lock(); }
+void manager::unlock_door(door* const door) { door->unlock(); }
 bool manager::is_door_blocked(door* const door) const
 {
     return door->is_blocked(door_state_open) || door->is_blocked(door_state_closed);

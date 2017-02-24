@@ -235,8 +235,8 @@ IC void set_vertex(SSkelVert& out_vertex, const SSkelVert& in_old_vertex, const 
 {
     out_vertex = in_old_vertex;
 
-    cv_vector(out_vertex.offs, in_vertex.pos);     //?
-    cv_vector(out_vertex.norm, in_vertex.normal);  //?
+    cv_vector(out_vertex.offs, in_vertex.pos); //?
+    cv_vector(out_vertex.norm, in_vertex.normal); //?
 
     out_vertex.uv.x = in_vertex.s;
     out_vertex.uv.y = in_vertex.t;

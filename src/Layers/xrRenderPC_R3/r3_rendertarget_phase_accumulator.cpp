@@ -3,9 +3,11 @@
 void CRenderTarget::phase_accumulator()
 {
     // Targets
-    if (dwAccumulatorClearMark == Device.dwFrame) {
+    if (dwAccumulatorClearMark == Device.dwFrame)
+    {
         // normal operation - setup
-        if (!RImplementation.o.dx10_msaa) {
+        if (!RImplementation.o.dx10_msaa)
+        {
             if (RImplementation.o.fp16_blend)
                 u_setrt(rt_Accumulator, NULL, NULL, HW.pBaseZB);
             else
@@ -33,7 +35,8 @@ void CRenderTarget::phase_accumulator()
         reset_light_marker();
         //	Igor: AMD bug workaround. Should be fixed in 8.7 catalyst
         //	Need for MSAA to work correctly.
-        if (RImplementation.o.dx10_msaa) {
+        if (RImplementation.o.dx10_msaa)
+        {
             HW.pDevice->OMSetRenderTargets(1, &(rt_Accumulator->pRT), 0);
         }
         //		u32		clr4clear					= color_rgba(0,0,0,0);	// 0x00
@@ -67,7 +70,8 @@ void CRenderTarget::phase_accumulator()
 
 void CRenderTarget::phase_vol_accumulator()
 {
-    if (!m_bHasActiveVolumetric) {
+    if (!m_bHasActiveVolumetric)
+    {
         m_bHasActiveVolumetric = true;
         if (!RImplementation.o.dx10_msaa)
             u_setrt(rt_Generic_2, NULL, NULL, HW.pBaseZB);

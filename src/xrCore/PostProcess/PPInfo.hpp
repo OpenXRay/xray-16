@@ -17,7 +17,6 @@ struct XRCORE_API SPPInfo
         }
 
         IC operator const Fvector&() { return *((Fvector*)this); }
-
         IC SColor& operator+=(const SColor& ppi)
         {
             r += ppi.r;

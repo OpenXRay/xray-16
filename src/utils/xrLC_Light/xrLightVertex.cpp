@@ -13,7 +13,7 @@ mapVert* g_trans;
 Lock g_trans_CS
 #ifdef CONFIG_PROFILE_LOCKS
     (MUTEX_PROFILE_ID(g_trans_CS))
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
         ;
 extern XRLC_LIGHT_API void LightPoint(CDB::COLLIDER* DB, CDB::MODEL* MDL, base_color_c& C, Fvector& P, Fvector& N,
     base_lighting& lights, u32 flags, Face* skip);
@@ -35,7 +35,8 @@ void g_trans_register_internal(Vertex* V)
         it--;
     while (it2 != g_trans->end() && ((it2->first - eps2) < key))
         it2++;
-    if (it2 != g_trans->end()) it2++;
+    if (it2 != g_trans->end())
+        it2++;
 
     // Search
     for (; it != it2; it++)
@@ -43,7 +44,8 @@ void g_trans_register_internal(Vertex* V)
         vecVertex& VL = it->second;
         Vertex* Front = VL.front();
         R_ASSERT(Front);
-        if (Front->P.similar(V->P, eps)) {
+        if (Front->P.similar(V->P, eps))
+        {
             VL.push_back(V);
             return;
         }
@@ -74,11 +76,10 @@ public:
 #ifdef CONFIG_PROFILE_LOCKS
           ,
           cs(MUTEX_PROFILE_ID(CVertexLightTasker))
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
               {};
 
     void init() { index = 0; }
-
     u32 get()
     {
         cs.Enter();
@@ -103,7 +104,8 @@ bool GetTranslucency(const Vertex* V, float& v_trans)
     {
         Face* F = V->m_adjacents[f];
         v_trans += F->Shader().vert_translucency;
-        if (F->Shader().flags.bLIGHT_Vertex) bVertexLight = TRUE;
+        if (F->Shader().flags.bLIGHT_Vertex)
+            bVertexLight = TRUE;
     }
     v_trans /= float(V->m_adjacents.size());
     return bVertexLight;
@@ -119,7 +121,8 @@ public:
         for (;; counter++)
         {
             u32 id = VLT.get();
-            if (id == VLT_END) break;
+            if (id == VLT_END)
+                break;
 
             Vertex* V = lc_global_data()->g_vertices()[id];
 
@@ -127,7 +130,8 @@ public:
 
             float v_trans = 0.f;
 
-            if (GetTranslucency(V, v_trans)) {
+            if (GetTranslucency(V, v_trans))
+            {
                 base_color_c vC, old;
                 V->C._get(old);
 
@@ -137,7 +141,7 @@ public:
                     (lc_global_data()->b_nosun() ? LP_dont_sun : 0) | LP_dont_hemi, 0);
                 vC._tmp_ = v_trans;
                 vC.mul(.5f);
-                vC.hemi = old.hemi;  // preserve pre-calculated hemisphere
+                vC.hemi = old.hemi; // preserve pre-calculated hemisphere
                 V->C._set(vC);
 
                 g_trans_register(V);
@@ -158,7 +162,8 @@ void LightVertex(bool net)
 
     // Start threads, wait, continue --- perform all the work
     Logger.Status("Calculating...");
-    if (!net) {
+    if (!net)
+    {
         CThreadManager Threads(ProxyStatus, ProxyProgress);
         VLT.init();
         CTimer start_time;

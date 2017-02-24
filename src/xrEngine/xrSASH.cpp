@@ -23,7 +23,8 @@ bool xrSASH::Init(const char* pszParam)
 {
     oaVersion ver;
     oaBool res = oaInit(pszParam, &ver);
-    if (res) {
+    if (res)
+    {
         m_bInited = true;
         m_bOpenAutomate = true;
 
@@ -46,7 +47,8 @@ void xrSASH::MainLoop()
     m_bRunning = true;
     m_bReinitEngine = false;
 
-    if (m_bOpenAutomate) {
+    if (m_bOpenAutomate)
+    {
         LoopOA();
     }
     else
@@ -117,7 +119,8 @@ void xrSASH::LoopNative()
     CInifile ini(in_file);
 
     IReader* R = FS.r_open(in_file);
-    if (R) {
+    if (R)
+    {
         FS.r_close(R);
 
         int test_count = ini.line_count("benchmark");
@@ -160,7 +163,8 @@ void xrSASH::ReportNative(LPCSTR pszTestName)
 
     const u32 iWindowSize = 15;
 
-    if (m_aFrimeTimes.size() > iWindowSize * 4) {
+    if (m_aFrimeTimes.size() > iWindowSize * 4)
+    {
         for (u32 it = 0; it < m_aFrimeTimes.size() - iWindowSize; it++)
         {
             float fTime = 0;
@@ -169,8 +173,10 @@ void xrSASH::ReportNative(LPCSTR pszTestName)
                 fTime += m_aFrimeTimes[it + i];
 
             float fFps = iWindowSize / fTime;
-            if (fFps < fMinFps) fMinFps = fFps;
-            if (fFps > fMaxFps) fMaxFps = fFps;
+            if (fFps < fMinFps)
+                fMinFps = fFps;
+            if (fFps > fMaxFps)
+                fMaxFps = fFps;
         }
     }
     else
@@ -178,8 +184,10 @@ void xrSASH::ReportNative(LPCSTR pszTestName)
         for (u32 it = 0; it < m_aFrimeTimes.size(); it++)
         {
             float fFps = 1.f / m_aFrimeTimes[it];
-            if (fFps < fMinFps) fMinFps = fFps;
-            if (fFps > fMaxFps) fMaxFps = fFps;
+            if (fFps < fMinFps)
+                fMinFps = fFps;
+            if (fFps > fMaxFps)
+                fMaxFps = fFps;
         }
     }
 
@@ -206,14 +214,16 @@ void xrSASH::ReportNative(LPCSTR pszTestName)
 
 void xrSASH::StartBenchmark()
 {
-    if (!m_bRunning) return;
+    if (!m_bRunning)
+        return;
 
     VERIFY(!m_bBenchmarkRunning);
 
     m_bBenchmarkRunning = true;
     oaStartBenchmark();
 
-    if (!m_bOpenAutomate) {
+    if (!m_bOpenAutomate)
+    {
         m_aFrimeTimes.clear();
         m_aFrimeTimes.reserve(1024);
         m_FrameTimer.Start();
@@ -222,12 +232,14 @@ void xrSASH::StartBenchmark()
 
 void xrSASH::DisplayFrame(float t)
 {
-    if (!m_bRunning) return;
+    if (!m_bRunning)
+        return;
 
     VERIFY(m_bBenchmarkRunning);
     oaDisplayFrame(t);
 
-    if (!m_bOpenAutomate) {
+    if (!m_bOpenAutomate)
+    {
         m_aFrimeTimes.push_back(m_FrameTimer.GetElapsed_sec());
         m_FrameTimer.Start();
     }
@@ -235,7 +247,8 @@ void xrSASH::DisplayFrame(float t)
 
 void xrSASH::EndBenchmark()
 {
-    if (!m_bRunning) return;
+    if (!m_bRunning)
+        return;
 
     VERIFY(m_bBenchmarkRunning);
 
@@ -280,7 +293,7 @@ void xrSASH::GetAllOptions()
     }
 
     // >=r2
-    oaInitOption(&Option);  // Reset dependency info
+    oaInitOption(&Option); // Reset dependency info
     // Currently only equal/not equal works
     // Option.Dependency.ParentName = TEXT("renderer");
     // Option.Dependency.ComparisonOp = OA_COMP_OP_GREATER_OR_EQUAL;
@@ -436,14 +449,16 @@ void xrSASH::RunBenchmark(LPCSTR pszName)
 
 void xrSASH::TryInitEngine(bool bNoRun)
 {
-    if (m_bReinitEngine) {
+    if (m_bReinitEngine)
+    {
         InitEngine();
         // It was destroyed on previous exit
         Console->Initialize();
     }
 
     xr_strcpy(Console->ConfigFile, "user.ltx");
-    if (strstr(Core.Params, "-ltx ")) {
+    if (strstr(Core.Params, "-ltx "))
+    {
         string64 c_name;
         sscanf(strstr(Core.Params, "-ltx ") + 5, "%[^ ] ", c_name);
         xr_strcpy(Console->ConfigFile, c_name);
@@ -470,13 +485,15 @@ void xrSASH::TryInitEngine(bool bNoRun)
 
     Console->Execute("unbindall");
     Console->ExecuteScript(Console->ConfigFile);
-    if (m_bOpenAutomate) {
+    if (m_bOpenAutomate)
+    {
         // Overwrite setting using SASH.ltx if has any.
         xr_strcpy(Console->ConfigFile, "SASH.ltx");
         Console->ExecuteScript(Console->ConfigFile);
     }
 
-    if (bNoRun) {
+    if (bNoRun)
+    {
         InitSound();
         Device.Create();
     }
@@ -495,7 +512,8 @@ void xrSASH::ReleaseEngine()
 oaOptionDataType xrSASH::GetOptionType(char* pszOptionName)
 {
     CConsole::vecCMD_IT I = Console->Commands.find(pszOptionName);
-    if (I == Console->Commands.end()) {
+    if (I == Console->Commands.end())
+    {
         Msg("SASH:: Option \"%s\" not found.", pszOptionName);
         VERIFY(I != Console->Commands.end());
         return OA_TYPE_BOOL;
@@ -530,7 +548,8 @@ void xrSASH::DescribeOption(char* pszOptionName, const oaOptionDependency& Depen
     Option.Dependency = Dependency;
 
     CConsole::vecCMD_IT I = Console->Commands.find(pszOptionName);
-    if (I == Console->Commands.end()) {
+    if (I == Console->Commands.end())
+    {
         Msg("SASH:: Option \"%s\" not found.", pszOptionName);
         VERIFY(I != Console->Commands.end());
         return;
@@ -546,7 +565,8 @@ void xrSASH::DescribeOption(char* pszOptionName, const oaOptionDependency& Depen
 
     Msg("SASH:: Registering option \"%s\".", pszOptionName);
 
-    if (pMask) {
+    if (pMask)
+    {
         Option.DataType = OA_TYPE_BOOL;
         oaAddOption(&Option);
     }
@@ -593,7 +613,8 @@ void xrSASH::GetOption(char* pszOptionName)
     oaValue Val;
 
     CConsole::vecCMD_IT I = Console->Commands.find(pszOptionName);
-    if (I == Console->Commands.end()) {
+    if (I == Console->Commands.end())
+    {
         Msg("SASH:: Option \"%s\" not found.", pszOptionName);
         VERIFY(I != Console->Commands.end());
         return;
@@ -607,7 +628,8 @@ void xrSASH::GetOption(char* pszOptionName)
 
     Msg("SASH:: Getting option \"%s\".", pszOptionName);
 
-    if (pMask) {
+    if (pMask)
+    {
         Val.Bool = pMask->GetValue() ? OA_TRUE : OA_FALSE;
         oaAddOptionValue(pszOptionName, OA_TYPE_BOOL, &Val);
     }
@@ -642,7 +664,8 @@ void xrSASH::SetOption(oaNamedOption* pOption)
     * and Option->Value will contain the appropriate value.
     */
     CConsole::vecCMD_IT I = Console->Commands.find(pOption->Name);
-    if (I == Console->Commands.end()) {
+    if (I == Console->Commands.end())
+    {
         Msg("SASH:: Option \"%s\" not found.", pOption->Name);
         VERIFY(I != Console->Commands.end());
         return;
@@ -658,7 +681,8 @@ void xrSASH::SetOption(oaNamedOption* pOption)
 
     string512 CmdBuf;
 
-    if (pMask) {
+    if (pMask)
+    {
         xr_sprintf(CmdBuf, "%s %s", pOption->Name, (pOption->Value.Bool ? "1" : "0"));
     }
     else if (pToken)
@@ -702,12 +726,14 @@ void xrSASH::Message(oaErrorType MessageType, const char* pszMsg, va_list& mark)
     int sz = _vsnprintf(buf, sizeof(buf) - 1, pszMsg, mark);
     buf[sizeof(buf) - 1] = 0;
 
-    if (sz) Message(MessageType, buf);
+    if (sz)
+        Message(MessageType, buf);
 }
 
 void xrSASH::OnConsoleInvalidSyntax(bool bLastLine, const char* pszMsg, ...)
 {
-    if (m_bInited && m_bExecutingConsoleCommand) {
+    if (m_bInited && m_bExecutingConsoleCommand)
+    {
         va_list mark;
         va_start(mark, pszMsg);
 

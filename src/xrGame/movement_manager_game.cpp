@@ -50,11 +50,13 @@ void CMovementManager::process_game_path()
 {
     START_PROFILE("Build Path/Process Game Path");
 
-    if (m_path_state != ePathStateTeleport) {
+    if (m_path_state != ePathStateTeleport)
+    {
         if (!level_path().actual() && (m_path_state > ePathStateBuildLevelPath))
             m_path_state = ePathStateBuildLevelPath;
 
-        if (!game_path().actual() && (m_path_state > ePathStateBuildGamePath)) m_path_state = ePathStateBuildGamePath;
+        if (!game_path().actual() && (m_path_state > ePathStateBuildGamePath))
+            m_path_state = ePathStateBuildGamePath;
     }
 
     switch (m_path_state)
@@ -63,12 +65,14 @@ void CMovementManager::process_game_path()
     {
         u32 current = game_path().m_dest_vertex_id;
         game_selector().select_location(object().ai_location().game_vertex_id(), game_path().m_dest_vertex_id);
-        if ((current == game_path().m_dest_vertex_id) && game_selector().used()) {
+        if ((current == game_path().m_dest_vertex_id) && game_selector().used())
+        {
             m_path_state = ePathStatePathCompleted;
             break;
         }
 
-        if (game_selector().failed()) break;
+        if (game_selector().failed())
+            break;
 
         m_path_state = ePathStateBuildGamePath;
     }
@@ -76,7 +80,8 @@ void CMovementManager::process_game_path()
     {
         game_path().build_path(object().ai_location().game_vertex_id(), game_dest_vertex_id());
 
-        if (game_path().failed()) {
+        if (game_path().failed())
+        {
             show_game_path_info();
             break;
         }
@@ -92,7 +97,7 @@ void CMovementManager::process_game_path()
             m_path_state = ePathStateTeleport;
             VERIFY(ai().get_alife());
             VERIFY(ai().alife().graph().level().level_id() ==
-                   ai().game_graph().vertex(object().ai_location().game_vertex_id())->level_id());
+                ai().game_graph().vertex(object().ai_location().game_vertex_id())->level_id());
             teleport(game_path().intermediate_vertex_id());
             break;
         }
@@ -102,11 +107,12 @@ void CMovementManager::process_game_path()
     case ePathStateBuildLevelPath:
     {
         VERIFY(ai().game_graph().vertex(object().ai_location().game_vertex_id())->level_id() ==
-               ai().game_graph().vertex(game_path().intermediate_vertex_id())->level_id());
+            ai().game_graph().vertex(game_path().intermediate_vertex_id())->level_id());
 
         u32 dest_level_vertex_id = ai().game_graph().vertex(game_path().intermediate_vertex_id())->level_vertex_id();
 
-        if (!accessible(dest_level_vertex_id)) {
+        if (!accessible(dest_level_vertex_id))
+        {
             Fvector dest_pos;
             dest_level_vertex_id =
                 restrictions().accessible_nearest(ai().level_graph().vertex_position(dest_level_vertex_id), dest_pos);
@@ -116,7 +122,8 @@ void CMovementManager::process_game_path()
             ai().level_graph().vertex_position(dest_level_vertex_id /**level_path().intermediate_vertex_id()/**/);
         level_path_builder().setup(object().ai_location().level_vertex_id(), dest_level_vertex_id, true, &temp);
 
-        if (can_use_distributed_computations(mtLevelPath)) {
+        if (can_use_distributed_computations(mtLevelPath))
+        {
             level_path_builder().register_to_process();
             break;
         }
@@ -142,7 +149,8 @@ void CMovementManager::process_game_path()
 
         detail_path_builder().setup(level_path().path(), level_path().intermediate_index());
 
-        if (can_use_distributed_computations(mtDetailPath)) {
+        if (can_use_distributed_computations(mtDetailPath))
+        {
             detail_path_builder().register_to_process();
             break;
         }
@@ -164,9 +172,11 @@ void CMovementManager::process_game_path()
         else if (detail().completed(object().Position(), !detail().state_patrol_path()))
         {
             m_path_state = ePathStateContinueLevelPath;
-            if (level_path().completed()) {
+            if (level_path().completed())
+            {
                 m_path_state = ePathStateContinueGamePath;
-                if (game_path().completed()) m_path_state = ePathStatePathCompleted;
+                if (game_path().completed())
+                    m_path_state = ePathStatePathCompleted;
             }
         }
         break;

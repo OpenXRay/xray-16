@@ -20,26 +20,20 @@ lwFreeEnvelope()
 Free the memory used by an lwEnvelope.
 ====================================================================== */
 
-void w_free(void* p)
-{
-    free(p);
-}
-
+void w_free(void* p) { free(p); }
 void lwFreeEnvelope(lwEnvelope* env)
 {
-    if (env) {
-        if (env->name) free(env->name);
+    if (env)
+    {
+        if (env->name)
+            free(env->name);
         lwListFree(env->key, w_free);
         lwListFree(env->cfilter, lwFreePlugin);
         free(env);
     }
 }
 
-static int compare_keys(lwKey* k1, lwKey* k2)
-{
-    return k1->time > k2->time ? 1 : k1->time < k2->time ? -1 : 0;
-}
-
+static int compare_keys(lwKey* k1, lwKey* k2) { return k1->time > k2->time ? 1 : k1->time < k2->time ? -1 : 0; }
 /*
 ======================================================================
 lwGetEnvelope()
@@ -60,7 +54,8 @@ lwEnvelope* lwGetEnvelope(FILE* fp, int cksize)
     /* allocate the Envelope structure */
 
     env = calloc(1, sizeof(lwEnvelope));
-    if (!env) goto Fail;
+    if (!env)
+        goto Fail;
 
     /* remember where we started */
 
@@ -75,7 +70,8 @@ lwEnvelope* lwGetEnvelope(FILE* fp, int cksize)
 
     id = getU4(fp);
     sz = getU2(fp);
-    if (0 > get_flen()) goto Fail;
+    if (0 > get_flen())
+        goto Fail;
 
     /* process subchunks as they're encountered */
 
@@ -96,7 +92,8 @@ lwEnvelope* lwGetEnvelope(FILE* fp, int cksize)
 
         case ID_KEY:
             key = calloc(1, sizeof(lwKey));
-            if (!key) goto Fail;
+            if (!key)
+                goto Fail;
             key->time = getF4(fp);
             key->value = getF4(fp);
             lwListInsert(&env->key, key, compare_keys);
@@ -104,11 +101,13 @@ lwEnvelope* lwGetEnvelope(FILE* fp, int cksize)
             break;
 
         case ID_SPAN:
-            if (!key) goto Fail;
+            if (!key)
+                goto Fail;
             key->shape = getU4(fp);
 
             nparams = (sz - 4) / 4;
-            if (nparams > 4) nparams = 4;
+            if (nparams > 4)
+                nparams = 4;
             for (i = 0; i < nparams; i++)
                 f[i] = getF4(fp);
 
@@ -131,7 +130,8 @@ lwEnvelope* lwGetEnvelope(FILE* fp, int cksize)
 
         case ID_CHAN:
             plug = calloc(1, sizeof(lwPlugin));
-            if (!plug) goto Fail;
+            if (!plug)
+                goto Fail;
 
             plug->name = getS0(fp);
             plug->flags = getU2(fp);
@@ -147,24 +147,29 @@ lwEnvelope* lwGetEnvelope(FILE* fp, int cksize)
         /* error while reading current subchunk? */
 
         rlen = get_flen();
-        if (rlen < 0 || rlen > sz) goto Fail;
+        if (rlen < 0 || rlen > sz)
+            goto Fail;
 
         /* skip unread parts of the current subchunk */
 
-        if (rlen < sz) fseek(fp, sz - rlen, SEEK_CUR);
+        if (rlen < sz)
+            fseek(fp, sz - rlen, SEEK_CUR);
 
         /* end of the ENVL chunk? */
 
         rlen = ftell(fp) - pos;
-        if (cksize < rlen) goto Fail;
-        if (cksize == rlen) break;
+        if (cksize < rlen)
+            goto Fail;
+        if (cksize == rlen)
+            break;
 
         /* get the next subchunk header */
 
         set_flen(0);
         id = getU4(fp);
         sz = getU2(fp);
-        if (6 != get_flen()) goto Fail;
+        if (6 != get_flen())
+            goto Fail;
     }
 
     return env;
@@ -188,7 +193,8 @@ lwEnvelope* lwFindEnvelope(lwEnvelope* list, int index)
     env = list;
     while (env)
     {
-        if (env->index == index) break;
+        if (env->index == index)
+            break;
         env = env->next;
     }
     return env;
@@ -211,13 +217,16 @@ static float range(float v, float lo, float hi, int* i)
 {
     float v2, r = hi - lo;
 
-    if (r == 0.0) {
-        if (i) *i = 0;
+    if (r == 0.0)
+    {
+        if (i)
+            *i = 0;
         return lo;
     }
 
     v2 = lo + v - r * (float)floor((double)v / r);
-    if (i) *i = -(int)((v2 - v) / r + (v2 > v ? 0.5 : -0.5));
+    if (i)
+        *i = -(int)((v2 - v) / r + (v2 > v ? 0.5 : -0.5));
 
     return v2;
 }
@@ -260,7 +269,8 @@ static float outgoing(lwKey* key0, Key* key1)
         b = (1.0f - key0->tension) * (1.0f - key0->continuity) * (1.0f - key0->bias);
         d = key1->value - key0->value;
 
-        if (key0->prev) {
+        if (key0->prev)
+        {
             t = (key1->time - key0->time) / (key1->time - key0->prev->time);
             out = t * (a * (key0->value - key0->prev->value) + b * d);
         }
@@ -271,7 +281,8 @@ static float outgoing(lwKey* key0, Key* key1)
     case SHAPE_BEZI:
     case SHAPE_HERM:
         out = key0->param[1];
-        if (key0->prev) out *= (key1->time - key0->time) / (key1->time - key0->prev->time);
+        if (key0->prev)
+            out *= (key1->time - key0->time) / (key1->time - key0->prev->time);
         break;
 
     case SHAPE_LINE:
@@ -304,7 +315,8 @@ static float incoming(Key* key0, Key* key1)
         b = (1.0f - key1->tension) * (1.0f + key1->continuity) * (1.0f - key1->bias);
         d = key1->value - key0->value;
 
-        if (key1->next) {
+        if (key1->next)
+        {
             t = (key1->time - key0->time) / (key1->next->time - key0->time);
             in = t * (b * (key1->next->value - key1->value) + a * d);
         }
@@ -315,7 +327,8 @@ static float incoming(Key* key0, Key* key1)
     case SHAPE_BEZI:
     case SHAPE_HERM:
         in = key1->param[0];
-        if (key1->next) in *= (key1->time - key0->time) / (key1->next->time - key0->time);
+        if (key1->next)
+            in *= (key1->time - key0->time) / (key1->next->time - key0->time);
         break;
         return in;
 
@@ -363,7 +376,8 @@ static float bez2_time(float x0, float x1, float x2, float x3, float time, float
 
     t = *t0 + (*t1 - *t0) * 0.5f;
     v = bezier(x0, x1, x2, x3, t);
-    if (fabs(time - v) > .0001f) {
+    if (fabs(time - v) > .0001f)
+    {
         if (v > time)
             *t1 = t;
         else
@@ -416,11 +430,13 @@ float lwEvalEnvelope(lwEnvelope* env, float time)
 
     /* if there's no key, the value is 0 */
 
-    if (env->nkeys == 0) return 0.0f;
+    if (env->nkeys == 0)
+        return 0.0f;
 
     /* if there's only one key, the value is constant */
 
-    if (env->nkeys == 1) return env->key->value;
+    if (env->nkeys == 1)
+        return env->key->value;
 
     /* find the first and last keys */
 
@@ -430,7 +446,8 @@ float lwEvalEnvelope(lwEnvelope* env, float time)
 
     /* use pre-behavior if time is before first key time */
 
-    if (time < skey->time) {
+    if (time < skey->time)
+    {
         switch (env->behavior[0])
         {
         case BEH_RESET: return 0.0f;
@@ -441,7 +458,8 @@ float lwEvalEnvelope(lwEnvelope* env, float time)
 
         case BEH_OSCILLATE:
             time = range(time, skey->time, ekey->time, &noff);
-            if (noff % 2) time = ekey->time - skey->time - time;
+            if (noff % 2)
+                time = ekey->time - skey->time - time;
             break;
 
         case BEH_OFFSET:
@@ -455,7 +473,7 @@ float lwEvalEnvelope(lwEnvelope* env, float time)
             case SHAPE_STEP: return skey->value;
             case SHAPE_LINE:
                 return (skey->value - skey->next->value) / (skey->time - skey->next->time) * (time - skey->next->time) +
-                       skey->next->value;
+                skey->next->value;
             case SHAPE_TCB:
             case SHAPE_HERM:
             case SHAPE_BEZI:
@@ -463,7 +481,7 @@ float lwEvalEnvelope(lwEnvelope* env, float time)
                 return out * (time - skey->time) + skey->value;
             case SHAPE_BEZ2:
                 return (skey->param[1] - skey->param[3]) / (skey->param[0] - skey->param[2]) * (time - skey->time) +
-                       skey->value;
+                skey->value;
             }
         }
     }
@@ -482,7 +500,8 @@ float lwEvalEnvelope(lwEnvelope* env, float time)
 
         case BEH_OSCILLATE:
             time = range(time, skey->time, ekey->time, &noff);
-            if (noff % 2) time = ekey->time - skey->time - time;
+            if (noff % 2)
+                time = ekey->time - skey->time - time;
             break;
 
         case BEH_OFFSET:
@@ -496,7 +515,7 @@ float lwEvalEnvelope(lwEnvelope* env, float time)
             case SHAPE_STEP: return ekey->value;
             case SHAPE_LINE:
                 return (ekey->value - ekey->prev->value) / (ekey->time - ekey->prev->time) * (time - ekey->prev->time) +
-                       ekey->prev->value;
+                ekey->prev->value;
             case SHAPE_TCB:
             case SHAPE_HERM:
             case SHAPE_BEZI:
@@ -504,7 +523,7 @@ float lwEvalEnvelope(lwEnvelope* env, float time)
                 return in * (time - ekey->time) + ekey->value;
             case SHAPE_BEZ2:
                 return (ekey->param[3] - ekey->param[1]) / (ekey->param[2] - ekey->param[0]) * (time - ekey->time) +
-                       ekey->value;
+                ekey->value;
             }
         }
     }

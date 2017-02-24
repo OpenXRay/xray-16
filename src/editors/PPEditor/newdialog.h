@@ -12,15 +12,15 @@
 //---------------------------------------------------------------------------
 class TNewEffectDialog : public TForm
 {
-    __published :  // IDE-managed Components
-                   TMultiObjSpinEdit* Time;
+    __published : // IDE-managed Components
+                  TMultiObjSpinEdit* Time;
     TMxLabel* RxLabel1;
     TButton* Button1;
     TButton* Button2;
     void __fastcall TimeChange(TObject* Sender);
 
-  private:  // User declarations
-  public:   // User declarations
+private: // User declarations
+public: // User declarations
     __fastcall TNewEffectDialog(TComponent* Owner);
 };
 

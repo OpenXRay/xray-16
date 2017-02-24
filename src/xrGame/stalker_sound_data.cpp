@@ -11,18 +11,13 @@
 #include "sound_user_data_visitor.h"
 #include "ai/stalker/ai_stalker.h"
 
-CStalkerSoundData::~CStalkerSoundData()
-{
-}
-
+CStalkerSoundData::~CStalkerSoundData() {}
 void CStalkerSoundData::accept(CSound_UserDataVisitor* visitor)
 {
-    if (!m_object || m_object->getDestroy()) return;
+    if (!m_object || m_object->getDestroy())
+        return;
 
     visitor->visit(this);
 }
 
-void CStalkerSoundData::invalidate()
-{
-    m_object = 0;
-}
+void CStalkerSoundData::invalidate() { m_object = 0; }

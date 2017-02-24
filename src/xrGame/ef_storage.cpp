@@ -85,8 +85,10 @@ CBaseFunction* CEF_Storage::function(LPCSTR function) const
 {
     for (int i = 0; i < AI_MAX_EVALUATION_FUNCTION_COUNT; ++i)
     {
-        if (!m_fpaBaseFunctions[i]) continue;
-        if (!xr_strcmp(function, m_fpaBaseFunctions[i]->Name())) return (m_fpaBaseFunctions[i]);
+        if (!m_fpaBaseFunctions[i])
+            continue;
+        if (!xr_strcmp(function, m_fpaBaseFunctions[i]->Name()))
+            return (m_fpaBaseFunctions[i]);
     }
     return (0);
 }

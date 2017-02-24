@@ -30,45 +30,32 @@ void TfraPS::OnItemFocused(ListItemsVec& items)
 }
 
 //------------------------------------------------------------------------------
-void __fastcall TfraPS::PaneMinClick(TObject* Sender)
-{
-    PanelMinMaxClick(Sender);
-}
-
+void __fastcall TfraPS::PaneMinClick(TObject* Sender) { PanelMinMaxClick(Sender); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraPS::ExpandClick(TObject* Sender)
-{
-    PanelMaximizeClick(Sender);
-}
-
+void __fastcall TfraPS::ExpandClick(TObject* Sender) { PanelMaximizeClick(Sender); }
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 // Selecting
 //---------------------------------------------------------------------------
-void __fastcall TfraPS::ebSelectByRefsClick(TObject* Sender)
-{
-    SelByRef(true);
-}
-
+void __fastcall TfraPS::ebSelectByRefsClick(TObject* Sender) { SelByRef(true); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraPS::ebDeselectByRefsClick(TObject* Sender)
-{
-    SelByRef(false);
-}
-
+void __fastcall TfraPS::ebDeselectByRefsClick(TObject* Sender) { SelByRef(false); }
 void __fastcall TfraPS::SelByRef(bool flag)
 {
-    if (m_Current) {
+    if (m_Current)
+    {
         ObjectIt _F = Scene->FirstObj(OBJCLASS_PS);
         ObjectIt _E = Scene->LastObj(OBJCLASS_PS);
         for (; _F != _E; _F++)
         {
-            if ((*_F)->Visible()) {
+            if ((*_F)->Visible())
+            {
                 EParticlesObject* _O = (EParticlesObject*)(*_F);
-                if (_O->RefCompare(m_Current)) _O->Select(flag);
+                if (_O->RefCompare(m_Current))
+                    _O->Select(flag);
             }
         }
     }
@@ -82,7 +69,8 @@ void __fastcall TfraPS::ebCurrentPSPlayClick(TObject* Sender)
     ObjectIt _E = Scene->LastObj(OBJCLASS_PS);
     for (; _F != _E; _F++)
     {
-        if ((*_F)->Visible() && (*_F)->Selected()) ((EParticlesObject*)(*_F))->Play();
+        if ((*_F)->Visible() && (*_F)->Selected())
+            ((EParticlesObject*)(*_F))->Play();
     }
 }
 
@@ -94,17 +82,14 @@ void __fastcall TfraPS::ebCurrentPSStopClick(TObject* Sender)
     ObjectIt _E = Scene->LastObj(OBJCLASS_PS);
     for (; _F != _E; _F++)
     {
-        if ((*_F)->Visible() && (*_F)->Selected()) ((EParticlesObject*)(*_F))->Stop();
+        if ((*_F)->Visible() && (*_F)->Selected())
+            ((EParticlesObject*)(*_F))->Stop();
     }
 }
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraPS::FormHide(TObject* Sender)
-{
-    m_Items->SaveSelection(fsStorage);
-}
-
+void __fastcall TfraPS::FormHide(TObject* Sender) { m_Items->SaveSelection(fsStorage); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfraPS::FormShow(TObject* Sender)
@@ -135,9 +120,5 @@ void __fastcall TfraPS::FormCreate(TObject* Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraPS::FormDestroy(TObject* Sender)
-{
-    TItemList::DestroyForm(m_Items);
-}
-
+void __fastcall TfraPS::FormDestroy(TObject* Sender) { TItemList::DestroyForm(m_Items); }
 //---------------------------------------------------------------------------

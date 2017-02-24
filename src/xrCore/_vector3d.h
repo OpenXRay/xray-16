@@ -18,7 +18,6 @@ public:
     // access operators
     ICF T& operator[](int i) { return *((T*)this + i); }
     ICF T& operator[](int i) const { return *((T*)this + i); }
-
     ICF SelfRef set(T _x, T _y, T _z)
     {
         x = _x;
@@ -237,7 +236,8 @@ public:
     IC SelfRef align()
     {
         y = 0;
-        if (_abs(z) >= _abs(x)) {
+        if (_abs(z) >= _abs(x))
+        {
             z /= _abs(z ? z : 1);
             x = 0;
         }
@@ -252,9 +252,12 @@ public:
     // Squeeze
     IC SelfRef squeeze(T Epsilon)
     {
-        if (_abs(x) < Epsilon) x = 0;
-        if (_abs(y) < Epsilon) y = 0;
-        if (_abs(z) < Epsilon) z = 0;
+        if (_abs(x) < Epsilon)
+            x = 0;
+        if (_abs(y) < Epsilon)
+            y = 0;
+        if (_abs(z) < Epsilon)
+            z = 0;
         return *this;
     }
 
@@ -345,7 +348,6 @@ public:
     IC T square_magnitude(void) const { return x * x + y * y + z * z; }
     // magnitude
     IC T magnitude(void) const { return _sqrt(square_magnitude()); }
-
     // Normalize
     IC T normalize_magn(void)
     {
@@ -372,7 +374,8 @@ public:
     ICF SelfRef normalize_safe(void)
     {
         T magnitude = x * x + y * y + z * z;
-        if (magnitude > std::numeric_limits<T>::min()) {
+        if (magnitude > std::numeric_limits<T>::min())
+        {
             magnitude = _sqrt(1 / magnitude);
             x *= magnitude;
             y *= magnitude;
@@ -396,7 +399,8 @@ public:
     ICF SelfRef normalize_safe(const Self& v)
     {
         T magnitude = v.x * v.x + v.y * v.y + v.z * v.z;
-        if (magnitude > std::numeric_limits<T>::min()) {
+        if (magnitude > std::numeric_limits<T>::min())
+        {
             magnitude = _sqrt(1 / magnitude);
             x = v.x * magnitude;
             y = v.y * magnitude;
@@ -439,13 +443,13 @@ public:
     }
 
     // DotProduct
-    ICF T dotproduct(const Self& v) const  // v1*v2
+    ICF T dotproduct(const Self& v) const // v1*v2
     {
         return x * v.x + y * v.y + z * v.z;
     }
 
     // CrossProduct
-    ICF SelfRef crossproduct(const Self& v1, const Self& v2)  // (v1,v2) -> this
+    ICF SelfRef crossproduct(const Self& v1, const Self& v2) // (v1,v2) -> this
     {
         x = v1.y * v2.z - v1.z * v2.y;
         y = v1.z * v2.x - v1.x * v2.z;
@@ -456,7 +460,6 @@ public:
     // Distance calculation
     IC T distance_to_xz(const Self& v) const { return _sqrt((x - v.x) * (x - v.x) + (z - v.z) * (z - v.z)); }
     IC T distance_to_xz_sqr(const Self& v) const { return (x - v.x) * (x - v.x) + (z - v.z) * (z - v.z); }
-
     // Distance calculation
     ICF T distance_to_sqr(const Self& v) const
     {
@@ -465,7 +468,6 @@ public:
 
     // Distance calculation
     ICF T distance_to(const Self& v) const { return _sqrt(distance_to_sqr(v)); }
-
     // Barycentric coords
     IC SelfRef from_bary(const Self& V1, const Self& V2, const Self& V3, T u, T v, T w)
     {
@@ -514,7 +516,8 @@ public:
     {
         float hyp;
 
-        if (fis_zero(x) && fis_zero(z)) {
+        if (fis_zero(x) && fis_zero(z))
+        {
             h = 0.0f;
             if (!fis_zero(float(y)))
                 p = (y > 0.0f) ? PI_DIV_2 : -PI_DIV_2;
@@ -538,7 +541,8 @@ public:
     }
     ICF float getH() const
     {
-        if (fis_zero(x) && fis_zero(z)) {
+        if (fis_zero(x) && fis_zero(z))
+        {
             return 0.0f;
         }
         else
@@ -553,7 +557,8 @@ public:
     }
     ICF float getP() const
     {
-        if (fis_zero(x) && fis_zero(z)) {
+        if (fis_zero(x) && fis_zero(z))
+        {
             if (!fis_zero(float(y)))
                 return (y > 0.0f) ? PI_DIV_2 : -PI_DIV_2;
             else
@@ -578,7 +583,8 @@ public:
     {
         T fInvLength;
 
-        if (_abs(dir.x) >= _abs(dir.y)) {
+        if (_abs(dir.x) >= _abs(dir.y))
+        {
             // W.x or W.z is the largest magnitude component, swap them
             fInvLength = 1.f / _sqrt(dir.x * dir.x + dir.z * dir.z);
             up.x = -dir.z * fInvLength;
@@ -594,13 +600,14 @@ public:
             up.z = -dir.y * fInvLength;
         }
 
-        right.crossproduct(up, dir);  //. <->
+        right.crossproduct(up, dir); //. <->
     }
     IC static void generate_orthonormal_basis_normalized(_vector3<T>& dir, _vector3<T>& up, _vector3<T>& right)
     {
         T fInvLength;
         dir.normalize();
-        if (fsimilar(dir.y, 1.f, EPS)) {
+        if (fsimilar(dir.y, 1.f, EPS))
+        {
             up.set(0.f, 0.f, 1.f);
             fInvLength = 1.f / _sqrt(dir.x * dir.x + dir.y * dir.y);
             // cross (up,dir) and normalize (right)
@@ -643,15 +650,13 @@ BOOL _valid(const _vector3<T>& v)
 //////////////////////////////////////////////////////////////////////////
 #pragma warning(push)
 #pragma warning(disable : 4244)
-ICF double rsqrt(double v)
-{
-    return 1.0 / _sqrt(v);
-}
+ICF double rsqrt(double v) { return 1.0 / _sqrt(v); }
 IC BOOL exact_normalize(float* a)
 {
     double sqr_magnitude = a[0] * a[0] + a[1] * a[1] + a[2] * a[2];
     double epsilon = 1.192092896e-05F;
-    if (sqr_magnitude > epsilon) {
+    if (sqr_magnitude > epsilon)
+    {
         double l = rsqrt(sqr_magnitude);
         a[0] *= l;
         a[1] *= l;
@@ -665,11 +670,13 @@ IC BOOL exact_normalize(float* a)
     aa0 = _abs(a0);
     aa1 = _abs(a1);
     aa2 = _abs(a2);
-    if (aa1 > aa0) {
-        if (aa2 > aa1) {
+    if (aa1 > aa0)
+    {
+        if (aa2 > aa1)
+        {
             goto aa2_largest;
         }
-        else  // aa1 is largest
+        else // aa1 is largest
         {
             a0 /= aa1;
             a2 /= aa1;
@@ -681,8 +688,9 @@ IC BOOL exact_normalize(float* a)
     }
     else
     {
-        if (aa2 > aa0) {
-        aa2_largest:  // aa2 is largest
+        if (aa2 > aa0)
+        {
+        aa2_largest: // aa2 is largest
             a0 /= aa2;
             a1 /= aa2;
             l = rsqrt(a0 * a0 + a1 * a1 + 1);
@@ -690,12 +698,13 @@ IC BOOL exact_normalize(float* a)
             a[1] = a1 * l;
             a[2] = (double)_copysign(l, a2);
         }
-        else  // aa0 is largest
+        else // aa0 is largest
         {
-            if (aa0 <= 0) {
+            if (aa0 <= 0)
+            {
                 // dDEBUGMSG ("vector has zero size"); ... this messace is annoying
-                a[0] = 0;  // if all a's are zero, this is where we'll end up.
-                a[1] = 1;  // return a default unit length vector.
+                a[0] = 0; // if all a's are zero, this is where we'll end up.
+                a[1] = 1; // return a default unit length vector.
                 a[2] = 0;
                 return FALSE;
             }
@@ -709,10 +718,7 @@ IC BOOL exact_normalize(float* a)
     }
     return TRUE;
 }
-IC BOOL exact_normalize(Fvector3& a)
-{
-    return exact_normalize(&a.x);
-}
+IC BOOL exact_normalize(Fvector3& a) { return exact_normalize(&a.x); }
 #pragma warning(pop)
 
 #endif

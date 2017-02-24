@@ -20,7 +20,8 @@ Free memory used by an lwClip.
 
 void lwFreeClip(lwClip* clip)
 {
-    if (clip) {
+    if (clip)
+    {
         lwListFree(clip->ifilter, lwFreePlugin);
         lwListFree(clip->pfilter, lwFreePlugin);
         free(clip);
@@ -45,7 +46,8 @@ lwClip* lwGetClip(FILE* fp, int cksize)
     /* allocate the Clip structure */
 
     clip = calloc(1, sizeof(lwClip));
-    if (!clip) goto Fail;
+    if (!clip)
+        goto Fail;
 
     clip->contrast.val = 1.0f;
     clip->brightness.val = 1.0f;
@@ -65,7 +67,8 @@ lwClip* lwGetClip(FILE* fp, int cksize)
 
     clip->type = getU4(fp);
     sz = getU2(fp);
-    if (0 > get_flen()) goto Fail;
+    if (0 > get_flen())
+        goto Fail;
 
     sz += sz & 1;
     set_flen(0);
@@ -108,23 +111,28 @@ lwClip* lwGetClip(FILE* fp, int cksize)
     /* error while reading current subchunk? */
 
     rlen = get_flen();
-    if (rlen < 0 || rlen > sz) goto Fail;
+    if (rlen < 0 || rlen > sz)
+        goto Fail;
 
     /* skip unread parts of the current subchunk */
 
-    if (rlen < sz) fseek(fp, sz - rlen, SEEK_CUR);
+    if (rlen < sz)
+        fseek(fp, sz - rlen, SEEK_CUR);
 
     /* end of the CLIP chunk? */
 
     rlen = ftell(fp) - pos;
-    if (cksize < rlen) goto Fail;
-    if (cksize == rlen) return clip;
+    if (cksize < rlen)
+        goto Fail;
+    if (cksize == rlen)
+        return clip;
 
     /* process subchunks as they're encountered */
 
     id = getU4(fp);
     sz = getU2(fp);
-    if (0 > get_flen()) goto Fail;
+    if (0 > get_flen())
+        goto Fail;
 
     while (1)
     {
@@ -169,14 +177,16 @@ lwClip* lwGetClip(FILE* fp, int cksize)
         case ID_IFLT:
         case ID_PFLT:
             filt = calloc(1, sizeof(lwPlugin));
-            if (!filt) goto Fail;
+            if (!filt)
+                goto Fail;
 
             filt->name = getS0(fp);
             filt->flags = getU2(fp);
             rlen = get_flen();
             filt->data = getbytes(fp, sz - rlen);
 
-            if (id == ID_IFLT) {
+            if (id == ID_IFLT)
+            {
                 lwListAdd(&clip->ifilter, filt);
                 clip->nifilters++;
             }
@@ -193,24 +203,29 @@ lwClip* lwGetClip(FILE* fp, int cksize)
         /* error while reading current subchunk? */
 
         rlen = get_flen();
-        if (rlen < 0 || rlen > sz) goto Fail;
+        if (rlen < 0 || rlen > sz)
+            goto Fail;
 
         /* skip unread parts of the current subchunk */
 
-        if (rlen < sz) fseek(fp, sz - rlen, SEEK_CUR);
+        if (rlen < sz)
+            fseek(fp, sz - rlen, SEEK_CUR);
 
         /* end of the CLIP chunk? */
 
         rlen = ftell(fp) - pos;
-        if (cksize < rlen) goto Fail;
-        if (cksize == rlen) break;
+        if (cksize < rlen)
+            goto Fail;
+        if (cksize == rlen)
+            break;
 
         /* get the next chunk header */
 
         set_flen(0);
         id = getU4(fp);
         sz = getU2(fp);
-        if (6 != get_flen()) goto Fail;
+        if (6 != get_flen())
+            goto Fail;
     }
 
     return clip;
@@ -234,7 +249,8 @@ lwClip* lwFindClip(lwClip* list, int index)
     clip = list;
     while (clip)
     {
-        if (clip->index == index) break;
+        if (clip->index == index)
+            break;
         clip = clip->next;
     }
     return clip;

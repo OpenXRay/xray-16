@@ -16,17 +16,17 @@ namespace CustomControls
 namespace Controls
 {
 ref class OpenFileDialogEx;
-}  // namespace Controls
-}  // namespace CustomControls
+} // namespace Controls
+} // namespace CustomControls
 
 public
 ref class property_editor_file_name : public System::Drawing::Design::UITypeEditor
 {
-  public:
+public:
     typedef editor::property_holder::string_getter_type string_getter_type;
     typedef editor::property_holder::string_setter_type string_setter_type;
 
-  private:
+private:
     typedef System::Drawing::Design::UITypeEditor inherited;
     typedef System::Drawing::Design::UITypeEditorEditStyle UITypeEditorEditStyle;
     typedef System::Windows::Forms::OpenFileDialog OpenFileDialog;
@@ -37,13 +37,13 @@ ref class property_editor_file_name : public System::Drawing::Design::UITypeEdit
     typedef System::Object Object;
     typedef CustomControls::Controls::OpenFileDialogEx OpenFileDialogEx;
 
-  public:
+public:
     property_editor_file_name();
     virtual UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext ^ context) override;
     virtual Object ^ EditValue(ITypeDescriptorContext ^ context, IServiceProvider ^ provider, Object ^ value) override;
 
-  private:
+private:
     OpenFileDialog ^ m_dialog;
-};  // ref class property_editor_file_name
+}; // ref class property_editor_file_name
 
-#endif  // ifndef PROPERTY_EDITOR_FILE_NAME_HPP_INCLUDED
+#endif // ifndef PROPERTY_EDITOR_FILE_NAME_HPP_INCLUDED

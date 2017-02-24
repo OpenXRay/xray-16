@@ -7,9 +7,12 @@
 
 bool CBurerFastGravi::check_start_conditions()
 {
-    if (is_active()) return false;
-    if (m_man->is_captured_pure()) return false;
-    if (!m_object->EnemyMan.get_enemy()) return false;
+    if (is_active())
+        return false;
+    if (m_man->is_captured_pure())
+        return false;
+    if (!m_object->EnemyMan.get_enemy())
+        return false;
 
     return true;
 }
@@ -21,16 +24,14 @@ void CBurerFastGravi::activate()
     m_object->dir().face_target(m_object->EnemyMan.get_enemy());
 }
 
-void CBurerFastGravi::deactivate()
-{
-    m_man->unsubscribe(this, ControlCom::eventTAChange);
-}
-
+void CBurerFastGravi::deactivate() { m_man->unsubscribe(this, ControlCom::eventTAChange); }
 void CBurerFastGravi::on_event(ControlCom::EEventType type, ControlCom::IEventData* data)
 {
-    if (type == ControlCom::eventTAChange) {
+    if (type == ControlCom::eventTAChange)
+    {
         STripleAnimEventData* event_data = (STripleAnimEventData*)data;
-        if (event_data->m_current_state == eStateExecute) {
+        if (event_data->m_current_state == eStateExecute)
+        {
             process_hit();
             m_object->com_man().ta_pointbreak();
             m_man->deactivate(this);

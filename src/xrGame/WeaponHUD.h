@@ -85,19 +85,16 @@ public:
 
     IC IRenderVisual* Visual() { return m_shared_data.animations()->dcast_RenderVisual(); }
     IC Fmatrix& Transform() { return m_Transform; }
-
     int FireBone() { return m_shared_data.get_value()->m_fire_bone; }
     const Fvector& FirePoint() { return m_shared_data.get_value()->m_fp_offset; }
     const Fvector& FirePoint2() { return m_shared_data.get_value()->m_fp2_offset; }
     const Fvector& ShellPoint() { return m_shared_data.get_value()->m_sp_offset; }
-
     const Fvector& ZoomOffset() const { return m_fZoomOffset; }
     float ZoomRotateX() const { return m_fZoomRotateX; }
     float ZoomRotateY() const { return m_fZoomRotateY; }
     void SetZoomOffset(const Fvector& zoom_offset) { m_fZoomOffset = zoom_offset; }
     void SetZoomRotateX(float zoom_rotate_x) { m_fZoomRotateX = zoom_rotate_x; }
     void SetZoomRotateY(float zoom_rotate_y) { m_fZoomRotateY = zoom_rotate_y; }
-
     // Animations
     void animPlay(MotionID M, BOOL bMixIn /*=TRUE*/, CHudItem* W /*=0*/, u32 state);
     void animDisplay(MotionID M, BOOL bMixIn);
@@ -108,9 +105,7 @@ public:
     bool IsHidden() { return m_bHidden; }
     void Hide() { m_bHidden = true; }
     void Show() { m_bHidden = false; }
-
     void Visible(bool val) { m_bVisible = val; }
-
     //обновление HUD должно вызыватьс€ на каждом кадре
     void Update();
 

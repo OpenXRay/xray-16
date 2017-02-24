@@ -29,9 +29,9 @@ struct OPCODE_API AABBCache : VolumeCache
     }
 
     // Cached faces signature
-    CollisionAABB FatBox;  //!< Box used when performing the query resulting in cached faces
+    CollisionAABB FatBox; //!< Box used when performing the query resulting in cached faces
     // User settings
-    float FatCoeff;  //!< mRadius2 multiplier used to create a fat sphere
+    float FatCoeff; //!< mRadius2 multiplier used to create a fat sphere
 };
 
 class OPCODE_API AABBCollider : public VolumeCollider
@@ -76,12 +76,12 @@ public:
     override(Collider) const char* ValidateSettings();
 
 protected:
-    CollisionAABB mBox;   //!< Query box in (center, extents) form
-    Point mMin;           //!< Query box min point
-    Point mMax;           //!< Query box max point
-                          // Leaf description
-    Point mLeafVerts[3];  //!< Triangle vertices
-                          // Internal methods
+    CollisionAABB mBox; //!< Query box in (center, extents) form
+    Point mMin; //!< Query box min point
+    Point mMax; //!< Query box max point
+    // Leaf description
+    Point mLeafVerts[3]; //!< Triangle vertices
+    // Internal methods
     void _Collide(const AABBCollisionNode* node);
     void _Collide(const AABBNoLeafNode* node);
     void _Collide(const AABBQuantizedNode* node);
@@ -95,4 +95,4 @@ protected:
     BOOL InitQuery(AABBCache& cache, const CollisionAABB& box);
 };
 
-#endif  // __OPC_AABBCOLLIDER_H__
+#endif // __OPC_AABBCOLLIDER_H__

@@ -17,10 +17,10 @@ struct fixed16
 class XRLC_LIGHT_API base_color_c
 {
 public:
-    Fvector rgb;  // - all static lighting
-    float hemi;   // - hemisphere
-    float sun;    // - sun
-    float _tmp_;  // ???
+    Fvector rgb; // - all static lighting
+    float hemi; // - hemisphere
+    float sun; // - sun
+    float _tmp_; // ???
     base_color_c()
     {
         rgb.set(0, 0, 0);
@@ -106,7 +106,7 @@ public:
         g._w(rgb.y);
         b._w(rgb.z);
         h._w(hemi);
-        s._w(sun);  // t._w(_tmp_);
+        s._w(sun); // t._w(_tmp_);
     }
     void _get(base_color_c& C) const
     {

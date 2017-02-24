@@ -9,17 +9,16 @@
 #define REG_PRIORITY_INVALID 0xfffffffful
 
 typedef void __fastcall RP_FUNC(void* obj);
-#define DECLARE_MESSAGE(name)                                                                                          \
-    extern ENGINE_API RP_FUNC rp_##name;                                                                               \
-    struct ENGINE_API pure##name                                                                                       \
-    {                                                                                                                  \
-        virtual void On##name() = 0;                                                                                   \
+#define DECLARE_MESSAGE(name)            \
+    extern ENGINE_API RP_FUNC rp_##name; \
+    struct ENGINE_API pure##name         \
+    {                                    \
+        virtual void On##name() = 0;     \
     }
 
-#define DECLARE_RP(name)                                                                                               \
+#define DECLARE_RP(name) \
     void __fastcall rp_##name(void* p) { ((pure##name*)p)->On##name(); }
-
-DECLARE_MESSAGE(Frame);  // XXX: rename to FrameStart
+DECLARE_MESSAGE(Frame); // XXX: rename to FrameStart
 DECLARE_MESSAGE(FrameEnd);
 DECLARE_MESSAGE(Render);
 DECLARE_MESSAGE(AppActivate);
@@ -40,7 +39,7 @@ struct _REG_INFO
 // ENGINE_API extern int __cdecl _REG_Compare(const void *, const void *);
 
 template <class T>
-class CRegistrator  // the registrator itself
+class CRegistrator // the registrator itself
 {
     // friend ENGINE_API int __cdecl _REG_Compare(const void *, const void *);
     static int __cdecl _REG_Compare(const void* e1, const void* e2)
@@ -88,7 +87,8 @@ public:
     {
         for (u32 i = 0; i < R.size(); i++)
         {
-            if (R[i].Object == obj) R[i].Prio = REG_PRIORITY_INVALID;
+            if (R[i].Object == obj)
+                R[i].Prio = REG_PRIORITY_INVALID;
         }
         if (in_process)
             changed = true;
@@ -98,15 +98,18 @@ public:
     void Process(RP_FUNC* f)
     {
         in_process = true;
-        if (R.empty()) return;
+        if (R.empty())
+            return;
         if (R[0].Prio == REG_PRIORITY_CAPTURE)
             f(R[0].Object);
         else
         {
             for (u32 i = 0; i < R.size(); i++)
-                if (R[i].Prio != REG_PRIORITY_INVALID) f(R[i].Object);
+                if (R[i].Prio != REG_PRIORITY_INVALID)
+                    f(R[i].Object);
         }
-        if (changed) Resort();
+        if (changed)
+            Resort();
         in_process = false;
     };
     void Resort(void)
@@ -114,7 +117,8 @@ public:
         qsort(&*R.begin(), R.size(), sizeof(_REG_INFO), _REG_Compare);
         while ((R.size()) && (R[R.size() - 1].Prio == REG_PRIORITY_INVALID))
             R.pop_back();
-        if (R.empty()) R.clear();
+        if (R.empty())
+            R.clear();
         changed = false;
     };
 };

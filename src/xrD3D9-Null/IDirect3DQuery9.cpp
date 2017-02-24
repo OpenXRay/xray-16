@@ -18,7 +18,8 @@ xrIDirect3DQuery9::xrIDirect3DQuery9(IDirect3DDevice9* pIDirect3DDevice9, D3DQUE
 HRESULT xrIDirect3DQuery9::QueryInterface(REFIID riid, void** ppvObj)
 {
     APIDEBUG("xrIDirect3DQuery9::QueryInterface");
-    if (riid == IID_IUnknown || riid == IID_IDirect3DQuery9) {
+    if (riid == IID_IUnknown || riid == IID_IDirect3DQuery9)
+    {
         *ppvObj = this;
         AddRef();
         return NOERROR;
@@ -37,7 +38,8 @@ ULONG xrIDirect3DQuery9::Release()
 {
     APIDEBUG("xrIDirect3DQuery9::Release");
     m_refCount--;
-    if (m_refCount < 0) {
+    if (m_refCount < 0)
+    {
         delete this;
         return -1;
     }

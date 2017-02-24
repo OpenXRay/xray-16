@@ -25,7 +25,7 @@ float dbg_imotion_draw_velocity_scale = 0.01;
 
 #endif
 
-static const float max_collide_timedelta = 0.02f;  // 0.005f;
+static const float max_collide_timedelta = 0.02f; // 0.005f;
 static const float end_delta = 0.5f * max_collide_timedelta;
 static const float collide_adwance_delta = 2.f * max_collide_timedelta;
 static const float depth_resolve = 0.01f;
@@ -38,7 +38,8 @@ imotion_position::imotion_position()
 static void interactive_motion_diag(LPCSTR message, const CBlend& b, CPhysicsShell* s, float time_left)
 {
 #ifdef DEBUG
-    if (!death_anim_debug) return;
+    if (!death_anim_debug)
+        return;
     const MotionID& m = b.motionID;
     VERIFY(m.valid());
     VERIFY(s);
@@ -48,7 +49,8 @@ static void interactive_motion_diag(LPCSTR message, const CBlend& b, CPhysicsShe
     VERIFY(O);
     LPCSTR motion_name = KA->LL_MotionDefName_dbg(m).first;
     Msg("death anims - interactive_motion:- %s, motion: %s, blend time %f , total blend time %f , time left: %f , obj: "
-        "%s, model:  %s ",
+        "%s, "
+        "model:  %s ",
         message, motion_name, b.timeCurrent, b.timeTotal, time_left, O->cName().c_str(), O->cNameVisual().c_str());
 #endif
 }
@@ -69,7 +71,8 @@ static void get_depth(bool& do_colide, bool bo1, dContact& c, SGameMtl* /*materi
 {
     save_max(depth, c.geom.depth);
 #ifdef DEBUG
-    if (depth != c.geom.depth) return;
+    if (depth != c.geom.depth)
+        return;
     dxGeomUserData* ud = 0;
     if (bo1)
         ud = PHRetrieveGeomUserData(c.geom.g2);
@@ -96,12 +99,14 @@ static std::string collide_diag()
 void disable_bone_calculation(IKinematics& K, bool v)
 {
     u16 bn = K.LL_BoneCount();
-    for (u16 i = 1; i < bn; ++i)  // ommit real root
+    for (u16 i = 1; i < bn; ++i) // ommit real root
     {
         CBoneInstance& bi = K.LL_GetBoneInstance(i);
-        if (bi.callback_param() != 0) continue;
+        if (bi.callback_param() != 0)
+            continue;
 #ifdef DEBUG
-        if (v && bi.callback_overwrite() == BOOL(v)) Msg("! bone callback_overwrite may have different states");
+        if (v && bi.callback_overwrite() == BOOL(v))
+            Msg("! bone callback_overwrite may have different states");
 #endif
         bi.set_callback_overwrite(v);
     }
@@ -126,13 +131,15 @@ void imotion_position::state_start()
         get_controled_blend(const PlayCallback _cb) : blend(0), cb(_cb) {}
         virtual void operator()(CBlend& B)
         {
-            if (cb == B.Callback && B.bone_or_part == 0) blend = &B;
+            if (cb == B.Callback && B.bone_or_part == 0)
+                blend = &B;
         }
     } get_blend(anim_callback);
 
     KA->LL_IterateBlends(get_blend);
 #ifdef DEBUG
-    if (!get_blend.blend) {
+    if (!get_blend.blend)
+    {
         Msg("bad animation params : %p", anim_callback);
         KA->LL_DumpBlends_dbg();
         NODEFAULT;
@@ -158,7 +165,8 @@ void imotion_position::state_start()
     }
 */
 
-    if (!is_enabled()) return;
+    if (!is_enabled())
+        return;
     CPhysicsShellHolder* obj = static_cast<CPhysicsShellHolder*>(shell->get_ElementByStoreOrder(0)->PhysicsRefObject());
     VERIFY(obj);
     obj->processing_activate();
@@ -172,14 +180,16 @@ void imotion_position::state_start()
     disable_bone_calculation(*K, true);
     // K->CalculateBones_Invalidate();
     collide_not_move(*KA);
-    if (flags.test(fl_switch_dm_toragdoll)) {
+    if (flags.test(fl_switch_dm_toragdoll))
+    {
         interactive_motion_diagnostic("stoped immediately");
         switch_to_free();
         flags.set(fl_not_played, TRUE);
         return;
     }
     move(float(Device.dwTimeDelta) / 1000, *KA);
-    if (flags.test(fl_switch_dm_toragdoll)) switch_to_free();
+    if (flags.test(fl_switch_dm_toragdoll))
+        switch_to_free();
     // K->CalculateBones_Invalidate();
 }
 
@@ -187,13 +197,15 @@ void imotion_position::state_start()
 static void dbg_draw_state_end(CPhysicsShell* shell)
 {
     VERIFY(shell);
-    if (dbg_imotion_draw_velocity) {
+    if (dbg_imotion_draw_velocity)
+    {
         DBG_OpenCashedDraw();
         shell->dbg_draw_velocity(dbg_imotion_draw_velocity_scale, color_argb(100, 255, 0, 0));
         // shell->dbg_draw_force( 0.01, color_xrgb( 0, 0, 255 ) );
         DBG_ClosedCashedDraw(50000);
     }
-    if (dbg_imotion_collide_debug) {
+    if (dbg_imotion_collide_debug)
+    {
 #ifdef DEBUG
         DBG_OpenCashedDraw();
         shell->dbg_draw_geometry(0.02, color_argb(255, 255, 255, 255));
@@ -212,7 +224,8 @@ static void save_fixes(IKinematics* K)
     for (u16 i = 0; i < nbb; ++i)
     {
         CBoneInstance& bi = K->LL_GetBoneInstance(i);
-        if (bi.callback() == anim_bone_fix::callback) {
+        if (bi.callback() == anim_bone_fix::callback)
+        {
             VERIFY(bi.callback_param());
             anim_bone_fix* fix = (anim_bone_fix*)bi.callback_param();
             VERIFY(fix->bone == &bi);
@@ -276,11 +289,13 @@ void imotion_position::state_end()
 #endif
 
     u16 root = K->LL_GetBoneRoot();
-    if (root != 0) {
+    if (root != 0)
+    {
         K->LL_GetTransform(0).set(Fidentity);
         K->LL_SetBoneVisible(0, FALSE, FALSE);
         u16 bip01 = K->LL_BoneID("bip01");
-        if (bip01 != BI_NONE && bip01 != root) {
+        if (bip01 != BI_NONE && bip01 != root)
+        {
             K->LL_GetTransform(bip01).set(Fidentity);
             K->LL_SetBoneVisible(bip01, FALSE, FALSE);
         }
@@ -330,7 +345,8 @@ void imotion_position::force_calculate_bones(IKinematicsAnimated& KA)
 
     K->Bone_Calculate(&K->LL_GetData(0), &Fidentity);
 
-    if (saved_visual_callback) {
+    if (saved_visual_callback)
+    {
         u16 sv_root = K->LL_GetBoneRoot();
         K->LL_SetBoneRoot(0);
         saved_visual_callback(K);
@@ -355,13 +371,15 @@ void DBG_PhysBones(IGameObject& O);
 void collide_anim_dbg_draw(CPhysicsShell* shell, float dt)
 {
     VERIFY(shell);
-    if (dbg_imotion_draw_velocity) {
+    if (dbg_imotion_draw_velocity)
+    {
         shell->AnimToVelocityState(dt, default_l_limit * 10, default_w_limit * 10);
         DBG_OpenCashedDraw();
         shell->dbg_draw_velocity(dbg_imotion_draw_velocity_scale, color_xrgb(0, 255, 0));
         DBG_ClosedCashedDraw(50000);
     }
-    if (dbg_imotion_draw_skeleton) {
+    if (dbg_imotion_draw_skeleton)
+    {
         DBG_OpenCashedDraw();
         CPhysicsShellHolder* sh =
             static_cast<CPhysicsShellHolder*>(shell->get_ElementByStoreOrder(0)->PhysicsRefObject());
@@ -380,11 +398,13 @@ float imotion_position::collide_animation(float dt, IKinematicsAnimated& k)
     shell->ToAnimBonesPositions(shell_motion_has_history ? mh_not_clear : mh_unspecified);
     depth = 0;
 #ifdef DEBUG
-    if (dbg_imotion_collide_debug) DBG_OpenCashedDraw();
+    if (dbg_imotion_collide_debug)
+        DBG_OpenCashedDraw();
 #endif
     shell->CollideAll();
 #ifdef DEBUG
-    if (dbg_imotion_collide_debug) DBG_ClosedCashedDraw(50000);
+    if (dbg_imotion_collide_debug)
+        DBG_ClosedCashedDraw(50000);
 #endif
 #ifdef DEBUG
     if (dbg_imotion_collide_debug)
@@ -473,7 +493,8 @@ float imotion_position::move(float dt, IKinematicsAnimated& KA)
     float collide_dt = dt;
     u32 iterations = 1;
 
-    if (dt > max_collide_timedelta) {
+    if (dt > max_collide_timedelta)
+    {
         float f_iterations = ceil(dt / max_collide_timedelta);
         VERIFY(f_iterations > 0.f);
         collide_dt = dt / f_iterations;
@@ -486,12 +507,14 @@ float imotion_position::move(float dt, IKinematicsAnimated& KA)
         u32 sv_blends_num = blends_num(KA);
         buffer_vector<sblend_save> saved_blends(_alloca(sv_blends_num * sizeof(sblend_save)), sv_blends_num);
 
-        if (!flags.test(fl_switch_dm_toragdoll)) {
+        if (!flags.test(fl_switch_dm_toragdoll))
+        {
             save_blends(saved_blends, KA);
             ad = motion_collide(collide_dt, KA);
         }
         advance_time += ad;
-        if (!!flags.test(fl_switch_dm_toragdoll)) {
+        if (!!flags.test(fl_switch_dm_toragdoll))
+        {
             restore_blends(saved_blends);
             time_to_end -= ad;
             force_calculate_bones(KA);
@@ -500,7 +523,8 @@ float imotion_position::move(float dt, IKinematicsAnimated& KA)
             shell_motion_has_history = true;
 
 #ifdef DEBUG
-            if (dbg_imotion_collide_debug) {
+            if (dbg_imotion_collide_debug)
+            {
                 depth = 0;
                 shell->CollideAll();
                 interactive_motion_diagnostic(make_string(" move (to ragdoll): deppth= %f", depth).c_str());
@@ -522,14 +546,17 @@ float imotion_position::motion_collide(float dt, IKinematicsAnimated& KA)
 
     float advance_time = collide_animation(dt, KA);
 
-    if (time_to_end < (max_collide_timedelta + end_delta)) {
+    if (time_to_end < (max_collide_timedelta + end_delta))
+    {
         interactive_motion_diagnostic(make_string("motion_collide 0: stoped: time out, time delta %f", dt).c_str());
         flags.set(fl_switch_dm_toragdoll, TRUE);
         return advance_time;
     }
-    if (depth > depth_resolve) {
+    if (depth > depth_resolve)
+    {
 #ifdef DEBUG
-        if (dbg_imotion_collide_debug) {
+        if (dbg_imotion_collide_debug)
+        {
             // interactive_motion_diagnostic( make_string( " motion_collide collided0: deppth= %f", depth ).c_str() );
             interactive_motion_diagnostic(
                 make_string("motion_collide 1: stoped: colide: %s, depth %f", collide_diag().c_str(), depth).c_str());
@@ -540,12 +567,13 @@ float imotion_position::motion_collide(float dt, IKinematicsAnimated& KA)
 #endif
         u32 sv_blends_num = blends_num(KA);
         buffer_vector<sblend_save> saved_blends(_alloca(sv_blends_num * sizeof(sblend_save)), sv_blends_num);
-        save_blends(saved_blends, KA);  //		sv1
+        save_blends(saved_blends, KA); //		sv1
         float depth0 = depth;
         advance_time += collide_animation(collide_adwance_delta, KA);
 
 #ifdef DEBUG
-        if (dbg_imotion_collide_debug) {
+        if (dbg_imotion_collide_debug)
+        {
             interactive_motion_diagnostic(make_string(" motion_collide collided1: deppth= %f", depth).c_str());
             DBG_OpenCashedDraw();
             shell->dbg_draw_geometry(0.02, color_argb(255, 0, 255, 255));
@@ -553,7 +581,8 @@ float imotion_position::motion_collide(float dt, IKinematicsAnimated& KA)
         }
 #endif
 
-        if (depth > depth0) {
+        if (depth > depth0)
+        {
             interactive_motion_diagnostic(
                 make_string("motion_collide 1: stoped: colide: %s, depth %f", collide_diag().c_str(), depth).c_str());
             flags.set(fl_switch_dm_toragdoll, TRUE);
@@ -564,20 +593,22 @@ float imotion_position::motion_collide(float dt, IKinematicsAnimated& KA)
             advance_time += collide_animation(collide_adwance_delta, KA);
 
 #ifdef DEBUG
-            if (dbg_imotion_collide_debug) {
+            if (dbg_imotion_collide_debug)
+            {
                 interactive_motion_diagnostic(make_string(" motion_collide collided2: deppth= %f", depth).c_str());
                 DBG_OpenCashedDraw();
                 shell->dbg_draw_geometry(0.02, color_argb(255, 0, 255, 0));
                 DBG_ClosedCashedDraw(50000);
             }
 #endif
-            if (depth > depth_resolve) {
+            if (depth > depth_resolve)
+            {
                 interactive_motion_diagnostic(make_string("motion_collide 2: stoped: colide: %s, depth %f",
                     collide_diag().c_str(), depth).c_str());
                 flags.set(fl_switch_dm_toragdoll, TRUE);
             }
         }
-        restore_blends(saved_blends);  // rs1
+        restore_blends(saved_blends); // rs1
         // advance_time += advance_animation( dt-advance_time, KA );
         time_to_end += (dt - advance_time);
         advance_time += (dt - advance_time);
@@ -585,7 +616,8 @@ float imotion_position::motion_collide(float dt, IKinematicsAnimated& KA)
         shell->ToAnimBonesPositions(shell_motion_has_history ? mh_clear : mh_unspecified);
 
 #ifdef DEBUG
-        if (dbg_imotion_collide_debug) {
+        if (dbg_imotion_collide_debug)
+        {
             depth = 0;
             shell->CollideAll();
             interactive_motion_diagnostic(make_string(" motion_collide restore: %f ", depth).c_str());
@@ -601,7 +633,8 @@ float imotion_position::motion_collide(float dt, IKinematicsAnimated& KA)
 ////////////////////////////////////////////////////////////////////////////////////
 bool imotion_position::tracks_update::operator()(float dt, IKinematicsAnimated& k)
 {
-    if (!update) return false;
+    if (!update)
+        return false;
     VERIFY(motion && &(motion->update_callback) == this);
     motion->move(dt, k);
     return true;
@@ -647,7 +680,7 @@ void imotion_position::set_root_callback()
     VERIFY(K);
     CBoneInstance& bi = K->LL_GetBoneInstance(0);
     VERIFY(!bi.callback());
-    bi.set_callback(bctCustom, rootbone_callback, this, true);  // root may be not "0" !
+    bi.set_callback(bctCustom, rootbone_callback, this, true); // root may be not "0" !
 }
 
 void imotion_position::remove_root_callback()
@@ -665,7 +698,8 @@ void imotion_position::rootbone_callback(CBoneInstance* BI)
 {
     imotion_position* im = (imotion_position*)BI->callback_param();
     VERIFY(im);
-    if (!im->update_callback.update) return;
+    if (!im->update_callback.update)
+        return;
     VERIFY(im->shell);
     IKinematics* K = im->shell->PKinematics();
     VERIFY(K);
@@ -677,9 +711,11 @@ void imotion_position::rootbone_callback(CBoneInstance* BI)
     CKey* key = 0;
     for (int i = 0; i < keys.chanel_blend_conts[0]; ++i)
     {
-        if (keys.blends[0][i] == im->blend) key = &keys.keys[0][i];
+        if (keys.blends[0][i] == im->blend)
+            key = &keys.keys[0][i];
     }
-    if (key) {
+    if (key)
+    {
         key->Q.rotation(Fvector().set(0, 1, 0), im->angle);
     }
     KA->LL_BoneMatrixBuild(*BI, &Fidentity, keys);

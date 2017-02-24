@@ -10,11 +10,7 @@
 
 #include "mat4.h"
 
-Mat4 Mat4::I()
-{
-    return Mat4(Vec4(1, 0, 0, 0), Vec4(0, 1, 0, 0), Vec4(0, 0, 1, 0), Vec4(0, 0, 0, 1));
-}
-
+Mat4 Mat4::I() { return Mat4(Vec4(1, 0, 0, 0), Vec4(0, 1, 0, 0), Vec4(0, 0, 1, 0), Vec4(0, 0, 0, 1)); }
 Mat4 translation_matrix(const Vec3& d)
 {
     return Mat4(Vec4(1, 0, 0, d[0]), Vec4(0, 1, 0, d[1]), Vec4(0, 0, 1, d[2]), Vec4(0, 0, 0, 1));
@@ -58,7 +54,8 @@ Mat4 perspective_matrix(double fovy, double aspect, double zmin, double zmax)
     double A, B;
     Mat4 M;
 
-    if (zmax == 0.0) {
+    if (zmax == 0.0)
+    {
         A = B = 1.0;
     }
     else
@@ -131,7 +128,8 @@ double invert_cramer(Mat4& inv, const Mat4& m)
     Mat4 A = adjoint(m);
     double d = A[0] * m[0];
 
-    if (d == 0.0) return 0.0;
+    if (d == 0.0)
+        return 0.0;
 
     inv = transpose(A) / d;
     return d;
@@ -144,11 +142,11 @@ double invert_cramer(Mat4& inv, const Mat4& m)
 // Returns determinant of A, and B=inverse(A)
 // If matrix A is singular, returns 0 and leaves trash in B.
 //
-#define SWAP(a, b, t)                                                                                                  \
-    {                                                                                                                  \
-        t = a;                                                                                                         \
-        a = b;                                                                                                         \
-        b = t;                                                                                                         \
+#define SWAP(a, b, t)\
+    {\
+        t = a;\
+        a = b;\
+        b = t;\
     }
 double invert(Mat4& B, const Mat4& m)
 {
@@ -167,12 +165,15 @@ double invert(Mat4& B, const Mat4& m)
     { /* eliminate in column i, below diag */
         max = -1.;
         for (k = i; k < 4; k++) /* find pivot for column i */
-            if (_abs(A(k, i)) > max) {
+            if (_abs(A(k, i)) > max)
+            {
                 max = _abs(A(k, i));
                 j = k;
             }
-        if (max <= 0.) return 0.; /* if no nonzero pivot, PUNT */
-        if (j != i) {             /* swap rows i and j */
+        if (max <= 0.)
+            return 0.; /* if no nonzero pivot, PUNT */
+        if (j != i)
+        { /* swap rows i and j */
             for (k = i; k < 4; k++)
                 SWAP(A(i, k), A(j, k), t);
             for (k = 0; k < 4; k++)
@@ -188,8 +189,8 @@ double invert(Mat4& B, const Mat4& m)
         /* we know that A(i, i) will be set to 1, so don't bother to do it */
 
         for (j = i + 1; j < 4; j++)
-        {                               /* eliminate in rows below i */
-            t = A(j, i);                /* we're gonna zero this guy */
+        { /* eliminate in rows below i */
+            t = A(j, i); /* we're gonna zero this guy */
             for (k = i + 1; k < 4; k++) /* subtract scaled row i from row j */
                 A(j, k) -= A(i, k) * t; /* (ignore k<=i, we know they're 0) */
             for (k = 0; k < 4; k++)
@@ -202,8 +203,8 @@ double invert(Mat4& B, const Mat4& m)
     for (i = 4 - 1; i > 0; i--)
     { /* eliminate in column i, above diag */
         for (j = 0; j < i; j++)
-        {                           /* eliminate in rows above i */
-            t = A(j, i);            /* we're gonna zero this guy */
+        { /* eliminate in rows above i */
+            t = A(j, i); /* we're gonna zero this guy */
             for (k = 0; k < 4; k++) /* subtract scaled row i from row j */
                 B(j, k) -= B(i, k) * t;
         }

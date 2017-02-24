@@ -11,7 +11,8 @@ void CSound_manager_interface::_create()
     SoundRender = SoundRenderA;
     Sound = SoundRender;
     SoundRender->bPresent = strstr(Core.Params, "-nosound") == nullptr;
-    if (!SoundRender->bPresent) return;
+    if (!SoundRender->bPresent)
+        return;
     Sound->_initialize();
 }
 

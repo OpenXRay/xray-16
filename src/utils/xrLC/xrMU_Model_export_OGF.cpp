@@ -6,14 +6,14 @@
 #include "build.h"
 #include "OGF_Face.h"
 
-#define TRY(a)                                                                                                         \
-    try                                                                                                                \
-    {                                                                                                                  \
-        a;                                                                                                             \
-    }                                                                                                                  \
-    catch (...)                                                                                                        \
-    {                                                                                                                  \
-        Logger.clMsg("* E: %s", #a);                                                                                   \
+#define TRY(a)\
+    try\
+    {\
+        a;\
+    }\
+    catch (...)\
+    {\
+        Logger.clMsg("* E: %s", #a);\
     }
 
 void export_ogf(xrMU_Reference& mu_reference)
@@ -25,7 +25,7 @@ void export_ogf(xrMU_Reference& mu_reference)
         for (xrMU_Model::v_subdivs_it it = model->m_subdivs.begin(); it != model->m_subdivs.end(); it++)
         {
             OGF_Reference* pOGF = new OGF_Reference();
-            b_material* M = &(pBuild->materials()[it->material]);  // and it's material
+            b_material* M = &(pBuild->materials()[it->material]); // and it's material
             R_ASSERT(M);
 
             // Common data
@@ -56,7 +56,8 @@ void export_ogf(xrMU_Reference& mu_reference)
     }
 
     // Now, let's fuck with LODs
-    if (u16(-1) == model->m_lod_ID) return;
+    if (u16(-1) == model->m_lod_ID)
+        return;
     {
         // Create Node and fill it with information
         b_lod& LOD = pBuild->lods[model->m_lod_ID];

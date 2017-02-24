@@ -30,7 +30,7 @@ struct ECORE_API SPBItem
     float max;
     float progress;
 
-  public:
+public:
     SPBItem(LPCSTR txt, LPCSTR inf, float mx) : text(txt), info(inf), max(mx), progress(0.f) {}
     void GetInfo(AnsiString& txt, float& p, float& m);
     void Inc(LPCSTR info = 0, bool bWarn = false);
@@ -45,7 +45,7 @@ class ECORE_API TUI :
 
     public IInputReceiver
 {
-  protected:
+protected:
     friend class CCustomPreferences;
     friend class CEditorRenderDevice;
     TD3DWindow* m_D3DWindow;
@@ -55,23 +55,22 @@ class ECORE_API TUI :
 
     bool m_bAppActive;
 
-  protected:
+protected:
     EStateList m_EditorState;
     bool bNeedAbort;
 
-  public:
+public:
     bool m_bReady;
     TD3DWindow* GetD3DWindow() { return m_D3DWindow; }
-
-  protected:
+protected:
     Fvector m_Pivot;
 
-  protected:
+protected:
     bool m_SelectionRect;
     Ivector2 m_SelStart;
     Ivector2 m_SelEnd;
 
-  protected:
+protected:
     enum
     {
         flRedraw = (1 << 0),
@@ -81,22 +80,22 @@ class ECORE_API TUI :
     };
     Flags32 m_Flags;
 
-  protected:
+protected:
     long m_StartTime;
 
     void PrepareRedraw();
     void Redraw();
 
-  protected:
+protected:
     void D3D_CreateStateBlocks();
     void D3D_DestroyStateBlocks();
 
-  public:
+public:
     virtual void OutUICursorPos() = 0;
     virtual void OutGridSize() = 0;
     virtual void OutInfo() = 0;
 
-  public:
+public:
     // non-hidden ops
     Ivector2 m_StartCp;
     Ivector2 m_CurrentCp;
@@ -108,7 +107,7 @@ class ECORE_API TUI :
     Ivector2 m_StartCpH;
     Ivector2 m_DeltaCpH;
 
-  protected:
+protected:
     bool m_MouseCaptured;
     bool m_MouseMultiClickCaptured;
     bool bMouseInUse;
@@ -121,38 +120,35 @@ class ECORE_API TUI :
     // mailslot
     HANDLE hMailSlot;
 
-  public:
+public:
     void ShowObjectHint();
     void ShowHint(const AnsiString& s);
     bool ShowHint(const AStringVec& SS);
     void HideHint();
 
-  public:
+public:
     // mouse sensetive
     float m_MouseSM, m_MouseSS, m_MouseSR;
 
-  protected:
+protected:
     virtual void RealQuit() = 0;
     virtual void RealUpdateScene() = 0;
     void RealRedrawScene();
     void RealResize();
     void OnFrame();
 
-  public:
+public:
     TUI();
     virtual ~TUI();
 
     void Quit() { m_Flags.set(flNeedQuit, TRUE); }
-
     IC HANDLE GetHWND() { return m_D3DWindow->Handle; }
     int GetRenderWidth() { return EDevice.dwWidth; }
     int GetRenderHeight() { return EDevice.dwHeight; }
     int GetRealWidth() { return EDevice.m_RealWidth; }
     int GetRealHeight() { return EDevice.m_RealHeight; }
-
     IC float ZFar() { return EDevice.m_Camera.m_Zfar; }
     IC TShiftState GetShiftState() { return m_ShiftState; }
-
     virtual bool OnCreate(TD3DWindow* w, TPanel* p);
     virtual void OnDestroy();
 
@@ -164,19 +160,22 @@ class ECORE_API TUI :
     void Resize(bool bForced = false)
     {
         m_Flags.set(flResize | flRedraw, TRUE);
-        if (bForced) RealResize();
+        if (bForced)
+            RealResize();
     }
     // add, remove, changing objects/scene
     void UpdateScene(bool bForced = false)
     {
         m_Flags.set(flUpdateScene, TRUE);
-        if (bForced) RealUpdateScene();
+        if (bForced)
+            RealUpdateScene();
     }
     // only redraw scene
     void RedrawScene(bool bForced = false)
     {
         m_Flags.set(flRedraw, TRUE);
-        if (bForced) RealRedrawScene();
+        if (bForced)
+            RealRedrawScene();
     }
 
     void SetRenderQuality(float q) { EDevice.m_ScreenQuality = q; }
@@ -185,10 +184,8 @@ class ECORE_API TUI :
     void UpdateSelectionRect(const Ivector2& from, const Ivector2& to);
 
     void MouseMultiClickCapture(bool b) { m_MouseMultiClickCaptured = b; }
-
     bool __fastcall IsMouseCaptured() { return m_MouseCaptured | m_MouseMultiClickCaptured; }
     bool __fastcall IsMouseInUse() { return bMouseInUse; }
-
     bool __fastcall KeyDown(WORD Key, TShiftState Shift);
     bool __fastcall KeyUp(WORD Key, TShiftState Shift);
     bool __fastcall KeyPress(WORD Key, TShiftState Shift);
@@ -202,7 +199,8 @@ class ECORE_API TUI :
     {
         VERIFY(std::find(m_EditorState.begin(), m_EditorState.end(), st) != m_EditorState.end());
         for (EStateIt it = m_EditorState.end() - 1; it >= m_EditorState.begin(); it--)
-            if (*it == st) {
+            if (*it == st)
+            {
                 m_EditorState.erase(it, m_EditorState.end());
                 break;
             }
@@ -230,12 +228,10 @@ class ECORE_API TUI :
     }
     void NeedBreak() { bNeedAbort = true; }
     void ResetBreak() { bNeedAbort = false; }
-
     virtual bool ApplyShortCut(WORD Key, TShiftState Shift) = 0;
     virtual bool ApplyGlobalShortCut(WORD Key, TShiftState Shift) = 0;
 
     void SetGradient(u32 color) { ; }
-
     void OnDeviceCreate();
     void OnDeviceDestroy();
 
@@ -260,13 +256,12 @@ class ECORE_API TUI :
 
     virtual void SaveSettings(CInifile*) {}
     virtual void LoadSettings(CInifile*) {}
-
-  protected:
+protected:
     // progress bar
     DEFINE_VECTOR(SPBItem*, PBVec, PBVecIt);
     PBVec m_ProgressItems;
 
-  public:
+public:
     SPBItem* ProgressStart(float max_val, LPCSTR text);
     void ProgressEnd(SPBItem*&);
     virtual void ProgressDraw() = 0;
@@ -276,15 +271,15 @@ class ECORE_API TUI :
 extern ECORE_API TUI* UI;
 //---------------------------------------------------------------------------
 void ECORE_API ResetActionToSelect();
-#define COMMAND0(cmd)                                                                                                  \
-    {                                                                                                                  \
-        ExecCommand(cmd);                                                                                              \
-        bExec = true;                                                                                                  \
+#define COMMAND0(cmd)     \
+    {                     \
+        ExecCommand(cmd); \
+        bExec = true;     \
     }
-#define COMMAND1(cmd, p0)                                                                                              \
-    {                                                                                                                  \
-        ExecCommand(cmd, p0);                                                                                          \
-        bExec = true;                                                                                                  \
+#define COMMAND1(cmd, p0)     \
+    {                         \
+        ExecCommand(cmd, p0); \
+        bExec = true;         \
     }
 extern ECORE_API void __fastcall PanelMinMax(TPanel* pa);
 extern ECORE_API void __fastcall PanelMinimize(TPanel* pa);

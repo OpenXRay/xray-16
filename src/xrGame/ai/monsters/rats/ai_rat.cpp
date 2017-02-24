@@ -44,11 +44,7 @@ CAI_Rat::CAI_Rat() : m_behaviour_manager(0)
     //	m_behaviour_manager->add		(new steering_behaviour::alignment(this),	.5f);
 }
 
-CAI_Rat::~CAI_Rat()
-{
-    delete_data(m_state_manager);
-}
-
+CAI_Rat::~CAI_Rat() { delete_data(m_state_manager); }
 void CAI_Rat::init()
 {
     m_tAction = eRatActionNone;
@@ -199,10 +195,10 @@ void CAI_Rat::Load(LPCSTR section)
     m_bCannibalism = pSettings->r_bool(section, "Cannibalism");
     m_dwEatCorpseInterval = pSettings->r_s32(section, "EatCorpseInterval");
 
-    m_fNullASpeed = pSettings->r_float(section, "AngularStandSpeed") / 180.f * PI;     // PI_MUL_2
-    m_fMinASpeed = pSettings->r_float(section, "AngularMinSpeed") / 180.f * PI;        // PI_MUL_2
-    m_fMaxASpeed = pSettings->r_float(section, "AngularMaxSpeed") / 180.f * PI;        //.2f
-    m_fAttackASpeed = pSettings->r_float(section, "AngularAttackSpeed") / 180.f * PI;  //.15f;
+    m_fNullASpeed = pSettings->r_float(section, "AngularStandSpeed") / 180.f * PI; // PI_MUL_2
+    m_fMinASpeed = pSettings->r_float(section, "AngularMinSpeed") / 180.f * PI; // PI_MUL_2
+    m_fMaxASpeed = pSettings->r_float(section, "AngularMaxSpeed") / 180.f * PI; //.2f
+    m_fAttackASpeed = pSettings->r_float(section, "AngularAttackSpeed") / 180.f * PI; //.15f;
 
     m_phMass = pSettings->r_float(section, "corp_mass");
     m_dwActiveScheduleMin = shedule.t_min;
@@ -216,9 +212,11 @@ BOOL CAI_Rat::net_Spawn(CSE_Abstract* DC)
     CSE_ALifeMonsterRat* tpSE_Rat = smart_cast<CSE_ALifeMonsterRat*>(e);
 
     // model
-    if (!inherited::net_Spawn(DC)) return (FALSE);
+    if (!inherited::net_Spawn(DC))
+        return (FALSE);
     // model
-    if (!CEatableItem::net_Spawn(DC)) return (FALSE);
+    if (!CEatableItem::net_Spawn(DC))
+        return (FALSE);
 
     monster_squad().register_member((u8)g_Team(), (u8)g_Squad(), (u8)g_Group(), this);
 
@@ -275,7 +273,8 @@ BOOL CAI_Rat::net_Spawn(CSE_Abstract* DC)
 
     m_home_position.set(m_tSpawnPosition);
     m_tStateStack.push(m_eCurrentState = aiRatFreeActive);
-    if (g_Alive()) add_active_member(true);
+    if (g_Alive())
+        add_active_member(true);
 
     m_bStateChanged = true;
     ai_location().game_vertex(ai().cross_table().vertex(ai_location().level_vertex_id()).game_vertex_id());
@@ -288,13 +287,15 @@ BOOL CAI_Rat::net_Spawn(CSE_Abstract* DC)
 
     load_animations();
 
-    if (g_Alive()) Level().seniority_holder().team(g_Team()).squad(g_Squad()).group(g_Group()).m_dwLastActionTime = 0;
+    if (g_Alive())
+        Level().seniority_holder().team(g_Team()).squad(g_Squad()).group(g_Group()).m_dwLastActionTime = 0;
 
     m_flags.set(FCanTake, FALSE);
 
     CInifile* m_spawn_ini = spawn_ini();
 
-    if (!m_spawn_ini || !m_spawn_ini->section_exist("patrol") || !m_spawn_ini->line_exist("patrol", "way")) {
+    if (!m_spawn_ini || !m_spawn_ini->section_exist("patrol") || !m_spawn_ini->line_exist("patrol", "way"))
+    {
         m_walk_on_way = false;
     }
     else
@@ -302,7 +303,8 @@ BOOL CAI_Rat::net_Spawn(CSE_Abstract* DC)
         m_walk_on_way = true;
     }
 
-    if (m_walk_on_way) {
+    if (m_walk_on_way)
+    {
         m_current_way_point = 0;
         m_path = ai().patrol_paths().path(m_spawn_ini->r_string("patrol", "way"));
     }
@@ -342,7 +344,8 @@ void CAI_Rat::net_Export(NET_Packet& P)
     //	P.w						(&m_fGoingSpeed,			sizeof(m_fGoingSpeed));
     //	P.w						(&m_fGoingSpeed,			sizeof(m_fGoingSpeed));
     float f1 = 0;
-    if (ai().game_graph().valid_vertex_id(l_game_vertex_id)) {
+    if (ai().game_graph().valid_vertex_id(l_game_vertex_id))
+    {
         f1 = Position().distance_to(ai().game_graph().vertex(l_game_vertex_id)->level_point());
         P.w(&f1, sizeof(f1));
         f1 = Position().distance_to(ai().game_graph().vertex(l_game_vertex_id)->level_point());
@@ -384,7 +387,8 @@ void CAI_Rat::net_Import(NET_Packet& P)
     P.r(&t, sizeof(t));
     ai_location().game_vertex(t);
 
-    if (NET.empty() || (NET.back().dwTimeStamp < N.dwTimeStamp)) {
+    if (NET.empty() || (NET.back().dwTimeStamp < N.dwTimeStamp))
+    {
         NET.push_back(N);
         NET_WasInterpolating = TRUE;
     }
@@ -397,7 +401,8 @@ void CAI_Rat::net_Import(NET_Packet& P)
 
 void CAI_Rat::CreateSkeleton()
 {
-    if (!Visual()) return;
+    if (!Visual())
+        return;
     CPhysicsElement* element = P_create_Element();
     Fobb box;
     box.m_rotate.identity();
@@ -416,7 +421,8 @@ void CAI_Rat::CreateSkeleton()
     m_pPhysicsShell->add_Element(element);
     m_pPhysicsShell->Activate(XFORM(), 0, XFORM());
     m_pPhysicsShell->set_PhysicsRefObject(this);
-    if (!fsimilar(0.f, m_saved_impulse)) {
+    if (!fsimilar(0.f, m_saved_impulse))
+    {
         m_pPhysicsShell->applyHit(m_saved_hit_position, m_saved_hit_dir, m_saved_impulse, 0, m_saved_hit_type);
     }
     /*
@@ -451,7 +457,8 @@ void CAI_Rat::CreateSkeleton()
 
 void CAI_Rat::shedule_Update(u32 dt)
 {
-    if (!monster_squad().get_squad(this)->GetLeader() || !monster_squad().get_squad(this)->GetLeader()->g_Alive()) {
+    if (!monster_squad().get_squad(this)->GetLeader() || !monster_squad().get_squad(this)->GetLeader()->g_Alive())
+    {
         monster_squad().get_squad(this)->SetLeader(this);
     }
     inherited::shedule_Update(dt);
@@ -461,15 +468,19 @@ void CAI_Rat::UpdateCL()
 {
 ///////////////////////////////////////////////////////////////////////////////////////
 #ifdef _DEBUG
-    if (monster_squad().get_squad(this)->GetLeader() == this) {
-        if (m_walk_on_way && m_path) draw_way();
+    if (monster_squad().get_squad(this)->GetLeader() == this)
+    {
+        if (m_walk_on_way && m_path)
+            draw_way();
     }
 #endif
     ///////////////////////////////////////////////////////////////////////////////////////
 
-    if (!m_pPhysicsShell && !g_Alive()) CreateSkeleton();
+    if (!m_pPhysicsShell && !g_Alive())
+        CreateSkeleton();
 
-    if (!Useful()) {
+    if (!Useful())
+    {
         inherited::UpdateCL();
         Exec_Look(Device.fTimeDelta);
 
@@ -508,7 +519,8 @@ void CAI_Rat::UpdatePositionAnimation()
     NET_Last.o_torso.pitch = -p;
     XFORM() = l_tSavedTransform;
 
-    if (!bfScriptAnimation()) SelectAnimation(XFORM().k, Fvector().set(1, 0, 0), m_fSpeed);
+    if (!bfScriptAnimation())
+        SelectAnimation(XFORM().k, Fvector().set(1, 0, 0), m_fSpeed);
 }
 
 // void CAI_Rat::Hit(float P,Fvector &dir,IGameObject*who,s16 element,Fvector p_in_object_space,float impulse,
@@ -517,7 +529,8 @@ void CAI_Rat::Hit(SHit* pHDS)
 {
     //	inherited::Hit				(P,dir,who,element,p_in_object_space,impulse, hit_type);
     inherited::Hit(pHDS);
-    if (!m_pPhysicsShell) {
+    if (!m_pPhysicsShell)
+    {
         m_saved_impulse = pHDS->impulse;
         m_saved_hit_dir.set(pHDS->dir);
         m_saved_hit_type = pHDS->hit_type;
@@ -530,10 +543,7 @@ void CAI_Rat::Hit(SHit* pHDS)
     }
 }
 
-void CAI_Rat::feel_touch_new(IGameObject* O)
-{
-}
-
+void CAI_Rat::feel_touch_new(IGameObject* O) {}
 /////////////////////////////////////
 // Rat as eatable item
 /////////////////////////////////////
@@ -548,7 +558,8 @@ void CAI_Rat::OnH_B_Chield()
     setVisible(FALSE);
     setEnabled(FALSE);
 
-    if (m_pPhysicsShell) m_pPhysicsShell->Deactivate();
+    if (m_pPhysicsShell)
+        m_pPhysicsShell->Deactivate();
 
     CEatableItem::OnH_B_Chield();
 }
@@ -558,12 +569,14 @@ void CAI_Rat::OnH_B_Independent()
     CEatableItem::OnH_B_Independent(TRUE);
     inherited::OnH_B_Independent(TRUE);
 
-    if (!Useful()) return;
+    if (!Useful())
+        return;
 
     setVisible(TRUE);
     setEnabled(TRUE);
 
-    if (m_pPhysicsShell) activate_physic_shell();
+    if (m_pPhysicsShell)
+        activate_physic_shell();
 }
 
 void CAI_Rat::OnH_A_Independent()
@@ -574,7 +587,8 @@ void CAI_Rat::OnH_A_Independent()
 
 bool CAI_Rat::Useful() const
 {
-    if (!g_Alive()) {
+    if (!g_Alive())
+    {
         return CEatableItem::Useful();
     }
 
@@ -589,11 +603,7 @@ void CAI_Rat::OnRender()
 }
 #endif
 
-BOOL CAI_Rat::UsedAI_Locations()
-{
-    return (TRUE);
-}
-
+BOOL CAI_Rat::UsedAI_Locations() { return (TRUE); }
 void CAI_Rat::make_Interpolation()
 {
     inherited::make_Interpolation();
@@ -636,11 +646,7 @@ void CAI_Rat::setup_physic_shell()
     // do not delete!!!
 }
 
-void CAI_Rat::activate_physic_shell()
-{
-    CEatableItem::activate_physic_shell();
-}
-
+void CAI_Rat::activate_physic_shell() { CEatableItem::activate_physic_shell(); }
 void CAI_Rat::on_activate_physic_shell()
 {
     IGameObject* object = smart_cast<IGameObject*>(H_Parent());
@@ -664,16 +670,8 @@ float CAI_Rat::get_custom_pitch_speed(float def_speed)
     return (PI_DIV_2);
 }
 
-BOOL CAI_Rat::renderable_ShadowReceive()
-{
-    return TRUE;
-}
-
-BOOL CAI_Rat::renderable_ShadowGenerate()
-{
-    return FALSE;
-}
-
+BOOL CAI_Rat::renderable_ShadowReceive() { return TRUE; }
+BOOL CAI_Rat::renderable_ShadowGenerate() { return FALSE; }
 IFactoryObject* CAI_Rat::_construct()
 {
     CCustomMonster::_construct();

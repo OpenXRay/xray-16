@@ -49,7 +49,8 @@ bool XRNETSERVER_API allow_to_include_path(xr_auth_strings_t const& ignore, LPCS
 {
     for (xr_auth_strings_t::const_iterator i = ignore.begin(), ie = ignore.end(); i != ie; ++i)
     {
-        if (!strncmp(i->c_str(), path, i->size())) return false;
+        if (!strncmp(i->c_str(), path, i->size()))
+            return false;
     }
     return true;
 }

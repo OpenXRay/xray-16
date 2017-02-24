@@ -132,7 +132,6 @@ public:
     void lua_pop_value(lua_State* L, int n) { lua_settop(L, -n - 1); }
     void lua_push_c_function(lua_State* L, lua_CFunction fn) { lua_pushcclosure(L, fn, 0); }
     const char* lua_to_string(lua_State* L, int n) { return lua_tolstring(L, n, nullptr); }
-
     virtual lua_Debug* CS_LUA_STUDIO_BACKEND_CALL lua_debug_create() = 0;
     virtual void CS_LUA_STUDIO_BACKEND_CALL lua_debug_destroy(lua_Debug*& instance) = 0;
     virtual char const* CS_LUA_STUDIO_BACKEND_CALL lua_debug_get_name(lua_Debug& instance) = 0;
@@ -148,5 +147,5 @@ public:
     virtual bool CS_LUA_STUDIO_BACKEND_CALL expand_value(
         cs::lua_studio::backend& backend, cs::lua_studio::value_to_expand& value, lua_State* state) = 0;
 };
-}  // namespace lua_studio
-}  // namespace cs
+} // namespace lua_studio
+} // namespace cs

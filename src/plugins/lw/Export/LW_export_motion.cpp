@@ -16,7 +16,8 @@ void SelectedCount(LWItemType type, int& sel_obj_count, LWItemID& last_sel_obj)
     object = g_iteminfo->first(type, NULL);
     while (object)
     {
-        if (g_intinfo->itemFlags(object) & LWITEMF_SELECTED) {
+        if (g_intinfo->itemFlags(object) & LWITEMF_SELECTED)
+        {
             last_sel_obj = object;
             sel_obj_count++;
         }
@@ -36,7 +37,8 @@ void __cdecl SaveObjectMotion(GlobalFunc* global)
     string_path buf = "";
 
     EFS.GetSaveName("$omotion$", buf);
-    if (buf[0]) {
+    if (buf[0])
+    {
         int sel_obj_cnt = 0;
         LWItemID sel_object;
 
@@ -45,7 +47,8 @@ void __cdecl SaveObjectMotion(GlobalFunc* global)
         SelectedCount(LWI_BONE, sel_obj_cnt, sel_object);
         SelectedCount(LWI_LIGHT, sel_obj_cnt, sel_object);
 
-        if (sel_obj_cnt == 1) {
+        if (sel_obj_cnt == 1)
+        {
             string_path name;
             _splitpath(buf, 0, 0, name, 0);
             m_Motion = new OMotionLW();

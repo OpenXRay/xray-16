@@ -6,7 +6,6 @@ public:
     virtual LPCSTR getComment() { return "INTERNAL: mask direct light"; }
     virtual BOOL canBeDetailed() { return FALSE; }
     virtual BOOL canBeLMAPped() { return FALSE; }
-
     virtual void Compile(CBlender_Compile& C);
 
     CBlender_accum_direct_mask();

@@ -20,7 +20,8 @@ void LuaLog(LPCSTR caMessage)
     GlobalEnv.ScriptEngine->script_log(LuaMessageType::Message, "%s", caMessage);
 #endif
 #if defined(USE_DEBUGGER) && !defined(USE_LUA_STUDIO)
-    if (GlobalEnv.ScriptEngine->debugger()) GlobalEnv.ScriptEngine->debugger()->Write(caMessage);
+    if (GlobalEnv.ScriptEngine->debugger())
+        GlobalEnv.ScriptEngine->debugger()->Write(caMessage);
 #endif
 }
 
@@ -31,11 +32,13 @@ void ErrorLog(LPCSTR caMessage)
     GlobalEnv.ScriptEngine->print_stack();
 #endif
 #if defined(USE_DEBUGGER) && !defined(USE_LUA_STUDIO)
-    if (GlobalEnv.ScriptEngine->debugger()) GlobalEnv.ScriptEngine->debugger()->Write(caMessage);
+    if (GlobalEnv.ScriptEngine->debugger())
+        GlobalEnv.ScriptEngine->debugger()->Write(caMessage);
 #endif
 #ifdef DEBUG
     bool lua_studio_connected = !!GlobalEnv.ScriptEngine->debugger();
-    if (!lua_studio_connected) R_ASSERT2(0, caMessage);
+    if (!lua_studio_connected)
+        R_ASSERT2(0, caMessage);
 #else
     R_ASSERT2(0, caMessage);
 #endif
@@ -63,31 +66,12 @@ bool is_editor()
 #endif
 }
 
-int bit_and(int i, int j)
-{
-    return i & j;
-}
-int bit_or(int i, int j)
-{
-    return i | j;
-}
-int bit_xor(int i, int j)
-{
-    return i ^ j;
-}
-int bit_not(int i)
-{
-    return ~i;
-}
-const char* user_name()
-{
-    return Core.UserName;
-}
-void prefetch_module(LPCSTR file_name)
-{
-    GlobalEnv.ScriptEngine->process_file(file_name);
-}
-
+int bit_and(int i, int j) { return i & j; }
+int bit_or(int i, int j) { return i | j; }
+int bit_xor(int i, int j) { return i ^ j; }
+int bit_not(int i) { return ~i; }
+const char* user_name() { return Core.UserName; }
+void prefetch_module(LPCSTR file_name) { GlobalEnv.ScriptEngine->process_file(file_name); }
 struct profile_timer_script
 {
     u64 m_start_cpu_tick_count;
@@ -104,7 +88,6 @@ struct profile_timer_script
     }
 
     profile_timer_script(const profile_timer_script& profile_timer) { *this = profile_timer; }
-
     profile_timer_script& operator=(const profile_timer_script& profile_timer)
     {
         m_start_cpu_tick_count = profile_timer.m_start_cpu_tick_count;
@@ -121,7 +104,8 @@ struct profile_timer_script
 
     void start()
     {
-        if (m_recurse_mark) {
+        if (m_recurse_mark)
+        {
             m_recurse_mark++;
             return;
         }
@@ -132,11 +116,14 @@ struct profile_timer_script
 
     void stop()
     {
-        if (!m_recurse_mark) return;
+        if (!m_recurse_mark)
+            return;
         m_recurse_mark--;
-        if (m_recurse_mark) return;
+        if (m_recurse_mark)
+            return;
         u64 finish = CPU::GetCLK();
-        if (finish > m_start_cpu_tick_count) m_accumulator += finish - m_start_cpu_tick_count;
+        if (finish > m_start_cpu_tick_count)
+            m_accumulator += finish - m_start_cpu_tick_count;
     }
 
     float time() const
@@ -156,11 +143,7 @@ IC profile_timer_script operator+(const profile_timer_script& portion0, const pr
     return result;
 }
 
-std::ostream& operator<<(std::ostream& os, const profile_timer_script& pt)
-{
-    return os << pt.time();
-}
-
+std::ostream& operator<<(std::ostream& os, const profile_timer_script& pt) { return os << pt.time(); }
 SCRIPT_EXPORT(CScriptEngine, (), {
     using namespace luabind;
     module(luaState)[class_<profile_timer_script>("profile_timer")

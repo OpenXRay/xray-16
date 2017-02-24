@@ -84,8 +84,7 @@ Box3<Real> Wml::ContOrientedBox(int iQuantity, const Vector3<Real>* akPoint)
     }
 
     kBox.Center() += (((Real)0.5) * (fY0Min + fY0Max)) * kBox.Axis(0) +
-                     (((Real)0.5) * (fY1Min + fY1Max)) * kBox.Axis(1) +
-                     (((Real)0.5) * (fY2Min + fY2Max)) * kBox.Axis(2);
+        (((Real)0.5) * (fY1Min + fY1Max)) * kBox.Axis(1) + (((Real)0.5) * (fY2Min + fY2Max)) * kBox.Axis(2);
 
     kBox.Extent(0) = ((Real)0.5) * (fY0Max - fY0Min);
     kBox.Extent(1) = ((Real)0.5) * (fY1Max - fY1Min);
@@ -97,7 +96,8 @@ Box3<Real> Wml::ContOrientedBox(int iQuantity, const Vector3<Real>* akPoint)
 template <class Real>
 bool Wml::ContOrientedBox(int iQuantity, const Vector3<Real>* akPoint, const bool* abValid, Box3<Real>& rkBox)
 {
-    if (!GaussPointsFit(iQuantity, akPoint, abValid, rkBox.Center(), rkBox.Axes(), rkBox.Extents())) {
+    if (!GaussPointsFit(iQuantity, akPoint, abValid, rkBox.Center(), rkBox.Axes(), rkBox.Extents()))
+    {
         return false;
     }
 
@@ -116,7 +116,8 @@ bool Wml::ContOrientedBox(int iQuantity, const Vector3<Real>* akPoint, const boo
     int i;
     for (i = 0; i < iQuantity; i++)
     {
-        if (abValid[i]) {
+        if (abValid[i])
+        {
             kDiff = akPoint[i] - rkBox.Center();
             fY0Min = kDiff.Dot(rkBox.Axis(0));
             fY0Max = fY0Min;
@@ -130,7 +131,8 @@ bool Wml::ContOrientedBox(int iQuantity, const Vector3<Real>* akPoint, const boo
 
     for (i++; i < iQuantity; i++)
     {
-        if (abValid[i]) {
+        if (abValid[i])
+        {
             kDiff = akPoint[i] - rkBox.Center();
 
             Real fY0 = kDiff.Dot(rkBox.Axis(0));
@@ -154,7 +156,7 @@ bool Wml::ContOrientedBox(int iQuantity, const Vector3<Real>* akPoint, const boo
     }
 
     rkBox.Center() += (0.5f * (fY0Min + fY0Max)) * rkBox.Axis(0) + (0.5f * (fY1Min + fY1Max)) * rkBox.Axis(1) +
-                      (0.5f * (fY2Min + fY2Max)) * rkBox.Axis(2);
+        (0.5f * (fY2Min + fY2Max)) * rkBox.Axis(2);
 
     rkBox.Extent(0) = 0.5f * (fY0Max - fY0Min);
     rkBox.Extent(1) = 0.5f * (fY1Max - fY1Min);
@@ -183,7 +185,8 @@ Box3<Real> Wml::MergeBoxes(const Box3<Real>& rkBox0, const Box3<Real>& rkBox1)
     Quaternion<Real> kQ0, kQ1;
     kQ0.FromRotationMatrix(rkBox0.Axes());
     kQ1.FromRotationMatrix(rkBox1.Axes());
-    if (kQ0.Dot(kQ1) < 0.0f) kQ1 = -kQ1;
+    if (kQ0.Dot(kQ1) < 0.0f)
+        kQ1 = -kQ1;
 
     Quaternion<Real> kQ = kQ0 + kQ1;
     Real fInvLength = Math<Real>::InvSqrt(kQ.Dot(kQ));
@@ -254,7 +257,8 @@ bool Wml::InBox(const Vector3<Real>& rkPoint, const Box3<Real>& rkBox, Real fEps
     for (int i = 0; i < 3; i++)
     {
         Real fCoeff = kDiff.Dot(rkBox.Axis(i));
-        if (Math<Real>::FAbs(fCoeff) > rkBox.Extent(i) + fEpsilon) return false;
+        if (Math<Real>::FAbs(fCoeff) > rkBox.Extent(i) + fEpsilon)
+            return false;
     }
     return true;
 }

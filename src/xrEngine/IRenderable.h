@@ -26,10 +26,7 @@ public:
     virtual BOOL renderable_ShadowReceive() = 0;
 };
 
-inline IRenderable::~IRenderable()
-{
-}
-
+inline IRenderable::~IRenderable() {}
 class ENGINE_API RenderableBase : public virtual IRenderable
 {
 public:
@@ -45,4 +42,4 @@ public:
     virtual BOOL renderable_ShadowReceive() override { return FALSE; }
 };
 
-#endif  // IRENDERABLE_H_INCLUDED
+#endif // IRENDERABLE_H_INCLUDED

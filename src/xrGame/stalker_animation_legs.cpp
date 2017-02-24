@@ -28,10 +28,10 @@ const u32 direction_switch_interval = 500;
 const u32 need_look_back_time_delay = 0;
 
 const float direction_angles[] = {
-    0.f,       //	eMovementDirectionForward
-    PI,        //	eMovementDirectionBackward
-    PI_DIV_2,  //	eMovementDirectionLeft
-    -PI_DIV_2  //	eMovementDirectionRight
+    0.f, //	eMovementDirectionForward
+    PI, //	eMovementDirectionBackward
+    PI_DIV_2, //	eMovementDirectionLeft
+    -PI_DIV_2 //	eMovementDirectionRight
 };
 
 void CStalkerAnimationManager::legs_play_callback(CBlend* blend)
@@ -62,11 +62,14 @@ IC float CStalkerAnimationManager::legs_switch_factor() const
 
 bool CStalkerAnimationManager::need_look_back() const
 {
-    if (m_looking_back) return (true);
+    if (m_looking_back)
+        return (true);
 
-    if (m_previous_speed_direction != eMovementDirectionBackward) return (false);
+    if (m_previous_speed_direction != eMovementDirectionBackward)
+        return (false);
 
-    if ((m_change_direction_time + need_look_back_time_delay) > Device.dwTimeGlobal) return (false);
+    if ((m_change_direction_time + need_look_back_time_delay) > Device.dwTimeGlobal)
+        return (false);
 
     m_looking_back = ::Random.randI(2) + 1;
     return (true);
@@ -74,19 +77,22 @@ bool CStalkerAnimationManager::need_look_back() const
 
 void CStalkerAnimationManager::legs_assign_direction(float switch_factor, const EMovementDirection& direction)
 {
-    if (m_current_direction == direction) {
+    if (m_current_direction == direction)
+    {
         m_direction_start = Device.dwTimeGlobal;
         return;
     }
 
-    if (m_target_direction != direction) {
+    if (m_target_direction != direction)
+    {
         m_direction_start = Device.dwTimeGlobal;
         m_target_direction = direction;
         return;
     }
 
     VERIFY(m_direction_start <= Device.dwTimeGlobal);
-    if ((Device.dwTimeGlobal - m_direction_start) <= (u32)iFloor(switch_factor * direction_switch_interval)) return;
+    if ((Device.dwTimeGlobal - m_direction_start) <= (u32)iFloor(switch_factor * direction_switch_interval))
+        return;
 
     m_direction_start = Device.dwTimeGlobal;
     m_current_direction = direction;
@@ -100,7 +106,8 @@ void CStalkerAnimationManager::legs_process_direction(float yaw)
     float left = left_angle(yaw, head_current);
     float test_angle_forward = right_forward_angle;
     float test_angle_backward = left_forward_angle;
-    if (left) {
+    if (left)
+    {
         test_angle_forward = left_forward_angle;
         test_angle_backward = right_forward_angle;
     }
@@ -131,7 +138,8 @@ MotionID CStalkerAnimationManager::legs_move_animation()
 
     VERIFY((movement.body_state() == eBodyStateStand) || (movement.mental_state() != eMentalStateFree));
 
-    if (eMentalStateDanger != movement.mental_state()) {
+    if (eMentalStateDanger != movement.mental_state())
+    {
         m_target_speed = movement.speed(eMovementDirectionForward);
         m_last_non_zero_speed = m_target_speed;
 
@@ -152,7 +160,8 @@ MotionID CStalkerAnimationManager::legs_move_animation()
     bool left = left_angle(yaw, body_current);
     float test_angle_forward = right_forward_angle;
     float test_angle_backward = left_forward_angle;
-    if (left) {
+    if (left)
+    {
         test_angle_forward = left_forward_angle;
         test_angle_backward = right_forward_angle;
     }
@@ -176,10 +185,13 @@ MotionID CStalkerAnimationManager::legs_move_animation()
         }
     }
 
-    if (m_previous_speed_direction != speed_direction) {
-        if (m_change_direction_time < Device.dwTimeGlobal) m_change_direction_time = Device.dwTimeGlobal;
+    if (m_previous_speed_direction != speed_direction)
+    {
+        if (m_change_direction_time < Device.dwTimeGlobal)
+            m_change_direction_time = Device.dwTimeGlobal;
 
-        if (!legs_switch_factor()) {
+        if (!legs_switch_factor())
+        {
             m_previous_speed = 0.f;
             m_target_speed = 0.f;
         }
@@ -201,7 +213,8 @@ MotionID CStalkerAnimationManager::legs_no_move_animation()
     m_previous_speed = 0.f;
     m_target_speed = 0.f;
 
-    if (!m_no_move_actual) {
+    if (!m_no_move_actual)
+    {
         m_no_move_actual = true;
         if (m_crouch_state_config == -1)
             m_crouch_state = ::Random.randI(2);
@@ -218,12 +231,16 @@ MotionID CStalkerAnimationManager::legs_no_move_animation()
     const SBoneRotation& body_orientation = movement.body_orientation();
     float current = body_orientation.current.yaw;
     float target = body_orientation.target.yaw;
-    if (angle_difference(target, current) < EPS_L) {
+    if (angle_difference(target, current) < EPS_L)
+    {
         //		float					head_current = movement.head_orientation().current.yaw;
-        if ((movement.mental_state() != eMentalStateFree) || !object().sight().turning_in_place()) {
-            if (movement.mental_state() == eMentalStateFree) return (animation[1]);
+        if ((movement.mental_state() != eMentalStateFree) || !object().sight().turning_in_place())
+        {
+            if (movement.mental_state() == eMentalStateFree)
+                return (animation[1]);
 
-            if (body_state == eBodyStateCrouch) return (animation[m_crouch_state]);
+            if (body_state == eBodyStateCrouch)
+                return (animation[m_crouch_state]);
 
             return (animation[0]);
         }
@@ -232,13 +249,16 @@ MotionID CStalkerAnimationManager::legs_no_move_animation()
         target = movement.m_body.target.yaw;
     }
 
-    if (left_angle(current, target)) {
-        if (movement.mental_state() == eMentalStateFree) return (animation[4]);
+    if (left_angle(current, target))
+    {
+        if (movement.mental_state() == eMentalStateFree)
+            return (animation[4]);
 
         return (animation[2]);
     }
 
-    if (movement.mental_state() == eMentalStateFree) return (animation[5]);
+    if (movement.mental_state() == eMentalStateFree)
+        return (animation[5]);
 
     return (animation[3]);
 }
@@ -246,14 +266,17 @@ MotionID CStalkerAnimationManager::legs_no_move_animation()
 MotionID CStalkerAnimationManager::assign_legs_animation()
 {
     MotionID result;
-    if (standing()) {
+    if (standing())
+    {
         result = legs_no_move_animation();
-        if (!result.valid()) legs_no_move_animation();
+        if (!result.valid())
+            legs_no_move_animation();
         return (result);
     }
 
     result = legs_move_animation();
-    if (!result.valid()) legs_move_animation();
+    if (!result.valid())
+        legs_move_animation();
 
     return (result);
 }

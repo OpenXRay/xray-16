@@ -37,7 +37,8 @@ CUICellItem::CUICellItem()
 
 CUICellItem::~CUICellItem()
 {
-    if (m_b_destroy_childs) delete_data(m_childs);
+    if (m_b_destroy_childs)
+        delete_data(m_childs);
 
     delete_data(m_custom_draw);
 }
@@ -78,13 +79,15 @@ void CUICellItem::Draw()
     m_drawn_frame = Device.dwFrame;
 
     inherited::Draw();
-    if (m_custom_draw) m_custom_draw->OnDraw(this);
+    if (m_custom_draw)
+        m_custom_draw->OnDraw(this);
 };
 
 void CUICellItem::Update()
 {
     EnableHeading(m_pParentList->GetVerticalPlacement());
-    if (Heading()) {
+    if (Heading())
+    {
         SetHeading(90.0f * (PI / 180.0f));
         SetHeadingPivot(Fvector2().set(0.0f, 0.0f), Fvector2().set(0.0f, GetWndSize().y), true);
     }
@@ -93,15 +96,18 @@ void CUICellItem::Update()
 
     inherited::Update();
 
-    if (CursorOverWindow()) {
+    if (CursorOverWindow())
+    {
         Frect clientArea;
         m_pParentList->GetClientArea(clientArea);
         Fvector2 cp = GetUICursor().GetCursorPosition();
-        if (clientArea.in(cp)) GetMessageTarget()->SendMessage(this, DRAG_DROP_ITEM_FOCUSED_UPDATE, NULL);
+        if (clientArea.in(cp))
+            GetMessageTarget()->SendMessage(this, DRAG_DROP_ITEM_FOCUSED_UPDATE, NULL);
     }
 
     PIItem item = (PIItem)m_pData;
-    if (item) {
+    if (item)
+    {
         m_has_upgrade = item->has_any_upgrades();
 
         //		Fvector2 size      = GetWndSize();
@@ -109,7 +115,8 @@ void CUICellItem::Update()
         //		pos.x = size.x - up_size.x - 4.0f;
         Fvector2 pos;
         pos.set(m_upgrade_pos);
-        if (ChildsCount()) {
+        if (ChildsCount())
+        {
             pos.x += m_text->GetWndSize().x + 2.0f;
         }
         m_upgrade->SetWndPos(pos);
@@ -119,7 +126,8 @@ void CUICellItem::Update()
 
 bool CUICellItem::OnMouseAction(float x, float y, EUIMessages mouse_action)
 {
-    if (mouse_action == WINDOW_LBUTTON_DOWN) {
+    if (mouse_action == WINDOW_LBUTTON_DOWN)
+    {
         GetMessageTarget()->SendMessage(this, DRAG_DROP_ITEM_LBUTTON_CLICK, NULL);
         GetMessageTarget()->SendMessage(this, DRAG_DROP_ITEM_SELECTED, NULL);
         m_mouse_selected_item = this;
@@ -127,7 +135,8 @@ bool CUICellItem::OnMouseAction(float x, float y, EUIMessages mouse_action)
     }
     else if (mouse_action == WINDOW_MOUSE_MOVE)
     {
-        if (pInput->iGetAsyncBtnState(0) && m_mouse_selected_item && m_mouse_selected_item == this) {
+        if (pInput->iGetAsyncBtnState(0) && m_mouse_selected_item && m_mouse_selected_item == this)
+        {
             GetMessageTarget()->SendMessage(this, DRAG_DROP_ITEM_DRAG, NULL);
             return true;
         }
@@ -149,8 +158,10 @@ bool CUICellItem::OnMouseAction(float x, float y, EUIMessages mouse_action)
 
 bool CUICellItem::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (WINDOW_KEY_PRESSED == keyboard_action) {
-        if (GetAccelerator() == dik) {
+    if (WINDOW_KEY_PRESSED == keyboard_action)
+    {
+        if (GetAccelerator() == dik)
+        {
             GetMessageTarget()->SendMessage(this, DRAG_DROP_ITEM_DB_CLICK, NULL);
             return true;
         }
@@ -165,7 +176,8 @@ CUIDragItem* CUICellItem::CreateDragItem()
     Frect r;
     GetAbsoluteRect(r);
 
-    if (m_UIStaticItem.GetFixedLTWhileHeading()) {
+    if (m_UIStaticItem.GetFixedLTWhileHeading())
+    {
         float t1, t2;
         t1 = r.width();
         t2 = r.height() * UI().get_current_kx();
@@ -189,14 +201,17 @@ void CUICellItem::SetOwnerList(CUIDragDropListEx* p)
 
 void CUICellItem::UpdateConditionProgressBar()
 {
-    if (m_pParentList && m_pParentList->GetConditionProgBarVisibility()) {
+    if (m_pParentList && m_pParentList->GetConditionProgBarVisibility())
+    {
         PIItem itm = (PIItem)m_pData;
         CWeapon* pWeapon = smart_cast<CWeapon*>(itm);
         CCustomOutfit* pOutfit = smart_cast<CCustomOutfit*>(itm);
         CHelmet* pHelmet = smart_cast<CHelmet*>(itm);
-        if (pWeapon || pOutfit || pHelmet) {
+        if (pWeapon || pOutfit || pHelmet)
+        {
             Ivector2 itm_grid_size = GetGridSize();
-            if (m_pParentList->GetVerticalPlacement()) std::swap(itm_grid_size.x, itm_grid_size.y);
+            if (m_pParentList->GetVerticalPlacement())
+                std::swap(itm_grid_size.x, itm_grid_size.y);
 
             Ivector2 cell_size = m_pParentList->CellSize();
             Ivector2 cell_space = m_pParentList->CellsSpacing();
@@ -217,11 +232,7 @@ bool CUICellItem::EqualTo(CUICellItem* itm)
     return (m_grid_size.x == itm->GetGridSize().x) && (m_grid_size.y == itm->GetGridSize().y);
 }
 
-u32 CUICellItem::ChildsCount()
-{
-    return m_childs.size();
-}
-
+u32 CUICellItem::ChildsCount() { return m_childs.size(); }
 void CUICellItem::PushChild(CUICellItem* c)
 {
     R_ASSERT(c->ChildsCount() == 0);
@@ -235,8 +246,10 @@ CUICellItem* CUICellItem::PopChild(CUICellItem* needed)
     CUICellItem* itm = m_childs.back();
     m_childs.pop_back();
 
-    if (needed) {
-        if (itm != needed) std::swap(itm->m_pData, needed->m_pData);
+    if (needed)
+    {
+        if (itm != needed)
+            std::swap(itm->m_pData, needed->m_pData);
     }
     else
     {
@@ -255,7 +268,8 @@ bool CUICellItem::HasChild(CUICellItem* item)
 
 void CUICellItem::UpdateItemText()
 {
-    if (ChildsCount()) {
+    if (ChildsCount())
+    {
         string32 str;
         xr_sprintf(str, "x%d", ChildsCount() + 1);
         m_text->TextItemControl()->SetText(str);
@@ -268,14 +282,11 @@ void CUICellItem::UpdateItemText()
     }
 }
 
-void CUICellItem::Mark(bool status)
-{
-    m_cur_mark = status;
-}
-
+void CUICellItem::Mark(bool status) { m_cur_mark = status; }
 void CUICellItem::SetCustomDraw(ICustomDrawCellItem* c)
 {
-    if (m_custom_draw) xr_delete(m_custom_draw);
+    if (m_custom_draw)
+        xr_delete(m_custom_draw);
     m_custom_draw = c;
 }
 
@@ -301,7 +312,8 @@ CUIDragItem::~CUIDragItem()
 
 void CUIDragItem::SetCustomDraw(ICustomDrawDragItem* c)
 {
-    if (m_custom_draw) xr_delete(m_custom_draw);
+    if (m_custom_draw)
+        xr_delete(m_custom_draw);
     m_custom_draw = c;
 }
 
@@ -320,23 +332,16 @@ void CUIDragItem::Init(const ui_shader& sh, const Frect& rect, const Frect& text
 
 bool CUIDragItem::OnMouseAction(float x, float y, EUIMessages mouse_action)
 {
-    if (mouse_action == WINDOW_LBUTTON_UP) {
+    if (mouse_action == WINDOW_LBUTTON_UP)
+    {
         m_pParent->GetMessageTarget()->SendMessage(m_pParent, DRAG_DROP_ITEM_DROP, NULL);
         return true;
     }
     return false;
 }
 
-void CUIDragItem::OnRender()
-{
-    Draw();
-}
-
-void CUIDragItem::OnFrame()
-{
-    Update();
-}
-
+void CUIDragItem::OnRender() { Draw(); }
+void CUIDragItem::OnFrame() { Update(); }
 void CUIDragItem::Draw()
 {
     Fvector2 tmp;
@@ -345,19 +350,19 @@ void CUIDragItem::Draw()
     tmp.mul(-1.0f);
     MoveWndDelta(tmp);
     inherited::Draw();
-    if (m_custom_draw) m_custom_draw->OnDraw(this);
+    if (m_custom_draw)
+        m_custom_draw->OnDraw(this);
 }
 
 void CUIDragItem::SetBackList(CUIDragDropListEx* l)
 {
-    if (m_back_list) m_back_list->OnDragEvent(this, false);
+    if (m_back_list)
+        m_back_list->OnDragEvent(this, false);
 
     m_back_list = l;
 
-    if (m_back_list) l->OnDragEvent(this, true);
+    if (m_back_list)
+        l->OnDragEvent(this, true);
 }
 
-Fvector2 CUIDragItem::GetPosition()
-{
-    return Fvector2().add(m_pos_offset, GetUICursor().GetCursorPosition());
-}
+Fvector2 CUIDragItem::GetPosition() { return Fvector2().add(m_pos_offset, GetUICursor().GetCursorPosition()); }

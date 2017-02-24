@@ -9,10 +9,7 @@
 #include "game_cl_capture_the_artefact.h"
 #include "game_cl_artefacthunt.h"
 
-UIPlayerItem::UIPlayerItem()
-{
-}
-
+UIPlayerItem::UIPlayerItem() {}
 UIPlayerItem::UIPlayerItem(ETeam team, ClientID const& clientId, UITeamState* tstate, UITeamPanels* tpanels)
 {
     VERIFY(tstate);
@@ -26,10 +23,7 @@ UIPlayerItem::UIPlayerItem(ETeam team, ClientID const& clientId, UITeamState* ts
     m_player_node_root = NULL;
 }
 
-UIPlayerItem::~UIPlayerItem()
-{
-}
-
+UIPlayerItem::~UIPlayerItem() {}
 void UIPlayerItem::Init(CUIXml& uiXml, LPCSTR playerNode, int index)
 {
     CUIXmlInit::InitWindow(uiXml, playerNode, index, this);
@@ -42,11 +36,7 @@ void UIPlayerItem::Init(CUIXml& uiXml, LPCSTR playerNode, int index)
     uiXml.SetLocalRoot(prev_root);
 }
 
-s32 UIPlayerItem::GetPlayerCheckPoints() const
-{
-    return m_checkPoints;
-}
-
+s32 UIPlayerItem::GetPlayerCheckPoints() const { return m_checkPoints; }
 s32 UIPlayerItem::CalculateCheckPoints(game_PlayerState const* ps) const
 {
     return (ps->m_iRivalKills + (ps->af_count * 3) - (ps->m_iTeamKills * 2));
@@ -60,7 +50,8 @@ void UIPlayerItem::InitTextParams(CUIXml& uiXml)
     for (int i = 0; i < temp_number; ++i)
     {
         XML_NODE* text_param_node = uiXml.NavigateToNode(TEXTPARAM_NODE_NAME, i);
-        if (!text_param_node) break;
+        if (!text_param_node)
+            break;
         LPCSTR param_name = uiXml.ReadAttrib(text_param_node, "name", "param_name_not_set_in_name_attribute");
         CUITextWnd* temp_static = new CUITextWnd();
         VERIFY(temp_static);
@@ -79,7 +70,8 @@ void UIPlayerItem::InitIconParams(CUIXml& uiXml)
     for (int i = 0; i < temp_number; ++i)
     {
         XML_NODE* icon_param_node = uiXml.NavigateToNode(ICONPARAM_NODE_NAME, i);
-        if (!icon_param_node) break;
+        if (!icon_param_node)
+            break;
         LPCSTR param_name = uiXml.ReadAttrib(icon_param_node, "name", "param_name_not_set_in_name_attribute");
         CUIStatsIcon* temp_static = new CUIStatsIcon();
         VERIFY(temp_static);
@@ -120,7 +112,8 @@ void UIPlayerItem::GetTextParamValue(
     game_PlayerState const* ps, shared_str const& param_name, buffer_vector<char>& dest)
 {
     VERIFY(ps);
-    if (param_name.equal("mp_name")) {
+    if (param_name.equal("mp_name"))
+    {
         xr_strcpy(dest.begin(), dest.size(), ps->getName());
     }
     else if (param_name.equal("mp_frags"))
@@ -157,8 +150,10 @@ void UIPlayerItem::GetIconParamValue(
     VERIFY(ps);
     game_cl_mp* cl_game = static_cast<game_cl_mp*>(&Game());
     VERIFY(cl_game);
-    if (param_name.equal("rank")) {
-        if (ETeam(cl_game->ModifyTeam(ps->team)) == etGreenTeam) {
+    if (param_name.equal("rank"))
+    {
+        if (ETeam(cl_game->ModifyTeam(ps->team)) == etGreenTeam)
+        {
             xr_sprintf(dest.begin(), dest.size(), "ui_hud_status_green_0%d", ps->rank + 1);
         }
         else if (ETeam(cl_game->ModifyTeam(ps->team)) == etBlueTeam)
@@ -168,11 +163,13 @@ void UIPlayerItem::GetIconParamValue(
     }
     else if (param_name.equal("death_atf"))
     {
-        if (ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) {
+        if (ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
+        {
             xr_strcpy(dest.begin(), dest.size(), "death");
             return;
         }
-        if (cl_game->Type() == eGameIDCaptureTheArtefact) {
+        if (cl_game->Type() == eGameIDCaptureTheArtefact)
+        {
             game_cl_CaptureTheArtefact* cta_cl_game = static_cast<game_cl_CaptureTheArtefact*>(cl_game);
             R_ASSERT(cta_cl_game);
             if (ps->GameID == cta_cl_game->GetGreenArtefactOwnerID() ||
@@ -185,7 +182,8 @@ void UIPlayerItem::GetIconParamValue(
         {
             game_cl_ArtefactHunt* ahunt_cl_game = static_cast<game_cl_ArtefactHunt*>(cl_game);
             R_ASSERT(ahunt_cl_game);
-            if (ps->GameID == ahunt_cl_game->artefactBearerID) {
+            if (ps->GameID == ahunt_cl_game->artefactBearerID)
+            {
                 xr_strcpy(dest.begin(), dest.size(), "artefact");
             }
         }
@@ -201,7 +199,8 @@ void UIPlayerItem::Update()
     game_cl_GameState::PLAYERS_MAP& playersMap = Game().players;
     game_cl_GameState::PLAYERS_MAP::iterator pi = playersMap.find(myClientId);
 
-    if (pi == playersMap.end()) {
+    if (pi == playersMap.end())
+    {
         m_teamState->RemovePlayer(myClientId);
         return;
     }
@@ -213,7 +212,8 @@ void UIPlayerItem::Update()
     UpdateTextParams(ps);
     UpdateIconParams(ps);
 
-    if (ps->team != m_prevTeam) {
+    if (ps->team != m_prevTeam)
+    {
         m_prevTeam = static_cast<ETeam>(ps->team);
         m_teamPanels->NeedUpdatePlayers();
         return;

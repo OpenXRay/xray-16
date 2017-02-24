@@ -38,7 +38,8 @@ bool CLevel::Load_GameSpecific_After()
     R_ASSERT(m_StaticParticles.empty());
     // loading static particles
     string_path fn_game;
-    if (FS.exist(fn_game, "$level$", "level.ps_static")) {
+    if (FS.exist(fn_game, "$level$", "level.ps_static"))
+    {
         IReader* F = FS.r_open(fn_game);
         CParticlesObject* pStaticParticles;
         u32 chunk = 0;
@@ -48,24 +49,28 @@ bool CLevel::Load_GameSpecific_After()
         u32 ver = 0;
         for (IReader* OBJ = F->open_chunk_iterator(chunk); OBJ; OBJ = F->open_chunk_iterator(chunk, OBJ))
         {
-            if (chunk == 0) {
-                if (OBJ->length() == sizeof(u32)) {
+            if (chunk == 0)
+            {
+                if (OBJ->length() == sizeof(u32))
+                {
                     ver = OBJ->r_u32();
 #ifndef MASTER_GOLD
                     Msg("PS new version, %d", ver);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
                     continue;
                 }
             }
             u16 gametype_usage = 0;
-            if (ver > 0) {
+            if (ver > 0)
+            {
                 gametype_usage = OBJ->r_u16();
             }
             OBJ->r_stringZ(ref_name, sizeof(ref_name));
             OBJ->r(&transform, sizeof(Fmatrix));
             transform.c.y += 0.01f;
 
-            if ((g_pGamePersistent->m_game_params.m_e_game_type & EGameIDs(gametype_usage)) || (ver == 0)) {
+            if ((g_pGamePersistent->m_game_params.m_e_game_type & EGameIDs(gametype_usage)) || (ver == 0))
+            {
                 pStaticParticles = CParticlesObject::Create(ref_name, FALSE, false);
                 pStaticParticles->UpdateParent(transform, zero_vel);
                 pStaticParticles->Play(false);
@@ -75,26 +80,30 @@ bool CLevel::Load_GameSpecific_After()
         FS.r_close(F);
     }
 
-    if (!g_dedicated_server) {
+    if (!g_dedicated_server)
+    {
         // loading static sounds
         VERIFY(m_level_sound_manager);
         m_level_sound_manager->Load();
 
         // loading sound environment
-        if (FS.exist(fn_game, "$level$", "level.snd_env")) {
+        if (FS.exist(fn_game, "$level$", "level.snd_env"))
+        {
             IReader* F = FS.r_open(fn_game);
             ::Sound->set_geometry_env(F);
             FS.r_close(F);
         }
         // loading SOM
-        if (FS.exist(fn_game, "$level$", "level.som")) {
+        if (FS.exist(fn_game, "$level$", "level.som"))
+        {
             IReader* F = FS.r_open(fn_game);
             ::Sound->set_geometry_som(F);
             FS.r_close(F);
         }
 
         // loading random (around player) sounds
-        if (pSettings->section_exist("sounds_random")) {
+        if (pSettings->section_exist("sounds_random"))
+        {
             CInifile::Sect& S = pSettings->r_section("sounds_random");
             Sounds_Random.reserve(S.Data.size());
             for (CInifile::SectCIt I = S.Data.begin(); S.Data.end() != I; ++I)
@@ -106,10 +115,12 @@ bool CLevel::Load_GameSpecific_After()
             Sounds_Random_Enabled = FALSE;
         }
 
-        if (FS.exist(fn_game, "$level$", "level.fog_vol")) {
+        if (FS.exist(fn_game, "$level$", "level.fog_vol"))
+        {
             IReader* F = FS.r_open(fn_game);
             u16 version = F->r_u16();
-            if (version == 2) {
+            if (version == 2)
+            {
                 u32 cnt = F->r_u32();
 
                 Fmatrix volume_matrix;
@@ -127,7 +138,8 @@ bool CLevel::Load_GameSpecific_After()
         }
     }
 
-    if (!g_dedicated_server) {
+    if (!g_dedicated_server)
+    {
         // loading scripts
         auto& scriptEngine = ai().script_engine();
         scriptEngine.remove_script_process(ScriptProcessor::Level);
@@ -158,9 +170,7 @@ struct translation_pair
     }
 
     IC bool operator==(const u16& id) const { return (m_id == id); }
-
     IC bool operator<(const translation_pair& pair) const { return (m_id < pair.m_id); }
-
     IC bool operator<(const u16& id) const { return (m_id < id); }
 };
 
@@ -177,23 +187,28 @@ void CLevel::Load_GameSpecific_CFORM(CDB::TRI* tris, u32 count)
     int max_static_ID = 0;
     for (GameMtlIt I = GMLib.FirstMaterial(); GMLib.LastMaterial() != I; ++I, ++index)
     {
-        if (!(*I)->Flags.test(SGameMtl::flDynamic)) {
+        if (!(*I)->Flags.test(SGameMtl::flDynamic))
+        {
             ++static_mtl_count;
             translator.push_back(translation_pair((*I)->GetID(), index));
-            if ((*I)->GetID() > max_static_ID) max_static_ID = (*I)->GetID();
+            if ((*I)->GetID() > max_static_ID)
+                max_static_ID = (*I)->GetID();
         }
-        if ((*I)->GetID() > max_ID) max_ID = (*I)->GetID();
+        if ((*I)->GetID() > max_ID)
+            max_ID = (*I)->GetID();
     }
     // Msg("* Material remapping ID: [Max:%d, StaticMax:%d]",max_ID,max_static_ID);
     VERIFY(max_static_ID < 0xFFFF);
 
-    if (static_mtl_count < 128) {
+    if (static_mtl_count < 128)
+    {
         CDB::TRI* I = tris;
         CDB::TRI* E = tris + count;
         for (; I != E; ++I)
         {
             ID_INDEX_PAIRS::iterator i = std::find(translator.begin(), translator.end(), (u16)(*I).material);
-            if (i != translator.end()) {
+            if (i != translator.end())
+            {
                 (*I).material = (*i).m_index;
                 SGameMtl* mtl = GMLib.GetMaterialByIdx((*i).m_index);
                 (*I).suppress_shadows = mtl->Flags.is(SGameMtl::flSuppressShadows);
@@ -213,7 +228,8 @@ void CLevel::Load_GameSpecific_CFORM(CDB::TRI* tris, u32 count)
         for (; I != E; ++I)
         {
             ID_INDEX_PAIRS::iterator i = std::lower_bound(translator.begin(), translator.end(), (u16)(*I).material);
-            if ((i != translator.end()) && ((*i).m_id == (*I).material)) {
+            if ((i != translator.end()) && ((*i).m_id == (*I).material))
+            {
                 (*I).material = (*i).m_index;
                 SGameMtl* mtl = GMLib.GetMaterialByIdx((*i).m_index);
                 (*I).suppress_shadows = mtl->Flags.is(SGameMtl::flSuppressShadows);
@@ -229,6 +245,7 @@ void CLevel::Load_GameSpecific_CFORM(CDB::TRI* tris, u32 count)
 void CLevel::BlockCheatLoad()
 {
 #ifndef DEBUG
-    if (game && (GameID() != eGameIDSingle)) phTimefactor = 1.f;
+    if (game && (GameID() != eGameIDSingle))
+        phTimefactor = 1.f;
 #endif
 }

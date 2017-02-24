@@ -26,7 +26,8 @@ inline_ BOOL SphereCollider::SphereAABBOverlap(const Point& center, const Point&
         else
         {
             s = tmp - extents[i];
-            if (s > 0.0f) d += s * s;
+            if (s > 0.0f)
+                d += s * s;
         }
     }
 #endif
@@ -41,48 +42,60 @@ inline_ BOOL SphereCollider::SphereAABBOverlap(const Point& center, const Point&
     tmp = mCenter.x - center.x;
     s = tmp + extents.x;
 
-    if (s < 0.0f) {
+    if (s < 0.0f)
+    {
         d += s * s;
-        if (d > mRadius2) return FALSE;
+        if (d > mRadius2)
+            return FALSE;
     }
     else
     {
         s = tmp - extents.x;
-        if (s > 0.0f) {
+        if (s > 0.0f)
+        {
             d += s * s;
-            if (d > mRadius2) return FALSE;
+            if (d > mRadius2)
+                return FALSE;
         }
     }
 
     tmp = mCenter.y - center.y;
     s = tmp + extents.y;
 
-    if (s < 0.0f) {
+    if (s < 0.0f)
+    {
         d += s * s;
-        if (d > mRadius2) return FALSE;
+        if (d > mRadius2)
+            return FALSE;
     }
     else
     {
         s = tmp - extents.y;
-        if (s > 0.0f) {
+        if (s > 0.0f)
+        {
             d += s * s;
-            if (d > mRadius2) return FALSE;
+            if (d > mRadius2)
+                return FALSE;
         }
     }
 
     tmp = mCenter.z - center.z;
     s = tmp + extents.z;
 
-    if (s < 0.0f) {
+    if (s < 0.0f)
+    {
         d += s * s;
-        if (d > mRadius2) return FALSE;
+        if (d > mRadius2)
+            return FALSE;
     }
     else
     {
         s = tmp - extents.z;
-        if (s > 0.0f) {
+        if (s > 0.0f)
+        {
             d += s * s;
-            if (d > mRadius2) return FALSE;
+            if (d > mRadius2)
+                return FALSE;
         }
     }
 //#endif
@@ -100,7 +113,8 @@ inline_ BOOL SphereCollider::SphereAABBOverlap(const Point& center, const Point&
         float Min = center[i] - extents[i];
 
         //		if(mCenter[i]<Min[i])
-        if (mCenter[i] < Min) {
+        if (mCenter[i] < Min)
+        {
             //			float s = mCenter[i] - Min[i];
             float s = mCenter[i] - Min;
             d += s * s;
@@ -110,7 +124,8 @@ inline_ BOOL SphereCollider::SphereAABBOverlap(const Point& center, const Point&
             float Max = center[i] + extents[i];
 
             //			if(mCenter[i]>Max[i])
-            if (mCenter[i] > Max) {
+            if (mCenter[i] > Max)
+            {
                 float s = mCenter[i] - Max;
                 d += s * s;
             }

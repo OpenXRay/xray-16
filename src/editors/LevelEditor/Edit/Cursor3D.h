@@ -25,18 +25,15 @@ class C3DCursor
     void GetPickPoint(Fvector& src, Fvector& dst, Fvector* N);
     ECursorStyle eStyle;
 
-  public:
+public:
     C3DCursor();
     virtual ~C3DCursor();
     void SetBrushSegment(float segment = CURSOR_PRECISION_SEGMENT);
     void Render();
 
     bool GetVisible() { return m_Visible; }
-
     float GetBrushSize() { return brush_radius; }
-
     void SetBrushRadius(float r) { brush_radius = r; }
-
     void SetBrushDepth(float up_d, float dn_d)
     {
         brush_up_depth = up_d;

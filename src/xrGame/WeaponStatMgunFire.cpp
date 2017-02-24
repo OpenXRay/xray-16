@@ -8,16 +8,8 @@
 #include "EffectorShot.h"
 #include "Weapon.h"
 
-const Fvector& CWeaponStatMgun::get_CurrentFirePoint()
-{
-    return m_fire_pos;
-}
-
-const Fmatrix& CWeaponStatMgun::get_ParticlesXFORM()
-{
-    return m_fire_bone_xform;
-}
-
+const Fvector& CWeaponStatMgun::get_CurrentFirePoint() { return m_fire_pos; }
+const Fmatrix& CWeaponStatMgun::get_ParticlesXFORM() { return m_fire_bone_xform; }
 void CWeaponStatMgun::FireStart()
 {
     m_dAngle.set(0.0f, 0.0f);
@@ -39,12 +31,14 @@ void CWeaponStatMgun::UpdateFire()
     inheritedShooting::UpdateFlameParticles();
     inheritedShooting::UpdateLight();
 
-    if (!IsWorking()) {
+    if (!IsWorking())
+    {
         clamp(fShotTimeCounter, 0.0f, flt_max);
         return;
     }
 
-    if (fShotTimeCounter <= 0) {
+    if (fShotTimeCounter <= 0)
+    {
         OnShot();
         fShotTimeCounter += fOneShotTime;
     }
@@ -63,7 +57,8 @@ void CWeaponStatMgun::OnShot()
 
     StartShotParticles();
 
-    if (m_bLightShotEnabled) Light_Start();
+    if (m_bLightShotEnabled)
+        Light_Start();
 
     StartFlameParticles();
     StartSmokeParticles(m_fire_pos, zero_vel);
@@ -79,7 +74,8 @@ void CWeaponStatMgun::OnShot()
 
 void CWeaponStatMgun::AddShotEffector()
 {
-    if (OwnerActor()) {
+    if (OwnerActor())
+    {
         CCameraShotEffector* S = smart_cast<CCameraShotEffector*>(OwnerActor()->Cameras().GetCamEffector(eCEShot));
         CameraRecoil camera_recoil;
         //( camMaxAngle,camRelaxSpeed, 0.25f, 0.01f, 0.7f )
@@ -99,5 +95,6 @@ void CWeaponStatMgun::AddShotEffector()
 
 void CWeaponStatMgun::RemoveShotEffector()
 {
-    if (OwnerActor()) OwnerActor()->Cameras().RemoveCamEffector(eCEShot);
+    if (OwnerActor())
+        OwnerActor()->Cameras().RemoveCamEffector(eCEShot);
 }

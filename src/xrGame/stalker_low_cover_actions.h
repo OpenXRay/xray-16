@@ -75,4 +75,4 @@ public:
     virtual void finalize();
 };
 
-#endif  // STALKER_LOW_COVER_ACTIONS_H_INCLUDED
+#endif // STALKER_LOW_COVER_ACTIONS_H_INCLUDED

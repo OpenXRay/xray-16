@@ -92,7 +92,8 @@ using editor::environment::manager;
 manager::manager()
 {
     // testing properties
-    if (!Device.editor()) return;
+    if (!Device.editor())
+        return;
 
     editor::ide& ide = *Device.editor();
     editor::property_holder* holder = ide.create_property_holder();

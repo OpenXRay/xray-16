@@ -27,11 +27,7 @@ CPGDef::~CPGDef()
     m_Effects.clear();
 }
 
-void CPGDef::SetName(LPCSTR name)
-{
-    m_Name = name;
-}
-
+void CPGDef::SetName(LPCSTR name) { m_Name = name; }
 #ifdef _EDITOR
 void CPGDef::Clone(CPGDef* source)
 {
@@ -54,7 +50,8 @@ BOOL CPGDef::Load(IReader& F)
     R_ASSERT(F.find_chunk(PGD_CHUNK_VERSION));
     u16 version = F.r_u16();
 
-    if (version != PGD_VERSION) {
+    if (version != PGD_VERSION)
+    {
         Log("!Unsupported PG version. Load failed.");
         return FALSE;
     }
@@ -70,7 +67,8 @@ BOOL CPGDef::Load(IReader& F)
         m_fTimeLimit = 0.0f;
 
     bool dont_calc_timelimit = m_fTimeLimit > 0.0f;
-    if (F.find_chunk(PGD_CHUNK_EFFECTS)) {
+    if (F.find_chunk(PGD_CHUNK_EFFECTS))
+    {
         m_Effects.resize(F.r_u32());
         for (EffectIt it = m_Effects.begin(); it != m_Effects.end(); it++)
         {
@@ -83,7 +81,8 @@ BOOL CPGDef::Load(IReader& F)
             (*it)->m_Time1 = F.r_float();
             (*it)->m_Flags.assign(F.r_u32());
 
-            if (!dont_calc_timelimit) m_fTimeLimit = _max(m_fTimeLimit, (*it)->m_Time1);
+            if (!dont_calc_timelimit)
+                m_fTimeLimit = _max(m_fTimeLimit, (*it)->m_Time1);
         }
     }
     return TRUE;
@@ -179,10 +178,7 @@ void CPGDef::Save2(CInifile& ini)
 //------------------------------------------------------------------------------
 // Particle Group item
 //------------------------------------------------------------------------------
-void CParticleGroup::SItem::Set(dxRender_Visual* e)
-{
-    _effect = e;
-}
+void CParticleGroup::SItem::Set(dxRender_Visual* e) { _effect = e; }
 void CParticleGroup::SItem::Clear()
 {
     VisualVec visuals;
@@ -212,7 +208,8 @@ void CParticleGroup::SItem::StartRelatedChild(CParticleEffect* emitter, LPCSTR e
     Fvector vel;
     vel.sub(m.pos, m.posB);
     vel.div(fDT_STEP);
-    if (emitter->m_RT_Flags.is(CParticleEffect::flRT_XFORM)) {
+    if (emitter->m_RT_Flags.is(CParticleEffect::flRT_XFORM))
+    {
         M.set(emitter->m_XFORM);
         M.transform_dir(vel);
     };
@@ -236,13 +233,15 @@ void CParticleGroup::SItem::StartFreeChild(CParticleEffect* emitter, LPCSTR nm, 
 {
     CParticleEffect* C = static_cast<CParticleEffect*>(RImplementation.model_CreatePE(nm));
     C->SetHudMode(emitter->GetHudMode());
-    if (!C->IsLooped()) {
+    if (!C->IsLooped())
+    {
         Fmatrix M;
         M.identity();
         Fvector vel;
         vel.sub(m.pos, m.posB);
         vel.div(fDT_STEP);
-        if (emitter->m_RT_Flags.is(CParticleEffect::flRT_XFORM)) {
+        if (emitter->m_RT_Flags.is(CParticleEffect::flRT_XFORM))
+        {
             M.set(emitter->m_XFORM);
             M.transform_dir(vel);
         };
@@ -265,20 +264,23 @@ void CParticleGroup::SItem::StartFreeChild(CParticleEffect* emitter, LPCSTR nm, 
 void CParticleGroup::SItem::Play()
 {
     CParticleEffect* E = static_cast<CParticleEffect*>(_effect);
-    if (E) E->Play();
+    if (E)
+        E->Play();
 }
 void CParticleGroup::SItem::Stop(BOOL def_stop)
 {
     // stop all effects
     CParticleEffect* E = static_cast<CParticleEffect*>(_effect);
-    if (E) E->Stop(def_stop);
+    if (E)
+        E->Stop(def_stop);
     VisualVecIt it;
     for (it = _children_related.begin(); it != _children_related.end(); it++)
         static_cast<CParticleEffect*>(*it)->Stop(def_stop);
     for (it = _children_free.begin(); it != _children_free.end(); it++)
         static_cast<CParticleEffect*>(*it)->Stop(def_stop);
     // and delete if !deffered
-    if (!def_stop) {
+    if (!def_stop)
+    {
         for (it = _children_related.begin(); it != _children_related.end(); it++)
         {
             // GlobalEnv.Render->model_Delete(*it);
@@ -305,7 +307,8 @@ BOOL CParticleGroup::SItem::IsPlaying()
 void CParticleGroup::SItem::UpdateParent(const Fmatrix& m, const Fvector& velocity, BOOL bXFORM)
 {
     CParticleEffect* E = static_cast<CParticleEffect*>(_effect);
-    if (E) E->UpdateParent(m, velocity, bXFORM);
+    if (E)
+        E->UpdateParent(m, velocity, bXFORM);
 }
 //------------------------------------------------------------------------------
 void OnGroupParticleBirth(void* owner, u32 param, PAPI::Particle& m, u32 idx)
@@ -333,7 +336,8 @@ void OnGroupParticleDead(void* owner, u32 param, PAPI::Particle& m, u32 idx)
     const CPGDef* PGD = PG->GetDefinition();
     VERIFY(PGD);
     const CPGDef::SEffect* eff = PGD->m_Effects[param];
-    if (eff->m_Flags.is(CPGDef::SEffect::flOnPlayChild)) PG->items[param].StopRelatedChild(idx);
+    if (eff->m_Flags.is(CPGDef::SEffect::flOnPlayChild))
+        PG->items[param].StopRelatedChild(idx);
     if (eff->m_Flags.is(CPGDef::SEffect::flOnDeadChild))
         PG->items[param].StartFreeChild(PE, *eff->m_OnDeadChildName, m);
 }
@@ -345,17 +349,22 @@ struct zero_vis_pred : public std::unary_function<dxRender_Visual*, bool>
 void CParticleGroup::SItem::OnFrame(u32 u_dt, const CPGDef::SEffect& def, Fbox& box, bool& bPlaying)
 {
     CParticleEffect* E = static_cast<CParticleEffect*>(_effect);
-    if (E) {
+    if (E)
+    {
         E->OnFrame(u_dt);
-        if (E->IsPlaying()) {
+        if (E->IsPlaying())
+        {
             bPlaying = true;
-            if (E->vis.box.is_valid()) box.merge(E->vis.box);
-            if (def.m_Flags.is(CPGDef::SEffect::flOnPlayChild) && def.m_OnPlayChildName.size()) {
+            if (E->vis.box.is_valid())
+                box.merge(E->vis.box);
+            if (def.m_Flags.is(CPGDef::SEffect::flOnPlayChild) && def.m_OnPlayChildName.size())
+            {
                 PAPI::Particle* particles;
                 u32 p_cnt;
                 PAPI::ParticleManager()->GetParticles(E->GetHandleEffect(), particles, p_cnt);
                 VERIFY(p_cnt == _children_related.size());
-                if (p_cnt) {
+                if (p_cnt)
+                {
                     for (u32 i = 0; i < p_cnt; i++)
                     {
                         PAPI::Particle& m = particles[i];
@@ -372,35 +381,44 @@ void CParticleGroup::SItem::OnFrame(u32 u_dt, const CPGDef::SEffect& def, Fbox& 
         }
     }
     VisualVecIt it;
-    if (!_children_related.empty()) {
+    if (!_children_related.empty())
+    {
         for (it = _children_related.begin(); it != _children_related.end(); it++)
         {
             CParticleEffect* E = static_cast<CParticleEffect*>(*it);
-            if (E) {
+            if (E)
+            {
                 E->OnFrame(u_dt);
-                if (E->IsPlaying()) {
+                if (E->IsPlaying())
+                {
                     bPlaying = true;
-                    if (E->vis.box.is_valid()) box.merge(E->vis.box);
+                    if (E->vis.box.is_valid())
+                        box.merge(E->vis.box);
                 }
                 else
                 {
-                    if (def.m_Flags.is(CPGDef::SEffect::flOnPlayChildRewind)) {
+                    if (def.m_Flags.is(CPGDef::SEffect::flOnPlayChildRewind))
+                    {
                         E->Play();
                     }
                 }
             }
         }
     }
-    if (!_children_free.empty()) {
+    if (!_children_free.empty())
+    {
         u32 rem_cnt = 0;
         for (it = _children_free.begin(); it != _children_free.end(); it++)
         {
             CParticleEffect* E = static_cast<CParticleEffect*>(*it);
-            if (E) {
+            if (E)
+            {
                 E->OnFrame(u_dt);
-                if (E->IsPlaying()) {
+                if (E->IsPlaying())
+                {
                     bPlaying = true;
-                    if (E->vis.box.is_valid()) box.merge(E->vis.box);
+                    if (E->vis.box.is_valid())
+                        box.merge(E->vis.box);
                 }
                 else
                 {
@@ -413,7 +431,8 @@ void CParticleGroup::SItem::OnFrame(u32 u_dt, const CPGDef::SEffect& def, Fbox& 
             }
         }
         // remove if stopped
-        if (rem_cnt) {
+        if (rem_cnt)
+        {
             VisualVecIt new_end = std::remove_if(_children_free.begin(), _children_free.end(), zero_vis_pred());
             _children_free.erase(new_end, _children_free.end());
         }
@@ -463,28 +482,33 @@ CParticleGroup::~CParticleGroup()
 
 void CParticleGroup::OnFrame(u32 u_dt)
 {
-    if (m_Def && m_RT_Flags.is(flRT_Playing)) {
+    if (m_Def && m_RT_Flags.is(flRT_Playing))
+    {
         float ct = m_CurrentTime;
         float f_dt = float(u_dt) / 1000.f;
         for (CPGDef::EffectVec::const_iterator e_it = m_Def->m_Effects.begin(); e_it != m_Def->m_Effects.end(); e_it++)
         {
-            if ((*e_it)->m_Flags.is(CPGDef::SEffect::flEnabled)) {
+            if ((*e_it)->m_Flags.is(CPGDef::SEffect::flEnabled))
+            {
                 VERIFY(items.size() == m_Def->m_Effects.size());
                 SItem& I = items[e_it - m_Def->m_Effects.begin()];
-                if (I.IsPlaying()) {
+                if (I.IsPlaying())
+                {
                     if ((ct <= (*e_it)->m_Time1) && (ct + f_dt >= (*e_it)->m_Time1))
                         I.Stop((*e_it)->m_Flags.is(CPGDef::SEffect::flDefferedStop));
                 }
                 else
                 {
                     if (!m_RT_Flags.is(flRT_DefferedStop))
-                        if ((ct <= (*e_it)->m_Time0) && (ct + f_dt >= (*e_it)->m_Time0)) I.Play();
+                        if ((ct <= (*e_it)->m_Time0) && (ct + f_dt >= (*e_it)->m_Time0))
+                            I.Play();
                 }
             }
         }
         m_CurrentTime += f_dt;
         if ((m_CurrentTime > m_Def->m_fTimeLimit) && (m_Def->m_fTimeLimit > 0.f))
-            if (!m_RT_Flags.is(flRT_DefferedStop)) Stop(true);
+            if (!m_RT_Flags.is(flRT_DefferedStop))
+                Stop(true);
 
         bool bPlaying = false;
         Fbox box;
@@ -492,10 +516,12 @@ void CParticleGroup::OnFrame(u32 u_dt)
         for (SItemVecIt i_it = items.begin(); i_it != items.end(); i_it++)
             i_it->OnFrame(u_dt, *m_Def->m_Effects[i_it - items.begin()], box, bPlaying);
 
-        if (m_RT_Flags.is(flRT_DefferedStop) && !bPlaying) {
+        if (m_RT_Flags.is(flRT_DefferedStop) && !bPlaying)
+        {
             m_RT_Flags.set(flRT_Playing | flRT_DefferedStop, FALSE);
         }
-        if (box.is_valid()) {
+        if (box.is_valid())
+        {
             vis.box.set(box);
             vis.box.getsphere(vis.sphere.P, vis.sphere.R);
         }
@@ -523,7 +549,8 @@ BOOL CParticleGroup::Compile(CPGDef* def)
         i_it->Clear();
     items.clear();
     // create new
-    if (m_Def) {
+    if (m_Def)
+    {
         items.resize(m_Def->m_Effects.size());
         for (CPGDef::EffectVec::const_iterator e_it = m_Def->m_Effects.begin(); e_it != m_Def->m_Effects.end(); e_it++)
         {
@@ -544,7 +571,8 @@ void CParticleGroup::Play()
 
 void CParticleGroup::Stop(BOOL bDefferedStop)
 {
-    if (bDefferedStop) {
+    if (bDefferedStop)
+    {
         m_RT_Flags.set(flRT_DefferedStop, TRUE);
     }
     else
@@ -586,7 +614,8 @@ void CParticleGroup::SetHudMode(BOOL b)
 
 BOOL CParticleGroup::GetHudMode()
 {
-    if (items.size()) {
+    if (items.size())
+    {
         CParticleEffect* E = static_cast<CParticleEffect*>(items[0]._effect);
         return E->GetHudMode();
     }

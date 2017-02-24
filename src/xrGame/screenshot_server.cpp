@@ -10,14 +10,13 @@
 extern BOOL g_sv_mp_save_proxy_screenshots;
 extern BOOL g_sv_mp_save_proxy_configs;
 
-clientdata_proxy::clientdata_proxy(file_transfer::server_site* ft_server) : m_ft_server(ft_server)
-{
-}
-
+clientdata_proxy::clientdata_proxy(file_transfer::server_site* ft_server) : m_ft_server(ft_server) {}
 clientdata_proxy::~clientdata_proxy()
 {
-    if (is_active()) {
-        if (m_ft_server->is_receiving_active(m_chearer_id)) m_ft_server->stop_receive_file(m_chearer_id);
+    if (is_active())
+    {
+        if (m_ft_server->is_receiving_active(m_chearer_id))
+            m_ft_server->stop_receive_file(m_chearer_id);
         if (m_ft_server->is_transfer_active(m_admin_id, m_chearer_id))
             m_ft_server->stop_transfer_file(std::make_pair(m_admin_id, m_chearer_id));
     }
@@ -28,11 +27,13 @@ void clientdata_proxy::make_screenshot(ClientID const& admin_id, ClientID const&
     m_admin_id = admin_id;
     m_chearer_id = cheater_id;
     xrClientData* tmp_cheater = static_cast<xrClientData*>(Level().Server->GetClientByID(m_chearer_id));
-    if (!tmp_cheater) {
+    if (!tmp_cheater)
+    {
         Msg("! ERROR: SV: client [%u] not found ...", cheater_id.value());
         return;
     }
-    if (m_ft_server->is_receiving_active(cheater_id)) {
+    if (m_ft_server->is_receiving_active(cheater_id))
+    {
         Msg("! Receiving from client [%u] already active, please try later", cheater_id.value());
         return;
     }
@@ -41,10 +42,10 @@ void clientdata_proxy::make_screenshot(ClientID const& admin_id, ClientID const&
     NET_Packet ssr_packet;
     ssr_packet.w_begin(M_GAMEMESSAGE);
     ssr_packet.w_u32(GAME_EVENT_MAKE_DATA);
-    ssr_packet.w_u8(e_screenshot_request);  // make screenshot
+    ssr_packet.w_u8(e_screenshot_request); // make screenshot
 
     // alligning size to GAME_EVENT_PLAYER_KILLED message size
-    ssr_packet.w_u16(u16(Random.randI(2)));  // food for thought for crackers :)
+    ssr_packet.w_u16(u16(Random.randI(2))); // food for thought for crackers :)
     ssr_packet.w_u16(u16(Random.randI(2)));
     ssr_packet.w_u16(u16(Random.randI(2)));
     ssr_packet.w_u8(u8(Random.randI(2)));
@@ -53,7 +54,8 @@ void clientdata_proxy::make_screenshot(ClientID const& admin_id, ClientID const&
 
     file_transfer::receiving_state_callback_t receiving_cb =
         fastdelegate::MakeDelegate(this, &clientdata_proxy::download_screenshot_callback);
-    if (my_proxy_mem_file.size()) my_proxy_mem_file.clear();
+    if (my_proxy_mem_file.size())
+        my_proxy_mem_file.clear();
     m_first_receive = true;
     m_receiver = m_ft_server->start_receive_file(my_proxy_mem_file, m_chearer_id, receiving_cb);
 }
@@ -63,11 +65,13 @@ void clientdata_proxy::make_config_dump(ClientID const& admin_id, ClientID const
     m_admin_id = admin_id;
     m_chearer_id = cheater_id;
     xrClientData* tmp_cheater = static_cast<xrClientData*>(Level().Server->GetClientByID(m_chearer_id));
-    if (!tmp_cheater) {
+    if (!tmp_cheater)
+    {
         Msg("! ERROR: SV: client [%u] not found ...", cheater_id.value());
         return;
     }
-    if (m_ft_server->is_receiving_active(cheater_id)) {
+    if (m_ft_server->is_receiving_active(cheater_id))
+    {
         Msg("! Receiving from client [%u] already active, please try later", cheater_id.value());
         return;
     }
@@ -76,10 +80,10 @@ void clientdata_proxy::make_config_dump(ClientID const& admin_id, ClientID const
     NET_Packet ssr_packet;
     ssr_packet.w_begin(M_GAMEMESSAGE);
     ssr_packet.w_u32(GAME_EVENT_MAKE_DATA);
-    ssr_packet.w_u8(e_configs_request);  // make screenshot
+    ssr_packet.w_u8(e_configs_request); // make screenshot
 
     // alligning size to GAME_EVENT_PLAYER_KILLED message size
-    ssr_packet.w_u16(u16(Random.randI(2)));  // food for thought for crackers :)
+    ssr_packet.w_u16(u16(Random.randI(2))); // food for thought for crackers :)
     ssr_packet.w_u16(u16(Random.randI(2)));
     ssr_packet.w_u16(u16(Random.randI(2)));
     ssr_packet.w_u8(u8(Random.randI(2)));
@@ -88,7 +92,8 @@ void clientdata_proxy::make_config_dump(ClientID const& admin_id, ClientID const
 
     file_transfer::receiving_state_callback_t receiving_cb =
         fastdelegate::MakeDelegate(this, &clientdata_proxy::download_config_callback);
-    if (my_proxy_mem_file.size()) my_proxy_mem_file.clear();
+    if (my_proxy_mem_file.size())
+        my_proxy_mem_file.clear();
     m_first_receive = true;
     m_receiver = m_ft_server->start_receive_file(my_proxy_mem_file, m_chearer_id, receiving_cb);
 }
@@ -104,10 +109,11 @@ void clientdata_proxy::notify_admin(clientdata_event_t event_for_admin, char con
     NET_Packet ssr_packet;
     ssr_packet.w_begin(M_GAMEMESSAGE);
     ssr_packet.w_u32(GAME_EVENT_MAKE_DATA);
-    ssr_packet.w_u8(static_cast<u8>(event_for_admin));  // receive data
+    ssr_packet.w_u8(static_cast<u8>(event_for_admin)); // receive data
     ssr_packet.w_u32(m_chearer_id.value());
 
-    if ((event_for_admin == e_screenshot_response) || (event_for_admin == e_configs_response)) {
+    if ((event_for_admin == e_screenshot_response) || (event_for_admin == e_configs_response))
+    {
         ssr_packet.w_stringZ(m_cheater_name);
     }
     else
@@ -120,7 +126,8 @@ void clientdata_proxy::notify_admin(clientdata_event_t event_for_admin, char con
 void clientdata_proxy::save_proxy_screenshot()
 {
     game_cl_mp* clgame = smart_cast<game_cl_mp*>(Level().game);
-    if (!clgame) return;
+    if (!clgame)
+        return;
 
     string_path screenshot_fn;
     string_path str_digest;
@@ -139,7 +146,8 @@ void clientdata_proxy::save_proxy_screenshot()
 void clientdata_proxy::save_proxy_config()
 {
     game_cl_mp* clgame = smart_cast<game_cl_mp*>(Level().game);
-    if (!clgame) return;
+    if (!clgame)
+        return;
 
     string_path config_fn;
     LPCSTR fn_suffix = NULL;
@@ -151,8 +159,9 @@ void clientdata_proxy::save_proxy_config()
     GetLocalTime(&date_time);
     clgame->generate_file_name(dest_file_name, fn_suffix, date_time);
     IWriter* tmp_writer = FS.w_open("$screenshots$", dest_file_name);
-    if (!tmp_writer) return;
-    tmp_writer->w_u32(m_receiver->get_user_param());  // unpacked size
+    if (!tmp_writer)
+        return;
+    tmp_writer->w_u32(m_receiver->get_user_param()); // unpacked size
     tmp_writer->w(my_proxy_mem_file.pointer(), my_proxy_mem_file.size());
     FS.w_close(tmp_writer);
 }
@@ -164,7 +173,8 @@ void clientdata_proxy::download_screenshot_callback(file_transfer::receiving_sta
     case file_transfer::receiving_data:
     {
         Msg("* downloaded %d from %d bytes of screenshot from client [%d]", downloaded, total, m_chearer_id);
-        if (m_first_receive) {
+        if (m_first_receive)
+        {
             notify_admin(e_screenshot_response, "prepare for receive...");
             file_transfer::sending_state_callback_t sending_cb =
                 fastdelegate::MakeDelegate(this, &clientdata_proxy::upload_file_callback);
@@ -196,7 +206,8 @@ void clientdata_proxy::download_screenshot_callback(file_transfer::receiving_sta
     break;
     case file_transfer::receiving_complete:
     {
-        if (m_first_receive) {
+        if (m_first_receive)
+        {
             notify_admin(e_screenshot_response, "prepare for receive...");
             file_transfer::sending_state_callback_t sending_cb =
                 fastdelegate::MakeDelegate(this, &clientdata_proxy::upload_file_callback);
@@ -204,7 +215,8 @@ void clientdata_proxy::download_screenshot_callback(file_transfer::receiving_sta
                 my_proxy_mem_file, total, m_admin_id, m_chearer_id, sending_cb, m_receiver->get_user_param());
             m_first_receive = false;
         }
-        if (g_sv_mp_save_proxy_screenshots) {
+        if (g_sv_mp_save_proxy_screenshots)
+        {
             save_proxy_screenshot();
         }
     }
@@ -219,7 +231,8 @@ void clientdata_proxy::download_config_callback(file_transfer::receiving_status_
     case file_transfer::receiving_data:
     {
         Msg("* downloaded %d from %d bytes of config from client [%d]", downloaded, total, m_chearer_id);
-        if (m_first_receive) {
+        if (m_first_receive)
+        {
             notify_admin(e_configs_response, "prepare for receive...");
             file_transfer::sending_state_callback_t sending_cb =
                 fastdelegate::MakeDelegate(this, &clientdata_proxy::upload_file_callback);
@@ -250,7 +263,8 @@ void clientdata_proxy::download_config_callback(file_transfer::receiving_status_
     break;
     case file_transfer::receiving_complete:
     {
-        if (m_first_receive) {
+        if (m_first_receive)
+        {
             notify_admin(e_configs_response, "prepare for receive...");
             file_transfer::sending_state_callback_t sending_cb =
                 fastdelegate::MakeDelegate(this, &clientdata_proxy::upload_file_callback);
@@ -258,7 +272,8 @@ void clientdata_proxy::download_config_callback(file_transfer::receiving_status_
                 my_proxy_mem_file, total, m_admin_id, m_chearer_id, sending_cb, m_receiver->get_user_param());
             m_first_receive = false;
         }
-        if (g_sv_mp_save_proxy_configs) {
+        if (g_sv_mp_save_proxy_configs)
+        {
             save_proxy_config();
         }
     }

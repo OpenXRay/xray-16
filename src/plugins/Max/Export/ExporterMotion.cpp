@@ -18,8 +18,10 @@ BOOL CExporter::ExportMotion(INode* pNode, LPCSTR fname)
     int i = U.ip->GetSelNodeCount();
     while (i--)
         ScanMesh(U.ip->GetSelNode(i));
-    if (!Capture()) return FALSE;
-    if (m_bHasError) return FALSE;
+    if (!Capture())
+        return FALSE;
+    if (m_bHasError)
+        return FALSE;
 
     int iFPS = GetFrameRate();
     int iTPF = GetTicksPerFrame();

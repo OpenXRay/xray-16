@@ -46,7 +46,7 @@ protected:
 protected:
     Fvector m_holder_start_position;
     Fvector m_object_start_position;
-    u32 m_state_fire_object;  // 0 : standard object navigation, 1 : vis_point navigation
+    u32 m_state_fire_object; // 0 : standard object navigation, 1 : vis_point navigation
     u32 m_state_fire_switch_time;
     bool m_already_switched;
     bool m_initialized;

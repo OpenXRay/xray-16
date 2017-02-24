@@ -14,16 +14,8 @@ IC u32 CScriptSound::Length()
     return iFloor(m_sound.get_length_sec() * 1000.0f);
 }
 
-IC void CScriptSound::Play(CScriptGameObject* object)
-{
-    Play(object, 0.f, 0);
-}
-
-IC void CScriptSound::Play(CScriptGameObject* object, float delay)
-{
-    Play(object, delay, 0);
-}
-
+IC void CScriptSound::Play(CScriptGameObject* object) { Play(object, 0.f, 0); }
+IC void CScriptSound::Play(CScriptGameObject* object, float delay) { Play(object, delay, 0); }
 IC void CScriptSound::PlayAtPos(CScriptGameObject* object, const Fvector& position)
 {
     PlayAtPos(object, position, 0.f, 0);
@@ -77,11 +69,7 @@ IC bool CScriptSound::IsPlaying() const
     return (!!m_sound._feedback());
 }
 
-IC void CScriptSound::AttachTail(LPCSTR caSoundName)
-{
-    m_sound.attach_tail(caSoundName);
-}
-
+IC void CScriptSound::AttachTail(LPCSTR caSoundName) { m_sound.attach_tail(caSoundName); }
 IC void CScriptSound::Stop()
 {
     VERIFY(m_sound._handle());

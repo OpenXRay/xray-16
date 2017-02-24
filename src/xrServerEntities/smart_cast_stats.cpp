@@ -24,7 +24,6 @@ private:
         u32 m_count;
 
         IC CStats(LPCSTR from, LPCSTR to, u32 count) : m_from(from), m_to(to), m_count(count) {}
-
         IC bool operator<(const CStats& stats) const
         {
             return ((m_from < stats.m_from) || ((m_from == stats.m_from) && (m_to < stats.m_to)));
@@ -57,26 +56,20 @@ CSmartCastStats* CSmartCastStats::m_instance = 0;
 
 IC CSmartCastStats* CSmartCastStats::instance()
 {
-    if (!m_instance) m_instance = new CSmartCastStats();
+    if (!m_instance)
+        m_instance = new CSmartCastStats();
     return (m_instance);
 }
 
-IC void CSmartCastStats::_release()
-{
-    xr_delete(m_instance);
-}
-
-IC CSmartCastStats& stats()
-{
-    return (*CSmartCastStats::instance());
-}
-
+IC void CSmartCastStats::_release() { xr_delete(m_instance); }
+IC CSmartCastStats& stats() { return (*CSmartCastStats::instance()); }
 #ifdef SMART_CAST_STATS_ALL
 CSmartCastStats* g_smart_cast_opt = 0;
 
 IC CSmartCastStats& stats_all()
 {
-    if (!g_smart_cast_opt) g_smart_cast_opt = new CSmartCastStats();
+    if (!g_smart_cast_opt)
+        g_smart_cast_opt = new CSmartCastStats();
     return (*g_smart_cast_opt);
 }
 #endif
@@ -91,14 +84,11 @@ IC void CSmartCastStats::add(LPCSTR from, LPCSTR to)
         ++(const_cast<CStats&>(*I).m_count);
 }
 
-IC void CSmartCastStats::clear()
-{
-    m_stats.clear();
-}
-
+IC void CSmartCastStats::clear() { m_stats.clear(); }
 IC void CSmartCastStats::show()
 {
-    if (m_stats.empty()) {
+    if (m_stats.empty())
+    {
         Msg("CONGRATULATIONS : SmartCast stats is empty!!!");
         return;
     }
@@ -171,4 +161,4 @@ void release_smart_cast_stats()
 #endif
 }
 
-#endif  // DEBUG
+#endif // DEBUG

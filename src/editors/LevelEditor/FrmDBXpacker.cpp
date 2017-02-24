@@ -26,7 +26,8 @@ __fastcall TDB_packer::TDB_packer(TComponent* Owner) : TForm(Owner)
 //---------------------------------------------------------------------------
 void __fastcall TDB_packer::ActivatePacker()
 {
-    if (!m_form) {
+    if (!m_form)
+    {
         m_form = new TDB_packer((TComponent*)0);
     }
     m_form->prepare();
@@ -42,7 +43,8 @@ void __fastcall TDB_packer::prepare()
     string16 tmp;
     tmp[0] = 0;
 
-    if (_curr_path[sz - 1] != '\\') strcpy(tmp, "\\");
+    if (_curr_path[sz - 1] != '\\')
+        strcpy(tmp, "\\");
 
     strconcat(sizeof(m_root_folder), m_root_folder, _curr_path, tmp, pth->m_Path);
 
@@ -77,7 +79,8 @@ void TDB_packer::_load_(const xr_string& fname)
 
     CInifile ini(fname.c_str());
 
-    if (ini.section_exist("include_folders")) {
+    if (ini.section_exist("include_folders"))
+    {
         CInifile::Sect S = ini.r_section("include_folders");
         CInifile::SectCIt it = S.Data.begin();
         CInifile::SectCIt it_e = S.Data.end();
@@ -88,7 +91,8 @@ void TDB_packer::_load_(const xr_string& fname)
             lbIncludeFolders->Items->Add(ws);
         }
     }
-    if (ini.section_exist("include_files")) {
+    if (ini.section_exist("include_files"))
+    {
         CInifile::Sect S = ini.r_section("include_files");
         CInifile::SectCIt it = S.Data.begin();
         CInifile::SectCIt it_e = S.Data.end();
@@ -104,7 +108,8 @@ void TDB_packer::_load_(const xr_string& fname)
 
 void __fastcall TDB_packer::btnLoadClick(TObject* Sender)
 {
-    if (EFS.GetOpenName("$fs_root$", m_cfgFileName, false, NULL, 0)) {
+    if (EFS.GetOpenName("$fs_root$", m_cfgFileName, false, NULL, 0))
+    {
         _load_(m_cfgFileName);
     }
 }
@@ -117,7 +122,8 @@ void remove_item_from_lb(TElListBox* lb)
         b = false;
         for (int i = 0; i < lb->Items->Count; ++i)
         {
-            if (lb->Selected[i]) {
+            if (lb->Selected[i])
+            {
                 lb->Items->Delete(i);
                 b = true;
                 break;
@@ -126,24 +132,17 @@ void remove_item_from_lb(TElListBox* lb)
     }
 }
 
-void __fastcall TDB_packer::ExtBtn2Click(TObject* Sender)
-{
-    remove_item_from_lb(lbIncludeFolders);
-}
-
+void __fastcall TDB_packer::ExtBtn2Click(TObject* Sender) { remove_item_from_lb(lbIncludeFolders); }
 //---------------------------------------------------------------------------
 
-void __fastcall TDB_packer::ExtBtn4Click(TObject* Sender)
-{
-    remove_item_from_lb(lbIncludeFiles);
-}
-
+void __fastcall TDB_packer::ExtBtn4Click(TObject* Sender) { remove_item_from_lb(lbIncludeFiles); }
 //---------------------------------------------------------------------------
 
 void __fastcall TDB_packer::ExtBtn1Click(TObject* Sender)
 {
     TElShellTreeItem* itm = shellTree->ItemFocused;
-    if (itm->IsFolder) {
+    if (itm->IsFolder)
+    {
         AnsiString str = itm->FullName;
         int root_len = xr_strlen(m_root_folder);
         int len = str.Length();
@@ -156,7 +155,8 @@ void __fastcall TDB_packer::ExtBtn1Click(TObject* Sender)
 void __fastcall TDB_packer::ExtBtn3Click(TObject* Sender)
 {
     TElShellTreeItem* itm = shellTree->ItemFocused;
-    if (!itm->IsFolder) {
+    if (!itm->IsFolder)
+    {
         AnsiString str = itm->FullName;
         int root_len = xr_strlen(m_root_folder);
         int len = str.Length();

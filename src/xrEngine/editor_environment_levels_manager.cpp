@@ -21,10 +21,7 @@ using editor::environment::levels::manager;
 static LPCSTR s_default_weather_id = "[default]";
 static LPCSTR s_level_section_id = "levels";
 
-manager::manager(::editor::environment::weathers::manager* weathers) : m_weathers(*weathers), m_property_holder(0)
-{
-}
-
+manager::manager(::editor::environment::weathers::manager* weathers) : m_weathers(*weathers), m_property_holder(0) {}
 manager::~manager()
 {
     VERIFY(m_config_single);
@@ -35,7 +32,8 @@ manager::~manager()
     CInifile::Destroy(m_config_mp);
     m_config_mp = 0;
 
-    if (!Device.editor()) return;
+    if (!Device.editor())
+        return;
 
     ::ide().destroy(m_property_holder);
 }
@@ -51,10 +49,12 @@ void manager::fill_levels(CInifile& config, LPCSTR prefix, LPCSTR category)
     CInifile::Items::const_iterator e = section.end();
     for (; i != e; ++i)
     {
-        if (!(*i).first.size()) continue;
+        if (!(*i).first.size())
+            continue;
 
         VERIFY(config.section_exist((*i).first));
-        if (!config.line_exist((*i).first, "weathers")) {
+        if (!config.line_exist((*i).first, "weathers"))
+        {
             m_levels.insert(std::make_pair((*i).first.c_str(), std::make_pair(category, s_default_weather_id)));
             continue;
         }
@@ -77,16 +77,8 @@ void manager::load()
     fill_levels(*m_config_mp, "mp", "multiplayer");
 }
 
-LPCSTR const* manager::collection()
-{
-    return (&*m_weathers.weather_ids().begin());
-}
-
-u32 manager::collection_size()
-{
-    return (m_weathers.weather_ids().size());
-}
-
+LPCSTR const* manager::collection() { return (&*m_weathers.weather_ids().begin()); }
+u32 manager::collection_size() { return (m_weathers.weather_ids().size()); }
 void manager::fill()
 {
     VERIFY(!m_property_holder);
@@ -115,4 +107,4 @@ void manager::fill()
     ::ide().environment_levels(m_property_holder);
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

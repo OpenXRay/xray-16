@@ -29,5 +29,5 @@ extern XRCORE_API Skin4WFunc Skin4W;
 extern XRCORE_API PLCCalcFunc PLCCalc;
 
 void XRCORE_API Initialize();
-}  // namespace Math
-}  // namespace XRay
+} // namespace Math
+} // namespace XRay

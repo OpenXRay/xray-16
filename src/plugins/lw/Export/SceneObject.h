@@ -28,7 +28,8 @@ private:
 public:
     virtual void SetScale(const Fvector& scale)
     {
-        if (m_pReference && m_pReference->IsDynamic()) {
+        if (m_pReference && m_pReference->IsDynamic())
+        {
             ELog.Msg(mtError, "Dynamic object %s - can't scale.", Name);
         }
         else
@@ -62,7 +63,6 @@ public:
     IC EditMeshVec* Meshes() { return m_pReference ? &m_pReference->Meshes() : 0; }
     virtual LPCSTR RefName() { return m_pReference ? m_pReference->GetName() : 0; }
     virtual bool CanAttach() { return true; }
-
     // statistics methods
     IC bool IsDynamic() { return (m_pReference ? m_pReference->IsDynamic() : false); }
     IC bool IsStatic() { return (m_pReference ? m_pReference->IsStatic() : false); }

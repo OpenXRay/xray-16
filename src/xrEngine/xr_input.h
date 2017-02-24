@@ -50,9 +50,9 @@ public:
 
 private:
     BENCH_SEC_SCRAMBLEMEMBER1
-    LPDIRECTINPUT8 pDI;              // The DInput object
-    LPDIRECTINPUTDEVICE8 pMouse;     // The DIDevice7 interface
-    LPDIRECTINPUTDEVICE8 pKeyboard;  // The DIDevice7 interface
+    LPDIRECTINPUT8 pDI; // The DInput object
+    LPDIRECTINPUTDEVICE8 pMouse; // The DIDevice7 interface
+    LPDIRECTINPUTDEVICE8 pKeyboard; // The DIDevice7 interface
     //----------------------
     u32 timeStamp[COUNT_MOUSE_AXIS];
     u32 timeSave[COUNT_MOUSE_AXIS];
@@ -112,4 +112,4 @@ public:
 
 extern ENGINE_API CInput* pInput;
 
-#endif  //__XR_INPUT__
+#endif //__XR_INPUT__

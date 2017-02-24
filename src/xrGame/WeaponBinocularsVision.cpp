@@ -62,7 +62,8 @@ void SBinocVisibleObj::create_default(u32 color)
 
 void SBinocVisibleObj::Draw()
 {
-    if (m_flags.test(flVisObjNotValid)) return;
+    if (m_flags.test(flVisObjNotValid))
+        return;
 
     m_lt.Draw();
     m_lb.Draw();
@@ -74,7 +75,8 @@ void SBinocVisibleObj::Update()
 {
     m_flags.set(flVisObjNotValid, TRUE);
 
-    if (!m_object->Visual()) return;
+    if (!m_object->Visual())
+        return;
 
     Fbox b = m_object->Visual()->getVisData().box;
 
@@ -98,8 +100,10 @@ void SBinocVisibleObj::Update()
     new_rect.lt = mn;
     new_rect.rb = mx;
 
-    if (FALSE == screen_rect.intersected(new_rect)) return;
-    if (new_rect.in(screen_rect.lt) && new_rect.in(screen_rect.rb)) return;
+    if (FALSE == screen_rect.intersected(new_rect))
+        return;
+    if (new_rect.in(screen_rect.lt) && new_rect.in(screen_rect.rb))
+        return;
 
     std::swap(mn.y, mx.y);
     mn.x = (1.f + mn.x) / 2.f * UI_BASE_WIDTH;
@@ -107,11 +111,14 @@ void SBinocVisibleObj::Update()
     mn.y = (1.f - mn.y) / 2.f * UI_BASE_HEIGHT;
     mx.y = (1.f - mx.y) / 2.f * UI_BASE_HEIGHT;
 
-    if (mx.x - mn.x < RECT_SIZE) mx.x = mn.x + RECT_SIZE;
+    if (mx.x - mn.x < RECT_SIZE)
+        mx.x = mn.x + RECT_SIZE;
 
-    if (mx.y - mn.y < RECT_SIZE) mx.y = mn.y + RECT_SIZE;
+    if (mx.y - mn.y < RECT_SIZE)
+        mx.y = mn.y + RECT_SIZE;
 
-    if (m_flags.is(flTargetLocked)) {
+    if (m_flags.is(flTargetLocked))
+    {
         cur_rect.lt.set(mn);
         cur_rect.rb.set(mx);
     }
@@ -121,7 +128,8 @@ void SBinocVisibleObj::Update()
         cur_rect.lt.y += (mn.y - cur_rect.lt.y) * m_upd_speed * Device.fTimeDelta;
         cur_rect.rb.x += (mx.x - cur_rect.rb.x) * m_upd_speed * Device.fTimeDelta;
         cur_rect.rb.y += (mx.y - cur_rect.rb.y) * m_upd_speed * Device.fTimeDelta;
-        if (mn.similar(cur_rect.lt, 2.f) && mx.similar(cur_rect.rb, 2.f)) {
+        if (mn.similar(cur_rect.lt, 2.f) && mx.similar(cur_rect.rb, 2.f))
+        {
             // target locked
             m_flags.set(flTargetLocked, TRUE);
             u32 clr = subst_alpha(m_lt.GetTextureColor(), 255);
@@ -132,19 +140,23 @@ void SBinocVisibleObj::Update()
                 pActor = Actor();
             else
             {
-                if (Level().CurrentViewEntity()) {
+                if (Level().CurrentViewEntity())
+                {
                     pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
                 }
             }
-            if (pActor) {
+            if (pActor)
+            {
                 //-----------------------------------------------------
 
                 CInventoryOwner* our_inv_owner = smart_cast<CInventoryOwner*>(pActor);
                 CInventoryOwner* others_inv_owner = smart_cast<CInventoryOwner*>(m_object);
                 CBaseMonster* monster = smart_cast<CBaseMonster*>(m_object);
 
-                if (our_inv_owner && others_inv_owner && !monster) {
-                    if (IsGameTypeSingle()) {
+                if (our_inv_owner && others_inv_owner && !monster)
+                {
+                    if (IsGameTypeSingle())
+                    {
                         switch (RELATION_REGISTRY().GetRelationType(others_inv_owner, our_inv_owner))
                         {
                         case ALife::eRelationTypeEnemy: clr = C_ON_ENEMY; break;
@@ -156,7 +168,8 @@ void SBinocVisibleObj::Update()
                     {
                         CEntityAlive* our_ealive = smart_cast<CEntityAlive*>(pActor);
                         CEntityAlive* others_ealive = smart_cast<CEntityAlive*>(m_object);
-                        if (our_ealive && others_ealive) {
+                        if (our_ealive && others_ealive)
+                        {
                             if (Game().IsEnemy(our_ealive, others_ealive))
                                 clr = C_ON_ENEMY;
                             else
@@ -181,30 +194,25 @@ void SBinocVisibleObj::Update()
     m_flags.set(flVisObjNotValid, FALSE);
 }
 
-CBinocularsVision::CBinocularsVision(const shared_str& sect)
-{
-    Load(sect);
-}
-
-CBinocularsVision::~CBinocularsVision()
-{
-    delete_data(m_active_objects);
-}
-
+CBinocularsVision::CBinocularsVision(const shared_str& sect) { Load(sect); }
+CBinocularsVision::~CBinocularsVision() { delete_data(m_active_objects); }
 void CBinocularsVision::Update()
 {
-    if (g_dedicated_server) return;
+    if (g_dedicated_server)
+        return;
     //-----------------------------------------------------
     const CActor* pActor = NULL;
     if (IsGameTypeSingle())
         pActor = Actor();
     else
     {
-        if (Level().CurrentViewEntity()) {
+        if (Level().CurrentViewEntity())
+        {
             pActor = smart_cast<const CActor*>(Level().CurrentViewEntity());
         }
     }
-    if (!pActor) return;
+    if (!pActor)
+        return;
     //-----------------------------------------------------
     const CVisualMemoryManager::VISIBLES& vVisibles = pActor->memory().visual().objects();
 
@@ -216,18 +224,21 @@ void CBinocularsVision::Update()
     for (; v_it != vVisibles.end(); ++v_it)
     {
         const IGameObject* _object_ = (*v_it).m_object;
-        if (!pActor->memory().visual().visible_now(smart_cast<const CGameObject*>(_object_))) continue;
+        if (!pActor->memory().visual().visible_now(smart_cast<const CGameObject*>(_object_)))
+            continue;
 
         IGameObject* object_ = const_cast<IGameObject*>(_object_);
 
         CEntityAlive* EA = smart_cast<CEntityAlive*>(object_);
-        if (!EA || !EA->g_Alive()) continue;
+        if (!EA || !EA->g_Alive())
+            continue;
 
         FindVisObjByObject f(object_);
         VIS_OBJECTS_IT found;
         found = std::find_if(m_active_objects.begin(), m_active_objects.end(), f);
 
-        if (found != m_active_objects.end()) {
+        if (found != m_active_objects.end())
+        {
             (*found)->m_flags.set(flVisObjNotValid, FALSE);
         }
         else
@@ -283,7 +294,8 @@ void CBinocularsVision::remove_links(IGameObject* object)
 {
     VIS_OBJECTS::iterator I =
         std::find_if(m_active_objects.begin(), m_active_objects.end(), FindVisObjByObject(object));
-    if (I == m_active_objects.end()) return;
+    if (I == m_active_objects.end())
+        return;
 
     m_active_objects.erase(I);
 }

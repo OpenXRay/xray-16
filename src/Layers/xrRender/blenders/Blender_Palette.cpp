@@ -5,11 +5,7 @@
 
 //////////////////////////////////////////////////////////////////////
 #include "blender_clsid.h"
-IC bool p_sort(IBlender* A, IBlender* B)
-{
-    return stricmp(A->getComment(), B->getComment()) < 0;
-}
-
+IC bool p_sort(IBlender* A, IBlender* B) { return stricmp(A->getComment(), B->getComment()) < 0; }
 #ifdef __BORLANDC__
 #define TYPES_EQUAL(A, B) (typeid(A) == typeid(B))
 #else
@@ -48,7 +44,8 @@ void IBlender::CreatePalette(xr_vector<IBlender*>& palette)
         for (u32 j = i + 1; j < palette.size(); j++)
         {
             IBlender* B = palette[j];
-            if (TYPES_EQUAL(*A, *B)) {
+            if (TYPES_EQUAL(*A, *B))
+            {
                 xr_delete(palette[j]);
                 j--;
             }
@@ -62,14 +59,8 @@ void IBlender::CreatePalette(xr_vector<IBlender*>& palette)
 #ifndef _EDITOR
 // Engine
 #include "xrEngine/Render.h"
-IBlender* IBlender::Create(CLASS_ID cls)
-{
-    return ::RImplementation.blender_create(cls);
-}
-void IBlender::Destroy(IBlender*& B)
-{
-    ::RImplementation.blender_destroy(B);
-}
+IBlender* IBlender::Create(CLASS_ID cls) { return ::RImplementation.blender_create(cls); }
+void IBlender::Destroy(IBlender*& B) { ::RImplementation.blender_destroy(B); }
 #else
 
 // Editor
@@ -122,8 +113,5 @@ IBlender* IBlender::Create(CLASS_ID cls)
     }
     return 0;
 }
-void IBlender::Destroy(IBlender*& B)
-{
-    xr_delete(B);
-}
+void IBlender::Destroy(IBlender*& B) { xr_delete(B); }
 #endif

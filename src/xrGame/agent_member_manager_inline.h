@@ -15,7 +15,6 @@ protected:
 
 public:
     IC CMemberPredicate(const CAI_Stalker* object) { m_object = object; }
-
     IC bool operator()(const CMemberOrder* order) const { return (&order->object() == m_object); }
 };
 
@@ -33,16 +32,8 @@ IC CAgentManager& CAgentMemberManager::object() const
     return (*m_object);
 }
 
-IC const CAgentMemberManager::MEMBER_STORAGE& CAgentMemberManager::members() const
-{
-    return (m_members);
-}
-
-IC CAgentMemberManager::MEMBER_STORAGE& CAgentMemberManager::members()
-{
-    return (m_members);
-}
-
+IC const CAgentMemberManager::MEMBER_STORAGE& CAgentMemberManager::members() const { return (m_members); }
+IC CAgentMemberManager::MEMBER_STORAGE& CAgentMemberManager::members() { return (m_members); }
 IC CMemberOrder& CAgentMemberManager::member(const CAI_Stalker* object)
 {
     iterator I = std::find_if(members().begin(), members().end(), CMemberPredicate(object));
@@ -62,29 +53,15 @@ IC CAgentMemberManager::iterator CAgentMemberManager::member(MemorySpace::squad_
     iterator I = m_members.begin();
     iterator E = m_members.end();
     for (; I != E; ++I, mask >>= 1)
-        if (mask == 1) return (I);
+        if (mask == 1)
+            return (I);
     NODEFAULT;
 #ifdef DEBUG
     return (E);
 #endif
 }
 
-IC bool CAgentMemberManager::group_behaviour() const
-{
-    return (members().size() > 1);
-}
-
-IC const CAgentMemberManager::squad_mask_type& CAgentMemberManager::combat_mask() const
-{
-    return (m_combat_mask);
-}
-
-IC const u32& CAgentMemberManager::throw_time_interval() const
-{
-    return (m_throw_time_interval);
-}
-
-IC void CAgentMemberManager::throw_time_interval(const u32& value)
-{
-    m_throw_time_interval = value;
-}
+IC bool CAgentMemberManager::group_behaviour() const { return (members().size() > 1); }
+IC const CAgentMemberManager::squad_mask_type& CAgentMemberManager::combat_mask() const { return (m_combat_mask); }
+IC const u32& CAgentMemberManager::throw_time_interval() const { return (m_throw_time_interval); }
+IC void CAgentMemberManager::throw_time_interval(const u32& value) { m_throw_time_interval = value; }

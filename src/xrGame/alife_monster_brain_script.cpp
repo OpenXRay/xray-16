@@ -13,11 +13,7 @@
 
 using namespace luabind;
 
-CALifeMonsterMovementManager* get_movement(const CALifeMonsterBrain* brain)
-{
-    return (&brain->movement());
-}
-
+CALifeMonsterMovementManager* get_movement(const CALifeMonsterBrain* brain) { return (&brain->movement()); }
 SCRIPT_EXPORT(CALifeMonsterBrain, (), {
     module(luaState)[class_<CALifeMonsterBrain>("CALifeMonsterBrain")
                          .def("movement", &get_movement)

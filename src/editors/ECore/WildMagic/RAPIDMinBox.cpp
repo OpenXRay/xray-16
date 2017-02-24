@@ -25,7 +25,8 @@ void compute_moment(moment& M, Fvector& p, Fvector& q, Fvector& r)
     w.crossproduct(u, v);
     M.A = 0.5f * w.magnitude();
 
-    if (M.A == 0.0f) {
+    if (M.A == 0.0f)
+    {
         // This triangle has zero area.  The second order components
         // would be eliminated with the usual formula, so, for the
         // sake of robustness we use an alternative form.  These are the
@@ -79,7 +80,8 @@ void compute_moments(moment* M, Fvector* vertices, int num_tris)
     for (i = 0; i < num_tris; i++)
     {
         compute_moment(M[i], vertices[i * 3 + 0], vertices[i * 3 + 1], vertices[i * 3 + 2]);
-        if (M[i].A == 0.0f) {
+        if (M[i].A == 0.0f)
+        {
             zero = 1;
         }
         else
@@ -91,16 +93,19 @@ void compute_moments(moment* M, Fvector* vertices, int num_tris)
         }
     }
 
-    if (zero) {
+    if (zero)
+    {
         // if there are any zero area triangles, go back and set their area
 
         // if ALL the triangles have zero area, then set the area thingy
         // to some arbitrary value.
-        if (Amin == 0.0f) Amin = 1.0f;
+        if (Amin == 0.0f)
+            Amin = 1.0f;
 
         for (i = 0; i < num_tris; i++)
         {
-            if (M[i].A == 0.0f) M[i].A = Amin;
+            if (M[i].A == 0.0f)
+                M[i].A = Amin;
         }
     }
 }
@@ -133,16 +138,8 @@ void accum_moment(accum& a, moment& b)
     a.A += b.A;
 }
 
-void mean_from_moment(Fvector& M, moment& m)
-{
-    M.set(m.m);
-}
-
-void mean_from_accum(Fvector& M, accum& a)
-{
-    M.div(a.m, a.A);
-}
-
+void mean_from_moment(Fvector& M, moment& m) { M.set(m.m); }
+void mean_from_accum(Fvector& M, accum& a) { M.div(a.m, a.A); }
 void covariance_from_accum(Fmatrix33& C, accum& a)
 {
     int i, j;
@@ -160,8 +157,10 @@ int eigen_and_sort1(Fmatrix33& evecs, Fmatrix33& cov)
 
     n = evecs.Meigen(evals, cov);
 
-    if (evals.z > evals.x) {
-        if (evals.z > evals.y) {
+    if (evals.z > evals.x)
+    {
+        if (evals.z > evals.y)
+        {
             // 2 is largest, swap with column 0
             t = evecs.m[0][2];
             evecs.m[0][2] = evecs.m[0][0];
@@ -189,7 +188,8 @@ int eigen_and_sort1(Fmatrix33& evecs, Fmatrix33& cov)
     }
     else
     {
-        if (evals.x > evals.y) {
+        if (evals.x > evals.y)
+        {
             // 0 is largest, do nothing
         }
         else

@@ -4,15 +4,8 @@
 namespace secure_messaging
 {
 seed_generator::seed_generator() : m_random(static_cast<s32>(CPU::QPC() & u32(-1))){};
-seed_generator::~seed_generator()
-{
-}
-
-s32 const seed_generator::genrate()
-{
-    return m_random.randI();
-}
-
+seed_generator::~seed_generator() {}
+s32 const seed_generator::genrate() { return m_random.randI(); }
 u32 const generate_key(s32 const seed, key_t& result_key)
 {
     CRandom tmp_random(seed);
@@ -38,7 +31,7 @@ u32 const generate_key(s32 const seed, key_t& result_key)
     return result_key.m_key_length;
 }
 
-enum enum_xray_crypt_action  // do not add any, identifier !
+enum enum_xray_crypt_action // do not add any, identifier !
 {
     xr_encrypt = 0x00,
     xr_decrypt
@@ -58,7 +51,8 @@ inline u32 const xray_crypt(void* buffer, u32 buffer_size, key_t const& sec_key,
         raw_word = *current_word;
         *current_word = (raw_word ^ sec_key.m_key[key_word_index]) ^ last_word;
 
-        if (crypt_action == xr_encrypt) {
+        if (crypt_action == xr_encrypt)
+        {
             last_word = raw_word;
             ret_checksum += raw_word;
         }
@@ -71,12 +65,14 @@ inline u32 const xray_crypt(void* buffer, u32 buffer_size, key_t const& sec_key,
 
         ++key_word_index;
         ++current_word;
-        if (key_word_index >= sec_key.m_key_length) {
+        if (key_word_index >= sec_key.m_key_length)
+        {
             key_word_index = 0;
         }
     }
     u32 rest_bytes = buffer_size - (words_count * sizeof(s32));
-    if (!rest_bytes) return ret_checksum;
+    if (!rest_bytes)
+        return ret_checksum;
 
     s32 next_raw_word = 0;
     CopyMemory(&next_raw_word, current_word, rest_bytes);
@@ -84,7 +80,8 @@ inline u32 const xray_crypt(void* buffer, u32 buffer_size, key_t const& sec_key,
     next_raw_word = (raw_word ^ sec_key.m_key[key_word_index]) ^ last_word;
     CopyMemory(current_word, &next_raw_word, rest_bytes);
 
-    if (crypt_action == xr_encrypt) {
+    if (crypt_action == xr_encrypt)
+    {
         ret_checksum += raw_word;
     }
     else
@@ -106,4 +103,4 @@ u32 const decrypt(void* buffer, u32 buffer_size, key_t const& sec_key)
     return xray_crypt(buffer, buffer_size, sec_key, xr_decrypt);
 }
 
-}  // namespace secure_messaging
+} // namespace secure_messaging

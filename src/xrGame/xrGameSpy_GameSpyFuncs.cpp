@@ -18,7 +18,8 @@ void xrGameSpyServer::QR2_Init(int PortID)
     ctx.OnClientMessage = callback_cm;
     ctx.OnDenyIP = callback_deny_ip;
     ctx.GSServer = this;
-    if (!m_QR2.Init(PortID, m_iReportToMasterServer, ctx)) return;
+    if (!m_QR2.Init(PortID, m_iReportToMasterServer, ctx))
+        return;
     m_bQR2_Initialized = TRUE;
 };
 
@@ -32,7 +33,8 @@ void xrGameSpyServer::QR2_ShutDown()
 
 void xrGameSpyServer::CDKey_Init()
 {
-    if (!m_GCDServer.Init()) return;
+    if (!m_GCDServer.Init())
+        return;
     m_bCDKey_Initialized = TRUE;
 };
 
@@ -46,7 +48,8 @@ void xrGameSpyServer::CDKey_ShutDown()
 
 void xrGameSpyServer::SendChallengeString_2_Client(IClient* C)
 {
-    if (!C) return;
+    if (!C)
+        return;
     xrGameSpyClientData* pClient = (xrGameSpyClientData*)C;
 
     m_GCDServer.CreateRandomChallenge(pClient->m_pChallengeString, 8);
@@ -64,11 +67,12 @@ void xrGameSpyServer::OnCDKey_Validation(int LocalID, int res, char* errormsg)
     ClientID ID;
     ID.set(u32(LocalID));
     xrGameSpyClientData* CL = (xrGameSpyClientData*)ID_to_client(ID);
-    if (0 != res) {
+    if (0 != res)
+    {
         CL->m_bCDKeyAuth = true;
 #ifndef MASTER_GOLD
         Msg("xrGS::CDKey: Validation successful - <%s>", errormsg);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
         Check_GameSpy_CDKey_Success(CL);
     }
     else
@@ -83,7 +87,8 @@ void xrGameSpyServer::OnCDKey_ReValidation(int LocalID, int hint, char* challeng
     ClientID ID;
     ID.set(u32(LocalID));
     xrGameSpyClientData* CL = (xrGameSpyClientData*)ID_to_client(ID);
-    if (!CL) return;
+    if (!CL)
+        return;
     xr_strcpy(CL->m_pChallengeString, challenge);
     CL->m_iCDKeyReauthHint = hint;
     //--------- Send Respond ---------------------------------------------

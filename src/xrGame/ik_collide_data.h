@@ -31,7 +31,6 @@ public:
     IC const Fvector& pos_toe() const { return _toe; }
     IC const Fvector& pos_heel() const { return _heel; }
     IC const Fvector& pos_side() const { return _side; }
-
 private:
     Fvector _toe;
     Fvector _heel;

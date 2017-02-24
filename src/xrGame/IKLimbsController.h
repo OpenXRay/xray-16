@@ -22,7 +22,6 @@ public:
     void PlayLegs(CBlend* b);
     void Update();
     float Shift() { return _object_shift.shift(); }
-
 private:
     void Calculate();
     void LimbCalculate(SCalculateData& cd);

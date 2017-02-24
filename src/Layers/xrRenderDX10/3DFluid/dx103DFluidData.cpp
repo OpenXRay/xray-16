@@ -12,9 +12,9 @@ const xr_token emitter_type_token[] = {{"SimpleGaussian", dx103DFluidEmitters::E
 }
 
 DXGI_FORMAT dx103DFluidData::m_VPRenderTargetFormats[VP_NUM_TARGETS] = {
-    DXGI_FORMAT_R16G16B16A16_FLOAT,  //	VP_VELOCITY0
-    DXGI_FORMAT_R16_FLOAT,           //	VP_PRESSURE
-    DXGI_FORMAT_R16_FLOAT            //	VP_COLOR
+    DXGI_FORMAT_R16G16B16A16_FLOAT, // VP_VELOCITY0
+    DXGI_FORMAT_R16_FLOAT, // VP_PRESSURE
+    DXGI_FORMAT_R16_FLOAT // VP_COLOR
 };
 
 dx103DFluidData::dx103DFluidData()
@@ -45,10 +45,10 @@ dx103DFluidData::dx103DFluidData()
 
 dx103DFluidData::~dx103DFluidData()
 {
-//	Allow real-time config reload
+//  Allow real-time config reload
 #ifdef DEBUG
     FluidManager.DeregisterFluidData(this);
-#endif  //	DEBUG
+#endif //   DEBUG
 
     for (int rtIndex = 0; rtIndex < VP_NUM_TARGETS; rtIndex++)
     {
@@ -84,15 +84,15 @@ void dx103DFluidData::DestroyRTTextureAndViews(int rtIndex)
 
 void dx103DFluidData::Load(IReader* data)
 {
-    //	Version 3
+    //  Version 3
 
     xr_string Profile;
     data->r_string(Profile);
 
-    //	Prepare transform
+    //  Prepare transform
     data->r(&m_Transform, sizeof(m_Transform));
 
-    //	Read obstacles
+    //  Read obstacles
     u32 uiObstCnt = data->r_u32();
     m_Obstacles.reserve(uiObstCnt);
     for (u32 i = 0; i < uiObstCnt; ++i)
@@ -126,7 +126,7 @@ void dx103DFluidData::ParseProfile(const xr_string& Profile)
         Fmatrix Scale;
         Fmatrix Translate;
         Fmatrix TranslateScale;
-        //	Convert to 0..intDim space since it is used by simulation
+        //  Convert to 0..intDim space since it is used by simulation
         // Scale.scale((float)m_iTextureWidth-1, (float)m_iTextureHeight-1, (float)m_iTextureDepth-1);
         // Translate.translate(0.5, 0.5, 0.5);
         // It seems that y axis is inverted in fluid simulation, so shange maths a bit
@@ -135,23 +135,25 @@ void dx103DFluidData::ParseProfile(const xr_string& Profile)
             (float)FluidManager.GetTextureDepth());
         Scale.scale(vGridDim.x - 1, -(vGridDim.y - 1), vGridDim.z - 1);
         Translate.translate(0.5, -0.5, 0.5);
-        //	Actually it is mul(Translate, Scale).
-        //	Our matrix multiplication is not correct.
+        //  Actually it is mul(Translate, Scale).
+        //  Our matrix multiplication is not correct.
         TranslateScale.mul(Scale, Translate);
         InvFluidTranform.invert(m_Transform);
         WorldToFluid.mul(TranslateScale, InvFluidTranform);
     }
 
-    //	Read Volume data
+    //  Read Volume data
     if (ini.line_exist("volume", "Type"))
         m_Settings.m_SimulationType = (SimulationType)ini.r_token("volume", "Type", simulation_type_token);
 
-    if (ini.line_exist("volume", "Hemi")) m_Settings.m_fHemi = ini.r_float("volume", "Hemi");
+    if (ini.line_exist("volume", "Hemi"))
+        m_Settings.m_fHemi = ini.r_float("volume", "Hemi");
 
     if (ini.line_exist("volume", "ConfinementScale"))
         m_Settings.m_fConfinementScale = ini.r_float("volume", "ConfinementScale");
 
-    if (ini.line_exist("volume", "Decay")) m_Settings.m_fDecay = ini.r_float("volume", "Decay");
+    if (ini.line_exist("volume", "Decay"))
+        m_Settings.m_fDecay = ini.r_float("volume", "Decay");
 
     if (ini.line_exist("volume", "GravityBuoyancy"))
         m_Settings.m_fGravityBuoyancy = ini.r_float("volume", "GravityBuoyancy");
@@ -204,17 +206,17 @@ void dx103DFluidData::ParseProfile(const xr_string& Profile)
         }
     }
 
-//	Allow real-time config reload
+//  Allow real-time config reload
 #ifdef DEBUG
     FluidManager.RegisterFluidData(this, Profile);
-#endif  //	DEBUG
+#endif //   DEBUG
 }
 
-//	Allow real-time config reload
+//  Allow real-time config reload
 #ifdef DEBUG
 void dx103DFluidData::ReparseProfile(const xr_string& Profile)
 {
     m_Emitters.clear_not_free();
     ParseProfile(Profile);
 }
-#endif  //	DEBUG
+#endif //   DEBUG

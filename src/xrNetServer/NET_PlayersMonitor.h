@@ -31,8 +31,10 @@ public:
 #ifdef DEBUG
     bool IsCurrentThreadIteratingOnClients() const
     {
-        if (now_iterating_in_net_players || now_iterating_in_net_players_disconn) {
-            if (iterator_thread_id == GetCurrentThreadId()) {
+        if (now_iterating_in_net_players || now_iterating_in_net_players_disconn)
+        {
+            if (iterator_thread_id == GetCurrentThreadId())
+            {
                 return true;
             }
         }
@@ -119,7 +121,8 @@ public:
 #endif
         players_collection_t::iterator client_iter = std::find_if(net_Players.begin(), net_Players.end(), predicate);
         IClient* ret_client = NULL;
-        if (client_iter != net_Players.end()) {
+        if (client_iter != net_Players.end())
+        {
             ret_client = *client_iter;
             net_Players.erase(client_iter);
         }
@@ -137,7 +140,8 @@ public:
         //	make_string("-S- Entered to csPlayers [%d]", GetCurrentThreadId()).c_str());
         players_collection_t::iterator client_iter = std::find_if(net_Players.begin(), net_Players.end(), predicate);
         IClient* ret_client = NULL;
-        if (client_iter != net_Players.end()) {
+        if (client_iter != net_Players.end())
+        {
             ret_client = *client_iter;
         }
         // Msg("-S- Leaving from csPlayers [%d]", GetCurrentThreadId());
@@ -254,6 +258,6 @@ public:
         csPlayers.Leave();
         return ret_client;
     }*/
-};  // class PlayersMonitor
+}; // class PlayersMonitor
 
-#endif  //#ifndef NET_PLAYERS_MONITOR
+#endif //#ifndef NET_PLAYERS_MONITOR

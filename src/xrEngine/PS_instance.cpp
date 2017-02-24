@@ -38,14 +38,17 @@ CPS_Instance::~CPS_Instance()
 //----------------------------------------------------
 void CPS_Instance::shedule_Update(u32 dt)
 {
-    if (renderable.pROS) GlobalEnv.Render->ros_destroy(renderable.pROS);  //. particles doesn't need ROS
+    if (renderable.pROS)
+        GlobalEnv.Render->ros_destroy(renderable.pROS); //. particles doesn't need ROS
 
     ScheduledBase::shedule_Update(dt);
     m_iLifeTime -= dt;
 
     // remove???
-    if (m_bDead) return;
-    if (m_bAutoRemove && m_iLifeTime <= 0) PSI_destroy();
+    if (m_bDead)
+        return;
+    if (m_bAutoRemove && m_iLifeTime <= 0)
+        PSI_destroy();
 }
 //----------------------------------------------------
 void CPS_Instance::PSI_destroy()

@@ -7,7 +7,8 @@ static char const* QueryPatchVersionString(char* dest, u32 dest_size)
 
     long res = RegOpenKeyEx(REGISTRY_BASE, REGISTRY_PATH, 0, KEY_READ, &KeyCDKey);
 
-    if (res != ERROR_SUCCESS || KeyCDKey == 0) return "";
+    if (res != ERROR_SUCCESS || KeyCDKey == 0)
+        return "";
 
     // string128 SourceID;
     string256 LangID;
@@ -28,22 +29,26 @@ static char const* QueryPatchVersionString(char* dest, u32 dest_size)
 #define APPEND_DWURL_INFO_LEN 256
 static char const* ModifyDownloadUrl(char* dest, u32 dest_size, char const* origDownloadUrl)
 {
-    if (!origDownloadUrl) return "";
+    if (!origDownloadUrl)
+        return "";
 
     xr_strcpy(dest, dest_size, origDownloadUrl);
     u32 url_size = xr_strlen(dest);
-    if (url_size < PATCH_SUFFIX_SIZE) return dest;
+    if (url_size < PATCH_SUFFIX_SIZE)
+        return dest;
 
     char* search_ptr = (dest + url_size) - PATCH_SUFFIX_SIZE;
     char* suffix_ptr = NULL;
     while (search_ptr > dest)
     {
         suffix_ptr = strstr(search_ptr, PATCH_SUFFIX);
-        if (suffix_ptr) break;
+        if (suffix_ptr)
+            break;
 
         search_ptr--;
     }
-    if (!suffix_ptr) return dest;
+    if (!suffix_ptr)
+        return dest;
 
     *suffix_ptr = 0;
     string256 tmp_append_str;
@@ -56,11 +61,14 @@ bool g_bInformUserThatNoPatchFound = true;
 void __cdecl GS_ptPatchCallback(
     PTBool available, PTBool mandatory, const char* versionName, int fileID, const char* downloadURL, void* param)
 {
-    if (!param) return;
+    if (!param)
+        return;
     auto& cb = *static_cast<CGameSpy_Patching::PatchCheckCallback*>(param);
-    if (!available) {
+    if (!available)
+    {
         Msg("No new patches are available.");
-        if (g_bInformUserThatNoPatchFound) cb(false, nullptr, nullptr);
+        if (g_bInformUserThatNoPatchFound)
+            cb(false, nullptr, nullptr);
         return;
     };
     Msg("Found NewPatch: %s - %s", versionName, downloadURL);
@@ -76,7 +84,8 @@ void CGameSpy_Patching::CheckForPatch(bool InformOfNoPatch, PatchCheckCallback& 
     g_bInformUserThatNoPatchFound = InformOfNoPatch;
     bool res = ptCheckForPatchA(GAMESPY_PRODUCTID, GetGameVersion(), GetGameDistribution(), GS_ptPatchCallback, PTFalse,
                    &cb) != PTFalse;
-    if (!res) Msg("! Unable to send query for patch!");
+    if (!res)
+        Msg("! Unable to send query for patch!");
 };
 
 void CGameSpy_Patching::PtTrackUsage(int userID)

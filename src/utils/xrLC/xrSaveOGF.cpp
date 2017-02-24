@@ -9,7 +9,7 @@ IBContainer g_IB, x_IB;
 bool CBuild::IsOGFContainersEmpty()
 {
     return g_SWI.is_empty() && x_SWI.is_empty() && g_VB.is_empty() && x_VB.is_empty() && g_IB.is_empty() &&
-           x_IB.is_empty();
+        x_IB.is_empty();
 }
 
 static u32 g_batch_count;
@@ -25,7 +25,8 @@ static u32 g_batch_5000;
 u16 RegisterShader(LPCSTR T)
 {
     for (u32 it = 0; it < pBuild->g_Shaders.size(); it++)
-        if (0 == stricmp(T, pBuild->g_Shaders[it])) return it;
+        if (0 == stricmp(T, pBuild->g_Shaders[it]))
+            return it;
     pBuild->g_Shaders.push_back(xr_strdup(T));
     return pBuild->g_Shaders.size() - 1;
 }
@@ -93,7 +94,8 @@ void CBuild::SaveTREE(IWriter& fs)
     for (u32 rid = 0; rid < g_tree.size(); rid++)
     {
         OGF* o = dynamic_cast<OGF*>(g_tree[rid]);
-        if (o) remap.push_back(rid);
+        if (o)
+            remap.push_back(rid);
     }
     std::stable_sort(remap.begin(), remap.end(), remap_order);
     Logger.clMsg("remap-size: %d / %d", remap.size(), g_tree.size());
@@ -122,8 +124,8 @@ void CBuild::SaveTREE(IWriter& fs)
         100.f * float(g_batch_1000) / float(g_batch_count), 100.f * float(g_batch_5000) / float(g_batch_count));
     mem_Compact();
 
-    SaveGEOMs("level.geom", g_VB, g_IB, g_SWI);   // Normal
-    SaveGEOMs("level.geomx", x_VB, x_IB, x_SWI);  // Fast-Path
+    SaveGEOMs("level.geom", g_VB, g_IB, g_SWI); // Normal
+    SaveGEOMs("level.geomx", x_VB, x_IB, x_SWI); // Fast-Path
 
     Logger.Status("Shader table...");
     fs.open_chunk(fsL_SHADERS);

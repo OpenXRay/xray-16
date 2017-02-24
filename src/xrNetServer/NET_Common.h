@@ -41,7 +41,6 @@ class XRNETSERVER_API MultipacketSender
 {
 public:
     virtual ~MultipacketSender() {}
-
 protected:
     void SendPacket(const void* packet_data, u32 packet_sz, u32 flags, u32 timeout);
     void FlushSendBuffer(u32 timeout);
@@ -55,7 +54,6 @@ private:
     struct Buffer
     {
         Buffer() : last_flags(0) { buffer.B.count = 0; }
-
         NET_Packet buffer;
         u32 last_flags;
     };
@@ -71,11 +69,10 @@ class XRNETSERVER_API MultipacketReciever
 {
 public:
     virtual ~MultipacketReciever() {}
-
 protected:
     void RecievePacket(const void* packet_data, u32 packet_sz, u32 param = 0);
     virtual void _Recieve(const void* data, u32 data_size, u32 param) = 0;
 };
 
 //==============================================================================
-#endif  // _INCDEF_NETCOMMON_H_
+#endif // _INCDEF_NETCOMMON_H_

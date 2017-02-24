@@ -17,23 +17,27 @@ static const float S_fade2 = S_fade * S_fade;
 static ICF float PLC_energy_SSE(const Fvector& p, const Fvector& n, const light* L, float e)
 {
     Fvector lDir;
-    if (L->flags.type == IRender_Light::DIRECT) {
+    if (L->flags.type == IRender_Light::DIRECT)
+    {
         // Cos
         lDir.invert(L->direction);
         float D = lDir.dotproduct(n);
-        if (D <= 0) return 0;
+        if (D <= 0)
+            return 0;
         return e;
     }
     else
     {
         // Distance
         float sqD = p.distance_to_sqr(L->position);
-        if (sqD > L->range * L->range) return 0;
+        if (sqD > L->range * L->range)
+            return 0;
         // Dir
         lDir.sub(L->position, p);
         lDir.normalize_safe();
         float D = lDir.dotproduct(n);
-        if (D <= 0) return 0;
+        if (D <= 0)
+            return 0;
         // Trace Light
         __m128 rcpr = _mm_rsqrt_ss(_mm_load_ss(&sqD));
         rcpr = _mm_rcp_ss(_mm_add_ss(rcpr, _mm_set_ss(1.0f)));
@@ -43,11 +47,7 @@ static ICF float PLC_energy_SSE(const Fvector& p, const Fvector& n, const light*
     }
 }
 
-static ICF int iCeil_SSE(float x)
-{
-    return _mm_cvt_ss2si(_mm_set_ss(x));
-}
-
+static ICF int iCeil_SSE(float x) { return _mm_cvt_ss2si(_mm_set_ss(x)); }
 void PLCCalc_SSE(int& c0, int& c1, int& c2, const Fvector& camPos, const Fvector* ps, const Fvector& n, const light* l,
     float energy, const Fvector& obj)
 {
@@ -68,5 +68,5 @@ void PLCCalc_SSE(int& c0, int& c1, int& c2, const Fvector& camPos, const Fvector
     c2 = iCeil_SSE(255.f * a);
 }
 
-}  // namespace Math
-}  // namespace XRay
+} // namespace Math
+} // namespace XRay

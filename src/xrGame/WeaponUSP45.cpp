@@ -2,14 +2,8 @@
 #include "weaponusp45.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-CWeaponUSP45::CWeaponUSP45()
-{
-}
-
-CWeaponUSP45::~CWeaponUSP45()
-{
-}
-
+CWeaponUSP45::CWeaponUSP45() {}
+CWeaponUSP45::~CWeaponUSP45() {}
 using namespace luabind;
 
 SCRIPT_EXPORT(CWeaponUSP45, (CGameObject),

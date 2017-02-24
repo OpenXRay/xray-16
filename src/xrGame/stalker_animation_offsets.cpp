@@ -11,7 +11,8 @@
 SRotation const animation_offsets::offsets(shared_str const& animation_id) const
 {
     AnimationOffsets::const_iterator found = m_animation_offsets.find(animation_id);
-    if (found != m_animation_offsets.end()) return found->second;
+    if (found != m_animation_offsets.end())
+        return found->second;
 
     return (SRotation());
 }

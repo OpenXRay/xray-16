@@ -10,7 +10,8 @@
 
 void DamageReceiverCollisionCallback(bool& do_colide, bool bo1, dContact& c, SGameMtl* material_1, SGameMtl* material_2)
 {
-    if (material_1->Flags.test(SGameMtl::flPassable) || material_2->Flags.test(SGameMtl::flPassable)) return;
+    if (material_1->Flags.test(SGameMtl::flPassable) || material_2->Flags.test(SGameMtl::flPassable))
+        return;
     dBodyID b1 = dGeomGetBody(c.geom.g1);
     dBodyID b2 = dGeomGetBody(c.geom.g2);
     dxGeomUserData* ud_self = bo1 ? retrieveGeomUserData(c.geom.g1) : retrieveGeomUserData(c.geom.g2);
@@ -21,7 +22,8 @@ void DamageReceiverCollisionCallback(bool& do_colide, bool bo1, dContact& c, SGa
     VERIFY(ud_self);
     IPhysicsShellHolder* o_self = ud_self->ph_ref_object;
     IPhysicsShellHolder* o_damager = NULL;
-    if (ud_damager) o_damager = ud_damager->ph_ref_object;
+    if (ud_damager)
+        o_damager = ud_damager->ph_ref_object;
     u16 source_id = o_damager ? o_damager->ObjectID() : u16(-1);
 
     // CPHCollisionDamageReceiver	*dr	= static_cast<CPhysicsShellHolder*>( o_self )->PHCollisionDamageReceiver();
@@ -37,12 +39,13 @@ void DamageReceiverCollisionCallback(bool& do_colide, bool bo1, dContact& c, SGa
     // if(phs->IsSpecificDamager())damager_material_factor=phs->BonceDamageFactor();
 
     float dfs = (material_self->fBounceDamageFactor + damager_material_factor);
-    if (fis_zero(dfs)) return;
+    if (fis_zero(dfs))
+        return;
     Fvector dir;
     dir.set(*(Fvector*)c.geom.normal);
     Fvector pos;
     pos.sub(*(Fvector*)c.geom.pos,
-        *(Fvector*)dGeomGetPosition(bo1 ? c.geom.g1 : c.geom.g2));  // it is not true pos in bone space
+        *(Fvector*)dGeomGetPosition(bo1 ? c.geom.g1 : c.geom.g2)); // it is not true pos in bone space
 
     dr->CollisionHit(
         source_id, ud_self->bone_id, E_NL(b1, b2, c.geom.normal) * damager_material_factor / dfs, dir, pos);
@@ -61,7 +64,8 @@ void BreakableObjectCollisionCallback(
     dBodyID body = 0;
     float norm_sign = 0;
 
-    if (bo1) {
+    if (bo1)
+    {
         VERIFY(usr_data_1->ph_ref_object);
         damag_receiver = usr_data_1->ph_ref_object->ObjectPhCollisionDamageReceiver();
         body = dGeomGetBody(c.geom.g2);

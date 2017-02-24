@@ -22,44 +22,21 @@ void CScriptActionWrapper::setup_static(CScriptActionBase* action, CScriptGameOb
     action->CScriptActionBase::setup(object, storage);
 }
 
-void CScriptActionWrapper::initialize()
-{
-    luabind::call_member<void>(this, "initialize");
-}
-
-void CScriptActionWrapper::initialize_static(CScriptActionBase* action)
-{
-    action->CScriptActionBase::initialize();
-}
-
-void CScriptActionWrapper::execute()
-{
-    luabind::call_member<void>(this, "execute");
-}
-
-void CScriptActionWrapper::execute_static(CScriptActionBase* action)
-{
-    action->CScriptActionBase::execute();
-}
-
-void CScriptActionWrapper::finalize()
-{
-    luabind::call_member<void>(this, "finalize");
-}
-
-void CScriptActionWrapper::finalize_static(CScriptActionBase* action)
-{
-    action->CScriptActionBase::finalize();
-}
-
+void CScriptActionWrapper::initialize() { luabind::call_member<void>(this, "initialize"); }
+void CScriptActionWrapper::initialize_static(CScriptActionBase* action) { action->CScriptActionBase::initialize(); }
+void CScriptActionWrapper::execute() { luabind::call_member<void>(this, "execute"); }
+void CScriptActionWrapper::execute_static(CScriptActionBase* action) { action->CScriptActionBase::execute(); }
+void CScriptActionWrapper::finalize() { luabind::call_member<void>(this, "finalize"); }
+void CScriptActionWrapper::finalize_static(CScriptActionBase* action) { action->CScriptActionBase::finalize(); }
 // CScriptActionWrapper::_edge_value_type CScriptActionWrapper::weight	(const CSConditionState &condition0, const
 // CSConditionState &condition1) const
 //{
 //	_edge_value_type					_weight =
-//luabind::call_member<_edge_value_type>(const_cast<CScriptActionWrapper*>(this),"weight",condition0,condition1);
+// luabind::call_member<_edge_value_type>(const_cast<CScriptActionWrapper*>(this),"weight",condition0,condition1);
 //	if (_weight < min_weight()) {
-//		ai().script_engine().script_log	(LuaMessageType::Error,"Weight is less than effect count! It is corrected from %d
-//to %d",_weight,min_weight());
+//		ai().script_engine().script_log	(LuaMessageType::Error,"Weight is less than effect count! It is corrected from
+//%d
+// to %d",_weight,min_weight());
 //		_weight							= min_weight();
 //	}
 //	return								(_weight);
@@ -69,5 +46,5 @@ void CScriptActionWrapper::finalize_static(CScriptActionBase* action)
 // CSConditionState &condition0, const CSConditionState &condition1)
 //{
 //	return								(((const
-//CScriptActionWrapper*)action)->CScriptActionBase::weight(condition0,condition1));
+// CScriptActionWrapper*)action)->CScriptActionBase::weight(condition0,condition1));
 //}

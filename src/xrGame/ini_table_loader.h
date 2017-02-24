@@ -84,17 +84,14 @@ CSIni_Table::CIni_Table()
 }
 
 TEMPLATE_SPECIALIZATION
-CSIni_Table::~CIni_Table()
-{
-    xr_delete(m_pTable);
-}
-
+CSIni_Table::~CIni_Table() { xr_delete(m_pTable); }
 TEMPLATE_SPECIALIZATION
 typename CSIni_Table::ITEM_TABLE& CSIni_Table::table()
 {
     //	T_INI_LOADER::InitIdToIndex ();
 
-    if (m_pTable) return *m_pTable;
+    if (m_pTable)
+        return *m_pTable;
 
     m_pTable = new ITEM_TABLE();
 
@@ -127,9 +124,5 @@ typename CSIni_Table::ITEM_TABLE& CSIni_Table::table()
 }
 
 TEMPLATE_SPECIALIZATION
-void CSIni_Table::clear()
-{
-    xr_delete(m_pTable);
-}
-
+void CSIni_Table::clear() { xr_delete(m_pTable); }
 #undef TEMPLATE_SPECIALIZATION

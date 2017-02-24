@@ -61,10 +61,7 @@ CUIMapList::CUIMapList()
     AttachChild(m_pBtnDown);
 }
 
-CUIMapList::~CUIMapList()
-{
-}
-
+CUIMapList::~CUIMapList() {}
 void CUIMapList::StartDedicatedServer()
 {
     string_path ModuleFileName;
@@ -89,7 +86,8 @@ void CUIMapList::StartDedicatedServer()
 
 void CUIMapList::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
-    if (BUTTON_CLICKED == msg) {
+    if (BUTTON_CLICKED == msg)
+    {
         if (m_pBtnLeft == pWnd)
             OnBtnLeftClick();
         else if (m_pBtnRight == pWnd)
@@ -110,11 +108,13 @@ void CUIMapList::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     }
     else if (LIST_ITEM_CLICKED == msg)
     {
-        if (pWnd == m_pList1) OnListItemClicked();
+        if (pWnd == m_pList1)
+            OnListItemClicked();
     }
     else if (LIST_ITEM_SELECT == msg)
     {
-        if (m_pModeSelector == pWnd) OnModeChange();
+        if (m_pModeSelector == pWnd)
+            OnModeChange();
     }
 }
 
@@ -143,17 +143,14 @@ void CUIMapList::OnListItemClicked()
 
 xr_token g_GameModes[];
 
-void CUIMapList::OnModeChange()
-{
-    UpdateMapList(GetCurGameType());
-}
-
+void CUIMapList::OnModeChange() { UpdateMapList(GetCurGameType()); }
 EGameIDs CUIMapList::GetCurGameType()
 {
     LPCSTR text = "";
     CUIComboBox* combo_ms = smart_cast<CUIComboBox*>(m_pModeSelector);
     CUISpinText* spin_ms = smart_cast<CUISpinText*>(m_pModeSelector);
-    if (combo_ms) {
+    if (combo_ms)
+    {
         text = combo_ms->GetText();
         if (0 == xr_strcmp(text, CStringTable().translate(get_token_name(g_GameModes, eGameIDDeathmatch))))
             return eGameIDDeathmatch;
@@ -191,7 +188,8 @@ EGameIDs CUIMapList::GetCurGameType()
 const char* CUIMapList::GetCommandLine(LPCSTR player_name)
 {
     CUIListBoxItem* itm = m_pList2->GetItemByIDX(0);
-    if (!itm) return NULL;
+    if (!itm)
+        return NULL;
 
     u32 _idx = (u32)(__int64)(itm->GetData());
     const MPLevelDesc& M = GetMapNameInt(GetCurGameType(), _idx);
@@ -212,11 +210,13 @@ const char* CUIMapList::GetCommandLine(LPCSTR player_name)
     m_command += ")";
 
     m_command += " client(localhost/name=";
-    if (player_name == NULL || 0 == xr_strlen(player_name)) {
+    if (player_name == NULL || 0 == xr_strlen(player_name))
+    {
         string64 player_name2;
         GetPlayerName_FromRegistry(player_name2, sizeof(player_name2));
 
-        if (xr_strlen(player_name2) == 0) {
+        if (xr_strlen(player_name2) == 0)
+        {
             xr_strcpy(player_name2, xr_strlen(Core.UserName) ? Core.UserName : Core.CompName);
         }
         VERIFY(xr_strlen(player_name2));
@@ -238,7 +238,8 @@ void CUIMapList::LoadMapList()
     u32 cnt = 0;
     for (const MPWeatherDesc& weather : weathers)
         AddWeather(weather.Name, weather.StartTime, cnt++);
-    if (weathers.size() > 0) m_pWeatherSelector->SetItemIDX(0);
+    if (weathers.size() > 0)
+        m_pWeatherSelector->SetItemIDX(0);
 }
 
 void CUIMapList::SaveMapList()
@@ -246,13 +247,15 @@ void CUIMapList::SaveMapList()
     string_path temp;
     FS.update_path(temp, "$app_data_root$", MAP_ROTATION_LIST);
 
-    if (m_pList2->GetSize() <= 1) {
+    if (m_pList2->GetSize() <= 1)
+    {
         FS.file_delete(temp);
         return;
     }
 
     IWriter* pW = FS.w_open(temp);
-    if (!pW) {
+    if (!pW)
+    {
         Msg("! Cant create map rotation file [%s]", temp);
         return;
     }
@@ -271,29 +274,11 @@ void CUIMapList::SaveMapList()
     FS.w_close(pW);
 }
 
-void CUIMapList::SetWeatherSelector(CUIComboBox* ws)
-{
-    m_pWeatherSelector = ws;
-}
-void CUIMapList::SetModeSelector(CUIWindow* ms)
-{
-    m_pModeSelector = ms;
-}
-void CUIMapList::SetMapPic(CUIStatic* map_pic)
-{
-    m_pMapPic = map_pic;
-}
-
-void CUIMapList::SetMapInfo(CUIMapInfo* map_info)
-{
-    m_pMapInfo = map_info;
-}
-
-void CUIMapList::SetServerParams(LPCSTR params)
-{
-    m_srv_params = params;
-}
-
+void CUIMapList::SetWeatherSelector(CUIComboBox* ws) { m_pWeatherSelector = ws; }
+void CUIMapList::SetModeSelector(CUIWindow* ms) { m_pModeSelector = ms; }
+void CUIMapList::SetMapPic(CUIStatic* map_pic) { m_pMapPic = map_pic; }
+void CUIMapList::SetMapInfo(CUIMapInfo* map_info) { m_pMapInfo = map_info; }
+void CUIMapList::SetServerParams(LPCSTR params) { m_srv_params = params; }
 #include "uilistboxitem.h"
 void CUIMapList::AddWeather(const shared_str& WeatherType, const shared_str& WeatherTime, u32 _id)
 {
@@ -337,7 +322,8 @@ void CUIMapList::UpdateMapList(EGameIDs GameType)
     }
 
     u32 list_size = m_pList2->GetSize();
-    if (list_size == 0) {
+    if (list_size == 0)
+    {
         m_pList2->Clear();
         return;
     }
@@ -356,7 +342,8 @@ void CUIMapList::UpdateMapList(EGameIDs GameType)
     for (; itb != ite; ++itb)
     {
         CUIListBoxItem* itm1 = GetMapItem_fromList1(*itb);
-        if (itm1) {
+        if (itm1)
+        {
             CUIListBoxItem* itm2 = m_pList2->AddTextItem((*itb).c_str());
             itm2->SetData(itm1->GetData());
             itm2->Enable(true);
@@ -370,7 +357,8 @@ CUIListBoxItem* CUIMapList::GetMapItem_fromList1(shared_str const& map_name)
     for (u32 i = 0; i < m_pList1->GetSize(); ++i)
     {
         map_name1._set(m_pList1->GetText(i));
-        if (map_name1 == map_name) {
+        if (map_name1 == map_name)
+        {
             return smart_cast<CUIListBoxItem*>(m_pList1->GetItem(i));
         }
     }
@@ -385,37 +373,23 @@ void CUIMapList::ClearList()
 
 void CUIMapList::OnBtnLeftClick()
 {
-    if (m_pList2->GetSelected()) m_pList2->RemoveWindow(m_pList2->GetSelected());
+    if (m_pList2->GetSelected())
+        m_pList2->RemoveWindow(m_pList2->GetSelected());
 }
 
-void CUIMapList::Update()
-{
-    CUIWindow::Update();
-}
-
+void CUIMapList::Update() { CUIWindow::Update(); }
 void CUIMapList::OnBtnRightClick()
 {
     CUIListBoxItem* itm1 = m_pList1->GetSelectedItem();
-    if (!itm1) return;
+    if (!itm1)
+        return;
     CUIListBoxItem* itm2 = m_pList2->AddTextItem(itm1->GetText());
     itm2->SetData(itm1->GetData());
 }
 
-void CUIMapList::OnBtnUpClick()
-{
-    m_pList2->MoveSelectedUp();
-}
-
-void CUIMapList::OnBtnDownClick()
-{
-    m_pList2->MoveSelectedDown();
-}
-
-bool CUIMapList::IsEmpty()
-{
-    return 0 == m_pList2->GetSize();
-}
-
+void CUIMapList::OnBtnUpClick() { m_pList2->MoveSelectedUp(); }
+void CUIMapList::OnBtnDownClick() { m_pList2->MoveSelectedDown(); }
+bool CUIMapList::IsEmpty() { return 0 == m_pList2->GetSize(); }
 const MPLevelDesc& CUIMapList::GetMapNameInt(EGameIDs _type, u32 idx)
 {
     const SGameTypeMaps& M = gMapListHelper.GetMapListFor(_type);

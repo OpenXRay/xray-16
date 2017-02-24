@@ -11,10 +11,7 @@ CBlender_deffer_flat::CBlender_deffer_flat()
     oTessellation.Count = 4;
     oTessellation.IDselected = 0;
 }
-CBlender_deffer_flat::~CBlender_deffer_flat()
-{
-}
-
+CBlender_deffer_flat::~CBlender_deffer_flat() {}
 void CBlender_deffer_flat::Save(IWriter& fs)
 {
     IBlender::Save(fs);
@@ -36,7 +33,8 @@ void CBlender_deffer_flat::Save(IWriter& fs)
 void CBlender_deffer_flat::Load(IReader& fs, u16 version)
 {
     IBlender::Load(fs, version);
-    if (version > 0) {
+    if (version > 0)
+    {
         xrPREAD_PROP(fs, xrPID_TOKEN, oTessellation);
         oTessellation.Count = 4;
     }
@@ -49,21 +47,21 @@ void CBlender_deffer_flat::Compile(CBlender_Compile& C)
     // codepath is the same, only the shaders differ
     switch (C.iElement)
     {
-    case SE_R2_NORMAL_HQ:  // deffer
+    case SE_R2_NORMAL_HQ: // deffer
         uber_deffer(C, true, "base", "base", false, 0, true);
 
         C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
         C.r_StencilRef(0x01);
         C.r_End();
         break;
-    case SE_R2_NORMAL_LQ:  // deffer
+    case SE_R2_NORMAL_LQ: // deffer
         uber_deffer(C, false, "base", "base", false, 0, true);
 
         C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
         C.r_StencilRef(0x01);
         C.r_End();
         break;
-    case SE_R2_SHADOW:  // smap-direct
+    case SE_R2_SHADOW: // smap-direct
         // if (RImplementation.o.HW_smap)	C.r_Pass	("shadow_direct_base","dumb",	FALSE,TRUE,TRUE,FALSE);
         // else							C.r_Pass	("shadow_direct_base","shadow_direct_base",FALSE);
         C.r_Pass("shadow_direct_base", "dumb", FALSE, TRUE, TRUE, FALSE);

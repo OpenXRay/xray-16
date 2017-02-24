@@ -2,7 +2,7 @@
 #include "xrserver.h"
 #include "xrmessages.h"
 
-#if 1  // def DEBUG
+#if 1 // def DEBUG
 #define USE_DESIGNER_KEY
 #endif
 
@@ -12,7 +12,8 @@
 
 void xrServer::SLS_Default()
 {
-    if (game->custom_sls_default()) {
+    if (game->custom_sls_default())
+    {
         game->sls_default();
         return;
     }
@@ -23,7 +24,8 @@ void xrServer::SLS_Default()
 #endif
 
     string_path fn_spawn;
-    if (FS.exist(fn_spawn, "$level$", "level.spawn")) {
+    if (FS.exist(fn_spawn, "$level$", "level.spawn"))
+    {
         IReader* SP = FS.r_open(fn_spawn);
         NET_Packet P;
         u32 S_id;
@@ -43,9 +45,11 @@ void xrServer::SLS_Default()
 #endif
                 Process_spawn(P, clientID);
 #ifdef USE_DESIGNER_KEY
-            if (_designer) {
+            if (_designer)
+            {
                 CSE_ALifeCreatureActor* actor = smart_cast<CSE_ALifeCreatureActor*>(entity);
-                if (actor) _actor = actor;
+                if (actor)
+                    _actor = actor;
             }
 #endif
         }
@@ -53,9 +57,11 @@ void xrServer::SLS_Default()
     }
 
 #ifdef USE_DESIGNER_KEY
-    if (!_designer) return;
+    if (!_designer)
+        return;
 
-    if (_actor) return;
+    if (_actor)
+        return;
 
     _actor = smart_cast<CSE_ALifeCreatureActor*>(entity_Create("actor"));
     _actor->o_Position = Fvector().set(0.f, 0.f, 0.f);

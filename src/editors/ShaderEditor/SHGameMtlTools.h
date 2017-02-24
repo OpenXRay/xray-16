@@ -13,10 +13,9 @@ class CSHGameMtlTools : public ISHTools
     ISHTools* m_GameMtlPairTools;
 
     void __stdcall ItemExist(LPCSTR name, bool& res) { res = !!FindItem(name); }
-
     SGameMtl* FindItem(LPCSTR name);
 
-  public:
+public:
     SGameMtl* m_Mtl;
     virtual LPCSTR AppendItem(LPCSTR folder_name, LPCSTR parent_name = 0);
     virtual void __stdcall OnRemoveItem(LPCSTR name, EItemType type, bool& res);
@@ -25,12 +24,11 @@ class CSHGameMtlTools : public ISHTools
 
     virtual void FillItemList();
 
-  public:
+public:
     CSHGameMtlTools(ISHInit& init);
     virtual ~CSHGameMtlTools();
 
     virtual LPCSTR ToolsName() { return "Game Materials"; }
-
     virtual void Reload();
     virtual void Load();
     virtual bool Save();
@@ -51,11 +49,9 @@ class CSHGameMtlTools : public ISHTools
     virtual void OnFrame();
 
     virtual void OnRender() { ; }
-
     virtual void OnDeviceCreate() { ; }
-
     virtual void OnDeviceDestroy() { ; }
 };
 
 //---------------------------------------------------------------------------
-#endif  // SHGameMtlToolsH
+#endif // SHGameMtlToolsH

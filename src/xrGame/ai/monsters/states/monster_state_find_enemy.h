@@ -13,7 +13,6 @@ public:
     CStateMonsterFindEnemy(_Object* obj);
     virtual ~CStateMonsterFindEnemy();
     virtual void remove_links(IGameObject* object) { inherited::remove_links(object); }
-
     virtual void reselect_state();
 };
 

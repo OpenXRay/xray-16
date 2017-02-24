@@ -33,12 +33,10 @@ public:
     void Load(LPCSTR name);
     IC LPCSTR Name() { return *m_Name; }
     float& Speed() { return m_Speed; }
-
     COMotion* Play(bool bLoop, LPCSTR name = 0);
     void Pause(bool val) { return m_MParam.Pause(val); }
     void Stop();
     IC BOOL IsPlaying() { return m_MParam.bPlay; }
-
     IC const Fmatrix& XFORM() { return m_XFORM; }
     float GetLength();
     // Update
@@ -46,4 +44,4 @@ public:
     void DrawPath();
 };
 
-#endif  // ObjectAnimatorH
+#endif // ObjectAnimatorH

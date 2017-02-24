@@ -12,11 +12,11 @@
 public
 interface class property_string_values_value_base
 {
-  public:
+public:
     typedef System::Collections::Generic::Queue<System::String ^> collection_type;
 
-  public:
+public:
     virtual collection_type ^ values() = 0;
-};  // ref class property_string_values_value
+}; // ref class property_string_values_value
 
-#endif  // ifndef PROPERTY_STRING_VALUES_VALUE_BASE_HPP_INCLUDED
+#endif // ifndef PROPERTY_STRING_VALUES_VALUE_BASE_HPP_INCLUDED

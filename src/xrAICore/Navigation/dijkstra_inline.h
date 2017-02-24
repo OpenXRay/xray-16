@@ -8,12 +8,12 @@
 
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
-    template <typename TDistance, typename TPriorityQueue, typename TVertexManager, typename TVertexAllocator,         \
+#define TEMPLATE_SPECIALIZATION                                                                                \
+    template <typename TDistance, typename TPriorityQueue, typename TVertexManager, typename TVertexAllocator, \
         bool EuclidianHeuristics, typename TPathBuilder, typename TIteration, typename TVertexData>
 
-#define CSDijkstra                                                                                                     \
-    CDijkstra<TDistance, TPriorityQueue, TVertexManager, TVertexAllocator, EuclidianHeuristics, TPathBuilder,          \
+#define CSDijkstra                                                                                            \
+    CDijkstra<TDistance, TPriorityQueue, TVertexManager, TVertexAllocator, EuclidianHeuristics, TPathBuilder, \
         TIteration, TVertexData>
 
 TEMPLATE_SPECIALIZATION
@@ -24,23 +24,11 @@ inline CSDijkstra::CDijkstra(const u32 max_vertex_count)
 }
 
 TEMPLATE_SPECIALIZATION
-inline CSDijkstra::~CDijkstra()
-{
-    xr_delete(m_data_storage);
-}
-
+inline CSDijkstra::~CDijkstra() { xr_delete(m_data_storage); }
 TEMPLATE_SPECIALIZATION
-inline typename CSDijkstra::CDataStorage& CSDijkstra::data_storage()
-{
-    return *m_data_storage;
-}
-
+inline typename CSDijkstra::CDataStorage& CSDijkstra::data_storage() { return *m_data_storage; }
 TEMPLATE_SPECIALIZATION
-inline const typename CSDijkstra::CDataStorage& CSDijkstra::data_storage() const
-{
-    return *m_data_storage;
-}
-
+inline const typename CSDijkstra::CDataStorage& CSDijkstra::data_storage() const { return *m_data_storage; }
 TEMPLATE_SPECIALIZATION
 template <typename TPathManager>
 inline void CSDijkstra::initialize(TPathManager& path_manager)
@@ -77,7 +65,8 @@ inline bool CSDijkstra::step(TPathManager& path_manager)
     // get the best node, i.e. a node with the minimum 'f'
     Vertex& best = data_storage().get_best();
     // check if this node is the one we are searching for
-    if (path_manager.is_goal_reached(best.index())) {
+    if (path_manager.is_goal_reached(best.index()))
+    {
         // we reached the goal, so we have to create a path
         path_manager.init_path();
         path_manager.create_path(best);
@@ -95,19 +84,23 @@ inline bool CSDijkstra::step(TPathManager& path_manager)
     {
         const Index& neighbour_index = path_manager.get_value(i);
         // check if neighbour is accessible
-        if (!path_manager.is_accessible(neighbour_index)) continue;
+        if (!path_manager.is_accessible(neighbour_index))
+            continue;
         // check if neighbour is visited, i.e. is in the opened or
         // closed lists
-        if (data_storage().is_visited(neighbour_index)) {
+        if (data_storage().is_visited(neighbour_index))
+        {
             // so, this neighbour node has been already visited
             // therefore get the pointer to this node
             Vertex& neighbour = data_storage().get_node(neighbour_index);
             // check if this node is in the opened list
-            if (data_storage().is_opened(neighbour)) {
+            if (data_storage().is_opened(neighbour))
+            {
                 // compute 'g' for the node
                 Distance f = best.f() + path_manager.evaluate(best.index(), neighbour_index, i);
                 // check if new path is better than the older one
-                if (neighbour.f() > f) {
+                if (neighbour.f() > f)
+                {
                     // so, new path is better
                     // assign corresponding values to the node
                     Distance d = neighbour.f();
@@ -156,14 +149,16 @@ inline bool CSDijkstra::find(TPathManager& path_manager)
     for (TIteration i = TIteration(0); !data_storage().is_opened_empty(); i++)
     {
         // check if we reached limit
-        if (path_manager.is_limit_reached(i)) {
+        if (path_manager.is_limit_reached(i))
+        {
             // so we reached limit, return failure
             finalize(path_manager);
             return false;
         }
         // so, limit is not reached
         // check if new step will get us success
-        if (step(path_manager)) {
+        if (step(path_manager))
+        {
             // so this step reached the goal, return success
             finalize(path_manager);
             return true;

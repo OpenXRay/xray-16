@@ -25,7 +25,8 @@ thunderbolt::thunderbolt(manager* manager, shared_str const& id) : m_manager(*ma
 
 thunderbolt::~thunderbolt()
 {
-    if (!Device.editor()) return;
+    if (!Device.editor())
+        return;
 
     ::ide().destroy(m_property_holder);
 }
@@ -63,15 +64,12 @@ void thunderbolt::save(CInifile& config)
     config.w_string(m_id.c_str(), "sound", m_sound.c_str());
 }
 
-LPCSTR thunderbolt::id_getter() const
-{
-    return (m_id.c_str());
-}
-
+LPCSTR thunderbolt::id_getter() const { return (m_id.c_str()); }
 void thunderbolt::id_setter(LPCSTR value_)
 {
     shared_str value = value_;
-    if (m_id._get() == value._get()) return;
+    if (m_id._get() == value._get())
+        return;
 
     m_id = m_manager.unique_thunderbolt_id(value);
 }
@@ -108,9 +106,5 @@ void thunderbolt::fill(::editor::environment::manager& environment, ::editor::pr
     m_top->fill(environment, "top", "this option is resposible for thunderbolt gradient top", *m_property_holder);
 }
 
-thunderbolt::property_holder_type* thunderbolt::object()
-{
-    return (m_property_holder);
-}
-
-#endif  // #ifdef INGAME_EDITOR
+thunderbolt::property_holder_type* thunderbolt::object() { return (m_property_holder); }
+#endif // #ifdef INGAME_EDITOR

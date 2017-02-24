@@ -89,7 +89,7 @@ protected:
     CScriptProcessStorage m_script_processes;
     int m_stack_level;
 #ifdef DEBUG
-    CMemoryWriter m_output;  // for call stack
+    CMemoryWriter m_output; // for call stack
 #endif
 #ifdef USE_DEBUGGER
 #ifndef USE_LUA_STUDIO
@@ -201,7 +201,8 @@ template <typename TResult>
 IC bool CScriptEngine::functor(LPCSTR function_to_call, luabind::functor<TResult>& lua_function)
 {
     luabind::object object;
-    if (!function_object(function_to_call, object)) return false;
+    if (!function_object(function_to_call, object))
+        return false;
     lua_function = object;
     return true;
 }

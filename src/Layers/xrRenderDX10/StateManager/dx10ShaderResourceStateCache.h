@@ -62,4 +62,4 @@ private:
 
 extern dx10ShaderResourceStateCache SRVSManager;
 
-#endif  //	dx10ShaderResourceStateCache_included
+#endif //	dx10ShaderResourceStateCache_included

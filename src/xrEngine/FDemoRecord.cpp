@@ -44,7 +44,8 @@ void setup_lm_screenshot_matrices()
 Fbox get_level_screenshot_bound()
 {
     Fbox res = g_pGameLevel->ObjectSpace.GetBoundingVolume();
-    if (g_pGameLevel->pLevel->section_exist("level_map")) {
+    if (g_pGameLevel->pLevel->section_exist("level_map"))
+    {
         Fvector4 res2d = g_pGameLevel->pLevel->r_fvector4("level_map", "bound_rect");
         res.min.x = res2d.x;
         res.min.z = res2d.y;
@@ -70,9 +71,10 @@ CDemoRecord::CDemoRecord(const char* name, float life_time) : CEffectorCam(cefDe
     m_b_redirect_input_to_level = false;
     _unlink(name);
     file = FS.w_open(name);
-    if (file) {
+    if (file)
+    {
         g_position.set_position = false;
-        IR_Capture();  // capture input
+        IR_Capture(); // capture input
         m_Camera.invert(Device.mView);
 
         // parse yaw
@@ -119,8 +121,9 @@ CDemoRecord::CDemoRecord(const char* name, float life_time) : CEffectorCam(cefDe
 
 CDemoRecord::~CDemoRecord()
 {
-    if (file) {
-        IR_Release();  // release input
+    if (file)
+    {
+        IR_Release(); // release input
         FS.w_close(file);
     }
     g_bDisableRedText = stored_red_text;
@@ -197,7 +200,8 @@ void CDemoRecord::MakeLevelMapProcess()
         s_hud_flag.assign(psHUD_Flags);
         psDeviceFlags.zero();
         psDeviceFlags.set(rsClearBB | rsFullscreen | rsDrawStatic, TRUE);
-        if (!psDeviceFlags.equal(s_dev_flags, rsFullscreen)) Device.Reset();
+        if (!psDeviceFlags.equal(s_dev_flags, rsFullscreen))
+            Device.Reset();
     }
     break;
 
@@ -211,10 +215,12 @@ void CDemoRecord::MakeLevelMapProcess()
         else
             xr_sprintf(tmp, sizeof(tmp), "map_%s#%d", *g_pGameLevel->name(), m_iLMScreenshotFragment);
 
-        if (m_iLMScreenshotFragment != -1) {
+        if (m_iLMScreenshotFragment != -1)
+        {
             ++m_iLMScreenshotFragment;
 
-            if (m_iLMScreenshotFragment != 4) {
+            if (m_iLMScreenshotFragment != 4)
+            {
                 curr_lm_fbox = get_level_screenshot_bound();
                 GetLM_BBox(curr_lm_fbox, m_iLMScreenshotFragment);
                 m_Stage -= 20;
@@ -223,12 +229,14 @@ void CDemoRecord::MakeLevelMapProcess()
 
         GlobalEnv.Render->Screenshot(IRender::SM_FOR_LEVELMAP, tmp);
 
-        if (m_iLMScreenshotFragment == -1 || m_iLMScreenshotFragment == 4) {
+        if (m_iLMScreenshotFragment == -1 || m_iLMScreenshotFragment == 4)
+        {
             psHUD_Flags.assign(s_hud_flag);
 
             BOOL bDevReset = !psDeviceFlags.equal(s_dev_flags, rsFullscreen);
             psDeviceFlags = s_dev_flags;
-            if (bDevReset) Device.Reset();
+            if (bDevReset)
+                Device.Reset();
             m_bMakeLevelMap = FALSE;
             m_iLMScreenshotFragment = -1;
         }
@@ -275,9 +283,11 @@ void CDemoRecord::MakeCubeMapFace(Fvector& D, Fvector& N)
 BOOL CDemoRecord::ProcessCam(SCamEffectorInfo& info)
 {
     info.dont_apply = false;
-    if (0 == file) return TRUE;
+    if (0 == file)
+        return TRUE;
 
-    if (m_bMakeScreenshot) {
+    if (m_bMakeScreenshot)
+    {
         MakeScreenshotFace();
         // update camera
         info.n.set(m_Camera.j);
@@ -297,7 +307,8 @@ BOOL CDemoRecord::ProcessCam(SCamEffectorInfo& info)
     }
     else
     {
-        if (IR_GetKeyState(DIK_F1)) {
+        if (IR_GetKeyState(DIK_F1))
+        {
             pApp->pFontSystem->SetColor(color_rgba(255, 0, 0, 255));
             pApp->pFontSystem->SetAligment(CGameFont::alCenter);
             pApp->pFontSystem->OutSetI(0, -.05f);
@@ -326,7 +337,8 @@ BOOL CDemoRecord::ProcessCam(SCamEffectorInfo& info)
 
         float speed = m_fSpeed1, ang_speed = m_fAngSpeed1;
 
-        if (IR_GetKeyState(DIK_LSHIFT)) {
+        if (IR_GetKeyState(DIK_LSHIFT))
+        {
             speed = m_fSpeed0;
             ang_speed = m_fAngSpeed0;
         }
@@ -347,7 +359,8 @@ BOOL CDemoRecord::ProcessCam(SCamEffectorInfo& info)
         m_HPB.x -= m_vR.y;
         m_HPB.y -= m_vR.x;
         m_HPB.z += m_vR.z;
-        if (g_position.set_position) {
+        if (g_position.set_position)
+        {
             m_Position.set(g_position.p);
             g_position.set_position = false;
         }
@@ -389,29 +402,40 @@ BOOL CDemoRecord::ProcessCam(SCamEffectorInfo& info)
 
 void CDemoRecord::IR_OnKeyboardPress(int dik)
 {
-    if (dik == DIK_MULTIPLY) m_b_redirect_input_to_level = !m_b_redirect_input_to_level;
+    if (dik == DIK_MULTIPLY)
+        m_b_redirect_input_to_level = !m_b_redirect_input_to_level;
 
-    if (m_b_redirect_input_to_level) {
+    if (m_b_redirect_input_to_level)
+    {
         g_pGameLevel->IR_OnKeyboardPress(dik);
         return;
     }
-    if (dik == DIK_GRAVE) Console->Show();
-    if (dik == DIK_SPACE) RecordKey();
-    if (dik == DIK_BACK) MakeCubemap();
-    if (dik == DIK_F11) MakeLevelMapScreenshot(IR_GetKeyState(DIK_LCONTROL));
-    if (dik == DIK_F12) MakeScreenshot();
-    if (dik == DIK_ESCAPE) fLifeTime = -1;
+    if (dik == DIK_GRAVE)
+        Console->Show();
+    if (dik == DIK_SPACE)
+        RecordKey();
+    if (dik == DIK_BACK)
+        MakeCubemap();
+    if (dik == DIK_F11)
+        MakeLevelMapScreenshot(IR_GetKeyState(DIK_LCONTROL));
+    if (dik == DIK_F12)
+        MakeScreenshot();
+    if (dik == DIK_ESCAPE)
+        fLifeTime = -1;
 
 #ifndef MASTER_GOLD
-    if (dik == DIK_RETURN) {
-        if (g_pGameLevel->CurrentEntity()) {
+    if (dik == DIK_RETURN)
+    {
+        if (g_pGameLevel->CurrentEntity())
+        {
             g_pGameLevel->CurrentEntity()->ForceTransform(m_Camera);
             fLifeTime = -1;
         }
     }
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
 
-    if (dik == DIK_PAUSE) Device.Pause(!Device.Paused(), TRUE, TRUE, "demo_record");
+    if (dik == DIK_PAUSE)
+        Device.Pause(!Device.Paused(), TRUE, TRUE, "demo_record");
 }
 
 static void update_whith_timescale(Fvector& v, const Fvector& v_delta)
@@ -423,7 +447,8 @@ static void update_whith_timescale(Fvector& v, const Fvector& v_delta)
 
 void CDemoRecord::IR_OnKeyboardHold(int dik)
 {
-    if (m_b_redirect_input_to_level) {
+    if (m_b_redirect_input_to_level)
+    {
         g_pGameLevel->IR_OnKeyboardHold(dik);
         return;
     }
@@ -436,39 +461,39 @@ void CDemoRecord::IR_OnKeyboardHold(int dik)
     case DIK_NUMPAD1:
     case DIK_LEFT:
         vT_delta.x -= 1.0f;
-        break;  // Slide Left
+        break; // Slide Left
     case DIK_D:
     case DIK_NUMPAD3:
     case DIK_RIGHT:
         vT_delta.x += 1.0f;
-        break;  // Slide Right
+        break; // Slide Right
     case DIK_S:
         vT_delta.y -= 1.0f;
-        break;  // Slide Down
+        break; // Slide Down
     case DIK_W:
         vT_delta.y += 1.0f;
-        break;  // Slide Up
+        break; // Slide Up
     // rotate
     case DIK_NUMPAD2:
         vR_delta.x -= 1.0f;
-        break;  // Pitch Down
+        break; // Pitch Down
     case DIK_NUMPAD8:
         vR_delta.x += 1.0f;
-        break;  // Pitch Up
+        break; // Pitch Up
     case DIK_E:
     case DIK_NUMPAD6:
         vR_delta.y += 1.0f;
-        break;  // Turn Left
+        break; // Turn Left
     case DIK_Q:
     case DIK_NUMPAD4:
         vR_delta.y -= 1.0f;
-        break;  // Turn Right
+        break; // Turn Right
     case DIK_NUMPAD9:
         vR_delta.z -= 2.0f;
-        break;  // Turn Right
+        break; // Turn Right
     case DIK_NUMPAD7:
         vR_delta.z += 2.0f;
-        break;  // Turn Right
+        break; // Turn Right
     }
 
     update_whith_timescale(m_vT, vT_delta);
@@ -477,24 +502,27 @@ void CDemoRecord::IR_OnKeyboardHold(int dik)
 
 void CDemoRecord::IR_OnMouseMove(int dx, int dy)
 {
-    if (m_b_redirect_input_to_level) {
+    if (m_b_redirect_input_to_level)
+    {
         g_pGameLevel->IR_OnMouseMove(dx, dy);
         return;
     }
 
     Fvector vR_delta = Fvector().set(0, 0, 0);
 
-    float scale = .5f;  // psMouseSens;
-    if (dx || dy) {
-        vR_delta.y += float(dx) * scale;                                                     // heading
-        vR_delta.x += ((psMouseInvert.test(1)) ? -1 : 1) * float(dy) * scale * (3.f / 4.f);  // pitch
+    float scale = .5f; // psMouseSens;
+    if (dx || dy)
+    {
+        vR_delta.y += float(dx) * scale; // heading
+        vR_delta.x += ((psMouseInvert.test(1)) ? -1 : 1) * float(dy) * scale * (3.f / 4.f); // pitch
     }
     update_whith_timescale(m_vR, vR_delta);
 }
 
 void CDemoRecord::IR_OnMouseHold(int btn)
 {
-    if (m_b_redirect_input_to_level) {
+    if (m_b_redirect_input_to_level)
+    {
         g_pGameLevel->IR_OnMouseHold(btn);
         return;
     }
@@ -503,10 +531,10 @@ void CDemoRecord::IR_OnMouseHold(int btn)
     {
     case 0:
         vT_delta.z += 1.0f;
-        break;  // Move Backward
+        break; // Move Backward
     case 1:
         vT_delta.z -= 1.0f;
-        break;  // Move Forward
+        break; // Move Forward
     }
     update_whith_timescale(m_vT, vT_delta);
 }
@@ -548,7 +576,4 @@ void CDemoRecord::MakeLevelMapScreenshot(BOOL bHQ)
     m_Stage = 0;
 }
 
-void CDemoRecord::OnRender()
-{
-    pApp->pFontSystem->OnRender();
-}
+void CDemoRecord::OnRender() { pApp->pFontSystem->OnRender(); }

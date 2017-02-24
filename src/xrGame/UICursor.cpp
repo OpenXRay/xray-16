@@ -69,12 +69,14 @@ void CUICursor::OnRender()
     g_btnHint->OnRender();
     g_statHint->OnRender();
 
-    if (!IsVisible()) return;
+    if (!IsVisible())
+        return;
 #ifdef DEBUG
     VERIFY(last_render_frame != Device.dwFrame);
     last_render_frame = Device.dwFrame;
 
-    if (bDebug) {
+    if (bDebug)
+    {
         CGameFont* F = UI().Font().pFontDI;
         F->SetAligment(CGameFont::alCenter);
         F->SetHeightI(0.02f);
@@ -90,11 +92,7 @@ void CUICursor::OnRender()
     m_static->Draw();
 }
 
-Fvector2 CUICursor::GetCursorPosition()
-{
-    return vPos;
-}
-
+Fvector2 CUICursor::GetCursorPosition() { return vPos; }
 Fvector2 CUICursor::GetCursorPositionDelta()
 {
     Fvector2 res_delta;
@@ -108,7 +106,8 @@ void CUICursor::UpdateCursorPosition(int _dx, int _dy)
 {
     Fvector2 p;
     vPrevPos = vPos;
-    if (m_b_use_win_cursor) {
+    if (m_b_use_win_cursor)
+    {
         Ivector2 pti;
         IInputReceiver::IR_GetMousePosReal(pti);
         p.x = (float)pti.x;
@@ -132,6 +131,7 @@ void CUICursor::SetUICursorPosition(Fvector2 pos)
     POINT p;
     p.x = iFloor(vPos.x / (UI_BASE_WIDTH / (float)Device.dwWidth));
     p.y = iFloor(vPos.y / (UI_BASE_HEIGHT / (float)Device.dwHeight));
-    if (m_b_use_win_cursor) ClientToScreen(Device.m_hWnd, (LPPOINT)&p);
+    if (m_b_use_win_cursor)
+        ClientToScreen(Device.m_hWnd, (LPPOINT)&p);
     SetCursorPos(p.x, p.y);
 }

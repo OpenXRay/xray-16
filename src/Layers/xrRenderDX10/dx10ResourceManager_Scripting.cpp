@@ -32,57 +32,66 @@ public:
 class adopt_dx10sampler
 {
     CBlender_Compile* m_pC;
-    u32 m_SI;  //	Sampler index
+    u32 m_SI; //	Sampler index
 public:
     adopt_dx10sampler(CBlender_Compile* C, u32 SamplerIndex) : m_pC(C), m_SI(SamplerIndex)
     {
-        if (u32(-1) == m_SI) m_pC = 0;
+        if (u32(-1) == m_SI)
+            m_pC = 0;
     }
     adopt_dx10sampler(const adopt_dx10sampler& _C) : m_pC(_C.m_pC), m_SI(_C.m_SI)
     {
-        if (u32(-1) == m_SI) m_pC = 0;
+        if (u32(-1) == m_SI)
+            m_pC = 0;
     }
 
     //	adopt_sampler&			_texture		(LPCSTR texture)		{ if (C) C->i_Texture	(stage,texture);
-    //return *this;	}
+    // return *this;	}
     //	adopt_sampler&			_projective		(bool _b)				{ if (C) C->i_Projective(stage,_b);
-    //return *this;	}
-    //	adopt_sampler&			_clamp			()						{ if (C) C->i_Address	(stage,D3DTADDRESS_CLAMP);
-    //return *this;	}
-    //	adopt_sampler&			_wrap			()						{ if (C) C->i_Address	(stage,D3DTADDRESS_WRAP);
-    //return *this;	}
-    //	adopt_sampler&			_mirror			()						{ if (C) C->i_Address	(stage,D3DTADDRESS_MIRROR);
-    //return *this;	}
+    // return *this;	}
+    //	adopt_sampler&			_clamp			()						{ if (C) C->i_Address
+    //(stage,D3DTADDRESS_CLAMP);
+    // return *this;	}
+    //	adopt_sampler&			_wrap			()						{ if (C) C->i_Address
+    //(stage,D3DTADDRESS_WRAP);
+    // return *this;	}
+    //	adopt_sampler&			_mirror			()						{ if (C) C->i_Address
+    //(stage,D3DTADDRESS_MIRROR);
+    // return *this;	}
     //	adopt_sampler&			_f_anisotropic	()						{ if (C) C->i_Filter
     //(stage,D3DTEXF_ANISOTROPIC,D3DTEXF_LINEAR,D3DTEXF_ANISOTROPIC);	return *this;	}
     //	adopt_sampler&			_f_trilinear	()						{ if (C) C->i_Filter
     //(stage,D3DTEXF_LINEAR,D3DTEXF_LINEAR,D3DTEXF_LINEAR);		return *this;	}
-    //	adopt_sampler&			_f_bilinear		()						{ if (C) C->i_Filter	(stage,D3DTEXF_LINEAR,D3DTEXF_POINT,
-    //D3DTEXF_LINEAR);		return *this;	}
-    //	adopt_sampler&			_f_linear		()						{ if (C) C->i_Filter	(stage,D3DTEXF_LINEAR,D3DTEXF_NONE,
-    //D3DTEXF_LINEAR);		return *this;	}
-    //	adopt_sampler&			_f_none			()						{ if (C) C->i_Filter	(stage,D3DTEXF_POINT, D3DTEXF_NONE,
-    //D3DTEXF_POINT);		return *this;	}
+    //	adopt_sampler&			_f_bilinear		()						{ if (C) C->i_Filter
+    //(stage,D3DTEXF_LINEAR,D3DTEXF_POINT,
+    // D3DTEXF_LINEAR);		return *this;	}
+    //	adopt_sampler&			_f_linear		()						{ if (C) C->i_Filter
+    //(stage,D3DTEXF_LINEAR,D3DTEXF_NONE,
+    // D3DTEXF_LINEAR);		return *this;	}
+    //	adopt_sampler&			_f_none			()						{ if (C) C->i_Filter	(stage,D3DTEXF_POINT,
+    // D3DTEXF_NONE,
+    // D3DTEXF_POINT);		return *this;	}
     //	adopt_sampler&			_fmin_none		()						{ if (C) C->i_Filter_Min(stage,D3DTEXF_NONE);
-    //return *this;	}
+    // return *this;	}
     //	adopt_sampler&			_fmin_point		()						{ if (C) C->i_Filter_Min(stage,D3DTEXF_POINT);
-    //return *this;	}
+    // return *this;	}
     //	adopt_sampler&			_fmin_linear	()						{ if (C) C->i_Filter_Min(stage,D3DTEXF_LINEAR);
-    //return *this;	}
-    //	adopt_sampler&			_fmin_aniso		()						{ if (C) C->i_Filter_Min(stage,D3DTEXF_ANISOTROPIC);
-    //return *this;	}
+    // return *this;	}
+    //	adopt_sampler&			_fmin_aniso		()						{ if (C)
+    // C->i_Filter_Min(stage,D3DTEXF_ANISOTROPIC);
+    // return *this;	}
     //	adopt_sampler&			_fmip_none		()						{ if (C) C->i_Filter_Mip(stage,D3DTEXF_NONE);
-    //return *this;	}
+    // return *this;	}
     //	adopt_sampler&			_fmip_point		()						{ if (C) C->i_Filter_Mip(stage,D3DTEXF_POINT);
-    //return *this;	}
+    // return *this;	}
     //	adopt_sampler&			_fmip_linear	()						{ if (C) C->i_Filter_Mip(stage,D3DTEXF_LINEAR);
-    //return *this;	}
+    // return *this;	}
     //	adopt_sampler&			_fmag_none		()						{ if (C) C->i_Filter_Mag(stage,D3DTEXF_NONE);
-    //return *this;	}
+    // return *this;	}
     //	adopt_sampler&			_fmag_point		()						{ if (C) C->i_Filter_Mag(stage,D3DTEXF_POINT);
-    //return *this;	}
+    // return *this;	}
     //	adopt_sampler&			_fmag_linear	()						{ if (C) C->i_Filter_Mag(stage,D3DTEXF_LINEAR);
-    //return *this;	}
+    // return *this;	}
 };
 /*
 class	adopt_dx10texture
@@ -107,14 +116,14 @@ class adopt_compiler
 
     void TryEndPass()
     {
-        if (!m_bFirstPass) C->r_End();
+        if (!m_bFirstPass)
+            C->r_End();
         m_bFirstPass = false;
     }
 
 public:
     adopt_compiler(CBlender_Compile* _C, bool& bFirstPass) : C(_C), m_bFirstPass(bFirstPass) { m_bFirstPass = true; }
     adopt_compiler(const adopt_compiler& _C) : C(_C.C), m_bFirstPass(_C.m_bFirstPass) {}
-
     adopt_compiler& _options(int P, bool S)
     {
         C->SetParams(P, S);
@@ -204,7 +213,9 @@ public:
         C->RS.SetRS(D3DRS_ZFUNC, Func);
         return *this;
     }
-    // adopt_dx10texture		_dx10texture	(LPCSTR _name)							{	u32 s = C->r_dx10Texture(_name,0);			return
+    // adopt_dx10texture		_dx10texture	(LPCSTR _name)							{	u32 s =
+    // C->r_dx10Texture(_name,0);
+    // return
     // adopt_dx10sampler(C,s);	}
 
     adopt_dx10options _dx10Options() { return adopt_dx10options(); };
@@ -279,8 +290,8 @@ void CResourceManager::LS_Load()
                 .def("dx10atoc", &adopt_compiler::_dx10ATOC, return_reference_to<1>())
                 .def("dx10zfunc", &adopt_compiler::_dx10ZFunc, return_reference_to<1>())
 
-                .def("dx10sampler", &adopt_compiler::_dx10sampler)   // returns sampler-object
-                .def("dx10Options", &adopt_compiler::_dx10Options),  // returns options-object
+                .def("dx10sampler", &adopt_compiler::_dx10sampler) // returns sampler-object
+                .def("dx10Options", &adopt_compiler::_dx10Options), // returns options-object
 
             class_<adopt_blend>("blend").enum_("blend")[value("zero", int(D3DBLEND_ZERO)),
                 value("one", int(D3DBLEND_ONE)), value("srccolor", int(D3DBLEND_SRCCOLOR)),
@@ -310,9 +321,11 @@ void CResourceManager::LS_Load()
     {
         string_path namesp, fn;
         xr_strcpy(namesp, (*folder)[it]);
-        if (0 == strext(namesp) || 0 != xr_strcmp(strext(namesp), ".s")) continue;
+        if (0 == strext(namesp) || 0 != xr_strcmp(strext(namesp), ".s"))
+            continue;
         *strext(namesp) = 0;
-        if (0 == namesp[0]) xr_strcpy(namesp, ScriptEngine.GlobalNamespace);
+        if (0 == namesp[0])
+            xr_strcpy(namesp, ScriptEngine.GlobalNamespace);
         strconcat(sizeof(fn), fn, shaderPath, (*folder)[it]);
         FS.update_path(fn, "$game_shaders$", fn);
         ScriptEngine.load_file_into_namespace(fn, namesp);
@@ -320,11 +333,7 @@ void CResourceManager::LS_Load()
     FS.file_list_close(folder);
 }
 
-void CResourceManager::LS_Unload()
-{
-    ScriptEngine.unload();
-}
-
+void CResourceManager::LS_Unload() { ScriptEngine.unload(); }
 BOOL CResourceManager::_lua_HasShader(LPCSTR s_shader)
 {
     string256 undercorated;
@@ -335,7 +344,7 @@ BOOL CResourceManager::_lua_HasShader(LPCSTR s_shader)
     return ScriptEngine.object(undercorated, "editor", LUA_TFUNCTION);
 #else
     return ScriptEngine.object(undercorated, "normal", LUA_TFUNCTION) ||
-           ScriptEngine.object(undercorated, "l_special", LUA_TFUNCTION);
+        ScriptEngine.object(undercorated, "l_special", LUA_TFUNCTION);
 #endif
 }
 
@@ -361,7 +370,8 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
     C.detail_scaler = NULL;
 
     // Compile element	(LOD0 - HQ)
-    if (ScriptEngine.object(s_shader, "normal_hq", LUA_TFUNCTION)) {
+    if (ScriptEngine.object(s_shader, "normal_hq", LUA_TFUNCTION))
+    {
         // Analyze possibility to detail this shader
         C.iElement = 0;
         C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
@@ -373,7 +383,8 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
     }
     else
     {
-        if (ScriptEngine.object(s_shader, "normal", LUA_TFUNCTION)) {
+        if (ScriptEngine.object(s_shader, "normal", LUA_TFUNCTION))
+        {
             C.iElement = 0;
             C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
             S.E[0] = C._lua_Compile(s_shader, "normal");
@@ -381,14 +392,16 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
     }
 
     // Compile element	(LOD1)
-    if (ScriptEngine.object(s_shader, "normal", LUA_TFUNCTION)) {
+    if (ScriptEngine.object(s_shader, "normal", LUA_TFUNCTION))
+    {
         C.iElement = 1;
         C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
         S.E[1] = C._lua_Compile(s_shader, "normal");
     }
 
     // Compile element
-    if (ScriptEngine.object(s_shader, "l_point", LUA_TFUNCTION)) {
+    if (ScriptEngine.object(s_shader, "l_point", LUA_TFUNCTION))
+    {
         C.iElement = 2;
         C.bDetail = FALSE;
         S.E[2] = C._lua_Compile(s_shader, "l_point");
@@ -396,7 +409,8 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
     }
 
     // Compile element
-    if (ScriptEngine.object(s_shader, "l_spot", LUA_TFUNCTION)) {
+    if (ScriptEngine.object(s_shader, "l_spot", LUA_TFUNCTION))
+    {
         C.iElement = 3;
         C.bDetail = FALSE;
         S.E[3] = C._lua_Compile(s_shader, "l_spot");
@@ -404,7 +418,8 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
     }
 
     // Compile element
-    if (ScriptEngine.object(s_shader, "l_special", LUA_TFUNCTION)) {
+    if (ScriptEngine.object(s_shader, "l_special", LUA_TFUNCTION))
+    {
         C.iElement = 4;
         C.bDetail = FALSE;
         S.E[4] = C._lua_Compile(s_shader, "l_special");
@@ -412,7 +427,8 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
 
     // Search equal in shaders array
     for (u32 it = 0; it < v_shaders.size(); it++)
-        if (S.equal(v_shaders[it])) return v_shaders[it];
+        if (S.equal(v_shaders[it]))
+            return v_shaders[it];
 
     // Create _new_ entry
     Shader* N = new Shader(S);

@@ -27,17 +27,21 @@ void CRender::Calculate()
     r_dtex_range = ps_r2_df_parallax_range * g_fSCREEN / (1024.f * 768.f);
 
     // Detect camera-sector
-    if (!vLastCameraPos.similar(Device.vCameraPosition, EPS_S)) {
+    if (!vLastCameraPos.similar(Device.vCameraPosition, EPS_S))
+    {
         CSector* pSector = (CSector*)detectSector(Device.vCameraPosition);
-        if (pSector && (pSector != pLastSector)) g_pGamePersistent->OnSectorChanged(translateSector(pSector));
+        if (pSector && (pSector != pLastSector))
+            g_pGamePersistent->OnSectorChanged(translateSector(pSector));
 
-        if (0 == pSector) pSector = pLastSector;
+        if (0 == pSector)
+            pSector = pLastSector;
         pLastSector = pSector;
         vLastCameraPos.set(Device.vCameraPosition);
     }
 
     // Check if camera is too near to some portal - if so force DualRender
-    if (rmPortals) {
+    if (rmPortals)
+    {
         float eps = VIEWPORT_NEAR + EPS_L;
         Fvector box_radius;
         box_radius.set(eps, eps, eps);
@@ -61,7 +65,8 @@ void CRender::Calculate()
         ISpatial* spatial = lstRenderables[_it];
         spatial->spatial_updatesector();
         CSector* sector = (CSector*)spatial->GetSpatialData().sector;
-        if (0 == sector) continue;  // disassociated from S/P structure
+        if (0 == sector)
+            continue; // disassociated from S/P structure
 
         VERIFY(spatial->GetSpatialData().type & STYPE_LIGHTSOURCE);
         // lightsource

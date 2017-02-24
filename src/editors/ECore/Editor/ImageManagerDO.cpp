@@ -47,7 +47,7 @@ IC
     // Normal (and fastest way)
     for (u32 y = 0; y < s_y; y++)
     {
-        u8* P = mask.begin() + (y + R.lt.y) * dest_width + R.lt.x;  // destination scan-line
+        u8* P = mask.begin() + (y + R.lt.y) * dest_width + R.lt.x; // destination scan-line
         for (u32 x = 0; x < s_x; x++, P++)
             *P = 0xff;
     }
@@ -62,14 +62,17 @@ IC
     u32 s_x = R.width() + 1;
     u32 s_y = R.height() + 1;
 
-    if (R.rb.x >= dest_width) return false;
-    if (R.rb.y >= dest_height) return false;
+    if (R.rb.x >= dest_width)
+        return false;
+    if (R.rb.y >= dest_height)
+        return false;
     // Normal (and fastest way)
     for (u32 y = 0; y < s_y; y++)
     {
-        u8* P = mask.begin() + (y + R.lt.y) * dest_width + R.lt.x;  // destination scan-line
+        u8* P = mask.begin() + (y + R.lt.y) * dest_width + R.lt.x; // destination scan-line
         for (u32 x = 0; x < s_x; x++, P++)
-            if (*P) return false;
+            if (*P)
+                return false;
     }
     // It's OK to place it
     return true;
@@ -84,7 +87,8 @@ IC
     Irect R;
 
     // Normal
-    if ((r.rb.x < dest_width) && (r.rb.y < dest_height)) {
+    if ((r.rb.x < dest_width) && (r.rb.y < dest_height))
+    {
         u32 x_max = dest_width - r.rb.x;
         u32 y_max = dest_height - r.rb.y;
         bRotated = FALSE;
@@ -92,9 +96,11 @@ IC
         {
             for (u32 _X = 0; _X < x_max; _X++)
             {
-                if (mask[_Y * dest_width + _X]) continue;
+                if (mask[_Y * dest_width + _X])
+                    continue;
                 R.set(_X, _Y, _X + r.rb.x, _Y + r.rb.y);
-                if (_rect_test(mask, dest_width, dest_height, R)) {
+                if (_rect_test(mask, dest_width, dest_height, R))
+                {
                     _rect_register(mask, dest_width, dest_height, R);
                     r.set(R);
                     return true;
@@ -104,7 +110,8 @@ IC
     }
 
     // Rotated
-    if ((r.rb.y < dest_width) && (r.rb.x < dest_height)) {
+    if ((r.rb.y < dest_width) && (r.rb.x < dest_height))
+    {
         u32 x_max = dest_width - r.rb.y;
         u32 y_max = dest_height - r.rb.x;
         bRotated = TRUE;
@@ -112,9 +119,11 @@ IC
         {
             for (u32 _X = 0; _X < x_max; _X++)
             {
-                if (mask[_Y * dest_width + _X]) continue;
+                if (mask[_Y * dest_width + _X])
+                    continue;
                 R.set(_X, _Y, _X + r.rb.y, _Y + r.rb.x);
-                if (_rect_test(mask, dest_width, dest_height, R)) {
+                if (_rect_test(mask, dest_width, dest_height, R))
+                {
                     _rect_register(mask, dest_width, dest_height, R);
                     r.set(R);
                     return true;
@@ -137,7 +146,8 @@ int CImageManager::CreateMergedTexture(u32 layer_cnt, SSimpleImageVec& src_image
     int dest_width, int dest_height, Fvector2Vec& dest_offset, Fvector2Vec& dest_scale, boolVec& dest_rotate,
     U32Vec& dest_remap)
 {
-    if (src_images.empty()) return -1;
+    if (src_images.empty())
+        return -1;
 
     dest_offset.clear();
     dest_scale.clear();
@@ -156,7 +166,8 @@ int CImageManager::CreateMergedTexture(u32 layer_cnt, SSimpleImageVec& src_image
     {
         s_it->tag = s_it - src_images.begin();
         calc_area += (s_it->w * s_it->h);
-        if (calc_area > max_area) return 0;
+        if (calc_area > max_area)
+            return 0;
     }
 
     std::sort(src_images.begin(), src_images.end(), item_area_sort_pred);
@@ -169,7 +180,8 @@ int CImageManager::CreateMergedTexture(u32 layer_cnt, SSimpleImageVec& src_image
         Irect R;
         R.set(0, 0, s_it->w - 1, s_it->h - 1);
         BOOL bRotated;
-        if (!_rect_place(dest_mask, dest_width, dest_height, R, bRotated)) return 0;
+        if (!_rect_place(dest_mask, dest_width, dest_height, R, bRotated))
+            return 0;
         Fvector2 offs, scale;
         offs.x = float(R.lt.x) / float(dest_width);
         offs.y = float(R.lt.y) / float(dest_height);
@@ -210,7 +222,8 @@ int CImageManager::CreateMergedTexture(u32 layer_cnt, SSimpleImageVec& src_image
     {
         res = ImageLib.CreateMergedTexture(
             layer_cnt, src_images, dst_image, w, h, dest_offset, dest_scale, dest_rotate, dest_remap);
-        if (0 == res) {
+        if (0 == res)
+        {
             if ((w <= h) && (w < dest_width_max))
                 w *= 2;
             else if ((h < w) && (h < dest_height_max))
@@ -226,7 +239,8 @@ int CImageManager::CreateMergedTexture(const RStringVec& _names, LPCSTR dest_nam
     int dest_width, int dest_height, Fvector2Vec& dest_offset, Fvector2Vec& dest_scale, boolVec& dest_rotate,
     U32Vec& dest_remap)
 {
-    if (_names.empty()) return -1;
+    if (_names.empty())
+        return -1;
 
     dest_offset.clear();
     dest_scale.clear();
@@ -258,7 +272,8 @@ int CImageManager::CreateMergedTexture(const RStringVec& _names, LPCSTR dest_nam
             return -1;
         }
         calc_area += (s_it->w * s_it->h);
-        if (calc_area > max_area) return 0;
+        if (calc_area > max_area)
+            return 0;
         s_it->name = *n_it;
     }
 
@@ -277,7 +292,8 @@ int CImageManager::CreateMergedTexture(const RStringVec& _names, LPCSTR dest_nam
         Irect R;
         R.set(0, 0, s_it->w - 1, s_it->h - 1);
         BOOL bRotated;
-        if (!_rect_place(dest_mask, dest_width, dest_height, R, bRotated)) return 0;
+        if (!_rect_place(dest_mask, dest_width, dest_height, R, bRotated))
+            return 0;
         Fvector2 offs, scale;
         offs.x = float(R.lt.x) / float(dest_width);
         offs.y = float(R.lt.y) / float(dest_height);
@@ -320,7 +336,8 @@ int CImageManager::CreateMergedTexture(const RStringVec& src_names, LPCSTR dest_
     {
         res =
             ImageLib.CreateMergedTexture(src_names, dest_name, fmt, w, h, dest_offset, dest_scale, dest_rotate, remap);
-        if (0 == res) {
+        if (0 == res)
+        {
             if ((w <= h) && (w < dest_width_max))
                 w *= 2;
             else if ((h < w) && (h < dest_height_max))
@@ -335,7 +352,8 @@ int CImageManager::CreateMergedTexture(const RStringVec& src_names, LPCSTR dest_
 void CImageManager::MergedTextureRemapUV(
     float& dest_u, float& dest_v, float src_u, float src_v, const Fvector2& offs, const Fvector2& scale, bool bRotate)
 {
-    if (bRotate) {
+    if (bRotate)
+    {
         dest_u = scale.x * src_v + offs.x;
         dest_v = scale.y * src_u + offs.y;
     }

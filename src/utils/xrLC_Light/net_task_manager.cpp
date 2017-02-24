@@ -15,7 +15,7 @@ static xr_vector<std::pair<CDeflector*, CDeflector*>> diff;
 void DumpDiff()
 {
     Msg("diference: %d ", diff.size());
-    xr_vector<std::pair<CDeflector*, CDeflector*>>::iterator i = diff.begin(), b = diff.begin(), e = diff.end();
+    xr_vector<std::pair<CDeflector *, CDeflector *>>::iterator i = diff.begin(), b = diff.begin(), e = diff.end();
     for (; i != e; ++i)
     {
         Msg("diff %d", u32(i - b));
@@ -27,23 +27,10 @@ void DumpDiff()
 
 net_task_manager* g_net_task_manager = 0;
 
-net_task_manager* get_net_task_manager()
-{
-    return g_net_task_manager;
-}
-void create_net_task_manager()
-{
-    g_net_task_manager = new net_task_manager();
-}
-void destroy_net_task_manager()
-{
-    xr_delete(g_net_task_manager);
-}
-
-net_task_manager::net_task_manager() : thProgress(0)
-{
-}
-
+net_task_manager* get_net_task_manager() { return g_net_task_manager; }
+void create_net_task_manager() { g_net_task_manager = new net_task_manager(); }
+void destroy_net_task_manager() { xr_delete(g_net_task_manager); }
+net_task_manager::net_task_manager() : thProgress(0) {}
 void __cdecl Finalize(IGenericStream* outStream)
 {
     VERIFY(g_net_task_manager);
@@ -140,7 +127,7 @@ void __cdecl GetDataCallback(const char* dataDesc, IGenericStream** stream)
     time.Start();
     // R_ASSERT(gl_data_write);
 
-    *stream = new CGenStreamOnFile(g_net_data);  // CreateGenericStream();
+    *stream = new CGenStreamOnFile(g_net_data); // CreateGenericStream();
     //*stream = gl_data_write->net_stream();
 
     // gl_data_write->send_not_clear(*stream);
@@ -208,10 +195,7 @@ void net_task_manager::run()
 // "XRLC_LightStab.dll,XRLC_Light.dll,xrCore.dll,xrCDB.dll,DXT.dll,BugTrap.dll,msvcr80.dll,Microsoft.VC80.CRT.manifest,tmp_global_data0,tmp_global_data1,tmp_global_data2,tmp_global_data3,tmp_global_data4,tmp_global_data5";
 //#endif
 
-void send_lightmap_task(IGridUser& user, u32 deflector_id)
-{
-}
-
+void send_lightmap_task(IGridUser& user, u32 deflector_id) {}
 void net_task_manager::send(IGridUser& user, u32 deflector_id)
 {
     clMsg("send task : %d", deflector_id);
@@ -241,7 +225,8 @@ void net_task_manager::receive(INetReader& r)
     send_receive_data_lock.Enter();
     u32 id = r.r_u32();
     xr_vector<u32>::iterator it = std::find(pool.begin(), pool.end(), id);
-    if (it == pool.end()) {
+    if (it == pool.end())
+    {
         send_receive_data_lock.Leave();
         //		CDeflector temp;
         //		temp.read( r );
@@ -257,7 +242,8 @@ void net_task_manager::receive(INetReader& r)
     CDeflector* netD = new CDeflector();
     CDeflector* D = inlc_global_data()->g_deflectors()[id];
     netD->read(r);
-    if (!netD->similar(*D)) {
+    if (!netD->similar(*D))
+    {
         send_receive_data_lock.Enter();
         diff.push_back(std::pair<CDeflector*, CDeflector*>(D, netD));
         send_receive_data_lock.Leave();
@@ -278,7 +264,8 @@ void net_task_manager::receive(INetReader& r)
     // thProgress+=(1.f/size);
     Progress(1.f - float(pool.size()) / float(size));
     clMsg("num task complited : %d , num task left %d  (task num %d)", size - pool_size, pool_size, size);
-    if (pool.empty()) {
+    if (pool.empty())
+    {
         clMsg("calculation complited");
         clMsg("%f net lightmaps calculation seconds", start_time.GetElapsed_sec());
     }

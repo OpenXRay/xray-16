@@ -31,14 +31,16 @@
    http://www.oberhumer.com/opensource/lzo/
  */
 
+
 /*
  * NOTE:
  *   the strict 16-bit memory model is *not* officially supported.
  *   This file is only included for the sake of completeness.
  */
 
+
 #ifndef __LZOCONF_H
-#include <lzoconf.h>
+#  include <lzoconf.h>
 #endif
 
 #ifndef __LZO16BIT_H
@@ -51,6 +53,7 @@
 extern "C" {
 #endif
 
+
 /***********************************************************************
 //
 ************************************************************************/
@@ -62,12 +65,13 @@ extern "C" {
 #define LZO_999_UNSUPPORTED
 #endif
 
-typedef unsigned int lzo_uint;
-typedef int lzo_int;
-#define LZO_UINT_MAX UINT_MAX
-#define LZO_INT_MAX INT_MAX
+typedef unsigned int        lzo_uint;
+typedef int                 lzo_int;
+#define LZO_UINT_MAX        UINT_MAX
+#define LZO_INT_MAX         INT_MAX
 
-#define lzo_sizeof_dict_t sizeof(lzo_uint)
+#define lzo_sizeof_dict_t   sizeof(lzo_uint)
+
 
 /***********************************************************************
 //
@@ -76,12 +80,13 @@ typedef int lzo_int;
 #if defined(__LZO_DOS16) || defined(__LZO_WIN16)
 
 #if 0
-#define __LZO_MMODEL __far
+#define __LZO_MMODEL        __far
 #else
 #define __LZO_MMODEL
 #endif
 
 #endif /* defined(__LZO_DOS16) || defined(__LZO_WIN16) */
+
 
 #ifdef __cplusplus
 } /* extern "C" */
@@ -91,3 +96,4 @@ typedef int lzo_int;
 #endif /* defined(__LZO_STRICT_16BIT) */
 
 #endif /* already included */
+

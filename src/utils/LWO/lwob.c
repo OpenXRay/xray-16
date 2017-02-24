@@ -58,14 +58,16 @@ static int add_clip(char* s, lwClip** clist, int* nclips)
     char* p;
 
     clip = calloc(1, sizeof(lwClip));
-    if (!clip) return 0;
+    if (!clip)
+        return 0;
 
     clip->contrast.val = 1.0f;
     clip->brightness.val = 1.0f;
     clip->saturation.val = 1.0f;
     clip->gamma.val = 1.0f;
 
-    if (p = strstr(s, "(sequence)")) {
+    if (p = strstr(s, "(sequence)"))
+    {
         p[-1] = 0;
         clip->type = ID_ISEQ;
         clip->source.seq.prefix = s;
@@ -104,7 +106,8 @@ static int add_tvel(float pos[], float vel[], lwEnvelope** elist, int* nenvs)
         env = calloc(1, sizeof(lwEnvelope));
         key0 = calloc(1, sizeof(lwKey));
         key1 = calloc(1, sizeof(lwKey));
-        if (!env || !key0 || !key1) return 0;
+        if (!env || !key0 || !key1)
+            return 0;
 
         key0->next = key1;
         key0->value = pos[i];
@@ -117,7 +120,8 @@ static int add_tvel(float pos[], float vel[], lwEnvelope** elist, int* nenvs)
         env->index = *nenvs + i + 1;
         env->type = 0x0301 + i;
         env->name = malloc(11);
-        if (env->name) {
+        if (env->name)
+        {
             strcpy_s(env->name, 11, "Position.X");
             env->name[9] += i;
         }
@@ -145,13 +149,15 @@ static lwTexture* get_texture(char* s)
     lwTexture* tex;
 
     tex = calloc(1, sizeof(lwTexture));
-    if (!tex) return NULL;
+    if (!tex)
+        return NULL;
 
     tex->tmap.size.val[0] = tex->tmap.size.val[1] = tex->tmap.size.val[2] = 1.0f;
     tex->opacity.val = 1.0f;
     tex->enabled = 1;
 
-    if (strstr(s, "Image Map")) {
+    if (strstr(s, "Image Map"))
+    {
         tex->type = ID_IMAP;
         if (strstr(s, "Planar"))
             tex->param.imap.projection = 0;
@@ -197,7 +203,8 @@ lwSurface* lwGetSurface5(FILE* fp, int cksize, lwObject* obj)
     /* allocate the Surface structure */
 
     surf = calloc(1, sizeof(lwSurface));
-    if (!surf) goto Fail;
+    if (!surf)
+        goto Fail;
 
     /* non-zero defaults */
 
@@ -223,7 +230,8 @@ lwSurface* lwGetSurface5(FILE* fp, int cksize, lwObject* obj)
 
     id = getU4(fp);
     sz = getU2(fp);
-    if (0 > get_flen()) goto Fail;
+    if (0 > get_flen())
+        goto Fail;
 
     /* process subchunks as they're encountered */
 
@@ -242,12 +250,18 @@ lwSurface* lwGetSurface5(FILE* fp, int cksize, lwObject* obj)
 
         case ID_FLAG:
             flags = getU2(fp);
-            if (flags & 4) surf->smooth = 1.56207f;
-            if (flags & 8) surf->color_hilite.val = 1.0f;
-            if (flags & 16) surf->color_filter.val = 1.0f;
-            if (flags & 128) surf->dif_sharp.val = 0.5f;
-            if (flags & 256) surf->sideflags = 3;
-            if (flags & 512) surf->add_trans.val = 1.0f;
+            if (flags & 4)
+                surf->smooth = 1.56207f;
+            if (flags & 8)
+                surf->color_hilite.val = 1.0f;
+            if (flags & 16)
+                surf->color_filter.val = 1.0f;
+            if (flags & 128)
+                surf->dif_sharp.val = 0.5f;
+            if (flags & 256)
+                surf->sideflags = 3;
+            if (flags & 512)
+                surf->add_trans.val = 1.0f;
             break;
 
         case ID_LUMI: surf->luminosity.val = getI2(fp) / 256.0f; break;
@@ -327,19 +341,26 @@ lwSurface* lwGetSurface5(FILE* fp, int cksize, lwObject* obj)
         case ID_TFLG:
             flags = getU2(fp);
 
-            if (flags & 1) i = 0;
-            if (flags & 2) i = 1;
-            if (flags & 4) i = 2;
+            if (flags & 1)
+                i = 0;
+            if (flags & 2)
+                i = 1;
+            if (flags & 4)
+                i = 2;
             tex->axis = i;
             if (tex->type == ID_IMAP)
                 tex->param.imap.axis = i;
             else
                 tex->param.proc.axis = i;
 
-            if (flags & 8) tex->tmap.coord_sys = 1;
-            if (flags & 16) tex->negative = 1;
-            if (flags & 32) tex->param.imap.pblend = 1;
-            if (flags & 64) {
+            if (flags & 8)
+                tex->tmap.coord_sys = 1;
+            if (flags & 16)
+                tex->negative = 1;
+            if (flags & 32)
+                tex->param.imap.pblend = 1;
+            if (flags & 64)
+            {
                 tex->param.imap.aa_strength = 1.0f;
                 tex->param.imap.aas_flags = 1;
             }
@@ -374,7 +395,8 @@ lwSurface* lwGetSurface5(FILE* fp, int cksize, lwObject* obj)
         case ID_TVAL: tex->param.proc.value[0] = getI2(fp) / 256.0f; break;
 
         case ID_TAMP:
-            if (tex->type == ID_IMAP) tex->param.imap.amplitude.val = getF4(fp);
+            if (tex->type == ID_IMAP)
+                tex->param.imap.amplitude.val = getF4(fp);
             break;
 
         case ID_TIMG:
@@ -391,7 +413,8 @@ lwSurface* lwGetSurface5(FILE* fp, int cksize, lwObject* obj)
 
         case ID_SHDR:
             shdr = calloc(1, sizeof(lwPlugin));
-            if (!shdr) goto Fail;
+            if (!shdr)
+                goto Fail;
             shdr->name = getbytes(fp, sz);
             lwListAdd(&surf->shader, shdr);
             surf->nshaders++;
@@ -405,28 +428,33 @@ lwSurface* lwGetSurface5(FILE* fp, int cksize, lwObject* obj)
         /* error while reading current subchunk? */
 
         rlen = get_flen();
-        if (rlen < 0 || rlen > sz) goto Fail;
+        if (rlen < 0 || rlen > sz)
+            goto Fail;
 
         /* skip unread parts of the current subchunk */
 
-        if (rlen < sz) fseek(fp, sz - rlen, SEEK_CUR);
+        if (rlen < sz)
+            fseek(fp, sz - rlen, SEEK_CUR);
 
         /* end of the SURF chunk? */
 
-        if (cksize <= ftell(fp) - pos) break;
+        if (cksize <= ftell(fp) - pos)
+            break;
 
         /* get the next subchunk header */
 
         set_flen(0);
         id = getU4(fp);
         sz = getU2(fp);
-        if (6 != get_flen()) goto Fail;
+        if (6 != get_flen())
+            goto Fail;
     }
 
     return surf;
 
 Fail:
-    if (surf) lwFreeSurface(surf);
+    if (surf)
+        lwFreeSurface(surf);
     return NULL;
 }
 
@@ -445,13 +473,15 @@ int lwGetPolygons5(FILE* fp, int cksize, lwPolygonList* plist, int ptoffset)
     unsigned char *buf, *bp;
     int i, j, nv, nverts, npols;
 
-    if (cksize == 0) return 1;
+    if (cksize == 0)
+        return 1;
 
     /* read the whole chunk */
 
     set_flen(0);
     buf = getbytes(fp, cksize);
-    if (!buf) goto Fail;
+    if (!buf)
+        goto Fail;
 
     /* count the polygons and vertices */
 
@@ -466,10 +496,12 @@ int lwGetPolygons5(FILE* fp, int cksize, lwPolygonList* plist, int ptoffset)
         npols++;
         bp += 2 * nv;
         i = sgetI2(&bp);
-        if (i < 0) bp += 2; /* detail polygons */
+        if (i < 0)
+            bp += 2; /* detail polygons */
     }
 
-    if (!lwAllocPolygons(plist, npols, nverts)) goto Fail;
+    if (!lwAllocPolygons(plist, npols, nverts))
+        goto Fail;
 
     /* fill in the new polygons */
 
@@ -483,11 +515,13 @@ int lwGetPolygons5(FILE* fp, int cksize, lwPolygonList* plist, int ptoffset)
 
         pp->nverts = nv;
         pp->type = ID_FACE;
-        if (!pp->v) pp->v = pv;
+        if (!pp->v)
+            pp->v = pv;
         for (j = 0; j < nv; j++)
             pv[j].index = sgetU2(&bp) + ptoffset;
         j = sgetI2(&bp);
-        if (j < 0) {
+        if (j < 0)
+        {
             j = -j;
             bp += 2;
         }
@@ -502,7 +536,8 @@ int lwGetPolygons5(FILE* fp, int cksize, lwPolygonList* plist, int ptoffset)
     return 1;
 
 Fail:
-    if (buf) free(buf);
+    if (buf)
+        free(buf);
     lwFreePolygons(plist);
     return 0;
 }
@@ -539,7 +574,8 @@ lwObject* lwGetObject5(char* filename, unsigned int* failID, int* failpos)
     /* open the file */
 
     fp = fopen(filename, "rb");
-    if (!fp) return NULL;
+    if (!fp)
+        return NULL;
 
     /* read the first 12 bytes */
 
@@ -547,26 +583,31 @@ lwObject* lwGetObject5(char* filename, unsigned int* failID, int* failpos)
     id = getU4(fp);
     formsize = getU4(fp);
     type = getU4(fp);
-    if (12 != get_flen()) {
+    if (12 != get_flen())
+    {
         fclose(fp);
         return NULL;
     }
 
     /* LWOB? */
 
-    if (id != ID_FORM || type != ID_LWOB) {
+    if (id != ID_FORM || type != ID_LWOB)
+    {
         fclose(fp);
-        if (failpos) *failpos = 12;
+        if (failpos)
+            *failpos = 12;
         return NULL;
     }
 
     /* allocate an object and a default layer */
 
     object = calloc(1, sizeof(lwObject));
-    if (!object) goto Fail;
+    if (!object)
+        goto Fail;
 
     layer = calloc(1, sizeof(lwLayer));
-    if (!layer) goto Fail;
+    if (!layer)
+        goto Fail;
     object->layer = layer;
     object->nlayers = 1;
 
@@ -574,7 +615,8 @@ lwObject* lwGetObject5(char* filename, unsigned int* failID, int* failpos)
 
     id = getU4(fp);
     cksize = getU4(fp);
-    if (0 > get_flen()) goto Fail;
+    if (0 > get_flen())
+        goto Fail;
 
     /* process chunks as they're encountered */
 
@@ -585,20 +627,24 @@ lwObject* lwGetObject5(char* filename, unsigned int* failID, int* failpos)
         switch (id)
         {
         case ID_PNTS:
-            if (!lwGetPoints(fp, cksize, &layer->point)) goto Fail;
+            if (!lwGetPoints(fp, cksize, &layer->point))
+                goto Fail;
             break;
 
         case ID_POLS:
-            if (!lwGetPolygons5(fp, cksize, &layer->polygon, layer->point.offset)) goto Fail;
+            if (!lwGetPolygons5(fp, cksize, &layer->polygon, layer->point.offset))
+                goto Fail;
             break;
 
         case ID_SRFS:
-            if (!lwGetTags(fp, cksize, &object->taglist)) goto Fail;
+            if (!lwGetTags(fp, cksize, &object->taglist))
+                goto Fail;
             break;
 
         case ID_SURF:
             node = (lwNode*)lwGetSurface5(fp, cksize, object);
-            if (!node) goto Fail;
+            if (!node)
+                goto Fail;
             lwListAdd(&object->surf, node);
             object->nsurfs++;
             break;
@@ -608,14 +654,16 @@ lwObject* lwGetObject5(char* filename, unsigned int* failID, int* failpos)
 
         /* end of the file? */
 
-        if ((long)formsize <= ftell(fp) - 8) break;
+        if ((long)formsize <= ftell(fp) - 8)
+            break;
 
         /* get the next chunk header */
 
         set_flen(0);
         id = getU4(fp);
         cksize = getU4(fp);
-        if (8 != get_flen()) goto Fail;
+        if (8 != get_flen())
+            goto Fail;
     }
 
     fclose(fp);
@@ -623,16 +671,21 @@ lwObject* lwGetObject5(char* filename, unsigned int* failID, int* failpos)
 
     lwGetBoundingBox(&layer->point, layer->bbox);
     lwGetPolyNormals(&layer->point, &layer->polygon);
-    if (!lwGetPointPolygons(&layer->point, &layer->polygon)) goto Fail;
-    if (!lwResolvePolySurfaces(&layer->polygon, &object->taglist, &object->surf, &object->nsurfs)) goto Fail;
+    if (!lwGetPointPolygons(&layer->point, &layer->polygon))
+        goto Fail;
+    if (!lwResolvePolySurfaces(&layer->polygon, &object->taglist, &object->surf, &object->nsurfs))
+        goto Fail;
     lwGetVertNormals(&layer->point, &layer->polygon);
 
     return object;
 
 Fail:
-    if (failID) *failID = id;
-    if (fp) {
-        if (failpos) *failpos = ftell(fp);
+    if (failID)
+        *failID = id;
+    if (fp)
+    {
+        if (failpos)
+            *failpos = ftell(fp);
         fclose(fp);
     }
     lwFreeObject(object);

@@ -1,21 +1,15 @@
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
 #define CStateBloodsuckerVampireApproachAbstract CStateBloodsuckerVampireApproach<_Object>
 
 TEMPLATE_SPECIALIZATION
-CStateBloodsuckerVampireApproachAbstract::CStateBloodsuckerVampireApproach(_Object* obj) : inherited(obj)
-{
-}
-
+CStateBloodsuckerVampireApproachAbstract::CStateBloodsuckerVampireApproach(_Object* obj) : inherited(obj) {}
 TEMPLATE_SPECIALIZATION
-CStateBloodsuckerVampireApproachAbstract::~CStateBloodsuckerVampireApproach()
-{
-}
-
+CStateBloodsuckerVampireApproachAbstract::~CStateBloodsuckerVampireApproach() {}
 TEMPLATE_SPECIALIZATION
 void CStateBloodsuckerVampireApproachAbstract::initialize()
 {

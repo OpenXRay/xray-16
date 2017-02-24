@@ -34,11 +34,7 @@ CALifeMonsterPatrolPathManager::CALifeMonsterPatrolPathManager(object_type* obje
     use_randomness(true);
 }
 
-void CALifeMonsterPatrolPathManager::path(const shared_str& path_name)
-{
-    path(ai().patrol_paths().path(path_name));
-}
-
+void CALifeMonsterPatrolPathManager::path(const shared_str& path_name) { path(ai().patrol_paths().path(path_name)); }
 const CALifeMonsterPatrolPathManager::_GRAPH_ID& CALifeMonsterPatrolPathManager::target_game_vertex_id() const
 {
     return (path().vertex(m_current_vertex_index)->data().game_vertex_id());
@@ -63,7 +59,8 @@ void CALifeMonsterPatrolPathManager::select_nearest()
     CPatrolPath::const_vertex_iterator E = path().vertices().end();
     for (; I != E; ++I)
     {
-        if ((*I).second->data().game_vertex_id() == object().get_object().m_tGraphID) {
+        if ((*I).second->data().game_vertex_id() == object().get_object().m_tGraphID)
+        {
             m_current_vertex_index = (*I).second->vertex_id();
             break;
         }
@@ -71,7 +68,8 @@ void CALifeMonsterPatrolPathManager::select_nearest()
         float distance =
             global_position.distance_to(ai().game_graph().vertex((*I).second->data().game_vertex_id())->game_point());
 
-        if (distance >= best_distance) continue;
+        if (distance >= best_distance)
+            continue;
 
         best_distance = distance;
         m_current_vertex_index = (*I).second->vertex_id();
@@ -119,9 +117,11 @@ void CALifeMonsterPatrolPathManager::actualize()
 
 bool CALifeMonsterPatrolPathManager::location_reached() const
 {
-    if (object().get_object().m_tGraphID != target_game_vertex_id()) return (false);
+    if (object().get_object().m_tGraphID != target_game_vertex_id())
+        return (false);
 
-    if (object().get_object().m_tNodeID != target_level_vertex_id()) return (false);
+    if (object().get_object().m_tNodeID != target_level_vertex_id())
+        return (false);
 
     return (true);
 }
@@ -137,12 +137,14 @@ void CALifeMonsterPatrolPathManager::navigate()
     u32 branching_factor = 0;
     for (; I != E; ++I)
     {
-        if (*I == m_previous_vertex_index) continue;
+        if (*I == m_previous_vertex_index)
+            continue;
 
         ++branching_factor;
     }
 
-    if (!branching_factor) {
+    if (!branching_factor)
+    {
         switch (route_type())
         {
         case ePatrolRouteTypeStop:
@@ -153,7 +155,8 @@ void CALifeMonsterPatrolPathManager::navigate()
         };
         case ePatrolRouteTypeContinue:
         {
-            if (vertex.edges().empty()) {
+            if (vertex.edges().empty())
+            {
                 VERIFY(!m_completed);
                 m_completed = true;
                 break;
@@ -172,9 +175,11 @@ void CALifeMonsterPatrolPathManager::navigate()
     u32 branch = 0;
     for (I = B; I != E; ++I)
     {
-        if (*I == m_previous_vertex_index) continue;
+        if (*I == m_previous_vertex_index)
+            continue;
 
-        if (chosen == branch) break;
+        if (chosen == branch)
+            break;
 
         ++branch;
     }
@@ -186,13 +191,17 @@ void CALifeMonsterPatrolPathManager::navigate()
 
 void CALifeMonsterPatrolPathManager::update()
 {
-    if (!m_path) return;
+    if (!m_path)
+        return;
 
-    if (completed()) return;
+    if (completed())
+        return;
 
-    if (!actual()) actualize();
+    if (!actual())
+        actualize();
 
-    if (!location_reached()) return;
+    if (!location_reached())
+        return;
 
     navigate();
 }

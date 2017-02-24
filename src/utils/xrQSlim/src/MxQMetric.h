@@ -1,4 +1,4 @@
-#ifndef MXQMETRIC_INCLUDED  // -*- C++ -*-
+#ifndef MXQMETRIC_INCLUDED // -*- C++ -*-
 #define MXQMETRIC_INCLUDED
 #if !defined(__GNUC__)
 #pragma once
@@ -32,7 +32,6 @@ public:
     MxQuadric(const MxVector& p1, const MxVector& p2, const MxVector& p3, double area = 1.0);
     MxQuadric(const MxQuadric3&, unsigned int N);
     MxQuadric(const MxQuadric& Q) : A(Q.A.dim()), b(Q.b.dim()) { *this = Q; }
-
     const MxMatrix& tensor() const { return A; }
     const MxVector& vector() const { return b; }
     double offset() const { return c; }
@@ -80,7 +79,6 @@ public:
 
     double evaluate(const MxVector& v) const;
     double operator()(const MxVector& v) const { return evaluate(v); }
-
     bool optimize(MxVector& v) const;
 };
 

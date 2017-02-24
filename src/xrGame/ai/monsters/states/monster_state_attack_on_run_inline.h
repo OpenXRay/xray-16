@@ -21,14 +21,11 @@ namespace monsters
 TTime const max_go_far_time = 6000;
 TTime const update_side_period = 5000;
 
-}  // namespace monsters
-}  // namespace detail
+} // namespace monsters
+} // namespace detail
 
 TEMPLATE_SIGNATURE
-ATTACK_ON_RUN_STATE::CStateMonsterAttackOnRun(_Object* obj) : inherited(obj)
-{
-}
-
+ATTACK_ON_RUN_STATE::CStateMonsterAttackOnRun(_Object* obj) : inherited(obj) {}
 TEMPLATE_SIGNATURE
 void ATTACK_ON_RUN_STATE::initialize()
 {
@@ -77,11 +74,13 @@ void ATTACK_ON_RUN_STATE::choose_next_atack_animation()
 TEMPLATE_SIGNATURE
 bool ATTACK_ON_RUN_STATE::check_control_start_conditions(ControlCom::EControlType type)
 {
-    if (type == ControlCom::eAntiAim) {
+    if (type == ControlCom::eAntiAim)
+    {
         return (m_phaze == go_close) && !m_attacking;
     }
 
-    if (type == ControlCom::eControlRotationJump) {
+    if (type == ControlCom::eControlRotationJump)
+    {
         CEntityAlive const* const enemy = object->EnemyMan.get_enemy();
         Fvector const enemy_pos = enemy->Position();
         float const self2enemy_mag = enemy_pos.distance_to(object->Position());
@@ -102,8 +101,9 @@ void ATTACK_ON_RUN_STATE::set_movement_phaze(phaze const new_phaze)
     m_phaze_chosen_time = current_time();
     m_prepare_side_chosen_time = current_time();
 
-    if (m_phaze == go_close) {
-        m_attack_side_chosen_time = 0;  // recalc attack_side
+    if (m_phaze == go_close)
+    {
+        m_attack_side_chosen_time = 0; // recalc attack_side
     }
     else if (m_phaze == go_prepare)
     {
@@ -131,7 +131,8 @@ void ATTACK_ON_RUN_STATE::calculate_predicted_enemy_pos()
     float const self2enemy_mag = magnitude(enemy_pos - object->Position());
     float const far_radius = object->get_attack_on_move_far_radius();
 
-    if (self2enemy_mag > far_radius * 2) {
+    if (self2enemy_mag > far_radius * 2)
+    {
         m_predicted_enemy_pos = enemy_pos;
         return;
     }
@@ -140,9 +141,12 @@ void ATTACK_ON_RUN_STATE::calculate_predicted_enemy_pos()
     float const self2enemy_time = self_velocity > epsilon ? self2enemy_mag / self_velocity : 0;
 
     float const predictiton_delta_sec = (current_time() - m_last_prediction_time) / 1000.f;
-    if (predictiton_delta_sec > 1.f) {
-        if (m_last_prediction_time != 0) {
-            if (predictiton_delta_sec < 2.f) {
+    if (predictiton_delta_sec > 1.f)
+    {
+        if (m_last_prediction_time != 0)
+        {
+            if (predictiton_delta_sec < 2.f)
+            {
                 Fvector const move_delta = enemy_pos - m_last_update_enemy_pos;
                 m_predicted_enemy_velocity = move_delta / predictiton_delta_sec;
             }
@@ -158,10 +162,12 @@ void ATTACK_ON_RUN_STATE::calculate_predicted_enemy_pos()
 
     m_predicted_enemy_pos = enemy_pos + m_predicted_enemy_velocity * self2enemy_time * prediction_factor;
 
-    if (magnitude(m_predicted_enemy_pos - object->Position()) < 0.01f) {
+    if (magnitude(m_predicted_enemy_pos - object->Position()) < 0.01f)
+    {
         m_predicted_enemy_pos = enemy_pos;
 
-        if (magnitude(m_predicted_enemy_pos - object->Position()) < 0.01f) {
+        if (magnitude(m_predicted_enemy_pos - object->Position()) < 0.01f)
+        {
             m_predicted_enemy_pos.x += 1.f;
         }
     }
@@ -179,7 +185,8 @@ void ATTACK_ON_RUN_STATE::update_aim_side()
 
     TTime const update_side_period = (TTime)(object->get_attack_on_move_update_side_period() * 1000);
 
-    if (current_time() > m_attack_side_chosen_time + update_side_period) {
+    if (current_time() > m_attack_side_chosen_time + update_side_period)
+    {
         if (m_attack_side == new_attack_side)
             m_attack_side = (new_attack_side == left) ? right : left;
         else
@@ -188,14 +195,16 @@ void ATTACK_ON_RUN_STATE::update_aim_side()
         m_attack_side_chosen_time = current_time();
     }
 
-    if (m_attacking) {
+    if (m_attacking)
+    {
         return;
     }
 }
 
 inline bool is_valid_point_to_move(Fvector const& point, u32* out_vertex)
 {
-    if (!ai().level_graph().valid_vertex_position(point)) {
+    if (!ai().level_graph().valid_vertex_position(point))
+    {
         return false;
     }
 
@@ -206,8 +215,10 @@ inline bool is_valid_point_to_move(Fvector const& point, u32* out_vertex)
 
     for (; (I != E) && ((*I).position().xz() == vertex_pos.xz()); ++I)
     {
-        if (abs(ai().level_graph().vertex_plane_y(*I) - point.y) < 4.f) {
-            if (out_vertex) {
+        if (abs(ai().level_graph().vertex_plane_y(*I) - point.y) < 4.f)
+        {
+            if (out_vertex)
+            {
                 *out_vertex = ai().level_graph().vertex_id(I);
             }
             return true;
@@ -224,7 +235,7 @@ void ATTACK_ON_RUN_STATE::update_movement_target()
     DBG().get_text_tree().clear();
     debug::text_tree& text_tree = DBG().get_text_tree().find_or_add("ActorView");
     text_tree.add_line("attacking", m_attacking);
-#endif  // DEBUG_STATE
+#endif // DEBUG_STATE
 
     TTime const max_go_close_time = (TTime)(1000 * object->get_attack_on_move_max_go_close_time());
     float const far_radius = object->get_attack_on_move_far_radius();
@@ -237,7 +248,8 @@ void ATTACK_ON_RUN_STATE::update_movement_target()
     Fvector const self2enemy = enemy_pos - self_pos;
     float const self2enemy_mag = self2enemy.magnitude();
 
-    if (self2enemy_mag > far_radius * 2) {
+    if (self2enemy_mag > far_radius * 2)
+    {
         m_target_vertex = enemy->ai_location().level_vertex_id();
         m_target = ai().level_graph().vertex_position(m_target_vertex);
         m_predicted_enemy_pos = m_target;
@@ -251,8 +263,10 @@ void ATTACK_ON_RUN_STATE::update_movement_target()
     Fvector const self2predicted = m_predicted_enemy_pos - self_pos;
     float const self2predicted_mag = self2predicted.magnitude();
 
-    if (m_phaze == go_prepare) {
-        if (current_time() > m_phaze_chosen_time + prepare_time * 1000) {
+    if (m_phaze == go_prepare)
+    {
+        if (current_time() > m_phaze_chosen_time + prepare_time * 1000)
+        {
             set_movement_phaze(go_close);
         }
         else if (self2predicted_mag < 3.f && current_time() > m_phaze_chosen_time + 3000)
@@ -276,7 +290,8 @@ void ATTACK_ON_RUN_STATE::update_movement_target()
             set_movement_phaze(go_prepare);
         }
 
-        if (current_time() - m_phaze_chosen_time > max_go_close_time) {
+        if (current_time() - m_phaze_chosen_time > max_go_close_time)
+        {
             set_movement_phaze(go_prepare);
         }
     }
@@ -284,11 +299,13 @@ void ATTACK_ON_RUN_STATE::update_movement_target()
 #ifdef DEBUG_STATE
     text_tree.add_line("phaze", m_phaze == go_prepare ? "preparation" : "close");
     text_tree.add_line("reach_old_target", m_reach_old_target);
-#endif  // DEBUG_STATE
+#endif // DEBUG_STATE
 
-    if (m_reach_old_target) {
+    if (m_reach_old_target)
+    {
         self2target = m_target - self_pos;
-        if (magnitude(m_target - self_pos) < 1.f || current_time() > m_reach_old_target_start_time + 1000) {
+        if (magnitude(m_target - self_pos) < 1.f || current_time() > m_reach_old_target_start_time + 1000)
+        {
             m_reach_old_target = false;
             set_movement_phaze(go_prepare);
         }
@@ -332,8 +349,9 @@ void ATTACK_ON_RUN_STATE::update_movement_target()
         Fvector dir2target = Fvector().crossproduct(self2predicted, cr_fvector3(0, 1, 0)).normalize();
 #ifdef DEBUG_STATE
         text_tree.add_line("type", 1);
-#endif  // DEBUG_STATE
-        if (self_dir.dotproduct(dir2target) < 0) {
+#endif // DEBUG_STATE
+        if (self_dir.dotproduct(dir2target) < 0)
+        {
             dir2target.invert();
         }
 
@@ -349,13 +367,16 @@ void ATTACK_ON_RUN_STATE::update_movement_target()
 
     bool const target_to_enemy_clear = ai().level_graph().valid_vertex_id(target_vertex);
 
-    if ((m_phaze == go_close && !target_to_enemy_clear) || !is_valid_point_to_move(m_target, &m_target_vertex)) {
-        if (m_phaze == go_close) {
+    if ((m_phaze == go_close && !target_to_enemy_clear) || !is_valid_point_to_move(m_target, &m_target_vertex))
+    {
+        if (m_phaze == go_close)
+        {
             m_target_vertex = enemy->ai_location().level_vertex_id();
             m_target = ai().level_graph().vertex_position(m_target_vertex);
             m_predicted_enemy_pos = m_target;
 
-            if (object->ai_location().level_vertex_id() == m_target_vertex) set_movement_phaze(go_prepare);
+            if (object->ai_location().level_vertex_id() == m_target_vertex)
+                set_movement_phaze(go_prepare);
         }
         else
         {
@@ -379,7 +400,8 @@ void ATTACK_ON_RUN_STATE::select_prepare_fallback_target()
         float const angle = move_scan_angle * index;
         Fvector const scan_point = enemy_pos + rotate_point(Fvector().set(far_radius, 0, 0), angle);
 
-        if (is_valid_point_to_move(scan_point, &m_target_vertex)) {
+        if (is_valid_point_to_move(scan_point, &m_target_vertex))
+        {
             m_target = scan_point;
             return;
         }
@@ -394,7 +416,8 @@ void ATTACK_ON_RUN_STATE::select_prepare_fallback_target()
 TEMPLATE_SIGNATURE
 void ATTACK_ON_RUN_STATE::update_try_min_time()
 {
-    if (current_time() > m_try_min_time_chosen_time + m_try_min_time_period) {
+    if (current_time() > m_try_min_time_chosen_time + m_try_min_time_period)
+    {
         m_try_min_time_chosen_time = current_time();
         m_try_min_time_period = 3000 + (rand() % 3000);
         m_try_min_time = !(rand() % 2);
@@ -404,15 +427,18 @@ void ATTACK_ON_RUN_STATE::update_try_min_time()
 TEMPLATE_SIGNATURE
 void ATTACK_ON_RUN_STATE::update_attack()
 {
-    if (m_attacking) {
-        if (current_time() > m_attack_end_time) {
+    if (m_attacking)
+    {
+        if (current_time() > m_attack_end_time)
+        {
             choose_next_atack_animation();
             m_attacking = false;
 
             // set_movement_phaze				(go_prepare);
 
             EMotionAnim override_animation = object->anim().get_override_animation();
-            if (override_animation == eAnimAttackOnRunLeft || override_animation == eAnimAttackOnRunRight) {
+            if (override_animation == eAnimAttackOnRunLeft || override_animation == eAnimAttackOnRunRight)
+            {
                 object->anim().clear_override_animation();
             }
         }
@@ -431,7 +457,7 @@ void ATTACK_ON_RUN_STATE::update_attack()
 
 #ifdef DEBUG_STATE
             debug::text_tree& text_tree = DBG().get_text_tree().find_or_add("ActorView");
-#endif  // #ifdef DEBUG_STATE
+#endif // #ifdef DEBUG_STATE
 
             float velocity = object->movement().speed();
             Fvector self_to_enemy_xz = enemy_pos - object->Position();
@@ -465,16 +491,18 @@ void ATTACK_ON_RUN_STATE::update_attack()
             text_tree.add_line("good_attack_angle", good_attack_angle);
             // text_tree.add_line					("see_enemy_now", see_enemy_now);
             text_tree.add_line("good_attack_dist", good_attack_dist);
-#endif  // #ifdef DEBUG_STATE
+#endif // #ifdef DEBUG_STATE
 
-            if (good_attack_angle && good_attack_dist) {
+            if (good_attack_angle && good_attack_dist)
+            {
                 can_attack = true;
                 m_enemy_to_attack = enemy;
                 break;
             }
         }
 
-        if (can_attack) {
+        if (can_attack)
+        {
             object->on_attack_on_run_hit();
             m_attacking = true;
             m_reach_old_target = true;
@@ -496,7 +524,8 @@ void ATTACK_ON_RUN_STATE::update_attack()
         }
     }
 
-    if (m_is_jumping && !object->is_jumping()) {
+    if (m_is_jumping && !object->is_jumping())
+    {
         set_movement_phaze(go_prepare);
     }
 
@@ -518,7 +547,7 @@ void ATTACK_ON_RUN_STATE::execute()
     object->anim().accel_set_braking(false);
 
     object->path().set_target_point(m_target, m_target_vertex);
-    object->path().set_rebuild_time(m_attacking ? 20 : 150);  // object->get_attack_rebuild_time());
+    object->path().set_rebuild_time(m_attacking ? 20 : 150); // object->get_attack_rebuild_time());
 
     object->path().set_use_covers();
     object->path().set_cover_params(0.1f, 30.f, 1.f, 30.f);
@@ -564,15 +593,18 @@ bool ATTACK_ON_RUN_STATE::check_start_conditions()
 {
     float dist = object->MeleeChecker.distance_to_enemy(object->EnemyMan.get_enemy());
 
-    if (dist > object->db().m_run_attack_start_dist) {
+    if (dist > object->db().m_run_attack_start_dist)
+    {
         return false;
     }
-    if (dist < object->MeleeChecker.get_min_distance()) {
+    if (dist < object->MeleeChecker.get_min_distance())
+    {
         return false;
     }
 
     // check angle
-    if (!object->control().direction().is_face_target(object->EnemyMan.get_enemy(), deg(30))) {
+    if (!object->control().direction().is_face_target(object->EnemyMan.get_enemy(), deg(30)))
+    {
         return false;
     }
 
@@ -592,4 +624,4 @@ bool ATTACK_ON_RUN_STATE::check_completion()
 #undef TEMPLATE_SIGNATURE
 #undef ATTACK_ON_RUN_STATE
 
-#endif  // MONSTER_STATE_ATTACK_ON_RUN_INLINE_H
+#endif // MONSTER_STATE_ATTACK_ON_RUN_INLINE_H

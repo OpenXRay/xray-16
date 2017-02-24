@@ -12,15 +12,8 @@
 #include "xrAICore/Navigation/level_graph.h"
 #include "moving_object.h"
 
-moving_objects::moving_objects() : m_tree(0)
-{
-}
-
-moving_objects::~moving_objects()
-{
-    xr_delete(m_tree);
-}
-
+moving_objects::moving_objects() : m_tree(0) {}
+moving_objects::~moving_objects() { xr_delete(m_tree); }
 void moving_objects::on_level_load()
 {
     xr_delete(m_tree);
@@ -35,7 +28,7 @@ void moving_objects::register_object(moving_object* moving_object)
 
 #ifdef DEBUG
     m_objects.insert(moving_object);
-#endif  // DEBUG
+#endif // DEBUG
 
     VERIFY(m_tree);
     m_tree->insert(moving_object);
@@ -48,7 +41,7 @@ void moving_objects::unregister_object(moving_object* moving_object)
 
 #ifdef DEBUG
     m_objects.erase(m_objects.find(moving_object));
-#endif  // DEBUG
+#endif // DEBUG
 
     VERIFY(m_tree);
     m_tree->remove(moving_object);
@@ -69,7 +62,4 @@ void moving_objects::on_object_move(moving_object* moving_object)
     m_tree->insert(moving_object);
 }
 
-void moving_objects::clear()
-{
-    m_previous_collisions.clear_not_free();
-}
+void moving_objects::clear() { m_previous_collisions.clear_not_free(); }

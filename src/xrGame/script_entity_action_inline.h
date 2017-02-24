@@ -14,11 +14,7 @@ IC CScriptEntityAction::CScriptEntityAction()
     m_started = false;
 }
 
-IC CScriptEntityAction::CScriptEntityAction(const CScriptEntityAction* entity_action)
-{
-    *this = *entity_action;
-}
-
+IC CScriptEntityAction::CScriptEntityAction(const CScriptEntityAction* entity_action) { *this = *entity_action; }
 template <typename T>
 IC void CScriptEntityAction::SetAction(const T& t, T& tt)
 {
@@ -30,21 +26,13 @@ IC void CScriptEntityAction::SetAction(CScriptMovementAction& tMovementAction)
     SetAction(tMovementAction, m_tMovementAction);
 }
 
-IC void CScriptEntityAction::SetAction(CScriptWatchAction& tWatchAction)
-{
-    SetAction(tWatchAction, m_tWatchAction);
-}
-
+IC void CScriptEntityAction::SetAction(CScriptWatchAction& tWatchAction) { SetAction(tWatchAction, m_tWatchAction); }
 IC void CScriptEntityAction::SetAction(CScriptAnimationAction& tAnimationAction)
 {
     SetAction(tAnimationAction, m_tAnimationAction);
 }
 
-IC void CScriptEntityAction::SetAction(CScriptSoundAction& tSoundAction)
-{
-    SetAction(tSoundAction, m_tSoundAction);
-}
-
+IC void CScriptEntityAction::SetAction(CScriptSoundAction& tSoundAction) { SetAction(tSoundAction, m_tSoundAction); }
 IC void CScriptEntityAction::SetAction(CScriptParticleAction& tParticleAction)
 {
     SetAction(tParticleAction, m_tParticleAction);
@@ -65,46 +53,18 @@ IC void CScriptEntityAction::SetAction(CScriptMonsterAction& tMonsterAction)
     SetAction(tMonsterAction, m_tMonsterAction);
 }
 
-IC void CScriptEntityAction::SetAction(void* user_data)
-{
-    m_user_data = user_data;
-}
-
+IC void CScriptEntityAction::SetAction(void* user_data) { m_user_data = user_data; }
 IC bool CScriptEntityAction::CheckIfActionCompleted(const CScriptAbstractAction& tAbstractAction) const
 {
     return (tAbstractAction.m_bCompleted);
 }
 
-IC bool CScriptEntityAction::CheckIfMovementCompleted() const
-{
-    return (CheckIfActionCompleted(m_tMovementAction));
-}
-
-IC bool CScriptEntityAction::CheckIfWatchCompleted() const
-{
-    return (CheckIfActionCompleted(m_tWatchAction));
-}
-
-IC bool CScriptEntityAction::CheckIfAnimationCompleted() const
-{
-    return (CheckIfActionCompleted(m_tAnimationAction));
-}
-
-IC bool CScriptEntityAction::CheckIfSoundCompleted() const
-{
-    return (CheckIfActionCompleted(m_tSoundAction));
-}
-
-IC bool CScriptEntityAction::CheckIfParticleCompleted() const
-{
-    return (CheckIfActionCompleted(m_tParticleAction));
-}
-
-IC bool CScriptEntityAction::CheckIfObjectCompleted() const
-{
-    return (CheckIfActionCompleted(m_tObjectAction));
-}
-
+IC bool CScriptEntityAction::CheckIfMovementCompleted() const { return (CheckIfActionCompleted(m_tMovementAction)); }
+IC bool CScriptEntityAction::CheckIfWatchCompleted() const { return (CheckIfActionCompleted(m_tWatchAction)); }
+IC bool CScriptEntityAction::CheckIfAnimationCompleted() const { return (CheckIfActionCompleted(m_tAnimationAction)); }
+IC bool CScriptEntityAction::CheckIfSoundCompleted() const { return (CheckIfActionCompleted(m_tSoundAction)); }
+IC bool CScriptEntityAction::CheckIfParticleCompleted() const { return (CheckIfActionCompleted(m_tParticleAction)); }
+IC bool CScriptEntityAction::CheckIfObjectCompleted() const { return (CheckIfActionCompleted(m_tObjectAction)); }
 IC bool CScriptEntityAction::CheckIfMonsterActionCompleted() const
 {
     return (CheckIfActionCompleted(m_tMonsterAction));
@@ -113,14 +73,15 @@ IC bool CScriptEntityAction::CheckIfMonsterActionCompleted() const
 IC bool CScriptEntityAction::CheckIfTimeOver()
 {
     return ((m_tActionCondition.m_tLifeTime >= 0) &&
-            ((m_tActionCondition.m_tStartTime + m_tActionCondition.m_tLifeTime) < Device.dwTimeGlobal));
+        ((m_tActionCondition.m_tStartTime + m_tActionCondition.m_tLifeTime) < Device.dwTimeGlobal));
 }
 
 IC bool CScriptEntityAction::CheckIfActionCompleted()
 {
     bool started = m_started;
     m_started = true;
-    if (!started) return (false);
+    if (!started)
+        return (false);
 
     u32 l_dwFlags = m_tActionCondition.m_dwFlags;
     if ((CScriptActionCondition::MOVEMENT_FLAG & m_tActionCondition.m_dwFlags) && CheckIfMovementCompleted())
@@ -160,37 +121,10 @@ IC void CScriptEntityAction::initialize()
     m_tActionCondition.initialize();
 }
 
-IC const CScriptMovementAction& CScriptEntityAction::move()
-{
-    return (m_tMovementAction);
-}
-
-IC const CScriptWatchAction& CScriptEntityAction::look()
-{
-    return (m_tWatchAction);
-}
-
-IC const CScriptAnimationAction& CScriptEntityAction::anim()
-{
-    return (m_tAnimationAction);
-}
-
-IC const CScriptParticleAction& CScriptEntityAction::particle()
-{
-    return (m_tParticleAction);
-}
-
-IC const CScriptObjectAction& CScriptEntityAction::object()
-{
-    return (m_tObjectAction);
-}
-
-IC const CScriptActionCondition& CScriptEntityAction::cond()
-{
-    return (m_tActionCondition);
-}
-
-IC void* CScriptEntityAction::data()
-{
-    return (m_user_data);
-}
+IC const CScriptMovementAction& CScriptEntityAction::move() { return (m_tMovementAction); }
+IC const CScriptWatchAction& CScriptEntityAction::look() { return (m_tWatchAction); }
+IC const CScriptAnimationAction& CScriptEntityAction::anim() { return (m_tAnimationAction); }
+IC const CScriptParticleAction& CScriptEntityAction::particle() { return (m_tParticleAction); }
+IC const CScriptObjectAction& CScriptEntityAction::object() { return (m_tObjectAction); }
+IC const CScriptActionCondition& CScriptEntityAction::cond() { return (m_tActionCondition); }
+IC void* CScriptEntityAction::data() { return (m_user_data); }

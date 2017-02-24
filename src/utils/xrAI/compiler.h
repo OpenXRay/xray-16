@@ -14,26 +14,26 @@ const u32 InvalidNode = (1 << 24) - 1;
 const u32 UnkonnectedNode = 0xfffffff0;
 const WORD InvalidSector = 0xff;
 
-struct vertex  // definition of "patch" or "node"
+struct vertex // definition of "patch" or "node"
 {
     union
     {
         struct
         {
-            u32 n1, n2, n3, n4;  // neighbourh patches (Left,Forward,Right,Backward)
+            u32 n1, n2, n3, n4; // neighbourh patches (Left,Forward,Right,Backward)
         };
         u32 n[4];
     };
-    Fplane Plane;  // plane of patch
-    Fvector Pos;   // position of patch center
-    WORD Sector;   //
+    Fplane Plane; // plane of patch
+    Fvector Pos; // position of patch center
+    WORD Sector; //
 
     u32 Group;
 
     float LightLevel;
 
-    float high_cover[4];  // cover in four directions
-    float low_cover[4];   // cover in four directions
+    float high_cover[4]; // cover in four directions
+    float low_cover[4]; // cover in four directions
 
     vertex()
     {
@@ -45,7 +45,6 @@ struct vertex  // definition of "patch" or "node"
     u32 nForward() { return n2; }
     u32 nRight() { return n3; }
     u32 nBack() { return n4; }
-
     void PointLF(Fvector& D);
     void PointFR(Fvector& D);
     void PointRB(Fvector& D);
@@ -64,17 +63,17 @@ void Compress(CLevelGraph::CVertex& Dest, vertex& Src);
 
 struct R_Light
 {
-    u32 type;            // Type of light source
-    float amount;        // Diffuse color of light
-    Fvector position;    // Position in world space
-    Fvector direction;   // Direction in world space
-    float range;         // Cutoff range
-    float range2;        // ^2
-    float attenuation0;  // Constant attenuation
-    float attenuation1;  // Linear attenuation
-    float attenuation2;  // Quadratic attenuation
+    u32 type; // Type of light source
+    float amount; // Diffuse color of light
+    Fvector position; // Position in world space
+    Fvector direction; // Direction in world space
+    float range; // Cutoff range
+    float range2; // ^2
+    float attenuation0; // Constant attenuation
+    float attenuation1; // Linear attenuation
+    float attenuation2; // Quadratic attenuation
 
-    Fvector tri[3];  // Cached triangle for ray-testing
+    Fvector tri[3]; // Cached triangle for ray-testing
 };
 
 struct SCover
@@ -155,7 +154,7 @@ IC CNodePositionCompressor::CNodePositionCompressor(NodePosition& Pdest, Fvector
     float sp = 1 / g_params.fPatchSize;
     int row_length = iFloor((H.aabb.max.z - H.aabb.min.z) / H.size + EPS_L + 1.5f);
     int pxz = iFloor((Psrc.x - H.aabb.min.x) * sp + EPS_L + .5f) * row_length +
-              iFloor((Psrc.z - H.aabb.min.z) * sp + EPS_L + .5f);
+        iFloor((Psrc.z - H.aabb.min.z) * sp + EPS_L + .5f);
     int py = iFloor(65535.f * (Psrc.y - H.aabb.min.y) / (H.size_y) + EPS_L);
     VERIFY(pxz < (1 << MAX_NODE_BIT_COUNT) - 1);
     Pdest.xz(pxz);

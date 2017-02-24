@@ -1,4 +1,4 @@
-#ifndef GFXVEC4_INCLUDED  // -*- C++ -*-
+#ifndef GFXVEC4_INCLUDED // -*- C++ -*-
 #define GFXVEC4_INCLUDED
 #if !defined(__GNUC__)
 #pragma once
@@ -73,12 +73,10 @@ public:
     //
     typedef T value_type;
     static int dim() { return 4; }
-
     // Access methods
     //
     operator T*() { return elt; }
     operator const T*() const { return elt; }
-
     // Assignment and in-place arithmetic methods
     //
     inline TVec4& operator+=(const TVec4& v);
@@ -248,14 +246,16 @@ template <class T>
 inline void unitize(TVec4<T>& v)
 {
     T l = norm2(v);
-    if (l != 1.0 && l != 0.0) v /= _sqrt(l);
+    if (l != 1.0 && l != 0.0)
+        v /= _sqrt(l);
 }
 
 template <class T>
 inline TVec3<T> proj(const TVec4<T>& v)
 {
     TVec3<T> u(v[0], v[1], v[2]);
-    if (v[3] != 1.0 && v[3] != 0.0) u /= v[3];
+    if (v[3] != 1.0 && v[3] != 0.0)
+        u /= v[3];
     return u;
 }
 

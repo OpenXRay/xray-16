@@ -25,7 +25,8 @@ void set_var(const char* name, float value)
     new_var.type = var::real;
 
     debug_vars_t::iterator it = s_debug_vars.find(xr_string(name));
-    if (it != s_debug_vars.end()) {
+    if (it != s_debug_vars.end())
+    {
         s_debug_vars.erase(it);
     }
 
@@ -35,12 +36,14 @@ void set_var(const char* name, float value)
 bool get_var(const char* name, float& value)
 {
     debug_vars_t::iterator it = s_debug_vars.find(xr_string(name));
-    if (it == s_debug_vars.end()) {
+    if (it == s_debug_vars.end())
+    {
         return false;
     }
 
     var& v = (*it).second;
-    if (v.type != var::real) {
+    if (v.type != var::real)
+    {
         return false;
     }
 
@@ -52,7 +55,8 @@ bool get_var(const char* name, u32& value)
 {
     float fval;
     bool res = get_var(name, fval);
-    if (res) {
+    if (res)
+    {
         value = (u32)fval;
     }
     return res;
@@ -62,7 +66,8 @@ bool get_var(const char* name, bool& value)
 {
     float fval;
     bool res = get_var(name, fval);
-    if (res) {
+    if (res)
+    {
         value = fval != 0;
     }
     return res;
@@ -71,13 +76,15 @@ bool get_var(const char* name, bool& value)
 void show_var(const char* name)
 {
     debug_vars_t::iterator it = s_debug_vars.find(xr_string(name));
-    if (it == s_debug_vars.end()) {
+    if (it == s_debug_vars.end())
+    {
         return;
     }
 
     var& v = (*it).second;
 
-    if (v.type == var::real) {
+    if (v.type == var::real)
+    {
         Msg("%s = %f", (*it).first.c_str(), v.fval);
     }
     else if (v.type == var::string)
@@ -86,4 +93,4 @@ void show_var(const char* name)
     }
 }
 
-}  // namespace ai_dbg
+} // namespace ai_dbg

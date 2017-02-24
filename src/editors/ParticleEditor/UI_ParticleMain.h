@@ -30,7 +30,7 @@ class CParticleMain : public TUI
     virtual void RealUpdateScene();
     virtual void RealQuit();
 
-  public:
+public:
     CParticleMain();
     virtual ~CParticleMain();
 
@@ -45,9 +45,7 @@ class CParticleMain : public TUI
     virtual void OutInfo();
 
     virtual LPCSTR EditorName() { return "particle"; }
-
     virtual LPCSTR EditorDesc() { return "Particle Editor"; }
-
     virtual bool ApplyShortCut(WORD Key, TShiftState Shift);
     virtual bool ApplyGlobalShortCut(WORD Key, TShiftState Shift);
 
@@ -57,4 +55,4 @@ class CParticleMain : public TUI
 
 extern CParticleMain*& PUI;
 //---------------------------------------------------------------------------
-#endif  // UI_MainCommandH
+#endif // UI_MainCommandH

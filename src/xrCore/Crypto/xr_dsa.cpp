@@ -19,11 +19,7 @@ xr_dsa::xr_dsa(u8 const p[public_key_length], u8 const q[private_key_length], u8
     BN_bin2bn(g, public_key_length, m_dsa->g);
 }
 
-xr_dsa::~xr_dsa()
-{
-    DSA_free(m_dsa);
-}
-
+xr_dsa::~xr_dsa() { DSA_free(m_dsa); }
 shared_str const xr_dsa::sign(private_key_t const& priv_key, u8 const* data, u32 const data_size)
 {
     BN_bin2bn(priv_key.m_value, sizeof(priv_key.m_value), m_dsa->priv_key);
@@ -58,15 +54,11 @@ bool xr_dsa::verify(public_key_t const& pub_key, u8 const* data, u32 const data_
 
 #ifdef DEBUG
 
-static void dsa_genparams_cb(int p, int n, void* arg)
-{
-    Msg("* dsa genparams cb(%d, %d)", p, n);
-}
-
+static void dsa_genparams_cb(int p, int n, void* arg) { Msg("* dsa genparams cb(%d, %d)", p, n); }
 static unsigned char rnd_seed[] = "S.T.A.L.K.E.R. 4ever Rulezz !!!";
 void print_big_number(BIGNUM* big_num, u32 max_columns = 8)
 {
-    u8 bin_buff[xr_dsa::public_key_length];  // public_key_length is the max
+    u8 bin_buff[xr_dsa::public_key_length]; // public_key_length is the max
     int bin_size = 0;
 
     string4096 result_buffer;
@@ -80,7 +72,8 @@ void print_big_number(BIGNUM* big_num, u32 max_columns = 8)
     xr_strcat(result_buffer, "\t");
     for (int i = 0; i < bin_size; ++i)
     {
-        if (((i % max_columns) == 0) && (i > 0)) {
+        if (((i % max_columns) == 0) && (i > 0))
+        {
             xr_strcat(result_buffer, "\n\t");
         }
         xr_sprintf(tmp_buff, "0x%02x, ", bin_buff[i]);
@@ -161,6 +154,6 @@ void xr_dsa::generate_params()
     DSA_free(tmp_dsa_params);
 }
 
-#endif  //#ifdef DEBUG
+#endif //#ifdef DEBUG
 
-}  // namespace crypto
+} // namespace crypto

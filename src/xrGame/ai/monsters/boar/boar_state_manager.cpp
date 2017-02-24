@@ -37,10 +37,12 @@ void CStateManagerBoar::execute()
 {
     u32 state_id = u32(-1);
 
-    if (!object->is_under_control()) {
+    if (!object->is_under_control())
+    {
         const CEntityAlive* enemy = object->EnemyMan.get_enemy();
 
-        if (enemy) {
+        if (enemy)
+        {
             switch (object->EnemyMan.get_danger_type())
             {
             case eStrong: state_id = eStatePanic; break;

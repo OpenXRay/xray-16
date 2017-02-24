@@ -11,13 +11,8 @@ char const* ss_creation_date = "creation_date";
 
 namespace screenshots
 {
-sign_verifyer::sign_verifyer() : xr_dsa_verifyer(p_number, q_number, g_number, public_key)
-{
-}
-sign_verifyer::~sign_verifyer()
-{
-}
-
+sign_verifyer::sign_verifyer() : xr_dsa_verifyer(p_number, q_number, g_number, public_key) {}
+sign_verifyer::~sign_verifyer() {}
 static char* search_info_section(u8* buffer, u32 buffer_size)
 {
     u32 sstr_size = xr_strlen(ss_info_secion);
@@ -26,7 +21,8 @@ static char* search_info_section(u8* buffer, u32 buffer_size)
     int r_size = static_cast<int>(buffer_size - sstr_size);
     do
     {
-        if (!memcmp(rbegin, ss_info_secion, sstr_size)) {
+        if (!memcmp(rbegin, ss_info_secion, sstr_size))
+        {
             return static_cast<char*>((void*)rbegin);
         }
         --rbegin;
@@ -50,11 +46,12 @@ reader::reader(IReader* freader)
 
     char* tmp_info_begin = search_info_section(m_jpeg_data, m_jpeg_data_size);
 
-    if (!tmp_info_begin) {
+    if (!tmp_info_begin)
+    {
         Msg("Can't find info section");
         return;
     }
-    --tmp_info_begin;  //- '['
+    --tmp_info_begin; //- '['
     u32 m_info_size = xr_strlen(tmp_info_begin);
     m_info_pos = static_cast<u32>((u8*)tmp_info_begin - m_jpeg_data);
 
@@ -106,10 +103,10 @@ bool const reader::verify()
     // xr_strcat(jpeg_info_start, m_info_size, admin_name().c_str());
     xr_strcat(jpeg_info_start, m_info_size, creation_date().c_str());
 
-    u32 jpeg_info_size = xr_strlen(jpeg_info_start) + 1;  // ending zero
+    u32 jpeg_info_size = xr_strlen(jpeg_info_start) + 1; // ending zero
     u32 jpeg_full_size = m_info_pos + jpeg_info_size;
 
     return m_verifyer.verify(m_jpeg_data, jpeg_full_size, tmp_sign);
 }
 
-}  // namespace screenshots
+} // namespace screenshots

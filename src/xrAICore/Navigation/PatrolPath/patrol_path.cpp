@@ -41,10 +41,7 @@ CPatrolPath& CPatrolPath::load_raw(
     return (*this);
 }
 
-CPatrolPath::~CPatrolPath()
-{
-}
-
+CPatrolPath::~CPatrolPath() {}
 #ifdef DEBUG
 void CPatrolPath::load(IReader& stream)
 {

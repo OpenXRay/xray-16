@@ -10,10 +10,7 @@
 #include "alife_object_registry.h"
 #include "ai_debug.h"
 
-CALifeObjectRegistry::CALifeObjectRegistry(LPCSTR section)
-{
-}
-
+CALifeObjectRegistry::CALifeObjectRegistry(LPCSTR section) {}
 CALifeObjectRegistry::~CALifeObjectRegistry()
 {
     OBJECT_REGISTRY::iterator const B = m_objects.begin();
@@ -48,9 +45,11 @@ void CALifeObjectRegistry::save(IWriter& memory_stream, CSE_ALifeDynamicObject* 
     for (; I != E; ++I)
     {
         CSE_ALifeDynamicObject* child = this->object(*I, true);
-        if (!child) continue;
+        if (!child)
+            continue;
 
-        if (!child->can_save()) continue;
+        if (!child->can_save())
+            continue;
 
         save(memory_stream, child, object_count);
     }
@@ -69,11 +68,14 @@ void CALifeObjectRegistry::save(IWriter& memory_stream)
     OBJECT_REGISTRY::iterator E = m_objects.end();
     for (; I != E; ++I)
     {
-        if (!(*I).second->can_save()) continue;
+        if (!(*I).second->can_save())
+            continue;
 
-        if ((*I).second->redundant()) continue;
+        if ((*I).second->redundant())
+            continue;
 
-        if ((*I).second->ID_Parent != 0xffff) continue;
+        if ((*I).second->ID_Parent != 0xffff)
+            continue;
 
         save(memory_stream, (*I).second, object_count);
     }
@@ -101,7 +103,8 @@ CSE_ALifeDynamicObject* CALifeObjectRegistry::get_object(IReader& file_stream)
     string64 s_name;
     tNetPacket.r_stringZ(s_name);
 #ifdef DEBUG
-    if (psAI_Flags.test(aiALife)) {
+    if (psAI_Flags.test(aiALife))
+    {
         Msg("Loading object %s [%d]b", s_name, tNetPacket.B.count);
     }
 #endif

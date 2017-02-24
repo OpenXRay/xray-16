@@ -16,7 +16,7 @@ class CEditableObject;
 
 class CParseBlender
 {
-  public:
+public:
     virtual void Parse(CSHEngineTools* owner, DWORD type, LPCSTR key, LPVOID data) = 0;
 };
 
@@ -54,7 +54,6 @@ class CSHEngineTools : public ISHTools
     BlenderMap m_Blenders;
 
     void __stdcall ItemExist(LPCSTR name, bool& res) { res = !!FindItem(name); }
-
     IBlender* FindItem(LPCSTR name);
 
     void AddMatrixRef(LPSTR name);
@@ -84,8 +83,8 @@ class CSHEngineTools : public ISHTools
 
     void ParseBlender(IBlender* B, CParseBlender& P);
 
-    CMemoryWriter m_BlenderStream;  // пользоваться функциями обновления стрима для синхронизации
-    bool m_bUpdateCurrent;          // если менялся объект непосредственно  Update____From___()
+    CMemoryWriter m_BlenderStream; // пользоваться функциями обновления стрима для синхронизации
+    bool m_bUpdateCurrent; // если менялся объект непосредственно  Update____From___()
     bool m_bCurBlenderChanged;
 
     void Save(CMemoryWriter& F);
@@ -112,14 +111,15 @@ class CSHEngineTools : public ISHTools
     void ResetShaders(bool bForced = false)
     {
         m_bNeedResetShaders = true;
-        if (bForced) RealResetShaders();
+        if (bForced)
+            RealResetShaders();
     }
 
     void UpdateObjectShader();
 
     bool __stdcall OnPreviewObjectRefChange(PropValue* sender, u32& edit_val);
 
-  public:
+public:
     CMemoryWriter m_RenderShaders;
 
     IBlender* m_CurrentBlender;
@@ -143,12 +143,11 @@ class CSHEngineTools : public ISHTools
 
     void ClearData();
 
-  public:
+public:
     CSHEngineTools(ISHInit& init);
     virtual ~CSHEngineTools();
 
     virtual LPCSTR ToolsName() { return "Engine Shader"; }
-
     virtual void Reload();
     virtual void Load();
     virtual bool Save();
@@ -172,7 +171,6 @@ class CSHEngineTools : public ISHTools
     virtual void OnDeviceCreate();
 
     virtual void OnDeviceDestroy() { ; }
-
     virtual void ZoomObject(bool bOnlySel);
     virtual void OnShowHint(AStringVec& ss);
 };

@@ -23,24 +23,21 @@
 #include "restriction_space.h"
 #include "xrEngine/IGame_Persistent.h"
 
-CtaArtefactActivation::CtaArtefactActivation(CArtefact* af, u32 owner_id) : SArtefactActivation(af, owner_id)
-{
-}
-
-CtaArtefactActivation::~CtaArtefactActivation()
-{
-}
-
+CtaArtefactActivation::CtaArtefactActivation(CArtefact* af, u32 owner_id) : SArtefactActivation(af, owner_id) {}
+CtaArtefactActivation::~CtaArtefactActivation() {}
 void CtaArtefactActivation::UpdateActivation()
 {
-    if (!IsInProgress()) return;
+    if (!IsInProgress())
+        return;
 
     VERIFY(!physics_world()->Processing());
     m_cur_state_time += Device.fTimeDelta;
-    if (m_cur_state_time >= m_activation_states[int(m_cur_activation_state)].m_time) {
+    if (m_cur_state_time >= m_activation_states[int(m_cur_activation_state)].m_time)
+    {
         m_cur_activation_state = (EActivationStates)(int)(m_cur_activation_state + 1);
 
-        if (m_cur_activation_state == eMax) {
+        if (m_cur_activation_state == eMax)
+        {
             m_cur_activation_state = eNone;
             // m_af->processing_deactivate			();
             // m_af->DestroyObject();
@@ -49,42 +46,20 @@ void CtaArtefactActivation::UpdateActivation()
         m_cur_state_time = 0.0f;
         ChangeEffects();
 
-        if (m_cur_activation_state == eSpawnZone && OnServer()) SpawnAnomaly();
+        if (m_cur_activation_state == eSpawnZone && OnServer())
+            SpawnAnomaly();
     }
     UpdateEffects();
 }
 
-void CtaArtefactActivation::Load()
-{
-    inherited::Load();
-}
-
-void CtaArtefactActivation::Start()
-{
-    inherited::Start();
-}
-
-void CtaArtefactActivation::Stop()
-{
-    inherited::Stop();
-}
-
+void CtaArtefactActivation::Load() { inherited::Load(); }
+void CtaArtefactActivation::Start() { inherited::Start(); }
+void CtaArtefactActivation::Stop() { inherited::Stop(); }
 void CtaArtefactActivation::ChangeEffects()
 {
     // inherited::ChangeEffects();
 }
 
-void CtaArtefactActivation::UpdateEffects()
-{
-    inherited::UpdateEffects();
-}
-
-void CtaArtefactActivation::SpawnAnomaly()
-{
-    inherited::SpawnAnomaly();
-}
-
-void CtaArtefactActivation::PhDataUpdate(float step)
-{
-    inherited::PhDataUpdate(step);
-}
+void CtaArtefactActivation::UpdateEffects() { inherited::UpdateEffects(); }
+void CtaArtefactActivation::SpawnAnomaly() { inherited::SpawnAnomaly(); }
+void CtaArtefactActivation::PhDataUpdate(float step) { inherited::PhDataUpdate(step); }

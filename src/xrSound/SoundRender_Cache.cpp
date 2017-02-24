@@ -14,23 +14,24 @@ CSoundRender_Cache::CSoundRender_Cache()
     _count = 0;
 }
 
-CSoundRender_Cache::~CSoundRender_Cache()
-{
-}
-
+CSoundRender_Cache::~CSoundRender_Cache() {}
 void CSoundRender_Cache::move2top(cache_line* line)
 {
     VERIFY(line);
-    if (line == c_begin) return;  // already at top
+    if (line == c_begin)
+        return; // already at top
 
     // track end
-    if (line == c_end) c_end = c_end->prev;
+    if (line == c_end)
+        c_end = c_end->prev;
 
     // cut
     cache_line* prev = line->prev;
     cache_line* next = line->next;
-    if (prev) prev->next = next;
-    if (next) next->prev = prev;
+    if (prev)
+        prev->next = next;
+    if (next)
+        next->prev = prev;
 
     // register at top
     line->prev = NULL;
@@ -51,7 +52,8 @@ BOOL CSoundRender_Cache::request(cache_cat& cat, u32 id)
     id %= cat.size;
     //. R_ASSERT        (id<cat.size);
     u16& cptr = cat.table[id];
-    if (CAT_FREE != cptr) {
+    if (CAT_FREE != cptr)
+    {
         // cache line exists - change it's priority and return
         _stat_hit++;
         cache_line* L = c_storage + cptr;
@@ -62,7 +64,8 @@ BOOL CSoundRender_Cache::request(cache_cat& cat, u32 id)
     // 2. purge oldest item + move it to top
     _stat_miss++;
     move2top(c_end);
-    if (c_begin->loopback) {
+    if (c_begin->loopback)
+    {
         *c_begin->loopback = CAT_FREE;
         c_begin->loopback = NULL;
     }
@@ -101,7 +104,8 @@ void CSoundRender_Cache::disconnect()
     for (u32 it = 0; it < _count; it++)
     {
         cache_line* L = c_storage + it;
-        if (L->loopback) {
+        if (L->loopback)
+        {
             *L->loopback = CAT_FREE;
             L->loopback = NULL;
         }
@@ -128,8 +132,8 @@ void CSoundRender_Cache::format()
 
 void CSoundRender_Cache::purge()
 {
-    disconnect();  // disconnect from CATs
-    format();      // format
+    disconnect(); // disconnect from CATs
+    format(); // format
 }
 
 void CSoundRender_Cache::destroy()
@@ -147,7 +151,8 @@ void CSoundRender_Cache::destroy()
 void CSoundRender_Cache::cat_create(cache_cat& cat, u32 bytes)
 {
     cat.size = bytes / _line;
-    if (bytes % _line) cat.size += 1;
+    if (bytes % _line)
+        cat.size += 1;
     u32 allocsize = (cat.size & 1) ? cat.size + 1 : cat.size;
     cat.table = xr_alloc<u16>(allocsize);
     MemFill32(cat.table, 0xffffffff, allocsize / 2);

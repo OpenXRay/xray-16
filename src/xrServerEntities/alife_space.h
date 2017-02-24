@@ -34,15 +34,15 @@ class CGameGraph;
 
 namespace ALife
 {
-typedef u64 _CLASS_ID;        // Class ID
-typedef u16 _OBJECT_ID;       // Object ID
-typedef u64 _TIME_ID;         // Time  ID
-typedef u32 _EVENT_ID;        // Event ID
-typedef u32 _TASK_ID;         // Event ID
-typedef u16 _SPAWN_ID;        // Spawn ID
-typedef u16 _TERRAIN_ID;      // Terrain ID
-typedef u32 _STORY_ID;        // Story ID
-typedef u32 _SPAWN_STORY_ID;  // Spawn Story ID
+typedef u64 _CLASS_ID; // Class ID
+typedef u16 _OBJECT_ID; // Object ID
+typedef u64 _TIME_ID; // Time  ID
+typedef u32 _EVENT_ID; // Event ID
+typedef u32 _TASK_ID; // Event ID
+typedef u16 _SPAWN_ID; // Spawn ID
+typedef u16 _TERRAIN_ID; // Terrain ID
+typedef u32 _STORY_ID; // Story ID
+typedef u32 _SPAWN_STORY_ID; // Spawn Story ID
 
 struct SSumStackCell
 {
@@ -99,7 +99,7 @@ enum EHitType
     eHitTypeFireWound,
     eHitTypeStrike,
     eHitTypeExplosion,
-    eHitTypeWound_2,  // knife's alternative fire
+    eHitTypeWound_2, // knife's alternative fire
     //		eHitTypePhysicStrike,
     eHitTypeLightBurn,
     eHitTypeMax,
@@ -191,10 +191,7 @@ IC EHitType g_tfString2HitType(LPCSTR caHitType)
 #ifndef _EDITOR
 extern xr_token hit_types_token[];
 
-IC LPCSTR g_cafHitType2String(EHitType tHitType)
-{
-    return get_token_name(hit_types_token, tHitType);
-}
+IC LPCSTR g_cafHitType2String(EHitType tHitType) { return get_token_name(hit_types_token, tHitType); }
 #endif
 DEFINE_VECTOR(int, INT_VECTOR, INT_IT);
 DEFINE_VECTOR(_OBJECT_ID, OBJECT_VECTOR, OBJECT_IT);
@@ -206,4 +203,4 @@ DEFINE_MAP(_OBJECT_ID, CSE_ALifeDynamicObject*, D_OBJECT_P_MAP, D_OBJECT_P_PAIR_
 DEFINE_MAP(_STORY_ID, CSE_ALifeDynamicObject*, STORY_P_MAP, STORY_P_PAIR_IT);
 };
 
-#endif  // XRAY_ALIFE_SPACE
+#endif // XRAY_ALIFE_SPACE

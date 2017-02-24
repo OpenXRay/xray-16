@@ -11,11 +11,7 @@
 
 using namespace luabind;
 
-bool r_eof(IReader* self)
-{
-    return (!!self->eof());
-}
-
+bool r_eof(IReader* self) { return (!!self->eof()); }
 LPCSTR r_stringZ(IReader* self)
 {
     shared_str temp;
@@ -23,16 +19,8 @@ LPCSTR r_stringZ(IReader* self)
     return (*temp);
 }
 
-bool r_bool(IReader* self)
-{
-    return (!!self->r_u8());
-}
-
-void r_fvector3(IReader* self, Fvector* arg0)
-{
-    self->r_fvector3(*arg0);
-}
-
+bool r_bool(IReader* self) { return (!!self->r_u8()); }
+void r_fvector3(IReader* self, Fvector* arg0) { self->r_fvector3(*arg0); }
 SCRIPT_EXPORT(IReader, (), {
     module(luaState)[class_<IReader>(
         "reader").def("r_seek", &IReader::seek)

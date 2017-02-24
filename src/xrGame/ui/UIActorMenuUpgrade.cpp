@@ -35,40 +35,48 @@ void CUIActorMenu::DeInitUpgradeMode()
     m_pUpgradeWnd->set_info_cur_upgrade(NULL);
     m_pUpgradeWnd->m_btn_repair->Enable(false);
 
-    if (m_upgrade_selected) {
+    if (m_upgrade_selected)
+    {
         m_upgrade_selected->Mark(false);
         m_upgrade_selected = NULL;
     }
-    if (m_pPartnerInvOwner) {
+    if (m_pPartnerInvOwner)
+    {
         m_pPartnerInvOwner->StopTrading();
     }
 
-    if (!CurrentGameUI()) return;
+    if (!CurrentGameUI())
+        return;
     //только если находимся в режиме single
     CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(CurrentGameUI());
-    if (!pGameSP) return;
+    if (!pGameSP)
+        return;
 
-    if (pGameSP->TalkMenu->IsShown()) {
+    if (pGameSP->TalkMenu->IsShown())
+    {
         pGameSP->TalkMenu->NeedUpdateQuestions();
     }
 }
 
 void CUIActorMenu::SetupUpgradeItem()
 {
-    if (m_upgrade_selected) {
+    if (m_upgrade_selected)
+    {
         m_upgrade_selected->Mark(false);
     }
 
     bool can_upgrade = false;
     PIItem item = CurrentIItem();
-    if (item) {
+    if (item)
+    {
         m_upgrade_selected = CurrentItem();
         m_upgrade_selected->Mark(true);
         can_upgrade = CanUpgradeItem(item);
     }
 
     m_pUpgradeWnd->InitInventory(item, can_upgrade);
-    if (m_upgrade_info) {
+    if (m_upgrade_info)
+    {
         m_upgrade_info->Show(false);
     }
 
@@ -82,18 +90,22 @@ void CUIActorMenu::UpdateUpgradeItem()
 
 void CUIActorMenu::TrySetCurUpgrade()
 {
-    if (!m_upgrade_info) return;
+    if (!m_upgrade_info)
+        return;
     Upgrade_type const* upgr = m_upgrade_info->get_upgrade();
-    if (!upgr) return;
+    if (!upgr)
+        return;
     m_pUpgradeWnd->DBClickOnUIUpgrade(upgr);
 }
 
 bool CUIActorMenu::SetInfoCurUpgrade(Upgrade_type* upgrade_type, CInventoryItem* inv_item)
 {
-    if (!m_upgrade_info) return false;
+    if (!m_upgrade_info)
+        return false;
     bool res = m_upgrade_info->init_upgrade(upgrade_type, inv_item);
 
-    if (!upgrade_type) {
+    if (!upgrade_type)
+    {
         return false;
     }
 
@@ -101,19 +113,17 @@ bool CUIActorMenu::SetInfoCurUpgrade(Upgrade_type* upgrade_type, CInventoryItem*
     return res;
 }
 
-PIItem CUIActorMenu::get_upgrade_item()
-{
-    return (m_upgrade_selected) ? (PIItem)m_upgrade_selected->m_pData : NULL;
-}
-
+PIItem CUIActorMenu::get_upgrade_item() { return (m_upgrade_selected) ? (PIItem)m_upgrade_selected->m_pData : NULL; }
 void CUIActorMenu::SeparateUpgradeItem()
 {
     VERIFY(m_upgrade_selected);
-    if (!m_upgrade_selected || !m_upgrade_selected->m_pData) {
+    if (!m_upgrade_selected || !m_upgrade_selected->m_pData)
+    {
         return;
     }
     CUIDragDropListEx* list_owner = m_upgrade_selected->OwnerList();
-    if (list_owner && (GetListType(list_owner) != iActorBag)) {
+    if (list_owner && (GetListType(list_owner) != iActorBag))
+    {
         return;
     }
 

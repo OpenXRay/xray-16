@@ -7,11 +7,11 @@ namespace PAPI
 // A effect of particles - Info and an array of Particles
 struct ParticleEffect
 {
-    u32 p_count;              // Number of particles currently existing.
-    u32 max_particles;        // Max particles allowed in effect.
-    u32 particles_allocated;  // Actual allocated size.
-    Particle* particles;      // Actually, num_particles in size
-    void* real_ptr;           // Base, possible not aligned pointer
+    u32 p_count; // Number of particles currently existing.
+    u32 max_particles; // Max particles allowed in effect.
+    u32 particles_allocated; // Actual allocated size.
+    Particle* particles; // Actually, num_particles in size
+    void* real_ptr; // Base, possible not aligned pointer
     OnBirthParticleCB b_cb;
     OnDeadParticleCB d_cb;
     void* owner;
@@ -37,11 +37,13 @@ public:
     IC int Resize(u32 max_count)
     {
         // Reducing max.
-        if (particles_allocated >= max_count) {
+        if (particles_allocated >= max_count)
+        {
             max_particles = max_count;
 
             // May have to kill particles.
-            if (p_count > max_particles) p_count = max_particles;
+            if (p_count > max_particles)
+                p_count = max_particles;
 
             return max_count;
         }
@@ -49,7 +51,8 @@ public:
         // Allocate particles.
         void* new_real_ptr = xr_malloc(sizeof(Particle) * (max_count + 1));
 
-        if (new_real_ptr == NULL) {
+        if (new_real_ptr == NULL)
+        {
             // ERROR - Not enough memory. Just give all we've got.
             max_particles = particles_allocated;
             return max_particles;
@@ -71,11 +74,13 @@ public:
     }
     IC void Remove(int i)
     {
-        if (0 == p_count) return;
+        if (0 == p_count)
+            return;
         Particle& m = particles[i];
-        if (d_cb) d_cb(owner, param, m, i);
-        m = particles[--p_count];  // не менять правило удаления !!! (dependence ParticleGroup)
-                                   // Msg( "pDel() : %u" , p_count );
+        if (d_cb)
+            d_cb(owner, param, m, i);
+        m = particles[--p_count]; // не менять правило удаления !!! (dependence ParticleGroup)
+        // Msg( "pDel() : %u" , p_count );
     }
 
     IC BOOL Add(const pVector& pos, const pVector& posB, const pVector& size, const pVector& rot, const pVector& vel,
@@ -95,7 +100,8 @@ public:
             P.age = age;
             P.frame = frame;
             P.flags.assign(flags);
-            if (b_cb) b_cb(owner, param, P, p_count);
+            if (b_cb)
+                b_cb(owner, param, P, p_count);
             p_count++;
             // Msg( "pAdd() : %u" , p_count );
             return TRUE;

@@ -44,13 +44,18 @@ public:
         const_dword = c;
     }
     void Calculate();
-    IC BOOL Similar(CConstant& C)  // comare by modes and params
+    IC BOOL Similar(CConstant& C) // comare by modes and params
     {
-        if (dwMode != C.dwMode) return FALSE;
-        if (!_R.Similar(C._R)) return FALSE;
-        if (!_G.Similar(C._G)) return FALSE;
-        if (!_B.Similar(C._B)) return FALSE;
-        if (!_A.Similar(C._A)) return FALSE;
+        if (dwMode != C.dwMode)
+            return FALSE;
+        if (!_R.Similar(C._R))
+            return FALSE;
+        if (!_G.Similar(C._G))
+            return FALSE;
+        if (!_B.Similar(C._B))
+            return FALSE;
+        if (!_A.Similar(C._A))
+            return FALSE;
         return TRUE;
     }
     void Load(IReader* fs);

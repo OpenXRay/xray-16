@@ -33,13 +33,15 @@ public:
     }
     void _prim(DWORD prim)
     {
-        if (bClass3) {
+        if (bClass3)
+        {
             sPoly src, dst;
             src.resize(3);
             src[0] = verts[tris[prim].verts[0]];
             src[1] = verts[tris[prim].verts[1]];
             src[2] = verts[tris[prim].verts[2]];
-            if (F->ClipPoly(src, dst)) {
+            if (F->ClipPoly(src, dst))
+            {
                 RESULT& R = dest->r_add();
                 R.id = prim;
                 R.verts[0] = verts[tris[prim].verts[0]];
@@ -63,7 +65,8 @@ public:
     {
         // Actual frustum/aabb test
         EFC_Visible result = _box((Fvector&)node->mAABB.mCenter, (Fvector&)node->mAABB.mExtents, mask);
-        if (fcvNone == result) return;
+        if (fcvNone == result)
+            return;
 
         // 1st chield
         if (node->HasLeaf())
@@ -72,7 +75,8 @@ public:
             _stab(node->GetPos(), mask);
 
         // Early exit for "only first"
-        if (bFirst && dest->r_count()) return;
+        if (bFirst && dest->r_count())
+            return;
 
         // 2nd chield
         if (node->HasLeaf2())
@@ -93,8 +97,10 @@ void COLLIDER::frustum_query(const MODEL* m_def, const CFrustum& F)
     r_clear();
 
     // Binary dispatcher
-    if (frustum_mode & OPT_FULL_TEST) {
-        if (frustum_mode & OPT_ONLYFIRST) {
+    if (frustum_mode & OPT_FULL_TEST)
+    {
+        if (frustum_mode & OPT_ONLYFIRST)
+        {
             frustum_collider<true, true> BC;
             BC._init(this, m_def->verts, m_def->tris, &F);
             BC._stab(N, mask);
@@ -108,7 +114,8 @@ void COLLIDER::frustum_query(const MODEL* m_def, const CFrustum& F)
     }
     else
     {
-        if (frustum_mode & OPT_ONLYFIRST) {
+        if (frustum_mode & OPT_ONLYFIRST)
+        {
             frustum_collider<false, true> BC;
             BC._init(this, m_def->verts, m_def->tris, &F);
             BC._stab(N, mask);

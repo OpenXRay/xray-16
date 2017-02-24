@@ -25,9 +25,9 @@ struct IUpdateTracksCallback
 
 struct SKeyTable
 {
-    CKey keys[MAX_CHANNELS][MAX_BLENDED];       // all keys
-    CBlend* blends[MAX_CHANNELS][MAX_BLENDED];  // blend pointers
-    int chanel_blend_conts[MAX_CHANNELS];       // channel counts
+    CKey keys[MAX_CHANNELS][MAX_BLENDED]; // all keys
+    CBlend* blends[MAX_CHANNELS][MAX_BLENDED]; // blend pointers
+    int chanel_blend_conts[MAX_CHANNELS]; // channel counts
     SKeyTable() { std::fill_n(chanel_blend_conts, MAX_CHANNELS, 0); }
 };
 
@@ -35,7 +35,6 @@ class IKinematicsAnimated
 {
 public:
     virtual ~IKinematicsAnimated() { ; }
-
     // Calculation
 public:
     virtual void OnCalculateBones() = 0;
@@ -52,11 +51,9 @@ public:
     virtual u16 LL_MotionsSlotCount() = 0;
     virtual const shared_motions& LL_MotionsSlot(u16 idx) = 0;
 
-    // IC CMotionDef*				LL_GetMotionDef	(MotionID id){return m_Motions[id.slot].motions.motion_def(id.idx);}
-    // IC CMotion*					LL_GetRootMotion(MotionID id){return
-    // &m_Motions[id.slot].bone_motions[iRoot]->at(id.idx);}
-    // IC CMotion*					LL_GetMotion	(MotionID id, u16 bone_id){return
-    // &m_Motions[id.slot].bone_motions[bone_id]->at(id.idx);}
+    //IC CMotionDef* LL_GetMotionDef(MotionID id) { return m_Motions[id.slot].motions.motion_def(id.idx); }
+    //IC CMotion* LL_GetRootMotion(MotionID id) { return &m_Motions[id.slot].bone_motions[iRoot]->at(id.idx); }
+    //IC CMotion* LL_GetMotion(MotionID id, u16 bone_id) {return &m_Motions[id.slot].bone_motions[bone_id]->at(id.idx); }
     virtual CMotionDef* LL_GetMotionDef(MotionID id) = 0;
     virtual CMotion* LL_GetRootMotion(MotionID id) = 0;
     virtual CMotion* LL_GetMotion(MotionID id, u16 bone_id) = 0;
@@ -73,21 +70,20 @@ public:
     virtual MotionID LL_MotionID(LPCSTR B) = 0;
     virtual u16 LL_PartID(LPCSTR B) = 0;
 
-    //	CBlend*						LL_PlayFX		(u16 bone,		MotionID motion, float blendAccrue,	float blendFalloff, float
-    //Speed, float Power);
+    //CBlend* LL_PlayFX(u16 bone, MotionID motion, float blendAccrue, float blendFalloff, float Speed, float Power);
     virtual CBlend* LL_PlayCycle(u16 partition, MotionID motion, BOOL bMixing, float blendAccrue, float blendFalloff,
         float Speed, BOOL noloop, PlayCallback Callback, LPVOID CallbackParam, u8 channel = 0) = 0;
     virtual CBlend* LL_PlayCycle(
         u16 partition, MotionID motion, BOOL bMixIn, PlayCallback Callback, LPVOID CallbackParam, u8 channel = 0) = 0;
-    //	void						LL_FadeCycle	(u16 partition, float	falloff, u8 mask_channel = (1<<0));
+    //void LL_FadeCycle(u16 partition, float falloff, u8 mask_channel = (1 << 0));
     virtual void LL_CloseCycle(u16 partition, u8 mask_channel = (1 << 0)) = 0;
     virtual void LL_SetChannelFactor(u16 channel, float factor) = 0;
-    //	virtual CBlendInstance&				LL_GetBlendInstance	(u16 bone_id) = 0;
+    //virtual CBlendInstance& LL_GetBlendInstance(u16 bone_id) = 0;
 
     // Main functionality
-    virtual void UpdateTracks() = 0;                                              // Update motions
-    virtual void LL_UpdateTracks(float dt, bool b_force, bool leave_blends) = 0;  // Update motions
-    // void						DestroyCycle	(CBlend &B);
+    virtual void UpdateTracks() = 0; // Update motions
+    virtual void LL_UpdateTracks(float dt, bool b_force, bool leave_blends) = 0; // Update motions
+    //void DestroyCycle(CBlend& B);
 
     // cycles
     virtual MotionID ID_Cycle(LPCSTR N) = 0;
@@ -113,8 +109,8 @@ public:
 
     virtual float get_animation_length(MotionID motion_ID) = 0;
     //#ifdef DEBUG
-    //	virtual	const BlendSVec			&blend_cycle	(const u32 &bone_part_id) const = 0;
-    //#endif //	DEBUG
+    //virtual const BlendSVec& blend_cycle(const u32& bone_part_id) const = 0;
+    //#endif
 };
 
-#endif  //	KinematicsAnimated_included
+#endif // KinematicsAnimated_included

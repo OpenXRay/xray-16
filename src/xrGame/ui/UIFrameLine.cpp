@@ -44,7 +44,8 @@ void CUIFrameLine::UpdateSize()
     float s_width = elements[flSecond].GetOriginalRect().width();
     float s_height = elements[flSecond].GetOriginalRect().height();
 
-    if (bHorizontalOrientation && UI()->is_16_9_mode()) s_width /= 1.2f;
+    if (bHorizontalOrientation && UI()->is_16_9_mode())
+        s_width /= 1.2f;
 
     if (bHorizontalOrientation)
         elements[flSecond].SetPos(iPos.x + iSize - s_width, iPos.y);
@@ -60,7 +61,8 @@ void CUIFrameLine::UpdateSize()
     // Now stretch back texture to remaining space
     float back_width, back_height;
 
-    if (bHorizontalOrientation) {
+    if (bHorizontalOrientation)
+    {
         back_width = iSize - f_width - s_width;
         back_height = f_height;
 
@@ -83,7 +85,8 @@ void CUIFrameLine::UpdateSize()
     float b_width = elements[flBack].GetOriginalRect().width();
     float b_height = elements[flBack].GetOriginalRect().height();
 
-    if (bHorizontalOrientation) {
+    if (bHorizontalOrientation)
+    {
         rem = fmod(back_width, b_width);
         tile = iFloor(back_width / b_width);
         elements[flBack].SetPos(iPos.x + f_width, iPos.y);
@@ -105,9 +108,11 @@ void CUIFrameLine::SetElementsRect(CUIStaticItem& item, int idx)
     float srtch_width = item.GetOriginalRect().width();
     float srtch_height = item.GetOriginalRect().height();
 
-    if (bStretchTexture) {
+    if (bStretchTexture)
+    {
         VERIFY((m_parent_wnd_size.x > 0.0f) && (m_parent_wnd_size.y > 0.0f));
-        if (bHorizontalOrientation) {
+        if (bHorizontalOrientation)
+        {
             srtch_height = m_parent_wnd_size.y;
         }
         else
@@ -116,7 +121,8 @@ void CUIFrameLine::SetElementsRect(CUIStaticItem& item, int idx)
         }
     }
 
-    if (bHorizontalOrientation && (idx == flSecond) && UI()->is_16_9_mode()) srtch_width /= 1.2f;
+    if (bHorizontalOrientation && (idx == flSecond) && UI()->is_16_9_mode())
+        srtch_width /= 1.2f;
 
     item.SetRect(Frect().set(0.0f, 0.0f, srtch_width, srtch_height));
 }
@@ -124,7 +130,8 @@ void CUIFrameLine::SetElementsRect(CUIStaticItem& item, int idx)
 void CUIFrameLine::Render()
 {
     // If size changed - update size
-    if (!(uFlags & flValidSize)) {
+    if (!(uFlags & flValidSize))
+    {
         UpdateSize();
     }
     // Now render all statics

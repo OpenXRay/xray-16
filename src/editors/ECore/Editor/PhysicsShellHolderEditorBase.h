@@ -5,21 +5,20 @@
 
 class ECORE_API CPhysicsShellHolderEditorBase : public IPhysicsShellHolder
 {
-  public:
+public:
     void CreatePhysicsShell(Fmatrix* obj_xform);
     void DeletePhysicsShell();
     void UpdateObjectXform(Fmatrix& obj_xform);
     void ApplyDragForce(const Fvector& force);
 
-  protected:
+protected:
     CPhysicsShellHolderEditorBase() : m_physics_shell(0), m_object_xform(Fidentity) {}
     ~CPhysicsShellHolderEditorBase() { /*DeletePhysicsShell	();*/}
-
-  protected:
+protected:
     CPhysicsShell* m_physics_shell;
     Fmatrix m_object_xform;
 
-  private:
+private:
     virtual LPCSTR _BCL ObjectName() const { return "EditorActor"; }
     virtual LPCSTR _BCL ObjectNameVisual() const { return "unknown"; }
     virtual LPCSTR _BCL ObjectNameSect() const { return "unknown"; }
@@ -32,7 +31,7 @@ class ECORE_API CPhysicsShellHolderEditorBase : public IPhysicsShellHolder
         return 0;
     }
     //	virtual	IRenderVisual*				_BCL	ObjectVisual						()				 { return
-    //m_pVisual;}
+    // m_pVisual;}
     virtual IDamageSource* _BCL ObjectCastIDamageSource() { return 0; }
     virtual void _BCL ObjectProcessingDeactivate() { ; }
     virtual void _BCL ObjectProcessingActivate() {}
@@ -46,18 +45,15 @@ class ECORE_API CPhysicsShellHolderEditorBase : public IPhysicsShellHolder
     virtual bool _BCL IsActor() { return false; }
     virtual bool _BCL IsStalker() { return false; }
     // virtual	void						SetWeaponHideState					( u16 State, bool bSet )=0;
-    virtual void _BCL HideAllWeapons(bool v) {}  //(SetWeaponHideState(INV_STATE_BLOCK_ALL,true))
+    virtual void _BCL HideAllWeapons(bool v) {} //(SetWeaponHideState(INV_STATE_BLOCK_ALL,true))
     virtual void _BCL MovementCollisionEnable(bool enable) {}
     virtual CPHSoundPlayer* _BCL ObjectPhSoundPlayer() { return 0; }
     virtual ICollisionDamageReceiver* _BCL ObjectPhCollisionDamageReceiver() { return 0; }
     virtual void _BCL BonceDamagerCallback(float& damage_factor) {}
-
-  public:
+public:
     virtual Fmatrix& _BCL ObjectXFORM() { return m_object_xform; }
-
-  private:
+private:
     virtual Fvector& _BCL ObjectPosition() { return m_object_xform.c; }
-
 #ifdef DEBUG
     virtual std::string _BCL dump(EDumpType type) const
     {

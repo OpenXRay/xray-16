@@ -40,21 +40,26 @@ struct ECORE_API SSkelVert :
         {
             bones[k] = b[k];
         }
-        sort_by_bone();  // need to similar
+        sort_by_bone(); // need to similar
     }
     BOOL similar_pos(SSkelVert& V) { return offs.similar(V.offs, g_EpsSkelPositionDelta); }
     BOOL similar(SSkelVert& V)
     {
-        if (bones.size() != V.bones.size()) return FALSE;
+        if (bones.size() != V.bones.size())
+            return FALSE;
         for (u8 k = 0; k < (u8)bones.size(); k++)
         {
-            if (!bones[k].similar(V.bones[k])) return FALSE;
+            if (!bones[k].similar(V.bones[k]))
+                return FALSE;
         }
-        if (!uv.similar(V.uv, EPS_S)) return FALSE;
+        if (!uv.similar(V.uv, EPS_S))
+            return FALSE;
 
-        if (!offs.similar(V.offs, g_EpsSkelPositionDelta)) return FALSE;
+        if (!offs.similar(V.offs, g_EpsSkelPositionDelta))
+            return FALSE;
 
-        if (!norm.similar(V.norm, g_EpsSkelPositionDelta)) return FALSE;
+        if (!norm.similar(V.norm, g_EpsSkelPositionDelta))
+            return FALSE;
 
         return TRUE;
     }
@@ -70,7 +75,7 @@ DEFINE_VECTOR(SSkelFace, SkelFaceVec, SkelFaceIt);
 
 class ECORE_API CSkeletonCollectorPacked
 {
-  protected:
+protected:
     SkelVertVec m_Verts;
     SkelFaceVec m_Faces;
 
@@ -80,29 +85,37 @@ class ECORE_API CSkeletonCollectorPacked
 
     u16 VPack(SSkelVert& V);
 
-  public:
+public:
     u32 invalid_faces;
 
-  public:
+public:
     CSkeletonCollectorPacked(const Fbox& bb, int apx_vertices = 5000, int apx_faces = 5000);
     bool check(SSkelFace& F)
     {
-        if ((F.v[0] == F.v[1]) || (F.v[0] == F.v[2]) || (F.v[1] == F.v[2])) return false;
+        if ((F.v[0] == F.v[1]) || (F.v[0] == F.v[2]) || (F.v[1] == F.v[2]))
+            return false;
         for (SkelFaceIt f_it = m_Faces.begin(); f_it != m_Faces.end(); f_it++)
         {
             // Test for 6 variations
-            if ((f_it->v[0] == F.v[0]) && (f_it->v[1] == F.v[1]) && (f_it->v[2] == F.v[2])) return false;
-            if ((f_it->v[0] == F.v[0]) && (f_it->v[2] == F.v[1]) && (f_it->v[1] == F.v[2])) return false;
-            if ((f_it->v[2] == F.v[0]) && (f_it->v[0] == F.v[1]) && (f_it->v[1] == F.v[2])) return false;
-            if ((f_it->v[2] == F.v[0]) && (f_it->v[1] == F.v[1]) && (f_it->v[0] == F.v[2])) return false;
-            if ((f_it->v[1] == F.v[0]) && (f_it->v[0] == F.v[1]) && (f_it->v[2] == F.v[2])) return false;
-            if ((f_it->v[1] == F.v[0]) && (f_it->v[2] == F.v[1]) && (f_it->v[0] == F.v[2])) return false;
+            if ((f_it->v[0] == F.v[0]) && (f_it->v[1] == F.v[1]) && (f_it->v[2] == F.v[2]))
+                return false;
+            if ((f_it->v[0] == F.v[0]) && (f_it->v[2] == F.v[1]) && (f_it->v[1] == F.v[2]))
+                return false;
+            if ((f_it->v[2] == F.v[0]) && (f_it->v[0] == F.v[1]) && (f_it->v[1] == F.v[2]))
+                return false;
+            if ((f_it->v[2] == F.v[0]) && (f_it->v[1] == F.v[1]) && (f_it->v[0] == F.v[2]))
+                return false;
+            if ((f_it->v[1] == F.v[0]) && (f_it->v[0] == F.v[1]) && (f_it->v[2] == F.v[2]))
+                return false;
+            if ((f_it->v[1] == F.v[0]) && (f_it->v[2] == F.v[1]) && (f_it->v[0] == F.v[2]))
+                return false;
         }
         return true;
     }
     bool add_face(SSkelVert& v0, SSkelVert& v1, SSkelVert& v2)
     {
-        if (v0.offs.similar(v1.offs, EPS) || v0.offs.similar(v2.offs, EPS) || v1.offs.similar(v2.offs, EPS)) {
+        if (v0.offs.similar(v1.offs, EPS) || v0.offs.similar(v2.offs, EPS) || v1.offs.similar(v2.offs, EPS))
+        {
             ELog.Msg(mtError, "Degenerate face found. Removed.");
             invalid_faces++;
             return false;
@@ -111,7 +124,8 @@ class ECORE_API CSkeletonCollectorPacked
         F.v[0] = VPack(v0);
         F.v[1] = VPack(v1);
         F.v[2] = VPack(v2);
-        if (check(F)) {
+        if (check(F))
+        {
             m_Faces.push_back(F);
             return true;
         }
@@ -133,7 +147,7 @@ class ECORE_API CSkeletonCollectorPacked
 
 class ECORE_API CExportSkeletonCustom
 {
-  protected:
+protected:
     struct ECORE_API SSplit : public CSkeletonCollectorPacked
     {
         shared_str m_Shader;
@@ -143,16 +157,18 @@ class ECORE_API CExportSkeletonCustom
         U16Vec m_UsedBones;
 
         // Progressive
-        ArbitraryList<VIPM_SWR> m_SWR;  // The records of the collapses.
+        ArbitraryList<VIPM_SWR> m_SWR; // The records of the collapses.
         u32 m_SkeletonLinkType;
 
-      public:
+    public:
         SSplit(CSurface* surf, const Fbox& bb, u16 part);
 
         bool valid()
         {
-            if (m_Verts.empty()) return false;
-            if (m_Faces.empty()) return false;
+            if (m_Verts.empty())
+                return false;
+            if (m_Faces.empty())
+                return false;
             return true;
         }
         void MakeProgressive();
@@ -188,7 +204,7 @@ class ECORE_API CExportSkeletonCustom
         }
     }
 
-  public:
+public:
     virtual bool Export(IWriter& F, u8 infl) = 0;
 };
 
@@ -199,7 +215,7 @@ class ECORE_API CExportSkeleton :
     CEditableObject* m_Source;
     bool PrepareGeometry(u8 influence);
 
-  public:
+public:
     CExportSkeleton(CEditableObject* object);
     virtual bool Export(IWriter& F, u8 infl);
     virtual bool ExportGeometry(IWriter& F, u8 infl);

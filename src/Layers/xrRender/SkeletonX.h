@@ -33,12 +33,12 @@ protected:
         RM_SKINNING_4B
     };
 
-    CKinematics* Parent;               // setted up by parent
-    ref_smem<vertBoned1W> Vertices1W;  // shared
-    ref_smem<vertBoned2W> Vertices2W;  // shared
-    ref_smem<vertBoned3W> Vertices3W;  // shared
-    ref_smem<vertBoned4W> Vertices4W;  // shared
-    ref_smem<u16> BonesUsed;           // actual bones which have influence on vertices
+    CKinematics* Parent; // setted up by parent
+    ref_smem<vertBoned1W> Vertices1W; // shared
+    ref_smem<vertBoned2W> Vertices2W; // shared
+    ref_smem<vertBoned3W> Vertices3W; // shared
+    ref_smem<vertBoned4W> Vertices4W; // shared
+    ref_smem<u16> BonesUsed; // actual bones which have influence on vertices
 
     u16 RenderMode;
     u16 ChildIDX;
@@ -47,13 +47,13 @@ protected:
     union
     {
         struct
-        {  // soft-skinning only
+        { // soft-skinning only
             u32 cache_DiscardID;
             u32 cache_vCount;
             u32 cache_vOffset;
         };
-        u32 RMS_boneid;     // single-bone-rendering
-        u32 RMS_bonecount;  // skinning, maximal bone ID
+        u32 RMS_boneid; // single-bone-rendering
+        u32 RMS_bonecount; // skinning, maximal bone ID
     };
 
     void _Copy(CSkeletonX* V);
@@ -122,7 +122,7 @@ protected:
 
     //	Index buffer replica since we can't read from index buffer in DX10
     ref_smem<u16> m_Indices;
-#endif  //	USE_DX10
+#endif //	USE_DX10
 };
 
 template <typename T_vertex, typename T_buffer>
@@ -139,7 +139,8 @@ BOOL pick_bone(T_buffer vertices, CKinematics* Parent, IKinematics::pick_result&
         }
         float u, v;
         r.dist = flt_max;
-        if (CDB::TestRayTri(S, D, r.tri, u, v, r.dist, true) && (r.dist < dist)) {
+        if (CDB::TestRayTri(S, D, r.tri, u, v, r.dist, true) && (r.dist < dist))
+        {
             r.normal.mknormal(r.tri[0], r.tri[1], r.tri[2]);
             return TRUE;
         };
@@ -166,6 +167,6 @@ BOOL pick_bone(CKinematics* Parent, IKinematics::pick_result& r, float dist, con
     CHK_DX(V->p_rm_Vertices->Unlock());
     return intersect;
 }
-#endif  //	USE_DX10
+#endif //	USE_DX10
 
-#endif  // SkeletonXH
+#endif // SkeletonXH

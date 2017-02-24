@@ -20,7 +20,8 @@ void __fastcall CSHEngineTools::FillMatrixProps(PropItemVec& items, LPCSTR pref,
 
     PHelper().CreateToken32(items, PrepareKey(pref, "Mode"), &M->dwMode, mode_token);
 
-    if (M->dwMode == CMatrix::modeTCM) {
+    if (M->dwMode == CMatrix::modeTCM)
+    {
         PHelper().CreateFlag32(items, PrepareKey(pref, "Scale enabled"), &M->tcm_flags, CMatrix::tcmScale);
         PHelper().CreateWave(items, PrepareKey(pref, "Scale U"), &M->scaleU);
         PHelper().CreateWave(items, PrepareKey(pref, "Scale V"), &M->scaleV);
@@ -36,7 +37,8 @@ void __fastcall CSHEngineTools::FillMatrixProps(PropItemVec& items, LPCSTR pref,
 
 void __fastcall CSHEngineTools::MCOnDraw(PropValue* sender, xr_string& draw_val)
 {
-    if (draw_val[0] != '$') draw_val = "Custom";
+    if (draw_val[0] != '$')
+        draw_val = "Custom";
 }
 
 //---------------------------------------------------------------------------
@@ -48,8 +50,10 @@ bool CSHEngineTools::MatrixOnAfterEdit(PropValue* sender, xr_string& nm)
     VERIFY(nm.size());
     LPCSTR src_val = V->GetValue();
 
-    if (nm[0] != '$') {
-        if (src_val[0] == '$') {
+    if (nm[0] != '$')
+    {
+        if (src_val[0] == '$')
+        {
             nm = AppendMatrix();
         }
         else
@@ -59,7 +63,8 @@ bool CSHEngineTools::MatrixOnAfterEdit(PropValue* sender, xr_string& nm)
     }
     else
     {
-        if (src_val[0] != '$') {
+        if (src_val[0] != '$')
+        {
             RemoveMatrix(src_val);
             V->ApplyValue(src_val);
         }
@@ -88,8 +93,10 @@ bool CSHEngineTools::ConstOnAfterEdit(PropValue* sender, xr_string& nm)
     VERIFY(nm.size());
     LPCSTR src_val = V->GetValue();
 
-    if (nm[0] != '$') {
-        if (src_val[0] == '$') {
+    if (nm[0] != '$')
+    {
+        if (src_val[0] == '$')
+        {
             nm = AppendConstant();
         }
         else
@@ -99,7 +106,8 @@ bool CSHEngineTools::ConstOnAfterEdit(PropValue* sender, xr_string& nm)
     }
     else
     {
-        if (src_val[0] != '$') {
+        if (src_val[0] != '$')
+        {
             RemoveConstant(src_val);
             V->ApplyValue(src_val);
         }
@@ -113,7 +121,8 @@ bool CSHEngineTools::NameOnAfterEdit(PropValue* sender, xr_string& new_name)
     CTextValue* V = dynamic_cast<CTextValue*>(sender);
     R_ASSERT(V);
     AnsiString nn = new_name.c_str();
-    if (FHelper.NameAfterEdit((TElTreeItem*)m_CurrentItem->Item(), V->GetValue(), nn)) {
+    if (FHelper.NameAfterEdit((TElTreeItem*)m_CurrentItem->Item(), V->GetValue(), nn))
+    {
         new_name = nn.c_str();
         RemoteRenameBlender(V->GetValue(), new_name.c_str());
     }
@@ -124,7 +133,8 @@ bool CSHEngineTools::NameOnAfterEdit(PropValue* sender, xr_string& new_name)
 
 void CSHEngineTools::RealUpdateList()
 {
-    if (m_bFreezeUpdate) return;
+    if (m_bFreezeUpdate)
+        return;
     FillItemList();
 }
 
@@ -132,10 +142,12 @@ void CSHEngineTools::RealUpdateList()
 
 void CSHEngineTools::RealUpdateProperties()
 {
-    if (m_bFreezeUpdate) return;
+    if (m_bFreezeUpdate)
+        return;
 
     PropItemVec items;
-    if (m_CurrentBlender) {  // fill Tree
+    if (m_CurrentBlender)
+    { // fill Tree
         AnsiString marker_text = "";
 
         IReader data(m_BlenderStream.pointer(), m_BlenderStream.size());
@@ -174,7 +186,8 @@ void CSHEngineTools::RealUpdateProperties()
                 CListValue* P = PHelper().CreateCList(
                     items, PrepareKey(marker_text.c_str(), key), V, sz, &*MCString.begin(), MCString.size());
                 AnsiString pref = AnsiString(PrepareKey(marker_text.c_str(), "Custom ").c_str()) + key;
-                if (V && V[0] && (*V != '$')) FillMatrixProps(items, pref.c_str(), V);
+                if (V && V[0] && (*V != '$'))
+                    FillMatrixProps(items, pref.c_str(), V);
                 P->OnAfterEditEvent.bind(this, &CSHEngineTools::MatrixOnAfterEdit);
                 P->Owner()->OnDrawTextEvent.bind(this, &CSHEngineTools::MCOnDraw);
             }
@@ -187,7 +200,8 @@ void CSHEngineTools::RealUpdateProperties()
                 CListValue* P = PHelper().CreateCList(
                     items, PrepareKey(marker_text.c_str(), key), V, sz, &*MCString.begin(), MCString.size());
                 AnsiString pref = AnsiString(PrepareKey(marker_text.c_str(), "Custom ").c_str()) + key;
-                if (V && V[0] && (*V != '$')) FillConstProps(items, pref.c_str(), V);
+                if (V && V[0] && (*V != '$'))
+                    FillConstProps(items, pref.c_str(), V);
                 P->OnAfterEditEvent.bind(this, &CSHEngineTools::ConstOnAfterEdit);
                 P->Owner()->OnDrawTextEvent.bind(this, &CSHEngineTools::MCOnDraw);
             }

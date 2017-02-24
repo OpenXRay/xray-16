@@ -9,11 +9,10 @@ class ESoundThumbnail;
 
 class ECORE_API CSoundManager
 {
-  public:
+public:
     void MakeGameSound(ESoundThumbnail* THM, LPCSTR src_name, LPCSTR game_name);
     CSoundManager() {}
     virtual ~CSoundManager() { ; }
-
     BOOL__stdcall RemoveSound(LPCSTR fname, EItemType type);
     void__stdcall RenameSound(LPCSTR p0, LPCSTR p1, EItemType type);
 
@@ -37,7 +36,6 @@ class ECORE_API CSoundManager
     virtual void OnFrame();
 
     virtual bool Validate() { return true; }
-
     void MuteSounds(BOOL bVal);
 
     void RefreshSounds(bool bSync);

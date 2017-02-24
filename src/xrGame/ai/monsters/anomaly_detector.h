@@ -23,7 +23,6 @@ class CAnomalyDetector
     {
         u32 time_remember;
         remove_predicate(u32 time) : time_remember(time) {}
-
         IC bool operator()(const SAnomalyInfo& info)
         {
             return (info.time_registered + time_remember < Device.dwTimeGlobal);

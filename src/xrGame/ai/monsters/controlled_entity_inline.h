@@ -1,6 +1,6 @@
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -48,7 +48,8 @@ void CControlledEntityAbstract::free_from_control()
 TEMPLATE_SPECIALIZATION
 void CControlledEntityAbstract::on_die()
 {
-    if (!is_under_control()) return;
+    if (!is_under_control())
+        return;
 
     m_controller->OnFreedFromControl(m_object);
     m_controller = 0;
@@ -56,7 +57,8 @@ void CControlledEntityAbstract::on_die()
 TEMPLATE_SPECIALIZATION
 void CControlledEntityAbstract::on_destroy()
 {
-    if (!is_under_control()) return;
+    if (!is_under_control())
+        return;
 
     m_object->ChangeTeam(saved_id.team_id, saved_id.squad_id, saved_id.group_id);
 

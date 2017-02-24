@@ -35,7 +35,6 @@ public:
     virtual void shedule_Update(u32 dt);
     virtual shared_str shedule_Name() const { return shared_str("configs_dumper"); };
     virtual bool shedule_Needed() { return true; };
-
     void dump_config(complete_callback_t complete_cb);
 
 private:
@@ -48,12 +47,11 @@ private:
     void __stdcall switch_thread();
 
     bool const is_active() const { return m_state == ds_active; };
-
     enum enum_dumper_state
     {
         ds_not_active = 0x00,
         ds_active = 0x01
-    };  // enum_dumper_state
+    }; // enum_dumper_state
 
     void realloc_compress_buffer(u32 need_size);
     u8* m_buffer_for_compress;
@@ -82,8 +80,8 @@ private:
     inline void timer_begin(LPCSTR comment) {}
     inline void timer_end() {}
 #endif
-};  // class configs_dumper
+}; // class configs_dumper
 
-}  // namespace mp_anticheat
+} // namespace mp_anticheat
 
 #endif

@@ -53,7 +53,7 @@
 #ifdef DEBUG
 #include "xrEngine/StatGraph.h"
 #include "PHDebug.h"
-#endif  // DEBUG
+#endif // DEBUG
 
 #include "hit.h"
 #include "PHDestroyable.h"
@@ -178,7 +178,7 @@
 #include "actor_mp_server.h"
 #include "actor_mp_client.h"
 #include "smart_cover_object.h"
-#endif  // NO_XR_GAME
+#endif // NO_XR_GAME
 
 #ifndef NO_XR_GAME
 ENGINE_API bool g_dedicated_server;
@@ -202,7 +202,7 @@ void CObjectFactory::register_classes()
     add<game_sv_TeamDeathmatch>(CLSID_SV_GAME_TEAMDEATHMATCH, "game_sv_team_deathmatch");
     add<game_sv_ArtefactHunt>(CLSID_SV_GAME_ARTEFACTHUNT, "game_sv_artefact_hunt");
     add<game_sv_CaptureTheArtefact>(CLSID_SV_GAME_CAPTURETHEARTEFACT, "game_sv_capture_the_artefact");
-#endif  //	BENCHMARK_BUILD
+#endif //	BENCHMARK_BUILD
     // Client Game type
     add<game_cl_Single>(CLSID_CL_GAME_SINGLE, "game_cl_single");
 #ifndef BENCHMARK_BUILD
@@ -210,7 +210,7 @@ void CObjectFactory::register_classes()
     add<game_cl_TeamDeathmatch>(CLSID_CL_GAME_TEAMDEATHMATCH, "game_cl_team_deathmatch");
     add<game_cl_ArtefactHunt>(CLSID_CL_GAME_ARTEFACTHUNT, "game_cl_artefact_hunt");
     add<game_cl_CaptureTheArtefact>(CLSID_CL_GAME_CAPTURETHEARTEFACT, "game_cl_capture_the_artefact");
-#endif  //	BENCHMARK_BUILD
+#endif //	BENCHMARK_BUILD
 
     add<CUIGameSP>(CLSID_GAME_UI_SINGLE, "game_ui_single");
     add<CUIGameDM>(CLSID_GAME_UI_DEATHMATCH, "game_ui_deathmatch");
@@ -218,9 +218,9 @@ void CObjectFactory::register_classes()
     add<CUIGameAHunt>(CLSID_GAME_UI_ARTEFACTHUNT, "game_ui_artefact_hunt");
     add<CUIGameCTA>(CLSID_GAME_UI_CAPTURETHEARTEFACT, "game_ui_capture_the_artefact");
     ADD_MP(CActor, CActorMP, CSE_ALifeCreatureActor, CSE_ActorMP, CLSID_OBJECT_ACTOR, "actor");
-#else   // NO_XR_GAME
+#else // NO_XR_GAME
     ADD(CActor, CSE_ALifeCreatureActor, CLSID_OBJECT_ACTOR, "actor");
-#endif  // NO_XR_GAME
+#endif // NO_XR_GAME
 
     // server entities
     add<CSE_ALifeGroupTemplate<CSE_ALifeMonsterBase>>(CLSID_AI_FLESH_GROUP, "flesh_group");
@@ -356,7 +356,7 @@ void CObjectFactory::register_classes()
     ADD(CMosquitoBald, CSE_ALifeAnomalousZone, CLSID_Z_DEAD, "zone_dead");
 #ifndef BENCHMARK_BUILD
     ADD(CLevelChanger, CSE_ALifeLevelChanger, CLSID_LEVEL_CHANGER, "level_changer");
-#endif  //	BENCHMARK_BUILD
+#endif //	BENCHMARK_BUILD
     ADD(CScriptZone, CSE_ALifeSpaceRestrictor, CLSID_SCRIPT_ZONE, "script_zone");
     ADD(CSmartZone, CSE_ALifeSmartZone, CLSID_SMART_ZONE, "smart_zone");
     ADD(CTeamBaseZone, CSE_ALifeTeamBaseZone, CLSID_Z_TEAM_BASE, "team_base_zone");
@@ -398,7 +398,8 @@ void CObjectFactory::register_classes()
     // because we do not have scripts
     // and script functionality is not
     // needed here
-    if (!g_dedicated_server) return;
+    if (!g_dedicated_server)
+        return;
 
     ADD(CElectricBall, CSE_ALifeItemArtefact, TEXT2CLSID("SCRPTART"), "artefact_s");
     //	ADD(CtaGameArtefact			,CSE_ALifeItemArtefact			,TEXT2CLSID("AF_CTA")			,"ctaartefact_s");
@@ -427,5 +428,5 @@ void CObjectFactory::register_classes()
     ADD(CMincer, CSE_ALifeAnomalousZone, TEXT2CLSID("ZS_GALAN"), "zone_galant_s");
     ADD(CMincer, CSE_ALifeAnomalousZone, TEXT2CLSID("ZS_MINCE"), "zone_mincer_s");
     ADD(CSpaceRestrictor, CSE_ALifeSpaceRestrictor, TEXT2CLSID("SPC_RS_S"), "script_restr");
-#endif  // NO_XR_GAME
+#endif // NO_XR_GAME
 }

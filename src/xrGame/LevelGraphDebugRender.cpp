@@ -53,13 +53,11 @@ LevelGraphDebugRender::LevelGraphDebugRender()
     currentRadius = {flt_max, flt_max, flt_max};
 }
 
-LevelGraphDebugRender::~LevelGraphDebugRender()
-{
-}
-
+LevelGraphDebugRender::~LevelGraphDebugRender() {}
 void LevelGraphDebugRender::SetupCurrentLevel(int levelId)
 {
-    if (currentLevelId == levelId) return;
+    if (currentLevelId == levelId)
+        return;
     currentActual = false;
     currentLevelId = levelId;
 }
@@ -68,12 +66,17 @@ void LevelGraphDebugRender::Render(CGameGraph& gameGraph, CLevelGraph& levelGrap
 {
     this->gameGraph = &gameGraph;
     this->levelGraph = &levelGraph;
-    if (psAI_Flags.test(aiDrawGameGraph)) DrawGameGraph();
-    if (!bDebug && !psAI_Flags.test(aiMotion)) return;
-    if (bDebug && psAI_Flags.test(aiDebug)) DrawNodes();
+    if (psAI_Flags.test(aiDrawGameGraph))
+        DrawGameGraph();
+    if (!bDebug && !psAI_Flags.test(aiMotion))
+        return;
+    if (bDebug && psAI_Flags.test(aiDebug))
+        DrawNodes();
     DrawRestrictions();
-    if (psAI_Flags.test(aiCover)) DrawCovers();
-    if (psAI_Flags.test(aiMotion)) DrawObjects();
+    if (psAI_Flags.test(aiCover))
+        DrawCovers();
+    if (psAI_Flags.test(aiMotion))
+        DrawObjects();
 #ifdef DEBUG
     DrawDebugNode();
 #endif
@@ -98,9 +101,12 @@ void LevelGraphDebugRender::UpdateCurrentInfo()
     int vertexCount = gameGraph->header().vertex_count();
     for (int i = 0; i < vertexCount; i++)
     {
-        if (!all) {
-            if (gameGraph->vertex(i)->level_id() != currentLevelId) {
-                if (found) break;
+        if (!all)
+        {
+            if (gameGraph->vertex(i)->level_id() != currentLevelId)
+            {
+                if (found)
+                    break;
                 continue;
             }
             found = true;
@@ -129,14 +135,16 @@ void LevelGraphDebugRender::DrawEdge(int vid1, int vid2)
     const GameGraph::CVertex& v1 = *gameGraph->vertex(vid1);
     const GameGraph::CVertex& v2 = *gameGraph->vertex(vid2);
     float radius = 0.005f;
-    if (psAI_Flags.test(aiDrawGameGraphRealPos)) radius = 1.f;
+    if (psAI_Flags.test(aiDrawGameGraphRealPos))
+        radius = 1.f;
     const u32 defaultVertexColor = color_xrgb(0, 255, 255);
     const u32 xVertexColor = color_xrgb(255, 0, 255);
     const u32 edgeColor = color_xrgb(0, 255, 0);
     u32 vertexColor1 = !v1.vertex_type()[3] ? xVertexColor : defaultVertexColor;
     u32 vertexColor2 = !v2.vertex_type()[3] ? xVertexColor : defaultVertexColor;
     Fvector pos1, pos2;
-    if (psAI_Flags.test(aiDrawGameGraphRealPos)) {
+    if (psAI_Flags.test(aiDrawGameGraphRealPos))
+    {
         pos1 = v1.level_point();
         pos2 = v2.level_point();
     }
@@ -158,15 +166,18 @@ void LevelGraphDebugRender::DrawVertex(int vid)
     for (; it != end; it++)
     {
         int neighbourId = gameGraph->value(vid, it);
-        if (neighbourId < vid) DrawEdge(vid, neighbourId);
+        if (neighbourId < vid)
+            DrawEdge(vid, neighbourId);
     }
 }
 
 void LevelGraphDebugRender::DrawStalkers(int vid)
 {
-    if (!ai().get_alife()) return;
+    if (!ai().get_alife())
+        return;
     float radius = 0.0105f;
-    if (psAI_Flags.test(aiDrawGameGraphRealPos)) radius = 1;
+    if (psAI_Flags.test(aiDrawGameGraphRealPos))
+        radius = 1;
     const u32 color = color_xrgb(255, 0, 0);
     IGameFont& font = *UI().Font().pFontDI;
     Fvector pos;
@@ -180,23 +191,28 @@ void LevelGraphDebugRender::DrawStalkers(int vid)
     Device.mFullTransform.transform(temp, pos);
     font.OutSetI(temp.x, -temp.y);
     font.SetHeightI(0.05f / _sqrt(temp.w));
-    if (temp.z < 0 || temp.w < 0 || _abs(temp.x) > 1 || _abs(temp.y) > 1) showText = false;
+    if (temp.z < 0 || temp.w < 0 || _abs(temp.x) > 1 || _abs(temp.y) > 1)
+        showText = false;
     using ObjectRegistry = CALifeGraphRegistry::OBJECT_REGISTRY;
     using DetailPath = CALifeMonsterDetailPathManager::PATH;
     const ObjectRegistry& objects = ai().alife().graph().objects()[vid].objects();
     CDebugRenderer& render = Level().debug_renderer();
-    if (showText) {
+    if (showText)
+    {
         bool firstTime = true;
         for (auto& pair : objects.objects())
         {
             CSE_ALifeDynamicObject* object = pair.second;
             auto* stalker = smart_cast<CSE_ALifeHumanStalker*>(object);
-            if (!stalker) continue;
+            if (!stalker)
+                continue;
             const DetailPath& path = stalker->brain().movement().detail().path();
             const float& walked_distance = path.size() < 2 ? 0 : stalker->brain().movement().detail().walked_distance();
             // font.OutNext("%s",stalker->name_replace());
-            if (path.size() >= 2 && !fis_zero(walked_distance)) continue;
-            if (!firstTime) continue;
+            if (path.size() >= 2 && !fis_zero(walked_distance))
+                continue;
+            if (!firstTime)
+                continue;
             Fvector pos;
             if (psAI_Flags.test(aiDrawGameGraphRealPos))
                 pos = gameGraph->vertex(stalker->m_tGraphID)->level_point();
@@ -210,18 +226,22 @@ void LevelGraphDebugRender::DrawStalkers(int vid)
     {
         CSE_ALifeDynamicObject* object = pair.second;
         auto* stalker = smart_cast<CSE_ALifeHumanStalker*>(object);
-        if (!stalker) continue;
+        if (!stalker)
+            continue;
         const DetailPath& path = stalker->brain().movement().detail().path();
-        if (path.size() < 2) continue;
+        if (path.size() < 2)
+            continue;
         u32 vid1 = stalker->m_tGraphID;
         u32 vid2 = path[path.size() - 2];
         const float& walkedDistance = stalker->brain().movement().detail().walked_distance();
-        if (fis_zero(walkedDistance)) continue;
+        if (fis_zero(walkedDistance))
+            continue;
         const CGameGraph::CVertex& v1 = *gameGraph->vertex(vid1);
         const CGameGraph::CVertex& v2 = *gameGraph->vertex(vid2);
         Fvector pos1, pos2;
         float distance;
-        if (psAI_Flags.test(aiDrawGameGraphRealPos)) {
+        if (psAI_Flags.test(aiDrawGameGraphRealPos))
+        {
             pos1 = v1.level_point();
             pos2 = v2.level_point();
             distance = pos1.distance_to(pos2);
@@ -240,17 +260,20 @@ void LevelGraphDebugRender::DrawStalkers(int vid)
         render.draw_aabb(direction, radius, radius, radius, color);
         Fvector4 temp;
         Device.mFullTransform.transform(temp, direction);
-        if (temp.z < 0 || temp.w < 0 || _abs(temp.x) > 1 || _abs(temp.y) > 1) continue;
+        if (temp.z < 0 || temp.w < 0 || _abs(temp.x) > 1 || _abs(temp.y) > 1)
+            continue;
         font.SetHeightI(0.05f / _sqrt(temp.w));
     }
 }
 
 void LevelGraphDebugRender::DrawObjects(int vid)
 {
-    if (!ai().get_alife()) return;
+    if (!ai().get_alife())
+        return;
     const GameGraph::CVertex& vertex = *gameGraph->vertex(vid);
     float radius = 0.0105f;
-    if (psAI_Flags.test(aiDrawGameGraphRealPos)) radius = 1.0f;
+    if (psAI_Flags.test(aiDrawGameGraphRealPos))
+        radius = 1.0f;
     const u32 color = color_xrgb(255, 0, 0);
     IGameFont& font = *UI().Font().pFontDI;
     Fvector position;
@@ -264,23 +287,28 @@ void LevelGraphDebugRender::DrawObjects(int vid)
     font.OutSetI(temp.x, -temp.y);
     font.SetHeightI(0.05f / _sqrt(temp.w));
     bool showText = true;
-    if (temp.z < 0 || temp.w < 0 || _abs(temp.x) > 1 || _abs(temp.y) > 1) showText = false;
+    if (temp.z < 0 || temp.w < 0 || _abs(temp.x) > 1 || _abs(temp.y) > 1)
+        showText = false;
     using ObjectRegistry = CALifeGraphRegistry::OBJECT_REGISTRY;
     using DetailPath = CALifeMonsterDetailPathManager::PATH;
     const ObjectRegistry& objects = ai().alife().graph().objects()[vid].objects();
     CDebugRenderer& render = Level().debug_renderer();
-    if (showText) {
+    if (showText)
+    {
         bool firstTime = true;
         for (auto& pair : objects.objects())
         {
             CSE_ALifeDynamicObject* object = pair.second;
             CSE_ALifeMonsterAbstract* monster = smart_cast<CSE_ALifeMonsterAbstract*>(object);
-            if (!monster) continue;
+            if (!monster)
+                continue;
             const DetailPath& path = monster->brain().movement().detail().path();
             const float walkedDistance = path.size() < 2 ? 0 : monster->brain().movement().detail().walked_distance();
             // font.OutNext("%s", monster->name_replace());
-            if (path.size() >= 2 && !fis_zero(walkedDistance)) continue;
-            if (!firstTime) continue;
+            if (path.size() >= 2 && !fis_zero(walkedDistance))
+                continue;
+            if (!firstTime)
+                continue;
             Fvector position;
             if (psAI_Flags.test(aiDrawGameGraphRealPos))
                 position = gameGraph->vertex(monster->m_tGraphID)->level_point();
@@ -294,18 +322,22 @@ void LevelGraphDebugRender::DrawObjects(int vid)
     {
         CSE_ALifeDynamicObject* object = pair.second;
         auto* monster = smart_cast<CSE_ALifeMonsterAbstract*>(object);
-        if (!monster) continue;
+        if (!monster)
+            continue;
         const DetailPath& path = monster->brain().movement().detail().path();
-        if (path.size() < 2) continue;
+        if (path.size() < 2)
+            continue;
         u32 vid1 = monster->m_tGraphID;
         u32 vid2 = path[path.size() - 2];
         const float walkedDistance = monster->brain().movement().detail().walked_distance();
-        if (fis_zero(walkedDistance)) continue;
+        if (fis_zero(walkedDistance))
+            continue;
         Fvector pos1, pos2;
         float distance;
         const CGameGraph::CVertex& v1 = *gameGraph->vertex(vid1);
         const CGameGraph::CVertex& v2 = *gameGraph->vertex(vid2);
-        if (psAI_Flags.test(aiDrawGameGraphRealPos)) {
+        if (psAI_Flags.test(aiDrawGameGraphRealPos))
+        {
             pos1 = v1.level_point();
             pos2 = v2.level_point();
             distance = pos1.distance_to(pos2);
@@ -324,7 +356,8 @@ void LevelGraphDebugRender::DrawObjects(int vid)
         render.draw_aabb(direction, radius, radius, radius, color);
         Fvector4 temp;
         Device.mFullTransform.transform(temp, direction);
-        if (temp.z < 0 || temp.w < 0 || _abs(temp.x) > 1 || _abs(temp.y) > 1) continue;
+        if (temp.z < 0 || temp.w < 0 || _abs(temp.x) > 1 || _abs(temp.y) > 1)
+            continue;
         font.SetHeightI(0.05f / _sqrt(temp.w));
     }
 }
@@ -332,12 +365,13 @@ void LevelGraphDebugRender::DrawObjects(int vid)
 void LevelGraphDebugRender::DrawGameGraph()
 {
     IGameObject* entity = Level().CurrentEntity();
-    if (!entity) return;
+    if (!entity)
+        return;
     const Fmatrix& xform = entity->XFORM();
     Fvector center = {0.f, 5.f, 0.f};
     Fvector bounds = {3.f, 0.f, 3.f};
 // draw back plane
-#if 0  // XXX: disabled in original, reenable?
+#if 0 // XXX: disabled in original, reenable?
     Fvector vertices[4];
 	xform.transform_tiny(vertices[0], {center.x-bounds.x, center.y+bounds.y, center.z+bounds.z});
 	xform.transform_tiny(vertices[1], {center.x+bounds.x, center.y+bounds.y, center.z+bounds.z});
@@ -354,18 +388,23 @@ void LevelGraphDebugRender::DrawGameGraph()
     int vertexCount = gameGraph->header().vertex_count();
     for (int i = 0; i < vertexCount; i++)
     {
-        if (!all) {
-            if (gameGraph->vertex(i)->level_id() != currentLevelId) {
-                if (found) break;
+        if (!all)
+        {
+            if (gameGraph->vertex(i)->level_id() != currentLevelId)
+            {
+                if (found)
+                    break;
                 continue;
             }
             found = true;
         }
         DrawVertex(i);
-        if (psAI_Flags.test(aiDrawGameGraphStalkers)) DrawStalkers(i);
-        if (psAI_Flags.test(aiDrawGameGraphObjects)) DrawObjects(i);
+        if (psAI_Flags.test(aiDrawGameGraphStalkers))
+            DrawStalkers(i);
+        if (psAI_Flags.test(aiDrawGameGraphObjects))
+            DrawObjects(i);
     }
-#if 0  // XXX: update/delete
+#if 0 // XXX: update/delete
     for (int i = 0; i<(int)ai().game_graph().header().vertex_count(); i++)
     {
         Fvector t1 = ai().game_graph().vertex(i)->game_point();
@@ -565,16 +604,19 @@ void LevelGraphDebugRender::DrawNodes()
     minPos.sub(30.0f);
     maxPos.add(30.0f);
     CLevelGraph::const_vertex_iterator it, end;
-    if (levelGraph->valid_vertex_position(minPos)) {
+    if (levelGraph->valid_vertex_position(minPos))
+    {
         it = std::lower_bound(levelGraph->begin(), levelGraph->end(), levelGraph->vertex_position(minPos).xz(),
             CLevelGraph::vertex::predicate2);
     }
     else
         it = levelGraph->begin();
-    if (levelGraph->valid_vertex_position(maxPos)) {
+    if (levelGraph->valid_vertex_position(maxPos))
+    {
         end = std::upper_bound(levelGraph->begin(), levelGraph->end(), levelGraph->vertex_position(maxPos).xz(),
             CLevelGraph::vertex::predicate);
-        if (end != levelGraph->end()) end++;
+        if (end != levelGraph->end())
+            end++;
     }
     else
         end = levelGraph->end();
@@ -585,14 +627,17 @@ void LevelGraphDebugRender::DrawNodes()
     {
         Fvector vertexPos = levelGraph->vertex_position(*it);
         u32 Nid = levelGraph->vertex_id(it);
-        if (Device.vCameraPosition.distance_to(vertexPos) > 30) continue;
+        if (Device.vCameraPosition.distance_to(vertexPos) > 30)
+            continue;
         float sr = levelGraph->header().cell_size();
-        if (GlobalEnv.Render->ViewBase.testSphere_dirty(vertexPos, sr)) {
+        if (GlobalEnv.Render->ViewBase.testSphere_dirty(vertexPos, sr))
+        {
             u32 colorC = color_xrgb(0, 0, 255);
             u32 colorT = color_xrgb(255, 255, 255);
             u32 colorH = color_xrgb(0, 128, 0);
             bool hl = false;
-            if (Nid == vid) {
+            if (Nid == vid)
+            {
                 hl = true;
                 colorT = color_xrgb(0, 255, 0);
             }
@@ -600,7 +645,8 @@ void LevelGraphDebugRender::DrawNodes()
             {
                 for (u32 t = 0; t < linked.size(); t++)
                 {
-                    if (linked[t] == Nid) {
+                    if (linked[t] == Nid)
+                    {
                         hl = true;
                         colorT = colorH;
                         break;
@@ -620,22 +666,24 @@ void LevelGraphDebugRender::DrawNodes()
                 result.mad(result, pl.n, tt);
                 return result;
             };
-            Fvector v1 = createVertex(PL, {vertexPos.x - st, vertexPos.y, vertexPos.z - st});  // minX, minZ
-            Fvector v2 = createVertex(PL, {vertexPos.x + st, vertexPos.y, vertexPos.z - st});  // maxX, minZ
-            Fvector v3 = createVertex(PL, {vertexPos.x + st, vertexPos.y, vertexPos.z + st});  // maxX, maxZ
-            Fvector v4 = createVertex(PL, {vertexPos.x - st, vertexPos.y, vertexPos.z + st});  // minX, maxZ
+            Fvector v1 = createVertex(PL, {vertexPos.x - st, vertexPos.y, vertexPos.z - st}); // minX, minZ
+            Fvector v2 = createVertex(PL, {vertexPos.x + st, vertexPos.y, vertexPos.z - st}); // maxX, minZ
+            Fvector v3 = createVertex(PL, {vertexPos.x + st, vertexPos.y, vertexPos.z + st}); // maxX, maxZ
+            Fvector v4 = createVertex(PL, {vertexPos.x - st, vertexPos.y, vertexPos.z + st}); // minX, maxZ
             // render quad
             GlobalEnv.DRender->dbg_DrawTRI(Fidentity, v3, v2, v1, colorT);
             GlobalEnv.DRender->dbg_DrawTRI(Fidentity, v1, v4, v3, colorT);
             // render center
             Level().debug_renderer().draw_aabb(vertexPos, sc, sc, sc, colorC);
             // render id
-            if (hl) {
+            if (hl)
+            {
                 Fvector offsetPos = vertexPos;
                 offsetPos.y += 0.3f;
                 Fvector4 tsmPos;
                 Device.mFullTransform.transform(tsmPos, offsetPos);
-                if (tsmPos.z < 0 || tsmPos.w < 0 || _abs(tsmPos.x) > 1 || _abs(tsmPos.y) > 1) continue;
+                if (tsmPos.z < 0 || tsmPos.w < 0 || _abs(tsmPos.x) > 1 || _abs(tsmPos.y) > 1)
+                    continue;
                 font->SetHeightI(0.05f / _sqrt(_abs(tsmPos.w)));
                 font->SetColor(0xffffffff);
                 font->OutI(tsmPos.x, -tsmPos.y, "~%d", Nid);
@@ -653,8 +701,10 @@ void LevelGraphDebugRender::DrawRestrictions()
     const float yOffset = 0.1;
     for (auto& pair : spaceRestrictionMgr.restrictions())
     {
-        if (!pair.second->m_ref_count) continue;
-        if (!pair.second->initialized()) continue;
+        if (!pair.second->m_ref_count)
+            continue;
+        if (!pair.second->initialized())
+            continue;
         u8 b = u8(random.randI(255));
         u8 g = u8(random.randI(255));
         u8 r = u8(random.randI(255));
@@ -706,7 +756,8 @@ void LevelGraphDebugRender::DrawCovers()
             dir.y = pos.y;
             debugRenderer.draw_line(Fidentity, pos, dir, color_xrgb(0, 0, 255));
             value = levelGraph->compute_high_square(float(10 * i) / 180 * PI, PI / 2, v);
-            if (value > bestValue) {
+            if (value > bestValue)
+            {
                 bestValue = value;
                 j = i;
             }
@@ -742,7 +793,8 @@ void LevelGraphDebugRender::DrawCovers()
             dir.y = pos.y;
             debugRenderer.draw_line(Fidentity, pos, dir, color_xrgb(0, 0, 255));
             value = levelGraph->compute_low_square(float(10 * i) / 180 * PI, PI / 2, v);
-            if (value > bestValue) {
+            if (value > bestValue)
+            {
                 bestValue = value;
                 j = i;
             }
@@ -774,22 +826,26 @@ void LevelGraphDebugRender::DrawObjects()
     {
         IGameObject* obj = levelObjects.o_get_by_iterator(i);
         auto teamBaseZone = smart_cast<CTeamBaseZone*>(obj);
-        if (teamBaseZone) {
+        if (teamBaseZone)
+        {
             teamBaseZone->OnRender();
             continue;
         }
         auto monster = smart_cast<CCustomMonster*>(obj);
-        if (monster) {
+        if (monster)
+        {
             monster->OnRender();
             auto& detailPath = monster->movement().detail().path();
-            if (!detailPath.empty()) {
+            if (!detailPath.empty())
+            {
                 Fvector temp = detailPath[detailPath.size() - 1].position;
                 debugRenderer.draw_aabb(temp, halfR, halfR, halfR, color_xrgb(0, 0, 255));
             }
             continue;
         }
         auto smartCover = smart_cast<smart_cover::object*>(obj);
-        if (smartCover) {
+        if (smartCover)
+        {
             smartCover->OnRender();
             continue;
         }
@@ -798,19 +854,22 @@ void LevelGraphDebugRender::DrawObjects()
 
 void LevelGraphDebugRender::DrawDebugNode()
 {
-    if (!g_bDebugNode) return;
+    if (!g_bDebugNode)
+        return;
     CDebugRenderer& debugRenderer = Level().debug_renderer();
     Fvector srcPos, dstPos;
     const float halfR = 0.35f;
     const float yOffset = 10.0f;
-    if (levelGraph->valid_vertex_id(g_dwDebugNodeSource)) {
+    if (levelGraph->valid_vertex_id(g_dwDebugNodeSource))
+    {
         srcPos = levelGraph->vertex_position(g_dwDebugNodeSource);
         dstPos = srcPos;
         dstPos.y += yOffset;
         debugRenderer.draw_aabb(srcPos, halfR, halfR, halfR, color_xrgb(0, 0, 255));
         debugRenderer.draw_line(Fidentity, srcPos, dstPos, color_xrgb(0, 0, 255));
     }
-    if (levelGraph->valid_vertex_id(g_dwDebugNodeDest)) {
+    if (levelGraph->valid_vertex_id(g_dwDebugNodeDest))
+    {
         srcPos = levelGraph->vertex_position(g_dwDebugNodeDest);
         dstPos = srcPos;
         dstPos.y += yOffset;
@@ -819,4 +878,4 @@ void LevelGraphDebugRender::DrawDebugNode()
     }
 }
 
-#endif  // DEBUG
+#endif // DEBUG

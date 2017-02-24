@@ -5,7 +5,7 @@
 #include "xrServer_Objects_Abstract.h"
 // old
 enum ERPGameType
-{  // [0..255]
+{ // [0..255]
     rpgtGameAny = u8(0),
     rpgtGameDeathmatch,
     rpgtGameTeamDeathmatch,
@@ -28,7 +28,8 @@ bool GameTypeChooser::LoadStream(IReader& F)
 
 bool GameTypeChooser::LoadLTX(CInifile& ini, LPCSTR sect_name, bool bOldFormat)
 {
-    if (bOldFormat /*version==0x0014*/) {
+    if (bOldFormat /*version==0x0014*/)
+    {
         u8 tmp = ini.r_u8(sect_name, "game_type");
         m_GameType.zero();
         switch (tmp)
@@ -45,15 +46,8 @@ bool GameTypeChooser::LoadLTX(CInifile& ini, LPCSTR sect_name, bool bOldFormat)
     return true;
 }
 
-void GameTypeChooser::SaveStream(IWriter& F)
-{
-    F.w_u16(m_GameType.get());
-}
-
-void GameTypeChooser::SaveLTX(CInifile& ini, LPCSTR sect_name)
-{
-    ini.w_u16(sect_name, "game_type", m_GameType.get());
-}
+void GameTypeChooser::SaveStream(IWriter& F) { F.w_u16(m_GameType.get()); }
+void GameTypeChooser::SaveLTX(CInifile& ini, LPCSTR sect_name) { ini.w_u16(sect_name, "game_type", m_GameType.get()); }
 #endif
 
 #ifndef XRGAME_EXPORTS
@@ -77,4 +71,4 @@ void GameTypeChooser::FillProp(LPCSTR pref, PropItemVec& items)
        eGameIDTeamDominationZone);
     */
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS

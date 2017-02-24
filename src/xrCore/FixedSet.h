@@ -25,7 +25,6 @@ private:
     u32 limit;
 
     IC u32 Size(u32 Count) { return Count * sizeof(TNode); }
-
     void Realloc()
     {
         u32 newLimit = limit + SG_REALLOC_ADVANCE;
@@ -34,7 +33,8 @@ private:
         VERIFY(newNodes);
 
         ZeroMemory(newNodes, Size(newLimit));
-        if (limit) CopyMemory(newNodes, nodes, Size(limit));
+        if (limit)
+            CopyMemory(newNodes, nodes, Size(limit));
 
         for (u32 I = 0; I < pool; I++)
         {
@@ -42,11 +42,13 @@ private:
             TNode* Nold = nodes + I;
             TNode* Nnew = newNodes + I;
 
-            if (Nold->left) {
+            if (Nold->left)
+            {
                 u32 Lid = u32(Nold->left - nodes);
                 Nnew->left = newNodes + Lid;
             }
-            if (Nold->right) {
+            if (Nold->right)
+            {
                 u32 Rid = u32(Nold->right - nodes);
                 Nnew->right = newNodes + Rid;
             }
@@ -60,7 +62,8 @@ private:
     }
     IC TNode* Alloc(const K& key)
     {
-        if (pool == limit) Realloc();
+        if (pool == limit)
+            Realloc();
         TNode* node = nodes + pool;
         node->key = key;
         node->right = node->left = 0;
@@ -77,15 +80,19 @@ private:
 
     IC void recurseLR(TNode* N, callback CB)
     {
-        if (N->left) recurseLR(N->left, CB);
+        if (N->left)
+            recurseLR(N->left, CB);
         CB(N);
-        if (N->right) recurseLR(N->right, CB);
+        if (N->right)
+            recurseLR(N->right, CB);
     }
     IC void recurseRL(TNode* N, callback CB)
     {
-        if (N->right) recurseRL(N->right, CB);
+        if (N->right)
+            recurseRL(N->right, CB);
         CB(N);
-        if (N->left) recurseRL(N->left, CB);
+        if (N->left)
+            recurseRL(N->left, CB);
     }
 
 public:
@@ -102,12 +109,15 @@ public:
     }
     IC TNode* insert(const K& k)
     {
-        if (pool) {
+        if (pool)
+        {
             TNode* node = nodes;
 
         once_more:
-            if (k < node->key) {
-                if (node->left) {
+            if (k < node->key)
+            {
+                if (node->left)
+                {
                     node = node->left;
                     goto once_more;
                 }
@@ -120,7 +130,8 @@ public:
             }
             else if (k > node->key)
             {
-                if (node->right) {
+                if (node->right)
+                {
                     node = node->right;
                     goto once_more;
                 }
@@ -141,12 +152,15 @@ public:
     }
     IC TNode* insertInAnyWay(const K& k)
     {
-        if (pool) {
+        if (pool)
+        {
             TNode* node = nodes;
 
         once_more:
-            if (k <= node->key) {
-                if (node->left) {
+            if (k <= node->key)
+            {
+                if (node->left)
+                {
                     node = node->left;
                     goto once_more;
                 }
@@ -159,7 +173,8 @@ public:
             }
             else
             {
-                if (node->right) {
+                if (node->right)
+                {
                     node = node->right;
                     goto once_more;
                 }
@@ -179,17 +194,18 @@ public:
     IC void clear() { pool = 0; }
     IC TNode* begin() { return nodes; }
     IC TNode* end() { return nodes + pool; }
-    IC TNode* last() { return nodes + limit; }  // for setup only
+    IC TNode* last() { return nodes + limit; } // for setup only
     IC u32 size() { return pool; }
     IC TNode& operator[](int v) { return nodes[v]; }
-
     IC void traverseLR(callback CB)
     {
-        if (pool) recurseLR(nodes, CB);
+        if (pool)
+            recurseLR(nodes, CB);
     }
     IC void traverseRL(callback CB)
     {
-        if (pool) recurseRL(nodes, CB);
+        if (pool)
+            recurseRL(nodes, CB);
     }
     IC void traverseANY(callback CB)
     {

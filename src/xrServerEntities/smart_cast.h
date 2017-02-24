@@ -11,7 +11,7 @@
 
 #ifdef DEBUG
 #define PURE_DYNAMIC_CAST
-#endif  // DEBUG
+#endif // DEBUG
 
 #ifdef PURE_DYNAMIC_CAST
 #define smart_cast dynamic_cast
@@ -332,4 +332,4 @@ DECLARE_SPECIALIZATION(CSE_ALifeItemPDA, CSE_Abstract, cast_item_pda);
 #endif
 #endif
 
-#endif  // SMART_CAST_H
+#endif // SMART_CAST_H

@@ -19,4 +19,4 @@
 #pragma comment(lib, "xrCore.lib")
 #endif
 
-#endif  // stdafxH
+#endif // stdafxH

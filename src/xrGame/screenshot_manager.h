@@ -43,7 +43,7 @@ private:
     u32 m_jpeg_buffer_capacity;
 
     u32 m_defered_ssframe_counter;
-    static u32 const defer_framescount = 30;  // count of frames to defer, must be > 1
+    static u32 const defer_framescount = 30; // count of frames to defer, must be > 1
 
     inline bool is_making_screenshot() const { return !!(m_state & making_screenshot); };
     inline bool is_drawing_downloads() const { return !!(m_state & drawing_download_states); };
@@ -65,6 +65,6 @@ private:
     inline void timer_begin(LPCSTR comment) {}
     inline void timer_end() {}
 #endif
-};  // class screenshot_manager
+}; // class screenshot_manager
 
-#endif  //#ifndef SCREENSHOT_MANAGER_FOR_MP
+#endif //#ifndef SCREENSHOT_MANAGER_FOR_MP

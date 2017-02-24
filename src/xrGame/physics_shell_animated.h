@@ -13,7 +13,6 @@ public:
 
     const CPhysicsShell* shell() const { return physics_shell; }
     CPhysicsShell* shell() { return physics_shell; }
-
 public:
     bool update(const Fmatrix& xrorm);
 

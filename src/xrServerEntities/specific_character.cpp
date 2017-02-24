@@ -27,25 +27,17 @@ SSpecificCharacterData::SSpecificCharacterData()
     m_upgrade_mechanic = false;
 }
 
-SSpecificCharacterData::~SSpecificCharacterData()
-{
-}
-
+SSpecificCharacterData::~SSpecificCharacterData() {}
 #endif
 
-CSpecificCharacter::CSpecificCharacter()
-{
-    m_OwnId = NULL;
-}
-
-CSpecificCharacter::~CSpecificCharacter()
-{
-}
-
+CSpecificCharacter::CSpecificCharacter() { m_OwnId = NULL; }
+CSpecificCharacter::~CSpecificCharacter() {}
 void CSpecificCharacter::InitXmlIdToIndex()
 {
-    if (!id_to_index::tag_name) id_to_index::tag_name = "specific_character";
-    if (!id_to_index::file_str) id_to_index::file_str = pSettings->r_string("profiles", "specific_characters_files");
+    if (!id_to_index::tag_name)
+        id_to_index::tag_name = "specific_character";
+    if (!id_to_index::file_str)
+        id_to_index::file_str = pSettings->r_string("profiles", "specific_characters_files");
 }
 
 void CSpecificCharacter::Load(shared_str id)
@@ -90,7 +82,8 @@ void CSpecificCharacter::load_shared(LPCSTR)
 #ifdef XRGAME_EXPORTS
 
     LPCSTR start_dialog = pXML->Read("start_dialog", 0, NULL);
-    if (start_dialog) {
+    if (start_dialog)
+    {
         data()->m_StartDialog = start_dialog;
     }
     else
@@ -124,7 +117,8 @@ void CSpecificCharacter::load_shared(LPCSTR)
 #ifdef XRGAME_EXPORTS
     data()->m_sSupplySpawn = pXML->Read("supplies", 0, "");
 
-    if (!data()->m_sSupplySpawn.empty()) {
+    if (!data()->m_sSupplySpawn.empty())
+    {
         xr_string& str = data()->m_sSupplySpawn;
         xr_string::size_type pos = str.find("\\n");
 
@@ -147,7 +141,8 @@ void CSpecificCharacter::load_shared(LPCSTR)
     for (int i = 0; i < classes_num; i++)
     {
         LPCSTR char_class = pXML->Read("class", 0, "");
-        if (char_class) {
+        if (char_class)
+        {
             char* buf_str = xr_strdup(char_class);
             xr_strlwr(buf_str);
             data()->m_Classes.push_back(buf_str);
@@ -174,11 +169,12 @@ void CSpecificCharacter::load_shared(LPCSTR)
     R_ASSERT3(
         data()->m_Reputation != NO_REPUTATION, "'reputation' field not fulfiled for specific character", *m_OwnId);
 
-    if (pXML->NavigateToNode(pXML->GetLocalRoot(), "money", 0)) {
+    if (pXML->NavigateToNode(pXML->GetLocalRoot(), "money", 0))
+    {
         MoneyDef().min_money = pXML->ReadAttribInt("money", 0, "min");
         MoneyDef().max_money = pXML->ReadAttribInt("money", 0, "max");
         MoneyDef().inf_money = !!pXML->ReadAttribInt("money", 0, "infinitive");
-        MoneyDef().max_money = _max(MoneyDef().max_money, MoneyDef().min_money);  // :)
+        MoneyDef().max_money = _max(MoneyDef().max_money, MoneyDef().min_money); // :)
     }
     else
     {
@@ -196,79 +192,20 @@ void CSpecificCharacter::load_shared(LPCSTR)
 
 #ifdef XRGAME_EXPORTS
 
-LPCSTR CSpecificCharacter::Name() const
-{
-    return data()->m_sGameName.c_str();
-}
-
-shared_str CSpecificCharacter::Bio() const
-{
-    return data()->m_sBioText;
-}
-
-const CHARACTER_COMMUNITY& CSpecificCharacter::Community() const
-{
-    return data()->m_Community;
-}
-
-LPCSTR CSpecificCharacter::SupplySpawn() const
-{
-    return data()->m_sSupplySpawn.c_str();
-}
-
-LPCSTR CSpecificCharacter::NpcConfigSect() const
-{
-    return data()->m_sNpcConfigSect.c_str();
-}
-
-LPCSTR CSpecificCharacter::sound_voice_prefix() const
-{
-    return data()->m_sound_voice_prefix.c_str();
-}
-
-float CSpecificCharacter::panic_threshold() const
-{
-    return data()->m_fPanic_threshold;
-}
-
-float CSpecificCharacter::hit_probability_factor() const
-{
-    return data()->m_fHitProbabilityFactor;
-}
-
-int CSpecificCharacter::crouch_type() const
-{
-    return data()->m_crouch_type;
-}
-
-bool CSpecificCharacter::upgrade_mechanic() const
-{
-    return data()->m_upgrade_mechanic;
-}
-
-LPCSTR CSpecificCharacter::critical_wound_weights() const
-{
-    return data()->m_critical_wound_weights.c_str();
-}
-
+LPCSTR CSpecificCharacter::Name() const { return data()->m_sGameName.c_str(); }
+shared_str CSpecificCharacter::Bio() const { return data()->m_sBioText; }
+const CHARACTER_COMMUNITY& CSpecificCharacter::Community() const { return data()->m_Community; }
+LPCSTR CSpecificCharacter::SupplySpawn() const { return data()->m_sSupplySpawn.c_str(); }
+LPCSTR CSpecificCharacter::NpcConfigSect() const { return data()->m_sNpcConfigSect.c_str(); }
+LPCSTR CSpecificCharacter::sound_voice_prefix() const { return data()->m_sound_voice_prefix.c_str(); }
+float CSpecificCharacter::panic_threshold() const { return data()->m_fPanic_threshold; }
+float CSpecificCharacter::hit_probability_factor() const { return data()->m_fHitProbabilityFactor; }
+int CSpecificCharacter::crouch_type() const { return data()->m_crouch_type; }
+bool CSpecificCharacter::upgrade_mechanic() const { return data()->m_upgrade_mechanic; }
+LPCSTR CSpecificCharacter::critical_wound_weights() const { return data()->m_critical_wound_weights.c_str(); }
 #endif
 
-shared_str CSpecificCharacter::terrain_sect() const
-{
-    return data()->m_terrain_sect;
-}
-
-CHARACTER_RANK_VALUE CSpecificCharacter::Rank() const
-{
-    return data()->m_Rank;
-}
-
-CHARACTER_REPUTATION_VALUE CSpecificCharacter::Reputation() const
-{
-    return data()->m_Reputation;
-}
-
-LPCSTR CSpecificCharacter::Visual() const
-{
-    return data()->m_sVisual.c_str();
-}
+shared_str CSpecificCharacter::terrain_sect() const { return data()->m_terrain_sect; }
+CHARACTER_RANK_VALUE CSpecificCharacter::Rank() const { return data()->m_Rank; }
+CHARACTER_REPUTATION_VALUE CSpecificCharacter::Reputation() const { return data()->m_Reputation; }
+LPCSTR CSpecificCharacter::Visual() const { return data()->m_sVisual.c_str(); }

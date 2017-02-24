@@ -28,4 +28,4 @@ public:
 
 #include "obsolete_queue_inline.h"
 
-#endif  //#ifndef OBSOLETE_QUEUE_INCLUDED
+#endif //#ifndef OBSOLETE_QUEUE_INCLUDED

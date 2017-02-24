@@ -25,7 +25,8 @@ BOOL CALLBACK ConsoleDialogProc(HWND hw, UINT msg, WPARAM wp, LPARAM lp)
         SetWindowPos(hw, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
         EConsole.m_hWindow = hw;
         EnterCriticalSection(&EConsole.m_CSection);
-        if (!EConsole.m_Messages.empty()) {
+        if (!EConsole.m_Messages.empty())
+        {
             _F = EConsole.m_Messages.begin();
             _E = EConsole.m_Messages.end();
             for (; _F != _E; _F++)
@@ -52,7 +53,8 @@ DWORD WINAPI ConsoleThreadProc(LPVOID)
 
 void CExportConsole::StayOnTop(BOOL flag)
 {
-    if (flag) {
+    if (flag)
+    {
         SetWindowPos(m_hWindow, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
     }
     else
@@ -64,7 +66,8 @@ void CExportConsole::StayOnTop(BOOL flag)
 
 bool CExportConsole::Init(HINSTANCE _Inst, HWND _Window)
 {
-    if (m_Valid) {
+    if (m_Valid)
+    {
         SetForegroundWindow(m_hWindow);
         return true;
     }
@@ -81,7 +84,8 @@ bool CExportConsole::Init(HINSTANCE _Inst, HWND _Window)
 
 void CExportConsole::Clear()
 {
-    if (!m_Valid) return;
+    if (!m_Valid)
+        return;
 
     m_Valid = false;
     TerminateThread(m_hThread, 0);
@@ -93,10 +97,12 @@ void CExportConsole::print(TMsgDlgType mt, const char* buf)
 {
     _ConsoleMsg msg(buf);
 
-    if (m_Messages.size() > 1000) m_Messages.pop_front();
+    if (m_Messages.size() > 1000)
+        m_Messages.pop_front();
     m_Messages.push_back(buf);
 
-    if (!m_Valid) return;
+    if (!m_Valid)
+        return;
 
     EnterCriticalSection(&m_CSection);
     if (SendDlgItemMessage(m_hWindow, IDC_MESSAGES, LB_GETCOUNT, 0, 0) > 1000)
@@ -108,11 +114,7 @@ void CExportConsole::print(TMsgDlgType mt, const char* buf)
     LeaveCriticalSection(&m_CSection);
 }
 
-bool CExportConsole::valid()
-{
-    return m_Valid;
-}
-
+bool CExportConsole::valid() { return m_Valid; }
 CExportConsole::CExportConsole()
 {
     VERIFY(this == &EConsole);
@@ -133,20 +135,16 @@ void CExportConsole::ProgressStart(float max_val, const char* text)
     Msg(text ? text : "");
     ProgressUpdate(0);
 }
-void CExportConsole::ProgressEnd()
-{
-    ProgressUpdate(0);
-}
-void CExportConsole::ProgressInc()
-{
-    ProgressUpdate(fStatusProgress + 1);
-}
+void CExportConsole::ProgressEnd() { ProgressUpdate(0); }
+void CExportConsole::ProgressInc() { ProgressUpdate(fStatusProgress + 1); }
 void CExportConsole::ProgressUpdate(float val)
 {
-    if (_abs(val - fStatusProgress) < 1) return;
+    if (_abs(val - fStatusProgress) < 1)
+        return;
     fStatusProgress = val;
     EnterCriticalSection(&m_CSection);
-    if (fMaxVal > 0) {
+    if (fMaxVal > 0)
+    {
         DWORD progress = (DWORD)((fStatusProgress / fMaxVal) * 100);
         SendDlgItemMessage(m_hWindow, IDC_PROGRESS, PBM_SETPOS, progress, 0);
     }

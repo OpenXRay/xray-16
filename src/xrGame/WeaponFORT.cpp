@@ -2,14 +2,8 @@
 #include "WeaponFORT.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-CWeaponFORT::CWeaponFORT()
-{
-}
-
-CWeaponFORT::~CWeaponFORT()
-{
-}
-
+CWeaponFORT::CWeaponFORT() {}
+CWeaponFORT::~CWeaponFORT() {}
 using namespace luabind;
 
 SCRIPT_EXPORT(CWeaponFORT, (CGameObject),

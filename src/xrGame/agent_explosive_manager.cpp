@@ -30,22 +30,26 @@ struct CRemoveExplosivesPredicate
 void CAgentExplosiveManager::remove_links(IGameObject* object)
 {
     TO_BE_DESTROYED::iterator I = std::find(m_explosives_to_remove.begin(), m_explosives_to_remove.end(), object->ID());
-    if (I != m_explosives_to_remove.end()) m_explosives_to_remove.erase(I);
+    if (I != m_explosives_to_remove.end())
+        m_explosives_to_remove.erase(I);
 
     EXPLOSIVES::iterator J = std::find(m_explosives.begin(), m_explosives.end(), object->ID());
-    if (J != m_explosives.end()) m_explosives.erase(J);
+    if (J != m_explosives.end())
+        m_explosives.erase(J);
 }
 
 void CAgentExplosiveManager::register_explosive(const CExplosive* explosive, const CGameObject* game_object)
 {
     {
         xr_vector<CDangerExplosive>::iterator I = std::find(m_explosives.begin(), m_explosives.end(), explosive);
-        if (I != m_explosives.end()) return;
+        if (I != m_explosives.end())
+            return;
     }
     {
         TO_BE_DESTROYED::iterator I =
             std::find(m_explosives_to_remove.begin(), m_explosives_to_remove.end(), game_object->ID());
-        if (I != m_explosives_to_remove.end()) return;
+        if (I != m_explosives_to_remove.end())
+            return;
     }
 
     m_explosives_to_remove.push_back(game_object->ID());
@@ -67,10 +71,12 @@ bool CAgentExplosiveManager::process_explosive(CMemberOrder& member)
     xr_vector<CDangerExplosive>::iterator E = m_explosives.end();
     for (; I != E; ++I)
     {
-        if (!member.object().memory().visual().visible_now((*I).m_game_object)) continue;
+        if (!member.object().memory().visual().visible_now((*I).m_game_object))
+            continue;
 
         float dist_sqr = (*I).m_game_object->Position().distance_to_sqr(member.object().Position());
-        if (dist_sqr < min_dist_sqr) {
+        if (dist_sqr < min_dist_sqr)
+        {
             if ((*I).m_reactor &&
                 ((*I).m_reactor->Position().distance_to_sqr((*I).m_game_object->Position()) <= min_dist_sqr))
                 continue;
@@ -79,7 +85,8 @@ bool CAgentExplosiveManager::process_explosive(CMemberOrder& member)
         }
     }
 
-    if (!best_grenade) return (false);
+    if (!best_grenade)
+        return (false);
 
     best_grenade->m_reactor = &member.object();
     return (true);
@@ -93,9 +100,11 @@ void CAgentExplosiveManager::react_on_explosives()
         CAgentMemberManager::iterator I = object().member().combat_members().begin();
         CAgentMemberManager::iterator E = object().member().combat_members().end();
         for (; I != E; ++I)
-            if (!(*I)->grenade_reaction().m_processing) changed = process_explosive(**I);
+            if (!(*I)->grenade_reaction().m_processing)
+                changed = process_explosive(**I);
 
-        if (!changed) break;
+        if (!changed)
+            break;
     }
 
     {
@@ -103,7 +112,8 @@ void CAgentExplosiveManager::react_on_explosives()
         EXPLOSIVES::iterator E = m_explosives.end();
         for (; I != E; ++I)
         {
-            if (!(*I).m_reactor) continue;
+            if (!(*I).m_reactor)
+                continue;
 
             CMemberOrder::CGrenadeReaction& reaction = object().member().member((*I).m_reactor).grenade_reaction();
             reaction.m_grenade = (*I).m_grenade;
@@ -117,6 +127,4 @@ void CAgentExplosiveManager::react_on_explosives()
     }
 }
 
-void CAgentExplosiveManager::update()
-{
-}
+void CAgentExplosiveManager::update() {}

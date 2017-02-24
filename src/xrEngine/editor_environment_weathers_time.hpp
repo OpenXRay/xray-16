@@ -84,11 +84,11 @@ private:
     editor::environment::manager& m_manager;
     weather const* m_weather;
     property_holder_type* m_property_holder;
-};  // class time
-}  // namespace weathers
-}  // namespace environment
-}  // namespace editor
+}; // class time
+} // namespace weathers
+} // namespace environment
+} // namespace editor
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
-#endif  // ifndef EDITOR_ENVIRONMENT_WEATHERS_TIME_HPP_INCLUDED
+#endif // ifndef EDITOR_ENVIRONMENT_WEATHERS_TIME_HPP_INCLUDED

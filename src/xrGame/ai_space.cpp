@@ -37,7 +37,8 @@ CAI_Space::CAI_Space()
 
 void CAI_Space::init()
 {
-    if (g_dedicated_server) return;
+    if (g_dedicated_server)
+        return;
     AISpaceBase::Initialize();
     VERIFY(!m_ef_storage);
     m_ef_storage = new CEF_Storage();
@@ -55,7 +56,7 @@ void CAI_Space::init()
 CAI_Space::~CAI_Space()
 {
     unload();
-    xr_delete(GlobalEnv.ScriptEngine);  // XXX: wrapped into try..catch(...) in vanilla source
+    xr_delete(GlobalEnv.ScriptEngine); // XXX: wrapped into try..catch(...) in vanilla source
     xr_delete(m_doors_manager);
     xr_delete(m_moving_objects);
     xr_delete(m_cover_manager);
@@ -71,7 +72,8 @@ void CAI_Space::RegisterScriptClasses()
     FS.update_path(S, "$game_config$", "script.ltx");
     CInifile* l_tpIniFile = new CInifile(S);
     R_ASSERT(l_tpIniFile);
-    if (!l_tpIniFile->section_exist("common")) {
+    if (!l_tpIniFile->section_exist("common"))
+    {
         xr_delete(l_tpIniFile);
         return;
     }
@@ -83,7 +85,8 @@ void CAI_Space::RegisterScriptClasses()
     {
         _GetItem(*registrators, i, I);
         luabind::functor<void> result;
-        if (!script_engine().functor(I, result)) {
+        if (!script_engine().functor(I, result))
+        {
             script_engine().script_log(LuaMessageType::Error, "Cannot load class registrator %s!", I);
             continue;
         }
@@ -101,11 +104,13 @@ void CAI_Space::LoadCommonScripts()
     FS.update_path(S, "$game_config$", "script.ltx");
     CInifile* l_tpIniFile = new CInifile(S);
     R_ASSERT(l_tpIniFile);
-    if (!l_tpIniFile->section_exist("common")) {
+    if (!l_tpIniFile->section_exist("common"))
+    {
         xr_delete(l_tpIniFile);
         return;
     }
-    if (l_tpIniFile->line_exist("common", "script")) {
+    if (l_tpIniFile->line_exist("common", "script"))
+    {
         shared_str scriptString = l_tpIniFile->r_string("common", "script");
         u32 scriptCount = _GetItemCount(*scriptString);
         string256 scriptName;
@@ -121,7 +126,7 @@ void CAI_Space::LoadCommonScripts()
 
 void CAI_Space::SetupScriptEngine()
 {
-    XRay::ScriptExporter::Reset();  // mark all nodes as undone
+    XRay::ScriptExporter::Reset(); // mark all nodes as undone
     GlobalEnv.ScriptEngine->init(XRay::ScriptExporter::Export, true);
     RegisterScriptClasses();
     object_factory().register_script();
@@ -155,7 +160,8 @@ void CAI_Space::load(LPCSTR level_name)
 
 void CAI_Space::unload(bool reload)
 {
-    if (g_dedicated_server) return;
+    if (g_dedicated_server)
+        return;
     script_engine().unload();
     xr_delete(m_doors_manager);
     AISpaceBase::Unload(reload);
@@ -167,6 +173,7 @@ void CAI_Space::set_alife(CALifeSimulator* alife_simulator)
     m_alife_simulator = alife_simulator;
 
     VERIFY(!alife_simulator || !m_game_graph);
-    if (alife_simulator) return;
+    if (alife_simulator)
+        return;
     SetGameGraph(nullptr);
 }

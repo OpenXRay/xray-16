@@ -17,9 +17,9 @@ struct OGF;
 struct OGF_Vertex
 {
     Fvector P;
-    Fvector N;     // normal
-    base_basis T;  // tangent
-    base_basis B;  // binormal
+    Fvector N; // normal
+    base_basis T; // tangent
+    base_basis B; // binormal
     base_color Color;
     svector<Fvector2, 2> UV;
 
@@ -29,7 +29,7 @@ struct OGF_Vertex
 typedef xr_vector<OGF_Vertex> vecOGF_V;
 typedef vecOGF_V::iterator itOGF_V;
 typedef vecOGF_V::const_iterator citOGF_V;
-struct x_vertex  // "fast" geometry, 16b/vertex
+struct x_vertex // "fast" geometry, 16b/vertex
 {
     Fvector P;
     x_vertex(const OGF_Vertex& c) { P = c.P; }
@@ -62,12 +62,18 @@ struct OGF_Face
     IC bool Equal(OGF_Face& F)
     {
         // Test for 6 variations
-        if ((v[0] == F.v[0]) && (v[1] == F.v[1]) && (v[2] == F.v[2])) return true;
-        if ((v[0] == F.v[0]) && (v[2] == F.v[1]) && (v[1] == F.v[2])) return true;
-        if ((v[2] == F.v[0]) && (v[0] == F.v[1]) && (v[1] == F.v[2])) return true;
-        if ((v[2] == F.v[0]) && (v[1] == F.v[1]) && (v[0] == F.v[2])) return true;
-        if ((v[1] == F.v[0]) && (v[0] == F.v[1]) && (v[2] == F.v[2])) return true;
-        if ((v[1] == F.v[0]) && (v[2] == F.v[1]) && (v[0] == F.v[2])) return true;
+        if ((v[0] == F.v[0]) && (v[1] == F.v[1]) && (v[2] == F.v[2]))
+            return true;
+        if ((v[0] == F.v[0]) && (v[2] == F.v[1]) && (v[1] == F.v[2]))
+            return true;
+        if ((v[2] == F.v[0]) && (v[0] == F.v[1]) && (v[1] == F.v[2]))
+            return true;
+        if ((v[2] == F.v[0]) && (v[1] == F.v[1]) && (v[0] == F.v[2]))
+            return true;
+        if ((v[1] == F.v[0]) && (v[0] == F.v[1]) && (v[2] == F.v[2]))
+            return true;
+        if ((v[1] == F.v[0]) && (v[2] == F.v[1]) && (v[0] == F.v[2]))
+            return true;
         return false;
     }
 };
@@ -98,7 +104,6 @@ struct OGF_Base
     }
 
     IC BOOL IsNode() { return iLevel; }
-
     virtual void PreSave(u32 tree_id){};
     virtual void Save(IWriter& fs);
     virtual void GetGeometry(xr_vector<Fvector>& RES) = 0;
@@ -164,7 +169,6 @@ struct OGF : public OGF_Base
         // vb_id=xvb_id=vb_start=xvb_start=ib_id=xib_id=ib_start=xib_start=sw_id=xsw_id=u32(-1);
     };
     ~OGF() { xr_free(data.m_SWI.sw); }
-
     BOOL dbg_SphereContainsVertex(Fvector& c, float R);
 
     u16 x_BuildVertex(x_vertex& V);
@@ -222,7 +226,6 @@ struct OGF_Reference : public OGF_Base
     base_color_c c_bias;
 
     OGF_Reference() : OGF_Base(0) { model = 0; }
-
     virtual void Save(IWriter& fs);
     virtual void GetGeometry(xr_vector<Fvector>& R)
     {
@@ -240,7 +243,6 @@ struct OGF_Node : public OGF_Base
     xr_vector<u32> chields;
 
     OGF_Node(int _L, u16 _Sector) : OGF_Base(_L) { Sector = _Sector; }
-
     void AddChield(u32 ID)
     {
         chields.push_back(ID);
@@ -265,7 +267,7 @@ struct OGF_LOD : public OGF_Node
     {
         Fvector v;
         Fvector2 t;
-        u32 c_rgb_hemi;  // rgb,hemi
+        u32 c_rgb_hemi; // rgb,hemi
         u8 c_sun;
     };
     struct _face

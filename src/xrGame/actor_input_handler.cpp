@@ -3,15 +3,12 @@
 #include "actor.h"
 #include "Level.h"
 
-void CActorInputHandler::reinit()
-{
-    m_actor = 0;
-}
-
+void CActorInputHandler::reinit() { m_actor = 0; }
 void CActorInputHandler::install()
 {
     m_actor = smart_cast<CActor*>(Level().CurrentEntity());
-    if (!m_actor) {
+    if (!m_actor)
+    {
         m_actor = Actor();
     }
     VERIFY(m_actor);

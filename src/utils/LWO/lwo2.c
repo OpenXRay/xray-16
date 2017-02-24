@@ -22,8 +22,10 @@ Free memory used by an lwLayer.
 
 void lwFreeLayer(lwLayer* layer)
 {
-    if (layer) {
-        if (layer->name) free(layer->name);
+    if (layer)
+    {
+        if (layer->name)
+            free(layer->name);
         lwFreePoints(&layer->point);
         lwFreePolygons(&layer->polygon);
         lwListFree(layer->vmap, lwFreeVMap);
@@ -40,7 +42,8 @@ Free memory used by an lwObject.
 
 void lwFreeObject(lwObject* object)
 {
-    if (object) {
+    if (object)
+    {
         lwListFree(object->layer, lwFreeLayer);
         lwListFree(object->env, lwFreeEnvelope);
         lwListFree(object->clip, lwFreeClip);
@@ -83,7 +86,8 @@ lwObject* lwGetObject(char* filename, unsigned int* failID, int* failpos)
     /* open the file */
 
     fp = fopen(filename, "rb");
-    if (!fp) return NULL;
+    if (!fp)
+        return NULL;
 
     /* read the first 12 bytes */
 
@@ -91,26 +95,31 @@ lwObject* lwGetObject(char* filename, unsigned int* failID, int* failpos)
     id = getU4(fp);
     formsize = getU4(fp);
     type = getU4(fp);
-    if (12 != get_flen()) {
+    if (12 != get_flen())
+    {
         fclose(fp);
         return NULL;
     }
 
     /* is this a LW object? */
 
-    if (id != ID_FORM) {
+    if (id != ID_FORM)
+    {
         fclose(fp);
-        if (failpos) *failpos = 12;
+        if (failpos)
+            *failpos = 12;
         return NULL;
     }
 
-    if (type != ID_LWO2) {
+    if (type != ID_LWO2)
+    {
         fclose(fp);
         if (type == ID_LWOB)
             return lwGetObject5(filename, failID, failpos);
         else
         {
-            if (failpos) *failpos = 12;
+            if (failpos)
+                *failpos = 12;
             return NULL;
         }
     }
@@ -118,17 +127,20 @@ lwObject* lwGetObject(char* filename, unsigned int* failID, int* failpos)
     /* allocate an object and a default layer */
 
     object = calloc(1, sizeof(lwObject));
-    if (!object) goto Fail;
+    if (!object)
+        goto Fail;
 
     layer = calloc(1, sizeof(lwLayer));
-    if (!layer) goto Fail;
+    if (!layer)
+        goto Fail;
     object->layer = layer;
 
     /* get the first chunk header */
 
     id = getU4(fp);
     cksize = getU4(fp);
-    if (0 > get_flen()) goto Fail;
+    if (0 > get_flen())
+        goto Fail;
 
     /* process chunks as they're encountered */
 
@@ -139,9 +151,11 @@ lwObject* lwGetObject(char* filename, unsigned int* failID, int* failpos)
         switch (id)
         {
         case ID_LAYR:
-            if (object->nlayers > 0) {
+            if (object->nlayers > 0)
+            {
                 layer = calloc(1, sizeof(lwLayer));
-                if (!layer) goto Fail;
+                if (!layer)
+                    goto Fail;
                 lwListAdd(&object->layer, layer);
             }
             object->nlayers++;
@@ -155,29 +169,36 @@ lwObject* lwGetObject(char* filename, unsigned int* failID, int* failpos)
             layer->name = getS0(fp);
 
             rlen = get_flen();
-            if (rlen < 0 || rlen > (int)cksize) goto Fail;
-            if (rlen <= (int)cksize - 2) layer->parent = getU2(fp);
-            if (rlen < (int)cksize) fseek(fp, cksize - rlen, SEEK_CUR);
+            if (rlen < 0 || rlen > (int)cksize)
+                goto Fail;
+            if (rlen <= (int)cksize - 2)
+                layer->parent = getU2(fp);
+            if (rlen < (int)cksize)
+                fseek(fp, cksize - rlen, SEEK_CUR);
             break;
 
         case ID_PNTS:
-            if (!lwGetPoints(fp, cksize, &layer->point)) goto Fail;
+            if (!lwGetPoints(fp, cksize, &layer->point))
+                goto Fail;
             break;
 
         case ID_POLS:
-            if (!lwGetPolygons(fp, cksize, &layer->polygon, layer->point.offset)) goto Fail;
+            if (!lwGetPolygons(fp, cksize, &layer->polygon, layer->point.offset))
+                goto Fail;
             break;
 
         case ID_VMAP:
         case ID_VMAD:
             node = (lwNode*)lwGetVMap(fp, cksize, layer->point.offset, layer->polygon.offset, id == ID_VMAD);
-            if (!node) goto Fail;
+            if (!node)
+                goto Fail;
             lwListAdd(&layer->vmap, node);
             layer->nvmaps++;
             break;
 
         case ID_PTAG:
-            if (!lwGetPolygonTags(fp, cksize, &object->taglist, &layer->polygon)) goto Fail;
+            if (!lwGetPolygonTags(fp, cksize, &object->taglist, &layer->polygon))
+                goto Fail;
             break;
 
         case ID_BBOX:
@@ -185,31 +206,37 @@ lwObject* lwGetObject(char* filename, unsigned int* failID, int* failpos)
             for (i = 0; i < 6; i++)
                 layer->bbox[i] = getF4(fp);
             rlen = get_flen();
-            if (rlen < 0 || rlen > (int)cksize) goto Fail;
-            if (rlen < (int)cksize) fseek(fp, cksize - rlen, SEEK_CUR);
+            if (rlen < 0 || rlen > (int)cksize)
+                goto Fail;
+            if (rlen < (int)cksize)
+                fseek(fp, cksize - rlen, SEEK_CUR);
             break;
 
         case ID_TAGS:
-            if (!lwGetTags(fp, cksize, &object->taglist)) goto Fail;
+            if (!lwGetTags(fp, cksize, &object->taglist))
+                goto Fail;
             break;
 
         case ID_ENVL:
             node = (lwNode*)lwGetEnvelope(fp, cksize);
-            if (!node) goto Fail;
+            if (!node)
+                goto Fail;
             lwListAdd(&object->env, node);
             object->nenvs++;
             break;
 
         case ID_CLIP:
             node = (lwNode*)lwGetClip(fp, cksize);
-            if (!node) goto Fail;
+            if (!node)
+                goto Fail;
             lwListAdd(&object->clip, node);
             object->nclips++;
             break;
 
         case ID_SURF:
             node = (lwNode*)lwGetSurface(fp, cksize);
-            if (!node) goto Fail;
+            if (!node)
+                goto Fail;
             lwListAdd(&object->surf, node);
             object->nsurfs++;
             break;
@@ -222,40 +249,50 @@ lwObject* lwGetObject(char* filename, unsigned int* failID, int* failpos)
 
         /* end of the file? */
 
-        if ((long)formsize <= ftell(fp) - 8) break;
+        if ((long)formsize <= ftell(fp) - 8)
+            break;
 
         /* get the next chunk header */
 
         set_flen(0);
         id = getU4(fp);
         cksize = getU4(fp);
-        if (8 != get_flen()) goto Fail;
+        if (8 != get_flen())
+            goto Fail;
     }
 
     fclose(fp);
     fp = NULL;
 
-    if (object->nlayers == 0) object->nlayers = 1;
+    if (object->nlayers == 0)
+        object->nlayers = 1;
 
     layer = object->layer;
     while (layer)
     {
         lwGetBoundingBox(&layer->point, layer->bbox);
         lwGetPolyNormals(&layer->point, &layer->polygon);
-        if (!lwGetPointPolygons(&layer->point, &layer->polygon)) goto Fail;
-        if (!lwResolvePolySurfaces(&layer->polygon, &object->taglist, &object->surf, &object->nsurfs)) goto Fail;
+        if (!lwGetPointPolygons(&layer->point, &layer->polygon))
+            goto Fail;
+        if (!lwResolvePolySurfaces(&layer->polygon, &object->taglist, &object->surf, &object->nsurfs))
+            goto Fail;
         lwGetVertNormals(&layer->point, &layer->polygon);
-        if (!lwGetPointVMaps(&layer->point, layer->vmap)) goto Fail;
-        if (!lwGetPolyVMaps(&layer->polygon, layer->vmap)) goto Fail;
+        if (!lwGetPointVMaps(&layer->point, layer->vmap))
+            goto Fail;
+        if (!lwGetPolyVMaps(&layer->polygon, layer->vmap))
+            goto Fail;
         layer = layer->next;
     }
 
     return object;
 
 Fail:
-    if (failID) *failID = id;
-    if (fp) {
-        if (failpos) *failpos = ftell(fp);
+    if (failID)
+        *failID = id;
+    if (fp)
+    {
+        if (failpos)
+            *failpos = ftell(fp);
         fclose(fp);
     }
     lwFreeObject(object);

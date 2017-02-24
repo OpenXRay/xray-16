@@ -19,10 +19,7 @@ using doors::door_state;
 float const doors::g_door_length = 1.1f;
 float const doors::g_door_open_time = 1.4f;
 
-actor::actor(CAI_Stalker const& object) : m_object(object)
-{
-}
-
+actor::actor(CAI_Stalker const& object) : m_object(object) {}
 actor::~actor()
 {
     revert_states(m_open_doors, door_state_closed);
@@ -32,7 +29,8 @@ actor::~actor()
 static void on_door_destroy(doors_type& doors, door& door)
 {
     doors_type::iterator const found = std::find(doors.begin(), doors.end(), &door);
-    if (found != doors.end()) doors.erase(found);
+    if (found != doors.end())
+        doors.erase(found);
 }
 
 void actor::on_door_destroy(door& door)
@@ -41,11 +39,7 @@ void actor::on_door_destroy(door& door)
     ::on_door_destroy(m_closed_doors, door);
 }
 
-pcstr actor::get_name() const
-{
-    return m_object.cName().c_str();
-}
-
+pcstr actor::get_name() const { return m_object.cName().c_str(); }
 void actor::revert_states(doors_type& doors, door_state const state)
 {
     doors_type::const_iterator i = doors.begin();
@@ -55,22 +49,14 @@ void actor::revert_states(doors_type& doors, door_state const state)
         (*i)->change_state(this, state);
 #ifdef DEBUG
         VERIFY(!(*i)->check_initiator(this));
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     }
 
     doors.clear_not_free();
 }
 
-Fvector const& actor::get_position() const
-{
-    return m_object.Position();
-}
-
-bool actor::need_update() const
-{
-    return !m_open_doors.empty() && !m_closed_doors.empty();
-}
-
+Fvector const& actor::get_position() const { return m_object.Position(); }
+bool actor::need_update() const { return !m_open_doors.empty() && !m_closed_doors.empty(); }
 class passed_doors_predicate
 {
 public:
@@ -82,7 +68,8 @@ public:
 
     inline bool operator()(door* const door) const
     {
-        if (door->is_locked(m_state)) return false;
+        if (door->is_locked(m_state))
+            return false;
 
         Fmatrix matrix = door->get_matrix();
         Fvector const open = door->get_vector(doors::door_state_open);
@@ -90,16 +77,19 @@ public:
         Fvector const diagonal = Fvector(open).sub(closed);
 
         float distance_to_open_state = m_movement->is_going_through(matrix, open, m_danger_distance);
-        if (distance_to_open_state != -1.f) return false;
+        if (distance_to_open_state != -1.f)
+            return false;
 
         float distance_to_closed_state = m_movement->is_going_through(matrix, closed, m_danger_distance);
-        if (distance_to_closed_state != -1.f) return false;
+        if (distance_to_closed_state != -1.f)
+            return false;
 
         Fvector temp;
         matrix.transform_tiny(temp, closed);
         matrix.c = temp;
         float distance_to_diagonal = m_movement->is_going_through(matrix, diagonal, m_danger_distance);
-        if (distance_to_diagonal != -1.f) return false;
+        if (distance_to_diagonal != -1.f)
+            return false;
 
         door->change_state(m_actor, m_state);
         return true;
@@ -110,7 +100,7 @@ private:
     actor* m_actor;
     door_state m_state;
     float m_danger_distance;
-};  // class passed_doors_predicate
+}; // class passed_doors_predicate
 
 void actor::process_doors(float const average_speed, doors_type& processed_doors, temp_doors_type const& new_doors,
     door_state const start_state, door_state const stop_state)
@@ -134,43 +124,49 @@ void actor::process_doors(float const average_speed, doors_type& processed_doors
 
 #ifdef DEBUG
 BOOL g_debug_doors = 1;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
 bool actor::add_new_door(float const average_speed, door* const door, doors_type const& processed_doors,
     doors_type& locked_doors, temp_doors_type& new_doors, door_state const state)
 {
-    if (door->is_locked(state)) {
+    if (door->is_locked(state))
+    {
 #ifdef DEBUG
-        if (g_debug_doors) Msg("actor[%s] is waiting for the locked door[%s]", get_name(), door->get_name());
-#endif  // #ifdef DEBUG
+        if (g_debug_doors)
+            Msg("actor[%s] is waiting for the locked door[%s]", get_name(), door->get_name());
+#endif // #ifdef DEBUG
         return false;
     }
 
-    if (door->is_blocked(state)) {
+    if (door->is_blocked(state))
+    {
         doors_type::iterator const i = std::find(locked_doors.begin(), locked_doors.end(), door);
-        if (i == locked_doors.end()) {
+        if (i == locked_doors.end())
+        {
 #ifdef DEBUG
             if (g_debug_doors)
                 Msg("actor[%s] is waiting for the door[%s] blocked by %s", get_name(), door->get_name(),
                     door->get_initiators_ids().c_str());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
             return false;
         }
 
         VERIFY(std::find(processed_doors.begin(), processed_doors.end(), door) == processed_doors.end());
         locked_doors.erase(i);
         door->change_state(this, state);
-        if (door->is_blocked(state)) {
+        if (door->is_blocked(state))
+        {
 #ifdef DEBUG
             if (g_debug_doors)
                 Msg("actor[%s] is waiting for the door[%s] blocked by %s", get_name(), door->get_name(),
                     door->get_initiators_ids().c_str());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
             return false;
         }
     }
 
-    if (std::find(processed_doors.begin(), processed_doors.end(), door) != processed_doors.end()) return true;
+    if (std::find(processed_doors.begin(), processed_doors.end(), door) != processed_doors.end())
+        return true;
 
     float const danger_distance = average_speed * g_door_open_time;
     Fvector const open = door->get_vector(doors::door_state_open);
@@ -194,7 +190,8 @@ bool actor::add_new_door(float const average_speed, door* const door, doors_type
 
     float const min_distance =
         std::min(distance_to_diagonal, std::min(distance_to_open_state, distance_to_closed_state));
-    if (min_distance > danger_distance) return true;
+    if (min_distance > danger_distance)
+        return true;
 
     new_doors.push_back(door);
     return true;
@@ -208,7 +205,7 @@ bool actor::update_doors(doors_type const& detected_doors, float const average_s
 
 #ifdef DEBUG
     m_detected_doors = detected_doors;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     stalker_movement_manager_smart_cover const& movement = m_object.movement();
 
@@ -229,9 +226,11 @@ bool actor::update_doors(doors_type const& detected_doors, float const average_s
             movement.is_going_through(matrix, (*i)->get_vector(door_state_open), check_distance);
         float const distance_to_closed =
             movement.is_going_through(matrix, (*i)->get_vector(door_state_closed), check_distance);
-        if (distance_to_open >= 0.f) {
+        if (distance_to_open >= 0.f)
+        {
             if (distance_to_closed >= 0.f)
-                if (distance_to_open < distance_to_closed) {
+                if (distance_to_open < distance_to_closed)
+                {
                     if (!add_new_door(
                             average_speed, *i, m_open_doors, m_closed_doors, new_doors_to_open, door_state_open))
                         return false;
@@ -252,7 +251,8 @@ bool actor::update_doors(doors_type const& detected_doors, float const average_s
             continue;
         }
 
-        if (distance_to_closed < 0.f) continue;
+        if (distance_to_closed < 0.f)
+            continue;
 
         if (!add_new_door(average_speed, *i, m_open_doors, m_closed_doors, new_doors_to_open, door_state_open))
             return false;
@@ -281,4 +281,4 @@ void actor::render() const
         renderer.draw_line(Fidentity, matrix.c, temp, color_xrgb(255, 0, 0));
     }
 }
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG

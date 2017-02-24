@@ -13,19 +13,17 @@ class CSHGameMtlPairTools : public ISHTools
     ISHTools* m_GameMtlTools;
     u32 m_StoreFlags;
 
-  public:
+public:
     SGameMtlPair* m_MtlPair;
 
     virtual LPCSTR AppendItem(LPCSTR folder_name, LPCSTR parent_name = 0) { return 0; }
-
     virtual void FillItemList();
 
-  public:
+public:
     CSHGameMtlPairTools(ISHInit& init);
     virtual ~CSHGameMtlPairTools();
 
     virtual LPCSTR ToolsName() { return "Game Material Pairs"; }
-
     virtual void Reload();
     virtual void Load();
     virtual bool Save();
@@ -46,11 +44,9 @@ class CSHGameMtlPairTools : public ISHTools
     virtual void OnFrame();
 
     virtual void OnRender() { ; }
-
     virtual void OnDeviceCreate() { ; }
-
     virtual void OnDeviceDestroy() { ; }
 };
 
 //---------------------------------------------------------------------------
-#endif  // SHGameMaterialToolsH
+#endif // SHGameMaterialToolsH

@@ -14,10 +14,7 @@
 using namespace Wml;
 
 //----------------------------------------------------------------------------
-void Wml::System::EndianCopy(int iSize, const void* pvSrc, void* pvDst)
-{
-    memcpy(pvDst, pvSrc, iSize);
-}
+void Wml::System::EndianCopy(int iSize, const void* pvSrc, void* pvDst) { memcpy(pvDst, pvSrc, iSize); }
 //----------------------------------------------------------------------------
 void Wml::System::EndianCopy(int iSize, int iQuantity, const void* pvSrc, void* pvDst)
 {

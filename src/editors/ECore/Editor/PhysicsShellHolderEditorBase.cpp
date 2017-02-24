@@ -22,15 +22,18 @@ static void SetBoneMaterials(IKinematics& K)
 void CPhysicsShellHolderEditorBase::CreatePhysicsShell(Fmatrix* obj_xform)
 {
     IKinematics* K = ObjectKinematics();
-    if (!K) return;
+    if (!K)
+        return;
     VERIFY(K);
     string1024 s;
-    if (!can_create_phys_shell(s, *this)) {
+    if (!can_create_phys_shell(s, *this))
+    {
         Msg(s);
         return;
     }
     m_object_xform.set(*obj_xform);
-    if (K->dcast_RenderVisual()) SetBoneMaterials(*K);
+    if (K->dcast_RenderVisual())
+        SetBoneMaterials(*K);
     K->CalculateBones_Invalidate();
     K->CalculateBones(TRUE);
     m_physics_shell = P_build_Shell(this, false);
@@ -46,7 +49,8 @@ void CPhysicsShellHolderEditorBase::DeletePhysicsShell()
 
 void CPhysicsShellHolderEditorBase::UpdateObjectXform(Fmatrix& obj_xform)
 {
-    if (m_physics_shell) {
+    if (m_physics_shell)
+    {
         IKinematics* K = ObjectKinematics();
         VERIFY(K);
         // K->CalculateBones();

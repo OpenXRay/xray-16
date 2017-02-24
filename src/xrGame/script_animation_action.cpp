@@ -9,6 +9,4 @@
 #include "stdafx.h"
 #include "script_animation_action.h"
 
-CScriptAnimationAction::~CScriptAnimationAction()
-{
-}
+CScriptAnimationAction::~CScriptAnimationAction() {}

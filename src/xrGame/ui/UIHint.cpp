@@ -38,7 +38,8 @@ void UIHint::init_from_xml(CUIXml& xml, LPCSTR path)
 
 void UIHint::set_text(LPCSTR text)
 {
-    if (!text || !xr_strlen(text)) {
+    if (!text || !xr_strlen(text))
+    {
         m_visible = false;
         return;
     }
@@ -54,14 +55,11 @@ void UIHint::set_text(LPCSTR text)
     SetWndSize(m_background->GetWndSize());
 }
 
-LPCSTR UIHint::get_text() const
-{
-    return m_text->GetText();
-}
-
+LPCSTR UIHint::get_text() const { return m_text->GetText(); }
 void UIHint::Draw()
 {
-    if (m_visible) {
+    if (m_visible)
+    {
         fit_in_rect(this, m_rect, m_border);
         inherited::Draw();
     }
@@ -69,13 +67,11 @@ void UIHint::Draw()
 
 // =================================================================================================
 
-UIHintWindow::UIHintWindow() : m_hint_wnd(NULL), m_hint_delay(1000), m_enable(false)
-{
-}
-
+UIHintWindow::UIHintWindow() : m_hint_wnd(NULL), m_hint_delay(1000), m_enable(false) {}
 void UIHintWindow::disable_hint()
 {
-    if (!m_hint_wnd) {
+    if (!m_hint_wnd)
+    {
         //		Msg( "! class <UIHintWindow> has not <hint_wnd>!" );
         return;
     }
@@ -85,33 +81,34 @@ void UIHintWindow::disable_hint()
 
 void UIHintWindow::set_hint_text(shared_str const& text)
 {
-    if (text.size() == 0) {
+    if (text.size() == 0)
+    {
         disable_hint();
     }
     else
     {
         m_hint_text = text;
     }
-    if (m_hint_wnd) {
+    if (m_hint_wnd)
+    {
         update_hint_text();
     }
 }
 
-void UIHintWindow::set_hint_text_ST(shared_str const& text)
-{
-    set_hint_text(CStringTable().translate(text));
-}
-
+void UIHintWindow::set_hint_text_ST(shared_str const& text) { set_hint_text(CStringTable().translate(text)); }
 void UIHintWindow::update_hint_text()
 {
-    if (!m_bCursorOverWindow || !m_hint_text.size() || !m_enable) {
+    if (!m_bCursorOverWindow || !m_hint_text.size() || !m_enable)
+    {
         return;
     }
-    if (Device.dwTimeGlobal < (m_dwFocusReceiveTime + m_hint_delay)) {
+    if (Device.dwTimeGlobal < (m_dwFocusReceiveTime + m_hint_delay))
+    {
         return;
     }
 
-    if (!m_hint_wnd) {
+    if (!m_hint_wnd)
+    {
         Msg("! class <UIHintWindow> has not <hint_wnd> (%s)!", m_hint_text.c_str());
         return;
     }

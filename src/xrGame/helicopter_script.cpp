@@ -3,21 +3,9 @@
 #include "script_game_object.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-int CHelicopter::GetMovementState()
-{
-    return m_movement.type;
-}
-
-int CHelicopter::GetHuntState()
-{
-    return m_enemy.type;
-}
-
-int CHelicopter::GetBodyState()
-{
-    return m_body.type;
-}
-
+int CHelicopter::GetMovementState() { return m_movement.type; }
+int CHelicopter::GetHuntState() { return m_enemy.type; }
+int CHelicopter::GetBodyState() { return m_body.type; }
 using namespace luabind;
 
 SCRIPT_EXPORT(CHelicopter, (CGameObject), {

@@ -15,10 +15,7 @@
 using editor::environment::suns::blend;
 using editor::environment::suns::manager;
 
-blend::blend() : m_down_time(0.f), m_rise_time(0.f), m_time(0.f)
-{
-}
-
+blend::blend() : m_down_time(0.f), m_rise_time(0.f), m_time(0.f) {}
 void blend::load(CInifile& config, shared_str const& section)
 {
     m_down_time = READ_IF_EXISTS(&config, r_float, section, "blend_down_time", 60.f);
@@ -39,4 +36,4 @@ void blend::fill(
     properties->add_property("time", "blend", "this option is resposible for the blend time", m_time, m_time);
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

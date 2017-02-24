@@ -34,11 +34,7 @@ SCRIPT_EXPORT(CSE_ALifeCreaturePhantom, (CSE_ALifeCreatureAbstract), {
         CSE_ALifeCreaturePhantom, "cse_alife_creature_phantom", CSE_ALifeCreatureAbstract)];
 });
 
-static SRotation* CSE_ALifeCreatureAbstract__o_torso(CSE_ALifeCreatureAbstract* self)
-{
-    return (&self->o_torso);
-}
-
+static SRotation* CSE_ALifeCreatureAbstract__o_torso(CSE_ALifeCreatureAbstract* self) { return (&self->o_torso); }
 SCRIPT_EXPORT(CSE_ALifeCreatureAbstract, (CSE_ALifeDynamicObjectVisual), {
     module(luaState)[luabind_class_creature1(
         CSE_ALifeCreatureAbstract, "cse_alife_creature_abstract", CSE_ALifeDynamicObjectVisual)

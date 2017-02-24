@@ -20,10 +20,10 @@ namespace Wml
 template <class Real>
 class WML_ITEM MinBox3
 {
-  public:
+public:
     MinBox3(int iQuantity, const Vector3<Real>* akPoint, Box3<Real>& kBox);
 
-  private:
+private:
     static Real Volume(const Real* afAngle, void* pvData);
 
     static void MinimalBoxForAngles(int iQuantity, const Vector3<Real>* akPoint, Real afAngle[3], Box3<Real>& rkBox);

@@ -14,13 +14,11 @@ CUIEditKeyBind::CUIEditKeyBind(bool bPrim)
     m_opt_backup_value = NULL;
     m_action = NULL;
 }
-CUIEditKeyBind::~CUIEditKeyBind()
-{
-}
-
+CUIEditKeyBind::~CUIEditKeyBind() {}
 u32 cut_string_by_length(CGameFont* pFont, LPCSTR src, LPSTR dst, u32 dst_size, float length)
 {
-    if (pFont->IsMultibyte()) {
+    if (pFont->IsMultibyte())
+    {
         u16 nPos = pFont->GetCutLengthPos(length, src);
         VERIFY(nPos < dst_size);
         strncpy_s(dst, dst_size, src, nPos);
@@ -79,11 +77,13 @@ void CUIEditKeyBind::OnFocusLost()
 
 bool CUIEditKeyBind::OnMouseDown(int mouse_btn)
 {
-    if (m_bIsEditMode) {
+    if (m_bIsEditMode)
+    {
         string64 message;
 
         m_keyboard = dik_to_ptr(mouse_btn, true);
-        if (!m_keyboard) return true;
+        if (!m_keyboard)
+            return true;
         SetValue();
         OnFocusLost();
 
@@ -95,21 +95,26 @@ bool CUIEditKeyBind::OnMouseDown(int mouse_btn)
         return true;
     }
 
-    if (mouse_btn == MOUSE_1) SetEditMode(m_bCursorOverWindow);
+    if (mouse_btn == MOUSE_1)
+        SetEditMode(m_bCursorOverWindow);
 
     return CUIStatic::OnMouseDown(mouse_btn);
 }
 
 bool CUIEditKeyBind::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (dik == MOUSE_1 || dik == MOUSE_2 || dik == MOUSE_3) return false;
+    if (dik == MOUSE_1 || dik == MOUSE_2 || dik == MOUSE_3)
+        return false;
 
-    if (CUIStatic::OnKeyboardAction(dik, keyboard_action)) return true;
+    if (CUIStatic::OnKeyboardAction(dik, keyboard_action))
+        return true;
 
     string64 message;
-    if (m_bIsEditMode) {
+    if (m_bIsEditMode)
+    {
         m_keyboard = dik_to_ptr(dik, true);
-        if (!m_keyboard) return true;
+        if (!m_keyboard)
+            return true;
 
         SetValue();
 
@@ -123,16 +128,13 @@ bool CUIEditKeyBind::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return false;
 }
 
-void CUIEditKeyBind::Update()
-{
-    CUIStatic::Update();
-}
-
+void CUIEditKeyBind::Update() { CUIStatic::Update(); }
 void CUIEditKeyBind::SetEditMode(bool b)
 {
     m_bIsEditMode = b;
 
-    if (b) {
+    if (b)
+    {
         SetColorAnimation("ui_map_area_anim", LA_CYCLIC | LA_ONLYALPHA | LA_TEXTCOLOR);
         TextureOn();
     }
@@ -188,18 +190,15 @@ void CUIEditKeyBind::UndoOptValue()
     CUIOptionsItem::UndoOptValue();
 }
 
-bool CUIEditKeyBind::IsChangedOptValue() const
-{
-    return m_keyboard != m_opt_backup_value;
-}
-
+bool CUIEditKeyBind::IsChangedOptValue() const { return m_keyboard != m_opt_backup_value; }
 void CUIEditKeyBind::BindAction2Key()
 {
     xr_string comm_unbind = (m_bPrimary) ? "unbind " : "unbind_sec ";
     comm_unbind += m_action->action_name;
     Console->Execute(comm_unbind.c_str());
 
-    if (m_keyboard) {
+    if (m_keyboard)
+    {
         xr_string comm_bind = (m_bPrimary) ? "bind " : "bind_sec ";
         comm_bind += m_action->action_name;
         comm_bind += " ";
@@ -213,18 +212,22 @@ void CUIEditKeyBind::OnMessage(LPCSTR message)
     // message = "command=key"
     int eq = (int)strcspn(message, "=");
 
-    if (!m_keyboard) return;
+    if (!m_keyboard)
+        return;
 
-    if (0 != xr_strcmp(m_keyboard->key_name, message + eq + 1)) return;
+    if (0 != xr_strcmp(m_keyboard->key_name, message + eq + 1))
+        return;
 
     string64 command;
     xr_strcpy(command, message);
     command[eq] = 0;
 
-    if (0 == xr_strcmp(m_action->action_name, command)) return;  // fuck
+    if (0 == xr_strcmp(m_action->action_name, command))
+        return; // fuck
 
     _action* other_action = action_name_to_ptr(command);
-    if (is_group_not_conflicted(m_action->key_group, other_action->key_group)) return;
+    if (is_group_not_conflicted(m_action->key_group, other_action->key_group))
+        return;
 
     SetText("---");
     m_keyboard = NULL;

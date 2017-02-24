@@ -33,8 +33,8 @@ SCRIPT_EXPORT(CScriptWatchAction, (), {
                          .def(constructor<const Fvector&, float, float>())
                          .def(constructor<CScriptGameObject*, float, float>())
 
-                         .def("object", &CScriptWatchAction::SetWatchObject)     // time
-                         .def("direct", &CScriptWatchAction::SetWatchDirection)  // time
+                         .def("object", &CScriptWatchAction::SetWatchObject) // time
+                         .def("direct", &CScriptWatchAction::SetWatchDirection) // time
                          .def("type", &CScriptWatchAction::SetWatchType)
                          .def("bone", &CScriptWatchAction::SetWatchBone)
                          .def("completed", (bool (CScriptWatchAction::*)())(&CScriptWatchAction::completed))];

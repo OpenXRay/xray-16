@@ -37,19 +37,16 @@ CThreadManager::ReportStatusFunc ProxyStatus = cdecl_cast([](const char* format,
 
 CThreadManager::ReportProgressFunc ProxyProgress = cdecl_cast([](float progress) { Logger.Progress(progress); });
 
-static const char* h_str = "The following keys are supported / required:\n"
-                           "-? or -h   == this help\n"
-                           "-o         == modify build options\n"
-                           "-nosun     == disable sun-lighting\n"
-                           "-f<NAME>   == compile level in GameData\\Levels\\<NAME>\\\n"
-                           "\n"
-                           "NOTE: The last key is required for any functionality\n";
+static const char* h_str =
+    "The following keys are supported / required:\n"
+    "-? or -h   == this help\n"
+    "-o         == modify build options\n"
+    "-nosun     == disable sun-lighting\n"
+    "-f<NAME>   == compile level in GameData\\Levels\\<NAME>\\\n"
+    "\n"
+    "NOTE: The last key is required for any functionality\n";
 
-void Help()
-{
-    MessageBox(0, h_str, "Command line options", MB_OK | MB_ICONINFORMATION);
-}
-
+void Help() { MessageBox(0, h_str, "Command line options", MB_OK | MB_ICONINFORMATION); }
 typedef int __cdecl xrOptions(b_params* params, u32 version, bool bRunBuild);
 
 void Startup(LPSTR lpCmdLine)
@@ -60,18 +57,24 @@ void Startup(LPSTR lpCmdLine)
 
     xr_strcpy(cmd, lpCmdLine);
     strlwr(cmd);
-    if (strstr(cmd, "-?") || strstr(cmd, "-h")) {
+    if (strstr(cmd, "-?") || strstr(cmd, "-h"))
+    {
         Help();
         return;
     }
-    if (strstr(cmd, "-f") == 0) {
+    if (strstr(cmd, "-f") == 0)
+    {
         Help();
         return;
     }
-    if (strstr(cmd, "-o")) bModifyOptions = TRUE;
-    if (strstr(cmd, "-gi")) g_build_options.b_radiosity = TRUE;
-    if (strstr(cmd, "-noise")) g_build_options.b_noise = TRUE;
-    if (strstr(cmd, "-net")) g_build_options.b_net_light = TRUE;
+    if (strstr(cmd, "-o"))
+        bModifyOptions = TRUE;
+    if (strstr(cmd, "-gi"))
+        g_build_options.b_radiosity = TRUE;
+    if (strstr(cmd, "-noise"))
+        g_build_options.b_noise = TRUE;
+    if (strstr(cmd, "-net"))
+        g_build_options.b_net_light = TRUE;
     VERIFY(lc_global_data());
     lc_global_data()->b_nosun_set(!!strstr(cmd, "-nosun"));
     // if (strstr(cmd,"-nosun"))                         b_nosun         = TRUE;
@@ -91,7 +94,8 @@ void Startup(LPSTR lpCmdLine)
 
     string256 inf;
     IReader* F = FS.r_open(prjName);
-    if (NULL == F) {
+    if (NULL == F)
+    {
         xr_sprintf(inf, "Build failed!\nCan't find level: '%s'", name);
         Logger.clMsg(inf);
         Logger.Failure(inf);
@@ -109,7 +113,8 @@ void Startup(LPSTR lpCmdLine)
     F->r_chunk(EB_Parameters, &Params);
 
     // Show options if needed
-    if (bModifyOptions) {
+    if (bModifyOptions)
+    {
         Logger.Phase("Project options...");
         HMODULE L = LoadLibrary("xrLC_Options");
         void* P = GetProcAddress(L, "_frmScenePropertiesRun");
@@ -117,7 +122,8 @@ void Startup(LPSTR lpCmdLine)
         xrOptions* O = (xrOptions*)P;
         int R = O(&Params, version, false);
         FreeLibrary(L);
-        if (R == 2) {
+        if (R == 2)
+        {
             ExitProcess(0);
         }
     }
@@ -140,7 +146,8 @@ void Startup(LPSTR lpCmdLine)
     u32 dwEndTime = dwStartupTime.GetElapsed_ms();
     xr_sprintf(inf, "Time elapsed: %s", make_time(dwEndTime / 1000).c_str());
     Logger.clMsg("Build succesful!\n%s", inf);
-    if (!strstr(cmd, "-silent")) Logger.Success(inf);
+    if (!strstr(cmd, "-silent"))
+        Logger.Success(inf);
     Logger.Destroy();
 }
 
@@ -150,7 +157,8 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR lpCmdLine, 
     xrDebug::Initialize(false);
     Core._initialize("xrLC");
 
-    if (strstr(Core.Params, "-nosmg")) g_using_smooth_groups = false;
+    if (strstr(Core.Params, "-nosmg"))
+        g_using_smooth_groups = false;
 
     Startup(lpCmdLine);
     Core._destroy();

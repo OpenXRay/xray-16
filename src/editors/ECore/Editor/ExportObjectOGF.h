@@ -38,12 +38,14 @@ struct SOGFVert
     }
 
     BOOL similar_pos(SOGFVert& V) { return P.similar(V.P, EPS_L); }
-
     BOOL similar(SOGFVert& V)
     {
-        if (!P.similar(V.P, EPS_L)) return FALSE;
-        if (!UV.similar(V.UV, EPS_S)) return FALSE;
-        if (!N.similar(V.N, EPS_L)) return FALSE;
+        if (!P.similar(V.P, EPS_L))
+            return FALSE;
+        if (!UV.similar(V.UV, EPS_S))
+            return FALSE;
+        if (!N.similar(V.N, EPS_L))
+            return FALSE;
         return TRUE;
     }
 };
@@ -58,7 +60,7 @@ DEFINE_VECTOR(SOGFFace, OGFFaceVec, OGFFaceIt);
 
 class CObjectOGFCollectorPacked
 {
-  public:
+public:
     //	Fobb			m_OBB;
     Fbox m_Box;
 
@@ -66,7 +68,7 @@ class CObjectOGFCollectorPacked
     OGFFaceVec m_Faces;
 
     // Progressive
-    ArbitraryList<VIPM_SWR> m_SWR;  // The records of the collapses.
+    ArbitraryList<VIPM_SWR> m_SWR; // The records of the collapses.
 
     Fvector m_VMmin, m_VMscale;
     U32Vec m_VM[clpOGFMX + 1][clpOGFMY + 1][clpOGFMZ + 1];
@@ -76,7 +78,7 @@ class CObjectOGFCollectorPacked
     void ComputeBounding();
     void OptimizeTextureCoordinates();
 
-  public:
+public:
     CObjectOGFCollectorPacked(const Fbox& bb, int apx_vertices, int apx_faces);
     void CalculateTB();
     void MakeProgressive();
@@ -96,20 +98,24 @@ class CObjectOGFCollectorPacked
         bool
         add_face(SOGFVert& v0, SOGFVert& v1, SOGFVert& v2)
     {
-        if (v0.P.similar(v1.P, EPS) || v0.P.similar(v2.P, EPS) || v1.P.similar(v2.P, EPS)) {
+        if (v0.P.similar(v1.P, EPS) || v0.P.similar(v2.P, EPS) || v1.P.similar(v2.P, EPS))
+        {
             ELog.Msg(mtError, "Degenerate face found. Removed.");
             return true;
         }
         SOGFFace F;
         u16 v;
         v = VPack(v0);
-        if (0xffff == v) return false;
+        if (0xffff == v)
+            return false;
         F.v[0] = v;
         v = VPack(v1);
-        if (0xffff == v) return false;
+        if (0xffff == v)
+            return false;
         F.v[1] = v;
         v = VPack(v2);
-        if (0xffff == v) return false;
+        if (0xffff == v)
+            return false;
         F.v[2] = v;
 
         if (check(F))
@@ -123,13 +129,9 @@ class CObjectOGFCollectorPacked
     }
 
     IC OGFVertVec& getV_Verts() { return m_Verts; }
-
     IC OGFFaceVec& getV_Faces() { return m_Faces; }
-
     IC SOGFVert* getVert() { return &m_Verts.front(); }
-
     IC u32 getVS() { return m_Verts.size(); }
-
     IC u32 getTS() { return m_Faces.size(); }
 };
 
@@ -191,7 +193,7 @@ class ECORE_API CExportObjectOGF
     bool PrepareMESH(CEditableMesh* mesh);
     bool Prepare(bool gen_tb, CEditableMesh* mesh);
 
-  public:
+public:
     CExportObjectOGF(CEditableObject* object);
     ~CExportObjectOGF();
     bool Export(IWriter& F, bool gen_tb = true, CEditableMesh* mesh = NULL);

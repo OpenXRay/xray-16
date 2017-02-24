@@ -41,7 +41,7 @@ char* player_values_strtable[] = {
     "move_velocity", "move_angular_velocity", "sprinter_victim_velocity", "marksman_count", "ambassador", "remembrance",
     "avenger", "cherub_ready", "stalker_flair", "black_list", "thunder_count", "killer_victim_angle_cos",
 };
-#endif  //#ifdef DEBUG
+#endif //#ifdef DEBUG
 
 void game_state_accumulator::init_accumulative_values()
 {
@@ -51,4 +51,4 @@ void game_state_accumulator::init_accumulative_values()
     init_acpv_list<ACCUMULATIVE_STATE_LIST>();
 }
 
-}  // namespace award_system
+} // namespace award_system

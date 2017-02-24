@@ -21,8 +21,8 @@ IC void set_vertex(SOGFVert& out_vertex, const SOGFVert& in_old_vertex, const Me
 {
     out_vertex = in_old_vertex;
 
-    cv_vector(out_vertex.P, in_vertex.pos);     //?
-    cv_vector(out_vertex.N, in_vertex.normal);  //?
+    cv_vector(out_vertex.P, in_vertex.pos); //?
+    cv_vector(out_vertex.N, in_vertex.normal); //?
 
     out_vertex.UV.x = in_vertex.s;
     out_vertex.UV.y = in_vertex.t;

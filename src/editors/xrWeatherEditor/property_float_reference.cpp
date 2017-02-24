@@ -15,21 +15,9 @@ property_float_reference::property_float_reference(float& value, float const % i
     VERIFY(m_increment_factor > 0.f);
 }
 
-property_float_reference::~property_float_reference()
-{
-    this->!property_float_reference();
-}
-
-property_float_reference::!property_float_reference()
-{
-    delete (m_value);
-}
-
-System::Object ^ property_float_reference::GetValue()
-{
-    return (m_value->get());
-}
-
+property_float_reference::~property_float_reference() { this->!property_float_reference(); }
+property_float_reference::!property_float_reference() { delete (m_value); }
+System::Object ^ property_float_reference::GetValue() { return (m_value->get()); }
 void property_float_reference::SetValue(System::Object ^ object)
 {
     float value = safe_cast<float>(object);

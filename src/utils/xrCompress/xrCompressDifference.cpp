@@ -35,38 +35,47 @@ struct file_comparer
 
         string_path path;
         m_fs_new->update_path(path, "$target_folder$", m_full_name);
-        if (m_fs_new->exist(path)) m_file_size = m_fs_new->file_length(path);
+        if (m_fs_new->exist(path))
+            m_file_size = m_fs_new->file_length(path);
     }
 
     bool operator()(char* o)
     {
         // compare file names
         int eq = xr_strcmp(m_full_name, o);
-        if (0 != eq) return false;
+        if (0 != eq)
+            return false;
 
-        if (!m_flags.test(eDontCheckFileSize)) {
+        if (!m_flags.test(eDontCheckFileSize))
+        {
             // compare file size
             string_path path;
             m_fs_old->update_path(path, "$target_folder$", o);
-            if (!m_fs_old->exist(path)) return false;
+            if (!m_fs_old->exist(path))
+                return false;
             auto fileDesc = m_fs_old->GetFileDesc(path);
-            if (fileDesc->vfs == 0xffffffff && fileDesc->size_real != m_file_size) return false;
+            if (fileDesc->vfs == 0xffffffff && fileDesc->size_real != m_file_size)
+                return false;
         };
         // compare file crc
-        if (!m_crc32 && !m_flags.test(eDontCheckCRC)) {
+        if (!m_crc32 && !m_flags.test(eDontCheckCRC))
+        {
             IReader* r = m_fs_new->r_open("$target_folder$", m_full_name);
             m_crc32 = crc32(r->pointer(), r->length());
             m_fs_new->r_close(r);
         };
 
-        if (!m_flags.test(eDontCheckCRC)) {
+        if (!m_flags.test(eDontCheckCRC))
+        {
             IReader* r_ = m_fs_old->r_open("$target_folder$", o);
             u32 crc32_ = crc32(r_->pointer(), r_->length());
             m_fs_old->r_close(r_);
-            if (m_crc32 != crc32_) return false;
+            if (m_crc32 != crc32_)
+                return false;
         }
 
-        if (!m_flags.test(eDontCheckBinary)) {
+        if (!m_flags.test(eDontCheckBinary))
+        {
             // compare files binary content
             IReader* f1 = m_fs_new->r_open("$target_folder$", m_full_name);
             IReader* f2 = m_fs_old->r_open("$target_folder$", o);
@@ -75,7 +84,8 @@ struct file_comparer
             m_fs_new->r_close(f1);
             m_fs_old->r_close(f2);
 
-            if (0 != res) return false;
+            if (0 != res)
+                return false;
         }
         return true;
     }
@@ -86,7 +96,8 @@ int ProcessDifference()
     LPCSTR params = GetCommandLine();
     Flags32 _flags;
     _flags.zero();
-    if (strstr(params, "-diff /?")) {
+    if (strstr(params, "-diff /?"))
+    {
         printf("HELP:\n");
         printf("xrCompress.exe -diff <new_data> <old_data> -out <diff_resulf> [options]\n");
         printf("<new_data>, <old_data> and <diff_resulf> values must be a folder name\n");
@@ -111,16 +122,20 @@ int ProcessDifference()
     sscanf(strstr(params, "-diff ") + 6 + xr_strlen(new_folder) + 1, "%[^ ] ", old_folder);
     sscanf(strstr(params, "-out ") + 5, "%[^ ] ", target_folder);
 
-    if (strstr(params, "-nofileage")) {
+    if (strstr(params, "-nofileage"))
+    {
         _flags.set(file_comparer::eDontCheckFileAge, TRUE);
     };
-    if (strstr(params, "-nocrc")) {
+    if (strstr(params, "-nocrc"))
+    {
         _flags.set(file_comparer::eDontCheckCRC, TRUE);
     };
-    if (strstr(params, "-nobinary")) {
+    if (strstr(params, "-nobinary"))
+    {
         _flags.set(file_comparer::eDontCheckBinary, TRUE);
     };
-    if (strstr(params, "-nosize")) {
+    if (strstr(params, "-nosize"))
+    {
         _flags.set(file_comparer::eDontCheckFileSize, TRUE);
     };
 
@@ -141,7 +156,8 @@ int ProcessDifference()
     {
         file_comparer fc(file_list_new->at(i), FS_new, FS_old, _flags);
         xr_vector<char*>::iterator it = std::find_if(file_list_old->begin(), file_list_old->end(), fc);
-        if (it != file_list_old->end()) {
+        if (it != file_list_old->end())
+        {
             printf("skip file %s\n", file_list_new->at(i));
         }
         else

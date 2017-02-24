@@ -17,10 +17,7 @@ CMercuryBall::CMercuryBall(void)
     m_fImpulseMax = 90.f;
 }
 
-CMercuryBall::~CMercuryBall(void)
-{
-}
-
+CMercuryBall::~CMercuryBall(void) {}
 void CMercuryBall::Load(LPCSTR section)
 {
     inherited::Load(section);
@@ -32,11 +29,14 @@ void CMercuryBall::Load(LPCSTR section)
 
 void CMercuryBall::UpdateCLChild()
 {
-    if (getVisible() && m_pPhysicsShell) {
-        if (Device.TimerAsync() - m_timeLastUpdate > m_timeToUpdate) {
+    if (getVisible() && m_pPhysicsShell)
+    {
+        if (Device.TimerAsync() - m_timeLastUpdate > m_timeToUpdate)
+        {
             m_timeLastUpdate = Device.TimerAsync();
 
-            if (::Random.randF(0.f, 1.0f) > 0.6f) {
+            if (::Random.randF(0.f, 1.0f) > 0.6f)
+            {
                 Fvector dir;
                 dir.set(::Random.randF(-0.5f, 0.5f), 0.0f, ::Random.randF(-0.5f, 0.5f));
                 m_pPhysicsShell->applyImpulse(

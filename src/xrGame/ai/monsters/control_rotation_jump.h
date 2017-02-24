@@ -10,8 +10,8 @@ struct SControlRotationJumpData : public ControlCom::IComData
 
     enum EFlags
     {
-        eStopAtOnce = u32(1) << 0,  // stop at once
-        eRotateOnce = u32(1) << 1,  // use only the first stage
+        eStopAtOnce = u32(1) << 0, // stop at once
+        eRotateOnce = u32(1) << 1, // use only the first stage
     };
 
     flags32 flags;

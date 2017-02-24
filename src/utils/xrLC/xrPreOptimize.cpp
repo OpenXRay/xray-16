@@ -13,12 +13,18 @@ const int HDIM_Z = 56;
 IC bool FaceEqual(Face& F1, Face& F2)
 {
     // Test for 6 variations
-    if ((F1.v[0] == F2.v[0]) && (F1.v[1] == F2.v[1]) && (F1.v[2] == F2.v[2])) return true;
-    if ((F1.v[0] == F2.v[0]) && (F1.v[2] == F2.v[1]) && (F1.v[1] == F2.v[2])) return true;
-    if ((F1.v[2] == F2.v[0]) && (F1.v[0] == F2.v[1]) && (F1.v[1] == F2.v[2])) return true;
-    if ((F1.v[2] == F2.v[0]) && (F1.v[1] == F2.v[1]) && (F1.v[0] == F2.v[2])) return true;
-    if ((F1.v[1] == F2.v[0]) && (F1.v[0] == F2.v[1]) && (F1.v[2] == F2.v[2])) return true;
-    if ((F1.v[1] == F2.v[0]) && (F1.v[2] == F2.v[1]) && (F1.v[0] == F2.v[2])) return true;
+    if ((F1.v[0] == F2.v[0]) && (F1.v[1] == F2.v[1]) && (F1.v[2] == F2.v[2]))
+        return true;
+    if ((F1.v[0] == F2.v[0]) && (F1.v[2] == F2.v[1]) && (F1.v[1] == F2.v[2]))
+        return true;
+    if ((F1.v[2] == F2.v[0]) && (F1.v[0] == F2.v[1]) && (F1.v[1] == F2.v[2]))
+        return true;
+    if ((F1.v[2] == F2.v[0]) && (F1.v[1] == F2.v[1]) && (F1.v[0] == F2.v[2]))
+        return true;
+    if ((F1.v[1] == F2.v[0]) && (F1.v[0] == F2.v[1]) && (F1.v[2] == F2.v[2]))
+        return true;
+    if ((F1.v[1] == F2.v[0]) && (F1.v[2] == F2.v[1]) && (F1.v[0] == F2.v[2]))
+        return true;
     return false;
 }
 
@@ -45,7 +51,8 @@ void CBuild::PreOptimize()
     // Pre-alloc memory
     int _size = (HDIM_X + 1) * (HDIM_Y + 1) * (HDIM_Z + 1);
     int _average = (Vcount / _size) / 2;
-    if (_average < 2) _average = 2;
+    if (_average < 2)
+        _average = 2;
     {
         for (int ix = 0; ix < HDIM_X + 1; ix++)
             for (int iy = 0; iy < HDIM_Y + 1; iy++)
@@ -61,12 +68,14 @@ void CBuild::PreOptimize()
     g_bUnregister = false;
     for (int it = 0; it < (int)lc_global_data()->g_vertices().size(); it++)
     {
-        if (0 == (it % 100000)) {
+        if (0 == (it % 100000))
+        {
             Logger.Progress(_sqrt(float(it) / float(lc_global_data()->g_vertices().size())));
             Logger.Status("Processing... (%d verts removed)", Vremoved);
         }
 
-        if (it >= (int)lc_global_data()->g_vertices().size()) break;
+        if (it >= (int)lc_global_data()->g_vertices().size())
+            break;
 
         Vertex* pTest = lc_global_data()->g_vertices()[it];
         Fvector& V = pTest->P;
@@ -83,7 +92,8 @@ void CBuild::PreOptimize()
         for (vecVertexIt T = H.begin(); T != H.end(); T++)
         {
             Vertex* pBase = *T;
-            if (pBase->similar(*pTest, g_params().m_weld_distance)) {
+            if (pBase->similar(*pTest, g_params().m_weld_distance))
+            {
                 while (pTest->m_adjacents.size())
                     pTest->m_adjacents.front()->VReplace(pTest, pBase);
 
@@ -95,7 +105,8 @@ void CBuild::PreOptimize()
         }
 
         // If we get here - there is no similar vertices - register in hash tables
-        if (pTest) {
+        if (pTest)
+        {
             H.push_back(pTest);
 
             u32 ixE, iyE, izE;
@@ -104,13 +115,20 @@ void CBuild::PreOptimize()
             izE = iFloor((V.z + VMeps.z - VMmin.z) * scale.z);
             R_ASSERT(ixE <= HDIM_X && iyE <= HDIM_Y && izE <= HDIM_Z);
 
-            if (ixE != ix) HASH[ixE][iy][iz]->push_back(pTest);
-            if (iyE != iy) HASH[ix][iyE][iz]->push_back(pTest);
-            if (izE != iz) HASH[ix][iy][izE]->push_back(pTest);
-            if ((ixE != ix) && (iyE != iy)) HASH[ixE][iyE][iz]->push_back(pTest);
-            if ((ixE != ix) && (izE != iz)) HASH[ixE][iy][izE]->push_back(pTest);
-            if ((iyE != iy) && (izE != iz)) HASH[ix][iyE][izE]->push_back(pTest);
-            if ((ixE != ix) && (iyE != iy) && (izE != iz)) HASH[ixE][iyE][izE]->push_back(pTest);
+            if (ixE != ix)
+                HASH[ixE][iy][iz]->push_back(pTest);
+            if (iyE != iy)
+                HASH[ix][iyE][iz]->push_back(pTest);
+            if (izE != iz)
+                HASH[ix][iy][izE]->push_back(pTest);
+            if ((ixE != ix) && (iyE != iy))
+                HASH[ixE][iyE][iz]->push_back(pTest);
+            if ((ixE != ix) && (izE != iz))
+                HASH[ixE][iy][izE]->push_back(pTest);
+            if ((iyE != iy) && (izE != iz))
+                HASH[ix][iyE][izE]->push_back(pTest);
+            if ((ixE != ix) && (iyE != iy) && (izE != iz))
+                HASH[ixE][iyE][izE]->push_back(pTest);
         }
     }
 
@@ -120,7 +138,8 @@ void CBuild::PreOptimize()
     {
         R_ASSERT(it >= 0 && it < (int)lc_global_data()->g_faces().size());
         Face* F = lc_global_data()->g_faces()[it];
-        if (F->isDegenerated()) {
+        if (F->isDegenerated())
+        {
             lc_global_data()->destroy_face(lc_global_data()->g_faces()[it]);
             Fremoved++;
         }
@@ -131,7 +150,8 @@ void CBuild::PreOptimize()
         }
         Logger.Progress(float(it) / float(lc_global_data()->g_faces().size()));
     }
-    if (InvalideFaces()) {
+    if (InvalideFaces())
+    {
         err_save();
         xrDebug::Fatal(DEBUG_INFO, "* FATAL: %d invalid faces. Compilation aborted", InvalideFaces());
     }
@@ -141,7 +161,8 @@ void CBuild::PreOptimize()
 
     for (u32 it = 0; it < lc_global_data()->g_vertices().size(); ++it)
     {
-        if (lc_global_data()->g_vertices()[it] && (lc_global_data()->g_vertices()[it]->m_adjacents.empty())) {
+        if (lc_global_data()->g_vertices()[it] && (lc_global_data()->g_vertices()[it]->m_adjacents.empty()))
+        {
             lc_global_data()->destroy_vertex(lc_global_data()->g_vertices()[it]);
             ++Vremoved;
         }
@@ -187,7 +208,4 @@ void CBuild::PreOptimize()
     // -------------------------------------------------------------
 }
 
-void CBuild::IsolateVertices(BOOL bProgress)
-{
-    isolate_vertices<Vertex>(bProgress, lc_global_data()->g_vertices());
-}
+void CBuild::IsolateVertices(BOOL bProgress) { isolate_vertices<Vertex>(bProgress, lc_global_data()->g_vertices()); }

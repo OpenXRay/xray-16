@@ -30,14 +30,14 @@ class CRender : public D3DXRenderBase
 public:
     enum
     {
-        PHASE_NORMAL = 0,  // E[0]
-        PHASE_SMAP = 1,    // E[1]
+        PHASE_NORMAL = 0, // E[0]
+        PHASE_SMAP = 1, // E[1]
     };
 
     enum
     {
-        MSAA_ATEST_NONE = 0x0,         //	Hi bit - DX10.1 mode
-        MSAA_ATEST_DX10_0_ATOC = 0x1,  //	Lo bit - ATOC mode
+        MSAA_ATEST_NONE = 0x0, //	Hi bit - DX10.1 mode
+        MSAA_ATEST_DX10_0_ATOC = 0x1, //	Lo bit - ATOC mode
         MSAA_ATEST_DX10_1_NATIVE = 0x2,
         MSAA_ATEST_DX10_1_ATOC = 0x3,
     };
@@ -69,7 +69,7 @@ public:
         u32 mrtmixdepth : 1;
         u32 fp16_filter : 1;
         u32 fp16_blend : 1;
-        u32 albedo_wo : 1;  // work-around albedo on less capable HW
+        u32 albedo_wo : 1; // work-around albedo on less capable HW
         u32 HW_smap : 1;
         u32 HW_smap_PCF : 1;
         u32 HW_smap_FETCH4 : 1;
@@ -89,17 +89,17 @@ public:
         u32 sunstatic : 1;
         u32 sjitter : 1;
         u32 noshadows : 1;
-        u32 Tshadows : 1;  // transluent shadows
+        u32 Tshadows : 1; // transluent shadows
         u32 disasm : 1;
-        u32 advancedpp : 1;  //	advanced post process (DOF, SSAO, volumetrics, etc.)
+        u32 advancedpp : 1; //	advanced post process (DOF, SSAO, volumetrics, etc.)
         u32 volumetricfog : 1;
 
-        u32 dx10_msaa : 1;            //	DX10.0 path
-        u32 dx10_msaa_hybrid : 1;     //	DX10.0 main path with DX10.1 A-test msaa allowed
-        u32 dx10_msaa_opt : 1;        //	DX10.1 path
-        u32 dx10_gbuffer_opt : 1;     //
-        u32 dx10_sm4_1 : 1;           //	DX10.1 path
-        u32 dx10_msaa_alphatest : 2;  //	A-test mode
+        u32 dx10_msaa : 1; //	DX10.0 path
+        u32 dx10_msaa_hybrid : 1; //	DX10.0 main path with DX10.1 A-test msaa allowed
+        u32 dx10_msaa_opt : 1; //	DX10.1 path
+        u32 dx10_gbuffer_opt : 1; //
+        u32 dx10_sm4_1 : 1; //	DX10.1 path
+        u32 dx10_msaa_alphatest : 2; //	A-test mode
         u32 dx10_msaa_samples : 4;
 
         u32 dx10_minmax_sm : 2;
@@ -124,7 +124,6 @@ public:
         u32 ic_culled;
 
         RenderR4Statistics() { FrameStart(); }
-
         void FrameStart()
         {
             l_total = 0;
@@ -159,8 +158,8 @@ public:
     xr_vector<ref_shader> Shaders;
     typedef svector<D3DVERTEXELEMENT9, MAXD3DDECLLENGTH + 1> VertexDeclarator;
     xr_vector<VertexDeclarator> nDC, xDC;
-    xr_vector<ID3DVertexBuffer*> nVB, xVB;
-    xr_vector<ID3DIndexBuffer*> nIB, xIB;
+    xr_vector<ID3DVertexBuffer *> nVB, xVB;
+    xr_vector<ID3DIndexBuffer *> nIB, xIB;
     xr_vector<dxRender_Visual*> Visuals;
     CPSLibrary PSLibrary;
 
@@ -168,7 +167,7 @@ public:
     CModelPool* Models;
     CWallmarksEngine* Wallmarks;
 
-    CRenderTarget* Target;  // Render-target
+    CRenderTarget* Target; // Render-target
 
     CLight_DB Lights;
     CLight_Compute_XFORM_and_VIS LR;
@@ -188,7 +187,7 @@ public:
     u32 q_sync_count;
 
     bool m_bMakeAsyncSS;
-    bool m_bFirstFrameAfterReset;  // Determines weather the frame is the first after resetting device.
+    bool m_bFirstFrameAfterReset; // Determines weather the frame is the first after resetting device.
     xr_vector<sun::cascade> m_sun_cascades;
 
 private:
@@ -201,10 +200,10 @@ private:
     void LoadSWIs(CStreamReader* fs);
     void Load3DFluid();
 
-    BOOL add_Dynamic(dxRender_Visual* pVisual, u32 planes);  // normal processing
+    BOOL add_Dynamic(dxRender_Visual* pVisual, u32 planes); // normal processing
     void add_Static(dxRender_Visual* pVisual, u32 planes);
-    void add_leafs_Dynamic(dxRender_Visual* pVisual);  // if detected node's full visibility
-    void add_leafs_Static(dxRender_Visual* pVisual);   // if detected node's full visibility
+    void add_leafs_Dynamic(dxRender_Visual* pVisual); // if detected node's full visibility
+    void add_leafs_Static(dxRender_Visual* pVisual); // if detected node's full visibility
 
 public:
     IRender_Sector* rimp_detectSector(Fvector& P, Fvector& D);
@@ -240,11 +239,12 @@ public:
     IC u32 occq_begin(u32& ID) { return HWOCC.occq_begin(ID); }
     IC void occq_end(u32& ID) { HWOCC.occq_end(ID); }
     IC R_occlusion::occq_result occq_get(u32& ID) { return HWOCC.occq_get(ID); }
-
     ICF void apply_object(IRenderable* O)
     {
-        if (0 == O) return;
-        if (0 == O->renderable_ROS()) return;
+        if (0 == O)
+            return;
+        if (0 == O->renderable_ROS())
+            return;
         CROS_impl& LT = *((CROS_impl*)O->renderable_ROS());
         LT.update_smooth(O);
         o_hemi = 0.75f * LT.get_hemi();
@@ -254,15 +254,17 @@ public:
     }
     IC void apply_lmaterial()
     {
-        R_constant* C = &*RCache.get_c(c_sbase);  // get sampler
-        if (0 == C) return;
+        R_constant* C = &*RCache.get_c(c_sbase); // get sampler
+        if (0 == C)
+            return;
         VERIFY(RC_dest_sampler == C->destination);
         VERIFY(RC_dx10texture == C->type);
         CTexture* T = RCache.get_ActiveTexture(u32(C->samp.index));
         VERIFY(T);
         float mtl = T->m_material;
 #ifdef DEBUG
-        if (ps_r2_ls_flags.test(R2FLAG_GLOBALMATERIAL)) mtl = ps_r2_gmaterial;
+        if (ps_r2_ls_flags.test(R2FLAG_GLOBALMATERIAL))
+            mtl = ps_r2_gmaterial;
 #endif
         RCache.hemi.set_material(o_hemi, o_sun, 0, (mtl + .5f) / 4.f);
         RCache.hemi.set_pos_faces(o_hemi_cube[CROS_impl::CUBE_FACE_POS_X], o_hemi_cube[CROS_impl::CUBE_FACE_POS_Y],
@@ -274,10 +276,8 @@ public:
 public:
     // feature level
     virtual GenerationLevel get_generation() { return IRender::GENERATION_R2; }
-
     virtual bool is_sun_static() { return o.sunstatic; }
     virtual DWORD get_dx_level() { return HW.FeatureLevel >= D3D_FEATURE_LEVEL_10_1 ? 0x000A0001 : 0x000A0000; }
-
     // Loading / Unloading
     virtual void create();
     virtual void destroy();
@@ -303,9 +303,9 @@ public:
     // Main
     virtual void flush();
     virtual void set_Object(IRenderable* O);
-    virtual void add_Occluder(Fbox2& bb_screenspace);  // mask screen region as oclluded
-    virtual void add_Visual(IRenderVisual* V);         // add visual leaf	(no culling performed at all)
-    virtual void add_Geometry(IRenderVisual* V);       // add visual(s)	(all culling performed)
+    virtual void add_Occluder(Fbox2& bb_screenspace); // mask screen region as oclluded
+    virtual void add_Visual(IRenderVisual* V); // add visual leaf	(no culling performed at all)
+    virtual void add_Geometry(IRenderVisual* V); // add visual(s)	(all culling performed)
 
     // wallmarks
     virtual void add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V);
@@ -367,7 +367,6 @@ public:
 
     void addShaderOption(const char* name, const char* value);
     void clearAllShaderOptions() { m_ShaderOptions.clear(); }
-
 private:
     xr_vector<D3D_SHADER_MACRO> m_ShaderOptions;
 

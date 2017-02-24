@@ -67,7 +67,8 @@ void CControllerAnimation::on_event(ControlCom::EEventType type, ControlCom::IEv
     case ControlCom::eventAnimationSignal:
     {
         SAnimationSignalEventData* event_data = (SAnimationSignalEventData*)data;
-        if (event_data->event_id == CControlAnimation::eAnimationHit) {
+        if (event_data->event_id == CControlAnimation::eAnimationHit)
+        {
             if (event_data->motion == m_torso[eTorsoPsyAttack])
                 m_controller->psy_fire();
             else
@@ -155,7 +156,8 @@ void CControllerAnimation::add_path_rotation(ELegsActionType action, float angle
     rot.legs_motion = type;
 
     PATH_ROTATIONS_MAP_IT map_it = m_path_rotations.find(action);
-    if (map_it == m_path_rotations.end()) {
+    if (map_it == m_path_rotations.end())
+    {
         PATH_ROTATIONS_VEC vec;
         vec.push_back(rot);
         m_path_rotations.insert(mk_pair(action, vec));
@@ -168,7 +170,8 @@ void CControllerAnimation::add_path_rotation(ELegsActionType action, float angle
 
 void CControllerAnimation::select_velocity()
 {
-    if (m_current_legs_action == eLegsTypeRun) {
+    if (m_current_legs_action == eLegsTypeRun)
+    {
         // if we are moving, get yaw from path
         float cur_yaw, target_yaw;
         m_man->direction().get_heading(cur_yaw, target_yaw);
@@ -207,15 +210,18 @@ void CControllerAnimation::set_path_direction()
 
 void CControllerAnimation::select_torso_animation()
 {
-    if (m_wait_torso_anim_end) return;
+    if (m_wait_torso_anim_end)
+        return;
 
     SControlAnimationData* ctrl_data = (SControlAnimationData*)m_man->data(this, ControlCom::eControlAnimation);
-    if (!ctrl_data) return;
+    if (!ctrl_data)
+        return;
 
     MotionID target_motion;
 
     // check fire animation
-    if (m_controller->can_psy_fire()) {
+    if (m_controller->can_psy_fire())
+    {
         target_motion = m_torso[eTorsoPsyAttack];
         m_wait_torso_anim_end = true;
     }
@@ -224,7 +230,8 @@ void CControllerAnimation::select_torso_animation()
         target_motion = m_torso[m_current_torso_action];
     }
 
-    if ((ctrl_data->torso.get_motion() != target_motion) || m_wait_torso_anim_end) {
+    if ((ctrl_data->torso.get_motion() != target_motion) || m_wait_torso_anim_end)
+    {
         ctrl_data->torso.set_motion(target_motion);
         ctrl_data->torso.actual = false;
     }
@@ -235,7 +242,8 @@ void CControllerAnimation::select_legs_animation()
     // select from action
     ELegsActionType legs_action = eLegsUndefined;
 
-    if (is_moving()) {
+    if (is_moving())
+    {
         // if we are moving, get yaw from path
         float cur_yaw, target_yaw;
         m_man->direction().get_heading(cur_yaw, target_yaw);
@@ -248,7 +256,8 @@ void CControllerAnimation::select_legs_animation()
         // else select standing animation
         for (LEGS_MOTION_MAP_IT it = m_legs.begin(); it != m_legs.end(); it++)
         {
-            if ((it->first & m_current_legs_action) == m_current_legs_action) {
+            if ((it->first & m_current_legs_action) == m_current_legs_action)
+            {
                 legs_action = it->first;
                 break;
             }
@@ -258,9 +267,11 @@ void CControllerAnimation::select_legs_animation()
 
     // start new animation
     SControlAnimationData* ctrl_data = (SControlAnimationData*)m_man->data(this, ControlCom::eControlAnimation);
-    if (!ctrl_data) return;
+    if (!ctrl_data)
+        return;
 
-    if (ctrl_data->legs.get_motion() != m_legs[legs_action]) ctrl_data->legs.actual = false;
+    if (ctrl_data->legs.get_motion() != m_legs[legs_action])
+        ctrl_data->legs.actual = false;
 
     ctrl_data->legs.set_motion(m_legs[legs_action]);
 }
@@ -271,7 +282,8 @@ CControllerAnimation::SPathRotations CControllerAnimation::get_path_rotation(flo
     target_yaw = angle_normalize(-target_yaw);
 
     float diff = angle_difference(cur_yaw, target_yaw);
-    if (from_right(target_yaw, cur_yaw)) diff = -diff;
+    if (from_right(target_yaw, cur_yaw))
+        diff = -diff;
 
     diff = angle_normalize(diff);
 
@@ -283,7 +295,8 @@ CControllerAnimation::SPathRotations CControllerAnimation::get_path_rotation(flo
         float angle_diff = angle_normalize(it->angle);
 
         float cur_diff = angle_difference(angle_diff, diff);
-        if (cur_diff < best_diff) {
+        if (cur_diff < best_diff)
+        {
             best_diff = cur_diff;
             it_best = it;
         }
@@ -302,7 +315,8 @@ void CControllerAnimation::set_body_state(ETorsoActionType torso, ELegsActionTyp
 
 bool CControllerAnimation::is_moving()
 {
-    if (!m_man->path_builder().is_moving_on_path()) return false;
+    if (!m_man->path_builder().is_moving_on_path())
+        return false;
 
     if (((m_current_legs_action & eLegsTypeStealMotion) != eLegsTypeStealMotion) &&
         ((m_current_legs_action & eLegsTypeWalk) != eLegsTypeWalk) &&
@@ -317,10 +331,11 @@ bool CControllerAnimation::is_moving()
 void CControllerAnimation::set_path_params()
 {
     bool moving_action = ((m_current_legs_action & eLegsTypeStealMotion) == eLegsTypeStealMotion) ||
-                         ((m_current_legs_action & eLegsTypeWalk) == eLegsTypeWalk) ||
-                         ((m_current_legs_action & eLegsTypeRun) == eLegsTypeRun);
+        ((m_current_legs_action & eLegsTypeWalk) == eLegsTypeWalk) ||
+        ((m_current_legs_action & eLegsTypeRun) == eLegsTypeRun);
 
-    if (moving_action) {
+    if (moving_action)
+    {
         u32 vel_mask = 0;
         u32 des_mask = 0;
 
@@ -328,15 +343,18 @@ void CControllerAnimation::set_path_params()
 
         Fvector target_pos = m_object->path().get_target_set();
         Fvector dir = Fvector().sub(target_pos, m_object->Position());
-        if (!fis_zero(dir.square_magnitude())) {
+        if (!fis_zero(dir.square_magnitude()))
+        {
             float target_yaw = dir.getH();
             target_yaw = angle_normalize(-target_yaw);
             float cur_yaw = m_man->direction().get_heading_current();
 
-            if (angle_difference(target_yaw, cur_yaw) > PI_DIV_2) looking_fwd = false;
+            if (angle_difference(target_yaw, cur_yaw) > PI_DIV_2)
+                looking_fwd = false;
         }
 
-        if (looking_fwd) {
+        if (looking_fwd)
+        {
             vel_mask = MonsterMovement::eControllerVelocityParamsMoveFwd;
             des_mask = MonsterMovement::eControllerVelocityParameterMoveFwd;
         }
@@ -359,7 +377,8 @@ void CControllerAnimation::set_path_params()
 
 void CControllerAnimation::on_switch_controller()
 {
-    if (m_controller->m_mental_state == CController::eStateDanger) {
+    if (m_controller->m_mental_state == CController::eStateDanger)
+    {
         m_wait_torso_anim_end = false;
         set_body_state(eTorsoIdle, eLegsTypeStand);
 

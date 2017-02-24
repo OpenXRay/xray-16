@@ -17,7 +17,7 @@
 
 #ifndef MASTER_GOLD
 #include "ai_debug.h"
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
@@ -30,33 +30,41 @@ struct priority
 {
     IC static bool standing(const moving_object* object)
     {
-        if (object->action() == moving_object::action_wait) return (false);
+        if (object->action() == moving_object::action_wait)
+            return (false);
 
         return (!!fis_zero(object->position().distance_to_sqr(object->predict_position(1.f))));
     }
 
     IC static bool predicate(const moving_object* _0, const moving_object* _1)
     {
-        if (standing(_0)) {
-            if (standing(_1)) return (_0 < _1);
+        if (standing(_0))
+        {
+            if (standing(_1))
+                return (_0 < _1);
 
             return (false);
         }
 
-        if (standing(_1)) return (true);
+        if (standing(_1))
+            return (true);
 
         return (_0 < _1);
     }
 
     IC static bool predicate2(const moving_objects::COLLISION_TIME& _0, const moving_objects::COLLISION_TIME& _1)
     {
-        if (_0.first < _1.first) return (true);
+        if (_0.first < _1.first)
+            return (true);
 
-        if (_1.first < _0.first) return (false);
+        if (_1.first < _0.first)
+            return (false);
 
-        if (predicate(_0.second.second.first, _1.second.second.first)) return (true);
+        if (predicate(_0.second.second.first, _1.second.second.first))
+            return (true);
 
-        if (predicate(_1.second.second.first, _0.second.second.first)) return (false);
+        if (predicate(_1.second.second.first, _0.second.second.first))
+            return (false);
 
         return (predicate(_0.second.second.second, _1.second.second.second));
     }
@@ -67,12 +75,13 @@ struct collision
     const moving_object* m_object;
 
     IC collision(const moving_object* object) : m_object(object) {}
-
     IC bool operator()(const moving_objects::COLLISION_TIME& object) const
     {
-        if (object.second.second.first == m_object) return (true);
+        if (object.second.second.first == m_object)
+            return (true);
 
-        if (object.second.second.second == m_object) return (true);
+        if (object.second.second.second == m_object)
+            return (true);
 
         return (false);
     }
@@ -83,21 +92,25 @@ struct already_wait_predicate
     const moving_objects::COLLISIONS* m_collisions;
 
     IC already_wait_predicate(const moving_objects::COLLISIONS& collisions) : m_collisions(&collisions) {}
-
     IC bool operator()(moving_object* object) const
     {
         moving_objects::COLLISIONS::const_iterator I =
             std::find_if(m_collisions->begin(), m_collisions->end(), collision(object));
-        if (I == m_collisions->end()) return (false);
+        if (I == m_collisions->end())
+            return (false);
 
-        if ((*I).second.second.first == object) {
-            if ((*I).second.first == moving_objects::possible_action_1_can_wait_2) return (true);
+        if ((*I).second.second.first == object)
+        {
+            if ((*I).second.first == moving_objects::possible_action_1_can_wait_2)
+                return (true);
 
             return (false);
         }
 
-        if ((*I).second.second.second == object) {
-            if ((*I).second.first == moving_objects::possible_action_2_can_wait_1) return (true);
+        if ((*I).second.second.second == object)
+        {
+            if ((*I).second.first == moving_objects::possible_action_2_can_wait_1)
+                return (true);
 
             return (false);
         }
@@ -121,9 +134,10 @@ void moving_objects::fill_nearest_moving(moving_object* object)
 			Msg					("    %s",(*I)->object().cName().c_str());
 		}
 	}
-#endif  // 0
+#endif // 0
 
-    if (m_nearest_moving.empty()) return;
+    if (m_nearest_moving.empty())
+        return;
 
     struct already_computed
     {
@@ -159,7 +173,8 @@ void moving_objects::generate_emitters()
 // it should be alredy sorted here
 //	std::sort					(m_nearest_moving.begin(),m_nearest_moving.end());
 #ifdef DEBUG
-    if (!m_nearest_moving.empty()) {
+    if (!m_nearest_moving.empty())
+    {
         NEAREST_MOVING::const_iterator I = m_nearest_moving.begin(), J = I + 1;
         NEAREST_MOVING::const_iterator E = m_nearest_moving.end();
         for (; J != E; ++I, ++J)
@@ -167,7 +182,7 @@ void moving_objects::generate_emitters()
             VERIFY(*I < *J);
         }
     }
-#endif  // DEBUG
+#endif // DEBUG
 
     u32 size = m_collision_emitters.size();
     m_collision_emitters.resize(size + m_nearest_moving.size());
@@ -189,8 +204,10 @@ bool moving_objects::exchange_all(moving_object* previous, moving_object* next, 
     COLLISIONS::iterator E = I + collision_count;
     for (; I != E; ++I)
     {
-        if ((*I).second.second.first == previous) {
-            if ((*I).second.first != possible_action_2_can_wait_1) {
+        if ((*I).second.second.first == previous)
+        {
+            if ((*I).second.first != possible_action_2_can_wait_1)
+            {
                 result = false;
                 continue;
             }
@@ -199,9 +216,11 @@ bool moving_objects::exchange_all(moving_object* previous, moving_object* next, 
             continue;
         }
 
-        if ((*I).second.second.second != previous) continue;
+        if ((*I).second.second.second != previous)
+            continue;
 
-        if ((*I).second.first != possible_action_1_can_wait_2) {
+        if ((*I).second.first != possible_action_1_can_wait_2)
+        {
             result = false;
             continue;
         }
@@ -225,7 +244,8 @@ bool moving_objects::fill_collisions(moving_object* object, const Fvector& objec
         bool break_cycle = false;
 
         bool priority = ::priority::predicate(object, *I);
-        if (priority) {
+        if (priority)
+        {
             if (!collided_dynamic(object, object_position, (*I), (*I)->predict_position(time_to_check), action))
                 continue;
 
@@ -248,7 +268,8 @@ bool moving_objects::fill_collisions(moving_object* object, const Fvector& objec
         m_collisions.push_back(std::make_pair(time_to_check,
             std::make_pair(action, std::make_pair(priority ? object : (*I), !priority ? object : (*I)))));
 
-        if (break_cycle) return (false);
+        if (break_cycle)
+            return (false);
     }
 
     {
@@ -269,12 +290,15 @@ bool moving_objects::fill_collisions(moving_object* object, const Fvector& objec
             }
 
             bool priority = ::priority::predicate(object, test);
-            if (priority) {
-                if (!collided_dynamic(object, object_position, test, test->position())) continue;
+            if (priority)
+            {
+                if (!collided_dynamic(object, object_position, test, test->position()))
+                    continue;
             }
             else
             {
-                if (!collided_dynamic(test, test->position(), object, object_position)) continue;
+                if (!collided_dynamic(test, test->position(), object, object_position))
+                    continue;
             }
 
             m_collisions.push_back(std::make_pair(
@@ -287,15 +311,18 @@ bool moving_objects::fill_collisions(moving_object* object, const Fvector& objec
         COLLISIONS::iterator e = m_collisions.end();
         for (; i != e; ++i)
         {
-            if ((*i).second.second.first == object) {
-                if (exchange_all((*i).second.second.second, object, collision_count)) continue;
+            if ((*i).second.second.first == object)
+            {
+                if (exchange_all((*i).second.second.second, object, collision_count))
+                    continue;
 
                 (*i).second.second.first = 0;
                 continue;
             }
 
             VERIFY((*i).second.second.second == object);
-            if (!exchange_all((*i).second.second.first, object, collision_count)) (*i).second.second.first = 0;
+            if (!exchange_all((*i).second.second.first, object, collision_count))
+                (*i).second.second.first = 0;
         }
 
         struct remove
@@ -313,16 +340,21 @@ bool moving_objects::already_wait(moving_object* object) const
 {
     moving_objects::COLLISIONS::const_iterator I =
         std::find_if(m_collisions.begin(), m_collisions.end(), collision(object));
-    if (I == m_collisions.end()) return (false);
+    if (I == m_collisions.end())
+        return (false);
 
-    if ((*I).second.second.first == object) {
-        if ((*I).second.first == moving_objects::possible_action_1_can_wait_2) return (true);
+    if ((*I).second.second.first == object)
+    {
+        if ((*I).second.first == moving_objects::possible_action_1_can_wait_2)
+            return (true);
 
         return (false);
     }
 
-    if ((*I).second.second.second == object) {
-        if ((*I).second.first == moving_objects::possible_action_2_can_wait_1) return (true);
+    if ((*I).second.second.second == object)
+    {
+        if ((*I).second.first == moving_objects::possible_action_2_can_wait_1)
+            return (true);
 
         return (false);
     }
@@ -332,9 +364,11 @@ bool moving_objects::already_wait(moving_object* object) const
 
 void moving_objects::generate_collisions(moving_object* object)
 {
-    if (m_nearest_moving.empty()) return;
+    if (m_nearest_moving.empty())
+        return;
 
-    if (already_wait(object)) return;
+    if (already_wait(object))
+        return;
 
     Fvector dest_position = object->predict_position(time_to_check);
     float linear_velocity = dest_position.distance_to(object->position()) / time_to_check;
@@ -342,19 +376,24 @@ void moving_objects::generate_collisions(moving_object* object)
     u32 step_count = iFloor(distance_to_check / step_to_check + .5f);
     for (u32 i = 0; (i < step_count) && !m_nearest_moving.empty(); ++i, remove_already_waited())
     {
-        if (!i) {
-            if (!fill_collisions(object, object->position(), 0.f)) return;
+        if (!i)
+        {
+            if (!fill_collisions(object, object->position(), 0.f))
+                return;
 
             continue;
         }
 
-        if ((i + 1) == step_count) {
-            if (!fill_collisions(object, dest_position, i * step_to_check)) return;
+        if ((i + 1) == step_count)
+        {
+            if (!fill_collisions(object, dest_position, i * step_to_check))
+                return;
 
             continue;
         }
 
-        if (!fill_collisions(object, object->predict_position(i * step_to_check), i * step_to_check)) return;
+        if (!fill_collisions(object, object->predict_position(i * step_to_check), i * step_to_check))
+            return;
     }
 }
 
@@ -365,7 +404,6 @@ struct decision_predicate
     const moving_object* m_object;
 
     IC decision_predicate(const moving_object* object) : m_object(object) {}
-
     IC bool operator()(const decision& decision) const { return (m_object == decision.first); }
 };
 
@@ -455,9 +493,11 @@ void moving_objects::resolve_collisions()
 void moving_objects::query_action_dynamic(moving_object* object)
 {
 #ifndef MASTER_GOLD
-    if (psAI_Flags.test(aiObstaclesAvoidingStatic)) return;
+    if (psAI_Flags.test(aiObstaclesAvoidingStatic))
+        return;
 
-    if (object->action_frame() == Device.dwFrame) return;
+    if (object->action_frame() == Device.dwFrame)
+        return;
 
     m_visited_emitters.clear_not_free();
     m_collision_emitters.clear_not_free();
@@ -484,18 +524,19 @@ void moving_objects::query_action_dynamic(moving_object* object)
             (*I)->dynamic_query().clear();
     }
 
-#if 0   // def DEBUG
+#if 0 // def DEBUG
 	Msg							("%6d end of iteration", Device.dwFrame);
-#endif  // DEBUG
+#endif // DEBUG
 
-    if (!m_collisions.empty()) {
+    if (!m_collisions.empty())
+    {
         resolve_collisions();
         return;
     }
 
     m_previous_collisions = m_collisions;
 
-#if 0   // def DEBUG
+#if 0 // def DEBUG
 	{
 		Msg							("Frame[%d], collisions[%d]",Device.dwFrame, m_visited_emitters.size());
 		NEAREST_MOVING::iterator	I = m_visited_emitters.begin();
@@ -503,12 +544,12 @@ void moving_objects::query_action_dynamic(moving_object* object)
 		for ( ; I != E; ++I)
 			Msg						("  %s",*(*I)->object().cName());
 	}
-#endif  // DEBUG
+#endif // DEBUG
 
     NEAREST_MOVING::iterator I = m_visited_emitters.begin();
     NEAREST_MOVING::iterator E = m_visited_emitters.end();
     for (; I != E; ++I)
         (*I)->action(moving_object::action_move);
 
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
 }

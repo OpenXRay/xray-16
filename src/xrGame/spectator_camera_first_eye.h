@@ -16,6 +16,6 @@ public:
     CSpectrCameraFirstEye& operator=(CSpectrCameraFirstEye& copy){};
 
     virtual void Move(int cmd, float val = 0, float factor = 1.0f);
-};  // class SpectrCameraFirstEye
+}; // class SpectrCameraFirstEye
 
-#endif  //#ifndef SPECTATOR_CAMERA_FIRST_EYE
+#endif //#ifndef SPECTATOR_CAMERA_FIRST_EYE

@@ -25,7 +25,7 @@ IC CGameLevelCrossTable::CGameLevelCrossTable(LPCSTR fName)
     R_ASSERT2(m_chunk, "Cross table is corrupted!");
     m_tpaCrossTable = (CCell*)m_chunk->pointer();
 }
-#endif  // AI_COMPILER
+#endif // AI_COMPILER
 
 IC CGameLevelCrossTable::CGameLevelCrossTable(const void* buffer, const u32& buffer_size)
 {
@@ -45,42 +45,11 @@ IC const CGameLevelCrossTable::CCell& CGameLevelCrossTable::vertex(u32 level_ver
     return (m_tpaCrossTable[level_vertex_id]);
 }
 
-IC u32 CGameLevelCrossTable::CHeader::version() const
-{
-    return (dwVersion);
-}
-
-IC u32 CGameLevelCrossTable::CHeader::level_vertex_count() const
-{
-    return (dwNodeCount);
-}
-
-IC u32 CGameLevelCrossTable::CHeader::game_vertex_count() const
-{
-    return (dwGraphPointCount);
-}
-
-IC const xrGUID& CGameLevelCrossTable::CHeader::level_guid() const
-{
-    return (m_level_guid);
-}
-
-IC const xrGUID& CGameLevelCrossTable::CHeader::game_guid() const
-{
-    return (m_game_guid);
-}
-
-IC GameGraph::_GRAPH_ID CGameLevelCrossTable::CCell::game_vertex_id() const
-{
-    return (tGraphIndex);
-}
-
-IC float CGameLevelCrossTable::CCell::distance() const
-{
-    return (fDistance);
-}
-
-IC const CGameLevelCrossTable::CHeader& CGameLevelCrossTable::header() const
-{
-    return (m_tCrossTableHeader);
-}
+IC u32 CGameLevelCrossTable::CHeader::version() const { return (dwVersion); }
+IC u32 CGameLevelCrossTable::CHeader::level_vertex_count() const { return (dwNodeCount); }
+IC u32 CGameLevelCrossTable::CHeader::game_vertex_count() const { return (dwGraphPointCount); }
+IC const xrGUID& CGameLevelCrossTable::CHeader::level_guid() const { return (m_level_guid); }
+IC const xrGUID& CGameLevelCrossTable::CHeader::game_guid() const { return (m_game_guid); }
+IC GameGraph::_GRAPH_ID CGameLevelCrossTable::CCell::game_vertex_id() const { return (tGraphIndex); }
+IC float CGameLevelCrossTable::CCell::distance() const { return (fDistance); }
+IC const CGameLevelCrossTable::CHeader& CGameLevelCrossTable::header() const { return (m_tCrossTableHeader); }

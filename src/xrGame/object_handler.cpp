@@ -34,16 +34,8 @@ CObjectHandler::CObjectHandler()
     //	m_last_enemy_for_best_weapon= 0;
 }
 
-CObjectHandler::~CObjectHandler()
-{
-    xr_delete(m_planner);
-}
-
-void CObjectHandler::Load(LPCSTR section)
-{
-    inherited::Load(section);
-}
-
+CObjectHandler::~CObjectHandler() { xr_delete(m_planner); }
+void CObjectHandler::Load(LPCSTR section) { inherited::Load(section); }
 void CObjectHandler::reinit(CAI_Stalker* object)
 {
     inherited::reinit();
@@ -59,14 +51,11 @@ void CObjectHandler::reinit(CAI_Stalker* object)
     m_clutched_hammer_enabled = false;
 }
 
-void CObjectHandler::reload(LPCSTR section)
-{
-    inherited::reload(section);
-}
-
+void CObjectHandler::reload(LPCSTR section) { inherited::reload(section); }
 BOOL CObjectHandler::net_Spawn(CSE_Abstract* DC)
 {
-    if (!inherited::net_Spawn(DC)) return (FALSE);
+    if (!inherited::net_Spawn(DC))
+        return (FALSE);
 
     CSE_Abstract* abstract = static_cast<CSE_Abstract*>(DC);
     CSE_ALifeTraderAbstract* trader = smart_cast<CSE_ALifeTraderAbstract*>(abstract);
@@ -84,15 +73,18 @@ void CObjectHandler::OnItemTake(CInventoryItem* inventory_item)
 
     planner().add_item(inventory_item);
 
-    if (planner().object().g_Alive()) switch_torch(inventory_item, true);
+    if (planner().object().g_Alive())
+        switch_torch(inventory_item, true);
 
-    if (inventory_item->useful_for_NPC() && (inventory_item->object().cNameSect() == m_item_to_spawn)) {
+    if (inventory_item->useful_for_NPC() && (inventory_item->object().cNameSect() == m_item_to_spawn))
+    {
         m_item_to_spawn = shared_str();
         m_ammo_in_box_to_spawn = 0;
     }
 
     CWeapon* weapon = smart_cast<CWeapon*>(inventory_item);
-    if (weapon) {
+    if (weapon)
+    {
         CameraRecoil cam_recoil_copy;
         cam_recoil_copy.Clone(weapon->cam_recoil);
         cam_recoil_copy.RelaxSpeed = cam_recoil_copy.RelaxSpeed_AI;
@@ -106,9 +98,11 @@ void CObjectHandler::OnItemDrop(CInventoryItem* inventory_item, bool just_before
 
     m_inventory_actual = false;
 
-    if (m_infinite_ammo && planner().object().g_Alive() && !inventory_item->useful_for_NPC()) {
+    if (m_infinite_ammo && planner().object().g_Alive() && !inventory_item->useful_for_NPC())
+    {
         CWeaponAmmo* weapon_ammo = smart_cast<CWeaponAmmo*>(inventory_item);
-        if (weapon_ammo) {
+        if (weapon_ammo)
+        {
             Level().spawn_item(*weapon_ammo->cNameSect(), planner().object().Position(),
                 planner().object().ai_location().level_vertex_id(), planner().object().ID());
             m_item_to_spawn = weapon_ammo->cNameSect();
@@ -123,7 +117,8 @@ void CObjectHandler::OnItemDrop(CInventoryItem* inventory_item, bool just_before
 
 CInventoryItem* CObjectHandler::best_weapon() const
 {
-    if (!planner().object().g_Alive()) return (0);
+    if (!planner().object().g_Alive())
+        return (0);
 
     planner().object().update_best_item_info();
     return (planner().object().m_best_item_to_kill);
@@ -150,16 +145,14 @@ void CObjectHandler::set_goal(MonsterSpace::EObjectAction object_action, CInvent
         min_queue_interval, max_queue_interval);
 }
 
-bool CObjectHandler::goal_reached()
-{
-    return (planner().solution().size() < 2);
-}
-
+bool CObjectHandler::goal_reached() { return (planner().solution().size() < 2); }
 void CObjectHandler::weapon_bones(int& b0, int& b1, int& b2) const
 {
     CWeapon* weapon = smart_cast<CWeapon*>(inventory().ActiveItem());
-    if (!weapon || !planner().m_storage.property(ObjectHandlerSpace::eWorldPropertyStrapped)) {
-        if (weapon) weapon->strapped_mode(false);
+    if (!weapon || !planner().m_storage.property(ObjectHandlerSpace::eWorldPropertyStrapped))
+    {
+        if (weapon)
+            weapon->strapped_mode(false);
         b0 = m_r_hand;
         b1 = m_r_finger2;
         b2 = m_l_finger1;
@@ -168,7 +161,8 @@ void CObjectHandler::weapon_bones(int& b0, int& b1, int& b2) const
 
     THROW3(weapon->can_be_strapped(), "Cannot strap weapon", *weapon->cName());
 
-    if (weapon->ID() != m_strap_object_id) {
+    if (weapon->ID() != m_strap_object_id)
+    {
         IKinematics* kinematics = smart_cast<IKinematics*>(planner().m_object->Visual());
         m_strap_bone0 = kinematics->LL_BoneID(weapon->strap_bone0());
         m_strap_bone1 = kinematics->LL_BoneID(weapon->strap_bone1());
@@ -184,7 +178,8 @@ void CObjectHandler::weapon_bones(int& b0, int& b1, int& b2) const
 bool CObjectHandler::weapon_strapped() const
 {
     CWeapon* weapon = smart_cast<CWeapon*>(inventory().ActiveItem());
-    if (!weapon) return (false);
+    if (!weapon)
+        return (false);
 
     return (weapon_strapped(weapon));
 }
@@ -193,16 +188,17 @@ void CObjectHandler::actualize_strap_mode(CWeapon* weapon) const
 {
     VERIFY(weapon);
 
-    if (!planner().m_storage.property(ObjectHandlerSpace::eWorldPropertyStrapped)) {
+    if (!planner().m_storage.property(ObjectHandlerSpace::eWorldPropertyStrapped))
+    {
         //		Msg						( "[%6d][%s] actualizing: weapon_strapped = false", Device.dwTimeGlobal,
-        //planner().object().cName().c_str() );
+        // planner().object().cName().c_str() );
         weapon->strapped_mode(false);
         return;
     }
 
     THROW3(weapon->can_be_strapped(), "Cannot strap weapon", *weapon->cName());
     //	Msg							( "[%6d][%s] actualizing: weapon_strapped = true", Device.dwTimeGlobal,
-    //planner().object().cName().c_str() );
+    // planner().object().cName().c_str() );
     weapon->strapped_mode(true);
 }
 
@@ -210,9 +206,10 @@ bool CObjectHandler::weapon_strapped(CWeapon* weapon) const
 {
     VERIFY(weapon);
 
-    if (!weapon->can_be_strapped()) {
+    if (!weapon->can_be_strapped())
+    {
         //		Msg						( "[%6d][%s] weapon_strapped = false0", Device.dwTimeGlobal,
-        //planner().object().cName().c_str() );
+        // planner().object().cName().c_str() );
         return (false);
     }
 
@@ -223,8 +220,8 @@ bool CObjectHandler::weapon_strapped(CWeapon* weapon) const
         (planner().current_action_state_id() == ObjectHandlerSpace::eWorldOperatorUnstrapping))
     {
         //		Msg						( "[%6d][%s] weapon_strapped = %s1", Device.dwTimeGlobal,
-        //planner().object().cName().c_str(), almost_strapped &&
-        //!planner().m_storage.property(ObjectHandlerSpace::eWorldPropertyStrapped2Idle) ? "true" : "false" );
+        // planner().object().cName().c_str(), almost_strapped &&
+        //! planner().m_storage.property(ObjectHandlerSpace::eWorldPropertyStrapped2Idle) ? "true" : "false" );
 
         if (!almost_strapped || planner().m_storage.property(ObjectHandlerSpace::eWorldPropertyStrapped2Idle))
             return (false);
@@ -238,10 +235,11 @@ bool CObjectHandler::weapon_strapped(CWeapon* weapon) const
 bool CObjectHandler::weapon_unstrapped() const
 {
     CWeapon* weapon = smart_cast<CWeapon*>(inventory().ActiveItem());
-    if (!weapon) {
+    if (!weapon)
+    {
         //		Msg						( "[%6d][%s] no active item!!(%d)(%s)", Device.dwTimeGlobal,
-        //planner().object().cName().c_str(), inventory().GetActiveSlot(), inventory().ItemFromSlot(3) ?
-        //inventory().ItemFromSlot(3)->object().cName().c_str() : "<no_item>" );
+        // planner().object().cName().c_str(), inventory().GetActiveSlot(), inventory().ItemFromSlot(3) ?
+        // inventory().ItemFromSlot(3)->object().cName().c_str() : "<no_item>" );
         return (true);
     }
 
@@ -252,9 +250,10 @@ bool CObjectHandler::weapon_unstrapped(CWeapon* weapon) const
 {
     VERIFY(weapon);
 
-    if (!weapon->can_be_strapped()) {
+    if (!weapon->can_be_strapped())
+    {
         //		Msg						( "[%6d][%s] weapon_unstrapped = true0", Device.dwTimeGlobal,
-        //planner().object().cName().c_str() );
+        // planner().object().cName().c_str() );
         return (true);
     }
 
@@ -266,8 +265,8 @@ bool CObjectHandler::weapon_unstrapped(CWeapon* weapon) const
         (planner().current_action_state_id() == ObjectHandlerSpace::eWorldOperatorUnstrapping))
     {
         //		Msg						( "[%6d][%s] weapon_unstrapped = %s1", Device.dwTimeGlobal,
-        //planner().object().cName().c_str(), almost_unstrapped &&
-        //!planner().m_storage.property(ObjectHandlerSpace::eWorldPropertyStrapped2Idle) ? "true" : "false" );
+        // planner().object().cName().c_str(), almost_unstrapped &&
+        //! planner().m_storage.property(ObjectHandlerSpace::eWorldPropertyStrapped2Idle) ? "true" : "false" );
 
         if (!almost_unstrapped || planner().m_storage.property(ObjectHandlerSpace::eWorldPropertyStrapped2Idle))
             return (false);
@@ -284,7 +283,8 @@ bool CObjectHandler::weapon_unstrapped(CWeapon* weapon) const
 IC void CObjectHandler::switch_torch(CInventoryItem* inventory_item, bool value)
 {
     CTorch* torch = smart_cast<CTorch*>(inventory_item);
-    if (torch && attached(torch) && planner().object().g_Alive()) torch->Switch(value);
+    if (torch && attached(torch) && planner().object().g_Alive())
+        torch->Switch(value);
 }
 
 void CObjectHandler::attach(CInventoryItem* inventory_item)
@@ -344,7 +344,8 @@ bool CObjectHandler::is_weapon_going_to_be_strapped(CGameObject const* object) c
     properties_type::const_iterator const properties_end = properties.end();
     properties_type::const_iterator const found = std::lower_bound(properties.begin(), properties_end, strap_property);
 
-    if (found == properties_end) return false;
+    if (found == properties_end)
+        return false;
 
     return *found == strap_property;
 }

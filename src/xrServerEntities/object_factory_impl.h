@@ -17,7 +17,7 @@
 #ifndef NO_XR_GAME
 #include "Common/object_type_traits.h"
 #include "object_item_client_server.h"
-#endif  // NO_XR_GAME
+#endif // NO_XR_GAME
 
 #ifndef NO_XR_GAME
 
@@ -47,7 +47,7 @@ IC void CObjectFactory::add(const CLASS_ID& clsid, LPCSTR script_clsid)
         object_type_traits::is_base_and_derived<ClientObjectBaseClass, _unknown_type>::value>(clsid, script_clsid));
 }
 
-#else  // NO_XR_GAME
+#else // NO_XR_GAME
 
 template <typename _unknown_type>
 IC void CObjectFactory::add(const CLASS_ID& clsid, LPCSTR script_clsid)
@@ -55,6 +55,6 @@ IC void CObjectFactory::add(const CLASS_ID& clsid, LPCSTR script_clsid)
     add(new CObjectItemSingle<_unknown_type, false>(clsid, script_clsid));
 }
 
-#endif  // NO_XR_GAME
+#endif // NO_XR_GAME
 
-#endif  // object_factory_implH
+#endif // object_factory_implH

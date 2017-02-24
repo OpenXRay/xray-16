@@ -10,15 +10,8 @@
 #include "alife_time_manager.h"
 #include "date_time.h"
 
-CALifeTimeManager::CALifeTimeManager(LPCSTR section)
-{
-    init(section);
-}
-
-CALifeTimeManager::~CALifeTimeManager()
-{
-}
-
+CALifeTimeManager::CALifeTimeManager(LPCSTR section) { init(section); }
+CALifeTimeManager::~CALifeTimeManager() {}
 void CALifeTimeManager::init(LPCSTR section)
 {
     u32 years, months, days, hours, minutes, seconds;

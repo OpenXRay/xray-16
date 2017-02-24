@@ -47,7 +47,8 @@ door::~door()
 {
     m_object.spatial.type &= ~STYPE_VISIBLEFORAI;
 
-    if (m_initiators.empty()) return;
+    if (m_initiators.empty())
+        return;
 
     actors_type::const_iterator i = m_initiators.begin();
     actors_type::const_iterator const e = m_initiators.end();
@@ -56,7 +57,7 @@ door::~door()
 
 #ifdef DEBUG
     m_initiators.clear_and_free();
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 }
 
 Fvector const& door::position() const
@@ -96,7 +97,8 @@ bool door::is_locked(door_state const state) const
     VERIFY(valid(m_target_state));
     VERIFY(valid(m_previous_state));
 
-    if (m_state != state) return m_locked;
+    if (m_state != state)
+        return m_locked;
 
     return false;
 }
@@ -107,14 +109,15 @@ bool door::is_blocked(door_state const state) const
     VERIFY(valid(m_target_state));
     VERIFY(valid(m_previous_state));
 
-    if (m_initiators.empty()) return false;
+    if (m_initiators.empty())
+        return false;
 
     return (m_target_state != state);
 }
 
 #ifdef DEBUG
 extern BOOL g_debug_doors;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
 void door::lock()
 {
@@ -125,8 +128,9 @@ void door::lock()
     VERIFY(!m_locked);
     m_locked = true;
 #ifdef DEBUG
-    if (g_debug_doors) Msg("door[%s] is locked", m_object.cName().c_str());
-#endif  // #ifdef DEBUG
+    if (g_debug_doors)
+        Msg("door[%s] is locked", m_object.cName().c_str());
+#endif // #ifdef DEBUG
 }
 
 void door::unlock()
@@ -138,8 +142,9 @@ void door::unlock()
     VERIFY(m_locked);
     m_locked = false;
 #ifdef DEBUG
-    if (g_debug_doors) Msg("door[%s] is unlocked", m_object.cName().c_str());
-#endif  // #ifdef DEBUG
+    if (g_debug_doors)
+        Msg("door[%s] is unlocked", m_object.cName().c_str());
+#endif // #ifdef DEBUG
 }
 
 void door::change_state()
@@ -148,14 +153,15 @@ void door::change_state()
     VERIFY(valid(m_target_state));
     VERIFY(valid(m_previous_state));
 
-    if (m_state == m_target_state) return;
+    if (m_state == m_target_state)
+        return;
 
     m_object.callback(GameObject::eUseObject)(m_object.lua_game_object(), (CScriptGameObject*)0);
 #ifdef DEBUG
     if (g_debug_doors)
         Msg("door[%s] started to change its state to [%s]", m_object.cName().c_str(),
             m_target_state == door_state_open ? "open" : "closed");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 }
 
 void door::change_state(actor* const initiator, door_state const start_state, door_state const stop_state)
@@ -167,14 +173,15 @@ void door::change_state(actor* const initiator, door_state const start_state, do
     VERIFY(valid(m_target_state));
     VERIFY(valid(m_previous_state));
 
-    if (m_initiators.empty()) {
+    if (m_initiators.empty())
+    {
         m_initiators.push_back(initiator);
         m_target_state = start_state;
 #ifdef DEBUG
         if (g_debug_doors)
             Msg("door[%s] added initiator[%s] to keep door %s", m_object.cName().c_str(), initiator->get_name(),
                 m_target_state == door_state_open ? "open" : "closed");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         //		if ( !xr_strcmp( "sim_default_duty_28212", initiator->get_name()) ) {
         //			int i=0; (void)i;
         //		}
@@ -182,12 +189,13 @@ void door::change_state(actor* const initiator, door_state const start_state, do
         return;
     }
 
-    if (m_target_state == start_state) {
+    if (m_target_state == start_state)
+    {
 #ifdef DEBUG
         if (g_debug_doors)
             Msg("door[%s] added initiator[%s] to keep door %s", m_object.cName().c_str(), initiator->get_name(),
                 m_target_state == door_state_open ? "open" : "closed");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         //		if ( !xr_strcmp( "sim_default_duty_28212", initiator->get_name()) ) {
         //			int i=0; (void)i;
         //		}
@@ -199,27 +207,30 @@ void door::change_state(actor* const initiator, door_state const start_state, do
     VERIFY(m_target_state == stop_state);
     actors_type::iterator const found = std::find(m_initiators.begin(), m_initiators.end(), initiator);
     VERIFY2(found != m_initiators.end(), make_string("cannot find initiator %s", initiator->get_name()));
-    if (found != m_initiators.end()) {
+    if (found != m_initiators.end())
+    {
 #ifdef DEBUG
         if (g_debug_doors)
             Msg("door[%s] removed initiator[%s] to keep door %s", m_object.cName().c_str(), initiator->get_name(),
                 m_target_state == door_state_open ? "open" : "closed");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         //		if ( !xr_strcmp( "sim_default_duty_28212", initiator->get_name()) ) {
         //			int i=0; (void)i;
         //		}
         m_initiators.erase(found);
     }
 
-    if (!m_initiators.empty()) return;
+    if (!m_initiators.empty())
+        return;
 
-    if (m_previous_state != stop_state) {
+    if (m_previous_state != stop_state)
+    {
         m_target_state = m_previous_state;
 #ifdef DEBUG
         if (g_debug_doors)
             Msg("door[%s] restores its state to %s", m_object.cName().c_str(),
                 m_target_state == door_state_open ? "open" : "closed");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         //		if ( !xr_strcmp( "sim_default_duty_28212", initiator->get_name()) ) {
         //			int i=0; (void)i;
         //		}
@@ -250,7 +261,8 @@ void door::on_change_state(door_state const state)
     //	VERIFY						( m_state == door_state_open );
     m_state = state;
 
-    if (m_initiators.empty()) {
+    if (m_initiators.empty())
+    {
         m_previous_state = state;
         return;
     }
@@ -259,11 +271,7 @@ void door::on_change_state(door_state const state)
 }
 
 #ifdef DEBUG
-LPCSTR door::get_name() const
-{
-    return m_object.cName().c_str();
-}
-
+LPCSTR door::get_name() const { return m_object.cName().c_str(); }
 shared_str door::get_initiators_ids() const
 {
     u32 buffer_size = 1;
@@ -286,7 +294,8 @@ shared_str door::get_initiators_ids() const
         left_size = buffer_size - (j - result);
     }
 
-    if (buffer_size > 1) result[buffer_size - 2] = 0;
+    if (buffer_size > 1)
+        result[buffer_size - 2] = 0;
 
     return result;
 }
@@ -295,4 +304,4 @@ bool door::check_initiator(actor const* const initiator) const
 {
     return std::find(m_initiators.begin(), m_initiators.end(), initiator) != m_initiators.end();
 }
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG

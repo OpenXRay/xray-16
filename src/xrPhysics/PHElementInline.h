@@ -27,7 +27,8 @@ IC void CPHElement::ActivatingPos(const Fmatrix& BoneTransform)
 {
     ToBonePos(BoneTransform, mh_unspecified);
     m_flags.set(flActivating, FALSE);
-    if (!m_parent_element) m_shell->SetObjVsShellTransform(BoneTransform);
+    if (!m_parent_element)
+        m_shell->SetObjVsShellTransform(BoneTransform);
 
     //{
     //	m_shell->m_object_in_root.set( B->mTransform );

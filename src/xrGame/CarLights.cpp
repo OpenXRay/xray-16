@@ -28,11 +28,7 @@ SCarLight::~SCarLight()
     bone_id = BI_NONE;
 }
 
-void SCarLight::Init(CCarLights* holder)
-{
-    m_holder = holder;
-}
-
+void SCarLight::Init(CCarLights* holder) { m_holder = holder; }
 void SCarLight::ParseDefinitions(LPCSTR section)
 {
     light_render = GlobalEnv.Render->light_create();
@@ -78,7 +74,8 @@ void SCarLight::Switch()
 void SCarLight::TurnOn()
 {
     VERIFY(!physics_world()->Processing());
-    if (isOn()) return;
+    if (isOn())
+        return;
     IKinematics* K = smart_cast<IKinematics*>(m_holder->PCar()->Visual());
     K->LL_SetBoneVisible(bone_id, TRUE, TRUE);
     K->CalculateBones_Invalidate();
@@ -90,7 +87,8 @@ void SCarLight::TurnOn()
 void SCarLight::TurnOff()
 {
     VERIFY(!physics_world()->Processing());
-    if (!isOn()) return;
+    if (!isOn())
+        return;
     glow_render->set_active(false);
     light_render->set_active(false);
     smart_cast<IKinematics*>(m_holder->PCar()->Visual())->LL_SetBoneVisible(bone_id, FALSE, TRUE);
@@ -106,7 +104,8 @@ bool SCarLight::isOn()
 void SCarLight::Update()
 {
     VERIFY(!physics_world()->Processing());
-    if (!isOn()) return;
+    if (!isOn())
+        return;
     CCar* pcar = m_holder->PCar();
     CBoneInstance& BI = smart_cast<IKinematics*>(pcar->Visual())->LL_GetBoneInstance(bone_id);
     Fmatrix M;
@@ -117,11 +116,7 @@ void SCarLight::Update()
     light_render->set_position(M.c);
 }
 
-CCarLights::CCarLights()
-{
-    m_pcar = NULL;
-}
-
+CCarLights::CCarLights() { m_pcar = NULL; }
 void CCarLights::Init(CCar* pcar)
 {
     m_pcar = pcar;
@@ -131,7 +126,8 @@ void CCarLights::Init(CCar* pcar)
 void CCarLights::ParseDefinitions()
 {
     CInifile* ini = smart_cast<IKinematics*>(m_pcar->Visual())->LL_UserData();
-    if (!ini->section_exist("lights")) return;
+    if (!ini->section_exist("lights"))
+        return;
     LPCSTR S = ini->r_string("lights", "headlights");
     string64 S1;
     int count = _GetItemCount(S);

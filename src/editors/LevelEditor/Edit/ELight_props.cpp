@@ -51,7 +51,8 @@ void CLight::OnFuzzyGenerateClick(ButtonValue* value, bool& bModif, bool& bSafe)
 
 void CLight::OnFuzzyFlagChange(PropValue* value)
 {
-    if (m_Flags.is(ELight::flPointFuzzy)) {
+    if (m_Flags.is(ELight::flPointFuzzy))
+    {
         m_FuzzyData = new SFuzzyData();
         OnFuzzyTypeChange(value);
     }
@@ -113,13 +114,14 @@ void CLight::OnAttenuationDraw(CanvasValue* sender, void* _canvas, const Irect& 
     //    float v = m_D3D.range;
     //    temp.sprintf("Range = %.2f",v); lbRange->Caption = temp;
     canvas->Pen->Color = clLime;
-    if (!(fis_zero(m_Attenuation0) && fis_zero(m_Attenuation1) && fis_zero(m_Attenuation2))) {
+    if (!(fis_zero(m_Attenuation0) && fis_zero(m_Attenuation1) && fis_zero(m_Attenuation2)))
+    {
         for (int d = 1; d < w; d++)
         {
             float R = d * d_cost;
             float b = m_Brightness / (m_Attenuation0 + m_Attenuation1 * R + m_Attenuation2 * R * R);
             b -= m_Brightness * R /
-                 (m_Range * (m_Attenuation0 + m_Attenuation1 * m_Range + m_Attenuation2 * m_Range * m_Range));
+                (m_Range * (m_Attenuation0 + m_Attenuation1 * m_Range + m_Attenuation2 * m_Range * m_Range));
             float bb = h - ((h / (/*br_max*/ 3.f * 2)) * b + h / 2);
             int y = iFloor(y0 + bb);
             clamp(y, int(rect.Top), int(rect.Bottom));
@@ -131,11 +133,7 @@ void CLight::OnAttenuationDraw(CanvasValue* sender, void* _canvas, const Irect& 
     }
 }
 
-void CLight::OnPointDataChange(PropValue* value)
-{
-    ExecCommand(COMMAND_UPDATE_PROPERTIES);
-}
-
+void CLight::OnPointDataChange(PropValue* value) { ExecCommand(COMMAND_UPDATE_PROPERTIES); }
 void CLight::OnPointDataTestEqual(CanvasValue* a, CanvasValue* b, bool& res)
 {
     CLight* A = (CLight*)(a->tag);
@@ -143,8 +141,8 @@ void CLight::OnPointDataTestEqual(CanvasValue* a, CanvasValue* b, bool& res)
     CLight* B = (CLight*)(b->tag);
     VERIFY(B);
     res = (fsimilar(A->m_Range, B->m_Range) && fsimilar(A->m_Attenuation0, B->m_Attenuation0) &&
-           fsimilar(A->m_Attenuation1, B->m_Attenuation1) && fsimilar(A->m_Attenuation2, B->m_Attenuation2) &&
-           fsimilar(A->m_Brightness, B->m_Brightness));
+        fsimilar(A->m_Attenuation1, B->m_Attenuation1) && fsimilar(A->m_Attenuation2, B->m_Attenuation2) &&
+        fsimilar(A->m_Brightness, B->m_Brightness));
 }
 
 void CLight::FillAttProp(LPCSTR pref, PropItemVec& items)
@@ -183,7 +181,8 @@ void CLight::FillPointProp(LPCSTR pref, PropItemVec& items)
     ButtonValue* B = 0;
     P = PHelper().CreateFlag32(items, PrepareKey(pref, "Fuzzy"), &m_Flags, ELight::flPointFuzzy);
     P->OnChangeEvent.bind(this, &CLight::OnFuzzyFlagChange);
-    if (m_Flags.is(ELight::flPointFuzzy)) {
+    if (m_Flags.is(ELight::flPointFuzzy))
+    {
         VERIFY(m_FuzzyData);
         P = PHelper().CreateS16(items, PrepareKey(pref, "Fuzzy\\Count"), &m_FuzzyData->m_PointCount, 1, 100);
         P->OnChangeEvent.bind(this, &CLight::OnFuzzyDataChange);
@@ -278,9 +277,12 @@ void CLight::OnShowHint(AStringVec& dest)
     }
     dest.push_back(temp);
     temp = "Flags: ";
-    if (m_Flags.is(ELight::flAffectStatic)) temp += "Stat ";
-    if (m_Flags.is(ELight::flAffectDynamic)) temp += "Dyn ";
-    if (m_Flags.is(ELight::flProcedural)) temp += "Proc ";
+    if (m_Flags.is(ELight::flAffectStatic))
+        temp += "Stat ";
+    if (m_Flags.is(ELight::flAffectDynamic))
+        temp += "Dyn ";
+    if (m_Flags.is(ELight::flProcedural))
+        temp += "Proc ";
     dest.push_back(temp);
     temp.sprintf("Pos:   %3.2f, %3.2f, %3.2f", PPosition.x, PPosition.y, PPosition.z);
     dest.push_back(temp);

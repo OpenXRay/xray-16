@@ -7,7 +7,7 @@
 #include "ai/monsters/monster_cover_manager.h"
 #include "ai/Monsters/monster_home.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -40,7 +40,8 @@ void CStateMonsterDangerMoveToHomePointAbstract::initialize()
     m_target_node = object->Home->get_place_in_cover();
     m_skip_camp = false;
 
-    if (m_target_node == u32(-1)) {
+    if (m_target_node == u32(-1))
+    {
         m_target_node = object->Home->get_place();
         m_skip_camp = true;
     }
@@ -79,8 +80,10 @@ bool CStateMonsterDangerMoveToHomePointAbstract::check_start_conditions()
 TEMPLATE_SPECIALIZATION
 bool CStateMonsterDangerMoveToHomePointAbstract::check_completion()
 {
-    if (object->HitMemory.get_last_hit_time() > time_state_started) return true;
-    if (m_skip_camp && (prev_substate != u32(-1)) && (prev_substate != eStatePanic_HomePoint_Hide)) return true;
+    if (object->HitMemory.get_last_hit_time() > time_state_started)
+        return true;
+    if (m_skip_camp && (prev_substate != u32(-1)) && (prev_substate != eStatePanic_HomePoint_Hide))
+        return true;
 
     return false;
 }
@@ -92,12 +95,14 @@ bool CStateMonsterDangerMoveToHomePointAbstract::check_completion()
 TEMPLATE_SPECIALIZATION
 void CStateMonsterDangerMoveToHomePointAbstract::reselect_state()
 {
-    if (prev_substate == u32(-1)) {
+    if (prev_substate == u32(-1))
+    {
         select_state(eStatePanic_HomePoint_Hide);
         return;
     }
 
-    if (prev_substate == eStatePanic_HomePoint_Hide) {
+    if (prev_substate == eStatePanic_HomePoint_Hide)
+    {
         select_state(eStatePanic_HomePoint_LookOpenPlace);
         return;
     }
@@ -114,15 +119,16 @@ void CStateMonsterDangerMoveToHomePointAbstract::setup_substates()
 {
     state_ptr state = get_state_current();
 
-    if (current_substate == eStatePanic_HomePoint_Hide) {
+    if (current_substate == eStatePanic_HomePoint_Hide)
+    {
         SStateDataMoveToPointEx data;
 
         data.vertex = m_target_node;
         data.point = ai().level_graph().vertex_position(data.vertex);
         data.action.action = ACT_RUN;
-        data.action.time_out = 0;    // do not use time out
-        data.completion_dist = 1.f;  // get exactly to the point
-        data.time_to_rebuild = 0;    // do not rebuild
+        data.action.time_out = 0; // do not use time out
+        data.completion_dist = 1.f; // get exactly to the point
+        data.time_to_rebuild = 0; // do not rebuild
         data.accelerated = true;
         data.braking = false;
         data.accel_type = eAT_Aggressive;
@@ -133,7 +139,8 @@ void CStateMonsterDangerMoveToHomePointAbstract::setup_substates()
         return;
     }
 
-    if (current_substate == eStatePanic_HomePoint_LookOpenPlace) {
+    if (current_substate == eStatePanic_HomePoint_LookOpenPlace)
+    {
         SStateDataLookToPoint data;
 
         Fvector dir;
@@ -150,11 +157,12 @@ void CStateMonsterDangerMoveToHomePointAbstract::setup_substates()
         return;
     }
 
-    if (current_substate == eStatePanic_HomePoint_Camp) {
+    if (current_substate == eStatePanic_HomePoint_Camp)
+    {
         SStateDataAction data;
 
         data.action = ACT_LOOK_AROUND;
-        data.time_out = 7000;  // do not use time out
+        data.time_out = 7000; // do not use time out
         data.sound_type = MonsterSound::eMonsterSoundAggressive;
         data.sound_delay = object->db().m_dwIdleSndDelay;
 
@@ -168,7 +176,8 @@ Fvector& CStateMonsterDangerMoveToHomePointAbstract::get_most_danger_pos()
 {
     m_danger_pos.set(0, 0, 0);
 
-    if (object->HitMemory.is_hit()) {
+    if (object->HitMemory.is_hit())
+    {
         m_danger_pos = object->HitMemory.get_last_hit_position();
     }
     else if (object->hear_dangerous_sound)

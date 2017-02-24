@@ -71,7 +71,6 @@ public:
     virtual void Load(LPCSTR section);
     void LoadSilencerKoeffs();
     virtual CWeaponMagazined* cast_weapon_magazined() { return this; }
-
     virtual void SetDefaults();
     virtual void FireStart();
     virtual void FireEnd();
@@ -142,7 +141,6 @@ public:
     void OnPrevFireMode();
     bool HasFireModes() { return m_bHasDifferentFireModes; };
     virtual int GetCurrentFireMode() { return m_aFireModes[m_iCurFireMode]; };
-
     virtual void save(NET_Packet& output_packet);
     virtual void load(IReader& input_packet);
 
@@ -151,7 +149,6 @@ protected:
 
 protected:
     virtual bool AllowFireWhileWorking() { return false; }
-
     //виртуальные функции для проигрывания анимации HUD
     virtual void PlayAnimShow();
     virtual void PlayAnimHide();

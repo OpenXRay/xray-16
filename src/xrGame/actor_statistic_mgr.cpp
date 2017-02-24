@@ -28,7 +28,8 @@ void SStatDetailBData::load(IReader& stream)
     load_data(int_count, stream);
     load_data(int_points, stream);
 
-    if (ai().get_alife()->header().version() > 0x0002) load_data(str_value, stream);
+    if (ai().get_alife()->header().version() > 0x0002)
+        load_data(str_value, stream);
 }
 
 ////////////////////////////////////////////////
@@ -41,7 +42,8 @@ void SStatSectionData::save(IWriter& stream)
 void SStatSectionData::load(IReader& stream)
 {
     load_data(data, stream);
-    if (ai().get_alife()->header().version() == 0x0002) {
+    if (ai().get_alife()->header().version() == 0x0002)
+    {
         int tmp;
         load_data(tmp, stream);
         switch (tmp)
@@ -55,7 +57,7 @@ void SStatSectionData::load(IReader& stream)
         case 0: key = "foo"; break;
         }
         s32 tmp2;
-        load_data(tmp2, stream);  // old total_points
+        load_data(tmp2, stream); // old total_points
     }
     else
         load_data(key, stream);
@@ -68,7 +70,8 @@ SStatDetailBData& SStatSectionData::GetData(const shared_str& key)
 
     for (; it != it_e; ++it)
     {
-        if ((*it).key == key) return *it;
+        if ((*it).key == key)
+            return *it;
     }
     data.resize(data.size() + 1);
     data.back().key = key;
@@ -84,7 +87,8 @@ s32 SStatSectionData::GetTotalPoints() const
     vStatDetailData::const_iterator it_e = data.end();
     for (; it != it_e; ++it)
     {
-        if ((*it).str_value.size() != 0) return -1;
+        if ((*it).str_value.size() != 0)
+            return -1;
 
         res += (*it).int_count * (*it).int_points;
     }
@@ -97,21 +101,9 @@ CActorStatisticMgr::CActorStatisticMgr()
     m_actor_stats_wrapper->registry().init(0);
 }
 
-CActorStatisticMgr::~CActorStatisticMgr()
-{
-    xr_delete(m_actor_stats_wrapper);
-}
-
-vStatSectionData& CActorStatisticMgr::GetStorage()
-{
-    return m_actor_stats_wrapper->registry().objects();
-}
-
-const vStatSectionData& CActorStatisticMgr::GetCStorage()
-{
-    return m_actor_stats_wrapper->registry().objects();
-}
-
+CActorStatisticMgr::~CActorStatisticMgr() { xr_delete(m_actor_stats_wrapper); }
+vStatSectionData& CActorStatisticMgr::GetStorage() { return m_actor_stats_wrapper->registry().objects(); }
+const vStatSectionData& CActorStatisticMgr::GetCStorage() { return m_actor_stats_wrapper->registry().objects(); }
 SStatSectionData& CActorStatisticMgr::GetSection(const shared_str& key)
 {
     vStatSectionData& d = GetStorage();
@@ -119,7 +111,8 @@ SStatSectionData& CActorStatisticMgr::GetSection(const shared_str& key)
     vStatSectionData::iterator it_e = d.end();
     for (; it != it_e; ++it)
     {
-        if ((*it).key == key) return *it;
+        if ((*it).key == key)
+            return *it;
     }
     d.resize(d.size() + 1);
     d.back().key = key;
@@ -146,7 +139,7 @@ s32 CActorStatisticMgr::GetSectionPoints(const shared_str& key)
     if (key != "total")
         return GetSection(key).GetTotalPoints();
     else
-    {  // total
+    { // total
         s32 _total = -1;
         vStatSectionData& d = GetStorage();
         vStatSectionData::iterator it = d.begin();
@@ -155,8 +148,10 @@ s32 CActorStatisticMgr::GetSectionPoints(const shared_str& key)
         {
             s32 _p = (*it).GetTotalPoints();
 
-            if (_p != -1) {
-                if (_total == -1) _total = 0;
+            if (_p != -1)
+            {
+                if (_total == -1)
+                    _total = 0;
 
                 _total += _p;
             }

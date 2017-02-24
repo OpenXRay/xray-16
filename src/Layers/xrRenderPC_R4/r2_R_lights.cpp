@@ -4,7 +4,7 @@ IC bool pred_area(light* _1, light* _2)
 {
     u32 a0 = _1->X.S.size;
     u32 a1 = _2->X.S.size;
-    return a0 > a1;  // reverse -> descending
+    return a0 > a1; // reverse -> descending
 }
 
 void CRender::render_lights(light_Package& LP)
@@ -19,7 +19,8 @@ void CRender::render_lights(light_Package& LP)
         {
             light* L = source[it];
             L->vis_update();
-            if (!L->vis.visible) {
+            if (!L->vis.visible)
+            {
                 source.erase(source.begin() + it);
                 it--;
             }
@@ -45,7 +46,8 @@ void CRender::render_lights(light_Package& LP)
             {
                 light* L = source[test];
                 SMAP_Rect R;
-                if (LP_smap_pool.push(R, L->X.S.size)) {
+                if (LP_smap_pool.push(R, L->X.S.size))
+                {
                     // OK
                     L->X.S.posX = R.min.x;
                     L->X.S.posY = R.min.y;
@@ -91,9 +93,11 @@ void CRender::render_lights(light_Package& LP)
         u16 sid = L->vis.smap_ID;
         while (true)
         {
-            if (source.empty()) break;
+            if (source.empty())
+                break;
             L = source.back();
-            if (L->vis.smap_ID != sid) break;
+            if (L->vis.smap_ID != sid)
+                break;
             source.pop_back();
             Lights_LastFrame.push_back(L);
 
@@ -108,7 +112,8 @@ void CRender::render_lights(light_Package& LP)
             r_dsgraph_render_subspace(L->spatial.sector, L->X.S.combine, L->position, TRUE);
             bool bNormal = mapNormalPasses[0][0].size() || mapMatrixPasses[0][0].size();
             bool bSpecial = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
-            if (bNormal || bSpecial) {
+            if (bNormal || bSpecial)
+            {
                 Stats.s_merged++;
                 L_spot_s.push_back(L);
                 Target->phase_smap_spot(L);
@@ -117,13 +122,14 @@ void CRender::render_lights(light_Package& LP)
                 RCache.set_xform_project(L->X.S.project);
                 r_dsgraph_render_graph(0);
                 L->X.S.transluent = FALSE;
-                if (bSpecial) {
+                if (bSpecial)
+                {
                     L->X.S.transluent = TRUE;
                     Target->phase_smap_spot_tsh(L);
                     PIX_EVENT(SHADOWED_LIGHTS_RENDER_GRAPH);
-                    r_dsgraph_render_graph(1);  // normal level, secondary priority
+                    r_dsgraph_render_graph(1); // normal level, secondary priority
                     PIX_EVENT(SHADOWED_LIGHTS_RENDER_SORTED);
-                    r_dsgraph_render_sorted();  // strict-sorted geoms
+                    r_dsgraph_render_sorted(); // strict-sorted geoms
                 }
             }
             else
@@ -143,11 +149,13 @@ void CRender::render_lights(light_Package& LP)
         PIX_EVENT(POINT_LIGHTS);
 
         //		if (has_point_unshadowed)	-> 	accum point unshadowed
-        if (!LP.v_point.empty()) {
+        if (!LP.v_point.empty())
+        {
             light* L = LP.v_point.back();
             LP.v_point.pop_back();
             L->vis_update();
-            if (L->vis.visible) {
+            if (L->vis.visible)
+            {
                 Target->accum_point(L);
                 render_indirect(L);
             }
@@ -156,11 +164,13 @@ void CRender::render_lights(light_Package& LP)
         PIX_EVENT(SPOT_LIGHTS);
 
         //		if (has_spot_unshadowed)	-> 	accum spot unshadowed
-        if (!LP.v_spot.empty()) {
+        if (!LP.v_spot.empty())
+        {
             light* L = LP.v_spot.back();
             LP.v_spot.pop_back();
             L->vis_update();
-            if (L->vis.visible) {
+            if (L->vis.visible)
+            {
                 LR.compute_xf_spot(L);
                 Target->accum_spot(L);
                 render_indirect(L);
@@ -170,7 +180,8 @@ void CRender::render_lights(light_Package& LP)
         PIX_EVENT(SPOT_LIGHTS_ACCUM_VOLUMETRIC);
 
         //		if (was_spot_shadowed)		->	accum spot shadowed
-        if (!L_spot_s.empty()) {
+        if (!L_spot_s.empty())
+        {
             PIX_EVENT(ACCUM_SPOT);
             for (u32 it = 0; it < L_spot_s.size(); it++)
             {
@@ -189,12 +200,14 @@ void CRender::render_lights(light_Package& LP)
 
     PIX_EVENT(POINT_LIGHTS_ACCUM);
     // Point lighting (unshadowed, if left)
-    if (!LP.v_point.empty()) {
+    if (!LP.v_point.empty())
+    {
         xr_vector<light*>& Lvec = LP.v_point;
         for (u32 pid = 0; pid < Lvec.size(); pid++)
         {
             Lvec[pid]->vis_update();
-            if (Lvec[pid]->vis.visible) {
+            if (Lvec[pid]->vis.visible)
+            {
                 render_indirect(Lvec[pid]);
                 Target->accum_point(Lvec[pid]);
             }
@@ -204,12 +217,14 @@ void CRender::render_lights(light_Package& LP)
 
     PIX_EVENT(SPOT_LIGHTS_ACCUM);
     // Spot lighting (unshadowed, if left)
-    if (!LP.v_spot.empty()) {
+    if (!LP.v_spot.empty())
+    {
         xr_vector<light*>& Lvec = LP.v_spot;
         for (u32 pid = 0; pid < Lvec.size(); pid++)
         {
             Lvec[pid]->vis_update();
-            if (Lvec[pid]->vis.visible) {
+            if (Lvec[pid]->vis.visible)
+            {
                 LR.compute_xf_spot(Lvec[pid]);
                 render_indirect(Lvec[pid]);
                 Target->accum_spot(Lvec[pid]);
@@ -221,7 +236,8 @@ void CRender::render_lights(light_Package& LP)
 
 void CRender::render_indirect(light* L)
 {
-    if (!ps_r2_ls_flags.test(R2FLAG_GI)) return;
+    if (!ps_r2_ls_flags.test(R2FLAG_GI))
+        return;
 
     light LIGEN;
     LIGEN.set_type(IRender_Light::REFLECTED);
@@ -229,7 +245,8 @@ void CRender::render_indirect(light* L)
     LIGEN.set_cone(PI_DIV_2 * 2.f);
 
     xr_vector<light_indirect>& Lvec = L->indirect;
-    if (Lvec.empty()) return;
+    if (Lvec.empty())
+        return;
     float LE = L->color.intensity();
     for (u32 it = 0; it < Lvec.size(); it++)
     {
@@ -237,7 +254,8 @@ void CRender::render_indirect(light* L)
 
         // energy and color
         float LIE = LE * LI.E;
-        if (LIE < ps_r2_GI_clip) continue;
+        if (LIE < ps_r2_GI_clip)
+            continue;
         Fvector T;
         T.set(L->color.r, L->color.g, L->color.b).mul(LI.E);
         LIGEN.set_color(T.x, T.y, T.z);
@@ -245,7 +263,8 @@ void CRender::render_indirect(light* L)
         // geometric
         Fvector L_up, L_right;
         L_up.set(0, 1, 0);
-        if (_abs(L_up.dotproduct(LI.D)) > .99f) L_up.set(0, 0, 1);
+        if (_abs(L_up.dotproduct(LI.D)) > .99f)
+            L_up.set(0, 0, 1);
         L_right.crossproduct(L_up, LI.D).normalize();
         LIGEN.spatial.sector = LI.S;
         LIGEN.set_position(LI.P);
@@ -257,7 +276,8 @@ void CRender::render_indirect(light* L)
         float Emax = LIE;
         float Emin = 1.f / 255.f;
         float x = (Emax - Emin) / Emin;
-        if (x < 0.1f) continue;
+        if (x < 0.1f)
+            continue;
         LIGEN.set_range(x);
 
         Target->accum_reflected(&LIGEN);

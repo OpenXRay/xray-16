@@ -13,7 +13,8 @@ const bool g_dedicated_server = false;
 
 void stats_manager::increment_stats(u32 size, enum_stats_buffer_type type, _D3DPOOL location)
 {
-    if (g_dedicated_server) return;
+    if (g_dedicated_server)
+        return;
 
     R_ASSERT(type >= 0 && type < enum_stats_buffer_type_COUNT);
     R_ASSERT(location >= 0 && location <= D3DPOOL_SCRATCH);
@@ -22,7 +23,8 @@ void stats_manager::increment_stats(u32 size, enum_stats_buffer_type type, _D3DP
 
 void stats_manager::increment_stats(u32 size, enum_stats_buffer_type type, _D3DPOOL location, void* buff_ptr)
 {
-    if (g_dedicated_server) return;
+    if (g_dedicated_server)
+        return;
 
     R_ASSERT(buff_ptr != NULL);
     R_ASSERT(type >= 0 && type < enum_stats_buffer_type_COUNT);
@@ -42,7 +44,8 @@ void stats_manager::increment_stats(u32 size, enum_stats_buffer_type type, _D3DP
 
 void stats_manager::increment_stats_rtarget(ID3DTexture2D* buff)
 {
-    if (g_dedicated_server) return;
+    if (g_dedicated_server)
+        return;
 
     _D3DPOOL pool = D3DPOOL_MANAGED;
 #if defined(USE_DX10) || defined(USE_DX11)
@@ -60,7 +63,8 @@ void stats_manager::increment_stats_rtarget(ID3DTexture2D* buff)
 
 void stats_manager::increment_stats_vb(ID3DVertexBuffer* buff)
 {
-    if (g_dedicated_server) return;
+    if (g_dedicated_server)
+        return;
 
 #if defined(USE_DX10) || defined(USE_DX11)
     D3D_BUFFER_DESC desc;
@@ -75,7 +79,8 @@ void stats_manager::increment_stats_vb(ID3DVertexBuffer* buff)
 
 void stats_manager::increment_stats_ib(ID3DIndexBuffer* buff)
 {
-    if (g_dedicated_server) return;
+    if (g_dedicated_server)
+        return;
 
 #if defined(USE_DX10) || defined(USE_DX11)
     D3D_BUFFER_DESC desc;
@@ -90,11 +95,13 @@ void stats_manager::increment_stats_ib(ID3DIndexBuffer* buff)
 
 void stats_manager::decrement_stats_rtarget(ID3DTexture2D* buff)
 {
-    if (buff == NULL || g_dedicated_server) return;
+    if (buff == NULL || g_dedicated_server)
+        return;
 
     buff->AddRef();
     int refcnt = 0;
-    if ((refcnt = buff->Release()) > 1) return;
+    if ((refcnt = buff->Release()) > 1)
+        return;
 
     _D3DPOOL pool = D3DPOOL_MANAGED;
 #if defined(USE_DX10) || defined(USE_DX11)
@@ -112,11 +119,13 @@ void stats_manager::decrement_stats_rtarget(ID3DTexture2D* buff)
 
 void stats_manager::decrement_stats_vb(ID3DVertexBuffer* buff)
 {
-    if (buff == NULL || g_dedicated_server) return;
+    if (buff == NULL || g_dedicated_server)
+        return;
 
     buff->AddRef();
     int refcnt = 0;
-    if ((refcnt = buff->Release()) > 1) return;
+    if ((refcnt = buff->Release()) > 1)
+        return;
 
 #if defined(USE_DX10) || defined(USE_DX11)
     D3D_BUFFER_DESC desc;
@@ -131,11 +140,13 @@ void stats_manager::decrement_stats_vb(ID3DVertexBuffer* buff)
 
 void stats_manager::decrement_stats_ib(ID3DIndexBuffer* buff)
 {
-    if (buff == NULL || g_dedicated_server) return;
+    if (buff == NULL || g_dedicated_server)
+        return;
 
     buff->AddRef();
     int refcnt = 0;
-    if ((refcnt = buff->Release()) > 1) return;
+    if ((refcnt = buff->Release()) > 1)
+        return;
 
 #if defined(USE_DX10) || defined(USE_DX11)
     D3D_BUFFER_DESC desc;
@@ -150,7 +161,8 @@ void stats_manager::decrement_stats_ib(ID3DIndexBuffer* buff)
 
 void stats_manager::decrement_stats(u32 size, enum_stats_buffer_type type, _D3DPOOL location)
 {
-    if (g_dedicated_server) return;
+    if (g_dedicated_server)
+        return;
 
     R_ASSERT(type >= 0 && type < enum_stats_buffer_type_COUNT);
     R_ASSERT(location >= 0 && location <= D3DPOOL_SCRATCH);
@@ -159,7 +171,8 @@ void stats_manager::decrement_stats(u32 size, enum_stats_buffer_type type, _D3DP
 
 void stats_manager::decrement_stats(u32 size, enum_stats_buffer_type type, _D3DPOOL location, void* buff_ptr)
 {
-    if (buff_ptr == 0 || g_dedicated_server) return;
+    if (buff_ptr == 0 || g_dedicated_server)
+        return;
 
 #ifdef DEBUG
     xr_vector<stats_item>::iterator it = m_buffers_list.begin();
@@ -167,7 +180,8 @@ void stats_manager::decrement_stats(u32 size, enum_stats_buffer_type type, _D3DP
     bool find = false;
     for (; it != en; ++it)
     {
-        if (it->buff_ptr == buff_ptr) {
+        if (it->buff_ptr == buff_ptr)
+        {
             // The pointers may coincide so this assertion may some times fail normally.
             // R_ASSERT ( it->type == type && it->location == location && it->size == size );
             m_buffers_list.erase(it);
@@ -175,9 +189,9 @@ void stats_manager::decrement_stats(u32 size, enum_stats_buffer_type type, _D3DP
             break;
         }
     }
-    R_ASSERT(find);  //  "Specified buffer not fount in the buffers list.
-                     //	The buffer may not incremented to stats or it already was removed"
-#endif               // DEBUG
+    R_ASSERT(find); //  "Specified buffer not fount in the buffers list.
+//	The buffer may not incremented to stats or it already was removed"
+#endif // DEBUG
 
     memory_usage_summary[type][location] -= size;
 }

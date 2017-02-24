@@ -72,23 +72,26 @@ void CStalkerActionReachEnemyLocation::execute()
 {
 #ifdef TEST_MENTAL_STATE
     VERIFY((start_level_time() == Device.dwTimeGlobal) || (object().movement().mental_state() == eMentalStateDanger));
-#endif  // TEST_MENTAL_STATE
+#endif // TEST_MENTAL_STATE
 
     inherited::execute();
 
     MemorySpace::CMemoryInfo mem_object = object().memory().memory(object().memory().enemy().selected());
 
-    if (!mem_object.m_object) return;
+    if (!mem_object.m_object)
+        return;
 
     const MemorySpace::CHitObject* hit = object().memory().hit().hit(object().memory().enemy().selected());
-    if (hit && hit->m_level_time > m_last_hit_time) {
+    if (hit && hit->m_level_time > m_last_hit_time)
+    {
         m_combat_storage->set_property(eWorldPropertyLookedOut, false);
         m_combat_storage->set_property(eWorldPropertyPositionHolded, false);
         m_combat_storage->set_property(eWorldPropertyEnemyDetoured, false);
         return;
     }
 
-    if (object().movement().path_completed()) {
+    if (object().movement().path_completed())
+    {
 #if 0
 		object().m_ce_ambush->setup		(mem_object.m_object_params.m_position,mem_object.m_self_params.m_position,10.f);
 		const CCoverPoint				*point = ai().cover_manager().best_cover(mem_object.m_object_params.m_position,10.f,*object().m_ce_ambush,CStalkerMovementRestrictor(m_object,true));
@@ -104,7 +107,8 @@ void CStalkerActionReachEnemyLocation::execute()
 		else
 			object().movement().set_nearest_accessible_position	();
 #else
-        if (object().movement().accessible(mem_object.m_object_params.m_level_vertex_id)) {
+        if (object().movement().accessible(mem_object.m_object_params.m_level_vertex_id))
+        {
             object().movement().set_level_dest_vertex(mem_object.m_object_params.m_level_vertex_id);
             //			object().movement().set_desired_position	(0);
         }
@@ -120,12 +124,13 @@ void CStalkerActionReachEnemyLocation::execute()
             true));
 #endif
 
-        if (object().movement().path_completed()) {
+        if (object().movement().path_completed())
+        {
             m_storage->set_property(eWorldPropertyEnemyLocationReached, true);
 
 #ifndef SILENT_COMBAT
             play_start_search_sound(0, 0, 10000, 10000);
-#endif  // SILENT_COMBAT
+#endif // SILENT_COMBAT
         }
     }
     else
@@ -158,21 +163,19 @@ void CStalkerActionReachAmbushLocation::initialize()
         m_last_hit_time = hit->m_level_time;
 }
 
-void CStalkerActionReachAmbushLocation::finalize()
-{
-    inherited::finalize();
-}
-
+void CStalkerActionReachAmbushLocation::finalize() { inherited::finalize(); }
 void CStalkerActionReachAmbushLocation::execute()
 {
     inherited::execute();
 
     MemorySpace::CMemoryInfo mem_object = object().memory().memory(object().memory().enemy().selected());
 
-    if (!mem_object.m_object) return;
+    if (!mem_object.m_object)
+        return;
 
     const MemorySpace::CHitObject* hit = object().memory().hit().hit(object().memory().enemy().selected());
-    if (hit && hit->m_level_time > m_last_hit_time) {
+    if (hit && hit->m_level_time > m_last_hit_time)
+    {
         m_combat_storage->set_property(eWorldPropertyLookedOut, false);
         m_combat_storage->set_property(eWorldPropertyPositionHolded, false);
         m_combat_storage->set_property(eWorldPropertyEnemyDetoured, false);
@@ -182,23 +185,26 @@ void CStalkerActionReachAmbushLocation::execute()
     object().m_ce_ambush->setup(mem_object.m_object_params.m_position, mem_object.m_self_params.m_position, 10.f);
     const CCoverPoint* point = ai().cover_manager().best_cover(
         mem_object.m_object_params.m_position, 10.f, *object().m_ce_ambush, CStalkerMovementRestrictor(m_object, true));
-    if (!point) {
+    if (!point)
+    {
         object().m_ce_ambush->setup(mem_object.m_object_params.m_position, mem_object.m_self_params.m_position, 10.f);
         point = ai().cover_manager().best_cover(mem_object.m_object_params.m_position, 30.f, *object().m_ce_ambush,
             CStalkerMovementRestrictor(m_object, true));
     }
 
-    if (point) {
+    if (point)
+    {
         object().movement().set_level_dest_vertex(point->level_vertex_id());
         object().movement().set_desired_position(&point->position());
     }
     else
         object().movement().set_nearest_accessible_position();
 
-    if (!object().movement().path_completed()) {
+    if (!object().movement().path_completed())
+    {
 #ifndef SILENT_COMBAT
         play_enemy_lost_sound(0, 0, 10000, 10000);
-#endif  // SILENT_COMBAT
+#endif // SILENT_COMBAT
         return;
     }
 
@@ -229,30 +235,30 @@ void CStalkerActionHoldAmbushLocation::initialize()
     object().sight().setup(CSightAction(SightManager::eSightTypeCoverLookOver, true));
 }
 
-void CStalkerActionHoldAmbushLocation::finalize()
-{
-    inherited::finalize();
-}
-
+void CStalkerActionHoldAmbushLocation::finalize() { inherited::finalize(); }
 void CStalkerActionHoldAmbushLocation::execute()
 {
     inherited::execute();
 
     MemorySpace::CMemoryInfo mem_object = object().memory().memory(object().memory().enemy().selected());
 
-    if (!mem_object.m_object) return;
+    if (!mem_object.m_object)
+        return;
 
     const MemorySpace::CHitObject* hit = object().memory().hit().hit(object().memory().enemy().selected());
-    if (hit && hit->m_level_time > m_last_hit_time) {
+    if (hit && hit->m_level_time > m_last_hit_time)
+    {
         m_combat_storage->set_property(eWorldPropertyLookedOut, false);
         m_combat_storage->set_property(eWorldPropertyPositionHolded, false);
         m_combat_storage->set_property(eWorldPropertyEnemyDetoured, false);
         return;
     }
 
-    if (!completed()) return;
+    if (!completed())
+        return;
 
-    if (mem_object.m_last_level_time + 60000 < Device.dwTimeGlobal) return;
+    if (mem_object.m_last_level_time + 60000 < Device.dwTimeGlobal)
+        return;
 
     object().memory().enable(object().memory().enemy().selected(), false);
 }

@@ -39,7 +39,8 @@ public:
     inline_ Container& Add(udword entry)
     {
         // Resize if needed
-        if (mCurNbEntries == mMaxNbEntries) Resize();
+        if (mCurNbEntries == mMaxNbEntries)
+            Resize();
 
         // Add _new_ entry
         mEntries[mCurNbEntries++] = entry;
@@ -49,7 +50,8 @@ public:
     inline_ Container& Add(const udword* entries, udword nb)
     {
         // Resize if needed
-        if (mCurNbEntries + nb > mMaxNbEntries) Resize(nb);
+        if (mCurNbEntries + nb > mMaxNbEntries)
+            Resize(nb);
 
         // Add _new_ entry
         CopyMemory(&mEntries[mCurNbEntries], entries, nb * sizeof(udword));
@@ -74,7 +76,8 @@ public:
     inline_ Container& Add(float entry)
     {
         // Resize if needed
-        if (mCurNbEntries == mMaxNbEntries) Resize();
+        if (mCurNbEntries == mMaxNbEntries)
+            Resize();
 
         // Add _new_ entry
         mEntries[mCurNbEntries++] = IR(entry);
@@ -84,7 +87,8 @@ public:
     inline_ Container& Add(const float* entries, udword nb)
     {
         // Resize if needed
-        if (mCurNbEntries + nb > mMaxNbEntries) Resize(nb);
+        if (mCurNbEntries + nb > mMaxNbEntries)
+            Resize(nb);
 
         // Add _new_ entry
         CopyMemory(&mEntries[mCurNbEntries], entries, nb * sizeof(float));
@@ -95,7 +99,8 @@ public:
     //! Add unique [slow]
     Container& AddUnique(udword entry)
     {
-        if (!Contains(entry)) Add(entry);
+        if (!Contains(entry))
+            Add(entry);
         return *this;
     }
 
@@ -128,7 +133,8 @@ public:
     {
         // Avoid the write if possible
         // ### CMOV
-        if (mCurNbEntries) mCurNbEntries = 0;
+        if (mCurNbEntries)
+            mCurNbEntries = 0;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -157,23 +163,21 @@ public:
     //! Deletes the very last entry.
     inline_ void DeleteLastEntry()
     {
-        if (mCurNbEntries) mCurNbEntries--;
+        if (mCurNbEntries)
+            mCurNbEntries--;
     }
     //! Deletes the entry whose index is given
     inline_ void DeleteIndex(udword index) { mEntries[index] = mEntries[--mCurNbEntries]; }
-
     // Helpers
     Container& FindNext(udword& entry, bool wrap = false);
     Container& FindPrev(udword& entry, bool wrap = false);
     // Data access.
-    inline_ udword GetNbEntries() const { return mCurNbEntries; }    //!< Returns the current number of entries.
-    inline_ udword GetEntry(udword i) const { return mEntries[i]; }  //!< Returns ith entry
-    inline_ udword* GetEntries() const { return mEntries; }          //!< Returns the list of entries.
-
+    inline_ udword GetNbEntries() const { return mCurNbEntries; } //!< Returns the current number of entries.
+    inline_ udword GetEntry(udword i) const { return mEntries[i]; } //!< Returns ith entry
+    inline_ udword* GetEntries() const { return mEntries; } //!< Returns the list of entries.
     // Growth control
-    inline_ float GetGrowthFactor() const { return mGrowthFactor; }         //!< Returns the growth factor
-    inline_ void SetGrowthFactor(float growth) { mGrowthFactor = growth; }  //!< Sets the growth factor
-
+    inline_ float GetGrowthFactor() const { return mGrowthFactor; } //!< Returns the growth factor
+    inline_ void SetGrowthFactor(float growth) { mGrowthFactor = growth; } //!< Sets the growth factor
     //! Access as an array
     inline_ udword& operator[](udword i) const
     {
@@ -195,19 +199,18 @@ public:
 #ifdef CONTAINER_STATS
     inline_ udword GetNbContainers() const { return mNbContainers; }
     inline_ udword GetTotalBytes() const { return mUsedRam; }
-
 private:
-    static udword mNbContainers;  //!< Number of containers around
-    static udword mUsedRam;       //!< Amount of bytes used by containers in the system
+    static udword mNbContainers; //!< Number of containers around
+    static udword mUsedRam; //!< Amount of bytes used by containers in the system
 #endif
 private:
     // Resizing
     bool Resize(udword needed = 1);
     // Data
-    udword mMaxNbEntries;  //!< Maximum possible number of entries
-    udword mCurNbEntries;  //!< Current number of entries
-    udword* mEntries;      //!< List of entries
-    float mGrowthFactor;   //!< Resize: _new_ number of entries = old number * mGrowthFactor
+    udword mMaxNbEntries; //!< Maximum possible number of entries
+    udword mCurNbEntries; //!< Current number of entries
+    udword* mEntries; //!< List of entries
+    float mGrowthFactor; //!< Resize: _new_ number of entries = old number * mGrowthFactor
 };
 
 class ICECORE_API Pairs : public Container
@@ -216,10 +219,8 @@ public:
     // Constructor / Destructor
     inline_ Pairs() {}
     inline_ ~Pairs() {}
-
     inline_ udword GetNbPairs() const { return GetNbEntries() >> 1; }
     inline_ Pair* GetPairs() const { return (Pair*)GetEntries(); }
-
     Pairs& AddPair(const Pair& p)
     {
         Add(p.id0).Add(p.id1);
@@ -227,4 +228,4 @@ public:
     }
 };
 
-#endif  // __ICECONTAINER_H__
+#endif // __ICECONTAINER_H__

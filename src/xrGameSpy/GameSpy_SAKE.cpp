@@ -21,7 +21,8 @@ shared_str const CGameSpy_SAKE::TryToTranslate(SAKEStartRequestResult const& req
 SAKEStartupResult xrGS_sakeStartup(SAKE* sakePtr)
 {
     SAKEStartupResult tmp_res = sakeStartup(sakePtr);
-    if (tmp_res == SAKEStartupResult_SUCCESS) {
+    if (tmp_res == SAKEStartupResult_SUCCESS)
+    {
         char secret_key[32];
         memset(secret_key, 0, sizeof(secret_key));
         FillSecretKey(secret_key);
@@ -33,7 +34,8 @@ SAKEStartupResult xrGS_sakeStartup(SAKE* sakePtr)
 void CGameSpy_SAKE::Init()
 {
     SAKEStartupResult result = sakeStartup(&m_sake_inst);
-    if (result == SAKEStartupResult_SUCCESS) {
+    if (result == SAKEStartupResult_SUCCESS)
+    {
         char secret_key[32];
         memset(secret_key, 0, sizeof(secret_key));
         FillSecretKey(secret_key);
@@ -52,7 +54,8 @@ CGameSpy_SAKE::CGameSpy_SAKE()
 
 CGameSpy_SAKE::~CGameSpy_SAKE()
 {
-    if (m_sake_inst) {
+    if (m_sake_inst)
+    {
         sakeShutdown(m_sake_inst);
     }
 }
@@ -62,11 +65,7 @@ void CGameSpy_SAKE::SetProfile(int profileId, const char* loginTicket)
     sakeSetProfile(m_sake_inst, profileId, loginTicket);
 }
 
-SAKEStartRequestResult CGameSpy_SAKE::GetRequestResult()
-{
-    return sakeGetStartRequestResult(m_sake_inst);
-}
-
+SAKEStartRequestResult CGameSpy_SAKE::GetRequestResult() { return sakeGetStartRequestResult(m_sake_inst); }
 SAKERequest CGameSpy_SAKE::GetMyRecords(SAKEGetMyRecordsInput* input, SAKERequestCallback callback, void* userData)
 {
     return sakeGetMyRecords(m_sake_inst, input, callback, userData);

@@ -57,7 +57,8 @@ CUIMpAdminMenu::~CUIMpAdminMenu()
 
 void CUIMpAdminMenu::Init()
 {
-    if (!xml_doc) xml_doc = new CUIXml();
+    if (!xml_doc)
+        xml_doc = new CUIXml();
 
     xml_doc->Load(CONFIG_PATH, UI_PATH, "ui_mp_admin_menu.xml");
 
@@ -82,12 +83,14 @@ void CUIMpAdminMenu::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     {
     case TAB_CHANGED:
     {
-        if (pWnd == m_pTabControl) SetActiveSubdialog(m_pTabControl->GetActiveId());
+        if (pWnd == m_pTabControl)
+            SetActiveSubdialog(m_pTabControl->GetActiveId());
         break;
     }
     case BUTTON_CLICKED:
     {
-        if (pWnd == m_pClose) HideDialog();
+        if (pWnd == m_pClose)
+            HideDialog();
         break;
     }
     default:
@@ -99,7 +102,8 @@ void CUIMpAdminMenu::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 }
 bool CUIMpAdminMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (dik == DIK_ESCAPE && keyboard_action == WINDOW_KEY_PRESSED) {
+    if (dik == DIK_ESCAPE && keyboard_action == WINDOW_KEY_PRESSED)
+    {
         if (m_pActiveDialog == m_pServerAdm && m_pServerAdm->IsBackBtnShown())
             m_pServerAdm->OnBackBtn();
         else
@@ -113,9 +117,11 @@ bool CUIMpAdminMenu::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 
 void CUIMpAdminMenu::SetActiveSubdialog(const shared_str& section)
 {
-    if (m_sActiveSection == section) return;
+    if (m_sActiveSection == section)
+        return;
 
-    if (m_pActiveDialog) {
+    if (m_pActiveDialog)
+    {
         DetachChild(m_pActiveDialog);
         m_pActiveDialog->Show(false);
     }

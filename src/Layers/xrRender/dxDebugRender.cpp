@@ -15,7 +15,8 @@ dxDebugRender::dxDebugRender()
 
 void dxDebugRender::Render()
 {
-    if (m_line_vertices.empty()) return;
+    if (m_line_vertices.empty())
+        return;
 
     RCache.set_xform_world(Fidentity);
     RCache.dbg_Draw(D3DPT_LINELIST, &*m_line_vertices.begin(), m_line_vertices.size(), &*m_line_indices.begin(),
@@ -28,12 +29,14 @@ void dxDebugRender::try_render(u32 const& vertex_count, u32 const& index_count)
 {
     VERIFY((m_line_indices.size() % 2) == 0);
 
-    if ((m_line_vertices.size() + vertex_count) >= line_vertex_limit) {
+    if ((m_line_vertices.size() + vertex_count) >= line_vertex_limit)
+    {
         Render();
         return;
     }
 
-    if ((m_line_indices.size() + 2 * index_count) >= line_index_limit) {
+    if ((m_line_indices.size() + 2 * index_count) >= line_index_limit)
+    {
         Render();
         return;
     }
@@ -74,7 +77,7 @@ void dxDebugRender::NextSceneMode()
 //	This mode is not supported in DX10
 #ifndef USE_DX10
     HW.Caps.SceneMode = (HW.Caps.SceneMode + 1) % 3;
-#endif  //	USE_DX10
+#endif //	USE_DX10
 }
 
 void dxDebugRender::ZEnable(bool bEnable)
@@ -83,34 +86,18 @@ void dxDebugRender::ZEnable(bool bEnable)
     RCache.set_Z(bEnable);
 }
 
-void dxDebugRender::OnFrameEnd()
-{
-    RCache.OnFrameEnd();
-}
-
-void dxDebugRender::SetShader(const debug_shader& shader)
-{
-    RCache.set_Shader(((dxUIShader*)&*shader)->hShader);
-}
-
-void dxDebugRender::CacheSetXformWorld(const Fmatrix& M)
-{
-    RCache.set_xform_world(M);
-}
-
-void dxDebugRender::CacheSetCullMode(CullMode m)
-{
-    RCache.set_CullMode(CULL_NONE + m);
-}
-
+void dxDebugRender::OnFrameEnd() { RCache.OnFrameEnd(); }
+void dxDebugRender::SetShader(const debug_shader& shader) { RCache.set_Shader(((dxUIShader*)&*shader)->hShader); }
+void dxDebugRender::CacheSetXformWorld(const Fmatrix& M) { RCache.set_xform_world(M); }
+void dxDebugRender::CacheSetCullMode(CullMode m) { RCache.set_CullMode(CULL_NONE + m); }
 void dxDebugRender::SetAmbient(u32 colour)
 {
 #if defined(USE_DX10) || defined(USE_DX11)
     //	TODO: DX10: Check if need this for DX10
     VERIFY(!"Not implemented for DX10");
-#else   //	USE_DX10
+#else //	USE_DX10
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_AMBIENT, colour));
-#endif  //	USE_DX10
+#endif //	USE_DX10
 }
 
 void dxDebugRender::SetDebugShader(dbgShaderHandle shdHandle)
@@ -118,7 +105,7 @@ void dxDebugRender::SetDebugShader(dbgShaderHandle shdHandle)
     R_ASSERT(shdHandle < dbgShaderCount);
 
     static const LPCSTR dbgShaderParams[][2] = {
-        {"hud\\default", "ui\\ui_pop_up_active_back"},  // dbgShaderWindow
+        {"hud\\default", "ui\\ui_pop_up_active_back"}, // dbgShaderWindow
     };
 
     if (!m_dbgShaders[shdHandle])
@@ -155,7 +142,6 @@ public:
     }
 
     virtual ~RDebugRender() { Device.seqRender.Remove(this); }
-
     void OnRender()
     {
         m_line_indices = _line_indices;
@@ -173,4 +159,4 @@ public:
 } rdebug_render_impl;
 dxDebugRender* rdebug_render = &rdebug_render_impl;
 
-#endif  //	DEBUG
+#endif //	DEBUG

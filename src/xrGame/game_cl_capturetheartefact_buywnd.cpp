@@ -14,7 +14,7 @@ void game_cl_CaptureTheArtefact::OnBuyMenu_Ok()
 {
 #ifdef DEBUG
     Msg("--- CTA: Buy menu OK...");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     typedef CUIGameCTA::BuyMenuItemsCollection TBuyCol;
 
     VERIFY2(m_game_ui, "game ui not initialized");
@@ -22,8 +22,10 @@ void game_cl_CaptureTheArtefact::OnBuyMenu_Ok()
     s32 moneyDif = 0;
     m_game_ui->GetPurchaseItems(toBuyItemsCollection, moneyDif);
     R_ASSERT(local_player);
-    if (local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) {
-        if (InWarmUp()) {
+    if (local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
+    {
+        if (InWarmUp())
+        {
             buy_amount = 0;
         }
         else
@@ -39,7 +41,8 @@ void game_cl_CaptureTheArtefact::OnBuyMenu_Ok()
     NET_Packet P;
     pPlayer->u_EventGen(P, GE_GAME_EVENT, pPlayer->ID());
     P.w_u16(GAME_EVENT_PLAYER_BUY_FINISHED);
-    if (InWarmUp()) {
+    if (InWarmUp())
+    {
         P.w_s32(0);
     }
     else
@@ -58,7 +61,8 @@ void game_cl_CaptureTheArtefact::OnBuyMenu_Ok()
 
     pPlayer->u_EventSend(P);
 
-    if (local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) {
+    if (local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
+    {
         u_EventGen(P, GE_GAME_EVENT, local_player->GameID);
         P.w_u16(GAME_EVENT_PLAYER_BUYMENU_CLOSE);
         u_EventSend(P);
@@ -68,7 +72,8 @@ void game_cl_CaptureTheArtefact::OnBuyMenu_Ok()
 
 void game_cl_CaptureTheArtefact::OnBuyMenu_Cancel()
 {
-    if (local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) {
+    if (local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
+    {
         NET_Packet P;
         u_EventGen(P, GE_GAME_EVENT, local_player->GameID);
         P.w_u16(GAME_EVENT_PLAYER_BUYMENU_CLOSE);
@@ -78,7 +83,8 @@ void game_cl_CaptureTheArtefact::OnBuyMenu_Cancel()
 
 void game_cl_CaptureTheArtefact::OnBuyMenuOpen()
 {
-    if (local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) {
+    if (local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
+    {
         NET_Packet P;
         u_EventGen(P, GE_GAME_EVENT, local_player->GameID);
         P.w_u16(GAME_EVENT_PLAYER_BUYMENU_OPEN);
@@ -88,7 +94,8 @@ void game_cl_CaptureTheArtefact::OnBuyMenuOpen()
 
 bool game_cl_CaptureTheArtefact::LocalPlayerCanBuyItem(shared_str const& name_sect)
 {
-    if (name_sect == "mp_wpn_knife") return true;
+    if (name_sect == "mp_wpn_knife")
+        return true;
     R_ASSERT(m_game_ui);
     return m_game_ui->CanBuyItem(name_sect);
 }

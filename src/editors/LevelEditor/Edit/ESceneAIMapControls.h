@@ -13,7 +13,7 @@ class TUI_ControlAIMapNodeAdd : public TUI_CustomControl
 {
     int append_nodes;
 
-  public:
+public:
     TUI_ControlAIMapNodeAdd(int st, int act, ESceneToolBase* parent);
     virtual bool Start(TShiftState _Shift);
     virtual bool End(TShiftState _Shift);
@@ -23,7 +23,7 @@ class TUI_ControlAIMapNodeAdd : public TUI_CustomControl
 //---------------------------------------------------------------------------
 class TUI_ControlAIMapNodeMove : public TUI_CustomControl
 {
-  public:
+public:
     TUI_ControlAIMapNodeMove(int st, int act, ESceneToolBase* parent);
     virtual bool Start(TShiftState _Shift);
     virtual bool End(TShiftState _Shift);
@@ -33,7 +33,7 @@ class TUI_ControlAIMapNodeMove : public TUI_CustomControl
 //---------------------------------------------------------------------------
 class TUI_ControlAIMapNodeRotate : public TUI_CustomControl
 {
-  public:
+public:
     TUI_ControlAIMapNodeRotate(int st, int act, ESceneToolBase* parent);
     virtual bool Start(TShiftState _Shift);
     virtual bool End(TShiftState _Shift);
@@ -41,4 +41,4 @@ class TUI_ControlAIMapNodeRotate : public TUI_CustomControl
 };
 
 //---------------------------------------------------------------------------
-#endif  // UI_AIMapToolsH
+#endif // UI_AIMapToolsH

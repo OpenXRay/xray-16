@@ -12,7 +12,7 @@ s16 QC(float v)
     return s16(t);
 }
 
-D3DVERTEXELEMENT9 decl[] =  // 12+4+4+4+8=32
+D3DVERTEXELEMENT9 decl[] = // 12+4+4+4+8=32
     {{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
         {0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0},
         {0, 16, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TANGENT, 0},
@@ -107,6 +107,7 @@ void export_geometry(xrMU_Model& mu_model)
             LPWORD(&*it->ogf->data.faces.begin()), LPWORD(&*it->ogf->data.faces.end()), &it->ib_id, &it->ib_start);
 
         // SW
-        if (it->ogf->progressive_test()) g_SWI.Register(&it->sw_id, &it->ogf->data.m_SWI);
+        if (it->ogf->progressive_test())
+            g_SWI.Register(&it->sw_id, &it->ogf->data.m_SWI);
     }
 }

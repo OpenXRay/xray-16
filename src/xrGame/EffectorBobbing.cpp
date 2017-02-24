@@ -28,10 +28,7 @@ CEffectorBobbing::CEffectorBobbing() : CEffectorCam(eCEBobbing, 10000.f)
     m_fSpeedLimp = pSettings->r_float(BOBBING_SECT, "limp_speed");
 }
 
-CEffectorBobbing::~CEffectorBobbing()
-{
-}
-
+CEffectorBobbing::~CEffectorBobbing() {}
 void CEffectorBobbing::SetState(u32 mstate, bool limping, bool ZoomMode)
 {
     dwMState = mstate;
@@ -42,7 +39,8 @@ void CEffectorBobbing::SetState(u32 mstate, bool limping, bool ZoomMode)
 BOOL CEffectorBobbing::ProcessCam(SCamEffectorInfo& info)
 {
     fTime += Device.fTimeDelta;
-    if (dwMState & ACTOR_DEFS::mcAnyMove) {
+    if (dwMState & ACTOR_DEFS::mcAnyMove)
+    {
         if (fReminderFactor < 1.f)
             fReminderFactor += SPEED_REMINDER * Device.fTimeDelta;
         else
@@ -55,7 +53,8 @@ BOOL CEffectorBobbing::ProcessCam(SCamEffectorInfo& info)
         else
             fReminderFactor = 0.f;
     }
-    if (!fsimilar(fReminderFactor, 0)) {
+    if (!fsimilar(fReminderFactor, 0))
+    {
         Fmatrix M;
         M.identity();
         M.j.set(info.n);
@@ -69,7 +68,8 @@ BOOL CEffectorBobbing::ProcessCam(SCamEffectorInfo& info)
 
         float A, ST;
 
-        if (isActorAccelerated(dwMState, m_bZoomMode)) {
+        if (isActorAccelerated(dwMState, m_bZoomMode))
+        {
             A = m_fAmplitudeRun * k;
             ST = m_fSpeedRun * fTime * k;
         }

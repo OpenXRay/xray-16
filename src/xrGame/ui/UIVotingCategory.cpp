@@ -52,7 +52,8 @@ CUIVotingCategory::~CUIVotingCategory()
 
 void CUIVotingCategory::InitVotingCategory()
 {
-    if (!xml_doc) xml_doc = new CUIXml();
+    if (!xml_doc)
+        xml_doc = new CUIXml();
 
     xml_doc->Load(CONFIG_PATH, UI_PATH, "voting_category.xml");
 
@@ -75,11 +76,14 @@ void CUIVotingCategory::InitVotingCategory()
 
 void CUIVotingCategory::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
-    if (BUTTON_CLICKED == msg) {
-        if (btn_cancel == pWnd) OnBtnCancel();
+    if (BUTTON_CLICKED == msg)
+    {
+        if (btn_cancel == pWnd)
+            OnBtnCancel();
         for (int i = 0; i < 7; i++)
         {
-            if (btn[i] == pWnd) {
+            if (btn[i] == pWnd)
+            {
                 OnBtn(i);
                 return;
             }
@@ -93,12 +97,15 @@ bool CUIVotingCategory::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     CUIDialogWnd::OnKeyboardAction(dik, keyboard_action);
 
-    if (WINDOW_KEY_PRESSED == keyboard_action) {
-        if (DIK_ESCAPE == dik) {
+    if (WINDOW_KEY_PRESSED == keyboard_action)
+    {
+        if (DIK_ESCAPE == dik)
+        {
             OnBtnCancel();
             return true;
         }
-        if (dik >= DIK_1 && dik <= DIK_7) OnBtn(dik - DIK_1);
+        if (dik >= DIK_1 && dik <= DIK_7)
+            OnBtn(dik - DIK_1);
         return true;
     }
     return false;
@@ -112,7 +119,8 @@ void CUIVotingCategory::OnBtn(int i)
 
     // check buttons state, based on voting mask
     u16 flag = 1 << (u16(i + 1) & 0xff);
-    if (Game().IsVotingEnabled(flag)) {
+    if (Game().IsVotingEnabled(flag))
+    {
         switch (i)
         {
         case 0:
@@ -125,31 +133,36 @@ void CUIVotingCategory::OnBtn(int i)
             break;
         case 2:
             HideDialog();
-            if (!kick) kick = new CUIKickPlayer();
+            if (!kick)
+                kick = new CUIKickPlayer();
             kick->InitKick(*xml_doc);
             kick->ShowDialog(true);
             break;
         case 3:
             HideDialog();
-            if (!kick) kick = new CUIKickPlayer();
+            if (!kick)
+                kick = new CUIKickPlayer();
             kick->InitBan(*xml_doc);
             kick->ShowDialog(true);
             break;
         case 4:
             HideDialog();
-            if (!change_map) change_map = new CUIChangeMap();
+            if (!change_map)
+                change_map = new CUIChangeMap();
             change_map->InitChangeMap(*xml_doc);
             change_map->ShowDialog(true);
             break;
         case 5:
             HideDialog();
-            if (!change_weather) change_weather = new ChangeWeatherDialog();
+            if (!change_weather)
+                change_weather = new ChangeWeatherDialog();
             change_weather->InitChangeWeather(*xml_doc);
             change_weather->ShowDialog(true);
             break;
         case 6:
             HideDialog();
-            if (!change_gametype) change_gametype = new ChangeGameTypeDialog();
+            if (!change_gametype)
+                change_gametype = new ChangeGameTypeDialog();
             change_gametype->InitChangeGameType(*xml_doc);
             change_gametype->ShowDialog(true);
             break;
@@ -158,11 +171,7 @@ void CUIVotingCategory::OnBtn(int i)
     }
 }
 
-void CUIVotingCategory::OnBtnCancel()
-{
-    HideDialog();
-}
-
+void CUIVotingCategory::OnBtnCancel() { HideDialog(); }
 void CUIVotingCategory::Update()
 {
     // check buttons state, based on voting mask

@@ -50,7 +50,7 @@ class ECORE_API CToolCustom
 {
     friendclass CCustomPreferences;
 
-  protected:
+protected:
     bool m_bReady;
 
     ETAction m_Action;
@@ -72,19 +72,19 @@ class ECORE_API CToolCustom
     float m_fRotateSnapValue;
     float m_RotateAmount;
 
-  public:
+public:
     float m_MoveSnap;
     float m_MoveSnapTo;
     float m_RotateSnapAngle;
 
-  public:
+public:
     float fFogness;
     u32 dwFogColor;
 
-  public:
+public:
     AnsiString m_LastFileName;
 
-  public:
+public:
     struct SDebugDraw
     {
         struct Face
@@ -133,7 +133,8 @@ class ECORE_API CToolCustom
             m_Points.back().c = c;
             m_Points.back().i = i;
             m_Points.back().m = m;
-            if (descr) m_Points.back().descr = descr;
+            if (descr)
+                m_Points.back().descr = descr;
         }
         void AppendLine(const Fvector& p0, const Fvector& p1, u32 c = 0xff00ff00, bool i = true, bool m = true)
         {
@@ -170,10 +171,9 @@ class ECORE_API CToolCustom
     };
     SDebugDraw m_DebugDraw;
 
-  public:
+public:
     void ClearDebugDraw() { m_DebugDraw.Clear(); }
-
-  public:
+public:
     CToolCustom();
     virtual ~CToolCustom();
 
@@ -227,7 +227,6 @@ class ECORE_API CToolCustom
     virtual bool__fastcall KeyDown(WORD Key, TShiftState Shift) { return false; }
     virtual bool__fastcall KeyUp(WORD Key, TShiftState Shift) { return false; }
     virtual bool__fastcall KeyPress(WORD Key, TShiftState Shift) { return false; }
-
     virtual bool Pick(TShiftState Shift) = 0;
     virtual bool RayPick(const Fvector& start, const Fvector& dir, float& dist, Fvector* pt = 0, Fvector* n = 0) = 0;
 
@@ -236,7 +235,6 @@ class ECORE_API CToolCustom
     virtual void RefreshProperties() = 0;
 
     const AnsiString& GetEditFileName() { return m_LastFileName; }
-
     CEditableObject* m_pAxisMoveObject;
     Fmatrix m_axis_xform;
 

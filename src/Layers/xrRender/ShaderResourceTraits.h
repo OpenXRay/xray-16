@@ -94,7 +94,8 @@ inline T* CResourceManager::CreateShader(const char* name)
 
         sh->dwFlags |= xr_resource_flagged::RF_REGISTERED;
         sh_map.insert(mk_pair(sh->set_name(name), sh));
-        if (0 == stricmp(name, "null")) {
+        if (0 == stricmp(name, "null"))
+        {
             sh->sh = NULL;
             return sh;
         }
@@ -139,12 +140,14 @@ inline void CResourceManager::DestroyShader(const T* sh)
 {
     ShaderTypeTraits<T>::MapType& sh_map = GetShaderMap<ShaderTypeTraits<T>::MapType>();
 
-    if (0 == (sh->dwFlags & xr_resource_flagged::RF_REGISTERED)) return;
+    if (0 == (sh->dwFlags & xr_resource_flagged::RF_REGISTERED))
+        return;
 
     LPSTR N = LPSTR(*sh->cName);
     typename ShaderTypeTraits<T>::MapType::iterator I = sh_map.find(N);
 
-    if (I != sh_map.end()) {
+    if (I != sh_map.end())
+    {
         sh_map.erase(I);
         return;
     }

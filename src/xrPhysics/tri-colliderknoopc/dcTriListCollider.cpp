@@ -14,12 +14,8 @@ dcTriListCollider::dcTriListCollider(dxGeom* Geometry)
     GeomData = (dxTriList*)dGeomGetClassData(Geometry);
 }
 
-dcTriListCollider::~dcTriListCollider()
-{
-}
-
-int dCollideBP(
-    const dxGeom* o1, const dxGeom* o2, int flags, dContactGeom* contact, int skip);  // ODE internal function
+dcTriListCollider::~dcTriListCollider() {}
+int dCollideBP(const dxGeom* o1, const dxGeom* o2, int flags, dContactGeom* contact, int skip); // ODE internal function
 
 //#define CONTACT(Ptr, Stride) ((dContactGeom*) (((byte*)Ptr) + (Stride)))
 //#define SURFACE(Ptr, Stride) ((dSurfaceParameters*) (((byte*)Ptr) + (Stride-sizeof(dSurfaceParameters))))
@@ -34,7 +30,8 @@ int dcTriListCollider::CollideBox(dxGeom* Box, int Flags, dContactGeom* Contacts
     AABB.y = (dFabs(BoxSides[0] * R[4]) + dFabs(BoxSides[1] * R[5]) + dFabs(BoxSides[2] * R[6])) / 2.f + 10.f * EPS_L;
     AABB.z = (dFabs(BoxSides[0] * R[8]) + dFabs(BoxSides[1] * R[9]) + dFabs(BoxSides[2] * R[10])) / 2.f + 10.f * EPS_L;
     dBodyID box_body = dGeomGetBody(Box);
-    if (box_body) {
+    if (box_body)
+    {
         const dReal* velocity = dBodyGetLinearVel(box_body);
         AABB.x += dFabs(velocity[0]) * 0.04f;
         AABB.y += dFabs(velocity[1]) * 0.04f;

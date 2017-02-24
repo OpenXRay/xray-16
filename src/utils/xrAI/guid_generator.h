@@ -15,4 +15,4 @@
 ENGINE_API extern xrGUID generate_guid();
 ENGINE_API extern LPCSTR generate_guid(const xrGUID& guid, LPSTR buffer, const u32& buffer_size);
 
-#endif  // guid_generatorH
+#endif // guid_generatorH

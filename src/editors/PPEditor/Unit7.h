@@ -18,8 +18,8 @@
 //---------------------------------------------------------------------------
 class TForm7 : public TForm
 {
-    __published :  // IDE-managed Components
-                   TPanel* Panel1;
+    __published : // IDE-managed Components
+                  TPanel* Panel1;
     TMultiObjSpinEdit* WorkTime;
     TPanel* ColorPanel;
     TSpeedButton* AddButton;
@@ -29,8 +29,8 @@ class TForm7 : public TForm
     void __fastcall ColorPanelClick(TObject* Sender);
     void __fastcall LinearFuncButtonClick(TObject* Sender);
 
-  private:  // User declarations
-  public:   // User declarations
+private: // User declarations
+public: // User declarations
     int m_iFunction;
     float tr, cr, br;
     float tg, cg, bg;

@@ -35,21 +35,9 @@ void default_behaviour_planner::setup(animation_planner* object, CPropertyStorag
     set_target_state(target);
 }
 
-void default_behaviour_planner::initialize()
-{
-    inherited::initialize();
-}
-
-void default_behaviour_planner::update()
-{
-    inherited::update();
-}
-
-void default_behaviour_planner::finalize()
-{
-    inherited::finalize();
-}
-
+void default_behaviour_planner::initialize() { inherited::initialize(); }
+void default_behaviour_planner::update() { inherited::update(); }
+void default_behaviour_planner::finalize() { inherited::finalize(); }
 void default_behaviour_planner::add_evaluators()
 {
     add_evaluator(eWorldPropertyPlannerHasTarget,
@@ -84,7 +72,4 @@ void default_behaviour_planner::add_actions()
     action->setup(&object(), inherited_action::m_storage);
 }
 
-LPCSTR default_behaviour_planner::object_name() const
-{
-    return ("default_behaviour_planner");
-}
+LPCSTR default_behaviour_planner::object_name() const { return ("default_behaviour_planner"); }

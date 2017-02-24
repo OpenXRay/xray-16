@@ -42,16 +42,13 @@ void CStalkerActionCombatBase::finalize()
 {
     inherited::finalize();
 
-    if (!object().g_Alive()) return;
+    if (!object().g_Alive())
+        return;
 
     object().sound().set_sound_mask(0);
 }
 
-bool CStalkerActionCombatBase::fire_make_sense() const
-{
-    return (object().fire_make_sense());
-}
-
+bool CStalkerActionCombatBase::fire_make_sense() const { return (object().fire_make_sense()); }
 void CStalkerActionCombatBase::fire()
 {
     Fvector enemy_position = object().memory().enemy().selected()->Position();
@@ -60,7 +57,8 @@ void CStalkerActionCombatBase::fire()
     float yaw, pitch;
     direction.getHP(yaw, pitch);
     const MonsterSpace::SBoneRotation& current_angles = object().movement().head_orientation();
-    if (angle_difference(-yaw, current_angles.current.yaw) > start_fire_angle_difference) {
+    if (angle_difference(-yaw, current_angles.current.yaw) > start_fire_angle_difference)
+    {
         aim_ready();
         return;
     }
@@ -95,14 +93,16 @@ void CStalkerActionCombatBase::select_queue_params(const float& distance, u32& m
 {
     /**/
     int weapon_type = 6;
-    if (object().best_weapon()) weapon_type = object().best_weapon()->object().ef_weapon_type();
+    if (object().best_weapon())
+        weapon_type = object().best_weapon()->object().ef_weapon_type();
 
     switch (weapon_type)
     {
     // pistols
     case 5:
     {
-        if (distance > object().pstl_queue_fire_dist_far()) {
+        if (distance > object().pstl_queue_fire_dist_far())
+        {
             min_queue_size = object().pstl_min_queue_size_far();
             max_queue_size = object().pstl_max_queue_size_far();
             min_queue_interval = object().pstl_min_queue_interval_far();
@@ -128,7 +128,8 @@ void CStalkerActionCombatBase::select_queue_params(const float& distance, u32& m
     // shotguns
     case 9:
     {
-        if (distance > object().shtg_queue_fire_dist_far()) {
+        if (distance > object().shtg_queue_fire_dist_far())
+        {
             min_queue_size = object().shtg_min_queue_size_far();
             max_queue_size = object().shtg_max_queue_size_far();
             min_queue_interval = object().shtg_min_queue_interval_far();
@@ -155,7 +156,8 @@ void CStalkerActionCombatBase::select_queue_params(const float& distance, u32& m
     case 11:
     case 12:
     {
-        if (distance > object().snp_queue_fire_dist_far()) {
+        if (distance > object().snp_queue_fire_dist_far())
+        {
             min_queue_size = object().snp_min_queue_size_far();
             max_queue_size = object().snp_max_queue_size_far();
             min_queue_interval = object().snp_min_queue_interval_far();
@@ -184,7 +186,8 @@ void CStalkerActionCombatBase::select_queue_params(const float& distance, u32& m
     case 8:
     case 10:
     {
-        if (distance > object().mchg_queue_fire_dist_far()) {
+        if (distance > object().mchg_queue_fire_dist_far())
+        {
             min_queue_size = object().mchg_min_queue_size_far();
             max_queue_size = object().mchg_max_queue_size_far();
             min_queue_interval = object().mchg_min_queue_interval_far();
@@ -209,7 +212,8 @@ void CStalkerActionCombatBase::select_queue_params(const float& distance, u32& m
     }
     default:
     {
-        if (distance > object().auto_queue_fire_dist_far()) {
+        if (distance > object().auto_queue_fire_dist_far())
+        {
             min_queue_size = object().auto_min_queue_size_far();
             max_queue_size = object().auto_max_queue_size_far();
             min_queue_interval = object().auto_min_queue_interval_far();
@@ -244,9 +248,11 @@ void CStalkerActionCombatBase::play_panic_sound(
 void CStalkerActionCombatBase::play_attack_sound(
     u32 max_start_time, u32 min_start_time, u32 max_stop_time, u32 min_stop_time, u32 id)
 {
-    if (!object().memory().enemy().selected()->human_being()) return;
+    if (!object().memory().enemy().selected()->human_being())
+        return;
 
-    if (!object().agent_manager().member().can_cry_noninfo_phrase()) return;
+    if (!object().agent_manager().member().can_cry_noninfo_phrase())
+        return;
 
     u32 sound_type = eStalkerSoundAttackNoAllies;
 #ifdef DEBUG
@@ -254,9 +260,10 @@ void CStalkerActionCombatBase::play_attack_sound(
         Msg("! I am in combat, but there is no combat members at all (including me), "
             "npc[%s],team[%d],squad[%d],group[%d]",
             *object().cName(), object().g_Team(), object().g_Squad(), object().g_Group());
-#endif  // DEBUG
+#endif // DEBUG
 
-    if (object().agent_manager().member().combat_members().size() > 1) {
+    if (object().agent_manager().member().combat_members().size() > 1)
+    {
         if (object().agent_manager().enemy().enemies().size() > 1)
             sound_type = eStalkerSoundAttackAlliesSeveralEnemies;
         else
@@ -271,14 +278,15 @@ void CStalkerActionCombatBase::play_attack_sound(
 void CStalkerActionCombatBase::play_start_search_sound(
     u32 max_start_time, u32 min_start_time, u32 max_stop_time, u32 min_stop_time, u32 id)
 {
-    if (!object().agent_manager().member().can_cry_noninfo_phrase()) return;
+    if (!object().agent_manager().member().can_cry_noninfo_phrase())
+        return;
 
 #ifdef DEBUG
     if (object().agent_manager().member().combat_members().empty())
         Msg("! I am in combat, but there is no combat members at all (including me), "
             "npc[%s],team[%d],squad[%d],group[%d]",
             *object().cName(), object().g_Team(), object().g_Squad(), object().g_Group());
-#endif  // DEBUG
+#endif // DEBUG
 
     bool search_with_allies = object().agent_manager().member().combat_members().size() > 1;
 
@@ -289,14 +297,15 @@ void CStalkerActionCombatBase::play_start_search_sound(
 void CStalkerActionCombatBase::play_enemy_lost_sound(
     u32 max_start_time, u32 min_start_time, u32 max_stop_time, u32 min_stop_time, u32 id)
 {
-    if (!object().agent_manager().member().can_cry_noninfo_phrase()) return;
+    if (!object().agent_manager().member().can_cry_noninfo_phrase())
+        return;
 
 #ifdef DEBUG
     if (object().agent_manager().member().combat_members().empty())
         Msg("! I am in combat, but there is no combat members at all (including me), "
             "npc[%s],team[%d],squad[%d],group[%d]",
             *object().cName(), object().g_Team(), object().g_Squad(), object().g_Group());
-#endif  // DEBUG
+#endif // DEBUG
 
     bool search_with_allies = object().agent_manager().member().combat_members().size() > 1;
 
@@ -306,7 +315,8 @@ void CStalkerActionCombatBase::play_enemy_lost_sound(
 
 void CStalkerActionCombatBase::setup_cover(CCoverPoint const& cover)
 {
-    if (cover.m_is_smart_cover) {
+    if (cover.m_is_smart_cover)
+    {
         object().movement().target_params().cover_id(static_cast<smart_cover::cover const&>(cover).id());
         return;
     }

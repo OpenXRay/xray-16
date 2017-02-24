@@ -20,10 +20,7 @@
 #endif
 
 #ifndef _EDITOR
-bool check_scale(Fmatrix F)
-{
-    return true;
-}
+bool check_scale(Fmatrix F) { return true; }
 #endif
 
 //----------------------------------------------------
@@ -31,7 +28,7 @@ class fBoneNameEQ
 {
     shared_str name;
 
-  public:
+public:
     fBoneNameEQ(shared_str N) : name(N){};
 
     IC
@@ -47,7 +44,7 @@ class fBoneWMNameEQ
 {
     shared_str wm_name;
 
-  public:
+public:
     fBoneWMNameEQ(shared_str N) : wm_name(N){};
 
     IC
@@ -66,9 +63,11 @@ extern u32 bone_to_delete_frame;
 
 void CEditableObject::OnFrame()
 {
-    if (IsSkeleton()) {
+    if (IsSkeleton())
+    {
         BoneVec& lst = m_Bones;
-        if (IsSMotionActive()) {
+        if (IsSMotionActive())
+        {
             Fvector R, T;
             int i = 0;
             for (BoneIt b_it = lst.begin(); b_it != lst.end(); b_it++, i++)
@@ -84,8 +83,10 @@ void CEditableObject::OnFrame()
         }
         CalculateAnimation(m_ActiveSMotion);
     }
-    if (bone_to_delete) {
-        if (EDevice.dwFrame > bone_to_delete_frame + 3) xr_delete(bone_to_delete);
+    if (bone_to_delete)
+    {
+        if (EDevice.dwFrame > bone_to_delete_frame + 3)
+            xr_delete(bone_to_delete);
     }
 }
 #endif
@@ -115,7 +116,8 @@ CSMotion* CEditableObject::ResetSAnimation(bool bGotoBindPose)
 {
     CSMotion* M = m_ActiveSMotion;
     SetActiveSMotion(0);
-    if (bGotoBindPose) GotoBindPose();
+    if (bGotoBindPose)
+        GotoBindPose();
     return M;
 }
 
@@ -126,14 +128,17 @@ static void CalculateAnimBone(CBone* bone, CSMotion* motion, Fmatrix& parent)
 {
     Flags8 flags;
     flags.zero();
-    if (motion) flags = motion->GetMotionFlags(bone->SelfID);
+    if (motion)
+        flags = motion->GetMotionFlags(bone->SelfID);
 
     Fmatrix& M = bone->_MTransform();
     Fmatrix& L = bone->_LTransform();
 
     const Fvector& r = bone->_Rotate();
-    if (!bone->callback_overwrite()) {
-        if (flags.is(st_BoneMotion::flWorldOrient)) {
+    if (!bone->callback_overwrite())
+    {
+        if (flags.is(st_BoneMotion::flWorldOrient))
+        {
             M.setXYZi(r.x, r.y, r.z);
             M.c.set(bone->_Offset());
             L.mul(parent, M);
@@ -152,7 +157,8 @@ static void CalculateAnimBone(CBone* bone, CSMotion* motion, Fmatrix& parent)
             L.mul(parent, M);
         }
     }
-    if (bone->callback()) {
+    if (bone->callback())
+    {
         bone->callback()(bone);
         M.mul_43(Fmatrix().invert(parent), L);
         // bone->_Offset().set( M.c );
@@ -185,7 +191,8 @@ static void CalculateRest(CBone* bone, Fmatrix& parent)
 
 void CEditableObject::CalculateAnimation(CSMotion* motion)
 {
-    if (!m_Bones.empty()) CalculateAnim(m_Bones.front(), motion, Fidentity);
+    if (!m_Bones.empty())
+        CalculateAnim(m_Bones.front(), motion, Fidentity);
 }
 
 float CEditableObject::GetBonesBottom()
@@ -193,7 +200,8 @@ float CEditableObject::GetBonesBottom()
     float bottom = FLT_MAX;
     VERIFY(!m_Bones.empty());
     for (BoneIt b_it = m_Bones.begin() + 1; b_it != m_Bones.end(); b_it++)
-        if (!(*b_it)->IsRoot() && (*b_it)->_LTransform().c.y < bottom) bottom = (*b_it)->_LTransform().c.y;
+        if (!(*b_it)->IsRoot() && (*b_it)->_LTransform().c.y < bottom)
+            bottom = (*b_it)->_LTransform().c.y;
     return bottom;
 }
 
@@ -209,9 +217,11 @@ static void SetBoneTransform(CBone& bone, const Fmatrix& T, const Fmatrix& paren
 bool CEditableObject::AnimateRootObject(CSMotion* motion)
 {
     VERIFY(motion);
-    if (!motion->m_Flags.test(esmRootMover)) return false;
+    if (!motion->m_Flags.test(esmRootMover))
+        return false;
     CBone& root_bone = *m_Bones[GetRootBoneID()];
-    if (root_bone.children.size() != 1) return false;
+    if (root_bone.children.size() != 1)
+        return false;
     return true;
 }
 
@@ -239,7 +249,8 @@ static void AlineYtoGlobalFrame(Fmatrix& in_out_m)
     float smk = m.k.x * m.k.x + m.k.z * m.k.z;
     bool bi = smi > EPS_S;
     bool bk = smk > EPS_S;
-    if (smk > smi && bk) {
+    if (smk > smi && bk)
+    {
         m.k.mul(1.f / _sqrt(smk));
         m.i.crossproduct(m.j, m.k);
     }
@@ -248,7 +259,7 @@ static void AlineYtoGlobalFrame(Fmatrix& in_out_m)
         m.i.mul(1.f / _sqrt(smi));
         m.k.crossproduct(m.i, m.j);
     }
-    else  // if( !bi && !bk )
+    else // if( !bi && !bk )
     {
         // unreal indeed
         m = Fidentity;
@@ -260,7 +271,8 @@ static void AlineYtoGlobalFrame(Fmatrix& in_out_m)
     //       m.k.mul( 1.f/_sqrt( smk ) );
     //   }
 
-    if (!check_scale(in_out_m)) VERIFY(check_scale(in_out_m));
+    if (!check_scale(in_out_m))
+        VERIFY(check_scale(in_out_m));
 }
 
 void CEditableObject::CalculateRootObjectAnimation(const Fmatrix& anchor)
@@ -271,7 +283,7 @@ void CEditableObject::CalculateRootObjectAnimation(const Fmatrix& anchor)
     CBone& anchor_bone = *root_bone.children[0];
     const Fmatrix gl_anchor = Fmatrix().mul_43(anchor_bone._LTransform(), anchor);
 
-    Fmatrix root_transform = gl_anchor;  // gl_anchor;
+    Fmatrix root_transform = gl_anchor; // gl_anchor;
     AlineYtoGlobalFrame(root_transform);
 
     root_transform.c = gl_anchor.c;
@@ -286,21 +298,25 @@ void CEditableObject::CalculateRootObjectAnimation(const Fmatrix& anchor)
 
 void CEditableObject::CalculateBindPose()
 {
-    if (!m_Bones.empty()) CalculateRest(m_Bones.front(), Fidentity);
+    if (!m_Bones.empty())
+        CalculateRest(m_Bones.front(), Fidentity);
 }
 
 void CEditableObject::SetActiveSMotion(CSMotion* mot)
 {
     m_ActiveSMotion = mot;
-    if (m_ActiveSMotion) m_SMParam.Set(m_ActiveSMotion);
+    if (m_ActiveSMotion)
+        m_SMParam.Set(m_ActiveSMotion);
 }
 
 bool CEditableObject::RemoveSMotion(const char* name)
 {
     SMotionVec& lst = m_SMotions;
     for (SMotionIt m = lst.begin(); m != lst.end(); m++)
-        if ((stricmp((*m)->Name(), name) == 0)) {
-            if (m_ActiveSMotion == *m) SetActiveSMotion(0);
+        if ((stricmp((*m)->Name(), name) == 0))
+        {
+            if (m_ActiveSMotion == *m)
+                SetActiveSMotion(0);
             xr_delete(*m);
             lst.erase(m);
             return true;
@@ -345,9 +361,11 @@ bool CEditableObject::AppendSMotion(LPCSTR fname, SMotionVec* inserted)
     bool bRes = true;
 
     LPCSTR ext = strext(fname);
-    if (0 == stricmp(ext, ".skl")) {
+    if (0 == stricmp(ext, ".skl"))
+    {
         CSMotion* M = new CSMotion();
-        if (!M->LoadMotion(fname)) {
+        if (!M->LoadMotion(fname))
+        {
             ELog.Msg(mtError, "Motion '%s' can't load. Append failed.", fname);
             xr_delete(M);
             bRes = false;
@@ -356,13 +374,15 @@ bool CEditableObject::AppendSMotion(LPCSTR fname, SMotionVec* inserted)
         {
             string256 name;
             _splitpath(fname, 0, 0, name, 0);
-            if (CheckBoneCompliance(M)) {
+            if (CheckBoneCompliance(M))
+            {
                 M->SortBonesBySkeleton(m_Bones);
                 string256 m_name;
                 GenerateSMotionName(m_name, name, M);
                 M->SetName(m_name);
                 m_SMotions.push_back(M);
-                if (inserted) inserted->push_back(M);
+                if (inserted)
+                    inserted->push_back(M);
                 // optimize
                 M->Optimize();
             }
@@ -377,34 +397,40 @@ bool CEditableObject::AppendSMotion(LPCSTR fname, SMotionVec* inserted)
     else if (0 == stricmp(ext, ".skls"))
     {
         IReader* F = FS.r_open(fname);
-        if (!F) {
+        if (!F)
+        {
             ELog.Msg(mtError, "Can't open file '%s'.", fname);
             bRes = false;
         }
-        if (bRes) {
+        if (bRes)
+        {
             // object motions
             int cnt = F->r_u32();
             for (int k = 0; k < cnt; k++)
             {
                 CSMotion* M = new CSMotion();
-                if (!M->Load(*F)) {
+                if (!M->Load(*F))
+                {
                     ELog.Msg(mtError, "Motion '%s' has different version. Load failed.", M->Name());
                     xr_delete(M);
                     bRes = false;
                     break;
                 }
-                if (!CheckBoneCompliance(M)) {
+                if (!CheckBoneCompliance(M))
+                {
                     xr_delete(M);
                     bRes = false;
                     break;
                 }
-                if (bRes) {
+                if (bRes)
+                {
                     M->SortBonesBySkeleton(m_Bones);
                     string256 m_name;
                     GenerateSMotionName(m_name, M->Name(), M);
                     M->SetName(m_name);
                     m_SMotions.push_back(M);
-                    if (inserted) inserted->push_back(M);
+                    if (inserted)
+                        inserted->push_back(M);
                     // optimize
                     M->Optimize();
                 }
@@ -434,8 +460,10 @@ bool CEditableObject::SaveSMotions(const char* fname)
 
 bool CEditableObject::RenameSMotion(const char* old_name, const char* new_name)
 {
-    if (stricmp(old_name, new_name) == 0) return true;
-    if (FindSMotionByName(new_name)) return false;
+    if (stricmp(old_name, new_name) == 0)
+        return true;
+    if (FindSMotionByName(new_name))
+        return false;
     CSMotion* M = FindSMotionByName(old_name);
     VERIFY(M);
     M->SetName(new_name);
@@ -444,10 +472,12 @@ bool CEditableObject::RenameSMotion(const char* old_name, const char* new_name)
 
 CSMotion* CEditableObject::FindSMotionByName(const char* name, const CSMotion* Ignore)
 {
-    if (name && name[0]) {
+    if (name && name[0])
+    {
         SMotionVec& lst = m_SMotions;
         for (SMotionIt m = lst.begin(); m != lst.end(); m++)
-            if ((Ignore != (*m)) && (stricmp((*m)->Name(), name) == 0)) return (*m);
+            if ((Ignore != (*m)) && (stricmp((*m)->Name(), name) == 0))
+                return (*m);
     }
     return 0;
 }
@@ -484,7 +514,8 @@ ICF
 
 void CEditableObject::PrepareBones()
 {
-    if (m_Bones.empty()) return;
+    if (m_Bones.empty())
+        return;
     CBone* PARENT = 0;
     // clear empty parent
     BoneIt b_it;
@@ -493,7 +524,8 @@ void CEditableObject::PrepareBones()
         (*b_it)->children.clear();
         (*b_it)->parent = NULL;
         BoneIt parent = std::find_if(m_Bones.begin(), m_Bones.end(), fBoneNameEQ((*b_it)->ParentName()));
-        if (parent == m_Bones.end()) {
+        if (parent == m_Bones.end())
+        {
             (*b_it)->SetParentName("");
             VERIFY2(0 == PARENT, "Invalid object. Have more than 1 parent.");
             PARENT = *b_it;
@@ -511,7 +543,8 @@ void CEditableObject::PrepareBones()
     for (b_it = m_Bones.begin(); b_it != m_Bones.end(); b_it++)
     {
         BoneIt parent = std::find_if(m_Bones.begin(), m_Bones.end(), fBoneNameEQ((*b_it)->ParentName()));
-        if (parent != m_Bones.end()) (*parent)->children.push_back(*b_it);
+        if (parent != m_Bones.end())
+            (*parent)->children.push_back(*b_it);
     }
     // manual sort
     u32 b_cnt = m_Bones.size();
@@ -551,7 +584,8 @@ CBone* CEditableObject::FindBoneByName(const char* name)
 int CEditableObject::GetRootBoneID()
 {
     for (BoneIt b_it = m_Bones.begin(); b_it != m_Bones.end(); b_it++)
-        if ((*b_it)->IsRoot()) return b_it - m_Bones.begin();
+        if ((*b_it)->IsRoot())
+            return b_it - m_Bones.begin();
     THROW;
     return -1;
 }
@@ -559,7 +593,8 @@ int CEditableObject::GetRootBoneID()
 int CEditableObject::PartIDByName(LPCSTR name)
 {
     for (BPIt it = m_BoneParts.begin(); it != m_BoneParts.end(); it++)
-        if (it->alias == name) return it - m_BoneParts.begin();
+        if (it->alias == name)
+            return it - m_BoneParts.begin();
     return -1;
 }
 
@@ -592,7 +627,8 @@ void CEditableObject::GetBoneWorldTransform(u32 bone_idx, float t, CSMotion* mot
         Fvector T, R;
         Fmatrix rot, mat;
         motion->_Evaluate(idx, t, T, R);
-        if (flags.is(st_BoneMotion::flWorldOrient)) {
+        if (flags.is(st_BoneMotion::flWorldOrient))
+        {
             rot.setXYZi(R.x, R.y, R.z);
             mat.identity();
             mat.c.set(T);
@@ -627,7 +663,8 @@ bool CEditableObject::CheckBoneCompliance(CSMotion* M)
             }
     */
     for (BoneIt b_it = m_Bones.begin(); b_it != m_Bones.end(); b_it++)
-        if (!M->FindBoneMotion((*b_it)->Name())) {
+        if (!M->FindBoneMotion((*b_it)->Name()))
+        {
             //        	Msg		("!Can't find bone '%s' in motion.",*(*b_it)->Name());
             //        	return false;
             M->add_empty_motion((*b_it)->Name());

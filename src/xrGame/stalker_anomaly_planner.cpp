@@ -21,10 +21,7 @@ CStalkerAnomalyPlanner::CStalkerAnomalyPlanner(CAI_Stalker* object, LPCSTR actio
 {
 }
 
-CStalkerAnomalyPlanner::~CStalkerAnomalyPlanner()
-{
-}
-
+CStalkerAnomalyPlanner::~CStalkerAnomalyPlanner() {}
 void CStalkerAnomalyPlanner::setup(CAI_Stalker* object, CPropertyStorage* storage)
 {
     inherited::setup(object, storage);

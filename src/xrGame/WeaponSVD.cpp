@@ -2,14 +2,8 @@
 #include "weaponsvd.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-CWeaponSVD::CWeaponSVD(void)
-{
-}
-
-CWeaponSVD::~CWeaponSVD(void)
-{
-}
-
+CWeaponSVD::CWeaponSVD(void) {}
+CWeaponSVD::~CWeaponSVD(void) {}
 void CWeaponSVD::switch2_Fire()
 {
     m_bFireSingleShot = true;
@@ -25,7 +19,7 @@ void CWeaponSVD::OnAnimationEnd(u32 state)
     {
     case eFire: { SetPending(FALSE);
     }
-    break;  // End of reload animation
+    break; // End of reload animation
     }
     inherited::OnAnimationEnd(state);
 }

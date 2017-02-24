@@ -96,4 +96,4 @@ struct rat_state_no_way : public rat_state_base
     virtual void finalize();
 };
 
-#endif  // RAT_STATES_H_INCLUDED
+#endif // RAT_STATES_H_INCLUDED

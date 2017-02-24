@@ -70,7 +70,8 @@ void CLensFlareDescriptor::load(CInifile* pIni, LPCSTR sect)
 {
     section = sect;
     m_Flags.set(flSource, pIni->r_bool(sect, "sun"));
-    if (m_Flags.is(flSource)) {
+    if (m_Flags.is(flSource))
+    {
         LPCSTR S = pIni->r_string(sect, "sun_shader");
         LPCSTR T = pIni->r_string(sect, "sun_texture");
         float r = pIni->r_float(sect, "sun_radius");
@@ -78,7 +79,8 @@ void CLensFlareDescriptor::load(CInifile* pIni, LPCSTR sect)
         SetSource(r, i, T, S);
     }
     m_Flags.set(flFlare, pIni->r_bool(sect, "flares"));
-    if (m_Flags.is(flFlare)) {
+    if (m_Flags.is(flFlare))
+    {
         LPCSTR S = pIni->r_string(sect, "flare_shader");
         LPCSTR T = pIni->r_string(sect, "flare_textures");
         LPCSTR R = pIni->r_string(sect, "flare_radius");
@@ -99,7 +101,8 @@ void CLensFlareDescriptor::load(CInifile* pIni, LPCSTR sect)
         }
     }
     m_Flags.set(flGradient, CInifile::IsBOOL(pIni->r_string(sect, "gradient")));
-    if (m_Flags.is(flGradient)) {
+    if (m_Flags.is(flGradient))
+    {
         LPCSTR S = pIni->r_string(sect, "gradient_shader");
         LPCSTR T = pIni->r_string(sect, "gradient_texture");
         float r = pIni->r_float(sect, "gradient_radius");
@@ -194,7 +197,8 @@ IC BOOL material_callback(collide::rq_result& result, LPVOID params)
 {
     STranspParam* fp = (STranspParam*)params;
     float vis = 1.f;
-    if (result.O) {
+    if (result.O)
+    {
         vis = 0.f;
         IKinematics* K = PKinematics(result.O->GetRenderData().visual);
         if (K && (result.element > 0))
@@ -204,7 +208,8 @@ IC BOOL material_callback(collide::rq_result& result, LPVOID params)
     {
         CDB::TRI* T = g_pGameLevel->ObjectSpace.GetStaticTris() + result.element;
         vis = g_pGamePersistent->MtlTransparent(T->material);
-        if (fis_zero(vis)) {
+        if (fis_zero(vis))
+        {
             Fvector* V = g_pGameLevel->ObjectSpace.GetStaticVerts();
             fp->pray_cache->set(fp->P, fp->D, fp->f, TRUE);
             fp->pray_cache->verts[0].set(V[T->verts[0]]);
@@ -221,9 +226,11 @@ IC void blend_lerp(float& cur, float tgt, float speed, float dt)
 {
     float diff = tgt - cur;
     float diff_a = _abs(diff);
-    if (diff_a < EPS_S) return;
+    if (diff_a < EPS_S)
+        return;
     float mot = speed * dt;
-    if (mot > diff_a) mot = diff_a;
+    if (mot > diff_a)
+        mot = diff_a;
     cur += (diff / diff_a) * mot;
 }
 
@@ -245,7 +252,7 @@ static LPCSTR state_to_string(const CLensFlare::LFState& state)
     }
 #ifdef DEBUG
     return (0);
-#endif  // DEBUG
+#endif // DEBUG
 }
 #endif
 
@@ -254,9 +261,11 @@ static Fvector2 RayDeltas[CLensFlare::MAX_RAYS] = {
 };
 void CLensFlare::OnFrame(shared_str id)
 {
-    if (dwFrame == Device.dwFrame) return;
+    if (dwFrame == Device.dwFrame)
+        return;
 #ifndef _EDITOR
-    if (!g_pGameLevel) return;
+    if (!g_pGameLevel)
+        return;
 #endif
     dwFrame = Device.dwFrame;
 
@@ -279,15 +288,18 @@ void CLensFlare::OnFrame(shared_str id)
         m_Current = desc;
         break;
     case lfsIdle:
-        if (desc != m_Current) m_State = lfsHide;
+        if (desc != m_Current)
+            m_State = lfsHide;
         break;
     case lfsShow:
         m_StateBlend = m_Current ? (m_StateBlend + m_Current->m_StateBlendUpSpeed * Device.fTimeDelta * tf) : 1.f + EPS;
-        if (m_StateBlend >= 1.f) m_State = lfsIdle;
+        if (m_StateBlend >= 1.f)
+            m_State = lfsIdle;
         break;
     case lfsHide:
         m_StateBlend = m_Current ? (m_StateBlend - m_Current->m_StateBlendDnSpeed * Device.fTimeDelta * tf) : 0.f - EPS;
-        if (m_StateBlend <= 0.f) {
+        if (m_StateBlend <= 0.f)
+        {
             m_State = lfsShow;
             m_Current = desc;
             m_StateBlend = m_Current ? m_Current->m_StateBlendUpSpeed * Device.fTimeDelta * tf : 0;
@@ -297,7 +309,8 @@ void CLensFlare::OnFrame(shared_str id)
     // Msg ("%6d : [%s] -> [%s]", Device.dwFrame, state_to_string(previous_state), state_to_string(m_State));
     clamp(m_StateBlend, 0.f, 1.f);
 
-    if ((m_Current == 0) || (LightColor.magnitude_rgb() == 0.f)) {
+    if ((m_Current == 0) || (LightColor.magnitude_rgb() == 0.f))
+    {
         bRender = false;
         return;
     }
@@ -328,7 +341,8 @@ void CLensFlare::OnFrame(shared_str id)
 
     fDot = vecLight.dotproduct(vecDir);
 
-    if (fDot <= 0.01f) {
+    if (fDot <= 0.01f)
+    {
         bRender = false;
         return;
     }
@@ -394,7 +408,8 @@ void CLensFlare::OnFrame(shared_str id)
         TP.vis = 1.0f;
         RD.dir = TP.D;
 
-        if (m_ray_cache[i].result && m_ray_cache[i].similar(TP.P, TP.D, TP.f)) {
+        if (m_ray_cache[i].result && m_ray_cache[i].similar(TP.P, TP.D, TP.f))
+        {
             // similar with previous query == 0
             TP.vis = 0.f;
         }
@@ -468,7 +483,8 @@ blend_lerp(fBlend,TP.vis,BLEND_DEC_SPEED,Device.fTimeDelta);
     clamp(fBlend, 0.0f, 1.0f);
 
     // gradient
-    if (m_Current->m_Flags.is(CLensFlareDescriptor::flGradient)) {
+    if (m_Current->m_Flags.is(CLensFlareDescriptor::flGradient))
+    {
         Fvector scr_pos;
         Device.mFullTransform.transform(scr_pos, vecLight);
         float kx = 1, ky = 1;
@@ -476,10 +492,13 @@ blend_lerp(fBlend,TP.vis,BLEND_DEC_SPEED,Device.fTimeDelta);
         float sun_max = 2.5f;
         scr_pos.y *= -1;
 
-        if (_abs(scr_pos.x) > sun_blend) kx = ((sun_max - (float)_abs(scr_pos.x))) / (sun_max - sun_blend);
-        if (_abs(scr_pos.y) > sun_blend) ky = ((sun_max - (float)_abs(scr_pos.y))) / (sun_max - sun_blend);
+        if (_abs(scr_pos.x) > sun_blend)
+            kx = ((sun_max - (float)_abs(scr_pos.x))) / (sun_max - sun_blend);
+        if (_abs(scr_pos.y) > sun_blend)
+            ky = ((sun_max - (float)_abs(scr_pos.y))) / (sun_max - sun_blend);
 
-        if (!((_abs(scr_pos.x) > sun_max) || (_abs(scr_pos.y) > sun_max))) {
+        if (!((_abs(scr_pos.x) > sun_max) || (_abs(scr_pos.y) > sun_max)))
+        {
             float op = m_StateBlend * m_Current->m_Gradient.fOpacity;
             fGradientValue = kx * ky * op * fBlend;
         }
@@ -490,8 +509,10 @@ blend_lerp(fBlend,TP.vis,BLEND_DEC_SPEED,Device.fTimeDelta);
 
 void CLensFlare::Render(BOOL bSun, BOOL bFlares, BOOL bGradient)
 {
-    if (!bRender) return;
-    if (!m_Current) return;
+    if (!bRender)
+        return;
+    if (!m_Current)
+        return;
     VERIFY(m_Current);
 
     m_pRender->Render(*this, bSun, bFlares, bGradient);
@@ -585,9 +606,11 @@ void CLensFlare::Render(BOOL bSun, BOOL bFlares, BOOL bGradient)
 
 shared_str CLensFlare::AppendDef(CEnvironment& environment, CInifile* pIni, LPCSTR sect)
 {
-    if (!sect || (0 == sect[0])) return "";
+    if (!sect || (0 == sect[0]))
+        return "";
     for (LensFlareDescIt it = m_Palette.begin(); it != m_Palette.end(); it++)
-        if (0 == xr_strcmp(*(*it)->section, sect)) return sect;
+        if (0 == xr_strcmp(*(*it)->section, sect))
+            return sect;
 
     environment.add_flare(m_Palette, sect);
     return sect;

@@ -1,9 +1,9 @@
 ////////////////////////////////////////////////////////////////////////////
-//	Module 		: object_type_traits.h
-//	Created 	: 21.01.2003
-//  Modified 	: 12.07.2004
-//	Author		: Dmitriy Iassenev
-//	Description : Object type traits
+//  Module      : object_type_traits.h
+//  Created     : 21.01.2003
+//  Modified    : 12.07.2004
+//  Author      : Dmitriy Iassenev
+//  Description : Object type traits
 ////////////////////////////////////////////////////////////////////////////
 #ifndef object_type_traits_h_included
 #define object_type_traits_h_included
@@ -11,18 +11,18 @@
 
 #include <type_traits>
 
-#define declare_has(a)                                                                                                 \
-    template <typename T>                                                                                              \
-    struct has_##a                                                                                                     \
-    {                                                                                                                  \
-        template <typename P>                                                                                          \
-        static detail::yes select(detail::other<typename P::a>*);                                                      \
-        template <typename P>                                                                                          \
-        static detail::no select(...);                                                                                 \
-        enum                                                                                                           \
-        {                                                                                                              \
-            value = sizeof(detail::yes) == sizeof(select<T>(0))                                                        \
-        };                                                                                                             \
+#define declare_has(a)                                            \
+    template <typename T>                                         \
+    struct has_##a                                                \
+    {                                                             \
+        template <typename P>                                     \
+        static detail::yes select(detail::other<typename P::a>*); \
+        template <typename P>                                     \
+        static detail::no select(...);                            \
+        enum                                                      \
+        {                                                         \
+            value = sizeof(detail::yes) == sizeof(select<T>(0))   \
+        };                                                        \
     };
 
 template <bool expression, typename T1, typename T2>
@@ -189,7 +189,7 @@ struct is_base_and_derived
     enum
     {
         value = std::is_class<T1>::value && std::is_class<T2>::value && !is_same<T1, T2>::value &&
-                sizeof(detail::yes) == sizeof(select((T2*)(0)))
+            sizeof(detail::yes) == sizeof(select((T2*)(0)))
     };
 };
 
@@ -222,11 +222,11 @@ struct is_base_and_derived_or_same_from_template
 
 declare_has(iterator);
 declare_has(const_iterator);
-//  declare_has(reference);
-//  declare_has(const_reference);
+//declare_has(reference);
+//declare_has(const_reference);
 declare_has(value_type);
 declare_has(size_type);
-//  declare_has(value_compare);
+//declare_has(value_compare);
 
 template <typename T>
 struct is_stl_container
@@ -234,19 +234,18 @@ struct is_stl_container
     enum
     {
         value = has_iterator<T>::value && has_const_iterator<T>::value &&
-                //					has_reference<T>::value &&
-                //					has_const_reference<T>::value &&
-                has_size_type<T>::value &&
-                has_value_type<T>::value
+            // has_reference<T>::value &&
+            // has_const_reference<T>::value &&
+            has_size_type<T>::value &&
+            has_value_type<T>::value
     };
 };
 
 //  template <typename _T>
 //  struct is_tree_structure {
-//  	enum {
-//  		value =
-//  			has_value_compare<_T>::value
-//  	};
+//      enum {
+//          value = has_value_compare<_T>::value
+//      };
 //  };
 };
-#endif  //	object_type_traits_h_included
+#endif //   object_type_traits_h_included

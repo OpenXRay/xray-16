@@ -15,19 +15,18 @@ class ESceneFogVolumeTool : public ESceneCustomOTool
 {
     typedef ESceneCustomOTool inherited;
 
-  protected:
+protected:
     u32 m_group_counter;
     // controls
     virtual void CreateControls();
     virtual void RemoveControls();
 
-  public:
+public:
     ESceneFogVolumeTool() : ESceneCustomOTool(OBJCLASS_FOG_VOL) { ; }
     // definition
     IC LPCSTR ClassName() { return "fog_volume"; }
     IC LPCSTR ClassDesc() { return "Scene fog volumes"; }
     IC int RenderPriority() { return 11; }
-
     virtual void Clear(bool bSpecific = false);
     // IO
     virtual bool IsNeedSave() { return inherited::IsNeedSave(); }
@@ -54,7 +53,7 @@ class EFogVolume : public CEditShape
     typedef CCustomObject inherited;
     void __stdcall OnChangeEnvs(PropValue* prop);
 
-  public:
+public:
     u8 m_volumeType;
     u32 m_group_id;
     shared_str m_volume_profile;
@@ -74,7 +73,7 @@ class EFogVolume : public CEditShape
     virtual bool GetSummaryInfo(SSceneSummary* inf);
     virtual void OnSceneUpdate();
 
-  protected:
+protected:
     virtual void Select(int flag);
 };
 

@@ -17,8 +17,8 @@ namespace WeifenLuo
 namespace WinFormsUI
 {
 interface class IDockContent;
-}  // namespace WinFormsUI
-}  // namespace WeifenLuo
+} // namespace WinFormsUI
+} // namespace WeifenLuo
 
 namespace editor
 {
@@ -42,7 +42,7 @@ ref class window_weather_editor;
 public
 ref class window_ide : public System::Windows::Forms::Form
 {
-  public:
+public:
     window_ide(editor::engine* engine)
     {
         InitializeComponent();
@@ -52,23 +52,24 @@ ref class window_ide : public System::Windows::Forms::Form
         custom_init(engine);
     }
 
-  protected:
+protected:
     /// <summary>
     /// Clean up any resources being used.
     /// </summary>
     ~window_ide()
     {
         custom_finalize();
-        if (components) {
+        if (components)
+        {
             delete components;
         }
     }
 
-  protected:
-  private:
+protected:
+private:
     WeifenLuo::WinFormsUI::DockPanel ^ Editor;
 
-  private:
+private:
     /// <summary>
     /// Required designer variable.
     /// </summary>
@@ -114,42 +115,42 @@ ref class window_ide : public System::Windows::Forms::Form
         this->ResumeLayout(false);
     }
 #pragma endregion
-  protected:
+protected:
     editor::engine* m_engine;
 
-  private:
+private:
     System::Drawing::Rectangle ^ m_window_rectangle;
 
-  private:
+private:
     window_view ^ m_view;
     window_levels ^ m_levels;
     window_weather ^ m_weather;
     window_weather_editor ^ m_weather_editor;
 
-  protected:
+protected:
     editor::ide* m_ide;
 
-  public:
+public:
     editor::ide& ide();
     window_view % view();
     editor::engine& engine();
 
-  public:
+public:
     window_levels % levels();
     window_weather % weather();
     window_weather_editor % weather_editor();
     Microsoft::Win32::RegistryKey ^ base_registry_key();
 
-  private:
+private:
     void custom_init(editor::engine* engine);
     void custom_finalize();
     void save_on_exit();
     void load_on_create();
 
-  private:
+private:
     WeifenLuo::WinFormsUI::IDockContent ^ reload_content(System::String ^ persist_string);
 
-  private:
+private:
     Void window_ide_SizeChanged(System::Object ^ sender, System::EventArgs ^ e);
     Void window_ide_LocationChanged(System::Object ^ sender, System::EventArgs ^ e);
     Void window_ide_FormClosing(System::Object ^ sender, System::Windows::Forms::FormClosingEventArgs ^ e);

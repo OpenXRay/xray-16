@@ -34,10 +34,7 @@ CUIMpChangeMapAdm::CUIMpChangeMapAdm()
     AttachChild(btn_ok);
 }
 
-CUIMpChangeMapAdm::~CUIMpChangeMapAdm()
-{
-}
-
+CUIMpChangeMapAdm::~CUIMpChangeMapAdm() {}
 void CUIMpChangeMapAdm::Init(CUIXml& xml_doc)
 {
     CUIXmlInit::InitWindow(xml_doc, "change_map_adm", 0, this);
@@ -56,14 +53,16 @@ void CUIMpChangeMapAdm::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         OnItemSelect();
     else if (BUTTON_CLICKED == msg)
     {
-        if (pWnd == btn_ok) OnBtnOk();
+        if (pWnd == btn_ok)
+            OnBtnOk();
     }
 }
 
 void CUIMpChangeMapAdm::OnItemSelect()
 {
     u32 idx = lst->GetSelectedIDX();
-    if (idx == u32(-1)) return;
+    if (idx == u32(-1))
+        return;
 
     const SGameTypeMaps& M = gMapListHelper.GetMapListFor((EGameIDs)GameID());
     const shared_str& name = M.m_map_names[idx].map_name;
@@ -86,7 +85,8 @@ void CUIMpChangeMapAdm::OnBtnOk()
 {
     u32 idx = lst->GetSelectedIDX();
     const SGameTypeMaps& M = gMapListHelper.GetMapListFor((EGameIDs)GameID());
-    if (idx >= 0 && idx < M.m_map_names.size()) {
+    if (idx >= 0 && idx < M.m_map_names.size())
+    {
         const shared_str& name = M.m_map_names[idx].map_name;
         const shared_str& ver = M.m_map_names[idx].map_ver;
         string512 command;

@@ -17,11 +17,7 @@ char* dbg_action_name_table[] = {"ACT_STAND_IDLE", "ACT_SIT_IDLE", "ACT_LIE_IDLE
     "ACT_RUN", "ACT_EAT", "ACT_SLEEP", "ACT_REST", "ACT_DRAG", "ACT_ATTACK", "ACT_STEAL", "ACT_LOOK_AROUND",
     "ACT_JUMP"};
 
-void SCurrentAnimationInfo::set_motion(EMotionAnim new_motion)
-{
-    motion = new_motion;
-}
-
+void SCurrentAnimationInfo::set_motion(EMotionAnim new_motion) { motion = new_motion; }
 CControlAnimationBase::CControlAnimationBase()
 {
     m_override_animation = eAnimUndefined;
@@ -30,11 +26,7 @@ CControlAnimationBase::CControlAnimationBase()
     init_anim_storage();
 }
 
-CControlAnimationBase::~CControlAnimationBase()
-{
-    free_anim_storage();
-}
-
+CControlAnimationBase::~CControlAnimationBase() { free_anim_storage(); }
 void CControlAnimationBase::reinit()
 {
     inherited::reinit();
@@ -133,7 +125,8 @@ float CControlAnimationBase::get_animation_length(EMotionAnim anim, u32 index) c
 bool CControlAnimationBase::get_animation_info(EMotionAnim anim, u32 index, MotionID& motion, float& length) const
 {
     SAnimItem* anim_it = m_anim_storage[anim];
-    if (!anim_it) {
+    if (!anim_it)
+    {
         return false;
     }
 
@@ -142,7 +135,8 @@ bool CControlAnimationBase::get_animation_info(EMotionAnim anim, u32 index, Moti
     STRCONCAT(animation_name_buffer, anim_it->target_name, itoa(index, index_string_buffer, 10));
 
     IKinematicsAnimated* animated = smart_cast<IKinematicsAnimated*>(m_object->Visual());
-    if (!animated) {
+    if (!animated)
+    {
         return false;
     }
 
@@ -159,13 +153,15 @@ float CControlAnimationBase::get_animation_hit_time(EMotionAnim anim, u32 index)
     MotionID motion;
     bool res = get_animation_info(anim, index, motion, animation_time);
     VERIFY(res);
-    if (!res) {
+    if (!res)
+    {
         return error_default_return_value;
     }
 
     for (AA_VECTOR::const_iterator it = m_attack_anims.begin(); it != m_attack_anims.end(); ++it)
     {
-        if (it->motion == motion) {
+        if (it->motion == motion)
+        {
             return it->time * animation_time;
         }
     }
@@ -185,9 +181,11 @@ void CControlAnimationBase::select_animation(bool anim_end)
 {
     // start new animation
     SControlAnimationData* ctrl_data = (SControlAnimationData*)m_man->data(this, ControlCom::eControlAnimation);
-    if (!ctrl_data) return;
+    if (!ctrl_data)
+        return;
 
-    if (m_state_attack && !anim_end) return;
+    if (m_state_attack && !anim_end)
+        return;
 
     if (cur_anim_info().get_motion() == eAnimAttack)
         m_state_attack = true;
@@ -204,7 +202,8 @@ void CControlAnimationBase::select_animation(bool anim_end)
     // определить необходимый индекс
     int index;
 
-    if (m_override_animation == cur_anim_info().get_motion() && m_override_animation_index != (u32)-1) {
+    if (m_override_animation == cur_anim_info().get_motion() && m_override_animation_index != (u32)-1)
+    {
         VERIFY(anim_it->count != 0);
         VERIFY(m_override_animation_index < anim_it->count);
         index = m_override_animation_index;
@@ -223,7 +222,8 @@ void CControlAnimationBase::select_animation(bool anim_end)
     string128 s1, s2;
     MotionID cur_anim = smart_cast<IKinematicsAnimated*>(
         m_object->Visual())->ID_Cycle_Safe(strconcat(sizeof(s2), s2, *anim_it->target_name, itoa(index, s1, 10)));
-    if (!cur_anim.valid()) FATAL(s2);
+    if (!cur_anim.valid())
+        FATAL(s2);
 
     // Setup Com
     ctrl_data->global.set_motion(cur_anim);
@@ -244,7 +244,8 @@ void CControlAnimationBase::select_animation(bool anim_end)
 // проверить существует ли переход из анимации from в to
 bool CControlAnimationBase::CheckTransition(EMotionAnim from, EMotionAnim to)
 {
-    if (!m_man->check_start_conditions(ControlCom::eControlSequencer)) return false;
+    if (!m_man->check_start_conditions(ControlCom::eControlSequencer))
+        return false;
 
     // поиск соответствующего перехода
     bool b_activated = false;
@@ -256,35 +257,40 @@ bool CControlAnimationBase::CheckTransition(EMotionAnim from, EMotionAnim to)
     bool bVectEmpty = m_tTransitions.empty();
 
     while (!bVectEmpty)
-    {  // вход в цикл, если вектор переходов не пустой
+    { // вход в цикл, если вектор переходов не пустой
 
         bool from_is_good = ((I->from.state_used) ? (I->from.state == state_from) : (I->from.anim == cur_from));
         bool target_is_good = ((I->target.state_used) ? (I->target.state == state_to) : (I->target.anim == to));
 
-        if (from_is_good && target_is_good) {
+        if (from_is_good && target_is_good)
+        {
             // if (I->skip_if_aggressive && m_object->m_bAggressive) return;
 
             // переход годится
-            if (!b_activated) {
+            if (!b_activated)
+            {
                 m_object->com_man().seq_init();
             }
 
             m_object->com_man().seq_add(get_motion_id(I->anim_transition));
             b_activated = true;
 
-            if (I->chain) {
+            if (I->chain)
+            {
                 cur_from = I->anim_transition;
                 state_from = GetState(cur_from);
-                I = m_tTransitions.begin();  // начать сначала
+                I = m_tTransitions.begin(); // начать сначала
                 continue;
             }
             else
                 break;
         }
-        if (m_tTransitions.end() == ++I) break;
+        if (m_tTransitions.end() == ++I)
+            break;
     }
 
-    if (b_activated) {
+    if (b_activated)
+    {
         m_object->com_man().seq_switch();
         return true;
     }
@@ -295,7 +301,8 @@ bool CControlAnimationBase::CheckTransition(EMotionAnim from, EMotionAnim to)
 void CControlAnimationBase::CheckReplacedAnim()
 {
     for (REPLACED_ANIM_IT it = m_tReplacedAnims.begin(); m_tReplacedAnims.end() != it; ++it)
-        if ((cur_anim_info().get_motion() == it->cur_anim) && (*(it->flag) == true)) {
+        if ((cur_anim_info().get_motion() == it->cur_anim) && (*(it->flag) == true))
+        {
             cur_anim_info().set_motion(it->new_anim);
             return;
         }
@@ -308,7 +315,8 @@ SAAParam& CControlAnimationBase::AA_GetParams(LPCSTR anim_name)
 
     for (AA_VECTOR_IT it = m_attack_anims.begin(); it != m_attack_anims.end(); it++)
     {
-        if (it->motion == motion) return (*it);
+        if (it->motion == motion)
+            return (*it);
     }
 
     VERIFY3(FALSE, "Error! No animation in AA_VECTOR! Animation = ", anim_name);
@@ -320,7 +328,8 @@ SAAParam& CControlAnimationBase::AA_GetParams(MotionID motion, float time_perc)
     // искать текущую анимацию в AA_VECTOR
     for (AA_VECTOR_IT it = m_attack_anims.begin(); it != m_attack_anims.end(); it++)
     {
-        if ((it->motion == motion) && (it->time == time_perc)) return (*it);
+        if ((it->motion == motion) && (it->time == time_perc))
+            return (*it);
     }
 
     VERIFY2(FALSE, "Error! No animation in AA_VECTOR! Animation = [UNKNOWN]");
@@ -340,7 +349,8 @@ EPState CControlAnimationBase::GetState(EMotionAnim a)
 
 void CControlAnimationBase::FX_Play(EHitSide side, float amount)
 {
-    if (fx_time_last_play + FX_CAN_PLAY_MIN_INTERVAL > m_object->m_dwCurrentTime) return;
+    if (fx_time_last_play + FX_CAN_PLAY_MIN_INTERVAL > m_object->m_dwCurrentTime)
+        return;
 
     SAnimItem* anim_it = m_anim_storage[cur_anim_info().get_motion()];
     VERIFY(anim_it);
@@ -356,7 +366,8 @@ void CControlAnimationBase::FX_Play(EHitSide side, float amount)
     case eSideRight: p_str = &anim_it->fxs.right; break;
     }
 
-    if (p_str && p_str->size()) smart_cast<IKinematicsAnimated*>(m_object->Visual())->PlayFX(*(*p_str), amount);
+    if (p_str && p_str->size())
+        smart_cast<IKinematicsAnimated*>(m_object->Visual())->PlayFX(*(*p_str), amount);
 
     fx_time_last_play = m_object->m_dwCurrentTime;
 }
@@ -377,7 +388,8 @@ bool CControlAnimationBase::IsTurningCurAnim()
     VERIFY2(item_it, make_string("animation not found in m_anim_storage!"));
     ;
 
-    if (!fis_zero(item_it->velocity.velocity.angular_real)) return true;
+    if (!fis_zero(item_it->velocity.velocity.angular_real))
+        return true;
     return false;
 }
 
@@ -387,7 +399,8 @@ bool CControlAnimationBase::IsStandCurAnim()
     VERIFY2(item_it, make_string("animation not found in m_anim_storage!"));
     ;
 
-    if (fis_zero(item_it->velocity.velocity.linear)) return true;
+    if (fis_zero(item_it->velocity.velocity.linear))
+        return true;
     return false;
 }
 
@@ -448,11 +461,7 @@ LPCSTR CControlAnimationBase::GetAnimationName(EMotionAnim anim)
     return *item_it->target_name;
 }
 
-LPCSTR CControlAnimationBase::GetActionName(EAction action)
-{
-    return dbg_action_name_table[action];
-}
-
+LPCSTR CControlAnimationBase::GetActionName(EAction action) { return dbg_action_name_table[action]; }
 ///////////////////////////////////////////////////////////////////////////////////////
 
 void CControlAnimationBase::ValidateAnimation()
@@ -462,18 +471,21 @@ void CControlAnimationBase::ValidateAnimation()
     bool is_moving_anim = !fis_zero(item_it->velocity.velocity.linear);
     bool is_moving_on_path = m_object->control().path_builder().is_moving_on_path();
 
-    if (is_moving_on_path && is_moving_anim) {
+    if (is_moving_on_path && is_moving_anim)
+    {
         m_object->dir().use_path_direction(cur_anim_info().get_motion() == eAnimDragCorpse);
         return;
     }
 
-    if (!is_moving_on_path && is_moving_anim) {
+    if (!is_moving_on_path && is_moving_anim)
+    {
         cur_anim_info().set_motion(eAnimStandIdle);
         m_object->move().stop();
         return;
     }
 
-    if (is_moving_on_path && !is_moving_anim) {
+    if (is_moving_on_path && !is_moving_anim)
+    {
         m_object->move().stop();
         return;
     }
@@ -493,10 +505,12 @@ void CControlAnimationBase::UpdateAnimCount()
 
     for (ANIM_ITEM_VECTOR_IT it = m_anim_storage.begin(); it != m_anim_storage.end(); it++)
     {
-        if (!(*it)) continue;
+        if (!(*it))
+            continue;
 
         // проверить, были ли уже загружены данные
-        if ((*it)->count != 0) return;
+        if ((*it)->count != 0)
+            return;
 
         string128 s, s_temp;
         u8 count = 0;
@@ -507,7 +521,8 @@ void CControlAnimationBase::UpdateAnimCount()
             LPCSTR name = s_temp;
             MotionID id = skel->ID_Cycle_Safe(name);
 
-            if (id.valid()) {
+            if (id.valid())
+            {
                 count++;
                 AddAnimTranslation(id, name);
             }
@@ -525,11 +540,7 @@ void CControlAnimationBase::UpdateAnimCount()
     }
 }
 
-void CControlAnimationBase::SetCurAnim(EMotionAnim a)
-{
-    cur_anim_info().set_motion(a);
-}
-
+void CControlAnimationBase::SetCurAnim(EMotionAnim a) { cur_anim_info().set_motion(a); }
 CMotionDef* CControlAnimationBase::get_motion_def(SAnimItem* it, u32 index)
 {
     string128 s1, s2;
@@ -548,7 +559,8 @@ shared_str CControlAnimationBase::GetAnimTranslation(const MotionID& motion)
     shared_str ret_value;
 
     ANIM_TO_MOTION_MAP_IT anim_it = m_anim_motion_map.find(motion);
-    if (anim_it != m_anim_motion_map.end()) ret_value = anim_it->second;
+    if (anim_it != m_anim_motion_map.end())
+        ret_value = anim_it->second;
 
     return ret_value;
 }
@@ -560,7 +572,8 @@ MotionID CControlAnimationBase::get_motion_id(EMotionAnim a, u32 index)
     VERIFY(anim_it);
 
     // определить необходимый индекс
-    if (index == u32(-1)) {
+    if (index == u32(-1))
+    {
         if (-1 != anim_it->spec_id)
             index = anim_it->spec_id;
         else
@@ -585,13 +598,15 @@ void CControlAnimationBase::set_animation_speed()
 {
     // Setup Com
     SControlAnimationData* ctrl_data = (SControlAnimationData*)m_man->data(this, ControlCom::eControlAnimation);
-    if (!ctrl_data) return;
+    if (!ctrl_data)
+        return;
     ctrl_data->set_speed(m_cur_anim.speed._get_target());
 }
 
 void CControlAnimationBase::check_hit(MotionID motion, float time_perc)
 {
-    if (!m_object->EnemyMan.get_enemy()) return;
+    if (!m_object->EnemyMan.get_enemy())
+        return;
     const CEntityAlive* enemy = m_object->EnemyMan.get_enemy();
 
     SAAParam& params = AA_GetParams(motion, time_perc);
@@ -602,7 +617,8 @@ void CControlAnimationBase::check_hit(MotionID motion, float time_perc)
     // определить дистанцию до врага
     Fvector d;
     d.sub(enemy->Position(), m_object->Position());
-    if (d.magnitude() > params.dist) should_hit = false;
+    if (d.magnitude() > params.dist)
+        should_hit = false;
 
     // проверка на  Field-Of-Hit
     float my_h, my_p;
@@ -614,14 +630,17 @@ void CControlAnimationBase::check_hit(MotionID motion, float time_perc)
     float from = angle_normalize(my_h + params.foh.from_yaw);
     float to = angle_normalize(my_h + params.foh.to_yaw);
 
-    if (!is_angle_between(h, from, to)) should_hit = false;
+    if (!is_angle_between(h, from, to))
+        should_hit = false;
 
     from = angle_normalize(my_p + params.foh.from_pitch);
     to = angle_normalize(my_p + params.foh.to_pitch);
 
-    if (!is_angle_between(p, from, to)) should_hit = false;
+    if (!is_angle_between(p, from, to))
+        should_hit = false;
 
-    if (should_hit) m_object->HitEntity(enemy, params.hit_power, params.impulse, params.impulse_dir);
+    if (should_hit)
+        m_object->HitEntity(enemy, params.hit_power, params.impulse, params.impulse_dir);
 
     m_object->MeleeChecker.on_hit_attempt(should_hit);
 }
@@ -664,7 +683,8 @@ void parse_anim_params(LPCSTR val, SAAParam& anim)
 
 void CControlAnimationBase::AA_reload(LPCSTR section)
 {
-    if (!pSettings->section_exist(section)) return;
+    if (!pSettings->section_exist(section))
+        return;
 
     m_attack_anims.clear();
 
@@ -676,10 +696,12 @@ void CControlAnimationBase::AA_reload(LPCSTR section)
     for (u32 i = 0; pSettings->r_line(section, i, &anim_name, &val); ++i)
     {
         anim.motion = skel_animated->LL_MotionID(anim_name);
-        if (!anim.motion.valid()) continue;
+        if (!anim.motion.valid())
+            continue;
 
         // check if it is compound (if there is one item, mean it as a section)
-        if (_GetItemCount(val) == 1) {
+        if (_GetItemCount(val) == 1)
+        {
             LPCSTR compound_section = val;
             LPCSTR unused_line_name;
 
@@ -713,7 +735,8 @@ void CControlAnimationBase::free_anim_storage()
     for (u32 i = 0; i < eAnimCount; i++)
     {
         SAnimItem* item = m_anim_storage[i];
-        if (item) {
+        if (item)
+        {
             xr_delete(item);
             m_anim_storage[i] = 0;
         }

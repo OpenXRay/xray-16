@@ -12,10 +12,7 @@
 
 #include "game_cl_mp.h"
 
-UITeamState::UITeamState()
-{
-    m_artefact_count = 0;
-}
+UITeamState::UITeamState() { m_artefact_count = 0; }
 UITeamState::UITeamState(ETeam teamId, UITeamPanels* teamPanels)
 {
     myTeam = teamId;
@@ -35,11 +32,7 @@ UITeamState::UITeamState(ETeam teamId, UITeamPanels* teamPanels)
     m_teamPanels = teamPanels;
 }
 
-UITeamState::~UITeamState()
-{
-    CleanupInternal();
-}
-
+UITeamState::~UITeamState() { CleanupInternal(); }
 void UITeamState::CleanupInternal()
 {
     MapClientIdToUIPlayer::iterator it = myPlayers.begin();
@@ -57,7 +50,8 @@ bool UITeamState::SortingLessFunction(CUIWindow* left, CUIWindow* right)
     UIPlayerItem* rpi = static_cast<UIPlayerItem*>(right);
     VERIFY(lpi && rpi);
 
-    if (lpi->GetPlayerCheckPoints() > rpi->GetPlayerCheckPoints()) return true;
+    if (lpi->GetPlayerCheckPoints() > rpi->GetPlayerCheckPoints())
+        return true;
 
     return false;
 }
@@ -65,7 +59,7 @@ bool UITeamState::SortingLessFunction(CUIWindow* left, CUIWindow* right)
 void UITeamState::Init(CUIXml& uiXml, LPCSTR teamNodeName, int index)
 {
     VERIFY(teamNodeName);
-    mainUiXml = &uiXml;  // warning !
+    mainUiXml = &uiXml; // warning !
     teamXmlNode = uiXml.NavigateToNode(teamNodeName, index);
     VERIFY2(teamXmlNode, make_string("team xml node (%s) not found", teamNodeName).c_str());
 
@@ -95,7 +89,8 @@ int UITeamState::InitScrollPanels()
 
         TScrollPanel temp_panel;
         XML_NODE* panel_root = mainUiXml->NavigateToNode("panel", i);
-        if (!panel_root) break;
+        if (!panel_root)
+            break;
 
         mainUiXml->SetLocalRoot(panel_root);
 
@@ -121,7 +116,8 @@ inline UITeamState::TScrollPanels::size_type UITeamState::GetNeedScrollPanelInde
     int panels_count = m_scroll_panels.size();
     VERIFY(panels_count);
 
-    if (m_last_panel >= panels_count) {
+    if (m_last_panel >= panels_count)
+    {
         m_last_panel = 0;
         return 0;
     }
@@ -132,7 +128,8 @@ void UITeamState::ReStoreAllPlayers()
 {
     typedef MapClientIdToUIPlayer::iterator PlayerIter;
 
-    if (m_scroll_panels.size() == 1) return;
+    if (m_scroll_panels.size() == 1)
+        return;
 
     PlayerIter ite = myPlayers.end();
     m_last_panel = 0;
@@ -166,13 +163,14 @@ void UITeamState::AddPlayer(ClientID const& clientId)
         return;
     }*/
     // if player not in my team...
-    if (Game().IsPlayerInTeam(ps, myTeam) == false) {
+    if (Game().IsPlayerInTeam(ps, myTeam) == false)
+    {
         return;
     }
 
 #ifdef DEBUG
     Msg("--- UITeamState: adding player (ClientID = 0x%08x) to %d team (0x%08x)", clientId.value(), myTeam, this);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     UIPlayerItem* tempPlayerItem = new UIPlayerItem(static_cast<ETeam>(ps->team), clientId, this, m_teamPanels);
 
@@ -188,7 +186,8 @@ void UITeamState::AddPlayer(ClientID const& clientId)
     XML_NODE* tempRoot = mainUiXml->GetLocalRoot();
     mainUiXml->SetLocalRoot(teamXmlNode);
 
-    if (clientId == Game().local_svdpnid) {
+    if (clientId == Game().local_svdpnid)
+    {
         tempPlayerItem->Init(*mainUiXml, "local_player_item", 0);
     }
     else
@@ -204,7 +203,8 @@ void UITeamState::AddPlayer(ClientID const& clientId)
 void UITeamState::RemovePlayer(ClientID const& clientId)
 {
     MapClientIdToUIPlayer::iterator tempIter = myPlayers.find(clientId);
-    if (tempIter != myPlayers.end()) {
+    if (tempIter != myPlayers.end())
+    {
         toDeletePlayers.push_back(clientId);
     }
 }
@@ -213,7 +213,8 @@ bool UITeamState::UpdatePlayer(ClientID const& clientId)
 {
     bool retVal = false;
     MapClientIdToUIPlayer::iterator tempIter = myPlayers.find(clientId);
-    if (tempIter != myPlayers.end()) {
+    if (tempIter != myPlayers.end())
+    {
         retVal = true;
         game_cl_GameState::PLAYERS_MAP& playersMap = Game().players;
         game_cl_GameState::PLAYERS_MAP::iterator pi = playersMap.find(clientId);
@@ -226,9 +227,10 @@ bool UITeamState::UpdatePlayer(ClientID const& clientId)
             Msg("--- Player state of ClientID = 0x%08x is NULL", clientId.value());
             return true;
         }*/
-        if (Game().IsPlayerInTeam(ps, myTeam) == false) {
+        if (Game().IsPlayerInTeam(ps, myTeam) == false)
+        {
             RemovePlayer(clientId);
-            retVal = false;  // tricky step :) player will be added by UITeamPanels::UpdatePlayer method :)
+            retVal = false; // tricky step :) player will be added by UITeamPanels::UpdatePlayer method :)
         }
         // warning ! after this Update tempIter will be not valid !!!
         Update();
@@ -239,7 +241,8 @@ bool UITeamState::UpdatePlayer(ClientID const& clientId)
 
 s32 UITeamState::GetFieldValue(shared_str const& field_name) const
 {
-    if (field_name.equal("mp_artefacts_upcase")) {
+    if (field_name.equal("mp_artefacts_upcase"))
+    {
         return m_artefact_count;
     }
     else if (field_name.equal("mp_players"))
@@ -264,22 +267,21 @@ s32 UITeamState::GetSummaryFrags() const
     for (PlCIter i = playersMap.begin(); i != eiter; ++i)
     {
         game_PlayerState* ps = i->second;
-        if (!ps) continue;
+        if (!ps)
+            continue;
         game_cl_mp* tempGame = smart_cast<game_cl_mp*>(&Game());
         R_ASSERT(tempGame);
-        if (static_cast<ETeam>(tempGame->ModifyTeam(ps->team)) == myTeam) sum = sum + ps->m_iRivalKills;
+        if (static_cast<ETeam>(tempGame->ModifyTeam(ps->team)) == myTeam)
+            sum = sum + ps->m_iRivalKills;
     }
     return sum;
 }
 
-void UITeamState::Draw()
-{
-    inherited::Draw();
-}
-
+void UITeamState::Draw() { inherited::Draw(); }
 void UITeamState::Update()
 {
-    if (toDeletePlayers.size()) {
+    if (toDeletePlayers.size())
+    {
         xr_vector<ClientID>::iterator ie = toDeletePlayers.end();
         for (xr_vector<ClientID>::iterator i = toDeletePlayers.begin(); i != ie; ++i)
         {
@@ -287,13 +289,13 @@ void UITeamState::Update()
             VERIFY2(tempIter != myPlayers.end(), "player not found while deleting");
 #ifdef DEBUG
             Msg("--- UITeamState: deleting player (ClientID = 0x%08x) from %d team (0x%08x)", i->value(), myTeam, this);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
             VERIFY(m_scroll_panels.size() > tempIter->second.m_panel_number);
             m_scroll_panels[tempIter->second.m_panel_number].first->RemoveWindow(tempIter->second.m_player_wnd);
             xr_delete(tempIter->second.m_player_wnd);
             myPlayers.erase(tempIter);
         }
-        ReStoreAllPlayers();  // warning ! uses myPlayers
+        ReStoreAllPlayers(); // warning ! uses myPlayers
         toDeletePlayers.clear();
     }
     TScrollPanels::iterator ite = m_scroll_panels.end();
@@ -306,7 +308,8 @@ void UITeamState::Update()
 
 void UITeamState::SetArtefactsCount(s32 greenTeamArtC, s32 blueTeamArtC)
 {
-    if (myTeam == etGreenTeam) {
+    if (myTeam == etGreenTeam)
+    {
         m_artefact_count = greenTeamArtC;
     }
     else if (myTeam == etBlueTeam)

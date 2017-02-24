@@ -19,7 +19,8 @@ MTextureCache* MTextureCache::m_instance = NULL;
 
 MTextureCacheElement::~MTextureCacheElement()
 {
-    if (m_texture) {
+    if (m_texture)
+    {
         xr_delete(m_texture);
         m_texture = NULL;
     }
@@ -27,7 +28,8 @@ MTextureCacheElement::~MTextureCacheElement()
 
 MTextureCache::~MTextureCache()
 {
-    if (m_textureTable.empty()) return;
+    if (m_textureTable.empty())
+        return;
 
     // Delete all texture cache elements.
     //
@@ -47,20 +49,23 @@ MTexture* MTextureCache::texture(MObject textureObj, MTexture::Type type /* = MT
 
     // If this isn't a file texture node, or if it has no valid name,
     // return NULL.
-    if (!textureObj.hasFn(MFn::kFileTexture) || textureName == "") return NULL;
+    if (!textureObj.hasFn(MFn::kFileTexture) || textureName == "")
+        return NULL;
 
     // Check if we already have a texCacheElement assigned to the given texture name.
     MTextureCacheElement* texCacheElement = m_textureTable[textureName.asChar()];
     bool newTexture = !texCacheElement;
     bool textureDirty = texCacheElement && texCacheElement->fMonitor.dirty();
 
-    if (textureDirty) {
+    if (textureDirty)
+    {
         texCacheElement->fMonitor.stopWatching();
         xr_delete(texCacheElement->m_texture);
         texCacheElement->m_texture = NULL;
     }
 
-    if (newTexture) {
+    if (newTexture)
+    {
         texCacheElement = xr_new<MTextureCacheElement>();
 
         texCacheElement->fMonitor.setManager(this);
@@ -69,7 +74,8 @@ MTexture* MTextureCache::texture(MObject textureObj, MTexture::Type type /* = MT
         m_textureTable[textureName.asChar()] = texCacheElement;
     }
 
-    if (textureDirty || newTexture) {
+    if (textureDirty || newTexture)
+    {
         // Get the filename of the file texture node.
         MString textureFilename;
         MFnDependencyNode textureNode(textureObj);
@@ -83,7 +89,8 @@ MTexture* MTextureCache::texture(MObject textureObj, MTexture::Type type /* = MT
         texCacheElement->fMonitor.watch(textureObj);
 
         // Attempt to load the texture from disk and bind it in the OpenGL driver.
-        if (texCacheElement->m_texture->load(textureFilename, type, mipmapped, target) == false) {
+        if (texCacheElement->m_texture->load(textureFilename, type, mipmapped, target) == false)
+        {
             // An error occured. Most likely, it was impossible to
             // open the given filename.
             // Clean up and return NULL.
@@ -108,7 +115,8 @@ bool MTextureCache::bind(MObject textureObj, MTexture::Type type /* = MTexture::
     // Get a reference to the texture, allocating it if necessary.
     MTexture* pTex = texture(textureObj, type, mipmapped, target);
 
-    if (pTex) {
+    if (pTex)
+    {
         // bind the texture.
         pTex->bind();
 

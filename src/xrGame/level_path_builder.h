@@ -39,9 +39,7 @@ public:
     }
 
     IC const u32& dest_vertex_id() const { return (m_dest_vertex_id); }
-
     IC void use_delay_after_fail(bool const value) { m_use_delay_after_fail = value; }
-
     IC void setup(
         const u32& start_vertex_id, const u32& dest_vertex_id, bool extrapolate_path, const Fvector* precise_position)
     {
@@ -64,7 +62,8 @@ public:
     void register_to_process()
     {
         m_object->m_wait_for_distributed_computation = true;
-        if (Device.dwTimeGlobal < m_last_fail_time + time_to_wait_after_fail) return;
+        if (Device.dwTimeGlobal < m_last_fail_time + time_to_wait_after_fail)
+            return;
 
         Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(this, &CLevelPathBuilder::process));
     }
@@ -74,8 +73,10 @@ public:
         m_object->m_wait_for_distributed_computation = false;
         m_object->level_path().build_path(m_start_vertex_id, m_dest_vertex_id);
 
-        if (m_object->level_path().failed()) {
-            if (m_use_delay_after_fail) m_last_fail_time = Device.dwTimeGlobal;
+        if (m_object->level_path().failed())
+        {
+            if (m_use_delay_after_fail)
+                m_last_fail_time = Device.dwTimeGlobal;
 
             m_object->m_path_state = CMovementManager::ePathStateBuildLevelPath;
             return;
@@ -89,7 +90,8 @@ public:
         m_object->detail().set_start_position(m_object->object().Position());
         m_object->detail().set_start_direction(Fvector().setHP(-m_object->m_body.current.yaw, 0));
 
-        if (m_precise_position) m_object->detail().set_dest_position(*m_precise_position);
+        if (m_precise_position)
+            m_object->detail().set_dest_position(*m_precise_position);
 
         inherited::setup(m_object->level_path().path(), m_object->level_path().intermediate_index());
         inherited::process_impl(false);
@@ -97,14 +99,16 @@ public:
 
     void __stdcall process()
     {
-        if (Device.dwTimeGlobal < m_last_fail_time + time_to_wait_after_fail) return;
+        if (Device.dwTimeGlobal < m_last_fail_time + time_to_wait_after_fail)
+            return;
 
         m_object->build_level_path();
     }
 
     IC void remove()
     {
-        if (m_object->m_wait_for_distributed_computation) m_object->m_wait_for_distributed_computation = false;
+        if (m_object->m_wait_for_distributed_computation)
+            m_object->m_wait_for_distributed_computation = false;
 
         Device.remove_from_seq_parallel(fastdelegate::FastDelegate0<>(this, &CLevelPathBuilder::process));
     }

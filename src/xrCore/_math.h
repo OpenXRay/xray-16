@@ -39,10 +39,7 @@ IC u64 GetCLK(void)
 }
 #pragma warning(default : 4035)
 #else
-IC u64 GetCLK(void)
-{
-    return __rdtsc();
-}
+IC u64 GetCLK(void) { return __rdtsc(); }
 #endif
 #endif
 
@@ -59,4 +56,4 @@ typedef void thread_t(void*);
 extern XRCORE_API void thread_name(const char* name);
 extern XRCORE_API void thread_spawn(thread_t* entry, const char* name, unsigned stack, void* arglist);
 
-#endif  //__XR_MATH_H__
+#endif //__XR_MATH_H__

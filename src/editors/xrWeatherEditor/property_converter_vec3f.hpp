@@ -12,7 +12,7 @@
 public
 ref class property_converter_vec3f : public System::ComponentModel::TypeConverter
 {
-  private:
+private:
     typedef System::ComponentModel::TypeConverter inherited;
     typedef System::ComponentModel::PropertyDescriptorCollection PropertyDescriptorCollection;
     typedef System::ComponentModel::ITypeDescriptorContext ITypeDescriptorContext;
@@ -21,20 +21,20 @@ ref class property_converter_vec3f : public System::ComponentModel::TypeConverte
     typedef System::Globalization::CultureInfo CultureInfo;
     typedef System::Type Type;
 
-  public:
+public:
     typedef System::ComponentModel::TypeConverter::StandardValuesCollection StandardValuesCollection;
 
-  public:
+public:
     virtual PropertyDescriptorCollection ^
         GetProperties(ITypeDescriptorContext ^ context, Object ^ value, array<Attribute ^> ^ attributes) override;
     virtual bool GetPropertiesSupported(ITypeDescriptorContext ^ context) override;
 
-  public:
+public:
     virtual bool CanConvertTo(ITypeDescriptorContext ^ context, Type ^ destination_type) override;
     virtual Object ^ ConvertTo(ITypeDescriptorContext ^ context, CultureInfo ^ culture, Object ^ value,
                          Type ^ destination_type) override;
     virtual bool CanConvertFrom(ITypeDescriptorContext ^ context, Type ^ source_type) override;
     virtual Object ^ ConvertFrom(ITypeDescriptorContext ^ context, CultureInfo ^ culture, Object ^ value) override;
-};  // ref class property_converter_vec3f
+}; // ref class property_converter_vec3f
 
-#endif  // ifndef PROPERTY_CONVERTER_VEC3F_HPP_INCLUDED
+#endif // ifndef PROPERTY_CONVERTER_VEC3F_HPP_INCLUDED

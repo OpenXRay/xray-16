@@ -130,7 +130,7 @@ generated on my behalf
 
 class NVMeshMender
 {
-  private:
+private:
     mutable xr_vector<xr_string> LastErrors_;
 
     struct Edge
@@ -142,14 +142,15 @@ class NVMeshMender
         unsigned int face2;
 
         bool operator==(const Edge& rhs) const { return ((v0 == rhs.v0) && (v1 == rhs.v1)); }
-
         bool operator<(const Edge& rhs) const
         {
-            if (v0 < rhs.v0) {
+            if (v0 < rhs.v0)
+            {
                 return true;
             }
 
-            if (v0 > rhs.v0) {
+            if (v0 > rhs.v0)
+            {
                 return false;
             }
 
@@ -157,14 +158,14 @@ class NVMeshMender
         }
     };
 
-  public:
+public:
     void SetLastError(const xr_string& rhs) const { LastErrors_.push_back(rhs); }
-
     xr_string GetLastError() const
     {
         xr_string aString;
 
-        if (LastErrors_.size() > 0) {
+        if (LastErrors_.size() > 0)
+        {
             aString = LastErrors_.back();
         }
         return aString;
@@ -189,11 +190,8 @@ class NVMeshMender
         }
 
         VertexAttribute(const char* pName = "") : Name_(pName) { ; }
-
         VertexAttribute(const VertexAttribute& rhs) { *this = rhs; }
-
         bool operator==(const VertexAttribute& rhs) { return (Name_ == rhs.Name_); }
-
         bool operator<(const VertexAttribute& rhs) { return (Name_ < rhs.Name_); }
     };
 
@@ -221,4 +219,4 @@ class NVMeshMender
         const Option _WeightNormalsByFaceSize = WeightNormalsByFaceSize);
 };
 
-#endif  //_NVMeshMender_H_
+#endif //_NVMeshMender_H_

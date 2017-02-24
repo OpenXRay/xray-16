@@ -55,10 +55,8 @@ class CControlledEntity : public CControlledEntityBase
 
 public:
     virtual bool is_under_control() { return (m_controller != 0); }
-
     virtual void set_data(const SControlledInfo& info) { m_data = info; }
     virtual SControlledInfo& get_data() { return m_data; }
-
     virtual void set_task_follow(const CEntity* e);
     virtual void set_task_attack(const CEntity* e);
 
@@ -70,7 +68,6 @@ public:
     virtual void on_destroy();
 
     void init_external(_Object* obj) { m_object = obj; }
-
     CController* get_controller() { return m_controller; }
 };
 

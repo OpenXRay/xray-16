@@ -25,9 +25,9 @@ private:
     Lock lock;
     CDB::MODEL Static;
     Fbox m_BoundingVolume;
-    xrXRC xrc;                       // MT: dangerous
-    collide::rq_results r_temp;      // MT: dangerous
-    xr_vector<ISpatial*> r_spatial;  // MT: dangerous
+    xrXRC xrc; // MT: dangerous
+    collide::rq_results r_temp; // MT: dangerous
+    xr_vector<ISpatial*> r_spatial; // MT: dangerous
 public:
 #ifdef DEBUG
     FactoryPtr<IObjectSpaceRender>* m_pRender;
@@ -80,9 +80,7 @@ public:
     CDB::TRI* GetStaticTris() { return Static.get_tris(); }
     Fvector* GetStaticVerts() { return Static.get_verts(); }
     CDB::MODEL* GetStaticModel() { return &Static; }
-
     const Fbox& GetBoundingVolume() { return m_BoundingVolume; }
-
 // Debugging
 #ifdef DEBUG
     void dbgRender();
@@ -91,4 +89,4 @@ public:
     void DumpStatistics(IGameFont& font, IPerformanceAlert* alert);
 };
 
-#endif  //__XR_AREA_H__
+#endif //__XR_AREA_H__

@@ -20,7 +20,7 @@ CUIButton::CUIButton()
     m_uAccelerator[3] = -1;
 
     TextItemControl()->SetTextComplexMode(false);
-    TextItemControl()->SetTextAlignment(CGameFont::alCenter);  // this will create class instance for m_pLines
+    TextItemControl()->SetTextAlignment(CGameFont::alCenter); // this will create class instance for m_pLines
     TextItemControl()->SetVTextAlignment(valCenter);
 }
 
@@ -34,18 +34,21 @@ void CUIButton::Enable(bool status)
 {
     CUIStatic::Enable(status);
 
-    if (!status) m_bCursorOverWindow = false;
+    if (!status)
+        m_bCursorOverWindow = false;
 }
 
 bool CUIButton::OnMouseAction(float x, float y, EUIMessages mouse_action)
 {
-    if (inherited::OnMouseAction(x, y, mouse_action)) return true;
+    if (inherited::OnMouseAction(x, y, mouse_action))
+        return true;
 
     switch (m_eButtonState)
     {
     case BUTTON_NORMAL:
     {
-        if (mouse_action == WINDOW_LBUTTON_DOWN || mouse_action == WINDOW_LBUTTON_DB_CLICK) {
+        if (mouse_action == WINDOW_LBUTTON_DOWN || mouse_action == WINDOW_LBUTTON_DB_CLICK)
+        {
             SetButtonState(BUTTON_PUSHED);
             GetMessageTarget()->SendMessage(this, BUTTON_DOWN, NULL);
             return true;
@@ -54,21 +57,27 @@ bool CUIButton::OnMouseAction(float x, float y, EUIMessages mouse_action)
     break;
     case BUTTON_PUSHED:
     {
-        if (mouse_action == WINDOW_LBUTTON_UP) {
-            if (m_bCursorOverWindow) OnClick();
+        if (mouse_action == WINDOW_LBUTTON_UP)
+        {
+            if (m_bCursorOverWindow)
+                OnClick();
 
-            if (!m_bIsSwitch) SetButtonState(BUTTON_NORMAL);
+            if (!m_bIsSwitch)
+                SetButtonState(BUTTON_NORMAL);
         }
         else if (mouse_action == WINDOW_MOUSE_MOVE)
         {
-            if (!m_bCursorOverWindow && !m_bIsSwitch) SetButtonState(BUTTON_UP);
+            if (!m_bCursorOverWindow && !m_bIsSwitch)
+                SetButtonState(BUTTON_UP);
         }
     }
     break;
     case BUTTON_UP:
     {
-        if (mouse_action == WINDOW_MOUSE_MOVE) {
-            if (m_bCursorOverWindow) SetButtonState(BUTTON_PUSHED);
+        if (mouse_action == WINDOW_MOUSE_MOVE)
+        {
+            if (m_bCursorOverWindow)
+                SetButtonState(BUTTON_PUSHED);
         }
         else if (mouse_action == WINDOW_LBUTTON_UP)
         {
@@ -80,17 +89,14 @@ bool CUIButton::OnMouseAction(float x, float y, EUIMessages mouse_action)
     return false;
 }
 
-void CUIButton::OnClick()
-{
-    GetMessageTarget()->SendMessage(this, BUTTON_CLICKED);
-}
-
+void CUIButton::OnClick() { GetMessageTarget()->SendMessage(this, BUTTON_CLICKED); }
 void CUIButton::DrawTexture()
 {
     Frect rect;
     GetAbsoluteRect(rect);
 
-    if (m_bTextureEnable && GetShader() && GetShader()->inited()) {
+    if (m_bTextureEnable && GetShader() && GetShader()->inited())
+    {
         if (GetButtonState() == BUTTON_UP || GetButtonState() == BUTTON_NORMAL)
             m_UIStaticItem.SetPos(rect.left + m_TextureOffset.x, rect.top + m_TextureOffset.y);
         else
@@ -115,7 +121,8 @@ void CUIButton::DrawText()
     float right_offset;
     float down_offset;
 
-    if (GetButtonState() == BUTTON_UP || GetButtonState() == BUTTON_NORMAL) {
+    if (GetButtonState() == BUTTON_UP || GetButtonState() == BUTTON_NORMAL)
+    {
         right_offset = 0;
         down_offset = 0;
     }
@@ -126,7 +133,8 @@ void CUIButton::DrawText()
     }
 
     CUIStatic::DrawText();
-    if (g_btnHint->Owner() == this) g_btnHint->Draw_();
+    if (g_btnHint->Owner() == this)
+        g_btnHint->Draw_();
 }
 
 bool is_in2(const Frect& b1, const Frect& b2)
@@ -153,10 +161,13 @@ void CUIButton::Update()
         r.add(c_pos.x, c_pos.y);
 
         r.sub(0.0f, r.height());
-        if (false == is_in2(vis_rect, r)) r.sub(r.width(), 0.0f);
-        if (false == is_in2(vis_rect, r)) r.add(0.0f, r.height());
+        if (false == is_in2(vis_rect, r))
+            r.sub(r.width(), 0.0f);
+        if (false == is_in2(vis_rect, r))
+            r.add(0.0f, r.height());
 
-        if (false == is_in2(vis_rect, r)) r.add(r.width(), 45.0f);
+        if (false == is_in2(vis_rect, r))
+            r.add(r.width(), 45.0f);
 
         g_btnHint->SetWndPos(r.lt);
     }
@@ -167,15 +178,18 @@ void CUIButton::OnFocusLost()
     inherited::OnFocusLost();
 
     if (m_eButtonState == BUTTON_PUSHED && pInput->iGetAsyncBtnState(0) && !m_bIsSwitch)
-        SetButtonState(BUTTON_NORMAL);  //???
+        SetButtonState(BUTTON_NORMAL); //???
 
-    if (g_btnHint->Owner() == this) g_btnHint->Discard();
+    if (g_btnHint->Owner() == this)
+        g_btnHint->Discard();
 }
 
 bool CUIButton::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (WINDOW_KEY_PRESSED == keyboard_action) {
-        if (IsAccelerator(dik)) {
+    if (WINDOW_KEY_PRESSED == keyboard_action)
+    {
+        if (IsAccelerator(dik))
+        {
             OnClick();
             return true;
         }
@@ -198,9 +212,10 @@ const int CUIButton::GetAccelerator(int idx) const
 bool CUIButton::IsAccelerator(int iAccel) const
 {
     bool res = GetAccelerator(0) == iAccel || GetAccelerator(1) == iAccel;
-    if (!res) {
+    if (!res)
+    {
         res = ((m_uAccelerator[2] != -1) ? is_binded((EGameActions)GetAccelerator(2), iAccel) : false) ||
-              ((m_uAccelerator[3] != -1) ? is_binded((EGameActions)GetAccelerator(3), iAccel) : false);
+            ((m_uAccelerator[3] != -1) ? is_binded((EGameActions)GetAccelerator(3), iAccel) : false);
     }
     return res;
 }

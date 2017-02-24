@@ -14,19 +14,19 @@
 public
 ref class property_vec3f_reference : public property_vec3f_base
 {
-  public:
+public:
     typedef property_vec3f_base inherited;
     typedef editor::vec3f vec3f;
 
-  public:
+public:
     property_vec3f_reference(vec3f& value);
     virtual ~property_vec3f_reference();
     !property_vec3f_reference();
     virtual vec3f get_value_raw() override;
     virtual void set_value_raw(vec3f value) override;
 
-  private:
+private:
     value_holder<vec3f>* m_value;
-};  // ref class property_vec3f_reference
+}; // ref class property_vec3f_reference
 
-#endif  // ifndef PROPERTY_VEC3F_REFERENCE_HPP_INCLUDED
+#endif // ifndef PROPERTY_VEC3F_REFERENCE_HPP_INCLUDED

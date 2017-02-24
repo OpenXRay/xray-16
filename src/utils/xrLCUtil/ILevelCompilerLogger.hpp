@@ -5,7 +5,6 @@ class XRLCUTIL_API ILevelCompilerLogger
 {
 protected:
     ILevelCompilerLogger() {}
-
 public:
     virtual void Initialize(const char* name) = 0;
     virtual void Destroy() = 0;

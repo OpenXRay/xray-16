@@ -13,24 +13,28 @@
 //----------------------------------------------------
 CCustomObject* EScene::FindObjectByName(LPCSTR name, ObjClassID classfilter)
 {
-    if (!name) return NULL;
+    if (!name)
+        return NULL;
 
     CCustomObject* object = 0;
-    if (classfilter == OBJCLASS_DUMMY) {
+    if (classfilter == OBJCLASS_DUMMY)
+    {
         SceneToolsMapPairIt _I = m_SceneTools.begin();
         SceneToolsMapPairIt _E = m_SceneTools.end();
         for (; _I != _E; ++_I)
         {
             ESceneCustomOTool* mt = dynamic_cast<ESceneCustomOTool*>(_I->second);
 
-            if (mt && (0 != (object = mt->FindObjectByName(name)))) return object;
+            if (mt && (0 != (object = mt->FindObjectByName(name))))
+                return object;
         }
     }
     else
     {
         ESceneCustomOTool* mt = GetOTool(classfilter);
         VERIFY(mt);
-        if (mt && (0 != (object = mt->FindObjectByName(name)))) return object;
+        if (mt && (0 != (object = mt->FindObjectByName(name))))
+            return object;
     }
     return object;
 }
@@ -43,7 +47,8 @@ CCustomObject* EScene::FindObjectByName(LPCSTR name, CCustomObject* pass_object)
     for (; _I != _E; _I++)
     {
         ESceneCustomOTool* mt = dynamic_cast<ESceneCustomOTool*>(_I->second);
-        if (mt && (0 != (object = mt->FindObjectByName(name, pass_object)))) return object;
+        if (mt && (0 != (object = mt->FindObjectByName(name, pass_object))))
+            return object;
     }
     return 0;
 }
@@ -56,10 +61,12 @@ bool EScene::FindDuplicateName()
     for (; _I != _E; _I++)
     {
         ESceneCustomOTool* mt = dynamic_cast<ESceneCustomOTool*>(_I->second);
-        if (mt) {
+        if (mt)
+        {
             ObjectList& lst = mt->GetObjects();
             for (ObjectIt _F = lst.begin(); _F != lst.end(); _F++)
-                if (FindObjectByName((*_F)->Name, *_F)) {
+                if (FindObjectByName((*_F)->Name, *_F))
+                {
                     ELog.DlgMsg(mtError, "Duplicate object name already exists: '%s'", (*_F)->Name);
                     return true;
                 }

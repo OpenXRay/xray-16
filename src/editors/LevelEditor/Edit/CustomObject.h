@@ -56,7 +56,7 @@ class ECORE_API CCustomObject
     void AnimationDeleteKey(float t);
     void AnimationUpdate(float t);
 
-  public:
+public:
     enum
     {
         flSelected_notused = (1 << 0),
@@ -84,7 +84,7 @@ class ECORE_API CCustomObject
     };
     Flags32 m_RT_Flags;
 
-  public:
+public:
     shared_str FName;
     int save_id;
     // orientation
@@ -112,7 +112,7 @@ class ECORE_API CCustomObject
     void__stdcall OnMotionCurrentFrameChange(PropValue* value);
     void__stdcall OnMotionCameraViewChange(PropValue* value);
 
-  protected:
+protected:
     LPCSTR GetName() const { return *FName; }
     void SetName(LPCSTR N)
     {
@@ -125,7 +125,6 @@ class ECORE_API CCustomObject
     virtual const Fvector& GetPosition() const { return FPosition; }
     virtual const Fvector& GetRotation() const { return FRotation; }
     virtual const Fvector& GetScale() const { return FScale; }
-
     virtual void SetPosition(const Fvector& pos)
     {
         FPosition.set(pos);
@@ -151,8 +150,7 @@ class ECORE_API CCustomObject
     void__stdcall OnNumChangeScale(PropValue* sender);
 
     virtual void DeleteThis() { m_RT_Flags.set(flRT_NeedSelfDelete, TRUE); }
-
-  public:
+public:
     CCustomObject(LPVOID data, LPCSTR name);
     virtual ~CCustomObject();
 
@@ -163,7 +161,6 @@ class ECORE_API CCustomObject
     IC BOOL Selected() const { return m_RT_Flags.is(flRT_Selected); }
     IC BOOL Valid() const { return m_RT_Flags.is(flRT_Valid); }
     IC BOOL IsDeleted() const { return m_RT_Flags.is(flRT_NeedSelfDelete); }
-
     // editor integration
     virtual bool Validate(bool bMsg) { return true; }
     virtual void FillProp(LPCSTR pref, PropItemVec& items);
@@ -174,7 +171,6 @@ class ECORE_API CCustomObject
     virtual void Show(BOOL flag);
     void SetValid(BOOL flag) { m_RT_Flags.set(flRT_Valid, flag); }
     void SetRenderIfSelected(BOOL flag) { m_CO_Flags.set(flRenderAnyWayIfSelected, flag); }
-
     virtual bool IsRender();
     virtual void Render(int priority, bool strictB2F);
     void RenderRoot(int priority, bool strictB2F);
@@ -184,7 +180,7 @@ class ECORE_API CCustomObject
     virtual void OnSceneRemove(){};
 
     virtual bool RaySelect(
-        int flag, const Fvector& start, const Fvector& dir, bool bRayTest = false);  // flag 1,0,-1 (-1 invert)
+        int flag, const Fvector& start, const Fvector& dir, bool bRayTest = false); // flag 1,0,-1 (-1 invert)
     virtual bool FrustumSelect(int flag, const CFrustum& frustum);
     virtual bool RayPick(float& dist, const Fvector& start, const Fvector& dir, SRayPickInfo* pinf = NULL)
     {
@@ -192,7 +188,6 @@ class ECORE_API CCustomObject
     };
     virtual bool FrustumPick(const CFrustum& frustum) { return false; };
     virtual bool SpherePick(const Fvector& center, float radius) { return false; };
-
     void ResetTransform()
     {
         FScale.set(1, 1, 1);
@@ -207,7 +202,8 @@ class ECORE_API CCustomObject
     virtual void UpdateTransform(bool bForced = false)
     {
         m_RT_Flags.set(flRT_UpdateTransform, TRUE);
-        if (bForced) OnUpdateTransform();
+        if (bForced)
+            OnUpdateTransform();
     }
 
     // animation methods
@@ -219,7 +215,6 @@ class ECORE_API CCustomObject
     virtual bool CanAttach() = 0;
 
     virtual bool OnChooseQuery(LPCSTR specific) { return true; }
-
     // change position/orientation methods
     virtual void NumSetPosition(const Fvector& pos) { SetPosition(pos); }
     virtual void NumSetRotation(const Fvector& rot) { SetRotation(rot); }
@@ -238,27 +233,22 @@ class ECORE_API CCustomObject
     virtual void SaveLTX(CInifile& ini, LPCSTR sect_name);
 
     virtual bool ExportGame(SExportStreams* data) { return true; }
-
     virtual bool GetBox(Fbox& box) const { return false; }
     virtual bool GetUTBox(Fbox& box) { return false; }
     virtual void OnSceneUpdate() { ; }
     virtual void OnObjectRemove(const CCustomObject* object) { ; }
-    virtual bool OnSelectionRemove() { return true; }  // возвращает можно ли его удалять вообще
-
+    virtual bool OnSelectionRemove() { return true; } // возвращает можно ли его удалять вообще
     virtual void OnDeviceCreate() { ; }
     virtual void OnDeviceDestroy() { ; }
-
     virtual void OnSynchronize();
     virtual void OnShowHint(AStringVec& dest);
 
     virtual LPCSTR RefName() { return 0; }
-
     IC const Fmatrix& _ITransform() { return FITransform; }
     IC const Fmatrix& _Transform() { return FTransform; }
     IC const Fvector& _Position() { return FPosition; }
     IC const Fvector& _Rotation() { return FRotation; }
     IC const Fvector& _Scale() { return FScale; }
-
     PropertyGP(GetPosition, SetPosition) Fvector PPosition;
     PropertyGP(GetRotation, SetRotation) Fvector PRotation;
     PropertyGP(GetScale, SetScale) Fvector PScale;
@@ -267,7 +257,7 @@ class ECORE_API CCustomObject
     PropertyGP(FClassID, FClassID) ObjClassID ClassID;
     PropertyGP(GetName, SetName) LPCSTR Name;
 
-  public:
+public:
     static void SnapMove(Fvector& pos, Fvector& rot, const Fmatrix& rotRP, const Fvector& amount);
     static void NormalAlign(Fvector& rot, const Fvector& up, const Fvector& dir);
 };

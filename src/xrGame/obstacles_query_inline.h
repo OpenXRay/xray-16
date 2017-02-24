@@ -9,16 +9,8 @@
 #ifndef OBSTACLES_QUERY_INLINE_H
 #define OBSTACLES_QUERY_INLINE_H
 
-IC obstacles_query::obstacles_query()
-{
-    init();
-}
-
-IC void obstacles_query::init()
-{
-    m_crc = 0;
-}
-
+IC obstacles_query::obstacles_query() { init(); }
+IC void obstacles_query::init() { m_crc = 0; }
 IC void obstacles_query::clear()
 {
     m_area.clear_not_free();
@@ -45,7 +37,8 @@ IC void obstacles_query::copy(const obstacles_query& object)
 IC void obstacles_query::add(const CGameObject* object)
 {
     VERIFY(object);
-    if (m_obstacles.find(object) != m_obstacles.end()) return;
+    if (m_obstacles.find(object) != m_obstacles.end())
+        return;
 
     m_actual = false;
     m_obstacles.insert(std::make_pair(object, u32(-1)));
@@ -66,9 +59,11 @@ IC bool obstacles_query::update_objects(const Fvector& position, const float& ra
 
 IC bool obstacles_query::operator==(const obstacles_query& object) const
 {
-    if (crc() != object.crc()) return (false);
+    if (crc() != object.crc())
+        return (false);
 
-    if (!equal(area(), object.area())) return (false);
+    if (!equal(area(), object.area()))
+        return (false);
 
     //	if (!equal(obstacles(),object.obstacles()))
     //		return				(false);
@@ -76,36 +71,17 @@ IC bool obstacles_query::operator==(const obstacles_query& object) const
     return (true);
 }
 
-IC bool obstacles_query::operator!=(const obstacles_query& object) const
-{
-    return (!operator==(object));
-}
-
-IC const obstacles_query::AREA& obstacles_query::area() const
-{
-    return (const_cast<obstacles_query*>(this)->area());
-}
-
+IC bool obstacles_query::operator!=(const obstacles_query& object) const { return (!operator==(object)); }
+IC const obstacles_query::AREA& obstacles_query::area() const { return (const_cast<obstacles_query*>(this)->area()); }
 IC obstacles_query::AREA& obstacles_query::area()
 {
-    if (!actual()) compute_area();
+    if (!actual())
+        compute_area();
 
     return (m_area);
 }
 
-IC const obstacles_query::OBSTACLES& obstacles_query::obstacles() const
-{
-    return (m_obstacles);
-}
-
-IC const u32& obstacles_query::crc() const
-{
-    return (m_crc);
-}
-
-IC const bool& obstacles_query::actual() const
-{
-    return (m_actual);
-}
-
-#endif  // OBSTACLES_QUERY_INLINE_H
+IC const obstacles_query::OBSTACLES& obstacles_query::obstacles() const { return (m_obstacles); }
+IC const u32& obstacles_query::crc() const { return (m_crc); }
+IC const bool& obstacles_query::actual() const { return (m_actual); }
+#endif // OBSTACLES_QUERY_INLINE_H

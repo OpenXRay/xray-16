@@ -8,11 +8,7 @@
 
 #pragma once
 
-IC bool CALifeSimulatorBase::initialized() const
-{
-    return (m_initialized);
-}
-
+IC bool CALifeSimulatorBase::initialized() const { return (m_initialized); }
 IC const CALifeSimulatorHeader& CALifeSimulatorBase::header() const
 {
     VERIFY(initialized());
@@ -153,16 +149,8 @@ IC inventory::upgrade::Manager& CALifeSimulatorBase::inventory_upgrade_manager()
     return (*m_upgrade_manager);
 }
 
-IC CRandom32& CALifeSimulatorBase::random()
-{
-    return (m_random);
-}
-
-IC void CALifeSimulatorBase::setup_command_line(shared_str* command_line)
-{
-    m_server_command_line = command_line;
-}
-
+IC CRandom32& CALifeSimulatorBase::random() { return (m_random); }
+IC void CALifeSimulatorBase::setup_command_line(shared_str* command_line) { m_server_command_line = command_line; }
 IC IPureServer& CALifeSimulatorBase::server() const
 {
     VERIFY(m_server);
@@ -201,7 +189,4 @@ IC void CALifeSimulatorBase::can_register_objects(const bool& value)
     m_can_register_objects = value;
 }
 
-IC const bool& CALifeSimulatorBase::can_register_objects() const
-{
-    return (m_can_register_objects);
-}
+IC const bool& CALifeSimulatorBase::can_register_objects() const { return (m_can_register_objects); }

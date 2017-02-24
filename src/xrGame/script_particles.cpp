@@ -36,20 +36,23 @@ CScriptParticlesCustom::~CScriptParticlesCustom()
 
 void CScriptParticlesCustom::PSI_internal_delete()
 {
-    if (m_owner) m_owner->m_particles = NULL;
+    if (m_owner)
+        m_owner->m_particles = NULL;
     CParticlesObject::PSI_internal_delete();
 }
 
 void CScriptParticlesCustom::PSI_destroy()
 {
-    if (m_owner) m_owner->m_particles = NULL;
+    if (m_owner)
+        m_owner->m_particles = NULL;
     CParticlesObject::PSI_destroy();
 }
 
 void CScriptParticlesCustom::shedule_Update(u32 _dt)
 {
     CParticlesObject::shedule_Update(_dt);
-    if (m_animator) {
+    if (m_animator)
+    {
         float dt = float(_dt) / 1000.f;
         Fvector prev_pos = m_animator->XFORM().c;
         m_animator->Update(dt);
@@ -60,8 +63,10 @@ void CScriptParticlesCustom::shedule_Update(u32 _dt)
 }
 void CScriptParticlesCustom::LoadPath(LPCSTR caPathName)
 {
-    if (!m_animator) m_animator = new CObjectAnimator();
-    if ((0 == m_animator->Name()) || (0 != xr_strcmp(m_animator->Name(), caPathName))) {
+    if (!m_animator)
+        m_animator = new CObjectAnimator();
+    if ((0 == m_animator->Name()) || (0 != xr_strcmp(m_animator->Name(), caPathName)))
+    {
         m_animator->Clear();
         m_animator->Load(caPathName);
     }
@@ -96,7 +101,8 @@ CScriptParticles::CScriptParticles(LPCSTR caParticlesName)
 
 CScriptParticles::~CScriptParticles()
 {
-    if (m_particles) {
+    if (m_particles)
+    {
         // destroy particles
         m_particles->remove_owner();
         m_particles->PSI_destroy();
@@ -153,15 +159,6 @@ void CScriptParticles::LoadPath(LPCSTR caPathName)
     VERIFY(m_particles);
     m_particles->LoadPath(caPathName);
 }
-void CScriptParticles::StartPath(bool looped)
-{
-    m_particles->StartPath(looped);
-}
-void CScriptParticles::StopPath()
-{
-    m_particles->StopPath();
-}
-void CScriptParticles::PausePath(bool val)
-{
-    m_particles->PausePath(val);
-}
+void CScriptParticles::StartPath(bool looped) { m_particles->StartPath(looped); }
+void CScriptParticles::StopPath() { m_particles->StopPath(); }
+void CScriptParticles::PausePath(bool val) { m_particles->PausePath(val); }

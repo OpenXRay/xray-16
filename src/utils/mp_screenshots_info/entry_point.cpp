@@ -4,16 +4,8 @@
 
 #pragma comment(lib, "xrCore.lib")
 
-void print_format()
-{
-    printf("Format: mp_screenshots_info.exe [screenshot_file_name]\n");
-};
-
-void xrcore_log_cb(void* context, LPCSTR log_string)
-{
-    printf("%s\n", log_string);
-};
-
+void print_format() { printf("Format: mp_screenshots_info.exe [screenshot_file_name]\n"); };
+void xrcore_log_cb(void* context, LPCSTR log_string) { printf("%s\n", log_string); };
 u8* ss_buffer = NULL;
 u32 ss_buffer_size = 0;
 /*#ifdef DEBUG
@@ -46,16 +38,18 @@ void debug_sign_screenshot(IReader* screenshot)
 
 void screenshot_info(IReader* screenshot)
 {
-    using namespace screenshots;  // for reader
+    using namespace screenshots; // for reader
     reader tmp_reader(screenshot);
-    if (!tmp_reader.is_valid()) {
+    if (!tmp_reader.is_valid())
+    {
         Msg("ERROR: screenshot not valid or corrupted.");
         return;
     }
     Msg("Verifying screenshot digital sign...");
     bool verify_res = tmp_reader.verify();
     Msg("Screenshot verification: %s", verify_res ? "Succeeded" : "FAILED");
-    if (!verify_res) {
+    if (!verify_res)
+    {
         return;
     }
     Msg("Screenshot info:");
@@ -68,7 +62,8 @@ void screenshot_info(IReader* screenshot)
 int main(int argc, char** argv)
 {
     printf("Copyright (C) GSC Game World 2009\n");
-    if (argc < 2) {
+    if (argc < 2)
+    {
         printf("ERROR: bad parameters.\n");
         print_format();
         return EXIT_FAILURE;
@@ -78,22 +73,26 @@ int main(int argc, char** argv)
     crypto::xr_crypto_init();
 
 #ifdef DEBUG
-    if (strstr(argv[1], "--gen_params")) {
+    if (strstr(argv[1], "--gen_params"))
+    {
         crypto::xr_dsa::generate_params();
         Core._destroy();
         return EXIT_SUCCESS;
     }
 #endif
-    if (argc < 3) {
+    if (argc < 3)
+    {
         printf("ERROR: screenshot file not specified.\n");
         print_format();
         return EXIT_FAILURE;
     }
     const char* ss_file = argv[2];
     IReader* tmp_jpg = FS.r_open("$screenshots$", ss_file);
-    if (!tmp_jpg) {
+    if (!tmp_jpg)
+    {
         tmp_jpg = FS.r_open(ss_file);
-        if (!tmp_jpg) {
+        if (!tmp_jpg)
+        {
             printf("ERROR: can't open file: %s", ss_file);
             Core._destroy();
             return EXIT_FAILURE;

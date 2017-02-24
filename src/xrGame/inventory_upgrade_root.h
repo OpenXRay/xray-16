@@ -33,7 +33,7 @@ public:
 #ifdef DEBUG
     virtual void log_hierarchy(LPCSTR nest);
     void test_all_upgrades(CInventoryItem& item);
-#endif  // DEBUG
+#endif // DEBUG
 
     virtual bool contain_upgrade(const shared_str& upgrade_id);
     bool verify_scheme_index(const Ivector2& scheme_index);
@@ -46,11 +46,11 @@ protected:
     shared_str m_upgrade_scheme;
     Upgrades_vec m_contained_upgrades;
 
-};  // class Root
+}; // class Root
 
-}  // namespace upgrade
-}  // namespace inventory
+} // namespace upgrade
+} // namespace inventory
 
 #include "inventory_upgrade_root_inline.h"
 
-#endif  // INVENTORY_UPGRADE_ROOT_H_INCLUDED
+#endif // INVENTORY_UPGRADE_ROOT_H_INCLUDED

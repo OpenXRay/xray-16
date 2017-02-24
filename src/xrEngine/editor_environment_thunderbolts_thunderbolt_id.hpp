@@ -31,7 +31,6 @@ public:
     virtual ~thunderbolt_id();
     void fill(editor::property_holder_collection* collection);
     inline LPCSTR id() const { return m_id.c_str(); }
-
 private:
     typedef editor::property_holder property_holder_type;
 
@@ -46,11 +45,11 @@ private:
     property_holder_type* m_property_holder;
     manager const& m_manager;
     shared_str m_id;
-};  // class thunderbolt_id
-}  // namespace thunderbolts
-}  // namespace environment
-}  // namespace editor
+}; // class thunderbolt_id
+} // namespace thunderbolts
+} // namespace environment
+} // namespace editor
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
-#endif  // ifndef EDITOR_WEATHER_THUNDERBOLTS_THUNDERBOLT_ID_HPP_INCLUDED
+#endif // ifndef EDITOR_WEATHER_THUNDERBOLTS_THUNDERBOLT_ID_HPP_INCLUDED

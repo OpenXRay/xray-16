@@ -22,17 +22,14 @@ class EParticlesObject : public CCustomObject
     void __stdcall OnRefChange(PropValue* V);
     void __stdcall OnControlClick(ButtonValue* sender, bool& bModif, bool& bSafe);
 
-  public:
+public:
     EParticlesObject(LPVOID data, LPCSTR name);
     void Construct(LPVOID data);
     virtual ~EParticlesObject();
 
     virtual bool CanAttach() { return true; }
-
     IParticleCustom* GetParticles() { return m_Particles; }
-
     LPCSTR GetReferenceName() { return m_Particles ? *m_Particles->Name() : 0; }
-
     void RenderSingle();
     virtual void Render(int priority, bool strictB2F);
     virtual bool RayPick(float& distance, const Fvector& start, const Fvector& direction, SRayPickInfo* pinf = NULL);

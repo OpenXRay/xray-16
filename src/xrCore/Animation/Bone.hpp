@@ -25,24 +25,23 @@ class XRCORE_API CBoneInstance
 {
 public:
     // data
-    Fmatrix mTransform;        // final x-form matrix (local to model)
-    Fmatrix mRenderTransform;  // final x-form matrix (model_base -> bone -> model)
+    Fmatrix mTransform; // final x-form matrix (local to model)
+    Fmatrix mRenderTransform; // final x-form matrix (model_base -> bone -> model)
 private:
     BoneCallback Callback;
     void* Callback_Param;
-    BOOL Callback_overwrite;  // performance hint - don't calc anims
+    BOOL Callback_overwrite; // performance hint - don't calc anims
     u32 Callback_type;
 
 public:
-    float param[MAX_BONE_PARAMS];  //
+    float param[MAX_BONE_PARAMS]; //
     //
     // methods
 public:
     IC BoneCallback callback() { return Callback; }
     IC void* callback_param() { return Callback_Param; }
-    IC BOOL callback_overwrite() { return Callback_overwrite; }  // performance hint - don't calc anims
+    IC BOOL callback_overwrite() { return Callback_overwrite; } // performance hint - don't calc anims
     IC u32 callback_type() { return Callback_type; }
-
 public:
     IC void construct();
 
@@ -62,7 +61,6 @@ public:
         Callback_type = 0;
     }
     void set_callback_overwrite(BOOL v) { Callback_overwrite = v; }
-
     void set_param(u32 idx, float data);
     float get_param(u32 idx);
 
@@ -71,7 +69,7 @@ public:
 #pragma pack(pop)
 
 #pragma pack(push, 2)
-struct XRCORE_API vertBoned1W  // (3+3+3+3+2+1)*4 = 15*4 = 60 bytes
+struct XRCORE_API vertBoned1W // (3+3+3+3+2+1)*4 = 15*4 = 60 bytes
 {
     Fvector P;
     Fvector N;
@@ -89,7 +87,7 @@ struct XRCORE_API vertBoned1W  // (3+3+3+3+2+1)*4 = 15*4 = 60 bytes
     }
 #endif
 };
-struct XRCORE_API vertBoned2W  // (1+3+3 + 1+3+3 + 2)*4 = 16*4 = 64 bytes
+struct XRCORE_API vertBoned2W // (1+3+3 + 1+3+3 + 2)*4 = 16*4 = 64 bytes
 {
     u16 matrix0;
     u16 matrix1;
@@ -109,7 +107,7 @@ struct XRCORE_API vertBoned2W  // (1+3+3 + 1+3+3 + 2)*4 = 16*4 = 64 bytes
     }
 #endif
 };
-struct XRCORE_API vertBoned3W  // 70 bytes
+struct XRCORE_API vertBoned3W // 70 bytes
 {
     u16 m[3];
     Fvector P;
@@ -128,7 +126,7 @@ struct XRCORE_API vertBoned3W  // 70 bytes
     }
 #endif
 };
-struct XRCORE_API vertBoned4W  // 76 bytes
+struct XRCORE_API vertBoned4W // 76 bytes
 {
     u16 m[4];
     Fvector P;
@@ -188,17 +186,17 @@ struct XRCORE_API SBoneShape
 
     enum EShapeFlags
     {
-        sfNoPickable = (1 << 0),  // use only in RayPick
+        sfNoPickable = (1 << 0), // use only in RayPick
         sfRemoveAfterBreak = (1 << 1),
         sfNoPhysics = (1 << 2),
         sfNoFogCollider = (1 << 3),
     };
 
-    u16 type;            // 2
-    Flags16 flags;       // 2
-    Fobb box;            // 15*4
-    Fsphere sphere;      // 4*4
-    Fcylinder cylinder;  // 8*4
+    u16 type; // 2
+    Flags16 flags; // 2
+    Fobb box; // 15*4
+    Fsphere sphere; // 4*4
+    Fcylinder cylinder; // 8*4
     SBoneShape() { Reset(); }
     void Reset()
     {
@@ -217,7 +215,7 @@ struct XRCORE_API SBoneShape
         case stSphere: return !fis_zero(sphere.R);
         case stCylinder:
             return !fis_zero(cylinder.m_height) && !fis_zero(cylinder.m_radius) &&
-                   !fis_zero(cylinder.m_direction.square_magnitude());
+                !fis_zero(cylinder.m_direction.square_magnitude());
         };
         return true;
     }
@@ -227,7 +225,7 @@ struct XRCORE_API SJointIKData
 {
     // IK
     EJointType type;
-    SJointLimit limits[3];  // by [axis XYZ on joint] and[Z-wheel,X-steer on wheel]
+    SJointLimit limits[3]; // by [axis XYZ on joint] and[Z-wheel,X-steer on wheel]
     float spring_factor;
     float damping_factor;
     enum
@@ -235,8 +233,8 @@ struct XRCORE_API SJointIKData
         flBreakable = (1 << 0),
     };
     Flags32 ik_flags;
-    float break_force;   // [0..+INF]
-    float break_torque;  // [0..+INF]
+    float break_force; // [0..+INF]
+    float break_torque; // [0..+INF]
 
     float friction;
 
@@ -268,8 +266,8 @@ struct XRCORE_API SJointIKData
             VERIFY(_min(-limits[k].limit.x, -limits[k].limit.y) == -limits[k].limit.y);
             VERIFY(_max(-limits[k].limit.x, -limits[k].limit.y) == -limits[k].limit.x);
 
-            F.w_float(-limits[k].limit.y);  // min (swap special for ODE)
-            F.w_float(-limits[k].limit.x);  // max (swap special for ODE)
+            F.w_float(-limits[k].limit.y); // min (swap special for ODE)
+            F.w_float(-limits[k].limit.x); // max (swap special for ODE)
 
             F.w_float(limits[k].spring_factor);
             F.w_float(limits[k].damping_factor);
@@ -292,7 +290,8 @@ struct XRCORE_API SJointIKData
         ik_flags.flags = F.r_u32();
         break_force = F.r_float();
         break_torque = F.r_float();
-        if (vers > 0) {
+        if (vers > 0)
+        {
             friction = F.r_float();
         }
         return true;
@@ -336,11 +335,11 @@ private:
     shared_str parent_name;
     shared_str wmap;
     Fvector rest_offset;
-    Fvector rest_rotate;  // XYZ format (Game format)
+    Fvector rest_rotate; // XYZ format (Game format)
     float rest_length;
 
     Fvector mot_offset;
-    Fvector mot_rotate;  // XYZ format (Game format)
+    Fvector mot_rotate; // XYZ format (Game format)
     float mot_length;
 
     Fmatrix mot_transform;
@@ -399,7 +398,6 @@ public:
     IC CBone* Parent() { return parent; }
     IC BOOL IsRoot() { return (parent == 0); }
     shared_str& NameRef() { return name; }
-
     // transformation
     const Fvector& _Offset() { return mot_offset; }
     const Fvector& _Rotate() { return mot_rotate; }
@@ -408,14 +406,11 @@ public:
     IC Fmatrix& _RITransform() { return rest_i_transform; }
     IC Fmatrix& _LRTransform() { return local_rest_transform; }
     IC Fmatrix& _MTransform() { return mot_transform; }
-
-    IC Fmatrix& _LTransform() { return mTransform; }  //{return last_transform;}
+    IC Fmatrix& _LTransform() { return mTransform; } //{return last_transform;}
     IC const Fmatrix& _LTransform() const { return mTransform; }
-
-    IC Fmatrix& _RenderTransform() { return mRenderTransform; }  //{return render_transform;}
+    IC Fmatrix& _RenderTransform() { return mRenderTransform; } //{return render_transform;}
     IC Fvector& _RestOffset() { return rest_offset; }
     IC Fvector& _RestRotate() { return rest_rotate; }
-
     void _Update(const Fvector& T, const Fvector& R)
     {
         mot_offset.set(T);
@@ -435,10 +430,8 @@ public:
     void Load_1(IReader& F);
     IC float engine_lo_limit(u8 k) const { return -IK_data.limits[k].limit.y; }
     IC float engine_hi_limit(u8 k) const { return -IK_data.limits[k].limit.x; }
-
     IC float editor_lo_limit(u8 k) const { return IK_data.limits[k].limit.x; }
     IC float editor_hi_limit(u8 k) const { return IK_data.limits[k].limit.y; }
-
     void SaveData(IWriter& F);
     void LoadData(IReader& F);
     void ResetData();
@@ -457,7 +450,6 @@ public:
 
     void Select(BOOL flag) { flags.set(flSelected, flag); }
     bool Selected() { return !!flags.is(flSelected); }
-
     void ClampByLimits();
 
     bool ExportOGF(IWriter& F);
@@ -505,7 +497,7 @@ public:
     Fobb obb;
 
     Fmatrix bind_transform;
-    Fmatrix m2b_transform;  // model to bone conversion transform
+    Fmatrix m2b_transform; // model to bone conversion transform
     SBoneShape shape;
     shared_str game_mtl_name;
     u16 game_mtl_idx;
@@ -513,11 +505,11 @@ public:
     float mass;
     Fvector center_of_mass;
 
-    vecBones children;  // bones which are slaves to this
+    vecBones children; // bones which are slaves to this
 
     DEFINE_VECTOR(u16, FacesVec, FacesVecIt);
     DEFINE_VECTOR(FacesVec, ChildFacesVec, ChildFacesVecIt);
-    ChildFacesVec child_faces;  // shared
+    ChildFacesVec child_faces; // shared
 public:
     CBoneData(u16 ID) : SelfID(ID) { VERIFY(SelfID != BI_NONE); }
     virtual ~CBoneData() {}
@@ -526,10 +518,8 @@ public:
     void DebugQuery(BoneDebug& L);
 #endif
     IC void SetParentID(u16 id) { ParentID = id; }
-
     IC u16 GetSelfID() const { return SelfID; }
     IC u16 GetParentID() const { return ParentID; }
-
     // assign face
     void AppendFace(u16 child_idx, u16 idx) { child_faces[child_idx].push_back(idx); }
     // Calculation
@@ -549,7 +539,6 @@ private:
     virtual shared_str GetMaterialName() const override { return name; }
     float lo_limit(u8 k) const { return IK_data.limits[k].limit.x; }
     float hi_limit(u8 k) const { return IK_data.limits[k].limit.y; }
-
 public:
     virtual u32 mem_usage()
     {
@@ -562,7 +551,7 @@ public:
 
 enum EBoneCallbackType
 {
-    bctDummy = u32(0),  // 0 - required!!!
+    bctDummy = u32(0), // 0 - required!!!
     bctPhysics,
     bctCustom,
     bctForceU32 = u32(-1),

@@ -92,7 +92,8 @@ void CUISpawnWnd::InitTeamLogo()
 
 void CUISpawnWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
-    if (BUTTON_CLICKED == msg) {
+    if (BUTTON_CLICKED == msg)
+    {
         HideDialog();
         game_cl_mp* game = smart_cast<game_cl_mp*>(&Game());
         VERIFY(game);
@@ -116,8 +117,10 @@ void CUISpawnWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 
 bool CUISpawnWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (WINDOW_KEY_PRESSED != keyboard_action) {
-        if (dik == DIK_TAB) {
+    if (WINDOW_KEY_PRESSED != keyboard_action)
+    {
+        if (dik == DIK_TAB)
+        {
             ShowChildren(true);
             game_cl_mp* game = smart_cast<game_cl_mp*>(&Game());
             game->OnKeyboardRelease(kSCORES);
@@ -126,7 +129,8 @@ bool CUISpawnWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
         return false;
     }
 
-    if (dik == DIK_TAB) {
+    if (dik == DIK_TAB)
+    {
         ShowChildren(false);
         game_cl_mp* game = smart_cast<game_cl_mp*>(&Game());
         game->OnKeyboardPress(kSCORES);
@@ -138,7 +142,8 @@ bool CUISpawnWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     VERIFY(game);
     // game_cl_TeamDeathmatch * dm = smart_cast<game_cl_TeamDeathmatch *>(&(Game()));
 
-    if (DIK_1 == dik || DIK_2 == dik) {
+    if (DIK_1 == dik || DIK_2 == dik)
+    {
         HideDialog();
 
         if (DIK_1 == dik)

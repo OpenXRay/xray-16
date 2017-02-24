@@ -15,15 +15,15 @@
 
 #ifndef AI_COMPILER
 #include "character_info.h"
-#endif  // AI_COMPILER
+#endif // AI_COMPILER
 
 #include "xrCore/Animation/Bone.hpp"
 
 #ifndef XRGAME_EXPORTS
 LPCSTR GAME_CONFIG = "game.ltx";
-#else  // XRGAME_EXPORTS
+#else // XRGAME_EXPORTS
 #include "xrEngine/render.h"
-#endif  // XRGAME_EXPORTS
+#endif // XRGAME_EXPORTS
 
 #ifdef XRSE_FACTORY_EXPORTS
 #include "ai_space.h"
@@ -47,7 +47,8 @@ struct logical_string_predicate
         u32 cCharacters = xr_strlen(pszA) + 1;
         VERIFY(cCharacters * 2 <= buffer_size);
 
-        if (MultiByteToWideChar(CP_ACP, 0, pszA, cCharacters, (LPOLESTR)buffer, cCharacters)) return (NOERROR);
+        if (MultiByteToWideChar(CP_ACP, 0, pszA, cCharacters, (LPOLESTR)buffer, cCharacters))
+            return (NOERROR);
 
         return (HRESULT_FROM_WIN32(GetLastError()));
     }
@@ -77,9 +78,9 @@ struct logical_string_predicate
 
         return (StrCmpLogicalW(buffer0, buffer1) < 0);
     }
-};  // struct logical_string_predicate
+}; // struct logical_string_predicate
 
-#endif  // XRSE_FACTORY_EXPORTS
+#endif // XRSE_FACTORY_EXPORTS
 
 bool SortStringsByAlphabetPred(const shared_str& s1, const shared_str& s2)
 {
@@ -101,28 +102,20 @@ struct story_name_predicate
 };
 
 #ifdef XRSE_FACTORY_EXPORTS
-SFillPropData::SFillPropData()
-{
-    counter = 0;
-};
-
-SFillPropData::~SFillPropData()
-{
-    VERIFY(0 == counter);
-};
-
+SFillPropData::SFillPropData() { counter = 0; };
+SFillPropData::~SFillPropData() { VERIFY(0 == counter); };
 void SFillPropData::load()
 {
 // create ini
 #ifdef XRGAME_EXPORTS
     CInifile* Ini = pGameIni;
-#else   // XRGAME_EXPORTS
+#else // XRGAME_EXPORTS
     CInifile* Ini = 0;
     string_path gm_name;
     FS.update_path(gm_name, "$game_config$", GAME_CONFIG);
     R_ASSERT3(FS.exist(gm_name), "Couldn't find file", gm_name);
     Ini = new CInifile(gm_name);
-#endif  // XRGAME_EXPORTS
+#endif // XRGAME_EXPORTS
 
     // location type
     LPCSTR N, V;
@@ -139,7 +132,8 @@ void SFillPropData::load()
     for (k = 0; Ini->r_line("graph_points_draw_color_palette", k, &N, &V); ++k)
     {
         u32 color;
-        if (1 == sscanf(V, "%x", &color)) {
+        if (1 == sscanf(V, "%x", &color))
+        {
             location_colors[N] = color;
         }
         else
@@ -184,12 +178,12 @@ void SFillPropData::load()
     }
 
     std::sort(character_profiles.begin(), character_profiles.end(), SortStringsByAlphabetPred);
-#endif  // AI_COMPILER
+#endif // AI_COMPILER
 
 // destroy ini
 #ifndef XRGAME_EXPORTS
     xr_delete(Ini);
-#endif  // XRGAME_EXPORTS
+#endif // XRGAME_EXPORTS
 
     luabind::object table;
     R_ASSERT(ai().script_engine().function_object("smart_covers.descriptions", table, LUA_TTABLE));
@@ -217,19 +211,21 @@ void SFillPropData::dec()
     VERIFY(counter > 0);
     --counter;
 
-    if (!counter) unload();
+    if (!counter)
+        unload();
 };
 
 void SFillPropData::inc()
 {
     VERIFY(counter < 0xffffffff);
 
-    if (!counter) load();
+    if (!counter)
+        load();
 
     ++counter;
 }
 static SFillPropData fp_data;
-#endif  // #ifdef XRSE_FACTORY_EXPORTS
+#endif // #ifdef XRSE_FACTORY_EXPORTS
 
 #ifndef XRGAME_EXPORTS
 void CSE_ALifeTraderAbstract::FillProps(LPCSTR pref, PropItemVec& items)
@@ -237,14 +233,14 @@ void CSE_ALifeTraderAbstract::FillProps(LPCSTR pref, PropItemVec& items)
 #ifdef XRSE_FACTORY_EXPORTS
     PHelper().CreateU32(items, PrepareKey(pref, *base()->s_name, "Money"), &m_dwMoney, 0, u32(-1));
     PHelper().CreateFlag32(
-        items, PrepareKey(pref, *base()->s_name, "Trader\\Infinite ammo"), &m_trader_flags, eTraderFlagInfiniteAmmo);
+    items, PrepareKey(pref, *base()->s_name, "Trader\\Infinite ammo"), &m_trader_flags, eTraderFlagInfiniteAmmo);
     RListValue* value = PHelper().CreateRList(items, PrepareKey(pref, *base()->s_name, "npc profile"),
-        &m_sCharacterProfile, &*fp_data.character_profiles.begin(), fp_data.character_profiles.size());
+    &m_sCharacterProfile, &*fp_data.character_profiles.begin(), fp_data.character_profiles.size());
 
     value->OnChangeEvent.bind(this, &CSE_ALifeTraderAbstract::OnChangeProfile);
-#endif  // #ifdef XRSE_FACTORY_EXPORTS
+#endif // #ifdef XRSE_FACTORY_EXPORTS
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeGraphPoint
 ////////////////////////////////////////////////////////////////////////////
@@ -258,14 +254,14 @@ CSE_ALifeGraphPoint::CSE_ALifeGraphPoint(LPCSTR caSection) : CSE_Abstract(caSect
 
 #ifdef XRSE_FACTORY_EXPORTS
     fp_data.inc();
-#endif  // XRSE_FACTORY_EXPORTS
+#endif // XRSE_FACTORY_EXPORTS
 }
 
 CSE_ALifeGraphPoint::~CSE_ALifeGraphPoint()
 {
 #ifdef XRSE_FACTORY_EXPORTS
     fp_data.dec();
-#endif  // XRSE_FACTORY_EXPORTS
+#endif // XRSE_FACTORY_EXPORTS
 }
 
 void CSE_ALifeGraphPoint::STATE_Read(NET_Packet& tNetPacket, u16 size)
@@ -290,40 +286,34 @@ void CSE_ALifeGraphPoint::STATE_Write(NET_Packet& tNetPacket)
     tNetPacket.w_u8(m_tLocations[2]);
     tNetPacket.w_u8(m_tLocations[3]);
 };
-void CSE_ALifeGraphPoint::UPDATE_Read(NET_Packet& tNetPacket)
-{
-}
-
-void CSE_ALifeGraphPoint::UPDATE_Write(NET_Packet& tNetPacket)
-{
-}
-
+void CSE_ALifeGraphPoint::UPDATE_Read(NET_Packet& tNetPacket) {}
+void CSE_ALifeGraphPoint::UPDATE_Write(NET_Packet& tNetPacket) {}
 #ifndef XRGAME_EXPORTS
 void CSE_ALifeGraphPoint::FillProps(LPCSTR pref, PropItemVec& items)
 {
 #ifdef XRSE_FACTORY_EXPORTS
     PHelper().CreateRToken8(items, PrepareKey(pref, *s_name, "Location\\1"), &m_tLocations[0],
-        &*fp_data.locations[0].begin(), fp_data.locations[0].size());
+    &*fp_data.locations[0].begin(), fp_data.locations[0].size());
     PHelper().CreateRToken8(items, PrepareKey(pref, *s_name, "Location\\2"), &m_tLocations[1],
-        &*fp_data.locations[1].begin(), fp_data.locations[1].size());
+    &*fp_data.locations[1].begin(), fp_data.locations[1].size());
     PHelper().CreateRToken8(items, PrepareKey(pref, *s_name, "Location\\3"), &m_tLocations[2],
-        &*fp_data.locations[2].begin(), fp_data.locations[2].size());
+    &*fp_data.locations[2].begin(), fp_data.locations[2].size());
     PHelper().CreateRToken8(items, PrepareKey(pref, *s_name, "Location\\4"), &m_tLocations[3],
-        &*fp_data.locations[3].begin(), fp_data.locations[3].size());
+    &*fp_data.locations[3].begin(), fp_data.locations[3].size());
     PHelper().CreateRList(items, PrepareKey(pref, *s_name, "Connection\\Level name"), &m_caConnectionLevelName,
-        &*fp_data.level_ids.begin(), fp_data.level_ids.size());
+    &*fp_data.level_ids.begin(), fp_data.level_ids.size());
     PHelper().CreateRText(items, PrepareKey(pref, *s_name, "Connection\\Point name"), &m_caConnectionPointName);
-#endif  // #ifdef XRSE_FACTORY_EXPORTS
+#endif // #ifdef XRSE_FACTORY_EXPORTS
 }
 
 void CSE_ALifeGraphPoint::on_render(
-    CDUInterface* du, IServerEntityLEOwner* owner, bool bSelected, const Fmatrix& parent, int priority, bool strictB2F)
+CDUInterface* du, IServerEntityLEOwner* owner, bool bSelected, const Fmatrix& parent, int priority, bool strictB2F)
 {
 #ifdef XRSE_FACTORY_EXPORTS
     static const u32 IL[16] = {0, 1, 0, 2, 0, 3, 0, 4, 1, 3, 3, 2, 2, 4, 4, 1};
     static const u32 IT[12] = {1, 3, 0, 3, 2, 0, 2, 4, 0, 4, 1, 0};
     static Fvector PT[5] = {
-        {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, -0.5f}, {0.0f, 0.0f, 0.5f}, {-0.5f, 0.0f, 0.0f}, {0.5f, 0.0f, 0.0f},
+    {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, -0.5f}, {0.0f, 0.0f, 0.5f}, {-0.5f, 0.0f, 0.0f}, {0.5f, 0.0f, 0.0f},
     };
 
     Fcolor C;
@@ -331,7 +321,8 @@ void CSE_ALifeGraphPoint::on_render(
     string16 buff;
     xr_sprintf(buff, "%03d_%03d_%03d_%03d", m_tLocations[0], m_tLocations[1], m_tLocations[2], m_tLocations[3]);
     xr_map<shared_str, u32>::iterator it = fp_data.location_colors.find(buff);
-    if (it == fp_data.location_colors.end()) {
+    if (it == fp_data.location_colors.end())
+    {
         it = fp_data.location_colors.find("default");
     }
     if (it != fp_data.location_colors.end())
@@ -341,17 +332,19 @@ void CSE_ALifeGraphPoint::on_render(
 
     C.set(cc);
 
-    if (!bSelected) C.a *= 0.6f;
+    if (!bSelected)
+        C.a *= 0.6f;
 
     du->DrawIndexedPrimitive(2 /*D3DPT_LINELIST*/, 8, parent.c, PT, 6, IL, 16, C.get());
     C.mul_rgba(0.75f);
     du->DrawIndexedPrimitive(4 /*D3DPT_TRIANGLELIST*/, 4, parent.c, PT, 6, IT, 12, C.get());
 
-    if (bSelected) du->DrawSelectionBox(parent.c, Fvector().set(0.5f, 1.0f, 0.5f), NULL);
-#endif  // #ifdef XRSE_FACTORY_EXPORTS
+    if (bSelected)
+        du->DrawSelectionBox(parent.c, Fvector().set(0.5f, 1.0f, 0.5f), NULL);
+#endif // #ifdef XRSE_FACTORY_EXPORTS
 }
 
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeObject
@@ -374,7 +367,7 @@ CSE_ALifeObject::CSE_ALifeObject(LPCSTR caSection) : CSE_Abstract(caSection)
 #endif
 #ifdef XRSE_FACTORY_EXPORTS
     fp_data.inc();
-#endif  // XRSE_FACTORY_EXPORTS
+#endif // XRSE_FACTORY_EXPORTS
     m_flags.set(flOfflineNoMove, FALSE);
     seed(u32(CPU::QPC() & 0xffffffff));
 }
@@ -386,39 +379,20 @@ CALifeSimulator& CSE_ALifeObject::alife() const
     return (*m_alife_simulator);
 }
 
-Fvector CSE_ALifeObject::draw_level_position() const
-{
-    return (Position());
-}
+Fvector CSE_ALifeObject::draw_level_position() const { return (Position()); }
 #endif
 
 CSE_ALifeObject::~CSE_ALifeObject()
 {
 #ifdef XRSE_FACTORY_EXPORTS
     fp_data.dec();
-#endif  // XRSE_FACTORY_EXPORTS
+#endif // XRSE_FACTORY_EXPORTS
 }
 
-bool CSE_ALifeObject::move_offline() const
-{
-    return (!m_flags.test(flOfflineNoMove));
-}
-
-void CSE_ALifeObject::move_offline(bool value)
-{
-    m_flags.set(flOfflineNoMove, !value ? TRUE : FALSE);
-}
-
-bool CSE_ALifeObject::visible_for_map() const
-{
-    return (!!m_flags.test(flVisibleForMap));
-}
-
-void CSE_ALifeObject::visible_for_map(bool value)
-{
-    m_flags.set(flVisibleForMap, value ? TRUE : FALSE);
-}
-
+bool CSE_ALifeObject::move_offline() const { return (!m_flags.test(flOfflineNoMove)); }
+void CSE_ALifeObject::move_offline(bool value) { m_flags.set(flOfflineNoMove, !value ? TRUE : FALSE); }
+bool CSE_ALifeObject::visible_for_map() const { return (!!m_flags.test(flVisibleForMap)); }
+void CSE_ALifeObject::visible_for_map(bool value) { m_flags.set(flVisibleForMap, value ? TRUE : FALSE); }
 void CSE_ALifeObject::STATE_Write(NET_Packet& tNetPacket)
 {
     tNetPacket.w_u16(m_tGraphID);
@@ -433,10 +407,13 @@ void CSE_ALifeObject::STATE_Write(NET_Packet& tNetPacket)
 
 void CSE_ALifeObject::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
-    if (m_wVersion >= 1) {
-        if (m_wVersion > 24) {
-            if (m_wVersion < 83) {
-                tNetPacket.r_float();  // m_spawn_probability);
+    if (m_wVersion >= 1)
+    {
+        if (m_wVersion > 24)
+        {
+            if (m_wVersion < 83)
+            {
+                tNetPacket.r_float(); // m_spawn_probability);
             }
         }
         else
@@ -448,49 +425,57 @@ void CSE_ALifeObject::STATE_Read(NET_Packet& tNetPacket, u16 size)
             m_spawn_probability = (float)l_ucTemp;
             /**/
         }
-        if (m_wVersion < 83) {
+        if (m_wVersion < 83)
+        {
             tNetPacket.r_u32();
         }
-        if (m_wVersion < 4) {
+        if (m_wVersion < 4)
+        {
             u16 wDummy;
             tNetPacket.r_u16(wDummy);
         }
         tNetPacket.r_u16(m_tGraphID);
         tNetPacket.r_float(m_fDistance);
     }
-    if (m_wVersion >= 4) {
+    if (m_wVersion >= 4)
+    {
         u32 dwDummy;
         tNetPacket.r_u32(dwDummy);
         m_bDirectControl = !!dwDummy;
     }
 
-    if (m_wVersion >= 8) tNetPacket.r_u32(m_tNodeID);
+    if (m_wVersion >= 8)
+        tNetPacket.r_u32(m_tNodeID);
 
-    if ((m_wVersion > 22) && (m_wVersion <= 79)) tNetPacket.r_u16(m_tSpawnID);
+    if ((m_wVersion > 22) && (m_wVersion <= 79))
+        tNetPacket.r_u16(m_tSpawnID);
 
-    if ((m_wVersion > 23) && (m_wVersion < 84)) {
+    if ((m_wVersion > 23) && (m_wVersion < 84))
+    {
         shared_str temp;
-        tNetPacket.r_stringZ(temp);  // m_spawn_control);
+        tNetPacket.r_stringZ(temp); // m_spawn_control);
     }
 
-    if (m_wVersion > 49) {
+    if (m_wVersion > 49)
+    {
         tNetPacket.r_u32(m_flags.flags);
     }
 
-    if (m_wVersion > 57) {
-        if (m_ini_file) xr_delete(m_ini_file);
+    if (m_wVersion > 57)
+    {
+        if (m_ini_file)
+            xr_delete(m_ini_file);
         tNetPacket.r_stringZ(m_ini_string);
     }
 
-    if (m_wVersion > 61) tNetPacket.r_u32(m_story_id);
+    if (m_wVersion > 61)
+        tNetPacket.r_u32(m_story_id);
 
-    if (m_wVersion > 111) tNetPacket.r_u32(m_spawn_story_id);
+    if (m_wVersion > 111)
+        tNetPacket.r_u32(m_spawn_story_id);
 }
 
-void CSE_ALifeObject::UPDATE_Write(NET_Packet& tNetPacket)
-{
-}
-
+void CSE_ALifeObject::UPDATE_Write(NET_Packet& tNetPacket) {}
 void CSE_ALifeObject::UPDATE_Read(NET_Packet& tNetPacket){};
 
 #ifndef XRGAME_EXPORTS
@@ -499,20 +484,21 @@ void CSE_ALifeObject::FillProps(LPCSTR pref, PropItemVec& items)
 #ifdef XRSE_FACTORY_EXPORTS
     inherited::FillProps(pref, items);
     PHelper().CreateRText(items, PrepareKey(pref, *s_name, "Custom data"), &m_ini_string);
-    if (m_flags.is(flUseSwitches)) {
+    if (m_flags.is(flUseSwitches))
+    {
         PHelper().CreateFlag32(items, PrepareKey(pref, *s_name, "ALife\\Can switch online"), &m_flags, flSwitchOnline);
         PHelper().CreateFlag32(
-            items, PrepareKey(pref, *s_name, "ALife\\Can switch offline"), &m_flags, flSwitchOffline);
+        items, PrepareKey(pref, *s_name, "ALife\\Can switch offline"), &m_flags, flSwitchOffline);
     }
     PHelper().CreateFlag32(items, PrepareKey(pref, *s_name, "ALife\\Interactive"), &m_flags, flInteractive);
     PHelper().CreateFlag32(items, PrepareKey(pref, *s_name, "ALife\\Used AI locations"), &m_flags, flUsedAI_Locations);
     PHelper().CreateRToken32(items, PrepareKey(pref, *s_name, "ALife\\Story ID"), &m_story_id,
-        &*fp_data.story_names.begin(), fp_data.story_names.size());
+    &*fp_data.story_names.begin(), fp_data.story_names.size());
     PHelper().CreateRToken32(items, PrepareKey(pref, *s_name, "ALife\\Spawn Story ID"), &m_spawn_story_id,
-        &*fp_data.spawn_story_names.begin(), fp_data.spawn_story_names.size());
-#endif  // #ifdef XRSE_FACTORY_EXPORTS
+    &*fp_data.spawn_story_names.begin(), fp_data.spawn_story_names.size());
+#endif // #ifdef XRSE_FACTORY_EXPORTS
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 u32 CSE_ALifeObject::ef_equipment_type() const
 {
@@ -548,51 +534,19 @@ u32 CSE_ALifeObject::ef_detector_type() const
     return (u32(-1));
 }
 
-bool CSE_ALifeObject::used_ai_locations() const
-{
-    return (!!m_flags.is(flUsedAI_Locations));
-}
-
-bool CSE_ALifeObject::can_switch_online() const
-{
-    return (match_configuration() && !!m_flags.is(flSwitchOnline));
-}
-
-bool CSE_ALifeObject::can_switch_offline() const
-{
-    return (!match_configuration() || !!m_flags.is(flSwitchOffline));
-}
-
-bool CSE_ALifeObject::can_save() const
-{
-    return (!!m_flags.is(flCanSave));
-}
-
+bool CSE_ALifeObject::used_ai_locations() const { return (!!m_flags.is(flUsedAI_Locations)); }
+bool CSE_ALifeObject::can_switch_online() const { return (match_configuration() && !!m_flags.is(flSwitchOnline)); }
+bool CSE_ALifeObject::can_switch_offline() const { return (!match_configuration() || !!m_flags.is(flSwitchOffline)); }
+bool CSE_ALifeObject::can_save() const { return (!!m_flags.is(flCanSave)); }
 bool CSE_ALifeObject::interactive() const
 {
     return (!!m_flags.is(flInteractive) && !!m_flags.is(flVisibleForAI) && !!m_flags.is(flUsefulForAI));
 }
 
-void CSE_ALifeObject::use_ai_locations(bool value)
-{
-    m_flags.set(flUsedAI_Locations, BOOL(value));
-}
-
-void CSE_ALifeObject::can_switch_online(bool value)
-{
-    m_flags.set(flSwitchOnline, BOOL(value));
-}
-
-void CSE_ALifeObject::can_switch_offline(bool value)
-{
-    m_flags.set(flSwitchOffline, BOOL(value));
-}
-
-void CSE_ALifeObject::interactive(bool value)
-{
-    m_flags.set(flInteractive, BOOL(value));
-}
-
+void CSE_ALifeObject::use_ai_locations(bool value) { m_flags.set(flUsedAI_Locations, BOOL(value)); }
+void CSE_ALifeObject::can_switch_online(bool value) { m_flags.set(flSwitchOnline, BOOL(value)); }
+void CSE_ALifeObject::can_switch_offline(bool value) { m_flags.set(flSwitchOffline, BOOL(value)); }
+void CSE_ALifeObject::interactive(bool value) { m_flags.set(flInteractive, BOOL(value)); }
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeGroupAbstract
 ////////////////////////////////////////////////////////////////////////////
@@ -604,15 +558,8 @@ CSE_ALifeGroupAbstract::CSE_ALifeGroupAbstract(LPCSTR caSection)
     m_tNextBirthTime = 0;
 }
 
-CSE_Abstract* CSE_ALifeGroupAbstract::init()
-{
-    return (base());
-}
-
-CSE_ALifeGroupAbstract::~CSE_ALifeGroupAbstract()
-{
-}
-
+CSE_Abstract* CSE_ALifeGroupAbstract::init() { return (base()); }
+CSE_ALifeGroupAbstract::~CSE_ALifeGroupAbstract() {}
 void CSE_ALifeGroupAbstract::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
     u16 m_wVersion = base()->m_wVersion;
@@ -620,7 +567,8 @@ void CSE_ALifeGroupAbstract::STATE_Read(NET_Packet& tNetPacket, u16 size)
     tNetPacket.r_u32(dwDummy);
     m_bCreateSpawnPositions = !!dwDummy;
     tNetPacket.r_u16(m_wCount);
-    if (m_wVersion > 19) load_data(m_tpMembers, tNetPacket);
+    if (m_wVersion > 19)
+        load_data(m_tpMembers, tNetPacket);
 };
 
 void CSE_ALifeGroupAbstract::STATE_Write(NET_Packet& tNetPacket)
@@ -637,17 +585,13 @@ void CSE_ALifeGroupAbstract::UPDATE_Read(NET_Packet& tNetPacket)
     m_bCreateSpawnPositions = !!dwDummy;
 };
 
-void CSE_ALifeGroupAbstract::UPDATE_Write(NET_Packet& tNetPacket)
-{
-    tNetPacket.w_u32(m_bCreateSpawnPositions);
-};
-
+void CSE_ALifeGroupAbstract::UPDATE_Write(NET_Packet& tNetPacket) { tNetPacket.w_u32(m_bCreateSpawnPositions); };
 #ifndef XRGAME_EXPORTS
 void CSE_ALifeGroupAbstract::FillProps(LPCSTR pref, PropItemVec& items)
 {
     PHelper().CreateU16(items, PrepareKey(pref, "ALife\\Count"), &m_wCount, 0, 0xff);
 };
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeDynamicObject
@@ -659,36 +603,14 @@ CSE_ALifeDynamicObject::CSE_ALifeDynamicObject(LPCSTR caSection) : CSE_ALifeObje
     m_switch_counter = u64(-1);
 }
 
-CSE_ALifeDynamicObject::~CSE_ALifeDynamicObject()
-{
-}
-
-void CSE_ALifeDynamicObject::STATE_Write(NET_Packet& tNetPacket)
-{
-    inherited::STATE_Write(tNetPacket);
-}
-
-void CSE_ALifeDynamicObject::STATE_Read(NET_Packet& tNetPacket, u16 size)
-{
-    inherited::STATE_Read(tNetPacket, size);
-}
-
-void CSE_ALifeDynamicObject::UPDATE_Write(NET_Packet& tNetPacket)
-{
-    inherited::UPDATE_Write(tNetPacket);
-};
-
-void CSE_ALifeDynamicObject::UPDATE_Read(NET_Packet& tNetPacket)
-{
-    inherited::UPDATE_Read(tNetPacket);
-};
-
+CSE_ALifeDynamicObject::~CSE_ALifeDynamicObject() {}
+void CSE_ALifeDynamicObject::STATE_Write(NET_Packet& tNetPacket) { inherited::STATE_Write(tNetPacket); }
+void CSE_ALifeDynamicObject::STATE_Read(NET_Packet& tNetPacket, u16 size) { inherited::STATE_Read(tNetPacket, size); }
+void CSE_ALifeDynamicObject::UPDATE_Write(NET_Packet& tNetPacket) { inherited::UPDATE_Write(tNetPacket); };
+void CSE_ALifeDynamicObject::UPDATE_Read(NET_Packet& tNetPacket) { inherited::UPDATE_Read(tNetPacket); };
 #ifndef XRGAME_EXPORTS
-void CSE_ALifeDynamicObject::FillProps(LPCSTR pref, PropItemVec& values)
-{
-    inherited::FillProps(pref, values);
-}
-#endif  // #ifndef XRGAME_EXPORTS
+void CSE_ALifeDynamicObject::FillProps(LPCSTR pref, PropItemVec& values) { inherited::FillProps(pref, values); }
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeDynamicObjectVisual
@@ -696,18 +618,12 @@ void CSE_ALifeDynamicObject::FillProps(LPCSTR pref, PropItemVec& values)
 CSE_ALifeDynamicObjectVisual::CSE_ALifeDynamicObjectVisual(LPCSTR caSection)
     : CSE_ALifeDynamicObject(caSection), CSE_Visual()
 {
-    if (pSettings->line_exist(caSection, "visual")) set_visual(pSettings->r_string(caSection, "visual"));
+    if (pSettings->line_exist(caSection, "visual"))
+        set_visual(pSettings->r_string(caSection, "visual"));
 }
 
-CSE_ALifeDynamicObjectVisual::~CSE_ALifeDynamicObjectVisual()
-{
-}
-
-CSE_Visual* CSE_ALifeDynamicObjectVisual::visual()
-{
-    return (this);
-}
-
+CSE_ALifeDynamicObjectVisual::~CSE_ALifeDynamicObjectVisual() {}
+CSE_Visual* CSE_ALifeDynamicObjectVisual::visual() { return (this); }
 void CSE_ALifeDynamicObjectVisual::STATE_Write(NET_Packet& tNetPacket)
 {
     inherited1::STATE_Write(tNetPacket);
@@ -717,26 +633,19 @@ void CSE_ALifeDynamicObjectVisual::STATE_Write(NET_Packet& tNetPacket)
 void CSE_ALifeDynamicObjectVisual::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
     inherited1::STATE_Read(tNetPacket, size);
-    if (m_wVersion > 31) visual_read(tNetPacket, m_wVersion);
+    if (m_wVersion > 31)
+        visual_read(tNetPacket, m_wVersion);
 }
 
-void CSE_ALifeDynamicObjectVisual::UPDATE_Write(NET_Packet& tNetPacket)
-{
-    inherited1::UPDATE_Write(tNetPacket);
-};
-
-void CSE_ALifeDynamicObjectVisual::UPDATE_Read(NET_Packet& tNetPacket)
-{
-    inherited1::UPDATE_Read(tNetPacket);
-};
-
+void CSE_ALifeDynamicObjectVisual::UPDATE_Write(NET_Packet& tNetPacket) { inherited1::UPDATE_Write(tNetPacket); };
+void CSE_ALifeDynamicObjectVisual::UPDATE_Read(NET_Packet& tNetPacket) { inherited1::UPDATE_Read(tNetPacket); };
 #ifndef XRGAME_EXPORTS
 void CSE_ALifeDynamicObjectVisual::FillProps(LPCSTR pref, PropItemVec& items)
 {
     inherited1::FillProps(pref, items);
     inherited2::FillProps(pref, items);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifePHSkeletonObject
@@ -748,14 +657,12 @@ CSE_ALifePHSkeletonObject::CSE_ALifePHSkeletonObject(LPCSTR caSection)
     m_flags.set(flSwitchOffline, FALSE);
 }
 
-CSE_ALifePHSkeletonObject::~CSE_ALifePHSkeletonObject()
-{
-}
-
+CSE_ALifePHSkeletonObject::~CSE_ALifePHSkeletonObject() {}
 void CSE_ALifePHSkeletonObject::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
     inherited1::STATE_Read(tNetPacket, size);
-    if (m_wVersion >= 64) inherited2::STATE_Read(tNetPacket, size);
+    if (m_wVersion >= 64)
+        inherited2::STATE_Read(tNetPacket, size);
 }
 
 void CSE_ALifePHSkeletonObject::STATE_Write(NET_Packet& tNetPacket)
@@ -781,23 +688,15 @@ void CSE_ALifePHSkeletonObject::UPDATE_Read(NET_Packet& tNetPacket)
     inherited2::UPDATE_Read(tNetPacket);
 };
 
-bool CSE_ALifePHSkeletonObject::can_save() const
-{
-    return CSE_PHSkeleton::need_save();
-}
-
-bool CSE_ALifePHSkeletonObject::used_ai_locations() const
-{
-    return false;
-}
-
+bool CSE_ALifePHSkeletonObject::can_save() const { return CSE_PHSkeleton::need_save(); }
+bool CSE_ALifePHSkeletonObject::used_ai_locations() const { return false; }
 #ifndef XRGAME_EXPORTS
 void CSE_ALifePHSkeletonObject::FillProps(LPCSTR pref, PropItemVec& items)
 {
     inherited1::FillProps(pref, items);
     inherited2::FillProps(pref, items);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeSpaceRestrictor
@@ -811,30 +710,16 @@ CSE_ALifeSpaceRestrictor::CSE_ALifeSpaceRestrictor(LPCSTR caSection) : CSE_ALife
     m_flags.set(flCheckForSeparator, TRUE);
 }
 
-CSE_ALifeSpaceRestrictor::~CSE_ALifeSpaceRestrictor()
-{
-}
-
-bool CSE_ALifeSpaceRestrictor::can_switch_offline() const
-{
-    return (false);
-}
-
-bool CSE_ALifeSpaceRestrictor::used_ai_locations() const
-{
-    return (false);
-}
-
-IServerEntityShape* CSE_ALifeSpaceRestrictor::shape()
-{
-    return (this);
-}
-
+CSE_ALifeSpaceRestrictor::~CSE_ALifeSpaceRestrictor() {}
+bool CSE_ALifeSpaceRestrictor::can_switch_offline() const { return (false); }
+bool CSE_ALifeSpaceRestrictor::used_ai_locations() const { return (false); }
+IServerEntityShape* CSE_ALifeSpaceRestrictor::shape() { return (this); }
 void CSE_ALifeSpaceRestrictor::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
     inherited1::STATE_Read(tNetPacket, size);
     cform_read(tNetPacket);
-    if (m_wVersion > 74) m_space_restrictor_type = tNetPacket.r_u8();
+    if (m_wVersion > 74)
+        m_space_restrictor_type = tNetPacket.r_u8();
 }
 
 void CSE_ALifeSpaceRestrictor::STATE_Write(NET_Packet& tNetPacket)
@@ -844,20 +729,12 @@ void CSE_ALifeSpaceRestrictor::STATE_Write(NET_Packet& tNetPacket)
     tNetPacket.w_u8(m_space_restrictor_type);
 }
 
-void CSE_ALifeSpaceRestrictor::UPDATE_Read(NET_Packet& tNetPacket)
-{
-    inherited1::UPDATE_Read(tNetPacket);
-}
-
-void CSE_ALifeSpaceRestrictor::UPDATE_Write(NET_Packet& tNetPacket)
-{
-    inherited1::UPDATE_Write(tNetPacket);
-}
-
+void CSE_ALifeSpaceRestrictor::UPDATE_Read(NET_Packet& tNetPacket) { inherited1::UPDATE_Read(tNetPacket); }
+void CSE_ALifeSpaceRestrictor::UPDATE_Write(NET_Packet& tNetPacket) { inherited1::UPDATE_Write(tNetPacket); }
 xr_token defaul_retrictor_types[] = {{"NOT A restrictor", RestrictionSpace::eRestrictorTypeNone},
-    {"NONE default restrictor", RestrictionSpace::eDefaultRestrictorTypeNone},
-    {"OUT default restrictor", RestrictionSpace::eDefaultRestrictorTypeOut},
-    {"IN default restrictor", RestrictionSpace::eDefaultRestrictorTypeIn}, {0, 0}};
+{"NONE default restrictor", RestrictionSpace::eDefaultRestrictorTypeNone},
+{"OUT default restrictor", RestrictionSpace::eDefaultRestrictorTypeOut},
+{"IN default restrictor", RestrictionSpace::eDefaultRestrictorTypeIn}, {0, 0}};
 
 #ifndef XRGAME_EXPORTS
 void CSE_ALifeSpaceRestrictor::FillProps(LPCSTR pref, PropItemVec& items)
@@ -867,7 +744,7 @@ void CSE_ALifeSpaceRestrictor::FillProps(LPCSTR pref, PropItemVec& items)
         items, PrepareKey(pref, *s_name, "restrictor type"), &m_space_restrictor_type, defaul_retrictor_types);
     PHelper().CreateFlag32(items, PrepareKey(pref, *s_name, "check for separator"), &m_flags, flCheckForSeparator);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeLevelChanger
@@ -880,22 +757,22 @@ CSE_ALifeLevelChanger::CSE_ALifeLevelChanger(LPCSTR caSection) : CSE_ALifeSpaceR
     m_tAngles.set(0.f, 0.f, 0.f);
 #ifdef XRSE_FACTORY_EXPORTS
     fp_data.inc();
-#endif  // XRSE_FACTORY_EXPORTS
+#endif // XRSE_FACTORY_EXPORTS
     m_bSilentMode = FALSE;
 }
 
 CSE_ALifeLevelChanger::~CSE_ALifeLevelChanger()
-\
 {
 #ifdef XRSE_FACTORY_EXPORTS
     fp_data.dec();
-#endif  // XRSE_FACTORY_EXPORTS
+#endif // XRSE_FACTORY_EXPORTS
 }
 
 void CSE_ALifeLevelChanger::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
     inherited::STATE_Read(tNetPacket, size);
-    if (m_wVersion < 34) {
+    if (m_wVersion < 34)
+    {
         tNetPacket.r_u32();
         tNetPacket.r_u32();
     }
@@ -914,7 +791,8 @@ void CSE_ALifeLevelChanger::STATE_Read(NET_Packet& tNetPacket, u16 size)
     tNetPacket.r_stringZ(m_caLevelToChange);
     tNetPacket.r_stringZ(m_caLevelPointToChange);
 
-    if (m_wVersion > 116) m_bSilentMode = !!tNetPacket.r_u8();
+    if (m_wVersion > 116)
+        m_bSilentMode = !!tNetPacket.r_u8();
 }
 
 void CSE_ALifeLevelChanger::STATE_Write(NET_Packet& tNetPacket)
@@ -931,16 +809,8 @@ void CSE_ALifeLevelChanger::STATE_Write(NET_Packet& tNetPacket)
     tNetPacket.w_u8(m_bSilentMode ? 1 : 0);
 }
 
-void CSE_ALifeLevelChanger::UPDATE_Read(NET_Packet& tNetPacket)
-{
-    inherited::UPDATE_Read(tNetPacket);
-}
-
-void CSE_ALifeLevelChanger::UPDATE_Write(NET_Packet& tNetPacket)
-{
-    inherited::UPDATE_Write(tNetPacket);
-}
-
+void CSE_ALifeLevelChanger::UPDATE_Read(NET_Packet& tNetPacket) { inherited::UPDATE_Read(tNetPacket); }
+void CSE_ALifeLevelChanger::UPDATE_Write(NET_Packet& tNetPacket) { inherited::UPDATE_Write(tNetPacket); }
 #ifndef XRGAME_EXPORTS
 void CSE_ALifeLevelChanger::FillProps(LPCSTR pref, PropItemVec& items)
 {
@@ -948,13 +818,13 @@ void CSE_ALifeLevelChanger::FillProps(LPCSTR pref, PropItemVec& items)
     inherited::FillProps(pref, items);
 
     PHelper().CreateRList(items, PrepareKey(pref, *s_name, "Level to change"), &m_caLevelToChange,
-        &*fp_data.level_ids.begin(), fp_data.level_ids.size());
+    &*fp_data.level_ids.begin(), fp_data.level_ids.size());
     PHelper().CreateRText(items, PrepareKey(pref, *s_name, "Level point to change"), &m_caLevelPointToChange);
 
     PHelper().CreateBOOL(items, PrepareKey(pref, *s_name, "Silent mode"), &m_bSilentMode);
-#endif  // #ifdef XRSE_FACTORY_EXPORTS
+#endif // #ifdef XRSE_FACTORY_EXPORTS
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeObjectPhysic
@@ -965,14 +835,16 @@ CSE_ALifeObjectPhysic::CSE_ALifeObjectPhysic(LPCSTR caSection)
     type = epotSkeleton;
     mass = 10.f;
 
-    if (pSettings->section_exist(caSection) && pSettings->line_exist(caSection, "visual")) {
+    if (pSettings->section_exist(caSection) && pSettings->line_exist(caSection, "visual"))
+    {
         set_visual(pSettings->r_string(caSection, "visual"));
 
         if (pSettings->line_exist(caSection, "startup_animation"))
             startup_animation = pSettings->r_string(caSection, "startup_animation");
     }
 
-    if (pSettings->line_exist(caSection, "fixed_bones")) fixed_bones = pSettings->r_string(caSection, "fixed_bones");
+    if (pSettings->line_exist(caSection, "fixed_bones"))
+        fixed_bones = pSettings->r_string(caSection, "fixed_bones");
 
     m_flags.set(flUseSwitches, FALSE);
     m_flags.set(flSwitchOffline, FALSE);
@@ -989,16 +861,15 @@ CSE_ALifeObjectPhysic::CSE_ALifeObjectPhysic(LPCSTR caSection)
     m_relevent_random.seed(u32(CPU::GetCLK() & u32(-1)));
 }
 
-CSE_ALifeObjectPhysic::~CSE_ALifeObjectPhysic()
-{
-}
-
+CSE_ALifeObjectPhysic::~CSE_ALifeObjectPhysic() {}
 void CSE_ALifeObjectPhysic::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
     if (m_wVersion >= 14)
-        if (m_wVersion >= 16) {
+        if (m_wVersion >= 16)
+        {
             inherited1::STATE_Read(tNetPacket, size);
-            if (m_wVersion < 32) visual_read(tNetPacket, m_wVersion);
+            if (m_wVersion < 32)
+                visual_read(tNetPacket, m_wVersion);
         }
         else
         {
@@ -1006,22 +877,28 @@ void CSE_ALifeObjectPhysic::STATE_Read(NET_Packet& tNetPacket, u16 size)
             visual_read(tNetPacket, m_wVersion);
         }
 
-    if (m_wVersion >= 64) inherited2::STATE_Read(tNetPacket, size);
+    if (m_wVersion >= 64)
+        inherited2::STATE_Read(tNetPacket, size);
 
     tNetPacket.r_u32(type);
     tNetPacket.r_float(mass);
 
-    if (m_wVersion > 9) tNetPacket.r_stringZ(fixed_bones);
+    if (m_wVersion > 9)
+        tNetPacket.r_stringZ(fixed_bones);
 
-    if (m_wVersion < 65 && m_wVersion > 28) tNetPacket.r_stringZ(startup_animation);
+    if (m_wVersion < 65 && m_wVersion > 28)
+        tNetPacket.r_stringZ(startup_animation);
 
-    if (m_wVersion < 64) {
-        if (m_wVersion > 39)  // > 39
+    if (m_wVersion < 64)
+    {
+        if (m_wVersion > 39) // > 39
             tNetPacket.r_u8(_flags.flags);
 
-        if (m_wVersion > 56) tNetPacket.r_u16(source_id);
+        if (m_wVersion > 56)
+            tNetPacket.r_u16(source_id);
 
-        if (m_wVersion > 60 && _flags.test(flSavedData)) {
+        if (m_wVersion > 60 && _flags.test(flSavedData))
+        {
             data_load(tNetPacket);
         }
     }
@@ -1037,39 +914,40 @@ void CSE_ALifeObjectPhysic::STATE_Write(NET_Packet& tNetPacket)
     tNetPacket.w_stringZ(fixed_bones);
 }
 
-static inline bool check(const u8& mask, const u8& test)
-{
-    return (!!(mask & test));
-}
-
+static inline bool check(const u8& mask, const u8& test) { return (!!(mask & test)); }
 const u32 CSE_ALifeObjectPhysic::m_freeze_delta_time = 5000;
 const u32 CSE_ALifeObjectPhysic::random_limit = 40;
 
 #ifdef DEBUG
 const u32 CSE_ALifeObjectPhysic::m_update_delta_time = 0;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
 // if TRUE, then object sends update packet
 BOOL CSE_ALifeObjectPhysic::Net_Relevant()
 {
-    if (!freezed) {
+    if (!freezed)
+    {
 #ifdef XRGAME_EXPORTS
-#ifdef DEBUG  // this block of code is only for test
-        if (Device.dwTimeGlobal < (m_last_update_time + m_update_delta_time)) return FALSE;
+#ifdef DEBUG // this block of code is only for test
+        if (Device.dwTimeGlobal < (m_last_update_time + m_update_delta_time))
+            return FALSE;
 #endif
 #endif
         return TRUE;
     }
 
 #ifdef XRGAME_EXPORTS
-    if (Device.dwTimeGlobal >= (m_freeze_time + m_freeze_delta_time)) return FALSE;
+    if (Device.dwTimeGlobal >= (m_freeze_time + m_freeze_delta_time))
+        return FALSE;
 #endif
-    if (!prev_freezed) {
-        prev_freezed = true;  // i.e. freezed
+    if (!prev_freezed)
+    {
+        prev_freezed = true; // i.e. freezed
         return TRUE;
     }
 
-    if (m_relevent_random.randI(random_limit)) return FALSE;
+    if (m_relevent_random.randI(random_limit))
+        return FALSE;
 
     return TRUE;
 }
@@ -1079,12 +957,13 @@ void CSE_ALifeObjectPhysic::UPDATE_Read(NET_Packet& tNetPacket)
     inherited1::UPDATE_Read(tNetPacket);
     inherited2::UPDATE_Read(tNetPacket);
 
-    if (tNetPacket.r_eof())  // backward compatibility
+    if (tNetPacket.r_eof()) // backward compatibility
         return;
 
     //////////////////////////////////////////////////////////////////////////
     tNetPacket.r_u8(m_u8NumItems);
-    if (!m_u8NumItems) {
+    if (!m_u8NumItems)
+    {
         return;
     }
 
@@ -1117,7 +996,8 @@ void CSE_ALifeObjectPhysic::UPDATE_Read(NET_Packet& tNetPacket)
 
         State.enabled = check(num_items.mask, inventory_item_state_enabled);
 
-        if (!check(num_items.mask, inventory_item_angular_null)) {
+        if (!check(num_items.mask, inventory_item_angular_null))
+        {
             tNetPacket.r_float(State.angular_vel.x);
             tNetPacket.r_float(State.angular_vel.y);
             tNetPacket.r_float(State.angular_vel.z);
@@ -1125,7 +1005,8 @@ void CSE_ALifeObjectPhysic::UPDATE_Read(NET_Packet& tNetPacket)
         else
             State.angular_vel.set(0.f, 0.f, 0.f);
 
-        if (!check(num_items.mask, inventory_item_linear_null)) {
+        if (!check(num_items.mask, inventory_item_linear_null))
+        {
             tNetPacket.r_float(State.linear_vel.x);
             tNetPacket.r_float(State.linear_vel.y);
             tNetPacket.r_float(State.linear_vel.z);
@@ -1139,12 +1020,13 @@ void CSE_ALifeObjectPhysic::UPDATE_Read(NET_Packet& tNetPacket)
         }*/
     }
     prev_freezed = freezed;
-    if (tNetPacket.r_eof())  // in case spawn + update
+    if (tNetPacket.r_eof()) // in case spawn + update
     {
         freezed = false;
         return;
     }
-    if (tNetPacket.r_u8()) {
+    if (tNetPacket.r_u8())
+    {
         freezed = false;
     }
     else
@@ -1164,7 +1046,8 @@ void CSE_ALifeObjectPhysic::UPDATE_Write(NET_Packet& tNetPacket)
     inherited1::UPDATE_Write(tNetPacket);
     inherited2::UPDATE_Write(tNetPacket);
     //////////////////////////////////////////////////////////////////////////
-    if (!m_u8NumItems) {
+    if (!m_u8NumItems)
+    {
         tNetPacket.w_u8(0);
         return;
     }
@@ -1175,9 +1058,12 @@ void CSE_ALifeObjectPhysic::UPDATE_Write(NET_Packet& tNetPacket)
 
     R_ASSERT2(num_items.num_items < (u8(1) << 5), make_string("%d", num_items.num_items));
 
-    if (State.enabled) num_items.mask |= inventory_item_state_enabled;
-    if (fis_zero(State.angular_vel.square_magnitude())) num_items.mask |= inventory_item_angular_null;
-    if (fis_zero(State.linear_vel.square_magnitude())) num_items.mask |= inventory_item_linear_null;
+    if (State.enabled)
+        num_items.mask |= inventory_item_state_enabled;
+    if (fis_zero(State.angular_vel.square_magnitude()))
+        num_items.mask |= inventory_item_angular_null;
+    if (fis_zero(State.linear_vel.square_magnitude()))
+        num_items.mask |= inventory_item_linear_null;
     // if (anim_use)                                     num_items.mask |= animated;
 
     tNetPacket.w_u8(num_items.common);
@@ -1198,20 +1084,22 @@ void CSE_ALifeObjectPhysic::UPDATE_Write(NET_Packet& tNetPacket)
         tNetPacket.w_float(State.quaternion.z);
         tNetPacket.w_float(State.quaternion.w);
 
-        if (!check(num_items.mask, inventory_item_angular_null)) {
+        if (!check(num_items.mask, inventory_item_angular_null))
+        {
             tNetPacket.w_float(State.angular_vel.x);
             tNetPacket.w_float(State.angular_vel.y);
             tNetPacket.w_float(State.angular_vel.z);
         }
 
-        if (!check(num_items.mask, inventory_item_linear_null)) {
+        if (!check(num_items.mask, inventory_item_linear_null))
+        {
             tNetPacket.w_float(State.linear_vel.x);
             tNetPacket.w_float(State.linear_vel.y);
             tNetPacket.w_float(State.linear_vel.z);
         }
     }
     //. Msg("--- Sync PH [%d].", ID);
-    tNetPacket.w_u8(1);  // not freezed - doesn't mean anything..
+    tNetPacket.w_u8(1); // not freezed - doesn't mean anything..
 
 #ifdef XRGAME_EXPORTS
 #ifdef DEBUG
@@ -1226,8 +1114,8 @@ void CSE_ALifeObjectPhysic::load(NET_Packet& tNetPacket)
     inherited2::load(tNetPacket);
 }
 
-xr_token po_types[] = {{"Box", epotBox}, {"Fixed chain", epotFixedChain}, {"Free chain", epotFreeChain},
-    {"Skeleton", epotSkeleton}, {0, 0}};
+xr_token po_types[] = {
+{"Box", epotBox}, {"Fixed chain", epotFixedChain}, {"Free chain", epotFreeChain}, {"Skeleton", epotSkeleton}, {0, 0}};
 
 #ifndef XRGAME_EXPORTS
 void CSE_ALifeObjectPhysic::FillProps(LPCSTR pref, PropItemVec& values)
@@ -1241,20 +1129,12 @@ void CSE_ALifeObjectPhysic::FillProps(LPCSTR pref, PropItemVec& values)
 
     // motions & bones
     PHelper().CreateChoose(values, PrepareKey(pref, *s_name, "Model\\Fixed bones"), &fixed_bones, smSkeletonBones, 0,
-        (void*)visual()->get_visual(), 8);
+    (void*)visual()->get_visual(), 8);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
-bool CSE_ALifeObjectPhysic::used_ai_locations() const
-{
-    return (false);
-}
-
-bool CSE_ALifeObjectPhysic::can_save() const
-{
-    return CSE_PHSkeleton::need_save();
-}
-
+bool CSE_ALifeObjectPhysic::used_ai_locations() const { return (false); }
+bool CSE_ALifeObjectPhysic::can_save() const { return CSE_PHSkeleton::need_save(); }
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeObjectHangingLamp
 ////////////////////////////////////////////////////////////////////////////
@@ -1280,17 +1160,18 @@ CSE_ALifeObjectHangingLamp::CSE_ALifeObjectHangingLamp(LPCSTR caSection)
     m_volumetric_distance = 1.0f;
 }
 
-CSE_ALifeObjectHangingLamp::~CSE_ALifeObjectHangingLamp()
-{
-}
-
+CSE_ALifeObjectHangingLamp::~CSE_ALifeObjectHangingLamp() {}
 void CSE_ALifeObjectHangingLamp::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
-    if (m_wVersion > 20) inherited1::STATE_Read(tNetPacket, size);
-    if (m_wVersion >= 69) inherited2::STATE_Read(tNetPacket, size);
-    if (m_wVersion < 32) visual_read(tNetPacket, m_wVersion);
+    if (m_wVersion > 20)
+        inherited1::STATE_Read(tNetPacket, size);
+    if (m_wVersion >= 69)
+        inherited2::STATE_Read(tNetPacket, size);
+    if (m_wVersion < 32)
+        visual_read(tNetPacket, m_wVersion);
 
-    if (m_wVersion < 49) {
+    if (m_wVersion < 49)
+    {
         shared_str s_tmp;
         float f_tmp;
         // model
@@ -1300,23 +1181,30 @@ void CSE_ALifeObjectHangingLamp::STATE_Read(NET_Packet& tNetPacket, u16 size)
         tNetPacket.r_stringZ(s_tmp);
         tNetPacket.r_float(range);
         tNetPacket.r_angle8(f_tmp);
-        if (m_wVersion > 10) tNetPacket.r_float(brightness);
-        if (m_wVersion > 11) tNetPacket.r_u16(flags.flags);
-        if (m_wVersion > 12) tNetPacket.r_float(f_tmp);
-        if (m_wVersion > 17) tNetPacket.r_stringZ(startup_animation);
+        if (m_wVersion > 10)
+            tNetPacket.r_float(brightness);
+        if (m_wVersion > 11)
+            tNetPacket.r_u16(flags.flags);
+        if (m_wVersion > 12)
+            tNetPacket.r_float(f_tmp);
+        if (m_wVersion > 17)
+            tNetPacket.r_stringZ(startup_animation);
 
         set_editor_flag(flVisualAnimationChange);
 
-        if (m_wVersion > 42) {
+        if (m_wVersion > 42)
+        {
             tNetPacket.r_stringZ(s_tmp);
             tNetPacket.r_float(f_tmp);
         }
 
-        if (m_wVersion > 43) {
+        if (m_wVersion > 43)
+        {
             tNetPacket.r_stringZ(fixed_bones);
         }
 
-        if (m_wVersion > 44) {
+        if (m_wVersion > 44)
+        {
             tNetPacket.r_float(m_health);
         }
     }
@@ -1333,7 +1221,8 @@ void CSE_ALifeObjectHangingLamp::STATE_Read(NET_Packet& tNetPacket, u16 size)
         tNetPacket.r_stringZ(fixed_bones);
         tNetPacket.r_float(m_health);
     }
-    if (m_wVersion > 55) {
+    if (m_wVersion > 55)
+    {
         tNetPacket.r_float(m_virtual_size);
         tNetPacket.r_float(m_ambient_radius);
         tNetPacket.r_float(m_ambient_power);
@@ -1344,7 +1233,8 @@ void CSE_ALifeObjectHangingLamp::STATE_Read(NET_Packet& tNetPacket, u16 size)
         tNetPacket.r_stringZ(glow_texture);
         tNetPacket.r_float(glow_radius);
     }
-    if (m_wVersion > 96) {
+    if (m_wVersion > 96)
+    {
         tNetPacket.r_stringZ(light_ambient_bone);
     }
     else
@@ -1352,7 +1242,8 @@ void CSE_ALifeObjectHangingLamp::STATE_Read(NET_Packet& tNetPacket, u16 size)
         light_ambient_bone = light_main_bone;
     }
 
-    if (m_wVersion > 118) {
+    if (m_wVersion > 118)
+    {
         tNetPacket.r_float(m_volumetric_quality);
         tNetPacket.r_float(m_volumetric_intensity);
         tNetPacket.r_float(m_volumetric_distance);
@@ -1409,11 +1300,7 @@ void CSE_ALifeObjectHangingLamp::load(NET_Packet& tNetPacket)
     inherited2::load(tNetPacket);
 }
 
-void CSE_ALifeObjectHangingLamp::OnChangeFlag(PropValue* sender)
-{
-    set_editor_flag(flUpdateProperties);
-}
-
+void CSE_ALifeObjectHangingLamp::OnChangeFlag(PropValue* sender) { set_editor_flag(flUpdateProperties); }
 #ifndef XRGAME_EXPORTS
 void CSE_ALifeObjectHangingLamp::FillProps(LPCSTR pref, PropItemVec& values)
 {
@@ -1436,40 +1323,43 @@ void CSE_ALifeObjectHangingLamp::FillProps(LPCSTR pref, PropItemVec& values)
     PHelper().CreateFloat(values, PrepareKey(pref, *s_name, "Light\\Main\\Range"), &range, 0.1f, 1000.f);
     PHelper().CreateFloat(values, PrepareKey(pref, *s_name, "Light\\Main\\Virtual Size"), &m_virtual_size, 0.f, 100.f);
     PHelper().CreateChoose(
-        values, PrepareKey(pref, *s_name, "Light\\Main\\Texture"), &light_texture, smTexture, "lights");
+    values, PrepareKey(pref, *s_name, "Light\\Main\\Texture"), &light_texture, smTexture, "lights");
     PHelper().CreateChoose(values, PrepareKey(pref, *s_name, "Light\\Main\\Bone"), &light_main_bone, smSkeletonBones, 0,
-        (void*)visual()->get_visual());
-    if (flags.is(flTypeSpot)) {
-        PHelper().CreateAngle(values, PrepareKey(pref, *s_name, "Light\\Main\\Cone Angle"), &spot_cone_angle,
-            deg2rad(1.f), deg2rad(120.f));
+    (void*)visual()->get_visual());
+    if (flags.is(flTypeSpot))
+    {
+        PHelper().CreateAngle(
+        values, PrepareKey(pref, *s_name, "Light\\Main\\Cone Angle"), &spot_cone_angle, deg2rad(1.f), deg2rad(120.f));
         //      PHelper().CreateFlag16  (values, PrepareKey(pref,*s_name,"Light\\Main\\Volumetric"),    &flags,
         //      flVolumetric);
         P = PHelper().CreateFlag16(values, PrepareKey(pref, *s_name, "Flags\\Volumetric"), &flags, flVolumetric);
         P->OnChangeEvent.bind(this, &CSE_ALifeObjectHangingLamp::OnChangeFlag);
     }
 
-    if (flags.is(flPointAmbient)) {
+    if (flags.is(flPointAmbient))
+    {
         PHelper().CreateFloat(
-            values, PrepareKey(pref, *s_name, "Light\\Ambient\\Radius"), &m_ambient_radius, 0.f, 1000.f);
+        values, PrepareKey(pref, *s_name, "Light\\Ambient\\Radius"), &m_ambient_radius, 0.f, 1000.f);
         PHelper().CreateFloat(values, PrepareKey(pref, *s_name, "Light\\Ambient\\Power"), &m_ambient_power);
         PHelper().CreateChoose(
-            values, PrepareKey(pref, *s_name, "Light\\Ambient\\Texture"), &m_ambient_texture, smTexture, "lights");
+        values, PrepareKey(pref, *s_name, "Light\\Ambient\\Texture"), &m_ambient_texture, smTexture, "lights");
         PHelper().CreateChoose(values, PrepareKey(pref, *s_name, "Light\\Ambient\\Bone"), &light_ambient_bone,
-            smSkeletonBones, 0, (void*)visual()->get_visual());
+        smSkeletonBones, 0, (void*)visual()->get_visual());
     }
 
-    if (flags.is(flVolumetric)) {
+    if (flags.is(flVolumetric))
+    {
         PHelper().CreateFloat(
-            values, PrepareKey(pref, *s_name, "Light\\Volumetric\\Quality"), &m_volumetric_quality, 0.f, 1.f);
+        values, PrepareKey(pref, *s_name, "Light\\Volumetric\\Quality"), &m_volumetric_quality, 0.f, 1.f);
         PHelper().CreateFloat(
-            values, PrepareKey(pref, *s_name, "Light\\Volumetric\\Intensity"), &m_volumetric_intensity, 0.f, 10.f);
+        values, PrepareKey(pref, *s_name, "Light\\Volumetric\\Intensity"), &m_volumetric_intensity, 0.f, 10.f);
         PHelper().CreateFloat(
-            values, PrepareKey(pref, *s_name, "Light\\Volumetric\\Distance"), &m_volumetric_distance, 0.f, 1.f);
+        values, PrepareKey(pref, *s_name, "Light\\Volumetric\\Distance"), &m_volumetric_distance, 0.f, 1.f);
     }
 
     // fixed bones
     PHelper().CreateChoose(values, PrepareKey(pref, *s_name, "Model\\Fixed bones"), &fixed_bones, smSkeletonBones, 0,
-        (void*)visual()->get_visual(), 8);
+    (void*)visual()->get_visual(), 8);
     // glow
     PHelper().CreateFloat(values, PrepareKey(pref, *s_name, "Glow\\Radius"), &glow_radius, 0.01f, 100.f);
     PHelper().CreateChoose(values, PrepareKey(pref, *s_name, "Glow\\Texture"), &glow_texture, smTexture, "glow");
@@ -1479,42 +1369,45 @@ void CSE_ALifeObjectHangingLamp::FillProps(LPCSTR pref, PropItemVec& values)
 
 #define VIS_RADIUS 0.25f
 void CSE_ALifeObjectHangingLamp::on_render(
-    CDUInterface* du, IServerEntityLEOwner* owner, bool bSelected, const Fmatrix& parent, int priority, bool strictB2F)
+CDUInterface* du, IServerEntityLEOwner* owner, bool bSelected, const Fmatrix& parent, int priority, bool strictB2F)
 {
     inherited1::on_render(du, owner, bSelected, parent, priority, strictB2F);
-    if ((1 == priority) && (false == strictB2F)) {
+    if ((1 == priority) && (false == strictB2F))
+    {
         u32 clr = bSelected ? 0x00FFFFFF : 0x00FFFF00;
         Fmatrix main_xform, ambient_xform;
         owner->get_bone_xform(*light_main_bone, main_xform);
         main_xform.mulA_43(parent);
-        if (flags.is(flPointAmbient)) {
+        if (flags.is(flPointAmbient))
+        {
             owner->get_bone_xform(*light_ambient_bone, ambient_xform);
             ambient_xform.mulA_43(parent);
         }
-        if (bSelected) {
-            if (flags.is(flTypeSpot)) {
+        if (bSelected)
+        {
+            if (flags.is(flTypeSpot))
+            {
                 du->DrawSpotLight(main_xform.c, main_xform.k, range, spot_cone_angle, clr);
             }
             else
             {
                 du->DrawLineSphere(main_xform.c, range, clr, true);
             }
-            if (flags.is(flPointAmbient)) du->DrawLineSphere(ambient_xform.c, m_ambient_radius, clr, true);
+            if (flags.is(flPointAmbient))
+                du->DrawLineSphere(ambient_xform.c, m_ambient_radius, clr, true);
         }
         du->DrawPointLight(main_xform.c, VIS_RADIUS, clr);
-        if (flags.is(flPointAmbient)) du->DrawPointLight(ambient_xform.c, VIS_RADIUS, clr);
+        if (flags.is(flPointAmbient))
+            du->DrawPointLight(ambient_xform.c, VIS_RADIUS, clr);
     }
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
-bool CSE_ALifeObjectHangingLamp::used_ai_locations() const
-{
-    return (false);
-}
-
+bool CSE_ALifeObjectHangingLamp::used_ai_locations() const { return (false); }
 bool CSE_ALifeObjectHangingLamp::validate()
 {
-    if (flags.test(flR1) || flags.test(flR2)) return (true);
+    if (flags.test(flR1) || flags.test(flR2))
+        return (true);
 
     Msg("! Render type is not set properly!");
     return (false);
@@ -1525,7 +1418,7 @@ bool CSE_ALifeObjectHangingLamp::match_configuration() const
     R_ASSERT3(flags.test(flR1) || flags.test(flR2), "no renderer type set for hanging-lamp ", name_replace());
 #ifdef XRGAME_EXPORTS
     return ((flags.test(flR1) && (GlobalEnv.Render->get_generation() == IRender::GENERATION_R1)) ||
-            (flags.test(flR2) && (GlobalEnv.Render->get_generation() == IRender::GENERATION_R2)));
+    (flags.test(flR2) && (GlobalEnv.Render->get_generation() == IRender::GENERATION_R2)));
 #else
     return (true);
 #endif
@@ -1541,42 +1434,16 @@ CSE_ALifeObjectProjector::CSE_ALifeObjectProjector(LPCSTR caSection) : CSE_ALife
     m_flags.set(flSwitchOffline, FALSE);
 }
 
-CSE_ALifeObjectProjector::~CSE_ALifeObjectProjector()
-{
-}
-
-void CSE_ALifeObjectProjector::STATE_Read(NET_Packet& tNetPacket, u16 size)
-{
-    inherited::STATE_Read(tNetPacket, size);
-}
-
-void CSE_ALifeObjectProjector::STATE_Write(NET_Packet& tNetPacket)
-{
-    inherited::STATE_Write(tNetPacket);
-}
-
-void CSE_ALifeObjectProjector::UPDATE_Read(NET_Packet& tNetPacket)
-{
-    inherited::UPDATE_Read(tNetPacket);
-}
-
-void CSE_ALifeObjectProjector::UPDATE_Write(NET_Packet& tNetPacket)
-{
-    inherited::UPDATE_Write(tNetPacket);
-}
-
+CSE_ALifeObjectProjector::~CSE_ALifeObjectProjector() {}
+void CSE_ALifeObjectProjector::STATE_Read(NET_Packet& tNetPacket, u16 size) { inherited::STATE_Read(tNetPacket, size); }
+void CSE_ALifeObjectProjector::STATE_Write(NET_Packet& tNetPacket) { inherited::STATE_Write(tNetPacket); }
+void CSE_ALifeObjectProjector::UPDATE_Read(NET_Packet& tNetPacket) { inherited::UPDATE_Read(tNetPacket); }
+void CSE_ALifeObjectProjector::UPDATE_Write(NET_Packet& tNetPacket) { inherited::UPDATE_Write(tNetPacket); }
 #ifndef XRGAME_EXPORTS
-void CSE_ALifeObjectProjector::FillProps(LPCSTR pref, PropItemVec& values)
-{
-    inherited::FillProps(pref, values);
-}
-#endif  // #ifndef XRGAME_EXPORTS
+void CSE_ALifeObjectProjector::FillProps(LPCSTR pref, PropItemVec& values) { inherited::FillProps(pref, values); }
+#endif // #ifndef XRGAME_EXPORTS
 
-bool CSE_ALifeObjectProjector::used_ai_locations() const
-{
-    return (false);
-}
-
+bool CSE_ALifeObjectProjector::used_ai_locations() const { return (false); }
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeSchedulable
 ////////////////////////////////////////////////////////////////////////////
@@ -1588,21 +1455,14 @@ CSE_ALifeSchedulable::CSE_ALifeSchedulable(LPCSTR caSection)
     m_schedule_counter = u64(-1);
 }
 
-CSE_ALifeSchedulable::~CSE_ALifeSchedulable()
-{
-}
-
+CSE_ALifeSchedulable::~CSE_ALifeSchedulable() {}
 bool CSE_ALifeSchedulable::need_update(CSE_ALifeDynamicObject* object)
 {
-    return (!object || (object->m_bDirectControl && /**object->interactive() && /**/ object->used_ai_locations() &&
-                           !object->m_bOnline));
+    return (!object ||
+    (object->m_bDirectControl && /**object->interactive() && /**/ object->used_ai_locations() && !object->m_bOnline));
 }
 
-CSE_Abstract* CSE_ALifeSchedulable::init()
-{
-    return (base());
-}
-
+CSE_Abstract* CSE_ALifeSchedulable::init() { return (base()); }
 u32 CSE_ALifeSchedulable::ef_creature_type() const
 {
     string16 temp;
@@ -1647,20 +1507,14 @@ CSE_ALifeHelicopter::CSE_ALifeHelicopter(LPCSTR caSection)
     m_flags.set(flInteractive, FALSE);
 }
 
-CSE_ALifeHelicopter::~CSE_ALifeHelicopter()
-{
-}
-
-CSE_Motion* CSE_ALifeHelicopter::motion()
-{
-    return (this);
-}
-
+CSE_ALifeHelicopter::~CSE_ALifeHelicopter() {}
+CSE_Motion* CSE_ALifeHelicopter::motion() { return (this); }
 void CSE_ALifeHelicopter::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
     inherited1::STATE_Read(tNetPacket, size);
     CSE_Motion::motion_read(tNetPacket);
-    if (m_wVersion >= 69) inherited3::STATE_Read(tNetPacket, size);
+    if (m_wVersion >= 69)
+        inherited3::STATE_Read(tNetPacket, size);
     tNetPacket.r_stringZ(startup_animation);
     tNetPacket.r_stringZ(engine_sound);
 
@@ -1693,11 +1547,7 @@ void CSE_ALifeHelicopter::load(NET_Packet& tNetPacket)
     inherited1::load(tNetPacket);
     inherited3::load(tNetPacket);
 }
-bool CSE_ALifeHelicopter::can_save() const
-{
-    return CSE_PHSkeleton::need_save();
-}
-
+bool CSE_ALifeHelicopter::can_save() const { return CSE_PHSkeleton::need_save(); }
 #ifndef XRGAME_EXPORTS
 void CSE_ALifeHelicopter::FillProps(LPCSTR pref, PropItemVec& values)
 {
@@ -1707,13 +1557,9 @@ void CSE_ALifeHelicopter::FillProps(LPCSTR pref, PropItemVec& values)
 
     PHelper().CreateChoose(values, PrepareKey(pref, *s_name, "Engine Sound"), &engine_sound, smSoundSource);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
-bool CSE_ALifeHelicopter::used_ai_locations() const
-{
-    return (false);
-}
-
+bool CSE_ALifeHelicopter::used_ai_locations() const { return (false); }
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeCar
 ////////////////////////////////////////////////////////////////////////////
@@ -1726,18 +1572,19 @@ CSE_ALifeCar::CSE_ALifeCar(LPCSTR caSection) : CSE_ALifeDynamicObjectVisual(caSe
     health = 1.0f;
 }
 
-CSE_ALifeCar::~CSE_ALifeCar()
-{
-}
-
+CSE_ALifeCar::~CSE_ALifeCar() {}
 void CSE_ALifeCar::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
     inherited1::STATE_Read(tNetPacket, size);
 
-    if (m_wVersion > 65) inherited2::STATE_Read(tNetPacket, size);
-    if ((m_wVersion > 52) && (m_wVersion < 55)) tNetPacket.r_float();
-    if (m_wVersion > 92) health = tNetPacket.r_float();
-    if (health > 1.0f) health /= 100.0f;
+    if (m_wVersion > 65)
+        inherited2::STATE_Read(tNetPacket, size);
+    if ((m_wVersion > 52) && (m_wVersion < 55))
+        tNetPacket.r_float();
+    if (m_wVersion > 92)
+        health = tNetPacket.r_float();
+    if (health > 1.0f)
+        health /= 100.0f;
 }
 
 void CSE_ALifeCar::STATE_Write(NET_Packet& tNetPacket)
@@ -1759,16 +1606,8 @@ void CSE_ALifeCar::UPDATE_Write(NET_Packet& tNetPacket)
     inherited2::UPDATE_Write(tNetPacket);
 }
 
-bool CSE_ALifeCar::used_ai_locations() const
-{
-    return (false);
-}
-
-bool CSE_ALifeCar::can_save() const
-{
-    return CSE_PHSkeleton::need_save();
-}
-
+bool CSE_ALifeCar::used_ai_locations() const { return (false); }
+bool CSE_ALifeCar::can_save() const { return CSE_PHSkeleton::need_save(); }
 void CSE_ALifeCar::load(NET_Packet& tNetPacket)
 {
     inherited1::load(tNetPacket);
@@ -1839,15 +1678,8 @@ void CSE_ALifeCar::SDoorState::write(NET_Packet& P)
     P.w_float(health);
 }
 
-void CSE_ALifeCar::SWheelState::read(NET_Packet& P)
-{
-    health = P.r_float();
-}
-void CSE_ALifeCar::SWheelState::write(NET_Packet& P)
-{
-    P.w_float(health);
-}
-
+void CSE_ALifeCar::SWheelState::read(NET_Packet& P) { health = P.r_float(); }
+void CSE_ALifeCar::SWheelState::write(NET_Packet& P) { P.w_float(health); }
 #ifndef XRGAME_EXPORTS
 void CSE_ALifeCar::FillProps(LPCSTR pref, PropItemVec& values)
 {
@@ -1855,7 +1687,7 @@ void CSE_ALifeCar::FillProps(LPCSTR pref, PropItemVec& values)
     inherited2::FillProps(pref, values);
     PHelper().CreateFloat(values, PrepareKey(pref, *s_name, "Health"), &health, 0.f, 1.0f);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeObjectBreakable
@@ -1867,10 +1699,7 @@ CSE_ALifeObjectBreakable::CSE_ALifeObjectBreakable(LPCSTR caSection) : CSE_ALife
     m_flags.set(flSwitchOffline, FALSE);
 }
 
-CSE_ALifeObjectBreakable::~CSE_ALifeObjectBreakable()
-{
-}
-
+CSE_ALifeObjectBreakable::~CSE_ALifeObjectBreakable() {}
 void CSE_ALifeObjectBreakable::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
     inherited::STATE_Read(tNetPacket, size);
@@ -1883,34 +1712,18 @@ void CSE_ALifeObjectBreakable::STATE_Write(NET_Packet& tNetPacket)
     tNetPacket.w_float(m_health);
 }
 
-void CSE_ALifeObjectBreakable::UPDATE_Read(NET_Packet& tNetPacket)
-{
-    inherited::UPDATE_Read(tNetPacket);
-}
-
-void CSE_ALifeObjectBreakable::UPDATE_Write(NET_Packet& tNetPacket)
-{
-    inherited::UPDATE_Write(tNetPacket);
-}
-
+void CSE_ALifeObjectBreakable::UPDATE_Read(NET_Packet& tNetPacket) { inherited::UPDATE_Read(tNetPacket); }
+void CSE_ALifeObjectBreakable::UPDATE_Write(NET_Packet& tNetPacket) { inherited::UPDATE_Write(tNetPacket); }
 #ifndef XRGAME_EXPORTS
 void CSE_ALifeObjectBreakable::FillProps(LPCSTR pref, PropItemVec& values)
 {
     inherited::FillProps(pref, values);
     PHelper().CreateFloat(values, PrepareKey(pref, *s_name, "Health"), &m_health, 0.f, 100.f);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
-bool CSE_ALifeObjectBreakable::used_ai_locations() const
-{
-    return (false);
-}
-
-bool CSE_ALifeObjectBreakable::can_switch_offline() const
-{
-    return (false);
-}
-
+bool CSE_ALifeObjectBreakable::used_ai_locations() const { return (false); }
+bool CSE_ALifeObjectBreakable::can_switch_offline() const { return (false); }
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeObjectClimable
 ////////////////////////////////////////////////////////////////////////////
@@ -1922,22 +1735,18 @@ CSE_ALifeObjectClimable::CSE_ALifeObjectClimable(LPCSTR caSection) : CSE_Shape()
     material = "materials\\fake_ladders";
 }
 
-CSE_ALifeObjectClimable::~CSE_ALifeObjectClimable()
-{
-}
-
-IServerEntityShape* CSE_ALifeObjectClimable::shape()
-{
-    return (this);
-}
-
+CSE_ALifeObjectClimable::~CSE_ALifeObjectClimable() {}
+IServerEntityShape* CSE_ALifeObjectClimable::shape() { return (this); }
 void CSE_ALifeObjectClimable::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
     // inherited1::STATE_Read        (tNetPacket,size);
-    if (m_wVersion == 99) CSE_ALifeObject::STATE_Read(tNetPacket, size);
-    if (m_wVersion > 99) inherited2::STATE_Read(tNetPacket, size);
+    if (m_wVersion == 99)
+        CSE_ALifeObject::STATE_Read(tNetPacket, size);
+    if (m_wVersion > 99)
+        inherited2::STATE_Read(tNetPacket, size);
     cform_read(tNetPacket);
-    if (m_wVersion > 126) tNetPacket.r_stringZ(material);
+    if (m_wVersion > 126)
+        tNetPacket.r_stringZ(material);
 }
 
 void CSE_ALifeObjectClimable::STATE_Write(NET_Packet& tNetPacket)
@@ -1973,64 +1782,25 @@ void CSE_ALifeObjectClimable::set_additional_info(void* info)
     LPCSTR material_name = (LPCSTR)info;
     material = material_name;
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
-bool CSE_ALifeObjectClimable::used_ai_locations() const
-{
-    return (false);
-}
-
-bool CSE_ALifeObjectClimable::can_switch_offline() const
-{
-    return (false);
-}
-
+bool CSE_ALifeObjectClimable::used_ai_locations() const { return (false); }
+bool CSE_ALifeObjectClimable::can_switch_offline() const { return (false); }
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeMountedWeapon
 ////////////////////////////////////////////////////////////////////////////
-CSE_ALifeMountedWeapon::CSE_ALifeMountedWeapon(LPCSTR caSection) : CSE_ALifeDynamicObjectVisual(caSection)
-{
-}
-
-CSE_ALifeMountedWeapon::~CSE_ALifeMountedWeapon()
-{
-}
-
-void CSE_ALifeMountedWeapon::STATE_Read(NET_Packet& tNetPacket, u16 size)
-{
-    inherited::STATE_Read(tNetPacket, size);
-}
-
-void CSE_ALifeMountedWeapon::STATE_Write(NET_Packet& tNetPacket)
-{
-    inherited::STATE_Write(tNetPacket);
-}
-
-void CSE_ALifeMountedWeapon::UPDATE_Read(NET_Packet& tNetPacket)
-{
-    inherited::UPDATE_Read(tNetPacket);
-}
-
-void CSE_ALifeMountedWeapon::UPDATE_Write(NET_Packet& tNetPacket)
-{
-    inherited::UPDATE_Write(tNetPacket);
-}
-
+CSE_ALifeMountedWeapon::CSE_ALifeMountedWeapon(LPCSTR caSection) : CSE_ALifeDynamicObjectVisual(caSection) {}
+CSE_ALifeMountedWeapon::~CSE_ALifeMountedWeapon() {}
+void CSE_ALifeMountedWeapon::STATE_Read(NET_Packet& tNetPacket, u16 size) { inherited::STATE_Read(tNetPacket, size); }
+void CSE_ALifeMountedWeapon::STATE_Write(NET_Packet& tNetPacket) { inherited::STATE_Write(tNetPacket); }
+void CSE_ALifeMountedWeapon::UPDATE_Read(NET_Packet& tNetPacket) { inherited::UPDATE_Read(tNetPacket); }
+void CSE_ALifeMountedWeapon::UPDATE_Write(NET_Packet& tNetPacket) { inherited::UPDATE_Write(tNetPacket); }
 #ifndef XRGAME_EXPORTS
-void CSE_ALifeMountedWeapon::FillProps(LPCSTR pref, PropItemVec& values)
-{
-    inherited::FillProps(pref, values);
-}
-#endif  // #ifndef XRGAME_EXPORTS
+void CSE_ALifeMountedWeapon::FillProps(LPCSTR pref, PropItemVec& values) { inherited::FillProps(pref, values); }
+#endif // #ifndef XRGAME_EXPORTS
 
-CSE_ALifeStationaryMgun::CSE_ALifeStationaryMgun(LPCSTR caSection) : CSE_ALifeDynamicObjectVisual(caSection)
-{
-}
-
-CSE_ALifeStationaryMgun::~CSE_ALifeStationaryMgun()
-{
-}
-
+CSE_ALifeStationaryMgun::CSE_ALifeStationaryMgun(LPCSTR caSection) : CSE_ALifeDynamicObjectVisual(caSection) {}
+CSE_ALifeStationaryMgun::~CSE_ALifeStationaryMgun() {}
 void CSE_ALifeStationaryMgun::UPDATE_Read(NET_Packet& tNetPacket)
 {
     inherited::UPDATE_Read(tNetPacket);
@@ -2045,35 +1815,17 @@ void CSE_ALifeStationaryMgun::UPDATE_Write(NET_Packet& tNetPacket)
     save_data(m_destEnemyDir, tNetPacket);
 }
 
-void CSE_ALifeStationaryMgun::STATE_Read(NET_Packet& tNetPacket, u16 size)
-{
-    inherited::STATE_Read(tNetPacket, size);
-}
-
-void CSE_ALifeStationaryMgun::STATE_Write(NET_Packet& tNetPacket)
-{
-    inherited::STATE_Write(tNetPacket);
-}
-
+void CSE_ALifeStationaryMgun::STATE_Read(NET_Packet& tNetPacket, u16 size) { inherited::STATE_Read(tNetPacket, size); }
+void CSE_ALifeStationaryMgun::STATE_Write(NET_Packet& tNetPacket) { inherited::STATE_Write(tNetPacket); }
 #ifndef XRGAME_EXPORTS
-void CSE_ALifeStationaryMgun::FillProps(LPCSTR pref, PropItemVec& values)
-{
-    inherited::FillProps(pref, values);
-}
-#endif  // #ifndef XRGAME_EXPORTS
+void CSE_ALifeStationaryMgun::FillProps(LPCSTR pref, PropItemVec& values) { inherited::FillProps(pref, values); }
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeTeamBaseZone
 ////////////////////////////////////////////////////////////////////////////
-CSE_ALifeTeamBaseZone::CSE_ALifeTeamBaseZone(LPCSTR caSection) : CSE_ALifeSpaceRestrictor(caSection)
-{
-    m_team = 0;
-}
-
-CSE_ALifeTeamBaseZone::~CSE_ALifeTeamBaseZone()
-{
-}
-
+CSE_ALifeTeamBaseZone::CSE_ALifeTeamBaseZone(LPCSTR caSection) : CSE_ALifeSpaceRestrictor(caSection) { m_team = 0; }
+CSE_ALifeTeamBaseZone::~CSE_ALifeTeamBaseZone() {}
 void CSE_ALifeTeamBaseZone::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
     inherited::STATE_Read(tNetPacket, size);
@@ -2086,23 +1838,15 @@ void CSE_ALifeTeamBaseZone::STATE_Write(NET_Packet& tNetPacket)
     tNetPacket.w_u8(m_team);
 }
 
-void CSE_ALifeTeamBaseZone::UPDATE_Read(NET_Packet& tNetPacket)
-{
-    inherited::UPDATE_Read(tNetPacket);
-}
-
-void CSE_ALifeTeamBaseZone::UPDATE_Write(NET_Packet& tNetPacket)
-{
-    inherited::UPDATE_Write(tNetPacket);
-}
-
+void CSE_ALifeTeamBaseZone::UPDATE_Read(NET_Packet& tNetPacket) { inherited::UPDATE_Read(tNetPacket); }
+void CSE_ALifeTeamBaseZone::UPDATE_Write(NET_Packet& tNetPacket) { inherited::UPDATE_Write(tNetPacket); }
 #ifndef XRGAME_EXPORTS
 void CSE_ALifeTeamBaseZone::FillProps(LPCSTR pref, PropItemVec& items)
 {
     inherited::FillProps(pref, items);
     PHelper().CreateU8(items, PrepareKey(pref, *s_name, "team"), &m_team, 0, 16);
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeSmartZone
@@ -2113,20 +1857,9 @@ CSE_ALifeSmartZone::CSE_ALifeSmartZone(LPCSTR caSection)
 {
 }
 
-CSE_ALifeSmartZone::~CSE_ALifeSmartZone()
-{
-}
-
-CSE_Abstract* CSE_ALifeSmartZone::base()
-{
-    return (this);
-}
-
-const CSE_Abstract* CSE_ALifeSmartZone::base() const
-{
-    return (this);
-}
-
+CSE_ALifeSmartZone::~CSE_ALifeSmartZone() {}
+CSE_Abstract* CSE_ALifeSmartZone::base() { return (this); }
+const CSE_Abstract* CSE_ALifeSmartZone::base() const { return (this); }
 CSE_Abstract* CSE_ALifeSmartZone::init()
 {
     inherited1::init();
@@ -2134,46 +1867,17 @@ CSE_Abstract* CSE_ALifeSmartZone::init()
     return (this);
 }
 
-void CSE_ALifeSmartZone::STATE_Read(NET_Packet& tNetPacket, u16 size)
-{
-    inherited1::STATE_Read(tNetPacket, size);
-}
-
-void CSE_ALifeSmartZone::STATE_Write(NET_Packet& tNetPacket)
-{
-    inherited1::STATE_Write(tNetPacket);
-}
-
-void CSE_ALifeSmartZone::UPDATE_Read(NET_Packet& tNetPacket)
-{
-    inherited1::UPDATE_Read(tNetPacket);
-}
-
-void CSE_ALifeSmartZone::UPDATE_Write(NET_Packet& tNetPacket)
-{
-    inherited1::UPDATE_Write(tNetPacket);
-}
-
+void CSE_ALifeSmartZone::STATE_Read(NET_Packet& tNetPacket, u16 size) { inherited1::STATE_Read(tNetPacket, size); }
+void CSE_ALifeSmartZone::STATE_Write(NET_Packet& tNetPacket) { inherited1::STATE_Write(tNetPacket); }
+void CSE_ALifeSmartZone::UPDATE_Read(NET_Packet& tNetPacket) { inherited1::UPDATE_Read(tNetPacket); }
+void CSE_ALifeSmartZone::UPDATE_Write(NET_Packet& tNetPacket) { inherited1::UPDATE_Write(tNetPacket); }
 #ifndef XRGAME_EXPORTS
-void CSE_ALifeSmartZone::FillProps(LPCSTR pref, PropItemVec& items)
-{
-    inherited1::FillProps(pref, items);
-}
-#endif  // #ifndef XRGAME_EXPORTS
+void CSE_ALifeSmartZone::FillProps(LPCSTR pref, PropItemVec& items) { inherited1::FillProps(pref, items); }
+#endif // #ifndef XRGAME_EXPORTS
 
-void CSE_ALifeSmartZone::update()
-{
-}
-
-float CSE_ALifeSmartZone::detect_probability()
-{
-    return (0.f);
-}
-
-void CSE_ALifeSmartZone::smart_touch(CSE_ALifeMonsterAbstract* monster)
-{
-}
-
+void CSE_ALifeSmartZone::update() {}
+float CSE_ALifeSmartZone::detect_probability() { return (0.f); }
+void CSE_ALifeSmartZone::smart_touch(CSE_ALifeMonsterAbstract* monster) {}
 ////////////////////////////////////////////////////////////////////////////
 // CSE_ALifeInventoryBox
 ////////////////////////////////////////////////////////////////////////////
@@ -2185,16 +1889,14 @@ CSE_ALifeInventoryBox::CSE_ALifeInventoryBox(LPCSTR caSection) : CSE_ALifeDynami
     m_tip_text._set("inventory_box_use");
 }
 
-CSE_ALifeInventoryBox::~CSE_ALifeInventoryBox()
-{
-}
-
+CSE_ALifeInventoryBox::~CSE_ALifeInventoryBox() {}
 void CSE_ALifeInventoryBox::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
     inherited::STATE_Read(tNetPacket, size);
 
     u16 m_wVersion = base()->m_wVersion;
-    if (m_wVersion > 124) {
+    if (m_wVersion > 124)
+    {
         u8 temp;
         tNetPacket.r_u8(temp);
         m_can_take = (temp == 1);
@@ -2212,19 +1914,8 @@ void CSE_ALifeInventoryBox::STATE_Write(NET_Packet& tNetPacket)
     tNetPacket.w_stringZ(m_tip_text);
 }
 
-void CSE_ALifeInventoryBox::UPDATE_Read(NET_Packet& tNetPacket)
-{
-    inherited::UPDATE_Read(tNetPacket);
-}
-
-void CSE_ALifeInventoryBox::UPDATE_Write(NET_Packet& tNetPacket)
-{
-    inherited::UPDATE_Write(tNetPacket);
-}
-
+void CSE_ALifeInventoryBox::UPDATE_Read(NET_Packet& tNetPacket) { inherited::UPDATE_Read(tNetPacket); }
+void CSE_ALifeInventoryBox::UPDATE_Write(NET_Packet& tNetPacket) { inherited::UPDATE_Write(tNetPacket); }
 #ifndef XRGAME_EXPORTS
-void CSE_ALifeInventoryBox::FillProps(LPCSTR pref, PropItemVec& values)
-{
-    inherited::FillProps(pref, values);
-}
-#endif  // #ifndef XRGAME_EXPORTS
+void CSE_ALifeInventoryBox::FillProps(LPCSTR pref, PropItemVec& values) { inherited::FillProps(pref, values); }
+#endif // #ifndef XRGAME_EXPORTS

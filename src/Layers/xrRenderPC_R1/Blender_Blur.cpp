@@ -7,25 +7,10 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CBlender_Blur::CBlender_Blur()
-{
-    description.CLS = B_BLUR;
-}
-
-CBlender_Blur::~CBlender_Blur()
-{
-}
-
-void CBlender_Blur::Save(IWriter& fs)
-{
-    IBlender::Save(fs);
-}
-
-void CBlender_Blur::Load(IReader& fs, u16 version)
-{
-    IBlender::Load(fs, version);
-}
-
+CBlender_Blur::CBlender_Blur() { description.CLS = B_BLUR; }
+CBlender_Blur::~CBlender_Blur() {}
+void CBlender_Blur::Save(IWriter& fs) { IBlender::Save(fs); }
+void CBlender_Blur::Load(IReader& fs, u16 version) { IBlender::Load(fs, version); }
 void CBlender_Blur::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);

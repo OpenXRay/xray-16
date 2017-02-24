@@ -29,7 +29,6 @@ public:
 
     void SetTextAtrib(CGameFont* pFont, u32 color);
     u32 GetTextColor() { return txt_color; }
-
 private:
     WINDOW_LIST toDelList;
     float kill_msg_height;

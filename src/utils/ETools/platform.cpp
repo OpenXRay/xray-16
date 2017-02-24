@@ -29,24 +29,15 @@
 
 #if defined(_WIN32) && defined(_MSC_VER)
 
-void setbinmode(FILE* f)
-{
-    _setmode(_fileno(f), _O_BINARY);
-}
+void setbinmode(FILE* f) { _setmode(_fileno(f), _O_BINARY); }
 #endif /* win32 */
 
 #ifdef __EMX__
-void setbinmode(FILE* f)
-{
-    _fsetmode(f, "b");
-}
+void setbinmode(FILE* f) { _fsetmode(f, "b"); }
 #endif
 
 #if defined(__WATCOMC__) || defined(__BORLANDC__) || defined(__MINGW32__)
-void setbinmode(FILE* f)
-{
-    setmode(fileno(f), O_BINARY);
-}
+void setbinmode(FILE* f) { setmode(fileno(f), O_BINARY); }
 #endif
 
 #if defined(_WIN32) || defined(__EMX__) || defined(__WATCOMC__)
@@ -68,11 +59,7 @@ double timer_time(void* timer)
         return 1; /* To avoid division by zero later, for very short inputs */
 }
 
-void timer_clear(void* timer)
-{
-    free((time_t*)timer);
-}
-
+void timer_clear(void* timer) { free((time_t*)timer); }
 #else /* unix. Or at least win32 */
 
 #include <sys/time.h>
@@ -95,10 +82,7 @@ double timer_time(void* timer)
     return (double)now.tv_sec - (double)start.tv_sec + ((double)now.tv_usec - (double)start.tv_usec) / 1000000.0;
 }
 
-void timer_clear(void* timer)
-{
-    free((time_t*)timer);
-}
+void timer_clear(void* timer) { free((time_t*)timer); }
 
 #endif
 
@@ -133,7 +117,8 @@ int create_directories(char* fn)
 
     start = fn;
 #ifdef _WIN32
-    if (strlen(fn) >= 3 && isalpha(fn[0]) && fn[1] == ':') start = start + 2;
+    if (strlen(fn) >= 3 && isalpha(fn[0]) && fn[1] == ':')
+        start = start + 2;
 #endif
 
     while ((end = strpbrk(start + 1, PATH_SEPS)) != NULL)
@@ -141,9 +126,12 @@ int create_directories(char* fn)
         memcpy(segment, fn, end - fn);
         segment[end - fn] = 0;
 
-        if (stat(segment, &statbuf)) {
-            if (errno == ENOENT) {
-                if (mkdir(segment, 0777)) {
+        if (stat(segment, &statbuf))
+        {
+            if (errno == ENOENT)
+            {
+                if (mkdir(segment, 0777))
+                {
                     fprintf(stderr, _("Couldn't create directory \"%s\": %s\n"), segment, strerror(errno));
                     free(segment);
                     return -1;

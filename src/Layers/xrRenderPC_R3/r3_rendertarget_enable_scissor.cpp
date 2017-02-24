@@ -12,12 +12,15 @@ BOOL tri_vs_sphere_intersect(Fvector& SC, float R, Fvector& v0, Fvector& v1, Fve
 
 void CRenderTarget::enable_dbt_bounds(light* L)
 {
-    if (!RImplementation.o.nvdbt) return;
-    if (!ps_r2_ls_flags.test(R2FLAG_USE_NVDBT)) return;
+    if (!RImplementation.o.nvdbt)
+        return;
+    if (!ps_r2_ls_flags.test(R2FLAG_USE_NVDBT))
+        return;
 
     u32 mask = 0xffffffff;
     EFC_Visible vis = RImplementation.ViewBase.testSphere(L->spatial.sphere.P, L->spatial.sphere.R * 1.01f, mask);
-    if (vis != fcvFully) return;
+    if (vis != fcvFully)
+        return;
 
     // xform BB
     Fbox BB;
@@ -40,8 +43,10 @@ void CRenderTarget::enable_dbt_bounds(light* L)
 // nv-DBT
 BOOL CRenderTarget::u_DBT_enable(float zMin, float zMax)
 {
-    if (!RImplementation.o.nvdbt) return FALSE;
-    if (!ps_r2_ls_flags.test(R2FLAG_USE_NVDBT)) return FALSE;
+    if (!RImplementation.o.nvdbt)
+        return FALSE;
+    if (!ps_r2_ls_flags.test(R2FLAG_USE_NVDBT))
+        return FALSE;
 
     return FALSE;
 
@@ -61,7 +66,7 @@ void CRenderTarget::u_DBT_disable()
     //	HW.pDevice->SetRenderState(D3DRS_ADAPTIVETESS_X,0);
 }
 
-BOOL CRenderTarget::enable_scissor(light* L)  // true if intersects near plane
+BOOL CRenderTarget::enable_scissor(light* L) // true if intersects near plane
 {
     // Msg	("%d: %x type(%d), pos(%f,%f,%f)",Device.dwFrame,u32(L),u32(L->flags.type),VPUSH(L->position));
 
@@ -83,7 +88,8 @@ BOOL CRenderTarget::enable_scissor(light* L)  // true if intersects near plane
         near_intersect = (p_dist <= 0);
     }
 #ifdef DEBUG
-    if (1) {
+    if (1)
+    {
         Fsphere S;
         S.set(L->spatial.sphere.P, L->spatial.sphere.R);
         dbg_spheres.push_back(mk_pair(S, L->color));

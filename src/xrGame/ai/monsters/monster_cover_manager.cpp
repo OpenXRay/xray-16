@@ -55,7 +55,6 @@ public:
     bool operator()(const CCoverPoint* cover) const { return true; }
     // must return a value that is transfered to cover evaluator
     float weight(const CCoverPoint* cover) const { return 1.f; }
-
     void finalize(const CCoverPoint* cover) const {}
 };
 
@@ -107,15 +106,19 @@ void CCoverEvaluator::evaluate_cover(const CCoverPoint* cover_point, float weigh
 // DBG().level_info(this).add_item(cover_point->position(), color_xrgb(0,255,0));
 #endif
     CMonsterSquad* squad = monster_squad().get_squad(m_object);
-    if (squad->is_locked_cover(cover_point->level_vertex_id())) return;
+    if (squad->is_locked_cover(cover_point->level_vertex_id()))
+        return;
 
-    if (fis_zero(weight)) return;
+    if (fis_zero(weight))
+        return;
 
     float dest_distance = m_dest_position.distance_to(cover_point->position());
 
-    if ((dest_distance <= m_min_distance) && (m_current_distance > dest_distance)) return;
+    if ((dest_distance <= m_min_distance) && (m_current_distance > dest_distance))
+        return;
 
-    if ((dest_distance >= m_max_distance) && (m_current_distance < dest_distance)) return;
+    if ((dest_distance >= m_max_distance) && (m_current_distance < dest_distance))
+        return;
 
     Fvector direction;
     float y, p;
@@ -126,33 +129,25 @@ void CCoverEvaluator::evaluate_cover(const CCoverPoint* cover_point, float weigh
     float low_cover_value = ai().level_graph().low_cover_in_direction(y, cover_point->level_vertex_id());
     float cover_value = _min(high_cover_value, low_cover_value);
     float value = cover_value;
-    if (ai().level_graph().neighbour_in_direction(direction, cover_point->level_vertex_id())) value += 10.f;
+    if (ai().level_graph().neighbour_in_direction(direction, cover_point->level_vertex_id()))
+        value += 10.f;
 
     value /= weight;
 
-    if (value >= m_best_value) return;
+    if (value >= m_best_value)
+        return;
 
     m_selected = cover_point;
     m_best_value = value;
 }
 
-void CCoverEvaluator::evaluate_smart_cover(smart_cover::cover const* smart_cover, float const& weight)
-{
-}
-
+void CCoverEvaluator::evaluate_smart_cover(smart_cover::cover const* smart_cover, float const& weight) {}
 //=============================================================================
 // Cover Manager
 //=============================================================================
 
-CMonsterCoverManager::CMonsterCoverManager(CBaseMonster* monster) : m_object(monster)
-{
-    m_ce_best = 0;
-}
-CMonsterCoverManager::~CMonsterCoverManager()
-{
-    xr_delete(m_ce_best);
-}
-
+CMonsterCoverManager::CMonsterCoverManager(CBaseMonster* monster) : m_object(monster) { m_ce_best = 0; }
+CMonsterCoverManager::~CMonsterCoverManager() { xr_delete(m_ce_best); }
 void CMonsterCoverManager::load()
 {
     m_ce_best = new CCoverEvaluator(&(m_object->control().path_builder().restrictions()));
@@ -203,8 +198,10 @@ void CMonsterCoverManager::less_cover_direction(Fvector& dir)
     {
         direction.setHP(ang, 0.f);
 
-        if (Level().ObjectSpace.RayPick(trace_from, direction, TRACE_STATIC_DIST, collide::rqtStatic, l_rq, m_object)) {
-            if ((l_rq.range < TRACE_STATIC_DIST)) {
+        if (Level().ObjectSpace.RayPick(trace_from, direction, TRACE_STATIC_DIST, collide::rqtStatic, l_rq, m_object))
+        {
+            if ((l_rq.range < TRACE_STATIC_DIST))
+            {
                 angle_from = ang;
                 break;
             }
@@ -216,8 +213,10 @@ void CMonsterCoverManager::less_cover_direction(Fvector& dir)
     {
         direction.setHP(ang, 0.f);
 
-        if (Level().ObjectSpace.RayPick(trace_from, direction, TRACE_STATIC_DIST, collide::rqtStatic, l_rq, m_object)) {
-            if ((l_rq.range < TRACE_STATIC_DIST)) {
+        if (Level().ObjectSpace.RayPick(trace_from, direction, TRACE_STATIC_DIST, collide::rqtStatic, l_rq, m_object))
+        {
+            if ((l_rq.range < TRACE_STATIC_DIST))
+            {
                 angle_to = ang;
                 break;
             }

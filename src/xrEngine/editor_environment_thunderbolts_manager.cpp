@@ -74,7 +74,8 @@ manager::~manager()
     delete_data(m_thunderbolts_ids);
     delete_data(m_collections_ids);
 
-    if (!Device.editor() || !m_property_holder) return;
+    if (!Device.editor() || !m_property_holder)
+        return;
 
     ::ide().destroy(m_property_holder);
 }
@@ -184,36 +185,12 @@ void manager::save()
     xr_delete(config);
 }
 
-float manager::altitude_getter() const
-{
-    return (rad2deg(m_environment.p_var_alt));
-}
-
-void manager::altitude_setter(float value)
-{
-    m_environment.p_var_alt = deg2rad(value);
-}
-
-float manager::longitude_getter() const
-{
-    return (rad2deg(m_environment.p_var_long));
-}
-
-void manager::longitude_setter(float value)
-{
-    m_environment.p_var_long = deg2rad(value);
-}
-
-float manager::tilt_getter() const
-{
-    return (rad2deg(m_environment.p_tilt));
-}
-
-void manager::tilt_setter(float value)
-{
-    m_environment.p_tilt = deg2rad(value);
-}
-
+float manager::altitude_getter() const { return (rad2deg(m_environment.p_var_alt)); }
+void manager::altitude_setter(float value) { m_environment.p_var_alt = deg2rad(value); }
+float manager::longitude_getter() const { return (rad2deg(m_environment.p_var_long)); }
+void manager::longitude_setter(float value) { m_environment.p_var_long = deg2rad(value); }
+float manager::tilt_getter() const { return (rad2deg(m_environment.p_tilt)); }
+void manager::tilt_setter(float value) { m_environment.p_tilt = deg2rad(value); }
 void manager::fill(editor::property_holder* holder)
 {
     VERIFY(holder);
@@ -259,7 +236,8 @@ void manager::fill(editor::property_holder* holder)
 
 manager::thunderbolts_ids_type const& manager::thunderbolts_ids() const
 {
-    if (!m_thunderbolts_changed) return (m_thunderbolts_ids);
+    if (!m_thunderbolts_changed)
+        return (m_thunderbolts_ids);
 
     delete_data(m_thunderbolts_ids);
 
@@ -278,7 +256,8 @@ manager::thunderbolts_ids_type const& manager::thunderbolts_ids() const
 
 manager::thunderbolts_ids_type const& manager::collections_ids() const
 {
-    if (!m_collections_changed) return (m_collections_ids);
+    if (!m_collections_changed)
+        return (m_collections_ids);
 
     delete_data(m_collections_ids);
 
@@ -296,21 +275,19 @@ manager::thunderbolts_ids_type const& manager::collections_ids() const
     return (m_collections_ids);
 }
 
-::editor::environment::manager& manager::environment() const
-{
-    return (m_environment);
-}
-
+::editor::environment::manager& manager::environment() const { return (m_environment); }
 shared_str manager::unique_thunderbolt_id(shared_str const& id) const
 {
-    if (m_thunderbolt_collection->unique_id(id.c_str())) return (id);
+    if (m_thunderbolt_collection->unique_id(id.c_str()))
+        return (id);
 
     return (m_thunderbolt_collection->generate_unique_id(id.c_str()));
 }
 
 shared_str manager::unique_collection_id(shared_str const& id) const
 {
-    if (m_collections_collection->unique_id(id.c_str())) return (id);
+    if (m_collections_collection->unique_id(id.c_str()))
+        return (id);
 
     return (m_collections_collection->generate_unique_id(id.c_str()));
 }
@@ -320,12 +297,13 @@ SThunderboltDesc* manager::description(CInifile& config, shared_str const& secti
     thunderbolt_container_type::const_iterator i = m_thunderbolts.begin();
     thunderbolt_container_type::const_iterator e = m_thunderbolts.end();
     for (; i != e; ++i)
-        if ((*i)->id() == section) return (*i);
+        if ((*i)->id() == section)
+            return (*i);
 
     NODEFAULT;
 #ifdef DEBUG
     return (0);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 }
 
 SThunderboltCollection* manager::get_collection(shared_str const& section)
@@ -333,12 +311,13 @@ SThunderboltCollection* manager::get_collection(shared_str const& section)
     collection_container_type::iterator i = m_collections.begin();
     collection_container_type::iterator e = m_collections.end();
     for (; i != e; ++i)
-        if ((*i)->id() == section) return (*i);
+        if ((*i)->id() == section)
+            return (*i);
 
     NODEFAULT;
 #ifdef DEBUG
     return (0);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

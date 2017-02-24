@@ -25,11 +25,7 @@ C3DCursor::C3DCursor()
 
 //---------------------------------------------------------------------------
 
-C3DCursor::~C3DCursor()
-{
-    m_RenderBuffer.clear();
-}
-
+C3DCursor::~C3DCursor() { m_RenderBuffer.clear(); }
 //---------------------------------------------------------------------------
 
 void C3DCursor::SetBrushSegment(float segment)
@@ -40,11 +36,7 @@ void C3DCursor::SetBrushSegment(float segment)
 
 //---------------------------------------------------------------------------
 
-void C3DCursor::SetColor(Fcolor& c)
-{
-    dwColor = c.get();
-}
-
+void C3DCursor::SetColor(Fcolor& c) { dwColor = c.get(); }
 //---------------------------------------------------------------------------
 
 void C3DCursor::GetPickPoint(Fvector& src, Fvector& dst, Fvector* N)
@@ -57,9 +49,11 @@ void C3DCursor::GetPickPoint(Fvector& src, Fvector& dst, Fvector* N)
     pinf.pt.set(src);
     Fvector pick_dir;
     pick_dir.set(0, -1, 0);
-    if (Scene->RayPickObject(pinf.inf.range, start, pick_dir, OBJCLASS_SCENEOBJECT, &pinf, Scene->GetSnapList(false))) {
+    if (Scene->RayPickObject(pinf.inf.range, start, pick_dir, OBJCLASS_SCENEOBJECT, &pinf, Scene->GetSnapList(false)))
+    {
         dst.set(pinf.pt);
-        if (N) {
+        if (N)
+        {
             Fvector verts[3];
             pinf.e_obj->GetFaceWorld(pinf.s_obj->_Transform(), pinf.e_mesh, pinf.inf.id, verts);
             N->mknormal(verts[0], verts[1], verts[2]);
@@ -68,7 +62,8 @@ void C3DCursor::GetPickPoint(Fvector& src, Fvector& dst, Fvector* N)
     else
     {
         dst.set(src);
-        if (N) N->set(0, 1, 0);
+        if (N)
+            N->set(0, 1, 0);
     }
 }
 
@@ -76,7 +71,8 @@ void C3DCursor::GetPickPoint(Fvector& src, Fvector& dst, Fvector* N)
 
 void C3DCursor::Render()
 {
-    if (m_Visible && !EDevice.m_Camera.IsMoving()) {
+    if (m_Visible && !EDevice.m_Camera.IsMoving())
+    {
         SRayPickInfo pinf;
         Fvector start, dir, N, D;
         POINT start_pt;
@@ -85,7 +81,8 @@ void C3DCursor::Render()
         start_pt = UI->GetD3DWindow()->ScreenToClient(start_pt);
         pt.set(float(start_pt.x), float(start_pt.y));
         EDevice.m_Camera.MouseRayFromPoint(start, dir, pt);
-        if (LUI->PickGround(pinf.pt, start, dir, -1)) {
+        if (LUI->PickGround(pinf.pt, start, dir, -1))
+        {
             N.set(0, 1, 0);
             D.set(0, 0, 1);
 
@@ -153,8 +150,10 @@ bool C3DCursor::PrepareBrush()
     EDevice.m_Camera.MouseRayFromPoint(brush_start, brush_dir, pt);
     bPickObject = !!Scene->RayPickObject(
         pinf.inf.range, brush_start, brush_dir, OBJCLASS_SCENEOBJECT, &pinf, Scene->GetSnapList(false));
-    if (!bPickObject) bPickGround = LUI->PickGround(pinf.pt, brush_start, brush_dir);
-    if (bPickObject || bPickGround) {
+    if (!bPickObject)
+        bPickGround = LUI->PickGround(pinf.pt, brush_start, brush_dir);
+    if (bPickObject || bPickGround)
+    {
         N.set(0, 1, 0);
         D.set(0, 0, 1);
         Fvector at;

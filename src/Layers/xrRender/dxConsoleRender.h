@@ -19,4 +19,4 @@ private:
 #endif
 };
 
-#endif  //	ConsoleRender_included
+#endif //	ConsoleRender_included

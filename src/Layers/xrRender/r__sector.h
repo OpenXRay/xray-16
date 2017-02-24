@@ -52,7 +52,6 @@ public:
             return pFace;
     }
     float distance(const Fvector& V) { return _abs(P.classify(V)); }
-
     CPortal();
     virtual ~CPortal();
 
@@ -67,7 +66,7 @@ class dxRender_Visual;
 class CSector : public IRender_Sector
 {
 protected:
-    dxRender_Visual* m_root;  // whole geometry of that sector
+    dxRender_Visual* m_root; // whole geometry of that sector
     xr_vector<CPortal*> m_portals;
 
 public:
@@ -94,18 +93,18 @@ public:
         VQ_HOM = (1 << 0),
         VQ_SSA = (1 << 1),
         VQ_SCISSOR = (1 << 2),
-        VQ_FADE = (1 << 3),  // requires SSA to work
+        VQ_FADE = (1 << 3), // requires SSA to work
     };
 
 public:
-    u32 i_marker;                                     // input
-    u32 i_options;                                    // input:	culling options
-    Fvector i_vBase;                                  // input:	"view" point
-    Fmatrix i_mXFORM;                                 // input:	4x4 xform
-    Fmatrix i_mXFORM_01;                              //
-    CSector* i_start;                                 // input:	starting point
-    xr_vector<IRender_Sector*> r_sectors;             // result
-    xr_vector<std::pair<CPortal*, float>> f_portals;  //
+    u32 i_marker; // input
+    u32 i_options; // input:	culling options
+    Fvector i_vBase; // input:	"view" point
+    Fmatrix i_mXFORM; // input:	4x4 xform
+    Fmatrix i_mXFORM_01; //
+    CSector* i_start; // input:	starting point
+    xr_vector<IRender_Sector*> r_sectors; // result
+    xr_vector<std::pair<CPortal*, float>> f_portals; //
     ref_shader f_shader;
     ref_geom f_geom;
 
@@ -123,4 +122,4 @@ public:
 
 extern CPortalTraverser PortalTraverser;
 
-#endif  // !defined(AFX_PORTAL_H__1FC2D371_4A19_49EA_BD1E_2D0F8DEBBF15__INCLUDED_)
+#endif // !defined(AFX_PORTAL_H__1FC2D371_4A19_49EA_BD1E_2D0F8DEBBF15__INCLUDED_)

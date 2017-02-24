@@ -2,16 +2,8 @@
 #include "PostProcess.hpp"
 
 // postprocess value LOAD method implementation
-void CPostProcessValue::load(IReader& pReader)
-{
-    m_Value.Load_2(pReader);
-}
-
-void CPostProcessValue::save(IWriter& pWriter)
-{
-    m_Value.Save(pWriter);
-}
-
+void CPostProcessValue::load(IReader& pReader) { m_Value.Load_2(pReader); }
+void CPostProcessValue::save(IWriter& pWriter) { m_Value.Save(pWriter); }
 // postprocess color LOAD method implementation
 void CPostProcessColor::load(IReader& pReader)
 {
@@ -31,21 +23,9 @@ void CPostProcessColor::save(IWriter& pWriter)
 
 // main PostProcessAnimator class
 
-BasicPostProcessAnimator::BasicPostProcessAnimator()
-{
-    Create();
-}
-
-BasicPostProcessAnimator::BasicPostProcessAnimator(int id, bool cyclic) : m_bCyclic(cyclic)
-{
-    Create();
-}
-
-BasicPostProcessAnimator::~BasicPostProcessAnimator()
-{
-    Clear();
-}
-
+BasicPostProcessAnimator::BasicPostProcessAnimator() { Create(); }
+BasicPostProcessAnimator::BasicPostProcessAnimator(int id, bool cyclic) : m_bCyclic(cyclic) { Create(); }
+BasicPostProcessAnimator::~BasicPostProcessAnimator() { Clear(); }
 void BasicPostProcessAnimator::Clear()
 {
     for (int a = 0; a < POSTPROCESS_PARAMS_COUNT; a++)
@@ -56,8 +36,10 @@ void BasicPostProcessAnimator::Load(LPCSTR name, bool internalFs /*= true*/)
 {
     m_Name = name;
     string_path full_path;
-    if (internalFs) {
-        if (!FS.exist(full_path, "$level$", name)) {
+    if (internalFs)
+    {
+        if (!FS.exist(full_path, "$level$", name))
+        {
             if (!FS.exist(full_path, "$game_anims$", name))
                 xrDebug::Fatal(DEBUG_INFO, "Can't find motion file '%s'.", name);
         }
@@ -66,8 +48,10 @@ void BasicPostProcessAnimator::Load(LPCSTR name, bool internalFs /*= true*/)
         xr_strcpy(full_path, name);
 
     LPCSTR ext = strext(full_path);
-    if (ext) {
-        if (!xr_strcmp(ext, POSTPROCESS_FILE_EXTENSION)) {
+    if (ext)
+    {
+        if (!xr_strcmp(ext, POSTPROCESS_FILE_EXTENSION))
+        {
             IReader* F = FS.r_open(full_path);
             u32 dwVersion = F->r_u32();
             //.       VERIFY (dwVersion == POSTPROCESS_FILE_VERSION);
@@ -101,7 +85,8 @@ void BasicPostProcessAnimator::Load(LPCSTR name, bool internalFs /*= true*/)
             // load noise fps
             VERIFY(m_Params[9]);
             m_Params[9]->load(*F);
-            if (dwVersion >= 0x0002) {
+            if (dwVersion >= 0x0002)
+            {
                 VERIFY(m_Params[10]);
                 m_Params[10]->load(*F);
                 F->r_stringZ(m_EffectorParams.cm_tex1);
@@ -118,7 +103,8 @@ void BasicPostProcessAnimator::Load(LPCSTR name, bool internalFs /*= true*/)
 
 void BasicPostProcessAnimator::Stop(float sp)
 {
-    if (m_bStop) return;
+    if (m_bStop)
+        return;
     m_bStop = true;
     VERIFY(_valid(sp));
     m_factor_speed = sp;
@@ -184,25 +170,25 @@ void BasicPostProcessAnimator::Create()
     m_factor_speed = 1.0f;
     f_length = 0.0f;
 
-    m_Params[0] = new CPostProcessColor(&m_EffectorParams.color_base);  // base color
+    m_Params[0] = new CPostProcessColor(&m_EffectorParams.color_base); // base color
     VERIFY(m_Params[0]);
-    m_Params[1] = new CPostProcessColor(&m_EffectorParams.color_add);  // add color
+    m_Params[1] = new CPostProcessColor(&m_EffectorParams.color_add); // add color
     VERIFY(m_Params[1]);
-    m_Params[2] = new CPostProcessColor(&m_EffectorParams.color_gray);  // gray color
+    m_Params[2] = new CPostProcessColor(&m_EffectorParams.color_gray); // gray color
     VERIFY(m_Params[2]);
-    m_Params[3] = new CPostProcessValue(&m_EffectorParams.gray);  // gray value
+    m_Params[3] = new CPostProcessValue(&m_EffectorParams.gray); // gray value
     VERIFY(m_Params[3]);
-    m_Params[4] = new CPostProcessValue(&m_EffectorParams.blur);  // blur value
+    m_Params[4] = new CPostProcessValue(&m_EffectorParams.blur); // blur value
     VERIFY(m_Params[4]);
-    m_Params[5] = new CPostProcessValue(&m_EffectorParams.duality.h);  // duality horizontal
+    m_Params[5] = new CPostProcessValue(&m_EffectorParams.duality.h); // duality horizontal
     VERIFY(m_Params[5]);
-    m_Params[6] = new CPostProcessValue(&m_EffectorParams.duality.v);  // duality vertical
+    m_Params[6] = new CPostProcessValue(&m_EffectorParams.duality.v); // duality vertical
     VERIFY(m_Params[6]);
-    m_Params[7] = new CPostProcessValue(&m_EffectorParams.noise.intensity);  // noise intensity
+    m_Params[7] = new CPostProcessValue(&m_EffectorParams.noise.intensity); // noise intensity
     VERIFY(m_Params[7]);
-    m_Params[8] = new CPostProcessValue(&m_EffectorParams.noise.grain);  // noise granularity
+    m_Params[8] = new CPostProcessValue(&m_EffectorParams.noise.grain); // noise granularity
     VERIFY(m_Params[8]);
-    m_Params[9] = new CPostProcessValue(&m_EffectorParams.noise.fps);  // noise fps
+    m_Params[9] = new CPostProcessValue(&m_EffectorParams.noise.fps); // noise fps
     VERIFY(m_Params[9]);
     m_Params[10] = new CPostProcessValue(&m_EffectorParams.cm_influence);
     VERIFY(m_Params[10]);
@@ -240,34 +226,34 @@ void BasicPostProcessAnimator::ResetParam(pp_params param)
     switch (param)
     {
     case pp_base_color:
-        m_Params[0] = new CPostProcessColor(&m_EffectorParams.color_base);  // base color
+        m_Params[0] = new CPostProcessColor(&m_EffectorParams.color_base); // base color
         break;
     case pp_add_color:
-        m_Params[1] = new CPostProcessColor(&m_EffectorParams.color_add);  // add color
+        m_Params[1] = new CPostProcessColor(&m_EffectorParams.color_add); // add color
         break;
     case pp_gray_color:
-        m_Params[2] = new CPostProcessColor(&m_EffectorParams.color_gray);  // gray color
+        m_Params[2] = new CPostProcessColor(&m_EffectorParams.color_gray); // gray color
         break;
     case pp_gray_value:
-        m_Params[3] = new CPostProcessValue(&m_EffectorParams.gray);  // gray value
+        m_Params[3] = new CPostProcessValue(&m_EffectorParams.gray); // gray value
         break;
     case pp_blur:
-        m_Params[4] = new CPostProcessValue(&m_EffectorParams.blur);  // blur value
+        m_Params[4] = new CPostProcessValue(&m_EffectorParams.blur); // blur value
         break;
     case pp_dual_h:
-        m_Params[5] = new CPostProcessValue(&m_EffectorParams.duality.h);  // duality horizontal
+        m_Params[5] = new CPostProcessValue(&m_EffectorParams.duality.h); // duality horizontal
         break;
     case pp_dual_v:
-        m_Params[6] = new CPostProcessValue(&m_EffectorParams.duality.v);  // duality vertical
+        m_Params[6] = new CPostProcessValue(&m_EffectorParams.duality.v); // duality vertical
         break;
     case pp_noise_i:
-        m_Params[7] = new CPostProcessValue(&m_EffectorParams.noise.intensity);  // noise intensity
+        m_Params[7] = new CPostProcessValue(&m_EffectorParams.noise.intensity); // noise intensity
         break;
     case pp_noise_g:
-        m_Params[8] = new CPostProcessValue(&m_EffectorParams.noise.grain);  // noise granularity
+        m_Params[8] = new CPostProcessValue(&m_EffectorParams.noise.grain); // noise granularity
         break;
     case pp_noise_f:
-        m_Params[9] = new CPostProcessValue(&m_EffectorParams.noise.fps);  // noise fps
+        m_Params[9] = new CPostProcessValue(&m_EffectorParams.noise.fps); // noise fps
         break;
     case pp_cm_influence: m_Params[10] = new CPostProcessValue(&m_EffectorParams.cm_influence); break;
     }
@@ -291,7 +277,8 @@ void CPostProcessColor::delete_value(float time)
 void CPostProcessColor::add_value(float time, float value, int index)
 {
     KeyIt i;
-    if (0 == index) {
+    if (0 == index)
+    {
         m_Red.InsertKey(time, value);
         i = m_Red.FindKey(time, 0.01f);
     }
@@ -338,16 +325,8 @@ void CPostProcessColor::get_value(float time, float& value, int index)
     value = (*i)->value;
 }
 
-void CPostProcessValue::delete_value(float time)
-{
-    m_Value.DeleteKey(time);
-}
-
-void CPostProcessValue::clear_all_keys()
-{
-    m_Value.ClearAndFree();
-}
-
+void CPostProcessValue::delete_value(float time) { m_Value.DeleteKey(time); }
+void CPostProcessValue::clear_all_keys() { m_Value.ClearAndFree(); }
 void CPostProcessValue::add_value(float time, float value, int index)
 {
     m_Value.InsertKey(time, value);

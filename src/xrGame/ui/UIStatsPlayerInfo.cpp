@@ -64,7 +64,8 @@ void CUIStatsPlayerInfo::SetInfo(game_PlayerState* pInfo)
 
 void CUIStatsPlayerInfo::Update()
 {
-    if (!m_pPlayerInfo) return;
+    if (!m_pPlayerInfo)
+        return;
 
     xr_vector<PI_FIELD_INFO>& field_info = *m_field_info;
 
@@ -79,7 +80,8 @@ void CUIStatsPlayerInfo::AddField(float len, CGameFont* pF, u32 text_col, bool i
     CUIStatic* wnd = icon ? new CUIStatsIcon() : new CUIStatic();
     wnd->SetAutoDelete(true);
 
-    if (m_fields.empty()) {
+    if (m_fields.empty())
+    {
         wnd->SetWndPos(Fvector2().set(5, 0));
         wnd->SetWndSize(Fvector2().set(len, this->GetHeight()));
     }
@@ -90,7 +92,8 @@ void CUIStatsPlayerInfo::AddField(float len, CGameFont* pF, u32 text_col, bool i
 
         wnd->TextItemControl()->SetTextAlignment(CGameFont::alCenter);
     }
-    if (pF) wnd->TextItemControl()->SetFont(pF);
+    if (pF)
+        wnd->TextItemControl()->SetFont(pF);
 
     wnd->TextItemControl()->SetTextColor(text_col);
     wnd->TextItemControl()->SetTextComplexMode(false);
@@ -116,7 +119,8 @@ const char* CUIStatsPlayerInfo::GetInfoByID(const char* id)
     else if (0 == xr_strcmp(id, "rank"))
     {
         int team = m_pPlayerInfo->team;
-        if (GameID() != eGameIDDeathmatch) team -= 1;
+        if (GameID() != eGameIDDeathmatch)
+            team -= 1;
 
         if (0 == team)
             xr_sprintf(ans, "ui_hud_status_green_0%d", (int)m_pPlayerInfo->rank + 1);

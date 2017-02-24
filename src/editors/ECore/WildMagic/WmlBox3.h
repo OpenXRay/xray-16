@@ -18,7 +18,7 @@ namespace Wml
 template <class Real>
 class WML_ITEM Box3
 {
-  public:
+public:
     Box3();
 
     Vector3<Real>& Center();
@@ -36,7 +36,7 @@ class WML_ITEM Box3
 
     void ComputeVertices(Vector3<Real> akVertex[8]) const;
 
-  protected:
+protected:
     Vector3<Real> m_kCenter;
     Vector3<Real> m_akAxis[3];
     Real m_afExtent[3];

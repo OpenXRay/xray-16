@@ -24,8 +24,8 @@ class TProperties;
 
 class TfrmSoundLib : public TForm
 {
-    __published :  // IDE-managed Components
-                   TPanel* paRight;
+    __published : // IDE-managed Components
+                  TPanel* paRight;
     TFormStorage* fsStorage;
     TPanel* paCommand;
     TExtBtn* ebOk;
@@ -46,7 +46,7 @@ class TfrmSoundLib : public TForm
     void __fastcall ebCancelClick(TObject* Sender);
     void __fastcall FormDestroy(TObject* Sender);
 
-  private:
+private:
     // list functions
     void InitItemsList();
     void __stdcall OnItemsFocused(ListItemsVec& items);
@@ -62,7 +62,7 @@ class TfrmSoundLib : public TForm
 
     static Flags32 m_Flags;
 
-  private:  // User declarations
+private: // User declarations
     static TfrmSoundLib* form;
 
     DEFINE_VECTOR(ESoundThumbnail*, THMVec, THMIt);
@@ -108,14 +108,13 @@ class TfrmSoundLib : public TForm
 
     void AppendModif(LPCSTR nm);
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TfrmSoundLib(TComponent* Owner);
     // static function
     static void __fastcall EditLib(AnsiString& title);
     static bool __fastcall HideLib();
 
     static bool __fastcall Visible() { return !!form; }
-
     static void OnFrame();
 
     static void UpdateProperties() { m_Flags.set(flUpdateProperties, TRUE); }

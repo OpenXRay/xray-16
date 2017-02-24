@@ -10,10 +10,7 @@ xr_dsa_signer::xr_dsa_signer(u8 const p_number[crypto::xr_dsa::public_key_length
         private_key_size_must_be_equal_to_digest_value_size);
 }
 
-xr_dsa_signer::~xr_dsa_signer()
-{
-}
-
+xr_dsa_signer::~xr_dsa_signer() {}
 shared_str const xr_dsa_signer::sign(u8 const* data, u32 data_size)
 {
     m_sha.start_calculate(data, data_size);

@@ -22,11 +22,7 @@ void EScenePortalTool::CreateControls()
 
 //----------------------------------------------------
 
-void EScenePortalTool::RemoveControls()
-{
-    inherited::RemoveControls();
-}
-
+void EScenePortalTool::RemoveControls() { inherited::RemoveControls(); }
 //----------------------------------------------------
 
 void EScenePortalTool::FillProp(LPCSTR pref, PropItemVec& items)
@@ -83,9 +79,11 @@ struct co_plane_pred
     bool operator()(CCustomObject* p)
     {
         CPortal* P = (CPortal*)p;
-        if (m_portal == P) return false;
+        if (m_portal == P)
+            return false;
 
-        if (P->m_SectorFront == m_portal->m_SectorFront && P->m_SectorBack == m_portal->m_SectorBack) {
+        if (P->m_SectorFront == m_portal->m_SectorFront && P->m_SectorBack == m_portal->m_SectorBack)
+        {
             Fvector rkOffset, rkNormal;
             Fplane p_plane;
             Mgc::OrthogonalPlaneFit(P->m_Vertices.size(), (Mgc::Vector3*)P->m_Vertices.begin(), (Mgc::Vector3&)rkOffset,
@@ -96,7 +94,8 @@ struct co_plane_pred
             p_plane.d /= plane_magn;
 
             float dot = _abs(plane_dot(m_plane, p_plane));
-            if (fsimilar(dot, 1.0f, EPS_L)) {
+            if (fsimilar(dot, 1.0f, EPS_L))
+            {
                 Fbox m_box, p_box;
                 m_portal->GetBox(m_box);
                 P->GetBox(p_box);
@@ -128,12 +127,14 @@ void EScenePortalTool::RemoveSimilar()
     while (it != p_lst_dup.end())
     {
         CPortal* p = (CPortal*)(*it);
-        if (std::find(p_lst_del.begin(), p_lst_del.end(), *it) != p_lst_del.end()) {
+        if (std::find(p_lst_del.begin(), p_lst_del.end(), *it) != p_lst_del.end())
+        {
             ++it;
             continue;
         }
         ObjectIt pit = std::find_if(p_lst.begin(), p_lst.end(), co_plane_pred(p));
-        if (pit != p_lst.end()) {
+        if (pit != p_lst.end())
+        {
             p_lst_del.push_back(*pit);
             p_lst.erase(pit);
             it = p_lst_dup.begin();

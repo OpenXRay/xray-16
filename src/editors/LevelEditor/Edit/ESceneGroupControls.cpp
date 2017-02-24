@@ -18,12 +18,14 @@ bool __fastcall TUI_ControlGroupAdd::AfterAppendCallback(TShiftState Shift, CCus
 {
     bool result = false;
     ESceneGroupTool* ot = dynamic_cast<ESceneGroupTool*>(parent_tool);
-    if (ot->GetCurrentObject()) {
+    if (ot->GetCurrentObject())
+    {
         CGroupObject* group = dynamic_cast<CGroupObject*>(obj);
         R_ASSERT(group);
         LPCSTR short_name = ot->GetCurrentObject();
         result = group->SetReference(short_name);
-        if (result) {
+        if (result)
+        {
             string256 namebuffer;
             Scene->GenObjectName(OBJCLASS_GROUP, namebuffer, short_name);
             group->Name = namebuffer;
@@ -38,11 +40,5 @@ bool __fastcall TUI_ControlGroupAdd::Start(TShiftState Shift)
     return false;
 }
 
-void __fastcall TUI_ControlGroupAdd::Move(TShiftState _Shift)
-{
-}
-
-bool __fastcall TUI_ControlGroupAdd::End(TShiftState _Shift)
-{
-    return true;
-}
+void __fastcall TUI_ControlGroupAdd::Move(TShiftState _Shift) {}
+bool __fastcall TUI_ControlGroupAdd::End(TShiftState _Shift) { return true; }

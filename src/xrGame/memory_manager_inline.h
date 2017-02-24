@@ -15,11 +15,13 @@ IC void CMemoryManager::fill_enemies(const xr_vector<T>& objects, const _predica
     xr_vector<T>::const_iterator E = objects.end();
     for (; I != E; ++I)
     {
-        if (!(*I).m_enabled) continue;
+        if (!(*I).m_enabled)
+            continue;
 
         const CEntityAlive* _enemy = smart_cast<const CEntityAlive*>((*I).m_object);
 
-        if (_enemy && enemy().useful(_enemy)) predicate(_enemy);
+        if (_enemy && enemy().useful(_enemy))
+            predicate(_enemy);
     }
 }
 

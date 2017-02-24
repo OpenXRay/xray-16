@@ -15,11 +15,14 @@ void CKinematics::CalculateBones(BOOL bForceExact)
     // early out.
     // check if the info is still relevant
     // skip all the computations - assume nothing changes in a small period of time :)
-    if (RDEVICE.dwTimeGlobal == UCalc_Time) return;  // early out for "fast" update
+    if (RDEVICE.dwTimeGlobal == UCalc_Time)
+        return; // early out for "fast" update
     UCalc_mtlock lock;
     OnCalculateBones();
-    if (!bForceExact && (RDEVICE.dwTimeGlobal < (UCalc_Time + UCalc_Interval))) return;  // early out for "slow" update
-    if (Update_Visibility) Visibility_Update();
+    if (!bForceExact && (RDEVICE.dwTimeGlobal < (UCalc_Time + UCalc_Interval)))
+        return; // early out for "slow" update
+    if (Update_Visibility)
+        Visibility_Update();
 
     _DBG_SINGLE_USE_MARKER;
     // here we have either:
@@ -41,7 +44,8 @@ void CKinematics::CalculateBones(BOOL bForceExact)
     VERIFY(LL_GetBonesVisible() != 0);
     // Calculate BOXes/Spheres if needed
     UCalc_Visibox++;
-    if (UCalc_Visibox >= psSkeletonUpdate) {
+    if (UCalc_Visibox >= psSkeletonUpdate)
+    {
         // mark
         UCalc_Visibox = -(::Random.randI(psSkeletonUpdate - 1));
 
@@ -50,7 +54,8 @@ void CKinematics::CalculateBones(BOOL bForceExact)
         Box.invalidate();
         for (u32 b = 0; b < bones->size(); b++)
         {
-            if (!LL_GetBoneVisible(u16(b))) continue;
+            if (!LL_GetBoneVisible(u16(b)))
+                continue;
             Fobb& obb = (*bones)[b]->obb;
             Fmatrix& Mbone = bone_instances[b].mTransform;
             Fmatrix Mbox;
@@ -85,7 +90,8 @@ void CKinematics::CalculateBones(BOOL bForceExact)
             X.transform_tiny(P, A);
             Box.modify(P);
         }
-        if (bones->size()) {
+        if (bones->size())
+        {
             // previous frame we have updated box - update sphere
             vis.box.min = (Box.min);
             vis.box.max = (Box.max);
@@ -94,7 +100,8 @@ void CKinematics::CalculateBones(BOOL bForceExact)
 #ifdef DEBUG
         // Validate
         VERIFY3(_valid(vis.box.min) && _valid(vis.box.max), "Invalid bones-xform in model", dbg_name.c_str());
-        if (vis.sphere.R > 1000.f) {
+        if (vis.sphere.R > 1000.f)
+        {
             for (u16 ii = 0; ii < LL_BoneCount(); ++ii)
             {
                 Fmatrix tr;
@@ -109,7 +116,8 @@ void CKinematics::CalculateBones(BOOL bForceExact)
     }
 
     //
-    if (Update_Callback) Update_Callback(this);
+    if (Update_Callback)
+        Update_Callback(this);
 }
 
 #ifdef DEBUG
@@ -117,7 +125,8 @@ void check_kinematics(CKinematics* _k, LPCSTR s)
 {
     CKinematics* K = _k;
     Fmatrix& MrootBone = K->LL_GetBoneInstance(K->LL_GetBoneRoot()).mTransform;
-    if (MrootBone.c.y > 10000) {
+    if (MrootBone.c.y > 10000)
+    {
         Msg("all bones transform:--------[%s]", s);
 
         for (u16 ii = 0; ii < K->LL_BoneCount(); ++ii)
@@ -144,21 +153,25 @@ void CKinematics::CLBone(const CBoneData* bd, CBoneInstance& bi, const Fmatrix* 
 {
     u16 SelfID = bd->GetSelfID();
 
-    if (LL_GetBoneVisible(SelfID)) {
-        if (bi.callback_overwrite()) {
-            if (bi.callback()) bi.callback()(&bi);
+    if (LL_GetBoneVisible(SelfID))
+    {
+        if (bi.callback_overwrite())
+        {
+            if (bi.callback())
+                bi.callback()(&bi);
         }
         else
         {
             BuildBoneMatrix(bd, bi, parent, channel_mask);
 #ifndef MASTER_GOLD
             R_ASSERT2(_valid(bi.mTransform), "anim kils bone matrix");
-#endif  // #ifndef MASTER_GOLD
-            if (bi.callback()) {
+#endif // #ifndef MASTER_GOLD
+            if (bi.callback())
+            {
                 bi.callback()(&bi);
 #ifndef MASTER_GOLD
                 R_ASSERT2(_valid(bi.mTransform), make_string("callback kils bone matrix bone: %s ", bd->name.c_str()));
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
             }
         }
         bi.mRenderTransform.mul_43(bi.mTransform, bd->m2b_transform);
@@ -194,10 +207,12 @@ void CKinematics::BoneChain_Calculate(const CBoneData* bd, CBoneInstance& bi, u8
     // ignore callbacks
     BoneCallback bc = bi.callback();
     BOOL ow = bi.callback_overwrite();
-    if (ignore_callbacks) {
+    if (ignore_callbacks)
+    {
         bi.set_callback(bi.callback_type(), 0, bi.callback_param(), 0);
     }
-    if (SelfID == LL_GetBoneRoot()) {
+    if (SelfID == LL_GetBoneRoot())
+    {
         CLBone(bd, bi, &Fidentity, mask_channel);
         // restore callback
         bi.set_callback(bi.callback_type(), bc, bi.callback_param(), ow);

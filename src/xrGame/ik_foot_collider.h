@@ -20,7 +20,8 @@ public:
     bool is_valid() const
     {
 #ifdef DEBUG
-        if (point() != ik_foot_geom::none) {
+        if (point() != ik_foot_geom::none)
+        {
             VERIFY(range() >= 0.f);
             VERIFY(fsimilar(dir().magnitude(), 1.f));
             return true;
@@ -36,14 +37,13 @@ public:
         VERIFY(q.is_valid());
         // VERIFY( is_valid() );
         return is_valid() && q.point() == point() && fsimilar(q.range(), range()) && q.pos().similar(pos()) &&
-               q.dir().similar(dir());
+            q.dir().similar(dir());
     }
 
     IC const Fvector& pos() const { return _pos; }
     IC const Fvector& dir() const { return _dir; }
     IC float range() const { return _range; }
     IC ik_foot_geom::e_collide_point point() const { return _point; }
-
 private:
     Fvector _pos;
     Fvector _dir;

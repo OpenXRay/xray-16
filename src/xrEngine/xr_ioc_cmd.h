@@ -1,29 +1,29 @@
 #pragma once
 
-#define CMD0(cls)                                                                                                      \
-    {                                                                                                                  \
-        static cls x##cls();                                                                                           \
-        Console->AddCommand(&x##cls);                                                                                  \
+#define CMD0(cls)                     \
+    {                                 \
+        static cls x##cls();          \
+        Console->AddCommand(&x##cls); \
     }
-#define CMD1(cls, p1)                                                                                                  \
-    {                                                                                                                  \
-        static cls x##cls(p1);                                                                                         \
-        Console->AddCommand(&x##cls);                                                                                  \
+#define CMD1(cls, p1)                 \
+    {                                 \
+        static cls x##cls(p1);        \
+        Console->AddCommand(&x##cls); \
     }
-#define CMD2(cls, p1, p2)                                                                                              \
-    {                                                                                                                  \
-        static cls x##cls(p1, p2);                                                                                     \
-        Console->AddCommand(&x##cls);                                                                                  \
+#define CMD2(cls, p1, p2)             \
+    {                                 \
+        static cls x##cls(p1, p2);    \
+        Console->AddCommand(&x##cls); \
     }
-#define CMD3(cls, p1, p2, p3)                                                                                          \
-    {                                                                                                                  \
-        static cls x##cls(p1, p2, p3);                                                                                 \
-        Console->AddCommand(&x##cls);                                                                                  \
+#define CMD3(cls, p1, p2, p3)          \
+    {                                  \
+        static cls x##cls(p1, p2, p3); \
+        Console->AddCommand(&x##cls);  \
     }
-#define CMD4(cls, p1, p2, p3, p4)                                                                                      \
-    {                                                                                                                  \
-        static cls x##cls(p1, p2, p3, p4);                                                                             \
-        Console->AddCommand(&x##cls);                                                                                  \
+#define CMD4(cls, p1, p2, p3, p4)          \
+    {                                      \
+        static cls x##cls(p1, p2, p3, p4); \
+        Console->AddCommand(&x##cls);      \
     }
 
 #include "xrSASH.h"
@@ -51,7 +51,6 @@ protected:
     };
 
     IC bool EQ(LPCSTR S1, LPCSTR S2) { return xr_strcmp(S1, S2) == 0; }
-
 public:
     IConsole_Command(LPCSTR N BENCH_SEC_SIGN) : cName(N), bEnabled(TRUE), bLowerCaseArgs(TRUE), bEmptyArgsHandled(FALSE)
     {
@@ -60,7 +59,8 @@ public:
     }
     virtual ~IConsole_Command()
     {
-        if (Console) Console->RemoveCommand(this);
+        if (Console)
+            Console->RemoveCommand(this);
     };
 
     BENCH_SEC_SCRAMBLEVTBL3
@@ -83,7 +83,8 @@ public:
     {
         TStatus S;
         Status(S);
-        if (S[0]) F->w_printf("%s %s\r\n", cName, S);
+        if (S[0])
+            F->w_printf("%s %s\r\n", cName, S);
     }
 
     BENCH_SEC_SCRAMBLEVTBL2
@@ -93,7 +94,7 @@ public:
     virtual void add_to_LRU(shared_str const& arg);
     void add_LRU_to_tips(vecTips& tips);
 
-};  // class IConsole_Command
+}; // class IConsole_Command
 
 class ENGINE_API CCC_Mask : public IConsole_Command
 {
@@ -119,7 +120,6 @@ public:
     }
     virtual void Status(TStatus& S) { xr_strcpy(S, value->test(mask) ? "on" : "off"); }
     virtual void Info(TInfo& I) { xr_strcpy(I, "'on/off' or '1/0'"); }
-
     virtual void fill_tips(vecTips& tips, u32 mode)
     {
         TStatus str;
@@ -146,7 +146,6 @@ public:
     }
     virtual void Status(TStatus& S) { xr_strcpy(S, value->test(mask) ? "on" : "off"); }
     virtual void Info(TInfo& I) { xr_strcpy(I, "'on/off' or '1/0'"); }
-
     virtual void fill_tips(vecTips& tips, u32 mode)
     {
         TStatus str;
@@ -169,20 +168,23 @@ public:
         xr_token* tok = tokens;
         while (tok->name)
         {
-            if (stricmp(tok->name, args) == 0) {
+            if (stricmp(tok->name, args) == 0)
+            {
                 *value = tok->id;
                 break;
             }
             tok++;
         }
-        if (!tok->name) InvalidSyntax();
+        if (!tok->name)
+            InvalidSyntax();
     }
     virtual void Status(TStatus& S)
     {
         xr_token* tok = tokens;
         while (tok->name)
         {
-            if (tok->id == (int)(*value)) {
+            if (tok->id == (int)(*value))
+            {
                 xr_strcpy(S, tok->name);
                 return;
             }
@@ -197,13 +199,13 @@ public:
         xr_token* tok = tokens;
         while (tok->name)
         {
-            if (I[0]) xr_strcat(I, "/");
+            if (I[0])
+                xr_strcat(I, "/");
             xr_strcat(I, tok->name);
             tok++;
         }
     }
     virtual xr_token* GetToken() { return tokens; }
-
     virtual void fill_tips(vecTips& tips, u32 mode)
     {
         TStatus str;
@@ -211,14 +213,16 @@ public:
         xr_token* tok = GetToken();
         while (tok->name && !res)
         {
-            if (tok->id == (int)(*value)) {
+            if (tok->id == (int)(*value))
+            {
                 xr_sprintf(str, sizeof(str), "%s (current)", tok->name);
                 tips.push_back(str);
                 res = true;
             }
             tok++;
         }
-        if (!res) {
+        if (!res)
+        {
             tips.push_back("--- (current)");
         }
         tok = GetToken();
@@ -284,19 +288,21 @@ public:
     };
     const Fvector GetValue() const { return *value; };
     Fvector* GetValuePtr() const { return value; };
-
     virtual void Execute(LPCSTR args)
     {
         Fvector v;
-        if (3 != sscanf(args, "%f,%f,%f", &v.x, &v.y, &v.z)) {
+        if (3 != sscanf(args, "%f,%f,%f", &v.x, &v.y, &v.z))
+        {
             InvalidSyntax();
             return;
         }
-        if (v.x < min.x || v.y < min.y || v.z < min.z) {
+        if (v.x < min.x || v.y < min.y || v.z < min.z)
+        {
             InvalidSyntax();
             return;
         }
-        if (v.x > max.x || v.y > max.y || v.z > max.z) {
+        if (v.x > max.x || v.y > max.y || v.z > max.z)
+        {
             InvalidSyntax();
             return;
         }

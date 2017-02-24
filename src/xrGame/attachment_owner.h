@@ -21,7 +21,6 @@ protected:
 public:
     virtual CGameObject* cast_game_object() = 0;
     virtual CAttachmentOwner* cast_attachment_owner() { return this; }
-
 public:
     IC CAttachmentOwner();
     virtual ~CAttachmentOwner();

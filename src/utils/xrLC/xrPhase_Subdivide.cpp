@@ -36,7 +36,8 @@ void CBuild::xrPhase_Subdivide()
     Fbox b1, b2;
     for (int X = 0; X < int(g_XSplit.size()); X++)
     {
-        if (g_XSplit[X]->empty()) {
+        if (g_XSplit[X]->empty())
+        {
             xr_delete(g_XSplit[X]);
             g_XSplit.erase(g_XSplit.begin() + X);
             X--;
@@ -45,7 +46,8 @@ void CBuild::xrPhase_Subdivide()
         Logger.Progress(float(X) / float(g_XSplit.size()));
 
         // skip if subdivision is too small already
-        if (int(g_XSplit[X]->size()) < (c_SS_LowVertLimit * 2)) continue;
+        if (int(g_XSplit[X]->size()) < (c_SS_LowVertLimit * 2))
+            continue;
 
         // calc bounding box
         Fbox bb;
@@ -63,27 +65,37 @@ void CBuild::xrPhase_Subdivide()
         // analyze if we need to split
         size.sub(bb.max, bb.min);
         BOOL bSplit = FALSE;
-        if (size.x > c_SS_maxsize) bSplit = TRUE;
-        if (size.y > c_SS_maxsize) bSplit = TRUE;
-        if (size.z > c_SS_maxsize) bSplit = TRUE;
-        if (int(g_XSplit[X]->size()) > c_SS_HighVertLimit) bSplit = TRUE;
+        if (size.x > c_SS_maxsize)
+            bSplit = TRUE;
+        if (size.y > c_SS_maxsize)
+            bSplit = TRUE;
+        if (size.z > c_SS_maxsize)
+            bSplit = TRUE;
+        if (int(g_XSplit[X]->size()) > c_SS_HighVertLimit)
+            bSplit = TRUE;
         CDeflector* defl_base = (CDeflector*)g_XSplit[X]->front()->pDeflector;
-        if (!bSplit && defl_base) {
-            if (defl_base->layer.width >= (c_LMAP_size - 2 * BORDER)) bSplit = TRUE;
-            if (defl_base->layer.height >= (c_LMAP_size - 2 * BORDER)) bSplit = TRUE;
+        if (!bSplit && defl_base)
+        {
+            if (defl_base->layer.width >= (c_LMAP_size - 2 * BORDER))
+                bSplit = TRUE;
+            if (defl_base->layer.height >= (c_LMAP_size - 2 * BORDER))
+                bSplit = TRUE;
         }
 
         // perform subdivide if needed
-        if (!bSplit) continue;
+        if (!bSplit)
+            continue;
 
         // select longest BBox edge
         int box_edge = -1;
-        if (size.x >= size.y && size.x >= size.z) {
+        if (size.x >= size.y && size.x >= size.z)
+        {
             box_edge = 0;
         }
         else
         {
-            if (size.y >= size.x && size.y >= size.z) {
+            if (size.y >= size.x && size.y >= size.z)
+            {
                 box_edge = 1;
             }
             else
@@ -96,8 +108,8 @@ void CBuild::xrPhase_Subdivide()
         // align plane onto vertices
 
         // Process all faces and rearrange them
-        u32 iteration_on_edge = 0;   // up to 3
-        u32 iteration_per_edge = 0;  // up to 10
+        u32 iteration_on_edge = 0; // up to 3
+        u32 iteration_per_edge = 0; // up to 10
     resplit:
         s2.clear();
         s1.clear();
@@ -107,7 +119,8 @@ void CBuild::xrPhase_Subdivide()
             Face* XF = *F;
             Fvector C;
             XF->CalcCenter(C);
-            if (b1.contains(C)) {
+            if (b1.contains(C))
+            {
                 s1.push_back(XF);
             }
             else
@@ -116,13 +129,17 @@ void CBuild::xrPhase_Subdivide()
             }
         }
 
-        if ((int(s1.size()) < c_SS_LowVertLimit) || (int(s2.size()) < c_SS_LowVertLimit)) {
+        if ((int(s1.size()) < c_SS_LowVertLimit) || (int(s2.size()) < c_SS_LowVertLimit))
+        {
             // splitting failed
             Logger.clMsg("! ERROR: model #%d - split fail, faces: %d, s1/s2:%d/%d", X, g_XSplit[X]->size(), s1.size(),
                 s2.size());
-            if (iteration_per_edge < 10) {
-                if (g_XSplit[X]->size() > c_SS_LowVertLimit * 4) {
-                    if (s2.size() > s1.size()) {  // b2 -less, b1-grow
+            if (iteration_per_edge < 10)
+            {
+                if (g_XSplit[X]->size() > c_SS_LowVertLimit * 4)
+                {
+                    if (s2.size() > s1.size())
+                    { // b2 -less, b1-grow
                         size.sub(b2.max, b2.min);
                         b1.max[box_edge] += size[box_edge] / 2;
                         b2.min[box_edge] = b1.max[box_edge];
@@ -142,7 +159,8 @@ void CBuild::xrPhase_Subdivide()
                 // switch edge
                 iteration_per_edge = 0;
                 iteration_on_edge++;
-                if (iteration_on_edge < 3) {
+                if (iteration_on_edge < 3)
+                {
                     box_edge = (box_edge + 1) % 3;
                     setup_bbs(b1, b2, bb, box_edge);
                     goto resplit;
@@ -152,11 +170,13 @@ void CBuild::xrPhase_Subdivide()
         else
         {
             // split deflector into TWO
-            if (defl_base) {
+            if (defl_base)
+            {
                 // _delete old deflector
                 for (u32 it = 0; it < lc_global_data()->g_deflectors().size(); it++)
                 {
-                    if (lc_global_data()->g_deflectors()[it] == defl_base) {
+                    if (lc_global_data()->g_deflectors()[it] == defl_base)
+                    {
                         lc_global_data()->g_deflectors().erase(lc_global_data()->g_deflectors().begin() + it);
                         xr_delete(defl_base);
                         break;

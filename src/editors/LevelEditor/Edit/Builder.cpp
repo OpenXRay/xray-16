@@ -44,24 +44,24 @@ SceneBuilder::SceneBuilder()
     m_save_as_object = false;
 }
 
-SceneBuilder::~SceneBuilder()
-{
-}
-
+SceneBuilder::~SceneBuilder() {}
 //------------------------------------------------------------------------------
-#define CHECK_BREAK                                                                                                    \
-    if (UI->NeedAbort()) break;
-#define VERIFY_COMPILE(x, c1, c2)                                                                                      \
-    CHECK_BREAK                                                                                                        \
-    if (!x) {                                                                                                          \
-        error_text.sprintf("ERROR: %s %s", c1, c2);                                                                    \
-        break;                                                                                                         \
+#define CHECK_BREAK      \
+    if (UI->NeedAbort()) \
+        break;
+#define VERIFY_COMPILE(x, c1, c2)                   \
+    CHECK_BREAK                                     \
+    if (!x)                                         \
+    {                                               \
+        error_text.sprintf("ERROR: %s %s", c1, c2); \
+        break;                                      \
     }
 
 //------------------------------------------------------------------------------
 BOOL SceneBuilder::Compile(bool b_selected_only)
 {
-    if (m_save_as_object) {
+    if (m_save_as_object)
+    {
         EvictResource();
         GetBounding();
         CompileStatic(b_selected_only);
@@ -71,7 +71,8 @@ BOOL SceneBuilder::Compile(bool b_selected_only)
 
     AnsiString error_text = "";
     UI->ResetBreak();
-    if (UI->ContainEState(esBuildLevel)) return false;
+    if (UI->ContainEState(esBuildLevel))
+        return false;
     ELog.Msg(mtInformation, "Building started...");
 
     UI->BeginEState(esBuildLevel);
@@ -105,8 +106,10 @@ BOOL SceneBuilder::Compile(bool b_selected_only)
             SceneToolsMapPairIt _E = Scene->LastTool();
             for (; _I != _E; ++_I)
             {
-                if (_I->first != OBJCLASS_DUMMY) {
-                    if (_I->second->Valid()) {
+                if (_I->first != OBJCLASS_DUMMY)
+                {
+                    if (_I->second->Valid())
+                    {
                         VERIFY_COMPILE(_I->second->Export(m_LevelPath), _I->second->ClassDesc(), "export failed.");
                         ELog.Msg(mtInformation, "Process %s - done.", _I->second->ClassDesc());
                     }
@@ -142,7 +145,8 @@ BOOL SceneBuilder::MakeGame()
 {
     AnsiString error_text = "";
     UI->ResetBreak();
-    if (UI->ContainEState(esBuildLevel)) return false;
+    if (UI->ContainEState(esBuildLevel))
+        return false;
     ELog.Msg(mtInformation, "Making started...");
 
     UI->BeginEState(esBuildLevel);
@@ -227,7 +231,8 @@ BOOL SceneBuilder::MakeHOM()
 {
     AnsiString error_text = "";
     UI->ResetBreak();
-    if (UI->ContainEState(esBuildLevel)) return false;
+    if (UI->ContainEState(esBuildLevel))
+        return false;
     ELog.Msg(mtInformation, "Making started...");
 
     UI->BeginEState(esBuildLevel);
@@ -263,7 +268,8 @@ BOOL SceneBuilder::MakeSOM()
 {
     AnsiString error_text = "";
     UI->ResetBreak();
-    if (UI->ContainEState(esBuildLevel)) return false;
+    if (UI->ContainEState(esBuildLevel))
+        return false;
     ELog.Msg(mtInformation, "Making started...");
 
     UI->BeginEState(esBuildLevel);
@@ -298,7 +304,8 @@ BOOL SceneBuilder::MakeSOM()
 
 void SceneBuilder::OnRender()
 {
-    if (object_for_render) {
+    if (object_for_render)
+    {
         object_for_render->OnFrame();
         object_for_render->RenderSingle(Fidentity);
     }

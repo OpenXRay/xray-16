@@ -33,11 +33,7 @@ animation_selector::animation_selector(CAI_Stalker* object)
     m_planner = new animation_planner(object, "animation planner");
 }
 
-animation_selector::~animation_selector()
-{
-    xr_delete(m_planner);
-}
-
+animation_selector::~animation_selector() { xr_delete(m_planner); }
 void animation_selector::initialize()
 {
     m_planner->initialize();
@@ -60,7 +56,8 @@ void animation_selector::initialize()
 
 void animation_selector::finalize()
 {
-    if (!m_planner->initialized()) return;
+    if (!m_planner->initialized())
+        return;
 
     m_planner->finalize();
 }
@@ -74,15 +71,18 @@ MotionID animation_selector::select_animation(bool& animation_movement_controlle
 {
     animation_movement_controller = true;
 
-    if (m_callback_called) {
-        if (m_planner->initialized()) {
+    if (m_callback_called)
+    {
+        if (m_planner->initialized())
+        {
             current_operator()->on_animation_end();
             m_callback_called = false;
 
             m_previous_time = 0.f;
-            if (!m_planner->initialized()) {
+            if (!m_planner->initialized())
+            {
                 //				Msg				("%6d no planner update, planner is not initialized, exiting",
-                //Device.dwTimeGlobal);
+                // Device.dwTimeGlobal);
                 return (m_object->animation().assign_global_animation(animation_movement_controller));
             }
         }
@@ -90,7 +90,8 @@ MotionID animation_selector::select_animation(bool& animation_movement_controlle
         //		Msg					("%6d updating planner", Device.dwTimeGlobal);
         m_planner->update();
 
-        if (!m_planner->initialized()) {
+        if (!m_planner->initialized())
+        {
             //			Msg				("%6d planner is not initialized after update, exiting", Device.dwTimeGlobal);
             return (m_object->animation().assign_global_animation(animation_movement_controller));
         }
@@ -105,7 +106,7 @@ MotionID animation_selector::select_animation(bool& animation_movement_controlle
         if (!m_object->movement().current_params().cover()->can_fire())
             return (m_skeleton_animated->ID_Cycle(m_animation.c_str()));
 
-#if 0   // ndef MASTER_GOLD
+#if 0 // ndef MASTER_GOLD
 		if (!psAI_Flags.test((u32)aiUseSmartCoversAnimationSlot))
 			return			(m_skeleton_animated->ID_Cycle( m_animation.c_str()));
 
@@ -127,15 +128,16 @@ MotionID animation_selector::select_animation(bool& animation_movement_controlle
 		animation_id		= m_skeleton_animated->ID_Cycle_Safe( result );
 		VERIFY				(animation_id);
 		return				(animation_id);
-#else   // #ifndef MASTER_GOLD
+#else // #ifndef MASTER_GOLD
         return (m_skeleton_animated->ID_Cycle(m_animation.c_str()));
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
     }
 
     VERIFY(m_animation._get());
     //	VERIFY				(m_first_time || m_object->animation().global().blend());
     MotionID result = m_skeleton_animated->ID_Cycle(m_animation.c_str());
-    if (m_first_time) {
+    if (m_first_time)
+    {
         m_first_time = false;
         m_previous_time = 0.f;
         current_operator()->on_no_mark();
@@ -143,7 +145,8 @@ MotionID animation_selector::select_animation(bool& animation_movement_controlle
     }
 
     CBlend const* const blend = m_object->animation().global().blend();
-    if (!blend) {
+    if (!blend)
+    {
         m_previous_time = 0.f;
         current_operator()->on_no_mark();
         return (result);
@@ -154,7 +157,8 @@ MotionID animation_selector::select_animation(bool& animation_movement_controlle
 
     typedef xr_vector<motion_marks> Marks;
     Marks const& marks = motion_def->marks;
-    if (marks.size() < 3) {
+    if (marks.size() < 3)
+    {
         current_operator()->on_no_mark();
         return (result);
     }
@@ -166,7 +170,8 @@ MotionID animation_selector::select_animation(bool& animation_movement_controlle
     // therefore we need here to clamp previous value
     clamp(previous_time, 0.f, time_current);
     // first 2 should be footsteps
-    if (!marks[2].is_mark_between(previous_time, time_current)) {
+    if (!marks[2].is_mark_between(previous_time, time_current))
+    {
         current_operator()->on_no_mark();
         return (result);
     }
@@ -184,24 +189,14 @@ void animation_selector::on_animation_end()
 
 void animation_selector::modify_animation(CBlend* blend)
 {
-    if (!blend) return;
+    if (!blend)
+        return;
 
     CMotionDef* motion_def = m_skeleton_animated->LL_GetMotionDef(blend->motionID);
     VERIFY(motion_def);
     blend->speed = motion_def->Speed() * g_smart_cover_animation_speed_factor;
 }
 
-void animation_selector::save(NET_Packet& packet)
-{
-    m_planner->save(packet);
-}
-
-void animation_selector::load(IReader& packet)
-{
-    m_planner->load(packet);
-}
-
-void animation_selector::setup(CAI_Stalker* object, CPropertyStorage* storage)
-{
-    m_planner->setup(object, storage);
-}
+void animation_selector::save(NET_Packet& packet) { m_planner->save(packet); }
+void animation_selector::load(IReader& packet) { m_planner->load(packet); }
+void animation_selector::setup(CAI_Stalker* object, CPropertyStorage* storage) { m_planner->setup(object, storage); }

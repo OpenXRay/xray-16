@@ -18,7 +18,7 @@ namespace Wml
 template <class Real>
 class Math
 {
-  public:
+public:
     // Wrappers to hide implementations of functions.  The ACos and ASin
     // functions clamp the input argument to [-1,1] to avoid NaN issues
     // when the input is slightly larger than 1 or slightly smaller than -1.
@@ -106,8 +106,8 @@ class Math
     static Real IncompleteGamma(Real fA, Real fX);
 
     // error functions
-    static Real Erf(Real fX);   // polynomial approximation
-    static Real Erfc(Real fX);  // erfc(x) = 1-erf(x)
+    static Real Erf(Real fX); // polynomial approximation
+    static Real Erfc(Real fX); // erfc(x) = 1-erf(x)
 
     // modified Bessel functions of order 0 and 1
     static Real ModBessel0(Real fX);
@@ -125,7 +125,7 @@ class Math
     WML_ITEM static const Real DEG_TO_RAD;
     WML_ITEM static const Real RAD_TO_DEG;
 
-  protected:
+protected:
     // series form (used when fX < 1+fA)
     static Real IncompleteGammaS(Real fA, Real fX);
 

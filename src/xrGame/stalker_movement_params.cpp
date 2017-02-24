@@ -66,32 +66,45 @@ stalker_movement_params& stalker_movement_params::operator=(stalker_movement_par
 
 bool stalker_movement_params::equal_to_target(stalker_movement_params const& target) const
 {
-    if (m_detail_path_type != target.m_detail_path_type) return (false);
+    if (m_detail_path_type != target.m_detail_path_type)
+        return (false);
 
-    if (m_path_type != target.m_path_type) return (false);
+    if (m_path_type != target.m_path_type)
+        return (false);
 
-    if (m_mental_state != target.m_mental_state) return (false);
+    if (m_mental_state != target.m_mental_state)
+        return (false);
 
-    if (m_movement_type != target.m_movement_type) return (false);
+    if (m_movement_type != target.m_movement_type)
+        return (false);
 
-    if (m_body_state != target.m_body_state) return (false);
+    if (m_body_state != target.m_body_state)
+        return (false);
 
-    if (!m_desired_direction_impl.similar(target.m_desired_direction_impl)) return (false);
+    if (!m_desired_direction_impl.similar(target.m_desired_direction_impl))
+        return (false);
 
-    if (!m_desired_position_impl.similar(target.m_desired_position_impl)) return (false);
+    if (!m_desired_position_impl.similar(target.m_desired_position_impl))
+        return (false);
 
-    if (m_cover_id != target.m_cover_id) return (false);
+    if (m_cover_id != target.m_cover_id)
+        return (false);
 
-    if (m_cover_fire_object != target.m_cover_fire_object) return (false);
+    if (m_cover_fire_object != target.m_cover_fire_object)
+        return (false);
 
-    if (!m_cover_fire_position_impl.similar(target.m_cover_fire_position_impl)) return (false);
+    if (!m_cover_fire_position_impl.similar(target.m_cover_fire_position_impl))
+        return (false);
 
-    if (!target.m_cover_loophole) {
-        if (m_cover_loophole != target.m_cover_selected_loophole) return (false);
+    if (!target.m_cover_loophole)
+    {
+        if (m_cover_loophole != target.m_cover_selected_loophole)
+            return (false);
     }
     else
     {
-        if (m_cover_loophole != target.m_cover_loophole) return (false);
+        if (m_cover_loophole != target.m_cover_loophole)
+            return (false);
     }
 
     return (true);
@@ -99,7 +112,8 @@ bool stalker_movement_params::equal_to_target(stalker_movement_params const& tar
 
 void stalker_movement_params::cover_id(shared_str const& cover_id)
 {
-    if (m_cover_id == cover_id) return;
+    if (m_cover_id == cover_id)
+        return;
 
     m_cover_id = cover_id;
 
@@ -109,7 +123,8 @@ void stalker_movement_params::cover_id(shared_str const& cover_id)
     m_selected_loophole_actual = false;
     m_cover_selected_loophole = 0;
 
-    if (!cover_id.size()) {
+    if (!cover_id.size())
+    {
         m_cover = 0;
         return;
     }
@@ -122,22 +137,23 @@ struct loophole_id_predicate
     shared_str m_id;
 
     IC loophole_id_predicate(shared_str const& id) : m_id(id) {}
-
     IC bool operator()(smart_cover::loophole* loophole) const { return (loophole->id()._get() == m_id._get()); }
-};  // struct loophole_id_predicate
+}; // struct loophole_id_predicate
 
 void stalker_movement_params::cover_loophole_id(shared_str const& loophole_id)
 {
     cover_fire_object(0);
     cover_fire_position(0);
 
-    if (m_cover_loophole_id == loophole_id) return;
+    if (m_cover_loophole_id == loophole_id)
+        return;
 
     m_cover_loophole_id = loophole_id;
     m_selected_loophole_actual = false;
     m_cover_selected_loophole = 0;
 
-    if (!loophole_id.size()) {
+    if (!loophole_id.size())
+    {
         m_cover_loophole = 0;
         return;
     }
@@ -156,10 +172,12 @@ void stalker_movement_params::cover_loophole_id(shared_str const& loophole_id)
 
 void stalker_movement_params::actualize_loophole() const
 {
-    if (m_selected_loophole_actual) {
+    if (m_selected_loophole_actual)
+    {
         if (!m_cover || !m_cover_selected_loophole || m_cover->description()->loophole(m_cover_selected_loophole->id()))
         {
-            if (m_last_selection_time + time_before_selection > Device.dwTimeGlobal) return;
+            if (m_last_selection_time + time_before_selection > Device.dwTimeGlobal)
+                return;
         }
     }
 
@@ -176,7 +194,8 @@ LPCSTR stalker_movement_params::cover_loophole_id() const
 {
     VERIFY(m_cover);
 
-    if (m_cover_loophole) {
+    if (m_cover_loophole)
+    {
         VERIFY(m_cover_loophole_id == m_cover_loophole->id());
         VERIFY(m_cover->description()->loophole(m_cover_loophole_id));
         return (m_cover_loophole_id.c_str());
@@ -191,7 +210,8 @@ smart_cover::loophole const* stalker_movement_params::cover_loophole() const
 {
     VERIFY(m_cover);
 
-    if (m_cover_loophole) {
+    if (m_cover_loophole)
+    {
         VERIFY(m_cover_loophole_id == m_cover_loophole->id());
         VERIFY(m_cover->description()->loophole(m_cover_loophole_id));
         return (m_cover_loophole);

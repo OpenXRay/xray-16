@@ -6,7 +6,8 @@
 
 void CResourceManager::OnDeviceDestroy(BOOL)
 {
-    if (RDEVICE.b_is_Ready) return;
+    if (RDEVICE.b_is_Ready)
+        return;
     m_textures_description.UnLoad();
 
     // Matrices
@@ -48,7 +49,8 @@ void CResourceManager::OnDeviceDestroy(BOOL)
 
 void CResourceManager::OnDeviceCreate(IReader* F)
 {
-    if (!RDEVICE.b_is_Ready) return;
+    if (!RDEVICE.b_is_Ready)
+        return;
 
     string256 name;
 
@@ -59,7 +61,8 @@ void CResourceManager::OnDeviceCreate(IReader* F)
     IReader* fs = 0;
     // Load constants
     fs = F->open_chunk(0);
-    if (fs) {
+    if (fs)
+    {
         while (!fs->eof())
         {
             fs->r_stringZ(name, sizeof(name));
@@ -71,7 +74,8 @@ void CResourceManager::OnDeviceCreate(IReader* F)
 
     // Load matrices
     fs = F->open_chunk(1);
-    if (fs) {
+    if (fs)
+    {
         while (!fs->eof())
         {
             fs->r_stringZ(name, sizeof(name));
@@ -83,7 +87,8 @@ void CResourceManager::OnDeviceCreate(IReader* F)
 
     // Load blenders
     fs = F->open_chunk(2);
-    if (fs) {
+    if (fs)
+    {
         IReader* chunk = NULL;
         int chunk_id = 0;
 
@@ -92,12 +97,14 @@ void CResourceManager::OnDeviceCreate(IReader* F)
             CBlender_DESC desc;
             chunk->r(&desc, sizeof(desc));
             IBlender* B = IBlender::Create(desc.CLS);
-            if (0 == B) {
+            if (0 == B)
+            {
                 Msg("! Renderer doesn't support blender '%s'", desc.cName);
             }
             else
             {
-                if (B->getDescription().version != desc.version) {
+                if (B->getDescription().version != desc.version)
+                {
                     Msg("! Version conflict in shader '%s'", desc.cName);
                 }
 
@@ -119,7 +126,8 @@ void CResourceManager::OnDeviceCreate(IReader* F)
 void CResourceManager::OnDeviceCreate(LPCSTR shName)
 {
 #ifdef _EDITOR
-    if (!FS.exist(shName)) return;
+    if (!FS.exist(shName))
+        return;
 #endif
 
     // Check if file is compressed already
@@ -128,7 +136,8 @@ void CResourceManager::OnDeviceCreate(LPCSTR shName)
     IReader* F = FS.r_open(shName);
     R_ASSERT2(F, shName);
     F->r(&id, 8);
-    if (0 == strncmp(id, ID, 8)) {
+    if (0 == strncmp(id, ID, 8))
+    {
         FATAL("Unsupported blender library. Compressed?");
     }
     OnDeviceCreate(F);
@@ -137,7 +146,8 @@ void CResourceManager::OnDeviceCreate(LPCSTR shName)
 
 void CResourceManager::StoreNecessaryTextures()
 {
-    if (!m_necessary.empty()) return;
+    if (!m_necessary.empty())
+        return;
 
     map_TextureIt it = m_textures.begin();
     map_TextureIt it_e = m_textures.end();
@@ -145,8 +155,10 @@ void CResourceManager::StoreNecessaryTextures()
     for (; it != it_e; ++it)
     {
         LPCSTR texture_name = it->first;
-        if (strstr(texture_name, "\\levels\\")) continue;
-        if (!strchr(texture_name, '\\')) continue;
+        if (strstr(texture_name, "\\levels\\"))
+            continue;
+        if (!strchr(texture_name, '\\'))
+            continue;
 
         ref_texture T;
         T.create(texture_name);
@@ -154,7 +166,4 @@ void CResourceManager::StoreNecessaryTextures()
     }
 }
 
-void CResourceManager::DestroyNecessaryTextures()
-{
-    m_necessary.clear();
-}
+void CResourceManager::DestroyNecessaryTextures() { m_necessary.clear(); }

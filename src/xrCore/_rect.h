@@ -155,10 +155,8 @@ public:
         center.div(2);
     }
     IC void getsize(Tvector& sz) const { sz.sub(rb, lt); }
-
     IC T width() const { return rb.x - lt.x; }
     IC T height() const { return rb.y - lt.y; }
-
     IC SelfRef shrink(T x, T y)
     {
         lt.x += x;
@@ -181,10 +179,10 @@ public:
         return !(b1.x1 > b2.x2 || b1.x2 < b2.x1 || b1.y1 > b2.y2 || b1.y2 < b2.y1);
     }
     IC BOOL intersected(SelfCRef b) const { return intersected(*this, b); }
-
     IC BOOL intersection(SelfCRef b1, SelfCRef b2)
     {
-        if (!intersected(b1, b2)) return (FALSE);
+        if (!intersected(b1, b2))
+            return (FALSE);
 
         x1 = _max(b1.x1, b2.x1);
         y1 = _max(b1.y1, b2.y1);

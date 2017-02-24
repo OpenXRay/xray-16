@@ -29,7 +29,8 @@ CPortal::~CPortal()
 #ifdef DEBUG
 void CPortal::OnRender()
 {
-    if (psDeviceFlags.is(rsOcclusionDraw)) {
+    if (psDeviceFlags.is(rsOcclusionDraw))
+    {
         VERIFY(poly.size());
         // draw rect
         DEFINE_VECTOR(FVF::L, LVec, LVecIt);
@@ -51,7 +52,8 @@ void CPortal::OnRender()
         RCache.dbg_Draw(D3DPT_TRIANGLEFAN, &*V.begin(), V.size() - 2);
 
         // draw wire
-        if (bDebug) {
+        if (bDebug)
+        {
             RImplementation.rmNear();
         }
         else
@@ -60,7 +62,8 @@ void CPortal::OnRender()
         }
         RCache.set_Shader(RImplementation.m_WireShader);
         RCache.dbg_Draw(D3DPT_LINESTRIP, &*(V.begin() + 1), V.size() - 2);
-        if (bDebug) {
+        if (bDebug)
+        {
             RImplementation.rmNormal();
         }
         else
@@ -95,7 +98,8 @@ void CPortal::Setup(Fvector* V, int vcnt, CSector* face, CSector* back)
     {
         T.mknormal_non_normalized(poly[0], poly[i - 1], poly[i]);
         float m = T.magnitude();
-        if (m > EPS_S) {
+        if (m > EPS_S)
+        {
             N.add(T.div(m));
             _cnt++;
         }
@@ -107,15 +111,12 @@ void CPortal::Setup(Fvector* V, int vcnt, CSector* face, CSector* back)
 
     /*
     if (_abs(1-P.n.magnitude())<EPS)
-    xrDebug::Fatal		(DEBUG_INFO,"Degenerated portal found at {%3.2f,%3.2f,%3.2f}.",VPUSH(poly[0]));
+    xrDebug::Fatal      (DEBUG_INFO,"Degenerated portal found at {%3.2f,%3.2f,%3.2f}.",VPUSH(poly[0]));
     */
 }
 
 //
-CSector::~CSector()
-{
-}
-
+CSector::~CSector() {}
 //
 extern float r_ssaDISCARD;
 extern float r_ssaLOD_A, r_ssaLOD_B;
@@ -123,7 +124,8 @@ extern float r_ssaLOD_A, r_ssaLOD_B;
 void CSector::traverse(CFrustum& F, _scissor& R_scissor)
 {
     // Register traversal process
-    if (r_marker != PortalTraverser.i_marker) {
+    if (r_marker != PortalTraverser.i_marker)
+    {
         r_marker = PortalTraverser.i_marker;
         PortalTraverser.r_sectors.push_back(this);
         r_frustums.clear();
@@ -136,27 +138,33 @@ void CSector::traverse(CFrustum& F, _scissor& R_scissor)
     sPoly S, D;
     for (u32 I = 0; I < m_portals.size(); I++)
     {
-        if (m_portals[I]->marker == PortalTraverser.i_marker) continue;
+        if (m_portals[I]->marker == PortalTraverser.i_marker)
+            continue;
 
         CPortal* PORTAL = m_portals[I];
         CSector* pSector;
 
         // Select sector (allow intersecting portals to be finely classified)
-        if (PORTAL->bDualRender) {
+        if (PORTAL->bDualRender)
+        {
             pSector = PORTAL->getSector(this);
         }
         else
         {
             pSector = PORTAL->getSectorBack(PortalTraverser.i_vBase);
-            if (pSector == this) continue;
-            if (pSector == PortalTraverser.i_start) continue;
+            if (pSector == this)
+                continue;
+            if (pSector == PortalTraverser.i_start)
+                continue;
         }
 
         // Early-out sphere
-        if (!F.testSphere_dirty(PORTAL->S.P, PORTAL->S.R)) continue;
+        if (!F.testSphere_dirty(PORTAL->S.P, PORTAL->S.R))
+            continue;
 
-        // SSA	(if required)
-        if (PortalTraverser.i_options & CPortalTraverser::VQ_SSA) {
+        // SSA  (if required)
+        if (PortalTraverser.i_options & CPortalTraverser::VQ_SSA)
+        {
             Fvector dir2portal;
             dir2portal.sub(PORTAL->S.P, PortalTraverser.i_vBase);
             float R = PORTAL->S.R;
@@ -164,11 +172,15 @@ void CSector::traverse(CFrustum& F, _scissor& R_scissor)
             float ssa = R * R / distSQ;
             dir2portal.div(_sqrt(distSQ));
             ssa *= _abs(PORTAL->P.n.dotproduct(dir2portal));
-            if (ssa < r_ssaDISCARD) continue;
+            if (ssa < r_ssaDISCARD)
+                continue;
 
-            if (PortalTraverser.i_options & CPortalTraverser::VQ_FADE) {
-                if (ssa < r_ssaLOD_A) PortalTraverser.fade_portal(PORTAL, ssa);
-                if (ssa < r_ssaLOD_B) continue;
+            if (PortalTraverser.i_options & CPortalTraverser::VQ_FADE)
+            {
+                if (ssa < r_ssaLOD_A)
+                    PortalTraverser.fade_portal(PORTAL, ssa);
+                if (ssa < r_ssaLOD_B)
+                    continue;
             }
         }
 
@@ -177,11 +189,13 @@ void CSector::traverse(CFrustum& F, _scissor& R_scissor)
         S.assign(&*POLY.begin(), POLY.size());
         D.clear();
         sPoly* P = F.ClipPoly(S, D);
-        if (0 == P) continue;
+        if (0 == P)
+            continue;
 
         // Scissor and optimized HOM-testing
         _scissor scissor;
-        if (PortalTraverser.i_options & CPortalTraverser::VQ_SCISSOR && (!PORTAL->bDualRender)) {
+        if (PortalTraverser.i_options & CPortalTraverser::VQ_SCISSOR && (!PORTAL->bDualRender))
+        {
             // Build scissor rectangle in projection-space
             Fbox2 bb;
             bb.invalidate();
@@ -199,15 +213,21 @@ void CSector::traverse(CFrustum& F, _scissor& R_scissor)
                 t.w = v.x * M._14 + v.y * M._24 + v.z * M._34 + M._44;
                 t.mul(1.f / t.w);
 
-                if (t.x < bb.min.x) bb.min.x = t.x;
-                if (t.x > bb.max.x) bb.max.x = t.x;
-                if (t.y < bb.min.y) bb.min.y = t.y;
-                if (t.y > bb.max.y) bb.max.y = t.y;
-                if (t.z < depth) depth = t.z;
+                if (t.x < bb.min.x)
+                    bb.min.x = t.x;
+                if (t.x > bb.max.x)
+                    bb.max.x = t.x;
+                if (t.y < bb.min.y)
+                    bb.min.y = t.y;
+                if (t.y > bb.max.y)
+                    bb.max.y = t.y;
+                if (t.z < depth)
+                    depth = t.z;
             }
-            // Msg	("bb(%s): (%f,%f)-(%f,%f), d=%f", PORTAL->bDualRender?"true":"false",bb.min.x, bb.min.y, bb.max.x,
+            // Msg  ("bb(%s): (%f,%f)-(%f,%f), d=%f", PORTAL->bDualRender?"true":"false",bb.min.x, bb.min.y, bb.max.x,
             // bb.max.y,depth);
-            if (depth < EPS) {
+            if (depth < EPS)
+            {
                 scissor = R_scissor;
 
                 // Cull by HOM (slower algo)
@@ -235,15 +255,19 @@ void CSector::traverse(CFrustum& F, _scissor& R_scissor)
                     scissor.max.y = R_scissor.max.y;
                 scissor.depth = depth;
 
-                // Msg	("scissor: (%f,%f)-(%f,%f)", scissor.min.x, scissor.min.y, scissor.max.x, scissor.max.y);
+                //Msg("scissor: (%f,%f)-(%f,%f)", scissor.min.x, scissor.min.y, scissor.max.x, scissor.max.y);
                 // Check if box is non-empty
-                if (scissor.min.x >= scissor.max.x) continue;
-                if (scissor.min.y >= scissor.max.y) continue;
+                if (scissor.min.x >= scissor.max.x)
+                    continue;
+                if (scissor.min.y >= scissor.max.y)
+                    continue;
 
                 // Cull by HOM (faster algo)
                 if ((PortalTraverser.i_options & CPortalTraverser::VQ_HOM) &&
-                    (!RImplementation.HOM.visible(scissor, depth)))
+                    !RImplementation.HOM.visible(scissor, depth))
+                {
                     continue;
+                }
             }
         }
         else
@@ -251,7 +275,8 @@ void CSector::traverse(CFrustum& F, _scissor& R_scissor)
             scissor = R_scissor;
 
             // Cull by HOM (slower algo)
-            if ((PortalTraverser.i_options & CPortalTraverser::VQ_HOM) && (!RImplementation.HOM.visible(*P))) continue;
+            if ((PortalTraverser.i_options & CPortalTraverser::VQ_HOM) && (!RImplementation.HOM.visible(*P)))
+                continue;
         }
 
         // Create _new_ frustum and recurse

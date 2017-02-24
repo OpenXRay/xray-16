@@ -7,10 +7,10 @@
 
 class ECORE_API CLog
 {
-  public:
+public:
     bool in_use;
 
-  public:
+public:
     CLog() { in_use = false; }
     void Msg(TMsgDlgType mt, LPCSTR _Format, ...);
     int DlgMsg(TMsgDlgType mt, LPCSTR _Format, ...);

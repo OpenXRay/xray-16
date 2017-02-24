@@ -63,7 +63,6 @@ public:
     CGameFont* GetFont() const { return m_pFont; }
     void SetFontSize(float sz) { fontSize = sz; }
     void SetFontAlignment(CGameFont::EAligment al) { aligment = al; }
-
     // Color
     void SetTextColor(u32 cl);
     u32 GetTextColor();
@@ -71,7 +70,6 @@ public:
     // Вкл/выкл анимации
     void PlayAnimation() { m_bAnimate = true; }
     void StopAnimation() { m_bAnimate = false; }
-
 protected:
     // Переменные времени для каждого из стилей.
     // В паре:	first	- контрольный период эффекта (задаваемый пользователем)

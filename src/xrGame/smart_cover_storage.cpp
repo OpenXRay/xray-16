@@ -24,7 +24,6 @@ struct id_predicate
 
 public:
     IC id_predicate(shared_str const& id) : m_id(id) {}
-
     IC bool operator()(::description* const& ptr) const { return (m_id._get() == ptr->table_id()._get()); }
 };
 
@@ -34,7 +33,8 @@ DescriptionPtr storage::description(shared_str const& table_id)
 
     Descriptions::iterator found = std::find_if(m_descriptions.begin(), m_descriptions.end(), id_predicate(table_id));
 
-    if (found != m_descriptions.end()) return (*found);
+    if (found != m_descriptions.end())
+        return (*found);
 
     ::description* description = new ::description(table_id);
     m_descriptions.push_back(description);
@@ -48,7 +48,7 @@ storage::~storage()
     Descriptions::const_iterator E = m_descriptions.end();
     for (; I != E; ++I)
         VERIFY(!(*I)->m_ref_count);
-#endif  // DEBUG
+#endif // DEBUG
     delete_data(m_descriptions);
 }
 
@@ -58,9 +58,11 @@ void storage::collect_garbage()
     {
         static IC bool predicate(::description* const& object)
         {
-            if (object->m_ref_count) return (false);
+            if (object->m_ref_count)
+                return (false);
 
-            if (Device.dwTimeGlobal < object->m_last_time_dec + time_to_delete) return (false);
+            if (Device.dwTimeGlobal < object->m_last_time_dec + time_to_delete)
+                return (false);
 
             ::description* temp = object;
             xr_delete(temp);

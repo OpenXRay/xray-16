@@ -7,10 +7,7 @@
 #include "Level.h"
 #include "game_cl_mp.h"
 
-UIGameMP::UIGameMP() : m_pDemoPlayControl(NULL), m_pServerInfo(NULL), m_pAchivementIdicator(NULL), m_game(NULL)
-{
-}
-
+UIGameMP::UIGameMP() : m_pDemoPlayControl(NULL), m_pServerInfo(NULL), m_pAchivementIdicator(NULL), m_game(NULL) {}
 UIGameMP::~UIGameMP()
 {
     xr_delete(m_pDemoPlayControl);
@@ -19,7 +16,8 @@ UIGameMP::~UIGameMP()
 
 void UIGameMP::ShowDemoPlayControl()
 {
-    if (!m_pDemoPlayControl) {
+    if (!m_pDemoPlayControl)
+    {
         m_pDemoPlayControl = new CUIDemoPlayControl();
         m_pDemoPlayControl->Init();
     }
@@ -31,22 +29,21 @@ void UIGameMP::ShowDemoPlayControl()
 
 bool UIGameMP::IR_UIOnKeyboardPress(int dik)
 {
-    if (is_binded(kCROUCH, dik) && Level().IsDemoPlay()) {
+    if (is_binded(kCROUCH, dik) && Level().IsDemoPlay())
+    {
         ShowDemoPlayControl();
         return true;
     }
 #ifdef DEBUG
-    if (dik == DIK_T) {
-        m_game->AddRewardTask(0);  // mp_award_massacre
+    if (dik == DIK_T)
+    {
+        m_game->AddRewardTask(0); // mp_award_massacre
     }
 #endif
     return inherited::IR_UIOnKeyboardPress(dik);
 }
 
-bool UIGameMP::IR_UIOnKeyboardRelease(int dik)
-{
-    return inherited::IR_UIOnKeyboardRelease(dik);
-}
+bool UIGameMP::IR_UIOnKeyboardRelease(int dik) { return inherited::IR_UIOnKeyboardRelease(dik); }
 /*
 bool UIGameMP::IsMapDescShown()
 {
@@ -74,10 +71,12 @@ bool UIGameMP::IsServerInfoShown()
 // shows only if it has some info ...
 bool UIGameMP::ShowServerInfo()
 {
-    if (Level().IsDemoPlay()) return true;
+    if (Level().IsDemoPlay())
+        return true;
 
     VERIFY2(m_pServerInfo, "game client UI not created");
-    if (!m_pServerInfo) {
+    if (!m_pServerInfo)
+    {
         return false;
     }
 
@@ -87,12 +86,14 @@ bool UIGameMP::ShowServerInfo()
         return true;
     }*/
 
-    if (!m_pServerInfo->HasInfo()) {
+    if (!m_pServerInfo->HasInfo())
+    {
         m_game->OnMapInfoAccept();
         return true;
     }
 
-    if (!m_pServerInfo->IsShown()) {
+    if (!m_pServerInfo->IsShown())
+    {
         m_pServerInfo->ShowDialog(true);
     }
     return true;
@@ -104,8 +105,10 @@ void UIGameMP::SetClGame(game_cl_GameState* g)
     m_game = smart_cast<game_cl_mp*>(g);
     VERIFY(m_game);
 
-    if (m_pServerInfo) {
-        if (m_pServerInfo->IsShown()) m_pServerInfo->HideDialog();
+    if (m_pServerInfo)
+    {
+        if (m_pServerInfo->IsShown())
+            m_pServerInfo->HideDialog();
 
         xr_delete(m_pServerInfo);
     }

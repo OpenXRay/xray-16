@@ -46,7 +46,8 @@ CGameSpy_Full::~CGameSpy_Full()
 
 GSUpdateStatus CGameSpy_Full::Update()
 {
-    if (!m_bServicesAlreadyChecked) {
+    if (!m_bServicesAlreadyChecked)
+    {
         m_bServicesAlreadyChecked = true;
         return GSUpdateStatus::OutOfService;
     }
@@ -58,7 +59,4 @@ GSUpdateStatus CGameSpy_Full::Update()
     return status;
 }
 
-void CGameSpy_Full::CoreThink(u32 millisecondsTimeout)
-{
-    gsCoreThink(millisecondsTimeout);
-}
+void CGameSpy_Full::CoreThink(u32 millisecondsTimeout) { gsCoreThink(millisecondsTimeout); }

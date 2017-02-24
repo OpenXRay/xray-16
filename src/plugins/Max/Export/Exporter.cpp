@@ -12,10 +12,12 @@ Modifier* FindPhysiqueModifier(INode* nodePtr)
     // Get object from node. Abort if no object.
     Object* ObjectPtr = nodePtr->GetObjectRef();
 
-    if (NULL == ObjectPtr) return NULL;
+    if (NULL == ObjectPtr)
+        return NULL;
 
     // Is derived object ?
-    if (ObjectPtr->SuperClassID() == GEN_DERIVOB_CLASS_ID) {
+    if (ObjectPtr->SuperClassID() == GEN_DERIVOB_CLASS_ID)
+    {
         // Yes -> Cast.
         IDerivedObject* DerivedObjectPtr = static_cast<IDerivedObject*>(ObjectPtr);
 
@@ -27,7 +29,8 @@ Modifier* FindPhysiqueModifier(INode* nodePtr)
             Modifier* ModifierPtr = DerivedObjectPtr->GetModifier(ModStackIndex);
             Class_ID clsid = ModifierPtr->ClassID();
             // Is this Physique ?
-            if (ModifierPtr->ClassID() == Class_ID(PHYSIQUE_CLASS_ID_A, PHYSIQUE_CLASS_ID_B)) {
+            if (ModifierPtr->ClassID() == Class_ID(PHYSIQUE_CLASS_ID_A, PHYSIQUE_CLASS_ID_B))
+            {
                 // Yes -> Exit.
                 return ModifierPtr;
             }
@@ -53,13 +56,15 @@ TriObject* GetTriObjectFromObjRef(Object* pObj, BOOL* pbDeleteIt)
 
     *pbDeleteIt = FALSE;
 
-    if (pObj->CanConvertToType(Class_ID(TRIOBJ_CLASS_ID, 0))) {
+    if (pObj->CanConvertToType(Class_ID(TRIOBJ_CLASS_ID, 0)))
+    {
         pTri = (TriObject*)pObj->ConvertToType(0, Class_ID(TRIOBJ_CLASS_ID, 0));
 
         // Note that the TriObject should only be deleted
         // if the pointer to it is not equal to the object
         // pointer that called ConvertToType()
-        if (pObj != pTri) *pbDeleteIt = TRUE;
+        if (pObj != pTri)
+            *pbDeleteIt = TRUE;
 
         return pTri;
     }
@@ -77,12 +82,14 @@ BOOL IsExportableMesh(INode* pNode, Object*& pObj)
     R_ASSERT(pNode);
     pObj = pNode->GetObjectRef();
 
-    if (pObj == NULL) return FALSE;
+    if (pObj == NULL)
+        return FALSE;
 
     superClassID = pObj->SuperClassID();
     // find out if mesh is renderable
 
-    if (!pNode->Renderable() || pNode->IsNodeHidden()) return FALSE;
+    if (!pNode->Renderable() || pNode->IsNodeHidden())
+        return FALSE;
 
     BOOL bFoundGeomObject = FALSE;
     // find out if mesh is renderable (more)
@@ -129,13 +136,16 @@ CExporter::~CExporter()
 //-----------------------------------------------------------------------------
 int CExporter::AddBone(INode* pNode, Matrix3& matMesh, IPhysiqueExport* pExport)
 {
-    if (!Helper::IsBone(pNode, U.m_SkinAllowDummy)) return BONE_NONE;
+    if (!Helper::IsBone(pNode, U.m_SkinAllowDummy))
+        return BONE_NONE;
 
     for (BoneDefIt it = m_Bones.begin(); it != m_Bones.end(); it++)
-        if ((*it)->isEqual(pNode)) return it - m_Bones.begin();
+        if ((*it)->isEqual(pNode))
+            return it - m_Bones.begin();
 
     CBoneDef* pBone = new CBoneDef(pNode);
-    if (pBone->SetInitTM(pExport, matMesh)) {
+    if (pBone->SetInitTM(pExport, matMesh))
+    {
         AddBone(pBone->pBone->GetParentNode(), matMesh, pExport);
         m_Bones.push_back(pBone);
         return m_Bones.size() - 1;
@@ -147,7 +157,8 @@ void CExporter::ScanBones(INode* pNode)
 {
     VERIFY(m_Style != eExportUndef);
     R_ASSERT(pNode);
-    if (Helper::IsBone(pNode, U.m_SkinAllowDummy)) m_AllBones.push_back(pNode);
+    if (Helper::IsBone(pNode, U.m_SkinAllowDummy))
+        m_AllBones.push_back(pNode);
     // process sub-nodes
     int cChildren = pNode->NumberOfChildren();
     for (int iChild = 0; iChild < cChildren; iChild++)
@@ -157,9 +168,11 @@ void CExporter::ScanBones(INode* pNode)
 //-----------------------------------------------------------------------------
 void CExporter::ScanMesh(INode* pNode)
 {
-    if (m_bHasError) return;
+    if (m_bHasError)
+        return;
 
-    if (!Helper::IsMesh(pNode)) {
+    if (!Helper::IsMesh(pNode))
+    {
         //		LPCSTR nm = pNode->GetName();
         int cChildren = pNode->NumberOfChildren();
         for (int iChild = 0; iChild < cChildren; iChild++)
@@ -171,8 +184,10 @@ void CExporter::ScanMesh(INode* pNode)
     else
     {
         //		LPCSTR nm = pNode->GetName();
-        if (pNode->Selected()) {
-            if (m_bFindMesh) {
+        if (pNode->Selected())
+        {
+            if (m_bFindMesh)
+            {
                 ERR("Single mesh support only.");
                 m_bHasError = TRUE;
                 return;
@@ -194,14 +209,16 @@ BOOL CExporter::Capture()
     Matrix3 matMesh;
     Matrix3 matZero;
 
-    if (!m_MeshNode) {
+    if (!m_MeshNode)
+    {
         ERR("Select mesh and try again.");
         m_bHasError = TRUE;
         return FALSE;
     }
 
     pObject = m_MeshNode->GetObjectRef();
-    if (!IsExportableMesh(m_MeshNode, pObject)) {
+    if (!IsExportableMesh(m_MeshNode, pObject))
+    {
         ERR("Can't receive node references.");
         m_bHasError = TRUE;
         return FALSE;
@@ -209,13 +226,15 @@ BOOL CExporter::Capture()
 
     // Get export interface
     pPhysique = FindPhysiqueModifier(m_MeshNode);
-    if (!pPhysique) {
+    if (!pPhysique)
+    {
         ERR("Can't find Physique modifier.");
         m_bHasError = TRUE;
         return FALSE;
     }
     pExport = (IPhysiqueExport*)pPhysique->GetInterface(I_PHYINTERFACE);
-    if (!pExport) {
+    if (!pExport)
+    {
         ERR("Can't find Physique interface.");
         m_bHasError = TRUE;
         return FALSE;
@@ -224,7 +243,8 @@ BOOL CExporter::Capture()
     // Get mesh initial transform (used to mult by the bone matrices)
     int rval = CGINTM(m_MeshNode, pExport->GetInitNodeTM(m_MeshNode, matMesh));
     matZero.Zero();
-    if (rval || matMesh.Equals(matZero, 0.0)) {
+    if (rval || matMesh.Equals(matZero, 0.0))
+    {
         ERR("Old CS version. Can't export mesh");
         matMesh.IdentityMatrix();
     }
@@ -232,8 +252,10 @@ BOOL CExporter::Capture()
     // Add hierrarhy parts that has no effect on vertices,
     // but required for hierrarhy stability
 
-    if (eExportMotion == m_Style) {
-        if (m_AllBones.empty()) {
+    if (eExportMotion == m_Style)
+    {
+        if (m_AllBones.empty())
+        {
             ERR("Invalid skin object. Bone not found.");
             return FALSE;
         }
@@ -248,11 +270,13 @@ BOOL CExporter::Capture()
     }
 
     bool bRes = TRUE;
-    if (eExportSkin == m_Style) {
+    if (eExportSkin == m_Style)
+    {
         // For a given Object's INode get a
         // ModContext Interface from the Physique Export Interface:
         pContext = (IPhyContextExport*)pExport->GetContextInterface(m_MeshNode);
-        if (!pContext) {
+        if (!pContext)
+        {
             ERR("Can't find Physique context interface.");
             return FALSE;
         }
@@ -284,7 +308,8 @@ BOOL CExporter::Capture()
                 // get bone and create vertex
                 CVertexDef* pVertex = AddVertex();
                 int boneId = AddBone(node, matMesh, pExport);
-                if (BONE_NONE == boneId) {
+                if (BONE_NONE == boneId)
+                {
                     ERR("Invalid bone: ", node->GetName());
                     bRes = FALSE;
                 }
@@ -304,7 +329,8 @@ BOOL CExporter::Capture()
                     LPCSTR nm = node->GetName();
                     // get bone and create vertex
                     int boneId = AddBone(node, matMesh, pExport);
-                    if (BONE_NONE == boneId) {
+                    if (BONE_NONE == boneId)
+                    {
                         ERR("Invalid bone: ", node->GetName());
                         bRes = FALSE;
                     }
@@ -320,14 +346,17 @@ BOOL CExporter::Capture()
 
             EConsole.ProgressInc();
 
-            if (!bRes) break;
+            if (!bRes)
+                break;
         }
         EConsole.ProgressEnd();
 
-        if (!bRes) return FALSE;
+        if (!bRes)
+            return FALSE;
 
         static int remap[3];
-        if (U.m_SkinFlipFaces) {
+        if (U.m_SkinFlipFaces)
+        {
             remap[0] = 0;
             remap[1] = 1;
             remap[2] = 2;
@@ -345,7 +374,8 @@ BOOL CExporter::Capture()
         BOOL bDeleteTriObject;
         R_ASSERT(pObject);
         TriObject* pTriObject = GetTriObjectFromObjRef(pObject, &bDeleteTriObject);
-        if (!pTriObject) {
+        if (!pTriObject)
+        {
             ERR("Can't create tri object.");
             return FALSE;
         }
@@ -355,9 +385,11 @@ BOOL CExporter::Capture()
         {
             // check match with
             int iNumVert = M.getNumVerts();
-            if (!(iNumVert == numVertices && iNumVert == m_Vertices.size())) {
+            if (!(iNumVert == numVertices && iNumVert == m_Vertices.size()))
+            {
                 ERR("Non attached vertices found.");
-                if (bDeleteTriObject) delete (pTriObject);
+                if (bDeleteTriObject)
+                    delete (pTriObject);
                 return FALSE;
             }
 
@@ -377,7 +409,8 @@ BOOL CExporter::Capture()
         R_ASSERT(m_MtlMain);
 
         DWORD cSubMaterials = m_MtlMain->NumSubMtls();
-        if (cSubMaterials < 1) {
+        if (cSubMaterials < 1)
+        {
             // Count the material itself as a submaterial.
             cSubMaterials = 1;
         }
@@ -394,7 +427,8 @@ BOOL CExporter::Capture()
                 TVFace* tF = M.tvFace + i;
 
                 int m_id = gF->getMatID();
-                if (cSubMaterials == 1) {
+                if (cSubMaterials == 1)
+                {
                     m_id = 0;
                 }
                 else
@@ -424,7 +458,8 @@ BOOL CExporter::Capture()
                 m_ExpFaces.push_back(nF);
             }
         }
-        if (bDeleteTriObject) delete (pTriObject);
+        if (bDeleteTriObject)
+            delete (pTriObject);
     }
     UpdateParenting();
 
@@ -434,7 +469,8 @@ BOOL CExporter::Capture()
 BOOL MeshExpUtility::SaveAsSkin(const char* fname)
 {
     BOOL bRes = true;
-    if (!(fname && fname[0])) return false;
+    if (!(fname && fname[0]))
+        return false;
 
     Log("Exporting...");
     Log("-------------------------------------------------------");
@@ -455,7 +491,8 @@ BOOL MeshExpUtility::SaveAsSkin(const char* fname)
 BOOL MeshExpUtility::SaveSkinKeys(LPCSTR fname)
 {
     BOOL bRes = true;
-    if (!(fname && fname[0])) return false;
+    if (!(fname && fname[0]))
+        return false;
 
     Log("Exporting Skin Keys...");
     Log("-------------------------------------------------------");

@@ -47,11 +47,7 @@ void MxQuadric3::init(const Mat4& Q, double area)
     r = area;
 }
 
-Mat3 MxQuadric3::tensor() const
-{
-    return Mat3(Vec3(a2, ab, ac), Vec3(ab, b2, bc), Vec3(ac, bc, c2));
-}
-
+Mat3 MxQuadric3::tensor() const { return Mat3(Vec3(a2, ab, ac), Vec3(ab, b2, bc), Vec3(ac, bc, c2)); }
 Mat4 MxQuadric3::homogeneous() const
 {
     return Mat4(Vec4(a2, ab, ac, ad), Vec4(ab, b2, bc, bd), Vec4(ac, bc, c2, cd), Vec4(ad, bd, cd, d2));
@@ -77,11 +73,11 @@ void MxQuadric3::point_constraint(const float* p)
     // of any point v to the given point p.
 
     a2 = b2 = c2 = 1.0;
-    ab = ac = bc = 0.0;  // A = I
+    ab = ac = bc = 0.0; // A = I
     ad = -p[0];
     bd = -p[1];
-    cd = -p[2];                                    // b = -p
-    d2 = p[0] * p[0] + p[1] * p[1] + p[2] * p[2];  // c = p*p
+    cd = -p[2]; // b = -p
+    d2 = p[0] * p[0] + p[1] * p[1] + p[2] * p[2]; // c = p*p
 }
 
 MxQuadric3& MxQuadric3::operator=(const MxQuadric3& Q)
@@ -178,14 +174,15 @@ double MxQuadric3::evaluate(double x, double y, double z) const
     // Evaluate vAv + 2bv + c
 
     return x * x * a2 + 2 * x * y * ab + 2 * x * z * ac + 2 * x * ad + y * y * b2 + 2 * y * z * bc + 2 * y * bd +
-           z * z * c2 + 2 * z * cd + d2;
+        z * z * c2 + 2 * z * cd + d2;
 }
 
 bool MxQuadric3::optimize(Vec3& v) const
 {
     Mat3 Ainv;
     double det = invert(Ainv, tensor());
-    if (FEQ(det, 0.0, 1e-12)) return false;
+    if (FEQ(det, 0.0, 1e-12))
+        return false;
 
     v = -(Ainv * vector());
 
@@ -197,7 +194,8 @@ bool MxQuadric3::optimize(float* x, float* y, float* z) const
     Vec3 v;
 
     bool success = optimize(v);
-    if (success) {
+    if (success)
+    {
         *x = (float)v[0];
         *y = (float)v[1];
         *z = (float)v[2];
@@ -214,7 +212,8 @@ bool MxQuadric3::optimize(Vec3& v, const Vec3& v1, const Vec3& v2) const
     Vec3 Ad = A * d;
 
     double denom = 2.0 * d * Ad;
-    if (FEQ(denom, 0.0, 1e-12)) return false;
+    if (FEQ(denom, 0.0, 1e-12))
+        return false;
 
     double a = (-2 * (vector() * d) - (d * Av2) - (v2 * Ad)) / (2 * (d * Ad));
 
@@ -246,7 +245,8 @@ bool MxQuadric3::optimize(Vec3& v, const Vec3& v1, const Vec3& v2, const Vec3& v
     double d13Ad13 = d13 * Ad13;
 
     double denom = d13Ad13 * d23Ad23 - 2 * d13_d23;
-    if (FEQ(denom, 0.0, 1e-12)) return false;
+    if (FEQ(denom, 0.0, 1e-12))
+        return false;
 
     double a = (d23Ad23 * (2 * (B * d13) + v3_d13) - d13_d23 * (2 * (B * d23) + v3_d23)) / -denom;
 

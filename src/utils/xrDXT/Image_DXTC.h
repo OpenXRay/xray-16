@@ -38,15 +38,15 @@ enum PixFormat
 
 class Image_DXTC
 {
-    BYTE* m_pCompBytes;  // compressed image bytes
+    BYTE* m_pCompBytes; // compressed image bytes
     BYTE* m_pDecompBytes;
     int m_nCompSize;
     int m_nCompLineSz;
     string256 m_strFormat;
     PixFormat m_CompFormat;
-    DDS_HEADER m_DDSD;   // read from dds file
-    bool m_bMipTexture;  // texture has mipmaps?
-    int m_nWidth;        // in pixels of uncompressed image
+    DDS_HEADER m_DDSD; // read from dds file
+    bool m_bMipTexture; // texture has mipmaps?
+    int m_nWidth; // in pixels of uncompressed image
     int m_nHeight;
 
 private:
@@ -62,9 +62,9 @@ public:
     Image_DXTC();
     virtual ~Image_DXTC();
 
-    bool LoadFromFile(LPCSTR filename);  // true if success
+    bool LoadFromFile(LPCSTR filename); // true if success
     void Decompress();
-    void SaveAsRaw();  // save decompressed bits
+    void SaveAsRaw(); // save decompressed bits
     BYTE* GetCompDataPointer() { return m_pCompBytes; };
     BYTE* GetDecompDataPointer() { return m_pDecompBytes; };
     int Width() { return m_nWidth; }

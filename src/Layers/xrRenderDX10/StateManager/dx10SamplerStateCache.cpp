@@ -13,11 +13,7 @@ dx10SamplerStateCache::dx10SamplerStateCache() : m_uiMaxAnisotropy(1)
     ResetDeviceState();
 }
 
-dx10SamplerStateCache::~dx10SamplerStateCache()
-{
-    ClearStateArray();
-}
-
+dx10SamplerStateCache::~dx10SamplerStateCache() { ClearStateArray(); }
 dx10SamplerStateCache::SHandle dx10SamplerStateCache::GetState(D3D_SAMPLER_DESC& desc)
 {
     SHandle hResult;
@@ -32,7 +28,8 @@ dx10SamplerStateCache::SHandle dx10SamplerStateCache::GetState(D3D_SAMPLER_DESC&
 
     hResult = FindState(desc, crc);
 
-    if (hResult == hInvalidHandle) {
+    if (hResult == hInvalidHandle)
+    {
         StateRecord rec;
         rec.m_crc = crc;
         CreateState(desc, &rec.m_pState);
@@ -54,7 +51,8 @@ dx10SamplerStateCache::SHandle dx10SamplerStateCache::FindState(const StateDecs&
     u32 i = 0;
     while (i < m_StateArray.size())
     {
-        if (m_StateArray[i].m_crc == StateCRC) {
+        if (m_StateArray[i].m_crc == StateCRC)
+        {
             StateDecs descCandidate;
             m_StateArray[i].m_pState->GetDesc(&descCandidate);
             if (descCandidate == desc)
@@ -95,7 +93,8 @@ void dx10SamplerStateCache::PrepareSamplerStates(HArray& samplers,
 
     for (u32 i = 0; i < samplers.size(); ++i)
     {
-        if (samplers[i] != hInvalidHandle) {
+        if (samplers[i] != hInvalidHandle)
+        {
             VERIFY(samplers[i] < m_StateArray.size());
             pSS[i] = m_StateArray[samplers[i]].m_pState;
         }
@@ -165,7 +164,8 @@ void dx10SamplerStateCache::SetMaxAnisotropy(UINT uiMaxAniso)
 {
     clamp(uiMaxAniso, (u32)1, (u32)16);
 
-    if (m_uiMaxAnisotropy == uiMaxAniso) return;
+    if (m_uiMaxAnisotropy == uiMaxAniso)
+        return;
 
     m_uiMaxAnisotropy = uiMaxAniso;
 

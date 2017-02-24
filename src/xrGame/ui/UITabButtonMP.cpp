@@ -19,14 +19,16 @@ void CUITabButtonMP::CreateHint()
 
 void CUITabButtonMP::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
-    if (this == pWnd) m_bIsEnabled = true;
+    if (this == pWnd)
+        m_bIsEnabled = true;
 
     CUITabButton::SendMessage(pWnd, msg, pData);
 }
 
 void CUITabButtonMP::UpdateTextAlign()
 {
-    if (m_bCursorOverWindow) {
+    if (m_bCursorOverWindow)
+    {
         TextItemControl()->m_TextOffset = m_text_ident_cursor_over;
     }
     else
@@ -44,8 +46,10 @@ void CUITabButtonMP::Update()
     UpdateTextAlign();
 
     u32 hintColor = 0;
-    if (m_hint) {
-        if (!m_bIsEnabled) {
+    if (m_hint)
+    {
+        if (!m_bIsEnabled)
+        {
             hintColor = m_bUseTextColor[S_Disabled] ? m_dwTextColor[S_Disabled] : m_dwTextColor[S_Enabled];
         }
         else if (CUIButton::BUTTON_PUSHED == GetButtonState())
@@ -69,5 +73,6 @@ void CUITabButtonMP::Draw()
 {
     CUITabButton::Draw();
 
-    if (m_hint) m_hint->Draw();
+    if (m_hint)
+        m_hint->Draw();
 }

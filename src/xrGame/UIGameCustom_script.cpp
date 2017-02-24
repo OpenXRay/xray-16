@@ -6,11 +6,7 @@
 
 using namespace luabind;
 
-CUIGameCustom* get_hud()
-{
-    return CurrentGameUI();
-}
-
+CUIGameCustom* get_hud() { return CurrentGameUI(); }
 SCRIPT_EXPORT(CUIGameCustom, (), {
     module(luaState)[class_<StaticDrawableWrapper>("StaticDrawableWrapper")
                          .def_readwrite("m_endTime", &StaticDrawableWrapper::m_endTime)

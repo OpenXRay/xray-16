@@ -163,19 +163,19 @@ int ECORE_API xrHemisphereVertices(int quality, const Fvector*& verts)
     int h_count = 0;
     switch (quality)
     {
-    case 1:  // LOW quality
+    case 1: // LOW quality
         h_count = HEMI1_VERTS;
         verts = hemi_1;
         break;
-    case 2:  // HIGH quality
+    case 2: // HIGH quality
         h_count = HEMI2_VERTS;
         verts = hemi_2;
         break;
-    case 3:  // SUPER HIGH quality
+    case 3: // SUPER HIGH quality
         h_count = HEMI3_VERTS;
         verts = hemi_3;
         break;
-    default:  // NO
+    default: // NO
         NODEFAULT;
     }
     return h_count;
@@ -187,11 +187,11 @@ int ECORE_API xrHemisphereIndices(int quality, const u16*& indices)
     int h_count = 0;
     switch (quality)
     {
-    case 1:  // LOW quality
+    case 1: // LOW quality
         h_count = HEMI1_FACES * 3;
         indices = hemi_1v;
         break;
-    case 2:  // HIGH quality
+    case 2: // HIGH quality
         h_count = HEMI2_FACES * 3;
         indices = hemi_2v;
         break;
@@ -199,7 +199,7 @@ int ECORE_API xrHemisphereIndices(int quality, const u16*& indices)
     // h_count = HEMI3_FACES*3;
     // indices = hemi_3v;
     // break;
-    default:  // NO
+    default: // NO
         NODEFAULT;
     }
     return h_count;

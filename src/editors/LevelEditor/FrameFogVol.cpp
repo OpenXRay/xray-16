@@ -10,18 +10,9 @@
 #pragma resource "*.dfm"
 
 //---------------------------------------------------------------------------
-__fastcall TfraFogVol::TfraFogVol(TComponent* Owner, ESceneFogVolumeTool* gt) : TForm(Owner)
-{
-    ParentTools = gt;
-}
+__fastcall TfraFogVol::TfraFogVol(TComponent* Owner, ESceneFogVolumeTool* gt) : TForm(Owner) { ParentTools = gt; }
 //---------------------------------------------------------------------------
-void __fastcall TfraFogVol::ebGroupClick(TObject* Sender)
-{
-    ParentTools->GroupSelected();
-}
+void __fastcall TfraFogVol::ebGroupClick(TObject* Sender) { ParentTools->GroupSelected(); }
 //---------------------------------------------------------------------------
-void __fastcall TfraFogVol::ebUngroupClick(TObject* Sender)
-{
-    ParentTools->UnGroupCurrent();
-}
+void __fastcall TfraFogVol::ebUngroupClick(TObject* Sender) { ParentTools->UnGroupCurrent(); }
 //---------------------------------------------------------------------------

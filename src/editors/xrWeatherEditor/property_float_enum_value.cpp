@@ -30,7 +30,8 @@ System::Object ^ property_float_enum_value::GetValue()
     for
         each(ValuePair ^ i in m_collection)
         {
-            if (i->first != value) continue;
+            if (i->first != value)
+                continue;
 
             return (value);
         }
@@ -45,7 +46,8 @@ void property_float_enum_value::SetValue(Object ^ object)
     for
         each(ValuePair ^ i in m_collection)
         {
-            if (!i->second->Equals(string_value)) continue;
+            if (!i->second->Equals(string_value))
+                continue;
 
             inherited::SetValue(i->first);
             return;
@@ -54,6 +56,4 @@ void property_float_enum_value::SetValue(Object ^ object)
     inherited::SetValue(safe_cast<ValuePair ^>(m_collection[0])->first);
 }
 
-void property_float_enum_value::Increment(float increment)
-{
-}
+void property_float_enum_value::Increment(float increment) {}

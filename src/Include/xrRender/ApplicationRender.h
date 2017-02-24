@@ -18,4 +18,4 @@ public:
     virtual void KillHW() = 0;
 };
 
-#endif  //	ApplicationRender_included
+#endif //	ApplicationRender_included

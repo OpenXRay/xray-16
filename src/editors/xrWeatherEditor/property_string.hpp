@@ -14,20 +14,20 @@
 public
 ref class property_string : public XRay::SdkControls::IProperty
 {
-  public:
+public:
     typedef editor::property_holder::string_getter_type string_getter_type;
     typedef editor::property_holder::string_setter_type string_setter_type;
 
-  public:
+public:
     property_string(string_getter_type const& getter, string_setter_type const& setter);
     virtual ~property_string();
     !property_string();
     virtual System::Object ^ GetValue();
     virtual void SetValue(System::Object ^ object);
 
-  private:
+private:
     string_getter_type* m_getter;
     string_setter_type* m_setter;
-};  // ref class property_string
+}; // ref class property_string
 
-#endif  // ifndef PROPERTY_STRING_HPP_INCLUDED
+#endif // ifndef PROPERTY_STRING_HPP_INCLUDED

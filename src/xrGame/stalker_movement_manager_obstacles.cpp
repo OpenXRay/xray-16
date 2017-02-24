@@ -22,7 +22,7 @@
 
 #ifndef MASTER_GOLD
 #include "ai_debug.h"
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
 
 static const u32 fail_check_time = 1000;
 
@@ -34,11 +34,7 @@ stalker_movement_manager_obstacles::stalker_movement_manager_obstacles(CAI_Stalk
     m_dynamic_obstacles.construct(this, m_failed_to_build_path);
 }
 
-stalker_movement_manager_obstacles::~stalker_movement_manager_obstacles()
-{
-    xr_delete(m_doors_actor);
-}
-
+stalker_movement_manager_obstacles::~stalker_movement_manager_obstacles() { xr_delete(m_doors_actor); }
 void stalker_movement_manager_obstacles::Load(LPCSTR section)
 {
     inherited::Load(section);
@@ -79,9 +75,11 @@ bool stalker_movement_manager_obstacles::apply_border(const obstacles_query& que
     AREA::const_iterator E = query.area().end();
     for (; I != E; ++I)
     {
-        if ((*I == dest_vertex_id)) continue;
+        if ((*I == dest_vertex_id))
+            continue;
 
-        if (*I == start_vertex_id) continue;
+        if (*I == start_vertex_id)
+            continue;
 
         graph.set_mask_no_check(*I);
     }
@@ -101,7 +99,8 @@ void stalker_movement_manager_obstacles::remove_border(const obstacles_query& qu
 
 bool stalker_movement_manager_obstacles::can_build_restricted_path(const obstacles_query& query)
 {
-    if (!apply_border(query)) {
+    if (!apply_border(query))
+    {
         VERIFY(!restricted_object().applied());
         return (false);
     }
@@ -123,10 +122,11 @@ void stalker_movement_manager_obstacles::move_along_path_impl(
 {
 #ifndef MASTER_GOLD
     if (psAI_Flags.test(aiObstaclesAvoidingStatic))
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
     {
         m_dynamic_obstacles.update();
-        if (!m_dynamic_obstacles.movement_enabled()) {
+        if (!m_dynamic_obstacles.movement_enabled())
+        {
             float desirable_speed = old_desirable_speed();
             set_desirable_speed(0.f);
 
@@ -142,7 +142,7 @@ void stalker_movement_manager_obstacles::move_along_path_impl(
     if (
 #ifndef MASTER_GOLD
         (!psAI_Flags.test(aiObstaclesAvoidingStatic) && m_dynamic_obstacles.need_path_to_rebuild()) ||
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
         m_static_obstacles.need_path_to_rebuild())
         rebuild_path();
 
@@ -154,9 +154,11 @@ void stalker_movement_manager_obstacles::move_along_path(
 {
     VERIFY(m_doors_actor);
 
-    if (!ai().doors().actualize_doors_state(*m_doors_actor, old_desirable_speed())) {
-        //		Msg							( "%6d stalker %s waits for the some door to be open/closed", Device.dwTimeGlobal,
-        //object().cName().c_str() );
+    if (!ai().doors().actualize_doors_state(*m_doors_actor, old_desirable_speed()))
+    {
+        //		Msg							( "%6d stalker %s waits for the some door to be open/closed",
+        //Device.dwTimeGlobal,
+        // object().cName().c_str() );
         float desirable_speed = old_desirable_speed();
         set_desirable_speed(0.f);
 
@@ -169,18 +171,21 @@ void stalker_movement_manager_obstacles::move_along_path(
 //	Msg								( "%6d stalker %s is going", Device.dwTimeGlobal, object().cName().c_str() );
 
 #ifndef MASTER_GOLD
-    if (!psAI_Flags.test(aiObstaclesAvoiding)) {
+    if (!psAI_Flags.test(aiObstaclesAvoiding))
+    {
         inherited::move_along_path(movement_control, dest_position, time_delta);
         return;
     }
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
 
-    if (Device.dwTimeGlobal < (m_last_fail_time + fail_check_time)) {
+    if (Device.dwTimeGlobal < (m_last_fail_time + fail_check_time))
+    {
         inherited::move_along_path(movement_control, dest_position, time_delta);
         return;
     }
 
-    if (!move_along_path()) {
+    if (!move_along_path())
+    {
         inherited::move_along_path(movement_control, dest_position, time_delta);
         return;
     }
@@ -220,7 +225,8 @@ static float get_distance(Fvector const& a_first, Fvector const& a_second, Fvect
         Fvector2 const as_af_dir = Fvector2(as_af).div(as_af_magnitude);
         float const signed_distance = as_af_dir.dotproduct(bf_af);
         float const distance = _sqrt(_sqr(bf_af_magnitude) + _sqr(signed_distance));
-        if (distance >= safe_distance) return -1.f;
+        if (distance >= safe_distance)
+            return -1.f;
 
         return 0.f;
     }
@@ -232,17 +238,20 @@ static float get_distance(Fvector const& a_first, Fvector const& a_second, Fvect
 
 #ifdef DEBUG
     return -1.f;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 }
 
 float stalker_movement_manager_obstacles::is_going_through(
     Fmatrix const& matrix, Fvector const& vector, float const max_distance) const
 {
-    if (!actual()) return -1.f;
+    if (!actual())
+        return -1.f;
 
-    if (path().empty()) return -1.f;
+    if (path().empty())
+        return -1.f;
 
-    if (detail().curr_travel_point_index() >= detail().path().size() - 1) return -1.f;
+    if (detail().curr_travel_point_index() >= detail().path().size() - 1)
+        return -1.f;
 
     Fvector start_position = matrix.c;
     Fvector stop_position;
@@ -259,7 +268,8 @@ float stalker_movement_manager_obstacles::is_going_through(
         min_distance = distance > -1.f ? std::min(min_distance, distance) : min_distance;
 
         current_distance += (*(i - 1)).position.distance_to((*i).position);
-        if (current_distance > max_distance) return min_distance == flt_max ? -1.f : min_distance;
+        if (current_distance > max_distance)
+            return min_distance == flt_max ? -1.f : min_distance;
     }
 
     return min_distance == flt_max ? -1.f : min_distance;

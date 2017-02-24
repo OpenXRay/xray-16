@@ -21,7 +21,7 @@
 #ifdef INGAME_EDITOR
 #include "Include/editor/ide.hpp"
 #include "engine_impl.hpp"
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
 #include "xrSASH.h"
 #include "IGame_Persistent.h"
@@ -59,11 +59,7 @@ BOOL CRenderDevice::Begin()
     return TRUE;
 }
 
-void CRenderDevice::Clear()
-{
-    GlobalEnv.Render->Clear();
-}
-
+void CRenderDevice::Clear() { GlobalEnv.Render->Clear(); }
 extern void CheckPrivilegySlowdown();
 
 void CRenderDevice::End(void)
@@ -71,16 +67,19 @@ void CRenderDevice::End(void)
 #ifndef DEDICATED_SERVER
 #ifdef INGAME_EDITOR
     bool load_finished = false;
-#endif  // #ifdef INGAME_EDITOR
-    if (dwPrecacheFrame) {
+#endif // #ifdef INGAME_EDITOR
+    if (dwPrecacheFrame)
+    {
         ::Sound->set_master_volume(0.f);
         dwPrecacheFrame--;
-        if (!dwPrecacheFrame) {
+        if (!dwPrecacheFrame)
+        {
 #ifdef INGAME_EDITOR
             load_finished = true;
 #endif
             GlobalEnv.Render->updateGamma();
-            if (precache_light) {
+            if (precache_light)
+            {
                 precache_light->set_active(false);
                 precache_light.destroy();
             }
@@ -93,23 +92,26 @@ void CRenderDevice::End(void)
             g_find_chunk_counter.flush();
 #endif
             CheckPrivilegySlowdown();
-            if (g_pGamePersistent->GameType() == 1)  // haCk
+            if (g_pGamePersistent->GameType() == 1) // haCk
             {
                 WINDOWINFO wi;
                 GetWindowInfo(m_hWnd, &wi);
-                if (wi.dwWindowStatus != WS_ACTIVECAPTION) Pause(TRUE, TRUE, TRUE, "application start");
+                if (wi.dwWindowStatus != WS_ACTIVECAPTION)
+                    Pause(TRUE, TRUE, TRUE, "application start");
             }
         }
     }
     g_bRendering = FALSE;
     // end scene
     // Present goes here, so call OA Frame end.
-    if (g_SASH.IsBenchmarkRunning()) g_SASH.DisplayFrame(Device.fTimeGlobal);
+    if (g_SASH.IsBenchmarkRunning())
+        g_SASH.DisplayFrame(Device.fTimeGlobal);
     GlobalEnv.Render->End();
 #ifdef INGAME_EDITOR
-    if (load_finished && m_editor) m_editor->on_load_finished();
+    if (load_finished && m_editor)
+        m_editor->on_load_finished();
 #endif
-#endif  // !DEDICATED_SERVER
+#endif // !DEDICATED_SERVER
 }
 
 void CRenderDevice::SecondaryThreadProc(void* context)
@@ -118,7 +120,8 @@ void CRenderDevice::SecondaryThreadProc(void* context)
     while (true)
     {
         device.syncProcessFrame.Wait();
-        if (device.mt_bMustExit) {
+        if (device.mt_bMustExit)
+        {
             device.mt_bMustExit = FALSE;
             device.syncThreadExit.Set();
             return;
@@ -137,10 +140,12 @@ void CRenderDevice::PreCache(u32 amount, bool b_draw_loadscreen, bool b_wait_use
 #ifdef DEDICATED_SERVER
     amount = 0;
 #else
-    if (GlobalEnv.Render->GetForceGPU_REF()) amount = 0;
+    if (GlobalEnv.Render->GetForceGPU_REF())
+        amount = 0;
 #endif
     dwPrecacheFrame = dwPrecacheTotal = amount;
-    if (amount && !precache_light && g_pGameLevel && g_loading_events.empty()) {
+    if (amount && !precache_light && g_pGameLevel && g_loading_events.empty())
+    {
         precache_light = GlobalEnv.Render->light_create();
         precache_light->set_shadow(false);
         precache_light->set_position(vCameraPosition);
@@ -148,7 +153,8 @@ void CRenderDevice::PreCache(u32 amount, bool b_draw_loadscreen, bool b_wait_use
         precache_light->set_range(5.0f);
         precache_light->set_active(true);
     }
-    if (amount && b_draw_loadscreen && !load_screen_renderer.b_registered) {
+    if (amount && b_draw_loadscreen && !load_screen_renderer.b_registered)
+    {
         load_screen_renderer.start(b_wait_user_input);
     }
 }
@@ -159,13 +165,15 @@ void CRenderDevice::CalcFrameStats()
     do
     {
         // calc FPS & TPS
-        if (fTimeDelta <= EPS_S) break;
+        if (fTimeDelta <= EPS_S)
+            break;
         float fps = 1.f / fTimeDelta;
         // if (Engine.External.tune_enabled) vtune.update (fps);
         float fOne = 0.3f;
         float fInv = 1.0f - fOne;
         stats.fFPS = fInv * stats.fFPS + fOne * fps;
-        if (stats.RenderTotal.result > EPS_S) {
+        if (stats.RenderTotal.result > EPS_S)
+        {
             u32 renderedPolys = GlobalEnv.Render->GetCacheStatPolys();
             stats.fTPS = fInv * stats.fTPS + fOne * float(renderedPolys) / (stats.RenderTotal.result * 1000.f);
             stats.fRFPS = fInv * stats.fRFPS + fOne * 1000.f / stats.RenderTotal.result;
@@ -180,7 +188,8 @@ ENGINE_API xr_list<LOADING_EVENT> g_loading_events;
 
 void CRenderDevice::on_idle()
 {
-    if (!b_is_Ready) {
+    if (!b_is_Ready)
+    {
         Sleep(100);
         return;
     }
@@ -188,18 +197,22 @@ void CRenderDevice::on_idle()
     u32 FrameStartTime = TimerGlobal.GetElapsed_ms();
 #endif
     if (psDeviceFlags.test(rsStatistic))
-        g_bEnableStatGather = TRUE;  // XXX: why not use either rsStatistic or g_bEnableStatGather?
+        g_bEnableStatGather = TRUE; // XXX: why not use either rsStatistic or g_bEnableStatGather?
     else
         g_bEnableStatGather = FALSE;
-    if (g_loading_events.size()) {
-        if (g_loading_events.front()()) g_loading_events.pop_front();
+    if (g_loading_events.size())
+    {
+        if (g_loading_events.front()())
+            g_loading_events.pop_front();
         pApp->LoadDraw();
         return;
     }
-    if (!Device.dwPrecacheFrame && !g_SASH.IsBenchmarkRunning() && g_bLoaded) g_SASH.StartBenchmark();
+    if (!Device.dwPrecacheFrame && !g_SASH.IsBenchmarkRunning() && g_bLoaded)
+        g_SASH.StartBenchmark();
     FrameMove();
     // Precache
-    if (dwPrecacheFrame) {
+    if (dwPrecacheFrame)
+    {
         float factor = float(dwPrecacheFrame) / float(dwPrecacheTotal);
         float angle = PI_MUL_2 * factor;
         vCameraDirection.set(_sin(angle), 0, _cos(angle));
@@ -216,7 +229,7 @@ void CRenderDevice::on_idle()
     mFullTransform_saved = mFullTransform;
     mView_saved = mView;
     mProject_saved = mProject;
-    syncProcessFrame.Set();  // allow secondary thread to do its job
+    syncProcessFrame.Set(); // allow secondary thread to do its job
     Sleep(0);
 
 #ifndef DEDICATED_SERVER
@@ -224,24 +237,27 @@ void CRenderDevice::on_idle()
     CStatTimer renderTotalReal;
     renderTotalReal.FrameStart();
     renderTotalReal.Begin();
-    if (b_is_Active && Begin()) {
+    if (b_is_Active && Begin())
+    {
         seqRender.Process(rp_Render);
         CalcFrameStats();
         Statistic->Show();
-        End();  // Present goes here
+        End(); // Present goes here
     }
     renderTotalReal.End();
     renderTotalReal.FrameEnd();
     stats.RenderTotal.accum = renderTotalReal.accum;
-#endif                     // #ifndef DEDICATED_SERVER
-    syncFrameDone.Wait();  // wait until secondary thread finish its job
+#endif // #ifndef DEDICATED_SERVER
+    syncFrameDone.Wait(); // wait until secondary thread finish its job
 #ifdef DEDICATED_SERVER
     u32 FrameEndTime = TimerGlobal.GetElapsed_ms();
     u32 FrameTime = (FrameEndTime - FrameStartTime);
     u32 DSUpdateDelta = 1000 / g_svDedicateServerUpdateReate;
-    if (FrameTime < DSUpdateDelta) Sleep(DSUpdateDelta - FrameTime);
+    if (FrameTime < DSUpdateDelta)
+        Sleep(DSUpdateDelta - FrameTime);
 #endif
-    if (!b_is_Active) Sleep(1);
+    if (!b_is_Active)
+        Sleep(1);
 }
 
 #ifdef INGAME_EDITOR
@@ -251,12 +267,13 @@ void CRenderDevice::message_loop_editor()
     m_editor_finalize(m_editor);
     xr_delete(m_engine);
 }
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
 void CRenderDevice::message_loop()
 {
 #ifdef INGAME_EDITOR
-    if (editor()) {
+    if (editor())
+    {
         message_loop_editor();
         return;
     }
@@ -265,7 +282,8 @@ void CRenderDevice::message_loop()
     PeekMessage(&msg, NULL, 0U, 0U, PM_NOREMOVE);
     while (msg.message != WM_QUIT)
     {
-        if (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE)) {
+        if (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE))
+        {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
             continue;
@@ -285,7 +303,7 @@ void CRenderDevice::Run()
     {
         u32 time_mm = timeGetTime();
         while (timeGetTime() == time_mm)
-            ;  // wait for next tick
+            ; // wait for next tick
         u32 time_system = timeGetTime();
         u32 time_local = TimerAsync();
         Timer_MM_Delta = time_system - time_local;
@@ -314,7 +332,8 @@ void CRenderDevice::FrameMove()
     dwFrame++;
     Core.dwFrame = dwFrame;
     dwTimeContinual = TimerMM.GetElapsed_ms() - app_inactive_time;
-    if (psDeviceFlags.test(rsConstantFPS)) {
+    if (psDeviceFlags.test(rsConstantFPS))
+    {
         // 20ms = 50fps
         // fTimeDelta = 0.020f;
         // fTimeGlobal += 0.020f;
@@ -330,15 +349,18 @@ void CRenderDevice::FrameMove()
     {
         // Timer
         float fPreviousFrameTime = Timer.GetElapsed_sec();
-        Timer.Start();  // previous frame
+        Timer.Start(); // previous frame
         fTimeDelta =
-            0.1f * fTimeDelta + 0.9f * fPreviousFrameTime;  // smooth random system activity - worst case ~7% error
+            0.1f * fTimeDelta + 0.9f * fPreviousFrameTime; // smooth random system activity - worst case ~7% error
         // fTimeDelta = 0.7f * fTimeDelta + 0.3f*fPreviousFrameTime; // smooth random system activity
-        if (fTimeDelta > .1f) fTimeDelta = .1f;             // limit to 15fps minimum
-        if (fTimeDelta <= 0.f) fTimeDelta = EPS_S + EPS_S;  // limit to 15fps minimum
-        if (Paused()) fTimeDelta = 0.0f;
+        if (fTimeDelta > .1f)
+            fTimeDelta = .1f; // limit to 15fps minimum
+        if (fTimeDelta <= 0.f)
+            fTimeDelta = EPS_S + EPS_S; // limit to 15fps minimum
+        if (Paused())
+            fTimeDelta = 0.0f;
         // u64 qTime = TimerGlobal.GetElapsed_clk();
-        fTimeGlobal = TimerGlobal.GetElapsed_sec();  // float(qTime)*CPU::cycles2seconds;
+        fTimeGlobal = TimerGlobal.GetElapsed_sec(); // float(qTime)*CPU::cycles2seconds;
         u32 _old_global = dwTimeGlobal;
         dwTimeGlobal = TimerGlobal.GetElapsed_ms();
         dwTimeDelta = dwTimeGlobal - _old_global;
@@ -362,34 +384,41 @@ ENGINE_API BOOL bShowPauseString = TRUE;
 void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
 {
     static int snd_emitters_ = -1;
-    if (g_bBenchmark) return;
+    if (g_bBenchmark)
+        return;
 #ifndef DEDICATED_SERVER
-    if (bOn) {
+    if (bOn)
+    {
         if (!Paused())
             bShowPauseString =
 #ifdef INGAME_EDITOR
                 editor() ? FALSE :
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 #ifdef DEBUG
                            !xr_strcmp(reason, "li_pause_key_no_clip") ? FALSE :
-#endif  // DEBUG
+#endif // DEBUG
                                                                         TRUE;
-        if (bTimer && (!g_pGamePersistent || g_pGamePersistent->CanBePaused())) {
+        if (bTimer && (!g_pGamePersistent || g_pGamePersistent->CanBePaused()))
+        {
             g_pauseMngr()->Pause(TRUE);
 #ifdef DEBUG
-            if (!xr_strcmp(reason, "li_pause_key_no_clip")) TimerGlobal.Pause(FALSE);
+            if (!xr_strcmp(reason, "li_pause_key_no_clip"))
+                TimerGlobal.Pause(FALSE);
 #endif
         }
-        if (bSound && ::Sound) snd_emitters_ = ::Sound->pause_emitters(true);
+        if (bSound && ::Sound)
+            snd_emitters_ = ::Sound->pause_emitters(true);
     }
     else
     {
-        if (bTimer && g_pauseMngr()->Paused()) {
+        if (bTimer && g_pauseMngr()->Paused())
+        {
             fTimeDelta = EPS_S + EPS_S;
             g_pauseMngr()->Pause(FALSE);
         }
-        if (bSound) {
-            if (snd_emitters_ > 0)  // avoid crash
+        if (bSound)
+        {
+            if (snd_emitters_ > 0) // avoid crash
                 snd_emitters_ = ::Sound->pause_emitters(false);
             else
             {
@@ -402,27 +431,25 @@ void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
 #endif
 }
 
-BOOL CRenderDevice::Paused()
-{
-    return g_pauseMngr()->Paused();
-}
-
+BOOL CRenderDevice::Paused() { return g_pauseMngr()->Paused(); }
 void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM lParam)
 {
     u16 fActive = LOWORD(wParam);
     BOOL fMinimized = (BOOL)HIWORD(wParam);
     BOOL bActive = ((fActive != WA_INACTIVE) && (!fMinimized)) ? TRUE : FALSE;
-    if (bActive != Device.b_is_Active) {
+    if (bActive != Device.b_is_Active)
+    {
         Device.b_is_Active = bActive;
-        if (Device.b_is_Active) {
+        if (Device.b_is_Active)
+        {
             Device.seqAppActivate.Process(rp_AppActivate);
             app_inactive_time += TimerMM.GetElapsed_ms() - app_inactive_time_start;
 #ifndef DEDICATED_SERVER
 #ifdef INGAME_EDITOR
             if (!editor())
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
                 ShowCursor(FALSE);
-#endif  // #ifndef DEDICATED_SERVER
+#endif // #ifndef DEDICATED_SERVER
         }
         else
         {
@@ -447,29 +474,16 @@ void CRenderDevice::RemoveSeqFrame(pureFrame* f)
     seqFrame.Remove(f);
 }
 
-CRenderDevice* get_device()
-{
-    return &Device;
-}
-u32 script_time_global()
-{
-    return Device.dwTimeGlobal;
-}
-u32 script_time_global_async()
-{
-    return Device.TimerAsync_MMT();
-}
-
+CRenderDevice* get_device() { return &Device; }
+u32 script_time_global() { return Device.dwTimeGlobal; }
+u32 script_time_global_async() { return Device.TimerAsync_MMT(); }
 SCRIPT_EXPORT(Device, (), {
     using namespace luabind;
     module(luaState)[def("time_global", &script_time_global), def("time_global_async", &script_time_global_async),
         def("device", &get_device), def("is_enough_address_space_available", &is_enough_address_space_available)];
 });
 
-CLoadScreenRenderer::CLoadScreenRenderer() : b_registered(false)
-{
-}
-
+CLoadScreenRenderer::CLoadScreenRenderer() : b_registered(false) {}
 void CLoadScreenRenderer::start(bool b_user_input)
 {
     Device.seqRender.Add(this, 0);
@@ -479,14 +493,12 @@ void CLoadScreenRenderer::start(bool b_user_input)
 
 void CLoadScreenRenderer::stop()
 {
-    if (!b_registered) return;
+    if (!b_registered)
+        return;
     Device.seqRender.Remove(this);
     pApp->destroy_loading_shaders();
     b_registered = false;
     b_need_user_input = false;
 }
 
-void CLoadScreenRenderer::OnRender()
-{
-    pApp->load_draw_internal();
-}
+void CLoadScreenRenderer::OnRender() { pApp->load_draw_internal(); }

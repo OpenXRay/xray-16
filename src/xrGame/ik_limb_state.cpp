@@ -19,13 +19,15 @@ ik_goal_matrix& ik_limb_state::to_ref_bone(ik_goal_matrix& m) const
 Fmatrix& ik_limb_state::to_ref_bone(Fmatrix& m) const
 {
     VERIFY(limb);
-    if (state.ref_bone == limb->ref_bone()) return m;
+    if (state.ref_bone == limb->ref_bone())
+        return m;
 
     //	Fmatrix tobone;
     //	m = Fmatrix().mul_43( m, limb->transform( tobone, state.ref_bone, limb->ref_bone() ) );
 
     Fmatrix tobone = state.b2tob3;
-    if (state.ref_bone == 2 && limb->ref_bone() == 3) {
+    if (state.ref_bone == 2 && limb->ref_bone() == 3)
+    {
     }
     else if (state.ref_bone == 3 && limb->ref_bone() == 2)
         tobone.invert();
@@ -54,7 +56,8 @@ ik_goal_matrix& ik_limb_state::blend_to(ik_goal_matrix& m) const
 }
 Fvector& ik_limb_state::pick(Fvector& v) const
 {
-    if (state.ref_bone == limb->ref_bone()) {
+    if (state.ref_bone == limb->ref_bone())
+    {
         v.set(state.pick);
         return v;
     }

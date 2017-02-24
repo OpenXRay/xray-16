@@ -9,14 +9,8 @@
 #include "stdafx.h"
 #include "eatable_item_object.h"
 
-CEatableItemObject::CEatableItemObject()
-{
-}
-
-CEatableItemObject::~CEatableItemObject()
-{
-}
-
+CEatableItemObject::CEatableItemObject() {}
+CEatableItemObject::~CEatableItemObject() {}
 IFactoryObject* CEatableItemObject::_construct()
 {
     CEatableItem::_construct();
@@ -111,16 +105,8 @@ void CEatableItemObject::net_Destroy()
     CPhysicItem::net_Destroy();
 }
 
-void CEatableItemObject::net_Import(NET_Packet& P)
-{
-    CEatableItem::net_Import(P);
-}
-
-void CEatableItemObject::net_Export(NET_Packet& P)
-{
-    CEatableItem::net_Export(P);
-}
-
+void CEatableItemObject::net_Import(NET_Packet& P) { CEatableItem::net_Import(P); }
+void CEatableItemObject::net_Export(NET_Packet& P) { CEatableItem::net_Export(P); }
 void CEatableItemObject::save(NET_Packet& packet)
 {
     CPhysicItem::save(packet);
@@ -151,61 +137,20 @@ void CEatableItemObject::reinit()
     CPhysicItem::reinit();
 }
 
-void CEatableItemObject::activate_physic_shell()
-{
-    CEatableItem::activate_physic_shell();
-}
-
-void CEatableItemObject::on_activate_physic_shell()
-{
-    CPhysicItem::activate_physic_shell();
-}
-
-void CEatableItemObject::make_Interpolation()
-{
-    CEatableItem::make_Interpolation();
-}
-
-void CEatableItemObject::PH_B_CrPr()
-{
-    CEatableItem::PH_B_CrPr();
-}
-
-void CEatableItemObject::PH_I_CrPr()
-{
-    CEatableItem::PH_I_CrPr();
-}
-
+void CEatableItemObject::activate_physic_shell() { CEatableItem::activate_physic_shell(); }
+void CEatableItemObject::on_activate_physic_shell() { CPhysicItem::activate_physic_shell(); }
+void CEatableItemObject::make_Interpolation() { CEatableItem::make_Interpolation(); }
+void CEatableItemObject::PH_B_CrPr() { CEatableItem::PH_B_CrPr(); }
+void CEatableItemObject::PH_I_CrPr() { CEatableItem::PH_I_CrPr(); }
 #ifdef DEBUG
-void CEatableItemObject::PH_Ch_CrPr()
-{
-    CEatableItem::PH_Ch_CrPr();
-}
+void CEatableItemObject::PH_Ch_CrPr() { CEatableItem::PH_Ch_CrPr(); }
 #endif
 
-void CEatableItemObject::PH_A_CrPr()
-{
-    CEatableItem::PH_A_CrPr();
-}
-
+void CEatableItemObject::PH_A_CrPr() { CEatableItem::PH_A_CrPr(); }
 #ifdef DEBUG
-void CEatableItemObject::OnRender()
-{
-    CEatableItem::OnRender();
-}
+void CEatableItemObject::OnRender() { CEatableItem::OnRender(); }
 #endif
 
-bool CEatableItemObject::NeedToDestroyObject() const
-{
-    return CInventoryItem::NeedToDestroyObject();
-}
-
-u32 CEatableItemObject::ef_weapon_type() const
-{
-    return (0);
-}
-
-bool CEatableItemObject::Useful() const
-{
-    return (CEatableItem::Useful());
-}
+bool CEatableItemObject::NeedToDestroyObject() const { return CInventoryItem::NeedToDestroyObject(); }
+u32 CEatableItemObject::ef_weapon_type() const { return (0); }
+bool CEatableItemObject::Useful() const { return (CEatableItem::Useful()); }

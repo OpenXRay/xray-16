@@ -52,10 +52,12 @@ void CStalkerActionDangerGrenadeTakeCover::initialize()
 void CStalkerActionDangerGrenadeTakeCover::execute()
 {
     inherited::execute();
-    if (!object().memory().danger().selected()) return;
+    if (!object().memory().danger().selected())
+        return;
 
     const CCoverPoint* point = object().agent_manager().member().member(&object()).cover();
-    if (point) {
+    if (point)
+    {
         object().movement().set_level_dest_vertex(point->level_vertex_id());
         object().movement().set_desired_position(&point->position());
     }
@@ -64,7 +66,8 @@ void CStalkerActionDangerGrenadeTakeCover::execute()
 
     EMentalState temp;
     {
-        if (!object().inventory().ActiveItem()) {
+        if (!object().inventory().ActiveItem())
+        {
             object().CObjectHandler::set_goal(eObjectActionIdle);
             temp = eMentalStatePanic;
         }
@@ -88,9 +91,11 @@ void CStalkerActionDangerGrenadeTakeCover::execute()
         }
     }
 
-    if (!object().movement().path_completed()) {
+    if (!object().movement().path_completed())
+    {
         object().movement().set_body_state(eBodyStateStand);
-        if (object().movement().distance_to_destination_greater(2.f)) {
+        if (object().movement().distance_to_destination_greater(2.f))
+        {
             object().movement().set_mental_state(temp);
             object().sight().setup(CSightAction(SightManager::eSightTypePathDirection, true, true));
         }
@@ -105,11 +110,7 @@ void CStalkerActionDangerGrenadeTakeCover::execute()
     set_property(eWorldPropertyCoverReached, true);
 }
 
-void CStalkerActionDangerGrenadeTakeCover::finalize()
-{
-    inherited::finalize();
-}
-
+void CStalkerActionDangerGrenadeTakeCover::finalize() { inherited::finalize(); }
 //////////////////////////////////////////////////////////////////////////
 // CStalkerActionDangerGrenadeWaitForExplosion
 //////////////////////////////////////////////////////////////////////////
@@ -136,7 +137,8 @@ void CStalkerActionDangerGrenadeWaitForExplosion::initialize()
 void CStalkerActionDangerGrenadeWaitForExplosion::execute()
 {
     inherited::execute();
-    if (!object().memory().danger().selected()) return;
+    if (!object().memory().danger().selected())
+        return;
 
     if (fsimilar(object().movement().body_orientation().target.yaw, object().movement().body_orientation().current.yaw))
         object().sight().setup(CSightAction(SightManager::eSightTypeCoverLookOver, true));
@@ -144,11 +146,7 @@ void CStalkerActionDangerGrenadeWaitForExplosion::execute()
         object().sight().setup(CSightAction(SightManager::eSightTypeCover, true));
 }
 
-void CStalkerActionDangerGrenadeWaitForExplosion::finalize()
-{
-    inherited::finalize();
-}
-
+void CStalkerActionDangerGrenadeWaitForExplosion::finalize() { inherited::finalize(); }
 //////////////////////////////////////////////////////////////////////////
 // CStalkerActionDangerGrenadeTakeCoverAfterExplosion
 //////////////////////////////////////////////////////////////////////////
@@ -177,10 +175,12 @@ void CStalkerActionDangerGrenadeTakeCoverAfterExplosion::initialize()
 void CStalkerActionDangerGrenadeTakeCoverAfterExplosion::execute()
 {
     inherited::execute();
-    if (!object().memory().danger().selected()) return;
+    if (!object().memory().danger().selected())
+        return;
 
     const CCoverPoint* point = object().agent_manager().member().member(&object()).cover();
-    if (point) {
+    if (point)
+    {
         object().movement().set_level_dest_vertex(point->level_vertex_id());
         object().movement().set_desired_position(&point->position());
     }
@@ -189,7 +189,8 @@ void CStalkerActionDangerGrenadeTakeCoverAfterExplosion::execute()
 
     object().CObjectHandler::set_goal(eObjectActionAimReady1, object().best_weapon());
 
-    if (!object().movement().path_completed()) {
+    if (!object().movement().path_completed())
+    {
         object().movement().set_body_state(eBodyStateStand);
         object().movement().set_movement_type(eMovementTypeRun);
         if (!m_direction_sight || !object().movement().distance_to_destination_greater(2.f))
@@ -202,11 +203,7 @@ void CStalkerActionDangerGrenadeTakeCoverAfterExplosion::execute()
     set_property(eWorldPropertyCoverReached, true);
 }
 
-void CStalkerActionDangerGrenadeTakeCoverAfterExplosion::finalize()
-{
-    inherited::finalize();
-}
-
+void CStalkerActionDangerGrenadeTakeCoverAfterExplosion::finalize() { inherited::finalize(); }
 //////////////////////////////////////////////////////////////////////////
 // CStalkerActionDangerGrenadeLookAround
 //////////////////////////////////////////////////////////////////////////
@@ -234,21 +231,19 @@ void CStalkerActionDangerGrenadeLookAround::initialize()
 void CStalkerActionDangerGrenadeLookAround::execute()
 {
     inherited::execute();
-    if (!object().memory().danger().selected()) return;
+    if (!object().memory().danger().selected())
+        return;
 
     if (fsimilar(object().movement().body_orientation().target.yaw, object().movement().body_orientation().current.yaw))
         object().sight().setup(CSightAction(SightManager::eSightTypeCoverLookOver, true));
     else
         object().sight().setup(CSightAction(SightManager::eSightTypeCover, true));
 
-    if (completed()) set_property(eWorldPropertyLookedAround, true);
+    if (completed())
+        set_property(eWorldPropertyLookedAround, true);
 }
 
-void CStalkerActionDangerGrenadeLookAround::finalize()
-{
-    inherited::finalize();
-}
-
+void CStalkerActionDangerGrenadeLookAround::finalize() { inherited::finalize(); }
 //////////////////////////////////////////////////////////////////////////
 // CStalkerActionDangerGrenadeSearch
 //////////////////////////////////////////////////////////////////////////
@@ -272,12 +267,5 @@ void CStalkerActionDangerGrenadeSearch::initialize()
     object().CObjectHandler::set_goal(eObjectActionIdle);
 }
 
-void CStalkerActionDangerGrenadeSearch::execute()
-{
-    inherited::execute();
-}
-
-void CStalkerActionDangerGrenadeSearch::finalize()
-{
-    inherited::finalize();
-}
+void CStalkerActionDangerGrenadeSearch::execute() { inherited::execute(); }
+void CStalkerActionDangerGrenadeSearch::finalize() { inherited::finalize(); }

@@ -28,10 +28,8 @@ public:
 
     DEFINE_VECTOR(shared_str, PRECONDITION_VECTOR, PRECONDITION_VECTOR_IT);
     const PRECONDITION_VECTOR& Preconditions() const { return m_Preconditions; }
-
     DEFINE_VECTOR(shared_str, ACTION_NAME_VECTOR, ACTION_NAME_VECTOR_IT);
     const ACTION_NAME_VECTOR& Actions() const { return m_ScriptActions; }
-
     void AddPrecondition(LPCSTR str);
     void AddAction(LPCSTR str);
     void AddHasInfo(LPCSTR str);

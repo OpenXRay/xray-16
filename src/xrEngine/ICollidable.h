@@ -10,9 +10,7 @@ public:
     virtual ICollisionForm* GetCForm() const = 0;
 };
 
-inline ICollidable::~ICollidable()
-{
-}
+inline ICollidable::~ICollidable() {}
 // XXX: merge into IGameObject
 class ENGINE_API CollidableBase : public virtual ICollidable
 {
@@ -22,7 +20,6 @@ public:
 
     virtual void SetCForm(ICollisionForm* cform) override { CForm = cform; }
     virtual ICollisionForm* GetCForm() const override { return CForm; }
-
 protected:
     ICollisionForm* CForm;
 };

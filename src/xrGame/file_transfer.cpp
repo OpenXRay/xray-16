@@ -5,7 +5,7 @@
 #include "xrServer.h"
 #include "ui_base.h"
 
-#define MAX_FT_WAIT_TIME (2000 * 3)     /*3 max pings*/
+#define MAX_FT_WAIT_TIME (2000 * 3) /*3 max pings*/
 #define MAX_START_WAIT_TIME (2000 * 14) /*10 max pings*/
 
 namespace file_transfer
@@ -23,10 +23,7 @@ void make_abort_packet(NET_Packet& packet, ClientID const& client)
     packet.w_u32(client.value());
 }
 
-server_site::server_site()
-{
-}
-
+server_site::server_site() {}
 server_site::~server_site()
 {
     transfer_sessions_t::iterator ti = m_transfers.begin();
@@ -44,7 +41,7 @@ server_site::~server_site()
 }
 
 void server_site::stop_transfer_sessions(
-    buffer_vector<dst_src_pair_t> const& tsessions)  // notifies sending_rejected_by_peer
+    buffer_vector<dst_src_pair_t> const& tsessions) // notifies sending_rejected_by_peer
 {
     for (buffer_vector<dst_src_pair_t>::const_iterator i = tsessions.begin(), ie = tsessions.end(); i != ie; ++i)
     {
@@ -52,7 +49,7 @@ void server_site::stop_transfer_sessions(
     }
 }
 
-void server_site::stop_receiving_sessions(buffer_vector<ClientID> const& rsessions)  // notifies receiving_timeout
+void server_site::stop_receiving_sessions(buffer_vector<ClientID> const& rsessions) // notifies receiving_timeout
 {
     for (buffer_vector<ClientID>::const_iterator i = rsessions.begin(), ie = rsessions.end(); i != ie; ++i)
     {
@@ -62,22 +59,25 @@ void server_site::stop_receiving_sessions(buffer_vector<ClientID> const& rsessio
 
 void server_site::update_transfer()
 {
-    if (m_transfers.empty()) return;
+    if (m_transfers.empty())
+        return;
 
     buffer_vector<dst_src_pair_t> to_stop_transfers(
         _alloca(m_transfers.size() * sizeof(dst_src_pair_t)), m_transfers.size());
 
     for (transfer_sessions_t::iterator ti = m_transfers.begin(), tie = m_transfers.end(); ti != tie; ++ti)
     {
-        IClient* tmp_client = Level().Server->GetClientByID(ti->first.first);  // dst
-        if (!tmp_client) {
+        IClient* tmp_client = Level().Server->GetClientByID(ti->first.first); // dst
+        if (!tmp_client)
+        {
             Msg("! ERROR: SV: client [%u] not found for transfering file", ti->first);
             to_stop_transfers.push_back(ti->first);
             ti->second->signal_callback(sending_rejected_by_peer);
             continue;
         }
         filetransfer_node* tmp_ftnode = ti->second;
-        if (!tmp_ftnode->is_ready_to_send()) {
+        if (!tmp_ftnode->is_ready_to_send())
+        {
             continue;
         }
 
@@ -85,10 +85,11 @@ void server_site::update_transfer()
         NET_Packet tmp_packet;
         tmp_packet.w_begin(M_FILE_TRANSFER);
         tmp_packet.w_u8(receive_data);
-        tmp_packet.w_u32(ti->first.second.value());  // src
+        tmp_packet.w_u32(ti->first.second.value()); // src
         bool complete = tmp_ftnode->make_data_packet(tmp_packet);
         Level().Server->SendTo(tmp_client->ID, tmp_packet, net_flags(TRUE, TRUE, TRUE));
-        if (complete) {
+        if (complete)
+        {
             tmp_ftnode->signal_callback(sending_complete);
             to_stop_transfers.push_back(ti->first);
         }
@@ -108,13 +109,15 @@ void server_site::on_message(NET_Packet* packet, ClientID const& sender)
     case receive_data:
     {
         receiving_sessions_t::iterator temp_iter = m_receivers.find(sender);
-        if (temp_iter == m_receivers.end()) {
+        if (temp_iter == m_receivers.end())
+        {
             NET_Packet reject_packet;
             make_reject_packet(reject_packet, ClientID(0));
             Level().Server->SendTo(sender, reject_packet, net_flags(TRUE, TRUE, TRUE));
             break;
         }
-        if (temp_iter->second->receive_packet(*packet)) {
+        if (temp_iter->second->receive_packet(*packet))
+        {
             temp_iter->second->signal_callback(receiving_complete);
             stop_receive_file(temp_iter->first);
         }
@@ -128,7 +131,8 @@ void server_site::on_message(NET_Packet* packet, ClientID const& sender)
     {
         // ignoring ClientID(0) source client
         receiving_sessions_t::iterator temp_iter = m_receivers.find(sender);
-        if (temp_iter != m_receivers.end()) {
+        if (temp_iter != m_receivers.end())
+        {
             temp_iter->second->signal_callback(receiving_aborted_by_peer);
             stop_receive_file(sender);
         }
@@ -137,7 +141,8 @@ void server_site::on_message(NET_Packet* packet, ClientID const& sender)
     case receive_rejected:
     {
         transfer_sessions_t::iterator temp_iter = m_transfers.find(std::make_pair(sender, ClientID(packet->r_u32())));
-        if (temp_iter != m_transfers.end()) {
+        if (temp_iter != m_transfers.end())
+        {
             temp_iter->second->signal_callback(sending_rejected_by_peer);
             stop_transfer_file(temp_iter->first);
         }
@@ -153,8 +158,10 @@ void server_site::stop_obsolete_receivers()
 
     for (receiving_sessions_t::iterator i = m_receivers.begin(), ie = m_receivers.end(); i != ie; ++i)
     {
-        if (!i->second->get_downloaded_size()) {
-            if (!i->second->get_last_read_time()) {
+        if (!i->second->get_downloaded_size())
+        {
+            if (!i->second->get_last_read_time())
+            {
                 i->second->set_last_read_time(current_time);
             }
             else if ((current_time - i->second->get_last_read_time()) > MAX_START_WAIT_TIME)
@@ -165,7 +172,8 @@ void server_site::stop_obsolete_receivers()
         }
         else
         {
-            if ((current_time - i->second->get_last_read_time()) > MAX_FT_WAIT_TIME) {
+            if ((current_time - i->second->get_last_read_time()) > MAX_FT_WAIT_TIME)
+            {
                 i->second->signal_callback(receiving_timeout);
                 to_stop_receivers.push_back(i->first);
             }
@@ -177,14 +185,16 @@ void server_site::stop_obsolete_receivers()
 void server_site::start_transfer_file(shared_str const& file_name, ClientID const& to_client,
     ClientID const& from_client, sending_state_callback_t& tstate_callback)
 {
-    if (is_transfer_active(to_client, from_client)) {
+    if (is_transfer_active(to_client, from_client))
+    {
         Msg("! ERROR: SV: transfering file to client [%d] already active.", to_client);
         return;
     }
     filetransfer_node* ftnode = new filetransfer_node(file_name, data_max_chunk_size, tstate_callback);
     dst_src_pair_t tkey = std::make_pair(to_client, from_client);
     m_transfers.insert(std::make_pair(tkey, ftnode));
-    if (!ftnode->opened()) {
+    if (!ftnode->opened())
+    {
         Msg("! ERROR: SV: failed to open file [%s]", file_name.c_str());
         stop_transfer_file(tkey);
     }
@@ -193,7 +203,8 @@ void server_site::start_transfer_file(shared_str const& file_name, ClientID cons
 void server_site::start_transfer_file(CMemoryWriter& mem_writer, u32 mem_writer_max_size, ClientID const& to_client,
     ClientID const& from_client, sending_state_callback_t& tstate_callback, u32 const user_param)
 {
-    if (is_transfer_active(to_client, from_client)) {
+    if (is_transfer_active(to_client, from_client))
+    {
         Msg("! ERROR: SV: transfering file to client [%d] already active.", to_client);
         return;
     }
@@ -205,7 +216,8 @@ void server_site::start_transfer_file(CMemoryWriter& mem_writer, u32 mem_writer_
 void server_site::start_transfer_file(u8* data_ptr, u32 const data_size, ClientID const& to_client,
     ClientID const& from_client, sending_state_callback_t& tstate_callback, u32 const user_param)
 {
-    if (is_transfer_active(to_client, from_client)) {
+    if (is_transfer_active(to_client, from_client))
+    {
         Msg("! ERROR: SV: transfering file to client [%d] already active.", to_client);
         return;
     }
@@ -216,7 +228,8 @@ void server_site::start_transfer_file(u8* data_ptr, u32 const data_size, ClientI
 void server_site::start_transfer_file(buffer_vector<mutable_buffer_t>& vector_of_buffers, ClientID const& to_client,
     ClientID const& from_client, sending_state_callback_t& tstate_callback, u32 const user_param)
 {
-    if (is_transfer_active(to_client, from_client)) {
+    if (is_transfer_active(to_client, from_client))
+    {
         Msg("! ERROR: SV: transfering file to client [%d] already active.", to_client);
         return;
     }
@@ -228,14 +241,17 @@ void server_site::start_transfer_file(buffer_vector<mutable_buffer_t>& vector_of
 void server_site::stop_transfer_file(dst_src_pair_t const& tkey)
 {
     transfer_sessions_t::iterator temp_iter = m_transfers.find(tkey);
-    if (temp_iter == m_transfers.end()) {
+    if (temp_iter == m_transfers.end())
+    {
         Msg("! ERROR: SV: no file transfer for client [%d] found from client [%d].", tkey.first, tkey.second);
         return;
     }
-    if (!temp_iter->second->is_complete()) {
+    if (!temp_iter->second->is_complete())
+    {
         NET_Packet abort_packet;
         make_abort_packet(abort_packet, tkey.second);
-        if (Level().Server->GetClientByID(tkey.first)) {
+        if (Level().Server->GetClientByID(tkey.first))
+        {
             Level().Server->SendTo(tkey.first, abort_packet, net_flags(TRUE, TRUE, TRUE));
         }
     }
@@ -247,13 +263,15 @@ filereceiver_node* server_site::start_receive_file(
     shared_str const& file_name, ClientID const& from_client, receiving_state_callback_t& rstate_callback)
 {
     receiving_sessions_t::iterator temp_iter = m_receivers.find(from_client);
-    if (temp_iter != m_receivers.end()) {
+    if (temp_iter != m_receivers.end())
+    {
         Msg("! ERROR: SV: file already receiving from client [%d]", from_client);
         return NULL;
     }
     filereceiver_node* frnode = new filereceiver_node(file_name, rstate_callback);
     m_receivers.insert(std::make_pair(from_client, frnode));
-    if (!frnode->get_writer()) {
+    if (!frnode->get_writer())
+    {
         Msg("! ERROR: SV: failed to create file [%s]", file_name.c_str());
         stop_receive_file(from_client);
         return NULL;
@@ -265,7 +283,8 @@ filereceiver_node* server_site::start_receive_file(
     CMemoryWriter& mem_writer, ClientID const& from_client, receiving_state_callback_t& rstate_callback)
 {
     receiving_sessions_t::iterator temp_iter = m_receivers.find(from_client);
-    if (temp_iter != m_receivers.end()) {
+    if (temp_iter != m_receivers.end())
+    {
         Msg("! ERROR: SV: file already receiving from client [%d]", from_client);
         return NULL;
     }
@@ -277,11 +296,13 @@ filereceiver_node* server_site::start_receive_file(
 void server_site::stop_receive_file(ClientID const& from_client)
 {
     receiving_sessions_t::iterator temp_iter = m_receivers.find(from_client);
-    if (temp_iter == m_receivers.end()) {
+    if (temp_iter == m_receivers.end())
+    {
         Msg("! ERROR: SV: no file receiving from client [%u] found", from_client);
         return;
     }
-    if (!temp_iter->second->is_complete()) {
+    if (!temp_iter->second->is_complete())
+    {
         NET_Packet reject_packet;
         make_reject_packet(reject_packet, ClientID(0));
         Level().Server->SendTo(from_client, reject_packet, net_flags(TRUE, TRUE, TRUE));
@@ -293,13 +314,15 @@ void server_site::stop_receive_file(ClientID const& from_client)
 bool server_site::is_transfer_active(ClientID const& to_client, ClientID const& from_client) const
 {
     transfer_sessions_t::const_iterator temp_iter = m_transfers.find(std::make_pair(to_client, from_client));
-    if (temp_iter == m_transfers.end()) return false;
+    if (temp_iter == m_transfers.end())
+        return false;
     return true;
 }
 bool server_site::is_receiving_active(ClientID const& from_client) const
 {
     receiving_sessions_t::const_iterator temp_iter = m_receivers.find(from_client);
-    if (temp_iter == m_receivers.end()) return false;
+    if (temp_iter == m_receivers.end())
+        return false;
     return true;
 }
 
@@ -326,11 +349,13 @@ client_site::~client_site()
 
 void client_site::update_transfer()
 {
-    if (is_transfer_active() && m_transfering->is_ready_to_send()) {
+    if (is_transfer_active() && m_transfering->is_ready_to_send())
+    {
         IClientStatistic& peer_stats = Level().GetStatistic();
         m_transfering->calculate_chunk_size(peer_stats.getPeakBPS(), peer_stats.getBPS());
 #ifdef DEBUG
-        if (psDeviceFlags.test(rsStatistic)) {
+        if (psDeviceFlags.test(rsStatistic))
+        {
             dbg_update_statgraph();
         }
         else
@@ -343,7 +368,8 @@ void client_site::update_transfer()
         tmp_packet.w_u8(receive_data);
         bool complete = m_transfering->make_data_packet(tmp_packet);
         Level().Send(tmp_packet, net_flags(TRUE, TRUE, TRUE));
-        if (complete) {
+        if (complete)
+        {
             m_transfering->signal_callback(sending_complete);
             stop_transfer_file();
         }
@@ -362,8 +388,10 @@ void client_site::on_message(NET_Packet* packet)
     case receive_data:
     {
         receiving_sessions_t::iterator tmp_iter = m_receivers.find(from_client);
-        if (tmp_iter != m_receivers.end()) {
-            if (tmp_iter->second->receive_packet(*packet)) {
+        if (tmp_iter != m_receivers.end())
+        {
+            if (tmp_iter->second->receive_packet(*packet))
+            {
                 tmp_iter->second->signal_callback(receiving_complete);
                 stop_receive_file(from_client);
             }
@@ -381,7 +409,8 @@ void client_site::on_message(NET_Packet* packet)
     case abort_receive:
     {
         receiving_sessions_t::iterator tmp_iter = m_receivers.find(from_client);
-        if (tmp_iter != m_receivers.end()) {
+        if (tmp_iter != m_receivers.end())
+        {
             tmp_iter->second->signal_callback(receiving_aborted_by_peer);
             stop_receive_file(from_client);
         }
@@ -394,7 +423,8 @@ void client_site::on_message(NET_Packet* packet)
     case receive_rejected:
     {
         // ignoring from_client u32
-        if (is_transfer_active()) {
+        if (is_transfer_active())
+        {
             m_transfering->signal_callback(sending_rejected_by_peer);
             stop_transfer_file();
         }
@@ -409,12 +439,14 @@ void client_site::on_message(NET_Packet* packet)
 
 void client_site::start_transfer_file(shared_str const& file_name, sending_state_callback_t& tstate_callback)
 {
-    if (is_transfer_active()) {
+    if (is_transfer_active())
+    {
         Msg("! ERROR: CL: transfering file already active.");
         return;
     }
     m_transfering = new filetransfer_node(file_name, data_min_chunk_size, tstate_callback);
-    if (!m_transfering->opened()) {
+    if (!m_transfering->opened())
+    {
         Msg("! ERROR: CL: failed to open file [%s]", file_name.c_str());
         stop_transfer_file();
     }
@@ -422,11 +454,13 @@ void client_site::start_transfer_file(shared_str const& file_name, sending_state
 void client_site::start_transfer_file(
     u8* data, u32 size, sending_state_callback_t& tstate_callback, u32 size_to_allocate)
 {
-    if (is_transfer_active()) {
+    if (is_transfer_active())
+    {
         Msg("! ERROR: CL: transfering file already active.");
         return;
     }
-    if (!size || !data) {
+    if (!size || !data)
+    {
         Msg("! ERROR: CL: no data to transfer ...");
         return;
     }
@@ -435,9 +469,11 @@ void client_site::start_transfer_file(
 
 void client_site::stop_transfer_file()
 {
-    if (!is_transfer_active()) return;
+    if (!is_transfer_active())
+        return;
 
-    if (!m_transfering->is_complete()) {
+    if (!m_transfering->is_complete())
+    {
         NET_Packet abort_packet;
         make_abort_packet(abort_packet, ClientID(0));
         Level().Send(abort_packet, net_flags(TRUE, TRUE, TRUE));
@@ -448,13 +484,15 @@ void client_site::stop_transfer_file()
 filereceiver_node* client_site::start_receive_file(
     shared_str const& file_name, ClientID const& from_client, receiving_state_callback_t& rstate_callback)
 {
-    if (is_receiving_active(from_client)) {
+    if (is_receiving_active(from_client))
+    {
         Msg("! ERROR: CL: file already receiving from client [%d]", from_client);
         return NULL;
     }
     filereceiver_node* frnode = new filereceiver_node(file_name, rstate_callback);
     m_receivers.insert(std::make_pair(from_client, frnode));
-    if (!frnode->get_writer()) {
+    if (!frnode->get_writer())
+    {
         Msg("! ERROR: CL: failed to create file [%s]", file_name.c_str());
         stop_receive_file(from_client);
         return NULL;
@@ -465,7 +503,8 @@ filereceiver_node* client_site::start_receive_file(
 filereceiver_node* client_site::start_receive_file(
     CMemoryWriter& mem_writer, ClientID const& from_client, receiving_state_callback_t& rstate_callback)
 {
-    if (is_receiving_active(from_client)) {
+    if (is_receiving_active(from_client))
+    {
         Msg("! ERROR: CL: file already receiving from client [%d]", from_client);
         return NULL;
     }
@@ -478,11 +517,13 @@ filereceiver_node* client_site::start_receive_file(
 void client_site::stop_receive_file(ClientID const& from_client)
 {
     receiving_sessions_t::iterator temp_iter = m_receivers.find(from_client);
-    if (temp_iter == m_receivers.end()) {
+    if (temp_iter == m_receivers.end())
+    {
         Msg("! ERROR: CL: no file receiving from client [%u] found", from_client);
         return;
     }
-    if (!temp_iter->second->is_complete()) {
+    if (!temp_iter->second->is_complete())
+    {
         NET_Packet reject_packet;
         make_reject_packet(reject_packet, from_client);
         Level().Send(reject_packet, net_flags(TRUE, TRUE, TRUE));
@@ -506,8 +547,10 @@ void client_site::stop_obsolete_receivers()
 
     for (receiving_sessions_t::iterator i = m_receivers.begin(), ie = m_receivers.end(); i != ie; ++i)
     {
-        if (!i->second->get_downloaded_size()) {
-            if (!i->second->get_last_read_time()) {
+        if (!i->second->get_downloaded_size())
+        {
+            if (!i->second->get_last_read_time())
+            {
                 i->second->set_last_read_time(current_time);
             }
             else if ((current_time - i->second->get_last_read_time()) > MAX_START_WAIT_TIME)
@@ -518,7 +561,8 @@ void client_site::stop_obsolete_receivers()
         }
         else
         {
-            if ((current_time - i->second->get_last_read_time()) > MAX_FT_WAIT_TIME) {
+            if ((current_time - i->second->get_last_read_time()) > MAX_FT_WAIT_TIME)
+            {
                 i->second->signal_callback(receiving_timeout);
                 to_stop_receivers.push_back(i->first);
             }
@@ -545,20 +589,23 @@ void client_site::dbg_init_statgraph()
 }
 void client_site::dbg_deinit_statgraph()
 {
-    if (m_stat_graph) {
+    if (m_stat_graph)
+    {
         xr_delete(m_stat_graph);
     }
 }
 
 void client_site::dbg_update_statgraph()
 {
-    if (!m_stat_graph) {
+    if (!m_stat_graph)
+    {
         dbg_init_statgraph();
     }
-    if (m_transfering) {
+    if (m_transfering)
+    {
         m_stat_graph->AppendItem(float(m_transfering->get_chunk_size()), 0xff00ff00, 0);
     }
 }
 #endif
 
-}  // namespace file_transfer
+} // namespace file_transfer

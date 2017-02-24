@@ -68,9 +68,7 @@ struct UVpoint
         v /= m;
     }
     IC float dist(UVpoint& p) { return _sqrt((u - p.u) * (u - p.u) + (v - p.v) * (v - p.v)); }
-
     IC BOOL similar(UVpoint& p, float eu, float ev) { return _abs(u - p.u) < eu && _abs(v - p.v) < ev; }
-
     // average arithmetic
     IC void averageA(UVpoint& p1, UVpoint& p2)
     {

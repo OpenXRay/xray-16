@@ -26,9 +26,7 @@ CMaterialManager::CMaterialManager(IGameObject* object, CPHMovementControl* move
     m_run_mode = false;
 }
 
-CMaterialManager::~CMaterialManager()
-{
-}
+CMaterialManager::~CMaterialManager() {}
 #ifdef DEBUG
 BOOL debug_character_material_load = FALSE;
 #endif
@@ -40,9 +38,11 @@ void CMaterialManager::Load(LPCSTR section)
     m_my_material_idx = GMLib.GetMaterialIdx(pSettings->r_string(section, "material"));
 
 #ifdef DEBUG
-    if (debug_character_material_load) {
+    if (debug_character_material_load)
+    {
         CEntityAlive* entity_alive = smart_cast<CEntityAlive*>(m_object);
-        if (entity_alive) {
+        if (entity_alive)
+        {
             VERIFY(GAMEMTL_NONE_IDX != m_my_material_idx);
             SGameMtl* m = GMLib.GetMaterialByIdx(m_my_material_idx);
 
@@ -61,7 +61,8 @@ void CMaterialManager::reinit()
     m_run_mode = false;
 
     CEntityAlive* entity_alive = smart_cast<CEntityAlive*>(m_object);
-    if (entity_alive) {
+    if (entity_alive)
+    {
         // VERIFY( entity_alive->character_physics_support()->movement()->CharacterExist() );
         entity_alive->character_physics_support()->movement()->SetPLastMaterialIDX(&m_last_material_idx);
 
@@ -72,7 +73,8 @@ void CMaterialManager::reinit()
 
         entity_alive->character_physics_support()->movement()->SetMaterial(m_my_material_idx);
 #ifdef DEBUG
-        if (debug_character_material_load) {
+        if (debug_character_material_load)
+        {
             VERIFY(GAMEMTL_NONE_IDX != m_my_material_idx);
             SGameMtl* m = GMLib.GetMaterialByIdx(m_my_material_idx);
             VERIFY(m);
@@ -83,10 +85,7 @@ void CMaterialManager::reinit()
     }
 }
 
-void CMaterialManager::reload(LPCSTR section)
-{
-}
-
+void CMaterialManager::reload(LPCSTR section) {}
 void CMaterialManager::update(float time_delta, float volume, float step_time, bool standing)
 {
     VERIFY(GAMEMTL_NONE_IDX != m_my_material_idx);
@@ -94,18 +93,23 @@ void CMaterialManager::update(float time_delta, float volume, float step_time, b
     SGameMtlPair* mtl_pair = GMLib.GetMaterialPairByIndices(m_my_material_idx, m_last_material_idx);
     VERIFY3(mtl_pair, "Undefined material pair: ", *GMLib.GetMaterialByIdx(m_last_material_idx)->m_Name);
     Fvector position = m_object->Position();
-    if (m_movement_control->CharacterExist()) {
+    if (m_movement_control->CharacterExist())
+    {
         position.y += m_movement_control->FootRadius();
     }
 
     // ref_sound step
-    if (!standing) {
-        if (m_time_to_step < 0) {
+    if (!standing)
+    {
+        if (m_time_to_step < 0)
+        {
             SoundVec& snd_array = mtl_pair->StepSounds;
 
-            if (m_run_mode && mtl_pair->BreakingSounds.size() > 0) snd_array = mtl_pair->BreakingSounds;
+            if (m_run_mode && mtl_pair->BreakingSounds.size() > 0)
+                snd_array = mtl_pair->BreakingSounds;
 
-            if (snd_array.size() > 0) {
+            if (snd_array.size() > 0)
+            {
                 m_step_id = ::Random.randI(0, snd_array.size());
                 m_time_to_step = step_time;
 
@@ -119,13 +123,11 @@ void CMaterialManager::update(float time_delta, float volume, float step_time, b
         m_time_to_step = 0;
 
     for (int i = 0; i < 4; i++)
-        if (m_step_sound[i]._feedback()) {
+        if (m_step_sound[i]._feedback())
+        {
             m_step_sound[i].set_position(position);
             m_step_sound[i].set_volume(1.f * volume);
         }
 }
 
-void CMaterialManager::set_run_mode(bool run_mode)
-{
-    m_run_mode = run_mode;
-}
+void CMaterialManager::set_run_mode(bool run_mode) { m_run_mode = run_mode; }

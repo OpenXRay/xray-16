@@ -20,10 +20,7 @@ using editor::property_holder;
 using editor::property_holder_collection;
 using editor::environment::suns::manager;
 
-gradient::gradient() : m_use(false), m_opacity(.0f), m_radius(.0f), m_shader(""), m_texture("")
-{
-}
-
+gradient::gradient() : m_use(false), m_opacity(.0f), m_radius(.0f), m_shader(""), m_texture("") {}
 void gradient::load(CInifile& config, shared_str const& section)
 {
     m_use = !!READ_IF_EXISTS(&config, r_bool, section, "gradient", true);
@@ -33,14 +30,11 @@ void gradient::load(CInifile& config, shared_str const& section)
     m_texture = READ_IF_EXISTS(&config, r_string, section, "gradient_texture", "fx\\fx_gradient.tga");
 }
 
-bool gradient::use_getter()
-{
-    return (m_use);
-}
-
+bool gradient::use_getter() { return (m_use); }
 void gradient::use_setter(bool value)
 {
-    if (m_use == value) return;
+    if (m_use == value)
+        return;
 
     m_use = value;
     // m_property_holder->clear();
@@ -75,4 +69,4 @@ void gradient::fill(manager const& manager, property_holder* holder, property_ho
         "Select texture...", editor::property_holder::cannot_enter_text, editor::property_holder::remove_extension);
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

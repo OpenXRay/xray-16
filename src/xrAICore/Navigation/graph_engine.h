@@ -25,10 +25,7 @@
 
 namespace hash_fixed_vertex_manager
 {
-inline u32 to_u32(const GraphEngineSpace::CWorldState& other)
-{
-    return other.hash_value();
-}
+inline u32 to_u32(const GraphEngineSpace::CWorldState& other) { return other.hash_value(); }
 }
 
 using namespace GraphEngineSpace;
@@ -68,7 +65,7 @@ public:
     using StringAlgorithmDistance = float;
     using CStringAlgorithm = CAStar<StringAlgorithmDistance, CStringPriorityQueue, CStringVertexManager,
         CStringVertexAllocator, true, StringAlgorithmStorage>;
-#endif  // AI_COMPILER
+#endif // AI_COMPILER
 
     CAlgorithm* m_algorithm;
 

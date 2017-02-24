@@ -19,4 +19,4 @@ private:
     ref_geom hGeom_gradient;
 };
 
-#endif  //	ThunderboltRender_included
+#endif //	ThunderboltRender_included

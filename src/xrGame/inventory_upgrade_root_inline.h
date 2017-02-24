@@ -13,12 +13,8 @@ namespace inventory
 {
 namespace upgrade
 {
-IC LPCSTR Root::scheme() const
-{
-    return m_upgrade_scheme.c_str();
-}
+IC LPCSTR Root::scheme() const { return m_upgrade_scheme.c_str(); }
+} // namespace upgrade
+} // namespace inventory
 
-}  // namespace upgrade
-}  // namespace inventory
-
-#endif  // INVENTORY_UPGRADE_ROOT_INLINE_H_INCLUDED
+#endif // INVENTORY_UPGRADE_ROOT_INLINE_H_INCLUDED

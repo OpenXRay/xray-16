@@ -79,13 +79,13 @@ class IRender_Light;
 class SpatialData
 {
 public:
-    u32 type = 0;  // STYPE_
+    u32 type = 0; // STYPE_
     Fsphere sphere;
-    Fvector node_center;      // Cached node center for TBV optimization
-    float node_radius;        // Cached node bounds for TBV optimization
-    ISpatial_NODE* node_ptr;  // Cached parent node for "empty-members" optimization
+    Fvector node_center; // Cached node center for TBV optimization
+    float node_radius; // Cached node bounds for TBV optimization
+    ISpatial_NODE* node_ptr; // Cached parent node for "empty-members" optimization
     IRender_Sector* sector;
-    ISpatial_DB* space;  // allow different spaces
+    ISpatial_DB* space; // allow different spaces
 };
 
 class ISpatial
@@ -105,10 +105,7 @@ public:
     virtual IRender_Light* dcast_Light() = 0;
 };
 
-inline ISpatial::~ISpatial()
-{
-}
-
+inline ISpatial::~ISpatial() {}
 class XRCDB_API SpatialBase : public virtual ISpatial
 {
 public:
@@ -127,7 +124,8 @@ public:
     virtual Fvector spatial_sector_point() override { return spatial.sphere.P; }
     virtual void spatial_updatesector() override final
     {
-        if (0 == (spatial.type & STYPEFLAG_INVALIDSECTOR)) return;
+        if (0 == (spatial.type & STYPEFLAG_INVALIDSECTOR))
+            return;
         spatial_updatesector_internal();
     }
 
@@ -135,7 +133,6 @@ public:
     virtual Feel::Sound* dcast_FeelSound() override { return 0; }
     virtual IRenderable* dcast_Renderable() override { return 0; }
     virtual IRender_Light* dcast_Light() override { return 0; }
-
     SpatialBase(ISpatial_DB* space);
     virtual ~SpatialBase();
 };
@@ -148,9 +145,9 @@ public:
     typedef _W64 unsigned ptrt;
 
 public:
-    ISpatial_NODE* parent;       // parent node for "empty-members" optimization
-    ISpatial_NODE* children[8];  // children nodes
-    xr_vector<ISpatial*> items;  // own items
+    ISpatial_NODE* parent; // parent node for "empty-members" optimization
+    ISpatial_NODE* children[8]; // children nodes
+    xr_vector<ISpatial*> items; // own items
 public:
     void _init(ISpatial_NODE* _parent);
     void _remove(ISpatial* _S);
@@ -158,8 +155,8 @@ public:
     BOOL _empty()
     {
         return items.empty() &&
-               (0 == (ptrt(children[0]) | ptrt(children[1]) | ptrt(children[2]) | ptrt(children[3]) |
-                         ptrt(children[4]) | ptrt(children[5]) | ptrt(children[6]) | ptrt(children[7])));
+            (0 == (ptrt(children[0]) | ptrt(children[1]) | ptrt(children[2]) | ptrt(children[3]) | ptrt(children[4]) |
+                      ptrt(children[5]) | ptrt(children[6]) | ptrt(children[7])));
     }
 };
 ////////////
@@ -168,7 +165,7 @@ public:
 // class	poolSS;
 #ifndef DLL_API
 #define DLL_API XR_IMPORT
-#endif  // #ifndef	DLL_API
+#endif // #ifndef	DLL_API
 
 //////////////////////////////////////////////////////////////////////////
 class XRCDB_API ISpatial_DB
@@ -179,8 +176,8 @@ public:
         u32 NodeCount;
         u32 ObjectCount;
 #ifdef DEBUG
-        CStatTimer Insert;  // debug only
-        CStatTimer Remove;  // debug only
+        CStatTimer Insert; // debug only
+        CStatTimer Remove; // debug only
 #endif
         CStatTimer Query;
 
@@ -232,9 +229,12 @@ private:
     IC u32 _octant(Fvector& base, Fvector& rel)
     {
         u32 o = 0;
-        if (rel.x > base.x) o += 1;
-        if (rel.y > base.y) o += 2;
-        if (rel.z > base.z) o += 4;
+        if (rel.x > base.x)
+            o += 1;
+        if (rel.y > base.y)
+            o += 2;
+        if (rel.z > base.z)
+            o += 4;
         return o;
     }
 
@@ -278,4 +278,4 @@ XRCDB_API extern ISpatial_DB* g_SpatialSpacePhysic;
 
 #pragma pack(pop)
 
-#endif  // #ifndef XRENGINE_ISPATIAL_H_INCLUDED
+#endif // #ifndef XRENGINE_ISPATIAL_H_INCLUDED

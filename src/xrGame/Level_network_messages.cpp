@@ -21,13 +21,15 @@ extern LPCSTR map_ver_string;
 LPSTR remove_version_option(LPCSTR opt_str, LPSTR new_opt_str, u32 new_opt_str_size)
 {
     LPCSTR temp_substr = strstr(opt_str, map_ver_string);
-    if (!temp_substr) {
+    if (!temp_substr)
+    {
         xr_strcpy(new_opt_str, new_opt_str_size, opt_str);
         return new_opt_str;
     }
     strncpy_s(new_opt_str, new_opt_str_size, opt_str, static_cast<size_t>(temp_substr - opt_str - 1));
     temp_substr = strchr(temp_substr, '/');
-    if (!temp_substr) return new_opt_str;
+    if (!temp_substr)
+        return new_opt_str;
 
     xr_strcat(new_opt_str, new_opt_str_size, temp_substr);
     return new_opt_str;
@@ -40,9 +42,11 @@ static bool SimmulateNetworkLag()
 {
     static u32 max_lag_time = 0;
 
-    if (!lag_simmulator_max_ping && !lag_simmulator_min_ping) return false;
+    if (!lag_simmulator_max_ping && !lag_simmulator_min_ping)
+        return false;
 
-    if (!max_lag_time || (max_lag_time <= Device.dwTimeGlobal)) {
+    if (!max_lag_time || (max_lag_time <= Device.dwTimeGlobal))
+    {
         CRandom tmp_random(Device.dwTimeGlobal);
         max_lag_time = Device.dwTimeGlobal + tmp_random.randI(lag_simmulator_min_ping, lag_simmulator_max_ping);
         return false;
@@ -56,16 +60,19 @@ void CLevel::ClientReceive()
     m_dwRPC = 0;
     m_dwRPS = 0;
 
-    if (IsDemoPlayStarted()) {
+    if (IsDemoPlayStarted())
+    {
         SimulateServerUpdate();
     }
 #ifdef DEBUG
-    if (SimmulateNetworkLag()) return;
+    if (SimmulateNetworkLag())
+        return;
 #endif
     StartProcessQueue();
     for (NET_Packet* P = net_msg_Retreive(); P; P = net_msg_Retreive())
     {
-        if (IsDemoSaveStarted()) {
+        if (IsDemoSaveStarted())
+        {
             SavePacket(*P);
         }
         //-----------------------------------------------------
@@ -79,7 +86,7 @@ void CLevel::ClientReceive()
         {
         case M_SPAWN:
         {
-            if (!bReady)  //! m_bGameConfigStarted ||
+            if (!bReady) //! m_bGameConfigStarted ||
             {
                 Msg("! Unconventional M_SPAWN received : map_data[%s] | bReady[%s] | deny_m_spawn[%s]",
                     (map_data.m_map_sync_received) ? "true" : "false", (bReady) ? "true" : "false",
@@ -91,7 +98,8 @@ void CLevel::ClientReceive()
             /*/
             // Msg("--- Client received M_SPAWN message...");
             game_events->insert(*P);
-            if (g_bDebugEvents) ProcessGameEvents();
+            if (g_bDebugEvents)
+                ProcessGameEvents();
             //*/
         }
         break;
@@ -103,7 +111,8 @@ void CLevel::ClientReceive()
             }*/
             // Msg("Client received M_EVENT message...");
             game_events->insert(*P);
-            if (g_bDebugEvents) ProcessGameEvents();
+            if (g_bDebugEvents)
+                ProcessGameEvents();
             break;
         case M_EVENT_PACK:
         {
@@ -120,7 +129,8 @@ void CLevel::ClientReceive()
                 tmpP.timeReceive = P->timeReceive;
 
                 game_events->insert(tmpP);
-                if (g_bDebugEvents) ProcessGameEvents();
+                if (g_bDebugEvents)
+                    ProcessGameEvents();
             };
         }
         break;
@@ -131,11 +141,13 @@ void CLevel::ClientReceive()
         {
             Objects.net_Import(P);
 
-            if (OnClient()) UpdateDeltaUpd(timeServer());
+            if (OnClient())
+                UpdateDeltaUpd(timeServer());
             IClientStatistic pStat = Level().GetStatistic();
             u32 dTime = 0;
 
-            if ((Level().timeServer() + pStat.getPing()) < P->timeReceive) {
+            if ((Level().timeServer() + pStat.getPing()) < P->timeReceive)
+            {
                 dTime = pStat.getPing();
             }
             else
@@ -158,19 +170,24 @@ void CLevel::ClientReceive()
                 Msg("! WARNING: ignoring game event [%d] - game not configured...", m_type);
                 break;
             }*/
-            if (OnClient()) break;
+            if (OnClient())
+                break;
             P->r_u16(ID);
             u32 Ping = P->r_u32();
             CGameObject* O = smart_cast<CGameObject*>(Objects.net_Find(ID));
-            if (0 == O) break;
+            if (0 == O)
+                break;
             O->net_Import(*P);
             //---------------------------------------------------
             UpdateDeltaUpd(timeServer());
-            if (pObjects4CrPr.empty() && pActors4CrPr.empty()) break;
-            if (!smart_cast<CActor*>(O)) break;
+            if (pObjects4CrPr.empty() && pActors4CrPr.empty())
+                break;
+            if (!smart_cast<CActor*>(O))
+                break;
 
             u32 dTime = 0;
-            if ((Level().timeServer() + Ping) < P->timeReceive) {
+            if ((Level().timeServer() + Ping) < P->timeReceive)
+            {
 #ifdef DEBUG
 //					Msg("! TimeServer[%d] < TimeReceive[%d]", Level().timeServer(), P->timeReceive);
 #endif
@@ -193,7 +210,8 @@ void CLevel::ClientReceive()
                 break;
             }*/
             game_events->insert(*P);
-            if (g_bDebugEvents) ProcessGameEvents();
+            if (g_bDebugEvents)
+                ProcessGameEvents();
         }
         break;
         // [08.11.07] Alexander Maniluk: added new message handler for moving artefacts.
@@ -211,7 +229,8 @@ void CLevel::ClientReceive()
                 Fvector NewPos;
                 P->r_vec3(NewPos);
                 CArtefact* OArtefact = smart_cast<CArtefact*>(Objects.net_Find(ID));
-                if (!OArtefact) break;
+                if (!OArtefact)
+                    break;
                 OArtefact->MoveTo(NewPos);
                 // destroy_physics_shell(OArtefact->PPhysicsShell());
             };
@@ -230,7 +249,8 @@ void CLevel::ClientReceive()
             }*/
             P->r_u16(ID);
             IGameObject* O = Objects.net_Find(ID);
-            if (0 == O) break;
+            if (0 == O)
+                break;
             O->net_ImportInput(*P);
         }
         break;
@@ -240,18 +260,19 @@ void CLevel::ClientReceive()
         case M_SV_CONFIG_FINISHED: { game_configured = TRUE;
 #ifdef DEBUG
             Msg("- Game configuring : Finished ");
-#endif  // #ifdef DEBUG
-            if (IsDemoPlayStarted() && !m_current_spectator) {
+#endif // #ifdef DEBUG
+            if (IsDemoPlayStarted() && !m_current_spectator)
+            {
                 SpawnDemoSpectator();
             }
         }
         break;
-        case M_MIGRATE_DEACTIVATE:  // TO:   Changing server, just deactivate
+        case M_MIGRATE_DEACTIVATE: // TO:   Changing server, just deactivate
         {
             NODEFAULT;
         }
         break;
-        case M_MIGRATE_ACTIVATE:  // TO:   Changing server, full state
+        case M_MIGRATE_ACTIVATE: // TO:   Changing server, full state
         {
             NODEFAULT;
         }
@@ -275,9 +296,11 @@ void CLevel::ClientReceive()
                 Msg("! WARNING: ignoring game event [%d] - game not configured...", m_type);
                 break;
             }*/
-            if (!game) break;
+            if (!game)
+                break;
             game_events->insert(*P);
-            if (g_bDebugEvents) ProcessGameEvents();
+            if (g_bDebugEvents)
+                ProcessGameEvents();
         }
         break;
         case M_RELOAD_GAME:
@@ -285,13 +308,16 @@ void CLevel::ClientReceive()
         case M_CHANGE_LEVEL: {
 #ifdef DEBUG
             Msg("--- Changing level message received...");
-#endif  // #ifdef DEBUG
-            if (m_type == M_LOAD_GAME) {
+#endif // #ifdef DEBUG
+            if (m_type == M_LOAD_GAME)
+            {
                 string256 saved_name;
                 P->r_stringZ_s(saved_name);
-                if (xr_strlen(saved_name) && ai().get_alife()) {
+                if (xr_strlen(saved_name) && ai().get_alife())
+                {
                     CSavedGameWrapper wrapper(saved_name);
-                    if (wrapper.level_id() == ai().level_graph().level_id()) {
+                    if (wrapper.level_id() == ai().level_graph().level_id())
+                    {
                         Engine.Event.Defer("Game:QuickLoad", size_t(xr_strdup(saved_name)), 0);
 
                         break;
@@ -323,13 +349,15 @@ void CLevel::ClientReceive()
                 Msg("! WARNING: ignoring game event [%d] - game not configured...", m_type);
                 break;
             }*/
-            if (!game) break;
+            if (!game)
+                break;
             Game().OnChatMessage(P);
         }
         break;
         case M_CLIENT_WARN:
         {
-            if (!game) break;
+            if (!game)
+                break;
             Game().OnWarnMessage(P);
         }
         break;
@@ -347,7 +375,8 @@ void CLevel::ClientReceive()
         {
             Msg("- M_CHANGE_LEVEL_GAME Received");
 
-            if (OnClient()) {
+            if (OnClient())
+            {
                 MakeReconnect();
             }
             else
@@ -356,7 +385,8 @@ void CLevel::ClientReceive()
                 //					const char* m_CO = m_caClientOptions.c_str();
 
                 m_SO = strchr(m_SO, '/');
-                if (m_SO) m_SO++;
+                if (m_SO)
+                    m_SO++;
                 m_SO = strchr(m_SO, '/');
 
                 shared_str LevelName;
@@ -392,7 +422,8 @@ void CLevel::ClientReceive()
                 xr_sprintf(NewServerOptions, "%s/%s/%s%s", LevelName.c_str(), GameType.c_str(), map_ver_string,
                     LevelVersion.c_str());
 
-                if (m_SO) {
+                if (m_SO)
+                {
                     string4096 additional_options;
                     xr_strcat(NewServerOptions, sizeof(NewServerOptions),
                         remove_version_option(m_SO, additional_options, sizeof(additional_options)));
@@ -407,19 +438,23 @@ void CLevel::ClientReceive()
         break;
         case M_BULLET_CHECK_RESPOND:
         {
-            if (!game) break;
-            if (GameID() != eGameIDSingle) Game().m_WeaponUsageStatistic->On_Check_Respond(P);
+            if (!game)
+                break;
+            if (GameID() != eGameIDSingle)
+                Game().m_WeaponUsageStatistic->On_Check_Respond(P);
         }
         break;
         case M_STATISTIC_UPDATE:
         {
             Msg("--- CL: On Update Request");
-            if (!game) break;
+            if (!game)
+                break;
             game_events->insert(*P);
-            if (g_bDebugEvents) ProcessGameEvents();
+            if (g_bDebugEvents)
+                ProcessGameEvents();
         }
         break;
-        case M_STATISTIC_UPDATE_RESPOND:  // deprecated, see  xrServer::OnMessage
+        case M_STATISTIC_UPDATE_RESPOND: // deprecated, see  xrServer::OnMessage
         {
             /*Msg("--- CL: On Update Respond");
             if (!game) break;
@@ -430,7 +465,8 @@ void CLevel::ClientReceive()
         case M_FILE_TRANSFER:
         {
             game_events->insert(*P);
-            if (g_bDebugEvents) ProcessGameEvents();
+            if (g_bDebugEvents)
+                ProcessGameEvents();
         }
         break;
         case M_SECURE_KEY_SYNC: { OnSecureKeySync(*P);
@@ -445,10 +481,8 @@ void CLevel::ClientReceive()
     }
     EndProcessQueue();
 
-    if (g_bDebugEvents) ProcessGameSpawns();
+    if (g_bDebugEvents)
+        ProcessGameSpawns();
 }
 
-void CLevel::OnMessage(void* data, u32 size)
-{
-    IPureClient::OnMessage(data, size);
-};
+void CLevel::OnMessage(void* data, u32 size) { IPureClient::OnMessage(data, size); };

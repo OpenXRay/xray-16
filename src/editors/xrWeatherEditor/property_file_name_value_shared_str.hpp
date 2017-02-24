@@ -15,10 +15,10 @@
 public
 ref class property_file_name_value_shared_str : public property_string_shared_str, public property_file_name_value_base
 {
-  private:
+private:
     typedef property_string_shared_str inherited;
 
-  public:
+public:
     property_file_name_value_shared_str(editor::engine* engine, shared_str& value, System::String ^ DefaultExt_,
         System::String ^ Filter_, System::String ^ InitialDirectory_, System::String ^ Title_, bool remove_extension);
 
@@ -28,12 +28,12 @@ ref class property_file_name_value_shared_str : public property_string_shared_st
     virtual System::String ^ title();
     virtual bool remove_extension();
 
-  public:
+public:
     System::String ^ DefaultExt;
     System::String ^ Filter;
     System::String ^ InitialDirectory;
     System::String ^ Title;
     bool m_remove_extension;
-};  // ref class property_file_name_value_shared_str
+}; // ref class property_file_name_value_shared_str
 
-#endif  // ifndef PROPERTY_FILE_NAME_VALUE_SHARED_STR_HPP_INCLUDED
+#endif // ifndef PROPERTY_FILE_NAME_VALUE_SHARED_STR_HPP_INCLUDED

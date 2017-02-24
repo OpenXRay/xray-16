@@ -60,7 +60,8 @@ void CUIGameDM::SetClGame(game_cl_GameState* g)
 
 void CUIGameDM::Init(int stage)
 {
-    if (stage == 0) {  // shared
+    if (stage == 0)
+    { // shared
         m_pTeamPanels = new UITeamPanels();
         m_pMoneyIndicator = new CUIMoneyIndicator();
         m_pMoneyIndicator->SetAutoDelete(true);
@@ -80,7 +81,8 @@ void CUIGameDM::Init(int stage)
         m_demo_play_caption = UIHelper::CreateTextWnd(*MsgConfig, "mp_demo_play", Window);
         m_warm_up_caption = UIHelper::CreateTextWnd(*MsgConfig, "mp_warm_up", Window);
     }
-    if (stage == 1) {  // unique
+    if (stage == 1)
+    { // unique
         m_pTeamPanels->Init(TEAM_PANELS_DM_XML_NAME, "team_panels_wnd");
         CUIXml uiXml;
         uiXml.Load(CONFIG_PATH, UI_PATH, "ui_game_dm.xml");
@@ -89,7 +91,8 @@ void CUIGameDM::Init(int stage)
         m_pRankIndicator->InitFromXml(uiXml);
         CUIXmlInit::InitTextWnd(uiXml, "fraglimit", 0, m_pFragLimitIndicator);
     }
-    if (stage == 2) {  // after
+    if (stage == 2)
+    { // after
         inherited::Init(stage);
         Window->AttachChild(m_pMoneyIndicator);
         Window->AttachChild(m_pRankIndicator);
@@ -104,15 +107,8 @@ void CUIGameDM::UnLoad()
     xr_delete(m_voteStatusWnd);
 }
 
-CUIGameDM::~CUIGameDM()
-{
-}
-
-void CUIGameDM::SetTimeMsgCaption(LPCSTR str)
-{
-    m_time_caption->SetTextST(str);
-}
-
+CUIGameDM::~CUIGameDM() {}
+void CUIGameDM::SetTimeMsgCaption(LPCSTR str) { m_time_caption->SetTextST(str); }
 void CUIGameDM::ShowFragList(bool bShow)
 {
     if (bShow && m_pTeamPanels)
@@ -129,53 +125,22 @@ void CUIGameDM::ShowPlayersList(bool bShow)
         RemoveDialogToRender(m_pTeamPanels);
 }
 
-void CUIGameDM::SetSpectrModeMsgCaption(LPCSTR str)
-{
-    m_spectrmode_caption->SetTextST(str);
-}
-
-void CUIGameDM::SetSpectatorMsgCaption(LPCSTR str)
-{
-    m_spectator_caption->SetTextST(str);
-}
-
-void CUIGameDM::SetPressJumpMsgCaption(LPCSTR str)
-{
-    m_pressjump_caption->SetTextST(str);
-}
-
-void CUIGameDM::SetPressBuyMsgCaption(LPCSTR str)
-{
-    m_pressbuy_caption->SetTextST(str);
-}
-
-void CUIGameDM::SetRoundResultCaption(LPCSTR str)
-{
-    m_round_result_caption->SetTextST(str);
-}
-
-void CUIGameDM::SetForceRespawnTimeCaption(LPCSTR str)
-{
-    m_force_respawn_time_caption->SetTextST(str);
-}
-
-void CUIGameDM::SetDemoPlayCaption(LPCSTR str)
-{
-    m_demo_play_caption->SetTextST(str);
-}
-
-void CUIGameDM::SetWarmUpCaption(LPCSTR str)
-{
-    m_warm_up_caption->SetTextST(str);
-}
-
+void CUIGameDM::SetSpectrModeMsgCaption(LPCSTR str) { m_spectrmode_caption->SetTextST(str); }
+void CUIGameDM::SetSpectatorMsgCaption(LPCSTR str) { m_spectator_caption->SetTextST(str); }
+void CUIGameDM::SetPressJumpMsgCaption(LPCSTR str) { m_pressjump_caption->SetTextST(str); }
+void CUIGameDM::SetPressBuyMsgCaption(LPCSTR str) { m_pressbuy_caption->SetTextST(str); }
+void CUIGameDM::SetRoundResultCaption(LPCSTR str) { m_round_result_caption->SetTextST(str); }
+void CUIGameDM::SetForceRespawnTimeCaption(LPCSTR str) { m_force_respawn_time_caption->SetTextST(str); }
+void CUIGameDM::SetDemoPlayCaption(LPCSTR str) { m_demo_play_caption->SetTextST(str); }
+void CUIGameDM::SetWarmUpCaption(LPCSTR str) { m_warm_up_caption->SetTextST(str); }
 void CUIGameDM::SetVoteMessage(LPCSTR str)
 {
     if (!str)
         xr_delete(m_voteStatusWnd);
     else
     {
-        if (!m_voteStatusWnd) {
+        if (!m_voteStatusWnd)
+        {
             CUIXml uiXml;
             uiXml.Load(CONFIG_PATH, UI_PATH, "ui_game_dm.xml");
             m_voteStatusWnd = new UIVoteStatusWnd();
@@ -188,41 +153,28 @@ void CUIGameDM::SetVoteMessage(LPCSTR str)
 
 void CUIGameDM::SetVoteTimeResultMsg(LPCSTR str)
 {
-    if (m_voteStatusWnd) m_voteStatusWnd->SetVoteTimeResultMsg(str);
+    if (m_voteStatusWnd)
+        m_voteStatusWnd->SetVoteTimeResultMsg(str);
 }
 
 void CUIGameDM::OnFrame()
 {
     inherited::OnFrame();
-    if (m_voteStatusWnd && m_voteStatusWnd->IsShown()) m_voteStatusWnd->Update();
+    if (m_voteStatusWnd && m_voteStatusWnd->IsShown())
+        m_voteStatusWnd->Update();
 }
 
 void CUIGameDM::Render()
 {
     inherited::Render();
-    if (m_voteStatusWnd && m_voteStatusWnd->IsShown()) m_voteStatusWnd->Draw();
+    if (m_voteStatusWnd && m_voteStatusWnd->IsShown())
+        m_voteStatusWnd->Draw();
 }
 
-void CUIGameDM::DisplayMoneyChange(LPCSTR deltaMoney)
-{
-    m_pMoneyIndicator->SetMoneyChange(deltaMoney);
-}
-
-void CUIGameDM::DisplayMoneyBonus(KillMessageStruct* bonus)
-{
-    m_pMoneyIndicator->AddBonusMoney(*bonus);
-}
-
-void CUIGameDM::ChangeTotalMoneyIndicator(LPCSTR newMoneyString)
-{
-    m_pMoneyIndicator->SetMoneyAmount(newMoneyString);
-}
-
-void CUIGameDM::SetRank(s16 team, u8 rank)
-{
-    m_pRankIndicator->SetRank(u8(m_game->ModifyTeam(team)), rank);
-};
-
+void CUIGameDM::DisplayMoneyChange(LPCSTR deltaMoney) { m_pMoneyIndicator->SetMoneyChange(deltaMoney); }
+void CUIGameDM::DisplayMoneyBonus(KillMessageStruct* bonus) { m_pMoneyIndicator->AddBonusMoney(*bonus); }
+void CUIGameDM::ChangeTotalMoneyIndicator(LPCSTR newMoneyString) { m_pMoneyIndicator->SetMoneyAmount(newMoneyString); }
+void CUIGameDM::SetRank(s16 team, u8 rank) { m_pRankIndicator->SetRank(u8(m_game->ModifyTeam(team)), rank); };
 void CUIGameDM::SetFraglimit(int local_frags, int fraglimit)
 {
     string64 str;

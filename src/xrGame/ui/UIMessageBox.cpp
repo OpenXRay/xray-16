@@ -23,11 +23,7 @@ CUIMessageBox::CUIMessageBox()
     m_UIStaticHost = NULL;
 }
 
-CUIMessageBox::~CUIMessageBox()
-{
-    Clear();
-}
-
+CUIMessageBox::~CUIMessageBox() { Clear(); }
 #define BUTTON_UP_OFFSET 75
 #define BUTTON_WIDTH 140
 
@@ -63,14 +59,16 @@ void CUIMessageBox::InitMessageBox(LPCSTR box_template)
     string512 str;
 
     strconcat(sizeof(str), str, box_template, ":picture");
-    if (uiXml.NavigateToNode(str, 0)) {
+    if (uiXml.NavigateToNode(str, 0))
+    {
         m_UIStaticPicture = new CUIStatic();
         AttachChild(m_UIStaticPicture);
         xml_init.InitStatic(uiXml, str, 0, m_UIStaticPicture);
     }
 
     strconcat(sizeof(str), str, box_template, ":message_text");
-    if (uiXml.NavigateToNode(str, 0)) {
+    if (uiXml.NavigateToNode(str, 0))
+    {
         m_UIStaticText = new CUITextWnd();
         AttachChild(m_UIStaticText);
         xml_init.InitTextWnd(uiXml, str, 0, m_UIStaticText);
@@ -83,7 +81,8 @@ void CUIMessageBox::InitMessageBox(LPCSTR box_template)
     R_ASSERT(_type);
 
     m_eMessageBoxStyle = MESSAGEBOX_OK;
-    if (0 == stricmp(_type, "ok")) {
+    if (0 == stricmp(_type, "ok"))
+    {
         m_eMessageBoxStyle = MESSAGEBOX_OK;
     }
     else if (0 == stricmp(_type, "yes_no"))
@@ -282,7 +281,8 @@ void CUIMessageBox::InitMessageBox(LPCSTR box_template)
         xml_init.Init3tButton(uiXml, str, 0, m_UIButtonCopy);
 
         strconcat(sizeof(str), str, box_template, ":edit_url");
-        if (uiXml.NavigateToNode(str)) {
+        if (uiXml.NavigateToNode(str))
+        {
             m_UIEditURL = new CUIEditBox();
             AttachChild(m_UIEditURL);
             xml_init.InitEditBox(uiXml, str, 0, m_UIEditURL);
@@ -319,11 +319,13 @@ void CUIMessageBox::OnYesOk()
 
 void CUIMessageBox::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
-    if (msg == BUTTON_CLICKED) {
+    if (msg == BUTTON_CLICKED)
+    {
         switch (m_eMessageBoxStyle)
         {
         case MESSAGEBOX_OK:
-            if (pWnd == m_UIButtonYesOk) {
+            if (pWnd == m_UIButtonYesOk)
+            {
                 OnYesOk();
             }
             break;
@@ -333,7 +335,8 @@ void CUIMessageBox::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         case MESSAGEBOX_YES_NO:
         case MESSAGEBOX_QUIT_GAME:
         case MESSAGEBOX_QUIT_WINDOWS:
-            if (pWnd == m_UIButtonYesOk) {
+            if (pWnd == m_UIButtonYesOk)
+            {
                 OnYesOk();
             }
             else if (pWnd == m_UIButtonNo)
@@ -343,7 +346,8 @@ void CUIMessageBox::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
             }
             break;
         case MESSAGEBOX_YES_NO_CANCEL:
-            if (pWnd == m_UIButtonYesOk) {
+            if (pWnd == m_UIButtonYesOk)
+            {
                 OnYesOk();
             }
             else if (pWnd == m_UIButtonNo)
@@ -358,7 +362,8 @@ void CUIMessageBox::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
             }
             break;
         case MESSAGEBOX_YES_NO_COPY:
-            if (pWnd == m_UIButtonYesOk) {
+            if (pWnd == m_UIButtonYesOk)
+            {
                 OnYesOk();
             }
             else if (pWnd == m_UIButtonNo)
@@ -377,24 +382,18 @@ void CUIMessageBox::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     inherited::SendMessage(pWnd, msg, pData);
 }
 
-void CUIMessageBox::SetText(LPCSTR str)
-{
-    m_UIStaticText->SetTextST(str);
-}
-
-LPCSTR CUIMessageBox::GetText()
-{
-    return m_UIStaticText->GetText();
-}
-
+void CUIMessageBox::SetText(LPCSTR str) { m_UIStaticText->SetTextST(str); }
+LPCSTR CUIMessageBox::GetText() { return m_UIStaticText->GetText(); }
 LPCSTR CUIMessageBox::GetHost()
 {
-    if (m_UIEditHost) {
+    if (m_UIEditHost)
+    {
         m_ret_val.clear();
         xr_string tmp = m_UIEditHost->GetText();
         xr_string::size_type pos = tmp.find(":");
 
-        if (xr_string::npos != pos) {
+        if (xr_string::npos != pos)
+        {
             m_ret_val.assign(tmp.begin(), tmp.begin() + pos);
             tmp.erase(tmp.begin(), tmp.begin() + pos + 1);
 
@@ -426,14 +425,16 @@ LPCSTR CUIMessageBox::GetUserPassword()
 
 void CUIMessageBox::SetTextEditURL(LPCSTR text)
 {
-    if (m_UIEditURL) {
+    if (m_UIEditURL)
+    {
         m_UIEditURL->SetText(text);
     }
 }
 
 LPCSTR CUIMessageBox::GetTextEditURL()
 {
-    if (m_UIEditURL) {
+    if (m_UIEditURL)
+    {
         return m_UIEditURL->GetText();
     }
     return NULL;
@@ -441,11 +442,15 @@ LPCSTR CUIMessageBox::GetTextEditURL()
 
 void CUIMessageBox::SetUserPasswordMode(bool b)
 {
-    if (m_UIEditUserPass) m_UIEditUserPass->Show(b);
-    if (m_UIStaticUserPass) m_UIStaticUserPass->Show(b);
+    if (m_UIEditUserPass)
+        m_UIEditUserPass->Show(b);
+    if (m_UIStaticUserPass)
+        m_UIStaticUserPass->Show(b);
 }
 void CUIMessageBox::SetPasswordMode(bool b)
 {
-    if (m_UIEditPass) m_UIEditPass->Show(b);
-    if (m_UIStaticPass) m_UIStaticPass->Show(b);
+    if (m_UIEditPass)
+        m_UIEditPass->Show(b);
+    if (m_UIStaticPass)
+        m_UIStaticPass->Show(b);
 }

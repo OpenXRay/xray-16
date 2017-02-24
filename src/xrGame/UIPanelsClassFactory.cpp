@@ -3,17 +3,12 @@
 #include "game_base.h"
 #include "UITeamPanels.h"
 
-UIPanelsClassFactory::UIPanelsClassFactory()
-{
-}
-
-UIPanelsClassFactory::~UIPanelsClassFactory()
-{
-}
-
+UIPanelsClassFactory::UIPanelsClassFactory() {}
+UIPanelsClassFactory::~UIPanelsClassFactory() {}
 UITeamState* UIPanelsClassFactory::CreateTeamPanel(shared_str const& teamName, UITeamPanels* teamPanels)
 {
-    if (teamName == "greenteam") {
+    if (teamName == "greenteam")
+    {
         return new UITeamState(etGreenTeam, teamPanels);
     }
     else if (teamName == "blueteam")

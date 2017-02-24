@@ -26,7 +26,6 @@ public:
 
 public:
     xrMU_Reference() : model(0), sector(u16(-1)), flags(Flags32().assign(0)), xform(Fidentity) {}
-
     void Load(IReader& fs, xr_vector<xrMU_Model*>& mu_models);
     void calc_lighting();
 
@@ -38,7 +37,6 @@ public:
     void receive_result(INetReader& r);
     void send_result(IWriter& w) const;
     static xrMU_Reference* read_create() { return new xrMU_Reference(); };
-
     //	void					export_ogf			();
 };
 

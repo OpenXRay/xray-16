@@ -20,17 +20,20 @@ void CActorTools::OnObjectItemFocused(ListItemsVec& items)
     m_EditMode = emObject;
 
     // unselect
-    if (m_pEditObject) {
+    if (m_pEditObject)
+    {
         m_pEditObject->ResetSAnimation(false);
         // StopMotion(); // убрал из-за того что не миксятся анимации в режиме енжине
         m_pEditObject->SelectBones(false);
     }
 
-    if (!items.empty()) {
+    if (!items.empty())
+    {
         for (ListItemsIt it = items.begin(); it != items.end(); it++)
         {
             ListItem* prop = *it;
-            if (prop) {
+            if (prop)
+            {
                 m_EditMode = EEditMode(prop->Type());
                 switch (m_EditMode)
                 {
@@ -47,7 +50,8 @@ void CActorTools::OnObjectItemFocused(ListItemsVec& items)
                 {
                     FillBoneProperties(props, BONES_PREFIX, prop);
                     CBone* BONE = (CBone*)prop->m_Object;
-                    if (BONE) BONE->Select(TRUE);
+                    if (BONE)
+                        BONE->Select(TRUE);
                 }
                 break;
                 case emSurface: FillSurfaceProperties(props, SURFACES_PREFIX, prop); break;
@@ -66,9 +70,11 @@ void CActorTools::PMMotionItemClick(TObject* Sender)
 {
     R_ASSERT(m_pEditObject);
     TMenuItem* mi = dynamic_cast<TMenuItem*>(Sender);
-    if (mi) {
+    if (mi)
+    {
         PropItem* prop = (PropItem*)mi->Tag;
-        if (prop) {
+        if (prop)
+        {
         }
     }
 }
@@ -85,9 +91,10 @@ void CActorTools::OnExportImportRefsClick(ButtonValue* V, bool& bModif, bool& bS
     switch (V->btn_num)
     {
     case 0:
-    {  // export
+    { // export
         xr_string fname;
-        if (EFS.GetSaveName(_import_, fname)) {
+        if (EFS.GetSaveName(_import_, fname))
+        {
             CInifile ini(fname.c_str(), FALSE, FALSE, FALSE);
             xr_vector<shared_str>::iterator it = m_pEditObject->m_SMotionRefs.begin();
             xr_vector<shared_str>::iterator it_e = m_pEditObject->m_SMotionRefs.end();
@@ -103,9 +110,10 @@ void CActorTools::OnExportImportRefsClick(ButtonValue* V, bool& bModif, bool& bS
     }
     break;
     case 1:
-    {  // import
+    { // import
         xr_string fname;
-        if (EFS.GetOpenName(_import_, fname, false)) {
+        if (EFS.GetOpenName(_import_, fname, false))
+        {
             CInifile ini(fname.c_str(), TRUE, TRUE, FALSE);
             m_pEditObject->m_SMotionRefs.clear();
             CInifile::Sect& S = ini.r_section("refs");
@@ -134,15 +142,17 @@ void CActorTools::OnMotionEditClick(ButtonValue* V, bool& bModif, bool& bSafe)
     switch (V->btn_num)
     {
     case 0:
-    {  // append
+    { // append
         AnsiString folder, nm, full_name;
         xr_string fnames;
-        if (EFS.GetOpenName(_smotion_, fnames, true)) {
+        if (EFS.GetOpenName(_smotion_, fnames, true))
+        {
             AStringVec lst;
             _SequenceToList(lst, fnames.c_str());
             bool bRes = false;
             for (AStringIt it = lst.begin(); it != lst.end(); it++)
-                if (AppendMotion(it->c_str())) bRes = true;
+                if (AppendMotion(it->c_str()))
+                    bRes = true;
             ExecCommand(COMMAND_UPDATE_PROPERTIES);
             if (bRes)
                 OnMotionKeysModified();
@@ -155,9 +165,10 @@ void CActorTools::OnMotionEditClick(ButtonValue* V, bool& bModif, bool& bSafe)
     }
     break;
     case 1:
-    {  // delete
+    { // delete
         ListItemsVec items;
-        if (m_ObjectItems->GetSelected(MOTIONS_PREFIX, items, true)) {
+        if (m_ObjectItems->GetSelected(MOTIONS_PREFIX, items, true))
+        {
             if (ELog.DlgMsg(mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, "Delete selected %d item(s)?",
                     items.size()) == mrYes)
             {
@@ -183,10 +194,12 @@ void CActorTools::OnMotionEditClick(ButtonValue* V, bool& bModif, bool& bSafe)
     }
     break;
     case 2:
-    {  // save
+    { // save
         int mr = ELog.DlgMsg(mtConfirmation, "Save selected motions only?");
-        if (mr != mrCancel) {
-            if (EFS.GetSaveName(_smotion_, fn, 0, 1)) {
+        if (mr != mrCancel)
+        {
+            if (EFS.GetSaveName(_smotion_, fn, 0, 1))
+            {
                 switch (mr)
                 {
                 case mrYes: SaveMotions(fn.c_str(), true); break;
@@ -204,12 +217,15 @@ void CActorTools::RealUpdateProperties()
 {
     m_Flags.set(flRefreshProps, FALSE);
     ListItemsVec items;
-    if (m_pEditObject) {
+    if (m_pEditObject)
+    {
         LHelper().CreateItem(items, OBJECT_PREFIX, 0, emObject);
         m_pEditObject->FillSurfaceList(SURFACES_PREFIX, items, emSurface);
         // skin
-        if (m_pEditObject->IsSkeleton()) {
-            if (m_pEditObject->m_SMotionRefs.size()) {
+        if (m_pEditObject->IsSkeleton())
+        {
+            if (m_pEditObject->m_SMotionRefs.size())
+            {
                 m_RenderObject.FillMotionList(MOTIONS_PREFIX, items, emMotion);
             }
             else
@@ -220,9 +236,10 @@ void CActorTools::RealUpdateProperties()
         }
     }
 
-    m_ObjectItems->AssignItems(items, false);  //,"",true);
+    m_ObjectItems->AssignItems(items, false); //,"",true);
     // if appended motions exist - select it
-    if (!appended_motions.empty()) {
+    if (!appended_motions.empty())
+    {
         SelectListItem(MOTIONS_PREFIX, 0, true, false, true);
         m_ObjectItems->LockUpdating();
         for (SMotionIt m_it = appended_motions.begin(); m_it != appended_motions.end(); m_it++)
@@ -234,18 +251,10 @@ void CActorTools::RealUpdateProperties()
 
 //------------------------------------------------------------------------------
 
-void CActorTools::OnMotionTypeChange(PropValue* sender)
-{
-    RefreshSubProperties();
-}
-
+void CActorTools::OnMotionTypeChange(PropValue* sender) { RefreshSubProperties(); }
 //------------------------------------------------------------------------------
 
-void CActorTools::OnMotionNameChange(PropValue* V)
-{
-    OnMotionKeysModified();
-}
-
+void CActorTools::OnMotionNameChange(PropValue* V) { OnMotionKeysModified(); }
 //------------------------------------------------------------------------------
 
 void CActorTools::OnMotionControlClick(ButtonValue* V, bool& bModif, bool& bSafe)
@@ -338,10 +347,13 @@ void CActorTools::FillMotionProperties(PropItemVec& items, LPCSTR pref, ListItem
     PropValue* V;
 
     AnsiString m_cnt;
-    if (m_pEditObject->m_SMotionRefs.size()) {
-        if (fraLeftBar->ebRenderEngineStyle->Down) {
+    if (m_pEditObject->m_SMotionRefs.size())
+    {
+        if (fraLeftBar->ebRenderEngineStyle->Down)
+        {
             CKinematicsAnimated* V = PKinematicsAnimated(m_RenderObject.m_pVisual);
-            if (V) m_cnt = V->LL_CycleCount() + V->LL_FXCount();
+            if (V)
+                m_cnt = V->LL_CycleCount() + V->LL_FXCount();
         }
         else
         {
@@ -358,7 +370,8 @@ void CActorTools::FillMotionProperties(PropItemVec& items, LPCSTR pref, ListItem
     AnsiString tmp;
     for (u32 i = 0; i < m_pEditObject->m_SMotionRefs.size(); ++i)
     {
-        if (i != 0) tmp += ',';
+        if (i != 0)
+            tmp += ',';
         tmp += m_pEditObject->m_SMotionRefs[i].c_str();
     }
     m_tmp_mot_refs = tmp.c_str();
@@ -372,12 +385,14 @@ void CActorTools::FillMotionProperties(PropItemVec& items, LPCSTR pref, ListItem
         items, PrepareKey(pref, "Export Import"), "ExportRefs,ImportRefs", ButtonValue::flFirstOnly);
     B->OnBtnClickEvent.bind(this, &CActorTools::OnExportImportRefsClick);
 
-    if (m_pEditObject->m_SMotionRefs.size() == 0) {
+    if (m_pEditObject->m_SMotionRefs.size() == 0)
+    {
         B = PHelper().CreateButton(
             items, PrepareKey(pref, "Global\\Edit"), "Append,Delete,Save", ButtonValue::flFirstOnly);
         B->OnBtnClickEvent.bind(this, &CActorTools::OnMotionEditClick);
     }
-    if (SM) {
+    if (SM)
+    {
         B = PHelper().CreateButton(
             items, PrepareKey(pref, "Motion\\Control"), "Play,Stop,Pause", ButtonValue::flFirstOnly);
         B->OnBtnClickEvent.bind(this, &CActorTools::OnMotionControlClick);
@@ -398,7 +413,8 @@ void CActorTools::FillMotionProperties(PropItemVec& items, LPCSTR pref, ListItem
         TV = PHelper().CreateFlag8(items, PrepareKey(pref, "Motion\\Type FX"), &SM->m_Flags, esmFX);
         TV->OnChangeEvent.bind(this, &CActorTools::OnMotionTypeChange);
         m_BoneParts.clear();
-        if (SM->m_Flags.is(esmFX)) {
+        if (SM->m_Flags.is(esmFX))
+        {
             for (BoneIt it = m_pEditObject->FirstBone(); it != m_pEditObject->LastBone(); it++)
                 m_BoneParts.push_back(xr_rtoken((*it)->Name().c_str(), (*it)->SelfID));
             PHelper().CreateRToken16(items, PrepareKey(pref, "Motion\\FX\\Start bone"), (u16*)&SM->m_BoneOrPart,
@@ -478,11 +494,7 @@ xr_token shape_types[] = {{"None", SBoneShape::stNone}, {"Box", SBoneShape::stBo
 
 static const LPCSTR axis[3] = {"Axis X", "Axis Y", "Axis Z"};
 
-void CActorTools::OnJointTypeChange(PropValue* V)
-{
-    ExecCommand(COMMAND_UPDATE_PROPERTIES);
-}
-
+void CActorTools::OnJointTypeChange(PropValue* V) { ExecCommand(COMMAND_UPDATE_PROPERTIES); }
 void CActorTools::OnShapeTypeChange(PropValue* V)
 {
     UI->RedrawScene();
@@ -508,7 +520,8 @@ void CActorTools::OnBoneShapeClick(ButtonValue* V, bool& bModif, bool& bSafe)
 
 void GetBindAbsolutePosition(CBone* B, Fmatrix& dest)
 {
-    if (B->Parent()) GetBindAbsolutePosition(B->Parent(), dest);
+    if (B->Parent())
+        GetBindAbsolutePosition(B->Parent(), dest);
 
     {
         Fmatrix M;
@@ -529,19 +542,21 @@ void CActorTools::OnBoneCreateDeleteClick(ButtonValue* V, bool& bModif, bool& bS
     switch (V->btn_num)
     {
     case 0:
-    {  // create
+    { // create
         CBone* B = sel_bones.size() ? sel_bones[0] : NULL;
         m_pEditObject->AddBone(B);
         bModif = true;
     }
     break;
     case 1:
-    {  // deleet
-        if (sel_bones.size() != 1) {
+    { // deleet
+        if (sel_bones.size() != 1)
+        {
             Msg("! Select 1 bone please.");
             return;
         }
-        if (ELog.DlgMsg(mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, "Delete selected bone?") == mrYes) {
+        if (ELog.DlgMsg(mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, "Delete selected bone?") == mrYes)
+        {
             m_pEditObject->DeleteBone(sel_bones[0]);
             bModif = true;
         }
@@ -549,13 +564,15 @@ void CActorTools::OnBoneCreateDeleteClick(ButtonValue* V, bool& bModif, bool& bS
     break;
     case 2:
     {
-        if (sel_bones.size() != 1) {
+        if (sel_bones.size() != 1)
+        {
             Msg("! Select 1 bone please.");
             return;
         }
         LPCSTR _bone_name = 0;
 
-        if (TfrmChoseItem::SelectItem(smSkeletonBonesInObject, _bone_name, 1, 0, 0, m_pEditObject)) {
+        if (TfrmChoseItem::SelectItem(smSkeletonBonesInObject, _bone_name, 1, 0, 0, m_pEditObject))
+        {
             Msg("selected bone %s", _bone_name);
             CBone* BSelected = m_pEditObject->FindBoneByName(_bone_name);
             R_ASSERT(BSelected);
@@ -583,7 +600,8 @@ void CActorTools::OnBoneCreateDeleteClick(ButtonValue* V, bool& bModif, bool& bS
     }
     break;
     }
-    if (bModif) {
+    if (bModif)
+    {
         bSafe = false;
         m_Flags.set(flRefreshProps, TRUE);
     }
@@ -614,7 +632,8 @@ void CActorTools::OnBoneEditClick(ButtonValue* V, bool& bModif, bool& bSafe)
         bModif = false;
         break;
     case 1:
-        if (ELog.DlgMsg(mtConfirmation, "Are you sure to reset IK data?") == mrYes) m_pEditObject->ResetBones();
+        if (ELog.DlgMsg(mtConfirmation, "Are you sure to reset IK data?") == mrYes)
+            m_pEditObject->ResetBones();
         bModif = true;
         break;
     case 2:
@@ -633,7 +652,8 @@ void CActorTools::OnBoneFileClick(ButtonValue* V, bool& bModif, bool& bSafe)
     case 0:
     {
         xr_string fn;
-        if (EFS.GetOpenName("$sbones$", fn)) {
+        if (EFS.GetOpenName("$sbones$", fn))
+        {
             IReader* R = FS.r_open(fn.c_str());
             if (m_pEditObject->LoadBoneData(*R))
                 ELog.DlgMsg(mtInformation, "Bone data succesfully loaded.");
@@ -650,9 +670,11 @@ void CActorTools::OnBoneFileClick(ButtonValue* V, bool& bModif, bool& bSafe)
     case 1:
     {
         xr_string fn;
-        if (EFS.GetSaveName("$sbones$", fn)) {
+        if (EFS.GetSaveName("$sbones$", fn))
+        {
             IWriter* W = FS.w_open(fn.c_str());
-            if (W) {
+            if (W)
+            {
                 m_pEditObject->SaveBoneData(*W);
                 FS.w_close(W);
             }
@@ -667,11 +689,7 @@ void CActorTools::OnBoneFileClick(ButtonValue* V, bool& bModif, bool& bSafe)
     }
 }
 
-void CActorTools::OnBoneLimitsChange(PropValue* sender)
-{
-    m_pEditObject->ClampByLimits(true);
-}
-
+void CActorTools::OnBoneLimitsChange(PropValue* sender) { m_pEditObject->ClampByLimits(true); }
 void CActorTools::FillBoneProperties(PropItemVec& items, LPCSTR pref, ListItem* sender)
 {
     R_ASSERT(m_pEditObject);
@@ -694,15 +712,17 @@ void CActorTools::FillBoneProperties(PropItemVec& items, LPCSTR pref, ListItem* 
     B->OnBtnClickEvent.bind(this, &CActorTools::OnBoneCreateDeleteClick);
     //---
 
-    if (BONE) {
+    if (BONE)
+    {
         PropValue* V;
         PHelper().CreateCaption(items, PrepareKey(pref, "Bone\\Name"), BONE->Name());
 
         PHelper().CreateNameCB(items, PrepareKey(pref, "Bone\\NameEditable"), &BONE->NameRef(), 0, 0,
             RTextValue::TOnAfterEditEvent(this, &CActorTools::OnBoneNameAfterEdit));
 
-        //.		PHelper().CreateCaption		(items, PrepareKey(pref,"Bone\\Influence"),					shared_str().sprintf("%d
-        //vertices",0));
+        //.		PHelper().CreateCaption		(items, PrepareKey(pref,"Bone\\Influence"),
+        //shared_str().sprintf("%d
+        // vertices",0));
         PHelper().CreateChoose(items, PrepareKey(pref, "Bone\\Game Material"), &BONE->game_mtl, smGameMaterial);
         PHelper().CreateFloat(items, PrepareKey(pref, "Bone\\Mass"), &BONE->mass, 0.f, 10000.f);
         PHelper().CreateVector(
@@ -770,7 +790,8 @@ void CActorTools::FillBoneProperties(PropItemVec& items, LPCSTR pref, ListItem* 
         V = PHelper().CreateFlag32(
             items, PrepareKey(pref, "Bone\\Joint\\Breakable"), &data.ik_flags, SJointIKData::flBreakable);
         V->OnChangeEvent.bind(this, &CActorTools::OnJointTypeChange);
-        if (data.ik_flags.is(SJointIKData::flBreakable)) {
+        if (data.ik_flags.is(SJointIKData::flBreakable))
+        {
             PHelper().CreateFloat(
                 items, PrepareKey(pref, "Bone\\Joint\\Break Force"), &data.break_force, 0.f, 1000000000.f);
             PHelper().CreateFloat(
@@ -838,7 +859,7 @@ void CActorTools::FillBoneProperties(PropItemVec& items, LPCSTR pref, ListItem* 
                 items, PrepareKey(pref, "Bone\\Joint\\Spring Factor"), &data.spring_factor, 0.f, 1000.f);
             PHelper().CreateFloat(
                 items, PrepareKey(pref, "Bone\\Joint\\Damping Factor"), &data.damping_factor, 0.f, 1000.f);
-            {  // slider
+            { // slider
                 V = PHelper().CreateFloat(items, PrepareKey(pref, "Bone\\Joint\\Slide (Axis Z)\\Limits Min"),
                     &data.limits[0].limit[0], -100.f, 0.f);
                 V->OnChangeEvent.bind(this, &CActorTools::OnBoneLimitsChange);
@@ -852,7 +873,7 @@ void CActorTools::FillBoneProperties(PropItemVec& items, LPCSTR pref, ListItem* 
                     &data.limits[0].damping_factor, 0.f, 1000.f);
                 V->OnChangeEvent.bind(this, &CActorTools::OnBoneLimitsChange);
             }
-            {  // rotate
+            { // rotate
                 V = PHelper().CreateAngle(items, PrepareKey(pref, "Bone\\Joint\\Rotate (Axis Z)\\Limits Min"),
                     &data.limits[1].limit[0], -M_PI, 0.f);
                 V->OnChangeEvent.bind(this, &CActorTools::OnBoneLimitsChange);
@@ -880,7 +901,8 @@ void CActorTools::FillSurfaceProperties(PropItemVec& items, LPCSTR pref, ListIte
     CSurface* SURF = (CSurface*)sender->m_Object;
     PHelper().CreateCaption(
         items, PrepareKey(pref, "Statistic\\Count"), shared_str().printf("%d", m_pEditObject->SurfaceCount()));
-    if (SURF) {
+    if (SURF)
+    {
         PHelper().CreateCaption(items, PrepareKey(pref, "Surface\\Name"), SURF->_Name());
         AnsiString _pref = PrepareKey(pref, "Surface").c_str();
         m_pEditObject->FillSurfaceProps(SURF, _pref.c_str(), items);
@@ -909,7 +931,7 @@ void CActorTools::FillObjectProperties(PropItemVec& items, LPCSTR pref, ListItem
         shared_str().printf("{%3.2f, %3.2f, %3.2f}", VPUSH(m_pEditObject->GetBox().max)));
 
     //.    PHelper().CreateChoose		 (items, "Object\\LOD\\Reference",  			&m_pEditObject->m_LODs,
-    //smObject);
+    // smObject);
     PHelper().CreateChoose(items, "Object\\LOD\\Reference", &m_pEditObject->m_LODs, smVisual);
     m_pEditObject->FillSummaryProps("Object\\Summary", items);
 }
@@ -920,7 +942,8 @@ void CActorTools::SelectListItem(LPCSTR pref, LPCSTR name, bool bVal, bool bLeav
 {
     AnsiString nm = (name && name[0]) ? PrepareKey(pref, name).c_str() : AnsiString(pref).c_str();
     m_ObjectItems->SelectItem(nm.c_str(), bVal, bLeaveSel, bExpand);
-    if (pref) {
+    if (pref)
+    {
         m_ObjectItems->SelectItem(pref, true, true, bExpand);
     }
 }

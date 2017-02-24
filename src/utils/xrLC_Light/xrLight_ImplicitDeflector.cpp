@@ -4,20 +4,9 @@
 #include "xrface.h"
 #include "xrLC_GlobalData.h"
 
-u32 ImplicitDeflector::Width()
-{
-    return texture->dwWidth;
-}
-u32 ImplicitDeflector::Height()
-{
-    return texture->dwHeight;
-}
-
-u32& ImplicitDeflector::Texel(u32 x, u32 y)
-{
-    return texture->pSurface[y * Width() + x];
-}
-
+u32 ImplicitDeflector::Width() { return texture->dwWidth; }
+u32 ImplicitDeflector::Height() { return texture->dwHeight; }
+u32& ImplicitDeflector::Texel(u32 x, u32 y) { return texture->pSurface[y * Width() + x]; }
 void ImplicitDeflector::Bounds(u32 ID, Fbox2& dest)
 {
     Face* F = faces[ID];

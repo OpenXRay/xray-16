@@ -22,31 +22,23 @@ CUIMessagesWindow::CUIMessagesWindow() : m_pChatLog(NULL), m_pChatWnd(NULL), m_p
     Init(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT);
 }
 
-CUIMessagesWindow::~CUIMessagesWindow()
-{
-}
-
-void CUIMessagesWindow::AddLogMessage(KillMessageStruct& msg)
-{
-    m_pGameLog->AddLogMessage(msg);
-}
-
-void CUIMessagesWindow::AddLogMessage(const shared_str& msg)
-{
-    m_pGameLog->AddLogMessage(*msg);
-}
-
+CUIMessagesWindow::~CUIMessagesWindow() {}
+void CUIMessagesWindow::AddLogMessage(KillMessageStruct& msg) { m_pGameLog->AddLogMessage(msg); }
+void CUIMessagesWindow::AddLogMessage(const shared_str& msg) { m_pGameLog->AddLogMessage(*msg); }
 void CUIMessagesWindow::PendingMode(bool const is_pending_mode)
 {
-    if (is_pending_mode) {
-        if (m_in_pending_mode) return;
+    if (is_pending_mode)
+    {
+        if (m_in_pending_mode)
+            return;
 
         m_pChatWnd->PendingMode(is_pending_mode);
         m_pChatLog->SetWndRect(m_pending_chat_log_rect);
         m_in_pending_mode = true;
         return;
     }
-    if (!m_in_pending_mode) return;
+    if (!m_in_pending_mode)
+        return;
 
     m_pChatWnd->PendingMode(is_pending_mode);
     m_pChatLog->SetWndRect(m_inprogress_chat_log_rect);
@@ -62,7 +54,8 @@ void CUIMessagesWindow::Init(float x, float y, float width, float height)
     m_pGameLog->SetAutoDelete(true);
     m_pGameLog->Show(true);
     AttachChild(m_pGameLog);
-    if (IsGameTypeSingle()) {
+    if (IsGameTypeSingle())
+    {
         CUIXmlInit::InitScrollView(xml, "sp_log_list", 0, m_pGameLog);
     }
     else
@@ -89,7 +82,8 @@ void CUIMessagesWindow::Init(float x, float y, float width, float height)
 
         XML_NODE* pending_chat_list = xml.NavigateToNode(CHAT_LOG_LIST_PENDING);
 
-        if (pending_chat_list) {
+        if (pending_chat_list)
+        {
             m_pending_chat_log_rect.x1 = xml.ReadAttribFlt(CHAT_LOG_LIST_PENDING, 0, "x");
             m_pending_chat_log_rect.y1 = xml.ReadAttribFlt(CHAT_LOG_LIST_PENDING, 0, "y");
             m_pending_chat_log_rect.x2 = xml.ReadAttribFlt(CHAT_LOG_LIST_PENDING, 0, "width");
@@ -131,10 +125,7 @@ void CUIMessagesWindow::AddIconedPdaMessage(GAME_NEWS_DATA* news)
     m_pGameLog->SendMessage(pItem, CHILD_CHANGED_SIZE);
 }
 
-void CUIMessagesWindow::AddChatMessage(shared_str msg, shared_str author)
-{
-    m_pChatLog->AddChatMessage(*msg, *author);
-}
+void CUIMessagesWindow::AddChatMessage(shared_str msg, shared_str author) { m_pChatLog->AddChatMessage(*msg, *author); }
 /*
 void CUIMessagesWindow::SetChatOwner(game_cl_GameState* owner)
 {
@@ -144,7 +135,10 @@ void CUIMessagesWindow::SetChatOwner(game_cl_GameState* owner)
 */
 void CUIMessagesWindow::Show(bool show)
 {
-    if (m_pChatWnd) m_pChatWnd->Show(show);
-    if (m_pGameLog) m_pGameLog->Show(show);
-    if (m_pChatLog) m_pChatLog->Show(show);
+    if (m_pChatWnd)
+        m_pChatWnd->Show(show);
+    if (m_pGameLog)
+        m_pGameLog->Show(show);
+    if (m_pChatLog)
+        m_pChatLog->Show(show);
 }

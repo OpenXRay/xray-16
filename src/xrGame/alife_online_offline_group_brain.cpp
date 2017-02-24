@@ -53,28 +53,13 @@ CALifeOnlineOfflineGroupBrain::~CALifeOnlineOfflineGroupBrain()
 #endif
 }
 
-void CALifeOnlineOfflineGroupBrain::on_state_write(NET_Packet& packet)
-{
-}
-
-void CALifeOnlineOfflineGroupBrain::on_state_read(NET_Packet& packet)
-{
-}
-
+void CALifeOnlineOfflineGroupBrain::on_state_write(NET_Packet& packet) {}
+void CALifeOnlineOfflineGroupBrain::on_state_read(NET_Packet& packet) {}
 #ifdef XRGAME_EXPORTS
 
-void CALifeOnlineOfflineGroupBrain::on_register()
-{
-}
-
-void CALifeOnlineOfflineGroupBrain::on_unregister()
-{
-}
-
-void CALifeOnlineOfflineGroupBrain::on_location_change()
-{
-}
-
+void CALifeOnlineOfflineGroupBrain::on_register() {}
+void CALifeOnlineOfflineGroupBrain::on_unregister() {}
+void CALifeOnlineOfflineGroupBrain::on_location_change() {}
 void CALifeOnlineOfflineGroupBrain::update()
 {
     CALifeSmartTerrainTask* const task = object().get_current_task();
@@ -84,14 +69,6 @@ void CALifeOnlineOfflineGroupBrain::update()
     movement().update();
 }
 
-void CALifeOnlineOfflineGroupBrain::on_switch_online()
-{
-    movement().on_switch_online();
-}
-
-void CALifeOnlineOfflineGroupBrain::on_switch_offline()
-{
-    movement().on_switch_offline();
-}
-
-#endif  // XRGAME_EXPORTS
+void CALifeOnlineOfflineGroupBrain::on_switch_online() { movement().on_switch_online(); }
+void CALifeOnlineOfflineGroupBrain::on_switch_offline() { movement().on_switch_offline(); }
+#endif // XRGAME_EXPORTS

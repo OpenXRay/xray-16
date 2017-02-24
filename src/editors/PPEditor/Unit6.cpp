@@ -39,14 +39,16 @@ void TForm6::AddEntryTemplate(int iInsertAfter)
     form->DeleteButton->OnClick = OnDelButtonClick;
     vector<TForm7*> temp;
     iInsertAfter++;
-    if (!m_Entries.size() || m_Entries.size() == (size_t)iInsertAfter) {
+    if (!m_Entries.size() || m_Entries.size() == (size_t)iInsertAfter)
+    {
         m_Entries.push_back(form);
     }
     else
     {
         for (int a = 0; a < (int)m_Entries.size(); a++)
         {
-            if (a == iInsertAfter) temp.push_back(form);
+            if (a == iInsertAfter)
+                temp.push_back(form);
             temp.push_back(m_Entries[a]);
         }
         m_Entries.assign(temp.begin(), temp.end());
@@ -66,7 +68,8 @@ void TForm6::ResetPositions()
     }
     Button1->Top = top + m_Entries[0]->Height + 4;
     Button2->Top = Button1->Top;
-    if (m_Entries.size() <= 6) ClientHeight = Button1->Top + Button1->Height;
+    if (m_Entries.size() <= 6)
+        ClientHeight = Button1->Top + Button1->Height;
 }
 
 //---------------------------------------------------------------------------
@@ -74,7 +77,8 @@ void __fastcall TForm6::OnAddButtonClick(TObject* Sender)
 {
     int tag = dynamic_cast<TComponent*>(Sender)->Tag;
     for (size_t a = 0; a < m_Entries.size(); a++)
-        if (m_Entries[a]->Tag == tag) {
+        if (m_Entries[a]->Tag == tag)
+        {
             AddEntryTemplate(a);
             return;
         }
@@ -83,11 +87,13 @@ void __fastcall TForm6::OnAddButtonClick(TObject* Sender)
 //---------------------------------------------------------------------------
 void __fastcall TForm6::OnDelButtonClick(TObject* Sender)
 {
-    if (m_Entries.size() == 1) return;
+    if (m_Entries.size() == 1)
+        return;
     int tag = dynamic_cast<TControl*>(Sender)->Parent->Parent->Tag;
-    vector<TForm7*>::iterator s = m_Entries.begin(), e = m_Entries.end();
+    vector<TForm7 *>::iterator s = m_Entries.begin(), e = m_Entries.end();
     for (; s != e; ++s)
-        if ((*s)->Tag == tag) {
+        if ((*s)->Tag == tag)
+        {
             TForm7* form = (*s);
             delete form;
             m_Entries.erase(s);
@@ -107,13 +113,15 @@ void TForm6::RecalcSize()
     }
     Button1->Top = top + m_Entries[0]->Height + 4;
     Button2->Top = Button1->Top;
-    if (m_Entries.size() <= 6) ClientHeight = Button1->Top + Button1->Height;
+    if (m_Entries.size() <= 6)
+        ClientHeight = Button1->Top + Button1->Height;
 }
 
 //---------------------------------------------------------------------------
 void __fastcall TForm6::Panel3Click(TObject* Sender)
 {
-    if (ColorDialog->Execute() == false) return;
+    if (ColorDialog->Execute() == false)
+        return;
     Panel3->Color = ColorDialog->Color;
     m_InitColor = Panel3->Color;
 }

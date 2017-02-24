@@ -1,15 +1,15 @@
 #include "wpn_collection.hpp"
 
-weapon_collection::weapon_collection()
-{
-}
-
+weapon_collection::weapon_collection() {}
 weapon_collection::~weapon_collection()
 {
-    if (priquel_config) xr_delete(priquel_config);
-    if (patch_config) xr_delete(patch_config);
+    if (priquel_config)
+        xr_delete(priquel_config);
+    if (patch_config)
+        xr_delete(patch_config);
 
-    if (settings) {
+    if (settings)
+    {
         xr_delete(settings);
     }
 
@@ -92,7 +92,8 @@ void weapon_collection::load_settings()
         extract_list.push_back(xr_new<tentity_extract_keys>());
         extract_list.back()->first = line;
         new_config.insert(std::make_pair(shared_str(line), xr_vector<CInifileEx::Sect>()));
-        if (larg) {
+        if (larg)
+        {
             read_arguments_to_set(extract_list.back()->second, larg);
         }
     }
@@ -104,7 +105,8 @@ weapon_collection::textract_list::const_iterator weapon_collection::get_extract_
     for (weapon_collection::textract_list::const_iterator i = extract_list.begin(), ie = extract_list.end(); i != ie;
          ++i)
     {
-        if (!strncmp((*i)->first.c_str(), section_name, (*i)->first.size())) return i;
+        if (!strncmp((*i)->first.c_str(), section_name, (*i)->first.size()))
+            return i;
     }
 
     return extract_list.end();
@@ -119,7 +121,8 @@ void weapon_collection::extract_all_params()
     for (xr_vector<shared_str>::const_iterator i = all_weapons.begin(); i != ie; ++i)
     {
         textract_list::const_iterator extr_iter = get_extract_keys(i->c_str());
-        if (extr_iter == extract_list.end()) {
+        if (extr_iter == extract_list.end())
+        {
             std::cerr << "Not found extract list for section: " << i->c_str() << std::endl;
             continue;
         }
@@ -189,7 +192,8 @@ void weapon_collection::extract_all_params()
 char const* weapon_collection::try_extract_from_patch(char const* sect, char const* line)
 {
     R_ASSERT(sect && line);
-    if (patch_config->line_exist(sect, line)) {
+    if (patch_config->line_exist(sect, line))
+    {
         return patch_config->r_string(sect, line);
     }
     return NULL;
@@ -201,24 +205,29 @@ void weapon_collection::copy_params_ex(
     std::cout << "Processing section: " << from.Name.c_str() << std::endl;
     for (CInifileEx::SectCIt i = from.Data.begin(), ie = from.Data.end(); i != ie; ++i)
     {
-        if (copy_keys.find(i->first) != copy_keys.end()) {
+        if (copy_keys.find(i->first) != copy_keys.end())
+        {
             char const* larg = try_extract_from_patch(from.Name.c_str(), i->first.c_str());
             CInifileEx::Item temp_item;
             temp_item.first = i->first;
             temp_item.second = priquel_config->r_string(dest.Name.c_str(), temp_item.first.c_str());
             temp_item.comment = i->comment;
-            if (larg) {
-                if (temp_item.second != larg) {
+            if (larg)
+            {
+                if (temp_item.second != larg)
+                {
                     //--------------------------------
                     std::cout << "Key: " << temp_item.first.c_str() << "\r\n";
-                    if (temp_item.comment.c_str()) {
+                    if (temp_item.comment.c_str())
+                    {
                         std::cout << "Comment: " << temp_item.comment.c_str() << std::endl;
                     }
 
                     std::cout << "Values not EQUAL:\r\n"
                               << "Priquel value is: " << temp_item.second.c_str() << ", patch value is: " << larg
                               << std::endl;
-                    if (remember_yes_keys.find(shared_str(temp_item.first)) != remember_yes_keys.end()) {
+                    if (remember_yes_keys.find(shared_str(temp_item.first)) != remember_yes_keys.end())
+                    {
                         temp_item.second = larg;
                         std::cout << "Processing YES action...\r\n";
                     }
@@ -231,7 +240,8 @@ void weapon_collection::copy_params_ex(
                         std::cout << "Do you want to save patch value ? (y - single yes, Y - multiple yes, n - single "
                                      "no, N - multiple no):";
                         int ch = _getch();
-                        if (ch == 'y') {
+                        if (ch == 'y')
+                        {
                             temp_item.second = larg;
                         }
                         else if (ch == 'Y')
@@ -274,7 +284,8 @@ void weapon_collection::build_section(
         for (xr_vector<shared_str>::const_iterator bi = orig.base_sections.begin(), bie = orig.base_sections.end();
              bi != bie; ++bi)
         {
-            if (priquel_config->line_exist(bi->c_str(), i->first.c_str())) {
+            if (priquel_config->line_exist(bi->c_str(), i->first.c_str()))
+            {
                 // char const * larg = config->r_string(bi->c_str(), i->first.c_str());
                 // if (i->second == larg)
                 //{
@@ -283,7 +294,8 @@ void weapon_collection::build_section(
                 //}
             }
         }
-        if (!found_key) {
+        if (!found_key)
+        {
             dest.Data.push_back(*i);
         }
     }
@@ -304,13 +316,15 @@ void weapon_collection::save_config_to_file(tnew_config_map::const_iterator cfg_
         sprintf_s(temp_buffer, "[%s]", i->Name.c_str());
 
         temp_string.append(temp_buffer);
-        if (i->base_sections.size()) {
+        if (i->base_sections.size())
+        {
             temp_string.append(":");
             for (xr_vector<shared_str>::const_iterator bi = i->base_sections.begin(), bie = i->base_sections.end();
                  bi != bie; ++bi)
             {
                 temp_string.append(bi->c_str());
-                if ((bi + 1) != bie) temp_string.append(", ");
+                if ((bi + 1) != bie)
+                    temp_string.append(", ");
             }
         }
         temp_string.append("\r\n");
@@ -319,8 +333,10 @@ void weapon_collection::save_config_to_file(tnew_config_map::const_iterator cfg_
         {
             sprintf_s(
                 temp_buffer, "%4s%-32s = %-8s", " ", si->first.c_str(), si->second.c_str() ? si->second.c_str() : "");
-            if (si->comment.c_str()) {
-                if (comments_set.find(si->first) == comments_set.end()) {
+            if (si->comment.c_str())
+            {
+                if (comments_set.find(si->first) == comments_set.end())
+                {
                     strcat_s(temp_buffer, ";");
                     strcat_s(temp_buffer, si->comment.c_str());
                     comments_set.insert(si->first);

@@ -17,7 +17,8 @@ bool CLevelSoundManager::Validate()
     {
         ESoundEnvironment* E = dynamic_cast<ESoundEnvironment*>(*it);
         R_ASSERT(E);
-        if (E->m_EnvInner == E->m_EnvOuter) {
+        if (E->m_EnvInner == E->m_EnvOuter)
+        {
             ELog.DlgMsg(mtError, "SoundEnvironment: '%s' inner and outer environment must be different.", E->Name);
             return false;
         }
@@ -27,7 +28,8 @@ bool CLevelSoundManager::Validate()
     {
         ESoundSource* S = dynamic_cast<ESoundSource*>(*it);
         R_ASSERT(S);
-        if (!S->GetSourceWAV() || (0 == strlen(S->GetSourceWAV()))) {
+        if (!S->GetSourceWAV() || (0 == strlen(S->GetSourceWAV())))
+        {
             ELog.DlgMsg(mtError, "SoundSource: '%s' hasn't wave.", S->Name);
             return false;
         }
@@ -118,7 +120,8 @@ bool CLevelSoundManager::MakeEnvGeometry(CMemoryWriter& F, bool bErrMsg)
 void CLevelSoundManager::OnFrame()
 {
     inherited::OnFrame();
-    if (bNeedRefreshEnvGeom) {
+    if (bNeedRefreshEnvGeom)
+    {
         bNeedRefreshEnvGeom = false;
         //                RealRefreshEnvGeometry ();
     }

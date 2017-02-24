@@ -21,8 +21,8 @@ class EDetailManager;
 //---------------------------------------------------------------------------
 class TfraDetailObject : public TForm
 {
-    __published :  // IDE-managed Components
-                   TFormStorage* fsStorage;
+    __published : // IDE-managed Components
+                  TFormStorage* fsStorage;
     TPanel* paCommand;
     TLabel* Label1;
     TExtBtn* ExtBtn3;
@@ -48,10 +48,10 @@ class TfraDetailObject : public TForm
     void __fastcall ebResetSlotsClick(TObject* Sender);
     void __fastcall ebClearDetailsClick(TObject* Sender);
 
-  private:  // User declarations
+private: // User declarations
     EDetailManager* DM;
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TfraDetailObject(TComponent* Owner, EDetailManager* dm_tools);
 };
 

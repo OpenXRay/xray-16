@@ -5,11 +5,11 @@
 
 IDirect3DStateBlock9* SimulatorStates::record()
 {
-//	TODO: DX10: Implement equivalent for SimulatorStates::record for DX10
+// TODO: DX10: Implement equivalent for SimulatorStates::record for DX10
 #if defined(USE_DX10) || defined(USE_DX11)
     // VERIFY(!"SimulatorStates::record not implemented!");
     return 0;
-#else   //	USE_DX10
+#else // USE_DX10
     CHK_DX(HW.pDevice->BeginStateBlock());
     for (u32 it = 0; it < States.size(); it++)
     {
@@ -21,8 +21,7 @@ IDirect3DStateBlock9* SimulatorStates::record()
         case 2:
         {
             CHK_DX(HW.pDevice->SetSamplerState(S.v1, (D3DSAMPLERSTATETYPE)S.v2,
-                ((D3DSAMPLERSTATETYPE)S.v2 == D3DSAMP_MAGFILTER && S.v3 == D3DTEXF_ANISOTROPIC) ? D3DTEXF_LINEAR :
-                                                                                                  S.v3));
+                ((D3DSAMPLERSTATETYPE)S.v2==D3DSAMP_MAGFILTER && S.v3==D3DTEXF_ANISOTROPIC) ? D3DTEXF_LINEAR : S.v3));
         }
         break;
         }
@@ -30,7 +29,7 @@ IDirect3DStateBlock9* SimulatorStates::record()
     IDirect3DStateBlock9* SB = 0;
     CHK_DX(HW.pDevice->EndStateBlock(&SB));
     return SB;
-#endif  //	USE_DX10
+#endif // USE_DX10
 }
 
 void SimulatorStates::set_RS(u32 a, u32 b)
@@ -39,7 +38,8 @@ void SimulatorStates::set_RS(u32 a, u32 b)
     for (int t = 0; t < int(States.size()); t++)
     {
         State& S = States[t];
-        if ((0 == S.type) && (a == S.v1)) {
+        if ((0 == S.type) && (a == S.v1))
+        {
             States.erase(States.begin() + t);
             break;
         }
@@ -57,7 +57,8 @@ void SimulatorStates::set_TSS(u32 a, u32 b, u32 c)
     for (int t = 0; t < int(States.size()); t++)
     {
         State& S = States[t];
-        if ((1 == S.type) && (a == S.v1) && (b == S.v2)) {
+        if ((1 == S.type) && (a == S.v1) && (b == S.v2))
+        {
             States.erase(States.begin() + t);
             break;
         }
@@ -75,7 +76,8 @@ void SimulatorStates::set_SAMP(u32 a, u32 b, u32 c)
     for (int t = 0; t < int(States.size()); t++)
     {
         State& S = States[t];
-        if ((2 == S.type) && (a == S.v1) && (b == S.v2)) {
+        if ((2 == S.type) && (a == S.v1) && (b == S.v2))
+        {
             States.erase(States.begin() + t);
             break;
         }
@@ -89,16 +91,14 @@ void SimulatorStates::set_SAMP(u32 a, u32 b, u32 c)
 
 BOOL SimulatorStates::equal(SimulatorStates& S)
 {
-    if (States.size() != S.States.size()) return FALSE;
-    if (0 != memcmp(&*States.begin(), &*S.States.begin(), States.size() * sizeof(State))) return FALSE;
+    if (States.size() != S.States.size())
+        return FALSE;
+    if (0 != memcmp(&*States.begin(), &*S.States.begin(), States.size() * sizeof(State)))
+        return FALSE;
     return TRUE;
 }
 
-void SimulatorStates::clear()
-{
-    States.clear();
-}
-
+void SimulatorStates::clear() { States.clear(); }
 #if defined(USE_DX10) || defined(USE_DX11)
 
 #include "Layers/xrRenderDX10/dx10StateUtils.h"
@@ -108,7 +108,8 @@ void SimulatorStates::UpdateState(dx10State& state) const
     for (u32 it = 0; it < States.size(); it++)
     {
         const State& S = States[it];
-        if (S.type == 0) {
+        if (S.type == 0)
+        {
             switch (S.v1)
             {
             case D3DRS_STENCILREF: state.UpdateStencilRef(S.v2); break;
@@ -123,8 +124,9 @@ void SimulatorStates::UpdateDesc(D3D_RASTERIZER_DESC& desc) const
     for (u32 it = 0; it < States.size(); it++)
     {
         const State& S = States[it];
-        if (S.type == 0) {
-            // CHK_DX(HW.pDevice->SetRenderState		((D3DRENDERSTATETYPE)S.v1,S.v2));
+        if (S.type == 0)
+        {
+            // CHK_DX(HW.pDevice->SetRenderState        ((D3DRENDERSTATETYPE)S.v1,S.v2));
             switch (S.v1)
             {
             case D3DRS_FILLMODE:
@@ -158,22 +160,22 @@ void SimulatorStates::UpdateDesc(D3D_RASTERIZER_DESC& desc) const
         break;
         */
 
-            //	desc.FrontCounterClockwise = FALSE;
+            //  desc.FrontCounterClockwise = FALSE;
 
-            //	TODO: DX10: Check how to scale unit for depth bias
+            //  TODO: DX10: Check how to scale unit for depth bias
             case D3DRS_DEPTHBIAS:
                 VERIFY(0);
                 break;
 
-            //	desc.DepthBiasClamp = 0.0f;
+            //  desc.DepthBiasClamp = 0.0f;
 
-            //	TODO: DX10: Check slope scaled depth bias is used
+            //  TODO: DX10: Check slope scaled depth bias is used
             case D3DRS_SLOPESCALEDEPTHBIAS:
                 // desc.SlopeScaledDepthBias = 0.0f;
                 VERIFY(0);
                 break;
 
-            //	desc.DepthClipEnable = TRUE;
+            //  desc.DepthClipEnable = TRUE;
 
             case D3DRS_SCISSORTESTENABLE:
                 desc.ScissorEnable = S.v2;
@@ -186,10 +188,10 @@ void SimulatorStates::UpdateDesc(D3D_RASTERIZER_DESC& desc) const
 
         // case 1:
         //
-        // CHK_DX(HW.pDevice->SetTextureStageState	(S.v1,(D3DTEXTURESTAGESTATETYPE)S.v2,S.v3));
-        //	TODO: DX10: Enable
-        //	VERIFY(!"DirectX 10 doesn't support texture stage states. Implement shader instead!");
-        //	break;
+        // CHK_DX(HW.pDevice->SetTextureStageState  (S.v1,(D3DTEXTURESTAGESTATETYPE)S.v2,S.v3));
+        //  TODO: DX10: Enable
+        //  VERIFY(!"DirectX 10 doesn't support texture stage states. Implement shader instead!");
+        //  break;
     }
 }
 
@@ -198,7 +200,8 @@ void SimulatorStates::UpdateDesc(D3D_DEPTH_STENCIL_DESC& desc) const
     for (u32 it = 0; it < States.size(); it++)
     {
         const State& S = States[it];
-        if (S.type == 0) {
+        if (S.type == 0)
+        {
             switch (S.v1)
             {
             case D3DRS_ZENABLE: desc.DepthEnable = S.v2 ? 1 : 0; break;
@@ -257,7 +260,8 @@ void SimulatorStates::UpdateDesc(D3D_BLEND_DESC& desc) const
     for (u32 it = 0; it < States.size(); it++)
     {
         const State& S = States[it];
-        if (S.type == 0) {
+        if (S.type == 0)
+        {
             switch (S.v1)
             {
             case XRDX10RS_ALPHATOCOVERAGE:
@@ -319,7 +323,8 @@ void SimulatorStates::UpdateDesc(D3D_BLEND_DESC& desc) const
     for (u32 it = 0; it < States.size(); it++)
     {
         const State& S = States[it];
-        if (S.type == 0) {
+        if (S.type == 0)
+        {
             switch (S.v1)
             {
             case XRDX10RS_ALPHATOCOVERAGE: desc.AlphaToCoverageEnable = S.v2 ? 1 : 0; break;
@@ -371,11 +376,13 @@ void SimulatorStates::UpdateDesc(D3D_SAMPLER_DESC descArray[D3D_COMMONSHADER_SAM
     for (u32 it = 0; it < States.size(); it++)
     {
         const State& S = States[it];
-        if (S.type == 2) {
+        if (S.type == 2)
+        {
             int iSamplerIndex = int(S.v1);
             iSamplerIndex -= iBaseSamplerIndex;
 
-            if ((iSamplerIndex >= D3D_COMMONSHADER_SAMPLER_SLOT_COUNT) || iSamplerIndex < 0) continue;
+            if ((iSamplerIndex >= D3D_COMMONSHADER_SAMPLER_SLOT_COUNT) || iSamplerIndex < 0)
+                continue;
 
             SamplerUsed[iSamplerIndex] = true;
             D3D_SAMPLER_DESC& desc = descArray[iSamplerIndex];
@@ -390,7 +397,7 @@ void SimulatorStates::UpdateDesc(D3D_SAMPLER_DESC descArray[D3D_COMMONSHADER_SAM
                 case D3DTEXF_POINT: desc.Filter = (D3D_FILTER)(desc.Filter & (~MagfilterLinear)); break;
                 case D3DTEXF_LINEAR:
                     desc.Filter = (D3D_FILTER)(desc.Filter | MagfilterLinear);
-                    //					desc.Filter |= MagfilterLinear;
+                    //desc.Filter |= MagfilterLinear;
                     break;
                 default: NODEFAULT;
                 }
@@ -429,7 +436,8 @@ void SimulatorStates::UpdateDesc(D3D_SAMPLER_DESC descArray[D3D_COMMONSHADER_SAM
                 break;
 
             case XRDX10SAMP_ANISOTROPICFILTER:
-                if (S.v3) desc.Filter = (D3D_FILTER)(desc.Filter | FilterAnisotropic);
+                if (S.v3)
+                    desc.Filter = (D3D_FILTER)(desc.Filter | FilterAnisotropic);
                 // desc.Filter |= FilterAnisotropic;
                 else
                     desc.Filter = (D3D_FILTER)(desc.Filter & (~FilterAnisotropic));
@@ -437,7 +445,8 @@ void SimulatorStates::UpdateDesc(D3D_SAMPLER_DESC descArray[D3D_COMMONSHADER_SAM
                 break;
 
             case XRDX10SAMP_COMPARISONFILTER:
-                if (S.v3) desc.Filter = (D3D_FILTER)(desc.Filter | FilterComparison);
+                if (S.v3)
+                    desc.Filter = (D3D_FILTER)(desc.Filter | FilterComparison);
                 // desc.Filter |= FilterComparison;
                 else
                     desc.Filter = (D3D_FILTER)(desc.Filter & (~FilterComparison));
@@ -457,22 +466,22 @@ void SimulatorStates::UpdateDesc(D3D_SAMPLER_DESC descArray[D3D_COMMONSHADER_SAM
                 desc.AddressW = dx10StateUtils::ConvertTextureAddressMode(D3DTEXTUREADDRESS(S.v3));
                 break;
 
-            //	FLOAT MipLODBias
+            // FLOAT MipLODBias
             case D3DSAMP_MIPMAPLODBIAS:
                 desc.MipLODBias = *((float*)(&(S.v3)));
                 break;
 
-            //	UINT MaxAnisotropy;
+            // UINT MaxAnisotropy;
             case D3DSAMP_MAXANISOTROPY:
                 desc.MaxAnisotropy = S.v3;
                 break;
 
-            //	D3Dxx_COMPARISON_FUNC ComparisonFunc;
+            // D3Dxx_COMPARISON_FUNC ComparisonFunc;
             case XRDX10SAMP_COMPARISONFUNC:
                 desc.ComparisonFunc = (D3D_COMPARISON_FUNC)S.v3;
                 break;
 
-            //	FLOAT BorderColor[4];
+            // FLOAT BorderColor[4];
             case D3DSAMP_BORDERCOLOR:
             {
                 desc.BorderColor[0] = ((S.v3 >> 16) & 0xff) / 255.0f;
@@ -482,29 +491,31 @@ void SimulatorStates::UpdateDesc(D3D_SAMPLER_DESC descArray[D3D_COMMONSHADER_SAM
             }
             break;
 
-            //	FLOAT MinLOD;
+            // FLOAT MinLOD;
             case XRDX10SAMP_MINLOD:
                 desc.MinLOD = (FLOAT)S.v3;
                 break;
 
-            //	FLOAT MaxLOD;
+            // FLOAT MaxLOD;
             case D3DSAMP_MAXMIPLEVEL: desc.MaxLOD = (FLOAT)S.v3; break;
             }
         }
     }
 
-    //	Validate data
+    // Validate data
     for (int i = 0; i < D3D_COMMONSHADER_SAMPLER_SLOT_COUNT; ++i)
     {
         D3D_SAMPLER_DESC& desc = descArray[i];
-        if (desc.Filter & FilterAnisotropic) {
+        if (desc.Filter & FilterAnisotropic)
+        {
             desc.Filter = (D3D_FILTER)(desc.Filter | AllfilterLinear);
             // desc.Filter |= AllfilterLinear;
         }
 
         VERIFY(desc.MinLOD <= desc.MaxLOD);
-        if (desc.MinLOD > desc.MaxLOD) desc.MaxLOD = desc.MinLOD;
+        if (desc.MinLOD > desc.MaxLOD)
+            desc.MaxLOD = desc.MinLOD;
     }
 }
 
-#endif  //	USE_DX10
+#endif // USE_DX10

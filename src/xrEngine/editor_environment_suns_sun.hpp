@@ -53,12 +53,12 @@ private:
     float m_radius;
     bool m_use;
     bool m_ignore_color;
-};  // class sun
+}; // class sun
 
-}  // namespace suns
-}  // namespace environment
-}  // namespace editor
+} // namespace suns
+} // namespace environment
+} // namespace editor
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
-#endif  // ifndef EDITOR_WEATHER_SUNS_SUN_HPP_INCLUDED
+#endif // ifndef EDITOR_WEATHER_SUNS_SUN_HPP_INCLUDED

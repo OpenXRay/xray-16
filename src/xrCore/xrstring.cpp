@@ -54,7 +54,8 @@ struct str_container_impl
             while (*current != NULL)
             {
                 str_value* value = *current;
-                if (!value->dwReference) {
+                if (!value->dwReference)
+                {
                     *current = value->next;
                     xr_free(value);
                 }
@@ -134,20 +135,17 @@ struct str_container_impl
     }
 };
 
-str_container::str_container()
-{
-    impl = new str_container_impl();
-}
-
+str_container::str_container() { impl = new str_container_impl(); }
 str_value* str_container::dock(str_c value)
 {
-    if (0 == value) return 0;
+    if (0 == value)
+        return 0;
 
     cs.Enter();
 
 #ifdef DEBUG_MEMORY_MANAGER
     Memory.stat_strdock++;
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 
     str_value* result = 0;
 
@@ -168,29 +166,30 @@ str_value* str_container::dock(str_c value)
 
 #ifdef DEBUG
     bool is_leaked_string = !xr_strcmp(value, "enter leaked string here");
-#endif  // DEBUG
+#endif // DEBUG
 
     // it may be the case, string is not found or has "non-exact" match
     if (0 == result
 #ifdef DEBUG
         || is_leaked_string
-#endif  // DEBUG
+#endif // DEBUG
         )
     {
         result = (str_value*)Memory.mem_alloc(sizeof(str_value) + s_len_with_zero
 #ifdef DEBUG_MEMORY_NAME
             ,
             "storage: sstring"
-#endif  // DEBUG_MEMORY_NAME
+#endif // DEBUG_MEMORY_NAME
             );
 
 #ifdef DEBUG
         static int num_leaked_string = 0;
-        if (is_leaked_string) {
+        if (is_leaked_string)
+        {
             ++num_leaked_string;
             Msg("leaked_string: %d 0x%08x", num_leaked_string, result);
         }
-#endif  // DEBUG
+#endif // DEBUG
 
         result->dwReference = 0;
         result->dwLength = sv->dwLength;
@@ -258,18 +257,14 @@ struct str_container_impl
     typedef xr_multiset<str_value*, str_value_cmp> cdb;
     int num_docs;
     str_container_impl() { num_docs = 0; }
-
     cdb container;
 };
 
-str_container::str_container()
-{
-    impl = new str_container_impl();
-}
-
+str_container::str_container() { impl = new str_container_impl(); }
 str_value* str_container::dock(str_c value)
 {
-    if (0 == value) return 0;
+    if (0 == value)
+        return 0;
 
     cs.Enter();
 
@@ -286,7 +281,7 @@ str_value* str_container::dock(str_c value)
 
 #ifdef DEBUG_MEMORY_MANAGER
     Memory.stat_strdock++;
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 
     str_value* result = 0;
 
@@ -304,16 +299,19 @@ str_value* str_container::dock(str_c value)
     sv->next = NULL;
 
     // search
-    str_container_impl::cdb::iterator I = impl->container.find(sv);  // only integer compares :)
-    if (I != impl->container.end()) {
+    str_container_impl::cdb::iterator I = impl->container.find(sv); // only integer compares :)
+    if (I != impl->container.end())
+    {
         // something found - verify, it is exactly our string
         str_container_impl::cdb::iterator save = I;
         for (; I != impl->container.end() && (*I)->dwCRC == sv->dwCRC; ++I)
         {
             str_value* V = (*I);
-            if (V->dwLength != sv->dwLength) continue;
-            if (0 != memcmp(V->value, value, s_len)) continue;
-            result = V;  // found
+            if (V->dwLength != sv->dwLength)
+                continue;
+            if (0 != memcmp(V->value, value, s_len))
+                continue;
+            result = V; // found
             break;
         }
     }
@@ -321,7 +319,8 @@ str_value* str_container::dock(str_c value)
     bool is_leaked_string = !xr_strcmp(value, "enter leaked string here");
 
     // it may be the case, string is not found or has "non-exact" match
-    if (0 == result || is_leaked_string) {
+    if (0 == result || is_leaked_string)
+    {
         // Insert string
         // DUMP_PHASE;
 
@@ -329,12 +328,13 @@ str_value* str_container::dock(str_c value)
 #ifdef DEBUG_MEMORY_NAME
             ,
             "storage: sstring"
-#endif  // DEBUG_MEMORY_NAME
+#endif // DEBUG_MEMORY_NAME
             );
 
         static int num11 = 0;
 
-        if (is_leaked_string) {
+        if (is_leaked_string)
+        {
             ++num11;
             Msg("leaked_string: %d 0x%08x", num11, result);
         }
@@ -364,7 +364,8 @@ void str_container::clean()
     for (; it != end;)
     {
         str_value* sv = *it;
-        if (0 == sv->dwReference) {
+        if (0 == sv->dwReference)
+        {
             str_container_impl::cdb::iterator i_current = it;
             str_container_impl::cdb::iterator i_next = ++it;
             xr_free(sv);
@@ -376,7 +377,8 @@ void str_container::clean()
             it++;
         }
     }
-    if (impl->container.empty()) impl->container.clear();
+    if (impl->container.empty())
+        impl->container.clear();
     cs.Leave();
 }
 

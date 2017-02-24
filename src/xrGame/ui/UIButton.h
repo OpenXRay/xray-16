@@ -25,9 +25,9 @@ public:
 
     //состояния в которых находится кнопка
     typedef enum {
-        BUTTON_NORMAL,  //кнопка никак не затрагивается
-        BUTTON_PUSHED,  //в нажатом сотоянии
-        BUTTON_UP       //при удерживаемой кнопки мыши
+        BUTTON_NORMAL, //кнопка никак не затрагивается
+        BUTTON_PUSHED, //в нажатом сотоянии
+        BUTTON_UP //при удерживаемой кнопки мыши
     } E_BUTTON_STATE;
 
     //заново подготовить состояние
@@ -36,10 +36,8 @@ public:
     // Установка состояния кнопки: утоплена, не утоплена
     void SetButtonState(E_BUTTON_STATE eBtnState) { m_eButtonState = eBtnState; }
     E_BUTTON_STATE GetButtonState() const { return m_eButtonState; }
-
     // Поведение кнопки как переключателя реализовано пока только в режиме NORMAL_PRESS
     void SetButtonAsSwitch(bool bAsSwitch) { m_bIsSwitch = bAsSwitch; }
-
     // Работа с акселератором
     // Код акселератора берется из файла dinput.h, из DirectX SDK.
     // Например: кнопка A - код 0x1E(DIK_A)

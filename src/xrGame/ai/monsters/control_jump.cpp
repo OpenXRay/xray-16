@@ -52,15 +52,18 @@ void CControlJump::load(LPCSTR section)
 
 bool CControlJump::check_start_conditions()
 {
-    if (is_active()) return false;
-    if (m_man->is_captured_pure()) return false;
+    if (is_active())
+        return false;
+    if (m_man->is_captured_pure())
+        return false;
 
     return true;
 }
 
 void CControlJump::remove_links(IGameObject* object)
 {
-    if (m_data.target_object == object) m_data.target_object = NULL;
+    if (m_data.target_object == object)
+        m_data.target_object = NULL;
 }
 
 void CControlJump::activate()
@@ -69,12 +72,14 @@ void CControlJump::activate()
     m_man->subscribe(this, ControlCom::eventAnimationEnd);
     m_man->subscribe(this, ControlCom::eventAnimationStart);
 
-    if (!m_data.flags.test(SControlJumpData::eDontUseVelocityBounce)) {
+    if (!m_data.flags.test(SControlJumpData::eDontUseVelocityBounce))
+    {
         m_man->subscribe(this, ControlCom::eventVelocityBounce);
         m_data.flags.set(SControlJumpData::eDontUseVelocityBounce, false);
     }
 
-    if (m_data.target_object && !m_data.flags.test(SControlJumpData::eUseTargetPosition)) {
+    if (m_data.target_object && !m_data.flags.test(SControlJumpData::eUseTargetPosition))
+    {
         start_jump(get_target(m_data.target_object));
     }
     else
@@ -97,7 +102,8 @@ void CControlJump::on_release()
     m_man->unsubscribe(this, ControlCom::eventAnimationEnd);
     m_man->unsubscribe(this, ControlCom::eventAnimationStart);
 
-    if (m_data.target_object && m_data.flags.test(SControlJumpData::eUseAutoAim)) {
+    if (m_data.target_object && m_data.flags.test(SControlJumpData::eUseAutoAim))
+    {
         m_object->character_physics_support()->movement()->PHCharacter()->SetAirControlFactor(0.f);
     }
 
@@ -129,7 +135,8 @@ void CControlJump::start_jump(const Fvector& point)
     m_object->set_ignore_collision_hit(true);
 
     // select correct state
-    if (is_flag(SControlJumpData::ePrepareSkip)) {
+    if (is_flag(SControlJumpData::ePrepareSkip))
+    {
         m_anim_state_current = eStateGlide;
         m_anim_state_prev = eStatePrepare;
 
@@ -141,7 +148,8 @@ void CControlJump::start_jump(const Fvector& point)
         // check if can prepare in move
         bool prepared = false;
 
-        if (is_flag(SControlJumpData::ePrepareInMove)) {
+        if (is_flag(SControlJumpData::ePrepareInMove))
+        {
             // get animation time
             float time = m_man->animation().motion_time(m_data.state_prepare_in_move.motion, m_object->Visual());
             // set acceleration and velocity
@@ -151,18 +159,21 @@ void CControlJump::start_jump(const Fvector& point)
             // check nodes in direction
             Fvector target_point;
             target_point.mad(m_object->Position(), m_object->Direction(), dist);
-            if (m_man->path_builder().accessible(target_point)) {
+            if (m_man->path_builder().accessible(target_point))
+            {
                 // нода в прямой видимости?
                 m_man->path_builder().restrictions().add_border(m_object->Position(), target_point);
                 u32 node = ai().level_graph().check_position_in_direction(
                     m_object->ai_location().level_vertex_id(), m_object->Position(), target_point);
                 m_man->path_builder().restrictions().remove_border();
 
-                if (ai().level_graph().valid_vertex_id(node) && m_man->path_builder().accessible(node)) prepared = true;
+                if (ai().level_graph().valid_vertex_id(node) && m_man->path_builder().accessible(node))
+                    prepared = true;
             }
 
             // node is checked, so try to build path
-            if (prepared) {
+            if (prepared)
+            {
                 if (m_man->build_path_line(this, target_point, u32(-1),
                         m_data.state_prepare_in_move.velocity_mask | MonsterMovement::eVelocityParameterStand))
                 {
@@ -189,10 +200,12 @@ void CControlJump::start_jump(const Fvector& point)
         }
 
         // if cannot perform prepare in move
-        if (!prepared) {
+        if (!prepared)
+        {
             VERIFY(m_data.state_prepare.motion.valid() || is_flag(SControlJumpData::eGlideOnPrepareFailed));
 
-            if (m_data.state_prepare.motion.valid()) {
+            if (m_data.state_prepare.motion.valid())
+            {
                 m_anim_state_current = eStatePrepare;
                 m_anim_state_prev = eStateNone;
 
@@ -215,13 +228,15 @@ void CControlJump::start_jump(const Fvector& point)
 //////////////////////////////////////////////////////////////////////////
 void CControlJump::select_next_anim_state()
 {
-    if (m_anim_state_current == eStateNone) {
+    if (m_anim_state_current == eStateNone)
+    {
         stop();
         return;
     }
     // check gliding state
     if ((m_anim_state_current == eStateGlide) && (m_anim_state_prev == eStateGlide))
-        if (is_flag(SControlJumpData::eGlidePlayAnimOnce)) return;
+        if (is_flag(SControlJumpData::eGlidePlayAnimOnce))
+            return;
 
     //---------------------------------------------------------------------------------------------------
     // start new animation
@@ -242,7 +257,8 @@ void CControlJump::select_next_anim_state()
     // switch state if needed
     m_anim_state_prev = m_anim_state_current;
 
-    if (m_anim_state_current != eStateGlide) {
+    if (m_anim_state_current != eStateGlide)
+    {
         if (m_anim_state_current != eStatePrepare)
             m_anim_state_current = EStateAnimJump(m_anim_state_current + 1);
         else
@@ -257,20 +273,25 @@ void CControlJump::select_next_anim_state()
 float CControlJump::relative_time()
 {
     float time = ((Device.dwTimeGlobal - m_time_started) / 1000.f) / m_jump_time;
-    if (time > 1.f) time = 1.f;
+    if (time > 1.f)
+        time = 1.f;
 
     return time;
 }
 
 bool CControlJump::in_auto_aim()
 {
-    if (!m_data.target_object) return false;
+    if (!m_data.target_object)
+        return false;
 
-    if (!m_data.flags.test(SControlJumpData::eUseAutoAim)) return false;
+    if (!m_data.flags.test(SControlJumpData::eUseAutoAim))
+        return false;
 
-    if (!m_auto_aim_factor) return false;
+    if (!m_auto_aim_factor)
+        return false;
 
-    if (m_anim_state_prev != eStateGlide) return false;
+    if (m_anim_state_prev != eStateGlide)
+        return false;
 
     return true;
 }
@@ -281,12 +302,14 @@ bool CControlJump::in_auto_aim()
 void CControlJump::update_frame()
 {
     // check if all jump stages are ended
-    if (m_velocity_bounced && m_man->path_builder().is_path_end(0.1f)) {
+    if (m_velocity_bounced && m_man->path_builder().is_path_end(0.1f))
+    {
         stop();
         return;
     }
 
-    if (m_anim_state_current == eStateGlide && in_auto_aim()) {
+    if (m_anim_state_current == eStateGlide && in_auto_aim())
+    {
         // set angular speed in exclusive force mode
         SControlDirectionData* ctrl_data_dir = (SControlDirectionData*)m_man->data(this, ControlCom::eControlDir);
         VERIFY(ctrl_data_dir);
@@ -306,7 +329,8 @@ void CControlJump::update_frame()
     hit_test();
 
     // set velocity from path if we are on it
-    if (m_man->path_builder().is_moving_on_path()) {
+    if (m_man->path_builder().is_moving_on_path())
+    {
         //---------------------------------------------------------------------------------------------------------------------------------
         // Set Velocity from path
         //---------------------------------------------------------------------------------------------------------------------------------
@@ -319,7 +343,8 @@ void CControlJump::update_frame()
     }
 
     // check if we landed
-    if (is_on_the_ground()) grounding();
+    if (is_on_the_ground())
+        grounding();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -327,8 +352,10 @@ void CControlJump::update_frame()
 //////////////////////////////////////////////////////////////////////////
 bool CControlJump::is_on_the_ground()
 {
-    if (m_time_started == 0) return false;
-    if (m_time_started + (m_jump_time * 1000) > time()) return false;
+    if (m_time_started == 0)
+        return false;
+    if (m_time_started + (m_jump_time * 1000) > time())
+        return false;
 
     Fvector direction;
     direction.set(0.f, -1.f, 0.f);
@@ -338,8 +365,10 @@ bool CControlJump::is_on_the_ground()
     collide::rq_result l_rq;
 
     bool on_the_ground = false;
-    if (Level().ObjectSpace.RayPick(trace_from, direction, m_trace_ground_range, collide::rqtStatic, l_rq, m_object)) {
-        if (l_rq.range < m_trace_ground_range) on_the_ground = true;
+    if (Level().ObjectSpace.RayPick(trace_from, direction, m_trace_ground_range, collide::rqtStatic, l_rq, m_object))
+    {
+        if (l_rq.range < m_trace_ground_range)
+            on_the_ground = true;
     }
     return (on_the_ground);
 }
@@ -382,11 +411,7 @@ void CControlJump::grounding()
     }
 }
 
-void CControlJump::stop()
-{
-    m_man->notify(ControlCom::eventJumpEnd, 0);
-}
-
+void CControlJump::stop() { m_man->notify(ControlCom::eventJumpEnd, 0); }
 //////////////////////////////////////////////////////////////////////////
 // Get target point in world space
 Fvector CControlJump::get_target(IGameObject* obj)
@@ -414,11 +439,14 @@ void CControlJump::calculate_jump_time(Fvector const& target, bool const check_f
 
 void CControlJump::on_event(ControlCom::EEventType type, ControlCom::IEventData* data)
 {
-    if (type == ControlCom::eventVelocityBounce) {
+    if (type == ControlCom::eventVelocityBounce)
+    {
         SEventVelocityBounce* event_data = (SEventVelocityBounce*)data;
         // !TEMP!
-        if ((event_data->m_ratio < 0) && !m_velocity_bounced && (m_jump_time != 0)) {
-            if (is_on_the_ground()) {
+        if ((event_data->m_ratio < 0) && !m_velocity_bounced && (m_jump_time != 0))
+        {
+            if (is_on_the_ground())
+            {
                 m_velocity_bounced = true;
                 grounding();
             }
@@ -438,7 +466,8 @@ void CControlJump::on_event(ControlCom::EEventType type, ControlCom::IEventData*
         SControlAnimationData* ctrl_data = (SControlAnimationData*)m_man->data(this, ControlCom::eControlAnimation);
         VERIFY(ctrl_data);
 
-        if ((m_anim_state_current == eStateGlide) && (m_anim_state_prev == eStateGlide)) {
+        if ((m_anim_state_current == eStateGlide) && (m_anim_state_prev == eStateGlide))
+        {
             //---------------------------------------------------------------------------------
             // start jump here
             //---------------------------------------------------------------------------------
@@ -454,7 +483,8 @@ void CControlJump::on_event(ControlCom::EEventType type, ControlCom::IEventData*
             SControlDirectionData* ctrl_data_dir = (SControlDirectionData*)m_man->data(this, ControlCom::eControlDir);
             VERIFY(ctrl_data_dir);
 
-            if (!m_data.flags.test(SControlJumpData::eUseAutoAim) || !m_data.target_object) {
+            if (!m_data.flags.test(SControlJumpData::eUseAutoAim) || !m_data.target_object)
+            {
                 ctrl_data_dir->heading.target_angle = m_man->direction().angle_to_target(m_target_position);
             }
 
@@ -465,7 +495,7 @@ void CControlJump::on_event(ControlCom::EEventType type, ControlCom::IEventData*
             //---------------------------------------------------------------------------------
 
             ctrl_data->set_speed(m_man->animation().current_blend()->timeTotal /
-                                 m_man->animation().current_blend()->speed / m_jump_time);
+                m_man->animation().current_blend()->speed / m_jump_time);
         }
         else
             ctrl_data->set_speed(-1.f);
@@ -474,8 +504,10 @@ void CControlJump::on_event(ControlCom::EEventType type, ControlCom::IEventData*
 
 void CControlJump::hit_test()
 {
-    if (m_object_hitted) return;
-    if (!m_data.target_object) return;
+    if (m_object_hitted)
+        return;
+    if (!m_data.target_object)
+        return;
 
     // Проверить на нанесение хита во время прыжка
     Fvector trace_from;
@@ -486,17 +518,20 @@ void CControlJump::hit_test()
     if (Level().ObjectSpace.RayPick(
             trace_from, m_object->Direction(), m_hit_trace_range, collide::rqtObject, l_rq, m_object))
     {
-        if ((l_rq.O == m_data.target_object) && (l_rq.range < m_hit_trace_range)) {
+        if ((l_rq.O == m_data.target_object) && (l_rq.range < m_hit_trace_range))
+        {
             m_object_hitted = true;
         }
     }
 
-    if (!m_object_hitted && m_data.target_object) {
+    if (!m_object_hitted && m_data.target_object)
+    {
         m_object_hitted = true;
         // определить дистанцию до врага
         Fvector d;
         d.sub(m_data.target_object->Position(), m_object->Position());
-        if (d.magnitude() > m_hit_trace_range) m_object_hitted = false;
+        if (d.magnitude() > m_hit_trace_range)
+            m_object_hitted = false;
 
         // проверка на  Field-Of-Hit
         float my_h, my_p;
@@ -508,15 +543,18 @@ void CControlJump::hit_test()
         float from = angle_normalize(my_h - PI_DIV_6);
         float to = angle_normalize(my_h + PI_DIV_6);
 
-        if (!is_angle_between(h, from, to)) m_object_hitted = false;
+        if (!is_angle_between(h, from, to))
+            m_object_hitted = false;
 
         from = angle_normalize(my_p - PI_DIV_6);
         to = angle_normalize(my_p + PI_DIV_6);
 
-        if (!is_angle_between(p, from, to)) m_object_hitted = false;
+        if (!is_angle_between(p, from, to))
+            m_object_hitted = false;
     }
 
-    if (m_object_hitted) m_object->HitEntityInJump(smart_cast<CEntity*>(m_data.target_object));
+    if (m_object_hitted)
+        m_object->HitEntityInJump(smart_cast<CEntity*>(m_data.target_object));
 }
 
 bool CControlJump::can_jump(IGameObject* target)
@@ -546,12 +584,13 @@ bool CControlJump::jump_intersect_geometry(Fvector const& target, IGameObject* c
     pass_jump_picks = &jump_picks;
     xr_vector<Fvector> collide_tris;
     pass_collide_tris = &collide_tris;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     Fvector const sizes = {0.8f, 1.4f, 0.8f};
 
     Fvector const start_to_target = target - m_object->Position();
-    if (magnitude(start_to_target) < 1.f) return false;
+    if (magnitude(start_to_target) < 1.f)
+        return false;
 
     Fvector const traj_start = m_object->Position() + Fvector().set(0, 1.2f, 0);
     Fvector const traj_target = target + Fvector().set(0, 1.2f, 0) - (normalize(start_to_target) * 1);
@@ -562,7 +601,7 @@ bool CControlJump::jump_intersect_geometry(Fvector const& target, IGameObject* c
 #ifdef DEBUG
         m_object->m_jump_picks = jump_picks;
         m_object->m_jump_collide_tris = collide_tris;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
         return true;
     }
@@ -570,21 +609,24 @@ bool CControlJump::jump_intersect_geometry(Fvector const& target, IGameObject* c
 #ifdef DEBUG
     m_object->m_jump_picks = jump_picks;
     m_object->m_jump_collide_tris = collide_tris;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     return false;
 }
 
 bool CControlJump::can_jump(Fvector const& target, bool const aggressive_jump)
 {
-    if (m_time_next_allowed != 0) {
+    if (m_time_next_allowed != 0)
+    {
         // in aggressive mode we can jump after 1/3 of m_delay_after_jump
-        if (m_time_next_allowed - (int)aggressive_jump * (2 * m_delay_after_jump / 3) > Device.dwTimeGlobal) {
+        if (m_time_next_allowed - (int)aggressive_jump * (2 * m_delay_after_jump / 3) > Device.dwTimeGlobal)
+        {
             return false;
         }
     }
 
-    if (!m_object->movement().restrictions().accessible(target)) return false;
+    if (!m_object->movement().restrictions().accessible(target))
+        return false;
 
     Fvector source_position = m_object->Position();
     Fvector target_position = target;
@@ -594,7 +636,8 @@ bool CControlJump::can_jump(Fvector const& target, bool const aggressive_jump)
 
     // in aggressive mode we can jump from distance >= 1
     const float test_min_distance = aggressive_jump ? _min(1.f, m_min_distance) : m_min_distance;
-    if ((dist < test_min_distance) || (dist > m_max_distance)) return false;
+    if ((dist < test_min_distance) || (dist > m_max_distance))
+        return false;
 
     // получить вектор направления и его мир угол
     float dir_yaw = Fvector().sub(target_position, source_position).getH();
@@ -604,14 +647,18 @@ bool CControlJump::can_jump(Fvector const& target, bool const aggressive_jump)
     float yaw_current, yaw_target;
     m_object->control().direction().get_heading(yaw_current, yaw_target);
 
-    if (angle_difference(yaw_current, dir_yaw) > m_max_angle) return false;
+    if (angle_difference(yaw_current, dir_yaw) > m_max_angle)
+        return false;
 
     // check if target on the same floor etc
-    if (_abs(target_position.y - source_position.y) > m_max_height) return false;
+    if (_abs(target_position.y - source_position.y) > m_max_height)
+        return false;
 
     // проверка prepare
-    if (!is_flag(SControlJumpData::ePrepareSkip) && !is_flag(SControlJumpData::eGlideOnPrepareFailed)) {
-        if (!is_flag(SControlJumpData::ePrepareInMove)) {
+    if (!is_flag(SControlJumpData::ePrepareSkip) && !is_flag(SControlJumpData::eGlideOnPrepareFailed))
+    {
+        if (!is_flag(SControlJumpData::ePrepareInMove))
+        {
             VERIFY(m_data.state_prepare.motion.valid());
         }
         else
@@ -632,7 +679,8 @@ bool CControlJump::can_jump(Fvector const& target, bool const aggressive_jump)
             Fvector target_point;
             target_point.mad(m_object->Position(), m_object->Direction(), dist);
 
-            if (m_man->path_builder().accessible(target_point)) {
+            if (m_man->path_builder().accessible(target_point))
+            {
                 // нода в прямой видимости?
                 m_man->path_builder().restrictions().add_border(m_object->Position(), target_point);
                 u32 node = ai().level_graph().check_position_in_direction(
@@ -643,9 +691,11 @@ bool CControlJump::can_jump(Fvector const& target, bool const aggressive_jump)
                     good_trace_res = true;
             }
 
-            if (!good_trace_res) {
+            if (!good_trace_res)
+            {
                 // cannot prepare in move, so check if can prepare in stand state
-                if (!m_data.state_prepare.motion.valid()) return false;
+                if (!m_data.state_prepare.motion.valid())
+                    return false;
             }
         }
     }
@@ -653,7 +703,4 @@ bool CControlJump::can_jump(Fvector const& target, bool const aggressive_jump)
     return true;
 }
 
-Fvector CControlJump::predict_position(IGameObject* obj, const Fvector& pos)
-{
-    return pos;
-}
+Fvector CControlJump::predict_position(IGameObject* obj, const Fvector& pos) { return pos; }

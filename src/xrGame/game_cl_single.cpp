@@ -15,10 +15,7 @@ ESingleGameDifficulty g_SingleGameDifficulty = egdStalker;
 xr_token difficulty_type_token[] = {
     {"gd_novice", egdNovice}, {"gd_stalker", egdStalker}, {"gd_veteran", egdVeteran}, {"gd_master", egdMaster}, {0, 0}};
 
-game_cl_Single::game_cl_Single()
-{
-}
-
+game_cl_Single::game_cl_Single() {}
 CUIGameCustom* game_cl_Single::createGameUI()
 {
     CLASS_ID clsid = CLSID_GAME_UI_SINGLE;
@@ -32,16 +29,8 @@ CUIGameCustom* game_cl_Single::createGameUI()
     return pUIGame;
 }
 
-char* game_cl_Single::getTeamSection(int Team)
-{
-    return NULL;
-};
-
-void game_cl_Single::OnDifficultyChanged()
-{
-    Actor()->OnDifficultyChanged();
-}
-
+char* game_cl_Single::getTeamSection(int Team) { return NULL; };
+void game_cl_Single::OnDifficultyChanged() { Actor()->OnDifficultyChanged(); }
 ALife::_TIME_ID game_cl_Single::GetGameTime()
 {
     if (ai().get_alife() && ai().alife().initialized())

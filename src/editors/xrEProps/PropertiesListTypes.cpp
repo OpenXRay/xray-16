@@ -8,7 +8,8 @@
 xr_string ShortcutValue::GetDrawText(TOnDrawTextEvent OnDrawText)
 {
     xr_string txt = MxShortCutToText(value->hotkey).c_str();
-    if (!OnDrawText.empty()) OnDrawText(this, txt);
+    if (!OnDrawText.empty())
+        OnDrawText(this, txt);
     return txt;
 }
 

@@ -26,9 +26,7 @@ public:
 
     void head_look_point(const Fvector& look_point);
     Fvector& get_head_look_point() { return m_head_look_point; }
-
     const MonsterSpace::SBoneRotation& get_head_orientation() const { return m_head_orient; }
-
 private:
     static void bone_callback(CBoneInstance* B);
 

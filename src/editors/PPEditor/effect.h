@@ -16,7 +16,7 @@ typedef enum _edit_effect {
 
 class Effect
 {
-  protected:
+protected:
     Graphics::TBitmap* m_Host;
     ColorParam* m_BaseColor;
     ColorParam* m_AddColor;
@@ -25,7 +25,7 @@ class Effect
     edit_effect m_Edit;
     float m_Time;
 
-  public:
+public:
     Effect(Graphics::TBitmap* host);
     ~Effect();
     void clear();
@@ -33,11 +33,8 @@ class Effect
     void draw();
 
     ColorParam* get_base_color() { return m_BaseColor; }
-
     ColorParam* get_add_color() { return m_AddColor; }
-
     ColorParam* get_gray_color() { return m_GrayColor; }
-
     void add_point(int _xpos, int _ypos);
 };
 #endif

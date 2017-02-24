@@ -21,7 +21,8 @@
 CUIStatic* UIHelper::CreateStatic(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent)
 {
     CUIStatic* ui = new CUIStatic();
-    if (parent) {
+    if (parent)
+    {
         parent->AttachChild(ui);
         ui->SetAutoDelete(true);
     }
@@ -32,7 +33,8 @@ CUIStatic* UIHelper::CreateStatic(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent
 CUITextWnd* UIHelper::CreateTextWnd(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent)
 {
     CUITextWnd* ui = new CUITextWnd();
-    if (parent) {
+    if (parent)
+    {
         parent->AttachChild(ui);
         ui->SetAutoDelete(true);
     }
@@ -43,7 +45,8 @@ CUITextWnd* UIHelper::CreateTextWnd(CUIXml& xml, LPCSTR ui_path, CUIWindow* pare
 CUIEditBox* UIHelper::CreateEditBox(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent)
 {
     CUIEditBox* ui = new CUIEditBox();
-    if (parent) {
+    if (parent)
+    {
         parent->AttachChild(ui);
         ui->SetAutoDelete(true);
     }
@@ -63,7 +66,8 @@ CUIProgressBar* UIHelper::CreateProgressBar(CUIXml& xml, LPCSTR ui_path, CUIWind
 CUIFrameLineWnd* UIHelper::CreateFrameLine(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent)
 {
     CUIFrameLineWnd* ui = new CUIFrameLineWnd();
-    if (parent) {
+    if (parent)
+    {
         parent->AttachChild(ui);
         ui->SetAutoDelete(true);
     }
@@ -74,7 +78,8 @@ CUIFrameLineWnd* UIHelper::CreateFrameLine(CUIXml& xml, LPCSTR ui_path, CUIWindo
 CUIFrameWindow* UIHelper::CreateFrameWindow(CUIXml& xml, LPCSTR ui_path, CUIWindow* parent)
 {
     CUIFrameWindow* ui = new CUIFrameWindow();
-    if (parent) {
+    if (parent)
+    {
         parent->AttachChild(ui);
         ui->SetAutoDelete(true);
     }

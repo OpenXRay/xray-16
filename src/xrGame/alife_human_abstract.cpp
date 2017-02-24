@@ -16,47 +16,24 @@
 
 void CSE_ALifeHumanAbstract::update()
 {
-    if (!bfActive()) return;
+    if (!bfActive())
+        return;
 
     brain().update();
 }
 
-bool CSE_ALifeHumanAbstract::bfPerformAttack()
-{
-    return (brain().perform_attack());
-}
-
+bool CSE_ALifeHumanAbstract::bfPerformAttack() { return (brain().perform_attack()); }
 ALife::EMeetActionType CSE_ALifeHumanAbstract::tfGetActionType(
     CSE_ALifeSchedulable* schedulable, int iGroupIndex, bool bMutualDetection)
 {
     return (brain().action_type(schedulable, iGroupIndex, bMutualDetection));
 }
 
-void CSE_ALifeHumanAbstract::vfDetachAll(bool bFictitious)
-{
-    brain().objects().detach_all(bFictitious);
-}
-
-void CSE_ALifeHumanAbstract::vfUpdateWeaponAmmo()
-{
-    brain().objects().update_weapon_ammo();
-}
-
-void CSE_ALifeHumanAbstract::vfProcessItems()
-{
-    brain().objects().process_items();
-}
-
-void CSE_ALifeHumanAbstract::vfAttachItems(ALife::ETakeType tTakeType)
-{
-    brain().objects().attach_items();
-}
-
-CSE_ALifeDynamicObject* CSE_ALifeHumanAbstract::tpfGetBestDetector()
-{
-    return (brain().objects().best_detector());
-}
-
+void CSE_ALifeHumanAbstract::vfDetachAll(bool bFictitious) { brain().objects().detach_all(bFictitious); }
+void CSE_ALifeHumanAbstract::vfUpdateWeaponAmmo() { brain().objects().update_weapon_ammo(); }
+void CSE_ALifeHumanAbstract::vfProcessItems() { brain().objects().process_items(); }
+void CSE_ALifeHumanAbstract::vfAttachItems(ALife::ETakeType tTakeType) { brain().objects().attach_items(); }
+CSE_ALifeDynamicObject* CSE_ALifeHumanAbstract::tpfGetBestDetector() { return (brain().objects().best_detector()); }
 CSE_ALifeItemWeapon* CSE_ALifeHumanAbstract::tpfGetBestWeapon(ALife::EHitType& tHitType, float& fHitPower)
 {
     return (brain().objects().best_weapon());
@@ -69,11 +46,7 @@ void CSE_ALifeHumanAbstract::on_register()
     specific_character();
 }
 
-void CSE_ALifeHumanAbstract::on_unregister()
-{
-    inherited2::on_unregister();
-}
-
+void CSE_ALifeHumanAbstract::on_unregister() { inherited2::on_unregister(); }
 void CSE_ALifeHumanAbstract::spawn_supplies()
 {
     specific_character();

@@ -6,7 +6,7 @@
 #include "group_state_panic_run.h"
 #include "ai/Monsters/states/monster_state_home_point_attack.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -21,20 +21,14 @@ CStateGroupPanicAbstract::CStateGroupPanic(_Object* obj) : inherited(obj)
 }
 
 TEMPLATE_SPECIALIZATION
-CStateGroupPanicAbstract::~CStateGroupPanic()
-{
-}
-
+CStateGroupPanicAbstract::~CStateGroupPanic() {}
 TEMPLATE_SPECIALIZATION
-void CStateGroupPanicAbstract::initialize()
-{
-    inherited::initialize();
-}
-
+void CStateGroupPanicAbstract::initialize() { inherited::initialize(); }
 TEMPLATE_SPECIALIZATION
 void CStateGroupPanicAbstract::reselect_state()
 {
-    if (get_state(eStatePanic_MoveToHomePoint)->check_start_conditions()) {
+    if (get_state(eStatePanic_MoveToHomePoint)->check_start_conditions())
+    {
         select_state(eStatePanic_MoveToHomePoint);
         return;
     }
@@ -50,7 +44,8 @@ void CStateGroupPanicAbstract::setup_substates()
 {
     state_ptr state = get_state_current();
 
-    if (current_substate == eStatePanic_FaceUnprotectedArea) {
+    if (current_substate == eStatePanic_FaceUnprotectedArea)
+    {
         SStateDataAction data;
 
         data.action = ACT_STAND_IDLE;
@@ -68,14 +63,17 @@ void CStateGroupPanicAbstract::setup_substates()
 TEMPLATE_SPECIALIZATION
 void CStateGroupPanicAbstract::check_force_state()
 {
-    if ((current_substate == eStatePanic_FaceUnprotectedArea)) {
+    if ((current_substate == eStatePanic_FaceUnprotectedArea))
+    {
         // если видит врага
-        if (object->EnemyMan.get_enemy_time_last_seen() == Device.dwTimeGlobal) {
+        if (object->EnemyMan.get_enemy_time_last_seen() == Device.dwTimeGlobal)
+        {
             select_state(eStatePanic_Run);
             return;
         }
         // если получил hit
-        if (object->HitMemory.get_last_hit_time() + 5000 > Device.dwTimeGlobal) {
+        if (object->HitMemory.get_last_hit_time() + 5000 > Device.dwTimeGlobal)
+        {
             select_state(eStatePanic_Run);
             return;
         }

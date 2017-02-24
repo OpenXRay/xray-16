@@ -28,10 +28,7 @@ CCameraBase::CCameraBase(IGameObject* p, u32 flags)
     tag = 0;
 }
 
-CCameraBase::~CCameraBase()
-{
-}
-
+CCameraBase::~CCameraBase() {}
 void CCameraBase::Load(LPCSTR section)
 {
     rot_speed = pSettings->r_fvector3(section, "rot_speed");
@@ -42,18 +39,17 @@ void CCameraBase::Load(LPCSTR section)
     bClampPitch = (0 != lim_pitch[0]) || (0 != lim_pitch[1]);
     bClampYaw = (0 != lim_yaw[0]) || (0 != lim_yaw[1]);
 
-    if (bClampPitch) pitch = (lim_pitch[0] + lim_pitch[1]) * 0.5f;
-    if (bClampYaw) yaw = (lim_yaw[0] + lim_yaw[1]) * 0.5f;
+    if (bClampPitch)
+        pitch = (lim_pitch[0] + lim_pitch[1]) * 0.5f;
+    if (bClampYaw)
+        yaw = (lim_yaw[0] + lim_yaw[1]) * 0.5f;
 }
 
-IC float AClamp(Fvector2& l, float v)
-{
-    return (2 * v - l[0] - l[1]) / (l[1] - l[0]);
-}
-
+IC float AClamp(Fvector2& l, float v) { return (2 * v - l[0] - l[1]) / (l[1] - l[0]); }
 float CCameraBase::CheckLimYaw()
 {
-    if (bClampYaw) {
+    if (bClampYaw)
+    {
         return AClamp(lim_yaw, yaw);
     }
     else
@@ -62,7 +58,8 @@ float CCameraBase::CheckLimYaw()
 
 float CCameraBase::CheckLimPitch()
 {
-    if (bClampYaw) {
+    if (bClampYaw)
+    {
         return AClamp(lim_pitch, pitch);
     }
     else
@@ -71,7 +68,8 @@ float CCameraBase::CheckLimPitch()
 
 float CCameraBase::CheckLimRoll()
 {
-    if (bClampYaw) {
+    if (bClampYaw)
+    {
         return AClamp(lim_roll, roll);
     }
     else

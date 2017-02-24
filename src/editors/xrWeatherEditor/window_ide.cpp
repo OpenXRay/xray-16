@@ -72,9 +72,11 @@ window_weather_editor % window_ide::weather_editor()
 
 Void window_ide::window_ide_SizeChanged(System::Object ^ sender, System::EventArgs ^ e)
 {
-    if (WindowState == System::Windows::Forms::FormWindowState::Maximized) return;
+    if (WindowState == System::Windows::Forms::FormWindowState::Maximized)
+        return;
 
-    if (WindowState == System::Windows::Forms::FormWindowState::Minimized) return;
+    if (WindowState == System::Windows::Forms::FormWindowState::Minimized)
+        return;
 
     m_window_rectangle = gcnew Drawing::Rectangle(Location, Size);
 }
@@ -83,9 +85,11 @@ Void window_ide::window_ide_LocationChanged(System::Object ^ sender, System::Eve
 {
     m_view->window_view_LocationChanged(sender, e);
 
-    if (WindowState == System::Windows::Forms::FormWindowState::Maximized) return;
+    if (WindowState == System::Windows::Forms::FormWindowState::Maximized)
+        return;
 
-    if (WindowState == System::Windows::Forms::FormWindowState::Minimized) return;
+    if (WindowState == System::Windows::Forms::FormWindowState::Minimized)
+        return;
 
     m_window_rectangle = gcnew Drawing::Rectangle(Location, Size);
 }

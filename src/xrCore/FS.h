@@ -18,7 +18,7 @@ XRCORE_API extern u32 g_file_mapped_count;
 XRCORE_API void dump_file_mappings();
 extern void register_file_mapping(void* address, const u32& size, LPCSTR file_name);
 extern void unregister_file_mapping(void* address, const u32& size);
-#endif  // DEBUG
+#endif // DEBUG
 
 //------------------------------------------------------------------------------------
 // Write
@@ -34,7 +34,6 @@ public:
 public:
     IWriter() {}
     virtual ~IWriter() { R_ASSERT3(chunk_pos.empty(), "Opened chunk not closed.", *fName); }
-
     // kernel
     virtual void seek(u32 pos) = 0;
     virtual u32 tell() = 0;
@@ -80,7 +79,6 @@ public:
     IC void w_ivector4(const Ivector4& v) { w(&v, sizeof(Ivector4)); }
     IC void w_ivector3(const Ivector3& v) { w(&v, sizeof(Ivector3)); }
     IC void w_ivector2(const Ivector2& v) { w(&v, sizeof(Ivector2)); }
-
     // quant writing functions
     IC void w_float_q16(float a, float min, float max)
     {
@@ -105,7 +103,7 @@ public:
     u32 align();
     void open_chunk(u32 type);
     void close_chunk();
-    u32 chunk_size();  // returns size of currently opened chunk, 0 otherwise
+    u32 chunk_size(); // returns size of currently opened chunk, 0 otherwise
     void w_compressed(void* ptr, u32 count);
     void w_chunk(u32 type, void* data, u32 size);
     virtual bool valid() { return true; }
@@ -134,7 +132,6 @@ public:
 
     virtual void seek(u32 pos) { position = pos; }
     virtual u32 tell() { return position; }
-
     // specific
     IC u8* pointer() { return data; }
     IC u32 size() const { return file_size; }
@@ -171,29 +168,25 @@ struct XRCORE_API IReaderTestPolicy
 {
     IReaderBase_Test* m_test;
     IReaderTestPolicy() { m_test = NULL; }
-    ~IReaderTestPolicy();  // defined in FS.cpp
+    ~IReaderTestPolicy(); // defined in FS.cpp
 };
-#endif  // TESTING_IREADER
+#endif // TESTING_IREADER
 
 template <typename implementation_type>
 class IReaderBase
 
 #ifdef TESTING_IREADER
-    : public IReaderTestPolicy  // inheriting
-#endif                          // TESTING_IREADER
+    : public IReaderTestPolicy // inheriting
+#endif // TESTING_IREADER
 
 {
 public:
     IC IReaderBase() : m_last_pos(0) {}
     virtual ~IReaderBase() {}
-
     IC implementation_type& impl() { return *(implementation_type*)this; }
     IC const implementation_type& impl() const { return *(implementation_type*)this; }
-
     IC BOOL eof() const { return impl().elapsed() <= 0; };
-
     IC void r(void* p, int cnt) { impl().r(p, cnt); }
-
     IC Fvector r_vec3()
     {
         Fvector tmp;
@@ -267,18 +260,17 @@ public:
     IC void r_ivector4(Ivector3& v) { r(&v, sizeof(Ivector3)); }
     IC void r_ivector4(Ivector2& v) { r(&v, sizeof(Ivector2)); }
     IC void r_fcolor(Fcolor& v) { r(&v, sizeof(Fcolor)); }
-
     IC float r_float_q16(float min, float max)
     {
         u16 val = r_u16();
-        float A = (float(val) * (max - min)) / 65535.f + min;  // floating-point-error possible
+        float A = (float(val) * (max - min)) / 65535.f + min; // floating-point-error possible
         VERIFY((A >= min - EPS_S) && (A <= max + EPS_S));
         return A;
     }
     IC float r_float_q8(float min, float max)
     {
         u8 val = r_u8();
-        float A = (float(val) / 255.0001f) * (max - min) + min;  // floating-point-error possible
+        float A = (float(val) / 255.0001f) * (max - min) + min; // floating-point-error possible
         VERIFY((A >= min) && (A <= max));
         return A;
     }
@@ -298,13 +290,13 @@ public:
     }
     // Set file pointer to start of chunk data (0 for root chunk)
     IC void rewind() { impl().seek(0); }
-
     u32 find_chunk(u32 ID, BOOL* bCompressed);
 
-    IC BOOL r_chunk(u32 ID, void* dest)  // чтение XR Chunk'ов (4b-ID,4b-size,??b-data)
+    IC BOOL r_chunk(u32 ID, void* dest) // чтение XR Chunk'ов (4b-ID,4b-size,??b-data)
     {
         u32 dwSize = ((implementation_type*)this)->find_chunk(ID);
-        if (dwSize != 0) {
+        if (dwSize != 0)
+        {
             r(dest, dwSize);
             return TRUE;
         }
@@ -312,10 +304,11 @@ public:
             return FALSE;
     }
 
-    IC BOOL r_chunk_safe(u32 ID, void* dest, u32 dest_size)  // чтение XR Chunk'ов (4b-ID,4b-size,??b-data)
+    IC BOOL r_chunk_safe(u32 ID, void* dest, u32 dest_size) // чтение XR Chunk'ов (4b-ID,4b-size,??b-data)
     {
         u32 dwSize = ((implementation_type*)this)->find_chunk(ID);
-        if (dwSize != 0) {
+        if (dwSize != 0)
+        {
             R_ASSERT(dwSize == dest_size);
             r(dest, dwSize);
             return TRUE;
@@ -338,9 +331,7 @@ protected:
 
 public:
     IC IReader() { Pos = 0; }
-
     virtual ~IReader() {}
-
     IC IReader(void* _data, int _size, int _iterpos = 0)
     {
         data = (char*)_data;
@@ -352,7 +343,8 @@ public:
 protected:
     IC u32 correction(u32 p)
     {
-        if (p % 16) {
+        if (p % 16)
+        {
             return ((p % 16) + 1) * 16 - p;
         }
         return 0;
@@ -396,7 +388,7 @@ public:
     IReader* open_chunk(u32 ID);
 
     // iterators
-    IReader* open_chunk_iterator(u32& ID, IReader* previous = NULL);  // NULL=first
+    IReader* open_chunk_iterator(u32& ID, IReader* previous = NULL); // NULL=first
 
     u32 find_chunk(u32 ID, BOOL* bCompressed = 0);
 
@@ -414,4 +406,4 @@ public:
     virtual ~CVirtualFileRW();
 };
 
-#endif  // fsH
+#endif // fsH

@@ -18,7 +18,4 @@ IC CDangerExplosive::CDangerExplosive(
     m_time = time;
 }
 
-IC bool CDangerExplosive::operator==(const CExplosive* grenade) const
-{
-    return (m_grenade == grenade);
-}
+IC bool CDangerExplosive::operator==(const CExplosive* grenade) const { return (m_grenade == grenade); }

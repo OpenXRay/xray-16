@@ -8,37 +8,41 @@ CUIDialogWnd::CUIDialogWnd()
     m_bShowMe = false;
 }
 
-CUIDialogWnd::~CUIDialogWnd()
-{
-}
-
+CUIDialogWnd::~CUIDialogWnd() {}
 void CUIDialogWnd::Show(bool status)
 {
     inherited::Show(status);
 
-    if (status) ResetAll();
+    if (status)
+        ResetAll();
 }
 
 bool CUIDialogWnd::OnKeyboardHold(int dik)
 {
-    if (!IR_process()) return false;
+    if (!IR_process())
+        return false;
     return inherited::OnKeyboardHold(dik);
 }
 
 bool CUIDialogWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (!IR_process()) return false;
-    if (inherited::OnKeyboardAction(dik, keyboard_action)) return true;
+    if (!IR_process())
+        return false;
+    if (inherited::OnKeyboardAction(dik, keyboard_action))
+        return true;
     return false;
 }
 
 bool CUIDialogWnd::IR_process()
 {
-    if (!IsEnabled()) return false;
+    if (!IsEnabled())
+        return false;
 
-    if (GetHolder()->IgnorePause()) return true;
+    if (GetHolder()->IgnorePause())
+        return true;
 
-    if (Device.Paused() && !WorkInPause()) return false;
+    if (Device.Paused() && !WorkInPause())
+        return false;
 
     return true;
 }
@@ -47,7 +51,8 @@ CDialogHolder* CurrentDialogHolder();
 
 void CUIDialogWnd::ShowDialog(bool bDoHideIndicators)
 {
-    if (!IsShown()) CurrentDialogHolder()->StartDialog(this, bDoHideIndicators);
+    if (!IsShown())
+        CurrentDialogHolder()->StartDialog(this, bDoHideIndicators);
 }
 
 void CUIDialogWnd::HideDialog()

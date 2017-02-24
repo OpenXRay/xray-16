@@ -71,7 +71,8 @@ void CStalkerAnimationManager::reload()
     VERIFY((m_crouch_state_config == 0) || (m_crouch_state_config == 1) || (m_crouch_state_config == -1));
     m_crouch_state = m_crouch_state_config;
 
-    if (object().already_dead()) return;
+    if (object().already_dead())
+        return;
 
     m_skeleton_animated = smart_cast<IKinematicsAnimated*>(m_visual);
     VERIFY(m_skeleton_animated);
@@ -79,7 +80,8 @@ void CStalkerAnimationManager::reload()
     m_data_storage = stalker_animation_data_storage().object(m_skeleton_animated);
     VERIFY(m_data_storage);
 
-    if (!object().g_Alive()) return;
+    if (!object().g_Alive())
+        return;
 
 #ifdef USE_HEAD_BONE_PART_FAKE
     VERIFY(!m_data_storage->m_head_animations.A.empty());
@@ -105,7 +107,8 @@ void CStalkerAnimationManager::play_fx(float power_factor, int fx_index)
     VERIFY(
         fx_index < (int)m_data_storage->m_part_animations.A[object().movement().body_state()].m_global.A[0].A.size());
 #ifdef DEBUG
-    if (psAI_Flags.is(aiAnimation)) {
+    if (psAI_Flags.is(aiAnimation))
+    {
         LPCSTR name =
             m_skeleton_animated
                 ->LL_MotionDefName_dbg(

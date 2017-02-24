@@ -18,15 +18,14 @@
 // definition (Renderer)
 class CRenderTarget /*:public IRender_Target*/
 {
-  public:
+public:
     virtual u32 get_width() { return EDevice.dwWidth; }
-
     virtual u32 get_height() { return EDevice.dwHeight; }
 };
 
 class IRender
 {
-  public:
+public:
     enum GenerationLevel
     {
         GENERATION_R1 = 81,
@@ -47,7 +46,7 @@ class ECORE_API CRender :
     CRenderTarget* Target;
     Fmatrix current_matrix;
 
-  public:
+public:
     // options
     s32 m_skinning;
 
@@ -57,7 +56,7 @@ class ECORE_API CRender :
 
     CModelPool* Models;
 
-  public:
+public:
     // Occlusion culling
     virtual BOOL occ_visible(Fbox& B);
     virtual BOOL occ_visible(sPoly& P);
@@ -68,7 +67,6 @@ class ECORE_API CRender :
     virtual ~CRender();
 
     void shader_option_skinning(u32 mode) { m_skinning = mode; }
-
     void Initialize();
     void ShutDown();
 
@@ -97,7 +95,8 @@ class ECORE_API CRender :
     virtual void model_Delete(IRenderVisual*& V, BOOL bDiscard = TRUE);
     virtual void model_Delete(IRender_DetailModel*& F)
     {
-        if (F) {
+        if (F)
+        {
             CDetail* D = (CDetail*)F;
             D->Unload();
             xr_delete(D);
@@ -108,7 +107,6 @@ class ECORE_API CRender :
     void model_RenderSingle(IRenderVisual* m_pVisual, const Fmatrix& mTransform, float m_fLOD);
     virtual GenerationLevel get_generation() { return GENERATION_R1; }
     virtual bool is_sun_static() { return true; };
-
     virtual void add_SkeletonWallmark(intrusive_ptr<CSkeletonWallmark> wm){};
     virtual void add_SkeletonWallmark(
         const Fmatrix* xf, CKinematics* obj, ref_shader& sh, const Fvector& start, const Fvector& dir, float size){};
@@ -119,9 +117,7 @@ class ECORE_API CRender :
     virtual void rmNormal();
 
     void apply_lmaterial() {}
-
     virtual LPCSTR getShaderPath() { return "R1\\"; }
-
     virtual HRESULT CompileShader(LPCSTR pSrcData, UINT SrcDataLen, void* pDefines, void* pInclude,
         LPCSTR pFunctionName, LPCSTR pTarget, DWORD Flags, void* ppShader, void* ppErrorMsgs, void* ppConstantTable);
 

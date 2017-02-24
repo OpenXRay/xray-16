@@ -21,7 +21,8 @@ CDemoPlay::CDemoPlay(const char* name, float ms, u32 cycles, float life_time)
 {
     Msg("*** Playing demo: %s", name);
     Console->Execute("hud_weapon 0");
-    if (g_bBenchmark || g_SASH.IsRunning()) Console->Execute("hud_draw 0");
+    if (g_bBenchmark || g_SASH.IsRunning())
+        Console->Execute("hud_draw 0");
 
     fSpeed = ms;
     dwCyclesLeft = cycles ? cycles : 1;
@@ -31,9 +32,11 @@ CDemoPlay::CDemoPlay(const char* name, float ms, u32 cycles, float life_time)
     string_path nm, fn;
     xr_strcpy(nm, sizeof(nm), name);
     LPSTR extp = strext(nm);
-    if (extp) xr_strcpy(nm, sizeof(nm) - (extp - nm), ".anm");
+    if (extp)
+        xr_strcpy(nm, sizeof(nm) - (extp - nm), ".anm");
 
-    if (FS.exist(fn, "$level$", nm) || FS.exist(fn, "$game_anims$", nm)) {
+    if (FS.exist(fn, "$level$", nm) || FS.exist(fn, "$game_anims$", nm))
+    {
         m_pMotion = new COMotion();
         m_pMotion->LoadMotion(fn);
         m_MParam = new SAnimParams();
@@ -42,13 +45,15 @@ CDemoPlay::CDemoPlay(const char* name, float ms, u32 cycles, float life_time)
     }
     else
     {
-        if (!FS.exist(name)) {
+        if (!FS.exist(name))
+        {
             g_pGameLevel->Cameras().RemoveCamEffector(cefDemo);
             return;
         }
         IReader* fs = FS.r_open(name);
         u32 sz = fs->length();
-        if (sz % sizeof(Fmatrix) != 0) {
+        if (sz % sizeof(Fmatrix) != 0)
+        {
             FS.r_close(fs);
             g_pGameLevel->Cameras().RemoveCamEffector(cefDemo);
             return;
@@ -70,7 +75,8 @@ CDemoPlay::~CDemoPlay()
     xr_delete(m_pMotion);
     xr_delete(m_MParam);
     Console->Execute("hud_weapon 1");
-    if (g_bBenchmark || g_SASH.IsRunning()) Console->Execute("hud_draw 1");
+    if (g_bBenchmark || g_SASH.IsRunning())
+        Console->Execute("hud_draw 1");
 }
 
 void CDemoPlay::stat_Start()
@@ -91,7 +97,8 @@ extern string512 g_sBenchmarkName;
 
 void CDemoPlay::stat_Stop()
 {
-    if (!stat_started) return;
+    if (!stat_started)
+        return;
 
     // g_SASH.EndBenchmark();
 
@@ -113,15 +120,18 @@ void CDemoPlay::stat_Stop()
     const u32 iAvgFPS = _max((u32)rfps_average, 10);
     const u32 WindowSize = _max(16, iAvgFPS / 2);
 
-    if (stat_table.size() > WindowSize * 4) {
+    if (stat_table.size() > WindowSize * 4)
+    {
         for (u32 it = 2; it < stat_table.size() - WindowSize + 1; it++)
         {
             float fTime = 0;
             for (u32 i = 0; i < WindowSize; ++i)
                 fTime += stat_table[it + i];
             float fps = WindowSize / fTime;
-            if (fps < rfps_min) rfps_min = fps;
-            if (fps > rfps_max) rfps_max = fps;
+            if (fps < rfps_min)
+                rfps_min = fps;
+            if (fps > rfps_max)
+                rfps_max = fps;
             rfps_middlepoint += fps;
         }
 
@@ -132,8 +142,10 @@ void CDemoPlay::stat_Stop()
         for (u32 it = 1; it < stat_table.size(); it++)
         {
             float fps = 1.f / stat_table[it];
-            if (fps < rfps_min) rfps_min = fps;
-            if (fps > rfps_max) rfps_max = fps;
+            if (fps < rfps_min)
+                rfps_min = fps;
+            if (fps > rfps_max)
+                rfps_max = fps;
             rfps_middlepoint += fps;
         }
         rfps_middlepoint /= float(stat_table.size() - 1);
@@ -152,7 +164,8 @@ void CDemoPlay::stat_Stop()
 
     Msg("* [DEMO] FPS: average[%f], min[%f], max[%f], middle[%f]", rfps_average, rfps_min, rfps_max, rfps_middlepoint);
 
-    if (g_bBenchmark) {
+    if (g_bBenchmark)
+    {
         string_path fname;
 
         if (xr_strlen(g_sBenchmarkName))
@@ -172,7 +185,8 @@ void CDemoPlay::stat_Stop()
             string32 id;
             xr_sprintf(id, sizeof(id), "%7d", it);
             for (u32 c = 0; id[c]; c++)
-                if (' ' == id[c]) id[c] = '0';
+                if (' ' == id[c])
+                    id[c] = '0';
             res.w_float("per_frame_stats", id, 1.f / stat_table[it]);
         }
 
@@ -180,8 +194,8 @@ void CDemoPlay::stat_Stop()
     }
 }
 
-#define FIX(a)                                                                                                         \
-    while (a >= m_count)                                                                                               \
+#define FIX(a)           \
+    while (a >= m_count) \
     a -= m_count
 void spline1(float t, Fvector* p, Fvector* ret)
 {
@@ -208,9 +222,11 @@ void spline1(float t, Fvector* p, Fvector* ret)
 BOOL CDemoPlay::ProcessCam(SCamEffectorInfo& info)
 {
     // skeep a few frames before counting
-    if (Device.dwPrecacheFrame) return TRUE;
+    if (Device.dwPrecacheFrame)
+        return TRUE;
 
-    if (stat_started) {
+    if (stat_started)
+    {
         // g_SASH.DisplayFrame(Device.fTimeGlobal);
     }
     else
@@ -226,13 +242,15 @@ BOOL CDemoPlay::ProcessCam(SCamEffectorInfo& info)
     }
 
     // Process motion
-    if (m_pMotion) {
+    if (m_pMotion)
+    {
         Fvector R;
         Fmatrix mRotate;
         m_pMotion->_Evaluate(m_MParam->Frame(), info.p, R);
         m_MParam->Update(Device.fTimeDelta, 1.f, true);
         fLifeTime -= Device.fTimeDelta;
-        if (m_MParam->bWrapped) {
+        if (m_MParam->bWrapped)
+        {
             stat_Stop();
             stat_Start();
         }
@@ -242,7 +260,8 @@ BOOL CDemoPlay::ProcessCam(SCamEffectorInfo& info)
     }
     else
     {
-        if (seq.empty()) {
+        if (seq.empty())
+        {
             g_pGameLevel->Cameras().RemoveCamEffector(cefDemo);
             return TRUE;
         }
@@ -255,9 +274,11 @@ BOOL CDemoPlay::ProcessCam(SCamEffectorInfo& info)
         int frame = iFloor(ip);
         VERIFY(t >= 0);
 
-        if (frame >= m_count) {
+        if (frame >= m_count)
+        {
             dwCyclesLeft--;
-            if (0 == dwCyclesLeft) return FALSE;
+            if (0 == dwCyclesLeft)
+                return FALSE;
             fStartTime = 0;
             // just continue
             // stat_Stop ();

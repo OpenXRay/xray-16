@@ -20,11 +20,14 @@ bool activating_character_delay::active()
 }
 void activating_character_delay::update()
 {
-    if (!active()) return;
+    if (!active())
+        return;
 
-    if (Device.dwTimeGlobal < activate_time) return;
+    if (Device.dwTimeGlobal < activate_time)
+        return;
 
-    if (do_position_correct()) char_support.CreateCharacter();
+    if (do_position_correct())
+        char_support.CreateCharacter();
 
     activate_time = Device.dwTimeGlobal + delay;
 }
@@ -44,7 +47,8 @@ bool activating_character_delay::do_position_correct()
     VERIFY(obj);
     Fvector sv_pos = obj->Position();
     bool ret = char_support.CollisionCorrectObjPos();
-    if (!ret) obj->Position().set(sv_pos);
+    if (!ret)
+        obj->Position().set(sv_pos);
 #if 0
 	else
 	{

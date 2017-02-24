@@ -7,10 +7,8 @@ class bnon_copy
 {
 protected:
     bnon_copy() {}
-
 protected:
     bnon_copy(const bnon_copy&) {}
-
 protected:
     const bnon_copy& operator=(const bnon_copy&) { return *this; }
 };
@@ -32,15 +30,15 @@ public:
     float timeCurrent;
     float timeTotal;
     MotionID motionID;
-    u16 bone_or_part;  // startup parameters
+    u16 bone_or_part; // startup parameters
     u8 channel;
 
 private:
     ECurvature blend;
 
 public:
-    float blendAccrue;   // increasing
-    float blendFalloff;  // decreasing
+    float blendAccrue; // increasing
+    float blendFalloff; // decreasing
     float blendPower;
     float speed;
 
@@ -75,7 +73,6 @@ public:
     }
 
     CBlend(const CBlend& r) { *this = r; }
-
     const CBlend& operator=(const CBlend& r)
     {
         VERIFY(r.blend_state() != eFREE_SLOT);
@@ -106,9 +103,11 @@ public:
 IC void CBlend::update_play(float dt, PlayCallback _Callback)
 {
     float pow_dt = dt;
-    if (pow_dt < 0.f) {
+    if (pow_dt < 0.f)
+    {
         pow_dt = 0;
-        if (stop_at_end) {
+        if (stop_at_end)
+        {
             VERIFY(blendAccrue > 0.f);
             pow_dt = timeCurrent + dt - 1.f / blendAccrue;
             clamp(pow_dt, dt, 0.f);
@@ -119,14 +118,16 @@ IC void CBlend::update_play(float dt, PlayCallback _Callback)
 
     clamp(blendAmount, 0.f, blendPower);
 
-    if (!update_time(dt))  // reached end
+    if (!update_time(dt)) // reached end
         return;
 
-    if (_Callback && stop_at_end_callback) _Callback(this);  // callback only once
+    if (_Callback && stop_at_end_callback)
+        _Callback(this); // callback only once
 
     stop_at_end_callback = FALSE;
 
-    if (fall_at_end) {
+    if (fall_at_end)
+    {
         blend = eFalloff;
         blendFalloff = 2.f;
         // blendAccrue = timeCurrent;
@@ -136,26 +137,33 @@ IC void CBlend::update_play(float dt, PlayCallback _Callback)
 
 IC bool CBlend::update_time(float dt)
 {
-    if (!playing) return false;
+    if (!playing)
+        return false;
     float quant = dt * speed;
-    timeCurrent += quant;  // stop@end - time is not going
+    timeCurrent += quant; // stop@end - time is not going
 
     bool running_fwrd = (quant > 0);
     float const END_EPS = SAMPLE_SPF + EPS;
     bool at_end = running_fwrd && (timeCurrent > (timeTotal - END_EPS));
     bool at_begin = !running_fwrd && (timeCurrent < 0.f);
 
-    if (!stop_at_end) {
-        if (at_begin) timeCurrent += timeTotal;
-        if (at_end) timeCurrent -= (timeTotal - END_EPS);
+    if (!stop_at_end)
+    {
+        if (at_begin)
+            timeCurrent += timeTotal;
+        if (at_end)
+            timeCurrent -= (timeTotal - END_EPS);
         VERIFY(timeCurrent >= 0.f);
         return false;
     }
-    if (!at_end && !at_begin) return false;
+    if (!at_end && !at_begin)
+        return false;
 
-    if (at_end) {
-        timeCurrent = timeTotal - END_EPS;  // stop@end - time frozen at the end
-        if (timeCurrent < 0.f) timeCurrent = 0.f;
+    if (at_end)
+    {
+        timeCurrent = timeTotal - END_EPS; // stop@end - time frozen at the end
+        if (timeCurrent < 0.f)
+            timeCurrent = 0.f;
     }
     else
         timeCurrent = 0.f;
@@ -183,7 +191,8 @@ IC bool CBlend::update(float dt, PlayCallback _Callback)
     case eFREE_SLOT: NODEFAULT;
     case eAccrue: update_play(dt, _Callback); break;
     case eFalloff:
-        if (update_falloff(dt)) return true;
+        if (update_falloff(dt))
+            return true;
         break;
     default: NODEFAULT;
     }

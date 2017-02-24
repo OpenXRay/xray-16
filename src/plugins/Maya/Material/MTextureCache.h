@@ -13,7 +13,7 @@
 ///////////////////////////////////////////////////////////////////
 
 #ifdef WIN32
-#pragma warning(disable : 4786)  // Disable stupid STL warnings.
+#pragma warning(disable : 4786) // Disable stupid STL warnings.
 #endif
 
 #include <maya/MObject.h>
@@ -40,10 +40,9 @@ public:
     ~MTextureCacheElement();
 
     MTexture* texture() { return m_texture; }
-
 private:
     MTexture* m_texture;
-    unsigned int lastAccessedTimestamp;  // can be used to track when the texture was last used.
+    unsigned int lastAccessedTimestamp; // can be used to track when the texture was last used.
     NodeMonitor fMonitor;
 };
 
@@ -67,7 +66,8 @@ public:
 
     static MTextureCache* instance()
     {
-        if (!m_instance) {
+        if (!m_instance)
+        {
             m_instance = xr_new<MTextureCache>();
         }
 
@@ -82,7 +82,8 @@ public:
 
         refcount--;
 
-        if (refcount == 0 && m_instance) {
+        if (refcount == 0 && m_instance)
+        {
             xr_delete(m_instance);
             m_instance = NULL;
         }
@@ -112,4 +113,4 @@ private:
     static MTextureCache* m_instance;
 };
 
-#endif  // MAYA_API_MTextureCache
+#endif // MAYA_API_MTextureCache

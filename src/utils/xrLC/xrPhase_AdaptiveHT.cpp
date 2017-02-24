@@ -10,15 +10,18 @@
 #include "common/face_smoth_flags.h"
 #include "utils/xrLCUtil/xrThread.hpp"
 
-const float aht_max_edge = c_SS_maxsize / 2.5f;  // 2.0f;			// 2 m
+const float aht_max_edge = c_SS_maxsize / 2.5f; // 2.0f;			// 2 m
 // const	float	aht_min_edge	= .2f;					// 20 cm
 // const	float	aht_min_err		= 16.f/255.f;			// ~10% error
 
 bool is_CCW(int _1, int _2)
 {
-    if (0 == _1 && 1 == _2) return true;
-    if (1 == _1 && 2 == _2) return true;
-    if (2 == _1 && 0 == _2) return true;
+    if (0 == _1 && 1 == _2)
+        return true;
+    if (1 == _1 && 2 == _2)
+        return true;
+    if (2 == _1 && 0 == _2)
+        return true;
     return false;
 }
 
@@ -31,9 +34,11 @@ int callback_edge_longest(const Face* F)
     {
         Vertex *V1, *V2;
         F->EdgeVerts(e, &V1, &V2);
-        float len = V1->P.distance_to(V2->P);  // len
-        if (len < aht_max_edge) continue;
-        if (len > max_err) {
+        float len = V1->P.distance_to(V2->P); // len
+        if (len < aht_max_edge)
+            continue;
+        if (len > max_err)
+        {
             max_err = len;
             max_id = e;
         }
@@ -162,14 +167,15 @@ void CBuild::xrPhase_AdaptiveHT()
     DB.ray_options(0);
 
     Logger.Status("Tesselating...");
-    if (1) {
+    if (1)
+    {
         for (u32 fit = 0; fit < lc_global_data()->g_faces().size(); fit++)
-        {  // clear split flag from all faces + calculate normals
+        { // clear split flag from all faces + calculate normals
             lc_global_data()->g_faces()[fit]->flags.bSplitted = false;
             lc_global_data()->g_faces()[fit]->flags.bLocked = true;
             lc_global_data()->g_faces()[fit]->CalcNormal();
         }
-        u_Tesselate(callback_edge_longest, 0, 0);  // tesselate
+        u_Tesselate(callback_edge_longest, 0, 0); // tesselate
     }
 
     // Tesselate + calculate
@@ -194,7 +200,7 @@ void CBuild::xrPhase_AdaptiveHT()
         //	Vertex*		V		= lc_global_data()->g_vertices()[vit];
         //	V->normalFromAdj	();
         //	LightPoint			(&DB, lc_global_data()->RCAST_Model(), vC, V->P, V->N, pBuild->L_static(),
-        //LP_dont_rgb+LP_dont_sun,0);
+        // LP_dont_rgb+LP_dont_sun,0);
         //	vC.mul				(0.5f);
         //	V->C._set			(vC);
         //}
@@ -250,9 +256,11 @@ void CollectProblematicFaces(const Face& F, int max_id, xr_vector<Face*>& reult,
     for (u32 adj = 0; adj < (*V1)->m_adjacents.size(); ++adj)
     {
         Face* A = (*V1)->m_adjacents[adj];
-        if (A->flags.bSplitted) continue;
+        if (A->flags.bSplitted)
+            continue;
 
-        if (A->VContains(*V2)) adjacent_vec.push_back(A);
+        if (A->VContains(*V2))
+            adjacent_vec.push_back(A);
     }
 
     std::sort(adjacent_vec.begin(), adjacent_vec.end());
@@ -263,17 +271,21 @@ bool check_and_destroy_splited(u32 face_it)
 {
     Face* F = lc_global_data()->g_faces()[face_it];
     VERIFY(F);
-    if (F->flags.bSplitted) {
-        if (!F->flags.bLocked) lc_global_data()->destroy_face(lc_global_data()->g_faces()[face_it]);
-        return false;  // continue;
+    if (F->flags.bSplitted)
+    {
+        if (!F->flags.bLocked)
+            lc_global_data()->destroy_face(lc_global_data()->g_faces()[face_it]);
+        return false; // continue;
     }
     return true;
 }
 bool do_tesselate_face(const Face& F, tesscb_estimator* cb_E, int& max_id)
 {
-    if (F.CalcArea() < EPS_L) return false;  // continue;
+    if (F.CalcArea() < EPS_L)
+        return false; // continue;
     max_id = cb_E(&F);
-    if (max_id < 0) return false;  // continue;	// nothing selected
+    if (max_id < 0)
+        return false; // continue;	// nothing selected
     return true;
 }
 
@@ -318,7 +330,8 @@ void tessalate_faces(xr_vector<Face*>& faces, Vertex* V1, Vertex* V2, tesscb_fac
         set_backface(F1->sm_group, is_backface(AF->sm_group));
         set_backface(F2->sm_group, is_backface(AF->sm_group));
 
-        if (is_CCW(id1, id2)) {
+        if (is_CCW(id1, id2))
+        {
             bool id1_id2_soft = is_soft_edge(AF->sm_group, id1);
             bool id2_idB_soft = is_soft_edge(AF->sm_group, id2);
             bool idB_id1_soft = is_soft_edge(AF->sm_group, idB);
@@ -364,9 +377,11 @@ void tessalate_faces(xr_vector<Face*>& faces, Vertex* V1, Vertex* V2, tesscb_fac
 
         // Normals and checkpoint
         F1->N = AF->N;
-        if (cb_F) cb_F(F1);
+        if (cb_F)
+            cb_F(F1);
         F2->N = AF->N;
-        if (cb_F) cb_F(F2);
+        if (cb_F)
+            cb_F(F2);
         // smoth groups
         // F1->sm_group= AF->sm_group;
         // F2->sm_group= AF->sm_group;
@@ -377,7 +392,8 @@ void tessalate_faces(xr_vector<Face*>& faces, Vertex* V1, Vertex* V2, tesscb_fac
     // calc vertex attributes
     {
         V->normalFromAdj();
-        if (cb_V) cb_V(V);
+        if (cb_V)
+            cb_V(V);
     }
 }
 void CBuild::u_Tesselate(tesscb_estimator* cb_E, tesscb_face* cb_F, tesscb_vertex* cb_V)
@@ -394,18 +410,22 @@ void CBuild::u_Tesselate(tesscb_estimator* cb_E, tesscb_face* cb_F, tesscb_verte
     for (u32 I = 0; I < lc_global_data()->g_faces().size(); ++I)
     {
         Face* F = lc_global_data()->g_faces()[I];
-        if (0 == F) continue;
-        if (!check_and_destroy_splited(I)) continue;
+        if (0 == F)
+            continue;
+        if (!check_and_destroy_splited(I))
+            continue;
 
         Logger.Progress(float(I) / float(lc_global_data()->g_faces().size()));
         int max_id = -1;
-        if (!do_tesselate_face(*F, cb_E, max_id)) continue;
+        if (!do_tesselate_face(*F, cb_E, max_id))
+            continue;
 
         xr_vector<Face*> adjacent_vec;
         Vertex *V1, *V2;
         CollectProblematicFaces(*F, max_id, adjacent_vec, &V1, &V2);
         ++counter_create;
-        if (0 == (counter_create % 10000)) {
+        if (0 == (counter_create % 10000))
+        {
             for (u32 I = 0; I < lc_global_data()->g_vertices().size(); ++I)
                 if (lc_global_data()->g_vertices()[I]->m_adjacents.empty())
                     lc_global_data()->destroy_vertex(lc_global_data()->g_vertices()[I]);

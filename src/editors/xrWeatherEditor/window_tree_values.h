@@ -23,7 +23,7 @@ namespace editor
 public
 ref class window_tree_values : public System::Windows::Forms::Form
 {
-  public:
+public:
     window_tree_values(void)
     {
         InitializeComponent();
@@ -32,65 +32,66 @@ ref class window_tree_values : public System::Windows::Forms::Form
         //
     }
 
-  protected:
+protected:
     /// <summary>
     /// Clean up any resources being used.
     /// </summary>
     ~window_tree_values()
     {
-        if (components) {
+        if (components)
+        {
             delete components;
         }
     }
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel2;
 
-  protected:
-  private:
+protected:
+private:
     System::Windows::Forms::Panel ^ panel3;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel4;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel1;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel5;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel6;
 
-  private:
+private:
     System::Windows::Forms::TreeView ^ TreeView;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel7;
 
-  private:
+private:
     System::Windows::Forms::ImageList ^ Images;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel10;
 
-  private:
+private:
     System::Windows::Forms::TextBox ^ TextBox;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel8;
 
-  private:
+private:
     System::Windows::Forms::Button ^ OK_Button;
 
-  private:
+private:
     System::Windows::Forms::Button ^ Cancel_Button;
 
-  private:
+private:
     System::ComponentModel::IContainer ^ components;
 
-  protected:
-  private:
+protected:
+private:
 /// <summary>
 /// Required designer variable.
 /// </summary>
@@ -292,16 +293,16 @@ ref class window_tree_values : public System::Windows::Forms::Form
         this->ResumeLayout(false);
     }
 #pragma endregion
-  public:
+public:
     typedef property_string_values_value_base::collection_type collection_type;
 
-  public:
+public:
     void values(collection_type ^ values, String ^ current_value);
 
-  public:
+public:
     System::String ^ Result;
 
-  private:
+private:
     Void TreeView_AfterCollapse(Object ^ sender, TreeViewEventArgs ^ e);
     Void TreeView_AfterExpand(Object ^ sender, TreeViewEventArgs ^ e);
     Void TreeView_MouseClick(Object ^ sender, MouseEventArgs ^ e);

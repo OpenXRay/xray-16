@@ -51,21 +51,24 @@ IC u32 common_edge_idx(const MxFace& base_f, u32 base_edge_idx, const MxFace& te
     VERIFY(base_edge_idx < 3);
     MxVertexID bv0 = base_f[base_edge_idx];
     MxVertexID bv1 = base_f[(base_edge_idx + 1) % 3];
-    if (bv0 > bv1) swap(bv0, bv1);
+    if (bv0 > bv1)
+        swap(bv0, bv1);
 
     for (u8 i = 0; i < 3; ++i)
     {
         MxVertexID tv0 = test_f[i];
         MxVertexID tv1 = test_f[(i + 1) % 3];
-        if (tv0 > tv1) swap(tv0, tv1);
-        if (bv0 == tv0 && bv1 == tv1) return i;
+        if (tv0 > tv1)
+            swap(tv0, tv1);
+        if (bv0 == tv0 && bv1 == tv1)
+            return i;
     }
     return u32(-1);
 }
 bool do_constrain(u32 base_edge_idx, u32 test_edg_idx, face_props& base_fprops, face_props& test_fprops)
 {
     return (test_fprops.material != base_fprops.material) || (test_fprops.sector != base_fprops.sector) ||
-           !do_connect_faces_by_faces_edge_flags(base_fprops.flags, test_fprops.flags, base_edge_idx, test_edg_idx);
+        !do_connect_faces_by_faces_edge_flags(base_fprops.flags, test_fprops.flags, base_edge_idx, test_edg_idx);
 }
 
 DEFINE_VECTOR(face_props, FPVec, FPVecIt);
@@ -79,7 +82,8 @@ void SimplifyCFORM(CDB::CollectorPacked& CL)
 
     // save source SMF
     bool keep_temp_files = !!strstr(Core.Params, "-keep_temp_files");
-    if (keep_temp_files) {
+    if (keep_temp_files)
+    {
         string_path fn;
         SaveAsSMF(strconcat(sizeof(fn), fn, pBuild->path, "cform_source.smf"), CL);
     }
@@ -110,15 +114,16 @@ void SimplifyCFORM(CDB::CollectorPacked& CL)
     slim->boundary_weight = 1000000.f;
     slim->compactness_ratio = COMPACTNESS_RATIO;
     slim->meshing_penalty = 1000000.f;
-    slim->placement_policy = MX_PLACE_ENDPOINTS;  // MX_PLACE_ENDPOINTS;//MX_PLACE_ENDORMID;//MX_PLACE_OPTIMAL;
-    slim->weighting_policy = MX_WEIGHT_UNIFORM;   // MX_WEIGHT_UNIFORM;//MX_WEIGHT_AREA;
+    slim->placement_policy = MX_PLACE_ENDPOINTS; // MX_PLACE_ENDPOINTS;//MX_PLACE_ENDORMID;//MX_PLACE_OPTIMAL;
+    slim->weighting_policy = MX_WEIGHT_UNIFORM; // MX_WEIGHT_UNIFORM;//MX_WEIGHT_AREA;
     slim->initialize();
 
     // constraint material&sector vertex
     Ivector2 f_rm[3] = {{0, 1}, {1, 2}, {2, 0}};
     for (u32 f_idx = 0; f_idx < slim->valid_faces; f_idx++)
     {
-        if (mdl->face_is_valid(f_idx)) {
+        if (mdl->face_is_valid(f_idx))
+        {
             MxFace& base_f = mdl->face(f_idx);
             for (u32 edge_idx = 0; edge_idx < 3; edge_idx++)
             {
@@ -135,7 +140,8 @@ void SimplifyCFORM(CDB::CollectorPacked& CL)
                     mdl->face_mark(N1[K], mdl->face_mark(N1[K]) + 1);
                 const MxFaceList& N = (N0.size() < N1.size()) ? N0 : N1;
                 face_props& base_t = FPs[f_idx];
-                if (N.size()) {
+                if (N.size())
+                {
                     u32 cnt_pos = 0, cnt_neg = 0;
                     bool need_constraint = false;
                     for (K = 0; K < N.length(); K++)
@@ -143,10 +149,12 @@ void SimplifyCFORM(CDB::CollectorPacked& CL)
                         u32 fff = N[K];
                         MxFace& cur_f = mdl->face(fff);
                         unsigned char mk = mdl->face_mark(fff);
-                        if ((f_idx != N[K]) && (mdl->face_mark(N[K]) == 2)) {
+                        if ((f_idx != N[K]) && (mdl->face_mark(N[K]) == 2))
+                        {
                             face_props& cur_t = FPs[N[K]];
                             u32 cur_edge_idx = common_edge_idx(base_f, edge_idx, cur_f);
-                            if (do_constrain(edge_idx, cur_edge_idx, base_t, cur_t)) {
+                            if (do_constrain(edge_idx, cur_edge_idx, base_t, cur_t))
+                            {
                                 need_constraint = true;
                                 break;
                             }
@@ -157,7 +165,8 @@ void SimplifyCFORM(CDB::CollectorPacked& CL)
                                 cnt_pos++;
                         }
                     }
-                    if (need_constraint || ((0 == cnt_pos) && (1 == cnt_neg))) {
+                    if (need_constraint || ((0 == cnt_pos) && (1 == cnt_neg)))
+                    {
                         slim->constraint_manual(base_f[I], base_f[J], f_idx);
                     }
                 }
@@ -174,7 +183,8 @@ void SimplifyCFORM(CDB::CollectorPacked& CL)
     // rebuild CDB
     for (u32 f_idx = 0; f_idx < mdl->face_count(); f_idx++)
     {
-        if (mdl->face_is_valid(f_idx)) {
+        if (mdl->face_is_valid(f_idx))
+        {
             MxFace& F = mdl->face(f_idx);
             face_props& FP = FPs[f_idx];
             CL.add_face(*((Fvector*)&mdl->vertex(F[0])), *((Fvector*)&mdl->vertex(F[1])),
@@ -183,7 +193,8 @@ void SimplifyCFORM(CDB::CollectorPacked& CL)
     }
 
     // save source CDB
-    if (keep_temp_files) {
+    if (keep_temp_files)
+    {
         string_path fn;
         SaveAsSMF(strconcat(sizeof(fn), fn, pBuild->path, "cform_optimized.smf"), CL);
     }

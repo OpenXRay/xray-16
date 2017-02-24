@@ -16,10 +16,7 @@
 #include "physics_game.h"
 extern pureFrame* g_pNetProcessor;
 
-bool CLevel::net_Start_client(const char* options)
-{
-    return false;
-}
+bool CLevel::net_Start_client(const char* options) { return false; }
 #include "string_table.h"
 bool CLevel::net_start_client1()
 {
@@ -30,7 +27,8 @@ bool CLevel::net_start_client1()
     if (strchr(*m_caClientOptions, '/'))
         strncpy_s(name_of_server, *m_caClientOptions, strchr(*m_caClientOptions, '/') - *m_caClientOptions);
 
-    if (strchr(name_of_server, '/')) *strchr(name_of_server, '/') = 0;
+    if (strchr(name_of_server, '/'))
+        *strchr(name_of_server, '/') = 0;
 
     // Startup client
     /*
@@ -48,7 +46,8 @@ bool CLevel::net_start_client1()
 
 bool CLevel::net_start_client2()
 {
-    if (psNET_direct_connect) {
+    if (psNET_direct_connect)
+    {
         Server->create_direct_client();
         // offline account creation
         m_bConnectResultReceived = false;
@@ -71,27 +70,29 @@ void rescan_mp_archives()
 
 bool CLevel::net_start_client3()
 {
-    if (connected_to_server) {
+    if (connected_to_server)
+    {
         LPCSTR level_name = NULL;
         LPCSTR level_ver = NULL;
         LPCSTR download_url = NULL;
 
-        if (psNET_direct_connect)  // single
+        if (psNET_direct_connect) // single
         {
             shared_str const& server_options = Server->GetConnectOptions();
-            level_name = name().c_str();                                // Server->level_name		(server_options).c_str();
-            level_ver = Server->level_version(server_options).c_str();  // 1.0
+            level_name = name().c_str(); // Server->level_name		(server_options).c_str();
+            level_ver = Server->level_version(server_options).c_str(); // 1.0
         }
-        else  // multiplayer
+        else // multiplayer
         {
             level_name = get_net_DescriptionData().map_name;
             level_ver = get_net_DescriptionData().map_version;
             download_url = get_net_DescriptionData().download_url;
-            rescan_mp_archives();  // because if we are using psNET_direct_connect, we not download map...
+            rescan_mp_archives(); // because if we are using psNET_direct_connect, we not download map...
         }
         // Determine internal level-ID
         int level_id = pApp->Level_ID(level_name, level_ver, true);
-        if (level_id == -1) {
+        if (level_id == -1)
+        {
             Disconnect();
 
             connected_to_server = FALSE;
@@ -105,7 +106,7 @@ bool CLevel::net_start_client3()
         }
 #ifdef DEBUG
         Msg("--- net_start_client3: level_id [%d], level_name[%s], level_version[%s]", level_id, level_name, level_ver);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         map_data.m_name = level_name;
         map_data.m_map_version = level_ver;
         map_data.m_map_download_url = download_url;
@@ -115,14 +116,16 @@ bool CLevel::net_start_client3()
         // Load level
         R_ASSERT2(Load(level_id), "Loading failed.");
         map_data.m_level_geom_crc32 = 0;
-        if (!IsGameTypeSingle()) CalculateLevelCrc32();
+        if (!IsGameTypeSingle())
+            CalculateLevelCrc32();
     }
     return true;
 }
 
 bool CLevel::net_start_client4()
 {
-    if (connected_to_server) {
+    if (connected_to_server)
+    {
         // Begin spawn
         //		g_pGamePersistent->LoadTitle		("st_client_spawning");
         g_pGamePersistent->LoadTitle();
@@ -151,7 +154,8 @@ bool CLevel::net_start_client4()
         else
             Device.seqFrame.Add(g_pNetProcessor, REG_PRIORITY_LOW - 2);
 
-        if (!psNET_direct_connect) {
+        if (!psNET_direct_connect)
+        {
             // Waiting for connection/configuration completition
             CTimer timer_sync;
             timer_sync.Start();
@@ -199,11 +203,13 @@ void CLevel::ClientSendProfileData()
 
 bool CLevel::net_start_client5()
 {
-    if (connected_to_server) {
+    if (connected_to_server)
+    {
         // HUD
 
         // Textures
-        if (!g_dedicated_server) {
+        if (!g_dedicated_server)
+        {
             g_pGamePersistent->LoadTitle();
             GlobalEnv.Render->DeferredLoad(FALSE);
             GlobalEnv.Render->ResourcesDeferredUpload();
@@ -217,26 +223,32 @@ bool CLevel::net_start_client5()
 
 bool CLevel::net_start_client6()
 {
-    if (connected_to_server) {
+    if (connected_to_server)
+    {
         // Sync
-        if (!synchronize_map_data()) return false;
+        if (!synchronize_map_data())
+            return false;
 
-        if (!game_configured) {
+        if (!game_configured)
+        {
             pApp->LoadEnd();
             return true;
         }
-        if (!g_dedicated_server) {
+        if (!g_dedicated_server)
+        {
             g_hud->Load();
             g_hud->OnConnected();
         }
 
 #ifdef DEBUG
         Msg("--- net_start_client6");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
-        if (game) {
+        if (game)
+        {
             game->OnConnected();
-            if (game->Type() != eGameIDSingle) {
+            if (game->Type() != eGameIDSingle)
+            {
                 m_file_transfer = new file_transfer::client_site();
             }
         }

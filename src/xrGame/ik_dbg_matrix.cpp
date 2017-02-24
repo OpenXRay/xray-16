@@ -6,20 +6,18 @@
 
 u32 sdbg_state_sequence_number = 130;
 
-IC Fmatrix& cvm(Matrix& IM)
-{
-    return *((Fmatrix*)(&IM));
-}
-
+IC Fmatrix& cvm(Matrix& IM) { return *((Fmatrix*)(&IM)); }
 #ifdef IK_DBG_STATE_SEQUENCE
 void dbg_matrises::next_state(SCalculateData& cd)
 {
-    if (old_dbg_m.size() > sdbg_state_sequence_number) old_dbg_m.erase(old_dbg_m.begin());
+    if (old_dbg_m.size() > sdbg_state_sequence_number)
+        old_dbg_m.erase(old_dbg_m.begin());
     old_dbg_m.push_back(dbg_m);
     Fmatrix m_dbg;
     dbg_m.OBJ = *cd.m_obj;
     dbg_m.ref_bone = cd.m_limb->ref_bone();
-    if (cd.m_limb->ref_bone() == 2) {
+    if (cd.m_limb->ref_bone() == 2)
+    {
         dbg_m.b2goal_gl = cd.state.goal;
         dbg_m.b3goal_gl.mul_43(dbg_m.b2goal_gl, cd.m_limb->transform(m_dbg, 2, 3));
 

@@ -6,31 +6,31 @@
 
 #ifdef USE_MEMORY_MONITOR
 #define DEBUG_MEMORY_NAME
-#endif  // USE_MEMORY_MONITOR
+#endif // USE_MEMORY_MONITOR
 
 #ifndef M_BORLAND
-#if 0  // def DEBUG
+#if 0 // def DEBUG
 #define DEBUG_MEMORY_MANAGER
-#endif  // DEBUG
-#endif  // M_BORLAND
+#endif // DEBUG
+#endif // M_BORLAND
 
 #ifdef DEBUG_MEMORY_MANAGER
 XRCORE_API extern BOOL g_bMEMO;
 #ifndef DEBUG_MEMORY_NAME
 #define DEBUG_MEMORY_NAME
-#endif  // DEBUG_MEMORY_NAME
+#endif // DEBUG_MEMORY_NAME
 extern XRCORE_API void dump_phase();
-#define DUMP_PHASE                                                                                                     \
-    do                                                                                                                 \
-    {                                                                                                                  \
-        dump_phase();                                                                                                  \
+#define DUMP_PHASE    \
+    do                \
+    {                 \
+        dump_phase(); \
     } while (0)
-#else  // DEBUG_MEMORY_MANAGER
-#define DUMP_PHASE                                                                                                     \
-    do                                                                                                                 \
-    {                                                                                                                  \
+#else // DEBUG_MEMORY_MANAGER
+#define DUMP_PHASE \
+    do             \
+    {              \
     } while (0)
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 
 #include "xrMemory_POOL.h"
 #include "xrMemory_pure.h"
@@ -58,7 +58,7 @@ public:
     u32 debug_info_update;
     u32 stat_strcmp;
     u32 stat_strdock;
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 
     u32 stat_calls;
     s32 stat_counter;
@@ -72,15 +72,14 @@ public:
     void mem_compact();
     void mem_counter_set(u32 _val) { stat_counter = _val; }
     u32 mem_counter_get() { return stat_counter; }
-
 #ifdef DEBUG_MEMORY_NAME
     void mem_statistic(LPCSTR fn);
     void* mem_alloc(size_t size, const char* _name);
     void* mem_realloc(void* p, size_t size, const char* _name);
-#else   // DEBUG_MEMORY_NAME
+#else // DEBUG_MEMORY_NAME
     void* mem_alloc(size_t size);
     void* mem_realloc(void* p, size_t size);
-#endif  // DEBUG_MEMORY_NAME
+#endif // DEBUG_MEMORY_NAME
     void mem_free(void* p);
 };
 
@@ -90,7 +89,7 @@ extern XRCORE_API xrMemory Memory;
 #undef CopyMemory
 #undef FillMemory
 #define ZeroMemory(a, b) memset(a, 0, b)
-#define CopyMemory(a, b, c) memcpy(a, b, c)  //. CopyMemory(a,b,c)
+#define CopyMemory(a, b, c) memcpy(a, b, c) //. CopyMemory(a,b,c)
 #define FillMemory(a, b, c) memset(a, c, b)
 
 // delete
@@ -112,20 +111,15 @@ IC T* xr_alloc(u32 count)
 template <class T>
 IC void xr_free(T*& P)
 {
-    if (P) {
+    if (P)
+    {
         Memory.mem_free((void*)P);
         P = NULL;
     };
 }
-IC void* xr_malloc(size_t size)
-{
-    return Memory.mem_alloc(size, "xr_malloc");
-}
-IC void* xr_realloc(void* P, size_t size)
-{
-    return Memory.mem_realloc(P, size, "xr_realloc");
-}
-#else   // DEBUG_MEMORY_NAME
+IC void* xr_malloc(size_t size) { return Memory.mem_alloc(size, "xr_malloc"); }
+IC void* xr_realloc(void* P, size_t size) { return Memory.mem_realloc(P, size, "xr_realloc"); }
+#else // DEBUG_MEMORY_NAME
 template <class T>
 IC T* xr_alloc(u32 count)
 {
@@ -134,63 +128,34 @@ IC T* xr_alloc(u32 count)
 template <class T>
 IC void xr_free(T*& P)
 {
-    if (P) {
+    if (P)
+    {
         Memory.mem_free((void*)P);
         P = NULL;
     };
 }
-IC void* xr_malloc(size_t size)
-{
-    return Memory.mem_alloc(size);
-}
-IC void* xr_realloc(void* P, size_t size)
-{
-    return Memory.mem_realloc(P, size);
-}
-#endif  // DEBUG_MEMORY_NAME
+IC void* xr_malloc(size_t size) { return Memory.mem_alloc(size); }
+IC void* xr_realloc(void* P, size_t size) { return Memory.mem_realloc(P, size); }
+#endif // DEBUG_MEMORY_NAME
 
 XRCORE_API char* xr_strdup(const char* string);
 
 #ifdef DEBUG_MEMORY_NAME
 // Global new/delete override
 #if !(defined(__BORLANDC__) || defined(NO_XRNEW))
-IC void* operator new(size_t size)
-{
-    return Memory.mem_alloc(size ? size : 1, "C++ NEW");
-}
-IC void operator delete(void* p)
-{
-    xr_free(p);
-}
-IC void* operator new[](size_t size)
-{
-    return Memory.mem_alloc(size ? size : 1, "C++ NEW");
-}
-IC void operator delete[](void* p)
-{
-    xr_free(p);
-}
+IC void* operator new(size_t size) { return Memory.mem_alloc(size ? size : 1, "C++ NEW"); }
+IC void operator delete(void* p) { xr_free(p); }
+IC void* operator new[](size_t size) { return Memory.mem_alloc(size ? size : 1, "C++ NEW"); }
+IC void operator delete[](void* p) { xr_free(p); }
 #endif
-#else  // DEBUG_MEMORY_NAME
+#else // DEBUG_MEMORY_NAME
 #if !(defined(__BORLANDC__) || defined(NO_XRNEW))
-IC void* operator new(size_t size)
-{
-    return Memory.mem_alloc(size ? size : 1);
-}
-IC void operator delete(void* p)
-{
-    xr_free(p);
-}
-IC void* operator new[](size_t size)
-{
-    return Memory.mem_alloc(size ? size : 1);
-}
-IC void operator delete[](void* p)
-{
-    xr_free(p);
-}
+IC void* operator new(size_t size) { return Memory.mem_alloc(size ? size : 1); }
+IC void operator delete(void* p) { xr_free(p); }
+IC void* operator new[](size_t size) { return Memory.mem_alloc(size ? size : 1); }
+IC void operator delete[](void* p) { xr_free(p); }
 #endif
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 
 // POOL-ing
 const u32 mem_pools_count = 54;
@@ -202,4 +167,4 @@ extern BOOL mem_initialized;
 XRCORE_API void vminfo(size_t* _free, size_t* reserved, size_t* committed);
 XRCORE_API void log_vminfo();
 
-#endif  // xrMemoryH
+#endif // xrMemoryH

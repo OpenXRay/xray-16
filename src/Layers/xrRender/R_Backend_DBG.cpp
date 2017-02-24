@@ -20,22 +20,22 @@ void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int vcnt, u16* pIdx,
 #if defined(USE_DX10) || defined(USE_DX11)
 //	TODO: DX10: implement
 // VERIFY(!"CBackend::dbg_Draw not implemented.");
-#else   //	USE_DX10
+#else //	USE_DX10
     OnFrameEnd();
     CHK_DX(HW.pDevice->SetFVF(FVF::F_L));
     CHK_DX(HW.pDevice->DrawIndexedPrimitiveUP(T, 0, vcnt, pcnt, pIdx, D3DFMT_INDEX16, pVerts, sizeof(FVF::L)));
-#endif  //	USE_DX10
+#endif //	USE_DX10
 }
 void CBackend::dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int pcnt)
 {
 #if defined(USE_DX10) || defined(USE_DX11)
 //	TODO: DX10: implement
 // VERIFY(!"CBackend::dbg_Draw not implemented.");
-#else   //	USE_DX10
+#else //	USE_DX10
     OnFrameEnd();
     CHK_DX(HW.pDevice->SetFVF(FVF::F_L));
     CHK_DX(HW.pDevice->DrawPrimitiveUP(T, pcnt, pVerts, sizeof(FVF::L)));
-#endif  //	USE_DX10
+#endif //	USE_DX10
 }
 
 #define RGBA_GETALPHA(rgb) ((rgb) >> 24)
@@ -47,14 +47,14 @@ void CBackend::dbg_DrawOBB(Fmatrix& T, Fvector& half_dim, u32 C)
     mL2W_Transform.mul_43(T, mScaleTransform);
 
     FVF::L aabb[8];
-    aabb[0].set(-1, -1, -1, C);  // 0
-    aabb[1].set(-1, +1, -1, C);  // 1
-    aabb[2].set(+1, +1, -1, C);  // 2
-    aabb[3].set(+1, -1, -1, C);  // 3
-    aabb[4].set(-1, -1, +1, C);  // 4
-    aabb[5].set(-1, +1, +1, C);  // 5
-    aabb[6].set(+1, +1, +1, C);  // 6
-    aabb[7].set(+1, -1, +1, C);  // 7
+    aabb[0].set(-1, -1, -1, C); // 0
+    aabb[1].set(-1, +1, -1, C); // 1
+    aabb[2].set(+1, +1, -1, C); // 2
+    aabb[3].set(+1, -1, -1, C); // 3
+    aabb[4].set(-1, -1, +1, C); // 4
+    aabb[5].set(-1, +1, +1, C); // 5
+    aabb[6].set(+1, +1, +1, C); // 6
+    aabb[7].set(+1, -1, +1, C); // 7
 
     u16 aabb_id[12 * 2] = {0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 1, 5, 2, 6, 3, 7, 0, 4};
     set_xform_world(mL2W_Transform);
@@ -142,7 +142,7 @@ void CBackend::dbg_DrawEllipse(Fmatrix& T, u32 C)
         96, 96, 112, 97, 96, 97, 81, 113, 98, 97, 113, 99, 98, 113, 100, 99, 113, 101, 100, 113, 102, 101, 113, 103,
         102, 113, 104, 103, 113, 105, 104, 113, 106, 105, 113, 107, 106, 113, 108, 107, 113, 109, 108, 113, 110, 109,
         113, 111, 110, 113, 112, 111, 113, 97, 112};
-#endif  // #if defined(USE_DX10) || defined(USE_DX11)
+#endif // #if defined(USE_DX10) || defined(USE_DX11)
 
     const int vcnt = sizeof(gVertices) / (sizeof(float) * 3);
     FVF::L verts[vcnt];
@@ -158,11 +158,11 @@ void CBackend::dbg_DrawEllipse(Fmatrix& T, u32 C)
 //	TODO: DX10: implement
 // VERIFY(!"CBackend::dbg_Draw not implemented.");
 // dbg_Draw(D3DPT_TRIANGLELIST,verts,vcnt,gFaces,224);
-#else   //	USE_DX10
+#else //	USE_DX10
     HW.pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
     dbg_Draw(D3DPT_TRIANGLELIST, verts, vcnt, gFaces, 224);
     HW.pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
-#endif  //	USE_DX10
+#endif //	USE_DX10
 }
 
 #endif

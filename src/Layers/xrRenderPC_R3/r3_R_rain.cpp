@@ -5,7 +5,7 @@
 #include "r3_R_sun_support.h"
 
 const float tweak_rain_COP_initial_offs = 1200.f;
-const float tweak_rain_ortho_xform_initial_offs = 1000.f;  //. ?
+const float tweak_rain_ortho_xform_initial_offs = 1000.f; //. ?
 
 //	Defined in r2_R_sun.cpp
 Fvector3 wform(Fmatrix& m, Fvector3 const& v);
@@ -24,7 +24,8 @@ void CRender::render_rain()
 {
     // return;
     float fRainFactor = g_pGamePersistent->Environment().CurrentEnv->rain_density;
-    if (fRainFactor < EPS_L) return;
+    if (fRainFactor < EPS_L)
+        return;
 
     PIX_EVENT(render_rain);
 
@@ -112,7 +113,8 @@ void CRender::render_rain()
             CSector* S = (CSector*)Sectors[s];
             dxRender_Visual* V = S->root();
             float vol = V->vis.box.getvolume();
-            if (vol > largest_sector_vol) {
+            if (vol > largest_sector_vol)
+            {
                 largest_sector_vol = vol;
                 largest_sector = S;
             }
@@ -136,7 +138,8 @@ void CRender::render_rain()
         L_pos.set(RainLight.position);
         L_dir.set(RainLight.direction).normalize();
         L_right.set(1, 0, 0);
-        if (_abs(L_right.dotproduct(L_dir)) > .99f) L_right.set(0, 0, 1);
+        if (_abs(L_right.dotproduct(L_dir)) > .99f)
+            L_right.set(0, 0, 1);
         L_up.crossproduct(L_dir, L_right).normalize();
         L_right.crossproduct(L_up, L_dir).normalize();
         mdir_View.build_camera_dir(L_pos, L_dir, L_up);
@@ -224,14 +227,15 @@ void CRender::render_rain()
     r_dsgraph_render_subspace(cull_sector, &cull_frustum, cull_xform, cull_COP, FALSE);
 
     // Finalize & Cleanup
-    RainLight.X.D.combine = cull_xform;  //*((Fmatrix*)&m_LightViewProj);
+    RainLight.X.D.combine = cull_xform; //*((Fmatrix*)&m_LightViewProj);
 
     // Render shadow-map
     //. !!! We should clip based on shrinked frustum (again)
     {
         bool bNormal = mapNormalPasses[0][0].size() || mapMatrixPasses[0][0].size();
         bool bSpecial = mapNormalPasses[1][0].size() || mapMatrixPasses[1][0].size() || mapSorted.size();
-        if (bNormal || bSpecial) {
+        if (bNormal || bSpecial)
+        {
             Target->phase_smap_direct(&RainLight, SE_SUN_RAIN_SMAP);
             RCache.set_xform_world(Fidentity);
             RCache.set_xform_view(Fidentity);

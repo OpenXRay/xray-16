@@ -12,7 +12,7 @@
     template <typename _key_type, typename _data_type, typename _predicate, bool use_time_limit, typename _cycle_type, \
         bool use_first_update>
 
-#define CSSafeMapIterator                                                                                              \
+#define CSSafeMapIterator \
     CSafeMapIterator<_key_type, _data_type, _predicate, use_time_limit, _cycle_type, use_first_update>
 
 TEMPLATE_SPEZIALIZATION
@@ -25,15 +25,13 @@ IC CSSafeMapIterator::CSafeMapIterator()
 }
 
 TEMPLATE_SPEZIALIZATION
-CSSafeMapIterator::~CSafeMapIterator()
-{
-}
-
+CSSafeMapIterator::~CSafeMapIterator() {}
 TEMPLATE_SPEZIALIZATION
 IC void CSSafeMapIterator::add(const _key_type& id, _data_type* value, bool no_assert)
 {
     _const_iterator I = m_objects.find(id);
-    if (I != m_objects.end()) {
+    if (I != m_objects.end())
+    {
         THROW2(no_assert, "Specified object has been already found in the registry!");
         return;
     }
@@ -42,23 +40,27 @@ IC void CSSafeMapIterator::add(const _key_type& id, _data_type* value, bool no_a
 
     m_objects.insert(std::make_pair(id, value));
 
-    if (addition) m_next_iterator = m_objects.begin();
+    if (addition)
+        m_next_iterator = m_objects.begin();
 }
 
 TEMPLATE_SPEZIALIZATION
 IC void CSSafeMapIterator::remove(const _key_type& id, bool no_assert)
 {
     _iterator I = m_objects.find(id);
-    if (I == m_objects.end()) {
+    if (I == m_objects.end())
+    {
         THROW2(no_assert, "Specified object hasn't been found in the registry!");
         return;
     }
 
-    if (I == m_next_iterator) update_next();
+    if (I == m_next_iterator)
+        update_next();
 
     m_objects.erase(I);
 
-    if (m_objects.empty()) update_next();
+    if (m_objects.empty())
+        update_next();
 }
 
 TEMPLATE_SPEZIALIZATION
@@ -69,22 +71,15 @@ IC void CSSafeMapIterator::update_next()
     else
     {
         ++m_next_iterator;
-        if (m_next_iterator == m_objects.end()) m_next_iterator = m_objects.begin();
+        if (m_next_iterator == m_objects.end())
+            m_next_iterator = m_objects.begin();
     }
 }
 
 TEMPLATE_SPEZIALIZATION
-IC typename CSSafeMapIterator::_iterator& CSSafeMapIterator::next()
-{
-    return (m_next_iterator);
-}
-
+IC typename CSSafeMapIterator::_iterator& CSSafeMapIterator::next() { return (m_next_iterator); }
 TEMPLATE_SPEZIALIZATION
-IC void CSSafeMapIterator::start_timer()
-{
-    m_timer.Start();
-}
-
+IC void CSSafeMapIterator::start_timer() { m_timer.Start(); }
 TEMPLATE_SPEZIALIZATION
 IC bool CSSafeMapIterator::time_over()
 {
@@ -92,22 +87,15 @@ IC bool CSSafeMapIterator::time_over()
 }
 
 TEMPLATE_SPEZIALIZATION
-IC void CSSafeMapIterator::set_process_time(const float& process_time)
-{
-    m_max_process_time = process_time;
-}
-
+IC void CSSafeMapIterator::set_process_time(const float& process_time) { m_max_process_time = process_time; }
 TEMPLATE_SPEZIALIZATION
-IC const typename CSSafeMapIterator::_REGISTRY& CSSafeMapIterator::objects() const
-{
-    return (m_objects);
-}
-
+IC const typename CSSafeMapIterator::_REGISTRY& CSSafeMapIterator::objects() const { return (m_objects); }
 TEMPLATE_SPEZIALIZATION
 template <typename _update_predicate>
 IC u32 CSSafeMapIterator::update(const _update_predicate& predicate, bool const iterate_as_first_time_next_time)
 {
-    if (empty()) return (0);
+    if (empty())
+        return (0);
 
     start_timer();
     ++m_cycle_count;
@@ -132,11 +120,7 @@ IC void CSSafeMapIterator::clear()
 }
 
 TEMPLATE_SPEZIALIZATION
-IC bool CSSafeMapIterator::empty() const
-{
-    return (objects().empty());
-}
-
+IC bool CSSafeMapIterator::empty() const { return (objects().empty()); }
 TEMPLATE_SPEZIALIZATION
 IC void CSSafeMapIterator::begin()
 {

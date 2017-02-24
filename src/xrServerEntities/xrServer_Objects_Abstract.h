@@ -36,10 +36,7 @@ public:
     virtual void __stdcall assign_shapes(CShapeData::shape_def* shapes, u32 cnt) = 0;
 };
 
-IC IServerEntityShape::~IServerEntityShape()
-{
-}
-
+IC IServerEntityShape::~IServerEntityShape() {}
 class CSE_Visual
 {
 public:
@@ -66,7 +63,7 @@ public:
     LPCSTR get_visual() const { return *visual_name; };
 #ifndef XRGAME_EXPORTS
     virtual void FillProps(LPCSTR pref, PropItemVec& items);
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
     virtual CSE_Visual* __stdcall visual() = 0;
 };
@@ -88,10 +85,9 @@ public:
 
     void set_motion(LPCSTR name);
     LPCSTR get_motion() const { return *motion_name; };
-
 #ifndef XRGAME_EXPORTS
     virtual void FillProps(LPCSTR pref, PropItemVec& items);
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
     virtual CSE_Motion* __stdcall motion() = 0;
 };
@@ -103,10 +99,7 @@ public:
     virtual void __stdcall get_bone_xform(LPCSTR name, Fmatrix& xform) = 0;
 };
 
-IC IServerEntityLEOwner::~IServerEntityLEOwner()
-{
-}
-
+IC IServerEntityLEOwner::~IServerEntityLEOwner() {}
 #pragma pack(push, 1)
 class visual_data
 {
@@ -132,7 +125,6 @@ public:
     // XXX: move to implementation
     Flags32 m_editor_flags;
     void set_editor_flag(u32 mask) { m_editor_flags.set(mask, TRUE); }
-
 public:
     virtual void __stdcall Spawn_Write(NET_Packet& tNetPacket, BOOL bLocal) = 0;
     virtual BOOL __stdcall Spawn_Read(NET_Packet& tNetPacket) = 0;
@@ -143,7 +135,7 @@ public:
     virtual visual_data* __stdcall visual_collection() const = 0;
     virtual u32 __stdcall visual_collection_size() const = 0;
     virtual void __stdcall set_additional_info(void* info) = 0;
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
     virtual LPCSTR __stdcall name() const = 0;
     virtual void __stdcall set_name(LPCSTR) = 0;
     virtual LPCSTR __stdcall name_replace() const = 0;
@@ -157,11 +149,8 @@ public:
     virtual bool __stdcall validate() = 0;
 };
 
-IC IServerEntity::~IServerEntity()
-{
-}
-
+IC IServerEntity::~IServerEntity() {}
 #pragma warning(pop)
 
 #pragma pack(pop)
-#endif  // xrServer_Objects_AbstractH
+#endif // xrServer_Objects_AbstractH

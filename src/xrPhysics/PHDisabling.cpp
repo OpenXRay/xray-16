@@ -8,16 +8,8 @@
 #endif
 
 extern CPHWorld* ph_world;
-SDisableVector::SDisableVector()
-{
-    Init();
-}
-
-void SDisableVector::Reset()
-{
-    sum.set(0.f, 0.f, 0.f);
-}
-
+SDisableVector::SDisableVector() { Init(); }
+void SDisableVector::Reset() { sum.set(0.f, 0.f, 0.f); }
 void SDisableVector::Init()
 {
     previous.set(0.f, 0.f, 0.f);
@@ -41,16 +33,8 @@ float SDisableVector::UpdatePrevious(const Fvector& new_vector)
     return dif.magnitude();
 }
 
-float SDisableVector::SumMagnitude()
-{
-    return sum.magnitude();
-}
-
-SDisableUpdateState::SDisableUpdateState()
-{
-    Reset();
-}
-
+float SDisableVector::SumMagnitude() { return sum.magnitude(); }
+SDisableUpdateState::SDisableUpdateState() { Reset(); }
 void SDisableUpdateState::Reset()
 {
     disable = false;
@@ -73,15 +57,18 @@ CBaseDisableData::CBaseDisableData() : m_disabled(false), m_last_frame_updated(u
 void CBaseDisableData::Reinit()
 {
     m_count = m_frames;
-    if (ph_world) m_count = m_count + ph_world->disable_count;
+    if (ph_world)
+        m_count = m_count + ph_world->disable_count;
     m_stateL1.Reset();
     m_stateL2.Reset();
 }
 void CBaseDisableData::Disabling()
 {
     VERIFY(ph_world);
-    if (ph_world->IsFreezed()) return;
-    if (m_last_frame_updated == ph_world->StepsShortCnt()) return;
+    if (ph_world->IsFreezed())
+        return;
+    if (m_last_frame_updated == ph_world->StepsShortCnt())
+        return;
     m_last_frame_updated = ph_world->StepsShortCnt();
     dBodyID body = get_body();
     m_count--;
@@ -90,7 +77,7 @@ void CBaseDisableData::Disabling()
 
     CheckState(m_stateL1);
 
-    if (m_count == 0)  // ph_world->disable_count==dis_frames//m_count==m_frames
+    if (m_count == 0) // ph_world->disable_count==dis_frames//m_count==m_frames
     {
         UpdateL2();
         CheckState(m_stateL2);
@@ -98,14 +85,18 @@ void CBaseDisableData::Disabling()
     }
     const dReal* force = dBodyGetForce(body);
     const dReal* torqu = dBodyGetTorque(body);
-    if (dDOT(force, force) > 0.f || dDOT(torqu, torqu) > 0.f) m_disabled = false;
-    if (dBodyIsEnabled(body)) {
+    if (dDOT(force, force) > 0.f || dDOT(torqu, torqu) > 0.f)
+        m_disabled = false;
+    if (dBodyIsEnabled(body))
+    {
         ReEnable();
-        if (!m_disabled && (ph_world->disable_count != m_count % worldDisablingParams.objects_params.L2frames)) {
+        if (!m_disabled && (ph_world->disable_count != m_count % worldDisablingParams.objects_params.L2frames))
+        {
             m_count = m_frames + ph_world->disable_count;
         }
     }
-    if (m_disabled) Disable();  // dBodyDisable(body);
+    if (m_disabled)
+        Disable(); // dBodyDisable(body);
 }
 
 void CPHDisablingBase::Reinit()
@@ -121,7 +112,8 @@ void CPHDisablingBase::Reinit()
 }
 void CPHDisablingBase::UpdateValues(const Fvector& new_pos, const Fvector& new_vel)
 {
-    if (m_count < m_frames) {
+    if (m_count < m_frames)
+    {
         float velocity_param = m_mean_velocity.Update(new_pos);
         float acceleration_param = m_mean_acceleration.Update(new_vel);
         CheckState(m_stateL1, velocity_param * m_frames, acceleration_param * m_frames);
@@ -145,16 +137,8 @@ void CPHDisablingBase::UpdateL2()
     m_mean_acceleration.Reset();
 }
 
-void CPHDisablingBase::set_DisableParams(const SOneDDOParams& params)
-{
-    m_params = params;
-}
-
-CPHDisablingTranslational::CPHDisablingTranslational()
-{
-    m_params = worldDisablingParams.objects_params.translational;
-}
-
+void CPHDisablingBase::set_DisableParams(const SOneDDOParams& params) { m_params = params; }
+CPHDisablingTranslational::CPHDisablingTranslational() { m_params = worldDisablingParams.objects_params.translational; }
 void CPHDisablingTranslational::Reinit()
 {
     CPHDisablingBase::Reinit();
@@ -186,10 +170,7 @@ void CPHDisablingTranslational::set_DisableParams(const SAllDDOParams& params)
     m_frames = params.L2frames;
 }
 
-CPHDisablingRotational::CPHDisablingRotational()
-{
-    m_params = worldDisablingParams.objects_params.rotational;
-}
+CPHDisablingRotational::CPHDisablingRotational() { m_params = worldDisablingParams.objects_params.rotational; }
 void CPHDisablingRotational::Reinit()
 {
     CPHDisablingBase::Reinit();

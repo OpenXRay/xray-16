@@ -1,7 +1,7 @@
 #ifndef REWARDING_EVENTS_HANDLERS_INCLUDED
 #define REWARDING_EVENTS_HANDLERS_INCLUDED
 
-#include "event_conditions_collection.h"  //for event_action_delegate_t
+#include "event_conditions_collection.h" //for event_action_delegate_t
 #include "game_cl_base_weapon_usage_statistic.h"
 #include "xrCore/Containers/AssociativeVector.hpp"
 #include "game_events_handler.h"
@@ -42,8 +42,8 @@ private:
     event_action_delegate_t m_reward_action;
     game_state_accumulator* m_player_state_accum;
     reward_event_handler* m_null_hanlder;
-};  // class rewarding_event_handlers
+}; // class rewarding_event_handlers
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef REWARDING_EVENTS_HANDLERS_INCLUDED
+#endif //#ifndef REWARDING_EVENTS_HANDLERS_INCLUDED

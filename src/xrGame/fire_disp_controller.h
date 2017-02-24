@@ -15,6 +15,6 @@ public:
     void SetDispertion(float const new_disp);
     float GetCurrentDispertion() const;
     void Update();
-};  // class CFireDispertionController
+}; // class CFireDispertionController
 
-#endif  //#ifndef FIRE_DISP_CONTROLLER
+#endif //#ifndef FIRE_DISP_CONTROLLER

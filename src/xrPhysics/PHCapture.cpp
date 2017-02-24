@@ -49,15 +49,11 @@ void CPHCapture::CreateBody()
     dBodySetGravityMode(m_body, 0);
 }
 
-CPHCapture::~CPHCapture()
-{
-    Deactivate();
-}
-
+CPHCapture::~CPHCapture() { Deactivate(); }
 bool CPHCapture::Invalid()
 {
     return !m_taget_object->ObjectPPhysicsShell() || !m_taget_object->ObjectPPhysicsShell()->isActive() ||
-           !m_character->b_exist;
+        !m_character->b_exist;
 }
 
 void CPHCapture::PhDataUpdate(dReal /**step/**/)
@@ -74,7 +70,8 @@ void CPHCapture::PhDataUpdate(dReal /**step/**/)
 
 void CPHCapture::PhTune(dReal /**step/**/)
 {
-    if (e_state == cstFree) return;
+    if (e_state == cstFree)
+        return;
 
     // if(!m_taget_object->PPhysicsShell())	{
     //	b_failed=true;
@@ -92,10 +89,12 @@ void CPHCapture::PhTune(dReal /**step/**/)
     bool act_taget = m_taget_object->ObjectPPhysicsShell()->isEnabled();
 
     b_disabled = !act_capturer && !act_taget;
-    if (act_capturer) {
+    if (act_capturer)
+    {
         m_taget_element->Enable();
     }
-    if (act_taget) {
+    if (act_taget)
+    {
         m_character->Enable();
     }
     switch (e_state)
@@ -120,7 +119,8 @@ void CPHCapture::PhTune(dReal /**step/**/)
 
 void CPHCapture::PullingUpdate()
 {
-    if (!m_taget_element->isActive() || inl_ph_world().Device().dwTimeGlobal - m_time_start > m_capture_time) {
+    if (!m_taget_element->isActive() || inl_ph_world().Device().dwTimeGlobal - m_time_start > m_capture_time)
+    {
         Release();
         return;
     }
@@ -133,12 +133,14 @@ void CPHCapture::PullingUpdate()
     m_taget_element->GetGlobalPositionDynamic(&dir);
     dir.sub(capture_bone_position, dir);
     float dist = dir.magnitude();
-    if (dist > m_pull_distance) {
+    if (dist > m_pull_distance)
+    {
         Release();
         return;
     }
     dir.mul(1.f / dist);
-    if (dist < m_capture_distance) {
+    if (dist < m_capture_distance)
+    {
         m_back_force = 0.f;
 
         m_joint = dJointCreateBall(0, 0);
@@ -160,8 +162,10 @@ void CPHCapture::PullingUpdate()
 
         dJointSetAMotorAxis(m_ajoint, 0, 1, dir.x, dir.y, dir.z);
 
-        if (dir.x > EPS) {
-            if (dir.y > EPS) {
+        if (dir.x > EPS)
+        {
+            if (dir.y > EPS)
+            {
                 float mag = dir.x * dir.x + dir.y * dir.y;
                 dJointSetAMotorAxis(m_ajoint, 2, 2, -dir.y / mag, dir.x / mag, 0.f);
             }
@@ -177,8 +181,10 @@ void CPHCapture::PullingUpdate()
         }
         else
         {
-            if (dir.y > EPS) {
-                if (dir.z > EPS) {
+            if (dir.y > EPS)
+            {
+                if (dir.z > EPS)
+                {
                     float mag = dir.y * dir.y + dir.z * dir.z;
                     dJointSetAMotorAxis(m_ajoint, 2, 2, 0.f, -dir.z / mag, dir.y / mag);
                 }
@@ -252,7 +258,8 @@ void CPHCapture::PullingUpdate()
 void CPHCapture::CapturedUpdate()
 {
     m_island.Unmerge();
-    if (m_character->CPHObject::is_active()) {
+    if (m_character->CPHObject::is_active())
+    {
         m_taget_element->Enable();
     }
 
@@ -267,7 +274,8 @@ void CPHCapture::CapturedUpdate()
 
     // m_back_force=m_back_force*0.999f+ ((mag<m_capture_force/5.f) ? mag : (m_capture_force/5.f))*0.001f;
     //
-    if (b_character_feedback && mag > m_capture_force / 2.2f) {
+    if (b_character_feedback && mag > m_capture_force / 2.2f)
+    {
         float f = mag / (m_capture_force / 15.f);
         m_character->ApplyForce(m_joint_feedback.f1[0] / f, m_joint_feedback.f1[1] / f, m_joint_feedback.f1[2] / f);
     }
@@ -281,8 +289,10 @@ void CPHCapture::CapturedUpdate()
 
 void CPHCapture::ReleasedUpdate()
 {
-    if (b_disabled) return;
-    if (!b_collide) {
+    if (b_disabled)
+        return;
+    if (!b_collide)
+    {
         e_state = cstFree;
         m_taget_element->Enable();
     }
@@ -303,38 +313,49 @@ void CPHCapture::object_contactCallbackFun(
     l_pUD1 = retrieveGeomUserData(c.geom.g1);
     l_pUD2 = retrieveGeomUserData(c.geom.g2);
 
-    if (!l_pUD1) return;
-    if (!l_pUD2) return;
+    if (!l_pUD1)
+        return;
+    if (!l_pUD2)
+        return;
 
     // CEntityAlive* capturer=smart_cast<CEntityAlive*>(l_pUD1->ph_ref_object);
     IPhysicsShellHolder* capturer = (l_pUD1->ph_ref_object);
-    if (capturer) {
+    if (capturer)
+    {
         IPHCapture* icapture = capturer->PHCapture();
         CPHCapture* capture = static_cast<CPHCapture*>(icapture);
-        if (capture) {
-            if (capture->m_taget_element->PhysicsRefObject() == l_pUD2->ph_ref_object) {
+        if (capture)
+        {
+            if (capture->m_taget_element->PhysicsRefObject() == l_pUD2->ph_ref_object)
+            {
                 do_colide = false;
                 capture->m_taget_element->Enable();
-                if (capture->e_state == CPHCapture::cstReleased) capture->ReleaseInCallBack();
+                if (capture->e_state == CPHCapture::cstReleased)
+                    capture->ReleaseInCallBack();
             }
         }
     }
 
     capturer = l_pUD2->ph_ref_object;
-    if (capturer) {
+    if (capturer)
+    {
         CPHCapture* capture = static_cast<CPHCapture*>(capturer->PHCapture());
-        if (capture) {
-            if (capture->m_taget_element->PhysicsRefObject() == l_pUD1->ph_ref_object) {
+        if (capture)
+        {
+            if (capture->m_taget_element->PhysicsRefObject() == l_pUD1->ph_ref_object)
+            {
                 do_colide = false;
                 capture->m_taget_element->Enable();
-                if (capture->e_state == CPHCapture::cstReleased) capture->ReleaseInCallBack();
+                if (capture->e_state == CPHCapture::cstReleased)
+                    capture->ReleaseInCallBack();
             }
         }
     }
 }
 void CPHCapture::RemoveConnection(IPhysicsShellHolder* O)
 {
-    if (m_taget_object == O) {
+    if (m_taget_object == O)
+    {
         Deactivate();
     }
 }

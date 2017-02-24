@@ -18,7 +18,7 @@ void xrServer::PerformSecretKeysSyncAck(xrClientData* xrCL, NET_Packet& P)
 {
     VERIFY(xrCL);
     s32 new_seed;
-    P.r_s32(new_seed);  // only for DEBUG
+    P.r_s32(new_seed); // only for DEBUG
     VERIFY2(new_seed == xrCL->m_last_key_sync_request_seed, "cracker detected !");
     secure_messaging::generate_key(xrCL->m_last_key_sync_request_seed, xrCL->m_secret_key);
 }
@@ -48,13 +48,14 @@ void xrServer::OnSecureMessage(NET_Packet& P, xrClientData* xrClSender)
     VERIFY(dbg_encrypt_checksum == dbg_decrypt_checksum);
 #endif
     NET_Packet dec_packet;
-    dec_packet.B.count = P.B.count - sizeof(u16) - sizeof(u32);  // - r_begin - crypt_check_sum
+    dec_packet.B.count = P.B.count - sizeof(u16) - sizeof(u32); // - r_begin - crypt_check_sum
     P.r(dec_packet.B.data, dec_packet.B.count);
     u32 checksum = secure_messaging::decrypt(dec_packet.B.data, dec_packet.B.count, xrClSender->m_secret_key);
     u32 real_checksum = 0;
     P.r_u32(real_checksum);
     VERIFY2(checksum == real_checksum, "caught cheater");
-    if (checksum != real_checksum) return;  // WARNING!: do not add any log messages - security treat!
+    if (checksum != real_checksum)
+        return; // WARNING!: do not add any log messages - security treat!
 
     OnMessage(dec_packet, xrClSender->ID);
 }

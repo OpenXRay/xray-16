@@ -32,11 +32,13 @@ void move_item_from_to(u16 from_id, u16 to_id, u16 what_id)
 
 bool move_item_check(PIItem itm, CInventoryOwner* from, CInventoryOwner* to, bool weight_check)
 {
-    if (weight_check) {
+    if (weight_check)
+    {
         float invWeight = to->inventory().CalcTotalWeight();
         float maxWeight = to->MaxCarryWeight();
         float itmWeight = itm->Weight();
-        if (invWeight + itmWeight >= maxWeight) {
+        if (invWeight + itmWeight >= maxWeight)
+        {
             return false;
         }
     }
@@ -54,7 +56,8 @@ void CUIActorMenu::InitDeadBodySearchMode()
     m_PartnerWeight->Show(true);
     m_takeall_button->Show(true);
 
-    if (m_pPartnerInvOwner) {
+    if (m_pPartnerInvOwner)
+    {
         m_PartnerCharacterInfo->Show(true);
     }
     else
@@ -65,8 +68,9 @@ void CUIActorMenu::InitDeadBodySearchMode()
     InitInventoryContents(m_pInventoryBagList);
 
     TIItemContainer items_list;
-    if (m_pPartnerInvOwner) {
-        m_pPartnerInvOwner->inventory().AddAvailableItems(items_list, false);  // true
+    if (m_pPartnerInvOwner)
+    {
+        m_pPartnerInvOwner->inventory().AddAvailableItems(items_list, false); // true
         UpdatePartnerBag();
     }
     else
@@ -89,7 +93,8 @@ void CUIActorMenu::InitDeadBodySearchMode()
     CBaseMonster* monster = smart_cast<CBaseMonster*>(m_pPartnerInvOwner);
 
     // only for partner, box = no, monster = no
-    if (m_pPartnerInvOwner && !monster) {
+    if (m_pPartnerInvOwner && !monster)
+    {
         CInfoPortionWrapper known_info_registry;
         known_info_registry.registry().init(m_pPartnerInvOwner->object_id());
         KNOWN_INFO_VECTOR& known_infos = known_info_registry.registry().objects();
@@ -118,31 +123,37 @@ void CUIActorMenu::DeInitDeadBodySearchMode()
     m_PartnerWeight->Show(false);
     m_takeall_button->Show(false);
 
-    if (m_pInvBox) {
+    if (m_pInvBox)
+    {
         m_pInvBox->set_in_use(false);
     }
 }
 
 bool CUIActorMenu::ToDeadBodyBag(CUICellItem* itm, bool b_use_cursor_pos)
 {
-    if (m_pPartnerInvOwner) {
-        if (!m_pPartnerInvOwner->deadbody_can_take_status()) {
+    if (m_pPartnerInvOwner)
+    {
+        if (!m_pPartnerInvOwner->deadbody_can_take_status())
+        {
             return false;
         }
     }
-    else  // box
+    else // box
     {
-        if (!m_pInvBox->can_take()) {
+        if (!m_pInvBox->can_take())
+        {
             return false;
         }
     }
     PIItem quest_item = (PIItem)itm->m_pData;
-    if (quest_item->IsQuestItem()) return false;
+    if (quest_item->IsQuestItem())
+        return false;
 
     CUIDragDropListEx* old_owner = itm->OwnerList();
     CUIDragDropListEx* new_owner = NULL;
 
-    if (b_use_cursor_pos) {
+    if (b_use_cursor_pos)
+    {
         new_owner = CUIDragDropListEx::m_drag_item->BackList();
         VERIFY(new_owner == m_pDeadBodyBagList);
     }
@@ -158,10 +169,11 @@ bool CUIActorMenu::ToDeadBodyBag(CUICellItem* itm, bool b_use_cursor_pos)
 
     PIItem iitem = (PIItem)i->m_pData;
 
-    if (m_pPartnerInvOwner) {
+    if (m_pPartnerInvOwner)
+    {
         move_item_from_to(m_pActorInvOwner->object_id(), m_pPartnerInvOwner->object_id(), iitem->object_id());
     }
-    else  // box
+    else // box
     {
         move_item_from_to(m_pActorInvOwner->object_id(), m_pInvBox->ID(), iitem->object_id());
     }
@@ -190,8 +202,10 @@ void CUIActorMenu::UpdateDeadBodyBag()
 void CUIActorMenu::TakeAllFromPartner(CUIWindow* w, void* d)
 {
     VERIFY(m_pActorInvOwner);
-    if (!m_pPartnerInvOwner) {
-        if (m_pInvBox) {
+    if (!m_pPartnerInvOwner)
+    {
+        if (m_pInvBox)
+        {
             TakeAllFromInventoryBox();
         }
         return;
@@ -208,8 +222,8 @@ void CUIActorMenu::TakeAllFromPartner(CUIWindow* w, void* d)
         }
         PIItem item = (PIItem)(ci->m_pData);
         move_item_check(item, m_pPartnerInvOwner, m_pActorInvOwner, false);
-    }                                    // for i
-    m_pDeadBodyBagList->ClearAll(true);  // false
+    } // for i
+    m_pDeadBodyBagList->ClearAll(true); // false
 }
 
 void CUIActorMenu::TakeAllFromInventoryBox()
@@ -228,6 +242,6 @@ void CUIActorMenu::TakeAllFromInventoryBox()
 
         PIItem item = (PIItem)(ci->m_pData);
         move_item_from_to(m_pInvBox->ID(), actor_id, item->object_id());
-    }                                    // for i
-    m_pDeadBodyBagList->ClearAll(true);  // false
+    } // for i
+    m_pDeadBodyBagList->ClearAll(true); // false
 }

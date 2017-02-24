@@ -21,9 +21,11 @@ void CLevel::cl_Process_Spawn(NET_Packet& P)
     R_ASSERT2(E, *s_name);
 
     E->Spawn_Read(P);
-    if (E->s_flags.is(M_SPAWN_UPDATE)) E->UPDATE_Read(P);
+    if (E->s_flags.is(M_SPAWN_UPDATE))
+        E->UPDATE_Read(P);
 
-    if (!E->match_configuration()) {
+    if (!E->match_configuration())
+    {
         F_entity_Destroy(E);
         return;
     }
@@ -31,7 +33,8 @@ void CLevel::cl_Process_Spawn(NET_Packet& P)
     //.	Msg ("M_SPAWN - %s[%d][%x] - %d %d", *s_name,  E->ID, E,E->ID_Parent, Device.dwFrame);
     //-------------------------------------------------
     // force object to be local for server client
-    if (OnServer()) {
+    if (OnServer())
+    {
         E->s_flags.set(M_SPAWN_OBJECT_LOCAL, TRUE);
     };
 
@@ -76,20 +79,21 @@ void CLevel::g_cl_Spawn(LPCSTR name, u8 rp, u16 flags, Fvector pos)
 extern Flags32 psAI_Flags;
 extern float debug_on_frame_gather_stats_frequency;
 #include "ai_debug.h"
-#endif  // DEBUG
+#endif // DEBUG
 
 void CLevel::g_sv_Spawn(CSE_Abstract* E)
 {
 #ifdef DEBUG_MEMORY_MANAGER
     u32 E_mem = 0;
-    if (g_bMEMO) {
+    if (g_bMEMO)
+    {
         lua_gc(ai().script_engine().lua(), LUA_GCCOLLECT, 0);
         lua_gc(ai().script_engine().lua(), LUA_GCCOLLECT, 0);
         E_mem = Memory.mem_usage();
         Memory.stat_calls = 0;
     }
-#endif  // DEBUG_MEMORY_MANAGER
-        //-----------------------------------------------------------------
+#endif // DEBUG_MEMORY_MANAGER
+//-----------------------------------------------------------------
 //	CTimer		T(false);
 
 #ifdef DEBUG
@@ -110,44 +114,53 @@ void CLevel::g_sv_Spawn(CSE_Abstract* E)
 //	T.Start		();
 #ifdef DEBUG_MEMORY_MANAGER
     mem_alloc_gather_stats(false);
-#endif  // DEBUG_MEMORY_MANAGER
-    if (0 == O || (!O->net_Spawn(E))) {
+#endif // DEBUG_MEMORY_MANAGER
+    if (0 == O || (!O->net_Spawn(E)))
+    {
         O->net_Destroy();
-        if (!g_dedicated_server) client_spawn_manager().clear(O->ID());
+        if (!g_dedicated_server)
+            client_spawn_manager().clear(O->ID());
         Objects.Destroy(O);
         Msg("! Failed to spawn entity '%s'", *E->s_name);
 #ifdef DEBUG_MEMORY_MANAGER
         mem_alloc_gather_stats(!!psAI_Flags.test(aiDebugOnFrameAllocs));
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
     }
     else
     {
 #ifdef DEBUG_MEMORY_MANAGER
         mem_alloc_gather_stats(!!psAI_Flags.test(aiDebugOnFrameAllocs));
-#endif  // DEBUG_MEMORY_MANAGER
-        if (!g_dedicated_server) client_spawn_manager().callback(O);
+#endif // DEBUG_MEMORY_MANAGER
+        if (!g_dedicated_server)
+            client_spawn_manager().callback(O);
         // Msg			("--spawn--SPAWN: %f ms",1000.f*T.GetAsync());
 
-        if ((E->s_flags.is(M_SPAWN_OBJECT_LOCAL)) && (E->s_flags.is(M_SPAWN_OBJECT_ASPLAYER))) {
-            if (IsDemoPlayStarted()) {
-                if (E->s_flags.is(M_SPAWN_OBJECT_PHANTOM)) {
+        if ((E->s_flags.is(M_SPAWN_OBJECT_LOCAL)) && (E->s_flags.is(M_SPAWN_OBJECT_ASPLAYER)))
+        {
+            if (IsDemoPlayStarted())
+            {
+                if (E->s_flags.is(M_SPAWN_OBJECT_PHANTOM))
+                {
                     SetControlEntity(O);
-                    SetEntity(O);  // do not switch !!!
+                    SetEntity(O); // do not switch !!!
                     SetDemoSpectator(O);
                 }
             }
             else
             {
-                if (CurrentEntity() != NULL) {
+                if (CurrentEntity() != NULL)
+                {
                     CGameObject* pGO = smart_cast<CGameObject*>(CurrentEntity());
-                    if (pGO) pGO->On_B_NotCurrentEntity();
+                    if (pGO)
+                        pGO->On_B_NotCurrentEntity();
                 }
                 SetControlEntity(O);
-                SetEntity(O);  // do not switch !!!
+                SetEntity(O); // do not switch !!!
             }
         }
 
-        if (0xffff != E->ID_Parent) {
+        if (0xffff != E->ID_Parent)
+        {
             /*
             // Generate ownership-event
             NET_Packet			GEN;
@@ -176,18 +189,19 @@ void CLevel::g_sv_Spawn(CSE_Abstract* E)
 			temp.r_seek				(0);
 			O->net_Import			(temp);
 		}
-		}*/  //:(
+		}*/ //:(
 
     //---------------------------------------------------------
     Game().OnSpawn(O);
 //---------------------------------------------------------
 #ifdef DEBUG_MEMORY_MANAGER
-    if (g_bMEMO) {
+    if (g_bMEMO)
+    {
         lua_gc(ai().script_engine().lua(), LUA_GCCOLLECT, 0);
         lua_gc(ai().script_engine().lua(), LUA_GCCOLLECT, 0);
         Msg("* %20s : %d bytes, %d ops", *E->s_name, Memory.mem_usage() - E_mem, Memory.stat_calls);
     }
-#endif  // DEBUG_MEMORY_MANAGER
+#endif // DEBUG_MEMORY_MANAGER
 }
 
 CSE_Abstract* CLevel::spawn_item(
@@ -196,7 +210,8 @@ CSE_Abstract* CLevel::spawn_item(
     CSE_Abstract* abstract = F_entity_Create(section);
     R_ASSERT3(abstract, "Cannot find item with section", section);
     CSE_ALifeDynamicObject* dynamic_object = smart_cast<CSE_ALifeDynamicObject*>(abstract);
-    if (dynamic_object && ai().get_level_graph()) {
+    if (dynamic_object && ai().get_level_graph())
+    {
         dynamic_object->m_tNodeID = level_vertex_id;
         if (ai().level_graph().valid_vertex_id(level_vertex_id) && ai().get_game_graph() && ai().get_cross_table())
             dynamic_object->m_tGraphID = ai().cross_table().vertex(level_vertex_id).game_vertex_id();
@@ -204,7 +219,8 @@ CSE_Abstract* CLevel::spawn_item(
 
     //оружие спавним с полным магазинои
     CSE_ALifeItemWeapon* weapon = smart_cast<CSE_ALifeItemWeapon*>(abstract);
-    if (weapon) weapon->a_elapsed = weapon->get_ammo_magsize();
+    if (weapon)
+        weapon->a_elapsed = weapon->get_ammo_magsize();
 
     // Fill
     abstract->s_name = section;
@@ -218,7 +234,8 @@ CSE_Abstract* CLevel::spawn_item(
     abstract->s_flags.assign(M_SPAWN_OBJECT_LOCAL);
     abstract->RespawnTime = 0;
 
-    if (!return_item) {
+    if (!return_item)
+    {
         NET_Packet P;
         abstract->Spawn_Write(P, TRUE);
         Send(P, net_flags(TRUE));

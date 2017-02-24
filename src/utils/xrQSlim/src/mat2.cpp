@@ -11,11 +11,7 @@
 #include "MxDefines.h"
 #include "mat2.h"
 
-Mat2 Mat2::I()
-{
-    return Mat2(1, 0, 0, 1);
-}
-
+Mat2 Mat2::I() { return Mat2(1, 0, 0, 1); }
 Mat2& Mat2::diag(double d)
 {
     row[0][0] = d;
@@ -42,7 +38,8 @@ double invert(Mat2& inv, const Mat2& m)
 {
     double d = det(m);
 
-    if (d == 0.0) return 0.0;
+    if (d == 0.0)
+        return 0.0;
 
     inv(0, 0) = m(1, 1) / d;
     inv(0, 1) = -m(0, 1) / d;
@@ -84,6 +81,7 @@ bool eigenvectors(const Mat2& M, const Vec2& evals, Vec2 evecs[2])
 bool eigen(const Mat2& M, Vec2& evals, Vec2 evecs[2])
 {
     bool result = eigenvalues(M, evals);
-    if (result) eigenvectors(M, evals, evecs);
+    if (result)
+        eigenvectors(M, evals, evecs);
     return result;
 }

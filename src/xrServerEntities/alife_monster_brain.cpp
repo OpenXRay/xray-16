@@ -63,43 +63,25 @@ CALifeMonsterBrain::~CALifeMonsterBrain()
 #endif
 }
 
-void CALifeMonsterBrain::on_state_write(NET_Packet& packet)
-{
-}
-
-void CALifeMonsterBrain::on_state_read(NET_Packet& packet)
-{
-}
-
+void CALifeMonsterBrain::on_state_write(NET_Packet& packet) {}
+void CALifeMonsterBrain::on_state_read(NET_Packet& packet) {}
 #ifdef XRGAME_EXPORTS
 
-bool CALifeMonsterBrain::perform_attack()
-{
-    return (false);
-}
-
+bool CALifeMonsterBrain::perform_attack() { return (false); }
 ALife::EMeetActionType CALifeMonsterBrain::action_type(
     CSE_ALifeSchedulable* tpALifeSchedulable, const int& iGroupIndex, const bool& bMutualDetection)
 {
     return (ALife::eMeetActionTypeIgnore);
 }
 
-void CALifeMonsterBrain::on_register()
-{
-}
-
-void CALifeMonsterBrain::on_unregister()
-{
-}
-
-void CALifeMonsterBrain::on_location_change()
-{
-}
-
+void CALifeMonsterBrain::on_register() {}
+void CALifeMonsterBrain::on_unregister() {}
+void CALifeMonsterBrain::on_location_change() {}
 IC CSE_ALifeSmartZone& CALifeMonsterBrain::smart_terrain()
 {
     VERIFY(object().m_smart_terrain_id != 0xffff);
-    if (m_smart_terrain && (object().m_smart_terrain_id == m_smart_terrain->ID)) return (*m_smart_terrain);
+    if (m_smart_terrain && (object().m_smart_terrain_id == m_smart_terrain->ID))
+        return (*m_smart_terrain);
 
     m_smart_terrain = ai().alife().smart_terrains().object(object().m_smart_terrain_id);
     VERIFY(m_smart_terrain);
@@ -116,13 +98,16 @@ void CALifeMonsterBrain::process_task()
 
 void CALifeMonsterBrain::select_task()
 {
-    if (object().m_smart_terrain_id != 0xffff) return;
+    if (object().m_smart_terrain_id != 0xffff)
+        return;
 
-    if (!can_choose_alife_tasks()) return;
+    if (!can_choose_alife_tasks())
+        return;
 
     ALife::_TIME_ID current_time = ai().alife().time_manager().game_time();
 
-    if (m_last_search_time + m_time_interval > current_time) return;
+    if (m_last_search_time + m_time_interval > current_time)
+        return;
 
     m_last_search_time = current_time;
 
@@ -131,16 +116,19 @@ void CALifeMonsterBrain::select_task()
     CALifeSmartTerrainRegistry::OBJECTS::const_iterator E = ai().alife().smart_terrains().objects().end();
     for (; I != E; ++I)
     {
-        if (!(*I).second->enabled(&object())) continue;
+        if (!(*I).second->enabled(&object()))
+            continue;
 
         float value = (*I).second->suitable(&object());
-        if (value > best_value) {
+        if (value > best_value)
+        {
             best_value = value;
             object().m_smart_terrain_id = (*I).second->ID;
         }
     }
 
-    if (object().m_smart_terrain_id != 0xffff) {
+    if (object().m_smart_terrain_id != 0xffff)
+    {
         smart_terrain().register_npc(&object());
         m_last_search_time = 0;
     }
@@ -148,7 +136,7 @@ void CALifeMonsterBrain::select_task()
 
 void CALifeMonsterBrain::update()
 {
-#if 0  // def DEBUG
+#if 0 // def DEBUG
 	if (!Level().MapManager().HasMapLocation("debug_stalker",object().ID)) {
 		CMapLocation				*map_location = 
 			Level().MapManager().AddMapLocation(
@@ -170,19 +158,7 @@ void CALifeMonsterBrain::update()
     movement().update();
 }
 
-void CALifeMonsterBrain::default_behaviour()
-{
-    movement().path_type(MovementManager::ePathTypeNoPath);
-}
-
-void CALifeMonsterBrain::on_switch_online()
-{
-    movement().on_switch_online();
-}
-
-void CALifeMonsterBrain::on_switch_offline()
-{
-    movement().on_switch_offline();
-}
-
-#endif  // XRGAME_EXPORTS
+void CALifeMonsterBrain::default_behaviour() { movement().path_type(MovementManager::ePathTypeNoPath); }
+void CALifeMonsterBrain::on_switch_online() { movement().on_switch_online(); }
+void CALifeMonsterBrain::on_switch_offline() { movement().on_switch_offline(); }
+#endif // XRGAME_EXPORTS

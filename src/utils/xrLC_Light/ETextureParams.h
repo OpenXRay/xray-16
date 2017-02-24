@@ -90,7 +90,7 @@ struct STextureParams
         flHasAlpha = (1 << 25),
         flBumpDetail = (1 << 26),
 
-        flHasSurface = (1 << 27),  // for compiler - save the fact the surface was loaded
+        flHasSurface = (1 << 27), // for compiler - save the fact the surface was loaded
         // use when deleted pSurface for memory issues
 
         flForceU32 = u32(-1)
@@ -138,7 +138,7 @@ struct STextureParams
     }
     IC BOOL HasSurface() const { return flags.is(flHasSurface); }
     IC void SetHasSurface(BOOL val) { flags.set(flHasSurface, val); }
-    IC BOOL HasAlphaChannel()  // игровая текстура содержит альфа канал
+    IC BOOL HasAlphaChannel() // игровая текстура содержит альфа канал
     {
         switch (fmt)
         {

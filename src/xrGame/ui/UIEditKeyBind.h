@@ -20,11 +20,11 @@ public:
     // options item
     virtual void AssignProps(const shared_str& entry, const shared_str& group);
 
-    virtual void SetCurrentOptValue();       // opt->current
-    virtual void SaveBackUpOptValue();       // current->backup
-    virtual void SaveOptValue();             // current->opt
-    virtual void UndoOptValue();             // backup->current
-    virtual bool IsChangedOptValue() const;  // backup!=current
+    virtual void SetCurrentOptValue(); // opt->current
+    virtual void SaveBackUpOptValue(); // current->backup
+    virtual void SaveOptValue(); // current->opt
+    virtual void UndoOptValue(); // backup->current
+    virtual bool IsChangedOptValue() const; // backup!=current
 
     void SetValue();
     virtual void OnMessage(LPCSTR message);

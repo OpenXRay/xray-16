@@ -122,6 +122,4 @@ IC void CScriptMovementAction::SetInputKeys(const EInputKeys tInputKeys)
     m_bCompleted = false;
 }
 
-IC void CScriptMovementAction::initialize()
-{
-}
+IC void CScriptMovementAction::initialize() {}

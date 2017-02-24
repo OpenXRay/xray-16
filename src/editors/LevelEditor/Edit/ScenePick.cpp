@@ -12,19 +12,22 @@ int EScene::FrustumPick(const CFrustum& frustum, ObjClassID classfilter, ObjectL
 {
     int count = 0;
 
-    if (classfilter == OBJCLASS_DUMMY) {
+    if (classfilter == OBJCLASS_DUMMY)
+    {
         SceneToolsMapPairIt _I = m_SceneTools.begin();
         SceneToolsMapPairIt _E = m_SceneTools.end();
         for (; _I != _E; _I++)
         {
             ESceneCustomOTool* mt = dynamic_cast<ESceneCustomOTool*>(_I->second);
-            if (mt) count += mt->FrustumPick(ol, frustum);
+            if (mt)
+                count += mt->FrustumPick(ol, frustum);
         }
     }
     else
     {
         ESceneCustomOTool* mt = GetOTool(classfilter);
-        if (mt) count += mt->FrustumPick(ol, frustum);
+        if (mt)
+            count += mt->FrustumPick(ol, frustum);
     }
 
     return count;
@@ -36,19 +39,22 @@ int EScene::SpherePick(const Fvector& center, float radius, ObjClassID classfilt
 {
     int count = 0;
 
-    if (classfilter == OBJCLASS_DUMMY) {
+    if (classfilter == OBJCLASS_DUMMY)
+    {
         SceneToolsMapPairIt _I = m_SceneTools.begin();
         SceneToolsMapPairIt _E = m_SceneTools.end();
         for (; _I != _E; _I++)
         {
             ESceneCustomOTool* mt = dynamic_cast<ESceneCustomOTool*>(_I->second);
-            if (mt) count += mt->SpherePick(ol, center, radius);
+            if (mt)
+                count += mt->SpherePick(ol, center, radius);
         }
     }
     else
     {
         ESceneCustomOTool* mt = GetOTool(classfilter);
-        if (mt) count += mt->SpherePick(ol, center, radius);
+        if (mt)
+            count += mt->SpherePick(ol, center, radius);
     }
 
     return count;
@@ -111,29 +117,35 @@ int EScene::BoxQuery(SPickQuery& PQ, const Fbox& bb, u32 flags, CDB::MODEL* mode
 CCustomObject* EScene::RayPickObject(float nearest_dist, const Fvector& start, const Fvector& direction,
     ObjClassID classfilter, SRayPickInfo* pinf, ObjectList* from_list)
 {
-    if (!valid()) return 0;
+    if (!valid())
+        return 0;
 
     CCustomObject* nearest_object = 0;
-    if (from_list) {
+    if (from_list)
+    {
         for (ObjectIt _F = from_list->begin(); _F != from_list->end(); _F++)
-            if ((*_F)->Visible() && (*_F)->RayPick(nearest_dist, start, direction, pinf)) nearest_object = (*_F);
+            if ((*_F)->Visible() && (*_F)->RayPick(nearest_dist, start, direction, pinf))
+                nearest_object = (*_F);
     }
     else
     {
-        if (classfilter == OBJCLASS_DUMMY) {
+        if (classfilter == OBJCLASS_DUMMY)
+        {
             CCustomObject* obj = 0;
             SceneToolsMapPairIt _I = m_SceneTools.begin();
             SceneToolsMapPairIt _E = m_SceneTools.end();
             for (; _I != _E; _I++)
             {
                 ESceneCustomOTool* mt = dynamic_cast<ESceneCustomOTool*>(_I->second);
-                if (mt && mt->RayPick(obj, nearest_dist, start, direction, pinf)) nearest_object = obj;
+                if (mt && mt->RayPick(obj, nearest_dist, start, direction, pinf))
+                    nearest_object = obj;
             }
         }
         else
         {
             ESceneCustomOTool* mt = GetOTool(classfilter);
-            if (mt) mt->RayPick(nearest_object, nearest_dist, start, direction, pinf);
+            if (mt)
+                mt->RayPick(nearest_object, nearest_dist, start, direction, pinf);
         }
     }
     return nearest_object;
@@ -143,19 +155,22 @@ CCustomObject* EScene::RayPickObject(float nearest_dist, const Fvector& start, c
 
 int EScene::GetQueryObjects(ObjectList& lst, ObjClassID classfilter, int iSel, int iVis, int iLock)
 {
-    if (classfilter == OBJCLASS_DUMMY) {
+    if (classfilter == OBJCLASS_DUMMY)
+    {
         SceneToolsMapPairIt _I = m_SceneTools.begin();
         SceneToolsMapPairIt _E = m_SceneTools.end();
         for (; _I != _E; ++_I)
         {
             ESceneCustomOTool* mt = dynamic_cast<ESceneCustomOTool*>(_I->second);
-            if (mt) mt->GetQueryObjects(lst, iSel, iVis, iLock);
+            if (mt)
+                mt->GetQueryObjects(lst, iSel, iVis, iLock);
         }
     }
     else
     {
         ESceneCustomOTool* mt = GetOTool(classfilter);
-        if (mt) mt->GetQueryObjects(lst, iSel, iVis, iLock);
+        if (mt)
+            mt->GetQueryObjects(lst, iSel, iVis, iLock);
     }
     return lst.size();
 }
@@ -164,18 +179,21 @@ int EScene::GetQueryObjects(ObjectList& lst, ObjClassID classfilter, int iSel, i
 
 int EScene::RaySelect(int flag, ObjClassID classfilter)
 {
-    if (!valid()) return 0;
+    if (!valid())
+        return 0;
 
     float dist = UI->ZFar();
     ESceneToolBase* mt = 0;
-    if (classfilter == OBJCLASS_DUMMY) {
+    if (classfilter == OBJCLASS_DUMMY)
+    {
         SceneToolsMapPairIt _I = m_SceneTools.begin();
         SceneToolsMapPairIt _E = m_SceneTools.end();
         for (; _I != _E; _I++)
         {
             float range = UI->ZFar();
             _I->second->RaySelect(flag, range, UI->m_CurrentRStart, UI->m_CurrentRDir, TRUE);
-            if (range < dist) {
+            if (range < dist)
+            {
                 dist = range;
                 mt = _I->second;
             }
@@ -187,7 +205,8 @@ int EScene::RaySelect(int flag, ObjClassID classfilter)
     }
     int count = 0;
     dist = UI->ZFar();
-    if (mt) count = mt->RaySelect(flag, dist, UI->m_CurrentRStart, UI->m_CurrentRDir, FALSE);
+    if (mt)
+        count = mt->RaySelect(flag, dist, UI->m_CurrentRStart, UI->m_CurrentRDir, FALSE);
     return count;
     /*
         CCustomObject *nearest_object = RayPickObject(flt_max,UI->m_CurrentRStart,UI->m_CurrentRNorm,classfilter,0,0);
@@ -201,11 +220,13 @@ int EScene::RaySelect(int flag, ObjClassID classfilter)
 
 int EScene::BoxPickObjects(const Fbox& box, SBoxPickInfoVec& pinf, ObjectList* lst)
 {
-    if (lst) {
+    if (lst)
+    {
         for (ObjectIt _F = lst->begin(); _F != lst->end(); _F++)
         {
             CSceneObject* _S = dynamic_cast<CSceneObject*>(*_F);
-            if (_S) _S->BoxPick(box, pinf);
+            if (_S)
+                _S->BoxPick(box, pinf);
         }
     }
     return pinf.size();

@@ -22,9 +22,7 @@ public:
     const CEntityAlive* get_enemy();
     SMonsterEnemy get_enemy_info();
     u32 get_enemies_count() { return m_objects.size(); }
-
     const ENEMIES_MAP& get_memory() { return m_objects; }
-
     void clear() { m_objects.clear(); }
     void remove_links(IGameObject* O);
 

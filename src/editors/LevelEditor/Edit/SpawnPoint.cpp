@@ -49,7 +49,8 @@ void CSE_Visual::set_visual(LPCSTR name, bool load)
 {
     string_path tmp;
     strcpy(tmp, name);
-    if (strext(tmp)) *strext(tmp) = 0;
+    if (strext(tmp))
+        *strext(tmp) = 0;
     xr_strlwr(tmp);
     visual_name = tmp;
 }
@@ -65,24 +66,23 @@ CSpawnPoint::CLE_Visual::CLE_Visual(CSE_Visual* src)
 
 bool CSpawnPoint::CLE_Visual::g_tmp_lock = false;
 
-CSpawnPoint::CLE_Visual::~CLE_Visual()
-{
-    ::Render->model_Delete(visual, TRUE);
-}
-
+CSpawnPoint::CLE_Visual::~CLE_Visual() { ::Render->model_Delete(visual, TRUE); }
 void CSpawnPoint::CLE_Visual::OnChangeVisual()
 {
     ::Render->model_Delete(visual, TRUE);
-    if (source->visual_name.size()) {
+    if (source->visual_name.size())
+    {
         visual = ::Render->model_Create(source->visual_name.c_str());
 
-        if (NULL == visual && !g_tmp_lock) {
+        if (NULL == visual && !g_tmp_lock)
+        {
             xr_string _msg = "Model [" + xr_string(source->visual_name.c_str()) +
-                             "] not found. Do you want to select it from library?";
+                "] not found. Do you want to select it from library?";
             int mr = ELog.DlgMsg(mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, _msg.c_str());
             LPCSTR _new_val = 0;
             g_tmp_lock = true;
-            if (mr == mrYes && TfrmChoseItem::SelectItem(smVisual, _new_val, 1)) {
+            if (mr == mrYes && TfrmChoseItem::SelectItem(smVisual, _new_val, 1))
+            {
                 source->visual_name = _new_val;
                 visual = ::Render->model_Create(source->visual_name.c_str());
             }
@@ -95,25 +95,31 @@ void CSpawnPoint::CLE_Visual::OnChangeVisual()
 
 void CSpawnPoint::CLE_Visual::PlayAnimation()
 {
-    if (g_tmp_lock) return;
+    if (g_tmp_lock)
+        return;
     // play motion if skeleton
     StopAllAnimations();
 
     CKinematicsAnimated* KA = PKinematicsAnimated(visual);
     IKinematics* K = PKinematics(visual);
-    if (KA) {
+    if (KA)
+    {
         MotionID M = KA->ID_Cycle_Safe(source->startup_animation.c_str());
-        if (M.valid()) KA->PlayCycle(M);
+        if (M.valid())
+            KA->PlayCycle(M);
     }
-    if (K) K->CalculateBones();
+    if (K)
+        K->CalculateBones();
 }
 
 void CSpawnPoint::CLE_Visual::StopAllAnimations()
 {
-    if (g_tmp_lock) return;
+    if (g_tmp_lock)
+        return;
     // play motion if skeleton
     CKinematicsAnimated* KA = PKinematicsAnimated(visual);
-    if (KA) {
+    if (KA)
+    {
         for (u16 i = 0; i < MAX_PARTS; ++i)
             KA->LL_CloseCycle(i, u8(-1));
     }
@@ -121,23 +127,27 @@ void CSpawnPoint::CLE_Visual::StopAllAnimations()
 
 void CSpawnPoint::CLE_Visual::PlayAnimationFirstFrame()
 {
-    if (g_tmp_lock) return;
+    if (g_tmp_lock)
+        return;
     // play motion if skeleton
 
     StopAllAnimations();
 
     CKinematicsAnimated* KA = PKinematicsAnimated(visual);
     IKinematics* K = PKinematics(visual);
-    if (KA) {
+    if (KA)
+    {
         MotionID M = KA->ID_Cycle_Safe(source->startup_animation.c_str());
-        if (M.valid()) {
+        if (M.valid())
+        {
             KA->PlayCycle(M);
             PauseAnimation();
         }
         else
             Msg("! visual [%s] has no animation [%s]", source->visual_name.c_str(), source->startup_animation.c_str());
     }
-    if (K) K->CalculateBones();
+    if (K)
+        K->CalculateBones();
 }
 
 struct SetBlendLastFrameCB : public IterateBlendsCallback
@@ -152,21 +162,25 @@ struct SetBlendLastFrameCB : public IterateBlendsCallback
 
 void CSpawnPoint::CLE_Visual::PlayAnimationLastFrame()
 {
-    if (g_tmp_lock) return;
+    if (g_tmp_lock)
+        return;
     // play motion if skeleton
 
     StopAllAnimations();
 
     CKinematicsAnimated* KA = PKinematicsAnimated(visual);
     IKinematics* K = PKinematics(visual);
-    if (KA) {
+    if (KA)
+    {
         MotionID M = KA->ID_Cycle_Safe(source->startup_animation.c_str());
-        if (M.valid()) {
+        if (M.valid())
+        {
             KA->PlayCycle(M);
             KA->LL_IterateBlends(g_Set_blend_last_frame_CB);
         }
     }
-    if (K) K->CalculateBones();
+    if (K)
+        K->CalculateBones();
 }
 
 struct TogglelendCB : public IterateBlendsCallback
@@ -176,14 +190,17 @@ struct TogglelendCB : public IterateBlendsCallback
 
 void CSpawnPoint::CLE_Visual::PauseAnimation()
 {
-    if (g_tmp_lock) return;
+    if (g_tmp_lock)
+        return;
 
     CKinematicsAnimated* KA = PKinematicsAnimated(visual);
     IKinematics* K = PKinematics(visual);
 
-    if (KA) KA->LL_IterateBlends(g_toggle_pause_blendCB);
+    if (KA)
+        KA->LL_IterateBlends(g_toggle_pause_blendCB);
 
-    if (K) K->CalculateBones();
+    if (K)
+        K->CalculateBones();
 }
 
 //------------------------------------------------------------------------------
@@ -195,14 +212,12 @@ CSpawnPoint::CLE_Motion::CLE_Motion(CSE_Motion* src)
     animator = 0;
 }
 
-CSpawnPoint::CLE_Motion::~CLE_Motion()
-{
-}
-
+CSpawnPoint::CLE_Motion::~CLE_Motion() {}
 void __stdcall CSpawnPoint::CLE_Motion::OnChangeMotion()
 {
     xr_delete(animator);
-    if (source->motion_name.size()) {
+    if (source->motion_name.size())
+    {
         animator = new CObjectAnimator();
         animator->Load(*source->motion_name);
         PlayMotion();
@@ -213,7 +228,8 @@ void __stdcall CSpawnPoint::CLE_Motion::OnChangeMotion()
 void CSpawnPoint::CLE_Motion::PlayMotion()
 {
     // play motion if skeleton
-    if (animator) animator->Play(true);
+    if (animator)
+        animator->Play(true);
 }
 
 //------------------------------------------------------------------------------
@@ -222,18 +238,23 @@ void CSpawnPoint::CLE_Motion::PlayMotion()
 void CSpawnPoint::SSpawnData::Create(LPCSTR _entity_ref)
 {
     m_Data = create_entity(_entity_ref);
-    if (m_Data) {
+    if (m_Data)
+    {
         m_Data->set_name(_entity_ref);
-        if (m_Data->visual()) {
+        if (m_Data->visual())
+        {
             m_Visual = new CLE_Visual(m_Data->visual());
             m_Data->set_editor_flag(IServerEntity::flVisualChange | IServerEntity::flVisualAnimationChange);
         }
-        if (m_Data->motion()) {
+        if (m_Data->motion())
+        {
             m_Motion = new CLE_Motion(m_Data->motion());
             m_Data->set_editor_flag(IServerEntity::flMotionChange);
         }
-        if (pSettings->line_exist(m_Data->name(), "$player")) {
-            if (pSettings->r_bool(m_Data->name(), "$player")) {
+        if (pSettings->line_exist(m_Data->name(), "$player"))
+        {
+            if (pSettings->r_bool(m_Data->name(), "$player"))
+            {
                 m_Data->flags().set(M_SPAWN_OBJECT_ASPLAYER, TRUE);
             }
         }
@@ -244,7 +265,8 @@ void CSpawnPoint::SSpawnData::Create(LPCSTR _entity_ref)
         Log("!Can't create entity: ", _entity_ref);
     }
 
-    if (pSettings->line_exist(_entity_ref, "$render_if_selected")) {
+    if (pSettings->line_exist(_entity_ref, "$render_if_selected"))
+    {
         m_owner->SetRenderIfSelected(TRUE);
     }
     else
@@ -261,11 +283,14 @@ void CSpawnPoint::SSpawnData::Destroy()
 void CSpawnPoint::SSpawnData::get_bone_xform(LPCSTR name, Fmatrix& xform)
 {
     xform.identity();
-    if (name && name[0] && m_Visual && m_Visual->visual) {
+    if (name && name[0] && m_Visual && m_Visual->visual)
+    {
         IKinematics* P = PKinematics(m_Visual->visual);
-        if (P) {
+        if (P)
+        {
             u16 id = P->LL_BoneID(name);
-            if (id != BI_NONE) xform = P->LL_GetTransform(id);
+            if (id != BI_NONE)
+                xform = P->LL_GetTransform(id);
         }
     }
 }
@@ -275,7 +300,8 @@ bool CSpawnPoint::SSpawnData::LoadLTX(CInifile& ini, LPCSTR sect_name)
     xr_string temp = ini.r_string(sect_name, "name");
     Create(temp.c_str());
 
-    if (ini.line_exist(sect_name, "fl")) m_flags.assign(ini.r_u8(sect_name, "fl"));
+    if (ini.line_exist(sect_name, "fl"))
+        m_flags.assign(ini.r_u8(sect_name, "fl"));
 
     NET_Packet Packet;
     SIniFileStream ini_stream;
@@ -285,7 +311,8 @@ bool CSpawnPoint::SSpawnData::LoadLTX(CInifile& ini, LPCSTR sect_name)
     Packet.inistream = &ini_stream;
 
     if (Valid())
-        if (!m_Data->Spawn_Read(Packet)) Destroy();
+        if (!m_Data->Spawn_Read(Packet))
+            Destroy();
 
     return Valid();
 }
@@ -329,7 +356,8 @@ bool CSpawnPoint::SSpawnData::LoadStream(IReader& F)
     R_ASSERT(F.find_chunk(SPAWNPOINT_CHUNK_ENTITYREF));
     F.r_stringZ(temp, sizeof(temp));
 
-    if (F.find_chunk(SPAWNPOINT_CHUNK_FLAGS)) m_flags.assign(F.r_u8());
+    if (F.find_chunk(SPAWNPOINT_CHUNK_FLAGS))
+        m_flags.assign(F.r_u8());
 
     NET_Packet Packet;
     R_ASSERT(F.find_chunk(SPAWNPOINT_CHUNK_SPAWNDATA));
@@ -337,7 +365,8 @@ bool CSpawnPoint::SSpawnData::LoadStream(IReader& F)
     F.r(Packet.B.data, Packet.B.count);
     Create(temp);
     if (Valid())
-        if (!m_Data->Spawn_Read(Packet)) Destroy();
+        if (!m_Data->Spawn_Read(Packet))
+            Destroy();
 
     return Valid();
 }
@@ -352,11 +381,13 @@ bool CSpawnPoint::SSpawnData::ExportGame(SExportStreams* F, CSpawnPoint* owner)
     // export cform (if needed)
     IServerEntityShape* cform = m_Data->shape();
     // SHAPE
-    if (cform && !(owner->m_AttachedObject && (owner->m_AttachedObject->ClassID == OBJCLASS_SHAPE))) {
+    if (cform && !(owner->m_AttachedObject && (owner->m_AttachedObject->ClassID == OBJCLASS_SHAPE)))
+    {
         ELog.DlgMsg(mtError, "Spawn Point: '%s' must contain attached shape.", owner->Name);
         return false;
     }
-    if (cform) {
+    if (cform)
+    {
         CEditShape* shape = dynamic_cast<CEditShape*>(owner->m_AttachedObject);
         R_ASSERT(shape);
         shape->ApplyScale();
@@ -383,27 +414,27 @@ void CSpawnPoint::SSpawnData::OnAnimControlClick(ButtonValue* value, bool& bModi
     switch (B->btn_num)
     {
     //      "First,Play,Pause,Stop,Last",
-    case 0:  // first
+    case 0: // first
     {
         m_Visual->PlayAnimationFirstFrame();
     }
     break;
-    case 1:  // play
+    case 1: // play
     {
         m_Visual->PlayAnimation();
     }
     break;
-    case 2:  // pause
+    case 2: // pause
     {
         m_Visual->PauseAnimation();
     }
     break;
-    case 3:  // stop
+    case 3: // stop
     {
         m_Visual->StopAllAnimations();
     }
     break;
-    case 4:  // last
+    case 4: // last
     {
         m_Visual->PlayAnimationLastFrame();
     }
@@ -419,7 +450,8 @@ void CSpawnPoint::SSpawnData::FillProp(LPCSTR pref, PropItemVec& items)
             eGameIDDeathmatch | eGameIDTeamDeathmatch | eGameIDArtefactHunt | eGameIDCaptureTheArtefact))
         PHelper().CreateFlag8(items, PrepareKey(pref, "MP respawn"), &m_flags, eSDTypeRespawn);
 
-    if (m_Visual) {
+    if (m_Visual)
+    {
         ButtonValue* BV = PHelper().CreateButton(
             items, PrepareKey(pref, m_Data->name(), "Model\\AnimationControl"), "|<<,Play,Pause,Stop,>>|", 0);
         BV->OnBtnClickEvent.bind(this, &CSpawnPoint::SSpawnData::OnAnimControlClick);
@@ -428,7 +460,8 @@ void CSpawnPoint::SSpawnData::FillProp(LPCSTR pref, PropItemVec& items)
 
 void CSpawnPoint::SSpawnData::Render(bool bSelected, const Fmatrix& parent, int priority, bool strictB2F)
 {
-    if (m_Visual && m_Visual->visual) ::Render->model_Render(m_Visual->visual, parent, priority, strictB2F, 1.f);
+    if (m_Visual && m_Visual->visual)
+        ::Render->model_Render(m_Visual->visual, parent, priority, strictB2F, 1.f);
 
     if (m_Motion && m_Motion->animator && bSelected && (1 == priority) && (false == strictB2F))
         m_Motion->animator->DrawPath();
@@ -437,7 +470,8 @@ void CSpawnPoint::SSpawnData::Render(bool bSelected, const Fmatrix& parent, int 
     EDevice.SetShader(EDevice.m_WireShader);
     m_Data->on_render(&DU_impl, this, bSelected, parent, priority, strictB2F);
 
-    if (bSelected) {
+    if (bSelected)
+    {
         xr_vector<CLE_Visual*>::iterator it = m_VisualHelpers.begin();
         xr_vector<CLE_Visual*>::iterator it_e = m_VisualHelpers.end();
         Fmatrix M;
@@ -454,25 +488,34 @@ void CSpawnPoint::SSpawnData::Render(bool bSelected, const Fmatrix& parent, int 
 
 void CSpawnPoint::SSpawnData::OnFrame()
 {
-    if (m_Data->m_editor_flags.is(IServerEntity::flUpdateProperties)) ExecCommand(COMMAND_UPDATE_PROPERTIES);
+    if (m_Data->m_editor_flags.is(IServerEntity::flUpdateProperties))
+        ExecCommand(COMMAND_UPDATE_PROPERTIES);
     // visual part
-    if (m_Visual) {
-        if (m_Data->m_editor_flags.is(IServerEntity::flVisualChange)) m_Visual->OnChangeVisual();
+    if (m_Visual)
+    {
+        if (m_Data->m_editor_flags.is(IServerEntity::flVisualChange))
+            m_Visual->OnChangeVisual();
 
-        if (m_Data->m_editor_flags.is(IServerEntity::flVisualAnimationChange)) {
+        if (m_Data->m_editor_flags.is(IServerEntity::flVisualAnimationChange))
+        {
             m_Visual->PlayAnimationFirstFrame();
             m_Data->m_editor_flags.set(IServerEntity::flVisualAnimationChange, FALSE);
         }
 
-        if (m_Visual->visual && PKinematics(m_Visual->visual)) PKinematics(m_Visual->visual)->CalculateBones(TRUE);
+        if (m_Visual->visual && PKinematics(m_Visual->visual))
+            PKinematics(m_Visual->visual)->CalculateBones(TRUE);
     }
     // motion part
-    if (m_Motion) {
-        if (m_Data->m_editor_flags.is(IServerEntity::flMotionChange)) m_Motion->OnChangeMotion();
-        if (m_Motion->animator) m_Motion->animator->Update(EDevice.fTimeDelta);
+    if (m_Motion)
+    {
+        if (m_Data->m_editor_flags.is(IServerEntity::flMotionChange))
+            m_Motion->OnChangeMotion();
+        if (m_Motion->animator)
+            m_Motion->animator->Update(EDevice.fTimeDelta);
     }
 
-    if (m_Data->m_editor_flags.is(IServerEntity::flVisualChange)) {
+    if (m_Data->m_editor_flags.is(IServerEntity::flVisualChange))
+    {
         xr_vector<CLE_Visual*>::iterator it = m_VisualHelpers.begin();
         xr_vector<CLE_Visual*>::iterator it_e = m_VisualHelpers.end();
         for (; it != it_e; ++it)
@@ -499,7 +542,8 @@ void CSpawnPoint::SSpawnData::OnFrame()
     for (; it != it_e; ++it)
     {
         CLE_Visual* v = *it;
-        if (PKinematics(v->visual)) PKinematics(v->visual)->CalculateBones(TRUE);
+        if (PKinematics(v->visual))
+            PKinematics(v->visual)->CalculateBones(TRUE);
     }
 
     // reset editor flags
@@ -518,8 +562,10 @@ void CSpawnPoint::Construct(LPVOID data)
 {
     ClassID = OBJCLASS_SPAWNPOINT;
     m_AttachedObject = 0;
-    if (data) {
-        if (strcmp(LPSTR(data), RPOINT_CHOOSE_NAME) == 0) {
+    if (data)
+    {
+        if (strcmp(LPSTR(data), RPOINT_CHOOSE_NAME) == 0)
+        {
             m_Type = ptRPoint;
             m_RP_Type = rptActorSpawn;
             m_GameType.SetDefaults();
@@ -540,7 +586,8 @@ void CSpawnPoint::Construct(LPVOID data)
         else
         {
             CreateSpawnData(LPCSTR(data));
-            if (!m_SpawnData.Valid()) {
+            if (!m_SpawnData.Valid())
+            {
                 SetValid(false);
             }
             else
@@ -570,42 +617,51 @@ CSpawnPoint::~CSpawnPoint()
 void CSpawnPoint::Select(int flag)
 {
     inherited::Select(flag);
-    if (m_AttachedObject) m_AttachedObject->Select(flag);
+    if (m_AttachedObject)
+        m_AttachedObject->Select(flag);
 }
 
 void CSpawnPoint::Move(Fvector& amount)
 {
     inherited::Move(amount);
     const float f_drag_factor = 200.f;
-    if (m_physics_shell) ApplyDragForce(Fvector().mul(amount, f_drag_factor));
+    if (m_physics_shell)
+        ApplyDragForce(Fvector().mul(amount, f_drag_factor));
 }
 
 void CSpawnPoint::SetPosition(const Fvector& pos)
 {
-    if (m_physics_shell) return;
+    if (m_physics_shell)
+        return;
     inherited::SetPosition(pos);
-    if (m_AttachedObject) m_AttachedObject->PPosition = pos;
+    if (m_AttachedObject)
+        m_AttachedObject->PPosition = pos;
 }
 
 void CSpawnPoint::SetRotation(const Fvector& rot)
 {
-    if (m_physics_shell) return;
+    if (m_physics_shell)
+        return;
     inherited::SetRotation(rot);
-    if (m_AttachedObject) m_AttachedObject->PRotation = rot;
+    if (m_AttachedObject)
+        m_AttachedObject->PRotation = rot;
 }
 
 void CSpawnPoint::SetScale(const Fvector& scale)
 {
-    if (m_physics_shell) return;
+    if (m_physics_shell)
+        return;
     inherited::SetScale(scale);
-    if (m_AttachedObject) m_AttachedObject->PScale = scale;
+    if (m_AttachedObject)
+        m_AttachedObject->PScale = scale;
 }
 
 bool CSpawnPoint::AttachObject(CCustomObject* obj)
 {
     bool bAllowed = false;
     //
-    if (m_SpawnData.Valid()) {
+    if (m_SpawnData.Valid())
+    {
         switch (obj->ClassID)
         {
         case OBJCLASS_SHAPE:
@@ -617,7 +673,8 @@ bool CSpawnPoint::AttachObject(CCustomObject* obj)
         }
     }
     //
-    if (bAllowed) {
+    if (bAllowed)
+    {
         DetachObject();
         OnAppendObject(obj);
         m_AttachedObject->OnAttach(this);
@@ -630,7 +687,8 @@ bool CSpawnPoint::AttachObject(CCustomObject* obj)
 
 void CSpawnPoint::DetachObject()
 {
-    if (m_AttachedObject) {
+    if (m_AttachedObject)
+    {
         m_AttachedObject->OnDetach();
         Scene->AppendObject(m_AttachedObject, false);
         m_AttachedObject = 0;
@@ -642,17 +700,14 @@ bool CSpawnPoint::RefCompare(LPCSTR ref)
     return ref && ref[0] && m_SpawnData.Valid() ? (strcmp(ref, m_SpawnData.m_Data->name()) == 0) : false;
 }
 
-LPCSTR CSpawnPoint::RefName()
-{
-    return m_SpawnData.Valid() ? m_SpawnData.m_Data->name() : 0;
-}
-
+LPCSTR CSpawnPoint::RefName() { return m_SpawnData.Valid() ? m_SpawnData.m_Data->name() : 0; }
 bool CSpawnPoint::CreateSpawnData(LPCSTR entity_ref)
 {
     R_ASSERT(entity_ref && entity_ref[0]);
     m_SpawnData.Destroy();
     m_SpawnData.Create(entity_ref);
-    if (m_SpawnData.Valid()) m_Type = ptSpawnPoint;
+    if (m_SpawnData.Valid())
+        m_Type = ptSpawnPoint;
     return m_SpawnData.Valid();
 }
 
@@ -676,18 +731,22 @@ bool CSpawnPoint::GetBox(Fbox& box) const
         box.grow(Selected() ? m_EM_Radius : ENVMOD_SIZE);
         break;
     case ptSpawnPoint:
-        if (m_SpawnData.Valid()) {
-            if (m_SpawnData.m_Visual && m_SpawnData.m_Visual->visual) {
+        if (m_SpawnData.Valid())
+        {
+            if (m_SpawnData.m_Visual && m_SpawnData.m_Visual->visual)
+            {
                 box.set(m_SpawnData.m_Visual->visual->getVisData().box);
                 Fmatrix transform = FTransformRP;
-                if (m_physics_shell) UpdateObjectXform(transform);
+                if (m_physics_shell)
+                    UpdateObjectXform(transform);
 
                 box.xform(transform);
             }
             else
             {
                 CEditShape* shape = dynamic_cast<CEditShape*>(m_AttachedObject);
-                if (shape && !shape->GetShapes().empty()) {
+                if (shape && !shape->GetShapes().empty())
+                {
                     CShapeData::ShapeVec& SV = shape->GetShapes();
                     box.invalidate();
                     Fvector p;
@@ -741,7 +800,8 @@ bool CSpawnPoint::GetBox(Fbox& box) const
         break;
     default: NODEFAULT;
     }
-    if (m_AttachedObject) {
+    if (m_AttachedObject)
+    {
         Fbox bb;
         m_AttachedObject->GetBox(bb);
         box.merge(bb);
@@ -752,9 +812,12 @@ bool CSpawnPoint::GetBox(Fbox& box) const
 void CSpawnPoint::OnFrame()
 {
     inherited::OnFrame();
-    if (m_AttachedObject) m_AttachedObject->OnFrame();
-    if (m_SpawnData.Valid()) {
-        if (m_physics_shell && m_SpawnData.m_Data->m_editor_flags.is(IServerEntity::flVisualAnimationChange)) {
+    if (m_AttachedObject)
+        m_AttachedObject->OnFrame();
+    if (m_SpawnData.Valid())
+    {
+        if (m_physics_shell && m_SpawnData.m_Data->m_editor_flags.is(IServerEntity::flVisualAnimationChange))
+        {
             DeletePhysicsShell();
             m_SpawnData.OnFrame();
             CreatePhysicsShell(&FTransform);
@@ -786,7 +849,8 @@ void CSpawnPoint::Render(int priority, bool strictB2F)
 {
     Fmatrix SaveTransform = FTransformRP;
 
-    if (m_physics_shell) {
+    if (m_physics_shell)
+    {
         UpdateObjectXform(FTransformRP);
         RenderSimBox();
     }
@@ -794,13 +858,18 @@ void CSpawnPoint::Render(int priority, bool strictB2F)
     Scene->SelectLightsForObject(this);
 
     // render attached object
-    if (m_AttachedObject) m_AttachedObject->Render(priority, strictB2F);
-    if (m_SpawnData.Valid()) m_SpawnData.Render(Selected(), FTransformRP, priority, strictB2F);
+    if (m_AttachedObject)
+        m_AttachedObject->Render(priority, strictB2F);
+    if (m_SpawnData.Valid())
+        m_SpawnData.Render(Selected(), FTransformRP, priority, strictB2F);
     // render spawn point
-    if (1 == priority) {
-        if (strictB2F) {
+    if (1 == priority)
+    {
+        if (strictB2F)
+        {
             RCache.set_xform_world(FTransformRP);
-            if (m_SpawnData.Valid()) {
+            if (m_SpawnData.Valid())
+            {
                 // render icon
                 ESceneSpawnTool* st = dynamic_cast<ESceneSpawnTool*>(ParentTool);
                 VERIFY(st);
@@ -815,7 +884,8 @@ void CSpawnPoint::Render(int priority, bool strictB2F)
                 {
                     ESceneSpawnTool* st = dynamic_cast<ESceneSpawnTool*>(ParentTool);
                     VERIFY(st);
-                    if (NULL == st->get_draw_visual(m_RP_TeamID, m_RP_Type, m_GameType)) {
+                    if (NULL == st->get_draw_visual(m_RP_TeamID, m_RP_Type, m_GameType))
+                    {
                         float k = 1.f / (float(m_RP_TeamID + 1) / float(MAX_TEAM));
                         int r = m_RP_TeamID % MAX_TEAM;
                         Fcolor c;
@@ -843,9 +913,11 @@ void CSpawnPoint::Render(int priority, bool strictB2F)
         {
             ESceneSpawnTool* st = dynamic_cast<ESceneSpawnTool*>(ParentTool);
             VERIFY(st);
-            if (st->m_Flags.is(ESceneSpawnTool::flShowSpawnType)) {
+            if (st->m_Flags.is(ESceneSpawnTool::flShowSpawnType))
+            {
                 AnsiString s_name;
-                if (m_SpawnData.Valid()) {
+                if (m_SpawnData.Valid())
+                {
                     s_name = m_SpawnData.m_Data->name();
                 }
                 else
@@ -865,7 +937,8 @@ void CSpawnPoint::Render(int priority, bool strictB2F)
                     !Scene->RayPickObject(dist, PPosition, D, OBJCLASS_SCENEOBJECT, 0, 0))
                     DU_impl.OutText(PPosition, s_name.c_str(), 0xffffffff, 0xff000000);
             }
-            if (Selected()) {
+            if (Selected())
+            {
                 RCache.set_xform_world(Fidentity);
                 Fbox bb;
                 GetBox(bb);
@@ -876,18 +949,21 @@ void CSpawnPoint::Render(int priority, bool strictB2F)
         }
     }
 
-    if (m_Type == ptRPoint) {
+    if (m_Type == ptRPoint)
+    {
         ESceneSpawnTool* st = dynamic_cast<ESceneSpawnTool*>(ParentTool);
         VERIFY(st);
         CEditableObject* v = st->get_draw_visual(m_RP_TeamID, m_RP_Type, m_GameType);
-        if (v) v->Render(FTransformRP, priority, strictB2F);
+        if (v)
+            v->Render(FTransformRP, priority, strictB2F);
     }
     FTransformRP = SaveTransform;
 }
 
 bool CSpawnPoint::FrustumPick(const CFrustum& frustum)
 {
-    if (m_AttachedObject && m_AttachedObject->FrustumPick(frustum)) return true;
+    if (m_AttachedObject && m_AttachedObject->FrustumPick(frustum))
+        return true;
     Fbox bb;
     GetBox(bb);
     u32 mask = 0xff;
@@ -897,7 +973,8 @@ bool CSpawnPoint::FrustumPick(const CFrustum& frustum)
 bool CSpawnPoint::RayPick(float& distance, const Fvector& start, const Fvector& direction, SRayPickInfo* pinf)
 {
     bool bPick = false;
-    if (m_AttachedObject) {
+    if (m_AttachedObject)
+    {
         bPick = m_AttachedObject->RayPick(distance, start, direction, pinf);
         return bPick;
     }
@@ -912,22 +989,29 @@ bool CSpawnPoint::RayPick(float& distance, const Fvector& start, const Fvector& 
     ray2.sub(pos, start);
 
     float d = ray2.dotproduct(direction);
-    if (d > 0) {
+    if (d > 0)
+    {
         float d2 = ray2.magnitude();
-        if (((d2 * d2 - d * d) < (radius * radius)) && (d > radius)) {
+        if (((d2 * d2 - d * d) < (radius * radius)) && (d > radius))
+        {
             Fvector pt;
-            if (Fbox::rpOriginOutside == bb.Pick2(start, direction, pt)) {
+            if (Fbox::rpOriginOutside == bb.Pick2(start, direction, pt))
+            {
                 d = start.distance_to(pt);
-                if (d < distance) {
+                if (d < distance)
+                {
                     distance = d;
                     bPick = true;
-                    if (pinf && m_SpawnData.m_Visual && m_SpawnData.m_Visual->visual) {
+                    if (pinf && m_SpawnData.m_Visual && m_SpawnData.m_Visual->visual)
+                    {
                         IKinematics* K = m_SpawnData.m_Visual->visual->dcast_PKinematics();
                         u16 b_id = u16(-1);
                         Fvector norm;
-                        if (K) {
+                        if (K)
+                        {
                             bPick = ETOOLS::intersect(FTransformRP, *K, start, direction, b_id, distance, norm);
-                            if (bPick) {
+                            if (bPick)
+                            {
                                 pinf->visual_inf.K = K;
                                 pinf->visual_inf.normal = norm;
                                 pt.mad(start, direction, distance);
@@ -952,15 +1036,18 @@ bool CSpawnPoint::RayPick(float& distance, const Fvector& start, const Fvector& 
 bool CSpawnPoint::OnAppendObject(CCustomObject* object)
 {
     R_ASSERT(!m_AttachedObject);
-    if (object->ClassID != OBJCLASS_SHAPE) return false;
+    if (object->ClassID != OBJCLASS_SHAPE)
+        return false;
     // all right
     m_AttachedObject = object;
     object->m_pOwnerObject = this;
     Scene->RemoveObject(object, false, false);
 
     CEditShape* sh = dynamic_cast<CEditShape*>(m_AttachedObject);
-    if (m_SpawnData.Valid()) {
-        if (pSettings->line_exist(m_SpawnData.m_Data->name(), "shape_transp_color")) {
+    if (m_SpawnData.Valid())
+    {
+        if (pSettings->line_exist(m_SpawnData.m_Data->name(), "shape_transp_color"))
+        {
             sh->m_DrawTranspColor = pSettings->r_color(m_SpawnData.m_Data->name(), "shape_transp_color");
             sh->m_DrawEdgeColor = pSettings->r_color(m_SpawnData.m_Data->name(), "shape_edge_color");
         }
@@ -973,7 +1060,8 @@ bool CSpawnPoint::LoadLTX(CInifile& ini, LPCSTR sect_name)
 {
     u32 version = ini.r_u32(sect_name, "version");
 
-    if (version < 0x0014) {
+    if (version < 0x0014)
+    {
         ELog.Msg(mtError, "SPAWNPOINT: Unsupported version.");
         return false;
     }
@@ -981,7 +1069,8 @@ bool CSpawnPoint::LoadLTX(CInifile& ini, LPCSTR sect_name)
     CCustomObject::LoadLTX(ini, sect_name);
     m_Type = (EPointType)ini.r_u32(sect_name, "type");
 
-    if (m_Type >= ptMaxType) {
+    if (m_Type >= ptMaxType)
+    {
         ELog.Msg(mtError, "SPAWNPOINT: Unsupported spawn version.");
         return false;
     }
@@ -991,7 +1080,8 @@ bool CSpawnPoint::LoadLTX(CInifile& ini, LPCSTR sect_name)
     {
         string128 buff;
         strconcat(sizeof(buff), buff, sect_name, "_spawndata");
-        if (!m_SpawnData.LoadLTX(ini, buff)) {
+        if (!m_SpawnData.LoadLTX(ini, buff))
+        {
             ELog.Msg(mtError, "SPAWNPOINT: Can't load Spawn Data.");
             return false;
         }
@@ -1000,7 +1090,8 @@ bool CSpawnPoint::LoadLTX(CInifile& ini, LPCSTR sect_name)
     break;
     case ptRPoint:
     {
-        if (version >= 0x0017) m_rpProfile = ini.r_string(sect_name, "rp_profile");
+        if (version >= 0x0017)
+            m_rpProfile = ini.r_string(sect_name, "rp_profile");
 
         m_RP_TeamID = ini.r_u8(sect_name, "team_id");
         m_RP_Type = ini.r_u8(sect_name, "rp_type");
@@ -1017,7 +1108,8 @@ bool CSpawnPoint::LoadLTX(CInifile& ini, LPCSTR sect_name)
         m_EM_AmbientColor = ini.r_u32(sect_name, "ambient_color");
         m_EM_SkyColor = ini.r_u32(sect_name, "sky_color");
         m_EM_HemiColor = ini.r_u32(sect_name, "hemi_color");
-        if (version >= 0x0016) m_EM_Flags.assign(ini.r_u16(sect_name, "em_flags"));
+        if (version >= 0x0016)
+            m_EM_Flags.assign(ini.r_u16(sect_name, "em_flags"));
     }
     break;
     default: THROW;
@@ -1031,7 +1123,8 @@ bool CSpawnPoint::LoadLTX(CInifile& ini, LPCSTR sect_name)
 
     // BUG fix
     CEditShape* shape = dynamic_cast<CEditShape*>(m_AttachedObject);
-    if (shape) PScale = shape->PScale;
+    if (shape)
+        PScale = shape->PScale;
 
     return true;
 }
@@ -1043,7 +1136,8 @@ void CSpawnPoint::SaveLTX(CInifile& ini, LPCSTR sect_name)
     ini.w_u32(sect_name, "version", SPAWNPOINT_VERSION);
 
     // save attachment
-    if (m_AttachedObject) {
+    if (m_AttachedObject)
+    {
         ObjectList lst;
         lst.push_back(m_AttachedObject);
         Scene->SaveObjectsLTX(lst, sect_name, "attached", ini);
@@ -1090,7 +1184,8 @@ bool CSpawnPoint::LoadStream(IReader& F)
     u16 version = 0;
 
     R_ASSERT(F.r_chunk(SPAWNPOINT_CHUNK_VERSION, &version));
-    if (version < 0x0014) {
+    if (version < 0x0014)
+    {
         ELog.Msg(mtError, "SPAWNPOINT: Unsupported version.");
         return false;
     }
@@ -1098,8 +1193,10 @@ bool CSpawnPoint::LoadStream(IReader& F)
     CCustomObject::LoadStream(F);
 
     // new generation
-    if (F.find_chunk(SPAWNPOINT_CHUNK_ENTITYREF)) {
-        if (!m_SpawnData.LoadStream(F)) {
+    if (F.find_chunk(SPAWNPOINT_CHUNK_ENTITYREF))
+    {
+        if (!m_SpawnData.LoadStream(F))
+        {
             ELog.Msg(mtError, "SPAWNPOINT: Can't load Spawn Data.");
             return false;
         }
@@ -1108,23 +1205,28 @@ bool CSpawnPoint::LoadStream(IReader& F)
     }
     else
     {
-        if (F.find_chunk(SPAWNPOINT_CHUNK_TYPE)) m_Type = (EPointType)F.r_u32();
-        if (m_Type >= ptMaxType) {
+        if (F.find_chunk(SPAWNPOINT_CHUNK_TYPE))
+            m_Type = (EPointType)F.r_u32();
+        if (m_Type >= ptMaxType)
+        {
             ELog.Msg(mtError, "SPAWNPOINT: Unsupported spawn version.");
             return false;
         }
         switch (m_Type)
         {
         case ptRPoint:
-            if (F.find_chunk(SPAWNPOINT_CHUNK_RPOINT)) {
+            if (F.find_chunk(SPAWNPOINT_CHUNK_RPOINT))
+            {
                 m_RP_TeamID = F.r_u8();
                 m_RP_Type = F.r_u8();
                 m_GameType.LoadStream(F);
-                if (version >= 0x0017) F.r_stringZ(m_rpProfile);
+                if (version >= 0x0017)
+                    F.r_stringZ(m_rpProfile);
             }
             break;
         case ptEnvMod:
-            if (F.find_chunk(SPAWNPOINT_CHUNK_ENVMOD)) {
+            if (F.find_chunk(SPAWNPOINT_CHUNK_ENVMOD))
+            {
                 m_EM_Radius = F.r_float();
                 m_EM_Power = F.r_float();
                 m_EM_ViewDist = F.r_float();
@@ -1132,8 +1234,10 @@ bool CSpawnPoint::LoadStream(IReader& F)
                 m_EM_FogDensity = F.r_float();
                 m_EM_AmbientColor = F.r_u32();
                 m_EM_SkyColor = F.r_u32();
-                if (F.find_chunk(SPAWNPOINT_CHUNK_ENVMOD2)) m_EM_HemiColor = F.r_u32();
-                if (F.find_chunk(SPAWNPOINT_CHUNK_ENVMOD3)) m_EM_Flags.assign(F.r_u16());
+                if (F.find_chunk(SPAWNPOINT_CHUNK_ENVMOD2))
+                    m_EM_HemiColor = F.r_u32();
+                if (F.find_chunk(SPAWNPOINT_CHUNK_ENVMOD3))
+                    m_EM_Flags.assign(F.r_u16());
             }
             break;
         default: THROW;
@@ -1147,7 +1251,8 @@ bool CSpawnPoint::LoadStream(IReader& F)
 
     // BUG fix
     CEditShape* shape = dynamic_cast<CEditShape*>(m_AttachedObject);
-    if (shape) PScale = shape->PScale;
+    if (shape)
+        PScale = shape->PScale;
 
     return true;
 }
@@ -1161,13 +1266,15 @@ void CSpawnPoint::SaveStream(IWriter& F)
     F.close_chunk();
 
     // save attachment
-    if (m_AttachedObject) {
+    if (m_AttachedObject)
+    {
         ObjectList lst;
         lst.push_back(m_AttachedObject);
         Scene->SaveObjectsStream(lst, SPAWNPOINT_CHUNK_ATTACHED_OBJ, F);
     }
 
-    if (m_SpawnData.Valid()) {
+    if (m_SpawnData.Valid())
+    {
         m_SpawnData.SaveStream(F);
     }
     else
@@ -1221,8 +1328,10 @@ Fvector3 u32_3f(u32 clr)
 bool CSpawnPoint::ExportGame(SExportStreams* F)
 {
     // spawn
-    if (m_SpawnData.Valid()) {
-        if (m_SpawnData.m_Data->validate()) {
+    if (m_SpawnData.Valid())
+    {
+        if (m_SpawnData.m_Data->validate())
+        {
             m_SpawnData.ExportGame(F, this);
         }
         else
@@ -1307,7 +1416,8 @@ shared_str CSpawnPoint::SectionToEditor(shared_str nm)
     ESceneSpawnTool::ClassSpawnMapIt cls_it = st->m_Classes.find(m_SpawnData.m_ClassID);
     VERIFY(cls_it != st->m_Classes.end());
     for (ESceneSpawnTool::SSVecIt ss_it = cls_it->second.begin(); ss_it != cls_it->second.end(); ++ss_it)
-        if (nm.equal(ss_it->hint)) return ss_it->name;
+        if (nm.equal(ss_it->hint))
+            return ss_it->name;
     return 0;
 }
 
@@ -1318,21 +1428,20 @@ shared_str CSpawnPoint::EditorToSection(shared_str nm)
     ESceneSpawnTool::ClassSpawnMapIt cls_it = st->m_Classes.find(m_SpawnData.m_ClassID);
     VERIFY(cls_it != st->m_Classes.end());
     for (ESceneSpawnTool::SSVecIt ss_it = cls_it->second.begin(); ss_it != cls_it->second.end(); ++ss_it)
-        if (nm.equal(ss_it->name)) return ss_it->hint;
+        if (nm.equal(ss_it->name))
+            return ss_it->hint;
     return 0;
 }
 
-void CSpawnPoint::OnRPointTypeChange(PropValue* prop)
-{
-    ExecCommand(COMMAND_UPDATE_PROPERTIES);
-}
-
+void CSpawnPoint::OnRPointTypeChange(PropValue* prop) { ExecCommand(COMMAND_UPDATE_PROPERTIES); }
 void CSpawnPoint::OnProfileChange(PropValue* prop)
 {
-    if (m_SpawnData.m_Profile.size() != 0) {
+    if (m_SpawnData.m_Profile.size() != 0)
+    {
         shared_str s_name = EditorToSection(m_SpawnData.m_Profile);
         VERIFY(s_name.size());
-        if (0 != strcmp(m_SpawnData.m_Data->name(), *s_name)) {
+        if (0 != strcmp(m_SpawnData.m_Data->name(), *s_name))
+        {
             IServerEntity* tmp = create_entity(*s_name);
             VERIFY(tmp);
             NET_Packet Packet;
@@ -1352,7 +1461,8 @@ void CSpawnPoint::FillProp(LPCSTR pref, PropItemVec& items)
 {
     inherited::FillProp(pref, items);
 
-    if (m_SpawnData.Valid()) {
+    if (m_SpawnData.Valid())
+    {
         shared_str pref1 = PrepareKey(pref, m_SpawnData.m_Data->name());
         m_SpawnData.m_Profile = SectionToEditor(m_SpawnData.m_Data->name());
         ChooseValue* C = PHelper().CreateChoose(items, PrepareKey(pref1.c_str(), "Profile (spawn section)"),
@@ -1367,7 +1477,8 @@ void CSpawnPoint::FillProp(LPCSTR pref, PropItemVec& items)
         {
         case ptRPoint:
         {
-            if (m_RP_Type == rptItemSpawn) {
+            if (m_RP_Type == rptItemSpawn)
+            {
                 ChooseValue* C = PHelper().CreateChoose(
                     items, PrepareKey(pref, "Respawn Point\\Profile"), &m_rpProfile, smCustom, 0, 0, 10, cfMultiSelect);
                 C->OnChooseFillEvent.bind(this, &CSpawnPoint::OnFillRespawnItemProfile);
@@ -1439,11 +1550,7 @@ void CSpawnPoint::FillProp(LPCSTR pref, PropItemVec& items)
 
 #include "UI_LevelTools.h"
 
-void CSpawnPoint::OnEnvModFlagChange(PropValue* prop)
-{
-    LTools->UpdateProperties(FALSE);
-}
-
+void CSpawnPoint::OnEnvModFlagChange(PropValue* prop) { LTools->UpdateProperties(FALSE); }
 //----------------------------------------------------
 
 bool CSpawnPoint::OnChooseQuery(LPCSTR specific)
@@ -1454,7 +1561,8 @@ bool CSpawnPoint::OnChooseQuery(LPCSTR specific)
 ///-----------------------------------------------------------------------------
 void CSpawnPoint::UseSimulatePose()
 {
-    if (m_physics_shell) {
+    if (m_physics_shell)
+    {
         Fmatrix m;
         UpdateObjectXform(m);
         FPosition.set(m.c);
@@ -1464,7 +1572,4 @@ void CSpawnPoint::UseSimulatePose()
     }
 }
 
-void CSpawnPoint::OnUpdateTransform()
-{
-    inherited::OnUpdateTransform();
-}
+void CSpawnPoint::OnUpdateTransform() { inherited::OnUpdateTransform(); }

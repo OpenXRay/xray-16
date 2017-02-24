@@ -16,11 +16,10 @@ public:
     ~gsc_dsigned_ltx_writer();
     void sign_and_save(IWriter& writer);
     CInifile& get_ltx() { return m_ltx; };
-
 private:
     CInifile m_ltx;
     CMemoryWriter m_mem_writer;
-};  // class gsc_dsigned_ltx_writer
+}; // class gsc_dsigned_ltx_writer
 
 class gsc_dsigned_ltx_reader : private xr_dsa_verifyer
 {
@@ -31,9 +30,8 @@ public:
     ~gsc_dsigned_ltx_reader();
     bool load_and_verify(u8* buffer, u32 const size);
     CInifile& get_ltx() { return *m_ltx; };
-
 private:
     CInifile* m_ltx;
-};  // class gsc_dsigned_ltx_reader
+}; // class gsc_dsigned_ltx_reader
 
-#endif  //#ifndef GSC_DSINGNED_LTX_INCLUDED
+#endif //#ifndef GSC_DSINGNED_LTX_INCLUDED

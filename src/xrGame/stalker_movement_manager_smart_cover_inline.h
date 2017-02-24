@@ -54,24 +54,8 @@ IC bool stalker_movement_manager_smart_cover::entering_smart_cover_with_animatio
     return (m_entering_smart_cover_with_animation);
 }
 
-IC bool stalker_movement_manager_smart_cover::check_can_kill_enemy() const
-{
-    return (m_check_can_kill_enemy);
-}
-
-IC void stalker_movement_manager_smart_cover::check_can_kill_enemy(bool const value)
-{
-    m_check_can_kill_enemy = value;
-}
-
-IC void stalker_movement_manager_smart_cover::combat_behaviour(bool const value)
-{
-    m_combat_behaviour = value;
-}
-
-IC bool stalker_movement_manager_smart_cover::combat_behaviour() const
-{
-    return (m_combat_behaviour);
-}
-
-#endif  // #ifndef STALKER_MOVEMENT_MANAGER_SMART_COVER_INLINE_H_INCLUDED
+IC bool stalker_movement_manager_smart_cover::check_can_kill_enemy() const { return (m_check_can_kill_enemy); }
+IC void stalker_movement_manager_smart_cover::check_can_kill_enemy(bool const value) { m_check_can_kill_enemy = value; }
+IC void stalker_movement_manager_smart_cover::combat_behaviour(bool const value) { m_combat_behaviour = value; }
+IC bool stalker_movement_manager_smart_cover::combat_behaviour() const { return (m_combat_behaviour); }
+#endif // #ifndef STALKER_MOVEMENT_MANAGER_SMART_COVER_INLINE_H_INCLUDED

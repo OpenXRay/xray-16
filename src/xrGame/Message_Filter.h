@@ -49,6 +49,6 @@ private:
     IWriter* m_msg_log_file;
     string256 m_last_string;
     u32 m_strrepeat_count;
-};  // class message_filter
+}; // class message_filter
 
-#endif  //#ifndef DEMO_MESSAGE_FILER
+#endif //#ifndef DEMO_MESSAGE_FILER

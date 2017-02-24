@@ -47,7 +47,6 @@ public:
     IC bool IsActive() { return m_actived; }
     //		void	SetActive			(bool Active)		{			m_actived = Active;		}
     IC void StopShoting() { m_shot_end = true; }
-
     void Update();
 
     void SetRndSeed(s32 Seed);
@@ -69,14 +68,14 @@ protected:
     CActor* m_pActor;
 
 public:
-    //-					CCameraShotEffector	(float max_angle, float relax_speed, float max_angle_horz, float step_angle_horz,
-    //float angle_frac);
+    //-					CCameraShotEffector	(float max_angle, float relax_speed, float max_angle_horz, float
+    //step_angle_horz,
+    // float angle_frac);
     CCameraShotEffector(const CameraRecoil& cam_recoil);
     virtual ~CCameraShotEffector();
 
     virtual BOOL ProcessCam(SCamEffectorInfo& info);
     virtual void SetActor(CActor* pActor) { m_pActor = pActor; };
-
     virtual CCameraShotEffector* cast_effector_shot() { return this; }
     u16 m_WeaponID;
 };

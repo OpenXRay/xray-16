@@ -62,7 +62,8 @@ void CEditableMesh::GenerateCFModel()
 
 void CEditableMesh::RayQuery(SPickQuery& pinf)
 {
-    if (!m_CFModel) GenerateCFModel();
+    if (!m_CFModel)
+        GenerateCFModel();
     //*
     ETOOLS::ray_query(m_CFModel, pinf.m_Start, pinf.m_Direction, pinf.m_Dist);
     for (int r = 0; r < ETOOLS::r_count(); r++)
@@ -76,7 +77,8 @@ void CEditableMesh::RayQuery(SPickQuery& pinf)
 
 void CEditableMesh::RayQuery(const Fmatrix& parent, const Fmatrix& inv_parent, SPickQuery& pinf)
 {
-    if (!m_CFModel) GenerateCFModel();
+    if (!m_CFModel)
+        GenerateCFModel();
     //*
     ETOOLS::ray_query_m(inv_parent, m_CFModel, pinf.m_Start, pinf.m_Direction, pinf.m_Dist);
     for (int r = 0; r < ETOOLS::r_count(); r++)
@@ -90,7 +92,8 @@ void CEditableMesh::RayQuery(const Fmatrix& parent, const Fmatrix& inv_parent, S
 
 void CEditableMesh::BoxQuery(const Fmatrix& parent, const Fmatrix& inv_parent, SPickQuery& pinf)
 {
-    if (!m_CFModel) GenerateCFModel();
+    if (!m_CFModel)
+        GenerateCFModel();
     ETOOLS::box_query_m(inv_parent, m_CFModel, pinf.m_BB);
     for (int r = 0; r < ETOOLS::r_count(); r++)
         pinf.append_mtx(parent, ETOOLS::r_begin() + r, m_Parent, this);
@@ -101,18 +104,23 @@ static const float _sqrt_flt_max = _sqrt(flt_max * 0.5f);
 bool CEditableMesh::RayPick(
     float& distance, const Fvector& start, const Fvector& direction, const Fmatrix& inv_parent, SRayPickInfo* pinf)
 {
-    if (!m_Flags.is(flVisible)) return false;
+    if (!m_Flags.is(flVisible))
+        return false;
 
-    if (!m_CFModel) GenerateCFModel();
+    if (!m_CFModel)
+        GenerateCFModel();
     //.	float m_r 		= pinf?pinf->inf.range+EPS_L:UI->ZFar();// (bugs: не всегда выбирает) //S ????
 
     ETOOLS::ray_options(CDB::OPT_ONLYNEAREST | CDB::OPT_CULL);
     ETOOLS::ray_query_m(inv_parent, m_CFModel, start, direction, _sqrt_flt_max);
 
-    if (ETOOLS::r_count()) {
+    if (ETOOLS::r_count())
+    {
         CDB::RESULT* I = ETOOLS::r_begin();
-        if (I->range < distance) {
-            if (pinf) {
+        if (I->range < distance)
+        {
+            if (pinf)
+            {
                 pinf->SetRESULT(m_CFModel, I);
                 pinf->e_obj = m_Parent;
                 pinf->e_mesh = this;
@@ -136,7 +144,8 @@ bool CEditableMesh::CHullPickMesh(PlaneVec& pl, const Fmatrix& parent)
     {
         parent.transform_tiny(p, m_Vertices[v_id]);
         for (PlaneIt p_it = pl.begin(); p_it != pl.end(); p_it++)
-            if (p_it->classify(p) > EPS_L) {
+            if (p_it->classify(p) > EPS_L)
+            {
                 inside[v_id] = false;
                 break;
             }
@@ -152,7 +161,8 @@ bool CEditableMesh::CHullPickMesh(PlaneVec& pl, const Fmatrix& parent)
 void CEditableMesh::RecurseTri(int id)
 {
     // Check if triangle already processed
-    if (std::find(sml_processed.begin(), sml_processed.end(), id) != sml_processed.end()) return;
+    if (std::find(sml_processed.begin(), sml_processed.end(), id) != sml_processed.end())
+        return;
 
     sml_processed.push_back(id);
 
@@ -164,7 +174,8 @@ void CEditableMesh::RecurseTri(int id)
         {
             Fvector& test_normal = m_FaceNormals[*pl_it];
             float cosa = test_normal.dotproduct(sml_normal);
-            if (cosa < m_fSoftAngle) continue;
+            if (cosa < m_fSoftAngle)
+                continue;
             RecurseTri(*pl_it);
         }
     }
@@ -178,7 +189,8 @@ void CEditableMesh::GetTiesFaces(int start_id, U32Vec& fl, float fSoftAngle, boo
     GenerateFNormals();
     GenerateAdjacency();
     VERIFY(m_FaceNormals);
-    if (bRecursive) {
+    if (bRecursive)
+    {
         sml_processed.clear();
         sml_normal.set(m_FaceNormals[start_id]);
         RecurseTri(start_id);
@@ -199,10 +211,12 @@ void CEditableMesh::GetTiesFaces(int start_id, U32Vec& fl, float fSoftAngle, boo
 
 bool CEditableMesh::BoxPick(const Fbox& box, const Fmatrix& inv_parent, SBoxPickInfoVec& pinf)
 {
-    if (!m_CFModel) GenerateCFModel();
+    if (!m_CFModel)
+        GenerateCFModel();
 
     ETOOLS::box_query_m(inv_parent, m_CFModel, box);
-    if (ETOOLS::r_count()) {
+    if (ETOOLS::r_count())
+    {
         pinf.push_back(SBoxPickInfo());
         pinf.back().e_obj = m_Parent;
         pinf.back().e_mesh = this;
@@ -216,14 +230,16 @@ bool CEditableMesh::BoxPick(const Fbox& box, const Fmatrix& inv_parent, SBoxPick
 
 bool CEditableMesh::FrustumPick(const CFrustum& frustum, const Fmatrix& parent)
 {
-    if (!m_Flags.is(flVisible)) return false;
+    if (!m_Flags.is(flVisible))
+        return false;
 
     Fvector p[3];
     for (u32 i = 0; i < m_FaceCount; i++)
     {
         for (int k = 0; k < 3; k++)
             parent.transform_tiny(p[k], m_Vertices[m_Faces[i].pv[k].pindex]);
-        if (frustum.testPolyInside(p, 3)) return true;
+        if (frustum.testPolyInside(p, 3))
+            return true;
     }
     return false;
 }
@@ -231,7 +247,8 @@ bool CEditableMesh::FrustumPick(const CFrustum& frustum, const Fmatrix& parent)
 
 void CEditableMesh::FrustumPickFaces(const CFrustum& frustum, const Fmatrix& parent, U32Vec& fl)
 {
-    if (!m_Flags.is(flVisible)) return;
+    if (!m_Flags.is(flVisible))
+        return;
 
     Fvector p[3];
     bool bCulling = EPrefs->bp_cull;
@@ -240,12 +257,15 @@ void CEditableMesh::FrustumPickFaces(const CFrustum& frustum, const Fmatrix& par
         for (int k = 0; k < 3; ++k)
             parent.transform_tiny(p[k], m_Vertices[m_Faces[p_id].pv[k].pindex]);
 
-        if (bCulling) {
+        if (bCulling)
+        {
             Fplane P;
             P.build(p[0], p[1], p[2]);
-            if (P.classify(EDevice.m_Camera.GetPosition()) < 0) continue;
+            if (P.classify(EDevice.m_Camera.GetPosition()) < 0)
+                continue;
         }
-        if (frustum.testPolyInside(p, 3)) fl.push_back(p_id);
+        if (frustum.testPolyInside(p, 3))
+            fl.push_back(p_id);
     }
 }
-#endif  //
+#endif //

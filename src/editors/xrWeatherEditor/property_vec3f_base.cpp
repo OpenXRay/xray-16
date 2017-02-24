@@ -18,40 +18,13 @@ using System::Collections::DictionaryEntry;
 
 ref class property_converter_float;
 
-vec3f_components::vec3f_components(property_vec3f_base ^ holder) : m_holder(holder)
-{
-}
-
-float vec3f_components::x_getter()
-{
-    return (m_holder->get_value_raw().x);
-}
-
-void vec3f_components::x_setter(float value)
-{
-    m_holder->x(value);
-}
-
-float vec3f_components::y_getter()
-{
-    return (m_holder->get_value_raw().y);
-}
-
-void vec3f_components::y_setter(float value)
-{
-    m_holder->y(value);
-}
-
-float vec3f_components::z_getter()
-{
-    return (m_holder->get_value_raw().z);
-}
-
-void vec3f_components::z_setter(float value)
-{
-    m_holder->z(value);
-}
-
+vec3f_components::vec3f_components(property_vec3f_base ^ holder) : m_holder(holder) {}
+float vec3f_components::x_getter() { return (m_holder->get_value_raw().x); }
+void vec3f_components::x_setter(float value) { m_holder->x(value); }
+float vec3f_components::y_getter() { return (m_holder->get_value_raw().y); }
+void vec3f_components::y_setter(float value) { m_holder->y(value); }
+float vec3f_components::z_getter() { return (m_holder->get_value_raw().z); }
+void vec3f_components::z_setter(float value) { m_holder->z(value); }
 property_vec3f_base::property_vec3f_base(editor::vec3f const % vec3f)
 {
     m_container = gcnew property_container(nullptr, this);
@@ -82,21 +55,9 @@ property_vec3f_base::property_vec3f_base(editor::vec3f const % vec3f)
         gcnew property_float(getter, setter, .01f));
 }
 
-property_vec3f_base::~property_vec3f_base()
-{
-    this->!property_vec3f_base();
-}
-
-property_vec3f_base::!property_vec3f_base()
-{
-    delete (m_container);
-}
-
-Object ^ property_vec3f_base::GetValue()
-{
-    return (m_container);
-}
-
+property_vec3f_base::~property_vec3f_base() { this->!property_vec3f_base(); }
+property_vec3f_base::!property_vec3f_base() { delete (m_container); }
+Object ^ property_vec3f_base::GetValue() { return (m_container); }
 void property_vec3f_base::SetValue(Object ^ object)
 {
     Vec3f vec3f = safe_cast<Vec3f>(object);

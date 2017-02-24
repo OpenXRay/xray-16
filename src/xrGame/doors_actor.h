@@ -26,7 +26,7 @@ public:
     pcstr get_name() const;
 #ifdef DEBUG
     void render() const;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
 private:
     typedef buffer_vector<door*> temp_doors_type;
@@ -43,10 +43,10 @@ private:
     doors_type m_closed_doors;
 #ifdef DEBUG
     doors_type m_detected_doors;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     CAI_Stalker const& m_object;
-};  // class actor
+}; // class actor
 
-}  // namespace doors
+} // namespace doors
 
-#endif  // #ifndef DOORS_ACTOR_H_INCLUDED
+#endif // #ifndef DOORS_ACTOR_H_INCLUDED

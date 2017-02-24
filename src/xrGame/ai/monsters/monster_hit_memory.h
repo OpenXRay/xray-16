@@ -23,7 +23,6 @@ public:
 
     // Lain: added
     int get_num_hits() { return m_hits.size(); }
-
     void add_hit(IGameObject* who, EHitSide side);
 
     Fvector get_last_hit_dir();
@@ -32,7 +31,6 @@ public:
     Fvector get_last_hit_position();
 
     void clear() { m_hits.clear(); }
-
     void remove_hit_info(const IGameObject* obj);
 
 private:

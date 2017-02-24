@@ -29,11 +29,7 @@ using namespace ALife;
 
 extern string_path g_last_saved_game;
 
-CALifeStorageManager::~CALifeStorageManager()
-{
-    *g_last_saved_game = 0;
-}
-
+CALifeStorageManager::~CALifeStorageManager() { *g_last_saved_game = 0; }
 void CALifeStorageManager::save(LPCSTR save_name_no_check, bool update_name)
 {
     LPCSTR game_saves_path = FS.get_path("$game_saves$")->m_Path;
@@ -46,12 +42,14 @@ void CALifeStorageManager::save(LPCSTR save_name_no_check, bool update_name)
 
     string_path save;
     xr_strcpy(save, m_save_name);
-    if (save_name) {
+    if (save_name)
+    {
         strconcat(sizeof(m_save_name), m_save_name, save_name, SAVE_EXTENSION);
     }
     else
     {
-        if (!xr_strlen(m_save_name)) {
+        if (!xr_strlen(m_save_name))
+        {
             Log("There is no file name specified!");
             return;
         }
@@ -88,11 +86,12 @@ void CALifeStorageManager::save(LPCSTR save_name_no_check, bool update_name)
 #ifdef DEBUG
     Msg("* Game %s is successfully saved to file '%s' (%d bytes compressed to %d)", m_save_name, temp, source_count,
         dest_count + 4);
-#else   // DEBUG
+#else // DEBUG
     Msg("* Game %s is successfully saved to file '%s'", m_save_name, temp);
-#endif  // DEBUG
+#endif // DEBUG
 
-    if (!update_name) xr_strcpy(m_save_name, save);
+    if (!update_name)
+        xr_strcpy(m_save_name, save);
 }
 
 void CALifeStorageManager::load(void* buffer, const u32& buffer_size, LPCSTR file_name)
@@ -124,7 +123,8 @@ void CALifeStorageManager::load(void* buffer, const u32& buffer_size, LPCSTR fil
     for (I = B; I != E; ++I)
         (*I).second->on_register();
 
-    if (!g_pGameLevel) return;
+    if (!g_pGameLevel)
+        return;
 
     Level().autosave_manager().on_game_loaded();
 }
@@ -142,8 +142,10 @@ bool CALifeStorageManager::load(LPCSTR save_name_no_check)
 
     string_path save;
     xr_strcpy(save, m_save_name);
-    if (!save_name) {
-        if (!xr_strlen(m_save_name)) R_ASSERT2(false, "There is no file name specified!");
+    if (!save_name)
+    {
+        if (!xr_strlen(m_save_name))
+            R_ASSERT2(false, "There is no file name specified!");
     }
     else
     {
@@ -157,7 +159,8 @@ bool CALifeStorageManager::load(LPCSTR save_name_no_check)
 
     IReader* stream;
     stream = FS.r_open(file_name);
-    if (!stream) {
+    if (!stream)
+    {
         Msg("* Cannot find saved game %s", file_name);
         xr_strcpy(m_save_name, save);
         return (false);

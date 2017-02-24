@@ -53,7 +53,6 @@ public:
     void Load(LPCSTR section);
 
     virtual bool IsZoomEnabled() const { return false; }
-
     void Fire2Start();
     virtual void FireStart();
 
@@ -123,7 +122,7 @@ private:
         CCF_Skeleton::SElement const* m_bone_element;
         u16 m_victim_id;
         u16 m_shots_count;
-    };  // struct	victim_bone_data
+    }; // struct	victim_bone_data
     typedef AssociativeVector<u16, u16> victims_hits_count_t;
     typedef buffer_vector<std::pair<victim_bone_data, float>> victims_shapes_list_t;
 
@@ -144,7 +143,7 @@ private:
         CWeaponKnife* m_owner;
         Fvector m_start_pos;
         float m_query_distance;
-    };  // class victim_filter
+    }; // class victim_filter
     class best_victim_selector
     {
     public:
@@ -162,7 +161,7 @@ private:
         float m_query_distance;
         u16 m_except_id;
         spartial_base_t::value_type& m_dest_result;
-    };  // struct best_victim_selector
+    }; // struct best_victim_selector
 
     static bool shapes_compare_predicate(
         victims_shapes_list_t::value_type const& left, victims_shapes_list_t::value_type const& right)

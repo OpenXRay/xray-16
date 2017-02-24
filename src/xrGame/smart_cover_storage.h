@@ -28,6 +28,6 @@ public:
     void collect_garbage();
 };
 
-}  // namespace smart_cover
+} // namespace smart_cover
 
-#endif  // SMART_COVER_STORAGE_H_INCLUDED
+#endif // SMART_COVER_STORAGE_H_INCLUDED

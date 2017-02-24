@@ -6,7 +6,6 @@ struct ray
 {
     ray() {}
     ray(Fvector3 const& _P, Fvector3 const& _D) : P(_P), D(_D) {}
-
     Fvector3 D;
     Fvector3 P;
 };
@@ -14,7 +13,6 @@ struct ray
 struct cascade
 {
     cascade() : reset_chain(false) {}
-
     Fmatrix xform;
     xr_vector<ray> rays;
     float size;
@@ -22,4 +20,4 @@ struct cascade
     bool reset_chain;
 };
 
-}  // namespace sun
+} // namespace sun

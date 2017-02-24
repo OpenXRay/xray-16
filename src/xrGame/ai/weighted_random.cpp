@@ -50,18 +50,21 @@ float weighted_random::generate()
 {
     const float epsilon = 0.0001f;
 
-    if (b_weight != -1 && c_weight != -1) {
+    if (b_weight != -1 && c_weight != -1)
+    {
         float ab_square = (a_weight + b_weight) * (b_val - a_val);
         float bc_square = (b_weight + c_weight) * (c_val - b_val);
 
-        if (ab_square + bc_square < epsilon) {
+        if (ab_square + bc_square < epsilon)
+        {
             return a_val;
         }
 
         float random1 = (rand() % RAND_MAX) / (RAND_MAX - 1.f);
         float k1 = ab_square / (ab_square + bc_square);
 
-        if (random1 < k1) {
+        if (random1 < k1)
+        {
             return weighted_random(a_val, a_weight, b_val, b_weight).generate();
         }
         else
@@ -76,7 +79,8 @@ float weighted_random::generate()
 
         float delta_weight = _abs(a_weight - b_weight);
 
-        if (delta_weight < epsilon) {
+        if (delta_weight < epsilon)
+        {
             return a_val + (b_val - a_val) * random1;
         }
         else if (a_weight < b_weight)
@@ -87,7 +91,8 @@ float weighted_random::generate()
 
             float weight_at = a_weight + (random_val - a_val) * k;
 
-            if (random_weight < weight_at) {
+            if (random_weight < weight_at)
+            {
                 return random_val;
             }
             else
@@ -103,7 +108,8 @@ float weighted_random::generate()
 
             float weight_at = a_weight + (random_val - a_val) * k;
 
-            if (random_weight < weight_at) {
+            if (random_weight < weight_at)
+            {
                 return random_val;
             }
             else

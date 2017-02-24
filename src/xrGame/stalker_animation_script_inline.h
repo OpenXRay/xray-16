@@ -13,7 +13,8 @@ IC CStalkerAnimationScript::CStalkerAnimationScript(const MotionID& animation, b
     : m_animation(animation), m_hand_usage(hand_usage), m_use_movement_controller(use_movement_controller),
       m_local_animation(local_animation)
 {
-    if (transform) {
+    if (transform)
+    {
         m_transform = *transform;
         m_transform_ptr = &m_transform;
         return;
@@ -36,34 +37,16 @@ IC CStalkerAnimationScript::CStalkerAnimationScript(CStalkerAnimationScript cons
     m_local_animation = object.m_local_animation;
 }
 
-IC const MotionID& CStalkerAnimationScript::animation() const
-{
-    return (m_animation);
-}
-
-IC const bool& CStalkerAnimationScript::hand_usage() const
-{
-    return (m_hand_usage);
-}
-
-IC const bool& CStalkerAnimationScript::use_movement_controller() const
-{
-    return (m_use_movement_controller);
-}
-
-IC const bool& CStalkerAnimationScript::local_animation() const
-{
-    return (m_local_animation);
-}
-
+IC const MotionID& CStalkerAnimationScript::animation() const { return (m_animation); }
+IC const bool& CStalkerAnimationScript::hand_usage() const { return (m_hand_usage); }
+IC const bool& CStalkerAnimationScript::use_movement_controller() const { return (m_use_movement_controller); }
+IC const bool& CStalkerAnimationScript::local_animation() const { return (m_local_animation); }
 IC Fmatrix const& CStalkerAnimationScript::transform(IGameObject const& object) const
 {
-    if (m_transform_ptr) return (*m_transform_ptr);
+    if (m_transform_ptr)
+        return (*m_transform_ptr);
 
     return (object.XFORM());
 }
 
-IC bool CStalkerAnimationScript::has_transform() const
-{
-    return (!!m_transform_ptr);
-}
+IC bool CStalkerAnimationScript::has_transform() const { return (!!m_transform_ptr); }

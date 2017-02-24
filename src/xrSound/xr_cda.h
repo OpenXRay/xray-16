@@ -32,4 +32,4 @@ public:
     void OnMove();
 };
 
-#endif  //__XR_CDAudio_H__
+#endif //__XR_CDAudio_H__

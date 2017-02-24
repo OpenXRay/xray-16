@@ -26,77 +26,24 @@ void CALifeHumanObjectHandler::attach_available_ammo(
 {
 }
 
-bool CALifeHumanObjectHandler::can_take_item(CSE_ALifeInventoryItem* inventory_item)
-{
-    return (false);
-}
-
-void CALifeHumanObjectHandler::collect_ammo_boxes()
-{
-}
-
-int CALifeHumanObjectHandler::choose_equipment(ALife::OBJECT_VECTOR* objects)
-{
-    return (-1);
-}
-
+bool CALifeHumanObjectHandler::can_take_item(CSE_ALifeInventoryItem* inventory_item) { return (false); }
+void CALifeHumanObjectHandler::collect_ammo_boxes() {}
+int CALifeHumanObjectHandler::choose_equipment(ALife::OBJECT_VECTOR* objects) { return (-1); }
 int CALifeHumanObjectHandler::choose_weapon(
     const ALife::EWeaponPriorityType& weapon_priority_type, ALife::OBJECT_VECTOR* objects)
 {
     return (-1);
 }
 
-int CALifeHumanObjectHandler::choose_food(ALife::OBJECT_VECTOR* objects)
-{
-    return (-1);
-}
-
-int CALifeHumanObjectHandler::choose_medikit(ALife::OBJECT_VECTOR* objects)
-{
-    return (-1);
-}
-
-int CALifeHumanObjectHandler::choose_detector(ALife::OBJECT_VECTOR* objects)
-{
-    return (-1);
-}
-
-int CALifeHumanObjectHandler::choose_valuables()
-{
-    return (-1);
-}
-
-bool CALifeHumanObjectHandler::choose_fast()
-{
-    return (false);
-}
-
-void CALifeHumanObjectHandler::choose_group(CSE_ALifeGroupAbstract* group_abstract)
-{
-}
-
-void CALifeHumanObjectHandler::detach_all(bool fictitious)
-{
-}
-
-void CALifeHumanObjectHandler::update_weapon_ammo()
-{
-}
-
-void CALifeHumanObjectHandler::process_items()
-{
-}
-
-CSE_ALifeDynamicObject* CALifeHumanObjectHandler::best_detector()
-{
-    return (0);
-}
-
-CSE_ALifeItemWeapon* CALifeHumanObjectHandler::best_weapon()
-{
-    return (0);
-}
-
-void CALifeHumanObjectHandler::attach_items()
-{
-}
+int CALifeHumanObjectHandler::choose_food(ALife::OBJECT_VECTOR* objects) { return (-1); }
+int CALifeHumanObjectHandler::choose_medikit(ALife::OBJECT_VECTOR* objects) { return (-1); }
+int CALifeHumanObjectHandler::choose_detector(ALife::OBJECT_VECTOR* objects) { return (-1); }
+int CALifeHumanObjectHandler::choose_valuables() { return (-1); }
+bool CALifeHumanObjectHandler::choose_fast() { return (false); }
+void CALifeHumanObjectHandler::choose_group(CSE_ALifeGroupAbstract* group_abstract) {}
+void CALifeHumanObjectHandler::detach_all(bool fictitious) {}
+void CALifeHumanObjectHandler::update_weapon_ammo() {}
+void CALifeHumanObjectHandler::process_items() {}
+CSE_ALifeDynamicObject* CALifeHumanObjectHandler::best_detector() { return (0); }
+CSE_ALifeItemWeapon* CALifeHumanObjectHandler::best_weapon() { return (0); }
+void CALifeHumanObjectHandler::attach_items() {}

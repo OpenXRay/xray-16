@@ -30,12 +30,14 @@ CScriptPropertiesListHelper* g_property_list_helper = 0;
 void load_prop_helper()
 {
     prop_helper_module = LoadLibrary(prop_helper_library);
-    if (!prop_helper_module) {
+    if (!prop_helper_module)
+    {
         Msg("! Cannot find library %s", prop_helper_library);
         return;
     }
     _PHelper = (TPHelper)GetProcAddress(prop_helper_module, prop_helper_func);
-    if (!_PHelper) {
+    if (!_PHelper)
+    {
         Msg("! Cannot find entry point of the function %s in the library %s", prop_helper_func, prop_helper_func);
         return;
     }
@@ -46,7 +48,8 @@ void load_prop_helper()
 IPropHelper& PHelper()
 {
     static bool first_time = true;
-    if (first_time) {
+    if (first_time)
+    {
         first_time = false;
         load_prop_helper();
     }
@@ -119,13 +122,17 @@ SCRIPT_EXPORT(
                                        LPCSTR, LPCSTR, u32))(&CScriptPropertiesListHelper::CreateChoose))
 
                 //			.def("create_s8", (S8Value *(CScriptPropertiesListHelper::*)(PropItemVec*, LPCSTR,
-                //luabind::object , LPCSTR ))					(&CScriptPropertiesListHelper::CreateS8))
+                //luabind::object , LPCSTR
+                //))					(&CScriptPropertiesListHelper::CreateS8))
                 //			.def("create_s8", (S8Value *(CScriptPropertiesListHelper::*)(PropItemVec*, LPCSTR,
-                //luabind::object , LPCSTR ,  s8))				(&CScriptPropertiesListHelper::CreateS8))
+                //luabind::object , LPCSTR
+                //,  s8))				(&CScriptPropertiesListHelper::CreateS8))
                 //			.def("create_s8", (S8Value *(CScriptPropertiesListHelper::*)(PropItemVec*, LPCSTR,
-                //luabind::object , LPCSTR ,  s8,  s8))			(&CScriptPropertiesListHelper::CreateS8))
+                //luabind::object , LPCSTR
+                //,  s8,  s8))			(&CScriptPropertiesListHelper::CreateS8))
                 //			.def("create_s8", (S8Value *(CScriptPropertiesListHelper::*)(PropItemVec*, LPCSTR,
-                //luabind::object , LPCSTR ,  s8,  s8,  s8))	(&CScriptPropertiesListHelper::CreateS8))
+                //luabind::object , LPCSTR
+                //,  s8,  s8,  s8))	(&CScriptPropertiesListHelper::CreateS8))
 
                 .def("create_s16", (S16Value * (CScriptPropertiesListHelper::*)(PropItemVec*, LPCSTR, luabind::object,
                                                    LPCSTR))(&CScriptPropertiesListHelper::CreateS16))

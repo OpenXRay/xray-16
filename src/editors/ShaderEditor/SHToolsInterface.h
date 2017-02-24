@@ -29,7 +29,6 @@ struct ISHInit
     TElTabSheet* m_Sheet;
 
     ISHInit() { ZeroMemory(this, sizeof(ISHInit)); }
-
     ISHInit(EToolsID id, TItemList* il, TElTabSheet* sh, TProperties* ip, TProperties* pp)
     {
         tools_id = id;
@@ -42,38 +41,35 @@ struct ISHInit
 
 class ISHTools
 {
-  protected:
+protected:
     typedef ISHTools inherited;
 
     ISHInit Ext;
 
     BOOL m_bModified;
 
-    BOOL m_bLockUpdate;  // если менялся объект непосредственно  Update____From___()
+    BOOL m_bLockUpdate; // если менялся объект непосредственно  Update____From___()
 
     AnsiString m_LastSelection;
 
-  public:
+public:
     ListItem* m_CurrentItem;
 
-  public:
+public:
     void ViewSetCurrentItem(LPCSTR full_name);
     AnsiString ViewGetCurrentItem(bool bFolderOnly);
     TElTreeItem* ViewGetCurrentItem();
 
-  public:
+public:
     virtual LPCSTR AppendItem(LPCSTR folder_name, LPCSTR parent = 0) = 0;
     virtual void FillItemList() = 0;
 
-  public:
+public:
     ISHTools(ISHInit& init);
 
     virtual ~ISHTools() { ; }
-
     EToolsID ID() { return Ext.tools_id; }
-
     TElTabSheet* Sheet() { return Ext.m_Sheet; }
-
     AnsiString SelectedName();
     void RemoveCurrent();
     void RenameCurrent();
@@ -85,7 +81,6 @@ class ISHTools
     virtual bool Save() = 0;
 
     bool IsModified() { return m_bModified; }
-
     virtual bool IfModified();
     virtual void __stdcall Modified();
 

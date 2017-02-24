@@ -24,7 +24,7 @@
 
 #pragma comment(lib, "shlwapi.lib")
 static SFillPropData fp_data;
-#endif  // XRSE_FACTORY_EXPORTS
+#endif // XRSE_FACTORY_EXPORTS
 
 #ifdef XRSE_FACTORY_EXPORTS
 bool parse_bool(luabind::object const& table, LPCSTR identifier)
@@ -38,7 +38,8 @@ bool parse_bool(luabind::object const& table, LPCSTR identifier)
 
 BOOL is_combat_cover(shared_str const& table_id)
 {
-    if (table_id.size() == 0) return (FALSE);
+    if (table_id.size() == 0)
+        return (FALSE);
 
     string256 temp;
     xr_strcpy(temp, "smart_covers.descriptions.");
@@ -48,26 +49,28 @@ BOOL is_combat_cover(shared_str const& table_id)
     bool result = ai().script_engine().function_object(temp, table, LUA_TTABLE);
 
     VERIFY2(result, make_string("bad or missing description in smart_cover [%s]", table_id.c_str()));
-    if (table.type() != LUA_TTABLE) {
+    if (table.type() != LUA_TTABLE)
+    {
         VERIFY(table.type() != LUA_TNIL);
         return (TRUE);
     }
 
     value = table["is_combat_cover"];
-    if (value.type() == LUA_TNIL) {
+    if (value.type() == LUA_TNIL)
+    {
         Msg("! is_combat_cover flag not found for smart_cover [%s], forcing to \"true\"", table_id.c_str());
         return (TRUE);
     }
 
     return (parse_bool(table, "is_combat_cover") ? TRUE : FALSE);
 }
-#endif  // XRSE_FACTORY_EXPORTS
+#endif // XRSE_FACTORY_EXPORTS
 
 CSE_SmartCover::CSE_SmartCover(LPCSTR section) : CSE_ALifeDynamicObject(section)
 {
 #ifdef XRSE_FACTORY_EXPORTS
     fp_data.inc();
-#endif  // XRSE_FACTORY_EXPORTS
+#endif // XRSE_FACTORY_EXPORTS
 
     m_enter_min_enemy_distance = pSettings->r_float(section, "enter_min_enemy_distance");
     m_exit_min_enemy_distance = pSettings->r_float(section, "exit_min_enemy_distance");
@@ -80,50 +83,19 @@ CSE_SmartCover::~CSE_SmartCover()
 {
 #ifdef XRSE_FACTORY_EXPORTS
     fp_data.dec();
-#endif  // XRSE_FACTORY_EXPORTS
+#endif // XRSE_FACTORY_EXPORTS
 }
 
-IServerEntityShape* CSE_SmartCover::shape()
-{
-    return (this);
-}
-
-bool CSE_SmartCover::used_ai_locations() const
-{
-    return (true);
-}
-
-bool CSE_SmartCover::can_save() const
-{
-    return (true);
-}
-
-bool CSE_SmartCover::can_switch_online() const
-{
-    return (true);
-}
-
-bool CSE_SmartCover::can_switch_offline() const
-{
-    return (false);
-}
-
-bool CSE_SmartCover::interactive() const
-{
-    return (false);
-}
-
-LPCSTR CSE_SmartCover::description() const
-{
-    return (m_description.c_str());
-}
-
+IServerEntityShape* CSE_SmartCover::shape() { return (this); }
+bool CSE_SmartCover::used_ai_locations() const { return (true); }
+bool CSE_SmartCover::can_save() const { return (true); }
+bool CSE_SmartCover::can_switch_online() const { return (true); }
+bool CSE_SmartCover::can_switch_offline() const { return (false); }
+bool CSE_SmartCover::interactive() const { return (false); }
+LPCSTR CSE_SmartCover::description() const { return (m_description.c_str()); }
 #ifndef AI_COMPILER
-void CSE_SmartCover::set_available_loopholes(luabind::object table)
-{
-    m_available_loopholes = table;
-}
-#endif  // #ifndef AI_COMPILER
+void CSE_SmartCover::set_available_loopholes(luabind::object table) { m_available_loopholes = table; }
+#endif // #ifndef AI_COMPILER
 
 void CSE_SmartCover::STATE_Read(NET_Packet& tNetPacket, u16 size)
 {
@@ -131,14 +103,17 @@ void CSE_SmartCover::STATE_Read(NET_Packet& tNetPacket, u16 size)
     cform_read(tNetPacket);
     tNetPacket.r_stringZ(m_description);
     m_hold_position_time = tNetPacket.r_float();
-    if (m_wVersion >= 120) {
+    if (m_wVersion >= 120)
+    {
         m_enter_min_enemy_distance = tNetPacket.r_float();
         m_exit_min_enemy_distance = tNetPacket.r_float();
     }
 
-    if (m_wVersion >= 122) m_is_combat_cover = tNetPacket.r_u8();
+    if (m_wVersion >= 122)
+        m_is_combat_cover = tNetPacket.r_u8();
 
-    if (m_wVersion >= 128) m_can_fire = tNetPacket.r_u8();
+    if (m_wVersion >= 128)
+        m_can_fire = tNetPacket.r_u8();
 }
 
 void CSE_SmartCover::STATE_Write(NET_Packet& tNetPacket)
@@ -153,15 +128,8 @@ void CSE_SmartCover::STATE_Write(NET_Packet& tNetPacket)
     tNetPacket.w_u8((u8)m_can_fire);
 }
 
-void CSE_SmartCover::UPDATE_Read(NET_Packet& tNetPacket)
-{
-    inherited1::UPDATE_Read(tNetPacket);
-}
-
-void CSE_SmartCover::UPDATE_Write(NET_Packet& tNetPacket)
-{
-    inherited1::UPDATE_Write(tNetPacket);
-}
+void CSE_SmartCover::UPDATE_Read(NET_Packet& tNetPacket) { inherited1::UPDATE_Read(tNetPacket); }
+void CSE_SmartCover::UPDATE_Write(NET_Packet& tNetPacket) { inherited1::UPDATE_Write(tNetPacket); }
 #ifndef XRGAME_EXPORTS
 void CSE_SmartCover::FillProps(LPCSTR pref, PropItemVec& items)
 {
@@ -176,13 +144,14 @@ void CSE_SmartCover::FillProps(LPCSTR pref, PropItemVec& items)
     PHelper().CreateFloat(
         items, PrepareKey(pref, *s_name, "exit min enemy distance"), &m_exit_min_enemy_distance, 0.f, 100.f);
 
-    if (is_combat_cover(m_description)) {
+    if (is_combat_cover(m_description))
+    {
         PHelper().CreateBOOL(items, PrepareKey(pref, *s_name, "is combat cover"), &m_is_combat_cover);
         PHelper().CreateBOOL(items, PrepareKey(pref, *s_name, "can fire"), &m_can_fire);
     }
-#endif  // #ifdef XRSE_FACTORY_EXPORTS
+#endif // #ifdef XRSE_FACTORY_EXPORTS
 }
-#endif  // #ifndef XRGAME_EXPORTS
+#endif // #ifndef XRGAME_EXPORTS
 
 #ifdef XRSE_FACTORY_EXPORTS
 void CSE_SmartCover::set_loopholes_table_checker(BOOLValue* value)
@@ -247,9 +216,11 @@ static LPCSTR s_exit_loophole_id = "<__EXIT__>";
 
 shared_str transform_vertex(shared_str const& vertex_id, bool const& in)
 {
-    if (*vertex_id.c_str()) return (vertex_id);
+    if (*vertex_id.c_str())
+        return (vertex_id);
 
-    if (in) return (s_enter_loophole_id);
+    if (in)
+        return (s_enter_loophole_id);
 
     return (s_exit_loophole_id);
 }
@@ -258,7 +229,7 @@ shared_str parse_vertex(luabind::object const& table, LPCSTR identifier, bool co
 {
     return (transform_vertex(parse_string(table, identifier), in));
 }
-}  // namespace smart_cover
+} // namespace smart_cover
 
 void CSE_SmartCover::set_enterable(shared_str const& id)
 {
@@ -268,13 +239,13 @@ void CSE_SmartCover::set_enterable(shared_str const& id)
 
     public:
         IC id_predicate(shared_str const& id) : m_id(id) {}
-
         IC bool operator()(SSCDrawHelper const& h) const { return (m_id._get() == h.string_identifier._get()); }
     };
 
     xr_vector<SSCDrawHelper>::iterator found = std::find_if(m_draw_data.begin(), m_draw_data.end(), id_predicate(id));
     // VERIFY2                       (found != m_draw_data.end(), id.c_str());
-    if (found == m_draw_data.end()) return;
+    if (found == m_draw_data.end())
+        return;
 
     found->is_enterable = true;
 }
@@ -295,13 +266,15 @@ void CSE_SmartCover::check_enterable_loopholes(shared_str const& description)
     for (; I != E; ++I)
     {
         luabind::object table = *I;
-        if (table.type() != LUA_TTABLE) {
+        if (table.type() != LUA_TTABLE)
+        {
             VERIFY(table.type() != LUA_TNIL);
             continue;
         }
 
         shared_str vertex_0 = smart_cover::parse_vertex(table, "vertex0", true);
-        if (vertex_0 != smart_cover::transform_vertex("", true)) continue;
+        if (vertex_0 != smart_cover::transform_vertex("", true))
+            continue;
 
         set_enterable(smart_cover::parse_vertex(table, "vertex1", false));
     }
@@ -311,7 +284,7 @@ class CSE_SmartVisual : public CSE_Visual
 {
 public:
     virtual CSE_Visual* __stdcall visual() { return (this); }
-};  // class CSE_SmartVisual
+}; // class CSE_SmartVisual
 
 void CSE_SmartCover::fill_visuals()
 {
@@ -321,12 +294,14 @@ void CSE_SmartCover::fill_visuals()
     xr_vector<SSCDrawHelper>::iterator E = m_draw_data.end();
     for (; I != E; ++I)
     {
-        if (!I->is_enterable) return;
+        if (!I->is_enterable)
+            return;
 
         CSE_Visual* visual = new CSE_SmartVisual();
         visual->set_visual("actors\\stalker_neutral\\stalker_neutral_1");
 
-        if (I->animation_id.size() == 0) {
+        if (I->animation_id.size() == 0)
+        {
             Msg("cover [%s] doesn't have idle_2_fire animation", I->string_identifier.c_str());
             return;
         }
@@ -364,7 +339,7 @@ void draw_frustum(CDUInterface* du, float FOV, float _FAR, float A, Fvector& P, 
     COP.set(P);
 
     // calculate the corner vertices of the window
-    Fvector sPts[4];  // silhouette points (corners of window)
+    Fvector sPts[4]; // silhouette points (corners of window)
     Fvector Offset, T;
     Offset.add(D, COP);
 
@@ -412,7 +387,8 @@ shared_str animation_id(luabind::object table)
     for (; i != e; ++i)
     {
         luabind::object string = *i;
-        if (string.type() != LUA_TSTRING) {
+        if (string.type() != LUA_TSTRING)
+        {
             VERIFY(string.type() != LUA_TNIL);
             continue;
         }
@@ -435,7 +411,8 @@ void CSE_SmartCover::load_draw_data()
     luabind::object loopholes;
     bool result = ai().script_engine().function_object(temp, loopholes, LUA_TTABLE);
 
-    if (!result) {
+    if (!result)
+    {
         Msg("no or invalid smart cover description (bad or missing loopholes table in smart_cover [%s])", temp);
         return;
         //      VERIFY2                 (result, make_string("bad or missing loopholes table in smart_cover [%s]",
@@ -447,22 +424,27 @@ void CSE_SmartCover::load_draw_data()
     for (; I != E; ++I)
     {
         bool loophole_exist = true;
-        if (m_available_loopholes.is_valid()) {
+        if (m_available_loopholes.is_valid())
+        {
             luabind::object::iterator i = m_available_loopholes.begin();
             luabind::object::iterator e = m_available_loopholes.end();
             for (; i != e; ++i)
             {
                 LPCSTR const loophole_id = luabind::object_cast<LPCSTR>(i.key());
                 shared_str descr_loophole_id = parse_string(*I, "id");
-                if (xr_strcmp(loophole_id, descr_loophole_id)) continue;
-                if (!luabind::object_cast<bool>(*i)) loophole_exist = false;
+                if (xr_strcmp(loophole_id, descr_loophole_id))
+                    continue;
+                if (!luabind::object_cast<bool>(*i))
+                    loophole_exist = false;
                 break;
             }
         }
-        if (!loophole_exist) continue;
+        if (!loophole_exist)
+            continue;
 
         luabind::object table = *I;
-        if (table.type() != LUA_TTABLE) {
+        if (table.type() != LUA_TTABLE)
+        {
             VERIFY(table.type() != LUA_TNIL);
             continue;
         }
@@ -474,7 +456,8 @@ void CSE_SmartCover::load_draw_data()
         H.is_enterable = false;
         H.fov_direction = parse_fvector(table, "fov_direction");
 
-        if (H.fov_direction.square_magnitude() < EPS_L) {
+        if (H.fov_direction.square_magnitude() < EPS_L)
+        {
             Msg("! fov direction for loophole %s is setup incorrectly", H.string_identifier.c_str());
             H.fov_direction.set(0.f, 0.f, 1.f);
         }
@@ -483,7 +466,8 @@ void CSE_SmartCover::load_draw_data()
 
         H.enter_direction = parse_fvector(table, "enter_direction");
 
-        if (H.enter_direction.square_magnitude() < EPS_L) {
+        if (H.enter_direction.square_magnitude() < EPS_L)
+        {
             Msg("! enter direction for loophole %s is setup incorrectly", H.string_identifier.c_str());
             H.enter_direction.set(0.f, 0.f, 1.f);
         }
@@ -526,14 +510,17 @@ void CSE_SmartCover::on_render(
     CDUInterface* du, IServerEntityLEOwner* owner, bool bSelected, const Fmatrix& parent, int priority, bool strictB2F)
 {
     inherited1::on_render(du, owner, bSelected, parent, priority, strictB2F);
-    if (!((1 == priority) && (false == strictB2F))) return;
+    if (!((1 == priority) && (false == strictB2F)))
+        return;
 
-    if (m_need_to_reparse_loopholes && m_description.size()) {
+    if (m_need_to_reparse_loopholes && m_description.size())
+    {
         OnChangeDescription(NULL);
         m_need_to_reparse_loopholes = false;
     }
 
-    if (!bSelected) return;
+    if (!bSelected)
+        return;
 
     xr_vector<SSCDrawHelper>::iterator it = m_draw_data.begin();
     xr_vector<SSCDrawHelper>::iterator it_e = m_draw_data.end();
@@ -557,4 +544,4 @@ void CSE_SmartCover::on_render(
         draw_frustum(du, H.fov, H.range, 1.f, pos, dir, up, color_rgba(255, 0, 0, 255));
     }
 }
-#endif  // #ifdef XRSE_FACTORY_EXPORTS
+#endif // #ifdef XRSE_FACTORY_EXPORTS

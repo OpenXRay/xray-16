@@ -28,14 +28,16 @@ bool CInventoryItem::has_upgrade_group(const shared_str& upgrade_group_id)
     for (; it != it_e; ++it)
     {
         inventory::upgrade::Upgrade* upgrade = ai().alife().inventory_upgrade_manager().get_upgrade(*it);
-        if (upgrade->parent_group_id() == upgrade_group_id) return true;
+        if (upgrade->parent_group_id() == upgrade_group_id)
+            return true;
     }
     return false;
 }
 
 bool CInventoryItem::has_upgrade(const shared_str& upgrade_id)
 {
-    if (m_section_id == upgrade_id) {
+    if (m_section_id == upgrade_id)
+    {
         return true;
     }
     return (std::find(m_upgrades.begin(), m_upgrades.end(), upgrade_id) != m_upgrades.end());
@@ -43,10 +45,12 @@ bool CInventoryItem::has_upgrade(const shared_str& upgrade_id)
 
 void CInventoryItem::add_upgrade(const shared_str& upgrade_id, bool loading)
 {
-    if (!has_upgrade(upgrade_id)) {
+    if (!has_upgrade(upgrade_id))
+    {
         m_upgrades.push_back(upgrade_id);
 
-        if (!loading) {
+        if (!loading)
+        {
             NET_Packet P;
             CGameObject::u_EventGen(P, GE_INSTALL_UPGRADE, object_id());
             P.w_stringZ(upgrade_id);
@@ -65,18 +69,21 @@ bool CInventoryItem::get_upgrades_str(string2048& res) const
     for (; ib != ie; ++ib)
     {
         upgr = ai().alife().inventory_upgrade_manager().get_upgrade(*ib);
-        if (!upgr) {
+        if (!upgr)
+        {
             continue;
         }
 
         LPCSTR upgr_section = upgr->section();
-        if (prop_count > 0) {
+        if (prop_count > 0)
+        {
             xr_strcat(res, sizeof(res), ", ");
         }
         xr_strcat(res, sizeof(res), upgr_section);
         ++prop_count;
     }
-    if (prop_count > 0) {
+    if (prop_count > 0)
+    {
         return true;
     }
     return false;
@@ -84,7 +91,8 @@ bool CInventoryItem::get_upgrades_str(string2048& res) const
 
 bool CInventoryItem::equal_upgrades(Upgrades_type const& other_upgrades) const
 {
-    if (m_upgrades.size() != other_upgrades.size()) {
+    if (m_upgrades.size() != other_upgrades.size())
+    {
         return false;
     }
 
@@ -98,12 +106,14 @@ bool CInventoryItem::equal_upgrades(Upgrades_type const& other_upgrades) const
         Upgrades_type::const_iterator ie2 = other_upgrades.end();
         for (; ib2 != ie2; ++ib2)
         {
-            if (name1.equal((*ib2))) {
+            if (name1.equal((*ib2)))
+            {
                 upg_equal = true;
-                break;  // from for2, in for1
+                break; // from for2, in for1
             }
         }
-        if (!upg_equal) {
+        if (!upg_equal)
+        {
             return false;
         }
     }
@@ -122,17 +132,18 @@ void CInventoryItem::log_upgrades()
     }
     Msg("* finish - upgrades of item = %s", m_section_id.c_str());
 }
-#endif  // DEBUG
+#endif // DEBUG
 
-void CInventoryItem::net_Spawn_install_upgrades(Upgrades_type saved_upgrades)  // net_Spawn
+void CInventoryItem::net_Spawn_install_upgrades(Upgrades_type saved_upgrades) // net_Spawn
 {
     m_upgrades.clear_not_free();
 
-    if (!ai().get_alife()) {
+    if (!ai().get_alife())
+    {
         return;
     }
 
-    ai().alife().inventory_upgrade_manager().init_install(*this);  // from pSettings
+    ai().alife().inventory_upgrade_manager().init_install(*this); // from pSettings
 
     Upgrades_type::iterator ib = saved_upgrades.begin();
     Upgrades_type::iterator ie = saved_upgrades.end();
@@ -142,33 +153,28 @@ void CInventoryItem::net_Spawn_install_upgrades(Upgrades_type saved_upgrades)  /
     }
 }
 
-bool CInventoryItem::install_upgrade(LPCSTR section)
-{
-    return install_upgrade_impl(section, false);
-}
-
-bool CInventoryItem::verify_upgrade(LPCSTR section)
-{
-    return install_upgrade_impl(section, true);
-}
-
+bool CInventoryItem::install_upgrade(LPCSTR section) { return install_upgrade_impl(section, false); }
+bool CInventoryItem::verify_upgrade(LPCSTR section) { return install_upgrade_impl(section, true); }
 bool CInventoryItem::install_upgrade_impl(LPCSTR section, bool test)
 {
     bool result = process_if_exists(section, "cost", &CInifile::r_u32, m_cost, test);
     result |= process_if_exists(section, "inv_weight", &CInifile::r_float, m_weight, test);
 
     bool result2 = false;
-    if (BaseSlot() != NO_ACTIVE_SLOT) {
+    if (BaseSlot() != NO_ACTIVE_SLOT)
+    {
         BOOL value = m_flags.test(FRuckDefault);
         result2 = process_if_exists_set(section, "default_to_ruck", &CInifile::r_bool, value, test);
-        if (result2 && !test) {
+        if (result2 && !test)
+        {
             m_flags.set(FRuckDefault, value);
         }
         result |= result2;
 
         value = m_flags.test(FAllowSprint);
         result2 = process_if_exists_set(section, "sprint_allowed", &CInifile::r_bool, value, test);
-        if (result2 && !test) {
+        if (result2 && !test)
+        {
             m_flags.set(FAllowSprint, value);
         }
         result |= result2;
@@ -179,10 +185,12 @@ bool CInventoryItem::install_upgrade_impl(LPCSTR section, bool test)
 
     LPCSTR str;
     result2 = process_if_exists_set(section, "immunities_sect", &CInifile::r_string, str, test);
-    if (result2 && !test) CHitImmunity::LoadImmunities(str, pSettings);
+    if (result2 && !test)
+        CHitImmunity::LoadImmunities(str, pSettings);
 
     result2 = process_if_exists_set(section, "immunities_sect_add", &CInifile::r_string, str, test);
-    if (result2 && !test) CHitImmunity::AddImmunities(str, pSettings);
+    if (result2 && !test)
+        CHitImmunity::AddImmunities(str, pSettings);
 
     return result;
 }
@@ -190,28 +198,35 @@ bool CInventoryItem::install_upgrade_impl(LPCSTR section, bool test)
 void CInventoryItem::pre_install_upgrade()
 {
     CWeaponMagazined* wm = smart_cast<CWeaponMagazined*>(this);
-    if (wm) {
+    if (wm)
+    {
         wm->UnloadMagazine();
 
         CWeaponMagazinedWGrenade* wg = smart_cast<CWeaponMagazinedWGrenade*>(this);
-        if (wg) {
-            if (wg->IsGrenadeLauncherAttached()) {
+        if (wg)
+        {
+            if (wg->IsGrenadeLauncherAttached())
+            {
                 wg->PerformSwitchGL();
                 wg->UnloadMagazine();
-                wg->PerformSwitchGL();  // restore state
+                wg->PerformSwitchGL(); // restore state
             }
         }
     }
 
     CWeapon* weapon = smart_cast<CWeapon*>(this);
-    if (weapon) {
-        if (weapon->ScopeAttachable() && weapon->IsScopeAttached()) {
+    if (weapon)
+    {
+        if (weapon->ScopeAttachable() && weapon->IsScopeAttached())
+        {
             weapon->Detach(weapon->GetScopeName().c_str(), true);
         }
-        if (weapon->SilencerAttachable() && weapon->IsSilencerAttached()) {
+        if (weapon->SilencerAttachable() && weapon->IsSilencerAttached())
+        {
             weapon->Detach(weapon->GetSilencerName().c_str(), true);
         }
-        if (weapon->GrenadeLauncherAttachable() && weapon->IsGrenadeLauncherAttached()) {
+        if (weapon->GrenadeLauncherAttachable() && weapon->IsGrenadeLauncherAttached())
+        {
             weapon->Detach(weapon->GetGrenadeLauncherName().c_str(), true);
         }
     }

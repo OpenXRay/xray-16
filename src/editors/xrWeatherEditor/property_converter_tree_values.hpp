@@ -12,7 +12,7 @@
 public
 ref class property_converter_tree_values : public System::ComponentModel::TypeConverter
 {
-  private:
+private:
     typedef System::ComponentModel::TypeConverter inherited;
     typedef System::ComponentModel::PropertyDescriptorCollection PropertyDescriptorCollection;
     typedef System::ComponentModel::ITypeDescriptorContext ITypeDescriptorContext;
@@ -21,11 +21,11 @@ ref class property_converter_tree_values : public System::ComponentModel::TypeCo
     typedef System::Globalization::CultureInfo CultureInfo;
     typedef System::Type Type;
 
-  public:
+public:
     typedef System::ComponentModel::TypeConverter::StandardValuesCollection StandardValuesCollection;
 
-  public:
+public:
     virtual bool CanConvertFrom(ITypeDescriptorContext ^ context, Type ^ source_type) override;
-};  // ref class property_converter_tree_values
+}; // ref class property_converter_tree_values
 
-#endif  // ifndef PROPERTY_CONVERTER_TREE_VALUES_HPP_INCLUDED
+#endif // ifndef PROPERTY_CONVERTER_TREE_VALUES_HPP_INCLUDED

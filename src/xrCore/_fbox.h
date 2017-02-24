@@ -28,9 +28,7 @@ public:
     };
 
     IC BOOL is_valid() { return (x2 >= x1) && (y2 >= y1) && (z2 >= z1); }
-
     IC const T* data() const { return &min.x; }
-
     IC SelfRef set(const Tvector& _min, const Tvector& _max)
     {
         min.set(_min);
@@ -131,9 +129,7 @@ public:
     };
     ICF BOOL contains(const Tvector& p) const { return contains(p.x, p.y, p.z); };
     ICF BOOL contains(SelfCRef b) const { return contains(b.min) && contains(b.max); };
-
     IC BOOL similar(SelfCRef b) const { return min.similar(b.min) && max.similar(b.max); };
-
     ICF SelfRef modify(const Tvector& p)
     {
         min.min(p);
@@ -243,13 +239,13 @@ public:
         C.z = (min.z + max.z) * 0.5f;
         return *this;
     };
-    IC SelfCRef get_CD(Tvector& bc, Tvector& bd) const  // center + dimensions
+    IC SelfCRef get_CD(Tvector& bc, Tvector& bd) const // center + dimensions
     {
         bd.sub(max, min).mul(.5f);
         bc.add(min, bd);
         return *this;
     }
-    IC SelfRef scale(float s)  // 0.1 means make 110%, -0.1 means make 90%
+    IC SelfRef scale(float s) // 0.1 means make 110%, -0.1 means make 90%
     {
         Fvector bd;
         bd.sub(max, min).mul(s);
@@ -266,12 +262,18 @@ public:
     // Detects if this box intersect other
     ICF BOOL intersect(SelfCRef box)
     {
-        if (max.x < box.min.x) return FALSE;
-        if (max.y < box.min.y) return FALSE;
-        if (max.z < box.min.z) return FALSE;
-        if (min.x > box.max.x) return FALSE;
-        if (min.y > box.max.y) return FALSE;
-        if (min.z > box.max.z) return FALSE;
+        if (max.x < box.min.x)
+            return FALSE;
+        if (max.y < box.min.y)
+            return FALSE;
+        if (max.z < box.min.z)
+            return FALSE;
+        if (min.x > box.max.x)
+            return FALSE;
+        if (min.y > box.max.y)
+            return FALSE;
+        if (min.z > box.max.z)
+            return FALSE;
         return TRUE;
     };
 
@@ -284,48 +286,63 @@ public:
         rvmin.sub(min, start);
         rvmax.sub(max, start);
 
-        if (!fis_zero(dir.x)) {
+        if (!fis_zero(dir.x))
+        {
             alpha = rvmin.x / dir.x;
             yt = alpha * dir.y;
-            if (yt >= rvmin.y && yt <= rvmax.y) {
+            if (yt >= rvmin.y && yt <= rvmax.y)
+            {
                 zt = alpha * dir.z;
-                if (zt >= rvmin.z && zt <= rvmax.z) return true;
+                if (zt >= rvmin.z && zt <= rvmax.z)
+                    return true;
             }
             alpha = rvmax.x / dir.x;
             yt = alpha * dir.y;
-            if (yt >= rvmin.y && yt <= rvmax.y) {
+            if (yt >= rvmin.y && yt <= rvmax.y)
+            {
                 zt = alpha * dir.z;
-                if (zt >= rvmin.z && zt <= rvmax.z) return true;
+                if (zt >= rvmin.z && zt <= rvmax.z)
+                    return true;
             }
         }
 
-        if (!fis_zero(dir.y)) {
+        if (!fis_zero(dir.y))
+        {
             alpha = rvmin.y / dir.y;
             xt = alpha * dir.x;
-            if (xt >= rvmin.x && xt <= rvmax.x) {
+            if (xt >= rvmin.x && xt <= rvmax.x)
+            {
                 zt = alpha * dir.z;
-                if (zt >= rvmin.z && zt <= rvmax.z) return true;
+                if (zt >= rvmin.z && zt <= rvmax.z)
+                    return true;
             }
             alpha = rvmax.y / dir.y;
             xt = alpha * dir.x;
-            if (xt >= rvmin.x && xt <= rvmax.x) {
+            if (xt >= rvmin.x && xt <= rvmax.x)
+            {
                 zt = alpha * dir.z;
-                if (zt >= rvmin.z && zt <= rvmax.z) return true;
+                if (zt >= rvmin.z && zt <= rvmax.z)
+                    return true;
             }
         }
 
-        if (!fis_zero(dir.z)) {
+        if (!fis_zero(dir.z))
+        {
             alpha = rvmin.z / dir.z;
             xt = alpha * dir.x;
-            if (xt >= rvmin.x && xt <= rvmax.x) {
+            if (xt >= rvmin.x && xt <= rvmax.x)
+            {
                 yt = alpha * dir.y;
-                if (yt >= rvmin.y && yt <= rvmax.y) return true;
+                if (yt >= rvmin.y && yt <= rvmax.y)
+                    return true;
             }
             alpha = rvmax.z / dir.z;
             xt = alpha * dir.x;
-            if (xt >= rvmin.x && xt <= rvmax.x) {
+            if (xt >= rvmin.x && xt <= rvmax.x)
+            {
                 yt = alpha * dir.y;
-                if (yt >= rvmin.y && yt <= rvmax.y) return true;
+                if (yt >= rvmin.y && yt <= rvmax.y)
+                    return true;
             }
         }
         return false;
@@ -347,81 +364,103 @@ public:
 
         // Find candidate planes.
         {
-            if (origin[0] < min[0]) {
+            if (origin[0] < min[0])
+            {
                 coord[0] = min[0];
                 Inside = FALSE;
-                if (IR(dir[0])) MaxT[0] = (min[0] - origin[0]) / dir[0];  // Calculate T distances to candidate planes
+                if (IR(dir[0]))
+                    MaxT[0] = (min[0] - origin[0]) / dir[0]; // Calculate T distances to candidate planes
             }
             else if (origin[0] > max[0])
             {
                 coord[0] = max[0];
                 Inside = FALSE;
-                if (IR(dir[0])) MaxT[0] = (max[0] - origin[0]) / dir[0];  // Calculate T distances to candidate planes
+                if (IR(dir[0]))
+                    MaxT[0] = (max[0] - origin[0]) / dir[0]; // Calculate T distances to candidate planes
             }
         }
         {
-            if (origin[1] < min[1]) {
+            if (origin[1] < min[1])
+            {
                 coord[1] = min[1];
                 Inside = FALSE;
-                if (IR(dir[1])) MaxT[1] = (min[1] - origin[1]) / dir[1];  // Calculate T distances to candidate planes
+                if (IR(dir[1]))
+                    MaxT[1] = (min[1] - origin[1]) / dir[1]; // Calculate T distances to candidate planes
             }
             else if (origin[1] > max[1])
             {
                 coord[1] = max[1];
                 Inside = FALSE;
-                if (IR(dir[1])) MaxT[1] = (max[1] - origin[1]) / dir[1];  // Calculate T distances to candidate planes
+                if (IR(dir[1]))
+                    MaxT[1] = (max[1] - origin[1]) / dir[1]; // Calculate T distances to candidate planes
             }
         }
         {
-            if (origin[2] < min[2]) {
+            if (origin[2] < min[2])
+            {
                 coord[2] = min[2];
                 Inside = FALSE;
-                if (IR(dir[2])) MaxT[2] = (min[2] - origin[2]) / dir[2];  // Calculate T distances to candidate planes
+                if (IR(dir[2]))
+                    MaxT[2] = (min[2] - origin[2]) / dir[2]; // Calculate T distances to candidate planes
             }
             else if (origin[2] > max[2])
             {
                 coord[2] = max[2];
                 Inside = FALSE;
-                if (IR(dir[2])) MaxT[2] = (max[2] - origin[2]) / dir[2];  // Calculate T distances to candidate planes
+                if (IR(dir[2]))
+                    MaxT[2] = (max[2] - origin[2]) / dir[2]; // Calculate T distances to candidate planes
             }
         }
 
         // Ray origin inside bounding box
-        if (Inside) {
+        if (Inside)
+        {
             coord = origin;
             return rpOriginInside;
         }
 
         // Get largest of the maxT's for final choice of intersection
         u32 WhichPlane = 0;
-        if (MaxT[1] > MaxT[0]) WhichPlane = 1;
-        if (MaxT[2] > MaxT[WhichPlane]) WhichPlane = 2;
+        if (MaxT[1] > MaxT[0])
+            WhichPlane = 1;
+        if (MaxT[2] > MaxT[WhichPlane])
+            WhichPlane = 2;
 
         // Check final candidate actually inside box
-        if (IR(MaxT[WhichPlane]) & 0x80000000) return rpNone;
+        if (IR(MaxT[WhichPlane]) & 0x80000000)
+            return rpNone;
 
-        if (0 == WhichPlane) {
+        if (0 == WhichPlane)
+        {
             // 1 & 2
             coord[1] = origin[1] + MaxT[0] * dir[1];
-            if ((coord[1] < min[1]) || (coord[1] > max[1])) return rpNone;
+            if ((coord[1] < min[1]) || (coord[1] > max[1]))
+                return rpNone;
             coord[2] = origin[2] + MaxT[0] * dir[2];
-            if ((coord[2] < min[2]) || (coord[2] > max[2])) return rpNone;
+            if ((coord[2] < min[2]) || (coord[2] > max[2]))
+                return rpNone;
             return rpOriginOutside;
         }
-        if (1 == WhichPlane) {
+        if (1 == WhichPlane)
+        {
             // 0 & 2
             coord[0] = origin[0] + MaxT[1] * dir[0];
-            if ((coord[0] < min[0]) || (coord[0] > max[0])) return rpNone;
+            if ((coord[0] < min[0]) || (coord[0] > max[0]))
+                return rpNone;
             coord[2] = origin[2] + MaxT[1] * dir[2];
-            if ((coord[2] < min[2]) || (coord[2] > max[2])) return rpNone;
+            if ((coord[2] < min[2]) || (coord[2] > max[2]))
+                return rpNone;
             return rpOriginOutside;
         }
-        if (2 == WhichPlane) {
+        if (2 == WhichPlane)
+        {
             // 0 & 1
             coord[0] = origin[0] + MaxT[2] * dir[0];
-            if ((coord[0] < min[0]) || (coord[0] > max[0])) return rpNone;
+            if ((coord[0] < min[0]) || (coord[0] > max[0]))
+                return rpNone;
             coord[1] = origin[1] + MaxT[2] * dir[1];
-            if ((coord[1] < min[1]) || (coord[1] > max[1])) return rpNone;
+            if ((coord[1] < min[1]) || (coord[1] > max[1]))
+                return rpNone;
             return rpOriginOutside;
         }
         return rpNone;

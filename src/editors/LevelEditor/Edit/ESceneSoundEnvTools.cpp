@@ -6,18 +6,10 @@
 #include "UI_LevelTools.h"
 #include "ESound_Environment.h"
 
-void ESceneSoundEnvTool::CreateControls()
-{
-    inherited::CreateDefaultControls(estDefault);
-}
-
+void ESceneSoundEnvTool::CreateControls() { inherited::CreateDefaultControls(estDefault); }
 //----------------------------------------------------
 
-void ESceneSoundEnvTool::RemoveControls()
-{
-    inherited::RemoveControls();
-}
-
+void ESceneSoundEnvTool::RemoveControls() { inherited::RemoveControls(); }
 //----------------------------------------------------
 
 void ESceneSoundEnvTool::Clear(bool bSpecific)

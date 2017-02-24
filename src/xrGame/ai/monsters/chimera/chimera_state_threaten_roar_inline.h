@@ -1,16 +1,12 @@
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 #define CStateChimeraThreatenRoarAbstract CStateChimeraThreatenRoar<_Object>
 
 TEMPLATE_SPECIALIZATION
-void CStateChimeraThreatenRoarAbstract::initialize()
-{
-    inherited::initialize();
-}
-
+void CStateChimeraThreatenRoarAbstract::initialize() { inherited::initialize(); }
 TEMPLATE_SPECIALIZATION
 void CStateChimeraThreatenRoarAbstract::execute()
 {
@@ -25,7 +21,8 @@ void CStateChimeraThreatenRoarAbstract::execute()
 TEMPLATE_SPECIALIZATION
 bool CStateChimeraThreatenRoarAbstract::check_completion()
 {
-    if (time_state_started + STATE_TIME_OUT < Device.dwTimeGlobal) return true;
+    if (time_state_started + STATE_TIME_OUT < Device.dwTimeGlobal)
+        return true;
     return false;
 }
 

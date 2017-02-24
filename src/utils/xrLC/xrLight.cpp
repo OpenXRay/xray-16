@@ -14,7 +14,7 @@
 Lock task_CS
 #ifdef CONFIG_PROFILE_LOCKS
     (MUTEX_PROFILE_ID(task_C_S))
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
         ;
 
 xr_vector<int> task_pool;
@@ -42,7 +42,8 @@ public:
             // Get task
             task_CS.Enter();
             thProgress = 1.f - float(task_pool.size()) / float(lc_global_data()->g_deflectors().size());
-            if (task_pool.empty()) {
+            if (task_pool.empty())
+            {
                 task_CS.Leave();
                 return;
             }
@@ -156,7 +157,4 @@ void CBuild::Light()
     }
 }
 
-void CBuild::LightVertex()
-{
-    ::LightVertex(!!g_build_options.b_net_light);
-}
+void CBuild::LightVertex() { ::LightVertex(!!g_build_options.b_net_light); }

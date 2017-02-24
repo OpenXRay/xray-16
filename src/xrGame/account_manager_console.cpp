@@ -11,7 +11,8 @@
 
 void CCC_CreateGameSpyAccount::Execute(LPCSTR args)
 {
-    if (!args || (xr_strlen(args) == 0)) {
+    if (!args || (xr_strlen(args) == 0))
+    {
         TInfo tmp_info;
         Info(tmp_info);
         Msg(tmp_info);
@@ -42,7 +43,8 @@ void CCC_CreateGameSpyAccount::Execute(LPCSTR args)
 
 void CCC_GapySpyListProfiles::Execute(LPCSTR args)
 {
-    if (!args || (xr_strlen(args) == 0)) {
+    if (!args || (xr_strlen(args) == 0))
+    {
         TInfo tmp_info;
         Info(tmp_info);
         Msg(tmp_info);
@@ -62,7 +64,8 @@ void CCC_GapySpyListProfiles::Execute(LPCSTR args)
 
 void CCC_GameSpyLogin::Execute(LPCSTR args)
 {
-    if (!args || (xr_strlen(args) == 0)) {
+    if (!args || (xr_strlen(args) == 0))
+    {
         TInfo tmp_info;
         Info(tmp_info);
         Msg(tmp_info);
@@ -104,13 +107,15 @@ void CCC_GameSpyPrintProfile::Execute(LPCSTR args)
     VERIFY(MainMenu() && MainMenu()->GetGS());
     gamespy_gp::login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     gamespy_gp::profile const* tmp_profile = tmp_lmngr->get_current_profile();
-    if (tmp_profile) {
+    if (tmp_profile)
+    {
         Msg("- Current profile:");
         Msg("- ProfileID  : %u", tmp_profile->m_profile_id);
         Msg("- UniqueNick : %s", tmp_profile->m_unique_nick.c_str());
 
         gamespy_profile::profile_store* tmp_store = MainMenu()->GetProfileStore();
-        if (!tmp_store) {
+        if (!tmp_store)
+        {
             Msg("! No profile store available");
             return;
         }
@@ -182,14 +187,16 @@ void CCC_GameSpyProfile::Execute(LPCSTR args)
     VERIFY(tmp_prof_store);
 
     gamespy_gp::profile const* tmp_curr_prof = tmp_lmngr->get_current_profile();
-    if (!tmp_curr_prof) {
+    if (!tmp_curr_prof)
+    {
         Msg("- No profile. You are not loged in.");
         return;
     }
 
     string256 tmp_command;
     sscanf_s(args, "%s", tmp_command, sizeof(tmp_command));
-    if (!xr_strcmp(tmp_command, "load")) {
+    if (!xr_strcmp(tmp_command, "load"))
+    {
         /*tmp_prof_store->set_current_profile(
             tmp_curr_prof->m_profile_id,
             tmp_curr_prof->m_login_ticket.c_str()
@@ -206,7 +213,8 @@ void CCC_GameSpyProfile::Execute(LPCSTR args)
         char const* tmp_reward_id_str = args + xr_strlen(tmp_command);
         int tmp_award_id = 0;
 
-        if (!sscanf_s(tmp_reward_id_str, "%u", &tmp_award_id)) {
+        if (!sscanf_s(tmp_reward_id_str, "%u", &tmp_award_id))
+        {
             Msg("! Bad award id");
             return;
         }
@@ -220,11 +228,13 @@ void CCC_GameSpyProfile::Execute(LPCSTR args)
         char const* tmp_scores_str = args + xr_strlen(tmp_command);
         unsigned int score_id = 0;
         int score_value = 0;
-        if (sscanf_s(tmp_scores_str, "%u %u", &score_id, &score_value) != 2) {
+        if (sscanf_s(tmp_scores_str, "%u %u", &score_id, &score_value) != 2)
+        {
             Msg("! Not enough parameters");
             return;
         }
-        if (score_id >= gamespy_profile::bst_score_types_count) {
+        if (score_id >= gamespy_profile::bst_score_types_count)
+        {
             Msg("! Bad scoreid");
         }
         debug_best_scores.clear();

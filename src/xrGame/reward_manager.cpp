@@ -13,23 +13,17 @@ reward_manager::reward_manager(game_cl_mp* owner) : m_reward_process_time(1000),
     load_rewards();
 }
 
-reward_manager::~reward_manager()
-{
-    delete_data(m_rewards_map);
-}
-
-void reward_manager::add_task(u32 const award_id)
-{
-    m_to_reward_queue.push_back(award_id);
-}
-
+reward_manager::~reward_manager() { delete_data(m_rewards_map); }
+void reward_manager::add_task(u32 const award_id) { m_to_reward_queue.push_back(award_id); }
 void reward_manager::update_tasks()
 {
-    if (m_to_reward_queue.empty()) return;
+    if (m_to_reward_queue.empty())
+        return;
 
     u32 const tmp_award_id = m_to_reward_queue.front();
 
-    if ((Device.dwTimeGlobal - m_last_reward_time) < m_reward_process_time) return;
+    if ((Device.dwTimeGlobal - m_last_reward_time) < m_reward_process_time)
+        return;
 
     process_reward(tmp_award_id);
     m_to_reward_queue.pop_front();
@@ -70,7 +64,7 @@ void reward_manager::load_reward_item(CInifile& reward_config, u32 const index, 
         {
             return item.second->m_award_name == m_award_name;
         }
-    };  // struct award_name_searcher
+    }; // struct award_name_searcher
 #endif
     VERIFY2(m_rewards_map.find(index) == m_rewards_map.end(),
         make_string("reward with id=%d already loaded", index).c_str());
@@ -99,7 +93,8 @@ void reward_manager::process_reward(u32 const award_id)
 {
     for (rewards_map_t::iterator i = m_rewards_map.begin(), ie = m_rewards_map.end(); i != ie; ++i)
     {
-        if (i->second->m_play_sound._feedback()) {
+        if (i->second->m_play_sound._feedback())
+        {
             i->second->m_play_sound.stop();
         }
     }
@@ -116,4 +111,4 @@ void reward_manager::process_reward(u32 const award_id)
     m_last_reward_time = Device.dwTimeGlobal;
 }
 
-}  // namespace award_system
+} // namespace award_system

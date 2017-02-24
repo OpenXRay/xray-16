@@ -21,8 +21,8 @@ class ESceneShapeTool;
 //---------------------------------------------------------------------------
 class TfraShape : public TForm
 {
-    __published :  // IDE-managed Components
-                   TPanel* paAppend;
+    __published : // IDE-managed Components
+                  TPanel* paAppend;
     TLabel* APHeadLabel1;
     TExtBtn* ExtBtn2;
     TFormStorage* fsStorage;
@@ -43,8 +43,8 @@ class TfraShape : public TForm
     void __fastcall ebEditLevelBoundModeClick(TObject* Sender);
     void __fastcall ebRecalcLBClick(TObject* Sender);
 
-  private:  // User declarations
-  public:   // User declarations
+private: // User declarations
+public: // User declarations
     __fastcall TfraShape(TComponent* Owner);
     AnsiString GetCurrentEntity(BOOL bForceSelect = FALSE);
     ESceneShapeTool* tool;

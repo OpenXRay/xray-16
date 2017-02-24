@@ -46,12 +46,14 @@ void CSE_ALifeMonsterAbstract::on_unregister()
     inherited1::on_unregister();
     RELATION_REGISTRY().ClearRelations(ID);
     brain().on_unregister();
-    if (m_group_id != 0xffff) ai().alife().groups().object(m_group_id).unregister_member(ID);
+    if (m_group_id != 0xffff)
+        ai().alife().groups().object(m_group_id).unregister_member(ID);
 }
 
 void CSE_ALifeMonsterAbstract::update()
 {
-    if (!bfActive()) return;
+    if (!bfActive())
+        return;
 
     brain().update();
     /**
@@ -145,11 +147,7 @@ void CSE_ALifeMonsterAbstract::update()
     /**/
 }
 
-void CSE_ALifeMonsterAbstract::on_location_change() const
-{
-    brain().on_location_change();
-}
-
+void CSE_ALifeMonsterAbstract::on_location_change() const { brain().on_location_change(); }
 CSE_ALifeItemWeapon* CSE_ALifeMonsterAbstract::tpfGetBestWeapon(ALife::EHitType& tHitType, float& fHitPower)
 {
     m_tpCurrentBestWeapon = 0;
@@ -187,7 +185,7 @@ bool CSE_ALifeMonsterAbstract::bfActive()
 {
     CSE_ALifeGroupAbstract* l_tpALifeGroupAbstract = smart_cast<CSE_ALifeGroupAbstract*>(this);
     return (/**/ interactive() && /**/ ((l_tpALifeGroupAbstract && (l_tpALifeGroupAbstract->m_wCount > 0)) ||
-                                        (!l_tpALifeGroupAbstract && (get_health() > EPS_L))));
+                                      (!l_tpALifeGroupAbstract && (get_health() > EPS_L))));
 }
 
 CSE_ALifeDynamicObject* CSE_ALifeMonsterAbstract::tpfGetBestDetector()
@@ -207,19 +205,23 @@ CSE_ALifeDynamicObject* CSE_ALifeMonsterAbstract::tpfGetBestDetector()
 void CSE_ALifeMonsterAbstract::vfCheckForPopulationChanges()
 {
     CSE_ALifeGroupAbstract* l_tpALifeGroupAbstract = smart_cast<CSE_ALifeGroupAbstract*>(this);
-    if (!l_tpALifeGroupAbstract || !bfActive() || m_bOnline) return;
+    if (!l_tpALifeGroupAbstract || !bfActive() || m_bOnline)
+        return;
 
     ai().ef_storage().alife_evaluation(true);
     ALife::_TIME_ID l_tTimeID = ai().alife().time_manager().game_time();
-    if (l_tTimeID >= l_tpALifeGroupAbstract->m_tNextBirthTime) {
+    if (l_tTimeID >= l_tpALifeGroupAbstract->m_tNextBirthTime)
+    {
         ai().ef_storage().alife().member() = this;
         l_tpALifeGroupAbstract->m_tNextBirthTime =
             l_tTimeID + ALife::_TIME_ID(ai().ef_storage().m_pfBirthSpeed->ffGetValue() * 24 * 60 * 60 * 1000);
-        if (randF(100) < ai().ef_storage().m_pfBirthProbability->ffGetValue()) {
+        if (randF(100) < ai().ef_storage().m_pfBirthProbability->ffGetValue())
+        {
             u32 l_dwBornCount = iFloor(float(l_tpALifeGroupAbstract->m_wCount) * randF(.5f, 1.5f) *
-                                           ai().ef_storage().m_pfBirthPercentage->ffGetValue() / 100.f +
-                                       .5f);
-            if (l_dwBornCount) {
+                    ai().ef_storage().m_pfBirthPercentage->ffGetValue() / 100.f +
+                .5f);
+            if (l_dwBornCount)
+            {
                 l_tpALifeGroupAbstract->m_tpMembers.resize(l_tpALifeGroupAbstract->m_wCount + l_dwBornCount);
                 ALife::OBJECT_IT I = l_tpALifeGroupAbstract->m_tpMembers.begin() + l_tpALifeGroupAbstract->m_wCount;
                 ALife::OBJECT_IT E = l_tpALifeGroupAbstract->m_tpMembers.end();
@@ -244,19 +246,24 @@ Fvector CSE_ALifeMonsterAbstract::draw_level_position() const
 
 bool CSE_ALifeMonsterAbstract::redundant() const
 {
-    if (g_Alive()) return (false);
+    if (g_Alive())
+        return (false);
 
-    if (m_bOnline) return (false);
+    if (m_bOnline)
+        return (false);
 
-    if (m_story_id != INVALID_STORY_ID) return (false);
+    if (m_story_id != INVALID_STORY_ID)
+        return (false);
 
-    if (!m_game_death_time) return (false);
+    if (!m_game_death_time)
+        return (false);
 
     ALife::_TIME_ID current_time = alife().time_manager().game_time();
     VERIFY2(m_game_death_time <= current_time,
         make_string("incorrect death time for monster %s[death time = %I64d][current time = %I64d]", name_replace(),
             m_game_death_time, current_time));
-    if ((m_game_death_time + m_stay_after_death_time_interval) > current_time) return (false);
+    if ((m_game_death_time + m_stay_after_death_time_interval) > current_time)
+        return (false);
 
     return (true);
 }

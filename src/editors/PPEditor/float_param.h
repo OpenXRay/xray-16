@@ -19,8 +19,8 @@
 //---------------------------------------------------------------------------
 class TfrmTimeConstructor : public TForm
 {
-    __published :  // IDE-managed Components
-                   TPanel* Panel1;
+    __published : // IDE-managed Components
+                  TPanel* Panel1;
     TMultiObjSpinEdit* WorkTime;
     TSpeedButton* AddButton;
     TSpeedButton* DeleteButton;
@@ -28,8 +28,8 @@ class TfrmTimeConstructor : public TForm
     TMxLabel* MxLabel1;
     TMultiObjSpinEdit* StartTime;
 
-  private:  // User declarations
-  public:   // User declarations
+private: // User declarations
+public: // User declarations
     float t, c, b;
     __fastcall TfrmTimeConstructor(TComponent* Owner);
 };

@@ -6,7 +6,7 @@
 
 class CEditFlare : public CLensFlare
 {
-  public:
+public:
     CEditFlare();
     void Load(IReader& F);
     void Save(IWriter& F);
@@ -21,7 +21,7 @@ class ESceneLightTool : public ESceneCustomOTool
     friend class SceneBuilder;
     friend class CLight;
 
-  protected:
+protected:
     enum
     {
         flShowSun = (1 << 31),
@@ -38,19 +38,19 @@ class ESceneLightTool : public ESceneCustomOTool
     xr_vector<CLight*> frame_light;
     void AppendFrameLight(CLight* L);
 
-  protected:
+protected:
     // light control
     int lcontrol_last_idx;
     RTokenVec lcontrols;
     void __stdcall OnControlAppendClick(ButtonValue* sender, bool& bDataModified, bool& bSafe);
     void __stdcall OnControlRenameRemoveClick(ButtonValue* sender, bool& bDataModified, bool& bSafe);
 
-  protected:
+protected:
     // controls
     virtual void CreateControls();
     virtual void RemoveControls();
 
-  public:
+public:
     ESceneLightTool();
     virtual ~ESceneLightTool();
 
@@ -58,9 +58,7 @@ class ESceneLightTool : public ESceneCustomOTool
 
     // definition
     IC LPCSTR ClassName() { return "light"; }
-
     IC LPCSTR ClassDesc() { return "Light"; }
-
     IC
 
         int
@@ -71,7 +69,6 @@ class ESceneLightTool : public ESceneCustomOTool
 
     // IO
     virtual bool IsNeedSave() { return true; }
-
     virtual bool LoadStream(IReader&);
     virtual bool LoadLTX(CInifile&);
     virtual void SaveStream(IWriter&);
@@ -105,4 +102,4 @@ class ESceneLightTool : public ESceneCustomOTool
 
     virtual CCustomObject* CreateObject(LPVOID data, LPCSTR name);
 };
-#endif  // ESceneCustomOToolsH
+#endif // ESceneCustomOToolsH

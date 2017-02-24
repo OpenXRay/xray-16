@@ -7,11 +7,7 @@ struct auth_options
     xr_vector<shared_str> important;
 };
 
-void auth_entry(void* p)
-{
-    FS.auth_runtime(p);
-}
-
+void auth_entry(void* p) { FS.auth_runtime(p); }
 void CLocatorAPI::auth_generate(xr_vector<shared_str>& ignore, xr_vector<shared_str>& important)
 {
     auth_options* _o = new auth_options();
@@ -42,7 +38,8 @@ void CLocatorAPI::auth_runtime(void* params)
     m_auth_code = crc32(writer.pointer(), writer.size());
 
 #ifdef DEBUG
-    if (strstr(Core.Params, "auth_debug")) {
+    if (strstr(Core.Params, "auth_debug"))
+    {
         string_path tmp_path;
         update_path(tmp_path, "$app_data_root$", "auth_psettings.ltx");
         IWriter* tmp_dst = w_open(tmp_path);
@@ -56,7 +53,7 @@ void CLocatorAPI::auth_runtime(void* params)
 #ifdef DEBUG
     bool b_extern_auth = !!strstr(Core.Params, "asdf");
     if (!b_extern_auth)
-#endif  // DEBUG
+#endif // DEBUG
     {
         for (files_it it = m_files.begin(); it != m_files.end(); ++it)
         {
@@ -66,37 +63,43 @@ void CLocatorAPI::auth_runtime(void* params)
             BOOL bSkip = FALSE;
             for (u32 s = 0; s < _o->ignore.size(); s++)
             {
-                if (strstr(f.name, _o->ignore[s].c_str())) bSkip = TRUE;
+                if (strstr(f.name, _o->ignore[s].c_str()))
+                    bSkip = TRUE;
             }
 
-            if (bSkip) continue;
+            if (bSkip)
+                continue;
 
             // test for important
             for (u32 s = 0; s < _o->important.size(); s++)
             {
-                if ((f.size_real != 0) && strstr(f.name, _o->important[s].c_str())) {
+                if ((f.size_real != 0) && strstr(f.name, _o->important[s].c_str()))
+                {
                     // crc for file
                     IReader* r = FS.r_open(f.name);
-                    if (!r) {
+                    if (!r)
+                    {
                         do_break = true;
                         break;
                     }
                     u32 crc = crc32(r->pointer(), r->length());
 
 #ifdef DEBUG
-                    if (strstr(Core.Params, "auth_debug")) Msg("auth %s = 0x%08x", f.name, crc);
-#endif  // DEBUG
+                    if (strstr(Core.Params, "auth_debug"))
+                        Msg("auth %s = 0x%08x", f.name, crc);
+#endif // DEBUG
 
                     FS.r_close(r);
                     m_auth_code ^= u64(crc);
                 }
             }
 
-            if (do_break) break;
+            if (do_break)
+                break;
         }
 #ifdef DEBUG
         Msg("auth_code = %d", m_auth_code);
-#endif  // DEBUG
+#endif // DEBUG
     }
 #ifdef DEBUG
     else
@@ -105,7 +108,7 @@ void CLocatorAPI::auth_runtime(void* params)
         sscanf(strstr(Core.Params, "asdf ") + 5, "%[^ ] ", c_auth_code);
         m_auth_code = _atoi64(c_auth_code);
     }
-#endif  // DEBUG
+#endif // DEBUG
     xr_delete(_o);
 
     m_auth_lock.Leave();

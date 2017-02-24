@@ -30,7 +30,7 @@ struct MyPt
     DWORD dwNewIndex;
 
     // Temporary data.
-    MeshPt* pTempPt;  // Temporary data.
+    MeshPt* pTempPt; // Temporary data.
 };
 
 struct MyEdge
@@ -41,7 +41,7 @@ struct MyEdge
 struct MyTri
 {
     // Temporary data.
-    int iSlidingWindowLevel;  // Which sliding window level this tri belongs to.
+    int iSlidingWindowLevel; // Which sliding window level this tri belongs to.
 
     DWORD dwNewIndex;
     MeshTri* pOriginalTri;
@@ -69,20 +69,19 @@ struct GeneralCollapseInfo
     ArbitraryList<GeneralTriInfo> TriOriginal;
     ArbitraryList<GeneralTriInfo> TriCollapsed;
 
-    int iSlidingWindowLevel;  // Which sliding window level the binned tris will belong to.
+    int iSlidingWindowLevel; // Which sliding window level the binned tris will belong to.
     ArbitraryList<GeneralTriInfo>
-        TriNextLevel;  // On collapses that change levels, lists the tris that were on the next level.
+        TriNextLevel; // On collapses that change levels, lists the tris that were on the next level.
 
     MeshPt* pptBin;
     MeshPt* pptKeep;
 
-    float fError;  // Error of this collapse.
-    int iNumTris;  // Number of tris after this collapse has been made.
+    float fError; // Error of this collapse.
+    int iNumTris; // Number of tris after this collapse has been made.
 
     DlinkMethods(GeneralCollapseInfo, List);
 
     GeneralCollapseInfo() { ListInit(); }
-
     GeneralCollapseInfo(GeneralCollapseInfo* pPrev)
     {
         ListInit();
@@ -108,9 +107,9 @@ struct Object
     // &CollapseRoot = no more collapses to do.
     GeneralCollapseInfo* pNextCollapse;
 
-    int iFullNumTris;   // How many tris with no collapses.
-    int iFullNumPts;    // How many pts with no collapses.
-    int iNumCollapses;  // Total number of collapses.
+    int iFullNumTris; // How many tris with no collapses.
+    int iFullNumPts; // How many pts with no collapses.
+    int iNumCollapses; // Total number of collapses.
 
     int iCurSlidingWindowLevel;
 
@@ -157,4 +156,4 @@ public:
     bool Valid(void);
 };
 
-#endif  // objectH
+#endif // objectH

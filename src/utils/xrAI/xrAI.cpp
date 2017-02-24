@@ -57,19 +57,16 @@ extern void verify_level_graph(LPCSTR name, bool verbose);
 extern void compare_graphs(LPCSTR level_name);
 extern void test_levels();
 
-static const char* h_str = "The following keys are supported / required:\n"
-                           "-? or -h   == this help\n"
-                           "-f<NAME>   == compile level in gamedata/levels/<NAME>/\n"
-                           "-o         == modify build options\n"
-                           "-s         == build game spawn data\n"
-                           "\n"
-                           "NOTE: The last key is required for any functionality\n";
+static const char* h_str =
+    "The following keys are supported / required:\n"
+    "-? or -h   == this help\n"
+    "-f<NAME>   == compile level in gamedata/levels/<NAME>/\n"
+    "-o         == modify build options\n"
+    "-s         == build game spawn data\n"
+    "\n"
+    "NOTE: The last key is required for any functionality\n";
 
-void Help()
-{
-    MessageBox(0, h_str, "Command line options", MB_OK | MB_ICONINFORMATION);
-}
-
+void Help() { MessageBox(0, h_str, "Command line options", MB_OK | MB_ICONINFORMATION); }
 string_path INI_FILE;
 
 extern LPCSTR GAME_CONFIG;
@@ -90,24 +87,28 @@ void execute(LPSTR cmd)
     else if (strstr(cmd, "-verify"))
         sscanf(strstr(cmd, "-verify") + xr_strlen("-verify"), "%s", name);
 
-    if (xr_strlen(name)) xr_strcat(name, "\\");
+    if (xr_strlen(name))
+        xr_strcat(name, "\\");
 
     string_path prjName;
     prjName[0] = 0;
     bool can_use_name = false;
-    if (xr_strlen(name) < sizeof(string_path)) {
+    if (xr_strlen(name) < sizeof(string_path))
+    {
         can_use_name = true;
         FS.update_path(prjName, "$game_levels$", name);
     }
 
     FS.update_path(INI_FILE, "$game_config$", GAME_CONFIG);
 
-    if (strstr(cmd, "-f")) {
+    if (strstr(cmd, "-f"))
+    {
         R_ASSERT3(can_use_name, "Too big level name", name);
 
         char* output = strstr(cmd, "-out");
         string256 temp0;
-        if (output) {
+        if (output)
+        {
             output += xr_strlen("-out");
             sscanf(output, "%s", temp0);
             _TrimLeft(temp0);
@@ -120,18 +121,22 @@ void execute(LPSTR cmd)
     }
     else
     {
-        if (strstr(cmd, "-s")) {
-            if (xr_strlen(name)) name[xr_strlen(name) - 1] = 0;
+        if (strstr(cmd, "-s"))
+        {
+            if (xr_strlen(name))
+                name[xr_strlen(name) - 1] = 0;
             char* output = strstr(cmd, "-out");
             string256 temp0, temp1;
-            if (output) {
+            if (output)
+            {
                 output += xr_strlen("-out");
                 sscanf(output, "%s", temp0);
                 _TrimLeft(temp0);
                 output = temp0;
             }
             char* start = strstr(cmd, "-start");
-            if (start) {
+            if (start)
+            {
                 start += xr_strlen("-start");
                 sscanf(start, "%s", temp1);
                 _TrimLeft(temp1);
@@ -156,7 +161,8 @@ void Startup(LPSTR lpCmdLine)
 
     xr_strcpy(cmd, lpCmdLine);
     strlwr(cmd);
-    if (strstr(cmd, "-?") || strstr(cmd, "-h")) {
+    if (strstr(cmd, "-?") || strstr(cmd, "-h"))
+    {
         Help();
         return;
     }
@@ -167,7 +173,8 @@ void Startup(LPSTR lpCmdLine)
         Help();
         return;
     }
-    if (strstr(cmd, "-o")) bModifyOptions = TRUE;
+    if (strstr(cmd, "-o"))
+        bModifyOptions = TRUE;
     Logger.Initialize("xrAI");
     u32 dwStartupTime = timeGetTime();
     execute(cmd);
@@ -195,7 +202,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     LPCSTR g_name = "xrSE_Factory";
     Log("Loading DLL:", g_name);
     hFactory = LoadLibrary(g_name);
-    if (0 == hFactory) R_CHK(GetLastError());
+    if (0 == hFactory)
+        R_CHK(GetLastError());
     R_ASSERT2(hFactory, "Factory DLL raised exception during loading or there is no factory DLL at all");
 
     create_entity = (Factory_Create*)GetProcAddress(hFactory, "_create_entity@4");

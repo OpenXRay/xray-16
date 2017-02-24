@@ -28,4 +28,4 @@ Comments:
 #define DECLSPEC_NV_MATH
 #endif
 
-#endif  // _nv_mathdecl_h_
+#endif // _nv_mathdecl_h_

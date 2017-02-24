@@ -30,7 +30,7 @@ class CControlDirection : public CControl_ComPure<SControlDirectionData>
     struct
     {
         float current_angle;
-        float current_speed;  // current speed
+        float current_speed; // current speed
         float current_acc;
 
         void init()

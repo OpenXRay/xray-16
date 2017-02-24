@@ -10,7 +10,8 @@ message_filter::message_filter()
 }
 message_filter::~message_filter()
 {
-    if (m_msg_log_file) FS.w_close(m_msg_log_file);
+    if (m_msg_log_file)
+        FS.w_close(m_msg_log_file);
 }
 
 void message_filter::filter(u16 const& msg_type, u32 const& msg_subtype, msg_type_subtype_func_t const& found_func)
@@ -46,7 +47,7 @@ void message_filter::msg_type_subtype_t::import(NET_Packet& packet)
     case M_GAMEMESSAGE: { packet.r_u32(msg_subtype);
     }
     break;
-    };  // switch (msg_type)
+    }; // switch (msg_type)
 }
 
 void message_filter::check_new_data(NET_Packet& packet)
@@ -56,7 +57,8 @@ void message_filter::check_new_data(NET_Packet& packet)
     msg_type_subtype_t packet_mtype;
     packet_mtype.import(packet);
 
-    if (packet_mtype.msg_type == M_EVENT_PACK) {
+    if (packet_mtype.msg_type == M_EVENT_PACK)
+    {
         NET_Packet tmp_packet;
         while (!packet.r_eof())
         {
@@ -68,7 +70,8 @@ void message_filter::check_new_data(NET_Packet& packet)
             dbg_print_msg(tmp_packet, packet_mtype);
 
             filters_map_t::iterator tmp_iter = m_filters.find(packet_mtype);
-            if (tmp_iter != m_filters.end()) {
+            if (tmp_iter != m_filters.end())
+            {
                 tmp_iter->second(packet_mtype.msg_type, packet_mtype.msg_subtype, tmp_packet);
             }
         }
@@ -77,7 +80,8 @@ void message_filter::check_new_data(NET_Packet& packet)
     {
         dbg_print_msg(packet, packet_mtype);
         filters_map_t::iterator tmp_iter = m_filters.find(packet_mtype);
-        if (tmp_iter != m_filters.end()) {
+        if (tmp_iter != m_filters.end())
+        {
             tmp_iter->second(packet_mtype.msg_type, packet_mtype.msg_subtype, packet);
         }
     }
@@ -88,7 +92,8 @@ void message_filter::dbg_set_message_log_file(string_path const& message_log_fil
 {
     R_ASSERT(message_log_file);
     m_msg_log_file = FS.w_open(message_log_file);
-    if (!m_msg_log_file) {
+    if (!m_msg_log_file)
+    {
         Msg("! ERROR: failed to open demo messages logging file");
     }
 }
@@ -129,7 +134,7 @@ void message_filter::dbg_print_msg(NET_Packet& packet, msg_type_subtype_t const&
             xr_sprintf(tmp_string, "--- CL_EVENT [%7u][%5u]: EVENT_ID=[%d]", msg_type.msg_receive_time,
                 msg_type.dest_obj_id, msg_type.msg_subtype);
         };
-        };  // switch (mtype.msg_subtype)
+        }; // switch (mtype.msg_subtype)
     }
     break;
     case M_EVENT_PACK: { FATAL("can't print M_EVENT_PACK message");
@@ -181,15 +186,18 @@ void message_filter::dbg_print_msg(NET_Packet& packet, msg_type_subtype_t const&
     break;
     default: { xr_sprintf(tmp_string, "--- MESSAGE_ID[%u]         [%7u]", msg_type.msg_type, msg_type.msg_receive_time);
     };
-    };  // switch (m_type)
-    if (!xr_strcmp(tmp_string, m_last_string)) {
+    }; // switch (m_type)
+    if (!xr_strcmp(tmp_string, m_last_string))
+    {
         ++m_strrepeat_count;
         return;
     }
     Msg(tmp_string);
     xr_strcpy(m_last_string, tmp_string);
-    if (m_msg_log_file) {
-        if (m_strrepeat_count) {
+    if (m_msg_log_file)
+    {
+        if (m_strrepeat_count)
+        {
             m_msg_log_file->w_printf(". %d\n", m_strrepeat_count);
         }
         xr_strcat(tmp_string, "\n");

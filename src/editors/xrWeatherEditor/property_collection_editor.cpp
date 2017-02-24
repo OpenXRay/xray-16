@@ -29,15 +29,8 @@ typedef PropertyBag::PropertySpecDescriptor PropertySpecDescriptor;
 extern ide_impl* g_ide;
 #pragma managed
 
-property_collection_editor::property_collection_editor(Type ^ type) : inherited(type)
-{
-}
-
-Type ^ property_collection_editor::CreateCollectionItemType()
-{
-    return (property_container::typeid);
-}
-
+property_collection_editor::property_collection_editor(Type ^ type) : inherited(type) {}
+Type ^ property_collection_editor::CreateCollectionItemType() { return (property_container::typeid); }
 Object ^ property_collection_editor::CreateInstance(Type ^ type)
 {
     property_container ^ container = safe_cast<property_container ^>(Context->Instance);
@@ -52,10 +45,12 @@ String ^ property_collection_editor::GetDisplayText(Object ^ value)
     property_container ^ container = safe_cast<property_container ^>(value);
 
     property_holder_collection* collection = container->holder().collection();
-    if (!collection) return (container->holder().display_name());
+    if (!collection)
+        return (container->holder().display_name());
 
     int index = collection->index(&container->holder());
-    if (index < 0) return (container->holder().display_name());
+    if (index < 0)
+        return (container->holder().display_name());
 
     VERIFY((index < (int)collection->size()));
     char buffer[256];
@@ -64,11 +59,7 @@ String ^ property_collection_editor::GetDisplayText(Object ^ value)
     return (to_string(buffer));
 }
 
-void property_collection_editor::on_move(Object ^ sender, EventArgs ^ e)
-{
-    g_ide->window()->view().Invalidate();
-}
-
+void property_collection_editor::on_move(Object ^ sender, EventArgs ^ e) { g_ide->window()->view().Invalidate(); }
 property_collection_editor::CollectionForm ^ property_collection_editor::CreateCollectionForm()
 {
     //	VERIFY						(!m_collection_form);
@@ -80,7 +71,8 @@ property_collection_editor::CollectionForm ^ property_collection_editor::CreateC
 Object ^
     property_collection_editor::EditValue(ITypeDescriptorContext ^ context, IServiceProvider ^ provider, Object ^ value)
 {
-    if (!m_collection_form || !m_collection_form->Visible) return (inherited::EditValue(context, provider, value));
+    if (!m_collection_form || !m_collection_form->Visible)
+        return (inherited::EditValue(context, provider, value));
 
     property_collection_editor ^ editor = gcnew property_collection_editor(CollectionType);
     return (editor->EditValue(context, provider, value));

@@ -4,72 +4,79 @@
 #define LOCAL_EPSILON 0.000001f
 
 //! sort so that a<=b
-#define SORT(a, b)                                                                                                     \
-    if (a > b) {                                                                                                       \
-        const float c = a;                                                                                             \
-        a = b;                                                                                                         \
-        b = c;                                                                                                         \
+#define SORT(a, b)         \
+    if (a > b)             \
+    {                      \
+        const float c = a; \
+        a = b;             \
+        b = c;             \
     }
 
 //! Edge to edge test based on Franlin Antonio's gem: "Faster Line Segment Intersection", in Graphics Gems III, pp.
 //! 199-202
-#define EDGE_EDGE_TEST(V0, U0, U1)                                                                                     \
-    Bx = ((const float*)U0)[i0] - ((const float*)U1)[i0];                                                              \
-    By = ((const float*)U0)[i1] - ((const float*)U1)[i1];                                                              \
-    Cx = ((const float*)V0)[i0] - ((const float*)U0)[i0];                                                              \
-    Cy = ((const float*)V0)[i1] - ((const float*)U0)[i1];                                                              \
-    f = Ay * Bx - Ax * By;                                                                                             \
-    d = By * Cx - Bx * Cy;                                                                                             \
-    if ((f > 0.0f && d >= 0.0f && d <= f) || (f < 0.0f && d <= 0.0f && d >= f)) {                                      \
-        const float e = Ax * Cy - Ay * Cx;                                                                             \
-        if (f > 0.0f) {                                                                                                \
-            if (e >= 0.0f && e <= f) return TRUE;                                                                      \
-        }                                                                                                              \
-        else                                                                                                           \
-        {                                                                                                              \
-            if (e <= 0.0f && e >= f) return TRUE;                                                                      \
-        }                                                                                                              \
+#define EDGE_EDGE_TEST(V0, U0, U1)                                              \
+    Bx = ((const float*)U0)[i0] - ((const float*)U1)[i0];                       \
+    By = ((const float*)U0)[i1] - ((const float*)U1)[i1];                       \
+    Cx = ((const float*)V0)[i0] - ((const float*)U0)[i0];                       \
+    Cy = ((const float*)V0)[i1] - ((const float*)U0)[i1];                       \
+    f = Ay * Bx - Ax * By;                                                      \
+    d = By * Cx - Bx * Cy;                                                      \
+    if ((f > 0.0f && d >= 0.0f && d <= f) || (f < 0.0f && d <= 0.0f && d >= f)) \
+    {                                                                           \
+        const float e = Ax * Cy - Ay * Cx;                                      \
+        if (f > 0.0f)                                                           \
+        {                                                                       \
+            if (e >= 0.0f && e <= f)                                            \
+                return TRUE;                                                    \
+        }                                                                       \
+        else                                                                    \
+        {                                                                       \
+            if (e <= 0.0f && e >= f)                                            \
+                return TRUE;                                                    \
+        }                                                                       \
     }
 
 //! TO BE DOCUMENTED
-#define EDGE_AGAINST_TRI_EDGES(V0, V1, U0, U1, U2)                                                                     \
+#define EDGE_AGAINST_TRI_EDGES(V0, V1, U0, U1, U2)                        \
     \
-{                                                                                                               \
-        float Bx, By, Cx, Cy, d, f;                                                                                    \
-        const float Ax = ((const float*)V1)[i0] - ((const float*)V0)[i0];                                              \
-        const float Ay = ((const float*)V1)[i1] - ((const float*)V0)[i1];                                              \
-        /* test edge U0,U1 against V0,V1 */                                                                            \
-        EDGE_EDGE_TEST(V0, U0, U1);                                                                                    \
-        /* test edge U1,U2 against V0,V1 */                                                                            \
-        EDGE_EDGE_TEST(V0, U1, U2);                                                                                    \
-        /* test edge U2,U1 against V0,V1 */                                                                            \
-        EDGE_EDGE_TEST(V0, U2, U0);                                                                                    \
+{                                                                  \
+        float Bx, By, Cx, Cy, d, f;                                       \
+        const float Ax = ((const float*)V1)[i0] - ((const float*)V0)[i0]; \
+        const float Ay = ((const float*)V1)[i1] - ((const float*)V0)[i1]; \
+        /* test edge U0,U1 against V0,V1 */                               \
+        EDGE_EDGE_TEST(V0, U0, U1);                                       \
+        /* test edge U1,U2 against V0,V1 */                               \
+        EDGE_EDGE_TEST(V0, U1, U2);                                       \
+        /* test edge U2,U1 against V0,V1 */                               \
+        EDGE_EDGE_TEST(V0, U2, U0);                                       \
     \
 }
 
 //! TO BE DOCUMENTED
-#define POINT_IN_TRI(V0, U0, U1, U2)                                                                                   \
+#define POINT_IN_TRI(V0, U0, U1, U2)                                                  \
     \
-{                                                                                                               \
-        /* is T1 completly inside T2? */                                                                               \
-        /* check if V0 is inside tri(U0,U1,U2) */                                                                      \
-        float a = ((const float*)U1)[i1] - ((const float*)U0)[i1];                                                     \
-        float b = -(((const float*)U1)[i0] - ((const float*)U0)[i0]);                                                  \
-        float c = -a * ((const float*)U0)[i0] - b * ((const float*)U0)[i1];                                            \
-        float d0 = a * ((const float*)V0)[i0] + b * ((const float*)V0)[i1] + c;                                        \
-                                                                                                                       \
-        a = ((const float*)U2)[i1] - ((const float*)U1)[i1];                                                           \
-        b = -(((const float*)U2)[i0] - ((const float*)U1)[i0]);                                                        \
-        c = -a * ((const float*)U1)[i0] - b * ((const float*)U1)[i1];                                                  \
-        const float d1 = a * ((const float*)V0)[i0] + b * ((const float*)V0)[i1] + c;                                  \
-                                                                                                                       \
-        a = ((const float*)U0)[i1] - ((const float*)U2)[i1];                                                           \
-        b = -(((const float*)U0)[i0] - ((const float*)U2)[i0]);                                                        \
-        c = -a * ((const float*)U2)[i0] - b * ((const float*)U2)[i1];                                                  \
-        const float d2 = a * ((const float*)V0)[i0] + b * ((const float*)V0)[i1] + c;                                  \
-        if (d0 * d1 > 0.0f) {                                                                                          \
-            if (d0 * d2 > 0.0f) return TRUE;                                                                           \
-        }                                                                                                              \
+{                                                                              \
+        /* is T1 completly inside T2? */                                              \
+        /* check if V0 is inside tri(U0,U1,U2) */                                     \
+        float a = ((const float*)U1)[i1] - ((const float*)U0)[i1];                    \
+        float b = -(((const float*)U1)[i0] - ((const float*)U0)[i0]);                 \
+        float c = -a * ((const float*)U0)[i0] - b * ((const float*)U0)[i1];           \
+        float d0 = a * ((const float*)V0)[i0] + b * ((const float*)V0)[i1] + c;       \
+                                                                                      \
+        a = ((const float*)U2)[i1] - ((const float*)U1)[i1];                          \
+        b = -(((const float*)U2)[i0] - ((const float*)U1)[i0]);                       \
+        c = -a * ((const float*)U1)[i0] - b * ((const float*)U1)[i1];                 \
+        const float d1 = a * ((const float*)V0)[i0] + b * ((const float*)V0)[i1] + c; \
+                                                                                      \
+        a = ((const float*)U0)[i1] - ((const float*)U2)[i1];                          \
+        b = -(((const float*)U0)[i0] - ((const float*)U2)[i0]);                       \
+        c = -a * ((const float*)U2)[i0] - b * ((const float*)U2)[i1];                 \
+        const float d2 = a * ((const float*)V0)[i0] + b * ((const float*)V0)[i1] + c; \
+        if (d0 * d1 > 0.0f)                                                           \
+        {                                                                             \
+            if (d0 * d2 > 0.0f)                                                       \
+                return TRUE;                                                          \
+        }                                                                             \
     \
 }
 
@@ -84,8 +91,10 @@ BOOL CoplanarTriTri(const Point& n, const Point& v0, const Point& v1, const Poin
     A[0] = _abs(((const float*)n)[0]);
     A[1] = _abs(((const float*)n)[1]);
     A[2] = _abs(((const float*)n)[2]);
-    if (A[0] > A[1]) {
-        if (A[0] > A[2]) {
+    if (A[0] > A[1])
+    {
+        if (A[0] > A[2])
+        {
             i0 = 1; /* A[0] is greatest */
             i1 = 2;
         }
@@ -97,7 +106,8 @@ BOOL CoplanarTriTri(const Point& n, const Point& v0, const Point& v1, const Poin
     }
     else /* A[0]<=A[1] */
     {
-        if (A[2] > A[1]) {
+        if (A[2] > A[1])
+        {
             i0 = 0; /* A[2] is greatest */
             i1 = 1;
         }
@@ -121,57 +131,58 @@ BOOL CoplanarTriTri(const Point& n, const Point& v0, const Point& v1, const Poin
 }
 
 //! TO BE DOCUMENTED
-#define NEWCOMPUTE_INTERVALS(VV0, VV1, VV2, D0, D1, D2, D0D1, D0D2, A, B, C, X0, X1)                                   \
+#define NEWCOMPUTE_INTERVALS(VV0, VV1, VV2, D0, D1, D2, D0D1, D0D2, A, B, C, X0, X1)   \
     \
-{                                                                                                               \
-        if (D0D1 > 0.0f) {                                                                                             \
-            /* here we know that D0D2<=0.0 */                                                                          \
-            /* that is D0, D1 are on the same side, D2 on the other or on the plane */                                 \
-            A = VV2;                                                                                                   \
-            B = (VV0 - VV2) * D2;                                                                                      \
-            C = (VV1 - VV2) * D2;                                                                                      \
-            X0 = D2 - D0;                                                                                              \
-            X1 = D2 - D1;                                                                                              \
-        }                                                                                                              \
-        else if (D0D2 > 0.0f)                                                                                          \
-        {                                                                                                              \
-            /* here we know that d0d1<=0.0 */                                                                          \
-            A = VV1;                                                                                                   \
-            B = (VV0 - VV1) * D1;                                                                                      \
-            C = (VV2 - VV1) * D1;                                                                                      \
-            X0 = D1 - D0;                                                                                              \
-            X1 = D1 - D2;                                                                                              \
-        }                                                                                                              \
-        else if (D1 * D2 > 0.0f || D0 != 0.0f)                                                                         \
-        {                                                                                                              \
-            /* here we know that d0d1<=0.0 or that D0!=0.0 */                                                          \
-            A = VV0;                                                                                                   \
-            B = (VV1 - VV0) * D0;                                                                                      \
-            C = (VV2 - VV0) * D0;                                                                                      \
-            X0 = D0 - D1;                                                                                              \
-            X1 = D0 - D2;                                                                                              \
-        }                                                                                                              \
-        else if (D1 != 0.0f)                                                                                           \
-        {                                                                                                              \
-            A = VV1;                                                                                                   \
-            B = (VV0 - VV1) * D1;                                                                                      \
-            C = (VV2 - VV1) * D1;                                                                                      \
-            X0 = D1 - D0;                                                                                              \
-            X1 = D1 - D2;                                                                                              \
-        }                                                                                                              \
-        else if (D2 != 0.0f)                                                                                           \
-        {                                                                                                              \
-            A = VV2;                                                                                                   \
-            B = (VV0 - VV2) * D2;                                                                                      \
-            C = (VV1 - VV2) * D2;                                                                                      \
-            X0 = D2 - D0;                                                                                              \
-            X1 = D2 - D1;                                                                                              \
-        }                                                                                                              \
-        else                                                                                                           \
-        {                                                                                                              \
-            /* triangles are coplanar */                                                                               \
-            return CoplanarTriTri(N1, V0, V1, V2, U0, U1, U2);                                                         \
-        }                                                                                                              \
+{                                                                               \
+        if (D0D1 > 0.0f)                                                               \
+        {                                                                              \
+            /* here we know that D0D2<=0.0 */                                          \
+            /* that is D0, D1 are on the same side, D2 on the other or on the plane */ \
+            A = VV2;                                                                   \
+            B = (VV0 - VV2) * D2;                                                      \
+            C = (VV1 - VV2) * D2;                                                      \
+            X0 = D2 - D0;                                                              \
+            X1 = D2 - D1;                                                              \
+        }                                                                              \
+        else if (D0D2 > 0.0f)                                                          \
+        {                                                                              \
+            /* here we know that d0d1<=0.0 */                                          \
+            A = VV1;                                                                   \
+            B = (VV0 - VV1) * D1;                                                      \
+            C = (VV2 - VV1) * D1;                                                      \
+            X0 = D1 - D0;                                                              \
+            X1 = D1 - D2;                                                              \
+        }                                                                              \
+        else if (D1 * D2 > 0.0f || D0 != 0.0f)                                         \
+        {                                                                              \
+            /* here we know that d0d1<=0.0 or that D0!=0.0 */                          \
+            A = VV0;                                                                   \
+            B = (VV1 - VV0) * D0;                                                      \
+            C = (VV2 - VV0) * D0;                                                      \
+            X0 = D0 - D1;                                                              \
+            X1 = D0 - D2;                                                              \
+        }                                                                              \
+        else if (D1 != 0.0f)                                                           \
+        {                                                                              \
+            A = VV1;                                                                   \
+            B = (VV0 - VV1) * D1;                                                      \
+            C = (VV2 - VV1) * D1;                                                      \
+            X0 = D1 - D0;                                                              \
+            X1 = D1 - D2;                                                              \
+        }                                                                              \
+        else if (D2 != 0.0f)                                                           \
+        {                                                                              \
+            A = VV2;                                                                   \
+            B = (VV0 - VV2) * D2;                                                      \
+            C = (VV1 - VV2) * D2;                                                      \
+            X0 = D2 - D0;                                                              \
+            X1 = D2 - D1;                                                              \
+        }                                                                              \
+        else                                                                           \
+        {                                                                              \
+            /* triangles are coplanar */                                               \
+            return CoplanarTriTri(N1, V0, V1, V2, U0, U1, U2);                         \
+        }                                                                              \
     \
 }
 
@@ -217,15 +228,18 @@ inline_ BOOL AABBTreeCollider::TriTriOverlap(
 
 // Coplanarity robustness check
 #ifdef OPC_TRITRI_EPSILON_TEST
-    if (_abs(du0) < LOCAL_EPSILON) du0 = 0.0f;
-    if (_abs(du1) < LOCAL_EPSILON) du1 = 0.0f;
-    if (_abs(du2) < LOCAL_EPSILON) du2 = 0.0f;
+    if (_abs(du0) < LOCAL_EPSILON)
+        du0 = 0.0f;
+    if (_abs(du1) < LOCAL_EPSILON)
+        du1 = 0.0f;
+    if (_abs(du2) < LOCAL_EPSILON)
+        du2 = 0.0f;
 #endif
     const float du0du1 = du0 * du1;
     const float du0du2 = du0 * du2;
 
-    if (du0du1 > 0.0f && du0du2 > 0.0f)  // same sign on all of them + not equal 0 ?
-        return FALSE;                    // no intersection occurs
+    if (du0du1 > 0.0f && du0du2 > 0.0f) // same sign on all of them + not equal 0 ?
+        return FALSE; // no intersection occurs
 
     // Compute plane of triangle (U0,U1,U2)
     E1 = U1 - U0;
@@ -240,16 +254,19 @@ inline_ BOOL AABBTreeCollider::TriTriOverlap(
     float dv2 = (N2 | V2) + d2;
 
 #ifdef OPC_TRITRI_EPSILON_TEST
-    if (_abs(dv0) < LOCAL_EPSILON) dv0 = 0.0f;
-    if (_abs(dv1) < LOCAL_EPSILON) dv1 = 0.0f;
-    if (_abs(dv2) < LOCAL_EPSILON) dv2 = 0.0f;
+    if (_abs(dv0) < LOCAL_EPSILON)
+        dv0 = 0.0f;
+    if (_abs(dv1) < LOCAL_EPSILON)
+        dv1 = 0.0f;
+    if (_abs(dv2) < LOCAL_EPSILON)
+        dv2 = 0.0f;
 #endif
 
     const float dv0dv1 = dv0 * dv1;
     const float dv0dv2 = dv0 * dv2;
 
-    if (dv0dv1 > 0.0f && dv0dv2 > 0.0f)  // same sign on all of them + not equal 0 ?
-        return FALSE;                    // no intersection occurs
+    if (dv0dv1 > 0.0f && dv0dv2 > 0.0f) // same sign on all of them + not equal 0 ?
+        return FALSE; // no intersection occurs
 
     // Compute direction of intersection line
     const Point D = N1 ^ N2;
@@ -259,8 +276,10 @@ inline_ BOOL AABBTreeCollider::TriTriOverlap(
     short index = 0;
     float bb = _abs(((const float*)D)[1]);
     float cc = _abs(((const float*)D)[2]);
-    if (bb > max) max = bb, index = 1;
-    if (cc > max) max = cc, index = 2;
+    if (bb > max)
+        max = bb, index = 1;
+    if (cc > max)
+        max = cc, index = 2;
 
     // This is the simplified projection onto L
     const float vp0 = ((const float*)V0)[index];
@@ -296,6 +315,7 @@ inline_ BOOL AABBTreeCollider::TriTriOverlap(
     SORT(isect1[0], isect1[1]);
     SORT(isect2[0], isect2[1]);
 
-    if (isect1[1] < isect2[0] || isect2[1] < isect1[0]) return FALSE;
+    if (isect1[1] < isect2[0] || isect2[1] < isect1[0])
+        return FALSE;
     return TRUE;
 }

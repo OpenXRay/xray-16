@@ -29,9 +29,10 @@ configs_dumper::configs_dumper()
 
 configs_dumper::~configs_dumper()
 {
-    if (m_make_start_event) {
+    if (m_make_start_event)
+    {
         SetEvent(m_make_start_event);
-        WaitForSingleObject(m_make_done_event, INFINITE);  // thread stoped
+        WaitForSingleObject(m_make_done_event, INFINITE); // thread stoped
         CloseHandle(m_make_done_event);
         CloseHandle(m_make_start_event);
     }
@@ -43,7 +44,8 @@ void configs_dumper::shedule_Update(u32 dt)
     DWORD thread_result = WaitForSingleObject(m_make_done_event, 0);
     R_ASSERT((thread_result != WAIT_ABANDONED) && (thread_result != WAIT_FAILED));
     R_ASSERT(m_state == ds_active);
-    if (thread_result == WAIT_OBJECT_0) {
+    if (thread_result == WAIT_OBJECT_0)
+    {
         m_complete_cb(m_buffer_for_compress, m_buffer_for_compress_size, m_dump_result.size());
         m_state = ds_not_active;
         Engine.Sheduler.Unregister(this);
@@ -55,42 +57,52 @@ struct ExistDumpPredicate
     shared_str section_name;
     bool operator()(IAnticheatDumpable const* dump_obj) const
     {
-        if (!dump_obj) return false;
-        if (dump_obj->GetAnticheatSectionName() == section_name) return true;
+        if (!dump_obj)
+            return false;
+        if (dump_obj->GetAnticheatSectionName() == section_name)
+            return true;
         return false;
     }
-};  // struct ExistDumpPredicate
+}; // struct ExistDumpPredicate
 
 typedef buffer_vector<IAnticheatDumpable const*> active_objects_t;
 static active_objects_t::size_type get_active_objects(active_objects_t& dest)
 {
     CActorMP const* tmp_actor = smart_cast<CActorMP const*>(Level().CurrentControlEntity());
 
-    if (!tmp_actor) return 0;
+    if (!tmp_actor)
+        return 0;
 
     dest.push_back(tmp_actor);
 
     for (u16 i = KNIFE_SLOT; i <= GRENADE_SLOT; ++i)
     {
         VERIFY(dest.capacity() != dest.size());
-        if (dest.capacity() == dest.size()) return dest.size();
+        if (dest.capacity() == dest.size())
+            return dest.size();
 
         CInventoryItem const* tmp_inv_item = tmp_actor->inventory().ItemFromSlot(i);
-        if (!tmp_inv_item) continue;
+        if (!tmp_inv_item)
+            continue;
 
         CWeapon const* tmp_weapon = smart_cast<CWeapon const*>(tmp_inv_item);
-        if (tmp_weapon) {
+        if (tmp_weapon)
+        {
             dest.push_back(tmp_weapon);
-            if (tmp_weapon->m_magazine.size()) {
+            if (tmp_weapon->m_magazine.size())
+            {
                 VERIFY(dest.capacity() != dest.size());
-                if (dest.capacity() == dest.size()) return dest.size();
+                if (dest.capacity() == dest.size())
+                    return dest.size();
 
                 IAnticheatDumpable const* tmp_cartridge = &tmp_weapon->m_magazine[0];
-                if (!tmp_cartridge) continue;
+                if (!tmp_cartridge)
+                    continue;
 
                 ExistDumpPredicate tmp_predicate;
                 tmp_predicate.section_name = tmp_cartridge->GetAnticheatSectionName();
-                if (std::find_if(dest.begin(), dest.end(), tmp_predicate) == dest.end()) {
+                if (std::find_if(dest.begin(), dest.end(), tmp_predicate) == dest.end())
+                {
                     dest.push_back(tmp_cartridge);
                 };
             }
@@ -106,7 +118,8 @@ void configs_dumper::write_configs()
     long i = 0;
     m_dump_result.clear();
     m_ltx_configs.start_dump();
-    if (m_yield_cb) {
+    if (m_yield_cb)
+    {
         while (m_ltx_configs.dump_one(m_dump_result))
         {
             m_yield_cb(i);
@@ -148,7 +161,8 @@ void configs_dumper::sign_configs()
     STRCONCAT(tmp_player_name, "\"",
         tmp_cl_game->local_player ? tmp_cl_game->local_player->getName() : "unknown_just_connected", "\"");
     LPCSTR tmp_cdkey_digest = Level().get_cdkey_digest().c_str();
-    if (!tmp_cdkey_digest) tmp_cdkey_digest = "null";
+    if (!tmp_cdkey_digest)
+        tmp_cdkey_digest = "null";
 
     LPCSTR add_str = NULL;
     STRCONCAT(add_str, tmp_player_name, tmp_cdkey_digest, current_time(creation_date));
@@ -162,7 +176,8 @@ void configs_dumper::sign_configs()
 
     shared_str tmp_dsign;
 
-    if (m_yield_cb) {
+    if (m_yield_cb)
+    {
         tmp_dsign = m_dump_signer.sign_mt(m_dump_result.pointer(), m_dump_result.size(), m_yield_cb);
     }
     else
@@ -177,7 +192,8 @@ void configs_dumper::sign_configs()
 
 void configs_dumper::dump_config(complete_callback_t complete_cb)
 {
-    if (is_active()) {
+    if (is_active())
+    {
 #ifdef DEBUG
         Msg("! ERROR: CL: dump making already in progress...");
 #endif
@@ -188,7 +204,8 @@ void configs_dumper::dump_config(complete_callback_t complete_cb)
     DWORD tmp_dword;
     GetProcessAffinityMask(GetCurrentProcess(), &process_affinity_mask, &tmp_dword);
     bool single_core = (btwCount1(static_cast<u32>(process_affinity_mask)) == 1);
-    if (single_core) {
+    if (single_core)
+    {
         m_yield_cb.bind(this, &configs_dumper::yield_cb);
     }
     else
@@ -198,7 +215,8 @@ void configs_dumper::dump_config(complete_callback_t complete_cb)
 
     m_complete_cb = complete_cb;
     m_state = ds_active;
-    if (m_make_start_event) {
+    if (m_make_start_event)
+    {
         SetEvent(m_make_start_event);
         Engine.Sheduler.Register(this, TRUE);
         return;
@@ -213,7 +231,8 @@ void configs_dumper::compress_configs()
 {
     realloc_compress_buffer(m_dump_result.size());
     ppmd_yield_callback_t ts_cb;
-    if (m_yield_cb) {
+    if (m_yield_cb)
+    {
         ts_cb.bind(this, &configs_dumper::switch_thread);
     }
     m_buffer_for_compress_size = ppmd_compress_mt(
@@ -226,7 +245,8 @@ void configs_dumper::dumper_thread(void* my_ptr)
     DWORD wait_result = WaitForSingleObject(this_ptr->m_make_start_event, INFINITE);
     while ((wait_result != WAIT_ABANDONED) || (wait_result != WAIT_FAILED))
     {
-        if (!this_ptr->is_active()) break;  // error
+        if (!this_ptr->is_active())
+            break; // error
         this_ptr->timer_begin("writing configs");
         this_ptr->write_configs();
         this_ptr->timer_end();
@@ -244,19 +264,22 @@ void configs_dumper::dumper_thread(void* my_ptr)
 
 void __stdcall configs_dumper::yield_cb(long progress)
 {
-    if (progress % 5 == 0) {
+    if (progress % 5 == 0)
+    {
         switch_thread();
     }
 }
 
 void __stdcall configs_dumper::switch_thread()
 {
-    if (!SwitchToThread()) Sleep(10);
+    if (!SwitchToThread())
+        Sleep(10);
 }
 
 void configs_dumper::realloc_compress_buffer(u32 need_size)
 {
-    if (m_buffer_for_compress && (need_size <= m_buffer_for_compress_capacity)) return;
+    if (m_buffer_for_compress && (need_size <= m_buffer_for_compress_capacity))
+        return;
 #ifdef DEBUG
     Msg("* reallocing compression buffer.");
 #endif
@@ -272,23 +295,13 @@ void configs_dumper::timer_begin(LPCSTR comment)
     m_debug_timer.Start();
 }
 
-void configs_dumper::timer_end()
-{
-    Msg("* %s : %u ms", m_timer_comment.c_str(), m_debug_timer.GetElapsed_ms());
-}
-#endif  //#ifdef DEBUG
+void configs_dumper::timer_end() { Msg("* %s : %u ms", m_timer_comment.c_str(), m_debug_timer.GetElapsed_ms()); }
+#endif //#ifdef DEBUG
 
 // dump_signer
 
-dump_signer::dump_signer() : xr_dsa_signer(p_number, q_number, g_number)
-{
-    feel_private_dsa_key();
-};
-
-dump_signer::~dump_signer()
-{
-}
-
+dump_signer::dump_signer() : xr_dsa_signer(p_number, q_number, g_number) { feel_private_dsa_key(); };
+dump_signer::~dump_signer() {}
 void dump_signer::feel_private_dsa_key()
 {
     // Private key:
@@ -314,4 +327,4 @@ void dump_signer::feel_private_dsa_key()
     m_private_key.m_value[19] = 0x17;
 }
 
-}  // namespace mp_anticheat
+} // namespace mp_anticheat

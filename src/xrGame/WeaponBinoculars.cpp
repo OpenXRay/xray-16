@@ -15,11 +15,7 @@ CWeaponBinoculars::CWeaponBinoculars()
     m_bVision = false;
 }
 
-CWeaponBinoculars::~CWeaponBinoculars()
-{
-    xr_delete(m_binoc_vision);
-}
-
+CWeaponBinoculars::~CWeaponBinoculars() { xr_delete(m_binoc_vision); }
 void CWeaponBinoculars::Load(LPCSTR section)
 {
     inherited::Load(section);
@@ -42,11 +38,13 @@ bool CWeaponBinoculars::Action(u16 cmd, u32 flags)
 
 void CWeaponBinoculars::OnZoomIn()
 {
-    if (H_Parent() && !IsZoomed()) {
+    if (H_Parent() && !IsZoomed())
+    {
         m_sounds.StopSound("sndZoomOut");
         bool b_hud_mode = (Level().CurrentEntity() == H_Parent());
         m_sounds.PlaySound("sndZoomIn", H_Parent()->Position(), H_Parent(), b_hud_mode);
-        if (m_bVision && !m_binoc_vision) {
+        if (m_bVision && !m_binoc_vision)
+        {
             //.VERIFY			(!m_binoc_vision);
             m_binoc_vision = new CBinocularsVision(cNameSect());
         }
@@ -56,7 +54,8 @@ void CWeaponBinoculars::OnZoomIn()
 
 void CWeaponBinoculars::OnZoomOut()
 {
-    if (H_Parent() && IsZoomed() && !IsRotatingToZoom()) {
+    if (H_Parent() && IsZoomed() && !IsRotatingToZoom())
+    {
         m_sounds.StopSound("sndZoomIn");
         bool b_hud_mode = (Level().CurrentEntity() == H_Parent());
         m_sounds.PlaySound("sndZoomOut", H_Parent()->Position(), H_Parent(), b_hud_mode);
@@ -83,7 +82,8 @@ void CWeaponBinoculars::UpdateCL()
 {
     inherited::UpdateCL();
     // manage visible entities here...
-    if (H_Parent() && IsZoomed() && !IsRotatingToZoom() && m_binoc_vision) m_binoc_vision->Update();
+    if (H_Parent() && IsZoomed() && !IsRotatingToZoom() && m_binoc_vision)
+        m_binoc_vision->Update();
 }
 
 bool CWeaponBinoculars::render_item_ui_query()
@@ -150,12 +150,10 @@ bool CWeaponBinoculars::GetBriefInfo(II_BriefInfo& info)
 
 void CWeaponBinoculars::net_Relcase(IGameObject* object)
 {
-    if (!m_binoc_vision) return;
+    if (!m_binoc_vision)
+        return;
 
     m_binoc_vision->remove_links(object);
 }
 
-bool CWeaponBinoculars::can_kill() const
-{
-    return (false);
-}
+bool CWeaponBinoculars::can_kill() const { return (false); }

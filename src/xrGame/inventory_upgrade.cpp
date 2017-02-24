@@ -21,14 +21,8 @@ namespace inventory
 {
 namespace upgrade
 {
-Upgrade::Upgrade()
-{
-}
-
-Upgrade::~Upgrade()
-{
-}
-
+Upgrade::Upgrade() {}
+Upgrade::~Upgrade() {}
 void Upgrade::construct(const shared_str& upgrade_id, Group& parental_group, Manager& manager_r)
 {
     inherited::construct(upgrade_id, manager_r);
@@ -67,9 +61,9 @@ void Upgrade::construct(const shared_str& upgrade_id, Group& parental_group, Man
     m_effects();
 
     // prereq_functor (1,2) : m_prerequisites, m_tooltip
-    LPCSTR prereq_functor_str = pSettings->r_string(id(), "prereq_functor");  // prerequisites_functor
+    LPCSTR prereq_functor_str = pSettings->r_string(id(), "prereq_functor"); // prerequisites_functor
     //	LPCSTR tooltip_functor_str	= pSettings->r_string( id(), "prereq_tooltip_functor" );
-    m_prerequisites.parameter = pSettings->r_string(id(), "prereq_params");  // prerequisites_params
+    m_prerequisites.parameter = pSettings->r_string(id(), "prereq_params"); // prerequisites_params
     m_prerequisites.parameter2 = m_section.c_str();
     //	m_tooltip.parameter			= pSettings->r_string( id(), "prereq_params" );
     R_ASSERT2(ai().script_engine().functor(prereq_functor_str, m_prerequisites.functr),
@@ -86,7 +80,8 @@ void Upgrade::construct(const shared_str& upgrade_id, Group& parental_group, Man
 
     // effects = groups
     LPCSTR groups_str = pSettings->r_string(id(), "effects");
-    if (groups_str) {
+    if (groups_str)
+    {
         add_dependent_groups(groups_str, manager_r);
     }
 
@@ -99,7 +94,8 @@ void Upgrade::construct(const shared_str& upgrade_id, Group& parental_group, Man
     for (u8 i = 0; i < max_properties_count; i++)
     {
         shared_str prop = _GetItem(properties.c_str(), i, buffer);
-        if (prop.size()) {
+        if (prop.size())
+        {
             m_properties[i] = prop;
             VERIFY2(manager_r.get_property(prop),
                 make_string("Upgrade <%s> : property [%s] is unknown (not found in upgrade manager) !", id_str(),
@@ -111,7 +107,7 @@ void Upgrade::construct(const shared_str& upgrade_id, Group& parental_group, Man
     m_scheme_index = pSettings->r_ivector2(id(), "scheme_index");
 
     m_highlight = false;
-}  // Upgrade()
+} // Upgrade()
 
 #ifdef DEBUG
 
@@ -126,7 +122,7 @@ void Upgrade::log_hierarchy(LPCSTR nest)
     inherited::log_hierarchy(nest2);
 }
 
-#endif  // DEBUG
+#endif // DEBUG
 
 void Upgrade::fill_root_container(Root* root)
 {
@@ -138,21 +134,25 @@ void Upgrade::fill_root_container(Root* root)
 UpgradeStateResult Upgrade::can_install(CInventoryItem& item, bool loading)
 {
     UpgradeStateResult res = inherited::can_install(item, loading);
-    if (res != result_ok) {
+    if (res != result_ok)
+    {
         return res;
     }
 
     res = m_parent_group->can_install(item, *this, loading);
-    if (res != result_ok) {
+    if (res != result_ok)
+    {
         return res;
     }
 
-    if (loading) {
-        return result_ok;  // later script check
+    if (loading)
+    {
+        return result_ok; // later script check
     }
 
     int res_prec = m_preconditions();
-    if (res_prec == 0) {
+    if (res_prec == 0)
+    {
         return result_ok;
     }
     else if (res_prec == 1)
@@ -172,15 +172,12 @@ bool Upgrade::check_scheme_index(Ivector2 const& scheme_index)
     return (m_scheme_index.x == scheme_index.x && m_scheme_index.y == scheme_index.y);
 }
 
-LPCSTR Upgrade::get_prerequisites()
-{
-    return m_prerequisites();
-}
-
+LPCSTR Upgrade::get_prerequisites() { return m_prerequisites(); }
 UpgradeStateResult Upgrade::get_preconditions()
 {
     int res_prec = m_preconditions();
-    if (res_prec == 0) {
+    if (res_prec == 0)
+    {
         return result_ok;
     }
     else if (res_prec == 1)
@@ -201,11 +198,7 @@ void Upgrade::run_effects(bool loading)
     m_effects();
 }
 
-void Upgrade::set_highlight(bool value)
-{
-    m_highlight = value;
-}
-
+void Upgrade::set_highlight(bool value) { m_highlight = value; }
 void Upgrade::highlight_up()
 {
     set_highlight(true);
@@ -223,5 +216,5 @@ void Upgrade::highlight_down()
     m_parent_group->highlight_down();
 }
 
-}  // namespace upgrade
-}  // namespace inventory
+} // namespace upgrade
+} // namespace inventory

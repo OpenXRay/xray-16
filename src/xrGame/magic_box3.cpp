@@ -13,11 +13,11 @@ bool MagicBox3::intersects(const MagicBox3& rkBox1) const
     // compute difference of box centers, D = C1-C0
     Fvector kD = Fvector().sub(rkBox1.Center(), rkBox0.Center());
 
-    float aafC[3][3];     // matrix C = A^T B, c_{ij} = dotproduct(A_i,B_j)
-    float aafAbsC[3][3];  // |c_{ij}|
-    float afAD[3];        // dotproduct(A_i,D)
-    float fR0, fR1, fR;   // interval radii and distance between centers
-    float fR01;           // = R0 + R1
+    float aafC[3][3]; // matrix C = A^T B, c_{ij} = dotproduct(A_i,B_j)
+    float aafAbsC[3][3]; // |c_{ij}|
+    float afAD[3]; // dotproduct(A_i,D)
+    float fR0, fR1, fR; // interval radii and distance between centers
+    float fR01; // = R0 + R1
 
     // axis C0+t*A0
     aafC[0][0] = akA[0].dotproduct(akB[0]);
@@ -30,7 +30,8 @@ bool MagicBox3::intersects(const MagicBox3& rkBox1) const
     fR = _abs(afAD[0]);
     fR1 = afEB[0] * aafAbsC[0][0] + afEB[1] * aafAbsC[0][1] + afEB[2] * aafAbsC[0][2];
     fR01 = afEA[0] + fR1;
-    if (fR > fR01) return false;
+    if (fR > fR01)
+        return false;
 
     // axis C0+t*A1
     aafC[1][0] = akA[1].dotproduct(akB[0]);
@@ -43,7 +44,8 @@ bool MagicBox3::intersects(const MagicBox3& rkBox1) const
     fR = _abs(afAD[1]);
     fR1 = afEB[0] * aafAbsC[1][0] + afEB[1] * aafAbsC[1][1] + afEB[2] * aafAbsC[1][2];
     fR01 = afEA[1] + fR1;
-    if (fR > fR01) return false;
+    if (fR > fR01)
+        return false;
 
     // axis C0+t*A2
     aafC[2][0] = akA[2].dotproduct(akB[0]);
@@ -56,88 +58,101 @@ bool MagicBox3::intersects(const MagicBox3& rkBox1) const
     fR = _abs(afAD[2]);
     fR1 = afEB[0] * aafAbsC[2][0] + afEB[1] * aafAbsC[2][1] + afEB[2] * aafAbsC[2][2];
     fR01 = afEA[2] + fR1;
-    if (fR > fR01) return false;
+    if (fR > fR01)
+        return false;
 
     // axis C0+t*B0
     fR = _abs(akB[0].dotproduct(kD));
     fR0 = afEA[0] * aafAbsC[0][0] + afEA[1] * aafAbsC[1][0] + afEA[2] * aafAbsC[2][0];
     fR01 = fR0 + afEB[0];
-    if (fR > fR01) return false;
+    if (fR > fR01)
+        return false;
 
     // axis C0+t*B1
     fR = _abs(akB[1].dotproduct(kD));
     fR0 = afEA[0] * aafAbsC[0][1] + afEA[1] * aafAbsC[1][1] + afEA[2] * aafAbsC[2][1];
     fR01 = fR0 + afEB[1];
-    if (fR > fR01) return false;
+    if (fR > fR01)
+        return false;
 
     // axis C0+t*B2
     fR = _abs(akB[2].dotproduct(kD));
     fR0 = afEA[0] * aafAbsC[0][2] + afEA[1] * aafAbsC[1][2] + afEA[2] * aafAbsC[2][2];
     fR01 = fR0 + afEB[2];
-    if (fR > fR01) return false;
+    if (fR > fR01)
+        return false;
 
     // axis C0+t*A0xB0
     fR = _abs(afAD[2] * aafC[1][0] - afAD[1] * aafC[2][0]);
     fR0 = afEA[1] * aafAbsC[2][0] + afEA[2] * aafAbsC[1][0];
     fR1 = afEB[1] * aafAbsC[0][2] + afEB[2] * aafAbsC[0][1];
     fR01 = fR0 + fR1;
-    if (fR > fR01) return false;
+    if (fR > fR01)
+        return false;
 
     // axis C0+t*A0xB1
     fR = _abs(afAD[2] * aafC[1][1] - afAD[1] * aafC[2][1]);
     fR0 = afEA[1] * aafAbsC[2][1] + afEA[2] * aafAbsC[1][1];
     fR1 = afEB[0] * aafAbsC[0][2] + afEB[2] * aafAbsC[0][0];
     fR01 = fR0 + fR1;
-    if (fR > fR01) return false;
+    if (fR > fR01)
+        return false;
 
     // axis C0+t*A0xB2
     fR = _abs(afAD[2] * aafC[1][2] - afAD[1] * aafC[2][2]);
     fR0 = afEA[1] * aafAbsC[2][2] + afEA[2] * aafAbsC[1][2];
     fR1 = afEB[0] * aafAbsC[0][1] + afEB[1] * aafAbsC[0][0];
     fR01 = fR0 + fR1;
-    if (fR > fR01) return false;
+    if (fR > fR01)
+        return false;
 
     // axis C0+t*A1xB0
     fR = _abs(afAD[0] * aafC[2][0] - afAD[2] * aafC[0][0]);
     fR0 = afEA[0] * aafAbsC[2][0] + afEA[2] * aafAbsC[0][0];
     fR1 = afEB[1] * aafAbsC[1][2] + afEB[2] * aafAbsC[1][1];
     fR01 = fR0 + fR1;
-    if (fR > fR01) return false;
+    if (fR > fR01)
+        return false;
 
     // axis C0+t*A1xB1
     fR = _abs(afAD[0] * aafC[2][1] - afAD[2] * aafC[0][1]);
     fR0 = afEA[0] * aafAbsC[2][1] + afEA[2] * aafAbsC[0][1];
     fR1 = afEB[0] * aafAbsC[1][2] + afEB[2] * aafAbsC[1][0];
     fR01 = fR0 + fR1;
-    if (fR > fR01) return false;
+    if (fR > fR01)
+        return false;
 
     // axis C0+t*A1xB2
     fR = _abs(afAD[0] * aafC[2][2] - afAD[2] * aafC[0][2]);
     fR0 = afEA[0] * aafAbsC[2][2] + afEA[2] * aafAbsC[0][2];
     fR1 = afEB[0] * aafAbsC[1][1] + afEB[1] * aafAbsC[1][0];
     fR01 = fR0 + fR1;
-    if (fR > fR01) return false;
+    if (fR > fR01)
+        return false;
 
     // axis C0+t*A2xB0
     fR = _abs(afAD[1] * aafC[0][0] - afAD[0] * aafC[1][0]);
     fR0 = afEA[0] * aafAbsC[1][0] + afEA[1] * aafAbsC[0][0];
     fR1 = afEB[1] * aafAbsC[2][2] + afEB[2] * aafAbsC[2][1];
     fR01 = fR0 + fR1;
-    if (fR > fR01) return false;
+    if (fR > fR01)
+        return false;
 
     // axis C0+t*A2xB1
     fR = _abs(afAD[1] * aafC[0][1] - afAD[0] * aafC[1][1]);
     fR0 = afEA[0] * aafAbsC[1][1] + afEA[1] * aafAbsC[0][1];
     fR1 = afEB[0] * aafAbsC[2][2] + afEB[2] * aafAbsC[2][0];
     fR01 = fR0 + fR1;
-    if (fR > fR01) return false;
+    if (fR > fR01)
+        return false;
 
     // axis C0+t*A2xB2
     fR = _abs(afAD[1] * aafC[0][2] - afAD[0] * aafC[1][2]);
     fR0 = afEA[0] * aafAbsC[1][2] + afEA[1] * aafAbsC[0][2];
     fR1 = afEB[0] * aafAbsC[2][1] + afEB[1] * aafAbsC[2][0];
     fR01 = fR0 + fR1;
-    if (fR > fR01) return false;
+    if (fR > fR01)
+        return false;
 
     return true;
 }

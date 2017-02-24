@@ -8,11 +8,11 @@
 
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
-    template <typename TPathId, typename TIndex, u8 Mask>                                                              \
+#define TEMPLATE_SPECIALIZATION                           \
+    template <typename TPathId, typename TIndex, u8 Mask> \
     template <typename TPathBuilder, typename TVertexAllocator, typename TCompoundVertex>
 
-#define CFixedVertexManager                                                                                            \
+#define CFixedVertexManager \
     CVertexManagerFixed<TPathId, TIndex, Mask>::CDataStorage<TPathBuilder, TVertexAllocator, TCompoundVertex>
 
 TEMPLATE_SPECIALIZATION
@@ -26,29 +26,22 @@ inline CFixedVertexManager::CDataStorage(const u32 vertex_count)
 }
 
 TEMPLATE_SPECIALIZATION
-CFixedVertexManager::~CDataStorage()
-{
-    xr_free(m_indexes);
-}
-
+CFixedVertexManager::~CDataStorage() { xr_free(m_indexes); }
 TEMPLATE_SPECIALIZATION
 inline void CFixedVertexManager::init()
 {
     CDataStorageBase::init();
     CDataStorageAllocator::init();
     m_current_path_id++;
-    if (!m_current_path_id) {
+    if (!m_current_path_id)
+    {
         ZeroMemory(m_indexes, m_max_node_count * sizeof(IndexVertex));
         m_current_path_id++;
     }
 }
 
 TEMPLATE_SPECIALIZATION
-inline bool CFixedVertexManager::is_opened(const Vertex& vertex) const
-{
-    return !!vertex.opened();
-}
-
+inline bool CFixedVertexManager::is_opened(const Vertex& vertex) const { return !!vertex.opened(); }
 TEMPLATE_SPECIALIZATION
 inline bool CFixedVertexManager::is_visited(const Index& vertex_id) const
 {
@@ -81,22 +74,10 @@ inline typename CFixedVertexManager::Vertex& CFixedVertexManager::create_vertex(
 }
 
 TEMPLATE_SPECIALIZATION
-inline void CFixedVertexManager::add_opened(Vertex& vertex)
-{
-    vertex._opened = 1;
-}
-
+inline void CFixedVertexManager::add_opened(Vertex& vertex) { vertex._opened = 1; }
 TEMPLATE_SPECIALIZATION
-inline void CFixedVertexManager::add_closed(Vertex& vertex)
-{
-    vertex._opened = 0;
-}
-
+inline void CFixedVertexManager::add_closed(Vertex& vertex) { vertex._opened = 0; }
 TEMPLATE_SPECIALIZATION
-inline typename CFixedVertexManager::PathId CFixedVertexManager::current_path_id() const
-{
-    return m_current_path_id;
-}
-
+inline typename CFixedVertexManager::PathId CFixedVertexManager::current_path_id() const { return m_current_path_id; }
 #undef TEMPLATE_SPECIALIZATION
 #undef CFixedVertexManager

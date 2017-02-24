@@ -18,8 +18,10 @@ IC float SqrDistance2Segment(const Fvector& P, const Fvector& A, const Fvector& 
     float t = V.dotproduct(c);
 
     // Check to see if ‘t’ is beyond the extents of the line segment
-    if (t <= 0.0f) return P.distance_to_sqr(A);
-    if (t >= d) return P.distance_to_sqr(B);
+    if (t <= 0.0f)
+        return P.distance_to_sqr(A);
+    if (t >= d)
+        return P.distance_to_sqr(B);
 
     // Return the point between ‘a’ and ‘b’
     // set length of V to t. V is normalized so this is easy
@@ -39,16 +41,20 @@ static xr_vector<record>* vecEdges;
 
 static void check(Vertex* vE1, Vertex* vE2, Vertex* vTEST)
 {
-    if (_sqrt(SqrDistance2Segment(vTEST->P, vE1->P, vE2->P)) < 0.002f) {
+    if (_sqrt(SqrDistance2Segment(vTEST->P, vE1->P, vE2->P)) < 0.002f)
+    {
         BOOL bWeld = FALSE;
 
         // check for duplicated errors
-        if (vE1 > vE2) std::swap(vE1, vE2);
+        if (vE1 > vE2)
+            std::swap(vE1, vE2);
         for (u32 i = 0; i < vecJunctions->size(); i++)
         {
             record& rec = (*vecJunctions)[i];
-            if (rec.T == vTEST) return;
-            if (rec.T->P.similar(vTEST->P, .002f)) bWeld = TRUE;
+            if (rec.T == vTEST)
+                return;
+            if (rec.T->P.similar(vTEST->P, .002f))
+                bWeld = TRUE;
         }
 
         // register
@@ -68,14 +74,17 @@ static void check(Vertex* vE1, Vertex* vE2, Vertex* vTEST)
 static void edge(Vertex* vE1, Vertex* vE2)
 {
     float len = vE1->P.distance_to(vE2->P);
-    if (len < 32.f) return;
+    if (len < 32.f)
+        return;
 
     // check for duplicated errors
-    if (vE1 > vE2) std::swap(vE1, vE2);
+    if (vE1 > vE2)
+        std::swap(vE1, vE2);
     for (u32 i = 0; i < vecEdges->size(); i++)
     {
         record& rec = (*vecEdges)[i];
-        if ((rec.E1 == vE1) && (rec.E2 == vE2)) return;
+        if ((rec.E1 == vE1) && (rec.E2 == vE2))
+            return;
     }
 
     // register

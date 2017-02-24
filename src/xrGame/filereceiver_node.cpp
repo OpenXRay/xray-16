@@ -17,13 +17,16 @@ filereceiver_node::filereceiver_node(CMemoryWriter* mem_writer, receiving_state_
 
 filereceiver_node::~filereceiver_node()
 {
-    if (m_writer && !m_is_writer_memory) FS.w_close(m_writer);
+    if (m_writer && !m_is_writer_memory)
+        FS.w_close(m_writer);
 }
 
 bool filereceiver_node::receive_packet(NET_Packet& packet)
 {
-    if (!m_writer->tell()) {
-        if (packet.r_elapsed() < (sizeof(u32) * 2)) {
+    if (!m_writer->tell())
+    {
+        if (packet.r_elapsed() < (sizeof(u32) * 2))
+        {
             m_data_size_to_receive = m_writer->tell();
             return false;
         }
@@ -45,7 +48,8 @@ void filereceiver_node::signal_callback(receiving_status_t status)
 
 bool filereceiver_node::is_complete()
 {
-    if (m_writer) return (m_writer->tell() == m_data_size_to_receive);
+    if (m_writer)
+        return (m_writer->tell() == m_data_size_to_receive);
     return false;
 }
 
@@ -63,4 +67,4 @@ void split_received_to_buffers(u8* data_ptr, u32 data_size, buffer_vector<const_
     }
 }
 
-};  // namespace file_transfer
+}; // namespace file_transfer

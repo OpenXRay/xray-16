@@ -3,7 +3,8 @@
 
 void CMatrix::Calculate()
 {
-    if (dwFrame == RDEVICE.dwFrame) return;
+    if (dwFrame == RDEVICE.dwFrame)
+        return;
     dwFrame = RDEVICE.dwFrame;
 
     // Switch on mode
@@ -16,17 +17,20 @@ void CMatrix::Calculate()
         Fmatrix T;
         float sU = 1, sV = 1, t = RDEVICE.fTimeGlobal;
         tc_trans(xform, .5f, .5f);
-        if (tcm & tcmRotate) {
+        if (tcm & tcmRotate)
+        {
             T.rotateZ(rotate.Calculate(t) * t);
             xform.mulA_43(T);
         }
-        if (tcm & tcmScale) {
+        if (tcm & tcmScale)
+        {
             sU = scaleU.Calculate(t);
             sV = scaleV.Calculate(t);
             T.scale(sU, sV, 1);
             xform.mulA_43(T);
         }
-        if (tcm & tcmScroll) {
+        if (tcm & tcmScroll)
+        {
             float u = scrollU.Calculate(t) * t;
             float v = scrollV.Calculate(t) * t;
             u *= sU;

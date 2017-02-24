@@ -70,6 +70,4 @@ IC void CScriptParticleAction::SetVelocity(const Fvector& tVelocity)
     m_bCompleted = false;
 }
 
-IC void CScriptParticleAction::initialize()
-{
-}
+IC void CScriptParticleAction::initialize() {}

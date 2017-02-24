@@ -4,8 +4,8 @@
 #ifdef DEBUG
 #ifndef _EDITOR
 #define USE_MEMORY_MONITOR
-#endif  // _EDITOR
-#endif  // DEBUG
+#endif // _EDITOR
+#endif // DEBUG
 
 #ifdef USE_MEMORY_MONITOR
 
@@ -20,6 +20,6 @@ extern XRCORE_API int counter_alloc;
 extern XRCORE_API int counter_free;
 }
 
-#endif  // USE_MEMORY_MONITOR
+#endif // USE_MEMORY_MONITOR
 
-#endif  // MEMORY_MONITOR_H
+#endif // MEMORY_MONITOR_H

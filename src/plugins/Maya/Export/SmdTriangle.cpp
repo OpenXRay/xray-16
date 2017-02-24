@@ -14,15 +14,8 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-SmdVertex::SmdVertex()
-{
-    id = -1;
-}
-
-SmdVertex::~SmdVertex()
-{
-}
-
+SmdVertex::SmdVertex() { id = -1; }
+SmdVertex::~SmdVertex() {}
 SmdVertex::SmdVertex(MPoint pt, float u, float v, const WBVec& wb)
 {
     pos.set((float)pt.x, (float)pt.y, (float)pt.z);
@@ -37,6 +30,4 @@ SmdTriangle::SmdTriangle()
     sm_group = -1;
 }
 
-SmdTriangle::~SmdTriangle()
-{
-}
+SmdTriangle::~SmdTriangle() {}

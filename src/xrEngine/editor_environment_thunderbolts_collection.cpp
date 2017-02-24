@@ -49,7 +49,8 @@ collection::~collection()
 
     palette.clear();
 
-    if (!Device.editor()) return;
+    if (!Device.editor())
+        return;
 
     ::ide().destroy(m_property_holder);
 }
@@ -79,15 +80,12 @@ void collection::save(CInifile& config)
         config.w_string(section.c_str(), (*i)->id(), "");
 }
 
-LPCSTR collection::id_getter() const
-{
-    return (section.c_str());
-}
-
+LPCSTR collection::id_getter() const { return (section.c_str()); }
 void collection::id_setter(LPCSTR value_)
 {
     shared_str value = value_;
-    if (section._get() == value._get()) return;
+    if (section._get() == value._get())
+        return;
 
     section = m_manager.unique_collection_id(value);
 }
@@ -111,9 +109,5 @@ void collection::fill(editor::property_holder_collection* collection)
         "thunderbolts", "properties", "this option is resposible for thunderbolts", m_collection);
 }
 
-property_holder* collection::object()
-{
-    return (m_property_holder);
-}
-
-#endif  // #ifdef INGAME_EDITOR
+property_holder* collection::object() { return (m_property_holder); }
+#endif // #ifdef INGAME_EDITOR

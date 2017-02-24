@@ -157,9 +157,11 @@ void __stdcall reward_event_generator::AddRewardTask(u32 award_id)
 {
     game_cl_mp* tmp_cl_game = smart_cast<game_cl_mp*>(&Game());
     VERIFY(tmp_cl_game);
-    if (!tmp_cl_game->Is_Rewarding_Allowed()) return;
+    if (!tmp_cl_game->Is_Rewarding_Allowed())
+        return;
 
-    if (Level().IsDemoPlayStarted()) return;
+    if (Level().IsDemoPlayStarted())
+        return;
 
     gamespy_profile::enum_awards_t tmp_award_type = static_cast<gamespy_profile::enum_awards_t>(award_id);
     VERIFY(award_id < gamespy_profile::at_awards_count);
@@ -167,11 +169,13 @@ void __stdcall reward_event_generator::AddRewardTask(u32 award_id)
     gamespy_gp::login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     VERIFY(tmp_lmngr);
     gamespy_gp::profile const* tmp_curr_prof = tmp_lmngr->get_current_profile();
-    if (!tmp_curr_prof) {
+    if (!tmp_curr_prof)
+    {
         Msg("! ERROR: can't reward player - not logged in");
         return;
     }
-    if ((m_rewarded >= m_max_rewards) && (m_max_rewards != u32(-1))) {
+    if ((m_rewarded >= m_max_rewards) && (m_max_rewards != u32(-1)))
+    {
         Msg("! You have been rewarded by award [%s], but maximum rewards per game reached... sorry :(",
             gamespy_profile::get_award_name(tmp_award_type));
         return;
@@ -182,7 +186,8 @@ void __stdcall reward_event_generator::AddRewardTask(u32 award_id)
     tmp_mp_game->AddRewardTask(award_id);
     ++m_rewarded;
 
-    if (!tmp_curr_prof->online()) {
+    if (!tmp_curr_prof->online())
+    {
         Msg("* An offline player has been rewarded by [%s] award", get_award_name(tmp_award_type));
         return;
     }
@@ -191,16 +196,19 @@ void __stdcall reward_event_generator::AddRewardTask(u32 award_id)
 
 void reward_event_generator::CommitBestResults()
 {
-    if (Level().IsDemoPlayStarted()) return;
+    if (Level().IsDemoPlayStarted())
+        return;
 
     gamespy_gp::login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
     VERIFY(tmp_lmngr);
     gamespy_gp::profile const* tmp_curr_prof = tmp_lmngr->get_current_profile();
-    if (!tmp_curr_prof) {
+    if (!tmp_curr_prof)
+    {
         Msg("! ERROR: can't submit best scores - not logged in");
         return;
     }
-    if (!tmp_curr_prof->online()) {
+    if (!tmp_curr_prof->online())
+    {
         return;
     }
 
@@ -209,4 +217,4 @@ void reward_event_generator::CommitBestResults()
     m_submit_queue->submit_best_results();
 }
 
-}  // namespace award_system
+} // namespace award_system

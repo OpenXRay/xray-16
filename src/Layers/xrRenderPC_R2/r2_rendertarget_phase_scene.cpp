@@ -4,17 +4,17 @@
 void CRenderTarget::phase_scene_prepare()
 {
     // Clear depth & stencil
-    // u_setrt	( Device.dwWidth,Device.dwHeight,HW.pBaseRT,NULL,NULL,HW.pBaseZB );
-    // CHK_DX	( HW.pDevice->Clear	( 0L, NULL, D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, 0x0, 1.0f, 0L) );
-    //	Igor: soft particles
+    // u_setrt  ( Device.dwWidth,Device.dwHeight,HW.pBaseRT,NULL,NULL,HW.pBaseZB );
+    // CHK_DX   ( HW.pDevice->Clear ( 0L, NULL, D3DCLEAR_ZBUFFER|D3DCLEAR_STENCIL, 0x0, 1.0f, 0L) );
+    //  Igor: soft particles
 
     CEnvDescriptor& E = *g_pGamePersistent->Environment().CurrentEnv;
     float fValue = E.m_fSunShaftsIntensity;
-    //	TODO: add multiplication by sun color here
+    //  TODO: add multiplication by sun color here
     // if (fValue<0.0001) FlagSunShafts = 0;
 
     if (RImplementation.o.advancedpp && (ps_r2_ls_flags.test(R2FLAG_SOFT_PARTICLES | R2FLAG_DOF) ||
-                                            ((ps_r_sun_shafts > 0) && (fValue >= 0.0001)) || (ps_r_ssao > 0)))
+        ((ps_r_sun_shafts > 0) && (fValue >= 0.0001)) || (ps_r_ssao > 0)))
     {
         u_setrt(Device.dwWidth, Device.dwHeight, rt_Position->pRT, NULL, NULL, HW.pBaseZB);
         CHK_DX(HW.pDevice->Clear(0L, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0x0, 1.0f, 0L));
@@ -25,9 +25,9 @@ void CRenderTarget::phase_scene_prepare()
         CHK_DX(HW.pDevice->Clear(0L, NULL, D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0x0, 1.0f, 0L));
     }
 
-    //	Igor: for volumetric lights
+    //  Igor: for volumetric lights
     m_bHasActiveVolumetric = false;
-    //	Clear later if try to draw volumetric
+    //  Clear later if try to draw volumetric
 }
 
 // begin
@@ -47,7 +47,7 @@ void CRenderTarget::phase_scene_begin()
     RCache.set_Stencil(
         TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0xff, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
 
-    // Misc		- draw only front-faces
+    // Misc     - draw only front-faces
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_TWOSIDEDSTENCILMODE, FALSE));
     RCache.set_CullMode(CULL_CCW);
     RCache.set_ColorWriteEnable();
@@ -65,14 +65,16 @@ void CRenderTarget::phase_scene_end()
 {
     disable_aniso();
 
-    if (!RImplementation.o.albedo_wo) return;
+    if (!RImplementation.o.albedo_wo)
+        return;
 
     // transfer from "rt_Accumulator" into "rt_Color"
     u_setrt(rt_Color, 0, 0, HW.pBaseZB);
     RCache.set_CullMode(CULL_NONE);
-    RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);  // stencil should be >= 1
-    if (RImplementation.o.nvstencil) u_stencil_optimize(FALSE);
-    RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00);  // stencil should be >= 1
+    RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00); // stencil should be >= 1
+    if (RImplementation.o.nvstencil)
+        u_stencil_optimize(FALSE);
+    RCache.set_Stencil(TRUE, D3DCMP_LESSEQUAL, 0x01, 0xff, 0x00); // stencil should be >= 1
     RCache.set_ColorWriteEnable();
 
     // common calc for quad-rendering
@@ -97,8 +99,8 @@ void CRenderTarget::phase_scene_end()
     pv++;
     RCache.Vertex.Unlock(4, g_combine->vb_stride);
 
-    // if (stencil>=1 && aref_pass)	stencil = light_id
-    RCache.set_Element(s_accum_mask->E[SE_MASK_ALBEDO]);  // masker
+    // if (stencil>=1 && aref_pass) stencil = light_id
+    RCache.set_Element(s_accum_mask->E[SE_MASK_ALBEDO]); // masker
     RCache.set_Geometry(g_combine);
     RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, 4, 0, 2);
 }

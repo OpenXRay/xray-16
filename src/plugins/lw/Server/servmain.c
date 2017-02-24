@@ -13,4 +13,4 @@ ModuleDescriptor mod_descrip =
 #else
 ModuleDescriptor _mod_descrip =
 #endif
-    {MOD_SYSSYNC, MOD_SYSVER, MOD_MACHINE, Startup, Shutdown, ServerDesc};
+{MOD_SYSSYNC, MOD_SYSVER, MOD_MACHINE, Startup, Shutdown, ServerDesc};

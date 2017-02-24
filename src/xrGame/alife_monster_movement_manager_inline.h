@@ -31,7 +31,4 @@ IC const CALifeMonsterMovementManager::EPathType& CALifeMonsterMovementManager::
     return (m_path_type);
 }
 
-IC void CALifeMonsterMovementManager::path_type(const EPathType& path_type)
-{
-    m_path_type = path_type;
-}
+IC void CALifeMonsterMovementManager::path_type(const EPathType& path_type) { m_path_type = path_type; }

@@ -22,7 +22,7 @@ namespace smart_cover
 {
 shared_str transform_vertex(shared_str const& vertex_id, bool const& in);
 shared_str parse_vertex(luabind::object const& table, LPCSTR identifier, bool const& in);
-}  // namespace smart_cover
+} // namespace smart_cover
 
 class id_predicate
 {
@@ -30,7 +30,6 @@ class id_predicate
 
 public:
     IC id_predicate(shared_str const& id) : m_id(id) {}
-
     IC bool operator()(std::pair<shared_str, action*> const& other) const
     {
         return (m_id._get() == other.first._get());
@@ -48,7 +47,8 @@ loophole::loophole(luabind::object const& description) : m_fov(0.f), m_range(0.f
     m_fov_position = parse_fvector(description, "fov_position");
 
     m_fov_direction = parse_fvector(description, "fov_direction");
-    if (m_fov_direction.square_magnitude() < EPS_L) {
+    if (m_fov_direction.square_magnitude() < EPS_L)
+    {
         Msg("! fov direction for loophole %s is setup incorrectly", m_id.c_str());
         m_fov_direction.set(0.f, 0.f, 1.f);
     }
@@ -56,7 +56,8 @@ loophole::loophole(luabind::object const& description) : m_fov(0.f), m_range(0.f
         m_fov_direction.normalize();
 
     m_danger_fov_direction = parse_fvector(description, "danger_fov_direction");
-    if (m_danger_fov_direction.square_magnitude() < EPS_L) {
+    if (m_danger_fov_direction.square_magnitude() < EPS_L)
+    {
         Msg("! danger fov direction for loophole %s is setup incorrectly", m_id.c_str());
         m_danger_fov_direction.set(0.f, 0.f, 1.f);
     }
@@ -65,7 +66,8 @@ loophole::loophole(luabind::object const& description) : m_fov(0.f), m_range(0.f
 
     m_enter_direction = parse_fvector(description, "enter_direction");
 
-    if (m_enter_direction.square_magnitude() < EPS_L) {
+    if (m_enter_direction.square_magnitude() < EPS_L)
+    {
         Msg("! enter direction for loophole %s is setup incorrectly", m_id.c_str());
         m_enter_direction.set(0.f, 0.f, 1.f);
     }
@@ -79,7 +81,8 @@ loophole::loophole(luabind::object const& description) : m_fov(0.f), m_range(0.f
         VERIFY(luabind::type(I.key()) == LUA_TSTRING);
         LPCSTR action_type = luabind::object_cast<LPCSTR>(I.key());
         luabind::object table = *I;
-        if (luabind::type(table) != LUA_TTABLE) {
+        if (luabind::type(table) != LUA_TTABLE)
+        {
             VERIFY(luabind::type(table) != LUA_TNIL);
             continue;
         }
@@ -88,7 +91,8 @@ loophole::loophole(luabind::object const& description) : m_fov(0.f), m_range(0.f
 
     m_usable = m_actions.empty() ? false : true;
 
-    if (!m_usable) return;
+    if (!m_usable)
+        return;
 
     luabind::object transitions;
     parse_table(description, "transitions", transitions);
@@ -129,7 +133,8 @@ void loophole::fill_transitions(luabind::object const& transitions_table)
         for (luabind::iterator i(result), e; i != e; ++i)
         {
             luabind::object string = *i;
-            if (luabind::type(string) != LUA_TSTRING) {
+            if (luabind::type(string) != LUA_TSTRING)
+            {
                 VERIFY(luabind::type(string) != LUA_TNIL);
                 continue;
             }
@@ -141,9 +146,11 @@ void loophole::fill_transitions(luabind::object const& transitions_table)
         }
         float weight = parse_float(table, "weight");
 
-        if (!m_transitions.vertex(action_from)) m_transitions.add_vertex(Loki::EmptyType(), action_from);
+        if (!m_transitions.vertex(action_from))
+            m_transitions.add_vertex(Loki::EmptyType(), action_from);
 
-        if (!m_transitions.vertex(action_to)) m_transitions.add_vertex(Loki::EmptyType(), action_to);
+        if (!m_transitions.vertex(action_to))
+            m_transitions.add_vertex(Loki::EmptyType(), action_to);
 
         m_transitions.add_edge(action_from, action_to, weight);
         TransitionGraph::CEdge* edge = m_transitions.edge(action_from, action_to);
@@ -176,5 +183,6 @@ void loophole::exit_position(Fvector& position) const
 {
     ActionList::const_iterator found = m_actions.find("exit");
 
-    if (found != m_actions.end()) position = found->second->target_position();
+    if (found != m_actions.end())
+        position = found->second->target_position();
 }

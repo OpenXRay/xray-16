@@ -21,7 +21,7 @@ public:
     TSTR name;
     INode *node, *tnode;
     Object* obj;
-    int type;  // See above
+    int type; // See above
     int id;
     SceneEntry* next;
     SceneEntry(INode* n, Object* o, int t);
@@ -99,19 +99,23 @@ int SceneEnumProc::callback(INode* node)
         //		MessageBox(NULL, line, node->GetName(), MB_OK);
     }
 
-    if ((obj->SuperClassID() == GEOMOBJECT_CLASS_ID) && (obj->ClassID() == Class_ID(BIP_BONE_CLASS_ID, 0))) {
+    if ((obj->SuperClassID() == GEOMOBJECT_CLASS_ID) && (obj->ClassID() == Class_ID(BIP_BONE_CLASS_ID, 0)))
+    {
         Append(node, obj, OBTYPE_BONE);
         return TREE_CONTINUE;
     }
 
-    if (obj->CanConvertToType(triObjectClassID)) {
+    if (obj->CanConvertToType(triObjectClassID))
+    {
         Append(node, obj, OBTYPE_MESH);
         return TREE_CONTINUE;
     }
 
-    if (node->IsTarget()) {
+    if (node->IsTarget())
+    {
         INode* ln = node->GetLookatNode();
-        if (ln) {
+        if (ln)
+        {
             Object* lobj = ln->EvalWorldState(time).obj;
             switch (lobj->SuperClassID())
             {
@@ -124,8 +128,10 @@ int SceneEnumProc::callback(INode* node)
     switch (obj->SuperClassID())
     {
     case HELPER_CLASS_ID:
-        if (obj->ClassID() == Class_ID(DUMMY_CLASS_ID, 0)) Append(node, obj, OBTYPE_DUMMY);
-        if (obj->ClassID() == Class_ID(BONE_CLASS_ID, 0)) Append(node, obj, OBTYPE_BONE);
+        if (obj->ClassID() == Class_ID(DUMMY_CLASS_ID, 0))
+            Append(node, obj, OBTYPE_DUMMY);
+        if (obj->ClassID() == Class_ID(BONE_CLASS_ID, 0))
+            Append(node, obj, OBTYPE_BONE);
         break;
     case LIGHT_CLASS_ID:
         if (obj->ClassID() == Class_ID(OMNI_LIGHT_CLASS_ID, 0))
@@ -135,19 +141,22 @@ int SceneEnumProc::callback(INode* node)
         // export DIR_LIGHT and FSPOT_LIGHT????
         break;
     case CAMERA_CLASS_ID:
-        if (obj->ClassID() == Class_ID(LOOKAT_CAM_CLASS_ID, 0)) Append(node, obj, OBTYPE_CAMERA);
+        if (obj->ClassID() == Class_ID(LOOKAT_CAM_CLASS_ID, 0))
+            Append(node, obj, OBTYPE_CAMERA);
         break;
     }
-    return TREE_CONTINUE;  // Keep on enumeratin'!
+    return TREE_CONTINUE; // Keep on enumeratin'!
 }
 
 void SceneEnumProc::Append(INode* node, Object* obj, int type)
 {
     SceneEntry* entry = new SceneEntry(node, obj, type);
 
-    if (tail) tail->next = entry;
+    if (tail)
+        tail->next = entry;
     tail = entry;
-    if (!head) head = entry;
+    if (!head)
+        head = entry;
     count++;
 }
 
@@ -191,7 +200,8 @@ ObjectList::ObjectList(SceneEnumProc& scene)
     {
         // can't multiple instance lights and cameras in 3DS
         // so make them all unique--DS 4/6/96
-        if ((se->type != OBTYPE_MESH) || !Contains(se->obj)) Append(se);
+        if ((se->type != OBTYPE_MESH) || !Contains(se->obj))
+            Append(se);
     }
 }
 
@@ -212,7 +222,8 @@ ObjectEntry* ObjectList::Contains(Object* obj)
     ObjectEntry* e;
     for (e = head; e != NULL; e = e->next)
     {
-        if (e->entry->obj == obj) return e;
+        if (e->entry->obj == obj)
+            return e;
     }
     return NULL;
 }
@@ -233,9 +244,11 @@ public:
 
 int FindDepNodeEnum::proc(ReferenceMaker* rmaker)
 {
-    if (rmaker->SuperClassID() != BASENODE_CLASS_ID) return 0;
+    if (rmaker->SuperClassID() != BASENODE_CLASS_ID)
+        return 0;
     INode* node = (INode*)rmaker;
-    if (node->GetTarget() == targ) {
+    if (node->GetTarget() == targ)
+    {
         depNode = node;
         return 1;
     }
@@ -250,7 +263,8 @@ ObjectEntry* ObjectList::FindLookatNode(INode* node)
     {
         finder.targ = node;
         e->entry->node->EnumDependents(&finder);
-        if (finder.depNode) return e;
+        if (finder.depNode)
+            return e;
     }
     return NULL;
 }
@@ -260,7 +274,8 @@ ObjectEntry* ObjectList::Contains(INode* node)
     ObjectEntry* e;
     for (e = head; e != NULL; e = e->next)
     {
-        if (e->entry->node == node) return e;
+        if (e->entry->node == node)
+            return e;
     }
     return NULL;
 }
@@ -268,9 +283,11 @@ ObjectEntry* ObjectList::Contains(INode* node)
 void ObjectList::Append(SceneEntry* e)
 {
     ObjectEntry* entry = new ObjectEntry(e);
-    if (tail) tail->next = entry;
+    if (tail)
+        tail->next = entry;
     tail = entry;
-    if (!head) head = entry;
+    if (!head)
+        head = entry;
     count++;
 }
 ObjectList* theObjects = NULL;
@@ -324,7 +341,8 @@ int ObjNameList::Contains(TSTR& n)
     int index = 0;
     while (e)
     {
-        if (e->name == n) return index;
+        if (e->name == n)
+            return index;
         e = e->next;
         index++;
     }
@@ -334,18 +352,22 @@ int ObjNameList::Contains(TSTR& n)
 void ObjNameList::Append(TSTR& n)
 {
     ObjName* entry = new ObjName(n);
-    if (tail) tail->next = entry;
+    if (tail)
+        tail->next = entry;
     tail = entry;
-    if (!head) head = entry;
+    if (!head)
+        head = entry;
     count++;
 }
 
 void ObjNameList::MakeUnique(TSTR& n)
 {
     // First make it less than 10 chars.
-    if (n.Length() > 10) n.Resize(10);
+    if (n.Length() > 10)
+        n.Resize(10);
 
-    if (Contains(n) < 0) {
+    if (Contains(n) < 0)
+    {
         Append(n);
         return;
     }
@@ -357,9 +379,11 @@ void ObjNameList::MakeUnique(TSTR& n)
         TSTR num(buf);
         TSTR work = n;
         int totlen = num.Length() + work.Length();
-        if (totlen > 10) work.Resize(10 - (totlen - 10));
+        if (totlen > 10)
+            work.Resize(10 - (totlen - 10));
         work = work + num;
-        if (Contains(work) < 0) {
+        if (Contains(work) < 0)
+        {
             Append(work);
             n = work;
             return;
@@ -482,13 +506,15 @@ bool MeshExpUtility::SaveSkinKeys(const char* n)
             for (n = 0; n < NumNT; n++)
             {
                 pNT = node->GetNoteTrack(n);
-                if (pNT->ClassID() == Class_ID(NOTETRACK_CLASS_ID, 0)) {
+                if (pNT->ClassID() == Class_ID(NOTETRACK_CLASS_ID, 0))
+                {
                     pDNT = (DefNoteTrack*)pNT;
                     j = pDNT->NumKeys();
                     for (i = 0; i < j; i++)
                     {
                         pNK = pDNT->keys[i];
-                        if ((pNK->time >= FirstTick) && (pNK->time <= LastTick)) NumNotes++;
+                        if ((pNK->time >= FirstTick) && (pNK->time <= LastTick))
+                            NumNotes++;
                     }
                 }
             }
@@ -499,13 +525,15 @@ bool MeshExpUtility::SaveSkinKeys(const char* n)
             for (n = 0; n < NumNT; n++)
             {
                 pNT = node->GetNoteTrack(n);
-                if (pNT->ClassID() == Class_ID(NOTETRACK_CLASS_ID, 0)) {
+                if (pNT->ClassID() == Class_ID(NOTETRACK_CLASS_ID, 0))
+                {
                     pDNT = (DefNoteTrack*)pNT;
                     j = pDNT->NumKeys();
                     for (i = 0; i < j; i++)
                     {
                         pNK = pDNT->keys[i];
-                        if ((pNK->time >= FirstTick) && (pNK->time <= LastTick)) {
+                        if ((pNK->time >= FirstTick) && (pNK->time <= LastTick))
+                        {
                             sprintf(S, "%d: %s", (pNK->time - FirstTick) / TicksPerFrame, pNK->note);
                             F.Wstring(S);
                         }
@@ -522,7 +550,8 @@ bool MeshExpUtility::SaveSkinKeys(const char* n)
             tm.SetTrans(tp);
 
             parent = node->GetParentNode();
-            if (parent) {
+            if (parent)
+            {
                 tmp = parent->GetNodeTM(t);
                 DecomposeMatrix(tmp, tp, qq, sp);
                 qq.MakeMatrix(tmp);
@@ -569,7 +598,8 @@ void MeshExpUtility::ExportSkinKeys()
     // Make sure there are nodes we're interested in!
     // Ask the scene to enumerate all its nodes so we can determine if there are any we can use
     INode* root_node = ip->GetRootNode();
-    if (!root_node) {
+    if (!root_node)
+    {
         ELog.Msg(mtError, "Scene empty.");
         ELog.Msg(mtInformation, "-------------------------------------------------------");
         return;
@@ -578,7 +608,8 @@ void MeshExpUtility::ExportSkinKeys()
     SceneEnumProc myScene(root_node, ip->GetTime(), ip);
 
     // Any useful nodes?
-    if (!myScene.Count()) {
+    if (!myScene.Count())
+    {
         ELog.Msg(mtError, "Scene has no useful nodes.");
         ELog.Msg(mtError, "-------------------------------------------------------");
         return;
@@ -586,7 +617,8 @@ void MeshExpUtility::ExportSkinKeys()
 
     char m_ExportName[MAX_PATH];
     m_ExportName[0] = 0;
-    if (!Engine.FS.GetSaveName(Engine.FS.m_GameKeys, m_ExportName, MAX_PATH, 0)) {
+    if (!Engine.FS.GetSaveName(Engine.FS.m_GameKeys, m_ExportName, MAX_PATH, 0))
+    {
         ELog.Msg(mtInformation, "Export cancelled");
         ELog.Msg(mtInformation, "-------------------------------------------------------");
         return;

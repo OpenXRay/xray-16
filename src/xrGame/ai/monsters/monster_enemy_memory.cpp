@@ -18,10 +18,7 @@ CMonsterEnemyMemory::CMonsterEnemyMemory()
     time_memory = 15000;
 }
 
-CMonsterEnemyMemory::~CMonsterEnemyMemory()
-{
-}
-
+CMonsterEnemyMemory::~CMonsterEnemyMemory() {}
 void CMonsterEnemyMemory::init_external(CBaseMonster* M, TTime mem_time)
 {
     monster = M;
@@ -40,8 +37,10 @@ void CMonsterEnemyMemory::update()
 
     objects_list const& objects = monster->memory().enemy().objects();
 
-    if (monster_hit_memory.is_hit() && time() < monster_hit_memory.get_last_hit_time() + 1000) {
-        if (CEntityAlive* enemy = smart_cast<CEntityAlive*>(monster->HitMemory.get_last_hit_object())) {
+    if (monster_hit_memory.is_hit() && time() < monster_hit_memory.get_last_hit_time() + 1000)
+    {
+        if (CEntityAlive* enemy = smart_cast<CEntityAlive*>(monster->HitMemory.get_last_hit_object()))
+        {
             if (monster->CCustomMonster::useful(&monster->memory().enemy(), enemy) &&
                 monster->Position().distance_to(enemy->Position()) <
                     monster->get_feel_enemy_who_just_hit_max_distance())
@@ -49,7 +48,8 @@ void CMonsterEnemyMemory::update()
                 add_enemy(enemy);
 
                 bool const self_is_dog = !!smart_cast<const CAI_Dog*>(monster);
-                if (self_is_dog) {
+                if (self_is_dog)
+                {
                     CMonsterSquad* const squad = monster_squad().get_squad(monster);
                     squad->set_home_in_danger();
                 }
@@ -57,12 +57,15 @@ void CMonsterEnemyMemory::update()
         }
     }
 
-    if (monster->SoundMemory.IsRememberSound()) {
+    if (monster->SoundMemory.IsRememberSound())
+    {
         SoundElem sound;
         bool dangerous;
         monster->SoundMemory.GetSound(sound, dangerous);
-        if (dangerous && Device.dwTimeGlobal < sound.time + 2000) {
-            if (CEntityAlive const* enemy = smart_cast<CEntityAlive const*>(sound.who)) {
+        if (dangerous && Device.dwTimeGlobal < sound.time + 2000)
+        {
+            if (CEntityAlive const* enemy = smart_cast<CEntityAlive const*>(sound.who))
+            {
                 float const xz_dist = monster->Position().distance_to_xz(g_actor->Position());
                 float const y_dist = _abs(monster->Position().y - g_actor->Position().y);
 
@@ -73,7 +76,8 @@ void CMonsterEnemyMemory::update()
                     add_enemy(enemy);
 
                     bool const self_is_dog = !!smart_cast<const CAI_Dog*>(monster);
-                    if (self_is_dog) {
+                    if (self_is_dog)
+                    {
                         CMonsterSquad* const squad = monster_squad().get_squad(monster);
                         squad->set_home_in_danger();
                     }
@@ -88,11 +92,13 @@ void CMonsterEnemyMemory::update()
         const bool feel_enemy =
             monster->Position().distance_to(enemy->Position()) < monster->get_feel_enemy_max_distance();
 
-        if (feel_enemy || monster->memory().visual().visible_now(*I)) add_enemy(*I);
+        if (feel_enemy || monster->memory().visual().visible_now(*I))
+            add_enemy(*I);
     }
 
     float const feel_enemy_max_distance = monster->get_feel_enemy_max_distance();
-    if (g_actor) {
+    if (g_actor)
+    {
         float const xz_dist = monster->Position().distance_to_xz(g_actor->Position());
         float const y_dist = _abs(monster->Position().y - g_actor->Position().y);
 
@@ -124,7 +130,8 @@ void CMonsterEnemyMemory::add_enemy(const CEntityAlive* enemy)
     enemy_info.danger = 0.f;
 
     ENEMIES_MAP_IT it = m_objects.find(enemy);
-    if (it != m_objects.end()) {
+    if (it != m_objects.end())
+    {
         // обновить данные о враге
         it->second = enemy_info;
     }
@@ -144,9 +151,11 @@ void CMonsterEnemyMemory::add_enemy(const CEntityAlive* enemy, const Fvector& po
     enemy_info.danger = 0.f;
 
     ENEMIES_MAP_IT it = m_objects.find(enemy);
-    if (it != m_objects.end()) {
+    if (it != m_objects.end())
+    {
         // обновить данные о враге
-        if (it->second.time < enemy_info.time) it->second = enemy_info;
+        if (it->second.time < enemy_info.time)
+            it->second = enemy_info;
     }
     else
     {
@@ -177,7 +186,8 @@ void CMonsterEnemyMemory::remove_non_actual()
 const CEntityAlive* CMonsterEnemyMemory::get_enemy()
 {
     ENEMIES_MAP_IT it = find_best_enemy();
-    if (it != m_objects.end()) return it->first;
+    if (it != m_objects.end())
+        return it->first;
     return (0);
 }
 
@@ -187,7 +197,8 @@ SMonsterEnemy CMonsterEnemyMemory::get_enemy_info()
     ret_val.time = 0;
 
     ENEMIES_MAP_IT it = find_best_enemy();
-    if (it != m_objects.end()) ret_val = it->second;
+    if (it != m_objects.end())
+        ret_val = it->second;
 
     return ret_val;
 }
@@ -200,20 +211,24 @@ ENEMIES_MAP_IT CMonsterEnemyMemory::find_best_enemy()
     // find best at home first
     for (ENEMIES_MAP_IT I = m_objects.begin(); I != m_objects.end(); I++)
     {
-        if (!monster->Home->at_home(I->second.position)) continue;
-        if (I->second.danger > max_value) {
+        if (!monster->Home->at_home(I->second.position))
+            continue;
+        if (I->second.danger > max_value)
+        {
             max_value = I->second.danger;
             it = I;
         }
     }
 
     // there is no best enemies at home
-    if (it == m_objects.end()) {
+    if (it == m_objects.end())
+    {
         // find any
         max_value = 0.f;
         for (ENEMIES_MAP_IT I = m_objects.begin(); I != m_objects.end(); I++)
         {
-            if (I->second.danger > max_value) {
+            if (I->second.danger > max_value)
+            {
                 max_value = I->second.danger;
                 it = I;
             }
@@ -225,13 +240,15 @@ ENEMIES_MAP_IT CMonsterEnemyMemory::find_best_enemy()
 
 void CMonsterEnemyMemory::remove_links(IGameObject* O)
 {
-    if (monster) {
+    if (monster)
+    {
         monster->EnemyMan.remove_links(O);
     }
 
     for (ENEMIES_MAP_IT I = m_objects.begin(); I != m_objects.end(); ++I)
     {
-        if ((*I).first == O) {
+        if ((*I).first == O)
+        {
             m_objects.erase(I);
             break;
         }

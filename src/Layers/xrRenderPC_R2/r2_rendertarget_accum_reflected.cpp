@@ -9,7 +9,7 @@ void CRenderTarget::accum_reflected(light* L)
     // *****************************	Mask by stencil		*************************************
     ref_shader shader = s_accum_reflected;
 
-    BOOL bIntersect = FALSE;  // enable_scissor(L);
+    BOOL bIntersect = FALSE; // enable_scissor(L);
     L->xform_calc();
     RCache.set_xform_world(L->m_xform);
     RCache.set_xform_view(Device.mView);
@@ -21,9 +21,9 @@ void CRenderTarget::accum_reflected(light* L)
     // Select shader (front or back-faces), *** back, if intersect near plane
     RCache.set_ColorWriteEnable();
     if (bIntersect)
-        RCache.set_CullMode(CULL_CW);  // back
+        RCache.set_CullMode(CULL_CW); // back
     else
-        RCache.set_CullMode(CULL_CCW);  // front
+        RCache.set_CullMode(CULL_CCW); // front
 
     // 2D texgen (texture adjustment matrix)
     Fmatrix m_Texgen;
@@ -62,7 +62,8 @@ void CRenderTarget::accum_reflected(light* L)
     }
 
     // blend-copy
-    if (!RImplementation.o.fp16_blend) {
+    if (!RImplementation.o.fp16_blend)
+    {
         u_setrt(rt_Accumulator, NULL, NULL, HW.pBaseZB);
         RCache.set_Element(s_accum_mask->E[SE_MASK_ACCUM_VOL]);
         RCache.set_c("m_texgen", m_Texgen);

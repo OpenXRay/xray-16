@@ -54,7 +54,7 @@ static int get_globals(GlobalFunc* global)
     g_hdi = global(LWHOSTDISPLAYINFO_GLOBAL, GFUSE_TRANSIENT);
 
     return (g_chinfo && g_envf && g_iteminfo && g_lwsi && g_intinfo && g_msg && g_boneinfo && g_objfunc && g_objinfo &&
-            g_surff);
+    g_surff);
 }
 
 //======================================================================
@@ -64,8 +64,10 @@ static int get_globals(GlobalFunc* global)
 void __cdecl SaveSkeletonMotion(GlobalFunc* global);
 XCALL_(int) SkeletonMotionExport(long version, GlobalFunc* global, LWLayoutGeneric* local, void* serverData)
 {
-    if (version != LWLAYOUTGENERIC_VERSION) return AFUNC_BADVERSION;
-    if (!get_globals(global)) return AFUNC_BADGLOBAL;
+    if (version != LWLAYOUTGENERIC_VERSION)
+        return AFUNC_BADVERSION;
+    if (!get_globals(global))
+        return AFUNC_BADGLOBAL;
 
     SaveSkeletonMotion(global);
 
@@ -80,8 +82,10 @@ XCALL_(int) SkeletonMotionExport(long version, GlobalFunc* global, LWLayoutGener
 void __cdecl SaveObject(GlobalFunc* global);
 XCALL_(int) ObjectExport(long version, GlobalFunc* global, LWLayoutGeneric* local, void* serverData)
 {
-    if (version != LWLAYOUTGENERIC_VERSION) return AFUNC_BADVERSION;
-    if (!get_globals(global)) return AFUNC_BADGLOBAL;
+    if (version != LWLAYOUTGENERIC_VERSION)
+        return AFUNC_BADVERSION;
+    if (!get_globals(global))
+        return AFUNC_BADGLOBAL;
 
     SaveObject(global);
 
@@ -96,8 +100,10 @@ XCALL_(int) ObjectExport(long version, GlobalFunc* global, LWLayoutGeneric* loca
 void __cdecl SaveObjectMotion(GlobalFunc* global);
 XCALL_(int) ObjectMotionExport(long version, GlobalFunc* global, LWLayoutGeneric* local, void* serverData)
 {
-    if (version != LWLAYOUTGENERIC_VERSION) return AFUNC_BADVERSION;
-    if (!get_globals(global)) return AFUNC_BADGLOBAL;
+    if (version != LWLAYOUTGENERIC_VERSION)
+        return AFUNC_BADVERSION;
+    if (!get_globals(global))
+        return AFUNC_BADGLOBAL;
 
     SaveObjectMotion(global);
 
@@ -105,5 +111,5 @@ XCALL_(int) ObjectMotionExport(long version, GlobalFunc* global, LWLayoutGeneric
 }
 
 ServerRecord ServerDesc[] = {{LWLAYOUTGENERIC_CLASS, "XRay_Skeleton_Motion_Export", SkeletonMotionExport},
-    {LWLAYOUTGENERIC_CLASS, "XRay_Object_Export", ObjectExport},
-    {LWLAYOUTGENERIC_CLASS, "XRay_Object_Motion_Export", ObjectMotionExport}, {NULL}};
+{LWLAYOUTGENERIC_CLASS, "XRay_Object_Export", ObjectExport},
+{LWLAYOUTGENERIC_CLASS, "XRay_Object_Motion_Export", ObjectMotionExport}, {NULL}};

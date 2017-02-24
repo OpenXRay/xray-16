@@ -55,8 +55,8 @@ public:
     IC animation_planner& planner();
 };
 
-}  // namespace smart_cover
+} // namespace smart_cover
 
 #include "smart_cover_animation_selector_inline.h"
 
-#endif  // SMART_COVER_ANIMATION_SELECTOR_H_INCLUDED
+#endif // SMART_COVER_ANIMATION_SELECTOR_H_INCLUDED

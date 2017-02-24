@@ -28,11 +28,7 @@ bool CHelicopter::isObjectVisible(IGameObject* O)
     return !res;
 }
 
-bool CHelicopter::isVisible(CScriptGameObject* O)
-{
-    return isObjectVisible(&O->object());
-}
-
+bool CHelicopter::isVisible(CScriptGameObject* O) { return isObjectVisible(&O->object()); }
 void CHelicopter::TurnLighting(bool bOn)
 {
     m_light_render->set_active(bOn);
@@ -48,7 +44,8 @@ void CHelicopter::TurnEngineSound(bool bOn)
 
 void CHelicopter::StartFlame()
 {
-    if (m_pParticle) return;
+    if (m_pParticle)
+        return;
     m_pParticle = CParticlesObject::Create(*m_smoke_particle, FALSE);
 
     Fvector zero_vector;
@@ -64,7 +61,8 @@ void CHelicopter::UpdateHeliParticles()
     m_particleXFORM = K->LL_GetTransform(m_smoke_bone);
     m_particleXFORM.mulA_43(XFORM());
 
-    if (m_pParticle) {
+    if (m_pParticle)
+    {
         Fvector vel;
 
         Fvector last_pos = PositionStack.back().vPosition;
@@ -74,7 +72,8 @@ void CHelicopter::UpdateHeliParticles()
         m_pParticle->UpdateParent(m_particleXFORM, vel);
     }
     // lighting
-    if (m_light_render->get_active()) {
+    if (m_light_render->get_active())
+    {
         Fmatrix xf;
         Fmatrix& M = K->LL_GetTransform(u16(m_light_bone));
         xf.mul(XFORM(), M);
@@ -83,9 +82,10 @@ void CHelicopter::UpdateHeliParticles()
         m_light_render->set_rotation(xf.k, xf.i);
         m_light_render->set_position(xf.c);
 
-        if (m_lanim) {
+        if (m_lanim)
+        {
             int frame;
-            u32 clr = m_lanim->CalculateBGR(Device.fTimeGlobal, frame);  // тючтЁр•рхЄ т ЇюЁьрЄх BGR
+            u32 clr = m_lanim->CalculateBGR(Device.fTimeGlobal, frame); // тючтЁр•рхЄ т ЇюЁьрЄх BGR
             Fcolor fclr;
             fclr.set((float)color_get_B(clr), (float)color_get_G(clr), (float)color_get_R(clr), 1.f);
             fclr.mul_rgb(m_light_brightness / 255.f);
@@ -97,11 +97,13 @@ void CHelicopter::ExplodeHelicopter()
 {
     m_ready_explode = false;
     m_exploded = true;
-    if (m_pParticle) {
+    if (m_pParticle)
+    {
         m_pParticle->Stop();
         CParticlesObject::Destroy(m_pParticle);
     }
-    if (CPHDestroyable::CanDestroy()) CPHDestroyable::Destroy(ID(), "physic_destroyable_object");
+    if (CPHDestroyable::CanDestroy())
+        CPHDestroyable::Destroy(ID(), "physic_destroyable_object");
 
     CExplosive::SetInitiator(ID());
     CExplosive::GenExplodeEvent(Position(), Fvector().set(0.f, 1.f, 0.f));
@@ -112,20 +114,13 @@ void CHelicopter::SetDestPosition(Fvector* pos)
 {
     m_movement.SetDestPosition(pos);
 #ifndef MASTER_GOLD
-    if (bDebug) Msg("---SetDestPosition %f %f %f", pos->x, pos->y, pos->z);
-#endif  // #ifndef MASTER_GOLD
+    if (bDebug)
+        Msg("---SetDestPosition %f %f %f", pos->x, pos->y, pos->z);
+#endif // #ifndef MASTER_GOLD
 }
 
-float CHelicopter::GetDistanceToDestPosition()
-{
-    return m_movement.GetDistanceToDestPosition();
-}
-
-void CHelicopter::UnSetEnemy()
-{
-    m_enemy.type = eEnemyNone;
-}
-
+float CHelicopter::GetDistanceToDestPosition() { return m_movement.GetDistanceToDestPosition(); }
+void CHelicopter::UnSetEnemy() { m_enemy.type = eEnemyNone; }
 void CHelicopter::SetEnemy(CScriptGameObject* e)
 {
     m_enemy.type = eEnemyEntity;
@@ -138,51 +133,36 @@ void CHelicopter::SetEnemy(Fvector* pos)
     m_enemy.destEnemyPos = *pos;
 }
 
-float CHelicopter::GetCurrVelocity()
-{
-    return m_movement.curLinearSpeed;
-}
-
-void CHelicopter::SetMaxVelocity(float v)
-{
-    m_movement.maxLinearSpeed = v;
-}
-float CHelicopter::GetMaxVelocity()
-{
-    return m_movement.maxLinearSpeed;
-}
+float CHelicopter::GetCurrVelocity() { return m_movement.curLinearSpeed; }
+void CHelicopter::SetMaxVelocity(float v) { m_movement.maxLinearSpeed = v; }
+float CHelicopter::GetMaxVelocity() { return m_movement.maxLinearSpeed; }
 //////////////////////Start By JoHnY///////////////////////
 void CHelicopter::SetLinearAcc(float LAcc_fw, float LAcc_bw)
 {
-    m_movement.LinearAcc_fw = LAcc_fw;  //ускорение разгона
-    m_movement.LinearAcc_bk = LAcc_bw;  //ускорение торможения
+    m_movement.LinearAcc_fw = LAcc_fw; //ускорение разгона
+    m_movement.LinearAcc_bk = LAcc_bw; //ускорение торможения
 }
 //////////////////////End By JoHnY/////////////////////////
 void CHelicopter::SetSpeedInDestPoint(float sp)
 {
     m_movement.SetSpeedInDestPoint(sp);
 #ifndef MASTER_GOLD
-    if (bDebug) Msg("---SetSpeedInDestPoint %f", sp);
-#endif  // #ifndef MASTER_GOLD
+    if (bDebug)
+        Msg("---SetSpeedInDestPoint %f", sp);
+#endif // #ifndef MASTER_GOLD
 }
 
-float CHelicopter::GetSpeedInDestPoint(float sp)
-{
-    return m_movement.GetSpeedInDestPoint();
-}
+float CHelicopter::GetSpeedInDestPoint(float sp) { return m_movement.GetSpeedInDestPoint(); }
 void CHelicopter::SetOnPointRangeDist(float d)
 {
     m_movement.onPointRangeDist = d;
 #ifndef MASTER_GOLD
-    if (bDebug) Msg("---SetOnPointRangeDist %f", d);
-#endif  // #ifndef MASTER_GOLD
+    if (bDebug)
+        Msg("---SetOnPointRangeDist %f", d);
+#endif // #ifndef MASTER_GOLD
 }
 
-float CHelicopter::GetOnPointRangeDist()
-{
-    return m_movement.onPointRangeDist;
-}
-
+float CHelicopter::GetOnPointRangeDist() { return m_movement.onPointRangeDist; }
 float CHelicopter::GetRealAltitude()
 {
     collide::rq_result cR;
@@ -199,19 +179,24 @@ void CHelicopter::Hit(SHit* pHDS)
 {
     //	inherited::Hit(pHDS);
 
-    if (GetfHealth() < 0.005f) return;
+    if (GetfHealth() < 0.005f)
+        return;
 
-    if (state() == CHelicopter::eDead) return;
+    if (state() == CHelicopter::eDead)
+        return;
 
-    if (pHDS->who == this) return;
+    if (pHDS->who == this)
+        return;
 
     bonesIt It = m_hitBones.find(pHDS->bone());
-    if (It != m_hitBones.end() && pHDS->hit_type == ALife::eHitTypeFireWound) {
+    if (It != m_hitBones.end() && pHDS->hit_type == ALife::eHitTypeFireWound)
+    {
         float curHealth = GetfHealth();
         curHealth -= pHDS->damage() * It->second * 1000.0f;
         SetfHealth(curHealth);
 #ifdef DEBUG
-        if (bDebug) Log("----Helicopter::PilotHit(). health=", curHealth);
+        if (bDebug)
+            Log("----Helicopter::PilotHit(). health=", curHealth);
 #endif
     }
     else
@@ -221,7 +206,8 @@ void CHelicopter::Hit(SHit* pHDS)
 
         SetfHealth(GetfHealth() - hit_power);
 #ifdef DEBUG
-        if (bDebug) Log("----Helicopter::Hit(). health=", GetfHealth());
+        if (bDebug)
+            Log("----Helicopter::Hit(). health=", GetfHealth());
 #endif
     };
     if (pHDS->who &&
@@ -235,7 +221,8 @@ void CHelicopter::Hit(SHit* pHDS)
 
 void CHelicopter::PHHit(SHit& H)
 {
-    if (!g_Alive()) inherited::PHHit(H);
+    if (!g_Alive())
+        inherited::PHHit(H);
 }
 
 #include "group_hierarchy_holder.h"
@@ -251,12 +238,14 @@ void CollisionCallbackDead(bool& do_colide, bool bo1, dContact& c, SGameMtl* mat
     CHelicopter* l_this = bo1 ? smart_cast<CHelicopter*>(PHRetrieveGeomUserData(c.geom.g1)->ph_ref_object) :
                                 smart_cast<CHelicopter*>(PHRetrieveGeomUserData(c.geom.g2)->ph_ref_object);
 
-    if (l_this && !l_this->m_exploded) l_this->m_ready_explode = true;
+    if (l_this && !l_this->m_exploded)
+        l_this->m_ready_explode = true;
 }
 
 void CHelicopter::DieHelicopter()
 {
-    if (state() == CHelicopter::eDead) return;
+    if (state() == CHelicopter::eDead)
+        return;
     CEntity::Die(NULL);
 
     m_engineSound.stop();
@@ -265,7 +254,8 @@ void CHelicopter::DieHelicopter()
     m_brokenSound.play_at_pos(0, XFORM().c, sm_Looped);
 
     IKinematics* K = smart_cast<IKinematics*>(Visual());
-    if (true /*!PPhysicsShell()*/) {
+    if (true /*!PPhysicsShell()*/)
+    {
         string256 I;
         LPCSTR bone;
 
@@ -355,19 +345,13 @@ void SHeliEnemy::load(IReader& input_packet)
     bUseFireTrail = !!input_packet.r_u8();
 }
 
-void CHelicopter::SetFireTrailLength(float val)
-{
-    m_enemy.fire_trail_length_des = val;
-}
-bool CHelicopter::UseFireTrail()
-{
-    return m_enemy.bUseFireTrail;
-}
-
+void CHelicopter::SetFireTrailLength(float val) { m_enemy.fire_trail_length_des = val; }
+bool CHelicopter::UseFireTrail() { return m_enemy.bUseFireTrail; }
 void CHelicopter::UseFireTrail(bool val)
 {
     m_enemy.bUseFireTrail = val;
-    if (val) {
+    if (val)
+    {
         fireDispersionBase = pSettings->r_float(*cNameSect(), "fire_dispersion_null");
         fireDispersionBase = deg2rad(fireDispersionBase);
     }
@@ -434,11 +418,7 @@ float t_1(float t10, float t11)
         return _min(t10, t11);
 }
 
-float t_0(float V0, float V1, float a0, float a1, float t1)
-{
-    return (V1 - V0 - a1 * t1) / a0;
-}
-
+float t_0(float V0, float V1, float a0, float a1, float t1) { return (V1 - V0 - a1 * t1) / a0; }
 float getA(float t0, float a1, float a0)
 {
     float eps = 0.001f;

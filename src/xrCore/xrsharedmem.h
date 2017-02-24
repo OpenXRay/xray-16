@@ -16,26 +16,34 @@ struct XRCORE_API smem_value
 // generic predicate for "less"
 IC bool smem_sort(const smem_value* A, const smem_value* B)
 {
-    if (A->dwCRC < B->dwCRC) return true;
-    if (A->dwCRC > B->dwCRC) return false;
-    if (A->dwLength < B->dwLength) return true;
-    if (A->dwLength > B->dwLength) return false;
+    if (A->dwCRC < B->dwCRC)
+        return true;
+    if (A->dwCRC > B->dwCRC)
+        return false;
+    if (A->dwLength < B->dwLength)
+        return true;
+    if (A->dwLength > B->dwLength)
+        return false;
     return memcmp(A->value, B->value, A->dwLength) < 0;
 };
 
 // predicate for insertion - just a quick estimate
 IC bool smem_search(const smem_value* A, const smem_value* B)
 {
-    if (A->dwCRC < B->dwCRC) return true;
-    if (A->dwCRC > B->dwCRC) return false;
+    if (A->dwCRC < B->dwCRC)
+        return true;
+    if (A->dwCRC > B->dwCRC)
+        return false;
     return A->dwLength < B->dwLength;
 };
 
 // predicate for exact (byte level) comparition
 IC bool smem_equal(const smem_value* A, u32 dwCRC, u32 dwLength, u8* ptr)
 {
-    if (A->dwCRC != dwCRC) return false;
-    if (A->dwLength != dwLength) return false;
+    if (A->dwCRC != dwCRC)
+        return false;
+    if (A->dwLength != dwLength)
+        return false;
     return 0 == memcmp(A->value, ptr, dwLength);
 };
 #pragma warning(default : 4200)
@@ -55,7 +63,7 @@ public:
     u32 stat_economy();
 #ifdef CONFIG_PROFILE_LOCKS
     smem_container() : cs(MUTEX_PROFILE_ID(smem_container)) {}
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
     ~smem_container();
 };
 XRCORE_API extern smem_container* g_pSharedMemoryContainer;
@@ -71,21 +79,23 @@ protected:
     // ref-counting
     void _dec()
     {
-        if (0 == p_) return;
+        if (0 == p_)
+            return;
         p_->dwReference--;
-        if (0 == p_->dwReference) p_ = 0;
+        if (0 == p_->dwReference)
+            p_ = 0;
     }
 
 public:
     void _set(ref_smem const& rhs)
     {
         smem_value* v = rhs.p_;
-        if (0 != v) v->dwReference++;
+        if (0 != v)
+            v->dwReference++;
         _dec();
         p_ = v;
     }
     const smem_value* _get() const { return p_; }
-
 public:
     // construction
     ref_smem() { p_ = 0; }
@@ -95,11 +105,11 @@ public:
         _set(rhs);
     }
     ~ref_smem() { _dec(); }
-
     void create(u32 dwCRC, u32 dwLength, T* ptr)
     {
         smem_value* v = g_pSharedMemoryContainer->dock(dwCRC, dwLength * sizeof(T), ptr);
-        if (0 != v) v->dwReference++;
+        if (0 != v)
+            v->dwReference++;
         _dec();
         p_ = v;
     }

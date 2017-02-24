@@ -42,8 +42,8 @@ struct XRNETSERVER_API ip_address
     bool operator==(const ip_address& other) const
     {
         return (m_data.data == other.m_data.data) ||
-               ((m_data.a1 == other.m_data.a1) && (m_data.a2 == other.m_data.a2) && (m_data.a3 == other.m_data.a3) &&
-                   (m_data.a4 == 0));
+            ((m_data.a1 == other.m_data.a1) && (m_data.a2 == other.m_data.a2) && (m_data.a3 == other.m_data.a3) &&
+                (m_data.a4 == 0));
     }
 };
 
@@ -68,7 +68,7 @@ public:
     shared_str name;
     shared_str pass;
 
-    Flags flags;  // local/host/normal
+    Flags flags; // local/host/normal
     u32 dwTime_LastUpdate;
 
     ip_address m_cAddress;
@@ -85,11 +85,7 @@ private:
     virtual void _SendTo_LL(const void* data, u32 size, u32 flags, u32 timeout);
 };
 
-IC bool operator==(IClient const* pClient, ClientID const& ID)
-{
-    return pClient->ID == ID;
-}
-
+IC bool operator==(IClient const* pClient, ClientID const& ID) { return pClient->ID == ID; }
 class XRNETSERVER_API IServerStatistic
 {
 public:
@@ -217,14 +213,13 @@ public:
     void UpdateClientStatistic(IClient* C);
 
     // extended functionality
-    virtual u32 OnMessage(NET_Packet& P, ClientID sender);  // Non-Zero means broadcasting with "flags" as returned
+    virtual u32 OnMessage(NET_Packet& P, ClientID sender); // Non-Zero means broadcasting with "flags" as returned
     virtual void OnCL_Connected(IClient* C);
     virtual void OnCL_Disconnected(IClient* C);
     virtual bool OnCL_QueryHost() { return true; };
-
-    virtual IClient* client_Create() = 0;         // create client info
-    virtual void client_Replicate() = 0;          // replicate current state to client
-    virtual void client_Destroy(IClient* C) = 0;  // destroy client info
+    virtual IClient* client_Create() = 0; // create client info
+    virtual void client_Replicate() = 0; // replicate current state to client
+    virtual void client_Destroy(IClient* C) = 0; // destroy client info
 
     // IC u32					client_Count		()			{ return net_Players.size(); }
     // IC IClient*				client_Get			(u32 num)	{ return net_Players[num]; }
@@ -266,15 +261,16 @@ public:
         csMessage.Enter();
 #ifdef DEBUG
         sender_functor_invoked = true;
-#endif  //#ifdef DEBUG
+#endif //#ifdef DEBUG
         net_players.ForEachClientDo(action);
 #ifdef DEBUG
         sender_functor_invoked = false;
-#endif  //#ifdef DEBUG
+#endif //#ifdef DEBUG
         csMessage.Leave();
     }
 // template<typename ActionFunctor>
-// void					ForEachDisconnectedClientDo(ActionFunctor & action) { net_players.ForEachDisconnectedClientDo(action);
+// void					ForEachDisconnectedClientDo(ActionFunctor & action) {
+// net_players.ForEachDisconnectedClientDo(action);
 // };
 #ifdef DEBUG
     bool IsPlayersMonitorLockedByMe() const
@@ -291,7 +287,6 @@ public:
     // net_players.GetFoundDisconnectedClient(ClientIdSearchPredicate(clientId));}
 
     const shared_str& GetConnectOptions() const { return connect_options; }
-
     virtual IServerGameState* GetGameState() = 0;
     virtual u16 PerformIDgen(u16 ID) = 0;
     virtual void FreeID(u16 ID, u32 time) = 0;

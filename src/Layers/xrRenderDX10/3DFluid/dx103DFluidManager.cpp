@@ -18,12 +18,12 @@ shared_str strDrawTexture("textureNumber");
 // ModulateShaderVariable = pEffect->GetVariableByName( "modulate")->AsScalar();
 shared_str strModulate("modulate");
 // For gaussian
-// ImpulseSizeShaderVariable = pEffect->GetVariableByName( "size")->AsScalar();
-// shared_str	strImpulseSize("size");
-// ImpulseCenterShaderVariable = pEffect->GetVariableByName( "center")->AsVector();
-// shared_str	strImpulseCenter("center");
-// SplatColorShaderVariable = pEffect->GetVariableByName( "splatColor")->AsVector();
-// shared_str	strSplatColor("splatColor");
+//ImpulseSizeShaderVariable = pEffect->GetVariableByName("size")->AsScalar();
+//shared_str strImpulseSize("size");
+//ImpulseCenterShaderVariable = pEffect->GetVariableByName("center")->AsVector();
+//shared_str strImpulseCenter("center");
+//SplatColorShaderVariable = pEffect->GetVariableByName("splatColor")->AsVector();
+//shared_str strSplatColor("splatColor");
 // For confinement
 // EpsilonShaderVariable = pEffect->GetVariableByName( "epsilon")->AsScalar();
 shared_str strEpsilon("epsilon");
@@ -39,44 +39,46 @@ shared_str strGravityBuoyancy("GravityBuoyancy");
 }
 
 LPCSTR dx103DFluidManager::m_pEngineTextureNames[NUM_RENDER_TARGETS] = {
-    "$user$Texture_velocity1",     //	RENDER_TARGET_VELOCITY1 = 0,
-    "$user$Texture_color_out",     //	RENDER_TARGET_COLOR,	//	Swap with object's
-    "$user$Texture_obstacles",     //	RENDER_TARGET_OBSTACLES,
-    "$user$Texture_obstvelocity",  //	RENDER_TARGET_OBSTVELOCITY,
-    "$user$Texture_tempscalar",    //	RENDER_TARGET_TEMPSCALAR,
-    "$user$Texture_tempvector",    //	 RENDER_TARGET_TEMPVECTOR,
-    "$user$Texture_velocity0",     //	RENDER_TARGET_VELOCITY0 = NUM_OWN_RENDER_TARGETS,	//	For textures generated from
-                                   //local data
-    "$user$Texture_pressure",      //	RENDER_TARGET_PRESSURE,
-    "$user$Texture_color",         //	RENDER_TARGET_COLOR_IN,
+    "$user$Texture_velocity1", //RENDER_TARGET_VELOCITY1 = 0,
+    // Swap with object's
+    "$user$Texture_color_out", //RENDER_TARGET_COLOR,
+    "$user$Texture_obstacles", //RENDER_TARGET_OBSTACLES,
+    "$user$Texture_obstvelocity", //RENDER_TARGET_OBSTVELOCITY,
+    "$user$Texture_tempscalar", //RENDER_TARGET_TEMPSCALAR,
+    "$user$Texture_tempvector", // RENDER_TARGET_TEMPVECTOR,
+    // For textures generated from local data
+    "$user$Texture_velocity0", //RENDER_TARGET_VELOCITY0 = NUM_OWN_RENDER_TARGETS,
+    "$user$Texture_pressure", //RENDER_TARGET_PRESSURE,
+    "$user$Texture_color", //RENDER_TARGET_COLOR_IN,
 };
 
 LPCSTR dx103DFluidManager::m_pShaderTextureNames[NUM_RENDER_TARGETS] = {
-    "Texture_velocity1",     //	RENDER_TARGET_VELOCITY1 = 0,
-    "Texture_color_out",     //	RENDER_TARGET_COLOR,	//	Swap with object's
-    "Texture_obstacles",     //	RENDER_TARGET_OBSTACLES,
-    "Texture_obstvelocity",  //	RENDER_TARGET_OBSTVELOCITY,
-    "Texture_tempscalar",    //	RENDER_TARGET_TEMPSCALAR,
-    "Texture_tempvector",    //	 RENDER_TARGET_TEMPVECTOR,
-    "Texture_velocity0",     //	RENDER_TARGET_VELOCITY0 = NUM_OWN_RENDER_TARGETS,	//	For textures generated from
-                             //local data
-    "Texture_pressure",      //	RENDER_TARGET_PRESSURE,
-    "Texture_color",         //	RENDER_TARGET_COLOR_IN,
+    "Texture_velocity1", //RENDER_TARGET_VELOCITY1 = 0,
+    // Swap with object's
+    "Texture_color_out", //RENDER_TARGET_COLOR,
+    "Texture_obstacles", //RENDER_TARGET_OBSTACLES,
+    "Texture_obstvelocity", //RENDER_TARGET_OBSTVELOCITY,
+    "Texture_tempscalar", //RENDER_TARGET_TEMPSCALAR,
+    "Texture_tempvector", //RENDER_TARGET_TEMPVECTOR,
+    // For textures generated from local data
+    "Texture_velocity0", //RENDER_TARGET_VELOCITY0 = NUM_OWN_RENDER_TARGETS,
+    "Texture_pressure", //  RENDER_TARGET_PRESSURE,
+    "Texture_color", // RENDER_TARGET_COLOR_IN,
 };
 
 dx103DFluidManager::dx103DFluidManager()
     : m_bInited(false),
-      //	m_nIterations(10), m_bUseBFECC(true),
+      // m_nIterations(10), m_bUseBFECC(true),
       m_nIterations(6), m_bUseBFECC(true),
-      //	m_nIterations(6), m_bUseBFECC(false),
+      // m_nIterations(6), m_bUseBFECC(false),
       m_fSaturation(0.78f), m_bAddDensity(true), m_fImpulseSize(0.15f), m_fConfinementScale(0.0f), m_fDecay(1.0f),
       m_pGrid(0), m_pRenderer(0), m_pObstaclesHandler(0)
 {
     ZeroMemory(pRenderTargetViews, sizeof(pRenderTargetViews));
 
-    // RenderTargetFormats [RENDER_TARGET_VELOCITY0]	= DXGI_FORMAT_R16G16B16A16_FLOAT;
+    // RenderTargetFormats [RENDER_TARGET_VELOCITY0] = DXGI_FORMAT_R16G16B16A16_FLOAT;
     RenderTargetFormats[RENDER_TARGET_VELOCITY1] = DXGI_FORMAT_R16G16B16A16_FLOAT;
-    // RenderTargetFormats [RENDER_TARGET_PRESSURE]	= DXGI_FORMAT_R16_FLOAT;
+    // RenderTargetFormats [RENDER_TARGET_PRESSURE] = DXGI_FORMAT_R16_FLOAT;
     RenderTargetFormats[RENDER_TARGET_COLOR] = DXGI_FORMAT_R16_FLOAT;
     RenderTargetFormats[RENDER_TARGET_OBSTACLES] = DXGI_FORMAT_R8_UNORM;
     RenderTargetFormats[RENDER_TARGET_OBSTVELOCITY] = DXGI_FORMAT_R16G16B16A16_FLOAT;
@@ -86,15 +88,12 @@ dx103DFluidManager::dx103DFluidManager()
     RenderTargetFormats[RENDER_TARGET_TEMPVECTOR] = DXGI_FORMAT_R16G16B16A16_FLOAT;
 }
 
-dx103DFluidManager::~dx103DFluidManager()
-{
-    Destroy();
-}
-
+dx103DFluidManager::~dx103DFluidManager() { Destroy(); }
 void dx103DFluidManager::Initialize(int width, int height, int depth)
 {
     // if (strstr(Core.Params,"-no_volumetric_fog"))
-    if (!RImplementation.o.volumetricfog) return;
+    if (!RImplementation.o.volumetricfog)
+        return;
 
     Destroy();
 
@@ -148,16 +147,17 @@ void dx103DFluidManager::Initialize(int width, int height, int depth)
 
     m_bInited = true;
 
-    //	Create and grid and renderer here
+    //  Create and grid and renderer here
     // grid = new Grid( m_pD3DDevice );
     // renderer = new VolumeRenderer( m_pD3DDevice );
 }
 
 void dx103DFluidManager::Destroy()
 {
-    if (!m_bInited) return;
+    if (!m_bInited)
+        return;
 
-    //	Destroy grid and renderer here
+    //  Destroy grid and renderer here
     xr_delete(m_pEmittersHandler);
     xr_delete(m_pObstaclesHandler);
     xr_delete(m_pRenderer);
@@ -205,7 +205,7 @@ void dx103DFluidManager::DestroyShaders()
 {
     for (int i = 0; i < SS_NumShaders; ++i)
     {
-        //	Release shader's element.
+        //  Release shader's element.
         m_SimulationTechnique[i] = 0;
     }
 }
@@ -217,7 +217,7 @@ void dx103DFluidManager::PrepareTexture(int rtIndex)
 
 void dx103DFluidManager::CreateRTTextureAndViews(int rtIndex, D3D_TEXTURE3D_DESC TexDesc)
 {
-    //	Resources must be already released by Destroy().
+    // Resources must be already released by Destroy().
 
     ID3DTexture3D* pRT;
 
@@ -235,7 +235,7 @@ void dx103DFluidManager::CreateRTTextureAndViews(int rtIndex, D3D_TEXTURE3D_DESC
 
     pRTTextures[rtIndex]->surface_set(pRT);
 
-    //	CTexture owns ID3DxxTexture3D interface
+    // CTexture owns ID3DxxTexture3D interface
     pRT->Release();
 }
 void dx103DFluidManager::DestroyRTTextureAndViews(int rtIndex)
@@ -273,10 +273,10 @@ void dx103DFluidManager::Update(dx103DFluidData& FluidData, float timestep)
 #ifdef USE_DX11
     rtViewport.Width = (float)m_iTextureWidth;
     rtViewport.Height = (float)m_iTextureHeight;
-#else   // #ifdef USE_DX11
+#else // #ifdef USE_DX11
     rtViewport.Width = m_iTextureWidth;
     rtViewport.Height = m_iTextureHeight;
-#endif  // #ifdef USE_DX11
+#endif // #ifdef USE_DX11
     HW.pContext->RSSetViewports(1, &rtViewport);
 
     RCache.set_ZB(0);
@@ -303,8 +303,10 @@ void dx103DFluidManager::Update(dx103DFluidData& FluidData, float timestep)
     UpdateObstacles(FluidData, timestep);
 
     // Set vorticity confinment and decay parameters
-    if (m_bUseBFECC) {
-        if (bSimulateFire) {
+    if (m_bUseBFECC)
+    {
+        if (bSimulateFire)
+        {
             m_fConfinementScale = 0.03f;
             m_fDecay = 0.9995f;
         }
@@ -342,12 +344,12 @@ void dx103DFluidManager::Update(dx103DFluidData& FluidData, float timestep)
 
     DetachAndSwapFluidData(FluidData);
 
-    //	Restore render state
+    //  Restore render state
     CRenderTarget* pTarget = RImplementation.Target;
     if (!RImplementation.o.dx10_msaa)
-        pTarget->u_setrt(pTarget->rt_Generic_0, 0, 0, HW.pBaseZB);  // LDR RT
+        pTarget->u_setrt(pTarget->rt_Generic_0, 0, 0, HW.pBaseZB); // LDR RT
     else
-        pTarget->u_setrt(pTarget->rt_Generic_0_r, 0, 0, pTarget->rt_MSAADepth->pZRT);  // LDR RT
+        pTarget->u_setrt(pTarget->rt_Generic_0_r, 0, 0, pTarget->rt_MSAADepth->pZRT); // LDR RT
 
     RImplementation.rmNormal();
     // RImplementation.Target->phase_scene_begin();
@@ -432,13 +434,13 @@ void dx103DFluidManager::AdvectColorBFECC(float timestep, bool bTeperature)
     // pShaderResourceVariables[RENDER_TARGET_TEMPSCALAR]->SetResource( NULL );
     // pShaderResourceVariables[RENDER_TARGET_COLOR0]->SetResource( pRenderTargetShaderViews[RENDER_TARGET_TEMPVECTOR]
     // );
-    //	Overwrite RENDER_TARGET_COLOR0 with RENDER_TARGET_TEMPVECTOR
-    //	Find texture index and patch texture manually using DirecX call!
+    //  Overwrite RENDER_TARGET_COLOR0 with RENDER_TARGET_TEMPVECTOR
+    //  Find texture index and patch texture manually using DirecX call!
     static shared_str strColorName(m_pEngineTextureNames[RENDER_TARGET_COLOR_IN]);
     STextureList* _T = &*(AdvectElement->passes[0]->T);
     u32 dwTextureStage = _T->find_texture_stage(strColorName);
-    //	This will be overritten by the next technique.
-    //	Otherwise we had to reset current texture list manually.
+    //  This will be overritten by the next technique.
+    //  Otherwise we had to reset current texture list manually.
     pRTTextures[RENDER_TARGET_TEMPVECTOR]->bind(dwTextureStage);
 
     // TimeStepShaderVariable->SetFloat(timestep);
@@ -459,13 +461,13 @@ void dx103DFluidManager::AdvectColorBFECC(float timestep, bool bTeperature)
     //  (specifically, (3/2)\phi^n - (1/2)\bar{\phi})
     // if(ColorTextureNumber == 0)
     //{
-    //	pShaderResourceVariables[RENDER_TARGET_COLOR1]->SetResource( pRenderTargetShaderViews[RENDER_TARGET_COLOR1] );
-    //	SetRenderTarget( RENDER_TARGET_COLOR0 );
+    //  pShaderResourceVariables[RENDER_TARGET_COLOR1]->SetResource( pRenderTargetShaderViews[RENDER_TARGET_COLOR1] );
+    //  SetRenderTarget( RENDER_TARGET_COLOR0 );
     //}
     // else
     //{
-    //	pShaderResourceVariables[RENDER_TARGET_COLOR0]->SetResource( pRenderTargetShaderViews[RENDER_TARGET_COLOR0] );
-    //	SetRenderTarget( RENDER_TARGET_COLOR1 );
+    //  pShaderResourceVariables[RENDER_TARGET_COLOR0]->SetResource( pRenderTargetShaderViews[RENDER_TARGET_COLOR0] );
+    //  SetRenderTarget( RENDER_TARGET_COLOR1 );
     //}
     RCache.set_RT(pRenderTargetViews[RENDER_TARGET_COLOR]);
     if (bTeperature)
@@ -495,13 +497,13 @@ void dx103DFluidManager::AdvectColor(float timestep, bool bTeperature)
     PIX_EVENT(AdvectColor);
     // if(ColorTextureNumber == 0)
     //{
-    //	pShaderResourceVariables[RENDER_TARGET_COLOR1]->SetResource( pRenderTargetShaderViews[RENDER_TARGET_COLOR1] );
-    //	SetRenderTarget( RENDER_TARGET_COLOR0 );
+    //  pShaderResourceVariables[RENDER_TARGET_COLOR1]->SetResource( pRenderTargetShaderViews[RENDER_TARGET_COLOR1] );
+    //  SetRenderTarget( RENDER_TARGET_COLOR0 );
     //}
     // else
     //{
-    //	pShaderResourceVariables[RENDER_TARGET_COLOR0]->SetResource( pRenderTargetShaderViews[RENDER_TARGET_COLOR0] );
-    //	SetRenderTarget( RENDER_TARGET_COLOR1 );
+    //  pShaderResourceVariables[RENDER_TARGET_COLOR0]->SetResource( pRenderTargetShaderViews[RENDER_TARGET_COLOR0] );
+    //  SetRenderTarget( RENDER_TARGET_COLOR1 );
     //}
 
     RCache.set_RT(pRenderTargetViews[RENDER_TARGET_COLOR]);
@@ -626,8 +628,8 @@ void dx103DFluidManager::ComputePressure(float timestep)
     float color[4] = {0, 0, 0, 0};
     HW.pContext->ClearRenderTargetView(pRenderTargetViews[RENDER_TARGET_TEMPSCALAR], color);
 
-    // ID3DxxTexture3D	*pTemp = (ID3DxxTexture3D*) pRTTextures[RENDER_TARGET_TEMPSCALAR]->surface_get();
-    // ID3DxxTexture3D	*pPressure = (ID3DxxTexture3D*) pRTTextures[RENDER_TARGET_PRESSURE]->surface_get();
+    // ID3DxxTexture3D  *pTemp = (ID3DxxTexture3D*) pRTTextures[RENDER_TARGET_TEMPSCALAR]->surface_get();
+    // ID3DxxTexture3D  *pPressure = (ID3DxxTexture3D*) pRTTextures[RENDER_TARGET_PRESSURE]->surface_get();
 
     // unbind this variable from the other technique that may have used it
     // pShaderResourceVariables[RENDER_TARGET_TEMPSCALAR]->SetResource( NULL );
@@ -636,26 +638,26 @@ void dx103DFluidManager::ComputePressure(float timestep)
     ref_selement CurrentTechnique = m_SimulationTechnique[SS_Jacobi];
     RCache.set_Element(CurrentTechnique);
 
-    //	Find texture index and patch texture manually using DirecX call!
+    //  Find texture index and patch texture manually using DirecX call!
     static shared_str strPressureName(m_pEngineTextureNames[RENDER_TARGET_PRESSURE]);
     STextureList* _T = &*(CurrentTechnique->passes[0]->T);
     u32 dwTextureStage = _T->find_texture_stage(strPressureName);
     // VERIFY(dwTextureStage != 1);
     /*
-    u32					dwTextureStage	= 0;
-    STextureList*		_T = &*(CurrentTechnique->passes[0]->T);
+    u32                 dwTextureStage  = 0;
+    STextureList*       _T = &*(CurrentTechnique->passes[0]->T);
 
-    STextureList::iterator	_it		= _T->begin	();
-    STextureList::iterator	_end	= _T->end	();
+    STextureList::iterator  _it     = _T->begin ();
+    STextureList::iterator  _end    = _T->end   ();
     for (; _it!=_end; _it++)
     {
-        std::pair<u32,ref_texture>&		loader	=	*_it;
+        std::pair<u32,ref_texture>&     loader  =   *_it;
 
-        //	Shadowmap texture always uses 0 texture unit
+        //  Shadowmap texture always uses 0 texture unit
         if (loader.second->cName==strPressureName)
         {
-            //	Assign correct texture
-            dwTextureStage	= loader.first;
+            //  Assign correct texture
+            dwTextureStage  = loader.first;
             break;
         }
     }
@@ -710,26 +712,26 @@ void dx103DFluidManager::ProjectVelocity(float timestep)
 
 void dx103DFluidManager::RenderFluid(dx103DFluidData& FluidData)
 {
-    //	return;
+    //  return;
     PIX_EVENT(render_fluid);
 
-    //	Bind input texture
+    //  Bind input texture
     ID3DTexture3D* pT = FluidData.GetTexture(dx103DFluidData::VP_COLOR);
     pRTTextures[RENDER_TARGET_COLOR_IN]->surface_set(pT);
     _RELEASE(pT);
 
-    //	Do rendering
+    //  Do rendering
     m_pRenderer->Draw(FluidData);
 
-    //	Unbind input texture
+    //  Unbind input texture
     pRTTextures[RENDER_TARGET_COLOR_IN]->surface_set(0);
 
-    //	Restore render state
+    //  Restore render state
     CRenderTarget* pTarget = RImplementation.Target;
     if (!RImplementation.o.dx10_msaa)
-        pTarget->u_setrt(pTarget->rt_Generic_0, 0, 0, HW.pBaseZB);  // LDR RT
+        pTarget->u_setrt(pTarget->rt_Generic_0, 0, 0, HW.pBaseZB); // LDR RT
     else
-        pTarget->u_setrt(pTarget->rt_Generic_0_r, 0, 0, pTarget->rt_MSAADepth->pZRT);  // LDR RT
+        pTarget->u_setrt(pTarget->rt_Generic_0_r, 0, 0, pTarget->rt_MSAADepth->pZRT); // LDR RT
 
     RImplementation.rmNormal();
 }
@@ -737,7 +739,7 @@ void dx103DFluidManager::RenderFluid(dx103DFluidData& FluidData)
 void dx103DFluidManager::UpdateObstacles(const dx103DFluidData& FluidData, float timestep)
 {
     PIX_EVENT(Fluid_update_obstacles);
-    //	Reset data
+    //  Reset data
     float color[4] = {0, 0, 0, 0};
     HW.pContext->ClearRenderTargetView(pRenderTargetViews[RENDER_TARGET_OBSTACLES], color);
     HW.pContext->ClearRenderTargetView(pRenderTargetViews[RENDER_TARGET_OBSTVELOCITY], color);
@@ -747,15 +749,15 @@ void dx103DFluidManager::UpdateObstacles(const dx103DFluidData& FluidData, float
 
     m_pObstaclesHandler->ProcessObstacles(FluidData, timestep);
 
-    //	Just reset render targets:
-    //	later only rt 0 will be reassigned so rt1
-    //	would be bound all the time
-    //	Reset to avoid confusion.
+    //  Just reset render targets:
+    //  later only rt 0 will be reassigned so rt1
+    //  would be bound all the time
+    //  Reset to avoid confusion.
     RCache.set_RT(0, 0);
     RCache.set_RT(0, 1);
 }
 
-//	Allow real-time config reload
+//  Allow real-time config reload
 #ifdef DEBUG
 void dx103DFluidManager::RegisterFluidData(dx103DFluidData* pData, const xr_string& SectionName)
 {
@@ -765,10 +767,12 @@ void dx103DFluidManager::RegisterFluidData(dx103DFluidData* pData, const xr_stri
 
     for (i = 0; i < iDataNum; ++i)
     {
-        if (m_lstFluidData[i] == pData) break;
+        if (m_lstFluidData[i] == pData)
+            break;
     }
 
-    if (iDataNum == i) {
+    if (iDataNum == i)
+    {
         m_lstFluidData.push_back(pData);
         m_lstSectionNames.push_back(SectionName);
     }
@@ -786,10 +790,12 @@ void dx103DFluidManager::DeregisterFluidData(dx103DFluidData* pData)
 
     for (i = 0; i < iDataNum; ++i)
     {
-        if (m_lstFluidData[i] == pData) break;
+        if (m_lstFluidData[i] == pData)
+            break;
     }
 
-    if (i != iDataNum) {
+    if (i != iDataNum)
+    {
         xr_vector<xr_string>::iterator it1 = m_lstSectionNames.begin();
         xr_vector<dx103DFluidData*>::iterator it2 = m_lstFluidData.begin();
         // it1.advance(i);
@@ -813,4 +819,4 @@ void dx103DFluidManager::UpdateProfiles()
     }
 }
 
-#endif  //	DEBUG
+#endif //   DEBUG

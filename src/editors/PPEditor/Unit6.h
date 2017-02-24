@@ -20,8 +20,8 @@ using namespace std;
 //---------------------------------------------------------------------------
 class TForm6 : public TForm
 {
-    __published :  // IDE-managed Components
-                   TButton* Button1;
+    __published : // IDE-managed Components
+                  TButton* Button1;
     TButton* Button2;
     TColorDialog* ColorDialog;
     TOpenDialog* OpenDialog;
@@ -31,12 +31,12 @@ class TForm6 : public TForm
     TPanel* Panel3;
     void __fastcall Panel3Click(TObject* Sender);
 
-  private:  // User declarations
+private: // User declarations
     void RecalcSize();
     void ResetPositions();
     int m_iTag;
 
-  public:  // User declarations
+public: // User declarations
     void AddEntryTemplate(int iInsertAfter);
     TColor m_InitColor;
     vector<TForm7*> m_Entries;

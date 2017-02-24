@@ -18,7 +18,8 @@ void rtc9_initialize()
 {
     static bool initialized = false;
 
-    if (initialized) return;
+    if (initialized)
+        return;
 
     VERIFY(lzo_init() == LZO_E_OK);
 
@@ -26,7 +27,8 @@ void rtc9_initialize()
 
     FS.update_path(file_name, "$game_config$", "mp\\lzo-dict.bin");
 
-    if (FS.exist(file_name)) {
+    if (FS.exist(file_name))
+    {
         IReader* reader = FS.r_open(file_name);
 
         R_ASSERT(reader);
@@ -51,7 +53,8 @@ void rtc9_initialize()
 
 void rtc9_uninitialize()
 {
-    if (_LZO_Dictionary) {
+    if (_LZO_Dictionary)
+    {
         xr_free(_LZO_Dictionary);
 
         _LZO_Dictionary = NULL;
@@ -76,7 +79,8 @@ u32 rtc9_compress(void* dst, u32 dst_len, const void* src, u32 src_len)
 
     rtc9_initialize();
 
-    if (_LZO_Dictionary) {
+    if (_LZO_Dictionary)
+    {
         r = lzo1x_999_compress_dict((const lzo_byte*)src, (lzo_uint)src_len, (lzo_byte*)dst, (lzo_uintp)&out_size,
             rtc9_wrkmem, _LZO_Dictionary, _LZO_DictionarySize);
     }
@@ -100,7 +104,8 @@ u32 rtc9_decompress(void* dst, u32 dst_len, const void* src, u32 src_len)
 
     rtc9_initialize();
 
-    if (_LZO_Dictionary) {
+    if (_LZO_Dictionary)
+    {
         r = lzo1x_decompress_dict_safe((const lzo_byte*)src, (lzo_uint)src_len, (lzo_byte*)dst, (lzo_uintp)&out_size,
             NULL, _LZO_Dictionary, _LZO_DictionarySize);
     }

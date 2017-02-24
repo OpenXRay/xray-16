@@ -12,15 +12,9 @@
 #define CPlanner CActionPlannerAction<_object_type>
 
 TEMPLATE_SPECIALIZATION
-IC CPlanner::CActionPlannerAction(_object_type* object, LPCSTR action_name) : inherited_action(object, action_name)
-{
-}
-
+IC CPlanner::CActionPlannerAction(_object_type* object, LPCSTR action_name) : inherited_action(object, action_name) {}
 TEMPLATE_SPECIALIZATION
-CPlanner::~CActionPlannerAction()
-{
-}
-
+CPlanner::~CActionPlannerAction() {}
 TEMPLATE_SPECIALIZATION
 void CPlanner::setup(_object_type* object, CPropertyStorage* storage)
 {
@@ -30,11 +24,7 @@ void CPlanner::setup(_object_type* object, CPropertyStorage* storage)
 }
 
 TEMPLATE_SPECIALIZATION
-void CPlanner::initialize()
-{
-    inherited_action::initialize();
-}
-
+void CPlanner::initialize() { inherited_action::initialize(); }
 TEMPLATE_SPECIALIZATION
 void CPlanner::finalize()
 {
@@ -43,11 +33,7 @@ void CPlanner::finalize()
 }
 
 TEMPLATE_SPECIALIZATION
-bool CPlanner::completed() const
-{
-    return (inherited_action::completed());
-}
-
+bool CPlanner::completed() const { return (inherited_action::completed()); }
 #ifdef LOG_ACTION
 TEMPLATE_SPECIALIZATION
 IC void CPlanner::set_use_log(bool value)

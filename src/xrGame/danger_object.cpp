@@ -9,6 +9,4 @@
 #include "stdafx.h"
 #include "danger_object.h"
 
-CDangerObject::~CDangerObject()
-{
-}
+CDangerObject::~CDangerObject() {}

@@ -10,10 +10,7 @@
 BOOL death_anim_debug = FALSE;
 #endif
 
-rnd_motion::rnd_motion()
-{
-}
-
+rnd_motion::rnd_motion() {}
 rnd_motion* rnd_motion::setup(IKinematicsAnimated* k, LPCSTR s)
 {
     VERIFY(k);
@@ -33,7 +30,8 @@ rnd_motion* rnd_motion::setup(IKinematicsAnimated* k, LPCSTR s)
 
 MotionID rnd_motion::motion() const
 {
-    if (motions.empty()) return MotionID();
+    if (motions.empty())
+        return MotionID();
     return motions[::Random.randI(0, motions.size())];
 }
 
@@ -66,25 +64,30 @@ void type_motion::set_motion(IKinematicsAnimated* k, u16 id_motion, LPCSTR dir_a
 type_motion* type_motion::setup(IKinematicsAnimated* k, CInifile const* ini, LPCSTR section, LPCSTR type)
 {
     anims.resize(dirs_number, 0);
-    if (ini->line_exist(section, type)) {
+    if (ini->line_exist(section, type))
+    {
         LPCSTR line = ini->r_string(section, type);
-        if (!line) {
+        if (!line)
+        {
 #ifdef DEBUG
-            if (death_anim_debug) Msg("death anims: load: no setings in section %s for %s", section, type);
+            if (death_anim_debug)
+                Msg("death anims: load: no setings in section %s for %s", section, type);
 #endif
             return this;
         }
         R_ASSERT(xr_strlen(line) < 1023);
         const int num = _GetItemCount(line, '/');
 #ifdef DEBUG
-        if (death_anim_debug && num == 0) Msg("death anims: load: no setings in section %s for %s", section, type);
+        if (death_anim_debug && num == 0)
+            Msg("death anims: load: no setings in section %s for %s", section, type);
 #endif
         for (int i = 0; num > i; ++i)
         {
             string1024 sdir_anim;
             set_motion(k, u16(i), _GetItem(line, i, sdir_anim, '/'));
 #ifdef DEBUG
-            if (death_anim_debug) Msg("death anims: load: loaded %s from section %s for %s", sdir_anim, section, type);
+            if (death_anim_debug)
+                Msg("death anims: load: loaded %s from section %s for %s", sdir_anim, section, type);
 #endif
         }
     }
@@ -116,10 +119,7 @@ type_motion::~type_motion()
     VERIFY(anims.empty());
 }
 
-death_anims::death_anims()
-{
-}
-
+death_anims::death_anims() {}
 death_anims::~death_anims()
 {
     clear();
@@ -137,27 +137,32 @@ MotionID type_motion::motion(type_motion::edirection dr) const
     VERIFY(dr < not_definite);
     rnd_motion* rm = anims[dr];
     MotionID m;
-    if (rm) m = rm->motion();
+    if (rm)
+        m = rm->motion();
     return m;
 }
 
 MotionID death_anims::motion(CEntityAlive& ea, const SHit& H, float& angle) const
 {
     angle = 0;
-    if (anims.empty()) {
+    if (anims.empty())
+    {
 #ifdef DEBUG
-        if (death_anim_debug) Msg(" death anims: obj: %s no death motions loaded ", ea.cName().c_str());
+        if (death_anim_debug)
+            Msg(" death anims: obj: %s no death motions loaded ", ea.cName().c_str());
 #endif
         return rnd_anims.motion();
     }
 
     MotionID m;
-    xr_vector<type_motion*>::const_iterator i = anims.begin(), e = anims.end();
+    xr_vector<type_motion *>::const_iterator i = anims.begin(), e = anims.end();
     for (; e != i; ++i)
-        if ((*i)->predicate(ea, H, m, angle) && m.valid()) return m;
+        if ((*i)->predicate(ea, H, m, angle) && m.valid())
+            return m;
 
 #ifdef DEBUG
-    if (death_anim_debug) Msg(" death anims: obj: %s no conditions evaluated  returns random ", ea.cName().c_str());
+    if (death_anim_debug)
+        Msg(" death anims: obj: %s no conditions evaluated  returns random ", ea.cName().c_str());
 #endif
     angle = 0;
     return rnd_anims.motion();

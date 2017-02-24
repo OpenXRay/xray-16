@@ -20,10 +20,7 @@ CScriptWatchAction::CScriptWatchAction()
     m_bCompleted = true;
 }
 
-CScriptWatchAction::~CScriptWatchAction()
-{
-}
-
+CScriptWatchAction::~CScriptWatchAction() {}
 void CScriptWatchAction::SetWatchObject(CScriptGameObject* tpObjectToWatch)
 {
     m_tpObjectToWatch = tpObjectToWatch->operator IGameObject*();

@@ -16,4 +16,4 @@ public:
     virtual void OnRender(CStatGraph& owner) = 0;
 };
 
-#endif  //	StatGraphRender_included
+#endif //	StatGraphRender_included

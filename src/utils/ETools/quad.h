@@ -79,7 +79,7 @@ struct Quad3
     const float FindError(const Fvector3& vec)
     {
         return (A00 * vec.x * vec.x + A01 * vec.x * vec.y * 2 + A02 * vec.x * vec.z * 2 + A11 * vec.y * vec.y +
-                A12 * vec.y * vec.z * 2 + A22 * vec.z * vec.z + B0 * vec.x * 2 + B1 * vec.y * 2 + B2 * vec.z * 2 + C);
+            A12 * vec.y * vec.z * 2 + A22 * vec.z * vec.z + B0 * vec.x * 2 + B1 * vec.y * 2 + B2 * vec.z * 2 + C);
     }
 
     Quad3 operator+(const Quad3& q)
@@ -114,4 +114,4 @@ struct Quad3
     }
 };
 
-#endif  // quadH
+#endif // quadH

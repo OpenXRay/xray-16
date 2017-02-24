@@ -10,10 +10,8 @@ class net_global_data_impl<gl_implicit_cl_data>
     // ImplicitCalcGlobs *data;
 public:
     net_global_data_impl<gl_implicit_cl_data>() {}
-
     void init();
     void cleanup() { data_cleanup(); }
-
 protected:
     void create_data_file(LPCSTR path);
     bool create_data(LPCSTR path);

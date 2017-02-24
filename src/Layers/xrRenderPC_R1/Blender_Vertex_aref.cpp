@@ -21,10 +21,7 @@ CBlender_Vertex_aref::CBlender_Vertex_aref()
     oBlend.value = FALSE;
 }
 
-CBlender_Vertex_aref::~CBlender_Vertex_aref()
-{
-}
-
+CBlender_Vertex_aref::~CBlender_Vertex_aref() {}
 void CBlender_Vertex_aref::Save(IWriter& fs)
 {
     IBlender::Save(fs);
@@ -54,7 +51,8 @@ void CBlender_Vertex_aref::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
 
-    if (C.bEditor) {
+    if (C.bEditor)
+    {
         C.PassBegin();
         {
             C.PassSET_ZB(TRUE, TRUE);
@@ -83,7 +81,8 @@ void CBlender_Vertex_aref::Compile(CBlender_Compile& C)
             // Level view
             {
                 LPCSTR sname = "vert";
-                if (C.bDetail_Diffuse) sname = "vert_dt";
+                if (C.bDetail_Diffuse)
+                    sname = "vert_dt";
                 if (oBlend.value)
                     C.r_Pass(sname, sname, TRUE, TRUE, TRUE, TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE,
                         oAREF.value);

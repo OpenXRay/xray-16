@@ -32,7 +32,8 @@ BOOL CSleepEffectorPP::Process(SPPInfo& pp)
     float time_past_perc = (m_total - fLifeTime) / m_total;
     float factor;
 
-    if (time_past_perc < m_attack) {
+    if (time_past_perc < m_attack)
+    {
         factor = time_past_perc / m_attack;
         m_eSleepState = BEGIN_SLEEP;
     }
@@ -47,12 +48,13 @@ BOOL CSleepEffectorPP::Process(SPPInfo& pp)
         fLifeTime = m_attack * m_total;
         factor = 1.0f;
     }
-    else if (AWAKING == m_eSleepState)  //просыпаемся
+    else if (AWAKING == m_eSleepState) //просыпаемся
         factor = (1.0f - time_past_perc) / (1.0f - m_release);
 
     clamp(factor, 0.01f, 1.0f);
 
-    if (m_eSleepState == SLEEPING) return TRUE;
+    if (m_eSleepState == SLEEPING)
+        return TRUE;
 
     SPPInfo def;
 

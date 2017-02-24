@@ -39,7 +39,8 @@ bool MTexture::load(
 {
     MImage image;
     MStatus stat = image.readFromFile(filename);
-    if (!stat) {
+    if (!stat)
+    {
         MGlobal::displayWarning("In MTexture::load(), file not found: \"" + filename + "\".");
         return false;
     }
@@ -49,13 +50,14 @@ bool MTexture::load(
 
 bool MTexture::set(MImage& image, Type type, bool mipmapped /* = true */, GLenum target /* = GL_TEXTURE_2D) */)
 {
-    unsigned int i;  // used as a temporary index.
+    unsigned int i; // used as a temporary index.
 
     // Store the type of texture, and derive other parameters.
     // (Depth is assumed to be 4 bytes per pixel RGBA.
     // MImage always returns that pixel format anyway.)
     m_type = type;
-    if ((m_type == RGBA) || (m_type == NMAP)) {
+    if ((m_type == RGBA) || (m_type == NMAP))
+    {
         m_internalFormat = GL_RGBA8;
         m_format = GL_RGBA;
         m_componentFormat = GL_UNSIGNED_BYTE;
@@ -84,10 +86,13 @@ bool MTexture::set(MImage& image, Type type, bool mipmapped /* = true */, GLenum
     bool widthIsExponent = (m_width == (unsigned int)(1 << maxWidthLevels));
     bool heightIsExponent = (m_height == (unsigned int)(1 << maxHeightLevels));
 
-    if (!widthIsExponent || !heightIsExponent) {
+    if (!widthIsExponent || !heightIsExponent)
+    {
         // Calculate the new width/height.
-        if (!widthIsExponent) maxWidthLevels++;
-        if (!heightIsExponent) maxHeightLevels++;
+        if (!widthIsExponent)
+            maxWidthLevels++;
+        if (!heightIsExponent)
+            maxHeightLevels++;
 
         // Resize the image, without bothering to preserve the aspect ratio.
         m_width = 1 << maxWidthLevels;
@@ -96,10 +101,12 @@ bool MTexture::set(MImage& image, Type type, bool mipmapped /* = true */, GLenum
     }
 
     // Deallocate any existing levels
-    if (m_levels != NULL) {
+    if (m_levels != NULL)
+    {
         for (i = 0; i < m_numLevels; i++)
         {
-            if (m_levels[i]) {
+            if (m_levels[i])
+            {
                 xr_free(m_levels[i]);
                 m_levels[i] = NULL;
             }
@@ -168,7 +175,8 @@ bool MTexture::set(MImage& image, Type type, bool mipmapped /* = true */, GLenum
         }
     }
 
-    if (type == NMAP) {
+    if (type == NMAP)
+    {
         // Convert each level to the NORMAL map format
         //
         MNormalMapConverter mapConverter;
@@ -199,7 +207,8 @@ bool MTexture::specify(GLenum target /* = GL_TEXTURE_2D */)
         assert(glGetError() == GL_NO_ERROR);
     }
 
-    if (mipmapped()) {
+    if (mipmapped())
+    {
         // Mipmapping enabled
         m_texObj.parameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         assert(glGetError() == GL_NO_ERROR);

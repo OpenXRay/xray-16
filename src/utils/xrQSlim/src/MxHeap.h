@@ -1,4 +1,4 @@
-#ifndef MXHEAP_INCLUDED  // -*- C++ -*-
+#ifndef MXHEAP_INCLUDED // -*- C++ -*-
 #define MXHEAP_INCLUDED
 #if !defined(__GNUC__)
 #pragma once
@@ -33,7 +33,6 @@ public:
     inline void not_in_heap() { token = -47; }
     inline int get_heap_pos() { return token; }
     inline void set_heap_pos(int t) { token = t; }
-
     inline void heap_key(float k) { import = k; }
     inline float heap_key() const { return import; }
 };
@@ -47,14 +46,12 @@ private:
     unsigned int parent(unsigned int i) { return (i - 1) / 2; }
     unsigned int left(unsigned int i) { return 2 * i + 1; }
     unsigned int right(unsigned int i) { return 2 * i + 2; }
-
     void upheap(unsigned int i);
     void downheap(unsigned int i);
 
 public:
     MxHeap() : MxDynBlock<MxHeapable*>(8) {}
     MxHeap(unsigned int n) : MxDynBlock<MxHeapable*>(n) {}
-
     void insert(MxHeapable* t) { insert(t, t->heap_key()); }
     void insert(MxHeapable*, float);
     void update(MxHeapable* t) { update(t, t->heap_key()); }

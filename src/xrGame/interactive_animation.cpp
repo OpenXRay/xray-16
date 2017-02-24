@@ -13,28 +13,32 @@ interactive_animation::interactive_animation(CPhysicsShellHolder* O, CBlend* b)
 {
 }
 
-interactive_animation::~interactive_animation()
-{
-}
+interactive_animation::~interactive_animation() {}
 static float depth = 0;
 bool interactive_animation::collide()
 {
     depth = 0;
     physics_shell->CollideAll();
-    if (depth > 0.05) return true;
+    if (depth > 0.05)
+        return true;
     return false;
 }
 bool interactive_animation::update(const Fmatrix& xrorm)
 {
-    if (!blend) return false;
-    if (!inherited::update(xrorm)) return false;
+    if (!blend)
+        return false;
+    if (!inherited::update(xrorm))
+        return false;
 
-    if (blend->playing && collide()) {
-        if (blend->Callback) blend->Callback(blend);
+    if (blend->playing && collide())
+    {
+        if (blend->Callback)
+            blend->Callback(blend);
         blend->blendPower *= 0.5f;
         blend->playing = FALSE;
     }
-    if (!blend->playing) {
+    if (!blend->playing)
+    {
         blend = 0;
         return false;
     }
@@ -47,7 +51,8 @@ void interactive_animation::contact_callback(
     dxGeomUserData *gd1 = NULL, *gd2 = NULL;
     get_user_data(gd1, gd2, bo1, c.geom);
     VERIFY(gd1);
-    if (gd2 && gd2->ph_ref_object == gd1->ph_ref_object) return;
+    if (gd2 && gd2->ph_ref_object == gd1->ph_ref_object)
+        return;
     save_max(depth, c.geom.depth);
     // if(gd1&&gd2&&(CPhysicsShellHolder*)gd1->callback_data==gd2->ph_ref_object)
     //																			do_colide=false;

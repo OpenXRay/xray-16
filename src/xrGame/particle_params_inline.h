@@ -16,6 +16,4 @@ IC CParticleParams::CParticleParams(
     m_tParticleVelocity = tVelocity;
 }
 
-IC void CParticleParams::initialize()
-{
-}
+IC void CParticleParams::initialize() {}

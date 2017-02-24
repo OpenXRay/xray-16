@@ -15,7 +15,7 @@ struct DataVertex;
 typedef Tvertex<DataVertex> Vertex;
 
 typedef std::pair<Vertex*, Vertex*> PAIR_VV;
-typedef xr_map<Vertex*, Vertex*> map_v2v;  // vertex to vertex translation
+typedef xr_map<Vertex*, Vertex*> map_v2v; // vertex to vertex translation
 typedef map_v2v::iterator map_v2v_it;
 
 struct XRLC_LIGHT_API DataVertex : public base_Vertex
@@ -39,15 +39,14 @@ struct XRLC_LIGHT_API DataFace : public base_Face
 {
 public:
     // Vertex*					v[3];			// vertices
-    Fvector N;  // face normal
+    Fvector N; // face normal
 
-    svector<_TCF, 2> tc;  // TC
+    svector<_TCF, 2> tc; // TC
 
-    void* pDeflector;  // does the face has LM-UV map?
+    void* pDeflector; // does the face has LM-UV map?
     CLightmap* lmap_layer;
     u32 sm_group;
     virtual Fvector2* getTC0() { return tc[0].uv; }
-
     BOOL RenderEqualTo(Face* F);
 
     void AddChannel(Fvector2& p1, Fvector2& p2, Fvector2& p3);
@@ -70,7 +69,7 @@ class Edge;
 namespace detail
 {
 typedef xr_vector<Vertex>::iterator dummy_compiler_treatment;
-}  // namespace detail
+} // namespace detail
 
 #include "xrUVpoint.h"
 

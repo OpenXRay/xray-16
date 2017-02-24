@@ -3,9 +3,10 @@
 #include "Level.h"
 #include "xrserver.h"
 
-void CLevel::net_Save(LPCSTR name)  // Game Save
+void CLevel::net_Save(LPCSTR name) // Game Save
 {
-    if (0 == Server) {
+    if (0 == Server)
+    {
         Msg("KERNEL::Can't save game on pure client");
         return;
     }

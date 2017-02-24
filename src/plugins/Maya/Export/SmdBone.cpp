@@ -21,7 +21,4 @@ SmdBone::SmdBone()
     name = NULL;
 }
 
-SmdBone::~SmdBone()
-{
-    xr_free(name);
-}
+SmdBone::~SmdBone() { xr_free(name); }

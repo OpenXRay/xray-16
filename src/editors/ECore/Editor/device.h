@@ -39,13 +39,13 @@ class ECORE_API CEditorRenderDevice :
     void _Destroy(BOOL bKeepTextures);
     void Reset();
 
-  public:
+public:
     ref_shader m_WireShader;
     ref_shader m_SelectionShader;
 
     Fmaterial m_DefaultMat;
 
-  public:
+public:
     // u32 					dwWidth, dwHeight;
     u32 m_RenderWidth_2, m_RenderHeight_2;
     u32 m_RealWidth, m_RealHeight;
@@ -55,7 +55,7 @@ class ECORE_API CEditorRenderDevice :
     u32 dwFillMode;
     u32 dwShadeMode;
 
-  public:
+public:
     //   HWND 					m_hWnd;
     HWND m_hRenderWnd;
 
@@ -109,7 +109,7 @@ class ECORE_API CEditorRenderDevice :
     // CRegistrator <pureAppEnd>					seqAppEnd;
     // CRegistrator <pureAppActivate	>			seqAppActivate;
     // CRegistrator <pureAppDeactivate	>			seqAppDeactivate;
-  public:
+public:
     CEditorRenderDevice();
     virtual ~CEditorRenderDevice();
 
@@ -133,12 +133,10 @@ class ECORE_API CEditorRenderDevice :
     void Reset(IReader* F, BOOL bKeepTextures);
 
     IC CTimer* GetTimerGlobal() { return &TimerGlobal; }
-
     IC float GetRenderArea() { return m_RenderArea; }
     // Sprite rendering
     IC float _x2real(float x) { return (x + 1) * m_RenderWidth_2; }
     IC float _y2real(float y) { return (y + 1) * m_RenderHeight_2; }
-
     // draw
     void SetShader(ref_shader sh) { m_CurrentShader = sh; }
     void DP(D3DPRIMITIVETYPE pt, ref_geom geom, u32 startV, u32 pc);
@@ -163,7 +161,6 @@ class ECORE_API CEditorRenderDevice :
     }
     IC void SetMaterial(Fmaterial& mat) { CHK_DX(HW.pDevice->SetMaterial((D3DMATERIAL9*)&mat)); }
     IC void ResetMaterial() { CHK_DX(HW.pDevice->SetMaterial((D3DMATERIAL9*)&m_DefaultMat)); }
-
     // update
     void UpdateView();
     void FrameMove();
@@ -174,11 +171,10 @@ class ECORE_API CEditorRenderDevice :
     // Mode control
     IC u32 TimerAsync(void) { return TimerGlobal.GetElapsed_ms(); }
     IC u32 TimerAsync_MMT(void) { return TimerAsync() + Timer_MM_Delta; }
-
-  public:
+public:
     Shader_xrLC_LIB ShaderXRLC;
 
-  private:
+private:
     virtual CStatsPhysics* _BCL StatPhysics() { return Statistic; }
     virtual void _BCL AddSeqFrame(pureFrame* f, bool mt) { seqFrame.Add(f, REG_PRIORITY_LOW); }
     virtual void _BCL RemoveSeqFrame(pureFrame* f) { seqFrame.Remove(f); }
@@ -203,10 +199,12 @@ enum
 
 #define DEFAULT_CLEARCOLOR 0x00555555
 
-#define REQ_CREATE()                                                                                                   \
-    if (!EDevice.bReady) return;
-#define REQ_DESTROY()                                                                                                  \
-    if (EDevice.bReady) return;
+#define REQ_CREATE()     \
+    if (!EDevice.bReady) \
+        return;
+#define REQ_DESTROY()   \
+    if (EDevice.bReady) \
+        return;
 
 #include "Layers/xrRender/R_Backend_Runtime.h"
 

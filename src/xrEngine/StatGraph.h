@@ -83,7 +83,8 @@ public:
 
     IC void SetStyle(EStyle s, u32 SubGraphID = 0)
     {
-        if (SubGraphID >= subgraphs.size()) return;
+        if (SubGraphID >= subgraphs.size())
+            return;
         SubGraphVecIt it = subgraphs.begin() + SubGraphID;
         it->SetStyle(s);
     }
@@ -115,7 +116,8 @@ public:
     }
     IC void AppendItem(float d, u32 clr, u32 SubGraphID = 0)
     {
-        if (SubGraphID >= subgraphs.size()) return;
+        if (SubGraphID >= subgraphs.size())
+            return;
 
         clamp(d, mn, mx);
 
@@ -148,15 +150,16 @@ public:
 
     IC void UpdateMarkerPos(u32 ID, float NewPos)
     {
-        if (ID >= m_Markers.size()) return;
+        if (ID >= m_Markers.size())
+            return;
         SMarker& pMarker = m_Markers[ID];
         pMarker.m_fPos = NewPos;
     };
     IC void ClearMarkers() { m_Markers.clear(); }
-
     IC void RemoveMarker(u32 ID)
     {
-        if (ID >= m_Markers.size()) return;
+        if (ID >= m_Markers.size())
+            return;
         m_Markers.erase(m_Markers.begin() + ID);
     }
 };

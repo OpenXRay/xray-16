@@ -33,7 +33,8 @@ size_t xrMemory::mem_usage()
     size_t bytesUsed = 0;
     while ((status = _heapwalk(&hinfo)) == _HEAPOK)
     {
-        if (hinfo._useflag == _USEDENTRY) bytesUsed += hinfo._size;
+        if (hinfo._useflag == _USEDENTRY)
+            bytesUsed += hinfo._size;
     }
     switch (status)
     {

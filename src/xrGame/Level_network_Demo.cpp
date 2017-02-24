@@ -32,11 +32,13 @@ bool CLevel::PrepareToPlayDemo(shared_str const& file_name)
 {
     R_ASSERT(!m_DemoSave);
     m_reader = FS.rs_open("$logs$", file_name.c_str());
-    if (!m_reader) {
+    if (!m_reader)
+    {
         Msg("ERROR: failed to open file [%s] to play demo...", file_name.c_str());
         return false;
     }
-    if (!LoadDemoHeader()) {
+    if (!LoadDemoHeader())
+    {
         Msg("ERROR: bad demo file...");
         return false;
     }
@@ -46,7 +48,8 @@ bool CLevel::PrepareToPlayDemo(shared_str const& file_name)
 
 void CLevel::StopSaveDemo()
 {
-    if (m_writer) {
+    if (m_writer)
+    {
         FS.w_close(m_writer);
     }
 }
@@ -67,22 +70,25 @@ void CLevel::StartPlayDemo()
 // if using some filter ...
 #ifdef MP_LOGGING
     message_filter* tmp_msg_filter = GetMessageFilter();
-    if (tmp_msg_filter) {
+    if (tmp_msg_filter)
+    {
         string_path demo_msg_path;
         FS.update_path(demo_msg_path, "$logs$", "dbg_msg.log");
         tmp_msg_filter->dbg_set_message_log_file(demo_msg_path);
     }
-#endif  //#ifdef MP_LOGGING
+#endif //#ifdef MP_LOGGING
 }
 
 void CLevel::RestartPlayDemo()
 {
-    if (!IsDemoPlay() || (m_starting_spawns_pos == 0)) {
+    if (!IsDemoPlay() || (m_starting_spawns_pos == 0))
+    {
         Msg("! ERROR: no demo play started");
         return;
     }
-    if (IsDemoPlayStarted()) {
-        remove_objects();  // WARNING ! need to be in DemoPlayStarted mode .
+    if (IsDemoPlayStarted())
+    {
+        remove_objects(); // WARNING ! need to be in DemoPlayStarted mode .
 // After remove_objects() invokation there where left a serveral (20) UpdateCLs so:
 #ifdef DEBUG
         VERIFY(g_pGameLevel);
@@ -107,7 +113,8 @@ void CLevel::RestartPlayDemo()
 void CLevel::StopPlayDemo()
 {
     SetDemoPlaySpeed(1.0f);
-    if (m_reader) {
+    if (m_reader)
+    {
         // FS.r_close			(m_reader);
         // m_reader			= NULL;
         m_DemoPlayStarted = FALSE;
@@ -139,13 +146,15 @@ void CLevel::SaveDemoHeader(shared_str const& server_options)
 void CLevel::SaveDemoInfo()
 {
     game_cl_mp* tmp_game = smart_cast<game_cl_mp*>(&Game());
-    if (!tmp_game) return;
+    if (!tmp_game)
+        return;
 
     R_ASSERT(m_writer);
 
     u32 old_pos = m_writer->tell();
     m_writer->seek(m_demo_info_file_pos);
-    if (!m_demo_info) {
+    if (!m_demo_info)
+    {
         m_demo_info = new demo_info();
     }
     m_demo_info->load_from_game();
@@ -178,7 +187,8 @@ bool CLevel::LoadDemoHeader()
 
 bool CLevel::LoadPacket(NET_Packet& dest_packet, u32 global_time_delta)
 {
-    if (!m_reader || m_reader->eof()) return false;
+    if (!m_reader || m_reader->eof())
+        return false;
 
     m_prev_packet_pos = m_reader->tell();
     DemoPacket tmp_hdr;
@@ -186,16 +196,17 @@ bool CLevel::LoadPacket(NET_Packet& dest_packet, u32 global_time_delta)
     m_reader->r(&tmp_hdr, sizeof(DemoPacket));
     m_prev_packet_dtime = tmp_hdr.m_time_global_delta;
 
-    if (map_data.m_sended_map_name_request ?  /// ???
+    if (map_data.m_sended_map_name_request ? /// ???
             (tmp_hdr.m_time_global_delta <= global_time_delta) :
             (tmp_hdr.m_time_global_delta < global_time_delta))
     {
         R_ASSERT2(tmp_hdr.m_packet_size < NET_PacketSizeLimit, "bad demo packet");
         m_reader->r(dest_packet.B.data, tmp_hdr.m_packet_size);
         dest_packet.B.count = tmp_hdr.m_packet_size;
-        dest_packet.timeReceive = tmp_hdr.m_timeReceive;  // not used ..
+        dest_packet.timeReceive = tmp_hdr.m_timeReceive; // not used ..
         dest_packet.r_pos = 0;
-        if (m_reader->elapsed() <= sizeof(DemoPacket)) {
+        if (m_reader->elapsed() <= sizeof(DemoPacket))
+        {
             StopPlayDemo();
         }
         return true;
@@ -209,7 +220,8 @@ void CLevel::SimulateServerUpdate()
     NET_Packet tmp_packet;
     while (LoadPacket(tmp_packet, tdelta))
     {
-        if (m_msg_filter) m_msg_filter->check_new_data(tmp_packet);
+        if (m_msg_filter)
+            m_msg_filter->check_new_data(tmp_packet);
         IPureClient::OnMessage(tmp_packet.B.data, tmp_packet.B.count);
     }
 }
@@ -227,9 +239,8 @@ void CLevel::SpawnDemoSpectator()
     // mp_cl_game->local_player		= mp_cl_game->createPlayerState();
     // xr_strcpy						(mp_cl_game->local_player->name, "demo_spectator");
     specentity->set_name_replace(mp_cl_game->local_player->getName());
-    specentity->s_flags.assign(
-        M_SPAWN_OBJECT_LOCAL | M_SPAWN_OBJECT_ASPLAYER |
-        M_SPAWN_OBJECT_PHANTOM);  // M_SPAWN_OBJECT_PHANTOM is ONLY to indicate thath this is a fake spectator
+    specentity->s_flags.assign(M_SPAWN_OBJECT_LOCAL | M_SPAWN_OBJECT_ASPLAYER |
+        M_SPAWN_OBJECT_PHANTOM); // M_SPAWN_OBJECT_PHANTOM is ONLY to indicate thath this is a fake spectator
     tmp_sv_game->assign_RP(specentity, Level().game->local_player);
 
     g_sv_Spawn(specentity);
@@ -247,20 +258,23 @@ float CLevel::GetDemoPlayPos() const
 {
     // if (!m_reader)
     //	return 1.f;
-    if (m_reader->eof()) return 1.f;
+    if (m_reader->eof())
+        return 1.f;
 
     return (float(m_reader->tell()) / float(m_reader->length()));
 }
 
 message_filter* CLevel::GetMessageFilter()
 {
-    if (m_msg_filter) return m_msg_filter;
+    if (m_msg_filter)
+        return m_msg_filter;
     m_msg_filter = new message_filter();
     return m_msg_filter;
 }
 demoplay_control* CLevel::GetDemoPlayControl()
 {
-    if (m_demoplay_control) return m_demoplay_control;
+    if (m_demoplay_control)
+        return m_demoplay_control;
     m_demoplay_control = new demoplay_control();
     return m_demoplay_control;
 }
@@ -307,18 +321,17 @@ void CLevel::SetDemoPlayPos(float const pos)
     m_reader->seek		(old_file_pos);
 }*/
 
-float CLevel::GetDemoPlaySpeed() const
-{
-    return Device.time_factor();
-}
+float CLevel::GetDemoPlaySpeed() const { return Device.time_factor(); }
 #define MAX_PLAY_SPEED 8.f
 void CLevel::SetDemoPlaySpeed(float const time_factor)
 {
-    if (!IsDemoPlayStarted()) {
+    if (!IsDemoPlayStarted())
+    {
         Msg("! ERROR: demo play not started");
         return;
     }
-    if (time_factor > MAX_PLAY_SPEED) {
+    if (time_factor > MAX_PLAY_SPEED)
+    {
         Msg("! Sorry, maximum play speed is: %1.1f", MAX_PLAY_SPEED);
         return;
     }
@@ -346,7 +359,4 @@ void __stdcall CLevel::MSpawnsCatchCallback(u32 message, u32 subtype, NET_Packet
     tmp_msg_filter->remove_filter(M_SPAWN, fake_sub_msg);
 }
 
-IGameObject* CLevel::GetDemoSpectator()
-{
-    return smart_cast<CGameObject*>(m_current_spectator);
-};
+IGameObject* CLevel::GetDemoSpectator() { return smart_cast<CGameObject*>(m_current_spectator); };

@@ -14,19 +14,13 @@ CUICheckButton::CUICheckButton()
     m_pDependControl = NULL;
 }
 
-CUICheckButton::~CUICheckButton()
-{
-}
-
-void CUICheckButton::SetDependControl(CUIWindow* pWnd)
-{
-    m_pDependControl = pWnd;
-}
-
+CUICheckButton::~CUICheckButton() {}
+void CUICheckButton::SetDependControl(CUIWindow* pWnd) { m_pDependControl = pWnd; }
 void CUICheckButton::Update()
 {
     CUI3tButton::Update();
-    if (m_pDependControl) m_pDependControl->Enable(GetCheck());
+    if (m_pDependControl)
+        m_pDependControl->Enable(GetCheck());
 }
 
 void CUICheckButton::SetCurrentOptValue()
@@ -47,11 +41,7 @@ void CUICheckButton::SaveBackUpOptValue()
     m_opt_backup_value = GetCheck();
 }
 
-bool CUICheckButton::IsChangedOptValue() const
-{
-    return m_opt_backup_value != GetCheck();
-}
-
+bool CUICheckButton::IsChangedOptValue() const { return m_opt_backup_value != GetCheck(); }
 void CUICheckButton::UndoOptValue()
 {
     SetCheck(m_opt_backup_value);
@@ -69,31 +59,25 @@ void CUICheckButton::InitCheckButton(Fvector2 pos, Fvector2 size, LPCSTR texture
 
 void CUICheckButton::InitTexture2(LPCSTR texture_name)
 {
-    CUI3tButton::InitTexture(texture_name);  // "ui_checker"
+    CUI3tButton::InitTexture(texture_name); // "ui_checker"
     Frect r = m_background->Get(S_Enabled)->GetStaticItem()->GetTextureRect();
     TextItemControl()->m_TextOffset.x = TextItemControl()->m_TextOffset.x + r.width();
 }
 
 void CUICheckButton::OnFocusLost()
 {
-    if (m_eButtonState == BUTTON_PUSHED && pInput->iGetAsyncBtnState(0)) return;
+    if (m_eButtonState == BUTTON_PUSHED && pInput->iGetAsyncBtnState(0))
+        return;
 
     inherited::OnFocusLost();
 }
 
-void CUICheckButton::OnFocusReceive()
-{
-    inherited::OnFocusReceive();
-}
-
-void CUICheckButton::Show(bool status)
-{
-    inherited::Show(status);
-}
-
+void CUICheckButton::OnFocusReceive() { inherited::OnFocusReceive(); }
+void CUICheckButton::Show(bool status) { inherited::Show(status); }
 bool CUICheckButton::OnMouseDown(int mouse_btn)
 {
-    if (mouse_btn == MOUSE_1) {
+    if (mouse_btn == MOUSE_1)
+    {
         if (GetButtonState() == BUTTON_NORMAL)
             SetButtonState(BUTTON_PUSHED);
         else

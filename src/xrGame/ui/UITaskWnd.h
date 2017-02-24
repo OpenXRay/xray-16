@@ -131,7 +131,6 @@ public:
     void Init(CUIXml& uiXml, LPCSTR path);
     void InitTask(CGameTask* task);
     CGameTask* OwnerTask() { return m_owner; }
-
 public:
     bool show_hint_can;
     bool show_hint;

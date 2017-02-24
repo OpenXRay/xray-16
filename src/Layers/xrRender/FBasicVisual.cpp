@@ -7,7 +7,7 @@
 
 #ifndef _EDITOR
 #include "xrEngine/Render.h"
-#endif  // #ifndef _EDITOR
+#endif // #ifndef _EDITOR
 
 #include "FBasicVisual.h"
 #include "xrCore/FMesh.hpp"
@@ -29,14 +29,8 @@ dxRender_Visual::dxRender_Visual()
     vis.clear();
 }
 
-dxRender_Visual::~dxRender_Visual()
-{
-}
-
-void dxRender_Visual::Release()
-{
-}
-
+dxRender_Visual::~dxRender_Visual() {}
+void dxRender_Visual::Release() {}
 // CStatTimer						tscreate;
 
 void dxRender_Visual::Load(const char* N, IReader* data, u32)
@@ -48,11 +42,13 @@ void dxRender_Visual::Load(const char* N, IReader* data, u32)
     // header
     VERIFY(data);
     ogf_header hdr;
-    if (data->r_chunk_safe(OGF_HEADER, &hdr, sizeof(hdr))) {
+    if (data->r_chunk_safe(OGF_HEADER, &hdr, sizeof(hdr)))
+    {
         R_ASSERT2(hdr.format_version == xrOGF_FormatVersion, "Invalid visual version");
         Type = hdr.type;
         // if (hdr.shader_id)	shader	= GlobalEnv.Render->getShader	(hdr.shader_id);
-        if (hdr.shader_id) shader = ::RImplementation.getShader(hdr.shader_id);
+        if (hdr.shader_id)
+            shader = ::RImplementation.getShader(hdr.shader_id);
         vis.box.set(hdr.bb.min, hdr.bb.max);
         vis.sphere.set(hdr.bs.c, hdr.bs.r);
     }
@@ -62,7 +58,8 @@ void dxRender_Visual::Load(const char* N, IReader* data, u32)
     }
 
     // Shader
-    if (data->find_chunk(OGF_TEXTURE)) {
+    if (data->find_chunk(OGF_TEXTURE))
+    {
         string256 fnT, fnS;
         data->r_stringZ(fnT, sizeof(fnT));
         data->r_stringZ(fnS, sizeof(fnS));
@@ -71,7 +68,8 @@ void dxRender_Visual::Load(const char* N, IReader* data, u32)
 
 // desc
 #ifdef _EDITOR
-    if (data->find_chunk(OGF_S_DESC)) desc.Load(*data);
+    if (data->find_chunk(OGF_S_DESC))
+        desc.Load(*data);
 #endif
 }
 

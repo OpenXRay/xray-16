@@ -9,7 +9,8 @@ CUICellItem* create_cell_item(CInventoryItem* itm)
 
     CWeaponAmmo* pAmmo = smart_cast<CWeaponAmmo*>(itm);
     CWeapon* pWeapon = smart_cast<CWeapon*>(itm);
-    if (pAmmo) {
+    if (pAmmo)
+    {
         cell_item = new CUIAmmoCellItem(pAmmo);
     }
     else if (pWeapon)

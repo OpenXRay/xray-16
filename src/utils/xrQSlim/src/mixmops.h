@@ -1,6 +1,6 @@
-#ifndef MIXMOPS_INCLUDED  // -*- C++ -*-
-#define MIXMOPS_INCLUDED  //
-#endif                    // WARNING:  Multiple inclusions allowed
+#ifndef MIXMOPS_INCLUDED // -*- C++ -*-
+#define MIXMOPS_INCLUDED //
+#endif // WARNING:  Multiple inclusions allowed
 
 /************************************************************************
 
@@ -27,67 +27,59 @@
 
 #define forall(i, N) for (unsigned int i = 0; i < (unsigned int)N * N; i++)
 
-#define def3(name, op)                                                                                                 \
-    inline __T* name(__T* r, const __T* a, const __T* b, __DIM)                                                        \
-    {                                                                                                                  \
-        forall(i, N) op;                                                                                               \
-        return r;                                                                                                      \
+#define def3(name, op)\
+    inline __T* name(__T* r, const __T* a, const __T* b, __DIM)\
+    {\
+        forall(i, N) op;\
+        return r;\
     }
 
-#define def2(name, op)                                                                                                 \
-    inline __T* name(__T* r, const __T* a, __DIM)                                                                      \
-    {                                                                                                                  \
-        forall(i, N) op;                                                                                               \
-        return r;                                                                                                      \
+#define def2(name, op)\
+    inline __T* name(__T* r, const __T* a, __DIM)\
+    {\
+        forall(i, N) op;\
+        return r;\
     }
 
-#define def1(name, op)                                                                                                 \
-    inline __T* name(__T* r, __DIM)                                                                                    \
-    {                                                                                                                  \
-        forall(i, N) op;                                                                                               \
-        return r;                                                                                                      \
+#define def1(name, op)\
+    inline __T* name(__T* r, __DIM)\
+    {\
+        forall(i, N) op;\
+        return r;\
     }
 
-#define def2s(name, op)                                                                                                \
-    inline __T* name(__T* r, const __T* a, __T d, __DIM)                                                               \
-    {                                                                                                                  \
-        forall(i, N) op;                                                                                               \
-        return r;                                                                                                      \
+#define def2s(name, op)\
+    inline __T* name(__T* r, const __T* a, __T d, __DIM)\
+    {\
+        forall(i, N) op;\
+        return r;\
     }
 
-#define def1s(name, op)                                                                                                \
-    inline __T* name(__T* r, __T d, __DIM)                                                                             \
-    {                                                                                                                  \
-        forall(i, N) op;                                                                                               \
-        return r;                                                                                                      \
+#define def1s(name, op)\
+    inline __T* name(__T* r, __T d, __DIM)\
+    {\
+        forall(i, N) op;\
+        return r;\
     }
 
-def3(mxm_add, r[i] = a[i] + b[i]) def3(mxm_sub, r[i] = a[i] - b[i])
+def3(mxm_add, r[i] = a[i] + b[i])
+def3(mxm_sub, r[i] = a[i] - b[i])
+def2(mxm_addinto, r[i] += a[i])
+def2(mxm_subfrom, r[i] -= a[i])
+def2(mxm_set, r[i] = a[i])
+def1(mxm_neg, r[i] = -r[i])
+def2(mxm_neg, r[i] = -a[i])
+def1s(mxm_set, r[i] = d)
+def1s(mxm_scale, r[i] *= d)
+def1s(mxm_invscale, r[i] /= d)
+def2s(mxm_scale, r[i] = a[i] * d)
+def2s(mxm_invscale, r[i] = a[i] / d)
 
-    def2(mxm_addinto, r[i] += a[i]) def2(mxm_subfrom, r[i] -= a[i])
-
-        def2(mxm_set, r[i] = a[i]) def1(mxm_neg, r[i] = -r[i]) def2(mxm_neg, r[i] = -a[i])
-
-            def1s(mxm_set, r[i] = d) def1s(mxm_scale, r[i] *= d) def1s(mxm_invscale, r[i] /= d)
-                def2s(mxm_scale, r[i] = a[i] * d) def2s(mxm_invscale, r[i] = a[i] / d)
-
-                    inline __T& mxm_ref(__T* A, unsigned int i, unsigned int j, __DIM)
-{
-    return A[i * N + j];
-}
-inline __T mxm_ref(const __T* A, unsigned int i, unsigned int j, __DIM)
-{
-    return A[i * N + j];
-}
-inline __T* mxm_row(__T* A, unsigned int i, __DIM)
-{
-    return A + i * N;
-}
-inline const __T* mxm_row(const __T* A, unsigned int i, __DIM)
-{
-    return A + i * N;
-}
-
+inline __T& mxm_ref(__T* A, unsigned int i, unsigned int j, __DIM)
+{ return A[i * N + j]; }
+inline __T mxm_ref(const __T* A, unsigned int i, unsigned int j, __DIM) { return A[i * N + j]; }
+inline __T* mxm_row(__T* A, unsigned int i, __DIM) { return A + i * N; }
+inline const __T* mxm_row(const __T* A, unsigned int i, __DIM) { return A + i * N; }
 inline __T* mxm_identity(__T* A, __DIM)
 {
     mxm_set(A, 0.0, N);

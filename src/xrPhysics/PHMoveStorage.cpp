@@ -8,9 +8,9 @@
 
 struct dxGeomTransform : public dxGeom
 {
-    dxGeom* obj;   // object that is being transformed
-    int cleanup;   // 1 to destroy obj when destroyed
-    int infomode;  // 1 to put Tx geom in dContactGeom g1
+    dxGeom* obj; // object that is being transformed
+    int cleanup; // 1 to destroy obj when destroyed
+    int infomode; // 1 to put Tx geom in dContactGeom g1
 
     // cached final object transform (body tx + relative tx). this is set by
     // computeAABB(), and it is valid while the AABB is valid.
@@ -29,7 +29,8 @@ struct dxGeomTransform : public dxGeom
 void CPHPositionsPairs::Positions(const Fvector*& p0, const Fvector*& p1)
 {
     CODEGeom* g = *geom;
-    if (g->is_transformed_bt()) {
+    if (g->is_transformed_bt())
+    {
         g->geometry_transform()->recomputeAABB();
         p0 = (const Fvector*)dGeomGetUserData(g->geom())->last_pos;
         p1 = (const Fvector*)((dxGeomTransform*)g->geometry_transform())->final_pos;

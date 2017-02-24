@@ -31,7 +31,7 @@ namespace Wml
 template <class Real>
 class GMatrix
 {
-  public:
+public:
     // construction and destruction
     GMatrix(int iRows = 0, int iCols = 0);
     GMatrix(int iRows, int iCols, const Real* afData);
@@ -86,15 +86,15 @@ class GMatrix
     GMatrix& operator/=(Real fScalar);
 
     // matrix products
-    GMatrix Transpose() const;                         // M^T
-    GMatrix TransposeTimes(const GMatrix& rkM) const;  // this^T * M
-    GMatrix TimesTranspose(const GMatrix& rkM) const;  // this * M^T
+    GMatrix Transpose() const; // M^T
+    GMatrix TransposeTimes(const GMatrix& rkM) const; // this^T * M
+    GMatrix TimesTranspose(const GMatrix& rkM) const; // this * M^T
 
     // matrix-vector operations
-    GVector<Real> operator*(const GVector<Real>& rkV) const;               // M * v
-    Real QForm(const GVector<Real>& rkU, const GVector<Real>& rkV) const;  // u^T*M*v
+    GVector<Real> operator*(const GVector<Real>& rkV) const; // M * v
+    Real QForm(const GVector<Real>& rkU, const GVector<Real>& rkV) const; // u^T*M*v
 
-  protected:
+protected:
     // Support for allocation and deallocation.  The allocation call requires
     // m_iRows, m_iCols, and m_iQuantity to have already been correctly
     // initialized.

@@ -15,7 +15,7 @@
 // tir2.xrdemo      -> 45.2
 // tir2.xrdemo      -> 61.8
 
-const float P_distance = 50;  // switch distance between LOW-q light and HIGH-q light
+const float P_distance = 50; // switch distance between LOW-q light and HIGH-q light
 const float P_cam_dist = 200;
 const float P_cam_range = 7.f;
 const D3DFORMAT P_rtf = D3DFMT_A8R8G8B8;
@@ -24,11 +24,7 @@ const int time_min = 30 * 1000;
 const int time_max = 90 * 1000;
 const float P_ideal_size = 1.f;
 
-float clipD(float R)
-{
-    return P_distance * (R / P_ideal_size);
-}
-
+float clipD(float R) { return P_distance * (R / P_ideal_size); }
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -80,21 +76,25 @@ void CLightProjector::set_object(IRenderable* O)
         else
             current = 0;
 
-        if (current) {
+        if (current)
+        {
             ISpatial* spatial = dynamic_cast<ISpatial*>(O);
             if (0 == spatial)
                 current = 0;
             else
             {
                 spatial->spatial_updatesector();
-                if (0 == spatial->GetSpatialData().sector) {
+                if (0 == spatial->GetSpatialData().sector)
+                {
                     IGameObject* obj = dynamic_cast<IGameObject*>(O);
-                    if (obj) Msg("! Invalid object '%s' position. Outside of sector structure.", obj->cName().c_str());
+                    if (obj)
+                        Msg("! Invalid object '%s' position. Outside of sector structure.", obj->cName().c_str());
                     current = 0;
                 }
             }
         }
-        if (current) {
+        if (current)
+        {
             CROS_impl* LT = (CROS_impl*)current->renderable_ROS();
             LT->shadow_recv_frame = Device.dwFrame;
             receivers.push_back(current);
@@ -105,8 +105,9 @@ void CLightProjector::set_object(IRenderable* O)
 //
 void CLightProjector::setup(int id)
 {
-    if (id >= int(cache.size()) || id < 0) {
-        // Log      ("! CLightProjector::setup - ID out of range");
+    if (id >= int(cache.size()) || id < 0)
+    {
+        //Log("! CLightProjector::setup - ID out of range");
         return;
     }
     recv& R = cache[id];
@@ -126,20 +127,17 @@ void CLightProjector::invalidate()
         cache[c_it].dwTimeValid = 0;
 }
 
-void CLightProjector::OnAppActivate()
-{
-    invalidate();
-}
-
+void CLightProjector::OnAppActivate() { invalidate(); }
 //
 #include "Layers/xrRender/SkeletonCustom.h"
 void CLightProjector::calculate()
 {
 #ifdef _GPA_ENABLED
     TAL_SCOPED_TASK_NAMED("CLightProjector::calculate()");
-#endif  // _GPA_ENABLED
+#endif // _GPA_ENABLED
 
-    if (receivers.empty()) return;
+    if (receivers.empty())
+        return;
 
     // perform validate / markup
     for (u32 r_it = 0; r_it < receivers.size(); r_it++)
@@ -150,24 +148,27 @@ void CLightProjector::calculate()
         CROS_impl* LT = (CROS_impl*)O->renderable_ROS();
         int slot = LT->shadow_recv_slot;
         if (slot < 0 || slot >= P_o_count)
-            bValid = FALSE;  // invalid slot
+            bValid = FALSE; // invalid slot
         else if (cache[slot].O != O)
-            bValid = FALSE;  // not the same object
+            bValid = FALSE; // not the same object
         else
         {
             // seems to be valid
             Fbox bb;
             bb.xform(O->GetRenderData().visual->getVisData().box, O->GetRenderData().xform);
-            if (cache[slot].BB.contains(bb)) {
+            if (cache[slot].BB.contains(bb))
+            {
                 // inside, but maybe timelimit exceeded?
-                if (Device.dwTimeGlobal > cache[slot].dwTimeValid) bValid = FALSE;  // timeout
+                if (Device.dwTimeGlobal > cache[slot].dwTimeValid)
+                    bValid = FALSE; // timeout
             }
             else
-                bValid = FALSE;  // out of bounds
+                bValid = FALSE; // out of bounds
         }
 
         //
-        if (bValid) {
+        if (bValid)
+        {
             // Ok, use cached version
             cache[slot].dwFrame = Device.dwFrame;
         }
@@ -176,7 +177,8 @@ void CLightProjector::calculate()
             taskid.push_back(r_it);
         }
     }
-    if (taskid.empty()) return;
+    if (taskid.empty())
+        return;
 
     // Begin
     RCache.set_RT(RT->pRT);
@@ -187,8 +189,10 @@ void CLightProjector::calculate()
     // reallocate/reassociate structures + perform all the work
     for (u32 c_it = 0; c_it < cache.size(); c_it++)
     {
-        if (taskid.empty()) break;
-        if (Device.dwFrame == cache[c_it].dwFrame) continue;
+        if (taskid.empty())
+            break;
+        if (Device.dwFrame == cache[c_it].dwFrame)
+            continue;
 
         // found not used slot
         int tid = taskid.back();
@@ -204,7 +208,7 @@ void CLightProjector::calculate()
         O->GetRenderData().xform.transform_tiny(C, vis.sphere.P);
         R.O = O;
         R.C = C;
-        R.C.y += vis.sphere.R * 0.1f;  //. YURA: 0.1 can be more
+        R.C.y += vis.sphere.R * 0.1f; //. YURA: 0.1 can be more
         R.BB.xform(vis.box, O->GetRenderData().xform).scale(0.1f);
         R.dwTimeValid = Device.dwTimeGlobal + ::Random.randI(time_min, time_max);
         LT->shadow_recv_slot = c_it;
@@ -236,7 +240,8 @@ void CLightProjector::calculate()
         v.sub(v_Cs, v_C);
         ;
 #ifdef DEBUG
-        if ((v.x * v.x + v.y * v.y + v.z * v.z) <= flt_zero) {
+        if ((v.x * v.x + v.y * v.y + v.z * v.z) <= flt_zero)
+        {
             IGameObject* OO = dynamic_cast<IGameObject*>(R.O);
             Msg("Object[%s] Visual[%s] has invalid position. ", *OO->cName(), *OO->cNameVisual());
             Fvector cc;
@@ -266,7 +271,8 @@ void CLightProjector::calculate()
         }
 #endif
         // handle invalid object-bug
-        if ((v.x * v.x + v.y * v.y + v.z * v.z) <= flt_zero) {
+        if ((v.x * v.x + v.y * v.y + v.z * v.z) <= flt_zero)
+        {
             // invalidate record, so that object will be unshadowed, but doesn't crash
             R.dwTimeValid = Device.dwTimeGlobal;
             LT->shadow_recv_frame = Device.dwFrame - 1;
@@ -310,10 +316,11 @@ void CLightProjector::calculate()
         min.set(R.C.x - p_R, R.C.y - (p_R + P_cam_range), R.C.z - p_R);
         max.set(R.C.x + p_R, R.C.y + 0, R.C.z + p_R);
         BB.set(min, max);
-        R.UVclamp_min.set(min).add(.05f);  // shrink a little
-        R.UVclamp_max.set(max).sub(.05f);  // shrink a little
+        R.UVclamp_min.set(min).add(.05f); // shrink a little
+        R.UVclamp_max.set(max).sub(.05f); // shrink a little
         ISpatial* spatial = dynamic_cast<ISpatial*>(O);
-        if (spatial) {
+        if (spatial)
+        {
             spatial->spatial_updatesector();
             if (spatial->GetSpatialData().sector)
                 RImplementation.r_dsgraph_render_R1_box(spatial->GetSpatialData().sector, BB, SE_R1_LMODELS);

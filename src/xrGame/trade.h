@@ -9,7 +9,7 @@ class CTrade
 {
     xr_vector<IGameObject*> m_nearest;
 
-    bool TradeState;  // режим торговли. true - включен
+    bool TradeState; // режим торговли. true - включен
     u32 m_dwLastTradeTime;
 
     typedef enum tagTraderType {
@@ -51,7 +51,6 @@ public:
     void StartTrade();
     void StopTrade();
     bool IsInTradeState() { return TradeState; }
-
     void OnPerformTrade(u32 money_get, u32 money_put);
 
     void TransferItem(CInventoryItem* pItem, bool bBuying);

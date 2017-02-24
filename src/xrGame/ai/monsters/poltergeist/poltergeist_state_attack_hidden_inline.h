@@ -3,7 +3,7 @@
 #include "sound_player.h"
 #include "xrCore/_vector3d_ext.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -42,9 +42,11 @@ void CStatePoltergeistAttackHiddenAbstract::select_target_for_move()
 
     Fvector const self2front = front_point - self_pos;
 
-    if (current_time() > m_fly_side_select_tick) {
+    if (current_time() > m_fly_side_select_tick)
+    {
         bool left_side = self2enemy.x * self2front.z - self2enemy.z * self2front.x > 0.f;
-        if (!(rand() % 2)) {
+        if (!(rand() % 2))
+        {
             left_side ^= true;
         }
 
@@ -63,12 +65,14 @@ void CStatePoltergeistAttackHiddenAbstract::select_target_for_move()
 
         Fvector const scan_point = enemy_pos + rotate_point(enemy2self, angle);
 
-        if (ai().level_graph().valid_vertex_position(scan_point)) {
+        if (ai().level_graph().valid_vertex_position(scan_point))
+        {
             m_target = scan_point;
             m_target_vertex = ai().level_graph().vertex_id(m_target);
 
             m_fly_radius_factor += 0.1f;
-            if (m_fly_radius_factor > 1.f) {
+            if (m_fly_radius_factor > 1.f)
+            {
                 m_fly_radius_factor = 1.f;
             }
 
@@ -77,7 +81,8 @@ void CStatePoltergeistAttackHiddenAbstract::select_target_for_move()
     }
 
     m_fly_radius_factor -= 0.1f;
-    if (m_fly_radius_factor < 0.1f) {
+    if (m_fly_radius_factor < 0.1f)
+    {
         m_fly_radius_factor = 0.1f;
     }
 
@@ -88,12 +93,15 @@ void CStatePoltergeistAttackHiddenAbstract::select_target_for_move()
 TEMPLATE_SPECIALIZATION
 bool CStatePoltergeistAttackHiddenAbstract::check_home_point()
 {
-    if (prev_substate != eStateAttack_MoveToHomePoint) {
-        if (get_state(eStateAttack_MoveToHomePoint)->check_start_conditions()) return true;
+    if (prev_substate != eStateAttack_MoveToHomePoint)
+    {
+        if (get_state(eStateAttack_MoveToHomePoint)->check_start_conditions())
+            return true;
     }
     else
     {
-        if (!get_state(eStateAttack_MoveToHomePoint)->check_completion()) return true;
+        if (!get_state(eStateAttack_MoveToHomePoint)->check_completion())
+            return true;
     }
 
     return false;
@@ -102,7 +110,8 @@ bool CStatePoltergeistAttackHiddenAbstract::check_home_point()
 TEMPLATE_SPECIALIZATION
 void CStatePoltergeistAttackHiddenAbstract::execute()
 {
-    if (check_home_point()) {
+    if (check_home_point())
+    {
         select_state(eStateAttack_MoveToHomePoint);
         get_state_current()->execute();
         prev_substate = current_substate;

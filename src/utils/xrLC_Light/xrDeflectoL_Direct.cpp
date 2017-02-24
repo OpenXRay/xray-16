@@ -22,7 +22,8 @@ void CDeflector::L_Direct_Edge(CDB::COLLIDER* DB, base_lighting* LightsSelected,
     int du = iCeil(_abs(size.x) / texel_size);
     int dv = iCeil(_abs(size.y) / texel_size);
     int steps = _max(du, dv);
-    if (steps <= 0) return;
+    if (steps <= 0)
+        return;
 
     for (int I = 0; I <= steps; I++)
     {
@@ -33,10 +34,13 @@ void CDeflector::L_Direct_Edge(CDB::COLLIDER* DB, base_lighting* LightsSelected,
         int _x = iFloor(uv.x * float(lm.width));
         int _y = iFloor(uv.y * float(lm.height));
 
-        if ((_x < 0) || (_x >= (int)lm.width)) continue;
-        if ((_y < 0) || (_y >= (int)lm.height)) continue;
+        if ((_x < 0) || (_x >= (int)lm.width))
+            continue;
+        if ((_y < 0) || (_y >= (int)lm.height))
+            continue;
 
-        if (lm.marker[_y * lm.width + _x]) continue;
+        if (lm.marker[_y * lm.width + _x])
+            continue;
 
         // ok - perform lighting
         base_color_c C;
@@ -46,7 +50,7 @@ void CDeflector::L_Direct_Edge(CDB::COLLIDER* DB, base_lighting* LightsSelected,
         VERIFY(inlc_global_data()->RCAST_Model());
 
         LightPoint(DB, inlc_global_data()->RCAST_Model(), C, P, N, *LightsSelected,
-            (inlc_global_data()->b_nosun() ? LP_dont_sun : 0) | LP_DEFAULT, skip);  //.
+            (inlc_global_data()->b_nosun() ? LP_dont_sun : 0) | LP_DEFAULT, skip); //.
 
         C.mul(.5f);
         lm.surface[_y * lm.width + _x]._set(C);
@@ -79,11 +83,13 @@ void CDeflector::L_Direct(CDB::COLLIDER* DB, base_lighting* LightsSelected, HASH
 
     for (u32 V = 0; V < lm.height; V++)
     {
-        if (_net_session && !_net_session->test_connection()) return;
+        if (_net_session && !_net_session->test_connection())
+            return;
         for (u32 U = 0; U < lm.width; U++)
         {
 #ifdef NET_CMP
-            if (V * lm.width + U != 8335) continue;
+            if (V * lm.width + U != 8335)
+                continue;
 #endif
             u32 Fcount = 0;
             base_color_c C;
@@ -102,7 +108,8 @@ void CDeflector::L_Direct(CDB::COLLIDER* DB, base_lighting* LightsSelected, HASH
                     Fvector wP, wN, B;
                     for (UVtri** it = &*space.begin(); it != &*space.end(); it++)
                     {
-                        if ((*it)->isInside(P, B)) {
+                        if ((*it)->isInside(P, B))
+                        {
                             // We found triangle and have barycentric coords
                             Face* F = (*it)->owner;
                             Vertex* V1 = F->v[0];
@@ -122,7 +129,7 @@ void CDeflector::L_Direct(CDB::COLLIDER* DB, base_lighting* LightsSelected, HASH
                                 VERIFY(inlc_global_data());
                                 VERIFY(inlc_global_data()->RCAST_Model());
                                 LightPoint(DB, inlc_global_data()->RCAST_Model(), C, wP, wN, *LightsSelected,
-                                    (inlc_global_data()->b_nosun() ? LP_dont_sun : 0) | LP_UseFaceDisable, F);  //.
+                                    (inlc_global_data()->b_nosun() ? LP_dont_sun : 0) | LP_UseFaceDisable, F); //.
                                 Fcount += 1;
                             }
                             catch (...)
@@ -139,7 +146,8 @@ void CDeflector::L_Direct(CDB::COLLIDER* DB, base_lighting* LightsSelected, HASH
                 Logger.clMsg("* ERROR (Light). Recovered. ");
             }
 
-            if (Fcount) {
+            if (Fcount)
+            {
                 C.scale(Fcount);
                 C.mul(.5f);
                 lm.surface[V * lm.width + U]._set(C);
@@ -147,7 +155,7 @@ void CDeflector::L_Direct(CDB::COLLIDER* DB, base_lighting* LightsSelected, HASH
             }
             else
             {
-                lm.surface[V * lm.width + U]._set(C);  // 0-0-0-0-0
+                lm.surface[V * lm.width + U]._set(C); // 0-0-0-0-0
                 lm.marker[V * lm.width + U] = 0;
             }
         }

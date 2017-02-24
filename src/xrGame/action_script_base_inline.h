@@ -27,10 +27,7 @@ IC CScriptBaseAction::CActionScriptBase(_object_type* object, LPCSTR action_name
 }
 
 TEMPLATE_SPECIALIZATION
-CScriptBaseAction::~CActionScriptBase()
-{
-}
-
+CScriptBaseAction::~CActionScriptBase() {}
 TEMPLATE_SPECIALIZATION
 void CScriptBaseAction::setup(_object_type* object, CPropertyStorage* storage)
 {

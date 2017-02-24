@@ -4,7 +4,7 @@
 #include "monster_state_hitted_moveout.h"
 #include "monster_state_home_point_danger.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -19,24 +19,24 @@ CStateMonsterHittedAbstract::CStateMonsterHitted(_Object* obj) : inherited(obj)
 }
 
 TEMPLATE_SPECIALIZATION
-CStateMonsterHittedAbstract::~CStateMonsterHitted()
-{
-}
-
+CStateMonsterHittedAbstract::~CStateMonsterHitted() {}
 TEMPLATE_SPECIALIZATION
 void CStateMonsterHittedAbstract::reselect_state()
 {
-    if (get_state(eStateHitted_Home)->check_start_conditions()) {
+    if (get_state(eStateHitted_Home)->check_start_conditions())
+    {
         select_state(eStateHitted_Home);
         return;
     }
 
-    if (prev_substate == u32(-1)) {
+    if (prev_substate == u32(-1))
+    {
         select_state(eStateHitted_Hide);
         return;
     }
 
-    if (prev_substate == eStateHitted_Hide) {
+    if (prev_substate == eStateHitted_Hide)
+    {
         select_state(eStateHitted_MoveOut);
         return;
     }

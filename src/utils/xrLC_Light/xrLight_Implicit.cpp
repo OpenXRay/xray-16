@@ -84,7 +84,8 @@ void ImplicitExecute::Execute(net_task_callback* net_callback)
     {
         for (u32 U = 0; U < defl.Width(); U++)
         {
-            if (net_callback && !net_callback->test_connection()) return;
+            if (net_callback && !net_callback->test_connection())
+                return;
             base_color_c C;
             u32 Fcount = 0;
 
@@ -104,7 +105,8 @@ void ImplicitExecute::Execute(net_task_callback* net_callback)
                     {
                         Face* F = *it;
                         _TCF& tc = F->tc[0];
-                        if (tc.isInside(P, B)) {
+                        if (tc.isInside(P, B))
+                        {
                             // We found triangle and have barycentric coords
                             Vertex* V1 = F->v[0];
                             Vertex* V2 = F->v[1];
@@ -121,9 +123,10 @@ void ImplicitExecute::Execute(net_task_callback* net_callback)
             }
             catch (...)
             {
-                Logger.clMsg("* THREAD #%d: Access violation. Possibly recovered.");  //,thID
+                Logger.clMsg("* THREAD #%d: Access violation. Possibly recovered."); //,thID
             }
-            if (Fcount) {
+            if (Fcount)
+            {
                 // Calculate lighting amount
                 C.scale(Fcount);
                 C.mul(.5f);
@@ -145,8 +148,10 @@ void ImplicitLightingExec(BOOL b_net);
 void ImplicitLightingTreadNetExec(void* p);
 void ImplicitLighting(BOOL b_net)
 {
-    if (g_params().m_quality == ebqDraft) return;
-    if (!b_net) {
+    if (g_params().m_quality == ebqDraft)
+        return;
+    if (!b_net)
+    {
         ImplicitLightingExec(FALSE);
         return;
     }
@@ -177,8 +182,10 @@ void ImplicitLightingExec(BOOL b_net)
     for (vecFaceIt I = inlc_global_data()->g_faces().begin(); I != inlc_global_data()->g_faces().end(); I++)
     {
         Face* F = *I;
-        if (F->pDeflector) continue;
-        if (!F->hasImplicitLighting()) continue;
+        if (F->pDeflector)
+            continue;
+        if (!F->hasImplicitLighting())
+            continue;
 
         Logger.Progress(float(I - inlc_global_data()->g_faces().begin()) / float(inlc_global_data()->g_faces().size()));
         b_material& M = inlc_global_data()->materials()[F->dwMaterial];
@@ -186,7 +193,8 @@ void ImplicitLightingExec(BOOL b_net)
         b_BuildTexture* T = &(inlc_global_data()->textures()[Tid]);
 
         Implicit_it it = calculator.find(Tid);
-        if (it == calculator.end()) {
+        if (it == calculator.end())
+        {
             ImplicitDeflector ImpD;
             ImpD.texture = T;
             ImpD.faces.push_back(F);
@@ -221,7 +229,8 @@ void ImplicitLightingExec(BOOL b_net)
         // Expand
         Logger.Status("Processing lightmap...");
         for (u32 ref = 254; ref > 0; ref--)
-            if (!ApplyBorders(defl.lmap, ref)) break;
+            if (!ApplyBorders(defl.lmap, ref))
+                break;
 
         Logger.Status("Mixing lighting with texture...");
         {
@@ -296,5 +305,6 @@ void ImplicitLightingExec(BOOL b_net)
     not_clear.clear();
     cl_globs.Deallocate();
     calculator.clear();
-    if (b_net) inlc_global_data()->clear_build_textures_surface();
+    if (b_net)
+        inlc_global_data()->clear_build_textures_surface();
 }

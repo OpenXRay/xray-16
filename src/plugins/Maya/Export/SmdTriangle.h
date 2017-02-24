@@ -30,16 +30,24 @@ public:
 
     IC bool similar(double x, double y, double z, float u, float v, const WBVec& wb) const
     {
-        if (influence.size() != wb.size()) return false;
-        if (!fsimilar(pos.x, (float)x)) return false;
-        if (!fsimilar(pos.y, (float)y)) return false;
-        if (!fsimilar(pos.z, (float)z)) return false;
-        if (!fsimilar(uv.x, u)) return false;
-        if (!fsimilar(uv.y, v)) return false;
+        if (influence.size() != wb.size())
+            return false;
+        if (!fsimilar(pos.x, (float)x))
+            return false;
+        if (!fsimilar(pos.y, (float)y))
+            return false;
+        if (!fsimilar(pos.z, (float)z))
+            return false;
+        if (!fsimilar(uv.x, u))
+            return false;
+        if (!fsimilar(uv.y, v))
+            return false;
         for (u32 k = 0; k < influence.size(); k++)
         {
-            if (influence[k].bone != wb[k].bone) return FALSE;
-            if (!fsimilar(influence[k].weight, wb[k].weight)) return FALSE;
+            if (influence[k].bone != wb[k].bone)
+                return FALSE;
+            if (!fsimilar(influence[k].weight, wb[k].weight))
+                return FALSE;
         }
         return true;
     }

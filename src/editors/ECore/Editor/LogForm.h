@@ -16,8 +16,8 @@ class ECORE_API TfrmLog :
 
     public TForm
 {
-    __published :  // IDE-managed Components
-                   TPanel* Panel1;
+    __published : // IDE-managed Components
+                  TPanel* Panel1;
     TPanel* Panel2;
     TListBox* lbLog;
     TExtBtn* ebClear;
@@ -43,10 +43,10 @@ class ECORE_API TfrmLog :
     void __fastcall imSelectAllClick(TObject* Sender);
     void __fastcall lbLogKeyPress(TObject* Sender, char& Key);
 
-  private:  // User declarations
+private: // User declarations
     static TfrmLog* form;
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TfrmLog(TComponent* Owner);
     static void __fastcall AddMessage(TMsgDlgType mt, const AnsiString& msg);
     static void __fastcall AddMessage(const AnsiString& msg) { AddMessage(mtCustom, msg); }

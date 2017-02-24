@@ -19,10 +19,7 @@ CUIListItem::CUIListItem(void)
     SetTextAlignment(CGameFont::alLeft);
 }
 
-CUIListItem::~CUIListItem(void)
-{
-}
-
+CUIListItem::~CUIListItem(void) {}
 void CUIListItem::InitListItem(Fvector2 pos, Fvector2 size)
 {
     inherited::SetWndPos(pos);
@@ -44,7 +41,4 @@ void CUIListItem::Init(const char* str, float x, float y, float width, float hei
     SetTextST(str);
 }*/
 
-bool CUIListItem::IsHighlightText()
-{
-    return CUIButton::IsHighlightText();
-}
+bool CUIListItem::IsHighlightText() { return CUIButton::IsHighlightText(); }

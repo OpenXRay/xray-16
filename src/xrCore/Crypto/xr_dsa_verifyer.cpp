@@ -10,10 +10,7 @@ xr_dsa_verifyer::xr_dsa_verifyer(u8 const p_number[crypto::xr_dsa::public_key_le
     CopyMemory(m_public_key.m_value, public_key, sizeof(m_public_key.m_value));
 }
 
-xr_dsa_verifyer::~xr_dsa_verifyer()
-{
-}
-
+xr_dsa_verifyer::~xr_dsa_verifyer() {}
 bool xr_dsa_verifyer::verify(u8 const* data, u32 data_size, shared_str const& dsign)
 {
     m_sha.start_calculate(data, data_size);

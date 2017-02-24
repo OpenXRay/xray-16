@@ -14,7 +14,7 @@ class CGlow : public CCustomObject
     typedef CCustomObject inherited;
     CTLSprite m_RenderSprite;
 
-  public:
+public:
     enum EFlags
     {
         gfFixedSize = (1 << 0),
@@ -30,7 +30,7 @@ class CGlow : public CCustomObject
     bool m_bDefLoad;
     void ShaderChange(PropValue* value);
 
-  protected:
+protected:
     virtual const Fvector& GetScale() const
     {
         FScale.set(m_fRadius, m_fRadius, m_fRadius);
@@ -40,21 +40,23 @@ class CGlow : public CCustomObject
     virtual void SetScale(const Fvector& sc)
     {
         float v = m_fRadius;
-        if (!fsimilar(FScale.x, sc.x)) v = sc.x;
-        if (!fsimilar(FScale.y, sc.y)) v = sc.y;
-        if (!fsimilar(FScale.z, sc.z)) v = sc.z;
+        if (!fsimilar(FScale.x, sc.x))
+            v = sc.x;
+        if (!fsimilar(FScale.y, sc.y))
+            v = sc.y;
+        if (!fsimilar(FScale.z, sc.z))
+            v = sc.z;
         FScale.set(v, v, v);
         m_fRadius = v;
         UpdateTransform();
     }
 
-  public:
+public:
     CGlow(LPVOID data, LPCSTR name);
     void Construct(LPVOID data);
     virtual ~CGlow();
 
     virtual bool CanAttach() { return true; }
-
     void Compile();
 
     virtual void Render(int priority, bool strictB2F);

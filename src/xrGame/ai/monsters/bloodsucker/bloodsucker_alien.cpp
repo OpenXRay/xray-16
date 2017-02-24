@@ -39,17 +39,15 @@ CAlienEffectorPP::CAlienEffectorPP(const SPPInfo& ppi, EEffectorPPType type) : C
     target_factor = 1.f;
 }
 
-CAlienEffectorPP::~CAlienEffectorPP()
-{
-}
-
+CAlienEffectorPP::~CAlienEffectorPP() {}
 #define PERIOD_SPEED 0.3f
 
 BOOL CAlienEffectorPP::Process(SPPInfo& pp)
 {
     inherited::Process(pp);
 
-    if (fsimilar(factor, target_factor)) {
+    if (fsimilar(factor, target_factor))
+    {
         target_factor = (target_factor > 0.5f) ? .3f : .6f;
     }
 
@@ -125,15 +123,18 @@ BOOL CAlienEffector::ProcessCam(SCamEffectorInfo& info)
     Mdef.c.set(info.p);
 
     // set angle
-    if (angle_lerp(dangle_current.x, dangle_target.x, ANGLE_SPEED, Device.fTimeDelta)) {
+    if (angle_lerp(dangle_current.x, dangle_target.x, ANGLE_SPEED, Device.fTimeDelta))
+    {
         dangle_target.x = angle_normalize(Random.randFs(DELTA_ANGLE_X));
     }
 
-    if (angle_lerp(dangle_current.y, dangle_target.y, ANGLE_SPEED, Device.fTimeDelta)) {
+    if (angle_lerp(dangle_current.y, dangle_target.y, ANGLE_SPEED, Device.fTimeDelta))
+    {
         dangle_target.y = angle_normalize(Random.randFs(DELTA_ANGLE_Y));
     }
 
-    if (angle_lerp(dangle_current.z, dangle_target.z, ANGLE_SPEED, Device.fTimeDelta)) {
+    if (angle_lerp(dangle_current.z, dangle_target.z, ANGLE_SPEED, Device.fTimeDelta))
+    {
         dangle_target.z = angle_normalize(Random.randFs(DELTA_ANGLE_Z));
     }
 
@@ -183,20 +184,9 @@ BOOL CAlienEffector::ProcessCam(SCamEffectorInfo& info)
 //
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-CBloodsuckerAlien::CBloodsuckerAlien()
-{
-    m_object = 0;
-}
-
-CBloodsuckerAlien::~CBloodsuckerAlien()
-{
-}
-
-void CBloodsuckerAlien::init_external(CAI_Bloodsucker* obj)
-{
-    m_object = obj;
-}
-
+CBloodsuckerAlien::CBloodsuckerAlien() { m_object = 0; }
+CBloodsuckerAlien::~CBloodsuckerAlien() {}
+void CBloodsuckerAlien::init_external(CAI_Bloodsucker* obj) { m_object = obj; }
 void CBloodsuckerAlien::reinit()
 {
     m_active = false;
@@ -205,20 +195,23 @@ void CBloodsuckerAlien::reinit()
 
 void CBloodsuckerAlien::activate()
 {
-    if (m_active) return;
+    if (m_active)
+        return;
 
     VERIFY(Actor());
     m_object->CControlledActor::install(Actor());
     m_object->CControlledActor::dont_need_turn();
 
-    if (!m_object->EnemyMan.get_enemy()) m_object->EnemyMan.add_enemy(Actor());
+    if (!m_object->EnemyMan.get_enemy())
+        m_object->EnemyMan.add_enemy(Actor());
 
     //.	Actor()->inventory().setSlotsBlocked			(true);
     Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL, true);
 
     // hide crosshair
     m_crosshair_show = !!psHUD_Flags.is(HUD_CROSSHAIR_RT);
-    if (m_crosshair_show) psHUD_Flags.set(HUD_CROSSHAIR_RT, FALSE);
+    if (m_crosshair_show)
+        psHUD_Flags.set(HUD_CROSSHAIR_RT, FALSE);
 
     // Start effector
     m_effector_pp = new CAlienEffectorPP(m_object->pp_vampire_effector, EFFECTOR_ID_GEN(EEffectorPPType));
@@ -236,12 +229,14 @@ void CBloodsuckerAlien::activate()
 
 void CBloodsuckerAlien::deactivate()
 {
-    if (!m_active) return;
+    if (!m_active)
+        return;
 
     m_object->CControlledActor::release();
 
     Actor()->SetWeaponHideState(INV_STATE_BLOCK_ALL, false);
-    if (m_crosshair_show) psHUD_Flags.set(HUD_CROSSHAIR_RT, TRUE);
+    if (m_crosshair_show)
+        psHUD_Flags.set(HUD_CROSSHAIR_RT, TRUE);
 
     // Stop camera effector
     Actor()->Cameras().RemoveCamEffector(EFFECTOR_ID_GEN(ECamEffectorType));

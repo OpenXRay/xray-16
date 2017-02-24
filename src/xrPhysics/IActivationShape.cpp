@@ -7,7 +7,7 @@
 void ActivateShapeExplosive(IPhysicsShellHolder* self_obj, const Fvector& size, Fvector& out_size, Fvector& in_out_pos)
 {
     //////////////
-    CPHActivationShape activation_shape;  // Fvector start_box;m_PhysicMovementControl.Box().getsize(start_box);
+    CPHActivationShape activation_shape; // Fvector start_box;m_PhysicMovementControl.Box().getsize(start_box);
     activation_shape.Create(in_out_pos, size, self_obj);
 
     CPHCollideValidator::SetCharacterClassNotCollide(activation_shape);
@@ -26,7 +26,8 @@ void ActivateShapePhysShellHolder(
     CPHActivationShape activation_shape;
     activation_shape.Create(in_pos, in_size, obj);
     activation_shape.set_rotation(in_xform);
-    if (obj->ObjectPPhysicsShell()) {
+    if (obj->ObjectPPhysicsShell())
+    {
         activation_shape.collide_bits() = obj->ObjectPPhysicsShell()->collide_bits();
         activation_shape.collide_class_bits() = obj->ObjectPPhysicsShell()->collide_class_bits();
     }
@@ -37,14 +38,15 @@ void ActivateShapePhysShellHolder(
     activation_shape.Destroy();
 
 #ifdef DEBUG
-    if (!valid_pos(out_pos, phBoundaries)) {
+    if (!valid_pos(out_pos, phBoundaries))
+    {
         Msg("not valid position	%f,%f,%f", out_pos.x, out_pos.y, out_pos.z);
         Msg("size	%f,%f,%f", in_size.x, in_size.y, in_size.z);
         Msg("Object: %s", obj->ObjectName());
         Msg("Visual: %s", obj->ObjectNameVisual());
         // Msg("Object	pos	%f,%f,%f",Position().x,Position().y,Position().z);
     }
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 bool ActivateShapeCharacterPhysicsSupport(Fvector& out_pos, const Fvector& vbox, const Fvector& activation_pos,
@@ -52,10 +54,12 @@ bool ActivateShapeCharacterPhysicsSupport(Fvector& out_pos, const Fvector& vbox,
 {
     CPHActivationShape activation_shape;
     activation_shape.Create(activation_pos, vbox, m_EntityAlife);
-    if (not_collide_characters) {
+    if (not_collide_characters)
+    {
         CPHCollideValidator::SetCharacterClassNotCollide(activation_shape);
     }
-    if (set_rotation) activation_shape.set_rotation(mXFORM);
+    if (set_rotation)
+        activation_shape.set_rotation(mXFORM);
     bool ret = activation_shape.Activate(vbox, 1, 1.f, M_PI / 8.f);
     out_pos.set(activation_shape.Position());
     activation_shape.Destroy();

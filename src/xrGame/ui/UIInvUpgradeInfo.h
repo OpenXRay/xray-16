@@ -18,7 +18,7 @@ namespace upgrade
 {
 class Upgrade;
 }
-}  // namespace upgrade, inventory
+} // namespace upgrade, inventory
 
 class CUITextWnd;
 class CUIFrameWindow;
@@ -39,7 +39,6 @@ public:
     bool init_upgrade(Upgrade_type* upgr, CInventoryItem* inv_item);
     bool is_upgrade() { return (m_upgrade != NULL); }
     IC Upgrade_type const* get_upgrade() const { return m_upgrade; }
-
     virtual void Draw();
 
 protected:
@@ -53,6 +52,6 @@ protected:
     CUITextWnd* m_desc;
     CUITextWnd* m_prereq;
 
-};  // class UIInvUpgradeInfo
+}; // class UIInvUpgradeInfo
 
-#endif  // UI_INVENTORY_UPGRADE_INFO_H_INCLUDED
+#endif // UI_INVENTORY_UPGRADE_INFO_H_INCLUDED

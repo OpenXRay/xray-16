@@ -35,7 +35,8 @@ xrIDirect3DSurface9::xrIDirect3DSurface9(IDirect3DDevice9* pIDirect3DDevice9, UI
 HRESULT xrIDirect3DSurface9::QueryInterface(REFIID riid, void** ppvObj)
 {
     APIDEBUG("xrIDirect3DSurface9::QueryInterface");
-    if (riid == IID_IUnknown || riid == IID_IDirect3DSurface9) {
+    if (riid == IID_IUnknown || riid == IID_IDirect3DSurface9)
+    {
         *ppvObj = this;
         AddRef();
         return NOERROR;
@@ -54,7 +55,8 @@ ULONG xrIDirect3DSurface9::Release()
 {
     APIDEBUG("xrIDirect3DSurface9::Release");
     m_refCount--;
-    if (m_refCount < 0) {
+    if (m_refCount < 0)
+    {
         delete this;
         return -1;
     }
@@ -97,10 +99,7 @@ DWORD xrIDirect3DSurface9::GetPriority()
     APIDEBUG("xrIDirect3DSurface9::GetPriority");
     return Priority;
 };
-void xrIDirect3DSurface9::PreLoad()
-{
-    APIDEBUG("xrIDirect3DSurface9::PreLoad");
-};
+void xrIDirect3DSurface9::PreLoad() { APIDEBUG("xrIDirect3DSurface9::PreLoad"); };
 D3DRESOURCETYPE xrIDirect3DSurface9::GetType()
 {
     APIDEBUG("xrIDirect3DSurface9::GetType");
@@ -130,7 +129,8 @@ HRESULT xrIDirect3DSurface9::LockRect(D3DLOCKED_RECT* pLockedRect, CONST RECT* p
 {
     APIDEBUG("xrIDirect3DSurface9::LockRect");
 #ifdef _DEBUG
-    if (m_pLockedData != NULL) {
+    if (m_pLockedData != NULL)
+    {
         _ASSERT(0);
     }
 #endif
@@ -147,7 +147,8 @@ HRESULT xrIDirect3DSurface9::UnlockRect()
     APIDEBUG("xrIDirect3DSurface9::UnlockRect");
 
 #ifdef _DEBUG
-    if (m_pLockedData == NULL) {
+    if (m_pLockedData == NULL)
+    {
         _ASSERT(0);
     }
 #endif

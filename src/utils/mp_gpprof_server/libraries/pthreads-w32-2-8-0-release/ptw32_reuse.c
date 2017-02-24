@@ -9,25 +9,25 @@
  *      Pthreads-win32 - POSIX Threads Library for Win32
  *      Copyright(C) 1998 John E. Bossom
  *      Copyright(C) 1999,2005 Pthreads-win32 contributors
- *
+ * 
  *      Contact Email: rpj@callisto.canberra.edu.au
- *
+ * 
  *      The current list of contributors is contained
  *      in the file CONTRIBUTORS included with the source
  *      code distribution. The list can also be seen at the
  *      following World Wide Web location:
  *      http://sources.redhat.com/pthreads-win32/contributors.html
- *
+ * 
  *      This library is free software; you can redistribute it and/or
  *      modify it under the terms of the GNU Lesser General Public
  *      License as published by the Free Software Foundation; either
  *      version 2 of the License, or (at your option) any later version.
- *
+ * 
  *      This library is distributed in the hope that it will be useful,
  *      but WITHOUT ANY WARRANTY; without even the implied warranty of
  *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *      Lesser General Public License for more details.
- *
+ * 
  *      You should have received a copy of the GNU Lesser General Public
  *      License along with this library in the file COPYING.LIB;
  *      if not, write to the Free Software Foundation, Inc.,
@@ -36,6 +36,7 @@
 
 #include "pthread.h"
 #include "implement.h"
+
 
 /*
  * How it works:
@@ -48,13 +49,13 @@
  * the thread state struct ptw32_thread_t_ (p), plus a reuse counter (x). Each
  * ptw32_thread_t contains the original copy of it's pthread_t.
  * Once malloced, a ptw32_thread_t_ struct is not freed until the process exits.
- *
+ * 
  * The thread reuse stack is a simple LILO stack managed through a singly
  * linked list element in the ptw32_thread_t.
  *
  * Each time a thread is destroyed, the ptw32_thread_t address is pushed onto the
  * reuse stack after it's ptHandle's reuse counter has been incremented.
- *
+ * 
  * The following can now be said from this:
  * - two pthread_t's are identical if their ptw32_thread_t reference pointers
  * are equal and their reuse counters are equal. That is,
@@ -71,31 +72,35 @@
 /*
  * Pop a clean pthread_t struct off the reuse stack.
  */
-pthread_t ptw32_threadReusePop(void)
+pthread_t
+ptw32_threadReusePop (void)
 {
-    pthread_t t = {NULL, 0};
+  pthread_t t = {NULL, 0};
 
-    EnterCriticalSection(&ptw32_thread_reuse_lock);
+  EnterCriticalSection (&ptw32_thread_reuse_lock);
 
-    if (PTW32_THREAD_REUSE_EMPTY != ptw32_threadReuseTop) {
-        ptw32_thread_t* tp;
+  if (PTW32_THREAD_REUSE_EMPTY != ptw32_threadReuseTop)
+    {
+      ptw32_thread_t * tp;
 
-        tp = ptw32_threadReuseTop;
+      tp = ptw32_threadReuseTop;
 
-        ptw32_threadReuseTop = tp->prevReuse;
+      ptw32_threadReuseTop = tp->prevReuse;
 
-        if (PTW32_THREAD_REUSE_EMPTY == ptw32_threadReuseTop) {
-            ptw32_threadReuseBottom = PTW32_THREAD_REUSE_EMPTY;
+      if (PTW32_THREAD_REUSE_EMPTY == ptw32_threadReuseTop)
+        {
+          ptw32_threadReuseBottom = PTW32_THREAD_REUSE_EMPTY;
         }
 
-        tp->prevReuse = NULL;
+      tp->prevReuse = NULL;
 
-        t = tp->ptHandle;
+      t = tp->ptHandle;
     }
 
-    LeaveCriticalSection(&ptw32_thread_reuse_lock);
+  LeaveCriticalSection (&ptw32_thread_reuse_lock);
 
-    return t;
+  return t;
+
 }
 
 /*
@@ -104,37 +109,39 @@ pthread_t ptw32_threadReusePop(void)
  * All object elements (mutexes, events etc) must have been either
  * detroyed before this, or never initialised.
  */
-void ptw32_threadReusePush(pthread_t thread)
+void
+ptw32_threadReusePush (pthread_t thread)
 {
-    ptw32_thread_t* tp = (ptw32_thread_t*)thread.p;
-    pthread_t t;
+  ptw32_thread_t * tp = (ptw32_thread_t *) thread.p;
+  pthread_t t;
 
-    EnterCriticalSection(&ptw32_thread_reuse_lock);
+  EnterCriticalSection (&ptw32_thread_reuse_lock);
 
-    t = tp->ptHandle;
-    memset(tp, 0, sizeof(ptw32_thread_t));
+  t = tp->ptHandle;
+  memset(tp, 0, sizeof(ptw32_thread_t));
 
-    /* Must restore the original POSIX handle that we just wiped. */
-    tp->ptHandle = t;
+  /* Must restore the original POSIX handle that we just wiped. */
+  tp->ptHandle = t;
 
-/* Bump the reuse counter now */
+  /* Bump the reuse counter now */
 #ifdef PTW32_THREAD_ID_REUSE_INCREMENT
-    tp->ptHandle.x += PTW32_THREAD_ID_REUSE_INCREMENT;
+  tp->ptHandle.x += PTW32_THREAD_ID_REUSE_INCREMENT;
 #else
-    tp->ptHandle.x++;
+  tp->ptHandle.x++;
 #endif
 
-    tp->prevReuse = PTW32_THREAD_REUSE_EMPTY;
+  tp->prevReuse = PTW32_THREAD_REUSE_EMPTY;
 
-    if (PTW32_THREAD_REUSE_EMPTY != ptw32_threadReuseBottom) {
-        ptw32_threadReuseBottom->prevReuse = tp;
-    }
-    else
+  if (PTW32_THREAD_REUSE_EMPTY != ptw32_threadReuseBottom)
     {
-        ptw32_threadReuseTop = tp;
+      ptw32_threadReuseBottom->prevReuse = tp;
+    }
+  else
+    {
+      ptw32_threadReuseTop = tp;
     }
 
-    ptw32_threadReuseBottom = tp;
+  ptw32_threadReuseBottom = tp;
 
-    LeaveCriticalSection(&ptw32_thread_reuse_lock);
+  LeaveCriticalSection (&ptw32_thread_reuse_lock);
 }

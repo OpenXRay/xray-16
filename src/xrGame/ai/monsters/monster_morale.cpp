@@ -1,10 +1,7 @@
 #include "stdafx.h"
 #include "monster_morale.h"
 
-void CMonsterMorale::init_external(CBaseMonster* obj)
-{
-    m_object = obj;
-}
+void CMonsterMorale::init_external(CBaseMonster* obj) { m_object = obj; }
 void CMonsterMorale::load(LPCSTR section)
 {
     m_hit_quant = pSettings->r_float(section, "Morale_Hit_Quant");
@@ -21,16 +18,8 @@ void CMonsterMorale::reinit()
     m_morale = 1.0f;
 }
 
-void CMonsterMorale::on_hit()
-{
-    change(-m_hit_quant);
-}
-
-void CMonsterMorale::on_attack_success()
-{
-    change(m_attack_success_quant);
-}
-
+void CMonsterMorale::on_hit() { change(-m_hit_quant); }
+void CMonsterMorale::on_attack_success() { change(m_attack_success_quant); }
 void CMonsterMorale::update_schedule(u32 dt)
 {
     float cur_v = 1.f;

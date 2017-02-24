@@ -19,7 +19,6 @@ public:
     virtual ~CPHCapture();
 
     bool Failed() { return e_state == cstFree; }
-
     void Release();
     void RemoveConnection(IPhysicsShellHolder* O);
 

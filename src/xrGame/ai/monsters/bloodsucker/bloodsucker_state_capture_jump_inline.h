@@ -2,7 +2,7 @@
 
 #include "ai/Monsters/states/state_custom_action.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -15,10 +15,7 @@ CStateCaptureJumpBloodsuckerAbstract::CStateCaptureJumpBloodsucker(_Object* obj)
 }
 
 TEMPLATE_SPECIALIZATION
-CStateCaptureJumpBloodsuckerAbstract::~CStateCaptureJumpBloodsucker()
-{
-}
-
+CStateCaptureJumpBloodsuckerAbstract::~CStateCaptureJumpBloodsucker() {}
 TEMPLATE_SPECIALIZATION
 void CStateCaptureJumpBloodsuckerAbstract::execute()
 {
@@ -32,11 +29,12 @@ TEMPLATE_SPECIALIZATION
 void CStateCaptureJumpBloodsuckerAbstract::setup_substates()
 {
     state_ptr state = get_state_current();
-    if (current_substate == eStateCustom) {
+    if (current_substate == eStateCustom)
+    {
         SStateDataAction data;
 
         data.action = ACT_STAND_IDLE;
-        data.time_out = 0;  // do not use time out
+        data.time_out = 0; // do not use time out
         /*data.sound_type	= MonsterSound::eMonsterSoundIdle;
         data.sound_delay = object->db().m_dwIdleSndDelay;
         */

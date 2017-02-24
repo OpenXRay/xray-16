@@ -9,7 +9,8 @@ bool CGameSpy_Available::CheckAvailableServices(shared_str& resultstr)
     while ((result = GSIAvailableCheckThink()) == GSIACWaiting)
         msleep(5);
 
-    if (result != GSIACAvailable) {
+    if (result != GSIACAvailable)
+    {
         switch (result)
         {
         case GSIACUnavailable: { resultstr = "! Online Services for STALKER are no longer available.";

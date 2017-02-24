@@ -11,25 +11,10 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CBlender_LIGHT::CBlender_LIGHT()
-{
-    description.CLS = B_LIGHT;
-}
-
-CBlender_LIGHT::~CBlender_LIGHT()
-{
-}
-
-void CBlender_LIGHT::Save(IWriter& fs)
-{
-    IBlender::Save(fs);
-}
-
-void CBlender_LIGHT::Load(IReader& fs, u16 version)
-{
-    IBlender::Load(fs, version);
-}
-
+CBlender_LIGHT::CBlender_LIGHT() { description.CLS = B_LIGHT; }
+CBlender_LIGHT::~CBlender_LIGHT() {}
+void CBlender_LIGHT::Save(IWriter& fs) { IBlender::Save(fs); }
+void CBlender_LIGHT::Load(IReader& fs, u16 version) { IBlender::Load(fs, version); }
 void CBlender_LIGHT::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);

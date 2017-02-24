@@ -30,13 +30,14 @@ CEngineAPI::CEngineAPI()
 CEngineAPI::~CEngineAPI()
 {
     // destroy quality token here
-    if (vid_quality_token) {
+    if (vid_quality_token)
+    {
         xr_free(vid_quality_token);
         vid_quality_token = NULL;
     }
 }
 
-extern u32 renderer_value;  // con cmd
+extern u32 renderer_value; // con cmd
 ENGINE_API int g_current_renderer = 0;
 
 bool is_enough_address_space_available()
@@ -54,20 +55,24 @@ void CEngineAPI::InitializeNotDedicated()
     LPCSTR r3_name = "xrRender_R3";
     LPCSTR r4_name = "xrRender_R4";
 
-    if (psDeviceFlags.test(rsR4)) {
+    if (psDeviceFlags.test(rsR4))
+    {
         // try to initialize R4
         hRender = XRay::LoadLibrary(r4_name);
-        if (0 == hRender) {
+        if (0 == hRender)
+        {
             // try to load R1
             Msg("! ...Failed - incompatible hardware/pre-Vista OS.");
             psDeviceFlags.set(rsR2, TRUE);
         }
     }
 
-    if (psDeviceFlags.test(rsR3)) {
+    if (psDeviceFlags.test(rsR3))
+    {
         // try to initialize R3
         hRender = XRay::LoadLibrary(r3_name);
-        if (0 == hRender) {
+        if (0 == hRender)
+        {
             // try to load R1
             Msg("! ...Failed - incompatible hardware/pre-Vista OS.");
             psDeviceFlags.set(rsR2, TRUE);
@@ -76,12 +81,14 @@ void CEngineAPI::InitializeNotDedicated()
             g_current_renderer = 3;
     }
 
-    if (psDeviceFlags.test(rsR2)) {
+    if (psDeviceFlags.test(rsR2))
+    {
         // try to initialize R2
         psDeviceFlags.set(rsR4, FALSE);
         psDeviceFlags.set(rsR3, FALSE);
         hRender = XRay::LoadLibrary(r2_name);
-        if (0 == hRender) {
+        if (0 == hRender)
+        {
             // try to load R1
             Msg("! ...Failed - incompatible hardware.");
         }
@@ -89,7 +96,7 @@ void CEngineAPI::InitializeNotDedicated()
             g_current_renderer = 2;
     }
 }
-#endif  // DEDICATED_SERVER
+#endif // DEDICATED_SERVER
 
 void CEngineAPI::Initialize(void)
 {
@@ -99,17 +106,19 @@ void CEngineAPI::Initialize(void)
 
 #ifndef DEDICATED_SERVER
     InitializeNotDedicated();
-#endif  // DEDICATED_SERVER
+#endif // DEDICATED_SERVER
 
-    if (0 == hRender) {
+    if (0 == hRender)
+    {
         // try to load R1
         psDeviceFlags.set(rsR4, FALSE);
         psDeviceFlags.set(rsR3, FALSE);
         psDeviceFlags.set(rsR2, FALSE);
-        renderer_value = 0;  // con cmd
+        renderer_value = 0; // con cmd
 
         hRender = XRay::LoadLibrary(r1_name);
-        if (0 == hRender) R_CHK(GetLastError());
+        if (0 == hRender)
+            R_CHK(GetLastError());
         R_ASSERT(hRender);
         g_current_renderer = 1;
     }
@@ -122,7 +131,8 @@ void CEngineAPI::Initialize(void)
     {
         LPCSTR g_name = "xrGame";
         hGame = XRay::LoadLibrary(g_name);
-        if (0 == hGame) R_CHK(GetLastError());
+        if (0 == hGame)
+            R_CHK(GetLastError());
         R_ASSERT2(hGame, "Game DLL raised exception during loading or there is no game DLL at all");
         pCreate = (Factory_Create*)XRay::GetProcAddress(hGame, "xrFactory_Create");
         R_ASSERT(pCreate);
@@ -133,10 +143,12 @@ void CEngineAPI::Initialize(void)
     //////////////////////////////////////////////////////////////////////////
     // vTune
     tune_enabled = FALSE;
-    if (strstr(Core.Params, "-tune")) {
+    if (strstr(Core.Params, "-tune"))
+    {
         LPCSTR g_name = "vTuneAPI";
         hTuner = XRay::LoadLibrary(g_name);
-        if (0 == hTuner) R_CHK(GetLastError());
+        if (0 == hTuner)
+            R_CHK(GetLastError());
         R_ASSERT2(hTuner, "Intel vTune is not installed");
         tune_enabled = TRUE;
         tune_pause = (VTPause*)XRay::GetProcAddress(hTuner, "VTPause");
@@ -148,11 +160,13 @@ void CEngineAPI::Initialize(void)
 
 void CEngineAPI::Destroy(void)
 {
-    if (hGame) {
+    if (hGame)
+    {
         XRay::UnloadLibrary(hGame);
         hGame = 0;
     }
-    if (hRender) {
+    if (hRender)
+    {
         XRay::UnloadLibrary(hRender);
         hRender = 0;
     }
@@ -182,7 +196,8 @@ void CEngineAPI::CreateRendererList()
 
 #else
     // TODO: ask renderers if they are supported!
-    if (vid_quality_token != NULL) return;
+    if (vid_quality_token != NULL)
+        return;
     bool bSupports_r2 = false;
     bool bSupports_r2_5 = false;
     bool bSupports_r3 = false;
@@ -192,7 +207,8 @@ void CEngineAPI::CreateRendererList()
     LPCSTR r3_name = "xrRender_R3";
     LPCSTR r4_name = "xrRender_R4";
 
-    if (strstr(Core.Params, "-perfhud_hack")) {
+    if (strstr(Core.Params, "-perfhud_hack"))
+    {
         bSupports_r2 = true;
         bSupports_r2_5 = true;
         bSupports_r3 = true;
@@ -202,7 +218,8 @@ void CEngineAPI::CreateRendererList()
     {
         // try to initialize R2
         hRender = XRay::LoadLibrary(r2_name);
-        if (hRender) {
+        if (hRender)
+        {
             bSupports_r2 = true;
             SupportsAdvancedRendering* test_rendering =
                 (SupportsAdvancedRendering*)XRay::GetProcAddress(hRender, "SupportsAdvancedRendering");
@@ -217,7 +234,8 @@ void CEngineAPI::CreateRendererList()
         hRender = XRay::LoadLibrary(r3_name);
         // Restore error handling
         SetErrorMode(0);
-        if (hRender) {
+        if (hRender)
+        {
             SupportsDX10Rendering* test_dx10_rendering =
                 (SupportsDX10Rendering*)XRay::GetProcAddress(hRender, "SupportsDX10Rendering");
             R_ASSERT(test_dx10_rendering);
@@ -231,7 +249,8 @@ void CEngineAPI::CreateRendererList()
         hRender = XRay::LoadLibrary(r4_name);
         // Restore error handling
         SetErrorMode(0);
-        if (hRender) {
+        if (hRender)
+        {
             SupportsDX11Rendering* test_dx11_rendering =
                 (SupportsDX11Rendering*)XRay::GetProcAddress(hRender, "SupportsDX11Rendering");
             R_ASSERT(test_dx11_rendering);
@@ -243,13 +262,17 @@ void CEngineAPI::CreateRendererList()
     bool proceed = true;
     xr_vector<LPCSTR> tmp;
     tmp.push_back("renderer_r1");
-    if (proceed &= bSupports_r2, proceed) {
+    if (proceed &= bSupports_r2, proceed)
+    {
         tmp.push_back("renderer_r2a");
         tmp.push_back("renderer_r2");
     }
-    if (proceed &= bSupports_r2_5, proceed) tmp.push_back("renderer_r2.5");
-    if (proceed &= bSupports_r3, proceed) tmp.push_back("renderer_r3");
-    if (proceed &= bSupports_r4, proceed) tmp.push_back("renderer_r4");
+    if (proceed &= bSupports_r2_5, proceed)
+        tmp.push_back("renderer_r2.5");
+    if (proceed &= bSupports_r3, proceed)
+        tmp.push_back("renderer_r3");
+    if (proceed &= bSupports_r4, proceed)
+        tmp.push_back("renderer_r4");
     u32 _cnt = tmp.size() + 1;
     vid_quality_token = xr_alloc<xr_token>(_cnt);
 
@@ -258,14 +281,14 @@ void CEngineAPI::CreateRendererList()
 
 #ifdef DEBUG
     Msg("Available render modes[%d]:", tmp.size());
-#endif  // DEBUG
+#endif // DEBUG
     for (u32 i = 0; i < tmp.size(); ++i)
     {
         vid_quality_token[i].id = i;
         vid_quality_token[i].name = tmp[i];
 #ifdef DEBUG
         Msg("[%s]", tmp[i]);
-#endif  // DEBUG
+#endif // DEBUG
     }
 
 /*
@@ -327,5 +350,5 @@ Msg ("[%s]",_tmp[i]);
 #endif // DEBUG
 }
 */
-#endif  //#ifndef DEDICATED_SERVER
+#endif //#ifndef DEDICATED_SERVER
 }

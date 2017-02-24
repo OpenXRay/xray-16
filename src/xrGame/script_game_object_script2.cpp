@@ -151,7 +151,7 @@ class_<CScriptGameObject>& script_register_game_object1(class_<CScriptGameObject
         .def("action_by_index", &CScriptGameObject::GetActionByIndex)
 
         //.def("set_hear_callback",			(void (CScriptGameObject::*)(const luabind::object &,
-        //LPCSTR))(&CScriptGameObject::SetSoundCallback))
+        // LPCSTR))(&CScriptGameObject::SetSoundCallback))
         //.def("set_hear_callback",			(void (CScriptGameObject::*)(const luabind::functor<void>
         //&))(&CScriptGameObject::SetSoundCallback))
         //.def("clear_hear_callback",		&CScriptGameObject::ClearSoundCallback)
@@ -295,7 +295,7 @@ class_<CScriptGameObject>& script_register_game_object1(class_<CScriptGameObject
 
 #ifdef DEBUG
         .def("debug_planner", &CScriptGameObject::debug_planner)
-#endif  // DEBUG
+#endif // DEBUG
         .def("invulnerable", (bool (CScriptGameObject::*)() const) & CScriptGameObject::invulnerable)
         .def("invulnerable", (void (CScriptGameObject::*)(bool)) & CScriptGameObject::invulnerable)
 
@@ -337,8 +337,7 @@ class_<CScriptGameObject>& script_register_game_object1(class_<CScriptGameObject
 
         .def("set_smart_cover_target_selector",
             (void (CScriptGameObject::*)(luabind::functor<void>)) & CScriptGameObject::set_smart_cover_target_selector)
-        .def("set_smart_cover_target_selector",
-            (void (CScriptGameObject::*)(luabind::functor<void>, luabind::object)) &
+        .def("set_smart_cover_target_selector", (void (CScriptGameObject::*)(luabind::functor<void>, luabind::object)) &
                 CScriptGameObject::set_smart_cover_target_selector)
         .def("set_smart_cover_target_selector",
             (void (CScriptGameObject::*)()) & CScriptGameObject::set_smart_cover_target_selector)

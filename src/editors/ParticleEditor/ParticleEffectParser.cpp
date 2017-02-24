@@ -409,17 +409,11 @@ union var
     string128 s;
 
     operator PDomainEnum() { return d; }
-
     operator float() { return f; }
-
     operator int() { return i; }
-
     operator WORD() { return w; }
-
     operator DWORD() { return o; }
-
     operator string128&() { return s; }
-
     var& operator=(PDomainEnum _d)
     {
         d = _d;
@@ -457,17 +451,11 @@ union var
     }
 
     var() {}
-
     var(PDomainEnum _d) : d(_d) {}
-
     var(float _f) : f(_f) {}
-
     var(int _i) : i(_i) {}
-
     var(WORD _w) : w(_w) {}
-
     var(DWORD _o) : o(_o) {}
-
     var(string128& _s) { strcpy(s, _s); }
 };
 
@@ -477,7 +465,8 @@ IC
     get_int(LPCSTR a, var& val)
 {
     for (int k = 0; a[k]; k++)
-        if (!isdigit(a[k]) && (a[k] != '-') && (a[k] != '+')) return false;
+        if (!isdigit(a[k]) && (a[k] != '-') && (a[k] != '+'))
+            return false;
     val = atoi(a);
     return true;
 }
@@ -487,15 +476,18 @@ IC
     bool
     get_float(LPCSTR a, var& val)
 {
-    if (strstr(a, "P_MAXFLOAT")) {
+    if (strstr(a, "P_MAXFLOAT"))
+    {
         val = P_MAXFLOAT;
         return true;
     }
-    if (strstr(a, "P_EPS")) {
+    if (strstr(a, "P_EPS"))
+    {
         val = EPS_L;
         return true;
     }
-    if (strstr(a, "EPS_L")) {
+    if (strstr(a, "EPS_L"))
+    {
         val = EPS_L;
         return true;
     }
@@ -515,7 +507,8 @@ IC
 {
     bool b0 = (0 == stricmp(a, "false"));
     bool b1 = (0 == stricmp(a, "true"));
-    if (b0 == b1) return false;
+    if (b0 == b1)
+        return false;
     val = (BOOL)b1;
     return true;
 }
@@ -537,7 +530,8 @@ IC
     get_token_ID(xr_token* token_list, LPCSTR name)
 {
     for (int i = 0; token_list[i].name; i++)
-        if (!strcmp(name, token_list[i].name)) return token_list[i].id;
+        if (!strcmp(name, token_list[i].name))
+            return token_list[i].id;
     return -1;
 }
 
@@ -573,7 +567,7 @@ namespace PS
 {
 class PFunction
 {
-  public:
+public:
     CPEDef* parent;
     // command
     AnsiString command;
@@ -609,7 +603,7 @@ class PFunction
 
     LPCSTR src;
 
-  public:
+public:
     PFunction()
     {
         req_params = -1;
@@ -636,7 +630,8 @@ class PFunction
             P.type = (PParamType)get_token_ID(type_token, t.c_str());
             R_ASSERT2(P.type != ptUnknown, "Unknown PParamType!");
             _GetItems(pm.c_str(), 1, 1000, v, ' ');
-            if (_GetItemCount(v.c_str(), '=') == 2) {
+            if (_GetItemCount(v.c_str(), '=') == 2)
+            {
                 _GetItem(v.c_str(), 0, P.hint, '=');
                 _GetItem(v.c_str(), 1, P.s_data, '=');
             }
@@ -644,7 +639,8 @@ class PFunction
             {
                 P.hint = v;
             }
-            if (!P.s_data.IsEmpty()) {
+            if (!P.s_data.IsEmpty())
+            {
                 switch (P.type)
                 {
                 case ptDomain: bRes = get_domain_type(P.s_data.c_str(), P.data); break;
@@ -660,7 +656,8 @@ class PFunction
             {
                 req_params = k + 1;
             }
-            if (!bRes) {
+            if (!bRes)
+            {
                 ErrMsg(*parent->m_Name, BAD_PARAM, 0, k, P.s_data.c_str());
                 break;
             }
@@ -675,11 +672,13 @@ class PFunction
         _GetItem(pms.c_str(), 0, pms, ')');
         bool bRes = true;
         int p_cnt = _GetItemCount(pms.c_str());
-        if (p_cnt > params.size()) {
+        if (p_cnt > params.size())
+        {
             ErrMsg(*parent->m_Name, MANY_PARAMS, l, 0, line);
             return false;
         }
-        if (p_cnt < req_params) {
+        if (p_cnt < req_params)
+        {
             ErrMsg(*parent->m_Name, FEW_PARAMS, l, 0, line);
             return false;
         }
@@ -697,7 +696,8 @@ class PFunction
             case ptDWORD: bRes = get_int(pm.c_str(), P.data); break;
             case ptString: bRes = get_string(pm.c_str(), P.data); break;
             }
-            if (!bRes) {
+            if (!bRes)
+            {
                 ErrMsg(*parent->m_Name, BAD_PARAM, l, k, pm.c_str());
                 break;
             }
@@ -848,34 +848,38 @@ static LPCSTR PStateCommands[] = {
     //	"pResetState();",
     "pColor(float red, float green, float blue, float alpha=1.0f);",
     "pColorD(float alpha, PDomainEnum dtype, float a0=0.0f, float a1=0.0f, float a2=0.0f, float a3=0.0f, float "
-    "a4=0.0f, float a5=0.0f, float a6=0.0f, float a7=0.0f, float a8=0.0f);",
+    "a4=0.0f, "
+    "float a5=0.0f, float a6=0.0f, float a7=0.0f, float a8=0.0f);",
     "pRotate(float rot_x, float rot_y=0.f, float rot_z=0.f);",
     "pRotateD(PDomainEnum dtype, float a0=0.0f, float a1=0.0f, float a2=0.0f, float a3=0.0f, float a4=0.0f, float "
-    "a5=0.0f, float a6=0.0f, float a7=0.0f, float a8=0.0f);",
+    "a5=0.0f, "
+    "float a6=0.0f, float a7=0.0f, float a8=0.0f);",
     "pSize(float size_x, float size_y=1.0f, float size_z=1.0f);",
     "pSizeD(PDomainEnum dtype, float a0=0.0f, float a1=0.0f, float a2=0.0f, float a3=0.0f, float a4=0.0f, float "
-    "a5=0.0f, float a6=0.0f, float a7=0.0f, float a8=0.0f, BOOL single_size=TRUE);",
+    "a5=0.0f, "
+    "float a6=0.0f, float a7=0.0f, float a8=0.0f, BOOL single_size=TRUE);",
     "pStartingAge(float age, float sigma=1.0f);", "pVelocity(float x, float y, float z);",
     "pVelocityD(PDomainEnum dtype, float a0=0.0f, float a1=0.0f, float a2=0.0f, float a3=0.0f, float a4=0.0f, float "
     "a5=0.0f, float a6=0.0f, float a7=0.0f, float a8=0.0f);",
-    "pVertexB(float x, float y, float z);", "pVertexBD(PDomainEnum dtype, float a0=0.0f, float a1=0.0f, float a2=0.0f, "
-                                            "float a3=0.0f, float a4=0.0f, float a5=0.0f, float a6=0.0f, float "
-                                            "a7=0.0f, float a8=0.0f);",
+    "pVertexB(float x, float y, float z);",
+    "pVertexBD(PDomainEnum dtype, float a0=0.0f, float a1=0.0f, float a2=0.0f, float a3=0.0f, float a4=0.0f, float "
+    "a5=0.0f, float a6=0.0f, float a7=0.0f, float a8=0.0f);",
     "pVertexBTracks(BOOL track_vertex=TRUE);", "pSetMaxParticles(int max_count);",
     // our
     "pParentMotion(float scale);", "pAlignToPath(float rot_x=-1.57f, float rot_y=0.f, float rot_z=0.f);",
     "pVelocityScale(float scale_x=0.f, float scale_y=0.f, float scale_z=0.f);",
     "pCollision(float friction, float resilience, float cutoff, BOOL destroy_on_contact=FALSE);",
     //    "pObject(LPCSTR obj_name);",
-    "pSprite(LPCSTR sh_name, LPCSTR tex_name);", "pFrame(BOOL random_frame=TRUE, u32 frame_count=16, u32 "
-                                                 "texture_width=128, u32 texture_height=128, u32 frame_width=32, u32 "
-                                                 "frame_height=32);",
+    "pSprite(LPCSTR sh_name, LPCSTR tex_name);",
+    "pFrame(BOOL random_frame=TRUE, u32 frame_count=16, u32 texture_width=128, u32 texture_height=128, u32 "
+    "frame_width=32, "
+    "u32 frame_height=32);",
     "pTimeLimit(float time_limit);", 0};
 
-static LPCSTR PActionCommands[] = {"pAvoid(float magnitude, float epsilon, float look_ahead,  PDomainEnum dtype, float "
-                                   "a0=0.0f, float a1=0.0f, float a2=0.0f, float a3=0.0f, float a4=0.0f, float "
-                                   "a5=0.0f, float a6=0.0f, float a7=0.0f, float a8=0.0f, BOOL allow_translate=TRUE, "
-                                   "BOOL allow_rotate=TRUE);",
+static LPCSTR PActionCommands[] = {
+    "pAvoid(float magnitude, float epsilon, float look_ahead,  PDomainEnum dtype, float a0=0.0f, float a1=0.0f, float "
+    "a2=0.0f, float a3=0.0f, float a4=0.0f, float a5=0.0f, float a6=0.0f, float a7=0.0f, float a8=0.0f, BOOL "
+    "allow_translate=TRUE, BOOL allow_rotate=TRUE);",
     "pBounce(float friction, float resilience, float cutoff, PDomainEnum dtype, float a0=0.0f, float a1=0.0f, float "
     "a2=0.0f, float a3=0.0f, float a4=0.0f, float a5=0.0f, float a6=0.0f, float a7=0.0f, float a8=0.0f, BOOL "
     "allow_translate=TRUE, BOOL allow_rotate=TRUE);",
@@ -897,14 +901,18 @@ static LPCSTR PActionCommands[] = {"pAvoid(float magnitude, float epsilon, float
     "pRandomAccel(PDomainEnum dtype, float a0=0.0f, float a1=0.0f, float a2=0.0f, float a3=0.0f, float a4=0.0f, float "
     "a5=0.0f, float a6=0.0f, float a7=0.0f, float a8=0.0f, BOOL allow_translate=TRUE, BOOL allow_rotate=TRUE);",
     "pRandomDisplace(PDomainEnum dtype, float a0=0.0f, float a1=0.0f, float a2=0.0f, float a3=0.0f, float a4=0.0f, "
-    "float a5=0.0f, float a6=0.0f, float a7=0.0f, float a8=0.0f, BOOL allow_translate=TRUE, BOOL allow_rotate=TRUE);",
+    "float "
+    "a5=0.0f, float a6=0.0f, float a7=0.0f, float a8=0.0f, BOOL allow_translate=TRUE, BOOL allow_rotate=TRUE);",
     "pRandomVelocity(PDomainEnum dtype, float a0=0.0f, float a1=0.0f, float a2=0.0f, float a3=0.0f, float a4=0.0f, "
+    "float "
+    "a5=0.0f, float a6=0.0f, float a7=0.0f, float a8=0.0f, BOOL allow_translate=TRUE, BOOL allow_rotate=TRUE);",
+    "pRestore(float time);",
+    "pSink(BOOL kill_inside, PDomainEnum dtype, float a0=0.0f, float a1=0.0f, float a2=0.0f, float a3=0.0f, float "
+    "a4=0.0f, "
     "float a5=0.0f, float a6=0.0f, float a7=0.0f, float a8=0.0f, BOOL allow_translate=TRUE, BOOL allow_rotate=TRUE);",
-    "pRestore(float time);", "pSink(BOOL kill_inside, PDomainEnum dtype, float a0=0.0f, float a1=0.0f, float a2=0.0f, "
-                             "float a3=0.0f, float a4=0.0f, float a5=0.0f, float a6=0.0f, float a7=0.0f, float "
-                             "a8=0.0f, BOOL allow_translate=TRUE, BOOL allow_rotate=TRUE);",
     "pSinkVelocity(BOOL kill_inside, PDomainEnum dtype, float a0=0.0f, float a1=0.0f, float a2=0.0f, float a3=0.0f, "
-    "float a4=0.0f, float a5=0.0f, float a6=0.0f, float a7=0.0f, float a8=0.0f, BOOL allow_translate=TRUE, BOOL "
+    "float "
+    "a4=0.0f, float a5=0.0f, float a6=0.0f, float a7=0.0f, float a8=0.0f, BOOL allow_translate=TRUE, BOOL "
     "allow_rotate=TRUE);",
     "pSource(float particle_rate, PDomainEnum dtype, float a0=0.0f, float a1=0.0f, float a2=0.0f, float a3=0.0f, float "
     "a4=0.0f, float a5=0.0f, float a6=0.0f, float a7=0.0f, float a8=0.0f, BOOL allow_translate=TRUE, BOOL "
@@ -919,12 +927,13 @@ static LPCSTR PActionCommands[] = {"pAvoid(float magnitude, float epsilon, float
     "pTargetVelocity(float vel_x, float vel_y, float vel_z, float scale, BOOL allow_translate=TRUE, BOOL "
     "allow_rotate=TRUE);",
     "pTargetVelocityD(float scale, PDomainEnum dtype, float a0=0.0f, float a1=0.0f, float a2=0.0f, float a3=0.0f, "
-    "float a4=0.0f, float a5=0.0f, float a6=0.0f, float a7=0.0f, float a8=0.0f, BOOL allow_translate=TRUE, BOOL "
+    "float "
+    "a4=0.0f, float a5=0.0f, float a6=0.0f, float a7=0.0f, float a8=0.0f, BOOL allow_translate=TRUE, BOOL "
     "allow_rotate=TRUE);",
-    "pVertex(float x, float y, float z);", "pVortex(float center_x, float center_y, float center_z, float axis_x, "
-                                           "float axis_y, float axis_z, float magnitude=1.0f, float epsilon=EPS_L, "
-                                           "float max_radius=P_MAXFLOAT, BOOL allow_translate=TRUE, BOOL "
-                                           "allow_rotate=TRUE);",
+    "pVertex(float x, float y, float z);",
+    "pVortex(float center_x, float center_y, float center_z, float axis_x, float axis_y, float axis_z, float "
+    "magnitude=1.0f, float epsilon=EPS_L, float max_radius=P_MAXFLOAT, BOOL allow_translate=TRUE, BOOL "
+    "allow_rotate=TRUE);",
     // our
     "pAnimate(float speed=24.f, BOOL random_playback=FALSE);", 0};
 
@@ -940,20 +949,24 @@ bool InitCommandTemplates()
         {
             PS::PFunction F;
             F.type = PFunction::ftState;
-            if (!(bRes = F.LoadTemplate(PStateCommands[k]))) break;
+            if (!(bRes = F.LoadTemplate(PStateCommands[k])))
+                break;
             ct.insert(mk_pair(F.command, F));
         }
-        if (!bRes) break;
+        if (!bRes)
+            break;
         // load action commands
         for (k = 0; PActionCommands[k]; k++)
         {
             PFunction F;
             F.type = PS::PFunction::ftAction;
-            if (!(bRes = F.LoadTemplate(PActionCommands[k]))) break;
+            if (!(bRes = F.LoadTemplate(PActionCommands[k])))
+                break;
             ct.insert(mk_pair(F.command, F));
         }
     } while (0);
-    if (!bRes) ct.clear();
+    if (!bRes)
+        ct.clear();
     return bRes;
 }
 
@@ -964,9 +977,11 @@ const AnsiString GetFunctionTemplate(const AnsiString& command)
     LPCSTR dest = 0;
     PFunction* F = CPEDef::FindCommandPrototype(command.c_str(), dest);
     AnsiString text = "";
-    if (F) {
+    if (F)
+    {
         text.sprintf("%-16s(", F->command);
-        if (!F->params.empty()) {
+        if (!F->params.empty())
+        {
             for (PFunction::ParamIt it = F->params.begin(); it != F->params.end(); it++)
             {
                 text += it->s_data;
@@ -982,11 +997,13 @@ const AnsiString GetFunctionTemplate(const AnsiString& command)
 void FillStateMenu(TMenuItem* root, TNotifyEvent on_click)
 {
     // load templates
-    if (CommandTemplates.empty()) R_ASSERT(InitCommandTemplates());
+    if (CommandTemplates.empty())
+        R_ASSERT(InitCommandTemplates());
 
     for (PFuncPairIt b = CommandTemplates.begin(); b != CommandTemplates.end(); b++)
     {
-        if (b->second.type == PFunction::ftState) {
+        if (b->second.type == PFunction::ftState)
+        {
             TMenuItem* mi = new TMenuItem((TComponent*)0);
             mi->Caption = b->second.command;
             mi->OnClick = on_click;
@@ -998,11 +1015,13 @@ void FillStateMenu(TMenuItem* root, TNotifyEvent on_click)
 void FillActionMenu(TMenuItem* root, TNotifyEvent on_click)
 {
     // load templates
-    if (CommandTemplates.empty()) R_ASSERT(InitCommandTemplates());
+    if (CommandTemplates.empty())
+        R_ASSERT(InitCommandTemplates());
 
     for (PFuncPairIt b = CommandTemplates.begin(); b != CommandTemplates.end(); b++)
     {
-        if (b->second.type == PFunction::ftAction) {
+        if (b->second.type == PFunction::ftAction)
+        {
             TMenuItem* mi = new TMenuItem((TComponent*)0);
             mi->Caption = b->second.command;
             mi->OnClick = on_click;
@@ -1014,12 +1033,14 @@ void FillActionMenu(TMenuItem* root, TNotifyEvent on_click)
 PFunction* CPEDef::FindCommandPrototype(LPCSTR src, LPCSTR& dest)
 {
     // load templates
-    if (CommandTemplates.empty()) R_ASSERT(InitCommandTemplates());
+    if (CommandTemplates.empty())
+        R_ASSERT(InitCommandTemplates());
 
     AnsiString command;
     _GetItem(src, 0, command, '(');
     // comment
-    if (command == strstr(command.c_str(), "//")) {
+    if (command == strstr(command.c_str(), "//"))
+    {
         dest = 0;
         return 0;
     }
@@ -1044,11 +1065,12 @@ void CPEDef::Compile()
         }
     */
     // load templates
-    if (CommandTemplates.empty()) R_ASSERT(InitCommandTemplates());
+    if (CommandTemplates.empty())
+        R_ASSERT(InitCommandTemplates());
 
     // parse
     LPSTRVec lst;
-    _SequenceToList(lst, m_SourceText.c_str(), '\r');  // 0x0d 0x0a \n \r
+    _SequenceToList(lst, m_SourceText.c_str(), '\r'); // 0x0d 0x0a \n \r
 
     // reset flags
     //.	m_Flags.zero		();
@@ -1063,17 +1085,20 @@ void CPEDef::Compile()
         AnsiString command, line;
         _GetItem(*it, 0, command, '(');
         // comment
-        if (command == strstr(command.c_str(), "//")) continue;
+        if (command == strstr(command.c_str(), "//"))
+            continue;
         // check ';' found
         _GetItem(*it, 1, line, ')');
-        if (line != strstr(line.c_str(), ";")) {
+        if (line != strstr(line.c_str(), ";"))
+        {
             ErrMsg(*m_Name, STA_MISSING, i_line, 0, *it);
             bRes = false;
             break;
         }
         // find command in templates
         PFuncPairIt pfp_it = CommandTemplates.find(command.c_str());
-        if (pfp_it == CommandTemplates.end()) {
+        if (pfp_it == CommandTemplates.end())
+        {
             ErrMsg(*m_Name, BAD_COMMAND, i_line, 0, *it);
             bRes = false;
             break;
@@ -1083,13 +1108,15 @@ void CPEDef::Compile()
         F = pfp_it->second;
         F.parent = this;
         // parse params
-        if (!(bRes = F.Parse(i_line, *it))) break;
+        if (!(bRes = F.Parse(i_line, *it)))
+            break;
     }
     // free list
     for (LPSTRIt it = lst.begin(); it != lst.end(); it++)
         xr_free(*it);
 
-    if (!bRes) return;
+    if (!bRes)
+        return;
 
     // destroy shader (may be changed)
     //.	m_CachedShader.destroy	();
@@ -1109,11 +1136,13 @@ void CPEDef::Compile()
         PFuncIt pf_it;
         // at first state commands
         for (pf_it = Commands.begin(); pf_it != Commands.end(); pf_it++)
-            if (PFunction::ftState == pf_it->type) pf_it->Execute();
+            if (PFunction::ftState == pf_it->type)
+                pf_it->Execute();
         // at next action commands
         pNewActionList(action_list_handle);
         for (pf_it = Commands.begin(); pf_it != Commands.end(); pf_it++)
-            if (PFunction::ftAction == pf_it->type) pf_it->Execute();
+            if (PFunction::ftAction == pf_it->type)
+                pf_it->Execute();
         pEndActionList();
 
         // save effect data

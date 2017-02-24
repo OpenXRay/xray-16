@@ -54,7 +54,7 @@ void base::aim_at_position(
 		VPUSH(object_position),
 		VPUSH(object_direction)
 	);
-#endif  // #if 0
+#endif // #if 0
 
     VERIFY2(_valid(bone_position), make_string("[%f][%f][%f]", VPUSH(bone_position)));
     VERIFY2(_valid(object_position), make_string("[%f][%f][%f]", VPUSH(object_position)));
@@ -73,7 +73,8 @@ void base::aim_at_position(
 
     Fvector bone2current = Fvector().sub(current_point, bone_position);
     VERIFY(_valid(bone2current));
-    if (bone2current.magnitude() < EPS_L) bone2current.set(0.f, 0.f, EPS_L);
+    if (bone2current.magnitude() < EPS_L)
+        bone2current.set(0.f, 0.f, EPS_L);
     VERIFY(_valid(bone2current));
 
     float const sphere_radius_sqr = bone2current.square_magnitude();
@@ -81,7 +82,8 @@ void base::aim_at_position(
 
     Fvector direction_target = Fvector().sub(m_target, bone_position);
     VERIFY(_valid(direction_target));
-    if (direction_target.magnitude() < EPS_L) direction_target.set(0.f, 0.f, EPS_L);
+    if (direction_target.magnitude() < EPS_L)
+        direction_target.set(0.f, 0.f, EPS_L);
     VERIFY(_valid(direction_target));
 
     float const invert_magnitude = 1.f / direction_target.magnitude();
@@ -104,14 +106,16 @@ void base::aim_at_position(
 
     Fvector projection2circle_center = Fvector().sub(projection, circle_center);
     VERIFY(_valid(projection2circle_center));
-    if (projection2circle_center.magnitude() < EPS_L) projection2circle_center.set(0.f, 0.f, EPS_L);
+    if (projection2circle_center.magnitude() < EPS_L)
+        projection2circle_center.set(0.f, 0.f, EPS_L);
     VERIFY(_valid(projection2circle_center));
     Fvector const center2projection_direction = projection2circle_center.normalize();
     VERIFY(_valid(center2projection_direction));
 
     float circle_radius_sqr = sphere_radius_sqr - _sqr(to_circle_center);
     VERIFY(_valid(circle_radius_sqr));
-    if (circle_radius_sqr < 0.f) circle_radius_sqr = 0.f;
+    if (circle_radius_sqr < 0.f)
+        circle_radius_sqr = 0.f;
     VERIFY(_valid(circle_radius_sqr));
 
     float const circle_radius = _sqrt(circle_radius_sqr);
@@ -123,7 +127,8 @@ void base::aim_at_position(
 
     Fvector target2bone = Fvector().sub(target_point, bone_position);
     VERIFY(_valid(target2bone));
-    if (target2bone.magnitude() < EPS_L) target2bone.set(0.f, 0.f, EPS_L);
+    if (target2bone.magnitude() < EPS_L)
+        target2bone.set(0.f, 0.f, EPS_L);
     VERIFY(_valid(target2bone));
     Fvector const target_direction = target2bone.normalize();
     VERIFY(_valid(target_direction));
@@ -133,7 +138,8 @@ void base::aim_at_position(
         Fvector cross_product = Fvector().crossproduct(current_direction, target_direction);
         VERIFY(_valid(cross_product));
         float const sin_alpha = clampr(cross_product.magnitude(), -1.f, 1.f);
-        if (!fis_zero(sin_alpha)) {
+        if (!fis_zero(sin_alpha))
+        {
             float cos_alpha = clampr(current_direction.dotproduct(target_direction), -1.f, 1.f);
             transform0.rotation(cross_product.div(sin_alpha), atan2f(sin_alpha, cos_alpha));
             VERIFY(_valid(transform0));
@@ -148,7 +154,8 @@ void base::aim_at_position(
                 VERIFY(fsimilar(_abs(dot_product), 1.f));
                 cross_product.crossproduct(current_direction, direction_target);
                 float const sin_alpha2 = clampr(cross_product.magnitude(), -1.f, 1.f);
-                if (!fis_zero(sin_alpha2)) {
+                if (!fis_zero(sin_alpha2))
+                {
                     transform0.rotation(cross_product.div(sin_alpha2), dot_product > 0.f ? 0.f : PI);
                     VERIFY(_valid(transform0));
                 }
@@ -164,14 +171,16 @@ void base::aim_at_position(
     Fmatrix transform1;
     {
         Fvector target2target_point = Fvector().sub(m_target, target_point);
-        if (target2target_point.magnitude() < EPS_L) target2target_point.set(0.f, 0.f, EPS_L);
+        if (target2target_point.magnitude() < EPS_L)
+            target2target_point.set(0.f, 0.f, EPS_L);
         Fvector const new_direction = target2target_point.normalize();
 
         Fvector old_direction;
         transform0.transform_dir(old_direction, object_direction);
         Fvector cross_product = Fvector().crossproduct(old_direction, new_direction);
         float const sin_alpha = clampr(cross_product.magnitude(), -1.f, 1.f);
-        if (!fis_zero(sin_alpha)) {
+        if (!fis_zero(sin_alpha))
+        {
             float const cos_alpha = clampr(old_direction.dotproduct(new_direction), -1.f, 1.f);
             transform1.rotation(cross_product.div(sin_alpha), atan2f(sin_alpha, cos_alpha));
         }

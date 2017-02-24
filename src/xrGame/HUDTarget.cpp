@@ -33,23 +33,10 @@ u32 C_ON_FRIEND = color_rgba(0, 0xff, 0, 0x80);
 #define SHOW_INFO_SPEED 0.5f
 #define HIDE_INFO_SPEED 10.f
 
-IC float recon_mindist()
-{
-    return 2.f;
-}
-IC float recon_maxdist()
-{
-    return 50.f;
-}
-IC float recon_minspeed()
-{
-    return 0.5f;
-}
-IC float recon_maxspeed()
-{
-    return 10.f;
-}
-
+IC float recon_mindist() { return 2.f; }
+IC float recon_maxdist() { return 50.f; }
+IC float recon_minspeed() { return 0.5f; }
+IC float recon_maxspeed() { return 10.f; }
 CHUDTarget::CHUDTarget()
 {
     fuzzyShowInfo = 0.f;
@@ -62,19 +49,9 @@ CHUDTarget::CHUDTarget()
     m_bShowCrosshair = false;
 }
 
-CHUDTarget::~CHUDTarget()
-{
-}
-
-void CHUDTarget::Load()
-{
-    HUDCrosshair.Load();
-}
-
-void CHUDTarget::ShowCrosshair(bool b)
-{
-    m_bShowCrosshair = b;
-}
+CHUDTarget::~CHUDTarget() {}
+void CHUDTarget::Load() { HUDCrosshair.Load(); }
+void CHUDTarget::ShowCrosshair(bool b) { m_bShowCrosshair = b; }
 //. fVisTransparencyFactor
 float fCurrentPickPower;
 ICF static BOOL pick_trace_callback(collide::rq_result& result, LPVOID params)
@@ -83,7 +60,8 @@ ICF static BOOL pick_trace_callback(collide::rq_result& result, LPVOID params)
     //	collide::rq_result* RQ	= pp->RQ;
     ++pp->pass;
 
-    if (result.O) {
+    if (result.O)
+    {
         pp->RQ = result;
         return FALSE;
     }
@@ -94,7 +72,8 @@ ICF static BOOL pick_trace_callback(collide::rq_result& result, LPVOID params)
 
         SGameMtl* mtl = GMLib.GetMaterialByIdx(T->material);
         pp->power *= mtl->fVisTransparencyFactor;
-        if (pp->power > 0.34f) {
+        if (pp->power > 0.34f)
+        {
             return TRUE;
         }
         //.		if (mtl->Flags.is(SGameMtl::flPassable))
@@ -112,7 +91,8 @@ void CHUDTarget::CursorOnFrame()
     dir = Device.vCameraDirection;
 
     // Render cursor
-    if (Level().CurrentEntity()) {
+    if (Level().CurrentEntity())
+    {
         PP.RQ.O = 0;
         PP.RQ.range = g_pGamePersistent->Environment().CurrentEnv->far_plane * 0.99f;
         PP.RQ.element = -1;
@@ -134,14 +114,17 @@ void CHUDTarget::Render()
 {
     BOOL b_do_rendering = (psHUD_Flags.is(HUD_CROSSHAIR | HUD_CROSSHAIR_RT | HUD_CROSSHAIR_RT2));
 
-    if (!b_do_rendering) return;
+    if (!b_do_rendering)
+        return;
 
     VERIFY(g_bRendering);
 
     IGameObject* O = Level().CurrentEntity();
-    if (0 == O) return;
+    if (0 == O)
+        return;
     CEntity* E = smart_cast<CEntity*>(O);
-    if (0 == E) return;
+    if (0 == E)
+        return;
 
     Fvector p1 = Device.vCameraPosition;
     Fvector dir = Device.vCameraDirection;
@@ -160,27 +143,33 @@ void CHUDTarget::Render()
     F->SetAligment(CGameFont::alCenter);
     F->OutSetI(0.f, 0.05f);
 
-    if (psHUD_Flags.test(HUD_CROSSHAIR_DIST)) F->OutSkip();
+    if (psHUD_Flags.test(HUD_CROSSHAIR_DIST))
+        F->OutSkip();
 
-    if (psHUD_Flags.test(HUD_INFO)) {
+    if (psHUD_Flags.test(HUD_INFO))
+    {
         bool const is_poltergeist = PP.RQ.O && !!smart_cast<CPoltergeist*>(PP.RQ.O);
 
-        if ((PP.RQ.O && PP.RQ.O->getVisible()) || is_poltergeist) {
+        if ((PP.RQ.O && PP.RQ.O->getVisible()) || is_poltergeist)
+        {
             CEntityAlive* E = smart_cast<CEntityAlive*>(PP.RQ.O);
             CEntityAlive* pCurEnt = smart_cast<CEntityAlive*>(Level().CurrentEntity());
             PIItem l_pI = smart_cast<PIItem>(PP.RQ.O);
 
-            if (IsGameTypeSingle()) {
+            if (IsGameTypeSingle())
+            {
                 CInventoryOwner* our_inv_owner = smart_cast<CInventoryOwner*>(pCurEnt);
 
-                if (E && E->g_Alive() && E->cast_base_monster()) {
+                if (E && E->g_Alive() && E->cast_base_monster())
+                {
                     C = C_ON_ENEMY;
                 }
                 else if (E && E->g_Alive() && !E->cast_base_monster())
                 {
                     CInventoryOwner* others_inv_owner = smart_cast<CInventoryOwner*>(E);
 
-                    if (our_inv_owner && others_inv_owner) {
+                    if (our_inv_owner && others_inv_owner)
+                    {
                         switch (RELATION_REGISTRY().GetRelationType(others_inv_owner, our_inv_owner))
                         {
                         case ALife::eRelationTypeEnemy: C = C_ON_ENEMY; break;
@@ -188,7 +177,8 @@ void CHUDTarget::Render()
                         case ALife::eRelationTypeFriend: C = C_ON_FRIEND; break;
                         }
 
-                        if (fuzzyShowInfo > 0.5f) {
+                        if (fuzzyShowInfo > 0.5f)
+                        {
                             CStringTable strtbl;
                             F->SetColor(subst_alpha(C, u8(iFloor(255.f * (fuzzyShowInfo - 0.5f) * 2.f))));
                             F->OutNext("%s", *strtbl.translate(others_inv_owner->Name()));
@@ -200,7 +190,8 @@ void CHUDTarget::Render()
                 }
                 else if (l_pI && our_inv_owner && PP.RQ.range < 2.0f * 2.0f)
                 {
-                    if (fuzzyShowInfo > 0.5f && l_pI->NameItem()) {
+                    if (fuzzyShowInfo > 0.5f && l_pI->NameItem())
+                    {
                         F->SetColor(subst_alpha(C, u8(iFloor(255.f * (fuzzyShowInfo - 0.5f) * 2.f))));
                         F->OutNext("%s", l_pI->NameItem());
                     }
@@ -209,8 +200,10 @@ void CHUDTarget::Render()
             }
             else
             {
-                if (E && (E->GetfHealth() > 0)) {
-                    if (pCurEnt && GameID() == eGameIDSingle) {
+                if (E && (E->GetfHealth() > 0))
+                {
+                    if (pCurEnt && GameID() == eGameIDSingle)
+                    {
                         if (GameID() == eGameIDDeathmatch)
                             C = C_ON_ENEMY;
                         else
@@ -220,7 +213,8 @@ void CHUDTarget::Render()
                             else
                                 C = C_ON_FRIEND;
                         };
-                        if (PP.RQ.range >= recon_mindist() && PP.RQ.range <= recon_maxdist()) {
+                        if (PP.RQ.range >= recon_mindist() && PP.RQ.range <= recon_maxdist())
+                        {
                             float ddist = (PP.RQ.range - recon_mindist()) / (recon_maxdist() - recon_mindist());
                             float dspeed = recon_minspeed() + (recon_maxspeed() - recon_minspeed()) * ddist;
                             fuzzyShowInfo += Device.fTimeDelta / dspeed;
@@ -233,7 +227,8 @@ void CHUDTarget::Render()
                                 fuzzyShowInfo = 0;
                         };
 
-                        if (fuzzyShowInfo > 0.5f) {
+                        if (fuzzyShowInfo > 0.5f)
+                        {
                             clamp(fuzzyShowInfo, 0.f, 1.f);
                             int alpha_C = iFloor(255.f * (fuzzyShowInfo - 0.5f) * 2.f);
                             u8 alpha_b = u8(alpha_C & 0x00ff);
@@ -251,7 +246,8 @@ void CHUDTarget::Render()
         clamp(fuzzyShowInfo, 0.f, 1.f);
     }
 
-    if (psHUD_Flags.test(HUD_CROSSHAIR_DIST)) {
+    if (psHUD_Flags.test(HUD_CROSSHAIR_DIST))
+    {
         F->OutSetI(0.f, 0.05f);
         F->SetColor(C);
 #ifdef DEBUG
@@ -262,7 +258,8 @@ void CHUDTarget::Render()
     }
 
     //отрендерить кружочек или крестик
-    if (!m_bShowCrosshair) {
+    if (!m_bShowCrosshair)
+    {
         GlobalEnv.UIRender->StartPrimitive(6, IUIRender::ptTriList, UI().m_currentPointType);
 
         Fvector2 scr_size;
@@ -303,7 +300,8 @@ void CHUDTarget::Render()
 
 void CHUDTarget::net_Relcase(IGameObject* O)
 {
-    if (PP.RQ.O == O) PP.RQ.O = NULL;
+    if (PP.RQ.O == O)
+        PP.RQ.O = NULL;
 
     RQR.r_clear();
 }

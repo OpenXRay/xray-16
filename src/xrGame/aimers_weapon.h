@@ -36,7 +36,7 @@ private:
         weapon_bone_id0,
         weapon_bone_id1,
         parent_weapon_bone_id0,
-    };  // enum
+    }; // enum
 
 private:
     Fmatrix m_result[2];
@@ -44,10 +44,10 @@ private:
     Fmatrix m_local_bones[5];
     CWeapon const& m_weapon;
     u16 m_bones_ids[5];
-};  // class weapon
+}; // class weapon
 
-}  // namespace aimers
+} // namespace aimers
 
 #include "aimers_weapon_inline.h"
 
-#endif  // #ifndef AIMERS_WEAPON_H_INCLUDED
+#endif // #ifndef AIMERS_WEAPON_H_INCLUDED

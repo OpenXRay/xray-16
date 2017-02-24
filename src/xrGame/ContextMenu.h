@@ -24,4 +24,4 @@ public:
     void Render(CGameFont* F, u32 cT, u32 cI, float s);
     void Select(int num);
 };
-#endif  // __XR_CONTEXTMENU_H__
+#endif // __XR_CONTEXTMENU_H__

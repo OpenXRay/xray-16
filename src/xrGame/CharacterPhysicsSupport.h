@@ -89,17 +89,14 @@ private:
 
 public:
     EType Type() { return m_eType; }
-
 private:
     EState STate() { return m_eState; }
     void SetState(EState astate) { m_eState = astate; }
     IC bool isDead() { return m_eState == esDead; }
     IC bool isAlive() { return !m_pPhysicsShell; }
-
 protected:
     virtual void SpawnInitPhysics(CSE_Abstract* D);
     virtual CPhysicsShellHolder* PPhysicsShellHolder() { return m_EntityAlife.PhysicsShellHolder(); }
-
     virtual bool CanRemoveObject();
 
 public:
@@ -185,4 +182,4 @@ private:
     void UpdateCollisionActivatingDellay();
     void SpawnCharacterCreate();
 };
-#endif  // CHARACTER_PHYSICS_SUPPORT
+#endif // CHARACTER_PHYSICS_SUPPORT

@@ -19,7 +19,7 @@ public:
         u32 dwInstructions : 16;
         u32 bSoftware : 1;
         u32 bPointSprites : 1;
-        u32 bVTF : 1;  // vertex-texture-fetch
+        u32 bVTF : 1; // vertex-texture-fetch
         u32 bNPatches : 1;
         u32 dwClipPlanes : 4;
         u32 dwVertexCache : 8;
@@ -28,7 +28,7 @@ public:
     {
         u32 dwRegisters : 16;
         u32 dwInstructions : 16;
-        u32 dwStages : 4;  // number of tex-stages
+        u32 dwStages : 4; // number of tex-stages
         u32 dwMRT_count : 4;
         u32 b_MRT_mixdepth : 1;
         u32 bNonPow2 : 1;
@@ -60,13 +60,13 @@ public:
     u32 id_vendor;
     u32 id_device;
 
-    BOOL bStencil;   // stencil buffer present
-    BOOL bScissor;   // scissor rect supported
-    BOOL bTableFog;  //
+    BOOL bStencil; // stencil buffer present
+    BOOL bScissor; // scissor rect supported
+    BOOL bTableFog; //
 
     // some precalculated values
-    D3DSTENCILOP soDec, soInc;  // best stencil OPs for shadows
-    u32 dwMaxStencilValue;      // maximum value the stencil buffer can hold
+    D3DSTENCILOP soDec, soInc; // best stencil OPs for shadows
+    u32 dwMaxStencilValue; // maximum value the stencil buffer can hold
 
     void Update(void);
 };

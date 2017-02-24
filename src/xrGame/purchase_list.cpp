@@ -49,7 +49,8 @@ void CPurchaseList::process(
     u32 j = 0;
     for (u32 i = 0; i < count; ++i)
     {
-        if (random.randF() > probability) continue;
+        if (random.randF() > probability)
+            continue;
 
         ++j;
         Level().spawn_item(*name, position, level_vertex_id, id, false);

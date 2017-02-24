@@ -26,7 +26,8 @@ bool can_capture(CPHCharacter* a_character, IPhysicsShellHolder* a_taget_object)
     IKinematics* p_kinematics = a_character->PhysicsRefObject()->ObjectKinematics();
     VERIFY(p_kinematics);
     CInifile* ini = p_kinematics->LL_UserData();
-    if (!ini || !ini->section_exist("capture")) return false;
+    if (!ini || !ini->section_exist("capture"))
+        return false;
     return true;
 }
 
@@ -40,7 +41,8 @@ bool can_capture(CPHCharacter* a_character, IPhysicsShellHolder* a_taget_object,
     // IKinematics* K=	smart_cast<IKinematics*>( a_taget_object->ObjectVisual( ) );
     IKinematics* K = a_taget_object->ObjectKinematics();
 
-    if (!K || !K->LL_GetBoneInstance(a_taget_element).callback_param()) return false;
+    if (!K || !K->LL_GetBoneInstance(a_taget_element).callback_param())
+        return false;
     return true;
 }
 
@@ -98,7 +100,8 @@ CPHCapture::CPHCapture(
       b_collide(false)
 
 {
-    if (!can_capture(a_character, a_taget_object)) return;
+    if (!can_capture(a_character, a_taget_object))
+        return;
 
     VERIFY(m_taget_object);
     VERIFY(m_taget_object->ObjectPPhysicsShell());
@@ -106,7 +109,8 @@ CPHCapture::CPHCapture(
     m_capture_bone = get_capture_bone(a_character);
     VERIFY(m_capture_bone);
     m_taget_element = m_taget_object->ObjectPPhysicsShell()->NearestToPoint(m_capture_bone->mTransform.c, cb);
-    if (!m_taget_element) return;
+    if (!m_taget_element)
+        return;
     Init();
 }
 
@@ -124,7 +128,8 @@ CPHCapture::CPHCapture(CPHCharacter* a_character, IPhysicsShellHolder* a_taget_o
       b_collide(false)
 
 {
-    if (!can_capture(a_character, a_taget_object, a_taget_element)) return;
+    if (!can_capture(a_character, a_taget_object, a_taget_element))
+        return;
     VERIFY(m_taget_object);
     VERIFY(a_character);
     m_capture_bone = get_capture_bone(a_character);
@@ -170,17 +175,19 @@ void CPHCapture::Init()
     dir.sub(capture_bone_position, dir);
 
     m_pull_distance = ini->r_float("capture", "pull_distance");
-    if (dir.magnitude() > m_pull_distance) return;
+    if (dir.magnitude() > m_pull_distance)
+        return;
 
     float pool_force_factor = 4.f;
-    m_capture_distance = ini->r_float("capture", "distance");     // distance
-    m_capture_force = ini->r_float("capture", "capture_force");   // capture force
-    m_capture_time = ini->r_u32("capture", "time_limit") * 1000;  // time;
+    m_capture_distance = ini->r_float("capture", "distance"); // distance
+    m_capture_force = ini->r_float("capture", "capture_force"); // capture force
+    m_capture_time = ini->r_u32("capture", "time_limit") * 1000; // time;
     m_time_start = inl_ph_world().Device().dwTimeGlobal;
-    float max_pull_force = ini->r_float("capture", "pull_force");  // pull force
+    float max_pull_force = ini->r_float("capture", "pull_force"); // pull force
     m_pull_force = pool_force_factor * ph_world->Gravity() * m_taget_element->PhysicsShell()->getMass();
-    if (m_pull_force > max_pull_force) m_pull_force = max_pull_force;
-    float pulling_vel_scale = ini->r_float("capture", "velocity_scale");  //
+    if (m_pull_force > max_pull_force)
+        m_pull_force = max_pull_force;
+    float pulling_vel_scale = ini->r_float("capture", "velocity_scale"); //
 
     m_taget_element->set_DynamicLimits(default_l_limit * pulling_vel_scale, default_w_limit * pulling_vel_scale);
     // m_taget_element->PhysicsShell()->set_ObjectContactCallback(object_contactCallbackFun);
@@ -188,7 +195,8 @@ void CPHCapture::Init()
     m_island.Init();
     // CActor* A=smart_cast<CActor*>(m_character->PhysicsRefObject());
     IPhysicsShellHolder* A = (m_character->PhysicsRefObject());
-    if (A->IsActor()) {
+    if (A->IsActor())
+    {
         // A->SetWeaponHideState(INV_STATE_BLOCK_ALL,true);
         A->HideAllWeapons(true);
     }
@@ -198,21 +206,25 @@ void CPHCapture::Init()
 
 void CPHCapture::Release()
 {
-    if (e_state == cstReleased || e_state == cstFree) return;
+    if (e_state == cstReleased || e_state == cstFree)
+        return;
     VERIFY(m_island.DActiveIsland() == &m_island);
 
-    if (m_joint) {
+    if (m_joint)
+    {
         m_island.RemoveJoint(m_joint);
         dJointDestroy(m_joint);
     }
     m_joint = NULL;
-    if (m_ajoint) {
+    if (m_ajoint)
+    {
         m_island.RemoveJoint(m_ajoint);
         dJointDestroy(m_ajoint);
     }
     m_ajoint = NULL;
 
-    if (m_body) {
+    if (m_body)
+    {
         m_island.RemoveBody(m_body);
         dBodyDestroy(m_body);
     }
@@ -227,7 +239,8 @@ void CPHCapture::Release()
     b_collide = true;
     // CActor* A=smart_cast<CActor*>(m_character->PhysicsRefObject());
     IPhysicsShellHolder* A = (m_character->PhysicsRefObject());
-    if (A) {
+    if (A)
+    {
         A->HideAllWeapons(false);
         // A->SetWeaponHideState(INV_STATE_BLOCK_ALL,false);
         //.		A->inventory().setSlotsBlocked(false);
@@ -239,7 +252,8 @@ void CPHCapture::Release()
 void CPHCapture::Deactivate()
 {
     Release();
-    if (m_taget_element) {
+    if (m_taget_element)
+    {
         VERIFY(dynamic_cast<CPHElement*>(m_taget_element));
 
         m_taget_element->Enable();
@@ -249,7 +263,8 @@ void CPHCapture::Deactivate()
     //	m_taget_element->set_ObjectContactCallback(0);
 
     //}
-    if (m_character) m_character->SetObjectContactCallback(0);
+    if (m_character)
+        m_character->SetObjectContactCallback(0);
     CPHUpdateObject::Deactivate();
     e_state = cstFree;
     m_character = NULL;

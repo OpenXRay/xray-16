@@ -162,11 +162,10 @@ private:
         return d;
     }
     IC T _acos_(T x) { return PI_DIV_2 - _asin_(x); }
-
 public:
     T x, y, z, w;
 
-    IC SelfRef set(T W, T X, T Y, T Z)  // don't normalize
+    IC SelfRef set(T W, T X, T Y, T Z) // don't normalize
     {
         x = X;
         y = Y;
@@ -174,7 +173,7 @@ public:
         w = W;
         return *this;
     }
-    IC SelfRef set(SelfCRef Q)  // don't normalize
+    IC SelfRef set(SelfCRef Q) // don't normalize
     {
         set(Q.w, Q.x, Q.y, Q.z);
         return *this;
@@ -244,10 +243,14 @@ public:
     // validates numerical stability
     IC const BOOL isValid(void) const
     {
-        if ((w * w) < 0.0f) return false;
-        if ((x * x) < 0.0f) return false;
-        if ((y * y) < 0.0f) return false;
-        if ((z * z) < 0.0f) return false;
+        if ((w * w) < 0.0f)
+            return false;
+        if ((x * x) < 0.0f)
+            return false;
+        if ((y * y) < 0.0f)
+            return false;
+        if ((z * z) < 0.0f)
+            return false;
         return true;
     }
 
@@ -256,7 +259,8 @@ public:
     {
         T m = magnitude();
 
-        if ((m < 1.0 + UNIT_TOLERANCE) && (m > 1.0 - UNIT_TOLERANCE)) return true;
+        if ((m < 1.0 + UNIT_TOLERANCE) && (m > 1.0 - UNIT_TOLERANCE))
+            return true;
         return false;
     }
 
@@ -267,7 +271,8 @@ public:
 
         m = _sqrt(magnitude());
 
-        if ((m < QZERO_TOLERANCE) && (m > -QZERO_TOLERANCE)) return *this;
+        if ((m < QZERO_TOLERANCE) && (m > -QZERO_TOLERANCE))
+            return *this;
 
         one_over_magnitude = 1.0f / m;
 
@@ -283,13 +288,10 @@ public:
     IC SelfRef inverse() { return set(w, -x, -y, -z); }
     IC SelfRef inverse_with_w(SelfCRef Q) { return set(-Q.w, -Q.x, -Q.y, -Q.z); }
     IC SelfRef inverse_with_w() { return set(-w, -x, -y, -z); }
-
     // identity - no rotation
     IC SelfRef identity(void) { return set(1.f, 0.f, 0.f, 0.f); }
-
     // square length
     IC T magnitude(void) { return w * w + x * x + y * y + z * z; }
-
     // makes unit rotation
     IC SelfRef rotationYawPitchRoll(T _x, T _y, T _z)
     {
@@ -309,7 +311,6 @@ public:
 
     // makes unit rotation
     IC SelfRef rotationYawPitchRoll(const Fvector& ypr) { return rotationYawPitchRoll(ypr.x, ypr.y, ypr.z); }
-
     // set a quaternion from an axis and a rotation around the axis
     IC SelfRef rotation(Fvector& axis, T angle)
     {
@@ -330,7 +331,8 @@ public:
     IC BOOL get_axis_angle(Fvector& axis, T& angle)
     {
         T s = _sqrt(x * x + y * y + z * z);
-        if (s > EPS_S) {
+        if (s > EPS_S)
+        {
             T OneOverSinTheta = 1.f / s;
             axis.x = OneOverSinTheta * x;
             axis.y = OneOverSinTheta * y;
@@ -362,7 +364,8 @@ public:
 
         T cosom = (Q0.w * Q1.w) + (Q0.x * Q1.x) + (Q0.y * Q1.y) + (Q0.z * Q1.z);
 
-        if (cosom < 0) {
+        if (cosom < 0)
+        {
             cosom = -cosom;
             sign = -1.f;
         }
@@ -371,7 +374,8 @@ public:
             sign = 1.f;
         }
 
-        if ((1.0f - cosom) > EPS) {
+        if ((1.0f - cosom) > EPS)
+        {
             T omega = _acos_(cosom);
             T i_sinom = 1.f / _sin(omega);
             T t_omega = tm * omega;
@@ -397,9 +401,9 @@ public:
     // return TRUE if quaternions differ elementwise by less than Tolerance.
     IC BOOL cmp(SelfCRef Q, T Tolerance = 0.0001f)
     {
-        if (  // they are the same but with opposite signs
+        if ( // they are the same but with opposite signs
             ((_abs(x + Q.x) <= Tolerance) && (_abs(y + Q.y) <= Tolerance) && (_abs(z + Q.z) <= Tolerance) &&
-                (_abs(w + Q.w) <= Tolerance)) ||  // they are the same with same signs
+                (_abs(w + Q.w) <= Tolerance)) || // they are the same with same signs
             ((_abs(x - Q.x) <= Tolerance) && (_abs(y - Q.y) <= Tolerance) && (_abs(z - Q.z) <= Tolerance) &&
                 (_abs(w - Q.w) <= Tolerance)))
             return true;

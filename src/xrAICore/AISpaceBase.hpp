@@ -11,7 +11,7 @@ class CPatrolPathStorage;
 class XRAICORE_API AISpaceBase
 {
 protected:
-    CGameGraph* m_game_graph = nullptr;  // not owned by AISpaceBase
+    CGameGraph* m_game_graph = nullptr; // not owned by AISpaceBase
     CLevelGraph* m_level_graph = nullptr;
     CGraphEngine* m_graph_engine = nullptr;
     CPatrolPathStorage* m_patrol_path_storage = nullptr;
@@ -49,22 +49,14 @@ inline CGameGraph& AISpaceBase::game_graph() const
     return *m_game_graph;
 }
 
-inline CGameGraph* AISpaceBase::get_game_graph() const
-{
-    return m_game_graph;
-}
-
+inline CGameGraph* AISpaceBase::get_game_graph() const { return m_game_graph; }
 inline CLevelGraph& AISpaceBase::level_graph() const
 {
     VERIFY(m_level_graph);
     return *m_level_graph;
 }
 
-inline const CLevelGraph* AISpaceBase::get_level_graph() const
-{
-    return m_level_graph;
-}
-
+inline const CLevelGraph* AISpaceBase::get_level_graph() const { return m_level_graph; }
 inline CGraphEngine& AISpaceBase::graph_engine() const
 {
     VERIFY(m_graph_engine);

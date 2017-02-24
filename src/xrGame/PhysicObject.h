@@ -86,7 +86,7 @@ public:
     virtual void CreatePhysicsShell(CSE_Abstract* e);
     virtual void net_Destroy();
     virtual void Load(LPCSTR section);
-    virtual void shedule_Update(u32 dt);  //
+    virtual void shedule_Update(u32 dt); //
     virtual void UpdateCL();
     virtual void net_Save(NET_Packet& P);
     virtual BOOL net_SaveRelevant();
@@ -98,9 +98,9 @@ public:
     virtual void net_Export(NET_Packet& P);
     virtual void net_Import(NET_Packet& P);
 
-    virtual void PH_B_CrPr();  // actions & operations before physic correction-prediction steps
-    virtual void PH_I_CrPr();  // actions & operations after correction before prediction steps
-    virtual void PH_A_CrPr();  // actions & operations after phisic correction-prediction steps
+    virtual void PH_B_CrPr(); // actions & operations before physic correction-prediction steps
+    virtual void PH_I_CrPr(); // actions & operations after correction before prediction steps
+    virtual void PH_A_CrPr(); // actions & operations after phisic correction-prediction steps
 protected:
     virtual void SpawnInitPhysics(CSE_Abstract* D);
     virtual void RunStartupAnim(CSE_Abstract* D);

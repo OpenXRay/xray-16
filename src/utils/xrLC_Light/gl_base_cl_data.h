@@ -16,7 +16,6 @@ class net_global_data_impl<gl_base_cl_data>
 {
 public:
     void init() { data_init(); }
-
 protected:
     void create_data_file(LPCSTR path);
     bool create_data(LPCSTR path);
@@ -27,4 +26,4 @@ protected:
 };
 }
 
-#endif  // #ifndef GL_BASE_CL_DATA_H_INCLUDED
+#endif // #ifndef GL_BASE_CL_DATA_H_INCLUDED

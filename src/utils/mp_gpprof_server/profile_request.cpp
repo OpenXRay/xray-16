@@ -7,7 +7,8 @@ template <int ArraySize>
 inline char* decode_url(char const (&src_url)[ArraySize], char (&dst_url)[ArraySize])
 {
     size_t src_length = strlen(src_url);
-    if (src_length > (ArraySize - 1)) {
+    if (src_length > (ArraySize - 1))
+    {
         src_length = ArraySize - 1;
     }
     char number[3];
@@ -18,9 +19,11 @@ inline char* decode_url(char const (&src_url)[ArraySize], char (&dst_url)[ArrayS
     while (i < src_length)
     {
         char cvt_char;
-        if (src_url[i] == '%') {
+        if (src_url[i] == '%')
+        {
             ++i;
-            if ((i + 2) > src_length) break;
+            if ((i + 2) > src_length)
+                break;
             strncpy(number, &src_url[i], 2);
             number[2] = 0;
             cvt_char = (char)strtoul(number, &pend, 16);
@@ -42,11 +45,12 @@ char* extract_username(char const* uri, char const* root_path, user_name_t& dst_
 {
     typedef char url_string_t[256];
     url_string_t tmp_format;
-    sprintf(tmp_format, "%s/%%255s", root_path);  // for url_string_t[256];
+    sprintf(tmp_format, "%s/%%255s", root_path); // for url_string_t[256];
     url_string_t tmp_uname;
     strcpy(tmp_uname, "");
 
-    if (sscanf(uri, tmp_format, tmp_uname)) {
+    if (sscanf(uri, tmp_format, tmp_uname))
+    {
         url_string_t decoded_uname;
         strncpy(dst_user, decode_url(tmp_uname, decoded_uname), sizeof(dst_user) - 1);
         dst_user[sizeof(dst_user) - 1] = 0;

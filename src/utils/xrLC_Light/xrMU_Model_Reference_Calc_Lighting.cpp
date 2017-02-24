@@ -21,7 +21,8 @@ T simple_optimize(xr_vector<T>& A, xr_vector<T>& B, T2& _scale, T2& _bias)
     for (;;)
     {
         count++;
-        if (count > 128) {
+        if (count > 128)
+        {
             _scale = (T2)scale;
             _bias = (T2)bias;
             return error;
@@ -33,7 +34,8 @@ T simple_optimize(xr_vector<T>& A, xr_vector<T>& B, T2& _scale, T2& _bias)
         // 1. scale
         u32 _ok = 0;
         for (accum = 0, it = 0; it < A.size(); it++)
-            if (_abs(A[it]) > EPS_L) {
+            if (_abs(A[it]) > EPS_L)
+            {
                 accum += (B[it] - bias) / A[it];
                 _ok += 1;
             }
@@ -41,7 +43,8 @@ T simple_optimize(xr_vector<T>& A, xr_vector<T>& B, T2& _scale, T2& _bias)
 
         // 2. bias
         T b = bias;
-        if (_abs(scale) > EPS) {
+        if (_abs(scale) > EPS)
+        {
             for (accum = 0, it = 0; it < A.size(); it++)
                 accum += B[it] - A[it] / scale;
             b = accum / elements;
@@ -57,10 +60,12 @@ T simple_optimize(xr_vector<T>& A, xr_vector<T>& B, T2& _scale, T2& _bias)
             accum += B[it] - (A[it] * scale + bias);
         T err = accum / elements;
 
-        if (err < error) {
+        if (err < error)
+        {
             // continue?
             error = err;
-            if (error < EPS) {
+            if (error < EPS)
+            {
                 _scale = (T2)scale;
                 _bias = (T2)bias;
                 return error;

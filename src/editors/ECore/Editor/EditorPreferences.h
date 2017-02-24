@@ -25,10 +25,10 @@ enum
 
 class ECORE_API CCustomPreferences
 {
-  private:  // User declarations
+private: // User declarations
     TProperties* m_ItemProps;
 
-  public:
+public:
     // view
     float view_np;
     float view_fp;
@@ -66,7 +66,7 @@ class ECORE_API CCustomPreferences
     Flags32 object_flags;
     shared_str sWeather;
 
-  protected:
+protected:
     void OnKeyboardCommonFileClick(ButtonValue* value, bool& bModif, bool& bSafe);
     void__stdcall OnClose();
     void ApplyValues();
@@ -74,7 +74,7 @@ class ECORE_API CCustomPreferences
     virtual void Load(CInifile*);
     virtual void Save(CInifile*);
 
-  public:  // User declarations
+public: // User declarations
     CCustomPreferences();
     virtual ~CCustomPreferences();
 

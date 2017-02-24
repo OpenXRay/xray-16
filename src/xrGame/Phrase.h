@@ -24,13 +24,10 @@ public:
     bool IsFinalizer() const { return m_b_finalizer; }
     void SetFinalizer(bool b) { m_b_finalizer = b; }
     int GoodwillLevel() const { return m_iGoodwillLevel; }
-
     bool IsDummy() const;
     CDialogScriptHelper* GetScriptHelper() { return &m_ScriptHelper; };
-
     int GetGoodwillLevel() const { return m_iGoodwillLevel; }
     void SetGoodwillLevel(int v) { m_iGoodwillLevel = v; }
-
 protected:
     //уникальный индекс в списке фраз диалога
     shared_str m_ID;

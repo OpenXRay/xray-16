@@ -31,4 +31,4 @@ private:
     ref_geom hGeom;
 };
 
-#endif  //	LensFlareRender_included
+#endif //	LensFlareRender_included

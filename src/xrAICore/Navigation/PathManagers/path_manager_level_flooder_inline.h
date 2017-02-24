@@ -8,19 +8,16 @@
 
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _DataStorage, typename _dist_type, typename _index_type, typename _iteration_type>
 
-#define CLevelFlooderPathManager                                                                                       \
-    CPathManager<CLevelGraph, _DataStorage, SFlooder<_dist_type, _index_type, _iteration_type>, _dist_type,            \
+#define CLevelFlooderPathManager                                                                            \
+    CPathManager<CLevelGraph, _DataStorage, SFlooder<_dist_type, _index_type, _iteration_type>, _dist_type, \
         _index_type, _iteration_type\
 >
 
 TEMPLATE_SPECIALIZATION
-CLevelFlooderPathManager::~CPathManager()
-{
-}
-
+CLevelFlooderPathManager::~CPathManager() {}
 TEMPLATE_SPECIALIZATION
 IC void CLevelFlooderPathManager::setup(const _Graph* _graph, _DataStorage* _data_storage,
     xr_vector<_index_type>* _path, const _index_type& _start_node_index, const _index_type& _goal_node_index,
@@ -61,7 +58,8 @@ IC _dist_type CLevelFlooderPathManager::estimate(const _index_type& node_index) 
 TEMPLATE_SPECIALIZATION
 IC bool CLevelFlooderPathManager::is_accessible(const _index_type& vertex_id) const
 {
-    if (!inherited::is_accessible(vertex_id)) return (false);
+    if (!inherited::is_accessible(vertex_id))
+        return (false);
     int x4, y4;
     graph->unpack_xz(graph->vertex(vertex_id), x4, y4);
     return (u32(_sqr(x0 - x4) + _sqr(y0 - y4)) <= max_range_sqr);

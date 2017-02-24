@@ -22,8 +22,8 @@ Fvector get_valid_position(const CEntity* entity, const Fvector& actual_position
 bool object_position_valid(const CEntity* entity)
 {
     return (ai().level_graph().valid_vertex_id(entity->ai_location().level_vertex_id()) &&
-            ai().level_graph().valid_vertex_position(entity->Position()) &&
-            ai().level_graph().inside(entity->ai_location().level_vertex_id(), entity->Position()));
+        ai().level_graph().valid_vertex_position(entity->Position()) &&
+        ai().level_graph().inside(entity->ai_location().level_vertex_id(), entity->Position()));
 }
 
 Fvector get_bone_position(IGameObject* object, LPCSTR bone_name)
@@ -40,7 +40,8 @@ Fvector get_bone_position(IGameObject* object, LPCSTR bone_name)
 Fvector get_head_position(IGameObject* object)
 {
     pcstr bone_name = "bip01_head";
-    if (CBaseMonster* monster = smart_cast<CBaseMonster*>(object)) {
+    if (CBaseMonster* monster = smart_cast<CBaseMonster*>(object))
+    {
         bone_name = monster->get_head_bone_name();
     }
 

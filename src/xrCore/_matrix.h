@@ -38,7 +38,7 @@ public:
 public:
     union
     {
-        struct  // Direct definition
+        struct // Direct definition
         {
             T _11, _12, _13, _14;
             T _21, _22, _23, _24;
@@ -56,7 +56,7 @@ public:
             Tvector c;
             T _44_;
         };
-        T m[4][4];  // Array
+        T m[4][4]; // Array
     };
 
     // Class members
@@ -158,39 +158,39 @@ public:
         m[3][3] = 1;
         return *this;
     }
-    IC SelfRef mulA_44(const Self& A)  // mul after
+    IC SelfRef mulA_44(const Self& A) // mul after
     {
         Self B;
         B.set(*this);
         mul(A, B);
         return *this;
     };
-    IC SelfRef mulB_44(const Self& B)  // mul before
+    IC SelfRef mulB_44(const Self& B) // mul before
     {
         Self A;
         A.set(*this);
         mul(A, B);
         return *this;
     };
-    ICF SelfRef mulA_43(const Self& A)  // mul after (no projection)
+    ICF SelfRef mulA_43(const Self& A) // mul after (no projection)
     {
         Self B;
         B.set(*this);
         mul_43(A, B);
         return *this;
     };
-    ICF SelfRef mulB_43(const Self& B)  // mul before (no projection)
+    ICF SelfRef mulB_43(const Self& B) // mul before (no projection)
     {
         Self A;
         A.set(*this);
         mul_43(A, B);
         return *this;
     };
-    IC SelfRef invert(const Self& a)  // important: this is 4x3 invert, not the 4x4 one
+    IC SelfRef invert(const Self& a) // important: this is 4x3 invert, not the 4x4 one
     {
         // faster than self-invert
         T fDetInv = (a._11 * (a._22 * a._33 - a._23 * a._32) - a._12 * (a._21 * a._33 - a._23 * a._31) +
-                     a._13 * (a._21 * a._32 - a._22 * a._31));
+            a._13 * (a._21 * a._32 - a._22 * a._31));
 
         VERIFY(_abs(fDetInv) > flt_zero);
         fDetInv = 1.0f / fDetInv;
@@ -217,13 +217,14 @@ public:
         return *this;
     }
 
-    IC bool invert_b(const Self& a)  // important: this is 4x3 invert, not the 4x4 one
+    IC bool invert_b(const Self& a) // important: this is 4x3 invert, not the 4x4 one
     {
         // faster than self-invert
         T fDetInv = (a._11 * (a._22 * a._33 - a._23 * a._32) - a._12 * (a._21 * a._33 - a._23 * a._31) +
-                     a._13 * (a._21 * a._32 - a._22 * a._31));
+            a._13 * (a._21 * a._32 - a._22 * a._31));
 
-        if (_abs(fDetInv) <= flt_zero) return false;
+        if (_abs(fDetInv) <= flt_zero)
+            return false;
         fDetInv = 1.0f / fDetInv;
 
         _11 = fDetInv * (a._22 * a._33 - a._23 * a._32);
@@ -248,14 +249,14 @@ public:
         return true;
     }
 
-    IC SelfRef invert()  // slower than invert other matrix
+    IC SelfRef invert() // slower than invert other matrix
     {
         Self a;
         a.set(*this);
         invert(a);
         return *this;
     }
-    IC SelfRef transpose(const Self& matSource)  // faster version of transpose
+    IC SelfRef transpose(const Self& matSource) // faster version of transpose
     {
         _11 = matSource._11;
         _12 = matSource._21;
@@ -275,41 +276,41 @@ public:
         _44 = matSource._44;
         return *this;
     }
-    IC SelfRef transpose()  // self transpose - slower
+    IC SelfRef transpose() // self transpose - slower
     {
         Self a;
         a.set(*this);
         transpose(a);
         return *this;
     }
-    IC SelfRef translate(const Tvector& Loc)  // setup translation matrix
+    IC SelfRef translate(const Tvector& Loc) // setup translation matrix
     {
         identity();
         c.set(Loc.x, Loc.y, Loc.z);
         return *this;
     }
-    IC SelfRef translate(T _x, T _y, T _z)  // setup translation matrix
+    IC SelfRef translate(T _x, T _y, T _z) // setup translation matrix
     {
         identity();
         c.set(_x, _y, _z);
         return *this;
     }
-    IC SelfRef translate_over(const Tvector& Loc)  // modify only translation
+    IC SelfRef translate_over(const Tvector& Loc) // modify only translation
     {
         c.set(Loc.x, Loc.y, Loc.z);
         return *this;
     }
-    IC SelfRef translate_over(T _x, T _y, T _z)  // modify only translation
+    IC SelfRef translate_over(T _x, T _y, T _z) // modify only translation
     {
         c.set(_x, _y, _z);
         return *this;
     }
-    IC SelfRef translate_add(const Tvector& Loc)  // combine translation
+    IC SelfRef translate_add(const Tvector& Loc) // combine translation
     {
         c.add(Loc);
         return *this;
     }
-    IC SelfRef scale(T x, T y, T z)  // setup scale matrix
+    IC SelfRef scale(T x, T y, T z) // setup scale matrix
     {
         identity();
         m[0][0] = x;
@@ -317,12 +318,12 @@ public:
         m[2][2] = z;
         return *this;
     }
-    IC SelfRef scale(const Tvector& v)  // setup scale matrix
+    IC SelfRef scale(const Tvector& v) // setup scale matrix
     {
         return scale(v.x, v.y, v.z);
     }
 
-    IC SelfRef rotateX(T Angle)  // rotation about X axis
+    IC SelfRef rotateX(T Angle) // rotation about X axis
     {
         T cosa = _cos(Angle);
         T sina = _sin(Angle);
@@ -336,7 +337,7 @@ public:
         _44 = 1;
         return *this;
     }
-    IC SelfRef rotateY(T Angle)  // rotation about Y axis
+    IC SelfRef rotateY(T Angle) // rotation about Y axis
     {
         T cosa = _cos(Angle);
         T sina = _sin(Angle);
@@ -350,7 +351,7 @@ public:
         _44 = 1;
         return *this;
     }
-    IC SelfRef rotateZ(T Angle)  // rotation about Z axis
+    IC SelfRef rotateZ(T Angle) // rotation about Z axis
     {
         T cosa = _cos(Angle);
         T sina = _sin(Angle);
@@ -731,37 +732,37 @@ public:
         }
         return *this;
     }
-    ICF void transform_tiny(Tvector& dest, const Tvector& v) const  // preferred to use
+    ICF void transform_tiny(Tvector& dest, const Tvector& v) const // preferred to use
     {
         dest.x = v.x * _11 + v.y * _21 + v.z * _31 + _41;
         dest.y = v.x * _12 + v.y * _22 + v.z * _32 + _42;
         dest.z = v.x * _13 + v.y * _23 + v.z * _33 + _43;
     }
-    ICF void transform_tiny32(Fvector2& dest, const Tvector& v) const  // preferred to use
+    ICF void transform_tiny32(Fvector2& dest, const Tvector& v) const // preferred to use
     {
         dest.x = v.x * _11 + v.y * _21 + v.z * _31 + _41;
         dest.y = v.x * _12 + v.y * _22 + v.z * _32 + _42;
     }
-    ICF void transform_tiny23(Tvector& dest, const Fvector2& v) const  // preferred to use
+    ICF void transform_tiny23(Tvector& dest, const Fvector2& v) const // preferred to use
     {
         dest.x = v.x * _11 + v.y * _21 + _41;
         dest.y = v.x * _12 + v.y * _22 + _42;
         dest.z = v.x * _13 + v.y * _23 + _43;
     }
-    ICF void transform_dir(Tvector& dest, const Tvector& v) const  // preferred to use
+    ICF void transform_dir(Tvector& dest, const Tvector& v) const // preferred to use
     {
         dest.x = v.x * _11 + v.y * _21 + v.z * _31;
         dest.y = v.x * _12 + v.y * _22 + v.z * _32;
         dest.z = v.x * _13 + v.y * _23 + v.z * _33;
     }
-    IC void transform(Fvector4& dest, const Tvector& v) const  // preferred to use
+    IC void transform(Fvector4& dest, const Tvector& v) const // preferred to use
     {
         dest.w = v.x * _14 + v.y * _24 + v.z * _34 + _44;
         dest.x = (v.x * _11 + v.y * _21 + v.z * _31 + _41) / dest.w;
         dest.y = (v.x * _12 + v.y * _22 + v.z * _32 + _42) / dest.w;
         dest.z = (v.x * _13 + v.y * _23 + v.z * _33 + _43) / dest.w;
     }
-    IC void transform(Tvector& dest, const Tvector& v) const  // preferred to use
+    IC void transform(Tvector& dest, const Tvector& v) const // preferred to use
     {
         T iw = 1.f / (v.x * _14 + v.y * _24 + v.z * _34 + _44);
         dest.x = (v.x * _11 + v.y * _21 + v.z * _31 + _41) * iw;
@@ -769,7 +770,7 @@ public:
         dest.z = (v.x * _13 + v.y * _23 + v.z * _33 + _43) * iw;
     }
 
-    IC void transform(Fvector4& dest, const Fvector4& v) const  // preferred to use
+    IC void transform(Fvector4& dest, const Fvector4& v) const // preferred to use
     {
         dest.w = v.x * _14 + v.y * _24 + v.z * _34 + v.w * _44;
         dest.x = v.x * _11 + v.y * _21 + v.z * _31 + v.w * _41;
@@ -828,7 +829,8 @@ public:
     IC void getHPB(T& h, T& p, T& b) const
     {
         T cy = _sqrt(j.y * j.y + i.y * i.y);
-        if (cy > 16.0f * type_epsilon(T)) {
+        if (cy > 16.0f * type_epsilon(T))
+        {
             h = (T)-atan2(k.x, k.z);
             p = (T)-atan2(-k.y, cy);
             b = (T)-atan2(i.y, j.y);
@@ -864,7 +866,7 @@ template <class T>
 BOOL _valid(const _matrix<T>& m)
 {
     return _valid(m.i) && _valid(m._14_) && _valid(m.j) && _valid(m._24_) && _valid(m.k) && _valid(m._34_) &&
-           _valid(m.c) && _valid(m._44_);
+        _valid(m.c) && _valid(m._44_);
 }
 
 extern XRCORE_API Fmatrix Fidentity;

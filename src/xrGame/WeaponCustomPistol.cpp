@@ -3,13 +3,8 @@
 #include "Entity.h"
 #include "WeaponCustomPistol.h"
 
-CWeaponCustomPistol::CWeaponCustomPistol() : CWeaponMagazined(SOUND_TYPE_WEAPON_PISTOL)
-{
-}
-
-CWeaponCustomPistol::~CWeaponCustomPistol()
-{
-}
+CWeaponCustomPistol::CWeaponCustomPistol() : CWeaponMagazined(SOUND_TYPE_WEAPON_PISTOL) {}
+CWeaponCustomPistol::~CWeaponCustomPistol() {}
 void CWeaponCustomPistol::switch2_Fire()
 {
     m_bFireSingleShot = true;
@@ -20,7 +15,8 @@ void CWeaponCustomPistol::switch2_Fire()
 
 void CWeaponCustomPistol::FireEnd()
 {
-    if (fShotTimeCounter <= 0) {
+    if (fShotTimeCounter <= 0)
+    {
         SetPending(FALSE);
         inherited::FireEnd();
     }

@@ -71,9 +71,7 @@ public:
     virtual CCustomMonster* cast_custom_monster() { return this; }
     virtual CScriptEntity* cast_script_entity() { return this; }
     virtual CBaseMonster* cast_base_monster() { return this; }
-
     virtual CGameObject* cast_game_object() { return this; }
-
 public:
     virtual BOOL renderable_ShadowReceive() { return TRUE; }
     virtual void Die(IGameObject* who);
@@ -100,7 +98,6 @@ public:
     // save/load server serialization
     virtual void save(NET_Packet& output_packet) { inherited::save(output_packet); }
     virtual void load(IReader& input_packet) { inherited::load(input_packet); }
-
     virtual void UpdateCL();
     virtual void shedule_Update(u32 dt);
 
@@ -110,7 +107,6 @@ public:
     virtual void reload(LPCSTR section);
 
     virtual void init() {}
-
     virtual void feel_sound_new(
         IGameObject* who, int eType, CSound_UserDataPtr user_data, const Fvector& Position, float power);
     virtual bool feel_vision_isRelevant(IGameObject* O);
@@ -127,10 +123,8 @@ public:
     virtual void PHUnFreeze() { return inherited::PHUnFreeze(); }
     virtual void PHFreeze() { return inherited::PHFreeze(); }
     virtual BOOL UsedAI_Locations() { return inherited::UsedAI_Locations(); }
-
     virtual const SRotation Orientation() const { return inherited::Orientation(); }
     virtual void renderable_Render() { return inherited::renderable_Render(); }
-
     virtual void on_restrictions_change();
 
     virtual void SetAttackEffector();
@@ -141,12 +135,10 @@ public:
     void squad_notify();
 
     virtual bool IsTalkEnabled() { return false; }
-
     virtual void HitEntity(const CEntity* pEntity, float fDamage, float impulse, Fvector& dir,
         ALife::EHitType hit_type = ALife::eHitTypeWound, bool draw_hit_marks = true);
 
     virtual void HitEntityInJump(const CEntity* pEntity) {}
-
     virtual void on_before_sell(CInventoryItem* item);
     float GetSatiety() { return 0.5f; }
     void ChangeSatiety(float v) {}
@@ -177,12 +169,9 @@ public:
     bool m_script_state_must_execute;
 
     virtual void jump(const Fvector& position, float factor) {}
-
     bool m_skip_transfer_enemy;
     IC void skip_transfer_enemy(bool value) { m_skip_transfer_enemy = value; }
-
     IC int Rank() { return m_rank; }
-
     //----------------------------------------------------------------------------------
 
     virtual void SetTurnAnimation(bool turn_left);
@@ -192,7 +181,7 @@ public:
     virtual void ForceFinalAnimation() {}
     virtual void LookPosition(Fvector to_point,
         float angular_speed =
-            PI_DIV_3);  // каждый монстр может по-разному реализвать эту функ (e.g. кровосос с поворотом головы и т.п.)
+            PI_DIV_3); // каждый монстр может по-разному реализвать эту функ (e.g. кровосос с поворотом головы и т.п.)
 
     // Team
     virtual void ChangeTeam(int team, int squad, int group);
@@ -237,7 +226,6 @@ protected:
 public:
     void set_force_anti_aim(bool force_anti_aim) { m_force_anti_aim = force_anti_aim; }
     bool get_force_anti_aim() const { return m_force_anti_aim; }
-
     // --------------------------------------------------------------------------------------
     // Monster Settings
     ref_smem<SMonsterSettings> m_base_settings;
@@ -272,7 +260,6 @@ public:
     // Lain: added
     bool check_eated_corpse_draggable();
     virtual bool is_base_monster_with_enemy() { return EnemyMan.get_enemy() != NULL; }
-
     bool hear_dangerous_sound;
     bool hear_interesting_sound;
 
@@ -361,7 +348,6 @@ public:
     bool m_bRunTurnRight;
 
     void set_aggressive(bool val = true) { m_bAggressive = val; }
-
     //---------------------------------------------------------------------------------------
 
     u32 m_prev_sound_type;
@@ -376,7 +362,6 @@ public:
     void set_state_sound(u32 type, bool once = false);
     IC void fall_asleep() { m_bSleep = true; }
     IC void wake_up() { m_bSleep = false; }
-
     // Temp
     u32 m_time_last_attack_success;
     int m_rank;
@@ -392,17 +377,13 @@ public:
 
 public:
     CControl_Manager& control() { return (*m_control_manager); }
-
     CControlAnimationBase& anim() { return (*m_anim_base); }
     CControlMovementBase& move() { return (*m_move_base); }
     CControlPathBuilderBase& path() { return (*m_path_base); }
     CControlDirectionBase& dir() { return (*m_dir_base); }
-
     CControlManagerCustom& com_man() { return m_com_manager; }
-
     virtual bool check_start_conditions(ControlCom::EControlType);
     virtual void on_activate_control(ControlCom::EControlType) {}
-
 protected:
     CControl_Manager* m_control_manager;
 
@@ -463,7 +444,7 @@ public:
         }
     };
 
-    u8 m_show_debug_info;  // 0 - none, 1 - first column, 2 - second column
+    u8 m_show_debug_info; // 0 - none, 1 - first column, 2 - second column
     void set_show_debug_info(u8 show = 1) { m_show_debug_info = show; }
     virtual SDebugInfo show_debug_info();
     virtual void add_debug_info(debug::text_tree& root_s);
@@ -479,7 +460,6 @@ public:
 public:
     bool is_jumping();
     virtual bool can_be_seen() const { return true; }
-
 #ifdef DEBUG
     bool is_paused() const;
 #endif
@@ -494,10 +474,9 @@ public:
     float get_feel_enemy_who_made_sound_max_distance() { return m_feel_enemy_who_made_sound_max_distance; }
     float get_feel_enemy_max_distance() { return m_feel_enemy_max_distance; }
     virtual bool can_use_agressive_jump(const IGameObject*) { return false; }
-
 private:
     steering_behaviour::manager* m_steer_manager;
-    squad_grouping_behaviour* m_grouping_behaviour;  // freed by manager
+    squad_grouping_behaviour* m_grouping_behaviour; // freed by manager
 
     void update_enemy_accessible_and_at_home_info();
     // updates position by applying little "pushing" force
@@ -580,10 +559,8 @@ private:
 public:
     pcstr get_head_bone_name() const { return m_head_bone_name; }
     shared_str get_section() const { return m_section; }
-
     anti_aim_ability* get_anti_aim() { return m_anti_aim; }
     virtual void on_attack_on_run_hit() {}
-
 private:
     void update_eyes_visibility();
     float get_screen_space_coverage_diagonal();
@@ -620,7 +597,7 @@ bool CBaseMonster::get_debug_var(pcstr var_name, OUT Type& result)
     STRCONCAT(full_var_name, get_monster_class_name(), "_", var_name);
     return ai_dbg::get_var(full_var_name, result);
 }
-#endif  // DEBUG
+#endif // DEBUG
 
 template <class Type>
 Type CBaseMonster::override_if_debug(pcstr var_name, Type value)
@@ -628,9 +605,9 @@ Type CBaseMonster::override_if_debug(pcstr var_name, Type value)
 #ifdef DEBUG
     Type debug_value;
     return get_debug_var(var_name, debug_value) ? debug_value : value;
-#else   // DEBUG
+#else // DEBUG
     return value;
-#endif  // DEBUG
+#endif // DEBUG
 }
 
 #include "base_monster_inline.h"

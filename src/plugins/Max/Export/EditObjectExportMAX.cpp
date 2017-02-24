@@ -16,7 +16,8 @@
 //----------------------------------------------------------------------------
 BOOL CEditableObject::ExtractTexName(Texmap* src, LPSTR dest)
 {
-    if (src->ClassID() != Class_ID(BMTEX_CLASS_ID, 0)) return FALSE;
+    if (src->ClassID() != Class_ID(BMTEX_CLASS_ID, 0))
+        return FALSE;
     BitmapTex* bmap = (BitmapTex*)src;
     _splitpath(bmap->GetMapName(), 0, 0, dest, 0);
     EFS.AppendFolderToName(dest, 1024, 1, TRUE);
@@ -31,9 +32,12 @@ BOOL CEditableObject::ParseStdMaterial(StdMat* src, CSurface* dest)
     Msg("- Processing material '%s' ...", src->GetName());
     // ------- texture (if exist)
     string1024 tname;
-    if (src->MapEnabled(ID_AM)) {
-        if (src->GetSubTexmap(ID_AM)) {
-            if (!ExtractTexName(src->GetSubTexmap(ID_AM), tname)) return FALSE;
+    if (src->MapEnabled(ID_AM))
+    {
+        if (src->GetSubTexmap(ID_AM))
+        {
+            if (!ExtractTexName(src->GetSubTexmap(ID_AM), tname))
+                return FALSE;
             dest->SetTexture(tname);
         }
         else
@@ -43,8 +47,10 @@ BOOL CEditableObject::ParseStdMaterial(StdMat* src, CSurface* dest)
     }
     else if (src->MapEnabled(ID_DI))
     {
-        if (src->GetSubTexmap(ID_DI)) {
-            if (!ExtractTexName(src->GetSubTexmap(ID_DI), tname)) return FALSE;
+        if (src->GetSubTexmap(ID_DI))
+        {
+            if (!ExtractTexName(src->GetSubTexmap(ID_DI), tname))
+                return FALSE;
             dest->SetTexture(tname);
         }
         else
@@ -57,7 +63,8 @@ BOOL CEditableObject::ParseStdMaterial(StdMat* src, CSurface* dest)
         return FALSE;
     }
     dest->m_Flags.set(CSurface::sf2Sided, !!src->GetTwoSided());
-    if (src->GetTwoSided()) ELog.Msg(mtInformation, "  - material 2-sided");
+    if (src->GetTwoSided())
+        ELog.Msg(mtInformation, "  - material 2-sided");
     dest->SetName(GenerateSurfaceName(src->GetName()));
     dest->SetFVF(D3DFVF_XYZ | D3DFVF_NORMAL | (1 << D3DFVF_TEXCOUNT_SHIFT));
     dest->SetVMap("Texture");
@@ -71,10 +78,13 @@ BOOL CEditableObject::ParseMultiMaterial(MultiMtl* src, u32 mid, CSurface* dest)
     R_ASSERT(src);
     R_ASSERT(src->ClassID() == Class_ID(MULTI_CLASS_ID, 0));
     Mtl* M = src->GetSubMtl(mid);
-    if (M) {
-        if (M->ClassID() == Class_ID(DMTL_CLASS_ID, 0)) {
+    if (M)
+    {
+        if (M->ClassID() == Class_ID(DMTL_CLASS_ID, 0))
+        {
             StdMat* smtl = (StdMat*)src->GetSubMtl(mid);
-            if (!ParseStdMaterial(smtl, dest)) {
+            if (!ParseStdMaterial(smtl, dest))
+            {
                 ELog.Msg(mtError, "'%s' -> bad submaterial", src->GetName());
                 return FALSE;
             }
@@ -83,7 +93,8 @@ BOOL CEditableObject::ParseMultiMaterial(MultiMtl* src, u32 mid, CSurface* dest)
         else if (M->ClassID() == XRAYMTL_CLASS_ID)
         {
             XRayMtl* smtl = (XRayMtl*)src->GetSubMtl(mid);
-            if (!ParseXRayMaterial(smtl, mid, dest)) {
+            if (!ParseXRayMaterial(smtl, mid, dest))
+            {
                 ELog.Msg(mtError, "'%s' -> bad submaterial", src->GetName());
                 return FALSE;
             }
@@ -101,7 +112,8 @@ BOOL CEditableObject::ParseXRayMaterial(XRayMtl* src, u32 mid, CSurface* dest)
 {
     R_ASSERT(src);
     R_ASSERT(src->ClassID() == XRAYMTL_CLASS_ID);
-    if (!ParseStdMaterial((StdMat*)src, dest)) {
+    if (!ParseStdMaterial((StdMat*)src, dest))
+    {
         ELog.Msg(mtError, "'%s' -> bad material", src->GetName());
         return FALSE;
     }
@@ -111,27 +123,33 @@ BOOL CEditableObject::ParseXRayMaterial(XRayMtl* src, u32 mid, CSurface* dest)
     dest->SetShader(e_shader ? e_shader : "default");
     dest->SetShaderXRLC(c_shader ? c_shader : "default");
     dest->SetGameMtl(g_mtl ? g_mtl : "default");
-    if (e_shader && c_shader && g_mtl) {
+    if (e_shader && c_shader && g_mtl)
+    {
         ELog.Msg(mtInformation, " -Found S.T.A.L.K.E.R. shaders [E:'%s', C:'%s', M:'%s']", dest->_ShaderName(),
             dest->_ShaderXRLCName(), dest->_GameMtlName());
     }
     else
     {
-        if (!e_shader) ELog.Msg(mtError, " *Empty engine shader! Set 'DEFAULT'.");
-        if (!c_shader) ELog.Msg(mtError, " *Empty compiler shader! Set 'DEFAULT'.");
-        if (!g_mtl) ELog.Msg(mtError, " *Empty game material! Set 'DEFAULT'.");
+        if (!e_shader)
+            ELog.Msg(mtError, " *Empty engine shader! Set 'DEFAULT'.");
+        if (!c_shader)
+            ELog.Msg(mtError, " *Empty compiler shader! Set 'DEFAULT'.");
+        if (!g_mtl)
+            ELog.Msg(mtError, " *Empty game material! Set 'DEFAULT'.");
     }
     return TRUE;
 }
 
 CSurface* CEditableObject::CreateSurface(Mtl* mtl, u32 mid)
 {
-    if (!mtl) {
+    if (!mtl)
+    {
         ELog.Msg(mtError, "Empty material...");
         return 0;
     }
     for (SurfaceIt s_it = m_Surfaces.begin(); s_it != m_Surfaces.end(); s_it++)
-        if (((*s_it)->mid == mid) && ((*s_it)->mtl == mtl)) return *s_it;
+        if (((*s_it)->mid == mid) && ((*s_it)->mtl == mtl))
+            return *s_it;
     CSurface* S = new CSurface();
     S->mid = mid;
     S->mtl = mtl;
@@ -149,7 +167,8 @@ CSurface* CEditableObject::CreateSurface(Mtl* mtl, u32 mid)
         xr_delete(S);
         return 0;
     }
-    if (!bRes) {
+    if (!bRes)
+    {
         ELog.Msg(mtError, "'%s' -> can't parse material", mtl->GetName());
         return 0;
     }
@@ -165,7 +184,8 @@ bool CEditableObject::ImportMAXSkeleton(CExporter* E)
     CEditableMesh* MESH = new CEditableMesh(this);
     m_Meshes.push_back(MESH);
     // import mesh
-    if (!MESH->Convert(E)) return FALSE;
+    if (!MESH->Convert(E))
+        return FALSE;
     // BONES
     m_Bones.reserve(E->m_Bones.size());
     for (int B = 0; B != E->m_Bones.size(); B++)
@@ -202,7 +222,8 @@ bool CEditableObject::ImportMAXSkeleton(CExporter* E)
 
     m_objectFlags.set(CEditableObject::eoDynamic, TRUE);
 
-    if ((0 == GetVertexCount()) || (0 == GetFaceCount())) {
+    if ((0 == GetVertexCount()) || (0 == GetFaceCount()))
+    {
         bResult = false;
     }
     else

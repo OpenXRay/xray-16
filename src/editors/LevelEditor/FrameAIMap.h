@@ -24,8 +24,8 @@ class ESceneAIMapTool;
 //---------------------------------------------------------------------------
 class TfraAIMap : public TForm
 {
-    __published :  // IDE-managed Components
-                   TFormStorage* fsStorage;
+    __published : // IDE-managed Components
+                  TFormStorage* fsStorage;
     TPanel* paObjectList;
     TLabel* Label2;
     TExtBtn* ExtBtn2;
@@ -70,10 +70,10 @@ class TfraAIMap : public TForm
     void __fastcall btnAddIgnoredMaterialClick(TObject* Sender);
     void __fastcall btnIgnoreMaterialClearClick(TObject* Sender);
 
-  private:  // User declarations
+private: // User declarations
     ESceneAIMapTool* tools;
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TfraAIMap(TComponent* Owner, ESceneAIMapTool* _tools);
 };
 

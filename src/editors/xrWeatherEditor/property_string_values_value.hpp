@@ -15,22 +15,22 @@
 public
 ref class property_string_values_value : public property_string, public property_string_values_value_base
 {
-  private:
+private:
     typedef property_string inherited;
     typedef property_string_values_value_base::collection_type collection_type;
 
-  public:
+public:
     typedef editor::property_holder::string_getter_type string_getter_type;
     typedef editor::property_holder::string_setter_type string_setter_type;
 
-  public:
+public:
     property_string_values_value(string_getter_type const& getter, string_setter_type const& setter,
         LPCSTR const* values, u32 const& value_count);
 
     virtual collection_type ^ values() { return m_collection; };
 
-  public:
+public:
     collection_type ^ m_collection;
-};  // ref class property_string_values_value
+}; // ref class property_string_values_value
 
-#endif  // ifndef PROPERTY_STRING_VALUES_VALUE_HPP_INCLUDED
+#endif // ifndef PROPERTY_STRING_VALUES_VALUE_HPP_INCLUDED

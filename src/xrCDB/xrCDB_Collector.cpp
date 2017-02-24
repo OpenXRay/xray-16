@@ -12,13 +12,14 @@ u32 Collector::VPack(const Fvector& V, float eps)
     I = verts.begin();
     E = verts.end();
     for (; I != E; I++)
-        if (I->similar(V, eps)) return u32(I - verts.begin());
+        if (I->similar(V, eps))
+            return u32(I - verts.begin());
     verts.push_back(V);
     return verts.size() - 1;
 }
 
-void Collector::add_face_D(const Fvector& v0, const Fvector& v1, const Fvector& v2,  // vertices
-    u32 dummy                                                                        // misc
+void Collector::add_face_D(const Fvector& v0, const Fvector& v1, const Fvector& v2, // vertices
+    u32 dummy // misc
     )
 {
     TRI T;
@@ -48,8 +49,8 @@ void Collector::add_face(const Fvector& v0, const Fvector& v1, const Fvector& v2
     faces.push_back(T);
 }
 
-void Collector::add_face_packed(const Fvector& v0, const Fvector& v1, const Fvector& v2,  // vertices
-    u16 material, u16 sector,                                                             // misc
+void Collector::add_face_packed(const Fvector& v0, const Fvector& v1, const Fvector& v2, // vertices
+    u16 material, u16 sector, // misc
     float eps)
 {
     TRI T;
@@ -61,7 +62,7 @@ void Collector::add_face_packed(const Fvector& v0, const Fvector& v1, const Fvec
     faces.push_back(T);
 }
 
-void Collector::add_face_packed_D(const Fvector& v0, const Fvector& v1, const Fvector& v2,  // vertices
+void Collector::add_face_packed_D(const Fvector& v0, const Fvector& v1, const Fvector& v2, // vertices
     u32 dummy, float eps)
 {
     TRI T;
@@ -91,13 +92,17 @@ struct sort_predicate
 {
     IC bool operator()(const edge& edge0, const edge& edge1) const
     {
-        if (edge0.vertex_id0 < edge1.vertex_id0) return (true);
+        if (edge0.vertex_id0 < edge1.vertex_id0)
+            return (true);
 
-        if (edge1.vertex_id0 < edge0.vertex_id0) return (false);
+        if (edge1.vertex_id0 < edge0.vertex_id0)
+            return (false);
 
-        if (edge0.vertex_id1 < edge1.vertex_id1) return (true);
+        if (edge0.vertex_id1 < edge1.vertex_id1)
+            return (true);
 
-        if (edge1.vertex_id1 < edge0.vertex_id1) return (false);
+        if (edge1.vertex_id1 < edge0.vertex_id1)
+            return (false);
 
         return (edge0.face_id < edge1.face_id);
     }
@@ -125,21 +130,24 @@ void Collector::calc_adjacency(xr_vector<u32>& dest)
         (*i).edge_id = 0;
         (*i).vertex_id0 = (u16)(*I).verts[0];
         (*i).vertex_id1 = (u16)(*I).verts[1];
-        if ((*i).vertex_id0 > (*i).vertex_id1) std::swap((*i).vertex_id0, (*i).vertex_id1);
+        if ((*i).vertex_id0 > (*i).vertex_id1)
+            std::swap((*i).vertex_id0, (*i).vertex_id1);
         ++i;
 
         (*i).face_id = face_id;
         (*i).edge_id = 1;
         (*i).vertex_id0 = (u16)(*I).verts[1];
         (*i).vertex_id1 = (u16)(*I).verts[2];
-        if ((*i).vertex_id0 > (*i).vertex_id1) std::swap((*i).vertex_id0, (*i).vertex_id1);
+        if ((*i).vertex_id0 > (*i).vertex_id1)
+            std::swap((*i).vertex_id0, (*i).vertex_id1);
         ++i;
 
         (*i).face_id = face_id;
         (*i).edge_id = 2;
         (*i).vertex_id0 = (u16)(*I).verts[2];
         (*i).vertex_id1 = (u16)(*I).verts[0];
-        if ((*i).vertex_id0 > (*i).vertex_id1) std::swap((*i).vertex_id0, (*i).vertex_id1);
+        if ((*i).vertex_id0 > (*i).vertex_id1)
+            std::swap((*i).vertex_id0, (*i).vertex_id1);
         ++i;
     }
 
@@ -152,13 +160,16 @@ void Collector::calc_adjacency(xr_vector<u32>& dest)
         edge* E = edges + edge_count;
         for (; I != E; ++I)
         {
-            if (I + 1 == E) continue;
+            if (I + 1 == E)
+                continue;
 
             J = I + 1;
 
-            if ((*I).vertex_id0 != (*J).vertex_id0) continue;
+            if ((*I).vertex_id0 != (*J).vertex_id0)
+                continue;
 
-            if ((*I).vertex_id1 != (*J).vertex_id1) continue;
+            if ((*I).vertex_id1 != (*J).vertex_id1)
+                continue;
 
             dest[(*I).face_id * 3 + (*I).edge_id] = (*J).face_id;
             dest[(*J).face_id * 3 + (*J).edge_id] = (*I).face_id;
@@ -214,21 +225,25 @@ void Collector::calc_adjacency(xr_vector<u32>& dest)
     {
         for (u32 t = 0; t < faces.size(); t++)
         {
-            if (t == f) continue;
+            if (t == f)
+                continue;
 
             for (u32 f_e = 0; f_e < 3; f_e++)
             {
                 u32 f1 = faces[f].verts[(f_e + 0) % 3];
                 u32 f2 = faces[f].verts[(f_e + 1) % 3];
-                if (f1 > f2) std::swap(f1, f2);
+                if (f1 > f2)
+                    std::swap(f1, f2);
 
                 for (u32 t_e = 0; t_e < 3; t_e++)
                 {
                     u32 t1 = faces[t].verts[(t_e + 0) % 3];
                     u32 t2 = faces[t].verts[(t_e + 1) % 3];
-                    if (t1 > t2) std::swap(t1, t2);
+                    if (t1 > t2)
+                        std::swap(t1, t2);
 
-                    if (f1 == t1 && f2 == t2) {
+                    if (f1 == t1 && f2 == t2)
+                    {
                         // f.edge[f_e] linked to t.edge[t_e]
                         dest[f * 3 + f_e] = t;
                         break;
@@ -267,10 +282,12 @@ void Collector::remove_duplicate_T()
     {
         for (u32 t = f + 1; t < faces.size();)
         {
-            if (t == f) continue;
+            if (t == f)
+                continue;
             TRI& T1 = faces[f];
             TRI& T2 = faces[t];
-            if (similar(T1, T2)) {
+            if (similar(T1, T2))
+            {
                 faces[t] = faces.back();
                 faces.pop_back();
             }
@@ -304,8 +321,8 @@ CollectorPacked::CollectorPacked(const Fbox& bb, int apx_vertices, int apx_faces
                 VM[ix][iy][iz].reserve(_average);
 }
 
-void CollectorPacked::add_face(const Fvector& v0, const Fvector& v1, const Fvector& v2,  // vertices
-    u16 material, u16 sector, u32 _flags                                                 // misc
+void CollectorPacked::add_face(const Fvector& v0, const Fvector& v1, const Fvector& v2, // vertices
+    u16 material, u16 sector, u32 _flags // misc
     )
 {
     TRI T;
@@ -318,8 +335,8 @@ void CollectorPacked::add_face(const Fvector& v0, const Fvector& v1, const Fvect
     faces.push_back(T);
 }
 
-void CollectorPacked::add_face_D(const Fvector& v0, const Fvector& v1, const Fvector& v2,  // vertices
-    u32 dummy, u32 _flags                                                                  // misc
+void CollectorPacked::add_face_D(const Fvector& v0, const Fvector& v1, const Fvector& v2, // vertices
+    u32 dummy, u32 _flags // misc
     )
 {
     TRI T;
@@ -349,12 +366,14 @@ u32 CollectorPacked::VPack(const Fvector& V)
         DWORDList* vl;
         vl = &(VM[ix][iy][iz]);
         for (DWORDIt it = vl->begin(); it != vl->end(); it++)
-            if (verts[*it].similar(V)) {
+            if (verts[*it].similar(V))
+            {
                 P = *it;
                 break;
             }
     }
-    if (0xffffffff == P) {
+    if (0xffffffff == P)
+    {
         P = verts.size();
         verts.push_back(V);
 
@@ -370,13 +389,20 @@ u32 CollectorPacked::VPack(const Fvector& V)
         clamp(iyE, (u32)0, clpMY);
         clamp(izE, (u32)0, clpMZ);
 
-        if (ixE != ix) VM[ixE][iy][iz].push_back(P);
-        if (iyE != iy) VM[ix][iyE][iz].push_back(P);
-        if (izE != iz) VM[ix][iy][izE].push_back(P);
-        if ((ixE != ix) && (iyE != iy)) VM[ixE][iyE][iz].push_back(P);
-        if ((ixE != ix) && (izE != iz)) VM[ixE][iy][izE].push_back(P);
-        if ((iyE != iy) && (izE != iz)) VM[ix][iyE][izE].push_back(P);
-        if ((ixE != ix) && (iyE != iy) && (izE != iz)) VM[ixE][iyE][izE].push_back(P);
+        if (ixE != ix)
+            VM[ixE][iy][iz].push_back(P);
+        if (iyE != iy)
+            VM[ix][iyE][iz].push_back(P);
+        if (izE != iz)
+            VM[ix][iy][izE].push_back(P);
+        if ((ixE != ix) && (iyE != iy))
+            VM[ixE][iyE][iz].push_back(P);
+        if ((ixE != ix) && (izE != iz))
+            VM[ixE][iy][izE].push_back(P);
+        if ((iyE != iy) && (izE != iz))
+            VM[ix][iyE][izE].push_back(P);
+        if ((ixE != ix) && (iyE != iy) && (izE != iz))
+            VM[ixE][iyE][izE].push_back(P);
     }
     return P;
 }

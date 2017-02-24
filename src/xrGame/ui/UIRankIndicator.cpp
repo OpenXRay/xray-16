@@ -3,11 +3,7 @@
 #include "UIXmlInit.h"
 #include "UIStatic.h"
 
-CUIRankIndicator::CUIRankIndicator()
-{
-    m_current = u8(-1);
-}
-
+CUIRankIndicator::CUIRankIndicator() { m_current = u8(-1); }
 CUIRankIndicator::~CUIRankIndicator()
 {
     for (u8 i = 0; i < max_rank; ++i)
@@ -34,9 +30,11 @@ void CUIRankIndicator::InitFromXml(CUIXml& xml_doc)
 void CUIRankIndicator::SetRank(u8 team, u8 rank)
 {
     rank += team * (max_rank / 2);
-    if (m_current == rank) return;
+    if (m_current == rank)
+        return;
 
-    if (m_current != u8(-1)) DetachChild(m_ranks[m_current]);
+    if (m_current != u8(-1))
+        DetachChild(m_ranks[m_current]);
 
     m_current = rank;
     AttachChild(m_ranks[m_current]);

@@ -26,7 +26,6 @@ struct SPrimitiveBuffer
     TOnRender OnRender;
     void xr_stdcall RenderDIP() { DU_DRAW_DIP(p_type, pGeom, 0, 0, v_cnt, 0, p_cnt); }
     void xr_stdcall RenderDP() { DU_DRAW_DP(p_type, pGeom, 0, p_cnt); }
-
 public:
     SPrimitiveBuffer() : OnRender(0), pGeom(0) { ; }
     void CreateFromData(

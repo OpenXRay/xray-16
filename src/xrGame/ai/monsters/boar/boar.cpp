@@ -14,16 +14,13 @@ CAI_Boar::CAI_Boar()
     CControlled::init_external(this);
 }
 
-CAI_Boar::~CAI_Boar()
-{
-    xr_delete(StateMan);
-}
-
+CAI_Boar::~CAI_Boar() { xr_delete(StateMan); }
 void CAI_Boar::Load(LPCSTR section)
 {
     inherited::Load(section);
 
-    if (!pSettings->line_exist(section, "is_friendly")) com_man().add_ability(ControlCom::eControlRunAttack);
+    if (!pSettings->line_exist(section, "is_friendly"))
+        com_man().add_ability(ControlCom::eControlRunAttack);
     com_man().add_ability(ControlCom::eControlRotationJump);
 
     anim().AddReplacedAnim(&m_bDamaged, eAnimRun, eAnimRunDamaged);
@@ -129,7 +126,8 @@ void CAI_Boar::Load(LPCSTR section)
 void CAI_Boar::reinit()
 {
     inherited::reinit();
-    if (CCustomMonster::use_simplified_visual()) return;
+    if (CCustomMonster::use_simplified_visual())
+        return;
     com_man().add_rotation_jump_data("stand_jump_left_0", 0, "stand_jump_right_0", 0, PI - PI_DIV_6,
         SControlRotationJumpData::eStopAtOnce | SControlRotationJumpData::eRotateOnce);
 }
@@ -138,7 +136,8 @@ void CAI_Boar::BoneCallback(CBoneInstance* B)
 {
     CAI_Boar* P = static_cast<CAI_Boar*>(B->callback_param());
 
-    if (!P->look_at_enemy) return;
+    if (!P->look_at_enemy)
+        return;
 
     Fmatrix M;
     M.setHPB(0.0f, -P->_cur_delta, 0.0f);
@@ -147,9 +146,10 @@ void CAI_Boar::BoneCallback(CBoneInstance* B)
 
 BOOL CAI_Boar::net_Spawn(CSE_Abstract* DC)
 {
-    if (!inherited::net_Spawn(DC)) return (FALSE);
+    if (!inherited::net_Spawn(DC))
+        return (FALSE);
 
-    if (!PPhysicsShell())  //нельзя ставить колбеки, если создан физ шел - у него стоят свои колбеки!!!
+    if (!PPhysicsShell()) //нельзя ставить колбеки, если создан физ шел - у него стоят свои колбеки!!!
     {
         CBoneInstance& BI = smart_cast<IKinematics*>(Visual())->LL_GetBoneInstance(
             smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_head"));

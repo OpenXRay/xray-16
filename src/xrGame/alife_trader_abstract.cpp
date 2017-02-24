@@ -37,23 +37,27 @@ void CSE_ALifeTraderAbstract::spawn_supplies()
     pda->m_specific_character = specific_character();
 #endif
 
-    if (m_SpecificCharacter.size()) {
+    if (m_SpecificCharacter.size())
+    {
         //если в custom data объекта есть
         //секция [dont_spawn_character_supplies]
         //то не вызывать spawn из selected_char.SupplySpawn()
         bool specific_character_supply = true;
 
-        if (xr_strlen(dynamic_object->m_ini_string)) {
+        if (xr_strlen(dynamic_object->m_ini_string))
+        {
 #pragma warning(push)
 #pragma warning(disable : 4238)
             CInifile ini(&IReader((void*)(*dynamic_object->m_ini_string), xr_strlen(dynamic_object->m_ini_string)),
                 FS.get_path("$game_config$")->m_Path);
 #pragma warning(pop)
 
-            if (ini.section_exist("dont_spawn_character_supplies")) specific_character_supply = false;
+            if (ini.section_exist("dont_spawn_character_supplies"))
+                specific_character_supply = false;
         }
 
-        if (specific_character_supply) {
+        if (specific_character_supply)
+        {
             CSpecificCharacter selected_char;
             selected_char.Load(m_SpecificCharacter);
             dynamic_object->spawn_supplies(selected_char.SupplySpawn());
@@ -67,7 +71,7 @@ void CSE_ALifeTraderAbstract::vfInitInventory()
     //	m_iCumulativeItemVolume		= 0;
 }
 
-#if 0  // def DEBUG
+#if 0 // def DEBUG
 bool CSE_ALifeTraderAbstract::check_inventory_consistency	()
 {
 	int							volume = 0;
@@ -107,11 +111,13 @@ bool CSE_ALifeTraderAbstract::check_inventory_consistency	()
 
 void CSE_ALifeDynamicObject::attach(CSE_ALifeInventoryItem* tpALifeInventoryItem, bool bALifeRequest, bool bAddChildren)
 {
-    if (!bALifeRequest) return;
+    if (!bALifeRequest)
+        return;
 
     tpALifeInventoryItem->base()->ID_Parent = ID;
 
-    if (!bAddChildren) return;
+    if (!bAddChildren)
+        return;
 
     R_ASSERT2(std::find(children.begin(), children.end(), tpALifeInventoryItem->base()->ID) == children.end(),
         "Item is already inside the inventory");
@@ -128,16 +134,19 @@ void CSE_ALifeDynamicObject::detach(
     l_tpALifeDynamicObject1->m_tGraphID = m_tGraphID;
     l_tpALifeDynamicObject1->m_fDistance = m_fDistance;
 
-    if (!bALifeRequest) return;
+    if (!bALifeRequest)
+        return;
 
     tpALifeInventoryItem->base()->ID_Parent = 0xffff;
 
-    if (I) {
+    if (I)
+    {
         children.erase(*I);
         return;
     }
 
-    if (!bRemoveChildren) return;
+    if (!bRemoveChildren)
+        return;
 
     ALife::OBJECT_IT i = std::find(children.begin(), children.end(), tpALifeInventoryItem->base()->ID);
     R_ASSERT2(children.end() != i, "Can't detach an item which is not on my own");
@@ -175,8 +184,9 @@ void add_online_impl(CSE_ALifeDynamicObject* object, const bool& update_registri
             object->name_replace(), "*SERVER*");
 #endif
 
-        //		R_ASSERT3								(ai().level_graph().valid_vertex_id(l_tpALifeDynamicObject->m_tNodeID),"Invalid
-        //vertex for object ",l_tpALifeInventoryItem->name_replace());
+        //		R_ASSERT3
+        //(ai().level_graph().valid_vertex_id(l_tpALifeDynamicObject->m_tNodeID),"Invalid
+        // vertex for object ",l_tpALifeInventoryItem->name_replace());
         l_tpALifeDynamicObject->o_Position = object->o_Position;
         l_tpALifeDynamicObject->m_tNodeID = object->m_tNodeID;
         object->alife().server().Process_spawn(tNetPacket, clientID, FALSE, l_tpALifeInventoryItem->base());
@@ -184,7 +194,8 @@ void add_online_impl(CSE_ALifeDynamicObject* object, const bool& update_registri
         l_tpALifeDynamicObject->m_bOnline = true;
     }
 
-    if (!update_registries) return;
+    if (!update_registries)
+        return;
 
     object->alife().scheduled().remove(object);
     object->alife().graph().remove(object, object->m_tGraphID, false);
@@ -222,7 +233,8 @@ void add_offline_impl(
         ALife::_OBJECT_ID item_id = inventory_item->base()->ID;
         inventory_item->base()->ID = object->alife().server().PerformIDgen(item_id);
 
-        if (!child->can_save()) {
+        if (!child->can_save())
+        {
             object->alife().release(child);
             --i;
             --n;
@@ -234,7 +246,8 @@ void add_offline_impl(
         object->alife().graph().attach(*object, inventory_item, child->m_tGraphID, true);
     }
 
-    if (!update_registries) return;
+    if (!update_registries)
+        return;
 
     object->alife().scheduled().add(object);
     object->alife().graph().add(object, object->m_tGraphID, false);

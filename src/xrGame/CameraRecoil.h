@@ -27,7 +27,6 @@ struct CameraRecoil
           DispersionFrac(1.0f), MaxAngleHorz(EPS), StepAngleHorz(0.0f), ReturnMode(false), StopReturn(false){};
 
     CameraRecoil(const CameraRecoil& clone) { Clone(clone); }
-
     IC void Clone(const CameraRecoil& clone)
     {
         // *this = clone;
@@ -48,6 +47,6 @@ struct CameraRecoil
         VERIFY(!fis_zero(MaxAngleVert));
         VERIFY(!fis_zero(MaxAngleHorz));
     }
-};  // struct CameraRecoil
+}; // struct CameraRecoil
 
-#endif  // CAMERA_RECOIL_H_INCLUDED
+#endif // CAMERA_RECOIL_H_INCLUDED

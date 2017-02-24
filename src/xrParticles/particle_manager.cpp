@@ -10,20 +10,10 @@ using namespace PAPI;
 
 // system
 CParticleManager PM;
-PARTICLES_API IParticleManager* PAPI::ParticleManager()
-{
-    return &PM;
-}
-
+PARTICLES_API IParticleManager* PAPI::ParticleManager() { return &PM; }
 //
-CParticleManager::CParticleManager()
-{
-}
-
-CParticleManager::~CParticleManager()
-{
-}
-
+CParticleManager::CParticleManager() {}
+CParticleManager::~CParticleManager() {}
 ParticleEffect* CParticleManager::GetEffectPtr(int effect_id)
 {
     R_ASSERT(effect_id >= 0 && effect_id < (int)effect_vec.size());
@@ -41,12 +31,14 @@ int CParticleManager::CreateEffect(u32 max_particles)
 {
     int eff_id = -1;
     for (int i = 0; i < (int)effect_vec.size(); i++)
-        if (!effect_vec[i]) {
+        if (!effect_vec[i])
+        {
             eff_id = i;
             break;
         }
 
-    if (eff_id < 0) {
+    if (eff_id < 0)
+    {
         // Couldn't find a big enough gap. Reallocate.
         eff_id = effect_vec.size();
         effect_vec.push_back(0);
@@ -65,12 +57,14 @@ int CParticleManager::CreateActionList()
 {
     int list_id = -1;
     for (u32 i = 0; i < m_alist_vec.size(); ++i)
-        if (!m_alist_vec[i]) {
+        if (!m_alist_vec[i])
+        {
             list_id = i;
             break;
         }
 
-    if (list_id < 0) {
+    if (list_id < 0)
+    {
         // Couldn't find a big enough gap. Reallocate.
         list_id = m_alist_vec.size();
         m_alist_vec.push_back(0);
@@ -94,7 +88,8 @@ void CParticleManager::PlayEffect(int effect_id, int alist_id)
     // Execute the specified action list.
     ParticleActions* pa = GetActionListPtr(alist_id);
     VERIFY(pa);
-    if (pa == NULL) return;  // ERROR
+    if (pa == NULL)
+        return; // ERROR
     pa->lock();
     // Step through all the actions in the action list.
     for (PAVecIt it = pa->begin(); it != pa->end(); ++it)
@@ -115,7 +110,8 @@ void CParticleManager::StopEffect(int effect_id, int alist_id, BOOL deffered)
     // Execute the specified action list.
     ParticleActions* pa = GetActionListPtr(alist_id);
     VERIFY(pa);
-    if (pa == NULL) return;  // ERROR
+    if (pa == NULL)
+        return; // ERROR
     pa->lock();
 
     // Step through all the actions in the action list.
@@ -126,7 +122,8 @@ void CParticleManager::StopEffect(int effect_id, int alist_id, BOOL deffered)
         case PASourceID: static_cast<PASource*>(*it)->m_Flags.set(PASource::flSilent, TRUE); break;
         }
     }
-    if (!deffered) {
+    if (!deffered)
+    {
         // effect
         ParticleEffect* pe = GetEffectPtr(effect_id);
         pe->p_count = 0;
@@ -164,7 +161,8 @@ void CParticleManager::Transform(int alist_id, const Fmatrix& full, const Fvecto
     ParticleActions* pa = GetActionListPtr(alist_id);
     VERIFY(pa);
 
-    if (pa == NULL) return;  // ERROR
+    if (pa == NULL)
+        return; // ERROR
     pa->lock();
 
     Fmatrix mT;
@@ -266,7 +264,8 @@ u32 CParticleManager::LoadActions(int alist_id, IReader& R)
     ParticleActions* pa = GetActionListPtr(alist_id);
     VERIFY(pa);
     pa->clear();
-    if (R.length()) {
+    if (R.length())
+    {
         u32 cnt = R.r_u32();
         for (u32 k = 0; k < cnt; k++)
         {

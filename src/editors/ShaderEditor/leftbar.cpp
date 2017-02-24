@@ -38,11 +38,13 @@ __fastcall TfraLeftBar::TfraLeftBar(TComponent* Owner) : TFrame(Owner)
 
 void UpdatePanel(TPanel* p)
 {
-    if (p) {
+    if (p)
+    {
         for (int j = 0; j < p->ControlCount; j++)
         {
             TExtBtn* btn = dynamic_cast<TExtBtn*>(p->Controls[j]);
-            if (btn) btn->UpdateMouseInControl();
+            if (btn)
+                btn->UpdateMouseInControl();
         }
     }
 }
@@ -55,17 +57,14 @@ void TfraLeftBar::UpdateBar()
     for (i = 0; i < fraLeftBar->ComponentCount; i++)
     {
         TComponent* temp = fraLeftBar->Components[i];
-        if (dynamic_cast<TExtBtn*>(temp) != NULL) ((TExtBtn*)temp)->UpdateMouseInControl();
+        if (dynamic_cast<TExtBtn*>(temp) != NULL)
+            ((TExtBtn*)temp)->UpdateMouseInControl();
     }
 }
 
 //---------------------------------------------------------------------------
 
-void TfraLeftBar::OnTimer()
-{
-    UpdateBar();
-}
-
+void TfraLeftBar::OnTimer() { UpdateBar(); }
 //---------------------------------------------------------------------------
 
 void TfraLeftBar::MinimizeAllFrames()
@@ -73,7 +72,8 @@ void TfraLeftBar::MinimizeAllFrames()
     for (int j = 0; j < paLeftBar->ControlCount; j++)
     {
         TPanel* pa = dynamic_cast<TPanel*>(paLeftBar->Controls[j]);
-        if (pa) PanelMinimize(pa);
+        if (pa)
+            PanelMinimize(pa);
     }
     UpdateBar();
 }
@@ -85,32 +85,21 @@ void TfraLeftBar::MaximizeAllFrames()
     for (int j = 0; j < paLeftBar->ControlCount; j++)
     {
         TPanel* pa = dynamic_cast<TPanel*>(paLeftBar->Controls[j]);
-        if (pa) PanelMaximize(pa);
+        if (pa)
+            PanelMaximize(pa);
     }
     UpdateBar();
 }
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::ebSaveClick(TObject* Sender)
-{
-    ExecCommand(COMMAND_SAVE);
-}
-
+void __fastcall TfraLeftBar::ebSaveClick(TObject* Sender) { ExecCommand(COMMAND_SAVE); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::ebReloadClick(TObject* Sender)
-{
-    ExecCommand(COMMAND_LOAD);
-}
-
+void __fastcall TfraLeftBar::ebReloadClick(TObject* Sender) { ExecCommand(COMMAND_LOAD); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::ebRefreshTexturesClick(TObject* Sender)
-{
-    ExecCommand(COMMAND_REFRESH_TEXTURES);
-}
-
+void __fastcall TfraLeftBar::ebRefreshTexturesClick(TObject* Sender) { ExecCommand(COMMAND_REFRESH_TEXTURES); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfraLeftBar::PanelMimimizeClick(TObject* Sender)
@@ -129,11 +118,7 @@ void __fastcall TfraLeftBar::PanelMaximizeClick(TObject* Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::ebEditorPreferencesClick(TObject* Sender)
-{
-    ExecCommand(COMMAND_EDITOR_PREF);
-}
-
+void __fastcall TfraLeftBar::ebEditorPreferencesClick(TObject* Sender) { ExecCommand(COMMAND_EDITOR_PREF); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfraLeftBar::ebCustomFileMouseDown(
@@ -165,17 +150,14 @@ void __fastcall TfraLeftBar::pcShadersChange(TObject* Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::ebRemoveItemClick(TObject* Sender)
-{
-    STools->Current()->RemoveCurrent();
-}
-
+void __fastcall TfraLeftBar::ebRemoveItemClick(TObject* Sender) { STools->Current()->RemoveCurrent(); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfraLeftBar::ebCloneItemClick(TObject* Sender)
 {
     TElTreeItem* pNode = STools->Current()->ViewGetCurrentItem();
-    if (pNode && FHelper.IsObject(pNode)) {
+    if (pNode && FHelper.IsObject(pNode))
+    {
         AnsiString full_name;
         FHelper.MakeName(pNode, 0, full_name, false);
         STools->Current()->AppendItem(0, full_name.c_str());
@@ -204,25 +186,13 @@ void __fastcall TfraLeftBar::fsStorageSavePlacement(TObject* Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::ImageEditor1Click(TObject* Sender)
-{
-    ExecCommand(COMMAND_IMAGE_EDITOR);
-}
-
+void __fastcall TfraLeftBar::ImageEditor1Click(TObject* Sender) { ExecCommand(COMMAND_IMAGE_EDITOR); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::Refresh1Click(TObject* Sender)
-{
-    ExecCommand(COMMAND_REFRESH_TEXTURES);
-}
-
+void __fastcall TfraLeftBar::Refresh1Click(TObject* Sender) { ExecCommand(COMMAND_REFRESH_TEXTURES); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::Checknewtextures1Click(TObject* Sender)
-{
-    ExecCommand(COMMAND_CHECK_TEXTURES);
-}
-
+void __fastcall TfraLeftBar::Checknewtextures1Click(TObject* Sender) { ExecCommand(COMMAND_CHECK_TEXTURES); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfraLeftBar::ExtBtn10MouseDown(TObject* Sender, TMouseButton Button, TShiftState Shift, int X, int Y)
@@ -232,23 +202,16 @@ void __fastcall TfraLeftBar::ExtBtn10MouseDown(TObject* Sender, TMouseButton But
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::MenuItem5Click(TObject* Sender)
-{
-    ExecCommand(COMMAND_SOUND_EDITOR);
-}
-
+void __fastcall TfraLeftBar::MenuItem5Click(TObject* Sender) { ExecCommand(COMMAND_SOUND_EDITOR); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraLeftBar::MenuItem7Click(TObject* Sender)
-{
-    ExecCommand(COMMAND_SYNC_SOUNDS);
-}
-
+void __fastcall TfraLeftBar::MenuItem7Click(TObject* Sender) { ExecCommand(COMMAND_SYNC_SOUNDS); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfraLeftBar::tvEngineKeyDown(TObject* Sender, WORD& Key, TShiftState Shift)
 {
-    if (Key == VK_DELETE) ebRemoveItemClick(Sender);
+    if (Key == VK_DELETE)
+        ebRemoveItemClick(Sender);
 }
 
 //---------------------------------------------------------------------------

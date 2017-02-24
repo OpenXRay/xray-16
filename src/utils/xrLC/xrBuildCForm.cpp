@@ -65,13 +65,16 @@ void TestEdge(Vertex* V1, Vertex* V2, Face* parent)
     for (vecFaceIt I = V1->m_adjacents.begin(); I != V1->m_adjacents.end(); ++I)
     {
         Face* test = *I;
-        if (test == parent) continue;
-        if (test->VContains(V2)) {
+        if (test == parent)
+            continue;
+        if (test->VContains(V2))
+        {
             ++f_count;
             found = test;
         }
     }
-    if (f_count > 1) {
+    if (f_count > 1)
+    {
         ++bCriticalErrCnt;
         pBuild->err_multiedge().w_fvector3(V1->P);
         pBuild->err_multiedge().w_fvector3(V2->P);
@@ -96,7 +99,8 @@ void CBuild::BuildCForm()
         for (vecFaceIt I = lc_global_data()->g_faces().begin(); I != lc_global_data()->g_faces().end(); ++I)
         {
             Face* F = *I;
-            if (F->Shader().flags.bCollision) {
+            if (F->Shader().flags.bCollision)
+            {
                 cfFaces->push_back(F);
                 int index = GetVertexIndex(F->v[0]);
                 cfVertexMarks[index] = true;
@@ -113,7 +117,8 @@ void CBuild::BuildCForm()
         cfVertices->reserve(lc_global_data()->g_vertices().size());
         std::sort(cfFaces->begin(), cfFaces->end());
         for (u32 V = 0; V < lc_global_data()->g_vertices().size(); V++)
-            if (cfVertexMarks[V]) cfVertices->push_back(lc_global_data()->g_vertices()[V]);
+            if (cfVertexMarks[V])
+                cfVertices->push_back(lc_global_data()->g_vertices()[V]);
     }
 
     float p_total = 0;
@@ -142,9 +147,10 @@ void CBuild::BuildCForm()
 
         CL.add_face(
             T->v[0]->P, T->v[1]->P, T->v[2]->P, T->dwMaterialGame, materials()[T->dwMaterial].sector, T->sm_group);
-        Logger.Progress(p_total += p_cost);  // progress
+        Logger.Progress(p_total += p_cost); // progress
     }
-    if (bCriticalErrCnt) {
+    if (bCriticalErrCnt)
+    {
         err_save();
         Logger.clMsg("MultipleEdges: %d faces", bCriticalErrCnt);
     }
@@ -157,7 +163,8 @@ void CBuild::BuildCForm()
         mu_refs()[ref]->export_cform_game(CL);
 
     // Simplification
-    if (g_params().m_quality != ebqDraft) SimplifyCFORM(CL);
+    if (g_params().m_quality != ebqDraft)
+        SimplifyCFORM(CL);
 
     // bb?
     BB.invalidate();

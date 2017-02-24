@@ -31,4 +31,4 @@ public:
     virtual void finalize();
 };
 
-#endif  // STALKER_LOW_COVER_PLANNER_H_INCLUDED
+#endif // STALKER_LOW_COVER_PLANNER_H_INCLUDED

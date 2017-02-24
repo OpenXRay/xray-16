@@ -25,9 +25,12 @@ IC static bool clip(float fDenom, float fNumer, float& rfT0, float& rfT1, bool& 
     // plane.  Otherwise 'false' is returned in which case the line segment
     // is entirely clipped.
     code0 = code1 = false;
-    if (fDenom > 0.0f) {
-        if (fNumer > fDenom * rfT1) return false;
-        if (fNumer > fDenom * rfT0) {
+    if (fDenom > 0.0f)
+    {
+        if (fNumer > fDenom * rfT1)
+            return false;
+        if (fNumer > fDenom * rfT0)
+        {
             rfT0 = fNumer / fDenom;
             code0 = true;
         }
@@ -35,8 +38,10 @@ IC static bool clip(float fDenom, float fNumer, float& rfT0, float& rfT1, bool& 
     }
     else if (fDenom < 0.0f)
     {
-        if (fNumer > fDenom * rfT0) return false;
-        if (fNumer > fDenom * rfT1) {
+        if (fNumer > fDenom * rfT0)
+            return false;
+        if (fNumer > fDenom * rfT1)
+        {
             rfT1 = fNumer / fDenom;
             code1 = true;
         }
@@ -50,11 +55,14 @@ IC static bool clip(float fDenom, float fNumer, float& rfT0, float& rfT1, bool& 
 IC static bool clip(float fDenom, float fNumer, float& rfT0, float& rfT1, box_axis& ax0, box_axis& ax1, box_axis ax)
 {
     bool b0 = false, b1 = false;
-    if (!clip(fDenom, fNumer, rfT0, rfT1, b0, b1)) return false;
+    if (!clip(fDenom, fNumer, rfT0, rfT1, b0, b1))
+        return false;
 
-    if (b0) ax0 = ax;
+    if (b0)
+        ax0 = ax;
 
-    if (b1) ax1 = ax;
+    if (b1)
+        ax1 = ax;
 
     return true;
 }
@@ -64,13 +72,13 @@ static bool intersect(const Fvector& start, const Fvector& dir, const Fvector& e
     // float fSaveT0 = rfT0, fSaveT1 = rfT1;
 
     bool bNotEntirelyClipped = clip(+dir.x, -start.x - extent[0], rfT0, rfT1, ax0, ax1, a_nx) &&
-                               clip(-dir.x, +start.x - extent[0], rfT0, rfT1, ax0, ax1, a_px) &&
-                               clip(+dir.y, -start.y - extent[1], rfT0, rfT1, ax0, ax1, a_ny) &&
-                               clip(-dir.y, +start.y - extent[1], rfT0, rfT1, ax0, ax1, a_py) &&
-                               clip(+dir.z, -start.z - extent[2], rfT0, rfT1, ax0, ax1, a_nz) &&
-                               clip(-dir.z, +start.z - extent[2], rfT0, rfT1, ax0, ax1, a_pz);
+        clip(-dir.x, +start.x - extent[0], rfT0, rfT1, ax0, ax1, a_px) &&
+        clip(+dir.y, -start.y - extent[1], rfT0, rfT1, ax0, ax1, a_ny) &&
+        clip(-dir.y, +start.y - extent[1], rfT0, rfT1, ax0, ax1, a_py) &&
+        clip(+dir.z, -start.z - extent[2], rfT0, rfT1, ax0, ax1, a_nz) &&
+        clip(-dir.z, +start.z - extent[2], rfT0, rfT1, ax0, ax1, a_pz);
 
-    return bNotEntirelyClipped && (ax0 != a_none || ax1 != a_none);  //( rfT0 != fSaveT0 || rfT1 != fSaveT1 );
+    return bNotEntirelyClipped && (ax0 != a_none || ax1 != a_none); //( rfT0 != fSaveT0 || rfT1 != fSaveT1 );
 }
 
 bool intersect(const Fobb& box, const Fvector& origin, const Fvector& direction, float& dist, Fvector& norm)
@@ -88,17 +96,21 @@ bool intersect(const Fobb& box, const Fvector& origin, const Fvector& direction,
     box_axis ax0 = a_none;
     box_axis ax1 = a_none;
     box_axis ax = a_none;
-    if (intersect(kOrigin, kDirection, box.m_halfsize, fT0, fT1, ax0, ax1)) {
+    if (intersect(kOrigin, kDirection, box.m_halfsize, fT0, fT1, ax0, ax1))
+    {
         bool bPick = false;
 
-        if (fT0 > 0.0f) {
-            if (fT0 < dist) {
+        if (fT0 > 0.0f)
+        {
+            if (fT0 < dist)
+            {
                 dist = fT0;
                 ax = ax0;
                 bPick = true;
             }
 
-            if (fT1 < dist) {
+            if (fT1 < dist)
+            {
                 dist = fT1;
                 ax = ax1;
                 bPick = true;
@@ -106,14 +118,16 @@ bool intersect(const Fobb& box, const Fvector& origin, const Fvector& direction,
         }
         else
         {
-            if (fT1 < dist) {
+            if (fT1 < dist)
+            {
                 dist = fT1;
                 ax = ax1;
                 bPick = true;
             }
         }
 
-        if (bPick) {
+        if (bPick)
+        {
             switch (ax)
             {
             case a_px: norm.set(box.m_rotate.i); break;
@@ -135,7 +149,8 @@ bool intersect(const Fobb& box, const Fvector& origin, const Fvector& direction,
 bool intersect(const Fsphere& sphere, const Fvector& origin, const Fvector& direction, float& dist, Fvector& norm)
 {
     bool b_result = !!sphere.intersect2(origin, direction, dist);
-    if (b_result) {
+    if (b_result)
+    {
         const Fvector pt = Fvector().mad(origin, direction, dist);
         norm.sub(pt, sphere.P).normalize_safe();
     }
@@ -149,14 +164,17 @@ bool intersect(const Fcylinder& cylinder, const Fvector& origin, const Fvector& 
     Fcylinder::ecode r_code = Fcylinder::cyl_none;
     bool b_result = false;
     int cnt;
-    if (0 != (cnt = cylinder.intersect(origin, direction, afT, code))) {
+    if (0 != (cnt = cylinder.intersect(origin, direction, afT, code)))
+    {
         // bool		o_inside	= false;
 
         for (int k = 0; k < cnt; k++)
         {
-            if (afT[k] < 0.f) continue;
+            if (afT[k] < 0.f)
+                continue;
 
-            if (afT[k] < dist) {
+            if (afT[k] < dist)
+            {
                 dist = afT[k];
                 r_code = code[k];
                 b_result = true;
@@ -168,18 +186,21 @@ bool intersect(const Fcylinder& cylinder, const Fvector& origin, const Fvector& 
         return false;
     }
 
-    if (b_result) {
+    if (b_result)
+    {
         const Fvector pt = Fvector().mad(origin, direction, dist);
         const Fvector c_pt = Fvector().sub(pt, cylinder.m_center);
         VERIFY(r_code != Fcylinder::cyl_none);
 
-        if (r_code == Fcylinder::cyl_cap) {
+        if (r_code == Fcylinder::cyl_cap)
+        {
             if (c_pt.dotproduct(cylinder.m_direction) > 0.f)
                 norm.set(cylinder.m_direction);
             else
                 norm.invert(cylinder.m_direction);
         }
-        if (r_code == Fcylinder::cyl_wall) {
+        if (r_code == Fcylinder::cyl_wall)
+        {
             const Fvector r_dir = Fvector().mad(pt, cylinder.m_direction, -pt.dotproduct(cylinder.m_direction));
             norm = Fvector().normalize_safe(r_dir);
         }
@@ -211,7 +232,8 @@ bool bone_intersect(
     default: NODEFAULT; return false;
     };
 
-    if (result) bone_transform.transform_dir(norm);
+    if (result)
+        bone_transform.transform_dir(norm);
 
     return result;
 }
@@ -226,9 +248,11 @@ bool __stdcall intersect(
         float l_dist = FLT_MAX;
         Fvector l_norm;
 
-        if (!bone_intersect(i, K, origin, direction, l_dist, l_norm)) continue;
+        if (!bone_intersect(i, K, origin, direction, l_dist, l_norm))
+            continue;
 
-        if (!b_res || l_dist < dist) {
+        if (!b_res || l_dist < dist)
+        {
             dist = l_dist;
             norm = l_norm;
             bone_id = i;
@@ -250,7 +274,8 @@ bool __stdcall intersect(const Fmatrix& object_transform, const IKinematics& K, 
 
     bool res = intersect(K, l_origin, l_direction, bone_id, dist, norm);
 
-    if (res) {
+    if (res)
+    {
         object_transform.transform_dir(norm);
     }
 

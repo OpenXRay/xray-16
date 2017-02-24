@@ -9,17 +9,14 @@ using namespace PAPI;
 // To offset [0 .. 1] vectors to [-.5 .. .5]
 static pVector vHalf(0.5, 0.5, 0.5);
 
-ICF pVector RandVec()
-{
-    return pVector(drand48(), drand48(), drand48());
-}
-
+ICF pVector RandVec() { return pVector(drand48(), drand48(), drand48()); }
 // Return a random number with a normal distribution.
 float PAPI::NRand(float sigma)
 {
 #define ONE_OVER_SIGMA_EXP (1.0f / 0.7975f)
 
-    if (sigma == 0) return 0;
+    if (sigma == 0)
+        return 0;
 
     float y;
     do
@@ -51,7 +48,8 @@ pDomain::pDomain(
     break;
     case PDBox:
         // p1 is the min corner. p2 is the max corner.
-        if (a0 < a3) {
+        if (a0 < a3)
+        {
             p1.x = a0;
             p2.x = a3;
         }
@@ -60,7 +58,8 @@ pDomain::pDomain(
             p1.x = a3;
             p2.x = a0;
         }
-        if (a1 < a4) {
+        if (a1 < a4)
+        {
             p1.y = a1;
             p2.y = a4;
         }
@@ -69,7 +68,8 @@ pDomain::pDomain(
             p1.y = a4;
             p2.y = a1;
         }
-        if (a2 < a5) {
+        if (a2 < a5)
+        {
             p1.z = a2;
             p2.z = a5;
         }
@@ -94,8 +94,8 @@ pDomain::pDomain(
         radius2Sqr = v.length();
         pVector tv = v / radius2Sqr;
 
-        p2 = tu ^ tv;         // This is the non-unit normal.
-        p2.normalize_safe();  // Must normalize it.
+        p2 = tu ^ tv; // This is the non-unit normal.
+        p2.normalize_safe(); // Must normalize it.
 
         // radius1 stores the d of the plane eqn.
         radius1 = -(p1 * p2);
@@ -113,8 +113,8 @@ pDomain::pDomain(
         radius2Sqr = v.length();
         pVector tv = v / radius2Sqr;
 
-        p2 = tu ^ tv;         // This is the non-unit normal.
-        p2.normalize_safe();  // Must normalize it.
+        p2 = tu ^ tv; // This is the non-unit normal.
+        p2.normalize_safe(); // Must normalize it.
 
         // radius1 stores the d of the plane eqn.
         radius1 = -(p1 * p2);
@@ -124,7 +124,7 @@ pDomain::pDomain(
     {
         p1 = pVector(a0, a1, a2);
         p2 = pVector(a3, a4, a5);
-        p2.normalize_safe();  // Must normalize it.
+        p2.normalize_safe(); // Must normalize it.
 
         // radius1 stores the d of the plane eqn.
         radius1 = -(p1 * p2);
@@ -132,7 +132,8 @@ pDomain::pDomain(
     break;
     case PDSphere:
         p1 = pVector(a0, a1, a2);
-        if (a3 > a4) {
+        if (a3 > a4)
+        {
             radius1 = a3;
             radius2 = a4;
         }
@@ -154,7 +155,8 @@ pDomain::pDomain(
         pVector tmp(a3, a4, a5);
         p2 = tmp - p1;
 
-        if (a6 > a7) {
+        if (a6 > a7)
+        {
             radius1 = a6;
             radius2 = a7;
         }
@@ -168,7 +170,7 @@ pDomain::pDomain(
         // Given an arbitrary nonzero vector3 n, make two orthonormal
         // vectors u and v forming a frame [u,v,n.normalize()].
         pVector n = p2;
-        float p2l2 = n.length2();  // Optimize this.
+        float p2l2 = n.length2(); // Optimize this.
         n.normalize_safe();
 
         // radius2Sqr stores 1 / (p2.p2)
@@ -177,7 +179,8 @@ pDomain::pDomain(
 
         // Find a vector3 orthogonal to n.
         pVector basis(1.0f, 0.0f, 0.0f);
-        if (_abs(basis * n) > 0.999) basis = pVector(0.0f, 1.0f, 0.0f);
+        if (_abs(basis * n) > 0.999)
+            basis = pVector(0.0f, 1.0f, 0.0f);
 
         // Project away N component, normalize and cross to get
         // second orthonormal vector3.
@@ -197,11 +200,12 @@ pDomain::pDomain(
     break;
     case PDDisc:
     {
-        p1 = pVector(a0, a1, a2);  // Center point
-        p2 = pVector(a3, a4, a5);  // Normal (not used in Within and Generate)
+        p1 = pVector(a0, a1, a2); // Center point
+        p2 = pVector(a3, a4, a5); // Normal (not used in Within and Generate)
         p2.normalize_safe();
 
-        if (a6 > a7) {
+        if (a6 > a7)
+        {
             radius1 = a6;
             radius2 = a7;
         }
@@ -213,14 +217,15 @@ pDomain::pDomain(
 
         // Find a vector3 orthogonal to n.
         pVector basis(1.0f, 0.0f, 0.0f);
-        if (_abs(basis * p2) > 0.999) basis = pVector(0.0f, 1.0f, 0.0f);
+        if (_abs(basis * p2) > 0.999)
+            basis = pVector(0.0f, 1.0f, 0.0f);
 
         // Project away N component, normalize and cross to get
         // second orthonormal vector3.
         u = basis - p2 * (basis * p2);
         u.normalize_safe();
         v = p2 ^ u;
-        radius1Sqr = -(p1 * p2);  // D of the plane eqn.
+        radius1Sqr = -(p1 * p2); // D of the plane eqn.
     }
     break;
     }
@@ -263,10 +268,11 @@ BOOL pDomain::Within(const pVector& pos) const
         // Check axial distance
         // radius2Sqr stores 1 / (p2.p2)
         float dist = (p2 * x) * radius2Sqr;
-        if (dist < 0.0f || dist > 1.0f) return FALSE;
+        if (dist < 0.0f || dist > 1.0f)
+            return FALSE;
 
         // Check radial distance; scale radius along axis for cones
-        pVector xrad = x - p2 * dist;  // Radial component of x
+        pVector xrad = x - p2 * dist; // Radial component of x
         float rSqr = xrad.length2();
 
         if (type == PDCone)
@@ -287,7 +293,7 @@ BOOL pDomain::Within(const pVector& pos) const
     case PDTriangle:
     case PDDisc:
     default:
-        return FALSE;  // XXX Is there something better?
+        return FALSE; // XXX Is there something better?
     }
 }
 
@@ -315,7 +321,7 @@ void pDomain::Generate(pVector& pos) const
     }
     break;
     case PDRectangle: pos = p1 + u * drand48() + v * drand48(); break;
-    case PDPlane:  // How do I sensibly make a point on an infinite plane?
+    case PDPlane: // How do I sensibly make a point on an infinite plane?
         pos = p1;
         break;
     case PDSphere:
@@ -334,16 +340,17 @@ void pDomain::Generate(pVector& pos) const
     case PDCone:
     {
         // For a cone, p2 is the apex of the cone.
-        float dist = drand48();                        // Distance between base and tip
-        float theta = drand48() * 2.0f * float(M_PI);  // Angle around axis
+        float dist = drand48(); // Distance between base and tip
+        float theta = drand48() * 2.0f * float(M_PI); // Angle around axis
         // Distance from axis
         float r = radius2 + drand48() * (radius1 - radius2);
 
-        float x = r * _cos(theta);  // Weighting of each frame vector3
+        float x = r * _cos(theta); // Weighting of each frame vector3
         float y = r * _sin(theta);
 
         // Scale radius along axis for cones
-        if (type == PDCone) {
+        if (type == PDCone)
+        {
             x *= dist;
             y *= dist;
         }
@@ -359,11 +366,11 @@ void pDomain::Generate(pVector& pos) const
         break;
     case PDDisc:
     {
-        float theta = drand48() * 2.0f * float(M_PI);  // Angle around normal
+        float theta = drand48() * 2.0f * float(M_PI); // Angle around normal
         // Distance from center
         float r = radius2 + drand48() * (radius1 - radius2);
 
-        float x = r * _cos(theta);  // Weighting of each frame vector3
+        float x = r * _cos(theta); // Weighting of each frame vector3
         float y = r * _sin(theta);
 
         pos = p1 + u * x + v * y;

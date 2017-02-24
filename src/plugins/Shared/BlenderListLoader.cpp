@@ -5,11 +5,7 @@
 #include "utils/Shader_xrLC.h"
 #include "xrEngine/GameMtlLib.h"
 
-IC bool str_pred(LPCSTR x, LPCSTR y)
-{
-    return xr_strcmp(x, y) < 0;
-}
-
+IC bool str_pred(LPCSTR x, LPCSTR y) { return xr_strcmp(x, y) < 0; }
 void ClearList(LPSTRVec& lst)
 {
     for (LPSTRIt it = lst.begin(); it != lst.end(); it++)

@@ -82,11 +82,11 @@ class CLevelMain : public TUI
     virtual void RealUpdateScene();
     virtual void RealQuit();
 
-  public:
+public:
     CInifile* m_rt_object_props;
     C3DCursor* m_Cursor;
 
-  public:
+public:
     CLevelMain();
     virtual ~CLevelMain();
 
@@ -104,9 +104,7 @@ class CLevelMain : public TUI
     virtual void OutInfo();
 
     virtual LPCSTR EditorName() { return "level"; }
-
     virtual LPCSTR EditorDesc() { return "Level Editor"; }
-
     void ShowContextMenu(int cls);
     bool PickGround(
         Fvector& hitpoint, const Fvector& start, const Fvector& direction, int bSnap = 1, Fvector* hitnormal = 0);
@@ -124,4 +122,4 @@ class CLevelMain : public TUI
 
 extern CLevelMain*& LUI;
 
-#endif  // UI_MainCommandH
+#endif // UI_MainCommandH

@@ -17,7 +17,6 @@ public:
     void reset_begin();
     void reset_end();
     IC BOOL valid() { return !!pTexture; }
-
 public:
     ID3DTexture2D* pSurface;
     ID3DRenderTargetView* pRT;
@@ -28,7 +27,7 @@ public:
     ID3D11UnorderedAccessView* pUAView;
 #endif
 
-#endif  //	USE_DX10
+#endif //	USE_DX10
     ref_texture pTexture;
 
     u32 dwWidth;
@@ -78,4 +77,4 @@ struct 		resptrcode_crtc	: public resptr_base<CRTC>
 typedef	resptr_core<CRTC,resptrcode_crtc>		ref_rtc;
 */
 
-#endif  // SH_RT_H
+#endif // SH_RT_H

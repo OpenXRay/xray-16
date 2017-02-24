@@ -33,7 +33,8 @@ void CControllerDirection::assign_bones()
     m_bone_spine = &kinematics->LL_GetBoneInstance(kinematics->LL_BoneID("bip01_spine"));
     m_bone_head = &kinematics->LL_GetBoneInstance(kinematics->LL_BoneID("bip01_head"));
 
-    if (!m_controller->PPhysicsShell()) {  //нельзя ставить колбеки, если создан физ шел - у него стоят свои колбеки!!!
+    if (!m_controller->PPhysicsShell())
+    { //нельзя ставить колбеки, если создан физ шел - у него стоят свои колбеки!!!
         m_bone_spine->set_callback(bctCustom, bone_callback, this);
         m_bone_head->set_callback(bctCustom, bone_callback, this);
     }
@@ -81,7 +82,7 @@ void CControllerDirection::head_look_point(const Fvector& look_point)
 
     // установить параметры вращения по heading
     float cur_yaw = m_man->direction().get_heading_current();
-    float dy = _abs(angle_normalize_signed(dir_yaw - cur_yaw));  // дельта, на которую нужно поворачиваться
+    float dy = _abs(angle_normalize_signed(dir_yaw - cur_yaw)); // дельта, на которую нужно поворачиваться
 
     bone_angle_head = _pmt_head_bone_limit / (_pmt_head_bone_limit + _pmt_torso_bone_limit) * dy;
     bone_angle_torso = _pmt_torso_bone_limit / (_pmt_head_bone_limit + _pmt_torso_bone_limit) * dy;
@@ -89,7 +90,8 @@ void CControllerDirection::head_look_point(const Fvector& look_point)
     clamp(bone_angle_head, 0.f, _pmt_head_bone_limit);
     clamp(bone_angle_torso, 0.f, _pmt_torso_bone_limit);
 
-    if (!from_right(dir_yaw, cur_yaw)) {
+    if (!from_right(dir_yaw, cur_yaw))
+    {
         bone_angle_head *= -1.f;
         bone_angle_torso *= -1.f;
     }
@@ -103,8 +105,7 @@ void CControllerDirection::head_look_point(const Fvector& look_point)
     if (fis_zero(target_dy))
         bone_speed = _pmt_min_speed;
     else
-        bone_speed =
-            _pmt_min_speed +
+        bone_speed = _pmt_min_speed +
             _pmt_rotation_speed * (_abs((x_spine.cur_yaw + x_head.cur_yaw) - (bone_angle_head + bone_angle_torso)) /
                                       (2 * (_pmt_head_bone_limit + _pmt_torso_bone_limit)));
     // set motion

@@ -27,12 +27,12 @@ public:
 
     struct _options
     {
-        u32 vis_intersect : 1;       // config
-        u32 distortion : 1;          // run-time modified
-        u32 color_mapping : 1;       // true if SM 1.4 and higher
-        u32 disasm : 1;              // config
-        u32 forceskinw : 1;          // config
-        u32 no_detail_textures : 1;  // config
+        u32 vis_intersect : 1; // config
+        u32 distortion : 1; // run-time modified
+        u32 color_mapping : 1; // true if SM 1.4 and higher
+        u32 disasm : 1; // config
+        u32 forceskinw : 1; // config
+        u32 no_detail_textures : 1; // config
     } o;
 
 public:
@@ -63,7 +63,7 @@ public:
     CWallmarksEngine* Wallmarks;
     CDetailManager* Details;
     CModelPool* Models;
-    CRenderTarget* Target;  // Render-target
+    CRenderTarget* Target; // Render-target
 
     // R1-specific global constants
     Fmatrix r1_dlight_tcgen;
@@ -74,7 +74,7 @@ public:
     cl_light_XFORM r1_dlight_binder_xform;
     shared_str c_ldynamic_props;
     bool m_bMakeAsyncSS;
-    bool m_bFirstFrameAfterReset;  // Determines weather the frame is the first after resetting device.
+    bool m_bFirstFrameAfterReset; // Determines weather the frame is the first after resetting device.
 
 private:
     // Loading / Unloading
@@ -83,10 +83,10 @@ private:
     void LoadLights(IReader* fs);
     void LoadSectors(IReader* fs);
     void LoadSWIs(CStreamReader* fs);
-    BOOL add_Dynamic(dxRender_Visual* pVisual, u32 planes);  // normal processing
+    BOOL add_Dynamic(dxRender_Visual* pVisual, u32 planes); // normal processing
     void add_Static(dxRender_Visual* pVisual, u32 planes);
-    void add_leafs_Dynamic(dxRender_Visual* pVisual);  // if detected node's full visibility
-    void add_leafs_Static(dxRender_Visual* pVisual);   // if detected node's full visibility
+    void add_leafs_Dynamic(dxRender_Visual* pVisual); // if detected node's full visibility
+    void add_leafs_Static(dxRender_Visual* pVisual); // if detected node's full visibility
 
 public:
     ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq);
@@ -107,7 +107,6 @@ public:
     virtual GenerationLevel get_generation() override { return IRender::GENERATION_R1; }
     virtual DWORD get_dx_level() override { return 0x00090000; }
     virtual bool is_sun_static() override { return true; }
-
     // Loading / Unloading
     virtual void create() override;
     virtual void destroy() override;
@@ -133,9 +132,9 @@ public:
     // Main
     virtual void flush() override;
     virtual void set_Object(IRenderable* O) override;
-    virtual void add_Occluder(Fbox2& bb_screenspace) override;  // mask screen region as oclluded
-    virtual void add_Visual(IRenderVisual* V) override;         // add visual leaf (no culling performed at all)
-    virtual void add_Geometry(IRenderVisual* V) override;       // add visual(s)	(all culling performed)
+    virtual void add_Occluder(Fbox2& bb_screenspace) override; // mask screen region as oclluded
+    virtual void add_Visual(IRenderVisual* V) override; // add visual leaf (no culling performed at all)
+    virtual void add_Geometry(IRenderVisual* V) override; // add visual(s)	(all culling performed)
 
     // wallmarks
     virtual void add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* V);
@@ -159,7 +158,6 @@ public:
 
     // Particle library
     virtual CPSLibrary* ps_library() { return &PSLibrary; }
-
     // Lighting
     virtual IRender_Light* light_create() override;
     virtual IRender_Glow* glow_create() override;

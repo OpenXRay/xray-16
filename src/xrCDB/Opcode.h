@@ -27,7 +27,7 @@
 #ifdef WIN32
 #include <windows.h>
 #include <windowsx.h>
-#endif  // WIN32
+#endif // WIN32
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -102,4 +102,4 @@ namespace Opcode
 #include "OPC_PlanesCollider.h"
 }
 
-#endif  // __OPCODE_H__
+#endif // __OPCODE_H__

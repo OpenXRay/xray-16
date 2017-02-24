@@ -8,16 +8,13 @@
 
 //------------------------------------------------------------------------------
 
-void __fastcall CPSLibrary::FindByName(LPCSTR new_name, bool& res)
-{
-    res = (FindPED(new_name) || FindPGD(new_name));
-}
-
+void __fastcall CPSLibrary::FindByName(LPCSTR new_name, bool& res) { res = (FindPED(new_name) || FindPGD(new_name)); }
 PS::CPEDef* CPSLibrary::AppendPED(PS::CPEDef* src)
 {
     m_PEDs.push_back(new PS::CPEDef());
 #ifdef _PARTICLE_EDITOR
-    if (src) m_PEDs.back()->Copy(*src);
+    if (src)
+        m_PEDs.back()->Copy(*src);
 #endif
     return m_PEDs.back();
 }
@@ -27,7 +24,8 @@ PS::CPEDef* CPSLibrary::AppendPED(PS::CPEDef* src)
 PS::CPGDef* CPSLibrary::AppendPGD(PS::CPGDef* src)
 {
     m_PGDs.push_back(new PS::CPGDef());
-    if (src) m_PGDs.back()->Clone(src);
+    if (src)
+        m_PGDs.back()->Clone(src);
     return m_PGDs.back();
 }
 
@@ -36,7 +34,8 @@ PS::CPGDef* CPSLibrary::AppendPGD(PS::CPGDef* src)
 bool CPSLibrary::Save()
 {
     xr_string temp_fn;
-    if (EFS.GetSaveName("$game_data$", temp_fn)) {
+    if (EFS.GetSaveName("$game_data$", temp_fn))
+    {
         return Save(temp_fn.c_str());
     }
     else

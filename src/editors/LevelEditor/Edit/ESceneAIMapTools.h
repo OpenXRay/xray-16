@@ -15,23 +15,23 @@ struct SAINode;
 const DWORD InvalidNode = (1 << 24) - 1;
 
 #pragma pack(push, 1)
-struct SAINode  // definition of "patch" or "node"
+struct SAINode // definition of "patch" or "node"
 {
     union
     {
         struct
         {
-            SAINode* n1;  // Left
-            SAINode* n2;  // Forward
-            SAINode* n3;  // Right
-            SAINode* n4;  // Backward
+            SAINode* n1; // Left
+            SAINode* n2; // Forward
+            SAINode* n3; // Right
+            SAINode* n4; // Backward
         };
 
         SAINode* n[4];
     };
 
-    Fplane Plane;  // plane of patch
-    Fvector Pos;   // position of patch center
+    Fplane Plane; // plane of patch
+    Fvector Pos; // position of patch center
 
     enum
     {
@@ -56,18 +56,15 @@ struct SAINode  // definition of "patch" or "node"
     }
 
     SAINode* nLeft() { return n1; }
-
     SAINode* nForward() { return n2; }
-
     SAINode* nRight() { return n3; }
-
     SAINode* nBack() { return n4; }
-
     int Links() const
     {
         int cnt = 0;
         for (int k = 0; k < 4; k++)
-            if (n[k]) cnt++;
+            if (n[k])
+                cnt++;
         return cnt;
     }
 
@@ -108,7 +105,7 @@ class ESceneAIMapTool : public ESceneToolBase
     ref_shader m_Shader;
     CDB::MODEL* m_CFModel;
 
-  protected:
+protected:
     void hash_FillFromNodes();
     void hash_Initialize();
     void hash_Clear();
@@ -144,7 +141,7 @@ class ESceneAIMapTool : public ESceneToolBase
     virtual void CreateControls();
     virtual void RemoveControls();
 
-  public:
+public:
     enum EMode
     {
         mdAppend,
@@ -169,20 +166,16 @@ class ESceneAIMapTool : public ESceneToolBase
 
     bool PickObjects(Fvector& dest, const Fvector& start, const Fvector& dir, float dist);
 
-  public:
+public:
     ESceneAIMapTool();
     virtual ~ESceneAIMapTool();
 
     virtual bool AllowEnabling() { return true; }
-
     virtual BOOL AllowMouseStart() { return true; }
-
     virtual void OnObjectRemove(CCustomObject* O, bool bDeleting);
 
     virtual void UpdateSnapList() { m_Flags.set(flUpdateSnapList, TRUE); }
-
     virtual ObjectList* GetSnapList() { return &m_SnapObjects; }
-
     // selection manipulate
     SAINode* PickNode(const Fvector& start, const Fvector& dir, float& dist);
     virtual int RaySelect(
@@ -194,14 +187,11 @@ class ESceneAIMapTool : public ESceneToolBase
     virtual int SelectionCount(bool testflag);
 
     virtual void ShowObjects(bool flag, bool bAllowSelectionFlag = false, bool bSelFlag = true) {}
-
     virtual void Clear(bool bOnlyNodes = false);
 
     // definition
     IC LPCSTR ClassName() { return "ai_map"; }
-
     IC LPCSTR ClassDesc() { return "AI Map"; }
-
     IC
 
         int
@@ -214,7 +204,6 @@ class ESceneAIMapTool : public ESceneToolBase
     virtual bool Valid();
 
     virtual bool Validate(bool) { return true; }
-
     virtual bool IsNeedSave();
 
     // events
@@ -229,7 +218,6 @@ class ESceneAIMapTool : public ESceneToolBase
     virtual void SaveLTX(CInifile&, int id);
 
     virtual bool can_use_inifile() { return false; }
-
     virtual bool LoadSelection(IReader&);
     virtual void SaveSelection(IWriter&);
     virtual bool Export(LPCSTR path);
@@ -244,7 +232,6 @@ class ESceneAIMapTool : public ESceneToolBase
     bool GenerateMap(bool bFromSelectedOnly);
 
     virtual bool GetSummaryInfo(SSceneSummary* inf) { return false; }
-
     virtual void GetBBox(Fbox& bb, bool bSelOnly);
 
     // properties
@@ -254,15 +241,13 @@ class ESceneAIMapTool : public ESceneToolBase
     int AddNode(const Fvector& pos, bool bIgnoreConstraints, bool bAutoLink, int cnt);
 
     AINodeVec& Nodes() { return m_Nodes; }
-
     void MakeLinks(u8 side_flag, EMode mode, bool bIgnoreConstraints);
     void RemoveLinks();
     void InvertLinks();
 
     void UpdateHLSelected() { m_Flags.set(flUpdateHL, TRUE); }
-
     void SmoothNodes();
     void ResetNodes();
     void SelectNodesByLink(int link);
 };
-#endif  // ESceneAIMapToolsH
+#endif // ESceneAIMapToolsH

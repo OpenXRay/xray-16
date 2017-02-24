@@ -18,7 +18,8 @@ CBlend* PlayMotionByParts(
     for (u16 i = 0; i < MAX_PARTS; ++i)
     {
         CBlend* blend = sa->LL_PlayCycle(i, motion_ID, bMixIn, Callback, CallbackParam);
-        if (blend && !ret) ret = blend;
+        if (blend && !ret)
+            ret = blend;
         // m_anim_blend = PKinematicsAnimated->PlayCycle(*visual->startup_animation);
     }
     return ret;
@@ -28,7 +29,8 @@ CBlend* anim_script_callback::play_cycle(IKinematicsAnimated* sa, const shared_s
 {
     MotionID m = sa->LL_MotionID(*anim);
     R_ASSERT(m.valid());
-    if (sa->LL_GetMotionDef(m)->StopAtEnd()) {
+    if (sa->LL_GetMotionDef(m)->StopAtEnd())
+    {
         on_end = false;
         on_begin = false;
         is_set = true;
@@ -70,7 +72,7 @@ void anim_script_callback::anim_callback(CBlend* B)
 
     ////////////////////BLEND UPDATE//////////////////////////////////////////////
 
-    if (B->timeTotal - B->timeCurrent - END_EPS < B->timeCurrent)  // this cool expression sims to work for all cases!
+    if (B->timeTotal - B->timeCurrent - END_EPS < B->timeCurrent) // this cool expression sims to work for all cases!
     {
         VERIFY(B->speed > 0.f);
         ths->on_end = true;
@@ -84,8 +86,10 @@ void anim_script_callback::anim_callback(CBlend* B)
 
 void anim_script_callback::update(CGameObject& O)
 {
-    if (!is_set) return;
-    if (!on_end && !on_begin) return;
+    if (!is_set)
+        return;
+    if (!on_end && !on_begin)
+        return;
     O.callback(GameObject::eScriptAnimation)(on_end);
     on_end = false;
     on_begin = false;

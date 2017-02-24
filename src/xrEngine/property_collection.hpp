@@ -66,8 +66,8 @@ private:
     container_type& m_container;
     holder_type& m_holder;
     bool* m_changed;
-};  // class property_collection
+}; // class property_collection
 
 #include "property_collection_inline.hpp"
 
-#endif  // #ifndef PROPERTY_COLLECTION_HPP_INCLUDED
+#endif // #ifndef PROPERTY_COLLECTION_HPP_INCLUDED

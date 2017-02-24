@@ -27,7 +27,8 @@ void CRestrictedObjectObstacle::apply(const obstacles_query& query, const u32& s
     AREA::const_iterator E = query.area().end();
     for (; I != E; ++I)
     {
-        if (*I == start_vertex_id) continue;
+        if (*I == start_vertex_id)
+            continue;
 
         graph.set_mask_no_check(*I);
     }
@@ -49,9 +50,11 @@ void CRestrictedObjectObstacle::apply(
     AREA::const_iterator E = query.area().end();
     for (; I != E; ++I)
     {
-        if (graph.inside(graph.vertex(*I), start_position)) continue;
+        if (graph.inside(graph.vertex(*I), start_position))
+            continue;
 
-        if (graph.inside(graph.vertex(*I), dest_position)) continue;
+        if (graph.inside(graph.vertex(*I), dest_position))
+            continue;
 
         graph.set_mask_no_check(*I);
     }
@@ -73,9 +76,11 @@ void CRestrictedObjectObstacle::apply(
     AREA::const_iterator E = query.area().end();
     for (; I != E; ++I)
     {
-        if (*I == start_vertex_id) continue;
+        if (*I == start_vertex_id)
+            continue;
 
-        if (*I == dest_vertex_id) continue;
+        if (*I == dest_vertex_id)
+            continue;
 
         graph.set_mask_no_check(*I);
     }

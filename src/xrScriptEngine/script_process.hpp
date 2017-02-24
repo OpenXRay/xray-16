@@ -51,7 +51,7 @@ protected:
     SCRIPT_REGISTRY m_scripts;
     SCRIPTS_TO_RUN m_scripts_to_run;
     shared_str m_name;
-    u32 m_iterator;  // Oles: iterative update
+    u32 m_iterator; // Oles: iterative update
 
 protected:
     void run_scripts();

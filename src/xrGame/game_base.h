@@ -7,7 +7,7 @@
 
 #pragma pack(push, 1)
 
-struct game_PlayerState;  // fw
+struct game_PlayerState; // fw
 class NET_Packet;
 
 struct RPoint
@@ -107,9 +107,7 @@ struct game_PlayerState
     void SetGameID(u16 NewID);
     bool HasOldID(u16 ID);
     bool IsSkip() const { return testFlag(GAME_PLAYER_FLAG_SKIP); }
-
     s16 frags() const { return m_iRivalKills - m_iSelfKills - m_iTeamKills; }
-
 #ifndef AI_COMPILER
     virtual void net_Export(NET_Packet& P, BOOL Full = FALSE);
     virtual void net_Import(NET_Packet& P);
@@ -171,10 +169,7 @@ public:
     virtual void SetEnvironmentGameTimeFactor(ALife::_TIME_ID gameTime, const float timeFactor) = 0;
 };
 
-IC IGameState::~IGameState()
-{
-}
-
+IC IGameState::~IGameState() {}
 class game_GameState : public FactoryObjectBase, public virtual IGameState
 {
 protected:

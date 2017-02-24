@@ -14,23 +14,12 @@ property_integer::property_integer(integer_getter_type const& getter, integer_se
 {
 }
 
-property_integer::~property_integer()
-{
-    this->!property_integer();
-}
-
+property_integer::~property_integer() { this->!property_integer(); }
 property_integer::!property_integer()
 {
     delete (m_getter);
     delete (m_setter);
 }
 
-System::Object ^ property_integer::GetValue()
-{
-    return ((*m_getter)());
-}
-
-void property_integer::SetValue(System::Object ^ object)
-{
-    (*m_setter)(safe_cast<int>(object));
-}
+System::Object ^ property_integer::GetValue() { return ((*m_getter)()); }
+void property_integer::SetValue(System::Object ^ object) { (*m_setter)(safe_cast<int>(object)); }

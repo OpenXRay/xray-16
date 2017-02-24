@@ -13,17 +13,9 @@ namespace inventory
 {
 namespace upgrade
 {
-IC const shared_str& Group::id() const
-{
-    return (m_id);
-}
+IC const shared_str& Group::id() const { return (m_id); }
+IC LPCSTR Group::id_str() const { return (m_id.c_str()); }
+} // namespace upgrade
+} // namespace inventory
 
-IC LPCSTR Group::id_str() const
-{
-    return (m_id.c_str());
-}
-
-}  // namespace upgrade
-}  // namespace inventory
-
-#endif  // INVENTORY_UPGRADE_GROUP_INLINE_H_INCLUDED
+#endif // INVENTORY_UPGRADE_GROUP_INLINE_H_INCLUDED

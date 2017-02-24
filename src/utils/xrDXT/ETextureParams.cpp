@@ -39,28 +39,35 @@ void STextureParams::Load(IReader& F)
     mip_filter = F.r_u32();
     width = F.r_u32();
     height = F.r_u32();
-    if (F.find_chunk(THM_CHUNK_TEXTURE_TYPE)) {
+    if (F.find_chunk(THM_CHUNK_TEXTURE_TYPE))
+    {
         type = (ETType)F.r_u32();
     }
-    if (F.find_chunk(THM_CHUNK_DETAIL_EXT)) {
+    if (F.find_chunk(THM_CHUNK_DETAIL_EXT))
+    {
         F.r_stringZ(detail_name);
         detail_scale = F.r_float();
     }
-    if (F.find_chunk(THM_CHUNK_MATERIAL)) {
+    if (F.find_chunk(THM_CHUNK_MATERIAL))
+    {
         material = (ETMaterial)F.r_u32();
         material_weight = F.r_float();
     }
-    if (F.find_chunk(THM_CHUNK_BUMP)) {
+    if (F.find_chunk(THM_CHUNK_BUMP))
+    {
         bump_virtual_height = F.r_float();
         bump_mode = (ETBumpMode)F.r_u32();
-        if (bump_mode < STextureParams::tbmNone) {
+        if (bump_mode < STextureParams::tbmNone)
+        {
             //.. временно (до полного убирания Autogen)
             bump_mode = STextureParams::tbmNone;
         }
         F.r_stringZ(bump_name);
     }
-    if (F.find_chunk(THM_CHUNK_EXT_NORMALMAP)) F.r_stringZ(ext_normal_map_name);
-    if (F.find_chunk(THM_CHUNK_FADE_DELAY)) fade_delay = F.r_u8();
+    if (F.find_chunk(THM_CHUNK_EXT_NORMALMAP))
+        F.r_stringZ(ext_normal_map_name);
+    if (F.find_chunk(THM_CHUNK_FADE_DELAY))
+        fade_delay = F.r_u8();
 }
 
 void STextureParams::Save(IWriter& F)
@@ -112,7 +119,7 @@ void STextureParams::OnTypeChange(PropValue* prop)
     case ttBumpMap: flags.set(flGenerateMipMaps, FALSE); break;
     case ttNormalMap:
         flags.set(flImplicitLighted | flBinaryAlpha | flAlphaBorder | flColorBorder | flFadeToColor | flFadeToAlpha |
-                      flDitherColor | flDitherEachMIPLevel | flBumpDetail,
+                flDitherColor | flDitherEachMIPLevel | flBumpDetail,
             FALSE);
         flags.set(flGenerateMipMaps, TRUE);
         mip_filter = kMIPFilterKaiser;
@@ -120,13 +127,14 @@ void STextureParams::OnTypeChange(PropValue* prop)
         break;
     case ttTerrain:
         flags.set(flGenerateMipMaps | flBinaryAlpha | flAlphaBorder | flColorBorder | flFadeToColor | flFadeToAlpha |
-                      flDitherColor | flDitherEachMIPLevel | flBumpDetail,
+                flDitherColor | flDitherEachMIPLevel | flBumpDetail,
             FALSE);
         flags.set(flImplicitLighted, TRUE);
         fmt = tfDXT1;
         break;
     }
-    if (!OnTypeChangeEvent.empty()) OnTypeChangeEvent(prop);
+    if (!OnTypeChangeEvent.empty())
+        OnTypeChangeEvent(prop);
 }
 
 void STextureParams::FillProp(LPCSTR base_name, PropItemVec& items, PropValue::TOnChange on_type_change)
@@ -146,7 +154,8 @@ void STextureParams::FillProp(LPCSTR base_name, PropItemVec& items, PropValue::T
         PHelper().CreateToken32(items, "MipMaps\\Filter", (u32*)&mip_filter, tparam_token);
         P = PHelper().CreateToken32(items, "Bump\\Mode", (u32*)&bump_mode, tbmode_token);
         P->OnChangeEvent.bind(this, &STextureParams::OnTypeChange);
-        if (tbmUse == bump_mode) {
+        if (tbmUse == bump_mode)
+        {
             AnsiString path;
             path = base_name;
             PHelper().CreateChoose(items, "Bump\\Texture", &bump_name, smTexture, path.c_str());
@@ -157,7 +166,8 @@ void STextureParams::FillProp(LPCSTR base_name, PropItemVec& items, PropValue::T
         PHelper().CreateFloat(items, "Details\\Scale", &detail_scale, 0.1f, 10000.f, 0.1f, 2);
         PHelper().CreateToken32(items, "Material\\Base", (u32*)&material, tmtl_token);
         PHelper().CreateFloat(items, "Material\\Weight", &material_weight);
-        if (false) {
+        if (false)
+        {
             PHelper().CreateFlag32(items, "Flags\\Binary Alpha", &flags, flBinaryAlpha);
         }
         PHelper().CreateFlag32(items, "Flags\\Dither", &flags, flDitherColor);
@@ -198,15 +208,12 @@ void STextureParams::FillProp(LPCSTR base_name, PropItemVec& items, PropValue::T
     }
 }
 
-LPCSTR STextureParams::FormatString()
-{
-    return get_token_name(tfmt_token, fmt);
-}
-
+LPCSTR STextureParams::FormatString() { return get_token_name(tfmt_token, fmt); }
 u32 STextureParams::MemoryUsage(LPCSTR base_name)
 {
     u32 mem_usage = width * height * 4;
-    if (flags.test(flGenerateMipMaps)) {
+    if (flags.test(flGenerateMipMaps))
+    {
         mem_usage *= 3ul;
         mem_usage /= 2ul;
     }
@@ -223,7 +230,8 @@ u32 STextureParams::MemoryUsage(LPCSTR base_name)
     }
     xr_string fn;
     FS.update_path(fn, _game_textures_, EFS.ChangeFileExt(base_name, ".seq").c_str());
-    if (FS.exist(fn.c_str())) {
+    if (FS.exist(fn.c_str()))
+    {
         string128 buffer;
         IReader* F = FS.r_open(0, fn.c_str());
         F->r_string(buffer, sizeof(buffer));

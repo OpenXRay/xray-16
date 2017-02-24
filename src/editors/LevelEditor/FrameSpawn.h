@@ -21,8 +21,8 @@ class CEditObject;
 //---------------------------------------------------------------------------
 class TfraSpawn : public TForm
 {
-    __published :  // IDE-managed Components
-                   TPanel* paCurrent;
+    __published : // IDE-managed Components
+                  TPanel* paCurrent;
     TLabel* APHeadLabel1;
     TFormStorage* fsStorage;
     TPanel* paCommands;
@@ -58,7 +58,7 @@ class TfraSpawn : public TForm
     void __fastcall ebMultiSelectByRefAppendClick(TObject* Sender);
     void __fastcall seSelPercentKeyPress(TObject* Sender, char& Key);
 
-  private:  // User declarations
+private: // User declarations
     TItemList* m_Items;
     void __stdcall OnItemFocused(ListItemsVec& items);
     LPCSTR m_Current;
@@ -67,7 +67,7 @@ class TfraSpawn : public TForm
     void __stdcall OnDrawObjectThumbnail(LPCSTR name, HDC hdc, const Irect& R);
     xr_map<shared_str, shared_str> m_caption_to_sect;
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TfraSpawn(TComponent* Owner);
 
     LPCSTR Current() { return m_Current; }

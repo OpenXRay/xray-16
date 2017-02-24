@@ -26,16 +26,14 @@ CStateManagerFracture::CStateManagerFracture(CFracture* obj) : inherited(obj)
     add_state(eStateHitted, new CStateMonsterHitted<CFracture>(obj));
 }
 
-CStateManagerFracture::~CStateManagerFracture()
-{
-}
-
+CStateManagerFracture::~CStateManagerFracture() {}
 void CStateManagerFracture::execute()
 {
     u32 state_id = u32(-1);
     const CEntityAlive* enemy = object->EnemyMan.get_enemy();
 
-    if (enemy) {
+    if (enemy)
+    {
         switch (object->EnemyMan.get_danger_type())
         {
         case eStrong: state_id = eStatePanic; break;

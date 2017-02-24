@@ -20,7 +20,6 @@ public:
 
     float velocity_current() { return m_velocity_current; }
     float velocity_target() { return m_data.velocity_target; }
-
     // return object's real velocity
     float real_velocity();
 };

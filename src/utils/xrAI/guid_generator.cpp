@@ -59,5 +59,5 @@ LPCSTR generate_guid(const xrGUID& guid, LPSTR buffer, const u32& buffer_size)
     return (buffer);
 #else
     NODEFAULT;
-#endif  // WINVER
+#endif // WINVER
 }

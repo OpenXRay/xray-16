@@ -16,11 +16,13 @@ void CMonsterSquad::ProcessAttack()
         //		CEntity *member = it_goal->first;
         SMemberGoal goal = it_goal->second;
 
-        if (goal.type == MG_AttackEnemy) {
+        if (goal.type == MG_AttackEnemy)
+        {
             VERIFY(goal.entity && !goal.entity->getDestroy());
 
             ENEMY_MAP_IT it = m_enemy_map.find(goal.entity);
-            if (it != m_enemy_map.end()) {
+            if (it != m_enemy_map.end())
+            {
                 it->second.push_back(it_goal->first);
             }
             else
@@ -35,7 +37,8 @@ void CMonsterSquad::ProcessAttack()
     for (ENEMY_MAP_IT it_enemy = m_enemy_map.begin(); it_enemy != m_enemy_map.end(); ++it_enemy)
     {
         ENTITY_VEC* monsters = &(*it_enemy).second;
-        if (!monsters->size()) {
+        if (!monsters->size())
+        {
             continue;
         }
 
@@ -58,7 +61,6 @@ struct sort_predicate
     const CEntity* enemy;
 
     sort_predicate(const CEntity* pEnemy) : enemy(pEnemy) {}
-
     bool operator()(const CEntity* pE1, const CEntity* pE2) const
     {
         return (pE1->Position().distance_to(enemy->Position()) > pE2->Position().distance_to(enemy->Position()));
@@ -76,9 +78,11 @@ void CMonsterSquad::set_rat_squad_index(const CEntity* m_enemy)
 
     for (MEMBER_GOAL_MAP_IT it_goal = m_goals.begin(); it_goal != m_goals.end(); it_goal++)
     {
-        if (it_goal->first->g_Alive()) {
+        if (it_goal->first->g_Alive())
+        {
             ENEMY_MAP_IT it = m_enemy_maps.find(m_enemy);
-            if (it != m_enemy_maps.end()) {
+            if (it != m_enemy_maps.end())
+            {
                 it->second.push_back(it_goal->first);
             }
             else
@@ -120,9 +124,11 @@ void CMonsterSquad::set_squad_index(const CEntity* m_enemy)
 
     for (MEMBER_GOAL_MAP_IT it_goal = m_goals.begin(); it_goal != m_goals.end(); it_goal++)
     {
-        if (it_goal->first->g_Alive()) {
+        if (it_goal->first->g_Alive())
+        {
             ENEMY_MAP_IT it = m_enemy_maps.find(m_enemy);
-            if (it != m_enemy_maps.end()) {
+            if (it != m_enemy_maps.end())
+            {
                 it->second.push_back(it_goal->first);
             }
             else
@@ -163,7 +169,8 @@ void CMonsterSquad::Attack_AssignTargetDir(ENTITY_VEC& members, const CEntity* e
 
     // сортировать по убыванию расстояния от npc до врага
     std::sort(members.begin(), members.end(), sort_predicate(enemy));
-    if (members.empty()) return;
+    if (members.empty())
+        return;
 
     float delta_yaw = PI_MUL_2 / members.size();
 
@@ -176,7 +183,8 @@ void CMonsterSquad::Attack_AssignTargetDir(ENTITY_VEC& members, const CEntity* e
     lines.push_back(first);
 
     // обработать дальний элемент
-    if (!members.empty()) {
+    if (!members.empty())
+    {
         last.pE = members[0];
         last.p_from = last.pE->Position();
         last.yaw = PI;
@@ -212,21 +220,23 @@ void CMonsterSquad::Attack_AssignTargetDir(ENTITY_VEC& members, const CEntity* e
 
         bool b_add_left = false;
 
-        if (angle_normalize_signed(h2 - h1) > 0) {  // right
+        if (angle_normalize_signed(h2 - h1) > 0)
+        { // right
             if ((next_right_yaw < PI) && !fsimilar(next_right_yaw, PI, PI / 60.f))
                 b_add_left = false;
             else
                 b_add_left = true;
         }
         else
-        {  // left
+        { // left
             if ((next_left_yaw < PI) && !fsimilar(next_left_yaw, PI, PI / 60.f))
                 b_add_left = true;
             else
                 b_add_left = false;
         }
 
-        if (b_add_left) {
+        if (b_add_left)
+        {
             cur_line.yaw = -next_left_yaw;
             next_left_yaw += delta_yaw;
         }
@@ -268,14 +278,16 @@ Fvector CMonsterSquad::calc_monster_target_dir(CBaseMonster* monster, const CEnt
 
     // enemy pos == home pos?
     const float near_zero = 0.00001f;
-    if (home2enemy_mag < near_zero) {
+    if (home2enemy_mag < near_zero)
+    {
         Fvector enemy2monster = monster->Position();
         enemy2monster.sub(enemy_pos);
         const float enemy2monster_mag = enemy2monster.magnitude();
         // monster pos == enemy pos?
-        if (enemy2monster_mag < near_zero) {
+        if (enemy2monster_mag < near_zero)
+        {
             VERIFY2(false, "Enemy and Monster should not have same pos!");
-            Fvector dir = {1.f, 0.f, 0.f};  // happy with random dir then :)
+            Fvector dir = {1.f, 0.f, 0.f}; // happy with random dir then :)
             return dir;
         }
 
@@ -287,7 +299,8 @@ Fvector CMonsterSquad::calc_monster_target_dir(CBaseMonster* monster, const CEnt
     VERIFY(squad_size);
 
     u8 squad_index = get_index(monster);
-    if (squad_index == -1) {
+    if (squad_index == -1)
+    {
         squad_index = 0;
     }
 

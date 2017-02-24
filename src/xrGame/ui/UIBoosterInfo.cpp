@@ -39,7 +39,8 @@ void CUIBoosterInfo::InitFromXml(CUIXml& xml)
     LPCSTR base = "booster_params";
     XML_NODE* stored_root = xml.GetLocalRoot();
     XML_NODE* base_node = xml.NavigateToNode(base, 0);
-    if (!base_node) return;
+    if (!base_node)
+        return;
 
     CUIXmlInit::InitWindow(xml, base, 0, this);
     xml.SetLocalRoot(base_node);
@@ -90,7 +91,8 @@ void CUIBoosterInfo::SetInfo(shared_str const& section)
     AttachChild(m_Prop_line);
 
     CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (!actor) {
+    if (!actor)
+    {
         return;
     }
 
@@ -102,9 +104,11 @@ void CUIBoosterInfo::SetInfo(shared_str const& section)
 
     for (u32 i = 0; i < eBoostExplImmunity; ++i)
     {
-        if (pSettings->line_exist(section.c_str(), ef_boosters_section_names[i])) {
+        if (pSettings->line_exist(section.c_str(), ef_boosters_section_names[i]))
+        {
             val = pSettings->r_float(section, ef_boosters_section_names[i]);
-            if (fis_zero(val)) continue;
+            if (fis_zero(val))
+                continue;
 
             EBoostParams type = (EBoostParams)i;
             switch (type)
@@ -135,9 +139,11 @@ void CUIBoosterInfo::SetInfo(shared_str const& section)
         }
     }
 
-    if (pSettings->line_exist(section.c_str(), "eat_satiety")) {
+    if (pSettings->line_exist(section.c_str(), "eat_satiety"))
+    {
         val = pSettings->r_float(section, "eat_satiety");
-        if (!fis_zero(val)) {
+        if (!fis_zero(val))
+        {
             m_booster_satiety->SetValue(val);
             pos.set(m_booster_satiety->GetWndPos());
             pos.y = h;
@@ -148,7 +154,8 @@ void CUIBoosterInfo::SetInfo(shared_str const& section)
         }
     }
 
-    if (!xr_strcmp(section.c_str(), "drug_anabiotic")) {
+    if (!xr_strcmp(section.c_str(), "drug_anabiotic"))
+    {
         pos.set(m_booster_anabiotic->GetWndPos());
         pos.y = h;
         m_booster_anabiotic->SetWndPos(pos);
@@ -157,9 +164,11 @@ void CUIBoosterInfo::SetInfo(shared_str const& section)
         AttachChild(m_booster_anabiotic);
     }
 
-    if (pSettings->line_exist(section.c_str(), "boost_time")) {
+    if (pSettings->line_exist(section.c_str(), "boost_time"))
+    {
         val = pSettings->r_float(section, "boost_time");
-        if (!fis_zero(val)) {
+        if (!fis_zero(val))
+        {
             m_booster_time->SetValue(val);
             pos.set(m_booster_time->GetWndPos());
             pos.y = h;
@@ -186,10 +195,7 @@ UIBoosterInfoItem::UIBoosterInfoItem()
     m_texture_plus._set("");
 }
 
-UIBoosterInfoItem::~UIBoosterInfoItem()
-{
-}
-
+UIBoosterInfoItem::~UIBoosterInfoItem() {}
 void UIBoosterInfoItem::Init(CUIXml& xml, LPCSTR section)
 {
     CUIXmlInit::InitWindow(xml, section, 0, this);
@@ -204,7 +210,8 @@ void UIBoosterInfoItem::Init(CUIXml& xml, LPCSTR section)
     m_unit_str._set(CStringTable().translate(unit_str));
 
     LPCSTR texture_minus = xml.Read("texture_minus", 0, "");
-    if (texture_minus && xr_strlen(texture_minus)) {
+    if (texture_minus && xr_strlen(texture_minus))
+    {
         m_texture_minus._set(texture_minus);
 
         LPCSTR texture_plus = xml.Read("caption:texture", 0, "");
@@ -213,11 +220,7 @@ void UIBoosterInfoItem::Init(CUIXml& xml, LPCSTR section)
     }
 }
 
-void UIBoosterInfoItem::SetCaption(LPCSTR name)
-{
-    m_caption->TextItemControl()->SetText(name);
-}
-
+void UIBoosterInfoItem::SetCaption(LPCSTR name) { m_caption->TextItemControl()->SetText(name); }
 void UIBoosterInfoItem::SetValue(float value)
 {
     value *= m_magnitude;
@@ -238,7 +241,8 @@ void UIBoosterInfoItem::SetValue(float value)
     bool positive = (value >= 0.0f);
     m_value->SetTextColor(color_rgba(170, 170, 170, 255));
 
-    if (m_texture_minus.size()) {
+    if (m_texture_minus.size())
+    {
         if (positive)
             m_caption->InitTexture(m_texture_plus.c_str());
         else

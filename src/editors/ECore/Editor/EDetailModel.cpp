@@ -38,11 +38,7 @@ EDetail::EDetail()
     number_indices = 0;
 }
 
-EDetail::~EDetail()
-{
-    Unload();
-}
-
+EDetail::~EDetail() { Unload(); }
 void EDetail::Unload()
 {
     CDetail::Unload();
@@ -50,11 +46,7 @@ void EDetail::Unload()
     OnDeviceDestroy();
 }
 
-LPCSTR EDetail::GetName()
-{
-    return m_pRefs ? m_pRefs->GetName() : m_sRefs.c_str();
-}
-
+LPCSTR EDetail::GetName() { return m_pRefs ? m_pRefs->GetName() : m_sRefs.c_str(); }
 LPCSTR EDetail::GetTextureName()
 {
     VERIFY(m_pRefs);
@@ -63,13 +55,11 @@ LPCSTR EDetail::GetTextureName()
     return surf->_Texture();
 }
 
-void EDetail::DefferedLoad()
-{
-}
-
+void EDetail::DefferedLoad() {}
 void EDetail::OnDeviceCreate()
 {
-    if (!m_pRefs) return;
+    if (!m_pRefs)
+        return;
     CSurface* surf = *m_pRefs->FirstSurface();
     VERIFY(surf);
     AnsiString s_name = surf->_ShaderName();
@@ -77,38 +67,37 @@ void EDetail::OnDeviceCreate()
     shader.create(s_name.c_str(), t_name.c_str());
 }
 
-void EDetail::OnDeviceDestroy()
-{
-    shader.destroy();
-}
-
+void EDetail::OnDeviceDestroy() { shader.destroy(); }
 u16 EDetail::_AddVert(const Fvector& p, float u, float v)
 {
     EVertexIn V(p, u, v);
     for (u16 k = 0; k < (u16)number_vertices; k++)
-        if (V.similar((EVertexIn&)vertices[k])) return k;
+        if (V.similar((EVertexIn&)vertices[k]))
+            return k;
     number_vertices++;
     vertices = (fvfVertexIn*)xr_realloc(vertices, number_vertices * sizeof(fvfVertexIn));
     vertices[number_vertices - 1] = V;
     return u16(number_vertices - 1);
 }
 
-IC BOOL isDegenerated(u16 v[3])
-{
-    return (v[0] == v[1] || v[0] == v[2] || v[1] == v[2]);
-};
-
+IC BOOL isDegenerated(u16 v[3]) { return (v[0] == v[1] || v[0] == v[2] || v[1] == v[2]); };
 IC BOOL isEqual(U16Vec& ind, u16 v[3])
 {
     for (U16It it = ind.begin(); it != ind.end(); it += 3)
     {
         // Test for 6 variations
-        if ((*(it + 0) == v[0]) && (*(it + 1) == v[1]) && (*(it + 2) == v[2])) return true;
-        if ((*(it + 0) == v[0]) && (*(it + 2) == v[1]) && (*(it + 1) == v[2])) return true;
-        if ((*(it + 2) == v[0]) && (*(it + 0) == v[1]) && (*(it + 1) == v[2])) return true;
-        if ((*(it + 2) == v[0]) && (*(it + 1) == v[1]) && (*(it + 0) == v[2])) return true;
-        if ((*(it + 1) == v[0]) && (*(it + 0) == v[1]) && (*(it + 2) == v[2])) return true;
-        if ((*(it + 1) == v[0]) && (*(it + 2) == v[1]) && (*(it + 0) == v[2])) return true;
+        if ((*(it + 0) == v[0]) && (*(it + 1) == v[1]) && (*(it + 2) == v[2]))
+            return true;
+        if ((*(it + 0) == v[0]) && (*(it + 2) == v[1]) && (*(it + 1) == v[2]))
+            return true;
+        if ((*(it + 2) == v[0]) && (*(it + 0) == v[1]) && (*(it + 1) == v[2]))
+            return true;
+        if ((*(it + 2) == v[0]) && (*(it + 1) == v[1]) && (*(it + 0) == v[2]))
+            return true;
+        if ((*(it + 1) == v[0]) && (*(it + 0) == v[1]) && (*(it + 2) == v[2]))
+            return true;
+        if ((*(it + 1) == v[0]) && (*(it + 2) == v[1]) && (*(it + 0) == v[2]))
+            return true;
     }
     return false;
 }
@@ -118,16 +107,19 @@ bool EDetail::Update(LPCSTR name)
     m_sRefs = name;
     // update link
     CEditableObject* R = Lib.CreateEditObject(name);
-    if (!R) {
+    if (!R)
+    {
         ELog.Msg(mtError, "Can't load detail object '%s'.", name);
         return false;
     }
-    if (R->SurfaceCount() != 1) {
+    if (R->SurfaceCount() != 1)
+    {
         ELog.Msg(mtError, "Object must contain 1 material.");
         Lib.RemoveEditObject(R);
         return false;
     }
-    if (R->MeshCount() == 0) {
+    if (R->MeshCount() == 0)
+    {
         ELog.Msg(mtError, "Object must contain 1 mesh.");
         Lib.RemoveEditObject(R);
         return false;
@@ -155,8 +147,10 @@ bool EDetail::Update(LPCSTR name)
             ind[k] = _AddVert(P, uv.x, uv.y);
             bv_bb.modify(vertices[ind[k]].P);
         }
-        if (isDegenerated(ind)) continue;
-        if (isEqual(inds, ind)) continue;
+        if (isDegenerated(ind))
+            continue;
+        if (isEqual(inds, ind))
+            continue;
         inds.push_back(ind[0]);
         inds.push_back(ind[1]);
         inds.push_back(ind[2]);
@@ -177,7 +171,8 @@ bool EDetail::Load(IReader& F)
     // check version
     R_ASSERT(F.find_chunk(DETOBJ_CHUNK_VERSION));
     u32 version = F.r_u32();
-    if (version != DETOBJ_VERSION) {
+    if (version != DETOBJ_VERSION)
+    {
         ELog.Msg(mtError, "EDetail: unsupported version.");
         return false;
     }
@@ -190,14 +185,18 @@ bool EDetail::Load(IReader& F)
     // scale
     R_ASSERT(F.find_chunk(DETOBJ_CHUNK_SCALE_LIMITS));
     m_fMinScale = F.r_float();
-    if (fis_zero(m_fMinScale)) m_fMinScale = 0.1f;
+    if (fis_zero(m_fMinScale))
+        m_fMinScale = 0.1f;
     m_fMaxScale = F.r_float();
-    if (m_fMaxScale < m_fMinScale) m_fMaxScale = m_fMinScale;
+    if (m_fMaxScale < m_fMinScale)
+        m_fMaxScale = m_fMinScale;
 
     // density factor
-    if (F.find_chunk(DETOBJ_CHUNK_DENSITY_FACTOR)) m_fDensityFactor = F.r_float();
+    if (F.find_chunk(DETOBJ_CHUNK_DENSITY_FACTOR))
+        m_fDensityFactor = F.r_float();
 
-    if (F.find_chunk(DETOBJ_CHUNK_FLAGS)) m_Flags.assign(F.r_u32());
+    if (F.find_chunk(DETOBJ_CHUNK_FLAGS))
+        m_Flags.assign(F.r_u32());
 
     // update object
     return Update(buf);
@@ -239,7 +238,7 @@ void EDetail::Export(IWriter& F, LPCSTR tex_name, const Fvector2& offs, const Fv
     R_ASSERT(surf);
     // write data
     F.w_stringZ(surf->_ShaderName());
-    F.w_stringZ(tex_name);  // surf->_Texture());
+    F.w_stringZ(tex_name); // surf->_Texture());
 
     F.w_u32(m_Flags.get());
     F.w_float(m_fMinScale);
@@ -264,7 +263,8 @@ void EDetail::Export(LPCSTR name)
     CSurface* surf = *m_pRefs->FirstSurface();
     R_ASSERT(surf);
     IWriter* F = FS.w_open(name);
-    if (F) {
+    if (F)
+    {
         Fvector2 offs = {0, 0};
         Fvector2 scale = {1, 1};
         Export(*F, surf->_Texture(), offs, scale, false);

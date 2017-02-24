@@ -20,55 +20,40 @@ CUI3tButton::CUI3tButton()
     m_frameline_mode = false;
 }
 
-CUI3tButton::~CUI3tButton()
-{
-}
-
+CUI3tButton::~CUI3tButton() {}
 void CUI3tButton::OnClick()
 {
     CUIButton::OnClick();
     PlaySoundT();
 }
 
-bool CUI3tButton::OnMouseDown(int mouse_btn)
-{
-    return CUIButton::OnMouseDown(mouse_btn);
-}
-
-void CUI3tButton::OnFocusLost()
-{
-    inherited::OnFocusLost();
-}
-
+bool CUI3tButton::OnMouseDown(int mouse_btn) { return CUIButton::OnMouseDown(mouse_btn); }
+void CUI3tButton::OnFocusLost() { inherited::OnFocusLost(); }
 void CUI3tButton::OnFocusReceive()
 {
     inherited::OnFocusReceive();
     PlaySoundH();
 }
 
-void CUI3tButton::InitSoundH(LPCSTR sound_file)
-{
-    ::Sound->create(m_sound_h, sound_file, st_Effect, sg_SourceType);
-}
-
-void CUI3tButton::InitSoundT(LPCSTR sound_file)
-{
-    ::Sound->create(m_sound_t, sound_file, st_Effect, sg_SourceType);
-}
-
+void CUI3tButton::InitSoundH(LPCSTR sound_file) { ::Sound->create(m_sound_h, sound_file, st_Effect, sg_SourceType); }
+void CUI3tButton::InitSoundT(LPCSTR sound_file) { ::Sound->create(m_sound_t, sound_file, st_Effect, sg_SourceType); }
 void CUI3tButton::PlaySoundT()
 {
-    if (m_sound_t._handle()) m_sound_t.play(NULL, sm_2D);
+    if (m_sound_t._handle())
+        m_sound_t.play(NULL, sm_2D);
 }
 
 void CUI3tButton::PlaySoundH()
 {
-    if (m_sound_h._handle()) m_sound_h.play(NULL, sm_2D);
+    if (m_sound_h._handle())
+        m_sound_h.play(NULL, sm_2D);
 }
 void CUI3tButton::InitButton(Fvector2 pos, Fvector2 size)
 {
-    if (m_frameline_mode) {
-        if (!m_back_frameline) {
+    if (m_frameline_mode)
+    {
+        if (!m_back_frameline)
+        {
             m_back_frameline = new CUI_IB_FrameLineWnd();
             m_back_frameline->SetAutoDelete(true);
             AttachChild(m_back_frameline);
@@ -78,7 +63,8 @@ void CUI3tButton::InitButton(Fvector2 pos, Fvector2 size)
     }
     else
     {
-        if (!m_background) {
+        if (!m_background)
+        {
             m_background = new CUI_IB_Static();
             m_background->SetAutoDelete(true);
             AttachChild(m_background);
@@ -93,7 +79,8 @@ void CUI3tButton::InitButton(Fvector2 pos, Fvector2 size)
 void CUI3tButton::SetWidth(float width)
 {
     CUIButton::SetWidth(width);
-    if (m_background) {
+    if (m_background)
+    {
         m_background->SetWidth(width);
     }
     else if (m_back_frameline)
@@ -105,7 +92,8 @@ void CUI3tButton::SetWidth(float width)
 void CUI3tButton::SetHeight(float height)
 {
     CUIButton::SetHeight(height);
-    if (m_background) {
+    if (m_background)
+    {
         m_background->SetHeight(height);
     }
     else if (m_back_frameline)
@@ -142,7 +130,8 @@ void CUI3tButton::InitTexture(LPCSTR tex_name)
 
 void CUI3tButton::InitTexture(LPCSTR tex_enabled, LPCSTR tex_disabled, LPCSTR tex_touched, LPCSTR tex_highlighted)
 {
-    if (m_background) {
+    if (m_background)
+    {
         m_background->InitState(S_Enabled, tex_enabled);
         m_background->InitState(S_Disabled, tex_disabled);
         m_background->InitState(S_Touched, tex_touched);
@@ -161,20 +150,19 @@ void CUI3tButton::InitTexture(LPCSTR tex_enabled, LPCSTR tex_disabled, LPCSTR te
 
 void CUI3tButton::SetTextureOffset(float x, float y)
 {
-    if (m_background) {
+    if (m_background)
+    {
         this->m_background->SetTextureOffset(x, y);
     }
 }
 
-void CUI3tButton::Draw()
-{
-    inherited::Draw();
-}
-
+void CUI3tButton::Draw() { inherited::Draw(); }
 void CUI3tButton::DrawTexture()
 {
-    if (m_bTextureEnable) {
-        if (m_background) {
+    if (m_bTextureEnable)
+    {
+        if (m_background)
+        {
             m_background->SetStretchTexture(true);
             m_background->Draw();
         }
@@ -189,9 +177,12 @@ void CUI3tButton::Update()
 {
     inherited::Update();
 
-    if (m_bTextureEnable) {
-        if (!m_bIsEnabled) {
-            if (m_background) {
+    if (m_bTextureEnable)
+    {
+        if (!m_bIsEnabled)
+        {
+            if (m_background)
+            {
                 m_background->SetCurrentState(S_Disabled);
             }
             else if (m_back_frameline)
@@ -201,7 +192,8 @@ void CUI3tButton::Update()
         }
         else if (CUIButton::BUTTON_PUSHED == GetButtonState())
         {
-            if (m_background) {
+            if (m_background)
+            {
                 m_background->SetCurrentState(S_Touched);
             }
             else if (m_back_frameline)
@@ -211,7 +203,8 @@ void CUI3tButton::Update()
         }
         else if (m_bCursorOverWindow)
         {
-            if (m_background) {
+            if (m_background)
+            {
                 m_background->SetCurrentState(S_Highlighted);
             }
             else if (m_back_frameline)
@@ -221,7 +214,8 @@ void CUI3tButton::Update()
         }
         else
         {
-            if (m_background) {
+            if (m_background)
+            {
                 m_background->SetCurrentState(S_Enabled);
             }
             else if (m_back_frameline)
@@ -233,7 +227,8 @@ void CUI3tButton::Update()
 
     u32 textColor;
 
-    if (!m_bIsEnabled) {
+    if (!m_bIsEnabled)
+    {
         textColor = m_bUseTextColor[S_Disabled] ? m_dwTextColor[S_Disabled] : m_dwTextColor[S_Enabled];
     }
     else if (CUIButton::BUTTON_PUSHED == GetButtonState())

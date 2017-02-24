@@ -31,9 +31,9 @@ public:
     ~NET_Compressor();
 
     u16 compressed_size(const u32& count);
-    u16 Compress(BYTE* dest, const u32& dest_size, BYTE* src, const u32& count);    // return size of compressed
-    u16 Decompress(BYTE* dest, const u32& dest_size, BYTE* src, const u32& count);  // return size of compressed
+    u16 Compress(BYTE* dest, const u32& dest_size, BYTE* src, const u32& count); // return size of compressed
+    u16 Decompress(BYTE* dest, const u32& dest_size, BYTE* src, const u32& count); // return size of compressed
     void DumpStats(bool brief);
 };
 
-#endif  // !defined(AFX_NET_COMPRESSOR_H__21E1ED1C_BF92_4BF0_94A8_18A27486EBFD__INCLUDED_)
+#endif // !defined(AFX_NET_COMPRESSOR_H__21E1ED1C_BF92_4BF0_94A8_18A27486EBFD__INCLUDED_)

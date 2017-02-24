@@ -29,8 +29,8 @@ class CBlend;
 #define ASP_UPPER_STATE (1 << 13)
 #define ASP_MOVE_SMELLING (1 << 14)
 
-#define AA_FLAG_ATTACK_RAT (1 << 0)   // аттака крыс?
-#define AA_FLAG_FIRE_ANYWAY (1 << 1)  // трассировка не нужна
+#define AA_FLAG_ATTACK_RAT (1 << 0) // аттака крыс?
+#define AA_FLAG_FIRE_ANYWAY (1 << 1) // трассировка не нужна
 
 #define CRITICAL_STAND_TIME 1400
 #define TIME_STAND_RECHECK 2000
@@ -268,9 +268,9 @@ typedef shared_str anim_string;
 // элемент анимации
 struct SAnimItem
 {
-    anim_string target_name;  // "stand_idle_"
-    int spec_id;              // (-1) - any,  (0 - ...) - идентификатор 3
-    u8 count;                 // количество анимаций : "idle_0", "idle_1", "idle_2"
+    anim_string target_name; // "stand_idle_"
+    int spec_id; // (-1) - any,  (0 - ...) - идентификатор 3
+    u8 count; // количество анимаций : "idle_0", "idle_1", "idle_2"
 
     SVelocityParam velocity;
 
@@ -310,7 +310,7 @@ struct SMotionItem
 
     struct
     {
-        EMotionAnim anim_left;  // speed, r_speed got from turn_left member
+        EMotionAnim anim_left; // speed, r_speed got from turn_left member
         EMotionAnim anim_right;
         float min_angle;
     } turn;
@@ -327,19 +327,19 @@ struct SReplacedAnim
 // Определение времени аттаки по анимации
 typedef struct
 {
-    EMotionAnim anim;  // параметры конкретной анимации
+    EMotionAnim anim; // параметры конкретной анимации
     u32 anim_i3;
 
-    TTime time_from;  // диапазон времени когда можно наносить hit (от)
-    TTime time_to;    // диапазон времени когда можно наносить hit (до)
+    TTime time_from; // диапазон времени когда можно наносить hit (от)
+    TTime time_to; // диапазон времени когда можно наносить hit (до)
 
-    Fvector trace_from;  // направление трассировки (относительно центра)
+    Fvector trace_from; // направление трассировки (относительно центра)
     Fvector trace_to;
 
-    u32 flags;  // специальные флаги
+    u32 flags; // специальные флаги
 
-    float damage;     // урон при данной атаке
-    Fvector hit_dir;  // угол направления приложения силы к объекту
+    float damage; // урон при данной атаке
+    Fvector hit_dir; // угол направления приложения силы к объекту
 
     //-----------------------------------------
     // temp
@@ -355,7 +355,7 @@ struct SAAParam
 {
     MotionID motion;
     float time;
-    float hit_power;  // damage
+    float hit_power; // damage
     float impulse;
     Fvector impulse_dir;
 
@@ -395,7 +395,6 @@ struct SCurrentAnimationInfo
         }
         IC float _get_current() { return current; }
         IC float _get_target() { return target; }
-
     private:
         float current;
         float target;
@@ -406,7 +405,6 @@ struct SCurrentAnimationInfo
 
     void set_motion(EMotionAnim new_motion);
     EMotionAnim get_motion() const { return motion; }
-
 private:
     EMotionAnim motion;
 };
@@ -478,15 +476,17 @@ enum EAccelValue
 
 ///////////////////////////////////////////////////////////////////////////////
 // State Management
-#define DO_ONCE_BEGIN(flag)                                                                                            \
-    if (!flag) {                                                                                                       \
+#define DO_ONCE_BEGIN(flag) \
+    if (!flag)              \
+    {                       \
         flag = true;
 #define DO_ONCE_END() }
 
 #define TIME_OUT(a, b) a + b < m_dwCurrentTime
 
-#define DO_IN_TIME_INTERVAL_BEGIN(varLastTime, varTimeInterval)                                                        \
-    if (TIME_OUT(varLastTime, varTimeInterval)) {                                                                      \
+#define DO_IN_TIME_INTERVAL_BEGIN(varLastTime, varTimeInterval) \
+    if (TIME_OUT(varLastTime, varTimeInterval))                 \
+    {                                                           \
         varLastTime = m_dwCurrentTime;
 #define DO_IN_TIME_INTERVAL_END() }
 ///////////////////////////////////////////////////////////////////////////////

@@ -14,10 +14,7 @@
 #ifdef DEBUG
 
 // Lain: added text_tree
-CLevelDebug::CLevelDebug() : m_p_texttree(new debug::text_tree()), m_texttree_offs(0)
-{
-}
-
+CLevelDebug::CLevelDebug() : m_p_texttree(new debug::text_tree()), m_texttree_offs(0) {}
 CLevelDebug::~CLevelDebug()
 {
     xr_delete(m_p_texttree);
@@ -26,69 +23,66 @@ CLevelDebug::~CLevelDebug()
 }
 
 // Lain: added
-void CLevelDebug::log_debug_info()
-{
-    debug::log_text_tree(*m_p_texttree);
-}
-
+void CLevelDebug::log_debug_info() { debug::log_text_tree(*m_p_texttree); }
 void CLevelDebug::debug_info_up()
 {
-    if (m_texttree_offs) {
+    if (m_texttree_offs)
+    {
         m_texttree_offs--;
     }
 }
 
-void CLevelDebug::debug_info_down()
-{
-    m_texttree_offs++;
-}
-
+void CLevelDebug::debug_info_down() { m_texttree_offs++; }
 void CLevelDebug::draw_debug_text()
 {
     int column_size = 1024 / 3;
     int y_start = 50;
     int x_start = 5;
 
-    if (!smart_cast<CBaseMonster*>(Level().CurrentEntity())) {
+    if (!smart_cast<CBaseMonster*>(Level().CurrentEntity()))
+    {
         bool debug_actor_view = false;
-        if (!ai_dbg::get_var("actor_view", debug_actor_view)) debug_actor_view = false;
+        if (!ai_dbg::get_var("actor_view", debug_actor_view))
+            debug_actor_view = false;
 
         debug::text_tree* actor_view = m_p_texttree->find_node("ActorView");
-        if (debug_actor_view && actor_view) {
+        if (debug_actor_view && actor_view)
+        {
             debug::draw_text_tree(*actor_view, 2, x_start, y_start, m_texttree_offs, column_size, 80,
                 color_xrgb(0, 255, 0), color_xrgb(255, 255, 0));
         }
         return;
     }
 
-    if (m_p_texttree->find_node("General")) {
+    if (m_p_texttree->find_node("General"))
+    {
         debug::draw_text_tree(*m_p_texttree->find_node("General"), 2, x_start, y_start, m_texttree_offs, column_size,
             80, color_xrgb(0, 255, 0), color_xrgb(255, 255, 0));
     }
 
-    if (m_p_texttree->find_node("Brain")) {
+    if (m_p_texttree->find_node("Brain"))
+    {
         debug::draw_text_tree(*m_p_texttree->find_node("Brain"), 2, x_start * 2 + column_size, y_start, m_texttree_offs,
             column_size, 80, color_xrgb(0, 255, 0), color_xrgb(255, 255, 0));
     }
 
-    if (m_p_texttree->find_node("Controllers")) {
+    if (m_p_texttree->find_node("Controllers"))
+    {
         debug::draw_text_tree(*m_p_texttree->find_node("Controllers"), 2, x_start * 3 + column_size * 2, y_start,
             m_texttree_offs, column_size, 80, color_xrgb(0, 255, 0), color_xrgb(255, 255, 0));
     }
 }
 
-debug::text_tree& CLevelDebug::get_text_tree()
-{
-    return *m_p_texttree;
-}
-
+debug::text_tree& CLevelDebug::get_text_tree() { return *m_p_texttree; }
 CLevelDebug::CObjectInfo& CLevelDebug::object_info(IGameObject* obj, LPCSTR class_name)
 {
     OBJECT_INFO_MAP_IT obj_it = m_objects_info.find(obj);
-    if (obj_it != m_objects_info.end()) {
+    if (obj_it != m_objects_info.end())
+    {
         CLASS_INFO_MAP_IT class_it = obj_it->second.find(class_name);
 
-        if (class_it != obj_it->second.end()) {
+        if (class_it != obj_it->second.end())
+        {
             return (*(class_it->second));
         }
         else
@@ -115,7 +109,8 @@ CLevelDebug::CTextInfo& CLevelDebug::text(void* class_ptr, LPCSTR class_name)
     SKey key(class_ptr, class_name);
 
     TEXT_INFO_MAP_IT it = m_text_info.find(key);
-    if (it != m_text_info.end()) {
+    if (it != m_text_info.end())
+    {
         return (*it->second);
     }
     else
@@ -131,7 +126,8 @@ CLevelDebug::CLevelInfo& CLevelDebug::level_info(void* class_ptr, LPCSTR class_n
     SKey key(class_ptr, class_name);
 
     LEVEL_INFO_MAP_IT it = m_level_info.find(key);
-    if (it != m_level_info.end()) {
+    if (it != m_level_info.end())
+    {
         return (*it->second);
     }
     else
@@ -172,7 +168,8 @@ void CLevelDebug::draw_object_info()
     for (OBJECT_INFO_MAP_IT it = m_objects_info.begin(); it != m_objects_info.end(); ++it)
     {
         // если объект невалидный - удалить информацию
-        if (!it->first || it->first->getDestroy()) {
+        if (!it->first || it->first->getDestroy())
+        {
             for (CLASS_INFO_MAP_IT it_class = it->second.begin(); it_class != it->second.end(); ++it_class)
             {
                 xr_delete(it_class->second);
@@ -195,8 +192,10 @@ void CLevelDebug::draw_object_info()
             res.transform(v_res, class_it->second->get_shift_pos());
 
             // check if the object in sight
-            if (v_res.z < 0 || v_res.w < 0) continue;
-            if (v_res.x < -1.f || v_res.x > 1.f || v_res.y < -1.f || v_res.y > 1.f) continue;
+            if (v_res.z < 0 || v_res.w < 0)
+                continue;
+            if (v_res.x < -1.f || v_res.x > 1.f || v_res.y < -1.f || v_res.y > 1.f)
+                continue;
 
             // get real (x,y)
             float x = (1.f + v_res.x) / 2.f * (Device.dwWidth);
@@ -316,7 +315,8 @@ struct DrawLevelPredicate
 {
     void operator()(CLevelDebug::SLevelItem s)
     {
-        if (s.ptype == CLevelDebug::SLevelItem::ePoint) {
+        if (s.ptype == CLevelDebug::SLevelItem::ePoint)
+        {
             Level().debug_renderer().draw_aabb(s.position1, 0.35f, 0.35f, 0.35f, s.color);
 
             Fvector upV;
@@ -348,7 +348,8 @@ void CLevelDebug::on_destroy_object(IGameObject* obj)
     for (OBJECT_INFO_MAP_IT it = m_objects_info.begin(); it != m_objects_info.end(); ++it)
     {
         // если объект невалидный - удалить информацию
-        if (it->first == obj) {
+        if (it->first == obj)
+        {
             for (CLASS_INFO_MAP_IT it_class = it->second.begin(); it_class != it->second.end(); ++it_class)
             {
                 xr_delete(it_class->second);

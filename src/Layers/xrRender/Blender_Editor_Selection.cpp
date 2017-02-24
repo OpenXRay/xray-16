@@ -13,10 +13,7 @@ CBlender_Editor_Selection::CBlender_Editor_Selection()
     xr_strcpy(oT_Factor, "$null");
 }
 
-CBlender_Editor_Selection::~CBlender_Editor_Selection()
-{
-}
-
+CBlender_Editor_Selection::~CBlender_Editor_Selection() {}
 void CBlender_Editor_Selection::Save(IWriter& fs)
 {
     IBlender::Save(fs);
@@ -33,7 +30,8 @@ void CBlender_Editor_Selection::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
 #if !defined(USE_DX10) && !defined(USE_DX11)
-    if (C.bEditor) {
+    if (C.bEditor)
+    {
         C.PassBegin();
         {
             C.PassSET_ZB(TRUE, FALSE);
@@ -53,7 +51,7 @@ void CBlender_Editor_Selection::Compile(CBlender_Compile& C)
         C.PassEnd();
     }
     else
-#endif  //	USE_DX10
+#endif //	USE_DX10
     {
         C.r_Pass("editor", "simple_color", FALSE, TRUE, FALSE, TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA);
         C.r_End();

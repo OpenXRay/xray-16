@@ -40,7 +40,8 @@ bool CObjectSpace::BoxQuery(Fvector const& box_center, Fvector const& box_z_axis
     xrc.frustum_options(CDB::OPT_FULL_TEST);
     xrc.frustum_query(&Static, frustum);
 
-    if (out_tris) {
+    if (out_tris)
+    {
         for (CDB::RESULT* result = xrc.r_begin(); result != xrc.r_end(); ++result)
         {
             out_tris->push_back(result->verts[0]);

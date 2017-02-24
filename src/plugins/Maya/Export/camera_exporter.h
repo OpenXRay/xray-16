@@ -21,4 +21,4 @@ private:
     MStatus ExportCamera(const MFileObject& file);
 };
 
-#endif  // CAMERA_EXPORTER_H_INCLUDED
+#endif // CAMERA_EXPORTER_H_INCLUDED

@@ -5,21 +5,9 @@
 namespace lc_net
 {
 global_data_cleanup _cleanup;
-global_data_cleanup& cleanup()
-{
-    return _cleanup;
-}
-
-global_data_cleanup::global_data_cleanup() : id_state(0)
-{
-    vec_cleanup.resize(gl_last, 0);
-}
-
-void global_data_cleanup::on_net_send(IGenericStream* outStream)
-{
-    outStream->Write(&id_state, sizeof(id_state));
-}
-
+global_data_cleanup& cleanup() { return _cleanup; }
+global_data_cleanup::global_data_cleanup() : id_state(0) { vec_cleanup.resize(gl_last, 0); }
+void global_data_cleanup::on_net_send(IGenericStream* outStream) { outStream->Write(&id_state, sizeof(id_state)); }
 static const u32 data_cleanup_callback_read_write_buff_size = 512;
 
 void __cdecl data_cleanup_callback(const char* dataDesc, IGenericStream** stream)
@@ -36,13 +24,15 @@ void global_data_cleanup::on_net_receive(IAgent* agent, DWORD sessionId, IGeneri
     u32 state = u32(-1);
     inStream->Read(&state, sizeof(id_state));
     lock.Enter();
-    if (state == id_state) {
+    if (state == id_state)
+    {
         lock.Leave();
         return;
     }
     IGenericStream* globalDataStream = 0;
     HRESULT rz = agent->GetData(sessionId, "data_cleanup", &globalDataStream);
-    if (rz != S_OK) {
+    if (rz != S_OK)
+    {
         lock.Leave();
         return;
     }

@@ -19,10 +19,7 @@ CBlender_Tree::CBlender_Tree()
     oNotAnTree.value = FALSE;
 }
 
-CBlender_Tree::~CBlender_Tree()
-{
-}
-
+CBlender_Tree::~CBlender_Tree() {}
 void CBlender_Tree::Save(IWriter& fs)
 {
     IBlender::Save(fs);
@@ -34,7 +31,8 @@ void CBlender_Tree::Load(IReader& fs, u16 version)
 {
     IBlender::Load(fs, version);
     xrPREAD_PROP(fs, xrPID_BOOL, oBlend);
-    if (version >= 1) {
+    if (version >= 1)
+    {
         xrPREAD_PROP(fs, xrPID_BOOL, oNotAnTree);
     }
 }
@@ -47,7 +45,8 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
 
-    if (C.bEditor) {
+    if (C.bEditor)
+    {
         C.PassBegin();
         {
             C.PassSET_ZB(TRUE, TRUE);
@@ -69,15 +68,18 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
     else
     {
         u32 tree_aref = 200;
-        if (oNotAnTree.value) tree_aref = 0;
+        if (oNotAnTree.value)
+            tree_aref = 0;
 
         switch (C.iElement)
         {
         case SE_R1_NORMAL_HQ:
-            if (oNotAnTree.value) {
+            if (oNotAnTree.value)
+            {
                 // Level view
                 LPCSTR tsv = "tree_s", tsp = "vert";
-                if (C.bDetail_Diffuse) {
+                if (C.bDetail_Diffuse)
+                {
                     tsv = "tree_s_dt";
                     tsp = "vert_dt";
                 }
@@ -93,7 +95,8 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
             else
             {
                 // Level view
-                if (C.bDetail_Diffuse) {
+                if (C.bDetail_Diffuse)
+                {
                     if (oBlend.value)
                         C.r_Pass("tree_w_dt", "vert_dt", TRUE, TRUE, TRUE, TRUE, D3DBLEND_SRCALPHA,
                             D3DBLEND_INVSRCALPHA, TRUE, tree_aref);
@@ -167,20 +170,21 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
     //*************** codepath is the same, only shaders differ
     LPCSTR tvs = "tree";
     LPCSTR tvs_s = "shadow_direct_tree";
-    if (oNotAnTree.value) {
+    if (oNotAnTree.value)
+    {
         tvs = "tree_s";
         tvs_s = "shadow_direct_tree_s";
     }
     switch (C.iElement)
     {
-    case SE_R2_NORMAL_HQ:  // deffer
+    case SE_R2_NORMAL_HQ: // deffer
         uber_deffer(C, true, tvs, "base", oBlend.value);
         break;
-    case SE_R2_NORMAL_LQ:  // deffer
+    case SE_R2_NORMAL_LQ: // deffer
         uber_deffer(C, false, tvs, "base", oBlend.value);
         break;
-    case SE_R2_SHADOW:  // smap-spot
-                        //	TODO: DX10: Use dumb shader for shadowmap since shadows are drawn using hardware PCF
+    case SE_R2_SHADOW: // smap-spot
+        //	TODO: DX10: Use dumb shader for shadowmap since shadows are drawn using hardware PCF
         if (oBlend.value)
             C.r_Pass(tvs_s, "shadow_direct_base_aref", FALSE, TRUE, TRUE, TRUE, D3DBLEND_ZERO, D3DBLEND_ONE, TRUE, 200);
         else
@@ -202,7 +206,8 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
     //*************** codepath is the same, only shaders differ
     LPCSTR tvs;
     LPCSTR tvs_s;
-    if (oNotAnTree.value) {
+    if (oNotAnTree.value)
+    {
         tvs = "tree_s";
         if (oBlend.value)
             tvs_s = "shadow_direct_tree_s_aref";
@@ -222,8 +227,9 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
 
     switch (C.iElement)
     {
-    case SE_R2_NORMAL_HQ:  // deffer
-        if (bUseATOC) {
+    case SE_R2_NORMAL_HQ: // deffer
+        if (bUseATOC)
+        {
             uber_deffer(C, true, tvs, "base_atoc", oBlend.value, 0, true);
             C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
             C.r_ColorWriteEnable(false, false, false, false);
@@ -238,12 +244,14 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
         C.r_StencilRef(0x01);
         // C.PassSET_ZB		(true,false);
         //	Need only for ATOC to emulate stencil test
-        if (bUseATOC) C.RS.SetRS(D3DRS_ZFUNC, D3DCMP_EQUAL);
+        if (bUseATOC)
+            C.RS.SetRS(D3DRS_ZFUNC, D3DCMP_EQUAL);
         C.r_End();
 
         break;
-    case SE_R2_NORMAL_LQ:  // deffer
-        if (bUseATOC) {
+    case SE_R2_NORMAL_LQ: // deffer
+        if (bUseATOC)
+        {
             uber_deffer(C, false, tvs, "base_atoc", oBlend.value, 0, true);
             C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
             C.r_StencilRef(0x01);
@@ -257,10 +265,11 @@ void CBlender_Tree::Compile(CBlender_Compile& C)
         C.r_Stencil(TRUE, D3DCMP_ALWAYS, 0xff, 0x7f, D3DSTENCILOP_KEEP, D3DSTENCILOP_REPLACE, D3DSTENCILOP_KEEP);
         C.r_StencilRef(0x01);
         //	Need only for ATOC to emulate stencil test
-        if (bUseATOC) C.RS.SetRS(D3DRS_ZFUNC, D3DCMP_EQUAL);
+        if (bUseATOC)
+            C.RS.SetRS(D3DRS_ZFUNC, D3DCMP_EQUAL);
         C.r_End();
         break;
-    case SE_R2_SHADOW:  // smap-spot
+    case SE_R2_SHADOW: // smap-spot
         //	TODO: DX10: Use dumb shader for shadowmap since shadows are drawn using hardware PCF
         if (oBlend.value)
             C.r_Pass(tvs_s, "shadow_direct_base_aref", FALSE, TRUE, TRUE, TRUE, D3DBLEND_ZERO, D3DBLEND_ONE, TRUE, 200);

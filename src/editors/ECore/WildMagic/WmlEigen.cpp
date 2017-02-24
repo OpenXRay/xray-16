@@ -156,7 +156,8 @@ template <class Real>
 void Eigen<Real>::GetEigenvector(int i, Vector2<Real>& rkV) const
 {
     assert(m_iSize == 2);
-    if (m_iSize == 2) {
+    if (m_iSize == 2)
+    {
         for (int iRow = 0; iRow < m_iSize; iRow++)
             rkV[iRow] = m_kMat[iRow][i];
     }
@@ -170,7 +171,8 @@ template <class Real>
 void Eigen<Real>::GetEigenvector(int i, Vector3<Real>& rkV) const
 {
     assert(m_iSize == 3);
-    if (m_iSize == 3) {
+    if (m_iSize == 3)
+    {
         for (int iRow = 0; iRow < m_iSize; iRow++)
             rkV[iRow] = m_kMat[iRow][i];
     }
@@ -184,7 +186,8 @@ template <class Real>
 void Eigen<Real>::GetEigenvector(int i, Vector4<Real>& rkV) const
 {
     assert(m_iSize == 4);
-    if (m_iSize == 4) {
+    if (m_iSize == 4)
+    {
         for (int iRow = 0; iRow < m_iSize; iRow++)
             rkV[iRow] = m_kMat[iRow][i];
     }
@@ -232,7 +235,8 @@ void Eigen<Real>::Tridiagonal3()
 
     m_afDiag[0] = fM00;
     m_afSubd[2] = (Real)0.0;
-    if (fM02 != (Real)0.0) {
+    if (fM02 != (Real)0.0)
+    {
         Real fLength = Math<Real>::Sqrt(fM01 * fM01 + fM02 * fM02);
         Real fInvLength = ((Real)1.0) / fLength;
         fM01 *= fInvLength;
@@ -298,7 +302,8 @@ void Eigen<Real>::Tridiagonal4()
 
     Real fLength, fInvLength;
 
-    if (fM02 != (Real)0.0 || fM03 != (Real)0.0) {
+    if (fM02 != (Real)0.0 || fM03 != (Real)0.0)
+    {
         Real fQ11, fQ12, fQ13;
         Real fQ21, fQ22, fQ23;
         Real fQ31, fQ32, fQ33;
@@ -324,7 +329,8 @@ void Eigen<Real>::Tridiagonal4()
         fQ23 = fQ31 * fV0 - fQ11 * fV2;
         fQ33 = fQ11 * fV1 - fQ21 * fV0;
         fLength = Math<Real>::Sqrt(fQ13 * fQ13 + fQ23 * fQ23 + fQ33 * fQ33);
-        if (fLength > (Real)0.0) {
+        if (fLength > (Real)0.0)
+        {
             fInvLength = ((Real)1.0) / fLength;
             fQ13 *= fInvLength;
             fQ23 *= fInvLength;
@@ -353,7 +359,8 @@ void Eigen<Real>::Tridiagonal4()
             m_afSubd[1] = (Real)0.0;
 
             fLength = fQ21 * fQ21 + fQ31 * fQ31;
-            if (fLength > (Real)0.0) {
+            if (fLength > (Real)0.0)
+            {
                 fInvLength = ((Real)1.0) / fLength;
                 Real fTmp = fQ11 - (Real)1.0;
                 fQ12 = -fQ21;
@@ -409,7 +416,8 @@ void Eigen<Real>::Tridiagonal4()
         m_kMat[2][1] = (Real)0.0;
         m_kMat[3][1] = (Real)0.0;
 
-        if (fM13 != (Real)0.0) {
+        if (fM13 != (Real)0.0)
+        {
             fLength = Math<Real>::Sqrt(fM12 * fM12 + fM13 * fM13);
             fInvLength = ((Real)1.0) / fLength;
             fM12 *= fInvLength;
@@ -452,10 +460,12 @@ void Eigen<Real>::TridiagonalN()
     {
         Real fH = (Real)0.0, fScale = (Real)0.0;
 
-        if (i3 > 0) {
+        if (i3 > 0)
+        {
             for (i2 = 0; i2 <= i3; i2++)
                 fScale += Math<Real>::FAbs(m_kMat[i0][i2]);
-            if (fScale == (Real)0.0) {
+            if (fScale == (Real)0.0)
+            {
                 m_afSubd[i0] = m_kMat[i0][i3];
             }
             else
@@ -468,7 +478,8 @@ void Eigen<Real>::TridiagonalN()
                 }
                 Real fF = m_kMat[i0][i3];
                 Real fG = Math<Real>::Sqrt(fH);
-                if (fF > (Real)0.0) fG = -fG;
+                if (fF > (Real)0.0)
+                    fG = -fG;
                 m_afSubd[i0] = fScale * fG;
                 fH -= fF * fG;
                 m_kMat[i0][i3] = fF - fG;
@@ -510,7 +521,8 @@ void Eigen<Real>::TridiagonalN()
     m_afSubd[0] = (Real)0.0;
     for (i0 = 0, i3 = -1; i0 <= m_iSize - 1; i0++, i3++)
     {
-        if (m_afDiag[i0] != (Real)0.0) {
+        if (m_afDiag[i0] != (Real)0.0)
+        {
             for (i1 = 0; i1 <= i3; i1++)
             {
                 Real fSum = (Real)0.0;
@@ -549,9 +561,11 @@ bool Eigen<Real>::QLAlgorithm()
             for (i2 = i0; i2 <= m_iSize - 2; i2++)
             {
                 Real fTmp = Math<Real>::FAbs(m_afDiag[i2]) + Math<Real>::FAbs(m_afDiag[i2 + 1]);
-                if (Math<Real>::FAbs(m_afSubd[i2]) + fTmp == fTmp) break;
+                if (Math<Real>::FAbs(m_afSubd[i2]) + fTmp == fTmp)
+                    break;
             }
-            if (i2 == i0) break;
+            if (i2 == i0)
+                break;
 
             Real fG = (m_afDiag[i0 + 1] - m_afDiag[i0]) / (((Real)2.0) * m_afSubd[i0]);
             Real fR = Math<Real>::Sqrt(fG * fG + (Real)1.0);
@@ -564,7 +578,8 @@ bool Eigen<Real>::QLAlgorithm()
             {
                 Real fF = fSin * m_afSubd[i3];
                 Real fB = fCos * m_afSubd[i3];
-                if (Math<Real>::FAbs(fF) >= Math<Real>::FAbs(fG)) {
+                if (Math<Real>::FAbs(fF) >= Math<Real>::FAbs(fG))
+                {
                     fCos = fG / fF;
                     fR = Math<Real>::Sqrt(fCos * fCos + (Real)1.0);
                     m_afSubd[i3 + 1] = fF * fR;
@@ -596,7 +611,8 @@ bool Eigen<Real>::QLAlgorithm()
             m_afSubd[i0] = fG;
             m_afSubd[i2] = (Real)0.0;
         }
-        if (i1 == iMaxIter) return false;
+        if (i1 == iMaxIter)
+            return false;
     }
 
     return true;
@@ -614,13 +630,15 @@ void Eigen<Real>::DecreasingSort()
         int i2;
         for (i2 = i0 + 1; i2 < m_iSize; i2++)
         {
-            if (m_afDiag[i2] > fMax) {
+            if (m_afDiag[i2] > fMax)
+            {
                 i1 = i2;
                 fMax = m_afDiag[i1];
             }
         }
 
-        if (i1 != i0) {
+        if (i1 != i0)
+        {
             // swap eigenvalues
             m_afDiag[i1] = m_afDiag[i0];
             m_afDiag[i0] = fMax;
@@ -649,13 +667,15 @@ void Eigen<Real>::IncreasingSort()
         int i2;
         for (i2 = i0 + 1; i2 < m_iSize; i2++)
         {
-            if (m_afDiag[i2] < fMin) {
+            if (m_afDiag[i2] < fMin)
+            {
                 i1 = i2;
                 fMin = m_afDiag[i1];
             }
         }
 
-        if (i1 != i0) {
+        if (i1 != i0)
+        {
             // swap eigenvalues
             m_afDiag[i1] = m_afDiag[i0];
             m_afDiag[i0] = fMin;
@@ -675,7 +695,8 @@ void Eigen<Real>::IncreasingSort()
 template <class Real>
 void Eigen<Real>::GuaranteeRotation()
 {
-    if (!m_bIsRotation) {
+    if (!m_bIsRotation)
+    {
         // change sign on the first column
         for (int iRow = 0; iRow < m_iSize; iRow++)
             m_kMat[iRow][0] = -m_kMat[iRow][0];

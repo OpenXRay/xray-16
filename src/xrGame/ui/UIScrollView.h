@@ -9,7 +9,7 @@ class CUIFixedScrollBar;
 class CUIScrollView : public CUIWindow, public CUIWndCallback
 {
     typedef CUIWindow inherited;
-    friend class CUIXmlInit;  // for init
+    friend class CUIXmlInit; // for init
 protected:
     enum
     {
@@ -41,12 +41,11 @@ protected:
     void SetUpIndention(float val);
     void SetDownIndention(float val);
     void SetVertFlip(bool val) { m_flags.set(eVertFlip, val); }
-
 public:
     CUIScrollView();
     CUIScrollView(CUIFixedScrollBar* scroll_bar);
     virtual ~CUIScrollView();
-    void InitScrollView();  // need parent to be initialized
+    void InitScrollView(); // need parent to be initialized
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = NULL);
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
     virtual void Draw();
@@ -72,26 +71,25 @@ public:
     int GetCurrentScrollPos();
     void SetScrollPos(int value);
     void SetScrollBarProfile(LPCSTR profile);
-    IC bool NeedShowScrollBar();  // no comment
-    float GetHorizIndent();       // left + right indent
-    float GetVertIndent();        // top + bottom indent
-    void UpdateChildrenLenght();  // set default width for all children
-    float Scroll2ViewV();         // calculate scale for scroll position
+    IC bool NeedShowScrollBar(); // no comment
+    float GetHorizIndent(); // left + right indent
+    float GetVertIndent(); // top + bottom indent
+    void UpdateChildrenLenght(); // set default width for all children
+    float Scroll2ViewV(); // calculate scale for scroll position
     CUIScrollBar* ScrollBar() { return m_VScrollBar; }
-
     typedef fastdelegate::FastDelegate2<CUIWindow*, CUIWindow*, bool> cmp_function;
     cmp_function m_sort_function;
 };
 
-#define ADD_TEXT_TO_VIEW3(txt, st, view)                                                                               \
-    st = new CUITextWnd();                                                                                             \
-    st->SetFont(UI().Font().pFontLetterica16Russian);                                                                  \
-    st->SetText(txt);                                                                                                  \
-    st->SetTextComplexMode(true);                                                                                      \
-    st->SetWidth(view->GetDesiredChildWidth());                                                                        \
-    st->AdjustHeightToText();                                                                                          \
+#define ADD_TEXT_TO_VIEW3(txt, st, view)              \
+    st = new CUITextWnd();                            \
+    st->SetFont(UI().Font().pFontLetterica16Russian); \
+    st->SetText(txt);                                 \
+    st->SetTextComplexMode(true);                     \
+    st->SetWidth(view->GetDesiredChildWidth());       \
+    st->AdjustHeightToText();                         \
     view->AddWindow(st, true)
 
-#define ADD_TEXT_TO_VIEW2(txt, view)                                                                                   \
-    CUITextWnd* pSt;                                                                                                   \
+#define ADD_TEXT_TO_VIEW2(txt, view) \
+    CUITextWnd* pSt;                 \
     ADD_TEXT_TO_VIEW3(txt, pSt, view)

@@ -36,22 +36,15 @@ dxRainRender::dxRainRender()
     FS.r_close(F);
 }
 
-dxRainRender::~dxRainRender()
-{
-    ::RImplementation.model_Delete(DM_Drop);
-}
-
-void dxRainRender::Copy(IRainRender& _in)
-{
-    *this = *(dxRainRender*)&_in;
-}
-
+dxRainRender::~dxRainRender() { ::RImplementation.model_Delete(DM_Drop); }
+void dxRainRender::Copy(IRainRender& _in) { *this = *(dxRainRender*)&_in; }
 #include "xrEngine/iGame_persistent.h"
 
 void dxRainRender::Render(CEffect_Rain& owner)
 {
     float factor = g_pGamePersistent->Environment().CurrentEnv->rain_density;
-    if (factor < EPS_L) return;
+    if (factor < EPS_L)
+        return;
 
     u32 desired_items = iFloor(0.5f * (1.f + factor) * float(max_desired_items));
     // visual
@@ -61,7 +54,8 @@ void dxRainRender::Render(CEffect_Rain& owner)
 
     // born _new_ if needed
     float b_radius_wrap_sqr = _sqr((source_radius + .5f));
-    if (owner.items.size() < desired_items) {
+    if (owner.items.size() < desired_items)
+    {
         // owner.items.reserve		(desired_items);
         while (owner.items.size() < desired_items)
         {
@@ -88,8 +82,10 @@ void dxRainRender::Render(CEffect_Rain& owner)
         // physics and time control
         CEffect_Rain::Item& one = owner.items[I];
 
-        if (one.dwTime_Hit < Device.dwTimeGlobal) owner.Hit(one.Phit);
-        if (one.dwTime_Life < Device.dwTimeGlobal) owner.Born(one, source_radius);
+        if (one.dwTime_Hit < Device.dwTimeGlobal)
+            owner.Hit(one.Phit);
+        if (one.dwTime_Life < Device.dwTimeGlobal)
+            owner.Born(one, source_radius);
 
         // последн€€ дельта ??
         //.		float xdt		= float(one.dwTime_Hit-Device.dwTimeGlobal)/1000.f;
@@ -99,10 +95,12 @@ void dxRainRender::Render(CEffect_Rain& owner)
         Fvector wdir;
         wdir.set(one.P.x - vEye.x, 0, one.P.z - vEye.z);
         float wlen = wdir.square_magnitude();
-        if (wlen > b_radius_wrap_sqr) {
+        if (wlen > b_radius_wrap_sqr)
+        {
             wlen = _sqrt(wlen);
             //.			Device.Statistic->TEST3.Begin();
-            if ((one.P.y - vEye.y) < sink_offset) {
+            if ((one.P.y - vEye.y) < sink_offset)
+            {
                 // need born
                 one.invalidate();
             }
@@ -112,23 +110,26 @@ void dxRainRender::Render(CEffect_Rain& owner)
                 inv_dir.invert(one.D);
                 wdir.div(wlen);
                 one.P.mad(one.P, wdir, -(wlen + source_radius));
-                if (src_plane.intersectRayPoint(one.P, inv_dir, src_p)) {
+                if (src_plane.intersectRayPoint(one.P, inv_dir, src_p))
+                {
                     float dist_sqr = one.P.distance_to_sqr(src_p);
                     float height = max_distance;
-                    if (owner.RayPick(src_p, one.D, height, collide::rqtBoth)) {
-                        if (_sqr(height) <= dist_sqr) {
-                            one.invalidate();  // need born
-                                               //							Log("1");
+                    if (owner.RayPick(src_p, one.D, height, collide::rqtBoth))
+                    {
+                        if (_sqr(height) <= dist_sqr)
+                        {
+                            one.invalidate(); // need born
+                            //							Log("1");
                         }
                         else
                         {
-                            owner.RenewItem(one, height - _sqrt(dist_sqr), TRUE);  // fly to point
-                                                                                   //							Log("2",height-dist);
+                            owner.RenewItem(one, height - _sqrt(dist_sqr), TRUE); // fly to point
+                            //							Log("2",height-dist);
                         }
                     }
                     else
                     {
-                        owner.RenewItem(one, max_distance - _sqrt(dist_sqr), FALSE);  // fly ...
+                        owner.RenewItem(one, max_distance - _sqrt(dist_sqr), FALSE); // fly ...
                         //						Log("3",1.5f*b_height-dist);
                     }
                 }
@@ -154,7 +155,8 @@ void dxRainRender::Render(CEffect_Rain& owner)
         sC.mul(.5f);
         sR = sC.magnitude();
         sC.add(pos_trail);
-        if (!GlobalEnv.Render->ViewBase.testSphere_dirty(sC, sR)) continue;
+        if (!GlobalEnv.Render->ViewBase.testSphere_dirty(sC, sR))
+            continue;
 
         static Fvector2 UV[2][4] = {{{0, 1}, {0, 0}, {1, 1}, {1, 0}}, {{1, 0}, {1, 1}, {0, 0}, {0, 1}}};
 
@@ -182,7 +184,8 @@ void dxRainRender::Render(CEffect_Rain& owner)
     RCache.Vertex.Unlock(vCount, hGeom_Rain->vb_stride);
 
     // Render if needed
-    if (vCount) {
+    if (vCount)
+    {
         // HW.pDevice->SetRenderState	(D3DRS_CULLMODE,D3DCULL_NONE);
         RCache.set_CullMode(CULL_NONE);
         RCache.set_xform_world(Fidentity);
@@ -195,7 +198,8 @@ void dxRainRender::Render(CEffect_Rain& owner)
 
     // Particles
     CEffect_Rain::Particle* P = owner.particle_active;
-    if (0 == P) return;
+    if (0 == P)
+        return;
 
     {
         float dt = Device.fTimeDelta;
@@ -217,14 +221,16 @@ void dxRainRender::Render(CEffect_Rain& owner)
             // Update
             // P can be zero sometimes and it crashes
             P->time -= dt;
-            if (P->time < 0) {
+            if (P->time < 0)
+            {
                 owner.p_free(P);
                 P = next;
                 continue;
             }
 
             // Render
-            if (GlobalEnv.Render->ViewBase.testSphere_dirty(P->bounds.P, P->bounds.R)) {
+            if (GlobalEnv.Render->ViewBase.testSphere_dirty(P->bounds.P, P->bounds.R))
+            {
                 // Build matrix
                 float scale = P->time / particles_time;
                 mScale.scale(scale, scale, scale);
@@ -236,7 +242,8 @@ void dxRainRender::Render(CEffect_Rain& owner)
                 i_ptr += DM_Drop->number_indices;
                 pcount++;
 
-                if (pcount >= particles_cache) {
+                if (pcount >= particles_cache)
+                {
                     // flush
                     u32 dwNumPrimitives = iCount_Lock / 3;
                     RCache.Vertex.Unlock(vCount_Lock, hGeom_Drops->vb_stride);
@@ -261,14 +268,12 @@ void dxRainRender::Render(CEffect_Rain& owner)
         u32 dwNumPrimitives = iCount_Lock / 3;
         RCache.Vertex.Unlock(vCount_Lock, hGeom_Drops->vb_stride);
         _IS.Unlock(iCount_Lock);
-        if (pcount) {
+        if (pcount)
+        {
             RCache.set_Geometry(hGeom_Drops);
             RCache.Render(D3DPT_TRIANGLELIST, v_offset, 0, vCount_Lock, i_offset, dwNumPrimitives);
         }
     }
 }
 
-const Fsphere& dxRainRender::GetDropBounds() const
-{
-    return DM_Drop->bv_sphere;
-}
+const Fsphere& dxRainRender::GetDropBounds() const { return DM_Drop->bv_sphere; }

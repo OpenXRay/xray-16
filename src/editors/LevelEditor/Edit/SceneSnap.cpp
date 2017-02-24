@@ -13,7 +13,8 @@ ObjectList* EScene::GetSnapList(bool bIgnoreUse)
 {
     ObjClassID cls = LTools->CurrentClassID();
     ESceneToolBase* mt = m_SceneTools[cls];
-    if (0 == mt) return 0;
+    if (0 == mt)
+        return 0;
     ObjectList* snap_list = mt->GetSnapList() ? mt->GetSnapList() : &m_ESO_SnapObjects;
     return bIgnoreUse ? snap_list : (fraLeftBar->ebUseSnapList->Down ? snap_list : NULL);
 }
@@ -29,9 +30,11 @@ bool EScene::FindObjectInSnapList(CCustomObject* O)
 void EScene::RenderSnapList()
 {
     ObjectList* lst = GetSnapList(false);
-    if (lst) {
+    if (lst)
+    {
         for (ObjectIt _F = lst->begin(); _F != lst->end(); _F++)
-            if ((*_F)->Visible()) ((CSceneObject*)(*_F))->RenderSelection();
+            if ((*_F)->Visible())
+                ((CSceneObject*)(*_F))->RenderSelection();
     }
 }
 
@@ -39,12 +42,16 @@ void EScene::RenderSnapList()
 
 bool EScene::AddToSnapList(CCustomObject* O, bool bUpdateScene)
 {
-    if (!O) return false;
+    if (!O)
+        return false;
     ObjectList* snap_objects = GetSnapList(true);
-    if (snap_objects) {
-        if (std::find(snap_objects->begin(), snap_objects->end(), O) == snap_objects->end()) {
+    if (snap_objects)
+    {
+        if (std::find(snap_objects->begin(), snap_objects->end(), O) == snap_objects->end())
+        {
             snap_objects->push_back(O);
-            if (bUpdateScene) {
+            if (bUpdateScene)
+            {
                 UI->RedrawScene();
                 UpdateSnapList();
                 UndoSave();
@@ -60,11 +67,14 @@ bool EScene::AddToSnapList(CCustomObject* O, bool bUpdateScene)
 bool EScene::DelFromSnapList(CCustomObject* O, bool bUpdateScene)
 {
     ObjectList* snap_objects = GetSnapList(true);
-    if (snap_objects) {
+    if (snap_objects)
+    {
         ObjectIt it = std::find(snap_objects->begin(), snap_objects->end(), O);
-        if (it != snap_objects->end()) {
+        if (it != snap_objects->end())
+        {
             snap_objects->erase(it);
-            if (bUpdateScene) {
+            if (bUpdateScene)
+            {
                 UI->RedrawScene();
                 UpdateSnapList();
                 UndoSave();
@@ -80,14 +90,18 @@ bool EScene::DelFromSnapList(CCustomObject* O, bool bUpdateScene)
 int EScene::AddSelToSnapList()
 {
     int count = 0;
-    if (GetSnapList(true)) {
+    if (GetSnapList(true))
+    {
         ObjectList lst;
         int count = GetQueryObjects(lst, OBJCLASS_SCENEOBJECT, 1, 1, 0);
-        if (count) {
+        if (count)
+        {
             count = 0;
             for (ObjectIt _F = lst.begin(); _F != lst.end(); _F++)
-                if (AddToSnapList(*_F, false)) count++;
-            if (count) {
+                if (AddToSnapList(*_F, false))
+                    count++;
+            if (count)
+            {
                 UI->RedrawScene();
                 UpdateSnapList();
                 UndoSave();
@@ -102,14 +116,18 @@ int EScene::AddSelToSnapList()
 int EScene::DelSelFromSnapList()
 {
     int count = 0;
-    if (GetSnapList(true)) {
+    if (GetSnapList(true))
+    {
         ObjectList lst;
         int count = GetQueryObjects(lst, OBJCLASS_SCENEOBJECT, 1, 1, 0);
-        if (count) {
+        if (count)
+        {
             count = 0;
             for (ObjectIt _F = lst.begin(); _F != lst.end(); _F++)
-                if (DelFromSnapList(*_F, false)) count++;
-            if (count) {
+                if (DelFromSnapList(*_F, false))
+                    count++;
+            if (count)
+            {
                 UI->RedrawScene();
                 UpdateSnapList();
                 UndoSave();
@@ -126,10 +144,12 @@ int EScene::SetSnapList()
     ClearSnapList(true);
     ObjectList* snap_objects = GetSnapList(true);
     int count = 0;
-    if (snap_objects) {
+    if (snap_objects)
+    {
         ObjectList& lst = ListObj(OBJCLASS_SCENEOBJECT);
         for (ObjectIt _F = lst.begin(); _F != lst.end(); _F++)
-            if ((*_F)->Visible() && (*_F)->Selected()) {
+            if ((*_F)->Visible() && (*_F)->Selected())
+            {
                 snap_objects->push_back(*_F);
                 count++;
             }
@@ -144,9 +164,11 @@ int EScene::SetSnapList()
 
 void EScene::ClearSnapList(bool bCurrentOnly)
 {
-    if (bCurrentOnly) {
+    if (bCurrentOnly)
+    {
         ObjectList* snap_objects = GetSnapList(true);
-        if (snap_objects) {
+        if (snap_objects)
+        {
             snap_objects->clear();
             UpdateSnapList();
             UndoSave();
@@ -158,7 +180,8 @@ void EScene::ClearSnapList(bool bCurrentOnly)
         for (int i = 0; i < OBJCLASS_COUNT; i++)
         {
             ESceneToolBase* mt = m_SceneTools[ObjClassID(i)];
-            if (mt && mt->GetSnapList()) mt->GetSnapList()->clear();
+            if (mt && mt->GetSnapList())
+                mt->GetSnapList()->clear();
         }
         UpdateSnapList();
     }
@@ -169,7 +192,8 @@ void EScene::ClearSnapList(bool bCurrentOnly)
 void EScene::SelectSnapList()
 {
     ObjectList* snap_objects = GetSnapList(true);
-    if (snap_objects) {
+    if (snap_objects)
+    {
         SelectObjects(FALSE, OBJCLASS_SCENEOBJECT);
         for (ObjectIt _F = snap_objects->begin(); _F != snap_objects->end(); _F++)
             (*_F)->Select(TRUE);
@@ -179,24 +203,23 @@ void EScene::SelectSnapList()
 
 //------------------------------------------------------------------------------
 
-void EScene::UpdateSnapList()
-{
-    m_RTFlags.set(flUpdateSnapList, TRUE);
-}
-
+void EScene::UpdateSnapList() { m_RTFlags.set(flUpdateSnapList, TRUE); }
 void EScene::UpdateSnapListReal()
 {
-    if (NULL == LTools) return;
+    if (NULL == LTools)
+        return;
     ObjClassID cls = LTools->CurrentClassID();
     switch (cls)
     {
     case OBJCLASS_DUMMY: break;
     default:
         ESceneToolBase* mt = m_SceneTools[cls];
-        if (mt) mt->UpdateSnapList();
+        if (mt)
+            mt->UpdateSnapList();
     }
     // visual update
-    if (fraLeftBar) fraLeftBar->UpdateSnapList();
+    if (fraLeftBar)
+        fraLeftBar->UpdateSnapList();
 
     m_RTFlags.set(flUpdateSnapList, FALSE);
 }

@@ -8,11 +8,11 @@
 
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _data_type, typename _vertex_id_type, typename _graph_type\
 >
 
-#define CSGraphVertex                                                                                                  \
+#define CSGraphVertex \
     CVertex<_data_type, _vertex_id_type, _graph_type\
 >
 
@@ -47,7 +47,8 @@ TEMPLATE_SPECIALIZATION
 IC const typename CSGraphVertex::_edge_type* CSGraphVertex::edge(const _vertex_id_type& vertex_id) const
 {
     EDGES::const_iterator I = std::find(edges().begin(), edges().end(), vertex_id);
-    if (m_edges.end() == I) return (0);
+    if (m_edges.end() == I)
+        return (0);
     return (&*I);
 }
 
@@ -55,7 +56,8 @@ TEMPLATE_SPECIALIZATION
 IC typename CSGraphVertex::_edge_type* CSGraphVertex::edge(const _vertex_id_type& vertex_id)
 {
     EDGES::iterator I = std::find(m_edges.begin(), m_edges.end(), vertex_id);
-    if (m_edges.end() == I) return (0);
+    if (m_edges.end() == I)
+        return (0);
     return (&*I);
 }
 
@@ -97,41 +99,23 @@ IC void CSGraphVertex::on_edge_removal(const CVertex* vertex)
 }
 
 TEMPLATE_SPECIALIZATION
-IC const _vertex_id_type& CSGraphVertex::vertex_id() const
-{
-    return (m_vertex_id);
-}
-
+IC const _vertex_id_type& CSGraphVertex::vertex_id() const { return (m_vertex_id); }
 TEMPLATE_SPECIALIZATION
-IC const _data_type& CSGraphVertex::data() const
-{
-    return (m_data);
-}
-
+IC const _data_type& CSGraphVertex::data() const { return (m_data); }
 TEMPLATE_SPECIALIZATION
-IC _data_type& CSGraphVertex::data()
-{
-    return (m_data);
-}
-
+IC _data_type& CSGraphVertex::data() { return (m_data); }
 TEMPLATE_SPECIALIZATION
-IC void CSGraphVertex::data(const _data_type& data)
-{
-    m_data = data;
-}
-
+IC void CSGraphVertex::data(const _data_type& data) { m_data = data; }
 TEMPLATE_SPECIALIZATION
-IC const typename CSGraphVertex::EDGES& CSGraphVertex::edges() const
-{
-    return (m_edges);
-}
-
+IC const typename CSGraphVertex::EDGES& CSGraphVertex::edges() const { return (m_edges); }
 TEMPLATE_SPECIALIZATION
 IC bool CSGraphVertex::operator==(const CVertex& obj) const
 {
-    if (vertex_id() != obj.vertex_id()) return (false);
+    if (vertex_id() != obj.vertex_id())
+        return (false);
 
-    if (!equal(edges(), obj.edges())) return (false);
+    if (!equal(edges(), obj.edges()))
+        return (false);
 
     return (equal(data(), obj.data()));
 }

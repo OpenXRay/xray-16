@@ -26,4 +26,4 @@ private:
     ref_geom hGeomLine;
 };
 
-#endif  //	dxStatGraphRender_included
+#endif //	dxStatGraphRender_included

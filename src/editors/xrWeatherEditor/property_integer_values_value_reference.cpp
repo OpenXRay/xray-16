@@ -24,9 +24,11 @@ property_integer_values_value_reference::property_integer_values_value_reference
 System::Object ^ property_integer_values_value_reference::GetValue()
 {
     int value = safe_cast<int>(inherited::GetValue());
-    if (value < 0) value = 0;
+    if (value < 0)
+        value = 0;
 
-    if (value >= m_collection->Count) value = (int)m_collection->Count - 1;
+    if (value >= m_collection->Count)
+        value = (int)m_collection->Count - 1;
 
     return (value);
 }
@@ -39,7 +41,4 @@ void property_integer_values_value_reference::SetValue(Object ^ object)
     inherited::SetValue(index);
 }
 
-IList ^ property_integer_values_value_reference::collection()
-{
-    return (m_collection);
-}
+IList ^ property_integer_values_value_reference::collection() { return (m_collection); }

@@ -6,21 +6,19 @@
 
 #pragma comment(lib, "MagicFM.lib")
 
-BOOL f_valid(float f)
-{
-    return _finite(f) && !_isnan(f);
-}
-
+BOOL f_valid(float f) { return _finite(f) && !_isnan(f); }
 BOOL SphereValid(xr_vector<Fvector>& geom, Fsphere& test)
 {
-    if (!f_valid(test.P.x) || !f_valid(test.R)) {
+    if (!f_valid(test.P.x) || !f_valid(test.R))
+    {
         Logger.clMsg("*** Attention ***: invalid sphere: %f,%f,%f - %f", test.P.x, test.P.y, test.P.z, test.R);
     }
 
     Fsphere S = test;
     S.R += EPS_L;
     for (xr_vector<Fvector>::iterator I = geom.begin(); I != geom.end(); I++)
-        if (!S.contains(*I)) return FALSE;
+        if (!S.contains(*I))
+            return FALSE;
     return TRUE;
 }
 
@@ -51,7 +49,8 @@ void OGF_Base::CalcBounds()
     for (I = V.begin(); I != V.end(); I++)
     {
         float d = S2.P.distance_to_sqr(*I);
-        if (d > S2.R) S2.R = d;
+        if (d > S2.R)
+            S2.R = d;
     }
     S2.R = _sqrt(_abs(S2.R));
     BOOL B2 = SphereValid(V, S2);
@@ -64,9 +63,11 @@ void OGF_Base::CalcBounds()
     BOOL B3 = SphereValid(V, S3);
 
     // select best one
-    if (B1 && (S1.R < S2.R)) {
+    if (B1 && (S1.R < S2.R))
+    {
         // miniball or FM
-        if (B3 && (S3.R < S1.R)) {
+        if (B3 && (S3.R < S1.R))
+        {
             // FM wins
             C.set(S3.P);
             R = S3.R;
@@ -81,7 +82,8 @@ void OGF_Base::CalcBounds()
     else
     {
         // base or FM
-        if (B3 && (S3.R < S2.R)) {
+        if (B3 && (S3.R < S2.R))
+        {
             // FM wins
             C.set(S3.P);
             R = S3.R;

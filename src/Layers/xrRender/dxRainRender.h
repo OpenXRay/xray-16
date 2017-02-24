@@ -25,4 +25,4 @@ private:
     ref_geom hGeom_Drops;
 };
 
-#endif  //	RainRender_included
+#endif //	RainRender_included

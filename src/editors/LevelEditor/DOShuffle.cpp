@@ -59,11 +59,7 @@ void __fastcall TfrmDOShuffle::FormCreate(TObject* Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmDOShuffle::FormDestroy(TObject* Sender)
-{
-    TProperties::DestroyForm(m_ObjectProps);
-}
-
+void __fastcall TfrmDOShuffle::FormDestroy(TObject* Sender) { TProperties::DestroyForm(m_ObjectProps); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfrmDOShuffle::FormShow(TObject* Sender)
@@ -101,7 +97,8 @@ void TfrmDOShuffle::FillData()
         {
             EDetail* dd = 0;
             for (CDetailManager::DetailIt d_it = DM->objects.begin(); d_it != DM->objects.end(); d_it++)
-                if (0 == strcmp(((EDetail*)(*d_it))->GetName(), (*do_it)->GetName())) {
+                if (0 == strcmp(((EDetail*)(*d_it))->GetName(), (*do_it)->GetName()))
+                {
                     dd = (EDetail*)*d_it;
                     break;
                 }
@@ -122,13 +119,15 @@ bool TfrmDOShuffle::ApplyChanges()
     for (u32 k = 0; k < color_indices.size(); k++)
     {
         TfrmOneColor* OneColor = color_indices[k];
-        if (OneColor->tvDOList->Items->Count) {
+        if (OneColor->tvDOList->Items->Count)
+        {
             u32 clr = bgr2rgb(OneColor->mcColor->Brush->Color);
             for (TElTreeItem* node = OneColor->tvDOList->Items->GetFirstNode(); node; node = node->GetNext())
                 DM->AppendIndexObject(clr, AnsiString(node->Text).c_str(), false);
         }
     }
-    if (/*bNeedUpdate||*/ bColorIndModif || bObjectModif) {
+    if (/*bNeedUpdate||*/ bColorIndModif || bObjectModif)
+    {
         ELog.DlgMsg(mtInformation, "Object or object list changed. Reinitialize needed!");
         DM->InvalidateSlots();
         return true;
@@ -162,7 +161,8 @@ __fastcall TfrmDOShuffle::TfrmDOShuffle(TComponent* Owner, EDetailManager* dm_to
 TElTreeItem* TfrmDOShuffle::FindItem(const char* s)
 {
     for (TElTreeItem* node = tvItems->Items->GetFirstNode(); node; node = node->GetNext())
-        if (node->Data && (AnsiString(node->Text) == s)) return node;
+        if (node->Data && (AnsiString(node->Text) == s))
+            return node;
     return 0;
 }
 
@@ -190,7 +190,8 @@ void __fastcall TfrmDOShuffle::FormClose(TObject* Sender, TCloseAction& Action)
 
     ClearIndexForms();
 
-    if (ModalResult == mrOk) DM->InvalidateCache();
+    if (ModalResult == mrOk)
+        DM->InvalidateCache();
 
     Action = caFree;
     form = 0;
@@ -200,15 +201,18 @@ void __fastcall TfrmDOShuffle::FormClose(TObject* Sender, TCloseAction& Action)
 
 void TfrmDOShuffle::OnItemFocused(TElTree* tv)
 {
-    if (bLockFocused) return;
+    if (bLockFocused)
+        return;
     bLockFocused = true;
 
     // unselect before
-    if (tvItems != tv) tvItems->Selected = 0;
+    if (tvItems != tv)
+        tvItems->Selected = 0;
     for (u32 k = 0; k < color_indices.size(); k++)
     {
         TfrmOneColor* OneColor = color_indices[k];
-        if (OneColor->tvDOList != tv) {
+        if (OneColor->tvDOList != tv)
+        {
             OneColor->tvDOList->IsUpdating = true;
             OneColor->tvDOList->Selected = 0;
             OneColor->tvDOList->IsUpdating = false;
@@ -221,7 +225,8 @@ void TfrmDOShuffle::OnItemFocused(TElTree* tv)
     xr_delete(m_Thm);
 
     PropItemVec items;
-    if (Item && Item->Data) {
+    if (Item && Item->Data)
+    {
         AnsiString nm = Item->Text;
         m_Thm = ImageLib.CreateThumbnail(nm.c_str(), EImageThumbnail::ETObject);
         EDetail* dd = (EDetail*)Item->Data;
@@ -232,21 +237,19 @@ void TfrmDOShuffle::OnItemFocused(TElTree* tv)
         PHelper().CreateFlag32(items, "No Waving", &dd->m_Flags, DO_NO_WAVING);
     }
     m_ObjectProps->AssignItems(items);
-    if (!bTHMLockRepaint) paImage->Repaint();
+    if (!bTHMLockRepaint)
+        paImage->Repaint();
 }
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmDOShuffle::tvItemsItemFocused(TObject* Sender)
-{
-    OnItemFocused(tvItems);
-}
-
+void __fastcall TfrmDOShuffle::tvItemsItemFocused(TObject* Sender) { OnItemFocused(tvItems); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfrmDOShuffle::paImagePaint(TObject* Sender)
 {
-    if (m_Thm) m_Thm->Draw(paImage);
+    if (m_Thm)
+        m_Thm->Draw(paImage);
 }
 
 //---------------------------------------------------------------------------
@@ -263,7 +266,8 @@ bool __fastcall LookupFunc(TElTreeItem* Item, void* SearchDetails)
 void __fastcall TfrmDOShuffle::tvItemsKeyPress(TObject* Sender, char& Key)
 {
     TElTreeItem* node = tvItems->Items->LookForItemEx(tvItems->Selected, -1, false, false, false, &Key, LookupFunc);
-    if (!node) node = tvItems->Items->LookForItemEx(0, -1, false, false, false, &Key, LookupFunc);
+    if (!node)
+        node = tvItems->Items->LookForItemEx(0, -1, false, false, false, &Key, LookupFunc);
     FHelper.RestoreSelection(tvItems, node, false);
 }
 
@@ -274,7 +278,8 @@ static TElTreeItem* DragItem = 0;
 void __fastcall TfrmDOShuffle::tvMultiDragDrop(TObject* Sender, TObject* Source, int X, int Y)
 {
     TElTreeItem* node = ((TElTree*)Sender)->GetItemAtY(Y);
-    if (node) DragItem->MoveToIns(0, node->Index);
+    if (node)
+        DragItem->MoveToIns(0, node->Index);
     DragItem = 0;
 }
 
@@ -285,7 +290,8 @@ void __fastcall TfrmDOShuffle::tvMultiDragOver(
 {
     Accept = false;
     TElTreeItem* node = ((TElTree*)Sender)->GetItemAtY(Y);
-    if ((Sender == Source) && (node != DragItem)) Accept = true;
+    if ((Sender == Source) && (node != DragItem))
+        Accept = true;
 }
 
 //---------------------------------------------------------------------------
@@ -300,12 +306,15 @@ void __fastcall TfrmDOShuffle::tvMultiStartDrag(TObject* Sender, TDragObject*& D
 void __fastcall TfrmDOShuffle::ebAddObjectClick(TObject* Sender)
 {
     LPCSTR S;
-    if (TfrmChoseItem::SelectItem(smObject, S, 8)) {
+    if (TfrmChoseItem::SelectItem(smObject, S, 8))
+    {
         AStringVec lst;
         _SequenceToList(lst, S);
         for (AStringIt s_it = lst.begin(); s_it != lst.end(); s_it++)
-            if (!FindItem(s_it->c_str())) {
-                if (tvItems->Items->Count >= dm_max_objects) {
+            if (!FindItem(s_it->c_str()))
+            {
+                if (tvItems->Items->Count >= dm_max_objects)
+                {
                     ELog.DlgMsg(mtInformation, "Maximum detail objects in scene '%d'", dm_max_objects);
                     return;
                 }
@@ -318,7 +327,8 @@ void __fastcall TfrmDOShuffle::ebAddObjectClick(TObject* Sender)
 
 void __fastcall TfrmDOShuffle::ebDelObjectClick(TObject* Sender)
 {
-    if (tvItems->Selected) {
+    if (tvItems->Selected)
+    {
         LPCSTR name = AnsiString(tvItems->Selected->Text).c_str();
         DM->RemoveDO(name);
         bObjectModif = true;
@@ -362,7 +372,8 @@ void __fastcall TfrmDOShuffle::ebMultiClearClick(TObject* Sender)
 void __fastcall TfrmDOShuffle::tvItemsDragDrop(TObject* Sender, TObject* Source, int X, int Y)
 {
     TfrmOneColor* OneColor = (TfrmOneColor*)((TElTree*)Source)->Parent;
-    if (OneColor && OneColor->FDragItem) {
+    if (OneColor && OneColor->FDragItem)
+    {
         OneColor->FDragItem->Delete();
         bColorIndModif = true;
     }
@@ -374,7 +385,8 @@ void __fastcall TfrmDOShuffle::tvItemsDragOver(
     TObject* Sender, TObject* Source, int X, int Y, TDragState State, bool& Accept)
 {
     Accept = false;
-    if (Source == tvItems) return;
+    if (Source == tvItems)
+        return;
     Accept = true;
 }
 
@@ -390,7 +402,8 @@ void __fastcall TfrmDOShuffle::tvItemsStartDrag(TObject* Sender, TDragObject*& D
 void __fastcall TfrmDOShuffle::ebSaveListClick(TObject* Sender)
 {
     xr_string fname;
-    if (EFS.GetSaveName(_detail_objects_, fname)) {
+    if (EFS.GetSaveName(_detail_objects_, fname))
+    {
         DM->ExportColorIndices(fname.c_str());
     }
 }
@@ -400,8 +413,10 @@ void __fastcall TfrmDOShuffle::ebSaveListClick(TObject* Sender)
 void __fastcall TfrmDOShuffle::ebLoadListClick(TObject* Sender)
 {
     xr_string fname;
-    if (EFS.GetOpenName(_detail_objects_, fname)) {
-        if (DM->ImportColorIndices(fname.c_str())) {
+    if (EFS.GetOpenName(_detail_objects_, fname))
+    {
+        if (DM->ImportColorIndices(fname.c_str()))
+        {
             bColorIndModif = true;
             DM->InvalidateSlots();
             ClearIndexForms();
@@ -425,16 +440,8 @@ void __fastcall TfrmDOShuffle::ebClearListClick(TObject* Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmDOShuffle::fsStorageRestorePlacement(TObject* Sender)
-{
-    m_ObjectProps->RestoreParams(fsStorage);
-}
-
+void __fastcall TfrmDOShuffle::fsStorageRestorePlacement(TObject* Sender) { m_ObjectProps->RestoreParams(fsStorage); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmDOShuffle::fsStorageSavePlacement(TObject* Sender)
-{
-    m_ObjectProps->SaveParams(fsStorage);
-}
-
+void __fastcall TfrmDOShuffle::fsStorageSavePlacement(TObject* Sender) { m_ObjectProps->SaveParams(fsStorage); }
 //---------------------------------------------------------------------------

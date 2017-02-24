@@ -6,22 +6,18 @@
 #include "xrEngine/iphysicsgeometry.h"
 
 // this is equivalent dMULTIPLYOP0_333 whith consequent transposion of A
-#define dMULTIPLYOP3_333(A, op, B, C)                                                                                  \
-    (A)[0] op dDOT14((B), (C));                                                                                        \
-    (A)[1] op dDOT14((B + 4), (C));                                                                                    \
-    (A)[2] op dDOT14((B + 8), (C));                                                                                    \
-    (A)[4] op dDOT14((B), (C + 1));                                                                                    \
-    (A)[5] op dDOT14((B + 4), (C + 1));                                                                                \
-    (A)[6] op dDOT14((B + 8), (C + 1));                                                                                \
-    (A)[8] op dDOT14((B), (C + 2));                                                                                    \
-    (A)[9] op dDOT14((B + 4), (C + 2));                                                                                \
+#define dMULTIPLYOP3_333(A, op, B, C)   \
+    (A)[0] op dDOT14((B), (C));         \
+    (A)[1] op dDOT14((B + 4), (C));     \
+    (A)[2] op dDOT14((B + 8), (C));     \
+    (A)[4] op dDOT14((B), (C + 1));     \
+    (A)[5] op dDOT14((B + 4), (C + 1)); \
+    (A)[6] op dDOT14((B + 8), (C + 1)); \
+    (A)[8] op dDOT14((B), (C + 2));     \
+    (A)[9] op dDOT14((B + 4), (C + 2)); \
     (A)[10] op dDOT14((B + 8), (C + 2));
 
-inline void dMULTIPLY3_333(dReal* A, const dReal* B, const dReal* C)
-{
-    dMULTIPLYOP3_333(A, =, B, C)
-}
-
+inline void dMULTIPLY3_333(dReal* A, const dReal* B, const dReal* C) { dMULTIPLYOP3_333(A, =, B, C) }
 class CGameObject;
 class CPHObject;
 class XRPHYSICS_API CODEGeom : public IPhysicsGeometry
@@ -35,21 +31,21 @@ protected:
 public:
     // get
     virtual float volume() = 0;
-    virtual void get_mass(dMass& m) = 0;  // unit dencity mass;
+    virtual void get_mass(dMass& m) = 0; // unit dencity mass;
     void get_mass(dMass& m, const Fvector& ref_point, float density);
     void get_mass(dMass& m, const Fvector& ref_point);
     void add_self_mass(dMass& m, const Fvector& ref_point);
     void add_self_mass(dMass& m, const Fvector& ref_point, float density);
-    void get_local_center_bt(Fvector& center);   // for built
-    void get_global_center_bt(Fvector& center);  // for built
-    void get_local_form_bt(Fmatrix& form);       // for built
+    void get_local_center_bt(Fvector& center); // for built
+    void get_global_center_bt(Fvector& center); // for built
+    void get_local_form_bt(Fmatrix& form); // for built
     virtual void get_xform(Fmatrix& form) const;
 #ifdef DEBUG
     virtual void dbg_draw(float scale, u32 color, Flags32 flags) const;
 #endif
     virtual void get_Box(Fmatrix& form, Fvector& sz) const;
     virtual bool collide_fluids() const;
-    void set_static_ref_form(const Fmatrix& form);  // for built
+    void set_static_ref_form(const Fmatrix& form); // for built
     virtual void get_max_area_dir_bt(Fvector& dir) = 0;
     virtual float radius() = 0;
     virtual void get_Extensions(const Fvector& axis, float center_prg, float& lo_ext, float& hi_ext) const = 0;
@@ -113,7 +109,7 @@ protected:
 public:
     static void get_final_tx(dGeomID g, const dReal*& p, const dReal*& R, dReal* bufV, dReal* bufM);
     void build(const Fvector& ref_point);
-    virtual void set_build_position(const Fvector& ref_point);  // for build geom
+    virtual void set_build_position(const Fvector& ref_point); // for build geom
     void clear_motion_history(bool set_unspecified);
     void move_local_basis(const Fmatrix& inv_new_mul_old);
     void destroy();
@@ -133,7 +129,7 @@ public:
     virtual float radius();
     virtual void get_Extensions(const Fvector& axis, float center_prg, float& lo_ext, float& hi_ext) const;
     virtual void get_max_area_dir_bt(Fvector& dir);
-    virtual void get_mass(dMass& m);  // unit dencity mass;
+    virtual void get_mass(dMass& m); // unit dencity mass;
     virtual const Fvector& local_center();
     virtual void get_local_form(Fmatrix& form);
     virtual void set_local_form(const Fmatrix& form);
@@ -159,7 +155,7 @@ public:
     virtual float radius();
     virtual void get_Extensions(const Fvector& axis, float center_prg, float& lo_ext, float& hi_ext) const;
     virtual void get_max_area_dir_bt(Fvector& dir){};
-    virtual void get_mass(dMass& m);  // unit dencity mass;
+    virtual void get_mass(dMass& m); // unit dencity mass;
     virtual const Fvector& local_center();
     virtual void get_local_form(Fmatrix& form);
     virtual void set_local_form(const Fmatrix& form);
@@ -183,7 +179,7 @@ public:
     virtual void get_Extensions(const Fvector& axis, float center_prg, float& lo_ext, float& hi_ext) const;
     virtual void get_max_area_dir_bt(Fvector& dir){};
     virtual const Fvector& local_center();
-    virtual void get_mass(dMass& m);  // unit dencity mass;
+    virtual void get_mass(dMass& m); // unit dencity mass;
     virtual void get_local_form(Fmatrix& form);
     virtual void set_local_form(const Fmatrix& form);
     virtual dGeomID create();
@@ -195,4 +191,4 @@ private:
     virtual void dbg_draw(float scale, u32 color, Flags32 flags) const;
 #endif
 };
-#endif  // GEOMETRY_H
+#endif // GEOMETRY_H

@@ -21,7 +21,7 @@
 
 class CSE_Abstract;
 
-const u32 NET_Latency = 50;  // time in (ms)
+const u32 NET_Latency = 50; // time in (ms)
 
 // t-defs
 typedef xr_hash_map<u16, CSE_Abstract*> xrS_entities;
@@ -63,11 +63,7 @@ struct svs_respawn
     u32 timestamp;
     u16 phantom;
 };
-IC bool operator<(const svs_respawn& A, const svs_respawn& B)
-{
-    return A.timestamp < B.timestamp;
-}
-
+IC bool operator<(const svs_respawn& A, const svs_respawn& B) { return A.timestamp < B.timestamp; }
 struct CheaterToKick
 {
     shared_str reason;
@@ -78,7 +74,7 @@ typedef xr_vector<CheaterToKick> cheaters_t;
 namespace file_transfer
 {
 class server_site;
-};  // namespace file_transfer
+}; // namespace file_transfer
 
 class clientdata_proxy;
 class server_info_uploader;
@@ -128,21 +124,21 @@ private:
     xr_deque<DelayedPacket> m_aDelayedPackets;
     void ProceedDelayedPackets();
     void AddDelayedPacket(NET_Packet& Packet, ClientID Sender);
-    u32 OnDelayedMessage(NET_Packet& P, ClientID sender);  // Non-Zero means broadcasting with "flags" as returned
+    u32 OnDelayedMessage(NET_Packet& P, ClientID sender); // Non-Zero means broadcasting with "flags" as returned
 
     void SendUpdatesToAll();
     void _stdcall SendGameUpdateTo(IClient* client);
 
 private:
-    typedef CID_Generator<u32,  // time identifier type
-        u8,                     // compressed id type
-        u16,                    // id type
-        u8,                     // block id type
-        u16,                    // chunk id type
-        0,                      // min value
-        u16(-2),                // max value
-        256,                    // block size
-        u16(-1)                 // invalid id
+    typedef CID_Generator<u32, // time identifier type
+        u8, // compressed id type
+        u16, // id type
+        u8, // block id type
+        u16, // chunk id type
+        0, // min value
+        u16(-2), // max value
+        256, // block size
+        u16(-1) // invalid id
         >
         id_generator_type;
 
@@ -175,7 +171,6 @@ public:
     IC void clear_ids() { m_tID_Generator = id_generator_type(); }
     virtual u16 PerformIDgen(u16 ID) override { return (m_tID_Generator.tfGetID(ID)); }
     virtual void FreeID(u16 ID, u32 time) override { return (m_tID_Generator.vfFreeID(ID, time)); }
-
     void Perform_connect_spawn(CSE_Abstract* E, xrClientData* to, NET_Packet& P);
     void Perform_transfer(NET_Packet& PR, NET_Packet& PT, CSE_Abstract* what, CSE_Abstract* from, CSE_Abstract* to);
     void Perform_reject(CSE_Abstract* what, CSE_Abstract* from, int delta);
@@ -206,7 +201,6 @@ protected:
     virtual IClient* new_client(SClientConnectData* cl_data);
 
     virtual bool Check_ServerAccess(IClient* CL, string512& reason) { return true; }
-
     virtual bool NeedToCheckClient_GameSpy_CDKey(IClient* CL) { return false; }
     virtual void Check_GameSpy_CDKey_Success(IClient* CL);
     void RequestClientDigest(IClient* CL);
@@ -233,7 +227,7 @@ public:
     virtual ~xrServer();
 
     // extended functionality
-    virtual u32 OnMessage(NET_Packet& P, ClientID sender);  // Non-Zero means broadcasting with "flags" as returned
+    virtual u32 OnMessage(NET_Packet& P, ClientID sender); // Non-Zero means broadcasting with "flags" as returned
     u32 OnMessageSync(NET_Packet& P, ClientID sender);
     virtual void OnCL_Connected(IClient* CL);
     virtual void OnCL_Disconnected(IClient* CL);
@@ -243,11 +237,10 @@ public:
     virtual void SendBroadcast(ClientID exclude, NET_Packet& P, u32 dwFlags = DPNSEND_GUARANTEED);
     void GetPooledState(xrClientData* xrCL);
     void ClearDisconnectedPool() { m_disconnected_clients.Clear(); };
-
-    virtual IClient* client_Create();               // create client info
-    virtual void client_Replicate();                // replicate current state to client
-    virtual IClient* client_Find_Get(ClientID ID);  // Find earlier disconnected client
-    virtual void client_Destroy(IClient* C);        // destroy client info
+    virtual IClient* client_Create(); // create client info
+    virtual void client_Replicate(); // replicate current state to client
+    virtual IClient* client_Find_Get(ClientID ID); // Find earlier disconnected client
+    virtual void client_Destroy(IClient* C); // destroy client info
 
     // utilities
     virtual CSE_Abstract* entity_Create(LPCSTR name) override;
@@ -255,7 +248,6 @@ public:
     u32 GetEntitiesNum() { return entities.size(); };
     CSE_Abstract* GetEntity(u32 Num);
     u32 const GetLastUpdatesSize() const { return m_last_updates_size; };
-
     xrClientData* ID_to_client(ClientID ID, bool ScanAll = false)
     {
         return (xrClientData*)(IPureServer::ID_to_client(ID, ScanAll));
@@ -276,7 +268,6 @@ public:
 
     void create_direct_client();
     BOOL IsDedicated() const { return m_bDedicated; };
-
     virtual void Assign_ServerType(string512& res){};
     virtual bool HasPassword() { return false; }
     virtual bool HasProtected() { return false; }
@@ -316,4 +307,4 @@ enum e_dbg_net_Draw_Flags
 extern Flags32 dbg_net_Draw_Flags;
 #endif
 
-#endif  // !defined(AFX_XRSERVER_H__65728A25_16FC_4A7B_8CCE_D798CA5EC64E__INCLUDED_)
+#endif // !defined(AFX_XRSERVER_H__65728A25_16FC_4A7B_8CCE_D798CA5EC64E__INCLUDED_)

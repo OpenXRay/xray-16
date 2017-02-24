@@ -12,7 +12,8 @@ void CLevel::ProcessCompressedUpdate(NET_Packet& P, u8 const compress_type)
     stats.ClientCompressor.Begin();
     while (next_size)
     {
-        if (compress_type & eto_ppmd_compression) {
+        if (compress_type & eto_ppmd_compression)
+        {
             R_ASSERT(m_trained_stream);
             uncompressed_packet.B.count = ppmd_trained_decompress(uncompressed_packet.B.data,
                 sizeof(uncompressed_packet.B.data), P.B.data + P.r_tell(), next_size, m_trained_stream);
@@ -39,11 +40,13 @@ void CLevel::ProcessCompressedUpdate(NET_Packet& P, u8 const compress_type)
     }
     stats.ClientCompressor.End();
 
-    if (OnClient()) UpdateDeltaUpd(timeServer());
+    if (OnClient())
+        UpdateDeltaUpd(timeServer());
     IClientStatistic pStat = Level().GetStatistic();
     u32 dTime = 0;
 
-    if ((Level().timeServer() + pStat.getPing()) < P.timeReceive) {
+    if ((Level().timeServer() + pStat.getPing()) < P.timeReceive)
+    {
         dTime = pStat.getPing();
     }
     else
@@ -62,10 +65,12 @@ void CLevel::init_compression()
 
 void CLevel::deinit_compression()
 {
-    if (m_trained_stream) {
+    if (m_trained_stream)
+    {
         compression::deinit_ppmd_trained_stream(m_trained_stream);
     }
-    if (m_lzo_working_buffer) {
+    if (m_lzo_working_buffer)
+    {
         VERIFY(m_lzo_dictionary.data);
         compression::deinit_lzo(m_lzo_working_buffer, m_lzo_dictionary);
     }

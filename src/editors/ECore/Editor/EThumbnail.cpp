@@ -18,10 +18,7 @@ ECustomThumbnail::ECustomThumbnail(LPCSTR src_name, THMType type)
 
 //------------------------------------------------------------------------------
 
-ECustomThumbnail::~ECustomThumbnail()
-{
-}
-
+ECustomThumbnail::~ECustomThumbnail() {}
 /*
 void DrawThumbnail(TCanvas* pCanvas, TRect& r, U32Vec& data, bool bDrawWithAlpha, int _w = THUMB_WIDTH, int _h =
 THUMB_HEIGHT)
@@ -65,11 +62,7 @@ THUMB_HEIGHT)
 //------------------------------------------------------------------------------
 // Image Thumbnail
 //------------------------------------------------------------------------------
-EImageThumbnail::~EImageThumbnail()
-{
-    m_Pixels.clear();
-}
-
+EImageThumbnail::~EImageThumbnail() { m_Pixels.clear(); }
 void EImageThumbnail::VFlip()
 {
     R_ASSERT(!m_Pixels.empty());
@@ -94,7 +87,8 @@ void EImageThumbnail::CreatePixels(u32* p, u32 w, u32 h)
 
 void EImageThumbnail::Draw(HDC hdc, const Irect& r)
 {
-    if (Valid()) FHelper.DrawThumbnail(hdc, r, Pixels(), THUMB_WIDTH, THUMB_HEIGHT);
+    if (Valid())
+        FHelper.DrawThumbnail(hdc, r, Pixels(), THUMB_WIDTH, THUMB_HEIGHT);
 }
 
 EImageThumbnail* CreateThumbnail(LPCSTR src_name, ECustomThumbnail::THMType type, bool bLoad)

@@ -24,9 +24,7 @@ struct SBreakPoint
     s32 nLine;
 
     SBreakPoint() { nLine = 0; }
-
     SBreakPoint(const SBreakPoint& other) { operator=(other); }
-
     SBreakPoint& operator=(const SBreakPoint& other)
     {
         fileName = other.fileName;
@@ -91,9 +89,9 @@ protected:
     CScriptCallStack* m_callStack;
     // static CScriptDebugger *m_pDebugger;
     int m_nMode;
-    int m_nLevel;               // for step into/over/out
-    string_path m_strPathName;  // for run_to_line_number
-    int m_nLine;                // for run_to_line_number
+    int m_nLevel; // for step into/over/out
+    string_path m_strPathName; // for run_to_line_number
+    int m_nLine; // for run_to_line_number
     HANDLE m_mailSlot;
     BOOL m_bIdePresent;
     xr_vector<SBreakPoint> m_breakPoints;

@@ -19,13 +19,16 @@ float CLevelGraph::distance(const Fvector& position, const CLevelGraph::CVertex*
     float best, dist;
     best = distance(position, _contour.v1, _contour.v2);
     dist = distance(position, _contour.v2, _contour.v3);
-    if (dist < best) best = dist;
+    if (dist < best)
+        best = dist;
 
     dist = distance(position, _contour.v3, _contour.v4);
-    if (dist < best) best = dist;
+    if (dist < best)
+        best = dist;
 
     dist = distance(position, _contour.v4, _contour.v1);
-    if (dist < best) best = dist;
+    if (dist < best)
+        best = dist;
 
     return (best);
 }
@@ -40,7 +43,8 @@ void CLevelGraph::choose_point(const Fvector& start_point, const Fvector& finish
     intersect(tNextSegment, tNextContour, _contour);
     u32 dwIntersect = intersect(start_point.x, start_point.z, finish_point.x, finish_point.z, tNextSegment.v1.x,
         tNextSegment.v1.z, tNextSegment.v2.x, tNextSegment.v2.z, &tIntersectPoint.x, &tIntersectPoint.z);
-    if (!dwIntersect) return;
+    if (!dwIntersect)
+        return;
     for (int i = 0; i < 4; ++i)
     {
         switch (i)
@@ -73,8 +77,10 @@ void CLevelGraph::choose_point(const Fvector& start_point, const Fvector& finish
         }
         dwIntersect = intersect(start_point.x, start_point.z, finish_point.x, finish_point.z, tCheckPoint1.x,
             tCheckPoint1.z, tCheckPoint2.x, tCheckPoint2.z, &tIntersectPoint.x, &tIntersectPoint.z);
-        if (dwIntersect == LevelGraph::eLineIntersectionIntersect) {
-            if (finish_point.distance_to_xz(tIntersectPoint) < finish_point.distance_to_xz(temp_point) + EPS_L) {
+        if (dwIntersect == LevelGraph::eLineIntersectionIntersect)
+        {
+            if (finish_point.distance_to_xz(tIntersectPoint) < finish_point.distance_to_xz(temp_point) + EPS_L)
+            {
                 temp_point = tIntersectPoint;
                 saved_index = node_id;
             }
@@ -82,7 +88,8 @@ void CLevelGraph::choose_point(const Fvector& start_point, const Fvector& finish
         else if (dwIntersect == LevelGraph::eLineIntersectionEqual)
         {
             if (start_point.distance_to_xz(tCheckPoint1) > start_point.distance_to_xz(temp_point))
-                if (start_point.distance_to_xz(tCheckPoint1) > start_point.distance_to_xz(tCheckPoint2)) {
+                if (start_point.distance_to_xz(tCheckPoint1) > start_point.distance_to_xz(tCheckPoint2))
+                {
                     temp_point = tCheckPoint1;
                     saved_index = node_id;
                 }
@@ -122,7 +129,8 @@ float CLevelGraph::check_position_in_direction(
                 choose_point(start_point, finish_point, _contour, iNextNode, temp_point, saved_index);
         }
 
-        if (saved_index > -1) {
+        if (saved_index > -1)
+        {
             fCurDistance = start_point.distance_to_xz(temp_point);
             iPrevIndex = dwCurNode;
             dwCurNode = saved_index;
@@ -177,7 +185,8 @@ float CLevelGraph::mark_nodes_in_direction(u32 start_vertex_id, const Fvector& s
                 choose_point(start_point, finish_point, _contour, iNextNode, temp_point, saved_index);
         }
 
-        if (saved_index > -1) {
+        if (saved_index > -1)
+        {
             fCurDistance = start_point.distance_to_xz(temp_point);
             iPrevIndex = dwCurNode;
             dwCurNode = saved_index;
@@ -185,7 +194,8 @@ float CLevelGraph::mark_nodes_in_direction(u32 start_vertex_id, const Fvector& s
         else
             return (fCurDistance);
 
-        if (tpaMarks) (*tpaMarks)[dwCurNode] = true;
+        if (tpaMarks)
+            (*tpaMarks)[dwCurNode] = true;
         tpaStack.push_back(dwCurNode);
     }
 
@@ -214,8 +224,10 @@ float CLevelGraph::farthest_vertex_in_direction(u32 start_vertex_id, const Fvect
                 choose_point(start_point, finish_point, _contour, iNextNode, temp_point, saved_index);
         }
 
-        if (saved_index > -1) {
-            if (check_accessability && !is_accessible(saved_index)) return (fCurDistance);
+        if (saved_index > -1)
+        {
+            if (check_accessability && !is_accessible(saved_index))
+                return (fCurDistance);
 
             fCurDistance = start_point.distance_to_xz(temp_point);
             iPrevIndex = dwCurNode;
@@ -224,7 +236,8 @@ float CLevelGraph::farthest_vertex_in_direction(u32 start_vertex_id, const Fvect
         else
             return (fCurDistance);
 
-        if (tpaMarks) (*tpaMarks)[dwCurNode] = true;
+        if (tpaMarks)
+            (*tpaMarks)[dwCurNode] = true;
         finish_vertex_id = dwCurNode;
     }
     return (fCurDistance);
@@ -240,7 +253,8 @@ bool CLevelGraph::create_straight_path(u32 start_vertex_id, const Fvector& start
 u32 CLevelGraph::check_position_in_direction_slow(
     u32 start_vertex_id, const Fvector2& start_position, const Fvector2& finish_position) const
 {
-    if (!valid_vertex_position(v3d(finish_position))) return (u32(-1));
+    if (!valid_vertex_position(v3d(finish_position)))
+        return (u32(-1));
 
     u32 cur_vertex_id = start_vertex_id, prev_vertex_id = u32(-1);
     Fbox2 box;
@@ -263,22 +277,27 @@ u32 CLevelGraph::check_position_in_direction_slow(
         for (; I != E; ++I)
         {
             u32 next_vertex_id = value(cur_vertex_id, I);
-            if ((next_vertex_id == prev_vertex_id) || !valid_vertex_id(next_vertex_id)) continue;
+            if ((next_vertex_id == prev_vertex_id) || !valid_vertex_id(next_vertex_id))
+                continue;
             CVertex* v = vertex(next_vertex_id);
             unpack_xz(v, temp.x, temp.y);
             box.min = box.max = temp;
             box.grow(identity);
-            if (box.pick_exact(start, dir)) {
-                if (dest_xz == v->position().xz()) {
+            if (box.pick_exact(start, dir))
+            {
+                if (dest_xz == v->position().xz())
+                {
                     return (is_accessible(next_vertex_id) ? next_vertex_id : u32(-1));
                 }
                 Fvector2 temp;
                 temp.add(box.min, box.max);
                 temp.mul(.5f);
                 float dist = _sqr(temp.x - dest.x) + _sqr(temp.y - dest.y);
-                if (dist > cur_sqr) continue;
+                if (dist > cur_sqr)
+                    continue;
 
-                if (!is_accessible(next_vertex_id)) return (u32(-1));
+                if (!is_accessible(next_vertex_id))
+                    return (u32(-1));
 
                 cur_sqr = dist;
                 found = true;
@@ -287,7 +306,8 @@ u32 CLevelGraph::check_position_in_direction_slow(
                 break;
             }
         }
-        if (!found) {
+        if (!found)
+        {
             return (u32(-1));
         }
     }
@@ -317,21 +337,26 @@ bool CLevelGraph::check_vertex_in_direction_slow(
         for (; I != E; ++I)
         {
             u32 next_vertex_id = value(cur_vertex_id, I);
-            if ((next_vertex_id == prev_vertex_id) || !valid_vertex_id(next_vertex_id)) continue;
+            if ((next_vertex_id == prev_vertex_id) || !valid_vertex_id(next_vertex_id))
+                continue;
             unpack_xz(vertex(next_vertex_id), temp.x, temp.y);
             box.min = box.max = temp;
             box.grow(identity);
-            if (box.pick_exact(start, dir)) {
-                if (next_vertex_id == finish_vertex_id) {
+            if (box.pick_exact(start, dir))
+            {
+                if (next_vertex_id == finish_vertex_id)
+                {
                     return (is_accessible(next_vertex_id));
                 }
                 Fvector2 temp;
                 temp.add(box.min, box.max);
                 temp.mul(.5f);
                 float dist = _sqr(temp.x - dest.x) + _sqr(temp.y - dest.y);
-                if (dist > cur_sqr) continue;
+                if (dist > cur_sqr)
+                    continue;
 
-                if (!is_accessible(next_vertex_id)) return (false);
+                if (!is_accessible(next_vertex_id))
+                    return (false);
 
                 cur_sqr = dist;
                 found = true;
@@ -340,26 +365,20 @@ bool CLevelGraph::check_vertex_in_direction_slow(
                 break;
             }
         }
-        if (!found) {
+        if (!found)
+        {
             return (false);
         }
     }
 }
 
-IC Fvector v3d(const Fvector2& vector2d)
-{
-    return (Fvector().set(vector2d.x, 0.f, vector2d.y));
-}
-
-IC Fvector2 v2d(const Fvector& vector3d)
-{
-    return (Fvector2().set(vector3d.x, vector3d.z));
-}
-
+IC Fvector v3d(const Fvector2& vector2d) { return (Fvector().set(vector2d.x, 0.f, vector2d.y)); }
+IC Fvector2 v2d(const Fvector& vector3d) { return (Fvector2().set(vector3d.x, vector3d.z)); }
 bool CLevelGraph::create_straight_path(u32 start_vertex_id, const Fvector2& start_point, const Fvector2& finish_point,
     xr_vector<Fvector>& tpaOutputPoints, xr_vector<u32>& tpaOutputNodes, bool bAddFirstPoint, bool bClearPath) const
 {
-    if (!valid_vertex_position(v3d(finish_point))) return (false);
+    if (!valid_vertex_position(v3d(finish_point)))
+        return (false);
 
     u32 cur_vertex_id = start_vertex_id, prev_vertex_id = start_vertex_id;
     Fbox2 box;
@@ -374,11 +393,13 @@ bool CLevelGraph::create_straight_path(u32 start_vertex_id, const Fvector2& star
     Fvector pos3d;
     unpack_xz(vertex(start_vertex_id), temp.x, temp.y);
 
-    if (bClearPath) {
+    if (bClearPath)
+    {
         tpaOutputPoints.clear();
         tpaOutputNodes.clear();
     }
-    if (bAddFirstPoint) {
+    if (bAddFirstPoint)
+    {
         pos3d = v3d(start_point);
         pos3d.y = vertex_plane_y(start_vertex_id, start_point.x, start_point.y);
         tpaOutputPoints.push_back(pos3d);
@@ -394,17 +415,20 @@ bool CLevelGraph::create_straight_path(u32 start_vertex_id, const Fvector2& star
         for (; I != E; ++I)
         {
             u32 next_vertex_id = value(cur_vertex_id, I);
-            if ((next_vertex_id == prev_vertex_id) || !valid_vertex_id(next_vertex_id)) continue;
+            if ((next_vertex_id == prev_vertex_id) || !valid_vertex_id(next_vertex_id))
+                continue;
             CVertex* v = vertex(next_vertex_id);
             unpack_xz(v, temp.x, temp.y);
             box.min = box.max = temp;
             box.grow(identity);
-            if (box.pick_exact(start, dir)) {
+            if (box.pick_exact(start, dir))
+            {
                 Fvector2 temp;
                 temp.add(box.min, box.max);
                 temp.mul(.5f);
                 float dist = _sqr(temp.x - dest.x) + _sqr(temp.y - dest.y);
-                if (dist > cur_sqr) continue;
+                if (dist > cur_sqr)
+                    continue;
 
                 Fvector2 next1, next2;
 #ifdef DEBUG
@@ -444,13 +468,15 @@ bool CLevelGraph::create_straight_path(u32 start_vertex_id, const Fvector2& star
                 VERIFY(_valid(next2));
                 u32 dwIntersect = intersect(start_point.x, start_point.y, finish_point.x, finish_point.y, next1.x,
                     next1.y, next2.x, next2.y, &tIntersectPoint.x, &tIntersectPoint.z);
-                if (!dwIntersect) continue;
+                if (!dwIntersect)
+                    continue;
                 tIntersectPoint.y = vertex_plane_y(vertex(cur_vertex_id), tIntersectPoint.x, tIntersectPoint.z);
 
                 tpaOutputPoints.push_back(tIntersectPoint);
                 tpaOutputNodes.push_back(cur_vertex_id);
 
-                if (dest_xz == v->position().xz()) return (true);
+                if (dest_xz == v->position().xz())
+                    return (true);
 
                 cur_sqr = dist;
                 found = true;
@@ -459,7 +485,8 @@ bool CLevelGraph::create_straight_path(u32 start_vertex_id, const Fvector2& star
                 break;
             }
         }
-        if (!found) return (false);
+        if (!found)
+            return (false);
     }
 }
 
@@ -513,16 +540,19 @@ bool CLevelGraph::neighbour_in_direction(const Fvector& direction, u32 start_ver
     for (; I != E; ++I)
     {
         u32 next_vertex_id = value(cur_vertex_id, I);
-        if ((next_vertex_id == prev_vertex_id) || !is_accessible(next_vertex_id)) continue;
+        if ((next_vertex_id == prev_vertex_id) || !is_accessible(next_vertex_id))
+            continue;
         unpack_xz(vertex(next_vertex_id), temp.x, temp.y);
         box.min = box.max = temp;
         box.grow(identity);
-        if (box.pick_exact(start, dir)) {
+        if (box.pick_exact(start, dir))
+        {
             Fvector2 temp;
             temp.add(box.min, box.max);
             temp.mul(.5f);
             float dist = _sqr(temp.x - dest.x) + _sqr(temp.y - dest.y);
-            if (dist > cur_sqr) continue;
+            if (dist > cur_sqr)
+                continue;
             return (true);
         }
     }

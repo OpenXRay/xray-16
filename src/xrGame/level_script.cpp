@@ -41,20 +41,9 @@
 using namespace luabind;
 using namespace luabind::policy;
 
-LPCSTR command_line()
-{
-    return (Core.Params);
-}
-bool IsDynamicMusic()
-{
-    return !!psActorFlags.test(AF_DYNAMIC_MUSIC);
-}
-
-bool IsImportantSave()
-{
-    return !!psActorFlags.test(AF_IMPORTANT_SAVE);
-}
-
+LPCSTR command_line() { return (Core.Params); }
+bool IsDynamicMusic() { return !!psActorFlags.test(AF_DYNAMIC_MUSIC); }
+bool IsImportantSave() { return !!psActorFlags.test(AF_IMPORTANT_SAVE); }
 #ifdef DEBUG
 void check_object(CScriptGameObject* object)
 {
@@ -71,7 +60,8 @@ void check_object(CScriptGameObject* object)
 CScriptGameObject* tpfGetActor()
 {
     static bool first_time = true;
-    if (first_time) ai().script_engine().script_log(LuaMessageType::Error, "Do not use level.actor function!");
+    if (first_time)
+        ai().script_engine().script_log(LuaMessageType::Error, "Do not use level.actor function!");
     first_time = false;
 
     CActor* l_tpActor = smart_cast<CActor*>(Level().CurrentEntity());
@@ -84,7 +74,8 @@ CScriptGameObject* tpfGetActor()
 CScriptGameObject* get_object_by_name(LPCSTR caObjectName)
 {
     static bool first_time = true;
-    if (first_time) ai().script_engine().script_log(LuaMessageType::Error, "Do not use level.object function!");
+    if (first_time)
+        ai().script_engine().script_log(LuaMessageType::Error, "Do not use level.object function!");
     first_time = false;
 
     CGameObject* l_tpGameObject = smart_cast<CGameObject*>(Level().Objects.FindObjectByName(caObjectName));
@@ -98,21 +89,18 @@ CScriptGameObject* get_object_by_name(LPCSTR caObjectName)
 CScriptGameObject* get_object_by_id(u16 id)
 {
     CGameObject* pGameObject = smart_cast<CGameObject*>(Level().Objects.net_Find(id));
-    if (!pGameObject) return NULL;
+    if (!pGameObject)
+        return NULL;
 
     return pGameObject->lua_game_object();
 }
 
-LPCSTR get_weather()
-{
-    return (*g_pGamePersistent->Environment().GetWeather());
-}
-
+LPCSTR get_weather() { return (*g_pGamePersistent->Environment().GetWeather()); }
 void set_weather(LPCSTR weather_name, bool forced)
 {
 #ifdef INGAME_EDITOR
     if (!Device.editor())
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
         g_pGamePersistent->Environment().SetWeather(weather_name, forced);
 }
 
@@ -120,57 +108,43 @@ bool set_weather_fx(LPCSTR weather_name)
 {
 #ifdef INGAME_EDITOR
     if (!Device.editor())
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
         return (g_pGamePersistent->Environment().SetWeatherFX(weather_name));
 
 #ifdef INGAME_EDITOR
     return (false);
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 }
 
 bool start_weather_fx_from_time(LPCSTR weather_name, float time)
 {
 #ifdef INGAME_EDITOR
     if (!Device.editor())
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
         return (g_pGamePersistent->Environment().StartWeatherFXFromTime(weather_name, time));
 
 #ifdef INGAME_EDITOR
     return (false);
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 }
 
-bool is_wfx_playing()
-{
-    return (g_pGamePersistent->Environment().IsWFXPlaying());
-}
-
-float get_wfx_time()
-{
-    return (g_pGamePersistent->Environment().wfx_time);
-}
-
-void stop_weather_fx()
-{
-    g_pGamePersistent->Environment().StopWFX();
-}
-
+bool is_wfx_playing() { return (g_pGamePersistent->Environment().IsWFXPlaying()); }
+float get_wfx_time() { return (g_pGamePersistent->Environment().wfx_time); }
+void stop_weather_fx() { g_pGamePersistent->Environment().StopWFX(); }
 void set_time_factor(float time_factor)
 {
-    if (!OnServer()) return;
+    if (!OnServer())
+        return;
 
 #ifdef INGAME_EDITOR
-    if (Device.editor()) return;
-#endif  // #ifdef INGAME_EDITOR
+    if (Device.editor())
+        return;
+#endif // #ifdef INGAME_EDITOR
 
     Level().Server->GetGameState()->SetGameTimeFactor(time_factor);
 }
 
-float get_time_factor()
-{
-    return (Level().GetGameTimeFactor());
-}
-
+float get_time_factor() { return (Level().GetGameTimeFactor()); }
 void set_game_difficulty(ESingleGameDifficulty dif)
 {
     g_SingleGameDifficulty = dif;
@@ -178,11 +152,7 @@ void set_game_difficulty(ESingleGameDifficulty dif)
     VERIFY(game);
     game->OnDifficultyChanged();
 }
-ESingleGameDifficulty get_game_difficulty()
-{
-    return g_SingleGameDifficulty;
-}
-
+ESingleGameDifficulty get_game_difficulty() { return g_SingleGameDifficulty; }
 u32 get_time_days()
 {
     u32 year = 0, month = 0, day = 0, hours = 0, mins = 0, secs = 0, milisecs = 0;
@@ -210,10 +180,11 @@ u32 get_time_minutes()
 void change_game_time(u32 days, u32 hours, u32 mins)
 {
     game_sv_Single* tpGame = smart_cast<game_sv_Single*>(Level().Server->GetGameState());
-    if (tpGame && ai().get_alife()) {
+    if (tpGame && ai().get_alife())
+    {
         u32 value = days * 86400 + hours * 3600 + mins * 60;
         float fValue = static_cast<float>(value);
-        value *= 1000;  // msec
+        value *= 1000; // msec
         g_pGamePersistent->Environment().ChangeGameTime(fValue);
         tpGame->alife().time_manager().change_game_time(value);
     }
@@ -233,11 +204,7 @@ float low_cover_in_direction(u32 level_vertex_id, const Fvector& direction)
     return (ai().level_graph().low_cover_in_direction(y, level_vertex_id));
 }
 
-float rain_factor()
-{
-    return (g_pGamePersistent->Environment().CurrentEnv->rain_density);
-}
-
+float rain_factor() { return (g_pGamePersistent->Environment().CurrentEnv->rain_density); }
 u32 vertex_in_direction(u32 level_vertex_id, Fvector direction, float max_distance)
 {
     direction.normalize_safe();
@@ -249,15 +216,12 @@ u32 vertex_in_direction(u32 level_vertex_id, Fvector direction, float max_distan
     return (ai().level_graph().valid_vertex_id(result) ? result : level_vertex_id);
 }
 
-Fvector vertex_position(u32 level_vertex_id)
-{
-    return (ai().level_graph().vertex_position(level_vertex_id));
-}
-
+Fvector vertex_position(u32 level_vertex_id) { return (ai().level_graph().vertex_position(level_vertex_id)); }
 void map_add_object_spot(u16 id, LPCSTR spot_type, LPCSTR text)
 {
     CMapLocation* ml = Level().MapManager().AddMapLocation(spot_type, id);
-    if (xr_strlen(text)) {
+    if (xr_strlen(text))
+    {
         ml->SetHint(text);
     }
 }
@@ -265,7 +229,8 @@ void map_add_object_spot(u16 id, LPCSTR spot_type, LPCSTR text)
 void map_add_object_spot_ser(u16 id, LPCSTR spot_type, LPCSTR text)
 {
     CMapLocation* ml = Level().MapManager().AddMapLocation(spot_type, id);
-    if (xr_strlen(text)) ml->SetHint(text);
+    if (xr_strlen(text))
+        ml->SetHint(text);
 
     ml->SetSerializable(true);
 }
@@ -273,39 +238,17 @@ void map_add_object_spot_ser(u16 id, LPCSTR spot_type, LPCSTR text)
 void map_change_spot_hint(u16 id, LPCSTR spot_type, LPCSTR text)
 {
     CMapLocation* ml = Level().MapManager().GetMapLocation(spot_type, id);
-    if (!ml) return;
+    if (!ml)
+        return;
     ml->SetHint(text);
 }
 
-void map_remove_object_spot(u16 id, LPCSTR spot_type)
-{
-    Level().MapManager().RemoveMapLocation(spot_type, id);
-}
-
-u16 map_has_object_spot(u16 id, LPCSTR spot_type)
-{
-    return Level().MapManager().HasMapLocation(spot_type, id);
-}
-
-bool patrol_path_exists(LPCSTR patrol_path)
-{
-    return (!!ai().patrol_paths().path(patrol_path, true));
-}
-
-LPCSTR get_name()
-{
-    return (*Level().name());
-}
-
-void prefetch_sound(LPCSTR name)
-{
-    Level().PrefetchSound(name);
-}
-
-CClientSpawnManager& get_client_spawn_manager()
-{
-    return (Level().client_spawn_manager());
-}
+void map_remove_object_spot(u16 id, LPCSTR spot_type) { Level().MapManager().RemoveMapLocation(spot_type, id); }
+u16 map_has_object_spot(u16 id, LPCSTR spot_type) { return Level().MapManager().HasMapLocation(spot_type, id); }
+bool patrol_path_exists(LPCSTR patrol_path) { return (!!ai().patrol_paths().path(patrol_path, true)); }
+LPCSTR get_name() { return (*Level().name()); }
+void prefetch_sound(LPCSTR name) { Level().PrefetchSound(name); }
+CClientSpawnManager& get_client_spawn_manager() { return (Level().client_spawn_manager()); }
 /*
 void start_stop_menu(CUIDialogWnd* pDialog, bool bDoHideIndicators)
 {
@@ -316,19 +259,12 @@ void start_stop_menu(CUIDialogWnd* pDialog, bool bDoHideIndicators)
 }
 */
 
-void add_dialog_to_render(CUIDialogWnd* pDialog)
-{
-    CurrentGameUI()->AddDialogToRender(pDialog);
-}
-
-void remove_dialog_to_render(CUIDialogWnd* pDialog)
-{
-    CurrentGameUI()->RemoveDialogToRender(pDialog);
-}
-
+void add_dialog_to_render(CUIDialogWnd* pDialog) { CurrentGameUI()->AddDialogToRender(pDialog); }
+void remove_dialog_to_render(CUIDialogWnd* pDialog) { CurrentGameUI()->RemoveDialogToRender(pDialog); }
 void hide_indicators()
 {
-    if (CurrentGameUI()) {
+    if (CurrentGameUI())
+    {
         CurrentGameUI()->HideShownDialogs();
         CurrentGameUI()->ShowGameIndicators(false);
         CurrentGameUI()->ShowCrosshair(false);
@@ -338,7 +274,8 @@ void hide_indicators()
 
 void hide_indicators_safe()
 {
-    if (CurrentGameUI()) {
+    if (CurrentGameUI())
+    {
         CurrentGameUI()->ShowGameIndicators(false);
         CurrentGameUI()->ShowCrosshair(false);
 
@@ -349,23 +286,16 @@ void hide_indicators_safe()
 
 void show_indicators()
 {
-    if (CurrentGameUI()) {
+    if (CurrentGameUI())
+    {
         CurrentGameUI()->ShowGameIndicators(true);
         CurrentGameUI()->ShowCrosshair(true);
     }
     psActorFlags.set(AF_GODMODE_RT, FALSE);
 }
 
-void show_weapon(bool b)
-{
-    psHUD_Flags.set(HUD_WEAPON_RT2, b);
-}
-
-bool is_level_present()
-{
-    return (!!g_pGameLevel);
-}
-
+void show_weapon(bool b) { psHUD_Flags.set(HUD_WEAPON_RT2, b); }
+bool is_level_present() { return (!!g_pGameLevel); }
 void add_call(const luabind::functor<bool>& condition, const luabind::functor<void>& action)
 {
     luabind::functor<bool> _condition = condition;
@@ -432,41 +362,26 @@ cphysics_world_scripted* physics_world_scripted()
 {
     return get_script_wrapper<cphysics_world_scripted>(*physics_world());
 }
-CEnvironment* environment()
-{
-    return (g_pGamePersistent->pEnvironment);
-}
-
-CEnvDescriptor* current_environment(CEnvironment* self)
-{
-    return (self->CurrentEnv);
-}
+CEnvironment* environment() { return (g_pGamePersistent->pEnvironment); }
+CEnvDescriptor* current_environment(CEnvironment* self) { return (self->CurrentEnv); }
 extern bool g_bDisableAllInput;
 void disable_input()
 {
     g_bDisableAllInput = true;
 #ifdef DEBUG
     Msg("input disabled");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 }
 void enable_input()
 {
     g_bDisableAllInput = false;
 #ifdef DEBUG
     Msg("input enabled");
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 }
 
-void spawn_phantom(const Fvector& position)
-{
-    Level().spawn_item("m_phantom", position, u32(-1), u16(-1), false);
-}
-
-Fbox get_bounding_volume()
-{
-    return Level().ObjectSpace.GetBoundingVolume();
-}
-
+void spawn_phantom(const Fvector& position) { Level().spawn_item("m_phantom", position, u32(-1), u16(-1), false); }
+Fbox get_bounding_volume() { return Level().ObjectSpace.GetBoundingVolume(); }
 void iterate_sounds(LPCSTR prefix, u32 max_count, const CScriptCallbackEx<void>& callback)
 {
     for (int j = 0, N = _GetItemCount(prefix); j < N; ++j)
@@ -474,13 +389,15 @@ void iterate_sounds(LPCSTR prefix, u32 max_count, const CScriptCallbackEx<void>&
         string_path fn, s;
         LPSTR S = (LPSTR)&s;
         _GetItem(prefix, j, s);
-        if (FS.exist(fn, "$game_sounds$", S, ".ogg")) callback(prefix);
+        if (FS.exist(fn, "$game_sounds$", S, ".ogg"))
+            callback(prefix);
 
         for (u32 i = 0; i < max_count; ++i)
         {
             string_path name;
             xr_sprintf(name, "%s%d", S, i);
-            if (FS.exist(fn, "$game_sounds$", name, ".ogg")) callback(name);
+            if (FS.exist(fn, "$game_sounds$", name, ".ogg"))
+                callback(name);
         }
     }
 }
@@ -522,16 +439,8 @@ float add_cam_effector2(LPCSTR fn, int id, bool cyclic, LPCSTR cb_func, float ca
     return e->GetAnimatorLength();
 }
 
-void remove_cam_effector(int id)
-{
-    Actor()->Cameras().RemoveCamEffector((ECamEffectorType)id);
-}
-
-float get_snd_volume()
-{
-    return psSoundVFactor;
-}
-
+void remove_cam_effector(int id) { Actor()->Cameras().RemoveCamEffector((ECamEffectorType)id); }
+float get_snd_volume() { return psSoundVFactor; }
 void set_snd_volume(float v)
 {
     psSoundVFactor = v;
@@ -548,22 +457,10 @@ void add_actor_points_str(LPCSTR sect, LPCSTR detail_key, LPCSTR str_value)
     return Actor()->StatisticMgr().AddPoints(sect, detail_key, str_value);
 }
 
-int get_actor_points(LPCSTR sect)
-{
-    return Actor()->StatisticMgr().GetSectionPoints(sect);
-}
-
+int get_actor_points(LPCSTR sect) { return Actor()->StatisticMgr().GetSectionPoints(sect); }
 #include "ActorEffector.h"
-void add_complex_effector(LPCSTR section, int id)
-{
-    AddEffector(Actor(), id, section);
-}
-
-void remove_complex_effector(int id)
-{
-    RemoveEffector(Actor(), id);
-}
-
+void add_complex_effector(LPCSTR section, int id) { AddEffector(Actor(), id, section); }
+void remove_complex_effector(int id) { RemoveEffector(Actor(), id); }
 #include "postprocessanimator.h"
 void add_pp_effector(LPCSTR fn, int id, bool cyclic)
 {
@@ -576,21 +473,24 @@ void remove_pp_effector(int id)
 {
     CPostprocessAnimator* pp = smart_cast<CPostprocessAnimator*>(Actor()->Cameras().GetPPEffector((EEffectorPPType)id));
 
-    if (pp) pp->Stop(1.0f);
+    if (pp)
+        pp->Stop(1.0f);
 }
 
 void set_pp_effector_factor(int id, float f, float f_sp)
 {
     CPostprocessAnimator* pp = smart_cast<CPostprocessAnimator*>(Actor()->Cameras().GetPPEffector((EEffectorPPType)id));
 
-    if (pp) pp->SetDesiredFactor(f, f_sp);
+    if (pp)
+        pp->SetDesiredFactor(f, f_sp);
 }
 
 void set_pp_effector_factor2(int id, float f)
 {
     CPostprocessAnimator* pp = smart_cast<CPostprocessAnimator*>(Actor()->Cameras().GetPPEffector((EEffectorPPType)id));
 
-    if (pp) pp->SetCurrentFactor(f);
+    if (pp)
+        pp->SetCurrentFactor(f);
 }
 
 #include "relation_registry.h"
@@ -645,7 +545,8 @@ int g_get_general_goodwill_between(u16 from, u16 to)
     CSE_ALifeTraderAbstract* from_obj = smart_cast<CSE_ALifeTraderAbstract*>(ai().alife().objects().object(from));
     CSE_ALifeTraderAbstract* to_obj = smart_cast<CSE_ALifeTraderAbstract*>(ai().alife().objects().object(to));
 
-    if (!from_obj || !to_obj) {
+    if (!from_obj || !to_obj)
+    {
         ai().script_engine().script_log(LuaMessageType::Error,
             "RELATION_REGISTRY::get_general_goodwill_between  : cannot convert obj to CSE_ALifeTraderAbstract!");
         return (0);
@@ -657,46 +558,33 @@ int g_get_general_goodwill_between(u16 from, u16 to)
     return presonal_goodwill + community_to_obj_goodwill + community_to_community_goodwill;
 }
 
-u32 vertex_id(Fvector position)
-{
-    return (ai().level_graph().vertex_id(position));
-}
-
-u32 render_get_dx_level()
-{
-    return GlobalEnv.Render->get_dx_level();
-}
-
+u32 vertex_id(Fvector position) { return (ai().level_graph().vertex_id(position)); }
+u32 render_get_dx_level() { return GlobalEnv.Render->get_dx_level(); }
 CUISequencer* g_tutorial = NULL;
 CUISequencer* g_tutorial2 = NULL;
 
 void start_tutorial(LPCSTR name)
 {
-    if (g_tutorial) {
+    if (g_tutorial)
+    {
         VERIFY(!g_tutorial2);
         g_tutorial2 = g_tutorial;
     };
 
     g_tutorial = new CUISequencer();
     g_tutorial->Start(name);
-    if (g_tutorial2) g_tutorial->m_pStoredInputReceiver = g_tutorial2->m_pStoredInputReceiver;
+    if (g_tutorial2)
+        g_tutorial->m_pStoredInputReceiver = g_tutorial2->m_pStoredInputReceiver;
 }
 
 void stop_tutorial()
 {
-    if (g_tutorial) g_tutorial->Stop();
+    if (g_tutorial)
+        g_tutorial->Stop();
 }
 
-LPCSTR translate_string(LPCSTR str)
-{
-    return *CStringTable().translate(str);
-}
-
-bool has_active_tutotial()
-{
-    return (g_tutorial != NULL);
-}
-
+LPCSTR translate_string(LPCSTR str) { return *CStringTable().translate(str); }
+bool has_active_tutotial() { return (g_tutorial != NULL); }
 IC static void CLevel_Export(lua_State* luaState)
 {
     class_<CEnvDescriptor>("CEnvDescriptor")

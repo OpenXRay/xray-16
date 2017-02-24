@@ -13,7 +13,6 @@ class CGroupObject : public CCustomObject
         CCustomObject* pObject;
 
         SGroupObjectItem() : pObject(NULL) {}
-
         bool operator==(const CCustomObject* obj) { return obj == pObject; }
     };
 
@@ -27,12 +26,11 @@ class CGroupObject : public CCustomObject
     void __stdcall OnFreezeAllClick(ButtonValue* sender, bool& bModif, bool& bSafe);
     void ClearInternal(ObjectsInGroup& v);
 
-  public:
+public:
     void Clear1() { ClearInternal(m_ObjectsInGroup); };
-
     bool UpdateReference(bool bForceReload);
 
-  public:
+public:
     CGroupObject(LPVOID data, LPCSTR name);
     void Construct(LPVOID data);
     virtual ~CGroupObject();
@@ -51,15 +49,12 @@ class CGroupObject : public CCustomObject
     bool SetReference(LPCSTR nm);
 
     virtual LPCSTR RefName() { return m_ReferenceName_.size() ? m_ReferenceName_.c_str() : "group"; }
-
     bool RefCompare(LPCSTR nm) { return m_ReferenceName_.equal(nm); }
-
     void SetRefName(LPCSTR nm);
     void UpdatePivot(LPCSTR nm, bool center);
     virtual bool GetBox(Fbox& box) const;
 
     virtual bool CanAttach() { return false; }
-
     virtual void NumSetPosition(const Fvector& pos);
     virtual void NumSetRotation(const Fvector& rot);
     virtual void NumSetScale(const Fvector& scale);

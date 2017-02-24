@@ -36,4 +36,4 @@ void ValidateState(D3D_BLEND_DESC& desc);
 void ValidateState(D3D_SAMPLER_DESC& desc);
 };
 
-#endif  //	dx10StateUtils_included
+#endif //	dx10StateUtils_included

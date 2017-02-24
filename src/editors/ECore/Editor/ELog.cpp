@@ -11,11 +11,14 @@
 #include "ui_main.h"
 void __stdcall ELogCallback(LPCSTR txt)
 {
-    if (0 == txt[0]) return;
+    if (0 == txt[0])
+        return;
     bool bDlg = ('#' == txt[0]) || ((0 != txt[1]) && ('#' == txt[1]));
     TMsgDlgType mt = ('!' == txt[0]) || ((0 != txt[1]) && ('!' == txt[1])) ? mtError : mtInformation;
-    if (('!' == txt[0]) || ('#' == txt[0])) txt++;
-    if (('!' == txt[0]) || ('#' == txt[0])) txt++;
+    if (('!' == txt[0]) || ('#' == txt[0]))
+        txt++;
+    if (('!' == txt[0]) || ('#' == txt[0]))
+        txt++;
     if (bDlg)
         TfrmLog::AddDlgMessage(mt, txt);
     else
@@ -27,12 +30,16 @@ void __stdcall ELogCallback(LPCSTR txt)
 extern "C" LWMessageFuncs* g_msg;
 void ELogCallback(void* context, LPCSTR txt)
 {
-    if (0 == txt[0]) return;
+    if (0 == txt[0])
+        return;
     bool bDlg = ('#' == txt[0]) || ((0 != txt[1]) && ('#' == txt[1]));
-    if (bDlg) {
+    if (bDlg)
+    {
         int mt = ('!' == txt[0]) || ((0 != txt[1]) && ('!' == txt[1])) ? 1 : 0;
-        if (('!' == txt[0]) || ('#' == txt[0])) txt++;
-        if (('!' == txt[0]) || ('#' == txt[0])) txt++;
+        if (('!' == txt[0]) || ('#' == txt[0]))
+            txt++;
+        if (('!' == txt[0]) || ('#' == txt[0]))
+            txt++;
         if (mt == 1)
             g_msg->error(txt, 0);
         else
@@ -44,7 +51,8 @@ void ELogCallback(void* context, LPCSTR txt)
 #include "NetDeviceLog.h"
 void ELogCallback(void* context, LPCSTR txt)
 {
-    if (0 != txt[0]) {
+    if (0 != txt[0])
+    {
         if (txt[0] == '!')
             EConsole.print(mtError, txt + 1);
         else
@@ -55,7 +63,8 @@ void ELogCallback(void* context, LPCSTR txt)
 #ifdef _MAYA_PLUGIN
 void ELogCallback(void* context, LPCSTR txt)
 {
-    if (0 != txt[0]) {
+    if (0 != txt[0])
+    {
         if (txt[0] == '!')
             std::cerr << "XR-Error: " << txt + 1 << "\n";
         else
@@ -85,7 +94,8 @@ int CLog::DlgMsg(TMsgDlgType mt, TMsgDlgButtons btn, LPCSTR _Format, ...)
     ExecCommand(COMMAND_RENDER_FOCUS);
 
     res = MessageDlg(buf, mt, btn, 0);
-    if (mtConfirmation == mt) {
+    if (mtConfirmation == mt)
+    {
         switch (res)
         {
         case mrYes: strcat(buf, " - Yes."); break;
@@ -136,7 +146,8 @@ int CLog::DlgMsg(TMsgDlgType mt, LPCSTR _Format, ...)
     else
         res = MessageDlg(buf, mt, TMsgDlgButtons() << mbOK, 0);
 
-    if (mtConfirmation == mt) {
+    if (mtConfirmation == mt)
+    {
         switch (res)
         {
         case mrYes: strcat(buf, " - Yes."); break;

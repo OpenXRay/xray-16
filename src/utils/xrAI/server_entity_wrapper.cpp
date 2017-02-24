@@ -17,11 +17,7 @@
 
 class IServerEntity;
 
-CServerEntityWrapper::~CServerEntityWrapper()
-{
-    F_entity_Destroy(m_object);
-}
-
+CServerEntityWrapper::~CServerEntityWrapper() { F_entity_Destroy(m_object); }
 void CServerEntityWrapper::save(IWriter& stream)
 {
     NET_Packet net_packet;

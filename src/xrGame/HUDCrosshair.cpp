@@ -14,10 +14,7 @@ CHUDCrosshair::CHUDCrosshair()
     radius = 0;
 }
 
-CHUDCrosshair::~CHUDCrosshair()
-{
-}
-
+CHUDCrosshair::~CHUDCrosshair() {}
 void CHUDCrosshair::Load()
 {
     //все размеры в процентах от длины экрана
@@ -65,7 +62,7 @@ void CHUDCrosshair::OnRenderFirstBulletDispertion()
 
     GlobalEnv.UIRender->StartPrimitive(10, IUIRender::ptLineList, UI().m_currentPointType);
 
-    u32 fb_cross_color = color_rgba(255, 0, 0, 255);  // red
+    u32 fb_cross_color = color_rgba(255, 0, 0, 255); // red
 
     float cross_length = /*cross_length_perc*/ 0.008f * scr_size.x;
     float min_radius = min_radius_perc * scr_size.x;
@@ -146,11 +143,13 @@ void CHUDCrosshair::OnRender()
     GlobalEnv.UIRender->SetShader(*hShader);
     GlobalEnv.UIRender->FlushPrimitive();
 
-    if (!fsimilar(target_radius, radius)) {
+    if (!fsimilar(target_radius, radius))
+    {
         // here was crosshair innertion emulation
         radius = target_radius;
     };
 #ifdef DEBUG
-    if (g_bDrawFirstBulletCrosshair) OnRenderFirstBulletDispertion();
+    if (g_bDrawFirstBulletCrosshair)
+        OnRenderFirstBulletDispertion();
 #endif
 }

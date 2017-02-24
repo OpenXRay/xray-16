@@ -47,7 +47,6 @@ public:
 
 private:
     void switch_Phase(u32 new_phase) { inherited::switch_Phase(new_phase); };
-
 protected:
     virtual void OnSwitchPhase(u32 old_phase, u32 new_phase);
 
@@ -57,7 +56,6 @@ protected:
     virtual shared_str shedule_Name() const { return shared_str("game_cl_GameState"); };
     virtual float shedule_Scale() { return 1.0f; };
     virtual bool shedule_Needed() { return true; };
-
     void sv_GameEventGen(NET_Packet& P);
     void sv_EventSend(NET_Packet& P);
 
@@ -69,7 +67,7 @@ public:
     virtual void Init(){};
     virtual void net_import_state(NET_Packet& P);
     virtual void net_import_update(NET_Packet& P);
-    virtual void net_import_GameTime(NET_Packet& P);  // update GameTime only for remote clients
+    virtual void net_import_GameTime(NET_Packet& P); // update GameTime only for remote clients
     virtual void net_signal(NET_Packet& P);
 
     virtual bool OnKeyboardPress(int key);
@@ -78,7 +76,6 @@ public:
     void OnGameMessage(NET_Packet& P);
 
     virtual char* getTeamSection(int Team) { return NULL; };
-
     game_PlayerState* GetPlayerByGameID(u32 GameID);
     game_PlayerState* GetPlayerByOrderID(u32 id);
     ClientID GetClientIDByOrderID(u32 id);
@@ -112,7 +109,6 @@ public:
     virtual bool IsEnemy(game_PlayerState* ps) { return false; };
     virtual bool IsEnemy(CEntityAlive* ea1, CEntityAlive* ea2) { return false; };
     virtual bool PlayerCanSprint(CActor* pActor) { return true; };
-
     virtual void OnSpawn(IGameObject* pObj){};
     virtual void OnDestroy(IGameObject* pObj){};
 

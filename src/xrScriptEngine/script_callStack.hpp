@@ -20,7 +20,6 @@ public:
     ~CScriptCallStack();
 
     int GetLevel() { return m_nCurrentLevel; }
-
     void SetStackTraceLevel(int);
 
 protected:

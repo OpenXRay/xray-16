@@ -29,7 +29,6 @@ public:
 
     static LPCSTR* GetRTNames() { return m_pRTNames; }
     static LPCSTR* GetResourceRTNames() { return m_pResourceRTNames; }
-
 private:
     enum RendererShader
     {
@@ -109,4 +108,4 @@ private:
     xr_vector<ISpatial*> m_lstRenderables;
 };
 
-#endif  //	dx103DFluidRenderer_included
+#endif //	dx103DFluidRenderer_included

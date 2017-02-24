@@ -9,7 +9,6 @@ class net_global_data_impl<gl_lm_data>
 {
 public:
     void init() { data_init(); }
-
 protected:
     void create_data_file(LPCSTR path);
     bool create_data(LPCSTR path);

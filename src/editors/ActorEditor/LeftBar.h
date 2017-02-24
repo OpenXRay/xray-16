@@ -26,8 +26,8 @@
 //---------------------------------------------------------------------------
 class TfraLeftBar : public TFrame
 {
-    __published :  // IDE-managed Components
-                   TPanel* paLeftBar;
+    __published : // IDE-managed Components
+                  TPanel* paLeftBar;
     TFormStorage* fsStorage;
     TMxPopupMenu* pmSceneFile;
     TMenuItem* Load1;
@@ -140,11 +140,11 @@ class TfraLeftBar : public TFrame
     void __fastcall ExportC1Click(TObject* Sender);
     void __fastcall Quit1Click(TObject* Sender);
 
-  private:  // User declarations
+private: // User declarations
     void __fastcall ShowPPMenu(TMxPopupMenu* M, TObject* btn);
     void RenameItem(LPCSTR p0, LPCSTR p1, EItemType tp);
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TfraLeftBar(TComponent* Owner);
     void UpdateBar();
     void OnTimer();

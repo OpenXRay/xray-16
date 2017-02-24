@@ -76,7 +76,8 @@ void CUIPdaWnd::Init()
     m_btn_close = UIHelper::Create3tButton(uiXml, "close_button", this);
     m_hint_wnd = UIHelper::CreateHint(uiXml, "hint_wnd");
 
-    if (IsGameTypeSingle()) {
+    if (IsGameTypeSingle())
+    {
         pUITaskWnd = new CUITaskWnd();
         pUITaskWnd->hint_wnd = m_hint_wnd;
         pUITaskWnd->Init();
@@ -111,14 +112,16 @@ void CUIPdaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     {
     case TAB_CHANGED:
     {
-        if (pWnd == UITabControl) {
+        if (pWnd == UITabControl)
+        {
             SetActiveSubdialog(UITabControl->GetActiveId());
         }
         break;
     }
     case BUTTON_CLICKED:
     {
-        if (pWnd == m_btn_close) {
+        if (pWnd == m_btn_close)
+        {
             HideDialog();
         }
         break;
@@ -134,10 +137,12 @@ void CUIPdaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 void CUIPdaWnd::Show(bool status)
 {
     inherited::Show(status);
-    if (status) {
+    if (status)
+    {
         InventoryUtilities::SendInfoToActor("ui_pda");
 
-        if (!m_pActiveDialog) {
+        if (!m_pActiveDialog)
+        {
             SetActiveSubdialog("eptTasks");
         }
         m_pActiveDialog->Show(true);
@@ -164,14 +169,17 @@ void CUIPdaWnd::Update()
 
 void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
 {
-    if (m_sActiveSection == section) return;
+    if (m_sActiveSection == section)
+        return;
 
-    if (m_pActiveDialog) {
+    if (m_pActiveDialog)
+    {
         UIMainPdaFrame->DetachChild(m_pActiveDialog);
         m_pActiveDialog->Show(false);
     }
 
-    if (section == "eptTasks") {
+    if (section == "eptTasks")
+    {
         m_pActiveDialog = pUITaskWnd;
     }
     //-	else if ( section == "eptFractionWar" )
@@ -191,7 +199,8 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
     UIMainPdaFrame->AttachChild(m_pActiveDialog);
     m_pActiveDialog->Show(true);
 
-    if (UITabControl->GetActiveId() != section) {
+    if (UITabControl->GetActiveId() != section)
+    {
         UITabControl->SetActiveTab(section);
     }
     m_sActiveSection = section;
@@ -205,7 +214,8 @@ void CUIPdaWnd::SetActiveCaption()
     TABS_VECTOR::iterator it_e = btn_vec->end();
     for (; it_b != it_e; ++it_b)
     {
-        if ((*it_b)->m_btn_id == m_sActiveSection) {
+        if ((*it_b)->m_btn_id == m_sActiveSection)
+        {
             LPCSTR cur = (*it_b)->TextItemControl()->GetText();
             string256 buf;
             strconcat(sizeof(buf), buf, m_caption_const.c_str(), cur);
@@ -217,7 +227,8 @@ void CUIPdaWnd::SetActiveCaption()
 
 void CUIPdaWnd::Show_SecondTaskWnd(bool status)
 {
-    if (status) {
+    if (status)
+    {
         SetActiveSubdialog("eptTasks");
     }
     pUITaskWnd->Show_TaskListWnd(status);
@@ -225,7 +236,8 @@ void CUIPdaWnd::Show_SecondTaskWnd(bool status)
 
 void CUIPdaWnd::Show_MapLegendWnd(bool status)
 {
-    if (status) {
+    if (status)
+    {
         SetActiveSubdialog("eptTasks");
     }
     pUITaskWnd->ShowMapLegend(status);
@@ -236,12 +248,13 @@ void CUIPdaWnd::Draw()
     inherited::Draw();
     //.	DrawUpdatedSections();
     DrawHint();
-    UINoice->Draw();  // over all
+    UINoice->Draw(); // over all
 }
 
 void CUIPdaWnd::DrawHint()
 {
-    if (m_pActiveDialog == pUITaskWnd) {
+    if (m_pActiveDialog == pUITaskWnd)
+    {
         pUITaskWnd->DrawHint();
     }
     //-	else if ( m_pActiveDialog == pUIFactionWarWnd )
@@ -262,31 +275,27 @@ void CUIPdaWnd::UpdatePda()
 {
     pUILogsWnd->UpdateNews();
 
-    if (m_pActiveDialog == pUITaskWnd) {
+    if (m_pActiveDialog == pUITaskWnd)
+    {
         pUITaskWnd->ReloadTaskInfo();
     }
 }
 
-void CUIPdaWnd::UpdateRankingWnd()
-{
-    pUIRankingWnd->Update();
-}
-
+void CUIPdaWnd::UpdateRankingWnd() { pUIRankingWnd->Update(); }
 void CUIPdaWnd::Reset()
 {
     inherited::ResetAll();
 
-    if (pUITaskWnd) pUITaskWnd->ResetAll();
+    if (pUITaskWnd)
+        pUITaskWnd->ResetAll();
     //-	if ( pUIFactionWarWnd )	pUITaskWnd->ResetAll();
-    if (pUIRankingWnd) pUIRankingWnd->ResetAll();
-    if (pUILogsWnd) pUILogsWnd->ResetAll();
+    if (pUIRankingWnd)
+        pUIRankingWnd->ResetAll();
+    if (pUILogsWnd)
+        pUILogsWnd->ResetAll();
 }
 
-void CUIPdaWnd::SetCaption(LPCSTR text)
-{
-    m_caption->SetText(text);
-}
-
+void CUIPdaWnd::SetCaption(LPCSTR text) { m_caption->SetText(text); }
 void RearrangeTabButtons(CUITabControl* pTab)
 {
     TABS_VECTOR* btn_vec = pTab->GetButtonsVector();
@@ -314,8 +323,10 @@ void RearrangeTabButtons(CUITabControl* pTab)
 
 bool CUIPdaWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (is_binded(kACTIVE_JOBS, dik)) {
-        if (WINDOW_KEY_PRESSED == keyboard_action) HideDialog();
+    if (is_binded(kACTIVE_JOBS, dik))
+    {
+        if (WINDOW_KEY_PRESSED == keyboard_action)
+            HideDialog();
 
         return true;
     }

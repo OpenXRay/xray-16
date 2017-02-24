@@ -12,22 +12,16 @@ player_multichampion::player_multichampion(game_state_accumulator* owner) : inhe
     m_can_be_multichampion = false;
 }
 
-void player_multichampion::reset_game()
-{
-    m_can_be_multichampion = false;
-}
-
-void player_multichampion::OnRoundEnd()
-{
-    m_can_be_multichampion = true;
-}
-
+void player_multichampion::reset_game() { m_can_be_multichampion = false; }
+void player_multichampion::OnRoundEnd() { m_can_be_multichampion = true; }
 u32 const player_multichampion::get_u32_param()
 {
     game_PlayerState* tmp_local_player = m_owner->get_local_player();
-    if (!tmp_local_player) return 0;
+    if (!tmp_local_player)
+        return 0;
 
-    if (!m_can_be_multichampion) return 0;
+    if (!m_can_be_multichampion)
+        return 0;
 
     s32 max_score = calculate_spots(tmp_local_player);
     s16 min_death = tmp_local_player->m_iDeaths;
@@ -43,7 +37,8 @@ u32 const player_multichampion::get_u32_param()
         s16 tmp_death = 0;
         u8 tmp_arts = 0;
         game_PlayerState* tmp_player = i->second;
-        if (tmp_player) {
+        if (tmp_player)
+        {
             tmp_score = calculate_spots(tmp_player);
             tmp_death = tmp_player->m_iDeaths;
             tmp_arts = tmp_player->af_count;
@@ -53,15 +48,18 @@ u32 const player_multichampion::get_u32_param()
             continue;
         }
 
-        if (max_score < tmp_score) {
+        if (max_score < tmp_score)
+        {
             max_score = tmp_score;
             max_score_player = tmp_player;
         }
-        if (min_death > tmp_death) {
+        if (min_death > tmp_death)
+        {
             min_death = tmp_death;
             min_death_player = tmp_player;
         }
-        if (max_arts < tmp_arts) {
+        if (max_arts < tmp_arts)
+        {
             max_arts = tmp_arts;
             max_arts_player = tmp_player;
         }
@@ -76,4 +74,4 @@ u32 const player_multichampion::get_u32_param()
     return 0;
 }
 
-}  // namespace award_system
+} // namespace award_system

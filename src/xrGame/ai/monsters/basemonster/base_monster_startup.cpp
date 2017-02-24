@@ -47,9 +47,9 @@ const float aom_attack_radius = 0.6f;
 const float aom_update_side_period = 4000;
 const float aom_prediction_factor = 1.3f;
 
-}  // namespace base_monster
+} // namespace base_monster
 
-}  // namespace detail
+} // namespace detail
 
 void CBaseMonster::Load(LPCSTR section)
 {
@@ -106,7 +106,8 @@ void CBaseMonster::Load(LPCSTR section)
     float separate_factor = READ_IF_EXISTS(pSettings, r_float, section, "separate_factor", 0.f);
     float separate_range = READ_IF_EXISTS(pSettings, r_float, section, "separate_range", 0.f);
 
-    if ((separate_factor > 0.0001f) && (separate_range > 0.01f)) {
+    if ((separate_factor > 0.0001f) && (separate_range > 0.01f))
+    {
         m_steer_manager = new steering_behaviour::manager();
 
         m_grouping_behaviour = new squad_grouping_behaviour(
@@ -129,7 +130,8 @@ void CBaseMonster::Load(LPCSTR section)
     //------------------------------------
     m_fSkinArmor = 0.f;
     m_fHitFracMonster = 0.1f;
-    if (pSettings->line_exist(section, "protections_sect")) {
+    if (pSettings->line_exist(section, "protections_sect"))
+    {
         LPCSTR protections_sect = pSettings->r_string(section, "protections_sect");
         m_fSkinArmor = READ_IF_EXISTS(pSettings, r_float, protections_sect, "skin_armor", 0.f);
         m_fHitFracMonster = READ_IF_EXISTS(pSettings, r_float, protections_sect, "hit_fraction_monster", 0.1f);
@@ -160,7 +162,8 @@ void CBaseMonster::PostLoad(LPCSTR section)
         READ_IF_EXISTS(pSettings, r_float, section, "aom_prepare_radius", detail::base_monster::aom_prepare_radius);
     aom.max_go_close_time = READ_IF_EXISTS(pSettings, r_float, section, "aom_max_go_close_time", 8.f);
 
-    if (aom.enabled) {
+    if (aom.enabled)
+    {
         SVelocityParam& velocity_run = move().get_velocity(MonsterMovement::eVelocityParameterRunNormal);
 
         pcstr attack_on_move_anim_l =
@@ -174,7 +177,8 @@ void CBaseMonster::PostLoad(LPCSTR section)
     //------------------------------------
     // Anti-Aim ability
     //------------------------------------
-    if (pSettings->line_exist(section, "anti_aim_effectors")) {
+    if (pSettings->line_exist(section, "anti_aim_effectors"))
+    {
         SVelocityParam& velocity_stand = move().get_velocity(MonsterMovement::eVelocityParameterStand);
 
         m_anti_aim = new anti_aim_ability(this);
@@ -193,16 +197,17 @@ steering_behaviour::manager* CBaseMonster::get_steer_manager()
 }
 
 // if sound is absent just do not load that one
-#define LOAD_SOUND(sound_name, _type, _prior, _mask, _int_type)                                                        \
-    if (pSettings->line_exist(section, sound_name))                                                                    \
-        sound().add(pSettings->r_string(section, sound_name), DEFAULT_SAMPLE_COUNT, _type, _prior, u32(_mask),         \
+#define LOAD_SOUND(sound_name, _type, _prior, _mask, _int_type)                                                \
+    if (pSettings->line_exist(section, sound_name))                                                            \
+        sound().add(pSettings->r_string(section, sound_name), DEFAULT_SAMPLE_COUNT, _type, _prior, u32(_mask), \
             _int_type, m_head_bone_name);
 
 void CBaseMonster::reload(LPCSTR section)
 {
     CCustomMonster::reload(section);
 
-    if (!CCustomMonster::use_simplified_visual()) CStepManager::reload(section);
+    if (!CCustomMonster::use_simplified_visual())
+        CStepManager::reload(section);
 
     movement().reload(section);
 
@@ -236,7 +241,8 @@ void CBaseMonster::reload(LPCSTR section)
 
     // load monster type
     m_monster_type = eMonsterTypeUniversal;
-    if (pSettings->line_exist(section, "monster_type")) {
+    if (pSettings->line_exist(section, "monster_type"))
+    {
         if (xr_strcmp(pSettings->r_string(section, "monster_type"), "indoor") == 0)
             m_monster_type = eMonsterTypeIndoor;
         else if (xr_strcmp(pSettings->r_string(section, "monster_type"), "outdoor") == 0)
@@ -277,7 +283,8 @@ void CBaseMonster::reinit()
     m_force_real_speed = false;
     m_script_processing_active = false;
 
-    if (m_controlled) m_controlled->on_reinit();
+    if (m_controlled)
+        m_controlled->on_reinit();
 
     ignore_collision_hit = false;
 
@@ -311,7 +318,8 @@ void CBaseMonster::reinit()
 
 BOOL CBaseMonster::net_Spawn(CSE_Abstract* DC)
 {
-    if (!inherited::net_Spawn(DC)) return (FALSE);
+    if (!inherited::net_Spawn(DC))
+        return (FALSE);
 
     CSE_Abstract* e = (CSE_Abstract*)(DC);
     R_ASSERT2(ai().get_level_graph() && ai().get_cross_table() && (ai().level_graph().level_id() != u32(-1)),
@@ -319,7 +327,8 @@ BOOL CBaseMonster::net_Spawn(CSE_Abstract* DC)
     monster_squad().register_member((u8)g_Team(), (u8)g_Squad(), (u8)g_Group(), this);
     settings_overrides();
 
-    if (GetScriptControl()) {
+    if (GetScriptControl())
+    {
         m_control_manager->animation().reset_data();
         ProcessScripts();
     }
@@ -332,7 +341,7 @@ BOOL CBaseMonster::net_Spawn(CSE_Abstract* DC)
     //	if (ai().get_alife()) {
     //
     //		CSE_ALifeMonsterBase					*se_monster =
-    //smart_cast<CSE_ALifeMonsterBase*>(ai().alife().objects().object(ID()));
+    // smart_cast<CSE_ALifeMonsterBase*>(ai().alife().objects().object(ID()));
     //		VERIFY									(se_monster);
     //
     //		if (se_monster->m_flags.is(CSE_ALifeMonsterBase::flNeedCheckSpawnItem)) {
@@ -365,8 +374,10 @@ BOOL CBaseMonster::net_Spawn(CSE_Abstract* DC)
 void CBaseMonster::net_Destroy()
 {
     // функция должена быть вызвана перед inherited
-    if (m_controlled) m_controlled->on_destroy();
-    if (StateMan) StateMan->critical_finalize();
+    if (m_controlled)
+        m_controlled->on_destroy();
+    if (StateMan)
+        StateMan->critical_finalize();
 
     inherited::net_Destroy();
 
@@ -379,12 +390,12 @@ void CBaseMonster::net_Destroy()
 #endif
 }
 
-#define READ_SETTINGS(var, name, method, ltx, section)                                                                 \
-    {                                                                                                                  \
-        if (ltx == pSettings)                                                                                          \
-            var = ltx->method(section, name);                                                                          \
-        else if (ltx->line_exist(section, name))                                                                       \
-            var = ltx->method(section, name);                                                                          \
+#define READ_SETTINGS(var, name, method, ltx, section) \
+    {                                                  \
+        if (ltx == pSettings)                          \
+            var = ltx->method(section, name);          \
+        else if (ltx->line_exist(section, name))       \
+            var = ltx->method(section, name);          \
     \
 }
 
@@ -392,7 +403,8 @@ void CBaseMonster::settings_read(CInifile const* ini, LPCSTR section, SMonsterSe
 {
     READ_SETTINGS(data.m_fSoundThreshold, "SoundThreshold", r_float, ini, section);
 
-    if (ability_run_attack()) {
+    if (ability_run_attack())
+    {
         READ_SETTINGS(data.m_run_attack_path_dist, "RunAttack_PathDistance", r_float, ini, section);
         READ_SETTINGS(data.m_run_attack_start_dist, "RunAttack_StartDistance", r_float, ini, section);
     }
@@ -420,7 +432,8 @@ void CBaseMonster::settings_read(CInifile const* ini, LPCSTR section, SMonsterSe
     READ_SETTINGS(data.m_max_hear_dist, "max_hear_dist", r_float, ini, section);
 
     // Load attack postprocess
-    if (ini->line_exist(section, "attack_effector")) {
+    if (ini->line_exist(section, "attack_effector"))
+    {
         LPCSTR ppi_section = ini->r_string(section, "attack_effector");
 
         READ_SETTINGS(data.m_attack_effector.ppi.duality.h, "duality_h", r_float, ini, ppi_section);
@@ -469,7 +482,8 @@ void CBaseMonster::settings_overrides()
     SMonsterSettings* data;
     data = *m_base_settings;
 
-    if (spawn_ini() && spawn_ini()->section_exist("settings_overrides")) {
+    if (spawn_ini() && spawn_ini()->section_exist("settings_overrides"))
+    {
         settings_read(spawn_ini(), "settings_overrides", (*data));
     }
 
@@ -483,23 +497,27 @@ void CBaseMonster::on_before_sell(CInventoryItem* item)
     CSE_Abstract* object = Level().Server->GetGameState()->get_entity_from_eid(item->object().ID());
     VERIFY(object);
     CSE_ALifeObject* alife_object = smart_cast<CSE_ALifeObject*>(object);
-    if (alife_object) alife_object->m_flags.set(CSE_ALifeObject::flCanSave, TRUE);
+    if (alife_object)
+        alife_object->m_flags.set(CSE_ALifeObject::flCanSave, TRUE);
 }
 
 void CBaseMonster::load_critical_wound_bones()
 {
     // animation does not exist - no bones loaded
-    if (pSettings->line_exist(cNameSect(), "critical_wound_anim_head")) {
+    if (pSettings->line_exist(cNameSect(), "critical_wound_anim_head"))
+    {
         fill_bones_body_parts("critical_wound_bones_head", critical_wound_type_head);
         m_critical_wound_anim_head = pSettings->r_string(cNameSect(), "critical_wound_anim_head");
     }
 
-    if (pSettings->line_exist(cNameSect(), "critical_wound_anim_torso")) {
+    if (pSettings->line_exist(cNameSect(), "critical_wound_anim_torso"))
+    {
         fill_bones_body_parts("critical_wound_bones_torso", critical_wound_type_torso);
         m_critical_wound_anim_torso = pSettings->r_string(cNameSect(), "critical_wound_anim_torso");
     }
 
-    if (pSettings->line_exist(cNameSect(), "critical_wound_anim_legs")) {
+    if (pSettings->line_exist(cNameSect(), "critical_wound_anim_legs"))
+    {
         fill_bones_body_parts("critical_wound_bones_legs", critical_wound_type_legs);
         m_critical_wound_anim_legs = pSettings->r_string(cNameSect(), "critical_wound_anim_legs");
     }

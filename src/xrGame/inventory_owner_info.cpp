@@ -28,9 +28,9 @@ void CInventoryOwner::OnEvent(NET_Packet& P, u16 type)
         shared_str info_id;
         u8 add_info;
 
-        P.r_u16(id);           //отправитель
-        P.r_stringZ(info_id);  //номер полученной информации
-        P.r_u8(add_info);      //добавление или убирание информации
+        P.r_u16(id); //отправитель
+        P.r_stringZ(info_id); //номер полученной информации
+        P.r_u8(add_info); //добавление или убирание информации
 
         if (add_info)
             OnReceiveInfo(info_id);
@@ -53,7 +53,8 @@ bool CInventoryOwner::OnReceiveInfo(shared_str info_id) const
         return false;
 
 #ifdef DEBUG
-    if (psAI_Flags.test(aiInfoPortion)) Msg("[%s] Received Info [%s]", Name(), *info_id);
+    if (psAI_Flags.test(aiInfoPortion))
+        Msg("[%s] Received Info [%s]", Name(), *info_id);
 #endif
 
     return true;
@@ -80,13 +81,15 @@ void CInventoryOwner::OnDisableInfo(shared_str info_id) const
 //удалить запись из реестра
 
 #ifdef DEBUG
-    if (psAI_Flags.test(aiInfoPortion)) Msg("[%s] Disabled Info [%s]", Name(), info_id.c_str());
+    if (psAI_Flags.test(aiInfoPortion))
+        Msg("[%s] Disabled Info [%s]", Name(), info_id.c_str());
 #endif
 
     KNOWN_INFO_VECTOR& known_info = m_known_info_registry->registry().objects();
 
     KNOWN_INFO_VECTOR_IT it = std::find_if(known_info.begin(), known_info.end(), CFindByIDPred(info_id));
-    if (known_info.end() == it) return;
+    if (known_info.end() == it)
+        return;
     known_info.erase(it);
 }
 
@@ -99,9 +102,9 @@ void CInventoryOwner::TransferInfo(shared_str info_id, bool add_info) const
     //отправляем от нашему PDA пакет информации с номером
     NET_Packet P;
     CGameObject::u_EventGen(P, GE_INFO_TRANSFER, pThisObject->ID());
-    P.w_u16(pThisObject->ID());  //отправитель
-    P.w_stringZ(info_id);        //сообщение
-    P.w_u8(add_info ? 1 : 0);    //добавить/удалить информацию
+    P.w_u16(pThisObject->ID()); //отправитель
+    P.w_stringZ(info_id); //сообщение
+    P.w_u8(add_info ? 1 : 0); //добавить/удалить информацию
     CGameObject::u_EventSend(P);
 
     CInfoPortion info_portion;
@@ -118,9 +121,11 @@ bool CInventoryOwner::HasInfo(shared_str info_id) const
 {
     VERIFY(info_id.size());
     const KNOWN_INFO_VECTOR* known_info = m_known_info_registry->registry().objects_ptr();
-    if (!known_info) return false;
+    if (!known_info)
+        return false;
 
-    if (std::find_if(known_info->begin(), known_info->end(), CFindByIDPred(info_id)) == known_info->end()) return false;
+    if (std::find_if(known_info->begin(), known_info->end(), CFindByIDPred(info_id)) == known_info->end())
+        return false;
 
     return true;
 }

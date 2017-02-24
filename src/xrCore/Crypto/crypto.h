@@ -9,6 +9,6 @@ namespace crypto
 {
 XRCORE_API void xr_crypto_init();
 
-}  // namespace crypto
+} // namespace crypto
 
 #endif

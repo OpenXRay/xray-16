@@ -9,33 +9,17 @@
 #include "PCH.hpp"
 #include "game_graph.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
-#include "xrScriptEngine/DebugMacros.hpp"  // for THROW // XXX: move debug macros to xrCore
+#include "xrScriptEngine/DebugMacros.hpp" // for THROW // XXX: move debug macros to xrCore
 #include "Include/xrAPI/xrAPI.h"
 #include "AISpaceBase.hpp"
 
 using namespace luabind;
 using namespace luabind::policy;
 
-const CGameGraph* get_game_graph()
-{
-    return &GlobalEnv.AISpace->game_graph();
-}
-
-const CGameGraph::CHeader* get_header(const CGameGraph* self)
-{
-    return (&self->header());
-}
-
-bool get_accessible1(const CGameGraph* self, const u32& vertex_id)
-{
-    return (self->accessible(vertex_id));
-}
-
-void get_accessible2(const CGameGraph* self, const u32& vertex_id, bool value)
-{
-    self->accessible(vertex_id, value);
-}
-
+const CGameGraph* get_game_graph() { return &GlobalEnv.AISpace->game_graph(); }
+const CGameGraph::CHeader* get_header(const CGameGraph* self) { return (&self->header()); }
+bool get_accessible1(const CGameGraph* self, const u32& vertex_id) { return (self->accessible(vertex_id)); }
+void get_accessible2(const CGameGraph* self, const u32& vertex_id, bool value) { self->accessible(vertex_id, value); }
 Fvector CVertex__level_point(const CGameGraph::CVertex* vertex)
 {
     THROW(vertex);

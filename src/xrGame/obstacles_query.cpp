@@ -28,7 +28,8 @@ void obstacles_query::set_intersection(const obstacles_query& query)
         std::set_intersection(temp, temp + n, query.obstacles().begin(), query.obstacles().end(), m_obstacles.begin()),
         m_obstacles.end());
 
-    if (obstacles().size() == n) return;
+    if (obstacles().size() == n)
+        return;
 
     m_actual = false;
 }
@@ -75,8 +76,10 @@ bool obstacles_query::merge(const Fvector& position, const float& radius, const 
 {
     merge(query);
 
-    if (actual()) {
-        if (!objects_changed(position, radius)) return (false);
+    if (actual())
+    {
+        if (!objects_changed(position, radius))
+            return (false);
 
         update_objects(position, radius);
         return (true);
@@ -93,9 +96,11 @@ bool obstacles_query::objects_changed(const Fvector& position, const float& radi
     OBSTACLES::const_iterator E = obstacles().end();
     for (; I != E; ++I)
     {
-        if ((*I).first->obstacle().crc() == (*I).second) continue;
+        if ((*I).first->obstacle().crc() == (*I).second)
+            continue;
 
-        if ((*I).first->obstacle().distance_to(position) >= radius) continue;
+        if ((*I).first->obstacle().distance_to(position) >= radius)
+            continue;
 
         return (true);
     }
@@ -124,7 +129,8 @@ struct too_far_predicate
         {
             Fvector vertex_position = ai().level_graph().vertex_position(*I);
             const float distance_sqr = vertex_position.distance_to_sqr(m_position);
-            if (distance_sqr < m_radius_sqr) return (false);
+            if (distance_sqr < m_radius_sqr)
+                return (false);
         }
 
         return (true);
@@ -137,7 +143,8 @@ bool obstacles_query::remove_objects(const Fvector& position, const float& radiu
 
     OBSTACLES::iterator I = std::remove_if(m_obstacles.begin(), m_obstacles.end(), too_far_predicate(position, radius));
 
-    if (I == m_obstacles.end()) return (false);
+    if (I == m_obstacles.end())
+        return (false);
 
     m_obstacles.erase(I, m_obstacles.end());
 
@@ -150,7 +157,8 @@ bool obstacles_query::remove_objects(const Fvector& position, const float& radiu
 void obstacles_query::remove_links(IGameObject* object)
 {
     OBSTACLES::iterator I = m_obstacles.find(smart_cast<CGameObject*>(object));
-    if (I == m_obstacles.end()) return;
+    if (I == m_obstacles.end())
+        return;
 
     m_obstacles.erase(I);
 }

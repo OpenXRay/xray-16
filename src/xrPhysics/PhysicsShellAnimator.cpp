@@ -15,10 +15,12 @@ CPhysicsShellAnimator::CPhysicsShellAnimator(CPhysicsShell* _pPhysicsShell, CIni
     IPhysicsShellHolder* obj = (*(_pPhysicsShell->Elements().begin()))->PhysicsRefObject();
     m_StartXFORM.set(obj->ObjectXFORM());
     bool all_bones = true;
-    if (ini->line_exist(section, "controled_bones")) {
+    if (ini->line_exist(section, "controled_bones"))
+    {
         LPCSTR controled = ini->r_string(section, "controled_bones");
         all_bones = xr_strcmp(controled, "all") == 0;
-        if (!all_bones) CreateJoints(controled);
+        if (!all_bones)
+            CreateJoints(controled);
     }
 
     if (all_bones)

@@ -16,7 +16,8 @@ void CVisionParameters::Load(LPCSTR section, bool not_a_stalker)
     m_still_visible_time = READ_IF_EXISTS(pSettings, r_u32, section, "still_visible_time", 0);
 
 #ifndef USE_STALKER_VISION_FOR_MONSTERS
-    if (!not_a_stalker) return;
+    if (!not_a_stalker)
+        return;
 #endif
     m_min_view_distance = pSettings->r_float(section, "min_view_distance");
     m_max_view_distance = pSettings->r_float(section, "max_view_distance");

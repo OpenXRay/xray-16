@@ -23,7 +23,7 @@ struct DECLSPEC_NOVTABLE world
     virtual int CS_LUA_STUDIO_BACKEND_CALL on_error(lua_State* state) = 0;
     virtual void CS_LUA_STUDIO_BACKEND_CALL add_log_line(const char* log_line) = 0;
     virtual bool CS_LUA_STUDIO_BACKEND_CALL evaluating_watch() = 0;
-};  // struct DECLSPEC_NOVTABLE world
+}; // struct DECLSPEC_NOVTABLE world
 
 typedef void* maf_parameter;
 typedef void*(CS_LUA_STUDIO_BACKEND_CALL* maf_ptr)(maf_parameter parameter, void const*, size_t);
@@ -33,8 +33,8 @@ typedef void(CS_LUA_STUDIO_BACKEND_CALL* destroy_world_function_type)(world*& wo
 typedef void(CS_LUA_STUDIO_BACKEND_CALL* memory_allocator_function_type)(
     maf_ptr memory_allocator, maf_parameter parameter);
 typedef size_t(CS_LUA_STUDIO_BACKEND_CALL* memory_stats_function_type)();
-}  // namespace lua_studio
-}  // namespace cs
+} // namespace lua_studio
+} // namespace cs
 
 extern "C" {
 CS_LUA_STUDIO_BACKEND_API cs::lua_studio::world* CS_LUA_STUDIO_BACKEND_CALL cs_lua_studio_backend_create_world(

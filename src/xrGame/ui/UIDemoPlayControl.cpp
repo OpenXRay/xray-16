@@ -157,7 +157,7 @@ void CUIDemoPlayControl::InitAllPlayers()
 
     CStringTable st;
     m_all_players->InitPropertiesBox(Fvector2().set(0, 0), Fvector2().set(100, 200));
-    m_all_players->AddItem(st.translate("mpd_any_player").c_str(), NULL, 0);  // warning ! zero tag means Any player !
+    m_all_players->AddItem(st.translate("mpd_any_player").c_str(), NULL, 0); // warning ! zero tag means Any player !
 
     m_players->clear();
     for (u32 i = 0; i != players_count; ++i)
@@ -167,7 +167,7 @@ void CUIDemoPlayControl::InitAllPlayers()
         LPCSTR tmp_player_name = tmp_player->get_name();
         R_ASSERT(tmp_player_name);
         m_players->push_back(shared_str(tmp_player_name));
-        m_all_players->AddItem(tmp_player_name, NULL, i + 1);  // warning ! player_index = tag - 1 !!!
+        m_all_players->AddItem(tmp_player_name, NULL, i + 1); // warning ! player_index = tag - 1 !!!
     }
     m_all_players->AutoUpdateSize();
     m_all_players->Hide();
@@ -175,7 +175,8 @@ void CUIDemoPlayControl::InitAllPlayers()
 
 bool CUIDemoPlayControl::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if ((dik == DIK_LCONTROL) && (keyboard_action == WINDOW_KEY_RELEASED)) {
+    if ((dik == DIK_LCONTROL) && (keyboard_action == WINDOW_KEY_RELEASED))
+    {
         m_last_curr_pos = GetUICursor().GetCursorPosition();
         m_rewind_type->Hide();
         HideDialog();
@@ -193,7 +194,8 @@ void CUIDemoPlayControl::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 void CUIDemoPlayControl::OnPlayPause(CUIWindow* w, void* d)
 {
     StopRewind();
-    if (Device.Paused()) {
+    if (Device.Paused())
+    {
         // m_play_pause_btn->SetText("Pause");
         Device.Pause(FALSE, TRUE, TRUE, "mpdemoplay ctrl unpause");
         return;
@@ -218,11 +220,7 @@ void CUIDemoPlayControl::OnDecresaseSpeed(CUIWindow* w, void* d)
     Console->Execute("mpdemoplay_divspeed");
 }
 
-void CUIDemoPlayControl::OnRewindUntil(CUIWindow* w, void* d)
-{
-    m_rewind_type->Show(m_pbox_rect, m_rewind_type_pos);
-}
-
+void CUIDemoPlayControl::OnRewindUntil(CUIWindow* w, void* d) { m_rewind_type->Show(m_pbox_rect, m_rewind_type_pos); }
 void CUIDemoPlayControl::OnRewindTypeSelected(CUIWindow* w, void* d)
 {
     VERIFY(m_rewind_type);
@@ -233,7 +231,8 @@ void CUIDemoPlayControl::OnRewindTypeSelected(CUIWindow* w, void* d)
 
     m_last_rewind_type = static_cast<ERewindTypeTags>(tmp_item_tag);
 
-    if (tmp_item_tag == eRewindUntilStart) {
+    if (tmp_item_tag == eRewindUntilStart)
+    {
         OnRepeatRewind(NULL, NULL);
         m_rewind_type->Hide();
         return;
@@ -249,7 +248,8 @@ void CUIDemoPlayControl::OnRewindPlayerSelected(CUIWindow* w, void* d)
     VERIFY(tmp_item);
 
     u32 tmp_item_tag = tmp_item->GetTAG();
-    if (tmp_item_tag == 0) {
+    if (tmp_item_tag == 0)
+    {
         m_last_rewind_target = "";
         OnRepeatRewind(NULL, NULL);
         return;
@@ -305,9 +305,10 @@ void CUIDemoPlayControl::OnRepeatRewind(CUIWindow* w, void* d)
     };
     break;
     default: NODEFAULT;
-    };  // switch (m_last_rewind_query)
+    }; // switch (m_last_rewind_query)
 
-    if (rewind_result) UIStartRewind();
+    if (rewind_result)
+        UIStartRewind();
 }
 
 void CUIDemoPlayControl::Update()

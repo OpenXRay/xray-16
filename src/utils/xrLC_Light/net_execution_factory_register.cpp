@@ -16,9 +16,7 @@ private:
 
 public:
     tnet_execution(u32 id) : tnet_execution_base<etype>(id) { on_construct(); }
-
     explicit tnet_execution() : tnet_execution_base<etype>(u32(-1)) { on_construct(); }
-
 private:
     void on_construct()
     {
@@ -28,7 +26,6 @@ private:
             globals().get(v[i]).add_ref();
     }
     virtual net_execution_impl& implementation() { return execution_impl; };
-
     virtual void send_task(IGridUser& user, IGenericStream* outStream, u32 id)
     {
         const xr_vector<e_net_globals>& v = exe_gl_reg().get_globals(etype);
@@ -45,7 +42,8 @@ private:
         const xr_vector<e_net_globals>& v = exe_gl_reg().get_globals(etype);
         u32 size = v.size();
         for (u32 i = 0; i < size; ++i)
-            if (!globals().get(v[i]).on_task_receive(agent, sessionId, inStream)) return false;
+            if (!globals().get(v[i]).on_task_receive(agent, sessionId, inStream))
+                return false;
         return execution_impl.receive_task(agent, sessionId, inStream);
     };
     virtual void send_result(IGenericStream* outStream) { execution_impl.send_result(outStream); };
@@ -85,13 +83,12 @@ class execution_type_creator : public base_execution_type_creator
 
     virtual void set_pool_size(u32 size){};
     virtual void free_pool() { pool.clear(); }
-
     virtual net_execution* create(u32 _net_id) { return new execution(_net_id); }
     virtual net_execution* pool_create()
     {
         return new execution(u32(-1));
         // return pool.create() ;
-        return pool.create();  // spool<execution>::pool.create() ;
+        return pool.create(); // spool<execution>::pool.create() ;
     }
     virtual void pool_destroy(net_execution*& e)
     {

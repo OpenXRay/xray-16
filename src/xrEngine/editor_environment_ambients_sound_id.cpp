@@ -16,27 +16,17 @@
 using editor::environment::ambients::sound_id;
 using editor::environment::sound_channels::manager;
 
-sound_id::sound_id(manager const& manager, shared_str const& id) : m_manager(manager), m_id(id), m_property_holder(0)
-{
-}
-
+sound_id::sound_id(manager const& manager, shared_str const& id) : m_manager(manager), m_id(id), m_property_holder(0) {}
 sound_id::~sound_id()
 {
-    if (!Device.editor()) return;
+    if (!Device.editor())
+        return;
 
     ::ide().destroy(m_property_holder);
 }
 
-LPCSTR const* sound_id::collection()
-{
-    return (&*m_manager.channels_ids().begin());
-}
-
-u32 sound_id::collection_size()
-{
-    return (m_manager.channels_ids().size());
-}
-
+LPCSTR const* sound_id::collection() { return (&*m_manager.channels_ids().begin()); }
+u32 sound_id::collection_size() { return (m_manager.channels_ids().size()); }
 void sound_id::fill(editor::property_holder_collection* collection)
 {
     VERIFY(!m_property_holder);
@@ -55,9 +45,5 @@ void sound_id::fill(editor::property_holder_collection* collection)
         editor::property_holder::cannot_enter_text);
 }
 
-sound_id::property_holder_type* sound_id::object()
-{
-    return (m_property_holder);
-}
-
-#endif  // #ifdef INGAME_EDITOR
+sound_id::property_holder_type* sound_id::object() { return (m_property_holder); }
+#endif // #ifdef INGAME_EDITOR

@@ -6,7 +6,7 @@
 #include "state_move_to_point.h"
 #include "restricted_object.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -26,10 +26,7 @@ CStateMonsterSquadRestAbstract::CStateMonsterSquadRest(_Object* obj) : inherited
 }
 
 TEMPLATE_SPECIALIZATION
-CStateMonsterSquadRestAbstract::~CStateMonsterSquadRest()
-{
-}
-
+CStateMonsterSquadRestAbstract::~CStateMonsterSquadRest() {}
 TEMPLATE_SPECIALIZATION
 void CStateMonsterSquadRestAbstract::reselect_state()
 {
@@ -41,7 +38,8 @@ void CStateMonsterSquadRestAbstract::setup_substates()
 {
     state_ptr state = get_state_current();
 
-    if (current_substate == eStateSquad_Rest_Idle) {
+    if (current_substate == eStateSquad_Rest_Idle)
+    {
         SStateDataAction data;
         data.action = ACT_REST;
         data.sound_type = MonsterSound::eMonsterSoundIdle;
@@ -53,7 +51,8 @@ void CStateMonsterSquadRestAbstract::setup_substates()
         return;
     }
 
-    if (current_substate == eStateSquad_Rest_WalkAroundLeader) {
+    if (current_substate == eStateSquad_Rest_WalkAroundLeader)
+    {
         SStateDataMoveToPoint data;
         CMonsterSquad* squad = monster_squad().get_squad(object);
 
@@ -65,7 +64,8 @@ void CStateMonsterSquadRestAbstract::setup_substates()
         else
         {
             Fvector dest_pos = random_position(squad->GetLeader()->Position(), LEADER_RADIUS);
-            if (!object->control().path_builder().restrictions().accessible(dest_pos)) {
+            if (!object->control().path_builder().restrictions().accessible(dest_pos))
+            {
                 data.vertex = object->control().path_builder().restrictions().accessible_nearest(dest_pos, data.point);
             }
             else

@@ -18,14 +18,8 @@
 
 using namespace StalkerDecisionSpace;
 
-CStalkerALifePlanner::CStalkerALifePlanner(CAI_Stalker* object, LPCSTR action_name) : inherited(object, action_name)
-{
-}
-
-CStalkerALifePlanner::~CStalkerALifePlanner()
-{
-}
-
+CStalkerALifePlanner::CStalkerALifePlanner(CAI_Stalker* object, LPCSTR action_name) : inherited(object, action_name) {}
+CStalkerALifePlanner::~CStalkerALifePlanner() {}
 void CStalkerALifePlanner::setup(CAI_Stalker* object, CPropertyStorage* storage)
 {
     inherited::setup(object, storage);

@@ -22,13 +22,15 @@
 void CActor::feel_touch_new(IGameObject* O)
 {
     CPhysicsShellHolder* sh = smart_cast<CPhysicsShellHolder*>(O);
-    if (sh && sh->character_physics_support()) m_feel_touch_characters++;
+    if (sh && sh->character_physics_support())
+        m_feel_touch_characters++;
 }
 
 void CActor::feel_touch_delete(IGameObject* O)
 {
     CPhysicsShellHolder* sh = smart_cast<CPhysicsShellHolder*>(O);
-    if (sh && sh->character_physics_support()) m_feel_touch_characters--;
+    if (sh && sh->character_physics_support())
+        m_feel_touch_characters--;
 }
 
 bool CActor::feel_touch_contact(IGameObject* O)
@@ -36,9 +38,11 @@ bool CActor::feel_touch_contact(IGameObject* O)
     CInventoryItem* item = smart_cast<CInventoryItem*>(O);
     CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(O);
 
-    if (item && item->Useful() && !item->object().H_Parent()) return true;
+    if (item && item->Useful() && !item->object().H_Parent())
+        return true;
 
-    if (inventory_owner && inventory_owner != smart_cast<CInventoryOwner*>(this)) {
+    if (inventory_owner && inventory_owner != smart_cast<CInventoryOwner*>(this))
+    {
         // CPhysicsShellHolder* sh=smart_cast<CPhysicsShellHolder*>(O);
         // if(sh&&sh->character_physics_support()) m_feel_touch_characters++;
         return true;
@@ -50,12 +54,14 @@ bool CActor::feel_touch_contact(IGameObject* O)
 bool CActor::feel_touch_on_contact(IGameObject* O)
 {
     CCustomZone* custom_zone = smart_cast<CCustomZone*>(O);
-    if (!custom_zone) return (true);
+    if (!custom_zone)
+        return (true);
 
     Fsphere sphere;
     Center(sphere.P);
     sphere.R = 0.1f;
-    if (custom_zone->inside(sphere)) return (true);
+    if (custom_zone->inside(sphere))
+        return (true);
 
     return (false);
 }
@@ -63,13 +69,16 @@ bool CActor::feel_touch_on_contact(IGameObject* O)
 ICF static BOOL info_trace_callback(collide::rq_result& result, LPVOID params)
 {
     BOOL& bOverlaped = *(BOOL*)params;
-    if (result.O) {
-        if (Level().CurrentEntity() == result.O) {  // ignore self-actor
+    if (result.O)
+    {
+        if (Level().CurrentEntity() == result.O)
+        { // ignore self-actor
             return TRUE;
         }
         else
-        {  // check obstacle flag
-            if (result.O->GetSpatialData().type & STYPE_OBSTACLE) bOverlaped = TRUE;
+        { // check obstacle flag
+            if (result.O->GetSpatialData().type & STYPE_OBSTACLE)
+                bOverlaped = TRUE;
 
             return TRUE;
         }
@@ -78,7 +87,8 @@ ICF static BOOL info_trace_callback(collide::rq_result& result, LPVOID params)
     {
         //получить треугольник и узнать его материал
         CDB::TRI* T = Level().ObjectSpace.GetStaticTris() + result.element;
-        if (GMLib.GetMaterialByIdx(T->material)->Flags.is(SGameMtl::flPassable)) return TRUE;
+        if (GMLib.GetMaterialByIdx(T->material)->Flags.is(SGameMtl::flPassable))
+            return TRUE;
     }
     bOverlaped = TRUE;
     return FALSE;
@@ -86,14 +96,17 @@ ICF static BOOL info_trace_callback(collide::rq_result& result, LPVOID params)
 
 BOOL CActor::CanPickItem(const CFrustum& frustum, const Fvector& from, IGameObject* item)
 {
-    if (!item->getVisible()) return FALSE;
+    if (!item->getVisible())
+        return FALSE;
 
     BOOL bOverlaped = FALSE;
     Fvector dir, to;
     item->Center(to);
     float range = dir.sub(to, from).magnitude();
-    if (range > 0.25f) {
-        if (frustum.testSphere_dirty(to, item->Radius())) {
+    if (range > 0.25f)
+    {
+        if (frustum.testSphere_dirty(to, item->Radius()))
+        {
             dir.div(range);
             collide::ray_defs RD(from, dir, range, CDB::OPT_CULL, collide::rqtBoth);
             VERIFY(!fis_zero(RD.dir.square_magnitude()));
@@ -106,8 +119,10 @@ BOOL CActor::CanPickItem(const CFrustum& frustum, const Fvector& from, IGameObje
 
 void CActor::PickupModeUpdate()
 {
-    if (!m_bPickupMode) return;  // kUSE key pressed
-    if (!IsGameTypeSingle()) return;
+    if (!m_bPickupMode)
+        return; // kUSE key pressed
+    if (!IsGameTypeSingle())
+        return;
 
     //подбирание объекта
     if (m_pObjectWeLookingAt && m_pObjectWeLookingAt->cast_inventory_item() &&
@@ -125,7 +140,8 @@ void CActor::PickupModeUpdate()
 
     for (xr_vector<IGameObject*>::iterator it = feel_touch.begin(); it != feel_touch.end(); it++)
     {
-        if (CanPickItem(frustum, Device.vCameraPosition, *it)) PickupInfoDraw(*it);
+        if (CanPickItem(frustum, Device.vCameraPosition, *it))
+            PickupInfoDraw(*it);
     }
 }
 
@@ -133,9 +149,11 @@ void CActor::PickupModeUpdate()
 BOOL g_b_COD_PickUpMode = TRUE;
 void CActor::PickupModeUpdate_COD()
 {
-    if (Level().CurrentViewEntity() != this || !g_b_COD_PickUpMode) return;
+    if (Level().CurrentViewEntity() != this || !g_b_COD_PickUpMode)
+        return;
 
-    if (!g_Alive() || eacFirstEye != cam_active) {
+    if (!g_Alive() || eacFirstEye != cam_active)
+    {
         CurrentGameUI()->UIMainIngameWnd->SetPickUpItem(NULL);
         return;
     };
@@ -154,49 +172,66 @@ void CActor::PickupModeUpdate_COD()
         ISpatial* spatial = ISpatialResult[o_it];
         CInventoryItem* pIItem = smart_cast<CInventoryItem*>(spatial->dcast_GameObject());
 
-        if (0 == pIItem) continue;
-        if (pIItem->object().H_Parent() != NULL) continue;
-        if (!pIItem->CanTake()) continue;
-        if (smart_cast<CExplosiveRocket*>(&pIItem->object())) continue;
+        if (0 == pIItem)
+            continue;
+        if (pIItem->object().H_Parent() != NULL)
+            continue;
+        if (!pIItem->CanTake())
+            continue;
+        if (smart_cast<CExplosiveRocket*>(&pIItem->object()))
+            continue;
 
         CGrenade* pGrenade = smart_cast<CGrenade*>(spatial->dcast_GameObject());
-        if (pGrenade && !pGrenade->Useful()) continue;
+        if (pGrenade && !pGrenade->Useful())
+            continue;
 
         CMissile* pMissile = smart_cast<CMissile*>(spatial->dcast_GameObject());
-        if (pMissile && !pMissile->Useful()) continue;
+        if (pMissile && !pMissile->Useful())
+            continue;
 
         Fvector A, B, tmp;
         pIItem->object().Center(A);
-        if (A.distance_to_sqr(Position()) > 4) continue;
+        if (A.distance_to_sqr(Position()) > 4)
+            continue;
 
         tmp.sub(A, cam_Active()->vPosition);
         B.mad(cam_Active()->vPosition, cam_Active()->vDirection, tmp.dotproduct(cam_Active()->vDirection));
         float len = B.distance_to_sqr(A);
-        if (len > 1) continue;
+        if (len > 1)
+            continue;
 
-        if (maxlen > len && !pIItem->object().getDestroy()) {
+        if (maxlen > len && !pIItem->object().getDestroy())
+        {
             maxlen = len;
             pNearestItem = pIItem;
         };
     }
 
-    if (pNearestItem) {
+    if (pNearestItem)
+    {
         CFrustum frustum;
         frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
-        if (!CanPickItem(frustum, Device.vCameraPosition, &pNearestItem->object())) pNearestItem = NULL;
+        if (!CanPickItem(frustum, Device.vCameraPosition, &pNearestItem->object()))
+            pNearestItem = NULL;
     }
-    if (pNearestItem && pNearestItem->cast_game_object()) {
-        if (Level().m_feel_deny.is_object_denied(pNearestItem->cast_game_object())) pNearestItem = NULL;
+    if (pNearestItem && pNearestItem->cast_game_object())
+    {
+        if (Level().m_feel_deny.is_object_denied(pNearestItem->cast_game_object()))
+            pNearestItem = NULL;
     }
-    if (pNearestItem && pNearestItem->cast_game_object()) {
-        if (!pNearestItem->cast_game_object()->getVisible()) pNearestItem = NULL;
+    if (pNearestItem && pNearestItem->cast_game_object())
+    {
+        if (!pNearestItem->cast_game_object()->getVisible())
+            pNearestItem = NULL;
     }
 
     CurrentGameUI()->UIMainIngameWnd->SetPickUpItem(pNearestItem);
 
-    if (pNearestItem && m_bPickupMode) {
+    if (pNearestItem && m_bPickupMode)
+    {
         CGameObject* pUsableObject = smart_cast<CGameObject*>(pNearestItem);
-        if (pUsableObject && (!m_pUsableObject)) pUsableObject->use(this);
+        if (pUsableObject && (!m_pUsableObject))
+            pUsableObject->use(this);
 
         //подбирание объекта
         Game().SendPickUpEvent(ID(), pNearestItem->object().ID());
@@ -206,10 +241,14 @@ void CActor::PickupModeUpdate_COD()
 void CActor::Check_for_AutoPickUp()
 {
     // mp only
-    if (!psActorFlags.test(AF_AUTOPICKUP)) return;
-    if (IsGameTypeSingle()) return;
-    if (Level().CurrentControlEntity() != this) return;
-    if (!g_Alive()) return;
+    if (!psActorFlags.test(AF_AUTOPICKUP))
+        return;
+    if (IsGameTypeSingle())
+        return;
+    if (Level().CurrentControlEntity() != this)
+        return;
+    if (!g_Alive())
+        return;
 
     Fvector bc;
     bc.add(Position(), m_AutoPickUp_AABB_Offset);
@@ -225,17 +264,25 @@ void CActor::Check_for_AutoPickUp()
         ISpatial* spatial = ISpatialResult[o_it];
         CInventoryItem* pIItem = smart_cast<CInventoryItem*>(spatial->dcast_GameObject());
 
-        if (0 == pIItem) continue;
-        if (!pIItem->CanTake()) continue;
-        if (Level().m_feel_deny.is_object_denied(spatial->dcast_GameObject())) continue;
+        if (0 == pIItem)
+            continue;
+        if (!pIItem->CanTake())
+            continue;
+        if (Level().m_feel_deny.is_object_denied(spatial->dcast_GameObject()))
+            continue;
 
         CGrenade* pGrenade = smart_cast<CGrenade*>(pIItem);
-        if (pGrenade) continue;
+        if (pGrenade)
+            continue;
 
-        if (APU_Box.Pick(pIItem->object().Position(), pIItem->object().Position())) {
-            if (GameID() == eGameIDDeathmatch || GameID() == eGameIDTeamDeathmatch) {
-                if (pIItem->BaseSlot() == INV_SLOT_2 || pIItem->BaseSlot() == INV_SLOT_3) {
-                    if (inventory().ItemFromSlot(pIItem->BaseSlot())) continue;
+        if (APU_Box.Pick(pIItem->object().Position(), pIItem->object().Position()))
+        {
+            if (GameID() == eGameIDDeathmatch || GameID() == eGameIDTeamDeathmatch)
+            {
+                if (pIItem->BaseSlot() == INV_SLOT_2 || pIItem->BaseSlot() == INV_SLOT_3)
+                {
+                    if (inventory().ItemFromSlot(pIItem->BaseSlot()))
+                        continue;
                 }
             }
 
@@ -249,7 +296,8 @@ void CActor::PickupInfoDraw(IGameObject* object)
     LPCSTR draw_str = NULL;
 
     CInventoryItem* item = smart_cast<CInventoryItem*>(object);
-    if (!item) return;
+    if (!item)
+        return;
 
     Fmatrix res;
     res.mul(Device.mFullTransform, object->XFORM());
@@ -261,8 +309,10 @@ void CActor::PickupInfoDraw(IGameObject* object)
 
     res.transform(v_res, shift);
 
-    if (v_res.z < 0 || v_res.w < 0) return;
-    if (v_res.x < -1.f || v_res.x > 1.f || v_res.y < -1.f || v_res.y > 1.f) return;
+    if (v_res.z < 0 || v_res.w < 0)
+        return;
+    if (v_res.x < -1.f || v_res.x > 1.f || v_res.y < -1.f || v_res.y > 1.f)
+        return;
 
     float x = (1.f + v_res.x) / 2.f * (Device.dwWidth);
     float y = (1.f - v_res.y) / 2.f * (Device.dwHeight);
@@ -275,12 +325,14 @@ void CActor::PickupInfoDraw(IGameObject* object)
 void CActor::feel_sound_new(
     IGameObject* who, int type, CSound_UserDataPtr user_data, const Fvector& Position, float power)
 {
-    if (who == this) m_snd_noise = _max(m_snd_noise, power);
+    if (who == this)
+        m_snd_noise = _max(m_snd_noise, power);
 }
 
 void CActor::Feel_Grenade_Update(float rad)
 {
-    if (!IsGameTypeSingle()) {
+    if (!IsGameTypeSingle())
+    {
         return;
     }
     // Find all nearest objects
@@ -296,19 +348,23 @@ void CActor::Feel_Grenade_Update(float rad)
     // select only grenade
     for (; it_b != it_e; ++it_b)
     {
-        if ((*it_b)->getDestroy()) continue;  // Don't touch candidates for destroy
+        if ((*it_b)->getDestroy())
+            continue; // Don't touch candidates for destroy
 
         CGrenade* grn = smart_cast<CGrenade*>(*it_b);
-        if (!grn || grn->Initiator() == ID() || grn->Useful()) {
+        if (!grn || grn->Initiator() == ID() || grn->Useful())
+        {
             continue;
         }
-        if (grn->time_from_begin_throw() < m_fFeelGrenadeTime) {
+        if (grn->time_from_begin_throw() < m_fFeelGrenadeTime)
+        {
             continue;
         }
-        if (HUD().AddGrenade_ForMark(grn)) {
+        if (HUD().AddGrenade_ForMark(grn))
+        {
             //.	Msg("__ __ Add new grenade! id = %d ", grn->ID() );
         }
-    }  // for it
+    } // for it
 
     HUD().Update_GrenadeView(pos_actor);
 }

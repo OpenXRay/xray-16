@@ -1,4 +1,4 @@
-#ifndef MXSTDSLIM_INCLUDED  // -*- C++ -*-
+#ifndef MXSTDSLIM_INCLUDED // -*- C++ -*-
 #define MXSTDSLIM_INCLUDED
 #if !defined(__GNUC__)
 #pragma once
@@ -60,7 +60,6 @@ public:
     virtual bool decimate(unsigned int, float max_error, void* cb_params = 0) = 0;
 
     MxStdModel& model() { return *m; }
-
 public:
     void (*contraction_callback)(const MxPairContraction&, float, void*);
 };

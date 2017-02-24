@@ -5,8 +5,10 @@ IC float clamp_rotation(Fquaternion& q, float v)
     Fvector ax;
     q.get_axis_angle(ax, angl);
     float abs_angl = _abs(angl);
-    if (abs_angl > v) {
-        if (angl < 0.f) v = -v;
+    if (abs_angl > v)
+    {
+        if (angl < 0.f)
+            v = -v;
         q.rotation(ax, v);
         q.normalize();
     }
@@ -38,11 +40,14 @@ IC bool clamp_change(Fmatrix& m, const Fmatrix& start, float ml, float ma, float
     float linear_ch = diff.c.magnitude();
     bool ret = linear_ch < tl;
 
-    if (linear_ch > ml) diff.c.mul(ml / linear_ch);
+    if (linear_ch > ml)
+        diff.c.mul(ml / linear_ch);
 
-    if (clamp_rotation(diff, ma) > ta) ret = false;
+    if (clamp_rotation(diff, ma) > ta)
+        ret = false;
 
-    if (!ret) m.mul_43(start, diff);
+    if (!ret)
+        m.mul_43(start, diff);
     return ret;
 }
 
@@ -76,11 +81,7 @@ IC void angular_diff(Fvector& aw, const Fmatrix& diff, float dt)
     aw.set((diff._32 - diff._23) / 2.f / dt, (diff._13 - diff._31) / 2.f / dt, (diff._21 - diff._12) / 2.f / dt);
 }
 
-IC void linear_diff(Fvector& lv, const Fvector& diff, float dt)
-{
-    lv.mul(diff, (1.f / dt));
-}
-
+IC void linear_diff(Fvector& lv, const Fvector& diff, float dt) { lv.mul(diff, (1.f / dt)); }
 IC void linear_diff(Fvector& lv, const Fvector& mc1, const Fvector& mc0, float dt)
 {
     linear_diff(lv, Fvector().sub(mc1, mc0), dt);

@@ -33,7 +33,8 @@ CUI::~CUI()
 
 void CUI::Load(CUIGameCustom* pGameUI)
 {
-    if (pGameUI) {
+    if (pGameUI)
+    {
         pGameUI->SetClGame(&Game());
         m_pMessagesWnd->SetChatOwner(&Game());
         return;
@@ -52,16 +53,20 @@ void CUI::UnLoad()
 void CUI::UIOnFrame()
 {
     CEntity* m_Actor = smart_cast<CEntity*>(Level().CurrentEntity());
-    if (m_Actor) {
+    if (m_Actor)
+    {
         // update windows
-        if (GameIndicatorsShown() && psHUD_Flags.is(HUD_DRAW | HUD_DRAW_RT)) {
+        if (GameIndicatorsShown() && psHUD_Flags.is(HUD_DRAW | HUD_DRAW_RT))
+        {
             UIMainIngameWnd->Update();
         }
     }
 
     // out GAME-style depend information
-    if (GameIndicatorsShown()) {
-        if (pUIGame) pUIGame->OnFrame();
+    if (GameIndicatorsShown())
+    {
+        if (pUIGame)
+            pUIGame->OnFrame();
     }
     m_pMessagesWnd->Update();
 }
@@ -70,25 +75,31 @@ void CUI::UIOnFrame()
 #include "huditem.h"
 bool CUI::Render()
 {
-    if (GameIndicatorsShown()) {
-        if (pUIGame) pUIGame->Render();
+    if (GameIndicatorsShown())
+    {
+        if (pUIGame)
+            pUIGame->Render();
     }
 
     CEntity* pEntity = smart_cast<CEntity*>(Level().CurrentEntity());
-    if (pEntity) {
+    if (pEntity)
+    {
         CActor* pActor = smart_cast<CActor*>(pEntity);
-        if (pActor && pActor->HUDview() && psHUD_Flags.is(HUD_WEAPON | HUD_WEAPON_RT | HUD_WEAPON_RT2)) {
+        if (pActor && pActor->HUDview() && psHUD_Flags.is(HUD_WEAPON | HUD_WEAPON_RT | HUD_WEAPON_RT2))
+        {
             TISlotArr& inv_slots = pActor->inventory().m_slots;
             TISlotArr::iterator it = inv_slots.begin();
             TISlotArr::iterator it_e = inv_slots.end();
             for (; it != it_e; ++it)
             {
                 PIItem itm = (*it).m_pIItem;
-                if (itm && itm->render_item_ui_query()) itm->render_item_ui();
+                if (itm && itm->render_item_ui_query())
+                    itm->render_item_ui();
             }
         }
 
-        if (GameIndicatorsShown() && psHUD_Flags.is(HUD_DRAW | HUD_DRAW_RT)) {
+        if (GameIndicatorsShown() && psHUD_Flags.is(HUD_DRAW | HUD_DRAW_RT))
+        {
             UIMainIngameWnd->Draw();
             m_pMessagesWnd->Draw();
         }
@@ -96,8 +107,10 @@ bool CUI::Render()
         {
             // hack - draw messagess wnd in scope mode
             CUIGameSP* gSP = smart_cast<CUIGameSP*>(HUD().GetUI()->UIGame());
-            if (gSP) {
-                if (!gSP->PdaMenu().GetVisible()) {
+            if (gSP)
+            {
+                if (!gSP->PdaMenu().GetVisible())
+                {
                     m_pMessagesWnd->Draw();
                 }
             }
@@ -119,39 +132,51 @@ bool CUI::Render()
 
 bool CUI::IR_OnMouseWheel(int direction)
 {
-    if (MainInputReceiver()) {
-        if (MainInputReceiver()->IR_OnMouseWheel(direction)) return true;
+    if (MainInputReceiver())
+    {
+        if (MainInputReceiver()->IR_OnMouseWheel(direction))
+            return true;
     }
 
-    if (pUIGame && pUIGame->IR_OnMouseWheel(direction)) return true;
+    if (pUIGame && pUIGame->IR_OnMouseWheel(direction))
+        return true;
 
-    if (MainInputReceiver()) return true;
+    if (MainInputReceiver())
+        return true;
 
     return false;
 }
 
 bool CUI::IR_OnKeyboardHold(int dik)
 {
-    if (MainInputReceiver()) {
-        if (MainInputReceiver()->IR_OnKeyboardHold(dik)) return true;
+    if (MainInputReceiver())
+    {
+        if (MainInputReceiver()->IR_OnKeyboardHold(dik))
+            return true;
     }
 
-    if (MainInputReceiver()) return true;
+    if (MainInputReceiver())
+        return true;
 
     return false;
 }
 
 bool CUI::IR_OnKeyboardPress(int dik)
 {
-    if (MainInputReceiver()) {
-        if (MainInputReceiver()->IR_OnKeyboardPress(dik)) return true;
+    if (MainInputReceiver())
+    {
+        if (MainInputReceiver()->IR_OnKeyboardPress(dik))
+            return true;
     }
 
-    if (UIMainIngameWnd->OnKeyboardPress(dik)) return true;
+    if (UIMainIngameWnd->OnKeyboardPress(dik))
+        return true;
 
-    if (pUIGame && pUIGame->IR_OnKeyboardPress(dik)) return true;
+    if (pUIGame && pUIGame->IR_OnKeyboardPress(dik))
+        return true;
 
-    if (MainInputReceiver()) return true;
+    if (MainInputReceiver())
+        return true;
 
     return false;
 }
@@ -159,13 +184,17 @@ bool CUI::IR_OnKeyboardPress(int dik)
 
 bool CUI::IR_OnKeyboardRelease(int dik)
 {
-    if (MainInputReceiver()) {
-        if (MainInputReceiver()->IR_OnKeyboardRelease(dik)) return true;
+    if (MainInputReceiver())
+    {
+        if (MainInputReceiver()->IR_OnKeyboardRelease(dik))
+            return true;
     }
 
-    if (pUIGame && pUIGame->IR_OnKeyboardRelease(dik)) return true;
+    if (pUIGame && pUIGame->IR_OnKeyboardRelease(dik))
+        return true;
 
-    if (MainInputReceiver()) return true;
+    if (MainInputReceiver())
+        return true;
 
     return false;
 }
@@ -173,13 +202,17 @@ bool CUI::IR_OnKeyboardRelease(int dik)
 
 bool CUI::IR_OnMouseMove(int dx, int dy)
 {
-    if (MainInputReceiver()) {
-        if (MainInputReceiver()->IR_OnMouseMove(dx, dy)) return true;
+    if (MainInputReceiver())
+    {
+        if (MainInputReceiver()->IR_OnMouseMove(dx, dy))
+            return true;
     }
 
-    if (pUIGame && pUIGame->IR_OnMouseMove(dx, dy)) return true;
+    if (pUIGame && pUIGame->IR_OnMouseMove(dx, dy))
+        return true;
 
-    if (MainInputReceiver()) return true;
+    if (MainInputReceiver())
+        return true;
 
     return false;
 }
@@ -187,33 +220,15 @@ bool CUI::IR_OnMouseMove(int dx, int dy)
 SDrawStaticStruct* CUI::AddInfoMessage(LPCSTR message)
 {
     SDrawStaticStruct* ss = pUIGame->GetCustomStatic(message);
-    if (!ss) {
+    if (!ss)
+    {
         ss = pUIGame->AddCustomStatic(message, true);
     }
     return ss;
 }
 
-void CUI::ShowGameIndicators(bool b)
-{
-    m_bShowGameIndicators = b;
-}
-
-void CUI::ShowCrosshair(bool b)
-{
-    psHUD_Flags.set(HUD_CROSSHAIR_RT, b);
-}
-
-bool CUI::CrosshairShown()
-{
-    return !!psHUD_Flags.test(HUD_CROSSHAIR_RT);
-}
-
-void CUI::OnConnected()
-{
-    UIMainIngameWnd->OnConnected();
-}
-
-void CUI::UpdatePda()
-{
-    UIGame()->PdaMenu().UpdatePda();
-}
+void CUI::ShowGameIndicators(bool b) { m_bShowGameIndicators = b; }
+void CUI::ShowCrosshair(bool b) { psHUD_Flags.set(HUD_CROSSHAIR_RT, b); }
+bool CUI::CrosshairShown() { return !!psHUD_Flags.test(HUD_CROSSHAIR_RT); }
+void CUI::OnConnected() { UIMainIngameWnd->OnConnected(); }
+void CUI::UpdatePda() { UIGame()->PdaMenu().UpdatePda(); }

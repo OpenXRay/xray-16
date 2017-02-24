@@ -36,11 +36,7 @@ enum
 #define NORM_DYN_COLOR 0x0000FF00
 #define LOCK_COLOR 0x00FF0000
 
-CLight::CLight(LPVOID data, LPCSTR name) : CCustomObject(data, name)
-{
-    Construct(data);
-}
-
+CLight::CLight(LPVOID data, LPCSTR name) : CCustomObject(data, name) { Construct(data); }
 void CLight::Construct(LPVOID data)
 {
     ClassID = OBJCLASS_LIGHT;
@@ -66,22 +62,14 @@ void CLight::Construct(LPVOID data)
     m_Flags.assign(ELight::flAffectStatic);
 }
 
-CLight::~CLight()
-{
-    xr_delete(m_FuzzyData);
-}
-
+CLight::~CLight() { xr_delete(m_FuzzyData); }
 void CLight::OnUpdateTransform()
 {
     FScale.set(1.f, 1.f, 1.f);
     inherited::OnUpdateTransform();
 }
 
-void CLight::CopyFrom(CLight* src)
-{
-    THROW2("CLight:: Go to AlexMX");
-}
-
+void CLight::CopyFrom(CLight* src) { THROW2("CLight:: Go to AlexMX"); }
 void CLight::AffectD3D(BOOL flag)
 {
     m_UseInD3D = flag;
@@ -101,17 +89,20 @@ bool CLight::GetBox(Fbox& box) const
 void CLight::Render(int priority, bool strictB2F)
 {
     inherited::Render(priority, strictB2F);
-    if ((1 == priority) && (false == strictB2F)) {
+    if ((1 == priority) && (false == strictB2F))
+    {
         EDevice.SetShader(EDevice.m_WireShader);
         RCache.set_xform_world(Fidentity);
         u32 clr = Selected() ? SEL_COLOR : (m_Flags.is(ELight::flAffectDynamic) ? NORM_DYN_COLOR : NORM_COLOR);
         switch (m_Type)
         {
         case ELight::ltPoint:
-            if (Selected()) DU_impl.DrawLineSphere(PPosition, m_Range, clr, true);
+            if (Selected())
+                DU_impl.DrawLineSphere(PPosition, m_Range, clr, true);
 
             DU_impl.DrawPointLight(PPosition, VIS_RADIUS, clr);
-            if (m_Flags.is(ELight::flPointFuzzy)) {
+            if (m_Flags.is(ELight::flPointFuzzy))
+            {
                 VERIFY(m_FuzzyData);
                 for (FvectorIt it = m_FuzzyData->m_Positions.begin(); it != m_FuzzyData->m_Positions.end(); it++)
                 {
@@ -126,7 +117,7 @@ void CLight::Render(int priority, bool strictB2F)
             //			Fvector dir;
             //			dir.setHP	(PRotation.y,PRotation.x);
             //			DU.DrawCone	(Fidentity, PPosition, dir, Selected()?m_Range:VIS_RADIUS, radius2, clr, true,
-            //false);
+            // false);
             if (Selected())
                 DU_impl.DrawSpotLight(PPosition, FTransformR.k, m_Range, m_Cone, clr);
             else
@@ -138,7 +129,8 @@ void CLight::Render(int priority, bool strictB2F)
         ESceneLightTool* lt = dynamic_cast<ESceneLightTool*>(ParentTool);
         VERIFY(lt);
 
-        if (lt->m_Flags.is(ESceneLightTool::flShowControlName)) {
+        if (lt->m_Flags.is(ESceneLightTool::flShowControlName))
+        {
             Fvector D;
             D.sub(EDevice.vCameraPosition, PPosition);
             float dist = D.normalize_magn();
@@ -154,7 +146,8 @@ void CLight::Render(int priority, bool strictB2F)
         switch (m_Type)
         {
         case ELight::ltPoint:
-            if (m_Flags.is(ELight::flPointFuzzy)) {
+            if (m_Flags.is(ELight::flPointFuzzy))
+            {
                 u32 clr = Selected() ? SEL_COLOR : (m_Flags.is(ELight::flAffectDynamic) ? NORM_DYN_COLOR : NORM_COLOR);
                 clr = subst_alpha(clr, 0x40);
                 const Fvector zero = {0.f, 0.f, 0.f};
@@ -188,10 +181,13 @@ bool CLight::RayPick(float& distance, const Fvector& start, const Fvector& direc
     ray2.sub(PPosition, start);
 
     float d = ray2.dotproduct(direction);
-    if (d > 0) {
+    if (d > 0)
+    {
         float d2 = ray2.magnitude();
-        if (((d2 * d2 - d * d) < (VIS_RADIUS * VIS_RADIUS)) && (d > VIS_RADIUS)) {
-            if (d < distance) {
+        if (((d2 * d2 - d * d) < (VIS_RADIUS * VIS_RADIUS)) && (d > VIS_RADIUS))
+        {
+            if (d < distance)
+            {
                 distance = d;
                 return true;
             }
@@ -202,18 +198,10 @@ bool CLight::RayPick(float& distance, const Fvector& start, const Fvector& direc
 
 //----------------------------------------------------
 
-void CLight::OnFrame()
-{
-    inherited::OnFrame();
-}
-
+void CLight::OnFrame() { inherited::OnFrame(); }
 //----------------------------------------------------
 
-void CLight::Update()
-{
-    UpdateTransform();
-}
-
+void CLight::Update() { UpdateTransform(); }
 //----------------------------------------------------
 
 LPCSTR CLight::GetLControlName()
@@ -226,11 +214,7 @@ LPCSTR CLight::GetLControlName()
 
 //----------------------------------------------------
 
-void CLight::OnNeedUpdate(PropValue* value)
-{
-    Update();
-}
-
+void CLight::OnNeedUpdate(PropValue* value) { Update(); }
 //----------------------------------------------------
 
 bool CLight::GetSummaryInfo(SSceneSummary* inf)
@@ -246,10 +230,14 @@ bool CLight::GetSummaryInfo(SSceneSummary* inf)
     {
     case ELight::ltPoint:
     case ELight::ltSpot:
-        if (m_Flags.is(ELight::flAffectStatic)) inf->light_static_cnt++;
-        if (m_Flags.is(ELight::flAffectDynamic)) inf->light_dynamic_cnt++;
-        if (m_Flags.is(ELight::flProcedural)) inf->light_procedural_cnt++;
-        if (m_Flags.is(ELight::flBreaking)) inf->light_breakable_cnt++;
+        if (m_Flags.is(ELight::flAffectStatic))
+            inf->light_static_cnt++;
+        if (m_Flags.is(ELight::flAffectDynamic))
+            inf->light_dynamic_cnt++;
+        if (m_Flags.is(ELight::flProcedural))
+            inf->light_procedural_cnt++;
+        if (m_Flags.is(ELight::flBreaking))
+            inf->light_breakable_cnt++;
         break;
     }
     return true;

@@ -8,7 +8,8 @@
 int FindLPCSTR(LPCSTRVec& vec, LPCSTR key)
 {
     for (LPCSTRIt it = vec.begin(); it != vec.end(); it++)
-        if (0 == strcmp(*it, key)) return it - vec.begin();
+        if (0 == strcmp(*it, key))
+            return it - vec.begin();
     return -1;
 }
 
@@ -26,7 +27,8 @@ bool CEditableObject::ExportLWO(LPCSTR fname)
         CSurface* S = *s_it;
         F->w_stringZ(S->_Name());
         S->tag = s_it - m_Surfaces.begin();
-        if (FindLPCSTR(images, S->_Texture()) < 0) images.push_back(S->_Texture());
+        if (FindLPCSTR(images, S->_Texture()) < 0)
+            images.push_back(S->_Texture());
     }
     F->close_chunk();
     // images

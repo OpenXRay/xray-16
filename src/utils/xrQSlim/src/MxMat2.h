@@ -1,4 +1,4 @@
-#ifndef MXMAT2_INCLUDED  // -*- C++ -*-
+#ifndef MXMAT2_INCLUDED // -*- C++ -*-
 #define MXMAT2_INCLUDED
 #if !defined(__GNUC__)
 #pragma once

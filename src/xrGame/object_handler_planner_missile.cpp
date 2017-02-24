@@ -24,7 +24,7 @@ void CObjectHandlerPlanner::add_evaluators(CMissile* missile)
     add_evaluator(uid(id, eWorldPropertyHidden), new CObjectPropertyEvaluatorMissileHidden(missile, m_object));
     add_evaluator(uid(id, eWorldPropertyThrowStarted), new CObjectPropertyEvaluatorMissileStarted(missile, m_object));
     //	add_evaluator		(uid(id,eWorldPropertyThrowIdle)	,new
-    //CObjectPropertyEvaluatorMissile(missile,m_object,MS_THROW));
+    // CObjectPropertyEvaluatorMissile(missile,m_object,MS_THROW));
     add_evaluator(
         uid(id, eWorldPropertyThrow), new CObjectPropertyEvaluatorMissile(missile, m_object, CMissile::eThrowEnd));
 

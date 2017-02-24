@@ -17,10 +17,7 @@ IC void CMeleeChecker::init_attack()
 
     m_current_min_distance = m_min_attack_distance;
 }
-IC float CMeleeChecker::get_min_distance()
-{
-    return m_current_min_distance;
-}
+IC float CMeleeChecker::get_min_distance() { return m_current_min_distance; }
 IC float CMeleeChecker::get_max_distance()
 {
     return (m_max_attack_distance - (m_min_attack_distance - m_current_min_distance));

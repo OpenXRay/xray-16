@@ -8,9 +8,8 @@ const int quant = 16384;
 const int c_hdr = 10;
 const int c_size = 4;
 
-static D3DVERTEXELEMENT9 dwDecl[] = {
-    {0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},   // pos
-    {0, 12, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},  // uv
+static D3DVERTEXELEMENT9 dwDecl[] = {{0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, // pos
+    {0, 12, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0}, // uv
     D3DDECL_END()};
 
 #pragma pack(push, 1)
@@ -49,7 +48,8 @@ void CDetailManager::hw_Render()
     //	Update timer
     //	Can't use Device.fTimeDelta since it is smoothed! Don't know why, but smoothed value looks more choppy!
     float fDelta = Device.fTimeGlobal - m_global_time_old;
-    if ((fDelta < 0) || (fDelta > 1)) fDelta = 0.03;
+    if ((fDelta < 0) || (fDelta > 1))
+        fDelta = 0.03;
     m_global_time_old = Device.fTimeGlobal;
 
     m_time_rot_1 += (PI_MUL_2 * fDelta / swing_current.rot1);
@@ -75,10 +75,11 @@ void CDetailManager::hw_Render()
     consts.set(scale, scale, ps_r__Detail_l_aniso, ps_r__Detail_l_ambient);
     // wave.set				(1.f/5.f,		1.f/7.f,	1.f/3.f,	Device.fTimeGlobal*swing_current.speed);
     wave.set(1.f / 5.f, 1.f / 7.f, 1.f / 3.f, m_time_pos);
-    // RCache.set_c			(&*hwc_consts,	scale,		scale,		ps_r__Detail_l_aniso,	ps_r__Detail_l_ambient);				//
+    // RCache.set_c			(&*hwc_consts,	scale,		scale,		ps_r__Detail_l_aniso,	ps_r__Detail_l_ambient);
+    // //
     // consts
     // RCache.set_c			(&*hwc_wave,	wave.div(PI_MUL_2));	// wave
-    // RCache.set_c			(&*hwc_wind,	dir1);																					//
+    // RCache.set_c			(&*hwc_wind,	dir1); //
     // wind-dir
     // hw_Render_dump			(&*hwc_array,	1, 0, c_hdr );
     hw_Render_dump(consts, wave.div(PI_MUL_2), dir1, 1, 0);
@@ -87,7 +88,7 @@ void CDetailManager::hw_Render()
     // wave.set				(1.f/3.f,		1.f/7.f,	1.f/5.f,	Device.fTimeGlobal*swing_current.speed);
     wave.set(1.f / 3.f, 1.f / 7.f, 1.f / 5.f, m_time_pos);
     // RCache.set_c			(&*hwc_wave,	wave.div(PI_MUL_2));	// wave
-    // RCache.set_c			(&*hwc_wind,	dir2);																					//
+    // RCache.set_c			(&*hwc_wind,	dir2); //
     // wind-dir
     // hw_Render_dump			(&*hwc_array,	2, 0, c_hdr );
     hw_Render_dump(consts, wave.div(PI_MUL_2), dir2, 2, 0);
@@ -129,7 +130,8 @@ void CDetailManager::hw_Render_dump(
     {
         CDetail& Object = *objects[O];
         xr_vector<SlotItemVec*>& vis = list[O];
-        if (!vis.empty()) {
+        if (!vis.empty())
+        {
             for (u32 iPass = 0; iPass < Object.shader->E[lod_id]->passes.size(); ++iPass)
             {
                 // Setup matrices + colors (and flush it as necessary)
@@ -190,7 +192,8 @@ void CDetailManager::hw_Render_dump(
                         // RCache.set_ca(&*constArray, base+3, s,				s,				s,				h
                         // );
                         dwBatch++;
-                        if (dwBatch == hw_BatchSize) {
+                        if (dwBatch == hw_BatchSize)
+                        {
                             // flush
                             RImplementation.BasicStats.DetailCount += dwBatch;
                             u32 dwCNT_verts = dwBatch * Object.number_vertices;
@@ -214,7 +217,8 @@ void CDetailManager::hw_Render_dump(
                     }
                 }
                 // flush if nessecary
-                if (dwBatch) {
+                if (dwBatch)
+                {
                     RImplementation.BasicStats.DetailCount += dwBatch;
                     u32 dwCNT_verts = dwBatch * Object.number_vertices;
                     u32 dwCNT_prims = (dwBatch * Object.number_indices) / 3;

@@ -23,7 +23,7 @@ typedef bool __fastcall(__closure* TAfterAppendCallback)(TShiftState _Shift, CCu
 
 class TUI_CustomControl
 {
-  protected:
+protected:
     friend class ESceneToolBase;
     int sub_target;
     int action;
@@ -55,36 +55,30 @@ class TUI_CustomControl
     void RotateProcess(TShiftState _Shift);
     bool RotateEnd(TShiftState _Shift);
 
-  protected:
+protected:
     bool CheckSnapList(TShiftState Shift);
 
     CCustomObject* DefaultAddObject(
         TShiftState Shift, TBeforeAppendCallback before = 0, TAfterAppendCallback after = 0);
     bool DefaultMovingProcess(TShiftState Shift, Fvector& amount);
 
-  public:
+public:
     ESceneToolBase* parent_tool;
 
-  public:
+public:
     TUI_CustomControl(int st, int act, ESceneToolBase* parent);
 
     virtual ~TUI_CustomControl() { ; }
-
     virtual bool Start(TShiftState _Shift);
     virtual bool End(TShiftState _Shift);
     virtual void Move(TShiftState _Shift);
     virtual bool HiddenMode();
 
     virtual bool KeyDown(WORD Key, TShiftState Shift) { return false; }
-
     virtual bool KeyUp(WORD Key, TShiftState Shift) { return false; }
-
     virtual bool KeyPress(WORD Key, TShiftState Shift) { return false; }
-
     virtual void OnEnter() { ; }
-
     virtual void OnExit() { ; }
-
     int Action() { return action; }
 };
 

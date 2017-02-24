@@ -11,7 +11,7 @@ class CInventoryOwner;
 
 struct ITEM_TYPE
 {
-    Fvector2 freq;  // min,max
+    Fvector2 freq; // min,max
     HUD_SOUND_ITEM detect_snds;
 
     shared_str zone_map_location;
@@ -81,7 +81,8 @@ public:
         do
         {
             xr_sprintf(temp, "%s_class_%d", prefix, i);
-            if (pSettings->line_exist(sect, temp)) {
+            if (pSettings->line_exist(sect, temp))
+            {
                 shared_str item_sect = pSettings->r_string(sect, temp);
 
                 m_TypesMap.insert(std::make_pair(item_sect, ITEM_TYPE()));
@@ -154,7 +155,6 @@ public:
     virtual bool CheckCompatibility(CHudItem* itm);
 
     virtual u32 ef_detector_type() const { return 1; };
-
 protected:
     bool CheckCompatibilityInt(CHudItem* itm, u16* slot_to_activate);
     void TurnDetectorInternal(bool b);
@@ -178,4 +178,4 @@ protected:
 public:
     CZoneList();
     virtual ~CZoneList();
-};  // class CZoneList
+}; // class CZoneList

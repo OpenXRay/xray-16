@@ -18,7 +18,7 @@ namespace Wml
 template <class Real>
 class GVector
 {
-  public:
+public:
     // construction
     GVector(int iSize = 0);
     GVector(int iSize, const Real* afTuple);
@@ -63,7 +63,7 @@ class GVector
     Real Dot(const GVector& rkV) const;
     Real Normalize();
 
-  protected:
+protected:
     // support for comparisons
     int CompareArrays(const GVector& rkV) const;
 

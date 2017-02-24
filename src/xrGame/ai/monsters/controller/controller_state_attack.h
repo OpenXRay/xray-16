@@ -13,7 +13,6 @@ protected:
 public:
     CStateControllerAttack(_Object* obj);
     virtual ~CStateControllerAttack() {}
-
     virtual void initialize();
     virtual void finalize();
     virtual void critical_finalize();

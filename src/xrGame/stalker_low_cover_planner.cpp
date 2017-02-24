@@ -45,7 +45,8 @@ void stalker_low_cover_planner::setup(CAI_Stalker* object, CPropertyStorage* sto
 void stalker_low_cover_planner::update()
 {
     MemorySpace::CMemoryInfo mem_object = object().memory().memory(object().memory().enemy().selected());
-    if (mem_object.m_object) object().best_cover(mem_object.m_object_params.m_position);
+    if (mem_object.m_object)
+        object().best_cover(mem_object.m_object_params.m_position);
 
     inherited::update();
 }
@@ -64,16 +65,8 @@ void stalker_low_cover_planner::initialize()
     CScriptActionPlanner::m_storage.set_property(eWorldPropertyInCover, true);
 }
 
-void stalker_low_cover_planner::execute()
-{
-    inherited::execute();
-}
-
-void stalker_low_cover_planner::finalize()
-{
-    inherited::finalize();
-}
-
+void stalker_low_cover_planner::execute() { inherited::execute(); }
+void stalker_low_cover_planner::finalize() { inherited::finalize(); }
 void stalker_low_cover_planner::add_evaluators()
 {
     add_evaluator(eWorldPropertyLowCover, new CStalkerPropertyEvaluatorConst(true, "using low cover"));

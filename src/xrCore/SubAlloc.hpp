@@ -42,7 +42,7 @@ struct MEM_BLK : public BLK_NODE
 } _PACK_ATTR;
 #pragma pack()
 
-static BYTE Indx2Units[N_INDEXES], Units2Indx[128];  // constants
+static BYTE Indx2Units[N_INDEXES], Units2Indx[128]; // constants
 static DWORD GlueCount, SubAllocatorSize = 0;
 static BYTE *HeapStart, *pText, *UnitsStart, *LoUnit, *HiUnit;
 
@@ -60,15 +60,13 @@ inline void BLK_NODE::insert(void* pv, int NU)
     p->NU = NU;
     Stamp++;
 }
-inline UINT U2B(UINT NU)
-{
-    return 8 * NU + 4 * NU;
-}
+inline UINT U2B(UINT NU) { return 8 * NU + 4 * NU; }
 inline void SplitBlock(void* pv, UINT OldIndx, UINT NewIndx)
 {
     UINT i, k, UDiff = Indx2Units[OldIndx] - Indx2Units[NewIndx];
     BYTE* p = ((BYTE*)pv) + U2B(Indx2Units[NewIndx]);
-    if (Indx2Units[i = Units2Indx[UDiff - 1]] != UDiff) {
+    if (Indx2Units[i = Units2Indx[UDiff - 1]] != UDiff)
+    {
         k = Indx2Units[--i];
         BList[i].insert(p, k);
         p += U2B(k);
@@ -85,7 +83,8 @@ DWORD _STDCALL GetUsedMemory()
 }
 void _STDCALL StopSubAllocator()
 {
-    if (SubAllocatorSize) {
+    if (SubAllocatorSize)
+    {
         SubAllocatorSize = 0;
         delete[] HeapStart;
     }
@@ -93,9 +92,11 @@ void _STDCALL StopSubAllocator()
 BOOL _STDCALL StartSubAllocator(UINT SASize)
 {
     DWORD t = SASize << 20U;
-    if (SubAllocatorSize == t) return TRUE;
+    if (SubAllocatorSize == t)
+        return TRUE;
     StopSubAllocator();
-    if ((HeapStart = new BYTE[t]) == NULL) return FALSE;
+    if ((HeapStart = new BYTE[t]) == NULL)
+        return FALSE;
     SubAllocatorSize = t;
     return TRUE;
 }
@@ -111,12 +112,14 @@ static void GlueFreeBlocks()
 {
     UINT i, k, sz;
     MEM_BLK s0, *p, *p0, *p1;
-    if (LoUnit != HiUnit) *LoUnit = 0;
+    if (LoUnit != HiUnit)
+        *LoUnit = 0;
     for (i = 0, (p0 = &s0)->next = NULL; i < N_INDEXES; i++)
         while (BList[i].avail())
         {
             p = (MEM_BLK*)BList[i].remove();
-            if (!p->NU) continue;
+            if (!p->NU)
+                continue;
             while ((p1 = p + p->NU)->Stamp == ~0UL)
             {
                 p->NU += p1->NU;
@@ -129,10 +132,12 @@ static void GlueFreeBlocks()
     {
         p = (MEM_BLK*)s0.remove();
         sz = p->NU;
-        if (!sz) continue;
+        if (!sz)
+            continue;
         for (; sz > 128; sz -= 128, p += 128)
             BList[N_INDEXES - 1].insert(p, 128);
-        if (Indx2Units[i = Units2Indx[sz - 1]] != sz) {
+        if (Indx2Units[i = Units2Indx[sz - 1]] != sz)
+        {
             k = sz - Indx2Units[--i];
             BList[k - 1].insert(p + (sz - k), k);
         }
@@ -143,13 +148,16 @@ static void GlueFreeBlocks()
 static void* _STDCALL AllocUnitsRare(UINT indx)
 {
     UINT i = indx;
-    if (!GlueCount) {
+    if (!GlueCount)
+    {
         GlueFreeBlocks();
-        if (BList[i].avail()) return BList[i].remove();
+        if (BList[i].avail())
+            return BList[i].remove();
     }
     do
     {
-        if (++i == N_INDEXES) {
+        if (++i == N_INDEXES)
+        {
             GlueCount--;
             i = U2B(Indx2Units[indx]);
             return (UnitsStart - pText > i) ? (UnitsStart -= i) : (NULL);
@@ -162,10 +170,12 @@ static void* _STDCALL AllocUnitsRare(UINT indx)
 inline void* AllocUnits(UINT NU)
 {
     UINT indx = Units2Indx[NU - 1];
-    if (BList[indx].avail()) return BList[indx].remove();
+    if (BList[indx].avail())
+        return BList[indx].remove();
     void* RetVal = LoUnit;
     LoUnit += U2B(Indx2Units[indx]);
-    if (LoUnit <= HiUnit) return RetVal;
+    if (LoUnit <= HiUnit)
+        return RetVal;
     LoUnit -= U2B(Indx2Units[indx]);
     return AllocUnitsRare(indx);
 }
@@ -180,7 +190,7 @@ inline void* AllocContext()
 }
 inline void UnitsCpy(void* Dest, void* Src, UINT NU)
 {
-    DWORD *p1 = (DWORD*)Dest, *p2 = (DWORD*)Src;
+    DWORD *p1 = (DWORD *)Dest, *p2 = (DWORD *)Src;
     do
     {
         p1[0] = p2[0];
@@ -193,9 +203,11 @@ inline void UnitsCpy(void* Dest, void* Src, UINT NU)
 inline void* ExpandUnits(void* OldPtr, UINT OldNU)
 {
     UINT i0 = Units2Indx[OldNU - 1], i1 = Units2Indx[OldNU - 1 + 1];
-    if (i0 == i1) return OldPtr;
+    if (i0 == i1)
+        return OldPtr;
     void* ptr = AllocUnits(OldNU + 1);
-    if (ptr) {
+    if (ptr)
+    {
         UnitsCpy(ptr, OldPtr, OldNU);
         BList[i0].insert(OldPtr, OldNU);
     }
@@ -204,8 +216,10 @@ inline void* ExpandUnits(void* OldPtr, UINT OldNU)
 inline void* ShrinkUnits(void* OldPtr, UINT OldNU, UINT NewNU)
 {
     UINT i0 = Units2Indx[OldNU - 1], i1 = Units2Indx[NewNU - 1];
-    if (i0 == i1) return OldPtr;
-    if (BList[i1].avail()) {
+    if (i0 == i1)
+        return OldPtr;
+    if (BList[i1].avail())
+    {
         void* ptr = BList[i1].remove();
         UnitsCpy(ptr, OldPtr, NewNU);
         BList[i0].insert(OldPtr, Indx2Units[i0]);
@@ -235,7 +249,8 @@ inline void SpecialFreeUnit(void* ptr)
 inline void* MoveUnitsUp(void* OldPtr, UINT NU)
 {
     UINT indx = Units2Indx[NU - 1];
-    if ((BYTE*)OldPtr > UnitsStart + 16 * 1024 || (BLK_NODE*)OldPtr > BList[indx].next) return OldPtr;
+    if ((BYTE*)OldPtr > UnitsStart + 16 * 1024 || (BLK_NODE*)OldPtr > BList[indx].next)
+        return OldPtr;
     void* ptr = BList[indx].remove();
     UnitsCpy(ptr, OldPtr, NU);
     NU = Indx2Units[indx];
@@ -263,6 +278,7 @@ static inline void ExpandTextArea()
             {
                 p->unlink();
                 BList[i].Stamp--;
-                if (!--Count[i]) break;
+                if (!--Count[i])
+                    break;
             }
 }

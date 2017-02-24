@@ -40,7 +40,8 @@ IDirect3D9* WINAPI Direct3DCreate9(UINT SDKVersion)
 //	LogOut_File("In %x out %x", cSDKVersion, SDKVersion);
 //	LogOut("In %d out %d", cSDKVersion, SDKVersion);
 #ifdef NDEBUG
-    if (SDKVersion != cSDKVersion) {
+    if (SDKVersion != cSDKVersion)
+    {
         //		LogOut_File("NULL");
         LogOut_File("cSDKVersion = %d, SDKVersion = %d", cSDKVersion, SDKVersion);
         return NULL;

@@ -51,8 +51,10 @@ void CLevelPreferences::FillProp(PropItemVec& items)
     SceneToolsMapPairIt _I = Scene->FirstTool();
     SceneToolsMapPairIt _E = Scene->LastTool();
     for (; _I != _E; _I++)
-        if (_I->second && (_I->first != OBJCLASS_DUMMY)) {
-            if (_I->second->AllowEnabling()) {
+        if (_I->second && (_I->first != OBJCLASS_DUMMY))
+        {
+            if (_I->second->AllowEnabling())
+            {
                 PropValue* V =
                     PHelper().CreateFlag32(items, PrepareKey("Scene\\Targets\\Enable", _I->second->ClassDesc()),
                         &_I->second->m_EditFlags, ESceneToolBase::flEnable);

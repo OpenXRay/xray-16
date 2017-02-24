@@ -17,7 +17,7 @@ ref class property_color_base;
 
 class color_components
 {
-  public:
+public:
     color_components(property_color_base ^ holder);
 
     float xr_stdcall red_getter();
@@ -29,14 +29,14 @@ class color_components
     float xr_stdcall blue_getter();
     void xr_stdcall blue_setter(float);
 
-  private:
+private:
     gcroot<property_color_base ^> m_holder;
-};  // class color_components
+}; // class color_components
 
 public
 value struct Color
 {
-  public:
+public:
     inline Color(float red, float green, float blue)
     {
         r = red;
@@ -47,7 +47,7 @@ value struct Color
     property float r;
     property float g;
     property float b;
-};  // value struct Color
+}; // value struct Color
 
 public
 ref class property_color_base abstract : public XRay::SdkControls::IProperty,
@@ -55,10 +55,10 @@ ref class property_color_base abstract : public XRay::SdkControls::IProperty,
                                          public XRay::SdkControls::IMouseListener,
                                          public XRay::SdkControls::IIncrementable
 {
-  public:
+public:
     typedef System::Attribute Attribute;
 
-  public:
+public:
     property_color_base(editor::color const % color, array<System::Attribute ^> ^ attributes);
     virtual ~property_color_base();
     !property_color_base();
@@ -66,20 +66,20 @@ ref class property_color_base abstract : public XRay::SdkControls::IProperty,
     void green(float value);
     void blue(float value);
 
-  public:
+public:
     virtual System::Object ^ GetValue();
     virtual void SetValue(System::Object ^ object);
     virtual void OnDoubleClick(XRay::SdkControls::PropertyGrid ^ property_grid);
     virtual void Increment(float increment);
 
-  public:
+public:
     virtual editor::color get_value_raw() = 0;
     virtual void set_value_raw(editor::color color) = 0;
 
-  private:
+private:
     property_container ^ m_container;
     color_components* m_components;
     array<System::Attribute ^> ^ m_attributes;
-};  // ref class property_color_base abstract
+}; // ref class property_color_base abstract
 
-#endif  // ifndef PROPERTY_COLOR_BASE_HPP_INCLUDED
+#endif // ifndef PROPERTY_COLOR_BASE_HPP_INCLUDED

@@ -43,20 +43,20 @@ struct XRCORE_API IIniFileStream
     virtual void __stdcall skip_stringZ() = 0;
 };
 
-#define INI_W(what_to_do)                                                                                              \
+#define INI_W(what_to_do)      \
     \
-if(inistream)                                                                                                          \
+if(inistream)                  \
     \
-{                                                                                                               \
-        inistream->what_to_do;                                                                                         \
+{                       \
+        inistream->what_to_do; \
     \
 }
 
-#define INI_ASSERT(what_to_do)                                                                                         \
+#define INI_ASSERT(what_to_do)                              \
     \
-{                                                                                                               \
+{                                                    \
         \
-if(inistream) R_ASSERT3(0, #what_to_do, "not implemented");                                                            \
+if(inistream) R_ASSERT3(0, #what_to_do, "not implemented"); \
     \
 }
 
@@ -113,74 +113,73 @@ public:
     }
     IC void w_seek(u32 pos, const void* p, u32 count);
     IC u32 w_tell() { return B.count; }
-
     // writing - utilities
     IC void w_float(float a)
     {
         W_guard g(&w_allow);
         w(&a, 4);
         INI_W(w_float(a));
-    }  // float
+    } // float
     IC void w_vec3(const Fvector& a)
     {
         W_guard g(&w_allow);
         w(&a, 3 * sizeof(float));
         INI_W(w_vec3(a));
-    }  // vec3
+    } // vec3
     IC void w_vec4(const Fvector4& a)
     {
         W_guard g(&w_allow);
         w(&a, 4 * sizeof(float));
         INI_W(w_vec4(a));
-    }  // vec4
+    } // vec4
     IC void w_u64(u64 a)
     {
         W_guard g(&w_allow);
         w(&a, 8);
         INI_W(w_u64(a));
-    }  // qword (8b)
+    } // qword (8b)
     IC void w_s64(s64 a)
     {
         W_guard g(&w_allow);
         w(&a, 8);
         INI_W(w_s64(a));
-    }  // qword (8b)
+    } // qword (8b)
     IC void w_u32(u32 a)
     {
         W_guard g(&w_allow);
         w(&a, 4);
         INI_W(w_u32(a));
-    }  // dword (4b)
+    } // dword (4b)
     IC void w_s32(s32 a)
     {
         W_guard g(&w_allow);
         w(&a, 4);
         INI_W(w_s32(a));
-    }  // dword (4b)
+    } // dword (4b)
     IC void w_u16(u16 a)
     {
         W_guard g(&w_allow);
         w(&a, 2);
         INI_W(w_u16(a));
-    }  // word (2b)
+    } // word (2b)
     IC void w_s16(s16 a)
     {
         W_guard g(&w_allow);
         w(&a, 2);
         INI_W(w_s16(a));
-    }  // word (2b)
+    } // word (2b)
     IC void w_u8(u8 a)
     {
         W_guard g(&w_allow);
         w(&a, 1);
         INI_W(w_u8(a));
-    }  // byte (1b)
+    } // byte (1b)
     IC void w_s8(s8 a)
     {
         W_guard g(&w_allow);
         w(&a, 1);
         INI_W(w_s8(a));
-    }  // byte (1b)
+    } // byte (1b)
 
     IC void w_float_q16(float a, float min, float max)
     {
@@ -201,7 +200,8 @@ public:
     {
         Fvector C;
         float mag = D.magnitude();
-        if (mag > EPS_S) {
+        if (mag > EPS_S)
+        {
             C.div(D, mag);
         }
         else
@@ -228,7 +228,7 @@ public:
             IIniFileStream* tmp = inistream;
             inistream = NULL;
             w_u8(0);
-            inistream = tmp;  // hack -(
+            inistream = tmp; // hack -(
         }
 
         INI_W(w_stringZ(p.c_str()));
@@ -242,7 +242,6 @@ public:
     }
 
     IC void w_clientID(ClientID& C) { w_u32(C.value()); }
-
     IC void w_chunk_open8(u32& position)
     {
         position = w_tell();

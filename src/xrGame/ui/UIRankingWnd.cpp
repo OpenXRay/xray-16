@@ -47,7 +47,8 @@ CUIRankingWnd::~CUIRankingWnd()
 
 void CUIRankingWnd::Show(bool status)
 {
-    if (status) {
+    if (status)
+    {
         m_actor_ch_info->InitCharacter(Actor()->object_id());
 
         string64 buf;
@@ -61,7 +62,8 @@ void CUIRankingWnd::Show(bool status)
 
 void CUIRankingWnd::Update()
 {
-    if (Device.dwTimeGlobal - m_previous_time > m_delay) {
+    if (Device.dwTimeGlobal - m_previous_time > m_delay)
+    {
         m_previous_time = Device.dwTimeGlobal;
         update_info();
     }
@@ -188,7 +190,8 @@ void CUIRankingWnd::DrawHint()
     ACHIEVES_VEC_IT b = m_achieves_vec.begin(), e = m_achieves_vec.end();
     for (; b != e; b++)
     {
-        if ((*b)->IsShown()) (*b)->DrawHint();
+        if ((*b)->IsShown())
+            (*b)->DrawHint();
     }
 }
 
@@ -213,9 +216,11 @@ void CUIRankingWnd::get_best_monster()
     luabind::functor<LPCSTR> funct;
     R_ASSERT(ai().script_engine().functor("pda.get_monster_back", funct));
     LPCSTR str = funct();
-    if (!xr_strcmp(str, "")) return;
+    if (!xr_strcmp(str, ""))
+        return;
 
-    if (xr_strcmp(str, m_last_monster_icon_back)) {
+    if (xr_strcmp(str, m_last_monster_icon_back))
+    {
         m_monster_icon_back->TextureOn();
         m_monster_icon_back->InitTexture(str);
         m_last_monster_icon_back = str;
@@ -223,9 +228,11 @@ void CUIRankingWnd::get_best_monster()
 
     R_ASSERT(ai().script_engine().functor("pda.get_monster_icon", funct));
     str = funct();
-    if (!xr_strcmp(str, "")) return;
+    if (!xr_strcmp(str, ""))
+        return;
 
-    if (xr_strcmp(str, m_last_monster_icon)) {
+    if (xr_strcmp(str, m_last_monster_icon))
+    {
         m_monster_icon->TextureOn();
         m_monster_icon->InitTexture(str);
         m_last_monster_icon = str;
@@ -237,10 +244,13 @@ void CUIRankingWnd::get_favorite_weapon()
     R_ASSERT(ai().script_engine().functor("pda.get_favorite_weapon", funct));
     LPCSTR str = funct();
 
-    if (!xr_strcmp(str, "")) return;
+    if (!xr_strcmp(str, ""))
+        return;
 
-    if (xr_strcmp(str, m_last_weapon_icon)) {
-        if (pSettings->section_exist(str) && pSettings->line_exist(str, "upgr_icon_x")) {
+    if (xr_strcmp(str, m_last_weapon_icon))
+    {
+        if (pSettings->section_exist(str) && pSettings->line_exist(str, "upgr_icon_x"))
+        {
             m_favorite_weapon_icon->SetShader(InventoryUtilities::GetWeaponUpgradeIconsShader());
             if (!xr_strcmp(str, "wpn_rpg7"))
                 m_favorite_weapon_icon->SetShader(InventoryUtilities::GetOutfitUpgradeIconsShader());

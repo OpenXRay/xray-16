@@ -9,7 +9,8 @@
 
 void CCustomObject::OnMotionableChange(PropValue* sender)
 {
-    if (m_CO_Flags.is(flMotion)) {
+    if (m_CO_Flags.is(flMotion))
+    {
         m_Motion = new COMotion();
         m_MotionParams = new SAnimParams();
     }
@@ -28,11 +29,7 @@ void CCustomObject::AnimationCreateKey(float t)
     m_Motion->CreateKey(t, PPosition, R);
 }
 
-void CCustomObject::AnimationDeleteKey(float t)
-{
-    m_Motion->DeleteKey(t);
-}
-
+void CCustomObject::AnimationDeleteKey(float t) { m_Motion->DeleteKey(t); }
 // float speed = 0.f;
 void CCustomObject::AnimationUpdate(float t)
 {
@@ -48,14 +45,16 @@ void CCustomObject::AnimationUpdate(float t)
     m_CO_Flags.set(flAutoKey, FALSE);
     UpdateTransform(true);
     m_CO_Flags.set(flAutoKey, bAK);
-    if (m_CO_Flags.is(flCameraView)) EDevice.m_Camera.Set(-r.y, -r.x, -r.z, P.x, P.y, P.z);
+    if (m_CO_Flags.is(flCameraView))
+        EDevice.m_Camera.Set(-r.y, -r.x, -r.z, P.x, P.y, P.z);
 }
 
 void CCustomObject::AnimationOnFrame()
 {
     VERIFY(m_Motion);
 
-    if (Selected() && m_MotionParams->bPlay) {
+    if (Selected() && m_MotionParams->bPlay)
+    {
         AnimationUpdate(m_MotionParams->Frame());
         m_MotionParams->Update(EDevice.fTimeDelta, 1.f, true);
     }
@@ -68,7 +67,8 @@ void CCustomObject::AnimationDrawPath()
     // motion path
     VERIFY(m_Motion);
 #ifdef _EDITOR
-    if (EPrefs->object_flags.is(epoDrawAnimPath)) {
+    if (EPrefs->object_flags.is(epoDrawAnimPath))
+    {
         float fps = m_Motion->FPS();
         float min_t = (float)m_Motion->FrameStart() / fps;
         float max_t = (float)m_Motion->FrameEnd() / fps;
@@ -91,7 +91,8 @@ void CCustomObject::AnimationDrawPath()
         for (KeyIt k_it = E->keys.begin(); k_it != E->keys.end(); k_it++)
         {
             m_Motion->_Evaluate((*k_it)->time, T, r);
-            if (EDevice.m_Camera.GetPosition().distance_to_sqr(T) < 50.f * 50.f) {
+            if (EDevice.m_Camera.GetPosition().distance_to_sqr(T) < 50.f * 50.f)
+            {
                 DU_impl.DrawCross(T, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, clr, false);
                 DU_impl.OutText(T, AnsiString().sprintf("K: %3.3f", (*k_it)->time).c_str(), 0xffffffff, 0x00000000);
             }
@@ -184,13 +185,15 @@ void CCustomObject::OnMotionCommandsClick(ButtonValue* value, bool& bModif, bool
         PHelper().CreateFloat(items, "To Time", &to_time, from_time, to_time, 1.f / 30.f, 3);
         PHelper().CreateFloat(items, "Scale", &scale_factor, -1000.f, 1000.f);
         P->AssignItems(items);
-        if (mrOk == P->ShowPropertiesModal()) {
+        if (mrOk == P->ShowPropertiesModal())
+        {
             m_Motion->ScaleKeys(from_time, to_time, scale_factor);
         }
         TProperties::DestroyForm(P);
         float mx;
         m_Motion->GetLength(0, &mx);
-        if (m_MotionParams->max_t < mx) {
+        if (m_MotionParams->max_t < mx)
+        {
             m_MotionParams->max_t = mx;
             m_Motion->SetParam(m_MotionParams->min_t * 30.f, m_MotionParams->max_t * 30.f, 30.f);
         }
@@ -205,13 +208,15 @@ void CCustomObject::OnMotionCommandsClick(ButtonValue* value, bool& bModif, bool
         PHelper().CreateFloat(items, "To Time", &to_time, from_time, to_time, 1.f / 30.f, 3);
         PHelper().CreateFloat(items, "Speed (m/sec)", &speed, 0.f, 100.f);
         P->AssignItems(items);
-        if (mrOk == P->ShowPropertiesModal()) {
+        if (mrOk == P->ShowPropertiesModal())
+        {
             m_Motion->NormalizeKeys(from_time, to_time, speed);
         }
         TProperties::DestroyForm(P);
         float mx;
         m_Motion->GetLength(0, &mx);
-        if (m_MotionParams->max_t < mx) {
+        if (m_MotionParams->max_t < mx)
+        {
             m_MotionParams->max_t = mx;
             m_Motion->SetParam(m_MotionParams->min_t * 30.f, m_MotionParams->max_t * 30.f, 30.f);
         }
@@ -240,7 +245,8 @@ void CCustomObject::OnMotionFilesClick(ButtonValue* value, bool& bModif, bool& b
     switch (B->btn_num)
     {
     case 0:
-        if (EFS.GetOpenName("$game_anims$", fn)) {
+        if (EFS.GetOpenName("$game_anims$", fn))
+        {
             m_Motion->LoadMotion(fn.c_str());
             m_MotionParams->Set(m_Motion);
             AnimationUpdate(m_MotionParams->Frame());
@@ -249,7 +255,8 @@ void CCustomObject::OnMotionFilesClick(ButtonValue* value, bool& bModif, bool& b
         }
         break;
     case 1:
-        if (EFS.GetSaveName("$game_anims$", fn)) m_Motion->SaveMotion(fn.c_str());
+        if (EFS.GetSaveName("$game_anims$", fn))
+            m_Motion->SaveMotion(fn.c_str());
         break;
     }
 }
@@ -287,19 +294,17 @@ void CCustomObject::OnMotionCurrentFrameChange(PropValue* value)
 
 void CCustomObject::OnMotionCameraViewChange(PropValue* value)
 {
-    if (m_CO_Flags.is(flCameraView)) AnimationUpdate(m_MotionParams->Frame());
+    if (m_CO_Flags.is(flCameraView))
+        AnimationUpdate(m_MotionParams->Frame());
 }
 
-void CCustomObject::OnTransformChange(PropValue* value)
-{
-    UpdateTransform();
-}
-
+void CCustomObject::OnTransformChange(PropValue* value) { UpdateTransform(); }
 void CCustomObject::AnimationFillProp(LPCSTR pref, PropItemVec& items)
 {
     PropValue* V = PHelper().CreateFlag32(items, PrepareKey(pref, "Flags\\Motionable"), &m_CO_Flags, flMotion);
     V->OnChangeEvent.bind(this, &CCustomObject::OnMotionableChange);
-    if (Motionable()) {
+    if (Motionable())
+    {
         PHelper().CreateCaption(items, PrepareKey(pref, "Motion\\Hint"), "Make KEY only on Parent CS");
         ButtonValue* B = PHelper().CreateButton(items, PrepareKey(pref, "Motion\\Files"), "Import,Export", 0);
         B->OnBtnClickEvent.bind(this, &CCustomObject::OnMotionFilesClick);

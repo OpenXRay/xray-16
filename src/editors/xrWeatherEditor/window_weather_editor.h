@@ -25,7 +25,7 @@ ref class window_ide;
 public
 ref class window_weather_editor : public WeifenLuo::WinFormsUI::DockContent
 {
-  public:
+public:
     window_weather_editor(window_ide ^ ide, engine* engine)
         : m_ide(ide), m_engine(*engine), m_weathers_getter(0), m_weathers_size_getter(0), m_frames_getter(0),
           m_frames_size_getter(0), m_update_enabled(true), m_load_finished(false), m_mouse_down(false),
@@ -38,187 +38,188 @@ ref class window_weather_editor : public WeifenLuo::WinFormsUI::DockContent
         //
     }
 
-  protected:
+protected:
     /// <summary>
     /// Clean up any resources being used.
     /// </summary>
     ~window_weather_editor()
     {
-        if (components) {
+        if (components)
+        {
             delete components;
         }
     }
 
-  protected:
-  private:
+protected:
+private:
     System::Windows::Forms::ImageList ^ imageList1;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel23;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel1;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel4;
 
-  private:
+private:
     System::Windows::Forms::TrackBar ^ CurrentTimeTrackBar;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel10;
 
-  private:
+private:
     System::Windows::Forms::Button ^ NextFrameButton;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel9;
 
-  private:
+private:
     System::Windows::Forms::Button ^ PauseButton;
 
-  private:
+private:
     System::Windows::Forms::Button ^ PreviousFrameButton;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel3;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel8;
 
-  private:
+private:
     System::Windows::Forms::ComboBox ^ WeathersComboBox;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel7;
 
-  private:
+private:
     System::Windows::Forms::Label ^ label2;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel6;
 
-  private:
+private:
     System::Windows::Forms::Label ^ label1;
 
-  private:
+private:
     System::Windows::Forms::NumericUpDown ^ TimeFactorNumericUpDown;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel5;
 
-  private:
+private:
     System::Windows::Forms::Label ^ label3;
 
-  private:
+private:
     System::Windows::Forms::ComboBox ^ FramesComboBox;
 
-  private:
+private:
     System::Windows::Forms::TrackBar ^ WeatherTrackBar;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel25;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel24;
 
-  private:
+private:
     System::Windows::Forms::Label ^ label7;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel2;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel13;
 
-  private:
+private:
     XRay::SdkControls::PropertyGrid ^ blend;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel15;
 
-  private:
+private:
     System::Windows::Forms::Label ^ label6;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel22;
 
-  private:
+private:
     System::Windows::Forms::Button ^ CopyButton;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel11;
 
-  private:
+private:
     System::Windows::Forms::Button ^ CreateFromButton;
 
-  private:
+private:
     System::Windows::Forms::Splitter ^ splitter2;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel14;
 
-  private:
+private:
     XRay::SdkControls::PropertyGrid ^ target;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel20;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel17;
 
-  private:
+private:
     System::Windows::Forms::Label ^ label5;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel18;
 
-  private:
+private:
     System::Windows::Forms::Button ^ PasteTargetButton;
 
-  private:
+private:
     System::Windows::Forms::Splitter ^ splitter1;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel12;
 
-  private:
+private:
     XRay::SdkControls::PropertyGrid ^ current;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel19;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel16;
 
-  private:
+private:
     System::Windows::Forms::Label ^ label4;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ panel21;
 
-  private:
+private:
     System::Windows::Forms::Button ^ PasteCurrentButton;
 
-  private:
+private:
     System::Windows::Forms::MaskedTextBox ^ CurrentTimeTextBox;
 
-  private:
+private:
     System::Windows::Forms::Label ^ label8;
 
-  private:
+private:
     System::Windows::Forms::Button ^ ReloadTargetButton;
 
-  private:
+private:
     System::Windows::Forms::Button ^ ReloadCurrentButton;
 
-  private:
+private:
     System::ComponentModel::IContainer ^ components;
 
-  protected:
-  protected:
-  protected:
-  private:
+protected:
+protected:
+protected:
+private:
 /// <summary>
 /// Required designer variable.
 /// </summary>
@@ -947,13 +948,13 @@ ref class window_weather_editor : public WeifenLuo::WinFormsUI::DockContent
         this->ResumeLayout(false);
     }
 #pragma endregion
-  public:
+public:
     typedef ::editor::ide::weathers_getter_type weathers_getter_type;
     typedef ::editor::ide::weathers_size_getter_type weathers_size_getter_type;
     typedef ::editor::ide::frames_getter_type frames_getter_type;
     typedef ::editor::ide::frames_size_getter_type frames_size_getter_type;
 
-  public:
+public:
     void weathers_ids(weathers_getter_type const& weathers_getter,
         weathers_size_getter_type const& weathers_size_getter, frames_getter_type const& frames_getter,
         frames_size_getter_type const& frames_size_getter);
@@ -963,13 +964,13 @@ ref class window_weather_editor : public WeifenLuo::WinFormsUI::DockContent
     void load(Microsoft::Win32::RegistryKey ^ root);
     void fill_weathers();
 
-  private:
+private:
     void fill_frames(LPCSTR current_weather_id);
     void update_frame();
     void save();
     void load();
 
-  private:
+private:
     window_ide ^ m_ide;
     engine& m_engine;
     weathers_getter_type* m_weathers_getter;
@@ -984,7 +985,7 @@ ref class window_weather_editor : public WeifenLuo::WinFormsUI::DockContent
     bool m_update_text_value;
     bool m_update_weather_time;
 
-  private:
+private:
     Void window_weather_editor_Enter(Object ^ sender, EventArgs ^ e);
     Void WeathersComboBox_SelectedIndexChanged(Object ^ sender, EventArgs ^ e);
     Void FramesComboBox_SelectedIndexChanged(Object ^ sender, EventArgs ^ e);
@@ -996,7 +997,7 @@ ref class window_weather_editor : public WeifenLuo::WinFormsUI::DockContent
     Void PauseButton_Click(Object ^ sender, EventArgs ^ e);
     Void TimeFactorNumericUpDown_ValueChanged(Object ^ sender, EventArgs ^ e);
 
-  private:
+private:
     Void CopyButton_Click(Object ^ sender, EventArgs ^ e);
     Void PasteCurrentButton_Click(Object ^ sender, EventArgs ^ e);
     Void PasteTargetButton_Click(Object ^ sender, EventArgs ^ e);

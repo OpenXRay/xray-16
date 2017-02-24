@@ -27,7 +27,7 @@ public:
     LPCSTR get_name() const;
     shared_str get_initiators_ids() const;
     bool check_initiator(actor const* initiator) const;
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     void lock();
     void unlock();
@@ -55,8 +55,8 @@ private:
     door_state m_target_state;
     Fvector m_registered_position;
     bool m_locked;
-};  // class door
+}; // class door
 
-}  // namespace doors
+} // namespace doors
 
-#endif  // #ifndef DOORS_DOOR_H_INCLUDED
+#endif // #ifndef DOORS_DOOR_H_INCLUDED

@@ -24,7 +24,8 @@ public:
         float n_vR = 2 * n_R;
         Fbox BB;
         BB.set(n_C.x - n_vR, n_C.y - n_vR, n_C.z - n_vR, n_C.x + n_vR, n_C.y + n_vR, n_C.z + n_vR);
-        if (fcvNone == F->testAABB(BB.data(), fmask)) return;
+        if (fcvNone == F->testAABB(BB.data(), fmask))
+            return;
 
         // test items
         xr_vector<ISpatial*>::iterator _it = N->items.begin();
@@ -32,12 +33,14 @@ public:
         for (; _it != _end; _it++)
         {
             ISpatial* S = *_it;
-            if (0 == (S->GetSpatialData().type & mask)) continue;
+            if (0 == (S->GetSpatialData().type & mask))
+                continue;
 
             Fvector& sC = S->GetSpatialData().sphere.P;
             float sR = S->GetSpatialData().sphere.R;
             u32 tmask = fmask;
-            if (fcvNone == F->testSphere(sC, sR, tmask)) continue;
+            if (fcvNone == F->testSphere(sC, sR, tmask))
+                continue;
 
             space->q_result->push_back(S);
         }
@@ -46,7 +49,8 @@ public:
         float c_R = n_R / 2;
         for (u32 octant = 0; octant < 8; octant++)
         {
-            if (0 == N->children[octant]) continue;
+            if (0 == N->children[octant])
+                continue;
             Fvector c_C;
             c_C.mad(n_C, c_spatial_offset[octant], c_R);
             walk(N->children[octant], c_C, c_R, fmask);

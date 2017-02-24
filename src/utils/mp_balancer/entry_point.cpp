@@ -14,8 +14,10 @@ void main(int argc, char* argv[])
 
     wpn_collection.load_all_mp_weapons();
 
-    if (argc == 2) {
-        if (!strcmp(argv[1], "export_configs")) {
+    if (argc == 2)
+    {
+        if (!strcmp(argv[1], "export_configs"))
+        {
             wpn_collection.extract_all_params();
             wpn_collection.save_new_configs();
         }

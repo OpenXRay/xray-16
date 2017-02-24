@@ -25,17 +25,14 @@ public:
     inline_ Sphere(const Sphere& sphere) : mCenter(sphere.mCenter), mRadius(sphere.mRadius) {}
     //! Destructor
     inline_ ~Sphere() {}
-
     bool Compute(udword nbverts, Point* verts);
     bool FastCompute(udword nbverts, Point* verts);
 
     // Access methods
     inline_ const Point& GetCenter() const { return mCenter; }
     inline_ float GetRadius() const { return mRadius; }
-
     inline_ const Point& Center() const { return mCenter; }
     inline_ float Radius() const { return mRadius; }
-
     inline_ Sphere& Set(const Point& center, float radius)
     {
         mCenter = center;
@@ -61,7 +58,6 @@ public:
      */
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     inline_ bool Contains(const Point& p) const { return mCenter.SquareDistance(p) < mRadius * mRadius; }
-
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      *	Tests if a sphere is contained within the sphere.
@@ -96,32 +92,40 @@ public:
         p.x = Max.x;
         p.y = Max.y;
         p.z = Max.z;
-        if (mCenter.SquareDistance(p) >= R2) return FALSE;
+        if (mCenter.SquareDistance(p) >= R2)
+            return FALSE;
         p.x = Min.x;
-        if (mCenter.SquareDistance(p) >= R2) return FALSE;
+        if (mCenter.SquareDistance(p) >= R2)
+            return FALSE;
         p.x = Max.x;
         p.y = Min.y;
-        if (mCenter.SquareDistance(p) >= R2) return FALSE;
+        if (mCenter.SquareDistance(p) >= R2)
+            return FALSE;
         p.x = Min.x;
-        if (mCenter.SquareDistance(p) >= R2) return FALSE;
+        if (mCenter.SquareDistance(p) >= R2)
+            return FALSE;
         p.x = Max.x;
         p.y = Max.y;
         p.z = Min.z;
-        if (mCenter.SquareDistance(p) >= R2) return FALSE;
+        if (mCenter.SquareDistance(p) >= R2)
+            return FALSE;
         p.x = Min.x;
-        if (mCenter.SquareDistance(p) >= R2) return FALSE;
+        if (mCenter.SquareDistance(p) >= R2)
+            return FALSE;
         p.x = Max.x;
         p.y = Min.y;
-        if (mCenter.SquareDistance(p) >= R2) return FALSE;
+        if (mCenter.SquareDistance(p) >= R2)
+            return FALSE;
         p.x = Min.x;
-        if (mCenter.SquareDistance(p) >= R2) return FALSE;
+        if (mCenter.SquareDistance(p) >= R2)
+            return FALSE;
 
         return TRUE;
     }
 
 public:
-    Point mCenter;  //!< Sphere center
-    float mRadius;  //!< Sphere radius
+    Point mCenter; //!< Sphere center
+    float mRadius; //!< Sphere radius
 #ifdef OLD
 private:
     Sphere PlanarCircumscribe3(const Point& p0, const Point& p1, const Point& p2);
@@ -138,4 +142,4 @@ private:
 #endif
 };
 
-#endif  // __ICEBOUNDINGSPHERE_H__
+#endif // __ICEBOUNDINGSPHERE_H__

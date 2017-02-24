@@ -7,36 +7,36 @@
 #include <eax/eax.h>
 
 #ifdef DEBUG
-#define A_CHK(expr)                                                                                                    \
-    {                                                                                                                  \
-        alGetError();                                                                                                  \
-        expr;                                                                                                          \
-        ALenum error = alGetError();                                                                                   \
-        VERIFY2(error == AL_NO_ERROR, (LPCSTR)alGetString(error));                                                     \
+#define A_CHK(expr)                                                \
+    {                                                              \
+        alGetError();                                              \
+        expr;                                                      \
+        ALenum error = alGetError();                               \
+        VERIFY2(error == AL_NO_ERROR, (LPCSTR)alGetString(error)); \
     }
-#define AC_CHK(expr)                                                                                                   \
-    {                                                                                                                  \
-        alcGetError(pDevice);                                                                                          \
-        expr;                                                                                                          \
-        ALCenum error = alcGetError(pDevice);                                                                          \
-        VERIFY2(error == ALC_NO_ERROR, (LPCSTR)alcGetString(pDevice, error));                                          \
+#define AC_CHK(expr)                                                          \
+    {                                                                         \
+        alcGetError(pDevice);                                                 \
+        expr;                                                                 \
+        ALCenum error = alcGetError(pDevice);                                 \
+        VERIFY2(error == ALC_NO_ERROR, (LPCSTR)alcGetString(pDevice, error)); \
     }
 #else
-#define A_CHK(expr)                                                                                                    \
-    {                                                                                                                  \
-        expr;                                                                                                          \
+#define A_CHK(expr) \
+    {               \
+        expr;       \
     }
-#define AC_CHK(expr)                                                                                                   \
-    {                                                                                                                  \
-        expr;                                                                                                          \
+#define AC_CHK(expr) \
+    {                \
+        expr;        \
     }
 #endif
 
 class CSoundRender_CoreA : public CSoundRender_Core
 {
     typedef CSoundRender_Core inherited;
-    EAXSet eaxSet;  // EAXSet function, retrieved if EAX Extension is supported
-    EAXGet eaxGet;  // EAXGet function, retrieved if EAX Extension is supported
+    EAXSet eaxSet; // EAXSet function, retrieved if EAX Extension is supported
+    EAXGet eaxGet; // EAXGet function, retrieved if EAX Extension is supported
     ALCdevice* pDevice;
     ALCcontext* pContext;
     ALDeviceList* pDeviceList;

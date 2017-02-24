@@ -10,14 +10,12 @@
 #include "alife_smart_terrain_registry.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 
-CALifeSmartTerrainRegistry::~CALifeSmartTerrainRegistry()
-{
-}
-
+CALifeSmartTerrainRegistry::~CALifeSmartTerrainRegistry() {}
 void CALifeSmartTerrainRegistry::add(CSE_ALifeDynamicObject* object)
 {
     CSE_ALifeSmartZone* zone = smart_cast<CSE_ALifeSmartZone*>(object);
-    if (!zone) return;
+    if (!zone)
+        return;
 
     OBJECTS::const_iterator I = objects().find(object->ID);
     VERIFY(I == objects().end());
@@ -27,7 +25,8 @@ void CALifeSmartTerrainRegistry::add(CSE_ALifeDynamicObject* object)
 void CALifeSmartTerrainRegistry::remove(CSE_ALifeDynamicObject* object)
 {
     CSE_ALifeSmartZone* zone = smart_cast<CSE_ALifeSmartZone*>(object);
-    if (!zone) return;
+    if (!zone)
+        return;
 
     OBJECTS::iterator I = m_objects.find(object->ID);
     VERIFY(I != m_objects.end());

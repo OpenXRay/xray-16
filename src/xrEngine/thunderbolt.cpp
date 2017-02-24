@@ -16,10 +16,7 @@
 #include "xr_object.h"
 #endif
 
-SThunderboltDesc::SThunderboltDesc() : m_GradientTop(0), m_GradientCenter(0)
-{
-}
-
+SThunderboltDesc::SThunderboltDesc() : m_GradientTop(0), m_GradientCenter(0) {}
 SThunderboltDesc::~SThunderboltDesc()
 {
     m_pRender->DestroyModel();
@@ -78,16 +75,14 @@ void SThunderboltDesc::load(CInifile& pIni, shared_str const& sect)
 
     // sound
     m_name = pIni.r_string(sect, "sound");
-    if (m_name && m_name[0]) snd.create(m_name, st_Effect, sg_Undefined);
+    if (m_name && m_name[0])
+        snd.create(m_name, st_Effect, sg_Undefined);
 }
 
 //----------------------------------------------------------------------------------------------
 // collection
 //----------------------------------------------------------------------------------------------
-SThunderboltCollection::SThunderboltCollection()
-{
-}
-
+SThunderboltCollection::SThunderboltCollection() {}
 void SThunderboltCollection::load(CInifile* pIni, CInifile* thunderbolts, LPCSTR sect)
 {
     section = sect;
@@ -147,9 +142,11 @@ CEffect_Thunderbolt::~CEffect_Thunderbolt()
 shared_str CEffect_Thunderbolt::AppendDef(
     CEnvironment& environment, CInifile* pIni, CInifile* thunderbolts, LPCSTR sect)
 {
-    if (!sect || (0 == sect[0])) return "";
+    if (!sect || (0 == sect[0]))
+        return "";
     for (CollectionVecIt it = collection.begin(); it != collection.end(); it++)
-        if ((*it)->section == sect) return (*it)->section;
+        if ((*it)->section == sect)
+            return (*it)->section;
     collection.push_back(environment.thunderbolt_collection(pIni, thunderbolts, sect));
     return collection.back()->section;
 }
@@ -172,7 +169,8 @@ BOOL CEffect_Thunderbolt::RayPick(const Fvector& s, const Fvector& d, float& dis
         Fplane PL;
         PL.build(P, N);
         float dst = dist;
-        if (PL.intersectRayDist(s, d, dst) && (dst <= dist)) {
+        if (PL.intersectRayDist(s, d, dst) && (dst <= dist))
+        {
             dist = dst;
             return true;
         }
@@ -199,7 +197,7 @@ void CEffect_Thunderbolt::Bolt(shared_str id, float period, float lt)
     float sun_h, sun_p;
     CEnvironment& environment = g_pGamePersistent->Environment();
     environment.CurrentEnv->sun_dir.getHP(sun_h, sun_p);
-    float alt = environment.p_var_alt;  // Random.randF(environment.p_var_alt.x,environment.p_var_alt.y);
+    float alt = environment.p_var_alt; // Random.randF(environment.p_var_alt.x,environment.p_var_alt.y);
     float lng = Random.randF(sun_h - environment.p_var_long + PI, sun_h + environment.p_var_long + PI);
     float dist = Random.randF(FAR_DIST * environment.p_min_dist, FAR_DIST * .95f);
     current_direction.setHP(lng, alt);
@@ -222,7 +220,8 @@ void CEffect_Thunderbolt::Bolt(shared_str id, float period, float lt)
 
     float next_v = Random.randF();
 
-    if (next_v < environment.p_second_prop) {
+    if (next_v < environment.p_second_prop)
+    {
         next_lightning_time = Device.fTimeGlobal + lt + EPS_L;
     }
     else
@@ -231,22 +230,26 @@ void CEffect_Thunderbolt::Bolt(shared_str id, float period, float lt)
         current->snd.play_no_feedback(0, 0, dist / 300.f, &pos, 0, 0, &Fvector2().set(dist / 2, dist * 2.f));
     }
 
-    current_direction.invert();  // for env-sun
+    current_direction.invert(); // for env-sun
 }
 
 void CEffect_Thunderbolt::OnFrame(shared_str id, float period, float duration)
 {
     BOOL enabled = !!(id.size());
-    if (bEnabled != enabled) {
+    if (bEnabled != enabled)
+    {
         bEnabled = enabled;
         next_lightning_time = Device.fTimeGlobal + period + Random.randF(-period * 0.5f, period * 0.5f);
     }
     else if (bEnabled && (Device.fTimeGlobal > next_lightning_time))
     {
-        if (state == stIdle && !!(id.size())) Bolt(id, period, duration);
+        if (state == stIdle && !!(id.size()))
+            Bolt(id, period, duration);
     }
-    if (state == stWorking) {
-        if (current_time > life_time) state = stIdle;
+    if (state == stWorking)
+    {
+        if (current_time > life_time)
+            state = stIdle;
         current_time += Device.fTimeDelta;
         Fvector fClr;
         int frame;
@@ -268,7 +271,8 @@ void CEffect_Thunderbolt::OnFrame(shared_str id, float period, float duration)
         environment.CurrentEnv->sun_color.mad(fClr, environment.p_sun_color);
         environment.CurrentEnv->fog_color.mad(fClr, environment.p_fog_color);
 
-        if (GlobalEnv.Render->get_generation() == IRender::GENERATION_R2) {
+        if (GlobalEnv.Render->get_generation() == IRender::GENERATION_R2)
+        {
             R_ASSERT(_valid(current_direction));
             g_pGamePersistent->Environment().CurrentEnv->sun_dir = current_direction;
             VERIFY2(g_pGamePersistent->Environment().CurrentEnv->sun_dir.y < 0,
@@ -279,7 +283,8 @@ void CEffect_Thunderbolt::OnFrame(shared_str id, float period, float duration)
 
 void CEffect_Thunderbolt::Render()
 {
-    if (state == stWorking) {
+    if (state == stWorking)
+    {
         m_pRender->Render(*this);
 
         /*

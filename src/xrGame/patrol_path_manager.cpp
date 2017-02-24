@@ -19,7 +19,7 @@
 #include "game_object_space.h"
 #include "xrAICore/Navigation/level_graph.h"
 
-#if 1  // def DEBUG
+#if 1 // def DEBUG
 #include "space_restriction_manager.h"
 
 static void show_restrictions(LPCSTR restrictions)
@@ -33,13 +33,13 @@ bool show_restrictions(CRestrictedObject* object)
 {
     Msg("DEFAULT OUT RESTRICTIONS :");
     show_restrictions(*Level().space_restriction_manager().default_out_restrictions() ?
-                          *Level().space_restriction_manager().default_out_restrictions() :
-                          "");
+            *Level().space_restriction_manager().default_out_restrictions() :
+            "");
 
     Msg("DEFAULT IN RESTRICTIONS  :");
     show_restrictions(*Level().space_restriction_manager().default_in_restrictions() ?
-                          *Level().space_restriction_manager().default_in_restrictions() :
-                          "");
+            *Level().space_restriction_manager().default_in_restrictions() :
+            "");
 
     Msg("OUT RESTRICTIONS         :");
     show_restrictions(*object->out_restrictions() ? *object->out_restrictions() : "");
@@ -51,14 +51,12 @@ bool show_restrictions(CRestrictedObject* object)
 }
 #endif
 
-CPatrolPathManager::~CPatrolPathManager()
-{
-}
-
+CPatrolPathManager::~CPatrolPathManager() {}
 bool CPatrolPathManager::extrapolate_path()
 {
     VERIFY(m_path && m_path->vertex(m_curr_point_index));
-    if (!m_extrapolate_callback) return (true);
+    if (!m_extrapolate_callback)
+        return (true);
 
     return (m_extrapolate_callback(m_curr_point_index));
 }
@@ -94,7 +92,6 @@ struct CAccessabilityEvaluator
     const CPatrolPathManager* m_manager;
 
     IC CAccessabilityEvaluator(const CPatrolPathManager* manager) { m_manager = manager; }
-
     IC bool operator()(const Fvector& position) const { return (m_manager->accessible(position)); }
 };
 
@@ -102,7 +99,8 @@ void CPatrolPathManager::select_point(const Fvector& position, u32& dest_vertex_
 {
     VERIFY(m_path && !m_path->vertices().empty());
     const CPatrolPath::CVertex* vertex = 0;
-    if (!actual() || !m_path->vertex(m_curr_point_index)) {
+    if (!actual() || !m_path->vertex(m_curr_point_index))
+    {
         switch (m_start_type)
         {
         case ePatrolStartTypeFirst:
@@ -132,8 +130,10 @@ void CPatrolPathManager::select_point(const Fvector& position, u32& dest_vertex_
         }
         case ePatrolStartTypeNext:
         {
-            if (m_prev_point_index != u32(-1)) {
-                if ((m_prev_point_index + 1) < m_path->vertex_count()) {
+            if (m_prev_point_index != u32(-1))
+            {
+                if ((m_prev_point_index + 1) < m_path->vertex_count())
+                {
                     vertex = m_path->vertex(m_prev_point_index + 1);
                 }
                 else
@@ -142,17 +142,20 @@ void CPatrolPathManager::select_point(const Fvector& position, u32& dest_vertex_
                     vertex = m_path->vertex(next_point_id);
                 }
 
-                if (!accessible(vertex)) vertex = 0;
+                if (!accessible(vertex))
+                    vertex = 0;
             }
 
-            if (!vertex) vertex = m_path->point(position, CAccessabilityEvaluator(this));
+            if (!vertex)
+                vertex = m_path->point(position, CAccessabilityEvaluator(this));
 
             VERIFY3(accessible(vertex) || show_restrictions(m_object), *m_path_name, *m_game_object->cName());
             break;
         }
         default: NODEFAULT;
         }
-        if (!(vertex || show_restrictions(m_object))) {
+        if (!(vertex || show_restrictions(m_object)))
+        {
             // ugly HACK, just because Plecha asked...
             VERIFY2(vertex || show_restrictions(m_object),
                 make_string("any vertex in patrol path [%s] is inaccessible for object [%s]", *m_path_name,
@@ -165,7 +168,8 @@ void CPatrolPathManager::select_point(const Fvector& position, u32& dest_vertex_
             make_string("patrol path[%s], point on path [%s],object [%s]", *m_path_name, *vertex->data().name(),
                 *m_game_object->cName()));
 
-        if (!m_path->vertex(m_prev_point_index)) m_prev_point_index = vertex->vertex_id();
+        if (!m_path->vertex(m_prev_point_index))
+            m_prev_point_index = vertex->vertex_id();
 
         m_curr_point_index = vertex->vertex_id();
 
@@ -181,7 +185,8 @@ void CPatrolPathManager::select_point(const Fvector& position, u32& dest_vertex_
 			return;
 		}
 #else
-        if (!m_game_object->Position().similar(vertex->data().position(), .1f)) {
+        if (!m_game_object->Position().similar(vertex->data().position(), .1f))
+        {
             dest_vertex_id = vertex->data().level_vertex_id();
             m_dest_position = vertex->data().position();
             VERIFY(accessible(m_dest_position) || show_restrictions(m_object));
@@ -196,8 +201,8 @@ void CPatrolPathManager::select_point(const Fvector& position, u32& dest_vertex_
     m_game_object->callback(GameObject::ePatrolPathInPoint)(
         m_game_object->lua_game_object(), u32(ScriptEntity::eActionTypeMovement), m_curr_point_index);
 
-    u32 count = 0;    // количество разветвлений
-    float sum = 0.f;  // сумма весов разветвления
+    u32 count = 0; // количество разветвлений
+    float sum = 0.f; // сумма весов разветвления
     vertex = m_path->vertex(m_curr_point_index);
     CPatrolPath::const_iterator I = vertex->edges().begin(), E = vertex->edges().end();
     u32 target = u32(-1);
@@ -205,17 +210,21 @@ void CPatrolPathManager::select_point(const Fvector& position, u32& dest_vertex_
     // вычислить количество разветвлений
     for (; I != E; ++I)
     {
-        if ((*I).vertex_id() == m_prev_point_index) continue;
+        if ((*I).vertex_id() == m_prev_point_index)
+            continue;
 
-        if (!accessible(m_path->vertex((*I).vertex_id()))) continue;
+        if (!accessible(m_path->vertex((*I).vertex_id())))
+            continue;
 
-        if (count == 0) target = (*I).vertex_id();
+        if (count == 0)
+            target = (*I).vertex_id();
 
         sum += (*I).weight();
         ++count;
     }
 
-    if (count == 0) {
+    if (count == 0)
+    {
         switch (m_route_type)
         {
         case ePatrolRouteTypeStop:
@@ -227,12 +236,14 @@ void CPatrolPathManager::select_point(const Fvector& position, u32& dest_vertex_
         {
             for (I = vertex->edges().begin(); I != E; ++I)
             {
-                if (!accessible(m_path->vertex((*I).vertex_id()))) continue;
+                if (!accessible(m_path->vertex((*I).vertex_id())))
+                    continue;
 
                 target = (*I).vertex_id();
                 break;
             }
-            if (target != u32(-1)) break;
+            if (target != u32(-1))
+                break;
 
             m_completed = true;
             return;
@@ -244,20 +255,24 @@ void CPatrolPathManager::select_point(const Fvector& position, u32& dest_vertex_
     {
         float fChoosed = 0.f;
 
-        if (random() && (count > 1)) fChoosed = ::Random.randF(sum);
+        if (random() && (count > 1))
+            fChoosed = ::Random.randF(sum);
 
         sum = 0.f;
         I = vertex->edges().begin();
 
         for (; I != E; ++I)
         {
-            if ((*I).vertex_id() == m_prev_point_index) continue;
+            if ((*I).vertex_id() == m_prev_point_index)
+                continue;
 
-            if (!accessible(m_path->vertex((*I).vertex_id()))) continue;
+            if (!accessible(m_path->vertex((*I).vertex_id())))
+                continue;
 
             sum += (*I).weight();
 
-            if (sum >= fChoosed) {
+            if (sum >= fChoosed)
+            {
                 target = (*I).vertex_id();
                 break;
             }
@@ -277,8 +292,8 @@ void CPatrolPathManager::select_point(const Fvector& position, u32& dest_vertex_
 
 u32 CPatrolPathManager::get_next_point(u32 prev_point_index)
 {
-    u32 count = 0;    // количество разветвлений
-    float sum = 0.f;  // сумма весов разветвления
+    u32 count = 0; // количество разветвлений
+    float sum = 0.f; // сумма весов разветвления
     const CPatrolPath::CVertex* vertex = m_path->vertex(prev_point_index);
 
     CPatrolPath::const_iterator I = vertex->edges().begin(), E = vertex->edges().end();
@@ -287,28 +302,33 @@ u32 CPatrolPathManager::get_next_point(u32 prev_point_index)
     // вычислить количество разветвлений
     for (; I != E; ++I)
     {
-        if (!accessible(m_path->vertex((*I).vertex_id()))) continue;
+        if (!accessible(m_path->vertex((*I).vertex_id())))
+            continue;
 
         sum += (*I).weight();
         ++count;
     }
 
     // проверить количество
-    if (count != 0) {
+    if (count != 0)
+    {
         float fChoosed = 0.f;
 
-        if (random() && (count > 1)) fChoosed = ::Random.randF(sum);
+        if (random() && (count > 1))
+            fChoosed = ::Random.randF(sum);
 
         sum = 0.f;
         I = vertex->edges().begin();
 
         for (; I != E; ++I)
         {
-            if (!accessible(m_path->vertex((*I).vertex_id()))) continue;
+            if (!accessible(m_path->vertex((*I).vertex_id())))
+                continue;
 
             sum += (*I).weight();
 
-            if (sum >= fChoosed) {
+            if (sum >= fChoosed)
+            {
                 target = (*I).vertex_id();
                 break;
             }
@@ -320,7 +340,8 @@ u32 CPatrolPathManager::get_next_point(u32 prev_point_index)
 
 shared_str CPatrolPathManager::path_name() const
 {
-    if (!m_path) {
+    if (!m_path)
+    {
         ai().script_engine().script_log(
             LuaMessageType::Error, "Path not specified (object %s)!", *m_game_object->cName());
         return ("");
@@ -331,13 +352,15 @@ shared_str CPatrolPathManager::path_name() const
 
 void CPatrolPathManager::set_previous_point(int point_index)
 {
-    if (!m_path) {
+    if (!m_path)
+    {
         ai().script_engine().script_log(
             LuaMessageType::Error, "Path not specified (object %s)!", *m_game_object->cName());
         return;
     }
 
-    if (!m_path->vertex(point_index)) {
+    if (!m_path->vertex(point_index))
+    {
         ai().script_engine().script_log(LuaMessageType::Error, "Start point violates path bounds %s (object %s)!",
             *m_path_name, *m_game_object->cName());
         return;
@@ -349,12 +372,14 @@ void CPatrolPathManager::set_previous_point(int point_index)
 
 void CPatrolPathManager::set_start_point(int point_index)
 {
-    if (!m_path) {
+    if (!m_path)
+    {
         ai().script_engine().script_log(
             LuaMessageType::Error, "Path not specified (object %s)!", *m_game_object->cName());
         return;
     }
-    if (!m_path->vertex(point_index)) {
+    if (!m_path->vertex(point_index))
+    {
         ai().script_engine().script_log(LuaMessageType::Error, "Start point violates path bounds %s (object %s)!",
             *m_path_name, *m_game_object->cName());
         return;

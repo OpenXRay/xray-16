@@ -35,7 +35,8 @@ int CEditableMesh::FindSimilarUV(st_VMap* vmap, Fvector2& _uv)
     for (int k = 0; k < sz; ++k)
     {
         const Fvector2& uv = vmap->getUV(k);
-        if (uv.similar(_uv)) return k;
+        if (uv.similar(_uv))
+            return k;
     }
     return -1;
 }
@@ -46,7 +47,8 @@ int CEditableMesh::FindSimilarWeight(st_VMap* vmap, float _w)
     for (int k = 0; k < sz; ++k)
     {
         float w = vmap->getW(k);
-        if (fsimilar(w, _w)) return k;
+        if (fsimilar(w, _w))
+            return k;
     }
     return -1;
 }
@@ -84,10 +86,12 @@ void CEditableMesh::RebuildVMaps()
                 case vmtUV:
                 {
                     int& pm = m_VertVMap[F.pv[k].pindex];
-                    if (-1 == pm) {  // point map
+                    if (-1 == pm)
+                    { // point map
                         pm = F.pv[k].vmref;
                         int vm_idx = FindVMapByName(nVMaps, vmap->name.c_str(), vmap->type, false);
-                        if (-1 == vm_idx) {
+                        if (-1 == vm_idx)
+                        {
                             nVMaps.push_back(new st_VMap(vmap->name.c_str(), vmap->type, false));
                             vm_idx = nVMaps.size() - 1;
                         }
@@ -106,9 +110,10 @@ void CEditableMesh::RebuildVMaps()
                         n_pt_it->vmap_index = vm_idx;
                     }
                     else
-                    {  // poly map
+                    { // poly map
                         int vm_idx = FindVMapByName(nVMaps, vmap->name.c_str(), vmap->type, true);
-                        if (-1 == vm_idx) {
+                        if (-1 == vm_idx)
+                        {
                             nVMaps.push_back(new st_VMap(vmap->name.c_str(), vmap->type, true));
                             vm_idx = nVMaps.size() - 1;
                         }
@@ -134,7 +139,8 @@ void CEditableMesh::RebuildVMaps()
                 case vmtWeight:
                 {
                     int vm_idx = FindVMapByName(nVMaps, vmap->name.c_str(), vmap->type, false);
-                    if (-1 == vm_idx) {
+                    if (-1 == vm_idx)
+                    {
                         nVMaps.push_back(new st_VMap(vmap->name.c_str(), vmap->type, false));
                         vm_idx = nVMaps.size() - 1;
                     }
@@ -194,12 +200,14 @@ bool CEditableMesh::OptimizeFace(st_Face& face)
         for (U32It it = vl->begin(); it != vl->end(); it++)
         {
             FvectorIt v = m_NewPoints.begin() + (*it);
-            if (v->similar(points[k], EPS)) mface[k] = *it;
+            if (v->similar(points[k], EPS))
+                mface[k] = *it;
         }
     }
     for (k = 0; k < 3; k++)
     {
-        if (mface[k] == -1) {
+        if (mface[k] == -1)
+        {
             mface[k] = m_NewPoints.size();
             m_NewPoints.push_back(points[k]);
             int ix, iy, iz;
@@ -211,17 +219,25 @@ bool CEditableMesh::OptimizeFace(st_Face& face)
             ixE = iFloor(float(points[k].x + VMeps.x - VMmin.x) / VMscale.x * MX);
             iyE = iFloor(float(points[k].y + VMeps.y - VMmin.y) / VMscale.y * MY);
             izE = iFloor(float(points[k].z + VMeps.z - VMmin.z) / VMscale.z * MZ);
-            if (ixE != ix) VM[ixE][iy][iz].push_back(mface[k]);
-            if (iyE != iy) VM[ix][iyE][iz].push_back(mface[k]);
-            if (izE != iz) VM[ix][iy][izE].push_back(mface[k]);
-            if ((ixE != ix) && (iyE != iy)) VM[ixE][iyE][iz].push_back(mface[k]);
-            if ((ixE != ix) && (izE != iz)) VM[ixE][iy][izE].push_back(mface[k]);
-            if ((iyE != iy) && (izE != iz)) VM[ix][iyE][izE].push_back(mface[k]);
-            if ((ixE != ix) && (iyE != iy) && (izE != iz)) VM[ixE][iyE][izE].push_back(mface[k]);
+            if (ixE != ix)
+                VM[ixE][iy][iz].push_back(mface[k]);
+            if (iyE != iy)
+                VM[ix][iyE][iz].push_back(mface[k]);
+            if (izE != iz)
+                VM[ix][iy][izE].push_back(mface[k]);
+            if ((ixE != ix) && (iyE != iy))
+                VM[ixE][iyE][iz].push_back(mface[k]);
+            if ((ixE != ix) && (izE != iz))
+                VM[ixE][iy][izE].push_back(mface[k]);
+            if ((iyE != iy) && (izE != iz))
+                VM[ix][iyE][izE].push_back(mface[k]);
+            if ((ixE != ix) && (iyE != iy) && (izE != iz))
+                VM[ixE][iyE][izE].push_back(mface[k]);
         }
     }
 
-    if ((mface[0] == mface[1]) || (mface[1] == mface[2]) || (mface[0] == mface[2])) {
+    if ((mface[0] == mface[1]) || (mface[1] == mface[2]) || (mface[0] == mface[2]))
+    {
         Msg("!Optimize: Invalid face found. Removed.");
         return false;
     }
@@ -236,7 +252,8 @@ bool CEditableMesh::OptimizeFace(st_Face& face)
 
 void CEditableMesh::OptimizeMesh(BOOL NoOpt)
 {
-    if (!NoOpt) {
+    if (!NoOpt)
+    {
 #ifdef _EDITOR
         UnloadRenderBuffers();
         UnloadCForm();
@@ -268,7 +285,8 @@ void CEditableMesh::OptimizeMesh(BOOL NoOpt)
         int i_del_face = 0;
         for (u32 k = 0; k < m_FaceCount; k++)
         {
-            if (!OptimizeFace(m_Faces[k])) {
+            if (!OptimizeFace(m_Faces[k]))
+            {
                 faces_mark[k] = true;
 
                 //. -----in plugin
@@ -284,7 +302,8 @@ void CEditableMesh::OptimizeMesh(BOOL NoOpt)
         m_Vertices = xr_alloc<Fvector>(m_VertCount);
         memcpy(m_Vertices, &*m_NewPoints.begin(), m_NewPoints.size() * sizeof(Fvector));
 
-        if (i_del_face) {
+        if (i_del_face)
+        {
             st_Face* old_faces = m_Faces;
             u32* old_sg = m_SmoothGroups;
 
@@ -294,14 +313,16 @@ void CEditableMesh::OptimizeMesh(BOOL NoOpt)
             u32 new_dk = 0;
             for (u32 dk = 0; dk < m_FaceCount; ++dk)
             {
-                if (faces_mark[dk]) {
+                if (faces_mark[dk])
+                {
                     for (SurfFacesPairIt plp_it = m_SurfFaces.begin(); plp_it != m_SurfFaces.end(); ++plp_it)
                     {
                         IntVec& pol_lst = plp_it->second;
                         for (int k = 0; k < int(pol_lst.size()); ++k)
                         {
                             int& f = pol_lst[k];
-                            if (f > (int)dk) {
+                            if (f > (int)dk)
+                            {
                                 --f;
                             }
                             else if (f == (int)dk)

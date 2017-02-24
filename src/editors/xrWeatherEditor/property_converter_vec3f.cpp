@@ -38,16 +38,14 @@ PropertyDescriptorCollection ^ property_converter_vec3f::GetProperties(
     return (current->Sort(names));
 }
 
-bool property_converter_vec3f::GetPropertiesSupported(ITypeDescriptorContext ^ context)
-{
-    return (true);
-}
-
+bool property_converter_vec3f::GetPropertiesSupported(ITypeDescriptorContext ^ context) { return (true); }
 bool property_converter_vec3f::CanConvertTo(ITypeDescriptorContext ^ context, Type ^ destination_type)
 {
-    if (destination_type == Vec3f::typeid) return (true);
+    if (destination_type == Vec3f::typeid)
+        return (true);
 
-    if (destination_type == String::typeid) return (false);
+    if (destination_type == String::typeid)
+        return (false);
 
     return (inherited::CanConvertTo(context, destination_type));
 }
@@ -55,15 +53,17 @@ bool property_converter_vec3f::CanConvertTo(ITypeDescriptorContext ^ context, Ty
 Object ^ property_converter_vec3f::ConvertTo(
              ITypeDescriptorContext ^ context, CultureInfo ^ culture, Object ^ value, Type ^ destination_type)
 {
-    if (destination_type == String::typeid) {
+    if (destination_type == String::typeid)
+    {
         property_container ^ container = safe_cast<property_container ^>(value);
         editor::vec3f vec3f = safe_cast<property_vec3f_base %>(container->container_holder()).get_value_raw();
         return ("" + property_converter_float().ConvertTo(context, culture, vec3f.x, String::typeid) + " " +
-                property_converter_float().ConvertTo(context, culture, vec3f.y, String::typeid) + " " +
-                property_converter_float().ConvertTo(context, culture, vec3f.z, String::typeid) + "");
+            property_converter_float().ConvertTo(context, culture, vec3f.y, String::typeid) + " " +
+            property_converter_float().ConvertTo(context, culture, vec3f.z, String::typeid) + "");
     }
 
-    if (destination_type == Vec3f::typeid) {
+    if (destination_type == Vec3f::typeid)
+    {
         property_container ^ container = safe_cast<property_container ^>(value);
         editor::vec3f vec3f = safe_cast<property_vec3f_base %>(container->container_holder()).get_value_raw();
         return (Vec3f(vec3f.x, vec3f.y, vec3f.z));
@@ -74,7 +74,8 @@ Object ^ property_converter_vec3f::ConvertTo(
 
 bool property_converter_vec3f::CanConvertFrom(ITypeDescriptorContext ^ context, Type ^ source_type)
 {
-    if (source_type == String::typeid) return (true);
+    if (source_type == String::typeid)
+        return (true);
 
     return (inherited::CanConvertFrom(context, source_type));
 }
@@ -82,7 +83,8 @@ bool property_converter_vec3f::CanConvertFrom(ITypeDescriptorContext ^ context, 
 Object ^ property_converter_vec3f::ConvertFrom(ITypeDescriptorContext ^ context, CultureInfo ^ culture, Object ^ value)
 {
     String ^ string = dynamic_cast<String ^>(value);
-    if (!value) return (inherited::ConvertFrom(context, culture, value));
+    if (!value)
+        return (inherited::ConvertFrom(context, culture, value));
 
     try
     {

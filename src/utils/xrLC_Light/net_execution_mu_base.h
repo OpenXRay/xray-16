@@ -18,7 +18,6 @@ class tnet_execution_base<et_mu_base_light>::net_execution_impl
 
 public:
     net_execution_impl() : mu_model_id(u32(-1)) {}
-
     void construct(u32 id) { mu_model_id = id; }
     void send_task(IGenericStream* outStream);
     void receive_result(IGenericStream* inStream);
@@ -34,4 +33,4 @@ struct add_global<et_mu_base_light, gl_base_cl_data>
 // execution_lightmaps
 };
 
-#endif  // #ifndef NET_EXECUTION_MU_BASE_H_INCLUDED
+#endif // #ifndef NET_EXECUTION_MU_BASE_H_INCLUDED

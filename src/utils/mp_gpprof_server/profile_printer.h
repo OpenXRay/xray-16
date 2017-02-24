@@ -30,4 +30,4 @@ inline std::basic_ostream<char, Traits>& operator<<(
     return ostr;
 }
 
-#endif  //#ifndef PROFILE_PRINTER_INCLUDED
+#endif //#ifndef PROFILE_PRINTER_INCLUDED

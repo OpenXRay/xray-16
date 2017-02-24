@@ -6,7 +6,6 @@ public:
     virtual LPCSTR getComment() { return "INTERNAL: accumulate direct light"; }
     virtual BOOL canBeDetailed() { return FALSE; }
     virtual BOOL canBeLMAPped() { return FALSE; }
-
     virtual void Compile(CBlender_Compile& C);
 
     CBlender_accum_direct();
@@ -19,7 +18,6 @@ public:
     virtual LPCSTR getComment() { return "INTERNAL: accumulate direct light"; }
     virtual BOOL canBeDetailed() { return FALSE; }
     virtual BOOL canBeLMAPped() { return FALSE; }
-
     virtual void Compile(CBlender_Compile& C);
     virtual void SetDefine(LPCSTR Name, LPCSTR Definition)
     {
@@ -39,7 +37,6 @@ public:
     virtual LPCSTR getComment() { return "INTERNAL: accumulate direct light"; }
     virtual BOOL canBeDetailed() { return FALSE; }
     virtual BOOL canBeLMAPped() { return FALSE; }
-
     virtual void Compile(CBlender_Compile& C);
     virtual void SetDefine(LPCSTR Name, LPCSTR Definition)
     {
@@ -59,7 +56,6 @@ public:
     virtual LPCSTR getComment() { return "INTERNAL: accumulate direct light"; }
     virtual BOOL canBeDetailed() { return FALSE; }
     virtual BOOL canBeLMAPped() { return FALSE; }
-
     virtual void Compile(CBlender_Compile& C);
     virtual void SetDefine(LPCSTR Name, LPCSTR Definition)
     {

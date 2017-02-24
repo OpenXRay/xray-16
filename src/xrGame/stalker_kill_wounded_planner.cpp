@@ -27,10 +27,7 @@ CStalkerKillWoundedPlanner::CStalkerKillWoundedPlanner(CAI_Stalker* object, LPCS
 {
 }
 
-CStalkerKillWoundedPlanner::~CStalkerKillWoundedPlanner()
-{
-}
-
+CStalkerKillWoundedPlanner::~CStalkerKillWoundedPlanner() {}
 void CStalkerKillWoundedPlanner::setup(CAI_Stalker* object, CPropertyStorage* storage)
 {
     inherited::setup(object, storage);
@@ -63,16 +60,13 @@ void CStalkerKillWoundedPlanner::initialize()
     inherited_action::m_storage->set_property(eWorldPropertyKilledWounded, true);
 }
 
-void CStalkerKillWoundedPlanner::execute()
-{
-    inherited::execute();
-}
-
+void CStalkerKillWoundedPlanner::execute() { inherited::execute(); }
 void CStalkerKillWoundedPlanner::finalize()
 {
     inherited::finalize();
 
-    if (object().memory().enemy().selected()) {
+    if (object().memory().enemy().selected())
+    {
         inherited_action::m_storage->set_property(eWorldPropertyKilledWounded, false);
         object().movement().set_mental_state(MonsterSpace::eMentalStateDanger);
     }

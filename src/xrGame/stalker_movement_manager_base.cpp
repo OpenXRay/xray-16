@@ -29,7 +29,7 @@
 #include "stalker_planner.h"
 #include "script_game_object.h"
 #include "stalker_combat_planner.h"
-#endif  // DEBUG
+#endif // DEBUG
 
 using namespace StalkerMovement;
 
@@ -45,18 +45,16 @@ class sight_manager_enable_guard : private Noncopyable
 
 public:
     inline sight_manager_enable_guard(CSightManager& manager, bool const value) : m_manager(manager), m_value(value) {}
-
     inline void enable(bool const value) { m_value = value; }
-
     inline bool enable() const { return (m_value); }
-
     inline ~sight_manager_enable_guard()
     {
-        if (m_manager.enabled() == m_value) return;
+        if (m_manager.enabled() == m_value)
+            return;
 
         m_manager.enable(m_value);
     }
-};  // struct sight_manager_enable_guard
+}; // struct sight_manager_enable_guard
 
 stalker_movement_manager_base::stalker_movement_manager_base(CAI_Stalker* object)
     : inherited(object), m_last_query_object(0), m_last_query_position(Fvector().set(flt_max, flt_max, flt_max)),
@@ -68,15 +66,8 @@ stalker_movement_manager_base::stalker_movement_manager_base(CAI_Stalker* object
     m_velocities = 0;
 }
 
-stalker_movement_manager_base::~stalker_movement_manager_base()
-{
-}
-
-void stalker_movement_manager_base::Load(LPCSTR section)
-{
-    inherited::Load(section);
-}
-
+stalker_movement_manager_base::~stalker_movement_manager_base() {}
+void stalker_movement_manager_base::Load(LPCSTR section) { inherited::Load(section); }
 void stalker_movement_manager_base::reload(LPCSTR section)
 {
     inherited::reload(section);
@@ -153,8 +144,10 @@ void stalker_movement_manager_base::reinit()
 
 IC void stalker_movement_manager_base::setup_head_speed(stalker_movement_params& movement_params)
 {
-    if (movement_params.m_mental_state == eMentalStateFree) {
-        if (object().sight().enabled()) m_head.speed = PI_DIV_2;
+    if (movement_params.m_mental_state == eMentalStateFree)
+    {
+        if (object().sight().enabled())
+            m_head.speed = PI_DIV_2;
     }
     else
         m_head.speed = m_danger_head_speed;
@@ -167,7 +160,8 @@ IC void stalker_movement_manager_base::add_velocity(int mask, float linear, floa
 
 IC float stalker_movement_manager_base::path_direction_angle()
 {
-    if (!path().empty() && (path().size() > detail().curr_travel_point_index() + 1)) {
+    if (!path().empty() && (path().size() > detail().curr_travel_point_index() + 1))
+    {
         Fvector t;
         t.sub(path()[detail().curr_travel_point_index() + 1].position,
             path()[detail().curr_travel_point_index()].position);
@@ -205,9 +199,11 @@ void stalker_movement_manager_base::set_desired_position(const Fvector* position
 
 IC void stalker_movement_manager_base::setup_body_orientation()
 {
-    if (path().empty()) return;
+    if (path().empty())
+        return;
 
-    if (path().size() <= detail().curr_travel_point_index() + 1) return;
+    if (path().size() <= detail().curr_travel_point_index() + 1)
+        return;
 
     Fvector temp;
     temp.sub(
@@ -221,11 +217,14 @@ IC void stalker_movement_manager_base::setup_body_orientation()
 
 bool stalker_movement_manager_base::script_control()
 {
-    if (!object().GetScriptControl()) return (false);
+    if (!object().GetScriptControl())
+        return (false);
 
-    if (!object().GetCurrentAction()) return (false);
+    if (!object().GetCurrentAction())
+        return (false);
 
-    if (fis_zero(object().GetCurrentAction()->m_tMovementAction.m_fSpeed)) return (false);
+    if (fis_zero(object().GetCurrentAction()->m_tMovementAction.m_fSpeed))
+        return (false);
 
     object().m_fCurSpeed = object().GetCurrentAction()->m_tMovementAction.m_fSpeed;
     set_desirable_speed(object().m_fCurSpeed);
@@ -248,8 +247,10 @@ void stalker_movement_manager_base::setup_movement_params(stalker_movement_param
     detail().set_path_type(movement_params.m_detail_path_type);
     level_path().set_evaluator(base_level_params());
 
-    if (movement_params.desired_position()) {
-        if (!restrictions().accessible(*movement_params.desired_position())) {
+    if (movement_params.desired_position())
+    {
+        if (!restrictions().accessible(*movement_params.desired_position()))
+        {
             Fvector temp;
             level_path().set_dest_vertex(restrictions().accessible_nearest(*movement_params.desired_position(), temp));
             detail().set_dest_position(temp);
@@ -263,7 +264,8 @@ void stalker_movement_manager_base::setup_movement_params(stalker_movement_param
             (movement_params.m_path_type != MovementManager::ePathTypeGamePath) &&
             (movement_params.m_path_type != MovementManager::ePathTypeNoPath))
         {
-            if (!restrictions().accessible(level_path().dest_vertex_id())) {
+            if (!restrictions().accessible(level_path().dest_vertex_id()))
+            {
                 Fvector temp;
                 level_path().set_dest_vertex(restrictions().accessible_nearest(
                     ai().level_graph().vertex_position(level_path().dest_vertex_id()), temp));
@@ -281,7 +283,8 @@ void stalker_movement_manager_base::setup_movement_params(stalker_movement_param
         }
     }
 
-    if (movement_params.desired_direction()) {
+    if (movement_params.desired_direction())
+    {
         detail().set_dest_direction(*desired_direction());
         detail().set_use_dest_orientation(true);
     }
@@ -353,7 +356,8 @@ void stalker_movement_manager_base::setup_velocities(stalker_movement_params& mo
     }
 
     // setup all the possible velocities
-    if (velocity_mask & eVelocityDanger) {
+    if (velocity_mask & eVelocityDanger)
+    {
         detail().set_desirable_mask(velocity_mask);
         detail().set_velocity_mask(velocity_mask | eVelocityStanding);
     }
@@ -367,7 +371,8 @@ void stalker_movement_manager_base::setup_velocities(stalker_movement_params& mo
 
 void stalker_movement_manager_base::parse_velocity_mask(stalker_movement_params& movement_params)
 {
-    if (path().empty() || (detail().curr_travel_point_index() != m_last_turn_index)) m_last_turn_index = u32(-1);
+    if (path().empty() || (detail().curr_travel_point_index() != m_last_turn_index))
+        m_last_turn_index = u32(-1);
 
     sight_manager_enable_guard guard(object().sight(), true);
 
@@ -388,8 +393,10 @@ void stalker_movement_manager_base::parse_velocity_mask(stalker_movement_params&
     DetailPathManager::STravelPathPoint point = path()[detail().curr_travel_point_index()];
     CDetailPathManager::STravelParams current_velocity = detail().velocity(point.velocity);
 
-    if (fis_zero(current_velocity.linear_velocity)) {
-        if (movement_params.m_mental_state == eMentalStateFree) {
+    if (fis_zero(current_velocity.linear_velocity))
+    {
+        if (movement_params.m_mental_state == eMentalStateFree)
+        {
             setup_body_orientation();
             guard.enable(false);
             //			Msg						("%d FALSE",Device.dwTimeGlobal);
@@ -401,7 +408,8 @@ void stalker_movement_manager_base::parse_velocity_mask(stalker_movement_params&
             m_last_turn_index = detail().curr_travel_point_index();
             guard.enable(true);
             //			Msg						("%d TRUE",Device.dwTimeGlobal);
-            if (detail().curr_travel_point_index() + 1 < path().size()) {
+            if (detail().curr_travel_point_index() + 1 < path().size())
+            {
                 point = path()[detail().curr_travel_point_index() + 1];
                 current_velocity = detail().velocity(point.velocity);
             }
@@ -409,9 +417,12 @@ void stalker_movement_manager_base::parse_velocity_mask(stalker_movement_params&
     }
     else
     {
-        if (movement_params.m_mental_state != eMentalStateDanger) {
-            if (movement_params.m_mental_state == eMentalStatePanic) {
-                if (!fis_zero(path_direction_angle(), PI_DIV_8 * .5f)) {
+        if (movement_params.m_mental_state != eMentalStateDanger)
+        {
+            if (movement_params.m_mental_state == eMentalStatePanic)
+            {
+                if (!fis_zero(path_direction_angle(), PI_DIV_8 * .5f))
+                {
                     u32 temp = u32(-1);
                     temp ^= eVelocityFree;
                     temp ^= eVelocityDanger;
@@ -425,7 +436,8 @@ void stalker_movement_manager_base::parse_velocity_mask(stalker_movement_params&
             {
                 CDetailPathManager::STravelParams const& path_velocity =
                     detail().velocity(path()[detail().curr_travel_point_index()].velocity);
-                if (!fis_zero(path_direction_angle(), path_velocity.real_angular_velocity)) {
+                if (!fis_zero(path_direction_angle(), path_velocity.real_angular_velocity))
+                {
                     setup_body_orientation();
                     guard.enable(false);
                     current_velocity = path_velocity;
@@ -461,13 +473,14 @@ void stalker_movement_manager_base::parse_velocity_mask(stalker_movement_params&
     {
     case eVelocityFree: {
 #ifdef DEBUG
-        if (m_object->brain().current_action_id() == StalkerDecisionSpace::eWorldOperatorCombatPlanner) {
+        if (m_object->brain().current_action_id() == StalkerDecisionSpace::eWorldOperatorCombatPlanner)
+        {
             CStalkerCombatPlanner& planner = smart_cast<CStalkerCombatPlanner&>(m_object->brain().current_action());
             if (planner.current_action_id() != StalkerDecisionSpace::eWorldOperatorKillWoundedEnemy)
                 Msg("~ stalker %s is doing bad thing (action %s)", *m_object->cName(),
                     planner.current_action().m_action_name);
         }
-#endif  // DEBUG
+#endif // DEBUG
         movement_params.m_mental_state = eMentalStateFree;
         break;
     }
@@ -522,14 +535,16 @@ void stalker_movement_manager_base::set_nearest_accessible_position(Fvector desi
     else
         desired_position.y = ai().level_graph().vertex_plane_y(level_vertex_id, desired_position.x, desired_position.z);
 
-    if (!restrictions().accessible(desired_position)) {
+    if (!restrictions().accessible(desired_position))
+    {
         level_vertex_id = restrictions().accessible_nearest(Fvector().set(desired_position), desired_position);
         VERIFY(restrictions().accessible(level_vertex_id));
         VERIFY(restrictions().accessible(desired_position));
     }
     else
     {
-        if (!restrictions().accessible(level_vertex_id)) {
+        if (!restrictions().accessible(level_vertex_id))
+        {
             level_vertex_id = restrictions().accessible_nearest(
                 ai().level_graph().vertex_position(level_vertex_id), desired_position);
             VERIFY(restrictions().accessible(level_vertex_id));
@@ -550,7 +565,8 @@ void stalker_movement_manager_base::update(u32 time_delta)
 {
     VERIFY((m_target.m_mental_state != eMentalStateFree) || (m_target.m_body_state != eBodyStateCrouch));
 
-    if (!enabled()) return;
+    if (!enabled())
+        return;
 
     m_current = m_target;
     update(m_current);
@@ -558,13 +574,17 @@ void stalker_movement_manager_base::update(u32 time_delta)
 
 void stalker_movement_manager_base::update(stalker_movement_params& movement_params)
 {
-    if (m_force_update || (movement_type() != eMovementTypeStand)) setup_movement_params(movement_params);
+    if (m_force_update || (movement_type() != eMovementTypeStand))
+        setup_movement_params(movement_params);
 
-    if (script_control()) return;
+    if (script_control())
+        return;
 
-    if (m_force_update || (movement_type() != eMovementTypeStand)) setup_velocities(movement_params);
+    if (m_force_update || (movement_type() != eMovementTypeStand))
+        setup_velocities(movement_params);
 
-    if (m_force_update || (movement_type() != eMovementTypeStand)) update_path();
+    if (m_force_update || (movement_type() != eMovementTypeStand))
+        update_path();
 
     parse_velocity_mask(movement_params);
 
@@ -608,22 +628,26 @@ bool stalker_movement_manager_base::is_object_on_the_way(const CGameObject* obje
 {
     update_object_on_the_way(object, distance);
 
-    if (m_last_query_object != object) {
+    if (m_last_query_object != object)
+    {
         update_object_on_the_way(object, distance);
         return (m_last_query_result);
     }
 
-    if (distance - EPS_L > m_last_query_distance) {
+    if (distance - EPS_L > m_last_query_distance)
+    {
         update_object_on_the_way(object, distance);
         return (m_last_query_result);
     }
 
-    if (!m_last_query_position.similar(this->object().Position())) {
+    if (!m_last_query_position.similar(this->object().Position()))
+    {
         update_object_on_the_way(object, distance);
         return (m_last_query_result);
     }
 
-    if (!m_last_query_object_position.similar(object->Position())) {
+    if (!m_last_query_object_position.similar(object->Position()))
+    {
         update_object_on_the_way(object, distance);
         return (m_last_query_result);
     }
@@ -633,13 +657,16 @@ bool stalker_movement_manager_base::is_object_on_the_way(const CGameObject* obje
 
 IC float distance_to_line(const Fvector& p0, const Fvector& p1, const Fvector& p2)
 {
-    if (p0.similar(p2)) return (0.f);
+    if (p0.similar(p2))
+        return (0.f);
 
-    if (p1.similar(p2)) return (0.f);
+    if (p1.similar(p2))
+        return (0.f);
 
     Fvector p0p2 = Fvector().sub(p2, p0);
     float p0p2_magnitude = p0p2.magnitude();
-    if (p0.similar(p1)) return (p0p2_magnitude);
+    if (p0.similar(p1))
+        return (p0p2_magnitude);
 
     p0p2.normalize();
 
@@ -647,11 +674,13 @@ IC float distance_to_line(const Fvector& p0, const Fvector& p1, const Fvector& p
     p0p1.normalize();
 
     float cos_alpha = p0p2.dotproduct(p0p1);
-    if (cos_alpha < 0.f) return (p0p2_magnitude);
+    if (cos_alpha < 0.f)
+        return (p0p2_magnitude);
 
     Fvector p1p2 = Fvector().sub(p2, p1);
     Fvector p1p0 = Fvector(p0p1).invert();
-    if (p1p2.dotproduct(p1p0) < 0.f) return (p1p2.magnitude());
+    if (p1p2.dotproduct(p1p0) < 0.f)
+        return (p1p2.magnitude());
 
     float sin_alpha = _sqrt(1.f - _sqr(cos_alpha));
     return (p0p2_magnitude * sin_alpha);
@@ -659,11 +688,14 @@ IC float distance_to_line(const Fvector& p0, const Fvector& p1, const Fvector& p
 
 void stalker_movement_manager_base::update_object_on_the_way(const CGameObject* object, const float& distance)
 {
-    if (!actual()) return;
+    if (!actual())
+        return;
 
-    if (path().empty()) return;
+    if (path().empty())
+        return;
 
-    if (detail().curr_travel_point_index() >= detail().path().size() - 1) return;
+    if (detail().curr_travel_point_index() >= detail().path().size() - 1)
+        return;
 
     m_last_query_object = object;
     m_last_query_position = this->object().Position();
@@ -677,35 +709,37 @@ void stalker_movement_manager_base::update_object_on_the_way(const CGameObject* 
     xr_vector<STravelPathPoint>::const_iterator E = detail().path().end();
     for (; I != E; ++I)
     {
-        if (distance_to_line((*(I - 1)).position, (*I).position, position) < 1.f) {
+        if (distance_to_line((*(I - 1)).position, (*I).position, position) < 1.f)
+        {
             m_last_query_result = true;
             return;
         }
 
         current_distance += (*(I - 1)).position.distance_to((*I).position);
-        if (current_distance > distance) return;
+        if (current_distance > distance)
+            return;
     }
 }
 
-void stalker_movement_manager_base::force_update(const bool& force_update)
-{
-    m_force_update = force_update;
-}
-
+void stalker_movement_manager_base::force_update(const bool& force_update) { m_force_update = force_update; }
 void stalker_movement_manager_base::check_for_bad_path(stalker_movement_params& movement_params)
 {
-    if (movement_params.m_movement_type != eMovementTypeRun) return;
+    if (movement_params.m_movement_type != eMovementTypeRun)
+        return;
 
-    if (movement_params.m_mental_state != eMentalStateDanger) return;
+    if (movement_params.m_mental_state != eMentalStateDanger)
+        return;
 
-    if (detail().completed(object().Position(), !detail().state_patrol_path())) return;
+    if (detail().completed(object().Position(), !detail().state_patrol_path()))
+        return;
 
     typedef xr_vector<STravelPathPoint> PATH;
     const PATH& path = detail().path();
 
     u32 point_count = path.size();
     u32 point_index = detail().curr_travel_point_index();
-    if (point_index + 2 >= point_count) return;
+    if (point_index + 2 >= point_count)
+        return;
 
     float distance = path[point_index + 1].position.distance_to(object().Position());
     Fvector current_direction = Fvector().sub(path[point_index + 1].position, path[point_index].position);
@@ -726,20 +760,23 @@ void stalker_movement_manager_base::check_for_bad_path(stalker_movement_params& 
         float magnitude = next_direction.magnitude();
         distance += magnitude;
         //. how can it be?
-        if (magnitude < EPS_L) continue;
+        if (magnitude < EPS_L)
+            continue;
 
         next_direction.normalize();
         float cos_angle = current_direction.dotproduct(next_direction);
         float angle = acosf(cos_angle);
-        if (angle > BAD_PATH_ANGLE) {
+        if (angle > BAD_PATH_ANGLE)
+        {
 #ifdef DEBUG
             Msg("bad path check changed movement type from RUN to WALK");
-#endif  // DEBUG
+#endif // DEBUG
             movement_params.m_movement_type = eMovementTypeWalk;
             return;
         }
 
-        if (distance >= BAD_PATH_DISTANCE_CHECK) return;
+        if (distance >= BAD_PATH_DISTANCE_CHECK)
+            return;
     }
 }
 
@@ -749,7 +786,4 @@ void stalker_movement_manager_base::set_level_dest_vertex(u32 const& level_verte
     m_target.cover_id("");
 }
 
-void stalker_movement_manager_base::remove_links(IGameObject* object)
-{
-    m_last_query_object = 0;
-}
+void stalker_movement_manager_base::remove_links(IGameObject* object) { m_last_query_object = 0; }

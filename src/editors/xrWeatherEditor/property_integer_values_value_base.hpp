@@ -12,11 +12,11 @@
 public
 interface class property_integer_values_value_base
 {
-  public:
+public:
     typedef System::Collections::IList IList;
 
-  public:
+public:
     virtual IList ^ collection() = 0;
-};  // interface class property_integer_values_value_base
+}; // interface class property_integer_values_value_base
 
-#endif  // ifndef PROPERTY_INTEGER_VALUES_VALUE_BASE_HPP_INCLUDED
+#endif // ifndef PROPERTY_INTEGER_VALUES_VALUE_BASE_HPP_INCLUDED

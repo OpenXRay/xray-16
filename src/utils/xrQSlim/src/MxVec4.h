@@ -1,4 +1,4 @@
-#ifndef MXVEC4_INCLUDED  // -*- C++ -*-
+#ifndef MXVEC4_INCLUDED // -*- C++ -*-
 #define MXVEC4_INCLUDED
 #if !defined(__GNUC__)
 #pragma once
@@ -17,14 +17,8 @@
 #include "vec4.h"
 
 #ifdef MXGL_INCLUDED
-inline void glV(const Vec4& v)
-{
-    glVertex4d(v[0], v[1], v[2], v[3]);
-}
-inline void glC(const Vec4& v)
-{
-    glColor4d(v[0], v[1], v[2], v[3]);
-}
+inline void glV(const Vec4& v) { glVertex4d(v[0], v[1], v[2], v[3]); }
+inline void glC(const Vec4& v) { glColor4d(v[0], v[1], v[2], v[3]); }
 #endif
 
 // MXVEC4_INCLUDED

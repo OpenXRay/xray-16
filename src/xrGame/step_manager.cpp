@@ -15,14 +15,8 @@ BOOL debug_step_info_load = FALSE;
 
 extern float psHUDStepSoundVolume;
 
-CStepManager::CStepManager()
-{
-}
-
-CStepManager::~CStepManager()
-{
-}
-
+CStepManager::CStepManager() {}
+CStepManager::~CStepManager() {}
 IFactoryObject* CStepManager::_construct()
 {
     m_object = smart_cast<CEntityAlive*>(this);
@@ -35,7 +29,8 @@ void CStepManager::reload(LPCSTR section)
     m_legs_count = pSettings->r_u8(section, "LegsCount");
     LPCSTR anim_section = pSettings->r_string(section, "step_params");
 
-    if (!pSettings->section_exist(anim_section)) {
+    if (!pSettings->section_exist(anim_section))
+    {
 #ifdef DEBUG
         Msg("! no step_params section for :%s section :s", m_object->cName().c_str(), section);
 #endif
@@ -44,7 +39,7 @@ void CStepManager::reload(LPCSTR section)
     VERIFY((m_legs_count >= MIN_LEGS_COUNT) && (m_legs_count <= MAX_LEGS_COUNT));
 
     SStepParam param;
-    param.step[0].time = 0.1f;  // avoid warning
+    param.step[0].time = 0.1f; // avoid warning
 
     LPCSTR anim_name, val;
     string16 cur_elem;
@@ -75,7 +70,8 @@ void CStepManager::reload(LPCSTR section)
         }
 
         MotionID motion_id = skeleton_animated->ID_Cycle_Safe(anim_name);
-        if (!motion_id) {
+        if (!motion_id)
+        {
 #ifdef DEBUG
 
             IKinematicsAnimated* KA = smart_cast<IKinematicsAnimated*>(m_object->Visual());
@@ -88,7 +84,8 @@ void CStepManager::reload(LPCSTR section)
             continue;
         }
 #ifdef DEBUG
-        if (debug_step_info_load) {
+        if (debug_step_info_load)
+        {
             IKinematicsAnimated* KA = smart_cast<IKinematicsAnimated*>(m_object->Visual());
             VERIFY(KA);
             std::pair<LPCSTR, LPCSTR> anim_name = KA->LL_MotionDefName_dbg(motion_id);
@@ -116,17 +113,21 @@ void CStepManager::reload(LPCSTR section)
 void CStepManager::on_animation_start(MotionID motion_id, CBlend* blend)
 {
     m_blend = blend;
-    if (!m_blend) return;
+    if (!m_blend)
+        return;
 
-    if (m_object->character_ik_controller()) m_object->character_ik_controller()->PlayLegs(blend);
+    if (m_object->character_ik_controller())
+        m_object->character_ik_controller()->PlayLegs(blend);
 
     m_time_anim_started = Device.dwTimeGlobal;
 
     // искать текущую анимацию в STEPS_MAP
     STEPS_MAP_IT it = m_steps_map.find(motion_id);
-    if (it == m_steps_map.end()) {
+    if (it == m_steps_map.end())
+    {
 #ifdef DEBUG
-        if (debug_step_info) {
+        if (debug_step_info)
+        {
             IKinematicsAnimated* KA = smart_cast<IKinematicsAnimated*>(m_object->Visual());
             VERIFY(KA);
             std::pair<LPCSTR, LPCSTR> anim_name = KA->LL_MotionDefName_dbg(motion_id);
@@ -140,7 +141,7 @@ void CStepManager::on_animation_start(MotionID motion_id, CBlend* blend)
 
     m_step_info.disable = false;
     m_step_info.params = it->second;
-    m_step_info.cur_cycle = 1;  // all cycles are 1-based
+    m_step_info.cur_cycle = 1; // all cycles are 1-based
 
     for (u32 i = 0; i < m_legs_count; i++)
     {
@@ -155,11 +156,13 @@ void CStepManager::update(bool b_hud_view)
 {
     START_PROFILE("Step Manager")
 
-    if (m_step_info.disable) return;
-    if (!m_blend) return;
+    if (m_step_info.disable)
+        return;
+    if (!m_blend)
+        return;
 
     float dist_sqr = m_object->Position().distance_to_sqr(Device.vCameraPosition);
-    bool b_play = dist_sqr < 400.0f;  // 20m
+    bool b_play = dist_sqr < 400.0f; // 20m
 
     // получить параметры шага
     SStepParam& step = m_step_info.params;
@@ -175,27 +178,31 @@ void CStepManager::update(bool b_hud_view)
     for (u32 i = 0; i < m_legs_count; i++)
     {
         // если событие уже обработано для этой ноги, то skip
-        if (m_step_info.activity[i].handled && (m_step_info.activity[i].cycle == m_step_info.cur_cycle)) continue;
+        if (m_step_info.activity[i].handled && (m_step_info.activity[i].cycle == m_step_info.cur_cycle))
+            continue;
 
         // вычислить смещённое время шага в соответствии с параметрами анимации ходьбы
-        u32 offset_time =
-            m_time_anim_started +
+        u32 offset_time = m_time_anim_started +
             u32(1000 * (cycle_anim_time * (m_step_info.cur_cycle - 1) + cycle_anim_time * step.step[i].time));
-        if (offset_time <= cur_time) {
-            if (!material_picked) {
+        if (offset_time <= cur_time)
+        {
+            if (!material_picked)
+            {
                 mtl_pair = m_object->material().get_current_pair();
 
                 material_picked = true;
             }
 
-            if (!mtl_pair) break;
+            if (!mtl_pair)
+                break;
 
             // Играть звук
             if (b_play && is_on_ground())
                 m_step_sound.play_next(mtl_pair, m_object, m_step_info.params.step[i].power, b_hud_view);
 
             // Играть партиклы
-            if (b_play && !mtl_pair->CollideParticles.empty()) {
+            if (b_play && !mtl_pair->CollideParticles.empty())
+            {
                 LPCSTR ps_name = *mtl_pair->CollideParticles[::Random.randI(0, mtl_pair->CollideParticles.size())];
 
                 //отыграть партиклы столкновения материалов
@@ -229,8 +236,9 @@ void CStepManager::update(bool b_hud_view)
         m_step_info.cur_cycle = 1 + u8(float(cur_time - m_time_anim_started) / (1000.f * cycle_anim_time));
 
     // если анимация циклическая...
-    u32 time_anim_end = m_time_anim_started + u32(get_blend_time() * 1000);  // время завершения работы анимации
-    if (!m_blend->stop_at_end && (time_anim_end < cur_time)) {
+    u32 time_anim_end = m_time_anim_started + u32(get_blend_time() * 1000); // время завершения работы анимации
+    if (!m_blend->stop_at_end && (time_anim_end < cur_time))
+    {
         m_time_anim_started = time_anim_end;
         m_step_info.cur_cycle = 1;
 
@@ -282,7 +290,8 @@ void CStepManager::load_foot_bones(CInifile::Sect& data)
 void CStepManager::reload_foot_bones()
 {
     CInifile* ini = smart_cast<IKinematics*>(m_object->Visual())->LL_UserData();
-    if (ini && ini->section_exist("foot_bones")) {
+    if (ini && ini->section_exist("foot_bones"))
+    {
         load_foot_bones(ini->r_section("foot_bones"));
     }
     else
@@ -295,38 +304,38 @@ void CStepManager::reload_foot_bones()
     // проверка на соответсвие
     int count = 0;
     for (u32 i = 0; i < MAX_LEGS_COUNT; i++)
-        if (m_foot_bones[i] != BI_NONE) count++;
+        if (m_foot_bones[i] != BI_NONE)
+            count++;
 
     VERIFY(count == m_legs_count);
 }
 
-float CStepManager::get_blend_time()
-{
-    return (m_blend->timeTotal / m_blend->speed);
-}
-
+float CStepManager::get_blend_time() { return (m_blend->timeTotal / m_blend->speed); }
 void CStepManager::material_sound::play_next(
     SGameMtlPair* mtl_pair, CEntityAlive* object, float volume, bool b_hud_mode)
 {
-    if (mtl_pair->StepSounds.empty()) return;
+    if (mtl_pair->StepSounds.empty())
+        return;
 
     Fvector sound_pos = object->Position();
     sound_pos.y += 0.5;
 
-    if (last_mtl_pair != mtl_pair || m_last_step_sound_played == u8(-1)) {
+    if (last_mtl_pair != mtl_pair || m_last_step_sound_played == u8(-1))
+    {
         m_last_step_sound_played = u8(Random.randI(mtl_pair->StepSounds.size()));
         last_mtl_pair = mtl_pair;
     }
     else
     {
         u8 new_played = u8((m_last_step_sound_played + 1 + Random.randI(mtl_pair->StepSounds.size() - 1)) %
-                           mtl_pair->StepSounds.size());
+            mtl_pair->StepSounds.size());
 
         m_last_step_sound_played = new_played;
     }
 
     float vol = (b_hud_mode) ? volume * psHUDStepSoundVolume : volume;
-    if (b_hud_mode) sound_pos.set(0, 0, 0);
+    if (b_hud_mode)
+        sound_pos.set(0, 0, 0);
 
     mtl_pair->StepSounds[m_last_step_sound_played].play_no_feedback(
         object, b_hud_mode ? sm_2D : 0, 0, &sound_pos, &vol);

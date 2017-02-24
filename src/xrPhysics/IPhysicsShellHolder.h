@@ -57,7 +57,7 @@ public:
     virtual bool IsActor() = 0;
     virtual bool IsStalker() = 0;
     // virtual	void							SetWeaponHideState					( u16 State, bool bSet )=0;
-    virtual void HideAllWeapons(bool v) = 0;  //(SetWeaponHideState(INV_STATE_BLOCK_ALL,true))
+    virtual void HideAllWeapons(bool v) = 0; //(SetWeaponHideState(INV_STATE_BLOCK_ALL,true))
     virtual void MovementCollisionEnable(bool enable) = 0;
     virtual CPHSoundPlayer* ObjectPhSoundPlayer() = 0;
     virtual ICollisionDamageReceiver* ObjectPhCollisionDamageReceiver() = 0;

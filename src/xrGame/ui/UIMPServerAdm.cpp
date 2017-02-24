@@ -220,10 +220,7 @@ CUIMpServerAdm::CUIMpServerAdm()
     m_pGameLimitsSelectionWnd->Show(false);
 }
 
-CUIMpServerAdm::~CUIMpServerAdm()
-{
-}
-
+CUIMpServerAdm::~CUIMpServerAdm() {}
 void CUIMpServerAdm::Init(CUIXml& xml_doc)
 {
     CUIXmlInit::InitWindow(xml_doc, "server_adm", 0, this);
@@ -364,7 +361,8 @@ void CUIMpServerAdm::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         }
         else if (pWnd == m_pSetTimeLimitBtn)
         {
-            if (xr_strcmp(m_pTimeLimitEdit->GetText(), "") != 0) {
+            if (xr_strcmp(m_pTimeLimitEdit->GetText(), "") != 0)
+            {
                 string512 tmp_string;
                 xr_sprintf(tmp_string, "ra sv_timelimit %s", m_pTimeLimitEdit->GetText());
                 Console->Execute(tmp_string);
@@ -373,7 +371,8 @@ void CUIMpServerAdm::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         }
         else if (pWnd == m_pSetFragLimitBtn)
         {
-            if (xr_strcmp(m_pFragLimitEdit->GetText(), "") != 0) {
+            if (xr_strcmp(m_pFragLimitEdit->GetText(), "") != 0)
+            {
                 string512 tmp_string;
                 xr_sprintf(tmp_string, "ra sv_fraglimit %s", m_pFragLimitEdit->GetText());
                 Console->Execute(tmp_string);
@@ -382,7 +381,8 @@ void CUIMpServerAdm::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         }
         else if (pWnd == m_pSetArtLimitBtn)
         {
-            if (xr_strcmp(m_pArtLimitEdit->GetText(), "") != 0) {
+            if (xr_strcmp(m_pArtLimitEdit->GetText(), "") != 0)
+            {
                 string512 tmp_string;
                 xr_sprintf(tmp_string, "ra sv_artefacts_count %s", m_pArtLimitEdit->GetText());
                 Console->Execute(tmp_string);
@@ -391,7 +391,8 @@ void CUIMpServerAdm::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         }
         else if (pWnd == m_pSetWarmUpBtn)
         {
-            if (xr_strcmp(m_pWarmUpEdit->GetText(), "") != 0) {
+            if (xr_strcmp(m_pWarmUpEdit->GetText(), "") != 0)
+            {
                 string512 tmp_string;
                 xr_sprintf(tmp_string, "ra sv_warm_up %s", m_pWarmUpEdit->GetText());
                 Console->Execute(tmp_string);
@@ -430,7 +431,8 @@ void CUIMpServerAdm::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         }
         else if (pWnd == m_pSetInvincibleTimeBtn)
         {
-            if (xr_strcmp(m_pInvincibleTimeEdit->GetText(), "") != 0) {
+            if (xr_strcmp(m_pInvincibleTimeEdit->GetText(), "") != 0)
+            {
                 string512 tmp_string;
                 xr_sprintf(tmp_string, "ra sv_invincible_time %s", m_pInvincibleTimeEdit->GetText());
                 Console->Execute(tmp_string);
@@ -439,7 +441,8 @@ void CUIMpServerAdm::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         }
         else if (pWnd == m_pSetDamageBlockTimeBtn)
         {
-            if (xr_strcmp(m_pDamageBlockTimeEdit->GetText(), "") != 0) {
+            if (xr_strcmp(m_pDamageBlockTimeEdit->GetText(), "") != 0)
+            {
                 string512 tmp_string;
                 xr_sprintf(tmp_string, "ra sv_dmgblocktime %s", m_pDamageBlockTimeEdit->GetText());
                 Console->Execute(tmp_string);
@@ -448,7 +451,8 @@ void CUIMpServerAdm::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         }
         else if (pWnd == m_pSetReinforcementTimeBtn)
         {
-            if (xr_strcmp(m_pReinforcementTimeEdit->GetText(), "") != 0) {
+            if (xr_strcmp(m_pReinforcementTimeEdit->GetText(), "") != 0)
+            {
                 string512 tmp_string;
                 xr_sprintf(tmp_string, "ra sv_reinforcement_time %s", m_pReinforcementTimeEdit->GetText());
                 Console->Execute(tmp_string);

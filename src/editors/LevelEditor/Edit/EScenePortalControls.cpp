@@ -12,17 +12,6 @@ __fastcall TUI_ControlPortalSelect::TUI_ControlPortalSelect(int st, int act, ESc
 {
 }
 
-bool __fastcall TUI_ControlPortalSelect::Start(TShiftState Shift)
-{
-    return SelectStart(Shift);
-}
-
-void __fastcall TUI_ControlPortalSelect::Move(TShiftState Shift)
-{
-    SelectProcess(Shift);
-}
-
-bool __fastcall TUI_ControlPortalSelect::End(TShiftState Shift)
-{
-    return SelectEnd(Shift);
-}
+bool __fastcall TUI_ControlPortalSelect::Start(TShiftState Shift) { return SelectStart(Shift); }
+void __fastcall TUI_ControlPortalSelect::Move(TShiftState Shift) { SelectProcess(Shift); }
+bool __fastcall TUI_ControlPortalSelect::End(TShiftState Shift) { return SelectEnd(Shift); }

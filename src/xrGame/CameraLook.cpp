@@ -6,10 +6,7 @@
 #include "xr_level_controller.h"
 #include "actor.h"
 
-CCameraLook::CCameraLook(IGameObject* p, u32 flags) : CCameraBase(p, flags)
-{
-}
-
+CCameraLook::CCameraLook(IGameObject* p, u32 flags) : CCameraBase(p, flags) {}
 void CCameraLook::Load(LPCSTR section)
 {
     inherited::Load(section);
@@ -19,10 +16,7 @@ void CCameraLook::Load(LPCSTR section)
     prev_d = 0;
 }
 
-CCameraLook::~CCameraLook()
-{
-}
-
+CCameraLook::~CCameraLook() {}
 void CCameraLook::Update(Fvector& point, Fvector& /**noise_dangle/**/)
 {
     vPosition.set(point);
@@ -32,7 +26,8 @@ void CCameraLook::Update(Fvector& point, Fvector& /**noise_dangle/**/)
     vDirection.set(mR.k);
     vNormal.set(mR.j);
 
-    if (m_Flags.is(flRelativeLink)) {
+    if (m_Flags.is(flRelativeLink))
+    {
         parent->XFORM().transform_dir(vDirection);
         parent->XFORM().transform_dir(vNormal);
     }
@@ -66,19 +61,24 @@ void CCameraLook::Move(int cmd, float val, float factor)
     case kLEFT: yaw -= val ? val : (rot_speed.y * Device.fTimeDelta / factor); break;
     case kRIGHT: yaw += val ? val : (rot_speed.y * Device.fTimeDelta / factor); break;
     }
-    if (bClampYaw) clamp(yaw, lim_yaw[0], lim_yaw[1]);
-    if (bClampPitch) clamp(pitch, lim_pitch[0], lim_pitch[1]);
+    if (bClampYaw)
+        clamp(yaw, lim_yaw[0], lim_yaw[1]);
+    if (bClampPitch)
+        clamp(pitch, lim_pitch[0], lim_pitch[1]);
     clamp(dist, lim_zoom[0], lim_zoom[1]);
 }
 
 void CCameraLook::OnActivate(CCameraBase* old_cam)
 {
-    if (old_cam && (m_Flags.is(flRelativeLink) == old_cam->m_Flags.is(flRelativeLink))) {
+    if (old_cam && (m_Flags.is(flRelativeLink) == old_cam->m_Flags.is(flRelativeLink)))
+    {
         yaw = old_cam->yaw;
         vPosition.set(old_cam->vPosition);
     }
-    if (yaw > PI_MUL_2) yaw -= PI_MUL_2;
-    if (yaw < -PI_MUL_2) yaw += PI_MUL_2;
+    if (yaw > PI_MUL_2)
+        yaw -= PI_MUL_2;
+    if (yaw < -PI_MUL_2)
+        yaw += PI_MUL_2;
 }
 
 #include "xrEngine/xr_input.h"
@@ -88,15 +88,13 @@ void CCameraLook::OnActivate(CCameraBase* old_cam)
 int cam_dik = DIK_LSHIFT;
 
 Fvector CCameraLook2::m_cam_offset;
-void CCameraLook2::OnActivate(CCameraBase* old_cam)
-{
-    CCameraLook::OnActivate(old_cam);
-}
-
+void CCameraLook2::OnActivate(CCameraBase* old_cam) { CCameraLook::OnActivate(old_cam); }
 void CCameraLook2::Update(Fvector& point, Fvector&)
 {
-    if (!m_locked_enemy) {  // autoaim
-        if (pInput->iGetAsyncKeyState(cam_dik)) {
+    if (!m_locked_enemy)
+    { // autoaim
+        if (pInput->iGetAsyncKeyState(cam_dik))
+        {
             const CVisualMemoryManager::VISIBLES& vVisibles = Actor()->memory().visual().objects();
             CVisualMemoryManager::VISIBLES::const_iterator v_it = vVisibles.begin();
             float _nearest_dst = flt_max;
@@ -104,15 +102,18 @@ void CCameraLook2::Update(Fvector& point, Fvector&)
             for (; v_it != vVisibles.end(); ++v_it)
             {
                 const IGameObject* _object_ = (*v_it).m_object;
-                if (!Actor()->memory().visual().visible_now(smart_cast<const CGameObject*>(_object_))) continue;
+                if (!Actor()->memory().visual().visible_now(smart_cast<const CGameObject*>(_object_)))
+                    continue;
 
                 IGameObject* object_ = const_cast<IGameObject*>(_object_);
 
                 CEntityAlive* EA = smart_cast<CEntityAlive*>(object_);
-                if (!EA || !EA->g_Alive()) continue;
+                if (!EA || !EA->g_Alive())
+                    continue;
 
                 float d = object_->Position().distance_to_xz(Actor()->Position());
-                if (!m_locked_enemy || d < _nearest_dst) {
+                if (!m_locked_enemy || d < _nearest_dst)
+                {
                     m_locked_enemy = object_;
                     _nearest_dst = d;
                 }
@@ -122,13 +123,15 @@ void CCameraLook2::Update(Fvector& point, Fvector&)
     }
     else
     {
-        if (!pInput->iGetAsyncKeyState(cam_dik)) {
+        if (!pInput->iGetAsyncKeyState(cam_dik))
+        {
             m_locked_enemy = NULL;
             //.			Msg				("enemy is NILL");
         }
     }
 
-    if (m_locked_enemy) UpdateAutoAim();
+    if (m_locked_enemy)
+        UpdateAutoAim();
 
     Fmatrix mR;
     mR.setHPB(-yaw, -pitch, -roll);
@@ -199,14 +202,11 @@ void CCameraFixedLook::OnActivate(CCameraBase* old_cam)
     roll = -roll;
 }
 
-void CCameraFixedLook::Move(int cmd, float val, float factor)
-{
-}
-
+void CCameraFixedLook::Move(int cmd, float val, float factor) {}
 void CCameraFixedLook::Update(Fvector& point, Fvector& noise_dangle)
 {
     Fquaternion new_dir;
-    new_dir.slerp(m_current_dir, m_final_dir, Device.fTimeDelta);  // 1 sec
+    new_dir.slerp(m_current_dir, m_final_dir, Device.fTimeDelta); // 1 sec
     m_current_dir.set(new_dir);
 
     Fmatrix rm;

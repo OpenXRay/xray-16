@@ -47,7 +47,8 @@ bool CStateBurerAntiAim<Object>::check_start_conditions()
 template <class Object>
 bool CStateBurerAntiAim<Object>::check_completion()
 {
-    if (!object->get_anti_aim()->is_active()) {
+    if (!object->get_anti_aim()->is_active())
+    {
         return true;
     }
 

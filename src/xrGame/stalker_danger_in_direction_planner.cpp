@@ -44,16 +44,8 @@ void CStalkerDangerInDirectionPlanner::initialize()
     CScriptActionPlanner::m_storage.set_property(eWorldPropertyEnemyDetoured, false);
 }
 
-void CStalkerDangerInDirectionPlanner::update()
-{
-    inherited::update();
-}
-
-void CStalkerDangerInDirectionPlanner::finalize()
-{
-    inherited::finalize();
-}
-
+void CStalkerDangerInDirectionPlanner::update() { inherited::update(); }
+void CStalkerDangerInDirectionPlanner::finalize() { inherited::finalize(); }
 void CStalkerDangerInDirectionPlanner::add_evaluators()
 {
     add_evaluator(eWorldPropertyDanger, new CStalkerPropertyEvaluatorDangers(m_object, "danger"));

@@ -8,7 +8,7 @@
 
 #pragma once
 
-#define OUT_MESSAGE(s1, s2)  // Msg(s1,s2);
+#define OUT_MESSAGE(s1, s2) // Msg(s1,s2);
 
 class CEntityAlive;
 class CSE_ALifeObject;
@@ -49,16 +49,13 @@ public:
             return (dwDiscretizationValue - 1);
         else
             return (iFloor((fTemp - m_fMinResultValue) / (m_fMaxResultValue - m_fMinResultValue) *
-                               float(dwDiscretizationValue - 1) +
-                           .5f));
+                    float(dwDiscretizationValue - 1) +
+                .5f));
     }
 
     IC float ffGetMaxResultValue() { return (m_fMaxResultValue); }
-
     IC float ffGetMinResultValue() { return (m_fMinResultValue); }
-
     IC LPCSTR Name() { return (m_caName); }
-
     IC CLASS_ID clsid_member() const;
     IC CLASS_ID clsid_enemy() const;
     IC CLASS_ID clsid_member_item() const;

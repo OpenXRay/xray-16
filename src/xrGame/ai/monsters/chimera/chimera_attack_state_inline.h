@@ -59,14 +59,18 @@ void ChimeraAttackState<Object>::initialize()
 template <class Object>
 void ChimeraAttackState<Object>::finalize()
 {
-    if (m_state == state_rotate || m_state == state_prepare_jump) {
-        if (object->control().get_capturer(ControlCom::eControlPath) == m_capturer) {
+    if (m_state == state_rotate || m_state == state_prepare_jump)
+    {
+        if (object->control().get_capturer(ControlCom::eControlPath) == m_capturer)
+        {
             object->control().release(m_capturer, ControlCom::eControlPath);
         }
-        if (object->control().get_capturer(ControlCom::eControlMovement) == m_capturer) {
+        if (object->control().get_capturer(ControlCom::eControlMovement) == m_capturer)
+        {
             object->control().release(m_capturer, ControlCom::eControlMovement);
         }
-        if (object->anim().has_override_animation()) {
+        if (object->anim().has_override_animation())
+        {
             object->anim().clear_override_animation();
         }
     }
@@ -81,7 +85,8 @@ void ChimeraAttackState<Object>::critical_finalize()
 template <class Object>
 bool ChimeraAttackState<Object>::check_control_start_conditions(ControlCom::EControlType type)
 {
-    if (type == ControlCom::eControlJump) {
+    if (type == ControlCom::eControlJump)
+    {
         return m_allow_jump;
     }
 
@@ -96,9 +101,11 @@ bool ChimeraAttackState<Object>::check_if_jump_possible(Fvector const& target)
     m_allow_jump = true;
     bool const possible = object->com_man().check_if_jump_possible(target, true);
     m_allow_jump = false;
-    if (!possible) return false;
+    if (!possible)
+        return false;
 
-    if (!ai().level_graph().valid_vertex_position(target)) return false;
+    if (!ai().level_graph().valid_vertex_position(target))
+        return false;
 
     if (object->com_man().get_jump_control()->jump_intersect_geometry(
             target, (IGameObject*)object->EnemyMan.get_enemy()))
@@ -115,12 +122,13 @@ bool ChimeraAttackState<Object>::jump(Fvector const& target, bool attack_jump)
     dir_yaw = angle_normalize(-dir_yaw);
     float yaw_current, yaw_target;
     object->control().direction().get_heading(yaw_current, yaw_target);
-    if (angle_difference(yaw_current, dir_yaw) > 1.f) return false;
+    if (angle_difference(yaw_current, dir_yaw) > 1.f)
+        return false;
 
     m_allow_jump = true;
     bool const jumped = object->com_man().jump_if_possible(target, (CEntityAlive*)object->EnemyMan.get_enemy(),
-        attack_jump,  // use_direction_to_target
-        true,         // use velocity bounce
+        attack_jump, // use_direction_to_target
+        true, // use velocity bounce
         true);
 
     m_allow_jump = false;
@@ -149,7 +157,8 @@ bool ChimeraAttackState<Object>::select_target_for_move()
 
     float const dist2attack_pos = magnitude(behind_point - self_pos);
 
-    if (dist2attack_pos < 5.f) {
+    if (dist2attack_pos < 5.f)
+    {
         m_target = behind_point;
         return true;
     }
@@ -157,9 +166,11 @@ bool ChimeraAttackState<Object>::select_target_for_move()
     {
         Fvector const self2behind = behind_point - self_pos;
 
-        if (m_run_side == run_side_undefined || current_time() > m_run_side_select_tick) {
+        if (m_run_side == run_side_undefined || current_time() > m_run_side_select_tick)
+        {
             bool left_side = self2enemy.x * self2behind.z - self2enemy.z * self2behind.x > 0.f;
-            if (!(rand() % 2)) {
+            if (!(rand() % 2))
+            {
                 left_side ^= true;
             }
 
@@ -178,7 +189,8 @@ bool ChimeraAttackState<Object>::select_target_for_move()
 
             Fvector const scan_point = enemy_pos + rotate_point(enemy2self, angle);
 
-            if (ai().level_graph().valid_vertex_position(scan_point)) {
+            if (ai().level_graph().valid_vertex_position(scan_point))
+            {
                 m_target = scan_point;
                 break;
             }
@@ -205,13 +217,15 @@ bool ChimeraAttackState<Object>::select_target_for_attack_jump()
     Fvector const enemy_pos = enemy->Position();
 
     Fvector const& corrected_enemy_pos = correct_jump_pos(enemy_pos);
-    if (check_if_jump_possible(corrected_enemy_pos)) {
+    if (check_if_jump_possible(corrected_enemy_pos))
+    {
         m_target = corrected_enemy_pos;
         m_attack_jump = true;
         return true;
     }
 
-    if (check_if_jump_possible(enemy_pos)) {
+    if (check_if_jump_possible(enemy_pos))
+    {
         m_target = enemy_pos;
         m_attack_jump = true;
         return true;
@@ -226,8 +240,10 @@ bool ChimeraAttackState<Object>::select_target_for_jump(enum_action const action
     CEntityAlive const* const enemy = object->EnemyMan.get_enemy();
     Fvector const enemy_pos = enemy->Position();
 
-    if (action == action_attack) {
-        if (select_target_for_attack_jump()) return true;
+    if (action == action_attack)
+    {
+        if (select_target_for_attack_jump())
+            return true;
     }
 
     Fvector const self_pos = object->Position();
@@ -243,7 +259,8 @@ bool ChimeraAttackState<Object>::select_target_for_jump(enum_action const action
     Fvector const enemy_dir = normalize(enemy->Direction());
     Fvector const behind_point = enemy_pos - (enemy_dir * attack_radius);
 
-    if (check_if_jump_possible(behind_point)) {
+    if (check_if_jump_possible(behind_point))
+    {
         m_target = behind_point;
         return true;
     }
@@ -251,7 +268,8 @@ bool ChimeraAttackState<Object>::select_target_for_jump(enum_action const action
     bool left_side_first = true;
     for (u32 index = 0; index < num_scan_points; ++index)
     {
-        if (!(index % 2)) {
+        if (!(index % 2))
+        {
             left_side_first = !(rand() % 2);
         }
 
@@ -260,7 +278,8 @@ bool ChimeraAttackState<Object>::select_target_for_jump(enum_action const action
 
         Fvector const scan_point = enemy_pos + rotate_point(behind_point - enemy_pos, angle);
 
-        if (magnitude(self_pos - scan_point) >= 7.f && check_if_jump_possible(scan_point)) {
+        if (magnitude(self_pos - scan_point) >= 7.f && check_if_jump_possible(scan_point))
+        {
             m_target = scan_point;
             return true;
         }
@@ -284,7 +303,7 @@ void ChimeraAttackState<Object>::execute()
 #ifdef DEBUG_STATE
     DBG().get_text_tree().clear();
     debug::text_tree& text_tree = DBG().get_text_tree().find_or_add("ActorView");
-#endif  // DEBUG_STATE
+#endif // DEBUG_STATE
 
     CEntityAlive* enemy = const_cast<CEntityAlive*>(object->EnemyMan.get_enemy());
     Fvector const enemy_pos = enemy->Position();
@@ -311,11 +330,14 @@ void ChimeraAttackState<Object>::execute()
 
     bool do_move = false;
 
-    if (m_state == state_rotate) {
+    if (m_state == state_rotate)
+    {
         m_target = m_jump_target;
-        if (m_attack_jump) {
+        if (m_attack_jump)
+        {
             m_target = correct_jump_pos(enemy_pos);
-            if (!ai().level_graph().valid_vertex_position(m_target)) {
+            if (!ai().level_graph().valid_vertex_position(m_target))
+            {
                 m_target_vertex = enemy->ai_location().level_vertex_id();
                 m_target = ai().level_graph().vertex_position(m_target_vertex);
             }
@@ -333,11 +355,14 @@ void ChimeraAttackState<Object>::execute()
 
         bool const good_aiming = _abs(self2target_yaw - self_dir_yaw) < deg2rad(20.f);
         bool const in_stealth = current_time() < m_stealth_end_tick && !object->EnemyMan.enemy_see_me_now();
-        if (!in_stealth) m_stealth_end_tick = 0;
+        if (!in_stealth)
+            m_stealth_end_tick = 0;
 
-        if (object->anim().has_override_animation()) object->anim().clear_override_animation();
+        if (object->anim().has_override_animation())
+            object->anim().clear_override_animation();
 
-        if (!good_aiming || in_stealth) {
+        if (!good_aiming || in_stealth)
+        {
             if (good_aiming && in_stealth)
                 object->anim().set_override_animation(eAnimPrepareAttack, 0);
             else
@@ -352,13 +377,15 @@ void ChimeraAttackState<Object>::execute()
 
             bool valid_target = check_if_jump_possible(m_target);
 
-            if (!valid_target && m_attack_jump) {
+            if (!valid_target && m_attack_jump)
+            {
                 m_target = m_jump_target;
                 m_target_vertex = ai().level_graph().vertex_id(m_target);
                 valid_target = check_if_jump_possible(m_target);
             }
 
-            if (valid_target) {
+            if (valid_target)
+            {
                 m_state = state_prepare_jump;
                 float length = object->anim().get_animation_length(eAnimUpperAttack, 0);
                 m_state_end_tick = current_time() + u32(length * 1000);
@@ -374,20 +401,25 @@ void ChimeraAttackState<Object>::execute()
     }
     else if (m_state == state_prepare_jump)
     {
-        if (object->anim().has_override_animation()) {
+        if (object->anim().has_override_animation())
+        {
             object->anim().clear_override_animation();
         }
 
-        if (current_time() > m_state_end_tick) {
-            if (jump(m_target, m_attack_jump)) {
+        if (current_time() > m_state_end_tick)
+        {
+            if (jump(m_target, m_attack_jump))
+            {
                 m_last_jump_time = current_time();
-                if (m_attack_jump) {
+                if (m_attack_jump)
+                {
                     ++m_num_attack_jumps;
                 }
                 else if (preparing_state)
                 {
                     ++m_num_prepare_jumps;
-                    if (m_num_prepare_jumps == max_prepare_jumps) {
+                    if (m_num_prepare_jumps == max_prepare_jumps)
+                    {
                         m_num_attack_jumps = 0;
                         m_num_prepare_jumps = 0;
                     }
@@ -414,12 +446,14 @@ void ChimeraAttackState<Object>::execute()
     }
     else if (can_prepare_jump || can_attack_jump)
     {
-        if (select_target_for_jump(can_attack_jump ? action_attack : action_jump)) {
+        if (select_target_for_jump(can_attack_jump ? action_attack : action_jump))
+        {
             m_target_vertex = ai().level_graph().vertex_id(m_target);
             m_jump_target = m_target;
             m_state = state_rotate;
 
-            if (can_attack_from_behind) {
+            if (can_attack_from_behind)
+            {
                 m_stealth_end_tick = current_time() + object->get_attack_params().stealth_timeout;
             }
 
@@ -440,8 +474,10 @@ void ChimeraAttackState<Object>::execute()
         do_move = true;
     }
 
-    if (do_move) {
-        if (select_target_for_move()) {
+    if (do_move)
+    {
+        if (select_target_for_move())
+        {
             m_target_vertex = ai().level_graph().vertex_id(m_target);
         }
         else
@@ -454,7 +490,7 @@ void ChimeraAttackState<Object>::execute()
 #ifdef DEBUG_STATE
     text_tree.add_line("num_prepare_jumps", m_num_prepare_jumps);
     text_tree.add_line("num_attack_jumps", m_num_attack_jumps);
-#endif  // #ifdef DEBUG_STATE
+#endif // #ifdef DEBUG_STATE
 
     object->set_action(ACT_RUN);
     object->path().set_use_dest_orient(false);
@@ -466,4 +502,4 @@ void ChimeraAttackState<Object>::execute()
     object->path().set_target_point(m_target, m_target_vertex);
 }
 
-#endif  // #ifdef CHIMERA_ATTACK_STATE_INLINE_H_INCLUDED
+#endif // #ifdef CHIMERA_ATTACK_STATE_INLINE_H_INCLUDED

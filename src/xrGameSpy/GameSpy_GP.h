@@ -35,6 +35,6 @@ private:
     GPConnection m_GPConnection;
     // main callbacks
     static void __cdecl OnGameSpyErrorCb(GPConnection* connection, void* arg, void* param);
-};  // CGameSpy_GP
+}; // CGameSpy_GP
 
-#endif  //#ifndef GAMESPY_GP_H
+#endif //#ifndef GAMESPY_GP_H

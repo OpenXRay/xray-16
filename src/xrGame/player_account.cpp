@@ -6,14 +6,8 @@
 
 using namespace gamespy_profile;
 
-player_account::player_account() : m_player_name(""), m_clan_name(""), m_clan_leader(false), m_online_account(false)
-{
-}
-
-player_account::~player_account()
-{
-}
-
+player_account::player_account() : m_player_name(""), m_clan_name(""), m_clan_leader(false), m_online_account(false) {}
+player_account::~player_account() {}
 void player_account::load_account()
 {
     gamespy_gp::login_manager* tmp_lmngr = MainMenu()->GetLoginMngr();
@@ -22,11 +16,13 @@ void player_account::load_account()
     VERIFY(tmp_store);
     gamespy_gp::profile const* tmp_curr_prof = tmp_lmngr->get_current_profile();
 
-    if (!tmp_curr_prof) {
+    if (!tmp_curr_prof)
+    {
         Msg("* WARNING: player not logged in");
     }
 
-    if (tmp_curr_prof) {
+    if (tmp_curr_prof)
+    {
         m_player_name = tmp_curr_prof->m_unique_nick;
         m_online_account = tmp_curr_prof->online();
         m_profile_id = static_cast<u32>(tmp_curr_prof->profile_id());

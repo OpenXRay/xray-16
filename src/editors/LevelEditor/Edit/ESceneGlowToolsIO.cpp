@@ -19,12 +19,14 @@ bool ESceneGlowTool::LoadLTX(CInifile& ini)
 {
     u16 version = ini.r_u32("main", "glow_tool_version");
 
-    if (version != GLOW_TOOLS_VERSION) {
+    if (version != GLOW_TOOLS_VERSION)
+    {
         ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
         return false;
     }
 
-    if (!inherited::LoadLTX(ini)) return false;
+    if (!inherited::LoadLTX(ini))
+        return false;
 
     m_Flags.assign(ini.r_u32("main", "flags"));
 
@@ -44,14 +46,17 @@ bool ESceneGlowTool::LoadStream(IReader& F)
 {
     u16 version = 0;
     if (F.r_chunk(CHUNK_VERSION, &version))
-        if (version != GLOW_TOOLS_VERSION) {
+        if (version != GLOW_TOOLS_VERSION)
+        {
             ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
             return false;
         }
 
-    if (!inherited::LoadStream(F)) return false;
+    if (!inherited::LoadStream(F))
+        return false;
 
-    if (F.find_chunk(CHUNK_FLAGS)) m_Flags.assign(F.r_u32());
+    if (F.find_chunk(CHUNK_FLAGS))
+        m_Flags.assign(F.r_u32());
 
     return true;
 }
@@ -75,7 +80,8 @@ bool ESceneGlowTool::LoadSelection(IReader& F)
 {
     u16 version = 0;
     R_ASSERT(F.r_chunk(CHUNK_VERSION, &version));
-    if (version != GLOW_TOOLS_VERSION) {
+    if (version != GLOW_TOOLS_VERSION)
+    {
         ELog.DlgMsg(mtError, "%s tools: Unsupported version.", ClassDesc());
         return false;
     }

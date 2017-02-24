@@ -17,10 +17,10 @@
 
 #include "MxMat4.h"
 
-#define ROT(a, i, j, k, l)                                                                                             \
-    g = a[i][j];                                                                                                       \
-    h = a[k][l];                                                                                                       \
-    a[i][j] = g - s * (h + g * tau);                                                                                   \
+#define ROT(a, i, j, k, l)\
+    g = a[i][j];\
+    h = a[k][l];\
+    a[i][j] = g - s * (h + g * tau);\
     a[k][l] = h + s * (g - h * tau);
 
 #define MAX_ROTATIONS 60
@@ -53,7 +53,8 @@ static bool internal_jacobi4(double a[4][4], double w[4], double v[4][4])
             for (iq = ip + 1; iq < 4; iq++)
                 sm += _abs(a[ip][iq]);
         }
-        if (sm == 0.0) break;
+        if (sm == 0.0)
+            break;
 
         if (i < 4)
             tresh = 0.2 * sm / (16);
@@ -65,7 +66,8 @@ static bool internal_jacobi4(double a[4][4], double w[4], double v[4][4])
             for (iq = ip + 1; iq < 4; iq++)
             {
                 g = 100.0 * _abs(a[ip][iq]);
-                if (i > 4 && (_abs(w[ip]) + g) == _abs(w[ip]) && (_abs(w[iq]) + g) == _abs(w[iq])) {
+                if (i > 4 && (_abs(w[ip]) + g) == _abs(w[ip]) && (_abs(w[iq]) + g) == _abs(w[iq]))
+                {
                     a[ip][iq] = 0.0;
                 }
                 else if (_abs(a[ip][iq]) > tresh)
@@ -77,7 +79,8 @@ static bool internal_jacobi4(double a[4][4], double w[4], double v[4][4])
                     {
                         theta = 0.5 * h / (a[ip][iq]);
                         t = 1.0 / (_abs(theta) + _sqrt(1.0 + theta * theta));
-                        if (theta < 0.0) t = -t;
+                        if (theta < 0.0)
+                            t = -t;
                     }
                     c = 1.0 / _sqrt(1 + t * t);
                     s = t * c;
@@ -116,7 +119,8 @@ static bool internal_jacobi4(double a[4][4], double w[4], double v[4][4])
         }
     }
 
-    if (i >= MAX_ROTATIONS) {
+    if (i >= MAX_ROTATIONS)
+    {
         FATAL("Error computing eigenvalues.");
         return false;
     }
@@ -128,12 +132,14 @@ static bool internal_jacobi4(double a[4][4], double w[4], double v[4][4])
         tmp = w[k];
         for (i = j; i < 4; i++)
         {
-            if (w[i] >= tmp) {
+            if (w[i] >= tmp)
+            {
                 k = i;
                 tmp = w[k];
             }
         }
-        if (k != j) {
+        if (k != j)
+        {
             w[k] = w[j];
             w[j] = tmp;
             for (i = 0; i < 4; i++)
@@ -152,7 +158,8 @@ static bool internal_jacobi4(double a[4][4], double w[4], double v[4][4])
     for (j = 0; j < 4; j++)
     {
         for (numPos = 0, i = 0; i < 4; i++)
-            if (v[i][j] >= 0.0) numPos++;
+            if (v[i][j] >= 0.0)
+                numPos++;
         if (numPos < 3)
             for (i = 0; i < 4; i++)
                 v[i][j] *= -1.0;
@@ -174,7 +181,8 @@ bool jacobi(const Mat4& m, Vec4& eig_vals, Vec4 eig_vecs[4])
             a[i][j] = m(i, j);
 
     bool result = internal_jacobi4(a, w, v);
-    if (result) {
+    if (result)
+    {
         for (i = 0; i < 4; i++)
             eig_vals[i] = w[i];
 

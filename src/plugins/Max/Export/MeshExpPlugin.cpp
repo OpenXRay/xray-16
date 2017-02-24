@@ -31,11 +31,12 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, ULONG fdwReason, LPVOID lpvReserved)
 {
     hInstance = hinstDLL;
 
-    if (!controlsInit) {
+    if (!controlsInit)
+    {
         controlsInit = TRUE;
         Core._initialize("S.T.A.L.K.E.R.Plugin", LogCallback(ELogCallback, nullptr), FALSE, nullptr, true);
         FS._initialize(CLocatorAPI::flScanAppRoot, NULL, "xray_path.ltx");
-        FPU::m64r();  // нужно чтобы макс не сбрасывал контрольки в 0
+        FPU::m64r(); // нужно чтобы макс не сбрасывал контрольки в 0
         InitCustomControls(hInstance);
         InitCommonControls();
         ELog.Msg(mtInformation, "S.T.A.L.K.E.R. Object Export (ver. %d.%02d)", EXPORTER_VERSION, EXPORTER_BUILD);
@@ -53,16 +54,8 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, ULONG fdwReason, LPVOID lpvReserved)
     return (TRUE);
 }
 
-__declspec(dllexport) const TCHAR* LibDescription()
-{
-    return "S.T.A.L.K.E.R. Mesh Export utility";
-}
-
-__declspec(dllexport) int LibNumberClasses()
-{
-    return 1;
-}
-
+__declspec(dllexport) const TCHAR* LibDescription() { return "S.T.A.L.K.E.R. Mesh Export utility"; }
+__declspec(dllexport) int LibNumberClasses() { return 1; }
 __declspec(dllexport) ClassDesc* LibClassDesc(int i)
 {
     switch (i)
@@ -72,7 +65,4 @@ __declspec(dllexport) ClassDesc* LibClassDesc(int i)
     }
 }
 
-__declspec(dllexport) ULONG LibVersion()
-{
-    return VERSION_3DSMAX;
-}
+__declspec(dllexport) ULONG LibVersion() { return VERSION_3DSMAX; }

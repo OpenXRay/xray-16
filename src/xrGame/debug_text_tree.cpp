@@ -38,7 +38,8 @@ struct texttree_draw_helper
 
     void operator()(const char* s, int num_siblings)
     {
-        if (s_params.offs) {
+        if (s_params.offs)
+        {
             s_params.offs--;
             return;
         }
@@ -50,11 +51,13 @@ struct texttree_draw_helper
         // 				s_params.ori_x  += s_params.column_size;
         // 			}
 
-        if (!s_params.cur_row) {
+        if (!s_params.cur_row)
+        {
             UI().Font().pFontStat->OutSet((float)s_params.ori_x, (float)s_params.ori_y);
         }
 
-        if (s_params.cur_row % 2) {
+        if (s_params.cur_row % 2)
+        {
             UI().Font().pFontStat->SetColor(s_params.color1);
         }
         else
@@ -74,13 +77,13 @@ struct texttree_log_helper
     void operator()(const char* s, int num_siblings) { Msg(s); }
 };
 
-}  // namespace detail
+} // namespace detail
 
 void draw_text_tree(text_tree& tree,
-    int indent,  // in spaces
+    int indent, // in spaces
     int ori_x, int ori_y,
-    int offs,         // skip offs lines
-    int column_size,  // in pixels
+    int offs, // skip offs lines
+    int column_size, // in pixels
     int max_rows, u32 color1, u32 color2)
 {
     detail::texttree_draw_helper::s_params.color1 = color1;
@@ -95,24 +98,22 @@ void draw_text_tree(text_tree& tree,
     tree.output(detail::texttree_draw_helper(), indent);
 }
 
-void log_text_tree(text_tree& tree)
-{
-    tree.output(detail::texttree_log_helper(), 2);
-}
-
+void log_text_tree(text_tree& tree) { tree.output(detail::texttree_log_helper(), 2); }
 //-----------------------------------------------
 // text_tree
 //-----------------------------------------------
 
 text_tree* text_tree::find_node(const xr_string& s1)
 {
-    if (strings.size() && (*strings.begin()) == s1) {
+    if (strings.size() && (*strings.begin()) == s1)
+    {
         return this;
     }
 
     for (Children::iterator i = children.begin(); i != children.end(); ++i)
     {
-        if (text_tree* p = (*i)->find_node(s1)) {
+        if (text_tree* p = (*i)->find_node(s1))
+        {
             return p;
         }
     }
@@ -122,7 +123,8 @@ text_tree* text_tree::find_node(const xr_string& s1)
 
 text_tree& text_tree::find_or_add(const xr_string& s1)
 {
-    if (text_tree* p = find_node(s1)) {
+    if (text_tree* p = find_node(s1))
+    {
         return *p;
     }
 
@@ -131,7 +133,8 @@ text_tree& text_tree::find_or_add(const xr_string& s1)
 
 void text_tree::toggle_show(int group_id_)
 {
-    if (group_id == group_id_) {
+    if (group_id == group_id_)
+    {
         shown = !shown;
     }
 }
@@ -152,17 +155,19 @@ void text_tree::clear()
 
 void text_tree::prepare(int current_indent, int indent, Columns& columns)
 {
-    num_siblings = 1;  // including ourselves
+    num_siblings = 1; // including ourselves
 
     for (Children::iterator i = children.begin(); i != children.end(); ++i)
     {
-        if ((*i)->shown) {
+        if ((*i)->shown)
+        {
             (*i)->prepare(current_indent + indent, indent, columns);
             num_siblings += (*i)->num_siblings;
         }
     }
 
-    if (columns.size() < strings.size()) {
+    if (columns.size() < strings.size())
+    {
         columns.resize(strings.size());
     }
 
@@ -170,7 +175,8 @@ void text_tree::prepare(int current_indent, int indent, Columns& columns)
     Columns::iterator c = columns.begin();
 
     // only count as column if theres more then 1 on the line!
-    if (strings.size() > 1) {
+    if (strings.size() > 1)
+    {
         for (; j != strings.end(); ++j, ++c)
         {
             int string_size = (int)(*j).size();
@@ -181,4 +187,4 @@ void text_tree::prepare(int current_indent, int indent, Columns& columns)
     }
 }
 
-}  // namespace debug
+} // namespace debug

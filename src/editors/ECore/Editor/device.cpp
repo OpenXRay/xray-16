@@ -57,11 +57,7 @@ CEditorRenderDevice::CEditorRenderDevice()
     dwPrecacheFrame = 0;
 }
 
-CEditorRenderDevice::~CEditorRenderDevice()
-{
-    VERIFY(!b_is_Ready);
-}
-
+CEditorRenderDevice::~CEditorRenderDevice() { VERIFY(!b_is_Ready); }
 extern void Surface_Init();
 #include "Include/xrAPI/xrAPI.h"
 #include "../../Layers/xrRender/dxRenderFactory.h"
@@ -79,7 +75,8 @@ void CEditorRenderDevice::Initialize()
     // compiler shader
     string_path fn;
     FS.update_path(fn, _game_data_, "shaders_xrlc.xr");
-    if (FS.exist(fn)) {
+    if (FS.exist(fn))
+    {
         ShaderXRLC.Load(fn);
     }
     else
@@ -116,7 +113,7 @@ void CEditorRenderDevice::InitTimer()
     {
         u32 time_mm = timeGetTime();
         while (timeGetTime() == time_mm)
-            ;  // wait for next tick
+            ; // wait for next tick
         u32 time_system = timeGetTime();
         u32 time_local = TimerAsync();
         Timer_MM_Delta = time_system - time_local;
@@ -139,7 +136,8 @@ void CEditorRenderDevice::ResetNearer()
 //---------------------------------------------------------------------------
 bool CEditorRenderDevice::Create()
 {
-    if (b_is_Ready) return false;
+    if (b_is_Ready)
+        return false;
     Statistic = new CEStats();
     ELog.Msg(mtInformation, "Starting RENDER device...");
 
@@ -152,11 +150,13 @@ bool CEditorRenderDevice::Create()
     FS.update_path(sh, _game_data_, "shaders.xr");
 
     IReader* F = 0;
-    if (FS.exist(sh)) F = FS.r_open(0, sh);
+    if (FS.exist(sh))
+        F = FS.r_open(0, sh);
     Resources = new CResourceManager();
 
     // if build options - load textures immediately
-    if (strstr(Core.Params, "-build") || strstr(Core.Params, "-ebuild")) EDevice.Resources->DeferredLoad(FALSE);
+    if (strstr(Core.Params, "-build") || strstr(Core.Params, "-ebuild"))
+        EDevice.Resources->DeferredLoad(FALSE);
 
     _Create(F);
     FS.r_close(F);
@@ -169,7 +169,8 @@ bool CEditorRenderDevice::Create()
 //---------------------------------------------------------------------------
 void CEditorRenderDevice::Destroy()
 {
-    if (!b_is_Ready) return;
+    if (!b_is_Ready)
+        return;
 
     ELog.Msg(mtInformation, "Destroying Direct3D...");
 
@@ -307,15 +308,18 @@ BOOL CEditorRenderDevice::Begin()
     VERIFY(b_is_Ready);
     HW.Validate();
     HRESULT _hr = HW.pDevice->TestCooperativeLevel();
-    if (FAILED(_hr)) {
+    if (FAILED(_hr))
+    {
         // If the device was lost, do not render until we get it back
-        if (D3DERR_DEVICELOST == _hr) {
+        if (D3DERR_DEVICELOST == _hr)
+        {
             Sleep(33);
             return FALSE;
         }
 
         // Check if the device is ready to be reset
-        if (D3DERR_DEVICENOTRESET == _hr) {
+        if (D3DERR_DEVICENOTRESET == _hr)
+        {
             Reset();
         }
     }
@@ -369,12 +373,13 @@ void CEditorRenderDevice::FrameMove()
 
     // Timer
     float fPreviousFrameTime = Timer.GetElapsed_sec();
-    Timer.Start();                                               // previous frame
-    fTimeDelta = 0.1f * fTimeDelta + 0.9f * fPreviousFrameTime;  // smooth random system activity - worst case ~7% error
-    if (fTimeDelta > .1f) fTimeDelta = .1f;                      // limit to 15fps minimum
+    Timer.Start(); // previous frame
+    fTimeDelta = 0.1f * fTimeDelta + 0.9f * fPreviousFrameTime; // smooth random system activity - worst case ~7% error
+    if (fTimeDelta > .1f)
+        fTimeDelta = .1f; // limit to 15fps minimum
 
-    fTimeGlobal = TimerGlobal.GetElapsed_sec();  // float(qTime)*CPU::cycles2seconds;
-    dwTimeGlobal = TimerGlobal.GetElapsed_ms();  // u32((qTime*u64(1000))/CPU::cycles_per_second);
+    fTimeGlobal = TimerGlobal.GetElapsed_sec(); // float(qTime)*CPU::cycles2seconds;
+    dwTimeGlobal = TimerGlobal.GetElapsed_ms(); // u32((qTime*u64(1000))/CPU::cycles_per_second);
     dwTimeDelta = iFloor(fTimeDelta * 1000.f + 0.5f);
     dwTimeContinual = dwTimeGlobal;
 

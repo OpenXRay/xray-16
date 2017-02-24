@@ -49,7 +49,6 @@ public:
     virtual bool Get_ShowPlayerNames() { return m_bShowPlayersNames; };
     virtual s16 ModifyTeam(s16 Team) { return (Team != -1) ? Team - 1 : Team; };
     virtual bool Get_ShowPlayerNamesEnabled() { return m_bFriendlyNames; };
-
     virtual bool IsPlayerInTeam(game_PlayerState* ps, ETeam team);
     virtual LPCSTR GetGameScore(string32& score_dest);
     s32 GetGreenTeamScore() const { return teams[0].score; };
@@ -86,7 +85,4 @@ protected:
     virtual void OnConnected();
 };
 
-IC bool TDM_Compare_Players(game_PlayerState* p1, game_PlayerState* p2)
-{
-    return DM_Compare_Players(p1, p2);
-};
+IC bool TDM_Compare_Players(game_PlayerState* p1, game_PlayerState* p2) { return DM_Compare_Players(p1, p2); };

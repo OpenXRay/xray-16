@@ -36,11 +36,13 @@ CGameTask::CGameTask()
 void CGameTask::SetTaskState(ETaskState state)
 {
     m_task_state = state;
-    if ((m_task_state == eTaskStateFail) || (m_task_state == eTaskStateCompleted)) {
+    if ((m_task_state == eTaskStateFail) || (m_task_state == eTaskStateCompleted))
+    {
         RemoveMapLocations(false);
         m_FinishTime = Level().GetGameTime();
 
-        if (m_task_state == eTaskStateFail) {
+        if (m_task_state == eTaskStateFail)
+        {
             SendInfo(m_infos_on_fail);
             CallAllFuncs(m_lua_functions_on_fail);
         }
@@ -63,11 +65,13 @@ void CGameTask::OnArrived()
 
 void CGameTask::CreateMapLocation(bool on_load)
 {
-    if (m_map_object_id == u16(-1) || m_map_location.size() == 0) {
+    if (m_map_object_id == u16(-1) || m_map_location.size() == 0)
+    {
         return;
     }
 
-    if (on_load) {
+    if (on_load)
+    {
         xr_vector<CMapLocation*> res;
         Level().MapManager().GetMapLocations(m_map_location, m_map_object_id, res);
         xr_vector<CMapLocation*>::iterator it = res.begin();
@@ -75,7 +79,8 @@ void CGameTask::CreateMapLocation(bool on_load)
         for (; it != it_e; ++it)
         {
             CMapLocation* ml = *it;
-            if (ml->m_owner_task_id == m_ID) {
+            if (ml->m_owner_task_id == m_ID)
+            {
                 m_linked_map_location = ml;
                 break;
             }
@@ -90,22 +95,26 @@ void CGameTask::CreateMapLocation(bool on_load)
 
     VERIFY(m_linked_map_location);
 
-    if (!on_load) {
-        if (m_map_hint.size()) {
+    if (!on_load)
+    {
+        if (m_map_hint.size())
+        {
             m_linked_map_location->SetHint(m_map_hint);
         }
         m_linked_map_location->DisablePointer();
         m_linked_map_location->SetSerializable(true);
     }
 
-    if (m_linked_map_location->complex_spot()) {
+    if (m_linked_map_location->complex_spot())
+    {
         m_linked_map_location->complex_spot()->SetTimerFinish(m_timer_finish);
     }
 }
 
 void CGameTask::RemoveMapLocations(bool notify)
 {
-    if (m_linked_map_location && !notify) Level().MapManager().RemoveMapLocation(m_linked_map_location);
+    if (m_linked_map_location && !notify)
+        Level().MapManager().RemoveMapLocation(m_linked_map_location);
 
     m_map_location = 0;
     m_linked_map_location = NULL;
@@ -123,29 +132,31 @@ void CGameTask::ChangeMapLocation(LPCSTR new_map_location, u16 new_map_object_id
     CreateMapLocation(false);
 }
 
-void CGameTask::ChangeStateCallback()
-{
-    Actor()->callback(GameObject::eTaskStateChange)(this, GetTaskState());
-}
-
+void CGameTask::ChangeStateCallback() { Actor()->callback(GameObject::eTaskStateChange)(this, GetTaskState()); }
 ETaskState CGameTask::UpdateState()
 {
-    if ((m_ReceiveTime != m_TimeToComplete)) {
-        if (Level().GetGameTime() > m_TimeToComplete) {
+    if ((m_ReceiveTime != m_TimeToComplete))
+    {
+        if (Level().GetGameTime() > m_TimeToComplete)
+        {
             return eTaskStateFail;
         }
     }
     // check fail infos
-    if (CheckInfo(m_failInfos)) return eTaskStateFail;
+    if (CheckInfo(m_failInfos))
+        return eTaskStateFail;
 
     // check fail functor
-    if (CheckFunctions(m_fail_lua_functions)) return eTaskStateFail;
+    if (CheckFunctions(m_fail_lua_functions))
+        return eTaskStateFail;
 
     // check complete infos
-    if (CheckInfo(m_completeInfos)) return eTaskStateCompleted;
+    if (CheckInfo(m_completeInfos))
+        return eTaskStateCompleted;
 
     // check complete functor
-    if (CheckFunctions(m_complete_lua_functions)) return eTaskStateCompleted;
+    if (CheckFunctions(m_complete_lua_functions))
+        return eTaskStateCompleted;
 
     return GetTaskState();
 }
@@ -157,7 +168,8 @@ bool CGameTask::CheckInfo(const xr_vector<shared_str>& v) const
     for (; it != v.end(); ++it)
     {
         res = Actor()->HasInfo(*it);
-        if (!res) break;
+        if (!res)
+            break;
     }
     return res;
 }
@@ -168,8 +180,10 @@ bool CGameTask::CheckFunctions(const task_state_functors& v) const
     task_state_functors::const_iterator it = v.begin();
     for (; it != v.end(); ++it)
     {
-        if ((*it).is_valid()) res = (*it)(m_ID.c_str());
-        if (!res) break;
+        if ((*it).is_valid())
+            res = (*it)(m_ID.c_str());
+        if (!res)
+            break;
     }
     return res;
 }
@@ -178,7 +192,8 @@ void CGameTask::CallAllFuncs(const task_state_functors& v)
     task_state_functors::const_iterator it = v.begin();
     for (; it != v.end(); ++it)
     {
-        if ((*it).is_valid()) (*it)(m_ID.c_str());
+        if ((*it).is_valid())
+            (*it)(m_ID.c_str());
     }
 }
 void CGameTask::SendInfo(const xr_vector<shared_str>& v)
@@ -236,43 +251,14 @@ void CGameTask::CommitScriptHelperContents()
     m_pScriptHelper.init_functors(m_pScriptHelper.m_s_lua_functions_on_fail, m_lua_functions_on_fail);
 }
 
-void CGameTask::AddCompleteInfo_script(LPCSTR _str)
-{
-    m_completeInfos.push_back(_str);
-}
-
-void CGameTask::AddFailInfo_script(LPCSTR _str)
-{
-    m_failInfos.push_back(_str);
-}
-
-void CGameTask::AddOnCompleteInfo_script(LPCSTR _str)
-{
-    m_infos_on_complete.push_back(_str);
-}
-
-void CGameTask::AddOnFailInfo_script(LPCSTR _str)
-{
-    m_infos_on_fail.push_back(_str);
-}
-
-void CGameTask::AddCompleteFunc_script(LPCSTR _str)
-{
-    m_pScriptHelper.m_s_complete_lua_functions.push_back(_str);
-}
-void CGameTask::AddFailFunc_script(LPCSTR _str)
-{
-    m_pScriptHelper.m_s_fail_lua_functions.push_back(_str);
-}
-void CGameTask::AddOnCompleteFunc_script(LPCSTR _str)
-{
-    m_pScriptHelper.m_s_lua_functions_on_complete.push_back(_str);
-}
-void CGameTask::AddOnFailFunc_script(LPCSTR _str)
-{
-    m_pScriptHelper.m_s_lua_functions_on_fail.push_back(_str);
-}
-
+void CGameTask::AddCompleteInfo_script(LPCSTR _str) { m_completeInfos.push_back(_str); }
+void CGameTask::AddFailInfo_script(LPCSTR _str) { m_failInfos.push_back(_str); }
+void CGameTask::AddOnCompleteInfo_script(LPCSTR _str) { m_infos_on_complete.push_back(_str); }
+void CGameTask::AddOnFailInfo_script(LPCSTR _str) { m_infos_on_fail.push_back(_str); }
+void CGameTask::AddCompleteFunc_script(LPCSTR _str) { m_pScriptHelper.m_s_complete_lua_functions.push_back(_str); }
+void CGameTask::AddFailFunc_script(LPCSTR _str) { m_pScriptHelper.m_s_fail_lua_functions.push_back(_str); }
+void CGameTask::AddOnCompleteFunc_script(LPCSTR _str) { m_pScriptHelper.m_s_lua_functions_on_complete.push_back(_str); }
+void CGameTask::AddOnFailFunc_script(LPCSTR _str) { m_pScriptHelper.m_s_lua_functions_on_fail.push_back(_str); }
 void SScriptTaskHelper::init_functors(xr_vector<shared_str>& v_src, task_state_functors& v_dest)
 {
     xr_vector<shared_str>::iterator it = v_src.begin();
@@ -282,7 +268,8 @@ void SScriptTaskHelper::init_functors(xr_vector<shared_str>& v_src, task_state_f
     for (u32 idx = 0; it != it_e; ++it, ++idx)
     {
         bool functor_exists = ai().script_engine().functor(*(*it), v_dest[idx]);
-        if (!functor_exists) Log("Cannot find script function described in task objective  ", *(*it));
+        if (!functor_exists)
+            Log("Cannot find script function described in task objective  ", *(*it));
     }
 }
 
@@ -316,7 +303,4 @@ void SGameTaskKey::load(IReader& stream)
     game_task->load_task(stream);
 }
 
-void SGameTaskKey::destroy()
-{
-    delete_data(game_task);
-}
+void SGameTaskKey::destroy() { delete_data(game_task); }

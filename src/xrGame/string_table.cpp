@@ -7,25 +7,20 @@
 STRING_TABLE_DATA* CStringTable::pData = NULL;
 BOOL CStringTable::m_bWriteErrorsToLog = FALSE;
 
-CStringTable::CStringTable()
-{
-    Init();
-}
-
-void CStringTable::Destroy()
-{
-    xr_delete(pData);
-}
+CStringTable::CStringTable() { Init(); }
+void CStringTable::Destroy() { xr_delete(pData); }
 void CStringTable::rescan()
 {
-    if (NULL != pData) return;
+    if (NULL != pData)
+        return;
     Destroy();
     Init();
 }
 
 void CStringTable::Init()
 {
-    if (NULL != pData) return;
+    if (NULL != pData)
+        return;
 
     pData = new STRING_TABLE_DATA();
 
@@ -50,8 +45,8 @@ void CStringTable::Init()
     }
 #ifdef DEBUG
     Msg("StringTable: loaded %d files", fset.size());
-#endif  // #ifdef DEBUG
-        //---
+#endif // #ifdef DEBUG
+    //---
     ReparseKeyBindings();
 }
 
@@ -88,7 +83,8 @@ void CStringTable::Load(LPCSTR xml_file_full)
 
 void CStringTable::ReparseKeyBindings()
 {
-    if (!pData) return;
+    if (!pData)
+        return;
     STRING_TABLE_MAP_IT it = pData->m_string_key_binding.begin();
     STRING_TABLE_MAP_IT it_e = pData->m_string_key_binding.end();
 
@@ -134,11 +130,13 @@ STRING_VALUE CStringTable::ParseLine(LPCSTR str, LPCSTR skey, bool bFirst)
         b_hit = true;
     };
 
-    if (k < (int)xr_strlen(str)) {
+    if (k < (int)xr_strlen(str))
+    {
         res.append(str + k);
     }
 
-    if (b_hit && bFirst) pData->m_string_key_binding[skey] = str;
+    if (b_hit && bFirst)
+        pData->m_string_key_binding[skey] = str;
 
     return STRING_VALUE(res.c_str());
 }

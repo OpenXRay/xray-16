@@ -1,21 +1,15 @@
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
 #define CStateMonsterFindEnemyRunAbstract CStateMonsterFindEnemyRun<_Object>
 
 TEMPLATE_SPECIALIZATION
-CStateMonsterFindEnemyRunAbstract::CStateMonsterFindEnemyRun(_Object* obj) : inherited(obj)
-{
-}
-
+CStateMonsterFindEnemyRunAbstract::CStateMonsterFindEnemyRun(_Object* obj) : inherited(obj) {}
 TEMPLATE_SPECIALIZATION
-CStateMonsterFindEnemyRunAbstract::~CStateMonsterFindEnemyRun()
-{
-}
-
+CStateMonsterFindEnemyRunAbstract::~CStateMonsterFindEnemyRun() {}
 TEMPLATE_SPECIALIZATION
 void CStateMonsterFindEnemyRunAbstract::initialize()
 {
@@ -34,9 +28,11 @@ void CStateMonsterFindEnemyRunAbstract::initialize()
     test_position.mad(target_point, dir, 10.f);
 
     // провериь возможность пробежать дальше
-    if (ai().level_graph().valid_vertex_position(test_position)) {
+    if (ai().level_graph().valid_vertex_position(test_position))
+    {
         u32 vertex_id = ai().level_graph().vertex_id(test_position);
-        if (ai().level_graph().valid_vertex_id(vertex_id)) {
+        if (ai().level_graph().valid_vertex_id(vertex_id))
+        {
             target_point = test_position;
             target_vertex = vertex_id;
         }

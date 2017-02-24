@@ -34,7 +34,8 @@ void CSE_ActorMP::fill_state(actor_mp_state& state)
 
 void CSE_ActorMP::UPDATE_Write(NET_Packet& packet)
 {
-    if (!m_ready_to_update) {
+    if (!m_ready_to_update)
+    {
         actor_mp_state state;
         fill_state(state);
         m_state_holder.relevant(state);

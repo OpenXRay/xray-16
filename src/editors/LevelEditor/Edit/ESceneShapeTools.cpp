@@ -18,11 +18,7 @@ void ESceneShapeTool::CreateControls()
 
 //----------------------------------------------------
 
-void ESceneShapeTool::RemoveControls()
-{
-    inherited::RemoveControls();
-}
-
+void ESceneShapeTool::RemoveControls() { inherited::RemoveControls(); }
 //----------------------------------------------------
 
 CCustomObject* ESceneShapeTool::CreateObject(LPVOID data, LPCSTR name)
@@ -46,14 +42,16 @@ void ESceneShapeTool::OnEditLevelBounds(bool recalc)
     {
         CEditShape* es = dynamic_cast<CEditShape*>(*it);
         R_ASSERT(es);
-        if (es->m_shape_type == eShapeLevelBound) {
+        if (es->m_shape_type == eShapeLevelBound)
+        {
             level_shape = es;
             break;
         }
     }
     bool b_recalc = recalc || (level_shape == NULL);
 
-    if (!level_shape) {
+    if (!level_shape)
+    {
         level_shape = dynamic_cast<CEditShape*>(CreateObject(NULL, "level_bbox"));
         level_shape->m_shape_type = eShapeLevelBound;
         Fmatrix M;
@@ -63,11 +61,13 @@ void ESceneShapeTool::OnEditLevelBounds(bool recalc)
         Scene->AppendObject(level_shape);
     }
 
-    if (b_recalc) {
+    if (b_recalc)
+    {
         Fbox bg, br;
         Scene->GetBox(br, OBJCLASS_SCENEOBJECT);
         bool r1 = Scene->GetBox(bg, OBJCLASS_GROUP);
-        if (r1) br.merge(bg);
+        if (r1)
+            br.merge(bg);
 
         Fvector vec;
         br.getsize(vec);

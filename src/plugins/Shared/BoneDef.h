@@ -24,7 +24,8 @@ public:
     {
         Fmatrix m;
         Helper::ConvertMatrix(pBone->GetNodeTM(tick), m);
-        if (parent) {
+        if (parent)
+        {
             Fmatrix i_m;
             Helper::ConvertMatrix(parent->pBone->GetNodeTM(tick), i_m);
             i_m.invert();

@@ -41,7 +41,8 @@ bool Object::Valid(void)
     for (MeshTri* pTriTgt = CurTriRoot.ListNext(); pTriTgt != NULL; pTriTgt = pTriTgt->ListNext())
         for (MeshTri* pTriLst = CurTriRoot.ListNext(); pTriLst != NULL; pTriLst = pTriLst->ListNext())
             if (pTriTgt != pTriLst)
-                if (pTriTgt->Equal(pTriLst)) return false;
+                if (pTriTgt->Equal(pTriLst))
+                    return false;
 
     return true;
 }
@@ -75,7 +76,7 @@ void Object::CheckObject(void)
     {
         // And all tris should be the current level or the next.
         VERIFY((tri->mytri.iSlidingWindowLevel == iCurSlidingWindowLevel) ||
-               (tri->mytri.iSlidingWindowLevel == iCurSlidingWindowLevel + 1));
+            (tri->mytri.iSlidingWindowLevel == iCurSlidingWindowLevel + 1));
         tri = tri->ListNext();
     }
 }
@@ -123,7 +124,7 @@ void Object::CreateEdgeCollapse(MeshPt* pptBinned, MeshPt* pptKept)
     pGCI->pptBin = pptBinned;
     pGCI->pptKeep = pptKept;
 
-    const int c_iMaxNumTris = 100;  // Grow as needed.
+    const int c_iMaxNumTris = 100; // Grow as needed.
     MeshTri* pBinnedTris[c_iMaxNumTris];
 
     MeshTri* ptri;
@@ -131,20 +132,23 @@ void Object::CreateEdgeCollapse(MeshPt* pptBinned, MeshPt* pptKept)
     long bNeedNewLevel = FALSE;
     for (ptri = pptBinned->FirstTri(); ptri != NULL; ptri = pptBinned->NextTri())
     {
-        VERIFY(iNumTrisCollapsed < c_iMaxNumTris);  // Grow c_iMaxNumTris as needed.
+        VERIFY(iNumTrisCollapsed < c_iMaxNumTris); // Grow c_iMaxNumTris as needed.
         pBinnedTris[iNumTrisCollapsed++] = ptri;
-        if (ptri->mytri.iSlidingWindowLevel != iCurSlidingWindowLevel) {
+        if (ptri->mytri.iSlidingWindowLevel != iCurSlidingWindowLevel)
+        {
             VERIFY(ptri->mytri.iSlidingWindowLevel == iCurSlidingWindowLevel + 1);
             // Need to set a new level before doing this collapse.
             bNeedNewLevel = TRUE;
         }
     }
 
-    if (bNeedNewLevel) {
+    if (bNeedNewLevel)
+    {
         // Store which tris were already on this level.
         for (MeshTri* pTri = CurTriRoot.ListNext(); pTri != NULL; pTri = pTri->ListNext())
         {
-            if (pTri->mytri.iSlidingWindowLevel != iCurSlidingWindowLevel) {
+            if (pTri->mytri.iSlidingWindowLevel != iCurSlidingWindowLevel)
+            {
                 VERIFY(pTri->mytri.iSlidingWindowLevel == iCurSlidingWindowLevel + 1);
                 GeneralTriInfo* pTriInfoNew = pGCI->TriNextLevel.append();
                 pTriInfoNew->ppt[0] = pTri->pPt1;
@@ -183,7 +187,8 @@ void Object::CreateEdgeCollapse(MeshPt* pptBinned, MeshPt* pptKept)
         }
         VERIFY(iCurSlidingWindowLevel == pBinnedTris[i]->mytri.iSlidingWindowLevel);
 
-        if ((ppt[0] == pptKept) || (ppt[1] == pptKept) || (ppt[2] == pptKept)) {
+        if ((ppt[0] == pptKept) || (ppt[1] == pptKept) || (ppt[2] == pptKept))
+        {
             // This tri will be binned. Store it next time round.
         }
         else
@@ -201,7 +206,8 @@ void Object::CreateEdgeCollapse(MeshPt* pptBinned, MeshPt* pptKept)
     int iNumBinned = 0;
     for (i = iNumTrisCollapsed - 1; i >= 0; i--)
     {
-        if (pBinnedTris[i] != NULL) {
+        if (pBinnedTris[i] != NULL)
+        {
             iNumBinned++;
 
             MeshPt* ppt[3];
@@ -239,7 +245,8 @@ void Object::CreateEdgeCollapse(MeshPt* pptBinned, MeshPt* pptKept)
 
         // Now, are either of the other two the kept point?
         // If so, these are tris that get binned, rather than remapped.
-        if ((pTriInfo->ppt[1] == pptKept) || (pTriInfo->ppt[2] == pptKept)) {
+        if ((pTriInfo->ppt[1] == pptKept) || (pTriInfo->ppt[2] == pptKept))
+        {
             // Binned tri - these should be the last few.
             VERIFY(i >= iNumTrisCollapsed - iNumBinned);
         }
@@ -274,7 +281,8 @@ void Object::CreateEdgeCollapse(MeshPt* pptBinned, MeshPt* pptKept)
 long Object::BinEdgeCollapse(void)
 {
     GeneralCollapseInfo* pGCI = CollapseRoot.ListNext();
-    if (pGCI == NULL) {
+    if (pGCI == NULL)
+    {
         // No collapses to bin.
         VERIFY(iNumCollapses == 0);
         return FALSE;
@@ -282,11 +290,13 @@ long Object::BinEdgeCollapse(void)
     else
     {
         iNumCollapses--;
-        if (pNextCollapse == &CollapseRoot) {
+        if (pNextCollapse == &CollapseRoot)
+        {
             // Fully collapsed - uncollapse once.
             UndoCollapse();
         }
-        if (pNextCollapse == pGCI) {
+        if (pNextCollapse == pGCI)
+        {
             // This is the next collapse to be done.
             pNextCollapse = &CollapseRoot;
         }
@@ -300,7 +310,8 @@ long Object::BinEdgeCollapse(void)
 // Returns TRUE if a collapse was undone.
 long Object::UndoCollapse(void)
 {
-    if (pNextCollapse->ListNext() == NULL) {
+    if (pNextCollapse->ListNext() == NULL)
+    {
         // No more to undo.
         return FALSE;
     }
@@ -329,8 +340,10 @@ long Object::UndoCollapse(void)
         }
 
         // Now see if the _previous_ collapse is on a different level.
-        if (pNextCollapse->ListNext() != NULL) {
-            if (pNextCollapse->ListNext()->iSlidingWindowLevel != iCurSlidingWindowLevel) {
+        if (pNextCollapse->ListNext() != NULL)
+        {
+            if (pNextCollapse->ListNext()->iSlidingWindowLevel != iCurSlidingWindowLevel)
+            {
                 // Need to go back a level.
                 VERIFY(pNextCollapse->ListNext()->iSlidingWindowLevel == iCurSlidingWindowLevel - 1);
                 iCurSlidingWindowLevel--;
@@ -354,13 +367,15 @@ long Object::UndoCollapse(void)
 // Returns TRUE if a collapse was done.
 long Object::DoCollapse(void)
 {
-    if (pNextCollapse == &CollapseRoot) {
+    if (pNextCollapse == &CollapseRoot)
+    {
         // No more to do.
         return FALSE;
     }
     else
     {
-        if (pNextCollapse->iSlidingWindowLevel != iCurSlidingWindowLevel) {
+        if (pNextCollapse->iSlidingWindowLevel != iCurSlidingWindowLevel)
+        {
             // Need to start a new level.
             VERIFY(pNextCollapse->TriNextLevel.size() > 0);
             VERIFY(pNextCollapse->iSlidingWindowLevel == iCurSlidingWindowLevel + 1);
@@ -414,7 +429,8 @@ long Object::CollapseAllowedForLevel(MeshPt* pptBinned, int iLevel)
     long bRes = TRUE;
     for (MeshTri* pTri = pptBinned->FirstTri(); pTri != NULL; pTri = pptBinned->NextTri())
     {
-        if (iLevel != pTri->mytri.iSlidingWindowLevel) {
+        if (iLevel != pTri->mytri.iSlidingWindowLevel)
+        {
             bRes = FALSE;
         }
     }
@@ -430,7 +446,8 @@ void pack_to_vector(MxVector& tgt, const Fvector3& src_p, float src_u, float src
     tgt[0] = src_p.x;
     tgt[1] = src_p.y;
     tgt[2] = src_p.z;
-    if (QUAD_SIZE > 3) {
+    if (QUAD_SIZE > 3)
+    {
         tgt[3] = src_u;
         tgt[4] = src_v;
     }
@@ -453,13 +470,15 @@ float Object::FindCollapseError(MeshPt* pptBinned, MeshEdge* pedgeCollapse, long
 {
     static MeshPt* pptLast;
     static MxQuadric qLast(QUAD_SIZE);
-    if (pptBinned == NULL) {
+    if (pptBinned == NULL)
+    {
         pptLast = 0;
         return 0.0f;
     }
 
     MxQuadric qSum = MxQuadric(QUAD_SIZE);
-    if (bTryToCacheResult && (pptLast == pptBinned)) {
+    if (bTryToCacheResult && (pptLast == pptBinned))
+    {
         qSum = qLast;
     }
     else
@@ -470,7 +489,8 @@ float Object::FindCollapseError(MeshPt* pptBinned, MeshEdge* pedgeCollapse, long
             compute_face_quadric(ptri, qCur);
             qSum += qCur;
         }
-        if (bTryToCacheResult) {
+        if (bTryToCacheResult)
+        {
             qLast = qSum;
             pptLast = pptBinned;
         }

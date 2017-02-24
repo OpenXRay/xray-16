@@ -29,13 +29,11 @@ void ARTICLE_DATA::save(IWriter& stream)
     save_data(article_type, stream);
 }
 
-CEncyclopediaArticle::CEncyclopediaArticle()
-{
-}
-
+CEncyclopediaArticle::CEncyclopediaArticle() {}
 CEncyclopediaArticle::~CEncyclopediaArticle()
 {
-    if (data()->image.GetParent()) data()->image.GetParent()->DetachChild(&(data()->image));
+    if (data()->image.GetParent())
+        data()->image.GetParent()->DetachChild(&(data()->image));
 }
 
 /*
@@ -70,7 +68,8 @@ void CEncyclopediaArticle::load_shared(LPCSTR)
     //секция ltx, откуда читать данные
     LPCSTR ltx = pXML->Read(pNode, "ltx", 0, NULL);
 
-    if (ltx) {
+    if (ltx)
+    {
         data()->image.SetShader(InventoryUtilities::GetEquipmentIconsShader());
         Frect tex_rect;
         tex_rect.x1 = float(pSettings->r_u32(ltx, "inv_grid_x") * INV_GRID_WIDTH);
@@ -82,27 +81,31 @@ void CEncyclopediaArticle::load_shared(LPCSTR)
     }
     else
     {
-        if (pXML->NavigateToNode(pNode, "texture", 0)) {
+        if (pXML->NavigateToNode(pNode, "texture", 0))
+        {
             pXML->SetLocalRoot(pNode);
             CUIXmlInit::InitTexture(*pXML, "", 0, &data()->image);
             pXML->SetLocalRoot(pXML->GetRoot());
         }
     }
 
-    if (data()->image.GetShader() && data()->image.GetShader()->inited()) {
+    if (data()->image.GetShader() && data()->image.GetShader()->inited())
+    {
         Frect r = data()->image.GetUIStaticItem().GetTextureRect();
         data()->image.SetAutoDelete(false);
 
         const int minSize = 65;
 
         // Сначала устанавливаем если надо минимально допустимые размеры иконки
-        if (r.width() < minSize) {
+        if (r.width() < minSize)
+        {
             float dx = minSize - r.width();
             r.x2 += dx;
             data()->image.SetTextureOffset(dx / 2, data()->image.GetTextureOffeset()[1]);
         }
 
-        if (r.height() < minSize) {
+        if (r.height() < minSize)
+        {
             float dy = minSize - r.height();
             r.y2 += dy;
             data()->image.SetTextureOffset(data()->image.GetTextureOffeset()[0], dy / 2);
@@ -113,7 +116,8 @@ void CEncyclopediaArticle::load_shared(LPCSTR)
 
     // Тип статьи
     xr_string atricle_type = pXML->ReadAttrib(pNode, "article_type", "encyclopedia");
-    if (0 == stricmp(atricle_type.c_str(), "encyclopedia")) {
+    if (0 == stricmp(atricle_type.c_str(), "encyclopedia"))
+    {
         data()->articleType = ARTICLE_DATA::eEncyclopediaArticle;
     }
     else if (0 == stricmp(atricle_type.c_str(), "journal"))
@@ -138,6 +142,8 @@ void CEncyclopediaArticle::load_shared(LPCSTR)
 
 void CEncyclopediaArticle::InitXmlIdToIndex()
 {
-    if (!id_to_index::tag_name) id_to_index::tag_name = "article";
-    if (!id_to_index::file_str) id_to_index::file_str = pSettings->r_string("encyclopedia", "files");
+    if (!id_to_index::tag_name)
+        id_to_index::tag_name = "article";
+    if (!id_to_index::file_str)
+        id_to_index::file_str = pSettings->r_string("encyclopedia", "files");
 }

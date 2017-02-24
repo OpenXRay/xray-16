@@ -15,13 +15,13 @@ public:
     enum RENDER_TARGET
     {
         RENDER_TARGET_VELOCITY1 = 0,
-        RENDER_TARGET_COLOR,  //	Swap with object's
+        RENDER_TARGET_COLOR, //	Swap with object's
         RENDER_TARGET_OBSTACLES,
         RENDER_TARGET_OBSTVELOCITY,
         RENDER_TARGET_TEMPSCALAR,
         RENDER_TARGET_TEMPVECTOR,
-        NUM_OWN_RENDER_TARGETS,                            //	Owns render targets only upt to this id.
-        RENDER_TARGET_VELOCITY0 = NUM_OWN_RENDER_TARGETS,  //	For textures generated from local data
+        NUM_OWN_RENDER_TARGETS, //	Owns render targets only upt to this id.
+        RENDER_TARGET_VELOCITY0 = NUM_OWN_RENDER_TARGETS, //	For textures generated from local data
         RENDER_TARGET_PRESSURE,
         RENDER_TARGET_COLOR_IN,
         NUM_RENDER_TARGETS
@@ -36,7 +36,8 @@ public:
     void Destroy();
     void SetScreenSize(int width, int height)
     {
-        if (m_bInited) m_pRenderer->SetScreenSize(width, height);
+        if (m_bInited)
+            m_pRenderer->SetScreenSize(width, height);
     }
 
     //		Interface for fluid volume
@@ -47,19 +48,16 @@ public:
     int GetTextureWidth() const { return m_iTextureWidth; }
     int GetTextureHeight() const { return m_iTextureHeight; }
     int GetTextureDepth() const { return m_iTextureDepth; }
-
     //	float	GetDecay() { return m_fDecay; }
     float GetImpulseSize() const { return m_fImpulseSize; }
-
     static LPCSTR* GetEngineTextureNames() { return m_pEngineTextureNames; }
     static LPCSTR* GetShaderTextureNames() { return m_pShaderTextureNames; }
-
 //	Allow real-time config reload
 #ifdef DEBUG
     void RegisterFluidData(dx103DFluidData* pData, const xr_string& SectionName);
     void DeregisterFluidData(dx103DFluidData* pData);
     void UpdateProfiles();
-#endif  //	DEBUG
+#endif //	DEBUG
 
 private:
     enum SimulationShader
@@ -142,13 +140,13 @@ private:
 #ifdef DEBUG
     xr_vector<xr_string> m_lstSectionNames;
     xr_vector<dx103DFluidData*> m_lstFluidData;
-#endif  //	DEBUG
+#endif //	DEBUG
 
 //	Allow real-time config reload
 #ifdef DEBUG
-#endif  //	DEBUG
+#endif //	DEBUG
 };
 
 extern dx103DFluidManager FluidManager;
 
-#endif  //	dx103DFluidManager_included
+#endif //	dx103DFluidManager_included

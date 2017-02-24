@@ -76,12 +76,14 @@ bool Wml::GaussPointsFit(int iQuantity, const Vector3<Real>* akPoint, const bool
     int i, iValidQuantity = 0;
     for (i = 0; i < iQuantity; i++)
     {
-        if (abValid[i]) {
+        if (abValid[i])
+        {
             rkCenter += akPoint[i];
             iValidQuantity++;
         }
     }
-    if (iValidQuantity == 0) return false;
+    if (iValidQuantity == 0)
+        return false;
 
     Real fInvQuantity = ((Real)1.0) / iValidQuantity;
     rkCenter *= fInvQuantity;
@@ -91,7 +93,8 @@ bool Wml::GaussPointsFit(int iQuantity, const Vector3<Real>* akPoint, const bool
     Real fSumYY = (Real)0.0, fSumYZ = (Real)0.0, fSumZZ = (Real)0.0;
     for (i = 0; i < iQuantity; i++)
     {
-        if (abValid[i]) {
+        if (abValid[i])
+        {
             Vector3<Real> kDiff = akPoint[i] - rkCenter;
             fSumXX += kDiff.X() * kDiff.X();
             fSumXY += kDiff.X() * kDiff.Y();

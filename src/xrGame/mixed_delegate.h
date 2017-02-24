@@ -24,13 +24,11 @@ public:
 
     mixed_delegate() {}
     ~mixed_delegate() {}
-
     template <class ThisRef, class ClassType>
     mixed_delegate(ThisRef* ptr_this, R (xr_stdcall ClassType::*func_ptr)(Param1, Param2))
         : m_cpp_delegate(ptr_this, func_ptr){};
 
     mixed_delegate(lua_object_type ptr_this, lua_function_type func_ptr) { m_lua_delegate.set(func_ptr, ptr_this); }
-
     mixed_delegate(mixed_delegate const& copy)
         : m_cpp_delegate(copy.m_cpp_delegate), m_lua_delegate(copy.m_lua_delegate)
 
@@ -43,40 +41,44 @@ public:
     }
 
     void bind(lua_object_type ptr_this, lua_function_type func_ptr) { m_lua_delegate.set(func_ptr, ptr_this); }
-
     void clear()
     {
-        if (m_cpp_delegate) {
+        if (m_cpp_delegate)
+        {
             m_cpp_delegate.clear();
         }
-        if (m_lua_delegate) {
+        if (m_lua_delegate)
+        {
             m_lua_delegate.clear();
         }
     }
 
     R operator()(Param1 arg1, Param2 arg2)
     {
-        if (m_cpp_delegate) {
+        if (m_cpp_delegate)
+        {
             return m_cpp_delegate.operator()(arg1, arg2);
         }
-        if (m_lua_delegate) {
+        if (m_lua_delegate)
+        {
             return m_lua_delegate.operator()(arg1, arg2);
         }
         FATAL("mixed delegate is not bound");
         return R();
     }
     bool operator!() const { return !operator bool(); }
-
     operator bool() const
     {
-        if (m_cpp_delegate) return true;
-        if (m_lua_delegate) return true;
+        if (m_cpp_delegate)
+            return true;
+        if (m_lua_delegate)
+            return true;
         return false;
     }
 
 private:
     fastdelegate_type m_cpp_delegate;
     lua_delegate_type m_lua_delegate;
-};  // class mixed_delegate
+}; // class mixed_delegate
 
-#endif  //#ifndef MIXED_DELEGATE_INCLUDED
+#endif //#ifndef MIXED_DELEGATE_INCLUDED

@@ -62,7 +62,6 @@ public:
     IC bool actual() const;
     virtual CSpaceRestrictor* cast_restrictor() { return this; }
     virtual bool register_schedule() const { return false; }
-
     IC RestrictionSpace::ERestrictorTypes restrictor_type() const;
 
 public:

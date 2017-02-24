@@ -15,16 +15,8 @@ using System::ComponentModel::TypeConverter;
 typedef TypeConverter::StandardValuesCollection StandardValuesCollection;
 using System::Object;
 
-bool property_converter_boolean_values::GetStandardValuesSupported(ITypeDescriptorContext ^ context)
-{
-    return (true);
-}
-
-bool property_converter_boolean_values::GetStandardValuesExclusive(ITypeDescriptorContext ^ context)
-{
-    return (true);
-}
-
+bool property_converter_boolean_values::GetStandardValuesSupported(ITypeDescriptorContext ^ context) { return (true); }
+bool property_converter_boolean_values::GetStandardValuesExclusive(ITypeDescriptorContext ^ context) { return (true); }
 StandardValuesCollection ^ property_converter_boolean_values::GetStandardValues(ITypeDescriptorContext ^ context)
 {
     property_container ^ container = safe_cast<property_container ^>(context->Instance);
@@ -37,16 +29,20 @@ StandardValuesCollection ^ property_converter_boolean_values::GetStandardValues(
 Object ^ property_converter_boolean_values::ConvertTo(
              ITypeDescriptorContext ^ context, CultureInfo ^ culture, Object ^ value, Type ^ destination_type)
 {
-    if (!context) return (inherited::ConvertTo(context, culture, value, destination_type));
+    if (!context)
+        return (inherited::ConvertTo(context, culture, value, destination_type));
 
-    if (!context->Instance) return (inherited::ConvertTo(context, culture, value, destination_type));
+    if (!context->Instance)
+        return (inherited::ConvertTo(context, culture, value, destination_type));
 
-    if (!context->PropertyDescriptor) return (inherited::ConvertTo(context, culture, value, destination_type));
+    if (!context->PropertyDescriptor)
+        return (inherited::ConvertTo(context, culture, value, destination_type));
 
     if (destination_type != System::String::typeid)
         return (inherited::ConvertTo(context, culture, value, destination_type));
 
-    if (dynamic_cast<System::String ^>(value)) return (value);
+    if (dynamic_cast<System::String ^>(value))
+        return (value);
 
     property_container ^ container = safe_cast<property_container ^>(context->Instance);
     PropertySpecDescriptor ^ descriptor = safe_cast<PropertySpecDescriptor ^>(context->PropertyDescriptor);

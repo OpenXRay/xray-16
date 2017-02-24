@@ -47,17 +47,6 @@ IC CSpaceRestrictionShape::CSpaceRestrictionShape(CSpaceRestrictor* space_restri
     build_border();
 }
 
-IC void CSpaceRestrictionShape::initialize()
-{
-    VERIFY(m_initialized);
-}
-
-IC bool CSpaceRestrictionShape::shape() const
-{
-    return (true);
-}
-
-IC bool CSpaceRestrictionShape::default_restrictor() const
-{
-    return (m_default);
-}
+IC void CSpaceRestrictionShape::initialize() { VERIFY(m_initialized); }
+IC bool CSpaceRestrictionShape::shape() const { return (true); }
+IC bool CSpaceRestrictionShape::default_restrictor() const { return (m_default); }

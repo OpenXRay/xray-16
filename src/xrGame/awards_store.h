@@ -47,8 +47,8 @@ private:
 
     static void __cdecl get_my_awards_cb(
         SAKE sake, SAKERequest request, SAKERequestResult result, void* inputData, void* outputData, void* userData);
-};  // class award_system
+}; // class award_system
 
-}  // namespace gamespy_profile
+} // namespace gamespy_profile
 
-#endif  //#ifndef AWARD_SYSTEM_INCLUDED
+#endif //#ifndef AWARD_SYSTEM_INCLUDED

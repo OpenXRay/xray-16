@@ -18,8 +18,8 @@
 //---------------------------------------------------------------------------
 class TfraSector : public TForm
 {
-    __published :  // IDE-managed Components
-                   TPanel* paSectorActions;
+    __published : // IDE-managed Components
+                  TPanel* paSectorActions;
     TExtBtn* ebAddMesh;
     TExtBtn* ebDelMesh;
     TExtBtn* ebBoxPick;
@@ -48,8 +48,8 @@ class TfraSector : public TForm
     void __fastcall ebBoxPickClick(TObject* Sender);
     void __fastcall ebDistributeObjectsClick(TObject* Sender);
 
-  private:  // User declarations
-  public:   // User declarations
+private: // User declarations
+public: // User declarations
     __fastcall TfraSector(TComponent* Owner);
 };
 

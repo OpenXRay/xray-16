@@ -81,11 +81,7 @@ void game_sv_CaptureTheArtefact::MyTeam::OnPlayerActivateArtefact(u16 eid_who)
     artefactActivated = true;
     last_activator_id = eid_who;
 }
-bool game_sv_CaptureTheArtefact::MyTeam::IsArtefactActivated()
-{
-    return artefactActivated;
-}
-
+bool game_sv_CaptureTheArtefact::MyTeam::IsArtefactActivated() { return artefactActivated; }
 void game_sv_CaptureTheArtefact::MyTeam::DeactivateArtefact()
 {
     artefactActivated = false;
@@ -93,15 +89,12 @@ void game_sv_CaptureTheArtefact::MyTeam::DeactivateArtefact()
     last_activator_id = 0;
 }
 
-CSE_ActorMP* game_sv_CaptureTheArtefact::MyTeam::GetArtefactOwner() const
-{
-    return artefactOwner;
-}
-
+CSE_ActorMP* game_sv_CaptureTheArtefact::MyTeam::GetArtefactOwner() const { return artefactOwner; }
 // functors ---------------
 bool game_sv_CaptureTheArtefact::MinPlayersFunctor::operator()(const TeamPair& left, const TeamPair& right) const
 {
-    if (left.second.playersCount < right.second.playersCount) {
+    if (left.second.playersCount < right.second.playersCount)
+    {
         return true;
     }
     return false;
@@ -109,8 +102,10 @@ bool game_sv_CaptureTheArtefact::MinPlayersFunctor::operator()(const TeamPair& l
 
 bool game_sv_CaptureTheArtefact::SearchArtefactIdFunctor::operator()(const TeamPair& tr, u16 artefactId) const
 {
-    if (tr.second.artefact) {
-        if (tr.second.artefact->ID == artefactId) {
+    if (tr.second.artefact)
+    {
+        if (tr.second.artefact->ID == artefactId)
+        {
             return true;
         }
     }
@@ -119,8 +114,10 @@ bool game_sv_CaptureTheArtefact::SearchArtefactIdFunctor::operator()(const TeamP
 
 bool game_sv_CaptureTheArtefact::SearchOwnerIdFunctor::operator()(const TeamPair& tr, u16 actorId) const
 {
-    if (tr.second.artefactOwner) {
-        if (tr.second.artefactOwner->ID == actorId) {
+    if (tr.second.artefactOwner)
+    {
+        if (tr.second.artefactOwner->ID == actorId)
+        {
             return true;
         }
     }

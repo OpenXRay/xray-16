@@ -30,19 +30,22 @@ struct ECORE_API STextureList : public xr_resource_flagged, public xr_vector<std
 
     IC BOOL equal(const STextureList& base) const
     {
-        if (size() != base.size()) return FALSE;
+        if (size() != base.size())
+            return FALSE;
         for (u32 cmp = 0; cmp < size(); cmp++)
         {
-            if ((*this)[cmp].first != base[cmp].first) return FALSE;
-            if ((*this)[cmp].second != base[cmp].second) return FALSE;
+            if ((*this)[cmp].first != base[cmp].first)
+                return FALSE;
+            if ((*this)[cmp].second != base[cmp].second)
+                return FALSE;
         }
         return TRUE;
     }
     virtual void clear();
     virtual void clear_not_free();
 
-    //	Avoid using this function.
-    //	If possible use precompiled texture list.
+    // Avoid using this function.
+    // If possible use precompiled texture list.
     u32 find_texture_stage(const shared_str& TexName) const;
 };
 typedef resptr_core<STextureList, resptr_base<STextureList>> ref_texture_list;
@@ -82,19 +85,19 @@ typedef resptr_core<SGeometry, resptrcode_geom> ref_geom;
 //////////////////////////////////////////////////////////////////////////
 struct ECORE_API SPass : public xr_resource_flagged
 {
-    ref_state state;  // Generic state, like Z-Buffering, samplers, etc
-    ref_ps ps;        // may be NULL = FFP, in that case "state" must contain TSS setup
-    ref_vs vs;  // may be NULL = FFP, in that case "state" must contain RS setup, *and* FVF-compatible declaration must
-                // be used
+    ref_state state; // Generic state, like Z-Buffering, samplers, etc
+    ref_ps ps; // may be NULL = FFP, in that case "state" must contain TSS setup
+    // may be NULL = FFP, in that case "state" must contain RS setup, *and* FVF-compatible declaration must be used
+    ref_vs vs; 
 #if defined(USE_DX10) || defined(USE_DX11)
-    ref_gs gs;  // may be NULL = don't use geometry shader at all
+    ref_gs gs; // may be NULL = don't use geometry shader at all
 #ifdef USE_DX11
-    ref_hs hs;  // may be NULL = don't use hull shader at all
-    ref_ds ds;  // may be NULL = don't use domain shader at all
-    ref_cs cs;  // may be NULL = don't use compute shader at all
+    ref_hs hs; // may be NULL = don't use hull shader at all
+    ref_ds ds; // may be NULL = don't use domain shader at all
+    ref_cs cs; // may be NULL = don't use compute shader at all
 #endif
-#endif                     //	USE_DX10
-    ref_ctable constants;  // may be NULL
+#endif // USE_DX10
+    ref_ctable constants; // may be NULL
 
     ref_texture_list T;
     ref_constant_list C;
@@ -136,8 +139,8 @@ typedef resptr_core<ShaderElement, resptr_base<ShaderElement>> ref_selement;
 struct ECORE_API Shader : public xr_resource_flagged
 {
 public:
-    ref_selement E[6];  // R1 - 0=norm_lod0(det),	1=norm_lod1(normal),	2=L_point,		3=L_spot,	4=L_for_models,
-    // R2 - 0=deffer,			1=norm_lod1(normal),	2=psm,			3=ssm,		4=dsm
+    ref_selement E[6]; // R1 - 0=norm_lod0(det), 1=norm_lod1(normal), 2=L_point, 3=L_spot, 4=L_for_models,
+    // R2 - 0=deffer, 1=norm_lod1(normal), 2=psm, 3=ssm, 4=dsm
     ~Shader();
     BOOL equal(Shader& S);
     BOOL equal(Shader* S);
@@ -152,21 +155,21 @@ typedef resptr_core<Shader, resptrcode_shader> ref_shader;
 
 enum SE_R1
 {
-    SE_R1_NORMAL_HQ = 0,  // high quality/detail
-    SE_R1_NORMAL_LQ = 1,  // normal or low quality
-    SE_R1_LPOINT = 2,     // add: point light
-    SE_R1_LSPOT = 3,      // add:	spot light
-    SE_R1_LMODELS = 4,    // lighting info for models or shadowing from models
+    SE_R1_NORMAL_HQ = 0, // high quality/detail
+    SE_R1_NORMAL_LQ = 1, // normal or low quality
+    SE_R1_LPOINT = 2, // add: point light
+    SE_R1_LSPOT = 3, // add: spot light
+    SE_R1_LMODELS = 4, // lighting info for models or shadowing from models
 };
 
-//#define		SE_R2_NORMAL_HQ		0	// high quality/detail
-//#define		SE_R2_NORMAL_LQ		1	// low quality
-//#define		SE_R2_SHADOW		2	// shadow generation
-//	E[3] - can use for night vision but need to extend SE_R1. Will need
-//	Extra shader element.
-//	E[4] - distortion or self illumination(self emission).
-//	E[4] Can use for lightmap capturing.
+//#define SE_R2_NORMAL_HQ 0 // high quality/detail
+//#define SE_R2_NORMAL_LQ 1 // low quality
+//#define SE_R2_SHADOW 2 // shadow generation
+//  E[3] - can use for night vision but need to extend SE_R1. Will need
+//  Extra shader element.
+//  E[4] - distortion or self illumination(self emission).
+//  E[4] Can use for lightmap capturing.
 
 #pragma pack(pop)
 
-#endif  // !defined(AFX_SHADER_H__9CBD70DD_E147_446B_B4EE_5DA321EB726F__INCLUDED_)
+#endif // !defined(AFX_SHADER_H__9CBD70DD_E147_446B_B4EE_5DA321EB726F__INCLUDED_)

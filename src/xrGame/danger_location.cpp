@@ -9,7 +9,4 @@
 #include "stdafx.h"
 #include "danger_location.h"
 
-bool CDangerLocation::useful() const
-{
-    return (!(Device.dwTimeGlobal > m_level_time + m_interval));
-}
+bool CDangerLocation::useful() const { return (!(Device.dwTimeGlobal > m_level_time + m_interval)); }

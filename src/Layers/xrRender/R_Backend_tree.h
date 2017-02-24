@@ -26,7 +26,6 @@ public:
     void set_c_c_scale(R_constant* C) { c_c_scale = C; }
     void set_c_c_bias(R_constant* C) { c_c_bias = C; }
     void set_c_c_sun(R_constant* C) { c_c_sun = C; }
-
     void set_m_xform_v(Fmatrix& mat);
     void set_m_xform(Fmatrix& mat);
     void set_consts(float x, float y, float z, float w);

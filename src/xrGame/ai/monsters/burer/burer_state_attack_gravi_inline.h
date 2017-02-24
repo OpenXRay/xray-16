@@ -34,7 +34,8 @@ void CStateBurerAttackGravi<Object>::execute()
         break;
 
     case ACTION_WAIT_ANIM_END:
-        if (current_time() > m_anim_end_tick) {
+        if (current_time() > m_anim_end_tick)
+        {
             m_action = ACTION_COMPLETED;
         }
 
@@ -43,7 +44,8 @@ void CStateBurerAttackGravi<Object>::execute()
 
     object->face_enemy();
 
-    if (current_time() < m_anim_end_tick) {
+    if (current_time() < m_anim_end_tick)
+    {
         object->anim().set_override_animation(eAnimGraviFire);
     }
 
@@ -70,13 +72,19 @@ template <typename Object>
 bool CStateBurerAttackGravi<Object>::check_start_conditions()
 {
     // обработать объекты
-    if (object->get_force_gravi_attack()) return true;
+    if (object->get_force_gravi_attack())
+        return true;
     float dist = object->Position().distance_to(object->EnemyMan.get_enemy()->Position());
-    if (current_time() < m_next_gravi_allowed_tick) return false;
-    if (dist < object->m_gravi.min_dist) return false;
-    if (dist > object->m_gravi.max_dist) return false;
-    if (!object->EnemyMan.see_enemy_now()) return false;
-    if (!object->control().direction().is_face_target(object->EnemyMan.get_enemy(), deg(45))) return false;
+    if (current_time() < m_next_gravi_allowed_tick)
+        return false;
+    if (dist < object->m_gravi.min_dist)
+        return false;
+    if (dist > object->m_gravi.max_dist)
+        return false;
+    if (!object->EnemyMan.see_enemy_now())
+        return false;
+    if (!object->control().direction().is_face_target(object->EnemyMan.get_enemy(), deg(45)))
+        return false;
 
     return true;
 }
@@ -109,7 +117,8 @@ void CStateBurerAttackGravi<Object>::ExecuteGraviContinue()
     clamp(time_to_hold, 0.f, 1.f);
     time_to_hold *= float(object->m_gravi.time_to_hold);
 
-    if (m_time_gravi_started + u32(time_to_hold) < Device.dwTimeGlobal) {
+    if (m_time_gravi_started + u32(time_to_hold) < Device.dwTimeGlobal)
+    {
         m_action = ACTION_GRAVI_FIRE;
     }
 }

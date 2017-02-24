@@ -7,9 +7,9 @@ class CUIFrameLine : public CUICustomItem
     friend class CUIFrameLineWnd;
     enum
     {
-        flFirst = 0,  // Left or top
-        flSecond,     // Right or bottom
-        flBack,       // Center texture
+        flFirst = 0, // Left or top
+        flSecond, // Right or bottom
+        flBack, // Center texture
         flMax
     };
 
@@ -37,7 +37,6 @@ public:
     CUIFrameLine();
 
     void set_parent_wnd_size(Fvector2 const& size) { m_parent_wnd_size = size; }
-
     void InitFrameLine(Fvector2 pos, float size, bool horizontal, DWORD align);
     void InitTexture(LPCSTR texture, LPCSTR sh_name);
     void SetColor(u32 cl);

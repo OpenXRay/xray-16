@@ -66,7 +66,8 @@ protected:
     void Reinit();
     IC void CheckState(SDisableUpdateState& state, float vel, float accel)
     {
-        if (vel < m_params.velocity && accel < m_params.acceleration) state.disable = true;
+        if (vel < m_params.velocity && accel < m_params.acceleration)
+            state.disable = true;
         if (vel > m_params.velocity * worldDisablingParams.reanable_factor ||
             accel > m_params.acceleration * worldDisablingParams.reanable_factor)
             state.enable = true;

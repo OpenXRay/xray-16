@@ -25,11 +25,7 @@ CSnork::CSnork()
     com_man().add_ability(ControlCom::eControlThreaten);
 }
 
-CSnork::~CSnork()
-{
-    xr_delete(StateMan);
-}
-
+CSnork::~CSnork() { xr_delete(StateMan); }
 void CSnork::Load(LPCSTR section)
 {
     inherited::Load(section);
@@ -110,7 +106,8 @@ void CSnork::reinit()
 {
     inherited::reinit();
 
-    if (CCustomMonster::use_simplified_visual()) return;
+    if (CCustomMonster::use_simplified_visual())
+        return;
     move().load_velocity(*cNameSect(), "Velocity_JumpGround", MonsterMovement::eSnorkVelocityParameterJumpGround);
     com_man().load_jump_data("stand_attack_2_0", 0, "stand_attack_2_1", "stand_somersault_0", u32(-1),
         MonsterMovement::eSnorkVelocityParameterJumpGround, 0);
@@ -136,11 +133,13 @@ void CSnork::UpdateCL()
 #ifdef _DEBUG
     // test
     IGameObject* obj = Level().CurrentEntity();
-    if (!obj) return;
+    if (!obj)
+        return;
     const CCoverPoint* point = CoverMan->find_cover(obj->Position(), 10.f, 30.f);
 
     DBG().level_info(this).clear();
-    if (point) {
+    if (point)
+    {
         DBG().level_info(this).add_item(point->position(), COLOR_RED);
 
         Fvector pos;
@@ -165,8 +164,10 @@ float CSnork::trace(const Fvector& dir)
 
     float trace_dist = Radius() + TRACE_RANGE;
 
-    if (Level().ObjectSpace.RayPick(trace_from, dir, trace_dist, collide::rqtStatic, l_rq, this)) {
-        if ((l_rq.range < trace_dist)) ret_val = l_rq.range;
+    if (Level().ObjectSpace.RayPick(trace_from, dir, trace_dist, collide::rqtStatic, l_rq, this))
+    {
+        if ((l_rq.range < trace_dist))
+            ret_val = l_rq.range;
     }
 
     return ret_val;
@@ -179,8 +180,10 @@ bool CSnork::find_geometry(Fvector& dir)
     dir = Direction();
     float range;
 
-    if (trace_geometry(dir, range)) {
-        if (range < JUMP_DISTANCE) {
+    if (trace_geometry(dir, range))
+    {
+        if (range < JUMP_DISTANCE)
+        {
             return true;
         }
     }
@@ -198,7 +201,8 @@ bool CSnork::trace_geometry(const Fvector& d, float& range)
     Center(center);
 
     range = trace(d);
-    if (range > TRACE_RANGE) return false;
+    if (range > TRACE_RANGE)
+        return false;
 
     float angle = asin(1.f / range);
 
@@ -211,7 +215,8 @@ bool CSnork::trace_geometry(const Fvector& d, float& range)
     dir.normalize_safe();
 
     range = trace(dir);
-    if (range > TRACE_RANGE) return false;
+    if (range > TRACE_RANGE)
+        return false;
 
     Pc.mad(center, dir, range);
 
@@ -222,7 +227,8 @@ bool CSnork::trace_geometry(const Fvector& d, float& range)
     dir.normalize_safe();
 
     range = trace(dir);
-    if (range > TRACE_RANGE) return false;
+    if (range > TRACE_RANGE)
+        return false;
 
     Pl.mad(center, dir, range);
 
@@ -234,7 +240,8 @@ bool CSnork::trace_geometry(const Fvector& d, float& range)
     dir.normalize_safe();
 
     range = trace(dir);
-    if (range > TRACE_RANGE) return false;
+    if (range > TRACE_RANGE)
+        return false;
 
     Pr.mad(center, dir, range);
 
@@ -248,11 +255,13 @@ bool CSnork::trace_geometry(const Fvector& d, float& range)
 
 void CSnork::CheckSpecParams(u32 spec_params)
 {
-    if ((spec_params & ASP_CHECK_CORPSE) == ASP_CHECK_CORPSE) {
+    if ((spec_params & ASP_CHECK_CORPSE) == ASP_CHECK_CORPSE)
+    {
         com_man().seq_run(anim().get_motion_id(eAnimCheckCorpse));
     }
 
-    if ((spec_params & ASP_STAND_SCARED) == ASP_STAND_SCARED) {
+    if ((spec_params & ASP_STAND_SCARED) == ASP_STAND_SCARED)
+    {
         anim().SetCurAnim(eAnimLookAround);
         return;
     }
@@ -273,9 +282,11 @@ void CSnork::jump(const Fvector& position, float factor)
 
 bool CSnork::check_start_conditions(ControlCom::EControlType type)
 {
-    if (!inherited::check_start_conditions(type)) return false;
+    if (!inherited::check_start_conditions(type))
+        return false;
 
-    if (type == ControlCom::eControlThreaten) {
+    if (type == ControlCom::eControlThreaten)
+    {
         return false;
         // 		if (!start_threaten) return false;
         // 		start_threaten = false;
@@ -287,7 +298,8 @@ bool CSnork::check_start_conditions(ControlCom::EControlType type)
 
 void CSnork::on_activate_control(ControlCom::EControlType type)
 {
-    if (type == ControlCom::eControlThreaten) {
+    if (type == ControlCom::eControlThreaten)
+    {
         sound().play(MonsterSound::eMonsterSoundThreaten);
         // m_sound_start_threaten.play_at_pos(this, get_head_position(this));
     }
@@ -298,7 +310,8 @@ void CSnork::on_activate_control(ControlCom::EControlType type)
 void CSnork::debug_on_key(int key)
 {
     CActor* actor = smart_cast<CActor*>(Level().CurrentEntity());
-    if (!actor) return;
+    if (!actor)
+        return;
 
     switch (key)
     {

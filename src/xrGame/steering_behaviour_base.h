@@ -31,8 +31,8 @@ private:
     bool m_enabled;
 };
 
-}  // namespace steering_behaviour
+} // namespace steering_behaviour
 
 #include "steering_behaviour_base_inline.h"
 
-#endif  // STEERING_BEHAVIOUR_BASE_H_INCLUDED
+#endif // STEERING_BEHAVIOUR_BASE_H_INCLUDED

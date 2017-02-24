@@ -52,6 +52,5 @@ private:
 public:
     bool IsBlending() const;
     inline Fmatrix const& start_transform() const { return (m_startObjXForm); }
-
     void stop();
 };

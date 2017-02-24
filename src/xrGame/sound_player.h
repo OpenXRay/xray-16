@@ -31,13 +31,17 @@ public:
 
         IC bool operator==(const CSoundCollectionParams& object) const
         {
-            if (m_sound_prefix != object.m_sound_prefix) return (false);
+            if (m_sound_prefix != object.m_sound_prefix)
+                return (false);
 
-            if (m_sound_player_prefix != object.m_sound_player_prefix) return (false);
+            if (m_sound_player_prefix != object.m_sound_player_prefix)
+                return (false);
 
-            if (m_max_count != object.m_max_count) return (false);
+            if (m_max_count != object.m_max_count)
+                return (false);
 
-            if (m_type != object.m_type) return (false);
+            if (m_type != object.m_type)
+                return (false);
 
             return (true);
         }
@@ -68,11 +72,11 @@ public:
         u16 m_bone_id;
 
         CSoundSingle() { m_started = false; }
-
         void destroy()
         {
             VERIFY(m_sound);
-            if (m_sound->_feedback()) m_sound->stop();
+            if (m_sound->_feedback())
+                m_sound->stop();
 
             xr_delete(m_sound);
         }
@@ -91,13 +95,13 @@ public:
         u32 m_sound_mask;
 
         CInappropriateSoundPredicate(u32 sound_mask) : m_sound_mask(sound_mask) {}
-
         bool operator()(CSoundSingle& sound)
         {
             VERIFY(sound.m_sound);
             bool result = (sound.m_synchro_mask & m_sound_mask) ||
-                          (!sound.m_sound->_feedback() && (sound.m_stop_time <= Device.dwTimeGlobal));
-            if (result) sound.destroy();
+                (!sound.m_sound->_feedback() && (sound.m_stop_time <= Device.dwTimeGlobal));
+            if (result)
+                sound.destroy();
             return (result);
         }
     };

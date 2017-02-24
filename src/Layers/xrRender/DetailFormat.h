@@ -74,11 +74,8 @@ public:
     }
 
     IC u32 version() const { return _version; }
-
     IC float fromSlotX(int x) const { return (x - offs_x) * DETAIL_SLOT_SIZE + DETAIL_SLOT_SIZE_2; }
-
     IC float fromSlotZ(int z) const { return (z - offs_z) * DETAIL_SLOT_SIZE + DETAIL_SLOT_SIZE_2; }
-
     IC void GetSlotRect(Frect& rect, int sx, int sz) const
     {
         float x = fromSlotX(sx);
@@ -90,15 +87,10 @@ public:
     }
 
     IC u32 object_count() const { return obj_count; }
-
     IC u32 x_size() const { return size_x; }
-
     IC u32 z_size() const { return size_z; }
-
     IC u32 x_offs() const { return offs_x; }
-
     IC u32 z_offs() const { return offs_z; }
-
     IC u32 slot_index(int _x, int _z) const
     {
         u32 ret = _z * size_x + _x;
@@ -119,9 +111,7 @@ public:
     }
 
     IC u32 slot_count() const { return size_x * size_z; }
-
     IC float slot_min_x(int _x) const { return (int(_x) - int(offs_x)) * DETAIL_SLOT_SIZE; }
-
     IC float slot_min_z(int _z) const { return (int(_z) - int(offs_z)) * DETAIL_SLOT_SIZE; }
 };
 
@@ -132,19 +122,19 @@ struct DetailPalette
     u16 a2 : 4;
     u16 a3 : 4;
 };
-struct DetailSlot  // was(4+4+3*4+2 = 22b), now(8+2*4=16b)
+struct DetailSlot // was(4+4+3*4+2 = 22b), now(8+2*4=16b)
 {
-    u32 y_base : 12;   // 11 // 1 unit = 20 cm, low = -200m, high = 4096*20cm - 200 = 619.2m
-    u32 y_height : 8;  // 20 // 1 unit = 10 cm, low = 0, high = 256*10 ~= 25.6m
-    u32 id0 : 6;       // 26 // 0x3F(63) = empty
-    u32 id1 : 6;       // 32 // 0x3F(63) = empty
-    u32 id2 : 6;       // 38 // 0x3F(63) = empty
-    u32 id3 : 6;       // 42 // 0x3F(63) = empty
-    u32 c_dir : 4;     // 48 // 0..1 q
-    u32 c_hemi : 4;    // 52 // 0..1 q
-    u32 c_r : 4;       // 56 // rgb = 4.4.4
-    u32 c_g : 4;       // 60 // rgb = 4.4.4
-    u32 c_b : 4;       // 64 // rgb = 4.4.4
+    u32 y_base : 12; // 11 // 1 unit = 20 cm, low = -200m, high = 4096*20cm - 200 = 619.2m
+    u32 y_height : 8; // 20 // 1 unit = 10 cm, low = 0, high = 256*10 ~= 25.6m
+    u32 id0 : 6; // 26 // 0x3F(63) = empty
+    u32 id1 : 6; // 32 // 0x3F(63) = empty
+    u32 id2 : 6; // 38 // 0x3F(63) = empty
+    u32 id3 : 6; // 42 // 0x3F(63) = empty
+    u32 c_dir : 4; // 48 // 0..1 q
+    u32 c_hemi : 4; // 52 // 0..1 q
+    u32 c_r : 4; // 56 // rgb = 4.4.4
+    u32 c_g : 4; // 60 // rgb = 4.4.4
+    u32 c_b : 4; // 64 // rgb = 4.4.4
     DetailPalette palette[4];
 
 public:
@@ -165,9 +155,7 @@ public:
     }
 
     float r_ybase() const { return float(y_base) * .2f - 200.f; }
-
     float r_yheight() const { return float(y_height) * .1f; }
-
     u32 w_qclr(float v, u32 range) const
     {
         s32 _v = iFloor(v * float(range));
@@ -176,7 +164,6 @@ public:
     }
 
     float r_qclr(u32 v, u32 range) const { return float(v) / float(range); }
-
     void color_editor()
     {
         c_dir = w_qclr(0.5f, 15);
@@ -214,23 +201,23 @@ public:
     }
 };
 
-IC bool is_empty(const DetailPalette& pallete)
-{
-    return !pallete.a0 && !pallete.a1 && !pallete.a2 && !pallete.a3;
-}
-
+IC bool is_empty(const DetailPalette& pallete) { return !pallete.a0 && !pallete.a1 && !pallete.a2 && !pallete.a3; }
 IC bool is_empty(const DetailSlot& DS)
 {
     return DS.id0 == DetailSlot::ID_Empty && DS.id1 == DetailSlot::ID_Empty && DS.id2 == DetailSlot::ID_Empty &&
-           DS.id3 == DetailSlot::ID_Empty;
+        DS.id3 == DetailSlot::ID_Empty;
 }
 
 IC void process_pallete(DetailSlot& DS)
 {
-    if (is_empty(DS.palette[0])) DS.id0 = DetailSlot::ID_Empty;
-    if (is_empty(DS.palette[1])) DS.id1 = DetailSlot::ID_Empty;
-    if (is_empty(DS.palette[2])) DS.id2 = DetailSlot::ID_Empty;
-    if (is_empty(DS.palette[3])) DS.id3 = DetailSlot::ID_Empty;
+    if (is_empty(DS.palette[0]))
+        DS.id0 = DetailSlot::ID_Empty;
+    if (is_empty(DS.palette[1]))
+        DS.id1 = DetailSlot::ID_Empty;
+    if (is_empty(DS.palette[2]))
+        DS.id2 = DetailSlot::ID_Empty;
+    if (is_empty(DS.palette[3]))
+        DS.id3 = DetailSlot::ID_Empty;
 }
 
 IC Fvector& get_slot_diameter(Fvector& diameter, const DetailSlot& DS)

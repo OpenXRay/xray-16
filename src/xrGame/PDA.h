@@ -40,18 +40,17 @@ public:
 
     void TurnOn() { m_bTurnedOff = false; }
     void TurnOff() { m_bTurnedOff = true; }
-
     bool IsActive() { return IsOn(); }
     bool IsOn() { return !m_bTurnedOff; }
     bool IsOff() { return m_bTurnedOff; }
-
     void ActivePDAContacts(xr_vector<CPda*>& res);
     CPda* GetPdaFromOwner(IGameObject* owner);
     u32 ActiveContactsNum() { return m_active_contacts.size(); }
     void PlayScriptFunction();
     bool CanPlayScriptFunction()
     {
-        if (!xr_strcmp(m_functor_str, "")) return false;
+        if (!xr_strcmp(m_functor_str, ""))
+            return false;
         return true;
     };
 

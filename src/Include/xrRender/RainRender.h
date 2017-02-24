@@ -18,4 +18,4 @@ public:
     virtual const Fsphere& GetDropBounds() const = 0;
 };
 
-#endif  //	RainRender_included
+#endif //	RainRender_included

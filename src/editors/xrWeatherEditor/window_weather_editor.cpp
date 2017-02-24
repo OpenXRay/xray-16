@@ -37,9 +37,8 @@ struct engine_pauser_guard
     }
 
     inline engine_pauser_guard(engine& engine) : m_engine(engine), m_weather_paused(engine.weather_paused()) {}
-
     inline ~engine_pauser_guard() { m_engine.weather_paused(m_weather_paused); }
-};  // struct engine_pauser_guard
+}; // struct engine_pauser_guard
 
 void window_weather_editor::save(Microsoft::Win32::RegistryKey ^ root)
 {
@@ -70,7 +69,8 @@ void window_weather_editor::save()
 void window_weather_editor::load(Microsoft::Win32::RegistryKey ^ root)
 {
     RegistryKey ^ weather_editor = root->OpenSubKey("weather_editor");
-    if (!weather_editor) return;
+    if (!weather_editor)
+        return;
 
     current->load(weather_editor, "property_grid_current");
     blend->load(weather_editor, "property_grid_blend");
@@ -84,7 +84,8 @@ void window_weather_editor::load()
 {
     RegistryKey ^ product = m_ide->base_registry_key();
     RegistryKey ^ windows = product->OpenSubKey("windows");
-    if (!windows) return;
+    if (!windows)
+        return;
 
     load(windows);
 
@@ -129,13 +130,15 @@ void window_weather_editor::fill_weathers()
 
     LPCSTR current_weather_id = m_engine.weather();
     int index = WeathersComboBox->Items->IndexOf(to_string(current_weather_id));
-    if ((index == -1) && WeathersComboBox->Items->Count) index = 0;
+    if ((index == -1) && WeathersComboBox->Items->Count)
+        index = 0;
 
     WeathersComboBox->SelectedIndex = index;
 
     FramesComboBox->Items->Clear();
 
-    if (index == -1) return;
+    if (index == -1)
+        return;
 
     fill_frames(current_weather_id);
 }
@@ -149,7 +152,8 @@ void window_weather_editor::fill_frames(LPCSTR current_weather_id)
         FramesComboBox->Items->Add(to_string(frames_ids[i]));
 
     int index = FramesComboBox->Items->IndexOf(to_string(m_engine.current_weather_frame()));
-    if ((index == -1) && FramesComboBox->Items->Count) index = 0;
+    if ((index == -1) && FramesComboBox->Items->Count)
+        index = 0;
 
     VERIFY(!m_update_frames_combo_box);
     m_update_frames_combo_box = true;
@@ -159,7 +163,8 @@ void window_weather_editor::fill_frames(LPCSTR current_weather_id)
 
 Void window_weather_editor::window_weather_editor_Enter(Object ^ sender, EventArgs ^ e)
 {
-    if (!m_weathers_getter) return;
+    if (!m_weathers_getter)
+        return;
 
     fill_weathers();
 }
@@ -182,7 +187,8 @@ void window_weather_editor::on_load_finished()
 
 Void window_weather_editor::WeathersComboBox_SelectedIndexChanged(Object ^ sender, EventArgs ^ e)
 {
-    if (WeathersComboBox->SelectedIndex == -1) return;
+    if (WeathersComboBox->SelectedIndex == -1)
+        return;
 
     String ^ new_weather = safe_cast<String ^>(WeathersComboBox->SelectedItem);
     LPSTR new_weather_id = to_string(new_weather);
@@ -195,9 +201,11 @@ Void window_weather_editor::WeathersComboBox_SelectedIndexChanged(Object ^ sende
 
 Void window_weather_editor::FramesComboBox_SelectedIndexChanged(Object ^ sender, EventArgs ^ e)
 {
-    if (m_update_frames_combo_box) return;
+    if (m_update_frames_combo_box)
+        return;
 
-    if (FramesComboBox->SelectedIndex == -1) return;
+    if (FramesComboBox->SelectedIndex == -1)
+        return;
 
     engine_pauser_guard guard(m_engine, false);
 
@@ -211,7 +219,8 @@ Void window_weather_editor::FramesComboBox_SelectedIndexChanged(Object ^ sender,
 
 Void window_weather_editor::PreviousFrameButton_Click(Object ^ sender, EventArgs ^ e)
 {
-    if (FramesComboBox->SelectedIndex == -1) return;
+    if (FramesComboBox->SelectedIndex == -1)
+        return;
 
     if (FramesComboBox->SelectedIndex == 0)
         FramesComboBox->SelectedIndex = FramesComboBox->Items->Count - 1;
@@ -221,7 +230,8 @@ Void window_weather_editor::PreviousFrameButton_Click(Object ^ sender, EventArgs
 
 Void window_weather_editor::NextFrameButton_Click(Object ^ sender, EventArgs ^ e)
 {
-    if (FramesComboBox->SelectedIndex == -1) return;
+    if (FramesComboBox->SelectedIndex == -1)
+        return;
 
     if (FramesComboBox->SelectedIndex == FramesComboBox->Items->Count - 1)
         FramesComboBox->SelectedIndex = 0;
@@ -242,7 +252,8 @@ void window_weather_editor::update_frame()
 
         u32 old_value = WeatherTrackBar->Value;
         u32 current_value = u32(1000 * m_engine.track_weather());
-        if (old_value != current_value) WeatherTrackBar->Value = current_value;
+        if (old_value != current_value)
+            WeatherTrackBar->Value = current_value;
 
         m_update_weather_time = false;
     }
@@ -251,7 +262,8 @@ void window_weather_editor::update_frame()
         m_update_frame_trackbar = true;
         u32 old_value = CurrentTimeTrackBar->Value;
         u32 current_value = u32(1000 * m_engine.track_frame());
-        if (old_value != current_value) CurrentTimeTrackBar->Value = current_value;
+        if (old_value != current_value)
+            CurrentTimeTrackBar->Value = current_value;
 
         m_update_frame_trackbar = false;
     }
@@ -259,27 +271,34 @@ void window_weather_editor::update_frame()
     ::property_holder* properties;
 
     properties = dynamic_cast<::property_holder*>(m_engine.current_frame_property_holder());
-    if (properties) {
-        if (safe_cast<property_container ^>(current->SelectedObject) != properties->container()) {
+    if (properties)
+    {
+        if (safe_cast<property_container ^>(current->SelectedObject) != properties->container())
+        {
             current->SelectedObject = properties->container();
             blend->Refresh();
         }
     }
 
-    if (!m_engine.weather_paused() && m_load_finished) blend->Refresh();
+    if (!m_engine.weather_paused() && m_load_finished)
+        blend->Refresh();
 
     properties = dynamic_cast<::property_holder*>(m_engine.target_frame_property_holder());
-    if (properties) {
-        if (safe_cast<property_container ^>(target->SelectedObject) != properties->container()) {
+    if (properties)
+    {
+        if (safe_cast<property_container ^>(target->SelectedObject) != properties->container())
+        {
             target->SelectedObject = properties->container();
             blend->Refresh();
         }
     }
 
-    if (!m_update_enabled) return;
+    if (!m_update_enabled)
+        return;
 
     String ^ new_frame_id = to_string(m_engine.current_weather_frame());
-    if (new_frame_id == FramesComboBox->SelectedItem) return;
+    if (new_frame_id == FramesComboBox->SelectedItem)
+        return;
 
     VERIFY(!m_update_frames_combo_box);
     m_update_frames_combo_box = true;
@@ -291,7 +310,8 @@ void window_weather_editor::on_idle()
 {
     update_frame();
 
-    if (m_mouse_down) blend->Refresh();
+    if (m_mouse_down)
+        blend->Refresh();
 
     if (ActiveControl == current)
         m_ide->view().property_grid(current);
@@ -299,16 +319,8 @@ void window_weather_editor::on_idle()
         m_ide->view().property_grid(target);
 }
 
-Void window_weather_editor::FramesComboBox_DropDown(Object ^ sender, EventArgs ^ e)
-{
-    m_update_enabled = false;
-}
-
-Void window_weather_editor::FramesComboBox_DropDownClosed(Object ^ sender, EventArgs ^ e)
-{
-    m_update_enabled = true;
-}
-
+Void window_weather_editor::FramesComboBox_DropDown(Object ^ sender, EventArgs ^ e) { m_update_enabled = false; }
+Void window_weather_editor::FramesComboBox_DropDownClosed(Object ^ sender, EventArgs ^ e) { m_update_enabled = true; }
 Void window_weather_editor::PauseButton_Click(Object ^ sender, EventArgs ^ e)
 {
     PauseButton->ImageIndex = (PauseButton->ImageIndex ^ 1);
@@ -323,7 +335,8 @@ Void window_weather_editor::TimeFactorNumericUpDown_ValueChanged(Object ^ sender
 Void window_weather_editor::CopyButton_Click(Object ^ sender, EventArgs ^ e)
 {
     char buffer[4096];
-    if (!m_engine.save_time_frame(buffer, sizeof(buffer))) return;
+    if (!m_engine.save_time_frame(buffer, sizeof(buffer)))
+        return;
 
     System::Windows::Forms::Clipboard::SetText(to_string(buffer));
 }
@@ -331,7 +344,8 @@ Void window_weather_editor::CopyButton_Click(Object ^ sender, EventArgs ^ e)
 Void window_weather_editor::PasteCurrentButton_Click(Object ^ sender, EventArgs ^ e)
 {
     char* buffer = to_string(Clipboard::GetText());
-    if (buffer) m_engine.paste_current_time_frame(buffer, (strlen(buffer) + 1) * sizeof(char));
+    if (buffer)
+        m_engine.paste_current_time_frame(buffer, (strlen(buffer) + 1) * sizeof(char));
     free(buffer);
 
     fill_frames(m_engine.weather());
@@ -341,7 +355,8 @@ Void window_weather_editor::PasteCurrentButton_Click(Object ^ sender, EventArgs 
 Void window_weather_editor::PasteTargetButton_Click(Object ^ sender, EventArgs ^ e)
 {
     char* buffer = to_string(Clipboard::GetText());
-    if (buffer) m_engine.paste_target_time_frame(buffer, (strlen(buffer) + 1) * sizeof(char));
+    if (buffer)
+        m_engine.paste_target_time_frame(buffer, (strlen(buffer) + 1) * sizeof(char));
     free(buffer);
 
     fill_frames(m_engine.weather());
@@ -351,7 +366,8 @@ Void window_weather_editor::PasteTargetButton_Click(Object ^ sender, EventArgs ^
 Void window_weather_editor::CreateFromButton_Click(Object ^ sender, EventArgs ^ e)
 {
     char buffer[4096];
-    if (!m_engine.save_time_frame(buffer, sizeof(buffer))) return;
+    if (!m_engine.save_time_frame(buffer, sizeof(buffer)))
+        return;
 
     m_engine.add_time_frame(buffer, (strlen(buffer) + 1) * sizeof(char));
 
@@ -371,13 +387,15 @@ Void window_weather_editor::window_weather_editor_SizeChanged(Object ^ sender, E
 
 Void window_weather_editor::CurrentTimeTrackBar_ValueChanged(Object ^ sender, EventArgs ^ e)
 {
-    if (m_update_frame_trackbar) return;
+    if (m_update_frame_trackbar)
+        return;
 
     engine_pauser_guard guard(m_engine, false);
     m_engine.track_frame(CurrentTimeTrackBar->Value / 1000.f);
     update_frame();
 
-    if (sender) m_engine.on_idle();
+    if (sender)
+        m_engine.on_idle();
 }
 
 Void window_weather_editor::CurrentTimeTrackBar_MouseDown(Object ^ sender, MouseEventArgs ^ e)
@@ -389,14 +407,15 @@ Void window_weather_editor::CurrentTimeTrackBar_MouseDown(Object ^ sender, Mouse
     int margin = 12;
     p -= margin;
     float coef = float(CurrentTimeTrackBar->Maximum - CurrentTimeTrackBar->Minimum) /
-                 float(CurrentTimeTrackBar->ClientSize.Width - 2 * margin);
+        float(CurrentTimeTrackBar->ClientSize.Width - 2 * margin);
 
     int value = int(p * coef + CurrentTimeTrackBar->Minimum);
     if (value < CurrentTimeTrackBar->Minimum)
         value = CurrentTimeTrackBar->Minimum;
     else
     {
-        if (value > CurrentTimeTrackBar->Maximum) value = CurrentTimeTrackBar->Maximum;
+        if (value > CurrentTimeTrackBar->Maximum)
+            value = CurrentTimeTrackBar->Maximum;
     }
 
     CurrentTimeTrackBar->Value = value;
@@ -413,7 +432,8 @@ Void window_weather_editor::CurrentTimeTrackBar_MouseUp(Object ^ sender, MouseEv
 
 Void window_weather_editor::WeatherTrackBar_ValueChanged(Object ^ sender, EventArgs ^ e)
 {
-    if (m_update_weather_time) return;
+    if (m_update_weather_time)
+        return;
 
     engine_pauser_guard guard(m_engine, false);
     m_engine.track_weather(WeatherTrackBar->Value / 1000.f);
@@ -430,14 +450,15 @@ Void window_weather_editor::WeatherTrackBar_MouseDown(Object ^ sender, MouseEven
     int margin = 12;
     p -= margin;
     float coef = float(WeatherTrackBar->Maximum - WeatherTrackBar->Minimum) /
-                 float(WeatherTrackBar->ClientSize.Width - 2 * margin);
+        float(WeatherTrackBar->ClientSize.Width - 2 * margin);
 
     int value = int(p * coef + WeatherTrackBar->Minimum);
     if (value < WeatherTrackBar->Minimum)
         value = WeatherTrackBar->Minimum;
     else
     {
-        if (value > WeatherTrackBar->Maximum) value = WeatherTrackBar->Maximum;
+        if (value > WeatherTrackBar->Maximum)
+            value = WeatherTrackBar->Maximum;
     }
 
     WeatherTrackBar->Value = value;
@@ -452,31 +473,17 @@ Void window_weather_editor::WeatherTrackBar_MouseUp(Object ^ sender, MouseEventA
     m_mouse_down = false;
 }
 
-Void window_weather_editor::current_Leave(Object ^ sender, EventArgs ^ e)
-{
-    m_ide->view().property_grid(current);
-}
-
-Void window_weather_editor::target_Leave(Object ^ sender, EventArgs ^ e)
-{
-    m_ide->view().property_grid(target);
-}
-
-Void window_weather_editor::current_Enter(Object ^ sender, EventArgs ^ e)
-{
-    m_ide->view().property_grid(current);
-}
-
-Void window_weather_editor::target_Enter(Object ^ sender, EventArgs ^ e)
-{
-    m_ide->view().property_grid(target);
-}
-
+Void window_weather_editor::current_Leave(Object ^ sender, EventArgs ^ e) { m_ide->view().property_grid(current); }
+Void window_weather_editor::target_Leave(Object ^ sender, EventArgs ^ e) { m_ide->view().property_grid(target); }
+Void window_weather_editor::current_Enter(Object ^ sender, EventArgs ^ e) { m_ide->view().property_grid(current); }
+Void window_weather_editor::target_Enter(Object ^ sender, EventArgs ^ e) { m_ide->view().property_grid(target); }
 Void window_weather_editor::CurrentTimeTextBox_TextChanged(Object ^ sender, EventArgs ^ e)
 {
-    if (m_update_text_value) return;
+    if (m_update_text_value)
+        return;
 
-    if (CurrentTimeTextBox->Text->Contains("_")) return;
+    if (CurrentTimeTextBox->Text->Contains("_"))
+        return;
 
     engine_pauser_guard guard(m_engine, false);
 

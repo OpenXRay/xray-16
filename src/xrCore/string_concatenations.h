@@ -11,7 +11,7 @@ LPSTR XRCORE_API strconcat(
 LPSTR XRCORE_API strconcat(int dest_sz, char* dest, const char* S1, const char* S2, const char* S3, const char* S4,
     const char* S5, const char* S6);
 
-#else  // _EDITOR
+#else // _EDITOR
 // obsolete: should be deleted as soon borland work correctly with new strconcats
 IC char* strconcat(int dest_sz, char* dest, const char* S1, const char* S2)
 {
@@ -58,29 +58,29 @@ IC char* strconcat(int dest_sz, char* dest, const char* S1, const char* S2, cons
 
 #ifdef STRCONCAT_STACKOVERFLOW_CHECK
 
-#define STRCONCAT(dest, ...)                                                                                           \
-    do                                                                                                                 \
-    {                                                                                                                  \
-        xray::core::detail::string_tupples STRCONCAT_tupples_unique_identifier(__VA_ARGS__);                           \
-        u32 STRCONCAT_buffer_size = STRCONCAT_tupples_unique_identifier.size();                                        \
-        xray::core::detail::check_stack_overflow(STRCONCAT_buffer_size);                                               \
-        (dest) = (LPSTR)_alloca(STRCONCAT_buffer_size);                                                                \
-        STRCONCAT_tupples_unique_identifier.concat(dest);                                                              \
+#define STRCONCAT(dest, ...)                                                                 \
+    do                                                                                       \
+    {                                                                                        \
+        xray::core::detail::string_tupples STRCONCAT_tupples_unique_identifier(__VA_ARGS__); \
+        u32 STRCONCAT_buffer_size = STRCONCAT_tupples_unique_identifier.size();              \
+        xray::core::detail::check_stack_overflow(STRCONCAT_buffer_size);                     \
+        (dest) = (LPSTR)_alloca(STRCONCAT_buffer_size);                                      \
+        STRCONCAT_tupples_unique_identifier.concat(dest);                                    \
     } while (0)
 
-#else  //#ifdef STRCONCAT_STACKOVERFLOW_CHECK
+#else //#ifdef STRCONCAT_STACKOVERFLOW_CHECK
 
-#define STRCONCAT(dest, ...)                                                                                           \
-    do                                                                                                                 \
-    {                                                                                                                  \
-        xray::core::detail::string_tupples STRCONCAT_tupples_unique_identifier(__VA_ARGS__);                           \
-        (dest) = (LPSTR)_alloca(STRCONCAT_tupples_unique_identifier.size());                                           \
-        STRCONCAT_tupples_unique_identifier.concat(dest);                                                              \
+#define STRCONCAT(dest, ...)                                                                 \
+    do                                                                                       \
+    {                                                                                        \
+        xray::core::detail::string_tupples STRCONCAT_tupples_unique_identifier(__VA_ARGS__); \
+        (dest) = (LPSTR)_alloca(STRCONCAT_tupples_unique_identifier.size());                 \
+        STRCONCAT_tupples_unique_identifier.concat(dest);                                    \
     } while (0)
 
-#endif  //#ifdef STRCONCAT_STACKOVERFLOW_CHECK
+#endif //#ifdef STRCONCAT_STACKOVERFLOW_CHECK
 
-#endif  //_EDITOR
+#endif //_EDITOR
 #include "string_concatenations_inline.h"
 
-#endif  // #ifndef STRING_CONCATENATIONS_H
+#endif // #ifndef STRING_CONCATENATIONS_H

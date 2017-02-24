@@ -51,8 +51,8 @@ const u32 default_tube_condition_min_delay = 10000;
 const float default_tube_condition_min_distance = 10;
 const float default_stamina_hit = 0.2f;
 
-}  // namespace controller
-}  // namespace detail
+} // namespace controller
+} // namespace detail
 
 CController::CController()
 {
@@ -240,16 +240,16 @@ void CController::Load(LPCSTR section)
 
     using namespace detail::controller;
     m_tube_condition_see_duration = pSettings->line_exist(section, tube_see_duration_line) ?
-                                        pSettings->r_u32(section, tube_see_duration_line) :
-                                        default_tube_condition_see_duration;
+        pSettings->r_u32(section, tube_see_duration_line) :
+        default_tube_condition_see_duration;
 
     m_tube_condition_min_delay = pSettings->line_exist(section, tube_condition_min_delay_line) ?
-                                     pSettings->r_u32(section, tube_condition_min_delay_line) :
-                                     default_tube_condition_min_delay;
+        pSettings->r_u32(section, tube_condition_min_delay_line) :
+        default_tube_condition_min_delay;
 
     m_tube_condition_min_distance = pSettings->line_exist(section, tube_condition_min_distance_line) ?
-                                        pSettings->r_float(section, tube_condition_min_distance_line) :
-                                        default_tube_condition_min_distance;
+        pSettings->r_float(section, tube_condition_min_distance_line) :
+        default_tube_condition_min_distance;
 
     m_stamina_hit = READ_IF_EXISTS(pSettings, r_float, section, "stamina_hit", default_stamina_hit);
 
@@ -274,8 +274,10 @@ void CController::load_friend_community_overrides(LPCSTR section)
 bool CController::is_community_friend_overrides(const CEntityAlive* entity_alive) const
 {
     const CInventoryOwner* IO = smart_cast<const CInventoryOwner*>(entity_alive);
-    if (!IO) return false;
-    if (const_cast<CEntityAlive*>(entity_alive)->cast_base_monster()) return false;
+    if (!IO)
+        return false;
+    if (const_cast<CEntityAlive*>(entity_alive)->cast_base_monster())
+        return false;
 
     return (std::find(m_friend_community_overrides.begin(), m_friend_community_overrides.end(),
                 IO->CharacterInfo().Community().id()) != m_friend_community_overrides.end());
@@ -283,7 +285,8 @@ bool CController::is_community_friend_overrides(const CEntityAlive* entity_alive
 
 BOOL CController::net_Spawn(CSE_Abstract* DC)
 {
-    if (!inherited::net_Spawn(DC)) return (FALSE);
+    if (!inherited::net_Spawn(DC))
+        return (FALSE);
 
     return (TRUE);
 }
@@ -291,11 +294,14 @@ BOOL CController::net_Spawn(CSE_Abstract* DC)
 void CController::UpdateControlled()
 {
     // если есть враг, проверить может ли быть враг взят под контроль
-    if (EnemyMan.get_enemy()) {
+    if (EnemyMan.get_enemy())
+    {
         CControlledEntityBase* entity =
             smart_cast<CControlledEntityBase*>(const_cast<CEntityAlive*>(EnemyMan.get_enemy()));
-        if (entity) {
-            if (!entity->is_under_control() && (m_controlled_objects.size() < m_max_controlled_number)) {
+        if (entity)
+        {
+            if (!entity->is_under_control() && (m_controlled_objects.size() < m_max_controlled_number))
+            {
                 // взять под контроль
                 entity->set_under_control(this);
                 entity->set_task_follow(this);
@@ -307,7 +313,8 @@ void CController::UpdateControlled()
 
 void CController::set_controlled_task(u32 task)
 {
-    if (!HasUnderControl()) return;
+    if (!HasUnderControl())
+        return;
 
     const CEntity* object =
         ((((ETask)task) == eTaskNone) ? 0 : ((((ETask)task) == eTaskFollow) ? this : EnemyMan.get_enemy()));
@@ -322,7 +329,8 @@ void CController::set_controlled_task(u32 task)
 
 void CController::CheckSpecParams(u32 spec_params)
 {
-    if ((spec_params & ASP_CHECK_CORPSE) == ASP_CHECK_CORPSE) {
+    if ((spec_params & ASP_CHECK_CORPSE) == ASP_CHECK_CORPSE)
+    {
         com_man().seq_run(anim().get_motion_id(eAnimCheckCorpse));
     }
 }
@@ -332,7 +340,8 @@ void CController::InitThink()
     for (u32 i = 0; i < m_controlled_objects.size(); i++)
     {
         CBaseMonster* base = smart_cast<CBaseMonster*>(m_controlled_objects[i]);
-        if (!base) continue;
+        if (!base)
+            continue;
         if (base->EnemyMan.get_enemy())
             EnemyMemory.add_enemy(base->EnemyMan.get_enemy(), base->EnemyMan.get_enemy_position(),
                 base->EnemyMan.get_enemy_vertex(), base->EnemyMan.get_enemy_time_last_seen());
@@ -344,7 +353,8 @@ void CController::play_control_sound_start()
     Fvector pos = EnemyMan.get_enemy()->Position();
     pos.y += 1.5f;
 
-    if (control_start_sound._feedback()) control_start_sound.stop();
+    if (control_start_sound._feedback())
+        control_start_sound.stop();
     control_start_sound.play_at_pos(const_cast<CEntityAlive*>(EnemyMan.get_enemy()), pos);
 }
 
@@ -353,7 +363,8 @@ void CController::play_control_sound_hit()
     Fvector pos = EnemyMan.get_enemy()->Position();
     pos.y += 1.5f;
 
-    if (control_hit_sound._feedback()) control_hit_sound.stop();
+    if (control_hit_sound._feedback())
+        control_hit_sound.stop();
     control_hit_sound.play_at_pos(const_cast<CEntityAlive*>(EnemyMan.get_enemy()), pos);
 }
 
@@ -392,7 +403,8 @@ void CController::control_hit()
 
     // start postprocess
     CActor* pA = const_cast<CActor*>(smart_cast<const CActor*>(EnemyMan.get_enemy()));
-    if (!pA) return;
+    if (!pA)
+        return;
 
     Actor()->Cameras().AddCamEffector(new CMonsterEffectorHit(m_control_effector.ce_time,
         m_control_effector.ce_amplitude, m_control_effector.ce_period_number, m_control_effector.ce_power));
@@ -412,17 +424,21 @@ void CController::UpdateCL()
 {
     inherited::UpdateCL();
 
-    if (m_sndShockEffector) {
+    if (m_sndShockEffector)
+    {
         m_sndShockEffector->Update();
-        if (!m_sndShockEffector->InWork()) xr_delete(m_sndShockEffector);
+        if (!m_sndShockEffector->InWork())
+            xr_delete(m_sndShockEffector);
     }
 
-    if (active_control_fx) {
+    if (active_control_fx)
+    {
         u32 time_to_show = 150;
         float percent = float((Device.dwTimeGlobal - time_control_hit_started)) / float(time_to_show);
         float percent2 = 1 - (percent - TEXTURE_SIZE_PERCENT) / 2;
 
-        if (percent < TEXTURE_SIZE_PERCENT) {
+        if (percent < TEXTURE_SIZE_PERCENT)
+        {
             CurrentGameUI()->RemoveCustomStatic("controller_fx2");
             StaticDrawableWrapper* s = CurrentGameUI()->AddCustomStatic("controller_fx", true);
 
@@ -458,9 +474,11 @@ void CController::shedule_Update(u32 dt)
 {
     inherited::shedule_Update(dt);
 
-    if (g_Alive()) {
+    if (g_Alive())
+    {
         UpdateControlled();
-        if (can_tube_fire()) tube_fire();
+        if (can_tube_fire())
+            tube_fire();
     }
 
     // DEBUG
@@ -482,11 +500,7 @@ void CController::net_Destroy()
     FreeFromControl();
 }
 
-void CController::net_Relcase(IGameObject* O)
-{
-    inherited::net_Relcase(O);
-}
-
+void CController::net_Relcase(IGameObject* O) { inherited::net_Relcase(O); }
 void CController::FreeFromControl()
 {
     for (u32 i = 0; i < m_controlled_objects.size(); i++)
@@ -497,7 +511,8 @@ void CController::FreeFromControl()
 void CController::OnFreedFromControl(const CEntity* entity)
 {
     for (u32 i = 0; i < m_controlled_objects.size(); i++)
-        if (m_controlled_objects[i] == entity) {
+        if (m_controlled_objects[i] == entity)
+        {
             m_controlled_objects[i] = m_controlled_objects.back();
             m_controlled_objects.pop_back();
             return;
@@ -508,9 +523,11 @@ void CController::OnFreedFromControl(const CEntity* entity)
 
 void CController::draw_fire_particles()
 {
-    if (!EnemyMan.get_enemy()) return;
+    if (!EnemyMan.get_enemy())
+        return;
     CEntityAlive* enemy = const_cast<CEntityAlive*>(EnemyMan.get_enemy());
-    if (!EnemyMan.see_enemy_now()) return;
+    if (!EnemyMan.see_enemy_now())
+        return;
 
     // вычислить позицию и направленность партикла
     Fvector my_head_pos;
@@ -543,7 +560,8 @@ void CController::draw_fire_particles()
 
 void CController::psy_fire()
 {
-    if (!EnemyMan.get_enemy()) return;
+    if (!EnemyMan.get_enemy())
+        return;
 
     draw_fire_particles();
     /*
@@ -554,15 +572,18 @@ void CController::psy_fire()
 
 bool CController::can_psy_fire()
 {
-    if (m_psy_fire_start_time + m_psy_fire_delay > time()) {
+    if (m_psy_fire_start_time + m_psy_fire_delay > time())
+    {
         return false;
     }
 
-    if (!EnemyMan.get_enemy()) {
+    if (!EnemyMan.get_enemy())
+    {
         return false;
     }
 
-    if (!EnemyMan.see_enemy_now()) {
+    if (!EnemyMan.see_enemy_now())
+    {
         return false;
     }
 
@@ -570,7 +591,8 @@ bool CController::can_psy_fire()
     float dir_yaw = Fvector().sub(EnemyMan.get_enemy()->Position(), Position()).getH();
     dir_yaw = angle_normalize(-dir_yaw);
 
-    if (angle_difference(cur_yaw, dir_yaw) > _pmt_psy_attack_min_angle) {
+    if (angle_difference(cur_yaw, dir_yaw) > _pmt_psy_attack_min_angle)
+    {
         return false;
     }
 
@@ -578,43 +600,38 @@ bool CController::can_psy_fire()
     return true;
 }
 
-void CController::set_psy_fire_delay_zero()
-{
-    m_psy_fire_delay = 0;
-}
-void CController::set_psy_fire_delay_default()
-{
-    m_psy_fire_delay = _pmt_psy_attack_delay;
-}
-
+void CController::set_psy_fire_delay_zero() { m_psy_fire_delay = 0; }
+void CController::set_psy_fire_delay_default() { m_psy_fire_delay = _pmt_psy_attack_delay; }
 //////////////////////////////////////////////////////////////////////////
 // TUBE
 //////////////////////////////////////////////////////////////////////////
 
-void CController::tube_fire()
-{
-    control().activate(ControlCom::eComCustom1);
-}
-
+void CController::tube_fire() { control().activate(ControlCom::eComCustom1); }
 bool CController::can_tube_fire()
 {
     using namespace detail::controller;
 
-    if (0 && m_tube_at_once) {
-        if (EnemyMan.get_enemy() && EnemyMan.see_enemy_now() && m_psy_hit->check_start_conditions()) {
+    if (0 && m_tube_at_once)
+    {
+        if (EnemyMan.get_enemy() && EnemyMan.see_enemy_now() && m_psy_hit->check_start_conditions())
+        {
             return true;
         }
 
         return false;
     }
 
-    if (!EnemyMan.get_enemy()) return false;
+    if (!EnemyMan.get_enemy())
+        return false;
 
-    if (EnemyMan.see_enemy_duration() < m_tube_condition_see_duration) return false;
+    if (EnemyMan.see_enemy_duration() < m_tube_condition_see_duration)
+        return false;
 
-    if (!m_psy_hit->check_start_conditions()) return false;
+    if (!m_psy_hit->check_start_conditions())
+        return false;
 
-    if (EnemyMan.get_enemy()->Position().distance_to(Position()) < m_tube_condition_min_distance) return false;
+    if (EnemyMan.get_enemy()->Position().distance_to(Position()) < m_tube_condition_min_distance)
+        return false;
 
     return true;
 }
@@ -653,7 +670,8 @@ void CController::TranslateActionToPathParams()
     //}
     // custom_anim().set_path_params();
 
-    if ((anim().m_tAction != ACT_RUN) && (anim().m_tAction != ACT_WALK_FWD)) {
+    if ((anim().m_tAction != ACT_RUN) && (anim().m_tAction != ACT_WALK_FWD))
+    {
         inherited::TranslateActionToPathParams();
         return;
     }
@@ -662,7 +680,8 @@ void CController::TranslateActionToPathParams()
     u32 des_mask =
         (m_bDamaged ? MonsterMovement::eVelocityParameterWalkDamaged : MonsterMovement::eVelocityParameterWalkNormal);
 
-    if (m_force_real_speed) vel_mask = des_mask;
+    if (m_force_real_speed)
+        vel_mask = des_mask;
 
     path().set_velocity_mask(vel_mask);
     path().set_desirable_mask(des_mask);
@@ -672,15 +691,18 @@ void CController::TranslateActionToPathParams()
 bool CController::is_relation_enemy(const CEntityAlive* tpEntityAlive) const
 {
     //	MONSTER_COMMUNITY_ID
-    if (xr_strcmp(*(tpEntityAlive->cNameSect()), "stalker_zombied") == 0) return false;
-    if (is_community_friend_overrides(tpEntityAlive)) return false;
+    if (xr_strcmp(*(tpEntityAlive->cNameSect()), "stalker_zombied") == 0)
+        return false;
+    if (is_community_friend_overrides(tpEntityAlive))
+        return false;
 
     return inherited::is_relation_enemy(tpEntityAlive);
 }
 
 void CController::set_mental_state(EMentalState state)
 {
-    if (m_mental_state == state) return;
+    if (m_mental_state == state)
+        return;
 
     m_mental_state = state;
 
@@ -690,10 +712,13 @@ void CController::set_mental_state(EMentalState state)
 void CController::HitEntity(
     const CEntity* pEntity, float fDamage, float impulse, Fvector& dir, ALife::EHitType hit_type, bool draw_hit_marks)
 {
-    if (pEntity == Actor() && !GodMode()) {
+    if (pEntity == Actor() && !GodMode())
+    {
         Actor()->conditions().PowerHit(m_stamina_hit, false);
-        if (Actor()->conditions().GetPower() < m_stamina_hit) {
-            if (!Actor()->inventory().Action((u16)kDROP, CMD_STOP)) {
+        if (Actor()->conditions().GetPower() < m_stamina_hit)
+        {
+            if (!Actor()->inventory().Action((u16)kDROP, CMD_STOP))
+            {
                 Actor()->g_PerformDrop();
             }
         }
@@ -702,16 +727,13 @@ void CController::HitEntity(
     inherited::HitEntity(pEntity, fDamage, impulse, dir, hit_type, draw_hit_marks);
 }
 
-bool CController::tube_ready() const
-{
-    return m_psy_hit && m_psy_hit->tube_ready();
-}
-
+bool CController::tube_ready() const { return m_psy_hit && m_psy_hit->tube_ready(); }
 #ifdef DEBUG
 CBaseMonster::SDebugInfo CController::show_debug_info()
 {
     CBaseMonster::SDebugInfo info = inherited::show_debug_info();
-    if (!info.active) return CBaseMonster::SDebugInfo();
+    if (!info.active)
+        return CBaseMonster::SDebugInfo();
 
     // Draw Controlled Lines
     DBG().level_info(this).clear();
@@ -749,7 +771,8 @@ void CController::debug_on_key(int key)
         // m_sound_aura_left_channel.play_at_pos(Level().CurrentEntity(), Fvector().set(-1.f, 0.f, 1.f), sm_2D);
         // m_sound_aura_right_channel.play_at_pos(Level().CurrentEntity(), Fvector().set(1.f, 0.f, 1.f), sm_2D);
 
-        if (m_psy_hit->check_start_conditions()) {
+        if (m_psy_hit->check_start_conditions())
+        {
             control().activate(ControlCom::eComCustom1);
         }
         // P1.set		(Actor()->Position());
@@ -772,9 +795,11 @@ void CController::debug_on_key(int key)
         DBG().level_info(this).remove_item(1);
         DBG().level_info(this).add_item(P2, 0.5f, COLOR_GREEN, 1);
 
-        if (!fsimilar(P1.square_magnitude(), 0.f) && !fsimilar(P2.square_magnitude(), 0.f)) {
+        if (!fsimilar(P1.square_magnitude(), 0.f) && !fsimilar(P2.square_magnitude(), 0.f))
+        {
             const CCoverPoint* cover = CoverMan->find_cover(P1, P2, 10.f, 40.f);
-            if (cover) {
+            if (cover)
+            {
                 DBG().level_info(this).remove_item(3);
                 DBG().level_info(this).add_item(cover->position(), 0.8f, COLOR_RED, 3);
             }

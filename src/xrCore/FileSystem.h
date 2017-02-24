@@ -18,7 +18,6 @@ public:
     virtual ~EFS_Utils();
     void _initialize() {}
     void _destroy() {}
-
     LPCSTR GenerateName(LPCSTR base_path, LPCSTR base_name, LPCSTR def_ext, LPSTR out_name, u32 const out_name_size);
 
     bool GetOpenName(LPCSTR initial, string_path& buffer, int sz_buf, bool bMulti = false, LPCSTR offset = 0,

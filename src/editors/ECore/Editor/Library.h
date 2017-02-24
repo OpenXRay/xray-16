@@ -12,7 +12,7 @@ class CEditableObject;
 
 DEFINE_MAP_PRED(AnsiString, CEditableObject*, EditObjMap, EditObjPairIt, astr_pred);
 //----------------------------------------------------
-class ECORE_API ELibrary  //:	public pureDeviceCreate, public pureDeviceDestroy
+class ECORE_API ELibrary //:	public pureDeviceCreate, public pureDeviceDestroy
 {
     bool m_bReady;
     friendclass TfrmChoseObject;
@@ -21,7 +21,7 @@ class ECORE_API ELibrary  //:	public pureDeviceCreate, public pureDeviceDestroy
     CEditableObject* LoadEditObject(LPCSTR full_name);
     void UnloadEditObject(LPCSTR full_name);
 
-  public:
+public:
     ELibrary();
     virtual ~ELibrary();
 
@@ -41,7 +41,6 @@ class ECORE_API ELibrary  //:	public pureDeviceCreate, public pureDeviceDestroy
 
     int GetObjects(FS_FileSet& files);
     int ObjectCount() { return m_EditObjects.size(); }
-
     void EvictObjects();
 
     virtual void OnDeviceCreate();

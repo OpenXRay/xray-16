@@ -6,6 +6,5 @@
 
 /*
 --- replaces following
-
-#pragma comment(lib,	"dxguid"			)
+#pragma comment(lib, "dxguid")
 */

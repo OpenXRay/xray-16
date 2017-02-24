@@ -45,6 +45,6 @@ private:
     CUIPropertiesBox* m_sub_property_box;
     void SetParentSubMenu(CUIPropertiesBox* parent_menu) { m_parent_sub_menu = parent_menu; };
     Frect m_last_show_rect;
-    CUIPropertiesBox* m_parent_sub_menu;   // warning !!! dubling pointers to the same object !!!
-    CUIWindow* m_item_sub_menu_initiator;  // fills in ShowSubMenu
+    CUIPropertiesBox* m_parent_sub_menu; // warning !!! dubling pointers to the same object !!!
+    CUIWindow* m_item_sub_menu_initiator; // fills in ShowSubMenu
 };

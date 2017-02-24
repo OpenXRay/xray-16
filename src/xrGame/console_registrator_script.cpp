@@ -4,11 +4,7 @@
 
 using namespace luabind;
 
-CConsole* console()
-{
-    return Console;
-}
-
+CConsole* console() { return Console; }
 int get_console_integer(CConsole* c, LPCSTR cmd)
 {
     int min = 0, max = 0;
@@ -23,11 +19,7 @@ float get_console_float(CConsole* c, LPCSTR cmd)
     return val;
 }
 
-bool get_console_bool(CConsole* c, LPCSTR cmd)
-{
-    return c->GetBool(cmd);
-}
-
+bool get_console_bool(CConsole* c, LPCSTR cmd) { return c->GetBool(cmd); }
 void execute_console_command_deferred(CConsole* c, LPCSTR string_to_execute)
 {
     Engine.Event.Defer("KERNEL:console", size_t(xr_strdup(string_to_execute)));

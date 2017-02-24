@@ -17,11 +17,11 @@ public:
     virtual ~CUITabControl();
 
     // options item
-    virtual void SetCurrentOptValue();       // opt->current
-    virtual void SaveBackUpOptValue();       // current->backup
-    virtual void SaveOptValue();             // current->opt
-    virtual void UndoOptValue();             // backup->current
-    virtual bool IsChangedOptValue() const;  // backup!=current
+    virtual void SetCurrentOptValue(); // opt->current
+    virtual void SaveBackUpOptValue(); // current->backup
+    virtual void SaveOptValue(); // current->opt
+    virtual void UndoOptValue(); // backup->current
+    virtual bool IsChangedOptValue() const; // backup!=current
 
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
     virtual void OnTabChange(const shared_str& sCur, const shared_str& sPrev);
@@ -43,15 +43,12 @@ public:
     void SetActiveTab(const shared_str& sNewTab);
     void SetActiveTab_script(LPCSTR sNewTab) { SetActiveTab(sNewTab); };
     const u32 GetTabsCount() const { return m_TabsArr.size(); }
-
     // –ежим клавилатурных акселераторов (вкл/выкл)
     IC bool GetAcceleratorsMode() const { return m_bAcceleratorsEnable; }
     void SetAcceleratorsMode(bool bEnable) { m_bAcceleratorsEnable = bEnable; }
-
     TABS_VECTOR* GetButtonsVector() { return &m_TabsArr; }
     CUITabButton* GetButtonById(const shared_str& id);
     CUITabButton* GetButtonById_script(LPCSTR s) { return GetButtonById(s); }
-
     void ResetTab();
 
 protected:

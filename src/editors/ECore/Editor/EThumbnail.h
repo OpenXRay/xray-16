@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 class ECORE_API ECustomThumbnail
 {
-  public:
+public:
     enum THMType
     {
         ETUndef = -1,
@@ -21,21 +21,19 @@ class ECORE_API ECustomThumbnail
         force_dword = (-1)
     };
 
-  protected:
+protected:
     AnsiString m_SrcName;
     AnsiString m_Name;
     int m_Age;
     THMType m_Type;
 
-  public:
+public:
     ECustomThumbnail(LPCSTR src_name, THMType type);
     virtual ~ECustomThumbnail();
 
     LPCSTR Name() { return m_Name.c_str(); }
     LPCSTR SrcName() { return m_SrcName.c_str(); }
-
     IC bool IsClass(THMType type) { return m_Type == type; }
-
     // thumbnail public routines
     virtual bool Load(LPCSTR src_name = 0, LPCSTR path = 0) = 0;
     virtual void Save(int age = 0, LPCSTR path = 0) = 0;
@@ -52,14 +50,14 @@ class ECORE_API EImageThumbnail :
 {
     friend class CImageManager;
 
-  protected:
+protected:
     U32Vec m_Pixels;
 
-  protected:
+protected:
     void CreatePixels(u32* p, u32 w, u32 h);
     void VFlip();
 
-  public:
+public:
     EImageThumbnail(LPCSTR src_name, THMType type) : ECustomThumbnail(src_name, type){};
     virtual ~EImageThumbnail();
     virtual void Draw(HDC hdc, const Irect& r);
@@ -80,11 +78,11 @@ class ECORE_API ETextureThumbnail :
     friend class CImageManager;
     typedef EImageThumbnail inherited;
 
-  private:
+private:
     STextureParams m_TexParams;
     bool m_bValid;
 
-  public:
+public:
     ETextureThumbnail(LPCSTR src_name, bool bLoad = true);
     virtual ~ETextureThumbnail();
 
@@ -104,7 +102,6 @@ class ECORE_API ETextureThumbnail :
 
     virtual void Draw(HDC hdc, const Irect& r);
     virtual void Draw(TMxPanel* panel) { inherited::Draw(panel); }
-
     virtual int MemoryUsage();
     LPCSTR FormatString();
     BOOL similar(ETextureThumbnail* thm1, xr_vector<AnsiString>& sel_params);
@@ -119,11 +116,11 @@ class ECORE_API EObjectThumbnail :
     friend class CImageManager;
     typedef EImageThumbnail inherited;
 
-  private:
+private:
     u32 face_count;
     u32 vertex_count;
 
-  public:
+public:
     EObjectThumbnail(LPCSTR src_name, bool bLoad = true);
     virtual ~EObjectThumbnail();
 
@@ -131,7 +128,6 @@ class ECORE_API EObjectThumbnail :
     void CreateFromData(u32* p, u32 w, u32 h, int fc, int vc);
     IC int _VertexCount() { return vertex_count; }
     IC int _FaceCount() { return face_count; }
-
     // thumbnail public routines
     virtual bool Load(LPCSTR src_name = 0, LPCSTR path = 0);
     virtual void Save(int age = 0, LPCSTR path = 0);
@@ -149,10 +145,10 @@ class ECORE_API EGroupThumbnail :
     friend class CImageManager;
     typedef EImageThumbnail inherited;
 
-  private:
+private:
     SStringVec objects;
 
-  public:
+public:
     EGroupThumbnail(LPCSTR src_name, bool bLoad = true);
     virtual ~EGroupThumbnail();
 
@@ -176,7 +172,7 @@ class ECORE_API ESoundThumbnail :
     friend class CSoundManager;
     typedef ECustomThumbnail inherited;
 
-  private:
+private:
     float m_fQuality;
     float m_fMinDist;
     float m_fMaxDist;
@@ -186,7 +182,7 @@ class ECORE_API ESoundThumbnail :
     bool OnMaxAIDistAfterEdit(PropValue* sender, float& edit_val);
     void OnMaxDistChange(PropValue* sender);
 
-  public:
+public:
     ESoundThumbnail(LPCSTR src_name, bool bLoad = true);
     virtual ~ESoundThumbnail();
 

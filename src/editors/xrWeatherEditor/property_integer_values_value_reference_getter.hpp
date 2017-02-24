@@ -16,19 +16,19 @@ public
 ref class property_integer_values_value_reference_getter : public property_integer_reference,
                                                            public property_integer_values_value_base
 {
-  public:
+public:
     typedef editor::property_holder property_holder;
     typedef property_holder::integer_getter_type integer_getter_type;
     typedef property_holder::integer_setter_type integer_setter_type;
     typedef property_holder::string_collection_getter_type string_collection_getter_type;
     typedef property_holder::string_collection_size_getter_type string_collection_size_getter_type;
 
-  private:
+private:
     typedef property_integer_reference inherited;
     typedef System::Object Object;
     typedef System::Collections::IList IList;
 
-  public:
+public:
     property_integer_values_value_reference_getter(int& value, string_collection_getter_type const& collection_getter,
         string_collection_size_getter_type const& collection_size_getter);
     virtual ~property_integer_values_value_reference_getter();
@@ -37,9 +37,9 @@ ref class property_integer_values_value_reference_getter : public property_integ
     virtual void SetValue(Object ^ object) override;
     virtual IList ^ collection();
 
-  public:
+public:
     string_collection_getter_type* m_collection_getter;
     string_collection_size_getter_type* m_collection_size_getter;
-};  // ref class property_integer_values_value_getter
+}; // ref class property_integer_values_value_getter
 
-#endif  // ifndef PROPERTY_INTEGER_VALUES_VALUE_REFERENCE_GETTER_HPP_INCLUDED
+#endif // ifndef PROPERTY_INTEGER_VALUES_VALUE_REFERENCE_GETTER_HPP_INCLUDED

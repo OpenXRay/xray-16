@@ -19,9 +19,11 @@ IC void CAI_Rat::vfChangeGoal()
 
 IC bool CAI_Rat::bfCheckIfGoalChanged(bool bForceChangeGoal)
 {
-    if (m_fGoalChangeTime <= 0) {
+    if (m_fGoalChangeTime <= 0)
+    {
         m_fGoalChangeTime += m_fGoalChangeDelta + m_fGoalChangeDelta * ::Random.randF(-0.5f, 0.5f);
-        if (bForceChangeGoal) vfChangeGoal();
+        if (bForceChangeGoal)
+            vfChangeGoal();
         return (true);
     }
     return (false);
@@ -46,12 +48,5 @@ IC void CAI_Rat::vfChooseNewSpeed()
     m_fSafeSpeed = m_fSpeed;
 };
 
-IC void CAI_Rat::vfUpdateTime(float fTimeDelta)
-{
-    m_fGoalChangeTime -= fTimeDelta > .1f ? .1f : fTimeDelta;
-};
-
-IC bool CAI_Rat::use_model_pitch() const
-{
-    return (!!g_Alive());
-}
+IC void CAI_Rat::vfUpdateTime(float fTimeDelta) { m_fGoalChangeTime -= fTimeDelta > .1f ? .1f : fTimeDelta; };
+IC bool CAI_Rat::use_model_pitch() const { return (!!g_Alive()); }

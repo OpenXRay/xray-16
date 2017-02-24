@@ -37,4 +37,4 @@
 
 // NB: no compilation flag to enable/disable stats since they're actually needed in the box/box overlap test
 
-#endif  //__OPC_SETTINGS_H__
+#endif //__OPC_SETTINGS_H__

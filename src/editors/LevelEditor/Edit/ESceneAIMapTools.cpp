@@ -24,21 +24,9 @@
 
 poolSS<SAINode, 1024> g_ainode_pool;
 
-void* SAINode::operator new(std::size_t size)
-{
-    return g_ainode_pool.create();
-}
-
-void* SAINode::operator new(std::size_t size, SAINode* src)
-{
-    return src;
-}
-
-void SAINode::operator delete(void* ptr)
-{
-    g_ainode_pool.destroy((SAINode*)ptr);
-}
-
+void* SAINode::operator new(std::size_t size) { return g_ainode_pool.create(); }
+void* SAINode::operator new(std::size_t size, SAINode* src) { return src; }
+void SAINode::operator delete(void* ptr) { g_ainode_pool.destroy((SAINode*)ptr); }
 void SAINode::PointLF(Fvector& D, float patch_size)
 {
     Fvector d;
@@ -83,11 +71,7 @@ void SAINode::PointBL(Fvector& D, float patch_size)
     Plane.intersectRayPoint(v, d, D);
 }
 
-void SAINode::LoadLTX(CInifile& ini, LPCSTR sect_name, ESceneAIMapTool* tools)
-{
-    R_ASSERT(0);
-}
-
+void SAINode::LoadLTX(CInifile& ini, LPCSTR sect_name, ESceneAIMapTool* tools) { R_ASSERT(0); }
 void SAINode::SaveLTX(CInifile& ini, LPCSTR sect_name, ESceneAIMapTool* tools)
 {
     R_ASSERT2(0, "dont use it !!!");
@@ -180,10 +164,7 @@ ESceneAIMapTool::ESceneAIMapTool() : ESceneToolBase(OBJCLASS_AIMAP)
 
 //----------------------------------------------------
 
-ESceneAIMapTool::~ESceneAIMapTool()
-{
-}
-
+ESceneAIMapTool::~ESceneAIMapTool() {}
 //----------------------------------------------------
 
 void ESceneAIMapTool::Clear(bool bOnlyNodes)
@@ -193,7 +174,8 @@ void ESceneAIMapTool::Clear(bool bOnlyNodes)
     for (AINodeIt it = m_Nodes.begin(); it != m_Nodes.end(); it++)
         xr_delete(*it);
     m_Nodes.clear_and_free();
-    if (!bOnlyNodes) {
+    if (!bOnlyNodes)
+    {
         m_SnapObjects.clear();
         m_AIBBox.invalidate();
         ExecCommand(COMMAND_REFRESH_SNAP_OBJECTS);
@@ -224,7 +206,8 @@ void ESceneAIMapTool::OnActivate()
 
 void ESceneAIMapTool::OnFrame()
 {
-    if (m_Flags.is(flUpdateHL)) {
+    if (m_Flags.is(flUpdateHL))
+    {
         m_Flags.set(flUpdateHL, FALSE);
         for (AINodeIt it = m_Nodes.begin(); it != m_Nodes.end(); it++)
             (*it)->flags.set(SAINode::flHLSelected, FALSE);
@@ -233,10 +216,12 @@ void ESceneAIMapTool::OnFrame()
             SAINode& N = **it;
             if (N.flags.is(SAINode::flSelected))
                 for (int k = 0; k < 4; k++)
-                    if (N.n[k]) N.n[k]->flags.set(SAINode::flHLSelected, TRUE);
+                    if (N.n[k])
+                        N.n[k]->flags.set(SAINode::flHLSelected, TRUE);
         }
     }
-    if (m_Flags.is(flUpdateSnapList)) RealUpdateSnapList();
+    if (m_Flags.is(flUpdateSnapList))
+        RealUpdateSnapList();
 }
 
 //----------------------------------------------------
@@ -336,7 +321,8 @@ bool ESceneAIMapTool::LoadStream(IReader& F)
     u16 version = 0;
 
     R_ASSERT(F.r_chunk(AIMAP_CHUNK_VERSION, &version));
-    if (version != AIMAP_VERSION) {
+    if (version != AIMAP_VERSION)
+    {
         ELog.DlgMsg(mtError, "AIMap: Unsupported version.");
         return false;
     }
@@ -359,19 +345,23 @@ bool ESceneAIMapTool::LoadStream(IReader& F)
     }
     DenumerateNodes();
 
-    if (F.find_chunk(AIMAP_CHUNK_INTERNAL_DATA)) {
+    if (F.find_chunk(AIMAP_CHUNK_INTERNAL_DATA))
+    {
         m_VisRadius = F.r_float();
         m_BrushSize = F.r_u32();
     }
-    if (F.find_chunk(AIMAP_CHUNK_INTERNAL_DATA2)) {
+    if (F.find_chunk(AIMAP_CHUNK_INTERNAL_DATA2))
+    {
         m_SmoothHeight = F.r_float();
     }
 
     // snap objects
-    if (F.find_chunk(AIMAP_CHUNK_SNAP_OBJECTS)) {
+    if (F.find_chunk(AIMAP_CHUNK_SNAP_OBJECTS))
+    {
         shared_str buf;
         int cnt = F.r_u32();
-        if (cnt) {
+        if (cnt)
+        {
             for (int i = 0; i < cnt; i++)
             {
                 F.r_stringZ(buf);
@@ -397,11 +387,7 @@ bool ESceneAIMapTool::LoadSelection(IReader& F)
     return LoadStream(F);
 }
 
-void ESceneAIMapTool::OnSynchronize()
-{
-    RealUpdateSnapList();
-}
-
+void ESceneAIMapTool::OnSynchronize() { RealUpdateSnapList(); }
 //----------------------------------------------------
 
 void ESceneAIMapTool::SaveStream(IWriter& F)
@@ -449,25 +435,15 @@ void ESceneAIMapTool::SaveStream(IWriter& F)
 
 //----------------------------------------------------
 
-void ESceneAIMapTool::SaveSelection(IWriter& F)
-{
-    SaveStream(F);
-}
-
-bool ESceneAIMapTool::Valid()
-{
-    return !m_Nodes.empty();
-}
-
-bool ESceneAIMapTool::IsNeedSave()
-{
-    return (!m_Nodes.empty() || !m_SnapObjects.empty());
-}
-
+void ESceneAIMapTool::SaveSelection(IWriter& F) { SaveStream(F); }
+bool ESceneAIMapTool::Valid() { return !m_Nodes.empty(); }
+bool ESceneAIMapTool::IsNeedSave() { return (!m_Nodes.empty() || !m_SnapObjects.empty()); }
 void ESceneAIMapTool::OnObjectRemove(CCustomObject* O, bool bDeleting)
 {
-    if (OBJCLASS_SCENEOBJECT == O->ClassID) {
-        if (find(m_SnapObjects.begin(), m_SnapObjects.end(), O) != m_SnapObjects.end()) {
+    if (OBJCLASS_SCENEOBJECT == O->ClassID)
+    {
+        if (find(m_SnapObjects.begin(), m_SnapObjects.end(), O) != m_SnapObjects.end())
+        {
             m_SnapObjects.remove(O);
             RealUpdateSnapList();
         }
@@ -477,11 +453,14 @@ void ESceneAIMapTool::OnObjectRemove(CCustomObject* O, bool bDeleting)
 int ESceneAIMapTool::AddNode(const Fvector& pos, bool bIgnoreConstraints, bool bAutoLink, int sz)
 {
     Fvector Pos = pos;
-    if (1 == sz) {
+    if (1 == sz)
+    {
         SAINode* N = BuildNode(Pos, Pos, bIgnoreConstraints, true);
-        if (N) {
+        if (N)
+        {
             N->flags.set(SAINode::flSelected, TRUE);
-            if (bAutoLink) UpdateLinks(N, bIgnoreConstraints);
+            if (bAutoLink)
+                UpdateLinks(N, bIgnoreConstraints);
             return 1;
         }
         else
@@ -501,7 +480,6 @@ struct invalid_node_pred : public std::unary_function<SAINode*, bool>
     int link;
 
     invalid_node_pred(int _link) : link(_link) { ; }
-
     bool operator()(const SAINode*& x) { return x->Links() == link; }
 };
 
@@ -538,10 +516,12 @@ struct delete_sel_node_pred : public std::unary_function<SAINode*, bool>
     {
         // breaking links
         for (int k = 0; k < 4; k++)
-            if (x->n[k] && x->n[k]->flags.is(SAINode::flSelected)) x->n[k] = 0;
+            if (x->n[k] && x->n[k]->flags.is(SAINode::flSelected))
+                x->n[k] = 0;
         // free memory
         bool res = x->flags.is(SAINode::flSelected);
-        if (res) xr_delete(x);
+        if (res)
+            xr_delete(x);
         return res;
     }
 };
@@ -552,7 +532,8 @@ void ESceneAIMapTool::RemoveSelection()
     {
     case estAIMapNode:
     {
-        if (m_Nodes.size() == (u32)SelectionCount(true)) {
+        if (m_Nodes.size() == (u32)SelectionCount(true))
+        {
             Clear(true);
         }
         else
@@ -600,7 +581,8 @@ int ESceneAIMapTool::SelectionCount(bool testflag)
     case estAIMapNode:
     {
         for (AINodeIt it = m_Nodes.begin(); it != m_Nodes.end(); it++)
-            if ((*it)->flags.is(SAINode::flSelected) == testflag) count++;
+            if ((*it)->flags.is(SAINode::flSelected) == testflag)
+                count++;
     }
     break;
     }
@@ -626,9 +608,11 @@ void ESceneAIMapTool::GetBBox(Fbox& bb, bool bSelOnly)
     {
     case estAIMapNode:
     {
-        if (bSelOnly) {
+        if (bSelOnly)
+        {
             for (AINodeIt it = m_Nodes.begin(); it != m_Nodes.end(); it++)
-                if ((*it)->flags.is(SAINode::flSelected)) {
+                if ((*it)->flags.is(SAINode::flSelected))
+                {
                     bb.modify(Fvector().add((*it)->Pos, -m_Params.fPatchSize * 0.5f));
                     bb.modify(Fvector().add((*it)->Pos, m_Params.fPatchSize * 0.5f));
                 }

@@ -18,8 +18,8 @@
 
 class XR_EPROPS_API TfrmItemDialog : public TForm
 {
-    __published :  // IDE-managed Components
-                   TExtBtn* eb0;
+    __published : // IDE-managed Components
+                  TExtBtn* eb0;
     TExtBtn* eb3;
     TMxLabel* lbMsg;
     TExtBtn* eb1;
@@ -35,11 +35,11 @@ class XR_EPROPS_API TfrmItemDialog : public TForm
     void __fastcall ebClick(TObject* Sender);
     void __fastcall FormClose(TObject* Sender, TCloseAction& Action);
 
-  private:  // User declarations
+private: // User declarations
     static TfrmItemDialog* form;
     static int res;
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TfrmItemDialog(TComponent* Owner);
     static int __fastcall Run(LPCSTR caption, LPCSTR msg, LPCSTR buttons);
 };

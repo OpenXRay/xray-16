@@ -65,9 +65,9 @@ CPhysicsShell* __stdcall P_build_Shell(
 
     pPhysicsShell->set_PhysicsRefObject(obj);
     pPhysicsShell->mXFORM.set(obj->ObjectXFORM());
-    pPhysicsShell->Activate(not_active_state, not_set_bone_callbacks);  //,
+    pPhysicsShell->Activate(not_active_state, not_set_bone_callbacks); //,
     // m_pPhysicsShell->SmoothElementsInertia(0.3f);
-    pPhysicsShell->SetAirResistance();  // 0.0014f,1.5f
+    pPhysicsShell->SetAirResistance(); // 0.0014f,1.5f
 
     return pPhysicsShell;
 }
@@ -86,7 +86,8 @@ void fix_bones(LPCSTR fixed_bones, CPhysicsShell* shell)
         u16 fixed_bone_id = pKinematics->LL_BoneID(fixed_bone);
         R_ASSERT2(BI_NONE != fixed_bone_id, "wrong fixed bone");
         CPhysicsElement* E = shell->get_Element(fixed_bone_id);
-        if (E) E->Fix();
+        if (E)
+            E->Fix();
     }
 }
 CPhysicsShell* P_build_Shell(
@@ -95,7 +96,8 @@ CPhysicsShell* P_build_Shell(
     CPhysicsShell* pPhysicsShell = 0;
     // IKinematics* pKinematics=smart_cast<IKinematics*>(obj->ObjectVisual());
     IKinematics* pKinematics = obj->ObjectKinematics();
-    if (fixed_bones) {
+    if (fixed_bones)
+    {
         int count = _GetItemCount(fixed_bones);
         for (int i = 0; i < count; ++i)
         {
@@ -114,7 +116,8 @@ CPhysicsShell* P_build_Shell(
         pPhysicsShell = P_build_Shell(obj, not_active_state);
 
     BONE_P_PAIR_IT i = p_bone_map->begin(), e = p_bone_map->end();
-    if (i != e) pPhysicsShell->SetPrefereExactIntegration();
+    if (i != e)
+        pPhysicsShell->SetPrefereExactIntegration();
     for (; i != e; i++)
     {
         CPhysicsElement* fixed_element = i->second.element;
@@ -128,7 +131,8 @@ CPhysicsShell* P_build_Shell(
 CPhysicsShell* P_build_Shell(IPhysicsShellHolder* obj, bool not_active_state, LPCSTR fixed_bones)
 {
     U16Vec f_bones;
-    if (fixed_bones) {
+    if (fixed_bones)
+    {
         // IKinematics* K		= smart_cast<IKinematics*>(obj->ObjectVisual());
         IKinematics* K = obj->ObjectKinematics();
         VERIFY(K);
@@ -156,12 +160,14 @@ CPhysicsShell* P_build_Shell(IPhysicsShellHolder* obj, bool not_active_state, U1
 
     // fix bones
     BONE_P_PAIR_IT i = bone_map.begin(), e = bone_map.end();
-    if (i != e) pPhysicsShell->SetPrefereExactIntegration();
+    if (i != e)
+        pPhysicsShell->SetPrefereExactIntegration();
     for (; i != e; i++)
     {
         CPhysicsElement* fixed_element = i->second.element;
         // R_ASSERT2(fixed_element,"fixed bone has no physics");
-        if (!fixed_element) continue;
+        if (!fixed_element)
+            continue;
         fixed_element->Fix();
     }
     return pPhysicsShell;
@@ -186,56 +192,62 @@ CPhysicsShell* P_build_SimpleShell(IPhysicsShellHolder* obj, float mass, bool no
     pPhysicsShell->add_Element(E);
     pPhysicsShell->setMass(mass);
     pPhysicsShell->set_PhysicsRefObject(obj);
-    if (!obj->has_parent_object()) pPhysicsShell->Activate(obj->ObjectXFORM(), 0, obj->ObjectXFORM(), not_active_state);
+    if (!obj->has_parent_object())
+        pPhysicsShell->Activate(obj->ObjectXFORM(), 0, obj->ObjectXFORM(), not_active_state);
     return pPhysicsShell;
 }
 
 void ApplySpawnIniToPhysicShell(CInifile const* ini, CPhysicsShell* physics_shell, bool fixed)
 {
-    if (!ini) return;
-    if (ini->section_exist("physics_common")) {
+    if (!ini)
+        return;
+    if (ini->section_exist("physics_common"))
+    {
         fixed = fixed || (ini->line_exist("physics_common", "fixed_bones"));
 #pragma todo("not ignore static if non realy fixed! ")
         fix_bones(ini->r_string("physics_common", "fixed_bones"), physics_shell);
     }
-    if (ini->section_exist("collide")) {
+    if (ini->section_exist("collide"))
+    {
         if ((ini->line_exist("collide", "ignore_static") && fixed) ||
             (ini->line_exist("collide", "ignore_static") && ini->section_exist("animated_object")))
         {
             physics_shell->SetIgnoreStatic();
         }
-        if (ini->line_exist("collide", "small_object")) {
+        if (ini->line_exist("collide", "small_object"))
+        {
             physics_shell->SetSmall();
         }
-        if (ini->line_exist("collide", "ignore_small_objects")) {
+        if (ini->line_exist("collide", "ignore_small_objects"))
+        {
             physics_shell->SetIgnoreSmall();
         }
-        if (ini->line_exist("collide", "ignore_ragdoll")) {
+        if (ini->line_exist("collide", "ignore_ragdoll"))
+        {
             physics_shell->SetIgnoreRagDoll();
         }
 
         // If need, then show here that it is needed to ignore collisions with "animated_object"
-        if (ini->line_exist("collide", "ignore_animated_objects")) {
+        if (ini->line_exist("collide", "ignore_animated_objects"))
+        {
             physics_shell->SetIgnoreAnimated();
         }
     }
     // If next section is available then given "PhysicShell" is classified
     // as animated and we read options for his animation
 
-    if (ini->section_exist("animated_object")) {
+    if (ini->section_exist("animated_object"))
+    {
         // Show that given "PhysicShell" animated
         physics_shell->CreateShellAnimator(ini, "animated_object");
     }
 }
 
-void get_box(const CPhysicsBase* shell, const Fmatrix& form, Fvector& sz, Fvector& c)
-{
-    t_get_box(shell, form, sz, c);
-}
-
+void get_box(const CPhysicsBase* shell, const Fmatrix& form, Fvector& sz, Fvector& c) { t_get_box(shell, form, sz, c); }
 void __stdcall destroy_physics_shell(CPhysicsShell*& p)
 {
-    if (p) p->Deactivate();
+    if (p)
+        p->Deactivate();
     xr_delete(p);
 }
 
@@ -255,7 +267,8 @@ bool has_physics_collision_shapes(IKinematics& K)
 {
     u16 nbb = K.LL_BoneCount();
     for (u16 i = 0; i < nbb; ++i)
-        if (bone_has_pysics(K, i)) return true;
+        if (bone_has_pysics(K, i))
+            return true;
     return false;
 }
 
@@ -299,25 +312,28 @@ bool __stdcall can_create_phys_shell(string1024& reason, IPhysicsShellHolder& O)
     xr_strcpy(reason, "ok");
     bool result = true;
     IKinematics* K = O.ObjectKinematics();
-    if (!K) {
-        xr_strcpy(reason,
-            make_string("Can not create physics shell for object %s, model %s is not skeleton", O.ObjectName(),
-                O.ObjectNameVisual())
-                .c_str());
+    if (!K)
+    {
+        xr_strcpy(reason, make_string("Can not create physics shell for object %s, model %s is not skeleton",
+                              O.ObjectName(), O.ObjectNameVisual())
+                              .c_str());
         return false;
     }
-    if (!has_physics_collision_shapes(*K)) {
+    if (!has_physics_collision_shapes(*K))
+    {
         xr_strcpy(reason,
             make_string("Can not create physics shell for object %s, model %s has no physics collision shapes set",
                 O.ObjectName(), O.ObjectNameVisual())
                 .c_str());
         return false;
     }
-    if (!_valid(O.ObjectXFORM())) {
+    if (!_valid(O.ObjectXFORM()))
+    {
         xr_strcpy(reason, make_string("create physics shell: object matrix is not valid").c_str());
         return false;
     }
-    if (!valid_pos(O.ObjectXFORM().c)) {
+    if (!valid_pos(O.ObjectXFORM().c))
+    {
 #ifdef DEBUG
         xr_strcpy(reason, dbg_valide_pos_string(O.ObjectXFORM().c, &O, "create physics shell").c_str());
 #else
@@ -328,7 +344,7 @@ bool __stdcall can_create_phys_shell(string1024& reason, IPhysicsShellHolder& O)
     return result;
 }
 
-float NonElasticCollisionEnergy(CPhysicsElement* e1, CPhysicsElement* e2, const Fvector& norm)  // norm - from 2 to 1
+float NonElasticCollisionEnergy(CPhysicsElement* e1, CPhysicsElement* e2, const Fvector& norm) // norm - from 2 to 1
 {
     VERIFY(e1);
     VERIFY(e2);
@@ -343,7 +359,8 @@ void StaticEnvironmentCB(bool& do_colide, bool bo1, dContact& c, SGameMtl* mater
 {
     dJointID contact_joint = dJointCreateContact(0, ContactGroup, &c);
 
-    if (bo1) {
+    if (bo1)
+    {
         ((CPHIsland*)(retrieveGeomUserData(c.geom.g1)->callback_data))->DActiveIsland()->ConnectJoint(contact_joint);
         dJointAttach(contact_joint, dGeomGetBody(c.geom.g1), 0);
     }

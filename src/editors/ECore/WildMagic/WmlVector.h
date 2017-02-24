@@ -18,7 +18,7 @@ namespace Wml
 template <int N, class Real>
 class Vector
 {
-  public:
+public:
     // construction
     Vector();
     Vector(const Real* afTuple);
@@ -60,7 +60,7 @@ class Vector
     Real Dot(const Vector& rkV) const;
     Real Normalize();
 
-  protected:
+protected:
     // support for comparisons
     int CompareArrays(const Vector& rkV) const;
 

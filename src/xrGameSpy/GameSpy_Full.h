@@ -27,7 +27,6 @@ public:
     CGameSpy_GP* GetGameSpyGP() const { return m_pGS_GP; };
     CGameSpy_SAKE* GetGameSpySAKE() const { return m_pGS_SAKE; };
     CGameSpy_ATLAS* GetGameSpyATLAS() const { return m_pGS_ATLAS; };
-
     GSUpdateStatus Update();
     void CoreThink(u32 millisecondsTimeout);
 

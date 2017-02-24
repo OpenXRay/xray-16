@@ -22,15 +22,8 @@ void _TCF::barycentric(Fvector2& P, float& u, float& v, float& w)
     w = 1.0f - u - v;
 }
 //	Fvector2			uv	[3];
-void _TCF::read(INetReader& r)
-{
-    r.r(uv, sizeof(uv));
-}
-void _TCF::write(IWriter& w) const
-{
-    w.w(uv, sizeof(uv));
-}
-
+void _TCF::read(INetReader& r) { r.r(uv, sizeof(uv)); }
+void _TCF::write(IWriter& w) const { w.w(uv, sizeof(uv)); }
 bool _TCF::similar(const _TCF& _tc, float eps /*= EPS*/) const
 {
     return uv[0].similar(_tc.uv[0], eps) && uv[1].similar(_tc.uv[1], eps) && uv[2].similar(_tc.uv[2], eps);

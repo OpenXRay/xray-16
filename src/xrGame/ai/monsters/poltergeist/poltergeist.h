@@ -62,7 +62,6 @@ public:
 
     void set_actor_ignore(bool const actor_ignore) { m_actor_ignore = actor_ignore; }
     bool get_actor_ignore() const { return m_actor_ignore; }
-
     virtual void Die(IGameObject* who);
 
     virtual CMovementManager* create_movement_manager();
@@ -73,17 +72,13 @@ public:
     virtual void on_deactivate();
     virtual void Hit(SHit* pHDS);
     virtual char* get_monster_class_name() { return "poltergeist"; }
-
     bool detected_enemy();
     float get_fly_around_distance() const { return m_fly_around_distance; }
     float get_fly_around_change_direction_time() const { return m_fly_around_change_direction_time; }
-
     virtual void renderable_Render();
 
     IC CPolterSpecialAbility* ability() { return (m_flame ? m_flame : m_tele); }
-
     IC bool is_hidden() { return state_invisible; }
-
     // Poltergeist ability
     void PhysicalImpulse(const Fvector& position);
     void StrangeSounds(const Fvector& position);
@@ -91,7 +86,7 @@ public:
     ref_sound m_strange_sound;
 
     // Movement
-    Fvector m_current_position;  // Позиция на ноде
+    Fvector m_current_position; // Позиция на ноде
 
     // Dynamic Height
     u32 time_height_updated;
@@ -103,10 +98,8 @@ public:
 
     void EnableHide() { m_disable_hide = false; }
     void DisableHide() { m_disable_hide = true; }
-
 public:
     virtual bool run_home_point_when_enemy_inaccessible() const { return false; }
-
 private:
     void Hide();
     void Show();
@@ -195,7 +188,7 @@ class CPolterFlame : public CPolterSpecialAbility
     u32 m_hit_delay;
 
     u32 m_count;
-    u32 m_delay;  // between 2 flames
+    u32 m_delay; // between 2 flames
 
     u32 m_time_flame_started;
 

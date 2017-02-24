@@ -53,13 +53,15 @@ u32 VCPacked::add_vert(const Fvector& V)
     {
         U32Vec& vl = get_element(ix, iy, iz);
         for (U32It it = vl.begin(); it != vl.end(); it++)
-            if (verts[*it].similar(V, eps)) {
+            if (verts[*it].similar(V, eps))
+            {
                 P = *it;
                 verts[*it].refs++;
                 break;
             }
     }
-    if (0xffffffff == P) {
+    if (0xffffffff == P)
+    {
         P = verts.size();
         verts.push_back(GCVertex(V));
 
@@ -75,13 +77,20 @@ u32 VCPacked::add_vert(const Fvector& V)
         clamp(iyE, (u32)0, clpY);
         clamp(izE, (u32)0, clpZ);
 
-        if (ixE != ix) get_element(ixE, iy, iz).push_back(P);
-        if (iyE != iy) get_element(ix, iyE, iz).push_back(P);
-        if (izE != iz) get_element(ix, iy, izE).push_back(P);
-        if ((ixE != ix) && (iyE != iy)) get_element(ixE, iyE, iz).push_back(P);
-        if ((ixE != ix) && (izE != iz)) get_element(ixE, iy, izE).push_back(P);
-        if ((iyE != iy) && (izE != iz)) get_element(ix, iyE, izE).push_back(P);
-        if ((ixE != ix) && (iyE != iy) && (izE != iz)) get_element(ixE, iyE, izE).push_back(P);
+        if (ixE != ix)
+            get_element(ixE, iy, iz).push_back(P);
+        if (iyE != iy)
+            get_element(ix, iyE, iz).push_back(P);
+        if (izE != iz)
+            get_element(ix, iy, izE).push_back(P);
+        if ((ixE != ix) && (iyE != iy))
+            get_element(ixE, iyE, iz).push_back(P);
+        if ((ixE != ix) && (izE != iz))
+            get_element(ixE, iy, izE).push_back(P);
+        if ((iyE != iy) && (izE != iz))
+            get_element(ix, iyE, izE).push_back(P);
+        if ((ixE != ix) && (iyE != iy) && (izE != iz))
+            get_element(ixE, iyE, izE).push_back(P);
     }
     return P;
 }
@@ -121,21 +130,25 @@ void GCPacked::calc_adjacency(U32Vec& dest)
     {
         for (u32 t = 0; t < faces.size(); t++)
         {
-            if (t == f) continue;
+            if (t == f)
+                continue;
 
             for (u32 f_e = 0; f_e < 3; f_e++)
             {
                 u32 f1 = faces[f].verts[(f_e + 0) % 3];
                 u32 f2 = faces[f].verts[(f_e + 1) % 3];
-                if (f1 > f2) std::swap(f1, f2);
+                if (f1 > f2)
+                    std::swap(f1, f2);
 
                 for (u32 t_e = 0; t_e < 3; t_e++)
                 {
                     u32 t1 = faces[t].verts[(t_e + 0) % 3];
                     u32 t2 = faces[t].verts[(t_e + 1) % 3];
-                    if (t1 > t2) std::swap(t1, t2);
+                    if (t1 > t2)
+                        std::swap(t1, t2);
 
-                    if (f1 == t1 && f2 == t2) {
+                    if (f1 == t1 && f2 == t2)
+                    {
                         // f.edge[f_e] linked to t.edge[t_e]
                         dest[f * 3 + f_e] = t;
                         break;

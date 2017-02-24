@@ -14,16 +14,8 @@
 
 using namespace luabind;
 
-CALifeMonsterDetailPathManager* get_detail(const CALifeMonsterMovementManager* self)
-{
-    return (&self->detail());
-}
-
-CALifeMonsterPatrolPathManager* get_patrol(const CALifeMonsterMovementManager* self)
-{
-    return (&self->patrol());
-}
-
+CALifeMonsterDetailPathManager* get_detail(const CALifeMonsterMovementManager* self) { return (&self->detail()); }
+CALifeMonsterPatrolPathManager* get_patrol(const CALifeMonsterMovementManager* self) { return (&self->patrol()); }
 SCRIPT_EXPORT(CALifeMonsterMovementManager, (), {
     module(luaState)[class_<CALifeMonsterMovementManager>("CALifeMonsterMovementManager")
                          .def("detail", &get_detail)

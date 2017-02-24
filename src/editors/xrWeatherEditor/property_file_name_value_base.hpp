@@ -16,6 +16,6 @@ interface class property_file_name_value_base : public XRay::SdkControls::IPrope
     virtual System::String ^ initial_directory() = 0;
     virtual System::String ^ title() = 0;
     virtual bool remove_extension() = 0;
-};  // interface class property_file_name_value_base
+}; // interface class property_file_name_value_base
 
-#endif  // ifndef PROPERTY_FILE_NAME_VALUE_BASE_HPP_INCLUDED
+#endif // ifndef PROPERTY_FILE_NAME_VALUE_BASE_HPP_INCLUDED

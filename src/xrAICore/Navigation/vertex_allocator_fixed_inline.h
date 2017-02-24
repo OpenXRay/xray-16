@@ -8,35 +8,20 @@
 
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
-    template <u32 ReserveSize>                                                                                         \
+#define TEMPLATE_SPECIALIZATION \
+    template <u32 ReserveSize>  \
     template <typename TCompoundVertex>
 
 #define CFixedVertexAllocator CVertexAllocatorFixed<ReserveSize>::CDataStorage<TCompoundVertex>
 
 TEMPLATE_SPECIALIZATION
-inline CFixedVertexAllocator::CDataStorage()
-{
-    m_vertices.resize(ReserveSize);
-}
-
+inline CFixedVertexAllocator::CDataStorage() { m_vertices.resize(ReserveSize); }
 TEMPLATE_SPECIALIZATION
-inline CFixedVertexAllocator::~CDataStorage()
-{
-}
-
+inline CFixedVertexAllocator::~CDataStorage() {}
 TEMPLATE_SPECIALIZATION
-inline void CFixedVertexAllocator::init()
-{
-    m_vertex_count = 0;
-}
-
+inline void CFixedVertexAllocator::init() { m_vertex_count = 0; }
 TEMPLATE_SPECIALIZATION
-inline u32 CFixedVertexAllocator::get_visited_node_count() const
-{
-    return m_vertex_count;
-}
-
+inline u32 CFixedVertexAllocator::get_visited_node_count() const { return m_vertex_count; }
 TEMPLATE_SPECIALIZATION
 inline typename CFixedVertexAllocator::Vertex& CFixedVertexAllocator::create_vertex()
 {

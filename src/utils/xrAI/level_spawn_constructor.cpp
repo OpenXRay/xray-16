@@ -38,11 +38,7 @@ CLevelSpawnConstructor::~CLevelSpawnConstructor()
     VERIFY(!m_graph_engine);
 }
 
-IC const CGameGraph& CLevelSpawnConstructor::game_graph() const
-{
-    return (m_game_spawn_constructor->game_graph());
-}
-
+IC const CGameGraph& CLevelSpawnConstructor::game_graph() const { return (m_game_spawn_constructor->game_graph()); }
 IC CLevelSpawnConstructor::LEVEL_CHANGER_STORAGE& CLevelSpawnConstructor::level_changers() const
 {
     return (m_game_spawn_constructor->level_changers());
@@ -53,21 +49,9 @@ IC u32 CLevelSpawnConstructor::level_id(shared_str level_name) const
     return (m_game_spawn_constructor->level_id(*level_name));
 }
 
-IC const CLevelGraph& CLevelSpawnConstructor::level_graph() const
-{
-    return (*m_level_graph);
-}
-
-IC const CGameLevelCrossTable& CLevelSpawnConstructor::cross_table() const
-{
-    return (*m_cross_table);
-}
-
-IC CGraphEngine& CLevelSpawnConstructor::graph_engine() const
-{
-    return (*m_graph_engine);
-}
-
+IC const CLevelGraph& CLevelSpawnConstructor::level_graph() const { return (*m_level_graph); }
+IC const CGameLevelCrossTable& CLevelSpawnConstructor::cross_table() const { return (*m_cross_table); }
+IC CGraphEngine& CLevelSpawnConstructor::graph_engine() const { return (*m_graph_engine); }
 void CLevelSpawnConstructor::init()
 {
     // loading level graph
@@ -83,7 +67,8 @@ void CLevelSpawnConstructor::init()
     // loading patrol paths
     FS.update_path(file_name, "$game_levels$", *m_level.name());
     xr_strcat(file_name, "\\level.game");
-    if (FS.exist(file_name)) {
+    if (FS.exist(file_name))
+    {
         IReader* stream = FS.r_open(file_name);
         VERIFY(stream);
         m_game_spawn_constructor->patrol_path_storage().load_raw(
@@ -105,7 +90,8 @@ CSE_Abstract* CLevelSpawnConstructor::create_object(IReader* chunk)
     string64 section_name;
     net_packet.r_stringZ(section_name);
     CSE_Abstract* abstract = F_entity_Create(section_name);
-    if (!abstract) {
+    if (!abstract)
+    {
         string256 temp;
         xr_sprintf(temp, "Can't create entity '%s' !\n", section_name);
         R_ASSERT2(abstract, temp);
@@ -139,11 +125,14 @@ void CLevelSpawnConstructor::add_story_object(CSE_ALifeDynamicObject* dynamic_ob
 void CLevelSpawnConstructor::add_space_restrictor(CSE_ALifeDynamicObject* dynamic_object)
 {
     CSE_ALifeSpaceRestrictor* space_restrictor = smart_cast<CSE_ALifeSpaceRestrictor*>(dynamic_object);
-    if (!space_restrictor) return;
+    if (!space_restrictor)
+        return;
 
-    if (space_restrictor->m_space_restrictor_type == RestrictionSpace::eRestrictorTypeNone) return;
+    if (space_restrictor->m_space_restrictor_type == RestrictionSpace::eRestrictorTypeNone)
+        return;
 
-    if (!space_restrictor->m_flags.test(CSE_ALifeObject::flCheckForSeparator)) return;
+    if (!space_restrictor->m_flags.test(CSE_ALifeObject::flCheckForSeparator))
+        return;
 
     m_space_restrictors.push_back(new CSpaceRestrictorWrapper(space_restrictor));
 }
@@ -156,12 +145,9 @@ void CLevelSpawnConstructor::add_level_changer(CSE_Abstract* abstract)
     m_level_changers.push_back(level_changer);
 }
 
-void CLevelSpawnConstructor::add_free_object(CSE_Abstract* abstract)
-{
-    m_game_spawn_constructor->add_object(abstract);
-}
-
-// void CLevelSpawnConstructor::add_group_object					(CSE_Abstract			*abstract, shared_str group_section,
+void CLevelSpawnConstructor::add_free_object(CSE_Abstract* abstract) { m_game_spawn_constructor->add_object(abstract); }
+// void CLevelSpawnConstructor::add_group_object					(CSE_Abstract			*abstract, shared_str
+// group_section,
 // bool)
 //{
 //	SPAWN_GRPOUP_OBJECTS::iterator	I = m_spawn_objects.find(group_section);
@@ -195,7 +181,8 @@ void CLevelSpawnConstructor::load_objects()
     for (; chunk; chunk = level_spawn->open_chunk_iterator(id, chunk))
     {
         CSE_Abstract* abstract = create_object(chunk);
-        if (abstract->m_tClassID == CLSID_AI_GRAPH) {
+        if (abstract->m_tClassID == CLSID_AI_GRAPH)
+        {
             add_graph_point(abstract);
             continue;
         }
@@ -205,19 +192,22 @@ void CLevelSpawnConstructor::load_objects()
         //			continue;
         //		}
 
-        if (!abstract->m_gameType.MatchType(eGameIDSingle)) {
+        if (!abstract->m_gameType.MatchType(eGameIDSingle))
+        {
             F_entity_Destroy(abstract);
             continue;
         }
 
         CSE_ALifeObject* alife_object = smart_cast<CSE_ALifeObject*>(abstract);
-        if (!alife_object) {
+        if (!alife_object)
+        {
             F_entity_Destroy(abstract);
             continue;
         }
 
         CSE_ALifeCreatureActor* actor = smart_cast<CSE_ALifeCreatureActor*>(alife_object);
-        if (actor) {
+        if (actor)
+        {
             R_ASSERT3(!m_actor, "Too many actors on the level ", *m_level.name());
             m_actor = actor;
         }
@@ -225,12 +215,14 @@ void CLevelSpawnConstructor::load_objects()
         m_spawns.push_back(alife_object);
 
         CSE_ALifeDynamicObject* dynamic_object = smart_cast<CSE_ALifeDynamicObject*>(alife_object);
-        if (dynamic_object) {
+        if (dynamic_object)
+        {
             add_story_object(dynamic_object);
             add_space_restrictor(dynamic_object);
         }
 
-        if (smart_cast<CSE_ALifeLevelChanger*>(abstract)) add_level_changer(abstract);
+        if (smart_cast<CSE_ALifeLevelChanger*>(abstract))
+            add_level_changer(abstract);
 
         //		if (xr_strlen(alife_object->m_spawn_control))
         //			add_group_object	(alife_object,alife_object->m_spawn_control);
@@ -275,7 +267,7 @@ void CLevelSpawnConstructor::load_objects()
 //		if (J == m_spawn_groups.end())
 //			clMsg								("! ERROR (spawn group not found!) : %s",*(*I).first);
 //		R_ASSERT3								(J != m_spawn_groups.end(),"Specified group control not
-//found!",(*(*I).second)[0]->name_replace());
+// found!",(*(*I).second)[0]->name_replace());
 //
 //		GROUP_OBJECTS::iterator					i = (*I).second->begin();
 //		GROUP_OBJECTS::iterator					e = (*I).second->end();
@@ -295,23 +287,29 @@ void CLevelSpawnConstructor::correct_objects()
     u32 m_level_graph_vertex_id = u32(-1);
     u32 dwStart = game_graph().header().vertex_count(), dwFinish = game_graph().header().vertex_count(), dwCount = 0;
     for (u32 i = 0; i < game_graph().header().vertex_count(); ++i)
-        if (game_graph().vertex(i)->level_id() == m_level.id()) {
-            if (m_level_graph_vertex_id == u32(-1)) m_level_graph_vertex_id = i;
+        if (game_graph().vertex(i)->level_id() == m_level.id())
+        {
+            if (m_level_graph_vertex_id == u32(-1))
+                m_level_graph_vertex_id = i;
             dwCount++;
         }
 
     for (int i = 0; i < (int)game_graph().header().vertex_count(); i++)
-        if (game_graph().vertex(i)->level_id() == m_level.id()) {
-            if (dwStart > (u32)i) dwStart = (u32)i;
+        if (game_graph().vertex(i)->level_id() == m_level.id())
+        {
+            if (dwStart > (u32)i)
+                dwStart = (u32)i;
         }
         else
         {
-            if ((dwStart <= (u32)i) && (dwFinish > (u32)i)) {
+            if ((dwStart <= (u32)i) && (dwFinish > (u32)i))
+            {
                 dwFinish = i;
                 break;
             }
         }
-    if (dwStart >= dwFinish) {
+    if (dwStart >= dwFinish)
+    {
         string4096 S;
         xr_sprintf(S, "There are no graph vertices in the game graph for the level '%s' !\n", *m_level.name());
         R_ASSERT2(dwStart < dwFinish, S);
@@ -319,7 +317,8 @@ void CLevelSpawnConstructor::correct_objects()
 
     for (int i = 0; i < (int)m_spawns.size(); i++)
     {
-        if (!m_spawns[i]->used_ai_locations()) {
+        if (!m_spawns[i]->used_ai_locations())
+        {
             m_spawns[i]->m_tGraphID = (GameGraph::_GRAPH_ID)m_level_graph_vertex_id;
             m_spawns[i]->m_fDistance = 0.f;
             m_spawns[i]->m_tNodeID = game_graph().vertex(m_level_graph_vertex_id)->level_vertex_id();
@@ -338,7 +337,8 @@ void CLevelSpawnConstructor::correct_objects()
             m_spawns[i]->o_Position = new_position;
         }
         u32 dwBest = cross_table().vertex(m_spawns[i]->m_tNodeID).game_vertex_id();
-        if (game_graph().vertex(dwBest)->level_id() != m_level.id()) {
+        if (game_graph().vertex(dwBest)->level_id() != m_level.id())
+        {
             string4096 S1;
             char* S = S1;
             S += xr_sprintf(S, sizeof(S1) - (S1 - &S[0]),
@@ -355,7 +355,8 @@ void CLevelSpawnConstructor::correct_objects()
         }
 
         float fCurrentBestDistance = cross_table().vertex(m_spawns[i]->m_tNodeID).distance();
-        if (dwBest == u32(-1)) {
+        if (dwBest == u32(-1))
+        {
             string4096 S1;
             char* S = S1;
             S += xr_sprintf(S, sizeof(S1) - (S1 - &S[0]),
@@ -434,7 +435,8 @@ public:
     IC bool operator()(CSE_ALifeObject* object) const
     {
         SPAWN_STORAGE::const_iterator I = std::find(m_zones->begin(), m_zones->end(), object);
-        if (I == m_zones->end()) return (false);
+        if (I == m_zones->end())
+            return (false);
 
         VERIFY(!object->m_spawn_control);
         VERIFY(object->m_story_id == INVALID_STORY_ID);
@@ -460,7 +462,8 @@ void CLevelSpawnConstructor::generate_artefact_spawn_positions()
     for (; I != E; I++)
     {
         CSE_ALifeAnomalousZone* zone = smart_cast<CSE_ALifeAnomalousZone*>(*I);
-        if (!zone) continue;
+        if (!zone)
+            continue;
 
         //		if (!level_graph().valid_vertex_position(zone->o_Position)) {
         //			zone->m_artefact_spawn_count	= 0;
@@ -510,7 +513,7 @@ void CLevelSpawnConstructor::generate_artefact_spawn_positions()
         m_level_points.resize(zone->m_artefact_position_offset + zone->m_artefact_spawn_count);
 
         //		Msg								("%s  %f [%f][%f][%f] : artefact spawn
-        //positions",zone->name_replace(),zone->m_fRadius,VPUSH(zone->o_Position));
+        // positions",zone->name_replace(),zone->m_fRadius,VPUSH(zone->o_Position));
 
         LEVEL_POINT_STORAGE::iterator I = m_level_points.begin() + zone->m_artefact_position_offset;
         LEVEL_POINT_STORAGE::iterator E = m_level_points.end();
@@ -537,13 +540,15 @@ void CLevelSpawnConstructor::fill_level_changers()
 {
     for (u32 i = 0, n = (u32)level_changers().size(); i < n; ++i)
     {
-        if (level_id(level_changers()[i]->m_caLevelToChange) != m_level.id()) continue;
+        if (level_id(level_changers()[i]->m_caLevelToChange) != m_level.id())
+            continue;
 
         bool found = false;
         GRAPH_POINT_STORAGE::const_iterator I = m_graph_points.begin();
         GRAPH_POINT_STORAGE::const_iterator E = m_graph_points.end();
         for (; I != E; ++I)
-            if (!xr_strcmp(*level_changers()[i]->m_caLevelPointToChange, (*I)->name_replace())) {
+            if (!xr_strcmp(*level_changers()[i]->m_caLevelPointToChange, (*I)->name_replace()))
+            {
                 bool ok = false;
                 for (u32 ii = 0, nn = game_graph().header().vertex_count(); ii < nn; ++ii)
                 {
@@ -558,8 +563,10 @@ void CLevelSpawnConstructor::fill_level_changers()
                     break;
                 }
 
-                R_ASSERT3(ok, "Cannot find a correspndance between graph and graph points from level editor! Rebuild "
-                              "graph for the level ",
+                R_ASSERT3(ok,
+                    "Cannot find a correspndance between graph and graph points from level editor! Rebuild graph for "
+                    "the "
+                    "level ",
                     *level_changers()[i]->m_caLevelToChange);
 
                 level_changers().erase(level_changers().begin() + i);
@@ -569,7 +576,8 @@ void CLevelSpawnConstructor::fill_level_changers()
                 break;
             }
 
-        if (!found) {
+        if (!found)
+        {
             Logger.clMsg("Graph point %s not found (level changer %s)", *level_changers()[i]->m_caLevelPointToChange,
                 level_changers()[i]->name_replace());
             VERIFY(false);
@@ -586,17 +594,19 @@ void CLevelSpawnConstructor::update_artefact_spawn_positions()
     {
         CSE_Abstract* abstract = *I;
         CSE_ALifeObject* alife_object = smart_cast<CSE_ALifeObject*>(abstract);
-        //		R_ASSERT3						(level_graph().valid_vertex_id(alife_object->m_tNodeID),"Invalid node for object
+        //		R_ASSERT3						(level_graph().valid_vertex_id(alife_object->m_tNodeID),"Invalid node for
+        //object
         //",alife_object->name_replace());
         R_ASSERT2(alife_object, "Non-ALife object!");
         VERIFY(game_graph().vertex(alife_object->m_tGraphID)->level_id() == m_level.id());
         //		alife_object->m_spawn_control	= "";
         CSE_ALifeAnomalousZone* zone = smart_cast<CSE_ALifeAnomalousZone*>(abstract);
-        if (zone) {
+        if (zone)
+        {
             zone->m_artefact_position_offset = level_point_count;
             level_point_count += zone->m_artefact_spawn_count;
             //			Msg							("%s  %f [%f][%f][%f] : artefact spawn
-            //positions",zone->name_replace(),zone->m_fRadius,VPUSH(zone->o_Position));
+            // positions",zone->name_replace(),zone->m_fRadius,VPUSH(zone->o_Position));
             //			for (u32 i=zone->m_artefact_position_offset; i<level_point_count; ++i)
             //				Msg						("    [%f][%f][%f] :
             //%f",VPUSH(m_level_points[i].tPoint),zone->o_Position.distance_to(m_level_points[i].tPoint));
@@ -638,12 +648,14 @@ void CLevelSpawnConstructor::verify_space_restrictors()
     {
         VERIFY(*I);
 
-        if ((*I)->object().m_space_restrictor_type == RestrictionSpace::eRestrictorTypeNone) continue;
+        if ((*I)->object().m_space_restrictor_type == RestrictionSpace::eRestrictorTypeNone)
+            continue;
 
         (*I)->verify(*m_level_graph, *m_graph_engine, m_no_separator_check);
     }
 
     delete_data(m_space_restrictors);
 
-    if (m_no_separator_check) Msg("Level [%s] : no separators found", *m_level.name());
+    if (m_no_separator_check)
+        Msg("Level [%s] : no separators found", *m_level.name());
 }

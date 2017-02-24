@@ -38,9 +38,11 @@
 
 void CActorMP::fill_state(actor_mp_state& state)
 {
-    if (OnClient()) {
+    if (OnClient())
+    {
         // R_ASSERT						(g_Alive());
-        // R_ASSERT2						(PHGetSyncItemsNumber() == 1,make_string("PHGetSyncItemsNumber() returned %d, health =
+        // R_ASSERT2						(PHGetSyncItemsNumber() == 1,make_string("PHGetSyncItemsNumber() returned %d, health
+        // =
         // %.2f",PHGetSyncItemsNumber(),GetfHealth()));
     }
 
@@ -62,7 +64,7 @@ void CActorMP::fill_state(actor_mp_state& state)
 //		Msg							("camera_pitch : [%f]",angle_normalize(unaffected_r_torso.pitch));
 //		Msg							("camera_roll  : [%f]",angle_normalize(unaffected_r_torso.roll));
 //	}
-#endif  // 0
+#endif // 0
 
     state.physics_quaternion = State.quaternion;
     state.physics_angular_velocity = State.angular_vel;
@@ -86,7 +88,8 @@ void CActorMP::fill_state(actor_mp_state& state)
     state.body_state_flags = mstate_real & 0x0000ffff;
     state.health = GetfHealth();
     // because after packing to 1 byte, this value can be positive...
-    if (state.health < EPS) state.health = 0;
+    if (state.health < EPS)
+        state.health = 0;
 
     state.radiation = g_Radiation() / 100.0f;
     state.physics_state_enabled = State.enabled ? 1 : 0;
@@ -94,7 +97,8 @@ void CActorMP::fill_state(actor_mp_state& state)
 
 BOOL CActorMP::net_Relevant()
 {
-    if (OnClient()) {
+    if (OnClient())
+    {
         /*
         if (!g_Alive())
             return						(false);
@@ -103,7 +107,8 @@ BOOL CActorMP::net_Relevant()
             return						(false);*/
     }
 
-    if (character_physics_support()->IsRemoved()) return (false);
+    if (character_physics_support()->IsRemoved())
+        return (false);
 
     actor_mp_state state;
     fill_state(state);
@@ -112,7 +117,8 @@ BOOL CActorMP::net_Relevant()
 
 void CActorMP::net_Export(NET_Packet& packet)
 {
-    if (OnClient()) {
+    if (OnClient())
+    {
         // Msg("net_Export: ID is: 0x%08x, is going to send health %2.04f", this->ID(), m_state_holder.state().health);
         // R_ASSERT						(g_Alive());
         // R_ASSERT						(PHGetSyncItemsNumber() == 1);

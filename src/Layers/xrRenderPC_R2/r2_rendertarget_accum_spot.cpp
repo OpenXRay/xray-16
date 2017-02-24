@@ -11,17 +11,20 @@ void CRenderTarget::accum_spot(light* L)
     // *** assume accumulator setted up ***
     // *****************************	Mask by stencil		*************************************
     ref_shader shader;
-    if (IRender_Light::OMNIPART == L->flags.type) {
+    if (IRender_Light::OMNIPART == L->flags.type)
+    {
         shader = L->s_point;
-        if (!shader) shader = s_accum_point;
+        if (!shader)
+            shader = s_accum_point;
     }
     else
     {
         shader = L->s_spot;
-        if (!shader) shader = s_accum_spot;
+        if (!shader)
+            shader = s_accum_spot;
     }
 
-    BOOL bIntersect = FALSE;  // enable_scissor(L);
+    BOOL bIntersect = FALSE; // enable_scissor(L);
     {
         // setup xform
         L->xform_calc();
@@ -35,7 +38,7 @@ void CRenderTarget::accum_spot(light* L)
         // *** thus can cope without stencil clear with 127 lights
         // *** in practice, 'cause we "clear" it back to 0x1 it usually allows us to > 200 lights :)
         RCache.set_ColorWriteEnable(FALSE);
-        RCache.set_Element(s_accum_mask->E[SE_MASK_SPOT]);  // masker
+        RCache.set_Element(s_accum_mask->E[SE_MASK_SPOT]); // masker
 
         // backfaces: if (stencil>=1 && zfail)			stencil = light_id
         RCache.set_CullMode(CULL_CW);
@@ -51,12 +54,13 @@ void CRenderTarget::accum_spot(light* L)
     }
 
     // nv-stencil recompression
-    if (RImplementation.o.nvstencil) u_stencil_optimize();
+    if (RImplementation.o.nvstencil)
+        u_stencil_optimize();
 
     // *****************************	Minimize overdraw	*************************************
     // Select shader (front or back-faces), *** back, if intersect near plane
     RCache.set_ColorWriteEnable();
-    RCache.set_CullMode(CULL_CW);  // back
+    RCache.set_CullMode(CULL_CW); // back
 
     // 2D texgens
     Fmatrix m_Texgen;
@@ -113,7 +117,8 @@ void CRenderTarget::accum_spot(light* L)
     {
         // Select shader
         u32 _id = 0;
-        if (L->flags.bShadow) {
+        if (L->flags.bShadow)
+        {
             bool bFullSize = (L->X.S.size == RImplementation.o.smapsize);
             if (L->X.S.transluent)
                 _id = SE_L_TRANSLUENT;
@@ -141,7 +146,8 @@ void CRenderTarget::accum_spot(light* L)
         RCache.set_ca("m_lmap", 1, m_Lmap._12, m_Lmap._22, m_Lmap._32, m_Lmap._42);
 
         // Fetch4 : enable
-        if (RImplementation.o.HW_smap_FETCH4) {
+        if (RImplementation.o.HW_smap_FETCH4)
+        {
 //. we hacked the shader to force smap on S0
 #define FOURCC_GET4 MAKEFOURCC('G', 'E', 'T', '4')
             HW.pDevice->SetSamplerState(0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET4);
@@ -151,7 +157,8 @@ void CRenderTarget::accum_spot(light* L)
         draw_volume(L);
 
         // Fetch4 : disable
-        if (RImplementation.o.HW_smap_FETCH4) {
+        if (RImplementation.o.HW_smap_FETCH4)
+        {
 //. we hacked the shader to force smap on S0
 #define FOURCC_GET1 MAKEFOURCC('G', 'E', 'T', '1')
             HW.pDevice->SetSamplerState(0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET1);
@@ -159,7 +166,8 @@ void CRenderTarget::accum_spot(light* L)
     }
 
     // blend-copy
-    if (!RImplementation.o.fp16_blend) {
+    if (!RImplementation.o.fp16_blend)
+    {
         u_setrt(rt_Accumulator, NULL, NULL, HW.pBaseZB);
         RCache.set_Element(s_accum_mask->E[SE_MASK_ACCUM_VOL]);
         RCache.set_c("m_texgen", m_Texgen);
@@ -176,17 +184,19 @@ void CRenderTarget::accum_spot(light* L)
 void CRenderTarget::accum_volumetric(light* L)
 {
     // if (L->flags.type != IRender_Light::SPOT) return;
-    if (!L->flags.bVolumetric) return;
+    if (!L->flags.bVolumetric)
+        return;
 
     phase_vol_accumulator();
 
     ref_shader shader;
     shader = L->s_volumetric;
-    if (!shader) shader = s_accum_volume;
+    if (!shader)
+        shader = s_accum_volume;
 
     // *** assume accumulator setted up ***
     // *****************************	Mask by stencil		*************************************
-    BOOL bIntersect = FALSE;  // enable_scissor(L);
+    BOOL bIntersect = FALSE; // enable_scissor(L);
     {
         // setup xform
         L->xform_calc();
@@ -199,7 +209,7 @@ void CRenderTarget::accum_volumetric(light* L)
     }
 
     RCache.set_ColorWriteEnable();
-    RCache.set_CullMode(CULL_NONE);  // back
+    RCache.set_CullMode(CULL_NONE); // back
 
     // 2D texgens
     Fmatrix m_Texgen;
@@ -342,7 +352,8 @@ void CRenderTarget::accum_volumetric(light* L)
             char* pszSMapName;
             BOOL b_HW_smap = RImplementation.o.HW_smap;
             BOOL b_HW_PCF = RImplementation.o.HW_smap_PCF;
-            if (b_HW_smap) {
+            if (b_HW_smap)
+            {
                 if (b_HW_PCF)
                     pszSMapName = r2_RT_smap_depth;
                 else
@@ -360,7 +371,8 @@ void CRenderTarget::accum_volumetric(light* L)
                 std::pair<u32, ref_texture>& loader = *_it;
                 u32 load_id = loader.first;
                 //	Shadowmap texture always uses 0 texture unit
-                if (load_id == 0) {
+                if (load_id == 0)
+                {
                     //	Assign correct texture
                     loader.second.create(pszSMapName);
                 }
@@ -410,7 +422,8 @@ void CRenderTarget::accum_volumetric(light* L)
         */
 
         // Fetch4 : enable
-        if (RImplementation.o.HW_smap_FETCH4) {
+        if (RImplementation.o.HW_smap_FETCH4)
+        {
 //. we hacked the shader to force smap on S0
 #define FOURCC_GET4 MAKEFOURCC('G', 'E', 'T', '4')
             HW.pDevice->SetSamplerState(0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET4);
@@ -425,7 +438,8 @@ void CRenderTarget::accum_volumetric(light* L)
         RCache.set_ColorWriteEnable();
 
         // Fetch4 : disable
-        if (RImplementation.o.HW_smap_FETCH4) {
+        if (RImplementation.o.HW_smap_FETCH4)
+        {
 //. we hacked the shader to force smap on S0
 #define FOURCC_GET1 MAKEFOURCC('G', 'E', 'T', '1')
             HW.pDevice->SetSamplerState(0, D3DSAMP_MIPMAPLODBIAS, FOURCC_GET1);

@@ -16,7 +16,8 @@ IC CScriptEngine& CAI_Space::script_engine() const
 
 IC CAI_Space& ai()
 {
-    if (!g_ai_space) {
+    if (!g_ai_space)
+    {
         g_ai_space = xr_new<CAI_Space>();
         g_ai_space->init();
     }

@@ -21,31 +21,19 @@ void CScriptActionPlannerActionWrapper::setup_static(
     planner->CScriptActionPlannerAction::setup(object, storage);
 }
 
-void CScriptActionPlannerActionWrapper::initialize()
-{
-    luabind::call_member<void>(this, "initialize");
-}
-
+void CScriptActionPlannerActionWrapper::initialize() { luabind::call_member<void>(this, "initialize"); }
 void CScriptActionPlannerActionWrapper::initialize_static(CScriptActionPlannerAction* action)
 {
     action->CScriptActionPlannerAction::initialize();
 }
 
-void CScriptActionPlannerActionWrapper::execute()
-{
-    luabind::call_member<void>(this, "execute");
-}
-
+void CScriptActionPlannerActionWrapper::execute() { luabind::call_member<void>(this, "execute"); }
 void CScriptActionPlannerActionWrapper::execute_static(CScriptActionPlannerAction* action)
 {
     action->CScriptActionPlannerAction::execute();
 }
 
-void CScriptActionPlannerActionWrapper::finalize()
-{
-    luabind::call_member<void>(this, "finalize");
-}
-
+void CScriptActionPlannerActionWrapper::finalize() { luabind::call_member<void>(this, "finalize"); }
 void CScriptActionPlannerActionWrapper::finalize_static(CScriptActionPlannerAction* action)
 {
     action->CScriptActionPlannerAction::finalize();

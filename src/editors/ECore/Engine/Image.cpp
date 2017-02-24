@@ -33,7 +33,8 @@ void CImage::SaveTGA(LPCSTR name, BOOL b24)
     tga.scanlenght = dwWidth * 4;
 
     IWriter* F = FS.w_open(name);
-    if (F) {
+    if (F)
+    {
         tga.maketga(*F);
         FS.w_close(F);
     }
@@ -95,9 +96,9 @@ void CImage::Contrast(float _fc)
         for (u32 j = 0; j < dwWidth; j++)
         {
             BYTE* p = (BYTE*)&(ptr[i * dwWidth * 4 + j * 4]);
-            p[0] = ClampColor(128.f + fc * (float(p[0]) - 128.f));  // red
-            p[1] = ClampColor(128.f + fc * (float(p[1]) - 128.f));  // green
-            p[2] = ClampColor(128.f + fc * (float(p[2]) - 128.f));  // blue
+            p[0] = ClampColor(128.f + fc * (float(p[0]) - 128.f)); // red
+            p[1] = ClampColor(128.f + fc * (float(p[1]) - 128.f)); // green
+            p[2] = ClampColor(128.f + fc * (float(p[2]) - 128.f)); // blue
         }
     }
 }
@@ -175,7 +176,7 @@ void CImage::LoadT(char *name)
 #define RGBA_GETBLUE(rgb) u32((rgb)&0xff)
 #endif
 
-#pragma pack(push, 1)  // Gotta pack these structures!
+#pragma pack(push, 1) // Gotta pack these structures!
 
 struct TGAHeader
 {
@@ -213,31 +214,37 @@ bool CImage::LoadTGA(LPCSTR name)
 
     TGA().r(&hdr, sizeof(TGAHeader));
 
-    if (!((hdr.imgtype == 2) || (hdr.imgtype == 10))) {
+    if (!((hdr.imgtype == 2) || (hdr.imgtype == 10)))
+    {
         Msg("Unsupported texture format (%s)", name);
         return false;
     }
-    if (!((hdr.pixsize == 24) || (hdr.pixsize == 32))) {
+    if (!((hdr.pixsize == 24) || (hdr.pixsize == 32)))
+    {
         Msg("Texture (%s) - invalid pixsize: %d", name, hdr.pixsize);
         return false;
     }
 #ifndef _EDITOR
-    if (!btwIsPow2(hdr.width)) {
+    if (!btwIsPow2(hdr.width))
+    {
         Msg("Texture (%s) - invalid width: %d", name, hdr.width);
         return false;
     }
-    if (!btwIsPow2(hdr.height)) {
+    if (!btwIsPow2(hdr.height))
+    {
         Msg("Texture (%s) - invalid height: %d", name, hdr.height);
         return false;
     }
 #endif
 
     // Skip funky stuff
-    if (hdr.idlen) TGA().advance(hdr.idlen);
-    if (hdr.cmlen) TGA().advance(hdr.cmlen * ((hdr.cmes + 7) / 8));
+    if (hdr.idlen)
+        TGA().advance(hdr.idlen);
+    if (hdr.cmlen)
+        TGA().advance(hdr.cmlen * ((hdr.cmes + 7) / 8));
 
-    hflip = (hdr.desc & 0x10) ? TRUE : FALSE;  // Need hflip
-    vflip = (hdr.desc & 0x20) ? TRUE : FALSE;  // Need vflip
+    hflip = (hdr.desc & 0x10) ? TRUE : FALSE; // Need hflip
+    vflip = (hdr.desc & 0x20) ? TRUE : FALSE; // Need vflip
 
     dwWidth = hdr.width;
     dwHeight = hdr.height;
@@ -252,15 +259,18 @@ bool CImage::LoadTGA(LPCSTR name)
     {
         u32 dwOffset = y * hdr.width;
 
-        if (0 == (hdr.desc & 0x0010)) dwOffset = (hdr.height - y - 1) * hdr.width;
+        if (0 == (hdr.desc & 0x0010))
+            dwOffset = (hdr.height - y - 1) * hdr.width;
         for (int x = 0; x < hdr.width;)
         {
-            if (hdr.imgtype == 10) {
+            if (hdr.imgtype == 10)
+            {
                 BYTE PacketInfo;
                 TGA().r(&PacketInfo, 1);
                 u16 PacketType = u16(0x80 & PacketInfo);
                 u16 PixelCount = u16((0x007f & PacketInfo) + 1);
-                if (PacketType) {
+                if (PacketType)
+                {
                     pixel = 0xffffffff;
                     if (hdr.pixsize == 32)
                         TGA().r(&pixel, 4);
@@ -320,8 +330,10 @@ bool CImage::LoadTGA(LPCSTR name)
             TGA.r(pData,hdr.width*hdr.height*4);
         }
     */
-    if (vflip) Vflip();
-    if (hflip) Hflip();
+    if (vflip)
+        Vflip();
+    if (hflip)
+        Hflip();
 
     return true;
 }

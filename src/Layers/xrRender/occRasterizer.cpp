@@ -38,9 +38,12 @@ IC void propagade_depth(LPVOID p_dest, LPVOID p_src, int dim)
             occD f3 = base1[0];
             occD f4 = base1[1];
             occD f = f1;
-            if (f2 > f) f = f2;
-            if (f3 > f) f = f3;
-            if (f4 > f) f = f4;
+            if (f2 > f)
+                f = f2;
+            if (f3 > f)
+                f = f3;
+            if (f4 > f)
+                f = f4;
             dest[y * dim + x] = f;
         }
     }
@@ -57,10 +60,7 @@ occRasterizer::occRasterizer()
 {
 }
 
-occRasterizer::~occRasterizer()
-{
-}
-
+occRasterizer::~occRasterizer() {}
 void occRasterizer::clear()
 {
     u32 size = occ_dim * occ_dim;
@@ -71,10 +71,14 @@ void occRasterizer::clear()
 
 IC BOOL shared(occTri* T1, occTri* T2)
 {
-    if (T1 == T2) return TRUE;
-    if (T1->adjacent[0] == T2) return TRUE;
-    if (T1->adjacent[1] == T2) return TRUE;
-    if (T1->adjacent[2] == T2) return TRUE;
+    if (T1 == T2)
+        return TRUE;
+    if (T1->adjacent[0] == T2)
+        return TRUE;
+    if (T1->adjacent[1] == T2)
+        return TRUE;
+    if (T1->adjacent[2] == T2)
+        return TRUE;
     return FALSE;
 }
 
@@ -96,12 +100,15 @@ void occRasterizer::propagade()
             int pos_down2 = pos_down + occ_dim;
 
             occTri* Tu1 = pFrame[pos_up];
-            if (Tu1) {
+            if (Tu1)
+            {
                 // We has pixel 1scan up
-                if (shared(Tu1, pFrame[pos_down])) {
+                if (shared(Tu1, pFrame[pos_down]))
+                {
                     // We has pixel 1scan down
                     float ZR = (pDepth[pos_up] + pDepth[pos_down]) / 2;
-                    if (ZR < pDepth[pos]) {
+                    if (ZR < pDepth[pos])
+                    {
                         pFrame[pos] = Tu1;
                         pDepth[pos] = ZR;
                     }
@@ -110,7 +117,8 @@ void occRasterizer::propagade()
                 {
                     // We has pixel 2scan down
                     float ZR = (pDepth[pos_up] + pDepth[pos_down2]) / 2;
-                    if (ZR < pDepth[pos]) {
+                    if (ZR < pDepth[pos])
+                    {
                         pFrame[pos] = Tu1;
                         pDepth[pos] = ZR;
                     }
@@ -133,7 +141,8 @@ void occRasterizer::propagade()
 void occRasterizer::on_dbg_render()
 {
 #if DEBUG
-    if (!ps_r2_ls_flags_ext.is(R_FLAGEXT_HOM_DEPTH_DRAW)) {
+    if (!ps_r2_ls_flags_ext.is(R_FLAGEXT_HOM_DEPTH_DRAW))
+    {
         dbg_HOM_draw_initialized = false;
         return;
     }
@@ -142,7 +151,8 @@ void occRasterizer::on_dbg_render()
     {
         for (int j = 0; j < occ_dim_0; ++j)
         {
-            if (bDebug) {
+            if (bDebug)
+            {
                 Fvector quad, left_top, right_bottom, box_center, box_r;
                 quad.set((float)j - occ_dim_0 / 2.f, -((float)i - occ_dim_0 / 2.f), (float)bufDepth_0[i][j] / occQ_s32);
                 Device.mProject;
@@ -169,7 +179,8 @@ void occRasterizer::on_dbg_render()
                 dbg_HOM_draw_initialized = true;
             }
 
-            if (!dbg_HOM_draw_initialized) return;
+            if (!dbg_HOM_draw_initialized)
+                return;
 
             pixel_box& tmp = dbg_pixel_boxes[i * occ_dim_0 + j];
             Fmatrix Transform;
@@ -208,7 +219,8 @@ IC BOOL test_Level(occD* depth, int dim, float _x0, float _y0, float _x1, float 
         occD* it = base + x0;
         occD* end = base + x1;
         for (; it <= end; it++)
-            if (z < *it) return TRUE;
+            if (z < *it)
+                return TRUE;
     }
     return FALSE;
 }

@@ -41,9 +41,9 @@ public:
 
     // data members are left public
     int m_v0, m_v1, m_v2;
-    int m_stripId;       // real strip Id
-    int m_testStripId;   // strip Id in an experiment
-    int m_experimentId;  // in what experiment was it given an experiment Id?
+    int m_stripId; // real strip Id
+    int m_testStripId; // strip Id in an experiment
+    int m_experimentId; // in what experiment was it given an experiment Id?
 };
 
 // nice and dumb edge class that points knows its
@@ -71,7 +71,8 @@ public:
     // ref and unref
     void Unref()
     {
-        if (--m_refCount == 0) {
+        if (--m_refCount == 0)
+        {
             Memory.mem_free(this);
         }
     }
@@ -133,10 +134,10 @@ public:
 
     // This is an experiment if the experiment id is >= 0
     inline bool IsExperiment() const { return m_experimentId >= 0; }
-
     inline bool IsInStrip(const NvFaceInfo* faceInfo) const
     {
-        if (faceInfo == NULL) return false;
+        if (faceInfo == NULL)
+            return false;
 
         return (m_experimentId >= 0 ? faceInfo->m_testStripId == m_stripId : faceInfo->m_stripId == m_stripId);
     }

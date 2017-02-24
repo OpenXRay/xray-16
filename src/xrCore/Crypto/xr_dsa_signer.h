@@ -24,8 +24,8 @@ private:
     crypto::xr_dsa m_dsa;
     crypto::xr_sha256 m_sha;
 
-};  // xr_dsa_signer
+}; // xr_dsa_signer
 
 XRCORE_API char* current_time(string64& dest_time);
 
-#endif  //#ifndef XR_DSA_SIGNER_INCLUDED
+#endif //#ifndef XR_DSA_SIGNER_INCLUDED

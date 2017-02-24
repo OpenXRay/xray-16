@@ -22,7 +22,7 @@ ref class window_ide;
 public
 ref class window_view : public WeifenLuo::WinFormsUI::DockContent
 {
-  public:
+public:
     window_view(window_ide % ide)
     {
         InitializeComponent();
@@ -32,37 +32,38 @@ ref class window_view : public WeifenLuo::WinFormsUI::DockContent
         custom_init(ide);
     }
 
-  protected:
+protected:
     /// <summary>
     /// Clean up any resources being used.
     /// </summary>
     ~window_view()
     {
-        if (components) {
+        if (components)
+        {
             delete components;
         }
     }
 
-  private:
+private:
     System::Windows::Forms::ToolStrip ^ MainToolBar;
 
-  protected:
-  private:
+protected:
+private:
     System::Windows::Forms::ToolStripButton ^ EditButton;
 
-  private:
+private:
     System::Windows::Forms::ToolStripButton ^ PauseButton;
 
-  private:
+private:
     System::Windows::Forms::Panel ^ ViewPanel;
 
-  private:
+private:
     System::Windows::Forms::ImageList ^ imageList1;
 
-  private:
+private:
     System::ComponentModel::IContainer ^ components;
 
-  private:
+private:
 /// <summary>
 /// Required designer variable.
 /// </summary>
@@ -168,7 +169,7 @@ ref class window_view : public WeifenLuo::WinFormsUI::DockContent
         this->PerformLayout();
     }
 #pragma endregion
-  public:
+public:
     void pause();
     void on_load_finished();
     void property_grid(PropertyGrid ^ property_grid);
@@ -178,20 +179,20 @@ ref class window_view : public WeifenLuo::WinFormsUI::DockContent
     Void window_view_Activated(System::Object ^ sender, System::EventArgs ^ e);
     Void window_view_Deactivate(System::Object ^ sender, System::EventArgs ^ e);
 
-  private:
+private:
     window_ide ^ m_ide;
     editor::engine* m_engine;
     PropertyGrid ^ m_property_grid;
     Point m_previous_location;
     bool m_loaded;
 
-  private:
+private:
     void reclip_cursor();
     bool pick_color_cursor();
     void pick_color_cursor(bool value);
     void check_cursor();
 
-  private:
+private:
     void custom_init(window_ide % ide);
     Void window_view_DoubleClick(Object ^ sender, EventArgs ^ e);
     Void window_view_SizeChanged(Object ^ sender, EventArgs ^ e);
@@ -204,6 +205,6 @@ ref class window_view : public WeifenLuo::WinFormsUI::DockContent
     Void ViewPanel_MouseLeave(Object ^ sender, EventArgs ^ e);
     Void ViewPanel_MouseClick(Object ^ sender, MouseEventArgs ^ e);
     Void window_view_KeyDown(Object ^ sender, KeyEventArgs ^ e);
-};  // ref class window_view
+}; // ref class window_view
 
-}  // namespace editor
+} // namespace editor

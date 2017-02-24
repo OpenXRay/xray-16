@@ -28,36 +28,41 @@ CItemManager::CItemManager(CCustomMonster* object)
     m_stalker = smart_cast<CAI_Stalker*>(m_object);
 }
 
-bool CItemManager::is_useful(const CGameObject* object) const
-{
-    return (m_object->useful(this, object));
-}
-
+bool CItemManager::is_useful(const CGameObject* object) const { return (m_object->useful(this, object)); }
 bool CItemManager::useful(const CGameObject* object) const
 {
-    if (!inherited::is_useful(object)) return (false);
+    if (!inherited::is_useful(object))
+        return (false);
 
-    if (m_object->getDestroy()) return (false);
+    if (m_object->getDestroy())
+        return (false);
 
     // we do not want to keep in memory attached objects
-    if (m_object->H_Parent()) return (false);
+    if (m_object->H_Parent())
+        return (false);
 
-    if (!const_cast<CGameObject*>(object)->UsedAI_Locations()) return (false);
+    if (!const_cast<CGameObject*>(object)->UsedAI_Locations())
+        return (false);
 
-    if (!m_object->movement().restrictions().accessible(object->Position())) return (false);
+    if (!m_object->movement().restrictions().accessible(object->Position()))
+        return (false);
 
-    if (!m_object->movement().restrictions().accessible(object->ai_location().level_vertex_id())) return (false);
+    if (!m_object->movement().restrictions().accessible(object->ai_location().level_vertex_id()))
+        return (false);
 
     const CInventoryItem* inventory_item = smart_cast<const CInventoryItem*>(object);
-    if (inventory_item && !inventory_item->useful_for_NPC()) return (false);
+    if (inventory_item && !inventory_item->useful_for_NPC())
+        return (false);
 
     if (m_stalker && (!m_stalker->can_take(inventory_item) ||
                          !m_stalker->movement().restrictions().accessible(inventory_item->object().Position())))
         return (false);
 
-    if (!ai().get_level_graph()) return (false);
+    if (!ai().get_level_graph())
+        return (false);
 
-    if (!ai().level_graph().valid_vertex_id(object->ai_location().level_vertex_id())) return (false);
+    if (!ai().level_graph().valid_vertex_id(object->ai_location().level_vertex_id()))
+        return (false);
 
     if (!ai().level_graph().inside(object->ai_location().level_vertex_id(), inventory_item->object().Position()))
         return (false);
@@ -90,7 +95,7 @@ void CItemManager::update()
     for (; I != E; ++I)
         VERIFY3(m_object->movement().restrictions().accessible((*I)->ai_location().level_vertex_id()),
             *m_object->cName(), *(*I)->cName());
-#endif  // DEBUG
+#endif // DEBUG
 
     inherited::update();
 
@@ -105,21 +110,26 @@ void CItemManager::remove_links(IGameObject* object)
     // since we use no members in CGameObject during search,
     // we just use the pinter itself, we can just statically cast object
     OBJECTS::iterator I = std::find(m_objects.begin(), m_objects.end(), (CGameObject*)object);
-    if (I != m_objects.end()) m_objects.erase(I);
+    if (I != m_objects.end())
+        m_objects.erase(I);
 
-    if (m_selected && (m_selected->ID() == object->ID())) m_selected = 0;
+    if (m_selected && (m_selected->ID() == object->ID()))
+        m_selected = 0;
 }
 
 void CItemManager::on_restrictions_change()
 {
-    if (!m_selected) return;
+    if (!m_selected)
+        return;
 
-    if (!m_object->movement().restrictions().accessible(m_selected->ai_location().level_vertex_id())) {
+    if (!m_object->movement().restrictions().accessible(m_selected->ai_location().level_vertex_id()))
+    {
         m_selected = 0;
         return;
     }
 
-    if (m_object->movement().restrictions().accessible(m_selected->Position())) return;
+    if (m_object->movement().restrictions().accessible(m_selected->Position()))
+        return;
 
     m_selected = 0;
 }

@@ -41,8 +41,8 @@ public:
     IC callback_type const& callback() const;
 };
 
-}  // namespace smart_cover
+} // namespace smart_cover
 
 #include "smart_cover_planner_target_selector_inline.h"
 
-#endif  // SMART_COVER_PLANNER_TARGET_SELECTOR_H_INCLUDED
+#endif // SMART_COVER_PLANNER_TARGET_SELECTOR_H_INCLUDED

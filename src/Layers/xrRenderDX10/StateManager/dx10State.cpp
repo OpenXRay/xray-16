@@ -47,7 +47,8 @@ HRESULT dx10State::Apply()
     StateManager.SetRasterizerState(m_pRasterizerState);
     VERIFY(m_pDepthStencilState);
     StateManager.SetDepthStencilState(m_pDepthStencilState);
-    if (m_uiStencilRef != -1) StateManager.SetStencilRef(m_uiStencilRef);
+    if (m_uiStencilRef != -1)
+        StateManager.SetStencilRef(m_uiStencilRef);
     VERIFY(m_pBlendState);
     StateManager.SetBlendState(m_pBlendState);
     StateManager.SetAlphaRef(m_uiAlphaRef);
@@ -96,10 +97,12 @@ void dx10State::InitSamplers(tSamplerHArray& SamplerArray, SimulatorStates& stat
     int iMaxSampler = D3D_COMMONSHADER_SAMPLER_SLOT_COUNT - 1;
     for (; iMaxSampler > -1; --iMaxSampler)
     {
-        if (SamplerUsed[iMaxSampler]) break;
+        if (SamplerUsed[iMaxSampler])
+            break;
     }
 
-    if (iMaxSampler > -1) {
+    if (iMaxSampler > -1)
+    {
         SamplerArray.reserve(iMaxSampler + 1);
         for (int i = 0; i <= iMaxSampler; ++i)
         {

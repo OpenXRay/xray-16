@@ -5,7 +5,7 @@
 
 class CHudItemObject : public CInventoryItemObject, public CHudItem
 {
-protected:  //чтоб нельзя было вызвать на прямую
+protected: //чтоб нельзя было вызвать на прямую
     CHudItemObject();
     virtual ~CHudItemObject();
 
@@ -14,7 +14,6 @@ public:
 
 public:
     virtual CHudItem* cast_hud_item() { return this; }
-
 public:
     virtual void Load(LPCSTR section);
     virtual bool Action(u16 cmd, u32 flags);

@@ -43,7 +43,7 @@ class ESoundSource : public CCustomObject
 
     ECommand m_Command;
 
-  public:
+public:
     enum ESoundType
     {
         stStaticSource = 0,
@@ -51,32 +51,27 @@ class ESoundSource : public CCustomObject
 
     ESoundType m_Type;
 
-  public:
+public:
     virtual const Fvector& GetPosition() const { return m_Params.position; }
-
     virtual void SetPosition(const Fvector& pos)
     {
         m_Params.position.set(pos);
-        if (m_Source._feedback()) m_Source.set_position(m_Params.position);
+        if (m_Source._feedback())
+            m_Source.set_position(m_Params.position);
     }
 
-  public:
+public:
     ESoundSource(LPVOID data, LPCSTR name);
     void Construct(LPVOID data);
     ~ESoundSource();
 
     virtual bool CanAttach() { return true; }
-
     LPCSTR GetSourceWAV() { return *m_WAVName; }
-
     void SetSourceWAV(LPCSTR fname);
 
     void Play() { m_Command = stPlay; }
-
     void Stop() { m_Command = stStop; }
-
     void Simulate() { m_Command = stSimulate; }
-
     virtual void Render(int priority, bool strictB2F);
     virtual bool RayPick(float& dist, const Fvector& S, const Fvector& D, SRayPickInfo* pinf = NULL);
     virtual bool FrustumPick(const CFrustum& frustum);
@@ -88,7 +83,6 @@ class ESoundSource : public CCustomObject
     virtual bool GetBox(Fbox& box) const;
 
     virtual void Scale(Fvector& amount) { ; }
-
     virtual void FillProp(LPCSTR pref, PropItemVec& values);
     virtual bool GetSummaryInfo(SSceneSummary* inf);
     virtual bool ExportGame(SExportStreams* data);

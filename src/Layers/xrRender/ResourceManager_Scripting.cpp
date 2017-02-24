@@ -27,111 +27,133 @@ class adopt_sampler
 public:
     adopt_sampler(CBlender_Compile* _C, u32 _stage) : C(_C), stage(_stage)
     {
-        if (u32(-1) == stage) C = 0;
+        if (u32(-1) == stage)
+            C = 0;
     }
     adopt_sampler(const adopt_sampler& _C) : C(_C.C), stage(_C.stage)
     {
-        if (u32(-1) == stage) C = 0;
+        if (u32(-1) == stage)
+            C = 0;
     }
 
     adopt_sampler& _texture(LPCSTR texture)
     {
-        if (C) C->i_Texture(stage, texture);
+        if (C)
+            C->i_Texture(stage, texture);
         return *this;
     }
     adopt_sampler& _projective(bool _b)
     {
-        if (C) C->i_Projective(stage, _b);
+        if (C)
+            C->i_Projective(stage, _b);
         return *this;
     }
     adopt_sampler& _clamp()
     {
-        if (C) C->i_Address(stage, D3DTADDRESS_CLAMP);
+        if (C)
+            C->i_Address(stage, D3DTADDRESS_CLAMP);
         return *this;
     }
     adopt_sampler& _wrap()
     {
-        if (C) C->i_Address(stage, D3DTADDRESS_WRAP);
+        if (C)
+            C->i_Address(stage, D3DTADDRESS_WRAP);
         return *this;
     }
     adopt_sampler& _mirror()
     {
-        if (C) C->i_Address(stage, D3DTADDRESS_MIRROR);
+        if (C)
+            C->i_Address(stage, D3DTADDRESS_MIRROR);
         return *this;
     }
     adopt_sampler& _f_anisotropic()
     {
-        if (C) C->i_Filter(stage, D3DTEXF_ANISOTROPIC, D3DTEXF_LINEAR, D3DTEXF_ANISOTROPIC);
+        if (C)
+            C->i_Filter(stage, D3DTEXF_ANISOTROPIC, D3DTEXF_LINEAR, D3DTEXF_ANISOTROPIC);
         return *this;
     }
     adopt_sampler& _f_trilinear()
     {
-        if (C) C->i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTEXF_LINEAR);
+        if (C)
+            C->i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTEXF_LINEAR);
         return *this;
     }
     adopt_sampler& _f_bilinear()
     {
-        if (C) C->i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_POINT, D3DTEXF_LINEAR);
+        if (C)
+            C->i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_POINT, D3DTEXF_LINEAR);
         return *this;
     }
     adopt_sampler& _f_linear()
     {
-        if (C) C->i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
+        if (C)
+            C->i_Filter(stage, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
         return *this;
     }
     adopt_sampler& _f_none()
     {
-        if (C) C->i_Filter(stage, D3DTEXF_POINT, D3DTEXF_NONE, D3DTEXF_POINT);
+        if (C)
+            C->i_Filter(stage, D3DTEXF_POINT, D3DTEXF_NONE, D3DTEXF_POINT);
         return *this;
     }
     adopt_sampler& _fmin_none()
     {
-        if (C) C->i_Filter_Min(stage, D3DTEXF_NONE);
+        if (C)
+            C->i_Filter_Min(stage, D3DTEXF_NONE);
         return *this;
     }
     adopt_sampler& _fmin_point()
     {
-        if (C) C->i_Filter_Min(stage, D3DTEXF_POINT);
+        if (C)
+            C->i_Filter_Min(stage, D3DTEXF_POINT);
         return *this;
     }
     adopt_sampler& _fmin_linear()
     {
-        if (C) C->i_Filter_Min(stage, D3DTEXF_LINEAR);
+        if (C)
+            C->i_Filter_Min(stage, D3DTEXF_LINEAR);
         return *this;
     }
     adopt_sampler& _fmin_aniso()
     {
-        if (C) C->i_Filter_Min(stage, D3DTEXF_ANISOTROPIC);
+        if (C)
+            C->i_Filter_Min(stage, D3DTEXF_ANISOTROPIC);
         return *this;
     }
     adopt_sampler& _fmip_none()
     {
-        if (C) C->i_Filter_Mip(stage, D3DTEXF_NONE);
+        if (C)
+            C->i_Filter_Mip(stage, D3DTEXF_NONE);
         return *this;
     }
     adopt_sampler& _fmip_point()
     {
-        if (C) C->i_Filter_Mip(stage, D3DTEXF_POINT);
+        if (C)
+            C->i_Filter_Mip(stage, D3DTEXF_POINT);
         return *this;
     }
     adopt_sampler& _fmip_linear()
     {
-        if (C) C->i_Filter_Mip(stage, D3DTEXF_LINEAR);
+        if (C)
+            C->i_Filter_Mip(stage, D3DTEXF_LINEAR);
         return *this;
     }
     adopt_sampler& _fmag_none()
     {
-        if (C) C->i_Filter_Mag(stage, D3DTEXF_NONE);
+        if (C)
+            C->i_Filter_Mag(stage, D3DTEXF_NONE);
         return *this;
     }
     adopt_sampler& _fmag_point()
     {
-        if (C) C->i_Filter_Mag(stage, D3DTEXF_POINT);
+        if (C)
+            C->i_Filter_Mag(stage, D3DTEXF_POINT);
         return *this;
     }
     adopt_sampler& _fmag_linear()
     {
-        if (C) C->i_Filter_Mag(stage, D3DTEXF_LINEAR);
+        if (C)
+            C->i_Filter_Mag(stage, D3DTEXF_LINEAR);
         return *this;
     }
 };
@@ -144,7 +166,6 @@ class adopt_compiler
 public:
     adopt_compiler(CBlender_Compile* _C) : C(_C) {}
     adopt_compiler(const adopt_compiler& _C) : C(_C.C) {}
-
     adopt_compiler& _options(int P, bool S)
     {
         C->SetParams(P, S);
@@ -210,29 +231,32 @@ public:
 // export
 void CResourceManager::LS_Load()
 {
-    auto exporterFunc = [](lua_State* luaState) {
-        module(luaState)[class_<adopt_sampler>("_sampler")
-                             .def(constructor<const adopt_sampler&>())
-                             .def("texture", &adopt_sampler::_texture, return_reference_to<1>())
-                             .def("project", &adopt_sampler::_projective, return_reference_to<1>())
-                             .def("clamp", &adopt_sampler::_clamp, return_reference_to<1>())
-                             .def("wrap", &adopt_sampler::_wrap, return_reference_to<1>())
-                             .def("mirror", &adopt_sampler::_mirror, return_reference_to<1>())
-                             .def("f_anisotropic", &adopt_sampler::_f_anisotropic, return_reference_to<1>())
-                             .def("f_trilinear", &adopt_sampler::_f_trilinear, return_reference_to<1>())
-                             .def("f_bilinear", &adopt_sampler::_f_bilinear, return_reference_to<1>())
-                             .def("f_linear", &adopt_sampler::_f_linear, return_reference_to<1>())
-                             .def("f_none", &adopt_sampler::_f_none, return_reference_to<1>())
-                             .def("fmin_none", &adopt_sampler::_fmin_none, return_reference_to<1>())
-                             .def("fmin_point", &adopt_sampler::_fmin_point, return_reference_to<1>())
-                             .def("fmin_linear", &adopt_sampler::_fmin_linear, return_reference_to<1>())
-                             .def("fmin_aniso", &adopt_sampler::_fmin_aniso, return_reference_to<1>())
-                             .def("fmip_none", &adopt_sampler::_fmip_none, return_reference_to<1>())
-                             .def("fmip_point", &adopt_sampler::_fmip_point, return_reference_to<1>())
-                             .def("fmip_linear", &adopt_sampler::_fmip_linear, return_reference_to<1>())
-                             .def("fmag_none", &adopt_sampler::_fmag_none, return_reference_to<1>())
-                             .def("fmag_point", &adopt_sampler::_fmag_point, return_reference_to<1>())
-                             .def("fmag_linear", &adopt_sampler::_fmag_linear, return_reference_to<1>()),
+    auto exporterFunc = [](lua_State* luaState)
+    {
+        module(luaState)
+        [
+            class_<adopt_sampler>("_sampler")
+                 .def(constructor<const adopt_sampler&>())
+                 .def("texture", &adopt_sampler::_texture, return_reference_to<1>())
+                 .def("project", &adopt_sampler::_projective, return_reference_to<1>())
+                 .def("clamp", &adopt_sampler::_clamp, return_reference_to<1>())
+                 .def("wrap", &adopt_sampler::_wrap, return_reference_to<1>())
+                 .def("mirror", &adopt_sampler::_mirror, return_reference_to<1>())
+                 .def("f_anisotropic", &adopt_sampler::_f_anisotropic, return_reference_to<1>())
+                 .def("f_trilinear", &adopt_sampler::_f_trilinear, return_reference_to<1>())
+                 .def("f_bilinear", &adopt_sampler::_f_bilinear, return_reference_to<1>())
+                 .def("f_linear", &adopt_sampler::_f_linear, return_reference_to<1>())
+                 .def("f_none", &adopt_sampler::_f_none, return_reference_to<1>())
+                 .def("fmin_none", &adopt_sampler::_fmin_none, return_reference_to<1>())
+                 .def("fmin_point", &adopt_sampler::_fmin_point, return_reference_to<1>())
+                 .def("fmin_linear", &adopt_sampler::_fmin_linear, return_reference_to<1>())
+                 .def("fmin_aniso", &adopt_sampler::_fmin_aniso, return_reference_to<1>())
+                 .def("fmip_none", &adopt_sampler::_fmip_none, return_reference_to<1>())
+                 .def("fmip_point", &adopt_sampler::_fmip_point, return_reference_to<1>())
+                 .def("fmip_linear", &adopt_sampler::_fmip_linear, return_reference_to<1>())
+                 .def("fmag_none", &adopt_sampler::_fmag_none, return_reference_to<1>())
+                 .def("fmag_point", &adopt_sampler::_fmag_point, return_reference_to<1>())
+                 .def("fmag_linear", &adopt_sampler::_fmag_linear, return_reference_to<1>()),
 
             class_<adopt_compiler>("_compiler")
                 .def(constructor<const adopt_compiler&>())
@@ -246,14 +270,16 @@ void CResourceManager::LS_Load()
                 .def("blend", &adopt_compiler::_blend, return_reference_to<1>())
                 .def("aref", &adopt_compiler::_aref, return_reference_to<1>())
                 .def("color_write_enable", &adopt_compiler::_color_write_enable, return_reference_to<1>())
-                .def("sampler", &adopt_compiler::_sampler),  // returns sampler-object
+                .def("sampler", &adopt_compiler::_sampler), // returns sampler-object
 
             class_<adopt_blend>("blend").enum_("blend")[value("zero", int(D3DBLEND_ZERO)),
                 value("one", int(D3DBLEND_ONE)), value("srccolor", int(D3DBLEND_SRCCOLOR)),
                 value("invsrccolor", int(D3DBLEND_INVSRCCOLOR)), value("srcalpha", int(D3DBLEND_SRCALPHA)),
                 value("invsrcalpha", int(D3DBLEND_INVSRCALPHA)), value("destalpha", int(D3DBLEND_DESTALPHA)),
                 value("invdestalpha", int(D3DBLEND_INVDESTALPHA)), value("destcolor", int(D3DBLEND_DESTCOLOR)),
-                value("invdestcolor", int(D3DBLEND_INVDESTCOLOR)), value("srcalphasat", int(D3DBLEND_SRCALPHASAT))]];
+                value("invdestcolor", int(D3DBLEND_INVDESTCOLOR)), value("srcalphasat", int(D3DBLEND_SRCALPHASAT))
+            ]
+        ];
     };
     ScriptEngine.init(exporterFunc, false);
     // load shaders
@@ -264,9 +290,11 @@ void CResourceManager::LS_Load()
     {
         string_path namesp, fn;
         xr_strcpy(namesp, (*folder)[it]);
-        if (0 == strext(namesp) || 0 != xr_strcmp(strext(namesp), ".s")) continue;
+        if (0 == strext(namesp) || 0 != xr_strcmp(strext(namesp), ".s"))
+            continue;
         *strext(namesp) = 0;
-        if (0 == namesp[0]) xr_strcpy(namesp, ScriptEngine.GlobalNamespace);
+        if (0 == namesp[0])
+            xr_strcpy(namesp, ScriptEngine.GlobalNamespace);
         strconcat(sizeof(fn), fn, shaderPath, (*folder)[it]);
         FS.update_path(fn, "$game_shaders$", fn);
         ScriptEngine.load_file_into_namespace(fn, namesp);
@@ -274,11 +302,7 @@ void CResourceManager::LS_Load()
     FS.file_list_close(folder);
 }
 
-void CResourceManager::LS_Unload()
-{
-    ScriptEngine.unload();
-}
-
+void CResourceManager::LS_Unload() { ScriptEngine.unload(); }
 BOOL CResourceManager::_lua_HasShader(LPCSTR s_shader)
 {
     string256 undercorated;
@@ -289,7 +313,7 @@ BOOL CResourceManager::_lua_HasShader(LPCSTR s_shader)
     return ScriptEngine.object(undercorated, "editor", LUA_TFUNCTION);
 #else
     return ScriptEngine.object(undercorated, "normal", LUA_TFUNCTION) ||
-           ScriptEngine.object(undercorated, "l_special", LUA_TFUNCTION);
+        ScriptEngine.object(undercorated, "l_special", LUA_TFUNCTION);
 #endif
 }
 
@@ -314,8 +338,9 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
     C.detail_texture = NULL;
     C.detail_scaler = NULL;
 
-    // Compile element	(LOD0 - HQ)
-    if (ScriptEngine.object(s_shader, "normal_hq", LUA_TFUNCTION)) {
+    // Compile element (LOD0 - HQ)
+    if (ScriptEngine.object(s_shader, "normal_hq", LUA_TFUNCTION))
+    {
         // Analyze possibility to detail this shader
         C.iElement = 0;
         C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
@@ -327,22 +352,25 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
     }
     else
     {
-        if (ScriptEngine.object(s_shader, "normal", LUA_TFUNCTION)) {
+        if (ScriptEngine.object(s_shader, "normal", LUA_TFUNCTION))
+        {
             C.iElement = 0;
             C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
             S.E[0] = C._lua_Compile(s_shader, "normal");
         }
     }
 
-    // Compile element	(LOD1)
-    if (ScriptEngine.object(s_shader, "normal", LUA_TFUNCTION)) {
+    // Compile element (LOD1)
+    if (ScriptEngine.object(s_shader, "normal", LUA_TFUNCTION))
+    {
         C.iElement = 1;
         C.bDetail = m_textures_description.GetDetailTexture(C.L_textures[0], C.detail_texture, C.detail_scaler);
         S.E[1] = C._lua_Compile(s_shader, "normal");
     }
 
     // Compile element
-    if (ScriptEngine.object(s_shader, "l_point", LUA_TFUNCTION)) {
+    if (ScriptEngine.object(s_shader, "l_point", LUA_TFUNCTION))
+    {
         C.iElement = 2;
         C.bDetail = FALSE;
         S.E[2] = C._lua_Compile(s_shader, "l_point");
@@ -350,7 +378,8 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
     }
 
     // Compile element
-    if (ScriptEngine.object(s_shader, "l_spot", LUA_TFUNCTION)) {
+    if (ScriptEngine.object(s_shader, "l_spot", LUA_TFUNCTION))
+    {
         C.iElement = 3;
         C.bDetail = FALSE;
         S.E[3] = C._lua_Compile(s_shader, "l_spot");
@@ -358,7 +387,8 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
     }
 
     // Compile element
-    if (ScriptEngine.object(s_shader, "l_special", LUA_TFUNCTION)) {
+    if (ScriptEngine.object(s_shader, "l_special", LUA_TFUNCTION))
+    {
         C.iElement = 4;
         C.bDetail = FALSE;
         S.E[4] = C._lua_Compile(s_shader, "l_special");
@@ -366,7 +396,8 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
 
     // Search equal in shaders array
     for (u32 it = 0; it < v_shaders.size(); it++)
-        if (S.equal(v_shaders[it])) return v_shaders[it];
+        if (S.equal(v_shaders[it]))
+            return v_shaders[it];
 
     // Create _new_ entry
     Shader* N = new Shader(S);

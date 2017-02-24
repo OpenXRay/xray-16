@@ -12,7 +12,8 @@ CSE_Abstract* xrServer::Process_spawn(
     // create server entity
     xrClientData* CL = ID_to_client(sender);
     CSE_Abstract* E = tpExistedEntity;
-    if (!E) {
+    if (!E)
+    {
         // read spawn information
         string64 s_name;
         P.r_stringZ(s_name);
@@ -27,7 +28,7 @@ CSE_Abstract* xrServer::Process_spawn(
         {
 #ifndef MASTER_GOLD
             Msg("- SERVER: Entity [%s] incompatible with current game type.", *E->s_name);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
             F_entity_Destroy(E);
             return NULL;
         }
@@ -47,30 +48,34 @@ CSE_Abstract* xrServer::Process_spawn(
     }
 
     CSE_Abstract* e_parent = 0;
-    if (E->ID_Parent != 0xffff) {
+    if (E->ID_Parent != 0xffff)
+    {
         e_parent = ID_to_entity(E->ID_Parent);
-        if (!e_parent) {
+        if (!e_parent)
+        {
             R_ASSERT(!tpExistedEntity);
             //			VERIFY3			(smart_cast<CSE_ALifeItemBolt*>(E) ||
-            //smart_cast<CSE_ALifeItemGrenade*>(E),*E->s_name,E->name_replace());
+            // smart_cast<CSE_ALifeItemGrenade*>(E),*E->s_name,E->name_replace());
             F_entity_Destroy(E);
             return NULL;
         }
     }
 
     // check if we can assign entity to some client
-    if (0 == CL) {
+    if (0 == CL)
+    {
         CL = SelectBestClientToMigrateTo(E);
     }
 
     // check for respawn-capability and create phantom as needed
-    if (E->RespawnTime && (0xffff == E->ID_Phantom)) {
+    if (E->RespawnTime && (0xffff == E->ID_Phantom))
+    {
         // Create phantom
         CSE_Abstract* Phantom = entity_Create(*E->s_name);
         R_ASSERT(Phantom);
         Phantom->Spawn_Read(P);
         Phantom->ID = PerformIDgen(0xffff);
-        Phantom->ID_Phantom = Phantom->ID;  // Self-linked to avoid phantom-breeding
+        Phantom->ID_Phantom = Phantom->ID; // Self-linked to avoid phantom-breeding
         Phantom->owner = NULL;
         entities.insert(mk_pair(Phantom->ID, Phantom));
 
@@ -84,17 +89,19 @@ CSE_Abstract* xrServer::Process_spawn(
     }
     else
     {
-        if (E->s_flags.is(M_SPAWN_OBJECT_PHANTOM)) {
+        if (E->s_flags.is(M_SPAWN_OBJECT_PHANTOM))
+        {
             // Clone from Phantom
             E->ID = PerformIDgen(0xffff);
-            E->owner = CL;  //		= SelectBestClientToMigrateTo	(E);
+            E->owner = CL; //		= SelectBestClientToMigrateTo	(E);
             E->s_flags.set(M_SPAWN_OBJECT_PHANTOM, FALSE);
             entities.insert(mk_pair(E->ID, E));
         }
         else
         {
             // Simple spawn
-            if (bSpawnWithClientsMainEntityAsParent) {
+            if (bSpawnWithClientsMainEntityAsParent)
+            {
                 R_ASSERT(CL);
                 CSE_Abstract* P = CL->owner;
                 R_ASSERT(P);
@@ -107,20 +114,23 @@ CSE_Abstract* xrServer::Process_spawn(
     }
 
     // PROCESS NAME; Name this entity
-    if (CL && (E->s_flags.is(M_SPAWN_OBJECT_ASPLAYER))) {
+    if (CL && (E->s_flags.is(M_SPAWN_OBJECT_ASPLAYER)))
+    {
         CL->owner = E;
         //		E->set_name_replace	(CL->Name);
     }
 
     // PROCESS RP;	 3D position/orientation
     PerformRP(E);
-    E->s_RP = 0xFE;  // Use supplied
+    E->s_RP = 0xFE; // Use supplied
 
     // Parent-Connect
-    if (!tpExistedEntity) {
+    if (!tpExistedEntity)
+    {
         game->OnCreate(E->ID);
 
-        if (0xffff != E->ID_Parent) {
+        if (0xffff != E->ID_Parent)
+        {
             R_ASSERT(e_parent);
 
             game->OnTouch(E->ID_Parent, E->ID);
@@ -131,26 +141,31 @@ CSE_Abstract* xrServer::Process_spawn(
 
     // create packet and broadcast packet to everybody
     NET_Packet Packet;
-    if (CL) {
+    if (CL)
+    {
         // For local ONLY
         E->Spawn_Write(Packet, TRUE);
-        if (E->s_flags.is(M_SPAWN_UPDATE)) E->UPDATE_Write(Packet);
+        if (E->s_flags.is(M_SPAWN_UPDATE))
+            E->UPDATE_Write(Packet);
         SendTo(CL->ID, Packet, net_flags(TRUE, TRUE));
 
         // For everybody, except client, which contains authorative copy
         E->Spawn_Write(Packet, FALSE);
-        if (E->s_flags.is(M_SPAWN_UPDATE)) E->UPDATE_Write(Packet);
+        if (E->s_flags.is(M_SPAWN_UPDATE))
+            E->UPDATE_Write(Packet);
         SendBroadcast(CL->ID, Packet, net_flags(TRUE, TRUE));
     }
     else
     {
         E->Spawn_Write(Packet, FALSE);
-        if (E->s_flags.is(M_SPAWN_UPDATE)) E->UPDATE_Write(Packet);
+        if (E->s_flags.is(M_SPAWN_UPDATE))
+            E->UPDATE_Write(Packet);
         ClientID clientID;
         clientID.set(0);
         SendBroadcast(clientID, Packet, net_flags(TRUE, TRUE));
     }
-    if (!tpExistedEntity) {
+    if (!tpExistedEntity)
+    {
         game->OnPostCreate(E->ID);
     };
 

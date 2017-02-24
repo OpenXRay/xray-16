@@ -18,7 +18,6 @@ public:
     virtual ~CEatableItem();
     virtual IFactoryObject* _construct();
     virtual CEatableItem* cast_eatable_item() { return this; }
-
     virtual void Load(LPCSTR section);
     virtual bool Useful() const;
 
@@ -29,7 +28,6 @@ public:
     virtual bool UseBy(CEntityAlive* npc);
     virtual bool Empty() { return PortionsNum() == 0; };
     int PortionsNum() const { return m_iPortionsNum; }
-
 protected:
     int m_iPortionsNum;
 };

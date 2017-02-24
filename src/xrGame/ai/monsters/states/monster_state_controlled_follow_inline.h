@@ -3,7 +3,7 @@
 #include "state_custom_action.h"
 #include "state_move_to_point.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -38,7 +38,8 @@ void CStateMonsterControlledFollowAbstract::setup_substates()
 {
     state_ptr state = get_state_current();
 
-    if (current_substate == eStateControlled_Follow_Wait) {
+    if (current_substate == eStateControlled_Follow_Wait)
+    {
         SStateDataAction data;
         data.action = ACT_REST;
         data.sound_type = MonsterSound::eMonsterSoundIdle;
@@ -50,7 +51,8 @@ void CStateMonsterControlledFollowAbstract::setup_substates()
         return;
     }
 
-    if (current_substate == eStateControlled_Follow_WalkToObject) {
+    if (current_substate == eStateControlled_Follow_WalkToObject)
+    {
         SStateDataMoveToPointEx data;
 
         CControlledEntityBase* entity = smart_cast<CControlledEntityBase*>(object);
@@ -58,7 +60,8 @@ void CStateMonsterControlledFollowAbstract::setup_substates()
         const CEntity* target_object = entity->get_data().m_object;
 
         Fvector dest_pos = random_position(target_object->Position(), 10.f);
-        if (!object->control().path_builder().restrictions().accessible(dest_pos)) {
+        if (!object->control().path_builder().restrictions().accessible(dest_pos))
+        {
             data.vertex = object->control().path_builder().restrictions().accessible_nearest(dest_pos, data.point);
         }
         else

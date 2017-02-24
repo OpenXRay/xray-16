@@ -37,26 +37,22 @@ CAutosaveManager::CAutosaveManager()
     shedule_register();
 }
 
-CAutosaveManager::~CAutosaveManager()
-{
-    shedule_unregister();
-}
-
-float CAutosaveManager::shedule_Scale()
-{
-    return (.5f);
-}
-
+CAutosaveManager::~CAutosaveManager() { shedule_unregister(); }
+float CAutosaveManager::shedule_Scale() { return (.5f); }
 void CAutosaveManager::shedule_Update(u32 dt)
 {
     inherited::shedule_Update(dt);
 #pragma todo("Plecha to Plecha : AUTOSAVE (do not forgive to enable it in release version:-))))!!!!")
-    if (true) return;
-    if (!ai().get_alife()) return;
+    if (true)
+        return;
+    if (!ai().get_alife())
+        return;
 
-    if (last_autosave_time() + autosave_interval() >= Device.dwTimeGlobal) return;
+    if (last_autosave_time() + autosave_interval() >= Device.dwTimeGlobal)
+        return;
 
-    if (Device.dwPrecacheFrame || !g_actor || !ready_for_autosave() || !Actor()->g_Alive()) {
+    if (Device.dwPrecacheFrame || !g_actor || !ready_for_autosave() || !Actor()->g_Alive())
+    {
         delay_autosave();
         return;
     }
@@ -82,7 +78,4 @@ void CAutosaveManager::shedule_Update(u32 dt)
     CurrentGameUI()->AddCustomStatic("autosave", true);
 }
 
-void CAutosaveManager::on_game_loaded()
-{
-    m_last_autosave_time = Device.dwTimeGlobal;
-}
+void CAutosaveManager::on_game_loaded() { m_last_autosave_time = Device.dwTimeGlobal; }

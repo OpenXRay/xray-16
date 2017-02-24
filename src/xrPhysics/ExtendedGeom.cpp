@@ -4,7 +4,8 @@
 bool IsCyliderContact(const dContact& c)
 {
     int geomClass = -1;
-    if (dGeomGetBody(c.geom.g1)) {
+    if (dGeomGetBody(c.geom.g1))
+    {
         geomClass = dGeomGetClass(retrieveGeom(c.geom.g1));
     }
     else
@@ -21,14 +22,11 @@ bool IsCyliderContact(const dContact& c)
 //	return dGeomGetUserData(geom);
 //}
 
-dxGeomUserData* PHRetrieveGeomUserData(dGeomID geom)
-{
-    return retrieveGeomUserData(geom);
-}
-
+dxGeomUserData* PHRetrieveGeomUserData(dGeomID geom) { return retrieveGeomUserData(geom); }
 void get_user_data(dxGeomUserData*& gd1, dxGeomUserData*& gd2, bool bo1, const dContactGeom& geom)
 {
-    if (bo1) {
+    if (bo1)
+    {
         gd1 = retrieveGeomUserData(geom.g1);
         gd2 = retrieveGeomUserData(geom.g2);
     }

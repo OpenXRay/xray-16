@@ -11,7 +11,7 @@
 #include "group_state_custom.h"
 #include "group_state_eat_eat.h "
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -33,10 +33,7 @@ CStateGroupEatAbstract::CStateGroupEat(_Object* obj) : inherited(obj)
 }
 
 TEMPLATE_SPECIALIZATION
-CStateGroupEatAbstract::~CStateGroupEat()
-{
-}
-
+CStateGroupEatAbstract::~CStateGroupEat() {}
 TEMPLATE_SPECIALIZATION
 void CStateGroupEatAbstract::reinit()
 {
@@ -57,7 +54,8 @@ void CStateGroupEatAbstract::finalize()
 {
     inherited::finalize();
 
-    if ((corpse == object->EatedCorpse) && object->EatedCorpse) {
+    if ((corpse == object->EatedCorpse) && object->EatedCorpse)
+    {
         const_cast<CEntityAlive*>(object->EatedCorpse)->m_use_timeout = object->m_corpse_use_timeout;
         const_cast<CEntityAlive*>(object->EatedCorpse)->set_lock_corpse(false);
     }
@@ -71,7 +69,8 @@ TEMPLATE_SPECIALIZATION
 void CStateGroupEatAbstract::critical_finalize()
 {
     inherited::critical_finalize();
-    if ((corpse == object->EatedCorpse) && object->EatedCorpse && check_completion()) {
+    if ((corpse == object->EatedCorpse) && object->EatedCorpse && check_completion())
+    {
         if (object->character_physics_support()->movement()->PHCapture())
             object->character_physics_support()->movement()->PHReleaseObject();
         const_cast<CEntityAlive*>(object->EatedCorpse)->m_use_timeout = object->m_corpse_use_timeout;
@@ -89,14 +88,16 @@ void CStateGroupEatAbstract::critical_finalize()
 TEMPLATE_SPECIALIZATION
 void CStateGroupEatAbstract::reselect_state()
 {
-    if (object->b_state_check) {
+    if (object->b_state_check)
+    {
         select_state(eStateCustom);
         object->b_state_check = false;
         m_time_last_eat = time() + TIME_NOT_HUNGRY;
         return;
     }
 
-    if (object->saved_state == eStateEat_Eat) {
+    if (object->saved_state == eStateEat_Eat)
+    {
         object->saved_state = u32(-1);
         if (object->character_physics_support()->movement()->PHCapture())
             object->character_physics_support()->movement()->PHReleaseObject();
@@ -118,18 +119,22 @@ void CStateGroupEatAbstract::reselect_state()
             return;
         }*/
 
-    if (prev_substate == u32(-1)) {
+    if (prev_substate == u32(-1))
+    {
         select_state(eStateEat_CorpseApproachWalk);
         return;
     }
 
-    if (prev_substate == eStateEat_CorpseApproachWalk) {
-        if (!get_state(eStateEat_CorpseApproachWalk)->check_completion()) {
+    if (prev_substate == eStateEat_CorpseApproachWalk)
+    {
+        if (!get_state(eStateEat_CorpseApproachWalk)->check_completion())
+        {
             select_state(eStateEat_CorpseApproachWalk);
             return;
         }
         // Lain: added
-        if (object->ability_can_drag() && object->check_eated_corpse_draggable()) {
+        if (object->ability_can_drag() && object->check_eated_corpse_draggable())
+        {
             select_state(eStateEat_Drag);
         }
         else
@@ -142,13 +147,16 @@ void CStateGroupEatAbstract::reselect_state()
         return;
     }
 
-    if (prev_substate == eStateEat_Drag) {
-        if (!get_state(eStateEat_Drag)->check_completion()) {
+    if (prev_substate == eStateEat_Drag)
+    {
+        if (!get_state(eStateEat_Drag)->check_completion())
+        {
             select_state(eStateEat_Drag);
             return;
         }
 
-        if (get_state(eStateEat_Eat)->check_start_conditions()) {
+        if (get_state(eStateEat_Eat)->check_start_conditions())
+        {
             object->set_current_animation(15);
             object->saved_state = eStateEat_Eat;
             select_state(eStateCustom);
@@ -161,7 +169,8 @@ void CStateGroupEatAbstract::reselect_state()
         return;
     }
 
-    if (prev_substate == eStateEat_Eat) {
+    if (prev_substate == eStateEat_Eat)
+    {
         m_time_last_eat = time();
 
         if (!hungry())
@@ -171,12 +180,14 @@ void CStateGroupEatAbstract::reselect_state()
         return;
     }
 
-    if (prev_substate == eStateEat_WalkAway) {
+    if (prev_substate == eStateEat_WalkAway)
+    {
         select_state(eStateEat_Rest);
         return;
     }
 
-    if (prev_substate == eStateEat_Rest) {
+    if (prev_substate == eStateEat_Rest)
+    {
         select_state(eStateEat_Rest);
         return;
     }
@@ -189,11 +200,13 @@ void CStateGroupEatAbstract::setup_substates()
 {
     state_ptr state = get_state_current();
 
-    if (current_substate == eStateEat_CorpseApproachRun) {
+    if (current_substate == eStateEat_CorpseApproachRun)
+    {
         // Определить позицию ближайшей боны у трупа
         Fvector nearest_bone_pos;
         const CEntityAlive* corpse = object->EatedCorpse;
-        if ((corpse->m_pPhysicsShell == NULL) || (!corpse->m_pPhysicsShell->isActive())) {
+        if ((corpse->m_pPhysicsShell == NULL) || (!corpse->m_pPhysicsShell->isActive()))
+        {
             nearest_bone_pos = corpse->Position();
         }
         else
@@ -214,7 +227,8 @@ void CStateGroupEatAbstract::setup_substates()
         return;
     }
 
-    if (current_substate == eStateEat_CheckCorpse) {
+    if (current_substate == eStateEat_CheckCorpse)
+    {
         SStateDataAction data;
         data.action = ACT_STAND_IDLE;
         data.spec_params = 0;
@@ -227,7 +241,8 @@ void CStateGroupEatAbstract::setup_substates()
         return;
     }
 
-    if (current_substate == eStateEat_WalkAway) {
+    if (current_substate == eStateEat_WalkAway)
+    {
         SStateHideFromPoint data;
 
         data.point = object->EatedCorpse->Position();
@@ -247,7 +262,8 @@ void CStateGroupEatAbstract::setup_substates()
         return;
     }
 
-    if (current_substate == eStateEat_Rest) {
+    if (current_substate == eStateEat_Rest)
+    {
         SStateDataAction data;
         data.action = ACT_STAND_IDLE;
         data.spec_params = 0;
@@ -260,21 +276,24 @@ void CStateGroupEatAbstract::setup_substates()
         return;
     }
 
-    if (current_substate == eStateEat_CorpseApproachWalk) {
+    if (current_substate == eStateEat_CorpseApproachWalk)
+    {
         // Определить позицию ближайшей боны у трупа
         Fvector nearest_bone_pos;
         const CEntityAlive* corpse = object->EatedCorpse;
 
 #ifdef DEBUG
-        if (!corpse) {
+        if (!corpse)
+        {
             debug::text_tree tree;
             object->add_debug_info(tree);
             debug::log_text_tree(tree);
             FATAL("Debug info has been added, plz save log");
         }
-#endif  //#ifdef DEBUG
+#endif //#ifdef DEBUG
 
-        if ((corpse->m_pPhysicsShell == NULL) || (!corpse->m_pPhysicsShell->isActive())) {
+        if ((corpse->m_pPhysicsShell == NULL) || (!corpse->m_pPhysicsShell->isActive()))
+        {
             nearest_bone_pos = corpse->Position();
         }
         else
@@ -299,8 +318,10 @@ void CStateGroupEatAbstract::setup_substates()
 TEMPLATE_SPECIALIZATION
 bool CStateGroupEatAbstract::check_completion()
 {
-    if (corpse != object->EatedCorpse) return true;
-    if (!hungry()) return true;
+    if (corpse != object->EatedCorpse)
+        return true;
+    if (!hungry())
+        return true;
 
     return false;
 }
@@ -308,9 +329,10 @@ bool CStateGroupEatAbstract::check_completion()
 TEMPLATE_SPECIALIZATION
 bool CStateGroupEatAbstract::check_start_conditions()
 {
-    if (object->EatedCorpse) return true;
+    if (object->EatedCorpse)
+        return true;
     return (object->CorpseMan.get_corpse() && object->Home->at_home(object->CorpseMan.get_corpse()->Position()) &&
-            hungry() && !const_cast<CEntityAlive*>(object->CorpseMan.get_corpse())->is_locked_corpse());
+        hungry() && !const_cast<CEntityAlive*>(object->CorpseMan.get_corpse())->is_locked_corpse());
 }
 
 TEMPLATE_SPECIALIZATION
@@ -322,7 +344,8 @@ bool CStateGroupEatAbstract::hungry()
 TEMPLATE_SPECIALIZATION
 void CStateGroupEatAbstract::remove_links(IGameObject* object)
 {
-    if (corpse == object) corpse = 0;
+    if (corpse == object)
+        corpse = 0;
 }
 
 #undef TEMPLATE_SPECIALIZATION

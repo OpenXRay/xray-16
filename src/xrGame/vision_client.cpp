@@ -67,16 +67,13 @@ void vision_client::eye_pp_s2()
     Level().AIStats.VisRayTests.End();
 }
 
-float vision_client::shedule_Scale()
-{
-    return (0.f);
-}
-
+float vision_client::shedule_Scale() { return (0.f); }
 void vision_client::shedule_Update(u32 dt)
 {
     inherited::shedule_Update(dt);
 
-    if (!object().g_Alive()) return;
+    if (!object().g_Alive())
+        return;
 
     switch (m_state)
     {
@@ -105,27 +102,12 @@ shared_str vision_client::shedule_Name() const
     return (temp);
 }
 
-bool vision_client::shedule_Needed()
-{
-    return (true);
-}
-
+bool vision_client::shedule_Needed() { return (true); }
 float vision_client::feel_vision_mtl_transp(IGameObject* O, u32 element)
 {
     return (visual().feel_vision_mtl_transp(O, element));
 }
 
-void vision_client::reinit()
-{
-    visual().reinit();
-}
-
-void vision_client::reload(LPCSTR section)
-{
-    visual().reload(section);
-}
-
-void vision_client::remove_links(IGameObject* object)
-{
-    visual().remove_links(object);
-}
+void vision_client::reinit() { visual().reinit(); }
+void vision_client::reload(LPCSTR section) { visual().reload(section); }
+void vision_client::remove_links(IGameObject* object) { visual().remove_links(object); }

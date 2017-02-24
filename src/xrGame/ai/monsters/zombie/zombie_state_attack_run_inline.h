@@ -2,22 +2,16 @@
 
 #include "sound_player.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
 #define CStateZombieAttackRunAbstract CStateZombieAttackRun<_Object>
 
 TEMPLATE_SPECIALIZATION
-CStateZombieAttackRunAbstract::CStateZombieAttackRun(_Object* obj) : inherited(obj)
-{
-}
-
+CStateZombieAttackRunAbstract::CStateZombieAttackRun(_Object* obj) : inherited(obj) {}
 TEMPLATE_SPECIALIZATION
-CStateZombieAttackRunAbstract::~CStateZombieAttackRun()
-{
-}
-
+CStateZombieAttackRunAbstract::~CStateZombieAttackRun() {}
 TEMPLATE_SPECIALIZATION
 void CStateZombieAttackRunAbstract::initialize()
 {
@@ -50,10 +44,12 @@ void CStateZombieAttackRunAbstract::execute()
     // Получить команду
     SSquadCommand command;
     squad->GetCommand(object, command);
-    if (!squad_active || (command.type != SC_ATTACK)) squad_active = false;
+    if (!squad_active || (command.type != SC_ATTACK))
+        squad_active = false;
     //////////////////////////////////////////////////////////////////////////
 
-    if (squad_active) {
+    if (squad_active)
+    {
         object->path().set_use_dest_orient(true);
         object->path().set_dest_direction(command.direction);
     }
@@ -63,7 +59,8 @@ void CStateZombieAttackRunAbstract::execute()
     choose_action();
     object->anim().m_tAction = action;
 
-    if (action == ACT_RUN) object->path().set_try_min_time(true);
+    if (action == ACT_RUN)
+        object->path().set_try_min_time(true);
 
     object->sound().play(MonsterSound::eMonsterSoundAggressive, 0, 0, object->db().m_dwAttackSndDelay);
     object->anim().accel_activate(eAT_Aggressive);
@@ -76,7 +73,8 @@ bool CStateZombieAttackRunAbstract::check_completion()
     float m_fDistMin = object->MeleeChecker.get_min_distance();
     float dist = object->MeleeChecker.distance_to_enemy(object->EnemyMan.get_enemy());
 
-    if (dist < m_fDistMin) return true;
+    if (dist < m_fDistMin)
+        return true;
 
     return false;
 }
@@ -87,7 +85,8 @@ bool CStateZombieAttackRunAbstract::check_start_conditions()
     float m_fDistMax = object->MeleeChecker.get_max_distance();
     float dist = object->MeleeChecker.distance_to_enemy(object->EnemyMan.get_enemy());
 
-    if (dist > m_fDistMax) return true;
+    if (dist > m_fDistMax)
+        return true;
 
     return false;
 }

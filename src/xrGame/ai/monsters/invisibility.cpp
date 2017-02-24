@@ -23,7 +23,8 @@ void CInvisibility::reload(LPCSTR section)
 
 void CInvisibility::activate()
 {
-    if (m_active) return;
+    if (m_active)
+        return;
     start_blink();
 
     m_active = true;
@@ -32,7 +33,8 @@ void CInvisibility::activate()
 
 void CInvisibility::deactivate()
 {
-    if (!m_active) return;
+    if (!m_active)
+        return;
     start_blink();
 
     m_active = false;
@@ -56,18 +58,21 @@ void CInvisibility::stop_blink()
 
 void CInvisibility::update_blink()
 {
-    if (!m_blink) return;
+    if (!m_blink)
+        return;
 
     u32 cur_time = Device.dwTimeGlobal;
 
     // check for whole blink time
-    if (m_time_start_blink + timeBlink < cur_time) {
+    if (m_time_start_blink + timeBlink < cur_time)
+    {
         stop_blink();
         return;
     }
 
     // check for current blink interval time
-    if (m_time_last_blink + timeBlinkInterval < cur_time) {
+    if (m_time_last_blink + timeBlinkInterval < cur_time)
+    {
         // blink
         m_time_last_blink = cur_time;
         m_cur_visibility = !m_cur_visibility;
@@ -80,7 +85,8 @@ void CInvisibility::frame_update()
 {
     update_blink();
 
-    if (!m_manual) {
+    if (!m_manual)
+    {
         if (m_active)
             m_energy -= m_speed * Device.fTimeDelta;
         else
@@ -89,17 +95,15 @@ void CInvisibility::frame_update()
     }
 }
 
-void CInvisibility::set_manual_control(bool b_man)
-{
-    m_manual = b_man;
-}
-
+void CInvisibility::set_manual_control(bool b_man) { m_manual = b_man; }
 void CInvisibility::manual_activate()
 {
-    if (m_manual) activate();
+    if (m_manual)
+        activate();
 }
 
 void CInvisibility::manual_deactivate()
 {
-    if (m_manual) deactivate();
+    if (m_manual)
+        deactivate();
 }

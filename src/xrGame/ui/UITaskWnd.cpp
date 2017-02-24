@@ -21,16 +21,8 @@
 #include "Actor.h"
 #include "UICheckButton.h"
 
-CUITaskWnd::CUITaskWnd()
-{
-    hint_wnd = NULL;
-}
-
-CUITaskWnd::~CUITaskWnd()
-{
-    delete_data(m_pMapWnd);
-}
-
+CUITaskWnd::CUITaskWnd() { hint_wnd = NULL; }
+CUITaskWnd::~CUITaskWnd() { delete_data(m_pMapWnd); }
 void CUITaskWnd::Init()
 {
     CUIXml xml;
@@ -105,11 +97,13 @@ void CUITaskWnd::Init()
 
 void CUITaskWnd::Update()
 {
-    if (Level().GameTaskManager().ActualFrame() != m_actual_frame) {
+    if (Level().GameTaskManager().ActualFrame() != m_actual_frame)
+    {
         ReloadTaskInfo();
     }
 
-    if (m_pStoryLineTaskItem->show_hint && m_pStoryLineTaskItem->OwnerTask()) {
+    if (m_pStoryLineTaskItem->show_hint && m_pStoryLineTaskItem->OwnerTask())
+    {
         m_pMapWnd->ShowHintTask(m_pStoryLineTaskItem->OwnerTask(), m_pStoryLineTaskItem);
     }
     else
@@ -119,40 +113,37 @@ void CUITaskWnd::Update()
     inherited::Update();
 }
 
-void CUITaskWnd::Draw()
-{
-    inherited::Draw();
-}
-
-void CUITaskWnd::DrawHint()
-{
-    m_pMapWnd->DrawHint();
-}
-
+void CUITaskWnd::Draw() { inherited::Draw(); }
+void CUITaskWnd::DrawHint() { m_pMapWnd->DrawHint(); }
 void CUITaskWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
-    if (msg == PDA_TASK_SET_TARGET_MAP && pData) {
+    if (msg == PDA_TASK_SET_TARGET_MAP && pData)
+    {
         CGameTask* task = static_cast<CGameTask*>(pData);
         TaskSetTargetMap(task);
         return;
     }
-    if (msg == PDA_TASK_SHOW_MAP_SPOT && pData && m_bSecondaryTasksEnabled) {
+    if (msg == PDA_TASK_SHOW_MAP_SPOT && pData && m_bSecondaryTasksEnabled)
+    {
         CGameTask* task = static_cast<CGameTask*>(pData);
         TaskShowMapSpot(task, true);
         return;
     }
-    if (msg == PDA_TASK_HIDE_MAP_SPOT && pData) {
+    if (msg == PDA_TASK_HIDE_MAP_SPOT && pData)
+    {
         CGameTask* task = static_cast<CGameTask*>(pData);
         TaskShowMapSpot(task, false);
         return;
     }
 
-    if (msg == PDA_TASK_SHOW_HINT && pData) {
+    if (msg == PDA_TASK_SHOW_HINT && pData)
+    {
         CGameTask* task = static_cast<CGameTask*>(pData);
         m_pMapWnd->ShowHintTask(task, pWnd);
         return;
     }
-    if (msg == PDA_TASK_HIDE_HINT) {
+    if (msg == PDA_TASK_HIDE_HINT)
+    {
         m_pMapWnd->HideCurHint();
         return;
     }
@@ -184,23 +175,26 @@ void CUITaskWnd::ReloadTaskInfo()
             (/*b->location->SpotEnabled() && */ m_bSecondaryTasksEnabled) ? b->location->EnableSpot() :
                                                                             b->location->DisableSpot();
         else if (spot == "ui_pda2_trader_location" || spot == "ui_pda2_mechanic_location" ||
-                 spot == "ui_pda2_scout_location" || spot == "ui_pda2_quest_npc_location" ||
-                 spot == "ui_pda2_medic_location" || spot == "ui_pda2_actor_box_location" ||
-                 spot == "ui_pda2_actor_sleep_location")
+            spot == "ui_pda2_scout_location" || spot == "ui_pda2_quest_npc_location" ||
+            spot == "ui_pda2_medic_location" || spot == "ui_pda2_actor_box_location" ||
+            spot == "ui_pda2_actor_sleep_location")
             m_bQuestNpcsEnabled ? b->location->EnableSpot() : b->location->DisableSpot();
     }
 
-    if (!t) return;
+    if (!t)
+        return;
 
     m_actual_frame = Level().GameTaskManager().ActualFrame();
 
     u32 task_count = Level().GameTaskManager().GetTaskCount(eTaskStateInProgress);
-    if (task_count) {
+    if (task_count)
+    {
         u32 task_index = Level().GameTaskManager().GetTaskIndex(t, eTaskStateInProgress);
         string32 buf;
         xr_sprintf(buf, sizeof(buf), "%d / %d", task_index, task_count);
     }
-    if (m_task_wnd->IsShown()) m_task_wnd->UpdateList();
+    if (m_task_wnd->IsShown())
+        m_task_wnd->UpdateList();
 }
 
 void CUITaskWnd::Show(bool status)
@@ -209,7 +203,8 @@ void CUITaskWnd::Show(bool status)
     m_pMapWnd->Show(status);
     m_pMapWnd->HideCurHint();
     m_map_legend_wnd->Show(false);
-    if (status) {
+    if (status)
+    {
         ReloadTaskInfo();
         m_task_wnd->Show(m_task_wnd_show);
     }
@@ -220,19 +215,9 @@ void CUITaskWnd::Show(bool status)
     }
 }
 
-void CUITaskWnd::Reset()
-{
-    inherited::Reset();
-}
-
-void CUITaskWnd::OnNextTaskClicked()
-{
-}
-
-void CUITaskWnd::OnPrevTaskClicked()
-{
-}
-
+void CUITaskWnd::Reset() { inherited::Reset(); }
+void CUITaskWnd::OnNextTaskClicked() {}
+void CUITaskWnd::OnPrevTaskClicked() {}
 void CUITaskWnd::OnShowTaskListWnd(CUIWindow* w, void* d)
 {
     m_task_wnd_show = !m_task_wnd_show;
@@ -247,13 +232,15 @@ void CUITaskWnd::Show_TaskListWnd(bool status)
 
 void CUITaskWnd::TaskSetTargetMap(CGameTask* task)
 {
-    if (!task || !m_bSecondaryTasksEnabled) {
+    if (!task || !m_bSecondaryTasksEnabled)
+    {
         return;
     }
 
     TaskShowMapSpot(task, true);
     CMapLocation* ml = task->LinkedMapLocation();
-    if (ml && ml->SpotEnabled()) {
+    if (ml && ml->SpotEnabled())
+    {
         ml->CalcPosition();
         m_pMapWnd->SetTargetMap(ml->GetLevelName(), ml->GetPosition(), true);
     }
@@ -261,13 +248,16 @@ void CUITaskWnd::TaskSetTargetMap(CGameTask* task)
 
 void CUITaskWnd::TaskShowMapSpot(CGameTask* task, bool show)
 {
-    if (!task || !m_bSecondaryTasksEnabled) {
+    if (!task || !m_bSecondaryTasksEnabled)
+    {
         return;
     }
 
     CMapLocation* ml = task->LinkedMapLocation();
-    if (ml) {
-        if (show) {
+    if (ml)
+    {
+        if (show)
+        {
             ml->EnableSpot();
             ml->CalcPosition();
             m_pMapWnd->SetTargetMap(ml->GetLevelName(), ml->GetPosition(), true);
@@ -285,16 +275,8 @@ void CUITaskWnd::OnTask1DbClicked(CUIWindow* ui, void* d)
     TaskSetTargetMap(task);
 }
 
-void CUITaskWnd::ShowMapLegend(bool status)
-{
-    m_map_legend_wnd->Show(status);
-}
-
-void CUITaskWnd::Switch_ShowMapLegend()
-{
-    m_map_legend_wnd->Show(!m_map_legend_wnd->IsShown());
-}
-
+void CUITaskWnd::ShowMapLegend(bool status) { m_map_legend_wnd->Show(status); }
+void CUITaskWnd::Switch_ShowMapLegend() { m_map_legend_wnd->Show(!m_map_legend_wnd->IsShown()); }
 void CUITaskWnd::OnShowTreasures(CUIWindow* ui, void* d)
 {
     m_bTreasuresEnabled = !m_bTreasuresEnabled;
@@ -316,14 +298,8 @@ void CUITaskWnd::OnShowQuestNpcs(CUIWindow* ui, void* d)
     ReloadTaskInfo();
 }
 // --------------------------------------------------------------------------------------------------
-CUITaskItem::CUITaskItem() : m_owner(NULL), m_hint_wt(500), show_hint(false), show_hint_can(false)
-{
-}
-
-CUITaskItem::~CUITaskItem()
-{
-}
-
+CUITaskItem::CUITaskItem() : m_owner(NULL), m_hint_wt(500), show_hint(false), show_hint_can(false) {}
+CUITaskItem::~CUITaskItem() {}
 CUIStatic* init_static_field(CUIXml& uiXml, LPCSTR path, LPCSTR path2);
 
 void CUITaskItem::Init(CUIXml& uiXml, LPCSTR path)
@@ -335,14 +311,16 @@ void CUITaskItem::Init(CUIXml& uiXml, LPCSTR path)
     CUIStatic* S = NULL;
 
     strconcat(sizeof(buff), buff, path, ":t_icon");
-    if (uiXml.NavigateToNode(buff)) {
+    if (uiXml.NavigateToNode(buff))
+    {
         S = init_static_field(uiXml, path, "t_icon");
         AttachChild(S);
     }
     m_info["t_icon"] = S;
 
     strconcat(sizeof(buff), buff, path, ":t_icon_over");
-    if (uiXml.NavigateToNode(buff)) {
+    if (uiXml.NavigateToNode(buff))
+    {
         S = init_static_field(uiXml, path, "t_icon_over");
         AttachChild(S);
     }
@@ -360,8 +338,10 @@ void CUITaskItem::InitTask(CGameTask* task)
 {
     m_owner = task;
     CUIStatic* S = m_info["t_icon"];
-    if (S) {
-        if (task) {
+    if (S)
+    {
+        if (task)
+        {
             S->InitTexture(task->m_icon_texture_name.c_str());
             S->SetStretchTexture(true);
             m_info["t_icon_over"]->Show(true);
@@ -394,21 +374,21 @@ void CUITaskItem::OnFocusLost()
 void CUITaskItem::Update()
 {
     inherited::Update();
-    if (m_owner && m_bCursorOverWindow && show_hint_can) {
-        if (Device.dwTimeGlobal > (m_dwFocusReceiveTime + m_hint_wt)) {
+    if (m_owner && m_bCursorOverWindow && show_hint_can)
+    {
+        if (Device.dwTimeGlobal > (m_dwFocusReceiveTime + m_hint_wt))
+        {
             show_hint = true;
             return;
         }
     }
 }
 
-void CUITaskItem::OnMouseScroll(float iDirection)
-{
-}
-
+void CUITaskItem::OnMouseScroll(float iDirection) {}
 bool CUITaskItem::OnMouseAction(float x, float y, EUIMessages mouse_action)
 {
-    if (inherited::OnMouseAction(x, y, mouse_action)) {
+    if (inherited::OnMouseAction(x, y, mouse_action))
+    {
         // return true;
     }
 
@@ -420,12 +400,9 @@ bool CUITaskItem::OnMouseAction(float x, float y, EUIMessages mouse_action)
         show_hint_can = false;
         show_hint = false;
         break;
-    }  // switch
+    } // switch
 
     return true;
 }
 
-void CUITaskItem::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
-{
-    inherited::SendMessage(pWnd, msg, pData);
-}
+void CUITaskItem::SendMessage(CUIWindow* pWnd, s16 msg, void* pData) { inherited::SendMessage(pWnd, msg, pData); }

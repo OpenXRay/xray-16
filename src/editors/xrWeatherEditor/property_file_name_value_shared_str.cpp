@@ -19,27 +19,8 @@ property_file_name_value_shared_str::property_file_name_value_shared_str(editor:
 {
 }
 
-String ^ property_file_name_value_shared_str::default_extension()
-{
-    return (DefaultExt);
-}
-
-String ^ property_file_name_value_shared_str::filter()
-{
-    return (Filter);
-}
-
-String ^ property_file_name_value_shared_str::initial_directory()
-{
-    return (InitialDirectory);
-}
-
-String ^ property_file_name_value_shared_str::title()
-{
-    return (Title);
-}
-
-bool property_file_name_value_shared_str::remove_extension()
-{
-    return (m_remove_extension);
-}
+String ^ property_file_name_value_shared_str::default_extension() { return (DefaultExt); }
+String ^ property_file_name_value_shared_str::filter() { return (Filter); }
+String ^ property_file_name_value_shared_str::initial_directory() { return (InitialDirectory); }
+String ^ property_file_name_value_shared_str::title() { return (Title); }
+bool property_file_name_value_shared_str::remove_extension() { return (m_remove_extension); }

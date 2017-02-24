@@ -12,21 +12,9 @@
 #define hour2ms 60 * min2ms
 #define day2ms 24 * hour2ms
 
-ALife::_TIME_ID __game_time()
-{
-    return (ai().get_alife() ? ai().alife().time().game_time() : Level().GetGameTime());
-}
-
-u32 get_time()
-{
-    return u32(__game_time() & u32(-1));
-}
-
-xrTime get_time_struct()
-{
-    return xrTime(__game_time());
-}
-
+ALife::_TIME_ID __game_time() { return (ai().get_alife() ? ai().alife().time().game_time() : Level().GetGameTime()); }
+u32 get_time() { return u32(__game_time() & u32(-1)); }
+xrTime get_time_struct() { return xrTime(__game_time()); }
 LPCSTR xrTime::dateToString(int mode)
 {
     return *InventoryUtilities::GetDateAsString(m_time, (InventoryUtilities::EDatePrecision)mode);
@@ -36,10 +24,7 @@ LPCSTR xrTime::timeToString(int mode)
     return *InventoryUtilities::GetTimeAsString(m_time, (InventoryUtilities::ETimePrecision)mode);
 }
 
-void xrTime::add(const xrTime& other)
-{
-    m_time += other.m_time;
-}
+void xrTime::add(const xrTime& other) { m_time += other.m_time; }
 void xrTime::sub(const xrTime& other)
 {
     if (*this > other)
@@ -73,6 +58,7 @@ void xrTime::get(u32& y, u32& mo, u32& d, u32& h, u32& mi, u32& s, u32& ms)
 
 float xrTime::diffSec(const xrTime& other)
 {
-    if (*this > other) return (m_time - other.m_time) / (float)sec2ms;
+    if (*this > other)
+        return (m_time - other.m_time) / (float)sec2ms;
     return ((other.m_time - m_time) / (float)sec2ms) * (-1.0f);
 }

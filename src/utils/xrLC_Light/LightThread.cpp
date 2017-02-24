@@ -17,8 +17,10 @@ void LightThread::Execute()
         for (u32 _x = 0; _x < gl_data.slots_data.size_x(); _x++)
         {
             DetailSlot& DS = gl_data.slots_data.get_slot(_x, _z);
-            if (!detail_slot_process(_x, _z, DS)) continue;
-            if (!detail_slot_calculate(_x, _z, DS, box_result, DB, Selected)) continue;  //?
+            if (!detail_slot_process(_x, _z, DS))
+                continue;
+            if (!detail_slot_calculate(_x, _z, DS, box_result, DB, Selected))
+                continue; //?
             gl_data.slots_data.set_slot_calculated(_x, _z);
 
             thProgress = float(_z - Nstart) / float(Nend - Nstart);

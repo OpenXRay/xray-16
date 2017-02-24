@@ -43,7 +43,8 @@ CPatternFunction::~CPatternFunction()
 void CPatternFunction::vfLoadEF(LPCSTR caFileName)
 {
     string_path caPath;
-    if (!FS.exist(caPath, "$game_ai$", caFileName)) {
+    if (!FS.exist(caPath, "$game_ai$", caFileName))
+    {
         Msg("! Evaluation function : File not found \"%s\"", caPath);
         R_ASSERT(false);
         return;
@@ -52,7 +53,8 @@ void CPatternFunction::vfLoadEF(LPCSTR caFileName)
     IReader* F = FS.r_open(caPath);
     F->r(&m_tEFHeader, sizeof(SEFHeader));
 
-    if (EFC_VERSION != m_tEFHeader.dwBuilderVersion) {
+    if (EFC_VERSION != m_tEFHeader.dwBuilderVersion)
+    {
         FS.r_close(F);
         Msg("! Evaluation function (%s) : Not supported version of the Evaluation Function Contructor", caPath);
         R_ASSERT(false);
@@ -68,7 +70,8 @@ void CPatternFunction::vfLoadEF(LPCSTR caFileName)
     for (u32 i = 0; i < m_dwVariableCount; ++i)
     {
         F->r(m_dwaAtomicFeatureRange + i, sizeof(u32));
-        if (i) m_dwaAtomicIndexes[i] = m_dwaAtomicIndexes[i - 1] + m_dwaAtomicFeatureRange[i - 1];
+        if (i)
+            m_dwaAtomicIndexes[i] = m_dwaAtomicIndexes[i - 1] + m_dwaAtomicFeatureRange[i - 1];
     }
 
     m_dwaVariableTypes = xr_alloc<u32>(m_dwVariableCount);
@@ -86,7 +89,8 @@ void CPatternFunction::vfLoadEF(LPCSTR caFileName)
     m_dwParameterCount = 0;
     for (u32 i = 0; i < m_dwPatternCount; ++i)
     {
-        if (i) m_dwaPatternIndexes[i] = m_dwParameterCount;
+        if (i)
+            m_dwaPatternIndexes[i] = m_dwParameterCount;
         F->r(&(m_tpPatterns[i].dwCardinality), sizeof(m_tpPatterns[i].dwCardinality));
         m_tpPatterns[i].dwaVariableIndexes = xr_alloc<u32>(m_tpPatterns[i].dwCardinality);
         F->r(m_tpPatterns[i].dwaVariableIndexes, m_tpPatterns[i].dwCardinality * sizeof(u32));
@@ -126,7 +130,8 @@ float CPatternFunction::ffGetValue()
             ef_storage().m_fpaBaseFunctions[m_dwaVariableTypes[i]]->dwfGetDiscreteValue(m_dwaAtomicFeatureRange[i]);
 
 #ifdef DEBUG
-    if (psAI_Flags.test(aiFuncs)) {
+    if (psAI_Flags.test(aiFuncs))
+    {
         float value = ffEvaluate();
         string256 caString;
 

@@ -12,7 +12,7 @@
 #include "alife_human_brain.h"
 #ifdef XRGAME_EXPORTS
 #include "relation_registry.h"
-#endif  // #ifdef XRGAME_EXPORTS
+#endif // #ifdef XRGAME_EXPORTS
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
@@ -53,21 +53,9 @@ ALife::_OBJECT_ID smart_terrain_id(CSE_ALifeMonsterAbstract* monster)
     return (monster->m_smart_terrain_id);
 }
 #ifdef XRGAME_EXPORTS
-float travel_speed(CSE_ALifeMonsterAbstract* self)
-{
-    return (self->m_fGoingSpeed);
-}
-
-void travel_speed2(CSE_ALifeMonsterAbstract* self, float travel_speed)
-{
-    self->m_fGoingSpeed = travel_speed;
-}
-
-float current_level_travel_speed(CSE_ALifeMonsterAbstract* self)
-{
-    return (self->m_fCurrentLevelGoingSpeed);
-}
-
+float travel_speed(CSE_ALifeMonsterAbstract* self) { return (self->m_fGoingSpeed); }
+void travel_speed2(CSE_ALifeMonsterAbstract* self, float travel_speed) { self->m_fGoingSpeed = travel_speed; }
+float current_level_travel_speed(CSE_ALifeMonsterAbstract* self) { return (self->m_fCurrentLevelGoingSpeed); }
 void current_level_travel_speed2(CSE_ALifeMonsterAbstract* self, float travel_speed)
 {
     self->m_fCurrentLevelGoingSpeed = travel_speed;
@@ -77,7 +65,7 @@ void ForceSetGoodwill(CSE_ALifeMonsterAbstract* self, int goodwill, ALife::_OBJE
 {
     RELATION_REGISTRY().ForceSetGoodwill(self->ID, pWhoToSet, goodwill);
 }
-#endif  // #ifdef XRGAME_EXPORTS
+#endif // #ifdef XRGAME_EXPORTS
 
 static void CSE_ALifeMonsterAbstract_Export(lua_State* luaState)
 {

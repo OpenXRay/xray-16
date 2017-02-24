@@ -29,12 +29,13 @@ void CRender::level_Load(IReader* fs)
         R_ASSERT2(chunk, "Level doesn't builded correctly.");
         u32 count = chunk->r_u32();
         Shaders.resize(count);
-        for (u32 i = 0; i < count; i++)  // skip first shader as "reserved" one
+        for (u32 i = 0; i < count; i++) // skip first shader as "reserved" one
         {
             string512 n_sh, n_tlist;
             LPCSTR n = LPCSTR(chunk->pointer());
             chunk->skip_stringZ();
-            if (0 == n[0]) continue;
+            if (0 == n[0])
+                continue;
             xr_strcpy(n_sh, n);
             LPSTR delim = strchr(n_sh, '/');
             *delim = 0;
@@ -58,7 +59,8 @@ void CRender::level_Load(IReader* fs)
 
     marker = 0;
 
-    if (!g_dedicated_server) {
+    if (!g_dedicated_server)
+    {
         // VB,IB,SWI
         //		g_pGamePersistent->LoadTitle("st_loading_geometry");
         g_pGamePersistent->LoadTitle();
@@ -99,8 +101,10 @@ void CRender::level_Load(IReader* fs)
 
 void CRender::level_Unload()
 {
-    if (0 == g_pGameLevel) return;
-    if (!b_loaded) return;
+    if (0 == g_pGameLevel)
+        return;
+    if (!b_loaded)
+        return;
 
     u32 I;
 
@@ -176,7 +180,8 @@ void CRender::LoadBuffers(CStreamReader* base_fs)
     u32 dwUsage = D3DUSAGE_WRITEONLY | (HW.Caps.geometry.bSoftware ? D3DUSAGE_SOFTWAREPROCESSING : 0);
 
     // Vertex buffers
-    if (base_fs->find_chunk(fsL_VB)) {
+    if (base_fs->find_chunk(fsL_VB))
+    {
         // Use DX9-style declarators
         CStreamReader* fs = base_fs->open_chunk(fsL_VB);
         u32 count = fs->r_u32();
@@ -225,7 +230,8 @@ void CRender::LoadBuffers(CStreamReader* base_fs)
     }
 
     // Index buffers
-    if (base_fs->find_chunk(fsL_IB)) {
+    if (base_fs->find_chunk(fsL_IB))
+    {
         CStreamReader* fs = base_fs->open_chunk(fsL_IB);
         u32 count = fs->r_u32();
         IB.resize(count);
@@ -302,7 +308,8 @@ void CRender::LoadSectors(IReader* fs)
     for (u32 i = 0;; i++)
     {
         IReader* P = S->open_chunk(i);
-        if (0 == P) break;
+        if (0 == P)
+            break;
 
         CSector* __S = new CSector();
         __S->load(*P);
@@ -313,7 +320,8 @@ void CRender::LoadSectors(IReader* fs)
     S->close();
 
     // load portals
-    if (count) {
+    if (count)
+    {
         u32 i;
         CDB::Collector CL;
         fs->find_chunk(fsL_PORTALS);
@@ -327,7 +335,8 @@ void CRender::LoadSectors(IReader* fs)
             for (u32 j = 2; j < P.vertices.size(); j++)
                 CL.add_face_packed_D(P.vertices[0], P.vertices[j - 1], P.vertices[j], u32(i));
         }
-        if (CL.getTS() < 2) {
+        if (CL.getTS() < 2)
+        {
             Fvector v1, v2, v3;
             v1.set(-20000.f, -20000.f, -20000.f);
             v2.set(-20001.f, -20001.f, -20001.f);
@@ -354,7 +363,8 @@ void CRender::LoadSectors(IReader* fs)
 void CRender::LoadSWIs(CStreamReader* base_fs)
 {
     // allocate memory for portals
-    if (base_fs->find_chunk(fsL_SWIS)) {
+    if (base_fs->find_chunk(fsL_SWIS))
+    {
         CStreamReader* fs = base_fs->open_chunk(fsL_SWIS);
         u32 item_count = fs->r_u32();
 

@@ -26,7 +26,8 @@ inline void aimers::base::fill_bones(u32 const (&bones)[bone_count0], u16 const 
     u32 const channel_id = 1;
     u32 const channel_mask = 1 << channel_id;
 
-    if (m_animation_start) {
+    if (m_animation_start)
+    {
         for (u16 i = 0; i < MAX_PARTS; ++i)
         {
             u32 const blend_count = m_animated.LL_PartBlendsCount(i);
@@ -45,7 +46,8 @@ inline void aimers::base::fill_bones(u32 const (&bones)[bone_count0], u16 const 
         for (u16 i = 0; i < MAX_PARTS; ++i)
         {
             CBlend* const blend = m_animated.LL_PlayCycle(i, m_animation_id, 0, 0, 0, channel_id);
-            if (blend) blend->timeCurrent = m_animation_start ? 0.f : (blend->timeTotal - (SAMPLE_SPF + EPS));
+            if (blend)
+                blend->timeCurrent = m_animation_start ? 0.f : (blend->timeTotal - (SAMPLE_SPF + EPS));
         }
     }
 
@@ -70,4 +72,4 @@ inline void aimers::base::fill_bones(u32 const (&bones)[bone_count0], u16 const 
     root_bone.set_callback(bctCustom, callback, callback_params);
 }
 
-#endif  // #ifndef AIMERS_BASE_INLINE_H_INCLUDED
+#endif // #ifndef AIMERS_BASE_INLINE_H_INCLUDED

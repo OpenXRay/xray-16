@@ -91,11 +91,7 @@ void __fastcall TMainForm::NewEffectButtonClick(TObject* Sender)
 }
 
 //---------------------------------------------------------------------------
-void __fastcall TMainForm::FormPaint(TObject* Sender)
-{
-    UpdateGraph();
-}
-
+void __fastcall TMainForm::FormPaint(TObject* Sender) { UpdateGraph(); }
 //---------------------------------------------------------------------------
 void __fastcall TMainForm::ImageMouseUp(TObject* Sender, TMouseButton Button, TShiftState Shift, int X, int Y)
 {
@@ -131,7 +127,8 @@ void TMainForm::FillPointList()
 
 void __fastcall TMainForm::TabControlChange(TObject* Sender)
 {
-    if (m_ActiveShowForm) {
+    if (m_ActiveShowForm)
+    {
         m_ActiveShowForm->GetForm()->Visible = false;
         m_ActiveShowForm = NULL;
     }
@@ -146,7 +143,8 @@ void __fastcall TMainForm::TabControlChange(TObject* Sender)
 
     FillPointList();
 
-    if (PointList->Count) PointList->ItemIndex = 0;
+    if (PointList->Count)
+        PointList->ItemIndex = 0;
 
     PointListClick(NULL);
     UpdateGraph();
@@ -168,7 +166,8 @@ void __fastcall TMainForm::LoadButtonClick(TObject* Sender)
        IDYES)
               SaveButtonClick (Sender);
     */
-    if (OpenDialog->Execute()) {
+    if (OpenDialog->Execute())
+    {
         m_Marker = 0.0f;
         m_Animator->Load(OpenDialog->FileName.c_str());
         Caption = OpenDialog->FileName.c_str();
@@ -180,8 +179,10 @@ void __fastcall TMainForm::LoadButtonClick(TObject* Sender)
 
 void __fastcall TMainForm::SaveButtonClick(TObject* Sender)
 {
-    if (m_Animator->GetLength() == 0.0f) return;
-    if (SaveDialog->Execute()) {
+    if (m_Animator->GetLength() == 0.0f)
+        return;
+    if (SaveDialog->Execute())
+    {
         m_Animator->Save(SaveDialog->FileName.c_str());
         Caption = SaveDialog->FileName.c_str();
     }
@@ -189,7 +190,8 @@ void __fastcall TMainForm::SaveButtonClick(TObject* Sender)
 
 void TMainForm::UpdateGraph()
 {
-    if (!m_Animator) return;
+    if (!m_Animator)
+        return;
     TCanvas* canvas = Image->Picture->Bitmap->Canvas;
     canvas->Brush->Color = clWhite;
     canvas->FillRect(TRect(0, 0, Image->Picture->Bitmap->Width, Image->Picture->Bitmap->Height));
@@ -208,7 +210,8 @@ void TMainForm::UpdateGraph()
     string128 buf;
     sprintf(buf, "Effect time : %.3f", alltime);
     StatusBar->Panels->Items[0]->Text = buf;
-    if (alltime == 0.0f) return;
+    if (alltime == 0.0f)
+        return;
 
     float width = (float)Image->Picture->Bitmap->Width, height = (float)Image->Picture->Bitmap->Height * 0.5f;
     // draw marker
@@ -230,7 +233,8 @@ void TMainForm::UpdateGraph()
 
         for (u32 idx = pp_base_color; idx < pp_last; ++idx)
         {
-            if (!m_ActiveShowForm->DrawChannel((_pp_params)idx)) continue;
+            if (!m_ActiveShowForm->DrawChannel((_pp_params)idx))
+                continue;
 
             switch (idx)
             {
@@ -258,9 +262,9 @@ void TMainForm::UpdateGraph()
                 break;
             case pp_noise_g: canvas->Pixels[x][(int)(-m_EffectorParams.noise.grain * height + height)] = clGreen; break;
             case pp_noise_f: canvas->Pixels[x][(int)(-m_EffectorParams.noise.fps * height + height)] = clBlue; break;
-            }  // switch
-        }      // channel
-    }          // time
+            } // switch
+        } // channel
+    } // time
 }
 
 //---------------------------------------------------------------------------

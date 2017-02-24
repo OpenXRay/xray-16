@@ -17,8 +17,8 @@
 //---------------------------------------------------------------------------
 class TAddColorForm : public TForm, public TPPPropEditor
 {
-    __published :  // IDE-managed Components
-                   TGroupBox* GroupBox1;
+    __published : // IDE-managed Components
+                  TGroupBox* GroupBox1;
     TMultiObjSpinEdit* RedValue;
     TMxLabel* RxLabel2;
     TPanel* Color;
@@ -36,13 +36,12 @@ class TAddColorForm : public TForm, public TPPPropEditor
     void __fastcall TimeValueExit(TObject* Sender);
     void __fastcall TimeValueKeyDown(TObject* Sender, WORD& Key, TShiftState Shift);
 
-  private:  // User declarations
+private: // User declarations
     void UpdateColor();
     bool m_bLocked;
 
-  public:  // User declarations
+public: // User declarations
     virtual void Lock(bool b) { m_bLocked = b; }
-
     _pp_params m_pp_params;
 
     __fastcall TAddColorForm(TComponent* Owner, _pp_params p);
@@ -50,13 +49,11 @@ class TAddColorForm : public TForm, public TPPPropEditor
     virtual void ShowCurrent(u32 keyIdx);
 
     virtual _pp_params GetTimeChannel() { return m_pp_params; };
-
     virtual bool DrawChannel(_pp_params p);
     ;
     virtual void Clear();
 
     virtual TForm* GetForm() { return this; };
-
     virtual void AddNew(u32 keyIdx);
     virtual void Remove(u32 keyIdx);
     virtual void RemoveAllKeys();

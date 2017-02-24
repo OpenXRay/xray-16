@@ -12,7 +12,6 @@ protected:
 public:
     CStateMonsterHearDangerousSound(_Object* obj);
     virtual ~CStateMonsterHearDangerousSound() {}
-
     virtual void reselect_state();
     virtual void setup_substates();
     virtual void remove_links(IGameObject* object) { inherited::remove_links(object); }

@@ -41,6 +41,6 @@ public:
 
 protected:
 private:
-};  // UITeamHeader
+}; // UITeamHeader
 
-#endif  // UI_TEAM_HEADER
+#endif // UI_TEAM_HEADER

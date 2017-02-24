@@ -21,8 +21,8 @@ struct SRayPickInfo;
 
 class TfrmPropertiesEObject : public TForm
 {
-    __published :  // IDE-managed Components
-                   TFormStorage* fsStorage;
+    __published : // IDE-managed Components
+                  TFormStorage* fsStorage;
     TElPageControl* ElPageControl1;
     TElTabSheet* tsBasic;
     TElTabSheet* tsSurfaces;
@@ -49,7 +49,7 @@ class TfrmPropertiesEObject : public TForm
     void __fastcall paImagePaint(TObject* Sender);
     void __fastcall FormShow(TObject* Sender);
 
-  private:  // User declarations
+private: // User declarations
     TProperties* m_BasicProp;
     TProperties* m_SurfProp;
     bool bModified;
@@ -61,7 +61,7 @@ class TfrmPropertiesEObject : public TForm
     void FillBasicProps();
     void FillSurfProps();
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TfrmPropertiesEObject(TComponent* Owner);
     static TfrmPropertiesEObject* CreateProperties(
         TWinControl* parent = 0, TAlign align = alNone, TOnModifiedEvent modif = 0);
@@ -69,11 +69,8 @@ class TfrmPropertiesEObject : public TForm
     void UpdateProperties(xr_vector<CSceneObject*> Ss, bool bReadOnly);
 
     void ShowProperties() { Show(); }
-
     void HideProperties() { Hide(); }
-
     bool __fastcall IsModified() { return (m_BasicProp->IsModified() || m_SurfProp->IsModified()); }
-
     void __fastcall OnPick(const SRayPickInfo& pinf);
 };
 

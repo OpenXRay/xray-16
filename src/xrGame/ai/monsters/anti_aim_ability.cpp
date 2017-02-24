@@ -17,7 +17,7 @@ static pcstr const s_anti_aim_max_angle_string = "anti_aim_max_angle";
 static pcstr const s_anti_aim_detection_gain_speed_string = "anti_aim_detection_gain_speed";
 static pcstr const s_anti_aim_detection_loose_speed_string = "anti_aim_detection_loose_speed";
 
-}  // namespace detail
+} // namespace detail
 
 anti_aim_ability::anti_aim_ability(CBaseMonster* const object) : m_object(object)
 {
@@ -29,11 +29,7 @@ anti_aim_ability::anti_aim_ability(CBaseMonster* const object) : m_object(object
     m_callback.clear();
 }
 
-anti_aim_ability::~anti_aim_ability()
-{
-    do_deactivate();
-}
-
+anti_aim_ability::~anti_aim_ability() { do_deactivate(); }
 void anti_aim_ability::load_from_ini(CInifile const* ini, pcstr const section)
 {
     using namespace detail;
@@ -45,7 +41,8 @@ void anti_aim_ability::load_from_ini(CInifile const* ini, pcstr const section)
     m_detection_loose_speed = READ_IF_EXISTS(ini, r_float, section, s_anti_aim_detection_loose_speed_string, 0.1f);
     pcstr effectors = READ_IF_EXISTS(ini, r_string, section, s_anti_aim_effectors_string, NULL);
 
-    if (effectors) {
+    if (effectors)
+    {
         u32 const num_effectors = _GetItemCount(effectors, ',');
         m_effectors.resize(num_effectors);
         for (u32 i = 0; i < num_effectors; ++i)
@@ -57,11 +54,7 @@ void anti_aim_ability::load_from_ini(CInifile const* ini, pcstr const section)
     }
 }
 
-void anti_aim_ability::on_monster_death()
-{
-    do_deactivate();
-}
-
+void anti_aim_ability::on_monster_death() { do_deactivate(); }
 bool anti_aim_ability::can_detect()
 {
     CEntityAlive const* enemy = m_object->EnemyMan.get_enemy();
@@ -74,47 +67,58 @@ bool anti_aim_ability::can_detect()
 
 bool anti_aim_ability::check_start_condition()
 {
-    if (is_active()) {
+    if (is_active())
+    {
         return false;
     }
 
-    if (m_object->GetScriptControl() && !m_object->get_force_anti_aim()) {
+    if (m_object->GetScriptControl() && !m_object->get_force_anti_aim())
+    {
         return false;
     }
 
-    if (!m_object->check_start_conditions(ControlCom::eAntiAim)) {
+    if (!m_object->check_start_conditions(ControlCom::eAntiAim))
+    {
         return false;
     }
 
-    if (m_man->is_captured(ControlCom::eControlAnimation)) {
+    if (m_man->is_captured(ControlCom::eControlAnimation))
+    {
         return false;
     }
 
-    if (m_man->is_captured(ControlCom::eControlPath)) {
+    if (m_man->is_captured(ControlCom::eControlPath))
+    {
         return false;
     }
 
-    if (m_man->is_captured(ControlCom::eControlMovement)) {
+    if (m_man->is_captured(ControlCom::eControlMovement))
+    {
         return false;
     }
 
-    if (is_active()) {
+    if (is_active())
+    {
         return false;
     }
 
-    if (!check_update_condition()) {
+    if (!check_update_condition())
+    {
         return false;
     }
 
-    if (m_object->anim().has_override_animation()) {
+    if (m_object->anim().has_override_animation())
+    {
         return false;
     }
 
-    if (m_detection_level < 1.f && !m_object->get_force_anti_aim()) {
+    if (m_detection_level < 1.f && !m_object->get_force_anti_aim())
+    {
         return false;
     }
 
-    if (!can_detect()) {
+    if (!can_detect())
+    {
         return false;
     }
 
@@ -163,7 +167,8 @@ void anti_aim_ability::start_camera_effector()
     cam_eff->SetType((ECamEffectorType)m_effector_id);
     cam_eff->SetCyclic(false);
 
-    if (pSettings->line_exist(effector_name, "cam_eff_hud_affect")) {
+    if (pSettings->line_exist(effector_name, "cam_eff_hud_affect"))
+    {
         cam_eff->SetHudAffect(!!pSettings->r_bool(effector_name, "cam_eff_hud_affect"));
     }
 
@@ -175,15 +180,17 @@ void anti_aim_ability::start_camera_effector()
 
     Actor()->Cameras().AddCamEffector(cam_eff);
 
-    if (m_callback) {
+    if (m_callback)
+    {
         m_callback();
     }
 }
 
 void anti_aim_ability::do_deactivate()
 {
-    if (is_active()) {
-        if (m_object->Visual())  // when m_object is destroying, visual might be dead already
+    if (is_active())
+    {
+        if (m_object->Visual()) // when m_object is destroying, visual might be dead already
         {
             m_man->deactivate(this);
         }
@@ -194,7 +201,8 @@ void anti_aim_ability::do_deactivate()
 
 void anti_aim_ability::deactivate()
 {
-    if (is_active()) {
+    if (is_active())
+    {
         return;
     }
 
@@ -204,7 +212,8 @@ void anti_aim_ability::deactivate()
 
     m_man->unsubscribe(this, ControlCom::eventAnimationEnd);
 
-    if (Actor()) {
+    if (Actor())
+    {
         Actor()->Cameras().RemoveCamEffector((ECamEffectorType)m_effector_id);
     }
 
@@ -218,7 +227,8 @@ float anti_aim_ability::calculate_angle() const
 {
     float const opposite_angle_return_value = M_PI;
 
-    if (!m_object->EnemyMan.see_enemy_now(Actor())) {
+    if (!m_object->EnemyMan.see_enemy_now(Actor()))
+    {
         return opposite_angle_return_value;
     }
 
@@ -244,12 +254,15 @@ extern CActor* g_actor;
 
 bool anti_aim_ability::check_update_condition() const
 {
-    if (!m_object->g_Alive() || !g_actor || !Actor()->g_Alive()) return false;
+    if (!m_object->g_Alive() || !g_actor || !Actor()->g_Alive())
+        return false;
 
     CEntityAlive const* enemy = m_object->EnemyMan.get_enemy();
-    if (enemy != Actor()) return false;
+    if (enemy != Actor())
+        return false;
 
-    if (!smart_cast<CWeapon*>(Actor()->inventory().ActiveItem())) return false;
+    if (!smart_cast<CWeapon*>(Actor()->inventory().ActiveItem()))
+        return false;
 
     return true;
 }
@@ -260,46 +273,54 @@ void anti_aim_ability::update_schedule()
     DBG().get_text_tree().clear();
     debug::text_tree& text_tree = DBG().get_text_tree().find_or_add("ActorView");
     text_tree.add_line("detection_level", m_detection_level);
-#endif  // #ifdef DEBUG_STATE
+#endif // #ifdef DEBUG_STATE
 
-    if (!check_update_condition()) {
+    if (!check_update_condition())
+    {
         do_deactivate();
         return;
     }
 
-    if (check_start_condition()) {
+    if (check_start_condition())
+    {
         m_man->activate(ControlCom::eAntiAim);
     }
 
-    if (is_active()) {
+    if (is_active())
+    {
 #ifdef DEBUG_STATE
         text_tree.add_line("state", "activated");
-#endif  // #ifdef DEBUG_STATE
+#endif // #ifdef DEBUG_STATE
 
-        if (Device.dwTimeGlobal < m_animation_hit_tick) {
+        if (Device.dwTimeGlobal < m_animation_hit_tick)
+        {
             return;
         }
-        if (m_effector_id == 0) {
+        if (m_effector_id == 0)
+        {
             start_camera_effector();
         }
-        if (Device.dwTimeGlobal < m_camera_effector_end_tick) {
+        if (Device.dwTimeGlobal < m_camera_effector_end_tick)
+        {
             return;
         }
         do_deactivate();
     }
 
-    if (Device.dwTimeGlobal < m_last_activated_tick + (TTime)(m_timeout * 1000)) {
+    if (Device.dwTimeGlobal < m_last_activated_tick + (TTime)(m_timeout * 1000))
+    {
 #ifdef DEBUG_STATE
         text_tree.add_line("state", "colddown");
-#endif  // #ifdef DEBUG_STATE
+#endif // #ifdef DEBUG_STATE
         return;
     }
 
 #ifdef DEBUG_STATE
     text_tree.add_line("state", "deactivated");
-#endif  // #ifdef DEBUG_STATE
+#endif // #ifdef DEBUG_STATE
 
-    if (m_last_detection_tick == 0) {
+    if (m_last_detection_tick == 0)
+    {
         m_last_detection_tick = Device.dwTimeGlobal;
     }
 

@@ -19,10 +19,10 @@ class ESoundEnvironment : public CEditShape
 
     void __stdcall OnChangeEnvs(PropValue* prop);
 
-  public:
+public:
     void get_box(Fmatrix& m);
 
-  public:
+public:
     ESoundEnvironment(LPVOID data, LPCSTR name);
     void Construct(LPVOID data);
     ~ESoundEnvironment();

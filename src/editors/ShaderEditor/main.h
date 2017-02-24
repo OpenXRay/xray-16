@@ -23,8 +23,8 @@ class ECORE_API TfrmMain :
 
     public TForm
 {
-    __published :  // IDE-managed Components
-                   TPanel* paLeftBar;
+    __published : // IDE-managed Components
+                  TPanel* paLeftBar;
     TPanel* paBottomBar;
     TPanel* paTools;
     TTimer* tmRefresh;
@@ -60,13 +60,13 @@ class ECORE_API TfrmMain :
     void __fastcall paRenderResize(TObject* Sender);
     void __fastcall fsStorageSavePlacement(TObject* Sender);
 
-  private:  // User declarations
+private: // User declarations
     void __fastcall IdleHandler(TObject* Sender, bool& Done);
 
     TShiftState ShiftKey;
     HINSTANCE m_HInstance;
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TfrmMain(TComponent* Owner);
     void __fastcall UpdateCaption();
     __inline void SetHInst(HINSTANCE inst) { m_HInstance = inst; }

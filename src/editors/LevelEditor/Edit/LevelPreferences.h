@@ -10,11 +10,11 @@ class CLevelPreferences : public CCustomPreferences
     void __stdcall OnEnabledChange(PropValue* prop);
     void __stdcall OnReadonlyChange(PropValue* prop);
 
-  protected:
+protected:
     virtual void Load(CInifile*);
     virtual void Save(CInifile*);
 
-  public:
+public:
     virtual void FillProp(PropItemVec& items);
 };
 

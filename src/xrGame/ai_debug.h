@@ -37,7 +37,7 @@
 #define aiDrawVisibilityRays (1 << 26)
 #define aiAnimationStats (1 << 27)
 #define aiDrawGameGraphRealPos (1 << 28)
-#endif  // DEBUG
+#endif // DEBUG
 
 #ifndef MASTER_GOLD
 #define aiIgnoreActor (1 << 24)
@@ -46,4 +46,4 @@
 #define aiUseSmartCovers (1 << 30)
 #define aiUseSmartCoversAnimationSlot (1 << 31)
 extern Flags32 psAI_Flags;
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD

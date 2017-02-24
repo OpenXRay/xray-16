@@ -17,22 +17,16 @@
 using editor::environment::suns::flare;
 using editor::property_holder;
 
-flare::flare() : m_property_holder(0), m_opacity(0.f), m_position(0.f), m_radius(0.f), m_texture("")
-{
-}
-
+flare::flare() : m_property_holder(0), m_opacity(0.f), m_position(0.f), m_radius(0.f), m_texture("") {}
 flare::~flare()
 {
-    if (!Device.editor()) return;
+    if (!Device.editor())
+        return;
 
     ::ide().destroy(m_property_holder);
 }
 
-editor::property_holder* flare::object()
-{
-    return (m_property_holder);
-}
-
+editor::property_holder* flare::object() { return (m_property_holder); }
 void flare::fill(editor::property_holder_collection* collection)
 {
     VERIFY(!m_property_holder);
@@ -49,4 +43,4 @@ void flare::fill(editor::property_holder_collection* collection)
     properties->add_property("radius", "flare", "this option is resposible for gradient radius", m_radius, m_radius);
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

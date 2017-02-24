@@ -32,11 +32,7 @@ void ESceneWayTool::CreateControls()
 
 //----------------------------------------------------
 
-void ESceneWayTool::RemoveControls()
-{
-    inherited::RemoveControls();
-}
-
+void ESceneWayTool::RemoveControls() { inherited::RemoveControls(); }
 //----------------------------------------------------
 
 //---------------------------------------------------------------------------
@@ -50,26 +46,29 @@ bool __fastcall TUI_ControlWayPointAdd::Start(TShiftState Shift)
     ObjectList lst;
     Scene->GetQueryObjects(lst, OBJCLASS_WAY, 1, 1, -1);
     TfraWayPoint* frame = (TfraWayPoint*)parent_tool->pFrame;
-    if (1 != lst.size()) {
+    if (1 != lst.size())
+    {
         ELog.DlgMsg(mtInformation, "Select one WayObject.");
         return false;
     }
     Fvector p;
-    if (LUI->PickGround(p, UI->m_CurrentRStart, UI->m_CurrentRDir, 1)) {
+    if (LUI->PickGround(p, UI->m_CurrentRStart, UI->m_CurrentRDir, 1))
+    {
         CWayObject* obj = (CWayObject*)lst.front();
         R_ASSERT(obj);
         CWayPoint* last_wp = obj->GetFirstSelected();
         CWayPoint* wp = obj->AppendWayPoint();
         wp->MoveTo(p);
-        if (frame->ebAutoLink->Down) {
-            if (last_wp) last_wp->AddSingleLink(wp);
+        if (frame->ebAutoLink->Down)
+        {
+            if (last_wp)
+                last_wp->AddSingleLink(wp);
         }
         Scene->UndoSave();
     }
-    if (!Shift.Contains(ssAlt)) ResetActionToSelect();
+    if (!Shift.Contains(ssAlt))
+        ResetActionToSelect();
     return false;
 }
 
-void __fastcall TUI_ControlWayPointAdd::OnEnter()
-{
-}
+void __fastcall TUI_ControlWayPointAdd::OnEnter() {}

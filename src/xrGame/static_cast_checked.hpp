@@ -48,9 +48,9 @@ struct helper
     }
 };
 
-}  // namespace static_cast_checked
-}  // namespace detail
-}  // namespace debug
+} // namespace static_cast_checked
+} // namespace detail
+} // namespace debug
 
 template <typename destination_type, typename source_type>
 inline destination_type static_cast_checked(source_type const& source)
@@ -76,8 +76,8 @@ inline destination_type static_cast_checked(source_type& source)
     return (static_cast<destination_type>(source));
 }
 
-#else  // #ifdef DEBUG
+#else // #ifdef DEBUG
 #define static_cast_checked static_cast
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
-#endif  // STATIC_CAST_CHECKED_HPP_INCLUDED
+#endif // STATIC_CAST_CHECKED_HPP_INCLUDED

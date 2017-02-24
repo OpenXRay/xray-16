@@ -4,10 +4,10 @@
 #ifdef _EDITOR
 #include "Layers/xrRender/FBasicVisual.h"
 #include "Layers/xrRender/dxParticleCustom.h"
-#else  // _EDITOR
+#else // _EDITOR
 #include "Layers/xrRender/FBasicVisual.h"
 #include "Layers/xrRender/dxParticleCustom.h"
-#endif  // _EDITOR
+#endif // _EDITOR
 
 namespace PS
 {
@@ -70,14 +70,11 @@ public:
     IC CPEDef* GetDefinition() { return m_Def; }
     IC int GetHandleEffect() { return m_HandleEffect; }
     IC int GetHandleActionList() { return m_HandleActionList; }
-
     virtual void Play();
     virtual void Stop(BOOL bDefferedStop = TRUE);
     virtual BOOL IsPlaying() { return m_RT_Flags.is(flRT_Playing); }
-
     virtual void SetHudMode(BOOL b) { m_RT_Flags.set(flRT_HUDmode, b); }
     virtual BOOL GetHudMode() { return m_RT_Flags.is(flRT_HUDmode); }
-
     virtual float GetTimeLimit()
     {
         VERIFY(m_Def);

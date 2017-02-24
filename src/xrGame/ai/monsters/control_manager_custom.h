@@ -54,7 +54,7 @@ public:
     // Sequencer
     void seq_init();
     void seq_add(MotionID motion);
-    void seq_switch();  // Перейти в следующее состояние, если такового не имеется - завершить
+    void seq_switch(); // Перейти в следующее состояние, если такового не имеется - завершить
     void seq_run(MotionID motion);
 
     //-------------------------------------------------------------------------------
@@ -101,7 +101,6 @@ public:
     void remove_links(IGameObject* object);
 
     CControlJump* get_jump_control() { return m_jump; }
-
 private:
     void check_attack_jump();
     void check_jump_over_physics();

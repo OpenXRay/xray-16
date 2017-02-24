@@ -10,24 +10,24 @@ bool xrServer::Process_event_reject(
     CSE_Abstract* e_entity = game->get_entity_from_eid(id_entity);
 
     //	R_ASSERT2( e_entity, make_string( "entity not found. parent_id = [%d], entity_id = [%d], frame = [%d]",
-    //id_parent, id_entity, Device.dwFrame ).c_str() );
-    VERIFY2(e_entity,
-        make_string(
-            "entity not found. parent_id = [%d], entity_id = [%d], frame = [%d]", id_parent, id_entity, Device.dwFrame)
-            .c_str());
-    if (!e_entity) {
+    // id_parent, id_entity, Device.dwFrame ).c_str() );
+    VERIFY2(e_entity, make_string("entity not found. parent_id = [%d], entity_id = [%d], frame = [%d]", id_parent,
+                          id_entity, Device.dwFrame)
+                          .c_str());
+    if (!e_entity)
+    {
         Msg("! ERROR on rejecting: entity not found. parent_id = [%d], entity_id = [%d], frame = [%d].", id_parent,
             id_entity, Device.dwFrame);
         return false;
     }
 
     //	R_ASSERT2( e_parent, make_string( "parent not found. parent_id = [%d], entity_id = [%d], frame = [%d]",
-    //id_parent, id_entity, Device.dwFrame ).c_str() );
-    VERIFY2(e_parent,
-        make_string(
-            "parent not found. parent_id = [%d], entity_id = [%d], frame = [%d]", id_parent, id_entity, Device.dwFrame)
-            .c_str());
-    if (!e_parent) {
+    // id_parent, id_entity, Device.dwFrame ).c_str() );
+    VERIFY2(e_parent, make_string("parent not found. parent_id = [%d], entity_id = [%d], frame = [%d]", id_parent,
+                          id_entity, Device.dwFrame)
+                          .c_str());
+    if (!e_parent)
+    {
         Msg("! ERROR on rejecting: parent not found. parent_id = [%d], entity_id = [%d], frame = [%d].", id_parent,
             id_entity, Device.dwFrame);
         return false;
@@ -36,20 +36,22 @@ bool xrServer::Process_event_reject(
 #ifdef MP_LOGGING
     Msg("--- SV: Process reject: parent[%d][%s], item[%d][%s]", id_parent, e_parent->name_replace(), id_entity,
         e_entity->name());
-#endif  // MP_LOGGING
+#endif // MP_LOGGING
 
     xr_vector<u16>& C = e_parent->children;
     xr_vector<u16>::iterator c = std::find(C.begin(), C.end(), id_entity);
-    if (c == C.end()) {
+    if (c == C.end())
+    {
         Msg("! ERROR: SV: can't find children [%d] of parent [%d]", id_entity, e_parent);
         return false;
     }
 
-    if (0xffff == e_entity->ID_Parent) {
+    if (0xffff == e_entity->ID_Parent)
+    {
 #ifndef MASTER_GOLD
         Msg("! ERROR: can't detach independant object. entity[%s][%d], parent[%s][%d], section[%s]",
             e_entity->name_replace(), id_entity, e_parent->name_replace(), id_parent, e_entity->s_name.c_str());
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
         return (false);
     }
 
@@ -57,7 +59,8 @@ bool xrServer::Process_event_reject(
     //.	Msg("---ID_Parent [%d], id_parent [%d]", e_entity->ID_Parent, id_parent);
 
     // R_ASSERT(e_entity->ID_Parent == id_parent);
-    if (e_entity->ID_Parent != id_parent) {
+    if (e_entity->ID_Parent != id_parent)
+    {
         Msg("! ERROR: e_entity->ID_Parent = [%d]  parent = [%d][%s]  entity_id = [%d]  frame = [%d]",
             e_entity->ID_Parent, id_parent, e_parent->name_replace(), id_entity, Device.dwFrame);
         // it can't be !!!
@@ -70,7 +73,8 @@ bool xrServer::Process_event_reject(
     C.erase(c);
 
     // Signal to everyone (including sender)
-    if (send_message) {
+    if (send_message)
+    {
         DWORD MODE = net_flags(TRUE, TRUE, FALSE, TRUE);
         SendBroadcast(BroadcastCID, P, MODE);
     }

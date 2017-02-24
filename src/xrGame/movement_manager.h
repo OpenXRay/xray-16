@@ -147,7 +147,7 @@ private:
     void process_patrol_path();
 #ifdef USE_FREE_IN_RESTRICTIONS
     void verify_detail_path();
-#endif  // USE_FREE_IN_RESTRICTIONS
+#endif // USE_FREE_IN_RESTRICTIONS
     void apply_collision_hit(CPHMovementControl* movement_control);
 
 protected:
@@ -187,7 +187,6 @@ public:
 
     virtual void on_travel_point_change(const u32& previous_travel_point_index);
     virtual void on_build_path() {}
-
     template <typename T>
     IC bool accessible(T position_or_vertex_id, float radius = EPS_L) const;
 

@@ -32,11 +32,7 @@ void CBuild::CheckBeforeSave(u32 stage)
     R_ASSERT(b_IsOGFContainersEmpty);
 }
 
-void CBuild::TempSave(u32 stage)
-{
-    CheckBeforeSave(stage);
-}
-
+void CBuild::TempSave(u32 stage) { CheckBeforeSave(stage); }
 // Fbox								scene_bb;
 // xr_vector<b_shader>				shader_render;
 // xr_vector<b_shader>				shader_compile;
@@ -77,15 +73,8 @@ void CBuild::write(IWriter& w) const
 
 //////////////////////////////////////////////////////////////////////
 
-CBuild::CBuild()
-{
-}
-
-CBuild::~CBuild()
-{
-    destroy_global_data();
-}
-
+CBuild::CBuild() {}
+CBuild::~CBuild() { destroy_global_data(); }
 CMemoryWriter& CBuild::err_invalid()
 {
     VERIFY(lc_global_data());
@@ -220,7 +209,8 @@ void CBuild::Run(LPCSTR P)
     BuildRapid(TRUE);
 
     //****************************************** GLOBAL-ILLUMINATION
-    if (g_build_options.b_radiosity) {
+    if (g_build_options.b_radiosity)
+    {
         FPU::m64r();
         Logger.Phase("Radiosity-Solver...");
         mem_Compact();
@@ -233,7 +223,8 @@ void CBuild::Run(LPCSTR P)
     Logger.Phase("LIGHT: Starting MU...");
     mem_Compact();
     Light_prepare();
-    if (g_build_options.b_net_light) {
+    if (g_build_options.b_net_light)
+    {
         lc_global_data()->mu_models_calc_materials();
         RunNetCompileDataPrepare();
     }
@@ -266,7 +257,8 @@ void CBuild::Run(LPCSTR P)
     mu_base.wait(500);
     mu_secondary.wait(500);
 #endif
-    if (g_build_options.b_net_light) SetGlobalLightmapsDataInitialized();
+    if (g_build_options.b_net_light)
+        SetGlobalLightmapsDataInitialized();
 
     Light();
     RunAfterLight(fs);
@@ -296,7 +288,8 @@ void CBuild::RunAfterLight(IWriter* fs)
     mem_Compact();
     wait_mu_base();
 
-    if (!g_build_options.b_net_light) wait_mu_secondary();
+    if (!g_build_options.b_net_light)
+        wait_mu_secondary();
 
     ///
     //	lc_global_data()->clear_mesh	();
@@ -410,7 +403,4 @@ xr_vector<xrMU_Reference*>& CBuild::mu_refs()
     return lc_global_data()->mu_refs();
 }
 
-void CBuild::ImplicitLighting()
-{
-    ::ImplicitLighting(g_build_options.b_net_light);
-}
+void CBuild::ImplicitLighting() { ::ImplicitLighting(g_build_options.b_net_light); }

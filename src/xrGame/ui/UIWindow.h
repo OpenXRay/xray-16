@@ -88,8 +88,8 @@ inline bool operator!=(const uialloc<_Ty>&, const uialloc<_Other>&)
 
 #define ui_list xr_vector
 
-#define DEF_UILIST(N, T)                                                                                               \
-    typedef ui_list<T> N;                                                                                              \
+#define DEF_UILIST(N, T)  \
+    typedef ui_list<T> N; \
     typedef N::iterator N##_it;
 
 //////////////////////////////////////////////////////////////////////////
@@ -110,10 +110,8 @@ public:
     virtual bool IsChild(CUIWindow* pChild) const;
     virtual void DetachAll();
     int GetChildNum() { return m_ChildWndList.size(); }
-
     void SetParent(CUIWindow* pNewParent);
     CUIWindow* GetParent() const { return m_pParentWnd; }
-
     //получить окно самого верхнего уровня
     CUIWindow* GetTop()
     {
@@ -142,7 +140,6 @@ public:
     //сообщение посылается дочерним окном родительскому
     void SetCapture(CUIWindow* pChildWindow, bool capture_status);
     CUIWindow* GetMouseCapturer() { return m_pMouseCapturer; }
-
     //окошко, которому пересылаются сообщения,
     //если NULL, то шлем на GetParent()
     void SetMessageTarget(CUIWindow* pWindow) { m_pMessageTarget = pWindow; }
@@ -158,7 +155,6 @@ public:
 
     virtual void Enable(bool status) { m_bIsEnabled = status; }
     bool IsEnabled() { return m_bIsEnabled; }
-
     //убрать/показать окно и его дочерние окна
     virtual void Show(bool status)
     {
@@ -180,7 +176,6 @@ public:
     void SetWndRect_script(Frect rect) { CUISimpleWindow::SetWndRect(rect); }
     void SetWndPos_script(Fvector2 pos) { CUISimpleWindow::SetWndPos(pos); }
     void SetWndSize_script(Fvector2 size) { CUISimpleWindow::SetWndSize(size); }
-
     //прорисовка окна
     virtual void Draw();
     virtual void Draw(float x, float y);
@@ -196,10 +191,8 @@ public:
 
     DEF_UILIST(WINDOW_LIST, CUIWindow*);
     WINDOW_LIST& GetChildWndList() { return m_ChildWndList; }
-
     IC bool IsAutoDelete() { return m_bAutoDelete; }
     IC void SetAutoDelete(bool auto_delete) { m_bAutoDelete = auto_delete; }
-
     // Name of the window
     const shared_str WindowName() const { return m_windowName; }
     void SetWindowName(LPCSTR wn) { m_windowName = wn; }
@@ -208,15 +201,14 @@ public:
 
     IC bool CursorOverWindow() const { return m_bCursorOverWindow; }
     IC u32 FocusReceiveTime() const { return m_dwFocusReceiveTime; }
-
     IC bool GetCustomDraw() const { return m_bCustomDraw; }
     IC void SetCustomDraw(bool b) { m_bCustomDraw = b; }
-
 protected:
     IC void SafeRemoveChild(CUIWindow* child)
     {
         WINDOW_LIST_it it = std::find(m_ChildWndList.begin(), m_ChildWndList.end(), child);
-        if (it != m_ChildWndList.end()) m_ChildWndList.erase(it);
+        if (it != m_ChildWndList.end())
+            m_ChildWndList.erase(it);
     };
 
     shared_str m_windowName;

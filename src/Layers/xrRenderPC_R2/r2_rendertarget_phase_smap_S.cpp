@@ -24,7 +24,8 @@ void CRenderTarget::phase_smap_spot(light* L)
     RCache.set_Stencil(FALSE);
 // no transparency
 #pragma todo("can optimize for multi-lights covering more than say 50%...")
-    if (RImplementation.o.HW_smap) RCache.set_ColorWriteEnable(FALSE);
+    if (RImplementation.o.HW_smap)
+        RCache.set_ColorWriteEnable(FALSE);
     CHK_DX(HW.pDevice->Clear(0L, NULL, D3DCLEAR_ZBUFFER, 0xffffffff, 1.0f, 0L));
 }
 
@@ -32,7 +33,8 @@ void CRenderTarget::phase_smap_spot_tsh(light* L)
 {
     VERIFY(RImplementation.o.Tshadows);
     RCache.set_ColorWriteEnable();
-    if (IRender_Light::OMNIPART == L->flags.type) {
+    if (IRender_Light::OMNIPART == L->flags.type)
+    {
         // omni-part
         CHK_DX(HW.pDevice->Clear(0L, NULL, D3DCLEAR_TARGET, 0xffffffff, 1.0f, 0L));
     }
@@ -41,7 +43,8 @@ void CRenderTarget::phase_smap_spot_tsh(light* L)
         // real-spot
         // Select color-mask
         ref_shader shader = L->s_spot;
-        if (!shader) shader = s_accum_spot;
+        if (!shader)
+            shader = s_accum_spot;
         RCache.set_Element(shader->E[SE_L_FILL]);
 
         // Fill vertex buffer

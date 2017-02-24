@@ -69,5 +69,5 @@ public:
     void respawn_all_items();
     void check_to_delete(u16 item_id);
     void update(u32 current_time);
-    void respawn_level_items();  // level_re.spawn
+    void respawn_level_items(); // level_re.spawn
 };

@@ -18,14 +18,13 @@ class XRCDB_API xrXRC
 public:
     struct ColliderStatistics
     {
-        CStatTimer RayQuery;      // total: ray-testing
-        CStatTimer BoxQuery;      // total: box query
-        CStatTimer FrustumQuery;  // total: frustum query
+        CStatTimer RayQuery; // total: ray-testing
+        CStatTimer BoxQuery; // total: box query
+        CStatTimer FrustumQuery; // total: frustum query
         float RayPs = 0;
         float BoxPs = 0;
 
         ColliderStatistics() { FrameStart(); }
-
         void FrameStart()
         {
             RayQuery.FrameStart();
@@ -39,10 +38,12 @@ public:
             BoxQuery.FrameEnd();
             FrustumQuery.FrameEnd();
             float newRayPs = RayQuery.count / RayQuery.result;
-            if (std::isnan(newRayPs)) newRayPs = 0;
+            if (std::isnan(newRayPs))
+                newRayPs = 0;
             RayPs = 0.99f * RayPs + 0.01f * newRayPs;
             float newBoxPs = BoxQuery.count / BoxQuery.result;
-            if (std::isnan(newBoxPs)) newBoxPs = 0;
+            if (std::isnan(newBoxPs))
+                newBoxPs = 0;
             BoxPs = 0.99f * BoxPs + 0.01f * newBoxPs;
         }
     };
@@ -78,11 +79,10 @@ public:
     IC int r_count() { return CL.r_count(); };
     IC void r_clear() { CL.r_clear(); };
     IC void r_clear_compact() { CL.r_clear_compact(); };
-
     void DumpStatistics(IGameFont& font, IPerformanceAlert* alert);
 
     xrXRC(const char* name = "<unknown>") : name(name) {}
 };
 XRCDB_API extern xrXRC XRC;
 
-#endif  // !defined(AFX_XRXRC_H__9AA25268_621F_4FCA_BD75_AF2E9822B8E3__INCLUDED_)
+#endif // !defined(AFX_XRXRC_H__9AA25268_621F_4FCA_BD75_AF2E9822B8E3__INCLUDED_)

@@ -14,6 +14,6 @@ public:
     // virtual void			feel_touch_deny				(IGameObject* O, DWORD	T); - implemented in inherited class
 
     bool is_object_denied(IGameObject const* O);
-};  // class GlobalFeelTouch
+}; // class GlobalFeelTouch
 
-#endif  //#ifndef GLOBAL_FEEL_TOUCH_HPP
+#endif //#ifndef GLOBAL_FEEL_TOUCH_HPP

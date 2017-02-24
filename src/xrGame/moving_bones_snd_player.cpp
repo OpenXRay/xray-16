@@ -18,10 +18,7 @@ moving_bones_snd_player::moving_bones_snd_player(IKinematics* K, CInifile* ini, 
     VERIFY(ini);
     load(*K, *ini, section, object);
 }
-moving_bones_snd_player::~moving_bones_snd_player()
-{
-    sound.destroy();
-}
+moving_bones_snd_player::~moving_bones_snd_player() { sound.destroy(); }
 Fmatrix& moving_bones_snd_player::bone_matrix()
 {
     VERIFY(kinematics);
@@ -46,7 +43,8 @@ void moving_bones_snd_player::update(float time_delta, CGameObject& object)
     float aw_speed = aw.magnitude();
     smothed_velocity = smothed_velocity * sm_factor + aw_speed * (1.f - sm_factor);
 
-    if (!sound._feedback()) {
+    if (!sound._feedback())
+    {
         if (smothed_velocity > play_threthhold)
             play(object);
         else
@@ -61,11 +59,14 @@ void moving_bones_snd_player::update(float time_delta, CGameObject& object)
 
     //	clamp( factor, min_factor, max_factor );
     float frequency_factor = 1.f;
-    if (factor > max_factor) frequency_factor = max_factor;
-    if (factor < min_factor) frequency_factor = min_factor;
+    if (factor > max_factor)
+        frequency_factor = max_factor;
+    if (factor < min_factor)
+        frequency_factor = min_factor;
 
 #ifdef DEBUG
-    if (dbg_moving_bones_snd_player) {
+    if (dbg_moving_bones_snd_player)
+    {
         DBG_OutText("smoothed angular speed							 : %f", smothed_velocity);
         // DBG_OutText( "angular speed         : %f",  aw_speed );
         DBG_OutText("velocity factor = base_speed/smoothed speed=       : %f", factor);
@@ -81,7 +82,8 @@ void moving_bones_snd_player::update(float time_delta, CGameObject& object)
     sound.set_frequency(frequency_factor);
     sound.set_position(new_position.c);
 
-    if (smothed_velocity < play_threthhold) sound.stop_deffered();
+    if (smothed_velocity < play_threthhold)
+        sound.stop_deffered();
 
     previous_position.set(new_position);
 }
@@ -101,7 +103,8 @@ void moving_bones_snd_player::stop()
 
 moving_bones_snd_player* create_moving_bones_snd_player(CInifile* ini, IKinematics& K, const Fmatrix& obj)
 {
-    if (!ini || !ini->section_exist("moving_bones_snd_player")) return 0;
+    if (!ini || !ini->section_exist("moving_bones_snd_player"))
+        return 0;
     return new moving_bones_snd_player(&K, ini, "moving_bones_snd_player", obj);
 }
 
@@ -110,7 +113,8 @@ moving_bones_snd_player* create_moving_bones_snd_player(CGameObject& O)
     IKinematics* K = smart_cast<IKinematics*>(O.Visual());
     VERIFY(K);
     moving_bones_snd_player* ret = create_moving_bones_snd_player(O.spawn_ini(), *K, O.XFORM());
-    if (ret) return ret;
+    if (ret)
+        return ret;
     return create_moving_bones_snd_player(K->LL_UserData(), *K, O.XFORM());
 }
 

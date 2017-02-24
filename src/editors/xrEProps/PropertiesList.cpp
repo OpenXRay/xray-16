@@ -44,7 +44,8 @@ const LPSTR TEXTUREString[TSTRING_COUNT] = {"Custom...", "-", "$null", "$base0"}
 //---------------------------------------------------------------------------
 void TProperties::ClearParams(TElTreeItem* node)
 {
-    if (node) {
+    if (node)
+    {
         FATAL("ClearParams - node");
         // S когда будут все итемы удалить у каждого
         /*
@@ -63,9 +64,11 @@ void TProperties::ClearParams(TElTreeItem* node)
     }
     else
     {
-        if (tvProperties->Selected) FHelper.MakeFullName(tvProperties->Selected, 0, last_selected_item);
+        if (tvProperties->Selected)
+            FHelper.MakeFullName(tvProperties->Selected, 0, last_selected_item);
         // store
-        if (!m_Flags.is(plNoClearStore)) FolderStorage.clear();
+        if (!m_Flags.is(plNoClearStore))
+            FolderStorage.clear();
         FolderStore();
         // clear
         for (PropItemIt it = m_Items.begin(); it != m_Items.end(); it++)
@@ -131,7 +134,8 @@ TProperties* TProperties::CreateForm(const AnsiString& title, TWinControl* paren
     props->OnModifiedEvent = modif;
     props->OnItemFocused = focused;
     props->OnCloseEvent = on_close;
-    if (parent) {
+    if (parent)
+    {
         props->Parent = parent;
         props->Align = align;
         props->BorderStyle = bsNone;
@@ -142,8 +146,10 @@ TProperties* TProperties::CreateForm(const AnsiString& title, TWinControl* paren
     props->fsStorage->IniSection = title;
     props->m_Flags.assign(flags);
 
-    if (props->m_Flags.is_any(plItemFolders)) {
-        if (props->m_Flags.is(plIFTop)) {
+    if (props->m_Flags.is_any(plItemFolders))
+    {
+        if (props->m_Flags.is(plIFTop))
+        {
             props->paFolders->Align = alTop;
             props->spFolders->Align = alTop;
             props->spFolders->Top = props->paFolders->Top + props->paFolders->Height;
@@ -157,8 +163,8 @@ TProperties* TProperties::CreateForm(const AnsiString& title, TWinControl* paren
         props->spFolders->Show();
         props->paFolders->Show();
         props->paFolders->Refresh();
-        props->m_Folders = TItemList::CreateForm("Folders", props->paFolders, alClient,
-            TItemList::ilSuppressIcon | TItemList::ilFolderStore | TItemList::ilSuppressStatus |
+        props->m_Folders = TItemList::CreateForm("Folders", props->paFolders, alClient, TItemList::ilSuppressIcon |
+                TItemList::ilFolderStore | TItemList::ilSuppressStatus |
                 (props->m_Flags.is(plMultiSelect) ? TItemList::ilMultiSelect : 0));
         props->m_Folders->OnItemFocusedEvent.bind(props, &TProperties::OnFolderFocused);
     }
@@ -181,8 +187,10 @@ TProperties* TProperties::CreateModalForm(const AnsiString& title, bool bShowBut
     props->Caption = title;
     props->fsStorage->IniSection = title;
     props->m_Flags.assign(flags);
-    if (props->m_Flags.is(plItemFolders)) {
-        if (props->m_Flags.is(plIFTop)) {
+    if (props->m_Flags.is(plItemFolders))
+    {
+        if (props->m_Flags.is(plIFTop))
+        {
             props->paFolders->Align = alTop;
             props->spFolders->Align = alTop;
             props->spFolders->Top = props->paFolders->Top + props->paFolders->Height;
@@ -196,8 +204,8 @@ TProperties* TProperties::CreateModalForm(const AnsiString& title, bool bShowBut
         props->spFolders->Show();
         props->paFolders->Show();
         props->paFolders->Refresh();
-        props->m_Folders = TItemList::CreateForm("Folders", props->paFolders, alClient,
-            TItemList::ilSuppressIcon | TItemList::ilFolderStore | TItemList::ilSuppressStatus |
+        props->m_Folders = TItemList::CreateForm("Folders", props->paFolders, alClient, TItemList::ilSuppressIcon |
+                TItemList::ilFolderStore | TItemList::ilSuppressStatus |
                 (props->m_Flags.is(plMultiSelect) ? TItemList::ilMultiSelect : 0));
         props->m_Folders->OnItemFocusedEvent.bind(props, &TProperties::OnFolderFocused);
     }
@@ -220,21 +228,9 @@ void TProperties::DestroyForm(TProperties*& props)
     props->Close();
     xr_delete(props);
 }
-void __fastcall TProperties::ShowProperties()
-{
-    Show();
-}
-
-int __fastcall TProperties::ShowPropertiesModal()
-{
-    return ShowModal();
-}
-
-void __fastcall TProperties::HideProperties()
-{
-    Hide();
-}
-
+void __fastcall TProperties::ShowProperties() { Show(); }
+int __fastcall TProperties::ShowPropertiesModal() { return ShowModal(); }
+void __fastcall TProperties::HideProperties() { Hide(); }
 int __fastcall TProperties::EditPropertiesModal(PropItemVec& values, LPCSTR title, bool bShowButtonsBar,
     TOnModifiedEvent modif, TOnItemFocused focused, TOnCloseEvent close, u32 flags)
 {
@@ -248,7 +244,8 @@ int __fastcall TProperties::EditPropertiesModal(PropItemVec& values, LPCSTR titl
 void __fastcall TProperties::FormClose(TObject* Sender, TCloseAction& Action)
 {
     ApplyEditControl();
-    if (Visible && !OnCloseEvent.empty()) OnCloseEvent();
+    if (Visible && !OnCloseEvent.empty())
+        OnCloseEvent();
 }
 //---------------------------------------------------------------------------
 
@@ -269,8 +266,10 @@ void TProperties::FillElItems(PropItemVec& items, LPCSTR startup_pref)
     {
         PropItem* prop = *it;
         AnsiString key = *prop->key;
-        if (m_Flags.is(plItemFolders) && (startup_pref && startup_pref[0])) {
-            if (startup_pref && startup_pref[0]) {
+        if (m_Flags.is(plItemFolders) && (startup_pref && startup_pref[0]))
+        {
+            if (startup_pref && startup_pref[0])
+            {
                 AnsiString k = key;
                 LPCSTR k0 = k.c_str();
                 LPCSTR k1 = startup_pref;
@@ -278,14 +277,17 @@ void TProperties::FillElItems(PropItemVec& items, LPCSTR startup_pref)
                 {
                     k0++;
                     k1++;
-                    if (k0[0] == '\\') key = k0 + 1;
+                    if (k0[0] == '\\')
+                        key = k0 + 1;
                 }
                 if (!((k0[0] == 0) && (k1[0] == 0)))
-                    if ((k0[0] != '\\') || (k1[0] != 0)) continue;
+                    if ((k0[0] != '\\') || (k1[0] != 0))
+                        continue;
             }
             else
             {
-                if (1 != _GetItemCount(key.c_str(), '\\')) continue;
+                if (1 != _GetItemCount(key.c_str(), '\\'))
+                    continue;
             }
         }
         m_ViewItems.push_back(prop);
@@ -299,12 +301,14 @@ void TProperties::FillElItems(PropItemVec& items, LPCSTR startup_pref)
         prop->Item()->ShowCheckBox = prop->m_Flags.is(PropItem::flShowCB);
         prop->Item()->CheckBoxState = (TCheckBoxState)prop->m_Flags.is(PropItem::flCBChecked);
         // if thumbnail draw
-        if (prop->m_Flags.is(PropItem::flDrawThumbnail)) {
+        if (prop->m_Flags.is(PropItem::flDrawThumbnail))
+        {
             prop->Item()->Height = 64;
             prop->Item()->OwnerHeight = !miDrawThumbnails->Checked;
         }
         // if canvas value
-        if (PROP_CANVAS == prop->type) {
+        if (PROP_CANVAS == prop->type)
+        {
             prop->Item()->Height = ((CanvasValue*)prop->GetFrontValue())->height;
             prop->Item()->OwnerHeight = false;
         }
@@ -318,8 +322,10 @@ void TProperties::FillElItems(PropItemVec& items, LPCSTR startup_pref)
         CS->Style = ElhsOwnerDraw;
         prop->Item()->ColumnText->Add(prop->GetDrawText().c_str());
     }
-    if (m_Flags.is(plFullExpand) || miAutoExpand->Checked) tvProperties->FullExpand();
-    if (m_Flags.is(plFullSort)) {
+    if (m_Flags.is(plFullExpand) || miAutoExpand->Checked)
+        tvProperties->FullExpand();
+    if (m_Flags.is(plFullSort))
+    {
         tvProperties->ShowColumns = false;
         tvProperties->Sort(true);
         tvProperties->SortMode = smAdd;
@@ -330,7 +336,8 @@ void TProperties::FillElItems(PropItemVec& items, LPCSTR startup_pref)
         for (PropItemIt it = m_ViewItems.begin(); it != m_ViewItems.end(); it++)
         {
             PropItem* prop = *it;
-            if (prop->m_Flags.is(PropItem::flSorted)) ((TElTreeItem*)prop->item)->Sort(true);
+            if (prop->m_Flags.is(PropItem::flSorted))
+                ((TElTreeItem*)prop->item)->Sort(true);
         }
     }
 
@@ -354,18 +361,22 @@ void __fastcall TProperties::AssignItems(PropItemVec& items)
     // folder
     ListItemsVec folder_items;
 
-    if (m_Flags.is(plItemFolders)) {
+    if (m_Flags.is(plItemFolders))
+    {
         for (PropItemIt it = m_Items.begin(); it != m_Items.end(); it++)
         {
             PropItem* prop = *it;
             int cnt = _GetItemCount(prop->key.c_str(), '\\');
-            if (cnt > 1) {
+            if (cnt > 1)
+            {
                 AnsiString folder;
                 _ReplaceItem(prop->key.c_str(), cnt - 1, "", folder, '\\');
-                if (0 == LHelper().FindItem(folder_items, folder.c_str())) {
+                if (0 == LHelper().FindItem(folder_items, folder.c_str()))
+                {
                     PropItem* P = PHelper().FindItem(m_Items, prop->key.c_str());
                     ListItem* I = LHelper().CreateItem(folder_items, folder.c_str(), 0);
-                    if (P) I->prop_color = P->prop_color;
+                    if (P)
+                        I->prop_color = P->prop_color;
                 }
             }
         }
@@ -392,10 +403,12 @@ void __fastcall TProperties::AssignItems(PropItemVec& items)
 
 void TProperties::FolderStore()
 {
-    if (m_Flags.is(plFolderStore) && tvProperties->Items->Count) {
+    if (m_Flags.is(plFolderStore) && tvProperties->Items->Count)
+    {
         for (TElTreeItem* item = tvProperties->Items->GetFirstNode(); item; item = item->GetNext())
         {
-            if (item->ChildrenCount) {
+            if (item->ChildrenCount)
+            {
                 AnsiString nm;
                 FHelper.MakeFullName(item, 0, nm);
                 SFolderStore st_item;
@@ -407,14 +420,17 @@ void TProperties::FolderStore()
 }
 void TProperties::FolderRestore()
 {
-    if (m_Flags.is(plFolderStore) && !FolderStorage.empty()) {
+    if (m_Flags.is(plFolderStore) && !FolderStorage.empty())
+    {
         for (TElTreeItem* item = tvProperties->Items->GetFirstNode(); item; item = item->GetNext())
         {
-            if (item->ChildrenCount) {
+            if (item->ChildrenCount)
+            {
                 AnsiString nm;
                 FHelper.MakeFullName(item, 0, nm);
                 FolderStorePairIt it = FolderStorage.find(nm);
-                if (it != FolderStorage.end()) {
+                if (it != FolderStorage.end())
+                {
                     SFolderStore& st_item = it->second;
                     if (st_item.expand)
                         item->Expand(false);
@@ -428,16 +444,19 @@ void TProperties::FolderRestore()
 void __fastcall TProperties::OnFolderFocused(TElTreeItem* item)
 {
     AnsiString s, lfsi;
-    if (tvProperties->Selected) FHelper.MakeFullName(tvProperties->Selected, 0, lfsi);
+    if (tvProperties->Selected)
+        FHelper.MakeFullName(tvProperties->Selected, 0, lfsi);
     FHelper.MakeFullName(item, 0, s);
     LockUpdating();
     FolderStore();
     FillElItems(m_Items, s.c_str());
     UnlockUpdating();
-    if (lfsi.Length()) {
+    if (lfsi.Length())
+    {
         AnsiString lfsi_new, new_part;
         int cnt = _GetItemCount(s.c_str(), '\\');
-        if (cnt) _GetItem(s.c_str(), cnt - 1, new_part, '\\', "", false);
+        if (cnt)
+            _GetItem(s.c_str(), cnt - 1, new_part, '\\', "", false);
         _ReplaceItem(lfsi.c_str(), 0, new_part.c_str(), lfsi_new, '\\');
         SelectItem(lfsi_new);
     }
@@ -446,7 +465,8 @@ void __fastcall TProperties::OnFolderFocused(TElTreeItem* item)
 
 void __fastcall TProperties::tvPropertiesClick(TObject* Sender)
 {
-    if (m_Flags.is(plReadOnly)) return;
+    if (m_Flags.is(plReadOnly))
+        return;
 
     TSTItemPart IP = (TSTItemPart)0;
     int HC = 0;
@@ -456,14 +476,16 @@ void __fastcall TProperties::tvPropertiesClick(TObject* Sender)
     GetCursorPos(&P);
     P = tvProperties->ScreenToClient(P);
     Item = tvProperties->GetItemAt(P.x, P.y, IP, HC);
-    if (HC == 1) tvProperties->EditItem(Item, HC);
+    if (HC == 1)
+        tvProperties->EditItem(Item, HC);
 }
 //---------------------------------------------------------------------------
 
 void TProperties::OutBOOL(BOOL val, TCanvas* Surface, TRect& R, bool bEnable)
 {
-    if (bEnable) {
-        Surface->CopyMode = cmSrcAnd;  // cmSrcErase;
+    if (bEnable)
+    {
+        Surface->CopyMode = cmSrcAnd; // cmSrcErase;
         if (val)
             Surface->Draw(R.Left, R.Top + 3, m_BMCheck);
         else
@@ -477,7 +499,8 @@ void TProperties::OutBOOL(BOOL val, TCanvas* Surface, TRect& R, bool bEnable)
 
 void TProperties::OutText(LPCSTR text, TCanvas* Surface, TRect& R, bool bEnable, TGraphic* g, bool bArrow)
 {
-    if (bEnable && (g || bArrow)) {
+    if (bEnable && (g || bArrow))
+    {
         R.Right -= g->Width + 2;
         R.Left += 1;
     }
@@ -487,8 +510,10 @@ void TProperties::OutText(LPCSTR text, TCanvas* Surface, TRect& R, bool bEnable,
         R.Left += 1;
     }
     DrawText(Surface->Handle, text, -1, &R, DT_LEFT | DT_SINGLELINE);
-    if (bEnable) {
-        if (g) {
+    if (bEnable)
+    {
+        if (g)
+        {
             R.Left = R.Right;
             Surface->CopyMode = cmSrcAnd;
             Surface->Draw(R.Left + 1, R.Top + 5, g);
@@ -525,7 +550,8 @@ void DrawButton(TRect R, TCanvas* Surface, LPCSTR caption, bool bDown, bool bSel
 }
 void DrawButtons(TRect R, TCanvas* Surface, RStringVec& lst, int down_btn, bool bSelected)
 {
-    if (!lst.empty()) {
+    if (!lst.empty())
+    {
         TRect r = R;
         float dx = float(R.Width()) / float(lst.size());
         for (RStringVecIt it = lst.begin(); it != lst.end(); it++)
@@ -538,22 +564,20 @@ void DrawButtons(TRect R, TCanvas* Surface, RStringVec& lst, int down_btn, bool 
     }
 }
 
-int DrawText(HDC hDC, LPCSTR text, LPRECT R, UINT uFormat)
-{
-    return DrawText(hDC, text, -1, R, uFormat);
-}
-
+int DrawText(HDC hDC, LPCSTR text, LPRECT R, UINT uFormat) { return DrawText(hDC, text, -1, R, uFormat); }
 void __fastcall TProperties::tvPropertiesItemDraw(
     TObject* Sender, TElTreeItem* Item, TCanvas* Surface, TRect& R, int SectionIndex)
 {
     PropItem* prop = (PropItem*)Item->Tag;
-    if (!prop) return;
+    if (!prop)
+        return;
 
     R.left += 4;
 
     TRect R1;
     Surface->Brush->Style = bsClear;
-    if (SectionIndex == 0) {
+    if (SectionIndex == 0)
+    {
         Surface->Font->Style = TFontStyles();
         Surface->Font->Color = (TColor)prop->prop_color;
         DrawText(Surface->Handle, AnsiString(Item->Text).c_str(), -1, &R, DT_LEFT | DT_SINGLELINE | DT_VCENTER);
@@ -561,7 +585,8 @@ void __fastcall TProperties::tvPropertiesItemDraw(
     else if (SectionIndex == 1)
     {
         u32 type = prop->type;
-        if (prop->Enabled()) {
+        if (prop->Enabled())
+        {
             Surface->Font->Color = (TColor)prop->val_color;
             Surface->Font->Style = TFontStyles();
         }
@@ -573,7 +598,8 @@ void __fastcall TProperties::tvPropertiesItemDraw(
         // check mixed
         prop->CheckMixed();
         // out caption mixed
-        if (prop->m_Flags.is(PropItem::flMixed)) {
+        if (prop->m_Flags.is(PropItem::flMixed))
+        {
             TColor C = Surface->Brush->Color;
             TBrushStyle S = Surface->Brush->Style;
             Surface->Brush->Style = bsSolid;
@@ -698,7 +724,8 @@ void __fastcall TProperties::tvPropertiesItemDraw(
                 ChooseValue* V = dynamic_cast<ChooseValue*>(prop->GetFrontValue());
                 R_ASSERT(V);
                 OutText(prop->GetDrawText().c_str(), Surface, R, prop->Enabled(), m_BMEllipsis);
-                if (miDrawThumbnails->Checked && prop->m_Flags.is(PropItem::flDrawThumbnail)) {
+                if (miDrawThumbnails->Checked && prop->m_Flags.is(PropItem::flDrawThumbnail))
+                {
                     R.top += tvProperties->LineHeight - 4;
                     R.left = R.Right - (R.bottom - R.top);
                     if (!V->OnDrawThumbnailEvent.empty())
@@ -710,7 +737,8 @@ void __fastcall TProperties::tvPropertiesItemDraw(
             case PROP_TEXTURE2:
             {
                 OutText(prop->GetDrawText().c_str(), Surface, R, prop->Enabled(), m_BMEllipsis);
-                if (miDrawThumbnails->Checked) {
+                if (miDrawThumbnails->Checked)
+                {
                     R.top += tvProperties->LineHeight - 4;
                     R.left = R.Right - (R.bottom - R.top);
                     SChooseEvents* E = TfrmChoseItem::GetEvents(smTexture);
@@ -740,34 +768,40 @@ void __fastcall TProperties::tvPropertiesItemDraw(
                     OutText(prop->GetDrawText().c_str(), Surface, R, prop->Enabled(), m_BMEllipsis);
                 break;
             case PROP_SHORTCUT:
-                if (hkShortcut->Tag != (int)Item) OutText(prop->GetDrawText().c_str(), Surface, R, prop->Enabled());
+                if (hkShortcut->Tag != (int)Item)
+                    OutText(prop->GetDrawText().c_str(), Surface, R, prop->Enabled());
                 break;
             case PROP_VECTOR:
             case PROP_GAMETYPE: OutText(prop->GetDrawText().c_str(), Surface, R, prop->Enabled()); break;
             case PROP_NUMERIC:
-                if (seNumber->Tag != (int)Item) OutText(prop->GetDrawText().c_str(), Surface, R, prop->Enabled());
+                if (seNumber->Tag != (int)Item)
+                    OutText(prop->GetDrawText().c_str(), Surface, R, prop->Enabled());
                 break;
             default: FATAL("Unknown prop type");
             };
         }
         // show LW edit
-        if (!prop->m_Flags.is(PropItem::flDisabled)) {
+        if (!prop->m_Flags.is(PropItem::flDisabled))
+        {
             switch (type)
             {
             case PROP_SHORTCUT:
                 if (hkShortcut->Tag == (int)Item)
-                    if (!hkShortcut->Visible) ShowSCText(R);
+                    if (!hkShortcut->Visible)
+                        ShowSCText(R);
                 break;
             case PROP_TIME:
             case PROP_CTEXT:
             case PROP_STEXT:
             case PROP_RTEXT:
                 if (edText->Tag == (int)Item)
-                    if (!edText->Visible) ShowLWText(R);
+                    if (!edText->Visible)
+                        ShowLWText(R);
                 break;
             case PROP_NUMERIC:
                 if (seNumber->Tag == (int)Item)
-                    if (!seNumber->Visible) ShowLWNumber(R);
+                    if (!seNumber->Visible)
+                        ShowLWNumber(R);
                 break;
             };
         }
@@ -779,7 +813,8 @@ template <class T>
 BOOL FlagOnEdit(PropItem* prop, BOOL& bRes)
 {
     FlagValue<_flags<T>>* V = dynamic_cast<FlagValue<_flags<T>>*>(prop->GetFrontValue());
-    if (!V) return FALSE;
+    if (!V)
+        return FALSE;
     _flags<T> new_val = V->GetValue();
     prop->BeforeEdit<FlagValue<_flags<T>>, _flags<T>>(new_val);
     new_val.invert(V->mask);
@@ -792,21 +827,27 @@ BOOL FlagOnEdit(PropItem* prop, BOOL& bRes)
 void __fastcall TProperties::tvPropertiesMouseDown(
     TObject* Sender, TMouseButton Button, TShiftState Shift, int X, int Y)
 {
-    if (m_Flags.is(plReadOnly)) return;
+    if (m_Flags.is(plReadOnly))
+        return;
 
     CancelEditControl();
 
     TSTItemPart IP = (TSTItemPart)0;
     int HC = 0;
     TElTreeItem* item = tvProperties->GetItemAt(X, Y, IP, HC);
-    if (item) {
-        if ((HC == 1) && (Button == mbLeft)) {
+    if (item)
+    {
+        if ((HC == 1) && (Button == mbLeft))
+        {
             //        	Log("Shift",(int)Shift.Contains(ssDouble));
             PropItem* prop = (PropItem*)item->Tag;
             // Проверить чтобы не нажимать 2 раза для кнопок
-            if (prop && (PROP_BUTTON == prop->type)) m_FirstClickItem = item;
-            if (m_FirstClickItem == item) {
-                if (!prop || (prop && !prop->Enabled())) return;
+            if (prop && (PROP_BUTTON == prop->type))
+                m_FirstClickItem = item;
+            if (m_FirstClickItem == item)
+            {
+                if (!prop || (prop && !prop->Enabled()))
+                    return;
                 pmEnum->Tag = (int)item;
                 switch (prop->type)
                 {
@@ -832,8 +873,10 @@ void __fastcall TProperties::tvPropertiesMouseDown(
                     BOOL bRes = FALSE;
                     if (!FlagOnEdit<u8>(prop, bRes))
                         if (!FlagOnEdit<u16>(prop, bRes))
-                            if (!FlagOnEdit<u32>(prop, bRes)) FATAL("Unknown flag type");
-                    if (bRes) {
+                            if (!FlagOnEdit<u32>(prop, bRes))
+                                FATAL("Unknown flag type");
+                    if (bRes)
+                    {
                         Modified();
                         RefreshForm();
                     }
@@ -847,7 +890,8 @@ void __fastcall TProperties::tvPropertiesMouseDown(
                     prop->BeforeEdit<BOOLValue, BOOL>(new_val);
                     new_val = !new_val;
                     if (prop->AfterEdit<BOOLValue, BOOL>(new_val))
-                        if (prop->ApplyValue<BOOLValue, BOOL>(new_val)) {
+                        if (prop->ApplyValue<BOOLValue, BOOL>(new_val))
+                        {
                             Modified();
                             RefreshForm();
                         }
@@ -997,7 +1041,8 @@ void __fastcall TProperties::tvPropertiesMouseDown(
                     break;
                 };
             }
-            if (prop && !prop->OnClickEvent.empty()) prop->OnClickEvent(prop);
+            if (prop && !prop->OnClickEvent.empty())
+                prop->OnClickEvent(prop);
         }
         else if (Button == mbRight)
         {
@@ -1014,16 +1059,20 @@ void __fastcall TProperties::tvPropertiesMouseDown(
 
 void __fastcall TProperties::tvPropertiesMouseMove(TObject* Sender, TShiftState Shift, int X, int Y)
 {
-    if (m_Flags.is(plReadOnly)) return;
-    if (tvProperties->Selected) {
+    if (m_Flags.is(plReadOnly))
+        return;
+    if (tvProperties->Selected)
+    {
         TElTreeItem* item = tvProperties->Selected;
         PropItem* prop = (PropItem*)item->Tag;
-        if (!prop || (prop && !prop->Enabled())) return;
+        if (!prop || (prop && !prop->Enabled()))
+            return;
         switch (prop->type)
         {
         case PROP_BUTTON:
         {
-            if (Shift.Contains(ssLeft)) {
+            if (Shift.Contains(ssLeft))
+            {
                 ButtonValue* V = dynamic_cast<ButtonValue*>(prop->GetFrontValue());
                 R_ASSERT(V);
                 Y -= tvProperties->HeaderHeight;
@@ -1049,33 +1098,42 @@ void __fastcall TProperties::tvPropertiesMouseMove(TObject* Sender, TShiftState 
 
 void __fastcall TProperties::tvPropertiesMouseUp(TObject* Sender, TMouseButton Button, TShiftState Shift, int X, int Y)
 {
-    if (m_Flags.is(plReadOnly)) return;
-    if (tvProperties->Selected) {
+    if (m_Flags.is(plReadOnly))
+        return;
+    if (tvProperties->Selected)
+    {
         TElTreeItem* item = tvProperties->Selected;
         PropItem* prop = (PropItem*)item->Tag;
-        if (!prop || (prop && !prop->Enabled())) return;
+        if (!prop || (prop && !prop->Enabled()))
+            return;
         switch (prop->type)
         {
         case PROP_BUTTON:
         {
-            if (Button == mbLeft) {
+            if (Button == mbLeft)
+            {
                 bool bRes = false;
                 bool bSafe = false;
                 for (PropItem::PropValueIt it = prop->Values().begin(); it != prop->Values().end(); it++)
                 {
                     ButtonValue* V = dynamic_cast<ButtonValue*>(*it);
                     R_ASSERT(V);
-                    if (V->btn_num > -1) {
+                    if (V->btn_num > -1)
+                    {
                         bRes |= V->OnBtnClick(bSafe);
                         V->btn_num = -1;
-                        if (V->m_Flags.is(ButtonValue::flFirstOnly)) break;
+                        if (V->m_Flags.is(ButtonValue::flFirstOnly))
+                            break;
                     }
                 }
-                if (bRes) {
+                if (bRes)
+                {
                     Modified();
-                    if (!bSafe) RefreshForm();
+                    if (!bSafe)
+                        RefreshForm();
                 }
-                if (!bSafe) item->RedrawItem(true);
+                if (!bSafe)
+                    item->RedrawItem(true);
             }
         }
         break;
@@ -1087,18 +1145,22 @@ template <class T>
 BOOL TokenOnEdit(PropItem* prop, u32 _new_val, BOOL& bRes)
 {
     TokenValue<T>* V = dynamic_cast<TokenValue<T>*>(prop->GetFrontValue());
-    if (!V) return FALSE;
+    if (!V)
+        return FALSE;
     T new_val = _new_val;
-    if (prop->AfterEdit<TokenValue<T>, T>(new_val)) bRes = prop->ApplyValue<TokenValue<T>, T>(new_val);
+    if (prop->AfterEdit<TokenValue<T>, T>(new_val))
+        bRes = prop->ApplyValue<TokenValue<T>, T>(new_val);
     return TRUE;
 }
 template <class T>
 BOOL RTokenOnEdit(PropItem* prop, u32 _new_val, BOOL& bRes)
 {
     RTokenValue<T>* V = dynamic_cast<RTokenValue<T>*>(prop->GetFrontValue());
-    if (!V) return FALSE;
+    if (!V)
+        return FALSE;
     T new_val = _new_val;
-    if (prop->AfterEdit<RTokenValue<T>, T>(new_val)) bRes = prop->ApplyValue<RTokenValue<T>, T>(new_val);
+    if (prop->AfterEdit<RTokenValue<T>, T>(new_val))
+        bRes = prop->ApplyValue<RTokenValue<T>, T>(new_val);
     return TRUE;
 }
 //---------------------------------------------------------------------------
@@ -1106,7 +1168,8 @@ BOOL RTokenOnEdit(PropItem* prop, u32 _new_val, BOOL& bRes)
 void __fastcall TProperties::PMItemClick(TObject* Sender)
 {
     TMenuItem* mi = dynamic_cast<TMenuItem*>(Sender);
-    if (mi) {
+    if (mi)
+    {
         TElTreeItem* item = (TElTreeItem*)pmEnum->Tag;
         PropItem* prop = (PropItem*)item->Tag;
         switch (prop->Type())
@@ -1120,8 +1183,10 @@ void __fastcall TProperties::PMItemClick(TObject* Sender)
             u32 new_val = token_list[mi->Tag].id;
             if (!TokenOnEdit<u8>(prop, new_val, bRes))
                 if (!TokenOnEdit<u16>(prop, new_val, bRes))
-                    if (!TokenOnEdit<u32>(prop, new_val, bRes)) FATAL("Unknown token type");
-            if (bRes) {
+                    if (!TokenOnEdit<u32>(prop, new_val, bRes))
+                        FATAL("Unknown token type");
+            if (bRes)
+            {
                 Modified();
             }
             item->ColumnText->Strings[0] = prop->GetDrawText().c_str();
@@ -1135,8 +1200,10 @@ void __fastcall TProperties::PMItemClick(TObject* Sender)
             u32 new_val = V->token[mi->Tag].id;
             if (!RTokenOnEdit<u8>(prop, new_val, bRes))
                 if (!RTokenOnEdit<u16>(prop, new_val, bRes))
-                    if (!RTokenOnEdit<u32>(prop, new_val, bRes)) FATAL("Unknown rtoken type");
-            if (bRes) {
+                    if (!RTokenOnEdit<u32>(prop, new_val, bRes))
+                        FATAL("Unknown rtoken type");
+            if (bRes)
+            {
                 Modified();
             }
             item->ColumnText->Strings[0] = prop->GetDrawText().c_str();
@@ -1148,7 +1215,8 @@ void __fastcall TProperties::PMItemClick(TObject* Sender)
             R_ASSERT(V);
             u32 new_val = V->items[mi->Tag].ID;
             if (prop->AfterEdit<TokenValueSH, u32>(new_val))
-                if (prop->ApplyValue<TokenValueSH, u32>(new_val)) {
+                if (prop->ApplyValue<TokenValueSH, u32>(new_val))
+                {
                     Modified();
                 }
             item->ColumnText->Strings[0] = prop->GetDrawText().c_str();
@@ -1160,7 +1228,8 @@ void __fastcall TProperties::PMItemClick(TObject* Sender)
             R_ASSERT(V);
             shared_str new_val = V->items[mi->Tag];
             if (prop->AfterEdit<RListValue, shared_str>(new_val))
-                if (prop->ApplyValue<RListValue, shared_str>(new_val)) {
+                if (prop->ApplyValue<RListValue, shared_str>(new_val))
+                {
                     Modified();
                 }
             item->ColumnText->Strings[0] = prop->GetDrawText().c_str();
@@ -1172,7 +1241,8 @@ void __fastcall TProperties::PMItemClick(TObject* Sender)
             R_ASSERT(V);
             xr_string new_val = V->items[mi->Tag];
             if (prop->AfterEdit<CListValue, xr_string>(new_val))
-                if (prop->ApplyValue<CListValue, LPCSTR>(new_val.c_str())) {
+                if (prop->ApplyValue<CListValue, LPCSTR>(new_val.c_str()))
+                {
                     Modified();
                 }
             item->ColumnText->Strings[0] = prop->GetDrawText().c_str();
@@ -1186,17 +1256,21 @@ void __fastcall TProperties::PMItemClick(TObject* Sender)
             prop->BeforeEdit<CTextValue, xr_string>(edit_val);
             LPCSTR new_val = 0;
             bool bRes = true;
-            if (mi->Tag == 0) {
+            if (mi->Tag == 0)
+            {
                 bRes = TfrmChoseItem::SelectItem(smTexture, new_val, 8, edit_val.c_str());
             }
             else if (mi->Tag >= 2)
             {
                 new_val = TEXTUREString[mi->Tag];
             }
-            if (bRes) {
+            if (bRes)
+            {
                 edit_val = new_val;
-                if (prop->AfterEdit<CTextValue, xr_string>(edit_val)) {
-                    if (prop->ApplyValue<CTextValue, LPCSTR>(edit_val.c_str())) Modified();
+                if (prop->AfterEdit<CTextValue, xr_string>(edit_val))
+                {
+                    if (prop->ApplyValue<CTextValue, LPCSTR>(edit_val.c_str()))
+                        Modified();
                     item->ColumnText->Strings[0] = prop->GetDrawText().c_str();
                 }
             }
@@ -1216,9 +1290,11 @@ void __fastcall TProperties::WaveFormClick(TElTreeItem* item)
     R_ASSERT(V);
     WaveForm edit_val = V->GetValue();
     prop->BeforeEdit<WaveValue, WaveForm>(edit_val);
-    if (TfrmShaderFunction::Run(&edit_val) == mrOk) {
+    if (TfrmShaderFunction::Run(&edit_val) == mrOk)
+    {
         if (prop->AfterEdit<WaveValue, WaveForm>(edit_val))
-            if (prop->ApplyValue<WaveValue, WaveForm>(edit_val)) {
+            if (prop->ApplyValue<WaveValue, WaveForm>(edit_val))
+            {
                 Modified();
             }
         item->ColumnText->Strings[0] = prop->GetDrawText().c_str();
@@ -1240,11 +1316,13 @@ void __fastcall TProperties::ColorClick(TElTreeItem* item)
         prop->BeforeEdit<ColorValue, Fcolor>(edit_val);
         u32 ev = edit_val.get();
         u32 a = color_get_A(ev);
-        if (SelectColor(&ev)) {
+        if (SelectColor(&ev))
+        {
             ev = subst_alpha(ev, a);
             edit_val.set(ev);
             if (prop->AfterEdit<ColorValue, Fcolor>(edit_val))
-                if (prop->ApplyValue<ColorValue, Fcolor>(edit_val)) {
+                if (prop->ApplyValue<ColorValue, Fcolor>(edit_val))
+                {
                     item->RedrawItem(true);
                     Modified();
                 }
@@ -1260,11 +1338,13 @@ void __fastcall TProperties::ColorClick(TElTreeItem* item)
         Fcolor C;
         C.set(edit_val.x, edit_val.y, edit_val.z, 1.f);
         u32 ev = C.get();
-        if (SelectColor(&ev)) {
+        if (SelectColor(&ev))
+        {
             C.set(ev);
             edit_val.set(C.r, C.g, C.b);
             if (prop->AfterEdit<VectorValue, Fvector>(edit_val))
-                if (prop->ApplyValue<VectorValue, Fvector>(edit_val)) {
+                if (prop->ApplyValue<VectorValue, Fvector>(edit_val))
+                {
                     item->RedrawItem(true);
                     Modified();
                 }
@@ -1278,10 +1358,12 @@ void __fastcall TProperties::ColorClick(TElTreeItem* item)
         u32 edit_val = V->GetValue();
         prop->BeforeEdit<U32Value, u32>(edit_val);
         u32 a = color_get_A(edit_val);
-        if (SelectColor(&edit_val)) {
+        if (SelectColor(&edit_val))
+        {
             edit_val = subst_alpha(edit_val, a);
             if (prop->AfterEdit<U32Value, u32>(edit_val))
-                if (prop->ApplyValue<U32Value, u32>(edit_val)) {
+                if (prop->ApplyValue<U32Value, u32>(edit_val))
+                {
                     item->RedrawItem(true);
                     Modified();
                 }
@@ -1300,9 +1382,11 @@ void __fastcall TProperties::GameTypeClick(TElTreeItem* item)
     GameTypeChooser edit_val = V->GetValue();
 
     prop->BeforeEdit<GameTypeValue, GameTypeChooser>(edit_val);
-    if (gameTypeRun(AnsiString(item->Text).c_str(), &edit_val)) {
+    if (gameTypeRun(AnsiString(item->Text).c_str(), &edit_val))
+    {
         if (prop->AfterEdit<GameTypeValue, GameTypeChooser>(edit_val))
-            if (prop->ApplyValue<GameTypeValue, GameTypeChooser>(edit_val)) {
+            if (prop->ApplyValue<GameTypeValue, GameTypeChooser>(edit_val))
+            {
                 item->RedrawItem(true);
                 Modified();
             }
@@ -1316,9 +1400,11 @@ void __fastcall TProperties::VectorClick(TElTreeItem* item)
     R_ASSERT(V);
     Fvector edit_val = V->GetValue();
     prop->BeforeEdit<VectorValue, Fvector>(edit_val);
-    if (NumericVectorRun(AnsiString(item->Text).c_str(), &edit_val, V->dec, &edit_val, &V->lim_mn, &V->lim_mx)) {
+    if (NumericVectorRun(AnsiString(item->Text).c_str(), &edit_val, V->dec, &edit_val, &V->lim_mn, &V->lim_mx))
+    {
         if (prop->AfterEdit<VectorValue, Fvector>(edit_val))
-            if (prop->ApplyValue<VectorValue, Fvector>(edit_val)) {
+            if (prop->ApplyValue<VectorValue, Fvector>(edit_val))
+            {
                 item->RedrawItem(true);
                 Modified();
             }
@@ -1333,11 +1419,13 @@ void __fastcall TProperties::ChooseClick(TElTreeItem* item)
     ChooseValue* V = dynamic_cast<ChooseValue*>(prop->GetFrontValue());
     VERIFY(V);
     shared_str edit_val = V->GetValue();
-    if (!edit_val.size()) edit_val = V->m_StartPath;
+    if (!edit_val.size())
+        edit_val = V->m_StartPath;
     prop->BeforeEdit<ChooseValue, shared_str>(edit_val);
     //
     ChooseItemVec items;
-    if (!V->OnChooseFillEvent.empty()) {
+    if (!V->OnChooseFillEvent.empty())
+    {
         V->m_Items = &items;
         V->OnChooseFillEvent(V);
     }
@@ -1348,7 +1436,8 @@ void __fastcall TProperties::ChooseClick(TElTreeItem* item)
     {
         edit_val = new_val;
         if (prop->AfterEdit<ChooseValue, shared_str>(edit_val))
-            if (prop->ApplyValue<ChooseValue, shared_str>(edit_val)) {
+            if (prop->ApplyValue<ChooseValue, shared_str>(edit_val))
+            {
                 Modified();
             }
         item->ColumnText->Strings[0] = prop->GetDrawText().c_str();
@@ -1359,16 +1448,13 @@ void __fastcall TProperties::ChooseClick(TElTreeItem* item)
 //---------------------------------------------------------------------------
 // LW style inplace editor
 //---------------------------------------------------------------------------
-void TProperties::CancelLWNumber()
-{
-    HideLWNumber();
-}
-
+void TProperties::CancelLWNumber() { HideLWNumber(); }
 void TProperties::HideLWNumber()
 {
     // последовательность важна (может быть 2 Apply)
     seNumber->Tag = 0;
-    if (seNumber->Visible && Visible) tvProperties->SetFocus();
+    if (seNumber->Visible && Visible)
+        tvProperties->SetFocus();
     seNumber->Hide();
 }
 //---------------------------------------------------------------------------
@@ -1376,7 +1462,8 @@ template <class T>
 BOOL NumericBeforeEdit(PropItem* prop, TMultiObjSpinEdit* seNumber)
 {
     NumericValue<T>* V = dynamic_cast<NumericValue<T>*>(prop->GetFrontValue());
-    if (!V) return FALSE;
+    if (!V)
+        return FALSE;
     T edit_val = V->GetValue();
     prop->BeforeEdit<NumericValue<T>, T>(edit_val);
     seNumber->MinValue = V->lim_mn;
@@ -1397,7 +1484,8 @@ void TProperties::PrepareLWNumber(TElTreeItem* item)
                 if (!NumericBeforeEdit<s8>(prop, seNumber))
                     if (!NumericBeforeEdit<s16>(prop, seNumber))
                         if (!NumericBeforeEdit<s32>(prop, seNumber))
-                            if (!NumericBeforeEdit<float>(prop, seNumber)) FATAL("Unknown numeric type");
+                            if (!NumericBeforeEdit<float>(prop, seNumber))
+                                FATAL("Unknown numeric type");
     seNumber->Tag = (int)item;
     tvProperties->Refresh();
 }
@@ -1416,8 +1504,10 @@ template <class T>
 BOOL NumericOnEdit(PropItem* prop, T new_val, BOOL& bRes)
 {
     NumericValue<T>* V = dynamic_cast<NumericValue<T>*>(prop->GetFrontValue());
-    if (!V) return FALSE;
-    if (prop->AfterEdit<NumericValue<T>, T>(T(new_val))) bRes = prop->ApplyValue<NumericValue<T>, T>(T(new_val));
+    if (!V)
+        return FALSE;
+    if (prop->AfterEdit<NumericValue<T>, T>(T(new_val)))
+        bRes = prop->ApplyValue<NumericValue<T>, T>(T(new_val));
     return TRUE;
 }
 
@@ -1425,7 +1515,8 @@ void TProperties::ApplyLWNumber()
 {
     TElTreeItem* item = (TElTreeItem*)seNumber->Tag;
     seNumber->Tag = 0;
-    if (item) {
+    if (item)
+    {
         PropItem* prop = (PropItem*)item->Tag;
         seNumber->Update();
         BOOL bRes = FALSE;
@@ -1435,8 +1526,10 @@ void TProperties::ApplyLWNumber()
                     if (!NumericOnEdit<s8>(prop, seNumber->Value, bRes))
                         if (!NumericOnEdit<s16>(prop, seNumber->Value, bRes))
                             if (!NumericOnEdit<s32>(prop, seNumber->Value, bRes))
-                                if (!NumericOnEdit<float>(prop, seNumber->Value, bRes)) FATAL("Unknown numeric type");
-        if (bRes) {
+                                if (!NumericOnEdit<float>(prop, seNumber->Value, bRes))
+                                    FATAL("Unknown numeric type");
+        if (bRes)
+        {
             Modified();
         }
         item->ColumnText->Strings[0] = prop->GetDrawText().c_str();
@@ -1452,7 +1545,8 @@ void __fastcall TProperties::seNumberExit(TObject* Sender)
 
 void __fastcall TProperties::seNumberKeyDown(TObject* Sender, WORD& Key, TShiftState Shift)
 {
-    if (VK_RETURN == Key) {
+    if (VK_RETURN == Key)
+    {
         ApplyLWNumber();
         HideLWNumber();
     }
@@ -1466,16 +1560,13 @@ void __fastcall TProperties::seNumberKeyDown(TObject* Sender, WORD& Key, TShiftS
 //---------------------------------------------------------------------------
 // Textinplace editor
 //---------------------------------------------------------------------------
-void TProperties::CancelLWText()
-{
-    HideLWText();
-}
-
+void TProperties::CancelLWText() { HideLWText(); }
 void TProperties::HideLWText()
 {
     // последовательность важна (может быть 2 Apply)
     edText->Tag = 0;
-    if (edText->Visible && Visible) tvProperties->SetFocus();
+    if (edText->Visible && Visible)
+        tvProperties->SetFocus();
     edText->Hide();
 }
 //---------------------------------------------------------------------------
@@ -1546,7 +1637,8 @@ void TProperties::ApplyLWText()
 {
     TElTreeItem* item = (TElTreeItem*)edText->Tag;
     edText->Tag = 0;
-    if (item) {
+    if (item)
+    {
         PropItem* prop = (PropItem*)item->Tag;
         edText->Update();
         switch (prop->type)
@@ -1557,7 +1649,8 @@ void TProperties::ApplyLWText()
             R_ASSERT(V);
             xr_string new_val = AnsiString(edText->Text).c_str();
             if (prop->AfterEdit<CTextValue, xr_string>(new_val))
-                if (prop->ApplyValue<CTextValue, LPCSTR>(new_val.c_str())) {
+                if (prop->ApplyValue<CTextValue, LPCSTR>(new_val.c_str()))
+                {
                     Modified();
                 }
             item->ColumnText->Strings[0] = prop->GetDrawText().c_str();
@@ -1569,7 +1662,8 @@ void TProperties::ApplyLWText()
             R_ASSERT(V);
             xr_string new_val = AnsiString(edText->Text).c_str();
             if (prop->AfterEdit<STextValue, xr_string>(new_val))
-                if (prop->ApplyValue<STextValue, xr_string>(new_val)) {
+                if (prop->ApplyValue<STextValue, xr_string>(new_val))
+                {
                     Modified();
                 }
             item->ColumnText->Strings[0] = prop->GetDrawText().c_str();
@@ -1581,7 +1675,8 @@ void TProperties::ApplyLWText()
             R_ASSERT(V);
             shared_str new_val = AnsiString(edText->Text).c_str();
             if (prop->AfterEdit<RTextValue, shared_str>(new_val))
-                if (prop->ApplyValue<RTextValue, shared_str>(new_val)) {
+                if (prop->ApplyValue<RTextValue, shared_str>(new_val))
+                {
                     Modified();
                 }
             item->ColumnText->Strings[0] = prop->GetDrawText().c_str();
@@ -1593,7 +1688,8 @@ void TProperties::ApplyLWText()
             R_ASSERT(V);
             float new_val = StrTimeToFloatTime(edText->Text.c_str());
             if (prop->AfterEdit<FloatValue, float>(new_val))
-                if (prop->ApplyValue<FloatValue, float>(new_val)) {
+                if (prop->ApplyValue<FloatValue, float>(new_val))
+                {
                     Modified();
                 }
             item->ColumnText->Strings[0] = FloatTimeToStrTime(V->GetValue());
@@ -1612,7 +1708,8 @@ void __fastcall TProperties::edTextExit(TObject* Sender)
 
 void __fastcall TProperties::edTextKeyDown(TObject* Sender, WORD& Key, TShiftState Shift)
 {
-    if (VK_RETURN == Key) {
+    if (VK_RETURN == Key)
+    {
         ApplyLWText();
         HideLWText();
     }
@@ -1626,7 +1723,8 @@ void __fastcall TProperties::edTextKeyDown(TObject* Sender, WORD& Key, TShiftSta
 void __fastcall TProperties::edTextDblClick(TObject* Sender)
 {
     TElTreeItem* item = (TElTreeItem*)edText->Tag;
-    if (item) {
+    if (item)
+    {
         PropItem* prop = (PropItem*)item->Tag;
         edText->Update();
         switch (prop->type)
@@ -1636,7 +1734,8 @@ void __fastcall TProperties::edTextDblClick(TObject* Sender)
         case PROP_RTEXT:
         {
             AnsiString new_val = edText->Text;
-            if (TfrmText::RunEditor(new_val, AnsiString(item->Text).c_str())) edText->Text = new_val;
+            if (TfrmText::RunEditor(new_val, AnsiString(item->Text).c_str()))
+                edText->Text = new_val;
             ApplyLWText();
             HideLWText();
         }
@@ -1648,7 +1747,8 @@ void __fastcall TProperties::edTextDblClick(TObject* Sender)
 
 void TProperties::ExecTextEditor(PropItem* prop)
 {
-    if (prop) {
+    if (prop)
+    {
         switch (prop->type)
         {
         case PROP_CTEXT:
@@ -1658,10 +1758,12 @@ void TProperties::ExecTextEditor(PropItem* prop)
             xr_string edit_val = V->GetValue();
             prop->BeforeEdit<CTextValue, xr_string>(edit_val);
             AnsiString tmp = edit_val.c_str();
-            if (TfrmText::RunEditor(tmp, AnsiString(prop->Item()->Text).c_str(), false)) {
+            if (TfrmText::RunEditor(tmp, AnsiString(prop->Item()->Text).c_str(), false))
+            {
                 edit_val = tmp.c_str();
                 if (prop->AfterEdit<CTextValue, xr_string>(edit_val))
-                    if (prop->ApplyValue<CTextValue, LPCSTR>(edit_val.c_str())) Modified();
+                    if (prop->ApplyValue<CTextValue, LPCSTR>(edit_val.c_str()))
+                        Modified();
                 prop->Item()->ColumnText->Strings[0] = prop->GetDrawText().c_str();
             }
         }
@@ -1673,10 +1775,12 @@ void TProperties::ExecTextEditor(PropItem* prop)
             xr_string edit_val = V->GetValue();
             prop->BeforeEdit<STextValue, xr_string>(edit_val);
             AnsiString tmp = edit_val.c_str();
-            if (TfrmText::RunEditor(tmp, AnsiString(prop->Item()->Text).c_str(), false)) {
+            if (TfrmText::RunEditor(tmp, AnsiString(prop->Item()->Text).c_str(), false))
+            {
                 edit_val = tmp.c_str();
                 if (prop->AfterEdit<STextValue, xr_string>(edit_val))
-                    if (prop->ApplyValue<STextValue, xr_string>(edit_val)) Modified();
+                    if (prop->ApplyValue<STextValue, xr_string>(edit_val))
+                        Modified();
                 prop->Item()->ColumnText->Strings[0] = prop->GetDrawText().c_str();
             }
         }
@@ -1688,10 +1792,12 @@ void TProperties::ExecTextEditor(PropItem* prop)
             shared_str edit_val = V->GetValue();
             prop->BeforeEdit<RTextValue, shared_str>(edit_val);
             AnsiString tmp = edit_val.c_str();
-            if (TfrmText::RunEditor(tmp, AnsiString(prop->Item()->Text).c_str(), false)) {
+            if (TfrmText::RunEditor(tmp, AnsiString(prop->Item()->Text).c_str(), false))
+            {
                 edit_val = tmp.c_str();
                 if (prop->AfterEdit<RTextValue, shared_str>(edit_val))
-                    if (prop->ApplyValue<RTextValue, shared_str>(edit_val)) Modified();
+                    if (prop->ApplyValue<RTextValue, shared_str>(edit_val))
+                        Modified();
                 prop->Item()->ColumnText->Strings[0] = prop->GetDrawText().c_str();
             }
         }
@@ -1704,16 +1810,13 @@ void TProperties::ExecTextEditor(PropItem* prop)
 //---------------------------------------------------------------------------
 // Shortcut editor
 //---------------------------------------------------------------------------
-void TProperties::CancelSCText()
-{
-    HideSCText();
-}
-
+void TProperties::CancelSCText() { HideSCText(); }
 void TProperties::HideSCText()
 {
     // последовательность важна (может быть 2 Apply)
     hkShortcut->Tag = 0;
-    if (hkShortcut->Visible && Visible) tvProperties->SetFocus();
+    if (hkShortcut->Visible && Visible)
+        tvProperties->SetFocus();
     hkShortcut->Hide();
 }
 void TProperties::PrepareSCText(TElTreeItem* item)
@@ -1749,7 +1852,8 @@ void TProperties::ApplySCText()
 {
     TElTreeItem* item = (TElTreeItem*)hkShortcut->Tag;
     hkShortcut->Tag = 0;
-    if (item) {
+    if (item)
+    {
         PropItem* prop = (PropItem*)item->Tag;
         hkShortcut->Update();
         switch (prop->type)
@@ -1761,7 +1865,8 @@ void TProperties::ApplySCText()
             xr_shortcut new_val;
             new_val.hotkey = hkShortcut->HotKey;
             if (prop->AfterEdit<ShortcutValue, xr_shortcut>(new_val))
-                if (prop->ApplyValue<ShortcutValue, xr_shortcut>(new_val)) {
+                if (prop->ApplyValue<ShortcutValue, xr_shortcut>(new_val))
+                {
                     Modified();
                 }
             item->ColumnText->Strings[0] = V->GetDrawText(0).c_str();
@@ -1790,19 +1895,19 @@ void __fastcall TProperties::hkShortcut_KeyDown(TObject* Sender, WORD& Key, TShi
 
 void __fastcall TProperties::tvPropertiesItemFocused(TObject* Sender)
 {
-    if (!OnItemFocused.empty()) OnItemFocused(tvProperties->Selected);
-    if (tvProperties->Selected) {
+    if (!OnItemFocused.empty())
+        OnItemFocused(tvProperties->Selected);
+    if (tvProperties->Selected)
+    {
         PropItem* prop = (PropItem*)tvProperties->Selected->Tag;
-        if (prop && !prop->OnItemFocused.empty()) prop->OnItemFocused(prop);
+        if (prop && !prop->OnItemFocused.empty())
+            prop->OnItemFocused(prop);
     }
     m_FirstClickItem = 0;
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TProperties::tvPropertiesHeaderColumnResize(TObject* Sender, int SectionIndex)
-{
-    ApplyEditControl();
-}
+void __fastcall TProperties::tvPropertiesHeaderColumnResize(TObject* Sender, int SectionIndex) { ApplyEditControl(); }
 //---------------------------------------------------------------------------
 
 void TProperties::ApplyEditControl()
@@ -1831,10 +1936,7 @@ bool __fastcall TProperties::IsModified()
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TProperties::FormDeactivate(TObject* Sender)
-{
-    ApplyEditControl();
-}
+void __fastcall TProperties::FormDeactivate(TObject* Sender) { ApplyEditControl(); }
 //---------------------------------------------------------------------------
 
 void __fastcall TProperties::FormShow(TObject* Sender)
@@ -1846,9 +1948,11 @@ void __fastcall TProperties::FormShow(TObject* Sender)
 
 void __fastcall TProperties::tvPropertiesItemChange(TObject* Sender, TElTreeItem* Item, TItemChangeMode ItemChangeMode)
 {
-    if (Item && (icmCheckState == ItemChangeMode)) {
+    if (Item && (icmCheckState == ItemChangeMode))
+    {
         PropItem* prop = (PropItem*)Item->Tag;
-        if (prop) {
+        if (prop)
+        {
             prop->m_Flags.set(PropItem::flCBChecked, Item->Checked);
             prop->OnChange();
             Modified();
@@ -1858,52 +1962,36 @@ void __fastcall TProperties::tvPropertiesItemChange(TObject* Sender, TElTreeItem
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TProperties::fsStorageRestorePlacement(TObject* Sender)
-{
-    RestoreParams(fsStorage);
-}
+void __fastcall TProperties::fsStorageRestorePlacement(TObject* Sender) { RestoreParams(fsStorage); }
 //---------------------------------------------------------------------------
 
-void __fastcall TProperties::fsStorageSavePlacement(TObject* Sender)
-{
-    SaveParams(fsStorage);
-}
+void __fastcall TProperties::fsStorageSavePlacement(TObject* Sender) { SaveParams(fsStorage); }
 //---------------------------------------------------------------------------
 
 void __fastcall TProperties::ExpandSelected1Click(TObject* Sender)
 {
-    if (tvProperties->Selected) tvProperties->Selected->Expand(false);
+    if (tvProperties->Selected)
+        tvProperties->Selected->Expand(false);
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TProperties::CollapseSelected1Click(TObject* Sender)
 {
-    if (tvProperties->Selected) tvProperties->Selected->Collapse(false);
+    if (tvProperties->Selected)
+        tvProperties->Selected->Collapse(false);
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TProperties::ExpandAll1Click(TObject* Sender)
-{
-    tvProperties->FullExpand();
-}
+void __fastcall TProperties::ExpandAll1Click(TObject* Sender) { tvProperties->FullExpand(); }
 //---------------------------------------------------------------------------
 
-void __fastcall TProperties::CollapseAll1Click(TObject* Sender)
-{
-    tvProperties->FullCollapse();
-}
+void __fastcall TProperties::CollapseAll1Click(TObject* Sender) { tvProperties->FullCollapse(); }
 //---------------------------------------------------------------------------
 
-void __fastcall TProperties::miDrawThumbnailsClick(TObject* Sender)
-{
-    RefreshForm();
-}
+void __fastcall TProperties::miDrawThumbnailsClick(TObject* Sender) { RefreshForm(); }
 //---------------------------------------------------------------------------
 
-void __fastcall TProperties::miAutoExpandClick(TObject* Sender)
-{
-    RefreshForm();
-}
+void __fastcall TProperties::miAutoExpandClick(TObject* Sender) { RefreshForm(); }
 //---------------------------------------------------------------------------
 
 void __fastcall TProperties::RefreshForm()
@@ -1915,29 +2003,25 @@ void __fastcall TProperties::RefreshForm()
         if (prop && prop->item && prop->m_Flags.is(PropItem::flDrawThumbnail))
             prop->Item()->OwnerHeight = !miDrawThumbnails->Checked;
     }
-    if (miAutoExpand->Checked) tvProperties->FullExpand();
+    if (miAutoExpand->Checked)
+        tvProperties->FullExpand();
     UnlockUpdating();
     tvProperties->Repaint();
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TProperties::ebOKClick(TObject* Sender)
-{
-    ModalResult = mrOk;
-}
+void __fastcall TProperties::ebOKClick(TObject* Sender) { ModalResult = mrOk; }
 //---------------------------------------------------------------------------
 
-void __fastcall TProperties::ebCancelClick(TObject* Sender)
-{
-    ModalResult = mrCancel;
-}
+void __fastcall TProperties::ebCancelClick(TObject* Sender) { ModalResult = mrCancel; }
 //---------------------------------------------------------------------------
 
 void __fastcall TProperties::tvPropertiesShowLineHint(TObject* Sender, TElTreeItem* Item, TElHeaderSection* Section,
     TElFString& Text, THintWindow* HintWindow, TPoint& MousePos, bool& DoShowHint)
 {
     PropItem* prop = (PropItem*)Item->Tag;
-    if (prop) {
+    if (prop)
+    {
         //    	HintWindow->Brush->Color= clGray;
         Text = prop->GetDrawText().c_str();
     }
@@ -1948,7 +2032,8 @@ void __fastcall TProperties::tvPropertiesCompareItems(TObject* Sender, TElTreeIt
 {
     u32 type1 = (u32)Item1->Data;
     u32 type2 = (u32)Item2->Data;
-    if (type1 == type2) {
+    if (type1 == type2)
+    {
         if (Item1->Text < Item2->Text)
             res = -1;
         else if (Item1->Text > Item2->Text)
@@ -1963,8 +2048,5 @@ void __fastcall TProperties::tvPropertiesCompareItems(TObject* Sender, TElTreeIt
 }
 //---------------------------------------------------------------------------
 
-PropItem* TProperties::FindItem(const shared_str& name)
-{
-    return PHelper().FindItem(m_Items, name, PROP_UNDEF);
-}
+PropItem* TProperties::FindItem(const shared_str& name) { return PHelper().FindItem(m_Items, name, PROP_UNDEF); }
 //---------------------------------------------------------------------------

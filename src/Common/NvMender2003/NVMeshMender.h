@@ -40,12 +40,12 @@ How to use MeshMender:
 ------------------------
 
 
-    std::vector< MeshMender::Vertex > theVerts;
-    std::vector< unsigned int > theIndices;
-    std::vector< unsigned int > mappingNewToOld;
+    std::vector<MeshMender::Vertex> theVerts;
+    std::vector<unsigned int> theIndices;
+    std::vector<unsigned int> mappingNewToOld;
 
     //fill up the vectors with your mesh's data
-    for(DWORD i = 0; i < numVerts; ++i)
+    for (DWORD i = 0; i < numVerts; ++i)
     {
         MeshMender::Vertex v;
         v.pos = myVerts[i].pos;
@@ -57,20 +57,20 @@ How to use MeshMender:
         theVerts.push_back(v);
     }
 
-    for(DWORD ind= 0 ; ind< numIndices; ++ind)
+    for(DWORD ind = 0; ind<numIndices; ++ind)
     {
         theIndices.push_back(myIndices[ind]);
     }
 
     //pass it in to the mender to do it's stuff
-    mender.Mend( theVerts,  theIndices, mappingNewToOld,
-                  minNormalCreaseCos,
-                  minTangentCreaseCos,
-                  minBinormalCreaseCos,
-                  weightNormalsByArea,
-                  MeshMender::CALCULATE_NORMALS,
-                  MeshMender::DONT_RESPECT_SPLITS
-                  MeshMender::DONT_FIX_CYLINDRICAL);
+    mender.Mend(theVerts, theIndices, mappingNewToOld,
+        minNormalCreaseCos,
+        minTangentCreaseCos,
+        minBinormalCreaseCos,
+        weightNormalsByArea,
+        MeshMender::CALCULATE_NORMALS,
+        MeshMender::DONT_RESPECT_SPLITS
+        MeshMender::DONT_FIX_CYLINDRICAL);
 
     //then update your mesh with the data provided in the Vertex vector
     //NOTE that MeshMender may add vertices to your mesh if needs to split
@@ -106,13 +106,12 @@ public:
         enum
         {
             FVF = D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_TEX3 | D3DFVF_TEXCOORDSIZE2(0) | D3DFVF_TEXCOORDSIZE3(1) |
-                  D3DFVF_TEXCOORDSIZE3(2)
+                D3DFVF_TEXCOORDSIZE3(2)
         };
-        Vertex::Vertex()
-            : pos(0.0f, 0.0f, 0.0f), normal(0.0f, 0.0f, 0.0f), s(0.0f), t(0.0f), tangent(0.0f, 0.0f, 0.0f),
-              binormal(0.0f, 0.0f, 0.0f)
-        {
-        }
+        Vertex::Vertex() :
+            pos(0.0f, 0.0f, 0.0f), normal(0.0f, 0.0f, 0.0f), s(0.0f), t(0.0f),
+            tangent(0.0f, 0.0f, 0.0f), binormal(0.0f, 0.0f, 0.0f)
+        {}
     };
 
     enum NormalCalcOption
@@ -132,75 +131,75 @@ public:
     };
 
     // Mend - given a mesh, output the new data complete with smoothed
-    //		  normals, binormals, and tangents
+    //        normals, binormals, and tangents
     //
     // RETURNS true on success, false on failure
     //
     // theVerts  - should be initialized with your mesh data, NOTE that when
-    //			  mesh mender is done with it, the number of vertices may grow
-    //			  and it will be filled with normals, tangents and binormals
+    //            mesh mender is done with it, the number of vertices may grow
+    //            and it will be filled with normals, tangents and binormals
     //
     // theIndices - should be initialized with your mesh indices
-    //				will contain the new indices..we are not adding triangles,
-    //				  so the number of indices passed back should be the same as the
-    //				  number of indices passed in, but they may point to new vertices now.
+    //              will contain the new indices..we are not adding triangles,
+    //                so the number of indices passed back should be the same as the
+    //                number of indices passed in, but they may point to new vertices now.
     //
     // mappingNewToOldVert - this should be passed in as an empty vector. after mending
-    //				it will contain a mapping of newvertexindex -> oldvertexindex
-    //				so it could be used to map any per vertex data you had in your original
-    //				mesh to the new mesh like so:
+    //              it will contain a mapping of newvertexindex -> oldvertexindex
+    //              so it could be used to map any per vertex data you had in your original
+    //              mesh to the new mesh like so:
     //
-    //					for each new vertex index
-    //						newVert[index]->myData = oldVert[ mappingNewToOldVert[index]]->myData;
+    //                  for each new vertex index
+    //                      newVert[index]->myData = oldVert[ mappingNewToOldVert[index]]->myData;
     //
-    //				where myData is some custom vertex data in your original mesh.
+    //              where myData is some custom vertex data in your original mesh.
     //
     // minNormalsCreaseCosAngle - the minimum cosine of the angle between normals
-    //							 so that they are allowed to be smoothed together
-    //							 ranges between -1.0 and +1.0
-    //							 this is ignored if computeNormals is set to DONT_CALCULATE_NORMALS
+    //                           so that they are allowed to be smoothed together
+    //                           ranges between -1.0 and +1.0
+    //                           this is ignored if computeNormals is set to DONT_CALCULATE_NORMALS
     //
     //
     // minTangentsCreaseCosAngle - the minimum cosine of the angle between tangents
-    //							  so that they are allowed to be smoothed together
-    //							  ranges between -1.0 and +1.0
+    //                            so that they are allowed to be smoothed together
+    //                            ranges between -1.0 and +1.0
     //
     // minBinormalsCreaseCosAngle - the minimum cosine of the angle between binormals
-    //							   so that they are allowed to be smoothed together
-    //		 					   ranges between -1.0 and +1.0
+    //                             so that they are allowed to be smoothed together
+    //                             ranges between -1.0 and +1.0
     //
     // weightNormalsByArea - an ammount to blend the normalized face normal, and the
-    //						unnormalized face normal together.  Thus weighting the
-    //						normal by the face area by a given ammount
-    //						ranges between 0.0 and +1.0
-    //						0.0 means use the normalized face normals (not weighted by area)
-    //						1.0 means use the unnormalized face normal(weighted by area)
-    //						this is ignored if computeNormals is set to DONT_CALCULATE_NORMALS
+    //                      unnormalized face normal together.  Thus weighting the
+    //                      normal by the face area by a given ammount
+    //                      ranges between 0.0 and +1.0
+    //                      0.0 means use the normalized face normals (not weighted by area)
+    //                      1.0 means use the unnormalized face normal(weighted by area)
+    //                      this is ignored if computeNormals is set to DONT_CALCULATE_NORMALS
     //
     // computeNormals - should mesh mender calculate normals? If this is set to DONT_CALCULATE_NORMALS
-    //					then the vertex normals after mesh mender is called will be the
-    //					same ones you pass in.  If you are automatically calculating normals yourself,
-    //					you may find that meshmender provides greater control over how normals are smoothed
-    //					together. I've been able to get better results using the Crease angle with
-    //					meshmender's smoothing groups
+    //                  then the vertex normals after mesh mender is called will be the
+    //                  same ones you pass in.  If you are automatically calculating normals yourself,
+    //                  you may find that meshmender provides greater control over how normals are smoothed
+    //                  together. I've been able to get better results using the Crease angle with
+    //                  meshmender's smoothing groups
     //
     // respectExistingSplits - DONT_RESPECT_SPLITS means that neighboring triangles for smoothing will be determined
-    //						  based on position and not on indices.
-    //						  RESPECT_SPLITS means that neighboring triangles will be determined based on the indices of
+    //                        based on position and not on indices.
+    //                        RESPECT_SPLITS means that neighboring triangles will be determined based on the indices of
     //the
-    //						  triangle and not the positions of the vertices.
-    //						  you can usually get better smoothing by not respecting existing splits
-    //						  only respect them if you know they should be respected.
+    //                        triangle and not the positions of the vertices.
+    //                        you can usually get better smoothing by not respecting existing splits
+    //                        only respect them if you know they should be respected.
     //
     // fixCylindricalWrapping - DONT_FIX_CYLINDRICAL means take the texture coordinates as they come
-    //						   FIX_CYLINDRICAL means we might need to split the verts
-    //						   at that point and generate the proper texture coordinate.
-    //						   for instance, if we have tex coords   0.9 -> 0.0-> 0.2 we would need to add
-    //						   a new vert so that we have       0.9 -> 1.0  0.0-> 0.2
-    //						   this is only supported for texture coordinates in the range [ 0.0f , 1.0f ]
-    //						   NOTE: don't leave this on for all meshes, only use it when you know
-    //							you need it. If you have polygons that map to a large area in texture space
-    //							this option could mess up the texture coordinates
+    //                         FIX_CYLINDRICAL means we might need to split the verts
+    //                         at that point and generate the proper texture coordinate.
+    //                         for instance, if we have tex coords   0.9 -> 0.0-> 0.2 we would need to add
+    //                         a new vert so that we have       0.9 -> 1.0  0.0-> 0.2
+    //                         this is only supported for texture coordinates in the range [ 0.0f , 1.0f ]
+    //                         NOTE: don't leave this on for all meshes, only use it when you know
+    //                          you need it. If you have polygons that map to a large area in texture space
+    //                          this option could mess up the texture coordinates
     bool Mend(xr_vector<Vertex>& theVerts, xr_vector<unsigned int>& theIndices,
         xr_vector<unsigned int>& mappingNewToOldVert, const float minNormalsCreaseCosAngle = 0.0f,
         const float minTangentsCreaseCosAngle = 0.0f, const float minBinormalsCreaseCosAngle = 0.0f,
@@ -247,7 +246,7 @@ protected:
         NeighborhoodID group;
         void Reset();
 
-        TriID myID;  // a global id used to keep track of tris'
+        TriID myID; // a global id used to keep track of tris'
     };
 
     xr_vector<Triangle> m_Triangles;
@@ -270,9 +269,9 @@ protected:
 
     // function responsible for growing the neighbor hood groups
     // arround a vertex
-    void BuildGroups(Triangle* tri,         // the tri of interest
-        TriangleList& possibleNeighbors,    // all tris arround a vertex
-        NeighborGroupList& neighborGroups,  // the neighbor groups to be updated
+    void BuildGroups(Triangle* tri, // the tri of interest
+        TriangleList& possibleNeighbors, // all tris arround a vertex
+        NeighborGroupList& neighborGroups, // the neighbor groups to be updated
         xr_vector<Vertex>& theVerts, CanSmoothChecker* smoothChecker, const float& minCreaseAngle);
 
     // given 2 triangles, fill the two neighbor pointers with either

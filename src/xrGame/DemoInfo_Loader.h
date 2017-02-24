@@ -17,6 +17,6 @@ public:
     ~demo_info_loader();
 
     demo_info const* get_demofile_info(LPCSTR demo_file_name);
-};  // class demo_info_loader
+}; // class demo_info_loader
 
-#endif  //#ifndef DEMO_INFO_LOADER
+#endif //#ifndef DEMO_INFO_LOADER

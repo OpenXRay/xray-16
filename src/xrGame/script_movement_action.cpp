@@ -76,7 +76,8 @@ CScriptMovementAction::CScriptMovementAction(
     m_tSpeedParam = speed_param;
     m_fDistToEnd = dist_to_end;
 
-    if (m_tMoveAction == MonsterSpace::eMA_Jump) {
+    if (m_tMoveAction == MonsterSpace::eMA_Jump)
+    {
         m_tGoalType = eGoalTypeJumpToPosition;
     }
     else if (m_tMoveAction == MonsterSpace::eMA_WalkWithLeader || m_tMoveAction == MonsterSpace::eMA_RunWithLeader)
@@ -121,10 +122,7 @@ CScriptMovementAction::CScriptMovementAction(
     m_fDistToEnd = dist_to_end;
 }
 
-CScriptMovementAction::~CScriptMovementAction()
-{
-}
-
+CScriptMovementAction::~CScriptMovementAction() {}
 void CScriptMovementAction::SetObjectToGo(CScriptGameObject* tpObjectToGo)
 {
     if (tpObjectToGo)

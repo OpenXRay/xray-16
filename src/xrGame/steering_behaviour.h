@@ -28,7 +28,7 @@ namespace detail
 {
 vec random_vec();
 
-}  // namespace detail
+} // namespace detail
 
 //----------------------------------------------------------
 // base
@@ -54,15 +54,12 @@ public:
 
 public:
     base(params* params_) : m_p_params(params_) {}
-
     virtual vec calc_acceleration() = 0;
 
     void set_enabled(bool value) { m_p_params->enabled = value; }
     bool is_enabled() const { return m_p_params->enabled; }
     params* get_supplier() { return m_p_params; }
-
     virtual ~base() { delete m_p_params; }
-
 protected:
     float calc_dist_factor(float dist) const;
     float calc_dist_factor(vec_arg factor, float dist) const;
@@ -85,7 +82,7 @@ public:
         vec pos;
         vec dest;
         float max_evade_range;
-        vec (*pf_random_dir)();  // randomizer func in case we're in 0 dist from dest
+        vec (*pf_random_dir)(); // randomizer func in case we're in 0 dist from dest
 
         params(float max_evade_range, vec_arg factor, float min_factor_dist = base::s_min_factor_dist,
             vec (*pf_random_dir)() = &detail::random_vec)
@@ -99,7 +96,6 @@ public:
 
 public:
     evade(params* params_) : base(params_), m_p_params(params_) {}
-
     virtual vec calc_acceleration();
 
 private:
@@ -136,7 +132,6 @@ public:
 
 public:
     pursue(params* params_) : base(params_), m_p_params(params_) {}
-
     virtual vec calc_acceleration();
 
 private:
@@ -167,7 +162,6 @@ public:
 
 public:
     restrictor(params* params_) : base(params_), m_p_params(params_) {}
-
     virtual vec calc_acceleration();
 
 private:
@@ -190,8 +184,8 @@ public:
             yz_plane
         } plane;
 
-        float conservativeness;  // how much we're taking current dir into account?
-        float angle_change;      // how big angle changes can be? (radians)
+        float conservativeness; // how much we're taking current dir into account?
+        float angle_change; // how big angle changes can be? (radians)
         vec dir;
 
         params(plane_t plane, float conservativeness, float angle_change, float factor)
@@ -206,7 +200,6 @@ public:
 
 public:
     wander(params* params_) : base(params_), m_p_params(params_), m_wander_angle(0) {}
-
     virtual vec calc_acceleration();
 
 private:
@@ -235,7 +228,7 @@ public:
         vec thrust_factor;
 
         typedef std::vector<vec> Probes;
-        Probes probes;  // obstacle-scanners (vectors in local (dir,up) space)
+        Probes probes; // obstacle-scanners (vectors in local (dir,up) space)
 
         params(float turn_factor, vec_arg thrust_factor, float min_factor_dist = base::s_min_factor_dist)
             : base::params(thrust_factor, min_factor_dist), turn_factor(turn_factor), thrust_factor(thrust_factor)
@@ -250,7 +243,6 @@ public:
 
 public:
     containment(params* params_) : base(params_), m_p_params(params_) {}
-
     virtual vec calc_acceleration();
 
 private:
@@ -281,9 +273,9 @@ public:
         }
 
         // this function should supply nearest object to group with
-        virtual void first_nearest(vec& v) = 0;  // start supplying nearest
+        virtual void first_nearest(vec& v) = 0; // start supplying nearest
         virtual bool nomore_nearest() = 0;
-        virtual void next_nearest(vec& v) = 0;  // next nearest, false if finished
+        virtual void next_nearest(vec& v) = 0; // next nearest, false if finished
 
         virtual bool update() = 0;
         virtual ~params() {}
@@ -291,7 +283,6 @@ public:
 
 public:
     grouping(params* params_) : base(params_), m_p_params(params_) {}
-
     virtual vec calc_acceleration();
 
 private:
@@ -311,7 +302,6 @@ public:
     void clear();
 
     virtual ~manager() { clear(); }
-
 protected:
     void remove_scheduled();
     static void deleter(base* p);
@@ -322,6 +312,6 @@ protected:
     Behaviours m_schedule_remove;
 };
 
-}  // namespace steering_behaviour
+} // namespace steering_behaviour
 
 #endif

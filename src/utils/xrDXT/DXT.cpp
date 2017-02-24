@@ -8,11 +8,7 @@
 #include "ETextureParams.h"
 #include "dds.h"
 
-BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved)
-{
-    return TRUE;
-}
-
+BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved) { return TRUE; }
 static HFILE gFileOut;
 static HFILE gFileIn;
 
@@ -24,9 +20,11 @@ const u32 fcc_DXT5 = MAKEFOURCC('D', 'X', 'T', '5');
 
 void __cdecl WriteDTXnFile(DWORD count, void* buffer, void* userData)
 {
-    if (count == sizeof(DDS_HEADER)) {
+    if (count == sizeof(DDS_HEADER))
+    {
         DDS_HEADER* hdr = (DDS_HEADER*)buffer;
-        if (hdr->dwSize == count) {
+        if (hdr->dwSize == count)
+        {
             switch (hdr->ddspf.dwFourCC)
             {
             case fcc_DXT1:
@@ -50,19 +48,15 @@ public:
     virtual bool writeData(const void* data, int size) override;
 };
 
-DDSWriter::DDSWriter(HFILE& file) : file(file)
-{
-}
-
-void DDSWriter::beginImage(int size, int width, int height, int depth, int face, int miplevel)
-{
-}
-
+DDSWriter::DDSWriter(HFILE& file) : file(file) {}
+void DDSWriter::beginImage(int size, int width, int height, int depth, int face, int miplevel) {}
 bool DDSWriter::writeData(const void* data, int size)
 {
-    if (size == sizeof(DDS_HEADER)) {
+    if (size == sizeof(DDS_HEADER))
+    {
         DDS_HEADER* hdr = (DDS_HEADER*)data;
-        if (hdr->dwSize == size) {
+        if (hdr->dwSize == size)
+        {
             switch (hdr->ddspf.dwFourCC)
             {
             case fcc_DXT1:
@@ -99,11 +93,7 @@ void DDSErrorHandler::error(nvtt::Error e)
     MessageBox(0, msg, "DXT compress error", MB_ICONERROR | MB_OK);
 }
 
-void __cdecl ReadDTXnFile(DWORD count, void* buffer, void* userData)
-{
-    _read(gFileIn, buffer, count);
-}
-
+void __cdecl ReadDTXnFile(DWORD count, void* buffer, void* userData) { _read(gFileIn, buffer, count); }
 HRESULT WriteCompressedData(void* data, int miplevel, u32 size)
 {
     _write(gFileOut, data, size);
@@ -133,21 +123,26 @@ ENGINE_API u32* Build32MipLevel(u32& _w, u32& _h, u32& _p, u32* pdwPixelSrc, STe
         {
             u8* p1 = pScanline + x * 4;
             u8* p2 = p1 + 4;
-            if (1 == _w) p2 = p1;
+            if (1 == _w)
+                p2 = p1;
             u8* p3 = p1 + _p;
-            if (1 == _h) p3 = p1;
+            if (1 == _h)
+                p3 = p1;
             u8* p4 = p2 + _p;
-            if (1 == _h) p4 = p2;
+            if (1 == _h)
+                p4 = p2;
             float c_r = float(u32(p1[0]) + u32(p2[0]) + u32(p3[0]) + u32(p4[0])) / 4.f;
             float c_g = float(u32(p1[1]) + u32(p2[1]) + u32(p3[1]) + u32(p4[1])) / 4.f;
             float c_b = float(u32(p1[2]) + u32(p2[2]) + u32(p3[2]) + u32(p4[2])) / 4.f;
             float c_a = float(u32(p1[3]) + u32(p2[3]) + u32(p3[3]) + u32(p4[3])) / 4.f;
-            if (fmt->flags.is(STextureParams::flFadeToColor)) {
+            if (fmt->flags.is(STextureParams::flFadeToColor))
+            {
                 c_r = c_r * inv_blend + mixed_r * blend;
                 c_g = c_g * inv_blend + mixed_g * blend;
                 c_b = c_b * inv_blend + mixed_b * blend;
             }
-            if (fmt->flags.is(STextureParams::flFadeToAlpha)) {
+            if (fmt->flags.is(STextureParams::flFadeToAlpha))
+            {
                 c_a = c_a * inv_blend + mixed_a * blend;
             }
             float A = c_a + c_a / 8.f;
@@ -194,7 +189,8 @@ int DXTCompressImage(LPCSTR out_name, u8* raw_data, u32 w, u32 h, u32 pitch, STe
 {
     R_ASSERT(0 != w && 0 != h);
     gFileOut = _open(out_name, _O_WRONLY | _O_BINARY | _O_CREAT | _O_TRUNC, _S_IWRITE);
-    if (gFileOut == -1) {
+    if (gFileOut == -1)
+    {
         fprintf(stderr, "Can't open output file %s\n", out_name);
         return 0;
     }
@@ -236,7 +232,8 @@ int DXTCompressImage(LPCSTR out_name, u8* raw_data, u32 w, u32 h, u32 pitch, STe
     outOpt.setOutputHandler(&writer);
     DDSErrorHandler handler;
     outOpt.setErrorHandler(&handler);
-    if (fmt->flags.is(STextureParams::flGenerateMipMaps) && STextureParams::kMIPFilterAdvanced == fmt->mip_filter) {
+    if (fmt->flags.is(STextureParams::flGenerateMipMaps) && STextureParams::kMIPFilterAdvanced == fmt->mip_filter)
+    {
         inOpt.setMipmapGeneration(false);
         u8* pImagePixels = 0;
         int numMipmaps = GetPowerOf2Plus1(__min(w, h));
@@ -284,7 +281,8 @@ int DXTCompressImage(LPCSTR out_name, u8* raw_data, u32 w, u32 h, u32 pitch, STe
         result = nvtt::Compressor().process(inOpt, compOpt, outOpt);
     }
     _close(gFileOut);
-    if (!result) {
+    if (!result)
+    {
         unlink(out_name);
         return 0;
     }

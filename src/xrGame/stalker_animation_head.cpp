@@ -29,16 +29,21 @@ MotionID CStalkerAnimationManager::assign_head_animation()
     const ANIM_VECTOR& animations = m_data_storage->m_head_animations.A;
 
     CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(CurrentGameUI());
-    if (pGameSP && pGameSP->TalkMenu->IsShown()) {
-        if (pGameSP->TalkMenu->OthersInvOwner() == m_object) {
-            if (pGameSP->TalkMenu->playing_sound()) return (animations[1]);
+    if (pGameSP && pGameSP->TalkMenu->IsShown())
+    {
+        if (pGameSP->TalkMenu->OthersInvOwner() == m_object)
+        {
+            if (pGameSP->TalkMenu->playing_sound())
+                return (animations[1]);
         }
     }
 
     CSoundPlayer& sound = object().sound();
-    if (!sound.active_sound_count(true)) return (animations[0]);
+    if (!sound.active_sound_count(true))
+        return (animations[0]);
 
-    if (!sound.active_sound_type((u32)StalkerSpace::eStalkerSoundMaskMovingInDanger)) return (animations[1]);
+    if (!sound.active_sound_type((u32)StalkerSpace::eStalkerSoundMaskMovingInDanger))
+        return (animations[1]);
 
     return (animations[0]);
 }

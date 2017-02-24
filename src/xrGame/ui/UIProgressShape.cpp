@@ -20,25 +20,18 @@ CUIProgressShape::~CUIProgressShape()
     //	xr_delete		(m_pTexture);
 }
 
-void CUIProgressShape::SetPos(float pos)
-{
-    m_stage = pos;
-}
-
+void CUIProgressShape::SetPos(float pos) { m_stage = pos; }
 void CUIProgressShape::SetPos(int pos, int max)
 {
     m_stage = float(pos) / float(max);
-    if (m_bText) {
+    if (m_bText)
+    {
         string256 _buff;
         TextItemControl()->SetText(itoa(pos, _buff, 10));
     }
 }
 
-void CUIProgressShape::SetTextVisible(bool b)
-{
-    m_bText = b;
-}
-
+void CUIProgressShape::SetTextVisible(bool b) { m_bText = b; }
 void _make_rot_pos(Fvector2& pt, float sin_a, float cos_a, float R1, float R2)
 {
     pt.x = -R1 * sin_a;
@@ -54,11 +47,13 @@ void _make_rot_tex(Fvector2& pt, float src, float sin_a, float cos_a)
 float calc_color(u32 idx, u32 total, float stage, float max_stage, bool blend)
 {
     float kk = (stage / max_stage) * (float(total + 1));
-    if (blend) {
+    if (blend)
+    {
         return (1 / (exp((float(idx) - kk) * 0.9f) + 1.0f));
     }
 
-    if ((float)idx < kk) {
+    if ((float)idx < kk)
+    {
         return 1.0f;
     }
     return 0.0f;
@@ -66,7 +61,8 @@ float calc_color(u32 idx, u32 total, float stage, float max_stage, bool blend)
 
 void CUIProgressShape::Draw()
 {
-    if (m_bText) DrawText();
+    if (m_bText)
+        DrawText();
 
     GlobalEnv.UIRender->SetShader(*GetShader());
     Fvector2 tsize;
@@ -112,7 +108,8 @@ void CUIProgressShape::Draw()
     _make_rot_tex(prev_tex_pt, start_tex_pt.y, sin_a, cos_a);
 
     float angle_range = PI_MUL_2;
-    if (m_bClockwise) {
+    if (m_bClockwise)
+    {
         angle_range = -abs(m_angle_end - m_angle_begin);
     }
     else
@@ -154,7 +151,8 @@ void CUIProgressShape::Draw()
         tx.set(prev_tex_pt);
         tx.add(center_tex);
 
-        if (m_bClockwise) {
+        if (m_bClockwise)
+        {
             GlobalEnv.UIRender->PushPoint(tp1.x, tp1.y, 0, color, tx1.x, tx1.y);
             GlobalEnv.UIRender->PushPoint(tp.x, tp.y, 0, color, tx.x, tx.y);
         }

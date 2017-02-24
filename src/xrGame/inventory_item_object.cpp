@@ -9,14 +9,8 @@
 #include "pch_script.h"
 #include "inventory_item_object.h"
 
-CInventoryItemObject::CInventoryItemObject()
-{
-}
-
-CInventoryItemObject::~CInventoryItemObject()
-{
-}
-
+CInventoryItemObject::CInventoryItemObject() {}
+CInventoryItemObject::~CInventoryItemObject() {}
 IFactoryObject* CInventoryItemObject::_construct()
 {
     CInventoryItem::_construct();
@@ -102,16 +96,8 @@ void CInventoryItemObject::net_Destroy()
     CPhysicItem::net_Destroy();
 }
 
-void CInventoryItemObject::net_Import(NET_Packet& P)
-{
-    CInventoryItem::net_Import(P);
-}
-
-void CInventoryItemObject::net_Export(NET_Packet& P)
-{
-    CInventoryItem::net_Export(P);
-}
-
+void CInventoryItemObject::net_Import(NET_Packet& P) { CInventoryItem::net_Import(P); }
+void CInventoryItemObject::net_Export(NET_Packet& P) { CInventoryItem::net_Export(P); }
 void CInventoryItemObject::save(NET_Packet& packet)
 {
     CPhysicItem::save(packet);
@@ -142,48 +128,18 @@ void CInventoryItemObject::reinit()
     CPhysicItem::reinit();
 }
 
-void CInventoryItemObject::activate_physic_shell()
-{
-    CInventoryItem::activate_physic_shell();
-}
-
-void CInventoryItemObject::on_activate_physic_shell()
-{
-    CPhysicItem::activate_physic_shell();
-}
-
-void CInventoryItemObject::make_Interpolation()
-{
-    CInventoryItem::make_Interpolation();
-}
-
-void CInventoryItemObject::PH_B_CrPr()
-{
-    CInventoryItem::PH_B_CrPr();
-}
-
-void CInventoryItemObject::PH_I_CrPr()
-{
-    CInventoryItem::PH_I_CrPr();
-}
-
+void CInventoryItemObject::activate_physic_shell() { CInventoryItem::activate_physic_shell(); }
+void CInventoryItemObject::on_activate_physic_shell() { CPhysicItem::activate_physic_shell(); }
+void CInventoryItemObject::make_Interpolation() { CInventoryItem::make_Interpolation(); }
+void CInventoryItemObject::PH_B_CrPr() { CInventoryItem::PH_B_CrPr(); }
+void CInventoryItemObject::PH_I_CrPr() { CInventoryItem::PH_I_CrPr(); }
 #ifdef DEBUG
-void CInventoryItemObject::PH_Ch_CrPr()
-{
-    CInventoryItem::PH_Ch_CrPr();
-}
+void CInventoryItemObject::PH_Ch_CrPr() { CInventoryItem::PH_Ch_CrPr(); }
 #endif
 
-void CInventoryItemObject::PH_A_CrPr()
-{
-    CInventoryItem::PH_A_CrPr();
-}
-
+void CInventoryItemObject::PH_A_CrPr() { CInventoryItem::PH_A_CrPr(); }
 #ifdef DEBUG
-void CInventoryItemObject::OnRender()
-{
-    CInventoryItem::OnRender();
-}
+void CInventoryItemObject::OnRender() { CInventoryItem::OnRender(); }
 #endif
 
 void CInventoryItemObject::modify_holder_params(float& range, float& fov) const
@@ -191,17 +147,6 @@ void CInventoryItemObject::modify_holder_params(float& range, float& fov) const
     CInventoryItem::modify_holder_params(range, fov);
 }
 
-u32 CInventoryItemObject::ef_weapon_type() const
-{
-    return (0);
-}
-
-bool CInventoryItemObject::NeedToDestroyObject() const
-{
-    return CInventoryItem::NeedToDestroyObject();
-}
-
-bool CInventoryItemObject::Useful() const
-{
-    return (CInventoryItem::Useful());
-}
+u32 CInventoryItemObject::ef_weapon_type() const { return (0); }
+bool CInventoryItemObject::NeedToDestroyObject() const { return CInventoryItem::NeedToDestroyObject(); }
+bool CInventoryItemObject::Useful() const { return (CInventoryItem::Useful()); }

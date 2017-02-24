@@ -23,8 +23,8 @@
 //---------------------------------------------------------------------------
 class TfraLeftBar : public TFrame
 {
-    __published :  // IDE-managed Components
-                   TPanel* paLeftBar;
+    __published : // IDE-managed Components
+                  TPanel* paLeftBar;
     TPanel* paScene;
     TFormStorage* fsStorage;
     TLabel* APHeadLabel2;
@@ -117,8 +117,8 @@ class TfraLeftBar : public TFrame
     void __fastcall MenuItem5Click(TObject* Sender);
     void __fastcall MenuItem7Click(TObject* Sender);
 
-  private:  // User declarations
-  public:   // User declarations
+private: // User declarations
+public: // User declarations
     __fastcall TfraLeftBar(TComponent* Owner);
     void ChangeTarget(int tgt);
     void UpdateBar();

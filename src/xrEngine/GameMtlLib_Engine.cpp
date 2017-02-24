@@ -9,10 +9,7 @@ static void DestroySounds(SoundVec& lst)
         it->destroy();
 }
 
-static void DestroyPSs(PSVec& lst)
-{
-}
-
+static void DestroyPSs(PSVec& lst) {}
 static void CreateSounds(SoundVec& lst, LPCSTR buf)
 {
     string128 tmp;

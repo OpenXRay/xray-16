@@ -24,11 +24,7 @@
 #include "trader_animation.h"
 #include "xrServerEntities/clsid_game.h"
 
-CAI_Trader::CAI_Trader()
-{
-    AnimMan = new CTraderAnimation(this);
-}
-
+CAI_Trader::CAI_Trader() { AnimMan = new CTraderAnimation(this); }
 CAI_Trader::~CAI_Trader()
 {
     xr_delete(m_sound_player);
@@ -69,7 +65,8 @@ void CAI_Trader::reload(LPCSTR section)
 
 bool CAI_Trader::bfAssignSound(CScriptEntityAction* tpEntityAction)
 {
-    if (!CScriptEntity::bfAssignSound(tpEntityAction)) {
+    if (!CScriptEntity::bfAssignSound(tpEntityAction))
+    {
         // m_cur_head_anim_type	= MonsterSpace::eHeadAnimNone;
         return (false);
     }
@@ -104,7 +101,8 @@ void CAI_Trader::LookAtActor(CBoneInstance* B)
     float cur_yaw = h;
     float dy = _abs(angle_normalize_signed(yaw - cur_yaw));
 
-    if (angle_normalize_signed(yaw - cur_yaw) > 0) dy *= -1.f;
+    if (angle_normalize_signed(yaw - cur_yaw) > 0)
+        dy *= -1.f;
 
     Fmatrix M;
     M.setHPB(0.f, -dy, 0.f);
@@ -120,9 +118,11 @@ BOOL CAI_Trader::net_Spawn(CSE_Abstract* DC)
     R_ASSERT(l_tpTrader);
 
     //проспавнить PDA у InventoryOwner
-    if (!CInventoryOwner::net_Spawn(DC)) return (FALSE);
+    if (!CInventoryOwner::net_Spawn(DC))
+        return (FALSE);
 
-    if (!inherited::net_Spawn(DC) || !CScriptEntity::net_Spawn(DC)) return (FALSE);
+    if (!inherited::net_Spawn(DC) || !CScriptEntity::net_Spawn(DC))
+        return (FALSE);
 
     setVisible(TRUE);
     setEnabled(TRUE);
@@ -135,7 +135,7 @@ BOOL CAI_Trader::net_Spawn(CSE_Abstract* DC)
     bone_head->set_callback(bctCustom, BoneCallback, this);
 
     shedule.t_min = 100;
-    shedule.t_max = 2500;  // This equaltiy is broken by Dima :-( // 30 * NET_Latency / 4;
+    shedule.t_max = 2500; // This equaltiy is broken by Dima :-( // 30 * NET_Latency / 4;
 
     return (TRUE);
 }
@@ -174,7 +174,8 @@ void CAI_Trader::OnEvent(NET_Packet& P, u16 type)
     case GE_OWNERSHIP_TAKE:
         P.r_u16(id);
         Obj = Level().Objects.net_Find(id);
-        if (inventory().CanTakeItem(smart_cast<CInventoryItem*>(Obj))) {
+        if (inventory().CanTakeItem(smart_cast<CInventoryItem*>(Obj)))
+        {
             Obj->H_SetParent(this);
             inventory().Take(smart_cast<CGameObject*>(Obj), false, false);
         }
@@ -206,13 +207,16 @@ void CAI_Trader::OnEvent(NET_Packet& P, u16 type)
 
 void CAI_Trader::feel_touch_new(IGameObject* O)
 {
-    if (!g_Alive()) return;
-    if (Remote()) return;
+    if (!g_Alive())
+        return;
+    if (Remote())
+        return;
 
     // Now, test for game specific logical objects to minimize traffic
     CInventoryItem* I = smart_cast<CInventoryItem*>(O);
 
-    if (I && I->useful_for_NPC()) {
+    if (I && I->useful_for_NPC())
+    {
         Msg("Taking item %s!", *I->object().cName());
         NET_Packet P;
         u_EventGen(P, GE_OWNERSHIP_TAKE, ID());
@@ -223,7 +227,8 @@ void CAI_Trader::feel_touch_new(IGameObject* O)
 
 void CAI_Trader::DropItemSendMessage(IGameObject* O)
 {
-    if (!O || !O->H_Parent() || (this != O->H_Parent())) return;
+    if (!O || !O->H_Parent() || (this != O->H_Parent()))
+        return;
 
     Msg("Dropping item!");
     // We doesn't have similar weapon - pick up it
@@ -255,22 +260,16 @@ void CAI_Trader::g_WeaponBones(int& L, int& R1, int& R2)
 void CAI_Trader::g_fireParams(const CHudItem* pHudItem, Fvector& P, Fvector& D)
 {
     VERIFY(inventory().ActiveItem());
-    if (g_Alive() && inventory().ActiveItem()) {
+    if (g_Alive() && inventory().ActiveItem())
+    {
         Center(P);
         D.setHP(0, 0);
         D.normalize_safe();
     }
 }
 
-void CAI_Trader::Think()
-{
-}
-
-void CAI_Trader::Die(IGameObject* who)
-{
-    inherited::Die(who);
-}
-
+void CAI_Trader::Think() {}
+void CAI_Trader::Die(IGameObject* who) { inherited::Die(who); }
 void CAI_Trader::net_Destroy()
 {
     inherited::net_Destroy();
@@ -282,14 +281,11 @@ void CAI_Trader::UpdateCL()
     inherited::UpdateCL();
     sound().update(Device.fTimeDelta);
 
-    if (!GetScriptControl() && !bfScriptAnimation()) animation().update_frame();
+    if (!GetScriptControl() && !bfScriptAnimation())
+        animation().update_frame();
 }
 
-BOOL CAI_Trader::UsedAI_Locations()
-{
-    return (TRUE);
-}
-
+BOOL CAI_Trader::UsedAI_Locations() { return (TRUE); }
 void CAI_Trader::OnStartTrade()
 {
     m_busy_now = true;
@@ -304,16 +300,8 @@ void CAI_Trader::OnStopTrade()
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-bool CAI_Trader::can_attach(const CInventoryItem* inventory_item) const
-{
-    return (false);
-}
-
-bool CAI_Trader::use_bolts() const
-{
-    return (false);
-}
-
+bool CAI_Trader::can_attach(const CInventoryItem* inventory_item) const { return (false); }
+bool CAI_Trader::use_bolts() const { return (false); }
 void CAI_Trader::spawn_supplies()
 {
     inherited::spawn_supplies();
@@ -332,11 +320,7 @@ void CAI_Trader::load(IReader& input_packet)
 }
 
 //проверяет список артефактов в заказах
-u32 CAI_Trader::ArtefactPrice(CArtefact* pArtefact)
-{
-    return pArtefact->Cost();
-}
-
+u32 CAI_Trader::ArtefactPrice(CArtefact* pArtefact) { return pArtefact->Cost(); }
 //продажа артефакта, с последуещим изменением списка заказов (true - если артефакт был в списке)
 bool CAI_Trader::BuyArtefact(CArtefact* pArtefact)
 {
@@ -372,19 +356,14 @@ IFactoryObject* CAI_Trader::_construct()
 
 bool CAI_Trader::AllowItemToTrade(CInventoryItem const* item, const SInvItemPlace& place) const
 {
-    if (!g_Alive()) return (true);
+    if (!g_Alive())
+        return (true);
 
-    if (item->object().CLS_ID == CLSID_DEVICE_PDA) return (false);
+    if (item->object().CLS_ID == CLSID_DEVICE_PDA)
+        return (false);
 
     return (CInventoryOwner::AllowItemToTrade(item, place));
 }
 
-void CAI_Trader::dialog_sound_start(LPCSTR phrase)
-{
-    animation().external_sound_start(phrase);
-}
-
-void CAI_Trader::dialog_sound_stop()
-{
-    animation().external_sound_stop();
-}
+void CAI_Trader::dialog_sound_start(LPCSTR phrase) { animation().external_sound_start(phrase); }
+void CAI_Trader::dialog_sound_stop() { animation().external_sound_stop(); }

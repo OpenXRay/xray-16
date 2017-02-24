@@ -1,21 +1,15 @@
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
 #define CStateMonsterFindEnemyAngryAbstract CStateMonsterFindEnemyAngry<_Object>
 
 TEMPLATE_SPECIALIZATION
-CStateMonsterFindEnemyAngryAbstract::CStateMonsterFindEnemyAngry(_Object* obj) : inherited(obj)
-{
-}
-
+CStateMonsterFindEnemyAngryAbstract::CStateMonsterFindEnemyAngry(_Object* obj) : inherited(obj) {}
 TEMPLATE_SPECIALIZATION
-CStateMonsterFindEnemyAngryAbstract::~CStateMonsterFindEnemyAngry()
-{
-}
-
+CStateMonsterFindEnemyAngryAbstract::~CStateMonsterFindEnemyAngry() {}
 TEMPLATE_SPECIALIZATION
 void CStateMonsterFindEnemyAngryAbstract::execute()
 {
@@ -27,6 +21,7 @@ void CStateMonsterFindEnemyAngryAbstract::execute()
 TEMPLATE_SPECIALIZATION
 bool CStateMonsterFindEnemyAngryAbstract::check_completion()
 {
-    if (time_state_started + 4000 > Device.dwTimeGlobal) return false;
+    if (time_state_started + 4000 > Device.dwTimeGlobal)
+        return false;
     return true;
 }

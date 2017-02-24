@@ -19,8 +19,8 @@ private:
 
     //	Can't implement in a single pass of a shader since
     //	should be compiled only for the hardware that supports it.
-    ref_shader s_postprocess[2];    //	Igor: 0 - plain, 1 - colormapped
-    ref_shader s_postprocess_D[2];  //	Igor: 0 - plain, 1 - colormapped
+    ref_shader s_postprocess[2]; //	Igor: 0 - plain, 1 - colormapped
+    ref_shader s_postprocess_D[2]; //	Igor: 0 - plain, 1 - colormapped
     ref_geom g_postprocess;
 
     float im_noise_time;
@@ -50,7 +50,7 @@ public:
     IDirect3DSurface9* pTempZB;
 
     //	Igor: for async screenshots
-    IDirect3DSurface9* pFB;  // 32bit		(r,g,b,a) is situated in the system memory
+    IDirect3DSurface9* pFB; // 32bit		(r,g,b,a) is situated in the system memory
 
 private:
     BOOL Create();
@@ -79,11 +79,9 @@ public:
     virtual void set_noise(float f) { param_noise = f; }
     virtual void set_noise_scale(float f) { param_noise_scale = f; }
     virtual void set_noise_fps(float f) { param_noise_fps = _abs(f) + EPS_S; }
-
     virtual void set_color_base(u32 f) { param_color_base = f; }
     virtual void set_color_gray(u32 f) { param_color_gray = f; }
     virtual void set_color_add(const Fvector& f) { param_color_add = f; }
-
     virtual void set_cm_imfluence(float f) { param_color_map_influence = f; }
     virtual void set_cm_interpolate(float f) { param_color_map_interpolate = f; }
     virtual void set_cm_textures(const shared_str& tex0, const shared_str& tex1)
@@ -93,7 +91,6 @@ public:
 
     virtual u32 get_width() { return curWidth; }
     virtual u32 get_height() { return curHeight; }
-
     u32 get_rtwidth() { return rtWidth; }
     u32 get_rtheight() { return rtHeight; }
 };

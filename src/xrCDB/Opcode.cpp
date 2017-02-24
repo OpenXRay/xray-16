@@ -38,14 +38,6 @@
 
 #ifdef ICE_MAIN
 
-void ModuleAttach(udword hmod)
-{
-    Log("// Opening OPCODE\n\n");
-}
-
-void ModuleDetach()
-{
-    Log("// Closing OPCODE\n\n");
-}
-
+void ModuleAttach(udword hmod) { Log("// Opening OPCODE\n\n"); }
+void ModuleDetach() { Log("// Closing OPCODE\n\n"); }
 #endif

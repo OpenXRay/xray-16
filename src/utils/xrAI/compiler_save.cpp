@@ -57,7 +57,6 @@ xr_vector<NodeCompressed> compressed_nodes;
 class CNodeRenumberer
 {
     IC bool operator=(const CNodeRenumberer&) {}
-
     struct SSortNodesPredicate
     {
         IC bool operator()(const NodeCompressed& vertex0, const NodeCompressed& vertex1) const
@@ -96,7 +95,8 @@ public:
             for (u32 j = 0; j < 4; ++j)
             {
                 u32 vertex_id = m_nodes[i].link(u8(j));
-                if (vertex_id >= N) continue;
+                if (vertex_id >= N)
+                    continue;
                 m_nodes[i].link(u8(j), m_renumbering[vertex_id]);
             }
         }

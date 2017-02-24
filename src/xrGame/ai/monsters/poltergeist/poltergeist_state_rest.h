@@ -19,8 +19,10 @@ void CPoltergeistStateRest<_Object>::execute()
     // check alife control
     bool captured_by_smart_terrain = false;
 
-    if (prev_substate == eStateSmartTerrainTask) {
-        if (!get_state(eStateSmartTerrainTask)->check_completion()) captured_by_smart_terrain = true;
+    if (prev_substate == eStateSmartTerrainTask)
+    {
+        if (!get_state(eStateSmartTerrainTask)->check_completion())
+            captured_by_smart_terrain = true;
     }
     else if (get_state(eStateSmartTerrainTask)->check_start_conditions())
         captured_by_smart_terrain = true;
@@ -32,8 +34,10 @@ void CPoltergeistStateRest<_Object>::execute()
         // check restrictions
         bool move_to_restrictor = false;
 
-        if (prev_substate == eStateCustomMoveToRestrictor) {
-            if (!get_state(eStateCustomMoveToRestrictor)->check_completion()) move_to_restrictor = true;
+        if (prev_substate == eStateCustomMoveToRestrictor)
+        {
+            if (!get_state(eStateCustomMoveToRestrictor)->check_completion())
+                move_to_restrictor = true;
         }
         else if (get_state(eStateCustomMoveToRestrictor)->check_start_conditions())
             move_to_restrictor = true;
@@ -45,8 +49,10 @@ void CPoltergeistStateRest<_Object>::execute()
             // check home point
             bool move_to_home_point = false;
 
-            if (prev_substate == eStateRest_MoveToHomePoint) {
-                if (!get_state(eStateRest_MoveToHomePoint)->check_completion()) move_to_home_point = true;
+            if (prev_substate == eStateRest_MoveToHomePoint)
+            {
+                if (!get_state(eStateRest_MoveToHomePoint)->check_completion())
+                    move_to_home_point = true;
             }
             else if (get_state(eStateRest_MoveToHomePoint)->check_start_conditions())
                 move_to_home_point = true;

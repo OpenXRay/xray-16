@@ -21,7 +21,6 @@ private:
         u32 VisibleTriangleCount;
 
         HOMStatistics() { FrameStart(); }
-
         void FrameStart()
         {
             Total.FrameStart();
@@ -59,7 +58,8 @@ public:
     void __stdcall MT_RENDER();
     ICF void MT_SYNC()
     {
-        if (g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive()) return;
+        if (g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive())
+            return;
 
         MT_RENDER();
     }
@@ -67,7 +67,7 @@ public:
     BOOL visible(vis_data& vis);
     BOOL visible(Fbox3& B);
     BOOL visible(sPoly& P);
-    BOOL visible(Fbox2& B, float depth);  // viewport-space (0..1)
+    BOOL visible(Fbox2& B, float depth); // viewport-space (0..1)
 
     CHOM();
     ~CHOM();

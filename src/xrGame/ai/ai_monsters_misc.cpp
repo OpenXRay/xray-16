@@ -34,29 +34,34 @@ bool bfGetActionSuccessProbability(GroupHierarchyHolder::MEMBER_REGISTRY& Member
     for (; (i < I) && (j < J);)
     {
         ai().ef_storage().non_alife().member() = smart_cast<CEntityAlive*>(Members[i]);
-        if (!(ai().ef_storage().non_alife().member()) || !(ai().ef_storage().non_alife().member()->g_Alive())) {
+        if (!(ai().ef_storage().non_alife().member()) || !(ai().ef_storage().non_alife().member()->g_Alive()))
+        {
             ++i;
             continue;
         }
         ai().ef_storage().non_alife().enemy() = *II;
-        if (!(ai().ef_storage().non_alife().enemy()) || !(ai().ef_storage().non_alife().enemy()->g_Alive())) {
+        if (!(ai().ef_storage().non_alife().enemy()) || !(ai().ef_storage().non_alife().enemy()->g_Alive()))
+        {
             ++j;
             ++II;
             continue;
         }
         float fProbability = fSuccessProbabilityFunction.ffGetValue() / 100.f, fCurrentProbability;
-        if (fProbability > fMinProbability) {
+        if (fProbability > fMinProbability)
+        {
             fCurrentProbability = fProbability;
             for (++j; (i < I) && (j < J); ++j)
             {
                 ai().ef_storage().non_alife().enemy() = *II;
-                if (!(ai().ef_storage().non_alife().enemy()) || !(ai().ef_storage().non_alife().enemy()->g_Alive())) {
+                if (!(ai().ef_storage().non_alife().enemy()) || !(ai().ef_storage().non_alife().enemy()->g_Alive()))
+                {
                     ++j;
                     ++II;
                     continue;
                 }
                 fProbability = fSuccessProbabilityFunction.ffGetValue() / 100.f;
-                if (fCurrentProbability * fProbability < fMinProbability) {
+                if (fCurrentProbability * fProbability < fMinProbability)
+                {
                     ++i;
                     break;
                 }
@@ -70,12 +75,14 @@ bool bfGetActionSuccessProbability(GroupHierarchyHolder::MEMBER_REGISTRY& Member
             for (++i; (i < I) && (j < J); ++i)
             {
                 ai().ef_storage().non_alife().member() = smart_cast<CEntityAlive*>(Members[i]);
-                if (!(ai().ef_storage().non_alife().member()) || !(ai().ef_storage().non_alife().member()->g_Alive())) {
+                if (!(ai().ef_storage().non_alife().member()) || !(ai().ef_storage().non_alife().member()->g_Alive()))
+                {
                     ++i;
                     continue;
                 }
                 fProbability = 1.0f - fSuccessProbabilityFunction.ffGetValue() / 100.f;
-                if (fCurrentProbability * fProbability < (1.f - fMinProbability)) {
+                if (fCurrentProbability * fProbability < (1.f - fMinProbability))
+                {
                     ++II;
                     ++j;
                     break;
@@ -92,11 +99,13 @@ u32 dwfChooseAction(u32 dwActionRefreshRate, float fMinProbability0, float fMinP
     float fMinProbability3, u32 dwTeam, u32 dwSquad, u32 dwGroup, u32 a0, u32 a1, u32 a2, u32 a3, u32 a4,
     CEntity* tpEntity, float fGroupDistance)
 {
-    if (fis_zero(fMinProbability0)) return (0);
+    if (fis_zero(fMinProbability0))
+        return (0);
 
     CGroupHierarchyHolder& Group = Level().seniority_holder().team(dwTeam).squad(dwSquad).group(dwGroup);
 
-    if (Device.dwTimeGlobal - Group.m_dwLastActionTime < dwActionRefreshRate) {
+    if (Device.dwTimeGlobal - Group.m_dwLastActionTime < dwActionRefreshRate)
+    {
         switch (Group.m_dwLastAction)
         {
         case 0: return (a0);
@@ -126,14 +135,17 @@ u32 dwfChooseAction(u32 dwActionRefreshRate, float fMinProbability0, float fMinP
         {
             if (Group.members()[k]->g_Alive() &&
                 ((Group.members()[k]->spatial.type & STYPE_VISIBLEFORAI) == STYPE_VISIBLEFORAI))
-                if (tpEntity->Position().distance_to(Group.members()[k]->Position()) < fGroupDistance) {
-                    if (!stalker) {
+                if (tpEntity->Position().distance_to(Group.members()[k]->Position()) < fGroupDistance)
+                {
+                    if (!stalker)
+                    {
                         Members.push_back(Group.members()[k]);
                         continue;
                     }
 
                     const CAI_Stalker* member = smart_cast<CAI_Stalker*>(Group.members()[k]);
-                    if (!member) {
+                    if (!member)
+                    {
                         Members.push_back(Group.members()[k]);
                         continue;
                     }
@@ -196,17 +208,20 @@ void CAniVector::Load(IKinematicsAnimated* tpKinematics, LPCSTR caBaseName)
     string256 S1, S2;
     MotionID tpMotionDef;
     for (int i = 0;; ++i)
-        if (!!(tpMotionDef = tpKinematics->ID_Cycle_Safe(strconcat(sizeof(S1), S1, caBaseName, itoa(i, S2, 10))))) {
+        if (!!(tpMotionDef = tpKinematics->ID_Cycle_Safe(strconcat(sizeof(S1), S1, caBaseName, itoa(i, S2, 10)))))
+        {
             A.push_back(tpMotionDef);
 #ifdef DEBUG
-            if (psAI_Flags.test(aiAnimation)) Msg("* Loaded animation %s", S1);
+            if (psAI_Flags.test(aiAnimation))
+                Msg("* Loaded animation %s", S1);
 #endif
         }
         else if (!!(tpMotionDef = tpKinematics->ID_FX_Safe(strconcat(sizeof(S1), S1, caBaseName, itoa(i, S2, 10)))))
         {
             A.push_back(tpMotionDef);
 #ifdef DEBUG
-            if (psAI_Flags.test(aiAnimation)) Msg("* Loaded animation fx %s", S1);
+            if (psAI_Flags.test(aiAnimation))
+                Msg("* Loaded animation fx %s", S1);
 #endif
         }
         else if (i < 10)

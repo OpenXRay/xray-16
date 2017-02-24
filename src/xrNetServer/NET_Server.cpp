@@ -22,7 +22,7 @@ void dump_URL(LPCSTR p, IDirectPlay8Address* A);
 
 LPCSTR nameTraffic = "traffic.net";
 
-XRNETSERVER_API int psNET_ServerUpdate = 30;  // FPS
+XRNETSERVER_API int psNET_ServerUpdate = 30; // FPS
 XRNETSERVER_API int psNET_ServerPending = 3;
 
 XRNETSERVER_API ClientID BroadcastCID(0xffffffff);
@@ -31,7 +31,8 @@ void ip_address::set(LPCSTR src_string)
 {
     u32 buff[4];
     int cnt = sscanf(src_string, "%d.%d.%d.%d", &buff[0], &buff[1], &buff[2], &buff[3]);
-    if (cnt == 4) {
+    if (cnt == 4)
+    {
         m_data.a1 = u8(buff[0] & 0xff);
         m_data.a2 = u8(buff[1] & 0xff);
         m_data.a3 = u8(buff[2] & 0xff);
@@ -69,11 +70,7 @@ void IBannedClient::Load(CInifile& ini, const shared_str& sect)
     Msg("- loaded banned client %s to %s", HAddr.to_string().c_str(), BannedTimeTo().c_str());
 }
 
-void IBannedClient::Save(CInifile& ini)
-{
-    ini.w_string(HAddr.to_string().c_str(), "time_to", BannedTimeTo().c_str());
-}
-
+void IBannedClient::Save(CInifile& ini) { ini.w_string(HAddr.to_string().c_str(), "time_to", BannedTimeTo().c_str()); }
 xr_string IBannedClient::BannedTimeTo() const
 {
     string256 res;
@@ -94,21 +91,19 @@ IClient::IClient(CTimer* timer) : stats(timer), server(NULL)
     flags.bVerified = TRUE;
 }
 
-IClient::~IClient()
-{
-}
-
+IClient::~IClient() {}
 void IClientStatistic::Update(DPN_CONNECTION_INFO& CI)
 {
     u32 time_global = TimeGlobal(device_timer);
-    if (time_global - dwBaseTime >= 999) {
+    if (time_global - dwBaseTime >= 999)
+    {
         dwBaseTime = time_global;
 
         mps_recive = CI.dwMessagesReceived - mps_receive_base;
         mps_receive_base = CI.dwMessagesReceived;
 
         u32 cur_msend = CI.dwMessagesTransmittedHighPriority + CI.dwMessagesTransmittedNormalPriority +
-                        CI.dwMessagesTransmittedLowPriority;
+            CI.dwMessagesTransmittedLowPriority;
         mps_send = cur_msend - mps_send_base;
         mps_send_base = cur_msend;
 
@@ -143,16 +138,19 @@ void IClient::_SendTo_LL(const void* data, u32 size, u32 flags, u32 timeout)
 //------------------------------------------------------------------------------
 IClient* IPureServer::ID_to_client(ClientID ID, bool ScanAll)
 {
-    if (0 == ID.value()) return NULL;
+    if (0 == ID.value())
+        return NULL;
     IClient* ret_client = GetClientByID(ID);
-    if (ret_client || !ScanAll) return ret_client;
+    if (ret_client || !ScanAll)
+        return ret_client;
 
     return NULL;
 }
 
 void IPureServer::_Recieve(const void* data, u32 data_size, u32 param)
 {
-    if (data_size >= NET_PacketSizeLimit) {
+    if (data_size >= NET_PacketSizeLimit)
+    {
         Msg("! too large packet size[%d] received, DoS attack?", data_size);
         return;
     }
@@ -168,17 +166,21 @@ void IPureServer::_Recieve(const void* data, u32 data_size, u32 param)
     // LogStackTrace(
     //		make_string("-S- Entered to csMessages [%d]", currentThreadId).c_str());
     //---------------------------------------
-    if (psNET_Flags.test(NETFLAG_LOG_SV_PACKETS)) {
-        if (!pSvNetLog) pSvNetLog = new INetLog("logs\\net_sv_log.log", TimeGlobal(device_timer));
+    if (psNET_Flags.test(NETFLAG_LOG_SV_PACKETS))
+    {
+        if (!pSvNetLog)
+            pSvNetLog = new INetLog("logs\\net_sv_log.log", TimeGlobal(device_timer));
 
-        if (pSvNetLog) pSvNetLog->LogPacket(TimeGlobal(device_timer), &packet, TRUE);
+        if (pSvNetLog)
+            pSvNetLog->LogPacket(TimeGlobal(device_timer), &packet, TRUE);
     }
     //---------------------------------------
     u32 result = OnMessage(packet, id);
     // Msg("-S- Leaving from csMessages [%d]", currentThreadId);
     csMessage.Leave();
 
-    if (result) SendBroadcast(id, packet, result);
+    if (result)
+        SendBroadcast(id, packet, result);
 }
 
 //==============================================================================
@@ -188,7 +190,7 @@ IPureServer::IPureServer(CTimer* timer, BOOL Dedicated)
 #ifdef CONFIG_PROFILE_LOCKS
       ,
       csPlayers(MUTEX_PROFILE_ID(IPureServer::csPlayers)), csMessage(MUTEX_PROFILE_ID(IPureServer::csMessage))
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
 {
     device_timer = timer;
     stats.clear();
@@ -196,7 +198,7 @@ IPureServer::IPureServer(CTimer* timer, BOOL Dedicated)
     SV_Client = NULL;
     NET = NULL;
     net_Address_device = NULL;
-    pSvNetLog = NULL;  // new INetLog("logs\\net_sv_log.log", TimeGlobal(device_timer));
+    pSvNetLog = NULL; // new INetLog("logs\\net_sv_log.log", TimeGlobal(device_timer));
 #ifdef DEBUG
     sender_functor_invoked = false;
 #endif
@@ -221,7 +223,8 @@ IPureServer::EConnect IPureServer::Connect(LPCSTR options, GameDescriptionData& 
     connect_options = options;
     psNET_direct_connect = FALSE;
 
-    if (strstr(options, "/single")) psNET_direct_connect = TRUE;
+    if (strstr(options, "/single"))
+        psNET_direct_connect = TRUE;
 
     // Parse options
     string4096 session_name;
@@ -232,16 +235,19 @@ IPureServer::EConnect IPureServer::Connect(LPCSTR options, GameDescriptionData& 
     // sertanly we can use game_descr structure for determinig level_name, but for backward compatibility we save next
     // line...
     xr_strcpy(session_name, options);
-    if (strchr(session_name, '/')) *strchr(session_name, '/') = 0;
+    if (strchr(session_name, '/'))
+        *strchr(session_name, '/') = 0;
 
-    if (strstr(options, "psw=")) {
+    if (strstr(options, "psw="))
+    {
         const char* PSW = strstr(options, "psw=") + 4;
         if (strchr(PSW, '/'))
             strncpy_s(password_str, PSW, strchr(PSW, '/') - PSW);
         else
             strncpy_s(password_str, PSW, 63);
     }
-    if (strstr(options, "maxplayers=")) {
+    if (strstr(options, "maxplayers="))
+    {
         const char* sMaxPlayers = strstr(options, "maxplayers=") + 11;
         string64 tmpStr = "";
         if (strchr(sMaxPlayers, '/'))
@@ -250,15 +256,17 @@ IPureServer::EConnect IPureServer::Connect(LPCSTR options, GameDescriptionData& 
             strncpy_s(tmpStr, sMaxPlayers, 63);
         dwMaxPlayers = atol(tmpStr);
     }
-    if (dwMaxPlayers > 32 || dwMaxPlayers < 1) dwMaxPlayers = 32;
+    if (dwMaxPlayers > 32 || dwMaxPlayers < 1)
+        dwMaxPlayers = 32;
 #ifdef DEBUG
     Msg("MaxPlayers = %d", dwMaxPlayers);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
     //-------------------------------------------------------------------
     BOOL bPortWasSet = FALSE;
     u32 dwServerPort = START_PORT_LAN_SV;
-    if (strstr(options, "portsv=")) {
+    if (strstr(options, "portsv="))
+    {
         const char* ServerPort = strstr(options, "portsv=") + 7;
         string64 tmpStr = "";
         if (strchr(ServerPort, '/'))
@@ -267,15 +275,16 @@ IPureServer::EConnect IPureServer::Connect(LPCSTR options, GameDescriptionData& 
             strncpy_s(tmpStr, ServerPort, 63);
         dwServerPort = atol(tmpStr);
         clamp(dwServerPort, u32(START_PORT), u32(END_PORT));
-        bPortWasSet = TRUE;  // this is not casual game
+        bPortWasSet = TRUE; // this is not casual game
     }
     //-------------------------------------------------------------------
 
-    if (!psNET_direct_connect) {
+    if (!psNET_direct_connect)
+    {
 //---------------------------
 #ifdef DEBUG
         string1024 tmp;
-#endif  // DEBUG
+#endif // DEBUG
         //	HRESULT CoInitializeExRes = CoInitializeEx(NULL, 0);
         //	if (CoInitializeExRes != S_OK && CoInitializeExRes != S_FALSE)
         //	{
@@ -287,7 +296,8 @@ IPureServer::EConnect IPureServer::Connect(LPCSTR options, GameDescriptionData& 
         HRESULT CoCreateInstanceRes = CoCreateInstance(
             CLSID_DirectPlay8Server, NULL, CLSCTX_INPROC_SERVER, IID_IDirectPlay8Server, (LPVOID*)&NET);
         //---------------------------
-        if (CoCreateInstanceRes != S_OK) {
+        if (CoCreateInstanceRes != S_OK)
+        {
             DXTRACE_ERR(tmp, CoCreateInstanceRes);
             CHK_DX(CoCreateInstanceRes);
         }
@@ -301,7 +311,8 @@ IPureServer::EConnect IPureServer::Connect(LPCSTR options, GameDescriptionData& 
 #endif
 
         BOOL bSimulator = FALSE;
-        if (strstr(Core.Params, "-netsim")) bSimulator = TRUE;
+        if (strstr(Core.Params, "-netsim"))
+            bSimulator = TRUE;
 
         // dump_URL		("! sv ",	net_Address_device);
 
@@ -336,7 +347,8 @@ IPureServer::EConnect IPureServer::Connect(LPCSTR options, GameDescriptionData& 
         dpAppDesc.dwApplicationReservedDataSize = sizeof(game_descr);
 
         WCHAR SessionPasswordUNICODE[4096];
-        if (xr_strlen(password_str)) {
+        if (xr_strlen(password_str))
+        {
             CHK_DX(MultiByteToWideChar(CP_ACP, 0, password_str, -1, SessionPasswordUNICODE, 4096));
             dpAppDesc.dwFlags |= DPNSESSION_REQUIREPASSWORD;
             dpAppDesc.pwszPassword = SessionPasswordUNICODE;
@@ -360,14 +372,16 @@ IPureServer::EConnect IPureServer::Connect(LPCSTR options, GameDescriptionData& 
             CHK_DX(
                 net_Address_device->AddComponent(DPNA_KEY_PORT, &psNET_Port, sizeof(psNET_Port), DPNA_DATATYPE_DWORD));
 
-            HostSuccess = NET->Host(&dpAppDesc,  // AppDesc
-                &net_Address_device, 1,          // Device Address
-                NULL, NULL,                      // Reserved
-                NULL,                            // Player Context
-                0);                              // dwFlags
-            if (HostSuccess != S_OK) {
+            HostSuccess = NET->Host(&dpAppDesc, // AppDesc
+                &net_Address_device, 1, // Device Address
+                NULL, NULL, // Reserved
+                NULL, // Player Context
+                0); // dwFlags
+            if (HostSuccess != S_OK)
+            {
                 //			xr_string res = xrDebug::ErrorToString(HostSuccess);
-                if (bPortWasSet) {
+                if (bPortWasSet)
+                {
                     Msg("! IPureServer : port %d is BUSY!", psNET_Port);
                     return ErrConnect;
                 }
@@ -377,7 +391,8 @@ IPureServer::EConnect IPureServer::Connect(LPCSTR options, GameDescriptionData& 
                 }
 
                 psNET_Port++;
-                if (psNET_Port > END_PORT_LAN) {
+                if (psNET_Port > END_PORT_LAN)
+                {
                     return ErrConnect;
                 }
             }
@@ -389,11 +404,12 @@ IPureServer::EConnect IPureServer::Connect(LPCSTR options, GameDescriptionData& 
 
         CHK_DX(HostSuccess);
 
-    }  // psNET_direct_connect
+    } // psNET_direct_connect
 
     //.	config_Load		();
 
-    if (!psNET_direct_connect) {
+    if (!psNET_direct_connect)
+    {
         BannedList_Load();
         IpList_Load();
     }
@@ -405,12 +421,14 @@ void IPureServer::Disconnect()
 {
     //.	config_Save		();
 
-    if (!psNET_direct_connect) {
+    if (!psNET_direct_connect)
+    {
         BannedList_Save();
         IpList_Unload();
     }
 
-    if (NET) NET->Close(0);
+    if (NET)
+        NET->Close(0);
 
     // Release interfaces
     _RELEASE(net_Address_device);
@@ -426,10 +444,14 @@ HRESULT IPureServer::net_Handler(u32 dwMessageType, PVOID pMessage)
     case DPN_MSGID_ENUM_HOSTS_QUERY:
     {
         PDPNMSG_ENUM_HOSTS_QUERY msg = PDPNMSG_ENUM_HOSTS_QUERY(pMessage);
-        if (0 == msg->dwReceivedDataSize) return S_FALSE;
-        if (!stricmp((const char*)msg->pvReceivedData, "ToConnect")) return S_OK;
-        if (*((const GUID*)msg->pvReceivedData) != NET_GUID) return S_FALSE;
-        if (!OnCL_QueryHost()) return S_FALSE;
+        if (0 == msg->dwReceivedDataSize)
+            return S_FALSE;
+        if (!stricmp((const char*)msg->pvReceivedData, "ToConnect"))
+            return S_OK;
+        if (*((const GUID*)msg->pvReceivedData) != NET_GUID)
+            return S_FALSE;
+        if (!OnCL_QueryHost())
+            return S_FALSE;
         return S_OK;
     }
     break;
@@ -446,9 +468,10 @@ HRESULT IPureServer::net_Handler(u32 dwMessageType, PVOID pMessage)
         DPN_PLAYER_INFO* Pinfo = (DPN_PLAYER_INFO*)bufferData;
         Pinfo->dwSize = sizeof(DPN_PLAYER_INFO);
         HRESULT _hr = NET->GetClientInfo(msg->dpnidPlayer, Pinfo, &bufferSize, 0);
-        if (_hr == DPNERR_INVALIDPLAYER) {
-            Assign_ServerType(res);  // once
-            break;                   // server player
+        if (_hr == DPNERR_INVALIDPLAYER)
+        {
+            Assign_ServerType(res); // once
+            break; // server player
         }
 
         CHK_DX(_hr);
@@ -459,7 +482,8 @@ HRESULT IPureServer::net_Handler(u32 dwMessageType, PVOID pMessage)
         SClientConnectData cl_data;
         // xr_strcpy( cl_data.name, cname );
 
-        if (Pinfo->pvData && Pinfo->dwDataSize == sizeof(cl_data)) {
+        if (Pinfo->pvData && Pinfo->dwDataSize == sizeof(cl_data))
+        {
             cl_data = *((SClientConnectData*)Pinfo->pvData);
         }
         cl_data.clientID.set(msg->dpnidPlayer);
@@ -472,7 +496,8 @@ HRESULT IPureServer::net_Handler(u32 dwMessageType, PVOID pMessage)
         PDPNMSG_DESTROY_PLAYER msg = PDPNMSG_DESTROY_PLAYER(pMessage);
         IClient* tmp_client =
             net_players.GetFoundClient(ClientIdSearchPredicate(static_cast<ClientID>(msg->dpnidPlayer)));
-        if (tmp_client) {
+        if (tmp_client)
+        {
             tmp_client->flags.bConnected = FALSE;
             tmp_client->flags.bReconnect = FALSE;
             OnCL_Disconnected(tmp_client);
@@ -490,9 +515,11 @@ HRESULT IPureServer::net_Handler(u32 dwMessageType, PVOID pMessage)
 
         MSYS_PING* m_ping = (MSYS_PING*)m_data;
 
-        if ((m_size > 2 * sizeof(u32)) && (m_ping->sign1 == 0x12071980) && (m_ping->sign2 == 0x26111975)) {
+        if ((m_size > 2 * sizeof(u32)) && (m_ping->sign1 == 0x12071980) && (m_ping->sign2 == 0x26111975))
+        {
             // this is system message
-            if (m_size == sizeof(MSYS_PING)) {
+            if (m_size == sizeof(MSYS_PING))
+            {
                 // ping - save server time and reply
                 m_ping->dwTime_Server = TimerAsync(device_timer);
                 ClientID ID;
@@ -515,13 +542,15 @@ HRESULT IPureServer::net_Handler(u32 dwMessageType, PVOID pMessage)
         ip_address HAddr;
         GetClientAddress(msg->pAddressPlayer, HAddr);
 
-        if (GetBannedClient(HAddr)) {
+        if (GetBannedClient(HAddr))
+        {
             msg->dwReplyDataSize = sizeof(NET_BANNED_STR);
             msg->pvReplyData = NET_BANNED_STR;
             return S_FALSE;
         };
         // first connected client is SV_Client so if it is NULL then this server client tries to connect ;)
-        if (SV_Client && !m_ip_filter.is_ip_present(HAddr.m_data.data)) {
+        if (SV_Client && !m_ip_filter.is_ip_present(HAddr.m_data.data))
+        {
             msg->dwReplyDataSize = sizeof(NET_NOTFOR_SUBNET_STR);
             msg->pvReplyData = NET_NOTFOR_SUBNET_STR;
             return S_FALSE;
@@ -556,9 +585,12 @@ void IPureServer::SendTo_Buf(ClientID id, void* data, u32 size, u32 dwFlags, u32
 void IPureServer::SendTo_LL(ClientID ID /*DPNID ID*/, void* data, u32 size, u32 dwFlags, u32 dwTimeout)
 {
     //	if (psNET_Flags.test(NETFLAG_LOG_SV_PACKETS)) pSvNetLog->LogData(TimeGlobal(device_timer), data, size);
-    if (psNET_Flags.test(NETFLAG_LOG_SV_PACKETS)) {
-        if (!pSvNetLog) pSvNetLog = new INetLog("logs\\net_sv_log.log", TimeGlobal(device_timer));
-        if (pSvNetLog) pSvNetLog->LogData(TimeGlobal(device_timer), data, size);
+    if (psNET_Flags.test(NETFLAG_LOG_SV_PACKETS))
+    {
+        if (!pSvNetLog)
+            pSvNetLog = new INetLog("logs\\net_sv_log.log", TimeGlobal(device_timer));
+        if (pSvNetLog)
+            pSvNetLog->LogData(TimeGlobal(device_timer), data, size);
     }
 
     // send it
@@ -568,12 +600,14 @@ void IPureServer::SendTo_LL(ClientID ID /*DPNID ID*/, void* data, u32 size, u32 
 
 #ifdef _DEBUG
     u32 time_global = TimeGlobal(device_timer);
-    if (time_global - stats.dwSendTime >= 999) {
+    if (time_global - stats.dwSendTime >= 999)
+    {
         stats.dwBytesPerSec = (stats.dwBytesPerSec * 9 + stats.dwBytesSended) / 10;
         stats.dwBytesSended = 0;
         stats.dwSendTime = time_global;
     };
-    if (ID.value()) stats.dwBytesSended += size;
+    if (ID.value())
+        stats.dwBytesSended += size;
 #endif
 
     // verify
@@ -585,7 +619,8 @@ void IPureServer::SendTo_LL(ClientID ID /*DPNID ID*/, void* data, u32 size, u32 
 
     //	Msg("- IPureServer::SendTo_LL [%d]", size);
 
-    if (SUCCEEDED(_hr) || (DPNERR_CONNECTIONLOST == _hr)) return;
+    if (SUCCEEDED(_hr) || (DPNERR_CONNECTIONLOST == _hr))
+        return;
 
     R_CHK(_hr);
 }
@@ -603,8 +638,10 @@ void IPureServer::SendBroadcast_LL(ClientID exclude, void* data, u32 size, u32 d
         ClientExcluderPredicate(ClientID exclude) : id_to_exclude(exclude) {}
         bool operator()(IClient* client)
         {
-            if (client->ID == id_to_exclude) return false;
-            if (!client->flags.bConnected) return false;
+            if (client->ID == id_to_exclude)
+                return false;
+            if (!client->flags.bConnected)
+                return false;
             return true;
         }
     };
@@ -630,7 +667,7 @@ void IPureServer::SendBroadcast(ClientID exclude, NET_Packet& P, u32 dwFlags)
     SendBroadcast_LL(exclude, P.B.data, P.B.count, dwFlags);
 }
 
-u32 IPureServer::OnMessage(NET_Packet& P, ClientID sender)  // Non-Zero means broadcasting with "flags" as returned
+u32 IPureServer::OnMessage(NET_Packet& P, ClientID sender) // Non-Zero means broadcasting with "flags" as returned
 {
     /*
     u16 m_type;
@@ -650,38 +687,37 @@ u32 IPureServer::OnMessage(NET_Packet& P, ClientID sender)  // Non-Zero means br
     return 0;
 }
 
-void IPureServer::OnCL_Connected(IClient* CL)
-{
-    Msg("* Player 0x%08x connected.\n", CL->ID.value());
-}
-void IPureServer::OnCL_Disconnected(IClient* CL)
-{
-    Msg("* Player 0x%08x disconnected.\n", CL->ID.value());
-}
-
+void IPureServer::OnCL_Connected(IClient* CL) { Msg("* Player 0x%08x connected.\n", CL->ID.value()); }
+void IPureServer::OnCL_Disconnected(IClient* CL) { Msg("* Player 0x%08x disconnected.\n", CL->ID.value()); }
 BOOL IPureServer::HasBandwidth(IClient* C)
 {
     u32 dwTime = TimeGlobal(device_timer);
     u32 dwInterval = 0;
 
-    if (psNET_direct_connect) {
+    if (psNET_direct_connect)
+    {
         UpdateClientStatistic(C);
         C->dwTime_LastUpdate = dwTime;
         dwInterval = 1000;
         return TRUE;
     }
 
-    if (psNET_ServerUpdate != 0) dwInterval = 1000 / psNET_ServerUpdate;
-    if (psNET_Flags.test(NETFLAG_MINIMIZEUPDATES)) dwInterval = 1000;  // approx 2 times per second
+    if (psNET_ServerUpdate != 0)
+        dwInterval = 1000 / psNET_ServerUpdate;
+    if (psNET_Flags.test(NETFLAG_MINIMIZEUPDATES))
+        dwInterval = 1000; // approx 2 times per second
 
     HRESULT hr;
-    if (psNET_ServerUpdate != 0 && (dwTime - C->dwTime_LastUpdate) > dwInterval) {
+    if (psNET_ServerUpdate != 0 && (dwTime - C->dwTime_LastUpdate) > dwInterval)
+    {
         // check queue for "empty" state
         DWORD dwPending;
         hr = NET->GetSendQueueInfo(C->ID.value(), &dwPending, 0, 0);
-        if (FAILED(hr)) return FALSE;
+        if (FAILED(hr))
+            return FALSE;
 
-        if (dwPending > u32(psNET_ServerPending)) {
+        if (dwPending > u32(psNET_ServerPending))
+        {
             C->stats.dwTimesBlocked++;
             return FALSE;
         };
@@ -700,9 +736,11 @@ void IPureServer::UpdateClientStatistic(IClient* C)
     DPN_CONNECTION_INFO CI;
     ZeroMemory(&CI, sizeof(CI));
     CI.dwSize = sizeof(CI);
-    if (!psNET_direct_connect) {
+    if (!psNET_direct_connect)
+    {
         HRESULT hr = NET->GetConnectionInfo(C->ID.value(), &CI, 0);
-        if (FAILED(hr)) return;
+        if (FAILED(hr))
+            return;
     }
     C->stats.Update(CI);
 }
@@ -729,7 +767,8 @@ void IPureServer::ClearStatistic()
 
 bool IPureServer::DisconnectClient(IClient* C, LPCSTR Reason)
 {
-    if (!C) return false;
+    if (!C)
+        return false;
 
     HRESULT res = NET->DestroyClient(C->ID.value(), Reason, xr_strlen(Reason) + 1, 0);
     CHK_DX(res);
@@ -754,7 +793,8 @@ bool IPureServer::DisconnectAddress(const ip_address& Address, LPCSTR reason)
         {
             ip_address tmp_address;
             m_owner->GetClientAddress(client->ID, tmp_address);
-            if (*address_to_disconnect == tmp_address) {
+            if (*address_to_disconnect == tmp_address)
+            {
                 dest->push_back(client);
             };
         }
@@ -784,7 +824,8 @@ bool IPureServer::GetClientAddress(IDirectPlay8Address* pClientAddress, ip_addre
 
     Address.set(HostName);
 
-    if (pPort != NULL) {
+    if (pPort != NULL)
+    {
         DWORD dwPort = 0;
         DWORD dwPortSize = sizeof(dwPort);
         DWORD dwPortDataType = DPNA_DATATYPE_DWORD;
@@ -808,7 +849,8 @@ IBannedClient* IPureServer::GetBannedClient(const ip_address& Address)
     for (u32 it = 0; it < BannedAddresses.size(); it++)
     {
         IBannedClient* pBClient = BannedAddresses[it];
-        if (pBClient->HAddr == Address) return pBClient;
+        if (pBClient->HAddr == Address)
+            return pBClient;
     }
     return NULL;
 };
@@ -822,7 +864,8 @@ void IPureServer::BanClient(IClient* C, u32 BanTime)
 
 void IPureServer::BanAddress(const ip_address& Address, u32 BanTimeSec)
 {
-    if (GetBannedClient(Address)) {
+    if (GetBannedClient(Address))
+    {
         Msg("Already banned\n");
         return;
     };
@@ -831,7 +874,8 @@ void IPureServer::BanAddress(const ip_address& Address, u32 BanTimeSec)
     pNewClient->HAddr = Address;
     time(&pNewClient->BanTime);
     pNewClient->BanTime += BanTimeSec;
-    if (pNewClient) {
+    if (pNewClient)
+    {
         BannedAddresses.push_back(pNewClient);
         BannedList_Save();
     }
@@ -839,7 +883,8 @@ void IPureServer::BanAddress(const ip_address& Address, u32 BanTimeSec)
 
 void IPureServer::UnBanAddress(const ip_address& Address)
 {
-    if (!GetBannedClient(Address)) {
+    if (!GetBannedClient(Address))
+    {
         Msg("! Can't find address %s in ban list.", Address.to_string().c_str());
         return;
     };
@@ -847,7 +892,8 @@ void IPureServer::UnBanAddress(const ip_address& Address)
     for (u32 it = 0; it < BannedAddresses.size(); it++)
     {
         IBannedClient* pBClient = BannedAddresses[it];
-        if (pBClient->HAddr == Address) {
+        if (pBClient->HAddr == Address)
+        {
             xr_delete(BannedAddresses[it]);
             BannedAddresses.erase(BannedAddresses.begin() + it);
             Msg("Unbanning %s", Address.to_string().c_str());
@@ -911,31 +957,22 @@ void IPureServer::IpList_Unload()
     Msg("* Deinitializing IP filter.");
     m_ip_filter.unload();
 }
-bool IPureServer::IsPlayerIPDenied(u32 ip_address)
-{
-    return !m_ip_filter.is_ip_present(ip_address);
-}
-
-bool banned_client_comparer(IBannedClient* C1, IBannedClient* C2)
-{
-    return C1->BanTime > C2->BanTime;
-}
-
+bool IPureServer::IsPlayerIPDenied(u32 ip_address) { return !m_ip_filter.is_ip_present(ip_address); }
+bool banned_client_comparer(IBannedClient* C1, IBannedClient* C2) { return C1->BanTime > C2->BanTime; }
 void IPureServer::UpdateBannedList()
 {
-    if (!BannedAddresses.size()) return;
+    if (!BannedAddresses.size())
+        return;
     std::sort(BannedAddresses.begin(), BannedAddresses.end(), banned_client_comparer);
     time_t T;
     time(&T);
 
     IBannedClient* Cl = BannedAddresses.back();
-    if (Cl->BanTime < T) {
+    if (Cl->BanTime < T)
+    {
         ip_address Address = Cl->HAddr;
         UnBanAddress(Address);
     }
 }
 
-LPCSTR IPureServer::GetBannedListName()
-{
-    return "banned_list_ip.ltx";
-}
+LPCSTR IPureServer::GetBannedListName() { return "banned_list_ip.ltx"; }

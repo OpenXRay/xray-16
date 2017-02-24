@@ -23,7 +23,7 @@ namespace environment
 namespace weathers
 {
 class manager;
-}  // namespace weathers
+} // namespace weathers
 
 namespace levels
 {
@@ -50,7 +50,7 @@ private:
         {
             return (xr_strcmp(left.c_str(), right.c_str()) < 0);
         }
-    };  // struct predicate
+    }; // struct predicate
 
     typedef AssociativeVector<shared_str, std::pair<LPCSTR, shared_str>, predicate> levels_container_type;
 
@@ -60,12 +60,12 @@ private:
     CInifile* m_config_single;
     CInifile* m_config_mp;
     editor::property_holder* m_property_holder;
-};  // class levels_manager
+}; // class levels_manager
 
-}  // namespace levels
-}  // namespace environment
-}  // namespace editor
+} // namespace levels
+} // namespace environment
+} // namespace editor
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 
-#endif  // ifndef EDITOR_WEATHER_LEVELS_MANAGER_HPP_INCLUDED
+#endif // ifndef EDITOR_WEATHER_LEVELS_MANAGER_HPP_INCLUDED

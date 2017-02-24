@@ -19,10 +19,7 @@ CBlender_Model::CBlender_Model()
     oBlend.value = FALSE;
 }
 
-CBlender_Model::~CBlender_Model()
-{
-}
-
+CBlender_Model::~CBlender_Model() {}
 void CBlender_Model::Save(IWriter& fs)
 {
     IBlender::Save(fs);
@@ -62,7 +59,8 @@ void CBlender_Model::Load(IReader& fs, u16 version)
         xrPREAD_PROP(fs, xrPID_INTEGER, oAREF);
         break;
     }
-    if (version > 1) {
+    if (version > 1)
+    {
         xrPREAD_PROP(fs, xrPID_TOKEN, oTessellation);
     }
 }
@@ -70,7 +68,8 @@ void CBlender_Model::Load(IReader& fs, u16 version)
 void CBlender_Model::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
-    if (C.bEditor) {
+    if (C.bEditor)
+    {
         C.PassBegin();
         {
             C.PassSET_ZB(TRUE, oBlend.value && (oAREF.value < 200) ? FALSE : TRUE);

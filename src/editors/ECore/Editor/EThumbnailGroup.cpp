@@ -13,16 +13,13 @@
 //------------------------------------------------------------------------------
 EGroupThumbnail::EGroupThumbnail(LPCSTR src_name, bool bLoad) : EImageThumbnail(src_name, ETObject)
 {
-    if (bLoad) Load();
+    if (bLoad)
+        Load();
 }
 
 //------------------------------------------------------------------------------
 
-EGroupThumbnail::~EGroupThumbnail()
-{
-    m_Pixels.clear();
-}
-
+EGroupThumbnail::~EGroupThumbnail() { m_Pixels.clear(); }
 //------------------------------------------------------------------------------
 
 void EGroupThumbnail::CreateFromData(u32* p, u32 w, u32 h, const SStringVec& lst)
@@ -41,13 +38,15 @@ bool EGroupThumbnail::Load(LPCSTR src_name, LPCSTR path)
         FS.update_path(fn, path, fn);
     else
         FS.update_path(fn, _objects_, fn);
-    if (!FS.exist(fn)) return false;
+    if (!FS.exist(fn))
+        return false;
 
     IReader* F = FS.r_open(fn);
     u16 version = 0;
 
     R_ASSERT(F->r_chunk(THM_CHUNK_VERSION, &version));
-    if (version != THM_GROUP_VERSION) {
+    if (version != THM_GROUP_VERSION)
+    {
         Msg("!Thumbnail: Unsupported version.");
         return false;
     }
@@ -78,7 +77,8 @@ bool EGroupThumbnail::Load(LPCSTR src_name, LPCSTR path)
 
 void EGroupThumbnail::Save(int age, LPCSTR path)
 {
-    if (!Valid()) return;
+    if (!Valid())
+        return;
 
     CMemoryWriter F;
     F.open_chunk(THM_CHUNK_VERSION);
@@ -102,7 +102,8 @@ void EGroupThumbnail::Save(int age, LPCSTR path)
         FS.update_path(fn, path, m_Name.c_str());
     else
         FS.update_path(fn, _objects_, m_Name.c_str());
-    if (F.save_to(fn)) {
+    if (F.save_to(fn))
+    {
         FS.set_file_age(fn, age ? age : m_Age);
     }
     else
@@ -122,9 +123,5 @@ void EGroupThumbnail::FillProp(PropItemVec& items)
 
 //------------------------------------------------------------------------------
 
-void EGroupThumbnail::FillInfo(PropItemVec& items)
-{
-    FillProp(items);
-}
-
+void EGroupThumbnail::FillInfo(PropItemVec& items) { FillProp(items); }
 //------------------------------------------------------------------------------

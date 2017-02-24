@@ -15,17 +15,17 @@
 public
 ref class property_string_values_value_getter : public property_string, public property_string_values_value_base
 {
-  private:
+private:
     typedef property_string inherited;
 
-  public:
+public:
     typedef property_string_values_value_base::collection_type collection_type;
     typedef editor::property_holder::string_getter_type string_getter_type;
     typedef editor::property_holder::string_setter_type string_setter_type;
     typedef editor::property_holder::string_collection_getter_type string_collection_getter_type;
     typedef editor::property_holder::string_collection_size_getter_type string_collection_size_getter_type;
 
-  public:
+public:
     property_string_values_value_getter(string_getter_type const& getter, string_setter_type const& setter,
         string_collection_getter_type const& collection_getter,
         string_collection_size_getter_type const& collection_size_getter);
@@ -34,9 +34,9 @@ ref class property_string_values_value_getter : public property_string, public p
 
     virtual collection_type ^ values();
 
-  public:
+public:
     string_collection_getter_type* m_collection_getter;
     string_collection_size_getter_type* m_collection_size_getter;
-};  // ref class property_string_values_value_getter
+}; // ref class property_string_values_value_getter
 
-#endif  // ifndef PROPERTY_STRING_VALUES_VALUE_GETTER_HPP_INCLUDED
+#endif // ifndef PROPERTY_STRING_VALUES_VALUE_GETTER_HPP_INCLUDED

@@ -8,35 +8,13 @@
 #include "Shader.h"
 #include "ResourceManager.h"
 // XXX: render scripts should call these destructors before resource manager gets destroyed
-STextureList::~STextureList()
-{
-    RImplementation.Resources->_DeleteTextureList(this);
-}
-SMatrixList::~SMatrixList()
-{
-    RImplementation.Resources->_DeleteMatrixList(this);
-}
-SConstantList::~SConstantList()
-{
-    RImplementation.Resources->_DeleteConstantList(this);
-}
-SPass::~SPass()
-{
-    RImplementation.Resources->_DeletePass(this);
-}
-ShaderElement::~ShaderElement()
-{
-    RImplementation.Resources->_DeleteElement(this);
-}
-SGeometry::~SGeometry()
-{
-    RImplementation.Resources->DeleteGeom(this);
-}
-Shader::~Shader()
-{
-    RImplementation.Resources->Delete(this);
-}
-
+STextureList::~STextureList() { RImplementation.Resources->_DeleteTextureList(this); }
+SMatrixList::~SMatrixList() { RImplementation.Resources->_DeleteMatrixList(this); }
+SConstantList::~SConstantList() { RImplementation.Resources->_DeleteConstantList(this); }
+SPass::~SPass() { RImplementation.Resources->_DeletePass(this); }
+ShaderElement::~ShaderElement() { RImplementation.Resources->_DeleteElement(this); }
+SGeometry::~SGeometry() { RImplementation.Resources->DeleteGeom(this); }
+Shader::~Shader() { RImplementation.Resources->Delete(this); }
 //////////////////////////////////////////////////////////////////////////
 void resptrcode_shader::create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_constants, LPCSTR s_matrices)
 {
@@ -62,23 +40,34 @@ void resptrcode_geom::create(D3DVERTEXELEMENT9* decl, ID3DVertexBuffer* vb, ID3D
 //////////////////////////////////////////////////////////////////////
 BOOL SPass::equal(const SPass& other)
 {
-    if (state != other.state) return FALSE;
-    if (ps != other.ps) return FALSE;
-    if (vs != other.vs) return FALSE;
+    if (state != other.state)
+        return FALSE;
+    if (ps != other.ps)
+        return FALSE;
+    if (vs != other.vs)
+        return FALSE;
 #if defined(USE_DX10) || defined(USE_DX11)
-    if (gs != other.gs) return FALSE;
+    if (gs != other.gs)
+        return FALSE;
 #ifdef USE_DX11
-    if (hs != other.hs) return FALSE;
-    if (ds != other.ds) return FALSE;
-    if (cs != other.cs) return FALSE;
+    if (hs != other.hs)
+        return FALSE;
+    if (ds != other.ds)
+        return FALSE;
+    if (cs != other.cs)
+        return FALSE;
 #endif
-#endif                                               //	USE_DX10
-    if (constants != other.constants) return FALSE;  // is this nessesary??? (ps+vs already combines)
+#endif //	USE_DX10
+    if (constants != other.constants)
+        return FALSE; // is this nessesary??? (ps+vs already combines)
 
-    if (T != other.T) return FALSE;
-    if (C != other.C) return FALSE;
+    if (T != other.T)
+        return FALSE;
+    if (C != other.C)
+        return FALSE;
 #ifdef _EDITOR
-    if (M != other.M) return FALSE;
+    if (M != other.M)
+        return FALSE;
 #endif
     return TRUE;
 }
@@ -95,21 +84,30 @@ ShaderElement::ShaderElement()
 
 BOOL ShaderElement::equal(ShaderElement& S)
 {
-    if (flags.iPriority != S.flags.iPriority) return FALSE;
-    if (flags.bStrictB2F != S.flags.bStrictB2F) return FALSE;
-    if (flags.bEmissive != S.flags.bEmissive) return FALSE;
-    if (flags.bWmark != S.flags.bWmark) return FALSE;
-    if (flags.bDistort != S.flags.bDistort) return FALSE;
-    if (passes.size() != S.passes.size()) return FALSE;
+    if (flags.iPriority != S.flags.iPriority)
+        return FALSE;
+    if (flags.bStrictB2F != S.flags.bStrictB2F)
+        return FALSE;
+    if (flags.bEmissive != S.flags.bEmissive)
+        return FALSE;
+    if (flags.bWmark != S.flags.bWmark)
+        return FALSE;
+    if (flags.bDistort != S.flags.bDistort)
+        return FALSE;
+    if (passes.size() != S.passes.size())
+        return FALSE;
     for (u32 p = 0; p < passes.size(); p++)
-        if (passes[p] != S.passes[p]) return FALSE;
+        if (passes[p] != S.passes[p])
+            return FALSE;
     return TRUE;
 }
 
 BOOL ShaderElement::equal(ShaderElement* S)
 {
-    if (0 == S && 0 == this) return TRUE;
-    if (0 == S || 0 == this) return FALSE;
+    if (0 == S && 0 == this)
+        return TRUE;
+    if (0 == S || 0 == this)
+        return FALSE;
     return equal(*S);
 }
 
@@ -117,13 +115,9 @@ BOOL ShaderElement::equal(ShaderElement* S)
 BOOL Shader::equal(Shader& S)
 {
     return E[0]->equal(&*S.E[0]) && E[1]->equal(&*S.E[1]) && E[2]->equal(&*S.E[2]) && E[3]->equal(&*S.E[3]) &&
-           E[4]->equal(&*S.E[4]);
+        E[4]->equal(&*S.E[4]);
 }
-BOOL Shader::equal(Shader* S)
-{
-    return equal(*S);
-}
-
+BOOL Shader::equal(Shader* S) { return equal(*S); }
 void STextureList::clear()
 {
     iterator it = begin();
@@ -155,7 +149,8 @@ u32 STextureList::find_texture_stage(const shared_str& TexName) const
         const std::pair<u32, ref_texture>& loader = *_it;
 
         //	Shadowmap texture always uses 0 texture unit
-        if (loader.second->cName == TexName) {
+        if (loader.second->cName == TexName)
+        {
             //	Assign correct texture
             dwTextureStage = loader.first;
             break;

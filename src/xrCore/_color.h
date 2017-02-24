@@ -6,10 +6,7 @@ ICF u32 color_argb(u32 a, u32 r, u32 g, u32 b)
 {
     return ((a & 0xff) << 24) | ((r & 0xff) << 16) | ((g & 0xff) << 8) | (b & 0xff);
 }
-ICF u32 color_rgba(u32 r, u32 g, u32 b, u32 a)
-{
-    return color_argb(a, r, g, b);
-}
+ICF u32 color_rgba(u32 r, u32 g, u32 b, u32 a) { return color_argb(a, r, g, b); }
 ICF u32 color_argb_f(f32 a, f32 r, f32 g, f32 b)
 {
     s32 _r = clampr(iFloor(r * 255.f), 0, 255);
@@ -18,43 +15,15 @@ ICF u32 color_argb_f(f32 a, f32 r, f32 g, f32 b)
     s32 _a = clampr(iFloor(a * 255.f), 0, 255);
     return color_argb(_a, _r, _g, _b);
 }
-ICF u32 color_rgba_f(f32 r, f32 g, f32 b, f32 a)
-{
-    return color_argb_f(a, r, g, b);
-}
-ICF u32 color_xrgb(u32 r, u32 g, u32 b)
-{
-    return color_argb(0xff, r, g, b);
-}
-ICF u32 color_get_R(u32 rgba)
-{
-    return (((rgba) >> 16) & 0xff);
-}
-ICF u32 color_get_G(u32 rgba)
-{
-    return (((rgba) >> 8) & 0xff);
-}
-ICF u32 color_get_B(u32 rgba)
-{
-    return ((rgba)&0xff);
-}
-ICF u32 color_get_A(u32 rgba)
-{
-    return ((rgba) >> 24);
-}
-ICF u32 subst_alpha(u32 rgba, u32 a)
-{
-    return (rgba & ~color_rgba(0, 0, 0, 0xff)) | color_rgba(0, 0, 0, a);
-}
-ICF u32 bgr2rgb(u32 bgr)
-{
-    return color_rgba(color_get_B(bgr), color_get_G(bgr), color_get_R(bgr), 0);
-}
-ICF u32 rgb2bgr(u32 rgb)
-{
-    return bgr2rgb(rgb);
-}
-
+ICF u32 color_rgba_f(f32 r, f32 g, f32 b, f32 a) { return color_argb_f(a, r, g, b); }
+ICF u32 color_xrgb(u32 r, u32 g, u32 b) { return color_argb(0xff, r, g, b); }
+ICF u32 color_get_R(u32 rgba) { return (((rgba) >> 16) & 0xff); }
+ICF u32 color_get_G(u32 rgba) { return (((rgba) >> 8) & 0xff); }
+ICF u32 color_get_B(u32 rgba) { return ((rgba)&0xff); }
+ICF u32 color_get_A(u32 rgba) { return ((rgba) >> 24); }
+ICF u32 subst_alpha(u32 rgba, u32 a) { return (rgba & ~color_rgba(0, 0, 0, 0xff)) | color_rgba(0, 0, 0, a); }
+ICF u32 bgr2rgb(u32 bgr) { return color_rgba(color_get_B(bgr), color_get_G(bgr), color_get_R(bgr), 0); }
+ICF u32 rgb2bgr(u32 rgb) { return bgr2rgb(rgb); }
 template <class T>
 struct _color
 {
@@ -110,14 +79,14 @@ public:
         r = f * (T)(BYTE)(dw >> 0);
         return *this;
     };
-    IC SelfRef adjust_contrast(T f)  // >1 - contrast will be increased
+    IC SelfRef adjust_contrast(T f) // >1 - contrast will be increased
     {
         r = 0.5f + f * (r - 0.5f);
         g = 0.5f + f * (g - 0.5f);
         b = 0.5f + f * (b - 0.5f);
         return *this;
     };
-    IC SelfRef adjust_contrast(SelfCRef in, T f)  // >1 - contrast will be increased
+    IC SelfRef adjust_contrast(SelfCRef in, T f) // >1 - contrast will be increased
     {
         r = 0.5f + f * (in.r - 0.5f);
         g = 0.5f + f * (in.g - 0.5f);
@@ -237,7 +206,6 @@ public:
     // magnitude
     IC T magnitude_rgb(void) const { return _sqrt(magnitude_sqr_rgb()); }
     IC T intensity(void) const { return (r + g + b) / 3.f; }
-
     // Normalize
     IC SelfRef normalize_rgb(void)
     {
@@ -260,7 +228,8 @@ public:
     }
     IC SelfRef lerp(SelfCRef c1, SelfCRef c2, SelfCRef c3, T t)
     {
-        if (t > .5f) {
+        if (t > .5f)
+        {
             return lerp(c2, c3, t * 2.f - 1.f);
         }
         else

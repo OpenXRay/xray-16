@@ -17,14 +17,16 @@ void CSoundRender_Core::i_start(CSoundRender_Emitter* E)
     for (u32 it = 0; it < s_targets.size(); it++)
     {
         CSoundRender_Target* Ttest = s_targets[it];
-        if (Ttest->priority < Ptarget) {
+        if (Ttest->priority < Ptarget)
+        {
             T = Ttest;
             Ptarget = Ttest->priority;
         }
     }
 
     // Stop currently playing
-    if (T->get_emitter()) T->get_emitter()->cancel();
+    if (T->get_emitter())
+        T->get_emitter()->cancel();
 
     // Associate
     E->target = T;
@@ -56,7 +58,8 @@ BOOL CSoundRender_Core::i_allow_play(CSoundRender_Emitter* E)
     for (u32 it = 0; it < s_targets.size(); it++)
     {
         CSoundRender_Target* T = s_targets[it];
-        if (T->priority < Ptest) return TRUE;
+        if (T->priority < Ptest)
+            return TRUE;
     }
     return FALSE;
 }

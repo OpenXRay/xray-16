@@ -22,42 +22,15 @@ static float s_increment_factor = .001f;
 
 #if 0
 	using System::Windows::Forms::ColorDialog;
-#endif  // #if 0
+#endif // #if 0
 
-color_components::color_components(property_color_base ^ holder) : m_holder(holder)
-{
-}
-
-float color_components::red_getter()
-{
-    return (m_holder->get_value_raw().r);
-}
-
-void color_components::red_setter(float value)
-{
-    m_holder->red(value);
-}
-
-float color_components::green_getter()
-{
-    return (m_holder->get_value_raw().g);
-}
-
-void color_components::green_setter(float value)
-{
-    m_holder->green(value);
-}
-
-float color_components::blue_getter()
-{
-    return (m_holder->get_value_raw().b);
-}
-
-void color_components::blue_setter(float value)
-{
-    m_holder->blue(value);
-}
-
+color_components::color_components(property_color_base ^ holder) : m_holder(holder) {}
+float color_components::red_getter() { return (m_holder->get_value_raw().r); }
+void color_components::red_setter(float value) { m_holder->red(value); }
+float color_components::green_getter() { return (m_holder->get_value_raw().g); }
+void color_components::green_setter(float value) { m_holder->green(value); }
+float color_components::blue_getter() { return (m_holder->get_value_raw().b); }
+void color_components::blue_setter(float value) { m_holder->blue(value); }
 property_color_base::property_color_base(editor::color const % color, array<System::Attribute ^> ^ attributes)
 {
     m_container = gcnew property_container(nullptr, this);
@@ -105,21 +78,9 @@ property_color_base::property_color_base(editor::color const % color, array<Syst
     m_container->add_property(spec, gcnew property_float_limited(getter, setter, .0025f, 0.f, 1.f));
 }
 
-property_color_base::~property_color_base()
-{
-    this->!property_color_base();
-}
-
-property_color_base::!property_color_base()
-{
-    delete (m_container);
-}
-
-Object ^ property_color_base::GetValue()
-{
-    return (m_container);
-}
-
+property_color_base::~property_color_base() { this->!property_color_base(); }
+property_color_base::!property_color_base() { delete (m_container); }
+Object ^ property_color_base::GetValue() { return (m_container); }
 void property_color_base::SetValue(Object ^ object)
 {
     Color color = safe_cast<Color>(object);
@@ -163,18 +124,20 @@ void property_color_base::OnDoubleClick(XRay::SdkControls::PropertyGrid ^ proper
 
 	SetValue					(::Color(dialog->Color.R/255.f, dialog->Color.G/255.f, dialog->Color.B/255.f));
 	property_grid->Refresh		();
-#endif  // #if 0
+#endif // #if 0
 }
 
 static void increment_and_clamp(float& value, float const& increment)
 {
     value += increment;
-    if (value > 1.f) {
+    if (value > 1.f)
+    {
         value = 1.f;
         return;
     }
 
-    if (value < 0.f) value = 0.f;
+    if (value < 0.f)
+        value = 0.f;
 }
 
 void property_color_base::Increment(float increment)

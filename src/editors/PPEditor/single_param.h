@@ -12,8 +12,8 @@
 //---------------------------------------------------------------------------
 class TAddFloatForm : public TForm, public TPPPropEditor
 {
-    __published :  // IDE-managed Components
-                   TGroupBox* GroupBox1;
+    __published : // IDE-managed Components
+                  TGroupBox* GroupBox1;
     TMxLabel* Label1;
     TMultiObjSpinEdit* Value1;
     TMxLabel* Label2;
@@ -29,26 +29,23 @@ class TAddFloatForm : public TForm, public TPPPropEditor
     void __fastcall TimeValueKeyDown(TObject* Sender, WORD& Key, TShiftState Shift);
     void __fastcall cmTextureNameChange(TObject* Sender);
 
-  private:  // User declarations
+private: // User declarations
     pp_params m_Param;
     _pp_params m_pp_params;
     bool m_bLocked;
 
-  public:  // User declarations
+public: // User declarations
     virtual void Lock(bool b) { m_bLocked = b; }
-
     __fastcall TAddFloatForm(TComponent* Owner, pp_params param);
 
     virtual void ShowCurrent(u32 keyIdx);
 
     virtual _pp_params GetTimeChannel() { return m_pp_params; };
-
     virtual bool DrawChannel(_pp_params p);
     ;
     virtual void Clear();
 
     virtual TForm* GetForm() { return this; };
-
     virtual void AddNew(u32 keyIdx);
     virtual void Remove(u32 keyIdx);
     virtual void RemoveAllKeys();

@@ -21,7 +21,7 @@
 
 #ifndef MASTER_GOLD
 #include "ai_debug.h"
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
 
 static const float check_time_delta = 1.f;
 
@@ -35,20 +35,22 @@ bool stalker_movement_manager_obstacles::simulate_path_navigation()
         m_static_obstacles.on_before_query();
         m_static_obstacles.query(current_position, previous_position);
 
-        if (!m_static_obstacles.process_query(false)) {
+        if (!m_static_obstacles.process_query(false))
+        {
             m_last_fail_time = Device.dwTimeGlobal;
             m_failed_to_build_path = true;
             restore_current_state();
             return (false);
         }
 
-        if (m_static_obstacles.need_path_to_rebuild()) return (false);
+        if (m_static_obstacles.need_path_to_rebuild())
+            return (false);
 
         //		float						dist_to_target;
         //		Fvector						dir_to_target;
         //		float						distance;
         //		current_position			=
-        //path_position(1.f,current_position,check_time_delta,current_travel_point,distance,dist_to_target,dir_to_target);
+        // path_position(1.f,current_position,check_time_delta,current_travel_point,distance,dist_to_target,dir_to_target);
         previous_position = current_position;
         current_position = predict_position(check_time_delta, current_position, current_travel_point, 1.f);
     }
@@ -60,13 +62,17 @@ void stalker_movement_manager_obstacles::save_current_state()
 {
     m_saved_state = false;
 
-    if (level_path().path().empty()) return;
+    if (level_path().path().empty())
+        return;
 
-    if (level_path().path().back() != level_path_builder().dest_vertex_id()) return;
+    if (level_path().path().back() != level_path_builder().dest_vertex_id())
+        return;
 
-    if (detail().path().empty()) return;
+    if (detail().path().empty())
+        return;
 
-    if (detail().dest_vertex_id() != level_path_builder().dest_vertex_id()) return;
+    if (detail().dest_vertex_id() != level_path_builder().dest_vertex_id())
+        return;
 
     m_saved_state = true;
     m_level_path.swap(level_path_path());
@@ -74,21 +80,22 @@ void stalker_movement_manager_obstacles::save_current_state()
     m_detail_path.swap(detail().path());
 #ifdef DEBUG
     m_detail_key_points.swap(detail().key_points());
-#endif  // DEBUG
+#endif // DEBUG
     m_detail_last_patrol_point = detail().last_patrol_point();
     m_saved_current_iteration.copy(m_static_obstacles.current_iteration());
 }
 
 void stalker_movement_manager_obstacles::restore_current_state()
 {
-    if (!m_saved_state) return;
+    if (!m_saved_state)
+        return;
 
     m_level_path.swap(level_path_path());
     m_detail_path.swap(detail().path());
     detail().m_current_travel_point = m_detail_current_index;
 #ifdef DEBUG
     m_detail_key_points.swap(detail().key_points());
-#endif  // DEBUG
+#endif // DEBUG
     detail().last_patrol_point(m_detail_last_patrol_point);
     m_saved_current_iteration.swap(m_static_obstacles.current_iteration());
 }
@@ -102,18 +109,20 @@ IC void stalker_movement_manager_obstacles::remove_query_objects(const Fvector& 
 void stalker_movement_manager_obstacles::build_level_path()
 {
 #ifndef MASTER_GOLD
-    if (!psAI_Flags.test(aiObstaclesAvoiding)) {
+    if (!psAI_Flags.test(aiObstaclesAvoiding))
+    {
         inherited::build_level_path();
         return;
     }
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
 
 #ifdef DEBUG
     CTimer timer;
     timer.Start();
-#endif  // DEBUG
+#endif // DEBUG
 
-    if (m_last_dest_vertex_id != level_path().dest_vertex_id()) remove_query_objects(object().Position(), 5.f);
+    if (m_last_dest_vertex_id != level_path().dest_vertex_id())
+        remove_query_objects(object().Position(), 5.f);
 
     m_last_fail_time = 0;
 
@@ -129,19 +138,22 @@ void stalker_movement_manager_obstacles::build_level_path()
 #ifndef MASTER_GOLD
     if (!psAI_Flags.test(aiObstaclesAvoidingStatic))
         m_dynamic_obstacles.inactive_query().copy(m_dynamic_obstacles.active_query());
-#endif  // MASTER_GOLD
+#endif // MASTER_GOLD
 
     bool pure_search_tried = false;
     bool pure_search_result = false;
 
     do
     {
-        if (m_failed_to_build_path) break;
+        if (m_failed_to_build_path)
+            break;
 
         inherited::build_level_path();
 
-        if (level_path().failed()) {
-            if (!pure_search_tried) {
+        if (level_path().failed())
+        {
+            if (!pure_search_tried)
+            {
                 pure_search_tried = true;
 
                 m_static_obstacles.clear();
@@ -154,10 +166,11 @@ void stalker_movement_manager_obstacles::build_level_path()
                 pure_search_result = !level_path().failed();
             }
 
-            if (!pure_search_result) {
+            if (!pure_search_result)
+            {
 #ifndef MASTER_GOLD
                 Msg("! level_path().failed() during navigation");
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
                 break;
             }
         }
@@ -165,5 +178,5 @@ void stalker_movement_manager_obstacles::build_level_path()
 
     m_last_dest_vertex_id = level_path().dest_vertex_id();
     //	Msg								("[%6d][%6d][%s][%f]
-    //build_level_path",Device.dwFrame,Device.dwTimeGlobal,*object().cName(),timer.GetElapsed_sec()*1000.f);
+    // build_level_path",Device.dwFrame,Device.dwTimeGlobal,*object().cName(),timer.GetElapsed_sec()*1000.f);
 }

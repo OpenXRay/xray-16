@@ -11,11 +11,7 @@ CUIEditBoxEx::CUIEditBoxEx()
     TextItemControl()->SetTextComplexMode(true);
 }
 
-CUIEditBoxEx::~CUIEditBoxEx()
-{
-    xr_delete(m_pFrameWindow);
-}
-
+CUIEditBoxEx::~CUIEditBoxEx() { xr_delete(m_pFrameWindow); }
 void CUIEditBoxEx::InitCustomEdit(Fvector2 pos, Fvector2 size)
 {
     m_pFrameWindow->SetWndSize(size);
@@ -23,11 +19,5 @@ void CUIEditBoxEx::InitCustomEdit(Fvector2 pos, Fvector2 size)
     CUICustomEdit::InitCustomEdit(pos, size);
 }
 
-void CUIEditBoxEx::InitTextureEx(LPCSTR texture, LPCSTR shader)
-{
-    m_pFrameWindow->InitTextureEx(texture, shader);
-}
-void CUIEditBoxEx::InitTexture(LPCSTR texture)
-{
-    m_pFrameWindow->InitTexture(texture);
-}
+void CUIEditBoxEx::InitTextureEx(LPCSTR texture, LPCSTR shader) { m_pFrameWindow->InitTextureEx(texture, shader); }
+void CUIEditBoxEx::InitTexture(LPCSTR texture) { m_pFrameWindow->InitTexture(texture); }

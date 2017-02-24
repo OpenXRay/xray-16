@@ -26,8 +26,10 @@ struct SVertex : public Fvector
         void
         SetLink(int id, int i0, int i1)
     {
-        if (i0 >= 0) link[id].push_back(i0);
-        if (i1 >= 0) link[id].push_back(i1);
+        if (i0 >= 0)
+            link[id].push_back(i0);
+        if (i1 >= 0)
+            link[id].push_back(i1);
     }
 
     IC
@@ -50,7 +52,7 @@ class CPortalUtils
     //	void FindSVertexLinks(int id, CSector* S, SVertexVec& V);
     int CalculateSelectedPortals(ObjectList& sectors);
 
-  public:
+public:
     bool CalculateConvexHull(FvectorVec& points);
     int CalculatePortals(CSector* SF, CSector* SB);
     int CalculateSelectedPortals();

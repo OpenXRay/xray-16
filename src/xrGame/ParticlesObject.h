@@ -14,8 +14,8 @@ class CParticlesObject : public CPS_Instance
     void UpdateSpatial();
 
 protected:
-    bool m_bLooped;    //флаг, что система зациклена
-    bool m_bStopping;  //вызвана функция Stop()
+    bool m_bLooped; //флаг, что система зациклена
+    bool m_bStopping; //вызвана функция Stop()
 
 protected:
     u32 mt_dt;
@@ -42,7 +42,6 @@ public:
     virtual void Play(bool bHudMode);
     void Stop(BOOL bDefferedStop = TRUE);
     virtual BOOL Locked() { return mt_dt; }
-
     bool IsLooped() { return m_bLooped; }
     bool IsAutoRemove();
     bool IsPlaying();
@@ -57,7 +56,8 @@ public:
     }
     static void Destroy(CParticlesObject*& p)
     {
-        if (p) {
+        if (p)
+        {
             p->PSI_destroy();
             p = 0;
         }

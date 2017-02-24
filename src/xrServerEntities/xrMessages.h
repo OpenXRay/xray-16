@@ -8,35 +8,35 @@
 
 enum
 {
-    M_UPDATE = 0,  // DUAL: Update state
-    M_SPAWN,       // DUAL: Spawning, full state
+    M_UPDATE = 0, // DUAL: Update state
+    M_SPAWN, // DUAL: Spawning, full state
 
     M_SV_CONFIG_NEW_CLIENT,
     M_SV_CONFIG_GAME,
     M_SV_CONFIG_FINISHED,
 
-    M_MIGRATE_DEACTIVATE,  // TO:   Changing server, just deactivate
-    M_MIGRATE_ACTIVATE,    // TO:   Changing server, full state
+    M_MIGRATE_DEACTIVATE, // TO:   Changing server, just deactivate
+    M_MIGRATE_ACTIVATE, // TO:   Changing server, full state
 
-    M_CHAT,  // DUAL:
+    M_CHAT, // DUAL:
 
-    M_EVENT,     // Game Event
-    M_CL_INPUT,  // Client Input Data
+    M_EVENT, // Game Event
+    M_CL_INPUT, // Client Input Data
     //----------- for E3 -----------------------------
     M_CL_UPDATE,
     M_UPDATE_OBJECTS,
     //-------------------------------------------------
-    M_CLIENTREADY,  // Client has finished to load level and are ready to play
+    M_CLIENTREADY, // Client has finished to load level and are ready to play
 
-    M_CHANGE_LEVEL,  // changing level
+    M_CHANGE_LEVEL, // changing level
     M_LOAD_GAME,
     M_RELOAD_GAME,
     M_SAVE_GAME,
     M_SAVE_PACKET,
 
     M_SWITCH_DISTANCE,
-    M_GAMEMESSAGE,  // Game Message
-    M_EVENT_PACK,   // Pack of M_EVENT
+    M_GAMEMESSAGE, // Game Message
+    M_EVENT_PACK, // Pack of M_EVENT
 
     //-----------------------------------------------------
     M_GAMESPY_CDKEY_VALIDATION_CHALLENGE,
@@ -69,8 +69,8 @@ enum
     M_REMOTE_CONTROL_CMD,
     M_BATTLEYE,
 
-    M_SV_MAP_NAME,  // request and responce
-    M_SV_DIGEST,    // request and responce
+    M_SV_MAP_NAME, // request and responce
+    M_SV_DIGEST, // request and responce
 
     M_FILE_TRANSFER,
     M_MAKE_SCREENSHOT,
@@ -85,15 +85,15 @@ enum
 enum
 {
     GE_RESPAWN,
-    GE_OWNERSHIP_TAKE,  // DUAL: Client request for ownership of an item
+    GE_OWNERSHIP_TAKE, // DUAL: Client request for ownership of an item
     GE_OWNERSHIP_TAKE_MP_FORCED,
-    GE_OWNERSHIP_REJECT,  // DUAL: Client request ownership rejection
-    GE_TRANSFER_AMMO,     // DUAL: Take ammo out of weapon for our weapon
-    GE_HIT,               //
-    GE_DIE,               //
-    GE_ASSIGN_KILLER,     //
-    GE_DESTROY,           // authorative client request for entity-destroy
-    GE_DESTROY_REJECT,    // GE_DESTROY + GE_OWNERSHIP_REJECT
+    GE_OWNERSHIP_REJECT, // DUAL: Client request ownership rejection
+    GE_TRANSFER_AMMO, // DUAL: Take ammo out of weapon for our weapon
+    GE_HIT, //
+    GE_DIE, //
+    GE_ASSIGN_KILLER, //
+    GE_DESTROY, // authorative client request for entity-destroy
+    GE_DESTROY_REJECT, // GE_DESTROY + GE_OWNERSHIP_REJECT
     GE_TELEPORT_OBJECT,
 
     GE_ADD_RESTRICTION,
@@ -102,7 +102,7 @@ enum
 
     GE_BUY,
 
-    GE_INFO_TRANSFER,  // transfer _new_ info on PDA
+    GE_INFO_TRANSFER, // transfer _new_ info on PDA
 
     GE_TRADE_SELL,
     GE_TRADE_BUY,
@@ -116,14 +116,14 @@ enum
     GE_INSTALL_UPGRADE,
 
     GE_GRENADE_EXPLODE,
-    GE_INV_ACTION,  // a action beign taken on inventory
+    GE_INV_ACTION, // a action beign taken on inventory
     GE_INV_BOX_STATUS,
     GE_INV_OWNER_STATUS,
 
     GE_ZONE_STATE_CHANGE,
 
-    GE_MOVE_ACTOR,     // move actor to desired position instantly
-    GE_ACTOR_JUMPING,  // actor press jump key
+    GE_MOVE_ACTOR, // move actor to desired position instantly
+    GE_ACTOR_JUMPING, // actor press jump key
     GE_ACTOR_MAX_POWER,
     GE_ACTOR_MAX_HEALTH,
 
@@ -164,10 +164,10 @@ enum
 };
 
 enum EGameMessages
-{  // game_cl <----> game_sv messages
+{ // game_cl <----> game_sv messages
     GAME_EVENT_PLAYER_READY,
-    GAME_EVENT_PLAYER_KILL,          // player wants to die
-    GAME_EVENT_PLAYER_BUY_FINISHED,  // player end to buy items
+    GAME_EVENT_PLAYER_KILL, // player wants to die
+    GAME_EVENT_PLAYER_BUY_FINISHED, // player end to buy items
     GAME_EVENT_PLAYER_BUYMENU_OPEN,
     GAME_EVENT_PLAYER_BUYMENU_CLOSE,
     GAME_EVENT_PLAYER_BUY_SPAWN,
@@ -179,7 +179,7 @@ enum EGameMessages
     GAME_EVENT_PLAYER_DISCONNECTED,
     GAME_EVENT_PLAYER_ENTERED_GAME,
 
-    GAME_EVENT_PLAYER_KILLED,  //////!!!!!
+    GAME_EVENT_PLAYER_KILLED, //////!!!!!
     GAME_EVENT_PLAYER_HITTED,
 
     GAME_EVENT_PLAYER_JOIN_TEAM,
@@ -228,20 +228,20 @@ enum EGameMessages
     GAME_EVENT_PLAYERS_INFO_REPLY,
 
     //-----------------------------------------
-    GAME_EVENT_SCRIPT_BEGINS_FROM,  // don't add messages after this
+    GAME_EVENT_SCRIPT_BEGINS_FROM, // don't add messages after this
     GAME_EVENT_FORCEDWORD = u32(-1)
 };
 
 enum
 {
-    M_SPAWN_OBJECT_LOCAL = (1 << 0),      // after spawn it becomes local (authorative)
-    M_SPAWN_OBJECT_HASUPDATE = (1 << 2),  // after spawn info it has update inside message
-    M_SPAWN_OBJECT_ASPLAYER = (1 << 3),   // after spawn it must become viewable
-    M_SPAWN_OBJECT_PHANTOM = (1 << 4),    // after spawn it must become viewable
-    M_SPAWN_VERSION = (1 << 5),           // control version
-    M_SPAWN_UPDATE = (1 << 6),            // + update packet
-    M_SPAWN_TIME = (1 << 7),              // + spawn time
-    M_SPAWN_DENIED = (1 << 8),            // don't spawn entity with this flag
+    M_SPAWN_OBJECT_LOCAL = (1 << 0), // after spawn it becomes local (authorative)
+    M_SPAWN_OBJECT_HASUPDATE = (1 << 2), // after spawn info it has update inside message
+    M_SPAWN_OBJECT_ASPLAYER = (1 << 3), // after spawn it must become viewable
+    M_SPAWN_OBJECT_PHANTOM = (1 << 4), // after spawn it must become viewable
+    M_SPAWN_VERSION = (1 << 5), // control version
+    M_SPAWN_UPDATE = (1 << 6), // + update packet
+    M_SPAWN_TIME = (1 << 7), // + spawn time
+    M_SPAWN_DENIED = (1 << 8), // don't spawn entity with this flag
 
     M_SPAWN_OBJECT_FORCEDWORD = u32(-1)
 };
@@ -253,6 +253,6 @@ enum enum_connection_results
     ecr_password_verification_failed,
     ecr_have_been_banned,
     ecr_profile_error,
-};  // enum enum_connection_results
+}; // enum enum_connection_results
 
 #endif /*_INCDEF_XRMESSAGES_H_*/

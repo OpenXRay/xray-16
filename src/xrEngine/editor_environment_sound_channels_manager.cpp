@@ -91,7 +91,8 @@ void manager::fill(editor::property_holder* holder)
 
 manager::channels_ids_type const& manager::channels_ids() const
 {
-    if (!m_changed) return (m_channels_ids);
+    if (!m_changed)
+        return (m_channels_ids);
 
     m_changed = false;
 
@@ -112,9 +113,10 @@ manager::channels_ids_type const& manager::channels_ids() const
 
 shared_str manager::unique_id(shared_str const& id) const
 {
-    if (m_collection->unique_id(id.c_str())) return (id);
+    if (m_collection->unique_id(id.c_str()))
+        return (id);
 
     return (m_collection->generate_unique_id(id.c_str()));
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

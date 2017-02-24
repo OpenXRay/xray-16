@@ -14,16 +14,8 @@ void CPPEffectorDistance::load(LPCSTR section)
     VERIFY(m_r_min_perc <= m_r_max_perc);
 }
 
-bool CPPEffectorDistance::check_completion()
-{
-    return (m_dist > m_radius * m_r_max_perc);
-}
-
-bool CPPEffectorDistance::check_start_conditions()
-{
-    return (m_dist < m_radius * m_r_max_perc);
-}
-
+bool CPPEffectorDistance::check_completion() { return (m_dist > m_radius * m_r_max_perc); }
+bool CPPEffectorDistance::check_start_conditions() { return (m_dist < m_radius * m_r_max_perc); }
 void CPPEffectorDistance::update_factor()
 {
     float factor;
@@ -33,7 +25,4 @@ void CPPEffectorDistance::update_factor()
     m_effector->set_factor(factor);
 }
 
-CPPEffectorControlled* CPPEffectorDistance::create_effector()
-{
-    return new CPPEffectorControlled(this, m_state);
-}
+CPPEffectorControlled* CPPEffectorDistance::create_effector() { return new CPPEffectorControlled(this, m_state); }

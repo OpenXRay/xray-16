@@ -17,24 +17,20 @@ namespace inventory
 {
 namespace upgrade
 {
-Root::Root()
-{
-}
-
-Root::~Root()
-{
-}
-
+Root::Root() {}
+Root::~Root() {}
 void Root::construct(const shared_str& root_id, Manager& manager_r)
 {
     inherited::construct(root_id, manager_r);
     m_known = true;
 
-    if (!pSettings->line_exist(root_id, "upgrades")) {
+    if (!pSettings->line_exist(root_id, "upgrades"))
+    {
         return;
     }
     LPCSTR upgrade_groups_str = pSettings->r_string(root_id, "upgrades");
-    if (!upgrade_groups_str || !xr_strlen(upgrade_groups_str)) {
+    if (!upgrade_groups_str || !xr_strlen(upgrade_groups_str))
+    {
         return;
     }
     add_dependent_groups(upgrade_groups_str, manager_r);
@@ -52,7 +48,8 @@ void Root::add_upgrade(Upgrade* upgr)
     Upgrades_vec::iterator ie = m_contained_upgrades.end();
     for (; ib != ie; ++ib)
     {
-        if (upgr == (*ib)) {
+        if (upgr == (*ib))
+        {
             return;
         }
     }
@@ -64,11 +61,7 @@ void Root::add_upgrade(Upgrade* upgr)
     m_contained_upgrades.push_back(upgr);
 }
 
-bool Root::is_root()
-{
-    return true;
-}
-
+bool Root::is_root() { return true; }
 #ifdef DEBUG
 
 void Root::log_hierarchy(LPCSTR nest)
@@ -89,18 +82,20 @@ void Root::test_all_upgrades(CInventoryItem& item)
     {
         bool res = item.verify_upgrade((*ib)->section());
 
-        if (g_upgrades_log == 1) {
+        if (g_upgrades_log == 1)
+        {
             Msg("# Checking upgrade <%s> (id = %d) is successful: %s ", (*ib)->section(), item.object_id(),
                 res ? "OK" : "FAILED");
         }
     }
 }
 
-#endif  // DEBUG
+#endif // DEBUG
 
 bool Root::contain_upgrade(const shared_str& upgrade_id)
 {
-    if (inherited::contain_upgrade(upgrade_id)) {
+    if (inherited::contain_upgrade(upgrade_id))
+    {
         return true;
     }
 
@@ -108,7 +103,8 @@ bool Root::contain_upgrade(const shared_str& upgrade_id)
     Upgrades_vec::iterator ie = m_contained_upgrades.end();
     for (; ib != ie; ++ib)
     {
-        if ((*ib)->contain_upgrade(upgrade_id)) {
+        if ((*ib)->contain_upgrade(upgrade_id))
+        {
             return true;
         }
     }
@@ -121,7 +117,8 @@ bool Root::verify_scheme_index(const Ivector2& scheme_index)
     Upgrades_vec::iterator ie = m_contained_upgrades.end();
     for (; ib != ie; ++ib)
     {
-        if ((*ib)->check_scheme_index(scheme_index)) {
+        if ((*ib)->check_scheme_index(scheme_index))
+        {
             return false;
         }
     }
@@ -134,7 +131,8 @@ Upgrade* Root::get_upgrade_by_index(Ivector2 const& index)
     Upgrades_vec::iterator ie = m_contained_upgrades.end();
     for (; ib != ie; ++ib)
     {
-        if ((*ib)->check_scheme_index(index)) {
+        if ((*ib)->check_scheme_index(index))
+        {
             return (*ib);
         }
     }
@@ -147,7 +145,8 @@ void Root::highlight_hierarchy(shared_str const& upgrade_id)
     Upgrades_vec::iterator ie = m_contained_upgrades.end();
     for (; ib != ie; ++ib)
     {
-        if ((*ib)->id()._get() == upgrade_id._get()) {
+        if ((*ib)->id()._get() == upgrade_id._get())
+        {
             //			(*ib)->highlight_up();
             (*ib)->highlight_down();
             return;
@@ -165,5 +164,5 @@ void Root::reset_highlight()
     }
 }
 
-}  // namespace upgrade
-}  // namespace inventory
+} // namespace upgrade
+} // namespace inventory

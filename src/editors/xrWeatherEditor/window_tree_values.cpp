@@ -8,23 +8,26 @@ using System::Void;
 
 ref class NodeSorter : public IComparer
 {
-  public:
+public:
     virtual int Compare(Object ^ x, Object ^ y)
     {
         TreeNode ^ left = safe_cast<TreeNode ^>(x);
         TreeNode ^ right = safe_cast<TreeNode ^>(y);
 
-        if (left->Nodes->Count) {
-            if (right->Nodes->Count) return (left->Text->CompareTo(right->Text));
+        if (left->Nodes->Count)
+        {
+            if (right->Nodes->Count)
+                return (left->Text->CompareTo(right->Text));
 
             return (false);
         }
 
-        if (right->Nodes->Count) return (true);
+        if (right->Nodes->Count)
+            return (true);
 
         return (left->Text->CompareTo(right->Text));
     }
-};  // ref class NodeSorter
+}; // ref class NodeSorter
 
 void window_tree_values::values(property_string_values_value_base::collection_type ^ values, String ^ current_value)
 {
@@ -48,17 +51,20 @@ void window_tree_values::values(property_string_values_value_base::collection_ty
                 int index = j->IndexOf('\\');
                 String ^ k = index < 0 ? j : j->Substring(0, index);
                 j = index < 0 ? "" : j->Substring(index + 1);
-                if (!current) {
+                if (!current)
+                {
                 for
                     each(TreeNode ^ i in TreeView->Nodes)
                     {
-                        if (i->Text != k) continue;
+                        if (i->Text != k)
+                            continue;
 
                         current = i;
                         break;
                     }
 
-                if (current) continue;
+                if (current)
+                    continue;
 
                 current = TreeView->Nodes->Add(k);
                 current->ImageIndex = 0;
@@ -70,20 +76,23 @@ void window_tree_values::values(property_string_values_value_base::collection_ty
             for
                 each(TreeNode ^ i in current->Nodes)
                 {
-                    if (i->Text != k) continue;
+                    if (i->Text != k)
+                        continue;
 
                     found = true;
                     current = i;
                     break;
                 }
-            if (!found) {
+            if (!found)
+            {
                 current->ImageIndex = 0;
                 current->SelectedImageIndex = 0;
                 current = current->Nodes->Add(k);
             }
             }
 
-            if (current->FullPath == current_value) selected = current;
+            if (current->FullPath == current_value)
+                selected = current;
 
             current->ImageIndex = 2;
             current->SelectedImageIndex = 2;
@@ -111,12 +120,15 @@ Void window_tree_values::TreeView_AfterExpand(Object ^ sender, TreeViewEventArgs
 
 Void window_tree_values::TreeView_MouseClick(Object ^ sender, MouseEventArgs ^ e)
 {
-    if (e->Button != ::MouseButtons::Left) return;
+    if (e->Button != ::MouseButtons::Left)
+        return;
 
     TreeViewHitTestInfo ^ info = TreeView->HitTest(e->Location);
-    if (!info->Node) return;
+    if (!info->Node)
+        return;
 
-    if (info->Node->Nodes->Count) {
+    if (info->Node->Nodes->Count)
+    {
         TextBox->Text = "";
         Result = "";
         return;
@@ -128,12 +140,15 @@ Void window_tree_values::TreeView_MouseClick(Object ^ sender, MouseEventArgs ^ e
 
 Void window_tree_values::TreeView_MouseDoubleClick(Object ^ sender, MouseEventArgs ^ e)
 {
-    if (e->Button != ::MouseButtons::Left) return;
+    if (e->Button != ::MouseButtons::Left)
+        return;
 
     TreeViewHitTestInfo ^ info = TreeView->HitTest(e->Location);
-    if (!info->Node) return;
+    if (!info->Node)
+        return;
 
-    if (info->Node->Nodes->Count) {
+    if (info->Node->Nodes->Count)
+    {
         TextBox->Text = "";
         Result = "";
         return;

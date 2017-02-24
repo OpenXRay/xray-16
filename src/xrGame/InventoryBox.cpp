@@ -17,10 +17,7 @@ CInventoryBox::CInventoryBox()
     m_closed = false;
 }
 
-CInventoryBox::~CInventoryBox()
-{
-}
-
+CInventoryBox::~CInventoryBox() {}
 void CInventoryBox::OnEvent(NET_Packet& P, u16 type)
 {
     inherited::OnEvent(P, type);
@@ -41,8 +38,10 @@ void CInventoryBox::OnEvent(NET_Packet& P, u16 type)
 
         CInventoryItem* pIItem = smart_cast<CInventoryItem*>(itm);
         VERIFY(pIItem);
-        if (CurrentGameUI()) {
-            if (CurrentGameUI()->GetActorMenu().GetMenuMode() == mmDeadBodySearch) {
+        if (CurrentGameUI())
+        {
+            if (CurrentGameUI()->GetActorMenu().GetMenuMode() == mmDeadBodySearch)
+            {
                 if (this == CurrentGameUI()->GetActorMenu().GetInvBox())
                     CurrentGameUI()->OnInventoryAction(pIItem, GE_OWNERSHIP_TAKE);
             }
@@ -67,7 +66,8 @@ void CInventoryBox::OnEvent(NET_Packet& P, u16 type)
 
         itm->H_SetParent(NULL, dont_create_shell);
 
-        if (m_in_use) {
+        if (m_in_use)
+        {
             CGameObject* GO = smart_cast<CGameObject*>(itm);
             Actor()->callback(GameObject::eInvBoxItemTake)(this->lua_game_object(), GO->lua_game_object());
         }
@@ -76,15 +76,8 @@ void CInventoryBox::OnEvent(NET_Packet& P, u16 type)
     };
 }
 
-void CInventoryBox::UpdateCL()
-{
-    inherited::UpdateCL();
-}
-
-void CInventoryBox::net_Destroy()
-{
-    inherited::net_Destroy();
-}
+void CInventoryBox::UpdateCL() { inherited::UpdateCL(); }
+void CInventoryBox::net_Destroy() { inherited::net_Destroy(); }
 #include "xrServerEntities/xrServer_Objects_Alife.h"
 BOOL CInventoryBox::net_Spawn(CSE_Abstract* DC)
 {
@@ -94,7 +87,8 @@ BOOL CInventoryBox::net_Spawn(CSE_Abstract* DC)
     set_tip_text("inventory_box_use");
 
     CSE_ALifeInventoryBox* pSE_box = smart_cast<CSE_ALifeInventoryBox*>(DC);
-    if (/*IsGameTypeSingle() &&*/ pSE_box) {
+    if (/*IsGameTypeSingle() &&*/ pSE_box)
+    {
         m_can_take = pSE_box->m_can_take;
         m_closed = pSE_box->m_closed;
         set_tip_text(pSE_box->m_tip_text.c_str());
@@ -103,10 +97,7 @@ BOOL CInventoryBox::net_Spawn(CSE_Abstract* DC)
     return TRUE;
 }
 
-void CInventoryBox::net_Relcase(IGameObject* O)
-{
-    inherited::net_Relcase(O);
-}
+void CInventoryBox::net_Relcase(IGameObject* O) { inherited::net_Relcase(O); }
 #include "inventory_item.h"
 void CInventoryBox::AddAvailableItems(TIItemContainer& items_container) const
 {
@@ -131,7 +122,8 @@ void CInventoryBox::set_closed(bool status, LPCSTR reason)
 {
     m_closed = status;
 
-    if (reason && xr_strlen(reason)) {
+    if (reason && xr_strlen(reason))
+    {
         set_tip_text(reason);
     }
     else

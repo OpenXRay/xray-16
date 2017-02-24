@@ -8,17 +8,14 @@
 
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
-    template <typename _DataStorage, typename _Parameters, typename _dist_type, typename _index_type,                  \
+#define TEMPLATE_SPECIALIZATION                                                                       \
+    template <typename _DataStorage, typename _Parameters, typename _dist_type, typename _index_type, \
         typename _iteration_type>
 
 #define CGamePathManager CPathManager<CGameGraph, _DataStorage, _Parameters, _dist_type, _index_type, _iteration_type>
 
 TEMPLATE_SPECIALIZATION
-CGamePathManager::~CPathManager()
-{
-}
-
+CGamePathManager::~CPathManager() {}
 TEMPLATE_SPECIALIZATION
 IC void CGamePathManager::setup(const _Graph* _graph, _DataStorage* _data_storage, xr_vector<_index_type>* _path,
     const _index_type& _start_node_index, const _index_type& _goal_node_index, const _Parameters& parameters)

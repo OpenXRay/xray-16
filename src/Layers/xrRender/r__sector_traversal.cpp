@@ -5,11 +5,7 @@
 
 CPortalTraverser PortalTraverser;
 
-CPortalTraverser::CPortalTraverser()
-{
-    i_marker = 0xffffffff;
-}
-
+CPortalTraverser::CPortalTraverser() { i_marker = 0xffffffff; }
 #ifdef DEBUG
 xr_vector<IRender_Sector*> dbg_sectors;
 #endif
@@ -19,7 +15,8 @@ void CPortalTraverser::traverse(IRender_Sector* start, CFrustum& F, Fvector& vBa
     Fmatrix m_viewport_01 = {1.f / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, -1.f / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
         1.f / 2.f + 0 + 0, 1.f / 2.f + 0 + 0, 0.0f, 1.0f};
 
-    if (options & VQ_FADE) {
+    if (options & VQ_FADE)
+    {
         f_portals.clear();
         f_portals.reserve(16);
     }
@@ -37,7 +34,8 @@ void CPortalTraverser::traverse(IRender_Sector* start, CFrustum& F, Fvector& vBa
     scissor.depth = 0;
     i_start->traverse(F, scissor);
 
-    if (options & VQ_SCISSOR) {
+    if (options & VQ_SCISSOR)
+    {
         // dbg_sectors					= r_sectors;
         // merge scissor info
         for (u32 s = 0; s < r_sectors.size(); s++)
@@ -55,10 +53,7 @@ void CPortalTraverser::traverse(IRender_Sector* start, CFrustum& F, Fvector& vBa
     }
 }
 
-void CPortalTraverser::fade_portal(CPortal* _p, float ssa)
-{
-    f_portals.push_back(mk_pair(_p, ssa));
-}
+void CPortalTraverser::fade_portal(CPortal* _p, float ssa) { f_portals.push_back(mk_pair(_p, ssa)); }
 void CPortalTraverser::initialize()
 {
     f_shader.create("portal");
@@ -73,13 +68,14 @@ ICF bool psort_pred(const std::pair<CPortal*, float>& _1, const std::pair<CPorta
 {
     float d1 = PortalTraverser.i_vBase.distance_to_sqr(_1.first->S.P);
     float d2 = PortalTraverser.i_vBase.distance_to_sqr(_2.first->S.P);
-    return d2 > d1;  // descending, back to front
+    return d2 > d1; // descending, back to front
 }
 extern float r_ssaDISCARD;
 extern float r_ssaLOD_A, r_ssaLOD_B;
 void CPortalTraverser::fade_render()
 {
-    if (f_portals.empty()) return;
+    if (f_portals.empty())
+        return;
 
     // re-sort, back to front
     std::sort(f_portals.begin(), f_portals.end(), psort_pred);

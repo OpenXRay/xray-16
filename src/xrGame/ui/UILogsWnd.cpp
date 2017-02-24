@@ -50,7 +50,8 @@ CUILogsWnd::~CUILogsWnd()
 void CUILogsWnd::Show(bool status)
 {
     m_ctrl_press = false;
-    if (status) {
+    if (status)
+    {
         // ALife::_TIME_ID	current_period = m_selected_period;
         //		m_actor_ch_info->InitCharacter( Actor()->object_id() );
         m_selected_period = GetShiftPeriod(Level().GetGameTime(), 0);
@@ -65,9 +66,11 @@ void CUILogsWnd::Show(bool status)
 void CUILogsWnd::Update()
 {
     inherited::Update();
-    if (m_need_reload) ReLoadNews();
+    if (m_need_reload)
+        ReLoadNews();
 
-    if (!m_items_ready.empty()) {
+    if (!m_items_ready.empty())
+    {
         WINDOW_LIST::reverse_iterator it = m_items_ready.rbegin();
         WINDOW_LIST::reverse_iterator it_e = m_items_ready.rend();
         for (; it != it_e; ++it)
@@ -152,7 +155,8 @@ extern CActor* g_actor;
 void CUILogsWnd::ReLoadNews()
 {
     m_news_in_queue.clear();
-    if (!g_actor) {
+    if (!g_actor)
+    {
         m_need_reload = false;
         return;
     }
@@ -179,25 +183,29 @@ void CUILogsWnd::ReLoadNews()
     {
         bool add = false;
         GAME_NEWS_DATA& gn = (*ib);
-        if (gn.m_type == GAME_NEWS_DATA::eNews && filter_news) {
+        if (gn.m_type == GAME_NEWS_DATA::eNews && filter_news)
+        {
             add = true;
         }
         else if (gn.m_type == GAME_NEWS_DATA::eTalk && filter_talk)
         {
             add = true;
         }
-        if (gn.receive_time < m_selected_period || end_period < gn.receive_time) {
+        if (gn.receive_time < m_selected_period || end_period < gn.receive_time)
+        {
             add = false;
         }
 
-        if (add) {
+        if (add)
+        {
             m_news_in_queue.push_back(idx);
             //			++currentNews;
         }
     }
     m_need_reload = false;
 
-    if (!m_list->Empty()) {
+    if (!m_list->Empty())
+    {
         m_items_cache.insert(m_items_cache.end(), m_list->Items().begin(), m_list->Items().end());
         m_list->Items().clear();
 
@@ -208,7 +216,8 @@ void CUILogsWnd::ReLoadNews()
 
 void CUILogsWnd::PerformWork()
 {
-    if (!m_news_in_queue.empty()) {
+    if (!m_news_in_queue.empty())
+    {
         u32 count = _min(30, m_news_in_queue.size());
         for (u32 i = 0; i < count; ++i)
         {
@@ -240,7 +249,8 @@ CUIWindow* CUILogsWnd::CreateItem()
 CUIWindow* CUILogsWnd::ItemFromCache()
 {
     CUIWindow* itm_res;
-    if (m_items_cache.empty()) {
+    if (m_items_cache.empty())
+    {
         itm_res = CreateItem();
     }
     else
@@ -260,30 +270,30 @@ void CUILogsWnd::AddNewsItem(GAME_NEWS_DATA& news_data)
     m_items_ready.push_back(news_itm);
 }
 
-void CUILogsWnd::UpdateChecks(CUIWindow* w, void* d)
-{
-    m_need_reload = true;
-}
-
+void CUILogsWnd::UpdateChecks(CUIWindow* w, void* d) { m_need_reload = true; }
 void CUILogsWnd::PrevPeriod(CUIWindow* w, void* d)
 {
     ALife::_TIME_ID current_period = m_selected_period;
     m_selected_period = GetShiftPeriod(m_selected_period, -1);
-    if (m_selected_period < m_start_game_time) {
+    if (m_selected_period < m_start_game_time)
+    {
         m_selected_period = m_start_game_time;
     }
-    if (current_period != m_selected_period) m_need_reload = true;
+    if (current_period != m_selected_period)
+        m_need_reload = true;
 }
 
 void CUILogsWnd::NextPeriod(CUIWindow* w, void* d)
 {
     ALife::_TIME_ID current_period = m_selected_period;
-    m_selected_period = GetShiftPeriod(m_selected_period, 1);  // +1
+    m_selected_period = GetShiftPeriod(m_selected_period, 1); // +1
     ALife::_TIME_ID game_time = GetShiftPeriod(Level().GetGameTime(), 0);
-    if (m_selected_period > game_time) {
+    if (m_selected_period > game_time)
+    {
         m_selected_period = game_time;
     }
-    if (current_period != m_selected_period) m_need_reload = true;
+    if (current_period != m_selected_period)
+        m_need_reload = true;
 }
 
 ALife::_TIME_ID CUILogsWnd::GetShiftPeriod(ALife::_TIME_ID datetime, int shift_day)
@@ -295,7 +305,8 @@ ALife::_TIME_ID CUILogsWnd::GetShiftPeriod(ALife::_TIME_ID datetime, int shift_d
 
 bool CUILogsWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (keyboard_action == WINDOW_KEY_PRESSED) {
+    if (keyboard_action == WINDOW_KEY_PRESSED)
+    {
         switch (dik)
         {
         case DIK_UP:
@@ -361,7 +372,8 @@ void CUILogsWnd::on_scroll_keys(int dik)
     }
     case DIK_PRIOR:
     {
-        if (m_ctrl_press) {
+        if (m_ctrl_press)
+        {
             m_list->ScrollToBegin();
             break;
         }
@@ -370,12 +382,13 @@ void CUILogsWnd::on_scroll_keys(int dik)
     }
     case DIK_NEXT:
     {
-        if (m_ctrl_press) {
+        if (m_ctrl_press)
+        {
             m_list->ScrollToEnd();
             break;
         }
         m_list->ScrollBar()->TryScrollInc();
         break;
     }
-    }  // switch
+    } // switch
 }

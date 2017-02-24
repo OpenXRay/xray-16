@@ -24,7 +24,8 @@ PropertyDescriptorCollection ^ property_container_converter::GetProperties(
     PropertyDescriptorCollection ^ current = TypeDescriptor::GetProperties(value, attributes);
     VERIFY(current);
     property_container ^ container = dynamic_cast<property_container ^>(context->Instance);
-    if (container) {
+    if (container)
+    {
         ArrayList % properties = container->ordered_properties();
         ArrayList ^ names = gcnew ArrayList();
         for
@@ -46,14 +47,11 @@ PropertyDescriptorCollection ^ property_container_converter::GetProperties(
     return (current->Sort(reinterpret_cast<array<String ^> ^>(names->ToArray(String::typeid))));
 }
 
-bool property_container_converter::GetPropertiesSupported(ITypeDescriptorContext ^ context)
-{
-    return (true);
-}
-
+bool property_container_converter::GetPropertiesSupported(ITypeDescriptorContext ^ context) { return (true); }
 bool property_container_converter::CanConvertTo(ITypeDescriptorContext ^ context, Type ^ destination_type)
 {
-    if (destination_type == property_container::typeid) return (true);
+    if (destination_type == property_container::typeid)
+        return (true);
 
     return (inherited::CanConvertTo(context, destination_type));
 }
@@ -61,7 +59,8 @@ bool property_container_converter::CanConvertTo(ITypeDescriptorContext ^ context
 Object ^ property_container_converter::ConvertTo(
              ITypeDescriptorContext ^ context, CultureInfo ^ culture, Object ^ value, Type ^ destination_type)
 {
-    if (destination_type != String::typeid) return (inherited::ConvertTo(context, culture, value, destination_type));
+    if (destination_type != String::typeid)
+        return (inherited::ConvertTo(context, culture, value, destination_type));
 
     return ("...");
 }

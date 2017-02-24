@@ -12,11 +12,11 @@ using namespace XRay::Math;
 
 const float S_distance = 48;
 const float S_distance2 = S_distance * S_distance;
-const float S_ideal_size = 4.f;  // ideal size for the object
+const float S_ideal_size = 4.f; // ideal size for the object
 const float S_fade = 4.5;
 const float S_fade2 = S_fade * S_fade;
 
-const float S_level = .05f;  // clip by energy level
+const float S_level = .05f; // clip by energy level
 const int S_size = 85;
 const int S_rt_size = 512;
 const int batch_size = 256;
@@ -26,7 +26,7 @@ const int S_clip = 256 - 8;
 const D3DFORMAT S_rtf = D3DFMT_A8R8G8B8;
 const float S_blur_kernel = 0.75f;
 
-const u32 cache_old = 30 * 1000;  // 30 secs
+const u32 cache_old = 30 * 1000; // 30 secs
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -110,7 +110,8 @@ void CLightShadows::set_object(IRenderable* O)
         else
             current = 0;
 
-        if (current) {
+        if (current)
+        {
             ((CROS_impl*)O->renderable_ROS())->shadow_gen_frame = Device.dwFrame;
 
             // alloc
@@ -135,9 +136,11 @@ void CLightShadows::set_object(IRenderable* O)
 
 void CLightShadows::add_element(NODE& N)
 {
-    if (0 == current) return;
+    if (0 == current)
+        return;
     VERIFY2(casters.back()->nodes.size() < 24, "Object exceeds limit of 24 renderable parts/materials");
-    if (0 == N.pVisual->shader->E[SE_R1_LMODELS]._get()) return;
+    if (0 == N.pVisual->shader->E[SE_R1_LMODELS]._get())
+        return;
     casters.back()->nodes.push_back(N);
 }
 
@@ -146,9 +149,10 @@ void CLightShadows::calculate()
 {
 #ifdef _GPA_ENABLED
     TAL_SCOPED_TASK_NAMED("CLightShadows::calculate()");
-#endif  // _GPA_ENABLED
+#endif // _GPA_ENABLED
 
-    if (casters.empty()) return;
+    if (casters.empty())
+        return;
 
     BOOL bRTS = FALSE;
     HW.pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
@@ -161,7 +165,8 @@ void CLightShadows::calculate()
     for (u32 o_it = 0; o_it < casters.size(); o_it++)
     {
         caster& C = *casters[o_it];
-        if (C.nodes.empty()) continue;
+        if (C.nodes.empty())
+            continue;
 
         // Select lights and calc importance
         CROS_impl* LT = (CROS_impl*)C.O->renderable_ROS();
@@ -171,12 +176,14 @@ void CLightShadows::calculate()
         for (u32 l_it = 0; (l_it < lights.size()) && (slot_id < slot_max); l_it++)
         {
             CROS_impl::Light& L = lights[l_it];
-            if (L.energy < S_level) continue;
+            if (L.energy < S_level)
+                continue;
 
             // Msg	("~ light: %d",l_it);
 
             // setup rt+state(s) for first use
-            if (!bRTS) {
+            if (!bRTS)
+            {
                 bRTS = TRUE;
                 RCache.set_RT(RT_temp->pRT);
                 RCache.set_ZB(RImplementation.Target->pTempZB);
@@ -188,7 +195,8 @@ void CLightShadows::calculate()
             float Lrange = L.source->range;
             // Log	("* l-pos:",Lpos);
             // Msg	("* l-range: %f",Lrange);
-            if (L.source->flags.type == IRender_Light::DIRECT) {
+            if (L.source->flags.type == IRender_Light::DIRECT)
+            {
                 // Msg		(" -direct- : %f",L.energy);
                 Lpos.mul(L.source->direction, -100);
                 Lpos.add(C.C);
@@ -203,12 +211,14 @@ void CLightShadows::calculate()
                 {
                     _dist = C.C.distance_to(Lpos);
                     // Msg		("* o-dist: %f",	_dist);
-                    if (_dist > EPS_L) break;
-                    Lpos.y += .01f;  //. hack to avoid light-in-the-center-of-object
+                    if (_dist > EPS_L)
+                        break;
+                    Lpos.y += .01f; //. hack to avoid light-in-the-center-of-object
                 }
                 float _R = C.O->GetRenderData().visual->getVisData().sphere.R + 0.1f;
                 // Msg	("* o-r: %f",_R);
-                if (_dist < _R) {
+                if (_dist < _R)
+                {
                     Fvector Ldir;
                     Ldir.sub(C.C, Lpos);
                     Ldir.normalize();
@@ -227,12 +237,17 @@ void CLightShadows::calculate()
             // float		p_nearR	=	C.C.distance_to(L.source->position) + p_R*0.85f + eps;
             //			p_nearR =	p_near;
             float p_far = _min(Lrange, _max(p_dist + S_fade, p_dist + p_R));
-            if (p_near < eps) continue;
-            if (p_far < (p_near + eps)) continue;
+            if (p_near < eps)
+                continue;
+            if (p_far < (p_near + eps))
+                continue;
             //	Igor: make check here instead of assertion in buil_projection_hat
-            if (!(_abs(p_far - p_near) > eps)) continue;
-            if (p_hat > 0.9f) continue;
-            if (p_hat < 0.01f) continue;
+            if (!(_abs(p_far - p_near) > eps))
+                continue;
+            if (p_hat > 0.9f)
+                continue;
+            if (p_hat < 0.01f)
+                continue;
 
             // Msg			("* near(%f), near-x(%f)",p_near,p_nearR);
 
@@ -300,7 +315,8 @@ void CLightShadows::calculate()
     casters.clear();
 
     // Blur
-    if (bRTS) {
+    if (bRTS)
+    {
         // Fill VB
         u32 Offset;
         FVF::TL4uv* pv = (FVF::TL4uv*)RCache.Vertex.Lock(4, geom_Blur.stride(), Offset);
@@ -326,34 +342,42 @@ void CLightShadows::calculate()
 
 IC bool cache_search(const CLightShadows::cache_item& A, const CLightShadows::cache_item& B)
 {
-    if (A.O < B.O) return true;
-    if (A.O > B.O) return false;
-    if (A.L < B.L) return true;
-    if (A.L > B.L) return false;
-    return false;  // eq
+    if (A.O < B.O)
+        return true;
+    if (A.O > B.O)
+        return false;
+    if (A.L < B.L)
+        return true;
+    if (A.L > B.L)
+        return false;
+    return false; // eq
 }
 
 IC float PLC_energy(Fvector& P, Fvector& N, light* L, float E)
 {
     Fvector Ldir;
-    if (L->flags.type == IRender_Light::DIRECT) {
+    if (L->flags.type == IRender_Light::DIRECT)
+    {
         // Cos
         Ldir.invert(L->direction);
         float D = Ldir.dotproduct(N);
-        if (D <= 0) return 0;
+        if (D <= 0)
+            return 0;
         return E;
     }
     else
     {
         // Distance
         float sqD = P.distance_to_sqr(L->position);
-        if (sqD > (L->range * L->range)) return 0;
+        if (sqD > (L->range * L->range))
+            return 0;
 
         // Dir
         Ldir.sub(L->position, P);
         Ldir.normalize_safe();
         float D = Ldir.dotproduct(N);
-        if (D <= 0) return 0;
+        if (D <= 0)
+            return 0;
 
         // Trace Light
         float R = _sqrt(sqD);
@@ -426,14 +450,16 @@ void CLightShadows::render()
         CI_what.L = S.L;
         CI_what.tris = 0;
         xr_vector<cache_item>::iterator CI_ptr = std::lower_bound(cache.begin(), cache.end(), CI_what, cache_search);
-        if (CI_ptr == cache.end()) {  // empty ?
+        if (CI_ptr == cache.end())
+        { // empty ?
             CI_ptr = cache.insert(CI_ptr, CI_what);
             CI = &*CI_ptr;
             bValid = FALSE;
         }
         else
         {
-            if (CI_ptr->O != CI_what.O || CI_ptr->L != CI_what.L) {  // we found something different
+            if (CI_ptr->O != CI_what.O || CI_ptr->L != CI_what.L)
+            { // we found something different
                 CI_ptr = cache.insert(CI_ptr, CI_what);
                 CI = &*CI_ptr;
                 bValid = FALSE;
@@ -449,9 +475,10 @@ void CLightShadows::render()
                     bValid = FALSE;
             }
         }
-        CI->time = Device.dwTimeGlobal;  // acess time
+        CI->time = Device.dwTimeGlobal; // acess time
 
-        if (!bValid) {
+        if (!bValid)
+        {
             // Frustum
             CFrustum F;
             F.CreateFromMatrix(S.M, FRUSTUM_P_ALL);
@@ -459,7 +486,8 @@ void CLightShadows::render()
             // Query
             xrc.frustum_options(0);
             xrc.frustum_query(DB, F);
-            if (0 == xrc.r_count()) continue;
+            if (0 == xrc.r_count())
+                continue;
 
             // Clip polys by frustum
             tess.clear();
@@ -468,7 +496,8 @@ void CLightShadows::render()
                 VERIFY((p->id >= 0) && (p->id < DB->get_tris_count()));
                 //
                 CDB::TRI& t = TRIS[p->id];
-                if (t.suppress_shadows) continue;
+                if (t.suppress_shadows)
+                    continue;
                 sPoly A, B;
                 A.push_back(VERTS[t.verts[0]]);
                 A.push_back(VERTS[t.verts[1]]);
@@ -482,15 +511,18 @@ void CLightShadows::render()
                 t2.sub(A[0], A[2]);
                 n.crossproduct(t1, t2);
                 mag = n.square_magnitude();
-                if (mag < EPS_S) continue;
+                if (mag < EPS_S)
+                    continue;
                 n.mul(1.f / _sqrt(mag));
                 P.build_unit_normal(A[0], n);
                 float DOT_Fade = P.classify(S.L->position);
-                if (DOT_Fade < 0) continue;
+                if (DOT_Fade < 0)
+                    continue;
 
                 // Clip polygon
                 sPoly* clip = F.ClipPoly(A, B);
-                if (0 == clip) continue;
+                if (0 == clip)
+                    continue;
 
                 // Triangulate poly
                 for (u32 v = 2; v < clip->size(); v++)
@@ -513,7 +545,8 @@ void CLightShadows::render()
             // Msg						("---free--- %x",u32(CI->tris));
             xr_free(CI->tris);
             VERIFY(0 == CI->tris);
-            if (tess.size()) {
+            if (tess.size())
+            {
                 CI->tris = xr_alloc<tess_tri>(CI->tcnt);
                 // Msg					("---alloc--- %x",u32(CI->tris));
                 CopyMemory(CI->tris, &*tess.begin(), CI->tcnt * sizeof(tess_tri));
@@ -529,7 +562,8 @@ void CLightShadows::render()
             Fplane ttp;
             ttp.build_unit_normal(v[0], TT.N);
 
-            if (ttp.classify(View) < 0) continue;
+            if (ttp.classify(View) < 0)
+                continue;
             /*
             int	c0		= PLC_calc(v[0],TT.N,S.L,Le,S.C);
             int	c1		= PLC_calc(v[1],TT.N,S.L,Le,S.C);
@@ -539,7 +573,8 @@ void CLightShadows::render()
 
             PLCCalc(c0, c1, c2, Device.vCameraPosition, v, TT.N, S.L, Le, S.C);
 
-            if (c0 > S_clip && c1 > S_clip && c2 > S_clip) continue;
+            if (c0 > S_clip && c1 > S_clip && c2 > S_clip)
+                continue;
             clamp(c0, S_ambient, 255);
             clamp(c1, S_ambient, 255);
             clamp(c2, S_ambient, 255);
@@ -555,7 +590,8 @@ void CLightShadows::render()
             pv++;
 
             batch++;
-            if (batch == batch_size) {
+            if (batch == batch_size)
+            {
                 // Flush
                 RCache.Vertex.Unlock(batch * 3, geom_World->vb_stride);
                 RCache.Render(D3DPT_TRIANGLELIST, Offset, batch);
@@ -568,7 +604,8 @@ void CLightShadows::render()
 
     // Flush if nessesary
     RCache.Vertex.Unlock(batch * 3, geom_World->vb_stride);
-    if (batch) {
+    if (batch)
+    {
         RCache.Render(D3DPT_TRIANGLELIST, Offset, batch);
     }
 
@@ -578,7 +615,8 @@ void CLightShadows::render()
     {
         cache_item& ci = cache[cit];
         u32 time = Device.dwTimeGlobal - ci.time;
-        if (time > cache_old) {
+        if (time > cache_old)
+        {
             // Msg			("---free--- %x",u32(ci.tris));
             xr_free(ci.tris);
             VERIFY(0 == ci.tris);

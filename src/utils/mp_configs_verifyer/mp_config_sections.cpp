@@ -31,18 +31,12 @@ mp_config_sections::mp_config_sections() : m_tmp_dumper(NULL, FALSE, FALSE, FALS
     m_current_dump_sect = m_mp_sections.end();
 }
 
-mp_config_sections::~mp_config_sections()
-{
-}
-
-void mp_config_sections::start_dump()
-{
-    m_current_dump_sect = m_mp_sections.begin();
-}
-
+mp_config_sections::~mp_config_sections() {}
+void mp_config_sections::start_dump() { m_current_dump_sect = m_mp_sections.begin(); }
 bool mp_config_sections::dump_one(CMemoryWriter& dest)
 {
-    if (m_current_dump_sect == m_mp_sections.end()) return false;
+    if (m_current_dump_sect == m_mp_sections.end())
+        return false;
 
     R_ASSERT(pSettings->section_exist(m_current_dump_sect->c_str()));
     CInifile::Sect& tmp_sect = pSettings->r_section(m_current_dump_sect->c_str());
@@ -56,14 +50,8 @@ bool mp_config_sections::dump_one(CMemoryWriter& dest)
 
 // mp_active_params
 
-mp_active_params::mp_active_params()
-{
-}
-
-mp_active_params::~mp_active_params()
-{
-}
-
+mp_active_params::mp_active_params() {}
+mp_active_params::~mp_active_params() {}
 char const* active_params_section = "active_params_section";
 
 /*void mp_active_params::dump	(IAnticheatDumpable const * dumpable_obj, LPCSTR sect_name_key, CInifile & dest_dumper)
@@ -91,7 +79,8 @@ char const* active_params_section = "active_params_section";
 
 void mp_active_params::load_to(LPCSTR sect_name, CInifile& dest_dumper)
 {
-    if (!pSettings->section_exist(sect_name)) return;
+    if (!pSettings->section_exist(sect_name))
+        return;
 
     u32 lines_count = pSettings->line_count(sect_name);
     for (u32 i = 0; i < lines_count; ++i)
@@ -103,4 +92,4 @@ void mp_active_params::load_to(LPCSTR sect_name, CInifile& dest_dumper)
     }
 }
 
-}  // namespace mp_anticheat
+} // namespace mp_anticheat

@@ -28,7 +28,6 @@ public:
 
     void update();
     IC bool is_enabled() { return !!flags.test(fl_use_death_motion); }
-
     void play();
 
 private:
@@ -54,7 +53,8 @@ protected:
 
 IC void destroy(interactive_motion*& im)
 {
-    if (!im) return;
+    if (!im)
+        return;
     im->destroy();
     xr_delete(im);
 }

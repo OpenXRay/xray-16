@@ -99,11 +99,8 @@ public:
     IC float GetRadiation() const { return m_fRadiation; }
     IC float GetPsyHealth() const { return m_fPsyHealth; }
     IC float GetSatiety() const { return 1.0f; }
-
     IC float GetEntityMorale() const { return m_fEntityMorale; }
-
     IC float GetHealthLost() const { return m_fHealthLost; }
-
     virtual bool IsLimping() const;
 
     virtual void ChangeSatiety(const float value){};
@@ -120,7 +117,6 @@ public:
         clamp(m_fPowerMax, 0.1f, 1.0f);
     };
     IC float GetMaxPower() const { return m_fPowerMax; };
-
     void ChangeBleeding(const float percent);
 
     void ChangeCircumspection(const float value);
@@ -132,13 +128,11 @@ public:
     void UpdateWounds();
     void UpdateConditionTime();
     IC void SetConditionDeltaTime(float DeltaTime) { m_fDeltaTime = DeltaTime; };
-
     //скорость потери крови из всех открытых ран
     float BleedingSpeed();
 
     IGameObject* GetWhoHitLastTime() { return m_pWho; }
     u16 GetWhoHitLastTimeID() { return m_iWhoID; }
-
     CWound* AddWound(float hit_power, ALife::EHitType hit_type, u16 element);
 
     IC void SetCanBeHarmedState(bool CanBeHarmed) { m_bCanBeHarmed = CanBeHarmed; }
@@ -148,7 +142,6 @@ public:
     void ClearWounds();
 
     IC float GetBoostRadiationImmunity() const { return m_fBoostRadiationImmunity; };
-
     typedef xr_map<EBoostParams, SBooster> BOOSTER_MAP;
 
 protected:
@@ -173,10 +166,10 @@ protected:
     //очистка массива ран
 
     //все величины от 0 до 1
-    float m_fPower;         //сила
-    float m_fRadiation;     //доза радиактивного облучения
-    float m_fPsyHealth;     //здоровье
-    float m_fEntityMorale;  //мораль
+    float m_fPower; //сила
+    float m_fRadiation; //доза радиактивного облучения
+    float m_fPsyHealth; //здоровье
+    float m_fEntityMorale; //мораль
 
     //максимальные величины
     //	float m_fSatietyMax;
@@ -211,7 +204,7 @@ protected:
     SConditionChangeV m_change_v;
 
     float m_fMinWoundSize;
-    bool m_bIsBleeding;  //есть кровотечение
+    bool m_bIsBleeding; //есть кровотечение
 
     //части хита, затрачиваемые на уменьшение здоровья и силы
     float m_fHealthHitPart;

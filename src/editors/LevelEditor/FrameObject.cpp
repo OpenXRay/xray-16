@@ -44,43 +44,28 @@ void __fastcall TfraObject::OnItemFocused(ListItemsVec& items)
 }
 
 //------------------------------------------------------------------------------
-void __fastcall TfraObject::PaneMinClick(TObject* Sender)
-{
-    PanelMinMaxClick(Sender);
-}
-
+void __fastcall TfraObject::PaneMinClick(TObject* Sender) { PanelMinMaxClick(Sender); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraObject::ExpandClick(TObject* Sender)
-{
-    PanelMaximizeClick(Sender);
-}
-
+void __fastcall TfraObject::ExpandClick(TObject* Sender) { PanelMaximizeClick(Sender); }
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 // Selecting
 //---------------------------------------------------------------------------
 
-void __fastcall TfraObject::ebSelectByRefsClick(TObject* Sender)
-{
-    SelByRefObject(true);
-}
-
+void __fastcall TfraObject::ebSelectByRefsClick(TObject* Sender) { SelByRefObject(true); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraObject::ebDeselectByRefsClick(TObject* Sender)
-{
-    SelByRefObject(false);
-}
-
+void __fastcall TfraObject::ebDeselectByRefsClick(TObject* Sender) { SelByRefObject(false); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfraObject::MultiSelByRefObject(bool clear_prev)
 {
     ObjectList objlist;
     LPU32Vec sellist;
-    if (Scene->GetQueryObjects(objlist, OBJCLASS_SCENEOBJECT, 1, 1, -1)) {
+    if (Scene->GetQueryObjects(objlist, OBJCLASS_SCENEOBJECT, 1, 1, -1))
+    {
         for (ObjectIt it = objlist.begin(); it != objlist.end(); it++)
         {
             LPCSTR N = ((CSceneObject*)*it)->RefName();
@@ -89,14 +74,17 @@ void __fastcall TfraObject::MultiSelByRefObject(bool clear_prev)
             for (; _F != _E; _F++)
             {
                 CSceneObject* _O = (CSceneObject*)(*_F);
-                if ((*_F)->Visible() && _O->RefCompare(N)) {
-                    if (clear_prev) {
+                if ((*_F)->Visible() && _O->RefCompare(N))
+                {
+                    if (clear_prev)
+                    {
                         _O->Select(false);
                         sellist.push_back((u32*)_O);
                     }
                     else
                     {
-                        if (!_O->Selected()) sellist.push_back((u32*)_O);
+                        if (!_O->Selected())
+                            sellist.push_back((u32*)_O);
                     }
                 }
             }
@@ -124,14 +112,17 @@ void TfraObject::SelByRefObject(bool flag)
     //        sel_name = ((CSceneObject*)objlist.front())->GetRefName();
     LPCSTR N = Current();
     //    if (!TfrmChoseItem::SelectItem(TfrmChoseItem::smObject,N,1,sel_name)) return;
-    if (N) {
+    if (N)
+    {
         ObjectIt _F = Scene->FirstObj(OBJCLASS_SCENEOBJECT);
         ObjectIt _E = Scene->LastObj(OBJCLASS_SCENEOBJECT);
         for (; _F != _E; _F++)
         {
-            if ((*_F)->Visible()) {
+            if ((*_F)->Visible())
+            {
                 CSceneObject* _O = (CSceneObject*)(*_F);
-                if (_O->RefCompare(N)) _O->Select(flag);
+                if (_O->RefCompare(N))
+                    _O->Select(flag);
             }
         }
     }
@@ -142,7 +133,8 @@ void TfraObject::SelByRefObject(bool flag)
 void __fastcall TfraObject::ebMultiAppendClick(TObject* Sender)
 {
     LPCSTR N;
-    if (TfrmChoseItem::SelectItem(smObject, N, 32, 0)) {
+    if (TfrmChoseItem::SelectItem(smObject, N, 32, 0))
+    {
         Fvector pos = {0.f, 0.f, 0.f};
         Fvector up = {0.f, 1.f, 0.f};
         Scene->SelectObjects(false, OBJCLASS_SCENEOBJECT);
@@ -155,7 +147,8 @@ void __fastcall TfraObject::ebMultiAppendClick(TObject* Sender)
             Scene->GenObjectName(OBJCLASS_SCENEOBJECT, namebuffer, it->c_str());
             CSceneObject* obj = new CSceneObject((LPVOID)0, namebuffer);
             CEditableObject* ref = obj->SetReference(it->c_str());
-            if (!ref) {
+            if (!ref)
+            {
                 ELog.DlgMsg(mtError, "TfraObject:: Can't load reference object.");
                 xr_delete(obj);
                 return;
@@ -175,30 +168,24 @@ void __fastcall TfraObject::ebMultiAppendClick(TObject* Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraObject::ebMultiSelectByRefMoveClick(TObject* Sender)
-{
-    MultiSelByRefObject(true);
-}
-
+void __fastcall TfraObject::ebMultiSelectByRefMoveClick(TObject* Sender) { MultiSelByRefObject(true); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraObject::ebMultiSelectByRefAppendClick(TObject* Sender)
-{
-    MultiSelByRefObject(false);
-}
-
+void __fastcall TfraObject::ebMultiSelectByRefAppendClick(TObject* Sender) { MultiSelByRefObject(false); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfraObject::seSelPercentKeyPress(TObject* Sender, char& Key)
 {
-    if (Key == VK_RETURN) ExecCommand(COMMAND_RENDER_FOCUS);
+    if (Key == VK_RETURN)
+        ExecCommand(COMMAND_RENDER_FOCUS);
 }
 
 //---------------------------------------------------------------------------
 
 void __fastcall TfraObject::ExtBtn4Click(TObject* Sender)
 {
-    if (TfrmChoseItem::SelectItem(smObject, m_Current, 1, m_Current)) {
+    if (TfrmChoseItem::SelectItem(smObject, m_Current, 1, m_Current))
+    {
         m_Items->SelectItem(m_Current, true, false, true);
         //..		RefreshList		();
     }
@@ -208,7 +195,8 @@ void __fastcall TfraObject::ExtBtn4Click(TObject* Sender)
 
 void __fastcall TfraObject::paCurrentObjectResize(TObject* Sender)
 {
-    if (m_Current) m_Items->SelectItem(m_Current, true, false, true);
+    if (m_Current)
+        m_Items->SelectItem(m_Current, true, false, true);
 }
 
 //---------------------------------------------------------------------------
@@ -217,7 +205,8 @@ void TfraObject::RefreshList()
 {
     ListItemsVec items;
     FS_FileSet lst;
-    if (Lib.GetObjects(lst)) {
+    if (Lib.GetObjects(lst))
+    {
         FS_FileSetIt it = lst.begin();
         FS_FileSetIt _E = lst.end();
         for (; it != _E; it++)
@@ -263,11 +252,7 @@ void __fastcall TfraObject::FormCreate(TObject* Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraObject::FormDestroy(TObject* Sender)
-{
-    TItemList::DestroyForm(m_Items);
-}
-
+void __fastcall TfraObject::FormDestroy(TObject* Sender) { TItemList::DestroyForm(m_Items); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfraObject::ebRandomAppendModeClick(TObject* Sender)
@@ -277,16 +262,8 @@ void __fastcall TfraObject::ebRandomAppendModeClick(TObject* Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraObject::ExtBtn8Click(TObject* Sender)
-{
-    ParentTools->FillAppendRandomProperties();
-}
-
+void __fastcall TfraObject::ExtBtn8Click(TObject* Sender) { ParentTools->FillAppendRandomProperties(); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraObject::ExtBtn9Click(TObject* Sender)
-{
-    RefreshList();
-}
-
+void __fastcall TfraObject::ExtBtn9Click(TObject* Sender) { RefreshList(); }
 //---------------------------------------------------------------------------

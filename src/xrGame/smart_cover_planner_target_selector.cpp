@@ -39,11 +39,7 @@ void target_selector::setup(animation_planner* object, CPropertyStorage* storage
     set_target_state(target);
 }
 
-void target_selector::callback(callback_type const& callback)
-{
-    m_script_callback = callback;
-}
-
+void target_selector::callback(callback_type const& callback) { m_script_callback = callback; }
 void target_selector::update()
 {
     //. think about this line
@@ -126,7 +122,4 @@ void target_selector::add_actions()
     add_operator(eWorldOperatorLoopholeTargetDefaultBehaviour, action);
 }
 
-LPCSTR target_selector::object_name() const
-{
-    return ("target_selector");
-}
+LPCSTR target_selector::object_name() const { return ("target_selector"); }

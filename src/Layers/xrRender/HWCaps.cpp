@@ -26,14 +26,16 @@ u32 GetNVGpuNum()
     NvAPI_Status status;
     status = NvAPI_Initialize();
 
-    if (status != NVAPI_OK) {
+    if (status != NVAPI_OK)
+    {
         Msg("* NVAPI is missing.");
         return iGpuNum;
     }
 
     // enumerate logical gpus
     status = NvAPI_EnumLogicalGPUs(logicalGPUs, &logicalGPUCount);
-    if (status != NVAPI_OK) {
+    if (status != NVAPI_OK)
+    {
         Msg("* NvAPI_EnumLogicalGPUs failed!");
         return iGpuNum;
         // error
@@ -41,7 +43,8 @@ u32 GetNVGpuNum()
 
     // enumerate physical gpus
     status = NvAPI_EnumPhysicalGPUs(physicalGPUs, &physicalGPUCount);
-    if (status != NVAPI_OK) {
+    if (status != NVAPI_OK)
+    {
         Msg("* NvAPI_EnumPhysicalGPUs failed!");
         return iGpuNum;
         // error
@@ -53,10 +56,12 @@ u32 GetNVGpuNum()
     for (u32 i = 0; i < logicalGPUCount; ++i)
     {
         status = NvAPI_GetPhysicalGPUsFromLogicalGPU(logicalGPUs[i], physicalGPUs, &physicalGPUCount);
-        if (status == NVAPI_OK) iGpuNum = _max(iGpuNum, physicalGPUCount);
+        if (status == NVAPI_OK)
+            iGpuNum = _max(iGpuNum, physicalGPUCount);
     }
 
-    if (iGpuNum > 1) {
+    if (iGpuNum > 1)
+    {
         Msg("* NVidia MGPU: %d-Way SLI detected.", iGpuNum);
     }
 
@@ -68,13 +73,15 @@ u32 GetATIGpuNum()
     AGSContext* ags = nullptr;
     AGSGPUInfo gpuInfo = {};
     AGSReturnCode status = agsInit(&ags, &gpuInfo);
-    if (status != AGS_SUCCESS) {
+    if (status != AGS_SUCCESS)
+    {
         Msg("! AGS: Initialization failed (%d)", status);
         return 1;
     }
     int crossfireGpuCount = 1;
     status = agsGetCrossfireGPUCount(ags, &crossfireGpuCount);
-    if (status != AGS_SUCCESS) {
+    if (status != AGS_SUCCESS)
+    {
         Msg("! AGS: Unable to get CrossFire GPU count (%d)", status);
         agsDeInit(ags);
         return 1;
@@ -103,10 +110,7 @@ u32 GetGpuNum()
     return res;
 }
 #else
-u32 GetGpuNum()
-{
-    return 1;
-}
+u32 GetGpuNum() { return 1; }
 #endif
 }
 
@@ -134,7 +138,7 @@ void CHWCaps::Update()
     raster_minor = u16(u32(u32(caps.PixelShaderVersion) & u32(0xf)));
     raster.dwStages = caps.MaxSimultaneousTextures;
     raster.bNonPow2 = ((caps.TextureCaps & D3DPTEXTURECAPS_NONPOW2CONDITIONAL) != 0) ||
-                      ((caps.TextureCaps & D3DPTEXTURECAPS_POW2) == 0);
+        ((caps.TextureCaps & D3DPTEXTURECAPS_POW2) == 0);
     raster.bCubemap = (caps.TextureCaps & D3DPTEXTURECAPS_CUBEMAP) != 0;
     raster.dwMRT_count = (caps.NumSimultaneousRTs);
     raster.b_MRT_mixdepth = (caps.PrimitiveMiscCaps & D3DPMISCCAPS_MRTINDEPENDENTBITDEPTHS) != 0;
@@ -149,7 +153,8 @@ void CHWCaps::Update()
     ID3DQuery* q_vc;
     D3DDEVINFO_VCACHE vc;
     HRESULT _hr = HW.pDevice->CreateQuery(D3DQUERYTYPE_VCACHE, &q_vc);
-    if (FAILED(_hr)) {
+    if (FAILED(_hr))
+    {
         vc.OptMethod = 0;
         vc.CacheSize = 16;
         geometry.dwVertexCache = 16;
@@ -167,13 +172,14 @@ void CHWCaps::Update()
     Msg("* GPU vertex cache: %s, %d", (1 == vc.OptMethod) ? "recognized" : "unrecognized", u32(geometry.dwVertexCache));
 
     // *******1********** Compatibility : vertex shader
-    if (0 == raster_major) geometry_major = 0;  // Disable VS if no PS
+    if (0 == raster_major)
+        geometry_major = 0; // Disable VS if no PS
 #ifdef _EDITOR
     geometry_major = 0;
 #endif
 
     //
-    bTableFog = FALSE;  // BOOL	(caps.RasterCaps&D3DPRASTERCAPS_FOGTABLE);
+    bTableFog = FALSE; // BOOL	(caps.RasterCaps&D3DPRASTERCAPS_FOGTABLE);
 
     // Detect if stencil available
     bStencil = FALSE;
@@ -217,7 +223,7 @@ void CHWCaps::Update()
 
     iGPUNum = GetGpuNum();
 }
-#else   //	USE_DX10
+#else //	USE_DX10
 void CHWCaps::Update()
 {
     // ***************** GEOMETRY
@@ -255,10 +261,11 @@ void CHWCaps::Update()
     Msg("* GPU vertex cache: %s, %d", "unrecognized", u32(geometry.dwVertexCache));
 
     // *******1********** Compatibility : vertex shader
-    if (0 == raster_major) geometry_major = 0;  // Disable VS if no PS
+    if (0 == raster_major)
+        geometry_major = 0; // Disable VS if no PS
 
     //
-    bTableFog = FALSE;  // BOOL	(caps.RasterCaps&D3DPRASTERCAPS_FOGTABLE);
+    bTableFog = FALSE; // BOOL	(caps.RasterCaps&D3DPRASTERCAPS_FOGTABLE);
 
     // Detect if stencil available
     bStencil = TRUE;
@@ -275,4 +282,4 @@ void CHWCaps::Update()
 
     iGPUNum = GetGpuNum();
 }
-#endif  //	USE_DX10
+#endif //	USE_DX10

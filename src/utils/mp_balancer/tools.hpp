@@ -20,8 +20,9 @@ inline void get_string_from_collection(xr_vector<shared_str> const& src_collecti
     for (xr_vector<shared_str>::const_iterator i = src_collection.begin(); i != ie; ++i)
     {
         dest_string.append(i->c_str());
-        if ((i + 1) != ie) dest_string.append(",");
+        if ((i + 1) != ie)
+            dest_string.append(",");
     }
 }
 
-#endif  //#ifndef TOOLS_HPP
+#endif //#ifndef TOOLS_HPP

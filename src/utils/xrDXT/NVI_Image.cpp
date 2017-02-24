@@ -19,7 +19,7 @@ class NVI_ImageBordered
 #include "stdafx.h"
 
 #include "NVI_Image.h"
-#include <limits.h>  // for UINT_MAX
+#include <limits.h> // for UINT_MAX
 
 using namespace xray_nvi;
 
@@ -31,11 +31,7 @@ NVI_Image::NVI_Image()
     m_nSizeY = 0;
 }
 
-NVI_Image::~NVI_Image()
-{
-    Free();
-}
-
+NVI_Image::~NVI_Image() { Free(); }
 HRESULT NVI_Image::Free()
 {
     SAFE_ARRAY_DELETE(m_pArray);
@@ -66,11 +62,7 @@ HRESULT NVI_Image::Initialize(int width, int height, NVI_PIXEL_FORMAT fmt, u8* d
     return S_OK;
 }
 
-UINT NVI_Image::GetNumPixels()
-{
-    return GetHeight() * GetWidth();
-}
-
+UINT NVI_Image::GetNumPixels() { return GetHeight() * GetWidth(); }
 UINT NVI_Image::GetBytesPerPixel()
 {
     switch (m_Format)
@@ -179,11 +171,7 @@ NVI_ImageBordered::NVI_ImageBordered() : NVI_Image()
     m_pArray = NULL;
 }
 
-NVI_ImageBordered::~NVI_ImageBordered()
-{
-    Free();
-}
-
+NVI_ImageBordered::~NVI_ImageBordered() { Free(); }
 HRESULT NVI_ImageBordered::Free()
 {
     NVI_Image::Free();
@@ -248,7 +236,8 @@ void NVI_ImageBordered::CopyDataFromSource()
         // low bounds are negative or zero
         memcpy(&pPadArray[(j - m_nBorderYLow) * m_nSizeX - m_nBorderXLow], &pSrcArray[j * sx], sizeof(DWORD) * sx);
     }
-    if (m_bWrap) {
+    if (m_bWrap)
+    {
         // copy rows opposite
         // copy out values in x first
         for (int j = 0; j < m_nSizeY; j++)

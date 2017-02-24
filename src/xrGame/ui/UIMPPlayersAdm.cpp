@@ -78,10 +78,7 @@ CUIMpPlayersAdm::CUIMpPlayersAdm()
     // AttachChild(m_pBanTimeText);
 }
 
-CUIMpPlayersAdm::~CUIMpPlayersAdm()
-{
-}
-
+CUIMpPlayersAdm::~CUIMpPlayersAdm() {}
 void CUIMpPlayersAdm::Init(CUIXml& xml_doc)
 {
     CUIXmlInit::InitWindow(xml_doc, "players_adm", 0, this);
@@ -131,7 +128,8 @@ void CUIMpPlayersAdm::FillPlayersList(u32 const)
 void CUIMpPlayersAdm::RefreshPlayersList()
 {
     game_cl_mp* tmp_game = smart_cast<game_cl_mp*>(&Game());
-    if (!tmp_game) return;
+    if (!tmp_game)
+        return;
 
     tmp_game->RequestPlayersInfo(fastdelegate::FastDelegate<void(u32 const)>(this, &CUIMpPlayersAdm::FillPlayersList));
 }
@@ -184,7 +182,8 @@ void CUIMpPlayersAdm::SetMaxPingLimitText()
 void CUIMpPlayersAdm::GetSelPlayerScreenshot()
 {
     CUIListBoxItem* itm = m_pPlayersList->GetSelectedItem();
-    if (!itm) return;
+    if (!itm)
+        return;
 
     u32 client_id = itm->GetTAG();
     string512 tmp_string;
@@ -194,7 +193,8 @@ void CUIMpPlayersAdm::GetSelPlayerScreenshot()
 void CUIMpPlayersAdm::GetSelPlayerConfig()
 {
     CUIListBoxItem* itm = m_pPlayersList->GetSelectedItem();
-    if (!itm) return;
+    if (!itm)
+        return;
 
     u32 client_id = itm->GetTAG();
     string512 tmp_string;
@@ -204,7 +204,8 @@ void CUIMpPlayersAdm::GetSelPlayerConfig()
 void CUIMpPlayersAdm::KickSelPlayer()
 {
     CUIListBoxItem* itm = m_pPlayersList->GetSelectedItem();
-    if (!itm) return;
+    if (!itm)
+        return;
 
     u32 client_id = itm->GetTAG();
     string512 tmp_string;
@@ -214,7 +215,8 @@ void CUIMpPlayersAdm::KickSelPlayer()
 void CUIMpPlayersAdm::BanSelPlayer()
 {
     CUIListBoxItem* itm = m_pPlayersList->GetSelectedItem();
-    if (!itm) return;
+    if (!itm)
+        return;
 
     u32 client_id = itm->GetTAG();
     int ban_time = m_pBanPlayerCombo->CurrentID();

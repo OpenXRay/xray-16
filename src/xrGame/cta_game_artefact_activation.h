@@ -27,6 +27,6 @@ public:
 
 private:
     typedef SArtefactActivation inherited;
-};  // class CtaArtefactActivation
+}; // class CtaArtefactActivation
 
-#endif  // CTA_GAME_ARTEFACT_ACTIVATION
+#endif // CTA_GAME_ARTEFACT_ACTIVATION

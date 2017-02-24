@@ -8,10 +8,7 @@ CScriptCallStack::CScriptCallStack(CScriptDebugger* d)
     m_nCurrentLevel = -1;
 }
 
-CScriptCallStack::~CScriptCallStack()
-{
-}
-
+CScriptCallStack::~CScriptCallStack() {}
 void CScriptCallStack::Clear()
 {
     m_nCurrentLevel = -1;
@@ -36,7 +33,8 @@ void CScriptCallStack::SetStackTraceLevel(int nLevel)
 
 void CScriptCallStack::GotoStackTraceLevel(int nLevel)
 {
-    if (nLevel < 0 || (u32)nLevel >= m_files.size()) return;
+    if (nLevel < 0 || (u32)nLevel >= m_files.size())
+        return;
     m_nCurrentLevel = nLevel;
     char* ppath = m_files[nLevel].path;
     m_debugger->_SendMessage(DMSG_GOTO_FILELINE, (WPARAM)ppath, (LPARAM)m_lines[nLevel]);

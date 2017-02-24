@@ -65,4 +65,4 @@ public:
 
 #include "vision_client_inline.h"
 
-#endif  // VISION_CLIENT_H
+#endif // VISION_CLIENT_H

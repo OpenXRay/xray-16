@@ -10,10 +10,7 @@ best_scores_helper::best_scores_helper(game_state_accumulator* pstate) : inherit
     reset_max();
 }
 
-best_scores_helper::~best_scores_helper()
-{
-}
-
+best_scores_helper::~best_scores_helper() {}
 void best_scores_helper::reset_max()
 {
     m_max_kills_in_row = 0;
@@ -65,9 +62,11 @@ void best_scores_helper::fill_best_results(gamespy_profile::all_best_scores_t& d
 bool best_scores_helper::OnPlayerBringArtefact(game_PlayerState const* ps)
 {
     game_PlayerState* local_player = m_player_state_accum->get_local_player();
-    if (!local_player) return false;
+    if (!local_player)
+        return false;
 
-    if (ps == local_player) ++m_artefacts;
+    if (ps == local_player)
+        ++m_artefacts;
 
     return false;
 }
@@ -75,9 +74,11 @@ bool best_scores_helper::OnPlayerBringArtefact(game_PlayerState const* ps)
 bool best_scores_helper::OnPlayerSpawned(game_PlayerState const* ps)
 {
     game_PlayerState* local_player = m_player_state_accum->get_local_player();
-    if (!local_player) return false;
+    if (!local_player)
+        return false;
 
-    if (ps == local_player) {
+    if (ps == local_player)
+    {
         write_max();
         reset_stats();
     }
@@ -96,18 +97,23 @@ bool best_scores_helper::OnPlayerKilled(
     u16 killer_id, u16 target_id, u16 weapon_id, std::pair<KILL_TYPE, SPECIAL_KILL_TYPE> kill_type)
 {
     game_PlayerState* local_player = m_player_state_accum->get_local_player();
-    if (!local_player) return false;
+    if (!local_player)
+        return false;
 
-    if (killer_id != local_player->GameID) return false;
+    if (killer_id != local_player->GameID)
+        return false;
 
-    if (!m_player_state_accum->is_enemies(killer_id, target_id)) return false;
+    if (!m_player_state_accum->is_enemies(killer_id, target_id))
+        return false;
 
-    if (kill_type.first == KT_BLEEDING) {
+    if (kill_type.first == KT_BLEEDING)
+    {
         ++m_bleed_kills_in_row;
     }
 
     u16 kill_weapon_id = m_player_state_accum->get_object_id(weapon_id);
-    if (m_player_state_accum->is_item_in_group(kill_weapon_id, ammunition_group::gid_hand_grenades)) {
+    if (m_player_state_accum->is_item_in_group(kill_weapon_id, ammunition_group::gid_hand_grenades))
+    {
         ++m_explosive_kills_in_row;
     }
 
@@ -125,10 +131,10 @@ bool best_scores_helper::OnPlayerKilled(
     case SKT_EYESHOT: { ++m_eyeshots_kills_in_row;
     }
     break;
-    };  // switch (kill_type.second)
+    }; // switch (kill_type.second)
 
     ++m_kills_in_row;
     return false;
 }
 
-}  // namespace award_system
+} // namespace award_system

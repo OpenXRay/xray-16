@@ -15,11 +15,13 @@ LPCSTR make_time(string64& buf, float fsec)
     // char		buf[64];
 
     u32 sec = iFloor(fsec);
-    if (sec < 0) sec = 0;
+    if (sec < 0)
+        sec = 0;
     xr_sprintf(buf, "%2.0d:%2.0d:%2.0d", sec / 3600, (sec % 3600) / 60, sec % 60);
     int len = int(xr_strlen(buf));
     for (int i = 0; i < len; i++)
-        if (buf[i] == ' ') buf[i] = '0';
+        if (buf[i] == ' ')
+            buf[i] = '0';
     return buf;
 }
 
@@ -43,7 +45,7 @@ bool exec_pool::has(u32 id)
 
 void exec_pool::receive_result(IGenericStream* inStream)
 {
-    u32 id = u32(-1), type = u32(-1);  // r.r_u32();
+    u32 id = u32(-1), type = u32(-1); // r.r_u32();
     read_task_caption(inStream, id, type);
 
     // xr_vector<u32>::iterator it =std::find( pool.begin(), pool.end(), id );
@@ -71,7 +73,8 @@ void exec_pool::receive_result(IGenericStream* inStream)
 
     net_execution* e = pool[pos];
     R_ASSERT(e->type() == type);
-    if (e == 0) {
+    if (e == 0)
+    {
         send_receive_lock.Leave();
         return;
     }
@@ -90,7 +93,8 @@ void exec_pool::receive_result(IGenericStream* inStream)
     Logger.clMsg("num task complited : %d , num task left %d  (task num %d)", l_completed, size - l_completed, size);
 #endif
     R_ASSERT(l_completed <= size);
-    if (l_completed == size) {
+    if (l_completed == size)
+    {
         string64 buf;
         Logger.clLog(" %s, calculation complited", _name);
         // clMsg	("%f %s calculation seconds",start_time.GetElapsed_sec(), _name );
@@ -147,7 +151,7 @@ void exec_pool::send_task(IGridUser& user, IGenericStream* Stream, u8 pool_id, u
     R_ASSERT(has(id));
     IGenericStream* outStream = CreateGenericStream();
     //////////////////////////////////////////////////////
-    write_task_pool(outStream, pool_id);  ////////////////////
+    write_task_pool(outStream, pool_id); ////////////////////
     //////////////////////////////////////////////////////
     cleanup().on_net_send(outStream);
 
@@ -180,7 +184,8 @@ run_task:;
 
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
-        if (!ok) {
+        if (!ok)
+        {
             Msg("accept run task");
             goto run_task;
         }
@@ -213,7 +218,8 @@ net_execution* exec_pool::receive_task(IAgent* agent, DWORD sessionId, IGenericS
         exec_find f(id);
         xr_vector<net_execution*>::iterator i = std::find_if(pool.begin(), pool.end(), f);
 
-        if (i != pool.end()) {
+        if (i != pool.end())
+        {
             send_receive_lock.Leave();
             return 0;
         }

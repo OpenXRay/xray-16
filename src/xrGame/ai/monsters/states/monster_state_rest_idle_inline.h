@@ -6,7 +6,7 @@
 #include "cover_point.h"
 #include "ai/monsters/monster_cover_manager.h"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
@@ -29,9 +29,11 @@ void CStateMonsterRestIdleAbstract::initialize()
 
     // try to get cover
     const CCoverPoint* point = object->CoverMan->find_cover(object->Position(), 5.f, 10.f);
-    if (!point) {
+    if (!point)
+    {
         point = object->CoverMan->find_cover(object->Position(), 10.f, 30.f);
-        if (!point) return;
+        if (!point)
+            return;
     }
 
     m_target_node = point->level_vertex_id();
@@ -60,12 +62,14 @@ void CStateMonsterRestIdleAbstract::critical_finalize()
 TEMPLATE_SPECIALIZATION
 void CStateMonsterRestIdleAbstract::reselect_state()
 {
-    if ((prev_substate == u32(-1)) && (m_target_node != u32(-1))) {
+    if ((prev_substate == u32(-1)) && (m_target_node != u32(-1)))
+    {
         select_state(eStateRest_WalkToCover);
         return;
     }
 
-    if ((prev_substate == eStateRest_WalkToCover) || (prev_substate == u32(-1))) {
+    if ((prev_substate == eStateRest_WalkToCover) || (prev_substate == u32(-1)))
+    {
         select_state(eStateRest_LookOpenPlace);
         return;
     }
@@ -78,15 +82,16 @@ void CStateMonsterRestIdleAbstract::setup_substates()
 {
     state_ptr state = get_state_current();
 
-    if (current_substate == eStateRest_WalkToCover) {
+    if (current_substate == eStateRest_WalkToCover)
+    {
         SStateDataMoveToPointEx data;
 
         data.vertex = m_target_node;
         data.point = ai().level_graph().vertex_position(data.vertex);
         data.action.action = ACT_WALK_FWD;
-        data.action.time_out = 0;    // do not use time out
-        data.completion_dist = 0.f;  // get exactly to the point
-        data.time_to_rebuild = 0;    // do not rebuild
+        data.action.time_out = 0; // do not use time out
+        data.completion_dist = 0.f; // get exactly to the point
+        data.time_to_rebuild = 0; // do not rebuild
         data.accelerated = true;
         data.braking = true;
         data.accel_type = eAT_Calm;
@@ -97,7 +102,8 @@ void CStateMonsterRestIdleAbstract::setup_substates()
         return;
     }
 
-    if (current_substate == eStateRest_LookOpenPlace) {
+    if (current_substate == eStateRest_LookOpenPlace)
+    {
         SStateDataLookToPoint data;
 
         Fvector dir;
@@ -114,11 +120,12 @@ void CStateMonsterRestIdleAbstract::setup_substates()
         return;
     }
 
-    if (current_substate == eStateRest_Idle) {
+    if (current_substate == eStateRest_Idle)
+    {
         SStateDataAction data;
 
         data.action = ACT_REST;
-        data.time_out = 0;  // do not use time out
+        data.time_out = 0; // do not use time out
         data.sound_type = MonsterSound::eMonsterSoundIdle;
         data.sound_delay = object->db().m_dwIdleSndDelay;
 

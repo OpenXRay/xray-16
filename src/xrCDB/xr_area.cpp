@@ -16,14 +16,15 @@ CObjectSpace::CObjectSpace()
 #ifdef CONFIG_PROFILE_LOCKS
       ,
       Lock(MUTEX_PROFILE_ID(CObjectSpace::Lock))
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
 #ifdef DEBUG
       ,
       m_pRender(0)
 #endif
 {
 #ifdef DEBUG
-    if (GlobalEnv.RenderFactory) m_pRender = CNEW(FactoryPtr<IObjectSpaceRender>)();
+    if (GlobalEnv.RenderFactory)
+        m_pRender = CNEW(FactoryPtr<IObjectSpaceRender>)();
 
 // sh_debug.create				("debug\\wireframe","$null");
 #endif
@@ -62,10 +63,13 @@ int CObjectSpace::GetNearest(xr_vector<ISpatial*>& q_spatial, xr_vector<IGameObj
     for (; it != end; it++)
     {
         IGameObject* O = (*it)->dcast_GameObject();
-        if (0 == O) continue;
-        if (O == ignore_object) continue;
+        if (0 == O)
+            continue;
+        if (O == ignore_object)
+            continue;
         Fsphere mS = {O->GetSpatialData().sphere.P, O->GetSpatialData().sphere.R};
-        if (Q.intersect(mS)) q_nearest.push_back(O);
+        if (Q.intersect(mS))
+            q_nearest.push_back(O);
     }
 
     return q_nearest.size();
@@ -87,16 +91,13 @@ IC int CObjectSpace::GetNearest(xr_vector<IGameObject*>& q_nearest, ICollisionFo
 
 //----------------------------------------------------------------------
 
-void CObjectSpace::Load(CDB::build_callback build_callback)
-{
-    Load("$level$", "level.cform", build_callback);
-}
+void CObjectSpace::Load(CDB::build_callback build_callback) { Load("$level$", "level.cform", build_callback); }
 void CObjectSpace::Load(LPCSTR path, LPCSTR fname, CDB::build_callback build_callback)
 {
 #ifdef USE_ARENA_ALLOCATOR
     Msg("CObjectSpace::Load, g_collision_allocator.get_allocated_size() - %d",
         int(g_collision_allocator.get_allocated_size() / 1024.0 / 1024));
-#endif  // #ifdef USE_ARENA_ALLOCATOR
+#endif // #ifdef USE_ARENA_ALLOCATOR
     IReader* F = FS.r_open(path, fname);
     R_ASSERT(F);
     Load(F, build_callback);
@@ -125,10 +126,7 @@ void CObjectSpace::Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H, CDB
 
 //----------------------------------------------------------------------
 #ifdef DEBUG
-void CObjectSpace::dbgRender()
-{
-    (*m_pRender)->dbgRender();
-}
+void CObjectSpace::dbgRender() { (*m_pRender)->dbgRender(); }
 /*
 void CObjectSpace::dbgRender()
 {
@@ -161,7 +159,4 @@ void CObjectSpace::dbgRender()
 */
 #endif
 // XXX stats: add to statistics
-void CObjectSpace::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
-{
-    xrc.DumpStatistics(font, alert);
-}
+void CObjectSpace::DumpStatistics(IGameFont& font, IPerformanceAlert* alert) { xrc.DumpStatistics(font, alert); }

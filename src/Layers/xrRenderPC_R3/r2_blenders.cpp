@@ -43,7 +43,4 @@ IBlender* CRender::blender_create(CLASS_ID cls)
     return 0;
 }
 
-void CRender::blender_destroy(IBlender*& B)
-{
-    xr_delete(B);
-}
+void CRender::blender_destroy(IBlender*& B) { xr_delete(B); }

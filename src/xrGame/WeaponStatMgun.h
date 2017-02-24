@@ -29,7 +29,6 @@ private:
     // casts
 public:
     virtual CHolderCustom* cast_holder_custom() { return this; }
-
     // general
 public:
     CWeaponStatMgun();
@@ -39,8 +38,8 @@ public:
 
     virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
-    virtual void net_Export(NET_Packet& P);  // export to server
-    virtual void net_Import(NET_Packet& P);  // import from server
+    virtual void net_Export(NET_Packet& P); // export to server
+    virtual void net_Import(NET_Packet& P); // import from server
 
     virtual void UpdateCL();
 
@@ -54,7 +53,7 @@ private:
     Fvector m_fire_dir, m_fire_pos;
 
     Fmatrix m_i_bind_x_xform, m_i_bind_y_xform, m_fire_bone_xform;
-    Fvector2 m_lim_x_rot, m_lim_y_rot;  // in bone space
+    Fvector2 m_lim_x_rot, m_lim_y_rot; // in bone space
     CCartridge* m_Ammo;
     float m_barrel_speed;
     Fvector2 m_dAngle;
@@ -76,7 +75,6 @@ protected:
     void RemoveShotEffector();
     void SetDesiredDir(float h, float p);
     virtual bool IsHudModeNow() { return false; };
-
     // HolderCustom
 public:
     virtual bool Use(const Fvector& pos, const Fvector& dir, const Fvector& foot_pos) { return !Owner(); };
@@ -94,9 +92,7 @@ public:
     virtual bool allowWeapon() const { return false; };
     virtual bool HUDView() const { return true; };
     virtual Fvector ExitPosition() { return Fvector().set(0.0f, 0.0f, 0.0f); };
-
     virtual CCameraBase* Camera() { return camera; };
-
     virtual void Action(u16 id, u32 flags);
     virtual void SetParam(int id, Fvector2 val);
 };

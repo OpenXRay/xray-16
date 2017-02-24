@@ -5,14 +5,8 @@
 
 namespace award_system
 {
-ammunition_group::ammunition_group()
-{
-}
-
-ammunition_group::~ammunition_group()
-{
-}
-
+ammunition_group::ammunition_group() {}
+ammunition_group::~ammunition_group() {}
 void ammunition_group::init_ammunition_group(
     CItemMgr const* item_manager, enum_group_id gid, shared_str const& weapons_string)
 {
@@ -22,7 +16,8 @@ void ammunition_group::init_ammunition_group(
     {
         _GetItem(weapons_string.c_str(), i, dststr);
         u32 itm_index = item_manager->GetItemIdx(dststr);
-        if (itm_index != u32(-1)) {
+        if (itm_index != u32(-1))
+        {
             VERIFY((itm_index & 0xffff0000) == 0);
             m_wpn_groups.push_back(std::make_pair(static_cast<u16>(itm_index), gid));
         }
@@ -72,14 +67,16 @@ void ammunition_group::init(CItemMgr const* item_manager)
 
 bool ammunition_group::is_item_in_group(u16 item_id, enum_group_id gid) const
 {
-    if (gid == gid_any) return true;
+    if (gid == gid_any)
+        return true;
 
     ammun_groups_map_t::const_iterator tmp_iter =
         std::find(m_wpn_groups.begin(), m_wpn_groups.end(), ammun_groups_map_t::value_type(item_id & 0x00ff, gid));
 
-    if (tmp_iter == m_wpn_groups.end()) return false;
+    if (tmp_iter == m_wpn_groups.end())
+        return false;
 
     return true;
 }
 
-}  // namespace award_system
+} // namespace award_system

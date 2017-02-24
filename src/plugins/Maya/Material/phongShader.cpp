@@ -111,40 +111,30 @@ MObject CXRayMtl::aReflectGain;
 
 MObject CXRayMtl::aTriangleNormalCamera;
 
-#define MAKE_INPUT(attr)                                                                                               \
-    CHECK_MSTATUS(attr.setKeyable(true));                                                                              \
-    CHECK_MSTATUS(attr.setStorable(true));                                                                             \
-    CHECK_MSTATUS(attr.setReadable(true));                                                                             \
+#define MAKE_INPUT(attr)                   \
+    CHECK_MSTATUS(attr.setKeyable(true));  \
+    CHECK_MSTATUS(attr.setStorable(true)); \
+    CHECK_MSTATUS(attr.setReadable(true)); \
     CHECK_MSTATUS(attr.setWritable(true));
 
-#define MAKE_OUTPUT(attr)                                                                                              \
-    CHECK_MSTATUS(attr.setKeyable(false));                                                                             \
-    CHECK_MSTATUS(attr.setStorable(false));                                                                            \
-    CHECK_MSTATUS(attr.setReadable(true));                                                                             \
+#define MAKE_OUTPUT(attr)                   \
+    CHECK_MSTATUS(attr.setKeyable(false));  \
+    CHECK_MSTATUS(attr.setStorable(false)); \
+    CHECK_MSTATUS(attr.setReadable(true));  \
     CHECK_MSTATUS(attr.setWritable(false));
 
 //
 // DESCRIPTION:
 ///////////////////////////////////////////////////////
-void CXRayMtl::postConstructor()
-{
-    setMPSafe(true);
-}
-
+void CXRayMtl::postConstructor() { setMPSafe(true); }
 //
 // DESCRIPTION:
 ///////////////////////////////////////////////////////
-CXRayMtl::CXRayMtl()
-{
-}
-
+CXRayMtl::CXRayMtl() {}
 //
 // DESCRIPTION:
 ///////////////////////////////////////////////////////
-CXRayMtl::~CXRayMtl()
-{
-}
-
+CXRayMtl::~CXRayMtl() {}
 //
 // DESCRIPTION:
 ///////////////////////////////////////////////////////
@@ -386,7 +376,8 @@ MStatus CXRayMtl::initialize()
 ///////////////////////////////////////////////////////
 MStatus CXRayMtl::compute(const MPlug& plug, MDataBlock& block)
 {
-    if ((plug != aOutColor) && (plug.parent() != aOutColor)) return MS::kUnknownParameter;
+    if ((plug != aOutColor) && (plug.parent() != aOutColor))
+        return MS::kUnknownParameter;
 
     MFloatVector resultColor(0.0, 0.0, 0.0);
 
@@ -427,7 +418,8 @@ MStatus CXRayMtl::compute(const MPlug& plug, MDataBlock& block)
         int& blindData = currentLight.child(aLightBlindData).asInt();
 
         // find ambient component
-        if (currentLight.child(aLightAmbient).asBool()) {
+        if (currentLight.child(aLightAmbient).asBool())
+        {
             diffuseR += lightIntensity[0];
             diffuseG += lightIntensity[1];
             diffuseB += lightIntensity[2];
@@ -435,12 +427,14 @@ MStatus CXRayMtl::compute(const MPlug& plug, MDataBlock& block)
 
         MFloatVector& lightDirection = currentLight.child(aLightDirection).asFloatVector();
 
-        if (blindData == 0) {
+        if (blindData == 0)
+        {
             // find diffuse and specular component
-            if (currentLight.child(aLightDiffuse).asBool()) {
+            if (currentLight.child(aLightDiffuse).asBool())
+            {
                 float cosln = lightDirection * surfaceNormal;
                 ;
-                if (cosln > 0.0f)  // calculate only if facing light
+                if (cosln > 0.0f) // calculate only if facing light
                 {
                     diffuseR += lightIntensity[0] * (cosln * diffuseReflectivity);
                     diffuseG += lightIntensity[1] * (cosln * diffuseReflectivity);
@@ -449,13 +443,16 @@ MStatus CXRayMtl::compute(const MPlug& plug, MDataBlock& block)
 
                 CHECK_MSTATUS(cameraPosition.normalize());
 
-                if (cosln > 0.0f)  // calculate only if facing light
+                if (cosln > 0.0f) // calculate only if facing light
                 {
                     float RV = (((2 * surfaceNormal) * cosln) - lightDirection) * cameraPosition;
-                    if (RV > 0.0) RV = 0.0;
-                    if (RV < 0.0) RV = -RV;
+                    if (RV > 0.0)
+                        RV = 0.0;
+                    if (RV < 0.0)
+                        RV = -RV;
 
-                    if (power < 0) power = -power;
+                    if (power < 0)
+                        power = -power;
 
                     float s = spec * powf(RV, power);
 
@@ -468,7 +465,7 @@ MStatus CXRayMtl::compute(const MPlug& plug, MDataBlock& block)
         else
         {
             float cosln = MRenderUtil::diffuseReflectance(blindData, lightDirection, point, surfaceNormal, true);
-            if (cosln > 0.0f)  // calculate only if facing light
+            if (cosln > 0.0f) // calculate only if facing light
             {
                 diffuseR += lightIntensity[0] * (cosln * diffuseReflectivity);
                 diffuseG += lightIntensity[1] * (cosln * diffuseReflectivity);
@@ -477,7 +474,8 @@ MStatus CXRayMtl::compute(const MPlug& plug, MDataBlock& block)
 
             CHECK_MSTATUS(cameraPosition.normalize());
 
-            if (currentLight.child(aLightSpecular).asBool()) {
+            if (currentLight.child(aLightSpecular).asBool())
+            {
                 MFloatVector specLightDirection = lightDirection;
                 MDataHandle directionH = block.inputValue(aRayDirection);
                 MFloatVector direction = directionH.asFloatVector();
@@ -488,7 +486,8 @@ MStatus CXRayMtl::compute(const MPlug& plug, MDataBlock& block)
                 lightAttenuation = MRenderUtil::lightAttenuation(blindData, point, surfaceNormal, false);
 
                 // Are we facing the light
-                if (specLightDirection * surfaceNormal > 0.0f) {
+                if (specLightDirection * surfaceNormal > 0.0f)
+                {
                     float power = block.inputValue(aPower).asFloat();
                     MFloatVector rv = 2 * surfaceNormal * (surfaceNormal * direction) - direction;
                     float s = spec * powf(rv * specLightDirection, power);
@@ -499,7 +498,8 @@ MStatus CXRayMtl::compute(const MPlug& plug, MDataBlock& block)
                 }
             }
         }
-        if (!lightData.next()) break;
+        if (!lightData.next())
+            break;
     }
 
     // factor incident light with surface color and add incandescence
@@ -508,7 +508,8 @@ MStatus CXRayMtl::compute(const MPlug& plug, MDataBlock& block)
     resultColor[2] = (diffuseB * surfaceColor[2]) + specularB + incandescence[2];
 
     // add the reflection color
-    if (reflectGain > 0.0) {
+    if (reflectGain > 0.0)
+    {
         MStatus status;
 
         // required attributes for using raytracer
@@ -537,10 +538,12 @@ MStatus CXRayMtl::compute(const MPlug& plug, MDataBlock& block)
         // compute reflected ray
         MFloatVector l = -direction;
         float dot = l * normal;
-        if (dot < 0.0) dot = -dot;
-        MFloatVector refVector = 2 * normal * dot - l;  // reflection ray
+        if (dot < 0.0)
+            dot = -dot;
+        MFloatVector refVector = 2 * normal * dot - l; // reflection ray
         float dotRef = refVector * triangleNormal;
-        if (dotRef < 0.0) {
+        if (dotRef < 0.0)
+        {
             const float s = 0.01f;
             MFloatVector mVec = refVector - dotRef * triangleNormal;
             mVec.normalize();
@@ -548,12 +551,12 @@ MStatus CXRayMtl::compute(const MPlug& plug, MDataBlock& block)
         }
         CHECK_MSTATUS(refVector.normalize());
 
-        status = MRenderUtil::raytrace(point,  //  origin
-            refVector,                         //  direction
-            objId,                             //  object id
-            samplerPtr,                        //  sampler info
-            depth,                             //  ray depth
-            reflectColor,                      // output color and transp
+        status = MRenderUtil::raytrace(point, //  origin
+            refVector, //  direction
+            objId, //  object id
+            samplerPtr, //  sampler info
+            depth, //  ray depth
+            reflectColor, // output color and transp
             reflectTransparency);
 
         // add in the reflection color

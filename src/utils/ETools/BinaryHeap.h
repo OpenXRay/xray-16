@@ -36,7 +36,8 @@ public:
 
     ~BinaryHeap(void)
     {
-        if (pBlobArray != NULL) {
+        if (pBlobArray != NULL)
+        {
             delete[] pBlobArray;
             pBlobArray = NULL;
         }
@@ -66,12 +67,14 @@ public:
 #endif
         iCurrentPos = 0;
 
-        if (iCurrentSize <= 1) {
+        if (iCurrentSize <= 1)
+        {
             iCurrentSize = 1;
         }
 
         // Make sure it's big enough.
-        if (iAllocatedSize <= iCurrentSize) {
+        if (iAllocatedSize <= iCurrentSize)
+        {
             // Add 50% to the allocated size.
             iAllocatedSize = (iAllocatedSize >> 1) + iAllocatedSize;
             // And then a bit more.
@@ -82,7 +85,8 @@ public:
             Blob* pOldBlobArray = pBlobArray;
             pBlobArray = new Blob[iAllocatedSize];
             VERIFY(pBlobArray != NULL);
-            if (pOldBlobArray != NULL) {
+            if (pOldBlobArray != NULL)
+            {
                 memcpy(pBlobArray, pOldBlobArray, (iCurrentSize + 1) * sizeof(Blob));
                 delete[] pOldBlobArray;
             }
@@ -106,7 +110,8 @@ public:
 
     THING* FindFirst(void)
     {
-        if (iCurrentSize > 1) {
+        if (iCurrentSize > 1)
+        {
             VERIFY(pBlobArray != NULL);
 #ifdef DEBUG
             bFindNextValid = TRUE;
@@ -131,7 +136,8 @@ public:
 #ifdef DEBUG
         VERIFY(bFindNextValid);
 #endif
-        if (iCurrentPos >= iCurrentSize - 1) {
+        if (iCurrentPos >= iCurrentSize - 1)
+        {
             // Reached the end.
             return NULL;
         }
@@ -161,7 +167,8 @@ public:
         VERIFY(bFindNextValid);
         bFindNextValid = FALSE;
 #endif
-        if (iCurrentPos < (iCurrentSize - 1)) {
+        if (iCurrentPos < (iCurrentSize - 1))
+        {
             VERIFY(pBlobArray != NULL);
             THING* pThing = pBlobArray[iCurrentPos].pThing;
 

@@ -24,4 +24,4 @@ public:
     virtual void Release();
 };
 
-#endif  // FHierrarhyVisualH
+#endif // FHierrarhyVisualH

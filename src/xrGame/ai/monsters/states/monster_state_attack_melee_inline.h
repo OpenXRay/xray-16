@@ -1,21 +1,15 @@
 #pragma once
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _Object\
 >
 
 #define CStateMonsterAttackMeleeAbstract CStateMonsterAttackMelee<_Object>
 
 TEMPLATE_SPECIALIZATION
-CStateMonsterAttackMeleeAbstract::CStateMonsterAttackMelee(_Object* obj) : inherited(obj)
-{
-}
-
+CStateMonsterAttackMeleeAbstract::CStateMonsterAttackMelee(_Object* obj) : inherited(obj) {}
 TEMPLATE_SPECIALIZATION
-CStateMonsterAttackMeleeAbstract::~CStateMonsterAttackMelee()
-{
-}
-
+CStateMonsterAttackMeleeAbstract::~CStateMonsterAttackMelee() {}
 TEMPLATE_SPECIALIZATION
 void CStateMonsterAttackMeleeAbstract::execute()
 {

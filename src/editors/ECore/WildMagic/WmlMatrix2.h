@@ -24,7 +24,7 @@ namespace Wml
 template <class Real>
 class Matrix2 : public Matrix<2, Real>
 {
-  public:
+public:
     // construction
     Matrix2();
     Matrix2(const Matrix2& rkM);

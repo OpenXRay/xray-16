@@ -7,7 +7,8 @@
 
 bool CExtraContentFilter::CheckPackKey(LPCSTR KeyName)
 {
-    if (!KeyName) return false;
+    if (!KeyName)
+        return false;
 
     DWORD KeyValue = 0;
     ReadRegistry_DWValue(KeyName, KeyValue);
@@ -17,7 +18,8 @@ bool CExtraContentFilter::CheckPackKey(LPCSTR KeyName)
 
 CExtraContentFilter::CExtraContentFilter()
 {
-    if (pSettings->section_exist(EXTRA_CONTENT_SECTION)) {
+    if (pSettings->section_exist(EXTRA_CONTENT_SECTION))
+    {
         u32 PacksCount = pSettings->line_count(EXTRA_CONTENT_SECTION);
         for (u32 i = 0; i < PacksCount; i++)
         {
@@ -27,7 +29,8 @@ CExtraContentFilter::CExtraContentFilter()
             pNewPack->sPackName = PackName;
             pNewPack->bEnabled = CheckPackKey(KeyName);
 
-            if (pSettings->section_exist(pNewPack->sPackName)) {
+            if (pSettings->section_exist(pNewPack->sPackName))
+            {
                 u32 ContentCount = pSettings->line_count(pNewPack->sPackName);
                 for (u32 c = 0; c < ContentCount; c++)
                 {
@@ -58,7 +61,8 @@ bool CExtraContentFilter::IsDataEnabled(LPCSTR pData)
         PackData* pPackData = *it;
         xr_vector<shared_str>::const_iterator i =
             std::find(pPackData->aContent.begin(), pPackData->aContent.end(), pData);
-        if (i != pPackData->aContent.end()) {
+        if (i != pPackData->aContent.end())
+        {
             return pPackData->bEnabled;
         }
     }

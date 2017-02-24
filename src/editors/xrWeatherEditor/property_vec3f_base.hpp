@@ -17,7 +17,7 @@ ref class property_vec3f_base;
 
 class vec3f_components
 {
-  public:
+public:
     vec3f_components(property_vec3f_base ^ holder);
 
     float xr_stdcall x_getter();
@@ -29,14 +29,14 @@ class vec3f_components
     float xr_stdcall z_getter();
     void xr_stdcall z_setter(float);
 
-  private:
+private:
     gcroot<property_vec3f_base ^> m_holder;
-};  // class vec3f_components
+}; // class vec3f_components
 
 public
 value struct Vec3f
 {
-  public:
+public:
     inline Vec3f(float x_, float y_, float z_)
     {
         x = x_;
@@ -47,12 +47,12 @@ value struct Vec3f
     property float x;
     property float y;
     property float z;
-};  // value struct  Vec3f
+}; // value struct  Vec3f
 
 public
 ref class property_vec3f_base abstract : public XRay::SdkControls::IProperty, public property_container_holder
 {
-  public:
+public:
     property_vec3f_base(editor::vec3f const % vec3f);
     virtual ~property_vec3f_base();
     !property_vec3f_base();
@@ -60,17 +60,17 @@ ref class property_vec3f_base abstract : public XRay::SdkControls::IProperty, pu
     void y(float value);
     void z(float value);
 
-  public:
+public:
     virtual System::Object ^ GetValue();
     virtual void SetValue(System::Object ^ object);
 
-  public:
+public:
     virtual editor::vec3f get_value_raw() = 0;
     virtual void set_value_raw(editor::vec3f vec3f) = 0;
 
-  private:
+private:
     property_container ^ m_container;
     vec3f_components* m_components;
-};  // ref class property_vec3f_base abstract
+}; // ref class property_vec3f_base abstract
 
-#endif  // ifndef PROPERTY_VEC3F_BASE_HPP_INCLUDED
+#endif // ifndef PROPERTY_VEC3F_BASE_HPP_INCLUDED

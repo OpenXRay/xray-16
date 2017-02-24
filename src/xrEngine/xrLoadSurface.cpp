@@ -8,9 +8,11 @@ struct SExts
     xr_vector<LPSTR> exts;
     void format_register(LPCSTR ext)
     {
-        if (ext && ext[0]) {
+        if (ext && ext[0])
+        {
             for (u32 i = 0; i < exts.size(); i++)
-                if (0 == stricmp(exts[i], ext)) return;
+                if (0 == stricmp(exts[i], ext))
+                    return;
             exts.push_back(xr_strdup(ext));
         }
     }
@@ -28,19 +30,22 @@ SExts formats;
 void Surface_FormatExt(FREE_IMAGE_FORMAT f)
 {
     LPCSTR n = FreeImage_GetFIFExtensionList(f);
-    if (n) {
+    if (n)
+    {
         LPSTR base = xr_strdup(n);
         LPSTR ext = base;
         LPSTR cur = ext;
         for (; ext[0]; ext++)
         {
-            if (ext[0] == ',') {
+            if (ext[0] == ',')
+            {
                 ext[0] = 0;
                 formats.format_register(cur);
                 cur = ++ext;
             }
         }
-        if (cur && cur[0]) formats.format_register(cur);
+        if (cur && cur[0])
+            formats.format_register(cur);
         xr_free(base);
     }
 }
@@ -79,7 +84,8 @@ BOOL Surface_Detect(string_path& F, LPSTR N)
 {
     FS.update_path(F, "$game_textures$", strconcat(sizeof(F), F, N, ".dds"));
     FILE* file = fopen(F, "rb");
-    if (file) {
+    if (file)
+    {
         fclose(file);
         return (TRUE);
     }
@@ -92,10 +98,12 @@ FIBITMAP* Surface_Load(char* full_name)
     // load
     FREE_IMAGE_FORMAT fif = FreeImage_GetFIFFromFilename(full_name);
     FIBITMAP* map = FreeImage_Load(fif, full_name);
-    if (0 == map) return NULL;
+    if (0 == map)
+        return NULL;
 
     // check if already 32bpp
-    if (32 == FreeImage_GetBPP(map)) return map;
+    if (32 == FreeImage_GetBPP(map))
+        return map;
 
     // convert
     FIBITMAP* map32 = FreeImage_ConvertTo32Bits(map);
@@ -109,11 +117,13 @@ FIBITMAP* Surface_Load(char* full_name)
 
 u32* Surface_Load(char* name, u32& w, u32& h)
 {
-    if (strchr(name, '.')) *(strchr(name, '.')) = 0;
+    if (strchr(name, '.'))
+        *(strchr(name, '.')) = 0;
 
     // detect format
     string_path full;
-    if (!Surface_Detect(full, name)) return NULL;
+    if (!Surface_Detect(full, name))
+        return NULL;
 
     FIBITMAP* map32 = Surface_Load(full);
 

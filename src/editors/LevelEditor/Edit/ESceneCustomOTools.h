@@ -10,18 +10,17 @@ class ESceneCustomOTool : public ESceneToolBase
 {
     typedef ESceneToolBase inherited;
 
-  protected:
+protected:
     ObjectList m_Objects;
 
     bool OnLoadSelectionAppendObject(CCustomObject* obj);
     bool OnLoadAppendObject(CCustomObject* obj);
 
-  public:
+public:
     ESceneCustomOTool(ObjClassID cls);
     virtual ~ESceneCustomOTool();
 
     virtual bool AllowEnabling() { return true; }
-
     virtual BOOL AllowMouseStart();
 
     // snap
@@ -52,7 +51,6 @@ class ESceneCustomOTool : public ESceneToolBase
     virtual void OnObjectRemove(CCustomObject* O, bool bDeleting);
 
     virtual void OnBeforeObjectChange(CCustomObject* O) { inherited::OnBeforeObjectChange(O); }
-
     virtual void OnFrame();
     virtual void OnRender(int priority, bool strictB2F);
 
@@ -82,7 +80,6 @@ class ESceneCustomOTool : public ESceneToolBase
     // object part
     //--------------------------------------------------------------------------
     IC ObjectList& GetObjects() { return m_Objects; }
-
     IC
 
         int
@@ -109,4 +106,4 @@ class ESceneCustomOTool : public ESceneToolBase
     void OnSelected(CCustomObject* object);
     virtual const CCustomObject* LastSelected() const;
 };
-#endif  // ESceneCustomOToolsH
+#endif // ESceneCustomOToolsH

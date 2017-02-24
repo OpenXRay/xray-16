@@ -18,15 +18,15 @@ bool NumericVectorRun(
 }
 
 //---------------------------------------------------------------------------
-__fastcall TfrmNumericVector::TfrmNumericVector(TComponent* Owner) : TForm(Owner)
-{
-}
+__fastcall TfrmNumericVector::TfrmNumericVector(TComponent* Owner) : TForm(Owner) {}
 //---------------------------------------------------------------------------
 
 void __fastcall TfrmNumericVector::FormKeyDown(TObject* Sender, WORD& Key, TShiftState Shift)
 {
-    if (Key == VK_ESCAPE) ebCancel->Click();
-    if (Key == VK_RETURN) ebOk->Click();
+    if (Key == VK_ESCAPE)
+        ebCancel->Click();
+    if (Key == VK_RETURN)
+        ebOk->Click();
 }
 
 //----------------------------------------------------
@@ -38,10 +38,7 @@ void __fastcall TfrmNumericVector::FormShow(TObject* Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmNumericVector::OnModified(TObject* Sender)
-{
-    ebOk->Enabled = true;
-}
+void __fastcall TfrmNumericVector::OnModified(TObject* Sender) { ebOk->Enabled = true; }
 //---------------------------------------------------------------------------
 
 void __fastcall TfrmNumericVector::ebOkClick(TObject* Sender)
@@ -82,7 +79,8 @@ bool __fastcall TfrmNumericVector::Run(
     seY->Value = data->y;
     seZ->Value = data->z;
 
-    if (MN) {
+    if (MN)
+    {
         seX->MinValue = MN->x;
         seY->MinValue = MN->y;
         seZ->MinValue = MN->z;
@@ -93,7 +91,8 @@ bool __fastcall TfrmNumericVector::Run(
         seY->MinValue = 0;
         seZ->MinValue = 0;
     }
-    if (MX) {
+    if (MX)
+    {
         seX->MaxValue = MX->x;
         seY->MaxValue = MX->y;
         seZ->MaxValue = MX->z;
@@ -105,14 +104,16 @@ bool __fastcall TfrmNumericVector::Run(
         seZ->MaxValue = 0;
     }
 
-    if (!X || !Y) {
+    if (!X || !Y)
+    {
         POINT pt;
         GetCursorPos(&pt);
         int w = GetSystemMetrics(SM_CXSCREEN);
         int h = GetSystemMetrics(SM_CYSCREEN);
         Left = pt.x - (Width * 0.5f);
         Top = pt.y;
-        if (((Left + Width * 0.5f) > w) || ((Top + Height) > h)) {
+        if (((Left + Width * 0.5f) > w) || ((Top + Height) > h))
+        {
             Left = w * 0.5f - Width * 0.5f;
             Top = h * 0.5f;
         }

@@ -38,7 +38,6 @@ public:
 
 public:
     IC const channal_rule& rule(u16 channel) { return rules[channel]; }
-
     IC void get_def(u16 channel, channel_def& def)
     {
         VERIFY(channel < max);

@@ -16,7 +16,8 @@ void xrMU_Model::export_cform_rcast(CDB::CollectorPacked& CL, Fmatrix& xform)
     {
         _face* F = (*it);
         const Shader_xrLC& SH = F->Shader();
-        if (!SH.flags.bLIGHT_CastShadow) continue;
+        if (!SH.flags.bLIGHT_CastShadow)
+            continue;
 
         // Collect
         adjacent.clear();
@@ -34,22 +35,26 @@ void xrMU_Model::export_cform_rcast(CDB::CollectorPacked& CL, Fmatrix& xform)
         for (u32 ait = 0; ait < adjacent.size(); ait++)
         {
             _face* Test = adjacent[ait];
-            if (Test == F) continue;
-            if (!Test->flags.bProcessed) continue;
-            if (F->isEqual(*Test)) {
+            if (Test == F)
+                continue;
+            if (!Test->flags.bProcessed)
+                continue;
+            if (F->isEqual(*Test))
+            {
                 bAlready = TRUE;
                 break;
             }
         }
 
         //
-        if (!bAlready) {
+        if (!bAlready)
+        {
             F->flags.bProcessed = true;
             Fvector P[3];
             xform.transform_tiny(P[0], F->v[0]->P);
             xform.transform_tiny(P[1], F->v[1]->P);
             xform.transform_tiny(P[2], F->v[2]->P);
-            CL.add_face_D(P[0], P[1], P[2], *((u32*)&F), F->sm_group);  //
+            CL.add_face_D(P[0], P[1], P[2], *((u32*)&F), F->sm_group); //
         }
     }
 }

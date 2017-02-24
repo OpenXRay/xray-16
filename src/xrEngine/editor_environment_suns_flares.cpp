@@ -36,11 +36,7 @@ editor::property_holder* property_collection<flares::flares_type, flares>::creat
     return (object->object());
 }
 
-flares::flares() : m_use(false), m_shader(""), m_collection(0)
-{
-    m_collection = new collection_type(&m_flares, this);
-}
-
+flares::flares() : m_use(false), m_shader(""), m_collection(0) { m_collection = new collection_type(&m_flares, this); }
 flares::~flares()
 {
     xr_delete(m_collection);
@@ -52,7 +48,8 @@ void flares::load(CInifile& config, shared_str const& section)
     m_use = !!READ_IF_EXISTS(&config, r_bool, section, "flares", true);
     m_shader = READ_IF_EXISTS(&config, r_string, section, "flare_shader", "effects\\flare");
 
-    if (!m_use) return;
+    if (!m_use)
+        return;
 
     shared_str flare_opacity =
         READ_IF_EXISTS(&config, r_string, section, "flare_opacity", "0.340, 0.260, 0.500, 0.420, 0.260, 0.260");
@@ -60,9 +57,9 @@ void flares::load(CInifile& config, shared_str const& section)
         READ_IF_EXISTS(&config, r_string, section, "flare_position", "1.300, 1.000, 0.500, -0.300, -0.600, -1.000");
     shared_str flare_radius =
         READ_IF_EXISTS(&config, r_string, section, "flare_radius", "0.080, 0.120, 0.040, 0.080, 0.120, 0.300");
-    shared_str flare_textures = READ_IF_EXISTS(
-        &config, r_string, section, "flare_textures", "fx\\fx_flare1.tga, fx\\fx_flare2.tga, fx\\fx_flare2.tga, "
-                                                      "fx\\fx_flare2.tga, fx\\fx_flare3.tga, fx\\fx_flare1.tga");
+    shared_str flare_textures = READ_IF_EXISTS(&config, r_string, section, "flare_textures",
+        "fx\\fx_flare1.tga, fx\\fx_flare2.tga, fx\\fx_flare2.tga, fx\\fx_flare2.tga, fx\\fx_flare3.tga, "
+        "fx\\fx_flare1.tga");
 
     u32 opacity_count = _GetItemCount(flare_opacity.c_str());
     u32 position_count = _GetItemCount(flare_position.c_str());
@@ -106,4 +103,4 @@ void flares::fill(
     properties->add_property("flares", "flares", "this option is resposible for flares", m_collection);
 }
 
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

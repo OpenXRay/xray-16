@@ -10,14 +10,8 @@ char const* cd_creation_date = "creation_date";
 
 namespace mp_anticheat
 {
-dump_verifyer::dump_verifyer() : xr_dsa_verifyer(p_number, q_number, g_number, public_key)
-{
-}
-
-dump_verifyer::~dump_verifyer()
-{
-}
-
+dump_verifyer::dump_verifyer() : xr_dsa_verifyer(p_number, q_number, g_number, public_key) {}
+dump_verifyer::~dump_verifyer() {}
 configs_verifyer::configs_verifyer()
 {
     m_original_config.start_dump();
@@ -27,10 +21,7 @@ configs_verifyer::configs_verifyer()
     m_orig_config_end_pos = m_orig_config_body.tell();
 }
 
-configs_verifyer::~configs_verifyer()
-{
-}
-
+configs_verifyer::~configs_verifyer() {}
 static char* search_info_section(u8* buffer, u32 buffer_size)
 {
     u32 sstr_size = xr_strlen(cd_info_secion);
@@ -39,7 +30,8 @@ static char* search_info_section(u8* buffer, u32 buffer_size)
     int r_size = static_cast<int>(buffer_size - sstr_size);
     do
     {
-        if (!memcmp(rbegin, cd_info_secion, sstr_size)) {
+        if (!memcmp(rbegin, cd_info_secion, sstr_size))
+        {
             return static_cast<char*>((void*)rbegin);
         }
         --rbegin;
@@ -51,7 +43,8 @@ static char* search_info_section(u8* buffer, u32 buffer_size)
 bool const configs_verifyer::verify_dsign(u8* data, u32 data_size, sha_checksum_t& sha_checksum)
 {
     char* tmp_info_sect = search_info_section(data, data_size);
-    if (!tmp_info_sect) return false;
+    if (!tmp_info_sect)
+        return false;
 
     --tmp_info_sect;
     u32 tmp_info_sect_size = xr_strlen(tmp_info_sect);
@@ -78,10 +71,11 @@ bool const configs_verifyer::verify_dsign(u8* data, u32 data_size, sha_checksum_
     shared_str tmp_dsign = tmp_ini.r_string(cd_info_secion, cd_digital_sign_key);
 
     xr_strcat(dst_buffer, dst_size, add_str);
-    src_data_size += xr_strlen(dst_buffer) + 1;  // zero ending
+    src_data_size += xr_strlen(dst_buffer) + 1; // zero ending
 
     bool ret = m_verifyer.verify(data, src_data_size, tmp_dsign);
-    if (!ret) return false;
+    if (!ret)
+        return false;
 
     CopyMemory(sha_checksum, m_verifyer.get_sha_checksum(), sizeof(sha_checksum));
 
@@ -92,7 +86,8 @@ LPCSTR configs_verifyer::get_section_diff(CInifile::Sect* sect_ptr, CInifile& ac
 {
     LPCSTR diff_str = NULL;
     bool tmp_active_param = false;
-    if (!strncmp(sect_ptr->Name.c_str(), "ap_", 3)) {
+    if (!strncmp(sect_ptr->Name.c_str(), "ap_", 3))
+    {
         tmp_active_param = true;
     }
 
@@ -100,10 +95,13 @@ LPCSTR configs_verifyer::get_section_diff(CInifile::Sect* sect_ptr, CInifile& ac
     {
         shared_str const& tmp_value = cit->second;
         shared_str real_value;
-        if (tmp_active_param) {
-            if (active_params.line_exist(sect_ptr->Name.c_str(), cit->first)) {
+        if (tmp_active_param)
+        {
+            if (active_params.line_exist(sect_ptr->Name.c_str(), cit->first))
+            {
                 real_value = active_params.r_string(sect_ptr->Name.c_str(), cit->first.c_str());
-                if (tmp_value != real_value) {
+                if (tmp_value != real_value)
+                {
                     LPCSTR tmp_key_str = NULL;
                     STRCONCAT(tmp_key_str, sect_ptr->Name.c_str(), "::", cit->first.c_str());
                     STRCONCAT(diff_str, tmp_key_str, " = ", tmp_value.c_str(), ",right = ", real_value.c_str());
@@ -114,14 +112,16 @@ LPCSTR configs_verifyer::get_section_diff(CInifile::Sect* sect_ptr, CInifile& ac
                 continue;
             }
         }
-        if (!pSettings->line_exist(sect_ptr->Name, cit->first)) {
+        if (!pSettings->line_exist(sect_ptr->Name, cit->first))
+        {
             STRCONCAT(diff_str, "line ", sect_ptr->Name.c_str(), "::", cit->first.c_str(), " not found");
             strncpy_s(dst_diff, diff_str, sizeof(dst_diff) - 1);
             dst_diff[sizeof(dst_diff) - 1] = 0;
             return dst_diff;
         }
         real_value = pSettings->r_string(sect_ptr->Name.c_str(), cit->first.c_str());
-        if (tmp_value != real_value) {
+        if (tmp_value != real_value)
+        {
             LPCSTR tmp_key_str = NULL;
             STRCONCAT(tmp_key_str, sect_ptr->Name.c_str(), "::", cit->first.c_str());
             STRCONCAT(diff_str, tmp_key_str, " = ", tmp_value.c_str(), ",right = ", real_value.c_str());
@@ -139,11 +139,14 @@ LPCSTR configs_verifyer::get_diff(CInifile& received, CInifile& active_params, s
     for (CInifile::RootIt sit = received.sections().begin(), siet = received.sections().end(); sit != siet; ++sit)
     {
         CInifile::Sect* tmp_sect = *sit;
-        if (tmp_sect->Name == cd_info_secion) continue;
-        if (tmp_sect->Name == active_params_section) continue;
+        if (tmp_sect->Name == cd_info_secion)
+            continue;
+        if (tmp_sect->Name == active_params_section)
+            continue;
 
         diff_str = get_section_diff(tmp_sect, active_params, dst_diff);
-        if (diff_str) {
+        if (diff_str)
+        {
             return diff_str;
         }
     }
@@ -153,7 +156,8 @@ LPCSTR configs_verifyer::get_diff(CInifile& received, CInifile& active_params, s
 
 bool const configs_verifyer::verify(u8* data, u32 data_size, string256& diff)
 {
-    if (!strstr(static_cast<char const*>((void*)data), cd_info_secion)) {
+    if (!strstr(static_cast<char const*>((void*)data), cd_info_secion))
+    {
         xr_strcpy(diff, "invalid data");
         return false;
     }
@@ -198,16 +202,18 @@ bool const configs_verifyer::verify(u8* data, u32 data_size, string256& diff)
     };
 
     u8 tmp_checksum[crypto::xr_sha256::digest_length];
-    if (!verify_dsign(data, data_size, tmp_checksum)) {
+    if (!verify_dsign(data, data_size, tmp_checksum))
+    {
         xr_strcpy(diff, "invalid digital sign");
         return false;
     }
 
-    if (memcmp(tmp_checksum, tmp_sha_checksum.pointer(), sizeof(tmp_checksum))) {
+    if (memcmp(tmp_checksum, tmp_sha_checksum.pointer(), sizeof(tmp_checksum)))
+    {
         get_diff(tmp_ini, tmp_active_params, diff);
         return false;
     }
     return true;
 }
 
-}  // namespace mp_anticheat
+} // namespace mp_anticheat

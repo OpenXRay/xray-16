@@ -17,7 +17,6 @@ struct intrusive_base
     u32 m_ref_count;
 
     IC intrusive_base() : m_ref_count(0) {}
-
     template <typename T>
     IC void _release(T* object)
     {
@@ -42,7 +41,7 @@ private:
     enum
     {
         result = object_type_traits::is_base_and_derived<base_type, object_type>::value ||
-                 object_type_traits::is_same<base_type, object_type>::value
+            object_type_traits::is_same<base_type, object_type>::value
     };
 
 private:

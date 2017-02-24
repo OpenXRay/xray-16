@@ -54,20 +54,24 @@ protected:
     // ref-counting
     void _inc()
     {
-        if (0 == p_) return;
+        if (0 == p_)
+            return;
         p_->dwReference++;
     }
     void _dec()
     {
-        if (0 == p_) return;
+        if (0 == p_)
+            return;
         p_->dwReference--;
-        if (0 == p_->dwReference) xr_delete(p_);
+        if (0 == p_->dwReference)
+            xr_delete(p_);
     }
 
 public:
     ICF void _set(T* rhs)
     {
-        if (0 != rhs) rhs->dwReference++;
+        if (0 != rhs)
+            rhs->dwReference++;
         _dec();
         p_ = rhs;
     }
@@ -94,7 +98,8 @@ public:
     resptr_core(T* p, bool add_ref = true)
     {
         C::p_ = p;
-        if (add_ref) C::_inc();
+        if (add_ref)
+            C::_inc();
     }
     resptr_core(const self& rhs)
     {
@@ -102,7 +107,6 @@ public:
         C::_inc();
     }
     ~resptr_core() { C::_dec(); }
-
     // assignment
     self& operator=(const self& rhs)
     {
@@ -113,12 +117,10 @@ public:
     // accessors
     T& operator*() const { return *C::p_; }
     T* operator->() const { return C::p_; }
-
     // unspecified bool type
     typedef T* (resptr_core::*unspecified_bool_type)() const;
     operator unspecified_bool_type() const { return C::p_ == 0 ? 0 : &resptr_core::_get; }
     bool operator!() const { return C::p_ == 0; }
-
     // fast swapping
     void swap(self& rhs)
     {
@@ -203,4 +205,4 @@ resptr_core<T, D> dynamic_pointer_cast(resptr_core<U, D> const& p)
     return dynamic_cast<T*>(p.get());
 }
 
-#endif  // xr_resourceH
+#endif // xr_resourceH

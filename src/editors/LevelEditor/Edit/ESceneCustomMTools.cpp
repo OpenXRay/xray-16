@@ -21,10 +21,7 @@ ESceneToolBase::ESceneToolBase(ObjClassID cls)
     m_ModifTime = 0;
 }
 
-ESceneToolBase::~ESceneToolBase()
-{
-}
-
+ESceneToolBase::~ESceneToolBase() {}
 void ESceneToolBase::Clear(bool bSpecific)
 {
     m_ModifName = "";
@@ -64,7 +61,8 @@ void ESceneToolBase::SaveLTX(CInifile& ini, int id)
 
 bool ESceneToolBase::LoadStream(IReader& F)
 {
-    if (F.find_chunk(CHUNK_TOOLS_TAG)) {
+    if (F.find_chunk(CHUNK_TOOLS_TAG))
+    {
         F.r_stringZ(m_ModifName);
         F.r(&m_ModifTime, sizeof(m_ModifTime));
     }

@@ -19,7 +19,7 @@ protected:
         om_count
     } m_orient_mode;
 
-    Fvector2 m_ProgressPos;  // x-current y-dest
+    Fvector2 m_ProgressPos; // x-current y-dest
     float m_MinPos;
     float m_MaxPos;
 
@@ -35,7 +35,7 @@ public:
     Fcolor m_minColor;
     Fcolor m_middleColor;
     Fcolor m_maxColor;
-    float m_inertion;  //
+    float m_inertion; //
 public:
     CUIStatic m_UIProgressItem;
     CUIStatic m_UIBackgroundItem;
@@ -53,13 +53,10 @@ public:
     }
     float GetRange_min() { return m_MinPos; }
     float GetRange_max() { return m_MaxPos; }
-
     void SetProgressPos(float _Pos);
     float GetProgressPos() { return m_ProgressPos.y; }
-
     void ShowBackground(bool status) { m_bBackgroundPresent = status; }
     bool IsShownBackground() { return m_bBackgroundPresent; }
-
     virtual void Draw();
     virtual void Update();
 };

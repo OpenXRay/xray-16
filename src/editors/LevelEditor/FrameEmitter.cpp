@@ -14,10 +14,7 @@
 TfraEmitter* fraEmitter;
 
 //---------------------------------------------------------------------------
-__fastcall TfraEmitter::TfraEmitter(TComponent* Owner) : TFrame(Owner)
-{
-}
-
+__fastcall TfraEmitter::TfraEmitter(TComponent* Owner) : TFrame(Owner) {}
 //---------------------------------------------------------------------------
 
 void TfraEmitter::GetInfoFirst(const PS::SEmitterDef& E)

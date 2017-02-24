@@ -53,7 +53,6 @@ public:
         }
 
         bool operator<(const _operator_id_type& operator_id) const { return (m_operator_id < operator_id); }
-
         _operator_ptr get_operator() const { return (m_operator); }
     };
     typedef xr_vector<SOperator> OPERATOR_VECTOR;
@@ -98,7 +97,7 @@ private:
         {
             return self.estimate_edge_weight_impl(vertex_index);
         }
-    };  // struct helper
+    }; // struct helper
 
     template <>
     struct helper<true>
@@ -107,7 +106,7 @@ private:
         {
             return self.estimate_edge_weight_impl(vertex_index, true);
         }
-    };  // struct helper
+    }; // struct helper
 
 protected:
 #ifdef DEBUG

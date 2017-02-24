@@ -23,17 +23,16 @@ class CPortal : public CCustomObject
     CSector* m_SectorFront;
     CSector* m_SectorBack;
 
-  public:
+public:
     CPortal(LPVOID data, LPCSTR name);
     void Construct(LPVOID data);
     virtual ~CPortal();
 
     virtual bool CanAttach() { return false; }
-
     virtual void Render(int priority, bool strictB2F);
     virtual bool RayPick(float& distance, const Fvector& start, const Fvector& direction, SRayPickInfo* pinf = NULL);
     virtual bool FrustumPick(const CFrustum& frustum);
-    virtual void Move(Fvector& amount);  // need for Shift Level
+    virtual void Move(Fvector& amount); // need for Shift Level
     virtual bool LoadStream(IReader&);
     virtual bool LoadLTX(CInifile& ini, LPCSTR sect_name);
     virtual void SaveStream(IWriter&);
@@ -45,7 +44,6 @@ class CPortal : public CCustomObject
     void InvertOrientation(bool bUndo);
 
     FvectorVec& Vertices() { return m_Vertices; }
-
     void SetSectors(CSector* sf, CSector* sb)
     {
         m_SectorFront = sf;

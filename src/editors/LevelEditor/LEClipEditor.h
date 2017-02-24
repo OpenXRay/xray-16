@@ -26,8 +26,8 @@ class CAnimationClip;
 
 class TClipMaker : public TForm, public pureFrame
 {
-    __published :  // IDE-managed Components
-                   TFormStorage* fsStorage;
+    __published : // IDE-managed Components
+                  TFormStorage* fsStorage;
     TPanel* paB;
     TPanel* paBase;
     TPanel* paClipProps;
@@ -129,10 +129,10 @@ class TClipMaker : public TForm, public pureFrame
     void __fastcall ebSyncClick(TObject* Sender);
     void __fastcall ebClearClick(TObject* Sender);
 
-  public:
+public:
     xr_string m_ClipFName;
 
-  protected:
+protected:
     enum
     {
         flRT_RepaintClips = (1 << 0),
@@ -170,20 +170,23 @@ class TClipMaker : public TForm, public pureFrame
     void RepaintClips(bool bForced = false)
     {
         m_RTFlags.set(flRT_RepaintClips, TRUE);
-        if (bForced) RealRepaintClips();
+        if (bForced)
+            RealRepaintClips();
     }
     void RealUpdateProperties();
     void UpdateProperties(bool bForced = false)
     {
         m_RTFlags.set(flRT_UpdateProperties, TRUE);
-        if (bForced) RealUpdateProperties();
+        if (bForced)
+            RealUpdateProperties();
     }
     void RealUpdateClips();
     void UpdateClips(bool bForced = false, bool bRepaint = true)
     {
         m_RTFlags.set(flRT_UpdateClips, TRUE);
         m_RTFlags.set(flRT_RepaintClips, bRepaint);
-        if (bForced) RealUpdateClips();
+        if (bForced)
+            RealUpdateClips();
     }
 
     void Clear();
@@ -194,7 +197,7 @@ class TClipMaker : public TForm, public pureFrame
 
     void __stdcall OnClipItemFocused(ListItemsVec& items);
 
-  public:
+public:
     float m_CurrentPlayTime;
     float m_TotalLength;
     float m_Zoom;
@@ -202,7 +205,7 @@ class TClipMaker : public TForm, public pureFrame
     void Play(BOOL bLoop);
     void Stop();
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TClipMaker(TComponent* Owner);
 
     static TClipMaker* CreateForm();
@@ -225,28 +228,26 @@ struct AnimClipItem
 
 class CAnimationClip
 {
-  public:
+public:
     AnimClipItem animItems[4];
 
-  public:
+public:
     shared_str name;
     float start_time;
     float length;
     s32 idx;
     TClipMaker* owner;
 
-  public:
+public:
     CAnimationClip(LPCSTR name, TClipMaker* owner);
     CAnimationClip(TClipMaker* owner);
     ~CAnimationClip();
     float Length() const { return length; }
     const float& StartTime() const { return start_time; }
-
     int PWidthUI() { return Length() * owner->m_Zoom; }
     int PLeftUI() { return StartTime() * owner->m_Zoom; }
     int PRightUI() { return PLeftUI() + PWidthUI(); }
-
-  public:
+public:
     void Save(IWriter& F) { R_ASSERT(0); }
     bool Load(IReader& F)
     {

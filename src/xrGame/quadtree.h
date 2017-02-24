@@ -47,7 +47,6 @@ public:
         }
 
         virtual ~CFixedStorage() { xr_free(m_objects); }
-
         IC T* get_object()
         {
             VERIFY(m_free);

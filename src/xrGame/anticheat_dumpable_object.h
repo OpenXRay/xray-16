@@ -8,4 +8,4 @@ public:
     virtual shared_str const GetAnticheatSectionName() const { return ""; }
 };
 
-#endif  //#ifndef ANTICHEAT_DUMPABLE_OBJECT
+#endif //#ifndef ANTICHEAT_DUMPABLE_OBJECT

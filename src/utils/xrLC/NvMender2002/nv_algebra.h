@@ -25,9 +25,7 @@ struct DECLSPEC_NV_MATH vec2
     vec2(const vec3t<nv_scalar>&);
 
     bool operator==(const vec2& u) const { return (u.x == x && u.y == y) ? true : false; }
-
     bool operator!=(const vec2& u) const { return !(*this == u); }
-
     vec2& operator*=(const nv_scalar& lambda)
     {
         x *= lambda;
@@ -50,48 +48,26 @@ struct DECLSPEC_NV_MATH vec2
     }
 
     nv_scalar& operator[](int i) { return vec_array[i]; }
-
     const nv_scalar operator[](int i) const { return vec_array[i]; }
-
     union
     {
         struct
         {
-            nv_scalar x, y;  // standard names for components
+            nv_scalar x, y; // standard names for components
         };
         struct
         {
-            nv_scalar s, t;  // standard names for components
+            nv_scalar s, t; // standard names for components
         };
-        nv_scalar vec_array[2];  // array access
+        nv_scalar vec_array[2]; // array access
     };
 };
 
-inline const vec2 operator+(const vec2& u, const vec2& v)
-{
-    return vec2(u.x + v.x, u.y + v.y);
-}
-
-inline const vec2 operator-(const vec2& u, const vec2& v)
-{
-    return vec2(u.x - v.x, u.y - v.y);
-}
-
-inline const vec2 operator*(const nv_scalar s, const vec2& u)
-{
-    return vec2(s * u.x, s * u.y);
-}
-
-inline const vec2 operator/(const vec2& u, const nv_scalar s)
-{
-    return vec2(u.x / s, u.y / s);
-}
-
-inline const vec2 operator*(const vec2& u, const vec2& v)
-{
-    return vec2(u.x * v.x, u.y * v.y);
-}
-
+inline const vec2 operator+(const vec2& u, const vec2& v) { return vec2(u.x + v.x, u.y + v.y); }
+inline const vec2 operator-(const vec2& u, const vec2& v) { return vec2(u.x - v.x, u.y - v.y); }
+inline const vec2 operator*(const nv_scalar s, const vec2& u) { return vec2(s * u.x, s * u.y); }
+inline const vec2 operator/(const vec2& u, const nv_scalar s) { return vec2(u.x / s, u.y / s); }
+inline const vec2 operator*(const vec2& u, const vec2& v) { return vec2(u.x * v.x, u.y * v.y); }
 template <class _T>
 struct vec3t
 {
@@ -143,18 +119,17 @@ struct vec3t
     }
 
     _T& operator[](int i) { return vec_array[i]; }
-
     union
     {
         struct
         {
-            _T x, y, z;  // standard names for components
+            _T x, y, z; // standard names for components
         };
         struct
         {
-            _T s, t, r;  // standard names for components
+            _T s, t, r; // standard names for components
         };
-        _T vec_array[3];  // array access
+        _T vec_array[3]; // array access
     };
 
     const _T operator[](int i) const { return vec_array[i]; }
@@ -210,11 +185,8 @@ struct DECLSPEC_NV_MATH vec4
     vec4(const nv_scalar* xyzw) : x(xyzw[0]), y(xyzw[1]), z(xyzw[2]), w(xyzw[3]) {}
     vec4(const vec3& u) : x(u.x), y(u.y), z(u.z), w(1.0f) {}
     vec4(const vec4& u) : x(u.x), y(u.y), z(u.z), w(u.w) {}
-
     bool operator==(const vec4& u) const { return (u.x == x && u.y == y && u.z == z && u.w == w) ? true : false; }
-
     bool operator!=(const vec4& rhs) const { return !(*this == rhs); }
-
     vec4& operator*=(const nv_scalar& lambda)
     {
         x *= lambda;
@@ -243,50 +215,27 @@ struct DECLSPEC_NV_MATH vec4
     }
 
     vec4 operator-() const { return vec4(-x, -y, -z, -w); }
-
     nv_scalar& operator[](int i) { return vec_array[i]; }
-
     const nv_scalar operator[](int i) const { return vec_array[i]; }
-
     union
     {
         struct
         {
-            nv_scalar x, y, z, w;  // standard names for components
+            nv_scalar x, y, z, w; // standard names for components
         };
         struct
         {
-            nv_scalar s, t, r, q;  // standard names for components
+            nv_scalar s, t, r, q; // standard names for components
         };
-        nv_scalar vec_array[4];  // array access
+        nv_scalar vec_array[4]; // array access
     };
 };
 
-inline const vec4 operator+(const vec4& u, const vec4& v)
-{
-    return vec4(u.x + v.x, u.y + v.y, u.z + v.z, u.w + v.w);
-}
-
-inline const vec4 operator-(const vec4& u, const vec4& v)
-{
-    return vec4(u.x - v.x, u.y - v.y, u.z - v.z, u.w - v.w);
-}
-
-inline const vec4 operator*(const nv_scalar s, const vec4& u)
-{
-    return vec4(s * u.x, s * u.y, s * u.z, s * u.w);
-}
-
-inline const vec4 operator/(const vec4& u, const nv_scalar s)
-{
-    return vec4(u.x / s, u.y / s, u.z / s, u.w / s);
-}
-
-inline const vec4 operator*(const vec4& u, const vec4& v)
-{
-    return vec4(u.x * v.x, u.y * v.y, u.z * v.z, u.w * v.w);
-}
-
+inline const vec4 operator+(const vec4& u, const vec4& v) { return vec4(u.x + v.x, u.y + v.y, u.z + v.z, u.w + v.w); }
+inline const vec4 operator-(const vec4& u, const vec4& v) { return vec4(u.x - v.x, u.y - v.y, u.z - v.z, u.w - v.w); }
+inline const vec4 operator*(const nv_scalar s, const vec4& u) { return vec4(s * u.x, s * u.y, s * u.z, s * u.w); }
+inline const vec4 operator/(const vec4& u, const nv_scalar s) { return vec4(u.x / s, u.y / s, u.z / s, u.w / s); }
+inline const vec4 operator*(const vec4& u, const vec4& v) { return vec4(u.x * v.x, u.y * v.y, u.z * v.z, u.w * v.w); }
 template <class _T>
 inline vec3t<_T>::vec3t(const vec4& u)
 {
@@ -317,13 +266,9 @@ struct DECLSPEC_NV_MATH mat3
     }
 
     const vec3 col(const int i) const { return vec3(&mat_array[i * 3]); }
-
     const vec3 operator[](int i) const { return vec3(mat_array[i], mat_array[i + 3], mat_array[i + 6]); }
-
     const nv_scalar& operator()(const int& i, const int& j) const { return mat_array[j * 3 + i]; }
-
     nv_scalar& operator()(const int& i, const int& j) { return mat_array[j * 3 + i]; }
-
     void set_row(int i, const vec3& v)
     {
         mat_array[i] = v.x;
@@ -345,11 +290,11 @@ struct DECLSPEC_NV_MATH mat3
     {
         struct
         {
-            nv_scalar a00, a10, a20;  // standard names for components
-            nv_scalar a01, a11, a21;  // standard names for components
-            nv_scalar a02, a12, a22;  // standard names for components
+            nv_scalar a00, a10, a20; // standard names for components
+            nv_scalar a01, a11, a21; // standard names for components
+            nv_scalar a02, a12, a22; // standard names for components
         };
-        nv_scalar mat_array[9];  // array access
+        nv_scalar mat_array[9]; // array access
     };
 };
 
@@ -372,16 +317,13 @@ struct DECLSPEC_NV_MATH mat4
     }
 
     const vec4 col(const int i) const { return vec4(&mat_array[i * 4]); }
-
     const vec4 operator[](const int& i) const
     {
         return vec4(mat_array[i], mat_array[i + 4], mat_array[i + 8], mat_array[i + 12]);
     }
 
     const nv_scalar& operator()(const int& i, const int& j) const { return mat_array[j * 4 + i]; }
-
     nv_scalar& operator()(const int& i, const int& j) { return mat_array[j * 4 + i]; }
-
     void set_col(int i, const vec4& v)
     {
         mat_array[i * 4] = v.x;
@@ -414,29 +356,29 @@ struct DECLSPEC_NV_MATH mat4
     {
         struct
         {
-            nv_scalar a00, a10, a20, a30;  // standard names for components
-            nv_scalar a01, a11, a21, a31;  // standard names for components
-            nv_scalar a02, a12, a22, a32;  // standard names for components
-            nv_scalar a03, a13, a23, a33;  // standard names for components
+            nv_scalar a00, a10, a20, a30; // standard names for components
+            nv_scalar a01, a11, a21, a31; // standard names for components
+            nv_scalar a02, a12, a22, a32; // standard names for components
+            nv_scalar a03, a13, a23, a33; // standard names for components
         };
         struct
         {
-            nv_scalar _11, _12, _13, _14;  // standard names for components
-            nv_scalar _21, _22, _23, _24;  // standard names for components
-            nv_scalar _31, _32, _33, _34;  // standard names for components
-            nv_scalar _41, _42, _43, _44;  // standard names for components
+            nv_scalar _11, _12, _13, _14; // standard names for components
+            nv_scalar _21, _22, _23, _24; // standard names for components
+            nv_scalar _31, _32, _33, _34; // standard names for components
+            nv_scalar _41, _42, _43, _44; // standard names for components
         };
         union
         {
             struct
             {
-                nv_scalar b00, b10, b20, p;  // standard names for components
-                nv_scalar b01, b11, b21, q;  // standard names for components
-                nv_scalar b02, b12, b22, r;  // standard names for components
-                nv_scalar x, y, z, w;        // standard names for components
+                nv_scalar b00, b10, b20, p; // standard names for components
+                nv_scalar b01, b11, b21, q; // standard names for components
+                nv_scalar b02, b12, b22, r; // standard names for components
+                nv_scalar x, y, z, w; // standard names for components
             };
         };
-        nv_scalar mat_array[16];  // array access
+        nv_scalar mat_array[16]; // array access
     };
 };
 
@@ -522,27 +464,11 @@ extern vec3& normalize(vec3& u);
 extern vec4& normalize(vec4& u);
 
 // Computes the squared magnitude
-inline nv_scalar nv_sq_norm(const vec3& n)
-{
-    return n.x * n.x + n.y * n.y + n.z * n.z;
-}
-
-inline nv_scalar nv_sq_norm(const vec4& n)
-{
-    return n.x * n.x + n.y * n.y + n.z * n.z + n.w * n.w;
-}
-
+inline nv_scalar nv_sq_norm(const vec3& n) { return n.x * n.x + n.y * n.y + n.z * n.z; }
+inline nv_scalar nv_sq_norm(const vec4& n) { return n.x * n.x + n.y * n.y + n.z * n.z + n.w * n.w; }
 // Computes the magnitude
-inline nv_scalar nv_norm(const vec3& n)
-{
-    return _sqrt(nv_sq_norm(n));
-}
-
-inline nv_scalar nv_norm(const vec4& n)
-{
-    return _sqrt(nv_sq_norm(n));
-}
-
+inline nv_scalar nv_norm(const vec3& n) { return _sqrt(nv_sq_norm(n)); }
+inline nv_scalar nv_norm(const vec4& n) { return _sqrt(nv_sq_norm(n)); }
 // computes the cross product ( v cross w) and stores the result in u
 // i.e.     u = v cross w
 extern vec3& cross(vec3& u, const vec3& v, const vec3& w);
@@ -657,11 +583,7 @@ extern mat3& tangent_basis(mat3& basis, const vec3& v0, const vec3& v1, const ve
     const vec2& t2, const vec3& n);
 
 // linear interpolation
-inline nv_scalar lerp(nv_scalar t, nv_scalar a, nv_scalar b)
-{
-    return a * (nv_one - t) + t * b;
-}
-
+inline nv_scalar lerp(nv_scalar t, nv_scalar a, nv_scalar b) { return a * (nv_one - t) + t * b; }
 inline vec3& lerp(vec3& w, const nv_scalar& t, const vec3& u, const vec3& v)
 {
     w.x = lerp(t, u.x, v.x);
@@ -671,16 +593,8 @@ inline vec3& lerp(vec3& w, const nv_scalar& t, const vec3& u, const vec3& v)
 }
 
 // utilities
-inline nv_scalar nv_min(const nv_scalar& lambda, const nv_scalar& n)
-{
-    return (lambda < n) ? lambda : n;
-}
-
-inline nv_scalar nv_max(const nv_scalar& lambda, const nv_scalar& n)
-{
-    return (lambda > n) ? lambda : n;
-}
-
+inline nv_scalar nv_min(const nv_scalar& lambda, const nv_scalar& n) { return (lambda < n) ? lambda : n; }
+inline nv_scalar nv_max(const nv_scalar& lambda, const nv_scalar& n) { return (lambda > n) ? lambda : n; }
 inline nv_scalar nv_clamp(nv_scalar u, const nv_scalar min, const nv_scalar max)
 {
     u = (u < min) ? min : u;
@@ -714,4 +628,4 @@ nv_scalar det(const mat3& A);
 extern void nv_is_valid(const vec3& v);
 extern void nv_is_valid(nv_scalar lambda);
 
-#endif  // nv_algebraH
+#endif // nv_algebraH

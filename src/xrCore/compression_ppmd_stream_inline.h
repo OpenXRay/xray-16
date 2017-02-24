@@ -23,20 +23,13 @@ inline void stream::put_char(const u8& object)
 inline int stream::get_char()
 {
     VERIFY(m_pointer >= m_buffer);
-    if (m_pointer < (m_buffer + m_buffer_size)) return (*m_pointer++);
+    if (m_pointer < (m_buffer + m_buffer_size))
+        return (*m_pointer++);
     return (EOF);
 }
 
-inline void stream::rewind()
-{
-    m_pointer = m_buffer;
-}
-
-inline u8* stream::buffer() const
-{
-    return (m_buffer);
-}
-
+inline void stream::rewind() { m_pointer = m_buffer; }
+inline u8* stream::buffer() const { return (m_buffer); }
 inline u32 stream::tell() const
 {
     VERIFY(m_pointer >= m_buffer);
@@ -45,7 +38,7 @@ inline u32 stream::tell() const
     return (u32(m_pointer - m_buffer));
 }
 
-}  // namespace ppmd
-}  // namespace compression
+} // namespace ppmd
+} // namespace compression
 
-#endif  // COMPRESSION_PPMD_STREAM_INLINE_H
+#endif // COMPRESSION_PPMD_STREAM_INLINE_H

@@ -28,7 +28,8 @@ void WaitMuModelsLocalCalcLightening()
         mu_models_local_calc_lightening_wait_lock.Enter();
         complited = mu_models_local_calc_lightening;
         mu_models_local_calc_lightening_wait_lock.Leave();
-        if (complited) break;
+        if (complited)
+            break;
     }
 }
 void SetMuModelsLocalCalcLighteningCompleted()
@@ -78,7 +79,8 @@ public:
 
         // Light models
 
-        if (mu_light_net) {
+        if (mu_light_net)
+        {
             lc_net::RunBaseModelsNet();
             lc_net::RunRefModelsNet();
             return;
@@ -101,20 +103,11 @@ public:
 
         for (u32 thID = 0; thID < threads; thID++)
             mu_secondary.start(new CMULight(thID, thID * stride, thID * stride + stride));
-        if (last > 0) mu_secondary.start(new CMULight(threads, threads * stride, threads * stride + last));
+        if (last > 0)
+            mu_secondary.start(new CMULight(threads, threads * stride, threads * stride + last));
     }
 };
 
-void run_mu_base(bool net)
-{
-    mu_base.start(new CMUThread(0));
-}
-
-void wait_mu_base_thread()
-{
-    mu_base.wait(500);
-}
-void wait_mu_secondary_thread()
-{
-    mu_secondary.wait(500);
-}
+void run_mu_base(bool net) { mu_base.start(new CMUThread(0)); }
+void wait_mu_base_thread() { mu_base.wait(500); }
+void wait_mu_secondary_thread() { mu_secondary.wait(500); }

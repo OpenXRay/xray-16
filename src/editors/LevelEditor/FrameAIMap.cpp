@@ -25,51 +25,28 @@ __fastcall TfraAIMap::TfraAIMap(TComponent* Owner, ESceneAIMapTool* _tools) : TF
 }
 
 //---------------------------------------------------------------------------
-void __fastcall TfraAIMap::PanelMinClick(TObject* Sender)
-{
-    PanelMinMaxClick(Sender);
-}
-
+void __fastcall TfraAIMap::PanelMinClick(TObject* Sender) { PanelMinMaxClick(Sender); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraAIMap::ExpandClick(TObject* Sender)
-{
-    PanelMaximizeClick(Sender);
-}
-
+void __fastcall TfraAIMap::ExpandClick(TObject* Sender) { PanelMaximizeClick(Sender); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraAIMap::ebGenerateMapClick(TObject* Sender)
-{
-    tools->GenerateMap(false);
-}
-
+void __fastcall TfraAIMap::ebGenerateMapClick(TObject* Sender) { tools->GenerateMap(false); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraAIMap::ebGenerateSelectedClick(TObject* Sender)
-{
-    tools->GenerateMap(true);
-}
-
+void __fastcall TfraAIMap::ebGenerateSelectedClick(TObject* Sender) { tools->GenerateMap(true); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraAIMap::ebResetSelectedClick(TObject* Sender)
-{
-    tools->ResetNodes();
-}
-
+void __fastcall TfraAIMap::ebResetSelectedClick(TObject* Sender) { tools->ResetNodes(); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfraAIMap::ebSmoothNodesClick(TObject* Sender)
-{
-    tools->SmoothNodes();
-}
-
+void __fastcall TfraAIMap::ebSmoothNodesClick(TObject* Sender) { tools->SmoothNodes(); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfraAIMap::ExtBtn6Click(TObject* Sender)
 {
-    if (ELog.DlgMsg(mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, "Are you sure to clear AI Map?") == mrYes) {
+    if (ELog.DlgMsg(mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, "Are you sure to clear AI Map?") == mrYes)
+    {
         tools->Clear();
         Scene->UndoSave();
     }
@@ -77,11 +54,7 @@ void __fastcall TfraAIMap::ExtBtn6Click(TObject* Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TfraAIMap::ebDrawSnapObjectsClick(TObject* Sender)
-{
-    UI->RedrawScene();
-}
-
+void __fastcall TfraAIMap::ebDrawSnapObjectsClick(TObject* Sender) { UI->RedrawScene(); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfraAIMap::ebInvertLinkClick(TObject* Sender)
@@ -99,7 +72,8 @@ static const int idx[5][4] = {
 
 int ConvertV2L(int side)
 {
-    if (side < 4) {
+    if (side < 4)
+    {
         const Fvector& HPB = EDevice.m_Camera.GetHPB();
         float h = angle_normalize(HPB.x) / PI;
         R_ASSERT((h >= 0.f) && (h <= 2.f));
@@ -154,7 +128,8 @@ void __fastcall TfraAIMap::ebSelLinkClick(TObject* Sender)
 void __fastcall TfraAIMap::btnAddIgnoredMaterialClick(TObject* Sender)
 {
     LPCSTR new_val = 0;
-    if (TfrmChoseItem::SelectItem(smGameMaterial, new_val, 1)) {
+    if (TfrmChoseItem::SelectItem(smGameMaterial, new_val, 1))
+    {
         lbIgnoreMaterialsList->AddItem(new_val, NULL);
         SGameMtl* mtl = GMLib.GetMaterial(new_val);
         tools->m_ignored_materials.push_back(mtl->GetID());

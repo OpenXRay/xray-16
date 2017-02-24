@@ -41,11 +41,10 @@ public:
     virtual void Load(LPCSTR section);
     virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
-    virtual void shedule_Update(u32 dt);  // Called by sheduler
+    virtual void shedule_Update(u32 dt); // Called by sheduler
     virtual void UpdateCL();
     virtual BOOL renderable_ShadowGenerate() { return FALSE; }
     virtual BOOL renderable_ShadowReceive() { return TRUE; }
-
     virtual void Hit(SHit* pHDS);
 
     virtual void net_Export(NET_Packet& P);
@@ -72,4 +71,4 @@ private:
     virtual void CollisionHit(u16 source_id, u16 bone_id, float power, const Fvector& dir, Fvector& pos);
 };
 
-#endif  // BreakableObjectH
+#endif // BreakableObjectH

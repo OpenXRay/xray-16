@@ -27,11 +27,7 @@ CProjector::~CProjector()
     glow_render.destroy();
 }
 
-void CProjector::Load(LPCSTR section)
-{
-    inherited::Load(section);
-}
-
+void CProjector::Load(LPCSTR section) { inherited::Load(section); }
 void CProjector::BoneCallbackX(CBoneInstance* B)
 {
     CProjector* P = static_cast<CProjector*>(B->callback_param());
@@ -46,7 +42,8 @@ void CProjector::BoneCallbackY(CBoneInstance* B)
     CProjector* P = static_cast<CProjector*>(B->callback_param());
 
     float delta_yaw = angle_difference(P->_start.yaw, P->_current.yaw);
-    if (angle_normalize_signed(P->_start.yaw - P->_current.yaw) > 0) delta_yaw = -delta_yaw;
+    if (angle_normalize_signed(P->_start.yaw - P->_current.yaw) > 0)
+        delta_yaw = -delta_yaw;
 
     Fmatrix M;
     M.setHPB(-delta_yaw, 0.0, 0.0f);
@@ -59,7 +56,8 @@ BOOL CProjector::net_Spawn(CSE_Abstract* DC)
     CSE_ALifeObjectProjector* slight = smart_cast<CSE_ALifeObjectProjector*>(e);
     R_ASSERT(slight);
 
-    if (!inherited::net_Spawn(DC)) return (FALSE);
+    if (!inherited::net_Spawn(DC))
+        return (FALSE);
 
     R_ASSERT(Visual() && smart_cast<IKinematics*>(Visual()));
 
@@ -104,14 +102,11 @@ BOOL CProjector::net_Spawn(CSE_Abstract* DC)
     return TRUE;
 }
 
-void CProjector::shedule_Update(u32 dt)
-{
-    inherited::shedule_Update(dt);
-}
-
+void CProjector::shedule_Update(u32 dt) { inherited::shedule_Update(dt); }
 void CProjector::TurnOn()
 {
-    if (light_render->get_active()) return;
+    if (light_render->get_active())
+        return;
 
     light_render->set_active(true);
     glow_render->set_active(true);
@@ -125,7 +120,8 @@ void CProjector::TurnOn()
 
 void CProjector::TurnOff()
 {
-    if (!light_render->get_active()) return;
+    if (!light_render->get_active())
+        return;
 
     light_render->set_active(false);
     glow_render->set_active(false);
@@ -138,9 +134,11 @@ void CProjector::UpdateCL()
     inherited::UpdateCL();
 
     // update light source
-    if (light_render->get_active()) {
+    if (light_render->get_active())
+    {
         // calc color animator
-        if (lanim) {
+        if (lanim)
+        {
             int frame;
             // возвращает в формате BGR
             u32 clr = lanim->CalculateBGR(Device.fTimeGlobal, frame);
@@ -168,19 +166,12 @@ void CProjector::UpdateCL()
     angle_lerp(_current.pitch, _target.pitch, bone_y.velocity, Device.fTimeDelta);
 }
 
-void CProjector::renderable_Render()
-{
-    inherited::renderable_Render();
-}
-
-BOOL CProjector::UsedAI_Locations()
-{
-    return (FALSE);
-}
-
+void CProjector::renderable_Render() { inherited::renderable_Render(); }
+BOOL CProjector::UsedAI_Locations() { return (FALSE); }
 bool CProjector::bfAssignWatch(CScriptEntityAction* tpEntityAction)
 {
-    if (!inherited::bfAssignWatch(tpEntityAction)) return (false);
+    if (!inherited::bfAssignWatch(tpEntityAction))
+        return (false);
 
     CScriptWatchAction& l_tWatchAction = tpEntityAction->m_tWatchAction;
 
@@ -199,7 +190,8 @@ bool CProjector::bfAssignWatch(CScriptEntityAction* tpEntityAction)
 
 bool CProjector::bfAssignObject(CScriptEntityAction* tpEntityAction)
 {
-    if (!inherited::bfAssignObject(tpEntityAction)) return (false);
+    if (!inherited::bfAssignObject(tpEntityAction))
+        return (false);
 
     CScriptObjectAction& l_tObjectAction = tpEntityAction->m_tObjectAction;
 
@@ -219,7 +211,8 @@ void CProjector::SetTarget(const Fvector& target_pos)
     float delta_h;
     delta_h = angle_difference(th, _start.yaw);
 
-    if (angle_normalize_signed(th - _start.yaw) > 0) delta_h = -delta_h;
+    if (angle_normalize_signed(th - _start.yaw) > 0)
+        delta_h = -delta_h;
     clamp(delta_h, -PI_DIV_2, PI_DIV_2);
 
     _target.yaw = angle_normalize(_start.yaw + delta_h);
@@ -228,7 +221,4 @@ void CProjector::SetTarget(const Fvector& target_pos)
     _target.pitch = tp;
 }
 
-Fvector CProjector::GetCurrentDirection()
-{
-    return (Fvector().setHP(_current.yaw, _current.pitch));
-}
+Fvector CProjector::GetCurrentDirection() { return (Fvector().setHP(_current.yaw, _current.pitch)); }

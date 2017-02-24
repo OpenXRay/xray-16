@@ -23,7 +23,7 @@ struct ECORE_API GCFace
 
 class ECORE_API VCPacked
 {
-  protected:
+protected:
     DEFINE_VECTOR(U32Vec, GCHash, GCHashIt);
 
     xr_vector<GCVertex> verts;
@@ -40,7 +40,7 @@ class ECORE_API VCPacked
         return VM[iz * sy * sx + iy * sx + ix];
     }
 
-  public:
+public:
     VCPacked(const Fbox& bb, float eps = EPS, u32 clpSX = 24, u32 clpSY = 16, u32 clpSZ = 24, int apx_vertices = 5000);
     virtual ~VCPacked() { clear(); }
     virtual void clear();
@@ -50,7 +50,6 @@ class ECORE_API VCPacked
     GCVertex* getV() { return &*verts.begin(); }
     size_t getVS() { return verts.size(); }
     xr_vector<GCVertex>& Vertices() { return verts; }
-
     void getHASH_size(u32& x, u32& y, u32& z)
     {
         x = sx;
@@ -73,7 +72,7 @@ class ECORE_API GCPacked :
             F.valid = true;
     }
 
-  public:
+public:
     GCPacked(const Fbox& bb, float eps = EPS, u32 clpMX = 24, u32 clpMY = 16, u32 clpMZ = 24, int apx_vertices = 5000,
         int apx_faces = 5000)
         : VCPacked(bb, eps, clpMX, clpMY, clpMZ, apx_vertices)
@@ -84,12 +83,10 @@ class ECORE_API GCPacked :
     virtual void clear();
 
     xr_vector<GCFace>& Faces() { return faces; }
-
     void add_face(const Fvector& v0, const Fvector& v1, const Fvector& v2, u32 dummy = 0);
 
     GCFace* getF() { return &*faces.begin(); }
     size_t getFS() { return faces.size(); }
-
     void calc_adjacency(U32Vec& dest);
 };
 

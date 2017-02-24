@@ -15,17 +15,16 @@
 
 #define TEAM_PANELS_AHUNT_XML_NAME "ui_team_panels_ahunt.xml"
 
-CUIGameAHunt::CUIGameAHunt() : m_game(NULL), m_pBuySpawnMsgBox(NULL)
-{
-}
-
+CUIGameAHunt::CUIGameAHunt() : m_game(NULL), m_pBuySpawnMsgBox(NULL) {}
 void CUIGameAHunt::Init(int stage)
 {
-    if (stage == 0) {  // shared
+    if (stage == 0)
+    { // shared
         inherited::Init(stage);
         m_buy_msg_caption = UIHelper::CreateTextWnd(*MsgConfig, "mp_ah_buy", Window);
     }
-    if (stage == 1) {  // unique
+    if (stage == 1)
+    { // unique
         m_pTeamPanels->Init(TEAM_PANELS_AHUNT_XML_NAME, "team_panels_wnd");
 
         CUIXml uiXml;
@@ -46,22 +45,15 @@ void CUIGameAHunt::Init(int stage)
         m_pMoneyIndicator->InitFromXML(uiXml);
         m_pRankIndicator->InitFromXml(uiXml);
     }
-    if (stage == 2) {  // after
+    if (stage == 2)
+    { // after
         inherited::Init(stage);
         Window->AttachChild(m_pReinforcementInidcator);
     }
 };
 
-void CUIGameAHunt::UnLoad()
-{
-    inherited::UnLoad();
-}
-
-CUIGameAHunt::~CUIGameAHunt()
-{
-    delete_data(m_pBuySpawnMsgBox);
-}
-
+void CUIGameAHunt::UnLoad() { inherited::UnLoad(); }
+CUIGameAHunt::~CUIGameAHunt() { delete_data(m_pBuySpawnMsgBox); }
 void CUIGameAHunt::SetClGame(game_cl_GameState* g)
 {
     inherited::SetClGame(g);
@@ -79,7 +71,4 @@ void CUIGameAHunt::SetClGame(game_cl_GameState* g)
     m_pBuySpawnMsgBox->func_on_ok = CUIWndCallback::void_function(clmp_game, &game_cl_mp::OnBuySpawn);
 }
 
-void CUIGameAHunt::SetBuyMsgCaption(LPCSTR str)
-{
-    m_buy_msg_caption->SetTextST(str);
-}
+void CUIGameAHunt::SetBuyMsgCaption(LPCSTR str) { m_buy_msg_caption->SetTextST(str); }

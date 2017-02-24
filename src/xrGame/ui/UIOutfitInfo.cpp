@@ -33,10 +33,7 @@ CUIOutfitImmunity::CUIOutfitImmunity()
     m_magnitude = 1.0f;
 }
 
-CUIOutfitImmunity::~CUIOutfitImmunity()
-{
-}
-
+CUIOutfitImmunity::~CUIOutfitImmunity() {}
 void CUIOutfitImmunity::InitFromXml(CUIXml& xml_doc, LPCSTR base_str, u32 hit_type)
 {
     CUIXmlInit::InitWindow(xml_doc, base_str, 0, this);
@@ -124,13 +121,15 @@ void CUIOutfitInfo::InitFromXml(CUIXml& xml_doc)
 void CUIOutfitInfo::UpdateInfo(CCustomOutfit* cur_outfit, CCustomOutfit* slot_outfit)
 {
     CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (!actor || !cur_outfit) {
+    if (!actor || !cur_outfit)
+    {
         return;
     }
 
     for (u32 i = 0; i < max_count; ++i)
     {
-        if (i == ALife::eHitTypeFireWound) {
+        if (i == ALife::eHitTypeFireWound)
+        {
             continue;
         }
 
@@ -138,17 +137,19 @@ void CUIOutfitInfo::UpdateInfo(CCustomOutfit* cur_outfit, CCustomOutfit* slot_ou
         float max_power = actor->conditions().GetZoneMaxPower(hit_type);
 
         float cur = cur_outfit->GetDefHitTypeProtection(hit_type);
-        cur /= max_power;  // = 0..1
+        cur /= max_power; // = 0..1
         float slot = cur;
 
-        if (slot_outfit) {
+        if (slot_outfit)
+        {
             slot = slot_outfit->GetDefHitTypeProtection(hit_type);
-            slot /= max_power;  //  = 0..1
+            slot /= max_power; //  = 0..1
         }
         m_items[i]->SetProgressValue(cur, slot);
     }
 
-    if (m_items[ALife::eHitTypeFireWound]) {
+    if (m_items[ALife::eHitTypeFireWound])
+    {
         IKinematics* ikv = smart_cast<IKinematics*>(actor->Visual());
         VERIFY(ikv);
         u16 spine_bone = ikv->LL_BoneID("bip01_spine");
@@ -160,7 +161,8 @@ void CUIOutfitInfo::UpdateInfo(CCustomOutfit* cur_outfit, CCustomOutfit* slot_ou
         //	cur += cur_outfit->GetBoneArmor(spine_bone);
         //}
         float slot = cur;
-        if (slot_outfit) {
+        if (slot_outfit)
+        {
             spine_bone = ikv->LL_BoneID("bip01_spine");
             slot = slot_outfit->GetBoneArmor(spine_bone) * slot_outfit->GetCondition();
             // if(!slot_outfit->bIsHelmetAvaliable)
@@ -179,13 +181,15 @@ void CUIOutfitInfo::UpdateInfo(CCustomOutfit* cur_outfit, CCustomOutfit* slot_ou
 void CUIOutfitInfo::UpdateInfo(CHelmet* cur_helmet, CHelmet* slot_helmet)
 {
     CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
-    if (!actor || !cur_helmet) {
+    if (!actor || !cur_helmet)
+    {
         return;
     }
 
     for (u32 i = 0; i < max_count; ++i)
     {
-        if (i == ALife::eHitTypeFireWound) {
+        if (i == ALife::eHitTypeFireWound)
+        {
             continue;
         }
 
@@ -193,17 +197,19 @@ void CUIOutfitInfo::UpdateInfo(CHelmet* cur_helmet, CHelmet* slot_helmet)
         float max_power = actor->conditions().GetZoneMaxPower(hit_type);
 
         float cur = cur_helmet->GetDefHitTypeProtection(hit_type);
-        cur /= max_power;  // = 0..1
+        cur /= max_power; // = 0..1
         float slot = cur;
 
-        if (slot_helmet) {
+        if (slot_helmet)
+        {
             slot = slot_helmet->GetDefHitTypeProtection(hit_type);
-            slot /= max_power;  //  = 0..1
+            slot /= max_power; //  = 0..1
         }
         m_items[i]->SetProgressValue(cur, slot);
     }
 
-    if (m_items[ALife::eHitTypeFireWound]) {
+    if (m_items[ALife::eHitTypeFireWound])
+    {
         IKinematics* ikv = smart_cast<IKinematics*>(actor->Visual());
         VERIFY(ikv);
         u16 spine_bone = ikv->LL_BoneID("bip01_head");

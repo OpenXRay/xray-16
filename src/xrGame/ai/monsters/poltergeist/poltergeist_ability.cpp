@@ -33,7 +33,8 @@ void CPolterSpecialAbility::load(LPCSTR section)
 
 void CPolterSpecialAbility::update_schedule()
 {
-    if (m_object->g_Alive()) {
+    if (m_object->g_Alive())
+    {
         if (!m_sound_base._feedback())
             m_sound_base.play_at_pos(m_object, m_object->Position());
         else
@@ -44,7 +45,8 @@ void CPolterSpecialAbility::update_schedule()
 void CPolterSpecialAbility::on_hide()
 {
     VERIFY(m_particles_object == 0);
-    if (!m_object->g_Alive()) return;
+    if (!m_object->g_Alive())
+        return;
 
     m_particles_object =
         m_object->PlayParticles(m_particles_hidden, m_object->Position(), Fvector().set(0.0f, 0.1f, 0.0f), false);
@@ -54,14 +56,18 @@ void CPolterSpecialAbility::on_hide()
 
 void CPolterSpecialAbility::on_show()
 {
-    if (m_particles_object) CParticlesObject::Destroy(m_particles_object);
-    if (m_particles_object_electro) CParticlesObject::Destroy(m_particles_object_electro);
+    if (m_particles_object)
+        CParticlesObject::Destroy(m_particles_object);
+    if (m_particles_object_electro)
+        CParticlesObject::Destroy(m_particles_object_electro);
 }
 
 void CPolterSpecialAbility::update_frame()
 {
-    if (m_particles_object) m_particles_object->SetXFORM(m_object->XFORM());
-    if (m_particles_object_electro) m_particles_object_electro->SetXFORM(m_object->XFORM());
+    if (m_particles_object)
+        m_particles_object->SetXFORM(m_object->XFORM());
+    if (m_particles_object_electro)
+        m_particles_object_electro->SetXFORM(m_object->XFORM());
 }
 
 void CPolterSpecialAbility::on_die()
@@ -77,8 +83,10 @@ void CPolterSpecialAbility::on_die()
 
 void CPolterSpecialAbility::on_hit(SHit* pHDS)
 {
-    if (m_object->g_Alive() && (pHDS->hit_type == ALife::eHitTypeFireWound) && (Device.dwFrame != m_last_hit_frame)) {
-        if (BI_NONE != pHDS->bone()) {
+    if (m_object->g_Alive() && (pHDS->hit_type == ALife::eHitTypeFireWound) && (Device.dwFrame != m_last_hit_frame))
+    {
+        if (BI_NONE != pHDS->bone())
+        {
             //вычислить координаты попадания
             IKinematics* V = smart_cast<IKinematics*>(m_object->Visual());
 
@@ -108,12 +116,14 @@ void CPoltergeist::PhysicalImpulse(const Fvector& position)
     m_nearest.clear_not_free();
     Level().ObjectSpace.GetNearest(m_nearest, position, IMPULSE_RADIUS, NULL);
     // xr_vector<IGameObject*> &m_nearest = Level().ObjectSpace.q_nearest;
-    if (m_nearest.empty()) return;
+    if (m_nearest.empty())
+        return;
 
     u32 index = Random.randI(m_nearest.size());
 
     CPhysicsShellHolder* obj = smart_cast<CPhysicsShellHolder*>(m_nearest[index]);
-    if (!obj || !obj->m_pPhysicsShell) return;
+    if (!obj || !obj->m_pPhysicsShell)
+        return;
 
     Fvector dir;
     dir.sub(obj->Position(), position);
@@ -127,7 +137,8 @@ void CPoltergeist::PhysicalImpulse(const Fvector& position)
 
 void CPoltergeist::StrangeSounds(const Fvector& position)
 {
-    if (m_strange_sound._feedback()) return;
+    if (m_strange_sound._feedback())
+        return;
 
     for (u32 i = 0; i < TRACE_ATTEMPT_COUNT; i++)
     {
@@ -135,15 +146,19 @@ void CPoltergeist::StrangeSounds(const Fvector& position)
         dir.random_dir();
 
         collide::rq_result l_rq;
-        if (Level().ObjectSpace.RayPick(position, dir, TRACE_DISTANCE, collide::rqtStatic, l_rq, NULL)) {
-            if (l_rq.range < TRACE_DISTANCE) {
+        if (Level().ObjectSpace.RayPick(position, dir, TRACE_DISTANCE, collide::rqtStatic, l_rq, NULL))
+        {
+            if (l_rq.range < TRACE_DISTANCE)
+            {
                 // Получить пару материалов
                 CDB::TRI* pTri = Level().ObjectSpace.GetStaticTris() + l_rq.element;
                 SGameMtlPair* mtl_pair = GMLib.GetMaterialPairByIndices(material().self_material_idx(), pTri->material);
-                if (!mtl_pair) continue;
+                if (!mtl_pair)
+                    continue;
 
                 // Играть звук
-                if (!mtl_pair->CollideSounds.empty()) {
+                if (!mtl_pair->CollideSounds.empty())
+                {
                     // CLONE_MTL_SOUND(m_strange_sound, mtl_pair, CollideSounds);
                     VERIFY2(!mtl_pair->CollideSounds.empty(), mtl_pair->dbg_Name());
                     ref_sound& randSound = mtl_pair->CollideSounds[Random.randI(mtl_pair->CollideSounds.size())];

@@ -24,7 +24,6 @@ public:
     };
 
     virtual ~CDistanceFunction() {}
-
     virtual float ffGetValue();
 
     virtual u32 dwfGetDiscreteValue(u32 dwDiscretizationValue)
@@ -69,7 +68,6 @@ public:
     };
 
     virtual ~CPersonalMoraleFunction() {}
-
     virtual float ffGetValue();
 };
 
@@ -87,7 +85,6 @@ public:
     };
 
     virtual ~CPersonalCreatureTypeFunction() {}
-
     virtual float ffGetValue();
 };
 
@@ -105,7 +102,6 @@ public:
     };
 
     virtual ~CPersonalWeaponTypeFunction() {}
-
     u32 dwfGetWeaponType();
     float ffGetTheBestWeapon();
     virtual float ffGetValue();
@@ -125,7 +121,6 @@ public:
     };
 
     virtual ~CPersonalAccuracyFunction() {}
-
     virtual float ffGetValue();
 };
 
@@ -143,7 +138,6 @@ public:
     };
 
     virtual ~CPersonalIntelligenceFunction() {}
-
     virtual float ffGetValue();
 };
 
@@ -161,7 +155,6 @@ public:
     };
 
     virtual ~CPersonalRelationFunction() {}
-
     virtual float ffGetValue();
 };
 
@@ -179,7 +172,6 @@ public:
     };
 
     virtual ~CPersonalGreedFunction() {}
-
     virtual float ffGetValue();
 };
 
@@ -197,7 +189,6 @@ public:
     };
 
     virtual ~CPersonalAggressivenessFunction() {}
-
     virtual float ffGetValue();
 };
 
@@ -215,7 +206,6 @@ public:
     };
 
     virtual ~CEnemyMoraleFunction() {}
-
     virtual float ffGetValue();
 };
 
@@ -233,7 +223,6 @@ public:
     };
 
     virtual ~CEnemyEquipmentCostFunction() {}
-
     virtual float ffGetValue();
 };
 
@@ -251,7 +240,6 @@ public:
     };
 
     virtual ~CEnemyRukzakWeightFunction() {}
-
     virtual float ffGetValue();
 };
 
@@ -269,7 +257,6 @@ public:
     };
 
     virtual ~CEnemyAnomalityFunction() {}
-
     virtual float ffGetValue();
 };
 
@@ -287,7 +274,6 @@ public:
     };
 
     virtual ~CGraphPointType0() {}
-
     virtual float ffGetValue();
 };
 
@@ -305,7 +291,6 @@ public:
     };
 
     virtual ~CPersonalEyeRange() {}
-
     virtual float ffGetValue();
 };
 
@@ -323,7 +308,6 @@ public:
     };
 
     virtual ~CPersonalMaxHealth() {}
-
     virtual float ffGetValue();
     virtual u32 dwfGetDiscreteValue(u32 dwDiscretizationValue = 1);
 };
@@ -342,7 +326,6 @@ public:
     };
 
     virtual ~CEquipmentType() {}
-
     virtual float ffGetValue();
 };
 
@@ -360,7 +343,6 @@ public:
     };
 
     virtual ~CItemDeterioration() {}
-
     virtual float ffGetValue();
 };
 
@@ -378,7 +360,6 @@ public:
     };
 
     virtual ~CEquipmentPreference() {}
-
     virtual float ffGetValue();
 };
 
@@ -396,7 +377,6 @@ public:
     };
 
     virtual ~CMainWeaponType() {}
-
     virtual float ffGetValue();
 };
 
@@ -414,7 +394,6 @@ public:
     };
 
     virtual ~CMainWeaponPreference() {}
-
     virtual float ffGetValue();
 };
 
@@ -432,7 +411,6 @@ public:
     };
 
     virtual ~CItemValue() {}
-
     virtual float ffGetValue();
 };
 
@@ -450,7 +428,6 @@ public:
     };
 
     virtual ~CWeaponAmmoCount() {}
-
     virtual float ffGetValue();
     virtual u32 dwfGetDiscreteValue(u32 dwDiscretizationValue = 1);
 };
@@ -469,7 +446,6 @@ public:
     };
 
     virtual ~CEnemyAnomalyType() {}
-
     virtual float ffGetValue();
 };
 
@@ -487,7 +463,6 @@ public:
     };
 
     virtual ~CDetectorType() {}
-
     virtual float ffGetValue();
 };
 
@@ -505,6 +480,5 @@ public:
     };
 
     virtual ~CEnemyDistanceToGraphPoint() {}
-
     virtual float ffGetValue();
 };

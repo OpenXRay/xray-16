@@ -31,4 +31,4 @@ private:
     map_Tex m_TexCache;
 };
 
-#endif  //	ColorMapManager_included
+#endif //	ColorMapManager_included

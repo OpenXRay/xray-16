@@ -81,4 +81,4 @@ protected:
     void get_best_monster();
     void get_favorite_weapon();
 
-};  // class CUIRankingWnd
+}; // class CUIRankingWnd

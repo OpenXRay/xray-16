@@ -15,7 +15,7 @@ public:
         gid_head = 0x00,
         gid_eyes,
         gid_spine,
-    };  // enum enum_group_id
+    }; // enum enum_group_id
     static u16 const gid_any = u16(-1);
 
     bone_group();
@@ -28,8 +28,8 @@ private:
     typedef AssociativeVector<u16, enum_group_id> bone_groups_map_t;
 
     bone_groups_map_t m_bone_groups;
-};  // class bone_group
+}; // class bone_group
 
-}  // namespace award_system
+} // namespace award_system
 
-#endif  //#ifndef BONE_GROUP_INCLUDED
+#endif //#ifndef BONE_GROUP_INCLUDED

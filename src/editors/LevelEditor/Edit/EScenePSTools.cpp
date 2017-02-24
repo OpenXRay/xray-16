@@ -17,11 +17,7 @@ void EScenePSTool::CreateControls()
 
 //----------------------------------------------------
 
-void EScenePSTool::RemoveControls()
-{
-    inherited::RemoveControls();
-}
-
+void EScenePSTool::RemoveControls() { inherited::RemoveControls(); }
 //----------------------------------------------------
 
 CCustomObject* EScenePSTool::CreateObject(LPVOID data, LPCSTR name)
@@ -32,7 +28,4 @@ CCustomObject* EScenePSTool::CreateObject(LPVOID data, LPCSTR name)
 }
 
 //----------------------------------------------------
-bool EScenePSTool::ExportGame(SExportStreams* F)
-{
-    return inherited::ExportGame(F);
-}
+bool EScenePSTool::ExportGame(SExportStreams* F) { return inherited::ExportGame(F); }

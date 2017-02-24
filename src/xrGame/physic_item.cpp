@@ -13,65 +13,48 @@
 #include "Include/xrRender/RenderVisual.h"
 #include "Include/xrRender/KinematicsAnimated.h"
 #include "Include/xrRender/Kinematics.h"
-#define CHOOSE_MAX(x, inst_x, y, inst_y, z, inst_z)                                                                    \
-    if (x > y)                                                                                                         \
-        if (x > z) {                                                                                                   \
-            inst_x;                                                                                                    \
-        }                                                                                                              \
-        else                                                                                                           \
-        {                                                                                                              \
-            inst_z;                                                                                                    \
-        }                                                                                                              \
-    else if (y > z)                                                                                                    \
-    {                                                                                                                  \
-        inst_y;                                                                                                        \
-    }                                                                                                                  \
-    else                                                                                                               \
-    {                                                                                                                  \
-        inst_z;                                                                                                        \
+#define CHOOSE_MAX(x, inst_x, y, inst_y, z, inst_z) \
+    if (x > y)                                      \
+        if (x > z)                                  \
+        {                                           \
+            inst_x;                                 \
+        }                                           \
+        else                                        \
+        {                                           \
+            inst_z;                                 \
+        }                                           \
+    else if (y > z)                                 \
+    {                                               \
+        inst_y;                                     \
+    }                                               \
+    else                                            \
+    {                                               \
+        inst_z;                                     \
     }
 
-CPhysicItem::CPhysicItem()
-{
-    init();
-}
-
-CPhysicItem::~CPhysicItem()
-{
-    xr_delete(m_pPhysicsShell);
-}
-
-void CPhysicItem::init()
-{
-    m_pPhysicsShell = 0;
-}
-
+CPhysicItem::CPhysicItem() { init(); }
+CPhysicItem::~CPhysicItem() { xr_delete(m_pPhysicsShell); }
+void CPhysicItem::init() { m_pPhysicsShell = 0; }
 void CPhysicItem::reinit()
 {
     inherited::reinit();
     m_ready_to_destroy = false;
 }
 
-void CPhysicItem::Load(LPCSTR section)
-{
-    inherited::Load(section);
-}
-
-void CPhysicItem::reload(LPCSTR section)
-{
-    inherited::reload(section);
-}
-
+void CPhysicItem::Load(LPCSTR section) { inherited::Load(section); }
+void CPhysicItem::reload(LPCSTR section) { inherited::reload(section); }
 void CPhysicItem::OnH_B_Independent(bool just_before_destroy)
 {
     inherited::OnH_B_Independent(just_before_destroy);
 
-    if (m_ready_to_destroy) return;
+    if (m_ready_to_destroy)
+        return;
 
     setVisible(TRUE);
     setEnabled(TRUE);
 
-    if (!just_before_destroy) activate_physic_shell();
+    if (!just_before_destroy)
+        activate_physic_shell();
 }
 
 void CPhysicItem::OnH_B_Chield()
@@ -86,13 +69,16 @@ void CPhysicItem::OnH_B_Chield()
 
 BOOL CPhysicItem::net_Spawn(CSE_Abstract* DC)
 {
-    if (!inherited::net_Spawn(DC)) return (FALSE);
+    if (!inherited::net_Spawn(DC))
+        return (FALSE);
     IKinematics* pK = smart_cast<IKinematics*>(Visual());
     pK->CalculateBones_Invalidate();
     pK->CalculateBones(TRUE);
     CSE_Abstract* abstract = (CSE_Abstract*)DC;
-    if (0xffff == abstract->ID_Parent) {
-        if (!PPhysicsShell()) setup_physic_shell();
+    if (0xffff == abstract->ID_Parent)
+    {
+        if (!PPhysicsShell())
+            setup_physic_shell();
         // else processing_deactivate();//.
     }
 
@@ -102,11 +88,7 @@ BOOL CPhysicItem::net_Spawn(CSE_Abstract* DC)
     return (TRUE);
 }
 
-void CPhysicItem::net_Destroy()
-{
-    inherited::net_Destroy();
-}
-
+void CPhysicItem::net_Destroy() { inherited::net_Destroy(); }
 void CPhysicItem::UpdateCL()
 {
     //	if (!xr_strcmp("bolt",cName()))
@@ -127,7 +109,8 @@ void CPhysicItem::activate_physic_shell()
     XFORM().set(object->XFORM());
     inherited::activate_physic_shell();
     IKinematics* K = smart_cast<IKinematics*>(Visual());
-    if (K) {
+    if (K)
+    {
         K->CalculateBones_Invalidate();
         K->CalculateBones(TRUE);
     }
@@ -138,7 +121,8 @@ void CPhysicItem::setup_physic_shell()
 {
     inherited::setup_physic_shell();
     IKinematics* K = smart_cast<IKinematics*>(Visual());
-    if (K) {
+    if (K)
+    {
         K->CalculateBones_Invalidate();
         K->CalculateBones(TRUE);
     }

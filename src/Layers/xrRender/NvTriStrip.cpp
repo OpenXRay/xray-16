@@ -18,11 +18,7 @@ static bool bListsOnly = false;
 //
 // Default value: false
 //
-void SetListsOnly(const bool _bListsOnly)
-{
-    bListsOnly = _bListsOnly;
-}
-
+void SetListsOnly(const bool _bListsOnly) { bListsOnly = _bListsOnly; }
 ////////////////////////////////////////////////////////////////////////////////////////
 // SetCacheSize()
 //
@@ -33,11 +29,7 @@ void SetListsOnly(const bool _bListsOnly)
 //
 // Default value: 16
 //
-void SetCacheSize(const unsigned int _cacheSize)
-{
-    cacheSize = _cacheSize;
-}
-
+void SetCacheSize(const unsigned int _cacheSize) { cacheSize = _cacheSize; }
 ////////////////////////////////////////////////////////////////////////////////////////
 // SetStitchStrips()
 //
@@ -48,11 +40,7 @@ void SetCacheSize(const unsigned int _cacheSize)
 //
 // Default value: true
 //
-void SetStitchStrips(const bool _bStitchStrips)
-{
-    bStitchStrips = _bStitchStrips;
-}
-
+void SetStitchStrips(const bool _bStitchStrips) { bStitchStrips = _bStitchStrips; }
 ////////////////////////////////////////////////////////////////////////////////////////
 // SetMinStripSize()
 //
@@ -61,11 +49,7 @@ void SetStitchStrips(const bool _bStitchStrips)
 //
 // Default value: 0
 //
-void SetMinStripSize(const unsigned int _minStripSize)
-{
-    minStripSize = _minStripSize;
-}
-
+void SetMinStripSize(const unsigned int _minStripSize) { minStripSize = _minStripSize; }
 ////////////////////////////////////////////////////////////////////////////////////////
 // GenerateStrips()
 //
@@ -96,7 +80,8 @@ void GenerateStrips(const u16* in_indices, const s32 in_numIndices, xr_vector<Pr
     IntVec stripIndices;
     unsigned int numSeparateStrips = 0;
 
-    if (bListsOnly) {
+    if (bListsOnly)
+    {
         // if we're outputting only lists, we're done
         primGroups.resize(1);
 
@@ -142,8 +127,9 @@ void GenerateStrips(const u16* in_indices, const s32 in_numIndices, xr_vector<Pr
         assert((bStitchStrips && (numSeparateStrips == 1)) || !bStitchStrips);
 
         // convert to output format
-        int numGroups = u16(numSeparateStrips);  // for the strips
-        if (tempFaces.size() != 0) numGroups++;  // we've got a list as well, increment
+        int numGroups = u16(numSeparateStrips); // for the strips
+        if (tempFaces.size() != 0)
+            numGroups++; // we've got a list as well, increment
         primGroups.resize(numGroups);
 
         // first, the strips
@@ -152,12 +138,14 @@ void GenerateStrips(const u16* in_indices, const s32 in_numIndices, xr_vector<Pr
         for (stripCtr = 0; stripCtr < numSeparateStrips; stripCtr++)
         {
             int stripLength = 0;
-            if (numSeparateStrips != 1) {
+            if (numSeparateStrips != 1)
+            {
                 // if we've got multiple strips, we need to figure out the correct length
                 int i;
                 for (i = startingLoc; i < stripIndices.size(); i++)
                 {
-                    if (stripIndices[i] == -1) break;
+                    if (stripIndices[i] == -1)
+                        break;
                 }
 
                 stripLength = i - startingLoc;
@@ -173,12 +161,13 @@ void GenerateStrips(const u16* in_indices, const s32 in_numIndices, xr_vector<Pr
             for (int i = startingLoc; i < stripLength + startingLoc; i++)
                 primGroups[stripCtr].indices[indexCtr++] = u16(stripIndices[i]);
 
-            startingLoc += stripLength + 1;  // we add 1 to account for the -1 separating strips
+            startingLoc += stripLength + 1; // we add 1 to account for the -1 separating strips
         }
 
         // next, the list
-        if (tempFaces.size() != 0) {
-            int faceGroupLoc = numGroups - 1;  // the face group is the last one
+        if (tempFaces.size() != 0)
+        {
+            int faceGroupLoc = numGroups - 1; // the face group is the last one
             primGroups[faceGroupLoc].type = PT_LIST;
             primGroups[faceGroupLoc].indices = xr_alloc<u16>(tempFaces.size() * 3);
             primGroups[faceGroupLoc].numIndices = tempFaces.size() * 3;
@@ -250,7 +239,7 @@ void RemapIndices(
         for (int j = 0; j < numIndices; j++)
         {
             int cachedIndex = indexCache[in_primGroups[i].indices[j]];
-            if (cachedIndex == -1)  // we haven't seen this index before
+            if (cachedIndex == -1) // we haven't seen this index before
             {
                 // point to "last" vertex in VB
                 remappedGroups[i].indices[j] = u16(indexCtr);

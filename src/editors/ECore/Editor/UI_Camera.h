@@ -23,7 +23,7 @@ class ECORE_API CUI_Camera
     Fvector m_Position;
     Fvector m_Target;
 
-  protected:
+protected:
     friendclass CEditorRenderDevice;
     friendclass TUI;
 
@@ -36,19 +36,17 @@ class ECORE_API CUI_Camera
     void Rotate(float X, float Y);
     void ArcBall(TShiftState Shift, float X, float Y);
 
-  public:
+public:
     CUI_Camera();
     virtual ~CUI_Camera();
 
     IC float _Znear() { return m_Znear; }
     IC float _Zfar() { return m_Zfar; }
-
     void BuildCamera();
     void Reset();
     void Update(float dt);
     void SetStyle(ECameraStyle style);
     ECameraStyle GetStyle() { return m_Style; }
-
     bool MoveStart(TShiftState Shift);
     bool MoveEnd(TShiftState Shift);
     bool IsMoving() { return m_bMoving; }

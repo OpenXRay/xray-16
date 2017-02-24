@@ -9,8 +9,5 @@
 #pragma once
 
 #ifdef DEBUG
-IC bool CSpaceRestrictionBase::correct() const
-{
-    return (m_correct);
-}
+IC bool CSpaceRestrictionBase::correct() const { return (m_correct); }
 #endif

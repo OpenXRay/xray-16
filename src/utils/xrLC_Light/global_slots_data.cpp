@@ -15,7 +15,8 @@ void global_slots_data::Load()
     u32 check_sum = crc32(R->pointer(), R->length());
 
     recalculation_data.load(check_sum);
-    if (!recalculation_data.recalculating()) {
+    if (!recalculation_data.recalculating())
+    {
         IWriter* W = FS.w_open("$level$", "level.details");
         W->w(R->pointer(), R->length());
         FS.w_close(W);
@@ -36,7 +37,8 @@ void global_slots_data::Load()
 
 void global_slots_data::Free()
 {
-    if (dtFS) xr_delete(dtFS);
+    if (dtFS)
+        xr_delete(dtFS);
     recalculation_data.close();
 }
 
@@ -64,11 +66,7 @@ void global_slots_data::read(INetReader& r)
     recalculation_data.read(r);
 }
 
-void global_slots_data::FreeOnAgent()
-{
-    xr_delete(dtS);
-}
-
+void global_slots_data::FreeOnAgent() { xr_delete(dtS); }
 void global_slots_data::process_all_pallete()
 {
     R_ASSERT(header().version() != u32(-1));
@@ -79,6 +77,7 @@ void global_slots_data::process_all_pallete()
         DetailSlot& DS = get_slot(i);
         process_pallete(DS);
 
-        if (is_empty(DS)) recalculation_data.set_slot_calculated(i);
+        if (is_empty(DS))
+            recalculation_data.set_slot_calculated(i);
     }
 }

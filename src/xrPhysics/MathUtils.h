@@ -3,49 +3,19 @@
 
 extern XRPHYSICS_API const float phInfinity;
 
-IC float* cast_fp(Fvector& fv)
-{
-    return (float*)(&fv);
-}
-
-IC const float* cast_fp(const Fvector& fv)
-{
-    return (const float*)(&fv);
-}
-IC Fvector& cast_fv(float* fp)
-{
-    return *((Fvector*)fp);
-}
-
-IC const Fvector& cast_fv(const float* fp)
-{
-    return *((const Fvector*)fp);
-}
-
-IC float dXZMag(const float* v)
-{
-    return _sqrt(v[0] * v[0] + v[2] * v[2]);
-}
-IC float dXZMag(const Fvector& v)
-{
-    return dXZMag(cast_fp(v));
-}
-IC float dXZDot(const float* v0, const float* v1)
-{
-    return v0[0] * v1[0] + v0[2] * v1[2];
-}
+IC float* cast_fp(Fvector& fv) { return (float*)(&fv); }
+IC const float* cast_fp(const Fvector& fv) { return (const float*)(&fv); }
+IC Fvector& cast_fv(float* fp) { return *((Fvector*)fp); }
+IC const Fvector& cast_fv(const float* fp) { return *((const Fvector*)fp); }
+IC float dXZMag(const float* v) { return _sqrt(v[0] * v[0] + v[2] * v[2]); }
+IC float dXZMag(const Fvector& v) { return dXZMag(cast_fp(v)); }
+IC float dXZDot(const float* v0, const float* v1) { return v0[0] * v1[0] + v0[2] * v1[2]; }
 IC float dXZDotNormalized(const Fvector& v0, const Fvector& v1)
 {
     return (v0.x * v1.x + v0.z * v1.z) / _sqrt((v0.x * v0.x + v0.z * v0.z) * (v1.x * v1.x + v1.z * v1.z));
 }
-IC float dXZDotNormalized(const float* v0, const float* v1)
-{
-    return dXZDotNormalized(cast_fv(v0), cast_fv(v1));
-}
-IC float dXZDot(const Fvector& v0, const Fvector& v1)
-{
-    return v0.x * v1.x + v0.z * v1.z;
-}
+IC float dXZDotNormalized(const float* v0, const float* v1) { return dXZDotNormalized(cast_fv(v0), cast_fv(v1)); }
+IC float dXZDot(const Fvector& v0, const Fvector& v1) { return v0.x * v1.x + v0.z * v1.z; }
 IC void dVectorSet(float* vd, const float* vs)
 {
     vd[0] = vs[0];
@@ -83,11 +53,7 @@ IC void dVector4SetZero(float* vd)
     vd[3] = 0.f;
 }
 
-IC void dQuaternionSet(float* vd, const float* vs)
-{
-    dVector4Set(vd, vs);
-}
-
+IC void dQuaternionSet(float* vd, const float* vs) { dVector4Set(vd, vs); }
 IC void dVectorAdd(float* v, const float* av)
 {
     v[0] += av[0];
@@ -138,7 +104,7 @@ IC void dVectorMul(float* res, const float* av, float mt)
     res[1] = av[1] * mt;
     res[2] = av[2] * mt;
 }
-IC void dVectorInterpolate(float* v, float* to, float k)  // changes to
+IC void dVectorInterpolate(float* v, float* to, float k) // changes to
 {
     dVectorMul(v, 1.f - k);
     dVectorMul(to, k);
@@ -181,7 +147,7 @@ IC void twoq_2w(const Fquaternion& q1, const Fquaternion& q2, float dt, Fvector&
     Fvector v1, v2;
     v1.set(q1.x, q1.y, q1.z);
     v2.set(q2.x, q2.y, q2.z);
-    float cosinus = q1.w * q2.w + v1.dotproduct(v2);  // q1.w*q2.w+ q1.v.dotproduct(q2.v)
+    float cosinus = q1.w * q2.w + v1.dotproduct(v2); // q1.w*q2.w+ q1.v.dotproduct(q2.v)
     w.crossproduct(v1, v2);
     //								  //the signum must be inverted ?
     v1.mul(q2.w);
@@ -189,7 +155,8 @@ IC void twoq_2w(const Fquaternion& q1, const Fquaternion& q2, float dt, Fvector&
     w.sub(v2);
     w.add(v1);
     float sinus_2 = 1.f - cosinus * cosinus, k = 2.f / dt;
-    if (sinus_2 > EPS) k *= acos(cosinus) / _sqrt(sinus_2);
+    if (sinus_2 > EPS)
+        k *= acos(cosinus) / _sqrt(sinus_2);
     w.mul(k);
 }
 
@@ -203,16 +170,8 @@ IC float to_mag_and_dir(const Fvector& in_v, Fvector& out_v)
     return mag;
 }
 
-IC float to_mag_and_dir(Fvector& in_out_v)
-{
-    return to_mag_and_dir(in_out_v, in_out_v);
-}
-
-IC void to_vector(Fvector& v, float mag, const Fvector dir)
-{
-    v.mul(dir, mag);
-}
-
+IC float to_mag_and_dir(Fvector& in_out_v) { return to_mag_and_dir(in_out_v, in_out_v); }
+IC void to_vector(Fvector& v, float mag, const Fvector dir) { v.mul(dir, mag); }
 IC void prg_pos_on_axis(const Fvector& in_ax_p, const Fvector& in_ax_d, Fvector& in_out_pos)
 {
     in_out_pos.sub(in_ax_p);
@@ -247,7 +206,8 @@ IC void restrict_vector_in_dir(Fvector& V, const Fvector& dir)
     Fvector sub;
     sub.set(dir);
     float dotpr = dir.dotproduct(V);
-    if (dotpr > 0.f) {
+    if (dotpr > 0.f)
+    {
         sub.mul(dotpr);
         V.sub(sub);
     }
@@ -258,28 +218,28 @@ IC bool check_obb_sise(const Fobb& obb)
         !fis_zero(obb.m_halfsize.x, EPS_L) || !fis_zero(obb.m_halfsize.y, EPS_L) || !fis_zero(obb.m_halfsize.z, EPS_L));
 }
 
-IC float fsignum(float val)
-{
-    return val < 0.f ? -1.f : 1.f;
-}
-
+IC float fsignum(float val) { return val < 0.f ? -1.f : 1.f; }
 IC void save_max(float& max, float val)
 {
-    if (val > max) max = val;
+    if (val > max)
+        max = val;
 }
 IC void save_min(float& min, float val)
 {
-    if (val < min) min = val;
+    if (val < min)
+        min = val;
 }
 
 IC void limit_above(float& val, float limit)
 {
-    if (val > limit) val = limit;
+    if (val > limit)
+        val = limit;
 }
 
 IC void limit_below(float& val, float limit)
 {
-    if (val < limit) val = limit;
+    if (val < limit)
+        val = limit;
 }
 
 IC void TransferenceToThrowVel(Fvector& in_transference_out_vel, float time, float gravity_accel)
@@ -298,10 +258,12 @@ IC u8 TransferenceAndThrowVelToTgA(
     float sqx = transference.x * transference.x + transference.z * transference.z;
     float sqv = throw_vel * throw_vel;
     float sqD4 = 1.f - gravity_accel / (sqv * sqv) * (2.f * transference.y * sqv + gravity_accel * sqx);
-    if (sqD4 < 0.f) return 0;
+    if (sqD4 < 0.f)
+        return 0;
     s = _sqrt(sqx);
     float mlt = sqv / (gravity_accel * s);
-    if (sqD4 == 0.f) {
+    if (sqD4 == 0.f)
+    {
         tgA.x = tgA.y = mlt;
         return 1;
     }
@@ -334,137 +296,153 @@ IC u8 TransferenceAndThrowVelToThrowDir(
     }
     return ret;
 }
-#define MAX_OF(x, on_x, y, on_y, z, on_z)                                                                              \
-    if (x > y) {                                                                                                       \
-        if (x > z) {                                                                                                   \
-            on_x;                                                                                                      \
-        }                                                                                                              \
-        else                                                                                                           \
-        {                                                                                                              \
-            on_z;                                                                                                      \
-        }                                                                                                              \
-    }                                                                                                                  \
-    else                                                                                                               \
+#define MAX_OF(x, on_x, y, on_y, z, on_z) \
+    if (x > y)                            \
+    {                                     \
+        if (x > z)                        \
+        {                                 \
+            on_x;                         \
+        }                                 \
+        else                              \
+        {                                 \
+            on_z;                         \
+        }                                 \
+    }                                     \
+    else                                  \
     \
-{                                                                                                               \
-        if (y > z) {                                                                                                   \
-            on_y;                                                                                                      \
-        }                                                                                                              \
-        else                                                                                                           \
-        {                                                                                                              \
-            on_z;                                                                                                      \
-        }                                                                                                              \
-    \
-}
-
-#define MIN_OF(x, on_x, y, on_y, z, on_z)                                                                              \
-    if (x < y) {                                                                                                       \
-        if (x < z) {                                                                                                   \
-            on_x;                                                                                                      \
-        }                                                                                                              \
-        else                                                                                                           \
-        {                                                                                                              \
-            on_z;                                                                                                      \
-        }                                                                                                              \
-    }                                                                                                                  \
-    else                                                                                                               \
-    \
-{                                                                                                               \
-        if (y < z) {                                                                                                   \
-            on_y;                                                                                                      \
-        }                                                                                                              \
-        else                                                                                                           \
-        {                                                                                                              \
-            on_z;                                                                                                      \
-        }                                                                                                              \
+{                                  \
+        if (y > z)                        \
+        {                                 \
+            on_y;                         \
+        }                                 \
+        else                              \
+        {                                 \
+            on_z;                         \
+        }                                 \
     \
 }
 
-#define NON_MIN_OF(x, on_x1, on_x2, y, on_y1, on_y2, z, on_z1, on_z2)                                                  \
-    if (x < y) {                                                                                                       \
-        if (x < z) {                                                                                                   \
-            if (y < z) {                                                                                               \
-                on_z1;                                                                                                 \
-                on_y2;                                                                                                 \
-            }                                                                                                          \
-            else                                                                                                       \
-            {                                                                                                          \
-                on_z2;                                                                                                 \
-                on_y1;                                                                                                 \
-            }                                                                                                          \
-        }                                                                                                              \
-        else                                                                                                           \
-        {                                                                                                              \
-            on_x2;                                                                                                     \
-            on_y1;                                                                                                     \
-        }                                                                                                              \
-    }                                                                                                                  \
-    else                                                                                                               \
+#define MIN_OF(x, on_x, y, on_y, z, on_z) \
+    if (x < y)                            \
+    {                                     \
+        if (x < z)                        \
+        {                                 \
+            on_x;                         \
+        }                                 \
+        else                              \
+        {                                 \
+            on_z;                         \
+        }                                 \
+    }                                     \
+    else                                  \
     \
-{                                                                                                               \
-        if (y < z) {                                                                                                   \
-            if (x > z) {                                                                                               \
-                on_x1;                                                                                                 \
-                on_z2;                                                                                                 \
-            }                                                                                                          \
-            else                                                                                                       \
-            {                                                                                                          \
-                on_z1;                                                                                                 \
-                on_x2;                                                                                                 \
-            }                                                                                                          \
-        }                                                                                                              \
-        else                                                                                                           \
-        {                                                                                                              \
-            on_x1;                                                                                                     \
-            on_y2;                                                                                                     \
-        }                                                                                                              \
+{                                  \
+        if (y < z)                        \
+        {                                 \
+            on_y;                         \
+        }                                 \
+        else                              \
+        {                                 \
+            on_z;                         \
+        }                                 \
     \
 }
 
-#define SORT(x, on_x1, on_x2, on_x3, y, on_y1, on_y2, on_y3, z, on_z1, on_z2, on_z3)                                   \
-    if (x < y) {                                                                                                       \
-        if (x < z) {                                                                                                   \
-            if (y < z) {                                                                                               \
-                on_z1;                                                                                                 \
-                on_y2;                                                                                                 \
-                on_x3;                                                                                                 \
-            }                                                                                                          \
-            else                                                                                                       \
-            {                                                                                                          \
-                on_z2;                                                                                                 \
-                on_y1;                                                                                                 \
-                on_x3;                                                                                                 \
-            }                                                                                                          \
-        }                                                                                                              \
-        else                                                                                                           \
-        {                                                                                                              \
-            on_x2;                                                                                                     \
-            on_y1;                                                                                                     \
-            on_z3;                                                                                                     \
-        }                                                                                                              \
-    }                                                                                                                  \
-    else                                                                                                               \
+#define NON_MIN_OF(x, on_x1, on_x2, y, on_y1, on_y2, z, on_z1, on_z2) \
+    if (x < y)                                                        \
+    {                                                                 \
+        if (x < z)                                                    \
+        {                                                             \
+            if (y < z)                                                \
+            {                                                         \
+                on_z1;                                                \
+                on_y2;                                                \
+            }                                                         \
+            else                                                      \
+            {                                                         \
+                on_z2;                                                \
+                on_y1;                                                \
+            }                                                         \
+        }                                                             \
+        else                                                          \
+        {                                                             \
+            on_x2;                                                    \
+            on_y1;                                                    \
+        }                                                             \
+    }                                                                 \
+    else                                                              \
     \
-{                                                                                                               \
-        if (y < z) {                                                                                                   \
-            if (x > z) {                                                                                               \
-                on_x1;                                                                                                 \
-                on_z2;                                                                                                 \
-                on_y3;                                                                                                 \
-            }                                                                                                          \
-            else                                                                                                       \
-            {                                                                                                          \
-                on_z1;                                                                                                 \
-                on_x2;                                                                                                 \
-                on_y3;                                                                                                 \
-            }                                                                                                          \
-        }                                                                                                              \
-        else                                                                                                           \
-        {                                                                                                              \
-            on_x1;                                                                                                     \
-            on_y2;                                                                                                     \
-            on_z3;                                                                                                     \
-        }                                                                                                              \
+{                                                              \
+        if (y < z)                                                    \
+        {                                                             \
+            if (x > z)                                                \
+            {                                                         \
+                on_x1;                                                \
+                on_z2;                                                \
+            }                                                         \
+            else                                                      \
+            {                                                         \
+                on_z1;                                                \
+                on_x2;                                                \
+            }                                                         \
+        }                                                             \
+        else                                                          \
+        {                                                             \
+            on_x1;                                                    \
+            on_y2;                                                    \
+        }                                                             \
+    \
+}
+
+#define SORT(x, on_x1, on_x2, on_x3, y, on_y1, on_y2, on_y3, z, on_z1, on_z2, on_z3) \
+    if (x < y)                                                                       \
+    {                                                                                \
+        if (x < z)                                                                   \
+        {                                                                            \
+            if (y < z)                                                               \
+            {                                                                        \
+                on_z1;                                                               \
+                on_y2;                                                               \
+                on_x3;                                                               \
+            }                                                                        \
+            else                                                                     \
+            {                                                                        \
+                on_z2;                                                               \
+                on_y1;                                                               \
+                on_x3;                                                               \
+            }                                                                        \
+        }                                                                            \
+        else                                                                         \
+        {                                                                            \
+            on_x2;                                                                   \
+            on_y1;                                                                   \
+            on_z3;                                                                   \
+        }                                                                            \
+    }                                                                                \
+    else                                                                             \
+    \
+{                                                                             \
+        if (y < z)                                                                   \
+        {                                                                            \
+            if (x > z)                                                               \
+            {                                                                        \
+                on_x1;                                                               \
+                on_z2;                                                               \
+                on_y3;                                                               \
+            }                                                                        \
+            else                                                                     \
+            {                                                                        \
+                on_z1;                                                               \
+                on_x2;                                                               \
+                on_y3;                                                               \
+            }                                                                        \
+        }                                                                            \
+        else                                                                         \
+        {                                                                            \
+            on_x1;                                                                   \
+            on_y2;                                                                   \
+            on_z3;                                                                   \
+        }                                                                            \
     \
 }
 //////////////////////////////////////////////////////////////////////////////////////
@@ -475,7 +453,6 @@ struct SInertVal
     const float inertion;
     SInertVal(float inert) : inertion(inert) { R_ASSERT(inert > 0.f && inert < 1.f); }
     IC void new_val(float new_val) { val = inertion * val + (1 - inertion) * new_val; }
-
 private:
     SInertVal& operator=(SInertVal& v) { R_ASSERT(false); }
 };
@@ -483,7 +460,7 @@ private:
 IC float DET(const Fmatrix& a)
 {
     return ((a._11 * (a._22 * a._33 - a._23 * a._32) - a._12 * (a._21 * a._33 - a._23 * a._31) +
-             a._13 * (a._21 * a._32 - a._22 * a._31)));
+        a._13 * (a._21 * a._32 - a._22 * a._31)));
 }
 
 IC bool valid_pos(const Fvector& P, const Fbox& B)
@@ -494,17 +471,18 @@ IC bool valid_pos(const Fvector& P, const Fbox& B)
 }
 
 #ifdef DEBUG
-const float DET_CHECK_EPS = 0.15f;       // scale -35%  !? ;)
-const float DET_CHECK_FATAL_EPS = 0.8f;  // scale -35%  !? ;)
-#define VERIFY_RMATRIX(M)                                                                                              \
-    {                                                                                                                  \
-        float d = DET(M);                                                                                              \
-        if (!fsimilar(d, 1.f, DET_CHECK_EPS)) {                                                                        \
-            Msg("! matrix: %s ", get_string(M).c_str());                                                               \
-            Msg("! determinant: %f ", d);                                                                              \
-            Msg("! Is not valid rotational matrix");                                                                   \
-            VERIFY(fsimilar(d, 1.f, DET_CHECK_FATAL_EPS));                                                             \
-        }                                                                                                              \
+const float DET_CHECK_EPS = 0.15f; // scale -35%  !? ;)
+const float DET_CHECK_FATAL_EPS = 0.8f; // scale -35%  !? ;)
+#define VERIFY_RMATRIX(M)                                  \
+    {                                                      \
+        float d = DET(M);                                  \
+        if (!fsimilar(d, 1.f, DET_CHECK_EPS))              \
+        {                                                  \
+            Msg("! matrix: %s ", get_string(M).c_str());   \
+            Msg("! determinant: %f ", d);                  \
+            Msg("! Is not valid rotational matrix");       \
+            VERIFY(fsimilar(d, 1.f, DET_CHECK_FATAL_EPS)); \
+        }                                                  \
     };
 #else
 #define VERIFY_RMATRIX(M)

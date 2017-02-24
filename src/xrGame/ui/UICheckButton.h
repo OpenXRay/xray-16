@@ -16,11 +16,11 @@ public:
     virtual void Update();
 
     // CUIOptionsItem
-    virtual void SetCurrentOptValue();       // opt->current
-    virtual void SaveBackUpOptValue();       // current->backup
-    virtual void SaveOptValue();             // current->opt
-    virtual void UndoOptValue();             // backup->current
-    virtual bool IsChangedOptValue() const;  // backup!=current
+    virtual void SetCurrentOptValue(); // opt->current
+    virtual void SaveBackUpOptValue(); // current->backup
+    virtual void SaveOptValue(); // current->opt
+    virtual void UndoOptValue(); // backup->current
+    virtual bool IsChangedOptValue() const; // backup!=current
 
     virtual void OnFocusReceive();
     virtual void OnFocusLost();
@@ -33,7 +33,6 @@ public:
     //состояние кнопки
     IC bool GetCheck() const { return GetButtonState() == BUTTON_PUSHED; }
     IC void SetCheck(bool ch) { SetButtonState(ch ? BUTTON_PUSHED : BUTTON_NORMAL); }
-
     void SetDependControl(CUIWindow* pWnd);
 
 private:

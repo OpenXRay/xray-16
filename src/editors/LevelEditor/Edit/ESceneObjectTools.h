@@ -8,7 +8,7 @@ class ESceneObjectTool : public ESceneCustomOTool
 {
     typedef ESceneCustomOTool inherited;
 
-  protected:
+protected:
     // controls
     virtual void CreateControls();
     virtual void RemoveControls();
@@ -29,7 +29,7 @@ class ESceneObjectTool : public ESceneCustomOTool
     TProperties* m_Props;
     void OnChangeAppendRandomFlags(PropValue* prop);
     //----------------------------------------------------
-  public:
+public:
     Fvector m_AppendRandomMinScale;
     Fvector m_AppendRandomMaxScale;
     Fvector m_AppendRandomMinRotation;
@@ -37,20 +37,17 @@ class ESceneObjectTool : public ESceneCustomOTool
     shared_str m_AppendRandomObjectsStr;
     RStringVec m_AppendRandomObjects;
 
-  public:
+public:
     ESceneObjectTool();
 
     virtual bool AllowEnabling() { return false; }
-
     virtual bool Validate(bool full_build);
 
     virtual void OnFrame();
 
     // definition
     IC LPCSTR ClassName() { return "scene_object"; }
-
     IC LPCSTR ClassDesc() { return "Scene Object"; }
-
     IC
 
         int
@@ -65,7 +62,6 @@ class ESceneObjectTool : public ESceneCustomOTool
 
     // IO
     virtual bool IsNeedSave() { return true; }
-
     virtual bool LoadStream(IReader&);
     virtual bool LoadLTX(CInifile&);
     virtual void SaveStream(IWriter&);
@@ -78,15 +74,10 @@ class ESceneObjectTool : public ESceneCustomOTool
     void FillAppendRandomProperties(bool bUpdateOnly = false);
 
     void ActivateAppendRandom(BOOL val) { m_Flags.set(flAppendRandom, val); }
-
     BOOL IsAppendRandomActive() { return m_Flags.is(flAppendRandom); }
-
     BOOL IsAppendRandomScaleActive() { return m_Flags.is(flAppendRandomScale); }
-
     BOOL IsAppendRandomRotationActive() { return m_Flags.is(flAppendRandomRotation); }
-
     BOOL IsAppendRandomScaleProportional() { return m_Flags.is(flAppendRandomScaleProportional); }
-
     // tools
     virtual bool ExportGame(SExportStreams* F);
     virtual void GetStaticDesc(int& v_cnt, int& f_cnt, bool b_selected_only, bool b_cform);

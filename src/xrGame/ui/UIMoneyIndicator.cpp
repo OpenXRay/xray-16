@@ -16,11 +16,7 @@ CUIMoneyIndicator::CUIMoneyIndicator()
     //	m_pAnimChange->SetDone(true);
 }
 
-CUIMoneyIndicator::~CUIMoneyIndicator()
-{
-    xr_delete(m_pBonusMoney);
-}
-
+CUIMoneyIndicator::~CUIMoneyIndicator() { xr_delete(m_pBonusMoney); }
 void CUIMoneyIndicator::InitFromXML(CUIXml& xml_doc)
 {
     CUIXmlInit::InitWindow(xml_doc, "money_wnd", 0, this);
@@ -37,23 +33,12 @@ void CUIMoneyIndicator::InitFromXML(CUIXml& xml_doc)
     m_money_change.SetColorAnimation("ui_mp_chat", LA_ONLYALPHA | LA_TEXTCOLOR);
 }
 
-void CUIMoneyIndicator::SetMoneyAmount(LPCSTR money)
-{
-    m_money_amount.SetText(money);
-}
-
+void CUIMoneyIndicator::SetMoneyAmount(LPCSTR money) { m_money_amount.SetText(money); }
 void CUIMoneyIndicator::SetMoneyChange(LPCSTR money)
 {
     m_money_change.SetText(money);
     m_money_change.ResetColorAnimation();
 }
 
-void CUIMoneyIndicator::AddBonusMoney(KillMessageStruct& msg)
-{
-    m_pBonusMoney->AddLogMessage(msg);
-}
-
-void CUIMoneyIndicator::Update()
-{
-    CUIWindow::Update();
-}
+void CUIMoneyIndicator::AddBonusMoney(KillMessageStruct& msg) { m_pBonusMoney->AddLogMessage(msg); }
+void CUIMoneyIndicator::Update() { CUIWindow::Update(); }

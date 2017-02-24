@@ -34,8 +34,8 @@ class PropValue;
 
 class TfrmEditLightAnim : public TForm
 {
-    __published :  // IDE-managed Components
-                   TPanel* paItemProps;
+    __published : // IDE-managed Components
+                  TPanel* paItemProps;
     TFormStorage* fsStorage;
     TPanel* paListAndButtons;
     TPanel* Panel2;
@@ -99,7 +99,7 @@ class TfrmEditLightAnim : public TForm
     void __fastcall wnShapeKeyDown(TObject* Sender, WORD& Key, TShiftState Shift);
     void __fastcall ebCloneClick(TObject* Sender);
 
-  private:  // User declarations
+private: // User declarations
     void InitItems();
     bool bFinalClose;
     bool IsClose();
@@ -119,7 +119,7 @@ class TfrmEditLightAnim : public TForm
     void UpdateProperties();
     void __stdcall FindItemByName(LPCSTR name, bool& res);
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TfrmEditLightAnim(TComponent* Owner);
     static bool FinalClose();
     static void __fastcall ShowEditor();

@@ -83,7 +83,8 @@ void CStalkerActionNoALife::finalize()
 
     object().movement().set_desired_position(0);
 
-    if (!object().g_Alive()) return;
+    if (!object().g_Alive())
+        return;
 
     object().sound().remove_active_sounds(u32(eStalkerSoundMaskNoHumming));
 }
@@ -136,7 +137,8 @@ void CStalkerActionGatherItems::initialize()
     ignored_touched_objects_type& ignored_touched_objects = m_object->ignored_touched_objects();
     ignored_touched_objects_type::iterator i =
         std::find(ignored_touched_objects.begin(), ignored_touched_objects.end(), selected);
-    if (i == ignored_touched_objects.end()) return;
+    if (i == ignored_touched_objects.end())
+        return;
 
     ignored_touched_objects.erase(i);
 
@@ -151,7 +153,8 @@ void CStalkerActionGatherItems::finalize()
 
     object().movement().set_desired_position(0);
 
-    if (!object().g_Alive()) return;
+    if (!object().g_Alive())
+        return;
 
     object().sound().set_sound_mask(0);
 }
@@ -160,7 +163,8 @@ void CStalkerActionGatherItems::execute()
 {
     inherited::execute();
 
-    if (!object().memory().item().selected()) return;
+    if (!object().memory().item().selected())
+        return;
 
     u32 level_vertex_id = object().memory().item().selected()->ai_location().level_vertex_id();
     //	if (object().movement().restrictions().accessible(level_vertex_id)) {

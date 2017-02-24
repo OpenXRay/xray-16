@@ -14,7 +14,7 @@
 #include "SkeletonX.h"
 #endif
 struct SEnumVerticesCallback;
-class CSkeletonX_ext : public CSkeletonX  // shared code for SkeletonX derivates
+class CSkeletonX_ext : public CSkeletonX // shared code for SkeletonX derivates
 {
 protected:
     virtual void _Load_hw(Fvisual& V, void* data);
@@ -96,4 +96,4 @@ private:
     void operator=(const CSkeletonX_PM& other);
 };
 
-#endif  // FSkinnedH
+#endif // FSkinnedH

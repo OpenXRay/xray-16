@@ -10,14 +10,12 @@
 #include "alife_group_registry.h"
 #include "xrServer_Objects_ALife_Monsters.h"
 
-CALifeGroupRegistry::~CALifeGroupRegistry()
-{
-}
-
+CALifeGroupRegistry::~CALifeGroupRegistry() {}
 void CALifeGroupRegistry::add(CSE_ALifeDynamicObject* object)
 {
     CSE_ALifeOnlineOfflineGroup* group = smart_cast<CSE_ALifeOnlineOfflineGroup*>(object);
-    if (!group) return;
+    if (!group)
+        return;
 
     OBJECTS::const_iterator I = objects().find(group->ID);
     VERIFY(I == objects().end());
@@ -27,7 +25,8 @@ void CALifeGroupRegistry::add(CSE_ALifeDynamicObject* object)
 void CALifeGroupRegistry::remove(CSE_ALifeDynamicObject* object)
 {
     CSE_ALifeOnlineOfflineGroup* group = smart_cast<CSE_ALifeOnlineOfflineGroup*>(object);
-    if (!group) return;
+    if (!group)
+        return;
 
     OBJECTS::iterator I = m_objects.find(group->ID);
     VERIFY(I != m_objects.end());

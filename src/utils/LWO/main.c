@@ -32,14 +32,16 @@ int testload(char* filename, unsigned int* failID, int* failpos)
 
     obj = lwGetObject(filename, failID, failpos);
 
-    if (obj) {
-        printf("Layers:  %d\n"
-               "Surfaces:  %d\n"
-               "Envelopes:  %d\n"
-               "Clips:  %d\n"
-               "Points (first layer):  %d\n"
-               "Polygons (first layer):  %d\n\n",
-            obj->nlayers, obj->nsurfs, obj->nenvs, obj->nclips, obj->layer->point.count, obj->layer->polygon.count);
+    if (obj)
+    {
+        printf(
+        "Layers:  %d\n"
+        "Surfaces:  %d\n"
+        "Envelopes:  %d\n"
+        "Clips:  %d\n"
+        "Points (first layer):  %d\n"
+        "Polygons (first layer):  %d\n\n",
+        obj->nlayers, obj->nsurfs, obj->nenvs, obj->nclips, obj->layer->point.count, obj->layer->polygon.count);
         nobjects++;
         nlayers += obj->nlayers;
         nsurfs += obj->nsurfs;
@@ -86,28 +88,34 @@ int find_files(char* filespec)
     int failpos;
 
     filename = malloc(520);
-    if (!filename) return 0;
+    if (!filename)
+        return 0;
     prevname = filename + 260;
 
     err = h = _findfirst(filespec, &data);
-    if (err == -1) {
+    if (err == -1)
+    {
         printf("No files found: '%s'\n", filespec);
         return 0;
     }
 
     while (err != -1)
     {
-        if ((data.attrib & _A_SUBDIR) && data.name[0] != '.') {
+        if ((data.attrib & _A_SUBDIR) && data.name[0] != '.')
+        {
             make_filespec(filespec, data.name, filename);
             find_files(filename);
         }
-        if (!(data.attrib & _A_SUBDIR)) {
+        if (!(data.attrib & _A_SUBDIR))
+        {
             make_filename(filespec, data.name, filename);
-            if (!strcmp(filename, prevname)) break;
+            if (!strcmp(filename, prevname))
+                break;
             strcpy(prevname, filename);
             printf("%s\n", filename);
             failID = failpos = 0;
-            if (!testload(filename, &failID, &failpos)) {
+            if (!testload(filename, &failID, &failpos))
+            {
                 printf("%s\nLoading failed near byte %d\n\n", filename, failpos);
             }
         }
@@ -123,7 +131,8 @@ void main(int argc, char* argv[])
 {
     float t1, t2;
 
-    if (argc != 2) {
+    if (argc != 2)
+    {
         printf("Usage:  %s <filespec>\n", argv[0]);
         exit(0);
     }

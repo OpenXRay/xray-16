@@ -30,28 +30,35 @@ void Minimize1D::GetMinimum(float fT0, float fT1, float fTInitial, float& rfTMin
 //----------------------------------------------------------------------------
 void Minimize1D::GetMinimum(float fT0, float fF0, float fTm, float fFm, float fT1, float fF1, int iLevel)
 {
-    if (fF0 < m_fFMin) {
+    if (fF0 < m_fFMin)
+    {
         m_fTMin = fT0;
         m_fFMin = fF0;
     }
 
-    if (fFm < m_fFMin) {
+    if (fFm < m_fFMin)
+    {
         m_fTMin = fTm;
         m_fFMin = fFm;
     }
 
-    if (fF1 < m_fFMin) {
+    if (fF1 < m_fFMin)
+    {
         m_fTMin = fT1;
         m_fFMin = fF1;
     }
 
-    if (iLevel-- == 0) return;
+    if (iLevel-- == 0)
+        return;
 
-    if ((fT1 - fTm) * (fF0 - fFm) > (fTm - fT0) * (fFm - fF1)) {
+    if ((fT1 - fTm) * (fF0 - fFm) > (fTm - fT0) * (fFm - fF1))
+    {
         // quadratic fit has positive second derivative at midpoint
 
-        if (fF1 > fF0) {
-            if (fFm >= fF0) {
+        if (fF1 > fF0)
+        {
+            if (fFm >= fF0)
+            {
                 // increasing, repeat on [t0,tm]
                 GetMinimum(fT0, fF0, fTm, fFm, iLevel);
             }
@@ -63,7 +70,8 @@ void Minimize1D::GetMinimum(float fT0, float fF0, float fTm, float fFm, float fT
         }
         else if (fF1 < fF0)
         {
-            if (fFm >= fF1) {
+            if (fFm >= fF1)
+            {
                 // decreasing, repeat on [tm,t1]
                 GetMinimum(fTm, fFm, fT1, fF1, iLevel);
             }
@@ -84,7 +92,8 @@ void Minimize1D::GetMinimum(float fT0, float fF0, float fTm, float fFm, float fT
     {
         // quadratic fit has nonpositive second derivative at midpoint
 
-        if (fF1 > fF0) {
+        if (fF1 > fF0)
+        {
             // repeat on [t0,tm]
             GetMinimum(fT0, fF0, fTm, fFm, iLevel);
         }
@@ -104,26 +113,32 @@ void Minimize1D::GetMinimum(float fT0, float fF0, float fTm, float fFm, float fT
 //----------------------------------------------------------------------------
 void Minimize1D::GetMinimum(float fT0, float fF0, float fT1, float fF1, int iLevel)
 {
-    if (fF0 < m_fFMin) {
+    if (fF0 < m_fFMin)
+    {
         m_fTMin = fT0;
         m_fFMin = fF0;
     }
 
-    if (fF1 < m_fFMin) {
+    if (fF1 < m_fFMin)
+    {
         m_fTMin = fT1;
         m_fFMin = fF1;
     }
 
-    if (iLevel-- == 0) return;
+    if (iLevel-- == 0)
+        return;
 
     float fTm = 0.5f * (fT0 + fT1);
     float fFm = m_oF(fTm, m_pvUserData);
 
-    if (fF0 - 2.0f * fFm + fF1 > 0.0f) {
+    if (fF0 - 2.0f * fFm + fF1 > 0.0f)
+    {
         // quadratic fit has positive second derivative at midpoint
 
-        if (fF1 > fF0) {
-            if (fFm >= fF0) {
+        if (fF1 > fF0)
+        {
+            if (fFm >= fF0)
+            {
                 // increasing, repeat on [t0,tm]
                 GetMinimum(fT0, fF0, fTm, fFm, iLevel);
             }
@@ -135,7 +150,8 @@ void Minimize1D::GetMinimum(float fT0, float fF0, float fT1, float fF1, int iLev
         }
         else if (fF1 < fF0)
         {
-            if (fFm >= fF1) {
+            if (fFm >= fF1)
+            {
                 // decreasing, repeat on [tm,t1]
                 GetMinimum(fTm, fFm, fT1, fF1, iLevel);
             }
@@ -156,7 +172,8 @@ void Minimize1D::GetMinimum(float fT0, float fF0, float fT1, float fF1, int iLev
     {
         // quadratic fit has nonpositive second derivative at midpoint
 
-        if (fF1 > fF0) {
+        if (fF1 > fF0)
+        {
             // repeat on [t0,tm]
             GetMinimum(fT0, fF0, fTm, fFm, iLevel);
         }
@@ -179,28 +196,33 @@ void Minimize1D::GetBracketedMinimum(float fT0, float fF0, float fTm, float fFm,
     for (int i = 0; i < m_iMaxBracket; i++)
     {
         // update minimum value
-        if (fFm < m_fFMin) {
+        if (fFm < m_fFMin)
+        {
             m_fTMin = fTm;
             m_fFMin = fFm;
         }
 
         // test for convergence
         const float fEps = 1e-08f, fTol = 1e-04f;
-        if (_abs(fT1 - fT0) <= 2.0f * fTol * _abs(fTm) + fEps) break;
+        if (_abs(fT1 - fT0) <= 2.0f * fTol * _abs(fTm) + fEps)
+            break;
 
         // compute vertex of interpolating parabola
         float fDT0 = fT0 - fTm, fDT1 = fT1 - fTm;
         float fDF0 = fF0 - fFm, fDF1 = fF1 - fFm;
         float fTmp0 = fDT0 * fDF1, fTmp1 = fDT1 * fDF0;
         float fDenom = fTmp1 - fTmp0;
-        if (_abs(fDenom) < fEps) return;
+        if (_abs(fDenom) < fEps)
+            return;
 
         float fTv = fTm + 0.5f * (fDT1 * fTmp1 - fDT0 * fTmp0) / fDenom;
         VERIFY(fT0 <= fTv && fTv <= fT1);
         float fFv = m_oF(fTv, m_pvUserData);
 
-        if (fTv < fTm) {
-            if (fFv < fFm) {
+        if (fTv < fTm)
+        {
+            if (fFv < fFm)
+            {
                 fT1 = fTm;
                 fF1 = fFm;
                 fTm = fTv;
@@ -214,7 +236,8 @@ void Minimize1D::GetBracketedMinimum(float fT0, float fF0, float fTm, float fFm,
         }
         else if (fTv > fTm)
         {
-            if (fFv < fFm) {
+            if (fFv < fFm)
+            {
                 fT0 = fTm;
                 fF0 = fFm;
                 fTm = fTv;

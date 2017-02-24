@@ -24,7 +24,6 @@ private:
 
 public:
     virtual CTelekinesis& Telekinesis() { return m_telekinetics; }
-
 public:
     CMincer();
     virtual ~CMincer();

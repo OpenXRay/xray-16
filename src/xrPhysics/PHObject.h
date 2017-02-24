@@ -59,11 +59,8 @@ protected:
     virtual void spatial_register();
     void SetRayMotions() { m_flags.set(fl_ray_motions, TRUE); }
     void UnsetRayMotions() { m_flags.set(fl_ray_motions, FALSE); }
-
     void SetPrefereExactIntegration() { m_island.SetPrefereExactIntegration(); }
-
     CPHObject* SelfPointer() { return this; }
-
 public:
     IC BOOL IsRayMotion() { return m_flags.test(fl_ray_motions); }
     void IslandReinit() { m_island.Unmerge(); }
@@ -73,7 +70,6 @@ public:
     dWorldID DActiveWorld() { return m_island.DActiveWorld(); }
     CPHIsland* DActiveIsland() { return m_island.DActiveIsland(); }
     dWorldID DWorld() { return m_island.DWorld(); }
-
     virtual void FreezeContent();
     virtual void UnFreezeContent();
     virtual void EnableObject(CPHObject* obj);
@@ -115,7 +111,6 @@ public:
     virtual ECastType CastType() { return tpNotDefinite; }
     virtual void vis_update_activate() {}
     virtual void vis_update_deactivate() {}
-
 #ifdef DEBUG
     virtual IPhysicsShellHolder* ref_object() = 0;
 #endif
@@ -129,4 +124,4 @@ public:
 
 DEFINE_PHITEM_LIST(CPHObject, PH_OBJECT_STORAGE, PH_OBJECT_I)
 
-#endif  // CPHOBJECT
+#endif // CPHOBJECT

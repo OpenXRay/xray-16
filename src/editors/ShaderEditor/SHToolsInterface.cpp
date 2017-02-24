@@ -18,7 +18,8 @@ ISHTools::ISHTools(ISHInit& init)
 
 void ISHTools::ViewSetCurrentItem(LPCSTR full_name)
 {
-    if (m_bLockUpdate) return;
+    if (m_bLockUpdate)
+        return;
 
     m_bLockUpdate = TRUE;
     Ext.m_Items->SelectItem(full_name, TRUE, false, true);
@@ -38,7 +39,8 @@ void ISHTools::Modified()
 
 bool ISHTools::IfModified()
 {
-    if (m_bModified) {
+    if (m_bModified)
+    {
         int mr =
             ELog.DlgMsg(mtConfirmation, "The '%s' has been modified.\nDo you want to save your changes?", ToolsName());
         switch (mr)
@@ -75,40 +77,25 @@ AnsiString ISHTools::ViewGetCurrentItem(bool bFolderOnly)
 
 //---------------------------------------------------------------------------
 
-TElTreeItem* ISHTools::ViewGetCurrentItem()
-{
-    return Ext.m_Items->GetSelected();
-}
-
+TElTreeItem* ISHTools::ViewGetCurrentItem() { return Ext.m_Items->GetSelected(); }
 //---------------------------------------------------------------------------
 
-void ISHTools::RemoveCurrent()
-{
-    Ext.m_Items->RemoveSelItems();
-}
-
+void ISHTools::RemoveCurrent() { Ext.m_Items->RemoveSelItems(); }
 //---------------------------------------------------------------------------
 
-void ISHTools::RenameCurrent()
-{
-    Ext.m_Items->RenameSelItem();
-}
-
+void ISHTools::RenameCurrent() { Ext.m_Items->RenameSelItem(); }
 //---------------------------------------------------------------------------
 
 void ISHTools::OnFrame()
 {
-    if (m_LastSelection.Length()) {
+    if (m_LastSelection.Length())
+    {
         SetCurrentItem(m_LastSelection.c_str(), true);
         m_LastSelection = "";
     }
 }
 
-void ISHTools::OnActivate()
-{
-    SetCurrentItem(m_LastSelection.c_str(), true);
-}
-
+void ISHTools::OnActivate() { SetCurrentItem(m_LastSelection.c_str(), true); }
 void ISHTools::OnDeactivate()
 {
     Ext.m_PreviewProps->ClearProperties();

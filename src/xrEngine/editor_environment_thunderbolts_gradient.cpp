@@ -16,13 +16,11 @@
 
 using editor::environment::thunderbolts::gradient;
 
-gradient::gradient() : m_property_holder(0)
-{
-}
-
+gradient::gradient() : m_property_holder(0) {}
 gradient::~gradient()
 {
-    if (!Device.editor()) return;
+    if (!Device.editor())
+        return;
 
     ::ide().destroy(m_property_holder);
 }
@@ -46,22 +44,14 @@ void gradient::save(CInifile& config, shared_str const& section_id, LPCSTR prefi
     config.w_fvector2(section_id.c_str(), strconcat(sizeof(temp), temp, prefix, "_radius"), fRadius);
 }
 
-LPCSTR gradient::shader_getter() const
-{
-    return (shader.c_str());
-}
-
+LPCSTR gradient::shader_getter() const { return (shader.c_str()); }
 void gradient::shader_setter(LPCSTR value)
 {
     shader = value;
     m_pFlare->CreateShader(*shader, *texture);
 }
 
-LPCSTR gradient::texture_getter() const
-{
-    return (texture.c_str());
-}
-
+LPCSTR gradient::texture_getter() const { return (texture.c_str()); }
 void gradient::texture_setter(LPCSTR value)
 {
     texture = value;
@@ -103,4 +93,4 @@ void gradient::fill(
         detail::real_path("$game_textures$", "").c_str(), "Select texture...",
         editor::property_holder::cannot_enter_text, editor::property_holder::remove_extension);
 }
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR

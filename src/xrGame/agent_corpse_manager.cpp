@@ -40,10 +40,12 @@ bool CAgentCorpseManager::process_corpse(CMemberOrder& member)
     xr_vector<CMemberCorpse>::iterator E = m_corpses.end();
     for (; I != E; ++I)
     {
-        if (!member.object().memory().visual().visible_now((*I).corpse())) continue;
+        if (!member.object().memory().visual().visible_now((*I).corpse()))
+            continue;
 
         float dist_sqr = (*I).corpse()->Position().distance_to_sqr(member.object().Position());
-        if (dist_sqr < min_dist_sqr) {
+        if (dist_sqr < min_dist_sqr)
+        {
             if ((*I).reactor() &&
                 ((*I).reactor()->Position().distance_to_sqr((*I).corpse()->Position()) <= min_dist_sqr))
                 continue;
@@ -52,7 +54,8 @@ bool CAgentCorpseManager::process_corpse(CMemberOrder& member)
         }
     }
 
-    if (!best_corpse) return (false);
+    if (!best_corpse)
+        return (false);
 
     best_corpse->reactor(&member.object());
     return (true);
@@ -66,9 +69,11 @@ void CAgentCorpseManager::react_on_member_death()
         CAgentMemberManager::MEMBER_STORAGE::iterator I = object().member().combat_members().begin();
         CAgentMemberManager::MEMBER_STORAGE::iterator E = object().member().combat_members().end();
         for (; I != E; ++I)
-            if (!(*I)->member_death_reaction().m_processing) changed = process_corpse(**I);
+            if (!(*I)->member_death_reaction().m_processing)
+                changed = process_corpse(**I);
 
-        if (!changed) break;
+        if (!changed)
+            break;
     }
 
     {
@@ -76,7 +81,8 @@ void CAgentCorpseManager::react_on_member_death()
         MEMBER_CORPSES::iterator E = m_corpses.end();
         for (; I != E; ++I)
         {
-            if (!(*I).reactor()) continue;
+            if (!(*I).reactor())
+                continue;
 
             CMemberOrder::CMemberDeathReaction& reaction =
                 object().member().member((*I).reactor()).member_death_reaction();
@@ -96,6 +102,4 @@ void CAgentCorpseManager::remove_links(IGameObject* object)
         std::remove_if(m_corpses.begin(), m_corpses.end(), CRemoveOfflineCorpsesPredicate(object)), m_corpses.end());
 }
 
-void CAgentCorpseManager::update()
-{
-}
+void CAgentCorpseManager::update() {}

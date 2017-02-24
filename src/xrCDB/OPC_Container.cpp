@@ -90,8 +90,9 @@ bool Container::Resize(udword needed)
 #endif
 
     // Get more entries
-    mMaxNbEntries = mMaxNbEntries ? udword(float(mMaxNbEntries) * mGrowthFactor) : 2;  // Default nb Entries = 2
-    if (mMaxNbEntries < mCurNbEntries + needed) mMaxNbEntries = mCurNbEntries + needed;
+    mMaxNbEntries = mMaxNbEntries ? udword(float(mMaxNbEntries) * mGrowthFactor) : 2; // Default nb Entries = 2
+    if (mMaxNbEntries < mCurNbEntries + needed)
+        mMaxNbEntries = mCurNbEntries + needed;
 
     // Get some bytes for _new_ entries
     udword* NewEntries = CALLOC(udword, mMaxNbEntries);
@@ -103,7 +104,8 @@ bool Container::Resize(udword needed)
 #endif
 
     // Copy old data if needed
-    if (mCurNbEntries) CopyMemory(NewEntries, mEntries, mCurNbEntries * sizeof(udword));
+    if (mCurNbEntries)
+        CopyMemory(NewEntries, mEntries, mCurNbEntries * sizeof(udword));
 
     // Delete old data
     CFREE(mEntries);
@@ -127,7 +129,8 @@ bool Container::SetSize(udword nb)
     Empty();
 
     // Checkings
-    if (!nb) return false;
+    if (!nb)
+        return false;
 
     // Initialize for nb entries
     mMaxNbEntries = nb;
@@ -158,7 +161,8 @@ bool Container::Refit()
 
     // Get just enough entries
     mMaxNbEntries = mCurNbEntries;
-    if (!mMaxNbEntries) return false;
+    if (!mMaxNbEntries)
+        return false;
 
     // Get just enough bytes
     udword* NewEntries = CALLOC(udword, mMaxNbEntries);
@@ -197,8 +201,10 @@ bool Container::Contains(udword entry, udword* location) const
     // Look for the entry
     for (udword i = 0; i < mCurNbEntries; i++)
     {
-        if (mEntries[i] == entry) {
-            if (location) *location = i;
+        if (mEntries[i] == entry)
+        {
+            if (location)
+                *location = i;
             return true;
         }
     }
@@ -218,7 +224,8 @@ bool Container::Delete(udword entry)
     // Look for the entry
     for (udword i = 0; i < mCurNbEntries; i++)
     {
-        if (mEntries[i] == entry) {
+        if (mEntries[i] == entry)
+        {
             // Entry has been found at index i. The strategy is to copy the last current entry at index i, and decrement
             // the current number of entries.
             DeleteIndex(i);
@@ -241,7 +248,8 @@ bool Container::DeleteKeepingOrder(udword entry)
     // Look for the entry
     for (udword i = 0; i < mCurNbEntries; i++)
     {
-        if (mEntries[i] == entry) {
+        if (mEntries[i] == entry)
+        {
             // Entry has been found at index i.
             // Shift entries to preserve order. You really should use a linked list instead.
             mCurNbEntries--;
@@ -266,9 +274,11 @@ bool Container::DeleteKeepingOrder(udword entry)
 Container& Container::FindNext(udword& entry, bool wrap)
 {
     udword Location;
-    if (Contains(entry, &Location)) {
+    if (Contains(entry, &Location))
+    {
         Location++;
-        if (Location == mCurNbEntries) Location = wrap ? 0 : mCurNbEntries - 1;
+        if (Location == mCurNbEntries)
+            Location = wrap ? 0 : mCurNbEntries - 1;
         entry = mEntries[Location];
     }
     return *this;
@@ -285,9 +295,11 @@ Container& Container::FindNext(udword& entry, bool wrap)
 Container& Container::FindPrev(udword& entry, bool wrap)
 {
     udword Location;
-    if (Contains(entry, &Location)) {
+    if (Contains(entry, &Location))
+    {
         Location--;
-        if (Location == 0xffffffff) Location = wrap ? mCurNbEntries - 1 : 0;
+        if (Location == 0xffffffff)
+            Location = wrap ? mCurNbEntries - 1 : 0;
         entry = mEntries[Location];
     }
     return *this;
@@ -299,7 +311,4 @@ Container& Container::FindPrev(udword& entry, bool wrap)
  *	\return		the ram used in bytes.
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-udword Container::GetUsedRam() const
-{
-    return sizeof(Container) + mMaxNbEntries * sizeof(udword);
-}
+udword Container::GetUsedRam() const { return sizeof(Container) + mMaxNbEntries * sizeof(udword); }

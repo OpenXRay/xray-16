@@ -13,10 +13,11 @@ namespace
 void __cdecl SBCallback(ServerBrowser sb, SBCallbackReason reason, SBServer server, void* instance)
 {
     CGameSpy_Browser* pGSBrowser = (CGameSpy_Browser*)instance;
-    if (!pGSBrowser) return;
+    if (!pGSBrowser)
+        return;
     switch (reason)
     {
-    case sbc_serveradded:  // a server was added to the list, may just have an IP & port at this point
+    case sbc_serveradded: // a server was added to the list, may just have an IP & port at this point
     {
 #ifdef _DEBUG
 //.			Msg("sbc_serveradded");
@@ -25,28 +26,28 @@ void __cdecl SBCallback(ServerBrowser sb, SBCallbackReason reason, SBServer serv
         //			pGSBrowser->UpdateServerList();
     }
     break;
-    case sbc_serverupdated:  // server information has been updated - either basic or full information is now available
-                             // about this server
-    {
+    case sbc_serverupdated: // server information has been updated - either basic or full information is now available
+        // about this server
+        {
 #ifdef _DEBUG
 //.			Msg("sbc_serverupdated");
 #endif
-        //			pGSBrowser->SortBrowserByPing();
-        pGSBrowser->UpdateServerList();
-    }
-    break;
-    case sbc_serverupdatefailed:  // an attempt to retrieve information about this server, either directly or from the
-                                  // master, failed
-    {
+            //			pGSBrowser->SortBrowserByPing();
+            pGSBrowser->UpdateServerList();
+        }
+        break;
+    case sbc_serverupdatefailed: // an attempt to retrieve information about this server, either directly or from the
+        // master, failed
+        {
 #ifdef _DEBUG
 //.			Msg("sbc_serverupdatefailed");
 #endif
-        //			pGSBrowser->OnUpdateFailed(server);
-        //			pGSBrowser->SortBrowserByPing();
-        pGSBrowser->UpdateServerList();
-    }
-    break;
-    case sbc_serverdeleted:  // a server was removed from the list
+            //			pGSBrowser->OnUpdateFailed(server);
+            //			pGSBrowser->SortBrowserByPing();
+            pGSBrowser->UpdateServerList();
+        }
+        break;
+    case sbc_serverdeleted: // a server was removed from the list
     {
 #ifdef _DEBUG
         Msg("sbc_serverdeleted");
@@ -55,7 +56,7 @@ void __cdecl SBCallback(ServerBrowser sb, SBCallbackReason reason, SBServer serv
         pGSBrowser->UpdateServerList();
     }
     break;
-    case sbc_updatecomplete:  // the server query engine is now idle
+    case sbc_updatecomplete: // the server query engine is now idle
     {
 #ifdef _DEBUG
 //.			Msg("sbc_updatecomplete");
@@ -64,7 +65,7 @@ void __cdecl SBCallback(ServerBrowser sb, SBCallbackReason reason, SBServer serv
         pGSBrowser->UpdateServerList();
     }
     break;
-    case sbc_queryerror:  // the master returned an error string for the provided query
+    case sbc_queryerror: // the master returned an error string for the provided query
     {
 #ifdef _DEBUG
         Msg("sbc_queryerror");
@@ -87,7 +88,7 @@ void __cdecl SBCallback(ServerBrowser sb, SBCallbackReason reason, SBServer serv
 CGameSpy_Browser::CGameSpy_Browser()
 #ifdef CONFIG_PROFILE_LOCKS
     : m_refresh_lock(MUTEX_PROFILE_ID(CGameSpy_Browser::m_refresh_lock))
-#endif  // CONFIG_PROFILE_LOCKS
+#endif // CONFIG_PROFILE_LOCKS
 {
     m_pQR2 = NULL;
     m_pGSBrowser = NULL;
@@ -100,7 +101,8 @@ CGameSpy_Browser::CGameSpy_Browser()
     FillSecretKey(secretKey);
     m_pGSBrowser = ServerBrowserNewA(GAMESPY_GAMENAME, GAMESPY_GAMENAME, secretKey, 0, GAMESPY_BROWSER_MAX_UPDATES,
         QVERSION_QR2, SBFalse, SBCallback, this);
-    if (!m_pGSBrowser) {
+    if (!m_pGSBrowser)
+    {
         Msg("! Unable to init Server Browser!");
     }
     //	else
@@ -109,12 +111,14 @@ CGameSpy_Browser::CGameSpy_Browser()
 
 CGameSpy_Browser::~CGameSpy_Browser()
 {
-    if (onDestroy) onDestroy(this);
+    if (onDestroy)
+        onDestroy(this);
 
     Clear();
 
     delete_data(m_pQR2);
-    if (m_pGSBrowser) {
+    if (m_pGSBrowser)
+    {
         ServerBrowserFree(m_pGSBrowser);
         m_pGSBrowser = NULL;
     }
@@ -124,7 +128,8 @@ static bool services_checked = false;
 
 bool CGameSpy_Browser::Init(UpdateCallback updateCb, DestroyCallback destroyCb)
 {
-    if (onDestroy) onDestroy(this);
+    if (onDestroy)
+        onDestroy(this);
     onUpdate = updateCb;
     onDestroy = destroyCb;
     return true;
@@ -165,19 +170,23 @@ void CGameSpy_Browser::RefreshListInternet(const char* FilterStr)
 
 GSUpdateStatus CGameSpy_Browser::RefreshList_Full(bool Local, const char* FilterStr)
 {
-    if (!m_pGSBrowser) return GSUpdateStatus::Success;
+    if (!m_pGSBrowser)
+        return GSUpdateStatus::Success;
     SBState state = ServerBrowserState(m_pGSBrowser);
-    if ((state != sb_connected) && (state != sb_disconnected)) {
+    if ((state != sb_connected) && (state != sb_disconnected))
+    {
         ServerBrowserHalt(m_pGSBrowser);
         Msg("xrGSB Refresh Stopped\n");
     };
     ServerBrowserClear(m_pGSBrowser);
 
     // do an update
-    if (!Local) {
+    if (!Local)
+    {
         m_refresh_lock.Enter();
         m_refresh_lock.Leave();
-        if (!m_bAbleToConnectToMasterServer) return GSUpdateStatus::MasterUnreachable;
+        if (!m_bAbleToConnectToMasterServer)
+            return GSUpdateStatus::MasterUnreachable;
         RefreshData* pRData = new RefreshData();
         xr_strcpy(pRData->FilterStr, FilterStr);
         pRData->pGSBrowser = this;
@@ -186,7 +195,8 @@ GSUpdateStatus CGameSpy_Browser::RefreshList_Full(bool Local, const char* Filter
         return GSUpdateStatus::ConnectingToMaster;
     }
     SBError error = ServerBrowserLANUpdate(m_pGSBrowser, onUpdate ? SBTrue : SBFalse, START_PORT_LAN, END_PORT_LAN);
-    if (error != sbe_noerror) {
+    if (error != sbe_noerror)
+    {
         Msg("! xrGSB Error - %s", ServerBrowserErrorDescA(m_pGSBrowser, error));
         return GSUpdateStatus::Unknown;
     }
@@ -205,11 +215,7 @@ void CGameSpy_Browser::CallBack_OnUpdateCompleted()
     }
 };
 
-int CGameSpy_Browser::GetServersCount()
-{
-    return ServerBrowserCount(m_pGSBrowser);
-};
-
+int CGameSpy_Browser::GetServersCount() { return ServerBrowserCount(m_pGSBrowser); };
 void CGameSpy_Browser::GetServerInfoByIndex(ServerInfo* pServerInfo, int idx)
 {
     void* pServer = GetServerByIndex(idx);
@@ -217,11 +223,7 @@ void CGameSpy_Browser::GetServerInfoByIndex(ServerInfo* pServerInfo, int idx)
     pServerInfo->Index = idx;
 }
 
-void* CGameSpy_Browser::GetServerByIndex(int index)
-{
-    return ServerBrowserGetServer(m_pGSBrowser, index);
-}
-
+void* CGameSpy_Browser::GetServerByIndex(int index) { return ServerBrowserGetServer(m_pGSBrowser, index); }
 bool CGameSpy_Browser::GetBool(void* srv, int keyId, bool defaultValue)
 {
     const char* key = m_pQR2->RegisteredKey(keyId);
@@ -249,7 +251,8 @@ const char* CGameSpy_Browser::GetString(void* srv, int keyId, const char* defaul
 void CGameSpy_Browser::ReadServerInfo(ServerInfo* pServerInfo, void* gsServer)
 {
     auto pServer = static_cast<SBServer>(gsServer);
-    if (!pServer || !pServerInfo) return;
+    if (!pServer || !pServerInfo)
+        return;
     xr_sprintf(pServerInfo->m_Address, "%s:%d", SBServerGetPublicAddress(pServer), SBServerGetPublicQueryPort(pServer));
     xr_sprintf(pServerInfo->m_HostName, "%s", SBServerGetPublicAddress(pServer));
     xr_sprintf(pServerInfo->m_ServerName, "%s", GetString(pServer, HOSTNAME_KEY, pServerInfo->m_HostName));
@@ -266,7 +269,8 @@ void CGameSpy_Browser::ReadServerInfo(ServerInfo* pServerInfo, void* gsServer)
     pServerInfo->m_HPort = (s16)SBServerGetPublicQueryPort(pServer);
     pServerInfo->m_bDedicated = GetBool(pServer, DEDICATED_KEY);
     pServerInfo->m_GameType = (u8)GetInt(pServer, GAMETYPE_NAME_KEY, 0);
-    if (pServerInfo->m_GameType == 0) {
+    if (pServerInfo->m_GameType == 0)
+    {
         pServerInfo->m_GameType = ParseStringToGameType(pServerInfo->m_ServerGameType);
     }
     xr_sprintf(pServerInfo->m_ServerVersion, "%s", GetString(pServer, GAMEVER_KEY, "--"));
@@ -275,7 +279,8 @@ void CGameSpy_Browser::ReadServerInfo(ServerInfo* pServerInfo, void* gsServer)
     pServerInfo->m_aPlayers.clear();
     pServerInfo->m_aTeams.clear();
     //-------------------------------------------------------//
-    if (SBServerHasFullKeys(pServer) == SBFalse) return;
+    if (SBServerHasFullKeys(pServer) == SBFalse)
+        return;
 
     pServerInfo->MaxPing = GetInt(pServer, G_MAX_PING_KEY);
     pServerInfo->MapRotation = GetBool(pServer, G_MAP_ROTATION_KEY);
@@ -288,7 +293,8 @@ void CGameSpy_Browser::ReadServerInfo(ServerInfo* pServerInfo, void* gsServer)
     if (pServerInfo->DamageBlockTime != 0)
         pServerInfo->DamageBlockIndicators = GetBool(pServer, G_DAMAGE_BLOCK_INDICATOR_KEY);
     pServerInfo->AnomaliesEnabled = GetBool(pServer, G_ANOMALIES_ENABLED_KEY);
-    if (pServerInfo->AnomaliesEnabled) pServerInfo->AnomaliesTime = GetFloat(pServer, G_ANOMALIES_TIME_KEY);
+    if (pServerInfo->AnomaliesEnabled)
+        pServerInfo->AnomaliesTime = GetFloat(pServer, G_ANOMALIES_TIME_KEY);
     pServerInfo->ForceRespawn = GetFloat(pServer, G_FORCE_RESPAWN_KEY);
     pServerInfo->WarmUp = GetFloat(pServer, G_WARM_UP_TIME_KEY);
     if (pServerInfo->m_GameType == eGameIDTeamDeathmatch || pServerInfo->m_GameType == eGameIDArtefactHunt ||
@@ -301,7 +307,8 @@ void CGameSpy_Browser::ReadServerInfo(ServerInfo* pServerInfo, void* gsServer)
         pServerInfo->FriendlyFire = GetFloat(pServer, G_FRIENDLY_FIRE_KEY);
     };
 
-    if (pServerInfo->m_GameType == eGameIDArtefactHunt || pServerInfo->m_GameType == eGameIDCaptureTheArtefact) {
+    if (pServerInfo->m_GameType == eGameIDArtefactHunt || pServerInfo->m_GameType == eGameIDCaptureTheArtefact)
+    {
         pServerInfo->ArtefactCount = GetInt(pServer, G_ARTEFACTS_COUNT_KEY);
         pServerInfo->ArtefactStayTime = GetFloat(pServer, G_ARTEFACT_STAY_TIME_KEY);
         pServerInfo->ArtefactRespawnTime = GetFloat(pServer, G_ARTEFACT_RESPAWN_TIME_KEY);
@@ -348,7 +355,8 @@ void CGameSpy_Browser::ReadServerInfo(ServerInfo* pServerInfo, void* gsServer)
 void CGameSpy_Browser::RefreshQuick(int Index)
 {
     SBServer pServer = ServerBrowserGetServer(m_pGSBrowser, Index);
-    if (!pServer) return;
+    if (!pServer)
+        return;
     ServerInfo xServerInfo;
     ReadServerInfo(&xServerInfo, pServer);
     ServerBrowserAuxUpdateServer(m_pGSBrowser, pServer, SBFalse, SBTrue);
@@ -357,7 +365,8 @@ void CGameSpy_Browser::RefreshQuick(int Index)
 bool CGameSpy_Browser::CheckDirectConnection(int Index)
 {
     SBServer pServer = ServerBrowserGetServer(m_pGSBrowser, Index);
-    if (!pServer) return false;
+    if (!pServer)
+        return false;
     SBBool res = SBServerDirectConnect(pServer);
     return res == SBTrue;
 };
@@ -370,8 +379,10 @@ void CGameSpy_Browser::OnUpdateFailed(void* server)
 GSUpdateStatus CGameSpy_Browser::Update()
 {
     ServerBrowserThink(m_pGSBrowser);
-    if (m_bTryingToConnectToMasterServer) return GSUpdateStatus::ConnectingToMaster;
-    if (m_bShowCMSErr) {
+    if (m_bTryingToConnectToMasterServer)
+        return GSUpdateStatus::ConnectingToMaster;
+    if (m_bShowCMSErr)
+    {
         m_bShowCMSErr = false;
         return GSUpdateStatus::MasterUnreachable;
     }
@@ -380,18 +391,16 @@ GSUpdateStatus CGameSpy_Browser::Update()
 
 void CGameSpy_Browser::UpdateServerList()
 {
-    if (onUpdate) onUpdate();
+    if (onUpdate)
+        onUpdate();
 }
 
-void CGameSpy_Browser::SortBrowserByPing()
-{
-    ServerBrowserSortA(m_pGSBrowser, SBTrue, "ping", sbcm_int);
-}
-
+void CGameSpy_Browser::SortBrowserByPing() { ServerBrowserSortA(m_pGSBrowser, SBTrue, "ping", sbcm_int); }
 bool CGameSpy_Browser::HasAllKeys(int Index)
 {
     SBServer pServer = ServerBrowserGetServer(m_pGSBrowser, Index);
-    if (!pServer) return true;
+    if (!pServer)
+        return true;
     ServerInfo xServerInfo;
     ReadServerInfo(&xServerInfo, pServer);
     //	xrGS_ServerBrowserAuxUpdateServer(m_pGSBrowser, pServer, SBFalse, SBTrue);

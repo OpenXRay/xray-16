@@ -17,16 +17,13 @@ CBlender_BmmD::CBlender_BmmD()
     xr_strcpy(oT2_Name, "$null");
     xr_strcpy(oT2_xform, "$null");
     description.version = 3;
-    xr_strcpy(oR_Name, "detail\\detail_grnd_grass");    //"$null");
-    xr_strcpy(oG_Name, "detail\\detail_grnd_asphalt");  //"$null");
-    xr_strcpy(oB_Name, "detail\\detail_grnd_earth");    //"$null");
-    xr_strcpy(oA_Name, "detail\\detail_grnd_yantar");   //"$null");
+    xr_strcpy(oR_Name, "detail\\detail_grnd_grass"); //"$null");
+    xr_strcpy(oG_Name, "detail\\detail_grnd_asphalt"); //"$null");
+    xr_strcpy(oB_Name, "detail\\detail_grnd_earth"); //"$null");
+    xr_strcpy(oA_Name, "detail\\detail_grnd_yantar"); //"$null");
 }
 
-CBlender_BmmD::~CBlender_BmmD()
-{
-}
-
+CBlender_BmmD::~CBlender_BmmD() {}
 void CBlender_BmmD::Save(IWriter& fs)
 {
     IBlender::Save(fs);
@@ -42,7 +39,8 @@ void CBlender_BmmD::Save(IWriter& fs)
 void CBlender_BmmD::Load(IReader& fs, u16 version)
 {
     IBlender::Load(fs, version);
-    if (version < 3) {
+    if (version < 3)
+    {
         xrPREAD_MARKER(fs);
         xrPREAD_PROP(fs, xrPID_TEXTURE, oT2_Name);
         xrPREAD_PROP(fs, xrPID_MATRIX, oT2_xform);
@@ -66,7 +64,8 @@ void CBlender_BmmD::Load(IReader& fs, u16 version)
 void CBlender_BmmD::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
-    if (C.bEditor) {
+    if (C.bEditor)
+    {
         C.PassBegin();
         {
             C.PassSET_ZB(TRUE, TRUE);
@@ -147,7 +146,7 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
     strconcat(sizeof(mask), mask, C.L_textures[0].c_str(), "_mask");
     switch (C.iElement)
     {
-    case SE_R2_NORMAL_HQ:  // deffer
+    case SE_R2_NORMAL_HQ: // deffer
         uber_deffer(C, true, "impl", "impl", false, oT2_Name[0] ? oT2_Name : 0, true);
         C.r_Sampler("s_mask", mask);
         C.r_Sampler("s_lmap", C.L_textures[1]);
@@ -168,12 +167,12 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
 
         C.r_End();
         break;
-    case SE_R2_NORMAL_LQ:  // deffer
+    case SE_R2_NORMAL_LQ: // deffer
         uber_deffer(C, false, "base", "impl", false, oT2_Name[0] ? oT2_Name : 0, true);
         C.r_Sampler("s_lmap", C.L_textures[1]);
         C.r_End();
         break;
-    case SE_R2_SHADOW:  // smap
+    case SE_R2_SHADOW: // smap
         if (RImplementation.o.HW_smap)
             C.r_Pass("shadow_direct_base", "dumb", FALSE, TRUE, TRUE, FALSE);
         else
@@ -197,7 +196,7 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
     strconcat(sizeof(mask), mask, C.L_textures[0].c_str(), "_mask");
     switch (C.iElement)
     {
-    case SE_R2_NORMAL_HQ:  // deffer
+    case SE_R2_NORMAL_HQ: // deffer
         uber_deffer(C, true, "impl", "impl", false, oT2_Name[0] ? oT2_Name : 0, true);
         // C.r_Sampler		("s_mask",	mask);
         // C.r_Sampler		("s_lmap",	C.L_textures[1]);
@@ -237,7 +236,7 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
 
         C.r_End();
         break;
-    case SE_R2_NORMAL_LQ:  // deffer
+    case SE_R2_NORMAL_LQ: // deffer
         uber_deffer(C, false, "base", "impl", false, oT2_Name[0] ? oT2_Name : 0, true);
 
         // C.r_Sampler		("s_lmap",	C.L_textures[1]);
@@ -250,7 +249,7 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
 
         C.r_End();
         break;
-    case SE_R2_SHADOW:  // smap
+    case SE_R2_SHADOW: // smap
         // if (RImplementation.o.HW_smap)	C.r_Pass	("shadow_direct_base","dumb",	FALSE,TRUE,TRUE,FALSE);
         // else							C.r_Pass	("shadow_direct_base","shadow_direct_base",FALSE);
         C.r_Pass("shadow_direct_base", "dumb", FALSE, TRUE, TRUE, FALSE);

@@ -15,8 +15,5 @@ namespace lc_net
         return false;
     }
 */
-void net_execution::send_task(IGridUser& user, IGenericStream* outStream, u32 id)
-{
-    _id = id;
-}
+void net_execution::send_task(IGridUser& user, IGenericStream* outStream, u32 id) { _id = id; }
 }

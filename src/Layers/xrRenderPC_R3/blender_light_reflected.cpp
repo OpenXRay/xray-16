@@ -3,14 +3,8 @@
 
 #include "Blender_light_reflected.h"
 
-CBlender_accum_reflected::CBlender_accum_reflected()
-{
-    description.CLS = 0;
-}
-CBlender_accum_reflected::~CBlender_accum_reflected()
-{
-}
-
+CBlender_accum_reflected::CBlender_accum_reflected() { description.CLS = 0; }
+CBlender_accum_reflected::~CBlender_accum_reflected() {}
 void CBlender_accum_reflected::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);
@@ -32,14 +26,8 @@ void CBlender_accum_reflected::Compile(CBlender_Compile& C)
     C.r_End();
 }
 
-CBlender_accum_reflected_msaa::CBlender_accum_reflected_msaa()
-{
-    description.CLS = 0;
-}
-CBlender_accum_reflected_msaa::~CBlender_accum_reflected_msaa()
-{
-}
-
+CBlender_accum_reflected_msaa::CBlender_accum_reflected_msaa() { description.CLS = 0; }
+CBlender_accum_reflected_msaa::~CBlender_accum_reflected_msaa() {}
 //	TODO: DX10: implement CBlender_accum_reflected::Compile
 void CBlender_accum_reflected_msaa::Compile(CBlender_Compile& C)
 {

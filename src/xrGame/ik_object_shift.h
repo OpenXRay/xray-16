@@ -22,7 +22,6 @@ public:
     void set_taget(float taget, float time);
     float shift() const;
     void freeze(bool v) { b_freeze = v; }
-
 private:
     float shift(float time_global) const;
     float delta_shift(float delta_time) const;

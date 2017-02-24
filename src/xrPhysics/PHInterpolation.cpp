@@ -16,7 +16,8 @@ CPHInterpolation::CPHInterpolation()
 
 void CPHInterpolation::SetBody(dBodyID body)
 {
-    if (!body) return;
+    if (!body)
+        return;
     m_body = body;
     qPositions.fill_in(*((Fvector*)dBodyGetPosition(m_body)));
     const dReal* dQ = dBodyGetQuaternion(m_body);
@@ -79,23 +80,27 @@ void CPHInterpolation::ResetRotations()
 
 void CPHInterpolation::GetRotation(Fquaternion& q, u16 num)
 {
-    if (!m_body) return;
+    if (!m_body)
+        return;
     q.set(qRotations[num]);
 }
 
 void CPHInterpolation::GetPosition(Fvector& p, u16 num)
 {
-    if (!m_body) return;
+    if (!m_body)
+        return;
     p.set(qPositions[num]);
 }
 void CPHInterpolation::SetPosition(const Fvector& p, u16 num)
 {
-    if (!m_body) return;
+    if (!m_body)
+        return;
     qPositions[num].set(p);
 }
 
 void CPHInterpolation::SetRotation(const Fquaternion& q, u16 num)
 {
-    if (!m_body) return;
+    if (!m_body)
+        return;
     qRotations[num] = q;
 }

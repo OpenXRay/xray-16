@@ -8,7 +8,6 @@ public:
     virtual LPCSTR getComment() { return "INTERNAL: 3dfluid maths"; }
     virtual BOOL canBeDetailed() { return FALSE; }
     virtual BOOL canBeLMAPped() { return FALSE; }
-
     virtual void Compile(CBlender_Compile& C);
 };
 
@@ -18,7 +17,6 @@ public:
     virtual LPCSTR getComment() { return "INTERNAL: 3dfluid maths"; }
     virtual BOOL canBeDetailed() { return FALSE; }
     virtual BOOL canBeLMAPped() { return FALSE; }
-
     virtual void Compile(CBlender_Compile& C);
 };
 
@@ -28,7 +26,6 @@ public:
     virtual LPCSTR getComment() { return "INTERNAL: 3dfluid maths"; }
     virtual BOOL canBeDetailed() { return FALSE; }
     virtual BOOL canBeLMAPped() { return FALSE; }
-
     virtual void Compile(CBlender_Compile& C);
 };
 
@@ -38,7 +35,6 @@ public:
     virtual LPCSTR getComment() { return "INTERNAL: 3dfluid maths 2"; }
     virtual BOOL canBeDetailed() { return FALSE; }
     virtual BOOL canBeLMAPped() { return FALSE; }
-
     virtual void Compile(CBlender_Compile& C);
 };
 
@@ -48,7 +44,6 @@ public:
     virtual LPCSTR getComment() { return "INTERNAL: 3dfluid emitters"; }
     virtual BOOL canBeDetailed() { return FALSE; }
     virtual BOOL canBeLMAPped() { return FALSE; }
-
     virtual void Compile(CBlender_Compile& C);
 };
 
@@ -58,7 +53,6 @@ public:
     virtual LPCSTR getComment() { return "INTERNAL: 3dfluid maths 2"; }
     virtual BOOL canBeDetailed() { return FALSE; }
     virtual BOOL canBeLMAPped() { return FALSE; }
-
     virtual void Compile(CBlender_Compile& C);
 };
 
@@ -68,7 +62,6 @@ public:
     virtual LPCSTR getComment() { return "INTERNAL: 3dfluid maths 2"; }
     virtual BOOL canBeDetailed() { return FALSE; }
     virtual BOOL canBeLMAPped() { return FALSE; }
-
     virtual void Compile(CBlender_Compile& C);
 };
 
@@ -78,8 +71,7 @@ public:
     virtual LPCSTR getComment() { return "INTERNAL: 3dfluid maths 2"; }
     virtual BOOL canBeDetailed() { return FALSE; }
     virtual BOOL canBeLMAPped() { return FALSE; }
-
     virtual void Compile(CBlender_Compile& C);
 };
 
-#endif  //	dx103DFluidBlenders_included
+#endif //	dx103DFluidBlenders_included

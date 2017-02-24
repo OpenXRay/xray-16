@@ -6,14 +6,8 @@
 #include "utils/xrLC_Light/R_light.h"
 #include "light_db.h"
 
-CLight_DB::CLight_DB()
-{
-}
-
-CLight_DB::~CLight_DB()
-{
-}
-
+CLight_DB::CLight_DB() {}
+CLight_DB::~CLight_DB() {}
 void CLight_DB::Load(IReader* fs)
 {
     IReader* F = 0;
@@ -44,7 +38,8 @@ void CLight_DB::Load(IReader* fs)
             u32 controller = 0;
             F->r(&controller, 4);
             F->r(&Ldata, sizeof(Flight));
-            if (Ldata.type == D3DLIGHT_DIRECTIONAL) {
+            if (Ldata.type == D3DLIGHT_DIRECTIONAL)
+            {
                 Fvector tmp_R;
                 tmp_R.set(1, 0, 0);
 
@@ -64,8 +59,8 @@ void CLight_DB::Load(IReader* fs)
             else
             {
                 Fvector tmp_D, tmp_R;
-                tmp_D.set(0, 0, -1);  // forward
-                tmp_R.set(1, 0, 0);   // right
+                tmp_D.set(0, 0, -1); // forward
+                tmp_R.set(1, 0, 0); // right
 
                 // point
                 v_static.push_back(L);
@@ -104,13 +99,15 @@ void CLight_DB::Load(IReader* fs)
 void CLight_DB::LoadHemi()
 {
     string_path fn_game;
-    if (FS.exist(fn_game, "$level$", "build.lights")) {
+    if (FS.exist(fn_game, "$level$", "build.lights"))
+    {
         IReader* F = FS.r_open(fn_game);
 
         {
-            IReader* chunk = F->open_chunk(1);  // Hemispheric light chunk
+            IReader* chunk = F->open_chunk(1); // Hemispheric light chunk
 
-            if (chunk) {
+            if (chunk)
+            {
                 u32 size = chunk->length();
                 u32 element = sizeof(R_Light);
                 u32 count = size / element;
@@ -130,8 +127,8 @@ void CLight_DB::LoadHemi()
                         L->set_type(IRender_Light::POINT);
 
                         Fvector tmp_D, tmp_R;
-                        tmp_D.set(0, 0, -1);  // forward
-                        tmp_R.set(1, 0, 0);   // right
+                        tmp_D.set(0, 0, -1); // forward
+                        tmp_R.set(1, 0, 0); // right
 
                         // point
                         v_hemi.push_back(L);
@@ -176,34 +173,42 @@ light* CLight_DB::Create()
 #if RENDER == R_R1
 void CLight_DB::add_light(light* L)
 {
-    if (Device.dwFrame == L->frame_render) return;
+    if (Device.dwFrame == L->frame_render)
+        return;
     L->frame_render = Device.dwFrame;
-    if (L->flags.bStatic) return;  // skip static lighting, 'cause they are in lmaps
-    if (ps_r1_flags.test(R1FLAG_DLIGHTS)) RImplementation.L_Dynamic->add(L);
+    if (L->flags.bStatic)
+        return; // skip static lighting, 'cause they are in lmaps
+    if (ps_r1_flags.test(R1FLAG_DLIGHTS))
+        RImplementation.L_Dynamic->add(L);
 }
 #endif
 
 #if (RENDER == R_R2) || (RENDER == R_R3) || (RENDER == R_R4)
 void CLight_DB::add_light(light* L)
 {
-    if (Device.dwFrame == L->frame_render) return;
+    if (Device.dwFrame == L->frame_render)
+        return;
     L->frame_render = Device.dwFrame;
-    if (RImplementation.o.noshadows) L->flags.bShadow = FALSE;
-    if (L->flags.bStatic && !ps_r2_ls_flags.test(R2FLAG_R1LIGHTS)) return;
+    if (RImplementation.o.noshadows)
+        L->flags.bShadow = FALSE;
+    if (L->flags.bStatic && !ps_r2_ls_flags.test(R2FLAG_R1LIGHTS))
+        return;
     L->Export(package);
 }
-#endif  // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
+#endif // (RENDER==R_R2) || (RENDER==R_R3) || (RENDER==R_R4)
 
 void CLight_DB::Update()
 {
     // set sun params
-    if (sun_original && sun_adapted) {
+    if (sun_original && sun_adapted)
+    {
         light* _sun_original = (light*)sun_original._get();
         light* _sun_adapted = (light*)sun_adapted._get();
         CEnvDescriptor& E = *g_pGamePersistent->Environment().CurrentEnv;
         VERIFY(_valid(E.sun_dir));
 #ifdef DEBUG
-        if (E.sun_dir.y >= 0) {
+        if (E.sun_dir.y >= 0)
+        {
             //			Log("sect_name", E.sect_name.c_str());
             Log("E.sun_dir", E.sun_dir);
             Log("E.wind_direction", E.wind_direction);
@@ -245,7 +250,8 @@ void CLight_DB::Update()
             E.sun_color.x * ps_r2_sun_lumscale, E.sun_color.y * ps_r2_sun_lumscale, E.sun_color.z * ps_r2_sun_lumscale);
         sun_adapted->set_range(600.f);
 
-        if (!GlobalEnv.Render->is_sun_static()) {
+        if (!GlobalEnv.Render->is_sun_static())
+        {
             sun_adapted->set_rotation(OD, _sun_original->right);
             sun_adapted->set_position(OP);
         }

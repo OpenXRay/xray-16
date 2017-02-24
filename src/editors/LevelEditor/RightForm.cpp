@@ -9,7 +9,5 @@
 #pragma resource "*.dfm"
 TfrmRight* frmRight;
 //---------------------------------------------------------------------------
-__fastcall TfrmRight::TfrmRight(TComponent* Owner) : TForm(Owner)
-{
-}
+__fastcall TfrmRight::TfrmRight(TComponent* Owner) : TForm(Owner) {}
 //---------------------------------------------------------------------------

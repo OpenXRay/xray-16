@@ -14,17 +14,6 @@ property_collection_getter::property_collection_getter(collection_getter_type co
 {
 }
 
-property_collection_getter::~property_collection_getter()
-{
-    this->!property_collection_getter();
-}
-
-property_collection_getter::!property_collection_getter()
-{
-    delete (m_getter);
-}
-
-property_collection_getter::collection_type* property_collection_getter::collection()
-{
-    return ((*m_getter)());
-}
+property_collection_getter::~property_collection_getter() { this->!property_collection_getter(); }
+property_collection_getter::!property_collection_getter() { delete (m_getter); }
+property_collection_getter::collection_type* property_collection_getter::collection() { return ((*m_getter)()); }

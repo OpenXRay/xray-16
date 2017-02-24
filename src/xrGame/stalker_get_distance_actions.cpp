@@ -48,19 +48,22 @@ void CStalkerActionRunToCover::initialize()
     object().m_ce_close->setup(position, 0.f, object().Position().distance_to(position), 10.f);
     const CCoverPoint* point = ai().cover_manager().best_cover(
         object().Position(), 10.f, *object().m_ce_close, CStalkerMovementRestrictor(m_object, true));
-    if (!point) {
+    if (!point)
+    {
         object().m_ce_close->setup(position, 0.f, object().Position().distance_to(position), 10.f);
         point = ai().cover_manager().best_cover(
             object().Position(), 30.f, *object().m_ce_close, CStalkerMovementRestrictor(m_object, true));
     }
 
-    if (point) {
+    if (point)
+    {
         object().movement().set_level_dest_vertex(point->level_vertex_id());
         object().movement().set_desired_position(&point->position());
         return;
     }
 
-    if (object().movement().restrictions().accessible(mem_object.m_object_params.m_level_vertex_id)) {
+    if (object().movement().restrictions().accessible(mem_object.m_object_params.m_level_vertex_id))
+    {
         object().movement().set_level_dest_vertex(mem_object.m_object_params.m_level_vertex_id);
         object().movement().set_desired_position(&mem_object.m_object_params.m_position);
         return;
@@ -74,7 +77,8 @@ void CStalkerActionRunToCover::execute()
 {
     inherited::execute();
 
-    if (!object().memory().visual().visible_now(object().memory().enemy().selected())) {
+    if (!object().memory().visual().visible_now(object().memory().enemy().selected()))
+    {
         object().set_goal(eObjectActionIdle, object().best_weapon());
         object().sight().setup(CSightAction(SightManager::eSightTypePathDirection));
     }
@@ -84,16 +88,13 @@ void CStalkerActionRunToCover::execute()
         fire();
     }
 
-    if (!object().movement().path_completed()) return;
+    if (!object().movement().path_completed())
+        return;
 
     m_storage->set_property(StalkerDecisionSpace::eWorldPropertyInCover, true);
 }
 
-void CStalkerActionRunToCover::finalize()
-{
-    inherited::finalize();
-}
-
+void CStalkerActionRunToCover::finalize() { inherited::finalize(); }
 //////////////////////////////////////////////////////////////////////////
 // CStalkerActionWaitInCover
 //////////////////////////////////////////////////////////////////////////
@@ -126,7 +127,8 @@ void CStalkerActionWaitInCover::execute()
 {
     inherited::execute();
 
-    if (!completed() && !object().memory().visual().visible_now(object().memory().enemy().selected())) return;
+    if (!completed() && !object().memory().visual().visible_now(object().memory().enemy().selected()))
+        return;
 
     m_storage->set_property(StalkerDecisionSpace::eWorldPropertyInCover, false);
 }

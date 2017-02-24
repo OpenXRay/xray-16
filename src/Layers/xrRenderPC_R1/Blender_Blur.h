@@ -7,7 +7,6 @@ class CBlender_Blur : public IBlender
 public:
     virtual LPCSTR getComment() { return "INTERNAL: blur"; }
     virtual BOOL canBeLMAPped() { return FALSE; }
-
     virtual void Save(IWriter& fs);
     virtual void Load(IReader& fs, u16 version);
 
@@ -17,4 +16,4 @@ public:
     virtual ~CBlender_Blur();
 };
 
-#endif  // BLENDER_BLUR_H
+#endif // BLENDER_BLUR_H

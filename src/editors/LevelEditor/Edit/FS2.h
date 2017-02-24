@@ -5,7 +5,7 @@
 
 class ENGINE_API IBasicStream
 {
-  private:
+private:
     std::stack<u32> chunk_pos;
     std::stack<u16> subchunk_pos;
     void revbytes(void* bp, int elsize, int elcount)
@@ -14,7 +14,8 @@ class ENGINE_API IBasicStream
 
         p = (unsigned char*)bp;
 
-        if (elsize == 2) {
+        if (elsize == 2)
+        {
             q = p + 1;
             while (elcount--)
             {
@@ -42,7 +43,7 @@ class ENGINE_API IBasicStream
         }
     }
 
-  public:
+public:
     virtual ~IBasicStream()
     {
         R_ASSERT(subchunk_pos.empty());
@@ -81,7 +82,8 @@ class ENGINE_API IBasicStream
     IC void w_stringZ(const char* p)
     {
         write(p, xr_strlen(p) + 1);
-        if (!(xr_strlen(p) & 1)) w_u8(0);
+        if (!(xr_strlen(p) & 1))
+            w_u8(0);
     }
     IC void w_vector(Fvector v)
     {
@@ -99,7 +101,7 @@ class ENGINE_API IBasicStream
     {
         w_u32(type);
         chunk_pos.push(tell());
-        w_u32(0);  // the place for 'size'
+        w_u32(0); // the place for 'size'
     }
     IC void close_chunk()
     {
@@ -116,7 +118,7 @@ class ENGINE_API IBasicStream
     {
         w_u32(type);
         subchunk_pos.push((u16)tell());
-        w_u16(0);  // the place for 'size'
+        w_u16(0); // the place for 'size'
     }
     IC void close_subchunk()
     {
@@ -145,7 +147,7 @@ class ENGINE_API CMemoryStream :
     u32 mem_size;
     u32 file_size;
 
-  public:
+public:
     CMemoryStream()
     {
         data = 0;
@@ -160,7 +162,6 @@ class ENGINE_API CMemoryStream :
 
     virtual void seek(u32 pos) { position = pos; }
     virtual u32 tell() { return position; }
-
     // specific
     u8* pointer() { return data; }
     u32 size() { return file_size; }
@@ -194,14 +195,15 @@ class ENGINE_API CLWMemoryStream :
 
         for (i = 8, d = 16; i < 128; i *= 2)
         {
-            if (i >= nbloks) break;
+            if (i >= nbloks)
+                break;
             d /= 2;
         }
         ord[0] = u8(128 + index * d);
         ord[1] = 0;
     }
 
-  public:
+public:
     IC void begin_save()
     {
         open_chunk(ID_FORM);
@@ -215,9 +217,9 @@ class ENGINE_API CLWMemoryStream :
     IC void w_layer(u16 number, LPCSTR name)
     {
         open_chunk(ID_LAYR);
-        w_u16(number);  // num
+        w_u16(number); // num
         w_u16(0);
-        w_float(0);  // pivot
+        w_float(0); // pivot
         w_float(0);
         w_float(0);
         w_stringZ(name);
@@ -225,7 +227,8 @@ class ENGINE_API CLWMemoryStream :
     }
     IC void w_vx(int idx)
     {
-        if (idx >= 0xFF00) {
+        if (idx >= 0xFF00)
+        {
             idx |= 0xff000000;
             w_u32(idx);
         }
@@ -250,12 +253,12 @@ class ENGINE_API CLWMemoryStream :
         w_stringZ(name);
     }
     IC void end_vmap() { close_chunk(); }
-
     IC void w_vmap(int v_index, int dim, float* uv)
     {
         w_vx(v_index);
         w_float(uv[0]);
-        if (dim == 2) w_float(1.f - uv[1]);
+        if (dim == 2)
+            w_float(1.f - uv[1]);
     }
 
     IC void w_vmad(int v_index, int f_index, int dim, float* uv)
@@ -263,7 +266,8 @@ class ENGINE_API CLWMemoryStream :
         w_vx(v_index);
         w_vx(f_index);
         w_float(uv[0]);
-        if (dim == 2) w_float(1.f - uv[1]);
+        if (dim == 2)
+            w_float(1.f - uv[1]);
     }
 
     IC void Wsurface(LPCSTR name, BOOL b2Sided, u16 image, LPCSTR vmap, LPCSTR sh_eng, LPCSTR sh_comp)

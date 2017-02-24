@@ -32,11 +32,7 @@ action::action(luabind::object const& table)
     load_animations(anim_table);
 }
 
-action::~action()
-{
-    delete_data(m_animations);
-}
-
+action::~action() { delete_data(m_animations); }
 bool action::applicable() const
 {
     luabind::functor<bool> functor;
@@ -67,7 +63,6 @@ class body_state_predicate
 
 public:
     IC body_state_predicate(MonsterSpace::EBodyState const& body_state) : m_body_state(body_state) {}
-
     IC bool operator()(animation_action* animation_action) const
     {
         VERIFY(animation_action);
@@ -84,15 +79,16 @@ animation_action const& action::animation(MonsterSpace::EBodyState const& target
     Animations::const_iterator found =
         std::find_if(m_animations.begin(), m_animations.end(), body_state_predicate(target_body_state));
 
-    if (found == m_animations.end()) {
+    if (found == m_animations.end())
+    {
 #ifndef MASTER_GOLD
         Msg("! There is no animation which can transfer bot to body_state [%i], selecting random transition",
             target_body_state);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
         return (animation());
     }
 
-#if 0  // for testing
+#if 0 // for testing
 	VERIFY2						(
 		found != m_animations.end(),
 		make_string("There is no animation which can transfer bot to body_state [%i]", target_body_state)
@@ -102,7 +98,4 @@ animation_action const& action::animation(MonsterSpace::EBodyState const& target
     return (**found);
 }
 
-animation_action const& action::animation() const
-{
-    return (*m_animations[Random.randI(m_animations.size())]);
-}
+animation_action const& action::animation() const { return (*m_animations[Random.randI(m_animations.size())]); }

@@ -14,11 +14,7 @@ extern "C" __declspec(dllexport) bool __stdcall FSColorPickerExecute(
 }
 
 extern "C" {
-ETOOLS_API UINT WINAPI D3DX_GetDriverLevel(LPDIRECT3DDEVICE9 pDevice)
-{
-    return D3DXGetDriverLevel(pDevice);
-}
-
+ETOOLS_API UINT WINAPI D3DX_GetDriverLevel(LPDIRECT3DDEVICE9 pDevice) { return D3DXGetDriverLevel(pDevice); }
 ETOOLS_API HRESULT WINAPI D3DX_GetImageInfoFromFileInMemory(
     LPCVOID pSrcData, UINT SrcDataSize, D3DXIMAGE_INFO* pSrcInfo)
 {
@@ -95,16 +91,8 @@ ETOOLS_API UINT WINAPI D3DX_GetDeclVertexSize(CONST D3DVERTEXELEMENT9* pDecl, DW
     return D3DXGetDeclVertexSize(pDecl, Stream);
 }
 
-ETOOLS_API UINT WINAPI D3DX_GetDeclLength(CONST D3DVERTEXELEMENT9* pDecl)
-{
-    return D3DXGetDeclLength(pDecl);
-}
-
-ETOOLS_API UINT WINAPI D3DX_GetFVFVertexSize(DWORD FVF)
-{
-    return D3DXGetFVFVertexSize(FVF);
-}
-
+ETOOLS_API UINT WINAPI D3DX_GetDeclLength(CONST D3DVERTEXELEMENT9* pDecl) { return D3DXGetDeclLength(pDecl); }
+ETOOLS_API UINT WINAPI D3DX_GetFVFVertexSize(DWORD FVF) { return D3DXGetFVFVertexSize(FVF); }
 ETOOLS_API const char* WINAPI DX_GetErrorDescription(HRESULT hr)
 {
     static char desc[1024];

@@ -7,14 +7,8 @@
 #include "Include/xrRender/Kinematics.h"
 #include "xrEngine/xr_collide_form.h"
 
-CPhysicsSkeletonObject::CPhysicsSkeletonObject()
-{
-}
-
-CPhysicsSkeletonObject::~CPhysicsSkeletonObject()
-{
-}
-
+CPhysicsSkeletonObject::CPhysicsSkeletonObject() {}
+CPhysicsSkeletonObject::~CPhysicsSkeletonObject() {}
 BOOL CPhysicsSkeletonObject::net_Spawn(CSE_Abstract* DC)
 {
     CSE_Abstract* e = (CSE_Abstract*)(DC);
@@ -25,7 +19,8 @@ BOOL CPhysicsSkeletonObject::net_Spawn(CSE_Abstract* DC)
     CPHSkeleton::Spawn(e);
     setVisible(TRUE);
     setEnabled(TRUE);
-    if (!PPhysicsShell()->isBreakable()) SheduleUnregister();
+    if (!PPhysicsShell()->isBreakable())
+        SheduleUnregister();
     return TRUE;
 }
 
@@ -33,7 +28,8 @@ void CPhysicsSkeletonObject::SpawnInitPhysics(CSE_Abstract* D)
 {
     CreatePhysicsShell(D);
     IKinematics* K = smart_cast<IKinematics*>(Visual());
-    if (K) {
+    if (K)
+    {
         K->CalculateBones_Invalidate();
         K->CalculateBones(TRUE);
     }
@@ -54,8 +50,10 @@ void CPhysicsSkeletonObject::Load(LPCSTR section)
 void CPhysicsSkeletonObject::CreatePhysicsShell(CSE_Abstract* e)
 {
     CSE_PHSkeleton* po = smart_cast<CSE_PHSkeleton*>(e);
-    if (m_pPhysicsShell) return;
-    if (!Visual()) return;
+    if (m_pPhysicsShell)
+        return;
+    if (!Visual())
+        return;
     m_pPhysicsShell = P_build_Shell(this, !po->_flags.test(CSE_PHSkeleton::flActive));
 }
 
@@ -74,14 +72,10 @@ void CPhysicsSkeletonObject::net_Save(NET_Packet& P)
 
 BOOL CPhysicsSkeletonObject::net_SaveRelevant()
 {
-    return TRUE;  //! m_flags.test(CSE_ALifeObjectPhysic::flSpawnCopy);
+    return TRUE; //! m_flags.test(CSE_ALifeObjectPhysic::flSpawnCopy);
 }
 
-BOOL CPhysicsSkeletonObject::UsedAI_Locations()
-{
-    return (FALSE);
-}
-
+BOOL CPhysicsSkeletonObject::UsedAI_Locations() { return (FALSE); }
 void CPhysicsSkeletonObject::UpdateCL()
 {
     inherited::UpdateCL();
@@ -90,7 +84,8 @@ void CPhysicsSkeletonObject::UpdateCL()
 
 void CPhysicsSkeletonObject::PHObjectPositionUpdate()
 {
-    if (m_pPhysicsShell) {
+    if (m_pPhysicsShell)
+    {
         m_pPhysicsShell->InterpolateGlobalTransform(&XFORM());
     }
 }

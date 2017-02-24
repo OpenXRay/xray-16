@@ -35,7 +35,7 @@ class CWayPoint
     bool AppendLink(CWayPoint* P, float pb);
     bool DeleteLink(CWayPoint* P);
 
-  public:
+public:
     CWayPoint(LPCSTR name);
     ~CWayPoint();
     void Render(LPCSTR parent_name, bool bParentSelect);
@@ -45,7 +45,6 @@ class CWayPoint
     void Select(int flag);
 
     void MoveTo(const Fvector& pos) { m_vPosition.set(pos); }
-
     bool AddSingleLink(CWayPoint* P);
     bool AddDoubleLink(CWayPoint* P);
     bool RemoveLink(CWayPoint* P);
@@ -60,7 +59,7 @@ DEFINE_VECTOR(CWayPoint*, WPVec, WPIt);
 
 class CWayObject : public CCustomObject
 {
-  protected:
+protected:
     friend class TfrmPropertiesWayPoint;
     EWayType m_Type;
     WPVec m_WayPoints;
@@ -68,22 +67,19 @@ class CWayObject : public CCustomObject
     CWayPoint* FindWayPoint(const shared_str& nm);
 
     void __stdcall FindWPByName(LPCSTR new_name, bool& res) { res = !!FindWayPoint(new_name); }
-
     bool __stdcall OnWayPointNameAfterEdit(PropValue* sender, shared_str& edit_val);
 
-  public:
+public:
     CWayObject(LPVOID data, LPCSTR name);
     void Construct(LPVOID data);
     virtual ~CWayObject();
     void Clear();
 
     virtual bool CanAttach() { return true; }
-
     EWayType GetType() { return m_Type; }
-
     virtual void Select(int flag);
     virtual bool RaySelect(
-        int flag, const Fvector& start, const Fvector& dir, bool bRayTest = false);  // flag 1,0,-1 (-1 invert)
+        int flag, const Fvector& start, const Fvector& dir, bool bRayTest = false); // flag 1,0,-1 (-1 invert)
     virtual bool FrustumSelect(int flag, const CFrustum& frustum);
 
     CWayPoint* AppendWayPoint();
@@ -101,15 +97,10 @@ class CWayObject : public CCustomObject
     virtual void Move(Fvector& amount);
 
     virtual void RotateParent(Fvector& axis, float angle) { ; }
-
     virtual void RotateLocal(Fvector& axis, float angle) { ; }
-
     virtual void RotatePivot(const Fmatrix& prev_inv, const Fmatrix& current) { ; }
-
     virtual void Scale(Fvector& amount) { ; }
-
     virtual void ScalePivot(const Fmatrix& prev_inv, const Fmatrix& current, Fvector& amount) { ; }
-
     virtual bool GetBox(Fbox& box) const;
     virtual void Render(int priority, bool strictB2F);
     virtual bool RayPick(float& distance, const Fvector& S, const Fvector& D, SRayPickInfo* pinf = NULL);
@@ -127,7 +118,6 @@ class CWayObject : public CCustomObject
     virtual bool OnSelectionRemove();
 
     virtual const Fvector& GetPosition() const { return m_WayPoints.front()->m_vPosition; }
-
     virtual void SetPosition(const Fvector& pos)
     {
         MoveTo(pos, Fvector().set(0, 1, 0));

@@ -21,58 +21,26 @@ IRenderFactory* RenderFactory = NULL;
 
 //---------------------------------------------------------------------------
 
-CRender::CRender()
-{
-    m_skinning = 0;
-}
-
-CRender::~CRender()
-{
-    xr_delete(Target);
-}
-
-void CRender::Initialize()
-{
-    PSLibrary.OnCreate();
-}
-
-void CRender::ShutDown()
-{
-    PSLibrary.OnDestroy();
-}
-
+CRender::CRender() { m_skinning = 0; }
+CRender::~CRender() { xr_delete(Target); }
+void CRender::Initialize() { PSLibrary.OnCreate(); }
+void CRender::ShutDown() { PSLibrary.OnDestroy(); }
 void CRender::OnDeviceCreate()
 {
     Models = new CModelPool();
     Models->Logging(FALSE);
 }
 
-void CRender::OnDeviceDestroy()
-{
-    xr_delete(Models);
-}
-
-ref_shader CRender::getShader(int id)
-{
-    return 0;
-}  // VERIFY(id<int(Shaders.size()));	return Shaders[id];	}
-
+void CRender::OnDeviceDestroy() { xr_delete(Models); }
+ref_shader CRender::getShader(int id) { return 0; } // VERIFY(id<int(Shaders.size()));	return Shaders[id];	}
 BOOL CRender::occ_visible(Fbox& B)
 {
     u32 mask = 0xff;
     return ViewBase.testAABB(B.data(), mask);
 }
 
-BOOL CRender::occ_visible(sPoly& P)
-{
-    return ViewBase.testPolyInside(P);
-}
-
-BOOL CRender::occ_visible(vis_data& P)
-{
-    return occ_visible(P.box);
-}
-
+BOOL CRender::occ_visible(sPoly& P) { return ViewBase.testPolyInside(P); }
+BOOL CRender::occ_visible(vis_data& P) { return occ_visible(P.box); }
 void CRender::Calculate()
 {
     // Transfer to global space to avoid deep pointer access
@@ -87,10 +55,7 @@ void CRender::Calculate()
 #include "xrEngine/IGame_Persistent.h"
 #include "environment.h"
 
-void CRender::Render()
-{
-}
-
+void CRender::Render() {}
 IRender_DetailModel* CRender::model_CreateDM(IReader* F)
 {
     VERIFY(F);
@@ -138,26 +103,14 @@ void CRender::rmNormal()
     CHK_DX(HW.pDevice->SetViewport(&VP));
 }
 
-void CRender::set_Transform(Fmatrix* M)
-{
-    current_matrix.set(*M);
-}
-
+void CRender::set_Transform(Fmatrix* M) { current_matrix.set(*M); }
 void CRender::add_Visual(IRenderVisual* visual)
 {
     Models->RenderSingle(dynamic_cast<dxRender_Visual*>(visual), current_matrix, 1.f);
 }
 
-IRenderVisual* CRender::model_Create(LPCSTR name, IReader* data)
-{
-    return Models->Create(name, data);
-}
-
-IRenderVisual* CRender::model_CreateChild(LPCSTR name, IReader* data)
-{
-    return Models->CreateChild(name, data);
-}
-
+IRenderVisual* CRender::model_Create(LPCSTR name, IReader* data) { return Models->Create(name, data); }
+IRenderVisual* CRender::model_CreateChild(LPCSTR name, IReader* data) { return Models->CreateChild(name, data); }
 void CRender::model_Delete(IRenderVisual*& V, BOOL bDiscard)
 {
     Models->Delete(dynamic_cast<dxRender_Visual*>(V), bDiscard);
@@ -198,31 +151,37 @@ HRESULT CRender::shader_compile(LPCSTR name, LPCSTR pSrcData, UINT SrcDataLen, v
     D3DXMACRO defines[128];
     int def_it = 0;
     CONST D3DXMACRO* pDefines = (CONST D3DXMACRO*)_pDefines;
-    if (pDefines) {
+    if (pDefines)
+    {
         // transfer existing defines
         for (;; def_it++)
         {
-            if (0 == pDefines[def_it].Name) break;
+            if (0 == pDefines[def_it].Name)
+                break;
             defines[def_it] = pDefines[def_it];
         }
     }
     // options
-    if (m_skinning < 0) {
+    if (m_skinning < 0)
+    {
         defines[def_it].Name = "SKIN_NONE";
         defines[def_it].Definition = "1";
         def_it++;
     }
-    if (0 == m_skinning) {
+    if (0 == m_skinning)
+    {
         defines[def_it].Name = "SKIN_0";
         defines[def_it].Definition = "1";
         def_it++;
     }
-    if (1 == m_skinning) {
+    if (1 == m_skinning)
+    {
         defines[def_it].Name = "SKIN_1";
         defines[def_it].Definition = "1";
         def_it++;
     }
-    if (2 == m_skinning) {
+    if (2 == m_skinning)
+    {
         defines[def_it].Name = "SKIN_2";
         defines[def_it].Definition = "1";
         def_it++;
@@ -238,7 +197,7 @@ HRESULT CRender::shader_compile(LPCSTR name, LPCSTR pSrcData, UINT SrcDataLen, v
     LPD3DXCONSTANTTABLE* ppConstantTable = (LPD3DXCONSTANTTABLE*)_ppConstantTable;
 //.	return D3DXCompileShader
 //(pSrcData,SrcDataLen,defines,pInclude,pFunctionName,pTarget,Flags,ppShader,ppErrorMsgs,ppConstantTable);
-#ifdef D3DXSHADER_USE_LEGACY_D3DX9_31_DLL  //	December 2006 and later
+#ifdef D3DXSHADER_USE_LEGACY_D3DX9_31_DLL //	December 2006 and later
 
     HRESULT _result = D3DXCompileShader(pSrcData, SrcDataLen, defines, pInclude, pFunctionName, pTarget,
         Flags | D3DXSHADER_USE_LEGACY_D3DX9_31_DLL, ppShader, ppErrorMsgs, ppConstantTable);
@@ -249,12 +208,5 @@ HRESULT CRender::shader_compile(LPCSTR name, LPCSTR pSrcData, UINT SrcDataLen, v
     return _result;
 }
 
-void CRender::reset_begin()
-{
-    xr_delete(Target);
-}
-
-void CRender::reset_end()
-{
-    Target = new CRenderTarget();
-}
+void CRender::reset_begin() { xr_delete(Target); }
+void CRender::reset_end() { Target = new CRenderTarget(); }

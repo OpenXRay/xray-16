@@ -47,7 +47,6 @@ public:
 
 protected:
     virtual bool use_parent_ai_locations() const = 0 { return !enabled(); }
-
 public:
 #ifdef DEBUG
     static CAttachableItem* m_dbgItem;

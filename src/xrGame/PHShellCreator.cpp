@@ -9,12 +9,14 @@ void CPHShellSimpleCreator::CreatePhysicsShell()
 {
     CPhysicsShellHolder* owner = smart_cast<CPhysicsShellHolder*>(this);
     VERIFY(owner);
-    if (!owner->Visual()) return;
+    if (!owner->Visual())
+        return;
 
     IKinematics* pKinematics = smart_cast<IKinematics*>(owner->Visual());
     VERIFY(pKinematics);
 
-    if (owner->PPhysicsShell()) return;
+    if (owner->PPhysicsShell())
+        return;
 
     phys_shell_verify_object_model(*owner);
 

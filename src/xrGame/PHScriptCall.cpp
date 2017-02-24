@@ -22,21 +22,9 @@ CPHScriptCondition::CPHScriptCondition(const CPHScriptCondition& func)
     m_lua_function = new luabind::functor<bool>(*func.m_lua_function);
 }
 
-CPHScriptCondition::~CPHScriptCondition()
-{
-    xr_delete(m_lua_function);
-}
-
-bool CPHScriptCondition::is_true()
-{
-    return (*m_lua_function)();
-}
-
-bool CPHScriptCondition::obsolete() const
-{
-    return false;
-}
-
+CPHScriptCondition::~CPHScriptCondition() { xr_delete(m_lua_function); }
+bool CPHScriptCondition::is_true() { return (*m_lua_function)(); }
+bool CPHScriptCondition::obsolete() const { return false; }
 //
 CPHScriptAction::CPHScriptAction(const luabind::functor<void>& func)
 {
@@ -50,22 +38,14 @@ CPHScriptAction::CPHScriptAction(const CPHScriptAction& action)
     m_lua_function = new luabind::functor<void>(*action.m_lua_function);
 }
 
-CPHScriptAction::~CPHScriptAction()
-{
-    xr_delete(m_lua_function);
-}
-
+CPHScriptAction::~CPHScriptAction() { xr_delete(m_lua_function); }
 void CPHScriptAction::run()
 {
     (*m_lua_function)();
     b_obsolete = true;
 }
 
-bool CPHScriptAction::obsolete() const
-{
-    return b_obsolete;
-}
-
+bool CPHScriptAction::obsolete() const { return b_obsolete; }
 /////////////////////////////////////////////////////////////////////////////////////////////
 CPHScriptObjectAction::CPHScriptObjectAction(const luabind::object& lua_object, LPCSTR method)
 {
@@ -81,11 +61,7 @@ CPHScriptObjectAction::CPHScriptObjectAction(const CPHScriptObjectAction& object
     m_method_name = object.m_method_name;
 }
 
-CPHScriptObjectAction::~CPHScriptObjectAction()
-{
-    xr_delete(m_lua_object);
-}
-
+CPHScriptObjectAction::~CPHScriptObjectAction() { xr_delete(m_lua_object); }
 bool CPHScriptObjectAction::compare(const CPHScriptObjectAction* v) const
 {
     return m_method_name == v->m_method_name && compare_safe(*m_lua_object, *(v->m_lua_object));
@@ -96,11 +72,7 @@ void CPHScriptObjectAction::run()
     b_obsolete = true;
 }
 
-bool CPHScriptObjectAction::obsolete() const
-{
-    return b_obsolete;
-}
-
+bool CPHScriptObjectAction::obsolete() const { return b_obsolete; }
 //
 CPHScriptObjectCondition::CPHScriptObjectCondition(const luabind::object& lua_object, LPCSTR method)
 {
@@ -114,62 +86,34 @@ CPHScriptObjectCondition::CPHScriptObjectCondition(const CPHScriptObjectConditio
     m_method_name = object.m_method_name;
 }
 
-CPHScriptObjectCondition::~CPHScriptObjectCondition()
-{
-    xr_delete(m_lua_object);
-}
+CPHScriptObjectCondition::~CPHScriptObjectCondition() { xr_delete(m_lua_object); }
 bool CPHScriptObjectCondition::compare(const CPHScriptObjectCondition* v) const
 {
     return m_method_name == v->m_method_name && compare_safe(*m_lua_object, *(v->m_lua_object));
 }
 
-bool CPHScriptObjectCondition::is_true()
-{
-    return luabind::call_member<bool>(*m_lua_object, *m_method_name);
-}
-bool CPHScriptObjectCondition::obsolete() const
-{
-    return false;
-}
-
+bool CPHScriptObjectCondition::is_true() { return luabind::call_member<bool>(*m_lua_object, *m_method_name); }
+bool CPHScriptObjectCondition::obsolete() const { return false; }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 CPHScriptObjectActionN::CPHScriptObjectActionN(const luabind::object& object, const luabind::functor<void>& functor)
 {
     m_callback.set(functor, object);
 }
 
-CPHScriptObjectActionN::~CPHScriptObjectActionN()
-{
-    m_callback.clear();
-}
-
+CPHScriptObjectActionN::~CPHScriptObjectActionN() { m_callback.clear(); }
 void CPHScriptObjectActionN::run()
 {
     m_callback();
     b_obsolete = true;
 }
 
-bool CPHScriptObjectActionN::obsolete() const
-{
-    return b_obsolete;
-}
-
+bool CPHScriptObjectActionN::obsolete() const { return b_obsolete; }
 CPHScriptObjectConditionN::CPHScriptObjectConditionN(
     const luabind::object& object, const luabind::functor<bool>& functor)
 {
     m_callback.set(functor, object);
 }
 
-CPHScriptObjectConditionN::~CPHScriptObjectConditionN()
-{
-    m_callback.clear();
-}
-
-bool CPHScriptObjectConditionN::is_true()
-{
-    return m_callback();
-}
-bool CPHScriptObjectConditionN::obsolete() const
-{
-    return false;
-}
+CPHScriptObjectConditionN::~CPHScriptObjectConditionN() { m_callback.clear(); }
+bool CPHScriptObjectConditionN::is_true() { return m_callback(); }
+bool CPHScriptObjectConditionN::obsolete() const { return false; }

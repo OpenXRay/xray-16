@@ -17,13 +17,14 @@
 
 int CALLBACK BrowseCallbackProc(HWND hWnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
 {
-    if (uMsg == BFFM_INITIALIZED) SendMessage(hWnd, BFFM_SETSELECTION, TRUE, lpData);
+    if (uMsg == BFFM_INITIALIZED)
+        SendMessage(hWnd, BFFM_SETSELECTION, TRUE, lpData);
     return 0;
 }
 
 bool EFS_Utils::GetOpenName(LPCSTR initial, xr_string& buffer, bool bMulti, LPCSTR offset, int start_flt_ext)
 {
-    char buf[255 * 255];  // max files to select
+    char buf[255 * 255]; // max files to select
     xr_strcpy(buf, buffer.c_str());
 
     /*
@@ -46,7 +47,8 @@ bool EFS_Utils::GetOpenName(LPCSTR initial, xr_string& buffer, bool bMulti, LPCS
     // bool bRes = false;
     bool bRes = GetOpenNameInternal(initial, buf, sizeof(buf), bMulti, offset, start_flt_ext);
 
-    if (bRes) buffer = (char*)buf;
+    if (bRes)
+        buffer = (char*)buf;
 
     return bRes;
 }
@@ -56,7 +58,8 @@ bool EFS_Utils::GetSaveName(LPCSTR initial, xr_string& buffer, LPCSTR offset, in
     string_path buf;
     xr_strcpy(buf, sizeof(buf), buffer.c_str());
     bool bRes = GetSaveName(initial, buf, offset, start_flt_ext);
-    if (bRes) buffer = buf;
+    if (bRes)
+        buffer = buf;
 
     return bRes;
 }
@@ -67,7 +70,8 @@ void EFS_Utils::MarkFile(LPCSTR fn, bool bDeleteSource)
     xr_string ext = strext(fn);
     ext.insert(1, "~");
     xr_string backup_fn = EFS.ChangeFileExt(fn, ext.c_str());
-    if (bDeleteSource) {
+    if (bDeleteSource)
+    {
         FS.file_rename(fn, backup_fn.c_str(), true);
     }
     else

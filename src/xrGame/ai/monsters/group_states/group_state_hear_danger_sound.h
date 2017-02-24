@@ -14,7 +14,6 @@ protected:
 public:
     CStateGroupHearDangerousSound(_Object* obj);
     virtual ~CStateGroupHearDangerousSound() {}
-
     virtual void initialize();
     virtual void reselect_state();
     virtual void setup_substates();

@@ -11,15 +11,8 @@
 #include "Common/object_broker.h"
 #include "rat_state_base.h"
 
-rat_state_manager::rat_state_manager() : m_object(0), m_last_state_id(u32(-1))
-{
-}
-
-rat_state_manager::~rat_state_manager()
-{
-    delete_data(m_states);
-}
-
+rat_state_manager::rat_state_manager() : m_object(0), m_last_state_id(u32(-1)) {}
+rat_state_manager::~rat_state_manager() { delete_data(m_states); }
 void rat_state_manager::construct(CAI_Rat* object)
 {
     VERIFY(object);
@@ -29,7 +22,8 @@ void rat_state_manager::construct(CAI_Rat* object)
 rat_state_base* rat_state_manager::state(state_id_type const& state_id)
 {
     States::iterator I = m_states.find(state_id);
-    if (I == m_states.end()) return (0);
+    if (I == m_states.end())
+        return (0);
 
     return ((*I).second);
 }
@@ -57,7 +51,8 @@ void rat_state_manager::update()
 {
     VERIFY(!m_stack.empty());
     state_id_type new_state_id = m_stack.top();
-    if (new_state_id == m_last_state_id) {
+    if (new_state_id == m_last_state_id)
+    {
         rat_state_base* current = state(m_last_state_id);
         VERIFY(current);
         current->execute();
@@ -65,7 +60,8 @@ void rat_state_manager::update()
     }
 
     rat_state_base* old_state = state(m_last_state_id);
-    if (old_state) old_state->finalize();
+    if (old_state)
+        old_state->finalize();
 
     m_last_state_id = new_state_id;
     rat_state_base* new_state = state(new_state_id);

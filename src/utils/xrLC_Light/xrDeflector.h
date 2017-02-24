@@ -43,7 +43,6 @@ public:
 
     void GetRect(Fvector2& min, Fvector2& max);
     u32 GetFaceCount() { return (u32)UVpolys.size(); };
-
     void Light(CDB::COLLIDER* DB, base_lighting* LightsSelected, HASH& H);
     void L_Direct(CDB::COLLIDER* DB, base_lighting* LightsSelected, HASH& H);
     void L_Direct_Edge(CDB::COLLIDER* DB, base_lighting* LightsSelected, Fvector2& p1, Fvector2& p2, Fvector& v1,
@@ -107,7 +106,7 @@ extern XRLC_LIGHT_API void DumpDeflctor(const CDeflector& d);
 extern XRLC_LIGHT_API void DeflectorsStats();
 extern XRLC_LIGHT_API void DumpDeflctor(u32 id);
 
-static const u32 c_LMAP_size = 1024;  // pixels
+static const u32 c_LMAP_size = 1024; // pixels
 
 #define rms_zero ((4 + g_params().m_lm_rms_zero) / 2)
 #define rms_shrink ((8 + g_params().m_lm_rms) / 2)

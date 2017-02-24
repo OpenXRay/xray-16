@@ -34,11 +34,7 @@ CUIStatic::CUIStatic()
     m_lanim_xform.set_defaults();
 }
 
-CUIStatic::~CUIStatic()
-{
-    xr_delete(m_pTextControl);
-}
-
+CUIStatic::~CUIStatic() { xr_delete(m_pTextControl); }
 void CUIStatic::SetXformLightAnim(LPCSTR lanim, bool bCyclic)
 {
     if (lanim && lanim[0] != 0)
@@ -52,16 +48,8 @@ void CUIStatic::SetXformLightAnim(LPCSTR lanim, bool bCyclic)
     m_lanim_xform.m_origSize = GetWndSize();
 }
 
-void CUIStatic::InitTexture(LPCSTR texture)
-{
-    InitTextureEx(texture);
-}
-
-void CUIStatic::CreateShader(const char* tex, const char* sh)
-{
-    m_UIStaticItem.CreateShader(tex, sh);
-}
-
+void CUIStatic::InitTexture(LPCSTR texture) { InitTextureEx(texture); }
+void CUIStatic::CreateShader(const char* tex, const char* sh) { m_UIStaticItem.CreateShader(tex, sh); }
 void CUIStatic::InitTextureEx(LPCSTR tex_name, LPCSTR sh_name)
 {
     LPCSTR res_shname = GlobalEnv.UIRender->UpdateShaderName(tex_name, sh_name);
@@ -80,7 +68,8 @@ void CUIStatic::Draw()
 
 void CUIStatic::DrawText()
 {
-    if (m_pTextControl) {
+    if (m_pTextControl)
+    {
         if (!fsimilar(m_pTextControl->m_wndSize.x, m_wndSize.x) || !fsimilar(m_pTextControl->m_wndSize.y, m_wndSize.y))
         {
             m_pTextControl->m_wndSize = m_wndSize;
@@ -91,21 +80,26 @@ void CUIStatic::DrawText()
         GetAbsolutePos(p);
         m_pTextControl->Draw(p.x, p.y);
     }
-    if (g_statHint->Owner() == this) g_statHint->Draw_();
+    if (g_statHint->Owner() == this)
+        g_statHint->Draw_();
 }
 
 #include "Include/xrRender/UIShader.h"
 
 void CUIStatic::DrawTexture()
 {
-    if (m_bTextureEnable && GetShader() && GetShader()->inited()) {
+    if (m_bTextureEnable && GetShader() && GetShader()->inited())
+    {
         Frect rect;
         GetAbsoluteRect(rect);
         m_UIStaticItem.SetPos(rect.left + m_TextureOffset.x, rect.top + m_TextureOffset.y);
 
-        if (m_bStretchTexture) {
-            if (Heading()) {
-                if (m_UIStaticItem.GetFixedLTWhileHeading()) {
+        if (m_bStretchTexture)
+        {
+            if (Heading())
+            {
+                if (m_UIStaticItem.GetFixedLTWhileHeading())
+                {
                     float t1, t2;
                     t1 = rect.width();
                     t2 = rect.height();
@@ -120,7 +114,8 @@ void CUIStatic::DrawTexture()
             Frect r = {0.0f, 0.0f, m_UIStaticItem.GetTextureRect().width(), m_UIStaticItem.GetTextureRect().height()};
 
             {
-                if (Heading()) {
+                if (Heading())
+                {
                     float t1, t2;
                     t1 = rect.width();
                     t2 = rect.height();
@@ -132,7 +127,8 @@ void CUIStatic::DrawTexture()
             }
         }
 
-        if (Heading()) {
+        if (Heading())
+        {
             m_UIStaticItem.Render(GetHeading());
         }
         else
@@ -146,8 +142,10 @@ void CUIStatic::Update()
     // update light animation if defined
     UpdateColorAnimation();
 
-    if (m_lanim_xform.m_lanim) {
-        if (m_lanim_xform.m_lanim_start_time < 0.0f) ResetXformAnimation();
+    if (m_lanim_xform.m_lanim)
+    {
+        if (m_lanim_xform.m_lanim_start_time < 0.0f)
+            ResetXformAnimation();
 
         float t = Device.dwTimeGlobal / 1000.0f;
 
@@ -190,28 +188,24 @@ void CUIStatic::Update()
         r.add(c_pos.x, c_pos.y);
 
         r.sub(0.0f, r.height());
-        if (false == is_in2(vis_rect, r)) r.sub(r.width(), 0.0f);
-        if (false == is_in2(vis_rect, r)) r.add(0.0f, r.height());
+        if (false == is_in2(vis_rect, r))
+            r.sub(r.width(), 0.0f);
+        if (false == is_in2(vis_rect, r))
+            r.add(0.0f, r.height());
 
-        if (false == is_in2(vis_rect, r)) r.add(r.width(), 45.0f);
+        if (false == is_in2(vis_rect, r))
+            r.add(r.width(), 45.0f);
 
         g_statHint->SetWndPos(r.lt);
     }
 }
 
-void CUIStatic::ResetXformAnimation()
-{
-    m_lanim_xform.m_lanim_start_time = Device.dwTimeGlobal / 1000.0f;
-}
-
-void CUIStatic::SetShader(const ui_shader& sh)
-{
-    m_UIStaticItem.SetShader(sh);
-}
-
+void CUIStatic::ResetXformAnimation() { m_lanim_xform.m_lanim_start_time = Device.dwTimeGlobal / 1000.0f; }
+void CUIStatic::SetShader(const ui_shader& sh) { m_UIStaticItem.SetShader(sh); }
 CUILines* CUIStatic::TextItemControl()
 {
-    if (!m_pTextControl) {
+    if (!m_pTextControl)
+    {
         m_pTextControl = new CUILines();
         m_pTextControl->SetTextAlignment(CGameFont::alLeft);
     }
@@ -220,7 +214,8 @@ CUILines* CUIStatic::TextItemControl()
 
 void CUIStatic::AdjustHeightToText()
 {
-    if (!fsimilar(TextItemControl()->m_wndSize.x, GetWidth())) {
+    if (!fsimilar(TextItemControl()->m_wndSize.x, GetWidth()))
+    {
         TextItemControl()->m_wndSize.x = GetWidth();
         TextItemControl()->ParseText(true);
     }
@@ -229,7 +224,8 @@ void CUIStatic::AdjustHeightToText()
 
 void CUIStatic::AdjustWidthToText()
 {
-    if (!m_pTextControl) return;
+    if (!m_pTextControl)
+        return;
     float _len = m_pTextControl->GetFont()->SizeOf_(m_pTextControl->GetText());
     UI().ClientToScreenScaledWidth(_len);
     SetWidth(_len);
@@ -249,17 +245,16 @@ void CUIStatic::OnFocusLost()
 {
     inherited::OnFocusLost();
 
-    if (g_statHint->Owner() == this) g_statHint->Discard();
+    if (g_statHint->Owner() == this)
+        g_statHint->Discard();
 }
 
 //-------------------------------------
-CUITextWnd::CUITextWnd()
-{
-}
-
+CUITextWnd::CUITextWnd() {}
 void CUITextWnd::AdjustHeightToText()
 {
-    if (!fsimilar(TextItemControl().m_wndSize.x, GetWidth())) {
+    if (!fsimilar(TextItemControl().m_wndSize.x, GetWidth()))
+    {
         TextItemControl().m_wndSize.x = GetWidth();
         TextItemControl().ParseText(true);
     }

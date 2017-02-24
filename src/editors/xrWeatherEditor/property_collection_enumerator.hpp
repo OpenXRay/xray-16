@@ -14,13 +14,13 @@
 public
 ref class property_collection_enumerator : public System::Collections::IEnumerator
 {
-  public:
+public:
     typedef editor::property_holder_collection collection_type;
     typedef System::Collections::IEnumerator IEnumerator;
     typedef System::Array Array;
     typedef System::Object Object;
 
-  public:
+public:
     property_collection_enumerator(collection_type* collection);
     virtual void Reset();
     virtual bool MoveNext();
@@ -28,6 +28,6 @@ ref class property_collection_enumerator : public System::Collections::IEnumerat
 
         private : collection_type* m_collection;
     int m_cursor;
-};  // ref class property_collection_enumerator
+}; // ref class property_collection_enumerator
 
-#endif  // ifndef PROPERTY_COLLECTION_ENUMERATOR_HPP_INCLUDED
+#endif // ifndef PROPERTY_COLLECTION_ENUMERATOR_HPP_INCLUDED

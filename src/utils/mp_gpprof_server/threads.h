@@ -19,10 +19,9 @@ public:
     bool try_lock();
     void unlock();
     pthread_mutex_t* get() { return &m_mutex; }
-
 private:
     pthread_mutex_t m_mutex;
-};  // class mutex
+}; // class mutex
 
 class condition
 {
@@ -34,7 +33,7 @@ public:
 
 private:
     pthread_cond_t m_cond;
-};  // class condition
+}; // class condition
 
 template <typename T>
 class thread_method
@@ -47,7 +46,8 @@ public:
         pthread_attr_init(&m_attr);
         pthread_attr_setdetachstate(&m_attr, PTHREAD_CREATE_DETACHED);
         m_thread_is_running = true;
-        if (pthread_create(&m_pid, &m_attr, worker, this) != 0) {
+        if (pthread_create(&m_pid, &m_attr, worker, this) != 0)
+        {
             std::string err_string("failed to start thread: ");
             err_string.append(typeid(method).name());
             throw std::runtime_error(err_string);
@@ -58,7 +58,8 @@ public:
     ~thread_method()
     {
         m_stop_mutex.lock();
-        if (m_thread_is_running) {
+        if (m_thread_is_running)
+        {
             pthread_kill(m_pid, SIGTERM);
             while (m_thread_is_running)
                 m_stopped_cond.wait(m_stop_mutex);
@@ -101,11 +102,11 @@ private:
         pthread_exit(ret_value);
         return ret_value;
     };
-};  // class thread_method
+}; // class thread_method
 
 unsigned int const get_clock_ms();
 void sleep(unsigned int const ms);
 
-}  // namespace xray
+} // namespace xray
 
-#endif  //#ifndef THREADS_H_INCLUDED
+#endif //#ifndef THREADS_H_INCLUDED

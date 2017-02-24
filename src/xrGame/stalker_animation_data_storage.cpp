@@ -28,20 +28,18 @@ public:
 
     IC bool operator()(const CStalkerAnimationDataStorage::OBJECT& object) const
     {
-        if (m_object->LL_MotionsSlotCount() != object.first->LL_MotionsSlotCount()) return (false);
+        if (m_object->LL_MotionsSlotCount() != object.first->LL_MotionsSlotCount())
+            return (false);
 
         for (u16 i = 0, n = m_object->LL_MotionsSlotCount(); i < n; ++i)
-            if (!(m_object->LL_MotionsSlot(i) == object.first->LL_MotionsSlot(i))) return (false);
+            if (!(m_object->LL_MotionsSlot(i) == object.first->LL_MotionsSlot(i)))
+                return (false);
 
         return (true);
     }
 };
 
-CStalkerAnimationDataStorage::~CStalkerAnimationDataStorage()
-{
-    clear();
-}
-
+CStalkerAnimationDataStorage::~CStalkerAnimationDataStorage() { clear(); }
 void CStalkerAnimationDataStorage::clear()
 {
     while (!m_objects.empty())
@@ -54,7 +52,8 @@ void CStalkerAnimationDataStorage::clear()
 const CStalkerAnimationData* CStalkerAnimationDataStorage::object(IKinematicsAnimated* skeleton_animated)
 {
     OBJECTS::const_iterator I = std::find_if(m_objects.begin(), m_objects.end(), data_predicate(skeleton_animated));
-    if (I != m_objects.end()) return ((*I).second);
+    if (I != m_objects.end())
+        return ((*I).second);
 
     m_objects.push_back(std::make_pair(skeleton_animated, new CStalkerAnimationData(skeleton_animated)));
     return (m_objects.back().second);

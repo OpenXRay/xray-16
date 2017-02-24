@@ -3,14 +3,8 @@
 
 #include "Blender_light_reflected.h"
 
-CBlender_accum_reflected::CBlender_accum_reflected()
-{
-    description.CLS = 0;
-}
-CBlender_accum_reflected::~CBlender_accum_reflected()
-{
-}
-
+CBlender_accum_reflected::CBlender_accum_reflected() { description.CLS = 0; }
+CBlender_accum_reflected::~CBlender_accum_reflected() {}
 void CBlender_accum_reflected::Compile(CBlender_Compile& C)
 {
     IBlender::Compile(C);

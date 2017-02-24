@@ -16,9 +16,9 @@
 #ifdef DEBUG
 #include "detail_path_manager.h"
 #include "ai/stalker/ai_stalker.h"
-#else  // #ifdef DEBUG
+#else // #ifdef DEBUG
 #include "detail_path_manager_space.h"
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
 
 using namespace MonsterSpace;
 
@@ -132,8 +132,8 @@ private:
     float m_last_query_distance;
     bool m_last_query_result;
     bool m_force_update;
-};  // class stalker_movement_manager_base
+}; // class stalker_movement_manager_base
 
 #include "stalker_movement_manager_base_inline.h"
 
-#endif  // #ifndef STALKER_MOVEMENT_MANAGER_BASE_H_INCLUDED
+#endif // #ifndef STALKER_MOVEMENT_MANAGER_BASE_H_INCLUDED

@@ -67,7 +67,8 @@ void CControlAnimationBase::update_frame()
 
 void CControlAnimationBase::update()
 {
-    if (m_state_attack) return;
+    if (m_state_attack)
+        return;
 
     // Установка Yaw
     if (m_object->control().path_builder().is_moving_on_path() && m_object->path().enabled())
@@ -77,7 +78,8 @@ void CControlAnimationBase::update()
     SelectVelocities();
 
     // применить
-    if (prev_motion != cur_anim_info().get_motion()) {
+    if (prev_motion != cur_anim_info().get_motion())
+    {
         prev_motion = cur_anim_info().get_motion();
         select_animation();
     }
@@ -91,9 +93,11 @@ void CControlAnimationBase::clear_override_animation()
 
 void CControlAnimationBase::set_override_animation(EMotionAnim anim, u32 index)
 {
-    if (m_override_animation == anim) return;
+    if (m_override_animation == anim)
+        return;
 
-    if (anim != eAnimUndefined) {
+    if (anim != eAnimUndefined)
+    {
         VERIFY2(m_override_animation == eAnimUndefined, "animation already overriden, call clear_override_animation");
     }
 
@@ -107,10 +111,12 @@ void CControlAnimationBase::set_override_animation(pcstr name)
     {
         SAnimItem const* const anim_item = m_anim_storage[anim_type];
 
-        if (!anim_item) continue;
+        if (!anim_item)
+            continue;
 
         pcstr anim_name = anim_item->target_name.c_str();
-        if (strstr(name, anim_name ? anim_name : "") == name) {
+        if (strstr(name, anim_name ? anim_name : "") == name)
+        {
             pcstr const anim_index_string = name + anim_item->target_name.size();
 
             u32 anim_index = 0;
@@ -131,14 +137,16 @@ void CControlAnimationBase::set_override_animation(pcstr name)
 void CControlAnimationBase::SelectAnimation()
 {
     // Lain: added
-    if (m_override_animation != eAnimUndefined) {
+    if (m_override_animation != eAnimUndefined)
+    {
         SetCurAnim(m_override_animation);
         return;
     }
 
     EAction action = m_tAction;
 
-    if (m_object->control().path_builder().is_moving_on_path() && m_object->path().enabled()) {
+    if (m_object->control().path_builder().is_moving_on_path() && m_object->path().enabled())
+    {
         action = GetActionFromPath();
     }
 
@@ -147,7 +155,8 @@ void CControlAnimationBase::SelectAnimation()
     m_object->CheckSpecParams(spec_params);
 
     if (prev_motion != cur_anim_info().get_motion())
-        if (CheckTransition(prev_motion, cur_anim_info().get_motion())) return;
+        if (CheckTransition(prev_motion, cur_anim_info().get_motion()))
+            return;
 
     CheckReplacedAnim();
     SetTurnAnimation();
@@ -162,10 +171,12 @@ void CControlAnimationBase::SetTurnAnimation()
     float delta_yaw = angle_difference(yaw_target, yaw_current);
 
     bool turn_left = true;
-    if (from_right(yaw_target, yaw_current)) turn_left = false;
+    if (from_right(yaw_target, yaw_current))
+        turn_left = false;
 
     EPState anim_state = GetState(cur_anim_info().get_motion());
-    if (IsStandCurAnim() && (anim_state == PS_STAND) && (!fis_zero(delta_yaw))) {
+    if (IsStandCurAnim() && (anim_state == PS_STAND) && (!fis_zero(delta_yaw)))
+    {
         m_object->SetTurnAnimation(turn_left);
         return;
     }
@@ -193,7 +204,8 @@ void CControlAnimationBase::SelectVelocities()
     SMotionVel anim_vel;
     anim_vel.set(0.f, 0.f);
 
-    if (b_moving) {
+    if (b_moving)
+    {
         u32 cur_point_velocity_index =
             m_object->movement().detail().path()[m_object->movement().detail().curr_travel_point_index()].velocity;
 
@@ -209,7 +221,8 @@ void CControlAnimationBase::SelectVelocities()
         if ((cur_point_velocity_index == MonsterMovement::eVelocityParameterStand) &&
             (next_point_velocity_index != u32(-1)))
         {
-            if (!m_object->control().direction().is_turning()) cur_point_velocity_index = next_point_velocity_index;
+            if (!m_object->control().direction().is_turning())
+                cur_point_velocity_index = next_point_velocity_index;
         }
 
         const CDetailPathManager::STravelParams& current_velocity =
@@ -228,7 +241,8 @@ void CControlAnimationBase::SelectVelocities()
     //	R_ASSERT(fsimilar(path_vel.angular,	anim_vel.angular));
 
     // установка линейной скорости
-    if (m_object->state_invisible) {
+    if (m_object->state_invisible)
+    {
         // если невидимый, то установить скорость из пути
         m_object->move().set_velocity(_abs(path_vel.linear));
     }
@@ -239,7 +253,8 @@ void CControlAnimationBase::SelectVelocities()
         else
         {
             // - проверить на возможность торможения
-            if (!accel_check_braking(-2.f, _abs(anim_vel.linear))) {
+            if (!accel_check_braking(-2.f, _abs(anim_vel.linear)))
+            {
                 m_object->move().set_velocity(_abs(anim_vel.linear));
                 // no braking mode
             }
@@ -253,14 +268,17 @@ void CControlAnimationBase::SelectVelocities()
 
     // финальная корректировка скорости анимации по физической скорости
 
-    if (!m_object->state_invisible && !fis_zero(anim_vel.linear)) {
+    if (!m_object->state_invisible && !fis_zero(anim_vel.linear))
+    {
         EMotionAnim new_anim;
         float a_speed;
 
-        if (accel_chain_get(m_man->movement().real_velocity(), cur_anim_info().get_motion(), new_anim, a_speed)) {
+        if (accel_chain_get(m_man->movement().real_velocity(), cur_anim_info().get_motion(), new_anim, a_speed))
+        {
             cur_anim_info().set_motion(new_anim);
 
-            if (a_speed < 0.5f) a_speed += 0.5f;
+            if (a_speed < 0.5f)
+                a_speed += 0.5f;
 
             cur_anim_info().speed._set_target(a_speed);
         }
@@ -281,10 +299,11 @@ void CControlAnimationBase::SelectVelocities()
         VERIFY(item_it);
 
         // Melee?
-        if (m_tAction == ACT_ATTACK) {
+        if (m_tAction == ACT_ATTACK)
+        {
             float vel = item_it->velocity.velocity.angular_real;
             m_object->dir().set_heading_speed(
-                vel * m_object->m_melee_rotation_factor);  // todo: make as an external factor
+                vel * m_object->m_melee_rotation_factor); // todo: make as an external factor
         }
         else
             m_object->dir().set_heading_speed(item_it->velocity.velocity.angular_real);
@@ -301,13 +320,17 @@ void CControlAnimationBase::CheckVelocityBounce()
     float cur_speed = temp_vec.magnitude();
 
     // prepare
-    if (fis_zero(prev_speed)) prev_speed = 0.01f;
-    if (fis_zero(cur_speed)) cur_speed = 0.01f;
+    if (fis_zero(prev_speed))
+        prev_speed = 0.01f;
+    if (fis_zero(cur_speed))
+        cur_speed = 0.01f;
 
     float ratio = ((prev_speed > cur_speed) ? (prev_speed / cur_speed) : (cur_speed / prev_speed));
 
-    if (ratio > VELOCITY_BOUNCE_THRESHOLD) {
-        if (prev_speed > cur_speed) ratio = -ratio;
+    if (ratio > VELOCITY_BOUNCE_THRESHOLD)
+    {
+        if (prev_speed > cur_speed)
+            ratio = -ratio;
 
         // prepare event
         SEventVelocityBounce event(ratio);

@@ -19,4 +19,4 @@ struct weighted_random
     float generate();
 };
 
-#endif  // WEIGHTED_RANDOM
+#endif // WEIGHTED_RANDOM

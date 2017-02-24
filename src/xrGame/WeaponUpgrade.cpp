@@ -4,15 +4,18 @@
 
 static bool process_if_exists_deg2rad(LPCSTR section, LPCSTR name, float& value, bool test)
 {
-    if (!pSettings->line_exist(section, name)) {
+    if (!pSettings->line_exist(section, name))
+    {
         return false;
     }
     LPCSTR str = pSettings->r_string(section, name);
-    if (!str || !xr_strlen(str)) {
+    if (!str || !xr_strlen(str))
+    {
         return false;
     }
 
-    if (!test) {
+    if (!test)
+    {
         value += deg2rad(pSettings->r_float(section, name));
     }
     return true;
@@ -38,7 +41,8 @@ bool CWeapon::install_upgrade_ammo_class(LPCSTR section, bool test)
 
     //	ammo_class = ammo_5.45x39_fmj, ammo_5.45x39_ap  // name of the ltx-section of used ammo
     bool result2 = process_if_exists_set(section, "ammo_class", &CInifile::r_string, str, test);
-    if (result2 && !test) {
+    if (result2 && !test)
+    {
         m_ammoTypes.clear();
         string128 ammoItem;
         int count = _GetItemCount(str);
@@ -86,8 +90,7 @@ bool CWeapon::install_upgrade_disp(LPCSTR section, bool test)
     VERIFY(!fis_zero(cam_recoil.MaxAngleVert));
     VERIFY(!fis_zero(cam_recoil.MaxAngleHorz));
 
-    result |=
-        process_if_exists_deg2rad(section, "zoom_cam_relax_speed", zoom_cam_recoil.RelaxSpeed, test);  // zoom_ ...
+    result |= process_if_exists_deg2rad(section, "zoom_cam_relax_speed", zoom_cam_recoil.RelaxSpeed, test); // zoom_ ...
     result |= process_if_exists_deg2rad(section, "zoom_cam_relax_speed_ai", zoom_cam_recoil.RelaxSpeed_AI, test);
     result |= process_if_exists_deg2rad(section, "zoom_cam_dispersion", zoom_cam_recoil.Dispersion, test);
     result |= process_if_exists_deg2rad(section, "zoom_cam_dispersion_inc", zoom_cam_recoil.DispersionInc, test);
@@ -126,7 +129,8 @@ bool CWeapon::install_upgrade_disp(LPCSTR section, bool test)
 
     BOOL value = m_zoom_params.m_bZoomEnabled;
     bool result2 = process_if_exists_set(section, "zoom_enabled", &CInifile::r_bool, value, test);
-    if (result2 && !test) {
+    if (result2 && !test)
+    {
         m_zoom_params.m_bZoomEnabled = !!value;
     }
     result |= result2;
@@ -140,19 +144,23 @@ bool CWeapon::install_upgrade_hit(LPCSTR section, bool test)
 
     shared_str s_sHitPower;
     bool result2 = process_if_exists_set(section, "hit_power", &CInifile::r_string_wb, s_sHitPower, test);
-    if (result2 && !test) {
+    if (result2 && !test)
+    {
         string32 buffer;
         fvHitPower[egdMaster] = (float)atof(_GetItem(*s_sHitPower, 0, buffer));
         fvHitPower[egdNovice] = fvHitPower[egdStalker] = fvHitPower[egdVeteran] = fvHitPower[egdMaster];
 
         int num_game_diff_param = _GetItemCount(*s_sHitPower);
-        if (num_game_diff_param > 1) {
+        if (num_game_diff_param > 1)
+        {
             fvHitPower[egdVeteran] = (float)atof(_GetItem(*s_sHitPower, 1, buffer));
         }
-        if (num_game_diff_param > 2) {
+        if (num_game_diff_param > 2)
+        {
             fvHitPower[egdStalker] = (float)atof(_GetItem(*s_sHitPower, 2, buffer));
         }
-        if (num_game_diff_param > 3) {
+        if (num_game_diff_param > 3)
+        {
             fvHitPower[egdNovice] = (float)atof(_GetItem(*s_sHitPower, 3, buffer));
         }
     }
@@ -160,20 +168,24 @@ bool CWeapon::install_upgrade_hit(LPCSTR section, bool test)
 
     shared_str s_sHitPowerCritical;
     result2 = process_if_exists_set(section, "hit_power_critical", &CInifile::r_string_wb, s_sHitPower, test);
-    if (result2 && !test) {
+    if (result2 && !test)
+    {
         string32 buffer;
         fvHitPowerCritical[egdMaster] = (float)atof(_GetItem(*s_sHitPowerCritical, 0, buffer));
         fvHitPowerCritical[egdNovice] = fvHitPowerCritical[egdStalker] = fvHitPowerCritical[egdVeteran] =
             fvHitPowerCritical[egdMaster];
 
         int num_game_diff_param = _GetItemCount(*s_sHitPowerCritical);
-        if (num_game_diff_param > 1) {
+        if (num_game_diff_param > 1)
+        {
             fvHitPowerCritical[egdVeteran] = (float)atof(_GetItem(*s_sHitPowerCritical, 1, buffer));
         }
-        if (num_game_diff_param > 2) {
+        if (num_game_diff_param > 2)
+        {
             fvHitPowerCritical[egdStalker] = (float)atof(_GetItem(*s_sHitPowerCritical, 2, buffer));
         }
-        if (num_game_diff_param > 3) {
+        if (num_game_diff_param > 3)
+        {
             fvHitPowerCritical[egdNovice] = (float)atof(_GetItem(*s_sHitPowerCritical, 3, buffer));
         }
     }
@@ -190,15 +202,16 @@ bool CWeapon::install_upgrade_hit(LPCSTR section, bool test)
     */
 
     result |= process_if_exists_set(section, "use_aim_bullet", &CInifile::r_bool, m_bUseAimBullet, test);
-    if (m_bUseAimBullet)  // first super bullet
+    if (m_bUseAimBullet) // first super bullet
     {
         result |= process_if_exists(section, "time_to_aim", &CInifile::r_float, m_fTimeToAim, test);
     }
 
     //	LPCSTR weapon_section = cNameSect().c_str();
-    float rpm = 60.0f / fOneShotTime;  // pSettings->r_float( weapon_section, "rpm" ); // fOneShotTime * 60.0f;
+    float rpm = 60.0f / fOneShotTime; // pSettings->r_float( weapon_section, "rpm" ); // fOneShotTime * 60.0f;
     result2 = process_if_exists(section, "rpm", &CInifile::r_float, rpm, test);
-    if (result2 && !test) {
+    if (result2 && !test)
+    {
         VERIFY(rpm > 0.0f);
         fOneShotTime = 60.0f / rpm;
     }
@@ -215,16 +228,20 @@ bool CWeapon::install_upgrade_addon(LPCSTR section, bool test)
     // 0 - no addon // 1 - permanent // 2 - attachable
     int temp_int = (int)m_eScopeStatus;
     bool result2 = process_if_exists_set(section, "scope_status", &CInifile::r_s32, temp_int, test);
-    if (result2 && !test) {
+    if (result2 && !test)
+    {
         m_eScopeStatus = (ALife::EWeaponAddonStatus)temp_int;
-        if (m_eScopeStatus == ALife::eAddonAttachable || m_eScopeStatus == ALife::eAddonPermanent) {
+        if (m_eScopeStatus == ALife::eAddonAttachable || m_eScopeStatus == ALife::eAddonPermanent)
+        {
             result |= process_if_exists(
                 section, "holder_range_modifier", &CInifile::r_float, m_addon_holder_range_modifier, test);
             result |= process_if_exists(
                 section, "holder_fov_modifier", &CInifile::r_float, m_addon_holder_fov_modifier, test);
 
-            if (m_eScopeStatus == ALife::eAddonAttachable) {
-                if (pSettings->line_exist(section, "scopes_sect")) {
+            if (m_eScopeStatus == ALife::eAddonAttachable)
+            {
+                if (pSettings->line_exist(section, "scopes_sect"))
+                {
                     LPCSTR str = pSettings->r_string(section, "scopes_sect");
                     for (int i = 0, count = _GetItemCount(str); i < count; ++i)
                     {
@@ -241,7 +258,8 @@ bool CWeapon::install_upgrade_addon(LPCSTR section, bool test)
             else
             {
                 m_scopes.push_back(section);
-                if (m_eScopeStatus == ALife::eAddonPermanent) InitAddons();
+                if (m_eScopeStatus == ALife::eAddonPermanent)
+                    InitAddons();
             }
         }
     }
@@ -256,26 +274,32 @@ bool CWeapon::install_upgrade_addon(LPCSTR section, bool test)
 
     temp_int = (int)m_eSilencerStatus;
     result2 = process_if_exists_set(section, "silencer_status", &CInifile::r_s32, temp_int, test);
-    if (result2 && !test) {
+    if (result2 && !test)
+    {
         m_eSilencerStatus = (ALife::EWeaponAddonStatus)temp_int;
-        if (m_eSilencerStatus == ALife::eAddonAttachable || m_eSilencerStatus == ALife::eAddonPermanent) {
+        if (m_eSilencerStatus == ALife::eAddonAttachable || m_eSilencerStatus == ALife::eAddonPermanent)
+        {
             m_sSilencerName = pSettings->r_string(section, "silencer_name");
             m_iSilencerX = pSettings->r_s32(section, "silencer_x");
             m_iSilencerY = pSettings->r_s32(section, "silencer_y");
-            if (m_eSilencerStatus == ALife::eAddonPermanent) InitAddons();
+            if (m_eSilencerStatus == ALife::eAddonPermanent)
+                InitAddons();
         }
     }
     result |= result2;
 
     temp_int = (int)m_eGrenadeLauncherStatus;
     result2 = process_if_exists_set(section, "grenade_launcher_status", &CInifile::r_s32, temp_int, test);
-    if (result2 && !test) {
+    if (result2 && !test)
+    {
         m_eGrenadeLauncherStatus = (ALife::EWeaponAddonStatus)temp_int;
-        if (m_eGrenadeLauncherStatus == ALife::eAddonAttachable || m_eGrenadeLauncherStatus == ALife::eAddonPermanent) {
+        if (m_eGrenadeLauncherStatus == ALife::eAddonAttachable || m_eGrenadeLauncherStatus == ALife::eAddonPermanent)
+        {
             m_sGrenadeLauncherName = pSettings->r_string(section, "grenade_launcher_name");
             m_iGrenadeLauncherX = pSettings->r_s32(section, "grenade_launcher_x");
             m_iGrenadeLauncherY = pSettings->r_s32(section, "grenade_launcher_y");
-            if (m_eGrenadeLauncherStatus == ALife::eAddonPermanent) InitAddons();
+            if (m_eGrenadeLauncherStatus == ALife::eAddonPermanent)
+                InitAddons();
         }
     }
     result |= result2;

@@ -9,21 +9,29 @@
 
 BOOL PS::CPGDef::SEffect::Equal(const SEffect& src)
 {
-    if (!m_Flags.equal(src.m_Flags)) return FALSE;
-    if (!m_EffectName.equal(src.m_EffectName)) return FALSE;
-    if (!fsimilar(m_Time0, src.m_Time0)) return FALSE;
-    if (!fsimilar(m_Time1, src.m_Time1)) return FALSE;
+    if (!m_Flags.equal(src.m_Flags))
+        return FALSE;
+    if (!m_EffectName.equal(src.m_EffectName))
+        return FALSE;
+    if (!fsimilar(m_Time0, src.m_Time0))
+        return FALSE;
+    if (!fsimilar(m_Time1, src.m_Time1))
+        return FALSE;
     return TRUE;
 }
 
 BOOL PS::CPGDef::Equal(const CPGDef* pg)
 {
-    if (!m_Flags.equal(pg->m_Flags)) return FALSE;
-    if (!fsimilar(m_fTimeLimit, pg->m_fTimeLimit)) return FALSE;
-    if (m_Effects.size() != pg->m_Effects.size()) return FALSE;
+    if (!m_Flags.equal(pg->m_Flags))
+        return FALSE;
+    if (!fsimilar(m_fTimeLimit, pg->m_fTimeLimit))
+        return FALSE;
+    if (m_Effects.size() != pg->m_Effects.size())
+        return FALSE;
     EffectIt s_it = m_Effects.begin();
     for (EffectIt d_it = m_Effects.begin(); d_it != m_Effects.end(); s_it++, d_it++)
-        if (!(*s_it)->Equal(**d_it)) return FALSE;
+        if (!(*s_it)->Equal(**d_it))
+            return FALSE;
     return TRUE;
 }
 
@@ -38,21 +46,26 @@ bool PS::CPGDef::Validate(bool bMsg)
     {
         PS::CPGDef::SEffect* Eff = (*pe_it);
         PS::CPEDef* ped = ::Render->PSLibrary.FindPED(Eff->m_EffectName.c_str());
-        if (!ped) {
+        if (!ped)
+        {
             failed = failed || true;
             Msg("Validation FAILED (non-existent effect used) group[%s] effect[%s]", m_Name.c_str(),
                 Eff->m_EffectName.c_str());
             break;
         }
 
-        if (Eff->m_Flags.test(SEffect::flOnPlayChild) && Eff->m_OnPlayChildName.size() == 0) failed = failed || true;
-        if (Eff->m_Flags.test(SEffect::flOnBirthChild) && Eff->m_OnBirthChildName.size() == 0) failed = failed || true;
-        if (Eff->m_Flags.test(SEffect::flOnDeadChild) && Eff->m_OnDeadChildName.size() == 0) failed = failed || true;
+        if (Eff->m_Flags.test(SEffect::flOnPlayChild) && Eff->m_OnPlayChildName.size() == 0)
+            failed = failed || true;
+        if (Eff->m_Flags.test(SEffect::flOnBirthChild) && Eff->m_OnBirthChildName.size() == 0)
+            failed = failed || true;
+        if (Eff->m_Flags.test(SEffect::flOnDeadChild) && Eff->m_OnDeadChildName.size() == 0)
+            failed = failed || true;
 
         if (failed && bMsg)
             Msg("Validation FAILED (incorrect child event settings) group[%s] effect[%s]", m_Name.c_str(),
                 Eff->m_EffectName.c_str());
-        if (failed) break;
+        if (failed)
+            break;
     }
     return !failed;
 }
@@ -106,7 +119,8 @@ void PS::CPGDef::OnEffectEditClick(ButtonValue* B, bool& bDataModified, bool& bS
     }
     break;
     case 2:
-        if (ELog.DlgMsg(mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, "Remove effect?") == mrYes) {
+        if (ELog.DlgMsg(mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, "Remove effect?") == mrYes)
+        {
             SEffect* eff = *(m_Effects.begin() + B->tag);
             xr_delete(eff);
             m_Effects.erase(m_Effects.begin() + B->tag);
@@ -172,7 +186,8 @@ void PS::CPGDef::FillProp(LPCSTR pref, ::PropItemVec& items, ::ListItem* owner)
             items, PrepareKey(pref, nm.c_str(), "Children\\On Birth"), &(*it)->m_Flags, SEffect::flOnBirthChild);
         V->OnChangeEvent.bind(this, &PS::CPGDef::OnParamsChange);
         V->Owner()->prop_color = clr;
-        if ((*it)->m_Flags.is(SEffect::flOnBirthChild)) {
+        if ((*it)->m_Flags.is(SEffect::flOnBirthChild))
+        {
             V = PHelper().CreateChoose(items, PrepareKey(pref, nm.c_str(), "Children\\On Birth\\Effect Name"),
                 &(*it)->m_OnBirthChildName, smPE);
             V->OnChangeEvent.bind(this, &PS::CPGDef::OnParamsChange);
@@ -182,7 +197,8 @@ void PS::CPGDef::FillProp(LPCSTR pref, ::PropItemVec& items, ::ListItem* owner)
             items, PrepareKey(pref, nm.c_str(), "Children\\On Play"), &(*it)->m_Flags, SEffect::flOnPlayChild);
         V->OnChangeEvent.bind(this, &PS::CPGDef::OnParamsChange);
         V->Owner()->prop_color = clr;
-        if ((*it)->m_Flags.is(SEffect::flOnPlayChild)) {
+        if ((*it)->m_Flags.is(SEffect::flOnPlayChild))
+        {
             V = PHelper().CreateChoose(
                 items, PrepareKey(pref, nm.c_str(), "Children\\On Play\\Effect Name"), &(*it)->m_OnPlayChildName, smPE);
             V->OnChangeEvent.bind(this, &PS::CPGDef::OnParamsChange);
@@ -196,7 +212,8 @@ void PS::CPGDef::FillProp(LPCSTR pref, ::PropItemVec& items, ::ListItem* owner)
             items, PrepareKey(pref, nm.c_str(), "Children\\On Dead"), &(*it)->m_Flags, SEffect::flOnDeadChild);
         V->OnChangeEvent.bind(this, &PS::CPGDef::OnParamsChange);
         V->Owner()->prop_color = clr;
-        if ((*it)->m_Flags.is(SEffect::flOnDeadChild)) {
+        if ((*it)->m_Flags.is(SEffect::flOnDeadChild))
+        {
             V = PHelper().CreateChoose(
                 items, PrepareKey(pref, nm.c_str(), "Children\\On Dead\\Effect Name"), &(*it)->m_OnDeadChildName, smPE);
             V->OnChangeEvent.bind(this, &PS::CPGDef::OnParamsChange);

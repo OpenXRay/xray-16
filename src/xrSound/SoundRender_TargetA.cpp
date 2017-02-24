@@ -14,10 +14,7 @@ CSoundRender_TargetA::CSoundRender_TargetA() : CSoundRender_Target()
     pSource = 0;
 }
 
-CSoundRender_TargetA::~CSoundRender_TargetA()
-{
-}
-
+CSoundRender_TargetA::~CSoundRender_TargetA() {}
 BOOL CSoundRender_TargetA::_initialize()
 {
     inherited::_initialize();
@@ -25,7 +22,8 @@ BOOL CSoundRender_TargetA::_initialize()
     A_CHK(alGenBuffers(sdef_target_count, pBuffers));
     alGenSources(1, &pSource);
     ALenum error = alGetError();
-    if (AL_NO_ERROR == error) {
+    if (AL_NO_ERROR == error)
+    {
         A_CHK(alSourcei(pSource, AL_LOOPING, AL_FALSE));
         A_CHK(alSourcef(pSource, AL_MIN_GAIN, 0.f));
         A_CHK(alSourcef(pSource, AL_MAX_GAIN, 1.f));
@@ -43,7 +41,8 @@ BOOL CSoundRender_TargetA::_initialize()
 void CSoundRender_TargetA::_destroy()
 {
     // clean up target
-    if (alIsSource(pSource)) alDeleteSources(1, &pSource);
+    if (alIsSource(pSource))
+        alDeleteSources(1, &pSource);
     A_CHK(alDeleteBuffers(sdef_target_count, pBuffers));
 }
 
@@ -75,7 +74,8 @@ void CSoundRender_TargetA::render()
 
 void CSoundRender_TargetA::stop()
 {
-    if (rendering) {
+    if (rendering)
+    {
         A_CHK(alSourceStop(pSource));
         A_CHK(alSourcei(pSource, AL_BUFFER, NULL));
         A_CHK(alSourcei(pSource, AL_SOURCE_RELATIVE, TRUE));
@@ -103,7 +103,8 @@ void CSoundRender_TargetA::update()
     // Get status
     A_CHK(alGetSourcei(pSource, AL_BUFFERS_PROCESSED, &processed));
 
-    if (processed > 0) {
+    if (processed > 0)
+    {
         while (processed)
         {
             ALuint BufferID;
@@ -119,7 +120,8 @@ void CSoundRender_TargetA::update()
         // check play status -- if stopped then queue is not being filled fast enough
         ALint state;
         A_CHK(alGetSourcei(pSource, AL_SOURCE_STATE, &state));
-        if (state != AL_PLAYING) {
+        if (state != AL_PLAYING)
+        {
             //			Log		("Queuing underrun detected.");
             A_CHK(alSourcePlay(pSource));
         }
@@ -152,7 +154,8 @@ void CSoundRender_TargetA::fill_parameters()
     VERIFY2(m_pEmitter, SE->source()->file_name());
     float _gain = m_pEmitter->smooth_volume;
     clamp(_gain, EPS_S, 1.f);
-    if (!fsimilar(_gain, cache_gain, 0.01f)) {
+    if (!fsimilar(_gain, cache_gain, 0.01f))
+    {
         cache_gain = _gain;
         A_CHK(alSourcef(pSource, AL_GAIN, _gain));
     }
@@ -160,7 +163,8 @@ void CSoundRender_TargetA::fill_parameters()
     VERIFY2(m_pEmitter, SE->source()->file_name());
     float _pitch = m_pEmitter->p_source.freq;
     clamp(_pitch, EPS_L, 2.f);
-    if (!fsimilar(_pitch, cache_pitch)) {
+    if (!fsimilar(_pitch, cache_pitch))
+    {
         cache_pitch = _pitch;
         A_CHK(alSourcef(pSource, AL_PITCH, _pitch));
     }

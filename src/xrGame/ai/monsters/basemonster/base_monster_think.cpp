@@ -14,7 +14,8 @@ void CBaseMonster::Think()
 {
     START_PROFILE("Base Monster/Think");
 
-    if (!g_Alive() || getDestroy()) return;
+    if (!g_Alive() || getDestroy())
+        return;
 
     // Инициализировать
     InitThink();
@@ -57,7 +58,8 @@ void CBaseMonster::update_fsm()
 
 void CBaseMonster::post_fsm_update()
 {
-    if (!EnemyMan.get_enemy()) return;
+    if (!EnemyMan.get_enemy())
+        return;
 
     EMonsterState state = StateMan->get_state_type();
 
@@ -69,13 +71,15 @@ void CBaseMonster::post_fsm_update()
         control().path_builder().detail().try_get_direction(direction))
     {
         Fvector const self_to_enemy = Fvector().sub(EnemyMan.get_enemy()->Position(), Position());
-        if (magnitude(self_to_enemy) > 3.f) {
+        if (magnitude(self_to_enemy) > 3.f)
+        {
             float dir_yaw = direction.getH();
             float yaw_target = self_to_enemy.getH();
 
             float angle_diff = angle_difference(yaw_target, dir_yaw);
 
-            if ((angle_diff > PI_DIV_3) && (angle_diff < 5 * PI_DIV_6)) {
+            if ((angle_diff > PI_DIV_3) && (angle_diff < 5 * PI_DIV_6))
+            {
                 if (from_right(dir_yaw, yaw_target))
                     m_bRunTurnRight = true;
                 else
@@ -92,7 +96,8 @@ void CBaseMonster::squad_notify()
 
     EMonsterState state = StateMan->get_state_type();
 
-    if (is_state(state, eStateAttack)) {
+    if (is_state(state, eStateAttack))
+    {
         goal.type = MG_AttackEnemy;
         goal.entity = const_cast<CEntityAlive*>(EnemyMan.get_enemy());
     }

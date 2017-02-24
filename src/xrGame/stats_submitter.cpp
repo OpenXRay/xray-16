@@ -24,14 +24,12 @@ stats_submitter::stats_submitter(CGameSpy_Full* fullgs)
     ZeroMemory(m_atlas_connection_id, sizeof(m_atlas_connection_id));
 }
 
-stats_submitter::~stats_submitter()
-{
-}
-
+stats_submitter::~stats_submitter() {}
 void stats_submitter::reward_with_award(
     enum_awards_t award_id, u32 const count, gamespy_gp::profile const* profile, store_operation_cb opcb)
 {
-    if (!opcb) {
+    if (!opcb)
+    {
         m_last_operation_cb.bind(this, &stats_submitter::onlylog_operation);
     }
     else
@@ -51,7 +49,8 @@ void stats_submitter::reward_with_award(
 void stats_submitter::set_best_scores(
     all_best_scores_t const* scores, gamespy_gp::profile const* profile, store_operation_cb opcb)
 {
-    if (!opcb) {
+    if (!opcb)
+    {
         m_last_operation_cb.bind(this, &stats_submitter::onlylog_operation);
     }
     else
@@ -70,7 +69,8 @@ void stats_submitter::set_best_scores(
 void stats_submitter::submit_all(all_awards_t const* awards, all_best_scores_t const* scores,
     gamespy_gp::profile const* profile, store_operation_cb opcb)
 {
-    if (!opcb) {
+    if (!opcb)
+    {
         m_last_operation_cb.bind(this, &stats_submitter::onlylog_operation);
     }
     else
@@ -93,27 +93,29 @@ void stats_submitter::shedule_Update(u32 dt)
 #ifdef DEBUG
     Msg("--- GameSpy core and atlas thinking ...");
 #endif
-    m_fullgs_obj->CoreThink(10);  // 10 milliseconds on update
+    m_fullgs_obj->CoreThink(10); // 10 milliseconds on update
     m_atlas_obj->Think();
 }
 
 void __stdcall stats_submitter::onlylog_operation(bool const result, char const* err_descr)
 {
-    if (!result) {
+    if (!result)
+    {
         Msg("! Store operation ERROR: %s", err_descr ? err_descr : "unknown");
         return;
     }
     Msg("* Store operation successfullly complete.");
 }
 
-u32 const stats_submitter::operation_timeout_value = 60000;  // 60 seconds
+u32 const stats_submitter::operation_timeout_value = 60000; // 60 seconds
 void stats_submitter::begin_session()
 {
     VERIFY(m_last_operation_profile && m_last_operation_cb);
     SCResult tmp_result = m_atlas_obj->CreateSession(&m_last_operation_profile->mCertificate,
         &m_last_operation_profile->mPrivateData, &stats_submitter::created_session_cb, operation_timeout_value, this);
 
-    if (tmp_result != SCResult_NO_ERROR) {
+    if (tmp_result != SCResult_NO_ERROR)
+    {
         m_last_operation_cb(false, CGameSpy_ATLAS::TryToTranslate(tmp_result).c_str());
         terminate_session();
         return;
@@ -127,13 +129,15 @@ void __cdecl stats_submitter::created_session_cb(
 {
     stats_submitter* my_inst = static_cast<stats_submitter*>(theUserData);
     VERIFY(my_inst && my_inst->m_last_operation_profile);
-    if (theHttpResult != GHTTPSuccess) {
+    if (theHttpResult != GHTTPSuccess)
+    {
         my_inst->m_last_operation_cb(false, CGameSpy_ATLAS::TryToTranslate(theHttpResult).c_str());
         my_inst->terminate_session();
         Engine.Sheduler.Unregister(my_inst);
         return;
     }
-    if (theResult != SCResult_NO_ERROR) {
+    if (theResult != SCResult_NO_ERROR)
+    {
         my_inst->m_last_operation_cb(false, CGameSpy_ATLAS::TryToTranslate(theResult).c_str());
         my_inst->terminate_session();
         Engine.Sheduler.Unregister(my_inst);
@@ -143,7 +147,8 @@ void __cdecl stats_submitter::created_session_cb(
         &my_inst->m_last_operation_profile->mCertificate, &my_inst->m_last_operation_profile->mPrivateData,
         &stats_submitter::set_intension_cb, stats_submitter::operation_timeout_value, my_inst);
 
-    if (tmp_result != SCResult_NO_ERROR) {
+    if (tmp_result != SCResult_NO_ERROR)
+    {
         my_inst->m_last_operation_cb(false, CGameSpy_ATLAS::TryToTranslate(tmp_result).c_str());
         my_inst->terminate_session();
         Engine.Sheduler.Unregister(my_inst);
@@ -156,13 +161,15 @@ void __cdecl stats_submitter::set_intension_cb(
 {
     stats_submitter* my_inst = static_cast<stats_submitter*>(theUserData);
     VERIFY(my_inst && my_inst->m_last_operation_profile);
-    if (theHttpResult != GHTTPSuccess) {
+    if (theHttpResult != GHTTPSuccess)
+    {
         my_inst->m_last_operation_cb(false, CGameSpy_ATLAS::TryToTranslate(theHttpResult).c_str());
         my_inst->terminate_session();
         Engine.Sheduler.Unregister(my_inst);
         return;
     }
-    if (theResult != SCResult_NO_ERROR) {
+    if (theResult != SCResult_NO_ERROR)
+    {
         my_inst->m_last_operation_cb(false, CGameSpy_ATLAS::TryToTranslate(theResult).c_str());
         my_inst->terminate_session();
         Engine.Sheduler.Unregister(my_inst);
@@ -173,7 +180,8 @@ void __cdecl stats_submitter::set_intension_cb(
     xr_strcpy(static_cast<char*>((void*)my_inst->m_atlas_connection_id), sizeof(my_inst->m_atlas_connection_id),
         tmp_connection_id);
 
-    if (!my_inst->prepare_report()) {
+    if (!my_inst->prepare_report())
+    {
         my_inst->m_last_operation_cb(false, "mp_failed_to_create_report");
         my_inst->terminate_session();
         Engine.Sheduler.Unregister(my_inst);
@@ -183,7 +191,8 @@ void __cdecl stats_submitter::set_intension_cb(
     SCResult tmp_result = my_inst->m_atlas_obj->SubmitReport(my_inst->m_atlas_report, gsi_true,
         &my_inst->m_last_operation_profile->mCertificate, &my_inst->m_last_operation_profile->mPrivateData,
         &stats_submitter::submitted_cb, stats_submitter::operation_timeout_value, my_inst);
-    if (tmp_result != SCResult_NO_ERROR) {
+    if (tmp_result != SCResult_NO_ERROR)
+    {
         my_inst->m_last_operation_cb(false, CGameSpy_ATLAS::TryToTranslate(tmp_result).c_str());
         my_inst->terminate_session();
         Engine.Sheduler.Unregister(my_inst);
@@ -196,13 +205,15 @@ void __cdecl stats_submitter::submitted_cb(
 {
     stats_submitter* my_inst = static_cast<stats_submitter*>(theUserData);
     VERIFY(my_inst && my_inst->m_last_operation_profile);
-    if (theHttpResult != GHTTPSuccess) {
+    if (theHttpResult != GHTTPSuccess)
+    {
         my_inst->m_last_operation_cb(false, CGameSpy_ATLAS::TryToTranslate(theHttpResult).c_str());
         my_inst->terminate_session();
         Engine.Sheduler.Unregister(my_inst);
         return;
     }
-    if (theResult != SCResult_NO_ERROR) {
+    if (theResult != SCResult_NO_ERROR)
+    {
         my_inst->m_last_operation_cb(false, CGameSpy_ATLAS::TryToTranslate(theResult).c_str());
         my_inst->terminate_session();
         Engine.Sheduler.Unregister(my_inst);
@@ -219,24 +230,29 @@ bool stats_submitter::prepare_report()
     VERIFY(!m_atlas_report);
     SCResult tmp_res = m_atlas_obj->CreateReport(ATLAS_RULE_SET_VERSION, 1, 0, &m_atlas_report);
     VERIFY2((tmp_res == SCResult_NO_ERROR) && (m_atlas_report), "failed to create atlas report");
-    if ((tmp_res != SCResult_NO_ERROR) || (!m_atlas_report)) return false;
+    if ((tmp_res != SCResult_NO_ERROR) || (!m_atlas_report))
+        return false;
 
     tmp_res = m_atlas_obj->ReportBeginGlobalData(m_atlas_report);
     VERIFY2(tmp_res == SCResult_NO_ERROR, "failed to begin global data");
-    if (tmp_res != SCResult_NO_ERROR) return false;
+    if (tmp_res != SCResult_NO_ERROR)
+        return false;
 
     tmp_res = m_atlas_obj->ReportBeginPlayerData(m_atlas_report);
     VERIFY2(tmp_res == SCResult_NO_ERROR, "failed to begin player data");
-    if (tmp_res != SCResult_NO_ERROR) return false;
+    if (tmp_res != SCResult_NO_ERROR)
+        return false;
 
     tmp_res = m_atlas_obj->ReportBeginNewPlayer(m_atlas_report);
     VERIFY2(tmp_res == SCResult_NO_ERROR, "failed to begin new player data");
-    if (tmp_res != SCResult_NO_ERROR) return false;
+    if (tmp_res != SCResult_NO_ERROR)
+        return false;
 
     tmp_res = m_atlas_obj->ReportSetPlayerData(m_atlas_report, 0, m_atlas_connection_id, 0, SCGameResult_NONE,
         m_last_operation_profile->m_profile_id, &m_last_operation_profile->mCertificate);
     VERIFY2(tmp_res == SCResult_NO_ERROR, "failed to set player data");
-    if (tmp_res != SCResult_NO_ERROR) return false;
+    if (tmp_res != SCResult_NO_ERROR)
+        return false;
 
     bool report_creation_result = false;
     switch (m_report_type)
@@ -254,8 +270,9 @@ bool stats_submitter::prepare_report()
     }
     break;
     default: NODEFAULT;
-    };  // switch (m_report_type)
-    if (report_creation_result) {
+    }; // switch (m_report_type)
+    if (report_creation_result)
+    {
         tmp_res = m_atlas_obj->ReportEnd(m_atlas_report, gsi_true, SCGameStatus_COMPLETE);
         VERIFY(tmp_res == SCResult_NO_ERROR);
         return (tmp_res == SCResult_NO_ERROR);
@@ -268,7 +285,8 @@ bool stats_submitter::add_player_name_to_report()
     SCResult tmp_res =
         m_atlas_obj->ReportAddStringValue(m_atlas_report, KEY_PlayerName, m_last_operation_profile->unique_nick());
     VERIFY(tmp_res == SCResult_NO_ERROR);
-    if (tmp_res != SCResult_NO_ERROR) return false;
+    if (tmp_res != SCResult_NO_ERROR)
+        return false;
 
     return true;
 }
@@ -281,12 +299,14 @@ bool stats_submitter::create_award_inc_report()
     SCResult tmp_res = m_atlas_obj->ReportAddIntValue(
         m_atlas_report, get_award_id_key(m_last_award_id), static_cast<gsi_i32>(m_last_award_count));
     VERIFY(tmp_res == SCResult_NO_ERROR);
-    if (tmp_res != SCResult_NO_ERROR) return false;
+    if (tmp_res != SCResult_NO_ERROR)
+        return false;
 
     tmp_res = m_atlas_obj->ReportAddIntValue(
         m_atlas_report, get_award_reward_date_key(m_last_award_id), static_cast<gsi_i32>(tmp_time));
     VERIFY(tmp_res == SCResult_NO_ERROR);
-    if (tmp_res != SCResult_NO_ERROR) return false;
+    if (tmp_res != SCResult_NO_ERROR)
+        return false;
 
     return add_player_name_to_report();
 }
@@ -301,7 +321,8 @@ bool stats_submitter::create_best_scores_report()
         tmp_res = m_atlas_obj->ReportAddIntValue(m_atlas_report,
             get_best_score_id_key(static_cast<gamespy_profile::enum_best_score_type>(si->first)), si->second);
         VERIFY(tmp_res == SCResult_NO_ERROR);
-        if (tmp_res != SCResult_NO_ERROR) return false;
+        if (tmp_res != SCResult_NO_ERROR)
+            return false;
     }
     return add_player_name_to_report();
 }
@@ -314,12 +335,14 @@ bool stats_submitter::create_all_awards_report()
         SCResult tmp_res = m_atlas_obj->ReportAddIntValue(
             m_atlas_report, get_award_id_key(ai->first), static_cast<gsi_i32>(ai->second.m_count));
         VERIFY(tmp_res == SCResult_NO_ERROR);
-        if (tmp_res != SCResult_NO_ERROR) return false;
+        if (tmp_res != SCResult_NO_ERROR)
+            return false;
 
         tmp_res = m_atlas_obj->ReportAddIntValue(
             m_atlas_report, get_award_reward_date_key(ai->first), static_cast<gsi_i32>(ai->second.m_last_reward_date));
         VERIFY(tmp_res == SCResult_NO_ERROR);
-        if (tmp_res != SCResult_NO_ERROR) return false;
+        if (tmp_res != SCResult_NO_ERROR)
+            return false;
     }
     return add_player_name_to_report();
 }
@@ -364,7 +387,8 @@ void stats_submitter::quick_set_best_scores(all_best_scores_t const* scores, gam
     for (all_best_scores_t::iterator i = tmp_best_scores.begin(), ie = tmp_best_scores.end(); i != ie; ++i)
     {
         all_best_scores_t::const_iterator tmp_iter = scores->find(i->first);
-        if (tmp_iter == scores->end()) continue;
+        if (tmp_iter == scores->end())
+            continue;
         i->second = std::max(i->second, tmp_iter->second);
     }
     save_file(profile);
@@ -433,4 +457,4 @@ void stats_submitter::fill_private_key(crypto::xr_dsa::private_key_t& priv_key_d
     priv_key_dest.m_value[19] = 0xf2;
 }
 
-}  // namespace gamespy_profile
+} // namespace gamespy_profile

@@ -34,16 +34,13 @@ void ESceneObjectTools::CreateControls()
 
 //----------------------------------------------------
 
-void ESceneObjectTools::RemoveControls()
-{
-    inherited::RemoveControls();
-}
-
+void ESceneObjectTools::RemoveControls() { inherited::RemoveControls(); }
 //----------------------------------------------------
 
 bool ESceneObjectTools::Validate()
 {
-    if (!inherited::Validate()) return false;
+    if (!inherited::Validate())
+        return false;
     // verify position & refs duplicate
     bool bRes = true;
     CSceneObject *A, *B;
@@ -53,9 +50,12 @@ bool ESceneObjectTools::Validate()
         for (ObjectIt b_it = m_Objects.begin(); b_it != m_Objects.end(); b_it++)
         {
             B = (CSceneObject*)(*b_it);
-            if (A == B) continue;
-            if (A->RefCompare(B->GetReference())) {
-                if (A->PPosition.similar(B->PPosition, EPS_L)) {
+            if (A == B)
+                continue;
+            if (A->RefCompare(B->GetReference()))
+            {
+                if (A->PPosition.similar(B->PPosition, EPS_L))
+                {
                     bRes = false;
                     ELog.Msg(mtError, "Duplicate object position '%s'-'%s' with reference '%s'.", A->Name, B->Name,
                         A->GetRefName());
@@ -68,14 +68,11 @@ bool ESceneObjectTools::Validate()
 
 //----------------------------------------------------
 
-void ESceneObjectTools::OnChangeAppendRandomFlags(PropValue* prop)
-{
-    m_Flags.set(flAppendRandomUpdateProps, TRUE);
-}
-
+void ESceneObjectTools::OnChangeAppendRandomFlags(PropValue* prop) { m_Flags.set(flAppendRandomUpdateProps, TRUE); }
 void ESceneObjectTools::FillAppendRandomProperties(bool bUpdateOnly)
 {
-    if (!bUpdateOnly) m_Props = TProperties::CreateModalForm("Random Append Properties", true);
+    if (!bUpdateOnly)
+        m_Props = TProperties::CreateModalForm("Random Append Properties", true);
 
     shared_str temp;
     temp = _ListToSequence(m_AppendRandomObjects).c_str();
@@ -85,10 +82,12 @@ void ESceneObjectTools::FillAppendRandomProperties(bool bUpdateOnly)
     PropItemVec items;
     V = PHelper().CreateFlag32(items, "Scale", &m_Flags, flAppendRandomScale);
     V->OnChangeEvent.bind(this, &ESceneObjectTools::OnChangeAppendRandomFlags);
-    if (m_Flags.is(flAppendRandomScale)) {
+    if (m_Flags.is(flAppendRandomScale))
+    {
         V = PHelper().CreateFlag32(items, "Scale\\Proportional", &m_Flags, flAppendRandomScaleProportional);
         V->OnChangeEvent.bind(this, &ESceneObjectTools::OnChangeAppendRandomFlags);
-        if (m_Flags.is(flAppendRandomScaleProportional)) {
+        if (m_Flags.is(flAppendRandomScaleProportional))
+        {
             PHelper().CreateFloat(items, "Scale\\Minimum", &m_AppendRandomMinScale.x, 0.001f, 1000.f, 0.001f, 3);
             PHelper().CreateFloat(items, "Scale\\Maximum", &m_AppendRandomMaxScale.x, 0.001f, 1000.f, 0.001f, 3);
         }
@@ -101,7 +100,8 @@ void ESceneObjectTools::FillAppendRandomProperties(bool bUpdateOnly)
 
     V = PHelper().CreateFlag32(items, "Rotate", &m_Flags, flAppendRandomRotation);
     V->OnChangeEvent.bind(this, &ESceneObjectTools::OnChangeAppendRandomFlags);
-    if (m_Flags.is(flAppendRandomRotation)) {
+    if (m_Flags.is(flAppendRandomRotation))
+    {
         PHelper().CreateAngle3(items, "Rotate\\Minimum", &m_AppendRandomMinRotation);
         PHelper().CreateAngle3(items, "Rotate\\Maximum", &m_AppendRandomMaxRotation);
     }
@@ -109,8 +109,10 @@ void ESceneObjectTools::FillAppendRandomProperties(bool bUpdateOnly)
 
     m_Props->AssignItems(items);
 
-    if (!bUpdateOnly) {
-        if (mrOk == m_Props->ShowPropertiesModal()) {
+    if (!bUpdateOnly)
+    {
+        if (mrOk == m_Props->ShowPropertiesModal())
+        {
             _SequenceToList(m_AppendRandomObjects, *temp);
             Scene->UndoSave();
         }
@@ -146,7 +148,8 @@ bool ESceneObjectTools::GetBox(Fbox& bb)
 void ESceneObjectTools::OnFrame()
 {
     inherited::OnFrame();
-    if (m_Flags.is(flAppendRandomUpdateProps)) {
+    if (m_Flags.is(flAppendRandomUpdateProps))
+    {
         m_Flags.set(flAppendRandomUpdateProps, FALSE);
         FillAppendRandomProperties(true);
     }
@@ -168,7 +171,8 @@ u32 ratio_colors[ratio_count][2] = {
 
 void ESceneObjectTools::HighlightTexture(LPCSTR tex_name, bool allow_ratio, u32 t_width, u32 t_height, BOOL mark)
 {
-    if (tex_name && tex_name[0]) {
+    if (tex_name && tex_name[0])
+    {
         for (ObjectIt a_it = m_Objects.begin(); a_it != m_Objects.end(); a_it++)
         {
             CSceneObject* s_obj = dynamic_cast<CSceneObject*>(*a_it);
@@ -177,19 +181,22 @@ void ESceneObjectTools::HighlightTexture(LPCSTR tex_name, bool allow_ratio, u32 
             SurfaceVec& s_vec = e_obj->Surfaces();
             for (SurfaceIt it = s_vec.begin(); it != s_vec.end(); it++)
             {
-                if (0 == stricmp((*it)->_Texture(), tex_name)) {
+                if (0 == stricmp((*it)->_Texture(), tex_name))
+                {
                     Fvector verts[3];
                     for (EditMeshIt mesh_it = e_obj->FirstMesh(); mesh_it != e_obj->LastMesh(); mesh_it++)
                     {
                         SurfFaces& surf_faces = (*mesh_it)->GetSurfFaces();
                         SurfFacesPairIt sf_it = surf_faces.find(*it);
-                        if (sf_it != surf_faces.end()) {
+                        if (sf_it != surf_faces.end())
+                        {
                             IntVec& lst = sf_it->second;
                             for (IntIt i_it = lst.begin(); i_it != lst.end(); i_it++)
                             {
                                 e_obj->GetFaceWorld(s_obj->_Transform(), *mesh_it, *i_it, verts);
                                 u32 clr = 0x80FFFFFF;
-                                if (allow_ratio) {
+                                if (allow_ratio)
+                                {
                                     // select color
                                     const Fvector2* tc[3];
                                     Fvector c, e01, e02;
@@ -209,7 +216,7 @@ void ESceneObjectTools::HighlightTexture(LPCSTR tex_name, bool allow_ratio, u32 
                                     w = (ratio - ratio_colors[idx_clr][0]) / float(ratio_colors[idx_clr + 1][0]);
                                     float inv_w = 1.f - w;
                                     clr = color_rgba(color_get_R(ratio_colors[idx_clr + 0][1]) * inv_w +
-                                                         color_get_R(ratio_colors[idx_clr + 1][1]) * w,
+                                            color_get_R(ratio_colors[idx_clr + 1][1]) * w,
                                         color_get_G(ratio_colors[idx_clr + 0][1]) * inv_w +
                                             color_get_G(ratio_colors[idx_clr + 1][1]) * w,
                                         color_get_B(ratio_colors[idx_clr + 0][1]) * inv_w +
@@ -218,7 +225,8 @@ void ESceneObjectTools::HighlightTexture(LPCSTR tex_name, bool allow_ratio, u32 
                                             color_get_A(ratio_colors[idx_clr + 1][1]) * w);
                                 }
                                 Tools->m_DebugDraw.AppendSolidFace(verts[0], verts[1], verts[2], clr, false);
-                                if (mark) Tools->m_DebugDraw.AppendWireFace(verts[0], verts[1], verts[2], clr, false);
+                                if (mark)
+                                    Tools->m_DebugDraw.AppendWireFace(verts[0], verts[1], verts[2], clr, false);
                             }
                         }
                     }

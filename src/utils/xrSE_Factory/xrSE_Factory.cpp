@@ -29,11 +29,7 @@ extern CScriptPropertiesListHelper* g_property_list_helper;
 extern HMODULE prop_helper_module;
 
 extern "C" {
-FACTORY_API IServerEntity* __stdcall create_entity(LPCSTR section)
-{
-    return (F_entity_Create(section));
-}
-
+FACTORY_API IServerEntity* __stdcall create_entity(LPCSTR section) { return (F_entity_Create(section)); }
 FACTORY_API void __stdcall destroy_entity(IServerEntity*& abstract)
 {
     CSE_Abstract* object = smart_cast<CSE_Abstract*>(abstract);
@@ -83,7 +79,8 @@ BOOL APIENTRY DllMain(HANDLE module_handle, DWORD call_reason, LPVOID reserved)
         xr_delete(g_property_list_helper);
         xr_delete(g_ai_space);
         xr_delete(g_object_factory);
-        if (prop_helper_module) FreeLibrary(prop_helper_module);
+        if (prop_helper_module)
+            FreeLibrary(prop_helper_module);
         Core._destroy();
         break;
     }
@@ -100,7 +97,8 @@ void _destroy_item_data_vector_cont(T_VECTOR* vec)
     for (; it != it_e; ++it)
     {
         xr_vector<CUIXml*>::iterator it_f = std::find(_tmp.begin(), _tmp.end(), (*it)._xml);
-        if (it_f == _tmp.end()) _tmp.push_back((*it)._xml);
+        if (it_f == _tmp.end())
+            _tmp.push_back((*it)._xml);
     }
     delete_data(_tmp);
 }

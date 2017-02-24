@@ -10,7 +10,7 @@
 
 //*** Bone Instance *******************************************************************************
 #pragma pack(push, 8)
-class CBlendInstance  // Bone Instance Blend List (per-bone data)
+class CBlendInstance // Bone Instance Blend List (per-bone data)
 {
 public:
     typedef svector<CBlend*, MAX_BLENDED> BlendSVec;
@@ -49,8 +49,8 @@ class ECORE_API CKinematicsAnimated : public CKinematics, public IKinematicsAnim
 
 private:
     // Motion control
-    void Bone_Motion_Start(CBoneData* bd, CBlend* handle);  // with recursion
-    void Bone_Motion_Stop(CBoneData* bd, CBlend* handle);   // with recursion
+    void Bone_Motion_Start(CBoneData* bd, CBlend* handle); // with recursion
+    void Bone_Motion_Stop(CBoneData* bd, CBlend* handle); // with recursion
 
     void Bone_Motion_Start_IM(CBoneData* bd, CBlend* handle);
     void Bone_Motion_Stop_IM(CBoneData* bd, CBlend* handle);
@@ -142,11 +142,9 @@ public:
 #endif
     u16 LL_MotionsSlotCount() { return (u16)m_Motions.size(); }
     const shared_motions& LL_MotionsSlot(u16 idx) { return m_Motions[idx].motions; }
-
     IC CMotionDef* LL_GetMotionDef(MotionID id) { return m_Motions[id.slot].motions.motion_def(id.idx); }
     IC CMotion* LL_GetRootMotion(MotionID id) { return &m_Motions[id.slot].bone_motions[iRoot]->at(id.idx); }
     IC CMotion* LL_GetMotion(MotionID id, u16 bone_id) { return &m_Motions[id.slot].bone_motions[bone_id]->at(id.idx); }
-
     virtual IBlendDestroyCallback* GetBlendDestroyCallback();
     virtual void SetBlendDestroyCallback(IBlendDestroyCallback* cb);
     // Low level interface
@@ -168,8 +166,8 @@ public:
     }
 
     // Main functionality
-    void UpdateTracks();                                              // Update motions
-    void LL_UpdateTracks(float dt, bool b_force, bool leave_blends);  // Update motions
+    void UpdateTracks(); // Update motions
+    void LL_UpdateTracks(float dt, bool b_force, bool leave_blends); // Update motions
     void LL_UpdateFxTracks(float dt);
     void DestroyCycle(CBlend& B);
 
@@ -191,7 +189,6 @@ public:
     CBlend* PlayFX(MotionID M, float power_scale);
 
     const CPartition& partitions() const { return *m_Partition; };
-
     // General "Visual" stuff
     virtual void Copy(dxRender_Visual* pFrom);
     virtual void Load(const char* N, IReader* data, u32 dwFlags);
@@ -200,14 +197,13 @@ public:
     virtual IKinematicsAnimated* dcast_PKinematicsAnimated() { return this; }
     virtual IRenderVisual* dcast_RenderVisual() { return this; }
     virtual IKinematics* dcast_PKinematics() { return this; }
-
     virtual ~CKinematicsAnimated();
     CKinematicsAnimated();
 
     virtual u32 mem_usage(bool bInstance)
     {
         u32 sz = CKinematics::mem_usage(bInstance) + sizeof(*this) +
-                 (bInstance && blend_instances ? blend_instances->mem_usage() : 0);
+            (bInstance && blend_instances ? blend_instances->mem_usage() : 0);
         return sz;
     }
 

@@ -28,7 +28,8 @@ effect::effect(manager const& manager, shared_str const& id)
 
 effect::~effect()
 {
-    if (!Device.editor()) return;
+    if (!Device.editor())
+        return;
 
     ::ide().destroy(m_property_holder);
 }
@@ -55,24 +56,17 @@ void effect::save(CInifile& config)
     config.w_float(m_id.c_str(), "wind_blast_longitude", rad2deg(wind_blast_direction.getH()));
 }
 
-LPCSTR effect::id_getter() const
-{
-    return (m_id.c_str());
-}
-
+LPCSTR effect::id_getter() const { return (m_id.c_str()); }
 void effect::id_setter(LPCSTR value_)
 {
     shared_str value = value_;
-    if (m_id._get() == value._get()) return;
+    if (m_id._get() == value._get())
+        return;
 
     m_id = m_manager.unique_id(value);
 }
 
-LPCSTR effect::sound_getter()
-{
-    return (m_sound.c_str());
-}
-
+LPCSTR effect::sound_getter() { return (m_sound.c_str()); }
 void effect::sound_setter(LPCSTR value)
 {
     m_sound = value;
@@ -87,11 +81,7 @@ float effect::wind_blast_longitude_getter() const
     return (rad2deg(h));
 }
 
-void effect::wind_blast_longitude_setter(float value)
-{
-    wind_blast_direction.setHP(deg2rad(value), 0.f);
-}
-
+void effect::wind_blast_longitude_setter(float value) { wind_blast_direction.setHP(deg2rad(value), 0.f); }
 void effect::fill(editor::property_holder_collection* collection)
 {
     VERIFY(!m_property_holder);
@@ -146,9 +136,5 @@ void effect::fill(editor::property_holder_collection* collection)
         360.f);
 }
 
-editor::property_holder* effect::object()
-{
-    return (m_property_holder);
-}
-
-#endif  // #ifdef INGAME_EDITOR
+editor::property_holder* effect::object() { return (m_property_holder); }
+#endif // #ifdef INGAME_EDITOR

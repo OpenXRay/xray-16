@@ -13,8 +13,10 @@ IC dReal dcTriListCollider::PointSphereTest(const dReal* center, const dReal rad
     norm[2] = center[2] - pt[2];
     dReal mag = dSqrt(dDOT(norm, norm));
     dReal depth = radius - mag;
-    if (depth < 0.f) return -1.f;
-    if (mag > 0.f) {
+    if (depth < 0.f)
+        return -1.f;
+    if (mag > 0.f)
+    {
         norm[0] /= mag;
         norm[1] /= mag;
         norm[2] /= mag;
@@ -37,7 +39,8 @@ inline dReal dcTriListCollider::FragmentonSphereTest(
     dReal pt1_prg = dDOT(pt1, direction);
     dReal pt2_prg = dDOT(pt2, direction);
     dReal from1_dist = center_prg - pt1_prg;
-    if (center_prg < pt1_prg || center_prg > pt2_prg) return -1;
+    if (center_prg < pt1_prg || center_prg > pt2_prg)
+        return -1;
     dVector3 line_to_center = {-pt1[0] - direction[0] * from1_dist + center[0],
         -pt1[1] - direction[1] * from1_dist + center[1], -pt1[2] - direction[2] * from1_dist + center[2]};
 
@@ -45,8 +48,10 @@ inline dReal dcTriListCollider::FragmentonSphereTest(
     // dNormalize3(norm);
 
     dReal depth = radius - mag;
-    if (depth < 0.f) return -1.f;
-    if (mag > 0.f) {
+    if (depth < 0.f)
+        return -1.f;
+    if (mag > 0.f)
+    {
         norm[0] = line_to_center[0] / mag;
         norm[1] = line_to_center[1] / mag;
         norm[2] = line_to_center[2] / mag;
@@ -68,18 +73,21 @@ IC bool dcTriListCollider::FragmentonSphereTest(
     dVector3 L = {pt1[0] - center[0], pt1[1] - center[1], pt1[2] - center[2]};
     dReal sq_mag_V = dDOT(V, V);
     dReal dot_L_V = dDOT(L, V);
-    dReal t = -dot_L_V / sq_mag_V;  // t
-    if (t < 0.f || t > 1.f) return false;
+    dReal t = -dot_L_V / sq_mag_V; // t
+    if (t < 0.f || t > 1.f)
+        return false;
     dVector3 Pc = {pt1[0] + t * V[0], pt1[1] + t * V[1], pt1[2] + t * V[2]};
     dVector3 Dc = {center[0] - Pc[0], center[1] - Pc[1], center[2] - Pc[2]};
     dReal sq_mag_Dc = dDOT(Dc, Dc);
-    if (sq_mag_Dc > radius * radius) return false;
+    if (sq_mag_Dc > radius * radius)
+        return false;
     // dReal dot_V_Pc=dDOT(V,Pc);
     // if(dDOT(V,pt1)>dot_V_Pc||dDOT(V,pt2)<dot_V_Pc) return false;
 
     dReal mag = dSqrt(sq_mag_Dc);
     depth = radius - mag;
-    if (mag > 0.f) {
+    if (mag > 0.f)
+    {
         norm[0] = Dc[0] / mag;
         norm[1] = Dc[1] / mag;
         norm[2] = Dc[2] / mag;
@@ -100,10 +108,12 @@ IC bool dcTriListCollider::PointSphereTest(
     norm[1] = center[1] - pt[1];
     norm[2] = center[2] - pt[2];
     dReal smag = dDOT(norm, norm);
-    if (smag > radius * radius) return false;
+    if (smag > radius * radius)
+        return false;
     float mag = dSqrt(smag);
     depth = radius - mag;
-    if (mag > 0.f) {
+    if (mag > 0.f)
+    {
         norm[0] /= mag;
         norm[1] /= mag;
         norm[2] /= mag;
@@ -127,12 +137,13 @@ int dcTriListCollider::dSortedTriSphere(const dReal* /**v1/**/, const dReal* /**
     const float SphereRadius = dGeomSphereGetRadius(Sphere);
 
     //	dNormalize3(triAx);
-    const dReal* ContactNormal = triAx;  //{triAx[0],triAx[1],triAx[2]};
+    const dReal* ContactNormal = triAx; //{triAx[0],triAx[1],triAx[2]};
     dVector3 ContactPos = {SphereCenter[0] - triAx[0] * SphereRadius, SphereCenter[1] - triAx[1] * SphereRadius,
         SphereCenter[2] - triAx[2] * SphereRadius};
 
     float ContactDepth = -dist + SphereRadius;
-    if (ContactDepth >= 0) {
+    if (ContactDepth >= 0)
+    {
         Contacts->normal[0] = -ContactNormal[0];
         Contacts->normal[1] = -ContactNormal[1];
         Contacts->normal[2] = -ContactNormal[2];
@@ -145,7 +156,8 @@ int dcTriListCollider::dSortedTriSphere(const dReal* /**v1/**/, const dReal* /**
         Contacts->g1 = Geometry;
         Contacts->g2 = Sphere;
         ((dxGeomUserData*)dGeomGetData(Sphere))->tri_material = T->material;
-        if (dGeomGetUserData(Sphere)->callback) dGeomGetUserData(Sphere)->callback(T, Contacts);
+        if (dGeomGetUserData(Sphere)->callback)
+            dGeomGetUserData(Sphere)->callback(T, Contacts);
         SURFACE(Contacts, 0)->mode = T->material;
         //////////////////////////////////
         return 1;
@@ -165,10 +177,12 @@ int dcTriListCollider::dTriSphere(const dReal* v0, const dReal* v1, const dReal*
 
     const dReal radius = dGeomSphereGetRadius(Sphere);
     float Depth = -T->dist + radius;
-    if (Depth < 0.f) return 0;
+    if (Depth < 0.f)
+        return 0;
     const dReal* pos = dGeomGetPosition(Sphere);
     dVector3 ContactNormal;
-    if (TriContainPoint(v0, v1, v2, triAx, triSideAx0, triSideAx1, pos)) {
+    if (TriContainPoint(v0, v1, v2, triAx, triSideAx0, triSideAx1, pos))
+    {
         ContactNormal[0] = triAx[0];
         ContactNormal[1] = triAx[1];
         ContactNormal[2] = triAx[2];
@@ -179,8 +193,10 @@ int dcTriListCollider::dTriSphere(const dReal* v0, const dReal* v1, const dReal*
         // VERIFY( g_pGameLevel );
         CDB::TRI* T_array = inl_ph_world().ObjectSpace().GetStaticTris();
         flags8& gl_state = gl_cl_tries_state[I - B];
-        if (gl_state.test(fl_engaged_s0) || gl_state.test(fl_engaged_s1) || gl_state.test(fl_engaged_s2)) return 0;
-        if (FragmentonSphereTest(pos, radius, v0, v1, ContactNormal, Depth)) {
+        if (gl_state.test(fl_engaged_s0) || gl_state.test(fl_engaged_s1) || gl_state.test(fl_engaged_s2))
+            return 0;
+        if (FragmentonSphereTest(pos, radius, v0, v1, ContactNormal, Depth))
+        {
             SideToGlClTriState(T->T->verts[0], T->T->verts[1], T_array);
         }
         else if (FragmentonSphereTest(pos, radius, v1, v2, ContactNormal, Depth))
@@ -193,8 +209,10 @@ int dcTriListCollider::dTriSphere(const dReal* v0, const dReal* v1, const dReal*
         }
         else
         {
-            if (gl_state.test(fl_engaged_v0) || gl_state.test(fl_engaged_v1) || gl_state.test(fl_engaged_v2)) return 0;
-            if (PointSphereTest(pos, radius, v0, ContactNormal, Depth)) {
+            if (gl_state.test(fl_engaged_v0) || gl_state.test(fl_engaged_v1) || gl_state.test(fl_engaged_v2))
+                return 0;
+            if (PointSphereTest(pos, radius, v0, ContactNormal, Depth))
+            {
                 VxToGlClTriState(T->T->verts[0], T_array);
             }
             else if (PointSphereTest(pos, radius, v1, ContactNormal, Depth))
@@ -222,7 +240,8 @@ int dcTriListCollider::dTriSphere(const dReal* v0, const dReal* v1, const dReal*
     Contacts->g1 = Geometry;
     Contacts->g2 = Sphere;
     ((dxGeomUserData*)dGeomGetData(Sphere))->tri_material = T->T->material;
-    if (dGeomGetUserData(Sphere)->callback) dGeomGetUserData(Sphere)->callback(T->T, Contacts);
+    if (dGeomGetUserData(Sphere)->callback)
+        dGeomGetUserData(Sphere)->callback(T->T, Contacts);
     SURFACE(Contacts, 0)->mode = T->T->material;
     //////////////////////////////////
     //	++OutTriCount;

@@ -2,19 +2,14 @@
 #include "GlobalFeelTouch.hpp"
 #include <functional>
 
-GlobalFeelTouch::GlobalFeelTouch()
-{
-}
-
-GlobalFeelTouch::~GlobalFeelTouch()
-{
-}
-
+GlobalFeelTouch::GlobalFeelTouch() {}
+GlobalFeelTouch::~GlobalFeelTouch() {}
 struct delete_predicate_by_time : public std::binary_function<Feel::Touch::DenyTouch, DWORD, bool>
 {
     bool operator()(Feel::Touch::DenyTouch const& left, DWORD const expire_time) const
     {
-        if (left.Expire <= expire_time) return true;
+        if (left.Expire <= expire_time)
+            return true;
         return false;
     };
 };
@@ -22,7 +17,8 @@ struct objects_ptrs_equal : public std::binary_function<Feel::Touch::DenyTouch, 
 {
     bool operator()(Feel::Touch::DenyTouch const& left, IGameObject const* const right) const
     {
-        if (left.O == right) return true;
+        if (left.O == right)
+            return true;
         return false;
     }
 };

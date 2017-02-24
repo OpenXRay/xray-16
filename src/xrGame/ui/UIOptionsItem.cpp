@@ -5,15 +5,8 @@
 
 CUIOptionsManager CUIOptionsItem::m_optionsManager;
 
-CUIOptionsItem::CUIOptionsItem() : m_dep(sdNothing)
-{
-}
-
-CUIOptionsItem::~CUIOptionsItem()
-{
-    m_optionsManager.UnRegisterItem(this);
-}
-
+CUIOptionsItem::CUIOptionsItem() : m_dep(sdNothing) {}
+CUIOptionsItem::~CUIOptionsItem() { m_optionsManager.UnRegisterItem(this); }
 void CUIOptionsItem::AssignProps(const shared_str& entry, const shared_str& group)
 {
     m_optionsManager.RegisterItem(this, group);
@@ -30,11 +23,7 @@ void CUIOptionsItem::OnMessage(LPCSTR message)
     // do nothing
 }
 
-LPCSTR CUIOptionsItem::GetOptStringValue()
-{
-    return Console->GetString(m_entry.c_str());
-}
-
+LPCSTR CUIOptionsItem::GetOptStringValue() { return Console->GetString(m_entry.c_str()); }
 void CUIOptionsItem::SaveOptStringValue(LPCSTR val)
 {
     xr_string command = m_entry.c_str();
@@ -67,11 +56,7 @@ void CUIOptionsItem::SaveOptFloatValue(float val)
     Console->Execute(command);
 }
 
-bool CUIOptionsItem::GetOptBoolValue()
-{
-    return Console->GetBool(m_entry.c_str());
-}
-
+bool CUIOptionsItem::GetOptBoolValue() { return Console->GetBool(m_entry.c_str()); }
 void CUIOptionsItem::SaveOptBoolValue(bool val)
 {
     string512 command;
@@ -79,19 +64,12 @@ void CUIOptionsItem::SaveOptBoolValue(bool val)
     Console->Execute(command);
 }
 
-LPCSTR CUIOptionsItem::GetOptTokenValue()
-{
-    return Console->GetToken(m_entry.c_str());
-}
-
-xr_token* CUIOptionsItem::GetOptToken()
-{
-    return Console->GetXRToken(m_entry.c_str());
-}
-
+LPCSTR CUIOptionsItem::GetOptTokenValue() { return Console->GetToken(m_entry.c_str()); }
+xr_token* CUIOptionsItem::GetOptToken() { return Console->GetXRToken(m_entry.c_str()); }
 void CUIOptionsItem::SaveOptValue()
 {
-    if (!IsChangedOptValue()) return;
+    if (!IsChangedOptValue())
+        return;
 
     if (m_dep == sdVidRestart)
         m_optionsManager.DoVidRestart();
@@ -103,10 +81,12 @@ void CUIOptionsItem::SaveOptValue()
 
 void CUIOptionsItem::OnChangedOptValue()
 {
-    if (m_dep == sdApplyOnChange) SaveOptValue();
+    if (m_dep == sdApplyOnChange)
+        SaveOptValue();
 }
 
 void CUIOptionsItem::UndoOptValue()
 {
-    if (m_dep == sdApplyOnChange) SaveOptValue();
+    if (m_dep == sdApplyOnChange)
+        SaveOptValue();
 }

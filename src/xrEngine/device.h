@@ -35,9 +35,9 @@ class ENGINE_API IRenderDevice
 public:
     struct RenderDeviceStatictics
     {
-        CStatTimer RenderTotal;   // pureRender
-        CStatTimer EngineTotal;   // pureFrame
-        float fFPS, fRFPS, fTPS;  // FPS, RenderFPS, TPS
+        CStatTimer RenderTotal; // pureRender
+        CStatTimer EngineTotal; // pureFrame
+        float fFPS, fRFPS, fTPS; // FPS, RenderFPS, TPS
 
         RenderDeviceStatictics()
         {
@@ -153,7 +153,8 @@ public:
     BOOL m_bNearer;
     void SetNearer(BOOL enabled)
     {
-        if (enabled && !m_bNearer) {
+        if (enabled && !m_bNearer)
+        {
             m_bNearer = TRUE;
             mProject._43 -= EPS_L;
         }
@@ -169,7 +170,6 @@ public:
     }
 
     void DumpResourcesMemoryUsage() { GlobalEnv.Render->ResourcesDumpMemoryUsage(); }
-
 public:
     CRegistrator<pureFrame> seqFrameMT;
     CRegistrator<pureDeviceReset> seqDeviceReset;
@@ -182,7 +182,7 @@ public:
 #ifdef INGAME_EDITOR
           ,
           m_editor_module(0), m_editor_initialize(0), m_editor_finalize(0), m_editor(0), m_engine(0)
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
     {
         m_hWnd = NULL;
         b_is_Active = FALSE;
@@ -213,7 +213,6 @@ public:
     IC CTimer_paused* GetTimerGlobal() { return &TimerGlobal; }
     u32 TimerAsync() { return TimerGlobal.GetElapsed_ms(); }
     u32 TimerAsync_MMT() { return TimerMM.GetElapsed_ms() + Timer_MM_Delta; }
-
     // Creation & Destroying
     void Create(void);
     void Run(void);
@@ -248,7 +247,8 @@ public:
     {
         xr_vector<fastdelegate::FastDelegate0<>>::iterator I =
             std::find(seqParallel.begin(), seqParallel.end(), delegate);
-        if (I != seqParallel.end()) seqParallel.erase(I);
+        if (I != seqParallel.end())
+            seqParallel.erase(I);
     }
 
 private:
@@ -265,7 +265,6 @@ private:
 #ifdef INGAME_EDITOR
 public:
     IC editor::ide* editor() const { return m_editor; }
-
 private:
     void initialize_editor();
     void message_loop_editor();
@@ -280,7 +279,7 @@ private:
     finalize_function_ptr m_editor_finalize;
     editor::ide* m_editor;
     engine_impl* m_engine;
-#endif  // #ifdef INGAME_EDITOR
+#endif // #ifdef INGAME_EDITOR
 };
 
 extern ENGINE_API CRenderDevice Device;

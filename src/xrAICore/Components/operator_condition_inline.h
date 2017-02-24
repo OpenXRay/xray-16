@@ -10,7 +10,7 @@
 
 #include "xrCore/Math/Random32.hpp"
 
-#define TEMPLATE_SPECIALIZATION                                                                                        \
+#define TEMPLATE_SPECIALIZATION \
     template <typename _condition_type, typename _value_type\
 >
 
@@ -28,36 +28,28 @@ IC CAbstractOperatorCondition::COperatorConditionAbstract(const _condition_type 
 }
 
 TEMPLATE_SPECIALIZATION
-IC const _condition_type& CAbstractOperatorCondition::condition() const
-{
-    return (m_condition);
-}
-
+IC const _condition_type& CAbstractOperatorCondition::condition() const { return (m_condition); }
 TEMPLATE_SPECIALIZATION
-IC const _value_type& CAbstractOperatorCondition::value() const
-{
-    return (m_value);
-}
-
+IC const _value_type& CAbstractOperatorCondition::value() const { return (m_value); }
 TEMPLATE_SPECIALIZATION
-IC const u32& CAbstractOperatorCondition::hash_value() const
-{
-    return (m_hash);
-}
-
+IC const u32& CAbstractOperatorCondition::hash_value() const { return (m_hash); }
 TEMPLATE_SPECIALIZATION
 IC bool CAbstractOperatorCondition::operator<(const COperatorCondition& _condition) const
 {
-    if (condition() < _condition.condition()) return (true);
-    if (condition() > _condition.condition()) return (false);
-    if (value() < _condition.value()) return (true);
+    if (condition() < _condition.condition())
+        return (true);
+    if (condition() > _condition.condition())
+        return (false);
+    if (value() < _condition.value())
+        return (true);
     return (false);
 }
 
 TEMPLATE_SPECIALIZATION
 IC bool CAbstractOperatorCondition::operator==(const COperatorCondition& _condition) const
 {
-    if ((condition() == _condition.condition()) && (value() == _condition.value())) return (true);
+    if ((condition() == _condition.condition()) && (value() == _condition.value()))
+        return (true);
     return (false);
 }
 

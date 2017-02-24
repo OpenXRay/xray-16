@@ -17,15 +17,13 @@ TTMinimapEditor* TTMinimapEditor::form = NULL;
 
 //.TTMinimapEditor *TMinimapEditor;
 //---------------------------------------------------------------------------
-__fastcall TTMinimapEditor::TTMinimapEditor(TComponent* Owner) : TForm(Owner)
-{
-}
-
+__fastcall TTMinimapEditor::TTMinimapEditor(TComponent* Owner) : TForm(Owner) {}
 #include "ui_main.h"
 
 void __fastcall TTMinimapEditor::Show()
 {
-    if (!form) {
+    if (!form)
+    {
         form = new TTMinimapEditor((TComponent*)0);
         //.        form->Caption 		= title;
     }
@@ -36,7 +34,8 @@ void __fastcall TTMinimapEditor::Show()
 
 void __fastcall TTMinimapEditor::Hide()
 {
-    if (form) {
+    if (form)
+    {
         form->Close();
     }
 }
@@ -52,8 +51,10 @@ void __fastcall TTMinimapEditor::btnLoadClick(TObject* Sender)
     xr_string fn;
     image_data.clear();
 
-    if (EFS.GetOpenName("$app_root$", fn, false, NULL, 0)) {
-        if (Surface_Load(fn.c_str(), image_data, image_w, image_h, image_a)) {
+    if (EFS.GetOpenName("$app_root$", fn, false, NULL, 0))
+    {
+        if (Surface_Load(fn.c_str(), image_data, image_w, image_h, image_a))
+        {
             u32* line = xr_alloc<u32>(image_w);
             u32 sz_ln = sizeof(u32) * image_w;
             u32 y2 = image_w - 1;
@@ -66,12 +67,14 @@ void __fastcall TTMinimapEditor::btnLoadClick(TObject* Sender)
             xr_free(line);
 
             LPCSTR _mark = "_[";
-            if (fn.find(_mark) != fn.npos) {
+            if (fn.find(_mark) != fn.npos)
+            {
                 LPCSTR _str = fn.c_str() + fn.find(_mark);
                 int cnt =
                     sscanf(_str, "_[%f, %f]-[%f, %f]", &map_bb.min.x, &map_bb.min.y, &map_bb.max.x, &map_bb.max.y);
                 //                "ss_andy_05-08-07_15-24-11_#ai_test_[-150.000, -100.000]-[52.927, 50.000].tga"
-                if (cnt != 4) {
+                if (cnt != 4)
+                {
                     map_bb.min.x = 0.0f;
                     map_bb.min.y = 0.0f;
                     map_bb.max.x = 100.0f;
@@ -95,8 +98,10 @@ void __fastcall TTMinimapEditor::btnLoadClick(TObject* Sender)
 void TTMinimapEditor::ApplyPoints(bool to_controls)
 {
     static bool b_block = false;
-    if (b_block) return;
-    if (to_controls) {
+    if (b_block)
+        return;
+    if (to_controls)
+    {
         b_block = true;
         ElFloatSpinEditX1->Value = map_bb.min.x;
         ElFloatSpinEditZ1->Value = map_bb.min.y;
@@ -129,11 +134,12 @@ void DrawThumbnail(TCanvas* pCanvas, TRect& r, U32Vec& data, bool bDrawWithAlpha
     pCanvas->CopyMode = cmSrcCopy;
     Graphics::TBitmap* pBitmap = new Graphics::TBitmap();
 
-    pBitmap->PixelFormat = pf24bit;  // pf32bit;
+    pBitmap->PixelFormat = pf24bit; // pf32bit;
     pBitmap->Height = _h;
     pBitmap->Width = _w;
 
-    if (bDrawWithAlpha) {
+    if (bDrawWithAlpha)
+    {
         Fcolor back;
         back.set(bgr2rgb(pCanvas->Brush->Color));
         back.mul_rgb(255.f);
@@ -167,7 +173,8 @@ void DrawThumbnail(TCanvas* pCanvas, TRect& r, U32Vec& data, bool bDrawWithAlpha
 
 void __fastcall TTMinimapEditor::imgPanelPaint(TObject* Sender)
 {
-    if (image_data.size() == 0) return;
+    if (image_data.size() == 0)
+        return;
 
     Irect R;
     R.x1 = 0;
@@ -204,15 +211,17 @@ void __fastcall TTMinimapEditor::imgPanelPaint(TObject* Sender)
 
 void __fastcall TTMinimapEditor::imgPanelResize(TObject* Sender)
 {
-    if (image_data.size() == 0) return;
+    if (image_data.size() == 0)
+        return;
     float _k_img = (float)image_w / (float)image_h;
     float _k_panel = (float)imgPanel->Width / (float)imgPanel->Height;
 
-    if (_k_img > _k_panel) {  // align to width
+    if (_k_img > _k_panel)
+    { // align to width
         image_draw_size.set(imgPanel->Width, iFloor(imgPanel->Width / _k_img));
     }
     else
-    {  // align to height
+    { // align to height
         image_draw_size.set(iFloor(imgPanel->Height * _k_img), imgPanel->Height);
     }
     VERIFY(image_draw_size.x <= imgPanel->Width && image_draw_size.y <= imgPanel->Height);
@@ -223,16 +232,19 @@ void __fastcall TTMinimapEditor::imgPanelResize(TObject* Sender)
 void __fastcall TTMinimapEditor::imgPanelMouseDown(
     TObject* Sender, TMouseButton Button, TShiftState Shift, int X, int Y)
 {
-    if (X > image_draw_size.x || Y > image_draw_size.y) return;
+    if (X > image_draw_size.x || Y > image_draw_size.y)
+        return;
     float kw = (map_bb_loaded.max.x - map_bb_loaded.min.x) / (float)image_draw_size.x;
     float kh = (map_bb_loaded.max.y - map_bb_loaded.min.y) / (float)image_draw_size.y;
 
-    if (X < (image_draw_size.x / 2) && Y < (image_draw_size.y / 2)) {  // LT
+    if (X < (image_draw_size.x / 2) && Y < (image_draw_size.y / 2))
+    { // LT
         map_bb.min.x = map_bb_loaded.min.x + X * kw;
         map_bb.min.y = map_bb_loaded.min.y + Y * kh;
     }
 
-    if (X > (image_draw_size.x / 2) && Y > (image_draw_size.y / 2)) {  // RB
+    if (X > (image_draw_size.x / 2) && Y > (image_draw_size.y / 2))
+    { // RB
         map_bb.max.x = map_bb_loaded.min.x + X * kw;
         map_bb.max.y = map_bb_loaded.min.y + Y * kh;
     }
@@ -241,9 +253,5 @@ void __fastcall TTMinimapEditor::imgPanelMouseDown(
 
 //---------------------------------------------------------------------------
 
-void __fastcall TTMinimapEditor::ElFloatSpinEditX1Change(TObject* Sender)
-{
-    ApplyPoints(false);
-}
-
+void __fastcall TTMinimapEditor::ElFloatSpinEditX1Change(TObject* Sender) { ApplyPoints(false); }
 //---------------------------------------------------------------------------

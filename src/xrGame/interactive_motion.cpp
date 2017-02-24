@@ -12,7 +12,8 @@
 void interactive_motion_diagnostic(LPCSTR message, const MotionID& m, CPhysicsShell* s)
 {
 #ifdef DEBUG
-    if (!death_anim_debug) return;
+    if (!death_anim_debug)
+        return;
     VERIFY(m.valid());
     VERIFY(s);
     IKinematicsAnimated* KA = smart_cast<IKinematicsAnimated*>(s->PKinematics());
@@ -25,14 +26,8 @@ void interactive_motion_diagnostic(LPCSTR message, const MotionID& m, CPhysicsSh
 #endif
 }
 
-interactive_motion::interactive_motion()
-{
-    init();
-}
-interactive_motion::~interactive_motion()
-{
-    VERIFY(flags.get() == 0);
-}
+interactive_motion::interactive_motion() { init(); }
+interactive_motion::~interactive_motion() { VERIFY(flags.get() == 0); }
 void interactive_motion::init()
 {
     flags.assign(0);
@@ -42,7 +37,8 @@ void interactive_motion::init()
 }
 void interactive_motion::destroy()
 {
-    if (flags.test(fl_started)) state_end();
+    if (flags.test(fl_started))
+        state_end();
 
     flags.assign(0);
 }
@@ -118,9 +114,11 @@ void interactive_motion::update()
     VERIFY(K);
 
     collide();
-    if (!flags.test(fl_switch_dm_toragdoll)) {
+    if (!flags.test(fl_switch_dm_toragdoll))
+    {
         move_update();
-        if (flags.test(fl_switch_dm_toragdoll)) switch_to_free();
+        if (flags.test(fl_switch_dm_toragdoll))
+            switch_to_free();
     }
 }
 

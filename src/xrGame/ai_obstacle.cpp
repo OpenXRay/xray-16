@@ -47,7 +47,8 @@ public:
     IC void operator()(const CLevelGraph::CVertex& vertex) const
     {
         u32 vertex_id = m_level_graph->vertex_id(&vertex);
-        if (!m_object->inside(vertex_id)) return;
+        if (!m_object->inside(vertex_id))
+            return;
 
         m_area->push_back(vertex_id);
     }
@@ -62,7 +63,8 @@ IC bool ai_obstacle::inside(const Fvector& position, const float& radius) const
 {
     for (u32 i = 0; i < PLANE_COUNT; ++i)
     {
-        if (m_box.m_planes[i].classify(position) > radius) return (false);
+        if (m_box.m_planes[i].classify(position) > radius)
+            return (false);
     }
     return (true);
 }
@@ -73,7 +75,8 @@ IC bool ai_obstacle::inside(
     Fvector temp = position;
     for (u32 i = 0; i < step_count; ++i, temp.y += increment)
     {
-        if (inside(temp, radius)) return (true);
+        if (inside(temp, radius))
+            return (true);
     }
     return (false);
 }
@@ -83,10 +86,10 @@ IC bool ai_obstacle::inside(const u32& vertex_id) const
     const Fvector& position = ai().level_graph().vertex_position(vertex_id);
     float offset = ai().level_graph().header().cell_size() * .5f - EPS_L;
     return (inside(construct_position(vertex_id, position.x + offset, position.z + offset), EPS_L, .3f, 6) ||
-            inside(construct_position(vertex_id, position.x + offset, position.z - offset), EPS_L, .3f, 6) ||
-            inside(construct_position(vertex_id, position.x - offset, position.z + offset), EPS_L, .3f, 6) ||
-            inside(construct_position(vertex_id, position.x - offset, position.z - offset), EPS_L, .3f, 6) ||
-            inside(Fvector().set(position.x, position.y, position.z), EPS_L, .3f, 6));
+        inside(construct_position(vertex_id, position.x + offset, position.z - offset), EPS_L, .3f, 6) ||
+        inside(construct_position(vertex_id, position.x - offset, position.z + offset), EPS_L, .3f, 6) ||
+        inside(construct_position(vertex_id, position.x - offset, position.z - offset), EPS_L, .3f, 6) ||
+        inside(Fvector().set(position.x, position.y, position.z), EPS_L, .3f, 6));
 }
 
 void ai_obstacle::compute_matrix(Fmatrix& result, const Fvector& additional)
@@ -96,7 +99,8 @@ void ai_obstacle::compute_matrix(Fmatrix& result, const Fvector& additional)
     u16 bone_count = kinematics->LL_BoneCount();
     VERIFY(bone_count);
     u16 visible_bone_count = kinematics->LL_VisibleBoneCount();
-    if (!visible_bone_count) {
+    if (!visible_bone_count)
+    {
         result.scale(0.f, 0.f, 0.f);
         return;
     }
@@ -108,10 +112,12 @@ void ai_obstacle::compute_matrix(Fmatrix& result, const Fvector& additional)
     Fvector* I = points;
     for (u16 i = 0; i < bone_count; ++i)
     {
-        if (!kinematics->LL_GetBoneVisible(i)) continue;
+        if (!kinematics->LL_GetBoneVisible(i))
+            continue;
 
         const Fobb& obb = kinematics->LL_GetData(i).obb;
-        if (fis_zero(obb.m_halfsize.square_magnitude())) {
+        if (fis_zero(obb.m_halfsize.square_magnitude()))
+        {
             VERIFY(visible_bone_count > 1);
             --visible_bone_count;
             continue;
@@ -133,7 +139,8 @@ void ai_obstacle::compute_matrix(Fmatrix& result, const Fvector& additional)
     }
 
     VERIFY(visible_bone_count);
-    if (visible_bone_count == 1) {
+    if (visible_bone_count == 1)
+    {
         result.mul_43(before_scale_matrix, Fmatrix().scale(last_half_size.add(additional)));
         return;
     }
@@ -236,13 +243,15 @@ void ai_obstacle::compute_impl()
         {
             u32 xz = x * row_length + z;
             const_iterator I = std::lower_bound(B, E, xz);
-            if ((I == E) || ((*I).position().xz() != xz)) continue;
+            if ((I == E) || ((*I).position().xz() != xz))
+                continue;
 
             predicate(*I);
 
             for (++I; I != E; ++I)
             {
-                if ((*I).position().xz() != xz) break;
+                if ((*I).position().xz() != xz)
+                    break;
 
                 predicate(*I);
             }
@@ -250,19 +259,13 @@ void ai_obstacle::compute_impl()
     }
 
     //	VERIFY						(m_area.empty());
-    if (m_area.empty()) {
+    if (m_area.empty())
+    {
         m_crc = 0;
         return;
     }
     m_crc = crc32(&*m_area.begin(), m_area.size() * sizeof(m_area[0]));
 }
 
-void ai_obstacle::on_move()
-{
-    m_actual = false;
-}
-
-float ai_obstacle::distance_to(const Fvector& position) const
-{
-    return (position.distance_to(m_object->Position()));
-}
+void ai_obstacle::on_move() { m_actual = false; }
+float ai_obstacle::distance_to(const Fvector& position) const { return (position.distance_to(m_object->Position())); }

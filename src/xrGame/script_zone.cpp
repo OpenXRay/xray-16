@@ -19,33 +19,20 @@
 #include "debug_renderer.h"
 #endif
 
-CScriptZone::CScriptZone()
-{
-}
-
-CScriptZone::~CScriptZone()
-{
-}
-
-void CScriptZone::reinit()
-{
-    inherited::reinit();
-}
-
+CScriptZone::CScriptZone() {}
+CScriptZone::~CScriptZone() {}
+void CScriptZone::reinit() { inherited::reinit(); }
 BOOL CScriptZone::net_Spawn(CSE_Abstract* DC)
 {
     feel_touch.clear();
 
-    if (!inherited::net_Spawn(DC)) return (FALSE);
+    if (!inherited::net_Spawn(DC))
+        return (FALSE);
 
     return (TRUE);
 }
 
-void CScriptZone::net_Destroy()
-{
-    inherited::net_Destroy();
-}
-
+void CScriptZone::net_Destroy() { inherited::net_Destroy(); }
 void CScriptZone::shedule_Update(u32 dt)
 {
     inherited::shedule_Update(dt);
@@ -59,7 +46,8 @@ void CScriptZone::shedule_Update(u32 dt)
 void CScriptZone::feel_touch_new(IGameObject* tpObject)
 {
     CGameObject* l_tpGameObject = smart_cast<CGameObject*>(tpObject);
-    if (!l_tpGameObject) return;
+    if (!l_tpGameObject)
+        return;
 
     callback(GameObject::eZoneEnter)(lua_game_object(), l_tpGameObject->lua_game_object());
 }
@@ -68,7 +56,8 @@ void CScriptZone::feel_touch_delete(IGameObject* tpObject)
 {
     CGameObject* l_tpGameObject = smart_cast<CGameObject*>(tpObject);
 
-    if (!l_tpGameObject || l_tpGameObject->getDestroy()) return;
+    if (!l_tpGameObject || l_tpGameObject->getDestroy())
+        return;
 
     callback(GameObject::eZoneExit)(lua_game_object(), l_tpGameObject->lua_game_object());
 }
@@ -76,23 +65,22 @@ void CScriptZone::feel_touch_delete(IGameObject* tpObject)
 void CScriptZone::net_Relcase(IGameObject* O)
 {
     CGameObject* l_tpGameObject = smart_cast<CGameObject*>(O);
-    if (!l_tpGameObject) return;
+    if (!l_tpGameObject)
+        return;
 
     xr_vector<IGameObject*>::iterator I = std::find(feel_touch.begin(), feel_touch.end(), O);
-    if (I != feel_touch.end()) {
+    if (I != feel_touch.end())
+    {
         callback(GameObject::eZoneExit)(lua_game_object(), l_tpGameObject->lua_game_object());
     }
 }
 
-bool CScriptZone::feel_touch_contact(IGameObject* O)
-{
-    return (((CCF_Shape*)GetCForm())->Contact(O));
-}
-
+bool CScriptZone::feel_touch_contact(IGameObject* O) { return (((CCF_Shape*)GetCForm())->Contact(O)); }
 #ifdef DEBUG
 void CScriptZone::OnRender()
 {
-    if (!bDebug) return;
+    if (!bDebug)
+        return;
     GlobalEnv.DRender->OnFrameEnd();
     // RCache.OnFrameEnd();
     Fvector l_half;
@@ -131,6 +119,7 @@ bool CScriptZone::active_contact(u16 id) const
     xr_vector<IGameObject*>::const_iterator I = feel_touch.begin();
     xr_vector<IGameObject*>::const_iterator E = feel_touch.end();
     for (; I != E; ++I)
-        if ((*I)->ID() == id) return (true);
+        if ((*I)->ID() == id)
+            return (true);
     return (false);
 }

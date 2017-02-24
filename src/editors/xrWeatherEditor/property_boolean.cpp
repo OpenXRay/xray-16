@@ -14,23 +14,12 @@ property_boolean::property_boolean(boolean_getter_type const& getter, boolean_se
 {
 }
 
-property_boolean::~property_boolean()
-{
-    this->!property_boolean();
-}
-
+property_boolean::~property_boolean() { this->!property_boolean(); }
 property_boolean::!property_boolean()
 {
     delete (m_getter);
     delete (m_setter);
 }
 
-System::Object ^ property_boolean::GetValue()
-{
-    return ((*m_getter)());
-}
-
-void property_boolean::SetValue(System::Object ^ object)
-{
-    (*m_setter)(safe_cast<bool>(object));
-}
+System::Object ^ property_boolean::GetValue() { return ((*m_getter)()); }
+void property_boolean::SetValue(System::Object ^ object) { (*m_setter)(safe_cast<bool>(object)); }

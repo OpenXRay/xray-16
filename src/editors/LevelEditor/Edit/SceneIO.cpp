@@ -117,7 +117,8 @@ void st_LevelOptions::ReadLTX(CInifile& ini)
     LPCSTR section = "level_options";
 
     u32 vers_op = ini.r_u32(section, "version");
-    if (vers_op < 0x00000008) {
+    if (vers_op < 0x00000008)
+    {
         ELog.DlgMsg(mtError, "Skipping bad version of level options.");
         return;
     }
@@ -126,7 +127,8 @@ void st_LevelOptions::ReadLTX(CInifile& ini)
     m_LevelPrefix = ini.r_string(section, "level_prefix");
     m_BOPText = ini.r_string_wb(section, "bop");
 
-    if (vers_op > 0x0000000B) m_map_version = ini.r_string(section, "map_version");
+    if (vers_op > 0x0000000B)
+        m_map_version = ini.r_string(section, "map_version");
 
     m_BuildParams.LoadLTX(ini);
 
@@ -134,7 +136,8 @@ void st_LevelOptions::ReadLTX(CInifile& ini)
     m_LightSunQuality = ini.r_u8(section, "light_sun_quality");
 
     m_mapUsage.SetDefaults();
-    if (vers_op > 0x0000000A) {
+    if (vers_op > 0x0000000A)
+    {
         m_mapUsage.LoadLTX(ini, section, false);
     }
     else
@@ -143,7 +146,8 @@ void st_LevelOptions::ReadLTX(CInifile& ini)
         m_mapUsage.m_GameType.set(eGameIDTeamDeathmatch, ini.r_s32(section, "usage_teamdeathmatch"));
         m_mapUsage.m_GameType.set(eGameIDArtefactHunt, ini.r_s32(section, "usage_artefacthunt"));
 
-        if (vers_op > 0x00000008) {
+        if (vers_op > 0x00000008)
+        {
             m_mapUsage.m_GameType.set(eGameIDCaptureTheArtefact, ini.r_s32(section, "usage_captretheartefact"));
 
             m_mapUsage.m_GameType.set(eGameIDTeamDominationZone, ini.r_s32(section, "usage_team_domination_zone"));
@@ -159,7 +163,8 @@ void st_LevelOptions::Read(IReader& F)
 {
     R_ASSERT(F.find_chunk(CHUNK_LO_VERSION));
     DWORD vers = F.r_u32();
-    if (vers < 0x00000008) {
+    if (vers < 0x00000008)
+    {
         ELog.DlgMsg(mtError, "Skipping bad version of level options.");
         return;
     }
@@ -167,18 +172,23 @@ void st_LevelOptions::Read(IReader& F)
     R_ASSERT(F.find_chunk(CHUNK_LO_NAMES));
     F.r_stringZ(m_FNLevelPath);
 
-    if (F.find_chunk(CHUNK_LO_PREFIX)) F.r_stringZ(m_LevelPrefix);
+    if (F.find_chunk(CHUNK_LO_PREFIX))
+        F.r_stringZ(m_LevelPrefix);
 
     R_ASSERT(F.find_chunk(CHUNK_LO_BOP));
     F.r_stringZ(m_BOPText);
 
-    if (F.find_chunk(CHUNK_LO_MAP_VER)) F.r_stringZ(m_map_version);
+    if (F.find_chunk(CHUNK_LO_MAP_VER))
+        F.r_stringZ(m_map_version);
 
     vers = 0;
-    if (F.find_chunk(CHUNK_LO_BP_VERSION)) vers = F.r_u32();
+    if (F.find_chunk(CHUNK_LO_BP_VERSION))
+        vers = F.r_u32();
 
-    if (CURRENT_LEVELOP_BP_VERSION == vers) {
-        if (F.find_chunk(CHUNK_BUILD_PARAMS)) F.r(&m_BuildParams, sizeof(m_BuildParams));
+    if (CURRENT_LEVELOP_BP_VERSION == vers)
+    {
+        if (F.find_chunk(CHUNK_BUILD_PARAMS))
+            F.r(&m_BuildParams, sizeof(m_BuildParams));
     }
     else
     {
@@ -186,12 +196,15 @@ void st_LevelOptions::Read(IReader& F)
         m_BuildParams.Init();
     }
 
-    if (F.find_chunk(CHUNK_LIGHT_QUALITY)) {
+    if (F.find_chunk(CHUNK_LIGHT_QUALITY))
+    {
         m_LightHemiQuality = F.r_u8();
         m_LightSunQuality = F.r_u8();
     }
-    if (F.find_chunk(CHUNK_MAP_USAGE)) {
-        if (vers > 0x00000008) {
+    if (F.find_chunk(CHUNK_MAP_USAGE))
+    {
+        if (vers > 0x00000008)
+        {
             m_mapUsage.m_GameType.assign(F.r_u16());
         }
         else
@@ -212,7 +225,8 @@ BOOL EScene::LoadLevelPartLTX(ESceneToolBase* M, LPCSTR mn)
     string_path map_name;
     strcpy(map_name, mn);
 
-    if (!M->can_use_inifile()) return LoadLevelPart(M, map_name);
+    if (!M->can_use_inifile())
+        return LoadLevelPart(M, map_name);
 
     int fnidx = 0;
     while (FS.exist(map_name))
@@ -224,7 +238,8 @@ BOOL EScene::LoadLevelPartLTX(ESceneToolBase* M, LPCSTR mn)
         bool b_is_inifile = (ch == '[');
         FS.r_close(R);
 
-        if (!b_is_inifile) return LoadLevelPart(M, map_name);
+        if (!b_is_inifile)
+            return LoadLevelPart(M, map_name);
 
         M->m_EditFlags.set(ESceneToolBase::flReadonly, FALSE);
 
@@ -234,7 +249,8 @@ BOOL EScene::LoadLevelPartLTX(ESceneToolBase* M, LPCSTR mn)
         xrGUID guid;
         guid.LoadLTX(ini, "guid", "guid");
 
-        if (guid != m_GUID) {
+        if (guid != m_GUID)
+        {
             ELog.DlgMsg(mtError, "Skipping invalid version of level part: '%s\\%s.part'",
                 EFS.ExtractFileName(map_name).c_str(), M->ClassName());
             return FALSE;
@@ -251,9 +267,11 @@ BOOL EScene::LoadLevelPartLTX(ESceneToolBase* M, LPCSTR mn)
 
 BOOL EScene::LoadLevelPart(ESceneToolBase* M, LPCSTR map_name)
 {
-    if (M->can_use_inifile()) return LoadLevelPartLTX(M, map_name);
+    if (M->can_use_inifile())
+        return LoadLevelPartLTX(M, map_name);
 
-    if (FS.exist(map_name)) {
+    if (FS.exist(map_name))
+    {
         // check locking
         M->m_EditFlags.set(ESceneToolBase::flReadonly, FALSE);
 
@@ -264,7 +282,8 @@ BOOL EScene::LoadLevelPart(ESceneToolBase* M, LPCSTR map_name)
         xrGUID guid;
         R->r(&guid, sizeof(guid));
 
-        if (guid != m_GUID) {
+        if (guid != m_GUID)
+        {
             ELog.DlgMsg(mtError, "Skipping invalid version of level part: '%s\\%s.part'",
                 EFS.ExtractFileName(map_name).c_str(), M->ClassName());
             FS.r_close(R);
@@ -272,7 +291,8 @@ BOOL EScene::LoadLevelPart(ESceneToolBase* M, LPCSTR map_name)
         }
         // read data
         IReader* chunk = R->open_chunk(CHUNK_TOOLS_DATA + M->ClassID);
-        if (chunk != NULL) {
+        if (chunk != NULL)
+        {
             M->LoadStream(*chunk);
             chunk->close();
         }
@@ -338,8 +358,10 @@ void EScene::SaveLTX(LPCSTR map_name, bool bForUndo, bool bForceSaveAll)
 
     bool bSaveMain = true;
 
-    if (!bForUndo) {
-        if (bSaveMain) {
+    if (!bForUndo)
+    {
+        if (bSaveMain)
+        {
             EFS.MarkFile(full_name.c_str(), true);
         }
         part_prefix = LevelPartPath(full_name.c_str());
@@ -347,7 +369,8 @@ void EScene::SaveLTX(LPCSTR map_name, bool bForUndo, bool bForceSaveAll)
 
     CInifile ini(full_name.c_str(), FALSE, FALSE, TRUE);
 
-    if (bSaveMain) {
+    if (bSaveMain)
+    {
         ini.w_u32("version", "value", CURRENT_FILE_VERSION);
 
         m_LevelOp.SaveLTX(ini);
@@ -373,18 +396,22 @@ void EScene::SaveLTX(LPCSTR map_name, bool bForUndo, bool bForceSaveAll)
 
     for (; _I != _E; ++_I)
     {
-        if ((_I->first != OBJCLASS_DUMMY) && _I->second && _I->second->IsEnabled() && _I->second->IsEditable()) {
-            if (bForUndo) {
-                if (_I->second->IsNeedSave()) _I->second->SaveStream(m_SaveCache);
+        if ((_I->first != OBJCLASS_DUMMY) && _I->second && _I->second->IsEnabled() && _I->second->IsEditable())
+        {
+            if (bForUndo)
+            {
+                if (_I->second->IsNeedSave())
+                    _I->second->SaveStream(m_SaveCache);
             }
             else
             {
                 // !ForUndo
                 xr_string part_name = part_prefix + _I->second->ClassName() + ".part";
-                if (_I->second->can_use_inifile()) {
+                if (_I->second->can_use_inifile())
+                {
                     EFS.MarkFile(part_name.c_str(), true);
                     SaveToolLTX(_I->second->ClassID, part_name.c_str());
-                }  // can_use_ini_file
+                } // can_use_ini_file
                 else
                 {
                     _I->second->SaveStream(m_SaveCache);
@@ -402,13 +429,14 @@ void EScene::SaveLTX(LPCSTR map_name, bool bForUndo, bool bForceSaveAll)
                     FF->close_chunk();
 
                     FS.w_close(FF);
-                }  //  ! can_use_ini_file
+                } //  ! can_use_ini_file
             }
             m_SaveCache.clear();
         }
     }
 
-    if (!bForUndo) {
+    if (!bForUndo)
+    {
         m_RTFlags.set(flRT_Unsaved, FALSE);
         Msg("Saving time: %3.2f sec", T.GetElapsed_sec());
     }
@@ -419,7 +447,8 @@ void EScene::SaveToolLTX(ObjClassID clsid, LPCSTR fn)
 {
     ESceneToolBase* tool = GetTool(clsid);
     int fc = tool->SaveFileCount();
-    if (fc == 1) {
+    if (fc == 1)
+    {
         CInifile ini_part(fn, FALSE, FALSE, FALSE);
         tool->SaveLTX(ini_part, 0);
         m_GUID.SaveLTX(ini_part, "guid", "guid");
@@ -467,7 +496,8 @@ void EScene::Save(LPCSTR map_name, bool bUndo, bool bForceSaveAll)
 
     IWriter* F = 0;
 
-    if (bSaveMain) {
+    if (bSaveMain)
+    {
         F = FS.w_open(full_name.c_str());
         R_ASSERT(F);
 
@@ -512,8 +542,10 @@ void EScene::Save(LPCSTR map_name, bool bUndo, bool bForceSaveAll)
         if ((_I->first != OBJCLASS_DUMMY) && _I->second && _I->second->IsEnabled() && _I->second->IsEditable() &&
             (_I->second->IsChanged() || bForceSaveAll))
         {
-            if (_I->second->IsEnabled() && _I->second->IsEditable()) {
-                if (_I->second->IsNeedSave()) {
+            if (_I->second->IsEnabled() && _I->second->IsEditable())
+            {
+                if (_I->second->IsNeedSave())
+                {
                     _I->second->SaveStream(m_SaveCache);
                     F->open_chunk(CHUNK_TOOLS_DATA + _I->first);
                     F->w(m_SaveCache.pointer(), m_SaveCache.size());
@@ -525,7 +557,8 @@ void EScene::Save(LPCSTR map_name, bool bUndo, bool bForceSaveAll)
     }
 
     // save data
-    if (bSaveMain) FS.w_close(F);
+    if (bSaveMain)
+        FS.w_close(F);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -589,7 +622,8 @@ bool EScene::ReadObjectStream(IReader& F, CCustomObject*& O)
     bool bRes = O->LoadStream(*S);
     S->close();
 
-    if (!bRes) xr_delete(O);
+    if (!bRes)
+        xr_delete(O);
 
     return bRes;
 }
@@ -603,7 +637,8 @@ bool EScene::ReadObjectLTX(CInifile& ini, LPCSTR sect_name, CCustomObject*& O)
 
     bool bRes = O->LoadLTX(ini, sect_name);
 
-    if (!bRes) xr_delete(O);
+    if (!bRes)
+        xr_delete(O);
 
     return bRes;
 }
@@ -624,10 +659,12 @@ bool EScene::ReadObjectsLTX(
         sprintf(buff, "%s_%s_%d", sect_name_parent, sect_name_prefix, i);
         CCustomObject* obj = NULL;
 
-        if (ReadObjectLTX(ini, buff, obj)) {
+        if (ReadObjectLTX(ini, buff, obj))
+        {
             LPCSTR obj_name = obj->Name;
             CCustomObject* existing = FindObjectByName(obj_name, obj->ClassID);
-            if (existing) {
+            if (existing)
+            {
                 if (g_frmConflictLoadObject->m_result != 2 && g_frmConflictLoadObject->m_result != 4 &&
                     g_frmConflictLoadObject->m_result != 6)
                 {
@@ -638,8 +675,8 @@ bool EScene::ReadObjectsLTX(
                 }
                 switch (g_frmConflictLoadObject->m_result)
                 {
-                case 1:  // Overwrite
-                case 2:  // Overwrite All
+                case 1: // Overwrite
+                case 2: // Overwrite All
                 {
                     bool res = RemoveObject(existing, true, true);
                     if (!res)
@@ -648,30 +685,32 @@ bool EScene::ReadObjectsLTX(
                         xr_delete(existing);
                 }
                 break;
-                case 3:  // Insert new
-                case 4:  // Insert new All
+                case 3: // Insert new
+                case 4: // Insert new All
                 {
                     string256 buf;
                     GenObjectName(obj->ClassID, buf, obj->Name);
                     obj->Name = buf;
                 }
                 break;
-                case 0:  // Cancel
-                case 5:  // Skip
-                case 6:  // Skip All
+                case 0: // Cancel
+                case 5: // Skip
+                case 6: // Skip All
                 {
                     xr_delete(obj);
                 }
                 break;
-                }  // switch
-            }      // if exist
-            if (obj && !on_append(obj)) xr_delete(obj);
+                } // switch
+            } // if exist
+            if (obj && !on_append(obj))
+                xr_delete(obj);
         }
 
         else
             bRes = false;
 
-        if (pb) pb->Inc();
+        if (pb)
+            pb->Inc();
     }
     return bRes;
 }
@@ -681,15 +720,18 @@ bool EScene::ReadObjectsStream(IReader& F, u32 chunk_id, TAppendObject on_append
     R_ASSERT(on_append);
     bool bRes = true;
     IReader* OBJ = F.open_chunk(chunk_id);
-    if (OBJ) {
+    if (OBJ)
+    {
         IReader* O = OBJ->open_chunk(0);
         for (int count = 1; O; ++count)
         {
             CCustomObject* obj = NULL;
-            if (ReadObjectStream(*O, obj)) {
+            if (ReadObjectStream(*O, obj))
+            {
                 LPCSTR obj_name = obj->Name;
                 CCustomObject* existing = FindObjectByName(obj_name, obj->ClassID);
-                if (existing) {
+                if (existing)
+                {
                     if (g_frmConflictLoadObject->m_result != 2 && g_frmConflictLoadObject->m_result != 4 &&
                         g_frmConflictLoadObject->m_result != 6)
                     {
@@ -700,8 +742,8 @@ bool EScene::ReadObjectsStream(IReader& F, u32 chunk_id, TAppendObject on_append
                     }
                     switch (g_frmConflictLoadObject->m_result)
                     {
-                    case 1:  // Overwrite
-                    case 2:  // Overwrite All
+                    case 1: // Overwrite
+                    case 2: // Overwrite All
                     {
                         bool res = RemoveObject(existing, true, true);
                         if (!res)
@@ -710,24 +752,25 @@ bool EScene::ReadObjectsStream(IReader& F, u32 chunk_id, TAppendObject on_append
                             xr_delete(existing);
                     }
                     break;
-                    case 3:  // Insert new
-                    case 4:  // Insert new All
+                    case 3: // Insert new
+                    case 4: // Insert new All
                     {
                         string256 buf;
                         GenObjectName(obj->ClassID, buf, obj->Name);
                         obj->Name = buf;
                     }
                     break;
-                    case 0:  // Cancel
-                    case 5:  // Skip
-                    case 6:  // Skip All
+                    case 0: // Cancel
+                    case 5: // Skip
+                    case 6: // Skip All
                     {
                         xr_delete(obj);
                     }
                     break;
                     }
                 }
-                if (obj && !on_append(obj)) xr_delete(obj);
+                if (obj && !on_append(obj))
+                    xr_delete(obj);
             }
             else
                 bRes = false;
@@ -735,7 +778,8 @@ bool EScene::ReadObjectsStream(IReader& F, u32 chunk_id, TAppendObject on_append
             O->close();
             O = OBJ->open_chunk(count);
 
-            if (pb) pb->Inc();
+            if (pb)
+                pb->Inc();
         }
         OBJ->close();
     }
@@ -752,13 +796,15 @@ bool EScene::OnLoadAppendObject(CCustomObject* O)
 bool EScene::LoadLTX(LPCSTR map_name, bool bUndo)
 {
     DWORD version = 0;
-    if (!map_name || (0 == map_name[0])) return false;
+    if (!map_name || (0 == map_name[0]))
+        return false;
 
     xr_string full_name;
     full_name = map_name;
 
     ELog.Msg(mtInformation, "EScene: loading '%s'", map_name);
-    if (FS.exist(full_name.c_str())) {
+    if (FS.exist(full_name.c_str()))
+    {
         CTimer T;
         T.Start();
 
@@ -766,7 +812,8 @@ bool EScene::LoadLTX(LPCSTR map_name, bool bUndo)
         CInifile ini(full_name.c_str());
         version = ini.r_u32("version", "value");
 
-        if (version != CURRENT_FILE_VERSION) {
+        if (version != CURRENT_FILE_VERSION)
+        {
             ELog.DlgMsg(mtError, "EScene: unsupported file version. Can't load Level.");
             UI->UpdateScene();
             return false;
@@ -790,9 +837,11 @@ bool EScene::LoadLTX(LPCSTR map_name, bool bUndo)
         SceneToolsMapPairIt _E = m_SceneTools.end();
         for (; _I != _E; ++_I)
         {
-            if (_I->second) {
+            if (_I->second)
+            {
                 {
-                    if (!bUndo && _I->second->IsEnabled() && (_I->first != OBJCLASS_DUMMY)) {
+                    if (!bUndo && _I->second->IsEnabled() && (_I->first != OBJCLASS_DUMMY))
+                    {
                         xr_string fn = LevelPartName(map_name, _I->first).c_str();
                         LoadLevelPartLTX(_I->second, fn.c_str());
                     }
@@ -800,7 +849,8 @@ bool EScene::LoadLTX(LPCSTR map_name, bool bUndo)
             }
         }
 
-        if (ini.section_exist("snap_objects")) {
+        if (ini.section_exist("snap_objects"))
+        {
             CInifile::Sect& S = ini.r_section("snap_objects");
             CInifile::SectCIt Si = S.Data.begin();
             CInifile::SectCIt Se = S.Data.end();
@@ -821,7 +871,8 @@ bool EScene::LoadLTX(LPCSTR map_name, bool bUndo)
 
         SynchronizeObjects();
 
-        if (!bUndo) m_RTFlags.set(flRT_Unsaved | flRT_Modified, FALSE);
+        if (!bUndo)
+            m_RTFlags.set(flRT_Unsaved | flRT_Modified, FALSE);
 
         return true;
     }
@@ -836,13 +887,15 @@ bool EScene::Load(LPCSTR map_name, bool bUndo)
 {
     u32 version = 0;
 
-    if (!map_name || (0 == map_name[0])) return false;
+    if (!map_name || (0 == map_name[0]))
+        return false;
 
     xr_string full_name;
     full_name = map_name;
 
     ELog.Msg(mtInformation, "EScene: loading '%s'", map_name);
-    if (FS.exist(full_name.c_str())) {
+    if (FS.exist(full_name.c_str()))
+    {
         CTimer T;
         T.Start();
 
@@ -851,7 +904,8 @@ bool EScene::Load(LPCSTR map_name, bool bUndo)
         VERIFY(F);
         // Version
         R_ASSERT(F->r_chunk(CHUNK_VERSION, &version));
-        if (version != CURRENT_FILE_VERSION) {
+        if (version != CURRENT_FILE_VERSION)
+        {
             ELog.DlgMsg(mtError, "EScene: unsupported file version. Can't load Level.");
             UI->UpdateScene();
             FS.r_close(F);
@@ -860,7 +914,8 @@ bool EScene::Load(LPCSTR map_name, bool bUndo)
 
         // Lev. ops.
         IReader* LOP = F->open_chunk(CHUNK_LEVELOP);
-        if (LOP) {
+        if (LOP)
+        {
             m_LevelOp.Read(*LOP);
             LOP->close();
         }
@@ -870,7 +925,8 @@ bool EScene::Load(LPCSTR map_name, bool bUndo)
         }
 
         //
-        if (F->find_chunk(CHUNK_CAMERA)) {
+        if (F->find_chunk(CHUNK_CAMERA))
+        {
             Fvector hpb, pos;
             F->r_fvector3(hpb);
             F->r_fvector3(pos);
@@ -878,11 +934,13 @@ bool EScene::Load(LPCSTR map_name, bool bUndo)
             EDevice.m_Camera.SetStyle(EDevice.m_Camera.GetStyle());
         }
 
-        if (F->find_chunk(CHUNK_TOOLS_GUID)) {
+        if (F->find_chunk(CHUNK_TOOLS_GUID))
+        {
             F->r(&m_GUID, sizeof(m_GUID));
         }
 
-        if (F->find_chunk(CHUNK_LEVEL_TAG)) {
+        if (F->find_chunk(CHUNK_LEVEL_TAG))
+        {
             F->r_stringZ(m_OwnerName);
             F->r(&m_CreateTime, sizeof(m_CreateTime));
         }
@@ -894,7 +952,8 @@ bool EScene::Load(LPCSTR map_name, bool bUndo)
 
         DWORD obj_cnt = 0;
 
-        if (F->find_chunk(CHUNK_OBJECT_COUNT)) obj_cnt = F->r_u32();
+        if (F->find_chunk(CHUNK_OBJECT_COUNT))
+            obj_cnt = F->r_u32();
 
         SPBItem* pb = UI->ProgressStart(obj_cnt, "Loading objects...");
         ReadObjectsStream(*F, CHUNK_OBJECT_LIST, OnLoadAppendObject, pb);
@@ -904,15 +963,18 @@ bool EScene::Load(LPCSTR map_name, bool bUndo)
         SceneToolsMapPairIt _E = m_SceneTools.end();
         for (; _I != _E; ++_I)
         {
-            if (_I->second) {
+            if (_I->second)
+            {
                 IReader* chunk = F->open_chunk(CHUNK_TOOLS_DATA + _I->first);
-                if (chunk) {
+                if (chunk)
+                {
                     _I->second->LoadStream(*chunk);
                     chunk->close();
                 }
                 else
                 {
-                    if (!bUndo && _I->second->IsEnabled() && (_I->first != OBJCLASS_DUMMY)) {
+                    if (!bUndo && _I->second->IsEnabled() && (_I->first != OBJCLASS_DUMMY))
+                    {
                         LoadLevelPart(_I->second, LevelPartName(map_name, _I->first).c_str());
                     }
                 }
@@ -920,10 +982,12 @@ bool EScene::Load(LPCSTR map_name, bool bUndo)
         }
 
         // snap list
-        if (F->find_chunk(CHUNK_SNAPOBJECTS)) {
+        if (F->find_chunk(CHUNK_SNAPOBJECTS))
+        {
             shared_str buf;
             int cnt = F->r_u32();
-            if (cnt) {
+            if (cnt)
+            {
                 for (int i = 0; i < cnt; ++i)
                 {
                     F->r_stringZ(buf);
@@ -946,7 +1010,8 @@ bool EScene::Load(LPCSTR map_name, bool bUndo)
 
         SynchronizeObjects();
 
-        if (!bUndo) m_RTFlags.set(flRT_Unsaved | flRT_Modified, FALSE);
+        if (!bUndo)
+            m_RTFlags.set(flRT_Unsaved | flRT_Modified, FALSE);
 
         return true;
     }
@@ -975,11 +1040,13 @@ void EScene::SaveSelection(ObjClassID classfilter, LPCSTR fname)
     F->close_chunk();
 
     m_SaveCache.clear();
-    if (OBJCLASS_DUMMY == classfilter) {
+    if (OBJCLASS_DUMMY == classfilter)
+    {
         SceneToolsMapPairIt _I = m_SceneTools.begin();
         SceneToolsMapPairIt _E = m_SceneTools.end();
         for (; _I != _E; ++_I)
-            if (_I->second && _I->second->IsNeedSave()) {
+            if (_I->second && _I->second->IsNeedSave())
+            {
                 F->open_chunk(CHUNK_TOOLS_DATA + _I->first);
                 _I->second->SaveSelection(m_SaveCache);
                 F->w(m_SaveCache.pointer(), m_SaveCache.size());
@@ -1027,14 +1094,16 @@ bool EScene::LoadSelection(LPCSTR fname)
 
     bool res = true;
 
-    if (FS.exist(full_name.c_str())) {
+    if (FS.exist(full_name.c_str()))
+    {
         SelectObjects(false);
 
         IReader* F = FS.r_open(full_name.c_str());
 
         // Version
         R_ASSERT(F->r_chunk(CHUNK_VERSION, &version));
-        if (version != CURRENT_FILE_VERSION) {
+        if (version != CURRENT_FILE_VERSION)
+        {
             ELog.DlgMsg(mtError, "EScene: unsupported file version. Can't load Level.");
             UI->UpdateScene();
             FS.r_close(F);
@@ -1042,7 +1111,8 @@ bool EScene::LoadSelection(LPCSTR fname)
         }
 
         // Objects
-        if (!ReadObjectsStream(*F, CHUNK_OBJECT_LIST, OnLoadSelectionAppendObject, 0)) {
+        if (!ReadObjectsStream(*F, CHUNK_OBJECT_LIST, OnLoadSelectionAppendObject, 0))
+        {
             ELog.DlgMsg(mtError, "EScene. Failed to load selection.");
             res = false;
         }
@@ -1050,9 +1120,11 @@ bool EScene::LoadSelection(LPCSTR fname)
         SceneToolsMapPairIt _I = m_SceneTools.begin();
         SceneToolsMapPairIt _E = m_SceneTools.end();
         for (; _I != _E; _I++)
-            if (_I->second && _I->second->IsEnabled() && _I->second->IsEditable()) {
+            if (_I->second && _I->second->IsEnabled() && _I->second->IsEditable())
+            {
                 IReader* chunk = F->open_chunk(CHUNK_TOOLS_DATA + _I->first);
-                if (chunk) {
+                if (chunk)
+                {
                     _I->second->LoadSelection(*chunk);
                     chunk->close();
                 }
@@ -1086,7 +1158,8 @@ void EScene::CopySelection(ObjClassID classfilter)
     GlobalUnlock(hmem);
 
     int clipformat = RegisterClipboardFormat("CF_XRAY_CLASS_LIST");
-    if (OpenClipboard(0)) {
+    if (OpenClipboard(0))
+    {
         SetClipboardData(clipformat, hmem);
         CloseClipboard();
     }
@@ -1100,9 +1173,11 @@ void EScene::CopySelection(ObjClassID classfilter)
 void EScene::PasteSelection()
 {
     int clipformat = RegisterClipboardFormat("CF_XRAY_CLASS_LIST");
-    if (OpenClipboard(0)) {
+    if (OpenClipboard(0))
+    {
         HGLOBAL hmem = GetClipboardData(clipformat);
-        if (hmem) {
+        if (hmem)
+        {
             SceneClipData* sceneclipdata = (SceneClipData*)GlobalLock(hmem);
             LoadSelection(sceneclipdata->m_FileName);
             GlobalUnlock(hmem);
@@ -1206,13 +1281,14 @@ void EScene::LoadCompilerError(LPCSTR fn)
     IReader* F = FS.r_open(fn);
     Tools->ClearDebugDraw();
     Fvector pt[3];
-    if (F->find_chunk(10)) {  // lc error (TJ)
+    if (F->find_chunk(10))
+    { // lc error (TJ)
         Tools->m_DebugDraw.m_Points.resize(F->r_u32());
         F->r(Tools->m_DebugDraw.m_Points.begin(),
             sizeof(CLevelTool::SDebugDraw::Point) * Tools->m_DebugDraw.m_Points.size());
     }
     else if (F->find_chunk(0))
-    {  // lc error (TJ)
+    { // lc error (TJ)
         u32 cnt = F->r_u32();
         for (u32 k = 0; k < cnt; k++)
         {
@@ -1230,13 +1306,14 @@ void EScene::LoadCompilerError(LPCSTR fn)
        Tools->m_DebugDraw.AppendLine(pt[0],pt[1],0xff0000ff,false,false); }
         }
     */
-    if (F->find_chunk(12)) {  // lc error (invalid faces)
+    if (F->find_chunk(12))
+    { // lc error (invalid faces)
         Tools->m_DebugDraw.m_WireFaces.resize(F->r_u32());
         F->r(Tools->m_DebugDraw.m_WireFaces.begin(),
             sizeof(CLevelTool::SDebugDraw::Face) * Tools->m_DebugDraw.m_WireFaces.size());
     }
     else if (F->find_chunk(2))
-    {  // lc error (invalid faces)
+    { // lc error (invalid faces)
         u32 cnt = F->r_u32();
         for (u32 k = 0; k < cnt; k++)
         {

@@ -18,10 +18,7 @@ CUIListItemEx::CUIListItemEx(void)
     this->SetColor(color_argb(0, 0, 0, 0));
 }
 
-CUIListItemEx::~CUIListItemEx(void)
-{
-}
-
+CUIListItemEx::~CUIListItemEx(void) {}
 void CUIListItemEx::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
     // inherited::SendMessage(pWnd, msg, pData);
@@ -39,11 +36,7 @@ void CUIListItemEx::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     }
 }
 
-void CUIListItemEx::SetSelectionColor(u32 dwColor)
-{
-    m_dwSelectionColor = dwColor;
-}
-
+void CUIListItemEx::SetSelectionColor(u32 dwColor) { m_dwSelectionColor = dwColor; }
 void CUIListItemEx::Draw()
 {
     //	if (m_bPerformTextLimit)

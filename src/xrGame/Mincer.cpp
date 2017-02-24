@@ -10,26 +10,23 @@
 #include "PHDestroyableNotificate.h"
 #include "actor.h"
 
-CMincer::CMincer(void)
-{
-    m_fActorBlowoutRadiusPercent = 0.5f;
-}
-
-CMincer::~CMincer(void)
-{
-}
+CMincer::CMincer(void) { m_fActorBlowoutRadiusPercent = 0.5f; }
+CMincer::~CMincer(void) {}
 void CMincer::OnStateSwitch(EZoneState new_state)
 {
-    if (m_eZoneState != eZoneStateBlowout && new_state == eZoneStateBlowout) {
+    if (m_eZoneState != eZoneStateBlowout && new_state == eZoneStateBlowout)
+    {
         OBJECT_INFO_VEC_IT it;
         for (it = m_ObjectInfoMap.begin(); m_ObjectInfoMap.end() != it; ++it)
         {
             CPhysicsShellHolder* GO = smart_cast<CPhysicsShellHolder*>((*it).object);
-            if (GO) Telekinesis().activate(GO, m_fThrowInImpulse, m_fTeleHeight, 100000);
+            if (GO)
+                Telekinesis().activate(GO, m_fThrowInImpulse, m_fTeleHeight, 100000);
         }
     }
 
-    if (m_eZoneState == eZoneStateBlowout && new_state != eZoneStateBlowout) {
+    if (m_eZoneState == eZoneStateBlowout && new_state != eZoneStateBlowout)
+    {
         Telekinesis().clear_deactivate();
     }
     inherited::OnStateSwitch(new_state);
@@ -66,7 +63,8 @@ void CMincer::net_Destroy()
 void CMincer::feel_touch_new(IGameObject* O)
 {
     inherited::feel_touch_new(O);
-    if (m_eZoneState == eZoneStateBlowout && (m_dwBlowoutExplosionTime > (u32)m_iStateTime)) {
+    if (m_eZoneState == eZoneStateBlowout && (m_dwBlowoutExplosionTime > (u32)m_iStateTime))
+    {
         CPhysicsShellHolder* GO = smart_cast<CPhysicsShellHolder*>(O);
         Telekinesis().activate(GO, m_fThrowInImpulse, m_fTeleHeight, 100000);
     }
@@ -105,15 +103,11 @@ void CMincer::ThrowInCenter(Fvector& C)
     C.y = Position().y;
 }
 
-void CMincer::Center(Fvector& C) const
-{
-    C.set(Position());
-}
-
+void CMincer::Center(Fvector& C) const { C.set(Position()); }
 void CMincer::NotificateDestroy(CPHDestroyableNotificate* dn)
 {
     Fvector dir;
-    float power = 0.0f;  // can change
+    float power = 0.0f; // can change
     float impulse;
     // if(!m_telekinetics.has_impacts()) return;
 
@@ -121,7 +115,8 @@ void CMincer::NotificateDestroy(CPHDestroyableNotificate* dn)
     CPhysicsShellHolder* obj = dn->PPhysicsShellHolder();
     m_telekinetics.draw_out_impact(dir, impulse);
     CParticlesPlayer* PP = smart_cast<CParticlesPlayer*>(obj);
-    if (PP && *m_torn_particles) {
+    if (PP && *m_torn_particles)
+    {
         PP->StartParticles(m_torn_particles, Fvector().set(0, 1, 0), ID());
     }
     m_tearing_sound.play_at_pos(0, m_telekinetics.Center());
@@ -137,7 +132,8 @@ void CMincer::AffectPullAlife(CEntityAlive* EA, const Fvector& throw_in_dir, flo
     float power = Power(dist, Radius());
     // Fvector dir;
     // dir.random_dir(throw_in_dir,2.f*M_PI);
-    if (!smart_cast<CActor*>(EA)) {
+    if (!smart_cast<CActor*>(EA))
+    {
         Fvector pos_in_bone_space;
         pos_in_bone_space.set(0, 0, 0);
         CreateHit(EA->ID(), ID(), throw_in_dir, power, 0, pos_in_bone_space, 0.0f, m_eHitTypeBlowout);

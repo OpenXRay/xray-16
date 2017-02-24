@@ -17,10 +17,7 @@
 #pragma warning(default : 4267)
 extern class CPHWorld* ph_world;
 static const float torque_factor = 10000000.f;
-CPHFracturesHolder::CPHFracturesHolder()
-{
-    m_has_breaks = false;
-}
+CPHFracturesHolder::CPHFracturesHolder() { m_has_breaks = false; }
 CPHFracturesHolder::~CPHFracturesHolder()
 {
     m_has_breaks = false;
@@ -84,8 +81,9 @@ element_fracture CPHFracturesHolder::SplitFromEnd(CPHElement* element, u16 fract
     // BodyCutForce(new_element_body,default_l_limit,default_w_limit);
     element_fracture ret = mk_pair(new_element, (CShellSplitInfo)(*fract_i));
 
-    if (m_fractures.size() - fracture > 0) {
-        if (new_element->m_fratures_holder == NULL)  // create fractures holder if it was not created before
+    if (m_fractures.size() - fracture > 0)
+    {
+        if (new_element->m_fratures_holder == NULL) // create fractures holder if it was not created before
         {
             new_element->m_fratures_holder = new CPHFracturesHolder();
         }
@@ -102,26 +100,29 @@ void CPHFracturesHolder::PassEndFractures(u16 from, CPHElement* dest)
     u16 begin_geom_num = i_from->m_start_geom_num;
     u16 leaved_geoms = begin_geom_num;
     u16 passed_geoms = end_geom - begin_geom_num;
-    if (i_from == e) return;
+    if (i_from == e)
+        return;
 
-    for (; i != i_from; ++i)  // correct end geoms for fractures leaved in source
+    for (; i != i_from; ++i) // correct end geoms for fractures leaved in source
     {
         u16& cur_end_geom = i->m_end_geom_num;
-        if (cur_end_geom > begin_geom_num) cur_end_geom = cur_end_geom - passed_geoms;
+        if (cur_end_geom > begin_geom_num)
+            cur_end_geom = cur_end_geom - passed_geoms;
     }
 
-    i++;  // omit used fracture;
+    i++; // omit used fracture;
     // these to be passed
-    for (; i != e; i++)  // itterate antil a fracture where geom num > end geom num
+    for (; i != e; i++) // itterate antil a fracture where geom num > end geom num
     {
         u16& cur_end_geom = i->m_end_geom_num;
         u16& cur_geom = i->m_start_geom_num;
-        if (cur_geom >= end_geom) break;
+        if (cur_geom >= end_geom)
+            break;
         cur_end_geom = cur_end_geom - leaved_geoms;
         cur_geom = cur_geom - leaved_geoms;
     }
     FRACTURE_I i_to = i;
-    for (; i != e; ++i)  // correct data in the rest leaved fractures
+    for (; i != e; ++i) // correct data in the rest leaved fractures
     {
         u16& cur_end_geom = i->m_end_geom_num;
         u16& cur_geom = i->m_start_geom_num;
@@ -129,17 +130,18 @@ void CPHFracturesHolder::PassEndFractures(u16 from, CPHElement* dest)
         cur_geom = cur_geom - passed_geoms;
     }
 
-    if (i_from + 1 != i_to)  // insure it!!
+    if (i_from + 1 != i_to) // insure it!!
     {
         CPHFracturesHolder*& dest_fract_holder = dest->m_fratures_holder;
-        if (!dest_fract_holder) dest_fract_holder = new CPHFracturesHolder();
+        if (!dest_fract_holder)
+            dest_fract_holder = new CPHFracturesHolder();
         // pass fractures not including end fracture
         dest_fract_holder->m_fractures.insert(dest_fract_holder->m_fractures.end(), i_from + 1, i_to);
 
         // u16 deb=u16(i_to-i_from-1);
         // deb++;deb--;
     }
-    m_fractures.erase(i_from, i_to);  // erase along whith used fracture
+    m_fractures.erase(i_from, i_to); // erase along whith used fracture
 }
 void CPHFracturesHolder::SplitProcess(CPHElement* element, ELEMENT_PAIR_VECTOR& new_elements)
 {
@@ -148,7 +150,8 @@ void CPHFracturesHolder::SplitProcess(CPHElement* element, ELEMENT_PAIR_VECTOR& 
 
     for (; i != u16(-1); i--)
     {
-        if (m_fractures[i].Breaked()) {
+        if (m_fractures[i].Breaked())
+        {
             // float density = element->getDensity();
             new_elements.push_back(SplitFromEnd(element, i));
             // element->ResetMass(density);
@@ -181,13 +184,15 @@ void CPHFracturesHolder::PhTune(dBodyID body)
     {
         dJointID joint = dBodyGetJoint(body, i);
 
-        if (dJointGetType(joint) == dJointTypeContact) {
+        if (dJointGetType(joint) == dJointTypeContact)
+        {
             dJointSetFeedback(joint, ContactFeedBacks.add());
         }
         else
         {
             CPHJoint* ph_joint = (CPHJoint*)dJointGetData(joint);
-            if (!(ph_joint && ph_joint->JointDestroyInfo())) dJointSetFeedback(joint, ContactFeedBacks.add());
+            if (!(ph_joint && ph_joint->JointDestroyInfo()))
+                dJointSetFeedback(joint, ContactFeedBacks.add());
             // if(!dJointGetFeedback(joint))
             //{
             //	m_feedbacks.push_back(dJointFeedback());
@@ -203,7 +208,8 @@ bool CPHFracturesHolder::PhDataUpdate(CPHElement* element)
     {
         m_has_breaks = i->Update(element) || m_has_breaks;
     }
-    if (!m_has_breaks) m_impacts.clear();
+    if (!m_has_breaks)
+        m_impacts.clear();
     return m_has_breaks;
 }
 
@@ -246,26 +252,28 @@ void CPHFracturesHolder::SubFractureMass(u16 fracture_num)
     dMass& first_mass = fracture->m_firstM;
     for (; f_i != f_e; ++f_i)
     {
-        if (f_i == fracture) continue;
+        if (f_i == fracture)
+            continue;
         R_ASSERT2(start_geom != f_i->m_start_geom_num, "Double fracture!!!");
 
-        if (start_geom > f_i->m_start_geom_num) {
+        if (start_geom > f_i->m_start_geom_num)
+        {
             if (end_geom <= f_i->m_end_geom_num)
-                f_i->MassSubFromSecond(second_mass);  // tag fracture is in current
+                f_i->MassSubFromSecond(second_mass); // tag fracture is in current
             else
             {
                 R_ASSERT2(start_geom >= f_i->m_end_geom_num, "Odd fracture!!!");
-                f_i->MassSubFromFirst(second_mass);  // tag fracture is ouside current
+                f_i->MassSubFromFirst(second_mass); // tag fracture is ouside current
             }
         }
         else
         {
             if (end_geom >= f_i->m_end_geom_num)
-                f_i->MassSubFromFirst(first_mass);  // current fracture is in tag
+                f_i->MassSubFromFirst(first_mass); // current fracture is in tag
             else
             {
                 R_ASSERT2(end_geom <= f_i->m_start_geom_num, "Odd fracture!!!");
-                f_i->MassSubFromFirst(second_mass);  // tag fracture is ouside current
+                f_i->MassSubFromFirst(second_mass); // tag fracture is ouside current
             }
         }
     }
@@ -301,8 +309,8 @@ bool CPHFracture::Update(CPHElement* element)
     // const Fvector& body_local_pos=element->local_mass_Center();
     const Fvector& body_global_pos = *(const Fvector*)dBodyGetPosition(body);
     Fvector body_to_first, body_to_second;
-    body_to_first.set(*((const Fvector*)m_firstM.c));    //,body_local_pos
-    body_to_second.set(*((const Fvector*)m_secondM.c));  //,body_local_pos
+    body_to_first.set(*((const Fvector*)m_firstM.c)); //,body_local_pos
+    body_to_second.set(*((const Fvector*)m_secondM.c)); //,body_local_pos
     // float body_to_first_smag=body_to_first.square_magnitude();
     // float body_to_second_smag=body_to_second.square_magnitude();
     int num = dBodyGetNumJoints(body);
@@ -315,20 +323,24 @@ bool CPHFracture::Update(CPHElement* element)
         dxJoint* b_joint = (dxJoint*)joint;
         bool b_body_second = (b_joint->node[1].body == body);
         Fvector joint_position;
-        if (dJointGetType(joint) == dJointTypeContact) {
+        if (dJointGetType(joint) == dJointTypeContact)
+        {
             dxJointContact* c_joint = (dxJointContact*)joint;
             dGeomID first_geom = c_joint->contact.geom.g1;
             dGeomID second_geom = c_joint->contact.geom.g2;
             joint_position.set(*(Fvector*)c_joint->contact.geom.pos);
-            if (dGeomGetClass(first_geom) == dGeomTransformClass) {
+            if (dGeomGetClass(first_geom) == dGeomTransformClass)
+            {
                 first_geom = dGeomTransformGetGeom(first_geom);
             }
-            if (dGeomGetClass(second_geom) == dGeomTransformClass) {
+            if (dGeomGetClass(second_geom) == dGeomTransformClass)
+            {
                 second_geom = dGeomTransformGetGeom(second_geom);
             }
             dxGeomUserData* UserData;
             UserData = dGeomGetUserData(first_geom);
-            if (UserData) {
+            if (UserData)
+            {
                 u16 el_position = UserData->element_position;
                 // define if the contact applied to second part;
                 if (el_position < element->numberOfGeoms() && el_position >= m_start_geom_num &&
@@ -336,7 +348,8 @@ bool CPHFracture::Update(CPHElement* element)
                     applied_to_second = true;
             }
             UserData = dGeomGetUserData(second_geom);
-            if (UserData) {
+            if (UserData)
+            {
                 u16 el_position = UserData->element_position;
                 if (el_position < element->numberOfGeoms() && el_position >= m_start_geom_num &&
                     el_position < m_end_geom_num && second_geom == element->Geom(el_position)->geometry())
@@ -346,10 +359,12 @@ bool CPHFracture::Update(CPHElement* element)
         else
         {
             CPHJoint* J = (CPHJoint*)dJointGetData(joint);
-            if (!J) continue;  // hack..
+            if (!J)
+                continue; // hack..
             J->PSecondElement()->InterpolateGlobalPosition(&joint_position);
             CODEGeom* root_geom = J->RootGeom();
-            if (root_geom) {
+            if (root_geom)
+            {
                 u16 el_position = root_geom->element_position();
                 if (element == J->PFirst_element() && el_position < element->numberOfGeoms() &&
                     el_position >= m_start_geom_num && el_position < m_end_geom_num)
@@ -359,10 +374,12 @@ bool CPHFracture::Update(CPHElement* element)
         // accomulate forces applied by joints to first and second parts
         Fvector body_to_joint;
         body_to_joint.sub(joint_position, body_global_pos);
-        if (applied_to_second) {
+        if (applied_to_second)
+        {
             Fvector shoulder;
             shoulder.sub(body_to_joint, body_to_second);
-            if (b_body_second) {
+            if (b_body_second)
+            {
                 Fvector joint_force;
                 joint_force.set(*(const Fvector*)feedback->f2);
                 second_part_force.add(joint_force);
@@ -385,7 +402,8 @@ bool CPHFracture::Update(CPHElement* element)
         {
             Fvector shoulder;
             shoulder.sub(body_to_joint, body_to_first);
-            if (b_body_second) {
+            if (b_body_second)
+            {
                 Fvector joint_force;
                 joint_force.set(*(const Fvector*)feedback->f2);
                 first_part_force.add(joint_force);
@@ -410,7 +428,8 @@ bool CPHFracture::Update(CPHElement* element)
     {
         u16 geom = i_i->geom;
 
-        if ((geom >= m_start_geom_num && geom < m_end_geom_num)) {
+        if ((geom >= m_start_geom_num && geom < m_end_geom_num))
+        {
             Fvector force;
             force.set(i_i->force);
             force.mul(ph_console::phRigidBreakWeaponFactor);
@@ -474,7 +493,8 @@ bool CPHFracture::Update(CPHElement* element)
 #ifdef DBG_BREAK
     float btm_dbg = break_torque.magnitude() * ph_console::phBreakCommonFactor / torque_factor;
 #endif
-    if (break_torque.magnitude() * ph_console::phBreakCommonFactor > m_break_torque * torque_factor) {
+    if (break_torque.magnitude() * ph_console::phBreakCommonFactor > m_break_torque * torque_factor)
+    {
         // m_break_torque.set(second_part_torque);
         m_pos_in_element.set(second_part_force);
         m_break_force = second_part_torque.x;
@@ -486,13 +506,13 @@ bool CPHFracture::Update(CPHElement* element)
 #endif
     }
 
-    Fvector break_force;  //=1/(m1+m2)*(F1*m2-F2*m1)+r2xT2/(r2^2)-r1xT1/(r1^2)
+    Fvector break_force; //=1/(m1+m2)*(F1*m2-F2*m1)+r2xT2/(r2^2)-r1xT1/(r1^2)
     break_force.set(first_part_force);
     break_force.mul(m_secondM.mass);
     vtemp.set(second_part_force);
     vtemp.mul(m_firstM.mass);
     break_force.sub(vtemp);
-    break_force.mul(1.f / element->getMass());  // element->getMass()//body->mass.mass
+    break_force.mul(1.f / element->getMass()); // element->getMass()//body->mass.mass
 
     // vtemp.crossproduct(second_in_bone,second_part_torque);
     // break_force.add(vtemp);
@@ -501,7 +521,8 @@ bool CPHFracture::Update(CPHElement* element)
 
     float bfm = break_force.magnitude() * ph_console::phBreakCommonFactor;
 
-    if (m_break_force < bfm) {
+    if (m_break_force < bfm)
+    {
         second_part_force.mul(bfm / m_break_force);
         m_pos_in_element.set(second_part_force);
 
@@ -527,31 +548,12 @@ void CPHFracture::SetMassParts(const dMass& first, const dMass& second)
     m_secondM = second;
 }
 
-void CPHFracture::MassAddToFirst(const dMass& m)
-{
-    dMassAdd(&m_firstM, &m);
-}
-
-void CPHFracture::MassAddToSecond(const dMass& m)
-{
-    dMassAdd(&m_secondM, &m);
-}
-void CPHFracture::MassSubFromFirst(const dMass& m)
-{
-    dMassSub(&m_firstM, &m);
-}
-void CPHFracture::MassSubFromSecond(const dMass& m)
-{
-    dMassSub(&m_secondM, &m);
-}
-void CPHFracture::MassSetFirst(const dMass& m)
-{
-    m_firstM = m;
-}
-void CPHFracture::MassSetSecond(const dMass& m)
-{
-    m_secondM = m;
-}
+void CPHFracture::MassAddToFirst(const dMass& m) { dMassAdd(&m_firstM, &m); }
+void CPHFracture::MassAddToSecond(const dMass& m) { dMassAdd(&m_secondM, &m); }
+void CPHFracture::MassSubFromFirst(const dMass& m) { dMassSub(&m_firstM, &m); }
+void CPHFracture::MassSubFromSecond(const dMass& m) { dMassSub(&m_secondM, &m); }
+void CPHFracture::MassSetFirst(const dMass& m) { m_firstM = m; }
+void CPHFracture::MassSetSecond(const dMass& m) { m_secondM = m; }
 void CPHFracture::MassUnsplitFromFirstToSecond(const dMass& m)
 {
     dMassSub(&m_firstM, &m);

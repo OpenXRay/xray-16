@@ -22,7 +22,8 @@ CTracer::CTracer()
     for (u8 i = 0; i < 255; i++)
     {
         xr_sprintf(LineName, "color_%d", i);
-        if (!pSettings->line_exist("tracers_color_table", LineName)) break;
+        if (!pSettings->line_exist("tracers_color_table", LineName))
+            break;
         u32 clr = pSettings->r_color("tracers_color_table", LineName);
 
         m_aColors.push_back(clr);
@@ -54,18 +55,18 @@ IC void FillSprite_Circle(const Fvector& pos, const float width, const float len
     //	TODO: return code back to indexed rendering since we use quads
     //	Tri 1
     GlobalEnv.UIRender->PushPoint(
-        d.x + pos.x, d.y + pos.y, d.z + pos.z, color, t_crcl.min.x, t_crcl.max.y);  // 0.f,1.f);
+        d.x + pos.x, d.y + pos.y, d.z + pos.z, color, t_crcl.min.x, t_crcl.max.y); // 0.f,1.f);
     GlobalEnv.UIRender->PushPoint(
-        a.x + pos.x, a.y + pos.y, a.z + pos.z, color, t_crcl.min.x, t_crcl.min.y);  // 0.f,0.f);
+        a.x + pos.x, a.y + pos.y, a.z + pos.z, color, t_crcl.min.x, t_crcl.min.y); // 0.f,0.f);
     GlobalEnv.UIRender->PushPoint(
-        c.x + pos.x, c.y + pos.y, c.z + pos.z, color, t_crcl.max.x, t_crcl.max.y);  // 1.f,1.f);
+        c.x + pos.x, c.y + pos.y, c.z + pos.z, color, t_crcl.max.x, t_crcl.max.y); // 1.f,1.f);
     //	Tri 2
     GlobalEnv.UIRender->PushPoint(
-        c.x + pos.x, c.y + pos.y, c.z + pos.z, color, t_crcl.max.x, t_crcl.max.y);  // 1.f,1.f);
+        c.x + pos.x, c.y + pos.y, c.z + pos.z, color, t_crcl.max.x, t_crcl.max.y); // 1.f,1.f);
     GlobalEnv.UIRender->PushPoint(
-        a.x + pos.x, a.y + pos.y, a.z + pos.z, color, t_crcl.min.x, t_crcl.min.y);  // 0.f,0.f);
+        a.x + pos.x, a.y + pos.y, a.z + pos.z, color, t_crcl.min.x, t_crcl.min.y); // 0.f,0.f);
     GlobalEnv.UIRender->PushPoint(
-        b.x + pos.x, b.y + pos.y, b.z + pos.z, color, t_crcl.max.x, t_crcl.min.y);  // 1.f,0.f);
+        b.x + pos.x, b.y + pos.y, b.z + pos.z, color, t_crcl.max.x, t_crcl.min.y); // 1.f,0.f);
 
     // pv->set         (d.x+pos.x,d.y+pos.y,d.z+pos.z, color, 0.f,1.f);        pv++;
     // pv->set         (a.x+pos.x,a.y+pos.y,a.z+pos.z, color, 0.f,0.f);        pv++;
@@ -117,10 +118,12 @@ IC void FillSprite_Line(const Fvector& pos, const Fvector& dir, const float widt
 void CTracer::Render(const Fvector& pos, const Fvector& center, const Fvector& dir, float length, float width,
     u8 colorID, float speed, bool bActor)
 {
-    if (GlobalEnv.Render->ViewBase.testSphere_dirty((Fvector&)center, length * .5f)) {
+    if (GlobalEnv.Render->ViewBase.testSphere_dirty((Fvector&)center, length * .5f))
+    {
         R_ASSERT(colorID < m_aColors.size());
 
-        if (bActor) {
+        if (bActor)
+        {
             float k_speed = speed / 1000.0f;
             //			float f_distance	= Device.vCameraPosition.distance_to(pos);
 

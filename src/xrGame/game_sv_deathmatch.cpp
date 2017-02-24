@@ -34,38 +34,14 @@ BOOL g_sv_dm_bPDAHunt = TRUE;
 u32 g_sv_dm_dwWarmUp_MaxTime = 0;
 BOOL g_sv_dm_bDMIgnore_Money_OnBuy = FALSE;
 //-----------------------------------------------------------------
-BOOL game_sv_Deathmatch::IsDamageBlockIndEnabled()
-{
-    return g_sv_dm_bDamageBlockIndicators;
-};
-s32 game_sv_Deathmatch::GetTimeLimit()
-{
-    return g_sv_dm_dwTimeLimit;
-};
-s32 game_sv_Deathmatch::GetFragLimit()
-{
-    return g_sv_dm_dwFragLimit;
-};
-u32 game_sv_Deathmatch::GetDMBLimit()
-{
-    return g_sv_dm_dwDamageBlockTime;
-};
-u32 game_sv_Deathmatch::GetForceRespawn()
-{
-    return g_sv_dm_dwForceRespawn;
-};
-u32 game_sv_Deathmatch::GetWarmUpTime()
-{
-    return g_sv_dm_dwWarmUp_MaxTime;
-};
-BOOL game_sv_Deathmatch::IsAnomaliesEnabled()
-{
-    return g_sv_dm_bAnomaliesEnabled;
-};
-u32 game_sv_Deathmatch::GetAnomaliesTime()
-{
-    return g_sv_dm_dwAnomalySetLengthTime;
-};
+BOOL game_sv_Deathmatch::IsDamageBlockIndEnabled() { return g_sv_dm_bDamageBlockIndicators; };
+s32 game_sv_Deathmatch::GetTimeLimit() { return g_sv_dm_dwTimeLimit; };
+s32 game_sv_Deathmatch::GetFragLimit() { return g_sv_dm_dwFragLimit; };
+u32 game_sv_Deathmatch::GetDMBLimit() { return g_sv_dm_dwDamageBlockTime; };
+u32 game_sv_Deathmatch::GetForceRespawn() { return g_sv_dm_dwForceRespawn; };
+u32 game_sv_Deathmatch::GetWarmUpTime() { return g_sv_dm_dwWarmUp_MaxTime; };
+BOOL game_sv_Deathmatch::IsAnomaliesEnabled() { return g_sv_dm_bAnomaliesEnabled; };
+u32 game_sv_Deathmatch::GetAnomaliesTime() { return g_sv_dm_dwAnomalySetLengthTime; };
 //-----------------------------------------------------------------
 
 game_sv_Deathmatch::game_sv_Deathmatch() : pure_relcase(&game_sv_Deathmatch::net_Relcase)
@@ -96,7 +72,8 @@ game_sv_Deathmatch::game_sv_Deathmatch() : pure_relcase(&game_sv_Deathmatch::net
 
 game_sv_Deathmatch::~game_sv_Deathmatch()
 {
-    if (!m_AnomalySetsList.empty()) {
+    if (!m_AnomalySetsList.empty())
+    {
         for (u32 i = 0; i < m_AnomalySetsList.size(); i++)
         {
             m_AnomalySetsList[i].clear();
@@ -104,7 +81,8 @@ game_sv_Deathmatch::~game_sv_Deathmatch()
         m_AnomalySetsList.clear();
     };
 
-    if (!m_AnomalyIDSetsList.empty()) {
+    if (!m_AnomalyIDSetsList.empty())
+    {
         for (u32 i = 0; i < m_AnomalyIDSetsList.size(); i++)
         {
             m_AnomalyIDSetsList[i].clear();
@@ -136,7 +114,8 @@ void game_sv_Deathmatch::RespawnPlayerAsSpectator(IClient* client)
 {
     xrClientData* l_pC = static_cast<xrClientData*>(client);
 
-    if (!l_pC || !l_pC->net_Ready || !l_pC->ps) return;
+    if (!l_pC || !l_pC->net_Ready || !l_pC->ps)
+        return;
 
     game_PlayerState* ps = l_pC->ps;
 
@@ -166,15 +145,18 @@ void game_sv_Deathmatch::OnRoundStart()
 
     m_dwWarmUp_CurTime = 0;
     m_bInWarmUp = false;
-    if (!m_bFastRestart) {
-        if (GetWarmUpTime() != 0) {
+    if (!m_bFastRestart)
+    {
+        if (GetWarmUpTime() != 0)
+        {
             m_dwWarmUp_CurTime = Level().timeServer() + GetWarmUpTime() * 1000;
             m_bInWarmUp = true;
         }
     }
     inherited::OnRoundStart();
 
-    if (IsAnomaliesEnabled()) StartAnomalies();
+    if (IsAnomaliesEnabled())
+        StartAnomalies();
     //-------------------------------------
 
     for (int i = 0; i < TEAM_COUNT; ++i)
@@ -202,8 +184,10 @@ void game_sv_Deathmatch::OnRoundEnd()
             {
                 xrClientData* l_pC = static_cast<xrClientData*>(client);
                 game_PlayerState* ps = l_pC->ps;
-                if (!ps) return;
-                if (ps->IsSkip()) return;
+                if (!ps)
+                    return;
+                if (ps->IsSkip())
+                    return;
                 m_owner->SpawnPlayer(client->ID, "spectator");
             }
         };
@@ -223,26 +207,30 @@ void game_sv_Deathmatch::OnPlayerKillPlayer(game_PlayerState* ps_killer, game_Pl
 
     signal_Syncronize();
 
-    if (!ps_killed || !ps_killer) return;
+    if (!ps_killed || !ps_killer)
+        return;
 
     KILL_RES KillRes = GetKillResult(ps_killer, ps_killed);
     bool CanGiveBonus = OnKillResult(KillRes, ps_killer, ps_killed);
 
     Game().m_WeaponUsageStatistic->OnPlayerKillPlayer(ps_killer, KillType, SpecialKillType);
 
-    if (CanGiveBonus) OnGiveBonus(KillRes, ps_killer, ps_killed, KillType, SpecialKillType, pWeaponA);
+    if (CanGiveBonus)
+        OnGiveBonus(KillRes, ps_killer, ps_killed, KillType, SpecialKillType, pWeaponA);
 }
 
 void game_sv_Deathmatch::Processing_Victim(game_PlayerState* pVictim, game_PlayerState* pKiller)
 {
-    if (!pVictim) return;
+    if (!pVictim)
+        return;
 
     pVictim->setFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD);
     pVictim->m_iDeaths++;
     pVictim->m_iKillsInRowCurr = 0;
     pVictim->DeathTime = Device.dwTimeGlobal;
 
-    if (!pKiller) {
+    if (!pKiller)
+    {
         pVictim->m_iSelfKills++;
     }
 
@@ -261,15 +249,18 @@ void game_sv_Deathmatch::Victim_Exp(game_PlayerState* pVictim)
 
 KILL_RES game_sv_Deathmatch::GetKillResult(game_PlayerState* pKiller, game_PlayerState* pVictim)
 {
-    if (!pKiller || !pVictim) return KR_NONE;
+    if (!pKiller || !pVictim)
+        return KR_NONE;
 
-    if (pKiller == pVictim) return KR_SELF;
+    if (pKiller == pVictim)
+        return KR_SELF;
     return KR_RIVAL;
 };
 
 bool game_sv_Deathmatch::OnKillResult(KILL_RES KillResult, game_PlayerState* pKiller, game_PlayerState* pVictim)
 {
-    if (!pKiller || !pVictim) return false;
+    if (!pKiller || !pVictim)
+        return false;
     bool res = true;
     TeamStruct* pTeam = GetTeamData(u8(pKiller->team));
     switch (KillResult)
@@ -282,7 +273,8 @@ bool game_sv_Deathmatch::OnKillResult(KILL_RES KillResult, game_PlayerState* pKi
         //.			pKiller->kills -= 1;
         pKiller->m_iSelfKills++;
 
-        if (pTeam) Player_AddMoney(pKiller, pTeam->m_iM_KillSelf);
+        if (pTeam)
+            Player_AddMoney(pKiller, pTeam->m_iM_KillSelf);
 
         res = false;
     }
@@ -293,7 +285,8 @@ bool game_sv_Deathmatch::OnKillResult(KILL_RES KillResult, game_PlayerState* pKi
         pKiller->m_iRivalKills++;
         pKiller->m_iKillsInRowCurr++;
         pKiller->m_iKillsInRowMax = _max(pKiller->m_iKillsInRowCurr, pKiller->m_iKillsInRowMax);
-        if (pTeam) {
+        if (pTeam)
+        {
             s32 ResMoney = pTeam->m_iM_KillRival;
 
             if (pKiller->testFlag(GAME_PLAYER_FLAG_INVINCIBLE))
@@ -313,7 +306,8 @@ bool game_sv_Deathmatch::OnKillResult(KILL_RES KillResult, game_PlayerState* pKi
 void game_sv_Deathmatch::OnGiveBonus(KILL_RES KillResult, game_PlayerState* pKiller, game_PlayerState* pVictim,
     KILL_TYPE KillType, SPECIAL_KILL_TYPE SpecialKillType, CSE_Abstract* pWeaponA)
 {
-    if (!pKiller) return;
+    if (!pKiller)
+        return;
     switch (KillResult)
     {
     case KR_RIVAL:
@@ -346,7 +340,8 @@ void game_sv_Deathmatch::OnGiveBonus(KILL_RES KillResult, game_PlayerState* pKil
             break;
             default:
             {
-                if (pWeaponA) {
+                if (pWeaponA)
+                {
                     switch (pWeaponA->m_tClassID)
                     {
                     case CLSID_OBJECT_W_KNIFE:
@@ -367,7 +362,8 @@ void game_sv_Deathmatch::OnGiveBonus(KILL_RES KillResult, game_PlayerState* pKil
         break;
         };
 
-        if (pKiller->m_iKillsInRowCurr) {
+        if (pKiller->m_iKillsInRowCurr)
+        {
             string64 tmpStr;
             xr_sprintf(tmpStr, "%d_kill_in_row", pKiller->m_iKillsInRowCurr);
             Player_AddBonusMoney(pKiller, READ_IF_EXISTS(pSettings, r_s32, "mp_bonus_money", tmpStr, 0), SKT_KIR,
@@ -396,8 +392,10 @@ game_PlayerState* game_sv_Deathmatch::GetWinningPlayer()
         {
             xrClientData* l_pC = static_cast<xrClientData*>(client);
             game_PlayerState* ps = l_pC->ps;
-            if (!ps) return;
-            if (ps->frags() > MaxFrags) {
+            if (!ps)
+                return;
+            if (ps->frags() > MaxFrags)
+            {
                 MaxFrags = ps->frags();
                 res = ps;
             }
@@ -411,7 +409,8 @@ game_PlayerState* game_sv_Deathmatch::GetWinningPlayer()
 void game_sv_Deathmatch::OnPlayerScores()
 {
     game_PlayerState* pWinner = GetWinningPlayer();
-    if (pWinner) {
+    if (pWinner)
+    {
         pWinnigPlayerName = pWinner->getName();
         m_phase = GAME_PHASE_PLAYER_SCORES;
         switch_Phase(m_phase);
@@ -451,16 +450,20 @@ void game_sv_Deathmatch::Update()
 
         check_for_Anomalies();
 
-        if (m_bSpectatorMode) {
+        if (m_bSpectatorMode)
+        {
             if (!m_pSM_CurViewEntity || !smart_cast<CActor*>(m_pSM_CurViewEntity) ||
                 m_dwSM_LastSwitchTime < Level().timeServer())
                 SM_SwitchOnNextActivePlayer();
             CUIGameDM* GameDM = NULL;
-            if (CurrentGameUI()) GameDM = smart_cast<CUIGameDM*>(CurrentGameUI());
+            if (CurrentGameUI())
+                GameDM = smart_cast<CUIGameDM*>(CurrentGameUI());
 
-            if (GameDM) {
+            if (GameDM)
+            {
                 IGameObject* pObject = Level().CurrentViewEntity();
-                if (pObject && smart_cast<CActor*>(pObject)) {
+                if (pObject && smart_cast<CActor*>(pObject))
+                {
                     string1024 Text;
                     xr_sprintf(Text, "Following %s", pObject->cName().c_str());
 
@@ -480,8 +483,9 @@ void game_sv_Deathmatch::Update()
     break;
     case GAME_PHASE_PLAYER_SCORES:
     {
-        if (m_delayedRoundEnd && m_roundEndDelay < Device.TimerAsync()) {
-            OnRoundEnd();  // eRoundEnd_Finish
+        if (m_delayedRoundEnd && m_roundEndDelay < Device.TimerAsync())
+        {
+            OnRoundEnd(); // eRoundEnd_Finish
         }
     }
     break;
@@ -493,7 +497,7 @@ INT g_sv_Wait_For_Players_Ready = 1;
 
 bool game_sv_Deathmatch::checkForRoundStart()
 {
-    if (!Level().m_bGameConfigStarted)  // in case of starting server stage (net_start 1..6) we can't do restart ....
+    if (!Level().m_bGameConfigStarted) // in case of starting server stage (net_start 1..6) we can't do restart ....
         return false;
 
     if (m_bFastRestart ||
@@ -503,12 +507,14 @@ bool game_sv_Deathmatch::checkForRoundStart()
 #endif
                                    (((Level().timeServer() - StartTime())) > u32(g_sv_Pending_Wait_Time)))))
     {
-        if (!HasMapRotation() || !SwitchToNextMap()) {
+        if (!HasMapRotation() || !SwitchToNextMap())
+        {
             OnRoundStart();
         }
         else
         {
-            if (!OnNextMap()) {
+            if (!OnNextMap())
+            {
             };
         };
         return true;
@@ -519,9 +525,12 @@ bool game_sv_Deathmatch::checkForRoundStart()
 
 bool game_sv_Deathmatch::checkForTimeLimit()
 {
-    if (m_dwWarmUp_CurTime != 0 || m_bInWarmUp) return false;
-    if (GetTimeLimit() && ((Level().timeServer() - StartTime())) > u32(GetTimeLimit() * 60000)) {
-        if (!HasChampion()) return false;
+    if (m_dwWarmUp_CurTime != 0 || m_bInWarmUp)
+        return false;
+    if (GetTimeLimit() && ((Level().timeServer() - StartTime())) > u32(GetTimeLimit() * 60000))
+    {
+        if (!HasChampion())
+            return false;
         OnTimelimitExceed();
         return true;
     };
@@ -530,20 +539,24 @@ bool game_sv_Deathmatch::checkForTimeLimit()
 
 bool game_sv_Deathmatch::checkForFragLimit()
 {
-    if (g_sv_dm_dwFragLimit) {
+    if (g_sv_dm_dwFragLimit)
+    {
         struct frag_limit_searcher
         {
             bool operator()(IClient* client)
             {
                 xrClientData* tmp_client = static_cast<xrClientData*>(client);
                 game_PlayerState* ps = tmp_client->ps;
-                if (!ps) return false;
-                if (ps->frags() >= g_sv_dm_dwFragLimit) return true;
+                if (!ps)
+                    return false;
+                if (ps->frags() >= g_sv_dm_dwFragLimit)
+                    return true;
                 return false;
             }
         };
         frag_limit_searcher tmp_predicate;
-        if (m_server->FindClient(tmp_predicate) != NULL) {
+        if (m_server->FindClient(tmp_predicate) != NULL)
+        {
             OnFraglimitExceed();
             return true;
         }
@@ -553,10 +566,13 @@ bool game_sv_Deathmatch::checkForFragLimit()
 
 bool game_sv_Deathmatch::checkForRoundEnd()
 {
-    if (m_dwWarmUp_CurTime != 0 || m_bInWarmUp) return false;
-    if (checkForTimeLimit()) return true;
+    if (m_dwWarmUp_CurTime != 0 || m_bInWarmUp)
+        return false;
+    if (checkForTimeLimit())
+        return true;
 
-    if (checkForFragLimit()) return true;
+    if (checkForFragLimit())
+        return true;
 
     return false;
 }
@@ -568,15 +584,18 @@ void game_sv_Deathmatch::SM_SwitchOnNextActivePlayer()
         xrClientData* PossiblePlayers[MAX_PLAYERS_COUNT];
         u32 PPlayersCount;
         next_active_player_switcher() { PPlayersCount = 0; }
-
         void operator()(IClient* client)
         {
             xrClientData* l_pC = static_cast<xrClientData*>(client);
             game_PlayerState* ps = l_pC->ps;
-            if (!ps) return;
-            if (!l_pC->net_Ready) return;
-            if (ps->IsSkip()) return;
-            if (ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) return;
+            if (!ps)
+                return;
+            if (!l_pC->net_Ready)
+                return;
+            if (ps->IsSkip())
+                return;
+            if (ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
+                return;
             PossiblePlayers[PPlayersCount++] = l_pC;
         };
     };
@@ -584,7 +603,8 @@ void game_sv_Deathmatch::SM_SwitchOnNextActivePlayer()
     m_server->ForEachClientDo(tmp_functor);
 
     IGameObject* pNewObject = NULL;
-    if (!tmp_functor.PPlayersCount) {
+    if (!tmp_functor.PPlayersCount)
+    {
         xrClientData* C = (xrClientData*)m_server->GetServerClient();
         pNewObject = Level().Objects.net_Find(C->ps->GameID);
     }
@@ -595,7 +615,8 @@ void game_sv_Deathmatch::SM_SwitchOnNextActivePlayer()
         pNewObject = Level().Objects.net_Find(C->ps->GameID);
         CActor* pActor = smart_cast<CActor*>(pNewObject);
 
-        if (!pActor || !pActor->g_Alive() || !pActor->inventory().ActiveItem()) return;
+        if (!pActor || !pActor->g_Alive() || !pActor->inventory().ActiveItem())
+            return;
     };
     SM_SwitchOnPlayer(pNewObject);
 };
@@ -604,23 +625,28 @@ void game_sv_Deathmatch::SM_SwitchOnNextActivePlayer()
 
 void game_sv_Deathmatch::net_Relcase(IGameObject* O)
 {
-    if (m_pSM_CurViewEntity == O) m_pSM_CurViewEntity = NULL;
+    if (m_pSM_CurViewEntity == O)
+        m_pSM_CurViewEntity = NULL;
 }
 
 void game_sv_Deathmatch::SM_SwitchOnPlayer(IGameObject* pNewObject)
 {
-    if (!pNewObject) return;
+    if (!pNewObject)
+        return;
 
     Level().SetEntity(pNewObject);
 
-    if (pNewObject != m_pSM_CurViewEntity) {
+    if (pNewObject != m_pSM_CurViewEntity)
+    {
         CActor* pActor = smart_cast<CActor*>(m_pSM_CurViewEntity);
 
-        if (pActor) pActor->inventory().Items_SetCurrentEntityHud(false);
+        if (pActor)
+            pActor->inventory().Items_SetCurrentEntityHud(false);
     }
 
     CActor* pActor = smart_cast<CActor*>(pNewObject);
-    if (pActor) {
+    if (pActor)
+    {
         pActor->inventory().Items_SetCurrentEntityHud(true);
         /*
                 CHudItem* pHudItem = smart_cast<CHudItem*>(pActor->inventory().ActiveItem());
@@ -638,7 +664,8 @@ void game_sv_Deathmatch::SM_SwitchOnPlayer(IGameObject* pNewObject)
 
 BOOL game_sv_Deathmatch::AllPlayers_Ready()
 {
-    if (!m_server->GetServerClient()) return FALSE;
+    if (!m_server->GetServerClient())
+        return FALSE;
     // Check if all players ready
     u32 cnt = get_players_count();
     struct ready_counter
@@ -646,20 +673,23 @@ BOOL game_sv_Deathmatch::AllPlayers_Ready()
         u32 ready;
         ClientID serverClientID;
         ready_counter() { ready = 0; }
-
         void operator()(IClient* client)
         {
             xrClientData* l_pC = static_cast<xrClientData*>(client);
             game_PlayerState* ps = l_pC->ps;
-            if (!ps) return;
+            if (!ps)
+                return;
 
-            if (!l_pC->net_Ready) {
-                if (l_pC->ID == serverClientID) {
+            if (!l_pC->net_Ready)
+            {
+                if (l_pC->ID == serverClientID)
+                {
                     return;
                 }
                 ++ready;
             };
-            if (ps->testFlag(GAME_PLAYER_FLAG_SPECTATOR)) {
+            if (ps->testFlag(GAME_PLAYER_FLAG_SPECTATOR))
+            {
                 ++ready;
                 return;
             }
@@ -672,7 +702,8 @@ BOOL game_sv_Deathmatch::AllPlayers_Ready()
     ready_counter tmp_functor;
     tmp_functor.serverClientID = m_server->GetServerClient()->ID;
     m_server->ForEachClientDo(tmp_functor);
-    if (tmp_functor.ready == cnt && tmp_functor.ready != 0) return TRUE;
+    if (tmp_functor.ready == cnt && tmp_functor.ready != 0)
+        return TRUE;
     return FALSE;
 };
 
@@ -683,8 +714,10 @@ void game_sv_Deathmatch::OnPlayerReady(ClientID id)
     case GAME_PHASE_PENDING:
     {
         game_PlayerState* ps = get_id(id);
-        if (ps) {
-            if (ps->testFlag(GAME_PLAYER_FLAG_READY)) {
+        if (ps)
+        {
+            if (ps->testFlag(GAME_PLAYER_FLAG_READY))
+            {
                 ps->resetFlag(GAME_PLAYER_FLAG_READY);
             }
             else
@@ -699,22 +732,28 @@ void game_sv_Deathmatch::OnPlayerReady(ClientID id)
     {
         xrClientData* xrCData = (xrClientData*)m_server->ID_to_client(id);
         game_PlayerState* ps = get_id(id);
-        if (ps->IsSkip()) break;
+        if (ps->IsSkip())
+            break;
 
-        if (!(ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))) break;
-        if (ps->testFlag(GAME_PLAYER_FLAG_SPECTATOR)) break;
+        if (!(ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)))
+            break;
+        if (ps->testFlag(GAME_PLAYER_FLAG_SPECTATOR))
+            break;
 
         xrClientData* xrSCData = (xrClientData*)m_server->GetServerClient();
 
-        if (xrSCData && xrSCData->ID == id && m_bSpectatorMode) {
+        if (xrSCData && xrSCData->ID == id && m_bSpectatorMode)
+        {
             SM_SwitchOnNextActivePlayer();
             return;
         }
         //------------------------------------------------------------
         CSE_Abstract* pOwner = xrCData->owner;
         CSE_Spectator* pS = smart_cast<CSE_Spectator*>(pOwner);
-        if (pS) {
-            if (xrSCData->ps->DeathTime + 1000 > Device.dwTimeGlobal) {
+        if (pS)
+        {
+            if (xrSCData->ps->DeathTime + 1000 > Device.dwTimeGlobal)
+            {
                 //					return;
             }
         }
@@ -722,7 +761,8 @@ void game_sv_Deathmatch::OnPlayerReady(ClientID id)
         RespawnPlayer(id, false);
         pOwner = xrCData->owner;
         CSE_ALifeCreatureActor* pA = smart_cast<CSE_ALifeCreatureActor*>(pOwner);
-        if (pA) {
+        if (pA)
+        {
             SpawnWeaponsForActor(pOwner, ps);
             //---------------------------------------
             Check_ForClearRun(ps);
@@ -738,28 +778,26 @@ void game_sv_Deathmatch::OnPlayerDisconnect(ClientID id_who, LPSTR Name, u16 Gam
     inherited::OnPlayerDisconnect(id_who, Name, GameID);
 };
 
-u32 game_sv_Deathmatch::RP_2_Use(CSE_Abstract* E)
-{
-    return 0;
-};
-
+u32 game_sv_Deathmatch::RP_2_Use(CSE_Abstract* E) { return 0; };
 void game_sv_Deathmatch::assign_RP(CSE_Abstract* E, game_PlayerState* ps_who)
 {
     VERIFY(E);
     u32 Team = RP_2_Use(E);
 #ifdef DEBUG
     Msg("--- Deathmatch RPoint for %s uses team %d", ps_who->getName(), Team);
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
     VERIFY(rpoints[Team].size());
 
     CSE_Spectator* pSpectator = smart_cast<CSE_Spectator*>(E);
-    if (pSpectator) {
+    if (pSpectator)
+    {
         inherited::assign_RP(E, ps_who);
         return;
     };
 
     CSE_ALifeCreatureActor* pA = smart_cast<CSE_ALifeCreatureActor*>(E);
-    if (!pA) {
+    if (!pA)
+    {
         inherited::assign_RP(E, ps_who);
         return;
     };
@@ -777,8 +815,10 @@ void game_sv_Deathmatch::assign_RP(CSE_Abstract* E, game_PlayerState* ps_who)
         {
             xrClientData* tmp_client = static_cast<xrClientData*>(client);
             game_PlayerState* ps = tmp_client->ps;
-            if (!ps) return;
-            if (ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) return;
+            if (!ps)
+                return;
+            if (ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
+                return;
             if (ps->team == pA->s_team && !m_owner->teams.empty())
                 pFriends.push_back(tmp_client);
             else
@@ -791,10 +831,12 @@ void game_sv_Deathmatch::assign_RP(CSE_Abstract* E, game_PlayerState* ps_who)
     m_server->ForEachClientDo(tmp_functor);
 
     //-------------------------------------------------------------------------------
-    if (m_vFreeRPoints[Team].empty()) {
+    if (m_vFreeRPoints[Team].empty())
+    {
         for (u32 i = 0; i < rp.size(); i++)
         {
-            if (i == m_dwLastRPoints[Team] && rp.size() > 1) continue;
+            if (i == m_dwLastRPoints[Team] && rp.size() > 1)
+                continue;
             m_vFreeRPoints[Team].push_back(i);
         }
     };
@@ -811,12 +853,14 @@ void game_sv_Deathmatch::assign_RP(CSE_Abstract* E, game_PlayerState* ps_who)
         for (u32 e = 0; e < tmp_functor.pEnemies.size(); e++)
         {
             xrClientData* xrCData = tmp_functor.pEnemies[e];
-            if (!xrCData || !xrCData->owner) continue;
+            if (!xrCData || !xrCData->owner)
+                continue;
 
             CSE_Abstract* pOwner = xrCData->owner;
             float Dist = r.P.distance_to_sqr(pOwner->o_Position);
 
-            if (MinEnemyDist > Dist) MinEnemyDist = Dist;
+            if (MinEnemyDist > Dist)
+                MinEnemyDist = Dist;
         };
         tmpPoints.push_back(RPointData(i, MinEnemyDist, false));
     }
@@ -837,42 +881,53 @@ void game_sv_Deathmatch::assign_RP(CSE_Abstract* E, game_PlayerState* ps_who)
 
 bool game_sv_Deathmatch::IsBuyableItem(LPCSTR ItemName)
 {
-    if (m_strWeaponsData->GetItemIdx(ItemName) == u32(-1)) return false;
+    if (m_strWeaponsData->GetItemIdx(ItemName) == u32(-1))
+        return false;
     return true;
 };
 
 void game_sv_Deathmatch::CheckItem(game_PlayerState* ps, PIItem pItem, xr_vector<s16>* pItemsDesired,
     xr_vector<u16>* pItemsToDelete, bool ExactMatch = false)
 {
-    if (!pItem || !pItemsDesired || !pItemsToDelete) return;
+    if (!pItem || !pItemsDesired || !pItemsToDelete)
+        return;
 
-    if (m_strWeaponsData->GetItemIdx(pItem->object().cNameSect()) == u32(-1)) return;
+    if (m_strWeaponsData->GetItemIdx(pItem->object().cNameSect()) == u32(-1))
+        return;
     //-------------------------------------------
     bool found = false;
     for (u32 it = 0; it < pItemsDesired->size(); it++)
     {
         s16 ItemID = (*pItemsDesired)[it];
-        if ((ItemID & 0x00ff) != u16(m_strWeaponsData->GetItemIdx(pItem->object().cNameSect()))) continue;
+        if ((ItemID & 0x00ff) != u16(m_strWeaponsData->GetItemIdx(pItem->object().cNameSect())))
+            continue;
 
         found = true;
         CWeaponAmmo* pAmmo = smart_cast<CWeaponAmmo*>(pItem);
-        if (pAmmo) {
-            if (pAmmo->m_boxCurr != pAmmo->m_boxSize) break;
+        if (pAmmo)
+        {
+            if (pAmmo->m_boxCurr != pAmmo->m_boxSize)
+                break;
         };
         //----- Check for Addon Changes ---------------------
         CWeapon* pWeapon = smart_cast<CWeapon*>(pItem);
-        if (pWeapon) {
+        if (pWeapon)
+        {
             u8 OldAddons = pWeapon->GetAddonsState();
             u8 NewAddons = u8((ItemID & 0xff00) >> 0x08) /*u8(ItemID&0x00ff)>>0x05*/;
-            if (ExactMatch) {
-                if (OldAddons != NewAddons) {
+            if (ExactMatch)
+            {
+                if (OldAddons != NewAddons)
+                {
                     found = false;
                     continue;
                 }
             }
-            if (OldAddons != NewAddons) {
+            if (OldAddons != NewAddons)
+            {
                 CSE_ALifeItemWeapon* pSWeapon = smart_cast<CSE_ALifeItemWeapon*>(get_entity_from_eid(pWeapon->ID()));
-                if (pSWeapon) {
+                if (pSWeapon)
+                {
                     pSWeapon->m_addon_flags.zero();
                     pSWeapon->m_addon_flags.set(NewAddons, TRUE);
                 }
@@ -887,7 +942,8 @@ void game_sv_Deathmatch::CheckItem(game_PlayerState* ps, PIItem pItem, xr_vector
         pItemsDesired->erase(pItemsDesired->begin() + it);
         break;
     };
-    if (found) return;
+    if (found)
+        return;
     pItemsToDelete->push_back(pItem->object().ID());
 };
 
@@ -919,7 +975,8 @@ void game_sv_Deathmatch::OnPlayerBuyFinished(ClientID id_who, NET_Packet& P)
         ps->pItemList.push_back((tempGroupId << 8) | tempItemId);
     }
 
-    if (ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) {
+    if (ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
+    {
         /*TGameIDToBoughtFlag::iterator buyer_iter = m_dead_buyers.find(id_who);
         if (buyer_iter != m_dead_buyers.end())
             buyer_iter->second = 1;
@@ -1014,16 +1071,18 @@ void game_sv_Deathmatch::SpawnWeaponsForActor(CSE_Abstract* pE, game_PlayerState
 {
     CSE_ALifeCreatureActor* pA = smart_cast<CSE_ALifeCreatureActor*>(pE);
     R_ASSERT2(pA, "Owner not a Actor");
-    if (!pA) return;
+    if (!pA)
+        return;
 
-    if (!(ps->team < s16(TeamList.size()))) return;
+    if (!(ps->team < s16(TeamList.size())))
+        return;
 
     while (ps->pItemList.size())
     {
         u16 ItemID = ps->pItemList.front();
 #ifdef DEBUG
         Msg("--- Server: spawning item [%d] for actor [%s]", ItemID, ps->getName());
-#endif  // #ifdef DEBUG
+#endif // #ifdef DEBUG
         SpawnWeapon4Actor(
             pA->ID, *m_strWeaponsData->GetItemName(ItemID & 0x00FF), u8((ItemID & 0xFF00) >> 0x08), ps->pItemList);
         // Game().m_WeaponUsageStatistic->OnWeaponBought(ps, *m_strWeaponsData->GetItemName(ItemID& 0x00FF));
@@ -1048,7 +1107,8 @@ void game_sv_Deathmatch::LoadSkinsForTeam(const shared_str& caSection, TEAM_SKIN
     pTeamSkins->clear();
 
     // Имя поля
-    if (!pSettings->line_exist(caSection, "skins")) return;
+    if (!pSettings->line_exist(caSection, "skins"))
+        return;
 
     // Читаем данные этого поля
     xr_strcpy(Skins, pSettings->r_string(caSection, "skins"));
@@ -1072,7 +1132,8 @@ void game_sv_Deathmatch::LoadDefItemsForTeam(const shared_str& caSection, DEF_IT
     pDefItems->clear();
 
     // Имя поля
-    if (!pSettings->line_exist(caSection, "default_items")) return;
+    if (!pSettings->line_exist(caSection, "default_items"))
+        return;
 
     // Читаем данные этого поля
     xr_strcpy(DefItems, pSettings->r_string(caSection, "default_items"));
@@ -1087,19 +1148,23 @@ void game_sv_Deathmatch::LoadDefItemsForTeam(const shared_str& caSection, DEF_IT
 
 void game_sv_Deathmatch::SetSkin(CSE_Abstract* E, u16 Team, u16 ID)
 {
-    if (!E) return;
+    if (!E)
+        return;
     //-------------------------------------------
     CSE_Visual* pV = smart_cast<CSE_Visual*>(E);
-    if (!pV) return;
+    if (!pV)
+        return;
     //-------------------------------------------
     string256 SkinName;
     xr_strcpy(SkinName, pSettings->r_string("mp_skins_path", "skin_path"));
     //загружены ли скины для этой комманды
     //	if (SkinID != -1) ID = u16(SkinID);
 
-    if (!TeamList.empty() && TeamList.size() > Team && !TeamList[Team].aSkins.empty()) {
+    if (!TeamList.empty() && TeamList.size() > Team && !TeamList[Team].aSkins.empty())
+    {
         //загружено ли достаточно скинов для этой комманды
-        if (TeamList[Team].aSkins.size() > ID) {
+        if (TeamList[Team].aSkins.size() > ID)
+        {
             xr_strcat(SkinName, TeamList[Team].aSkins[ID].c_str());
         }
         else
@@ -1128,7 +1193,8 @@ void game_sv_Deathmatch::OnPlayerHitPlayer_Case(game_PlayerState* ps_hitter, gam
 {
     // if (pHitS->hit_type != ALife::eHitTypePhysicStrike)
     //{
-    if (ps_hitted->testFlag(GAME_PLAYER_FLAG_INVINCIBLE)) {
+    if (ps_hitted->testFlag(GAME_PLAYER_FLAG_INVINCIBLE))
+    {
         pHitS->power = 0;
         pHitS->impulse = 0;
     }
@@ -1140,13 +1206,16 @@ void game_sv_Deathmatch::OnPlayerHitPlayer(u16 id_hitter, u16 id_hitted, NET_Pac
     CSE_Abstract* e_hitter = get_entity_from_eid(id_hitter);
     CSE_Abstract* e_hitted = get_entity_from_eid(id_hitted);
 
-    if (!e_hitter || !e_hitted) return;
-    if (!smart_cast<CSE_ALifeCreatureActor*>(e_hitted)) return;
+    if (!e_hitter || !e_hitted)
+        return;
+    if (!smart_cast<CSE_ALifeCreatureActor*>(e_hitted))
+        return;
 
     game_PlayerState* ps_hitter = get_eid(id_hitter);
     game_PlayerState* ps_hitted = get_eid(id_hitted);
 
-    if (!ps_hitter || !ps_hitted) return;
+    if (!ps_hitter || !ps_hitted)
+        return;
 
     SHit HitS;
     HitS.Read_Packet(P);
@@ -1156,7 +1225,8 @@ void game_sv_Deathmatch::OnPlayerHitPlayer(u16 id_hitter, u16 id_hitted, NET_Pac
     OnPlayerHitPlayer_Case(ps_hitter, ps_hitted, &HitS);
 
     //---------------------------------------
-    if (HitS.power > 0) {
+    if (HitS.power > 0)
+    {
         ps_hitted->lasthitter = ps_hitter->GameID;
         ps_hitted->lasthitweapon = HitS.weaponID;
     };
@@ -1167,7 +1237,8 @@ void game_sv_Deathmatch::OnPlayerHitPlayer(u16 id_hitter, u16 id_hitted, NET_Pac
 void game_sv_Deathmatch::LoadTeams()
 {
     m_sBaseWeaponCostSection._set("deathmatch_base_cost");
-    if (!pSettings->section_exist(m_sBaseWeaponCostSection)) {
+    if (!pSettings->section_exist(m_sBaseWeaponCostSection))
+    {
         R_ASSERT2(0, "No section for base weapon cost for this type of the Game!");
         return;
     };
@@ -1179,7 +1250,8 @@ void game_sv_Deathmatch::LoadTeams()
 
 s32 game_sv_Deathmatch::GetMoneyAmount(const shared_str& caSection, char* caMoneyStr)
 {
-    if (pSettings->line_exist(caSection, caMoneyStr)) return pSettings->r_s32(caSection, caMoneyStr);
+    if (pSettings->line_exist(caSection, caMoneyStr))
+        return pSettings->r_s32(caSection, caMoneyStr);
 
     return 0;
 };
@@ -1194,7 +1266,7 @@ void game_sv_Deathmatch::LoadTeamData(const shared_str& caSection)
     LoadSkinsForTeam(caSection, &NewTeam.aSkins);
     LoadDefItemsForTeam(caSection, /*&NewTeam.aWeapons, */ &NewTeam.aDefaultItems);
     //-------------------------------------------------------------
-    if (pSettings->section_exist(caSection))  // money
+    if (pSettings->section_exist(caSection)) // money
     {
         NewTeam.m_iM_Start = GetMoneyAmount(caSection, "money_start");
         NewTeam.m_iM_OnRespawn = GetMoneyAmount(caSection, "money_respawn");
@@ -1232,13 +1304,15 @@ void game_sv_Deathmatch::LoadTeamData(const shared_str& caSection)
 
 void game_sv_Deathmatch::OnDestroyObject(u16 eid_who)
 {
-    if (eid_who == m_dwSM_CurViewEntity && m_bSpectatorMode) {
+    if (eid_who == m_dwSM_CurViewEntity && m_bSpectatorMode)
+    {
         SM_SwitchOnNextActivePlayer();
     };
 
     for (u32 i = 0; i < m_CorpseList.size();)
     {
-        if (m_CorpseList[i] == eid_who) {
+        if (m_CorpseList[i] == eid_who)
+        {
             m_CorpseList.erase(m_CorpseList.begin() + i);
         }
         else
@@ -1246,12 +1320,15 @@ void game_sv_Deathmatch::OnDestroyObject(u16 eid_who)
     };
 
     CSE_Abstract* entity = get_entity_from_eid(eid_who);
-    if (entity && entity->owner->ps->GameID == eid_who) {
+    if (entity && entity->owner->ps->GameID == eid_who)
+    {
         xrClientData* xrCData = entity->owner;
         //		game_PlayerState* ps = entity->owner->ps;
-        if (Phase() == GAME_PHASE_INPROGRESS) {
+        if (Phase() == GAME_PHASE_INPROGRESS)
+        {
             CSE_ALifeCreatureActor* A = smart_cast<CSE_ALifeCreatureActor*>(entity);
-            if (A) {
+            if (A)
+            {
                 SpawnPlayer(xrCData->ID, "spectator");
             }
         };
@@ -1262,22 +1339,28 @@ void game_sv_Deathmatch::OnDestroyObject(u16 eid_who)
 void game_sv_Deathmatch::Money_SetStart(ClientID id_who)
 {
     xrClientData* C = (xrClientData*)m_server->ID_to_client(id_who);
-    if (!C || (C->ID != id_who)) return;
+    if (!C || (C->ID != id_who))
+        return;
     game_PlayerState* ps_who = (game_PlayerState*)C->ps;
-    if (!ps_who) return;
+    if (!ps_who)
+        return;
     ps_who->money_for_round = 0;
-    if (ps_who->team < 0) return;
+    if (ps_who->team < 0)
+        return;
     TeamStruct* pTeamData = GetTeamData(u8(ps_who->team));
-    if (!pTeamData) return;
+    if (!pTeamData)
+        return;
     ps_who->money_for_round = pTeamData->m_iM_Start;
 }
 
 void game_sv_Deathmatch::RemoveItemFromActor(CSE_Abstract* pItem)
 {
-    if (!pItem) return;
+    if (!pItem)
+        return;
     //-------------------------------------------------------------
     CSE_ALifeItemWeapon* pWeapon = smart_cast<CSE_ALifeItemWeapon*>(pItem);
-    if (pWeapon) {
+    if (pWeapon)
+    {
     };
     //-------------------------------------------------------------
     NET_Packet P;
@@ -1297,9 +1380,12 @@ void game_sv_Deathmatch::OnTeamScore(u32 Team, bool Minor)
         {
             xrClientData* l_pC = static_cast<xrClientData*>(client);
             game_PlayerState* ps = l_pC->ps;
-            if (!ps) return;
-            if (!l_pC->net_Ready) return;
-            if (ps->IsSkip()) return;
+            if (!ps)
+                return;
+            if (!l_pC->net_Ready)
+                return;
+            if (ps->IsSkip())
+                return;
 
             if (ps->team == s16(Team))
                 m_owner->Player_AddMoney(ps, ((Minor) ? pTeam->m_iM_RoundWin_Minor : pTeam->m_iM_RoundWin));
@@ -1312,7 +1398,8 @@ void game_sv_Deathmatch::OnTeamScore(u32 Team, bool Minor)
     tmp_functor.Minor = Minor;
     tmp_functor.m_owner = this;
     tmp_functor.pTeam = GetTeamData(u8(Team));
-    if (!tmp_functor.pTeam) return;
+    if (!tmp_functor.pTeam)
+        return;
     m_server->ForEachClientDo(tmp_functor);
 }
 
@@ -1366,11 +1453,14 @@ void game_sv_Deathmatch::OnPlayerSelectSkin(NET_Packet& P, ClientID sender)
 void game_sv_Deathmatch::OnPlayerChangeSkin(ClientID id_who, s8 skin)
 {
     game_PlayerState* ps_who = get_id(id_who);
-    if (!ps_who) return;
+    if (!ps_who)
+        return;
     ps_who->skin = skin;
     ps_who->resetFlag(GAME_PLAYER_FLAG_SPECTATOR);
-    if (skin == ps_who->skin) return;
-    if (skin == -1) {
+    if (skin == ps_who->skin)
+        return;
+    if (skin == -1)
+    {
         ps_who->skin = u8(::Random.randI((int)TeamList[ps_who->team].aSkins.size()));
     }
 
@@ -1380,7 +1470,8 @@ void game_sv_Deathmatch::OnPlayerChangeSkin(ClientID id_who, s8 skin)
 void game_sv_Deathmatch::SetTeamScore(u32 idx, int val)
 {
     VERIFY((idx >= 0) && (idx < teams.size()));
-    if (Phase() == GAME_PHASE_INPROGRESS) {
+    if (Phase() == GAME_PHASE_INPROGRESS)
+    {
         teams[idx].score = val;
     }
 }
@@ -1391,7 +1482,8 @@ void game_sv_Deathmatch::LoadAnomalySets()
     m_AnomalySetsList.clear();
     m_AnomaliesPermanent.clear();
     //-----------------------------------------------------------
-    if (!m_AnomalyIDSetsList.empty()) {
+    if (!m_AnomalyIDSetsList.empty())
+    {
         for (u32 i = 0; i < m_AnomalyIDSetsList.size(); i++)
         {
             m_AnomalyIDSetsList[i].clear();
@@ -1399,7 +1491,8 @@ void game_sv_Deathmatch::LoadAnomalySets()
         m_AnomalyIDSetsList.clear();
     };
     //-----------------------------------------------------------
-    if (!g_pGameLevel || !Level().pLevel) return;
+    if (!g_pGameLevel || !Level().pLevel)
+        return;
 
     char* ASetBaseName = GetAnomalySetBaseName();
 
@@ -1412,11 +1505,13 @@ void game_sv_Deathmatch::LoadAnomalySets()
         AnomalyIDSingleSet.clear();
 
         xr_sprintf(SetName, "set%i", i);
-        if (!Level().pLevel->line_exist(ASetBaseName, SetName)) continue;
+        if (!Level().pLevel->line_exist(ASetBaseName, SetName))
+            continue;
 
         xr_strcpy(AnomaliesNames, Level().pLevel->r_string(ASetBaseName, SetName));
         u32 count = _GetItemCount(AnomaliesNames);
-        if (!count) continue;
+        if (!count)
+            continue;
 
         for (u32 j = 0; j < count; j++)
         {
@@ -1424,12 +1519,14 @@ void game_sv_Deathmatch::LoadAnomalySets()
             AnomalySingleSet.push_back(AnomalyName);
         };
 
-        if (AnomalySingleSet.empty()) continue;
+        if (AnomalySingleSet.empty())
+            continue;
         m_AnomalySetsList.push_back(AnomalySingleSet);
         m_AnomalyIDSetsList.push_back(AnomalyIDSingleSet);
     };
     //---------------------------------------------------------
-    if (Level().pLevel->line_exist(ASetBaseName, "permanent")) {
+    if (Level().pLevel->line_exist(ASetBaseName, "permanent"))
+    {
         xr_strcpy(AnomaliesNames, Level().pLevel->r_string(ASetBaseName, "permanent"));
         u32 count = _GetItemCount(AnomaliesNames);
         for (u32 j = 0; j < count; j++)
@@ -1440,26 +1537,25 @@ void game_sv_Deathmatch::LoadAnomalySets()
     }
 };
 
-void game_sv_Deathmatch::LoadItemRespawns()
-{
-}
-
+void game_sv_Deathmatch::LoadItemRespawns() {}
 void game_sv_Deathmatch::Send_EventPack_for_AnomalySet(u32 AnomalySet, u8 Event)
 {
-    if (m_AnomalyIDSetsList.size() <= AnomalySet) return;
+    if (m_AnomalyIDSetsList.size() <= AnomalySet)
+        return;
     //-----------------------------------
     NET_Packet EventPack;
     EventPack.w_begin(M_EVENT_PACK);
     //-----------------------------------
     ANOMALIES_ID* Anomalies = &(m_AnomalyIDSetsList[AnomalySet]);
-    if (Anomalies->empty()) return;
+    if (Anomalies->empty())
+        return;
     for (u32 i = 0; i < Anomalies->size(); i++)
     {
         u16 ID = (*Anomalies)[i];
         //-----------------------------------
         NET_Packet P;
         u_EventGen(P, GE_ZONE_STATE_CHANGE, ID);
-        P.w_u8(u8(Event));  // eZoneStateDisabled
+        P.w_u8(u8(Event)); // eZoneStateDisabled
         //-----------------------------------
         EventPack.w_u8(u8(P.B.count));
         EventPack.w(&P.B.data, P.B.count);
@@ -1469,16 +1565,20 @@ void game_sv_Deathmatch::Send_EventPack_for_AnomalySet(u32 AnomalySet, u8 Event)
 
 void game_sv_Deathmatch::StartAnomalies(int AnomalySet)
 {
-    if (m_AnomalySetsList.empty()) return;
+    if (m_AnomalySetsList.empty())
+        return;
 
-    if (AnomalySet != -1 && u32(AnomalySet) >= m_AnomalySetsList.size()) return;
+    if (AnomalySet != -1 && u32(AnomalySet) >= m_AnomalySetsList.size())
+        return;
 
     xr_vector<u8>& ASetID = m_AnomalySetID;
-    if (ASetID.empty()) {
+    if (ASetID.empty())
+    {
         u8 Size = (u8)m_AnomalySetsList.size();
         for (u8 i = 0; i < Size; i++)
         {
-            if (m_dwLastAnomalySetID == i && Size > 1) continue;
+            if (m_dwLastAnomalySetID == i && Size > 1)
+                continue;
             ASetID.push_back(i);
         };
     };
@@ -1487,18 +1587,21 @@ void game_sv_Deathmatch::StartAnomalies(int AnomalySet)
     u32 NewAnomalySetID = ASetID[ID];
     ASetID.erase(ASetID.begin() + ID);
     ///////////////////////////////////////////////////
-    if (m_dwLastAnomalySetID < m_AnomalySetsList.size()) {
-        Send_EventPack_for_AnomalySet(m_dwLastAnomalySetID, CCustomZone::eZoneStateDisabled);  // Disable
+    if (m_dwLastAnomalySetID < m_AnomalySetsList.size())
+    {
+        Send_EventPack_for_AnomalySet(m_dwLastAnomalySetID, CCustomZone::eZoneStateDisabled); // Disable
     };
     ///////////////////////////////////////////////////
-    if (AnomalySet != -1 && AnomalySet < (int)m_AnomalySetsList.size()) {
+    if (AnomalySet != -1 && AnomalySet < (int)m_AnomalySetsList.size())
+    {
         m_dwLastAnomalySetID = u32(AnomalySet);
         m_AnomalySetID.clear();
     }
     else
         m_dwLastAnomalySetID = NewAnomalySetID;
 
-    if (IsAnomaliesEnabled()) Send_EventPack_for_AnomalySet(m_dwLastAnomalySetID, CCustomZone::eZoneStateIdle);  // Idle
+    if (IsAnomaliesEnabled())
+        Send_EventPack_for_AnomalySet(m_dwLastAnomalySetID, CCustomZone::eZoneStateIdle); // Idle
     m_dwLastAnomalyStartTime = Level().timeServer();
 #ifdef DEBUG
     Msg("Anomaly Set %d Activated", m_dwLastAnomalySetID);
@@ -1513,21 +1616,27 @@ BOOL game_sv_Deathmatch::OnTouch(u16 eid_who, u16 eid_what, BOOL bForced)
     VERIFY(e_what);
 
     CSE_ALifeCreatureActor* A = smart_cast<CSE_ALifeCreatureActor*>(e_who);
-    if (A) {
+    if (A)
+    {
         // Actor touches something
         CSE_ALifeItemWeapon* W = smart_cast<CSE_ALifeItemWeapon*>(e_what);
-        if (W) {
+        if (W)
+        {
             // Weapon
             xr_vector<u16>& C = A->children;
             u8 slot = W->get_slot();
             for (u32 it = 0; it < C.size(); ++it)
             {
                 CSE_Abstract* Et = m_server->ID_to_entity(C[it]);
-                if (0 == Et) continue;
+                if (0 == Et)
+                    continue;
                 CSE_ALifeItemWeapon* T = smart_cast<CSE_ALifeItemWeapon*>(Et);
-                if (0 == T) continue;
-                if (slot == T->get_slot()) {
-                    if (bForced) {
+                if (0 == T)
+                    continue;
+                if (slot == T->get_slot())
+                {
+                    if (bForced)
+                    {
                         // We've found same slot occupied - disallow ownership
                         //-----------------------------------------------------
                         NET_Packet P;
@@ -1549,37 +1658,45 @@ BOOL game_sv_Deathmatch::OnTouch(u16 eid_who, u16 eid_what, BOOL bForced)
         }
 
         CSE_ALifeItemAmmo* pIAmmo = smart_cast<CSE_ALifeItemAmmo*>(e_what);
-        if (pIAmmo) {
+        if (pIAmmo)
+        {
             // Ammo
             return TRUE;
         };
 
         CSE_ALifeItemGrenade* pIGrenade = smart_cast<CSE_ALifeItemGrenade*>(e_what);
-        if (pIGrenade) {
+        if (pIGrenade)
+        {
             // Grenade
             return TRUE;
         };
 
         CSE_ALifeItemCustomOutfit* pOutfit = smart_cast<CSE_ALifeItemCustomOutfit*>(e_what);
-        if (pOutfit) {
+        if (pOutfit)
+        {
             // Possibly Addons and/or Outfits
             return TRUE;
         };
 
         //---------------------------------------------------------------
-        if (e_what->m_tClassID == CLSID_OBJECT_PLAYERS_BAG) {
-            if (e_what->ID_Parent == 0xffff) {
+        if (e_what->m_tClassID == CLSID_OBJECT_PLAYERS_BAG)
+        {
+            if (e_what->ID_Parent == 0xffff)
+            {
                 //-------------------------------
                 // move all items from rukzak to player
-                if (!e_what->children.empty()) {
+                if (!e_what->children.empty())
+                {
                     NET_Packet EventPack, PacketReject, PacketTake;
                     EventPack.w_begin(M_EVENT_PACK);
 
                     while (!e_what->children.empty())
                     {
                         CSE_Abstract* e_child_item = get_entity_from_eid(e_what->children.back());
-                        if (e_child_item) {
-                            if (!OnTouch(eid_who, e_child_item->ID, FALSE)) {
+                        if (e_child_item)
+                        {
+                            if (!OnTouch(eid_who, e_child_item->ID, FALSE))
+                            {
                                 NET_Packet P;
                                 u_EventGen(P, GE_OWNERSHIP_REJECT, e_what->ID);
                                 P.w_u16(e_child_item->ID);
@@ -1597,19 +1714,22 @@ BOOL game_sv_Deathmatch::OnTouch(u16 eid_who, u16 eid_what, BOOL bForced)
                         EventPack.w_u8(u8(PacketTake.B.count));
                         EventPack.w(&PacketTake.B.data, PacketTake.B.count);
                     }
-                    if (EventPack.B.count > 2) u_EventSend(EventPack);
+                    if (EventPack.B.count > 2)
+                        u_EventSend(EventPack);
                 }
                 //-------------------------------
                 // destroy the BAG
                 NET_Packet P;
                 u_EventGen(P, GE_DESTROY, e_what->ID);
                 m_server->OnMessageSync(
-                    P, m_server->GetServerClient()->ID);  // m_server->OnMessage(P, m_server->GetServerClient()->ID);
+                    P, m_server->GetServerClient()->ID); // m_server->OnMessage(P, m_server->GetServerClient()->ID);
                 //-------------------------------
 
                 game_PlayerState* pKiller = get_eid(eid_who);
-                if (pKiller) {
-                    if (g_sv_dm_bPDAHunt) {
+                if (pKiller)
+                {
+                    if (g_sv_dm_bPDAHunt)
+                    {
                         Player_AddBonusMoney(
                             pKiller, READ_IF_EXISTS(pSettings, r_s32, "mp_bonus_money", "pda_taken", 0), SKT_PDA);
                     };
@@ -1619,7 +1739,8 @@ BOOL game_sv_Deathmatch::OnTouch(u16 eid_who, u16 eid_what, BOOL bForced)
             }
         };
         //---------------------------------------------------------------
-        if (IsBuyableItem(*e_what->s_name)) return TRUE;
+        if (IsBuyableItem(*e_what->s_name))
+            return TRUE;
         //---------------------------------------------------------------
     };
     // We don't know what the hell is it, so disallow ownership just for safety
@@ -1632,7 +1753,8 @@ void game_sv_Deathmatch::OnDetach(u16 eid_who, u16 eid_what)
     CSE_Abstract* e_entity = get_entity_from_eid(eid_what);
     CSE_ActorMP* actor = e_parent ? smart_cast<CSE_ActorMP*>(e_parent) : NULL;
 
-    if (e_entity->m_tClassID == CLSID_OBJECT_PLAYERS_BAG && actor) {
+    if (e_entity->m_tClassID == CLSID_OBJECT_PLAYERS_BAG && actor)
+    {
         // move all items from player to rukzak
         xr_vector<u16>::const_iterator it = e_parent->children.begin();
         xr_vector<u16>::const_iterator it_e = e_parent->children.end();
@@ -1649,14 +1771,17 @@ void game_sv_Deathmatch::OnDetach(u16 eid_who, u16 eid_what)
 
             R_ASSERT(e_item->ID_Parent == e_parent->ID);
 
-            if (std::find(to_reject.begin(), to_reject.end(), e_item) != to_reject.end()) continue;
+            if (std::find(to_reject.begin(), to_reject.end(), e_item) != to_reject.end())
+                continue;
 
-            if ((e_item->m_tClassID == CLSID_OBJECT_W_KNIFE) || (e_item->m_tClassID == CLSID_DEVICE_TORCH)) {
+            if ((e_item->m_tClassID == CLSID_OBJECT_W_KNIFE) || (e_item->m_tClassID == CLSID_DEVICE_TORCH))
+            {
                 to_destroy.push_back(e_item);
             }
             else if (m_strWeaponsData->GetItemIdx(e_item->s_name) != u32(-1))
             {
-                if (!smart_cast<CSE_ALifeItemCustomOutfit*>(e_item)) to_transfer.push_back(e_item);
+                if (!smart_cast<CSE_ALifeItemCustomOutfit*>(e_item))
+                    to_transfer.push_back(e_item);
             }
         }
 
@@ -1677,7 +1802,8 @@ void game_sv_Deathmatch::OnDetach(u16 eid_who, u16 eid_what)
             EventPack.w(&PacketTake.B.data, PacketTake.B.count);
         }
 
-        if (EventPack.B.count > 2) u_EventSend(EventPack);
+        if (EventPack.B.count > 2)
+            u_EventSend(EventPack);
         for (auto item : to_reject)
             RejectGameItem(item);
     };
@@ -1690,7 +1816,8 @@ void game_sv_Deathmatch::OnPlayerConnect(ClientID id_who)
     xrClientData* xrCData = m_server->ID_to_client(id_who);
     game_PlayerState* ps_who = get_id(id_who);
 
-    if (!xrCData->flags.bReconnect) {
+    if (!xrCData->flags.bReconnect)
+    {
         ps_who->clear();
         ps_who->team = 0;
         ps_who->skin = -1;
@@ -1699,12 +1826,14 @@ void game_sv_Deathmatch::OnPlayerConnect(ClientID id_who)
 
     ps_who->resetFlag(GAME_PLAYER_FLAG_SKIP);
 
-    if ((g_dedicated_server || m_bSpectatorMode) && (xrCData == m_server->GetServerClient())) {
+    if ((g_dedicated_server || m_bSpectatorMode) && (xrCData == m_server->GetServerClient()))
+    {
         ps_who->setFlag(GAME_PLAYER_FLAG_SKIP);
         return;
     }
 
-    if (!xrCData->flags.bReconnect) Money_SetStart(id_who);
+    if (!xrCData->flags.bReconnect)
+        Money_SetStart(id_who);
 
     SetPlayersDefItems(ps_who);
 }
@@ -1714,7 +1843,8 @@ void game_sv_Deathmatch::OnPlayerConnectFinished(ClientID id_who)
     xrClientData* xrCData = m_server->ID_to_client(id_who);
     SpawnPlayer(id_who, "spectator");
     // Send Message About Client Connected
-    if (xrCData) {
+    if (xrCData)
+    {
         VERIFY2(xrCData->ps, "Player state not created yet");
 
         NET_Packet P;
@@ -1733,10 +1863,12 @@ void game_sv_Deathmatch::OnPlayerConnectFinished(ClientID id_who)
 
 void game_sv_Deathmatch::check_Player_for_Invincibility(game_PlayerState* ps)
 {
-    if (!ps) return;
+    if (!ps)
+        return;
     u32 CurTime = Device.dwTimeGlobal;
 
-    if ((ps->RespawnTime + GetDMBLimit() * 1000 < CurTime) && ps->testFlag(GAME_PLAYER_FLAG_INVINCIBLE)) {
+    if ((ps->RespawnTime + GetDMBLimit() * 1000 < CurTime) && ps->testFlag(GAME_PLAYER_FLAG_INVINCIBLE))
+    {
         ps->resetFlag(GAME_PLAYER_FLAG_INVINCIBLE);
     }
 };
@@ -1750,13 +1882,16 @@ void game_sv_Deathmatch::check_InvinciblePlayers()
         {
             xrClientData* l_pC = static_cast<xrClientData*>(client);
             game_PlayerState* ps = l_pC->ps;
-            if (!ps) return;
+            if (!ps)
+                return;
 
-            if (ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) return;
+            if (ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
+                return;
 
             u16 OldFlags = ps->flags__;
             m_owner->check_Player_for_Invincibility(ps);
-            if (ps->flags__ != OldFlags) m_owner->signal_Syncronize();
+            if (ps->flags__ != OldFlags)
+                m_owner->signal_Syncronize();
         };
     };
     invinvible_controller tmp_functor;
@@ -1772,12 +1907,15 @@ void game_sv_Deathmatch::RespawnPlayer(ClientID id_who, bool NoSpectator)
     game_PlayerState* ps = xrCData->ps;
     CSE_Abstract* pOwner = xrCData->owner;
     CSE_ALifeCreatureActor* pA = smart_cast<CSE_ALifeCreatureActor*>(pOwner);
-    if (!pA) return;
+    if (!pA)
+        return;
 
     TeamStruct* pTeamData = GetTeamData(u8(ps->team));
-    if (pTeamData) Player_AddMoney(ps, pTeamData->m_iM_OnRespawn);
+    if (pTeamData)
+        Player_AddMoney(ps, pTeamData->m_iM_OnRespawn);
 
-    if (GetDMBLimit() * 1000 > 0) ps->setFlag(GAME_PLAYER_FLAG_INVINCIBLE);
+    if (GetDMBLimit() * 1000 > 0)
+        ps->setFlag(GAME_PLAYER_FLAG_INVINCIBLE);
 
     SpawnWeapon4Actor(pA->ID, "mp_players_rukzak", 0, ps->pItemList);
 }
@@ -1800,7 +1938,8 @@ void game_sv_Deathmatch::OnDelayedTeamEliminated()
 
 void game_sv_Deathmatch::check_ForceRespawn()
 {
-    if (!GetForceRespawn()) return;
+    if (!GetForceRespawn())
+        return;
     struct respawn_checker
     {
         game_sv_Deathmatch* m_owner;
@@ -1808,12 +1947,17 @@ void game_sv_Deathmatch::check_ForceRespawn()
         {
             xrClientData* l_pC = static_cast<xrClientData*>(client);
             game_PlayerState* ps = l_pC->ps;
-            if (!ps) return;
-            if (!l_pC->net_Ready || ps->IsSkip()) return;
-            if (!ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD)) return;
-            if (ps->testFlag(GAME_PLAYER_FLAG_SPECTATOR)) return;
+            if (!ps)
+                return;
+            if (!l_pC->net_Ready || ps->IsSkip())
+                return;
+            if (!ps->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
+                return;
+            if (ps->testFlag(GAME_PLAYER_FLAG_SPECTATOR))
+                return;
             u32 CurTime = Device.dwTimeGlobal;
-            if (ps->DeathTime + m_owner->GetForceRespawn() * 1000 < CurTime) {
+            if (ps->DeathTime + m_owner->GetForceRespawn() * 1000 < CurTime)
+            {
                 m_owner->SetPlayersDefItems(ps);
                 m_owner->RespawnPlayer(l_pC->ID, true);
                 m_owner->SpawnWeaponsForActor(l_pC->owner, ps);
@@ -1845,9 +1989,11 @@ bool game_sv_Deathmatch::HasChampion()
         {
             xrClientData* l_pC = static_cast<xrClientData*>(client);
             game_PlayerState* ps = l_pC->ps;
-            if (!ps) return;
+            if (!ps)
+                return;
             s16 ps_frags = ps->frags();
-            if (ps_frags > MaxFragsCurr) {
+            if (ps_frags > MaxFragsCurr)
+            {
                 MaxFragsCurr = ps_frags;
                 champions_count = 1;
             }
@@ -1864,11 +2010,15 @@ bool game_sv_Deathmatch::HasChampion()
 
 bool game_sv_Deathmatch::check_for_Anomalies()
 {
-    if (!IsAnomaliesEnabled()) return false;
+    if (!IsAnomaliesEnabled())
+        return false;
 
-    if (m_dwLastAnomalySetID < 1000) {
-        if (GetAnomaliesTime() == 0) return false;
-        if (m_dwLastAnomalyStartTime + GetAnomaliesTime() * 60000 > Level().timeServer()) return false;
+    if (m_dwLastAnomalySetID < 1000)
+    {
+        if (GetAnomaliesTime() == 0)
+            return false;
+        if (m_dwLastAnomalyStartTime + GetAnomaliesTime() * 60000 > Level().timeServer())
+            return false;
     };
     StartAnomalies();
     return true;
@@ -1876,7 +2026,8 @@ bool game_sv_Deathmatch::check_for_Anomalies()
 
 BOOL game_sv_Deathmatch::Is_Anomaly_InLists(CSE_Abstract* E)
 {
-    if (!E) return FALSE;
+    if (!E)
+        return FALSE;
     return TRUE;
     /*CSE_ALifeCustomZone* pCustomZone	=	smart_cast<CSE_ALifeCustomZone*> (E);
     if (pCustomZone)
@@ -1906,41 +2057,42 @@ BOOL game_sv_Deathmatch::Is_Anomaly_InLists(CSE_Abstract* E)
 BOOL game_sv_Deathmatch::OnPreCreate(CSE_Abstract* E)
 {
     BOOL res = inherited::OnPreCreate(E);
-    if (!res) return res;
+    if (!res)
+        return res;
 
     CSE_ALifeCustomZone* pCustomZone = smart_cast<CSE_ALifeCustomZone*>(E);
-    if (pCustomZone) {
+    if (pCustomZone)
+    {
         return Is_Anomaly_InLists(pCustomZone);
     }
     return TRUE;
 };
 
-void game_sv_Deathmatch::OnCreate(u16 eid_who)
-{
-    inherited::OnCreate(eid_who);
-};
-
+void game_sv_Deathmatch::OnCreate(u16 eid_who) { inherited::OnCreate(eid_who); };
 void game_sv_Deathmatch::OnPostCreate(u16 eid_who)
 {
     inherited::OnPostCreate(eid_who);
 
     CSE_Abstract* pEntity = get_entity_from_eid(eid_who);
-    if (!pEntity) return;
+    if (!pEntity)
+        return;
 
     CSE_ALifeCustomZone* pCustomZone = smart_cast<CSE_ALifeCustomZone*>(pEntity);
-    if (!pCustomZone || pCustomZone->m_owner_id != u32(-1)) return;
+    if (!pCustomZone || pCustomZone->m_owner_id != u32(-1))
+        return;
 
     for (u32 j = 0; j < m_AnomalySetsList.size(); j++)
     {
         ANOMALIES* Anomalies = &(m_AnomalySetsList[j]);
         ANOMALIES_it It = std::find(Anomalies->begin(), Anomalies->end(), pCustomZone->name_replace());
-        if (It != Anomalies->end()) {
+        if (It != Anomalies->end())
+        {
             m_AnomalyIDSetsList[j].push_back(eid_who);
 
             //-----------------------------------------------------------------------------
             NET_Packet P;
             u_EventGen(P, GE_ZONE_STATE_CHANGE, eid_who);
-            P.w_u8(u8(CCustomZone::eZoneStateDisabled));  // eZoneStateDisabled
+            P.w_u8(u8(CCustomZone::eZoneStateDisabled)); // eZoneStateDisabled
             u_EventSend(P);
             //-----------------------------------------------------------------------------
             return;
@@ -1961,7 +2113,8 @@ void game_sv_Deathmatch::OnPostCreate(u16 eid_who)
 
 void game_sv_Deathmatch::Send_Anomaly_States(ClientID id_who)
 {
-    if (m_AnomalyIDSetsList.empty()) return;
+    if (m_AnomalyIDSetsList.empty())
+        return;
     //-----------------------------------
     NET_Packet EventPack;
     EventPack.w_begin(M_EVENT_PACK);
@@ -1972,7 +2125,8 @@ void game_sv_Deathmatch::Send_Anomaly_States(ClientID id_who)
             u8((m_dwLastAnomalySetID == j) ? CCustomZone::eZoneStateIdle : CCustomZone::eZoneStateDisabled);
 
         ANOMALIES_ID* Anomalies = &(m_AnomalyIDSetsList[j]);
-        if (Anomalies->empty()) return;
+        if (Anomalies->empty())
+            return;
         for (u32 i = 0; i < Anomalies->size(); i++)
         {
             u16 ID = (*Anomalies)[i];
@@ -1992,11 +2146,15 @@ void game_sv_Deathmatch::Send_Anomaly_States(ClientID id_who)
 
 void game_sv_Deathmatch::Check_ForClearRun(game_PlayerState* ps)
 {
-    if (!ps) return;
-    if (m_bInWarmUp) return;
-    if (ps->LastBuyAcount != 0) return;
+    if (!ps)
+        return;
+    if (m_bInWarmUp)
+        return;
+    if (ps->LastBuyAcount != 0)
+        return;
     TeamStruct* pTeam = GetTeamData(u8(ps->team));
-    if (!pTeam) return;
+    if (!pTeam)
+        return;
 
     Player_AddMoney(ps, pTeam->m_iM_ClearRunBonus);
 };
@@ -2007,19 +2165,21 @@ void game_sv_Deathmatch::ReadOptions(shared_str& options)
     //-------------------------------
     g_sv_dm_dwForceRespawn = get_option_i(*options, "frcrspwn", g_sv_dm_dwForceRespawn);
     g_sv_dm_dwFragLimit = get_option_i(*options, "fraglimit", g_sv_dm_dwFragLimit);
-    g_sv_dm_dwTimeLimit = get_option_i(*options, "timelimit", g_sv_dm_dwTimeLimit);             // in (min)
-    g_sv_dm_dwDamageBlockTime = get_option_i(*options, "dmgblock", g_sv_dm_dwDamageBlockTime);  // in (sec)
+    g_sv_dm_dwTimeLimit = get_option_i(*options, "timelimit", g_sv_dm_dwTimeLimit); // in (min)
+    g_sv_dm_dwDamageBlockTime = get_option_i(*options, "dmgblock", g_sv_dm_dwDamageBlockTime); // in (sec)
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     g_sv_dm_bDamageBlockIndicators = (get_option_i(*options, "dmbi", (g_sv_dm_bDamageBlockIndicators ? 1 : 0)) != 0);
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     g_sv_dm_bAnomaliesEnabled = (get_option_i(*options, "ans", (IsAnomaliesEnabled() ? 1 : 0)) != 0);
-    g_sv_dm_dwAnomalySetLengthTime = get_option_i(*options, "anslen", g_sv_dm_dwAnomalySetLengthTime);  // in (min)
+    g_sv_dm_dwAnomalySetLengthTime = get_option_i(*options, "anslen", g_sv_dm_dwAnomalySetLengthTime); // in (min)
     //-----------------------------------------------------------------------
     m_bSpectatorMode = false;
-    if (!g_dedicated_server && (get_option_i(*options, "spectr", -1) != -1)) {
+    if (!g_dedicated_server && (get_option_i(*options, "spectr", -1) != -1))
+    {
         m_bSpectatorMode = true;
         m_dwSM_SwitchDelta = get_option_i(*options, "spectr", 0) * 1000;
-        if (m_dwSM_SwitchDelta < 1000) m_dwSM_SwitchDelta = 1000;
+        if (m_dwSM_SwitchDelta < 1000)
+            m_dwSM_SwitchDelta = 1000;
     };
     //-------------------------------------------------------------------------
     g_sv_dm_dwWarmUp_MaxTime = get_option_i(*options, "warmup", g_sv_dm_dwWarmUp_MaxTime);
@@ -2036,8 +2196,10 @@ void game_sv_Deathmatch::OnPlayerFire(ClientID id_who, NET_Packet& P)
 {
     u16 PlayerID = P.r_u16();
     game_PlayerState* ps = get_eid(PlayerID);
-    if (!ps || ps->IsSkip()) return;
-    if (ps->testFlag(GAME_PLAYER_FLAG_INVINCIBLE)) {
+    if (!ps || ps->IsSkip())
+        return;
+    if (ps->testFlag(GAME_PLAYER_FLAG_INVINCIBLE))
+    {
         ps->resetFlag(GAME_PLAYER_FLAG_INVINCIBLE);
         signal_Syncronize();
     };
@@ -2092,8 +2254,10 @@ void game_sv_Deathmatch::OnRender()
 
 void game_sv_Deathmatch::check_for_WarmUp()
 {
-    if (m_dwWarmUp_CurTime == 0 && !m_bInWarmUp) return;
-    if (m_dwWarmUp_CurTime < Level().timeServer()) {
+    if (m_dwWarmUp_CurTime == 0 && !m_bInWarmUp)
+        return;
+    if (m_dwWarmUp_CurTime < Level().timeServer())
+    {
         m_dwWarmUp_CurTime = 0;
         Console->Execute("g_restart_fast");
     };
@@ -2102,7 +2266,8 @@ void game_sv_Deathmatch::check_for_WarmUp()
 void game_sv_Deathmatch::on_death(CSE_Abstract* e_dest, CSE_Abstract* e_src)
 {
     CSE_ALifeCreatureActor* pVictim = smart_cast<CSE_ALifeCreatureActor*>(e_dest);
-    if (!pVictim) return;
+    if (!pVictim)
+        return;
     pVictim->on_death(e_src);
 }
 
@@ -2112,19 +2277,23 @@ void game_sv_Deathmatch::WriteGameState(CInifile& ini, LPCSTR sect, bool bRoundR
 {
     inherited::WriteGameState(ini, sect, bRoundResult);
 
-    if (!bRoundResult) ini.w_string(sect, "in_warmup", m_bInWarmUp ? "true" : "false");
+    if (!bRoundResult)
+        ini.w_string(sect, "in_warmup", m_bInWarmUp ? "true" : "false");
     ini.w_string(sect, "anomalies", IsAnomaliesEnabled() ? "true" : "false");
 
-    if (!bRoundResult) {
+    if (!bRoundResult)
+    {
         game_PlayerState* ps = GetWinningPlayer();
-        if (ps) {
+        if (ps)
+        {
             ini.w_string(sect, "best_killer", ps->getName());
         }
     }
     ini.w_s32(sect, "timelimit_mins", GetTimeLimit());
     ini.w_s32(sect, "fraglimit", GetFragLimit());
 
-    if (!bRoundResult) {
+    if (!bRoundResult)
+    {
         u32 game_time = (Level().timeServer() - m_round_start_time);
         ini.w_u32(sect, "round_time_sec", game_time / 1000);
     }
@@ -2137,27 +2306,32 @@ void game_sv_Deathmatch::FillDeathActorRejectItems(CSE_ActorMP* actor, xr_vector
 
     //	R_ASSERT2( pActor, make_string("Actor not found. actor_id = [%d]", actor->ID).c_str() );
     VERIFY2(pActor, make_string("Actor not found. actor_id = [%d]", actor->ID).c_str());
-    if (!pActor) {
+    if (!pActor)
+    {
         Msg("! ERROR: Actor not found. actor_id = [%d]", actor->ID);
         return;
     }
 
     u16 active_slot = pActor->inventory().GetActiveSlot();
-    if (active_slot == KNIFE_SLOT) active_slot = NO_ACTIVE_SLOT;
+    if (active_slot == KNIFE_SLOT)
+        active_slot = NO_ACTIVE_SLOT;
 
-    if (active_slot != NO_ACTIVE_SLOT) {
+    if (active_slot != NO_ACTIVE_SLOT)
+    {
         PIItem item = pActor->inventory().ItemFromSlot(active_slot);
-        if (!item) {
+        if (!item)
+        {
 #ifndef MASTER_GOLD
             Msg("! ERROR: item from slot[%d] is NULL", active_slot);
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
             return;
         }
         CSE_Abstract* server_item = m_server->ID_to_entity(item->object_id());
-        if (!server_item) {
+        if (!server_item)
+        {
 #ifndef MASTER_GOLD
             Msg("! ERROR: server entity is NULL, object_id = [%d]", item->object_id());
-#endif  // #ifndef MASTER_GOLD
+#endif // #ifndef MASTER_GOLD
             return;
         }
 
@@ -2170,13 +2344,17 @@ void game_sv_Deathmatch::FillDeathActorRejectItems(CSE_ActorMP* actor, xr_vector
 bool game_sv_Deathmatch::CanChargeFreeAmmo(char const* ammo_section)
 {
     VERIFY2(m_not_free_ammo_str.size(), "'not_free_ammo' not initialized");
-    if (!m_not_free_ammo_str.size()) return true;
+    if (!m_not_free_ammo_str.size())
+        return true;
 
-    if (!ammo_section) return true;
+    if (!ammo_section)
+        return true;
 
-    if (!xr_strlen(ammo_section)) return true;
+    if (!xr_strlen(ammo_section))
+        return true;
 
-    if (strstr(m_not_free_ammo_str.c_str(), ammo_section)) return false;
+    if (strstr(m_not_free_ammo_str.c_str(), ammo_section))
+        return false;
 
     return true;
 }

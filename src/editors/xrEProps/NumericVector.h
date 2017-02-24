@@ -17,8 +17,8 @@
 
 class TfrmNumericVector : public TForm
 {
-    __published :  // IDE-managed Components
-                   TExtBtn* ebOk;
+    __published : // IDE-managed Components
+                  TExtBtn* ebOk;
     TExtBtn* ebCancel;
     TPanel* paBottom;
     TExtBtn* ebReset;
@@ -38,11 +38,11 @@ class TfrmNumericVector : public TForm
     void __fastcall OnModified(TObject* Sender);
     void __fastcall ebResetClick(TObject* Sender);
 
-  private:  // User declarations
+private: // User declarations
     Fvector* edit_data;
     Fvector* reset_value;
 
-  public:  // User declarations
+public: // User declarations
     __fastcall TfrmNumericVector(TComponent* Owner);
     bool __fastcall Run(const char* title, Fvector* data, int decimal = 3, Fvector* reset_value = 0, Fvector* min = 0,
         Fvector* max = 0, int* X = 0, int* Y = 0);

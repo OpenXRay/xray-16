@@ -31,7 +31,8 @@ void CCarDamageParticles::Init(CCar* car)
 {
     IKinematics* K = smart_cast<IKinematics*>(car->Visual());
     CInifile* ini = K->LL_UserData();
-    if (ini->section_exist("damage_particles")) {
+    if (ini->section_exist("damage_particles"))
+    {
         m_car_damage_particles1 = ini->r_string("damage_particles", "car_damage_particles1");
         m_car_damage_particles2 = ini->r_string("damage_particles", "car_damage_particles2");
         m_wheels_damage_particles1 = ini->r_string("damage_particles", "wheels_damage_particles1");
@@ -44,7 +45,8 @@ void CCarDamageParticles::Init(CCar* car)
 
 void CCarDamageParticles::Play1(CCar* car)
 {
-    if (*m_car_damage_particles1) {
+    if (*m_car_damage_particles1)
+    {
         BIDS_I i = bones1.begin(), e = bones1.end();
         for (; e != i; ++i)
             car->StartParticles(m_car_damage_particles1, *i, Fvector().set(0, 1, 0), car->ID());
@@ -54,7 +56,8 @@ void CCarDamageParticles::Play1(CCar* car)
 void CCarDamageParticles::Play2(CCar* car)
 {
     VERIFY(!physics_world()->Processing());
-    if (*m_car_damage_particles2) {
+    if (*m_car_damage_particles2)
+    {
         BIDS_I i = bones2.begin(), e = bones2.end();
         for (; e != i; ++i)
             car->StartParticles(m_car_damage_particles2, *i, Fvector().set(0, 1, 0), car->ID());

@@ -9,7 +9,7 @@ class EScenePortalTool : public ESceneCustomOTool
     typedef ESceneCustomOTool inherited;
     friend class CPortal;
 
-  protected:
+protected:
     enum
     {
         flDrawSimpleModel = (1 << 31),
@@ -20,14 +20,11 @@ class EScenePortalTool : public ESceneCustomOTool
     virtual void CreateControls();
     virtual void RemoveControls();
 
-  public:
+public:
     EScenePortalTool() : ESceneCustomOTool(OBJCLASS_PORTAL) { m_Flags.zero(); }
-
     // definition
     IC LPCSTR ClassName() { return "portal"; }
-
     IC LPCSTR ClassDesc() { return "Portal"; }
-
     IC
 
         int
@@ -46,7 +43,6 @@ class EScenePortalTool : public ESceneCustomOTool
 
     // IO
     virtual bool IsNeedSave() { return true; }
-
     virtual bool LoadStream(IReader&);
     virtual bool LoadLTX(CInifile&);
     virtual void SaveStream(IWriter&);

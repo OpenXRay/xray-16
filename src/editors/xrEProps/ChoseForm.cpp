@@ -24,7 +24,8 @@ AnsiString TfrmChoseItem::m_LastSelection;
 SChooseEvents* TfrmChoseItem::GetEvents(u32 choose_ID)
 {
     EventsMapIt it = m_Events.find(choose_ID);
-    if (it != m_Events.end()) {
+    if (it != m_Events.end())
+    {
         return &it->second;
     }
     else
@@ -37,10 +38,7 @@ void TfrmChoseItem::AppendEvents(u32 choose_ID, LPCSTR caption, TOnChooseFillIte
     VERIFY(it == m_Events.end());
     m_Events.insert(std::make_pair(choose_ID, SChooseEvents(caption, on_fill, on_sel, on_thm, on_close, flags)));
 }
-void TfrmChoseItem::ClearEvents()
-{
-    m_Events.clear();
-}
+void TfrmChoseItem::ClearEvents() { m_Events.clear(); }
 //---------------------------------------------------------------------------
 void __fastcall TfrmChoseItem::FormCreate(TObject* Sender)
 {
@@ -48,10 +46,7 @@ void __fastcall TfrmChoseItem::FormCreate(TObject* Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmChoseItem::FormDestroy(TObject* Sender)
-{
-    TProperties::DestroyForm(m_Props);
-}
+void __fastcall TfrmChoseItem::FormDestroy(TObject* Sender) { TProperties::DestroyForm(m_Props); }
 //---------------------------------------------------------------------------
 
 int __fastcall TfrmChoseItem::SelectItem(u32 choose_ID, LPCSTR& dest, int sel_cnt, LPCSTR init_name,
@@ -69,7 +64,8 @@ int __fastcall TfrmChoseItem::SelectItem(u32 choose_ID, LPCSTR& dest, int sel_cn
     form->tvItems->Selected = 0;
 
     // fill items
-    if (items) {
+    if (items)
+    {
         VERIFY2(item_fill.empty(), "ChooseForm: Duplicate source.");
         form->m_Items = *items;
         form->E.Set("Select Item", 0, item_select, 0, 0, 0);
@@ -88,7 +84,8 @@ int __fastcall TfrmChoseItem::SelectItem(u32 choose_ID, LPCSTR& dest, int sel_cn
     // set & fill
     form->Caption = form->E.caption.c_str();
 
-    if (!form->E.on_fill.empty()) form->E.on_fill(form->m_Items, fill_param);
+    if (!form->E.on_fill.empty())
+        form->E.on_fill(form->m_Items, fill_param);
 
     form->FillItems(choose_ID);
 
@@ -97,7 +94,8 @@ int __fastcall TfrmChoseItem::SelectItem(u32 choose_ID, LPCSTR& dest, int sel_cn
     // show
     bool bRes = (form->ShowModal() == mrOk);
     dest = 0;
-    if (bRes) {
+    if (bRes)
+    {
         int item_cnt = _GetItemCount(select_item.c_str(), ',');
         dest = (select_item == NONE_CAPTION) ? 0 : select_item.c_str();
         m_LastSelection = select_item;
@@ -122,19 +120,21 @@ void __fastcall TfrmChoseItem::FillItems(u32 choose_id)
     form->tvItems->IsUpdating = true;
     tvItems->Items->Clear();
 
-    if (m_Flags.is(cfAllowNone) && !m_Flags.is(cfMultiSelect)) FHelper.AppendObject(tvItems, NONE_CAPTION, false, true);
+    if (m_Flags.is(cfAllowNone) && !m_Flags.is(cfMultiSelect))
+        FHelper.AppendObject(tvItems, NONE_CAPTION, false, true);
 
     u32 ss = m_Items.size();
     ChooseItemVecIt it = m_Items.begin();
     ChooseItemVecIt _E = m_Items.end();
 
-    bool b_check_duplicate = (choose_id != 15);  // smSkeletonAnimations is already unique set !!!
+    bool b_check_duplicate = (choose_id != 15); // smSkeletonAnimations is already unique set !!!
     for (; it != _E; it++)
         AppendItem(&(*it), b_check_duplicate);
 
     form->tvItems->Sort(true);
     form->tvItems->IsUpdating = false;
-    if (m_Flags.is(cfFullExpand)) form->tvItems->FullExpand();
+    if (m_Flags.is(cfFullExpand))
+        form->tvItems->FullExpand();
 }
 
 //---------------------------------------------------------------------------
@@ -150,7 +150,8 @@ __fastcall TfrmChoseItem::TfrmChoseItem(TComponent* Owner) : TForm(Owner)
 //---------------------------------------------------------------------------
 void __fastcall TfrmChoseItem::sbSelectClick(TObject* Sender)
 {
-    if (m_Flags.is(cfMultiSelect)) {
+    if (m_Flags.is(cfMultiSelect))
+    {
         select_item = "";
         AnsiString nm;
         for (TElTreeItem* node = tvMulti->Items->GetFirstNode(); node; node = node->GetNext())
@@ -158,14 +159,16 @@ void __fastcall TfrmChoseItem::sbSelectClick(TObject* Sender)
             FHelper.MakeName(node, 0, nm, false);
             select_item += nm + AnsiString(",");
         }
-        if (!select_item.IsEmpty()) select_item.Delete(select_item.Length(), 1);
+        if (!select_item.IsEmpty())
+            select_item.Delete(select_item.Length(), 1);
 
         Close();
         ModalResult = mrOk;
     }
     else
     {
-        if (tvItems->Selected && FHelper.IsObject(tvItems->Selected)) {
+        if (tvItems->Selected && FHelper.IsObject(tvItems->Selected))
+        {
             FHelper.MakeName(tvItems->Selected, 0, select_item, false);
             Close();
             ModalResult = mrOk;
@@ -185,8 +188,10 @@ void __fastcall TfrmChoseItem::sbCancelClick(TObject* Sender)
 //---------------------------------------------------------------------------
 void __fastcall TfrmChoseItem::FormKeyDown(TObject* Sender, WORD& Key, TShiftState Shift)
 {
-    if (Key == VK_ESCAPE) sbCancel->Click();
-    if (Key == VK_RETURN) sbSelect->Click();
+    if (Key == VK_ESCAPE)
+        sbCancel->Click();
+    if (Key == VK_RETURN)
+        sbSelect->Click();
 }
 //---------------------------------------------------------------------------
 
@@ -194,32 +199,37 @@ void __fastcall TfrmChoseItem::FormShow(TObject* Sender)
 {
     tvItems->ShowCheckboxes = m_Flags.is(cfMultiSelect);
     int itm_cnt = _GetItemCount(m_LastSelection.c_str());
-    if (m_Flags.is(cfMultiSelect)) {
+    if (m_Flags.is(cfMultiSelect))
+    {
         string256 T;
         for (int i = 0; i < itm_cnt; i++)
         {
             TElTreeItem* itm_node = FHelper.FindObject(
-                tvItems, _GetItem(m_LastSelection.LowerCase().c_str(), i, T, ',', "", false), 0, 0);  //,bIgnoreExt);
+                tvItems, _GetItem(m_LastSelection.LowerCase().c_str(), i, T, ',', "", false), 0, 0); //,bIgnoreExt);
             TElTreeItem* fld_node = 0;
-            if (itm_node) {
+            if (itm_node)
+            {
                 tvMulti->Items->AddObject(
                     0, _GetItem(m_LastSelection.c_str(), i, T, ',', "", false), (void*)TYPE_OBJECT);
                 itm_node->Checked = true;
                 tvItems->EnsureVisible(itm_node);
                 fld_node = itm_node->Parent;
-                if (fld_node) fld_node->Expand(false);
+                if (fld_node)
+                    fld_node->Expand(false);
             }
         }
     }
     else
     {
-        TElTreeItem* itm_node = FHelper.FindItem(tvItems, m_LastSelection.LowerCase().c_str(), 0, 0);  //,bIgnoreExt);
+        TElTreeItem* itm_node = FHelper.FindItem(tvItems, m_LastSelection.LowerCase().c_str(), 0, 0); //,bIgnoreExt);
         TElTreeItem* fld_node = 0;
-        if (itm_node) {
+        if (itm_node)
+        {
             tvItems->Selected = itm_node;
             tvItems->EnsureVisible(itm_node);
             fld_node = itm_node->Parent;
-            if (fld_node) fld_node->Expand(false);
+            if (fld_node)
+                fld_node->Expand(false);
         }
         else if (fld_node)
         {
@@ -236,8 +246,10 @@ void __fastcall TfrmChoseItem::FormShow(TObject* Sender)
 
 void __fastcall TfrmChoseItem::FormClose(TObject* Sender, TCloseAction& Action)
 {
-    if (tvItems->Selected) m_LastSelection = tvItems->Selected->Text;
-    if (!E.on_close.empty()) E.on_close();
+    if (tvItems->Selected)
+        m_LastSelection = tvItems->Selected->Text;
+    if (!E.on_close.empty())
+        E.on_close();
     Action = caFree;
     form = 0;
 }
@@ -245,7 +257,8 @@ void __fastcall TfrmChoseItem::FormClose(TObject* Sender, TCloseAction& Action)
 
 void __fastcall TfrmChoseItem::tvItemsDblClick(TObject* Sender)
 {
-    if (!m_Flags.is(cfMultiSelect) && FHelper.IsObject(tvItems->Selected)) sbSelectClick(Sender);
+    if (!m_Flags.is(cfMultiSelect) && FHelper.IsObject(tvItems->Selected))
+        sbSelectClick(Sender);
 }
 //---------------------------------------------------------------------------
 
@@ -260,8 +273,10 @@ bool __fastcall LookupFunc(TElTreeItem* Item, void* SearchDetails)
 void __fastcall TfrmChoseItem::tvItemsKeyPress(TObject* Sender, char& Key)
 {
     TElTreeItem* node = tvItems->Items->LookForItemEx(tvItems->Selected, -1, false, false, false, &Key, LookupFunc);
-    if (!node) node = tvItems->Items->LookForItemEx(0, -1, false, false, false, &Key, LookupFunc);
-    if (node) {
+    if (!node)
+        node = tvItems->Items->LookForItemEx(0, -1, false, false, false, &Key, LookupFunc);
+    if (node)
+    {
         tvItems->Selected = node;
         tvItems->EnsureVisible(node);
     }
@@ -270,13 +285,17 @@ void __fastcall TfrmChoseItem::tvItemsKeyPress(TObject* Sender, char& Key)
 
 void __fastcall TfrmChoseItem::tvItemsItemChange(TObject* Sender, TElTreeItem* Item, TItemChangeMode ItemChangeMode)
 {
-    if (Item && (ItemChangeMode == icmCheckState)) {
+    if (Item && (ItemChangeMode == icmCheckState))
+    {
         AnsiString fn;
         FHelper.MakeName(Item, 0, fn, false);
         TElTreeItem* node = tvMulti->Items->LookForItem(0, fn.c_str(), 0, 0, false, true, false, true, true);
-        if (node && !Item->Checked) node->Delete();
-        if (!node && Item->Checked) {
-            if ((tvMulti->Items->Count + 1) <= iMultiSelLimit) {
+        if (node && !Item->Checked)
+            node->Delete();
+        if (!node && Item->Checked)
+        {
+            if ((tvMulti->Items->Count + 1) <= iMultiSelLimit)
+            {
                 tvMulti->Items->AddObject(0, fn, (void*)TYPE_OBJECT);
             }
             else
@@ -306,7 +325,8 @@ static TElTreeItem* DragItem = 0;
 void __fastcall TfrmChoseItem::tvMultiDragDrop(TObject* Sender, TObject* Source, int X, int Y)
 {
     TElTreeItem* node = ((TElTree*)Sender)->GetItemAtY(Y);
-    if (node) DragItem->MoveToIns(0, node->Index);
+    if (node)
+        DragItem->MoveToIns(0, node->Index);
     DragItem = 0;
 }
 //---------------------------------------------------------------------------
@@ -316,7 +336,8 @@ void __fastcall TfrmChoseItem::tvMultiDragOver(
 {
     Accept = false;
     TElTreeItem* node = ((TElTree*)Sender)->GetItemAtY(Y);
-    if ((Sender == Source) && (node != DragItem)) Accept = true;
+    if ((Sender == Source) && (node != DragItem))
+        Accept = true;
 }
 //---------------------------------------------------------------------------
 
@@ -328,10 +349,12 @@ void __fastcall TfrmChoseItem::tvMultiStartDrag(TObject* Sender, TDragObject*& D
 
 void __fastcall TfrmChoseItem::ebMultiRemoveClick(TObject* Sender)
 {
-    if (tvMulti->Selected) {
+    if (tvMulti->Selected)
+    {
         TElTreeItem* cur = tvMulti->Selected;
         TElTreeItem* node = tvItems->Items->LookForItem(0, cur->Text, 0, 0, false, true, false, true, true);
-        if (node) node->Checked = false;
+        if (node)
+            node->Checked = false;
         tvMulti->Selected = cur->GetNext() ? cur->GetNext() : cur->GetPrev();
         cur->Delete();
     }
@@ -342,7 +365,8 @@ void __fastcall TfrmChoseItem::ebMultiClearClick(TObject* Sender)
 {
     tvMulti->Items->Clear();
     for (TElTreeItem* node = tvItems->Items->GetFirstNode(); node; node = node->GetNext())
-        if (node->Checked) node->Checked = false;
+        if (node->Checked)
+            node->Checked = false;
 }
 //---------------------------------------------------------------------------
 
@@ -352,8 +376,10 @@ void __fastcall TfrmChoseItem::tvItemsItemFocused(TObject* Sender)
     PropItemVec items;
     lbItemName->Caption = "";
     lbHint->Caption = "";
-    if (Item && FHelper.IsObject(Item) && Item->Tag) {
-        if (ebExt->Down && !E.on_sel.empty()) E.on_sel((SChooseItem*)Item->Tag, items);
+    if (Item && FHelper.IsObject(Item) && Item->Tag)
+    {
+        if (ebExt->Down && !E.on_sel.empty())
+            E.on_sel((SChooseItem*)Item->Tag, items);
         lbItemName->Caption = Item->Text;
         lbHint->Caption = Item->Hint;
     }
@@ -366,45 +392,37 @@ void __fastcall TfrmChoseItem::tvItemsItemFocused(TObject* Sender)
 void TfrmChoseItem::DrawImage()
 {
     TElTreeItem* Item = tvItems->Selected;
-    if (Item && FHelper.IsObject(Item) && Item->Tag) {
-        if (ebExt->Down) {  //&&!E.on_sel.empty()){
+    if (Item && FHelper.IsObject(Item) && Item->Tag)
+    {
+        if (ebExt->Down)
+        { //&&!E.on_sel.empty()){
             SChooseItem* itm = (SChooseItem*)Item->Tag;
-            if (!E.on_thm.empty()) {
+            if (!E.on_thm.empty())
+            {
                 E.on_thm(*itm->name, paImage->Canvas->Handle, Irect().set(0, 0, paImage->Width, paImage->Height));
             }
         }
     }
 }
 
-void __fastcall TfrmChoseItem::paImagePaint(TObject* Sender)
-{
-    DrawImage();
-}
+void __fastcall TfrmChoseItem::paImagePaint(TObject* Sender) { DrawImage(); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmChoseItem::ebExtClick(TObject* Sender)
-{
-    tvItemsItemFocused(0);
-}
+void __fastcall TfrmChoseItem::ebExtClick(TObject* Sender) { tvItemsItemFocused(0); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmChoseItem::fsStorageRestorePlacement(TObject* Sender)
-{
-    m_Props->RestoreParams(fsStorage);
-}
+void __fastcall TfrmChoseItem::fsStorageRestorePlacement(TObject* Sender) { m_Props->RestoreParams(fsStorage); }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmChoseItem::fsStorageSavePlacement(TObject* Sender)
-{
-    m_Props->SaveParams(fsStorage);
-}
+void __fastcall TfrmChoseItem::fsStorageSavePlacement(TObject* Sender) { m_Props->SaveParams(fsStorage); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfrmChoseItem::tvItemsCompareItems(TObject* Sender, TElTreeItem* Item1, TElTreeItem* Item2, int& res)
 {
     u32 type1 = (u32)Item1->Data;
     u32 type2 = (u32)Item2->Data;
-    if (type1 == type2) {
+    if (type1 == type2)
+    {
         if (Item1->Text < Item2->Text)
             res = -1;
         else if (Item1->Text > Item2->Text)
@@ -419,10 +437,7 @@ void __fastcall TfrmChoseItem::tvItemsCompareItems(TObject* Sender, TElTreeItem*
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TfrmChoseItem::tmRepaintTimer(TObject* Sender)
-{
-    DrawImage();
-}
+void __fastcall TfrmChoseItem::tmRepaintTimer(TObject* Sender) { DrawImage(); }
 //---------------------------------------------------------------------------
 
 void __fastcall TfrmChoseItem::edFindChange(TObject* Sender)
@@ -434,8 +449,10 @@ void __fastcall TfrmChoseItem::edFindChange(TObject* Sender)
 
 void __fastcall TfrmChoseItem::OnFrame()
 {
-    if (form) {
-        if (form->E.flags.is(SChooseEvents::flAnimated)) form->DrawImage();
+    if (form)
+    {
+        if (form->E.flags.is(SChooseEvents::flAnimated))
+            form->DrawImage();
     }
 }
 //---------------------------------------------------------------------------
