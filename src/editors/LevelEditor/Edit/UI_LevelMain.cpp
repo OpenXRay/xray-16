@@ -1367,7 +1367,7 @@ void CLevelMain::RealUpdateScene()
     if (GetEState() == esEditScene)
     {
         Scene->OnObjectsUpdate();
-        LTools->OnObjectsUpdate(); // îáíîâèòü âñå ÷òî êàê-òî ñâÿçàíî ñ îáúåêòàìè
+        LTools->OnObjectsUpdate(); // Ğ¾Ğ±Ğ½Ğ¾Ğ²Ğ¸Ñ‚ÑŒ Ğ²ÑĞµ Ñ‡Ñ‚Ğ¾ ĞºĞ°Ğº-Ñ‚Ğ¾ ÑĞ²ÑĞ·Ğ°Ğ½Ğ¾ Ñ Ğ¾Ğ±ÑŠĞµĞºÑ‚Ğ°Ğ¼Ğ¸
         RedrawScene();
     }
 }
@@ -1424,7 +1424,7 @@ void CLevelMain::OutCameraPos()
         const Fvector& c = EDevice.m_Camera.GetPosition();
         s.sprintf("C: %3.1f, %3.1f, %3.1f", c.x, c.y, c.z);
         //	const Fvector& hpb 	= EDevice.m_Camera.GetHPB();
-        //	s.sprintf(" Cam: %3.1f°, %3.1f°, %3.1f°",rad2deg(hpb.y),rad2deg(hpb.x),rad2deg(hpb.z));
+        //	s.sprintf(" Cam: %3.1fÂ°, %3.1fÂ°, %3.1fÂ°",rad2deg(hpb.y),rad2deg(hpb.x),rad2deg(hpb.z));
         fraBottomBar->paCamera->Caption = s;
         fraBottomBar->paCamera->Repaint();
     }

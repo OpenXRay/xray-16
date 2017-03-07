@@ -35,7 +35,7 @@ static float m_fSoftAngle;
 //----------------------------------------------------
 
 //----------------------------------------------------
-// номер face должен соответствовать списку
+// РЅРѕРјРµСЂ face РґРѕР»Р¶РµРЅ СЃРѕРѕС‚РІРµС‚СЃС‚РІРѕРІР°С‚СЊ СЃРїРёСЃРєСѓ
 //----------------------------------------------------
 void CEditableMesh::GenerateCFModel()
 {
@@ -109,7 +109,7 @@ bool CEditableMesh::RayPick(
 
     if (!m_CFModel)
         GenerateCFModel();
-    //.	float m_r 		= pinf?pinf->inf.range+EPS_L:UI->ZFar();// (bugs: не всегда выбирает) //S ????
+    //.	float m_r 		= pinf?pinf->inf.range+EPS_L:UI->ZFar();// (bugs: РЅРµ РІСЃРµРіРґР° РІС‹Р±РёСЂР°РµС‚) //S ????
 
     ETOOLS::ray_options(CDB::OPT_ONLYNEAREST | CDB::OPT_CULL);
     ETOOLS::ray_query_m(inv_parent, m_CFModel, start, direction, _sqrt_flt_max);

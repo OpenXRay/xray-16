@@ -99,8 +99,8 @@ public:
     virtual void FillProp(LPCSTR pref, PropItemVec& values);
     virtual bool GetSummaryInfo(SSceneSummary* inf);
 
-    bool AddMesh(CSceneObject* O, CEditableMesh* M); // возвращает добавлен ли объект
-    int DelMesh(CSceneObject* O, CEditableMesh* M); // 0-не удален 1-удален 2-удален сектор вообще
+    bool AddMesh(CSceneObject* O, CEditableMesh* M); // РІРѕР·РІСЂР°С‰Р°РµС‚ РґРѕР±Р°РІР»РµРЅ Р»Рё РѕР±СЉРµРєС‚
+    int DelMesh(CSceneObject* O, CEditableMesh* M); // 0-РЅРµ СѓРґР°Р»РµРЅ 1-СѓРґР°Р»РµРЅ 2-СѓРґР°Р»РµРЅ СЃРµРєС‚РѕСЂ РІРѕРѕР±С‰Рµ
 
     bool IsDefault() { return m_bDefault; }
     bool Contains(CSceneObject* O, CEditableMesh* M)

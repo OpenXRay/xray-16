@@ -1164,7 +1164,7 @@ void CGameObject::DestroyObject()
 
 void CGameObject::shedule_Update(u32 dt)
 {
-    //уничтожить
+    //СѓРЅРёС‡С‚РѕР¶РёС‚СЊ
     if (NeedToDestroyObject())
     {
 #ifndef MASTER_GOLD
@@ -1191,7 +1191,7 @@ void CGameObject::shedule_Update(u32 dt)
 }
 
 BOOL CGameObject::net_SaveRelevant() { return scriptBinder.net_SaveRelevant(); }
-//игровое имя объекта
+//РёРіСЂРѕРІРѕРµ РёРјСЏ РѕР±СЉРµРєС‚Р°
 LPCSTR CGameObject::Name() const { return (*cName()); }
 u32 CGameObject::ef_creature_type() const
 {

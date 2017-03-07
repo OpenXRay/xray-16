@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////
 // BottleItem.cpp
-// BottleItem - бутылка с напитком, которую можно разбить
+// BottleItem - Р±СѓС‚С‹Р»РєР° СЃ РЅР°РїРёС‚РєРѕРј, РєРѕС‚РѕСЂСѓСЋ РјРѕР¶РЅРѕ СЂР°Р·Р±РёС‚СЊ
 ///////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -36,19 +36,19 @@ void CBottleItem::OnEvent(NET_Packet& P, u16 type)
 
 void CBottleItem::BreakToPieces()
 {
-    //играем звук
+    //РёРіСЂР°РµРј Р·РІСѓРє
     sndBreaking.play_at_pos(0, Position(), false);
 
-    //отыграть партиклы разбивания
+    //РѕС‚С‹РіСЂР°С‚СЊ РїР°СЂС‚РёРєР»С‹ СЂР°Р·Р±РёРІР°РЅРёСЏ
     if (*m_sBreakParticles)
     {
-        //показываем эффекты
+        //РїРѕРєР°Р·С‹РІР°РµРј СЌС„С„РµРєС‚С‹
         CParticlesObject* pStaticPG;
         pStaticPG = CParticlesObject::Create(*m_sBreakParticles, TRUE);
         pStaticPG->play_at_pos(Position());
     }
 
-    //ликвидировать сам объект
+    //Р»РёРєРІРёРґРёСЂРѕРІР°С‚СЊ СЃР°Рј РѕР±СЉРµРєС‚
     if (Local())
     {
         DestroyObject();

@@ -72,7 +72,7 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
     static CHARACTER_REPUTATION_VALUE enemy_kill_reputation =
         pSettings->r_s32(ACTIONS_POINTS_SECT, "enemy_kill_reputation");
 
-    //(ñ) ìèí. âðåìÿ ÷åðåç êîòîðîå ñíîâà áóäåò çàðåãåñòðèðîâàíî ñîîáùåíèå îá àòàêå íà ïåðñîíàæà
+    //(Ñ) Ð¼Ð¸Ð½. Ð²Ñ€ÐµÐ¼Ñ Ñ‡ÐµÑ€ÐµÐ· ÐºÐ¾Ñ‚Ð¾Ñ€Ð¾Ðµ ÑÐ½Ð¾Ð²Ð° Ð±ÑƒÐ´ÐµÑ‚ Ð·Ð°Ñ€ÐµÐ³ÐµÑÑ‚Ñ€Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¾ ÑÐ¾Ð¾Ð±Ñ‰ÐµÐ½Ð¸Ðµ Ð¾Ð± Ð°Ñ‚Ð°ÐºÐµ Ð½Ð° Ð¿ÐµÑ€ÑÐ¾Ð½Ð°Ð¶Ð°
     static u32 min_attack_delta_time = u32(1000.f * pSettings->r_float(ACTIONS_POINTS_SECT, "min_attack_delta_time"));
 
     static CHARACTER_GOODWILL friend_fight_help_goodwill =
@@ -96,8 +96,8 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
     CAI_Stalker* stalker_from = smart_cast<CAI_Stalker*>(from);
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(to);
 
-    //âû÷èñëåíèå èçìåíåíèÿ ðåïóòàöèè è ðåéòèíãà ïîêà âåäåòñÿ
-    //òîëüêî äëÿ àêòåðà
+    //Ð²Ñ‹Ñ‡Ð¸ÑÐ»ÐµÐ½Ð¸Ðµ Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ñ Ñ€ÐµÐ¿ÑƒÑ‚Ð°Ñ†Ð¸Ð¸ Ð¸ Ñ€ÐµÐ¹Ñ‚Ð¸Ð½Ð³Ð° Ð¿Ð¾ÐºÐ° Ð²ÐµÐ´ÐµÑ‚ÑÑ
+    //Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð´Ð»Ñ Ð°ÐºÑ‚ÐµÑ€Ð°
     if (!inv_owner_from || from->cast_base_monster())
         return;
 
@@ -114,7 +114,7 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
     {
         if (actor)
         {
-            //ó÷èòûâàòü ATTACK è FIGHT_HELP, òîëüêî åñëè ïðîøëî âðåìÿ
+            //ÑƒÑ‡Ð¸Ñ‚Ñ‹Ð²Ð°Ñ‚ÑŒ ATTACK Ð¸ FIGHT_HELP, Ñ‚Ð¾Ð»ÑŒÐºÐ¾ ÐµÑÐ»Ð¸ Ð¿Ñ€Ð¾ÑˆÐ»Ð¾ Ð²Ñ€ÐµÐ¼Ñ
             // min_attack_delta_time
             FIGHT_DATA* fight_data_from = FindFight(from->ID(), true);
             if (Device.dwTimeGlobal - fight_data_from->attack_time < min_attack_delta_time)
@@ -122,8 +122,8 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
 
             fight_data_from->attack_time = Device.dwTimeGlobal;
 
-            //åñëè ìû àòàêîâàëè ïåðñîíàæà èëè ìîíñòðà, êîòîðûé
-            //êîãî-òî àòàêîâàë, òî ìû ïîìîãëè òîìó, êòî çàùèùàëñÿ
+            //ÐµÑÐ»Ð¸ Ð¼Ñ‹ Ð°Ñ‚Ð°ÐºÐ¾Ð²Ð°Ð»Ð¸ Ð¿ÐµÑ€ÑÐ¾Ð½Ð°Ð¶Ð° Ð¸Ð»Ð¸ Ð¼Ð¾Ð½ÑÑ‚Ñ€Ð°, ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ð¹
+            //ÐºÐ¾Ð³Ð¾-Ñ‚Ð¾ Ð°Ñ‚Ð°ÐºÐ¾Ð²Ð°Ð», Ñ‚Ð¾ Ð¼Ñ‹ Ð¿Ð¾Ð¼Ð¾Ð³Ð»Ð¸ Ñ‚Ð¾Ð¼Ñƒ, ÐºÑ‚Ð¾ Ð·Ð°Ñ‰Ð¸Ñ‰Ð°Ð»ÑÑ
             FIGHT_DATA* fight_data = FindFight(to->ID(), true);
             if (fight_data)
             {
@@ -182,14 +182,14 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
             break;
             };
 
-            //ñòàëêåð ïðè íàïàäåíèè íà ÷ëåíîâ ñâîåé æå ãðóïïèðîâêè îòíîøåíèÿ íå ìåíÿþò
-            //(ñ÷èòàåòñÿ, ÷òî òàêîå íàïàäåíèå âñåãäà ñëó÷àéíî)
+            //ÑÑ‚Ð°Ð»ÐºÐµÑ€ Ð¿Ñ€Ð¸ Ð½Ð°Ð¿Ð°Ð´ÐµÐ½Ð¸Ð¸ Ð½Ð° Ñ‡Ð»ÐµÐ½Ð¾Ð² ÑÐ²Ð¾ÐµÐ¹ Ð¶Ðµ Ð³Ñ€ÑƒÐ¿Ð¿Ð¸Ñ€Ð¾Ð²ÐºÐ¸ Ð¾Ñ‚Ð½Ð¾ÑˆÐµÐ½Ð¸Ñ Ð½Ðµ Ð¼ÐµÐ½ÑÑŽÑ‚
+            //(ÑÑ‡Ð¸Ñ‚Ð°ÐµÑ‚ÑÑ, Ñ‡Ñ‚Ð¾ Ñ‚Ð°ÐºÐ¾Ðµ Ð½Ð°Ð¿Ð°Ð´ÐµÐ½Ð¸Ðµ Ð²ÑÐµÐ³Ð´Ð° ÑÐ»ÑƒÑ‡Ð°Ð¹Ð½Ð¾)
             // change relation only for pairs actor->stalker, do not use pairs stalker->stalker
             bool stalker_attack_team_mate = stalker && stalker_from;
             if (delta_goodwill && !stalker_attack_team_mate)
             {
-                //èçìåíèòü îòíîøåíèå êî âñåì ÷ëåíàì àòàêîâàíîé ãðóïïû (åñëè òàêàÿ åñòü)
-                //êàê ê òîìó êîãî àòàêîâàëè
+                //Ð¸Ð·Ð¼ÐµÐ½Ð¸Ñ‚ÑŒ Ð¾Ñ‚Ð½Ð¾ÑˆÐµÐ½Ð¸Ðµ ÐºÐ¾ Ð²ÑÐµÐ¼ Ñ‡Ð»ÐµÐ½Ð°Ð¼ Ð°Ñ‚Ð°ÐºÐ¾Ð²Ð°Ð½Ð¾Ð¹ Ð³Ñ€ÑƒÐ¿Ð¿Ñ‹ (ÐµÑÐ»Ð¸ Ñ‚Ð°ÐºÐ°Ñ ÐµÑÑ‚ÑŒ)
+                //ÐºÐ°Ðº Ðº Ñ‚Ð¾Ð¼Ñƒ ÐºÐ¾Ð³Ð¾ Ð°Ñ‚Ð°ÐºÐ¾Ð²Ð°Ð»Ð¸
                 CGroupHierarchyHolder& group = Level()
                                                    .seniority_holder()
                                                    .team(stalker->g_Team())
@@ -221,8 +221,8 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
         {
             // FIGHT_DATA* fight_data_from = FindFight (from->ID(), true);
 
-            //ìû ïîìíèì òî, êàêîå îòíîøåíèå îáîðîíÿþùåãîñÿ ê àòàêóþùåìó
-            //áûëî ïåðåä íà÷àëîì äðàêè
+            //Ð¼Ñ‹ Ð¿Ð¾Ð¼Ð½Ð¸Ð¼ Ñ‚Ð¾, ÐºÐ°ÐºÐ¾Ðµ Ð¾Ñ‚Ð½Ð¾ÑˆÐµÐ½Ð¸Ðµ Ð¾Ð±Ð¾Ñ€Ð¾Ð½ÑÑŽÑ‰ÐµÐ³Ð¾ÑÑ Ðº Ð°Ñ‚Ð°ÐºÑƒÑŽÑ‰ÐµÐ¼Ñƒ
+            //Ð±Ñ‹Ð»Ð¾ Ð¿ÐµÑ€ÐµÐ´ Ð½Ð°Ñ‡Ð°Ð»Ð¾Ð¼ Ð´Ñ€Ð°ÐºÐ¸
             ALife::ERelationType relation_before_attack = ALife::eRelationTypeDummy;
             // if(fight_data_from)
             //	relation_before_attack = fight_data_from->defender_to_attacker;
@@ -254,14 +254,14 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
             break;
             };
 
-            //ñòàëêåð ïðè íàïàäåíèè íà ÷ëåíîâ ñâîåé æå ãðóïïèðîâêè îòíîøåíèÿ íå ìåíÿþò
-            //(ñ÷èòàåòñÿ, ÷òî òàêîå íàïàäåíèå âñåãäà ñëó÷àéíî)
+            //ÑÑ‚Ð°Ð»ÐºÐµÑ€ Ð¿Ñ€Ð¸ Ð½Ð°Ð¿Ð°Ð´ÐµÐ½Ð¸Ð¸ Ð½Ð° Ñ‡Ð»ÐµÐ½Ð¾Ð² ÑÐ²Ð¾ÐµÐ¹ Ð¶Ðµ Ð³Ñ€ÑƒÐ¿Ð¿Ð¸Ñ€Ð¾Ð²ÐºÐ¸ Ð¾Ñ‚Ð½Ð¾ÑˆÐµÐ½Ð¸Ñ Ð½Ðµ Ð¼ÐµÐ½ÑÑŽÑ‚
+            //(ÑÑ‡Ð¸Ñ‚Ð°ÐµÑ‚ÑÑ, Ñ‡Ñ‚Ð¾ Ñ‚Ð°ÐºÐ¾Ðµ Ð½Ð°Ð¿Ð°Ð´ÐµÐ½Ð¸Ðµ Ð²ÑÐµÐ³Ð´Ð° ÑÐ»ÑƒÑ‡Ð°Ð¹Ð½Ð¾)
             bool stalker_kills_team_mate = stalker_from && (stalker_from->Community() == stalker->Community());
 
             if (delta_goodwill && !stalker_kills_team_mate)
             {
-                //èçìåíèòü îòíîøåíèå êî âñåì ÷ëåíàì ãðóïïû (åñëè òàêàÿ åñòü)
-                //óáèòîãî, êðîìå íåãî ñàìîãî
+                //Ð¸Ð·Ð¼ÐµÐ½Ð¸Ñ‚ÑŒ Ð¾Ñ‚Ð½Ð¾ÑˆÐµÐ½Ð¸Ðµ ÐºÐ¾ Ð²ÑÐµÐ¼ Ñ‡Ð»ÐµÐ½Ð°Ð¼ Ð³Ñ€ÑƒÐ¿Ð¿Ñ‹ (ÐµÑÐ»Ð¸ Ñ‚Ð°ÐºÐ°Ñ ÐµÑÑ‚ÑŒ)
+                //ÑƒÐ±Ð¸Ñ‚Ð¾Ð³Ð¾, ÐºÑ€Ð¾Ð¼Ðµ Ð½ÐµÐ³Ð¾ ÑÐ°Ð¼Ð¾Ð³Ð¾
                 CGroupHierarchyHolder& group = Level()
                                                    .seniority_holder()
                                                    .team(stalker->g_Team())
@@ -328,8 +328,8 @@ void RELATION_REGISTRY::Action(CEntityAlive* from, CEntityAlive* to, ERelationAc
 
             if (delta_goodwill)
             {
-                //èçìåíèòü îòíîøåíèå êî âñåì ÷ëåíàì àòàêîâàíîé ãðóïïû (åñëè òàêàÿ åñòü)
-                //êàê ê òîìó êîãî àòàêîâàëè
+                //Ð¸Ð·Ð¼ÐµÐ½Ð¸Ñ‚ÑŒ Ð¾Ñ‚Ð½Ð¾ÑˆÐµÐ½Ð¸Ðµ ÐºÐ¾ Ð²ÑÐµÐ¼ Ñ‡Ð»ÐµÐ½Ð°Ð¼ Ð°Ñ‚Ð°ÐºÐ¾Ð²Ð°Ð½Ð¾Ð¹ Ð³Ñ€ÑƒÐ¿Ð¿Ñ‹ (ÐµÑÐ»Ð¸ Ñ‚Ð°ÐºÐ°Ñ ÐµÑÑ‚ÑŒ)
+                //ÐºÐ°Ðº Ðº Ñ‚Ð¾Ð¼Ñƒ ÐºÐ¾Ð³Ð¾ Ð°Ñ‚Ð°ÐºÐ¾Ð²Ð°Ð»Ð¸
                 CGroupHierarchyHolder& group = Level()
                                                    .seniority_holder()
                                                    .team(stalker->g_Team())

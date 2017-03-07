@@ -19,10 +19,10 @@ void CWalmarkManager::AddWallmark(const Fvector& dir, const Fvector& start_pos, 
 
     if (pMaterial->Flags.is(SGameMtl::flBloodmark))
     {
-        //âû÷èñëèòü íîðìàëü ê ïîðàæåííîé ïîâåðõíîñòè
+        //Ð²Ñ‹Ñ‡Ð¸ÑÐ»Ð¸Ñ‚ÑŒ Ð½Ð¾Ñ€Ð¼Ð°Ð»ÑŒ Ðº Ð¿Ð¾Ñ€Ð°Ð¶ÐµÐ½Ð½Ð¾Ð¹ Ð¿Ð¾Ð²ÐµÑ€Ñ…Ð½Ð¾ÑÑ‚Ð¸
         Fvector* pVerts = Level().ObjectSpace.GetStaticVerts();
 
-        //âû÷èñëèòü òî÷êó ïîïàäàíèÿ
+        //Ð²Ñ‹Ñ‡Ð¸ÑÐ»Ð¸Ñ‚ÑŒ Ñ‚Ð¾Ñ‡ÐºÑƒ Ð¿Ð¾Ð¿Ð°Ð´Ð°Ð½Ð¸Ñ
         Fvector end_point;
         end_point.set(0, 0, 0);
         end_point.mad(start_pos, dir, range);
@@ -38,7 +38,7 @@ void CWalmarkManager::AddWallmark(const Fvector& dir, const Fvector& start_pos, 
 
         if (pWallmarkShader)
         {
-            //äîáàâèòü îòìåòêó íà ìàòåðèàëå
+            //Ð´Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ Ð¾Ñ‚Ð¼ÐµÑ‚ÐºÑƒ Ð½Ð° Ð¼Ð°Ñ‚ÐµÑ€Ð¸Ð°Ð»Ðµ
             GlobalEnv.Render->add_StaticWallmark(*pWallmarkShader, end_point, wallmark_size, pTri, pVerts);
         }
         */
@@ -63,7 +63,7 @@ void CWalmarkManager::PlaceWallmark(const Fvector& dir, const Fvector& start_pos
         &&
         !result.O;
 
-    //åñëè êðîâü äîëåòåëà äî ñòàòè÷åñêîãî îáúåêòà
+    //ÐµÑÐ»Ð¸ ÐºÑ€Ð¾Ð²ÑŒ Ð´Ð¾Ð»ÐµÑ‚ÐµÐ»Ð° Ð´Ð¾ ÑÑ‚Ð°Ñ‚Ð¸Ñ‡ÐµÑÐºÐ¾Ð³Ð¾ Ð¾Ð±ÑŠÐµÐºÑ‚Ð°
     if(reach_wall)
     {
         AddWallmark(dir,start_pos,result.range,wallmark_size,wallmarks_vector,result.element);
@@ -188,7 +188,7 @@ void CWalmarkManager::StartWorkflow()
 
 void CWalmarkManager::Load(LPCSTR section)
 {
-    //êðîâàâûå îòìåòêè íà ñòåíàõ
+    //ÐºÑ€Ð¾Ð²Ð°Ð²Ñ‹Ðµ Ð¾Ñ‚Ð¼ÐµÑ‚ÐºÐ¸ Ð½Ð° ÑÑ‚ÐµÐ½Ð°Ñ…
     //	string256	tmp;
     LPCSTR wallmarks_name = pSettings->r_string(section, "wallmarks");
     m_wallmarks->AppendMark(wallmarks_name);

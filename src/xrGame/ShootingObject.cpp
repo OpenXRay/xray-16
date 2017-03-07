@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////
-// ShootingObject.cpp:  интерфейс для семейства стреляющих объектов
-//						(оружие и осколочные гранаты)
+// ShootingObject.cpp:  РёРЅС‚РµСЂС„РµР№СЃ РґР»СЏ СЃРµРјРµР№СЃС‚РІР° СЃС‚СЂРµР»СЏСЋС‰РёС… РѕР±СЉРµРєС‚РѕРІ
+//						(РѕСЂСѓР¶РёРµ Рё РѕСЃРєРѕР»РѕС‡РЅС‹Рµ РіСЂР°РЅР°С‚С‹)
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -59,7 +59,7 @@ void CShootingObject::Load(LPCSTR section)
     else
         m_bLightShotEnabled = true;
 
-    //время затрачиваемое на выстрел
+    //РІСЂРµРјСЏ Р·Р°С‚СЂР°С‡РёРІР°РµРјРѕРµ РЅР° РІС‹СЃС‚СЂРµР»
     fOneShotTime = pSettings->r_float(section, "rpm");
     VERIFY(fOneShotTime > 0.f);
     fOneShotTime = 60.f / fOneShotTime;
@@ -89,57 +89,57 @@ void CShootingObject::LoadFireParams(LPCSTR section)
     shared_str s_sHitPower;
     shared_str s_sHitPowerCritical;
 
-    //базовая дисперсия оружия
+    //Р±Р°Р·РѕРІР°СЏ РґРёСЃРїРµСЂСЃРёСЏ РѕСЂСѓР¶РёСЏ
     fireDispersionBase = deg2rad(pSettings->r_float(section, "fire_dispersion_base"));
 
-    //сила выстрела и его мощьность
-    s_sHitPower = pSettings->r_string_wb(section, "hit_power"); //читаем строку силы хита пули оружия
+    //СЃРёР»Р° РІС‹СЃС‚СЂРµР»Р° Рё РµРіРѕ РјРѕС‰СЊРЅРѕСЃС‚СЊ
+    s_sHitPower = pSettings->r_string_wb(section, "hit_power"); //С‡РёС‚Р°РµРј СЃС‚СЂРѕРєСѓ СЃРёР»С‹ С…РёС‚Р° РїСѓР»Рё РѕСЂСѓР¶РёСЏ
     s_sHitPowerCritical = pSettings->r_string_wb(section, "hit_power_critical");
     fvHitPower[egdMaster] =
-        (float)atof(_GetItem(*s_sHitPower, 0, buffer)); //первый параметр - это хит для уровня игры мастер
+        (float)atof(_GetItem(*s_sHitPower, 0, buffer)); //РїРµСЂРІС‹Р№ РїР°СЂР°РјРµС‚СЂ - СЌС‚Рѕ С…РёС‚ РґР»СЏ СѓСЂРѕРІРЅСЏ РёРіСЂС‹ РјР°СЃС‚РµСЂ
     fvHitPowerCritical[egdMaster] =
-        (float)atof(_GetItem(*s_sHitPowerCritical, 0, buffer)); //первый параметр - это хит для уровня игры мастер
+        (float)atof(_GetItem(*s_sHitPowerCritical, 0, buffer)); //РїРµСЂРІС‹Р№ РїР°СЂР°РјРµС‚СЂ - СЌС‚Рѕ С…РёС‚ РґР»СЏ СѓСЂРѕРІРЅСЏ РёРіСЂС‹ РјР°СЃС‚РµСЂ
 
     fvHitPower[egdNovice] = fvHitPower[egdStalker] = fvHitPower[egdVeteran] =
-        fvHitPower[egdMaster]; //изначально параметры для других уровней сложности такие же
+        fvHitPower[egdMaster]; //РёР·РЅР°С‡Р°Р»СЊРЅРѕ РїР°СЂР°РјРµС‚СЂС‹ РґР»СЏ РґСЂСѓРіРёС… СѓСЂРѕРІРЅРµР№ СЃР»РѕР¶РЅРѕСЃС‚Рё С‚Р°РєРёРµ Р¶Рµ
     fvHitPowerCritical[egdNovice] = fvHitPowerCritical[egdStalker] = fvHitPowerCritical[egdVeteran] =
-        fvHitPowerCritical[egdMaster]; //изначально параметры для других уровней сложности такие же
+        fvHitPowerCritical[egdMaster]; //РёР·РЅР°С‡Р°Р»СЊРЅРѕ РїР°СЂР°РјРµС‚СЂС‹ РґР»СЏ РґСЂСѓРіРёС… СѓСЂРѕРІРЅРµР№ СЃР»РѕР¶РЅРѕСЃС‚Рё С‚Р°РєРёРµ Р¶Рµ
 
-    int num_game_diff_param = _GetItemCount(*s_sHitPower); //узнаём колличество параметров для хитов
-    if (num_game_diff_param > 1) //если задан второй параметр хита
+    int num_game_diff_param = _GetItemCount(*s_sHitPower); //СѓР·РЅР°С‘Рј РєРѕР»Р»РёС‡РµСЃС‚РІРѕ РїР°СЂР°РјРµС‚СЂРѕРІ РґР»СЏ С…РёС‚РѕРІ
+    if (num_game_diff_param > 1) //РµСЃР»Рё Р·Р°РґР°РЅ РІС‚РѕСЂРѕР№ РїР°СЂР°РјРµС‚СЂ С…РёС‚Р°
     {
-        fvHitPower[egdVeteran] = (float)atof(_GetItem(*s_sHitPower, 1, buffer)); //то вычитываем его для уровня ветерана
+        fvHitPower[egdVeteran] = (float)atof(_GetItem(*s_sHitPower, 1, buffer)); //С‚Рѕ РІС‹С‡РёС‚С‹РІР°РµРј РµРіРѕ РґР»СЏ СѓСЂРѕРІРЅСЏ РІРµС‚РµСЂР°РЅР°
     }
-    if (num_game_diff_param > 2) //если задан третий параметр хита
+    if (num_game_diff_param > 2) //РµСЃР»Рё Р·Р°РґР°РЅ С‚СЂРµС‚РёР№ РїР°СЂР°РјРµС‚СЂ С…РёС‚Р°
     {
-        fvHitPower[egdStalker] = (float)atof(_GetItem(*s_sHitPower, 2, buffer)); //то вычитываем его для уровня сталкера
+        fvHitPower[egdStalker] = (float)atof(_GetItem(*s_sHitPower, 2, buffer)); //С‚Рѕ РІС‹С‡РёС‚С‹РІР°РµРј РµРіРѕ РґР»СЏ СѓСЂРѕРІРЅСЏ СЃС‚Р°Р»РєРµСЂР°
     }
-    if (num_game_diff_param > 3) //если задан четвёртый параметр хита
+    if (num_game_diff_param > 3) //РµСЃР»Рё Р·Р°РґР°РЅ С‡РµС‚РІС‘СЂС‚С‹Р№ РїР°СЂР°РјРµС‚СЂ С…РёС‚Р°
     {
-        fvHitPower[egdNovice] = (float)atof(_GetItem(*s_sHitPower, 3, buffer)); //то вычитываем его для уровня новичка
+        fvHitPower[egdNovice] = (float)atof(_GetItem(*s_sHitPower, 3, buffer)); //С‚Рѕ РІС‹С‡РёС‚С‹РІР°РµРј РµРіРѕ РґР»СЏ СѓСЂРѕРІРЅСЏ РЅРѕРІРёС‡РєР°
     }
 
-    num_game_diff_param = _GetItemCount(*s_sHitPowerCritical); //узнаём колличество параметров
-    if (num_game_diff_param > 1) //если задан второй параметр хита
+    num_game_diff_param = _GetItemCount(*s_sHitPowerCritical); //СѓР·РЅР°С‘Рј РєРѕР»Р»РёС‡РµСЃС‚РІРѕ РїР°СЂР°РјРµС‚СЂРѕРІ
+    if (num_game_diff_param > 1) //РµСЃР»Рё Р·Р°РґР°РЅ РІС‚РѕСЂРѕР№ РїР°СЂР°РјРµС‚СЂ С…РёС‚Р°
     {
         fvHitPowerCritical[egdVeteran] =
-            (float)atof(_GetItem(*s_sHitPowerCritical, 1, buffer)); //то вычитываем его для уровня ветерана
+            (float)atof(_GetItem(*s_sHitPowerCritical, 1, buffer)); //С‚Рѕ РІС‹С‡РёС‚С‹РІР°РµРј РµРіРѕ РґР»СЏ СѓСЂРѕРІРЅСЏ РІРµС‚РµСЂР°РЅР°
     }
-    if (num_game_diff_param > 2) //если задан третий параметр хита
+    if (num_game_diff_param > 2) //РµСЃР»Рё Р·Р°РґР°РЅ С‚СЂРµС‚РёР№ РїР°СЂР°РјРµС‚СЂ С…РёС‚Р°
     {
         fvHitPowerCritical[egdStalker] =
-            (float)atof(_GetItem(*s_sHitPowerCritical, 2, buffer)); //то вычитываем его для уровня сталкера
+            (float)atof(_GetItem(*s_sHitPowerCritical, 2, buffer)); //С‚Рѕ РІС‹С‡РёС‚С‹РІР°РµРј РµРіРѕ РґР»СЏ СѓСЂРѕРІРЅСЏ СЃС‚Р°Р»РєРµСЂР°
     }
-    if (num_game_diff_param > 3) //если задан четвёртый параметр хита
+    if (num_game_diff_param > 3) //РµСЃР»Рё Р·Р°РґР°РЅ С‡РµС‚РІС‘СЂС‚С‹Р№ РїР°СЂР°РјРµС‚СЂ С…РёС‚Р°
     {
         fvHitPowerCritical[egdNovice] =
-            (float)atof(_GetItem(*s_sHitPowerCritical, 3, buffer)); //то вычитываем его для уровня новичка
+            (float)atof(_GetItem(*s_sHitPowerCritical, 3, buffer)); //С‚Рѕ РІС‹С‡РёС‚С‹РІР°РµРј РµРіРѕ РґР»СЏ СѓСЂРѕРІРЅСЏ РЅРѕРІРёС‡РєР°
     }
 
     fHitImpulse = pSettings->r_float(section, "hit_impulse");
-    //максимальное расстояние полета пули
+    //РјР°РєСЃРёРјР°Р»СЊРЅРѕРµ СЂР°СЃСЃС‚РѕСЏРЅРёРµ РїРѕР»РµС‚Р° РїСѓР»Рё
     fireDistance = pSettings->r_float(section, "fire_distance");
-    //начальная скорость пули
+    //РЅР°С‡Р°Р»СЊРЅР°СЏ СЃРєРѕСЂРѕСЃС‚СЊ РїСѓР»Рё
     m_fStartBulletSpeed = pSettings->r_float(section, "bullet_speed");
     m_bUseAimBullet = pSettings->r_bool(section, "use_aim_bullet");
     if (m_bUseAimBullet)
@@ -282,7 +282,7 @@ void CShootingObject::LoadFlameParticles(LPCSTR section, LPCSTR prefix)
     if (pSettings->line_exist(section, full_name))
         m_sShotParticles = pSettings->r_string(section, full_name);
 
-    //текущие партиклы
+    //С‚РµРєСѓС‰РёРµ РїР°СЂС‚РёРєР»С‹
     m_sFlameParticlesCurrent = m_sFlameParticles;
     m_sSmokeParticlesCurrent = m_sSmokeParticles;
 }
@@ -310,7 +310,7 @@ void CShootingObject::OnShellDrop(const Fvector& play_pos, const Fvector& parent
     pShellParticles->Play(in_hud_mode);
 }
 
-//партиклы дыма
+//РїР°СЂС‚РёРєР»С‹ РґС‹РјР°
 void CShootingObject::StartSmokeParticles(const Fvector& play_pos, const Fvector& parent_vel)
 {
     CParticlesObject* pSmokeParticles = NULL;
@@ -322,7 +322,7 @@ void CShootingObject::StartFlameParticles()
     if (0 == m_sFlameParticlesCurrent.size())
         return;
 
-    //если партиклы циклические
+    //РµСЃР»Рё РїР°СЂС‚РёРєР»С‹ С†РёРєР»РёС‡РµСЃРєРёРµ
     if (m_pFlameParticles && m_pFlameParticles->IsLooped() && m_pFlameParticles->IsPlaying())
     {
         UpdateFlameParticles();
@@ -375,7 +375,7 @@ void CShootingObject::UpdateFlameParticles()
     }
 }
 
-//подсветка от выстрела
+//РїРѕРґСЃРІРµС‚РєР° РѕС‚ РІС‹СЃС‚СЂРµР»Р°
 void CShootingObject::UpdateLight()
 {
     if (light_render && light_time > 0)
@@ -476,7 +476,7 @@ void CShootingObject::FireBullet(const Fvector& pos, const Fvector& shot_dir, fl
     m_fPredBulletTime = Device.fTimeGlobal;
 
     float l_fHitPower = 0.0f;
-    if (ParentIsActor()) //если из оружия стреляет актёр(игрок)
+    if (ParentIsActor()) //РµСЃР»Рё РёР· РѕСЂСѓР¶РёСЏ СЃС‚СЂРµР»СЏРµС‚ Р°РєС‚С‘СЂ(РёРіСЂРѕРє)
     {
         if (GameID() == eGameIDSingle)
         {

@@ -1,7 +1,7 @@
 /*
     The "c_dfDI..." global instances of the DirectInput
     DIDATAFORMAT structure for users of Borland compilers.
-    Author: Michael Fötsch
+    Author: Michael FÑ†tsch
 
     Visit my site: http://www.geocities.com/foetsch
     Contact me: foetsch@crosswinds.net

@@ -8,10 +8,10 @@ void CControlPathBuilderBase::update_frame()
 {
     START_PROFILE("Base Monster/Path Builder Base/Frame Update");
 
-    // îáíîâèòü ñîñòîÿíèå áèëäåğà
+    // Ğ¾Ğ±Ğ½Ğ¾Ğ²Ğ¸Ñ‚ÑŒ ÑĞ¾ÑÑ‚Ğ¾ÑĞ½Ğ¸Ğµ Ğ±Ğ¸Ğ»Ğ´ĞµÑ€Ğ°
     update_path_builder_state();
 
-    // îáíîâèòü / óñòàíîâèòü öåëåâóş ïîçèöèş
+    // Ğ¾Ğ±Ğ½Ğ¾Ğ²Ğ¸Ñ‚ÑŒ / ÑƒÑÑ‚Ğ°Ğ½Ğ¾Ğ²Ğ¸Ñ‚ÑŒ Ñ†ĞµĞ»ĞµĞ²ÑƒÑ Ğ¿Ğ¾Ğ·Ğ¸Ñ†Ğ¸Ñ
     update_target_point();
 
     // set params
@@ -29,7 +29,7 @@ void CControlPathBuilderBase::update_target_point()
     if (m_path_type != MovementManager::ePathTypeLevelPath)
         return;
 
-    // ïğîâåğèòü óñëîâèÿ, êîãäà ïóòü ñòğîèòü íå íóæíî
+    // Ğ¿Ñ€Ğ¾Ğ²ĞµÑ€Ğ¸Ñ‚ÑŒ ÑƒÑĞ»Ğ¾Ğ²Ğ¸Ñ, ĞºĞ¾Ğ³Ğ´Ğ° Ğ¿ÑƒÑ‚ÑŒ ÑÑ‚Ñ€Ğ¾Ğ¸Ñ‚ÑŒ Ğ½Ğµ Ğ½ÑƒĞ¶Ğ½Ğ¾
     if (!target_point_need_update())
         return;
 
@@ -39,22 +39,22 @@ void CControlPathBuilderBase::update_target_point()
     if (global_failed())
         find_target_point_failed();
     else
-        // âûáğàòü íîäó è ïîçèöèş â ñîîòâåòñòâèè ñ æåëàåìûìè íîäîé è ïîçèöèåé
+        // Ğ²Ñ‹Ğ±Ñ€Ğ°Ñ‚ÑŒ Ğ½Ğ¾Ğ´Ñƒ Ğ¸ Ğ¿Ğ¾Ğ·Ğ¸Ñ†Ğ¸Ñ Ğ² ÑĞ¾Ğ¾Ñ‚Ğ²ĞµÑ‚ÑÑ‚Ğ²Ğ¸Ğ¸ Ñ Ğ¶ĞµĞ»Ğ°ĞµĞ¼Ñ‹Ğ¼Ğ¸ Ğ½Ğ¾Ğ´Ğ¾Ğ¹ Ğ¸ Ğ¿Ğ¾Ğ·Ğ¸Ñ†Ğ¸ĞµĞ¹
         find_target_point_set();
 
     //-----------------------------------------------------------------------
     // postprocess target_point
     if (m_target_found.node() == saved_target.node())
     {
-        // level_path îñòàíåòñÿ àêòóàëüíûì - ñáğîñèòü àêòóàëüíîñòü
+        // level_path Ğ¾ÑÑ‚Ğ°Ğ½ĞµÑ‚ÑÑ Ğ°ĞºÑ‚ÑƒĞ°Ğ»ÑŒĞ½Ñ‹Ğ¼ - ÑĞ±Ñ€Ğ¾ÑĞ¸Ñ‚ÑŒ Ğ°ĞºÑ‚ÑƒĞ°Ğ»ÑŒĞ½Ğ¾ÑÑ‚ÑŒ
         m_reset_actuality = true;
     }
     //-----------------------------------------------------------------------
 
-    // ñîõğàíèòü òåêóùåå âğåìÿ
+    // ÑĞ¾Ñ…Ñ€Ğ°Ğ½Ğ¸Ñ‚ÑŒ Ñ‚ĞµĞºÑƒÑ‰ĞµĞµ Ğ²Ñ€ĞµĞ¼Ñ
     m_last_time_target_set = Device.dwTimeGlobal;
 
-    // ïàğàìåòğû óñòàíîâëåíû, âêëş÷àåì àêòóàëüíîñòü
+    // Ğ¿Ğ°Ñ€Ğ°Ğ¼ĞµÑ‚Ñ€Ñ‹ ÑƒÑÑ‚Ğ°Ğ½Ğ¾Ğ²Ğ»ĞµĞ½Ñ‹, Ğ²ĞºĞ»ÑÑ‡Ğ°ĞµĞ¼ Ğ°ĞºÑ‚ÑƒĞ°Ğ»ÑŒĞ½Ğ¾ÑÑ‚ÑŒ
     m_target_actual = true;
 }
 
@@ -84,18 +84,18 @@ void CControlPathBuilderBase::update_path_builder_state()
 
     m_state = eStatePathValid;
 
-    // íåò ïóòè
+    // Ğ½ĞµÑ‚ Ğ¿ÑƒÑ‚Ğ¸
     if (m_man->path_builder().detail().path().empty())
     {
         m_state = eStateNoPath;
     }
-    // ïğîâåğêà íà êîíåö ïóòè
+    // Ğ¿Ñ€Ğ¾Ğ²ĞµÑ€ĞºĞ° Ğ½Ğ° ĞºĞ¾Ğ½ĞµÑ† Ğ¿ÑƒÑ‚Ğ¸
     else if (m_path_end)
     {
         m_state = eStatePathEnd;
     }
 
-    // æäàòü ïîêà íå áóäåò ïîñòğîåí ïóòü (ïóòü äîëæåí áûòü ãàğàíòèğîâàííî ïîñòğîåí)
+    // Ğ¶Ğ´Ğ°Ñ‚ÑŒ Ğ¿Ğ¾ĞºĞ° Ğ½Ğµ Ğ±ÑƒĞ´ĞµÑ‚ Ğ¿Ğ¾ÑÑ‚Ñ€Ğ¾ĞµĞ½ Ğ¿ÑƒÑ‚ÑŒ (Ğ¿ÑƒÑ‚ÑŒ Ğ´Ğ¾Ğ»Ğ¶ĞµĞ½ Ğ±Ñ‹Ñ‚ÑŒ Ğ³Ğ°Ñ€Ğ°Ğ½Ñ‚Ğ¸Ñ€Ğ¾Ğ²Ğ°Ğ½Ğ½Ğ¾ Ğ¿Ğ¾ÑÑ‚Ñ€Ğ¾ĞµĞ½)
     if ((m_last_time_target_set > m_time_path_updated_external) ||
         (!m_man->path_builder().detail().actual() &&
             (m_man->path_builder().detail().time_path_built() < m_last_time_target_set)))

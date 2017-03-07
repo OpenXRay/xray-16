@@ -137,13 +137,13 @@ void CWeaponPistol::OnShot()
     PHGetLinearVell(vel);
     OnShellDrop(get_LastSP(), vel);
 
-    // Огонь из ствола
+    // РћРіРѕРЅСЊ РёР· СЃС‚РІРѕР»Р°
 
     StartFlameParticles();
     R_ASSERT2(!m_pFlameParticles || !m_pFlameParticles->IsLooped(),
         "can't set looped particles system for shoting with pistol");
 
-    //дым из ствола
+    //РґС‹Рј РёР· СЃС‚РІРѕР»Р°
     StartSmokeParticles(get_LastFP(), vel);
 }
 

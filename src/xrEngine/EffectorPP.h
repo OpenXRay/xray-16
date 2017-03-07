@@ -2,7 +2,7 @@
 #include "xrEngine/CameraDefs.h"
 struct SPPInfo;
 
-// постпроцесс
+// РїРѕСЃС‚РїСЂРѕС†РµСЃСЃ
 class ENGINE_API CEffectorPP : public SBaseEffector
 {
     EEffectorPPType eType;

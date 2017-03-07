@@ -30,7 +30,7 @@ void xrServer::Process_event_destroy(NET_Packet& P, ClientID sender, u32 time, u
         Msg("sv destroy object %s [%d]", ent_name_safe(id_dest).c_str(), Device.dwFrame);
 #endif
 
-    CSE_Abstract* e_dest = game->get_entity_from_eid(id_dest); // êòî äîëæåí áûòü óíè÷òîæåí
+    CSE_Abstract* e_dest = game->get_entity_from_eid(id_dest); // ĞºÑ‚Ğ¾ Ğ´Ğ¾Ğ»Ğ¶ĞµĞ½ Ğ±Ñ‹Ñ‚ÑŒ ÑƒĞ½Ğ¸Ñ‡Ñ‚Ğ¾Ğ¶ĞµĞ½
     if (!e_dest)
     {
 #ifndef MASTER_GOLD
@@ -40,9 +40,9 @@ void xrServer::Process_event_destroy(NET_Packet& P, ClientID sender, u32 time, u
     };
 
     R_ASSERT(e_dest);
-    xrClientData* c_dest = e_dest->owner; // êëèåíò, ÷åé şíèò
+    xrClientData* c_dest = e_dest->owner; // ĞºĞ»Ğ¸ĞµĞ½Ñ‚, Ñ‡ĞµĞ¹ ÑĞ½Ğ¸Ñ‚
     R_ASSERT(c_dest);
-    xrClientData* c_from = ID_to_client(sender); // êëèåíò, êòî ïğèñëàë
+    xrClientData* c_from = ID_to_client(sender); // ĞºĞ»Ğ¸ĞµĞ½Ñ‚, ĞºÑ‚Ğ¾ Ğ¿Ñ€Ğ¸ÑĞ»Ğ°Ğ»
     R_ASSERT(c_dest == c_from); // assure client ownership of event
     u16 parent_id = e_dest->ID_Parent;
 

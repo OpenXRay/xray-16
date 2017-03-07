@@ -25,12 +25,12 @@ CTrade::CTrade(CInventoryOwner* p_io)
 
     m_bNeedToUpdateArtefactTasks = false;
 
-    // Заполнить pThis
+    // Р—Р°РїРѕР»РЅРёС‚СЊ pThis
     CAI_Trader* pTrader;
     CActor* pActor;
     CAI_Stalker* pStalker;
 
-    // Определяем потомка этого экземпляра класса
+    // РћРїСЂРµРґРµР»СЏРµРј РїРѕС‚РѕРјРєР° СЌС‚РѕРіРѕ СЌРєР·РµРјРїР»СЏСЂР° РєР»Р°СЃСЃР°
     pTrader = smart_cast<CAI_Trader*>(p_io);
     if (pTrader)
         pThis.Set(TT_TRADER, pTrader, p_io);
@@ -50,10 +50,10 @@ CTrade::CTrade(CInventoryOwner* p_io)
 
 CTrade::~CTrade() {}
 void CTrade::RemovePartner() { pPartner.Set(TT_NONE, 0, 0); }
-//// предложение торговли
+//// РїСЂРµРґР»РѕР¶РµРЅРёРµ С‚РѕСЂРіРѕРІР»Рё
 // void CTrade::Communicate()
 //{
-//	// Вывести приветствие
+//	// Р’С‹РІРµСЃС‚Рё РїСЂРёРІРµС‚СЃС‚РІРёРµ
 ////	Msg("--TRADE::----------------------------------------------");
 ////	Msg("--TRADE::          TRADE ACIVATED                      ");
 ////	Msg("--TRADE::----------------------------------------------");
@@ -92,9 +92,9 @@ bool CTrade::SetPartner(CEntity* p)
     return true;
 }
 
-//// Man предлагает торговать
-//// возвращает true, если данный trader готов торговать с man
-//// т.е. принятие торговли
+//// Man РїСЂРµРґР»Р°РіР°РµС‚ С‚РѕСЂРіРѕРІР°С‚СЊ
+//// РІРѕР·РІСЂР°С‰Р°РµС‚ true, РµСЃР»Рё РґР°РЅРЅС‹Р№ trader РіРѕС‚РѕРІ С‚РѕСЂРіРѕРІР°С‚СЊ СЃ man
+//// С‚.Рµ. РїСЂРёРЅСЏС‚РёРµ С‚РѕСЂРіРѕРІР»Рё
 // bool CTrade::OfferTrade(SInventoryOwner man)
 //{
 //	StartTrade();

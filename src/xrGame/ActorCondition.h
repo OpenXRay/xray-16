@@ -1,4 +1,4 @@
-// ActorCondition.h: класс состояния игрока
+// ActorCondition.h: РєР»Р°СЃСЃ СЃРѕСЃС‚РѕСЏРЅРёСЏ РёРіСЂРѕРєР°
 //
 
 #pragma once
@@ -70,7 +70,7 @@ public:
     IC void BoostTelepaticProtection(const float value);
     IC void BoostChemicalBurnProtection(const float value);
     BOOSTER_MAP GetCurBoosterInfluences() { return m_booster_influences; };
-    // хромание при потере сил и здоровья
+    // С…СЂРѕРјР°РЅРёРµ РїСЂРё РїРѕС‚РµСЂРµ СЃРёР» Рё Р·РґРѕСЂРѕРІСЊСЏ
     virtual bool IsLimping() const;
     virtual bool IsCantWalk() const;
     virtual bool IsCantWalkWeight();
@@ -151,7 +151,7 @@ protected:
     mutable bool m_bCantWalk;
     mutable bool m_bCantSprint;
 
-    //порог силы и здоровья меньше которого актер начинает хромать
+    //РїРѕСЂРѕРі СЃРёР»С‹ Рё Р·РґРѕСЂРѕРІСЊСЏ РјРµРЅСЊС€Рµ РєРѕС‚РѕСЂРѕРіРѕ Р°РєС‚РµСЂ РЅР°С‡РёРЅР°РµС‚ С…СЂРѕРјР°С‚СЊ
     float m_fLimpingPowerBegin;
     float m_fLimpingPowerEnd;
     float m_fCantWalkPowerBegin;

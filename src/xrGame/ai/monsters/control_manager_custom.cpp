@@ -209,7 +209,7 @@ bool CControlManagerCustom::ta_is_active(const SAnimationTripleData& data)
 
 void CControlManagerCustom::ta_deactivate() { m_man->release(this, ControlCom::eControlTripleAnimation); }
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-// Ğàáîòà ñ ïîñëåäîâàòåëüíîñòÿìè
+// Ğ Ğ°Ğ±Ğ¾Ñ‚Ğ° Ñ Ğ¿Ğ¾ÑĞ»ĞµĞ´Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»ÑŒĞ½Ğ¾ÑÑ‚ÑĞ¼Ğ¸
 void CControlManagerCustom::seq_init()
 {
     m_man->capture(this, ControlCom::eControlSequencer);
@@ -494,7 +494,7 @@ void CControlManagerCustom::check_jump_over_physics()
     {
         const DetailPathManager::STravelPathPoint& travel_point = m_man->path_builder().detail().path()[i];
 
-        // ïîëó÷èòü ñïèñîê îáúåêòîâ âîêğóã âğàãà
+        // Ğ¿Ğ¾Ğ»ÑƒÑ‡Ğ¸Ñ‚ÑŒ ÑĞ¿Ğ¸ÑĞ¾Ğº Ğ¾Ğ±ÑŠĞµĞºÑ‚Ğ¾Ğ² Ğ²Ğ¾ĞºÑ€ÑƒĞ³ Ğ²Ñ€Ğ°Ğ³Ğ°
         m_nearest.clear_not_free();
         Level().ObjectSpace.GetNearest(m_nearest, travel_point.position, m_object->Radius(), NULL);
 
@@ -508,7 +508,7 @@ void CControlManagerCustom::check_jump_over_physics()
 
             Fvector dir = Fvector().sub(travel_point.position, m_object->Position());
 
-            // ïğîâåğêà íà  Field-Of-View
+            // Ğ¿Ñ€Ğ¾Ğ²ĞµÑ€ĞºĞ° Ğ½Ğ°  Field-Of-View
             float my_h = m_object->Direction().getH();
             float h = dir.getH();
 
@@ -520,7 +520,7 @@ void CControlManagerCustom::check_jump_over_physics()
 
             dir = Fvector().sub(obj->Position(), m_object->Position());
 
-            // âû÷èñëèòü öåëåâóş ïîçèöèş äëÿ ïğûæêà
+            // Ğ²Ñ‹Ñ‡Ğ¸ÑĞ»Ğ¸Ñ‚ÑŒ Ñ†ĞµĞ»ĞµĞ²ÑƒÑ Ğ¿Ğ¾Ğ·Ğ¸Ñ†Ğ¸Ñ Ğ´Ğ»Ñ Ğ¿Ñ€Ñ‹Ğ¶ĞºĞ°
             Fvector target;
             obj->Center(target);
             target.y += obj->Radius();

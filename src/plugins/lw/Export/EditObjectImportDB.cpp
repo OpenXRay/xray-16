@@ -76,7 +76,7 @@ bool CEditableObject::Import_LWO(st_ObjectDB* I)
                         break;
                     }
 
-                    // индексы соответствия импортируемых мап
+                    // РёРЅРґРµРєСЃС‹ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ РёРјРїРѕСЂС‚РёСЂСѓРµРјС‹С… РјР°Рї
                     static VMIndexLink VMIndices;
                     VMIndices.clear();
 
@@ -196,20 +196,20 @@ bool CEditableObject::Import_LWO(st_ObjectDB* I)
                             int vmp_cnt = Ipv.nvmaps;
                             if (vmp_cnt)
                             {
-                                // берем из poly
+                                // Р±РµСЂРµРј РёР· poly
                                 for (int vm_i = 0; vm_i < vmp_cnt; vm_i++)
                                 {
                                     if (Ipv.vm[vm_i].vmap->type != LWVMAP_TXUV)
                                         continue;
                                     vm_lst.push_back(st_VMapPt());
                                     st_VMapPt& pt = vm_lst.back();
-                                    pt.vmap_index = VMIndices[Ipv.vm[vm_i].vmap]; // номер моей VMap
+                                    pt.vmap_index = VMIndices[Ipv.vm[vm_i].vmap]; // РЅРѕРјРµСЂ РјРѕРµР№ VMap
                                     pt.index = Ipv.vm[vm_i].index;
                                 }
                             }
                             else
                             {
-                                // берем из points
+                                // Р±РµСЂРµРј РёР· points
                                 DBPoint& Ipt = I->pt[Mpv.pindex];
                                 int vm_cnt = Ipt.nvmaps;
                                 if (!vm_cnt)
@@ -224,7 +224,7 @@ bool CEditableObject::Import_LWO(st_ObjectDB* I)
                                         continue;
                                     vm_lst.push_back(st_VMapPt());
                                     st_VMapPt& pt = vm_lst.back();
-                                    pt.vmap_index = VMIndices[Ipt.vm[vm_i].vmap]; // номер моей VMap
+                                    pt.vmap_index = VMIndices[Ipt.vm[vm_i].vmap]; // РЅРѕРјРµСЂ РјРѕРµР№ VMap
                                     pt.index = Ipt.vm[vm_i].index;
                                 }
                             }
@@ -238,13 +238,13 @@ bool CEditableObject::Import_LWO(st_ObjectDB* I)
                                     continue;
                                 vm_lst.push_back(st_VMapPt());
                                 st_VMapPt& pt = vm_lst.back();
-                                pt.vmap_index = VMIndices[Ipt.vm[vm_i].vmap]; // номер моей VMap
+                                pt.vmap_index = VMIndices[Ipt.vm[vm_i].vmap]; // РЅРѕРјРµСЂ РјРѕРµР№ VMap
                                 pt.index = Ipt.vm[vm_i].index;
                             }
                         }
                         if (!bResult)
                             break;
-                        // Ipol.surf->alpha_mode - заполнено как номер моего surface
+                        // Ipol.surf->alpha_mode - Р·Р°РїРѕР»РЅРµРЅРѕ РєР°Рє РЅРѕРјРµСЂ РјРѕРµРіРѕ surface
                         surf_ids[p_i] = Ipol.sindex;
                     }
                     if (!bResult)

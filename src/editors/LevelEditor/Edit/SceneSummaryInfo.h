@@ -18,7 +18,7 @@ public:
         sttGlow,
         sttLOD,
         sttLast
-    }; // не забывать токен менять
+    }; // РЅРµ Р·Р°Р±С‹РІР°С‚СЊ С‚РѕРєРµРЅ РјРµРЅСЏС‚СЊ
 private:
     struct STextureInfo
     {

@@ -172,10 +172,10 @@ GameGraph::_GRAPH_ID tGraphID) :
                 break;
             }
             case eMeetActionTypeInteract : {
-                R_ASSERT2				(l_tpALifeHumanAbstract,"Non-human objects Òannot communicate with each other");
+                R_ASSERT2				(l_tpALifeHumanAbstract,"Non-human objects —Åannot communicate with each other");
                 CSE_ALifeHumanAbstract	*l_tpALifeHumanAbstract2 =
 smart_cast<CSE_ALifeHumanAbstract*>(l_tpALifeSchedulable);
-                R_ASSERT2				(l_tpALifeHumanAbstract2,"Non-human objects Òannot communicate with each
+                R_ASSERT2				(l_tpALifeHumanAbstract2,"Non-human objects —Åannot communicate with each
 other");
 #ifdef DEBUG
                 if (psAI_Flags.test(aiALife)) {

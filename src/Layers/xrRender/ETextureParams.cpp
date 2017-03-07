@@ -69,7 +69,7 @@ void STextureParams::Load(IReader& F)
         bump_mode = (ETBumpMode)F.r_u32();
         if (bump_mode < STextureParams::tbmNone)
         {
-            bump_mode = STextureParams::tbmNone; //.. временно (до полного убирания Autogen)
+            bump_mode = STextureParams::tbmNone; //.. РІСЂРµРјРµРЅРЅРѕ (РґРѕ РїРѕР»РЅРѕРіРѕ СѓР±РёСЂР°РЅРёСЏ Autogen)
         }
         F.r_stringZ(bump_name);
     }

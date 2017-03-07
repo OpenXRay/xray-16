@@ -246,7 +246,7 @@ public:
     virtual void Hit(SHit* pHDS) override {}
     virtual void SetHitInfo(IGameObject* who, IGameObject* weapon, s16 element, Fvector Pos, Fvector Dir) override {}
     virtual BOOL BonePassBullet(int boneID) override { return FALSE; }
-    //игровое имя объекта
+    //РёРіСЂРѕРІРѕРµ РёРјСЏ РѕР±СЉРµРєС‚Р°
     virtual LPCSTR Name() const override;
     // Active/non active
     virtual void OnH_B_Chield() override; // before
@@ -347,11 +347,11 @@ public:
     virtual void on_matrix_change(const Fmatrix& previous) override;
     // UsableScriptObject functions
     virtual bool use(IGameObject* obj) override;
-    //строчка появляющаяся при наведении на объект (если NULL, то нет)
+    //СЃС‚СЂРѕС‡РєР° РїРѕСЏРІР»СЏСЋС‰Р°СЏСЃСЏ РїСЂРё РЅР°РІРµРґРµРЅРёРё РЅР° РѕР±СЉРµРєС‚ (РµСЃР»Рё NULL, С‚Рѕ РЅРµС‚)
     virtual LPCSTR tip_text() override;
     virtual void set_tip_text(LPCSTR new_text) override;
     virtual void set_tip_text_default() override;
-    //можно ли использовать объект стандартным (не скриптовым) образом
+    //РјРѕР¶РЅРѕ Р»Рё РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РѕР±СЉРµРєС‚ СЃС‚Р°РЅРґР°СЂС‚РЅС‹Рј (РЅРµ СЃРєСЂРёРїС‚РѕРІС‹Рј) РѕР±СЂР°Р·РѕРј
     virtual bool nonscript_usable() override;
     virtual void set_nonscript_usable(bool usable) override;
     virtual CScriptBinderObject* GetScriptBinderObject() override { return scriptBinder.object(); }

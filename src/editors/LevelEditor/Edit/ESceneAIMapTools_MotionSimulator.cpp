@@ -103,7 +103,7 @@ IC
     void
     closestPointOnLine(Fvector& res, const Fvector& a, const Fvector& b, const Fvector& p)
 {
-    // Determine t (the length of the vector from ‘a’ to ‘p’)
+    // Determine t (the length of the vector from â€˜aâ€™ to â€˜pâ€™)
     Fvector c;
     c.sub(p, a);
     Fvector V;
@@ -114,7 +114,7 @@ IC
     V.div(d);
     float t = V.dotproduct(c);
 
-    // Check to see if ‘t’ is beyond the extents of the line segment
+    // Check to see if â€˜tâ€™ is beyond the extents of the line segment
     if (t <= 0.0f)
     {
         res.set(a);
@@ -126,7 +126,7 @@ IC
         return;
     }
 
-    // Return the point between ‘a’ and ‘b’
+    // Return the point between â€˜aâ€™ and â€˜bâ€™
     // set length of V to t. V is normalized so this is easy
     res.mad(a, V, t);
 }
@@ -139,12 +139,12 @@ IC
         const Fvector& ED, float elen, // edge direction (b-a) and length
         const Fvector& P) // query point
 {
-    // Determine t (the length of the vector from ‘a’ to ‘p’)
+    // Determine t (the length of the vector from â€˜aâ€™ to â€˜pâ€™)
     Fvector c;
     c.sub(P, a);
     float t = ED.dotproduct(c);
 
-    // Check to see if ‘t’ is beyond the extents of the line segment
+    // Check to see if â€˜tâ€™ is beyond the extents of the line segment
     if (t <= 0.0f)
     {
         res.set(a);
@@ -156,7 +156,7 @@ IC
         return;
     }
 
-    // Return the point between ‘a’ and ‘b’
+    // Return the point between â€˜aâ€™ and â€˜bâ€™
     res.mad(a, ED, t);
 }
 

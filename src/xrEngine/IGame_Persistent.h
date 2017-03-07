@@ -102,7 +102,7 @@ public:
     virtual void OnAppDeactivate();
     virtual void OnFrame();
 
-    // вызывается только когда изменяется тип игры
+    // РІС‹Р·С‹РІР°РµС‚СЃСЏ С‚РѕР»СЊРєРѕ РєРѕРіРґР° РёР·РјРµРЅСЏРµС‚СЃСЏ С‚РёРї РёРіСЂС‹
     virtual void OnGameStart();
     virtual void OnGameEnd();
 

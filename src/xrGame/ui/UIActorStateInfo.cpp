@@ -257,7 +257,7 @@ void ui_actor_state_wnd::update_round_states(CActor* actor, ALife::EHitType hit_
 
 void ui_actor_state_wnd::UpdateHitZone()
 {
-    CUIHudStatesWnd* wnd = CurrentGameUI()->UIMainIngameWnd->get_hud_states(); //некрасиво слишком
+    CUIHudStatesWnd* wnd = CurrentGameUI()->UIMainIngameWnd->get_hud_states(); //РЅРµРєСЂР°СЃРёРІРѕ СЃР»РёС€РєРѕРј
     VERIFY(wnd);
     if (!wnd)
     {

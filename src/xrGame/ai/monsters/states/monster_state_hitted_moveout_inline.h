@@ -19,7 +19,7 @@ void CStateMonsterHittedMoveOutAbstract::initialize()
 TEMPLATE_SPECIALIZATION
 void CStateMonsterHittedMoveOutAbstract::execute()
 {
-    // проверить на завершение пути
+    // РїСЂРѕРІРµСЂРёС‚СЊ РЅР° Р·Р°РІРµСЂС€РµРЅРёРµ РїСѓС‚Рё
     if (object->control().path_builder().detail().time_path_built() > time_state_started)
     {
         if (object->control().path_builder().is_path_end(DIST_TO_PATH_END))

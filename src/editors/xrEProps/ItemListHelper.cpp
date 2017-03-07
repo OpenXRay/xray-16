@@ -56,7 +56,7 @@ bool CListHelper::NameAfterEdit(ListItem* sender, LPCSTR value, shared_str& N)
     {
         if ((itm != node) && (itm->Text == AnsiString(N.c_str())))
         {
-            // елемент с таким именем уже существует
+            // РµР»РµРјРµРЅС‚ СЃ С‚Р°РєРёРј РёРјРµРЅРµРј СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚
             N = value;
             return false;
         }
@@ -66,7 +66,7 @@ bool CListHelper::NameAfterEdit(ListItem* sender, LPCSTR value, shared_str& N)
     AnsiString tmp;
     _ReplaceItem(*sender->key, _GetItemCount(*sender->key, '\\') - 1, N.c_str(), tmp, '\\');
     sender->key = tmp.c_str();
-    // Имя объекта может быть составным из a\\b\\name
+    // РРјСЏ РѕР±СЉРµРєС‚Р° РјРѕР¶РµС‚ Р±С‹С‚СЊ СЃРѕСЃС‚Р°РІРЅС‹Рј РёР· a\\b\\name
     _ReplaceItem(value, _GetItemCount(value, '\\') - 1, N.c_str(), tmp, '\\');
     N = tmp.c_str();
 

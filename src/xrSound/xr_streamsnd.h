@@ -53,7 +53,7 @@ private:
     unsigned char* WaveDest;
 
     u32 writepos;
-    BOOL isPresentData; // признак окончания буфера
+    BOOL isPresentData; // РїСЂРёР·РЅР°Рє РѕРєРѕРЅС‡Р°РЅРёСЏ Р±СѓС„РµСЂР°
     u32 dwDecPos;
     IReader* hf;
     int DataPos;

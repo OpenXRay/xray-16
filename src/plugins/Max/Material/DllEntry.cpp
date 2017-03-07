@@ -18,7 +18,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, ULONG fdwReason, LPVOID lpvReserved)
         controlsInit = TRUE;
         Core._initialize("S.T.A.L.K.E.R.Plugin", 0, FALSE, nullptr, true);
         FS._initialize(CLocatorAPI::flScanAppRoot, NULL, "xray_path.ltx");
-        FPU::m64r(); // нужно чтобы макс не сбрасывал контрольки в 0
+        FPU::m64r(); // РЅСѓР¶РЅРѕ С‡С‚РѕР±С‹ РјР°РєСЃ РЅРµ СЃР±СЂР°СЃС‹РІР°Р» РєРѕРЅС‚СЂРѕР»СЊРєРё РІ 0
         InitCustomControls(hInstance); // Initialize MAX's custom controls
         InitCommonControls(); // Initialize Win95 controls
         // load shader list

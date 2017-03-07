@@ -54,7 +54,7 @@ void CEnergyHolder::schedule_update()
     if (!m_enable)
         return;
 
-    // Обновить значение энергии
+    // РћР±РЅРѕРІРёС‚СЊ Р·РЅР°С‡РµРЅРёРµ СЌРЅРµСЂРіРёРё
     u32 cur_time = Device.dwTimeGlobal;
     float dt = float(cur_time - m_time_last_update) / 1000.f;
 
@@ -65,10 +65,10 @@ void CEnergyHolder::schedule_update()
 
     clamp(m_value, 0.f, 1.f);
 
-    // сохранить время последнего обновления
+    // СЃРѕС…СЂР°РЅРёС‚СЊ РІСЂРµРјСЏ РїРѕСЃР»РµРґРЅРµРіРѕ РѕР±РЅРѕРІР»РµРЅРёСЏ
     m_time_last_update = cur_time;
 
-    // проверка на автоматическое включение/выключение поля
+    // РїСЂРѕРІРµСЂРєР° РЅР° Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРµ РІРєР»СЋС‡РµРЅРёРµ/РІС‹РєР»СЋС‡РµРЅРёРµ РїРѕР»СЏ
     if (is_active() && should_deactivate() && m_auto_deactivate)
         deactivate();
     if (!is_active() && can_activate() && m_auto_activate)

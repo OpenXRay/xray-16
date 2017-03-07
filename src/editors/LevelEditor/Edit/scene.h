@@ -85,7 +85,7 @@ protected:
 
     TProperties* m_SummaryInfo;
 
-    ObjectList m_ESO_SnapObjects; // временно здесь а вообще нужно перенести в ESceneTools
+    ObjectList m_ESO_SnapObjects; // РІСЂРµРјРµРЅРЅРѕ Р·РґРµСЃСЊ Р° РІРѕРѕР±С‰Рµ РЅСѓР¶РЅРѕ РїРµСЂРµРЅРµСЃС‚Рё РІ ESceneTools
 protected:
     bool OnLoadAppendObject(CCustomObject* O);
     bool OnLoadSelectionAppendObject(CCustomObject* O);

@@ -88,7 +88,7 @@ void CLevel::IR_OnMouseMove(int dx, int dy)
     }
 }
 
-// Обработка нажатия клавиш
+// РћР±СЂР°Р±РѕС‚РєР° РЅР°Р¶Р°С‚РёСЏ РєР»Р°РІРёС€
 extern bool g_block_pause;
 
 // Lain: added TEMP!!!

@@ -11,7 +11,7 @@ IC void CMeleeChecker::load(LPCSTR section)
 
 IC void CMeleeChecker::init_attack()
 {
-    // инициализировать стек
+    // РёРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊ СЃС‚РµРє
     for (u32 i = 0; i < HIT_STACK_SIZE; i++)
         m_hit_stack[i] = true;
 

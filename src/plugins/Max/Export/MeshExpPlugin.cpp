@@ -36,7 +36,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, ULONG fdwReason, LPVOID lpvReserved)
         controlsInit = TRUE;
         Core._initialize("S.T.A.L.K.E.R.Plugin", LogCallback(ELogCallback, nullptr), FALSE, nullptr, true);
         FS._initialize(CLocatorAPI::flScanAppRoot, NULL, "xray_path.ltx");
-        FPU::m64r(); // нужно чтобы макс не сбрасывал контрольки в 0
+        FPU::m64r(); // РЅСѓР¶РЅРѕ С‡С‚РѕР±С‹ РјР°РєСЃ РЅРµ СЃР±СЂР°СЃС‹РІР°Р» РєРѕРЅС‚СЂРѕР»СЊРєРё РІ 0
         InitCustomControls(hInstance);
         InitCommonControls();
         ELog.Msg(mtInformation, "S.T.A.L.K.E.R. Object Export (ver. %d.%02d)", EXPORTER_VERSION, EXPORTER_BUILD);

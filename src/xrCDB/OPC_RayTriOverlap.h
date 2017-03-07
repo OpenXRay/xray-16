@@ -3,7 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *	Computes a ray-triangle intersection test.
- *	From Tomas Möller's "Fast Minimum Storage Ray-Triangle Intersection"
+ *	From Tomas MÑ†ller's "Fast Minimum Storage Ray-Triangle Intersection"
  *
  *	\param		vert0	[in] triangle vertex
  *	\param		vert1	[in] triangle vertex

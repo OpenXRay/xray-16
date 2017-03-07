@@ -71,7 +71,7 @@ void game_cl_Deathmatch::OnBuyMenu_Ok()
         }
     }
 
-    //принудительно добавляем нож
+    //РїСЂРёРЅСѓРґРёС‚РµР»СЊРЅРѕ РґРѕР±Р°РІР»СЏРµРј РЅРѕР¶
     if (local_player && local_player->testFlag(GAME_PLAYER_FLAG_VERY_VERY_DEAD))
     {
         u8 KnifeSlot, KnifeIndex;
@@ -150,7 +150,7 @@ void game_cl_Deathmatch::SetBuyMenuItems(PRESET_ITEMS* pItems, BOOL OnlyPreset)
             _alloca(sizeof(aditional_ammo_t::value_type) * (max_addammo_count * 2)), (max_addammo_count * 2));
         TryToDefuseAllWeapons(add_ammo);
 
-        //проверяем слоты
+        //РїСЂРѕРІРµСЂСЏРµРј СЃР»РѕС‚С‹
         u16 ISlot = pCurActor->inventory().FirstSlot();
         u16 ESlot = pCurActor->inventory().LastSlot();
 
@@ -185,7 +185,7 @@ void game_cl_Deathmatch::SetBuyMenuItems(PRESET_ITEMS* pItems, BOOL OnlyPreset)
             }
         };
 
-        //проверяем пояс
+        //РїСЂРѕРІРµСЂСЏРµРј РїРѕСЏСЃ
         TIItemContainer::const_iterator IBelt = pCurActor->inventory().m_belt.begin();
         TIItemContainer::const_iterator EBelt = pCurActor->inventory().m_belt.end();
 
@@ -212,7 +212,7 @@ void game_cl_Deathmatch::SetBuyMenuItems(PRESET_ITEMS* pItems, BOOL OnlyPreset)
             }
         };
 
-        //проверяем ruck
+        //РїСЂРѕРІРµСЂСЏРµРј ruck
         TIItemContainer::const_iterator IRuck = pCurActor->inventory().m_ruck.begin();
         TIItemContainer::const_iterator ERuck = pCurActor->inventory().m_ruck.end();
 
@@ -388,10 +388,10 @@ void game_cl_Deathmatch::LoadTeamDefaultPresetItems(
 
     string256 ItemName;
     string4096 DefItems;
-    // Читаем данные этого поля
+    // Р§РёС‚Р°РµРј РґР°РЅРЅС‹Рµ СЌС‚РѕРіРѕ РїРѕР»СЏ
     xr_strcpy(DefItems, pSettings->r_string(caSection, "default_items"));
     u32 count = _GetItemCount(DefItems);
-    // теперь для каждое имя оружия, разделенные запятыми, заносим в массив
+    // С‚РµРїРµСЂСЊ РґР»СЏ РєР°Р¶РґРѕРµ РёРјСЏ РѕСЂСѓР¶РёСЏ, СЂР°Р·РґРµР»РµРЅРЅС‹Рµ Р·Р°РїСЏС‚С‹РјРё, Р·Р°РЅРѕСЃРёРј РІ РјР°СЃСЃРёРІ
     for (u32 i = 0; i < count; ++i)
     {
         _GetItem(DefItems, i, ItemName);

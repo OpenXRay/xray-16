@@ -47,7 +47,7 @@ public:
 
     virtual void UpdateSounds();
 
-    //переключение в режим подствольника
+    //РїРµСЂРµРєР»СЋС‡РµРЅРёРµ РІ СЂРµР¶РёРј РїРѕРґСЃС‚РІРѕР»СЊРЅРёРєР°
     virtual bool SwitchMode();
     void PerformSwitchGL();
     void OnAnimationEnd(u32 state);
@@ -56,7 +56,7 @@ public:
 
     virtual bool IsNecessaryItem(const shared_str& item_sect);
 
-    //виртуальные функции для проигрывания анимации HUD
+    //РІРёСЂС‚СѓР°Р»СЊРЅС‹Рµ С„СѓРЅРєС†РёРё РґР»СЏ РїСЂРѕРёРіСЂС‹РІР°РЅРёСЏ Р°РЅРёРјР°С†РёРё HUD
     virtual void PlayAnimShow();
     virtual void PlayAnimHide();
     virtual void PlayAnimReload();
@@ -73,8 +73,8 @@ private:
     int GetAmmoCount2(u8 ammo2_type) const;
 
 public:
-    //дополнительные параметры патронов
-    //для подствольника
+    //РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ РїР°С‚СЂРѕРЅРѕРІ
+    //РґР»СЏ РїРѕРґСЃС‚РІРѕР»СЊРЅРёРєР°
     //-	CWeaponAmmo*			m_pAmmo2;
     xr_vector<shared_str> m_ammoTypes2;
     u8 m_ammoType2;

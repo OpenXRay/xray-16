@@ -43,7 +43,7 @@ struct SND_Message
 
 struct cl_TeamStruct
 {
-    shared_str caSection; // имя секции комманды
+    shared_str caSection; // РёРјСЏ СЃРµРєС†РёРё РєРѕРјРјР°РЅРґС‹
     //-----------------------------------
     ui_shader IndicatorShader;
     ui_shader InvincibleShader;

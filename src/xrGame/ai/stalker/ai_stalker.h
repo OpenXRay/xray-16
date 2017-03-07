@@ -289,8 +289,8 @@ public:
     virtual bool feel_touch_contact(IGameObject* O);
     virtual bool feel_touch_on_contact(IGameObject* O);
 
-    //флаги, какие действия совершал актер по отношению к сталкеру
-    //(помог, атаковал и т.д.)
+    //С„Р»Р°РіРё, РєР°РєРёРµ РґРµР№СЃС‚РІРёСЏ СЃРѕРІРµСЂС€Р°Р» Р°РєС‚РµСЂ РїРѕ РѕС‚РЅРѕС€РµРЅРёСЋ Рє СЃС‚Р°Р»РєРµСЂСѓ
+    //(РїРѕРјРѕРі, Р°С‚Р°РєРѕРІР°Р» Рё С‚.Рґ.)
     Flags32 m_actor_relation_flags;
 
     // ALife

@@ -142,7 +142,7 @@ public:
     }
     virtual void run()
     {
-        //äîáàâèòü îòìåòêó íà ìàòåðèàëå
+        //Ð´Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ Ð¾Ñ‚Ð¼ÐµÑ‚ÐºÑƒ Ð½Ð° Ð¼Ð°Ñ‚ÐµÑ€Ð¸Ð°Ð»Ðµ
         GlobalEnv.Render->add_StaticWallmark(pWallmarkShader, pos, 0.09f, T, Level().ObjectSpace.GetStaticVerts());
     };
     virtual bool obsolete() const { return false; }

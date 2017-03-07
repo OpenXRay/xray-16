@@ -178,7 +178,7 @@ void CTextConsole::Destroy()
     DestroyWindow(m_hConsoleWnd);
 }
 
-void CTextConsole::OnRender() {} // disable ÑConsole::OnRender()
+void CTextConsole::OnRender() {} // disable Ð¡Console::OnRender()
 void CTextConsole::OnPaint()
 {
     RECT wRC;

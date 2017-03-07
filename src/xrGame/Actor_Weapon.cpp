@@ -1,4 +1,4 @@
-// Actor_Weapon.cpp:	 для работы с оружием
+// Actor_Weapon.cpp:	 РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ РѕСЂСѓР¶РёРµРј
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -22,7 +22,7 @@ static const float VEL_A_MAX = 10.f;
 
 #define GetWeaponParam(pWeapon, func_name, def_value) ((pWeapon) ? (pWeapon->func_name) : def_value)
 
-//возвращает текуший разброс стрельбы (в радианах)с учетом движения
+//РІРѕР·РІСЂР°С‰Р°РµС‚ С‚РµРєСѓС€РёР№ СЂР°Р·Р±СЂРѕСЃ СЃС‚СЂРµР»СЊР±С‹ (РІ СЂР°РґРёР°РЅР°С…)СЃ СѓС‡РµС‚РѕРј РґРІРёР¶РµРЅРёСЏ
 float CActor::GetWeaponAccuracy() const
 {
     CWeapon* W = smart_cast<CWeapon*>(inventory().ActiveItem());
@@ -319,9 +319,9 @@ void CActor::RemoveAmmoForWeapon(CInventoryItem* pIItem)
     CWeaponAmmo* pAmmo = smart_cast<CWeaponAmmo*>(inventory().GetAny(pWM->m_ammoTypes[0].c_str()));
     if (!pAmmo)
         return;
-    //--- мы нашли патроны к текущему оружию
+    //--- РјС‹ РЅР°С€Р»Рё РїР°С‚СЂРѕРЅС‹ Рє С‚РµРєСѓС‰РµРјСѓ РѕСЂСѓР¶РёСЋ
     /*
-    //--- проверяем не подходят ли они к чему-то еще
+    //--- РїСЂРѕРІРµСЂСЏРµРј РЅРµ РїРѕРґС…РѕРґСЏС‚ Р»Рё РѕРЅРё Рє С‡РµРјСѓ-С‚Рѕ РµС‰Рµ
     bool CanRemove = true;
     TIItemContainer::const_iterator I = inventory().m_all.begin();//, B = I;
     TIItemContainer::const_iterator E = inventory().m_all.end();

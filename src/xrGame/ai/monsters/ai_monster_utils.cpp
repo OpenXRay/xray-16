@@ -6,8 +6,8 @@
 #include "xrAICore/Navigation/level_graph.h"
 #include "Include/xrRender/Kinematics.h"
 #include "basemonster/base_monster.h"
-// ïðîâåðèòü, íàõîäèòñÿ ëè îáúåêò entity íà íîäå
-// âîçâðàùàåò ïîçèöèþ îáúåêòà, åñëè îí íàõîäèòñÿ íà íîäå, èëè öåíòð åãî íîäû
+// Ð¿Ñ€Ð¾Ð²ÐµÑ€Ð¸Ñ‚ÑŒ, Ð½Ð°Ñ…Ð¾Ð´Ð¸Ñ‚ÑÑ Ð»Ð¸ Ð¾Ð±ÑŠÐµÐºÑ‚ entity Ð½Ð° Ð½Ð¾Ð´Ðµ
+// Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰Ð°ÐµÑ‚ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸ÑŽ Ð¾Ð±ÑŠÐµÐºÑ‚Ð°, ÐµÑÐ»Ð¸ Ð¾Ð½ Ð½Ð°Ñ…Ð¾Ð´Ð¸Ñ‚ÑÑ Ð½Ð° Ð½Ð¾Ð´Ðµ, Ð¸Ð»Ð¸ Ñ†ÐµÐ½Ñ‚Ñ€ ÐµÐ³Ð¾ Ð½Ð¾Ð´Ñ‹
 Fvector get_valid_position(const CEntity* entity, const Fvector& actual_position)
 {
     if (ai().level_graph().valid_vertex_id(entity->ai_location().level_vertex_id()) &&
@@ -18,7 +18,7 @@ Fvector get_valid_position(const CEntity* entity, const Fvector& actual_position
         return (ai().level_graph().vertex_position(entity->ai_location().level_vertex()));
 }
 
-// âîçâðàùàåò true, åñëè îáúåêò entity íàõîäèòñÿ íà íîäå
+// Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰Ð°ÐµÑ‚ true, ÐµÑÐ»Ð¸ Ð¾Ð±ÑŠÐµÐºÑ‚ entity Ð½Ð°Ñ…Ð¾Ð´Ð¸Ñ‚ÑÑ Ð½Ð° Ð½Ð¾Ð´Ðµ
 bool object_position_valid(const CEntity* entity)
 {
     return (ai().level_graph().valid_vertex_id(entity->ai_location().level_vertex_id()) &&

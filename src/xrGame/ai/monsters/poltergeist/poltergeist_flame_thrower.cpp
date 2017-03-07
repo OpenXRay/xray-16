@@ -199,7 +199,7 @@ void CPolterFlame::update_schedule()
 
     // remove all flames in state stop
 
-    // óäàëèòü âñå ýëåìåíòû, âûïîëíåíèå êîòîðûõ çàêîí÷åíî
+    // ÑƒÐ´Ð°Ð»Ð¸Ñ‚ÑŒ Ð²ÑÐµ ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚Ñ‹, Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½Ð¸Ðµ ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ñ… Ð·Ð°ÐºÐ¾Ð½Ñ‡ÐµÐ½Ð¾
     m_flames.erase(std::remove_if(m_flames.begin(), m_flames.end(), remove_predicate()), m_flames.end());
 
     bool const detected = m_object->get_current_detection_level() >= m_object->get_detection_success_level();
@@ -228,7 +228,7 @@ void CPolterFlame::on_destroy()
     FLAME_ELEMS_IT I = m_flames.begin();
     FLAME_ELEMS_IT E = m_flames.end();
 
-    // Ïðîéòè ïî âñåì îáúåêòàì è ïðîâåðèòü íà õèò âðàãà
+    // ÐŸÑ€Ð¾Ð¹Ñ‚Ð¸ Ð¿Ð¾ Ð²ÑÐµÐ¼ Ð¾Ð±ÑŠÐµÐºÑ‚Ð°Ð¼ Ð¸ Ð¿Ñ€Ð¾Ð²ÐµÑ€Ð¸Ñ‚ÑŒ Ð½Ð° Ñ…Ð¸Ñ‚ Ð²Ñ€Ð°Ð³Ð°
     for (; I != E; ++I)
     {
         if ((*I)->sound._feedback())

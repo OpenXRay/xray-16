@@ -384,7 +384,7 @@ void CCustomMonster::shedule_Update(u32 DT)
             //////////////////////////////////////
             // Fvector C; float R;
             //////////////////////////////////////
-            // С Олеся - ПИВО!!!! (Диме :-))))
+            // РЎ РћР»РµСЃСЏ - РџРР’Рћ!!!! (Р”РёРјРµ :-))))
             // m_PhysicMovementControl->GetBoundingSphere	(C,R);
             //////////////////////////////////////
             // Center(C);
@@ -828,12 +828,12 @@ void CCustomMonster::PitchCorrection()
     Fvector position_on_plane;
     P.project(position_on_plane, Position());
 
-    // находим проекцию точки, лежащей на векторе текущего направления
+    // РЅР°С…РѕРґРёРј РїСЂРѕРµРєС†РёСЋ С‚РѕС‡РєРё, Р»РµР¶Р°С‰РµР№ РЅР° РІРµРєС‚РѕСЂРµ С‚РµРєСѓС‰РµРіРѕ РЅР°РїСЂР°РІР»РµРЅРёСЏ
     Fvector dir_point, proj_point;
     dir_point.mad(position_on_plane, Direction(), 1.f);
     P.project(proj_point, dir_point);
 
-    // получаем искомый вектор направления
+    // РїРѕР»СѓС‡Р°РµРј РёСЃРєРѕРјС‹Р№ РІРµРєС‚РѕСЂ РЅР°РїСЂР°РІР»РµРЅРёСЏ
     Fvector target_dir;
     target_dir.sub(proj_point, position_on_plane);
 
@@ -1101,7 +1101,7 @@ void CCustomMonster::OnRender()
                 P2.y += 0.1f;
                 if (!fis_zero(P1.distance_to_sqr(P2), EPS_L))
                     Level().debug_renderer().draw_line(Fidentity, P1, P2, color0);
-                if ((path.size() - 1) == I) // песледний box?
+                if ((path.size() - 1) == I) // РїРµСЃР»РµРґРЅРёР№ box?
                     Level().debug_renderer().draw_aabb(P1, radius0, radius0, radius0, color1);
                 else
                     Level().debug_renderer().draw_aabb(P1, radius0, radius0, radius0, color2);

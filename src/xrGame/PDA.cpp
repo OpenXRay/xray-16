@@ -133,7 +133,7 @@ void CPda::OnH_A_Chield()
 {
     VERIFY(IsOff());
 
-    //включить PDA только если оно находится у первого владельца
+    //РІРєР»СЋС‡РёС‚СЊ PDA С‚РѕР»СЊРєРѕ РµСЃР»Рё РѕРЅРѕ РЅР°С…РѕРґРёС‚СЃСЏ Сѓ РїРµСЂРІРѕРіРѕ РІР»Р°РґРµР»СЊС†Р°
     if (H_Parent()->ID() == m_idOriginalOwner)
     {
         TurnOn();
@@ -151,7 +151,7 @@ void CPda::OnH_B_Independent(bool just_before_destroy)
 {
     inherited::OnH_B_Independent(just_before_destroy);
 
-    //выключить
+    //РІС‹РєР»СЋС‡РёС‚СЊ
     TurnOff();
 }
 

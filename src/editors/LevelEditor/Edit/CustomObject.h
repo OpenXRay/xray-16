@@ -237,7 +237,7 @@ public:
     virtual bool GetUTBox(Fbox& box) { return false; }
     virtual void OnSceneUpdate() { ; }
     virtual void OnObjectRemove(const CCustomObject* object) { ; }
-    virtual bool OnSelectionRemove() { return true; } // возвращает можно ли его удалять вообще
+    virtual bool OnSelectionRemove() { return true; } // РІРѕР·РІСЂР°С‰Р°РµС‚ РјРѕР¶РЅРѕ Р»Рё РµРіРѕ СѓРґР°Р»СЏС‚СЊ РІРѕРѕР±С‰Рµ
     virtual void OnDeviceCreate() { ; }
     virtual void OnDeviceDestroy() { ; }
     virtual void OnSynchronize();

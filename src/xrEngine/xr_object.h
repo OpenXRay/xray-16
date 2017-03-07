@@ -277,7 +277,7 @@ public:
     virtual void Hit(SHit* hit) = 0;
     virtual void SetHitInfo(IGameObject* who, IGameObject* weapon, s16 element, Fvector pos, Fvector dir) = 0;
     virtual BOOL BonePassBullet(int boneId) = 0;
-    // игровое имя объекта
+    // РёРіСЂРѕРІРѕРµ РёРјСЏ РѕР±СЉРµРєС‚Р°
     virtual LPCSTR Name() const = 0;
     virtual bool IsVisibleForZones() = 0;
     virtual bool NeedToDestroyObject() const = 0;
@@ -342,11 +342,11 @@ public:
     virtual void on_matrix_change(const Fmatrix& prev) = 0;
     // UsableScriptObject functions
     virtual bool use(IGameObject* obj) = 0;
-    //строчка появляющаяся при наведении на объект (если NULL, то нет)
+    //СЃС‚СЂРѕС‡РєР° РїРѕСЏРІР»СЏСЋС‰Р°СЏСЃСЏ РїСЂРё РЅР°РІРµРґРµРЅРёРё РЅР° РѕР±СЉРµРєС‚ (РµСЃР»Рё NULL, С‚Рѕ РЅРµС‚)
     virtual LPCSTR tip_text() = 0;
     virtual void set_tip_text(LPCSTR text) = 0;
     virtual void set_tip_text_default() = 0;
-    // можно ли использовать объект стандартным (не скриптовым) образом
+    // РјРѕР¶РЅРѕ Р»Рё РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РѕР±СЉРµРєС‚ СЃС‚Р°РЅРґР°СЂС‚РЅС‹Рј (РЅРµ СЃРєСЂРёРїС‚РѕРІС‹Рј) РѕР±СЂР°Р·РѕРј
     virtual bool nonscript_usable() = 0;
     virtual void set_nonscript_usable(bool usable) = 0;
     virtual CScriptBinderObject* GetScriptBinderObject() = 0;

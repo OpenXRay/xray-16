@@ -34,7 +34,7 @@ public:
     virtual void Update();
     virtual void DetachChild(CUIWindow* pChild);
     void SetScrollBarProfile(LPCSTR profile) { m_scrollbar_profile = profile; };
-    // Добавление элементов в листбокс
+    // Р”РѕР±Р°РІР»РµРЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ РІ Р»РёСЃС‚Р±РѕРєСЃ
     template <class Element>
     bool AddItem(
         const char* str, const float shift = 0.0f, void* pData = NULL, int value = 0, int insertBeforeIdx = -1);
@@ -46,11 +46,11 @@ public:
 
     void RemoveItem(int index);
     void RemoveAll();
-    //находит первый элемент с заданной pData, иначе -1
+    //РЅР°С…РѕРґРёС‚ РїРµСЂРІС‹Р№ СЌР»РµРјРµРЅС‚ СЃ Р·Р°РґР°РЅРЅРѕР№ pData, РёРЅР°С‡Рµ -1
     int FindItem(void* pData);
     int FindItemWithValue(int iValue);
     CUIListItem* GetItem(int index);
-    // Получить индекс элемента по адресу. Либо -1 если нет такого
+    // РџРѕР»СѓС‡РёС‚СЊ РёРЅРґРµРєСЃ СЌР»РµРјРµРЅС‚Р° РїРѕ Р°РґСЂРµСЃСѓ. Р›РёР±Рѕ -1 РµСЃР»Рё РЅРµС‚ С‚Р°РєРѕРіРѕ
     int GetItemPos(CUIListItem* pItem);
 
     void SetItemWidth(float iItemWidth);
@@ -62,7 +62,7 @@ public:
     void SetAlwaysShowScroll(bool flag = true) { m_bAlwaysShowScroll = flag; }
     void EnableAlwaysShowScroll(bool flag) { m_bAlwaysShowScroll_enable = flag; }
     int GetItemsCount() { return m_ItemList.size(); }
-    //подготовить все элементы заново
+    //РїРѕРґРіРѕС‚РѕРІРёС‚СЊ РІСЃРµ СЌР»РµРјРµРЅС‚С‹ Р·Р°РЅРѕРІРѕ
     void Reset();
 
     void EnableScrollBar(bool enable);
@@ -80,12 +80,12 @@ public:
 
     void SetTextColor(u32 color) { m_dwFontColor = color; }
     u32 GetTextColor() { return m_dwFontColor; }
-    //делает активными (как кнопки) элементы списка
+    //РґРµР»Р°РµС‚ Р°РєС‚РёРІРЅС‹РјРё (РєР°Рє РєРЅРѕРїРєРё) СЌР»РµРјРµРЅС‚С‹ СЃРїРёСЃРєР°
     void ActivateList(bool activity);
     bool IsListActive() { return m_bListActivity; }
     void SetVertFlip(bool vert_flip) { m_bVertFlip = vert_flip; }
     bool GetVertFlip() { return m_bVertFlip; }
-    // Принудительная установка фокуса
+    // РџСЂРёРЅСѓРґРёС‚РµР»СЊРЅР°СЏ СѓСЃС‚Р°РЅРѕРІРєР° С„РѕРєСѓСЃР°
     void SetFocusedItem(int iNewFocusedItem);
     int GetFocusedItem() { return m_iFocusedItem; }
     int GetSelectedItem() { return m_iSelectedItem; }
@@ -100,24 +100,24 @@ protected:
 
     CUIScrollBar* m_ScrollBar;
 
-    //обновления елементов списка, вызвается
-    //если произошли изменения
+    //РѕР±РЅРѕРІР»РµРЅРёСЏ РµР»РµРјРµРЅС‚РѕРІ СЃРїРёСЃРєР°, РІС‹Р·РІР°РµС‚СЃСЏ
+    //РµСЃР»Рё РїСЂРѕРёР·РѕС€Р»Рё РёР·РјРµРЅРµРЅРёСЏ
     void UpdateList();
 
-    //список элементов листа
+    //СЃРїРёСЃРѕРє СЌР»РµРјРµРЅС‚РѕРІ Р»РёСЃС‚Р°
     LIST_ITEM_LIST m_ItemList;
 
-    //размеры элемента списка
+    //СЂР°Р·РјРµСЂС‹ СЌР»РµРјРµРЅС‚Р° СЃРїРёСЃРєР°
     float m_iItemHeight;
     float m_iItemWidth;
 
-    //количество рядов для элементов
+    //РєРѕР»РёС‡РµСЃС‚РІРѕ СЂСЏРґРѕРІ РґР»СЏ СЌР»РµРјРµРЅС‚РѕРІ
     int m_iRowNum;
 
-    //индекс первого показанного элемента
+    //РёРЅРґРµРєСЃ РїРµСЂРІРѕРіРѕ РїРѕРєР°Р·Р°РЅРЅРѕРіРѕ СЌР»РµРјРµРЅС‚Р°
     int m_iFirstShownIndex;
 
-    //элемент над которым курсор в данный момент или -1, если такого нет
+    //СЌР»РµРјРµРЅС‚ РЅР°Рґ РєРѕС‚РѕСЂС‹Рј РєСѓСЂСЃРѕСЂ РІ РґР°РЅРЅС‹Р№ РјРѕРјРµРЅС‚ РёР»Рё -1, РµСЃР»Рё С‚Р°РєРѕРіРѕ РЅРµС‚
     int m_iFocusedItem;
     int m_iFocusedItemGroupID;
     int m_iSelectedItem;
@@ -127,23 +127,23 @@ protected:
     bool m_bAlwaysShowScroll_enable;
     bool m_bAlwaysShowScroll;
     bool m_bActiveBackground;
-    // Если хотим принудительно выставлять фокус, то поднять этот флаг
+    // Р•СЃР»Рё С…РѕС‚РёРј РїСЂРёРЅСѓРґРёС‚РµР»СЊРЅРѕ РІС‹СЃС‚Р°РІР»СЏС‚СЊ С„РѕРєСѓСЃ, С‚Рѕ РїРѕРґРЅСЏС‚СЊ СЌС‚РѕС‚ С„Р»Р°Рі
     bool m_bForceFocusedItem;
 
-    //подсветка активного элемента
+    //РїРѕРґСЃРІРµС‚РєР° Р°РєС‚РёРІРЅРѕРіРѕ СЌР»РµРјРµРЅС‚Р°
     CUIFrameLineWnd* m_ActiveBackgroundFrame;
 
-    //текущий цвет текста
+    //С‚РµРєСѓС‰РёР№ С†РІРµС‚ С‚РµРєСЃС‚Р°
     u32 m_dwFontColor;
     bool m_bListActivity;
 
-    //переворот списка по вертикали
+    //РїРµСЂРµРІРѕСЂРѕС‚ СЃРїРёСЃРєР° РїРѕ РІРµСЂС‚РёРєР°Р»Рё
     bool m_bVertFlip;
 
-    // Признак того, что мышь подвинули
+    // РџСЂРёР·РЅР°Рє С‚РѕРіРѕ, С‡С‚Рѕ РјС‹С€СЊ РїРѕРґРІРёРЅСѓР»Рё
     bool m_bUpdateMouseMove;
 
-    // Текущий уникальный идентификатор
+    // РўРµРєСѓС‰РёР№ СѓРЅРёРєР°Р»СЊРЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ
     int m_iLastUniqueID;
 
     DECLARE_SCRIPT_REGISTER_FUNCTION

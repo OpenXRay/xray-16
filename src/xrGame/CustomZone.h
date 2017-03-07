@@ -10,7 +10,7 @@ class CZoneEffector;
 
 #define SMALL_OBJECT_RADIUS 0.6f
 
-//информация о объекте, находящемся в зоне
+//РёРЅС„РѕСЂРјР°С†РёСЏ Рѕ РѕР±СЉРµРєС‚Рµ, РЅР°С…РѕРґСЏС‰РµРјСЃСЏ РІ Р·РѕРЅРµ
 struct SZoneObjectInfo
 {
     SZoneObjectInfo()
@@ -21,11 +21,11 @@ struct SZoneObjectInfo
     CGameObject* object;
     bool small_object;
     bool nonalive_object;
-    //игнорирование объекта в зоне
+    //РёРіРЅРѕСЂРёСЂРѕРІР°РЅРёРµ РѕР±СЉРµРєС‚Р° РІ Р·РѕРЅРµ
     bool zone_ignore;
-    //присоединенные партиклы
+    //РїСЂРёСЃРѕРµРґРёРЅРµРЅРЅС‹Рµ РїР°СЂС‚РёРєР»С‹
     xr_vector<CParticlesObject*> particles_vector;
-    //время прибывания в зоне
+    //РІСЂРµРјСЏ РїСЂРёР±С‹РІР°РЅРёСЏ РІ Р·РѕРЅРµ
     u32 dw_time_in_zone;
     float f_time_affected;
 
@@ -69,19 +69,19 @@ public:
 
     float GetMaxPower() { return m_fMaxPower; }
     void SetMaxPower(float p) { m_fMaxPower = p; }
-    //вычисление силы хита в зависимости от расстояния до центра зоны
-    //относительный размер силы (от 0 до 1)
+    //РІС‹С‡РёСЃР»РµРЅРёРµ СЃРёР»С‹ С…РёС‚Р° РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ СЂР°СЃСЃС‚РѕСЏРЅРёСЏ РґРѕ С†РµРЅС‚СЂР° Р·РѕРЅС‹
+    //РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ СЃРёР»С‹ (РѕС‚ 0 РґРѕ 1)
     float RelativePower(float dist, float nearest_shape_radius);
-    //абсолютный размер
+    //Р°Р±СЃРѕР»СЋС‚РЅС‹Р№ СЂР°Р·РјРµСЂ
     float Power(float dist, float nearest_shape_radius);
 
     virtual CCustomZone* cast_custom_zone() { return this; }
-    //различные состояния в которых может находиться зона
+    //СЂР°Р·Р»РёС‡РЅС‹Рµ СЃРѕСЃС‚РѕСЏРЅРёСЏ РІ РєРѕС‚РѕСЂС‹С… РјРѕР¶РµС‚ РЅР°С…РѕРґРёС‚СЊСЃСЏ Р·РѕРЅР°
     typedef enum {
-        eZoneStateIdle = 0, //состояние зоны, когда внутри нее нет активных объектов
-        eZoneStateAwaking, //пробуждение зоны (объект попал в зону)
-        eZoneStateBlowout, //выброс
-        eZoneStateAccumulate, //накапливание энергии, после выброса
+        eZoneStateIdle = 0, //СЃРѕСЃС‚РѕСЏРЅРёРµ Р·РѕРЅС‹, РєРѕРіРґР° РІРЅСѓС‚СЂРё РЅРµРµ РЅРµС‚ Р°РєС‚РёРІРЅС‹С… РѕР±СЉРµРєС‚РѕРІ
+        eZoneStateAwaking, //РїСЂРѕР±СѓР¶РґРµРЅРёРµ Р·РѕРЅС‹ (РѕР±СЉРµРєС‚ РїРѕРїР°Р» РІ Р·РѕРЅСѓ)
+        eZoneStateBlowout, //РІС‹Р±СЂРѕСЃ
+        eZoneStateAccumulate, //РЅР°РєР°РїР»РёРІР°РЅРёРµ СЌРЅРµСЂРіРёРё, РїРѕСЃР»Рµ РІС‹Р±СЂРѕСЃР°
         eZoneStateDisabled,
         eZoneStateMax
     } EZoneState;
@@ -113,24 +113,24 @@ protected:
     u32 m_ttl;
     Flags32 m_zone_flags;
 
-    //максимальная сила заряда зоны
+    //РјР°РєСЃРёРјР°Р»СЊРЅР°СЏ СЃРёР»Р° Р·Р°СЂСЏРґР° Р·РѕРЅС‹
     float m_fMaxPower;
-    //сила постоянного небольшого демеджа (для огненных и ядовитых мин)
+    //СЃРёР»Р° РїРѕСЃС‚РѕСЏРЅРЅРѕРіРѕ РЅРµР±РѕР»СЊС€РѕРіРѕ РґРµРјРµРґР¶Р° (РґР»СЏ РѕРіРЅРµРЅРЅС‹С… Рё СЏРґРѕРІРёС‚С‹С… РјРёРЅ)
     float m_fSecondaryHitPower;
 
-    //линейный коэффициент затухания в зависимости от расстояния
+    //Р»РёРЅРµР№РЅС‹Р№ РєРѕСЌС„С„РёС†РёРµРЅС‚ Р·Р°С‚СѓС…Р°РЅРёСЏ РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ СЂР°СЃСЃС‚РѕСЏРЅРёСЏ
     float m_fAttenuation;
-    //процент удара зоны, который пойдет на физический импульс
+    //РїСЂРѕС†РµРЅС‚ СѓРґР°СЂР° Р·РѕРЅС‹, РєРѕС‚РѕСЂС‹Р№ РїРѕР№РґРµС‚ РЅР° С„РёР·РёС‡РµСЃРєРёР№ РёРјРїСѓР»СЊСЃ
     float m_fHitImpulseScale;
-    //размер радиуса в процентах от оригинального,
-    //где действует зона
+    //СЂР°Р·РјРµСЂ СЂР°РґРёСѓСЃР° РІ РїСЂРѕС†РµРЅС‚Р°С… РѕС‚ РѕСЂРёРіРёРЅР°Р»СЊРЅРѕРіРѕ,
+    //РіРґРµ РґРµР№СЃС‚РІСѓРµС‚ Р·РѕРЅР°
     float m_fEffectiveRadius;
 
-    //тип наносимого хита
+    //С‚РёРї РЅР°РЅРѕСЃРёРјРѕРіРѕ С…РёС‚Р°
     ALife::EHitType m_eHitTypeBlowout;
     EZoneState m_eZoneState;
 
-    //текущее время пребывания зоны в определенном состоянии
+    //С‚РµРєСѓС‰РµРµ РІСЂРµРјСЏ РїСЂРµР±С‹РІР°РЅРёСЏ Р·РѕРЅС‹ РІ РѕРїСЂРµРґРµР»РµРЅРЅРѕРј СЃРѕСЃС‚РѕСЏРЅРёРё
     int m_iStateTime;
     int m_iPreviousStateTime;
 
@@ -139,16 +139,16 @@ protected:
     u32 m_TimeShift;
     u32 m_StartTime;
 
-    //массив с временами, сколько каждое состояние должно
-    //длиться (если 0, то мгновенно -1 - бесконечность,
-    //-2 - вообще не должно вызываться)
+    //РјР°СЃСЃРёРІ СЃ РІСЂРµРјРµРЅР°РјРё, СЃРєРѕР»СЊРєРѕ РєР°Р¶РґРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ РґРѕР»Р¶РЅРѕ
+    //РґР»РёС‚СЊСЃСЏ (РµСЃР»Рё 0, С‚Рѕ РјРіРЅРѕРІРµРЅРЅРѕ -1 - Р±РµСЃРєРѕРЅРµС‡РЅРѕСЃС‚СЊ,
+    //-2 - РІРѕРѕР±С‰Рµ РЅРµ РґРѕР»Р¶РЅРѕ РІС‹Р·С‹РІР°С‚СЊСЃСЏ)
     typedef svector<int, eZoneStateMax> StateTimeSVec;
     StateTimeSVec m_StateTime;
 
     virtual void SwitchZoneState(EZoneState new_state);
     virtual void OnStateSwitch(EZoneState new_state);
     virtual void CheckForAwaking();
-    //обработка зоны в различных состояниях
+    //РѕР±СЂР°Р±РѕС‚РєР° Р·РѕРЅС‹ РІ СЂР°Р·Р»РёС‡РЅС‹С… СЃРѕСЃС‚РѕСЏРЅРёСЏС…
     virtual bool IdleState();
     virtual bool AwakingState();
     virtual bool BlowoutState();
@@ -168,26 +168,26 @@ public:
     void ZoneDisable();
     EZoneState ZoneState() { return m_eZoneState; }
 protected:
-    //воздействие зоной на объект
+    //РІРѕР·РґРµР№СЃС‚РІРёРµ Р·РѕРЅРѕР№ РЅР° РѕР±СЉРµРєС‚
     virtual void Affect(SZoneObjectInfo* O) {}
-    //воздействовать на все объекты в зоне
+    //РІРѕР·РґРµР№СЃС‚РІРѕРІР°С‚СЊ РЅР° РІСЃРµ РѕР±СЉРµРєС‚С‹ РІ Р·РѕРЅРµ
     void AffectObjects();
 
     u32 m_dwAffectFrameNum;
 
-    //параметры для выброса, с какой задержкой
-    //включать эффекты и логику
+    //РїР°СЂР°РјРµС‚СЂС‹ РґР»СЏ РІС‹Р±СЂРѕСЃР°, СЃ РєР°РєРѕР№ Р·Р°РґРµСЂР¶РєРѕР№
+    //РІРєР»СЋС‡Р°С‚СЊ СЌС„С„РµРєС‚С‹ Рё Р»РѕРіРёРєСѓ
     u32 m_dwBlowoutParticlesTime;
     u32 m_dwBlowoutLightTime;
     u32 m_dwBlowoutSoundTime;
     u32 m_dwBlowoutExplosionTime;
     void UpdateBlowout();
 
-    //ветер
+    //РІРµС‚РµСЂ
     u32 m_dwBlowoutWindTimeStart;
     u32 m_dwBlowoutWindTimePeak;
     u32 m_dwBlowoutWindTimeEnd;
-    //сила ветра (увеличение текущего) (0,1) когда в аномалию попадает актер
+    //СЃРёР»Р° РІРµС‚СЂР° (СѓРІРµР»РёС‡РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ) (0,1) РєРѕРіРґР° РІ Р°РЅРѕРјР°Р»РёСЋ РїРѕРїР°РґР°РµС‚ Р°РєС‚РµСЂ
     float m_fBlowoutWindPowerMax;
     float m_fStoreWindPower;
 
@@ -195,30 +195,30 @@ protected:
     void StopWind();
     void UpdateWind();
 
-    //время, через которое, зона перестает реагировать
-    //на объект мертвый объект (-1 если не указано)
+    //РІСЂРµРјСЏ, С‡РµСЂРµР· РєРѕС‚РѕСЂРѕРµ, Р·РѕРЅР° РїРµСЂРµСЃС‚Р°РµС‚ СЂРµР°РіРёСЂРѕРІР°С‚СЊ
+    //РЅР° РѕР±СЉРµРєС‚ РјРµСЂС‚РІС‹Р№ РѕР±СЉРµРєС‚ (-1 РµСЃР»Рё РЅРµ СѓРєР°Р·Р°РЅРѕ)
     int m_iDisableHitTime;
-    //тоже самое но для маленьких объектов
+    //С‚РѕР¶Рµ СЃР°РјРѕРµ РЅРѕ РґР»СЏ РјР°Р»РµРЅСЊРєРёС… РѕР±СЉРµРєС‚РѕРІ
     int m_iDisableHitTimeSmall;
     int m_iDisableIdleTime;
 
     ////////////////////////////////
-    // имена партиклов зоны
-    //обычное состояние зоны
+    // РёРјРµРЅР° РїР°СЂС‚РёРєР»РѕРІ Р·РѕРЅС‹
+    //РѕР±С‹С‡РЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ Р·РѕРЅС‹
     shared_str m_sIdleParticles;
-    //выброс зоны
+    //РІС‹Р±СЂРѕСЃ Р·РѕРЅС‹
     shared_str m_sBlowoutParticles;
     BOOL m_bBlowoutOnce;
     shared_str m_sAccumParticles;
     shared_str m_sAwakingParticles;
 
-    //появление большого и мальнекого объекта в зоне
+    //РїРѕСЏРІР»РµРЅРёРµ Р±РѕР»СЊС€РѕРіРѕ Рё РјР°Р»СЊРЅРµРєРѕРіРѕ РѕР±СЉРµРєС‚Р° РІ Р·РѕРЅРµ
     shared_str m_sEntranceParticlesSmall;
     shared_str m_sEntranceParticlesBig;
-    //поражение большого и мальнекого объекта в зоне
+    //РїРѕСЂР°Р¶РµРЅРёРµ Р±РѕР»СЊС€РѕРіРѕ Рё РјР°Р»СЊРЅРµРєРѕРіРѕ РѕР±СЉРµРєС‚Р° РІ Р·РѕРЅРµ
     shared_str m_sHitParticlesSmall;
     shared_str m_sHitParticlesBig;
-    //нахождение большого и мальнекого объекта в зоне
+    //РЅР°С…РѕР¶РґРµРЅРёРµ Р±РѕР»СЊС€РѕРіРѕ Рё РјР°Р»СЊРЅРµРєРѕРіРѕ РѕР±СЉРµРєС‚Р° РІ Р·РѕРЅРµ
     shared_str m_sIdleObjectParticlesSmall;
     shared_str m_sIdleObjectParticlesBig;
     shared_str m_sBoltEntranceParticles;
@@ -230,13 +230,13 @@ protected:
     ref_sound m_hit_sound;
     ref_sound m_entrance_sound;
 
-    //объект партиклов обычного состояния зоны
+    //РѕР±СЉРµРєС‚ РїР°СЂС‚РёРєР»РѕРІ РѕР±С‹С‡РЅРѕРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ Р·РѕРЅС‹
     CParticlesObject* m_pIdleParticles;
 
     //////////////////////////////
-    //подсветка аномалии
+    //РїРѕРґСЃРІРµС‚РєР° Р°РЅРѕРјР°Р»РёРё
 
-    //подсветка idle состояния
+    //РїРѕРґСЃРІРµС‚РєР° idle СЃРѕСЃС‚РѕСЏРЅРёСЏ
     ref_light m_pIdleLight;
     Fcolor m_IdleLightColor;
     float m_fIdleLightRange;
@@ -247,7 +247,7 @@ protected:
     void StopIdleLight();
     void UpdateIdleLight();
 
-    //подсветка выброса
+    //РїРѕРґСЃРІРµС‚РєР° РІС‹Р±СЂРѕСЃР°
     ref_light m_pLight;
     float m_fLightRange;
     Fcolor m_LightColor;
@@ -259,7 +259,7 @@ protected:
     void StopBlowoutLight();
     void UpdateBlowoutLight();
 
-    //список партиклов для объетов внутри зоны
+    //СЃРїРёСЃРѕРє РїР°СЂС‚РёРєР»РѕРІ РґР»СЏ РѕР±СЉРµС‚РѕРІ РІРЅСѓС‚СЂРё Р·РѕРЅС‹
     DEFINE_VECTOR(SZoneObjectInfo, OBJECT_INFO_VEC, OBJECT_INFO_VEC_IT);
     OBJECT_INFO_VEC m_ObjectInfoMap;
 
@@ -268,7 +268,7 @@ protected:
 
     virtual void Hit(SHit* pHDS);
 
-    //для визуализации зоны
+    //РґР»СЏ РІРёР·СѓР°Р»РёР·Р°С†РёРё Р·РѕРЅС‹
     virtual void PlayIdleParticles(bool bIdleLight = true);
     virtual void StopIdleParticles(bool bIdleLight = true);
     void PlayAccumParticles();
@@ -284,12 +284,12 @@ protected:
     void StopObjectIdleParticles(CGameObject* pObject);
 
     virtual bool IsVisibleForZones() { return false; }
-    //обновление, если зона передвигается
+    //РѕР±РЅРѕРІР»РµРЅРёРµ, РµСЃР»Рё Р·РѕРЅР° РїРµСЂРµРґРІРёРіР°РµС‚СЃСЏ
     virtual void OnMove();
     Fvector m_vPrevPos;
     u32 m_dwLastTimeMoved;
 
-    //расстояние от зоны до текущего актера
+    //СЂР°СЃСЃС‚РѕСЏРЅРёРµ РѕС‚ Р·РѕРЅС‹ РґРѕ С‚РµРєСѓС‰РµРіРѕ Р°РєС‚РµСЂР°
     float m_fDistanceToCurEntity;
 
 protected:

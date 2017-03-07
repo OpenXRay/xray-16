@@ -33,7 +33,7 @@ class game_sv_mp : public game_sv_GameState
     typedef game_sv_GameState inherited;
 
 protected:
-    //список трупов для удаления
+    //СЃРїРёСЃРѕРє С‚СЂСѓРїРѕРІ РґР»СЏ СѓРґР°Р»РµРЅРёСЏ
     DEF_DEQUE(CORPSE_LIST, u16);
 
     CORPSE_LIST m_CorpseList;
@@ -129,8 +129,8 @@ public:
 
     virtual void net_Export_State(NET_Packet& P, ClientID id_to);
 
-    virtual void OnRoundStart(); // старт раунда
-    virtual void OnRoundEnd(); // round_end_reason							// конец раунда
+    virtual void OnRoundStart(); // СЃС‚Р°СЂС‚ СЂР°СѓРЅРґР°
+    virtual void OnRoundEnd(); // round_end_reason							// РєРѕРЅРµС† СЂР°СѓРЅРґР°
     virtual bool OnNextMap();
     virtual void OnPrevMap();
 

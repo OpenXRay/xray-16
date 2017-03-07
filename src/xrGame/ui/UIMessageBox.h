@@ -14,7 +14,7 @@ public:
     CUIMessageBox();
     virtual ~CUIMessageBox();
 
-    //разновидности MessageBox
+    //СЂР°Р·РЅРѕРІРёРґРЅРѕСЃС‚Рё MessageBox
     typedef enum {
         MESSAGEBOX_OK,
         MESSAGEBOX_INFO,

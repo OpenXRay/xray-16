@@ -8,7 +8,7 @@ void CMonsterSquad::ProcessIdle()
     m_temp_entities.clear();
     VERIFY(leader && !leader->getDestroy());
 
-    // Выделить элементы с общими врагами и состянием атаки
+    // Р’С‹РґРµР»РёС‚СЊ СЌР»РµРјРµРЅС‚С‹ СЃ РѕР±С‰РёРјРё РІСЂР°РіР°РјРё Рё СЃРѕСЃС‚СЏРЅРёРµРј Р°С‚Р°РєРё
     for (MEMBER_GOAL_MAP_IT it_goal = m_goals.begin(); it_goal != m_goals.end(); it_goal++)
     {
         SMemberGoal goal = it_goal->second;
@@ -38,7 +38,7 @@ struct CPredicateSideSort
 
 void CMonsterSquad::Idle_AssignAction(ENTITY_VEC& members)
 {
-    // получить цель лидера
+    // РїРѕР»СѓС‡РёС‚СЊ С†РµР»СЊ Р»РёРґРµСЂР°
     SMemberGoal& goal = GetGoal(leader);
 
     if (goal.type == MG_WalkGraph)
@@ -213,7 +213,7 @@ void CMonsterSquad::Idle_AssignAction(ENTITY_VEC& members)
     }
     else if (goal.type == MG_Rest)
     {
-        // пересчитать положение в команде в соответствие с целью лидера
+        // РїРµСЂРµСЃС‡РёС‚Р°С‚СЊ РїРѕР»РѕР¶РµРЅРёРµ РІ РєРѕРјР°РЅРґРµ РІ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ СЃ С†РµР»СЊСЋ Р»РёРґРµСЂР°
         for (ENTITY_VEC_IT it = members.begin(); it != members.end(); it++)
         {
             if ((*it) == leader)

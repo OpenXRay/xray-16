@@ -238,7 +238,7 @@ void CKinematicsAnimated::LL_FadeCycle(u16 part, float falloff, u8 mask_channel 
         B.blendFalloff = falloff;
         // B.blendAccrue		= B.timeCurrent;
         if (B.stop_at_end)
-            B.stop_at_end_callback = FALSE; // callback не должен приходить!
+            B.stop_at_end_callback = FALSE; // callback РЅРµ РґРѕР»Р¶РµРЅ РїСЂРёС…РѕРґРёС‚СЊ!
     }
 }
 void CKinematicsAnimated::LL_CloseCycle(u16 part, u8 mask_channel /*= (1<<0)*/)

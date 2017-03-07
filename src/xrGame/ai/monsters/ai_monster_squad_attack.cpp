@@ -10,7 +10,7 @@ void CMonsterSquad::ProcessAttack()
     m_enemy_map.clear();
     m_temp_entities.clear();
 
-    // Выделить элементы с общими врагами и состянием атаки
+    // Р’С‹РґРµР»РёС‚СЊ СЌР»РµРјРµРЅС‚С‹ СЃ РѕР±С‰РёРјРё РІСЂР°РіР°РјРё Рё СЃРѕСЃС‚СЏРЅРёРµРј Р°С‚Р°РєРё
     for (MEMBER_GOAL_MAP_IT it_goal = m_goals.begin(); it_goal != m_goals.end(); it_goal++)
     {
         //		CEntity *member = it_goal->first;
@@ -33,7 +33,7 @@ void CMonsterSquad::ProcessAttack()
         }
     }
 
-    // Пройти по всем группам и назначить углы всем елементам в группе
+    // РџСЂРѕР№С‚Рё РїРѕ РІСЃРµРј РіСЂСѓРїРїР°Рј Рё РЅР°Р·РЅР°С‡РёС‚СЊ СѓРіР»С‹ РІСЃРµРј РµР»РµРјРµРЅС‚Р°Рј РІ РіСЂСѓРїРїРµ
     for (ENEMY_MAP_IT it_enemy = m_enemy_map.begin(); it_enemy != m_enemy_map.end(); ++it_enemy)
     {
         ENTITY_VEC* monsters = &(*it_enemy).second;
@@ -74,7 +74,7 @@ void CMonsterSquad::set_rat_squad_index(const CEntity* m_enemy)
     m_enemy_maps.clear();
     m_entities.clear();
 
-    // Выделить элементы с общей целью
+    // Р’С‹РґРµР»РёС‚СЊ СЌР»РµРјРµРЅС‚С‹ СЃ РѕР±С‰РµР№ С†РµР»СЊСЋ
 
     for (MEMBER_GOAL_MAP_IT it_goal = m_goals.begin(); it_goal != m_goals.end(); it_goal++)
     {
@@ -120,7 +120,7 @@ void CMonsterSquad::set_squad_index(const CEntity* m_enemy)
     m_enemy_maps.clear();
     m_entities.clear();
 
-    // Выделить элементы с общей целью
+    // Р’С‹РґРµР»РёС‚СЊ СЌР»РµРјРµРЅС‚С‹ СЃ РѕР±С‰РµР№ С†РµР»СЊСЋ
 
     for (MEMBER_GOAL_MAP_IT it_goal = m_goals.begin(); it_goal != m_goals.end(); it_goal++)
     {
@@ -167,14 +167,14 @@ void CMonsterSquad::Attack_AssignTargetDir(ENTITY_VEC& members, const CEntity* e
 
     lines.clear();
 
-    // сортировать по убыванию расстояния от npc до врага
+    // СЃРѕСЂС‚РёСЂРѕРІР°С‚СЊ РїРѕ СѓР±С‹РІР°РЅРёСЋ СЂР°СЃСЃС‚РѕСЏРЅРёСЏ РѕС‚ npc РґРѕ РІСЂР°РіР°
     std::sort(members.begin(), members.end(), sort_predicate(enemy));
     if (members.empty())
         return;
 
     float delta_yaw = PI_MUL_2 / members.size();
 
-    // обработать ближний элемент
+    // РѕР±СЂР°Р±РѕС‚Р°С‚СЊ Р±Р»РёР¶РЅРёР№ СЌР»РµРјРµРЅС‚
     first.pE = members.back();
     first.p_from = first.pE->Position();
     first.yaw = 0;
@@ -182,7 +182,7 @@ void CMonsterSquad::Attack_AssignTargetDir(ENTITY_VEC& members, const CEntity* e
 
     lines.push_back(first);
 
-    // обработать дальний элемент
+    // РѕР±СЂР°Р±РѕС‚Р°С‚СЊ РґР°Р»СЊРЅРёР№ СЌР»РµРјРµРЅС‚
     if (!members.empty())
     {
         last.pE = members[0];
@@ -197,7 +197,7 @@ void CMonsterSquad::Attack_AssignTargetDir(ENTITY_VEC& members, const CEntity* e
     float next_right_yaw = delta_yaw;
     float next_left_yaw = delta_yaw;
 
-    // проходим с конца members в начало (начиная с наименьшего расстояния)
+    // РїСЂРѕС…РѕРґРёРј СЃ РєРѕРЅС†Р° members РІ РЅР°С‡Р°Р»Рѕ (РЅР°С‡РёРЅР°СЏ СЃ РЅР°РёРјРµРЅСЊС€РµРіРѕ СЂР°СЃСЃС‚РѕСЏРЅРёСЏ)
     while (!members.empty())
     {
         CEntity* pCur;
@@ -209,7 +209,7 @@ void CMonsterSquad::Attack_AssignTargetDir(ENTITY_VEC& members, const CEntity* e
         cur_line.p_from = pCur->Position();
         cur_line.pE = pCur;
 
-        // определить cur_line.yaw
+        // РѕРїСЂРµРґРµР»РёС‚СЊ cur_line.yaw
 
         float h1, p1, h2, p2;
         Fvector dir;
@@ -249,7 +249,7 @@ void CMonsterSquad::Attack_AssignTargetDir(ENTITY_VEC& members, const CEntity* e
         lines.push_back(cur_line);
     }
 
-    // Пройти по всем линиям и заполнить таргеты у npc
+    // РџСЂРѕР№С‚Рё РїРѕ РІСЃРµРј Р»РёРЅРёСЏРј Рё Р·Р°РїРѕР»РЅРёС‚СЊ С‚Р°СЂРіРµС‚С‹ Сѓ npc
     float first_h, first_p;
     Fvector d;
     d.sub(target_pos, first.p_from);

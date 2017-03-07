@@ -116,8 +116,8 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
     {
         u16 id_entity;
         P.r_u16(id_entity);
-        CSE_Abstract* e_parent = receiver; // êòî çàáèðàåò (äëÿ ñâîèõ íóæä)
-        CSE_Abstract* e_entity = game->get_entity_from_eid(id_entity); // êòî îòäàåò
+        CSE_Abstract* e_parent = receiver; // ÐºÑ‚Ð¾ Ð·Ð°Ð±Ð¸Ñ€Ð°ÐµÑ‚ (Ð´Ð»Ñ ÑÐ²Ð¾Ð¸Ñ… Ð½ÑƒÐ¶Ð´)
+        CSE_Abstract* e_entity = game->get_entity_from_eid(id_entity); // ÐºÑ‚Ð¾ Ð¾Ñ‚Ð´Ð°ÐµÑ‚
         if (!e_entity)
             break;
         if (0xffff != e_entity->ID_Parent)
@@ -151,7 +151,7 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
         u16 id_src;
         P.r_u16(id_src);
 
-        CSE_Abstract* e_dest = receiver; // êòî óìåð
+        CSE_Abstract* e_dest = receiver; // ÐºÑ‚Ð¾ ÑƒÐ¼ÐµÑ€
         // this is possible when hit event is sent before destroy event
         if (!e_dest)
             break;
@@ -189,7 +189,7 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
         }
 #endif // #ifndef MASTER_GOLD
 
-        CSE_Abstract* e_dest = receiver; // êòî óìåð
+        CSE_Abstract* e_dest = receiver; // ÐºÑ‚Ð¾ ÑƒÐ¼ÐµÑ€
         // this is possible when hit event is sent before destroy event
         if (!e_dest)
             break;
@@ -199,7 +199,7 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
             Msg("* [%2d] is [%s:%s]", id_dest, *e_dest->s_name, e_dest->name_replace());
 #endif // #ifndef MASTER_GOLD
 
-        CSE_Abstract* e_src = game->get_entity_from_eid(id_src); // êòî óáèë
+        CSE_Abstract* e_src = game->get_entity_from_eid(id_src); // ÐºÑ‚Ð¾ ÑƒÐ±Ð¸Ð»
         if (!e_src)
         {
             xrClientData* C = (xrClientData*)game->get_client(id_src);
@@ -220,7 +220,7 @@ void xrServer::Process_event(NET_Packet& P, ClientID sender)
 
         game->on_death(e_dest, e_src);
 
-        xrClientData* c_src = e_src->owner; // êëèåíò, ÷åé þíèò óáèë
+        xrClientData* c_src = e_src->owner; // ÐºÐ»Ð¸ÐµÐ½Ñ‚, Ñ‡ÐµÐ¹ ÑŽÐ½Ð¸Ñ‚ ÑƒÐ±Ð¸Ð»
 
         if (c_src->owner->ID == id_src)
         {

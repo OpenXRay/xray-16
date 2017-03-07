@@ -326,7 +326,7 @@ bool ESceneObjectTool::ExportClimableObjects(SExportStreams* F)
                     {
                         Fmatrix M;
                         M.set(P->m_OBB.m_rotate.i, P->m_OBB.m_rotate.j, P->m_OBB.m_rotate.k, P->m_OBB.m_translate);
-                        M.getXYZ(P->m_RefRotate); // íå i ïîòîìó ÷òî â äâèæêå òàê
+                        M.getXYZ(P->m_RefRotate); // Ð½Ðµ i Ð¿Ð¾Ñ‚Ð¾Ð¼Ñƒ Ñ‡Ñ‚Ð¾ Ð² Ð´Ð²Ð¸Ð¶ÐºÐµ Ñ‚Ð°Ðº
                         m_Data->position().set(P->m_RefOffset);
                         m_Data->angle().set(P->m_RefRotate);
 

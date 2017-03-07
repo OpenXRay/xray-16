@@ -193,7 +193,7 @@ void CSE_Abstract::Spawn_Write(NET_Packet& tNetPacket, BOOL bLocal)
     tNetPacket.w_u16(script_server_object_version());
 
     // client object custom data serialization SAVE
-    u16 client_data_size = (u16)client_data.size(); //íå ìîæåò áûòü áîëüøå 256 áàéò
+    u16 client_data_size = (u16)client_data.size(); //Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð±Ñ‹Ñ‚ÑŒ Ð±Ð¾Ð»ÑŒÑˆÐµ 256 Ð±Ð°Ð¹Ñ‚
     tNetPacket.w_u16(client_data_size);
     //	Msg							("SERVER:saving:save:%d bytes:%d:%s",client_data_size,ID,s_name_replace ? s_name_replace
     //:
@@ -294,7 +294,7 @@ BOOL CSE_Abstract::Spawn_Read(NET_Packet& tNetPacket)
     if (m_wVersion > 70)
     {
         u16 client_data_size =
-            (m_wVersion > 93) ? tNetPacket.r_u16() : tNetPacket.r_u8(); //íå ìîæåò áûòü áîëüøå 256 áàéò
+            (m_wVersion > 93) ? tNetPacket.r_u16() : tNetPacket.r_u8(); //Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð±Ñ‹Ñ‚ÑŒ Ð±Ð¾Ð»ÑŒÑˆÐµ 256 Ð±Ð°Ð¹Ñ‚
         if (client_data_size > 0)
         {
             //			Msg					("SERVER:loading:load:%d bytes:%d:%s",client_data_size,ID,s_name_replace ?
@@ -346,7 +346,7 @@ BOOL CSE_Abstract::Spawn_Read(NET_Packet& tNetPacket)
 void CSE_Abstract::load(NET_Packet& tNetPacket)
 {
     CPureServerObject::load(tNetPacket);
-    u16 client_data_size = (m_wVersion > 93) ? tNetPacket.r_u16() : tNetPacket.r_u8(); //íå ìîæåò áûòü áîëüøå 256 áàéò
+    u16 client_data_size = (m_wVersion > 93) ? tNetPacket.r_u16() : tNetPacket.r_u8(); //Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð±Ñ‹Ñ‚ÑŒ Ð±Ð¾Ð»ÑŒÑˆÐµ 256 Ð±Ð°Ð¹Ñ‚
     if (client_data_size > 0)
     {
 #ifdef DEBUG

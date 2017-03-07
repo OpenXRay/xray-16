@@ -47,7 +47,7 @@ void CUIActorMenu::DeInitUpgradeMode()
 
     if (!CurrentGameUI())
         return;
-    //только если находимся в режиме single
+    //С‚РѕР»СЊРєРѕ РµСЃР»Рё РЅР°С…РѕРґРёРјСЃСЏ РІ СЂРµР¶РёРјРµ single
     CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(CurrentGameUI());
     if (!pGameSP)
         return;

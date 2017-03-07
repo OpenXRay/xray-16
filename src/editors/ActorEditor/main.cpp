@@ -235,7 +235,7 @@ void __fastcall TfrmMain::D3DWindowChangeFocus(TObject* Sender)
     {
         UI->OnAppDeactivate();
         UI->IR_Release();
-        //        paRender->Color=paRender->Color; // чтобы не было  internal code gen error
+        //        paRender->Color=paRender->Color; // С‡С‚РѕР±С‹ РЅРµ Р±С‹Р»Рѕ  internal code gen error
     }
 }
 

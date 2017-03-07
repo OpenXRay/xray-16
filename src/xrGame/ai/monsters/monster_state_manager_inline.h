@@ -33,14 +33,14 @@ void CMonsterStateManagerAbstract::update()
 TEMPLATE_SPECIALIZATION
 void CMonsterStateManagerAbstract::force_script_state(EMonsterState state)
 {
-    // установить текущее состояние
+    // СѓСЃС‚Р°РЅРѕРІРёС‚СЊ С‚РµРєСѓС‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ
     select_state(state);
 }
 
 TEMPLATE_SPECIALIZATION
 void CMonsterStateManagerAbstract::execute_script_state()
 {
-    // выполнить текущее состояние
+    // РІС‹РїРѕР»РЅРёС‚СЊ С‚РµРєСѓС‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ
     get_state_current()->execute();
 }
 

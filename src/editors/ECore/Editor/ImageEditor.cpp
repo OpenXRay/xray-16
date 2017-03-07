@@ -267,7 +267,7 @@ void __fastcall TfrmImageLib::FormKeyDown(TObject*, WORD& Key, TShiftState Shift
         {
             if (bFormLocked)
                 ExecCommand(COMMAND_BREAK_LAST_OPERATION);
-            Key = 0; // :-) нужно для того чтобы AccessVoilation не вылазил по ESCAPE
+            Key = 0; // :-) РЅСѓР¶РЅРѕ РґР»СЏ С‚РѕРіРѕ С‡С‚РѕР±С‹ AccessVoilation РЅРµ РІС‹Р»Р°Р·РёР» РїРѕ ESCAPE
         }
     }
 }

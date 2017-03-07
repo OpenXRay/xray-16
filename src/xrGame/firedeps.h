@@ -2,7 +2,7 @@
 
 struct firedeps
 {
-    Fmatrix m_FireParticlesXForm; //направление для партиклов огня и дыма
+    Fmatrix m_FireParticlesXForm; //РЅР°РїСЂР°РІР»РµРЅРёРµ РґР»СЏ РїР°СЂС‚РёРєР»РѕРІ РѕРіРЅСЏ Рё РґС‹РјР°
     Fvector vLastFP; // fire point
     Fvector vLastFP2; // fire point2
     Fvector vLastFD; // fire direction

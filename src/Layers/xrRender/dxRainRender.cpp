@@ -87,7 +87,7 @@ void dxRainRender::Render(CEffect_Rain& owner)
         if (one.dwTime_Life < Device.dwTimeGlobal)
             owner.Born(one, source_radius);
 
-        // ïîñëåäíÿÿ äåëüòà ??
+        // Ð¿Ð¾ÑÐ»ÐµÐ´Ð½ÑÑ Ð´ÐµÐ»ÑŒÑ‚Ð° ??
         //.		float xdt		= float(one.dwTime_Hit-Device.dwTimeGlobal)/1000.f;
         //.		float dt		= Device.fTimeDelta;//xdt<Device.fTimeDelta?xdt:Device.fTimeDelta;
         float dt = Device.fTimeDelta;

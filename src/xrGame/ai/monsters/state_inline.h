@@ -42,10 +42,10 @@ TEMPLATE_SPECIALIZATION
 void CStateAbstract::execute()
 {
     VERIFY(object->g_Alive());
-    // проверить внешние условия изменения состояния
+    // РїСЂРѕРІРµСЂРёС‚СЊ РІРЅРµС€РЅРёРµ СѓСЃР»РѕРІРёСЏ РёР·РјРµРЅРµРЅРёСЏ СЃРѕСЃС‚РѕСЏРЅРёСЏ
     check_force_state();
 
-    // если состояние не выбрано, перевыбрать
+    // РµСЃР»Рё СЃРѕСЃС‚РѕСЏРЅРёРµ РЅРµ РІС‹Р±СЂР°РЅРѕ, РїРµСЂРµРІС‹Р±СЂР°С‚СЊ
     if (current_substate == u32(-1))
     {
         reselect_state();
@@ -66,14 +66,14 @@ void CStateAbstract::execute()
 #endif
     }
 
-    // выполнить текущее состояние
+    // РІС‹РїРѕР»РЅРёС‚СЊ С‚РµРєСѓС‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ
     CSState* state = get_state(current_substate);
     state->execute();
 
-    // сохранить текущее состояние
+    // СЃРѕС…СЂР°РЅРёС‚СЊ С‚РµРєСѓС‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ
     prev_substate = current_substate;
 
-    // проверить на завершение текущего состояния
+    // РїСЂРѕРІРµСЂРёС‚СЊ РЅР° Р·Р°РІРµСЂС€РµРЅРёРµ С‚РµРєСѓС‰РµРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ
     if (state->check_completion())
     {
         state->finalize();
@@ -106,17 +106,17 @@ void CStateAbstract::select_state(u32 new_state_id)
         return;
     CSState* state;
 
-    // если предыдущее состояние активно, завершить его
+    // РµСЃР»Рё РїСЂРµРґС‹РґСѓС‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ Р°РєС‚РёРІРЅРѕ, Р·Р°РІРµСЂС€РёС‚СЊ РµРіРѕ
     if (current_substate != u32(-1))
     {
         state = get_state(current_substate);
         state->critical_finalize();
     }
 
-    // установить новое состояние
+    // СѓСЃС‚Р°РЅРѕРІРёС‚СЊ РЅРѕРІРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ
     state = get_state(current_substate = new_state_id);
 
-    // инициализировать новое состояние
+    // РёРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊ РЅРѕРІРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ
     setup_substates();
 
     state->initialize();

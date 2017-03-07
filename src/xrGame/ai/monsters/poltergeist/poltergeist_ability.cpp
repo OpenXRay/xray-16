@@ -87,7 +87,7 @@ void CPolterSpecialAbility::on_hit(SHit* pHDS)
     {
         if (BI_NONE != pHDS->bone())
         {
-            //вычислить координаты попадания
+            //РІС‹С‡РёСЃР»РёС‚СЊ РєРѕРѕСЂРґРёРЅР°С‚С‹ РїРѕРїР°РґР°РЅРёСЏ
             IKinematics* V = smart_cast<IKinematics*>(m_object->Visual());
 
             Fvector start_pos = pHDS->bone_space_position();
@@ -150,13 +150,13 @@ void CPoltergeist::StrangeSounds(const Fvector& position)
         {
             if (l_rq.range < TRACE_DISTANCE)
             {
-                // Получить пару материалов
+                // РџРѕР»СѓС‡РёС‚СЊ РїР°СЂСѓ РјР°С‚РµСЂРёР°Р»РѕРІ
                 CDB::TRI* pTri = Level().ObjectSpace.GetStaticTris() + l_rq.element;
                 SGameMtlPair* mtl_pair = GMLib.GetMaterialPairByIndices(material().self_material_idx(), pTri->material);
                 if (!mtl_pair)
                     continue;
 
-                // Играть звук
+                // РРіСЂР°С‚СЊ Р·РІСѓРє
                 if (!mtl_pair->CollideSounds.empty())
                 {
                     // CLONE_MTL_SOUND(m_strange_sound, mtl_pair, CollideSounds);

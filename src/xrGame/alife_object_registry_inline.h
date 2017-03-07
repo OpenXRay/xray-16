@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-//	Module 		: alife_object_registry_øòäøòó.h
+//	Module 		: alife_object_registry_ÑˆÑ‚Ğ´ÑˆÑ‚Ñƒ.h
 //	Created 	: 15.01.2003
 //  Modified 	: 12.05.2004
 //	Author		: Dmitriy Iassenev
