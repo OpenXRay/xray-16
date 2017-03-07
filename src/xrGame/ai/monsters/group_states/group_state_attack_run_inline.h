@@ -137,7 +137,7 @@ void CStateGroupAttackRunAbstract::execute()
         vertex = object->EnemyMan.get_enemy()->ai_location().level_vertex_id();
     }
 
-    // óñòàíîâêà ïàðàìåòðîâ ôóíêöèîíàëüíûõ áëîêîâ
+    // ÑƒÑÑ‚Ð°Ð½Ð¾Ð²ÐºÐ° Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ð¾Ð² Ñ„ÑƒÐ½ÐºÑ†Ð¸Ð¾Ð½Ð°Ð»ÑŒÐ½Ñ‹Ñ… Ð±Ð»Ð¾ÐºÐ¾Ð²
     object->set_action(ACT_RUN);
 
     object->anim().accel_activate(eAT_Aggressive);
@@ -169,7 +169,7 @@ void CStateGroupAttackRunAbstract::execute()
 // TEMPLATE_SPECIALIZATION
 // void CStateGroupAttackRunAbstract::execute()
 // {
-// 	// óñòàíîâêà ïàðàìåòðîâ ôóíêöèîíàëüíûõ áëîêîâ
+// 	// ÑƒÑÑ‚Ð°Ð½Ð¾Ð²ÐºÐ° Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ð¾Ð² Ñ„ÑƒÐ½ÐºÑ†Ð¸Ð¾Ð½Ð°Ð»ÑŒÐ½Ñ‹Ñ… Ð±Ð»Ð¾ÐºÐ¾Ð²
 // 	object->set_action						(ACT_RUN);
 // 	object->anim().accel_activate			(eAT_Aggressive);
 // 	object->anim().accel_set_braking		(false);
@@ -183,7 +183,7 @@ void CStateGroupAttackRunAbstract::execute()
 //
 // 	object->path().extrapolate_path			(true);
 //
-// 	// îáðàáîòàòü squad èíôî
+// 	// Ð¾Ð±Ñ€Ð°Ð±Ð¾Ñ‚Ð°Ñ‚ÑŒ squad Ð¸Ð½Ñ„Ð¾
 // 	object->path().set_use_dest_orient		(false);
 //
 //
@@ -192,7 +192,7 @@ void CStateGroupAttackRunAbstract::execute()
 // 	{
 //  		CMonsterSquad *squad	= monster_squad().get_squad(object);
 //  		if (squad && squad->SquadActive()) {
-//  			// Ïîëó÷èòü êîìàíäó
+//  			// ÐŸÐ¾Ð»ÑƒÑ‡Ð¸Ñ‚ÑŒ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñƒ
 //  			SSquadCommand command;
 //  			squad->GetCommand(object, command);
 //

@@ -139,12 +139,12 @@ bool CAttachmentOwner::can_attach(const CInventoryItem* inventory_item) const
     if (!item || !item->enabled() || !item->can_be_attached())
         return (false);
 
-    //ìîæíî ëè ïðèñîåäèíÿòü îáúåêòû òàêîãî òèïà
+    //Ð¼Ð¾Ð¶Ð½Ð¾ Ð»Ð¸ Ð¿Ñ€Ð¸ÑÐ¾ÐµÐ´Ð¸Ð½ÑÑ‚ÑŒ Ð¾Ð±ÑŠÐµÐºÑ‚Ñ‹ Ñ‚Ð°ÐºÐ¾Ð³Ð¾ Ñ‚Ð¸Ð¿Ð°
     if (m_attach_item_sections.end() ==
         std::find(m_attach_item_sections.begin(), m_attach_item_sections.end(), inventory_item->object().cNameSect()))
         return false;
 
-    //åñëè óæå åñòü ïðèñîåäèííåíûé îáúåò òàêîãî òèïà
+    //ÐµÑÐ»Ð¸ ÑƒÐ¶Ðµ ÐµÑÑ‚ÑŒ Ð¿Ñ€Ð¸ÑÐ¾ÐµÐ´Ð¸Ð½Ð½ÐµÐ½Ñ‹Ð¹ Ð¾Ð±ÑŠÐµÑ‚ Ñ‚Ð°ÐºÐ¾Ð³Ð¾ Ñ‚Ð¸Ð¿Ð°
     if (attached(inventory_item->object().cNameSect()))
         return false;
 

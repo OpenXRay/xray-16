@@ -24,7 +24,7 @@ void CStateMonsterControlledAbstract::execute()
     case eTaskFollow: select_state(eStateControlled_Follow); break;
     case eTaskAttack:
     {
-        // проверить валидность данных атаки
+        // РїСЂРѕРІРµСЂРёС‚СЊ РІР°Р»РёРґРЅРѕСЃС‚СЊ РґР°РЅРЅС‹С… Р°С‚Р°РєРё
         const CEntity* enemy = object->get_data().m_object;
         if (!enemy || enemy->getDestroy() || !enemy->g_Alive())
         {

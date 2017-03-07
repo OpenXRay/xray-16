@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////
 // PhraseDialogManager.cpp
-// Класс, от которого наследуются персонажи, ведущие диалог
-// между собой
+// РљР»Р°СЃСЃ, РѕС‚ РєРѕС‚РѕСЂРѕРіРѕ РЅР°СЃР»РµРґСѓСЋС‚СЃСЏ РїРµСЂСЃРѕРЅР°Р¶Рё, РІРµРґСѓС‰РёРµ РґРёР°Р»РѕРі
+// РјРµР¶РґСѓ СЃРѕР±РѕР№
 ///////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -95,8 +95,8 @@ bool CPhraseDialogManager::AddAvailableDialog(shared_str dialog_id, CPhraseDialo
     DIALOG_SHARED_PTR phrase_dialog(new CPhraseDialog());
     phrase_dialog->Load(dialog_id);
 
-    //вызвать скриптовую присоединенную функцию
-    //активируется после сказанной фразы
+    //РІС‹Р·РІР°С‚СЊ СЃРєСЂРёРїС‚РѕРІСѓСЋ РїСЂРёСЃРѕРµРґРёРЅРµРЅРЅСѓСЋ С„СѓРЅРєС†РёСЋ
+    //Р°РєС‚РёРІРёСЂСѓРµС‚СЃСЏ РїРѕСЃР»Рµ СЃРєР°Р·Р°РЅРЅРѕР№ С„СЂР°Р·С‹
     const CGameObject* pSpeakerGO1 = smart_cast<const CGameObject*>(this);
     VERIFY(pSpeakerGO1);
     const CGameObject* pSpeakerGO2 = smart_cast<const CGameObject*>(partner);

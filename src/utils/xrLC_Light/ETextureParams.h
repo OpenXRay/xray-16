@@ -133,12 +133,12 @@ struct STextureParams
     }
     IC BOOL HasAlpha()
     {
-        // исходная текстура содержит альфа канал
+        // РёСЃС…РѕРґРЅР°СЏ С‚РµРєСЃС‚СѓСЂР° СЃРѕРґРµСЂР¶РёС‚ Р°Р»СЊС„Р° РєР°РЅР°Р»
         return flags.is(flHasAlpha);
     }
     IC BOOL HasSurface() const { return flags.is(flHasSurface); }
     IC void SetHasSurface(BOOL val) { flags.set(flHasSurface, val); }
-    IC BOOL HasAlphaChannel() // игровая текстура содержит альфа канал
+    IC BOOL HasAlphaChannel() // РёРіСЂРѕРІР°СЏ С‚РµРєСЃС‚СѓСЂР° СЃРѕРґРµСЂР¶РёС‚ Р°Р»СЊС„Р° РєР°РЅР°Р»
     {
         switch (fmt)
         {

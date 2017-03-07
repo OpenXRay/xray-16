@@ -161,7 +161,7 @@ void CControlJump::start_jump(const Fvector& point)
             target_point.mad(m_object->Position(), m_object->Direction(), dist);
             if (m_man->path_builder().accessible(target_point))
             {
-                // íîäà â ïðÿìîé âèäèìîñòè?
+                // Ð½Ð¾Ð´Ð° Ð² Ð¿Ñ€ÑÐ¼Ð¾Ð¹ Ð²Ð¸Ð´Ð¸Ð¼Ð¾ÑÑ‚Ð¸?
                 m_man->path_builder().restrictions().add_border(m_object->Position(), target_point);
                 u32 node = ai().level_graph().check_position_in_direction(
                     m_object->ai_location().level_vertex_id(), m_object->Position(), target_point);
@@ -431,7 +431,7 @@ Fvector CControlJump::get_target(IGameObject* obj)
 void CControlJump::calculate_jump_time(Fvector const& target, bool const check_force_factor)
 {
     float ph_time = m_object->character_physics_support()->movement()->JumpMinVelTime(target);
-    // âûïîëíèòü ïðûæîê â ñîîòâåòñòâèè ñ äåëèòåëåì âðåìåíè
+    // Ð²Ñ‹Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ Ð¿Ñ€Ñ‹Ð¶Ð¾Ðº Ð² ÑÐ¾Ð¾Ñ‚Ð²ÐµÑ‚ÑÑ‚Ð²Ð¸Ð¸ Ñ Ð´ÐµÐ»Ð¸Ñ‚ÐµÐ»ÐµÐ¼ Ð²Ñ€ÐµÐ¼ÐµÐ½Ð¸
     float cur_factor = (check_force_factor && m_data.force_factor > 0) ? m_data.force_factor : m_jump_factor;
 
     m_jump_time = ph_time / cur_factor;
@@ -471,7 +471,7 @@ void CControlJump::on_event(ControlCom::EEventType type, ControlCom::IEventData*
             //---------------------------------------------------------------------------------
             // start jump here
             //---------------------------------------------------------------------------------
-            // ïîëó÷èòü âðåìÿ ôèç.ïðûæêà
+            // Ð¿Ð¾Ð»ÑƒÑ‡Ð¸Ñ‚ÑŒ Ð²Ñ€ÐµÐ¼Ñ Ñ„Ð¸Ð·.Ð¿Ñ€Ñ‹Ð¶ÐºÐ°
             calculate_jump_time(m_target_position, true);
 
             m_object->character_physics_support()->movement()->Jump(m_target_position, m_jump_time);
@@ -509,7 +509,7 @@ void CControlJump::hit_test()
     if (!m_data.target_object)
         return;
 
-    // Ïðîâåðèòü íà íàíåñåíèå õèòà âî âðåìÿ ïðûæêà
+    // ÐŸÑ€Ð¾Ð²ÐµÑ€Ð¸Ñ‚ÑŒ Ð½Ð° Ð½Ð°Ð½ÐµÑÐµÐ½Ð¸Ðµ Ñ…Ð¸Ñ‚Ð° Ð²Ð¾ Ð²Ñ€ÐµÐ¼Ñ Ð¿Ñ€Ñ‹Ð¶ÐºÐ°
     Fvector trace_from;
     m_object->Center(trace_from);
 
@@ -527,13 +527,13 @@ void CControlJump::hit_test()
     if (!m_object_hitted && m_data.target_object)
     {
         m_object_hitted = true;
-        // îïðåäåëèòü äèñòàíöèþ äî âðàãà
+        // Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»Ð¸Ñ‚ÑŒ Ð´Ð¸ÑÑ‚Ð°Ð½Ñ†Ð¸ÑŽ Ð´Ð¾ Ð²Ñ€Ð°Ð³Ð°
         Fvector d;
         d.sub(m_data.target_object->Position(), m_object->Position());
         if (d.magnitude() > m_hit_trace_range)
             m_object_hitted = false;
 
-        // ïðîâåðêà íà  Field-Of-Hit
+        // Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ° Ð½Ð°  Field-Of-Hit
         float my_h, my_p;
         float h, p;
 
@@ -631,7 +631,7 @@ bool CControlJump::can_jump(Fvector const& target, bool const aggressive_jump)
     Fvector source_position = m_object->Position();
     Fvector target_position = target;
 
-    // ïðîâåðêà íà dist
+    // Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ° Ð½Ð° dist
     float dist = source_position.distance_to(target_position);
 
     // in aggressive mode we can jump from distance >= 1
@@ -639,11 +639,11 @@ bool CControlJump::can_jump(Fvector const& target, bool const aggressive_jump)
     if ((dist < test_min_distance) || (dist > m_max_distance))
         return false;
 
-    // ïîëó÷èòü âåêòîð íàïðàâëåíèÿ è åãî ìèð óãîë
+    // Ð¿Ð¾Ð»ÑƒÑ‡Ð¸Ñ‚ÑŒ Ð²ÐµÐºÑ‚Ð¾Ñ€ Ð½Ð°Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸Ñ Ð¸ ÐµÐ³Ð¾ Ð¼Ð¸Ñ€ ÑƒÐ³Ð¾Ð»
     float dir_yaw = Fvector().sub(target_position, source_position).getH();
     dir_yaw = angle_normalize(-dir_yaw);
 
-    // ïðîâåðêà íà angle
+    // Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ° Ð½Ð° angle
     float yaw_current, yaw_target;
     m_object->control().direction().get_heading(yaw_current, yaw_target);
 
@@ -654,7 +654,7 @@ bool CControlJump::can_jump(Fvector const& target, bool const aggressive_jump)
     if (_abs(target_position.y - source_position.y) > m_max_height)
         return false;
 
-    // ïðîâåðêà prepare
+    // Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ° prepare
     if (!is_flag(SControlJumpData::ePrepareSkip) && !is_flag(SControlJumpData::eGlideOnPrepareFailed))
     {
         if (!is_flag(SControlJumpData::ePrepareInMove))
@@ -681,7 +681,7 @@ bool CControlJump::can_jump(Fvector const& target, bool const aggressive_jump)
 
             if (m_man->path_builder().accessible(target_point))
             {
-                // íîäà â ïðÿìîé âèäèìîñòè?
+                // Ð½Ð¾Ð´Ð° Ð² Ð¿Ñ€ÑÐ¼Ð¾Ð¹ Ð²Ð¸Ð´Ð¸Ð¼Ð¾ÑÑ‚Ð¸?
                 m_man->path_builder().restrictions().add_border(m_object->Position(), target_point);
                 u32 node = ai().level_graph().check_position_in_direction(
                     m_object->ai_location().level_vertex_id(), m_object->Position(), target_point);

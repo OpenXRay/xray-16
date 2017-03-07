@@ -14,7 +14,7 @@ public:
     virtual bool OnMouseAction(float x, float y, EUIMessages mouse_action);
     virtual void OnClick();
 
-    //прорисовка окна
+    //РїСЂРѕСЂРёСЃРѕРІРєР° РѕРєРЅР°
     virtual void DrawTexture();
     virtual void DrawText();
 
@@ -23,24 +23,24 @@ public:
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
     virtual void OnFocusLost();
 
-    //состояния в которых находится кнопка
+    //СЃРѕСЃС‚РѕСЏРЅРёСЏ РІ РєРѕС‚РѕСЂС‹С… РЅР°С…РѕРґРёС‚СЃСЏ РєРЅРѕРїРєР°
     typedef enum {
-        BUTTON_NORMAL, //кнопка никак не затрагивается
-        BUTTON_PUSHED, //в нажатом сотоянии
-        BUTTON_UP //при удерживаемой кнопки мыши
+        BUTTON_NORMAL, //РєРЅРѕРїРєР° РЅРёРєР°Рє РЅРµ Р·Р°С‚СЂР°РіРёРІР°РµС‚СЃСЏ
+        BUTTON_PUSHED, //РІ РЅР°Р¶Р°С‚РѕРј СЃРѕС‚РѕСЏРЅРёРё
+        BUTTON_UP //РїСЂРё СѓРґРµСЂР¶РёРІР°РµРјРѕР№ РєРЅРѕРїРєРё РјС‹С€Рё
     } E_BUTTON_STATE;
 
-    //заново подготовить состояние
+    //Р·Р°РЅРѕРІРѕ РїРѕРґРіРѕС‚РѕРІРёС‚СЊ СЃРѕСЃС‚РѕСЏРЅРёРµ
     virtual void Reset();
 
-    // Установка состояния кнопки: утоплена, не утоплена
+    // РЈСЃС‚Р°РЅРѕРІРєР° СЃРѕСЃС‚РѕСЏРЅРёСЏ РєРЅРѕРїРєРё: СѓС‚РѕРїР»РµРЅР°, РЅРµ СѓС‚РѕРїР»РµРЅР°
     void SetButtonState(E_BUTTON_STATE eBtnState) { m_eButtonState = eBtnState; }
     E_BUTTON_STATE GetButtonState() const { return m_eButtonState; }
-    // Поведение кнопки как переключателя реализовано пока только в режиме NORMAL_PRESS
+    // РџРѕРІРµРґРµРЅРёРµ РєРЅРѕРїРєРё РєР°Рє РїРµСЂРµРєР»СЋС‡Р°С‚РµР»СЏ СЂРµР°Р»РёР·РѕРІР°РЅРѕ РїРѕРєР° С‚РѕР»СЊРєРѕ РІ СЂРµР¶РёРјРµ NORMAL_PRESS
     void SetButtonAsSwitch(bool bAsSwitch) { m_bIsSwitch = bAsSwitch; }
-    // Работа с акселератором
-    // Код акселератора берется из файла dinput.h, из DirectX SDK.
-    // Например: кнопка A - код 0x1E(DIK_A)
+    // Р Р°Р±РѕС‚Р° СЃ Р°РєСЃРµР»РµСЂР°С‚РѕСЂРѕРј
+    // РљРѕРґ Р°РєСЃРµР»РµСЂР°С‚РѕСЂР° Р±РµСЂРµС‚СЃСЏ РёР· С„Р°Р№Р»Р° dinput.h, РёР· DirectX SDK.
+    // РќР°РїСЂРёРјРµСЂ: РєРЅРѕРїРєР° A - РєРѕРґ 0x1E(DIK_A)
     void SetAccelerator(int iAccel, int idx);
     const int GetAccelerator(int idx) const;
     bool IsAccelerator(int iAccel) const;

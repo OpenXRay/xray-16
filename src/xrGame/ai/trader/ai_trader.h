@@ -85,7 +85,7 @@ public:
     void OnStartTrade();
     void OnStopTrade();
 
-    //игровое имя
+    //РёРіСЂРѕРІРѕРµ РёРјСЏ
     virtual LPCSTR Name() const { return CInventoryOwner::Name(); }
     virtual bool can_attach(const CInventoryItem* inventory_item) const;
     virtual bool use_bolts() const;
@@ -96,11 +96,11 @@ public:
     virtual ALife::ERelationType tfGetRelationType(const CEntityAlive* tpEntityAlive) const;
 
     //////////////////////////////////////////////////////////////////////////
-    //генерируемые задания
+    //РіРµРЅРµСЂРёСЂСѓРµРјС‹Рµ Р·Р°РґР°РЅРёСЏ
 public:
-    //проверяет список артефактов в заказах
+    //РїСЂРѕРІРµСЂСЏРµС‚ СЃРїРёСЃРѕРє Р°СЂС‚РµС„Р°РєС‚РѕРІ РІ Р·Р°РєР°Р·Р°С…
     virtual u32 ArtefactPrice(CArtefact* pArtefact);
-    //продажа артефакта, с последуещим изменением списка заказов  (true - если артефакт был в списке)
+    //РїСЂРѕРґР°Р¶Р° Р°СЂС‚РµС„Р°РєС‚Р°, СЃ РїРѕСЃР»РµРґСѓРµС‰РёРј РёР·РјРµРЅРµРЅРёРµРј СЃРїРёСЃРєР° Р·Р°РєР°Р·РѕРІ  (true - РµСЃР»Рё Р°СЂС‚РµС„Р°РєС‚ Р±С‹Р» РІ СЃРїРёСЃРєРµ)
     virtual bool BuyArtefact(CArtefact* pArtefact);
 
 public:

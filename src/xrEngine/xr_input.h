@@ -7,7 +7,7 @@
 class ENGINE_API IInputReceiver;
 
 //\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-//описание класса
+//РѕРїРёСЃР°РЅРёРµ РєР»Р°СЃСЃР°
 const int mouse_device_key = 1;
 const int keyboard_device_key = 2;
 const int all_device_key = mouse_device_key | keyboard_device_key;

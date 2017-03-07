@@ -24,7 +24,7 @@ void CStringTable::Init()
 
     pData = new STRING_TABLE_DATA();
 
-    //имя языка, если не задано (NULL), то первый <text> в <string> в XML
+    //РёРјСЏ СЏР·С‹РєР°, РµСЃР»Рё РЅРµ Р·Р°РґР°РЅРѕ (NULL), С‚Рѕ РїРµСЂРІС‹Р№ <text> РІ <string> РІ XML
     pData->m_sLanguage = pSettings->r_string("string_table", "language");
 
     //---
@@ -58,7 +58,7 @@ void CStringTable::Load(LPCSTR xml_file_full)
 
     uiXml.Load(CONFIG_PATH, _s, xml_file_full);
 
-    //общий список всех записей таблицы в файле
+    //РѕР±С‰РёР№ СЃРїРёСЃРѕРє РІСЃРµС… Р·Р°РїРёСЃРµР№ С‚Р°Р±Р»РёС†С‹ РІ С„Р°Р№Р»Рµ
     int string_num = uiXml.GetNodesNum(uiXml.GetRoot(), "string");
 
     for (int i = 0; i < string_num; ++i)

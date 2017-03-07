@@ -94,7 +94,7 @@ bool SBPart::prepare(SBAdjVec& adjs, u32 bone_face_min)
     Fmatrix M;
     M.set(m_OBB.m_rotate.i, m_OBB.m_rotate.j, m_OBB.m_rotate.k, m_OBB.m_translate);
     m_RefOffset.set(m_OBB.m_translate);
-    M.getXYZ(m_RefRotate); // не i потому что в движке так
+    M.getXYZ(m_RefRotate); // РЅРµ i РїРѕС‚РѕРјСѓ С‡С‚Рѕ РІ РґРІРёР¶РєРµ С‚Р°Рє
     M.invert();
 
     // transform vertices & calculate bounding box
@@ -173,8 +173,8 @@ bool SBPart::prepare(SBAdjVec& adjs, u32 bone_face_min)
             }
             else
             {
-                // если проход оказался безрезультатным (т.е. не смогли добавить хоть один фейс) - добавляем
-                //  все неприаттаченные фейсы к 0-кости (иначе зацикливается (mike - L03_agroprom))
+                // РµСЃР»Рё РїСЂРѕС…РѕРґ РѕРєР°Р·Р°Р»СЃСЏ Р±РµР·СЂРµР·СѓР»СЊС‚Р°С‚РЅС‹Рј (С‚.Рµ. РЅРµ СЃРјРѕРіР»Рё РґРѕР±Р°РІРёС‚СЊ С…РѕС‚СЊ РѕРґРёРЅ С„РµР№СЃ) - РґРѕР±Р°РІР»СЏРµРј
+                //  РІСЃРµ РЅРµРїСЂРёР°С‚С‚Р°С‡РµРЅРЅС‹Рµ С„РµР№СЃС‹ Рє 0-РєРѕСЃС‚Рё (РёРЅР°С‡Рµ Р·Р°С†РёРєР»РёРІР°РµС‚СЃСЏ (mike - L03_agroprom))
                 for (SBFaceVecIt f_it = m_Faces.begin(); f_it != m_Faces.end(); f_it++)
                 {
                     SBFace* F = *f_it;
@@ -389,7 +389,7 @@ bool SBPart::Export(IWriter& F, u8 infl)
         Fvector rot = {0, 0, 0};
         F.w_fvector3(rot);
         F.w_fvector3(bone.offset);
-        F.w_float(bone.area); // mass (для Кости посчитал площадь)
+        F.w_float(bone.area); // mass (РґР»СЏ РљРѕСЃС‚Рё РїРѕСЃС‡РёС‚Р°Р» РїР»РѕС‰Р°РґСЊ)
         F.w_fvector3(shape.box.m_translate); // center of mass
     }
     F.close_chunk();

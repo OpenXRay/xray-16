@@ -174,8 +174,8 @@ void CPatrolPathManager::select_point(const Fvector& position, u32& dest_vertex_
         m_curr_point_index = vertex->vertex_id();
 
 #if 0
-		// если выбранная нода не соответствует текущей ноде - все ок
-		// иначе выбрать следующую вершину патрульного пути
+		// РµСЃР»Рё РІС‹Р±СЂР°РЅРЅР°СЏ РЅРѕРґР° РЅРµ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ С‚РµРєСѓС‰РµР№ РЅРѕРґРµ - РІСЃРµ РѕРє
+		// РёРЅР°С‡Рµ РІС‹Р±СЂР°С‚СЊ СЃР»РµРґСѓСЋС‰СѓСЋ РІРµСЂС€РёРЅСѓ РїР°С‚СЂСѓР»СЊРЅРѕРіРѕ РїСѓС‚Рё
 		if (vertex->data().level_vertex_id() != m_game_object->ai_location().level_vertex_id()) {
 			dest_vertex_id		= vertex->data().level_vertex_id();
 			m_dest_position		= vertex->data().position();
@@ -201,13 +201,13 @@ void CPatrolPathManager::select_point(const Fvector& position, u32& dest_vertex_
     m_game_object->callback(GameObject::ePatrolPathInPoint)(
         m_game_object->lua_game_object(), u32(ScriptEntity::eActionTypeMovement), m_curr_point_index);
 
-    u32 count = 0; // количество разветвлений
-    float sum = 0.f; // сумма весов разветвления
+    u32 count = 0; // РєРѕР»РёС‡РµСЃС‚РІРѕ СЂР°Р·РІРµС‚РІР»РµРЅРёР№
+    float sum = 0.f; // СЃСѓРјРјР° РІРµСЃРѕРІ СЂР°Р·РІРµС‚РІР»РµРЅРёСЏ
     vertex = m_path->vertex(m_curr_point_index);
     CPatrolPath::const_iterator I = vertex->edges().begin(), E = vertex->edges().end();
     u32 target = u32(-1);
 
-    // вычислить количество разветвлений
+    // РІС‹С‡РёСЃР»РёС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ СЂР°Р·РІРµС‚РІР»РµРЅРёР№
     for (; I != E; ++I)
     {
         if ((*I).vertex_id() == m_prev_point_index)
@@ -292,14 +292,14 @@ void CPatrolPathManager::select_point(const Fvector& position, u32& dest_vertex_
 
 u32 CPatrolPathManager::get_next_point(u32 prev_point_index)
 {
-    u32 count = 0; // количество разветвлений
-    float sum = 0.f; // сумма весов разветвления
+    u32 count = 0; // РєРѕР»РёС‡РµСЃС‚РІРѕ СЂР°Р·РІРµС‚РІР»РµРЅРёР№
+    float sum = 0.f; // СЃСѓРјРјР° РІРµСЃРѕРІ СЂР°Р·РІРµС‚РІР»РµРЅРёСЏ
     const CPatrolPath::CVertex* vertex = m_path->vertex(prev_point_index);
 
     CPatrolPath::const_iterator I = vertex->edges().begin(), E = vertex->edges().end();
     u32 target = u32(-1);
 
-    // вычислить количество разветвлений
+    // РІС‹С‡РёСЃР»РёС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ СЂР°Р·РІРµС‚РІР»РµРЅРёР№
     for (; I != E; ++I)
     {
         if (!accessible(m_path->vertex((*I).vertex_id())))
@@ -309,7 +309,7 @@ u32 CPatrolPathManager::get_next_point(u32 prev_point_index)
         ++count;
     }
 
-    // проверить количество
+    // РїСЂРѕРІРµСЂРёС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ
     if (count != 0)
     {
         float fChoosed = 0.f;

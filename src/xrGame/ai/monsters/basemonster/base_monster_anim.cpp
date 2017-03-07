@@ -13,7 +13,7 @@
 #include "ai_monster_space.h"
 #include "ai/Monsters/control_animation_base.h"
 
-// Установка анимации
+// РЈСЃС‚Р°РЅРѕРІРєР° Р°РЅРёРјР°С†РёРё
 void CBaseMonster::SelectAnimation(const Fvector& /**_view/**/, const Fvector& /**_move/**/, float /**speed/**/)
 {
     control().animation().update_frame();

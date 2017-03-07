@@ -35,10 +35,10 @@ public:
     void Update_GrenadeView(Fvector& pos_actor);
     void net_Relcase(IGameObject* obj);
 
-    //текущий предмет на который смотрит HUD
+    //С‚РµРєСѓС‰РёР№ РїСЂРµРґРјРµС‚ РЅР° РєРѕС‚РѕСЂС‹Р№ СЃРјРѕС‚СЂРёС‚ HUD
     collide::rq_result& GetCurrentRayQuery();
 
-    //устанвка внешнего вида прицела в зависимости от текущей дисперсии
+    //СѓСЃС‚Р°РЅРІРєР° РІРЅРµС€РЅРµРіРѕ РІРёРґР° РїСЂРёС†РµР»Р° РІ Р·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ С‚РµРєСѓС‰РµР№ РґРёСЃРїРµСЂСЃРёРё
     void SetCrosshairDisp(float dispf, float disps = 0.f);
 #ifdef DEBUG
     void SetFirstBulletCrosshairDisp(float fbdispf);

@@ -36,13 +36,13 @@ void CControlPathBuilderBase::prepare_builder()
 //////////////////////////////////////////////////////////////////////////
 void CControlPathBuilderBase::set_target_point(const Fvector& position, u32 node)
 {
-    // обновить актуальность
+    // РѕР±РЅРѕРІРёС‚СЊ Р°РєС‚СѓР°Р»СЊРЅРѕСЃС‚СЊ
     m_target_actual = m_target_actual && (m_target_set.position().similar(position) && (m_target_set.node() == node));
 
-    // установить позицию
+    // СѓСЃС‚Р°РЅРѕРІРёС‚СЊ РїРѕР·РёС†РёСЋ
     m_target_set.set(position, node);
 
-    // установить глобальные параметры передвижения
+    // СѓСЃС‚Р°РЅРѕРІРёС‚СЊ РіР»РѕР±Р°Р»СЊРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ РїРµСЂРµРґРІРёР¶РµРЅРёСЏ
     m_target_type = eMoveToTarget;
 
     set_level_path_type();
@@ -55,13 +55,13 @@ void CControlPathBuilderBase::set_target_point(u32 node)
 
 void CControlPathBuilderBase::set_retreat_from_point(const Fvector& position)
 {
-    // обновить актуальность
+    // РѕР±РЅРѕРІРёС‚СЊ Р°РєС‚СѓР°Р»СЊРЅРѕСЃС‚СЊ
     m_target_actual = m_target_actual && (m_target_set.position().similar(position));
 
-    // установить позицию
+    // СѓСЃС‚Р°РЅРѕРІРёС‚СЊ РїРѕР·РёС†РёСЋ
     m_target_set.set(position, u32(-1));
 
-    // установить глобальные параметры передвижения
+    // СѓСЃС‚Р°РЅРѕРІРёС‚СЊ РіР»РѕР±Р°Р»СЊРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ РїРµСЂРµРґРІРёР¶РµРЅРёСЏ
     m_target_type = eRetreatFromTarget;
 
     set_level_path_type();

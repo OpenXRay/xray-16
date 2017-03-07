@@ -167,7 +167,7 @@ class CSE_ALifeItemWeapon : public CSE_ALifeItem
 public:
     typedef ALife::EWeaponAddonStatus EWeaponAddonStatus;
 
-    //текущее состояние аддонов
+    //С‚РµРєСѓС‰РµРµ СЃРѕСЃС‚РѕСЏРЅРёРµ Р°РґРґРѕРЅРѕРІ
     enum EWeaponAddonState
     {
         eWeaponAddonScope = 0x01,

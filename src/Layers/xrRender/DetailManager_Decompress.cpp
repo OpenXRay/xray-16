@@ -116,7 +116,7 @@ void CDetailManager::cache_Decompress(Slot* S)
     u32 d_size = iCeil(dm_slot_size / density);
     svector<int, dm_obj_in_slot> selected;
 
-    u32 p_rnd = D.sx * D.sz; // нужно для того чтобы убрать полосы(ряды)
+    u32 p_rnd = D.sx * D.sz; // РЅСѓР¶РЅРѕ РґР»СЏ С‚РѕРіРѕ С‡С‚РѕР±С‹ СѓР±СЂР°С‚СЊ РїРѕР»РѕСЃС‹(СЂСЏРґС‹)
     CRandom r_selection(0x12071980 ^ p_rnd);
     CRandom r_jitter(0x12071980 ^ p_rnd);
     CRandom r_yaw(0x12071980 ^ p_rnd);

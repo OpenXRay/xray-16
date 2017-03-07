@@ -13,16 +13,16 @@
 
 // typedef CALifeRegistryWrapper<CInfoPortionRegistry> KNOWN_INFO_REGISTRY;
 
-//реестр контактов общения с другими персонажами
+//СЂРµРµСЃС‚СЂ РєРѕРЅС‚Р°РєС‚РѕРІ РѕР±С‰РµРЅРёСЏ СЃ РґСЂСѓРіРёРјРё РїРµСЂСЃРѕРЅР°Р¶Р°РјРё
 // typedef CALifeRegistryWrapper<CKnownContactsRegistry> KNOWN_CONTACTS_REGISTRY;
 
-//реестр статей энциклопедии, о которых знает актер
+//СЂРµРµСЃС‚СЂ СЃС‚Р°С‚РµР№ СЌРЅС†РёРєР»РѕРїРµРґРёРё, Рѕ РєРѕС‚РѕСЂС‹С… Р·РЅР°РµС‚ Р°РєС‚РµСЂ
 // typedef CALifeRegistryWrapper<CEncyclopediaRegistry> ENCYCLOPEDIA_REGISTRY;
 
-//реестр заданий, полученных актером
+//СЂРµРµСЃС‚СЂ Р·Р°РґР°РЅРёР№, РїРѕР»СѓС‡РµРЅРЅС‹С… Р°РєС‚РµСЂРѕРј
 // typedef CALifeRegistryWrapper<CGameTaskRegistry> GAME_TASK_REGISTRY;
 
-//реестр новостей, полученных актером
+//СЂРµРµСЃС‚СЂ РЅРѕРІРѕСЃС‚РµР№, РїРѕР»СѓС‡РµРЅРЅС‹С… Р°РєС‚РµСЂРѕРј
 // typedef CALifeRegistryWrapper<CGameNewsRegistry> GAME_NEWS_REGISTRY;
 
 template <typename T>

@@ -38,11 +38,11 @@ class ECORE_API CDetailManager
 {
 public:
     struct SlotItem
-    { // один кустик
+    { // РѕРґРёРЅ РєСѓСЃС‚РёРє
         float scale;
         float scale_calculated;
         Fmatrix mRotY;
-        u32 vis_ID; // индекс в visibility списке он же тип [не качается, качается1, качается2]
+        u32 vis_ID; // РёРЅРґРµРєСЃ РІ visibility СЃРїРёСЃРєРµ РѕРЅ Р¶Рµ С‚РёРї [РЅРµ РєР°С‡Р°РµС‚СЃСЏ, РєР°С‡Р°РµС‚СЃСЏ1, РєР°С‡Р°РµС‚СЃСЏ2]
         float c_hemi;
         float c_sun;
 #if RENDER == R_R1
@@ -52,9 +52,9 @@ public:
     DEFINE_VECTOR(SlotItem*, SlotItemVec, SlotItemVecIt);
     struct SlotPart
     { //
-        u32 id; // ID модельки
-        SlotItemVec items; // список кустиков
-        SlotItemVec r_items[3]; // список кустиков for render
+        u32 id; // ID РјРѕРґРµР»СЊРєРё
+        SlotItemVec items; // СЃРїРёСЃРѕРє РєСѓСЃС‚РёРєРѕРІ
+        SlotItemVec r_items[3]; // СЃРїРёСЃРѕРє РєСѓСЃС‚РёРєРѕРІ for render
     };
     enum SlotType
     {
@@ -64,14 +64,14 @@ public:
         stFORCEDWORD = 0xffffffff
     };
     struct Slot
-    { // распакованый слот размером DETAIL_SLOT_SIZE
+    { // СЂР°СЃРїР°РєРѕРІР°РЅС‹Р№ СЃР»РѕС‚ СЂР°Р·РјРµСЂРѕРј DETAIL_SLOT_SIZE
         struct
         {
             u32 empty : 1;
             u32 type : 1;
             u32 frame : 30;
         };
-        int sx, sz; // координаты слота X x Y
+        int sx, sz; // РєРѕРѕСЂРґРёРЅР°С‚С‹ СЃР»РѕС‚Р° X x Y
         vis_data vis; //
         SlotPart G[dm_obj_in_slot]; //
 
@@ -142,7 +142,7 @@ public:
     int cache_cx;
     int cache_cz;
 
-    PSS poolSI; // pool из которого выделяются SlotItem
+    PSS poolSI; // pool РёР· РєРѕС‚РѕСЂРѕРіРѕ РІС‹РґРµР»СЏСЋС‚СЃСЏ SlotItem
 
     void UpdateVisibleM();
     void UpdateVisibleS();

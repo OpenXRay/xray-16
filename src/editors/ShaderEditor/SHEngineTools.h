@@ -83,8 +83,8 @@ class CSHEngineTools : public ISHTools
 
     void ParseBlender(IBlender* B, CParseBlender& P);
 
-    CMemoryWriter m_BlenderStream; // пользоваться функциями обновления стрима для синхронизации
-    bool m_bUpdateCurrent; // если менялся объект непосредственно  Update____From___()
+    CMemoryWriter m_BlenderStream; // РїРѕР»СЊР·РѕРІР°С‚СЊСЃСЏ С„СѓРЅРєС†РёСЏРјРё РѕР±РЅРѕРІР»РµРЅРёСЏ СЃС‚СЂРёРјР° РґР»СЏ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёРё
+    bool m_bUpdateCurrent; // РµСЃР»Рё РјРµРЅСЏР»СЃСЏ РѕР±СЉРµРєС‚ РЅРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅРѕ  Update____From___()
     bool m_bCurBlenderChanged;
 
     void Save(CMemoryWriter& F);

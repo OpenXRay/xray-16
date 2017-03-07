@@ -2,7 +2,7 @@
 
 #include "xrEngine/Effector.h"
 
-// приседание после падения
+// РїСЂРёСЃРµРґР°РЅРёРµ РїРѕСЃР»Рµ РїР°РґРµРЅРёСЏ
 class CEffectorFall : public CEffectorCam
 {
     float fPower;

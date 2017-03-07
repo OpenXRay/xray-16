@@ -18,7 +18,7 @@ public:
     virtual void net_Destroy();
     virtual void OnH_B_Chield();
 
-    //анимации
+    //Р°РЅРёРјР°С†РёРё
     virtual void PlayAnimShow();
     virtual void PlayAnimIdle();
     virtual void PlayAnimIdleMoving();

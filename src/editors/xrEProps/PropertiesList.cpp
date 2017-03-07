@@ -47,7 +47,7 @@ void TProperties::ClearParams(TElTreeItem* node)
     if (node)
     {
         FATAL("ClearParams - node");
-        // S êîãäà áóäóò âñå èòåìû óäàëèòü ó êàæäîãî
+        // S ÐºÐ¾Ð³Ð´Ð° Ð±ÑƒÐ´ÑƒÑ‚ Ð²ÑÐµ Ð¸Ñ‚ÐµÐ¼Ñ‹ ÑƒÐ´Ð°Ð»Ð¸Ñ‚ÑŒ Ñƒ ÐºÐ°Ð¶Ð´Ð¾Ð³Ð¾
         /*
         //s
                 for (TElTreeItem* item=node; item; item=item->GetNext()){
@@ -841,7 +841,7 @@ void __fastcall TProperties::tvPropertiesMouseDown(
         {
             //        	Log("Shift",(int)Shift.Contains(ssDouble));
             PropItem* prop = (PropItem*)item->Tag;
-            // Ïðîâåðèòü ÷òîáû íå íàæèìàòü 2 ðàçà äëÿ êíîïîê
+            // ÐŸÑ€Ð¾Ð²ÐµÑ€Ð¸Ñ‚ÑŒ Ñ‡Ñ‚Ð¾Ð±Ñ‹ Ð½Ðµ Ð½Ð°Ð¶Ð¸Ð¼Ð°Ñ‚ÑŒ 2 Ñ€Ð°Ð·Ð° Ð´Ð»Ñ ÐºÐ½Ð¾Ð¿Ð¾Ðº
             if (prop && (PROP_BUTTON == prop->type))
                 m_FirstClickItem = item;
             if (m_FirstClickItem == item)
@@ -1451,7 +1451,7 @@ void __fastcall TProperties::ChooseClick(TElTreeItem* item)
 void TProperties::CancelLWNumber() { HideLWNumber(); }
 void TProperties::HideLWNumber()
 {
-    // ïîñëåäîâàòåëüíîñòü âàæíà (ìîæåò áûòü 2 Apply)
+    // Ð¿Ð¾ÑÐ»ÐµÐ´Ð¾Ð²Ð°Ñ‚ÐµÐ»ÑŒÐ½Ð¾ÑÑ‚ÑŒ Ð²Ð°Ð¶Ð½Ð° (Ð¼Ð¾Ð¶ÐµÑ‚ Ð±Ñ‹Ñ‚ÑŒ 2 Apply)
     seNumber->Tag = 0;
     if (seNumber->Visible && Visible)
         tvProperties->SetFocus();
@@ -1563,7 +1563,7 @@ void __fastcall TProperties::seNumberKeyDown(TObject* Sender, WORD& Key, TShiftS
 void TProperties::CancelLWText() { HideLWText(); }
 void TProperties::HideLWText()
 {
-    // ïîñëåäîâàòåëüíîñòü âàæíà (ìîæåò áûòü 2 Apply)
+    // Ð¿Ð¾ÑÐ»ÐµÐ´Ð¾Ð²Ð°Ñ‚ÐµÐ»ÑŒÐ½Ð¾ÑÑ‚ÑŒ Ð²Ð°Ð¶Ð½Ð° (Ð¼Ð¾Ð¶ÐµÑ‚ Ð±Ñ‹Ñ‚ÑŒ 2 Apply)
     edText->Tag = 0;
     if (edText->Visible && Visible)
         tvProperties->SetFocus();
@@ -1813,7 +1813,7 @@ void TProperties::ExecTextEditor(PropItem* prop)
 void TProperties::CancelSCText() { HideSCText(); }
 void TProperties::HideSCText()
 {
-    // ïîñëåäîâàòåëüíîñòü âàæíà (ìîæåò áûòü 2 Apply)
+    // Ð¿Ð¾ÑÐ»ÐµÐ´Ð¾Ð²Ð°Ñ‚ÐµÐ»ÑŒÐ½Ð¾ÑÑ‚ÑŒ Ð²Ð°Ð¶Ð½Ð° (Ð¼Ð¾Ð¶ÐµÑ‚ Ð±Ñ‹Ñ‚ÑŒ 2 Apply)
     hkShortcut->Tag = 0;
     if (hkShortcut->Visible && Visible)
         tvProperties->SetFocus();

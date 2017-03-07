@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////
-// SleepEffector.h:		эффектор, который запускается во время сна
-//						актера
+// SleepEffector.h:		СЌС„С„РµРєС‚РѕСЂ, РєРѕС‚РѕСЂС‹Р№ Р·Р°РїСѓСЃРєР°РµС‚СЃСЏ РІРѕ РІСЂРµРјСЏ СЃРЅР°
+//						Р°РєС‚РµСЂР°
 //////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -26,7 +26,7 @@ public:
     CSleepEffectorPP(const SPPInfo& ppi, float life_time, float attack_time = 0.0f, float release_time = 0.0f);
     virtual BOOL Process(SPPInfo& pp);
 
-    //текущий статус сна
+    //С‚РµРєСѓС‰РёР№ СЃС‚Р°С‚СѓСЃ СЃРЅР°
     enum SLEEP_STATE
     {
         BEGIN_SLEEP,

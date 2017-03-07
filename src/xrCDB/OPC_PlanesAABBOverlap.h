@@ -21,7 +21,7 @@ inline_ BOOL PlanesCollider::PlanesAABBOverlap(
 
     // Evaluate through all active frustum planes. We determine the relation
     // between the AABB and a plane by using the concept of "near" and "far"
-    // vertices originally described by Zhang (and later by Möller). Our
+    // vertices originally described by Zhang (and later by MÑ†ller). Our
     // variant here uses 3 fabs ops, 6 muls, 7 adds and two floating point
     // comparisons per plane. The routine early-exits if the AABB is found
     // to be outside any of the planes. The loop also constructs a _new_ output

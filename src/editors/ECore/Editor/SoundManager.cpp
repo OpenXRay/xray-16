@@ -15,7 +15,7 @@ extern "C" int ogg_enc(const char* in_fn, const char* out_fn, float quality, voi
 //------------------------------------------------------------------------------
 xr_string CSoundManager::UpdateFileName(xr_string& fn) { return EFS.AppendFolderToName(fn, -1, FALSE); }
 //------------------------------------------------------------------------------
-// возвращает список всех звуков
+// РІРѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє РІСЃРµС… Р·РІСѓРєРѕРІ
 //------------------------------------------------------------------------------
 int CSoundManager::GetSounds(FS_FileSet& files, BOOL bFolders)
 {
@@ -129,7 +129,7 @@ BOOL CSoundManager::RemoveSound(LPCSTR fname, EItemType type)
 }
 
 //------------------------------------------------------------------------------
-// возвращает список новых звуков
+// РІРѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє РЅРѕРІС‹С… Р·РІСѓРєРѕРІ
 //------------------------------------------------------------------------------
 int CSoundManager::GetLocalNewSounds(FS_FileSet& files)
 {
@@ -137,8 +137,8 @@ int CSoundManager::GetLocalNewSounds(FS_FileSet& files)
 }
 
 //------------------------------------------------------------------------------
-// копирует обновленные звуки с Import'a в Sounds
-// files - список файлов для копирование
+// РєРѕРїРёСЂСѓРµС‚ РѕР±РЅРѕРІР»РµРЅРЅС‹Рµ Р·РІСѓРєРё СЃ Import'a РІ Sounds
+// files - СЃРїРёСЃРѕРє С„Р°Р№Р»РѕРІ РґР»СЏ РєРѕРїРёСЂРѕРІР°РЅРёРµ
 //------------------------------------------------------------------------------
 /*
 void CSoundManager::SafeCopyLocalToServer(FS_FileSet& files)
@@ -174,7 +174,7 @@ void CSoundManager::SafeCopyLocalToServer(FS_FileSet& files)
 }
 */
 //------------------------------------------------------------------------------
-// создает тхм
+// СЃРѕР·РґР°РµС‚ С‚С…Рј
 //------------------------------------------------------------------------------
 void CSoundManager::CreateSoundThumbnail(
     ESoundThumbnail* THM, const AnsiString& src_name, LPCSTR initial, bool bSetDefParam)
@@ -187,7 +187,7 @@ void CSoundManager::CreateSoundThumbnail(
         FS.update_path(base_name, _sounds_, src_name.c_str());
     strcpy(base_name, EFS.ChangeFileExt(base_name, ".wav").c_str());
 
-    // выставить начальные параметры
+    // РІС‹СЃС‚Р°РІРёС‚СЊ РЅР°С‡Р°Р»СЊРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹
     if (bSetDefParam)
     {
         THM->m_Age = FS.get_file_age(base_name);
@@ -216,9 +216,9 @@ void CSoundManager::MakeGameSound(ESoundThumbnail* THM, LPCSTR src_name, LPCSTR 
 }
 
 //------------------------------------------------------------------------------
-// возвращает список не синхронизированных (модифицированных) текстур
-// source_list - содержит список текстур с расширениями
-// sync_list - реально сохраненные файлы (после использования освободить)
+// РІРѕР·РІСЂР°С‰Р°РµС‚ СЃРїРёСЃРѕРє РЅРµ СЃРёРЅС…СЂРѕРЅРёР·РёСЂРѕРІР°РЅРЅС‹С… (РјРѕРґРёС„РёС†РёСЂРѕРІР°РЅРЅС‹С…) С‚РµРєСЃС‚СѓСЂ
+// source_list - СЃРѕРґРµСЂР¶РёС‚ СЃРїРёСЃРѕРє С‚РµРєСЃС‚СѓСЂ СЃ СЂР°СЃС€РёСЂРµРЅРёСЏРјРё
+// sync_list - СЂРµР°Р»СЊРЅРѕ СЃРѕС…СЂР°РЅРµРЅРЅС‹Рµ С„Р°Р№Р»С‹ (РїРѕСЃР»Рµ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ РѕСЃРІРѕР±РѕРґРёС‚СЊ)
 //------------------------------------------------------------------------------
 void CSoundManager::SynchronizeSounds(bool sync_thm, bool sync_game, bool bForceGame, FS_FileSet* source_list,
     AStringVec* sync_list, FS_FileSet* modif_map)
@@ -423,8 +423,8 @@ void CSoundManager::ChangeFileAgeTo(FS_FileSet* tgt_map, int age)
 }
 */
 //------------------------------------------------------------------------------
-// если передан параметр modif - обновляем DX-Surface only и только из списка
-// иначе полная синхронизация
+// РµСЃР»Рё РїРµСЂРµРґР°РЅ РїР°СЂР°РјРµС‚СЂ modif - РѕР±РЅРѕРІР»СЏРµРј DX-Surface only Рё С‚РѕР»СЊРєРѕ РёР· СЃРїРёСЃРєР°
+// РёРЅР°С‡Рµ РїРѕР»РЅР°СЏ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ
 //------------------------------------------------------------------------------
 void CSoundManager::RefreshSounds(bool bSync)
 {

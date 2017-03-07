@@ -236,7 +236,7 @@ void CEffect_Rain::Render()
     if (one.dwTime_Hit<Device.dwTimeGlobal) Hit (one.Phit);
     if (one.dwTime_Life<Device.dwTimeGlobal) Born(one,source_radius);
 
-    // ïîñëåäíÿÿ äåëüòà ??
+    // Ð¿Ð¾ÑÐ»ÐµÐ´Ð½ÑÑ Ð´ÐµÐ»ÑŒÑ‚Ð° ??
     //. float xdt = float(one.dwTime_Hit-Device.dwTimeGlobal)/1000.f;
     //. float dt = Device.fTimeDelta;//xdt<Device.fTimeDelta?xdt:Device.fTimeDelta;
     float dt = Device.fTimeDelta;

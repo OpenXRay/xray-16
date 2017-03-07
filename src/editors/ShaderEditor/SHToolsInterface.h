@@ -48,7 +48,7 @@ protected:
 
     BOOL m_bModified;
 
-    BOOL m_bLockUpdate; // если менялся объект непосредственно  Update____From___()
+    BOOL m_bLockUpdate; // РµСЃР»Рё РјРµРЅСЏР»СЃСЏ РѕР±СЉРµРєС‚ РЅРµРїРѕСЃСЂРµРґСЃС‚РІРµРЅРЅРѕ  Update____From___()
 
     AnsiString m_LastSelection;
 

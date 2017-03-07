@@ -287,7 +287,7 @@ void EDetailManager::GetSlotTCRect(Irect& rect, int sx, int sz)
     GetSlotRect(R, sx, sz);
     rect.x1 = m_Base.GetPixelUFromX(R.x1, m_BBox);
     rect.x2 = m_Base.GetPixelUFromX(R.x2, m_BBox);
-    rect.y2 = m_Base.GetPixelVFromZ(R.y1, m_BBox); // v - координата флипнута
+    rect.y2 = m_Base.GetPixelVFromZ(R.y1, m_BBox); // v - РєРѕРѕСЂРґРёРЅР°С‚Р° С„Р»РёРїРЅСѓС‚Р°
     rect.y1 = m_Base.GetPixelVFromZ(R.y2, m_BBox);
 }
 
@@ -366,7 +366,7 @@ bool EDetailManager::UpdateSlotObjects(int x, int z)
         }
     }
     std::sort(best.begin(), best.end(), CompareWeightFunc);
-    // пройдем по 4 частям слота и определим плотность заполнения (учесть переворот V)
+    // РїСЂРѕР№РґРµРј РїРѕ 4 С‡Р°СЃС‚СЏРј СЃР»РѕС‚Р° Рё РѕРїСЂРµРґРµР»РёРј РїР»РѕС‚РЅРѕСЃС‚СЊ Р·Р°РїРѕР»РЅРµРЅРёСЏ (СѓС‡РµСЃС‚СЊ РїРµСЂРµРІРѕСЂРѕС‚ V)
     Irect P[4];
     float dx = float(R.x2 - R.x1) / 2.f;
     float dy = float(R.y2 - R.y1) / 2.f;
@@ -421,7 +421,7 @@ bool EDetailManager::UpdateSlotObjects(int x, int z)
     u32 o_cnt = 0;
     for (u32 i = 0; i < best.size(); i++)
         o_cnt += m_ColorIndices[best[i].index].size();
-    // равномерно заполняем пустые слоты
+    // СЂР°РІРЅРѕРјРµСЂРЅРѕ Р·Р°РїРѕР»РЅСЏРµРј РїСѓСЃС‚С‹Рµ СЃР»РѕС‚С‹
     if (o_cnt > best.size())
     {
         while (best.size() < 4)
@@ -439,7 +439,7 @@ bool EDetailManager::UpdateSlotObjects(int x, int z)
         }
     }
 
-    // заполним палитру и установим Random'ы
+    // Р·Р°РїРѕР»РЅРёРј РїР°Р»РёС‚СЂСѓ Рё СѓСЃС‚Р°РЅРѕРІРёРј Random'С‹
     //	Msg("Slot: %d %d",x,z);
     for (u32 k = 0; k < best.size(); k++)
     {
@@ -476,7 +476,7 @@ bool EDetailManager::UpdateSlotObjects(int x, int z)
         slot->palette[k].a3 = (u16)iFloor(best[k].dens[3] * f * 15.f + .5f);
     }
 
-    // определим ID незаполненных слотов как пустышки
+    // РѕРїСЂРµРґРµР»РёРј ID РЅРµР·Р°РїРѕР»РЅРµРЅРЅС‹С… СЃР»РѕС‚РѕРІ РєР°Рє РїСѓСЃС‚С‹С€РєРё
     for (k = best.size(); k < 4; k++)
         slot->w_id(k, DetailSlot::ID_Empty);
     return true;

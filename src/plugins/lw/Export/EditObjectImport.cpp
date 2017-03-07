@@ -58,7 +58,7 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
                 for (Isf = I->surf; Isf; Isf = Isf->next)
                 {
                     //                    UI->ProgressUpdate(i);
-                    Isf->alpha_mode = i; // перетираем для внутренних целей !!!
+                    Isf->alpha_mode = i; // РїРµСЂРµС‚РёСЂР°РµРј РґР»СЏ РІРЅСѓС‚СЂРµРЅРЅРёС… С†РµР»РµР№ !!!
                     CSurface* Osf = xr_new<CSurface>();
                     m_Surfaces.push_back(Osf);
                     if (Isf->name && Isf->name[0])
@@ -202,7 +202,7 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
                         break;
                     }
 
-                    // индексы соответствия импортируемых мап
+                    // РёРЅРґРµРєСЃС‹ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёСЏ РёРјРїРѕСЂС‚РёСЂСѓРµРјС‹С… РјР°Рї
                     static VMIndexLink VMIndices;
                     VMIndices.clear();
 
@@ -348,21 +348,21 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
                             AStringVec names;
                             if (vmpl_cnt)
                             {
-                                // берем из poly
+                                // Р±РµСЂРµРј РёР· poly
                                 for (int vm_i = 0; vm_i < vmpl_cnt; vm_i++)
                                 {
                                     if (Ipv.vm[vm_i].vmap->type != ID_TXUV)
                                         continue;
                                     vm_lst.push_back(st_VMapPt());
                                     st_VMapPt& pt = vm_lst.back();
-                                    pt.vmap_index = VMIndices[Ipv.vm[vm_i].vmap]; // номер моей VMap
+                                    pt.vmap_index = VMIndices[Ipv.vm[vm_i].vmap]; // РЅРѕРјРµСЂ РјРѕРµР№ VMap
                                     names.push_back(Ipv.vm[vm_i].vmap->name);
                                     pt.index = Ipv.vm[vm_i].index;
                                 }
                             }
                             if (vmpt_cnt)
                             {
-                                // берем из points
+                                // Р±РµСЂРµРј РёР· points
                                 for (int vm_i = 0; vm_i < vmpt_cnt; vm_i++)
                                 {
                                     if (Ipt.vm[vm_i].vmap->type != ID_TXUV)
@@ -371,7 +371,7 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
                                         continue;
                                     vm_lst.push_back(st_VMapPt());
                                     st_VMapPt& pt = vm_lst.back();
-                                    pt.vmap_index = VMIndices[Ipt.vm[vm_i].vmap]; // номер моей VMap
+                                    pt.vmap_index = VMIndices[Ipt.vm[vm_i].vmap]; // РЅРѕРјРµСЂ РјРѕРµР№ VMap
                                     pt.index = Ipt.vm[vm_i].index;
                                 }
                             }
@@ -386,7 +386,7 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
                                     continue;
                                 vm_lst.push_back(st_VMapPt());
                                 st_VMapPt& pt = vm_lst.back();
-                                pt.vmap_index = VMIndices[Ipt.vm[vm_i].vmap]; // номер моей VMap
+                                pt.vmap_index = VMIndices[Ipt.vm[vm_i].vmap]; // РЅРѕРјРµСЂ РјРѕРµР№ VMap
                                 pt.index = Ipt.vm[vm_i].index;
                             }
                             m_vm_lst.count = vm_lst.size();
@@ -395,7 +395,7 @@ bool CEditableObject::Import_LWO(const char* fn, bool bNeedOptimize)
                         }
                         if (!bResult)
                             break;
-                        // Ipol.surf->alpha_mode - заполнено как номер моего surface
+                        // Ipol.surf->alpha_mode - Р·Р°РїРѕР»РЅРµРЅРѕ РєР°Рє РЅРѕРјРµСЂ РјРѕРµРіРѕ surface
                         surf_ids[i] = Ipol.surf->alpha_mode;
                     }
                     if (!bResult)

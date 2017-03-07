@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////
-// SleepEffector.cpp:	эффектор, который запускается во время сна
-//						актера
+// SleepEffector.cpp:	СЌС„С„РµРєС‚РѕСЂ, РєРѕС‚РѕСЂС‹Р№ Р·Р°РїСѓСЃРєР°РµС‚СЃСЏ РІРѕ РІСЂРµРјСЏ СЃРЅР°
+//						Р°РєС‚РµСЂР°
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
@@ -44,11 +44,11 @@ BOOL CSleepEffectorPP::Process(SPPInfo& pp)
     }
     else if (SLEEPING == m_eSleepState)
     {
-        //не изменять значение fLifeTime пока спим
+        //РЅРµ РёР·РјРµРЅСЏС‚СЊ Р·РЅР°С‡РµРЅРёРµ fLifeTime РїРѕРєР° СЃРїРёРј
         fLifeTime = m_attack * m_total;
         factor = 1.0f;
     }
-    else if (AWAKING == m_eSleepState) //просыпаемся
+    else if (AWAKING == m_eSleepState) //РїСЂРѕСЃС‹РїР°РµРјСЃСЏ
         factor = (1.0f - time_past_perc) / (1.0f - m_release);
 
     clamp(factor, 0.01f, 1.0f);

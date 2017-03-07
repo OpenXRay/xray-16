@@ -49,13 +49,13 @@ void CUIStaticItem::RenderInternal(const Fvector2& in_pos)
 
     Fvector2 LTp, RBp;
     Fvector2 LTt, RBt;
-    //координаты на экране в пикселях
+    //РєРѕРѕСЂРґРёРЅР°С‚С‹ РЅР° СЌРєСЂР°РЅРµ РІ РїРёРєСЃРµР»СЏС…
     LTp.set(pos);
 
     UI().ClientToScreenScaled(RBp, vSize.x, vSize.y);
     RBp.add(pos);
 
-    //текстурные координаты
+    //С‚РµРєСЃС‚СѓСЂРЅС‹Рµ РєРѕРѕСЂРґРёРЅР°С‚С‹
     LTt.set(TextureRect.x1 / ts.x, TextureRect.y1 / ts.y);
     RBt.set(TextureRect.x2 / ts.x, TextureRect.y2 / ts.y);
 

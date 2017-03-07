@@ -1015,7 +1015,7 @@ void game_sv_Deathmatch::OnPlayerBuyFinished(ClientID id_who, NET_Packet& P)
         xr_vector<u16>				ItemsToDelete;
 
         bool ExactMatch	= true;
-        //проверяем пояс
+        //РїСЂРѕРІРµСЂСЏРµРј РїРѕСЏСЃ
         TIItemContainer::const_iterator	IBelt = pActor->inventory().m_belt.begin();
         TIItemContainer::const_iterator	EBelt = pActor->inventory().m_belt.end();
 
@@ -1025,7 +1025,7 @@ void game_sv_Deathmatch::OnPlayerBuyFinished(ClientID id_who, NET_Packet& P)
             CheckItem(ps, pItem, &ItemsDesired, &ItemsToDelete, ExactMatch);
         };
 
-        //проверяем ruck
+        //РїСЂРѕРІРµСЂСЏРµРј ruck
         TIItemContainer::const_iterator	IRuck = pActor->inventory().m_ruck.begin();
         TIItemContainer::const_iterator	ERuck = pActor->inventory().m_ruck.end();
 
@@ -1036,7 +1036,7 @@ void game_sv_Deathmatch::OnPlayerBuyFinished(ClientID id_who, NET_Packet& P)
             CheckItem(ps, pItem, &ItemsDesired, &ItemsToDelete, ExactMatch);
         };
 
-        //проверяем слоты
+        //РїСЂРѕРІРµСЂСЏРµРј СЃР»РѕС‚С‹
         TISlotArr::const_iterator	ISlot = pActor->inventory().m_slots.begin();
         TISlotArr::const_iterator	ESlot = pActor->inventory().m_slots.end();
 
@@ -1101,19 +1101,19 @@ void game_sv_Deathmatch::LoadSkinsForTeam(const shared_str& caSection, TEAM_SKIN
     string256 SkinSingleName;
     string4096 Skins;
 
-    // Поле strSectionName должно содержать имя секции
+    // РџРѕР»Рµ strSectionName РґРѕР»Р¶РЅРѕ СЃРѕРґРµСЂР¶Р°С‚СЊ РёРјСЏ СЃРµРєС†РёРё
     R_ASSERT(xr_strcmp(caSection, ""));
 
     pTeamSkins->clear();
 
-    // Имя поля
+    // РРјСЏ РїРѕР»СЏ
     if (!pSettings->line_exist(caSection, "skins"))
         return;
 
-    // Читаем данные этого поля
+    // Р§РёС‚Р°РµРј РґР°РЅРЅС‹Рµ СЌС‚РѕРіРѕ РїРѕР»СЏ
     xr_strcpy(Skins, pSettings->r_string(caSection, "skins"));
     u32 count = _GetItemCount(Skins);
-    // теперь для каждое имя оружия, разделенные запятыми, заносим в массив
+    // С‚РµРїРµСЂСЊ РґР»СЏ РєР°Р¶РґРѕРµ РёРјСЏ РѕСЂСѓР¶РёСЏ, СЂР°Р·РґРµР»РµРЅРЅС‹Рµ Р·Р°РїСЏС‚С‹РјРё, Р·Р°РЅРѕСЃРёРј РІ РјР°СЃСЃРёРІ
     for (u32 i = 0; i < count; ++i)
     {
         _GetItem(Skins, i, SkinSingleName);
@@ -1126,19 +1126,19 @@ void game_sv_Deathmatch::LoadDefItemsForTeam(const shared_str& caSection, DEF_IT
     string256 ItemName;
     string4096 DefItems;
 
-    // Поле strSectionName должно содержать имя секции
+    // РџРѕР»Рµ strSectionName РґРѕР»Р¶РЅРѕ СЃРѕРґРµСЂР¶Р°С‚СЊ РёРјСЏ СЃРµРєС†РёРё
     R_ASSERT(xr_strcmp(caSection, ""));
 
     pDefItems->clear();
 
-    // Имя поля
+    // РРјСЏ РїРѕР»СЏ
     if (!pSettings->line_exist(caSection, "default_items"))
         return;
 
-    // Читаем данные этого поля
+    // Р§РёС‚Р°РµРј РґР°РЅРЅС‹Рµ СЌС‚РѕРіРѕ РїРѕР»СЏ
     xr_strcpy(DefItems, pSettings->r_string(caSection, "default_items"));
     u32 count = _GetItemCount(DefItems);
-    // теперь для каждое имя оружия, разделенные запятыми, заносим в массив
+    // С‚РµРїРµСЂСЊ РґР»СЏ РєР°Р¶РґРѕРµ РёРјСЏ РѕСЂСѓР¶РёСЏ, СЂР°Р·РґРµР»РµРЅРЅС‹Рµ Р·Р°РїСЏС‚С‹РјРё, Р·Р°РЅРѕСЃРёРј РІ РјР°СЃСЃРёРІ
     for (u32 i = 0; i < count; ++i)
     {
         _GetItem(DefItems, i, ItemName);
@@ -1157,12 +1157,12 @@ void game_sv_Deathmatch::SetSkin(CSE_Abstract* E, u16 Team, u16 ID)
     //-------------------------------------------
     string256 SkinName;
     xr_strcpy(SkinName, pSettings->r_string("mp_skins_path", "skin_path"));
-    //загружены ли скины для этой комманды
+    //Р·Р°РіСЂСѓР¶РµРЅС‹ Р»Рё СЃРєРёРЅС‹ РґР»СЏ СЌС‚РѕР№ РєРѕРјРјР°РЅРґС‹
     //	if (SkinID != -1) ID = u16(SkinID);
 
     if (!TeamList.empty() && TeamList.size() > Team && !TeamList[Team].aSkins.empty())
     {
-        //загружено ли достаточно скинов для этой комманды
+        //Р·Р°РіСЂСѓР¶РµРЅРѕ Р»Рё РґРѕСЃС‚Р°С‚РѕС‡РЅРѕ СЃРєРёРЅРѕРІ РґР»СЏ СЌС‚РѕР№ РєРѕРјРјР°РЅРґС‹
         if (TeamList[Team].aSkins.size() > ID)
         {
             xr_strcat(SkinName, TeamList[Team].aSkins[ID].c_str());
@@ -1172,7 +1172,7 @@ void game_sv_Deathmatch::SetSkin(CSE_Abstract* E, u16 Team, u16 ID)
     }
     else
     {
-        //скины для такой комманды не загружены
+        //СЃРєРёРЅС‹ РґР»СЏ С‚Р°РєРѕР№ РєРѕРјРјР°РЅРґС‹ РЅРµ Р·Р°РіСЂСѓР¶РµРЅС‹
         switch (Team)
         {
         case 0: xr_strcat(SkinName, "stalker_hood_multiplayer"); break;

@@ -853,10 +853,10 @@ void CUIGameCTA::LoadTeamDefaultPresetItems(const shared_str& caSection)
 
     string256 ItemName;
     string4096 DefItems;
-    // Читаем данные этого поля
+    // Р§РёС‚Р°РµРј РґР°РЅРЅС‹Рµ СЌС‚РѕРіРѕ РїРѕР»СЏ
     xr_strcpy(DefItems, pSettings->r_string(caSection, "default_items"));
     u32 count = _GetItemCount(DefItems);
-    // теперь для каждое имя оружия, разделенные запятыми, заносим в массив
+    // С‚РµРїРµСЂСЊ РґР»СЏ РєР°Р¶РґРѕРµ РёРјСЏ РѕСЂСѓР¶РёСЏ, СЂР°Р·РґРµР»РµРЅРЅС‹Рµ Р·Р°РїСЏС‚С‹РјРё, Р·Р°РЅРѕСЃРёРј РІ РјР°СЃСЃРёРІ
     for (u32 i = 0; i < count; ++i)
     {
         _GetItem(DefItems, i, ItemName);

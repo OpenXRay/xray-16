@@ -43,8 +43,8 @@ AnsiString CFolderHelper::GetObjectName(const AnsiString& full_name, AnsiString&
     return dest.c_str();
 }
 
-// ñîáèðàåò èìÿ îò ñòàðòîâîãî èòåìà äî êîíå÷íîãî
-// ìîæåò âêëþ÷àòü ëèáî íå âêëþ÷àòü èìÿ îáúåêòà
+// ÑÐ¾Ð±Ð¸Ñ€Ð°ÐµÑ‚ Ð¸Ð¼Ñ Ð¾Ñ‚ ÑÑ‚Ð°Ñ€Ñ‚Ð¾Ð²Ð¾Ð³Ð¾ Ð¸Ñ‚ÐµÐ¼Ð° Ð´Ð¾ ÐºÐ¾Ð½ÐµÑ‡Ð½Ð¾Ð³Ð¾
+// Ð¼Ð¾Ð¶ÐµÑ‚ Ð²ÐºÐ»ÑŽÑ‡Ð°Ñ‚ÑŒ Ð»Ð¸Ð±Ð¾ Ð½Ðµ Ð²ÐºÐ»ÑŽÑ‡Ð°Ñ‚ÑŒ Ð¸Ð¼Ñ Ð¾Ð±ÑŠÐµÐºÑ‚Ð°
 bool CFolderHelper::MakeName(TElTreeItem* begin_item, TElTreeItem* end_item, AnsiString& name, bool bOnlyFolder)
 {
     name = "";
@@ -382,7 +382,7 @@ void CFolderHelper::DragDrop(TObject* Sender, TObject* Source, int X, int Y, TOn
 
         do
         {
-            // ïðîâåðÿåì åñòü ëè â òàðãåòå òàêîé ýëåìåíò
+            // Ð¿Ñ€Ð¾Ð²ÐµÑ€ÑÐµÐ¼ ÐµÑÑ‚ÑŒ Ð»Ð¸ Ð² Ñ‚Ð°Ñ€Ð³ÐµÑ‚Ðµ Ñ‚Ð°ÐºÐ¾Ð¹ ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚
             EItemType type = EItemType(item->Data);
             TElTreeItem* pNode = FindItemInFolder(type, tv, cur_folder, item->Text);
             if (pNode && IsObject(item))
@@ -392,7 +392,7 @@ void CFolderHelper::DragDrop(TObject* Sender, TObject* Source, int X, int Y, TOn
                 item = item->GetNext();
                 continue;
             }
-            // åñëè íåò äîáàâëÿåì
+            // ÐµÑÐ»Ð¸ Ð½ÐµÑ‚ Ð´Ð¾Ð±Ð°Ð²Ð»ÑÐµÐ¼
             if (!pNode)
             {
                 pNode = (type == TYPE_FOLDER) ? LL_CreateFolder(tv, cur_folder, item->Text, item->ForceButtons) :

@@ -28,7 +28,7 @@ void CStateBurerAttackTele<Object>::initialize()
     m_initial_health = object->conditions().GetHealth();
     m_end_tick = current_time() + object->m_tele_max_time;
 
-    // запретить взятие скриптом
+    // Р·Р°РїСЂРµС‚РёС‚СЊ РІР·СЏС‚РёРµ СЃРєСЂРёРїС‚РѕРј
     object->set_script_capture(false);
 }
 
@@ -216,15 +216,15 @@ void CStateBurerAttackTele<Object>::FindObjects()
     u32 res_size = tele_objects.size();
     tele_objects.clear_and_reserve();
 
-    // получить список объектов вокруг врага
+    // РїРѕР»СѓС‡РёС‚СЊ СЃРїРёСЃРѕРє РѕР±СЉРµРєС‚РѕРІ РІРѕРєСЂСѓРі РІСЂР°РіР°
     m_nearest.clear_not_free();
     m_nearest.reserve(res_size);
     FindFreeObjects(m_nearest, object->EnemyMan.get_enemy()->Position());
 
-    // получить список объектов вокруг монстра
+    // РїРѕР»СѓС‡РёС‚СЊ СЃРїРёСЃРѕРє РѕР±СЉРµРєС‚РѕРІ РІРѕРєСЂСѓРі РјРѕРЅСЃС‚СЂР°
     FindFreeObjects(m_nearest, object->Position());
 
-    // получить список объектов между монстром и врагом
+    // РїРѕР»СѓС‡РёС‚СЊ СЃРїРёСЃРѕРє РѕР±СЉРµРєС‚РѕРІ РјРµР¶РґСѓ РјРѕРЅСЃС‚СЂРѕРј Рё РІСЂР°РіРѕРј
     float dist = object->EnemyMan.get_enemy()->Position().distance_to(object->Position());
     Fvector dir;
     dir.sub(object->EnemyMan.get_enemy()->Position(), object->Position());
@@ -234,7 +234,7 @@ void CStateBurerAttackTele<Object>::FindObjects()
     pos.mad(object->Position(), dir, dist / 2.f);
     FindFreeObjects(m_nearest, pos);
 
-    // оставить уникальные объекты
+    // РѕСЃС‚Р°РІРёС‚СЊ СѓРЅРёРєР°Р»СЊРЅС‹Рµ РѕР±СЉРµРєС‚С‹
     tele_objects.erase(std::unique(tele_objects.begin(), tele_objects.end()), tele_objects.end());
 }
 
@@ -290,7 +290,7 @@ void CStateBurerAttackTele<Object>::ExecuteTeleContinue()
     if (!object->EnemyMan.see_enemy_now())
         return;
 
-    // найти объект для атаки
+    // РЅР°Р№С‚Рё РѕР±СЉРµРєС‚ РґР»СЏ Р°С‚Р°РєРё
     bool object_found = false;
     CTelekineticObject tele_object;
 
@@ -349,30 +349,30 @@ bool CStateBurerAttackTele<Object>::IsActiveObjects()
 template <typename Object>
 bool CStateBurerAttackTele<Object>::CheckTeleStart()
 {
-    // проверка на текущую активность
+    // РїСЂРѕРІРµСЂРєР° РЅР° С‚РµРєСѓС‰СѓСЋ Р°РєС‚РёРІРЅРѕСЃС‚СЊ
     if (IsActiveObjects())
         return false;
 
-    // проверить дистанцию до врага
+    // РїСЂРѕРІРµСЂРёС‚СЊ РґРёСЃС‚Р°РЅС†РёСЋ РґРѕ РІСЂР°РіР°
     float dist = object->Position().distance_to(object->EnemyMan.get_enemy()->Position());
     if (dist < object->m_tele_min_distance)
         return false;
     if (dist > object->m_tele_max_distance)
         return false;
 
-    // найти телекинетические объекты
+    // РЅР°Р№С‚Рё С‚РµР»РµРєРёРЅРµС‚РёС‡РµСЃРєРёРµ РѕР±СЉРµРєС‚С‹
     FindObjects();
 
-    // если нет объектов
+    // РµСЃР»Рё РЅРµС‚ РѕР±СЉРµРєС‚РѕРІ
     if (tele_objects.empty())
         return false;
 
-    // всё ок можно начинать телекинез
+    // РІСЃС‘ РѕРє РјРѕР¶РЅРѕ РЅР°С‡РёРЅР°С‚СЊ С‚РµР»РµРєРёРЅРµР·
     return true;
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Выбор подходящих объектов для телекинеза
+// Р’С‹Р±РѕСЂ РїРѕРґС…РѕРґСЏС‰РёС… РѕР±СЉРµРєС‚РѕРІ РґР»СЏ С‚РµР»РµРєРёРЅРµР·Р°
 //////////////////////////////////////////////////////////////////////////
 class best_object_predicate
 {
@@ -423,12 +423,12 @@ void CStateBurerAttackTele<Object>::SelectObjects()
     std::sort(tele_objects.begin(), tele_objects.end(),
         best_object_predicate2(object->Position(), object->EnemyMan.get_enemy()->Position()));
 
-    // выбрать объект
+    // РІС‹Р±СЂР°С‚СЊ РѕР±СЉРµРєС‚
     for (u32 i = 0; i < tele_objects.size(); ++i)
     {
         CPhysicsShellHolder* obj = tele_objects[i];
 
-        // применить телекинез на объект
+        // РїСЂРёРјРµРЅРёС‚СЊ С‚РµР»РµРєРёРЅРµР· РЅР° РѕР±СЉРµРєС‚
 
         float height = object->m_tele_object_height;
 
@@ -446,7 +446,7 @@ void CStateBurerAttackTele<Object>::SelectObjects()
 
         object->StartTeleObjectParticle(obj);
 
-        // удалить из списка
+        // СѓРґР°Р»РёС‚СЊ РёР· СЃРїРёСЃРєР°
         tele_objects[i] = tele_objects[tele_objects.size() - 1];
         tele_objects.pop_back();
 

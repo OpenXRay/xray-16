@@ -9,9 +9,9 @@ using namespace std;
 
 typedef struct _point
 {
-    float value; //значение функции
-    float deriv; //производная
-    float time; //время
+    float value; //Р·РЅР°С‡РµРЅРёРµ С„СѓРЅРєС†РёРё
+    float deriv; //РїСЂРѕРёР·РІРѕРґРЅР°СЏ
+    float time; //РІСЂРµРјСЏ
 } point;
 
 typedef vector<point> point_list;

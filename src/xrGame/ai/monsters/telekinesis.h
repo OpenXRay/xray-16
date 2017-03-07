@@ -16,11 +16,11 @@ public:
 
     // allocates relevant TelekineticObject
 
-    // активировать объект
+    // Р°РєС‚РёРІРёСЂРѕРІР°С‚СЊ РѕР±СЉРµРєС‚
     virtual CTelekineticObject* activate(
         CPhysicsShellHolder* obj, float strength, float height, u32 max_time_keep, bool rot = true);
 
-    // деактивировать все объекты
+    // РґРµР°РєС‚РёРІРёСЂРѕРІР°С‚СЊ РІСЃРµ РѕР±СЉРµРєС‚С‹
     void deactivate();
 
     // clear objects (does not call release, but call switch to TS_None)
@@ -28,30 +28,30 @@ public:
     // clear
     virtual void clear();
     virtual void clear_notrelevant();
-    // деактивировать объект
+    // РґРµР°РєС‚РёРІРёСЂРѕРІР°С‚СЊ РѕР±СЉРµРєС‚
     void deactivate(CPhysicsShellHolder* obj);
     void remove_object(TELE_OBJECTS_IT it);
     void remove_object(CPhysicsShellHolder* obj);
-    // бросить все объекты в позицию 'target'
+    // Р±СЂРѕСЃРёС‚СЊ РІСЃРµ РѕР±СЉРµРєС‚С‹ РІ РїРѕР·РёС†РёСЋ 'target'
     void fire_all(const Fvector& target);
 
-    // бросить объект 'obj' в позицию 'target' с учетом коэф силы
+    // Р±СЂРѕСЃРёС‚СЊ РѕР±СЉРµРєС‚ 'obj' РІ РїРѕР·РёС†РёСЋ 'target' СЃ СѓС‡РµС‚РѕРј РєРѕСЌС„ СЃРёР»С‹
     void fire(CPhysicsShellHolder* obj, const Fvector& target, float power);
 
-    // бросить объект 'obj' в позицию 'target' с учетом коэф силы
+    // Р±СЂРѕСЃРёС‚СЊ РѕР±СЉРµРєС‚ 'obj' РІ РїРѕР·РёС†РёСЋ 'target' СЃ СѓС‡РµС‚РѕРј РєРѕСЌС„ СЃРёР»С‹
     void fire_t(CPhysicsShellHolder* obj, const Fvector& target, float time);
 
-    // вернуть активность телекинеза
+    // РІРµСЂРЅСѓС‚СЊ Р°РєС‚РёРІРЅРѕСЃС‚СЊ С‚РµР»РµРєРёРЅРµР·Р°
     bool is_active() { return active; }
-    // вернуть активность объекта
+    // РІРµСЂРЅСѓС‚СЊ Р°РєС‚РёРІРЅРѕСЃС‚СЊ РѕР±СЉРµРєС‚Р°
     bool is_active_object(CPhysicsShellHolder* obj);
 
-    // вернуть количество контролируемых объектов (в состоянии TS_Raise & TS_Keep)
+    // РІРµСЂРЅСѓС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ РєРѕРЅС‚СЂРѕР»РёСЂСѓРµРјС‹С… РѕР±СЉРµРєС‚РѕРІ (РІ СЃРѕСЃС‚РѕСЏРЅРёРё TS_Raise & TS_Keep)
     u32 get_objects_count();
 
-    // вернуть количество контролируемых объектов (всех)
+    // РІРµСЂРЅСѓС‚СЊ РєРѕР»РёС‡РµСЃС‚РІРѕ РєРѕРЅС‚СЂРѕР»РёСЂСѓРµРјС‹С… РѕР±СЉРµРєС‚РѕРІ (РІСЃРµС…)
     u32 get_objects_total_count() { return objects.size(); }
-    // вернуть объект по индексу в массиве
+    // РІРµСЂРЅСѓС‚СЊ РѕР±СЉРµРєС‚ РїРѕ РёРЅРґРµРєСЃСѓ РІ РјР°СЃСЃРёРІРµ
     // a	copy of the object!
     CTelekineticObject get_object_by_index(u32 index)
     {
@@ -59,16 +59,16 @@ public:
         return *objects[index];
     }
 
-    // обновить состоняие на shedule_Update
+    // РѕР±РЅРѕРІРёС‚СЊ СЃРѕСЃС‚РѕРЅСЏРёРµ РЅР° shedule_Update
     void schedule_update();
 
-    // объект был удален - удалить все связи на объект
+    // РѕР±СЉРµРєС‚ Р±С‹Р» СѓРґР°Р»РµРЅ - СѓРґР°Р»РёС‚СЊ РІСЃРµ СЃРІСЏР·Рё РЅР° РѕР±СЉРµРєС‚
     void remove_links(IGameObject* O);
 
 protected:
     virtual CTelekineticObject* alloc_tele_object() { return new CTelekineticObject(); }
 private:
-    // обновление на шагах физики
+    // РѕР±РЅРѕРІР»РµРЅРёРµ РЅР° С€Р°РіР°С… С„РёР·РёРєРё
     virtual void PhDataUpdate(float step);
     virtual void PhTune(float step);
 };

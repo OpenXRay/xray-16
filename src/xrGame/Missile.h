@@ -58,15 +58,15 @@ protected:
     virtual void OnActiveItem();
     virtual void OnHiddenItem();
 
-    //для сети
+    //РґР»СЏ СЃРµС‚Рё
     virtual void net_Relcase(IGameObject* O);
 
 protected:
-    //время нахождения в текущем состоянии
+    //РІСЂРµРјСЏ РЅР°С…РѕР¶РґРµРЅРёСЏ РІ С‚РµРєСѓС‰РµРј СЃРѕСЃС‚РѕСЏРЅРёРё
     u32 m_dwStateTime;
     bool m_throw;
 
-    //время уничтожения
+    //РІСЂРµРјСЏ СѓРЅРёС‡С‚РѕР¶РµРЅРёСЏ
     u32 m_dwDestroyTime;
     u32 m_dwDestroyTimeMax;
 
@@ -75,7 +75,7 @@ protected:
 
     CMissile* m_fake_missile;
 
-    //параметры броска
+    //РїР°СЂР°РјРµС‚СЂС‹ Р±СЂРѕСЃРєР°
 
     float m_fMinForce, m_fConstForce, m_fMaxForce, m_fForceGrowSpeed;
     // private:
@@ -83,7 +83,7 @@ protected:
     float m_fThrowForce;
 
 protected:
-    //относительная точка и направление вылета гранаты
+    //РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅР°СЏ С‚РѕС‡РєР° Рё РЅР°РїСЂР°РІР»РµРЅРёРµ РІС‹Р»РµС‚Р° РіСЂР°РЅР°С‚С‹
     Fvector m_vThrowPoint;
     Fvector m_vThrowDir;
 

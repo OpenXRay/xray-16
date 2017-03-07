@@ -129,7 +129,7 @@ public:
     virtual void load_shared(LPCSTR section) {}
     SHARED_TYPE* get_sd() { return _sd; }
     const SHARED_TYPE* get_sd() const { return _sd; }
-    // óïğàâëåíèå çàãğóçêîé äàííûõ ïğè êîìïîíåíòíîì ïîäõîäå (çàãğóçêà äàííûõ âğó÷íóş)
+    // ÑƒĞ¿Ñ€Ğ°Ğ²Ğ»ĞµĞ½Ğ¸Ğµ Ğ·Ğ°Ğ³Ñ€ÑƒĞ·ĞºĞ¾Ğ¹ Ğ´Ğ°Ğ½Ğ½Ñ‹Ñ… Ğ¿Ñ€Ğ¸ ĞºĞ¾Ğ¼Ğ¿Ğ¾Ğ½ĞµĞ½Ñ‚Ğ½Ğ¾Ğ¼ Ğ¿Ğ¾Ğ´Ñ…Ğ¾Ğ´Ğµ (Ğ·Ğ°Ğ³Ñ€ÑƒĞ·ĞºĞ° Ğ´Ğ°Ğ½Ğ½Ñ‹Ñ… Ğ²Ñ€ÑƒÑ‡Ğ½ÑƒÑ)
     bool start_load_shared(KEY_TYPE key)
     {
         _sd = pSharedObj->get_shared(key);

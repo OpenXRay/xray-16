@@ -256,9 +256,9 @@ void CUIWindow::GetAbsoluteRect(Frect& r)
     r.bottom = r.top + GetHeight();
 }
 
-//реакция на мышь
-//координаты курсора всегда, кроме начального вызова
-//задаются относительно текущего окна
+//СЂРµР°РєС†РёСЏ РЅР° РјС‹С€СЊ
+//РєРѕРѕСЂРґРёРЅР°С‚С‹ РєСѓСЂСЃРѕСЂР° РІСЃРµРіРґР°, РєСЂРѕРјРµ РЅР°С‡Р°Р»СЊРЅРѕРіРѕ РІС‹Р·РѕРІР°
+//Р·Р°РґР°СЋС‚СЃСЏ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ С‚РµРєСѓС‰РµРіРѕ РѕРєРЅР°
 
 #define DOUBLE_CLICK_TIME 250
 
@@ -287,13 +287,13 @@ bool CUIWindow::OnMouseAction(float x, float y, EUIMessages mouse_action)
     {
         if (!wndRect.in(cursor_pos))
             return false;
-        //получить координаты относительно окна
+        //РїРѕР»СѓС‡РёС‚СЊ РєРѕРѕСЂРґРёРЅР°С‚С‹ РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ РѕРєРЅР°
         cursor_pos.x -= wndRect.left;
         cursor_pos.y -= wndRect.top;
     }
 
-    //если есть дочернее окно,захватившее мышь, то
-    //сообщение направляем ему сразу
+    //РµСЃР»Рё РµСЃС‚СЊ РґРѕС‡РµСЂРЅРµРµ РѕРєРЅРѕ,Р·Р°С…РІР°С‚РёРІС€РµРµ РјС‹С€СЊ, С‚Рѕ
+    //СЃРѕРѕР±С‰РµРЅРёРµ РЅР°РїСЂР°РІР»СЏРµРј РµРјСѓ СЃСЂР°Р·Сѓ
     if (m_pMouseCapturer)
     {
         m_pMouseCapturer->OnMouseAction(cursor_pos.x - m_pMouseCapturer->GetWndRect().left,
@@ -326,9 +326,9 @@ bool CUIWindow::OnMouseAction(float x, float y, EUIMessages mouse_action)
     default: break;
     }
 
-    //Проверка на попадание мыши в окно,
-    //происходит в обратном порядке, чем рисование окон
-    //(последние в списке имеют высший приоритет)
+    //РџСЂРѕРІРµСЂРєР° РЅР° РїРѕРїР°РґР°РЅРёРµ РјС‹С€Рё РІ РѕРєРЅРѕ,
+    //РїСЂРѕРёСЃС…РѕРґРёС‚ РІ РѕР±СЂР°С‚РЅРѕРј РїРѕСЂСЏРґРєРµ, С‡РµРј СЂРёСЃРѕРІР°РЅРёРµ РѕРєРѕРЅ
+    //(РїРѕСЃР»РµРґРЅРёРµ РІ СЃРїРёСЃРєРµ РёРјРµСЋС‚ РІС‹СЃС€РёР№ РїСЂРёРѕСЂРёС‚РµС‚)
     WINDOW_LIST::reverse_iterator it = m_ChildWndList.rbegin();
 
     for (; it != m_ChildWndList.rend(); ++it)
@@ -383,10 +383,10 @@ void CUIWindow::OnFocusLost()
         GetMessageTarget()->SendMessage(this, WINDOW_FOCUS_LOST, NULL);
 }
 
-//Сообщение, посылаемое дочерним окном,
-//о том, что окно хочет захватить мышь,
-//все сообщения от нее будут направляться только
-//ему в независимости от того где мышь
+//РЎРѕРѕР±С‰РµРЅРёРµ, РїРѕСЃС‹Р»Р°РµРјРѕРµ РґРѕС‡РµСЂРЅРёРј РѕРєРЅРѕРј,
+//Рѕ С‚РѕРј, С‡С‚Рѕ РѕРєРЅРѕ С…РѕС‡РµС‚ Р·Р°С…РІР°С‚РёС‚СЊ РјС‹С€СЊ,
+//РІСЃРµ СЃРѕРѕР±С‰РµРЅРёСЏ РѕС‚ РЅРµРµ Р±СѓРґСѓС‚ РЅР°РїСЂР°РІР»СЏС‚СЊСЃСЏ С‚РѕР»СЊРєРѕ
+//РµРјСѓ РІ РЅРµР·Р°РІРёСЃРёРјРѕСЃС‚Рё РѕС‚ С‚РѕРіРѕ РіРґРµ РјС‹С€СЊ
 void CUIWindow::SetCapture(CUIWindow* pChildWindow, bool capture_status)
 {
     if (GetParent())
@@ -396,7 +396,7 @@ void CUIWindow::SetCapture(CUIWindow* pChildWindow, bool capture_status)
 
     if (capture_status)
     {
-        //оповестить дочернее окно о потере фокуса мыши
+        //РѕРїРѕРІРµСЃС‚РёС‚СЊ РґРѕС‡РµСЂРЅРµРµ РѕРєРЅРѕ Рѕ РїРѕС‚РµСЂРµ С„РѕРєСѓСЃР° РјС‹С€Рё
         if (NULL != m_pMouseCapturer)
             m_pMouseCapturer->SendMessage(this, WINDOW_MOUSE_CAPTURE_LOST);
 
@@ -408,13 +408,13 @@ void CUIWindow::SetCapture(CUIWindow* pChildWindow, bool capture_status)
     }
 }
 
-//реакция на клавиатуру
+//СЂРµР°РєС†РёСЏ РЅР° РєР»Р°РІРёР°С‚СѓСЂСѓ
 bool CUIWindow::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
     bool result;
 
-    //если есть дочернее окно,захватившее клавиатуру, то
-    //сообщение направляем ему сразу
+    //РµСЃР»Рё РµСЃС‚СЊ РґРѕС‡РµСЂРЅРµРµ РѕРєРЅРѕ,Р·Р°С…РІР°С‚РёРІС€РµРµ РєР»Р°РІРёР°С‚СѓСЂСѓ, С‚Рѕ
+    //СЃРѕРѕР±С‰РµРЅРёРµ РЅР°РїСЂР°РІР»СЏРµРј РµРјСѓ СЃСЂР°Р·Сѓ
     if (NULL != m_pKeyboardCapturer)
     {
         result = m_pKeyboardCapturer->OnKeyboardAction(dik, keyboard_action);
@@ -473,7 +473,7 @@ void CUIWindow::SetKeyboardCapture(CUIWindow* pChildWindow, bool capture_status)
 
     if (capture_status)
     {
-        //оповестить дочернее окно о потере фокуса клавиатуры
+        //РѕРїРѕРІРµСЃС‚РёС‚СЊ РґРѕС‡РµСЂРЅРµРµ РѕРєРЅРѕ Рѕ РїРѕС‚РµСЂРµ С„РѕРєСѓСЃР° РєР»Р°РІРёР°С‚СѓСЂС‹
         if (NULL != m_pKeyboardCapturer)
             m_pKeyboardCapturer->SendMessage(this, WINDOW_KEYBOARD_CAPTURE_LOST);
 
@@ -483,10 +483,10 @@ void CUIWindow::SetKeyboardCapture(CUIWindow* pChildWindow, bool capture_status)
         m_pKeyboardCapturer = NULL;
 }
 
-//обработка сообщений
+//РѕР±СЂР°Р±РѕС‚РєР° СЃРѕРѕР±С‰РµРЅРёР№
 void CUIWindow::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
-    //оповестить дочерние окна
+    //РѕРїРѕРІРµСЃС‚РёС‚СЊ РґРѕС‡РµСЂРЅРёРµ РѕРєРЅР°
     for (WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
     {
         if ((*it)->IsEnabled())
@@ -521,7 +521,7 @@ CUIWindow* CUIWindow::GetChildMouseHandler()
     return this;
 }
 
-//для перевода окна и потомков в исходное состояние
+//РґР»СЏ РїРµСЂРµРІРѕРґР° РѕРєРЅР° Рё РїРѕС‚РѕРјРєРѕРІ РІ РёСЃС…РѕРґРЅРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ
 void CUIWindow::Reset() { m_pMouseCapturer = NULL; }
 void CUIWindow::ResetAll()
 {

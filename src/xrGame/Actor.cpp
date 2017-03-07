@@ -123,7 +123,7 @@ CActor::CActor() : CEntityAlive(), current_ik_cam_shift(0)
     fPrevCamPos = 0.0f;
     vPrevCamDir.set(0.f, 0.f, 1.f);
     fCurAVelocity = 0.0f;
-    // ýôôåêòîðû
+    // ÑÑ„Ñ„ÐµÐºÑ‚Ð¾Ñ€Ñ‹
     pCamBobbing = 0;
 
     r_torso.yaw = 0;
@@ -157,7 +157,7 @@ CActor::CActor() : CEntityAlive(), current_ik_cam_shift(0)
     Device.seqRender.Add(this, REG_PRIORITY_LOW);
 #endif
 
-    //ðàçðåøèòü èñïîëüçîâàíèå ïîÿñà â inventory
+    //Ñ€Ð°Ð·Ñ€ÐµÑˆÐ¸Ñ‚ÑŒ Ð¸ÑÐ¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð¿Ð¾ÑÑÐ° Ð² inventory
     inventory().SetBeltUseful(true);
 
     m_pPersonWeLookingAt = NULL;
@@ -403,7 +403,7 @@ void CActor::Load(LPCSTR section)
     // sheduler
     shedule.t_min = shedule.t_max = 1;
 
-    // íàñòðîéêè äèñïåðñèè ñòðåëüáû
+    // Ð½Ð°ÑÑ‚Ñ€Ð¾Ð¹ÐºÐ¸ Ð´Ð¸ÑÐ¿ÐµÑ€ÑÐ¸Ð¸ ÑÑ‚Ñ€ÐµÐ»ÑŒÐ±Ñ‹
     m_fDispBase = pSettings->r_float(section, "disp_base");
     m_fDispBase = deg2rad(m_fDispBase);
 
@@ -480,12 +480,12 @@ void CActor::Hit(SHit* pHDS)
             bPlaySound = false;
             if (Device.dwFrame != last_hit_frame && HDS.bone() != BI_NONE)
             {
-                // âû÷èñëèòü ïîçèöèþ è íàïðàâëåííîñòü ïàðòèêëà
+                // Ð²Ñ‹Ñ‡Ð¸ÑÐ»Ð¸Ñ‚ÑŒ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸ÑŽ Ð¸ Ð½Ð°Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð½Ð¾ÑÑ‚ÑŒ Ð¿Ð°Ñ€Ñ‚Ð¸ÐºÐ»Ð°
                 Fmatrix pos;
 
                 CParticlesPlayer::MakeXFORM(this, HDS.bone(), HDS.dir, HDS.p_in_bone_space, pos);
 
-                // óñòàíîâèòü particles
+                // ÑƒÑÑ‚Ð°Ð½Ð¾Ð²Ð¸Ñ‚ÑŒ particles
                 CParticlesObject* ps = NULL;
 
                 if (eacFirstEye == cam_active && this == Level().CurrentEntity())
@@ -755,7 +755,7 @@ void CActor::Die(IGameObject* who)
                 inventory().Ruck(item_in_slot);
         };
 
-        ///!!! ÷èñòêà ïîÿñà
+        ///!!! Ñ‡Ð¸ÑÑ‚ÐºÐ° Ð¿Ð¾ÑÑÐ°
         TIItemContainer& l_blist = inventory().m_belt;
         while (!l_blist.empty())
             inventory().Ruck(l_blist.front());
@@ -1197,7 +1197,7 @@ void CActor::shedule_Update(u32 DT)
 
     inherited::shedule_Update(DT);
 
-    //ýôôåêòîð âêëþ÷àåìûé ïðè õîäüáå
+    //ÑÑ„Ñ„ÐµÐºÑ‚Ð¾Ñ€ Ð²ÐºÐ»ÑŽÑ‡Ð°ÐµÐ¼Ñ‹Ð¹ Ð¿Ñ€Ð¸ Ñ…Ð¾Ð´ÑŒÐ±Ðµ
     if (!pCamBobbing)
     {
         pCamBobbing = new CEffectorBobbing();
@@ -1205,7 +1205,7 @@ void CActor::shedule_Update(u32 DT)
     }
     pCamBobbing->SetState(mstate_real, conditions().IsLimping(), IsZoomAimingMode());
 
-    //çâóê òÿæåëîãî äûõàíèÿ ïðè óòàëîñòè è õðîìàíèè
+    //Ð·Ð²ÑƒÐº Ñ‚ÑÐ¶ÐµÐ»Ð¾Ð³Ð¾ Ð´Ñ‹Ñ…Ð°Ð½Ð¸Ñ Ð¿Ñ€Ð¸ ÑƒÑ‚Ð°Ð»Ð¾ÑÑ‚Ð¸ Ð¸ Ñ…Ñ€Ð¾Ð¼Ð°Ð½Ð¸Ð¸
     if (this == Level().CurrentControlEntity() && !g_dedicated_server)
     {
         if (conditions().IsLimping() && g_Alive() && !psActorFlags.test(AF_GODMODE_RT))
@@ -1273,11 +1273,11 @@ void CActor::shedule_Update(u32 DT)
             m_DangerSnd.stop();
     }
 
-    //åñëè â ðåæèìå HUD, òî ñàìà ìîäåëü àêòåðà íå ðèñóåòñÿ
+    //ÐµÑÐ»Ð¸ Ð² Ñ€ÐµÐ¶Ð¸Ð¼Ðµ HUD, Ñ‚Ð¾ ÑÐ°Ð¼Ð° Ð¼Ð¾Ð´ÐµÐ»ÑŒ Ð°ÐºÑ‚ÐµÑ€Ð° Ð½Ðµ Ñ€Ð¸ÑÑƒÐµÑ‚ÑÑ
     if (!character_physics_support()->IsRemoved())
         setVisible(!HUDview());
 
-    //÷òî àêòåð âèäèò ïåðåä ñîáîé
+    //Ñ‡Ñ‚Ð¾ Ð°ÐºÑ‚ÐµÑ€ Ð²Ð¸Ð´Ð¸Ñ‚ Ð¿ÐµÑ€ÐµÐ´ ÑÐ¾Ð±Ð¾Ð¹
     collide::rq_result& RQ = HUD().GetCurrentRayQuery();
 
     if (!input_external_handler_installed() && RQ.O && RQ.O->getVisible() && RQ.range < 2.0f)
@@ -1350,7 +1350,7 @@ void CActor::shedule_Update(u32 DT)
 
     //	UpdateSleep									();
 
-    //äëÿ ñâîéñò àðòåôàêòîâ, íàõîäÿùèõñÿ íà ïîÿñå
+    //Ð´Ð»Ñ ÑÐ²Ð¾Ð¹ÑÑ‚ Ð°Ñ€Ñ‚ÐµÑ„Ð°ÐºÑ‚Ð¾Ð², Ð½Ð°Ñ…Ð¾Ð´ÑÑ‰Ð¸Ñ…ÑÑ Ð½Ð° Ð¿Ð¾ÑÑÐµ
     UpdateArtefactsOnBeltAndOutfit();
     m_pPhysics_support->in_shedule_Update(DT);
     Check_for_AutoPickUp();
@@ -1865,12 +1865,12 @@ bool CActor::can_attach(const CInventoryItem* inventory_item) const
     if (!item || /*!item->enabled() ||*/ !item->can_be_attached())
         return (false);
 
-    //ìîæíî ëè ïðèñîåäèíÿòü îáúåêòû òàêîãî òèïà
+    //Ð¼Ð¾Ð¶Ð½Ð¾ Ð»Ð¸ Ð¿Ñ€Ð¸ÑÐ¾ÐµÐ´Ð¸Ð½ÑÑ‚ÑŒ Ð¾Ð±ÑŠÐµÐºÑ‚Ñ‹ Ñ‚Ð°ÐºÐ¾Ð³Ð¾ Ñ‚Ð¸Ð¿Ð°
     if (m_attach_item_sections.end() ==
         std::find(m_attach_item_sections.begin(), m_attach_item_sections.end(), inventory_item->object().cNameSect()))
         return false;
 
-    //åñëè óæå åñòü ïðèñîåäèííåíûé îáúåò òàêîãî òèïà
+    //ÐµÑÐ»Ð¸ ÑƒÐ¶Ðµ ÐµÑÑ‚ÑŒ Ð¿Ñ€Ð¸ÑÐ¾ÐµÐ´Ð¸Ð½Ð½ÐµÐ½Ñ‹Ð¹ Ð¾Ð±ÑŠÐµÑ‚ Ñ‚Ð°ÐºÐ¾Ð³Ð¾ Ñ‚Ð¸Ð¿Ð°
     if (attached(inventory_item->object().cNameSect()))
         return false;
 

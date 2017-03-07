@@ -48,7 +48,7 @@ Matrix3x3::operator Matrix4x4() const
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *	Creates a rotation matrix that rotates a vector3 "from" into another vector3 "to".
- *	Original code by Tomas Möller. It has been modified to match ICE maths conventions (vector3 * matrix)
+ *	Original code by Tomas MÑ†ller. It has been modified to match ICE maths conventions (vector3 * matrix)
  *	\param		from	[in] normalized source vector3
  *	\param		to		[in] normalized destination vector3
  *	\return		Self-Reference

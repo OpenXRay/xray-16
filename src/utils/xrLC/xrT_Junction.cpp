@@ -6,7 +6,7 @@
 
 IC float SqrDistance2Segment(const Fvector& P, const Fvector& A, const Fvector& B)
 {
-    // Determine t (the length of the vector from ‘a’ to ‘p’)
+    // Determine t (the length of the vector from â€˜aâ€™ to â€˜pâ€™)
     Fvector c;
     c.sub(P, A);
     Fvector V;
@@ -17,13 +17,13 @@ IC float SqrDistance2Segment(const Fvector& P, const Fvector& A, const Fvector& 
     V.div(d);
     float t = V.dotproduct(c);
 
-    // Check to see if ‘t’ is beyond the extents of the line segment
+    // Check to see if â€˜tâ€™ is beyond the extents of the line segment
     if (t <= 0.0f)
         return P.distance_to_sqr(A);
     if (t >= d)
         return P.distance_to_sqr(B);
 
-    // Return the point between ‘a’ and ‘b’
+    // Return the point between â€˜aâ€™ and â€˜bâ€™
     // set length of V to t. V is normalized so this is easy
     Fvector R;
     R.mad(A, V, t);

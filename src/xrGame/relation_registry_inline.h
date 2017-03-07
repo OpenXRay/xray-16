@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////
-// relation_registry_inline.h:	реестр для хранения данных об отношении
-//								персонажа к другим персонажам
+// relation_registry_inline.h:	СЂРµРµСЃС‚СЂ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РґР°РЅРЅС‹С… РѕР± РѕС‚РЅРѕС€РµРЅРёРё
+//								РїРµСЂСЃРѕРЅР°Р¶Р° Рє РґСЂСѓРіРёРј РїРµСЂСЃРѕРЅР°Р¶Р°Рј
 //////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -59,18 +59,18 @@ ALife::ERelationType RELATION_REGISTRY::GetRelationType(T from, T to) const
 template <typename T>
 CHARACTER_GOODWILL RELATION_REGISTRY::GetAttitude(T from, T to) const
 {
-    //личное отношение from к to
+    //Р»РёС‡РЅРѕРµ РѕС‚РЅРѕС€РµРЅРёРµ from Рє to
     CHARACTER_GOODWILL presonal_goodwill = GetGoodwill(from->object_id(), to->object_id());
     VERIFY(presonal_goodwill != NO_GOODWILL);
-    //влияние репутации персонажей
+    //РІР»РёСЏРЅРёРµ СЂРµРїСѓС‚Р°С†РёРё РїРµСЂСЃРѕРЅР°Р¶РµР№
     CHARACTER_GOODWILL reputation_goodwill = GetReputationRelation(from->Reputation(), to->Reputation());
-    //влияние рангов персонажей
+    //РІР»РёСЏРЅРёРµ СЂР°РЅРіРѕРІ РїРµСЂСЃРѕРЅР°Р¶РµР№
     CHARACTER_GOODWILL rank_goodwill = GetRankRelation(from->Rank(), to->Rank());
 
-    //отношение группировки from персонально к to
+    //РѕС‚РЅРѕС€РµРЅРёРµ РіСЂСѓРїРїРёСЂРѕРІРєРё from РїРµСЂСЃРѕРЅР°Р»СЊРЅРѕ Рє to
     CHARACTER_GOODWILL community_goodwill = GetCommunityGoodwill(from->Community(), to->object_id());
     VERIFY(community_goodwill != NO_GOODWILL);
-    //отношение группировки from к группировки to
+    //РѕС‚РЅРѕС€РµРЅРёРµ РіСЂСѓРїРїРёСЂРѕРІРєРё from Рє РіСЂСѓРїРїРёСЂРѕРІРєРё to
     CHARACTER_GOODWILL community_to_community = GetCommunityRelation(from->Community(), to->Community());
 
     CHARACTER_GOODWILL attitude =

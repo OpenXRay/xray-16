@@ -214,7 +214,7 @@ int _NetworkAdHocSocketBroadcast(	int			socketid,
 							dest_port,		//	dport Destination port number
 							data,			//	data Pointer to send data
 							len,			//	len Length of send data
-							10,				//	timeout Timeout (µsec)
+							10,				//	timeout Timeout (Âµsec)
 							flags			//	flag Send options
 		);
 
@@ -239,7 +239,7 @@ int _NetworkAdHocSocketSendTo(	int			socketid,
 							dest_port,		//	dport Destination port number
 							data,			//	data Pointer to send data
 							len,			//	len Length of send data
-							10,				//	timeout Timeout (µsec)
+							10,				//	timeout Timeout (Âµsec)
 							flags			//	flag Send options
 		);
 #else
@@ -250,7 +250,7 @@ int _NetworkAdHocSocketSendTo(	int			socketid,
 							dest_port,		//	dport Destination port number
 							data,			//	data Pointer to send data
 							len,			//	len Length of send data
-							10,				//	timeout Timeout (µsec)
+							10,				//	timeout Timeout (Âµsec)
 							flags			//	flag Send options
 		);
 #endif
@@ -320,11 +320,11 @@ int _NetworkAdHocSocketRecv(int socket_id,
 {
 	int ret = sceNetAdhocPdpRecv(	
 			socket_id,				// id		Socket ID	
-			saddr,					// saddr	Sender’s MAC address	
+			saddr,					// saddr	Senderâ€™s MAC address	
 			sport,					// sport	Sender port number
 			buf,					// buf		Pointer to receive buffer	
 			&bufferlen,				// len		Receive buffer size (IN), receive data length (OUT)	
-			0,						// timeout	Timeout (µsec)
+			0,						// timeout	Timeout (Âµsec)
 			SCE_NET_ADHOC_F_NONBLOCK// flag		Receive options
 			);
 

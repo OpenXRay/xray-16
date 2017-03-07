@@ -81,9 +81,9 @@ public:
     virtual void OnDetach(u16 eidWho, u16 eidTarget) = 0;
     virtual BOOL OnActivate(u16 eidWho, u16 eidTarget) = 0;
     virtual void OnDestroyObject(u16 eidWho) = 0;
-    // кто-то получил Hit
+    // РєС‚Рѕ-С‚Рѕ РїРѕР»СѓС‡РёР» Hit
     virtual void OnHit(u16 hitterId, u16 targetId, NET_Packet& packet) = 0;
-    // игрок получил Hit
+    // РёРіСЂРѕРє РїРѕР»СѓС‡РёР» Hit
     virtual void OnPlayerHitPlayer(u16 hitterId, u16 targetId, NET_Packet& packet) = 0;
     virtual void Create(shared_str& options) = 0;
     virtual void Update() = 0;
@@ -225,8 +225,8 @@ public:
     virtual BOOL OnActivate(u16 eid_who, u16 eid_target) { return TRUE; };
     virtual void OnDestroyObject(u16 eid_who);
 
-    virtual void OnHit(u16 id_hitter, u16 id_hitted, NET_Packet& P); //кто-то получил Hit
-    virtual void OnPlayerHitPlayer(u16 id_hitter, u16 id_hitted, NET_Packet& P){}; //игрок получил Hit
+    virtual void OnHit(u16 id_hitter, u16 id_hitted, NET_Packet& P); //РєС‚Рѕ-С‚Рѕ РїРѕР»СѓС‡РёР» Hit
+    virtual void OnPlayerHitPlayer(u16 id_hitter, u16 id_hitted, NET_Packet& P){}; //РёРіСЂРѕРє РїРѕР»СѓС‡РёР» Hit
 
     // Main
     virtual void Create(shared_str& options);

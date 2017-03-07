@@ -133,8 +133,8 @@ bool CScriptEntity::CheckObjectVisibility(const CGameObject* tpObject)
     return (m_monster->memory().visual().visible_now(tpObject));
 }
 
-//îïðåäåëÿåò âèäèìîñòü îïðåäåëåííîãî òèïà îáúåêòîâ,
-//çàäàííîãî ÷åðåç section_name
+//Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÑÐµÑ‚ Ð²Ð¸Ð´Ð¸Ð¼Ð¾ÑÑ‚ÑŒ Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð½Ð¾Ð³Ð¾ Ñ‚Ð¸Ð¿Ð° Ð¾Ð±ÑŠÐµÐºÑ‚Ð¾Ð²,
+//Ð·Ð°Ð´Ð°Ð½Ð½Ð¾Ð³Ð¾ Ñ‡ÐµÑ€ÐµÐ· section_name
 bool CScriptEntity::CheckTypeVisibility(const char* section_name)
 {
     if (!m_monster)
@@ -309,7 +309,7 @@ void CScriptEntity::ProcessScripts()
             object().callback(GameObject::eActionTypeMovement)(
                 object().lua_game_object(), u32(eActionTypeMovement), -1);
 
-        // Óñòàíîâèòü âûáðàííóþ àíèìàöèþ
+        // Ð£ÑÑ‚Ð°Ð½Ð¾Ð²Ð¸Ñ‚ÑŒ Ð²Ñ‹Ð±Ñ€Ð°Ð½Ð½ÑƒÑŽ Ð°Ð½Ð¸Ð¼Ð°Ñ†Ð¸ÑŽ
         if (!l_tpEntityAction->m_tAnimationAction.m_bCompleted)
             bfScriptAnimation();
 

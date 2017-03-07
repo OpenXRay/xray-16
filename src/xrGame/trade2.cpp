@@ -24,7 +24,7 @@ bool CTrade::CanTrade()
     {
         for (u32 i = 0, n = m_nearest.size(); i < n; ++i)
         {
-            // Ìîæåò ëè îáúåêò òîðãîâàòü
+            // ÐœÐ¾Ð¶ÐµÑ‚ Ð»Ð¸ Ð¾Ð±ÑŠÐµÐºÑ‚ Ñ‚Ð¾Ñ€Ð³Ð¾Ð²Ð°Ñ‚ÑŒ
             pEntity = smart_cast<CEntity*>(m_nearest[i]);
             if (pEntity && !pEntity->g_Alive())
                 return false;
@@ -36,7 +36,7 @@ bool CTrade::CanTrade()
     if (!pPartner.base)
         return false;
 
-    // Îáúåêò ðÿäîì
+    // ÐžÐ±ÑŠÐµÐºÑ‚ Ñ€ÑÐ´Ð¾Ð¼
     float dist = pPartner.base->Position().distance_to(pThis.base->Position());
     if (dist < 0.5f || dist > 4.5f)
     {
@@ -44,7 +44,7 @@ bool CTrade::CanTrade()
         return false;
     }
 
-    // Îáúåêò ñìîòðèò íà ìåíÿ
+    // ÐžÐ±ÑŠÐµÐºÑ‚ ÑÐ¼Ð¾Ñ‚Ñ€Ð¸Ñ‚ Ð½Ð° Ð¼ÐµÐ½Ñ
     float yaw, pitch;
     float yaw2, pitch2;
 
@@ -65,8 +65,8 @@ bool CTrade::CanTrade()
 
 void CTrade::TransferItem(CInventoryItem* pItem, bool bBuying)
 {
-    // ñóììà ñäåëêè ó÷èòûâàÿ öåíîâîé êîýôôèöèåíò
-    // àêòåð öåíó íå ãîâîðèò íèêîãäà, âñå äåëàþò çà íåãî
+    // ÑÑƒÐ¼Ð¼Ð° ÑÐ´ÐµÐ»ÐºÐ¸ ÑƒÑ‡Ð¸Ñ‚Ñ‹Ð²Ð°Ñ Ñ†ÐµÐ½Ð¾Ð²Ð¾Ð¹ ÐºÐ¾ÑÑ„Ñ„Ð¸Ñ†Ð¸ÐµÐ½Ñ‚
+    // Ð°ÐºÑ‚ÐµÑ€ Ñ†ÐµÐ½Ñƒ Ð½Ðµ Ð³Ð¾Ð²Ð¾Ñ€Ð¸Ñ‚ Ð½Ð¸ÐºÐ¾Ð³Ð´Ð°, Ð²ÑÐµ Ð´ÐµÐ»Ð°ÑŽÑ‚ Ð·Ð° Ð½ÐµÐ³Ð¾
     u32 dwTransferMoney = GetItemPrice(pItem, bBuying);
 
     if (bBuying)
@@ -96,7 +96,7 @@ void CTrade::TransferItem(CInventoryItem* pItem, bool bBuying)
     else
         pThis.inv_owner->set_money(pThis.inv_owner->get_money() + dwTransferMoney, false);
 
-    // âçÿòü ó ïàðòíåðà
+    // Ð²Ð·ÑÑ‚ÑŒ Ñƒ Ð¿Ð°Ñ€Ñ‚Ð½ÐµÑ€Ð°
     O2->u_EventGen(P, GE_TRADE_BUY, O2->ID());
     P.w_u16(pItem->object().ID());
     O2->u_EventSend(P);

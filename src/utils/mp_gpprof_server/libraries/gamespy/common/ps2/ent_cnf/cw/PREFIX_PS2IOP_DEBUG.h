@@ -1,5 +1,5 @@
 //	===========================================================================
-//	PREFIX_PS2_DEBUG.h			©2000 Metrowerks Inc. All rights reserved.
+//	PREFIX_PS2_DEBUG.h			Â©2000 Metrowerks Inc. All rights reserved.
 //	===========================================================================
 //
 //	07/18/2000	james combs,	for SDK1.6

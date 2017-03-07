@@ -115,7 +115,7 @@ void CStateGroupDragAbstract::execute()
     if (m_failed)
         return;
 
-    // Óñòàíîâèòü ïàðàìåòðû äâèæåíèÿ
+    // Ð£ÑÑ‚Ð°Ð½Ð¾Ð²Ð¸Ñ‚ÑŒ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ñ‹ Ð´Ð²Ð¸Ð¶ÐµÐ½Ð¸Ñ
     object->set_action(ACT_DRAG);
     object->anim().SetSpecParams(ASP_MOVE_BKWD);
 
@@ -137,7 +137,7 @@ void CStateGroupDragAbstract::finalize()
 {
     inherited::finalize();
 
-    // áðîñèòü òðóï
+    // Ð±Ñ€Ð¾ÑÐ¸Ñ‚ÑŒ Ñ‚Ñ€ÑƒÐ¿
     if (object->character_physics_support()->movement()->PHCapture())
         object->character_physics_support()->movement()->PHReleaseObject();
 }
@@ -147,7 +147,7 @@ void CStateGroupDragAbstract::critical_finalize()
 {
     inherited::critical_finalize();
 
-    // áðîñèòü òðóï
+    // Ð±Ñ€Ð¾ÑÐ¸Ñ‚ÑŒ Ñ‚Ñ€ÑƒÐ¿
     if (object->character_physics_support()->movement()->PHCapture())
         object->character_physics_support()->movement()->PHReleaseObject();
 }

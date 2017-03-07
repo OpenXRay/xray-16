@@ -3,13 +3,13 @@
 //	Created by Roman E. Marchenko, vortex@gsc-game.kiev.ua
 //	Copyright 2004. GSC Game World
 //	---------------------------------------------------------------------------
-//  Реализация темплейтовых функций листбокса
+//  Р РµР°Р»РёР·Р°С†РёСЏ С‚РµРјРїР»РµР№С‚РѕРІС‹С… С„СѓРЅРєС†РёР№ Р»РёСЃС‚Р±РѕРєСЃР°
 //=============================================================================
 
 template <class Element>
 bool CUIListWnd::AddItem(const char* str, const float shift, void* pData, int value, int insertBeforeIdx)
 {
-    //создать новый элемент и добавить его в список
+    //СЃРѕР·РґР°С‚СЊ РЅРѕРІС‹Р№ СЌР»РµРјРµРЅС‚ Рё РґРѕР±Р°РІРёС‚СЊ РµРіРѕ РІ СЃРїРёСЃРѕРє
     Element* pItem = NULL;
     pItem = xr_new<Element>();
 
@@ -36,7 +36,7 @@ bool CUIListWnd::AddItem(Element* pItem, int insertBeforeIdx)
                                 GetItemsCount() * m_iItemHeight),
         Fvector2().set(m_iItemWidth, m_iItemHeight));
 
-    //добавление в конец или начало списка
+    //РґРѕР±Р°РІР»РµРЅРёРµ РІ РєРѕРЅРµС† РёР»Рё РЅР°С‡Р°Р»Рѕ СЃРїРёСЃРєР°
     if (-1 == insertBeforeIdx)
     {
         m_ItemList.push_back(pItem);
@@ -44,7 +44,7 @@ bool CUIListWnd::AddItem(Element* pItem, int insertBeforeIdx)
     }
     else
     {
-        //изменить значения индексов уже добавленых элементов
+        //РёР·РјРµРЅРёС‚СЊ Р·РЅР°С‡РµРЅРёСЏ РёРЅРґРµРєСЃРѕРІ СѓР¶Рµ РґРѕР±Р°РІР»РµРЅС‹С… СЌР»РµРјРµРЅС‚РѕРІ
         if (!m_ItemList.empty())
             R_ASSERT(static_cast<u32>(insertBeforeIdx) <= m_ItemList.size());
 
@@ -60,7 +60,7 @@ bool CUIListWnd::AddItem(Element* pItem, int insertBeforeIdx)
 
     UpdateList();
 
-    //обновить полосу прокрутки
+    //РѕР±РЅРѕРІРёС‚СЊ РїРѕР»РѕСЃСѓ РїСЂРѕРєСЂСѓС‚РєРё
     m_ScrollBar->SetRange(0, s16(m_ItemList.size() - 1));
     m_ScrollBar->SetPageSize((m_iRowNum < (int)m_ItemList.size()) ? m_iRowNum : (int)m_ItemList.size());
     m_ScrollBar->SetScrollPos(s16(m_iFirstShownIndex));

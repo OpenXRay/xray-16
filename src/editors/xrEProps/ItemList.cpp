@@ -411,11 +411,11 @@ void __fastcall TItemList::tvItemsAfterSelectionChange(TObject* Sender)
 {
     if (IsLocked())
         return;
-    // hack, нода не должна была быть выделенной
+    // hack, РЅРѕРґР° РЅРµ РґРѕР»Р¶РЅР° Р±С‹Р»Р° Р±С‹С‚СЊ РІС‹РґРµР»РµРЅРЅРѕР№
     for (TElTreeItem* item = tvItems->GetNextSelected(0); item; item = tvItems->GetNextSelected(item))
         if (item->Hidden)
             item->Selected = false;
-    // получаем выделение и обрабатываем ивенты
+    // РїРѕР»СѓС‡Р°РµРј РІС‹РґРµР»РµРЅРёРµ Рё РѕР±СЂР°Р±Р°С‚С‹РІР°РµРј РёРІРµРЅС‚С‹
     ListItemsVec sel_items;
     GetSelected(0, sel_items, false);
     if (!OnItemFocusedEvent.empty())
@@ -540,7 +540,7 @@ void __fastcall TItemList::InplaceEditValidateResult(TObject* Sender, bool& Inpu
         FHelper.MakeName(IE->Item, 0, old_name, false);
         _ReplaceItem(old_name.c_str(), IE->Item->Level, new_text.c_str(), new_name, '\\');
         TElTreeItem* find_item = FHelper.FindItem(tvItems, new_name);
-        InputValid = (find_item == IE->Item) || (!find_item); //.(!find_item); нужно для того чтобы принимало
+        InputValid = (find_item == IE->Item) || (!find_item); //.(!find_item); РЅСѓР¶РЅРѕ РґР»СЏ С‚РѕРіРѕ С‡С‚РѕР±С‹ РїСЂРёРЅРёРјР°Р»Рѕ
     }
 }
 //---------------------------------------------------------------------------
@@ -666,7 +666,7 @@ void TItemList::RemoveSelItems(TOnItemRemove on_remove)
         RStringVec sel_items;
         if (GetSelected(sel_items))
         {
-            tvItems->IsUpdating = true; // LockUpdating нельзя
+            tvItems->IsUpdating = true; // LockUpdating РЅРµР»СЊР·СЏ
             DeselectAll();
             tvItemsAfterSelectionChange(0);
             bool bSelChanged = false;

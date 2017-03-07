@@ -1,17 +1,17 @@
 #pragma once
 
-// Вектор имен скинов комманды
+// Р’РµРєС‚РѕСЂ РёРјРµРЅ СЃРєРёРЅРѕРІ РєРѕРјРјР°РЅРґС‹
 DEF_VECTOR(TEAM_SKINS_NAMES, xr_string);
 
-// Вектор имен скинов комманды
+// Р’РµРєС‚РѕСЂ РёРјРµРЅ СЃРєРёРЅРѕРІ РєРѕРјРјР°РЅРґС‹
 DEF_VECTOR(DEF_ITEMS_LIST, u16);
 
-//структура данных по команде
+//СЃС‚СЂСѓРєС‚СѓСЂР° РґР°РЅРЅС‹С… РїРѕ РєРѕРјР°РЅРґРµ
 struct TeamStruct
 {
-    shared_str caSection; // имя секции комманды
-    TEAM_SKINS_NAMES aSkins; // список скинов для команды
-    DEF_ITEMS_LIST aDefaultItems; // список предметов по умолчанию
+    shared_str caSection; // РёРјСЏ СЃРµРєС†РёРё РєРѕРјРјР°РЅРґС‹
+    TEAM_SKINS_NAMES aSkins; // СЃРїРёСЃРѕРє СЃРєРёРЅРѕРІ РґР»СЏ РєРѕРјР°РЅРґС‹
+    DEF_ITEMS_LIST aDefaultItems; // СЃРїРёСЃРѕРє РїСЂРµРґРјРµС‚РѕРІ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
     //---- Money -------------------
     s32 m_iM_Start;
@@ -41,5 +41,5 @@ struct TeamStruct
     float m_fInvinsibleKillModifier;
 };
 
-//массив данных по командам
+//РјР°СЃСЃРёРІ РґР°РЅРЅС‹С… РїРѕ РєРѕРјР°РЅРґР°Рј
 DEF_DEQUE(TEAM_DATA_LIST, TeamStruct);

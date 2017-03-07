@@ -24,7 +24,7 @@ public:
 
     void Load(LPCSTR path_alias, LPCSTR path, LPCSTR xml_filename);
 
-    //чтение элементов
+    //С‡С‚РµРЅРёРµ СЌР»РµРјРµРЅС‚РѕРІ
     LPCSTR Read(LPCSTR path, int index, LPCSTR default_str_val);
     LPCSTR Read(XML_NODE* start_node, LPCSTR path, int index, LPCSTR default_str_val);
     LPCSTR Read(XML_NODE* node, LPCSTR default_str_val);
@@ -52,20 +52,20 @@ public:
     XML_NODE* SearchForAttribute(LPCSTR path, int index, LPCSTR tag_name, LPCSTR attrib, LPCSTR attrib_value_pattern);
     XML_NODE* SearchForAttribute(XML_NODE* start_node, LPCSTR tag_name, LPCSTR attrib, LPCSTR attrib_value_pattern);
 
-    //возвращает количество узлов с заданым именем
+    //РІРѕР·РІСЂР°С‰Р°РµС‚ РєРѕР»РёС‡РµСЃС‚РІРѕ СѓР·Р»РѕРІ СЃ Р·Р°РґР°РЅС‹Рј РёРјРµРЅРµРј
     int GetNodesNum(LPCSTR path, int index, LPCSTR tag_name);
     int GetNodesNum(XML_NODE* node, LPCSTR tag_name);
 
 #ifdef DEBUG // debug & mixed
-    //проверка того, что аттрибуты у тегов уникальны
-    //(если не NULL, то уникальность нарушена и возврашается имя
-    //повторяющегося атрибута)
+    //РїСЂРѕРІРµСЂРєР° С‚РѕРіРѕ, С‡С‚Рѕ Р°С‚С‚СЂРёР±СѓС‚С‹ Сѓ С‚РµРіРѕРІ СѓРЅРёРєР°Р»СЊРЅС‹
+    //(РµСЃР»Рё РЅРµ NULL, С‚Рѕ СѓРЅРёРєР°Р»СЊРЅРѕСЃС‚СЊ РЅР°СЂСѓС€РµРЅР° Рё РІРѕР·РІСЂР°С€Р°РµС‚СЃСЏ РёРјСЏ
+    //РїРѕРІС‚РѕСЂСЏСЋС‰РµРіРѕСЃСЏ Р°С‚СЂРёР±СѓС‚Р°)
     LPCSTR CheckUniqueAttrib(XML_NODE* start_node, LPCSTR tag_name, LPCSTR attrib_name);
 #endif
 
-    //переместиться по XML дереву
-    //путь задается в форме PARENT:CHILD:CHIDLS_CHILD
-    // node_index - номер, если узлов с одним именем несколько
+    //РїРµСЂРµРјРµСЃС‚РёС‚СЊСЃСЏ РїРѕ XML РґРµСЂРµРІСѓ
+    //РїСѓС‚СЊ Р·Р°РґР°РµС‚СЃСЏ РІ С„РѕСЂРјРµ PARENT:CHILD:CHIDLS_CHILD
+    // node_index - РЅРѕРјРµСЂ, РµСЃР»Рё СѓР·Р»РѕРІ СЃ РѕРґРЅРёРј РёРјРµРЅРµРј РЅРµСЃРєРѕР»СЊРєРѕ
     XML_NODE* NavigateToNode(LPCSTR path, int node_index = 0);
     XML_NODE* NavigateToNode(XML_NODE* start_node, LPCSTR path, int node_index = 0);
     XML_NODE* NavigateToNodeWithAttribute(LPCSTR tag_name, LPCSTR attrib_name, LPCSTR attrib_value);
@@ -78,7 +78,7 @@ protected:
     XML_NODE* m_pLocalRoot;
 
 #ifdef DEBUG // debug & mixed
-    //буфферный вектор для проверки уникальность аттрибутов
+    //Р±СѓС„С„РµСЂРЅС‹Р№ РІРµРєС‚РѕСЂ РґР»СЏ РїСЂРѕРІРµСЂРєРё СѓРЅРёРєР°Р»СЊРЅРѕСЃС‚СЊ Р°С‚С‚СЂРёР±СѓС‚РѕРІ
     xr_vector<shared_str> m_AttribValues;
 #endif
 public:

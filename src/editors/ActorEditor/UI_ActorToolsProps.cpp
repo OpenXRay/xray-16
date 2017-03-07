@@ -23,7 +23,7 @@ void CActorTools::OnObjectItemFocused(ListItemsVec& items)
     if (m_pEditObject)
     {
         m_pEditObject->ResetSAnimation(false);
-        // StopMotion(); // óáðàë èç-çà òîãî ÷òî íå ìèêñÿòñÿ àíèìàöèè â ðåæèìå åíæèíå
+        // StopMotion(); // ÑƒÐ±Ñ€Ð°Ð» Ð¸Ð·-Ð·Ð° Ñ‚Ð¾Ð³Ð¾ Ñ‡Ñ‚Ð¾ Ð½Ðµ Ð¼Ð¸ÐºÑÑÑ‚ÑÑ Ð°Ð½Ð¸Ð¼Ð°Ñ†Ð¸Ð¸ Ð² Ñ€ÐµÐ¶Ð¸Ð¼Ðµ ÐµÐ½Ð¶Ð¸Ð½Ðµ
         m_pEditObject->SelectBones(false);
     }
 

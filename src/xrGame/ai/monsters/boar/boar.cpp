@@ -149,7 +149,7 @@ BOOL CAI_Boar::net_Spawn(CSE_Abstract* DC)
     if (!inherited::net_Spawn(DC))
         return (FALSE);
 
-    if (!PPhysicsShell()) //нельзя ставить колбеки, если создан физ шел - у него стоят свои колбеки!!!
+    if (!PPhysicsShell()) //РЅРµР»СЊР·СЏ СЃС‚Р°РІРёС‚СЊ РєРѕР»Р±РµРєРё, РµСЃР»Рё СЃРѕР·РґР°РЅ С„РёР· С€РµР» - Сѓ РЅРµРіРѕ СЃС‚РѕСЏС‚ СЃРІРѕРё РєРѕР»Р±РµРєРё!!!
     {
         CBoneInstance& BI = smart_cast<IKinematics*>(Visual())->LL_GetBoneInstance(
             smart_cast<IKinematics*>(Visual())->LL_BoneID("bip01_head"));

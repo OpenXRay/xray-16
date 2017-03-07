@@ -61,10 +61,10 @@ void CPHCollideValidator::SetRagDollClassNotCollide(CPHObject& obj)
     obj.collide_class_bits().set(cbNCClassRagDoll, TRUE);
 }
 
-//Относит физический объект к классу анимированных объектов
+//РћС‚РЅРѕСЃРёС‚ С„РёР·РёС‡РµСЃРєРёР№ РѕР±СЉРµРєС‚ Рє РєР»Р°СЃСЃСѓ Р°РЅРёРјРёСЂРѕРІР°РЅРЅС‹С… РѕР±СЉРµРєС‚РѕРІ
 void CPHCollideValidator::SetAnimatedClass(CPHObject& obj) { obj.collide_class_bits().set(cbClassAnimated, TRUE); }
-//Задаёт игнорирование коллизий данного физического
-//объекта с анимированными телами
+//Р—Р°РґР°С‘С‚ РёРіРЅРѕСЂРёСЂРѕРІР°РЅРёРµ РєРѕР»Р»РёР·РёР№ РґР°РЅРЅРѕРіРѕ С„РёР·РёС‡РµСЃРєРѕРіРѕ
+//РѕР±СЉРµРєС‚Р° СЃ Р°РЅРёРјРёСЂРѕРІР°РЅРЅС‹РјРё С‚РµР»Р°РјРё
 void CPHCollideValidator::SetAnimatedClassNotCollide(CPHObject& obj)
 {
     obj.collide_class_bits().set(cbNCClassAnimated, TRUE);

@@ -21,7 +21,7 @@
 
 CDrawUtilities DU_impl;
 
-#define LINE_DIVISION 32 // не меньше 6!!!!!
+#define LINE_DIVISION 32 // РЅРµ РјРµРЅСЊС€Рµ 6!!!!!
 // for drawing sphere
 static Fvector circledef1[LINE_DIVISION];
 static Fvector circledef2[LINE_DIVISION];

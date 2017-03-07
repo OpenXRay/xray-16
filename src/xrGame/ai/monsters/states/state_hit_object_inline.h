@@ -41,7 +41,7 @@ bool CStateMonsterHitObjectAbstract::check_start_conditions()
 {
     target = 0;
 
-    // получить физ. объекты в радиусе
+    // РїРѕР»СѓС‡РёС‚СЊ С„РёР·. РѕР±СЉРµРєС‚С‹ РІ СЂР°РґРёСѓСЃРµ
     m_nearest_objects.clear_not_free();
     Level().ObjectSpace.GetNearest(m_nearest_objects, object->Position(), object->Radius() - 0.5f, object());
 
@@ -54,11 +54,11 @@ bool CStateMonsterHitObjectAbstract::check_start_conditions()
         if (!obj || !obj->m_pPhysicsShell)
             continue;
 
-        // определить дистанцию до врага
+        // РѕРїСЂРµРґРµР»РёС‚СЊ РґРёСЃС‚Р°РЅС†РёСЋ РґРѕ РІСЂР°РіР°
         Fvector d;
         d.sub(obj->Position(), object->Position());
 
-        // проверка на  Field-Of-Hit
+        // РїСЂРѕРІРµСЂРєР° РЅР°  Field-Of-Hit
         float my_h, my_p;
         float h, p;
 

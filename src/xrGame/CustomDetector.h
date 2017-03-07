@@ -18,12 +18,12 @@ struct ITEM_TYPE
     shared_str nightvision_particle;
 };
 
-//описание зоны, обнаруженной детектором
+//РѕРїРёСЃР°РЅРёРµ Р·РѕРЅС‹, РѕР±РЅР°СЂСѓР¶РµРЅРЅРѕР№ РґРµС‚РµРєС‚РѕСЂРѕРј
 struct ITEM_INFO
 {
     ITEM_TYPE* curr_ref;
     float snd_time;
-    //текущая частота работы датчика
+    //С‚РµРєСѓС‰Р°СЏ С‡Р°СЃС‚РѕС‚Р° СЂР°Р±РѕС‚С‹ РґР°С‚С‡РёРєР°
     float cur_period;
     // particle for night-vision mode
     CParticlesObject* pParticle;

@@ -73,7 +73,7 @@ CCar::CCar()
     m_exhaust_particles = "vehiclefx\\exhaust_1";
     m_car_sound = new SCarSound(this);
 
-    //у машины слотов в инвентаре нет
+    //Сѓ РјР°С€РёРЅС‹ СЃР»РѕС‚РѕРІ РІ РёРЅРІРµРЅС‚Р°СЂРµ РЅРµС‚
     inventory = new CInventory();
     inventory->SetSlotsUseful(false);
     m_doors_torque_factor = 2.f;
@@ -1652,7 +1652,7 @@ void CCar::OnEvent(NET_Packet& P, u16 type)
     inherited::OnEvent(P, type);
     CExplosive::OnEvent(P, type);
 
-    //обработка сообщений, нужных для работы с багажником машины
+    //РѕР±СЂР°Р±РѕС‚РєР° СЃРѕРѕР±С‰РµРЅРёР№, РЅСѓР¶РЅС‹С… РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ Р±Р°РіР°Р¶РЅРёРєРѕРј РјР°С€РёРЅС‹
     u16 id;
     switch (type)
     {

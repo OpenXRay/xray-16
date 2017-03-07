@@ -70,7 +70,7 @@ void CBloodsuckerStateAttackAbstract::execute()
         select_state(eStateAttack_RunAttack);
     else
     {
-        // определить тип атаки
+        // РѕРїСЂРµРґРµР»РёС‚СЊ С‚РёРї Р°С‚Р°РєРё
         bool b_melee = false;
 
         if (prev_substate == eStateAttack_Melee)
@@ -90,7 +90,7 @@ void CBloodsuckerStateAttackAbstract::execute()
             select_state(eStateAttack_Hide);
         }
         else
-            // установить целевое состояние
+            // СѓСЃС‚Р°РЅРѕРІРёС‚СЊ С†РµР»РµРІРѕРµ СЃРѕСЃС‚РѕСЏРЅРёРµ
             if (b_melee)
         {
             // check if enemy is behind me for a long time

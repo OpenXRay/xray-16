@@ -39,7 +39,7 @@ struct st_BoneMotion
     }
     void SetName(LPCSTR nm) { name = nm; }
 };
-// vector по костям
+// vector РїРѕ РєРѕСЃС‚СЏРј
 DEFINE_VECTOR(st_BoneMotion, BoneMotionVec, BoneMotionIt);
 
 //--------------------------------------------------------------------------
