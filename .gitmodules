@@ -31,3 +31,6 @@
 [submodule "src/Externals/BugTrap"]
 	path = src/Externals/BugTrap
 	url = https://github.com/OpenXRay/BugTrap.git
+[submodule "src/Externals/FreeImage"]
+	path = src/Externals/FreeImage
+	url = https://github.com/OpenXRay/ext-win-freeimage.git

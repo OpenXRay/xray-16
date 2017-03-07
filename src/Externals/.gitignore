@@ -1,6 +1,5 @@
 # exclude third-party libraries (except submodules)
 3dsmax
-FreeImage
 lightwave
 MagicSoftware
 maya
