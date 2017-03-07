@@ -246,7 +246,7 @@ class type_motion4 : public type_motion
         {
             edirection dr = dir(ea, H, angle);
             m = motion(dr);
-            type_motion_diagnostic(" type_motion4: 5.	Снайперка в голову", dr, ea, H, m);
+            type_motion_diagnostic(" type_motion4: 5.	Снайперка в головy", dr, ea, H, m);
             return true;
         }
         return false;
