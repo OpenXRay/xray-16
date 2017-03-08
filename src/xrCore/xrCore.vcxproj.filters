@@ -707,9 +707,6 @@
     <ClInclude Include="..\Common\LevelStructure.hpp">
       <Filter>Kernel\Common</Filter>
     </ClInclude>
-    <ClInclude Include="Crypto\crypto.h">
-      <Filter>Crypto</Filter>
-    </ClInclude>
     <ClInclude Include="Crypto\xr_dsa.h">
       <Filter>Crypto</Filter>
     </ClInclude>

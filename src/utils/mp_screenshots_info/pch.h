@@ -3,7 +3,6 @@
 
 #include "xrCore/xrCore.h"
 #include "xrCore/LocatorAPI.h"
-#include "xrCore/Crypto/crypto.h"
 
 #include <stdio.h>
 

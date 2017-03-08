@@ -35,7 +35,6 @@
 #include "xrCore/ppmd_compressor.h"
 #include "xrCore/Compression/rt_compressor.h"
 #include "game_cl_mp_snd_messages.h"
-#include "xrCore/Crypto/crypto.h"
 
 #include "reward_event_generator.h"
 #include "game_cl_base_weapon_usage_statistic.h"
@@ -97,7 +96,6 @@ game_cl_mp::game_cl_mp()
     m_reward_generator = NULL;
     m_ready_to_open_buy_menu = true;
     m_reward_manager = NULL;
-    crypto::xr_crypto_init();
 };
 
 game_cl_mp::~game_cl_mp()

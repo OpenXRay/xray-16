@@ -1,7 +1,7 @@
 #ifndef CONFIGS_COMMON_INCLUDED
 #define CONFIGS_COMMON_INCLUDED
 
-#include "xrCore/Crypto/crypto.h"
+#include "xrCore/Crypto/xr_dsa.h"
 
 namespace mp_anticheat
 {

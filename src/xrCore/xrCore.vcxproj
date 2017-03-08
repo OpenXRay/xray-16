@@ -70,8 +70,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)Externals;$(SolutionDir)Externals\openssl\include;$(SolutionDir)Externals\lzo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)Externals;$(SolutionDir)Externals\lzo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;CRYPTOPP_IMPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>false</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -91,7 +91,7 @@
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>libeay32.lib;ssleay32.lib;lzo2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lzo2.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LargeAddressAware>true</LargeAddressAware>
     </Link>
   </ItemDefinitionGroup>
@@ -104,8 +104,8 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)Externals;$(SolutionDir)Externals\openssl\include;$(SolutionDir)Externals\lzo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)Externals;$(SolutionDir)Externals\lzo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;CRYPTOPP_IMPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
@@ -125,7 +125,7 @@
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>libeay32.lib;ssleay32.lib;lzo2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lzo2.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LargeAddressAware>true</LargeAddressAware>
     </Link>
   </ItemDefinitionGroup>
@@ -137,8 +137,8 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(SolutionDir)Externals;$(SolutionDir)Externals\openssl\include;$(SolutionDir)Externals\lzo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)Externals;$(SolutionDir)Externals\lzo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;CRYPTOPP_IMPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -157,7 +157,7 @@
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <ImportLibrary>$(xrLibDir)$(TargetName).lib</ImportLibrary>
       <TargetMachine>MachineX86</TargetMachine>
-      <AdditionalDependencies>libeay32.lib;ssleay32.lib;lzo2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>lzo2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -303,7 +303,6 @@
     <ClInclude Include="Containers\AssociativeVector.hpp" />
     <ClInclude Include="Containers\AssociativeVectorComparer.hpp" />
     <ClInclude Include="cpuid.h" />
-    <ClInclude Include="Crypto\crypto.h" />
     <ClInclude Include="Crypto\xr_dsa.h" />
     <ClInclude Include="Crypto\xr_dsa_signer.h" />
     <ClInclude Include="Crypto\xr_dsa_verifyer.h" />
@@ -419,6 +418,9 @@
     <None Include="Debug\DXTrace.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Externals\cryptdll.vcxproj">
+      <Project>{94a428a1-9ba8-4db2-b76e-bd2e3c08f257}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Externals\lzo.vcxproj">
       <Project>{614aa57f-58d7-45a8-a5ff-93f04b05fac6}</Project>
     </ProjectReference>
