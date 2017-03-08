@@ -37,6 +37,9 @@
 [submodule "src/Externals/cryptopp"]
 	path = src/Externals/cryptopp
 	url = https://github.com/weidai11/cryptopp.git
+[submodule "src/Externals/OpenAutomate"]
+	path = src/Externals/OpenAutomate
+	url = https://github.com/OpenXRay/OpenAutomate.git
 [submodule "src/Externals/FreeMagic"]
 	path = src/Externals/FreeMagic
 	url = https://github.com/OpenXRay/FreeMagic.git
