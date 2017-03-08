@@ -97,7 +97,7 @@ size_t xrDebug::BuildStackTrace(char* buffer, size_t capacity, size_t lineCapaci
 
 size_t xrDebug::BuildStackTrace(EXCEPTION_POINTERS* exPtrs, char* buffer, size_t capacity, size_t lineCapacity)
 {
-    memset(buffer, capacity * lineCapacity, 0);
+    memset(buffer, 0, capacity*lineCapacity);
     auto flags = GSTSO_MODULE | GSTSO_SYMBOL | GSTSO_SRCLINE;
     auto traceDump = GetFirstStackTraceString(flags, exPtrs);
     int frameCount = 0;

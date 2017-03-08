@@ -952,7 +952,7 @@ public:
     const RGBAMipMappedImage& operator[](size_t i) const { return cubeFaces[i]; }
     size_t numMIPMaps() const { return cubeFaces[0].numMIPMaps(); }
     size_t height() const { return cubeFaces[0].height(); }
-    size_t width() const { return cubeFaces[0].height(); }
+    size_t width() const { return cubeFaces[0].width(); }
     void clear()
     {
         for (size_t f = 0; f < 6; f++)
@@ -1140,7 +1140,7 @@ public:
     const fpMipMappedImage& operator[](size_t i) const { return cubeFaces[i]; }
     size_t numMIPMaps() const { return cubeFaces[0].numMIPMaps(); }
     size_t height() const { return cubeFaces[0].height(); }
-    size_t width() const { return cubeFaces[0].height(); }
+    size_t width() const { return cubeFaces[0].width(); }
     void clear()
     {
         for (size_t f = 0; f < 6; f++)

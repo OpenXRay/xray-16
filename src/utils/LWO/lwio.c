@@ -335,7 +335,7 @@ int sgetI1(unsigned char** bp)
     if (i > 127)
         i -= 256;
     flen += 1;
-    *bp++;
+    (*bp)++;
     return i;
 }
 
@@ -373,7 +373,7 @@ unsigned char sgetU1(unsigned char** bp)
         return 0;
     c = **bp;
     flen += 1;
-    *bp++;
+    (*bp)++;
     return c;
 }
 

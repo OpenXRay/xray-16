@@ -47,7 +47,6 @@ RELATION_REGISTRY::RELATION_MAP_SPOTS::RELATION_MAP_SPOTS()
     spot_names[ALife::eRelationTypeNeutral] = "neutral_location";
     spot_names[ALife::eRelationTypeEnemy] = "enemy_location";
     spot_names[ALife::eRelationTypeWorstEnemy] = "enemy_location";
-    spot_names[ALife::eRelationTypeWorstEnemy] = "enemy_location";
     spot_names[ALife::eRelationTypeLast] = "neutral_location";
 }
 //////////////////////////////////////////////////////////////////////////

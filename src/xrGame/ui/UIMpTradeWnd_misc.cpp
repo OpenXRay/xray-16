@@ -373,7 +373,7 @@ CUIDragDropListEx* CUIMpTradeWnd::GetMatchedListForItem(const shared_str& sect_n
             return m_list[e_player_bag];
     }
 
-    if (list_idx == e_pistol || list_idx == e_rifle || list_idx == e_outfit || list_idx == e_outfit)
+    if (list_idx == e_pistol || list_idx == e_rifle || list_idx == e_outfit)
     {
         if (m_list[list_idx]->ItemsCount())
             return m_list[e_player_bag];
