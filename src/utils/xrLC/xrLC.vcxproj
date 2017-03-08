@@ -84,7 +84,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim\src;$(SolutionDir)Externals\FreeImage\Dist\x32;$(SolutionDir)Externals\MagicSoftware\Sdk\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim\src;$(SolutionDir)Externals\FreeImage\Dist\x32;$(SolutionDir)Externals\FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LEVEL_COMPILER;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -127,7 +127,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim\src;$(SolutionDir)Externals\FreeImage\Dist\x32;$(SolutionDir)Externals\MagicSoftware\Sdk\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim\src;$(SolutionDir)Externals\FreeImage\Dist\x32;$(SolutionDir)Externals\FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LEVEL_COMPILER;_USE_MATH_DEFINES;FORCE_NO_EXCEPTIONS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -171,7 +171,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim\src;$(SolutionDir)Externals\FreeImage\Dist\x32;$(SolutionDir)Externals\MagicSoftware\Sdk\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)utils\xrQSlim\src;$(SolutionDir)Externals\FreeImage\Dist\x32;$(SolutionDir)Externals\FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>LEVEL_COMPILER;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>

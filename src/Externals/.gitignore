@@ -1,7 +1,6 @@
 # exclude third-party libraries (except submodules)
 3dsmax
 lightwave
-MagicSoftware
 maya
 nvapi
 OpenAutomate

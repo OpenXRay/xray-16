@@ -78,7 +78,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)xrServerEntities;$(SolutionDir)Externals\MagicSoftware\Sdk\Include;$(SolutionDir)Externals\FreeImage\Dist\x32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)xrServerEntities;$(SolutionDir)Externals\FreeMagic\Include;$(SolutionDir)Externals\FreeImage\Dist\x32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>AI_COMPILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -126,7 +126,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)xrServerEntities;$(SolutionDir)Externals\MagicSoftware\Sdk\Include;$(SolutionDir)Externals\FreeImage\Dist\x32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)xrServerEntities;$(SolutionDir)Externals\FreeMagic\Include;$(SolutionDir)Externals\FreeImage\Dist\x32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>AI_COMPILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -174,7 +174,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(SolutionDir)xrServerEntities;$(SolutionDir)Externals\MagicSoftware\Sdk\Include;$(SolutionDir)Externals\FreeImage\Dist\x32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)xrServerEntities;$(SolutionDir)Externals\FreeMagic\Include;$(SolutionDir)Externals\FreeImage\Dist\x32;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>AI_COMPILER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>

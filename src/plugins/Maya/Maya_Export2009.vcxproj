@@ -85,7 +85,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir)Externals\maya/ver-2009/include;../Shared;$(SolutionDir)xrEngine;$(SolutionDir)utils/xrQSlim/src/;$(SolutionDir)Externals\MagicSoftware\FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Externals\maya/ver-2009/include;../Shared;$(SolutionDir)xrEngine;$(SolutionDir)utils/xrQSlim/src/;$(SolutionDir)Externals\FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NT_PLUGIN;_MAYA_EXPORT;_MAYA_PLUGIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -120,7 +120,7 @@
     </Midl>
     <ClCompile>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(SolutionDir)Externals\maya/ver-2009/include;../Shared;$(SolutionDir)xrEngine;$(SolutionDir)utils/xrQSlim/src/;$(SolutionDir)Externals\MagicSoftware\FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Externals\maya/ver-2009/include;../Shared;$(SolutionDir)xrEngine;$(SolutionDir)utils/xrQSlim/src/;$(SolutionDir)Externals\FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NT_PLUGIN;_MAYA_EXPORT;_MAYA_PLUGIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>false</MinimalRebuild>
@@ -155,7 +155,7 @@
     </Midl>
     <ClCompile>
       <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
-      <AdditionalIncludeDirectories>$(SolutionDir)Externals\maya/ver-2009/include;../Shared;$(SolutionDir)xrEngine;$(SolutionDir)utils/xrQSlim/src/;$(SolutionDir)Externals\MagicSoftware\FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Externals\maya/ver-2009/include;../Shared;$(SolutionDir)xrEngine;$(SolutionDir)utils/xrQSlim/src/;$(SolutionDir)Externals\FreeMagic\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NT_PLUGIN;_MAYA_EXPORT;_MAYA_PLUGIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>false</MinimalRebuild>
