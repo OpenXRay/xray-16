@@ -98,7 +98,7 @@
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(xrLibDir);$(xrSdkDir)libraries;$(SolutionDir)Externals\FreeImage\Dist\x32;$(SolutionDir)Externals\MagicSoftware\Sdk\Library\DebugDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(xrLibDir);$(xrSdkDir)libraries;$(SolutionDir)Externals\FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <MapExports>false</MapExports>
       <SubSystem>Windows</SubSystem>
       <StackReserveSize>0</StackReserveSize>
@@ -147,7 +147,7 @@
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(xrLibDir);$(xrSdkDir)libraries;$(SolutionDir)Externals\FreeImage\Dist\x32;$(SolutionDir)Externals\MagicSoftware\Sdk\Library\ReleaseDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(xrLibDir);$(xrSdkDir)libraries;$(SolutionDir)Externals\FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
       <StackReserveSize>0</StackReserveSize>
       <StackCommitSize>0</StackCommitSize>
@@ -195,7 +195,7 @@
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(xrLibDir);$(xrSdkDir)libraries;$(SolutionDir)Externals\FreeImage\Dist\x32;$(SolutionDir)Externals\MagicSoftware\Sdk\Library\ReleaseDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(xrLibDir);$(xrSdkDir)libraries;$(SolutionDir)Externals\FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <StackReserveSize>0</StackReserveSize>

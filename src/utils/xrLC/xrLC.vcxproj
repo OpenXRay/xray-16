@@ -106,7 +106,7 @@
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
       <ShowProgress>NotSet</ShowProgress>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(xrLibDir);$(xrSdkDir)libraries;$(SolutionDir)Externals\FreeImage\Dist\x32;$(SolutionDir)Externals\MagicSoftware\Sdk\Library\ReleaseDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(xrLibDir);$(xrSdkDir)libraries;$(SolutionDir)Externals\FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
       <OptimizeReferences>true</OptimizeReferences>
@@ -146,7 +146,7 @@
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(xrLibDir);$(xrSdkDir)libraries;$(SolutionDir)Externals\FreeImage\Dist\x32;$(SolutionDir)Externals\MagicSoftware\Sdk\Library\DebugDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(xrLibDir);$(xrSdkDir)libraries;$(SolutionDir)Externals\FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
       <StackReserveSize>2097152</StackReserveSize>
       <LargeAddressAware>true</LargeAddressAware>
@@ -191,7 +191,7 @@
     <Link>
       <ShowProgress>NotSet</ShowProgress>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(xrLibDir);$(xrSdkDir)libraries;$(SolutionDir)Externals\FreeImage\Dist\x32;$(SolutionDir)Externals\MagicSoftware\Sdk\Library\ReleaseDLL;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(xrLibDir);$(xrSdkDir)libraries;$(SolutionDir)Externals\FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <MapExports>false</MapExports>
       <SubSystem>Windows</SubSystem>
