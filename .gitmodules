@@ -43,3 +43,15 @@
 [submodule "src/Externals/FreeMagic"]
 	path = src/Externals/FreeMagic
 	url = https://github.com/OpenXRay/FreeMagic.git
+[submodule "src/Externals/lightwave"]
+	path = src/Externals/lightwave
+	url = https://github.com/OpenXRay/LightWave.git
+[submodule "src/Externals/3dsmax"]
+	path = src/Externals/3dsmax
+	url = https://github.com/OpenXRay/3dsmax.git
+[submodule "src/Externals/maya"]
+	path = src/Externals/maya
+	url = https://github.com/OpenXRay/maya.git
+[submodule "src/Externals/nvapi"]
+	path = src/Externals/nvapi
+	url = https://github.com/OpenXRay/nvapi.git

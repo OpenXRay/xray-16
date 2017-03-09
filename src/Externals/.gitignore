@@ -1,5 +1,0 @@
-# exclude third-party libraries (except submodules)
-3dsmax
-lightwave
-maya
-nvapi
