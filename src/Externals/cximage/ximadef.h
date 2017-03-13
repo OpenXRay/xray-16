@@ -98,10 +98,16 @@ typedef unsigned char  BYTE;
 typedef unsigned short WORD;
 typedef unsigned long  DWORD;
 typedef unsigned int   UINT;
+typedef const char* LPCTSTR;
 
 typedef DWORD          COLORREF;
 typedef unsigned int   HANDLE;
 typedef void*          HRGN;
+typedef void*          HDC;
+
+typedef int boolean;
+
+#define _tfopen fopen
 
 #ifndef BOOL
 #define	BOOL bool
