@@ -1,6 +1,6 @@
 // This code is in the public domain -- castanyo@yahoo.es
 
-#include <nvmath/Random.h>
+#include <Random.h>
 #include <time.h>
 
 using namespace nv;

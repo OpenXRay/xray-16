@@ -3,7 +3,7 @@
 #ifndef NV_MATH_SPHERICALHARMONIC_H
 #define NV_MATH_SPHERICALHARMONIC_H
 
-#include <nvmath/Vector.h>
+#include <Vector.h>
 
 namespace nv
 {

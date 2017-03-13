@@ -24,7 +24,7 @@
 #ifndef NV_IMAGE_PIXELFORMAT_H
 #define NV_IMAGE_PIXELFORMAT_H
 
-#include <nvimage/nvimage.h>
+#include <nvimage.h>
 
 
 namespace nv

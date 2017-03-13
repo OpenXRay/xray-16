@@ -3,9 +3,9 @@
 #ifndef NV_MATH_BASIS_H
 #define NV_MATH_BASIS_H
 
-#include <nvmath/nvmath.h>
-#include <nvmath/Vector.h>
-#include <nvmath/Matrix.h>
+#include <nvmath.h>
+#include <Vector.h>
+#include <Matrix.h>
 
 namespace nv
 {

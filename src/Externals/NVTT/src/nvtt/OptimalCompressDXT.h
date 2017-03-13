@@ -24,7 +24,7 @@
 #ifndef NV_TT_OPTIMALCOMPRESSDXT_H
 #define NV_TT_OPTIMALCOMPRESSDXT_H
 
-#include <nvimage/nvimage.h>
+#include <nvimage.h>
 
 namespace nv
 {

@@ -23,7 +23,7 @@
 
 #include <string.h> // memcpy
 
-#include <nvcore/Memory.h>
+#include <Memory.h>
 
 #include "nvtt.h"
 #include "InputOptions.h"

@@ -3,8 +3,8 @@
 #ifndef NV_MATH_VECTOR_H
 #define NV_MATH_VECTOR_H
 
-#include <nvmath/nvmath.h>
-#include <nvcore/Containers.h> // min, max
+#include <nvmath.h>
+#include <Containers.h> // min, max
 
 namespace nv
 {

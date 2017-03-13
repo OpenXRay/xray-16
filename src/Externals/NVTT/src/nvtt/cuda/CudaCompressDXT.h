@@ -24,8 +24,8 @@
 #ifndef NV_TT_CUDACOMPRESSDXT_H
 #define NV_TT_CUDACOMPRESSDXT_H
 
-#include <nvimage/nvimage.h>
-#include <nvtt/nvtt.h>
+#include <nvimage.h>
+#include <nvtt.h>
 
 namespace nv
 {

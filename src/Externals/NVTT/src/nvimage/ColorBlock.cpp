@@ -1,8 +1,8 @@
 // This code is in the public domain -- castanyo@yahoo.es
 
-#include <nvmath/Box.h>
-#include <nvimage/ColorBlock.h>
-#include <nvimage/Image.h>
+#include <Box.h>
+#include <ColorBlock.h>
+#include <Image.h>
 
 using namespace nv;
 

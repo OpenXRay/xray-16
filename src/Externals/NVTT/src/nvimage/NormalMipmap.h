@@ -3,7 +3,7 @@
 #ifndef NV_IMAGE_NORMALMIPMAP_H
 #define NV_IMAGE_NORMALMIPMAP_H
 
-#include <nvimage/nvimage.h>
+#include <nvimage.h>
 
 
 namespace nv

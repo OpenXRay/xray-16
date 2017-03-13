@@ -1,7 +1,7 @@
 // This code is in the public domain -- castanyo@yahoo.es
 
-#include <nvcore/Debug.h>
-#include <nvcore/StrLib.h>
+#include <Debug.h>
+#include <StrLib.h>
 
 // Extern
 #if NV_OS_WIN32 //&& NV_CC_MSVC
@@ -28,6 +28,8 @@
 #endif
 
 #if NV_OS_LINUX && defined(HAVE_EXECINFO_H)
+#	include <sys/types.h>
+#	include <unistd.h> // getpid
 #	include <execinfo.h> // backtrace
 #	if NV_CC_GNUC // defined(HAVE_CXXABI_H)
 #		include <cxxabi.h>

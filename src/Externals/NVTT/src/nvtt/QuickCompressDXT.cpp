@@ -21,10 +21,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#include <nvmath/Color.h>
+#include <Color.h>
 
-#include <nvimage/ColorBlock.h>
-#include <nvimage/BlockDXT.h>
+#include <ColorBlock.h>
+#include <BlockDXT.h>
 
 #include "QuickCompressDXT.h"
 #include "OptimalCompressDXT.h"

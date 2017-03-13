@@ -24,7 +24,7 @@
 #ifndef NV_TT_QUICKCOMPRESSDXT_H
 #define NV_TT_QUICKCOMPRESSDXT_H
 
-#include <nvimage/nvimage.h>
+#include <nvimage.h>
 
 namespace nv
 {

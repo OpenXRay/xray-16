@@ -3,7 +3,7 @@
 #ifndef NV_CORE_DEBUG_H
 #define NV_CORE_DEBUG_H
 
-#include <nvcore/nvcore.h>
+#include <nvcore.h>
 
 #if defined(HAVE_STDARG_H)
 #	include <stdarg.h>	// va_list

@@ -24,9 +24,9 @@
 #ifndef NV_TT_COMPRESSOR_H
 #define NV_TT_COMPRESSOR_H
 
-#include <nvcore/Ptr.h>
+#include <Ptr.h>
 
-#include <nvtt/cuda/CudaCompressDXT.h>
+#include <cuda/CudaCompressDXT.h>
 
 #include "nvtt.h"
 

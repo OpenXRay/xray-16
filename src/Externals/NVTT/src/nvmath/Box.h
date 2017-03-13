@@ -3,7 +3,7 @@
 #ifndef NV_MATH_BOX_H
 #define NV_MATH_BOX_H
 
-#include <nvmath/Vector.h>
+#include <Vector.h>
 
 #include <float.h> // FLT_MAX
 

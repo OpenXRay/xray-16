@@ -1,5 +1,5 @@
 
-#include <nvimage/Filter.h>
+#include <Filter.h>
 #include "../tools/cmdline.h"
 
 #include <math.h>

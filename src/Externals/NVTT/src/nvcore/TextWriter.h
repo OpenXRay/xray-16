@@ -3,9 +3,9 @@
 #ifndef NVCORE_TEXTWRITER_H
 #define NVCORE_TEXTWRITER_H
 
-#include <nvcore/nvcore.h>
-#include <nvcore/Stream.h>
-#include <nvcore/StrLib.h>
+#include <nvcore.h>
+#include <Stream.h>
+#include <StrLib.h>
 
 namespace nv
 {

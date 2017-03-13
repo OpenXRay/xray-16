@@ -3,8 +3,8 @@
 #ifndef NV_IMAGE_HOLEFILLING_H
 #define NV_IMAGE_HOLEFILLING_H
 
-#include <nvcore/BitArray.h>
-#include <nvimage/nvimage.h>
+#include <BitArray.h>
+#include <nvimage.h>
 
 namespace nv 
 {

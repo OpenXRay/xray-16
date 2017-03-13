@@ -12,7 +12,7 @@
 #ifndef NV_CORE_RADIXSORT_H
 #define NV_CORE_RADIXSORT_H
 
-#include <nvcore/nvcore.h>
+#include <nvcore.h>
 
 
 #define RADIX_LOCAL_RAM

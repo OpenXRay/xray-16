@@ -1,6 +1,6 @@
 /********************************************************/
 /* AABB-triangle overlap test code                      */
-/* by Tomas Akenine-Möller                              */
+/* by Tomas Akenine-Mï¿½ller                              */
 /* Function: int triBoxOverlap(float boxcenter[3],      */
 /*          float boxhalfsize[3],float triverts[3][3]); */
 /* History:                                             */
@@ -12,8 +12,8 @@
 /* Thanks to David Hunt for finding a ">="-bug!         */
 /********************************************************/
 
-#include <nvmath/Vector.h>
-#include <nvmath/Triangle.h>
+#include <Vector.h>
+#include <Triangle.h>
 
 using namespace nv;
 
