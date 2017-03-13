@@ -11,7 +11,7 @@
 
 #define XMD_H
 #define HAVE_BOOLEAN
-#include <jpeg/jmorecfg.h>
+#include <jmorecfg.h>
 #undef HAVE_BOOLEAN
 #undef XMD_H
 
