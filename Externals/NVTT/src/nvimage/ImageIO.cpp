@@ -1,13 +1,13 @@
 // This code is in the public domain -- castanyo@yahoo.es
 
-#include <nvcore/Ptr.h>
-#include <nvcore/Containers.h>
-#include <nvcore/StrLib.h>
-#include <nvcore/StdStream.h>
+#include <Ptr.h>
+#include <Containers.h>
+#include <StrLib.h>
+#include <StdStream.h>
 
-#include <nvcore/TextWriter.h>
+#include <TextWriter.h>
 
-#include <nvmath/Color.h>
+#include <Color.h>
 
 #include "ImageIO.h"
 #include "Image.h"

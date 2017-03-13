@@ -16,9 +16,9 @@ Do not use memmove in insert & remove, use copy ctors instead.
 
 
 // nvcore
-#include <nvcore/nvcore.h>
-#include <nvcore/Memory.h>
-#include <nvcore/Debug.h>
+#include <nvcore.h>
+#include <Memory.h>
+#include <Debug.h>
 
 #include <string.h>	// memmove
 #include <new>		// for placement new

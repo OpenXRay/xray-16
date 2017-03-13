@@ -21,8 +21,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#include <nvcore/Debug.h>
-#include <nvcore/Library.h>
+#include <Debug.h>
+#include <Library.h>
 #include "CudaUtils.h"
 
 #if defined HAVE_CUDA

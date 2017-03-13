@@ -3,8 +3,8 @@
 #ifndef NV_CORE_STRING_H
 #define NV_CORE_STRING_H
 
-#include <nvcore/nvcore.h>
-#include <nvcore/Containers.h>	// swap
+#include <nvcore.h>
+#include <Containers.h>	// swap
 
 #include <string.h> // strlen, strcmp, etc.
 

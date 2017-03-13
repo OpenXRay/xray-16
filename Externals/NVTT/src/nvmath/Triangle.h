@@ -3,9 +3,9 @@
 #ifndef NV_MATH_TRIANGLE_H
 #define NV_MATH_TRIANGLE_H
 
-#include <nvmath/nvmath.h>
-#include <nvmath/Vector.h>
-#include <nvmath/Box.h>
+#include <nvmath.h>
+#include <Vector.h>
+#include <Box.h>
 
 namespace nv
 {

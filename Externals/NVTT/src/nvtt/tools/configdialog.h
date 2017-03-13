@@ -28,7 +28,7 @@
 
 #include "ui_configdialog.h"
 
-#include <nvtt/nvtt.h>
+#include <nvtt.h>
 
 
 class ConfigDialog : public QDialog

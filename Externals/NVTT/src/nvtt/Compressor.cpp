@@ -21,20 +21,20 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#include <nvtt/nvtt.h>
+#include <nvtt.h>
 
-#include <nvcore/Memory.h>
-#include <nvcore/Ptr.h>
+#include <Memory.h>
+#include <Ptr.h>
 
-#include <nvimage/DirectDrawSurface.h>
-#include <nvimage/ColorBlock.h>
-#include <nvimage/BlockDXT.h>
-#include <nvimage/Image.h>
-#include <nvimage/FloatImage.h>
-#include <nvimage/Filter.h>
-#include <nvimage/Quantize.h>
-#include <nvimage/NormalMap.h>
-#include <nvimage/PixelFormat.h>
+#include <DirectDrawSurface.h>
+#include <ColorBlock.h>
+#include <BlockDXT.h>
+#include <Image.h>
+#include <FloatImage.h>
+#include <Filter.h>
+#include <Quantize.h>
+#include <NormalMap.h>
+#include <PixelFormat.h>
 
 #include "Compressor.h"
 #include "InputOptions.h"

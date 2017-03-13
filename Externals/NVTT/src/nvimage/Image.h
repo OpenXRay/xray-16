@@ -3,8 +3,8 @@
 #ifndef NV_IMAGE_IMAGE_H
 #define NV_IMAGE_IMAGE_H
 
-#include <nvcore/Debug.h>
-#include <nvimage/nvimage.h>
+#include <Debug.h>
+#include <nvimage.h>
 
 namespace nv
 {

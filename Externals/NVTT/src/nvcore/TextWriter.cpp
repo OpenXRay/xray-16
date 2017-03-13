@@ -1,6 +1,6 @@
 // This code is in the public domain -- castanyo@yahoo.es
 
-#include <nvcore/TextWriter.h>
+#include <TextWriter.h>
 
 using namespace nv;
 

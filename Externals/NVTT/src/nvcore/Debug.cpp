@@ -1,7 +1,7 @@
 // This code is in the public domain -- castanyo@yahoo.es
 
-#include <nvcore/Debug.h>
-#include <nvcore/StrLib.h>
+#include <Debug.h>
+#include <StrLib.h>
 
 // Extern
 #if NV_OS_WIN32 //&& NV_CC_MSVC

@@ -21,11 +21,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#include <nvcore/Debug.h>
+#include <Debug.h>
 
-#include <nvimage/Image.h>
-#include <nvimage/PixelFormat.h>
-#include <nvmath/Color.h>
+#include <Image.h>
+#include <PixelFormat.h>
+#include <Color.h>
 
 #include "CompressRGB.h"
 #include "CompressionOptions.h"

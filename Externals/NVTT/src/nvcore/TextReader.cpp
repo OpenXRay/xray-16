@@ -1,6 +1,6 @@
 // This code is in the public domain -- castanyo@yahoo.es
 
-#include <nvcore/TextReader.h>
+#include <TextReader.h>
 
 using namespace nv;
 

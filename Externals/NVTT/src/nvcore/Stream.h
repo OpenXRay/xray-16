@@ -3,8 +3,8 @@
 #ifndef NVCORE_STREAM_H
 #define NVCORE_STREAM_H
 
-#include <nvcore/nvcore.h>
-#include <nvcore/Debug.h>
+#include <nvcore.h>
+#include <Debug.h>
 
 namespace nv
 {

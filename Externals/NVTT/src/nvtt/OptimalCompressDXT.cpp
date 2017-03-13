@@ -21,12 +21,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
 
-#include <nvcore/Containers.h> // swap
+#include <Containers.h> // swap
 
-#include <nvmath/Color.h>
+#include <Color.h>
 
-#include <nvimage/ColorBlock.h>
-#include <nvimage/BlockDXT.h>
+#include <ColorBlock.h>
+#include <BlockDXT.h>
 
 #include "OptimalCompressDXT.h"
 #include "SingleColorLookup.h"

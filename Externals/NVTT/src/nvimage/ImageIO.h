@@ -3,7 +3,7 @@
 #ifndef NV_IMAGE_IMAGEIO_H
 #define NV_IMAGE_IMAGEIO_H
 
-#include <nvimage/nvimage.h>
+#include <nvimage.h>
 
 namespace nv
 {

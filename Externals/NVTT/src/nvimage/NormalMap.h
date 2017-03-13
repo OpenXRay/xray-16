@@ -24,9 +24,9 @@
 #ifndef NV_IMAGE_NORMALMAP_H
 #define NV_IMAGE_NORMALMAP_H
 
-#include <nvmath/Vector.h>
-#include <nvimage/nvimage.h>
-#include <nvimage/FloatImage.h>
+#include <Vector.h>
+#include <nvimage.h>
+#include <FloatImage.h>
 
 
 namespace nv

@@ -3,7 +3,7 @@
 #ifndef NV_IMAGE_COLORBLOCK_H
 #define NV_IMAGE_COLORBLOCK_H
 
-#include <nvmath/Color.h>
+#include <Color.h>
 
 namespace nv
 {

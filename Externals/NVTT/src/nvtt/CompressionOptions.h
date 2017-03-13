@@ -24,8 +24,8 @@
 #ifndef NV_TT_COMPRESSIONOPTIONS_H
 #define NV_TT_COMPRESSIONOPTIONS_H
 
-#include <nvcore/StrLib.h>
-#include <nvmath/Vector.h>
+#include <StrLib.h>
+#include <Vector.h>
 #include "nvtt.h"
 
 namespace nvtt

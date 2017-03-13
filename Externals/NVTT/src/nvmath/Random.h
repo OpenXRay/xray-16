@@ -3,8 +3,8 @@
 #ifndef NV_MATH_RANDOM_H
 #define NV_MATH_RANDOM_H
 
-#include <nvcore/Containers.h> // nextPowerOfTwo
-#include <nvmath/nvmath.h>
+#include <Containers.h> // nextPowerOfTwo
+#include <nvmath.h>
 
 namespace nv
 {
