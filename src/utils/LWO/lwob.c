@@ -79,7 +79,7 @@ static int add_clip(char* s, lwClip** clist, int* nclips)
         clip->source.still.name = s;
     }
 
-    *nclips++;
+    (*nclips)++;
     clip->index = *nclips;
 
     lwListAdd(clist, clip);
