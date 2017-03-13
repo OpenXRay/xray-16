@@ -26,7 +26,7 @@ XRCORE_API extern u64 qpc_freq;
 XRCORE_API extern u64 qpc_overhead;
 XRCORE_API extern u32 qpc_counter;
 
-XRCORE_API extern _processor_info ID;
+XRCORE_API extern processor_info ID;
 XRCORE_API extern u64 QPC();
 
 #ifdef M_VISUAL

@@ -1,39 +1,51 @@
 #ifndef _INC_CPUID
 #define _INC_CPUID
 
-#define _CPU_FEATURE_MMX 0x0001
-#define _CPU_FEATURE_SSE 0x0002
-#define _CPU_FEATURE_SSE2 0x0004
-#define _CPU_FEATURE_3DNOW 0x0008
+#ifdef WINDOWS
+#include <intrin.h>
+#else // POSIX
+#include <unistd.h>
+#include <cpuid.h>
+#define _GNU_SOURCE
+#include <sched.h>
+#endif // WINDOWS
+#include <thread>
 
-#define _CPU_FEATURE_SSE3 0x0010
-#define _CPU_FEATURE_SSSE3 0x0020
-#define _CPU_FEATURE_SSE4_1 0x0040
-#define _CPU_FEATURE_SSE4_2 0x0080
-
-#define _CPU_FEATURE_MWAIT 0x0100
-#define _CPU_FEATURE_HTT 0x0200
-
-struct _processor_info
+enum class CpuFeature : u32
 {
-    char v_name[13]; // vendor name
-    char model_name[49]; // Name of model eg. Intel_Pentium_Pro
-
-    unsigned char family; // family of the processor, eg. Intel_Pentium_Pro is family 6 processor
-    unsigned char model; // model of processor, eg. Intel_Pentium_Pro is model 1 of family 6 processor
-    unsigned char stepping; // Processor revision number
-
-    unsigned int feature; // processor Feature ( same as return value).
-
-    unsigned int n_cores; // number of available physical cores
-    unsigned int n_threads; // number of available logical threads
-
-    unsigned int affinity_mask; // recommended affinity mask
-    // all processors available to process
-    // except 2nd (and upper) logical threads
-    // of the same physical core
+    FEATURE_MMX = 0x0001,
+    FEATURE_SSE = 0x0002,
+    FEATURE_SSE2 = 0x0004,
+    FEATURE_3DNOW = 0x0008,
+    FEATURE_SSE3 = 0x0010,
+    FEATURE_SSSE3 = 0x0020,
+    FEATURE_SSE41 = 0x0040,
+    FEATURE_SSE42 = 0x0080,
+    FEATURE_MWAIT = 0x1000,
+    FEATURE_HT = 0x0200
 };
 
-int _cpuid(_processor_info*);
+struct processor_info {
+    string32 vendor; // Vendor name
+    string64 modelName; // Name of model
 
-#endif
+    unsigned char family; // Family of the processor
+    unsigned char model; // Model of processor
+    unsigned char stepping; // Processor revision number
+
+    unsigned int features; // Processor Features
+
+    unsigned int n_cores; // Number of available physical cores
+    unsigned int n_threads; // Number of available logical threads
+
+    unsigned int affinity_mask; // Recommended affinity mask
+
+    bool hasFeature(const CpuFeature feature) const noexcept
+    {
+        return features & static_cast<u32>(feature);
+    }
+};
+
+unsigned int query_processor_info(processor_info*);
+
+#endif // _INC_CPUID

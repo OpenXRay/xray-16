@@ -105,7 +105,7 @@ void SetThreadName(DWORD dwThreadID, LPCSTR szThreadName)
     }
 }
 
-int ttapi_Init(const _processor_info& pi)
+int ttapi_Init(const processor_info& pi)
 {
     if (ttapi_initialized)
         return ttapi_worker_count;
