@@ -1,9 +1,9 @@
 [submodule "src/Externals/luabind"]
 	path = src/Externals/luabind
-	url = https://github.com/OpenXRay/luabind-deboostified.git
+	url = https://github.com/vincent-t/luabind-deboostified.git
 [submodule "src/Externals/luajit"]
 	path = src/Externals/luajit
-	url = https://github.com/OpenXRay/LuaJIT.git
+	url = https://github.com/vincent-t/LuaJIT.git
 [submodule "src/Externals/GameSpy"]
 	path = src/Externals/GameSpy
 	url = https://github.com/nitrocaster/GameSpy.git
