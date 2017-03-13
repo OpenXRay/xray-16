@@ -26,6 +26,8 @@
 #define DOSWIN32
 #define _WIN32_DCOM
 
+#define STUBBED(txt) do {} while (0)
+
 #pragma warning(push)
 #pragma warning(disable : 4005) // macro redefinition
 #include <windows.h>
