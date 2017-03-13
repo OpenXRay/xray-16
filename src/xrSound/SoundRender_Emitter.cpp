@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "soundrender_emitter.h"
-#include "soundrender_core.h"
-#include "soundrender_source.h"
-#include "soundrender_targetA.h"
+#include "SoundRender_Emitter.h"
+#include "SoundRender_Core.h"
+#include "SoundRender_Source.h"
+#include "SoundRender_TargetA.h"
 
 extern u32 psSoundModel;
 extern float psSoundVEffects;

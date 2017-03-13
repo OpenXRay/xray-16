@@ -14,11 +14,11 @@
 #pragma comment(lib, "EToolsB.lib")
 #pragma comment(lib, "OpenAL32B.lib")
 #pragma comment(lib, "dsoundb.lib")
-//#	pragma comment(lib,	"xrapi.lib" 		)
+//#pragma comment(lib, "xrAPI.lib")
 #else
 #pragma comment(lib, "eax.lib")
 #pragma comment(lib, "xrCore.lib")
 #pragma comment(lib, "xrCDB.lib")
 #pragma comment(lib, "dsound.lib")
-#pragma comment(lib, "xrapi.lib")
+#pragma comment(lib, "xrAPI.lib")
 #endif

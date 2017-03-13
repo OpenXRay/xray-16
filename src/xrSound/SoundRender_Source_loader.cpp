@@ -3,8 +3,8 @@
 
 #include <msacm.h>
 
-#include "soundrender_core.h"
-#include "soundrender_source.h"
+#include "SoundRender_Core.h"
+#include "SoundRender_Source.h"
 
 //	SEEK_SET	0	File beginning
 //	SEEK_CUR	1	Current file pointer position

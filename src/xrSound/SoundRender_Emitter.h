@@ -2,8 +2,8 @@
 #define SoundRender_EmitterH
 #pragma once
 
-#include "soundrender.h"
-#include "soundrender_environment.h"
+#include "SoundRender.h"
+#include "SoundRender_Environment.h"
 
 class CSoundRender_Emitter : public CSound_emitter
 {

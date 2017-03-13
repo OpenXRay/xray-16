@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "soundrender_coreA.h"
-#include "soundrender_targetA.h"
+#include "SoundRender_CoreA.h"
+#include "SoundRender_TargetA.h"
 
 CSoundRender_CoreA* SoundRenderA = 0;
 

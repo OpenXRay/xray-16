@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "soundrender.h"
-#include "soundrender_environment.h"
+#include "SoundRender.h"
+#include "SoundRender_Environment.h"
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #include <eax/eax.h>

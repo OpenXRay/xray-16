@@ -2,7 +2,7 @@
 #define SoundRender_TargetH
 #pragma once
 
-#include "soundrender.h"
+#include "SoundRender.h"
 
 class CSoundRender_Target
 {

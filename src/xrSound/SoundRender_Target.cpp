@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "soundrender_target.h"
-#include "soundrender_core.h"
-#include "soundrender_emitter.h"
-#include "soundrender_source.h"
+#include "SoundRender_Target.h"
+#include "SoundRender_Core.h"
+#include "SoundRender_Emitter.h"
+#include "SoundRender_Source.h"
 
 CSoundRender_Target::CSoundRender_Target(void)
 {

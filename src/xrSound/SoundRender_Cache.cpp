@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include ".\soundrender_cache.h"
+#include "SoundRender_Cache.h"
 
 CSoundRender_Cache::CSoundRender_Cache()
 {
@@ -80,7 +80,7 @@ BOOL CSoundRender_Cache::request(cache_cat& cat, u32 id)
 
 void CSoundRender_Cache::initialize(u32 _total_kb_approx, u32 bytes_per_line)
 {
-    // use twice the requisted memory (to avoid bad configs)
+    // use twice the requested memory (to avoid bad configs)
     _total_kb_approx *= 2;
 
     // calc

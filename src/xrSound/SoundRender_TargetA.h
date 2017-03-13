@@ -2,8 +2,8 @@
 #define SoundRender_TargetAH
 #pragma once
 
-#include "soundrender_Target.h"
-#include "soundrender_CoreA.h"
+#include "Soundrender_Target.h"
+#include "Soundrender_CoreA.h"
 
 class CSoundRender_TargetA : public CSoundRender_Target
 {
