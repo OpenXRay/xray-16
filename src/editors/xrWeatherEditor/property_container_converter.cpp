@@ -28,8 +28,7 @@ PropertyDescriptorCollection ^ property_container_converter::GetProperties(
     {
         ArrayList % properties = container->ordered_properties();
         ArrayList ^ names = gcnew ArrayList();
-        for
-            each(PropertySpec ^ i in properties) names->Add(i->Name);
+        for each(PropertySpec ^ i in properties) names->Add(i->Name);
 
         return (current->Sort(reinterpret_cast<array<String ^> ^>(names->ToArray(String::typeid))));
     }
@@ -41,8 +40,7 @@ PropertyDescriptorCollection ^ property_container_converter::GetProperties(
     container = safe_cast<property_container ^>(objects->GetValue(0));
     ArrayList % properties = container->ordered_properties();
     ArrayList ^ names = gcnew ArrayList();
-    for
-        each(PropertySpec ^ i in properties) names->Add(i->Name);
+    for each(PropertySpec ^ i in properties) names->Add(i->Name);
 
     return (current->Sort(reinterpret_cast<array<String ^> ^>(names->ToArray(String::typeid))));
 }

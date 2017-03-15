@@ -27,14 +27,13 @@ property_float_enum_value::property_float_enum_value(
 System::Object ^ property_float_enum_value::GetValue()
 {
     float value = safe_cast<float>(inherited::GetValue());
-    for
-        each(ValuePair ^ i in m_collection)
-        {
-            if (i->first != value)
-                continue;
+    for each(ValuePair ^ i in m_collection)
+    {
+        if (i->first != value)
+            continue;
 
-            return (value);
-        }
+        return (value);
+    }
 
     return (safe_cast<ValuePair ^>(m_collection[0])->first);
 }
@@ -43,15 +42,14 @@ void property_float_enum_value::SetValue(Object ^ object)
 {
     String ^ string_value = dynamic_cast<String ^>(object);
 
-    for
-        each(ValuePair ^ i in m_collection)
-        {
-            if (!i->second->Equals(string_value))
-                continue;
+    for each(ValuePair ^ i in m_collection)
+    {
+        if (!i->second->Equals(string_value))
+            continue;
 
-            inherited::SetValue(i->first);
-            return;
-        }
+        inherited::SetValue(i->first);
+        return;
+    }
 
     inherited::SetValue(safe_cast<ValuePair ^>(m_collection[0])->first);
 }

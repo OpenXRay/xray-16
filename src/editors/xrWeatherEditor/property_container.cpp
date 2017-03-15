@@ -78,18 +78,17 @@ bool property_container::equal_category(String ^ new_category, String ^ old_cate
 
 String ^ property_container::update_categories(String ^ new_category)
 {
-    for
-        each(PropertySpec ^ i in m_ordered_properties)
-        {
-            String ^ category = i->Category;
-            if (!equal_category(new_category, category))
-                continue;
+    for each(PropertySpec ^ i in m_ordered_properties)
+    {
+        String ^ category = i->Category;
+        if (!equal_category(new_category, category))
+            continue;
 
-            return (category);
-        }
+        return (category);
+    }
 
-    for
-        each(PropertySpec ^ i in m_ordered_properties) i->Category = "\t" + i->Category;
+    for each(PropertySpec ^ i in m_ordered_properties)
+        i->Category = "\t" + i->Category;
 
     return (new_category);
 }
@@ -128,21 +127,19 @@ void property_container::try_update_name(PropertySpec ^ description, String ^ na
 void property_container::update_names(String ^ name)
 {
     bool found = false;
-    for
-        each(PropertySpec ^ i in m_ordered_properties)
-        {
-            if (i->Name != name)
-                continue;
+    for each(PropertySpec ^ i in m_ordered_properties)
+    {
+        if (i->Name != name)
+            continue;
 
-            found = true;
-            break;
-        }
+        found = true;
+        break;
+    }
 
     if (!found)
         return;
 
-    for
-        each(PropertySpec ^ i in m_ordered_properties) try_update_name(i, name);
+    for each(PropertySpec ^ i in m_ordered_properties) try_update_name(i, name);
 }
 
 void property_container::add_property(PropertySpec ^ description, IProperty ^ value)

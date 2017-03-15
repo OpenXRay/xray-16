@@ -55,14 +55,13 @@ Object ^ property_converter_float_enum::ConvertTo(
     property_float_enum_value ^ real_value = safe_cast<property_float_enum_value ^>(raw_value);
     float float_value = safe_cast<float>(value);
 
-    for
-        each(ValuePair ^ i in real_value->m_collection)
-        {
-            if (i->first != float_value)
-                continue;
+    for each(ValuePair ^ i in real_value->m_collection)
+    {
+        if (i->first != float_value)
+            continue;
 
-            return (i->second);
-        }
+        return (i->second);
+    }
 
     return (safe_cast<ValuePair ^>(real_value->m_collection[0])->second);
 }
