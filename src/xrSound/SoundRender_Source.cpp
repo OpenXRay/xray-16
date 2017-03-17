@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "soundrender_core.h"
-#include "soundrender_source.h"
+#include "SoundRender_Core.h"
+#include "SoundRender_Source.h"
 
 CSoundRender_Source::CSoundRender_Source()
 {

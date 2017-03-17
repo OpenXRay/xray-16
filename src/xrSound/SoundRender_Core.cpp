@@ -2,9 +2,9 @@
 #pragma hdrstop
 
 #include "Common/LevelStructure.hpp"
-#include "soundrender_core.h"
-#include "soundrender_source.h"
-#include "soundrender_emitter.h"
+#include "SoundRender_Core.h"
+#include "SoundRender_Source.h"
+#include "SoundRender_Emitter.h"
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #include <eax/eax.h>

@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #pragma hdrstop
 
-#include "soundrender_TargetA.h"
-#include "soundrender_emitter.h"
-#include "soundrender_source.h"
+#include "SoundRender_TargetA.h"
+#include "SoundRender_Emitter.h"
+#include "SoundRender_Source.h"
 
 xr_vector<u8> g_target_temp_data;
 
