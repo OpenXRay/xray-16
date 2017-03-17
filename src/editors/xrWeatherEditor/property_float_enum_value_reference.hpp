@@ -29,7 +29,7 @@ public:
     property_float_enum_value_reference(float& value, pair* values, u32 const& value_count);
     virtual Object ^ GetValue() override;
     virtual void SetValue(Object ^ object) override;
-    virtual void increment(float const % increment) override;
+    virtual void Increment(float const % increment) override;
 
 public:
     collection_type ^ m_collection;

@@ -41,27 +41,25 @@ void window_tree_values::values(property_string_values_value_base::collection_ty
 
     TreeNode ^ selected = nullptr;
 
-    for
-        each(String ^ i in values)
+    for each(String ^ i in values)
+    {
+        TreeNode ^ current = nullptr;
+        String ^ j = i;
+        while (j->Length)
         {
-            TreeNode ^ current = nullptr;
-            String ^ j = i;
-            while (j->Length)
+            int index = j->IndexOf('\\');
+            String ^ k = index < 0 ? j : j->Substring(0, index);
+            j = index < 0 ? "" : j->Substring(index + 1);
+            if (!current)
             {
-                int index = j->IndexOf('\\');
-                String ^ k = index < 0 ? j : j->Substring(0, index);
-                j = index < 0 ? "" : j->Substring(index + 1);
-                if (!current)
+                for each(TreeNode ^ i in TreeView->Nodes)
                 {
-                for
-                    each(TreeNode ^ i in TreeView->Nodes)
-                    {
-                        if (i->Text != k)
-                            continue;
+                    if (i->Text != k)
+                        continue;
 
-                        current = i;
-                        break;
-                    }
+                    current = i;
+                    break;
+                }
 
                 if (current)
                     continue;
@@ -70,33 +68,32 @@ void window_tree_values::values(property_string_values_value_base::collection_ty
                 current->ImageIndex = 0;
                 current->SelectedImageIndex = 0;
                 continue;
-                }
+            }
 
-                bool found = false;
-            for
-                each(TreeNode ^ i in current->Nodes)
-                {
-                    if (i->Text != k)
-                        continue;
+            bool found = false;
+            for each(TreeNode ^ i in current->Nodes)
+            {
+                if (i->Text != k)
+                    continue;
 
-                    found = true;
-                    current = i;
-                    break;
-                }
+                found = true;
+                current = i;
+                break;
+            }
             if (!found)
             {
                 current->ImageIndex = 0;
                 current->SelectedImageIndex = 0;
                 current = current->Nodes->Add(k);
             }
-            }
-
-            if (current->FullPath == current_value)
-                selected = current;
-
-            current->ImageIndex = 2;
-            current->SelectedImageIndex = 2;
         }
+
+        if (current->FullPath == current_value)
+            selected = current;
+
+        current->ImageIndex = 2;
+        current->SelectedImageIndex = 2;
+    }
 
     TreeView->TreeViewNodeSorter = gcnew NodeSorter();
     TreeView->Sort();
