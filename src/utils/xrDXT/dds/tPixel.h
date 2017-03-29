@@ -50,8 +50,6 @@ inline size_t calcMaxMipmap(size_t w, size_t h)
 {
     size_t n = 0;
     size_t count = 0;
-    assert(w >= 0);
-    assert(h >= 0);
     count = w > h ? w : h;
     while (count)
     {
@@ -65,9 +63,6 @@ inline size_t calcMaxMipmap(size_t w, size_t h, size_t d)
 {
     size_t n = 0;
     size_t count = 0;
-    assert(w >= 0);
-    assert(h >= 0);
-    assert(d >= 0);
     count = w > h ? w : h;
     if (d > count)
         count = d;
