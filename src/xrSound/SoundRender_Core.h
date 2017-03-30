@@ -5,7 +5,6 @@
 #include "SoundRender.h"
 #include "SoundRender_Environment.h"
 #include "SoundRender_Cache.h"
-#include "soundrender_environment.h"
 
 class CSoundRender_Core : public CSound_manager_interface
 {
