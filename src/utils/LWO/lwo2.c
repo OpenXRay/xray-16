@@ -11,6 +11,7 @@ Ernie Wright  17 Sep 00
 #include <stdlib.h>
 #include "lwo2.h"
 
+#pragma warning(push)
 #pragma warning(disable : 4996)
 
 /*
@@ -299,4 +300,4 @@ Fail:
     return NULL;
 }
 
-#pragma warning(default : 4996)
+#pragma warning(pop)

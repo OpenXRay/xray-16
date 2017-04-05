@@ -2,12 +2,13 @@
 #pragma hdrstop
 
 #include "LocatorAPI_defs.h"
+#pragma warning(push)
 #pragma warning(disable : 4995)
 #include <io.h>
 #include <direct.h>
 #include <fcntl.h>
 #include <sys\stat.h>
-#pragma warning(default : 4995)
+#pragma warning(pop)
 
 //////////////////////////////////////////////////////////////////////
 // FS_File

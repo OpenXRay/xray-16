@@ -8,11 +8,12 @@
 #define D3D_DEBUG_INFO
 #endif
 
+#pragma warning(push)
 #pragma warning(disable : 4995)
 #include "xrEngine/stdafx.h"
-#pragma warning(disable : 4995)
 #include <d3dx9.h>
-#pragma warning(default : 4995)
+#pragma warning(pop)
+
 #pragma warning(disable : 4714)
 #pragma warning(4 : 4018)
 #pragma warning(4 : 4244)

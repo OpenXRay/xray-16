@@ -15,15 +15,16 @@
 #include "xrCore/animation/Bone.hpp"
 #include "xrEngine/GameMtlLib.h"
 
+//#pragma warning(push)
 //#pragma warning(disable:4995)
 //#pragma warning(disable:4267)
 
-//#pragma warning(default:4995)
-//#pragma warning(default:4267)
+//#pragma warning(pop)
 ///////////////////////////////////////////////////////////////
+//#pragma warning(push)
 ///#pragma warning(disable:4995)
 
-//#pragma warning(default:4995)
+//#pragma warning(pop)
 ///////////////////////////////////////////////////////////////////
 
 #include "ExtendedGeom.h"

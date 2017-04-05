@@ -1,5 +1,6 @@
 #pragma once
 
+#pragma warning(push)
 #pragma warning(disable : 4995)
 #pragma warning(disable : 4267)
 #include "Externals/ode/include/ode/common.h"
@@ -114,5 +115,4 @@ float E_NL(dBodyID b1, dBodyID b2, const dReal* norm);
 
 float E_NlS(dBodyID body, const dReal* norm, float norm_sign); // if body c.geom.g1 norm_sign + else -
 
-#pragma warning(default : 4995)
-#pragma warning(default : 4267)
+#pragma warning(pop)

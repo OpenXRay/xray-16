@@ -8,6 +8,7 @@
 #define XRSCRIPTENGINE_API XR_IMPORT
 #endif
 
+#pragma warning(push)
 #pragma warning(disable : 4244)
 #pragma warning(disable : 4995)
 #pragma warning(disable : 4267)
@@ -35,14 +36,4 @@ extern "C" {
 #include <luabind/out_value_policy.hpp>
 #include <luabind/iterator_policy.hpp>
 
-#pragma warning(default : 4127)
-#pragma warning(default : 4456)
-#pragma warning(default : 4458)
-#pragma warning(default : 4459)
-#pragma warning(default : 4913)
-#pragma warning(default : 4297)
-
-#pragma warning(default : 4244)
-#pragma warning(default : 4995)
-#pragma warning(default : 4267)
-#pragma warning(default : 4100)
+#pragma warning(pop)

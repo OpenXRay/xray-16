@@ -10,10 +10,11 @@
 
 #include "xrCore/xrCore.h"
 
+#pragma warning(push)
 #pragma warning(disable : 4995)
 #include <d3dx9.h>
 #include <commctrl.h>
-#pragma warning(default : 4995)
+#pragma warning(pop)
 
 #define ENGINE_API
 #define ECORE_API

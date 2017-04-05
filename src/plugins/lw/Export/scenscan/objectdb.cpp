@@ -9,6 +9,7 @@ Functions for creating an object database.
 #include "objectdb.h"
 #include "vecmat.h"
 
+#pragma warning(push)
 #pragma warning(disable : 4995)
 
 /*
@@ -486,4 +487,4 @@ int printObjectDB(ObjectDB* odb, FILE* fp, int c)
     return 1;
 }
 
-#pragma warning(default : 4995)
+#pragma warning(pop)

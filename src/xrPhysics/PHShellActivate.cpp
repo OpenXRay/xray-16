@@ -12,9 +12,10 @@
 #include "Include/xrRender/Kinematics.h"
 
 ///////////////////////////////////////////////////////////////
+//#pragma warning(push)
 ///#pragma warning(disable:4995)
 
-//#pragma warning(default:4995)
+//#pragma warning(pop)
 ///////////////////////////////////////////////////////////////////
 
 #include "ExtendedGeom.h"

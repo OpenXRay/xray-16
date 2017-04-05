@@ -9,6 +9,7 @@ surface.c
 #include "objectdb.h"
 #include <lwhost.h>
 
+#pragma warning(push)
 #pragma warning(disable : 4995)
 
 extern "C" LWMessageFuncs* g_msg;
@@ -231,4 +232,4 @@ int getObjectSurfs(ObjectDB* odb, LWMeshInfo* mesh, GlobalFunc* global)
     return 1;
 }
 
-#pragma warning(default : 4995)
+#pragma warning(pop)

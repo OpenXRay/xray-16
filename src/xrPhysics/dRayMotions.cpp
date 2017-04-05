@@ -2,17 +2,12 @@
 #include "dCylinder/dCylinder.h"
 struct dContactGeom;
 int dCollideCylRay(dxGeom* o1, dxGeom* o2, int flags, dContactGeom* contact, int skip);
-//#pragma warning(disable:4995)
-//#pragma warning(disable:4267)
 
-//#pragma warning(default:4995)
-//#pragma warning(default:4267)
-
+#pragma warning(push)
 #pragma warning(disable : 4995)
 #pragma warning(disable : 4267)
 #include "Externals/ode/ode/src/collision_std.h"
-#pragma warning(default : 4995)
-#pragma warning(default : 4267)
+#pragma warning(pop)
 
 struct dxRayMotions
 {

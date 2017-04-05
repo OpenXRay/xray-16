@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "xrCDB/Frustum.h"
 
+#pragma warning(push)
 #pragma warning(disable : 4995)
 // mmsystem.h
 #define MMNOSOUND
@@ -9,7 +10,7 @@
 #define MMNOMIXER
 #define MMNOJOY
 #include <mmsystem.h>
-#pragma warning(default : 4995)
+#pragma warning(pop)
 
 #include "x_ray.h"
 #include "Render.h"

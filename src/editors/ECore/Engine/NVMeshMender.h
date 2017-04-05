@@ -123,10 +123,10 @@ generated on my behalf
 
 
 ******************************************************************************/
-
+#pragma warning(push)
 #pragma warning(disable : 4995)
 #include <string>
-#pragma warning(default : 4995)
+#pragma warning(pop)
 
 class NVMeshMender
 {

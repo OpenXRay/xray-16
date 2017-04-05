@@ -177,9 +177,10 @@ void CUILines::ParseText(bool force)
                     m_lines.push_back(tmp_line);
                     tmp_line.Clear();
 // Compiler bug :)
+#pragma warning(push)
 #pragma warning(disable : 4244)
                     uFrom += uPartLen;
-#pragma warning(default : 4244)
+#pragma warning(pop)
                 }
                 strncpy_s(szTempLine, pszText + uFrom, MAX_MB_CHARS);
                 tmp_line.AddSubLine(szTempLine, tcolor);

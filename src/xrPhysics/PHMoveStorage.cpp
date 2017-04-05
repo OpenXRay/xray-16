@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "phmovestorage.h"
+#pragma warning(push)
 #pragma warning(disable : 4995)
 #pragma warning(disable : 4267)
 #include "Externals/ode/ode/src/collision_kernel.h"
-#pragma warning(default : 4995)
-#pragma warning(default : 4267)
+#pragma warning(pop)
 
 struct dxGeomTransform : public dxGeom
 {

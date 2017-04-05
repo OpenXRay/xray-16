@@ -4,9 +4,11 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#pragma warning(push)
 #pragma warning(disable : 4995)
 #include <d3dx9.h>
-#pragma warning(default : 4995)
+#pragma warning(pop)
+
 #include "HW.h"
 #include "xrEngine/XR_IOConsole.h"
 

@@ -108,8 +108,9 @@ IC u32 IReaderBase<T>::find_chunk(u32 ID, BOOL* bCompressed)
 struct IReaderBase_Test
 {
 };
-#pragma warning(disable : 4701)
 
+#pragma warning(push)
+#pragma warning(disable : 4701)
 template <typename T>
 IC u32 IReaderBase<T>::find_chunk(u32 ID, BOOL* bCompressed)
 {
@@ -175,7 +176,7 @@ IC u32 IReaderBase<T>::find_chunk(u32 ID, BOOL* bCompressed)
     return dwSize;
 }
 
-#pragma warning(default : 4701)
+#pragma warning(pop)
 
 #endif // #ifdef FIND_CHUNK_HEU
 

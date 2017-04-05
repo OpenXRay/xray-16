@@ -1,13 +1,13 @@
 //----------------------------------------------------
 // file: stdafx.h
 //----------------------------------------------------
+#pragma once
 #ifndef __INCDEF_STDAFX_H_
 #define __INCDEF_STDAFX_H_
 
-#pragma once
-
 #define _WIN32_WINNT 0x0500
 
+#pragma warning(push)
 #pragma warning(disable : 4995)
 #include "Max.h"
 
@@ -106,6 +106,6 @@ DEFINE_VECTOR(AnsiString, AStringVec, AStringIt);
 #define GAMEMTL_NONE u32(-1)
 #define _game_data_ "$game_data$"
 
-#pragma warning(default : 4995)
+#pragma warning(pop)
 
 #endif /*_INCDEF_STDAFX_H_*/

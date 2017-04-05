@@ -8,6 +8,7 @@ vmap.c
 #include "scenscan.h"
 #include "objectdb.h"
 
+#pragma warning(push)
 #pragma warning(disable : 4995)
 
 /*
@@ -440,4 +441,4 @@ Finish:
     return ok;
 }
 
-#pragma warning(default : 4995)
+#pragma warning(pop)
