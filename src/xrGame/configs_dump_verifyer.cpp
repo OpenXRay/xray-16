@@ -2,6 +2,7 @@
 #include "configs_dump_verifyer.h"
 #include "configs_common.h"
 #include "configs_dumper.h"
+#include "xrCore/Crypto/xr_dsa_verifyer.h"
 
 namespace mp_anticheat
 {

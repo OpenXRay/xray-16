@@ -33,12 +33,15 @@
   <PropertyGroup Condition="'$(ConfigurationType)'=='StaticLibrary'">
     <OutDir>$(xrLibDir)</OutDir>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(ConfigurationType)'=='Makefile'">
+    <OutDir>$(xrLibDir)</OutDir>
+  </PropertyGroup>
   <PropertyGroup>
     <IntDir>$(xrIntDir)$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(ProjectDir);$(xrSdkDir)include;$(DXSDK_DIR)Include;$(SolutionDir)Externals\luajit\src;$(SolutionDir)Externals\luabind;$(SolutionDir)Externals\GameSpy\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(ProjectDir);$(xrSdkDir)include;$(SolutionDir)Externals;$(DXSDK_DIR)Include;$(SolutionDir)Externals\luajit\src;$(SolutionDir)Externals\luabind;$(SolutionDir)Externals\GameSpy\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <!--
         4251 : class 'x' needs to have dll-interface to be used by clients of class 'y'

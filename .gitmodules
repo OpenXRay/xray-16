@@ -13,3 +13,45 @@
 [submodule "src/Externals/lzo"]
 	path = src/Externals/lzo
 	url = https://github.com/alexgdi/lzo.git
+[submodule "src/Externals/zlib"]
+	path = src/Externals/zlib
+	url = https://github.com/madler/zlib.git
+[submodule "src/Externals/libvorbis"]
+	path = src/Externals/libvorbis
+	url = https://github.com/xiph/vorbis.git
+[submodule "src/Externals/libogg"]
+	path = src/Externals/libogg
+	url = https://github.com/xiph/ogg.git
+[submodule "src/Externals/libtheora"]
+	path = src/Externals/libtheora
+	url = https://github.com/xiph/theora.git
+[submodule "src/Externals/jpeg"]
+	path = src/Externals/jpeg
+	url = https://github.com/OpenXRay/libjpeg.git
+[submodule "src/Externals/BugTrap"]
+	path = src/Externals/BugTrap
+	url = https://github.com/OpenXRay/BugTrap.git
+[submodule "src/Externals/FreeImage"]
+	path = src/Externals/FreeImage
+	url = https://github.com/OpenXRay/ext-win-freeimage.git
+[submodule "src/Externals/cryptopp"]
+	path = src/Externals/cryptopp
+	url = https://github.com/weidai11/cryptopp.git
+[submodule "src/Externals/OpenAutomate"]
+	path = src/Externals/OpenAutomate
+	url = https://github.com/OpenXRay/OpenAutomate.git
+[submodule "src/Externals/FreeMagic"]
+	path = src/Externals/FreeMagic
+	url = https://github.com/OpenXRay/FreeMagic.git
+[submodule "src/Externals/lightwave"]
+	path = src/Externals/lightwave
+	url = https://github.com/OpenXRay/LightWave.git
+[submodule "src/Externals/3dsmax"]
+	path = src/Externals/3dsmax
+	url = https://github.com/OpenXRay/3dsmax.git
+[submodule "src/Externals/maya"]
+	path = src/Externals/maya
+	url = https://github.com/OpenXRay/maya.git
+[submodule "src/Externals/nvapi"]
+	path = src/Externals/nvapi
+	url = https://github.com/OpenXRay/nvapi.git

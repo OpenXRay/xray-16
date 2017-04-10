@@ -1,62 +1,53 @@
 #include "stdafx.h"
 #include "xr_dsa.h"
-#include "crypto.h"
-#include <openssl/dsa.h>
+#include <cryptopp/dsa.h>
+#include <cryptopp/integer.h>
 
 namespace crypto
 {
 xr_dsa::xr_dsa(u8 const p[public_key_length], u8 const q[private_key_length], u8 const g[public_key_length])
 {
-    m_dsa = DSA_new();
-    m_dsa->p = BN_new();
-    m_dsa->q = BN_new();
-    m_dsa->g = BN_new();
-    m_dsa->priv_key = BN_new();
-    m_dsa->pub_key = BN_new();
+    CryptoPP::Integer p_number(p, public_key_length);
+    CryptoPP::Integer q_number(q, private_key_length);
+    CryptoPP::Integer g_number(g, public_key_length);
 
-    BN_bin2bn(p, public_key_length, m_dsa->p);
-    BN_bin2bn(q, private_key_length, m_dsa->q);
-    BN_bin2bn(g, public_key_length, m_dsa->g);
+    m_dsa.Initialize(p_number, q_number, g_number);
 }
 
-xr_dsa::~xr_dsa() { DSA_free(m_dsa); }
+xr_dsa::~xr_dsa() {}
 shared_str const xr_dsa::sign(private_key_t const& priv_key, u8 const* data, u32 const data_size)
 {
-    BN_bin2bn(priv_key.m_value, sizeof(priv_key.m_value), m_dsa->priv_key);
+    CryptoPP::Integer exp(priv_key.m_value, sizeof(priv_key.m_value));
+    CryptoPP::DSA::PrivateKey private_key;
+    private_key.Initialize(m_dsa, exp);
 
-    unsigned int sign_size = DSA_size(m_dsa);
-    u8* sign_dest = static_cast<u8*>(_alloca(sign_size));
+    std::string signature;
+    CryptoPP::DSA::Signer signer(private_key);
+    CryptoPP::StringSource(data, data_size, true, new CryptoPP::SignerFilter(m_rng, signer,
+                                                      new CryptoPP::StringSink(signature)) // SignerFilter
+        ); // StringSource
 
-    BIGNUM tmp_sign_res_bn;
-    BN_init(&tmp_sign_res_bn);
-
-    DSA_sign(0, data, data_size, sign_dest, &sign_size, m_dsa);
-    BN_bin2bn(sign_dest, sign_size, &tmp_sign_res_bn);
-
-    return shared_str(BN_bn2hex(&tmp_sign_res_bn));
+    return shared_str(signature.c_str());
 }
 
 bool xr_dsa::verify(public_key_t const& pub_key, u8 const* data, u32 const data_size, shared_str const& dsign)
 {
-    BN_bin2bn(pub_key.m_value, sizeof(pub_key.m_value), m_dsa->pub_key);
+    CryptoPP::Integer exp(pub_key.m_value, sizeof(pub_key.m_value));
+    CryptoPP::DSA::PublicKey public_key;
+    public_key.Initialize(m_dsa, exp);
 
-    BIGNUM* tmp_bn = NULL;
-    BN_hex2bn(&tmp_bn, dsign.c_str());
-    int sig_size = tmp_bn->top * sizeof(unsigned long);
-    u8* sig_buff = static_cast<u8*>(_alloca(sig_size));
-    VERIFY(sig_size == DSA_size(m_dsa));
-    BN_bn2bin(tmp_bn, sig_buff);
+    std::string signature(dsign.c_str());
+    std::string message((const char*)data, data_size);
+    CryptoPP::DSA::Verifier verifier(public_key);
+    CryptoPP::SignatureVerificationFilter svf(verifier);
+    CryptoPP::StringSource(signature + message, true, new CryptoPP::Redirector(svf));
 
-    bool ret = DSA_verify(0, data, data_size, sig_buff, sig_size, m_dsa) == 1 ? true : false;
-    BN_free(tmp_bn);
-    return ret;
+    return svf.GetLastResult();
 }
 
 #ifdef DEBUG
 
-static void dsa_genparams_cb(int p, int n, void* arg) { Msg("* dsa genparams cb(%d, %d)", p, n); }
-static unsigned char rnd_seed[] = "S.T.A.L.K.E.R. 4ever Rulezz !!!";
-void print_big_number(BIGNUM* big_num, u32 max_columns = 8)
+void print_big_number(CryptoPP::Integer big_num, u32 max_columns = 8)
 {
     u8 bin_buff[xr_dsa::public_key_length]; // public_key_length is the max
     int bin_size = 0;
@@ -65,8 +56,8 @@ void print_big_number(BIGNUM* big_num, u32 max_columns = 8)
     string16 tmp_buff;
 
     ZeroMemory(bin_buff, sizeof(bin_buff));
-    BN_bn2bin(big_num, bin_buff);
-    bin_size = big_num->top * sizeof(unsigned long);
+    big_num.Encode(bin_buff, xr_dsa::public_key_length);
+    bin_size = big_num.ByteCount();
 
     result_buffer[0] = 0;
     xr_strcat(result_buffer, "\t");
@@ -84,74 +75,62 @@ void print_big_number(BIGNUM* big_num, u32 max_columns = 8)
 
 void xr_dsa::generate_params()
 {
-    int counter;
-    unsigned long long_ret;
-    string256 random_string;
-    xr_sprintf(random_string, "%I64d_%s", CPU::QPC(), rnd_seed);
-    // sprintf_s					(random_string, "%s", rnd_seed);
-    unsigned char* seed = static_cast<unsigned char*>((void*)random_string);
-    unsigned int rnd_ssize = xr_strlen(random_string);
-    DSA* tmp_dsa_params =
-        DSA_generate_parameters(key_bit_length, seed, rnd_ssize, &counter, &long_ret, dsa_genparams_cb, NULL);
-    DSA_generate_key(tmp_dsa_params);
+    CryptoPP::AutoSeededRandomPool rng;
+    CryptoPP::DSA::PrivateKey priv_key;
+    priv_key.GenerateRandomWithKeySize(rng, key_bit_length);
+    CryptoPP::DSA::PublicKey pub_key;
+    pub_key.AssignFrom(priv_key);
 
-    VERIFY(tmp_dsa_params->p->top * sizeof(u32) == public_key_length);
-    VERIFY(tmp_dsa_params->q->top * sizeof(u32) == private_key_length);
-    VERIFY(tmp_dsa_params->g->top * sizeof(u32) == public_key_length);
-    VERIFY(tmp_dsa_params->pub_key->top * sizeof(u32) == public_key_length);
-    VERIFY(tmp_dsa_params->priv_key->top * sizeof(u32) == private_key_length);
+    const CryptoPP::DL_GroupParameters_DSA& tmp_dsa_params = priv_key.GetGroupParameters();
+    VERIFY(tmp_dsa_params.GetModulus().ByteCount() == public_key_length);
+    VERIFY(tmp_dsa_params.GetSubgroupOrder().ByteCount() == private_key_length);
+    VERIFY(tmp_dsa_params.GetSubgroupGenerator().ByteCount() == public_key_length);
+    VERIFY(pub_key.GetPublicElement().ByteCount() == public_key_length);
+    VERIFY(priv_key.GetPrivateExponent().ByteCount() == private_key_length);
 
     Msg("// DSA params ");
 
     Msg("u8 const p_number[crypto::xr_dsa::public_key_length] = {");
-    print_big_number(tmp_dsa_params->p);
+    print_big_number(tmp_dsa_params.GetModulus());
     Msg("};//p_number");
 
     Msg("u8 const q_number[crypto::xr_dsa::private_key_length] = {");
-    print_big_number(tmp_dsa_params->q);
+    print_big_number(tmp_dsa_params.GetSubgroupOrder());
     Msg("};//q_number");
 
     Msg("u8 const g_number[crypto::xr_dsa::public_key_length] = {");
-    print_big_number(tmp_dsa_params->g);
+    print_big_number(tmp_dsa_params.GetSubgroupGenerator());
     Msg("};//g_number");
 
     Msg("u8 const public_key[crypto::xr_dsa::public_key_length] = {");
-    print_big_number(tmp_dsa_params->pub_key);
+    print_big_number(pub_key.GetPublicElement());
     Msg("};//public_key");
 
     u8 priv_bin[private_key_length];
-    BN_bn2bin(tmp_dsa_params->priv_key, priv_bin);
+    priv_key.GetPrivateExponent().Encode(priv_bin, private_key_length);
     Msg("// Private key:");
     for (int i = 0; i < private_key_length; ++i)
     {
         Msg("	m_private_key.m_value[%d]	= 0x%02x;", i, priv_bin[i]);
     }
 
-    u8 debug_digest[] = "this is a test";
-    u8 debug_bad_digest[] = "this as a test";
+    std::string debug_digest = "this is a test";
+    std::string debug_bad_digest = "this as a test";
 
-    u32 siglen = DSA_size(tmp_dsa_params);
-    u8* sig = static_cast<u8*>(_alloca(siglen));
+    std::string signature;
+    CryptoPP::DSA::Signer signer(priv_key);
+    CryptoPP::StringSource(debug_digest, true, new CryptoPP::SignerFilter(rng, signer,
+                                                   new CryptoPP::StringSink(signature)) // SignerFilter
+        ); // StringSource
 
-    BIGNUM bn_sign;
-    BN_init(&bn_sign);
+    CryptoPP::DSA::Verifier verifier(pub_key);
+    CryptoPP::SignatureVerificationFilter svf(verifier);
 
-    VERIFY(DSA_sign(0, debug_digest, sizeof(debug_digest), sig, &siglen, tmp_dsa_params) == 1);
+    CryptoPP::StringSource(signature + debug_digest, true, new CryptoPP::Redirector(svf));
+    VERIFY(svf.GetLastResult() == true);
 
-    BN_bin2bn(sig, siglen, &bn_sign);
-    shared_str sig_str = BN_bn2hex(&bn_sign);
-
-    BIGNUM* bn_rsing = NULL;
-    ZeroMemory(sig, siglen);
-    BN_hex2bn(&bn_rsing, sig_str.c_str());
-    BN_bn2bin(bn_rsing, sig);
-    BN_free(bn_rsing);
-
-    VERIFY(DSA_verify(0, debug_digest, sizeof(debug_digest), sig, siglen, tmp_dsa_params) == 1);
-
-    VERIFY(DSA_verify(0, debug_bad_digest, sizeof(debug_bad_digest), sig, siglen, tmp_dsa_params) == 0);
-
-    DSA_free(tmp_dsa_params);
+    CryptoPP::StringSource(signature + debug_bad_digest, true, new CryptoPP::Redirector(svf));
+    VERIFY(svf.GetLastResult() == false);
 }
 
 #endif //#ifdef DEBUG

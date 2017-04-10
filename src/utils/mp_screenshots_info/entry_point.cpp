@@ -70,7 +70,6 @@ int main(int argc, char** argv)
     }
     printf("Initializing core...\n");
     Core._initialize("mp_screenshots_info", LogCallback(xrcore_log_cb, nullptr), TRUE, "fsgame4mpu.ltx");
-    crypto::xr_crypto_init();
 
 #ifdef DEBUG
     if (strstr(argv[1], "--gen_params"))

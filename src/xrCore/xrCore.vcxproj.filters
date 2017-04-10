@@ -309,9 +309,6 @@
     <ClCompile Include="Debug\dxerr.cpp">
       <Filter>Debug core\DxErr</Filter>
     </ClCompile>
-    <ClCompile Include="Crypto\crypto.cpp">
-      <Filter>Crypto</Filter>
-    </ClCompile>
     <ClCompile Include="Crypto\xr_dsa.cpp">
       <Filter>Crypto</Filter>
     </ClCompile>
@@ -706,9 +703,6 @@
     </ClInclude>
     <ClInclude Include="..\Common\LevelStructure.hpp">
       <Filter>Kernel\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="Crypto\crypto.h">
-      <Filter>Crypto</Filter>
     </ClInclude>
     <ClInclude Include="Crypto\xr_dsa.h">
       <Filter>Crypto</Filter>
