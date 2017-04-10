@@ -765,9 +765,8 @@ void CLocatorAPI::_initialize(u32 flags, LPCSTR target_folder, LPCSTR fs_name)
 #endif // DEBUG
 
             CHECK_OR_EXIT(I.second,
-                "The file 'fsgame.ltx' is corrupted (it contains duplicated lines).\nPlease reinstall the game or fix "
-                "the "
-                "problem manually.");
+                "The file 'fsgame.ltx' is corrupted (it contains duplicated lines).\n"
+                "Please reinstall the game or fix the problem manually.");
         }
         r_close(pFSltx);
         R_ASSERT(path_exist("$app_data_root$"));
@@ -794,9 +793,6 @@ void CLocatorAPI::_initialize(u32 flags, LPCSTR target_folder, LPCSTR fs_name)
             pAppdataPath->_set_root(c_newAppPathRoot);
             rescan_path(pAppdataPath->m_Path, pAppdataPath->m_Flags.is(FS_Path::flRecurse));
         }
-
-        int x = 0;
-        x = x;
     }
 
     rec_files.clear();
