@@ -47,7 +47,7 @@ private:
     template <typename T_CONVERT_ITEM>
     T_ITEM convert(LPCSTR)
     {
-        STATIC_CHECK(false, Specialization_for_convert_in_CIni_Table_not_found);
+        static_assert(!std::is_same_v<T_CONVERT_ITEM, T_CONVERT_ITEM>, "Specialization for convert in CIni_Table not found."); // Xottab_DUTY: Is this correct?
         NODEFAULT;
     }
 
