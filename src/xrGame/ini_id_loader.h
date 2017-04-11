@@ -34,7 +34,7 @@ protected:
     template <u32 NUM>
     static void LoadItemData(u32, LPCSTR)
     {
-        STATIC_CHECK(false, Specialization_for_LoadItemData_in_CIni_IdToIndex_not_found);
+        static_assert(std::is_same_v<decltype(NUM), bool>, "Specialization for LoadItemData in CIni_IdToIndex not found."); // Xottab_DUTY: Is this correct?
         NODEFAULT;
     }
 
