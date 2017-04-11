@@ -17,7 +17,6 @@
 #define smart_cast dynamic_cast
 #else
 #define TL_FAST_COMPILATION
-#undef STATIC_CHECK
 #include <loki/Typelist.h>
 
 #define PURE_DYNAMIC_CAST_COMPATIBILITY_CHECK
