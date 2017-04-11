@@ -138,7 +138,7 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
     {
         SVS* _vs = new SVS();
         _vs->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        m_vs.insert(mk_pair(_vs->set_name(name), _vs));
+        m_vs.insert(std::make_pair(_vs->set_name(name), _vs));
         //_vs->vs				= NULL;
         //_vs->signature		= NULL;
         if (0 == stricmp(_name, "null"))
@@ -263,7 +263,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
     {
         SPS* _ps = new SPS();
         _ps->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        m_ps.insert(mk_pair(_ps->set_name(name), _ps));
+        m_ps.insert(std::make_pair(_ps->set_name(name), _ps));
         if (0 == stricmp(_name, "null"))
         {
             _ps->ps = NULL;
@@ -368,7 +368,7 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
     {
         SGS* _gs = new SGS();
         _gs->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        m_gs.insert(mk_pair(_gs->set_name(name), _gs));
+        m_gs.insert(std::make_pair(_gs->set_name(name), _gs));
         if (0 == stricmp(name, "null"))
         {
             _gs->gs = NULL;
@@ -511,7 +511,7 @@ CRT* CResourceManager::_CreateRT(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 Sam
     {
         CRT* RT = new CRT();
         RT->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        m_rtargets.insert(mk_pair(RT->set_name(Name), RT));
+        m_rtargets.insert(std::make_pair(RT->set_name(Name), RT));
 #ifdef USE_DX11
         if (Device.b_is_Ready)
             RT->create(Name, w, h, f, SampleCount, useUAV);
@@ -644,7 +644,7 @@ CTexture* CResourceManager::_CreateTexture(LPCSTR _Name)
     {
         CTexture* T = new CTexture();
         T->dwFlags |= xr_resource_flagged::RF_REGISTERED;
-        m_textures.insert(mk_pair(T->set_name(Name), T));
+        m_textures.insert(std::make_pair(T->set_name(Name), T));
         T->Preload();
         if (Device.b_is_Ready && !bDeferredLoad)
             T->Load();
@@ -698,7 +698,7 @@ CMatrix* CResourceManager::_CreateMatrix(LPCSTR Name)
         CMatrix* M = new CMatrix();
         M->dwFlags |= xr_resource_flagged::RF_REGISTERED;
         M->dwReference = 1;
-        m_matrices.insert(mk_pair(M->set_name(Name), M));
+        m_matrices.insert(std::make_pair(M->set_name(Name), M));
         return M;
     }
 }
@@ -736,7 +736,7 @@ CConstant* CResourceManager::_CreateConstant(LPCSTR Name)
         CConstant* C = new CConstant();
         C->dwFlags |= xr_resource_flagged::RF_REGISTERED;
         C->dwReference = 1;
-        m_constants.insert(mk_pair(C->set_name(Name), C));
+        m_constants.insert(std::make_pair(C->set_name(Name), C));
         return C;
     }
 }

@@ -64,7 +64,7 @@ void SBoneProtections::reload(const shared_str& bone_sect, IKinematics* kinemati
 
             s16 bone_id = kinematics->LL_BoneID(i->first);
             R_ASSERT2(BI_NONE != bone_id, i->first.c_str());
-            m_bones_koeff.insert(mk_pair(bone_id, BP));
+            m_bones_koeff.insert(std::make_pair(bone_id, BP));
         }
     }
 }

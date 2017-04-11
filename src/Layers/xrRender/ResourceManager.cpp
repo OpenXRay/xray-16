@@ -97,7 +97,7 @@ void CResourceManager::ED_UpdateBlender(LPCSTR Name, IBlender* data)
     }
     else
     {
-        m_blenders.insert(mk_pair(xr_strdup(Name), data));
+        m_blenders.insert(std::make_pair(xr_strdup(Name), data));
     }
 }
 
@@ -440,7 +440,7 @@ void CResourceManager::_DumpMemoryUsage()
         {
             u32 m = I->second->flags.MemoryUsage;
             shared_str n = I->second->cName;
-            mtex.insert(mk_pair(m, mk_pair(I->second->dwReference, n)));
+            mtex.insert(std::make_pair(m, std::make_pair(I->second->dwReference, n)));
         }
     }
 

@@ -101,7 +101,7 @@ void CRestrictions::AddRestriction4rank(u32 rank, const shared_str& lst)
         restr_item* ritem = find_restr_item_internal(rank, r.name);
         VERIFY2((ritem || rank == _RANK_COUNT), singleItem);
         if (!ritem)
-            rest.push_back(mk_pair(r.name, r.n));
+            rest.push_back(std::make_pair(r.name, r.n));
         else
             ritem->second = r.n;
     }
