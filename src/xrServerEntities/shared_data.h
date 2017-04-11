@@ -82,7 +82,7 @@ public:
         if (_shared_tab.end() == shared_it)
         {
             _data = new SHARED_TYPE();
-            _shared_tab.insert(mk_pair(id, _data));
+            _shared_tab.insert(std::make_pair(id, _data));
         }
         else
             _data = shared_it->second;

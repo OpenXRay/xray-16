@@ -32,7 +32,7 @@ public:
             result = new T();
             result->m_ref_cnt = 0;
             if (p(key, result))
-                container.insert(mk_pair(key, result));
+                container.insert(std::make_pair(key, result));
             else
                 xr_delete(result);
         }

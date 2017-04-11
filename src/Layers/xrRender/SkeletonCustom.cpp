@@ -242,8 +242,8 @@ void CKinematics::Load(const char* N, IReader* data, u32 dwFlags)
         pBone->name = shared_str(buf);
         pBone->child_faces.resize(children.size());
         bones->push_back(pBone);
-        bone_map_N->push_back(mk_pair(pBone->name, ID));
-        bone_map_P->push_back(mk_pair(pBone->name, ID));
+        bone_map_N->push_back(std::make_pair(pBone->name, ID));
+        bone_map_P->push_back(std::make_pair(pBone->name, ID));
 
         // It's parent
         data->r_stringZ(buf, sizeof(buf));

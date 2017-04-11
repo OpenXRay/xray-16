@@ -49,7 +49,7 @@ void CBlender_Compile::r_dx10Texture(LPCSTR ResourceName, LPCSTR texture)
     R_ASSERT(C->type == RC_dx10texture);
     u32 stage = C->samp.index;
 
-    passTextures.push_back(mk_pair(stage, ref_texture(RImplementation.Resources->_CreateTexture(TexName))));
+    passTextures.push_back(std::make_pair(stage, ref_texture(RImplementation.Resources->_CreateTexture(TexName))));
 }
 
 void CBlender_Compile::i_dx10Address(u32 s, u32 address)

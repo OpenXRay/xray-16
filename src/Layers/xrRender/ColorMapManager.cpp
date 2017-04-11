@@ -34,7 +34,7 @@ void ColorMapManager::UpdateTexture(const shared_str& strTexName, int iTex)
             ref_texture tmp;
             tmp.create(strTexName.c_str());
 
-            m_TexCache.insert(mk_pair(strTexName, tmp));
+            m_TexCache.insert(std::make_pair(strTexName, tmp));
 
             ID3DBaseTexture* e0 = tmp->surface_get();
             m_CMap[iTex]->surface_set(e0);

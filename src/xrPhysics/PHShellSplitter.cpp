@@ -38,7 +38,7 @@ shell_root CPHShellSplitterHolder::SplitJoint(u16 aspl)
     u16 end_element = m_pShell->joints[start_joint]->JointDestroyInfo()->m_end_element;
     u16 end_joint = m_pShell->joints[start_joint]->JointDestroyInfo()->m_end_joint;
 
-    shell_root ret = mk_pair(new_shell, (m_pShell->joints[start_joint])->BoneID());
+    shell_root ret = std::make_pair(new_shell, (m_pShell->joints[start_joint])->BoneID());
 
     CShellSplitInfo split_inf;
     split_inf.m_bone_id = m_pShell->joints[start_joint]->BoneID();
@@ -372,7 +372,7 @@ shell_root CPHShellSplitterHolder::ElementSingleSplit(
     VERIFY(dBodyStateValide(split_elem.first->get_body()));
     new_shell_last->set_ObjectContactCallback(NULL);
     new_shell_last->set_PhysicsRefObject(NULL);
-    return mk_pair(new_shell_last, split_elem.second.m_bone_id);
+    return std::make_pair(new_shell_last, split_elem.second.m_bone_id);
 }
 
 IC void correct_diapasones(ELEMENT_PAIR_VECTOR& element_pairs)

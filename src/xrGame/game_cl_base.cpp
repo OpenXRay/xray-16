@@ -160,7 +160,7 @@ void game_cl_GameState::net_import_state(NET_Packet& P)
             if (Type() != eGameIDSingle)
                 OnPlayerFlagsChanged(IP);
 
-            players.insert(mk_pair(ID, IP));
+            players.insert(std::make_pair(ID, IP));
             valid_players.push_back(ID);
         }
     }
@@ -237,7 +237,7 @@ void game_cl_GameState::TranslateGameMessage(u32 msg, NET_Packet& P)
 
         if (Type() != eGameIDSingle)
         {
-            players.insert(mk_pair(newClientId, PS));
+            players.insert(std::make_pair(newClientId, PS));
             OnNewPlayerConnected(newClientId);
         }
         xr_sprintf(Text, "%s%s %s%s", Color_Teams[0], PS->getName(), Color_Main, *st.translate("mp_connected"));

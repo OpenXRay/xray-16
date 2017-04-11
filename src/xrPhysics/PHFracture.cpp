@@ -79,7 +79,7 @@ element_fracture CPHFracturesHolder::SplitFromEnd(CPHElement* element, u16 fract
     //									   fract_i->m_break_torque,
     //									   fract_i->m_add_torque_z);
     // BodyCutForce(new_element_body,default_l_limit,default_w_limit);
-    element_fracture ret = mk_pair(new_element, (CShellSplitInfo)(*fract_i));
+    element_fracture ret = std::make_pair(new_element, (CShellSplitInfo)(*fract_i));
 
     if (m_fractures.size() - fracture > 0)
     {

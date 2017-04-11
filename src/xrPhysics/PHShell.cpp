@@ -815,7 +815,7 @@ void CPHShell::AddElementRecursive(
 #endif
     if (m_spliter_holder && E->has_geoms())
     {
-        m_spliter_holder->AddToGeomMap(mk_pair(id, E->last_geom()));
+        m_spliter_holder->AddToGeomMap(std::make_pair(id, E->last_geom()));
     }
 
     if (spGetingMap)

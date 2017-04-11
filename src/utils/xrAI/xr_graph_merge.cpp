@@ -263,7 +263,7 @@ public:
 
                         if (ok)
                         {
-                            m_tVertexMap.insert(mk_pair(S, T));
+                            m_tVertexMap.insert(std::make_pair(S, T));
                             vertexId++;
                         }
                     }
@@ -613,7 +613,7 @@ CGraphMerger::CGraphMerger(LPCSTR game_graph_id, LPCSTR name, bool rebuild)
             new ::CLevelGameGraph(_0, _1, &tLevel, level_folder, dwOffset, tLevel.id(), Ini);
         dwOffset += tpLevelGraph->m_tpGraph->header().vertex_count();
         R_ASSERT2(tpGraphs.find(tLevel.id()) == tpGraphs.end(), "Level ids _MUST_ be different!");
-        tpGraphs.insert(mk_pair(tLevel.id(), tpLevelGraph));
+        tpGraphs.insert(std::make_pair(tLevel.id(), tpLevelGraph));
         tGraphHeader.m_levels.insert(std::make_pair(tLevel.id(), tLevel));
     }
 

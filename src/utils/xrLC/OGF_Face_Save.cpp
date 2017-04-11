@@ -33,7 +33,7 @@ std::pair<s16, u8> s24_tc_base(float uv) // [-32 .. +32]
     clamp(_primary, -32768, 32767);
     s32 _secondary = iFloor(255.5f * (rebased - float(_primary)));
     clamp(_secondary, 0, 255);
-    return mk_pair(s16(_primary), u8(_secondary));
+    return std::make_pair(s16(_primary), u8(_secondary));
 }
 
 s16 s16_tc_lmap(float uv) // [-1 .. +1]
