@@ -24,7 +24,7 @@ bool xr_sha256::continue_calculate()
 
     if (!m_data_size)
     {
-        STATIC_CHECK(digest_length == CryptoPP::SHA1::DIGESTSIZE, digest_length_must_be_equal_to_digest_size);
+        static_assert(digest_length == CryptoPP::SHA1::DIGESTSIZE, "Digest length must be equal to digest size.");
         m_sha_ctx.Final(m_result);
         return true;
     }

@@ -394,7 +394,7 @@ struct conversion_sequence
     template <int length>
     struct selector
     {
-        STATIC_CHECK(length > 1, Internal_error_please_report);
+        static_assert(length > 1, "Internal error, please report.");
 
         typedef typename selector<1>::result nearest;
 
@@ -515,8 +515,8 @@ struct CHelper2
     template <typename T1>
     IC static T1* smart_cast(T2* p)
     {
-        STATIC_CHECK(!object_type_traits::is_const<T2>::value || object_type_traits::is_const<T1>::value,
-            Cannot_use_smart_cast_to_convert_const_to_non_const);
+        static_assert(!object_type_traits::is_const<T2>::value || object_type_traits::is_const<T1>::value,
+            "Cannot use smart_cast to convert const to non-const.");
         typedef object_type_traits::remove_const<T1>::type _T1;
         typedef object_type_traits::remove_const<T2>::type _T2;
 #ifdef DEBUG
@@ -551,11 +551,11 @@ template <typename T1, typename T2>
 IC T1 smart_cast(T2* p)
 {
 #ifdef PURE_DYNAMIC_CAST_COMPATIBILITY_CHECK
-    STATIC_CHECK(object_type_traits::is_pointer<T1>::value, Invalid_target_type_for_Dynamic_Cast);
-    STATIC_CHECK(object_type_traits::is_void<object_type_traits::remove_pointer<T1>::type>::value ||
+    static_assert(object_type_traits::is_pointer<T1>::value, "Invalid target type for Dynamic Cast.");
+    static_assert(object_type_traits::is_void<object_type_traits::remove_pointer<T1>::type>::value ||
             std::is_polymorphic<object_type_traits::remove_pointer<T1>::type>::value,
-        Invalid_target_type_for_Dynamic_Cast);
-    STATIC_CHECK(std::is_polymorphic<T2>::value, Invalid_source_type_for_Dynamic_Cast);
+        "Invalid target type for Dynamic Cast");
+    static_assert(std::is_polymorphic<T2>::value, "Invalid source type for Dynamic Cast.");
 #endif
 #ifdef SMART_CAST_STATS_ALL
     add_smart_cast_stats_all(typeid(T2*).name(), typeid(T1).name());
@@ -569,10 +569,10 @@ template <typename T1, typename T2>
 IC T1 smart_cast(T2& p)
 {
 #ifdef PURE_DYNAMIC_CAST_COMPATIBILITY_CHECK
-    STATIC_CHECK(object_type_traits::is_reference<T1>::value, Invalid_target_type_for_Dynamic_Cast);
-    STATIC_CHECK(std::is_polymorphic<object_type_traits::remove_reference<T1>::type>::value,
-        Invalid_target_type_for_Dynamic_Cast);
-    STATIC_CHECK(std::is_polymorphic<T2>::value, Invalid_source_type_for_Dynamic_Cast);
+    static_assert(object_type_traits::is_reference<T1>::value, "Invalid target type for Dynamic Cast.");
+    static_assert(std::is_polymorphic<object_type_traits::remove_reference<T1>::type>::value,
+        "Invalid target type for Dynamic Cast.");
+    static_assert(std::is_polymorphic<T2>::value, "Invalid source type for Dynamic Cast.");
 #endif
 #ifdef SMART_CAST_STATS_ALL
     add_smart_cast_stats_all(typeid(T2*).name(), typeid(object_type_traits::remove_reference<T1>::type*).name());

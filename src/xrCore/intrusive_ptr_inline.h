@@ -31,7 +31,7 @@ IC intrusive_ptr<object_type, base_type>::intrusive_ptr(self_type const& rhs)
 template <typename object_type, typename base_type>
 IC intrusive_ptr<object_type, base_type>::~intrusive_ptr()
 {
-    STATIC_CHECK(result, Class_MUST_Be_Derived_From_The_Base);
+    static_assert(result, "Class MUST be derived from the base.");
     dec();
 }
 

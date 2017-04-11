@@ -12,7 +12,7 @@ template <typename T>
 IC T& CALifeRegistryContainer::operator()(const T*)
 {
     const int value = Loki::TL::IndexOf<TYPE_LIST, T>::value;
-    STATIC_CHECK(value != -1, There_is_no_specified_registry_in_the_registry_container);
+    static_assert(value != -1, "There is no specified registry in the registry container.");
     return (*static_cast<T*>(this));
 }
 
@@ -20,6 +20,6 @@ template <typename T>
 IC const T& CALifeRegistryContainer::operator()(const T*) const
 {
     const int value = Loki::TL::IndexOf<TYPE_LIST, T>::value;
-    STATIC_CHECK(value != -1, There_is_no_specified_registry_in_the_registry_container);
+    static_assert(value != -1, "There is no specified registry in the registry container.");
     return (*static_cast<T*>(this));
 }
