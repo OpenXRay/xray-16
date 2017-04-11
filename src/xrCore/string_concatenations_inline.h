@@ -115,7 +115,7 @@ private:
         template <typename T>
         static inline void add_string(string_tupples& self, T p)
         {
-            STATIC_CHECK(index < max_item_count, Error_invalid_string_index_specified);
+            static_assert(index < max_item_count, "Error invalid string index specified.");
 
             LPCSTR cstr = string(p);
             VERIFY(cstr);

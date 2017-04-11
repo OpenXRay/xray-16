@@ -6,7 +6,7 @@ xr_dsa_verifyer::xr_dsa_verifyer(u8 const p_number[crypto::xr_dsa::public_key_le
     u8 const public_key[crypto::xr_dsa::public_key_length])
     : m_dsa(p_number, q_number, g_number)
 {
-    STATIC_CHECK(sizeof(m_public_key.m_value) == crypto::xr_dsa::public_key_length, public_key_sizes_not_equal);
+    static_assert(sizeof(m_public_key.m_value) == crypto::xr_dsa::public_key_length, "Public key sizes not equal.");
     CopyMemory(m_public_key.m_value, public_key, sizeof(m_public_key.m_value));
 }
 

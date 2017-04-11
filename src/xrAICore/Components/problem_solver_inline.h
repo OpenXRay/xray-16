@@ -246,7 +246,7 @@ IC bool CProblemSolverAbstract::is_goal_reached(const _index_type& vertex_index)
 TEMPLATE_SPECIALIZATION
 IC bool CProblemSolverAbstract::is_goal_reached_impl(const _index_type& vertex_index) const
 {
-    STATIC_CHECK(!reverse_search, This_function_cannot_be_used_in_the_REVERSE_search);
+    static_assert(!reverse_search, "This function cannot be used in the REVERSE search.");
     xr_vector<COperatorCondition>::const_iterator I = vertex_index.conditions().begin();
     xr_vector<COperatorCondition>::const_iterator E = vertex_index.conditions().end();
     xr_vector<COperatorCondition>::const_iterator i = target_state().conditions().begin();
@@ -309,7 +309,7 @@ IC bool CProblemSolverAbstract::is_goal_reached_impl(const _index_type& vertex_i
 TEMPLATE_SPECIALIZATION
 IC bool CProblemSolverAbstract::is_goal_reached_impl(const _index_type& vertex_index, bool) const
 {
-    STATIC_CHECK(reverse_search, This_function_cannot_be_used_in_the_STRAIGHT_search);
+    static_assert(reverse_search, "This function cannot be used in the STRAIGHT search.");
     xr_vector<COperatorCondition>::const_iterator I = m_current_state.conditions().begin();
     xr_vector<COperatorCondition>::const_iterator E = m_current_state.conditions().end();
     xr_vector<COperatorCondition>::const_iterator i = vertex_index.conditions().begin();
@@ -377,7 +377,7 @@ TEMPLATE_SPECIALIZATION
 IC typename CProblemSolverAbstract::_edge_value_type CProblemSolverAbstract::estimate_edge_weight_impl(
     const _index_type& condition) const
 {
-    STATIC_CHECK(!reverse_search, This_function_cannot_be_used_in_the_REVERSE_search);
+    static_assert(!reverse_search, "This function cannot be used in the REVERSE search.");
     _edge_value_type result = 0;
     xr_vector<COperatorCondition>::const_iterator I = target_state().conditions().begin();
     xr_vector<COperatorCondition>::const_iterator E = target_state().conditions().end();
@@ -405,7 +405,7 @@ TEMPLATE_SPECIALIZATION
 IC typename CProblemSolverAbstract::_edge_value_type CProblemSolverAbstract::estimate_edge_weight_impl(
     const _index_type& condition, bool) const
 {
-    STATIC_CHECK(reverse_search, This_function_cannot_be_used_in_the_STRAIGHT_search);
+    static_assert(reverse_search, "This function cannot be used in the STRAIGHT search.");
     _edge_value_type result = 0;
     xr_vector<COperatorCondition>::const_iterator I = current_state().conditions().begin();
     xr_vector<COperatorCondition>::const_iterator E = current_state().conditions().end();

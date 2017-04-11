@@ -45,8 +45,8 @@ char* player_values_strtable[] = {
 
 void game_state_accumulator::init_accumulative_values()
 {
-    STATIC_CHECK(Loki::TL::Length<ACCUMULATIVE_STATE_LIST>::value == acpv_count,
-        Not_all_accumulative_values_has_been_added_to_a__ACCUMULATIVE_STATE_LIST__type_list);
+    static_assert(Loki::TL::Length<ACCUMULATIVE_STATE_LIST>::value == acpv_count,
+        "Not all accumulative values has been added to a ACCUMULATIVE_STATE_LIST type list.");
 
     init_acpv_list<ACCUMULATIVE_STATE_LIST>();
 }

@@ -20,7 +20,7 @@ xrGUID generate_guid()
 {
     xrGUID result;
 #ifdef WINVER
-    STATIC_CHECK(sizeof(xrGUID) == sizeof(GUID), Different_GUID_types);
+    static_assert(sizeof(xrGUID) == sizeof(GUID), "Different GUID types.");
     GUID _result;
     RPC_STATUS gen_result = UuidCreate(&_result);
     memcpy(&result, &_result, sizeof(_result));
@@ -32,7 +32,7 @@ xrGUID generate_guid()
     default: break;
     }
 #endif
-    STATIC_CHECK(sizeof(result) >= sizeof(u64), GUID_must_have_size_greater_or_equal_to_the_long_long);
+    static_assert(sizeof(result) >= sizeof(u64), "GUID must have size greater or equal to the long long.");
     ZeroMemory(&result, sizeof(result));
     u64 temp = CPU::GetCLK();
     memcpy(&result, &temp, sizeof(temp));
@@ -42,7 +42,7 @@ xrGUID generate_guid()
 LPCSTR generate_guid(const xrGUID& guid, LPSTR buffer, const u32& buffer_size)
 {
 #ifdef WINVER
-    STATIC_CHECK(sizeof(xrGUID) == sizeof(GUID), Different_GUID_types);
+    static_assert(sizeof(xrGUID) == sizeof(GUID), "Different GUID types.");
     GUID temp;
     memcpy(&temp, &guid, sizeof(guid));
     RPC_CSTR temp2;
