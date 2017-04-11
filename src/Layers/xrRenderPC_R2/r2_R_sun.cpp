@@ -71,12 +71,12 @@ struct BoundingBox
     void Centroid(D3DXVECTOR3* vec) const { *vec = 0.5f * (minPt + maxPt); }
     void Merge(const D3DXVECTOR3* vec)
     {
-        minPt.x = _min(minPt.x, vec->x);
-        minPt.y = _min(minPt.y, vec->y);
-        minPt.z = _min(minPt.z, vec->z);
-        maxPt.x = _max(maxPt.x, vec->x);
-        maxPt.y = _max(maxPt.y, vec->y);
-        maxPt.z = _max(maxPt.z, vec->z);
+        minPt.x = std::min(minPt.x, vec->x);
+        minPt.y = std::min(minPt.y, vec->y);
+        minPt.z = std::min(minPt.z, vec->z);
+        maxPt.x = std::max(maxPt.x, vec->x);
+        maxPt.y = std::max(maxPt.y, vec->y);
+        maxPt.z = std::max(maxPt.z, vec->z);
     }
     D3DXVECTOR3 Point(int i) const
     {
@@ -286,7 +286,7 @@ public:
                 Fvector tmp_point = view_frustum_rays[i].P;
 
                 tmp_dist = light_cuboid_polys[align_planes[p]].plane.classify(tmp_point);
-                min_dist = _min(tmp_dist, min_dist);
+                min_dist = std::min(tmp_dist, min_dist);
             }
 
             Fvector shift = light_cuboid_polys[align_planes[p]].plane.n;
@@ -747,8 +747,8 @@ D3DXVECTOR2 BuildTSMProjectionMatrix_caster_depth_bounds(D3DXMATRIX& lightSpaceB
         {
             s_casters[c].getpoint(e, pt);
             pt = wform(minmax_xform, pt);
-            min_z = _min(min_z, pt.z);
-            max_z = _max(max_z, pt.z);
+            min_z = std::min(min_z, pt.z);
+            max_z = std::max(max_z, pt.z);
         }
     }
     return D3DXVECTOR2(min_z, max_z);

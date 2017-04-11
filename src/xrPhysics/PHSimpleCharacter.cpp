@@ -212,7 +212,7 @@ void CPHSimpleCharacter::TestPathCallback(
 
 void CPHSimpleCharacter::SetBox(const dVector3& sizes)
 {
-    m_radius = _min(sizes[0], sizes[2]) / 2.f;
+    m_radius = std::min(sizes[0], sizes[2]) / 2.f;
     m_cyl_hight = sizes[1] - 2.f * m_radius;
     if (m_cyl_hight < 0.f)
         m_cyl_hight = 0.01f;
@@ -256,7 +256,7 @@ void CPHSimpleCharacter::Create(dVector3 sizes)
     m_creation_step = ph_world->m_steps_num;
     ////////////////////////////////////////////////////////
 
-    m_radius = _min(sizes[0], sizes[2]) / 2.f;
+    m_radius = std::min(sizes[0], sizes[2]) / 2.f;
     m_current_object_radius = m_radius;
     m_cyl_hight = sizes[1] - 2.f * m_radius;
     if (m_cyl_hight < 0.f)

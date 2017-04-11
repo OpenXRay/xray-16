@@ -212,7 +212,7 @@ void CActorCondition::UpdateCondition()
         if (true)
         {
             k_max_power =
-                1.0f + _min(cur_weight, base_weight) / base_weight + _max(0.0f, (cur_weight - base_weight) / 10.0f);
+                1.0f + std::min(cur_weight, base_weight) / base_weight + std::max(0.0f, (cur_weight - base_weight) / 10.0f);
         }
         else
         {

@@ -106,8 +106,8 @@ void CAI_Stalker::compute_enemy_distances(float& minimum_enemy_distance, float& 
     }
     }
 
-    minimum_enemy_distance = _min(minimum_enemy_distance, maximum_enemy_distance);
-    maximum_enemy_distance = _max(minimum_enemy_distance, maximum_enemy_distance);
+    minimum_enemy_distance = std::min(minimum_enemy_distance, maximum_enemy_distance);
+    maximum_enemy_distance = std::max(minimum_enemy_distance, maximum_enemy_distance);
 }
 
 const CCoverPoint* CAI_Stalker::find_best_cover(const Fvector& position_to_cover_from)

@@ -399,7 +399,7 @@ void CConsole::DrawBackgrounds(bool bGame)
     float list_w = pFont->SizeOf_(max_str) + 2.0f * w1;
 
     float font_h = pFont->CurrentHeight_();
-    float tips_h = _min(m_tips.size(), (u32)VIEW_TIPS_COUNT) * font_h;
+    float tips_h = std::min(m_tips.size(), (u32)VIEW_TIPS_COUNT) * font_h;
     tips_h += (m_tips.size() > 0) ? 5.0f : 0.0f;
 
     Frect pr, sr;

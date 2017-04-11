@@ -269,10 +269,10 @@ u32 CLevelGraph::guess_vertex_id(u32 const& current_vertex_id, Fvector const& po
 
     CVertex const* B = m_nodes;
     CVertex const* E = m_nodes + header().vertex_count();
-    u32 start_x = (u32)_max(0, int(x) - max_guess_vertex_count);
-    u32 stop_x = _min(max_x(), x + (u32)max_guess_vertex_count);
-    u32 start_z = (u32)_max(0, int(z) - max_guess_vertex_count);
-    u32 stop_z = _min(max_z(), z + (u32)max_guess_vertex_count);
+    u32 start_x = (u32)std::max(0, int(x) - max_guess_vertex_count);
+    u32 stop_x = std::min(max_x(), x + (u32)max_guess_vertex_count);
+    u32 start_z = (u32)std::max(0, int(z) - max_guess_vertex_count);
+    u32 stop_z = std::min(max_z(), z + (u32)max_guess_vertex_count);
     for (u32 i = start_x; i <= stop_x; ++i)
     {
         for (u32 j = start_z; j <= stop_z; ++j)

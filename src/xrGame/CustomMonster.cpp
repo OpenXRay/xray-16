@@ -624,7 +624,7 @@ void CCustomMonster::update_range_fov(float& new_range, float& new_fov, float st
     // 300=standart, 50=super-fog
 
     new_fov = start_fov;
-    new_range = start_range * (_min(m_far_plane_factor * current_far_plane, standard_far_plane) / standard_far_plane) *
+    new_range = start_range * (std::min(m_far_plane_factor * current_far_plane, standard_far_plane) / standard_far_plane) *
         (1.f / (1.f + m_fog_density_factor * current_fog_density));
 }
 

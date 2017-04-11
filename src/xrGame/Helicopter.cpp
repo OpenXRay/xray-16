@@ -286,7 +286,7 @@ void CHelicopter::MoveStep()
         dir.normalize_safe();
         pathDir = dir;
         dir.getHP(desired_H, desired_P);
-        float speed_ = _min(m_movement.GetSpeedInDestPoint(), GetMaxVelocity());
+        float speed_ = std::min(m_movement.GetSpeedInDestPoint(), GetMaxVelocity());
 
         static float ang = pSettings->r_float(cNameSect(), "magic_angle");
         if (m_movement.curLinearSpeed > GetMaxVelocity() || angle_difference(m_movement.currPathH, desired_H) > ang)

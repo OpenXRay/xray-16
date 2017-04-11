@@ -187,30 +187,30 @@ public:
 
     IC SelfRef min(const Self& v1, const Self& v2)
     {
-        x = _min(v1.x, v2.x);
-        y = _min(v1.y, v2.y);
-        z = _min(v1.z, v2.z);
+        x = std::min(v1.x, v2.x);
+        y = std::min(v1.y, v2.y);
+        z = std::min(v1.z, v2.z);
         return *this;
     }
     IC SelfRef min(const Self& v)
     {
-        x = _min(x, v.x);
-        y = _min(y, v.y);
-        z = _min(z, v.z);
+        x = std::min(x, v.x);
+        y = std::min(y, v.y);
+        z = std::min(z, v.z);
         return *this;
     }
     IC SelfRef max(const Self& v1, const Self& v2)
     {
-        x = _max(v1.x, v2.x);
-        y = _max(v1.y, v2.y);
-        z = _max(v1.z, v2.z);
+        x = std::max(v1.x, v2.x);
+        y = std::max(v1.y, v2.y);
+        z = std::max(v1.z, v2.z);
         return *this;
     }
     IC SelfRef max(const Self& v)
     {
-        x = _max(x, v.x);
-        y = _max(y, v.y);
-        z = _max(z, v.z);
+        x = std::max(x, v.x);
+        y = std::max(y, v.y);
+        z = std::max(z, v.z);
         return *this;
     }
 

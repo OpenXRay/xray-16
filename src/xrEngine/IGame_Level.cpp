@@ -272,7 +272,7 @@ void IGame_Level::SoundEvent_Register(ref_sound_data_ptr S, float range)
     }
 
     VERIFY(p && _valid(range));
-    range = _min(range, p->max_ai_distance);
+    range = std::min(range, p->max_ai_distance);
     VERIFY(_valid(snd_position));
     VERIFY(_valid(p->max_ai_distance));
     VERIFY(_valid(p->volume));

@@ -206,7 +206,7 @@ void CCoverEvaluatorBest::evaluate_cover(const CCoverPoint* cover_point, float w
 
     float high_cover_value = ai().level_graph().high_cover_in_direction(y, cover_point->level_vertex_id());
     float low_cover_value = ai().level_graph().low_cover_in_direction(y, cover_point->level_vertex_id());
-    float cover_value = _min(high_cover_value, low_cover_value);
+    float cover_value = std::min(high_cover_value, low_cover_value);
     float value = cover_value;
     if (ai().level_graph().neighbour_in_direction(direction, cover_point->level_vertex_id()))
         value += 10.f;
@@ -309,7 +309,7 @@ void CCoverEvaluatorSafe::evaluate_cover(const CCoverPoint* cover_point, float w
 
     float high_cover_value = ai().level_graph().vertex_high_cover(cover_point->level_vertex_id());
     float low_cover_value = ai().level_graph().vertex_low_cover(cover_point->level_vertex_id());
-    float cover_value = _min(high_cover_value, low_cover_value);
+    float cover_value = std::min(high_cover_value, low_cover_value);
     if (cover_value >= m_best_value)
         return;
 
@@ -352,14 +352,14 @@ void CCoverEvaluatorAmbush::evaluate_cover(const CCoverPoint* cover_point, float
     y = angle_normalize(y);
     float high_cover_from_enemy = ai().level_graph().high_cover_in_direction(y, cover_point->level_vertex_id());
     float low_cover_from_enemy = ai().level_graph().low_cover_in_direction(y, cover_point->level_vertex_id());
-    float cover_from_enemy = _min(high_cover_from_enemy, low_cover_from_enemy);
+    float cover_from_enemy = std::min(high_cover_from_enemy, low_cover_from_enemy);
 
     direction.sub(m_my_position, cover_point->position());
     direction.getHP(y, p);
     y = angle_normalize(y);
     float high_cover_from_myself = ai().level_graph().high_cover_in_direction(y, cover_point->level_vertex_id());
     float low_cover_from_myself = ai().level_graph().low_cover_in_direction(y, cover_point->level_vertex_id());
-    float cover_from_myself = _min(high_cover_from_myself, low_cover_from_myself);
+    float cover_from_myself = std::min(high_cover_from_myself, low_cover_from_myself);
 
     float value = cover_from_enemy / cover_from_myself;
     if (value >= m_best_value)

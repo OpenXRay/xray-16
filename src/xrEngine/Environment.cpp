@@ -106,7 +106,7 @@ CEnvironment::CEnvironment() : CurrentEnv(0), m_ambients_config(0)
     // params
     p_var_alt = deg2rad(config->r_float("environment", "altitude"));
     p_var_long = deg2rad(config->r_float("environment", "delta_longitude"));
-    p_min_dist = _min(.95f, config->r_float("environment", "min_dist_factor"));
+    p_min_dist = std::min(.95f, config->r_float("environment", "min_dist_factor"));
     p_tilt = deg2rad(config->r_float("environment", "tilt"));
     p_second_prop = config->r_float("environment", "second_propability");
     clamp(p_second_prop, 0.f, 1.f);

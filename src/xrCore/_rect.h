@@ -184,10 +184,10 @@ public:
         if (!intersected(b1, b2))
             return (FALSE);
 
-        x1 = _max(b1.x1, b2.x1);
-        y1 = _max(b1.y1, b2.y1);
-        x2 = _min(b1.x2, b2.x2);
-        y2 = _min(b1.y2, b2.y2);
+        x1 = std::max(b1.x1, b2.x1);
+        y1 = std::max(b1.y1, b2.y1);
+        x2 = std::min(b1.x2, b2.x2);
+        y2 = std::min(b1.y2, b2.y2);
         return (TRUE);
     }
 };

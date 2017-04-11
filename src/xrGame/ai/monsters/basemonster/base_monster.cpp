@@ -1006,10 +1006,10 @@ float CBaseMonster::get_screen_space_coverage_diagonal()
         Fvector p;
         b.getpoint(k, p);
         xform.transform(p);
-        mn.x = _min(mn.x, p.x);
-        mn.y = _min(mn.y, p.y);
-        mx.x = _max(mx.x, p.x);
-        mx.y = _max(mx.y, p.y);
+        mn.x = std::min(mn.x, p.x);
+        mn.y = std::min(mn.y, p.y);
+        mx.x = std::max(mx.x, p.x);
+        mx.y = std::max(mx.y, p.y);
     }
 
     float const width = mx.x - mn.x;

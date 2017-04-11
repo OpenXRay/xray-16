@@ -328,7 +328,7 @@ void anti_aim_ability::update_schedule()
     m_last_detection_tick = Device.dwTimeGlobal;
 
     float const angle = calculate_angle();
-    float const average_angle = _min(m_max_angle, (angle + m_last_angle) / 2);
+    float const average_angle = std::min(m_max_angle, (angle + m_last_angle) / 2);
     float const relative_angle = (m_max_angle - average_angle) / m_max_angle;
     float const detect_speed = can_detect() ? _sqr(relative_angle) * m_detection_gain_speed : 0;
 

@@ -218,7 +218,7 @@ void* xrMemory::mem_realloc(void* P, size_t size)
 #endif
         // Igor: Reserve 1 byte for xrMemory header
         // Don't bother in this case?
-        memcpy(p_new, p_old, _min(s_current - 1, s_dest));
+        memcpy(p_new, p_old, std::min(s_current - 1, s_dest));
         mem_free(p_old);
         _ptr = p_new;
     }

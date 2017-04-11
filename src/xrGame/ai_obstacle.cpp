@@ -179,13 +179,13 @@ void ai_obstacle::prepare_inside(Fvector& min, Fvector& max)
     {
         matrix.transform_tiny(points[i], local_points[i]);
 
-        min.x = _min(min.x, points[i].x);
-        min.y = _min(min.y, points[i].y);
-        min.z = _min(min.z, points[i].z);
+        min.x = std::min(min.x, points[i].x);
+        min.y = std::min(min.y, points[i].y);
+        min.z = std::min(min.z, points[i].z);
 
-        max.x = _max(max.x, points[i].x);
-        max.y = _max(max.y, points[i].y);
-        max.z = _max(max.z, points[i].z);
+        max.x = std::max(max.x, points[i].x);
+        max.y = std::max(max.y, points[i].y);
+        max.z = std::max(max.z, points[i].z);
     }
 
     m_box.m_planes[0].build(points[0], points[3], points[5]);
@@ -199,12 +199,12 @@ void ai_obstacle::prepare_inside(Fvector& min, Fvector& max)
 void ai_obstacle::correct_position(Fvector& position)
 {
     const Fbox& box = ai().level_graph().header().box();
-    position.x = _max(position.x, box.min.x);
-    position.y = _max(position.y, box.min.y);
-    position.z = _max(position.z, box.min.z);
-    position.x = _min(position.x, box.max.x);
-    position.y = _min(position.y, box.max.y);
-    position.z = _min(position.z, box.max.z);
+    position.x = std::max(position.x, box.min.x);
+    position.y = std::max(position.y, box.min.y);
+    position.z = std::max(position.z, box.min.z);
+    position.x = std::min(position.x, box.max.x);
+    position.y = std::min(position.y, box.max.y);
+    position.z = std::min(position.z, box.max.z);
 }
 
 void ai_obstacle::compute_impl()

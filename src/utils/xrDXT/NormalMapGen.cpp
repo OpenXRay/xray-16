@@ -59,11 +59,11 @@ Ivector vpack(Fvector src)
     float e_best = flt_max;
     int r = bx, g = by, b = bz;
     int d = 2;
-    for (int x = _max(bx - d, 0); x <= _min(bx + d, 255); x++)
+    for (int x = std::max(bx - d, 0); x <= std::min(bx + d, 255); x++)
     {
-        for (int y = _max(by - d, 0); y <= _min(by + d, 255); y++)
+        for (int y = std::max(by - d, 0); y <= std::min(by + d, 255); y++)
         {
-            for (int z = _max(bz - d, 0); z <= _min(bz + d, 255); z++)
+            for (int z = std::max(bz - d, 0); z <= std::min(bz + d, 255); z++)
             {
                 _v = vunpack(x, y, z);
                 float m = _v.magnitude();

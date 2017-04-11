@@ -58,7 +58,7 @@ void CSoundRender_Emitter::fill_data(u8* _dest, u32 offset, u32 size)
         }
 
         // fill block
-        u32 blk_size = _min(size, line_amount);
+        u32 blk_size = std::min(size, line_amount);
         u8* ptr = (u8*)SoundRender->cache.get_dataptr(source()->CAT, line);
         CopyMemory(_dest, ptr + line_offs, blk_size);
 
@@ -108,7 +108,7 @@ void CSoundRender_Emitter::fill_block(void* ptr, u32 size)
             do
             {
                 u32 sz_data = dwBytesTotal - get_cursor(true);
-                u32 sz_write = _min(size - hw_position, sz_data);
+                u32 sz_write = std::min(size - hw_position, sz_data);
                 fill_data(dest + hw_position, get_cursor(true), sz_write);
                 hw_position += sz_write;
                 move_cursor(sz_write);
