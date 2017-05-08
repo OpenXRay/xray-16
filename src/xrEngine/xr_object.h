@@ -49,6 +49,7 @@ class CSpaceRestrictor;
 class CAttachableItem;
 class CHolderCustom;
 class CBaseMonster;
+class CShellLauncher; //--#SM+#--
 class CBlend;
 struct SHit;
 class CScriptGameObject;
@@ -56,6 +57,7 @@ class CAI_ObjectLocation;
 class CScriptBinderObject;
 class ai_obstacle;
 class animation_movement_controller;
+class CCameraBase; //--#SM+#--
 
 template <typename TResult>
 class CScriptCallbackEx;
@@ -211,14 +213,18 @@ public:
     virtual BOOL getReady() const = 0;
     // ~Properties
     virtual void Load(LPCSTR section) = 0;
+    virtual void PostLoad(LPCSTR section) = 0; //--#SM+#--
     // Update
     virtual void UpdateCL() = 0; // Called each frame, so no need for dt
+    virtual void PostUpdateCL(bool bUpdateCL_disabled) = 0; //--#SM+#-- Вызывается всегда, в отличии от UpdateCL [called always for object regardless of it being active\sleep]
     // Position stack
     virtual u32 ps_Size() const = 0;
     virtual GameObjectSavedPosition ps_Element(u32 id) const = 0;
     virtual void ForceTransform(const Fmatrix& m) = 0;
     // HUD
     virtual void OnHUDDraw(CCustomHUD* hud) = 0;
+    virtual void OnRenderHUD(IGameObject* pCurViewEntity) = 0; //--#SM+#--
+    virtual void OnOwnedCameraMove(CCameraBase* pCam, float fOldYaw, float fOldPitch) = 0; //--#SM+#--
     // Active/non active
     virtual void OnH_B_Chield() = 0; // before
     virtual void OnH_B_Independent(bool justBeforeDestroy) = 0;
@@ -252,6 +258,7 @@ public:
     virtual CAttachableItem* cast_attachable_item() = 0;
     virtual CHolderCustom* cast_holder_custom() = 0;
     virtual CBaseMonster* cast_base_monster() = 0;
+    virtual CShellLauncher* cast_shell_launcher() = 0; //--#SM+#--
     virtual bool feel_touch_on_contact(IGameObject* obj) = 0;
     // Utilities
     // XXX: move out
@@ -342,7 +349,7 @@ public:
     virtual void on_matrix_change(const Fmatrix& prev) = 0;
     // UsableScriptObject functions
     virtual bool use(IGameObject* obj) = 0;
-    //строчка появляющаяся при наведении на объект (если NULL, то нет)
+    // строчка появляющаяся при наведении на объект (если NULL, то нет)
     virtual LPCSTR tip_text() = 0;
     virtual void set_tip_text(LPCSTR text) = 0;
     virtual void set_tip_text_default() = 0;

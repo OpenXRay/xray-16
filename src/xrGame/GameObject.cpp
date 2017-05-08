@@ -246,6 +246,8 @@ void CGameObject::Load(LPCSTR section)
     }
 }
 
+void CGameObject::PostLoad(LPCSTR section) {}
+
 void CGameObject::init()
 {
     m_lua_game_object = 0;
@@ -1386,6 +1388,8 @@ void CGameObject::UpdateCL()
     on_matrix_change(m_previous_matrix);
     m_previous_matrix = XFORM();
 }
+
+void CGameObject::PostUpdateCL(bool bUpdateCL_disabled) {}
 
 void CGameObject::on_matrix_change(const Fmatrix& previous) { obstacle().on_move(); }
 #ifdef DEBUG

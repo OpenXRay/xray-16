@@ -46,6 +46,7 @@ IGameObject* IGame_ObjectPool::create(LPCSTR name)
     IGameObject* O = smart_cast<IGameObject*>(NEW_INSTANCE(CLS));
     O->cNameSect_set(name);
     O->Load(name);
+    O->PostLoad(name); //--#SM+#--
     return O;
 }
 

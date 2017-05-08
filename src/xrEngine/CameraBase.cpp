@@ -26,6 +26,7 @@ CCameraBase::CCameraBase(IGameObject* p, u32 flags)
     f_fov = 90;
     f_aspect = 1.f;
     tag = 0;
+    m_bInputDisabled = false; //--#SM+#--
 }
 
 CCameraBase::~CCameraBase() {}

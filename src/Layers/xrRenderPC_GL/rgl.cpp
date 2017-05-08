@@ -468,6 +468,8 @@ void CRender::OnFrame()
     }
 }
 
+void CRender::BeforeWorldRender() {}
+void CRender::AfterWorldRender() {}
 
 // Implementation
 IRender_ObjectSpecific* CRender::ros_create(IRenderable* parent) { return new CROS_impl(); }

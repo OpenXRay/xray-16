@@ -210,6 +210,7 @@ public:
     virtual CAttachableItem* cast_attachable_item() override { return NULL; }
     virtual CHolderCustom* cast_holder_custom() override { return NULL; }
     virtual CBaseMonster* cast_base_monster() override { return NULL; }
+    CShellLauncher* cast_shell_launcher() override { return nullptr; }
     virtual bool feel_touch_on_contact(IGameObject*) override { return TRUE; }
     // Utilities
     // XXX: move out
@@ -217,7 +218,9 @@ public:
     static void u_EventSend(NET_Packet& P, u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/);
     // Methods
     virtual void Load(LPCSTR section) override;
+    void PostLoad(LPCSTR section) override; //--#SM+#--
     virtual void UpdateCL() override; // Called each frame, so no need for dt
+    void PostUpdateCL(bool bUpdateCL_disabled) override; //--#SM+#--
     virtual void OnChangeVisual() override;
     // object serialization
     virtual void net_Save(NET_Packet& packet) override;
@@ -239,6 +242,8 @@ public:
     virtual GameObjectSavedPosition ps_Element(u32 ID) const override;
     virtual void ForceTransform(const Fmatrix& m) override {}
     virtual void OnHUDDraw(CCustomHUD* hud) override {}
+    void OnRenderHUD(IGameObject* pCurViewEntity) override {} //--#SM+#--
+    void OnOwnedCameraMove(CCameraBase* pCam, float fOldYaw, float fOldPitch) override  {} //--#SM+#--
     virtual BOOL Ready() override { return getReady(); } // update only if active and fully initialized by/for network
     virtual void renderable_Render() override;
     virtual void OnEvent(NET_Packet& P, u16 type) override;
@@ -344,17 +349,21 @@ public:
         return *m_ai_obstacle;
     }
     virtual void on_matrix_change(const Fmatrix& previous) override;
+
     // UsableScriptObject functions
     virtual bool use(IGameObject* obj) override;
+
     //строчка появляющаяся при наведении на объект (если NULL, то нет)
     virtual LPCSTR tip_text() override;
     virtual void set_tip_text(LPCSTR new_text) override;
     virtual void set_tip_text_default() override;
+
     //можно ли использовать объект стандартным (не скриптовым) образом
     virtual bool nonscript_usable() override;
     virtual void set_nonscript_usable(bool usable) override;
     virtual CScriptBinderObject* GetScriptBinderObject() override { return scriptBinder.object(); }
     virtual void SetScriptBinderObject(CScriptBinderObject* object) override { scriptBinder.set_object(object); }
+
 protected:
     virtual void spawn_supplies();
 

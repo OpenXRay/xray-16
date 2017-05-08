@@ -357,7 +357,7 @@ public:
         FTold = Device.mFullTransform;
 
         // XXX: Xottab_DUTY: custom FOV. Implement it someday
-        // It should something like this:
+        // It should be something like this:
         // float customFOV;
         // if (isCustomFOV)
         //     customFOV = V->getVisData().obj_data->m_hud_custom_fov;
