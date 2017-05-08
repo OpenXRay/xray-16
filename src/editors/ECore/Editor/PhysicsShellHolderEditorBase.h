@@ -14,6 +14,7 @@ public:
 protected:
     CPhysicsShellHolderEditorBase() : m_physics_shell(0), m_object_xform(Fidentity) {}
     ~CPhysicsShellHolderEditorBase() { /*DeletePhysicsShell	();*/}
+
 protected:
     CPhysicsShell* m_physics_shell;
     Fmatrix m_object_xform;
@@ -25,6 +26,7 @@ private:
     virtual bool _BCL ObjectGetDestroy() const { return false; };
     virtual ICollisionHitCallback* _BCL ObjectGetCollisionHitCallback() { return 0; }
     virtual u16 _BCL ObjectID() const { return u16(-1); }
+    virtual IGameObject* _BCL IObject() { return 0; } //--#SM+#--
     virtual ICollisionForm* _BCL ObjectCollisionModel()
     {
         VERIFY(false);
@@ -44,14 +46,18 @@ private:
     virtual bool _BCL IsInventoryItem() { return false; }
     virtual bool _BCL IsActor() { return false; }
     virtual bool _BCL IsStalker() { return false; }
+    virtual bool _BCL IsCollideWithBullets() { return false; } //--#SM+#--
+    virtual bool _BCL IsCollideWithActorCamera() { return false; } //--#SM+#--
     // virtual	void						SetWeaponHideState					( u16 State, bool bSet )=0;
     virtual void _BCL HideAllWeapons(bool v) {} //(SetWeaponHideState(INV_STATE_BLOCK_ALL,true))
     virtual void _BCL MovementCollisionEnable(bool enable) {}
     virtual CPHSoundPlayer* _BCL ObjectPhSoundPlayer() { return 0; }
     virtual ICollisionDamageReceiver* _BCL ObjectPhCollisionDamageReceiver() { return 0; }
     virtual void _BCL BonceDamagerCallback(float& damage_factor) {}
+
 public:
     virtual Fmatrix& _BCL ObjectXFORM() { return m_object_xform; }
+
 private:
     virtual Fvector& _BCL ObjectPosition() { return m_object_xform.c; }
 #ifdef DEBUG

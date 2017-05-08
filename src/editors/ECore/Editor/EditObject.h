@@ -572,6 +572,10 @@ private:
     virtual void LL_SetBoneVisible(u16 bone_id, BOOL val, BOOL bRecursive) { VERIFY(false); }
     virtual u64 LL_GetBonesVisible() { return u64(-1); }
     virtual void LL_SetBonesVisible(u64 mask) { VERIFY(false); }
+
+    virtual void LL_AddTransformToBone(KinematicsABT::additional_bone_transform& offset){}; //--#SM+#--
+    virtual void LL_ClearAdditionalTransform(u16 bone_id){}; //--#SM+#--
+
     // Main functionality
     virtual void CalculateBones(BOOL bForceExact = FALSE) {} // Recalculate skeleton
     virtual void CalculateBones_Invalidate() {}
