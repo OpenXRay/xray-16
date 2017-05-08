@@ -10,6 +10,8 @@ class IPhysicsShellHolder;
 class CPHSoundPlayer;
 class ICollisionDamageReceiver;
 class ICollisionForm;
+class IGameObject; //--#SM+#--
+
 class ICollisionHitCallback
 {
 public:
@@ -41,6 +43,7 @@ public:
     virtual bool ObjectGetDestroy() const = 0;
     virtual ICollisionHitCallback* ObjectGetCollisionHitCallback() = 0;
     virtual u16 ObjectID() const = 0;
+    virtual IGameObject* IObject() = 0; //--#SM+#--
     virtual ICollisionForm* ObjectCollisionModel() = 0;
     //	virtual	IRenderVisual*					ObjectVisual						()						=0;
     virtual IKinematics* ObjectKinematics() = 0;
@@ -56,6 +59,8 @@ public:
     virtual bool IsInventoryItem() = 0;
     virtual bool IsActor() = 0;
     virtual bool IsStalker() = 0;
+    virtual bool IsCollideWithBullets() = 0; //--#SM+#--
+    virtual bool IsCollideWithActorCamera() = 0; //--#SM+#--
     // virtual	void							SetWeaponHideState					( u16 State, bool bSet )=0;
     virtual void HideAllWeapons(bool v) = 0; //(SetWeaponHideState(INV_STATE_BLOCK_ALL,true))
     virtual void MovementCollisionEnable(bool enable) = 0;

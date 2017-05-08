@@ -1,11 +1,9 @@
 #pragma once
-#ifndef PHYSICSSHELL_HOLDER_H
-#define PHYSICSSHELL_HOLDER_H
 
 #include "GameObject.h"
 #include "ParticlesPlayer.h"
-#include "xrEngine/iobjectphysicscollision.h"
-#include "xrPhysics/iphysicsshellholder.h"
+#include "xrEngine/IObjectPhysicsCollision.h"
+#include "xrPhysics/IPhysicsShellHolder.h"
 
 class CPHDestroyable;
 class CPHCollisionDamageReceiver;
@@ -118,6 +116,7 @@ private: // IPhysicsShellHolder
     virtual bool ObjectGetDestroy() const;
     virtual ICollisionHitCallback* ObjectGetCollisionHitCallback();
     virtual u16 ObjectID() const;
+    virtual IGameObject* IObject(); //--#SM+#--
     virtual ICollisionForm* ObjectCollisionModel();
     // virtual	IRenderVisual*								ObjectVisual						() ;
     virtual IKinematics* ObjectKinematics();
@@ -133,6 +132,8 @@ private: // IPhysicsShellHolder
     virtual bool IsInventoryItem();
     virtual bool IsActor();
     virtual bool IsStalker();
+    virtual bool IsCollideWithBullets(); //--#SM+#--
+    virtual bool IsCollideWithActorCamera(); //--#SM+#--
     // virtual	void						SetWeaponHideState					( u16 State, bool bSet )=0;
     virtual void HideAllWeapons(bool v); //(SetWeaponHideState(INV_STATE_BLOCK_ALL,true))
     virtual void MovementCollisionEnable(bool enable);
@@ -144,4 +145,3 @@ private: // IPhysicsShellHolder
 #endif
 };
 
-#endif

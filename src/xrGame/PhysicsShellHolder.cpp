@@ -461,6 +461,12 @@ LPCSTR CPhysicsShellHolder::ObjectNameSect() const { return cNameSect().c_str();
 bool CPhysicsShellHolder::ObjectGetDestroy() const { return !!CGameObject::getDestroy(); }
 ICollisionHitCallback* CPhysicsShellHolder::ObjectGetCollisionHitCallback() { return get_collision_hit_callback(); }
 u16 CPhysicsShellHolder::ObjectID() const { return ID(); }
+
+IGameObject* CPhysicsShellHolder::IObject() //--#SM+#--
+{
+    return smart_cast<IGameObject*>(this);
+}
+
 ICollisionForm* CPhysicsShellHolder::ObjectCollisionModel()
 {
     return CForm; // XXX: use ICollidable::GetCForm() instead
@@ -498,6 +504,9 @@ IPHCapture* CPhysicsShellHolder::PHCapture()
 bool CPhysicsShellHolder::IsInventoryItem() { return !!cast_inventory_item(); }
 bool CPhysicsShellHolder::IsActor() { return !!cast_actor(); }
 bool CPhysicsShellHolder::IsStalker() { return !!cast_stalker(); }
+bool CPhysicsShellHolder::IsCollideWithBullets() { return true; }
+bool CPhysicsShellHolder::IsCollideWithActorCamera() { return true; }
+
 // void						SetWeaponHideState( u16 State, bool bSet )
 void CPhysicsShellHolder::HideAllWeapons(bool v) {}
 void CPhysicsShellHolder::MovementCollisionEnable(bool enable)
