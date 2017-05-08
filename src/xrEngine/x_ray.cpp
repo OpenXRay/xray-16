@@ -16,6 +16,7 @@
 #include "xrCDB/ISpatial.h"
 #include "xrSASH.h"
 #include "xrServerEntities/smart_cast.h"
+#include "xr_input.h"
 
 //---------------------------------------------------------------------
 
@@ -155,6 +156,9 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
 {
     if (E == eQuit)
     {
+        if (pInput != NULL)
+            pInput->ClipCursor(false);
+
         g_SASH.EndBenchmark();
 
         PostQuitMessage(0);
@@ -194,6 +198,9 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
         ls_header[0] = '\0';
         ls_tip_number[0] = '\0';
         ls_tip[0] = '\0';
+
+        if (pInput != NULL && TRUE == Engine.Event.Peek("KERNEL:quit"))
+            pInput->ClipCursor(false);
 
         if (g_pGameLevel)
         {
