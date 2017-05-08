@@ -143,10 +143,58 @@ void check_kinematics(CKinematics* _k, LPCSTR s)
 }
 #endif
 
+// Добавить скриптовое смещение для кости --#SM+#--
+void CKinematics::LL_AddTransformToBone(KinematicsABT::additional_bone_transform& offset)
+{
+    m_bones_offsets.push_back(offset);
+}
+
+// Обнулить скриптовое смещение для конкретной кости или всех сразу (bone_id = BI_NONE) --#SM+#--
+void CKinematics::LL_ClearAdditionalTransform(u16 bone_id)
+{
+    if (bone_id == BI_NONE)
+    {
+        m_bones_offsets.clear();
+        return;
+    }
+
+    BONE_TRANSFORM_VECTOR_IT it = m_bones_offsets.begin();
+    while (it != m_bones_offsets.end())
+    {
+        if (it->m_bone_id == bone_id)
+        {
+            it = m_bones_offsets.erase(it);
+        }
+        else
+            ++it;
+    }
+}
+
 void CKinematics::BuildBoneMatrix(
     const CBoneData* bd, CBoneInstance& bi, const Fmatrix* parent, u8 /*channel_mask = (1<<0)*/)
 {
     bi.mTransform.mul_43(*parent, bd->bind_transform);
+    CalculateBonesAdditionalTransforms(bd, bi, parent, channel_mask); //--#SM+#--
+}
+
+// Добавляем константные смещения к нужным костям --#SM+#--
+void CKinematics::CalculateBonesAdditionalTransforms(
+    const CBoneData* bd, CBoneInstance& bi, const Fmatrix* parent, u8 channel_mask /* = (1<<0)*/)
+{
+    // bi.mTransform.c - содержит смещение относительно первой кости модели\центра сцены (0, 0, 0)
+    BONE_TRANSFORM_VECTOR_IT it = m_bones_offsets.begin();
+    while (it != m_bones_offsets.end())
+    {
+        if (it->m_bone_id == bd->GetSelfID())
+        {
+            Fvector vOldPos = bi.mTransform.c;
+            bi.mTransform.mulB_43(it->m_transform); // Rotation
+            bi.mTransform.c.add(vOldPos, it->m_transform.c); // Translation
+        }
+
+        // next
+        ++it;
+    }
 }
 
 void CKinematics::CLBone(const CBoneData* bd, CBoneInstance& bi, const Fmatrix* parent, u8 channel_mask /*= (1<<0)*/)

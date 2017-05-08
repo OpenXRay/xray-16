@@ -108,6 +108,7 @@ public:
         d = counter_D;
     }
     void clear_Counters() { counter_S = counter_D = 0; }
+
 public:
     D3DXRenderBase();
 

@@ -374,7 +374,12 @@ void CRender::add_leafs_Dynamic(dxRender_Visual* pVisual)
         // Add all children, doesn't perform any tests
         FHierrarhyVisual* pV = (FHierrarhyVisual*)pVisual;
         for (auto &i : pV->children)
+        {
+            i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
+                                                                                   // [use shader data from parent model, rather than it childrens]
+
             add_leafs_Dynamic(i);
+        }
     }
         return;
     case MT_SKELETON_ANIM:
@@ -401,7 +406,11 @@ void CRender::add_leafs_Dynamic(dxRender_Visual* pVisual)
             pV->CalculateBones(TRUE);
             pV->CalculateWallmarks(); //. bug?
             for (auto &i : pV->children)
+            {
+                i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
+                                                                                       // [use shader data from parent model, rather than it childrens]
                 add_leafs_Dynamic(i);
+            }
         }
     }
         return;
@@ -446,7 +455,11 @@ void CRender::add_leafs_Static(dxRender_Visual* pVisual)
         // Add all children, doesn't perform any tests
         FHierrarhyVisual* pV = (FHierrarhyVisual*)pVisual;
         for (auto &i : pV->children)
+        {
+            i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
+                                                                                   // [use shader data from parent model, rather than it childrens]
             add_leafs_Static(i);
+        }
     }
         return;
     case MT_SKELETON_ANIM:
@@ -456,7 +469,11 @@ void CRender::add_leafs_Static(dxRender_Visual* pVisual)
         CKinematics* pV = (CKinematics*)pVisual;
         pV->CalculateBones(TRUE);
         for (auto &i : pV->children)
+        {
+            i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
+                                                                                   // [use shader data from parent model, rather than it childrens]
             add_leafs_Static(i);
+        }
     }
         return;
     case MT_LOD:
@@ -479,7 +496,11 @@ void CRender::add_leafs_Static(dxRender_Visual* pVisual)
         {
             // Add all children, doesn't perform any tests
             for (auto &i : pV->children)
+            {
+                i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
+                                                                                       // [use shader data from parent model, rather than it childrens]
                 add_leafs_Static(i);
+            }
         }
     }
         return;

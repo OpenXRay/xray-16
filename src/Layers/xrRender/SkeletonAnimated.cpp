@@ -920,6 +920,15 @@ void CKinematicsAnimated::LL_BoneMatrixBuild(CBoneInstance& bi, const Fmatrix* p
 #endif
 }
 
+// Добавить скриптовое смещение для кости --#SM+#--
+void CKinematicsAnimated::LL_AddTransformToBone(KinematicsABT::additional_bone_transform& offset)
+{
+    inherited::LL_AddTransformToBone(offset);
+}
+
+// Обнулить скриптовое смещение для конкретной кости или всех сразу (bone_id = BI_NONE) --#SM+#--
+void CKinematicsAnimated::LL_ClearAdditionalTransform(u16 bone_id) { inherited::LL_ClearAdditionalTransform(bone_id); }
+
 void CKinematicsAnimated::BuildBoneMatrix(
     const CBoneData* bd, CBoneInstance& bi, const Fmatrix* parent, u8 channel_mask /*= (1<<0)*/)
 {
@@ -930,6 +939,8 @@ void CKinematicsAnimated::BuildBoneMatrix(
     LL_BuldBoneMatrixDequatize(bd, channel_mask, keys);
 
     LL_BoneMatrixBuild(bi, parent, keys);
+
+    CalculateBonesAdditionalTransforms(bd, bi, parent, channel_mask); //--#SM+#--
 
     /*
     if(bi.mTransform.c.y>10000)
