@@ -527,3 +527,8 @@ void CLoadScreenRenderer::stop()
 }
 
 void CLoadScreenRenderer::OnRender() { pApp->load_draw_internal(); }
+
+bool CRenderDevice::CSecondVPParams::IsSVPFrame() //--#SM+#-- +SecondVP+
+{
+    return IsSVPActive() && Device.dwFrame % frameDelay == 0;
+}
