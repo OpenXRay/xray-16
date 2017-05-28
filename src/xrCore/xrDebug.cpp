@@ -30,7 +30,7 @@ static BOOL bException = FALSE;
 #endif
 
 #ifdef USE_BUG_TRAP
-#include <BugTrap/source/Client/BugTrap.h>
+#include <BugTrap/source/BugTrap.h>
 #pragma comment(lib, "BugTrap.lib")
 #endif
 
