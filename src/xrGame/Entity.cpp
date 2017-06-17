@@ -266,7 +266,7 @@ void CEntity::KillEntity(u16 whoID, bool bypass_actor_check)
 #endif
     //-AVO
 
-    if (this->ID() == Actor()->ID())
+    if (GameID() == eGameIDSingle && this->ID() == Actor()->ID())
     {
         Actor()->detach_Vehicle();
         Actor()->use_MountedWeapon(nullptr);
