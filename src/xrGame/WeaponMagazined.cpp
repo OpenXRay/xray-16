@@ -201,7 +201,7 @@ bool CWeaponMagazined::TryReload()
                 m_pCurrentAmmo = smart_cast<CWeaponAmmo*>(m_pInventory->GetAny(m_ammoTypes[i].c_str()));
                 if (m_pCurrentAmmo)
                 {
-                    m_ammoType = i;
+                    m_set_next_ammoType_on_reload = i;
                     SetPending(TRUE);
                     SwitchState(eReload);
                     return true;
