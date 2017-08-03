@@ -45,7 +45,7 @@ public:
 
     virtual bool Action(u16 cmd, u32 flags);
 
-    virtual void State(u32 state);
+    virtual void State(u32 state, u32 old_state);
     virtual void OnStateSwitch(u32 S);
     virtual bool GetBriefInfo(II_BriefInfo& info);
 

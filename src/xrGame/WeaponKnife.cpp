@@ -70,12 +70,18 @@ void CWeaponKnife::Load(LPCSTR section)
 
 void CWeaponKnife::OnStateSwitch(u32 S)
 {
+    u32 old_state = GetState();
     inherited::OnStateSwitch(S);
     switch (S)
     {
     case eIdle: switch2_Idle(); break;
     case eShowing: switch2_Showing(); break;
-    case eHiding: switch2_Hiding(); break;
+    case eHiding:
+    {
+        if (old_state != eHiding)
+            switch2_Hiding();
+        break;
+    }
     case eHidden: switch2_Hidden(); break;
     case eFire:
     {
