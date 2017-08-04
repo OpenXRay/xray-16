@@ -66,10 +66,10 @@ public:
 
     IC SelfRef invalidate()
     {
-        lt.x = type_max(T);
-        lt.y = type_max(T);
-        rb.x = type_min(T);
-        rb.y = type_min(T);
+        lt.x = type_max<T>;
+        lt.y = type_max<T>;
+        rb.x = type_min<T>;
+        rb.y = type_min<T>;
         return *this;
     };
     IC bool valide() { return lt.x1 < rb.x && lt.y < rb.y; }

@@ -25,7 +25,7 @@ void OptimiseVertexCoherencyTriList(WORD* pwList, int iHowManyTris, u32 optimize
         DWORD* remap = xr_alloc<DWORD>(iHowManyTris);
         WORD max_idx = 0;
         for (int k = 0; k < iHowManyTris * 3; k++)
-            max_idx = _max(max_idx, pwList[k]);
+            max_idx = std::max(max_idx, pwList[k]);
         HRESULT rhr = D3DXOptimizeFaces(pwList, iHowManyTris, max_idx + 1, FALSE, remap);
         R_CHK(rhr);
         WORD* tmp = xr_alloc<WORD>(iHowManyTris * 3);
@@ -368,7 +368,7 @@ BOOL CalculateSW(Object* object, VIPM_Result* result, u32 optimize_vertex_order)
         {
             R_ASSERT((j + swr->offset) < result->indices.size());
             swr->num_verts =
-                _max(swr->num_verts, *(result->indices.item(j + swr->offset))); // fignya index ne doljen bit bolshe!!!
+                std::max(swr->num_verts, *(result->indices.item(j + swr->offset))); // fignya index ne doljen bit bolshe!!!
             //.			R_ASSERT ( *(result->indices.item(j+swr->offset)) < swr->num_verts );
             if (*(result->indices.item(j + swr->offset)) >= swr->num_verts)
             {

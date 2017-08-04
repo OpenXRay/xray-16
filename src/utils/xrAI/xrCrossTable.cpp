@@ -30,13 +30,13 @@ void vfRecurseUpdate(u32 dwStartNodeID, u32 percent, u32 iVertexCount)
     Logger.Progress(float(percent) / float(iVertexCount));
     for (; !curr_fringe.empty();)
     {
-        xr_vector<u32>::iterator I = curr_fringe.begin();
-        xr_vector<u32>::iterator E = curr_fringe.end();
+        auto I = curr_fringe.begin();
+        auto E = curr_fringe.end();
         for (; I != E; ++I)
         {
             (*g_tDistances)[*I] = curr_dist;
             CLevelGraph::const_iterator i, e;
-            CLevelGraph::CVertex* node = (*g_tMap).vertex(*I);
+            auto node = (*g_tMap).vertex(*I);
             (*g_tMap).begin(*I, i, e);
             for (; i != e; ++i)
             {
@@ -75,7 +75,7 @@ void vfRecurseMark(const CLevelGraph& tMap, xr_vector<bool>& tMarks, u32 dwStart
     {
         dwStartNodeID = l_stack.back();
         l_stack.resize(l_stack.size() - 1);
-        CLevelGraph::CVertex* node = tMap.vertex(dwStartNodeID);
+        auto node = tMap.vertex(dwStartNodeID);
         tMap.begin(dwStartNodeID, I, E);
         tMarks[dwStartNodeID] = true;
         for (; I != E; ++I)
@@ -119,13 +119,13 @@ CCrossTableBuilder::CCrossTableBuilder(LPCSTR caProjectName)
 
     tDistances.resize(iVertexCount);
     {
-        FLOAT_VECTOR_IT I = tDistances.begin();
-        FLOAT_VECTOR_IT E = tDistances.end();
+        auto I = tDistances.begin();
+        auto E = tDistances.end();
         for (; I != E; I++)
         {
             (*I).resize(iNodeCount);
-            FLOAT_IT i = (*I).begin();
-            FLOAT_IT e = (*I).end();
+            auto i = (*I).begin();
+            auto e = (*I).end();
             for (; i != e; i++)
                 *i = u32(-1);
         }
@@ -164,8 +164,8 @@ CCrossTableBuilder::CCrossTableBuilder(LPCSTR caProjectName)
     {
         for (int i = 0; i < iNodeCount; i++)
         {
-            FLOAT_VECTOR_IT I = tDistances.begin(), B = I;
-            FLOAT_VECTOR_IT E = tDistances.end();
+            auto I = tDistances.begin(), B = I;
+            auto E = tDistances.end();
             CGameLevelCrossTable::CCell tCrossTableCell;
             tCrossTableCell.fDistance = flt_max;
             tCrossTableCell.tGraphIndex = u16(-1);

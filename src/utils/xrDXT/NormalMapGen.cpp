@@ -100,7 +100,7 @@ void CalculateNormalMap(NVI_Image* pSrc, ConvolutionKernel* pKernels, int num_ke
     conv.Initialize(&pSrc, pKernels, num_kernels, wrap);
     int size_x = (int)pSrc->GetWidth();
     int size_y = (int)pSrc->GetHeight();
-    DWORD* pArray = (DWORD*)pSrc->GetImageDataPointer();
+    auto pArray = (DWORD*)pSrc->GetImageDataPointer();
     assert(pArray != NULL);
     // Now run the kernel over the source image area and write out the values.
     // coordinates of source image (not padded)

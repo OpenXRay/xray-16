@@ -92,7 +92,7 @@ bool intersect(const Fobb& box, const Fvector& origin, const Fvector& direction,
     kDirection.set(direction.dotproduct(box.m_rotate.i), direction.dotproduct(box.m_rotate.j),
         direction.dotproduct(box.m_rotate.k));
 
-    float fT0 = 0.0f, fT1 = type_max(float);
+    float fT0 = 0.0f, fT1 = type_max<float>;
     box_axis ax0 = a_none;
     box_axis ax1 = a_none;
     box_axis ax = a_none;

@@ -20,8 +20,8 @@ IC Fvector construct_position(CLevelGraph& level_graph, u32 level_vertex_id, flo
 CSpaceRestrictorWrapper::CSpaceRestrictorWrapper(CSE_ALifeSpaceRestrictor* object)
 {
     m_object = object;
-    m_level_graph = 0;
-    m_graph_engine = 0;
+    m_level_graph = nullptr;
+    m_graph_engine = nullptr;
     m_xform.setXYZ(object->o_Angle);
     m_xform.c.set(object->o_Position);
 }
@@ -29,8 +29,8 @@ CSpaceRestrictorWrapper::CSpaceRestrictorWrapper(CSE_ALifeSpaceRestrictor* objec
 void CSpaceRestrictorWrapper::clear()
 {
     m_border.clear();
-    m_level_graph = 0;
-    m_graph_engine = 0;
+    m_level_graph = nullptr;
+    m_graph_engine = nullptr;
 }
 
 bool CSpaceRestrictorWrapper::inside(const Fvector& position, float radius) const
@@ -160,12 +160,12 @@ void CSpaceRestrictorWrapper::fill_shape(const CShapeData::shape_def& shape)
         for (int i = 0; i < 8; ++i)
         {
             Q.transform_tiny(temp, points[i]);
-            start.x = _min(start.x, temp.x);
-            start.y = _min(start.y, temp.y);
-            start.z = _min(start.z, temp.z);
-            dest.x = _max(dest.x, temp.x);
-            dest.y = _max(dest.y, temp.y);
-            dest.z = _max(dest.z, temp.z);
+            start.x = std::min(start.x, temp.x);
+            start.y = std::min(start.y, temp.y);
+            start.z = std::min(start.z, temp.z);
+            dest.x = std::max(dest.x, temp.x);
+            dest.y = std::max(dest.y, temp.y);
+            dest.z = std::max(dest.z, temp.z);
         }
         break;
     }
@@ -177,7 +177,7 @@ void CSpaceRestrictorWrapper::fill_shape(const CShapeData::shape_def& shape)
 
 bool CSpaceRestrictorWrapper::inside(u32 level_vertex_id, bool partially_inside, float radius) const
 {
-    const Fvector& position = level_graph().vertex_position(level_vertex_id);
+    const auto& position = level_graph().vertex_position(level_vertex_id);
     float offset = level_graph().header().cell_size() * .5f - EPS_L;
     if (partially_inside)
         return (inside(construct_position(level_graph(), level_vertex_id, position.x + offset, position.z + offset),
@@ -226,14 +226,14 @@ void CSpaceRestrictorWrapper::build_border()
         fill_shape(*I);
 
     {
-        BORDER::iterator I =
+        auto I =
             std::remove_if(m_border.begin(), m_border.end(), border_merge_predicate(this, m_level_graph));
         m_border.erase(I, m_border.end());
     }
 
     {
         std::sort(m_border.begin(), m_border.end());
-        BORDER::iterator I = std::unique(m_border.begin(), m_border.end());
+        auto I = std::unique(m_border.begin(), m_border.end());
         m_border.erase(I, m_border.end());
         std::sort(m_border.begin(), m_border.end(), sort_by_xz_predicate(m_level_graph));
     }
@@ -245,13 +245,13 @@ void CSpaceRestrictorWrapper::verify_connectivity()
 {
     {
         std::sort(m_internal.begin(), m_internal.end());
-        BORDER::iterator I = std::unique(m_internal.begin(), m_internal.end());
+        auto I = std::unique(m_internal.begin(), m_internal.end());
         m_internal.erase(I, m_internal.end());
     }
 
     u32 start_vertex_id = u32(-1);
-    CLevelGraph::const_vertex_iterator I = level_graph().begin();
-    CLevelGraph::const_vertex_iterator E = level_graph().end();
+    auto I = level_graph().begin();
+    auto E = level_graph().end();
     for (; I != E; ++I)
         if (!inside(level_graph().vertex(I), true))
         {

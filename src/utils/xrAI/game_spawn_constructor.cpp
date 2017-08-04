@@ -82,8 +82,8 @@ void CGameSpawnConstructor::load_spawns(LPCSTR name, bool no_separator_check)
 
     // load levels
     GameGraph::SLevel level;
-    LEVEL_INFO_STORAGE::const_iterator I = m_levels.begin();
-    LEVEL_INFO_STORAGE::const_iterator E = m_levels.end();
+    auto I = m_levels.begin();
+    auto E = m_levels.end();
     for (; I != E; ++I)
     {
         level.m_offset = (*I).m_offset;
@@ -103,8 +103,8 @@ void CGameSpawnConstructor::load_spawns(LPCSTR name, bool no_separator_check)
 
 void CGameSpawnConstructor::process_spawns()
 {
-    LEVEL_SPAWN_STORAGE::iterator I = m_level_spawns.begin();
-    LEVEL_SPAWN_STORAGE::iterator E = m_level_spawns.end();
+    auto I = m_level_spawns.begin();
+    auto E = m_level_spawns.end();
     for (; I != E; ++I)
 #ifdef NO_MULTITHREADING
         (*I)->Execute();
@@ -123,14 +123,14 @@ void CGameSpawnConstructor::process_spawns()
 
 void CGameSpawnConstructor::verify_spawns(ALife::_SPAWN_ID spawn_id)
 {
-    xr_vector<ALife::_SPAWN_ID>::iterator J = std::find(m_temp0.begin(), m_temp0.end(), spawn_id);
+    auto J = std::find(m_temp0.begin(), m_temp0.end(), spawn_id);
     R_ASSERT3(J == m_temp0.end(), "RECURSIVE Spawn group chain found in spawn",
         m_spawn_graph->vertex(spawn_id)->data()->object().name_replace());
     m_temp0.push_back(spawn_id);
 
-    SPAWN_GRAPH::CVertex* vertex = m_spawn_graph->vertex(spawn_id);
-    SPAWN_GRAPH::const_iterator I = vertex->edges().begin();
-    SPAWN_GRAPH::const_iterator E = vertex->edges().end();
+    auto vertex = m_spawn_graph->vertex(spawn_id);
+    auto I = vertex->edges().begin();
+    auto E = vertex->edges().end();
     for (; I != E; ++I)
         verify_spawns((*I).vertex_id());
 }
@@ -217,7 +217,7 @@ void CGameSpawnConstructor::add_story_object(ALife::_STORY_ID id, CSE_ALifeDynam
     if (id == INVALID_STORY_ID)
         return;
 
-    ALife::STORY_P_PAIR_IT I = m_story_objects.find(id);
+    auto I = m_story_objects.find(id);
     if (I != m_story_objects.end())
     {
         Msg("Object %s, story id %d", object->name_replace(), object->m_story_id);
@@ -240,10 +240,10 @@ void CGameSpawnConstructor::add_object(CSE_Abstract* object)
 void CGameSpawnConstructor::remove_object(CSE_Abstract* object) { spawn_graph().remove_vertex(object->m_tSpawnID); }
 void CGameSpawnConstructor::process_actor(LPCSTR start_level_name)
 {
-    m_actor = 0;
+    m_actor = nullptr;
 
-    LEVEL_SPAWN_STORAGE::iterator I = m_level_spawns.begin();
-    LEVEL_SPAWN_STORAGE::iterator E = m_level_spawns.end();
+    auto I = m_level_spawns.begin();
+    auto E = m_level_spawns.end();
     for (; I != E; ++I)
     {
         if (!(*I)->actor())
@@ -263,18 +263,18 @@ void CGameSpawnConstructor::process_actor(LPCSTR start_level_name)
     if (!xr_strcmp(*actor_level_name(), start_level_name))
         return;
 
-    const CGameGraph::SLevel& level = game_graph().header().level(start_level_name);
-    GameGraph::_GRAPH_ID dest = GameGraph::_GRAPH_ID(-1);
+    const auto& level = game_graph().header().level(start_level_name);
+    auto dest = GameGraph::_GRAPH_ID(-1);
     GraphEngineSpace::CGameLevelParams evaluator(level.id());
-    CGraphEngine* graph_engine = new CGraphEngine(game_graph().header().vertex_count());
+    auto graph_engine = new CGraphEngine(game_graph().header().vertex_count());
 
-    bool failed = !graph_engine->search(game_graph(), m_actor->m_tGraphID, GameGraph::_GRAPH_ID(-1), 0, evaluator);
+    bool failed = !graph_engine->search(game_graph(), m_actor->m_tGraphID, GameGraph::_GRAPH_ID(-1), nullptr, evaluator);
     if (failed)
     {
         Msg("! Cannot build path via game graph from the current level to the level %s!", start_level_name);
         float min_dist = flt_max;
-        Fvector current = game_graph().vertex(m_actor->m_tGraphID)->game_point();
-        GameGraph::_GRAPH_ID n = game_graph().header().vertex_count();
+        auto current = game_graph().vertex(m_actor->m_tGraphID)->game_point();
+        auto n = game_graph().header().vertex_count();
         for (GameGraph::_GRAPH_ID i = 0; i < n; ++i)
         {
             if (game_graph().vertex(i)->level_id() == level.id())
@@ -308,7 +308,7 @@ void clear_temp_folder()
     string_path query;
     FS.update_path(query, "$app_data_root$", "temp\\*.*");
     _finddata_t file;
-    intptr_t handle = _findfirst(query, &file);
+    auto handle = _findfirst(query, &file);
     if (handle == intptr_t(-1))
         return;
 

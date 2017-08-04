@@ -3,6 +3,7 @@
 #define TYPES_H
 
 #include <cstdint>
+#include <limits>
 
 // Type defs
 using s8 = std::int8_t;
@@ -45,6 +46,8 @@ constexpr float flt_min = type_min<float>;
 constexpr float flt_zero = type_zero<float>;
 constexpr float flt_eps = type_epsilon<float>;
 
+#undef FLT_MAX
+#undef FLT_MIN
 #define FLT_MAX flt_max
 #define FLT_MIN flt_min
 
@@ -52,6 +55,8 @@ constexpr double dbl_max = type_max<double>;
 constexpr double dbl_min = type_min<double>;
 constexpr double dbl_zero = type_zero<double>;
 constexpr double dbl_eps = type_epsilon<double>;
+
+constexpr int max_path = 260;
 
 using string16 = char[16];
 using string32 = char[32];
@@ -63,6 +68,6 @@ using string1024 = char[1024];
 using string2048 = char[2048];
 using string4096 = char[4096];
 
-using string_path = char[2 * MAX_PATH];
+using string_path = char[2 * max_path];
 
 #endif

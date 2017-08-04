@@ -19,7 +19,7 @@ typedef xr_vector<bool> COVER_NODES;
 COVER_NODES g_cover_nodes;
 
 typedef CQuadTree<CCoverPoint> CPointQuadTree;
-static CPointQuadTree* g_covers = 0;
+static CPointQuadTree* g_covers = nullptr;
 typedef xr_vector<CCoverPoint*> COVERS;
 
 // -------------------------------- Ray pick
@@ -51,8 +51,9 @@ IC float getLastRP_Scale(CDB::COLLIDER* DB, RayCache& C)
             if (!SH.flags.bLIGHT_CastShadow)
                 continue;
 
-            if (0 == T.pSurface)
-                T.bHasAlpha = FALSE;
+            if (T.pSurface == nullptr)
+                T.bHasAlpha = false;
+
             if (!T.bHasAlpha)
             {
                 // Opaque poly - cache it
@@ -67,7 +68,7 @@ IC float getLastRP_Scale(CDB::COLLIDER* DB, RayCache& C)
             B.set(1.0f - rpinf.u - rpinf.v, rpinf.u, rpinf.v);
 
             // calc UV
-            Fvector2* cuv = F.t;
+            auto cuv = F.t;
             Fvector2 uv;
             uv.x = cuv[0].x * B.x + cuv[1].x * B.y + cuv[2].x * B.z;
             uv.y = cuv[0].y * B.x + cuv[1].y * B.y + cuv[2].y * B.z;
@@ -225,7 +226,7 @@ public:
 
     IC void Clear()
     {
-        for (Nearest_it it = q_Clear.begin(); it != q_Clear.end(); it++)
+        for (auto it = q_Clear.begin(); it != q_Clear.end(); ++it)
             q_Marks[*it] = false;
     }
 };
@@ -264,7 +265,7 @@ public:
         Q.Perform(N);
 
         // main cycle: trace rays and compute counts
-        for (Nearest_it it = Q.q_List.begin(); it != Q.q_List.end(); it++)
+        for (auto it = Q.q_List.begin(); it != Q.q_List.end(); it++)
         {
             // calc dir & range
             u32 ID = *it;
@@ -406,8 +407,7 @@ bool vertex_in_direction(const u32& start_vertex_id, const u32& target_vertex_id
     start = Fvector2().set(start_position.x, start_position.z);
     dest.set(finish_position.x, finish_position.z);
     dir.sub(dest, start);
-    Fvector2 temp;
-    temp = start;
+    auto temp = start;
 
     float cur_sqr = _sqr(temp.x - dest.x) + _sqr(temp.y - dest.y);
     for (;;)
@@ -464,9 +464,9 @@ void compute_non_covers()
         VERIFY(!g_covers);
         g_covers = new CPointQuadTree(aabb, g_params.fPatchSize * .5f, 8 * 65536, 4 * 65536);
 
-        Nodes::iterator B = g_nodes.begin(), I = B;
-        Nodes::iterator E = g_nodes.end();
-        COVER_NODES::iterator J = g_cover_nodes.begin();
+        auto B = g_nodes.begin(), I = B;
+        auto E = g_nodes.end();
+        auto J = g_cover_nodes.begin();
         for (; I != E; ++I, ++J)
         {
             if (!*J)
@@ -488,9 +488,9 @@ void compute_non_covers()
     typedef xr_vector<COVER_PAIR> COVER_PAIRS;
     COVER_PAIRS cover_pairs;
 
-    Nodes::iterator B = g_nodes.begin(), I = B;
-    Nodes::iterator E = g_nodes.end();
-    COVER_NODES::iterator J = g_cover_nodes.begin();
+    auto B = g_nodes.begin(), I = B;
+    auto E = g_nodes.end();
+    auto J = g_cover_nodes.begin();
     for (; I != E; ++I, ++J)
     {
         if (*J)
@@ -609,7 +609,7 @@ void xrCover(bool pure_covers)
     // Smooth
     Logger.Status("Smoothing coverage mask...");
     mem_Optimize();
-    Nodes Old = g_nodes;
+    auto Old = g_nodes;
     for (u32 N = 0; N < g_nodes.size(); N++)
     {
         vertex& Base = Old[N];

@@ -279,7 +279,7 @@ void MxEdgeQSlim::apply_mesh_penalties(MxQSlimEdge* info)
 
     // Check for excess over degree bounds.
     //
-    unsigned int max_degree = _max(N1.length(), N2.length());
+    unsigned int max_degree = std::max(N1.length(), N2.length());
     if (max_degree > vertex_degree_limit)
         bias += (max_degree - vertex_degree_limit) * meshing_penalty * 0.001;
 
@@ -305,7 +305,7 @@ void MxEdgeQSlim::apply_mesh_penalties(MxQSlimEdge* info)
     {
         double Nmin1 = check_local_inversion(info->v1, info->v2, info->vnew);
         double Nmin2 = check_local_inversion(info->v2, info->v1, info->vnew);
-        if (_min(Nmin1, Nmin2) < 0.0)
+        if (std::min(Nmin1, Nmin2) < 0.0)
             bias += meshing_penalty;
     }
 
@@ -336,7 +336,7 @@ void MxEdgeQSlim::apply_mesh_penalties(MxQSlimEdge* info)
 #if USE_OLD_INVERSION_CHECK
     double Nmin1 = check_local_inversion(info->v1, info->v2, info->vnew);
     double Nmin2 = check_local_inversion(info->v2, info->v1, info->vnew);
-    if (_min(Nmin1, Nmin2) < 0.0)
+    if (std::min(Nmin1, Nmin2) < 0.0)
         bias += meshing_penalty;
 #endif
 
@@ -532,11 +532,11 @@ void MxEdgeQSlim::apply_contraction(const MxPairContraction& conx)
 
     //	u32 r=edges.size();
     std::sort(edges.begin(), edges.end());
-    EdgeVecIt new_end = std::unique(edges.begin(), edges.end());
+    auto new_end = std::unique(edges.begin(), edges.end());
     edges.erase(new_end, edges.end());
     //	u32 rr=edges.size();
     //	Msg	("%d: %d/%d - %d",(unsigned int)edge_links(conx.v1).length(),r,rr,r-rr);
-    for (EdgeVecIt it = edges.begin(); it != edges.end(); it++)
+    for (auto it = edges.begin(); it != edges.end(); it++)
         compute_edge_info(*it);
 }
 

@@ -435,7 +435,7 @@ void CGameGraphBuilder::fill_neighbours(const u32& game_vertex_id)
     {
         level_vertex_id = m_mark_stack.back();
         m_mark_stack.resize(m_mark_stack.size() - 1);
-        CLevelGraph::CVertex* node = level_graph().vertex(level_vertex_id);
+        auto node = level_graph().vertex(level_vertex_id);
         level_graph().begin(level_vertex_id, I, E);
         m_marks[level_vertex_id] = true;
         for (; I != E; ++I)
@@ -494,12 +494,12 @@ float CGameGraphBuilder::path_distance(const u32& game_vertex_id0, const u32& ga
     Msg("Cannot build path from [%f][%f][%f] to [%f][%f][%f]", VPUSH(vertex0.data().level_point()),
         VPUSH(vertex1.data().level_point()));
     R_ASSERT2(false, "Cannot build path, check AI map");
-    return (flt_max);
+    return flt_max;
 }
 
 void CGameGraphBuilder::generate_edges(const u32& game_vertex_id)
 {
-    graph_type::CVertex* vertex = graph().vertex(game_vertex_id);
+    auto vertex = graph().vertex(game_vertex_id);
 
     xr_vector<u32>::const_iterator I = m_current_fringe.begin();
     xr_vector<u32>::const_iterator E = m_current_fringe.end();
@@ -554,7 +554,7 @@ void CGameGraphBuilder::create_tripples(const float& start, const float& amount)
 
             const graph_type::CEdge* edge = graph().vertex((*i).vertex_id())->edge((*I).first);
 
-            m_tripples.push_back(std::make_pair(_min((*i).weight(), edge ? edge->weight() : (*i).weight()),
+            m_tripples.push_back(std::make_pair(std::min((*i).weight(), edge ? edge->weight() : (*i).weight()),
                 std::make_pair((*I).first, (*i).vertex_id())));
         }
     }
