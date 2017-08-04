@@ -92,7 +92,7 @@ BOOL CRenderTarget::enable_scissor(light* L) // true if intersects near plane
     {
         Fsphere S;
         S.set(L->spatial.sphere.P, L->spatial.sphere.R);
-        dbg_spheres.push_back(mk_pair(S, L->color));
+        dbg_spheres.push_back(std::make_pair(S, L->color));
     }
 #endif
 
