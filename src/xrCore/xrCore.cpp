@@ -20,7 +20,7 @@ XRCORE_API xrCore Core;
 namespace CPU
 {
 extern void Detect();
-};
+}
 
 static u32 init_counter = 0;
 

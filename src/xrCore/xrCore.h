@@ -59,9 +59,7 @@
 #ifndef DEBUG
 #pragma inline_depth(254)
 #pragma inline_recursion(on)
-#ifndef __BORLANDC__
 #pragma intrinsic(abs, fabs, fmod, sin, cos, tan, asin, acos, atan, sqrt, exp, log, log10, strcat)
-#endif
 #endif
 
 #include <time.h>
@@ -93,10 +91,11 @@
 #include <set>
 #include <map>
 
-#ifndef _EDITOR
 #include <hash_map>
 #include <hash_set>
-#endif
+
+#include <cinttypes>
+#include <chrono>
 
 #include <string>
 #pragma warning(pop)
@@ -209,7 +208,6 @@ public:
 // ********************************************** The Core definition
 class XRCORE_API xrCore
 {
-private:
     const char* buildDate;
     u32 buildId;
 
@@ -223,7 +221,6 @@ public:
     DWORD dwFrame;
     bool PluginMode;
 
-public:
     void _initialize(
     LPCSTR ApplicationName, LogCallback cb = 0, BOOL init_fs = TRUE, LPCSTR fs_fname = 0, bool plugin = false);
     void _destroy();
