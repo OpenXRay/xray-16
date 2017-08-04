@@ -744,6 +744,26 @@ void CWeaponMagazinedWGrenade::net_Import(NET_Packet& P)
     inherited::net_Import(P);
 }
 
+float CWeaponMagazinedWGrenade::Weight() const
+{
+    float res = inherited::Weight();
+
+    const char* last_type = nullptr;
+    float w = 0, bs = 0;
+    for (auto& c : m_magazine2)
+    {
+        // Usually ammos in mag have same type, use it to improve performance
+        if (last_type != c.m_ammoSect.c_str())
+        {
+            last_type = c.m_ammoSect.c_str();
+            w = pSettings->r_float(last_type, "inv_weight");
+            bs = pSettings->r_float(last_type, "box_size");
+        }
+        res += w / bs;
+    }
+    return res;
+}
+
 bool CWeaponMagazinedWGrenade::IsNecessaryItem(const shared_str& item_sect)
 {
     return (std::find(m_ammoTypes.begin(), m_ammoTypes.end(), item_sect) != m_ammoTypes.end() ||
