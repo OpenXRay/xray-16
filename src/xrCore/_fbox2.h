@@ -59,8 +59,8 @@ public:
     };
     IC SelfRef invalidate()
     {
-        min.set(type_max(T), type_max(T));
-        max.set(type_min(T), type_min(T));
+        min.set(type_max<T>, type_max<T>);
+        max.set(type_min<T>, type_min<T>);
         return *this;
     }
 

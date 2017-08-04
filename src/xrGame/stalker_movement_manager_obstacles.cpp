@@ -108,7 +108,7 @@ bool stalker_movement_manager_obstacles::can_build_restricted_path(const obstacl
     typedef SBaseParameters<float, u32, u32> evaluator_type;
 
     m_failed_to_build_path = !ai().graph_engine().search(ai().level_graph(), object().ai_location().level_vertex_id(),
-        level_path().dest_vertex_id(), &m_temp_path, evaluator_type(type_max(_dist_type), _iteration_type(-1), 4096));
+        level_path().dest_vertex_id(), &m_temp_path, evaluator_type(type_max<_dist_type>, _iteration_type(-1), 4096));
 
     remove_border(query);
 
