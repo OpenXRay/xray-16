@@ -117,10 +117,9 @@ void CCustomDetector::ToggleDetector(bool bFastMode)
         SwitchState(eHiding);
 }
 
-void CCustomDetector::OnStateSwitch(u32 S)
+void CCustomDetector::OnStateSwitch(u32 S, u32 oldState)
 {
-    u32 oldState = GetState();
-    inherited::OnStateSwitch(S);
+    inherited::OnStateSwitch(S, oldState);
 
     switch (S)
     {

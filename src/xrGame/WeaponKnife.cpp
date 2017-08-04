@@ -68,17 +68,16 @@ void CWeaponKnife::Load(LPCSTR section)
     knife_material_idx = GMLib.GetMaterialIdx(KNIFE_MATERIAL_NAME);
 }
 
-void CWeaponKnife::OnStateSwitch(u32 S)
+void CWeaponKnife::OnStateSwitch(u32 S, u32 oldState)
 {
-    u32 old_state = GetState();
-    inherited::OnStateSwitch(S);
+    inherited::OnStateSwitch(S, oldState);
     switch (S)
     {
     case eIdle: switch2_Idle(); break;
     case eShowing: switch2_Showing(); break;
     case eHiding:
     {
-        if (old_state != eHiding)
+        if (oldState != eHiding)
             switch2_Hiding();
         break;
     }

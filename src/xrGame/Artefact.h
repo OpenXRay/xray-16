@@ -96,7 +96,7 @@ public:
     virtual void Show();
     virtual void UpdateXForm();
     virtual bool Action(u16 cmd, u32 flags);
-    virtual void OnStateSwitch(u32 S);
+    virtual void OnStateSwitch(u32 S, u32 oldState);
     virtual void OnAnimationEnd(u32 state);
     virtual bool IsHidden() const { return GetState() == eHidden; }
     // optimization FAST/SLOW mode

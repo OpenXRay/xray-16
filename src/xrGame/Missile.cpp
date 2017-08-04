@@ -239,7 +239,7 @@ void CMissile::shedule_Update(u32 dt)
     }
 }
 
-void CMissile::State(u32 state, u32 old_state)
+void CMissile::State(u32 state, u32 oldState)
 {
     switch (state)
     {
@@ -259,7 +259,7 @@ void CMissile::State(u32 state, u32 old_state)
     {
         if (H_Parent())
         {
-            if (old_state != eHiding)
+            if (oldState != eHiding)
             {
                 SetPending(TRUE);
                 PlayHUDMotion("anm_hide", TRUE, this, GetState());
@@ -311,11 +311,10 @@ void CMissile::State(u32 state, u32 old_state)
     }
 }
 
-void CMissile::OnStateSwitch(u32 S)
+void CMissile::OnStateSwitch(u32 S, u32 oldState)
 {
     m_dwStateTime = 0;
-    u32 oldState = GetState();
-    inherited::OnStateSwitch(S);
+    inherited::OnStateSwitch(S, oldState);
     State(S, oldState);
 }
 

@@ -35,7 +35,7 @@ public:
     virtual void FireEnd();
     void LaunchGrenade();
 
-    virtual void OnStateSwitch(u32 S);
+    virtual void OnStateSwitch(u32 S, u32 oldState);
 
     virtual void switch2_Reload();
     virtual void state_Fire(float dt);

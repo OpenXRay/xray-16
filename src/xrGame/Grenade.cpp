@@ -136,8 +136,12 @@ bool CGrenade::DropGrenade()
 
 void CGrenade::DiscardState()
 {
-    if (IsGameTypeSingle() && (GetState() == eReady || GetState() == eThrow))
-        OnStateSwitch(eIdle);
+    if (IsGameTypeSingle())
+    {
+        u32 state = GetState();
+        if (state == eReady || state == eThrow)
+            OnStateSwitch(eIdle, state);
+    }
 }
 
 void CGrenade::SendHiddenItem()
