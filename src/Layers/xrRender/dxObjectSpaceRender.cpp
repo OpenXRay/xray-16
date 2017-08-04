@@ -7,7 +7,7 @@
 dxObjectSpaceRender::dxObjectSpaceRender() { m_shDebug.create("debug\\wireframe", "$null"); }
 dxObjectSpaceRender::~dxObjectSpaceRender() { m_shDebug.destroy(); }
 void dxObjectSpaceRender::Copy(IObjectSpaceRender& _in) { *this = *(dxObjectSpaceRender*)&_in; }
-void dxObjectSpaceRender::dbgAddSphere(const Fsphere& sphere, u32 colour) { dbg_S.push_back(mk_pair(sphere, colour)); }
+void dxObjectSpaceRender::dbgAddSphere(const Fsphere& sphere, u32 colour) { dbg_S.push_back(std::make_pair(sphere, colour)); }
 void dxObjectSpaceRender::dbgRender()
 {
     R_ASSERT(bDebug);
