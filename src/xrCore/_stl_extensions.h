@@ -108,8 +108,8 @@ public:
     char* _charalloc(size_type n) { return (char*)allocate(n); }
     void deallocate(pointer p, size_type n) const { xr_free(p); }
     void deallocate(void* p, size_type n) const { xr_free(p); }
-    void construct(pointer p, const T& _Val) { std::_Construct(p, _Val); }
-    void destroy(pointer p) { std::_Destroy(p); }
+    void construct(pointer p, const T& _Val) { new(p) T(_Val); }
+    void destroy(pointer p) { p->~T(); }
     size_type max_size() const
     {
         size_type _Count = (size_type)(-1) / sizeof(T);
