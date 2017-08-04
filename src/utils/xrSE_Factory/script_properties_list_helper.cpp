@@ -64,14 +64,14 @@ struct CWrapHelper<bool>
 template <typename T>
 typename CWrapHelper<T>::result_type* wrap_value(luabind::object object, LPCSTR name)
 {
-    return (CWrapHelper<T>::wrap_value < is_class<T>::result &&
+    return (CWrapHelper<T>::wrap_value < std::is_class_v<T> &&
         !object_type_traits::is_same<shared_str, T>::value > (object, name));
 }
 
 template <typename T>
 typename CWrapHelper<T>::result_type* wrap_value(luabind::object object, luabind::object table, LPCSTR name)
 {
-    return (CWrapHelper<T>::wrap_value < is_class<T>::result &&
+    return (CWrapHelper<T>::wrap_value < std::is_class_v<T> &&
         !object_type_traits::is_same<shared_str, T>::value > (object, table, name));
 }
 
