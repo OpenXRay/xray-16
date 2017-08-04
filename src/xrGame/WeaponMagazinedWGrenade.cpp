@@ -176,22 +176,7 @@ void CWeaponMagazinedWGrenade::PerformSwitchGL()
     swap(m_ammoType, m_ammoType2);
     swap(m_DefaultCartridge, m_DefaultCartridge2);
 
-    xr_vector<CCartridge> l_magazine;
-    while (m_magazine.size())
-    {
-        l_magazine.push_back(m_magazine.back());
-        m_magazine.pop_back();
-    }
-    while (m_magazine2.size())
-    {
-        m_magazine.push_back(m_magazine2.back());
-        m_magazine2.pop_back();
-    }
-    while (l_magazine.size())
-    {
-        m_magazine2.push_back(l_magazine.back());
-        l_magazine.pop_back();
-    }
+    m_magazine.swap(m_magazine2);
     iAmmoElapsed = (int)m_magazine.size();
 
     m_BriefInfo_CalcFrame = 0;
