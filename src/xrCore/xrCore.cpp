@@ -73,7 +73,7 @@ void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs, 
 
         InitLog();
         _initialize_cpu();
-        R_ASSERT(CPU::ID.feature & _CPU_FEATURE_SSE);
+        R_ASSERT(CPU::ID.hasFeature(CpuFeature::Sse));
         ttapi_Init(CPU::ID);
         XRay::Math::Initialize();
         // xrDebug::Initialize ();

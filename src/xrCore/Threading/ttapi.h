@@ -6,7 +6,7 @@ using TTAPIWorkerFunc = void (*)(void* lpWorkerParameters);
 
 // Initializes subsystem
 // Returns zero for error, and number of workers on success
-int XRCORE_API ttapi_Init(const _processor_info& pi);
+int XRCORE_API ttapi_Init(const processor_info& pi);
 
 // Destroys subsystem
 void XRCORE_API ttapi_Done();

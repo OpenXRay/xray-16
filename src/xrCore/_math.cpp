@@ -143,7 +143,7 @@ XRCORE_API u64 qpc_freq = 0;
 XRCORE_API u64 qpc_overhead = 0;
 XRCORE_API u32 qpc_counter = 0;
 
-XRCORE_API _processor_info ID;
+XRCORE_API processor_info ID;
 
 XRCORE_API u64 QPC()
 {
@@ -164,7 +164,7 @@ u64 __fastcall GetCLK(void)
 void Detect()
 {
     // General CPU identification
-    if (!_cpuid(&ID))
+    if (!query_processor_info(&ID))
     {
         // Core.Fatal ("Fatal error: can't detect CPU/FPU.");
         abort();
@@ -234,7 +234,7 @@ bool g_initialize_cpu_called = false;
 //------------------------------------------------------------------------------------
 void _initialize_cpu(void)
 {
-    Msg("* Detected CPU: %s [%s], F%d/M%d/S%d, %.2f mhz, %d-clk 'rdtsc'", CPU::ID.model_name, CPU::ID.v_name,
+    Msg("* Detected CPU: %s [%s], F%d/M%d/S%d, %.2f mhz, %d-clk 'rdtsc'", CPU::ID.modelName, CPU::ID.vendor,
         CPU::ID.family, CPU::ID.model, CPU::ID.stepping, float(CPU::clk_per_second / u64(1000000)),
         u32(CPU::clk_overhead));
 
@@ -242,36 +242,28 @@ void _initialize_cpu(void)
 
     if (strstr(Core.Params, "-x86"))
     {
-        CPU::ID.feature &= ~_CPU_FEATURE_MMX;
-        CPU::ID.feature &= ~_CPU_FEATURE_3DNOW;
-        CPU::ID.feature &= ~_CPU_FEATURE_SSE;
-        CPU::ID.feature &= ~_CPU_FEATURE_SSE2;
-        CPU::ID.feature &= ~_CPU_FEATURE_SSE3;
-        CPU::ID.feature &= ~_CPU_FEATURE_SSSE3;
-        CPU::ID.feature &= ~_CPU_FEATURE_SSE4_1;
-        CPU::ID.feature &= ~_CPU_FEATURE_SSE4_2;
+        CPU::ID.hasFeature(CpuFeature::Mmx);
+        CPU::ID.hasFeature(CpuFeature::_3dNow);
+        CPU::ID.hasFeature(CpuFeature::Sse);
+        CPU::ID.hasFeature(CpuFeature::Sse2);
+        CPU::ID.hasFeature(CpuFeature::Sse3);
+        CPU::ID.hasFeature(CpuFeature::Ssse3);
+        CPU::ID.hasFeature(CpuFeature::Sse41);
+        CPU::ID.hasFeature(CpuFeature::Sse42);
     };
 
     string256 features;
     xr_strcpy(features, sizeof(features), "RDTSC");
-    if (CPU::ID.feature & _CPU_FEATURE_MMX)
-        xr_strcat(features, ", MMX");
-    if (CPU::ID.feature & _CPU_FEATURE_3DNOW)
-        xr_strcat(features, ", 3DNow!");
-    if (CPU::ID.feature & _CPU_FEATURE_SSE)
-        xr_strcat(features, ", SSE");
-    if (CPU::ID.feature & _CPU_FEATURE_SSE2)
-        xr_strcat(features, ", SSE2");
-    if (CPU::ID.feature & _CPU_FEATURE_SSE3)
-        xr_strcat(features, ", SSE3");
-    if (CPU::ID.feature & _CPU_FEATURE_SSSE3)
-        xr_strcat(features, ", SSSE3");
-    if (CPU::ID.feature & _CPU_FEATURE_SSE4_1)
-        xr_strcat(features, ", SSE4.1");
-    if (CPU::ID.feature & _CPU_FEATURE_SSE4_2)
-        xr_strcat(features, ", SSE4.2");
-    if (CPU::ID.feature & _CPU_FEATURE_HTT)
-        xr_strcat(features, ", HTT");
+    if (CPU::ID.hasFeature(CpuFeature::Mmx)) xr_strcat(features, ", MMX");
+    if (CPU::ID.hasFeature(CpuFeature::_3dNow)) xr_strcat(features, ", 3DNow!");
+    if (CPU::ID.hasFeature(CpuFeature::Sse)) xr_strcat(features, ", SSE");
+    if (CPU::ID.hasFeature(CpuFeature::Sse2)) xr_strcat(features, ", SSE2");
+    if (CPU::ID.hasFeature(CpuFeature::Sse3)) xr_strcat(features, ", SSE3");
+    if (CPU::ID.hasFeature(CpuFeature::MWait)) xr_strcat(features, ", MONITOR/MWAIT");
+    if (CPU::ID.hasFeature(CpuFeature::Ssse3)) xr_strcat(features, ", SSSE3");
+    if (CPU::ID.hasFeature(CpuFeature::Sse41)) xr_strcat(features, ", SSE4.1");
+    if (CPU::ID.hasFeature(CpuFeature::Sse42)) xr_strcat(features, ", SSE4.2");
+    if (CPU::ID.hasFeature(CpuFeature::HT)) xr_strcat(features, ", HTT");
 
     Msg("* CPU features: %s", features);
     Msg("* CPU cores/threads: %d/%d\n", CPU::ID.n_cores, CPU::ID.n_threads);
@@ -304,7 +296,7 @@ void _initialize_cpu_thread()
     xrDebug::OnThreadSpawn();
     if (!Core.PluginMode)
         FPU::m24r();
-    if (CPU::ID.feature & _CPU_FEATURE_SSE)
+    if (CPU::ID.hasFeature(CpuFeature::Sse))
     {
         //_mm_setcsr ( _mm_getcsr() | (_MM_FLUSH_ZERO_ON+_MM_DENORMALS_ZERO_ON) );
         _MM_SET_FLUSH_ZERO_MODE(_MM_FLUSH_ZERO_ON);
