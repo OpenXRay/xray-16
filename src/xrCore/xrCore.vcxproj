@@ -70,11 +70,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-<<<<<<< HEAD
-      <AdditionalIncludeDirectories>$(SolutionDir)Externals;$(SolutionDir)Externals\lzo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-=======
-      <AdditionalIncludeDirectories>$(xrExternals);$(xrExternals)openssl\include;$(xrExternals)lzo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
->>>>>>> 1ca44c6e... Move src/Externals to Externals.
+      <AdditionalIncludeDirectories>$(xrExternals);$(xrExternals)lzo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>false</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
@@ -90,11 +86,7 @@
     </ClCompile>
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-<<<<<<< HEAD
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(SolutionDir)Externals\lzo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-=======
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(xrExternals)BugTrap\Bin;$(xrExternals)openssl\lib;$(xrExternals)lzo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
->>>>>>> 1ca44c6e... Move src/Externals to Externals.
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(xrExternals)lzo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <MapExports>false</MapExports>
       <SubSystem>Windows</SubSystem>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -112,11 +104,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-<<<<<<< HEAD
-      <AdditionalIncludeDirectories>$(SolutionDir)Externals;$(SolutionDir)Externals\lzo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-=======
-      <AdditionalIncludeDirectories>$(xrExternals);$(xrExternals)openssl\include;$(xrExternals)lzo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
->>>>>>> 1ca44c6e... Move src/Externals to Externals.
+      <AdditionalIncludeDirectories>$(xrExternals);$(xrExternals)lzo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -130,11 +118,7 @@
       <WarningLevel>Level4</WarningLevel>
     </ClCompile>
     <Link>
-<<<<<<< HEAD
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(SolutionDir)Externals\lzo-2.02;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-=======
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(xrExternals)BugTrap\Bin;$(xrExternals)openssl\lib;$(xrExternals)lzo-2.02;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
->>>>>>> 1ca44c6e... Move src/Externals to Externals.
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(xrExternals)lzo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -153,11 +137,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>false</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-<<<<<<< HEAD
-      <AdditionalIncludeDirectories>$(SolutionDir)Externals;$(SolutionDir)Externals\lzo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-=======
-      <AdditionalIncludeDirectories>$(xrExternals);$(xrExternals)openssl\include;$(xrExternals)lzo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
->>>>>>> 1ca44c6e... Move src/Externals to Externals.
+      <AdditionalIncludeDirectories>$(xrExternals);$(xrExternals)lzo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRCORE_EXPORTS;CRYPTO_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -171,11 +151,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-<<<<<<< HEAD
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(SolutionDir)Externals\lzo-2.02;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-=======
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(xrExternals)BugTrap\Bin;$(xrExternals)openssl\lib;$(xrExternals)lzo-2.02;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
->>>>>>> 1ca44c6e... Move src/Externals to Externals.
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\x86;$(xrExternals)lzo;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
@@ -443,18 +419,11 @@
     <None Include="Debug\DXTrace.inl" />
   </ItemGroup>
   <ItemGroup>
-<<<<<<< HEAD
     <ProjectReference Include="..\Externals\cryptlib.vcxproj">
       <Project>{c39f4b46-6e89-4074-902e-ca57073044d2}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Externals\lzo.vcxproj">
-=======
     <ProjectReference Include="$(xrExternals)lzo.vcxproj">
->>>>>>> 1ca44c6e... Move src/Externals to Externals.
       <Project>{614aa57f-58d7-45a8-a5ff-93f04b05fac6}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\utils\xrMiscMath\xrMiscMath.vcxproj">
-      <Project>{cc912a26-e688-49f5-99f4-7a0f9af4e438}</Project>
     </ProjectReference>
     <ProjectReference Include="..\xrMisc\xrMisc.vcxproj">
       <Project>{c964d17a-05a8-4bfa-b0a8-7af5c6b627ec}</Project>
