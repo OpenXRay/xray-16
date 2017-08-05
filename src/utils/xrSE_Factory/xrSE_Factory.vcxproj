@@ -83,7 +83,6 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <ForceConformanceInForLoopScope>false</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
@@ -124,7 +123,6 @@
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <ForceConformanceInForLoopScope>false</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
@@ -162,7 +160,6 @@
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <ForceConformanceInForLoopScope>false</ForceConformanceInForLoopScope>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
@@ -224,10 +221,10 @@
     <ClInclude Include="..\..\xrServerEntities\PHSynchronize.h" />
     <ClInclude Include="..\..\xrServerEntities\PropertiesListTypes.h" />
     <ClInclude Include="..\..\xrServerEntities\restriction_space.h" />
-    <ClInclude Include="..\..\xrServerEntities\script_callStack.h" />
-    <ClInclude Include="..\..\xrServerEntities\script_debugger.h" />
-    <ClInclude Include="..\..\xrServerEntities\script_debugger_messages.h" />
-    <ClInclude Include="..\..\xrServerEntities\script_debugger_threads.h" />
+    <ClInclude Include="..\..\xrScriptEngine\script_callStack.hpp" />
+    <ClInclude Include="..\..\xrScriptEngine\script_debugger.hpp" />
+    <ClInclude Include="..\..\xrScriptEngine\script_debugger_messages.hpp" />
+    <ClInclude Include="..\..\xrScriptEngine\script_debugger_threads.hpp" />
     <ClInclude Include="..\..\xrServerEntities\script_export.hpp" />
     <ClInclude Include="..\..\xrServerEntities\script_export_macroses.h" />
     <ClInclude Include="..\..\xrServerEntities\script_export_space.h" />
@@ -340,9 +337,9 @@
     </ClCompile>
     <ClCompile Include="..\..\xrServerEntities\PHNetState.cpp" />
     <ClCompile Include="..\..\xrServerEntities\PHSynchronize.cpp" />
-    <ClCompile Include="..\..\xrServerEntities\script_callStack.cpp" />
-    <ClCompile Include="..\..\xrServerEntities\script_debugger.cpp" />
-    <ClCompile Include="..\..\xrServerEntities\script_debugger_threads.cpp" />
+    <ClCompile Include="..\..\xrScriptEngine\script_callStack.cpp" />
+    <ClCompile Include="..\..\xrScriptEngine\script_debugger.cpp" />
+    <ClCompile Include="..\..\xrScriptEngine\script_debugger_threads.cpp" />
     <ClCompile Include="..\..\xrServerEntities\script_engine_script.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
