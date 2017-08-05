@@ -36,21 +36,21 @@ public:
         vMin.set(_min);
         vMax.set(_max);
         return *this;
-    };
+    }
 
     SelfRef set(T x1, T y1, T z1, T x2, T y2, T z2)
     {
         vMin.set(x1, y1, z1);
         vMax.set(x2, y2, z2);
         return *this;
-    };
+    }
 
     SelfRef set(SelfCRef b)
     {
         vMin.set(b.vMin);
         vMax.set(b.vMax);
         return *this;
-    };
+    }
 
     SelfRef setb(const Tvector& center, const Tvector& dim)
     {
@@ -64,14 +64,14 @@ public:
         vMin.set(0, 0, 0);
         vMax.set(0, 0, 0);
         return *this;
-    };
+    }
 
     SelfRef identity()
     {
         vMin.set(-0.5, -0.5, -0.5);
         vMax.set(0.5, 0.5, 0.5);
         return *this;
-    };
+    }
 
     SelfRef invalidate()
     {
@@ -85,64 +85,65 @@ public:
         vMin.add(s);
         vMax.sub(s);
         return *this;
-    };
+    }
 
     SelfRef shrink(const Tvector& s)
     {
         vMin.add(s);
         vMax.sub(s);
         return *this;
-    };
+    }
 
     SelfRef grow(T s)
     {
         vMin.sub(s);
         vMax.add(s);
         return *this;
-    };
+    }
 
     SelfRef grow(const Tvector& s)
     {
         vMin.sub(s);
         vMax.add(s);
         return *this;
-    };
+    }
 
     SelfRef add(const Tvector& p)
     {
         vMin.add(p);
         vMax.add(p);
         return *this;
-    };
+    }
 
     SelfRef sub(const Tvector& p)
     {
         vMin.sub(p);
         vMax.sub(p);
         return *this;
-    };
+    }
 
     SelfRef offset(const Tvector& p)
     {
         vMin.add(p);
         vMax.add(p);
         return *this;
-    };
+    }
 
     SelfRef add(SelfCRef b, const Tvector& p)
     {
-        vMin.add(b.min, p);
-        vMax.add(b.max, p);
+        vMin.add(b.vMin, p);
+        vMax.add(b.vMax, p);
         return *this;
-    };
+    }
 
-    ICF BOOL contains(T x, T y, T z) const
+    ICF bool contains(T x, T y, T z) const
     {
         return (x >= x1) && (x <= x2) && (y >= y1) && (y <= y2) && (z >= z1) && (z <= z2);
-    };
-    ICF BOOL contains(const Tvector& p) const { return contains(p.x, p.y, p.z); };
-    ICF BOOL contains(SelfCRef b) const { return contains(b.vMin) && contains(b.vMax); };
-    BOOL similar(SelfCRef b) const { return vMin.similar(b.vMin) && vMax.similar(b.vMax); };
+    }
+
+    ICF bool contains(const Tvector& p) const { return contains(p.x, p.y, p.z); }
+    ICF bool contains(SelfCRef b) const { return contains(b.vMin) && contains(b.vMax); }
+    bool similar(SelfCRef b) const { return vMin.similar(b.vMin) && vMax.similar(b.vMax); }
 
     ICF SelfRef modify(const Tvector& p)
     {
@@ -150,6 +151,7 @@ public:
         vMax.max(p);
         return *this;
     }
+
     ICF SelfRef modify(T x, T y, T z)
     {
         _vector3<T> tmp = {x, y, z};
@@ -161,7 +163,7 @@ public:
         modify(b.vMin);
         modify(b.vMax);
         return *this;
-    };
+    }
 
     SelfRef merge(SelfCRef b1, SelfCRef b2)
     {
@@ -230,27 +232,27 @@ public:
         return xform(b, m);
     }
 
-    void getsize(Tvector& R) const { R.sub(vMax, vMin); };
+    void getsize(Tvector& R) const { R.sub(vMax, vMin); }
 
     void getradius(Tvector& R) const
     {
         getsize(R);
         R.mul(0.5f);
-    };
+    }
 
     T getradius() const
     {
         Tvector R;
         getradius(R);
         return R.magnitude();
-    };
+    }
 
     T getvolume() const
     {
         Tvector sz;
         getsize(sz);
         return sz.x * sz.y * sz.z;
-    };
+    }
 
     SelfCRef getcenter(Tvector& C) const
     {
@@ -258,7 +260,7 @@ public:
         C.y = (vMin.y + vMax.y) * 0.5f;
         C.z = (vMin.z + vMax.z) * 0.5f;
         return *this;
-    };
+    }
 
     SelfCRef get_CD(Tvector& bc, Tvector& bd) const // center + dimensions
     {
@@ -280,28 +282,28 @@ public:
         getcenter(C);
         R = C.distance_to(vMax);
         return *this;
-    };
+    }
 
     // Detects if this box intersect other
-    ICF BOOL intersect(SelfCRef box)
+    ICF bool intersect(SelfCRef box)
     {
         if (vMax.x < box.vMin.x)
-            return FALSE;
+            return false;
         if (vMax.y < box.vMin.y)
-            return FALSE;
+            return false;
         if (vMax.z < box.vMin.z)
-            return FALSE;
+            return false;
         if (vMin.x > box.vMax.x)
-            return FALSE;
+            return false;
         if (vMin.y > box.vMax.y)
-            return FALSE;
+            return false;
         if (vMin.z > box.vMax.z)
-            return FALSE;
-        return TRUE;
-    };
+            return false;
+        return true;
+    }
 
     // Does the vector3 intersects box
-    BOOL Pick(const Tvector& start, const Tvector& dir)
+    bool Pick(const Tvector& start, const Tvector& dir)
     {
         T alpha, xt, yt, zt;
         Tvector rvmin, rvmax;
@@ -372,6 +374,7 @@ public:
     };
 
     u32& IntRref(T& x) { return (u32&)x; }
+
     enum ERP_Result
     {
         rpNone = 0,
@@ -382,7 +385,7 @@ public:
 
     ERP_Result Pick2(const Tvector& origin, const Tvector& dir, Tvector& coord)
     {
-        BOOL Inside = TRUE;
+        bool Inside = true;
         Tvector MaxT;
         MaxT.x = MaxT.y = MaxT.z = -1.0f;
 
@@ -391,14 +394,14 @@ public:
             if (origin[0] < vMin[0])
             {
                 coord[0] = vMin[0];
-                Inside = FALSE;
+                Inside = false;
                 if (IntRref(dir[0])) MaxT[0] = (vMin[0] - origin[0]) / dir[0]; // Calculate T distances to candidate planes
                     MaxT[0] = (vMin[0] - origin[0]) / dir[0]; // Calculate T distances to candidate planes
             }
             else if (origin[0] > vMax[0])
             {
                 coord[0] = vMax[0];
-                Inside = FALSE;
+                Inside = false;
                 if (IntRref(dir[0])) MaxT[0] = (vMax[0] - origin[0]) / dir[0]; // Calculate T distances to candidate planes
                     MaxT[0] = (vMax[0] - origin[0]) / dir[0]; // Calculate T distances to candidate planes
             }
@@ -407,14 +410,14 @@ public:
             if (origin[1] < vMin[1])
             {
                 coord[1] = vMin[1];
-                Inside = FALSE;
+                Inside = false;
                 if (IntRref(dir[1])) MaxT[1] = (vMin[1] - origin[1]) / dir[1]; // Calculate T distances to candidate planes
                     MaxT[1] = (vMin[1] - origin[1]) / dir[1]; // Calculate T distances to candidate planes
             }
             else if (origin[1] > vMax[1])
             {
                 coord[1] = vMax[1];
-                Inside = FALSE;
+                Inside = false;
                 if (IntRref(dir[1])) MaxT[1] = (vMax[1] - origin[1]) / dir[1]; // Calculate T distances to candidate planes
                     MaxT[1] = (vMax[1] - origin[1]) / dir[1]; // Calculate T distances to candidate planes
             }
@@ -423,14 +426,14 @@ public:
             if (origin[2] < vMin[2])
             {
                 coord[2] = vMin[2];
-                Inside = FALSE;
+                Inside = false;
                 if (IntRref(dir[2])) MaxT[2] = (vMin[2] - origin[2]) / dir[2]; // Calculate T distances to candidate planes
                     MaxT[2] = (vMin[2] - origin[2]) / dir[2]; // Calculate T distances to candidate planes
             }
             else if (origin[2] > vMax[2])
             {
                 coord[2] = vMax[2];
-                Inside = FALSE;
+                Inside = false;
                 if (IntRref(dir[2])) MaxT[2] = (vMax[2] - origin[2]) / dir[2]; // Calculate T distances to candidate planes
                     MaxT[2] = (vMax[2] - origin[2]) / dir[2]; // Calculate T distances to candidate planes
             }
@@ -452,39 +455,44 @@ public:
 
         // Check final candidate actually inside box
         if (IntRref(MaxT[WhichPlane]) & 0x80000000) return rpNone;
-            return rpNone;
 
         if (0 == WhichPlane)
         {
             // 1 & 2
             coord[1] = origin[1] + MaxT[0] * dir[1];
+
             if ((coord[1] < vMin[1]) || (coord[1] > vMax[1])) return rpNone;
-                return rpNone;
+
             coord[2] = origin[2] + MaxT[0] * dir[2];
+
             if ((coord[2] < vMin[2]) || (coord[2] > vMax[2])) return rpNone;
-                return rpNone;
+
             return rpOriginOutside;
         }
         if (1 == WhichPlane)
         {
             // 0 & 2
             coord[0] = origin[0] + MaxT[1] * dir[0];
+
             if ((coord[0] < vMin[0]) || (coord[0] > vMax[0])) return rpNone;
-                return rpNone;
+
             coord[2] = origin[2] + MaxT[1] * dir[2];
+
             if ((coord[2] < vMin[2]) || (coord[2] > vMax[2])) return rpNone;
-                return rpNone;
+
             return rpOriginOutside;
         }
         if (2 == WhichPlane)
         {
             // 0 & 1
             coord[0] = origin[0] + MaxT[2] * dir[0];
+
             if ((coord[0] < vMin[0]) || (coord[0] > vMax[0])) return rpNone;
-                return rpNone;
+
             coord[1] = origin[1] + MaxT[2] * dir[1];
+
             if ((coord[1] < vMin[1]) || (coord[1] > vMax[1])) return rpNone;
-                return rpNone;
+
             return rpOriginOutside;
         }
         return rpNone;
@@ -504,7 +512,7 @@ public:
         case 7: result.set(vMax.x, vMax.y, vMin.z); break;
         default: result.set(0, 0, 0); break;
         }
-    };
+    }
 
     void getpoints(Tvector* result)
     {
@@ -516,7 +524,7 @@ public:
         result[5].set(vMin.x, vMax.y, vMax.z);
         result[6].set(vMax.x, vMax.y, vMax.z);
         result[7].set(vMax.x, vMax.y, vMin.z);
-    };
+    }
 
     SelfRef modify(SelfCRef src, const Tmatrix& M)
     {
@@ -531,13 +539,14 @@ public:
     }
 };
 
-typedef _box3<float> Fbox;
-typedef _box3<float> Fbox3;
-typedef _box3<double> Dbox;
-typedef _box3<double> Dbox3;
+using Fbox = _box3<float>;
+using Fbox3 = _box3<float>;
+
+using Dbox = _box3<double>;
+using Dbox3 = _box3<double>;
 
 template <class T>
-BOOL _valid(const _box3<T>& c)
+bool _valid(const _box3<T>& c)
 {
     return _valid(c.vMin) && _valid(c.vMax);
 }
