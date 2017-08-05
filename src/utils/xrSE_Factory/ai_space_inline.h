@@ -11,7 +11,7 @@
 IC CScriptEngine& CAI_Space::script_engine() const
 {
     VERIFY(m_script_engine);
-    return (*m_script_engine);
+    return *m_script_engine;
 }
 
 IC CAI_Space& ai()
@@ -21,5 +21,5 @@ IC CAI_Space& ai()
         g_ai_space = xr_new<CAI_Space>();
         g_ai_space->init();
     }
-    return (*g_ai_space);
+    return *g_ai_space;
 }

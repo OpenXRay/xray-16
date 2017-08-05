@@ -5,7 +5,7 @@ namespace sun
 struct ray
 {
     ray() {}
-    ray(Fvector3 const& _P, Fvector3 const& _D) : P(_P), D(_D) {}
+    ray(Fvector3 const& _P, Fvector3 const& _D) : D(_D), P(_P) {}
     Fvector3 D;
     Fvector3 P;
 };

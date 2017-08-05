@@ -66,7 +66,7 @@ public:
     virtual const CSE_Abstract* base() const = 0;
     virtual CSE_Abstract* init();
     virtual CSE_ALifeSchedulable* cast_schedulable() { return this; };
-    virtual CSE_Abstract* cast_abstract() { return 0; };
+    virtual CSE_Abstract* cast_abstract() { return nullptr; };
     // end of the virtual inheritance dependant code
     virtual bool need_update(CSE_ALifeDynamicObject* object);
     virtual u32 ef_creature_type() const;
@@ -197,7 +197,7 @@ public:
     virtual CSE_Abstract* base() = 0;
     virtual const CSE_Abstract* base() const = 0;
     virtual CSE_ALifeGroupAbstract* cast_group_abstract() { return this; };
-    virtual CSE_Abstract* cast_abstract() { return 0; };
+    virtual CSE_Abstract* cast_abstract() { return nullptr; };
 #ifdef XRGAME_EXPORTS
     virtual bool synchronize_location();
     virtual void try_switch_online();

@@ -39,13 +39,15 @@ public:
     void surface_set(ID3DBaseTexture* surf);
     ID3DBaseTexture* surface_get();
 
-    IC BOOL isUser() { return flags.bUser; }
-    IC u32 get_Width()
+    BOOL isUser() { return flags.bUser; }
+
+    u32 get_Width()
     {
         desc_enshure();
         return desc.Width;
     }
-    IC u32 get_Height()
+
+    u32 get_Height()
     {
         desc_enshure();
         return desc.Height;
@@ -65,8 +67,9 @@ public:
 #endif //	USE_DX10
 
 private:
-    IC BOOL desc_valid() { return pSurface == desc_cache; }
-    IC void desc_enshure()
+    BOOL desc_valid() { return pSurface == desc_cache; }
+
+    void desc_enshure()
     {
         if (!desc_valid())
             desc_update();
@@ -121,7 +124,7 @@ private:
 struct resptrcode_texture : public resptr_base<CTexture>
 {
     void create(LPCSTR _name);
-    void destroy() { _set(NULL); }
+    void destroy() { _set(nullptr); }
     shared_str bump_get() { return _get()->m_bumpmap; }
     bool bump_exist() { return 0 != bump_get().size(); }
 };

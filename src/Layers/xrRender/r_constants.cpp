@@ -26,7 +26,7 @@ ref_constant R_constant_table::get(LPCSTR S)
     // assumption - sorted by name
     c_table::iterator I = std::lower_bound(table.begin(), table.end(), S, p_search);
     if (I == table.end() || (0 != xr_strcmp(*(*I)->name, S)))
-        return 0;
+        return nullptr;
     else
         return *I;
 }
@@ -41,7 +41,7 @@ ref_constant R_constant_table::get(shared_str& S)
         if (C->name.equal(S))
             return C;
     }
-    return 0;
+    return nullptr;
 }
 
 #if !defined(USE_DX10) && !defined(USE_DX11)
@@ -178,7 +178,7 @@ BOOL R_constant_table::parse(void* _desc, u32 destination)
 /// !!!!!!!!FIX THIS FOR DX11!!!!!!!!!
 void R_constant_table::merge(R_constant_table* T)
 {
-    if (0 == T)
+    if (nullptr == T)
         return;
 
     // Real merge

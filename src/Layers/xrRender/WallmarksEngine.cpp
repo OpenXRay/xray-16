@@ -58,7 +58,7 @@ CWallmarksEngine::CWallmarksEngine()
 {
     static_pool.reserve(256);
     marks.reserve(256);
-    hGeom.create(FVF::F_LIT, RCache.Vertex.Buffer(), NULL);
+    hGeom.create(FVF::F_LIT, RCache.Vertex.Buffer(), nullptr);
 }
 
 CWallmarksEngine::~CWallmarksEngine()
@@ -88,7 +88,7 @@ void CWallmarksEngine::clear()
 // allocate
 CWallmarksEngine::static_wallmark* CWallmarksEngine::static_wm_allocate()
 {
-    static_wallmark* W = 0;
+    static_wallmark* W = nullptr;
     if (static_pool.empty())
         W = new static_wallmark();
     else
@@ -333,7 +333,7 @@ void CWallmarksEngine::AddSkeletonWallmark(intrusive_ptr<CSkeletonWallmark> wm)
         lock.Enter();
         // search if similar wallmark exists
         wm_slot* slot = FindSlot(wm->Shader());
-        if (0 == slot)
+        if (nullptr == slot)
             slot = AppendSlot(wm->Shader());
         // no similar - register _new_
         slot->skeleton_items.push_back(wm);

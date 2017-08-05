@@ -113,7 +113,7 @@ void SFillPropData::load()
 #ifdef XRGAME_EXPORTS
     CInifile* Ini = pGameIni;
 #else // XRGAME_EXPORTS
-    CInifile* Ini = 0;
+    CInifile* Ini = nullptr;
     string_path gm_name;
     FS.update_path(gm_name, "$game_config$", GAME_CONFIG);
     R_ASSERT3(FS.exist(gm_name), "Couldn't find file", gm_name);
@@ -189,9 +189,11 @@ void SFillPropData::load()
 #endif // XRGAME_EXPORTS
 
     luabind::object table;
+
     R_ASSERT(ai().script_engine().function_object("smart_covers.descriptions", table, LUA_TTABLE));
     luabind::object::iterator I = table.begin();
     luabind::object::iterator E = table.end();
+
     for (; I != E; ++I)
         smart_covers.push_back(luabind::object_cast<LPCSTR>(I.key()));
 
@@ -352,7 +354,7 @@ void CSE_ALifeGraphPoint::on_render(CDUInterface* du, IServerEntityLEOwner* /*ow
     du->DrawIndexedPrimitive(4 /*D3DPT_TRIANGLELIST*/, 4, parent.c, PT, 6, IT, 12, C.get());
 
     if (bSelected)
-        du->DrawSelectionBox(parent.c, Fvector().set(0.5f, 1.0f, 0.5f), NULL);
+        du->DrawSelectionBox(parent.c, Fvector().set(0.5f, 1.0f, 0.5f), nullptr);
 #endif // #ifdef XRSE_FACTORY_EXPORTS
 }
 
@@ -748,7 +750,7 @@ void CSE_ALifeSpaceRestrictor::UPDATE_Write(NET_Packet& tNetPacket) { inherited1
 xr_token defaul_retrictor_types[] = {{"NOT A restrictor", RestrictionSpace::eRestrictorTypeNone},
 {"NONE default restrictor", RestrictionSpace::eDefaultRestrictorTypeNone},
 {"OUT default restrictor", RestrictionSpace::eDefaultRestrictorTypeOut},
-{"IN default restrictor", RestrictionSpace::eDefaultRestrictorTypeIn}, {0, 0}};
+{"IN default restrictor", RestrictionSpace::eDefaultRestrictorTypeIn}, {nullptr, 0}};
 
 #ifndef XRGAME_EXPORTS
 void CSE_ALifeSpaceRestrictor::FillProps(LPCSTR pref, PropItemVec& items)
@@ -860,9 +862,9 @@ CSE_ALifeObjectPhysic::CSE_ALifeObjectPhysic(LPCSTR caSection)
     if (pSettings->line_exist(caSection, "fixed_bones"))
         fixed_bones = pSettings->r_string(caSection, "fixed_bones");
 
-    m_flags.set(flUseSwitches, FALSE);
-    m_flags.set(flSwitchOffline, FALSE);
-    m_flags.set(flUsedAI_Locations, FALSE);
+    m_flags.set(flUseSwitches, false);
+    m_flags.set(flSwitchOffline, false);
+    m_flags.set(flUsedAI_Locations, false);
 
 #ifdef XRGAME_EXPORTS
     m_freeze_time = Device.dwTimeGlobal;
@@ -1129,7 +1131,7 @@ void CSE_ALifeObjectPhysic::load(NET_Packet& tNetPacket)
 }
 
 xr_token po_types[] = {
-{"Box", epotBox}, {"Fixed chain", epotFixedChain}, {"Free chain", epotFreeChain}, {"Skeleton", epotSkeleton}, {0, 0}};
+{"Box", epotBox}, {"Fixed chain", epotFixedChain}, {"Free chain", epotFreeChain}, {"Skeleton", epotSkeleton}, {nullptr, 0}};
 
 #ifndef XRGAME_EXPORTS
 void CSE_ALifeObjectPhysic::FillProps(LPCSTR pref, PropItemVec& values)
@@ -1142,7 +1144,7 @@ void CSE_ALifeObjectPhysic::FillProps(LPCSTR pref, PropItemVec& values)
     PHelper().CreateFlag8(values, PrepareKey(pref, *s_name, "Active"), &_flags, flActive);
 
     // motions & bones
-    PHelper().CreateChoose(values, PrepareKey(pref, *s_name, "Model\\Fixed bones"), &fixed_bones, smSkeletonBones, 0,
+    PHelper().CreateChoose(values, PrepareKey(pref, *s_name, "Model\\Fixed bones"), &fixed_bones, smSkeletonBones, nullptr,
     (void*)visual()->get_visual(), 8);
 }
 #endif // #ifndef XRGAME_EXPORTS
@@ -1321,7 +1323,7 @@ void CSE_ALifeObjectHangingLamp::FillProps(LPCSTR pref, PropItemVec& values)
     inherited1::FillProps(pref, values);
     inherited2::FillProps(pref, values);
 
-    PropValue* P = 0;
+    PropValue* P = nullptr;
     PHelper().CreateFlag16(values, PrepareKey(pref, *s_name, "Flags\\Physic"), &flags, flPhysic);
     PHelper().CreateFlag16(values, PrepareKey(pref, *s_name, "Flags\\Cast Shadow"), &flags, flCastShadow);
     PHelper().CreateFlag16(values, PrepareKey(pref, *s_name, "Flags\\Allow R1"), &flags, flR1);
@@ -1338,7 +1340,7 @@ void CSE_ALifeObjectHangingLamp::FillProps(LPCSTR pref, PropItemVec& values)
     PHelper().CreateFloat(values, PrepareKey(pref, *s_name, "Light\\Main\\Virtual Size"), &m_virtual_size, 0.f, 100.f);
     PHelper().CreateChoose(
     values, PrepareKey(pref, *s_name, "Light\\Main\\Texture"), &light_texture, smTexture, "lights");
-    PHelper().CreateChoose(values, PrepareKey(pref, *s_name, "Light\\Main\\Bone"), &light_main_bone, smSkeletonBones, 0,
+    PHelper().CreateChoose(values, PrepareKey(pref, *s_name, "Light\\Main\\Bone"), &light_main_bone, smSkeletonBones, nullptr,
     (void*)visual()->get_visual());
     if (flags.is(flTypeSpot))
     {
@@ -1358,7 +1360,7 @@ void CSE_ALifeObjectHangingLamp::FillProps(LPCSTR pref, PropItemVec& values)
         PHelper().CreateChoose(
         values, PrepareKey(pref, *s_name, "Light\\Ambient\\Texture"), &m_ambient_texture, smTexture, "lights");
         PHelper().CreateChoose(values, PrepareKey(pref, *s_name, "Light\\Ambient\\Bone"), &light_ambient_bone,
-        smSkeletonBones, 0, (void*)visual()->get_visual());
+        smSkeletonBones, nullptr, (void*)visual()->get_visual());
     }
 
     if (flags.is(flVolumetric))
@@ -1372,7 +1374,7 @@ void CSE_ALifeObjectHangingLamp::FillProps(LPCSTR pref, PropItemVec& values)
     }
 
     // fixed bones
-    PHelper().CreateChoose(values, PrepareKey(pref, *s_name, "Model\\Fixed bones"), &fixed_bones, smSkeletonBones, 0,
+    PHelper().CreateChoose(values, PrepareKey(pref, *s_name, "Model\\Fixed bones"), &fixed_bones, smSkeletonBones, nullptr,
     (void*)visual()->get_visual(), 8);
     // glow
     PHelper().CreateFloat(values, PrepareKey(pref, *s_name, "Glow\\Radius"), &glow_radius, 0.01f, 100.f);
@@ -1464,8 +1466,8 @@ bool CSE_ALifeObjectProjector::used_ai_locations() const throw() { return false;
 
 CSE_ALifeSchedulable::CSE_ALifeSchedulable(LPCSTR caSection)
 {
-    m_tpCurrentBestWeapon = 0;
-    m_tpBestDetector = 0;
+    m_tpCurrentBestWeapon = nullptr;
+    m_tpBestDetector = nullptr;
     m_schedule_counter = u64(-1);
 }
 

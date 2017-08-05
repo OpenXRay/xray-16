@@ -67,9 +67,9 @@ public:
 
     BOOL Compile(CPEDef* def);
 
-    IC CPEDef* GetDefinition() { return m_Def; }
-    IC int GetHandleEffect() { return m_HandleEffect; }
-    IC int GetHandleActionList() { return m_HandleActionList; }
+    CPEDef* GetDefinition() { return m_Def; }
+    int GetHandleEffect() { return m_HandleEffect; }
+    int GetHandleActionList() { return m_HandleActionList; }
     virtual void Play();
     virtual void Stop(BOOL bDefferedStop = TRUE);
     virtual BOOL IsPlaying() { return m_RT_Flags.is(flRT_Playing); }

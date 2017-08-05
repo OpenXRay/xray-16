@@ -46,12 +46,12 @@ public:
     PS::PGDIt FindPGDIt(LPCSTR name);
 
     // get object properties methods
-    IC PS::PEDIt FirstPED() { return m_PEDs.begin(); }
-    IC PS::PEDIt LastPED() { return m_PEDs.end(); }
-    IC PS::PGDIt FirstPGD() { return m_PGDs.begin(); }
-    IC PS::PGDIt LastPGD() { return m_PGDs.end(); }
-    PS::CPEDef* AppendPED(PS::CPEDef* src = 0);
-    PS::CPGDef* AppendPGD(PS::CPGDef* src = 0);
+    PS::PEDIt FirstPED() { return m_PEDs.begin(); }
+    PS::PEDIt LastPED() { return m_PEDs.end(); }
+    PS::PGDIt FirstPGD() { return m_PGDs.begin(); }
+    PS::PGDIt LastPGD() { return m_PGDs.end(); }
+    PS::CPEDef* AppendPED(PS::CPEDef* src = nullptr);
+    PS::CPGDef* AppendPGD(PS::CPGDef* src = nullptr);
     void Remove(LPCSTR name);
     void RenamePED(PS::CPEDef* src, LPCSTR new_name);
     void RenamePGD(PS::CPGDef* src, LPCSTR new_name);

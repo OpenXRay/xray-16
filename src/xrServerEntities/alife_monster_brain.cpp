@@ -40,7 +40,7 @@ CALifeMonsterBrain::CALifeMonsterBrain(object_type* object)
     VERIFY(object);
     m_object = object;
     m_last_search_time = 0;
-    m_smart_terrain = 0;
+    m_smart_terrain = nullptr;
 
 #ifdef XRGAME_EXPORTS
     m_movement_manager = new CALifeMonsterMovementManager(object);

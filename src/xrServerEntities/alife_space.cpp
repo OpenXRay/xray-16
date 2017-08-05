@@ -17,7 +17,7 @@ const xr_token hit_types_token[] =
     {"wound_2", eHitTypeWound_2},
     //{"physic_strike", eHitTypePhysicStrike},
     {"light_burn", eHitTypeLightBurn},
-    {0, 0}
+    {nullptr, 0}
 };
 
 EHitType g_tfString2HitType(LPCSTR caHitType)

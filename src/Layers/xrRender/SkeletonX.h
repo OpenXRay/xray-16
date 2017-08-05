@@ -104,7 +104,7 @@ public:
     BOOL has_visible_bones();
     CSkeletonX()
     {
-        Parent = 0;
+        Parent = nullptr;
         ChildIDX = u16(-1);
     }
 

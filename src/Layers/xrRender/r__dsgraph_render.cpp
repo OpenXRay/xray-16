@@ -753,7 +753,7 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
 
     if (_dynamic)
     {
-        set_Object(0);
+        set_Object(nullptr);
 
         // Traverse object database
         g_SpatialSpace->q_frustum(lstRenderables, ISpatial_DB::O_ORDERED, STYPE_RENDERABLE, ViewBase);
@@ -763,7 +763,7 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
         {
             ISpatial* spatial = lstRenderables[o_it];
             CSector* sector = (CSector*)spatial->GetSpatialData().sector;
-            if (0 == sector)
+            if (nullptr == sector)
                 continue; // disassociated from S/P structure
             if (PortalTraverser.i_marker != sector->r_marker)
                 continue; // inactive (untouched) sector
@@ -775,7 +775,7 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
 
                 // renderable
                 IRenderable* renderable = spatial->dcast_Renderable();
-                if (0 == renderable)
+                if (nullptr == renderable)
                     continue; // unknown, but renderable object (r1_glow???)
 
                 renderable->renderable_Render();
@@ -785,7 +785,7 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
 
     // Restore
     ViewBase = ViewSave;
-    View = 0;
+    View = nullptr;
 }
 
 #include "FHierrarhyVisual.h"

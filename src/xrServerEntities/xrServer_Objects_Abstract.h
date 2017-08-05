@@ -53,7 +53,7 @@ public:
     Flags8 flags;
 
 public:
-    CSE_Visual(LPCSTR name = 0);
+    CSE_Visual(LPCSTR name = nullptr);
     virtual ~CSE_Visual();
 
     void visual_read(NET_Packet& P, u16 version);
@@ -77,7 +77,7 @@ public:
     shared_str motion_name;
 
 public:
-    CSE_Motion(LPCSTR name = 0);
+    CSE_Motion(LPCSTR name = nullptr);
     virtual ~CSE_Motion();
 
     void motion_read(NET_Packet& P);
@@ -124,7 +124,7 @@ public:
     virtual ~IServerEntity() = 0;
     // XXX: move to implementation
     Flags32 m_editor_flags;
-    void set_editor_flag(u32 mask) { m_editor_flags.set(mask, TRUE); }
+    void set_editor_flag(u32 mask) { m_editor_flags.set(mask, true); }
 public:
     virtual void __stdcall Spawn_Write(NET_Packet& tNetPacket, BOOL bLocal) = 0;
     virtual BOOL __stdcall Spawn_Read(NET_Packet& tNetPacket) = 0;

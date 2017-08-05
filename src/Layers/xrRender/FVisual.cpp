@@ -14,7 +14,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-Fvisual::Fvisual() : dxRender_Visual() { m_fast = 0; }
+Fvisual::Fvisual() : dxRender_Visual() { m_fast = nullptr; }
 Fvisual::~Fvisual()
 {
     HW.stats_manager.decrement_stats_vb(p_rm_Vertices);
@@ -28,7 +28,7 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
     dxRender_Visual::Load(N, data, dwFlags);
 
     D3DVERTEXELEMENT9 dcl[MAX_FVF_DECL_SIZE];
-    D3DVERTEXELEMENT9* vFormat = 0;
+    D3DVERTEXELEMENT9* vFormat = nullptr;
     dwPrimitives = 0;
     BOOL loaded_v = false;
 
@@ -127,9 +127,9 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
 #else //    USE_DX10
             BOOL bSoft = HW.Caps.geometry.bSoftware;
             u32 dwUsage = D3DUSAGE_WRITEONLY | (bSoft ? D3DUSAGE_SOFTWAREPROCESSING : 0);
-            BYTE* bytes = 0;
+            BYTE* bytes = nullptr;
             VERIFY(NULL == p_rm_Vertices);
-            R_CHK(HW.pDevice->CreateVertexBuffer(vCount * vStride, dwUsage, 0, D3DPOOL_MANAGED, &p_rm_Vertices, 0));
+            R_CHK(HW.pDevice->CreateVertexBuffer(vCount * vStride, dwUsage, 0, D3DPOOL_MANAGED, &p_rm_Vertices, nullptr));
             HW.stats_manager.increment_stats_vb(p_rm_Vertices);
             R_CHK(p_rm_Vertices->Lock(0, 0, (void**)&bytes, 0));
             CopyMemory(bytes, data->pointer(), vCount * vStride);
@@ -181,11 +181,11 @@ void Fvisual::Load(const char* N, IReader* data, u32 dwFlags)
             BOOL bSoft = HW.Caps.geometry.bSoftware;
             u32 dwUsage = /*D3DUSAGE_WRITEONLY |*/ (
                 bSoft ? D3DUSAGE_SOFTWAREPROCESSING : 0); // indices are read in model-wallmarks code
-            BYTE* bytes = 0;
+            BYTE* bytes = nullptr;
 
             VERIFY(NULL == p_rm_Indices);
             R_CHK(
-                HW.pDevice->CreateIndexBuffer(iCount * 2, dwUsage, D3DFMT_INDEX16, D3DPOOL_MANAGED, &p_rm_Indices, 0));
+                HW.pDevice->CreateIndexBuffer(iCount * 2, dwUsage, D3DFMT_INDEX16, D3DPOOL_MANAGED, &p_rm_Indices, nullptr));
             HW.stats_manager.increment_stats_ib(p_rm_Indices);
             R_CHK(p_rm_Indices->Lock(0, 0, (void**)&bytes, 0));
             CopyMemory(bytes, data->pointer(), iCount * 2);

@@ -66,7 +66,7 @@ IBlender* CResourceManager::_GetBlender(LPCSTR Name)
     if (I == m_blenders.end())
     {
         xrDebug::Fatal(DEBUG_INFO, "Shader '%s' not found in library.", Name);
-        return 0;
+        return nullptr;
     }
 #endif
     else
@@ -76,12 +76,12 @@ IBlender* CResourceManager::_GetBlender(LPCSTR Name)
 IBlender* CResourceManager::_FindBlender(LPCSTR Name)
 {
     if (!(Name && Name[0]))
-        return 0;
+        return nullptr;
 
     LPSTR N = LPSTR(Name);
     map_Blender::iterator I = m_blenders.find(N);
     if (I == m_blenders.end())
-        return 0;
+        return nullptr;
     else
         return I->second;
 }
@@ -107,7 +107,7 @@ void CResourceManager::ED_UpdateBlender(LPCSTR Name, IBlender* data)
 //////////////////////////////////////////////////////////////////////
 void CResourceManager::_ParseList(sh_list& dest, LPCSTR names)
 {
-    if (0 == names || 0 == names[0])
+    if (nullptr == names || 0 == names[0])
         names = "$null";
 
     ZeroMemory(&dest, sizeof(dest));
@@ -148,7 +148,7 @@ void CResourceManager::_ParseList(sh_list& dest, LPCSTR names)
 ShaderElement* CResourceManager::_CreateElement(ShaderElement& S)
 {
     if (S.passes.empty())
-        return 0;
+        return nullptr;
 
     // Search equal in shaders array
     for (u32 it = 0; it < v_elements.size(); it++)
@@ -288,7 +288,7 @@ Shader* CResourceManager::_cpp_Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR
     else
 #endif
     {
-        return NULL;
+        return nullptr;
     }
     //#endif
 }
@@ -307,7 +307,7 @@ Shader* CResourceManager::Create(IBlender* B, LPCSTR s_shader, LPCSTR s_textures
     else
 #endif
     {
-        return NULL;
+        return nullptr;
         //#endif
     }
 }
@@ -353,7 +353,7 @@ Shader* CResourceManager::Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_co
     else
 #endif
     {
-        return NULL;
+        return nullptr;
     }
     //#endif
 }

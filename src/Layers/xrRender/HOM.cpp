@@ -31,8 +31,8 @@ void __stdcall CHOM::MT_RENDER()
 CHOM::CHOM() : xrc("HOM")
 {
     bEnabled = FALSE;
-    m_pModel = 0;
-    m_pTris = 0;
+    m_pModel = nullptr;
+    m_pTris = nullptr;
 #ifdef DEBUG
     Device.seqRender.Add(this, REG_PRIORITY_LOW - 1000);
 #endif
@@ -207,7 +207,7 @@ void CHOM::Render_DB(CFrustum& base)
         src.push_back(v[t.verts[1]]);
         src.push_back(v[t.verts[2]]);
         sPoly* P = clip.ClipPoly(src, dst);
-        if (0 == P)
+        if (nullptr == P)
         {
             T.skip = next;
             continue;

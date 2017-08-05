@@ -19,11 +19,11 @@ public:
         Balance(1.f, 1.f, 1.f);
     };
 
-    IC void Balance(float _r, float _g, float _b) { cBalance.set(_r, _g, _b, 1); }
-    IC void Balance(Fcolor& C) { Balance(C.r, C.g, C.b); }
-    IC void Gamma(float G) { fGamma = G; }
-    IC void Brightness(float B) { fBrightness = B; }
-    IC void Contrast(float C) { fContrast = C; }
+    void Balance(float _r, float _g, float _b) { cBalance.set(_r, _g, _b, 1); }
+    void Balance(Fcolor& C) { Balance(C.r, C.g, C.b); }
+    void Gamma(float G) { fGamma = G; }
+    void Brightness(float B) { fBrightness = B; }
+    void Contrast(float C) { fContrast = C; }
     void GetIP(float& G, float& B, float& C, Fcolor& Balance)
     {
         G = fGamma;

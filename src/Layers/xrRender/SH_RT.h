@@ -16,7 +16,7 @@ public:
     void destroy();
     void reset_begin();
     void reset_end();
-    IC BOOL valid() { return !!pTexture; }
+    BOOL valid() { return !!pTexture; }
 public:
     ID3DTexture2D* pSurface;
     ID3DRenderTargetView* pRT;
@@ -43,7 +43,7 @@ struct resptrcode_crt : public resptr_base<CRT>
 #else
     void create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount = 1);
 #endif
-    void destroy() { _set(NULL); }
+    void destroy() { _set(nullptr); }
 };
 typedef resptr_core<CRT, resptrcode_crt> ref_rt;
 

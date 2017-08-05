@@ -30,7 +30,7 @@ SSpecificCharacterData::SSpecificCharacterData()
 SSpecificCharacterData::~SSpecificCharacterData() {}
 #endif
 
-CSpecificCharacter::CSpecificCharacter() { m_OwnId = NULL; }
+CSpecificCharacter::CSpecificCharacter() { m_OwnId = nullptr; }
 CSpecificCharacter::~CSpecificCharacter() {}
 void CSpecificCharacter::InitXmlIdToIndex()
 {
@@ -44,7 +44,7 @@ void CSpecificCharacter::Load(shared_str id)
 {
     R_ASSERT(id.size());
     m_OwnId = id;
-    inherited_shared::load_shared(m_OwnId, NULL);
+    inherited_shared::load_shared(m_OwnId, nullptr);
 }
 
 void CSpecificCharacter::load_shared(LPCSTR)

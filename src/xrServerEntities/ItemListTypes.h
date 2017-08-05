@@ -39,8 +39,8 @@ public:
 
 public:
     ListItem(int _type)
-        : type(_type), prop_color(0), item(0), key(0), tag(0), icon_index(-1), OnDrawThumbnail(0), OnItemFocused(0),
-          m_Object(0)
+        : type(_type), prop_color(0), item(nullptr), key(nullptr), tag(0), icon_index(-1), OnDrawThumbnail(nullptr), OnItemFocused(nullptr),
+          m_Object(nullptr)
     {
         m_Flags.zero();
     }

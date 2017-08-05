@@ -92,9 +92,9 @@ public:
     virtual CaptionValue* __stdcall CreateCaption(PropItemVec& items, shared_str key, shared_str val) = 0;
     virtual CanvasValue* __stdcall CreateCanvas(PropItemVec& items, shared_str key, shared_str val, int height) = 0;
     virtual ButtonValue* __stdcall CreateButton(
-        PropItemVec& items, shared_str key, shared_str val, u32 flags, ButtonValue::TOnBtnClick onclick = 0) = 0;
+        PropItemVec& items, shared_str key, shared_str val, u32 flags, ButtonValue::TOnBtnClick onclick = nullptr) = 0;
     virtual ChooseValue* __stdcall CreateChoose(PropItemVec& items, shared_str key, shared_str* val, u32 mode,
-        LPCSTR path = 0, void* fill_param = 0, u32 sub_item_count = 1, u32 choose_flags = cfAllowNone) = 0;
+        LPCSTR path = nullptr, void* fill_param = nullptr, u32 sub_item_count = 1, u32 choose_flags = cfAllowNone) = 0;
     virtual S8Value* __stdcall CreateS8(
         PropItemVec& items, shared_str key, s8* val, s8 mn = 0, s8 mx = 100, s8 inc = 1) = 0;
     virtual S16Value* __stdcall CreateS16(
@@ -113,11 +113,11 @@ public:
     virtual VectorValue* __stdcall CreateVector(PropItemVec& items, shared_str key, Fvector* val, float mn = 0.f,
         float mx = 1.f, float inc = 0.01f, int decim = 2) = 0;
     virtual Flag8Value* __stdcall CreateFlag8(
-        PropItemVec& items, shared_str key, Flags8* val, u8 mask, LPCSTR c0 = 0, LPCSTR c1 = 0, u32 flags = 0) = 0;
+        PropItemVec& items, shared_str key, Flags8* val, u8 mask, LPCSTR c0 = nullptr, LPCSTR c1 = nullptr, u32 flags = 0) = 0;
     virtual Flag16Value* __stdcall CreateFlag16(
-        PropItemVec& items, shared_str key, Flags16* val, u16 mask, LPCSTR c0 = 0, LPCSTR c1 = 0, u32 flags = 0) = 0;
+        PropItemVec& items, shared_str key, Flags16* val, u16 mask, LPCSTR c0 = nullptr, LPCSTR c1 = nullptr, u32 flags = 0) = 0;
     virtual Flag32Value* __stdcall CreateFlag32(
-        PropItemVec& items, shared_str key, Flags32* val, u32 mask, LPCSTR c0 = 0, LPCSTR c1 = 0, u32 flags = 0) = 0;
+        PropItemVec& items, shared_str key, Flags32* val, u32 mask, LPCSTR c0 = nullptr, LPCSTR c1 = nullptr, u32 flags = 0) = 0;
     virtual Token8Value* __stdcall CreateToken8(PropItemVec& items, shared_str key, u8* val, xr_token* token) = 0;
     virtual Token16Value* __stdcall CreateToken16(PropItemVec& items, shared_str key, u16* val, xr_token* token) = 0;
     virtual Token32Value* __stdcall CreateToken32(PropItemVec& items, shared_str key, u32* val, xr_token* token) = 0;
@@ -145,7 +145,7 @@ public:
         float mx = flt_max, float inc = 0.01f, int decim = 2) = 0;
     virtual RTextValue* __stdcall CreateName(PropItemVec& items, shared_str key, shared_str* val, ListItem* owner) = 0;
     virtual RTextValue* __stdcall CreateNameCB(PropItemVec& items, shared_str key, shared_str* val,
-        TOnDrawTextEvent = 0, RTextValue::TOnBeforeEditEvent = 0, RTextValue::TOnAfterEditEvent = 0) = 0;
+        TOnDrawTextEvent = nullptr, RTextValue::TOnBeforeEditEvent = nullptr, RTextValue::TOnAfterEditEvent = nullptr) = 0;
 
     virtual GameTypeValue* __stdcall CreateGameType(PropItemVec& items, shared_str key, GameTypeChooser* val) = 0;
     // obsolette
@@ -177,7 +177,7 @@ public:
 
 public:
     virtual ListItem* __stdcall CreateItem(
-        ListItemsVec& items, LPCSTR key, int type, u32 item_flags = 0, void* object = 0) = 0;
+        ListItemsVec& items, LPCSTR key, int type, u32 item_flags = 0, void* object = nullptr) = 0;
 };
 
 #ifdef __BORLANDC__

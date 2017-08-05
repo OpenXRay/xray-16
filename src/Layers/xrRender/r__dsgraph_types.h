@@ -36,7 +36,7 @@ public:
     {
         return (*this);
     }
-    pointer allocate(size_type n, const void* /*p*/ = 0) const
+    pointer allocate(size_type n, const void* /*p*/ = nullptr) const
     {
         return (T*)g_render_allocator.malloc_impl(sizeof(T) * (u32)n);
     }
@@ -53,12 +53,12 @@ public:
 };
 
 template <class _Ty, class _Other>
-inline bool operator==(const doug_lea_alloc<_Ty>&, const doug_lea_alloc<_Other>&)
+bool operator==(const doug_lea_alloc<_Ty>&, const doug_lea_alloc<_Other>&)
 {
     return (true);
 }
 template <class _Ty, class _Other>
-inline bool operator!=(const doug_lea_alloc<_Ty>&, const doug_lea_alloc<_Other>&)
+bool operator!=(const doug_lea_alloc<_Ty>&, const doug_lea_alloc<_Other>&)
 {
     return (false);
 }

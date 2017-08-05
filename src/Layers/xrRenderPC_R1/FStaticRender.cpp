@@ -36,7 +36,7 @@ ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float /
     default: NODEFAULT;
     }
 #ifdef DEBUG
-    return 0;
+    return nullptr;
 #endif
 }
 //////////////////////////////////////////////////////////////////////////
@@ -53,16 +53,16 @@ ShaderElement* CRender::rimp_select_sh_static(dxRender_Visual* pVisual, float cd
     default: NODEFAULT;
     }
 #ifdef DEBUG
-    return 0;
+    return nullptr;
 #endif
 }
 
 //////////////////////////////////////////////////////////////////////////
 void CRender::create()
 {
-    L_DB = 0;
-    L_Shadows = 0;
-    L_Projector = 0;
+    L_DB = nullptr;
+    L_Shadows = nullptr;
+    L_Projector = nullptr;
 
     Device.seqFrame.Add(this, REG_PRIORITY_HIGH + 0x12345678);
 
@@ -161,7 +161,7 @@ void CRender::model_Delete(IRenderVisual*& V, BOOL bDiscard)
 {
     dxRender_Visual* pVisual = (dxRender_Visual*)V;
     Models->Delete(pVisual, bDiscard);
-    V = 0;
+    V = nullptr;
 }
 IRender_DetailModel* CRender::model_CreateDM(IReader* F)
 {
@@ -176,7 +176,7 @@ void CRender::model_Delete(IRender_DetailModel*& F)
         CDetail* D = (CDetail*)F;
         D->Unload();
         xr_delete(D);
-        F = NULL;
+        F = nullptr;
     }
 }
 IRenderVisual* CRender::model_CreatePE(LPCSTR name)
@@ -328,15 +328,15 @@ void CRender::set_Object(IRenderable* O)
     else
     {
         if (L_Shadows)
-            L_Shadows->set_object(0);
+            L_Shadows->set_object(nullptr);
 
         if (L_Projector)
-            L_Projector->set_object(0);
+            L_Projector->set_object(nullptr);
     }
 }
 void CRender::apply_object(IRenderable* O)
 {
-    if (0 == O)
+    if (nullptr == O)
         return;
     if (PHASE_NORMAL == phase && O->renderable_ROS())
     {
@@ -408,7 +408,7 @@ void CRender::Calculate()
 
     // Frustum & HOM rendering
     ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
-    View = 0;
+    View = nullptr;
     HOM.Enable();
     HOM.Render(ViewBase);
     gm_SetNearer(FALSE);
@@ -421,7 +421,7 @@ void CRender::Calculate()
         if (pSector && (pSector != pLastSector))
             g_pGamePersistent->OnSectorChanged(translateSector(pSector));
 
-        if (0 == pSector)
+        if (nullptr == pSector)
             pSector = pLastSector;
         pLastSector = pSector;
         vLastCameraPos.set(Device.vCameraPosition);
@@ -477,7 +477,7 @@ void CRender::Calculate()
             std::sort(lstRenderables.begin(), lstRenderables.end(), pred_sp_sort);
 
             // Determine visibility for dynamic part of scene
-            set_Object(0);
+            set_Object(nullptr);
             g_hud->Render_First(); // R1 shadows
             g_hud->Render_Last();
             u32 uID_LTRACK = 0xffffffff;
@@ -501,7 +501,7 @@ void CRender::Calculate()
                 ISpatial* spatial = lstRenderables[o_it];
                 spatial->spatial_updatesector();
                 CSector* sector = (CSector*)spatial->GetSpatialData().sector;
-                if (0 == sector)
+                if (nullptr == sector)
                     continue; // disassociated from S/P structure
 
                 // Filter only not light spatial
@@ -519,7 +519,7 @@ void CRender::Calculate()
                             continue;
                         // renderable
                         IRenderable* renderable = spatial->dcast_Renderable();
-                        if (0 == renderable)
+                        if (nullptr == renderable)
                         {
                             // It may be an glow
                             CGlow* glow = dynamic_cast<CGlow*>(spatial);
@@ -555,7 +555,7 @@ void CRender::Calculate()
                             }
                             set_Object(renderable);
                             renderable->renderable_Render();
-                            set_Object(0); //? is it needed at all
+                            set_Object(nullptr); //? is it needed at all
                         }
                         break; // exit loop on frustums
                     }
@@ -590,7 +590,7 @@ void CRender::Calculate()
     }
     else
     {
-        set_Object(0);
+        set_Object(nullptr);
     }
 
     // End calc
@@ -757,11 +757,11 @@ public:
         string_path pname;
         strconcat(sizeof(pname), pname, GlobalEnv.Render->getShaderPath(), pFileName);
         IReader* R = FS.r_open("$game_shaders$", pname);
-        if (0 == R)
+        if (nullptr == R)
         {
             // possibly in shared directory or somewhere else - open directly
             R = FS.r_open("$game_shaders$", pFileName);
-            if (0 == R)
+            if (nullptr == R)
                 return E_FAIL;
         }
 
@@ -798,8 +798,8 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
             return E_FAIL;
         }
 
-        LPCVOID data = NULL;
-        _result = D3DXFindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, NULL);
+        LPCVOID data = nullptr;
+        _result = D3DXFindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, nullptr);
         if (SUCCEEDED(_result) && data)
         {
             LPD3DXSHADER_CONSTANTTABLE pConstants = LPD3DXSHADER_CONSTANTTABLE(data);
@@ -822,8 +822,8 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
             return E_FAIL;
         }
 
-        LPCVOID data = NULL;
-        _result = D3DXFindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, NULL);
+        LPCVOID data = nullptr;
+        _result = D3DXFindShaderComment(buffer, MAKEFOURCC('C', 'T', 'A', 'B'), &data, nullptr);
         if (SUCCEEDED(_result) && data)
         {
             LPD3DXSHADER_CONSTANTTABLE pConstants = LPD3DXSHADER_CONSTANTTABLE(data);
@@ -838,8 +838,8 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
 
     if (disasm)
     {
-        ID3DXBuffer* disasm = 0;
-        D3DXDisassembleShader(LPDWORD(buffer), FALSE, 0, &disasm);
+        ID3DXBuffer* disasm = nullptr;
+        D3DXDisassembleShader(LPDWORD(buffer), FALSE, nullptr, &disasm);
         string_path dname;
         strconcat(sizeof(dname), dname, "disasm\\", file_name, ('v' == pTarget[0]) ? ".vs" : ".ps");
         IWriter* W = FS.w_open("$logs$", dname);
@@ -930,8 +930,8 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
     ++len;
 
     // finish
-    defines[def_it].Name = 0;
-    defines[def_it].Definition = 0;
+    defines[def_it].Name = nullptr;
+    defines[def_it].Definition = nullptr;
     def_it++;
     R_ASSERT(def_it < 128);
 
@@ -986,9 +986,9 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
     if (FAILED(_result))
     {
         includer Includer;
-        LPD3DXBUFFER pShaderBuf = NULL;
-        LPD3DXBUFFER pErrorBuf = NULL;
-        LPD3DXCONSTANTTABLE pConstants = NULL;
+        LPD3DXBUFFER pShaderBuf = nullptr;
+        LPD3DXBUFFER pErrorBuf = nullptr;
+        LPD3DXCONSTANTTABLE pConstants = nullptr;
         LPD3DXINCLUDE pInclude = (LPD3DXINCLUDE)&Includer;
 
         _result = D3DXCompileShader((LPCSTR)pSrcData, SrcDataLen, defines, pInclude, pFunctionName, pTarget,

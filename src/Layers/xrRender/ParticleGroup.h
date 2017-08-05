@@ -85,11 +85,10 @@ public:
         VisualVec _children_related;
         VisualVec _children_free;
 
-    public:
         void Set(dxRender_Visual* e);
         void Clear();
 
-        IC u32 GetVisuals(xr_vector<dxRender_Visual*>& visuals)
+        u32 GetVisuals(xr_vector<dxRender_Visual*>& visuals)
         {
             visuals.reserve(_children_related.size() + _children_free.size() + 1);
             if (_effect)

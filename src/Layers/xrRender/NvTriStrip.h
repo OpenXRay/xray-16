@@ -30,7 +30,7 @@ struct PrimitiveGroup
 
     ////////////////////////////////////////////////////////////////////////////////////////
 
-    PrimitiveGroup() : type(PT_STRIP), numIndices(0), indices(NULL) {}
+    PrimitiveGroup() : type(PT_STRIP), numIndices(0), indices(nullptr) {}
     ~PrimitiveGroup()
     {
         if (indices)

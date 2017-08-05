@@ -85,7 +85,7 @@ BOOL CRenderTarget::enable_scissor(light* L) // true if intersects near plane
         P.n.set(plane.x, plane.y, plane.z);
         P.d = plane.w;
         float p_dist = P.classify(L->spatial.sphere.P) - L->spatial.sphere.R;
-        near_intersect = (p_dist <= 0);
+        near_intersect = p_dist <= 0;
     }
 #ifdef DEBUG
     if (1)

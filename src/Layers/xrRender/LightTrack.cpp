@@ -164,9 +164,9 @@ void CROS_impl::update(IRenderable* O)
     if (dwFrame == Device.dwFrame)
         return;
     dwFrame = Device.dwFrame;
-    if (0 == O)
+    if (nullptr == O)
         return;
-    if (0 == O->GetRenderData().visual)
+    if (nullptr == O->GetRenderData().visual)
         return;
     VERIFY(dynamic_cast<CROS_impl*>(O->renderable_ROS()));
     // float	dt			=	Device.fTimeDelta;

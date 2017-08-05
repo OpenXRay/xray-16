@@ -28,10 +28,10 @@ void free_render_mode_list() {}
 CHW HW;
 
 #ifdef DEBUG
-IDirect3DStateBlock9* dwDebugSB = 0;
+IDirect3DStateBlock9* dwDebugSB = nullptr;
 #endif
 
-CHW::CHW() : hD3D(NULL), pD3D(NULL), pDevice(NULL), pBaseRT(NULL), pBaseZB(NULL), m_move_window(true) { ; }
+CHW::CHW() : hD3D(nullptr), pD3D(nullptr), pDevice(nullptr), pBaseRT(nullptr), pBaseZB(nullptr), m_move_window(true) { ; }
 CHW::~CHW() { ; }
 void CHW::Reset(HWND hwnd)
 {
@@ -313,7 +313,7 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
             "Please try to restart the game.\n"
             "Can not find matching format for back buffer.");
         FlushLog();
-        MessageBox(NULL, "Failed to initialize graphics hardware.\nPlease try to restart the game.", "Error!",
+        MessageBox(nullptr, "Failed to initialize graphics hardware.\nPlease try to restart the game.", "Error!",
             MB_OK | MB_ICONERROR);
         TerminateProcess(GetCurrentProcess(), 0);
     }
@@ -376,7 +376,7 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
             "Please try to restart the game.\n"
             "CreateDevice returned 0x%08x(D3DERR_DEVICELOST)", R);
         FlushLog();
-        MessageBox(NULL, "Failed to initialize graphics hardware.\nPlease try to restart the game.", "Error!",
+        MessageBox(nullptr, "Failed to initialize graphics hardware.\nPlease try to restart the game.", "Error!",
             MB_OK | MB_ICONERROR);
         TerminateProcess(GetCurrentProcess(), 0);
     };
@@ -602,12 +602,12 @@ void free_vid_mode_list()
         xr_free(GlobalEnv.vid_mode_token[i].name);
     }
     xr_free(GlobalEnv.vid_mode_token);
-    GlobalEnv.vid_mode_token = NULL;
+    GlobalEnv.vid_mode_token = nullptr;
 }
 
 void fill_vid_mode_list(CHW* _hw)
 {
-    if (GlobalEnv.vid_mode_token != NULL)
+    if (GlobalEnv.vid_mode_token != nullptr)
         return;
     xr_vector<LPCSTR> _tmp;
     u32 cnt = _hw->pD3D->GetAdapterModeCount(_hw->DevAdapter, _hw->Caps.fTarget);
@@ -627,7 +627,7 @@ void fill_vid_mode_list(CHW* _hw)
         if (_tmp.end() != std::find_if(_tmp.begin(), _tmp.end(), _uniq_mode(str)))
             continue;
 
-        _tmp.push_back(NULL);
+        _tmp.push_back(nullptr);
         _tmp.back() = xr_strdup(str);
     }
 
@@ -636,7 +636,7 @@ void fill_vid_mode_list(CHW* _hw)
     GlobalEnv.vid_mode_token = xr_alloc<xr_token>(_cnt);
 
     GlobalEnv.vid_mode_token[_cnt - 1].id = -1;
-    GlobalEnv.vid_mode_token[_cnt - 1].name = NULL;
+    GlobalEnv.vid_mode_token[_cnt - 1].name = nullptr;
 
 #ifdef DEBUG
     Msg("Available video modes[%d]:", _tmp.size());

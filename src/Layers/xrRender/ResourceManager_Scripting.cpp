@@ -28,12 +28,12 @@ public:
     adopt_sampler(CBlender_Compile* _C, u32 _stage) : C(_C), stage(_stage)
     {
         if (u32(-1) == stage)
-            C = 0;
+            C = nullptr;
     }
     adopt_sampler(const adopt_sampler& _C) : C(_C.C), stage(_C.stage)
     {
         if (u32(-1) == stage)
-            C = 0;
+            C = nullptr;
     }
 
     adopt_sampler& _texture(LPCSTR texture)
@@ -218,7 +218,7 @@ public:
     }
     adopt_sampler _sampler(LPCSTR _name)
     {
-        u32 s = C->r_Sampler(_name, 0);
+        u32 s = C->r_Sampler(_name, nullptr);
         return adopt_sampler(C, s);
     }
 };
@@ -290,7 +290,7 @@ void CResourceManager::LS_Load()
     {
         string_path namesp, fn;
         xr_strcpy(namesp, (*folder)[it]);
-        if (0 == strext(namesp) || 0 != xr_strcmp(strext(namesp), ".s"))
+        if (nullptr == strext(namesp) || 0 != xr_strcmp(strext(namesp), ".s"))
             continue;
         *strext(namesp) = 0;
         if (0 == namesp[0])
@@ -329,14 +329,14 @@ Shader* CResourceManager::_lua_Create(LPCSTR d_shader, LPCSTR s_textures)
     LPCSTR s_shader = undercorated;
 
     // Access to template
-    C.BT = NULL;
+    C.BT = nullptr;
     C.bEditor = FALSE;
     C.bDetail = FALSE;
 
     // Prepare
     _ParseList(C.L_textures, s_textures);
-    C.detail_texture = NULL;
-    C.detail_scaler = NULL;
+    C.detail_texture = nullptr;
+    C.detail_scaler = nullptr;
 
     // Compile element (LOD0 - HQ)
     if (ScriptEngine.object(s_shader, "normal_hq", LUA_TFUNCTION))

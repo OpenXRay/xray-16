@@ -28,7 +28,7 @@ CSE_Visual::CSE_Visual(LPCSTR name)
         visual_name = tmp;
     }
     else
-        visual_name = NULL;
+        visual_name = nullptr;
 
     startup_animation = "$editor";
     flags.zero();
@@ -81,7 +81,7 @@ void CSE_Visual::FillProps(LPCSTR pref, PropItemVec& items)
         PHelper().CreateChoose(items, PrepareKey(pref, abstract->name(), "Model\\Visual"), &visual_name, smVisual);
     V->OnChangeEvent.bind(this, &CSE_Visual::OnChangeVisual);
     V = PHelper().CreateChoose(items, PrepareKey(pref, abstract->name(), "Model\\Animation"), &startup_animation,
-        smSkeletonAnims, 0, (void*)*visual_name);
+        smSkeletonAnims, nullptr, (void*)*visual_name);
     V->OnChangeEvent.bind(this, &CSE_Visual::OnChangeAnim);
     PHelper().CreateFlag8(items, PrepareKey(pref, abstract->name(), "Model\\Obstacle"), &flags, flObstacle);
 }

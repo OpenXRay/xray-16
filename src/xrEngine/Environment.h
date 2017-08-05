@@ -96,7 +96,7 @@ public:
             return (m_sound_dist.x < m_sound_dist.y) ? Random.randF(m_sound_dist.x, m_sound_dist.y) : 0;
         }
         INGAME_EDITOR_VIRTUAL ~SSndChannel() {}
-        inline INGAME_EDITOR_VIRTUAL sounds_type& sounds() { return m_sounds; }
+        INGAME_EDITOR_VIRTUAL sounds_type& sounds() { return m_sounds; }
     protected:
         xr_vector<ref_sound> m_sounds;
     };
@@ -112,18 +112,18 @@ protected:
     shared_str m_ambients_config_filename;
 
 public:
-    IC const shared_str& name() { return m_load_section; }
-    IC const shared_str& get_ambients_config_filename() { return m_ambients_config_filename; }
+    const shared_str& name() { return m_load_section; }
+    const shared_str& get_ambients_config_filename() { return m_ambients_config_filename; }
     INGAME_EDITOR_VIRTUAL void load(CInifile& ambients_config, CInifile& sound_channels_config,
         CInifile& effects_config, const shared_str& section);
-    IC SEffect* get_rnd_effect() { return effects().empty() ? 0 : effects()[Random.randI(effects().size())]; }
-    IC u32 get_rnd_effect_time() { return Random.randI(m_effect_period.x, m_effect_period.y); }
+    SEffect* get_rnd_effect() { return effects().empty() ? 0 : effects()[Random.randI(effects().size())]; }
+    u32 get_rnd_effect_time() { return Random.randI(m_effect_period.x, m_effect_period.y); }
     INGAME_EDITOR_VIRTUAL SEffect* create_effect(CInifile& config, LPCSTR id);
     INGAME_EDITOR_VIRTUAL SSndChannel* create_sound_channel(CInifile& config, LPCSTR id);
     INGAME_EDITOR_VIRTUAL ~CEnvAmbient();
     void destroy();
-    inline INGAME_EDITOR_VIRTUAL EffectVec& effects() { return m_effects; }
-    inline INGAME_EDITOR_VIRTUAL SSndChannelVec& get_snd_channels() { return m_sound_channels; }
+    INGAME_EDITOR_VIRTUAL EffectVec& effects() { return m_effects; }
+    INGAME_EDITOR_VIRTUAL SSndChannelVec& get_snd_channels() { return m_sound_channels; }
 };
 
 class ENGINE_API CEnvDescriptor
@@ -223,7 +223,7 @@ class ENGINE_API CEnvironment
     friend class dxEnvironmentRender;
     struct str_pred : public std::binary_function<shared_str, shared_str, bool>
     {
-        IC bool operator()(const shared_str& x, const shared_str& y) const { return xr_strcmp(x, y) < 0; }
+        bool operator()(const shared_str& x, const shared_str& y) const { return xr_strcmp(x, y) < 0; }
     };
 
 public:

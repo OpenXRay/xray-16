@@ -174,7 +174,7 @@ ChooseValue* CScriptPropertiesListHelper::CreateChoose(
 ChooseValue* CScriptPropertiesListHelper::CreateChoose(
     PropItemVec* items, LPCSTR key, luabind::object object, LPCSTR name, u32 mode)
 {
-    return (PHelper().CreateChoose(*items, key, wrap_value<shared_str>(object, name), mode, 0));
+    return (PHelper().CreateChoose(*items, key, wrap_value<shared_str>(object, name), mode, nullptr));
 }
 
 // S8Value* CScriptPropertiesListHelper::CreateS8		(PropItemVec* items, LPCSTR key, luabind::object object, LPCSTR

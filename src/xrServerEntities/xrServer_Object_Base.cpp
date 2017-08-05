@@ -74,13 +74,13 @@ CSE_Abstract::CSE_Abstract(LPCSTR caSection)
     ID = 0xffff;
     ID_Parent = 0xffff;
     ID_Phantom = 0xffff;
-    owner = 0;
+    owner = nullptr;
     m_gameType.SetDefaults();
     //.	s_gameid					= 0;
     s_RP = 0xFE; // Use supplied coords
     s_flags.assign(0);
     s_name = caSection;
-    s_name_replace = 0; // xr_strdup("");
+    s_name_replace = nullptr; // xr_strdup("");
     o_Angle.set(0.f, 0.f, 0.f);
     o_Position.set(0.f, 0.f, 0.f);
     m_bALifeControl = false;
@@ -102,12 +102,12 @@ CSE_Abstract::CSE_Abstract(LPCSTR caSection)
     //	m_next_spawn_time			= 0;
     //	m_min_spawn_interval		= 0;
     //	m_max_spawn_interval		= 0;
-    m_ini_file = 0;
+    m_ini_file = nullptr;
 
     if (pSettings->line_exist(caSection, "custom_data"))
     {
         pcstr const raw_file_name = pSettings->r_string(caSection, "custom_data");
-        IReader const* config = 0;
+        IReader const* config = nullptr;
 #ifdef XRGAME_EXPORTS
         if (ai().get_alife())
             config = ai().alife().get_config(raw_file_name);
@@ -151,9 +151,9 @@ CSE_Abstract::~CSE_Abstract()
     xr_delete(m_ini_file);
 }
 
-CSE_Visual* CSE_Abstract::visual() { return (0); }
-IServerEntityShape* CSE_Abstract::shape() { return (0); }
-CSE_Motion* CSE_Abstract::motion() { return (0); }
+CSE_Visual* CSE_Abstract::visual() { return (nullptr); }
+IServerEntityShape* CSE_Abstract::shape() { return (nullptr); }
+CSE_Motion* CSE_Abstract::motion() { return (nullptr); }
 CInifile& CSE_Abstract::spawn_ini()
 {
     if (!m_ini_file)
@@ -337,7 +337,7 @@ BOOL CSE_Abstract::Spawn_Read(NET_Packet& tNetPacket)
     u16 size;
     tNetPacket.r_u16(size); // size
     bool b1 = (m_tClassID == CLSID_SPECTATOR);
-    bool b2 = (size > sizeof(size)) || (tNetPacket.inistream != NULL);
+    bool b2 = (size > sizeof(size)) || (tNetPacket.inistream != nullptr);
     R_ASSERT3((b1 || b2), "cannot read object, which is not successfully saved :(", name_replace());
     STATE_Read(tNetPacket, size);
     return TRUE;
@@ -380,7 +380,7 @@ xr_token game_types[] = {{"any_game", eGameIDNoGame}, {"single", eGameIDSingle},
     {"capture_the_artefact", eGameIDCaptureTheArtefact},
     // eGameIDDominationZone
     // eGameIDTeamDominationZone
-    {0, 0}};
+    {nullptr, 0}};
 
 #ifndef XRGAME_EXPORTS
 void CSE_Abstract::FillProps(LPCSTR pref, PropItemVec& items)

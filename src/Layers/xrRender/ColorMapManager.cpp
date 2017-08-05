@@ -43,6 +43,6 @@ void ColorMapManager::UpdateTexture(const shared_str& strTexName, int iTex)
     }
     else
     {
-        m_CMap[iTex]->surface_set(0);
+        m_CMap[iTex]->surface_set(nullptr);
     }
 }

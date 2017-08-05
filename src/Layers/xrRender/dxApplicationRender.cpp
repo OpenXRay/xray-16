@@ -13,7 +13,7 @@ void dxApplicationRender::LoadBegin()
     sh_progress.create("hud\\default", "ui\\ui_actor_loadgame_screen");
     hLevelLogo_Add.create("hud\\default", "ui\\ui_actor_widescreen_sidepanels.dds");
 
-    ll_hGeom2.create(FVF::F_TL, RCache.Vertex.Buffer(), NULL);
+    ll_hGeom2.create(FVF::F_TL, RCache.Vertex.Buffer(), nullptr);
 }
 
 void dxApplicationRender::destroy_loading_shaders()
@@ -40,7 +40,7 @@ void dxApplicationRender::load_draw_internal(CApplication& owner)
     FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
     HW.pContext->ClearRenderTargetView(RCache.get_RT(), ColorRGBA);
 #else //    USE_DX10
-    CHK_DX(HW.pDevice->Clear(0, 0, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0, 0, 0, 0), 1, 0));
+    CHK_DX(HW.pDevice->Clear(0, nullptr, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0, 0, 0, 0), 1, 0));
 #endif //   USE_DX10
 
     if (!sh_progress)
@@ -108,7 +108,7 @@ void dxApplicationRender::load_draw_internal(CApplication& owner)
 
     u32 Offset;
     u32 C = 0xffffffff;
-    FVF::TL* pv = NULL;
+    FVF::TL* pv = nullptr;
     u32 v_cnt = 40;
     pv = (FVF::TL*)RCache.Vertex.Lock(2 * (v_cnt + 1), ll_hGeom2.stride(), Offset);
     FVF::TL* _pv = pv;
@@ -241,7 +241,7 @@ void dxApplicationRender::draw_face(ref_shader& sh, Frect& coords, Frect& tex_co
 {
     u32 Offset;
     u32 C = 0xffffffff;
-    FVF::TL* pv = NULL;
+    FVF::TL* pv = nullptr;
 
     tex_coords.lt.x /= tsz.x;
     tex_coords.lt.y /= tsz.y;
@@ -294,7 +294,7 @@ void draw_multiline_text(CGameFont* F, float fTargetWidth, LPCSTR pszText)
 
     LPCSTR ch = pszText;
     float curr_word_len = 0.0f;
-    LPCSTR next_word = NULL;
+    LPCSTR next_word = nullptr;
 
     float curr_len = 0.0f;
     string512 buff;

@@ -4,7 +4,7 @@
 #include "IGame_Persistent.h"
 #include "xr_IOConsole.h"
 
-void CRenderDevice::Destroy(void)
+void CRenderDevice::Destroy()
 {
     if (!b_is_Ready)
         return;

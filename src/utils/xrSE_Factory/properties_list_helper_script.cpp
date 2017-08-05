@@ -22,10 +22,10 @@ struct CChooseType
 
 typedef IPropHelper&(__stdcall* TPHelper)();
 
-TPHelper _PHelper = 0;
-HMODULE prop_helper_module = 0;
+TPHelper _PHelper = nullptr;
+HMODULE prop_helper_module = nullptr;
 LPCSTR prop_helper_library = "xrEPropsB", prop_helper_func = "PHelper";
-CScriptPropertiesListHelper* g_property_list_helper = 0;
+CScriptPropertiesListHelper* g_property_list_helper = nullptr;
 
 void load_prop_helper()
 {

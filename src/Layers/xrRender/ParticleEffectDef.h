@@ -38,10 +38,11 @@ struct SFrame
         m_iFrameCount = 16;
         m_fSpeed = 24.f;
     }
-    IC void CalculateTC(int frame, Fvector2& lt, Fvector2& rb)
+
+    void CalculateTC(int frame, Fvector2& lt, Fvector2& rb)
     {
-        lt.x = (frame % m_iFrameDimX) * m_fTexSize.x;
-        lt.y = (frame / m_iFrameDimX) * m_fTexSize.y;
+        lt.x = frame % m_iFrameDimX * m_fTexSize.x;
+        lt.y = frame / m_iFrameDimX * m_fTexSize.y;
         rb.x = lt.x + m_fTexSize.x;
         rb.y = lt.y + m_fTexSize.y;
     }
@@ -52,22 +53,22 @@ class ECORE_API CPEDef
 public:
     enum
     {
-        dfSprite = (1 << 0),
+        dfSprite = 1 << 0,
         //dfObject = (1 << 1),
-        dfFramed = (1 << 10),
-        dfAnimated = (1 << 11),
-        dfRandomFrame = (1 << 12),
-        dfRandomPlayback = (1 << 13),
-        dfTimeLimit = (1 << 14),
-        dfAlignToPath = (1 << 15),
-        dfCollision = (1 << 16),
-        dfCollisionDel = (1 << 17),
-        dfVelocityScale = (1 << 18),
-        dfCollisionDyn = (1 << 19),
-        dfWorldAlign = (1 << 20),
-        dfFaceAlign = (1 << 21),
-        dfCulling = (1 << 22),
-        dfCullCCW = (1 << 23),
+        dfFramed = 1 << 10,
+        dfAnimated = 1 << 11,
+        dfRandomFrame = 1 << 12,
+        dfRandomPlayback = 1 << 13,
+        dfTimeLimit = 1 << 14,
+        dfAlignToPath = 1 << 15,
+        dfCollision = 1 << 16,
+        dfCollisionDel = 1 << 17,
+        dfVelocityScale = 1 << 18,
+        dfCollisionDyn = 1 << 19,
+        dfWorldAlign = 1 << 20,
+        dfFaceAlign = 1 << 21,
+        dfCulling = 1 << 22,
+        dfCullCCW = 1 << 23,
     };
     shared_str m_Name;
     Flags32 m_Flags;
@@ -88,19 +89,17 @@ public:
     float m_fCollideResilience;
     float m_fCollideSqrCutoff;
 
-public:
     BOOL SaveActionList(IWriter& F);
     BOOL LoadActionList(IReader& F);
     // execute
     void ExecuteAnimate(PAPI::Particle* particles, u32 p_cnt, float dt);
     void ExecuteCollision(PAPI::Particle* particles, u32 p_cnt, float dt, CParticleEffect* owner, CollisionCallback cb);
 
-public:
     CPEDef();
     ~CPEDef();
 
     void SetName(LPCSTR name);
-    IC LPCSTR Name() const { return *m_Name; }
+    LPCSTR Name() const { return *m_Name; }
     void CreateShader();
     void DestroyShader();
 

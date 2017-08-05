@@ -76,13 +76,13 @@ void CDetailManager::SSwingValue::lerp(const SSwingValue& A, const SSwingValue& 
 // XXX stats: add to statistics
 CDetailManager::CDetailManager() : xrc("detail manager")
 {
-    dtFS = 0;
-    dtSlots = 0;
-    soft_Geom = 0;
-    hw_Geom = 0;
+    dtFS = nullptr;
+    dtSlots = nullptr;
+    soft_Geom = nullptr;
+    hw_Geom = nullptr;
     hw_BatchSize = 0;
-    hw_VB = 0;
-    hw_IB = 0;
+    hw_VB = nullptr;
+    hw_IB = nullptr;
     m_time_rot_1 = 0;
     m_time_rot_2 = 0;
     m_time_pos = 0;
@@ -108,7 +108,7 @@ void CDetailManager::Load()
     // Open file stream
     if (!FS.exist("$level$", "level.details"))
     {
-        dtFS = NULL;
+        dtFS = nullptr;
         return;
     }
 
@@ -179,6 +179,7 @@ void CDetailManager::Unload()
         (*it)->Unload();
         xr_delete(*it);
     }
+
     objects.clear();
     m_visibles[0].clear();
     m_visibles[1].clear();
@@ -330,7 +331,7 @@ void CDetailManager::UpdateVisibleM()
 void CDetailManager::Render()
 {
 #ifndef _EDITOR
-    if (0 == dtFS)
+    if (nullptr == dtFS)
         return;
     if (!psDeviceFlags.is(rsDetails))
         return;
@@ -362,9 +363,9 @@ void CDetailManager::Render()
 void __stdcall CDetailManager::MT_CALC()
 {
 #ifndef _EDITOR
-    if (0 == RImplementation.Details)
+    if (nullptr == RImplementation.Details)
         return; // possibly deleted
-    if (0 == dtFS)
+    if (nullptr == dtFS)
         return;
     if (!psDeviceFlags.is(rsDetails))
         return;

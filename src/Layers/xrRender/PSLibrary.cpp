@@ -58,8 +58,7 @@ PS::PEDIt CPSLibrary::FindPEDIt(LPCSTR Name)
     PS::PEDIt I = std::lower_bound(m_PEDs.begin(), m_PEDs.end(), Name, ped_find_pred);
     if (I == m_PEDs.end() || (0 != xr_strcmp((*I)->m_Name, Name)))
         return m_PEDs.end();
-    else
-        return I;
+    return I;
 #endif
 }
 
@@ -82,8 +81,7 @@ PS::PGDIt CPSLibrary::FindPGDIt(LPCSTR Name)
     PS::PGDIt I = std::lower_bound(m_PGDs.begin(), m_PGDs.end(), Name, pgd_find_pred);
     if (I == m_PGDs.end() || (0 != xr_strcmp((*I)->m_Name, Name)))
         return m_PGDs.end();
-    else
-        return I;
+    return I;
 #endif
 }
 
@@ -134,7 +132,7 @@ bool CPSLibrary::Load2()
     FS.file_list(files, _path, FS_ListFiles, "*.pe,*.pg");
 
 #ifdef _EDITOR
-    SPBItem* pb = NULL;
+    SPBItem* pb = nullptr;
     if (UI->m_bReady)
         pb = UI->ProgressStart(files.size(), "Loading particles...");
 #endif

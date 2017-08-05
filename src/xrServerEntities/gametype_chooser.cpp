@@ -16,7 +16,7 @@ enum ERPGameType
 
 xr_token rpoint_game_type[] = {{"Any game", rpgtGameAny}, {"Deathmatch", rpgtGameDeathmatch},
     {"TeamDeathmatch", rpgtGameTeamDeathmatch}, {"ArtefactHunt", rpgtGameArtefactHunt},
-    {"CaptureTheArtefact", rpgtGameCaptureTheArtefact}, {0, 0}};
+    {"CaptureTheArtefact", rpgtGameCaptureTheArtefact}, {nullptr, 0}};
 
 #ifdef _EDITOR
 bool GameTypeChooser::LoadStream(IReader& F)

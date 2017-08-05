@@ -42,12 +42,12 @@ ObjectFactory::ServerObjectBaseClass* CObjectItemScript::server_object(LPCSTR se
     catch (std::exception e)
     {
         Msg("Exception [%s] raised while creating server object from section [%s]", e.what(), section);
-        return (0);
+        return (nullptr);
     }
     catch (...)
     {
         Msg("Exception raised while creating server object from section [%s]", section);
-        return (0);
+        return (nullptr);
     }
 
     R_ASSERT(object);

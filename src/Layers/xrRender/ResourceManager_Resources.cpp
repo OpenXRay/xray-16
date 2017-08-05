@@ -182,7 +182,7 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
         m_vs.insert(std::make_pair(_vs->set_name(name), _vs));
         if (0 == _stricmp(_name, "null"))
         {
-            _vs->vs = NULL;
+            _vs->vs = nullptr;
             return _vs;
         }
 
@@ -268,7 +268,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR name)
         m_ps.insert(std::make_pair(_ps->set_name(name), _ps));
         if (0 == _stricmp(name, "null"))
         {
-            _ps->ps = NULL;
+            _ps->ps = nullptr;
             return _ps;
         }
 
@@ -350,7 +350,7 @@ void CResourceManager::_DeletePS(const SPS* ps)
 R_constant_table* CResourceManager::_CreateConstantTable(R_constant_table& C)
 {
     if (C.empty())
-        return NULL;
+        return nullptr;
     for (u32 it = 0; it < v_constant_tables.size(); it++)
         if (v_constant_tables[it]->equal(C))
             return v_constant_tables[it];
@@ -497,7 +497,7 @@ CTexture* CResourceManager::_CreateTexture(LPCSTR _Name)
 {
     // DBG_VerifyTextures	();
     if (0 == xr_strcmp(_Name, "null"))
-        return 0;
+        return nullptr;
     R_ASSERT(_Name && _Name[0]);
     string_path Name;
     xr_strcpy(Name, _Name); //. andy if (strext(Name)) *strext(Name)=0;
@@ -559,7 +559,7 @@ CMatrix* CResourceManager::_CreateMatrix(LPCSTR Name)
 {
     R_ASSERT(Name && Name[0]);
     if (0 == _stricmp(Name, "$null"))
-        return NULL;
+        return nullptr;
 
     LPSTR N = LPSTR(Name);
     map_Matrix::iterator I = m_matrices.find(N);
@@ -597,7 +597,7 @@ CConstant* CResourceManager::_CreateConstant(LPCSTR Name)
 {
     R_ASSERT(Name && Name[0]);
     if (0 == _stricmp(Name, "$null"))
-        return NULL;
+        return nullptr;
 
     LPSTR N = LPSTR(Name);
     map_Constant::iterator I = m_constants.find(N);
@@ -670,7 +670,7 @@ SMatrixList* CResourceManager::_CreateMatrixList(SMatrixList& L)
             break;
         }
     if (bEmpty)
-        return NULL;
+        return nullptr;
 
     for (u32 it = 0; it < lst_matrices.size(); it++)
     {
@@ -702,7 +702,7 @@ SConstantList* CResourceManager::_CreateConstantList(SConstantList& L)
             break;
         }
     if (bEmpty)
-        return NULL;
+        return nullptr;
 
     for (u32 it = 0; it < lst_constants.size(); it++)
     {

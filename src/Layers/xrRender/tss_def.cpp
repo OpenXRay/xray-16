@@ -26,7 +26,7 @@ IDirect3DStateBlock9* SimulatorStates::record()
         break;
         }
     }
-    IDirect3DStateBlock9* SB = 0;
+    IDirect3DStateBlock9* SB = nullptr;
     CHK_DX(HW.pDevice->EndStateBlock(&SB));
     return SB;
 #endif // USE_DX10

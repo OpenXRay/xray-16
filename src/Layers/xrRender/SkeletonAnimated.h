@@ -22,7 +22,7 @@ private:
 
 public:
     // methods
-    IC BlendSVec& blend_vector() { return Blend; }
+    BlendSVec& blend_vector() { return Blend; }
     void construct();
     void blend_add(CBlend* H);
     void blend_remove(CBlend* H);
@@ -142,9 +142,9 @@ public:
 #endif
     u16 LL_MotionsSlotCount() { return (u16)m_Motions.size(); }
     const shared_motions& LL_MotionsSlot(u16 idx) { return m_Motions[idx].motions; }
-    IC CMotionDef* LL_GetMotionDef(MotionID id) { return m_Motions[id.slot].motions.motion_def(id.idx); }
-    IC CMotion* LL_GetRootMotion(MotionID id) { return &m_Motions[id.slot].bone_motions[iRoot]->at(id.idx); }
-    IC CMotion* LL_GetMotion(MotionID id, u16 bone_id) { return &m_Motions[id.slot].bone_motions[bone_id]->at(id.idx); }
+    CMotionDef* LL_GetMotionDef(MotionID id) { return m_Motions[id.slot].motions.motion_def(id.idx); }
+    CMotion* LL_GetRootMotion(MotionID id) { return &m_Motions[id.slot].bone_motions[iRoot]->at(id.idx); }
+    CMotion* LL_GetMotion(MotionID id, u16 bone_id) { return &m_Motions[id.slot].bone_motions[bone_id]->at(id.idx); }
     virtual IBlendDestroyCallback* GetBlendDestroyCallback();
     virtual void SetBlendDestroyCallback(IBlendDestroyCallback* cb);
     // Low level interface
@@ -177,11 +177,11 @@ public:
     MotionID ID_Cycle(shared_str N);
     MotionID ID_Cycle_Safe(shared_str N);
     CBlend* PlayCycle(
-        LPCSTR N, BOOL bMixIn = TRUE, PlayCallback Callback = 0, LPVOID CallbackParam = 0, u8 channel = 0);
+        LPCSTR N, BOOL bMixIn = TRUE, PlayCallback Callback = nullptr, LPVOID CallbackParam = nullptr, u8 channel = 0);
     CBlend* PlayCycle(
-        MotionID M, BOOL bMixIn = TRUE, PlayCallback Callback = 0, LPVOID CallbackParam = 0, u8 channel = 0);
-    CBlend* PlayCycle(u16 partition, MotionID M, BOOL bMixIn = TRUE, PlayCallback Callback = 0,
-        LPVOID CallbackParam = 0, u8 channel = 0);
+        MotionID M, BOOL bMixIn = TRUE, PlayCallback Callback = nullptr, LPVOID CallbackParam = nullptr, u8 channel = 0);
+    CBlend* PlayCycle(u16 partition, MotionID M, BOOL bMixIn = TRUE, PlayCallback Callback = nullptr,
+        LPVOID CallbackParam = nullptr, u8 channel = 0);
     // fx'es
     MotionID ID_FX(LPCSTR N);
     MotionID ID_FX_Safe(LPCSTR N);
@@ -207,7 +207,7 @@ public:
         return sz;
     }
 
-    IC const BlendSVec& blend_cycle(const u32& bone_part_id) const
+    const BlendSVec& blend_cycle(const u32& bone_part_id) const
     {
         VERIFY(bone_part_id < MAX_PARTS);
         return (blend_cycles[bone_part_id]);

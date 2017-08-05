@@ -26,11 +26,11 @@ void CBackend::OnFrameEnd()
 #else // USE_DX10
 
         for (u32 stage = 0; stage < HW.Caps.raster.dwStages; stage++)
-            CHK_DX(HW.pDevice->SetTexture(0, 0));
-        CHK_DX(HW.pDevice->SetStreamSource(0, 0, 0, 0));
-        CHK_DX(HW.pDevice->SetIndices(0));
-        CHK_DX(HW.pDevice->SetVertexShader(0));
-        CHK_DX(HW.pDevice->SetPixelShader(0));
+            CHK_DX(HW.pDevice->SetTexture(0, nullptr));
+        CHK_DX(HW.pDevice->SetStreamSource(0, nullptr, 0, 0));
+        CHK_DX(HW.pDevice->SetIndices(nullptr));
+        CHK_DX(HW.pDevice->SetVertexShader(nullptr));
+        CHK_DX(HW.pDevice->SetPixelShader(nullptr));
         Invalidate();
 #endif // USE_DX10
     }
@@ -62,31 +62,31 @@ void CBackend::OnFrameBegin()
 
 void CBackend::Invalidate()
 {
-    pRT[0] = NULL;
-    pRT[1] = NULL;
-    pRT[2] = NULL;
-    pRT[3] = NULL;
-    pZB = NULL;
+    pRT[0] = nullptr;
+    pRT[1] = nullptr;
+    pRT[2] = nullptr;
+    pRT[3] = nullptr;
+    pZB = nullptr;
 
-    decl = NULL;
-    vb = NULL;
-    ib = NULL;
+    decl = nullptr;
+    vb = nullptr;
+    ib = nullptr;
     vb_stride = 0;
 
-    state = NULL;
-    ps = NULL;
-    vs = NULL;
+    state = nullptr;
+    ps = nullptr;
+    vs = nullptr;
     DX10_ONLY(gs = NULL);
 #ifdef USE_DX11
     hs = 0;
     ds = 0;
     cs = 0;
 #endif
-    ctable = NULL;
+    ctable = nullptr;
 
-    T = NULL;
-    M = NULL;
-    C = NULL;
+    T = nullptr;
+    M = nullptr;
+    C = nullptr;
 
     stencil_enable = u32(-1);
     stencil_func = u32(-1);
@@ -142,9 +142,9 @@ void CBackend::Invalidate()
 #endif // USE_DX10
 
     for (u32 ps_it = 0; ps_it < mtMaxPixelShaderTextures;)
-        textures_ps[ps_it++] = 0;
+        textures_ps[ps_it++] = nullptr;
     for (u32 vs_it = 0; vs_it < mtMaxVertexShaderTextures;)
-        textures_vs[vs_it++] = 0;
+        textures_vs[vs_it++] = nullptr;
 #ifdef _EDITOR
     for (u32 m_it = 0; m_it < 8;)
         matrices[m_it++] = 0;
@@ -173,7 +173,7 @@ void CBackend::set_ClipPlanes(u32 _enable, Fplane* _planes /*=NULL */, u32 count
         count = HW.Caps.geometry.dwClipPlanes;
 
     D3DXMATRIX worldToClipMatrixIT;
-    D3DXMatrixInverse(&worldToClipMatrixIT, NULL, (D3DXMATRIX*)&RDEVICE.mFullTransform);
+    D3DXMatrixInverse(&worldToClipMatrixIT, nullptr, (D3DXMATRIX*)&RDEVICE.mFullTransform);
     D3DXMatrixTranspose(&worldToClipMatrixIT, &worldToClipMatrixIT);
     for (u32 it = 0; it < count; it++)
     {
@@ -390,7 +390,7 @@ void CBackend::set_Textures(STextureList* _T)
         if (!textures_ps[_last_ps])
             continue;
 
-        textures_ps[_last_ps] = 0;
+        textures_ps[_last_ps] = nullptr;
 #if defined(USE_DX10) || defined(USE_DX11)
         // TODO: DX10: Optimise: set all resources at once
         ID3DShaderResourceView* pRes = 0;
@@ -406,7 +406,7 @@ void CBackend::set_Textures(STextureList* _T)
         if (!textures_vs[_last_vs])
             continue;
 
-        textures_vs[_last_vs] = 0;
+        textures_vs[_last_vs] = nullptr;
 #if defined(USE_DX10) || defined(USE_DX11)
         // TODO: DX10: Optimise: set all resources at once
         ID3DShaderResourceView* pRes = 0;

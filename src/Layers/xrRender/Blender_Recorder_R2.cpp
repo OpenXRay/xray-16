@@ -179,7 +179,7 @@ void CBlender_Compile::r_End()
     dest.constants = RImplementation.Resources->_CreateConstantTable(ctable);
     dest.state = RImplementation.Resources->_CreateState(RS.GetContainer());
     dest.T = RImplementation.Resources->_CreateTextureList(passTextures);
-    dest.C = 0;
+    dest.C = nullptr;
 #ifdef _EDITOR
     dest.M = 0;
 #endif

@@ -129,7 +129,7 @@ CSE_ALifeTraderAbstract::CSE_ALifeTraderAbstract(LPCSTR caSection)
     m_fMaxItemMass = pSettings->r_float(caSection, "max_item_mass");
 
     m_sCharacterProfile = READ_IF_EXISTS(pSettings, r_string, caSection, "character_profile", "default");
-    m_SpecificCharacter = NULL;
+    m_SpecificCharacter = nullptr;
 
 #ifdef XRGAME_EXPORTS
     m_community_index = NO_COMMUNITY_INDEX;
@@ -211,7 +211,7 @@ void CSE_ALifeTraderAbstract::STATE_Read(NET_Packet& tNetPacket, u16 size)
             if (tmp != -1)
                 m_SpecificCharacter = CSpecificCharacter::IndexToId(tmp);
             else
-                m_SpecificCharacter = NULL;
+                m_SpecificCharacter = nullptr;
 
 #else
             m_SpecificCharacter = NULL;
@@ -269,7 +269,7 @@ void CSE_ALifeTraderAbstract::STATE_Read(NET_Packet& tNetPacket, u16 size)
 
 void CSE_ALifeTraderAbstract::OnChangeProfile(PropValue* sender)
 {
-    m_SpecificCharacter = NULL;
+    m_SpecificCharacter = nullptr;
 #ifndef AI_COMPILER
     specific_character();
 #endif
@@ -466,7 +466,7 @@ void CSE_ALifeTraderAbstract::set_specific_character(shared_str new_spec_char)
     }
 #else
     //в редакторе специфический профиль оставляем не заполненым
-    m_SpecificCharacter = NULL;
+    m_SpecificCharacter = nullptr;
 #endif
 }
 
@@ -675,7 +675,7 @@ CSE_ALifeAnomalousZone::CSE_ALifeAnomalousZone(LPCSTR caSection) : CSE_ALifeCust
 {
     m_offline_interactive_radius = 30.f;
     m_artefact_spawn_count = 32;
-    m_spawn_flags.set(flSpawnDestroyOnSpawn, TRUE);
+    m_spawn_flags.set(flSpawnDestroyOnSpawn, true);
 }
 
 CSE_Abstract* CSE_ALifeAnomalousZone::init()
@@ -831,7 +831,7 @@ void CSE_ALifeZoneVisual::FillProps(LPCSTR pref, PropItemVec& values)
     IServerEntity* abstract = smart_cast<IServerEntity*>(this);
     VERIFY(abstract);
     PHelper().CreateChoose(values, PrepareKey(pref, abstract->name(), "Attack animation"), &attack_animation,
-        smSkeletonAnims, 0, (void*)*visual_name);
+        smSkeletonAnims, nullptr, (void*)*visual_name);
 }
 #endif // #ifndef XRGAME_EXPORTS
 //-------------------------------------------------------------------------
@@ -1051,7 +1051,7 @@ CSE_ALifeMonsterAbstract::CSE_ALifeMonsterAbstract(LPCSTR caSection)
 
     m_tpBestDetector = this;
 
-    m_brain = 0;
+    m_brain = nullptr;
     m_smart_terrain_id = 0xffff;
     m_task_reached = false;
 
@@ -1154,9 +1154,9 @@ void CSE_ALifeMonsterAbstract::FillProps(LPCSTR pref, PropItemVec& items)
     {
         LPCSTR gcs = pSettings->r_string(s_name, "SpaceRestrictionSection");
         PHelper().CreateChoose(items, PrepareKey(pref, *s_name, "out space restrictions"), &m_out_space_restrictors,
-            smSpawnItem, 0, (void*)gcs, 16);
+            smSpawnItem, nullptr, (void*)gcs, 16);
         PHelper().CreateChoose(items, PrepareKey(pref, *s_name, "in space restrictions"), &m_in_space_restrictors,
-            smSpawnItem, 0, (void*)gcs, 16);
+            smSpawnItem, nullptr, (void*)gcs, 16);
     }
 }
 #endif // #ifndef XRGAME_EXPORTS
@@ -1302,14 +1302,14 @@ void CSE_ALifeCreatureActor::UPDATE_Read(NET_Packet& tNetPacket)
         tNetPacket.r_float(m_AliveState.quaternion.w);
 
         return;
-    };
+    }
     ////////////// Import dead body ////////////////////
     Msg("A mi ni hera tut ne chitaem (m_u16NumItems == %d)", m_u16NumItems);
     {
         m_BoneDataSize = tNetPacket.r_u8();
         u32 BodyDataSize = 24 + m_BoneDataSize * m_u16NumItems;
         tNetPacket.r(m_DeadBodyData, BodyDataSize);
-    };
+    }
 };
 void CSE_ALifeCreatureActor::UPDATE_Write(NET_Packet& tNetPacket)
 {
@@ -1343,13 +1343,13 @@ void CSE_ALifeCreatureActor::UPDATE_Write(NET_Packet& tNetPacket)
         tNetPacket.w_float(m_AliveState.quaternion.w);
 
         return;
-    };
+    }
     ////////////// Export dead body ////////////////////
     {
         tNetPacket.w_u8(m_BoneDataSize);
         u32 BodyDataSize = 24 + m_BoneDataSize * m_u16NumItems;
         tNetPacket.w(m_DeadBodyData, BodyDataSize);
-    };
+    }
 }
 
 #ifndef XRGAME_EXPORTS
@@ -1921,7 +1921,7 @@ void CSE_ALifeOnlineOfflineGroup::STATE_Read(NET_Packet& tNetPacket, u16 size)
     {
         MEMBERS::value_type pair;
         load_data(pair.first, tNetPacket);
-        pair.second = 0;
+        pair.second = nullptr;
         m_members.insert(pair);
     }
 #endif

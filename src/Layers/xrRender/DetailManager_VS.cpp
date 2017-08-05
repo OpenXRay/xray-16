@@ -63,9 +63,9 @@ void CDetailManager::hw_Load_Geom()
     u32 dwUsage = D3DUSAGE_WRITEONLY;
 
     // Create VB/IB
-    R_CHK(HW.pDevice->CreateVertexBuffer(dwVerts * vSize, dwUsage, 0, D3DPOOL_MANAGED, &hw_VB, 0));
+    R_CHK(HW.pDevice->CreateVertexBuffer(dwVerts * vSize, dwUsage, 0, D3DPOOL_MANAGED, &hw_VB, nullptr));
     HW.stats_manager.increment_stats_vb(hw_VB);
-    R_CHK(HW.pDevice->CreateIndexBuffer(dwIndices * 2, dwUsage, D3DFMT_INDEX16, D3DPOOL_MANAGED, &hw_IB, 0));
+    R_CHK(HW.pDevice->CreateIndexBuffer(dwIndices * 2, dwUsage, D3DFMT_INDEX16, D3DPOOL_MANAGED, &hw_IB, nullptr));
     HW.stats_manager.increment_stats_ib(hw_IB);
 
 #endif //	USE_DX10

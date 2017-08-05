@@ -14,7 +14,7 @@ struct ConsistantKey
     const CKey* K;
     float w;
 
-    IC void set(const CKey* _K, float _w)
+    void set(const CKey* _K, float _w)
     {
         K = _K;
         w = _w;

@@ -238,7 +238,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
     if ((psDeviceFlags.test(rsFullscreen)) == 0)
     {
         if (name && FS.exist(name))
-            FS.file_delete(0, name);
+            FS.file_delete(nullptr, name);
 
         Log("~ Can't capture screen while in windowed mode...");
         return;
@@ -249,7 +249,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
     D3DLOCKED_RECT D;
     HRESULT hr;
     hr = HW.pDevice->CreateOffscreenPlainSurface(
-        Device.dwWidth, Device.dwHeight, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &pFB, NULL);
+        Device.dwWidth, Device.dwHeight, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &pFB, nullptr);
     if (hr != D3D_OK)
         return;
 
@@ -257,7 +257,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
     if (hr != D3D_OK)
         return;
 
-    hr = pFB->LockRect(&D, 0, D3DLOCK_NOSYSLOCK);
+    hr = pFB->LockRect(&D, nullptr, D3DLOCK_NOSYSLOCK);
     if (hr != D3D_OK)
         return;
 
@@ -300,27 +300,27 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
     case IRender::SM_FOR_GAMESAVE:
     {
         // texture
-        ID3DTexture2D* texture = NULL;
+        ID3DTexture2D* texture = nullptr;
         hr = D3DXCreateTexture(HW.pDevice, GAMESAVE_SIZE, GAMESAVE_SIZE, 1, 0, D3DFMT_DXT1, D3DPOOL_SCRATCH, &texture);
         if (hr != D3D_OK)
             goto _end_;
-        if (NULL == texture)
+        if (nullptr == texture)
             goto _end_;
 
         // resize&convert to surface
-        IDirect3DSurface9* surface = 0;
+        IDirect3DSurface9* surface = nullptr;
         hr = texture->GetSurfaceLevel(0, &surface);
         if (hr != D3D_OK)
             goto _end_;
         VERIFY(surface);
-        hr = D3DXLoadSurfaceFromSurface(surface, 0, 0, pFB, 0, 0, D3DX_DEFAULT, 0);
+        hr = D3DXLoadSurfaceFromSurface(surface, nullptr, nullptr, pFB, nullptr, nullptr, D3DX_DEFAULT, 0);
         _RELEASE(surface);
         if (hr != D3D_OK)
             goto _end_;
 
         // save (logical & physical)
-        ID3DBlob* saved = 0;
-        hr = D3DXSaveTextureToFileInMemory(&saved, D3DXIFF_DDS, texture, 0);
+        ID3DBlob* saved = nullptr;
+        hr = D3DXSaveTextureToFileInMemory(&saved, D3DXIFF_DDS, texture, nullptr);
         if (hr != D3D_OK)
             goto _end_;
 
@@ -339,28 +339,28 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
     case IRender::SM_FOR_MPSENDING:
     {
         // texture
-        ID3DTexture2D* texture = NULL;
+        ID3DTexture2D* texture = nullptr;
         hr = D3DXCreateTexture(
             HW.pDevice, SM_FOR_SEND_WIDTH, SM_FOR_SEND_HEIGHT, 1, 0, D3DFMT_R8G8B8, D3DPOOL_SCRATCH, &texture);
         if (hr != D3D_OK)
             goto _end_;
-        if (NULL == texture)
+        if (nullptr == texture)
             goto _end_;
 
         // resize&convert to surface
-        IDirect3DSurface9* surface = 0;
+        IDirect3DSurface9* surface = nullptr;
         hr = texture->GetSurfaceLevel(0, &surface);
         if (hr != D3D_OK)
             goto _end_;
         VERIFY(surface);
-        hr = D3DXLoadSurfaceFromSurface(surface, 0, 0, pFB, 0, 0, D3DX_DEFAULT, 0);
+        hr = D3DXLoadSurfaceFromSurface(surface, nullptr, nullptr, pFB, nullptr, nullptr, D3DX_DEFAULT, 0);
         _RELEASE(surface);
         if (hr != D3D_OK)
             goto _end_;
 
         // save (logical & physical)
-        ID3DBlob* saved = 0;
-        hr = D3DXSaveTextureToFileInMemory(&saved, D3DXIFF_DDS, texture, 0);
+        ID3DBlob* saved = nullptr;
+        hr = D3DXSaveTextureToFileInMemory(&saved, D3DXIFF_DDS, texture, nullptr);
         if (hr != D3D_OK)
             goto _end_;
 
@@ -390,8 +390,8 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         string_path buf;
         xr_sprintf(buf, sizeof(buf), "ss_%s_%s_(%s).jpg", Core.UserName, timestamp(t_stemp),
             (g_pGameLevel) ? g_pGameLevel->name().c_str() : "mainmenu");
-        ID3DBlob* saved = 0;
-        CHK_DX(D3DXSaveSurfaceToFileInMemory(&saved, D3DXIFF_JPG, pFB, 0, 0));
+        ID3DBlob* saved = nullptr;
+        CHK_DX(D3DXSaveSurfaceToFileInMemory(&saved, D3DXIFF_JPG, pFB, nullptr, nullptr));
         IWriter* fs = FS.w_open("$screenshots$", buf);
         R_ASSERT(fs);
         fs->w(saved->GetBufferPointer(), saved->GetBufferSize());
@@ -401,8 +401,8 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         { // hq
             xr_sprintf(buf, sizeof(buf), "ssq_%s_%s_(%s).tga", Core.UserName, timestamp(t_stemp),
                 (g_pGameLevel) ? g_pGameLevel->name().c_str() : "mainmenu");
-            ID3DBlob* saved = 0;
-            CHK_DX(D3DXSaveSurfaceToFileInMemory(&saved, D3DXIFF_TGA, pFB, 0, 0));
+            ID3DBlob* saved = nullptr;
+            CHK_DX(D3DXSaveSurfaceToFileInMemory(&saved, D3DXIFF_TGA, pFB, nullptr, nullptr));
             IWriter* fs = FS.w_open("$screenshots$", buf);
             R_ASSERT(fs);
             fs->w(saved->GetBufferPointer(), saved->GetBufferSize());
@@ -422,7 +422,7 @@ void CRender::ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* me
         R_ASSERT(fs);
         //	TODO: DX10: This is totally incorrect but mimics
         //	original behavior. Fix later.
-        hr = pFB->LockRect(&D, 0, D3DLOCK_NOSYSLOCK);
+        hr = pFB->LockRect(&D, nullptr, D3DLOCK_NOSYSLOCK);
         if (hr != D3D_OK)
             return;
         hr = pFB->UnlockRect();
@@ -448,7 +448,7 @@ _end_:
 
 #endif //	USE_DX10
 
-void CRender::Screenshot(ScreenshotMode mode, LPCSTR name) { ScreenshotImpl(mode, name, NULL); }
+void CRender::Screenshot(ScreenshotMode mode, LPCSTR name) { ScreenshotImpl(mode, name, nullptr); }
 void CRender::Screenshot(ScreenshotMode mode, CMemoryWriter& memory_writer)
 {
     if (mode != SM_FOR_MPSENDING)
@@ -456,7 +456,7 @@ void CRender::Screenshot(ScreenshotMode mode, CMemoryWriter& memory_writer)
         Log("~ Not implemented screenshot mode...");
         return;
     }
-    ScreenshotImpl(mode, NULL, &memory_writer);
+    ScreenshotImpl(mode, nullptr, &memory_writer);
 }
 
 void CRender::ScreenshotAsyncBegin()
@@ -520,7 +520,7 @@ void CRender::ScreenshotAsyncEnd(CMemoryWriter& memory_writer)
 
     pFB = Target->pFB;
 
-    hr = pFB->LockRect(&D, 0, D3DLOCK_NOSYSLOCK);
+    hr = pFB->LockRect(&D, nullptr, D3DLOCK_NOSYSLOCK);
     if (hr != D3D_OK)
         return;
 

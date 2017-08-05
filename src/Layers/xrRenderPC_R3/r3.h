@@ -44,7 +44,6 @@ public:
         MMSM_AUTODETECT
     };
 
-public:
     struct _options
     {
         u32 bug : 1;
@@ -135,7 +134,6 @@ public:
         void FrameEnd() {}
     };
 
-public:
     RenderR3Statistics Stats;
     // Sector detection and visibility
     CSector* pLastSector;
@@ -217,7 +215,6 @@ public:
     void init_cacades();
     void render_sun_cascades();
 
-public:
     ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq);
     ShaderElement* rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq);
     D3DVERTEXELEMENT9* getVB_Format(int id, BOOL _alt = FALSE);
@@ -231,9 +228,10 @@ public:
     int translateSector(IRender_Sector* pSector);
 
     // HW-occlusion culling
-    IC u32 occq_begin(u32& ID) { return HWOCC.occq_begin(ID); }
-    IC void occq_end(u32& ID) { HWOCC.occq_end(ID); }
-    IC R_occlusion::occq_result occq_get(u32& ID) { return HWOCC.occq_get(ID); }
+    u32 occq_begin(u32& ID) { return HWOCC.occq_begin(ID); }
+    void occq_end(u32& ID) { HWOCC.occq_end(ID); }
+    R_occlusion::occq_result occq_get(u32& ID) { return HWOCC.occq_get(ID); }
+
     ICF void apply_object(IRenderable* O)
     {
         if (0 == O)
@@ -247,7 +245,8 @@ public:
         o_sun = 0.75f * LT.get_sun();
         CopyMemory(o_hemi_cube, LT.get_hemi_cube(), CROS_impl::NUM_FACES * sizeof(float));
     }
-    IC void apply_lmaterial()
+
+    void apply_lmaterial()
     {
         R_constant* C = &*RCache.get_c(c_sbase); // get sampler
         if (0 == C)
@@ -268,7 +267,6 @@ public:
             o_hemi_cube[CROS_impl::CUBE_FACE_NEG_Z]);
     }
 
-public:
     // feature level
     virtual GenerationLevel get_generation() { return IRender::GENERATION_R2; }
     virtual bool is_sun_static() { return o.sunstatic; }

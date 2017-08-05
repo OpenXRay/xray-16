@@ -43,7 +43,7 @@ private:
 
 public:
     void set_object(IRenderable* O);
-    BOOL shadowing() { return current != 0; }
+    BOOL shadowing() { return current != nullptr; }
     void calculate();
     void setup(int slot);
     void finalize()

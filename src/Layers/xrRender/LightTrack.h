@@ -90,7 +90,7 @@ public:
     virtual float* get_luminocity_hemi_cube() { return hemi_cube_smooth; }
     void add(light* L);
     void update(IRenderable* O);
-    void update_smooth(IRenderable* O = 0);
+    void update_smooth(IRenderable* O = nullptr);
 
     ICF float get_hemi()
     {

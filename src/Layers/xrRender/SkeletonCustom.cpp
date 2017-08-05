@@ -52,7 +52,7 @@ LPCSTR CKinematics::LL_BoneName_dbg(u16 ID)
     for (_I = bone_map_N->begin(); _I != _E; ++_I)
         if (_I->second == ID)
             return *_I->first;
-    return 0;
+    return nullptr;
 }
 
 #ifdef DEBUG
@@ -143,7 +143,7 @@ void CKinematics::IBoneInstances_Destroy()
     if (bone_instances)
     {
         xr_free(bone_instances);
-        bone_instances = NULL;
+        bone_instances = nullptr;
     }
 }
 
@@ -168,8 +168,8 @@ void CKinematics::Load(const char* N, IReader* data, u32 dwFlags)
     // Msg              ("skeleton: %s",N);
     inherited::Load(N, data, dwFlags);
 
-    pUserData = NULL;
-    m_lod = NULL;
+    pUserData = nullptr;
+    m_lod = nullptr;
     // loading lods
 
     IReader* LD = data->open_chunk(OGF_S_LODS);
@@ -185,7 +185,7 @@ void CKinematics::Load(const char* N, IReader* data, u32 dwFlags)
             string_path lod_name;
             LD->r_string(lod_name, sizeof(lod_name));
             //.         strconcat       (sizeof(name_load),name_load, short_name, ":lod:", lod_name.c_str());
-            m_lod = (dxRender_Visual*)GlobalEnv.Render->model_CreateChild(lod_name, NULL);
+            m_lod = (dxRender_Visual*)GlobalEnv.Render->model_CreateChild(lod_name, nullptr);
 
             if (CKinematics* lod_kinematics = dynamic_cast<CKinematics*>(m_lod))
             {
@@ -216,7 +216,7 @@ void CKinematics::Load(const char* N, IReader* data, u32 dwFlags)
     bone_map_N = new accel();
     bone_map_P = new accel();
     bones = new vecBones();
-    bone_instances = NULL;
+    bone_instances = nullptr;
 
 // Load bones
 #pragma todo("container is created in stack!")
@@ -331,7 +331,7 @@ void CKinematics::Load(const char* N, IReader* data, u32 dwFlags)
     }
 
     // reset update_callback
-    Update_Callback = NULL;
+    Update_Callback = nullptr;
     // reset update frame
     wm_frame = u32(-1);
 
@@ -436,7 +436,7 @@ void CKinematics::Spawn()
     // bones
     for (u32 i = 0; i < bones->size(); i++)
         bone_instances[i].construct();
-    Update_Callback = NULL;
+    Update_Callback = nullptr;
     CalculateBones_Invalidate();
     // wallmarks
     ClearWallmarks();
@@ -729,7 +729,7 @@ void CKinematics::AddWallmark(
 static const float LIFE_TIME = 30.f;
 struct zero_wm_pred : public std::unary_function<intrusive_ptr<CSkeletonWallmark>, bool>
 {
-    bool operator()(const intrusive_ptr<CSkeletonWallmark> x) { return x == 0; }
+    bool operator()(const intrusive_ptr<CSkeletonWallmark> x) { return x == nullptr; }
 };
 
 void CKinematics::CalculateWallmarks()
@@ -770,7 +770,7 @@ void CKinematics::RenderWallmark(intrusive_ptr<CSkeletonWallmark> wm, FVF::LIT*&
     VERIFY2(bones, "Invalid visual. Bones already released.");
     VERIFY2(bone_instances, "Invalid visual. bone_instances already deleted.");
 
-    if ((wm == 0) || (0 == bones) || (0 == bone_instances))
+    if ((wm == nullptr) || (nullptr == bones) || (nullptr == bone_instances))
         return;
 
     // skin vertices

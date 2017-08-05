@@ -6,14 +6,14 @@
 R_tree::R_tree() { unmap(); }
 void R_tree::unmap()
 {
-    c_m_xform_v = 0;
-    c_m_xform = 0;
-    c_consts = 0;
-    c_wave = 0;
-    c_wind = 0;
-    c_c_scale = 0;
-    c_c_bias = 0;
-    c_c_sun = 0;
+    c_m_xform_v = nullptr;
+    c_m_xform = nullptr;
+    c_consts = nullptr;
+    c_wave = nullptr;
+    c_wind = nullptr;
+    c_c_scale = nullptr;
+    c_c_bias = nullptr;
+    c_c_sun = nullptr;
 }
 
 void R_tree::set_m_xform_v(Fmatrix& mat)

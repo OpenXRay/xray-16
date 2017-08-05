@@ -4,7 +4,7 @@
 void dxThunderboltDescRender::Copy(IThunderboltDescRender& _in) { *this = *((dxThunderboltDescRender*)&_in); }
 void dxThunderboltDescRender::CreateModel(LPCSTR m_name)
 {
-    IReader* F = 0;
+    IReader* F = nullptr;
     F = FS.r_open("$game_meshes$", m_name);
     R_ASSERT2(F, "Empty 'lightning_model'.");
     l_model = ::RImplementation.model_CreateDM(F);

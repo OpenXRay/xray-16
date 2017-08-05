@@ -31,8 +31,8 @@ struct IRender_Mesh
 
     IRender_Mesh()
     {
-        p_rm_Vertices = 0;
-        p_rm_Indices = 0;
+        p_rm_Vertices = nullptr;
+        p_rm_Indices = nullptr;
     }
     virtual ~IRender_Mesh();
 

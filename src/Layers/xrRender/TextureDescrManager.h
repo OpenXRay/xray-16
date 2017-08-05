@@ -26,7 +26,7 @@ class CTextureDescrMngr
     {
         texture_assoc* m_assoc;
         texture_spec* m_spec;
-        texture_desc() : m_assoc(NULL), m_spec(NULL) {}
+        texture_desc() : m_assoc(nullptr), m_spec(nullptr) {}
     };
     DEFINE_MAP(shared_str, texture_desc, map_TD, map_TDIt);
     DEFINE_MAP(shared_str, cl_dt_scaler*, map_CS, map_CSIt);

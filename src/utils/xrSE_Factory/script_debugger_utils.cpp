@@ -7,7 +7,7 @@
 #	include <errno.h>
 #endif*/
 
-xr_event::xr_event(bool broadcast, bool signalled) { m_event = CreateEvent(0, broadcast, signalled, 0); }
+xr_event::xr_event(bool broadcast, bool signalled) { m_event = CreateEvent(nullptr, broadcast, signalled, nullptr); }
 xr_event::~xr_event() { CloseHandle(m_event); }
 bool xr_event::signal() { return SetEvent(m_event) != 0; }
 bool xr_event::reset() { return ResetEvent(m_event) != 0; }
@@ -54,7 +54,7 @@ DWORD __stdcall xrThreadStart(void* th)
     return 0;
 }
 
-xr_thread::xr_thread() : m_thread(0) {}
+xr_thread::xr_thread() : m_thread(nullptr) {}
 xr_thread::~xr_thread()
 {
     if (m_thread)
@@ -65,8 +65,8 @@ bool xr_thread::start()
 {
     kill();
     DWORD dwID;
-    m_thread = CreateThread(0, 0, &xrThreadStart, (void*)this, 0, &dwID);
-    return m_thread != 0;
+    m_thread = CreateThread(nullptr, 0, &xrThreadStart, (void*)this, 0, &dwID);
+    return m_thread != nullptr;
 }
 
 bool xr_thread::kill()
@@ -80,7 +80,7 @@ bool xr_thread::kill()
     if (res)
     {
         CloseHandle(m_thread);
-        m_thread = 0;
+        m_thread = nullptr;
     }
     return res != 0;
 }

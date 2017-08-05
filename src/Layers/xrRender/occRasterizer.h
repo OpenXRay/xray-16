@@ -36,12 +36,12 @@ private:
     occD bufDepth_3[occ_dim_3][occ_dim_3];
 
 public:
-    IC int df_2_s32(float d) { return iFloor(d * occQ_s32); }
-    IC s16 df_2_s16(float d) { return s16(iFloor(d * occQ_s16)); }
-    IC int df_2_s32up(float d) { return iCeil(d * occQ_s32); }
-    IC s16 df_2_s16up(float d) { return s16(iCeil(d * occQ_s16)); }
-    IC float ds32_2_f(s32 d) { return float(d) / occQ_s32; }
-    IC float ds16_2_f(s16 d) { return float(d) / occQ_s16; }
+    int df_2_s32(float d) { return iFloor(d * occQ_s32); }
+    s16 df_2_s16(float d) { return s16(iFloor(d * occQ_s16)); }
+    int df_2_s32up(float d) { return iCeil(d * occQ_s32); }
+    s16 df_2_s16up(float d) { return s16(iCeil(d * occQ_s16)); }
+    float ds32_2_f(s32 d) { return float(d) / occQ_s32; }
+    float ds16_2_f(s16 d) { return float(d) / occQ_s16; }
     void clear();
     void propagade();
     u32 rasterize(occTri* T);
@@ -57,7 +57,7 @@ public:
         case 1: return &(bufDepth_1[0][0]);
         case 2: return &(bufDepth_2[0][0]);
         case 3: return &(bufDepth_3[0][0]);
-        default: return NULL;
+        default: return nullptr;
         }
     }
 

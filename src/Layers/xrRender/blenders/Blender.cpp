@@ -14,7 +14,7 @@ void CBlender_DESC::Setup(LPCSTR N)
 {
     // Name
     VERIFY(xr_strlen(N) < 128);
-    VERIFY(0 == strchr(N, '.'));
+    VERIFY(nullptr == strchr(N, '.'));
     xr_strcpy(cName, N);
     _strlwr(cName);
 

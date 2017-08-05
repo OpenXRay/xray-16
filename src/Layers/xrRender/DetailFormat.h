@@ -73,10 +73,11 @@ public:
         size_x = size_z = u32(-1);
     }
 
-    IC u32 version() const { return _version; }
-    IC float fromSlotX(int x) const { return (x - offs_x) * DETAIL_SLOT_SIZE + DETAIL_SLOT_SIZE_2; }
-    IC float fromSlotZ(int z) const { return (z - offs_z) * DETAIL_SLOT_SIZE + DETAIL_SLOT_SIZE_2; }
-    IC void GetSlotRect(Frect& rect, int sx, int sz) const
+    u32 version() const { return _version; }
+    float fromSlotX(int x) const { return (x - offs_x) * DETAIL_SLOT_SIZE + DETAIL_SLOT_SIZE_2; }
+    float fromSlotZ(int z) const { return (z - offs_z) * DETAIL_SLOT_SIZE + DETAIL_SLOT_SIZE_2; }
+
+    void GetSlotRect(Frect& rect, int sx, int sz) const
     {
         float x = fromSlotX(sx);
         float z = fromSlotZ(sz);
@@ -86,12 +87,13 @@ public:
         rect.y2 = z + DETAIL_SLOT_SIZE_2 - EPS_L;
     }
 
-    IC u32 object_count() const { return obj_count; }
-    IC u32 x_size() const { return size_x; }
-    IC u32 z_size() const { return size_z; }
-    IC u32 x_offs() const { return offs_x; }
-    IC u32 z_offs() const { return offs_z; }
-    IC u32 slot_index(int _x, int _z) const
+    u32 object_count() const { return obj_count; }
+    u32 x_size() const { return size_x; }
+    u32 z_size() const { return size_z; }
+    u32 x_offs() const { return offs_x; }
+    u32 z_offs() const { return offs_z; }
+
+    u32 slot_index(int _x, int _z) const
     {
         u32 ret = _z * size_x + _x;
         int xx, zz;
@@ -101,7 +103,7 @@ public:
         return ret;
     }
 
-    IC void slot_x_z(u32 idx, int& _x, int& _z) const
+    void slot_x_z(u32 idx, int& _x, int& _z) const
     {
         VERIFY(idx < slot_count());
         _z = idx / size_x;
@@ -110,9 +112,9 @@ public:
         VERIFY(u32(_x) < x_size());
     }
 
-    IC u32 slot_count() const { return size_x * size_z; }
-    IC float slot_min_x(int _x) const { return (int(_x) - int(offs_x)) * DETAIL_SLOT_SIZE; }
-    IC float slot_min_z(int _z) const { return (int(_z) - int(offs_z)) * DETAIL_SLOT_SIZE; }
+    u32 slot_count() const { return size_x * size_z; }
+    float slot_min_x(int _x) const { return (int(_x) - int(offs_x)) * DETAIL_SLOT_SIZE; }
+    float slot_min_z(int _z) const { return (int(_z) - int(offs_z)) * DETAIL_SLOT_SIZE; }
 };
 
 struct DetailPalette

@@ -34,7 +34,7 @@ void CSkeletonX::AfterLoad(CKinematics* parent, u16 child_idx)
 }
 void CSkeletonX::_Copy(CSkeletonX* B)
 {
-    Parent = NULL;
+    Parent = nullptr;
     ChildIDX = B->ChildIDX;
     Vertices1W = B->Vertices1W;
     Vertices2W = B->Vertices2W;

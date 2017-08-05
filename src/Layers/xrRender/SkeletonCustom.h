@@ -64,16 +64,18 @@ public:
     }
 #endif
 
-    IC CKinematics* Parent() { return m_Parent; }
-    IC u32 VCount() { return m_Faces.size() * 3; }
-    IC bool Similar(ref_shader& sh, const Fvector& cp, float eps)
+    CKinematics* Parent() { return m_Parent; }
+    u32 VCount() { return m_Faces.size() * 3; }
+
+    bool Similar(ref_shader& sh, const Fvector& cp, float eps)
     {
         return (m_Shader == sh) && m_ContactPoint.similar(cp, eps);
     }
-    IC float TimeStart() { return m_fTimeStart; }
-    IC const Fmatrix* XFORM() { return m_XForm; }
-    IC const Fvector3& ContactPoint() { return m_ContactPoint; }
-    IC ref_shader Shader() { return m_Shader; }
+
+    float TimeStart() { return m_fTimeStart; }
+    const Fmatrix* XFORM() { return m_XForm; }
+    const Fvector3& ContactPoint() { return m_ContactPoint; }
+    ref_shader Shader() { return m_Shader; }
 };
 DEFINE_VECTOR(intrusive_ptr<CSkeletonWallmark>, SkeletonWMVec, SkeletonWMVecIt);
 
@@ -282,7 +284,7 @@ public:
     virtual void Depart();
     virtual void Release();
 
-    virtual IKinematicsAnimated* dcast_PKinematicsAnimated() { return 0; }
+    virtual IKinematicsAnimated* dcast_PKinematicsAnimated() { return nullptr; }
     virtual IRenderVisual* dcast_RenderVisual() { return this; }
     virtual IKinematics* dcast_PKinematics() { return this; }
     //virtual CKinematics* dcast_PKinematics() { return this; }

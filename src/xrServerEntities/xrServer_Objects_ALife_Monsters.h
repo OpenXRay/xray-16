@@ -80,7 +80,7 @@ public:
     virtual CSE_Abstract* base() = 0;
     virtual const CSE_Abstract* base() const = 0;
     virtual CSE_Abstract* init();
-    virtual CSE_Abstract* cast_abstract() { return 0; };
+    virtual CSE_Abstract* cast_abstract() { return nullptr; };
     virtual CSE_ALifeTraderAbstract* cast_trader_abstract() { return this; };
     // end of the virtual inheritance dependant code
     void __stdcall OnChangeProfile(PropValue* sender);

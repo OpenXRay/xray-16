@@ -6,9 +6,9 @@
 R_hemi::R_hemi() { unmap(); }
 void R_hemi::unmap()
 {
-    c_pos_faces = 0;
-    c_neg_faces = 0;
-    c_material = 0;
+    c_pos_faces = nullptr;
+    c_neg_faces = nullptr;
+    c_material = nullptr;
 }
 
 void R_hemi::set_pos_faces(float posx, float posy, float posz)

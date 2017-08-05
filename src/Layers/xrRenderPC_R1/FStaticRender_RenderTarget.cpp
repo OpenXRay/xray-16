@@ -9,11 +9,11 @@ static LPCSTR RTname_distort = "$user$distort";
 CRenderTarget::CRenderTarget()
 {
     bAvailable = FALSE;
-    RT = 0;
-    RT_color_map = 0;
-    pTempZB = 0;
-    ZB = 0;
-    pFB = 0;
+    RT = nullptr;
+    RT_color_map = nullptr;
+    pTempZB = nullptr;
+    ZB = nullptr;
+    pFB = nullptr;
 
     param_blur = 0.f;
     param_gray = 0.f;
@@ -84,7 +84,7 @@ BOOL CRenderTarget::Create()
     //u32 w = Device.dwWidth, h = Device.dwHeight;
     //HW.pDevice->CreateOffscreenPlainSurface(
     // Device.dwWidth, Device.dwHeight, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &pFB, NULL);
-    HW.pDevice->CreateOffscreenPlainSurface(rtWidth, rtHeight, HW.Caps.fTarget, D3DPOOL_SYSTEMMEM, &pFB, NULL);
+    HW.pDevice->CreateOffscreenPlainSurface(rtWidth, rtHeight, HW.Caps.fTarget, D3DPOOL_SYSTEMMEM, &pFB, nullptr);
 
     // Shaders and stream
     s_postprocess[0].create("postprocess");
@@ -272,7 +272,8 @@ struct TL_2c3uv
     u32 color0;
     u32 color1;
     Fvector2 uv[3];
-    IC void set(float x, float y, u32 c0, u32 c1, float u0, float v0, float u1, float v1, float u2, float v2)
+
+    void set(float x, float y, u32 c0, u32 c1, float u0, float v0, float u1, float v1, float u2, float v2)
     {
         p.set(x, y, EPS_S, 1.f);
         color0 = c0;

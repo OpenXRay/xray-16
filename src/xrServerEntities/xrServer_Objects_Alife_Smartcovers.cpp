@@ -515,7 +515,7 @@ void CSE_SmartCover::on_render(
 
     if (m_need_to_reparse_loopholes && m_description.size())
     {
-        OnChangeDescription(NULL);
+        OnChangeDescription(nullptr);
         m_need_to_reparse_loopholes = false;
     }
 

@@ -21,7 +21,7 @@ class ECORE_API CResourceManager
 private:
     struct str_pred : public std::binary_function<char*, char*, bool>
     {
-        IC bool operator()(LPCSTR x, LPCSTR y) const { return xr_strcmp(x, y) < 0; }
+        bool operator()(LPCSTR x, LPCSTR y) const { return xr_strcmp(x, y) < 0; }
     };
     struct texture_detail
     {
@@ -193,9 +193,9 @@ public:
     ShaderElement* _CreateElement(ShaderElement& L);
     void _DeleteElement(const ShaderElement* L);
 
-    Shader* _cpp_Create(LPCSTR s_shader, LPCSTR s_textures = 0, LPCSTR s_constants = 0, LPCSTR s_matrices = 0);
+    Shader* _cpp_Create(LPCSTR s_shader, LPCSTR s_textures = nullptr, LPCSTR s_constants = nullptr, LPCSTR s_matrices = nullptr);
     Shader* _cpp_Create(
-        IBlender* B, LPCSTR s_shader = 0, LPCSTR s_textures = 0, LPCSTR s_constants = 0, LPCSTR s_matrices = 0);
+        IBlender* B, LPCSTR s_shader = nullptr, LPCSTR s_textures = nullptr, LPCSTR s_constants = nullptr, LPCSTR s_matrices = nullptr);
     Shader* _lua_Create(LPCSTR s_shader, LPCSTR s_textures);
     BOOL _lua_HasShader(LPCSTR s_shader);
 
@@ -210,9 +210,9 @@ public:
     void reset_end();
 
     // Creation/Destroying
-    Shader* Create(LPCSTR s_shader = 0, LPCSTR s_textures = 0, LPCSTR s_constants = 0, LPCSTR s_matrices = 0);
+    Shader* Create(LPCSTR s_shader = nullptr, LPCSTR s_textures = nullptr, LPCSTR s_constants = nullptr, LPCSTR s_matrices = nullptr);
     Shader* Create(
-        IBlender* B, LPCSTR s_shader = 0, LPCSTR s_textures = 0, LPCSTR s_constants = 0, LPCSTR s_matrices = 0);
+        IBlender* B, LPCSTR s_shader = nullptr, LPCSTR s_textures = nullptr, LPCSTR s_constants = nullptr, LPCSTR s_matrices = nullptr);
     void Delete(const Shader* S);
     void RegisterConstantSetup(LPCSTR name, R_constant_setup* s)
     {

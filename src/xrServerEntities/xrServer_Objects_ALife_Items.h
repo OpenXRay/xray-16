@@ -60,7 +60,7 @@ public:
     virtual CSE_Abstract* base() = 0;
     virtual const CSE_Abstract* base() const = 0;
     virtual CSE_Abstract* init();
-    virtual CSE_Abstract* cast_abstract() { return 0; };
+    virtual CSE_Abstract* cast_abstract() { return nullptr; };
     virtual CSE_ALifeInventoryItem* cast_inventory_item() { return this; };
     virtual u32 update_rate() const;
     virtual BOOL Net_Relevant();

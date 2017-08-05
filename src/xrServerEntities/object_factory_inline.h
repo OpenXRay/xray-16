@@ -65,7 +65,7 @@ IC const CObjectItemAbstract* CObjectFactory::item(const CLASS_ID& clsid, bool n
     if ((I == clsids().end()) || ((*I)->clsid() != clsid))
     {
         R_ASSERT(no_assert);
-        return (0);
+        return (nullptr);
     }
     return (*I);
 }

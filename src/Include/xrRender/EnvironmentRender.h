@@ -13,7 +13,7 @@ class CEnvDescriptor;
 class IEnvDescriptorRender
 {
 public:
-    virtual ~IEnvDescriptorRender() { ; }
+    virtual ~IEnvDescriptorRender() {}
     virtual void Copy(IEnvDescriptorRender& _in) = 0;
 
     virtual void OnDeviceCreate(CEnvDescriptor& owner) = 0;
@@ -23,7 +23,7 @@ public:
 class IEnvDescriptorMixerRender
 {
 public:
-    virtual ~IEnvDescriptorMixerRender() { ; }
+    virtual ~IEnvDescriptorMixerRender() {}
     virtual void Copy(IEnvDescriptorMixerRender& _in) = 0;
 
     virtual void Destroy() = 0;
@@ -34,7 +34,7 @@ public:
 class IEnvironmentRender
 {
 public:
-    virtual ~IEnvironmentRender() { ; }
+    virtual ~IEnvironmentRender() {}
     virtual void Copy(IEnvironmentRender& _in) = 0;
     virtual void OnFrame(CEnvironment& env) = 0;
     virtual void OnLoad() = 0;

@@ -91,11 +91,11 @@ public:
     virtual MotionID ID_Cycle(shared_str N) = 0;
     virtual MotionID ID_Cycle_Safe(shared_str N) = 0;
     virtual CBlend* PlayCycle(
-        LPCSTR N, BOOL bMixIn = TRUE, PlayCallback Callback = 0, LPVOID CallbackParam = 0, u8 channel = 0) = 0;
+        LPCSTR N, BOOL bMixIn = TRUE, PlayCallback Callback = nullptr, LPVOID CallbackParam = nullptr, u8 channel = 0) = 0;
     virtual CBlend* PlayCycle(
-        MotionID M, BOOL bMixIn = TRUE, PlayCallback Callback = 0, LPVOID CallbackParam = 0, u8 channel = 0) = 0;
-    virtual CBlend* PlayCycle(u16 partition, MotionID M, BOOL bMixIn = TRUE, PlayCallback Callback = 0,
-        LPVOID CallbackParam = 0, u8 channel = 0) = 0;
+        MotionID M, BOOL bMixIn = TRUE, PlayCallback Callback = nullptr, LPVOID CallbackParam = nullptr, u8 channel = 0) = 0;
+    virtual CBlend* PlayCycle(u16 partition, MotionID M, BOOL bMixIn = TRUE, PlayCallback Callback = nullptr,
+        LPVOID CallbackParam = nullptr, u8 channel = 0) = 0;
     // fx'es
     virtual MotionID ID_FX(LPCSTR N) = 0;
     virtual MotionID ID_FX_Safe(LPCSTR N) = 0;

@@ -70,7 +70,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
 
     // Select shader
     ShaderElement* sh = RImplementation.rimp_select_sh_dynamic(pVisual, distSQ);
-    if (0 == sh)
+    if (nullptr == sh)
         return;
     if (!pmask[sh->flags.iPriority / 2])
         return;
@@ -289,7 +289,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
     {
         mapSorted_Node* N = mapDistort.insertInAnyWay(distSQ);
         N->val.ssa = SSA;
-        N->val.pObject = NULL;
+        N->val.pObject = nullptr;
         N->val.pVisual = pVisual;
         N->val.Matrix = Fidentity;
         N->val.se = &*pVisual->shader->E[4]; // 4=L_special
@@ -297,7 +297,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
 
     // Select shader
     ShaderElement* sh = RImplementation.rimp_select_sh_static(pVisual, distSQ);
-    if (0 == sh)
+    if (nullptr == sh)
         return;
     if (!pmask[sh->flags.iPriority / 2])
         return;
@@ -306,7 +306,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
     if (sh->flags.bStrictB2F)
     {
         mapSorted_Node* N = mapSorted.insertInAnyWay(distSQ);
-        N->val.pObject = NULL;
+        N->val.pObject = nullptr;
         N->val.pVisual = pVisual;
         N->val.Matrix = Fidentity;
         N->val.se = sh;
@@ -461,7 +461,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void CRender::add_leafs_Dynamic(dxRender_Visual* pVisual)
 {
-    if (0 == pVisual)
+    if (nullptr == pVisual)
         return;
 
     // Visual is 100% visible - simply add it
@@ -891,9 +891,9 @@ D3DXRenderBase::D3DXRenderBase()
     val_bHUD = FALSE;
     val_bInvisible = FALSE;
     val_bRecordMP = FALSE;
-    val_feedback = 0;
+    val_feedback = nullptr;
     val_feedback_breakp = 0;
-    val_recorder = 0;
+    val_recorder = nullptr;
     marker = 0;
     r_pmask(true, true);
     b_loaded = FALSE;
@@ -1068,7 +1068,7 @@ void D3DXRenderBase::overdrawEnd()
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_EQUAL));
     CHK_DX(HW.pDevice->SetRenderState(D3DRS_STENCILMASK, 0xff));
     // Set the background to black
-    CHK_DX(HW.pDevice->Clear(0, 0, D3DCLEAR_TARGET, color_xrgb(255, 0, 0), 0, 0));
+    CHK_DX(HW.pDevice->Clear(0, nullptr, D3DCLEAR_TARGET, color_xrgb(255, 0, 0), 0, 0));
     // Draw a rectangle wherever the count equal I
     RCache.OnFrameEnd();
     CHK_DX(HW.pDevice->SetFVF(FVF::F_TL));
@@ -1145,7 +1145,7 @@ void D3DXRenderBase::Clear()
         HW.pContext->ClearRenderTargetView(RCache.get_RT(), ColorRGBA);
     }
 #else
-    CHK_DX(HW.pDevice->Clear(0, 0, D3DCLEAR_ZBUFFER | (psDeviceFlags.test(rsClearBB) ? D3DCLEAR_TARGET : 0) |
+    CHK_DX(HW.pDevice->Clear(0, nullptr, D3DCLEAR_ZBUFFER | (psDeviceFlags.test(rsClearBB) ? D3DCLEAR_TARGET : 0) |
         (HW.Caps.bStencil ? D3DCLEAR_STENCIL : 0), color_xrgb(0, 0, 0), 1, 0));
 #endif
 }
@@ -1165,7 +1165,7 @@ void D3DXRenderBase::End()
     HW.m_pSwapChain->Present(bUseVSync ? 1 : 0, 0);
 #else
     CHK_DX(HW.pDevice->EndScene());
-    HW.pDevice->Present(NULL, NULL, NULL, NULL);
+    HW.pDevice->Present(nullptr, nullptr, nullptr, nullptr);
 #endif
 }
 
@@ -1176,7 +1176,7 @@ void D3DXRenderBase::ClearTarget()
     FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
     HW.pContext->ClearRenderTargetView(RCache.get_RT(), ColorRGBA);
 #else
-    CHK_DX(HW.pDevice->Clear(0, 0, D3DCLEAR_TARGET, color_xrgb(0, 0, 0), 1, 0));
+    CHK_DX(HW.pDevice->Clear(0, nullptr, D3DCLEAR_TARGET, color_xrgb(0, 0, 0), 1, 0));
 #endif
 }
 

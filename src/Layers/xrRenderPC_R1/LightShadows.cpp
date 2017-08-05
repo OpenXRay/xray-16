@@ -34,8 +34,8 @@ const u32 cache_old = 30 * 1000; // 30 secs
 // XXX: add to statistics
 CLightShadows::CLightShadows() : xrc("LightShadows")
 {
-    current = 0;
-    RT = 0;
+    current = nullptr;
+    RT = nullptr;
 
     LPCSTR RTname = "$user$shadow";
     LPCSTR RTtemp = "$user$temp";
@@ -48,7 +48,7 @@ CLightShadows::CLightShadows() : xrc("LightShadows")
     RT.create(RTname, S_rt_size, S_rt_size, S_rtf);
     RT_temp.create(RTtemp, S_rt_size, S_rt_size, S_rtf);
     sh_World.create("effects\\shadow_world", RTname);
-    geom_World.create(FVF::F_LIT, RCache.Vertex.Buffer(), NULL);
+    geom_World.create(FVF::F_LIT, RCache.Vertex.Buffer(), nullptr);
     sh_BlurTR.create("blur4", RTtemp2);
     sh_BlurRT.create("blur4", RTname2);
     geom_Blur.create(FVF::F_TL4uv, RCache.Vertex.Buffer(), RCache.QuadIB);
@@ -86,14 +86,14 @@ CLightShadows::~CLightShadows()
 
 void CLightShadows::set_object(IRenderable* O)
 {
-    if (0 == O)
-        current = 0;
+    if (nullptr == O)
+        current = nullptr;
     else
     {
         if (!O->renderable_ShadowGenerate() || RImplementation.val_bHUD ||
             ((CROS_impl*)O->renderable_ROS())->shadow_gen_frame == Device.dwFrame)
         {
-            current = 0;
+            current = nullptr;
             return;
         }
 
@@ -108,14 +108,14 @@ void CLightShadows::set_object(IRenderable* O)
         if (_priority < 1.f)
             current = O;
         else
-            current = 0;
+            current = nullptr;
 
         if (current)
         {
             ((CROS_impl*)O->renderable_ROS())->shadow_gen_frame = Device.dwFrame;
 
             // alloc
-            caster* cs = NULL;
+            caster* cs = nullptr;
             if (casters_pool.empty())
                 cs = new caster();
             else
@@ -136,10 +136,10 @@ void CLightShadows::set_object(IRenderable* O)
 
 void CLightShadows::add_element(NODE& N)
 {
-    if (0 == current)
+    if (nullptr == current)
         return;
     VERIFY2(casters.back()->nodes.size() < 24, "Object exceeds limit of 24 renderable parts/materials");
-    if (0 == N.pVisual->shader->E[SE_R1_LMODELS]._get())
+    if (nullptr == N.pVisual->shader->E[SE_R1_LMODELS]._get())
         return;
     casters.back()->nodes.push_back(N);
 }
@@ -187,7 +187,7 @@ void CLightShadows::calculate()
                 bRTS = TRUE;
                 RCache.set_RT(RT_temp->pRT);
                 RCache.set_ZB(RImplementation.Target->pTempZB);
-                HW.pDevice->Clear(0, 0, D3DCLEAR_TARGET, color_xrgb(255, 255, 255), 1, 0);
+                HW.pDevice->Clear(0, nullptr, D3DCLEAR_TARGET, color_xrgb(255, 255, 255), 1, 0);
             }
 
             // calculate light center
@@ -443,12 +443,12 @@ void CLightShadows::render()
         t_offset.y += .5f / S_rt_size;
 
         // Search the cache
-        cache_item* CI = 0;
+        cache_item* CI = nullptr;
         BOOL bValid = FALSE;
         cache_item CI_what;
         CI_what.O = S.O;
         CI_what.L = S.L;
-        CI_what.tris = 0;
+        CI_what.tris = nullptr;
         xr_vector<cache_item>::iterator CI_ptr = std::lower_bound(cache.begin(), cache.end(), CI_what, cache_search);
         if (CI_ptr == cache.end())
         { // empty ?
@@ -521,7 +521,7 @@ void CLightShadows::render()
 
                 // Clip polygon
                 sPoly* clip = F.ClipPoly(A, B);
-                if (0 == clip)
+                if (nullptr == clip)
                     continue;
 
                 // Triangulate poly
@@ -544,7 +544,7 @@ void CLightShadows::render()
             CI->tcnt = tess.size();
             // Msg						("---free--- %x",u32(CI->tris));
             xr_free(CI->tris);
-            VERIFY(0 == CI->tris);
+            VERIFY(nullptr == CI->tris);
             if (tess.size())
             {
                 CI->tris = xr_alloc<tess_tri>(CI->tcnt);
@@ -619,7 +619,7 @@ void CLightShadows::render()
         {
             // Msg			("---free--- %x",u32(ci.tris));
             xr_free(ci.tris);
-            VERIFY(0 == ci.tris);
+            VERIFY(nullptr == ci.tris);
             cache.erase(cache.begin() + cit);
             cit--;
         }

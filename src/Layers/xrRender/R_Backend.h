@@ -217,7 +217,7 @@ public:
     } stat;
 
 public:
-    IC CTexture* get_ActiveTexture(u32 stage)
+    CTexture* get_ActiveTexture(u32 stage)
     {
         if (stage < CTexture::rstVertex)
             return textures_ps[stage];
@@ -242,15 +242,15 @@ public:
         }
 #else //	USE_DX10
         VERIFY(!"Invalid texture stage");
-        return 0;
+        return nullptr;
 #endif //	USE_DX10
     }
 
 #if defined(USE_DX10) || defined(USE_DX11)
     IC void get_ConstantDirect(shared_str& n, u32 DataSize, void** pVData, void** pGData, void** pPData);
 #else // USE_DX10
-    IC R_constant_array& get_ConstantCache_Vertex() { return constants.a_vertex; }
-    IC R_constant_array& get_ConstantCache_Pixel() { return constants.a_pixel; }
+    R_constant_array& get_ConstantCache_Vertex() { return constants.a_vertex; }
+    R_constant_array& get_ConstantCache_Pixel() { return constants.a_pixel; }
 #endif //	USE_DX10
 
     // API
@@ -268,18 +268,18 @@ public:
     IC ID3DDepthStencilView* get_ZB();
 
     IC void set_Constants(R_constant_table* C);
-    IC void set_Constants(ref_ctable& C) { set_Constants(&*C); }
+    void set_Constants(ref_ctable& C) { set_Constants(&*C); }
     void set_Textures(STextureList* T);
-    IC void set_Textures(ref_texture_list& T) { set_Textures(&*T); }
+    void set_Textures(ref_texture_list& T) { set_Textures(&*T); }
 #ifdef _EDITOR
     IC void set_Matrices(SMatrixList* M);
     IC void set_Matrices(ref_matrix_list& M) { set_Matrices(&*M); }
 #endif
 
     IC void set_Element(ShaderElement* S, u32 pass = 0);
-    IC void set_Element(ref_selement& S, u32 pass = 0) { set_Element(&*S, pass); }
+    void set_Element(ref_selement& S, u32 pass = 0) { set_Element(&*S, pass); }
     IC void set_Shader(Shader* S, u32 pass = 0);
-    IC void set_Shader(ref_shader& S, u32 pass = 0) { set_Shader(&*S, pass); }
+    void set_Shader(ref_shader& S, u32 pass = 0) { set_Shader(&*S, pass); }
     ICF void set_States(ID3DState* _state);
     ICF void set_States(ref_state& _state) { set_States(_state->state); }
 #if defined(USE_DX10) || defined(USE_DX11)
@@ -288,7 +288,7 @@ public:
     ICF void set_Format(IDirect3DVertexDeclaration9* _decl);
 #endif //	USE_DX10
 
-    ICF void set_PS(ID3DPixelShader* _ps, LPCSTR _n = 0);
+    ICF void set_PS(ID3DPixelShader* _ps, LPCSTR _n = nullptr);
     ICF void set_PS(ref_ps& _ps) { set_PS(_ps->ps, _ps->cName.c_str()); }
 #if defined(USE_DX10) || defined(USE_DX11)
     ICF void set_GS(ID3DGeometryShader* _gs, LPCSTR _n = 0);
@@ -316,7 +316,7 @@ public:
 
 protected: //	In DX10 we need input shader signature which is stored in ref_vs
 #endif //	USE_DX10
-    ICF void set_VS(ID3DVertexShader* _vs, LPCSTR _n = 0);
+    ICF void set_VS(ID3DVertexShader* _vs, LPCSTR _n = nullptr);
 #if defined(USE_DX10) || defined(USE_DX11)
 public:
 #endif //	USE_DX10
@@ -334,10 +334,10 @@ public:
     IC void set_ColorWriteEnable(u32 _mask = D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN |
             D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA);
     IC void set_CullMode(u32 _mode);
-    IC u32 get_CullMode() { return cull_mode; }
-    void set_ClipPlanes(u32 _enable, Fplane* _planes = NULL, u32 count = 0);
-    void set_ClipPlanes(u32 _enable, Fmatrix* _xform = NULL, u32 fmask = 0xff);
-    IC void set_Scissor(Irect* rect = NULL);
+    u32 get_CullMode() { return cull_mode; }
+    void set_ClipPlanes(u32 _enable, Fplane* _planes = nullptr, u32 count = 0);
+    void set_ClipPlanes(u32 _enable, Fmatrix* _xform = nullptr, u32 fmask = 0xff);
+    IC void set_Scissor(Irect* rect = nullptr);
 
     // constants
     ICF ref_constant get_c(LPCSTR n)
@@ -345,14 +345,14 @@ public:
         if (ctable)
             return ctable->get(n);
         else
-            return 0;
+            return nullptr;
     }
     ICF ref_constant get_c(shared_str& n)
     {
         if (ctable)
             return ctable->get(n);
         else
-            return 0;
+            return nullptr;
     }
 
     // constants - direct (fast)
@@ -510,8 +510,9 @@ public:
     IC void dbg_SetRS(D3DRENDERSTATETYPE p1, u32 p2) { VERIFY(!"Not implemented"); }
     IC void dbg_SetSS(u32 sampler, D3DSAMPLERSTATETYPE type, u32 value) { VERIFY(!"Not implemented"); }
 #else //	USE_DX10
-    IC void dbg_SetRS(D3DRENDERSTATETYPE p1, u32 p2) { CHK_DX(HW.pDevice->SetRenderState(p1, p2)); }
-    IC void dbg_SetSS(u32 sampler, D3DSAMPLERSTATETYPE type, u32 value)
+    void dbg_SetRS(D3DRENDERSTATETYPE p1, u32 p2) { CHK_DX(HW.pDevice->SetRenderState(p1, p2)); }
+
+    void dbg_SetSS(u32 sampler, D3DSAMPLERSTATETYPE type, u32 value)
     {
         CHK_DX(HW.pDevice->SetSamplerState(sampler, type, value));
     }
@@ -519,7 +520,8 @@ public:
 #ifdef DEBUG
     void dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int vcnt, u16* pIdx, int pcnt);
     void dbg_Draw(D3DPRIMITIVETYPE T, FVF::L* pVerts, int pcnt);
-    IC void dbg_DrawAABB(Fvector& T, float sx, float sy, float sz, u32 C)
+
+    void dbg_DrawAABB(Fvector& T, float sx, float sy, float sz, u32 C)
     {
         Fvector half_dim;
         half_dim.set(sx, sy, sz);
@@ -528,7 +530,7 @@ public:
         dbg_DrawOBB(TM, half_dim, C);
     }
     void dbg_DrawOBB(Fmatrix& T, Fvector& half_dim, u32 C);
-    IC void dbg_DrawTRI(Fmatrix& T, Fvector* p, u32 C) { dbg_DrawTRI(T, p[0], p[1], p[2], C); }
+    void dbg_DrawTRI(Fmatrix& T, Fvector* p, u32 C) { dbg_DrawTRI(T, p[0], p[1], p[2], C); }
     void dbg_DrawTRI(Fmatrix& T, Fvector& p1, Fvector& p2, Fvector& p3, u32 C);
     void dbg_DrawLINE(Fmatrix& T, Fvector& p1, Fvector& p2, u32 C);
     void dbg_DrawEllipse(Fmatrix& T, u32 C);

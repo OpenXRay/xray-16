@@ -23,7 +23,7 @@ LPCSTR CScriptIniFile::update(LPCSTR file_name)
 {
     string_path S1;
     FS.update_path(S1, "$game_config$", file_name);
-    return (*shared_str(S1));
+    return *shared_str(S1);
 }
 
 bool CScriptIniFile::line_exist(LPCSTR S, LPCSTR L) { return (!!inherited::line_exist(S, L)); }
@@ -32,10 +32,10 @@ int CScriptIniFile::r_clsid(LPCSTR S, LPCSTR L) { return (object_factory().scrip
 bool CScriptIniFile::r_bool(LPCSTR S, LPCSTR L) { return (!!inherited::r_bool(S, L)); }
 int CScriptIniFile::r_token(LPCSTR S, LPCSTR L, const CScriptTokenList& token_list)
 {
-    return (inherited::r_token(S, L, &*token_list.tokens().begin()));
+    return inherited::r_token(S, L, &*token_list.tokens().begin());
 }
 
-LPCSTR CScriptIniFile::r_string_wb(LPCSTR S, LPCSTR L) { return (*inherited::r_string_wb(S, L)); }
+LPCSTR CScriptIniFile::r_string_wb(LPCSTR S, LPCSTR L) { return *inherited::r_string_wb(S, L); }
 u32 CScriptIniFile::line_count(LPCSTR S)
 {
     THROW3(inherited::section_exist(S), "Cannot find section", S);

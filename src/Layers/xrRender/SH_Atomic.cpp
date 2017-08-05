@@ -28,7 +28,7 @@
 
 ///////////////////////////////////////////////////////////////////////
 //  SVS
-SVS::SVS() : vs(0)
+SVS::SVS() : vs(nullptr)
 #if defined(USE_DX10) || defined(USE_DX11)
 //  ,signature(0)
 #endif //   USE_DX10

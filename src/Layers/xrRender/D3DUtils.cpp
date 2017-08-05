@@ -115,14 +115,14 @@ void SPrimitiveBuffer::CreateFromData(
 //  TODO: DX10: Implement SPrimitiveBuffer::CreateFromData for DX10
 //  VERIFY(!"SPrimitiveBuffer::CreateFromData not implemented for dx10");
 #else //    USE_DX10
-    ID3DVertexBuffer* pVB = 0;
-    ID3DIndexBuffer* pIB = 0;
+    ID3DVertexBuffer* pVB = nullptr;
+    ID3DIndexBuffer* pIB = nullptr;
     p_cnt = _p_cnt;
     p_type = _pt;
     v_cnt = _v_cnt;
     i_cnt = _i_cnt;
     u32 stride = D3DXGetFVFVertexSize(FVF);
-    R_CHK(HW.pDevice->CreateVertexBuffer(v_cnt * stride, D3DUSAGE_WRITEONLY, 0, D3DPOOL_MANAGED, &pVB, 0));
+    R_CHK(HW.pDevice->CreateVertexBuffer(v_cnt * stride, D3DUSAGE_WRITEONLY, 0, D3DPOOL_MANAGED, &pVB, nullptr));
     HW.stats_manager.increment_stats_vb(pVB);
     u8* bytes;
     R_CHK(pVB->Lock(0, 0, (LPVOID*)&bytes, 0));
@@ -926,7 +926,7 @@ void CDrawUtilities::DrawFace(
 static const u32 MAX_VERT_COUNT = 0xFFFF;
 void CDrawUtilities::DD_DrawFace_begin(BOOL bWire)
 {
-    VERIFY(m_DD_pv_start == 0);
+    VERIFY(m_DD_pv_start == nullptr);
     m_DD_wire = bWire;
     m_DD_pv_start = (FVF::L*)RCache.Vertex.Lock(MAX_VERT_COUNT, vs_L->vb_stride, m_DD_base);
     m_DD_pv = m_DD_pv_start;
@@ -959,7 +959,7 @@ void CDrawUtilities::DD_DrawFace_push(const Fvector& p0, const Fvector& p1, cons
 void CDrawUtilities::DD_DrawFace_end()
 {
     DD_DrawFace_flush(FALSE);
-    m_DD_pv_start = 0;
+    m_DD_pv_start = nullptr;
 }
 //----------------------------------------------------
 

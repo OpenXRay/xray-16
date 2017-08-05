@@ -45,7 +45,7 @@ public:
     void StackLevelChanged();
     void initiateDebugBreak();
     void DebugBreak(const char* szFile, int nLine);
-    void ErrorBreak(const char* szFile = 0, int nLine = 0);
+    void ErrorBreak(const char* szFile = nullptr, int nLine = 0);
     void LineHook(const char* szFile, int nLine);
     void FunctionHook(const char* szFile, int nLine, BOOL bCall);
     void Write(const char* szMsg);
