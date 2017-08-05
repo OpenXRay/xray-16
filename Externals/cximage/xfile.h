@@ -42,8 +42,7 @@
 #define __xfile_h
 
 #if defined (WIN32) || defined (_WIN32_WCE)
-#define NOMINMAX
-#include <windows.h>
+ #include <windows.h>
 #endif
 
 #include <stdio.h>

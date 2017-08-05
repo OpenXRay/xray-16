@@ -9,3 +9,4 @@ intermediate/
 intermediate_plugs/
 lib/
 *.aps
+*.user
