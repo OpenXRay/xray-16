@@ -25,6 +25,7 @@ template <typename T>
 struct CWrapHelper
 {
     typedef T result_type;
+
     template <bool a>
     static T* wrap_value(luabind::object object, LPCSTR name)
     {
@@ -44,6 +45,7 @@ template <>
 struct CWrapHelper<bool>
 {
     typedef BOOL result_type;
+
     template <bool a>
     static BOOL* wrap_value(luabind::object object, LPCSTR name)
     {

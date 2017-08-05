@@ -683,7 +683,7 @@ void CSE_ALifeItemWeaponMagazined::FillProps(LPCSTR pref, PropItemVec& items) { 
 CSE_ALifeItemWeaponMagazinedWGL::CSE_ALifeItemWeaponMagazinedWGL(LPCSTR caSection)
     : CSE_ALifeItemWeaponMagazined(caSection)
 {
-    m_bGrenadeMode = 0;
+    m_bGrenadeMode = false;
 }
 
 CSE_ALifeItemWeaponMagazinedWGL::~CSE_ALifeItemWeaponMagazinedWGL() {}
@@ -932,8 +932,8 @@ void CSE_ALifeItemExplosive::FillProps(LPCSTR pref, PropItemVec& items) { inheri
 ////////////////////////////////////////////////////////////////////////////
 CSE_ALifeItemBolt::CSE_ALifeItemBolt(LPCSTR caSection) : CSE_ALifeItem(caSection)
 {
-    m_flags.set(flUseSwitches, FALSE);
-    m_flags.set(flSwitchOffline, FALSE);
+    m_flags.set(flUseSwitches, false);
+    m_flags.set(flSwitchOffline, false);
     m_ef_weapon_type = READ_IF_EXISTS(pSettings, r_u32, caSection, "ef_weapon_type", u32(-1));
 }
 

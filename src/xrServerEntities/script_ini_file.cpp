@@ -26,10 +26,10 @@ LPCSTR CScriptIniFile::update(LPCSTR file_name)
     return *shared_str(S1);
 }
 
-bool CScriptIniFile::line_exist(LPCSTR S, LPCSTR L) { return (!!inherited::line_exist(S, L)); }
-bool CScriptIniFile::section_exist(LPCSTR S) { return (!!inherited::section_exist(S)); }
-int CScriptIniFile::r_clsid(LPCSTR S, LPCSTR L) { return (object_factory().script_clsid(inherited::r_clsid(S, L))); }
-bool CScriptIniFile::r_bool(LPCSTR S, LPCSTR L) { return (!!inherited::r_bool(S, L)); }
+bool CScriptIniFile::line_exist(LPCSTR S, LPCSTR L) { return !!inherited::line_exist(S, L); }
+bool CScriptIniFile::section_exist(LPCSTR S) { return !!inherited::section_exist(S); }
+int CScriptIniFile::r_clsid(LPCSTR S, LPCSTR L) { return object_factory().script_clsid(inherited::r_clsid(S, L)); }
+bool CScriptIniFile::r_bool(LPCSTR S, LPCSTR L) { return !!inherited::r_bool(S, L); }
 int CScriptIniFile::r_token(LPCSTR S, LPCSTR L, const CScriptTokenList& token_list)
 {
     return inherited::r_token(S, L, &*token_list.tokens().begin());

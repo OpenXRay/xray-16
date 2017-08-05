@@ -56,6 +56,7 @@ public:
         SlotItemVec items; // список кустиков
         SlotItemVec r_items[3]; // список кустиков for render
     };
+
     enum SlotType
     {
         stReady = 0, // Ready to use
@@ -63,6 +64,7 @@ public:
 
         stFORCEDWORD = 0xffffffff
     };
+
     struct Slot
     { // распакованый слот размером DETAIL_SLOT_SIZE
         struct
@@ -84,6 +86,7 @@ public:
             vis.clear();
         }
     };
+
     struct CacheSlot1
     {
         u32 empty;
@@ -101,10 +104,8 @@ public:
     typedef DetailVec::iterator DetailIt;
     typedef poolSS<SlotItem, 4096> PSS;
 
-public:
     int dither[16][16];
 
-public:
     // swing values
     struct SSwingValue
     {

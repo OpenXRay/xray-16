@@ -90,11 +90,11 @@ CSE_Abstract::CSE_Abstract(LPCSTR caSection)
 
     //	m_spawn_probability			= 1.f;
     m_spawn_flags.zero();
-    m_spawn_flags.set(flSpawnEnabled, TRUE);
-    m_spawn_flags.set(flSpawnOnSurgeOnly, TRUE);
-    m_spawn_flags.set(flSpawnSingleItemOnly, TRUE);
-    m_spawn_flags.set(flSpawnIfDestroyedOnly, TRUE);
-    m_spawn_flags.set(flSpawnInfiniteCount, TRUE);
+    m_spawn_flags.set(flSpawnEnabled, true);
+    m_spawn_flags.set(flSpawnOnSurgeOnly, true);
+    m_spawn_flags.set(flSpawnSingleItemOnly, true);
+    m_spawn_flags.set(flSpawnIfDestroyedOnly, true);
+    m_spawn_flags.set(flSpawnInfiniteCount, true);
     //	m_max_spawn_count			= 1;
     //	m_spawn_control				= "";
     //	m_spawn_count				= 0;
@@ -180,7 +180,7 @@ void CSE_Abstract::Spawn_Write(NET_Packet& tNetPacket, BOOL bLocal)
     tNetPacket.w_u16(ID_Parent);
     tNetPacket.w_u16(ID_Phantom);
 
-    s_flags.set(M_SPAWN_VERSION, TRUE);
+    s_flags.set(M_SPAWN_VERSION, true);
     if (bLocal)
         tNetPacket.w_u16(u16(s_flags.flags | M_SPAWN_OBJECT_LOCAL));
     else

@@ -382,7 +382,7 @@ CSE_ALifeObject::CSE_ALifeObject(LPCSTR caSection) : CSE_Abstract(caSection)
 #ifdef XRSE_FACTORY_EXPORTS
     fp_data.inc();
 #endif // XRSE_FACTORY_EXPORTS
-    m_flags.set(flOfflineNoMove, FALSE);
+    m_flags.set(flOfflineNoMove, false);
     seed(u32(CPU::QPC() & 0xffffffff));
 }
 
@@ -669,8 +669,8 @@ void CSE_ALifeDynamicObjectVisual::FillProps(LPCSTR pref, PropItemVec& items)
 CSE_ALifePHSkeletonObject::CSE_ALifePHSkeletonObject(LPCSTR caSection)
     : CSE_ALifeDynamicObjectVisual(caSection), CSE_PHSkeleton(caSection)
 {
-    m_flags.set(flUseSwitches, FALSE);
-    m_flags.set(flSwitchOffline, FALSE);
+    m_flags.set(flUseSwitches, false);
+    m_flags.set(flSwitchOffline, false);
 }
 
 CSE_ALifePHSkeletonObject::~CSE_ALifePHSkeletonObject() {}
@@ -719,11 +719,11 @@ void CSE_ALifePHSkeletonObject::FillProps(LPCSTR pref, PropItemVec& items)
 ////////////////////////////////////////////////////////////////////////////
 CSE_ALifeSpaceRestrictor::CSE_ALifeSpaceRestrictor(LPCSTR caSection) : CSE_ALifeDynamicObject(caSection)
 {
-    m_flags.set(flUseSwitches, FALSE);
+    m_flags.set(flUseSwitches, false);
     m_space_restrictor_type = RestrictionSpace::eDefaultRestrictorTypeNone;
-    m_flags.set(flUsedAI_Locations, FALSE);
-    m_spawn_flags.set(flSpawnDestroyOnSpawn, FALSE);
-    m_flags.set(flCheckForSeparator, TRUE);
+    m_flags.set(flUsedAI_Locations, false);
+    m_spawn_flags.set(flSpawnDestroyOnSpawn, false);
+    m_flags.set(flCheckForSeparator, true);
 }
 
 CSE_ALifeSpaceRestrictor::~CSE_ALifeSpaceRestrictor() {}
@@ -1163,8 +1163,8 @@ CSE_ALifeObjectHangingLamp::CSE_ALifeObjectHangingLamp(LPCSTR caSection)
     color = 0xffffffff;
     brightness = 1.f;
     m_health = 100.f;
-    m_flags.set(flUseSwitches, FALSE);
-    m_flags.set(flSwitchOffline, FALSE);
+    m_flags.set(flUseSwitches, false);
+    m_flags.set(flSwitchOffline, false);
 
     m_virtual_size = 0.1f;
     m_ambient_radius = 10.f;
@@ -1446,8 +1446,8 @@ bool CSE_ALifeObjectHangingLamp::match_configuration() const throw()
 
 CSE_ALifeObjectProjector::CSE_ALifeObjectProjector(LPCSTR caSection) : CSE_ALifeDynamicObjectVisual(caSection)
 {
-    m_flags.set(flUseSwitches, FALSE);
-    m_flags.set(flSwitchOffline, FALSE);
+    m_flags.set(flUseSwitches, false);
+    m_flags.set(flSwitchOffline, false);
 }
 
 CSE_ALifeObjectProjector::~CSE_ALifeObjectProjector() {}
@@ -1518,9 +1518,9 @@ u32 CSE_ALifeSchedulable::ef_detector_type() const
 CSE_ALifeHelicopter::CSE_ALifeHelicopter(LPCSTR caSection)
     : CSE_ALifeDynamicObjectVisual(caSection), CSE_Motion(), CSE_PHSkeleton(caSection)
 {
-    m_flags.set(flUseSwitches, FALSE);
-    m_flags.set(flSwitchOffline, FALSE);
-    m_flags.set(flInteractive, FALSE);
+    m_flags.set(flUseSwitches, false);
+    m_flags.set(flSwitchOffline, false);
+    m_flags.set(flInteractive, false);
 }
 
 CSE_ALifeHelicopter::~CSE_ALifeHelicopter() {}
@@ -1583,8 +1583,8 @@ CSE_ALifeCar::CSE_ALifeCar(LPCSTR caSection) : CSE_ALifeDynamicObjectVisual(caSe
 {
     if (pSettings->section_exist(caSection) && pSettings->line_exist(caSection, "visual"))
         set_visual(pSettings->r_string(caSection, "visual"));
-    m_flags.set(flUseSwitches, FALSE);
-    m_flags.set(flSwitchOffline, FALSE);
+    m_flags.set(flUseSwitches, false);
+    m_flags.set(flSwitchOffline, false);
     health = 1.0f;
 }
 
@@ -1711,8 +1711,8 @@ void CSE_ALifeCar::FillProps(LPCSTR pref, PropItemVec& values)
 CSE_ALifeObjectBreakable::CSE_ALifeObjectBreakable(LPCSTR caSection) : CSE_ALifeDynamicObjectVisual(caSection)
 {
     m_health = 1.f;
-    m_flags.set(flUseSwitches, FALSE);
-    m_flags.set(flSwitchOffline, FALSE);
+    m_flags.set(flUseSwitches, false);
+    m_flags.set(flSwitchOffline, false);
 }
 
 CSE_ALifeObjectBreakable::~CSE_ALifeObjectBreakable() {}
