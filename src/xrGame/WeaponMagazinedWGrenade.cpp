@@ -748,20 +748,8 @@ void CWeaponMagazinedWGrenade::net_Import(NET_Packet& P)
 float CWeaponMagazinedWGrenade::Weight() const
 {
     float res = inherited::Weight();
+    res += GetMagazineWeight(m_magazine2);
 
-    const char* last_type = nullptr;
-    float w = 0, bs = 0;
-    for (auto& c : m_magazine2)
-    {
-        // Usually ammos in mag have same type, use it to improve performance
-        if (last_type != c.m_ammoSect.c_str())
-        {
-            last_type = c.m_ammoSect.c_str();
-            w = pSettings->r_float(last_type, "inv_weight");
-            bs = pSettings->r_float(last_type, "box_size");
-        }
-        res += w / bs;
-    }
     return res;
 }
 
