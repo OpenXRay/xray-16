@@ -430,7 +430,7 @@ bool vertex_in_direction(const u32& start_vertex_id, const u32& target_vertex_id
                     return (true);
 
                 Fvector2 temp2;
-                temp2.add(box.vMin, box.vMax);
+                temp2.add(box.min, box.max);
                 temp2.mul(.5f);
                 float dist = _sqr(temp2.x - dest.x) + _sqr(temp2.y - dest.y);
                 if (dist > cur_sqr)

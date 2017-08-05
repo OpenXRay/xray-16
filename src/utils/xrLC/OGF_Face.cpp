@@ -522,8 +522,8 @@ void OGF_Node::Save(IWriter& fs)
     H.format_version = xrOGF_FormatVersion;
     H.type = MT_HIERRARHY;
     H.shader_id = 0;
-    H.bb.vMin = bbox.vMin;
-    H.bb.vMax = bbox.vMax;
+    H.bb.min = bbox.vMin;
+    H.bb.max = bbox.vMax;
     H.bs.c = C;
     H.bs.r = R;
     fs.w(&H, sizeof(H));
@@ -551,8 +551,8 @@ void OGF_LOD::Save(IWriter& fs)
     H.format_version = xrOGF_FormatVersion;
     H.type = MT_LOD;
     H.shader_id = RegisterShader(sid);
-    H.bb.vMin = bbox.vMin;
-    H.bb.vMax = bbox.vMax;
+    H.bb.min = bbox.vMin;
+    H.bb.max = bbox.vMax;
     H.bs.c = C;
     H.bs.r = R;
     fs.w(&H, sizeof(H));

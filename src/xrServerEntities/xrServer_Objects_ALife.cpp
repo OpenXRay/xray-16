@@ -315,8 +315,8 @@ void CSE_ALifeGraphPoint::FillProps(LPCSTR pref, PropItemVec& items)
 #endif // #ifdef XRSE_FACTORY_EXPORTS
 }
 
-void CSE_ALifeGraphPoint::on_render(CDUInterface* du, IServerEntityLEOwner* /*owner*/,
-    bool /*bSelected*/, const Fmatrix& parent, int /*priority*/, bool /*strictB2F*/)
+void CSE_ALifeGraphPoint::on_render(CDUInterface* du, IServerEntityLEOwner* owner,
+    bool bSelected, const Fmatrix& parent, int priority, bool strictB2F)
 {
 #ifdef XRSE_FACTORY_EXPORTS
     static const u32 IL[16] = {0, 1, 0, 2, 0, 3, 0, 4, 1, 3, 3, 2, 2, 4, 4, 1};
