@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "GameSpy_GCD_Client.h"
 
 void CGameSpy_GCD_Client::CreateRespond(char* cdkey, char* RespondStr, char* ChallengeStr, u8 Reauth)

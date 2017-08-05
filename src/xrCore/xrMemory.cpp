@@ -7,7 +7,7 @@
 #include <malloc.h>
 
 xrMemory Memory;
-BOOL mem_initialized = FALSE;
+bool mem_initialized = false;
 bool shared_str_initialized = false;
 
 // fake fix of memory corruptions in multiplayer game :(
@@ -46,7 +46,7 @@ xrMemory::xrMemory()
 BOOL g_bMEMO = FALSE;
 #endif // DEBUG_MEMORY_MANAGER
 
-void xrMemory::_initialize(BOOL bDebug)
+void xrMemory::_initialize(bool bDebug)
 {
 #ifdef DEBUG_MEMORY_MANAGER
     debug_mode = bDebug;
@@ -75,7 +75,7 @@ void xrMemory::_initialize(BOOL bDebug)
     else
         g_bMEMO = TRUE;
 #else // DEBUG_MEMORY_MANAGER
-    mem_initialized = TRUE;
+    mem_initialized = true;
 #endif // DEBUG_MEMORY_MANAGER
 
     // DUMP_PHASE;
@@ -114,7 +114,7 @@ void xrMemory::_destroy()
 #endif // DEBUG_MEMORY_MANAGER
 #endif // M_BORLAND
 
-    mem_initialized = FALSE;
+    mem_initialized = true;
 #ifdef DEBUG_MEMORY_MANAGER
     debug_mode = FALSE;
 #endif // DEBUG_MEMORY_MANAGER
@@ -142,7 +142,7 @@ ICF u8* acc_header(void* P)
     return _P - 1;
 }
 ICF u32 get_header(void* P) { return (u32)*acc_header(P); }
-void xrMemory::mem_statistic(LPCSTR fn)
+void xrMemory::mem_statistic(const char* fn)
 {
     if (!debug_mode)
         return;

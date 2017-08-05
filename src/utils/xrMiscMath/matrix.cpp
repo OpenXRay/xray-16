@@ -427,7 +427,7 @@ template <typename T>
 void _matrix<T>::getHPB(T& h, T& p, T& b) const
 {
 	T cy = _sqrt(j.y*j.y + i.y*i.y);
-	if (cy > 16.0f*type_epsilon(T))
+	if (cy > 16.0f*type_epsilon<T>)
 	{
 		h = (T)-atan2(k.x, k.z);
 		p = (T)-atan2(-k.y, cy);

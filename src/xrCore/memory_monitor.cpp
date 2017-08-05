@@ -84,8 +84,8 @@ STATIC void initialize()
 XRCORE_API int memory_monitor::counter = 0;
 XRCORE_API int memory_monitor::counter_alloc = 0;
 XRCORE_API int memory_monitor::counter_free = 0;
-void memory_monitor::monitor_alloc(
-    const void* allocation_address, const u32& allocation_size, LPCSTR allocation_description)
+XRCORE_API void memory_monitor::monitor_alloc(
+    const void* pointer, const u32& size, const char* description)
 {
     counter++;
     counter_alloc++;
@@ -107,10 +107,10 @@ void memory_monitor::monitor_alloc(
 
     _allocation_size temp;
     temp.allocation = 1;
-    temp.size = allocation_size;
+    temp.size = size;
     fwrite(&temp, sizeof(temp), 1, file());
-    fwrite(&allocation_address, sizeof(allocation_address), 1, file());
-    fwrite(allocation_description, (xr_strlen(allocation_description) + 1) * sizeof(char), 1, file());
+    fwrite(&pointer, sizeof(pointer), 1, file());
+    fwrite(description, (xr_strlen(description) + 1) * sizeof(char), 1, file());
 
     if (!detaching)
         ;
@@ -146,11 +146,11 @@ void memory_monitor::monitor_free(const void* deallocation_address)
     LeaveCriticalSection(&critical_section);
 }
 
-void memory_monitor::make_checkpoint(LPCSTR checkpoint_name)
+XRCORE_API void memory_monitor::make_checkpoint(const char* name)
 {
     fflush(file());
     string_path fn;
-    strconcat(sizeof(fn), fn, output_folder, checkpoint_name, output_extension);
+    strconcat(sizeof(fn), fn, output_folder, name, output_extension);
 
     Msg("Creating memory checkpoint file[%s]...", fn);
     CopyFile(file_name(), fn, FALSE);

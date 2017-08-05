@@ -1,6 +1,4 @@
 #include "xrCore/_vector3d.h"
-#include "xrCore/_random.h"
-#include "xrCore/xrDebug.h"
 //#include "xrCore/math_constants.h"
 #include "xrCore/vector.h"
 
@@ -74,8 +72,3 @@ bool exact_normalize(float* a)
 }
 
 bool exact_normalize(Fvector3& a) { return exact_normalize(&a.x); }
-
-//////////////////////////////////////////////////////////////////
-
-s32 CRandom::randI(s32 max) { VERIFY(max); return randI() % max; }
-

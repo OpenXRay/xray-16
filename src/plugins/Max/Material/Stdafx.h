@@ -12,7 +12,6 @@
 #include "Max.h"
 
 #include "xrCore/xrCore.h"
-#pragma comment(lib, "xrCore.lib")
 
 #undef _MIN
 #undef _MAX
@@ -41,9 +40,9 @@ using std::string;
 #define FLT_MIN flt_max
 
 #include <io.h>
-#include <sys\stat.h>
+#include <sys/stat.h>
 #include <fcntl.h>
-#include <sys\utime.h>
+#include <sys/utime.h>
 
 #include "istdplug.h"
 #include "iparamb2.h"

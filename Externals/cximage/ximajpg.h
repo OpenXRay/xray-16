@@ -27,7 +27,6 @@
 #if CXIMAGE_SUPPORT_JPG
 
 #define CXIMAGEJPG_SUPPORT_EXIF 1
-
 #define XMD_H
 #define HAVE_BOOLEAN
 extern "C" {
@@ -36,8 +35,6 @@ extern "C" {
 }
 #undef HAVE_BOOLEAN
 #undef XMD_H
-
-#pragma comment(lib, "libjpeg.lib")
 
 class DLL_EXP CxImageJPG: public CxImage
 {

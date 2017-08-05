@@ -1,7 +1,4 @@
-#ifndef GAMESPY_GP_H
-#define GAMESPY_GP_H
-
-#include "xrCore/xrCore.h"
+#pragma once
 #include "xrGameSpy/xrGameSpy.h"
 
 class XRGAMESPY_API CGameSpy_GP
@@ -36,5 +33,3 @@ private:
     // main callbacks
     static void __cdecl OnGameSpyErrorCb(GPConnection* connection, void* arg, void* param);
 }; // CGameSpy_GP
-
-#endif //#ifndef GAMESPY_GP_H

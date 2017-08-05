@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "GameSpy_HTTP.h"
 
 CGameSpy_HTTP::CGameSpy_HTTP()

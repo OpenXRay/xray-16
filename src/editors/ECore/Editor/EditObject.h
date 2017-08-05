@@ -174,7 +174,6 @@ DEFINE_VECTOR(SBonePart, BPVec, BPIt);
 const u32 FVF_SV = D3DFVF_XYZ | D3DFVF_TEX1 | D3DFVF_NORMAL;
 
 class ECORE_API CEditableObject :
-
     public IKinematics,
     public CPhysicsShellHolderEditorBase
 {

@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "GameSpy_Patching.h"
 
 static char const* QueryPatchVersionString(char* dest, u32 dest_size)

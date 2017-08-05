@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Common/Platform.hpp"
+#include "xrCore/xrCore.h"
 
 #include <GameSpy/Common/gsCommon.h>
 #include <GameSpy/Common/gsAvailable.h>

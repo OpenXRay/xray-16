@@ -81,6 +81,9 @@
     <ClInclude Include="..\xrCommon\xr_deque.h">
       <Filter>xrCommon</Filter>
     </ClInclude>
+    <ClInclude Include="xr_impexp_macros.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="NvMender2003">

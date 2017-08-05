@@ -7,20 +7,18 @@ extern "C" void*	cxrealloc(void* ptr, size_t size);
 
 #ifdef CXIMAGE_AS_SHARED_LIBRARY //must be defined in Release_Shared configuration
 
+// XXX: dirty hack.
+#undef max
+#undef min
 #include "xrCore/xrCore.h"
 
-#ifdef _MSC_VER // TODO: Remove this and instead depend on VS project "References"?
-#pragma comment(lib,"libjpeg.lib")
-#pragma comment(lib,"xrCore.lib")
-#endif
-
 #ifdef	CXIMAGE_BUILD
-#	define	CXIMAGE_API	__declspec(dllexport)
+#define	CXIMAGE_API	XR_EXPORT
 #else
-#	define	CXIMAGE_API	__declspec(dllimport)
+#define	CXIMAGE_API	XR_IMPORT
 #endif //#ifdef	CXIMAGE_BUILD
 #else  //if CXIMAGE_AS_SHARED_LIBRARY linking as static library ...
-#	define	CXIMAGE_API
+#define	CXIMAGE_API
 #endif //CXIMAGE_AS_SHARED_LIBRARY
 
 /////////////////////////////////////////////////////////////////////////////

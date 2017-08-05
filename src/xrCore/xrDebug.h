@@ -1,4 +1,5 @@
 #pragma once
+#include "Common/Platform.hpp"
 #include "xrCore/_types.h"
 #include <string>
 

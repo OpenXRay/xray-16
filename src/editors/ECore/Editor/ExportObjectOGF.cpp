@@ -16,8 +16,8 @@
 CObjectOGFCollectorPacked::CObjectOGFCollectorPacked(const Fbox& bb, int apx_vertices, int apx_faces)
 {
     // Params
-    m_VMscale.set(bb.max.x - bb.min.x + EPS, bb.max.y - bb.min.y + EPS, bb.max.z - bb.min.z + EPS);
-    m_VMmin.set(bb.min).sub(EPS);
+    m_VMscale.set(bb.vMax.x - bb.vMin.x + EPS, bb.vMax.y - bb.vMin.y + EPS, bb.vMax.z - bb.vMin.z + EPS);
+    m_VMmin.set(bb.vMin).sub(EPS);
     m_VMeps.set(m_VMscale.x / clpOGFMX / 2, m_VMscale.y / clpOGFMY / 2, m_VMscale.z / clpOGFMZ / 2);
     m_VMeps.x = (m_VMeps.x < EPS_L) ? m_VMeps.x : EPS_L;
     m_VMeps.y = (m_VMeps.y < EPS_L) ? m_VMeps.y : EPS_L;
@@ -133,8 +133,8 @@ void CExportObjectOGF::SSplit::SavePart(IWriter& F, CObjectOGFCollectorPacked* p
     H.format_version = xrOGF_FormatVersion;
     H.type = (part->m_SWR.size()) ? MT_PROGRESSIVE : MT_NORMAL;
     H.shader_id = 0;
-    H.bb.min = part->m_Box.min;
-    H.bb.max = part->m_Box.max;
+    H.bb.min = part->m_Box.vMin;
+    H.bb.max = part->m_Box.vMax;
     part->m_Box.getsphere(H.bs.c, H.bs.r);
     F.w(&H, sizeof(H));
     F.close_chunk();

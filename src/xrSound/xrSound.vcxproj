@@ -227,6 +227,9 @@
     <ProjectReference Include="$(xrExternals)openal\OpenAL-Windows\Router\Router.vcxproj">
       <Project>{566551f4-4ef1-4cb4-a131-f982e7606907}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\utils\xrMiscMath\xrMiscMath.vcxproj">
+      <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\xrMisc\xrMisc.vcxproj">
       <Project>{c964d17a-05a8-4bfa-b0a8-7af5c6b627ec}</Project>
     </ProjectReference>

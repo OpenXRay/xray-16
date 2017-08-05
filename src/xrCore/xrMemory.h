@@ -49,7 +49,7 @@ public:
 
 public:
     xrMemory();
-    void _initialize(BOOL _debug_mode = FALSE);
+    void _initialize(bool _debug_mode = false);
     void _destroy();
 
 #ifdef DEBUG_MEMORY_MANAGER
@@ -74,7 +74,7 @@ public:
     void mem_counter_set(u32 _val) { stat_counter = _val; }
     u32 mem_counter_get() { return stat_counter; }
 #ifdef DEBUG_MEMORY_NAME
-    void mem_statistic(LPCSTR fn);
+    void mem_statistic(const char* fn);
     void* mem_alloc(size_t size, const char* _name);
     void* mem_realloc(void* p, size_t size, const char* _name);
 #else // DEBUG_MEMORY_NAME
@@ -149,7 +149,7 @@ const u32 mem_pools_count = 54;
 const u32 mem_pools_ebase = 16;
 const u32 mem_generic = mem_pools_count + 1;
 extern MEMPOOL mem_pools[mem_pools_count];
-extern BOOL mem_initialized;
+extern bool mem_initialized;
 
 XRCORE_API void vminfo(size_t* _free, size_t* reserved, size_t* committed);
 XRCORE_API void log_vminfo();

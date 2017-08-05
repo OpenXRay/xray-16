@@ -1,6 +1,7 @@
 #pragma once
 #ifndef __V3D__
 #define __V3D__
+#include <algorithm>
 // XXX: review
 //#include "Common/Platform.hpp"
 #include "xrCommon/inlining_macros.h"
@@ -10,53 +11,56 @@
 template <class T>
 struct _vector3
 {
-public:
-    typedef T TYPE;
-    typedef _vector3<T> Self;
-    typedef Self& SelfRef;
-    typedef const Self& SelfCRef;
+    using TYPE = T;
+    using Self = _vector3<T>;
+    using SelfRef = Self&;
+    using SelfCRef = const Self&;
 
-public:
     T x, y, z;
 
     // access operators
     ICF T& operator[](int i) { return *((T*)this + i); }
     ICF T& operator[](int i) const { return *((T*)this + i); }
+
     ICF SelfRef set(T _x, T _y, T _z)
     {
         x = _x;
         y = _y;
         z = _z;
         return *this;
-    };
+    }
+
     ICF SelfRef set(const _vector3<float>& v)
     {
         x = T(v.x);
         y = T(v.y);
         z = T(v.z);
         return *this;
-    };
+    }
+
     ICF SelfRef set(const _vector3<double>& v)
     {
         x = T(v.x);
         y = T(v.y);
         z = T(v.z);
         return *this;
-    };
+    }
+
     ICF SelfRef set(float* p)
     {
         x = p[0];
         y = p[1];
         z = p[2];
         return *this;
-    };
+    }
+
     ICF SelfRef set(double* p)
     {
         x = p[0];
         y = p[1];
         z = p[2];
         return *this;
-    };
+    }
 
     ICF SelfRef add(const Self& v)
     {
@@ -64,28 +68,31 @@ public:
         y += v.y;
         z += v.z;
         return *this;
-    };
+    }
+
     ICF SelfRef add(T s)
     {
         x += s;
         y += s;
         z += s;
         return *this;
-    };
+    }
+
     ICF SelfRef add(const Self& a, const Self& v)
     {
         x = a.x + v.x;
         y = a.y + v.y;
         z = a.z + v.z;
         return *this;
-    };
+    }
+
     ICF SelfRef add(const Self& a, T s)
     {
         x = a.x + s;
         y = a.y + s;
         z = a.z + s;
         return *this;
-    };
+    }
 
     ICF SelfRef sub(const Self& v)
     {
@@ -93,28 +100,31 @@ public:
         y -= v.y;
         z -= v.z;
         return *this;
-    };
+    }
+
     ICF SelfRef sub(T s)
     {
         x -= s;
         y -= s;
         z -= s;
         return *this;
-    };
+    }
+
     ICF SelfRef sub(const Self& a, const Self& v)
     {
         x = a.x - v.x;
         y = a.y - v.y;
         z = a.z - v.z;
         return *this;
-    };
+    }
+
     ICF SelfRef sub(const Self& a, T s)
     {
         x = a.x - s;
         y = a.y - s;
         z = a.z - s;
         return *this;
-    };
+    }
 
     ICF SelfRef mul(const Self& v)
     {
@@ -122,28 +132,31 @@ public:
         y *= v.y;
         z *= v.z;
         return *this;
-    };
+    }
+
     ICF SelfRef mul(T s)
     {
         x *= s;
         y *= s;
         z *= s;
         return *this;
-    };
+    }
+
     ICF SelfRef mul(const Self& a, const Self& v)
     {
         x = a.x * v.x;
         y = a.y * v.y;
         z = a.z * v.z;
         return *this;
-    };
+    }
+
     ICF SelfRef mul(const Self& a, T s)
     {
         x = a.x * s;
         y = a.y * s;
         z = a.z * s;
         return *this;
-    };
+    }
 
     ICF SelfRef div(const Self& v)
     {
@@ -151,37 +164,41 @@ public:
         y /= v.y;
         z /= v.z;
         return *this;
-    };
+    }
+
     ICF SelfRef div(T s)
     {
         x /= s;
         y /= s;
         z /= s;
         return *this;
-    };
+    }
+
     ICF SelfRef div(const Self& a, const Self& v)
     {
         x = a.x / v.x;
         y = a.y / v.y;
         z = a.z / v.z;
         return *this;
-    };
+    }
+
     ICF SelfRef div(const Self& a, T s)
     {
         x = a.x / s;
         y = a.y / s;
         z = a.z / s;
         return *this;
-    };
+    }
 
-    IC SelfRef invert()
+    SelfRef invert()
     {
         x = -x;
         y = -y;
         z = -z;
         return *this;
     }
-    IC SelfRef invert(const Self& a)
+
+    SelfRef invert(const Self& a)
     {
         x = -a.x;
         y = -a.y;
@@ -189,28 +206,31 @@ public:
         return *this;
     }
 
-    IC SelfRef min(const Self& v1, const Self& v2)
+    SelfRef min(const Self& v1, const Self& v2)
     {
         x = std::min(v1.x, v2.x);
         y = std::min(v1.y, v2.y);
         z = std::min(v1.z, v2.z);
         return *this;
     }
-    IC SelfRef min(const Self& v)
+
+    SelfRef min(const Self& v)
     {
         x = std::min(x, v.x);
         y = std::min(y, v.y);
         z = std::min(z, v.z);
         return *this;
     }
-    IC SelfRef max(const Self& v1, const Self& v2)
+
+    SelfRef max(const Self& v1, const Self& v2)
     {
         x = std::max(v1.x, v2.x);
         y = std::max(v1.y, v2.y);
         z = std::max(v1.z, v2.z);
         return *this;
     }
-    IC SelfRef max(const Self& v)
+
+    SelfRef max(const Self& v)
     {
         x = std::max(x, v.x);
         y = std::max(y, v.y);
@@ -218,14 +238,15 @@ public:
         return *this;
     }
 
-    IC SelfRef abs(const Self& v)
+    SelfRef abs(const Self& v)
     {
         x = _abs(v.x);
         y = _abs(v.y);
         z = _abs(v.z);
         return *this;
     }
-    ICF BOOL similar(const Self& v, T E = EPS_L) const
+
+    ICF bool similar(const Self& v, T E = EPS_L) const
     {
         return _abs(x - v.x) < E && _abs(y - v.y) < E && _abs(z - v.z) < E;
     };
@@ -258,17 +279,17 @@ public:
     SelfRef mad(const Self& p, const Self& d, const Self& s);
 
     // SQ magnitude
-    T square_magnitude(void) const;
+    T square_magnitude() const;
 
     // magnitude
-    T magnitude(void) const;
+    T magnitude() const;
     // Normalize
-    T normalize_magn(void);
+    T normalize_magn();
 
-    SelfRef normalize(void);
+    SelfRef normalize();
 
     // Safe-Normalize
-    SelfRef normalize_safe(void);
+    SelfRef normalize_safe();
 
     // Normalize
     SelfRef normalize(const Self& v);
@@ -319,15 +340,18 @@ public:
     static void generate_orthonormal_basis(const _vector3<T>& dir, _vector3<T>& up, _vector3<T>& right);
     static void generate_orthonormal_basis_normalized(_vector3<T>& dir, _vector3<T>& up, _vector3<T>& right);
 };
-typedef _vector3<float> Fvector;
-typedef _vector3<float> Fvector3;
-typedef _vector3<double> Dvector;
-typedef _vector3<double> Dvector3;
-typedef _vector3<s32> Ivector;
-typedef _vector3<s32> Ivector3;
+
+using Fvector = _vector3<float>;
+using Fvector3 = _vector3<float>;
+
+using Dvector = _vector3<double>;
+using Dvector3 = _vector3<double>;
+
+using Ivector = _vector3<s32>;
+using Ivector3 = _vector3<s32>;
 
 template <class T>
-BOOL _valid(const _vector3<T>& v)
+bool _valid(const _vector3<T>& v)
 {
     return _valid((T)v.x) && _valid((T)v.y) && _valid((T)v.z);
 }

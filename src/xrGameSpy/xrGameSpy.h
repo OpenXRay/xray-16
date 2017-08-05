@@ -18,8 +18,6 @@
 #include <GameSpy/gp/gp.h>
 #include <GameSpy/sake/sake.h>
 #include <GameSpy/sc/sc.h>
-#undef min
-#undef max
 
 #include "xrGameSpy/xrGameSpy_MainDefs.h"
 #include "xrGameSpy/GameSpy_Available.h"
