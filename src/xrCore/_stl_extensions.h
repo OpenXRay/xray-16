@@ -360,8 +360,6 @@ public:
 
 #endif // M_NOSTDCONTAINERS_EXT
 
-#pragma todo("tamlin: Why define our own mk_pair? What's wrong with std::make_pair")
-
 struct pred_str : public std::binary_function<char*, char*, bool>
 {
     IC bool operator()(const char* x, const char* y) const { return xr_strcmp(x, y) < 0; }
@@ -372,6 +370,7 @@ struct pred_stri : public std::binary_function<char*, char*, bool>
 };
 
 // tamlin: TODO (low priority, for a rainy day): Rename these macros from DEFINE_* to DECLARE_*
+// Xottab_DUTY: TODO: or maybe use Im-Dex variant (Get rid of this DEFINE macroses)
 
 // STL extensions
 #define DEF_VECTOR(N, T)    \
