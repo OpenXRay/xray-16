@@ -11,6 +11,7 @@
 #include "xrScriptEngine/script_engine.hpp"
 #include "ai_space.h"
 #include "object_factory.h"
+#include "xrCore/xrDebug.h"
 
 CScriptIniFile::CScriptIniFile(IReader* F, LPCSTR path) : inherited(F, path) {}
 CScriptIniFile::CScriptIniFile(LPCSTR szFileName, BOOL ReadOnly, BOOL bLoadAtStart, BOOL SaveAtEnd)
@@ -38,41 +39,41 @@ int CScriptIniFile::r_token(LPCSTR S, LPCSTR L, const CScriptTokenList& token_li
 LPCSTR CScriptIniFile::r_string_wb(LPCSTR S, LPCSTR L) { return *inherited::r_string_wb(S, L); }
 u32 CScriptIniFile::line_count(LPCSTR S)
 {
-    THROW3(inherited::section_exist(S), "Cannot find section", S);
-    return (inherited::line_count(S));
+    VERIFY3(inherited::section_exist(S), "Cannot find section", S);
+    return inherited::line_count(S);
 }
 
 LPCSTR CScriptIniFile::r_string(LPCSTR S, LPCSTR L)
 {
-    THROW3(inherited::section_exist(S), "Cannot find section", S);
-    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
-    return (inherited::r_string(S, L));
+    VERIFY3(inherited::section_exist(S), "Cannot find section", S);
+    VERIFY3(inherited::line_exist(S, L), "Cannot find line", L);
+    return inherited::r_string(S, L);
 }
 
 u32 CScriptIniFile::r_u32(LPCSTR S, LPCSTR L)
 {
-    THROW3(inherited::section_exist(S), "Cannot find section", S);
-    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
-    return (inherited::r_u32(S, L));
+    VERIFY3(inherited::section_exist(S), "Cannot find section", S);
+    VERIFY3(inherited::line_exist(S, L), "Cannot find line", L);
+    return inherited::r_u32(S, L);
 }
 
 int CScriptIniFile::r_s32(LPCSTR S, LPCSTR L)
 {
-    THROW3(inherited::section_exist(S), "Cannot find section", S);
-    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
-    return (inherited::r_s32(S, L));
+    VERIFY3(inherited::section_exist(S), "Cannot find section", S);
+    VERIFY3(inherited::line_exist(S, L), "Cannot find line", L);
+    return inherited::r_s32(S, L);
 }
 
 float CScriptIniFile::r_float(LPCSTR S, LPCSTR L)
 {
-    THROW3(inherited::section_exist(S), "Cannot find section", S);
-    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
-    return (inherited::r_float(S, L));
+    VERIFY3(inherited::section_exist(S), "Cannot find section", S);
+    VERIFY3(inherited::line_exist(S, L), "Cannot find line", L);
+    return inherited::r_float(S, L);
 }
 
 Fvector CScriptIniFile::r_fvector3(LPCSTR S, LPCSTR L)
 {
-    THROW3(inherited::section_exist(S), "Cannot find section", S);
-    THROW3(inherited::line_exist(S, L), "Cannot find line", L);
-    return (inherited::r_fvector3(S, L));
+    VERIFY3(inherited::section_exist(S), "Cannot find section", S);
+    VERIFY3(inherited::line_exist(S, L), "Cannot find line", L);
+    return inherited::r_fvector3(S, L);
 }
