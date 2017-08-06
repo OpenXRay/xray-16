@@ -31,8 +31,8 @@ void CUIChatWnd::PendingMode(bool const is_pending_mode)
     pendingGameMode = false;
 }
 
-#define CHAT_PREFIX_PENDING "chat_prefix_pending"
-#define CHAT_EDITBOX_PENDING "chat_editbox_pending"
+const pcstr CHAT_PREFIX_PENDING = "chat_prefix_pending";
+const pcstr CHAT_EDITBOX_PENDING = "chat_editbox_pending";
 
 void CUIChatWnd::Init(CUIXml& uiXml)
 {
