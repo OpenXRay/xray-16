@@ -55,3 +55,6 @@
 [submodule "src/Externals/nvapi"]
 	path = src/Externals/nvapi
 	url = https://github.com/OpenXRay/nvapi.git
+[submodule "src/Externals/tinyxml"]
+	path = src/Externals/tinyxml
+	url = https://github.com/alexgdi/tinyxml.git
