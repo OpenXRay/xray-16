@@ -65,7 +65,7 @@ void XMLDocument::Load(LPCSTR path, LPCSTR xml_filename)
     W.w_stringZ("");
     FS.r_close(F);
 
-    m_Doc.Parse(&m_Doc, (LPCSTR)W.pointer());
+    m_Doc.Parse((LPCSTR)W.pointer());
     if (m_Doc.Error())
     {
         string1024 str;

@@ -7,7 +7,7 @@
 const LPCSTR CONFIG_PATH = "$game_config$";
 const LPCSTR UI_PATH = "ui";
 
-#include "tinyxml.h"
+#include "tinyxml\tinyxml.h"
 
 typedef TiXmlNode XML_NODE;
 typedef TiXmlAttribute XML_ATTRIBUTE;
