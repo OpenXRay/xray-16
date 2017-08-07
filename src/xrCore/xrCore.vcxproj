@@ -419,7 +419,7 @@
     <None Include="Debug\DXTrace.inl" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Externals\cryptlib.vcxproj">
+    <ProjectReference Include="..\..\Externals\cryptlib.vcxproj">
       <Project>{c39f4b46-6e89-4074-902e-ca57073044d2}</Project>
     </ProjectReference>
     <ProjectReference Include="$(xrExternals)lzo.vcxproj">
