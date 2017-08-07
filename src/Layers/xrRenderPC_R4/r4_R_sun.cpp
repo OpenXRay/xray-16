@@ -247,6 +247,7 @@ struct DumbClipper
     {
         return D3DXVECTOR3((i & 1) ? bb.vMin.x : bb.vMax.x, (i & 2) ? bb.vMin.y : bb.vMax.y, (i & 4) ? bb.vMin.z : bb.vMax.z);
     }
+
     Fbox clipped_AABB(xr_vector<Fbox, render_alloc<Fbox3>>& src, Fmatrix& xf)
     {
         Fbox3 result;
@@ -963,10 +964,10 @@ void CRender::render_sun_near()
             scissor.modify(xf);
         }
         s32 limit = RImplementation.o.smapsize - 1;
-        fuckingsun->X.D.vMinX = clampr(iFloor(scissor.vMin.x), 0, limit);
-        fuckingsun->X.D.vMaxX = clampr(iCeil(scissor.vMax.x), 0, limit);
-        fuckingsun->X.D.vMinY = clampr(iFloor(scissor.vMin.y), 0, limit);
-        fuckingsun->X.D.vMaxY = clampr(iCeil(scissor.vMax.y), 0, limit);
+        fuckingsun->X.D.minX = clampr(iFloor(scissor.vMin.x), 0, limit);
+        fuckingsun->X.D.maxX = clampr(iCeil(scissor.vMax.x), 0, limit);
+        fuckingsun->X.D.minY = clampr(iFloor(scissor.vMin.y), 0, limit);
+        fuckingsun->X.D.maxY = clampr(iCeil(scissor.vMax.y), 0, limit);
 
         // full-xform
         FPU::m24r();

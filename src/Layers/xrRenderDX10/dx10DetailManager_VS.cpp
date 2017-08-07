@@ -167,6 +167,7 @@ void CDetailManager::hw_Render_dump(
                 for (; _vI != _vE; _vI++)
                 {
                     SlotItemVec* items = *_vI;
+
                     SlotItemVecIt _iI = items->begin();
                     SlotItemVecIt _iE = items->end();
                     for (; _iI != _iE; _iI++)
@@ -216,7 +217,7 @@ void CDetailManager::hw_Render_dump(
                         }
                     }
                 }
-                // flush if nessecary
+                // flush if necessary
                 if (dwBatch)
                 {
                     RImplementation.BasicStats.DetailCount += dwBatch;
