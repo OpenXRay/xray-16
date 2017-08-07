@@ -6,8 +6,6 @@
 
 #include <d3dx9math.h>
 
-#pragma comment( lib, "d3dx9.lib"		)
-
 const float tweak_COP_initial_offs = 1200.f;
 const float tweak_ortho_xform_initial_offs = 1000.f; //. ?
 const float tweak_guaranteed_range = 20.f; //. ?

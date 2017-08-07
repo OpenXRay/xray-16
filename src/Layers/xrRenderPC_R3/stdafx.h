@@ -46,8 +46,8 @@
 #include "xrEngine/Render.h"
 #include "Common/_d3d_extensions.h"
 #include "xrEngine/IGame_Level.h"
-#include "Layers/xrRender/blenders\blender.h"
-#include "Layers/xrRender/blenders\blender_clsid.h"
+#include "Layers/xrRender/blenders/Blender.h"
+#include "Layers/xrRender/blenders/Blender_CLSID.h"
 #include "Layers/xrRender/xrRender_console.h"
 #include "r3.h"
 
