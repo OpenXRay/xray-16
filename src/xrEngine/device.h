@@ -65,7 +65,6 @@ public:
     BOOL b_is_Ready;
     BOOL b_is_Active;
 
-public:
     // Engine flow-control
     u32 dwFrame;
 
@@ -123,7 +122,6 @@ protected:
 // refs
 class ENGINE_API CRenderDevice : public CRenderDeviceBase
 {
-private:
     // Main objects used for creating and rendering the 3D scene
     u32 m_dwWindowStyle;
     RECT m_rcWindowBounds;
@@ -147,7 +145,6 @@ public:
     // BOOL b_is_Active;
     void OnWM_Activate(WPARAM wParam, LPARAM lParam);
 
-public:
     // ref_shader m_WireShader;
     // ref_shader m_SelectionShader;
 
@@ -171,7 +168,7 @@ public:
     }
 
     void DumpResourcesMemoryUsage() { GlobalEnv.Render->ResourcesDumpMemoryUsage(); }
-public:
+
     CRegistrator<pureFrame> seqFrameMT;
     CRegistrator<pureDeviceReset> seqDeviceReset;
     xr_vector<fastdelegate::FastDelegate0<>> seqParallel;
@@ -225,7 +222,6 @@ public:
     virtual const RenderDeviceStatictics& GetStats() const override { return stats; }
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override;
 
-public:
     void time_factor(const float& time_factor)
     {
         Timer.time_factor(time_factor);
@@ -270,11 +266,9 @@ private:
     void initialize_editor();
     void message_loop_editor();
 
-private:
     typedef editor::initialize_function_ptr initialize_function_ptr;
     typedef editor::finalize_function_ptr finalize_function_ptr;
 
-private:
     HMODULE m_editor_module;
     initialize_function_ptr m_editor_initialize;
     finalize_function_ptr m_editor_finalize;
