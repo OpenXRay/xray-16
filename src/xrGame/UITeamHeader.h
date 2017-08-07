@@ -28,7 +28,7 @@ private:
     TranslatedStrings m_translated_strings;
 
     UITeamState const* const m_parent;
-    XML_NODE* m_team_header_root;
+    XML_NODE m_team_header_root;
 
     void InitColumnsStatics(CUIXml& uiXml);
     void InitFieldsStatics(CUIXml& uiXml);

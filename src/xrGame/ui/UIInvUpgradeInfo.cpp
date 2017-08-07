@@ -37,8 +37,8 @@ void UIInvUpgradeInfo::init_from_xml(LPCSTR xml_name)
     ui_xml.Load(CONFIG_PATH, UI_PATH, xml_name);
     CUIXmlInit xml_init;
 
-    XML_NODE* stored_root = ui_xml.GetLocalRoot();
-    XML_NODE* node = ui_xml.NavigateToNode("upgrade_info", 0);
+    XML_NODE stored_root = ui_xml.GetLocalRoot();
+    XML_NODE node = ui_xml.NavigateToNode("upgrade_info", 0);
     ui_xml.SetLocalRoot(node);
 
     xml_init.InitWindow(ui_xml, "main_frame", 0, this);

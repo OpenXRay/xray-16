@@ -49,7 +49,7 @@ void CUIStatsPlayerList::Init(CUIXml& xml_doc, LPCSTR path)
 
     // init item structure
     int tabsCount = xml_doc.GetNodesNum(path, 0, "field");
-    XML_NODE* tab_node = xml_doc.NavigateToNode(path, 0);
+    XML_NODE tab_node = xml_doc.NavigateToNode(path, 0);
     xml_doc.SetLocalRoot(tab_node);
 
     for (int i = 0; i < tabsCount; ++i)

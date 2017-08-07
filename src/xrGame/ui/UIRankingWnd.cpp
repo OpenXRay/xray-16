@@ -97,8 +97,8 @@ void CUIRankingWnd::Init()
 
     m_center_caption = UIHelper::CreateTextWnd(xml, "center_caption", this);
 
-    XML_NODE* stored_root = xml.GetLocalRoot();
-    XML_NODE* node = xml.NavigateToNode("stat_info", 0);
+    XML_NODE stored_root = xml.GetLocalRoot();
+    XML_NODE node = xml.NavigateToNode("stat_info", 0);
     xml.SetLocalRoot(node);
 
     m_stat_count = (u32)xml.GetNodesNum(node, "stat");

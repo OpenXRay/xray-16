@@ -35,8 +35,8 @@ void UITaskListWnd::init_from_xml(CUIXml& xml, LPCSTR path)
     VERIFY(hint_wnd);
     CUIXmlInit::InitWindow(xml, path, 0, this);
 
-    XML_NODE* stored_root = xml.GetLocalRoot();
-    XML_NODE* tmpl_root = xml.NavigateToNode(path, 0);
+    XML_NODE stored_root = xml.GetLocalRoot();
+    XML_NODE tmpl_root = xml.NavigateToNode(path, 0);
     xml.SetLocalRoot(tmpl_root);
 
     m_background = UIHelper::CreateFrameWindow(xml, "background_frame", this);

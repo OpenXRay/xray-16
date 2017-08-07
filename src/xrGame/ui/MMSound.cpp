@@ -12,7 +12,7 @@ void CMMSound::Init(CUIXml& xml_doc, LPCSTR path)
 
     int nodes_num = xml_doc.GetNodesNum(path, 0, "menu_music");
 
-    XML_NODE* tab_node = xml_doc.NavigateToNode(path, 0);
+    XML_NODE tab_node = xml_doc.NavigateToNode(path, 0);
     xml_doc.SetLocalRoot(tab_node);
     for (int i = 0; i < nodes_num; ++i)
         m_play_list.push_back(xml_doc.Read("menu_music", i, ""));

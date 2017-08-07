@@ -203,7 +203,7 @@ void CPhraseDialog::load_shared(LPCSTR)
     pXML->SetLocalRoot(pXML->GetRoot());
 
     // loading from XML
-    XML_NODE* dialog_node = pXML->NavigateToNode(id_to_index::tag_name, item_data.pos_in_file);
+    XML_NODE dialog_node = pXML->NavigateToNode(id_to_index::tag_name, item_data.pos_in_file);
     THROW3(dialog_node, "dialog id=", *item_data.id);
 
     pXML->SetLocalRoot(dialog_node);
@@ -219,7 +219,7 @@ void CPhraseDialog::load_shared(LPCSTR)
     //заполнить граф диалога фразами
     data()->m_PhraseGraph.clear();
 
-    XML_NODE* phrase_list_node = pXML->NavigateToNode(dialog_node, "phrase_list", 0);
+    XML_NODE phrase_list_node = pXML->NavigateToNode(dialog_node, "phrase_list", 0);
     if (NULL == phrase_list_node)
     {
         LPCSTR func = pXML->Read(dialog_node, "init_func", 0, "");
@@ -242,7 +242,7 @@ void CPhraseDialog::load_shared(LPCSTR)
 #endif
 
     //ищем стартовую фразу
-    XML_NODE* phrase_node = pXML->NavigateToNodeWithAttribute("phrase", "id", "0");
+    XML_NODE phrase_node = pXML->NavigateToNodeWithAttribute("phrase", "id", "0");
     THROW(phrase_node);
     AddPhrase(pXML, phrase_node, "0", "");
 }
@@ -273,7 +273,7 @@ CPhrase* CPhraseDialog::AddPhrase(
 }
 
 void CPhraseDialog::AddPhrase(
-    CUIXml* pXml, XML_NODE* phrase_node, const shared_str& phrase_id, const shared_str& prev_phrase_id)
+    CUIXml* pXml, XML_NODE phrase_node, const shared_str& phrase_id, const shared_str& prev_phrase_id)
 {
     LPCSTR sText = pXml->Read(phrase_node, "text", 0, "");
     int gw = pXml->ReadInt(phrase_node, "goodwill", 0, -10000);
@@ -292,7 +292,7 @@ void CPhraseDialog::AddPhrase(
     for (int i = 0; i < next_num; ++i)
     {
         LPCSTR next_phrase_id_str = pXml->Read(phrase_node, "next", i, "");
-        XML_NODE* next_phrase_node = pXml->NavigateToNodeWithAttribute("phrase", "id", next_phrase_id_str);
+        XML_NODE next_phrase_node = pXml->NavigateToNodeWithAttribute("phrase", "id", next_phrase_id_str);
         R_ASSERT2(next_phrase_node, next_phrase_id_str);
         AddPhrase(pXml, next_phrase_node, next_phrase_id_str, phrase_id);
     }

@@ -56,7 +56,7 @@ void CEncyclopediaArticle::load_shared(LPCSTR)
     pXML->SetLocalRoot(pXML->GetRoot());
 
     // loading from XML
-    XML_NODE* pNode = pXML->NavigateToNode(id_to_index::tag_name, item_data.pos_in_file);
+    XML_NODE pNode = pXML->NavigateToNode(id_to_index::tag_name, item_data.pos_in_file);
     THROW3(pNode, "encyclopedia article id=", *item_data.id);
 
     //текст

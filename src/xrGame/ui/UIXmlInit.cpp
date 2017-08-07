@@ -646,14 +646,14 @@ bool CUIXmlInit::InitProgressShape(CUIXml& xml_doc, LPCSTR path, int index, CUIP
 
 void CUIXmlInit::InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index, CUIWindow* pParentWnd)
 {
-    XML_NODE* _stored_root = xml_doc.GetLocalRoot();
+    XML_NODE _stored_root = xml_doc.GetLocalRoot();
     xml_doc.SetLocalRoot(xml_doc.NavigateToNode(path, index));
 
-    XML_NODE* curr_root = xml_doc.GetLocalRoot();
+    XML_NODE curr_root = xml_doc.GetLocalRoot();
     if (!curr_root)
         curr_root = xml_doc.GetRoot();
 
-    XML_NODE* node = curr_root->IterateChildren(NULL);
+    XML_NODE node = curr_root.firstChild();
     int cnt_static = 0;
     int cnt_frameline = 0;
     int cnt_text = 0;
@@ -661,7 +661,7 @@ void CUIXmlInit::InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index, CU
 
     while (node)
     {
-        LPCSTR node_name = node->Value();
+        LPCSTR node_name = node.value();
         if (0 == _stricmp(node_name, "auto_static"))
         {
             CUIStatic* pUIStatic = new CUIStatic();
@@ -688,7 +688,7 @@ void CUIXmlInit::InitAutoStaticGroup(CUIXml& xml_doc, LPCSTR path, int index, CU
         {
             ++cnt_text;
         }
-        node = curr_root->IterateChildren(node);
+        node = node.nextSibling();
     }
     /*
         CUIStatic* pUIStatic				= NULL;
@@ -714,7 +714,7 @@ void CUIXmlInit::InitAutoFrameLineGroup(CUIXml& xml_doc, LPCSTR path, int index,
     {
         return;
     }
-    XML_NODE* _stored_root = xml_doc.GetLocalRoot();
+    XML_NODE _stored_root = xml_doc.GetLocalRoot();
     xml_doc.SetLocalRoot(xml_doc.NavigateToNode(path, index));
 
     CUIFrameLineWnd* pUIFL = NULL;
@@ -809,7 +809,7 @@ bool CUIXmlInit::InitTabControl(CUIXml& xml_doc, LPCSTR path, int index, CUITabC
     int tabsCount = xml_doc.GetNodesNum(path, index, "button");
     int radio = xml_doc.ReadAttribInt(path, index, "radio");
 
-    XML_NODE* tab_node = xml_doc.NavigateToNode(path, index);
+    XML_NODE tab_node = xml_doc.NavigateToNode(path, index);
     xml_doc.SetLocalRoot(tab_node);
 
     CUITabButton* newButton;
@@ -1193,7 +1193,7 @@ bool CUIXmlInit::InitScrollView(CUIXml& xml_doc, LPCSTR path, int index, CUIScro
     /////////////////////////////////////////////////////////////////////
     int tabsCount = xml_doc.GetNodesNum(path, index, "text");
 
-    XML_NODE* _stored_root = xml_doc.GetLocalRoot();
+    XML_NODE _stored_root = xml_doc.GetLocalRoot();
     xml_doc.SetLocalRoot(xml_doc.NavigateToNode(path, index));
 
     for (int i = 0; i < tabsCount; ++i)

@@ -15,11 +15,11 @@
 
 void CUIInventoryUpgradeWnd::LoadCellsBacks(CUIXml& uiXml)
 {
-    XML_NODE* stored_root = uiXml.GetLocalRoot();
+    XML_NODE stored_root = uiXml.GetLocalRoot();
 
     int cnt = uiXml.GetNodesNum("cell_states", 0, "state");
 
-    XML_NODE* node = uiXml.NavigateToNode("cell_states", 0);
+    XML_NODE node = uiXml.NavigateToNode("cell_states", 0);
     uiXml.SetLocalRoot(node);
     for (int i_st = 0; i_st < cnt; ++i_st)
     {
@@ -119,9 +119,9 @@ bool CUIInventoryUpgradeWnd::VerirfyCells()
 
 void CUIInventoryUpgradeWnd::LoadSchemes(CUIXml& uiXml)
 {
-    XML_NODE* stored_root = uiXml.GetLocalRoot();
+    XML_NODE stored_root = uiXml.GetLocalRoot();
 
-    XML_NODE* tmpl_root = uiXml.NavigateToNode("templates", 0);
+    XML_NODE tmpl_root = uiXml.NavigateToNode("templates", 0);
     uiXml.SetLocalRoot(tmpl_root);
 
     Frect t_cell_item;
@@ -135,7 +135,7 @@ void CUIInventoryUpgradeWnd::LoadSchemes(CUIXml& uiXml)
     int tmpl_count = uiXml.GetNodesNum(tmpl_root, "template");
     for (int i_tmpl = 0; i_tmpl < tmpl_count; ++i_tmpl)
     {
-        XML_NODE* tmpl_node = uiXml.NavigateToNode("template", i_tmpl);
+        XML_NODE tmpl_node = uiXml.NavigateToNode("template", i_tmpl);
         uiXml.SetLocalRoot(tmpl_node);
 
         Scheme* scheme = new Scheme();
@@ -148,7 +148,7 @@ void CUIInventoryUpgradeWnd::LoadSchemes(CUIXml& uiXml)
         int clm_count = uiXml.GetNodesNum(tmpl_node, "column");
         for (int i_clm = 0; i_clm < clm_count; ++i_clm)
         {
-            XML_NODE* clm_node = uiXml.NavigateToNode("column", i_clm);
+            XML_NODE clm_node = uiXml.NavigateToNode("column", i_clm);
             uiXml.SetLocalRoot(clm_node);
 
             int cell_cnt = uiXml.GetNodesNum(clm_node, "cell");

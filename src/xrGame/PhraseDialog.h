@@ -133,7 +133,7 @@ protected:
     virtual void load_shared(LPCSTR);
 
     //рекурсивное добавление фраз в граф
-    void AddPhrase(CUIXml* pXml, XML_NODE* phrase_node, const shared_str& phrase_id, const shared_str& prev_phrase_id);
+    void AddPhrase(CUIXml* pXml, XML_NODE phrase_node, const shared_str& phrase_id, const shared_str& prev_phrase_id);
 
 public:
     CPhrase* AddPhrase(LPCSTR text, const shared_str& phrase_id, const shared_str& prev_phrase_id, int goodwil_level);

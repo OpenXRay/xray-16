@@ -64,7 +64,7 @@ void UITeamState::Init(CUIXml& uiXml, LPCSTR teamNodeName, int index)
     VERIFY2(teamXmlNode, make_string("team xml node (%s) not found", teamNodeName).c_str());
 
     CUIXmlInit::InitWindow(uiXml, teamNodeName, index, this);
-    XML_NODE* tempRoot = uiXml.GetLocalRoot();
+    XML_NODE tempRoot = uiXml.GetLocalRoot();
 
     uiXml.SetLocalRoot(teamXmlNode);
 
@@ -76,9 +76,9 @@ void UITeamState::Init(CUIXml& uiXml, LPCSTR teamNodeName, int index)
 }
 int UITeamState::InitScrollPanels()
 {
-    XML_NODE* scroll_panels_root = mainUiXml->NavigateToNode("scroll_panels", 0);
+    XML_NODE scroll_panels_root = mainUiXml->NavigateToNode("scroll_panels", 0);
     VERIFY2(scroll_panels_root, "scroll_panels tag not found");
-    XML_NODE* tempRoot = mainUiXml->GetLocalRoot();
+    XML_NODE tempRoot = mainUiXml->GetLocalRoot();
 
     int panels_count = mainUiXml->ReadAttribInt(scroll_panels_root, "count", 0);
     VERIFY2(panels_count, "count of scroll panels is 0, minimum is 1");
@@ -88,7 +88,7 @@ int UITeamState::InitScrollPanels()
         mainUiXml->SetLocalRoot(scroll_panels_root);
 
         TScrollPanel temp_panel;
-        XML_NODE* panel_root = mainUiXml->NavigateToNode("panel", i);
+        XML_NODE panel_root = mainUiXml->NavigateToNode("panel", i);
         if (!panel_root)
             break;
 
@@ -183,7 +183,7 @@ void UITeamState::AddPlayer(ClientID const& clientId)
 
     VERIFY2(mainUiXml, "main UI XML not initialized");
 
-    XML_NODE* tempRoot = mainUiXml->GetLocalRoot();
+    XML_NODE tempRoot = mainUiXml->GetLocalRoot();
     mainUiXml->SetLocalRoot(teamXmlNode);
 
     if (clientId == Game().local_svdpnid)

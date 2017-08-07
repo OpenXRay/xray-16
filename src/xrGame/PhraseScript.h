@@ -9,15 +9,13 @@
 
 class CGameObject;
 class CInventoryOwner;
-class TiXmlNode;
+class XML_NODE;
 class CUIXml;
-
-typedef TiXmlNode XML_NODE;
 
 class CDialogScriptHelper
 {
 public:
-    void Load(CUIXml* ui_xml, XML_NODE* phrase_node);
+    void Load(CUIXml* ui_xml, XML_NODE phrase_node);
 
     bool Precondition(const CGameObject* pSpeaker, LPCSTR dialog_id, LPCSTR phrase_id) const;
     void Action(const CGameObject* pSpeaker, LPCSTR dialog_id, LPCSTR phrase_id) const;
@@ -43,7 +41,7 @@ public:
 protected:
     //загрузка содержания последовательности тагов в контейнер строк
     template <class T>
-    void LoadSequence(CUIXml* ui_xml, XML_NODE* phrase_node, LPCSTR tag, T& str_vector);
+    void LoadSequence(CUIXml* ui_xml, XML_NODE phrase_node, LPCSTR tag, T& str_vector);
 
     //манипуляции с информацией во время вызовов Precondition и Action
     virtual bool CheckInfo(const CInventoryOwner* pOwner) const;

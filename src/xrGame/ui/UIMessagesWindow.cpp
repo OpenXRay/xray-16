@@ -80,7 +80,7 @@ void CUIMessagesWindow::Init(float x, float y, float width, float height)
 
         m_in_pending_mode = false;
 
-        XML_NODE* pending_chat_list = xml.NavigateToNode(CHAT_LOG_LIST_PENDING);
+        XML_NODE pending_chat_list = xml.NavigateToNode(CHAT_LOG_LIST_PENDING);
 
         if (pending_chat_list)
         {

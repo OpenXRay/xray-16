@@ -33,7 +33,7 @@ void CallFunctions(xr_vector<shared_str>& v)
 
 void CUISequenceItem::Load(CUIXml* xml, int idx)
 {
-    XML_NODE* _stored_root = xml->GetLocalRoot();
+    XML_NODE _stored_root = xml->GetLocalRoot();
     xml->SetLocalRoot(xml->NavigateToNode("item", idx));
     int disabled_cnt = xml->GetNodesNum(xml->GetLocalRoot(), "disabled_key");
 
@@ -125,7 +125,7 @@ void CUISequencer::Start(LPCSTR tutor_name)
         xml_init.InitWindow(uiXml, "global_wnd", 0, m_UIWindow);
     }
 
-    XML_NODE* bk = uiXml.GetLocalRoot();
+    XML_NODE bk = uiXml.GetLocalRoot();
     uiXml.SetLocalRoot(uiXml.NavigateToNode("global_wnd", 0));
     {
         LPCSTR str = uiXml.Read("pause_state", 0, "ignore");

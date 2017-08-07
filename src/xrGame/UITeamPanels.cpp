@@ -18,7 +18,7 @@ void UITeamPanels::Init(LPCSTR xmlName, LPCSTR panelsRootNode)
 {
     uiXml.Load(CONFIG_PATH, UI_PATH, xmlName);
     CUIXmlInit::InitWindow(uiXml, panelsRootNode, 0, this);
-    XML_NODE* panelsRoot = uiXml.NavigateToNode(panelsRootNode, 0);
+    XML_NODE panelsRoot = uiXml.NavigateToNode(panelsRootNode, 0);
     VERIFY(panelsRoot);
     uiXml.SetLocalRoot(panelsRoot);
 
@@ -34,7 +34,7 @@ void UITeamPanels::InitAllFrames(shared_str const& frame_node)
     int number_of_items = uiXml.GetNodesNum(uiXml.GetLocalRoot(), frame_node.c_str());
     for (int i = 0; i < number_of_items; ++i)
     {
-        XML_NODE* tempFrameNode = uiXml.NavigateToNode(frame_node.c_str(), i);
+        XML_NODE tempFrameNode = uiXml.NavigateToNode(frame_node.c_str(), i);
         if (!tempFrameNode)
             break;
         LPCSTR frame_class = uiXml.ReadAttrib(tempFrameNode, "class", "class_of_frame_not_defined");
@@ -60,7 +60,7 @@ void UITeamPanels::InitAllTeams(shared_str const& team_node)
     int numberOfTeams = uiXml.GetNodesNum(uiXml.GetLocalRoot(), team_node.c_str());
     for (int i = 0; i < numberOfTeams; ++i)
     {
-        XML_NODE* tempTeamNode = uiXml.NavigateToNode(team_node.c_str(), i);
+        XML_NODE tempTeamNode = uiXml.NavigateToNode(team_node.c_str(), i);
         if (!tempTeamNode)
             break;
         LPCSTR tempTeamName = uiXml.ReadAttrib(tempTeamNode, "tname", "team_not_set_in_tname_xml_attribute");

@@ -81,9 +81,9 @@ ALife::EInfluenceType CUIHudStatesWnd::get_indik_type(ALife::EHitType hit_type)
 void CUIHudStatesWnd::InitFromXml(CUIXml& xml, LPCSTR path)
 {
     CUIXmlInit::InitWindow(xml, path, 0, this);
-    XML_NODE* stored_root = xml.GetLocalRoot();
+    XML_NODE stored_root = xml.GetLocalRoot();
 
-    XML_NODE* new_root = xml.NavigateToNode(path, 0);
+    XML_NODE new_root = xml.NavigateToNode(path, 0);
     xml.SetLocalRoot(new_root);
 
     m_back = UIHelper::CreateStatic(xml, "back", this);

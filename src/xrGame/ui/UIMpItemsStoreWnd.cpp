@@ -20,9 +20,9 @@ CStoreHierarchy::CStoreHierarchy()
 CStoreHierarchy::~CStoreHierarchy() { delete_data(m_root); }
 void CStoreHierarchy::LoadLevel(CUIXml& xml, int index, item* _item, int depth_level)
 {
-    XML_NODE* stored_root = xml.GetLocalRoot();
+    XML_NODE stored_root = xml.GetLocalRoot();
 
-    XML_NODE* node = xml.NavigateToNode("level", index);
+    XML_NODE node = xml.NavigateToNode("level", index);
     _item->m_name = xml.ReadAttrib("level", index, "name", NULL);
     _item->m_btn_xml_name = xml.ReadAttrib("level", index, "btn_ref", NULL);
 
@@ -32,7 +32,7 @@ void CStoreHierarchy::LoadLevel(CUIXml& xml, int index, item* _item, int depth_l
         _item->m_button = btn;
         btn->SetAutoDelete(false);
 
-        XML_NODE* stored_root2 = xml.GetLocalRoot();
+        XML_NODE stored_root2 = xml.GetLocalRoot();
         xml.SetLocalRoot(xml.GetRoot());
         CUIXmlInit::InitTabButtonMP(xml, _item->m_btn_xml_name.c_str(), 0, btn);
         btn->m_btn_id = _item->m_name;
@@ -63,9 +63,9 @@ void CStoreHierarchy::LoadLevel(CUIXml& xml, int index, item* _item, int depth_l
 
 void CStoreHierarchy::Init(CUIXml& xml, LPCSTR path)
 {
-    XML_NODE* p_stored_root = xml.GetLocalRoot();
+    XML_NODE p_stored_root = xml.GetLocalRoot();
 
-    XML_NODE* node = xml.NavigateToNode(path, 0);
+    XML_NODE node = xml.NavigateToNode(path, 0);
     xml.SetLocalRoot(node);
 
     m_root = new CStoreHierarchy::item();

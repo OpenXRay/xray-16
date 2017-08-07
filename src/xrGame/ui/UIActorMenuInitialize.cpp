@@ -190,7 +190,7 @@ void CUIActorMenu::Construct()
     m_ActorStateInfo->SetAutoDelete(true);
     AttachChild(m_ActorStateInfo);
 
-    XML_NODE* stored_root = uiXml.GetLocalRoot();
+    XML_NODE stored_root = uiXml.GetLocalRoot();
     uiXml.SetLocalRoot(uiXml.NavigateToNode("action_sounds", 0));
     ::Sound->create(sounds[eSndOpen], uiXml.Read("snd_open", 0, NULL), st_Effect, sg_SourceType);
     ::Sound->create(sounds[eSndClose], uiXml.Read("snd_close", 0, NULL), st_Effect, sg_SourceType);
