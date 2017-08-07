@@ -33,7 +33,7 @@ namespace
 {
 HWND logoWindow = nullptr;
 
-void RunBenchmark(const char* name);
+void RunBenchmark(pcstr name);
 }
 
 void InitEngine()
@@ -52,7 +52,7 @@ private:
 
 public:
     explicit PathIncludePred(const xr_auth_strings_t* ignoredPaths) : ignored(ignoredPaths) {}
-    bool xr_stdcall IsIncluded(const char* path)
+    bool xr_stdcall IsIncluded(pcstr path)
     {
         if (!ignored)
             return true;
@@ -163,10 +163,10 @@ void Startup()
     execUserScript();
     InitSound();
     // ...command line for auto start
-    const char* startArgs = strstr(Core.Params, "-start ");
+    pcstr startArgs = strstr(Core.Params, "-start ");
     if (startArgs)
         Console->Execute(startArgs + 1);
-    const char* loadArgs = strstr(Core.Params, "-load ");
+    pcstr loadArgs = strstr(Core.Params, "-load ");
     if (loadArgs)
         Console->Execute(loadArgs + 1);
     // Initialize APP
@@ -180,7 +180,7 @@ void Startup()
     g_SpatialSpacePhysic = new ISpatial_DB("Spatial phys");
     // Destroy LOGO
     DestroyWindow(logoWindow);
-    logoWindow = NULL;
+    logoWindow = nullptr;
     // Main cycle
     Memory.mem_usage();
     Device.Run();
@@ -290,7 +290,7 @@ public:
     }
 };
 
-int RunApplication(const char* commandLine)
+int RunApplication(pcstr commandLine)
 {
 #ifdef DEDICATED_SERVER
     g_dedicated_server = true;
@@ -324,7 +324,8 @@ int RunApplication(const char* commandLine)
     UpdateWindow(logoWindow);
     *g_sLaunchOnExit_app = 0;
     *g_sLaunchOnExit_params = 0;
-    const char* fsltx = "-fsltx ";
+
+    pcstr fsltx = "-fsltx ";
     string_path fsgame = "";
     if (strstr(commandLine, fsltx))
     {
@@ -349,7 +350,8 @@ int RunApplication(const char* commandLine)
     InitConsole();
     Engine.External.CreateRendererList();
     Msg("command line %s", commandLine);
-    LPCSTR benchName = "-batch_benchmark ";
+
+    pcstr benchName = "-batch_benchmark ";
     if (strstr(commandLine, benchName))
     {
         u32 sz = xr_strlen(benchName);
@@ -358,7 +360,8 @@ int RunApplication(const char* commandLine)
         RunBenchmark(benchmarkName);
         return 0;
     }
-    LPCSTR sashName = "-openautomate ";
+
+    pcstr sashName = "-openautomate ";
     if (strstr(commandLine, sashName))
     {
         u32 sz = xr_strlen(sashName);
@@ -368,6 +371,7 @@ int RunApplication(const char* commandLine)
         g_SASH.MainLoop();
         return 0;
     }
+
 #ifndef DEDICATED_SERVER
     if (strstr(Core.Params, "-r4"))
         Console->Execute("renderer renderer_r4");
@@ -398,7 +402,7 @@ int RunApplication(const char* commandLine)
         si.cb = sizeof(si);
         PROCESS_INFORMATION pi = {};
         // We use CreateProcess to setup working folder
-        const char* tempDir = xr_strlen(g_sLaunchWorkingFolder) ? g_sLaunchWorkingFolder : nullptr;
+        pcstr tempDir = xr_strlen(g_sLaunchWorkingFolder) ? g_sLaunchWorkingFolder : nullptr;
         CreateProcess(g_sLaunchOnExit_app, g_sLaunchOnExit_params, NULL, NULL, FALSE, 0, NULL, tempDir, &si, &pi);
     }
     return 0;
@@ -406,7 +410,7 @@ int RunApplication(const char* commandLine)
 
 namespace
 {
-void RunBenchmark(const char* name)
+void RunBenchmark(pcstr name)
 {
     g_bBenchmark = true;
     string_path cfgPath;
