@@ -33,9 +33,16 @@ enum EBoostParams
     eBoostMaxCount,
 };
 
-// XXX: Place this array in a C++ fource file, not the header.
-static const char* const ef_boosters_section_names[] =
+// tamlin: XXX: Place this array in a C++ source file, not the header.
+// Xottab_DUTY: Array currently used in eatable_item.cpp and UIBoosterInfo.cpp
+static const pcstr ef_boosters_section_names[] =
 {
+    "boost_health_restore",
+    "boost_power_restore",
+    "boost_radiation_restore",
+    "boost_bleeding_restore",
+    "boost_max_weight",
+    "boost_radiation_protection",
     "boost_telepat_protection",
     "boost_chemburn_protection",
     "boost_burn_immunity",
