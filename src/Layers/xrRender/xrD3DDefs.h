@@ -1,6 +1,6 @@
+#pragma once
 #ifndef xrD3DDefs_included
 #define xrD3DDefs_included
-#pragma once
 
 #if defined(USE_DX11) || defined(USE_DX10)
 #include "Layers/xrRenderDX10/DXCommonTypes.h"

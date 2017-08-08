@@ -1,6 +1,6 @@
+#pragma once
 #ifndef EnvironmentRender_included
 #define EnvironmentRender_included
-#pragma once
 
 namespace particles_systems
 {
