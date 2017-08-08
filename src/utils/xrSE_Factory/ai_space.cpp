@@ -16,7 +16,7 @@ CAI_Space::CAI_Space() { m_script_engine = nullptr; }
 void CAI_Space::init()
 {
     VERIFY(!m_script_engine);
-    m_script_engine = xr_new<CScriptEngine>();
+    m_script_engine = new CScriptEngine();
     m_script_engine->init();
 #error additional initialization is required here: RegisterScriptClasses + object_factory().register_script()
     // RegisterScriptClasses();

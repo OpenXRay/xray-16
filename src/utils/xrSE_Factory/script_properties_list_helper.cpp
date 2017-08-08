@@ -29,7 +29,7 @@ struct CWrapHelper
     template <bool a>
     static T* wrap_value(luabind::object object, LPCSTR name)
     {
-        CScriptValueWrapper<T>* value = xr_new<CScriptValueWrapper<T>>(object, name);
+        CScriptValueWrapper<T>* value = new CScriptValueWrapper<T>(object, name);
         owner(object)->add(value);
         return (value->value());
     }
@@ -49,7 +49,7 @@ struct CWrapHelper<bool>
     template <bool a>
     static BOOL* wrap_value(luabind::object object, LPCSTR name)
     {
-        CScriptValueWrapper<bool>* value = xr_new<CScriptValueWrapper<bool>>(object, name);
+        CScriptValueWrapper<bool>* value = new CScriptValueWrapper<bool>(object, name);
         owner(object)->add(value);
         return (value->value());
     }
@@ -57,7 +57,7 @@ struct CWrapHelper<bool>
     template <bool a>
     static BOOL* wrap_value(luabind::object object, luabind::object table, LPCSTR name)
     {
-        CScriptValueWrapper<bool>* value = xr_new<CScriptValueWrapper<bool>>(table, name);
+        CScriptValueWrapper<bool>* value = new CScriptValueWrapper<bool>(table, name);
         owner(object)->add(value);
         return (value->value());
     }
