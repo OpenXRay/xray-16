@@ -31,14 +31,20 @@
 #if !defined(_CPPUNWIND)
 #error Please enable exceptions...
 #endif
+
 #ifndef _MT
 #error Please enable multi-threaded library...
 #endif
+
 #ifdef NDEBUG
 #define XRAY_EXCEPTIONS 0
 #define LUABIND_NO_EXCEPTIONS
+#define XR_NOEXCEPT throw()
+#define XR_NOEXCEPT_OP(x)
 #else
 #define XRAY_EXCEPTIONS 1
+#define XR_NOEXCEPT noexcept
+#define XR_NOEXCEPT_OP(x) noexcept(x)
 #endif
 
 #include "Common/Platform.hpp"

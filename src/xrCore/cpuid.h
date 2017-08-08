@@ -2,6 +2,17 @@
 #ifndef _INC_CPUID
 #define _INC_CPUID
 
+#ifndef xrCoreH
+// If xrCore.h is not included then compilation fails
+// This fixes it.
+// XXX: Find a better solution
+#ifdef NDEBUG
+#define XR_NOEXCEPT throw()
+#else
+#define XR_NOEXCEPT noexcept
+#endif
+#endif
+
 enum class CpuFeature : u32
 {
     Mmx = 0x0001,
@@ -36,9 +47,9 @@ struct processor_info
     // except 2nd (and upper) logical threads
     // of the same physical core
 
-    bool hasFeature(const CpuFeature feature) const noexcept
+    bool hasFeature(const CpuFeature feature) const XR_NOEXCEPT
     {
-        return features & static_cast<u32>(feature);
+        return (features & static_cast<u32>(feature)) != 0;
     }
 };
 
