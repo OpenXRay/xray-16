@@ -563,9 +563,6 @@
     <ClInclude Include="intrusive_ptr.h">
       <Filter>intrusive_ptr</Filter>
     </ClInclude>
-    <ClInclude Include="intrusive_ptr_inline.h">
-      <Filter>intrusive_ptr</Filter>
-    </ClInclude>
     <ClInclude Include="memory_monitor.h">
       <Filter>memory_monitor</Filter>
     </ClInclude>

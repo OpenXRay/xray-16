@@ -327,7 +327,6 @@
     <ClInclude Include="FS_internal.h" />
     <ClInclude Include="FTimer.h" />
     <ClInclude Include="intrusive_ptr.h" />
-    <ClInclude Include="intrusive_ptr_inline.h" />
     <ClInclude Include="LocatorAPI.h" />
     <ClInclude Include="LocatorAPI_defs.h" />
     <ClInclude Include="log.h" />

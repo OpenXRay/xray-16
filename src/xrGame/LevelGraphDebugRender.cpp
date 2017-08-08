@@ -701,7 +701,7 @@ void LevelGraphDebugRender::DrawRestrictions()
     const float yOffset = 0.1;
     for (auto& pair : spaceRestrictionMgr.restrictions())
     {
-        if (!pair.second->m_ref_count)
+        if (pair.second->released())
             continue;
         if (!pair.second->initialized())
             continue;
