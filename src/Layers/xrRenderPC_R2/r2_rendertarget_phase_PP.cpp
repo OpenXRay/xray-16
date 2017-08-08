@@ -58,7 +58,7 @@ void CRenderTarget::u_calc_tc_duality_ss(Fvector2& r0, Fvector2& r1, Fvector2& l
     l1.set(p1.x, p1.y);
 }
 
-BOOL CRenderTarget::u_need_PP()
+bool CRenderTarget::u_need_PP()
 {
     bool _blur = (param_blur > 0.001f);
     bool _gray = (param_gray > 0.001f);
