@@ -10,4 +10,3 @@
 
 //int* p = new int;
 
-//int main() {}
