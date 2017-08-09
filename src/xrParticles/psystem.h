@@ -1,13 +1,15 @@
+#pragma once
 #ifndef PSystemH
 #define PSystemH
-#pragma once
 
 #include "Common/Platform.hpp"
+#include "xrCore/_vector3d.h"
 
 #ifdef XR_PARTICLES_EXPORTS
 #define PARTICLES_API XR_EXPORT
 #else
 #define PARTICLES_API XR_IMPORT
+
 #ifdef _EDITOR
 #pragma comment(lib, "x:\\xrParticlesB.lib")
 #else

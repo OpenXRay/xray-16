@@ -176,8 +176,11 @@ void CRender::render_rain()
 
         // D3DXMatrixOrthoOffCenterLH	((D3DXMATRIX*)&mdir_Project,bb.vMin.x,bb.vMax.x,  bb.vMin.y,bb.vMax.y,
         // bb.vMin.z-tweak_rain_ortho_xform_initial_offs,bb.vMax.z);
-        D3DXMatrixOrthoOffCenterLH((D3DXMATRIX*)&mdir_Project, bb.min.x, bb.max.x, bb.min.y, bb.max.y,
-            bb.min.z - tweak_rain_ortho_xform_initial_offs, bb.min.z + 2 * tweak_rain_ortho_xform_initial_offs);
+        D3DXMatrixOrthoOffCenterLH((D3DXMATRIX*)&mdir_Project,
+            bb.vMin.x, bb.vMax.x,
+            bb.vMin.y, bb.vMax.y,
+            bb.vMin.z - tweak_rain_ortho_xform_initial_offs,
+            bb.vMin.z + 2 * tweak_rain_ortho_xform_initial_offs);
 
         cull_xform.mul(mdir_Project, mdir_View);
 

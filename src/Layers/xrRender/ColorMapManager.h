@@ -1,6 +1,6 @@
+#pragma once
 #ifndef ColorMapManager_included
 #define ColorMapManager_included
-#pragma once
 
 //	Reduces amount of work if the texture was not changed.
 //	Stores used textures in a separate map to avoid removal of

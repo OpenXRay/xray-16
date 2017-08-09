@@ -6,9 +6,9 @@
 #define DetailManagerH
 #pragma once
 
-#include "xrCore/xrpool.h"
-#include "detailformat.h"
-#include "detailmodel.h"
+#include "xrCore/xrPool.h"
+#include "DetailFormat.h"
+#include "DetailModel.h"
 
 #ifdef _EDITOR
 //.	#include	"ESceneClassList.h"
