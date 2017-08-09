@@ -300,10 +300,10 @@ void CParticleGroup::SItem::Stop(BOOL def_stop)
         _children_free.clear();
     }
 }
-BOOL CParticleGroup::SItem::IsPlaying()
+bool CParticleGroup::SItem::IsPlaying() const
 {
     CParticleEffect* E = static_cast<CParticleEffect*>(_effect);
-    return E ? E->IsPlaying() : FALSE;
+    return E ? E->IsPlaying() : false;
 }
 
 void CParticleGroup::SItem::UpdateParent(const Fmatrix& m, const Fvector& velocity, BOOL bXFORM)

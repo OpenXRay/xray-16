@@ -109,7 +109,7 @@ public:
         void OnFrame(u32 u_dt, const CPGDef::SEffect& def, Fbox& box, bool& bPlaying);
 
         u32 ParticlesCount();
-        BOOL IsPlaying();
+        bool IsPlaying() const;
         void Play();
         void Stop(BOOL def_stop);
     };
