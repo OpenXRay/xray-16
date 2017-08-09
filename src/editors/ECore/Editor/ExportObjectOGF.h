@@ -57,8 +57,8 @@ struct SOGFFace
     WORD v[3];
 };
 
-DEFINE_VECTOR(SOGFVert, OGFVertVec, OGFVertIt);
-DEFINE_VECTOR(SOGFFace, OGFFaceVec, OGFFaceIt);
+using OGFVertVec = xr_vector<SOGFVert>;
+using OGFFaceVec = xr_vector<SOGFFace>;
 
 class CObjectOGFCollectorPacked
 {
@@ -131,7 +131,7 @@ public:
 };
 
 //----------------------------------------------------
-DEFINE_VECTOR(CObjectOGFCollectorPacked*, COGFCPVec, COGFCPIt)
+using COGFCPVec = xr_vector<CObjectOGFCollectorPacked*>;
 
 class ECORE_API CExportObjectOGF
 {
@@ -152,7 +152,7 @@ class ECORE_API CExportObjectOGF
 
         void CalculateTB()
         {
-            for (COGFCPIt it = m_Parts.begin(); it != m_Parts.end(); ++it)
+            for (auto it = m_Parts.begin(); it != m_Parts.end(); ++it)
                 (*it)->CalculateTB();
         }
         void MakeProgressive();
@@ -161,7 +161,7 @@ class ECORE_API CExportObjectOGF
         void ComputeBounding()
         {
             m_Box.invalidate();
-            for (COGFCPIt it = m_Parts.begin(); it != m_Parts.end(); it++)
+            for (auto it = m_Parts.begin(); it != m_Parts.end(); it++)
             {
                 CObjectOGFCollectorPacked* part = *it;
                 part->ComputeBounding();
@@ -169,7 +169,7 @@ class ECORE_API CExportObjectOGF
             }
         }
     };
-    DEFINE_VECTOR(SSplit*, SplitVec, SplitIt);
+    using SplitVec = xr_vector<SSplit*>;
     SplitVec m_Splits;
     CEditableObject* m_Source;
     Fbox m_Box;
@@ -179,7 +179,7 @@ class ECORE_API CExportObjectOGF
     void ComputeBounding()
     {
         m_Box.invalidate();
-        for (SplitIt it = m_Splits.begin(); it != m_Splits.end(); it++)
+        for (auto it = m_Splits.begin(); it != m_Splits.end(); it++)
         {
             (*it)->ComputeBounding();
             m_Box.merge((*it)->m_Box);

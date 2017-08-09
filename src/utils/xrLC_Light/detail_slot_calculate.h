@@ -11,7 +11,8 @@ using Clock = std::chrono::high_resolution_clock;
 using Time = Clock::time_point;
 using Duration = Clock::duration;
 
-DEFINE_VECTOR(u32, DWORDVec, DWORDIt);
+using DWORDVec = xr_vector<u32>;
+
 namespace CDB
 {
 class COLLIDER;

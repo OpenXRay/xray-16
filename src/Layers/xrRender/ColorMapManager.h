@@ -21,7 +21,7 @@ private:
         bool operator()(const shared_str& x, const shared_str& y) const { return x < y; }
     };
 
-    DEFINE_MAP_PRED(shared_str, ref_texture, map_Tex, map_TexIt, str_pred);
+    using map_Tex = xr_map<shared_str, ref_texture, str_pred>;
 
     ref_texture m_CMap[2];
     shared_str m_strCMap[2];

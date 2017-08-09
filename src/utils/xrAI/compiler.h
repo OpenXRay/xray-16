@@ -51,7 +51,7 @@ struct vertex // definition of "patch" or "node"
     void PointBL(Fvector& D);
 };
 
-DEF_VECTOR(DWORDs, u32);
+using DWORDs = xr_vector<u32>;
 
 #include "xrAICore/Navigation/level_graph.h"
 
@@ -81,10 +81,10 @@ struct SCover
     u8 cover[4];
 };
 
-DEF_VECTOR(Nodes, vertex);
-DEF_VECTOR(Vectors, Fvector);
-DEF_VECTOR(Marks, BYTE);
-DEF_VECTOR(Lights, R_Light);
+using Nodes = xr_vector<vertex>;
+using Vectors = xr_vector<Fvector>;
+using Marks = xr_vector<BYTE>;
+using Lights = xr_vector<R_Light>;
 
 // data
 extern Nodes g_nodes;

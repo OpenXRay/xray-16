@@ -27,7 +27,7 @@ void CResourceManager::OnDeviceDestroy(BOOL)
     m_constants.clear();
 
     // Release blenders
-    for (map_BlenderIt b = m_blenders.begin(); b != m_blenders.end(); b++)
+    for (auto b = m_blenders.begin(); b != m_blenders.end(); b++)
     {
         xr_free((char*&)b->first);
         IBlender::Destroy(b->second);
@@ -35,7 +35,7 @@ void CResourceManager::OnDeviceDestroy(BOOL)
     m_blenders.clear();
 
     // destroy TD
-    for (map_TDIt _t = m_td.begin(); _t != m_td.end(); _t++)
+    for (auto _t = m_td.begin(); _t != m_td.end(); _t++)
     {
         xr_free((char*&)_t->first);
         xr_free((char*&)_t->second.T);
@@ -111,7 +111,7 @@ void CResourceManager::OnDeviceCreate(IReader* F)
                 chunk->seek(0);
                 B->Load(*chunk, desc.version);
 
-                std::pair<map_BlenderIt, bool> I = m_blenders.insert(std::make_pair(xr_strdup(desc.cName), B));
+                auto I = m_blenders.insert(std::make_pair(xr_strdup(desc.cName), B));
                 R_ASSERT2(I.second, "shader.xr - found duplicate name!!!");
             }
             chunk->close();
@@ -149,8 +149,8 @@ void CResourceManager::StoreNecessaryTextures()
     if (!m_necessary.empty())
         return;
 
-    map_TextureIt it = m_textures.begin();
-    map_TextureIt it_e = m_textures.end();
+    auto it = m_textures.begin();
+    auto it_e = m_textures.end();
 
     for (; it != it_e; ++it)
     {

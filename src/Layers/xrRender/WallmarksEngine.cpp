@@ -36,7 +36,7 @@ const int MAX_TRIS = 1024;
 IC bool operator==(const CWallmarksEngine::wm_slot* slot, const ref_shader& shader) { return slot->shader == shader; }
 CWallmarksEngine::wm_slot* CWallmarksEngine::FindSlot(ref_shader shader)
 {
-    WMSlotVecIt it = std::find(marks.begin(), marks.end(), shader);
+    auto it = std::find(marks.begin(), marks.end(), shader);
     return (it != marks.end()) ? *it : 0;
 }
 CWallmarksEngine::wm_slot* CWallmarksEngine::AppendSlot(ref_shader shader)
@@ -70,9 +70,9 @@ CWallmarksEngine::~CWallmarksEngine()
 void CWallmarksEngine::clear()
 {
     {
-        for (WMSlotVecIt p_it = marks.begin(); p_it != marks.end(); p_it++)
+        for (auto p_it = marks.begin(); p_it != marks.end(); p_it++)
         {
-            for (StaticWMVecIt m_it = (*p_it)->static_items.begin(); m_it != (*p_it)->static_items.end(); m_it++)
+            for (auto m_it = (*p_it)->static_items.begin(); m_it != (*p_it)->static_items.end(); m_it++)
                 static_wm_destroy(*m_it);
             xr_delete(*p_it);
         }
@@ -268,8 +268,8 @@ void CWallmarksEngine::AddWallmark_internal(
         wm_slot* slot = FindSlot(hShader);
         if (slot)
         {
-            StaticWMVecIt it = slot->static_items.begin();
-            StaticWMVecIt end = slot->static_items.end();
+            auto it = slot->static_items.begin();
+            auto end = slot->static_items.end();
             for (; it != end; it++)
             {
                 static_wallmark* wm = *it;
@@ -394,14 +394,14 @@ void CWallmarksEngine::Render()
 
     lock.Enter(); // Physics may add wallmarks in parallel with rendering
 
-    for (WMSlotVecIt slot_it = marks.begin(); slot_it != marks.end(); slot_it++)
+    for (auto slot_it = marks.begin(); slot_it != marks.end(); slot_it++)
     {
         u32 w_offset;
         FVF::LIT *w_verts, *w_start;
         BeginStream(hGeom, w_offset, w_verts, w_start);
         wm_slot* slot = *slot_it;
         // static wallmarks
-        for (StaticWMVecIt w_it = slot->static_items.begin(); w_it != slot->static_items.end();)
+        for (auto w_it = slot->static_items.begin(); w_it != slot->static_items.end();)
         {
             static_wallmark* W = *w_it;
             if (RImplementation.ViewBase.testSphere_dirty(W->bounds.P, W->bounds.R))

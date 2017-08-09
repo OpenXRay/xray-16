@@ -282,7 +282,7 @@ void dxEnvironmentRender::RenderClouds(CEnvironment& env)
 
     // Fill vertex buffer
     v_clouds* pv = (v_clouds*)RCache.Vertex.Lock(env.CloudsVerts.size(), clouds_geom.stride(), v_offset);
-    for (FvectorIt it = env.CloudsVerts.begin(); it != env.CloudsVerts.end(); it++, pv++)
+    for (auto it = env.CloudsVerts.begin(); it != env.CloudsVerts.end(); it++, pv++)
         pv->set(*it, C0, C1);
     RCache.Vertex.Unlock(env.CloudsVerts.size(), clouds_geom.stride());
 

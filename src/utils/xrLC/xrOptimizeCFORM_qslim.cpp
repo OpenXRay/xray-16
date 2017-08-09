@@ -71,7 +71,7 @@ bool do_constrain(u32 base_edge_idx, u32 test_edg_idx, face_props& base_fprops, 
         !do_connect_faces_by_faces_edge_flags(base_fprops.flags, test_fprops.flags, base_edge_idx, test_edg_idx);
 }
 
-DEFINE_VECTOR(face_props, FPVec, FPVecIt);
+using FPVec = xr_vector<face_props>;
 
 void SimplifyCFORM(CDB::CollectorPacked& CL)
 {

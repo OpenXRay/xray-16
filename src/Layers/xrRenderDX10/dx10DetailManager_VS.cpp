@@ -168,8 +168,8 @@ void CDetailManager::hw_Render_dump(
                 {
                     SlotItemVec* items = *_vI;
 
-                    SlotItemVecIt _iI = items->begin();
-                    SlotItemVecIt _iE = items->end();
+                    auto _iI = items->begin();
+                    auto _iE = items->end();
                     for (; _iI != _iE; _iI++)
                     {
                         SlotItem& Instance = **_iI;

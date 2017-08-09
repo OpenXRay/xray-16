@@ -1147,7 +1147,7 @@ void CSkeletonX_ext::_FillVerticesHW4W(const Fmatrix& view, CSkeletonWallmark& w
     {
         vertHW_1W* vertices;
         CHK_DX(V->p_rm_Vertices->Lock(V->vBase, V->vCount, (void**)&vertices, D3DLOCK_READONLY));
-        for (CBoneData::FacesVecIt it = faces.begin(); it != faces.end(); it++)
+        for (auto it = faces.begin(); it != faces.end(); it++)
         {
             Fvector p[3];
             u32 idx = (*it) * 3;
@@ -1188,7 +1188,7 @@ void CSkeletonX_ext::_FillVerticesHW4W(const Fmatrix& view, CSkeletonWallmark& w
         vertHW_2W* vertices;
         CHK_DX(V->p_rm_Vertices->Lock(V->vBase, V->vCount, (void**)&vertices, D3DLOCK_READONLY));
 
-        for (CBoneData::FacesVecIt it = faces.begin(); it != faces.end(); ++it)
+        for (auto it = faces.begin(); it != faces.end(); ++it)
         {
             Fvector p[3];
             u32 idx = (*it) * 3;
@@ -1362,7 +1362,7 @@ template <typename vertex_buffer_type>
 void TEnumBoneVertices(
     vertex_buffer_type vertices, u16* indices, CBoneData::FacesVec& faces, SEnumVerticesCallback& C)
 {
-    for (CBoneData::FacesVecIt it = faces.begin(); it != faces.end(); it++)
+    for (auto it = faces.begin(); it != faces.end(); it++)
     {
         u32 idx = (*it) * 3;
         for (u32 k = 0; k < 3; k++)

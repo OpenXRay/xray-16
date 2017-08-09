@@ -42,7 +42,8 @@ public:
         BOOL Equal(const SEffect&);
 #endif
     };
-    DEFINE_VECTOR(SEffect*, EffectVec, EffectIt);
+
+    using EffectVec = xr_vector<SEffect*>;
     EffectVec m_Effects;
 #ifdef _EDITOR
     // change Equal if variables changed
@@ -78,7 +79,7 @@ class ECORE_API CParticleGroup : public dxParticleCustom
     Fvector m_InitialPosition;
 
 public:
-    DEFINE_VECTOR(dxRender_Visual*, VisualVec, VisualVecIt);
+    using VisualVec = xr_vector<dxRender_Visual*>;
     struct SItem
     {
         dxRender_Visual* _effect;
@@ -113,7 +114,7 @@ public:
         void Play();
         void Stop(BOOL def_stop);
     };
-    DEFINE_VECTOR(SItem, SItemVec, SItemVecIt)
+    using SItemVec = xr_vector<SItem>;
     SItemVec items;
 
 public:

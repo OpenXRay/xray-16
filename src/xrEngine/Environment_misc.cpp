@@ -474,7 +474,7 @@ void CEnvDescriptorMixer::lerp(
 //-----------------------------------------------------------------------------
 CEnvAmbient* CEnvironment::AppendEnvAmb(const shared_str& sect)
 {
-    for (EnvAmbVecIt it = Ambients.begin(); it != Ambients.end(); it++)
+    for (auto it = Ambients.begin(); it != Ambients.end(); it++)
         if ((*it)->name().equal(sect))
             return (*it);
 
@@ -525,7 +525,7 @@ void CEnvironment::load_level_specific_ambients()
     string_path full_path;
     CInifile* level_ambients = new CInifile(FS.update_path(full_path, "$game_config$", path), TRUE, TRUE, FALSE);
 
-    for (EnvAmbVecIt I = Ambients.begin(), E = Ambients.end(); I != E; ++I)
+    for (auto I = Ambients.begin(), E = Ambients.end(); I != E; ++I)
     {
         CEnvAmbient* ambient = *I;
 
@@ -600,8 +600,8 @@ void CEnvironment::load_weathers()
     FS.file_list_close(file_list);
 
     // sorting weather envs
-    EnvsMapIt _I = WeatherCycles.begin();
-    EnvsMapIt _E = WeatherCycles.end();
+    auto _I = WeatherCycles.begin();
+    auto _E = WeatherCycles.end();
     for (; _I != _E; _I++)
     {
         R_ASSERT3(_I->second.size() > 1, "Environment in weather must >=2", *_I->first);
@@ -685,8 +685,8 @@ void CEnvironment::load_weather_effects()
 #endif // #if 0
 
     // sorting weather envs
-    EnvsMapIt _I = WeatherFXs.begin();
-    EnvsMapIt _E = WeatherFXs.end();
+    auto _I = WeatherFXs.begin();
+    auto _E = WeatherFXs.end();
     for (; _I != _E; _I++)
     {
         R_ASSERT3(_I->second.size() > 1, "Environment in weather must >=2", *_I->first);
@@ -714,13 +714,12 @@ void CEnvironment::load()
 
 void CEnvironment::unload()
 {
-    EnvsMapIt _I, _E;
     // clear weathers
-    _I = WeatherCycles.begin();
-    _E = WeatherCycles.end();
+    auto _I = WeatherCycles.begin();
+    auto _E = WeatherCycles.end();
     for (; _I != _E; _I++)
     {
-        for (EnvIt it = _I->second.begin(); it != _I->second.end(); it++)
+        for (auto it = _I->second.begin(); it != _I->second.end(); it++)
             xr_delete(*it);
     }
 
@@ -730,12 +729,12 @@ void CEnvironment::unload()
     _E = WeatherFXs.end();
     for (; _I != _E; _I++)
     {
-        for (EnvIt it = _I->second.begin(); it != _I->second.end(); it++)
+        for (auto it = _I->second.begin(); it != _I->second.end(); it++)
             xr_delete(*it);
     }
     WeatherFXs.clear();
     // clear ambient
-    for (EnvAmbVecIt it = Ambients.begin(); it != Ambients.end(); it++)
+    for (auto it = Ambients.begin(); it != Ambients.end(); it++)
         xr_delete(*it);
     Ambients.clear();
     // misc

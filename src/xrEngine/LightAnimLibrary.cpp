@@ -49,7 +49,7 @@ void CLAItem::Save(IWriter& F)
 
     F.open_chunk(CHUNK_ITEM_KEYS);
     F.w_u32(Keys.size());
-    for (KeyPairIt it = Keys.begin(); it != Keys.end(); it++)
+    for (auto it = Keys.begin(); it != Keys.end(); it++)
     {
         F.w_u32(it->first);
         F.w_u32(it->second);
@@ -68,7 +68,7 @@ void CLAItem::DeleteKey(int frame)
     R_ASSERT(frame <= iFrameCount);
     if (0 == frame)
         return;
-    KeyPairIt it = Keys.find(frame);
+    auto it = Keys.find(frame);
     if (it != Keys.end())
         Keys.erase(it);
 }
@@ -77,7 +77,7 @@ void CLAItem::MoveKey(int from, int to)
 {
     R_ASSERT(from <= iFrameCount);
     R_ASSERT(to <= iFrameCount);
-    KeyPairIt it = Keys.find(from);
+    auto it = Keys.find(from);
     if (it != Keys.end())
     {
         Keys[to] = it->second;
@@ -98,7 +98,7 @@ void CLAItem::Resize(int new_len)
         }
         else
         {
-            KeyPairIt I = Keys.upper_bound(new_len - 1);
+            auto I = Keys.upper_bound(new_len - 1);
             if (I != Keys.end())
                 Keys.erase(I, Keys.end());
             iFrameCount = new_len;
@@ -110,12 +110,10 @@ u32 CLAItem::InterpolateRGB(int frame)
 {
     R_ASSERT(frame <= iFrameCount);
 
-    KeyPairIt A = Keys.find(frame);
-    KeyPairIt B;
+    auto A = Keys.find(frame);
+    auto B = Keys.end();
     if (A != Keys.end()) // ключ - возвращаем цвет ключа
-    {
         return A->second;
-    }
     else // не ключ
     {
         B = Keys.upper_bound(frame); // ищем следующий ключ
@@ -131,8 +129,8 @@ u32 CLAItem::InterpolateRGB(int frame)
     R_ASSERT(Keys.size() > 1);
     // интерполируем цвет
     Fcolor c, c0, c1;
-    float a0 = (float)A->first;
-    float a1 = (float)B->first;
+    float a0 = static_cast<float>(A->first);
+    float a1 = static_cast<float>(B->first);
     c0.set(A->second);
     c1.set(B->second);
     float t = float(frame - a0) / float(a1 - a0);
@@ -160,10 +158,10 @@ u32 CLAItem::CalculateBGR(float T, int& frame)
 
 int CLAItem::PrevKeyFrame(int frame)
 {
-    KeyPairIt A = Keys.lower_bound(frame);
+    auto A = Keys.lower_bound(frame);
     if (A != Keys.end())
     {
-        KeyPairIt B = A;
+        auto B = A;
         B--;
         if (B != Keys.end())
             return B->first;
@@ -177,7 +175,7 @@ int CLAItem::PrevKeyFrame(int frame)
 
 int CLAItem::NextKeyFrame(int frame)
 {
-    KeyPairIt A = Keys.upper_bound(frame);
+    auto A = Keys.upper_bound(frame);
     if (A != Keys.end())
     {
         return A->first;
@@ -224,7 +222,7 @@ XR_EXPORT void ELightAnimLibrary::Load()
                 I->Load(*O);
                 if (version == 0)
                 {
-                    for (CLAItem::KeyPairIt it = I->Keys.begin(); it != I->Keys.end(); it++)
+                    for (auto it = I->Keys.begin(); it != I->Keys.end(); it++)
                         it->second = subst_alpha(bgr2rgb(it->second), color_get_A(it->second));
                 }
                 Items.push_back(I);

@@ -112,7 +112,7 @@ CApplication::CApplication()
     Level_Scan();
 
     // Font
-    pFontSystem = NULL;
+    pFontSystem = nullptr;
 
     // Register us
     Device.seqFrame.Add(this, REG_PRIORITY_HIGH + 1000);
@@ -170,8 +170,8 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
         LPSTR op_server = LPSTR(P1);
         LPSTR op_client = LPSTR(P2);
         Level_Current = u32(-1);
-        R_ASSERT(0 == g_pGameLevel);
-        R_ASSERT(0 != g_pGamePersistent);
+        R_ASSERT(nullptr == g_pGameLevel);
+        R_ASSERT(nullptr != g_pGamePersistent);
         Console->Execute("main_menu off");
         Console->Hide();
         //! this line is commented by Dima
@@ -208,7 +208,7 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
                 Console->Execute("main_menu on");
             }
         }
-        R_ASSERT(0 != g_pGamePersistent);
+        R_ASSERT(nullptr != g_pGamePersistent);
         g_pGamePersistent->Disconnect();
     }
     else if (E == eConsole)
@@ -221,8 +221,8 @@ void CApplication::OnEvent(EVENT E, u64 P1, u64 P2)
     {
         LPSTR demo_file = LPSTR(P1);
 
-        R_ASSERT(0 == g_pGameLevel);
-        R_ASSERT(0 != g_pGamePersistent);
+        R_ASSERT(nullptr == g_pGameLevel);
+        R_ASSERT(nullptr != g_pGamePersistent);
 
         Console->Execute("main_menu off");
         Console->Hide();
@@ -348,7 +348,7 @@ void CApplication::Level_Append(LPCSTR folder)
     {
         sLevelInfo LI;
         LI.folder = xr_strdup(folder);
-        LI.name = 0;
+        LI.name = nullptr;
         Levels.push_back(LI);
     }
 }
@@ -423,14 +423,14 @@ void CApplication::Level_Set(u32 L)
 int CApplication::Level_ID(LPCSTR name, LPCSTR ver, bool bSet)
 {
     int result = -1;
-    CLocatorAPI::archives_it it = FS.m_archives.begin();
-    CLocatorAPI::archives_it it_e = FS.m_archives.end();
+    auto it = FS.m_archives.begin();
+    auto it_e = FS.m_archives.end();
     bool arch_res = false;
 
     for (; it != it_e; ++it)
     {
         CLocatorAPI::archive& A = *it;
-        if (A.hSrcFile == NULL)
+        if (A.hSrcFile == nullptr)
         {
             LPCSTR ln = A.header->r_string("header", "level_name");
             LPCSTR lv = A.header->r_string("header", "level_ver");
@@ -466,8 +466,8 @@ int CApplication::Level_ID(LPCSTR name, LPCSTR ver, bool bSet)
 
 CInifile* CApplication::GetArchiveHeader(LPCSTR name, LPCSTR ver)
 {
-    CLocatorAPI::archives_it it = FS.m_archives.begin();
-    CLocatorAPI::archives_it it_e = FS.m_archives.end();
+    auto it = FS.m_archives.begin();
+    auto it_e = FS.m_archives.end();
 
     for (; it != it_e; ++it)
     {
@@ -480,7 +480,7 @@ CInifile* CApplication::GetArchiveHeader(LPCSTR name, LPCSTR ver)
             return A.header;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void CApplication::LoadAllArchives()

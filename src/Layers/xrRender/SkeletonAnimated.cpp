@@ -820,7 +820,7 @@ void CKinematicsAnimated::Load(const char* N, IReader* data, u32 dwFlags)
     m_Partition->load(this, N);
 
     // initialize motions
-    for (MotionsSlotVecIt m_it = m_Motions.begin(); m_it != m_Motions.end(); m_it++)
+    for (auto m_it = m_Motions.begin(); m_it != m_Motions.end(); m_it++)
     {
         SMotionsSlot& MS = *m_it;
         MS.bone_motions.resize(bones->size());

@@ -33,7 +33,8 @@ protected:
             data = d;
         }
     };
-    DEFINE_DEQUE(SElement, ElementsDeq, ElementsDeqIt);
+    using ElementsDeq = xr_deque<SElement>;
+
     struct SSubGraph
     {
         EStyle style;
@@ -41,7 +42,7 @@ protected:
         SSubGraph(EStyle s) { style = s; };
         void SetStyle(EStyle s) { style = s; };
     };
-    DEFINE_VECTOR(SSubGraph, SubGraphVec, SubGraphVecIt);
+    using SubGraphVec = xr_vector<SSubGraph>;
     SubGraphVec subgraphs;
 
     float mn, mx;
@@ -63,8 +64,7 @@ protected:
         float m_fPos;
         u32 m_dwColor;
     };
-
-    DEFINE_DEQUE(SMarker, MarkersDeq, MarkersDeqIt);
+    using MarkersDeq = xr_deque<SMarker>;
     MarkersDeq m_Markers;
 
 protected:
@@ -82,58 +82,62 @@ public:
     void OnDeviceCreate();
     void OnDeviceDestroy();
 
-    IC void SetStyle(EStyle s, u32 SubGraphID = 0)
+    void SetStyle(EStyle s, u32 SubGraphID = 0)
     {
         if (SubGraphID >= subgraphs.size())
             return;
-        SubGraphVecIt it = subgraphs.begin() + SubGraphID;
+        auto it = subgraphs.begin() + SubGraphID;
         it->SetStyle(s);
     }
 
-    IC void SetRect(int l, int t, int w, int h, u32 rect_clr, u32 back_clr)
+    void SetRect(int l, int t, int w, int h, u32 rect_clr, u32 back_clr)
     {
         lt.set(l, t);
         rb.set(l + w, t + h);
         rect_color = rect_clr;
         back_color = back_clr;
     }
-    IC void SetGrid(int w_div, float w_step, int h_div, float h_step, u32 grid_clr, u32 base_clr)
+
+    void SetGrid(int w_div, float w_step, int h_div, float h_step, u32 grid_clr, u32 base_clr)
     {
         grid.set(w_div, h_div);
         grid_step.set(w_step, h_step);
         grid_color = grid_clr;
         base_color = base_clr;
     }
-    IC void SetMinMax(float _mn, float _mx, u32 item_count)
+
+    void SetMinMax(float _mn, float _mx, u32 item_count)
     {
         mn = _mn;
         mx = _mx;
         max_item_count = item_count;
-        for (SubGraphVecIt it = subgraphs.begin(); it != subgraphs.end(); it++)
+        for (auto it = subgraphs.begin(); it != subgraphs.end(); it++)
         {
             while (it->elements.size() > max_item_count)
                 it->elements.pop_front();
         };
     }
-    IC void AppendItem(float d, u32 clr, u32 SubGraphID = 0)
+
+    void AppendItem(float d, u32 clr, u32 SubGraphID = 0)
     {
         if (SubGraphID >= subgraphs.size())
             return;
 
         clamp(d, mn, mx);
 
-        SubGraphVecIt it = subgraphs.begin() + SubGraphID;
+        auto it = subgraphs.begin() + SubGraphID;
         it->elements.push_back(SElement(d, clr));
         while (it->elements.size() > max_item_count)
             it->elements.pop_front();
     };
-    IC u32 AppendSubGraph(EStyle S)
+
+    u32 AppendSubGraph(EStyle S)
     {
         subgraphs.push_back(SSubGraph(S));
         return subgraphs.size() - 1;
     };
 
-    IC void AddMarker(EStyle Style, float pos, u32 Color)
+    void AddMarker(EStyle Style, float pos, u32 Color)
     {
         SMarker NewMarker;
         NewMarker.m_dwColor = Color;
@@ -143,21 +147,22 @@ public:
         m_Markers.push_back(NewMarker);
     };
 
-    IC const SMarker& Marker(u32 ID)
+    const SMarker& Marker(u32 ID)
     {
         VERIFY(ID < m_Markers.size());
         return m_Markers[ID];
     };
 
-    IC void UpdateMarkerPos(u32 ID, float NewPos)
+    void UpdateMarkerPos(u32 ID, float NewPos)
     {
         if (ID >= m_Markers.size())
             return;
         SMarker& pMarker = m_Markers[ID];
         pMarker.m_fPos = NewPos;
     };
-    IC void ClearMarkers() { m_Markers.clear(); }
-    IC void RemoveMarker(u32 ID)
+    void ClearMarkers() { m_Markers.clear(); }
+
+    void RemoveMarker(u32 ID)
     {
         if (ID >= m_Markers.size())
             return;

@@ -90,7 +90,7 @@ typedef TMsgDlgBtn TMsgDlgButtons[mbHelp];
 #include <string>
 
 #define AnsiString string
-DEFINE_VECTOR(AnsiString, AStringVec, AStringIt);
+using AStringVec = xr_vector<std::string>;
 
 #include "plugins/Shared/ELog.h"
 

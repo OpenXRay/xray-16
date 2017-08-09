@@ -16,9 +16,9 @@
 
 #define CROSS_TABLE_NAME_RAW "level.gct.raw"
 
-typedef char FILE_NAME[_MAX_PATH];
+using FILE_NAME = char[_MAX_PATH];
 
-extern LPCSTR GAME_LEVEL_GRAPH;
+extern const pcstr GAME_LEVEL_GRAPH;
 
 extern void xrBuildCrossTable(LPCSTR caProjectName);
 extern void vfRecurseMark(const CLevelGraph& tMap, xr_vector<bool>& tMarks, u32 dwStartNodeID);

@@ -2,21 +2,21 @@
 
 #include "Common/Platform.hpp"
 
-#include "xrlight_implicit.h"
+#include "xrLight_Implicit.h"
 #include "xrLight_ImplicitDeflector.h"
-#include "xrlight_implicitrun.h"
+#include "xrLight_ImplicitRun.h"
 #include "light_point.h"
-#include "xrdeflector.h"
+#include "xrDeflector.h"
 #include "xrLC_GlobalData.h"
-#include "xrface.h"
-#include "xrlight_implicitcalcglobs.h"
+#include "xrFace.h"
+#include "xrLight_ImplicitCalcGlobs.h"
 #include "net_task_callback.h"
 #include "xrCDB/xrCDB.h"
 
 extern "C" bool XR_IMPORT __stdcall DXTCompress(
     LPCSTR out_name, u8* raw_data, u8* normal_map, u32 w, u32 h, u32 pitch, STextureParams* fmt, u32 depth);
 
-DEF_MAP(Implicit, u32, ImplicitDeflector);
+using Implicit = xr_map<u32, ImplicitDeflector>;
 
 void ImplicitExecute::read(INetReader& r)
 {
@@ -101,7 +101,7 @@ void ImplicitExecute::Execute(net_task_callback* net_callback)
 
                     // World space
                     Fvector wP, wN, B;
-                    for (vecFaceIt it = space.begin(); it != space.end(); it++)
+                    for (auto it = space.begin(); it != space.end(); it++)
                     {
                         Face* F = *it;
                         _TCF& tc = F->tc[0];
@@ -179,7 +179,7 @@ void ImplicitLightingExec(BOOL b_net)
     not_clear.clear();
     // Sorting
     Logger.Status("Sorting faces...");
-    for (vecFaceIt I = inlc_global_data()->g_faces().begin(); I != inlc_global_data()->g_faces().end(); I++)
+    for (auto I = inlc_global_data()->g_faces().begin(); I != inlc_global_data()->g_faces().end(); I++)
     {
         Face* F = *I;
         if (F->pDeflector)
@@ -192,7 +192,7 @@ void ImplicitLightingExec(BOOL b_net)
         u32 Tid = M.surfidx;
         b_BuildTexture* T = &(inlc_global_data()->textures()[Tid]);
 
-        Implicit_it it = calculator.find(Tid);
+        auto it = calculator.find(Tid);
         if (it == calculator.end())
         {
             ImplicitDeflector ImpD;
@@ -208,8 +208,8 @@ void ImplicitLightingExec(BOOL b_net)
         }
     }
 
-    // Lighing
-    for (Implicit_it imp = calculator.begin(); imp != calculator.end(); imp++)
+    // Lighting
+    for (auto imp = calculator.begin(); imp != calculator.end(); imp++)
     {
         ImplicitDeflector& defl = imp->second;
         Logger.Status("Lighting implicit map '%s'...", defl.texture->name);

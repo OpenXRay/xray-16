@@ -18,7 +18,7 @@ void CResourceManager::reset_begin()
         _RELEASE(v_states[_it]->state);
 
     // destroy RTs
-    for (map_RTIt rt_it = m_rtargets.begin(); rt_it != m_rtargets.end(); rt_it++)
+    for (auto rt_it = m_rtargets.begin(); rt_it != m_rtargets.end(); rt_it++)
         rt_it->second->reset_begin();
     //  DX10 cut    for (map_RTCIt rtc_it=m_rtargets_c.begin(); rtc_it!=m_rtargets_c.end(); rtc_it++)
     //  DX10 cut        rtc_it->second->reset_begin();
@@ -70,7 +70,7 @@ void CResourceManager::reset_end()
 // RT
 #pragma todo("container is created in stack!")
         xr_vector<CRT*> rt;
-        for (map_RTIt rt_it = m_rtargets.begin(); rt_it != m_rtargets.end(); rt_it++)
+        for (auto rt_it = m_rtargets.begin(); rt_it != m_rtargets.end(); rt_it++)
             rt.push_back(rt_it->second);
         std::sort(rt.begin(), rt.end(), cmp_rt);
         for (u32 _it = 0; _it < rt.size(); _it++)

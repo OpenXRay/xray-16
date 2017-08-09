@@ -21,7 +21,7 @@ typedef map_v2v::iterator map_v2v_it;
 struct XRLC_LIGHT_API DataVertex : public base_Vertex
 {
 public:
-    // vecAdj		m_adjacents;
+    // vecAdj m_adjacents;
     typedef DataFace DataFaceType;
 
     IC BOOL similar(Tvertex<DataVertex>& V, float eps);

@@ -31,8 +31,8 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial)
 #ifdef DEBUG
     Msg("count of .thm files=%d", flist.size());
 #endif // #ifdef DEBUG
-    FS_FileSetIt It = flist.begin();
-    FS_FileSetIt It_e = flist.end();
+    auto It = flist.begin();
+    auto It_e = flist.end();
     STextureParams tp;
     string_path fn;
     for (; It != It_e; ++It)

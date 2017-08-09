@@ -371,7 +371,7 @@ void CResourceManager::DeferredUpload()
 {
     if (!RDEVICE.b_is_Ready)
         return;
-    for (map_TextureIt t = m_textures.begin(); t != m_textures.end(); t++)
+    for (auto t = m_textures.begin(); t != m_textures.end(); t++)
     {
         t->second->Load();
     }
@@ -380,7 +380,7 @@ void CResourceManager::DeferredUpload()
 void	CResourceManager::DeferredUnload	()
 {
     if (!RDEVICE.b_is_Ready)				return;
-    for (map_TextureIt t=m_textures.begin(); t!=m_textures.end(); t++)
+    for (auto t=m_textures.begin(); t!=m_textures.end(); t++)
         t->second->Unload();
 }
 */

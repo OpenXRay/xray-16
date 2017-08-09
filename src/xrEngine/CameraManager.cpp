@@ -54,15 +54,16 @@ CCameraManager::CCameraManager(bool bApplyOnUpdate)
 
 CCameraManager::~CCameraManager()
 {
-    for (EffectorCamIt it = m_EffectorsCam.begin(); it != m_EffectorsCam.end(); it++)
+    for (auto it = m_EffectorsCam.begin(); it != m_EffectorsCam.end(); it++)
         xr_delete(*it);
-    for (EffectorPPIt it = m_EffectorsPP.begin(); it != m_EffectorsPP.end(); it++)
+
+    for (auto it = m_EffectorsPP.begin(); it != m_EffectorsPP.end(); it++)
         xr_delete(*it);
 }
 
 CEffectorCam* CCameraManager::GetCamEffector(ECamEffectorType type)
 {
-    for (EffectorCamIt it = m_EffectorsCam.begin(); it != m_EffectorsCam.end(); it++)
+    for (auto it = m_EffectorsCam.begin(); it != m_EffectorsCam.end(); it++)
         if ((*it)->eType == type)
         {
             return *it;
@@ -78,8 +79,8 @@ CEffectorCam* CCameraManager::AddCamEffector(CEffectorCam* ef)
 
 void CCameraManager::UpdateDeffered()
 {
-    EffectorCamIt it = m_EffectorsCam_added_deffered.begin();
-    EffectorCamIt it_e = m_EffectorsCam_added_deffered.end();
+    auto it = m_EffectorsCam_added_deffered.begin();
+    auto it_e = m_EffectorsCam_added_deffered.end();
     for (; it != it_e; ++it)
     {
         RemoveCamEffector((*it)->eType);
@@ -95,7 +96,7 @@ void CCameraManager::UpdateDeffered()
 
 void CCameraManager::RemoveCamEffector(ECamEffectorType type)
 {
-    for (EffectorCamIt it = m_EffectorsCam.begin(); it != m_EffectorsCam.end(); it++)
+    for (auto it = m_EffectorsCam.begin(); it != m_EffectorsCam.end(); it++)
         if ((*it)->eType == type)
         {
             OnEffectorReleased(*it);
@@ -106,7 +107,7 @@ void CCameraManager::RemoveCamEffector(ECamEffectorType type)
 
 CEffectorPP* CCameraManager::GetPPEffector(EEffectorPPType type)
 {
-    for (EffectorPPIt it = m_EffectorsPP.begin(); it != m_EffectorsPP.end(); it++)
+    for (auto it = m_EffectorsPP.begin(); it != m_EffectorsPP.end(); it++)
         if ((*it)->Type() == type)
             return *it;
     return 0;
@@ -141,7 +142,7 @@ CEffectorPP* CCameraManager::AddPPEffector(CEffectorPP* ef)
 
 void CCameraManager::RemovePPEffector(EEffectorPPType type)
 {
-    for (EffectorPPIt it = m_EffectorsPP.begin(); it != m_EffectorsPP.end(); it++)
+    for (auto it = m_EffectorsPP.begin(); it != m_EffectorsPP.end(); it++)
         if ((*it)->Type() == type)
         {
             if ((*it)->FreeOnRemove())

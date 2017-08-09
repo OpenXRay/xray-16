@@ -457,7 +457,7 @@ CBoneData::FacesVec& faces)
 {
     VERIFY				(*Vertices1W);
     bool intersect		= FALSE;
-    for (CBoneData::FacesVecIt it=faces.begin(); it!=faces.end(); it++){
+    for (CBoneData::auto it=faces.begin(); it!=faces.end(); it++){
         Fvector			p[3];
         u32 idx			= (*it)*3;
         for (u32 k=0; k<3; k++){
@@ -479,7 +479,7 @@ CBoneData::FacesVec& faces)
 {
     VERIFY				(*Vertices2W);
     bool intersect		= FALSE;
-    for (CBoneData::FacesVecIt it=faces.begin(); it!=faces.end(); it++){
+    for (CBoneData::auto it=faces.begin(); it!=faces.end(); it++){
         Fvector			p[3];
         u32 idx			= (*it)*3;
         for (u32 k=0; k<3; k++){
@@ -501,7 +501,7 @@ void CSkeletonX::_FillVerticesSoft1W(const Fmatrix& view, CSkeletonWallmark& wm,
     u16* indices, CBoneData::FacesVec& faces)
 {
     VERIFY(*Vertices1W);
-    for (CBoneData::FacesVecIt it = faces.begin(); it != faces.end(); it++)
+    for (auto it = faces.begin(); it != faces.end(); it++)
     {
         Fvector p[3];
         u32 idx = (*it) * 3;
@@ -539,7 +539,7 @@ void CSkeletonX::_FillVerticesSoft2W(const Fmatrix& view, CSkeletonWallmark& wm,
     u16* indices, CBoneData::FacesVec& faces)
 {
     VERIFY(*Vertices2W);
-    for (CBoneData::FacesVecIt it = faces.begin(); it != faces.end(); it++)
+    for (auto it = faces.begin(); it != faces.end(); it++)
     {
         Fvector p[3];
         u32 idx = (*it) * 3;

@@ -23,7 +23,7 @@ bool g_dedicated_server = false;
 #include "editor_environment_manager.hpp"
 #endif // INGAME_EDITOR
 
-ENGINE_API IGame_Persistent* g_pGamePersistent = NULL;
+ENGINE_API IGame_Persistent* g_pGamePersistent = nullptr;
 
 IGame_Persistent::IGame_Persistent()
 {
@@ -33,7 +33,7 @@ IGame_Persistent::IGame_Persistent()
     RDEVICE.seqAppActivate.Add(this);
     RDEVICE.seqAppDeactivate.Add(this);
 
-    m_pMainMenu = NULL;
+    m_pMainMenu = nullptr;
 
 #ifndef INGAME_EDITOR
 #ifndef _EDITOR

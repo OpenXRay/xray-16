@@ -116,7 +116,7 @@ typedef TMsgDlgBtn TMsgDlgButtons[mbHelp];
 
 //#define AnsiString std::string
 #define AnsiString xr_string
-DEFINE_VECTOR(AnsiString, AStringVec, AStringIt);
+using AStringVec = xr_vector<xr_string>;
 
 #define THROW R_ASSERT(0)
 

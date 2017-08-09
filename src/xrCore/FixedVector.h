@@ -1,8 +1,8 @@
+#pragma once
 #ifndef FixedVectorH
 #define FixedVectorH
-#pragma once
 
-template <class T, const int dim>
+template <class T, std::size_t dim>
 class svector
 {
 public:
@@ -26,17 +26,21 @@ public:
     IC const_iterator end() const { return array + count; }
     IC u32 size() const { return count; }
     IC void clear() { count = 0; }
+
     IC void resize(int c)
     {
         VERIFY(c <= dim);
         count = c;
     }
+
     IC void reserve(int c) {}
+
     IC void push_back(value_type e)
     {
         VERIFY(count < dim);
         array[count++] = e;
     }
+
     IC void pop_back()
     {
         VERIFY(count);
@@ -48,6 +52,7 @@ public:
         VERIFY(id < count);
         return array[id];
     }
+
     IC const_reference operator[](u32 id) const
     {
         VERIFY(id < count);
@@ -56,11 +61,13 @@ public:
 
     IC reference front() { return array[0]; }
     IC reference back() { return array[count - 1]; }
+
     IC reference last()
     {
         VERIFY(count < dim);
         return array[count];
     }
+
     IC const_reference front() const { return array[0]; }
     IC const_reference back() const { return array[count - 1]; }
     IC const_reference last() const
@@ -68,6 +75,7 @@ public:
         VERIFY(count < dim);
         return array[count];
     }
+
     IC void inc() { count++; }
     IC bool empty() const { return 0 == count; }
     IC void erase(u32 id)
@@ -77,6 +85,7 @@ public:
         for (u32 i = id; i < count; i++)
             array[i] = array[i + 1];
     }
+
     IC void erase(iterator it) { erase(u32(it - begin())); }
     IC void insert(u32 id, reference V)
     {

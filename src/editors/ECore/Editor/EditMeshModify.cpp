@@ -280,7 +280,7 @@ void CEditableMesh::OptimizeMesh(BOOL NoOpt)
         m_NewPoints.clear();
         m_NewPoints.reserve(m_VertCount);
 
-        boolVec faces_mark;
+        xr_vector<bool> faces_mark;
         faces_mark.resize(m_FaceCount, false);
         int i_del_face = 0;
         for (u32 k = 0; k < m_FaceCount; k++)

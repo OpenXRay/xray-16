@@ -70,8 +70,8 @@ struct ECORE_API SSkelFace
     WORD v[3];
 };
 
-DEFINE_VECTOR(SSkelVert, SkelVertVec, SkelVertIt);
-DEFINE_VECTOR(SSkelFace, SkelFaceVec, SkelFaceIt);
+using SkelVertVec = xr_vector<SSkelVert>;
+using SkelFaceVec = xr_vector<SSkelFace>;
 
 class ECORE_API CSkeletonCollectorPacked
 {
@@ -94,7 +94,7 @@ public:
     {
         if ((F.v[0] == F.v[1]) || (F.v[0] == F.v[2]) || (F.v[1] == F.v[2]))
             return false;
-        for (SkelFaceIt f_it = m_Faces.begin(); f_it != m_Faces.end(); f_it++)
+        for (auto f_it = m_Faces.begin(); f_it != m_Faces.end(); f_it++)
         {
             // Test for 6 variations
             if ((f_it->v[0] == F.v[0]) && (f_it->v[1] == F.v[1]) && (f_it->v[2] == F.v[2]))
@@ -182,14 +182,14 @@ protected:
         {
             // calculate BBox
             m_Box.invalidate();
-            for (SkelVertIt v_it = m_Verts.begin(); v_it != m_Verts.end(); v_it++)
+            for (auto v_it = m_Verts.begin(); v_it != m_Verts.end(); v_it++)
             {
                 SSkelVert& pV = *v_it;
                 m_Box.modify(pV.offs);
             }
         }
     };
-    DEFINE_VECTOR(SSplit, SplitVec, SplitIt);
+    using SplitVec = xr_vector<SSplit>;
     SplitVec m_Splits;
     Fbox m_Box;
     //----------------------------------------------------
@@ -197,7 +197,7 @@ protected:
     void ComputeBounding()
     {
         m_Box.invalidate();
-        for (SplitIt it = m_Splits.begin(); it != m_Splits.end(); it++)
+        for (auto it = m_Splits.begin(); it != m_Splits.end(); it++)
         {
             it->ComputeBounding();
             m_Box.merge(it->m_Box);

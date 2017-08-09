@@ -21,9 +21,16 @@ const float half_p_y = 0.5f * (1.f / tex_h);
 const float offs_x = 1.f / tex_w;
 const float offs_y = 1.f / tex_h;
 
-static Fvector LOD_pos[4] = {{-1.0f + offs_x, 1.0f - offs_y, 0.0f}, {1.0f - offs_x, 1.0f - offs_y, 0.0f},
-    {1.0f - offs_x, -1.0f + offs_y, 0.0f}, {-1.0f + offs_x, -1.0f + offs_y, 0.0f}};
-static FVF::LIT LOD[4] = {
+static Fvector LOD_pos[4] =
+{
+    {-1.0f + offs_x, 1.0f - offs_y, 0.0f},
+    {1.0f - offs_x, 1.0f - offs_y, 0.0f},
+    {1.0f - offs_x, -1.0f + offs_y, 0.0f},
+    {-1.0f + offs_x, -1.0f + offs_y, 0.0f}
+};
+
+static FVF::LIT LOD[4] =
+{
     {{-1.0f, 1.0f, 0.0f}, 0xFFFFFFFF, {0.0f, 0.0f}}, // F 0
     {{1.0f, 1.0f, 0.0f}, 0xFFFFFFFF, {0.0f, 0.0f}}, // F 1
     {{1.0f, -1.0f, 0.0f}, 0xFFFFFFFF, {0.0f, 0.0f}}, // F 2

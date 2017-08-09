@@ -60,8 +60,8 @@ u32 dwfGetIDByLevelName(CInifile* Ini, LPCSTR caLevelName)
     return (u32(-1));
 }
 
-DEFINE_MAP(u32, ::CLevelGameGraph*, GRAPH_P_MAP, GRAPH_P_PAIR_IT);
-DEFINE_MAP_PRED(LPSTR, SConnectionVertex, VERTEX_MAP, VERTEX_PAIR_IT, CCompareVertexPredicate);
+using GRAPH_P_MAP = xr_map<u32, ::CLevelGameGraph*>;
+using VERTEX_MAP = xr_map<LPSTR, SConnectionVertex, CCompareVertexPredicate>;
 
 typedef struct tagSDynamicGraphVertex
 {
@@ -76,8 +76,8 @@ typedef struct tagSDynamicGraphVertex
     CGameGraph::CEdge* tpaEdges;
 } SDynamicGraphVertex;
 
-DEFINE_VECTOR(SDynamicGraphVertex, GRAPH_VERTEX_VECTOR, GRAPH_VERTEX_IT);
-DEFINE_VECTOR(CGameGraph::CEdge, GRAPH_EDGE_VECTOR, GRAPH_EDGE_IT);
+using GRAPH_VERTEX_VECTOR = xr_vector<SDynamicGraphVertex>;
+using GRAPH_EDGE_VECTOR = xr_vector<CGameGraph::CEdge>;
 
 class CLevelGameGraph
 {
@@ -629,11 +629,9 @@ CGraphMerger::CGraphMerger(LPCSTR game_graph_id, LPCSTR name, bool rebuild)
             for (; i != e; i++)
                 if ((*i).second.caConnectName[0])
                 {
-                    GRAPH_P_PAIR_IT K;
-                    VERTEX_PAIR_IT M;
                     CGameGraph::CEdge tGraphEdge;
                     auto& tConnectionVertex = (*i).second;
-                    K = tpGraphs.find(tConnectionVertex.dwLevelID);
+                    auto K = tpGraphs.find(tConnectionVertex.dwLevelID);
                     if (K == tpGraphs.end())
                     {
                         Msg("Cannot find level with level_id %d. Connection point will not be generated!",
@@ -641,7 +639,7 @@ CGraphMerger::CGraphMerger(LPCSTR game_graph_id, LPCSTR name, bool rebuild)
                         continue;
                     }
                     R_ASSERT(K != tpGraphs.end());
-                    M = (*K).second->m_tVertexMap.find(tConnectionVertex.caConnectName);
+                    auto M = (*K).second->m_tVertexMap.find(tConnectionVertex.caConnectName);
                     if (M == (*K).second->m_tVertexMap.end())
                     {
                         Msg("Level %s with id %d has an INVALID connection point %s,\nwhich references to graph point "

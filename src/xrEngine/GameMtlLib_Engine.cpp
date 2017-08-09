@@ -5,8 +5,8 @@
 
 static void DestroySounds(SoundVec& lst)
 {
-    for (SoundIt it = lst.begin(); lst.end() != it; ++it)
-        it->destroy();
+    for (auto it : lst)
+        it.destroy();
 }
 
 static void DestroyPSs(PSVec& lst) {}

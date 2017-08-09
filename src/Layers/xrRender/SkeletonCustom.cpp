@@ -322,7 +322,7 @@ void CKinematics::Load(const char* N, IReader* data, u32 dwFlags)
             {
                 CBoneData::FacesVec faces = B->child_faces[child_idx];
                 std::sort(faces.begin(), faces.end());
-                CBoneData::FacesVecIt new_end = std::unique(faces.begin(), faces.end());
+                auto new_end = std::unique(faces.begin(), faces.end());
                 faces.erase(new_end, faces.end());
                 B->child_faces[child_idx].clear_and_free();
                 B->child_faces[child_idx] = faces;
@@ -601,7 +601,7 @@ void CKinematics::EnumBoneVertices(SEnumVerticesCallback& C, u16 bone_id)
 }
 #include "xrCDB/Intersect.hpp"
 
-DEFINE_VECTOR(Fobb, OBBVec, OBBVecIt);
+using OBBVec = xr_vector<Fobb>;
 
 bool CKinematics::PickBone(const Fmatrix& parent_xform, IKinematics::pick_result& r, float dist, const Fvector& start,
     const Fvector& dir, u16 bone_id)
@@ -637,7 +637,7 @@ void CKinematics::AddWallmark(
     float dist = flt_max;
     BOOL picked = FALSE;
 
-    DEFINE_VECTOR(Fobb, OBBVec, OBBVecIt);
+    using OBBVec = xr_vector<Fobb>;
     OBBVec cache_obb;
     cache_obb.resize(LL_BoneCount());
     IKinematics::pick_result r;
@@ -719,7 +719,7 @@ void CKinematics::AddWallmark(
     for (u32 i = 0; i < children.size(); i++)
     {
         CSkeletonX* S = LL_GetChild(i);
-        for (U16It b_it = test_bones.begin(); b_it != test_bones.end(); b_it++)
+        for (auto b_it = test_bones.begin(); b_it != test_bones.end(); b_it++)
             S->FillVertices(mView, *wm, normal, size, *b_it);
     }
 
@@ -738,7 +738,7 @@ void CKinematics::CalculateWallmarks()
     {
         wm_frame = RDEVICE.dwFrame;
         bool need_remove = false;
-        for (SkeletonWMVecIt it = wallmarks.begin(); it != wallmarks.end(); it++)
+        for (auto it = wallmarks.begin(); it != wallmarks.end(); it++)
         {
             intrusive_ptr<CSkeletonWallmark>& wm = *it;
             float w = (RDEVICE.fTimeGlobal - wm->TimeStart()) / LIFE_TIME;
@@ -757,7 +757,7 @@ void CKinematics::CalculateWallmarks()
         }
         if (need_remove)
         {
-            SkeletonWMVecIt new_end = std::remove_if(wallmarks.begin(), wallmarks.end(), zero_wm_pred());
+            auto new_end = std::remove_if(wallmarks.begin(), wallmarks.end(), zero_wm_pred());
             wallmarks.erase(new_end, wallmarks.end());
         }
     }
@@ -810,7 +810,7 @@ void CKinematics::RenderWallmark(intrusive_ptr<CSkeletonWallmark> wm, FVF::LIT*&
 
 void CKinematics::ClearWallmarks()
 {
-    //  for (SkeletonWMVecIt it=wallmarks.begin(); it!=wallmarks.end(); it++)
+    //  for (auto it=wallmarks.begin(); it!=wallmarks.end(); it++)
     //      xr_delete   (*it);
     wallmarks.clear();
 }

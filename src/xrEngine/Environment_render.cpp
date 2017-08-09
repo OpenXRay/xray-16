@@ -234,20 +234,18 @@ void CEnvironment::OnDeviceCreate()
 
     // weathers
     {
-        EnvsMapIt _I, _E;
-        _I = WeatherCycles.begin();
-        _E = WeatherCycles.end();
+        auto _I = WeatherCycles.begin();
+        auto _E = WeatherCycles.end();
         for (; _I != _E; _I++)
-            for (EnvIt it = _I->second.begin(); it != _I->second.end(); it++)
+            for (auto it = _I->second.begin(); it != _I->second.end(); it++)
                 (*it)->on_device_create();
     }
     // effects
     {
-        EnvsMapIt _I, _E;
-        _I = WeatherFXs.begin();
-        _E = WeatherFXs.end();
+        auto _I = WeatherFXs.begin();
+        auto _E = WeatherFXs.end();
         for (; _I != _E; _I++)
-            for (EnvIt it = _I->second.begin(); it != _I->second.end(); it++)
+            for (auto it = _I->second.begin(); it != _I->second.end(); it++)
                 (*it)->on_device_create();
     }
 
@@ -269,20 +267,18 @@ void CEnvironment::OnDeviceDestroy()
     */
     // weathers
     {
-        EnvsMapIt _I, _E;
-        _I = WeatherCycles.begin();
-        _E = WeatherCycles.end();
+        auto _I = WeatherCycles.begin();
+        auto _E = WeatherCycles.end();
         for (; _I != _E; _I++)
-            for (EnvIt it = _I->second.begin(); it != _I->second.end(); it++)
+            for (auto it = _I->second.begin(); it != _I->second.end(); it++)
                 (*it)->on_device_destroy();
     }
     // effects
     {
-        EnvsMapIt _I, _E;
-        _I = WeatherFXs.begin();
-        _E = WeatherFXs.end();
+        auto _I = WeatherFXs.begin();
+        auto _E = WeatherFXs.end();
         for (; _I != _E; _I++)
-            for (EnvIt it = _I->second.begin(); it != _I->second.end(); it++)
+            for (auto it = _I->second.begin(); it != _I->second.end(); it++)
                 (*it)->on_device_destroy();
     }
     CurrentEnv->destroy();

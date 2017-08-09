@@ -8,7 +8,7 @@ struct itterate_adjacents_params_dynamic
 {
     typedef typeVertex type_vertex;
     typedef typename typeVertex::type_face type_face;
-    // typedef xr_vector<type_face*>								vecFace;
+    //typedef xr_vector<type_face*> vecFace;
 
 private:
     Fvector& normal;
@@ -17,7 +17,7 @@ private:
     const IntVec& a_lst;
     const type_face* m_Faces;
     u32 m_FaceCount;
-    U8Vec m_procesed;
+    xr_vector<u8> m_procesed;
 
 public:
     itterate_adjacents_params_dynamic(

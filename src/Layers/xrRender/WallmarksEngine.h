@@ -24,8 +24,8 @@ public:
         xr_vector<FVF::LIT> verts;
         float ttl;
     };
-    DEFINE_VECTOR(static_wallmark*, StaticWMVec, StaticWMVecIt);
-    DEFINE_VECTOR(wm_slot*, WMSlotVec, WMSlotVecIt);
+    using StaticWMVec = xr_vector<static_wallmark*>;
+    using WMSlotVec = xr_vector<wm_slot*>;
 
 private:
     StaticWMVec static_pool;

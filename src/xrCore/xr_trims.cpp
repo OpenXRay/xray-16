@@ -407,7 +407,7 @@ void _SequenceToList(LPSTRVec& lst, LPCSTR in, char separator)
     }
 }
 
-void _SequenceToList(RStringVec& lst, LPCSTR in, char separator)
+void _SequenceToList(xr_vector<shared_str>& lst, LPCSTR in, char separator)
 {
     lst.clear();
     int t_cnt = _GetItemCount(in, separator);

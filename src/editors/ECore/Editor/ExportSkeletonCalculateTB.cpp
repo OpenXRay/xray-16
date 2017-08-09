@@ -16,10 +16,10 @@ class CGameFont;
 #include "Common/_d3d_extensions.h"
 #include "xrEngine/Properties.h"
 
-DEFINE_VECTOR(FVF::L, FLvertexVec, FLvertexIt);
-DEFINE_VECTOR(FVF::TL, FTLvertexVec, FTLvertexIt);
-DEFINE_VECTOR(FVF::LIT, FLITvertexVec, FLITvertexIt);
-DEFINE_VECTOR(shared_str, RStrVec, RStrVecIt);
+using FLvertexVec = xr_vector<FVF::L>;
+using FTLvertexVec = xr_vector<FVF::TL>;
+using FLITvertexVec = xr_vector<FVF::LIT>;
+using RStrVec = xr_vector<shared_str>;
 #endif
 
 #include "ExportSkeleton.h"
@@ -143,7 +143,7 @@ i_c_w0_b0.push_back	(*(float*)&iV.bones[0].id);
     R_ASSERT		(v_cnt == o_c_w0_b0.size());
     v_cnt			/= 3;
 
-    // retriving data
+    // retrieving data
     u32 o_idx		= 0;
     for (face_it=m_Faces.begin(); face_it!=m_Faces.end(); face_it++){
         SSkelFace	&iF = *face_it;

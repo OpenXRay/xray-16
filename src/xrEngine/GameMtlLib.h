@@ -136,7 +136,8 @@ public:
     void FillProp(PropItemVec& values, ListItem* owner);
 #endif
 };
-DEFINE_VECTOR(SGameMtl*, GameMtlVec, GameMtlIt);
+using GameMtlVec = xr_vector<SGameMtl*>;
+using GameMtlIt = GameMtlVec::iterator;
 
 struct MTL_EXPORT_API SGameMtlPair
 {
@@ -222,7 +223,8 @@ public:
 #endif
 };
 
-DEFINE_VECTOR(SGameMtlPair*, GameMtlPairVec, GameMtlPairIt);
+using GameMtlPairVec = xr_vector<SGameMtlPair*>;
+using GameMtlPairIt = GameMtlPairVec::iterator;
 
 class MTL_EXPORT_API CGameMtlLibrary
 {

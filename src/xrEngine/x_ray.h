@@ -55,7 +55,7 @@ public:
     int Level_ID(LPCSTR name, LPCSTR ver, bool bSet);
     void Level_Set(u32 ID);
     void LoadAllArchives();
-    CInifile* GetArchiveHeader(LPCSTR name, LPCSTR ver);
+    static CInifile* GetArchiveHeader(LPCSTR name, LPCSTR ver);
 
     // Loading
     void LoadBegin();

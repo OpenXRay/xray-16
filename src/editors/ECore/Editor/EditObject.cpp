@@ -221,7 +221,7 @@ LPCSTR CEditableObject::GenerateSurfaceName(const char* base_name)
 
 bool CEditableObject::VerifyBoneParts()
 {
-    U8Vec b_use(BoneCount(), 0);
+    std::vector<u8> b_use(BoneCount(), 0);
     for (BPIt bp_it = m_BoneParts.begin(); bp_it != m_BoneParts.end(); bp_it++)
         for (int i = 0; i < int(bp_it->bones.size()); i++)
         {
