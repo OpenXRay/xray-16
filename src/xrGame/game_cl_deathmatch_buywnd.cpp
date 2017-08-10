@@ -117,8 +117,8 @@ void game_cl_Deathmatch::OnBuyMenu_Ok()
 void game_cl_Deathmatch::OnBuyMenu_DefaultItems()
 {
     //---------------------------------------------------------
-    /*	PRESET_ITEMS_it It = PlayerDefItems.begin();
-	PRESET_ITEMS_it Et = PlayerDefItems.end();
+    /*	auto It = PlayerDefItems.begin();
+	auto Et = PlayerDefItems.end();
 	for ( ; It != Et; ++It) 
 	{
 		s16	ItemID = (*It);
@@ -254,8 +254,8 @@ void game_cl_Deathmatch::SetBuyMenuItems(PRESET_ITEMS* pItems, BOOL OnlyPreset)
         pCurBuyMenu->GetWeaponIndexByName("mp_wpn_knife", KnifeSlot, KnifeIndex);
         //---------------------------------------------------------
         PRESET_ITEMS TmpPresetItems;
-        PRESET_ITEMS_it It = pItems->begin();
-        PRESET_ITEMS_it Et = pItems->end();
+        auto It = pItems->begin();
+        auto Et = pItems->end();
         for (; It != Et; ++It)
         {
             PresetItem PIT = *It;
@@ -290,7 +290,7 @@ void game_cl_Deathmatch::CheckItem(PIItem pItem, PRESET_ITEMS* pPresetItems, BOO
             return;
     }
     //-----------------------------------------------------
-    PRESET_ITEMS_it PresetItemIt = std::find(pPresetItems->begin(), pPresetItems->end(), BigID);
+    auto PresetItemIt = std::find(pPresetItems->begin(), pPresetItems->end(), BigID);
     if (OnlyPreset)
     {
         if (PresetItemIt == pPresetItems->end())
@@ -299,7 +299,7 @@ void game_cl_Deathmatch::CheckItem(PIItem pItem, PRESET_ITEMS* pPresetItems, BOO
 
     if (SlotID == INV_SLOT_2)
     {
-        PRESET_ITEMS_it DefPistolIt = std::find(PlayerDefItems.begin(), PlayerDefItems.end(), BigID);
+        auto DefPistolIt = std::find(PlayerDefItems.begin(), PlayerDefItems.end(), BigID);
         if (DefPistolIt != PlayerDefItems.end() && PresetItemIt == pPresetItems->end())
             return;
     }
@@ -492,8 +492,8 @@ void game_cl_Deathmatch::LoadDefItemsForRank(IBuyWnd* pBuyMenu)
     pCurBuyMenu->GetWeaponIndexByName("mp_wpn_knife", KnifeSlot, KnifeIndex);
     //---------------------------------------------------------
     PRESET_ITEMS TmpPresetItems;
-    PRESET_ITEMS_it It = PlayerDefItems.begin();
-    PRESET_ITEMS_it Et = PlayerDefItems.end();
+    auto It = PlayerDefItems.begin();
+    auto Et = PlayerDefItems.end();
     for (; It != Et; ++It)
     {
         PresetItem PIT = *It;

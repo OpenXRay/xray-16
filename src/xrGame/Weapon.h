@@ -26,7 +26,6 @@ class CNightVisionEffector;
 
 class CWeapon : public CHudItemObject, public CShootingObject
 {
-private:
     typedef CHudItemObject inherited;
 
 public:
@@ -449,7 +448,7 @@ public:
         u8						cur_scope;
     */
 
-    DEFINE_VECTOR(shared_str, SCOPES_VECTOR, SCOPES_VECTOR_IT);
+    using SCOPES_VECTOR = xr_vector<shared_str>;
     SCOPES_VECTOR m_scopes;
     u8 m_cur_scope;
 

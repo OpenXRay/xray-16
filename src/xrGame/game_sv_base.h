@@ -134,7 +134,7 @@ protected:
         shared_str map_name;
         shared_str map_ver;
     };
-    DEF_DEQUE(MAP_ROTATION_LIST, SMapRot);
+    using MAP_ROTATION_LIST = xr_deque<SMapRot>;
     bool m_bMapRotation;
     bool m_bMapNeedRotation;
     bool m_bMapSwitched;
@@ -150,7 +150,7 @@ public:
     BOOL sv_force_sync;
     float rpoints_MinDist[TEAM_COUNT];
     xr_vector<RPoint> rpoints[TEAM_COUNT];
-    DEF_VECTOR(RPRef, RPoint*);
+    using RPRef = xr_vector<RPoint*>;
     RPRef rpointsBlocked;
 
     virtual void SaveMapList() override;

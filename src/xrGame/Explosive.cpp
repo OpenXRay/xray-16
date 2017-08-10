@@ -716,7 +716,7 @@ struct SRemovePred
 };
 void CExplosive::ExplodeWaveProcess()
 {
-    BLASTED_OBJECTS_I I = std::remove_if(m_blasted_objects.begin(), m_blasted_objects.end(), SRemovePred());
+    auto I = std::remove_if(m_blasted_objects.begin(), m_blasted_objects.end(), SRemovePred());
     m_blasted_objects.erase(I, m_blasted_objects.end());
     rq_storage.r_clear();
     u16 i = BLASTED_OBJ_PROCESSED_PER_FRAME;
@@ -748,7 +748,7 @@ void CExplosive::net_Relcase(IGameObject* O)
             m_iCurrentParentID = u16(-1);
     }
 
-    BLASTED_OBJECTS_I I =
+    auto I =
         std::find(m_blasted_objects.begin(), m_blasted_objects.end(), smart_cast<CPhysicsShellHolder*>(O));
     if (m_blasted_objects.end() != I)
     {

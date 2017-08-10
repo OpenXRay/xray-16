@@ -215,7 +215,7 @@ public:
     void OnBuildVersionChallenge();
     void OnConnectResult(NET_Packet* P);
     // Static particles
-    DEFINE_VECTOR(CParticlesObject*, POVec, POIt);
+    using POVec = xr_vector<CParticlesObject*>;
     POVec m_StaticParticles;
     game_cl_GameState* game = nullptr;
     bool m_bGameConfigStarted = false;
@@ -229,7 +229,7 @@ public:
 
 private:
     // preload sounds registry
-    DEFINE_MAP(shared_str, ref_sound, SoundRegistryMap, SoundRegistryMapIt);
+    using SoundRegistryMap = xr_map<shared_str, ref_sound>;
     SoundRegistryMap sound_registry;
 
 public:

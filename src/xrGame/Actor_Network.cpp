@@ -1675,7 +1675,7 @@ void CActor::OnRender_Network()
         if (!pLastPos->empty())
         {
             Fvector Pos1, Pos2;
-            VIS_POSITION_it It = pLastPos->begin();
+            auto It = pLastPos->begin();
             Pos1 = *It;
             for (; It != pLastPos->end(); It++)
             {

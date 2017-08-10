@@ -128,7 +128,7 @@ CLevel::~CLevel()
         xr_delete(m_ph_commander_physics_worldstep);
     }
     // destroy PSs
-    for (POIt p_it = m_StaticParticles.begin(); m_StaticParticles.end() != p_it; ++p_it)
+    for (auto p_it = m_StaticParticles.begin(); m_StaticParticles.end() != p_it; ++p_it)
         CParticlesObject::Destroy(*p_it);
     m_StaticParticles.clear();
     // Unload sounds
@@ -214,7 +214,7 @@ void CLevel::PrefetchSound(LPCSTR name)
         *strext(tmp) = 0;
     shared_str snd_name = tmp;
     // find in registry
-    SoundRegistryMapIt it = sound_registry.find(snd_name);
+    auto it = sound_registry.find(snd_name);
     // if find failed - preload sound
     if (it == sound_registry.end())
         sound_registry[snd_name].create(snd_name.c_str(), st_Effect, sg_SourceType);

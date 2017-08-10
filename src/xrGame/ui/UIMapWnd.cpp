@@ -494,14 +494,14 @@ void CUIMapWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 CUICustomMap* CUIMapWnd::GetMapByIdx(u16 idx)
 {
     VERIFY(idx != u16(-1));
-    GameMapsPairIt it = m_GameMaps.begin();
+    auto it = m_GameMaps.begin();
     std::advance(it, idx);
     return it->second;
 }
 
 u16 CUIMapWnd::GetIdxByName(const shared_str& map_name)
 {
-    GameMapsPairIt it = m_GameMaps.find(map_name);
+    auto it = m_GameMaps.find(map_name);
     if (it == m_GameMaps.end())
     {
         Msg("~ Level Map '%s' not registered", map_name.c_str());

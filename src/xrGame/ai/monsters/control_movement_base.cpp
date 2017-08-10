@@ -52,7 +52,7 @@ void CControlMovementBase::load_velocity(LPCSTR section, LPCSTR line, u32 veloci
 
 SVelocityParam& CControlMovementBase::get_velocity(u32 velocity_id)
 {
-    VELOCITY_MAP_IT it = m_velocities.find(velocity_id);
+    auto it = m_velocities.find(velocity_id);
     VERIFY(it != m_velocities.end());
 
     return it->second;

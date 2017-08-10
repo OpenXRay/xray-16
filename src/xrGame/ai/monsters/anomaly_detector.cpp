@@ -35,7 +35,7 @@ void CAnomalyDetector::update_schedule()
     temp_in_restrictors.reserve(m_storage.size());
 
     // add new restrictions
-    for (ANOMALY_INFO_VEC_IT it = m_storage.begin(); it != m_storage.end(); it++)
+    for (auto it = m_storage.begin(); it != m_storage.end(); it++)
     {
         if (it->time_registered == 0)
         {
@@ -48,7 +48,7 @@ void CAnomalyDetector::update_schedule()
 
     // remove old restrictions
     temp_in_restrictors.clear();
-    for (ANOMALY_INFO_VEC_IT it = m_storage.begin(); it != m_storage.end(); it++)
+    for (auto it = m_storage.begin(); it != m_storage.end(); it++)
     {
         if (it->time_registered + m_time_to_rememeber < time())
         {
@@ -80,7 +80,7 @@ void CAnomalyDetector::on_contact(IGameObject* obj)
             m_object->control().path_builder().restrictions().in_restrictions(), custom_zone->cName()))
         return;
 
-    ANOMALY_INFO_VEC_IT it = std::find(m_storage.begin(), m_storage.end(), custom_zone);
+    auto it = std::find(m_storage.begin(), m_storage.end(), custom_zone);
     if (it != m_storage.end())
         return;
 

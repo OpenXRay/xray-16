@@ -11,7 +11,7 @@
 #include "Include/xrRender/KinematicsAnimated.h"
 #include "ai_debug.h"
 
-DEFINE_VECTOR(MotionID, ANIM_VECTOR, ANIM_IT);
+using ANIM_VECTOR = xr_vector<MotionID>;
 
 class CAniVector
 {

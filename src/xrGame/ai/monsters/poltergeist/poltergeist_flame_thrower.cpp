@@ -138,7 +138,7 @@ void CPolterFlame::update_schedule()
     inherited::update_schedule();
 
     // check all flames
-    for (FLAME_ELEMS_IT it = m_flames.begin(); it != m_flames.end(); it++)
+    for (auto it = m_flames.begin(); it != m_flames.end(); it++)
     {
         SFlameElement* elem = *it;
 
@@ -225,8 +225,8 @@ void CPolterFlame::on_destroy()
 {
     inherited::on_destroy();
 
-    FLAME_ELEMS_IT I = m_flames.begin();
-    FLAME_ELEMS_IT E = m_flames.end();
+    auto I = m_flames.begin();
+    auto E = m_flames.end();
 
     // Пройти по всем объектам и проверить на хит врага
     for (; I != E; ++I)

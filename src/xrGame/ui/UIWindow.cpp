@@ -148,7 +148,7 @@ CUIWindow::~CUIWindow()
 
 void CUIWindow::Draw()
 {
-    for (WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
+    for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
     {
         if (!(*it)->IsShown())
             continue;
@@ -192,7 +192,7 @@ void CUIWindow::Update()
         }
     }
 
-    for (WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
+    for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
     {
         if (!(*it)->IsShown())
             continue;
@@ -221,7 +221,7 @@ void CUIWindow::DetachChild(CUIWindow* pChild)
         SetCapture(pChild, false);
 
     //.	SafeRemoveChild			(pChild);
-    WINDOW_LIST_it it = std::find(m_ChildWndList.begin(), m_ChildWndList.end(), pChild);
+    auto it = std::find(m_ChildWndList.begin(), m_ChildWndList.end(), pChild);
     R_ASSERT(it != m_ChildWndList.end());
     m_ChildWndList.erase(it);
 
@@ -487,7 +487,7 @@ void CUIWindow::SetKeyboardCapture(CUIWindow* pChildWindow, bool capture_status)
 void CUIWindow::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
     //оповестить дочерние окна
-    for (WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
+    for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
     {
         if ((*it)->IsEnabled())
             (*it)->SendMessage(pWnd, msg, pData);
@@ -525,7 +525,7 @@ CUIWindow* CUIWindow::GetChildMouseHandler()
 void CUIWindow::Reset() { m_pMouseCapturer = NULL; }
 void CUIWindow::ResetAll()
 {
-    for (WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
+    for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
     {
         (*it)->Reset();
     }
@@ -563,7 +563,7 @@ void CUIWindow::SetParent(CUIWindow* pNewParent)
 
 void CUIWindow::ShowChildren(bool show)
 {
-    for (WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
+    for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
         (*it)->Show(show);
 }
 

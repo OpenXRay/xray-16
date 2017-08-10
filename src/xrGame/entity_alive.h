@@ -3,7 +3,7 @@
 #include "entity.h"
 
 // Igor DEFINE_VECTOR(ref_shader, SHADER_VECTOR, SHADER_VECTOR_IT);
-DEFINE_VECTOR(shared_str, STR_VECTOR, STR_VECTOR_IT);
+using STR_VECTOR = xr_vector<shared_str>;
 
 class MONSTER_COMMUNITY;
 class CEntityCondition;
@@ -14,13 +14,12 @@ class CVisualMemoryManager;
 class CBlend;
 class CEntityAlive : public CEntity
 {
-private:
     typedef CEntity inherited;
     u32 m_used_time;
 
 public:
     virtual CEntityAlive* cast_entity_alive() { return this; }
-public:
+
     bool m_bMobility;
     float m_fAccuracy;
     float m_fIntelligence;
@@ -76,7 +75,7 @@ public:
     virtual float ffGetFov() const = 0;
     virtual float ffGetRange() const = 0;
 
-    virtual bool human_being() const { return (false); }
+    virtual bool human_being() const { return false; }
 public:
     // IC	CPHMovementControl*					PMovement					()						{return
     // m_PhysicMovementControl;}
@@ -93,7 +92,7 @@ public:
     virtual void set_collision_hit_callback(ICollisionHitCallback* cc);
 
 protected:
-    DEFINE_VECTOR(CWound*, WOUND_VECTOR, WOUND_VECTOR_IT);
+    using WOUND_VECTOR = xr_vector<CWound*>;
     WOUND_VECTOR m_ParticleWounds;
 
     virtual void StartFireParticles(CWound* pWound);
@@ -131,7 +130,6 @@ protected:
     static FactoryPtr<IWallMarkArray>* m_pBloodDropsVector;
     //список ран с которых капает кровь
 
-    DEFINE_VECTOR(CWound*, WOUND_VECTOR, WOUND_VECTOR_IT);
     WOUND_VECTOR m_BloodWounds;
     //размер раны, чтоб начала капать кровь
     static float m_fStartBloodWoundSize;
@@ -148,7 +146,6 @@ public:
     virtual ALife::ERelationType tfGetRelationType(const CEntityAlive* tpEntityAlive) const;
     virtual bool is_relation_enemy(const CEntityAlive* tpEntityAlive) const;
 
-public:
     MONSTER_COMMUNITY* monster_community;
 
 private:
@@ -177,7 +174,6 @@ public:
     virtual u32 ef_weapon_type() const;
     virtual u32 ef_detector_type() const;
 
-public:
     virtual void OnHitHealthLoss(float NewHealth){}; //вызывается если entity теряет здоровье
     virtual void OnCriticalHitHealthLoss(){}; //вызывается если entity умрет от хита
     virtual void OnCriticalWoundHealthLoss(){}; //вызывается если entity умрет от потери крови
@@ -186,7 +182,6 @@ public:
     virtual CVisualMemoryManager* visual_memory() const { return (0); }
     virtual void net_Relcase(IGameObject* O);
 
-public:
     virtual Fvector predict_position(const float& time_to_check) const;
     virtual Fvector target_position() const;
     IC bool const& is_agresive() const;
@@ -194,7 +189,6 @@ public:
     IC bool const& is_start_attack() const;
     IC void is_start_attack(bool const& value);
 
-public:
     virtual Fvector get_new_local_point_on_mesh(u16& bone_id) const;
     virtual Fvector get_last_local_point_on_mesh(Fvector const& last_point, u16 bone_id) const;
     virtual void OnChangeVisual();
@@ -202,10 +196,8 @@ public:
 private:
     void fill_hit_bone_surface_areas() const;
 
-private:
     typedef xr_vector<std::pair<u16, float>> hit_bone_surface_areas_type;
 
-private:
     mutable hit_bone_surface_areas_type m_hit_bone_surface_areas;
     mutable CRandom m_hit_bones_random;
     mutable bool m_hit_bone_surface_areas_actual;

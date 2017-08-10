@@ -21,11 +21,9 @@ class CEntityAlive;
 
 struct RELATION_REGISTRY
 {
-public:
     RELATION_REGISTRY();
     virtual ~RELATION_REGISTRY();
 
-public:
     template <typename T>
     ALife::ERelationType GetRelationBetween(T char1, T char2) const;
 
@@ -80,7 +78,6 @@ public:
     };
     void Action(CEntityAlive* from, CEntityAlive* to, ERelationAction action);
 
-public:
     struct FIGHT_DATA
     {
         FIGHT_DATA();
@@ -107,11 +104,11 @@ public:
         };
     };
     //зарегистрировать драку (реакция на Hit в EntityAlive)
-    void FightRegister(u16 attacker, u16 defender, ALife::ERelationType defender_to_attacker, float hit_amount);
-    void UpdateFightRegister();
+    static void FightRegister(u16 attacker, u16 defender, ALife::ERelationType defender_to_attacker, float hit_amount);
+    static void UpdateFightRegister();
 
 private:
-    DEFINE_VECTOR(FIGHT_DATA, FIGHT_VECTOR, FIGHT_VECTOR_IT);
+    using FIGHT_VECTOR = xr_vector<FIGHT_DATA>;
     static FIGHT_VECTOR* m_fight_registry;
     static FIGHT_VECTOR& fight_registry();
 

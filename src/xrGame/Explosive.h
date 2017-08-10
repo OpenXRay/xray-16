@@ -13,7 +13,7 @@
 #include "ParticlesObject.h"
 
 class IRender_Light;
-DEFINE_VECTOR(CPhysicsShellHolder*, BLASTED_OBJECTS_V, BLASTED_OBJECTS_I);
+using BLASTED_OBJECTS_V = xr_vector<CPhysicsShellHolder*>;
 class CExplosive : public IDamageSource
 {
 private:

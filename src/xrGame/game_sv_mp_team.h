@@ -1,10 +1,10 @@
 #pragma once
 
 // Вектор имен скинов комманды
-DEF_VECTOR(TEAM_SKINS_NAMES, xr_string);
+using TEAM_SKINS_NAMES = xr_vector<xr_string>;
 
 // Вектор имен скинов комманды
-DEF_VECTOR(DEF_ITEMS_LIST, u16);
+using DEF_ITEMS_LIST = xr_vector<u16>;
 
 //структура данных по команде
 struct TeamStruct
@@ -42,4 +42,4 @@ struct TeamStruct
 };
 
 //массив данных по командам
-DEF_DEQUE(TEAM_DATA_LIST, TeamStruct);
+using TEAM_DATA_LIST = xr_deque<TeamStruct>;

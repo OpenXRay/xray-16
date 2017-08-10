@@ -12,9 +12,9 @@ class CMonsterSquadManager
     //		 Team->Level->Squad used only for private members and functions
     //------------------------------------------------------------------------
 
-    DEFINE_VECTOR(CMonsterSquad*, MONSTER_SQUAD_VEC, MONSTER_SQUAD_VEC_IT);
-    DEFINE_VECTOR(MONSTER_SQUAD_VEC, MONSTER_LEVEL_VEC, MONSTER_LEVEL_VEC_IT);
-    DEFINE_VECTOR(MONSTER_LEVEL_VEC, MONSTER_TEAM_VEC, MONSTER_TEAM_VEC_IT);
+    using MONSTER_SQUAD_VEC = xr_vector<CMonsterSquad*>;
+    using MONSTER_LEVEL_VEC = xr_vector<MONSTER_SQUAD_VEC>;
+    using MONSTER_TEAM_VEC = xr_vector<MONSTER_LEVEL_VEC>;
 
     MONSTER_TEAM_VEC team;
 

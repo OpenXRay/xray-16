@@ -92,16 +92,13 @@ class CLevel;
 
 class CBulletManager
 {
-private:
     static float const parent_ignore_distance;
 
-private:
     collide::rq_results rq_storage;
     collide::rq_results m_rq_results;
 
-private:
-    DEFINE_VECTOR(ref_sound, SoundVec, SoundVecIt);
-    DEFINE_VECTOR(SBullet, BulletVec, BulletVecIt);
+    using SoundVec = xr_vector<ref_sound>;
+    using BulletVec = xr_vector<SBullet>;
     friend CLevel;
 
     enum EventType

@@ -369,8 +369,8 @@ void CCustomZone::net_Destroy()
     if (m_actor_effector)
         m_actor_effector->Stop();
 
-    OBJECT_INFO_VEC_IT i = m_ObjectInfoMap.begin();
-    OBJECT_INFO_VEC_IT e = m_ObjectInfoMap.end();
+    auto i = m_ObjectInfoMap.begin();
+    auto e = m_ObjectInfoMap.end();
     for (; e != i; ++i)
         exit_Zone(*i);
     m_ObjectInfoMap.clear();
@@ -492,7 +492,7 @@ void CCustomZone::shedule_Update(u32 dt)
 
         //пройтись по всем объектам в зоне
         //и проверить их состояние
-        for (OBJECT_INFO_VEC_IT it = m_ObjectInfoMap.begin(); m_ObjectInfoMap.end() != it; ++it)
+        for (auto it = m_ObjectInfoMap.begin(); m_ObjectInfoMap.end() != it; ++it)
         {
             CGameObject* pObject = (*it).object;
             if (!pObject)
@@ -599,7 +599,7 @@ void CCustomZone::feel_touch_delete(IGameObject* O)
         StopObjectIdleParticles(pGameObject);
     }
 
-    OBJECT_INFO_VEC_IT it = std::find(m_ObjectInfoMap.begin(), m_ObjectInfoMap.end(), pGameObject);
+    auto it = std::find(m_ObjectInfoMap.begin(), m_ObjectInfoMap.end(), pGameObject);
     if (it != m_ObjectInfoMap.end())
     {
         exit_Zone(*it);
@@ -928,7 +928,7 @@ void CCustomZone::StopObjectIdleParticles(CGameObject* pObject)
     if (!PP)
         return;
 
-    OBJECT_INFO_VEC_IT it = std::find(m_ObjectInfoMap.begin(), m_ObjectInfoMap.end(), pObject);
+    auto it = std::find(m_ObjectInfoMap.begin(), m_ObjectInfoMap.end(), pObject);
     if (m_ObjectInfoMap.end() == it)
         return;
 
@@ -1015,8 +1015,7 @@ void CCustomZone::AffectObjects()
     if (Device.dwPrecacheFrame)
         return;
 
-    OBJECT_INFO_VEC_IT it;
-    for (it = m_ObjectInfoMap.begin(); m_ObjectInfoMap.end() != it; ++it)
+    for (auto it = m_ObjectInfoMap.begin(); m_ObjectInfoMap.end() != it; ++it)
     {
         if (!(*it).object->getDestroy())
             Affect(&(*it));
@@ -1041,9 +1040,7 @@ void CCustomZone::UpdateBlowout()
     UpdateWind();
 
     if (m_dwBlowoutExplosionTime >= (u32)m_iPreviousStateTime && m_dwBlowoutExplosionTime < (u32)m_iStateTime)
-    {
         AffectObjects();
-    }
 }
 
 void CCustomZone::OnMove()
@@ -1132,7 +1129,7 @@ bool CCustomZone::Enable()
 
     o_switch_2_fast();
 
-    for (OBJECT_INFO_VEC_IT it = m_ObjectInfoMap.begin(); m_ObjectInfoMap.end() != it; ++it)
+    for (auto it = m_ObjectInfoMap.begin(); m_ObjectInfoMap.end() != it; ++it)
     {
         CGameObject* pObject = (*it).object;
         if (!pObject)
@@ -1150,7 +1147,7 @@ bool CCustomZone::Disable()
         return false;
     o_switch_2_slow();
 
-    for (OBJECT_INFO_VEC_IT it = m_ObjectInfoMap.begin(); m_ObjectInfoMap.end() != it; ++it)
+    for (auto it = m_ObjectInfoMap.begin(); m_ObjectInfoMap.end() != it; ++it)
     {
         CGameObject* pObject = (*it).object;
         if (!pObject)
@@ -1242,7 +1239,7 @@ void CCustomZone::CreateHit(u16 id_to, u16 id_from, const Fvector& hit_dir, floa
 void CCustomZone::net_Relcase(IGameObject* O)
 {
     CGameObject* GO = smart_cast<CGameObject*>(O);
-    OBJECT_INFO_VEC_IT it = std::find(m_ObjectInfoMap.begin(), m_ObjectInfoMap.end(), GO);
+    auto it = std::find(m_ObjectInfoMap.begin(), m_ObjectInfoMap.end(), GO);
     if (it != m_ObjectInfoMap.end())
     {
         exit_Zone(*it);
@@ -1344,8 +1341,8 @@ void CCustomZone::GoDisabledState()
     P.w_u8(u8(eZoneStateDisabled));
     u_EventSend(P);
 
-    OBJECT_INFO_VEC_IT it = m_ObjectInfoMap.begin();
-    OBJECT_INFO_VEC_IT it_e = m_ObjectInfoMap.end();
+    auto it = m_ObjectInfoMap.begin();
+    auto it_e = m_ObjectInfoMap.end();
 
     for (; it != it_e; ++it)
         exit_Zone(*it);

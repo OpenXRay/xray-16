@@ -11,7 +11,7 @@
 class CInventoryOwner;
 class CPda;
 
-DEF_VECTOR(PDA_LIST, CPda*);
+using PDA_LIST = xr_vector<CPda*>;
 
 class CPda : public CInventoryItemObject, public Feel::Touch
 {

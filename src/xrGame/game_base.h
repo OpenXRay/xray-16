@@ -81,10 +81,10 @@ struct game_PlayerState
     u32 DeathTime;
     s16 money_delta;
     u8 m_bCurrentVoteAgreed;
-    DEF_DEQUE(OLD_GAME_ID, u16);
+    using OLD_GAME_ID = xr_deque<u16>;
     OLD_GAME_ID mOldIDs;
     s32 money_added;
-    DEF_VECTOR(MONEY_BONUS, Bonus_Money_Struct);
+    using MONEY_BONUS = xr_vector<Bonus_Money_Struct>;
     MONEY_BONUS m_aBonusMoney;
     bool m_bPayForSpawn;
     u32 m_online_time;
@@ -115,11 +115,11 @@ struct game_PlayerState
 #endif
     //---------------------------------------
 
-    DEF_VECTOR(PLAYER_ITEMS_LIST, u16);
+    using PLAYER_ITEMS_LIST = xr_vector<u16>;
 
     PLAYER_ITEMS_LIST pItemList;
 
-    DEF_VECTOR(SPAWN_POINTS_LIST, s16);
+    using SPAWN_POINTS_LIST = xr_vector<s16>;
 
     SPAWN_POINTS_LIST pSpawnPointsList;
     s16 m_s16LastSRoint;

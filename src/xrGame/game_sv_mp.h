@@ -34,11 +34,11 @@ class game_sv_mp : public game_sv_GameState
 
 protected:
     //список трупов для удаления
-    DEF_DEQUE(CORPSE_LIST, u16);
+    using CORPSE_LIST = xr_deque<u16>;
 
     CORPSE_LIST m_CorpseList;
 
-    DEF_VECTOR(RANKS_LIST, Rank_Struct);
+    using RANKS_LIST = xr_vector<Rank_Struct>;
 
     RANKS_LIST m_aRanks;
     bool m_bRankUp_Allowed;

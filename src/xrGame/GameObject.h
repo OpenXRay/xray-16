@@ -56,7 +56,6 @@ class CGameObject : public IGameObject,
                     public RenderableBase,
                     public CollidableBase
 {
-private:
     BENCH_SEC_SCRAMBLEMEMBER1
     BENCH_SEC_SCRAMBLEVTBL2
     // Some property variables
@@ -89,8 +88,7 @@ private:
     mutable CScriptGameObject* m_lua_game_object;
     int m_script_clsid;
     u32 m_spawn_time;
-    typedef xr_map<GameObject::ECallbackType, CScriptCallbackExVoid> CALLBACK_MAP;
-    typedef CALLBACK_MAP::iterator CALLBACK_MAP_IT;
+    using CALLBACK_MAP = xr_map<GameObject::ECallbackType, CScriptCallbackExVoid>;
     CALLBACK_MAP* m_callbacks;
     ai_obstacle* m_ai_obstacle;
     Fmatrix m_previous_matrix;

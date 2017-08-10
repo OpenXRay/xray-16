@@ -19,8 +19,8 @@ extern ENGINE_API BOOL bShowPauseString;
 
 CUISequenceSimpleItem::~CUISequenceSimpleItem()
 {
-    SubItemVecIt _I = m_subitems.begin();
-    SubItemVecIt _E = m_subitems.end();
+    auto _I = m_subitems.begin();
+    auto _E = m_subitems.end();
     for (; _I != _E; ++_I)
         _I->Stop();
     m_subitems.clear();
@@ -39,12 +39,12 @@ bool CUISequenceSimpleItem::IsPlaying()
 CUIWindow* find_child_window(CUIWindow* parent, const shared_str& _name)
 {
     CUIWindow::WINDOW_LIST& wl = parent->GetChildWndList();
-    CUIWindow::WINDOW_LIST_it _I = wl.begin();
-    CUIWindow::WINDOW_LIST_it _E = wl.end();
+    auto _I = wl.begin();
+    auto _E = wl.end();
     for (; _I != _E; ++_I)
         if ((*_I)->WindowName() == _name)
             return (*_I);
-    return NULL;
+    return nullptr;
 }
 
 void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
@@ -75,7 +75,7 @@ void CUISequenceSimpleItem::Load(CUIXml* xml, int idx)
     if (str && !_stricmp(str, "any"))
     {
         m_continue_dik_guard = 9999;
-        str = NULL;
+        str = nullptr;
     }
     if (str)
     {
@@ -188,8 +188,8 @@ void CUISequenceSimpleItem::Update()
     float _start = (m_time_start < 0.0f) ? (float(Device.dwTimeContinual) / 1000.0f) : m_time_start;
 
     float gt = float(Device.dwTimeContinual) / 1000.0f;
-    SubItemVecIt _I = m_subitems.begin();
-    SubItemVecIt _E = m_subitems.end();
+    auto _I = m_subitems.begin();
+    auto _E = m_subitems.end();
     for (; _I != _E; ++_I)
     {
         SSubItem& s = *_I;

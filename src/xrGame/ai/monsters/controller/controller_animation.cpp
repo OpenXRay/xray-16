@@ -155,7 +155,7 @@ void CControllerAnimation::add_path_rotation(ELegsActionType action, float angle
     rot.angle = angle;
     rot.legs_motion = type;
 
-    PATH_ROTATIONS_MAP_IT map_it = m_path_rotations.find(action);
+    auto map_it = m_path_rotations.find(action);
     if (map_it == m_path_rotations.end())
     {
         PATH_ROTATIONS_VEC vec;
@@ -254,7 +254,7 @@ void CControllerAnimation::select_legs_animation()
     else
     {
         // else select standing animation
-        for (LEGS_MOTION_MAP_IT it = m_legs.begin(); it != m_legs.end(); it++)
+        for (auto it = m_legs.begin(); it != m_legs.end(); it++)
         {
             if ((it->first & m_current_legs_action) == m_current_legs_action)
             {
@@ -287,9 +287,9 @@ CControllerAnimation::SPathRotations CControllerAnimation::get_path_rotation(flo
 
     diff = angle_normalize(diff);
 
-    PATH_ROTATIONS_VEC_IT it_best = m_path_rotations[m_current_legs_action].begin();
+    auto it_best = m_path_rotations[m_current_legs_action].begin();
     float best_diff = flt_max;
-    for (PATH_ROTATIONS_VEC_IT it = m_path_rotations[m_current_legs_action].begin();
+    for (auto it = m_path_rotations[m_current_legs_action].begin();
          it != m_path_rotations[m_current_legs_action].end(); it++)
     {
         float angle_diff = angle_normalize(it->angle);
@@ -302,7 +302,7 @@ CControllerAnimation::SPathRotations CControllerAnimation::get_path_rotation(flo
         }
     }
 
-    return (*it_best);
+    return *it_best;
 }
 
 void CControllerAnimation::set_body_state(ETorsoActionType torso, ELegsActionType legs)

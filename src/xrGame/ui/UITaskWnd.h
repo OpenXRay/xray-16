@@ -64,8 +64,8 @@ public:
     virtual void Reset();
 
     void ReloadTaskInfo();
-    void ShowMapLegend(bool status);
-    void Switch_ShowMapLegend();
+    void ShowMapLegend(bool status) const;
+    void Switch_ShowMapLegend() const;
 
     bool IsTreasuresEnabled() { return m_bTreasuresEnabled; };
     bool IsQuestNpcsEnabled() { return m_bQuestNpcsEnabled; };
@@ -96,7 +96,7 @@ public:
 
 private:
     void TaskSetTargetMap(CGameTask* task);
-    void TaskShowMapSpot(CGameTask* task, bool show);
+    void TaskShowMapSpot(CGameTask* task, bool show) const;
 
     void OnNextTaskClicked();
     void OnPrevTaskClicked();

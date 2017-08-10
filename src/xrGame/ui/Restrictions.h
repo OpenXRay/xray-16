@@ -41,12 +41,12 @@ private:
     u32 m_rank;
     bool m_bInited;
 
-    DEF_VECTOR(group_items, shared_str);
-    DEF_MAP(Groups, shared_str, group_items);
+    using group_items = xr_vector<shared_str>;
+    using Groups = xr_map<shared_str, group_items>;
     Groups m_goups;
 
     typedef std::pair<shared_str, u32> restr_item;
-    DEF_VECTOR(rank_rest_vec, restr_item);
+    using rank_rest_vec = xr_vector<restr_item>;
     rank_rest_vec m_restrictions[_RANK_COUNT + 1];
     shared_str m_names[_RANK_COUNT];
 

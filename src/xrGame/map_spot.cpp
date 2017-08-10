@@ -328,7 +328,7 @@ void CComplexMapSpot::SetWndSize(const Fvector2& size)
     }
     float k = size.x / m_originSize.x;
 
-    for (WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
+    for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
     {
         CUIStaticOrig* static_orig = smart_cast<CUIStaticOrig*>(*it);
         if (static_orig)

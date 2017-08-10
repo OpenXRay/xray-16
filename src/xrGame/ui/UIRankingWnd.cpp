@@ -29,7 +29,7 @@
 
 CUIRankingWnd::CUIRankingWnd()
 {
-    m_actor_ch_info = NULL;
+    m_actor_ch_info = nullptr;
     m_previous_time = Device.dwTimeGlobal;
     m_delay = 3000;
     m_last_monster_icon_back = "";
@@ -39,7 +39,7 @@ CUIRankingWnd::CUIRankingWnd()
 
 CUIRankingWnd::~CUIRankingWnd()
 {
-    ACHIEVES_VEC_IT b = m_achieves_vec.begin(), e = m_achieves_vec.end();
+    auto b = m_achieves_vec.begin(), e = m_achieves_vec.end();
     for (; b != e; b++)
         xr_delete(*b);
     m_achieves_vec.clear();
@@ -177,7 +177,7 @@ void CUIRankingWnd::add_achievement(CUIXml& xml, shared_str const& achiev_id)
 
 void CUIRankingWnd::update_info()
 {
-    ACHIEVES_VEC_IT b = m_achieves_vec.begin(), e = m_achieves_vec.end();
+    auto b = m_achieves_vec.begin(), e = m_achieves_vec.end();
     for (; b != e; b++)
         (*b)->Update();
     get_statistic();
@@ -187,7 +187,7 @@ void CUIRankingWnd::update_info()
 
 void CUIRankingWnd::DrawHint()
 {
-    ACHIEVES_VEC_IT b = m_achieves_vec.begin(), e = m_achieves_vec.end();
+    auto b = m_achieves_vec.begin(), e = m_achieves_vec.end();
     for (; b != e; b++)
     {
         if ((*b)->IsShown())
@@ -280,7 +280,7 @@ void CUIRankingWnd::ResetAll()
     m_monster_icon_back->TextureOff();
     m_monster_icon->TextureOff();
     m_favorite_weapon_icon->TextureOff();
-    ACHIEVES_VEC_IT b = m_achieves_vec.begin(), e = m_achieves_vec.end();
+    auto b = m_achieves_vec.begin(), e = m_achieves_vec.end();
     for (; b != e; b++)
         (*b)->Reset();
 

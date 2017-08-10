@@ -39,7 +39,7 @@ ui_shader* g_tmpWMShader = NULL;
 static CUIStatic* GetUIStatic();
 
 typedef std::pair<CHARACTER_RANK_VALUE, shared_str> CharInfoStringID;
-DEF_MAP(CharInfoStrings, CHARACTER_RANK_VALUE, shared_str);
+using CharInfoStrings = xr_map<CHARACTER_RANK_VALUE, shared_str>;
 
 CharInfoStrings* charInfoReputationStrings = NULL;
 CharInfoStrings* charInfoRankStrings = NULL;

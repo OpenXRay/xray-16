@@ -29,7 +29,7 @@ class CControlManagerCustom : public CControl_ComBase
     CControlMeleeJump* m_melee_jump;
     CControlCriticalWound* m_critical_wound;
 
-    DEFINE_VECTOR(SControlRotationJumpData, ROT_JUMP_DATA_VEC, ROT_JUMP_DATA_VEC_IT);
+    using ROT_JUMP_DATA_VEC = xr_vector<SControlRotationJumpData>;
     ROT_JUMP_DATA_VEC m_rot_jump_data;
 
     SControlMeleeJumpData m_melee_jump_data;

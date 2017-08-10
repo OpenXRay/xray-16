@@ -189,7 +189,8 @@ public:
     virtual void Reset();
     void ResetAll();
 
-    DEF_UILIST(WINDOW_LIST, CUIWindow*);
+    using WINDOW_LIST = ui_list<CUIWindow*>;
+
     WINDOW_LIST& GetChildWndList() { return m_ChildWndList; }
     IC bool IsAutoDelete() { return m_bAutoDelete; }
     IC void SetAutoDelete(bool auto_delete) { m_bAutoDelete = auto_delete; }
@@ -206,7 +207,7 @@ public:
 protected:
     IC void SafeRemoveChild(CUIWindow* child)
     {
-        WINDOW_LIST_it it = std::find(m_ChildWndList.begin(), m_ChildWndList.end(), child);
+        auto it = std::find(m_ChildWndList.begin(), m_ChildWndList.end(), child);
         if (it != m_ChildWndList.end())
             m_ChildWndList.erase(it);
     };

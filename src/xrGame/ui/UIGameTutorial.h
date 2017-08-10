@@ -117,11 +117,10 @@ class CUISequenceSimpleItem : public CUISequenceItem
         float m_length;
         bool m_visible;
 
-    public:
         virtual void Start();
         virtual void Stop();
     };
-    DEFINE_VECTOR(SSubItem, SubItemVec, SubItemVecIt);
+    using SubItemVec = xr_vector<SSubItem>;
     SubItemVec m_subitems;
     struct SActionItem
     {

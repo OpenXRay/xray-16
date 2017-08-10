@@ -1827,7 +1827,7 @@ IC void CCar::fill_wheel_vector(LPCSTR S, xr_vector<T>& type_wheels)
         type_wheels.push_back(T());
         T& twheel = type_wheels.back();
 
-        BONE_P_PAIR_IT J = bone_map.find(bone_id);
+        auto J = bone_map.find(bone_id);
         if (J == bone_map.end())
         {
             bone_map.insert(std::make_pair(bone_id, physicsBone()));
@@ -1861,11 +1861,9 @@ IC void CCar::fill_exhaust_vector(LPCSTR S, xr_vector<SExhaust>& exhausts)
         SExhaust& exhaust = exhausts.back();
         exhaust.bone_id = bone_id;
 
-        BONE_P_PAIR_IT J = bone_map.find(bone_id);
+        auto J = bone_map.find(bone_id);
         if (J == bone_map.end())
-        {
             bone_map.insert(std::make_pair(bone_id, physicsBone()));
-        }
     }
 }
 
@@ -1882,11 +1880,9 @@ IC void CCar::fill_doors_map(LPCSTR S, xr_map<u16, SDoor>& doors)
         SDoor door(this);
         door.bone_id = bone_id;
         doors.insert(std::make_pair(bone_id, door));
-        BONE_P_PAIR_IT J = bone_map.find(bone_id);
+        auto J = bone_map.find(bone_id);
         if (J == bone_map.end())
-        {
             bone_map.insert(std::make_pair(bone_id, physicsBone()));
-        }
     }
 }
 
@@ -1908,8 +1904,8 @@ u16 CCar::Initiator()
         return ID();
 }
 
-float CCar::RefWheelMaxSpeed() { return m_max_rpm / m_current_gear_ratio; }
-float CCar::EngineCurTorque() { return m_current_engine_power / m_current_rpm; }
+float CCar::RefWheelMaxSpeed() const { return m_max_rpm / m_current_gear_ratio; }
+float CCar::EngineCurTorque() const { return m_current_engine_power / m_current_rpm; }
 float CCar::RefWheelCurTorque()
 {
     if (b_transmission_switching)

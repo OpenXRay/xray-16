@@ -26,8 +26,8 @@ void RELATION_REGISTRY::FightRegister(
     UpdateFightRegister();
 
     FIGHT_VECTOR& fights = fight_registry();
-    FIGHT_VECTOR_IT it;
-    for (it = fights.begin(); it != fights.end(); it++)
+    auto it = fights.begin();
+    for (; it != fights.end(); it++)
     {
         FIGHT_DATA& fight_data = *it;
         if (attacker == fight_data.attacker && defender == fight_data.defender)
@@ -54,7 +54,7 @@ void RELATION_REGISTRY::FightRegister(
 RELATION_REGISTRY::FIGHT_DATA* RELATION_REGISTRY::FindFight(u16 object_id, bool by_attacker)
 {
     FIGHT_VECTOR& fights = fight_registry();
-    for (FIGHT_VECTOR_IT it = fights.begin(); it != fights.end(); it++)
+    for (auto it = fights.begin(); it != fights.end(); it++)
     {
         FIGHT_DATA& fight_data = *it;
         u16 id_to_find = by_attacker ? fight_data.attacker : fight_data.defender;
@@ -64,7 +64,7 @@ RELATION_REGISTRY::FIGHT_DATA* RELATION_REGISTRY::FindFight(u16 object_id, bool 
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 bool fight_time_pred(RELATION_REGISTRY::FIGHT_DATA& fight_data)
@@ -82,6 +82,6 @@ bool fight_time_pred(RELATION_REGISTRY::FIGHT_DATA& fight_data)
 void RELATION_REGISTRY::UpdateFightRegister()
 {
     FIGHT_VECTOR& fights = fight_registry();
-    FIGHT_VECTOR_IT it = std::remove_if(fights.begin(), fights.end(), fight_time_pred);
+    auto it = std::remove_if(fights.begin(), fights.end(), fight_time_pred);
     fights.erase(it, fights.end());
 }

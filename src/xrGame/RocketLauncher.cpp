@@ -60,8 +60,8 @@ void CRocketLauncher::DetachRocket(u16 rocket_id, bool bLaunch)
         return;
 
     VERIFY(pRocket);
-    ROCKETIT It = std::find(m_rockets.begin(), m_rockets.end(), pRocket);
-    ROCKETIT It_l = std::find(m_launched_rockets.begin(), m_launched_rockets.end(), pRocket);
+    auto It = std::find(m_rockets.begin(), m_rockets.end(), pRocket);
+    auto It_l = std::find(m_launched_rockets.begin(), m_launched_rockets.end(), pRocket);
 
     if (OnServer())
     {
@@ -95,8 +95,7 @@ CCustomRocket* CRocketLauncher::getCurrentRocket()
 {
     if (m_rockets.size())
         return m_rockets.back();
-    else
-        return (CCustomRocket*)0;
+    return (CCustomRocket*)0;
 }
 
 void CRocketLauncher::dropCurrentRocket() { m_rockets.pop_back(); }

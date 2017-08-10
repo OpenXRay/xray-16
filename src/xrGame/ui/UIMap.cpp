@@ -21,7 +21,7 @@ CUICustomMap::CUICustomMap()
 
 void CUICustomMap::Initialize(shared_str name, LPCSTR sh_name)
 {
-    CInifile* levelIni = NULL;
+    CInifile* levelIni = nullptr;
     if (name == g_pGameLevel->name())
         levelIni = g_pGameLevel->pLevel;
     else
@@ -285,7 +285,7 @@ void CUIGlobalMap::Init_internal(const shared_str& name, CInifile& pLtx, const s
 
 void CUIGlobalMap::Update()
 {
-    for (WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
+    for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
     {
         CUICustomMap* m = smart_cast<CUICustomMap*>(*it);
         if (!m)
@@ -385,7 +385,7 @@ void CUILevelMap::Draw()
     if (MapWnd())
     {
         float gmz = MapWnd()->GlobalMap()->GetCurrentZoom().x;
-        for (WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
+        for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
         {
             CMapSpot* sp = smart_cast<CMapSpot*>((*it));
             if (sp)
@@ -446,16 +446,12 @@ void CUILevelMap::UpdateSpots()
         return;
 
     Locations& ls = Level().MapManager().Locations();
-    Locations_it it = ls.begin();
-    Locations_it it_e = ls.end();
+    auto it = ls.begin();
+    auto it_e = ls.end();
 
     for (u32 idx = 0; it != it_e; ++it, ++idx)
-    {
         if ((*it).actual && MapName() == (*it).location->GetLevelName())
-        {
             (*it).location->UpdateLevelMap(this);
-        }
-    }
 }
 
 Frect CUILevelMap::CalcWndRectOnGlobal()
@@ -556,7 +552,7 @@ void CUIMiniMap::UpdateSpots()
 {
     DetachAll();
     Locations& ls = Level().MapManager().Locations();
-    for (Locations_it it = ls.begin(); it != ls.end(); ++it)
+    for (auto it = ls.begin(); it != ls.end(); ++it)
         (*it).location->UpdateMiniMap(this);
 }
 

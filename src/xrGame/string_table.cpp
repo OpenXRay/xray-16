@@ -32,8 +32,8 @@ void CStringTable::Init()
     string_path files_mask;
     xr_sprintf(files_mask, "text\\%s\\*.xml", pData->m_sLanguage.c_str());
     FS.file_list(fset, "$game_config$", FS_ListFiles, files_mask);
-    FS_FileSetIt fit = fset.begin();
-    FS_FileSetIt fit_e = fset.end();
+    auto fit = fset.begin();
+    auto fit_e = fset.end();
 
     for (; fit != fit_e; ++fit)
     {
@@ -85,8 +85,8 @@ void CStringTable::ReparseKeyBindings()
 {
     if (!pData)
         return;
-    STRING_TABLE_MAP_IT it = pData->m_string_key_binding.begin();
-    STRING_TABLE_MAP_IT it_e = pData->m_string_key_binding.end();
+    auto it = pData->m_string_key_binding.begin();
+    auto it_e = pData->m_string_key_binding.end();
 
     for (; it != it_e; ++it)
     {

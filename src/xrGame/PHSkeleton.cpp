@@ -245,7 +245,7 @@ void CPHSkeleton::RestoreNetState(CSE_PHSkeleton* po)
     PHNETSTATE_VECTOR& saved_bones = po->saved_bones.bones;
     VERIFY(saved_bones.size() == obj->PHGetSyncItemsNumber());
 
-    PHNETSTATE_I i = saved_bones.begin(), e = saved_bones.end();
+    auto i = saved_bones.begin(), e = saved_bones.end();
     if (obj->PPhysicsShell() && obj->PPhysicsShell()->isActive())
     {
         obj->PPhysicsShell()->Disable();
@@ -264,7 +264,7 @@ void CPHSkeleton::RestoreNetState(CSE_PHSkeleton* po)
 
 void CPHSkeleton::ClearUnsplited()
 {
-    SHELL_PAIR_I i = m_unsplited_shels.begin(), e = m_unsplited_shels.end();
+    auto i = m_unsplited_shels.begin(), e = m_unsplited_shels.end();
     for (; i != e; ++i)
     {
         i->first->Deactivate();

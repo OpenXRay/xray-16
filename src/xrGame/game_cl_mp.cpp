@@ -939,7 +939,7 @@ void game_cl_mp::OnPlayerKilled(NET_Packet& P)
         break;
         case SKT_HEADSHOT: // Head Shot
         {
-            BONUSES_it it = std::find(m_pBonusList.begin(), m_pBonusList.end(), "headshot");
+            auto it = std::find(m_pBonusList.begin(), m_pBonusList.end(), "headshot");
             if (it != m_pBonusList.end() && (*it == "headshot"))
             {
                 Bonus_Struct* pBS = &(*it);
@@ -958,7 +958,7 @@ void game_cl_mp::OnPlayerKilled(NET_Packet& P)
         break;
         case SKT_EYESHOT:
         {
-            BONUSES_it it = std::find(m_pBonusList.begin(), m_pBonusList.end(), "eyeshot");
+            auto it = std::find(m_pBonusList.begin(), m_pBonusList.end(), "eyeshot");
             if (it != m_pBonusList.end() && (*it == "eyeshot"))
             {
                 Bonus_Struct* pBS = &(*it);
@@ -977,7 +977,7 @@ void game_cl_mp::OnPlayerKilled(NET_Packet& P)
         break;
         case SKT_BACKSTAB: // BackStab
         {
-            BONUSES_it it = std::find(m_pBonusList.begin(), m_pBonusList.end(), "backstab");
+            auto it = std::find(m_pBonusList.begin(), m_pBonusList.end(), "backstab");
             if (it != m_pBonusList.end() && (*it == "backstab"))
             {
                 Bonus_Struct* pBS = &(*it);
@@ -1273,7 +1273,7 @@ void game_cl_mp::OnEventMoneyChanged(NET_Packet& P)
         }
         break;
         };
-        BONUSES_it it = std::find(m_pBonusList.begin(), m_pBonusList.end(), BName.c_str());
+        auto it = std::find(m_pBonusList.begin(), m_pBonusList.end(), BName.c_str());
         if (it != m_pBonusList.end() && (*it == BName.c_str()))
         {
             Bonus_Struct* pBS = &(*it);

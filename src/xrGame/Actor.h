@@ -522,7 +522,7 @@ protected:
     Fvector IPosS, IPosH, IPosL; //положение актера после интерполяции Бизье, Эрмита, линейной
 
 #ifdef DEBUG
-    DEF_DEQUE(VIS_POSITION, Fvector);
+    using VIS_POSITION = xr_deque<Fvector>;
 
     VIS_POSITION LastPosS;
     VIS_POSITION LastPosH;
@@ -544,7 +544,7 @@ protected:
     u32 m_dwILastUpdateTime;
 
     //---------------------------------------------
-    DEF_DEQUE(PH_STATES, SPHNetState);
+    using PH_STATES = xr_deque<SPHNetState>;
     PH_STATES m_States;
     u16 m_u16NumBones;
     void net_ExportDeadBody(NET_Packet& P);

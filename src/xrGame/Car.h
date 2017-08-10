@@ -452,8 +452,8 @@ private:
     void ResetKeys();
 
     ////////////////////////////////////////////////////////////////////////////
-    float RefWheelMaxSpeed();
-    float EngineCurTorque();
+    float RefWheelMaxSpeed() const;
+    float EngineCurTorque() const;
     float RefWheelCurTorque();
     float EnginePower();
     float EngineDriveSpeed();

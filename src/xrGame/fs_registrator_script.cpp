@@ -109,7 +109,7 @@ FS_file_list_ex::FS_file_list_ex(LPCSTR path, u32 flags, LPCSTR mask)
     FS_FileSet files;
     FS.file_list(files, path, flags, mask);
 
-    for (FS_FileSetIt it = files.begin(); it != files.end(); ++it)
+    for (auto it = files.begin(); it != files.end(); ++it)
     {
         m_file_items.push_back(FS_item());
         FS_item& itm = m_file_items.back();

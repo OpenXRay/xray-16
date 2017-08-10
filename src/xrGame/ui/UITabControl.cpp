@@ -72,7 +72,7 @@ bool CUITabControl::AddItem(CUITabButton* pButton)
 
 void CUITabControl::RemoveAll()
 {
-    TABS_VECTOR_it it = m_TabsArr.begin();
+    auto it = m_TabsArr.begin();
     for (; it != m_TabsArr.end(); ++it)
     {
         DetachChild(*it);

@@ -11,7 +11,7 @@ void CMonsterSquad::ProcessAttack()
     m_temp_entities.clear();
 
     // Выделить элементы с общими врагами и состянием атаки
-    for (MEMBER_GOAL_MAP_IT it_goal = m_goals.begin(); it_goal != m_goals.end(); it_goal++)
+    for (auto it_goal = m_goals.begin(); it_goal != m_goals.end(); it_goal++)
     {
         //		CEntity *member = it_goal->first;
         SMemberGoal goal = it_goal->second;
@@ -20,7 +20,7 @@ void CMonsterSquad::ProcessAttack()
         {
             VERIFY(goal.entity && !goal.entity->getDestroy());
 
-            ENEMY_MAP_IT it = m_enemy_map.find(goal.entity);
+            auto it = m_enemy_map.find(goal.entity);
             if (it != m_enemy_map.end())
             {
                 it->second.push_back(it_goal->first);
@@ -34,7 +34,7 @@ void CMonsterSquad::ProcessAttack()
     }
 
     // Пройти по всем группам и назначить углы всем елементам в группе
-    for (ENEMY_MAP_IT it_enemy = m_enemy_map.begin(); it_enemy != m_enemy_map.end(); ++it_enemy)
+    for (auto it_enemy = m_enemy_map.begin(); it_enemy != m_enemy_map.end(); ++it_enemy)
     {
         ENTITY_VEC* monsters = &(*it_enemy).second;
         if (!monsters->size())
@@ -76,11 +76,11 @@ void CMonsterSquad::set_rat_squad_index(const CEntity* m_enemy)
 
     // Выделить элементы с общей целью
 
-    for (MEMBER_GOAL_MAP_IT it_goal = m_goals.begin(); it_goal != m_goals.end(); it_goal++)
+    for (auto it_goal = m_goals.begin(); it_goal != m_goals.end(); it_goal++)
     {
         if (it_goal->first->g_Alive())
         {
-            ENEMY_MAP_IT it = m_enemy_maps.find(m_enemy);
+            auto it = m_enemy_maps.find(m_enemy);
             if (it != m_enemy_maps.end())
             {
                 it->second.push_back(it_goal->first);
@@ -93,7 +93,7 @@ void CMonsterSquad::set_rat_squad_index(const CEntity* m_enemy)
         }
     }
 
-    for (ENEMY_MAP_IT it_enemy = m_enemy_maps.begin(); it_enemy != m_enemy_maps.end(); it_enemy++)
+    for (auto it_enemy = m_enemy_maps.begin(); it_enemy != m_enemy_maps.end(); it_enemy++)
     {
         get_index_in_rat_squad(it_enemy->second, it_enemy->first);
     }
@@ -122,11 +122,11 @@ void CMonsterSquad::set_squad_index(const CEntity* m_enemy)
 
     // Выделить элементы с общей целью
 
-    for (MEMBER_GOAL_MAP_IT it_goal = m_goals.begin(); it_goal != m_goals.end(); it_goal++)
+    for (auto it_goal = m_goals.begin(); it_goal != m_goals.end(); it_goal++)
     {
         if (it_goal->first->g_Alive())
         {
-            ENEMY_MAP_IT it = m_enemy_maps.find(m_enemy);
+            auto it = m_enemy_maps.find(m_enemy);
             if (it != m_enemy_maps.end())
             {
                 it->second.push_back(it_goal->first);
@@ -139,13 +139,13 @@ void CMonsterSquad::set_squad_index(const CEntity* m_enemy)
         }
     }
 
-    for (ENEMY_MAP_IT it_enemy = m_enemy_maps.begin(); it_enemy != m_enemy_maps.end(); it_enemy++)
+    for (auto it_enemy = m_enemy_maps.begin(); it_enemy != m_enemy_maps.end(); it_enemy++)
     {
         get_index_in_squad(it_enemy->second, it_enemy->first);
     }
 }
 
-void CMonsterSquad::get_index_in_squad(ENTITY_VEC& members, const CEntity* m_enemy)
+void CMonsterSquad::get_index_in_squad(ENTITY_VEC& members, const CEntity* m_enemy) const
 {
     u8 m_index = 0;
     std::sort(members.begin(), members.end(), sort_predicate(m_enemy));
@@ -320,7 +320,7 @@ Fvector CMonsterSquad::calc_monster_target_dir(CBaseMonster* monster, const CEnt
 
 void CMonsterSquad::assign_monsters_target_dirs(ENTITY_VEC& members, const CEntity* enemy)
 {
-    for (ENTITY_VEC_IT i = members.begin(), e = members.end(); i != e; ++i)
+    for (auto i = members.begin(), e = members.end(); i != e; ++i)
     {
         CBaseMonster* monster = smart_cast<CBaseMonster*>(*i);
         SSquadCommand command;

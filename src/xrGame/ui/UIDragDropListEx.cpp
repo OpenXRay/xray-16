@@ -261,8 +261,8 @@ void CUIDragDropListEx::Compact()
     CUIWindow::WINDOW_LIST wl = m_container->GetChildWndList();
     ClearAll(false);
 
-    CUIWindow::WINDOW_LIST_it it = wl.begin();
-    CUIWindow::WINDOW_LIST_it it_e = wl.end();
+    auto it = wl.begin();
+    auto it_e = wl.end();
     for (; it != it_e; ++it)
     {
         CUICellItem* itm = smart_cast<CUICellItem*>(*it);
@@ -425,7 +425,7 @@ bool CUIDragDropListEx::IsOwner(CUICellItem* itm) { return m_container->IsChild(
 CUICellItem* CUIDragDropListEx::GetItemIdx(u32 idx)
 {
     R_ASSERT(idx < ItemsCount());
-    WINDOW_LIST_it it = m_container->GetChildWndList().begin();
+    auto it = m_container->GetChildWndList().begin();
     std::advance(it, idx);
     return smart_cast<CUICellItem*>(*it);
 }
@@ -492,7 +492,7 @@ bool CUICellContainer::AddSimilar(CUICellItem* itm)
 
 CUICellItem* CUICellContainer::FindSimilar(CUICellItem* itm)
 {
-    for (WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
+    for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
     {
 #ifdef DEBUG
         CUICellItem* i = smart_cast<CUICellItem*>(*it);
@@ -546,7 +546,7 @@ void CUICellContainer::PlaceItemAtPos(CUICellItem* itm, Ivector2& cell_pos)
 
 CUICellItem* CUICellContainer::RemoveItem(CUICellItem* itm, bool force_root)
 {
-    for (WINDOW_LIST_it it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
+    for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
     {
         CUICellItem* i = (CUICellItem*)(*it);
 
