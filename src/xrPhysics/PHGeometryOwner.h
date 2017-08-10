@@ -3,8 +3,10 @@
 #include "Geometry.h"
 #include "xrEngine/GameMtlLib.h"
 
-DEFINE_VECTOR(CODEGeom*, GEOM_STORAGE, GEOM_I)
-typedef xr_vector<CODEGeom*>::const_iterator GEOM_CI;
+using GEOM_STORAGE = xr_vector<CODEGeom*>;
+using GEOM_I = GEOM_STORAGE::iterator;
+using GEOM_CI = GEOM_STORAGE::const_iterator;
+
 struct SBoneShape;
 class IKinematics;
 

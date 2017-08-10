@@ -184,17 +184,17 @@ void SoundEnvironment_LIB::Unload()
 }
 int SoundEnvironment_LIB::GetID(LPCSTR name)
 {
-    for (SE_IT it = library.begin(); it != library.end(); it++)
+    for (auto it = library.begin(); it != library.end(); ++it)
         if (0 == _stricmp(name, *(*it)->name))
             return int(it - library.begin());
     return -1;
 }
 CSoundRender_Environment* SoundEnvironment_LIB::Get(LPCSTR name)
 {
-    for (SE_IT it = library.begin(); it != library.end(); it++)
-        if (0 == _stricmp(name, *(*it)->name))
-            return *it;
-    return NULL;
+    for (const auto& it : library)
+        if (0 == _stricmp(name, *it->name))
+            return it;
+    return nullptr;
 }
 CSoundRender_Environment* SoundEnvironment_LIB::Get(int id) { return library[id]; }
 CSoundRender_Environment* SoundEnvironment_LIB::Append(CSoundRender_Environment* parent)
@@ -204,7 +204,7 @@ CSoundRender_Environment* SoundEnvironment_LIB::Append(CSoundRender_Environment*
 }
 void SoundEnvironment_LIB::Remove(LPCSTR name)
 {
-    for (SE_IT it = library.begin(); it != library.end(); it++)
+    for (auto it = library.begin(); it != library.end(); ++it)
         if (0 == _stricmp(name, *(*it)->name))
         {
             xr_delete(*it);

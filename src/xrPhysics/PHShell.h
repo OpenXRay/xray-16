@@ -133,8 +133,7 @@ public:
     virtual void setForce(const Fvector& force);
     virtual void set_JointResistance(float force)
     {
-        JOINT_I i;
-        for (i = joints.begin(); joints.end() != i; ++i)
+        for (auto i = joints.begin(); joints.end() != i; ++i)
         {
             (*i)->SetForce(force);
             (*i)->SetVelocity();

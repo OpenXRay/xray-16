@@ -21,7 +21,9 @@ struct PARTICLES_API ParticleAction
     virtual void Load(IReader& F) = 0;
     virtual void Save(IWriter& F) = 0;
 };
-DEFINE_VECTOR(ParticleAction*, PAVec, PAVecIt);
+using PAVec = xr_vector<ParticleAction*>;
+using PAVecIt = PAVec::iterator;
+
 class ParticleActions
 {
     PAVec actions;
@@ -34,23 +36,27 @@ public:
         m_bLocked = false;
     }
     ~ParticleActions() { clear(); }
-    IC void clear()
+
+    void clear()
     {
         R_ASSERT(!m_bLocked);
         for (PAVecIt it = actions.begin(); it != actions.end(); it++)
             xr_delete(*it);
         actions.clear();
     }
-    IC void append(ParticleAction* pa)
+
+    void append(ParticleAction* pa)
     {
         R_ASSERT(!m_bLocked);
         actions.push_back(pa);
     }
-    IC bool empty() { return actions.empty(); }
-    IC PAVecIt begin() { return actions.begin(); }
-    IC PAVecIt end() { return actions.end(); }
-    IC int size() { return actions.size(); }
-    IC void resize(int cnt)
+
+    bool empty() { return actions.empty(); }
+    PAVecIt begin() { return actions.begin(); }
+    PAVecIt end() { return actions.end(); }
+    int size() { return actions.size(); }
+
+    void resize(int cnt)
     {
         R_ASSERT(!m_bLocked);
         actions.resize(cnt);

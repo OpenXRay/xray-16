@@ -11,7 +11,7 @@
 class CPHFracture;
 class CPHElement;
 
-DEFINE_VECTOR(dJointFeedback, CFEEDBACK_STORAGE, CFEEDBACK_I)
+using CFEEDBACK_STORAGE = xr_vector<dJointFeedback>;
 
 IC void sub_diapasones(u16& from1, u16& to1, const u16& from0, const u16& to0);
 
@@ -20,10 +20,11 @@ class CShellSplitInfo
     friend class CPHFracturesHolder;
     friend class CPHShellSplitterHolder;
     friend class CPHElement;
-    IC bool HaveElements() { return m_end_el_num != m_start_el_num; }
-    IC bool HaveJoints() { return m_start_jt_num != m_end_jt_num; }
+    bool HaveElements() { return m_end_el_num != m_start_el_num; }
+    bool HaveJoints() { return m_start_jt_num != m_end_jt_num; }
+
 public:
-    IC void sub_diapasone(const CShellSplitInfo& sub)
+    void sub_diapasone(const CShellSplitInfo& sub)
     {
         sub_diapasones(m_start_el_num, m_end_el_num, sub.m_start_el_num, sub.m_end_el_num);
         sub_diapasones(m_start_jt_num, m_end_jt_num, sub.m_start_jt_num, sub.m_end_jt_num);
@@ -57,7 +58,7 @@ class CPHFracture : public CShellSplitInfo
 
 public:
     bool Update(CPHElement* element);
-    IC bool Breaked() { return m_breaked; }
+    bool Breaked() { return m_breaked; }
     void SetMassParts(const dMass& first, const dMass& second);
     void MassSetZerro();
     void MassAddToFirst(const dMass& m);
@@ -71,11 +72,11 @@ public:
     void MassUnsplitFromFirstToSecond(const dMass& m);
 };
 
-DEFINE_VECTOR(CPHFracture, FRACTURE_STORAGE, FRACTURE_I)
-typedef std::pair<CPHElement*, CShellSplitInfo> element_fracture;
-typedef xr_vector<element_fracture>::reverse_iterator ELEMENT_PAIR_RI;
-typedef xr_vector<CPHFracture>::reverse_iterator FRACTURE_RI;
-DEFINE_VECTOR(element_fracture, ELEMENT_PAIR_VECTOR, ELEMENT_PAIR_I)
+using FRACTURE_STORAGE = xr_vector<CPHFracture>;
+using FRACTURE_I = FRACTURE_STORAGE::iterator;
+using FRACTURE_RI = FRACTURE_STORAGE::reverse_iterator;
+using element_fracture = std::pair<CPHElement*, CShellSplitInfo>;
+using ELEMENT_PAIR_VECTOR = xr_vector<element_fracture>;
 
 class CPHFracturesHolder // stored in CPHElement
 {

@@ -113,7 +113,6 @@ public:
     u32 dwBytesTotal;
     float fTimeTotal;
 
-public:
     ref_sound_data() throw();
     ref_sound_data(LPCSTR fName, esound_type sound_type, int game_type);
     virtual ~ref_sound_data();
@@ -131,7 +130,6 @@ struct ref_sound
 {
     ref_sound_data_ptr _p;
 
-public:
     ref_sound() {}
     ~ref_sound() {}
     CSound_source* _handle() const;
@@ -247,10 +245,9 @@ public:
             u32 _rendered : 1;
         };
     };
-    DEFINE_VECTOR(SItem, item_vec, item_vec_it);
+    using item_vec = xr_vector<SItem>;
     item_vec items;
 
-public:
     void clear() { items.clear(); }
     void append(const SItem& itm) { items.push_back(itm); }
 };

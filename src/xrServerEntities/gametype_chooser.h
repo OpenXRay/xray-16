@@ -38,7 +38,7 @@ inline EGameIDs ParseStringToGameType(LPCSTR str)
 
 class PropValue;
 class PropItem;
-DEFINE_VECTOR(PropItem*, PropItemVec, PropItemIt);
+using PropItemVec = xr_vector<PropItem*>;
 
 struct GameTypeChooser
 {

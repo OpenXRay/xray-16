@@ -111,8 +111,8 @@ void manager::load_weathers()
     m_weathers->load();
 
     // sorting weather envs
-    EnvsMapIt _I = WeatherCycles.begin();
-    EnvsMapIt _E = WeatherCycles.end();
+    auto _I = WeatherCycles.begin();
+    auto _E = WeatherCycles.end();
     for (; _I != _E; _I++)
     {
         R_ASSERT3(_I->second.size() > 1, "Environment in weather must >=2", *_I->first);

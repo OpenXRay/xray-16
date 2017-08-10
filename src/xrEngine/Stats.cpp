@@ -217,8 +217,8 @@ void CStats::OnRender()
     {
         CSound_stats_ext snd_stat_ext;
         ::Sound->statistic(0, &snd_stat_ext);
-        CSound_stats_ext::item_vec_it _I = snd_stat_ext.items.begin();
-        CSound_stats_ext::item_vec_it _E = snd_stat_ext.items.end();
+        auto _I = snd_stat_ext.items.begin();
+        auto _E = snd_stat_ext.items.end();
         for (; _I != _E; _I++)
         {
             const CSound_stats_ext::SItem& item = *_I;

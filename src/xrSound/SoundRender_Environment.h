@@ -22,7 +22,7 @@ public:
     float EnvironmentSize; // environment size in meters
     float EnvironmentDiffusion; // environment diffusion
     float AirAbsorptionHF; // change in level per meter at 5 kHz
-public:
+
     CSoundRender_Environment(void);
     ~CSoundRender_Environment(void);
     void set_identity();
@@ -36,7 +36,7 @@ public:
 class XRSOUND_EDITOR_API SoundEnvironment_LIB
 {
 public:
-    DEFINE_VECTOR(CSoundRender_Environment*, SE_VEC, SE_IT);
+    using SE_VEC = xr_vector<CSoundRender_Environment*>;
 
 private:
     SE_VEC library;

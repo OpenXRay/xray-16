@@ -46,7 +46,7 @@ enum EPropType
 struct xr_token;
 class PropValue;
 class PropItem;
-DEFINE_VECTOR(PropItem*, PropItemVec, PropItemIt);
+using PropItemVec = xr_vector<PropItem*>;
 
 //------------------------------------------------------------------------------
 #include "xrCore/ChooseTypes.H"
@@ -140,7 +140,7 @@ class PropItem
     void* item;
 
 public:
-    DEFINE_VECTOR(PropValue*, PropValueVec, PropValueIt);
+    using PropValueVec = xr_vector<PropValue*>;
 
 private:
     PropValueVec values;
@@ -178,7 +178,7 @@ public:
     }
     virtual ~PropItem()
     {
-        for (PropValueIt it = values.begin(); values.end() != it; ++it)
+        for (auto it = values.begin(); values.end() != it; ++it)
             xr_delete(*it);
     };
     TProperties* Owner() { return m_Owner; }
@@ -186,7 +186,7 @@ public:
 
     void ResetValues()
     {
-        for (PropValueIt it = values.begin(); values.end() != it; ++it)
+        for (auto it = values.begin(); values.end() != it; ++it)
             (*it)->ResetValue();
         CheckMixed();
     }
@@ -209,8 +209,8 @@ public:
         m_Flags.set(flMixed, false);
         if (values.size() > 1)
         {
-            PropValueIt F = values.begin();
-            PropValueIt it = F;
+            auto F = values.begin();
+            auto it = F;
             ++it;
             for (; values.end() != it; ++it)
             {
@@ -245,7 +245,7 @@ public:
     {
         bool bChanged = false;
         m_Flags.set(flMixed, false);
-        for (PropValueIt it = values.begin(); values.end() != it; ++it)
+        for (auto it = values.begin(); values.end() != it; ++it)
         {
             T1* CV = smart_cast<T1*>(*it);
             VERIFY(CV);
@@ -278,7 +278,7 @@ public:
 
     void OnChange()
     {
-        for (PropValueIt it = values.begin(); values.end() != it; ++it)
+        for (auto it = values.begin(); values.end() != it; ++it)
             if (!(*it)->OnChangeEvent.empty())
                 (*it)->OnChangeEvent(*it);
     }
@@ -286,7 +286,7 @@ public:
         template <class T1, class T2>
         IC void				OnBeforeEdit	()
         {
-            for (PropValueIt it=values.begin(); values.end() != it; ++it){
+            for (auto it=values.begin(); values.end() != it; ++it){
                 T1* CV		= smart_cast<T1*>(*it); VERIFY(CV);
                 if (CV->OnChangeEvent) 		CV->OnChangeEvent(*it);
             }

@@ -27,7 +27,7 @@ CPHFracturesHolder::~CPHFracturesHolder()
 }
 void CPHFracturesHolder::ApplyImpactsToElement(CPHElement* E)
 {
-    PH_IMPACT_I i = m_impacts.begin(), e = m_impacts.end();
+    auto i = m_impacts.begin(), e = m_impacts.end();
     BOOL ac_state = E->isActive();
     // E->bActive=true;
     E->m_flags.set(CPHElement::flActive, TRUE);
@@ -423,7 +423,7 @@ bool CPHFracture::Update(CPHElement* element)
         }
     }
 
-    PH_IMPACT_I i_i = impacts.begin(), i_e = impacts.end();
+    auto i_i = impacts.begin(), i_e = impacts.end();
     for (; i_i != i_e; i_i++)
     {
         u16 geom = i_i->geom;

@@ -8,8 +8,8 @@ class CPHShellSplitter;
 
 class CPHShell;
 class CODEGeom;
-typedef std::pair<u16, CODEGeom*> id_geom;
-DEFINE_MAP(u16, CODEGeom*, GEOM_MAP, GEOM_MAP_I)
+using id_geom = std::pair<u16, CODEGeom*>;
+using GEOM_MAP = xr_map<u16, CODEGeom*>;
 
 class CPHShellSplitter
 {
@@ -32,8 +32,8 @@ private:
     CPHShellSplitter();
 };
 
-DEFINE_VECTOR(CPHShellSplitter, SPLITTER_STORAGE, SPLITTER_I)
-typedef xr_vector<CPHShellSplitter>::reverse_iterator SPLITTER_RI;
+using SPLITTER_STORAGE = xr_vector<CPHShellSplitter>;
+using SPLITTER_RI = xr_vector<CPHShellSplitter>::reverse_iterator;
 
 class CPHShellSplitterHolder : public CPHUpdateObject // call all Fractures and Breakable Joints Updates
 {
@@ -53,6 +53,7 @@ class CPHShellSplitterHolder : public CPHUpdateObject // call all Fractures and 
     void SplitElement(u16 aspl, PHSHELL_PAIR_VECTOR& out_shels); //
     void PassEndSplitters(const CShellSplitInfo& spl_inf, CPHShell* dest, u16 jt_add_shift, u16 el_add_shift);
     void InitNewShell(CPHShell* shell); // inits new active shell
+
 public:
     CPHShellSplitterHolder(CPHShell* shell);
     virtual ~CPHShellSplitterHolder();
