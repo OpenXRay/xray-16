@@ -14,6 +14,8 @@ scope, so I didn’t wrap them with this class.
 #include <DbgHelp.h>
 #include <tchar.h>
 
+#include "Common/Platform.hpp"
+
 // Include these in case the user forgets to link against them.
 #pragma comment(lib, "dbghelp.lib")
 #pragma comment(lib, "version.lib")
@@ -105,9 +107,7 @@ public:
 
         dwVerSize = GetFileVersionInfoSize(szImageHlp, &dwVerInfoHandle);
         if (dwVerSize == 0)
-        {
             return false;
-        }
 
         // Got the version size, now get the version information.
         LPVOID lpData = (LPVOID) new TCHAR[dwVerSize];
@@ -176,7 +176,7 @@ public:
         return ::SymEnumerateSymbols(m_hProcess, BaseOfDll, EnumSymbolsCallback, UserContext);
     }
 
-    BOOL SymGetSymFromAddr(IN DWORD dwAddr, OUT PDWORD pdwDisplacement, OUT PIMAGEHLP_SYMBOL Symbol)
+    BOOL SymGetSymFromAddr(IN DWORD dwAddr, OUT PDWORD_PTR pdwDisplacement, OUT PIMAGEHLP_SYMBOL Symbol)
     {
         return ::SymGetSymFromAddr(m_hProcess, dwAddr, pdwDisplacement, Symbol);
     }
@@ -247,7 +247,11 @@ public:
     }
 
     BOOL SymSetSearchPath(IN LPSTR SearchPath) { return ::SymSetSearchPath(m_hProcess, SearchPath); }
+#ifdef XR_X64
+    BOOL SymRegisterCallback(IN PSYMBOL_REGISTERED_CALLBACK CallbackFunction, IN ULONG64 UserContext)
+#else
     BOOL SymRegisterCallback(IN PSYMBOL_REGISTERED_CALLBACK CallbackFunction, IN PVOID UserContext)
+#endif
     {
         return ::SymRegisterCallback(m_hProcess, CallbackFunction, UserContext);
     }

@@ -13,6 +13,8 @@ Copyright (c) 1997-2000 John Robbins -- All rights reserved.
 #include <psapi.h>
 #pragma comment(lib, "psapi.lib")
 
+#include "Common/Platform.hpp"
+
 /*//////////////////////////////////////////////////////////////////////
 File Scope Defines
 //////////////////////////////////////////////////////////////////////*/
@@ -77,7 +79,16 @@ LPCTSTR __stdcall GetFirstStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS* pEx
     // Initialize the STACKFRAME structure.
     ZeroMemory(&g_stFrame, sizeof(STACKFRAME));
 
-#ifdef _X86_
+#if defined(XR_X64)
+    g_stFrame.AddrPC.Offset = pExPtrs->ContextRecord->Rip;
+    g_stFrame.AddrPC.Mode = AddrModeFlat;
+    g_stFrame.AddrReturn.Offset = 0;
+    g_stFrame.AddrReturn.Mode = AddrModeFlat;
+    g_stFrame.AddrStack.Offset = pExPtrs->ContextRecord->Rsp;
+    g_stFrame.AddrStack.Mode = AddrModeFlat;
+    g_stFrame.AddrFrame.Offset = pExPtrs->ContextRecord->Rbp;
+    g_stFrame.AddrFrame.Mode = AddrModeFlat;
+#elif defined(XR_X86)
     g_stFrame.AddrPC.Offset = pExPtrs->ContextRecord->Eip;
     g_stFrame.AddrPC.Mode = AddrModeFlat;
     g_stFrame.AddrStack.Offset = pExPtrs->ContextRecord->Esp;
@@ -106,8 +117,11 @@ LPCTSTR __stdcall GetNextStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS* pExP
     return InternalGetStackTraceString(dwOpts, pExPtrs);
 }
 
-BOOL __stdcall ReadCurrentProcessMemory(
-    HANDLE, LPCVOID lpBaseAddress, LPVOID lpBuffer, DWORD nSize, LPDWORD lpNumberOfBytesRead)
+#ifndef XR_X64
+BOOL __stdcall ReadCurrentProcessMemory(HANDLE, LPCVOID lpBaseAddress, LPVOID lpBuffer, DWORD nSize, LPDWORD lpNumberOfBytesRead)
+#else
+BOOL __stdcall ReadCurrentProcessMemory(HANDLE, LPCVOID lpBaseAddress, LPVOID lpBuffer, DWORD nSize, SIZE_T* lpNumberOfBytesRead)
+#endif
 {
     return ReadProcessMemory(GetCurrentProcess(), lpBaseAddress, lpBuffer, nSize, lpNumberOfBytesRead);
 }
@@ -199,7 +213,7 @@ LPCTSTR __stdcall InternalGetStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS* 
         }
 
         // ASSERT(iCurr < (BUFF_SIZE - MAX_PATH));
-        DWORD dwDisp;
+        DWORD_PTR dwDisp;
         // Output the symbol name?
         if ((dwOpts & GSTSO_SYMBOL) == GSTSO_SYMBOL)
         {
@@ -251,7 +265,7 @@ LPCTSTR __stdcall InternalGetStackTraceString(DWORD dwOpts, EXCEPTION_POINTERS* 
             ZeroMemory(&g_stLine, sizeof(IMAGEHLP_LINE));
             g_stLine.SizeOfStruct = sizeof(IMAGEHLP_LINE);
 
-            if (SymGetLineFromAddr(hProcess, g_stFrame.AddrPC.Offset, &dwDisp, &g_stLine) == TRUE)
+            if (SymGetLineFromAddr(hProcess, g_stFrame.AddrPC.Offset, (PDWORD)&dwDisp, &g_stLine) == TRUE)
             {
                 iCurr += wsprintf(g_szBuff + iCurr, _T(", "));
 

@@ -127,7 +127,7 @@ unsigned int query_processor_info(processor_info* pinfo)
     pinfo->stepping = cpui[0] & 0xf;
 
     // Calculate available processors
-    DWORD pa_mask_save, sa_mask_stub = 0;
+    ULONG_PTR pa_mask_save, sa_mask_stub = 0;
     GetProcessAffinityMask(GetCurrentProcess(), &pa_mask_save, &sa_mask_stub);
 
     DWORD returnedLength = 0;

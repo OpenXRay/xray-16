@@ -22,10 +22,12 @@ namespace XRay
 {
 namespace Math
 {
+#ifdef XR_X86
 Skin1WFunc Skin1W;
 Skin2WFunc Skin2W;
 Skin3WFunc Skin3W;
 Skin4WFunc Skin4W;
+#endif
 PLCCalcFunc PLCCalc;
 
 void Initialize()
@@ -33,14 +35,18 @@ void Initialize()
     static bool initialized = false;
     if (initialized)
         return;
+#ifdef XR_X86
     Skin1W = Skin1W_SSE;
     Skin2W = Skin2W_SSE;
     Skin3W = Skin3W_SSE;
     Skin4W = Skin4W_SSE;
     Skin4W_MTs = Skin4W_SSE;
+#endif
     PLCCalc = PLCCalc_SSE;
+#ifdef XR_X86
     if (ttapi_GetWorkerCount() > 1)
         Skin4W = Skin4W_MT;
+#endif
     initialized = true;
 }
 

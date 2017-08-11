@@ -48,14 +48,18 @@ static BOOL bException = FALSE;
 
 namespace
 {
+#ifdef XR_X64
+    extern "C" void * _ReturnAddress(void);
+    DWORD_PTR GetInstructionPtr()
+    {
+        return (DWORD_PTR)_ReturnAddress();
+    }
+#else
 void __declspec(naked, noinline) * __cdecl GetInstructionPtr()
 {
-#ifdef _WIN64
-    _asm mov rax, [rsp] _asm retn
-#else
     _asm mov eax, [esp] _asm retn
-#endif
 }
+#endif
 }
 
 xrDebug::UnhandledExceptionFilter xrDebug::PrevFilter = nullptr;
@@ -86,9 +90,15 @@ size_t xrDebug::BuildStackTrace(char* buffer, size_t capacity, size_t lineCapaci
     context.ContextFlags = CONTEXT_FULL;
     if (GetThreadContext(GetCurrentThread(), &context))
     {
+#if defined(XR_X64)
+        context.Rip = GetInstructionPtr();
+        context.Rbp = (DWORD64)&ebp;
+        context.Rsp = (DWORD64)&context;
+#elif defined(XR_X86)
         context.Eip = (DWORD)GetInstructionPtr();
         context.Ebp = (DWORD)&ebp;
         context.Esp = (DWORD)&context;
+#endif
         ex_ptrs.ContextRecord = &context;
         ex_ptrs.ExceptionRecord = 0;
         return BuildStackTrace(&ex_ptrs, buffer, capacity, lineCapacity);

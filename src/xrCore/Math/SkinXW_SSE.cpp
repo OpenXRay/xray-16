@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "Common/Platform.hpp"
 #include "SkinXW_SSE.hpp"
 #ifdef _EDITOR
 #include "SkeletonX.h"
@@ -12,6 +13,7 @@ namespace XRay
 {
 namespace Math
 {
+#ifdef XR_X86
 #define transform_dir(idx, res, SX, SY, SZ, T1) \
     \
 __asm movzx eax,                                \
@@ -408,6 +410,6 @@ void Skin1W_SSE(vertRender* D, vertBoned1W* S, u32 vCount, CBoneInstance* Bones)
         // ------------------------------------------------------------------
     }
 }
-
+#endif
 } // namespace Util3D
 } // namespace XRay
