@@ -411,5 +411,5 @@ void Skin1W_SSE(vertRender* D, vertBoned1W* S, u32 vCount, CBoneInstance* Bones)
     }
 }
 #endif
-} // namespace Util3D
+} // namespace Math
 } // namespace XRay

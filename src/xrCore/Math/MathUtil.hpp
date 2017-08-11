@@ -23,13 +23,11 @@ namespace XRay
 {
 namespace Math
 {
-#ifdef XR_X86
 extern XRCORE_API Skin1WFunc Skin1W;
 extern XRCORE_API Skin2WFunc Skin2W;
 extern XRCORE_API Skin3WFunc Skin3W;
 extern XRCORE_API Skin4WFunc Skin4W;
 extern XRCORE_API PLCCalcFunc PLCCalc;
-#endif
 
 void XRCORE_API Initialize();
 } // namespace Math

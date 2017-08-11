@@ -357,6 +357,9 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>PCH</Filter>
     </ClCompile>
+    <ClCompile Include="Math\SkinXW_CPP.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">
@@ -751,6 +754,9 @@
     </ClInclude>
     <ClInclude Include="xr_vector_defs.h">
       <Filter>Math\Extensions</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\SkinXW_CPP.hpp">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

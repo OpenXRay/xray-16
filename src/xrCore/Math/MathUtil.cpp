@@ -12,8 +12,11 @@
 #include "xrEngine/Render.h"
 #include "Layers/xrRender/light.h"
 #endif
-
+#ifdef XR_X86
 #include "SkinXW_SSE.hpp"
+#else
+#include "SkinXW_CPP.hpp"
+#endif
 #include "Skin4W_MT.hpp"
 #include "PLC_SSE.hpp"
 #include "_math.h"
@@ -22,12 +25,11 @@ namespace XRay
 {
 namespace Math
 {
-#ifdef XR_X86
 Skin1WFunc Skin1W;
 Skin2WFunc Skin2W;
 Skin3WFunc Skin3W;
 Skin4WFunc Skin4W;
-#endif
+
 PLCCalcFunc PLCCalc;
 
 void Initialize()
@@ -41,12 +43,18 @@ void Initialize()
     Skin3W = Skin3W_SSE;
     Skin4W = Skin4W_SSE;
     Skin4W_MTs = Skin4W_SSE;
+#else
+    Skin1W = Skin1W_CPP;
+    Skin2W = Skin2W_CPP;
+    Skin3W = Skin3W_CPP;
+    Skin4W = Skin4W_CPP;
+    Skin4W_MTs = Skin4W_CPP;
 #endif
     PLCCalc = PLCCalc_SSE;
-#ifdef XR_X86
+
     if (ttapi_GetWorkerCount() > 1)
         Skin4W = Skin4W_MT;
-#endif
+
     initialized = true;
 }
 

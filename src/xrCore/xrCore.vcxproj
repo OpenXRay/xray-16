@@ -334,6 +334,7 @@
     <ClCompile Include="log.cpp" />
     <ClCompile Include="LzHuf.cpp" />
     <ClCompile Include="Math\PLC_SSE.cpp" />
+    <ClCompile Include="Math\SkinXW_CPP.cpp" />
     <ClCompile Include="Math\Skin4W_MT.cpp" />
     <ClCompile Include="Math\SkinXW_SSE.cpp" />
     <ClCompile Include="Math\MathUtil.cpp" />
@@ -503,6 +504,7 @@
     <ClInclude Include="Math\PLC_SSE.hpp" />
     <ClInclude Include="Math\Random32.hpp" />
     <ClInclude Include="Math\Skin4W_MT.hpp" />
+    <ClInclude Include="Math\SkinXW_CPP.hpp" />
     <ClInclude Include="Math\SkinXW_SSE.hpp" />
     <ClInclude Include="Math\MathUtil.hpp" />
     <ClInclude Include="math_constants.h" />
