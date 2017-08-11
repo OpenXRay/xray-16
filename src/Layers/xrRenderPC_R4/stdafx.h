@@ -19,8 +19,6 @@
 #pragma warning(4 : 4244)
 #pragma warning(disable : 4237)
 
-#pragma comment(lib, "d3d9.lib")
-
 #include <D3D11.h>
 #include <D3Dx11core.h>
 #include <D3DCompiler.h>

@@ -20,8 +20,6 @@
 #pragma warning(4 : 4244)
 #pragma warning(disable : 4237)
 
-#pragma comment(lib, "d3d9.lib")
-
 #include "Layers/xrRender/xrD3DDefs.h"
 #include "Layers/xrRender/HW.h"
 #include "Layers/xrRender/Shader.h"

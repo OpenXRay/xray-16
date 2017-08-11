@@ -6,7 +6,7 @@
 #define AFX_HW_H__0E25CF4A_FFEC_11D3_B4E3_4854E82A090D__INCLUDED_
 #pragma once
 
-#include "hwcaps.h"
+#include "HWCaps.h"
 
 #ifndef _MAYA_EXPORT
 #include "stats_manager.h"
