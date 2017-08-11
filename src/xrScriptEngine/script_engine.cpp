@@ -176,7 +176,8 @@ void CScriptEngine::reinit()
         lua_close(m_virtual_machine);
         UnregisterState(m_virtual_machine);
     }
-    m_virtual_machine = lua_newstate(lua_alloc, nullptr);
+    //m_virtual_machine = lua_newstate(lua_alloc, nullptr);
+    m_virtual_machine = luaL_newstate();
     if (!m_virtual_machine)
     {
         Msg("! ERROR : Cannot initialize script virtual machine!");
