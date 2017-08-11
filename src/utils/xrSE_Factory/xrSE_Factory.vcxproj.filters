@@ -300,18 +300,6 @@
     <ClInclude Include="..\..\xrServerEntities\mslotutils.h">
       <Filter>Scripts\ScriptDebugger</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\script_callStack.h">
-      <Filter>Scripts\ScriptDebugger</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\script_debugger.h">
-      <Filter>Scripts\ScriptDebugger</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\script_debugger_messages.h">
-      <Filter>Scripts\ScriptDebugger</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\script_debugger_threads.h">
-      <Filter>Scripts\ScriptDebugger</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\xrServerEntities\script_lua_helper.h">
       <Filter>Scripts\ScriptDebugger</Filter>
     </ClInclude>
@@ -477,6 +465,10 @@
     <ClInclude Include="..\..\xrServerEntities\script_export_space.h">
       <Filter>Scripts</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\xrScriptEngine\script_callStack.hpp" />
+    <ClInclude Include="..\..\xrScriptEngine\script_debugger.hpp" />
+    <ClInclude Include="..\..\xrScriptEngine\script_debugger_messages.hpp" />
+    <ClInclude Include="..\..\xrScriptEngine\script_debugger_threads.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\xrServerEntities\pch_script.cpp">
@@ -547,15 +539,6 @@
     </ClCompile>
     <ClCompile Include="..\..\xrServerEntities\script_engine_script.cpp">
       <Filter>Scripts\ScriptEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\script_callStack.cpp">
-      <Filter>Scripts\ScriptDebugger</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\script_debugger.cpp">
-      <Filter>Scripts\ScriptDebugger</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\xrServerEntities\script_debugger_threads.cpp">
-      <Filter>Scripts\ScriptDebugger</Filter>
     </ClCompile>
     <ClCompile Include="..\..\xrServerEntities\script_lua_helper.cpp">
       <Filter>Scripts\ScriptDebugger</Filter>
@@ -668,5 +651,8 @@
     <ClCompile Include="..\..\xrServerEntities\script_export.cpp">
       <Filter>Scripts</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\xrScriptEngine\script_callStack.cpp" />
+    <ClCompile Include="..\..\xrScriptEngine\script_debugger.cpp" />
+    <ClCompile Include="..\..\xrScriptEngine\script_debugger_threads.cpp" />
   </ItemGroup>
 </Project>
