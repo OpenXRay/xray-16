@@ -399,9 +399,6 @@
     <ClInclude Include="xrTheora_Surface.h">
       <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
     </ClInclude>
-    <ClInclude Include="xrTheora_Surface_mmx.h">
-      <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
-    </ClInclude>
     <ClInclude Include="Text_Console.h">
       <Filter>Render\Execution &amp; 3D\TextConsole</Filter>
     </ClInclude>
@@ -700,9 +697,6 @@
       <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
     </ClCompile>
     <ClCompile Include="xrTheora_Surface.cpp">
-      <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
-    </ClCompile>
-    <ClCompile Include="xrTheora_Surface_mmx.cpp">
       <Filter>Render\Execution &amp; 3D\Shaders\Textures</Filter>
     </ClCompile>
     <ClCompile Include="Text_Console.cpp">

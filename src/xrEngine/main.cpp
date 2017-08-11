@@ -203,7 +203,7 @@ void Startup()
     destroySound();
 }
 
-static BOOL CALLBACK LogoWndProc(HWND hw, UINT msg, WPARAM wp, LPARAM lp)
+static INT_PTR CALLBACK LogoWndProc(HWND hw, UINT msg, WPARAM wp, LPARAM lp)
 {
     switch (msg)
     {
@@ -213,15 +213,14 @@ static BOOL CALLBACK LogoWndProc(HWND hw, UINT msg, WPARAM wp, LPARAM lp)
         if (LOWORD(wp) == IDCANCEL)
             DestroyWindow(hw);
         break;
-    default: return FALSE;
+    default: return false;
     }
-    return TRUE;
+    return true;
 }
 
 class StickyKeyFilter
 {
-private:
-    BOOL screensaverState;
+    bool screensaverState;
     STICKYKEYS stickyKeys;
     FILTERKEYS filterKeys;
     TOGGLEKEYS toggleKeys;
@@ -232,10 +231,10 @@ private:
 public:
     StickyKeyFilter()
     {
-        screensaverState = FALSE;
+        screensaverState = false;
         SystemParametersInfo(SPI_GETSCREENSAVEACTIVE, 0, &screensaverState, 0);
         if (screensaverState)
-            SystemParametersInfo(SPI_SETSCREENSAVEACTIVE, FALSE, NULL, 0);
+            SystemParametersInfo(SPI_SETSCREENSAVEACTIVE, FALSE, nullptr, 0);
         stickyKeysFlags = 0;
         filterKeysFlags = 0;
         toggleKeysFlags = 0;
@@ -248,18 +247,21 @@ public:
         SystemParametersInfo(SPI_GETSTICKYKEYS, sizeof(stickyKeys), &stickyKeys, 0);
         SystemParametersInfo(SPI_GETFILTERKEYS, sizeof(filterKeys), &filterKeys, 0);
         SystemParametersInfo(SPI_GETTOGGLEKEYS, sizeof(toggleKeys), &toggleKeys, 0);
+
         if (stickyKeys.dwFlags & SKF_AVAILABLE)
         {
             stickyKeysFlags = stickyKeys.dwFlags;
             stickyKeys.dwFlags = 0;
             SystemParametersInfo(SPI_SETSTICKYKEYS, sizeof(stickyKeys), &stickyKeys, 0);
         }
+
         if (filterKeys.dwFlags & FKF_AVAILABLE)
         {
             filterKeysFlags = filterKeys.dwFlags;
             filterKeys.dwFlags = 0;
             SystemParametersInfo(SPI_SETFILTERKEYS, sizeof(filterKeys), &filterKeys, 0);
         }
+
         if (toggleKeys.dwFlags & TKF_AVAILABLE)
         {
             toggleKeysFlags = toggleKeys.dwFlags;
@@ -271,7 +273,7 @@ public:
     ~StickyKeyFilter()
     {
         if (screensaverState)
-            SystemParametersInfo(SPI_SETSCREENSAVEACTIVE, TRUE, NULL, 0);
+            SystemParametersInfo(SPI_SETSCREENSAVEACTIVE, TRUE, nullptr, 0);
         if (stickyKeysFlags)
         {
             stickyKeys.dwFlags = stickyKeysFlags;
@@ -299,18 +301,18 @@ int RunApplication(pcstr commandLine)
     if (!IsDebuggerPresent())
     {
         u32 heapFragmentation = 2;
-        BOOL result = HeapSetInformation(
+        bool result = HeapSetInformation(
             GetProcessHeap(), HeapCompatibilityInformation, &heapFragmentation, sizeof(heapFragmentation));
         VERIFY2(result, "can't set process heap low fragmentation");
         (void)result;
     }
 #if !defined(DEDICATED_SERVER) && defined(NO_MULTI_INSTANCES)
-    CreateMutex(NULL, TRUE, "Local\\STALKER-COP");
+    CreateMutex(nullptr, TRUE, "Local\\STALKER-COP");
     if (GetLastError() == ERROR_ALREADY_EXISTS)
         return 2;
 #endif
     SetThreadAffinityMask(GetCurrentThread(), 1);
-    logoWindow = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_STARTUP), 0, LogoWndProc);
+    logoWindow = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_STARTUP), nullptr, LogoWndProc);
     HWND logoPicture = GetDlgItem(logoWindow, IDC_STATIC_LOGO);
     RECT logoRect;
     GetWindowRect(logoPicture, &logoRect);
@@ -403,7 +405,7 @@ int RunApplication(pcstr commandLine)
         PROCESS_INFORMATION pi = {};
         // We use CreateProcess to setup working folder
         pcstr tempDir = xr_strlen(g_sLaunchWorkingFolder) ? g_sLaunchWorkingFolder : nullptr;
-        CreateProcess(g_sLaunchOnExit_app, g_sLaunchOnExit_params, NULL, NULL, FALSE, 0, NULL, tempDir, &si, &pi);
+        CreateProcess(g_sLaunchOnExit_app, g_sLaunchOnExit_params, nullptr, nullptr, FALSE, 0, nullptr, tempDir, &si, &pi);
     }
     return 0;
 }
