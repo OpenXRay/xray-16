@@ -32,7 +32,6 @@ static BOOL bException = FALSE;
 
 #ifdef USE_BUG_TRAP
 #include <BugTrap/source/Client/BugTrap.h>
-#pragma comment(lib, "BugTrap.lib")
 #endif
 
 #include <new.h> // for _set_new_mode

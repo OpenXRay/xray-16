@@ -20,10 +20,10 @@ struct ParticleEffect
 public:
     ParticleEffect(int mp)
     {
-        owner = 0;
+        owner = nullptr;
         param = 0;
-        b_cb = 0;
-        d_cb = 0;
+        b_cb = nullptr;
+        d_cb = nullptr;
         p_count = 0;
         max_particles = mp;
         particles_allocated = max_particles;
@@ -51,7 +51,7 @@ public:
         // Allocate particles.
         void* new_real_ptr = xr_malloc(sizeof(Particle) * (max_count + 1));
 
-        if (new_real_ptr == NULL)
+        if (new_real_ptr == nullptr)
         {
             // ERROR - Not enough memory. Just give all we've got.
             max_particles = particles_allocated;

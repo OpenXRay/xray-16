@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#pragma hdrstop
 
 #include "xrEngine/Render.h"
 #include "Layers/xrRender/ResourceManager.h"
@@ -24,7 +23,7 @@ class adopt_dx10options
 public:
     bool _dx10_msaa_alphatest_atoc()
     {
-        return (RImplementation.o.dx10_msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC);
+        return RImplementation.o.dx10_msaa_alphatest == CRender::MSAA_ATEST_DX10_0_ATOC;
     }
 };
 
@@ -32,13 +31,15 @@ public:
 class adopt_dx10sampler
 {
     CBlender_Compile* m_pC;
-    u32 m_SI; //	Sampler index
+    u32 m_SI; // Sampler index
+
 public:
     adopt_dx10sampler(CBlender_Compile* C, u32 SamplerIndex) : m_pC(C), m_SI(SamplerIndex)
     {
         if (u32(-1) == m_SI)
             m_pC = 0;
     }
+
     adopt_dx10sampler(const adopt_dx10sampler& _C) : m_pC(_C.m_pC), m_SI(_C.m_SI)
     {
         if (u32(-1) == m_SI)

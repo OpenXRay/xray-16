@@ -250,7 +250,7 @@ public:
     }
 
     // validates numerical stability
-    const bool isValid() const
+    bool isValid() const
     {
         if ((w * w) < 0.0f)
             return false;
@@ -263,8 +263,8 @@ public:
         return true;
     }
 
-    // checks for Unit-length quanternion
-    const bool isUnit()
+    // checks for Unit-length quaternion
+    bool isUnit() const
     {
         T m = magnitude();
 
@@ -276,14 +276,12 @@ public:
     // normalizes Q to be a unit geQuaternion
     SelfRef normalize()
     {
-        T m, one_over_magnitude;
-
-        m = _sqrt(magnitude());
+        T m = _sqrt(magnitude());
 
         if ((m < QZERO_TOLERANCE) && (m > -QZERO_TOLERANCE))
             return *this;
 
-        one_over_magnitude = 1.0f / m;
+        T one_over_magnitude = 1.0f / m;
 
         w *= one_over_magnitude;
         x *= one_over_magnitude;
@@ -341,7 +339,7 @@ public:
     // returns TRUE if there is an axis.
     // returns FALSE if there is no axis (and Axis is set to 0,0,0, and Theta is 0)
 
-    bool get_axis_angle(Fvector& axis, T& angle)
+    bool get_axis_angle(_vector3<T>& axis, T& angle)
     {
         T s = _sqrt(x * x + y * y + z * z);
         if (s > EPS_S)
@@ -350,7 +348,7 @@ public:
             axis.x = OneOverSinTheta * x;
             axis.y = OneOverSinTheta * y;
             axis.z = OneOverSinTheta * z;
-            angle = 2.0f * atan2(s, w);
+            angle = 2.0f * std::atan2(s, w);
             return true;
         }
         axis.x = axis.y = axis.z = 0.0f;
@@ -424,7 +422,7 @@ public:
     {
         T n = Q.x * Q.x + Q.y * Q.y + Q.z * Q.z;
         T r = _sqrt(n);
-        T t = (r > EPS_S) ? atan2f(r, Q.w) / r : 0.f;
+        T t = (r > EPS_S) ? std::atan2(r, Q.w) / r : T(0);
         x = t * Q.x;
         y = t * Q.y;
         z = t * Q.z;
@@ -435,7 +433,7 @@ public:
     SelfRef exp(SelfCRef Q)
     {
         T r = _sqrt(Q.x * Q.x + Q.y * Q.y + Q.z * Q.z);
-        T et = expf(Q.w);
+        T et = std::exp(Q.w);
         T s = (r >= EPS_S) ? et * _sin(r) / r : 0.f;
         x = s * Q.x;
         y = s * Q.y;
@@ -445,8 +443,8 @@ public:
     }
 };
 
-typedef _quaternion<float> Fquaternion;
-typedef _quaternion<double> Dquaternion;
+using Fquaternion = _quaternion<float>;
+using Dquaternion = _quaternion<double>;
 
 template <class T>
 bool _valid(const _quaternion<T>& s)

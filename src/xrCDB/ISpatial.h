@@ -1,7 +1,7 @@
+#pragma once
 #ifndef XRENGINE_ISPATIAL_H_INCLUDED
 #define XRENGINE_ISPATIAL_H_INCLUDED
 
-//#pragma once
 #include "Common/Platform.hpp"
 #include "xrCore/xrPool.h"
 //#include "xr_collide_defs.h"
@@ -133,10 +133,10 @@ public:
         spatial_updatesector_internal();
     }
 
-    virtual IGameObject* dcast_GameObject() override { return 0; }
-    virtual Feel::Sound* dcast_FeelSound() override { return 0; }
-    virtual IRenderable* dcast_Renderable() override { return 0; }
-    virtual IRender_Light* dcast_Light() override { return 0; }
+    virtual IGameObject* dcast_GameObject() override { return nullptr; }
+    virtual Feel::Sound* dcast_FeelSound() override { return nullptr; }
+    virtual IRenderable* dcast_Renderable() override { return nullptr; }
+    virtual IRender_Light* dcast_Light() override { return nullptr; }
     SpatialBase(ISpatial_DB* space);
     virtual ~SpatialBase();
 };
@@ -146,30 +146,27 @@ public:
 class ISpatial_NODE
 {
 public:
-    typedef _W64 unsigned ptrt;
-
-public:
     ISpatial_NODE* parent; // parent node for "empty-members" optimization
     ISpatial_NODE* children[8]; // children nodes
     xr_vector<ISpatial*> items; // own items
-public:
+
     void _init(ISpatial_NODE* _parent);
     void _remove(ISpatial* _S);
     void _insert(ISpatial* _S);
-    BOOL _empty()
+    bool _empty()
     {
         return items.empty() &&
-            (0 == (ptrt(children[0]) | ptrt(children[1]) | ptrt(children[2]) | ptrt(children[3]) | ptrt(children[4]) |
-                      ptrt(children[5]) | ptrt(children[6]) | ptrt(children[7])));
+            0 == (intptr_t(children[0]) | intptr_t(children[1]) | intptr_t(children[2]) | intptr_t(children[3]) | intptr_t(children[4]) |
+                intptr_t(children[5]) | intptr_t(children[6]) | intptr_t(children[7]));
     }
 };
 ////////////
 
 // template <class T, int granularity>
-// class	poolSS;
+// class poolSS;
 #ifndef DLL_API
 #define DLL_API XR_IMPORT
-#endif // #ifndef	DLL_API
+#endif // #ifndef DLL_API
 
 //////////////////////////////////////////////////////////////////////////
 class XRCDB_API ISpatial_DB
@@ -260,7 +257,6 @@ public:
     void update(u32 nodes = 8);
     BOOL verify();
 
-public:
     enum
     {
         O_ONLYFIRST = (1 << 0),

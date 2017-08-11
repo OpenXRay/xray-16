@@ -9,12 +9,6 @@
 #define PARTICLES_API XR_EXPORT
 #else
 #define PARTICLES_API XR_IMPORT
-
-#ifdef _EDITOR
-#pragma comment(lib, "x:\\xrParticlesB.lib")
-#else
-#pragma comment(lib, "xrParticles.lib")
-#endif
 #endif
 
 // Actually this must be < sqrt(MAXFLOAT) since we store this value squared.

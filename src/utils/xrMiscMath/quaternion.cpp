@@ -9,9 +9,9 @@
 template <class T>
 _quaternion<T>& _quaternion<T>::set(const _matrix<T>& M)
 {
-	float trace, s;
+	auto s = T(0);
 
-	trace = M._11 + M._22 + M._33;
+	float trace = M._11 + M._22 + M._33;
 	if (trace > 0.0f)
 	{
 		s = _sqrt(trace + 1.0f);

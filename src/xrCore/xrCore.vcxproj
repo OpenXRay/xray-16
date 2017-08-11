@@ -591,6 +591,9 @@
     <None Include="Debug\DXTrace.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Externals\BugTrap.vcxproj">
+      <Project>{e8cf1ada-264a-4127-86c2-fd7057d3792c}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\Externals\cryptlib.vcxproj">
       <Project>{c39f4b46-6e89-4074-902e-ca57073044d2}</Project>
     </ProjectReference>
