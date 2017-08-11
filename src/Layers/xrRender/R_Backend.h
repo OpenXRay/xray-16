@@ -127,7 +127,7 @@ private:
     u32 vb_stride;
 
     // Pixel/Vertex constants
-    ALIGN(16) R_constants constants;
+    alignas(16) R_constants constants;
     R_constant_table* ctable;
 
     // Shaders/State
