@@ -3,8 +3,12 @@
 #include "xrPhase_MergeLM_Rect.h"
 #include "utils/xrLC_Light/xrdeflector.h"
 
+#ifdef XR_X64
+#include <intrin.h>
+#else
 #include <mmintrin.h>
 #include <emmintrin.h>
+#endif
 
 static BYTE surface[c_LMAP_size * c_LMAP_size];
 const u32 alpha_ref = 254 - BORDER;
@@ -51,8 +55,13 @@ bool Place_Perpixel(L_rect& R, lm_layer* D, BOOL bRotate)
     int s_y = D->height + 2 * BORDER;
     int x;
 
+#ifdef _M_X64
+    __m128i mm_alpha_ref = _mm_set1_epi8(alpha_ref);
+    __m128i mm_zero = _mm_setzero_si128();
+#else
     const __m64 mm_alpha_ref = _mm_set1_pi8(alpha_ref);
     const __m64 mm_zero = _mm_setzero_si64();
+#endif
 
     if (!bRotate)
     {
@@ -65,6 +74,17 @@ bool Place_Perpixel(L_rect& R, lm_layer* D, BOOL bRotate)
             for (x = 0; x < s_x - 8; x += 8, P += 8, S += 8)
             {
                 // if ( (*P) && ( *S >= alpha_ref ) ) goto r_false;	// overlap
+#ifdef XR_X64
+                __m128i regS = _mm_set1_epi64x(*((__int64*)S));
+                __m128i regP = _mm_set1_epi64x(*((__int64*)P));
+                __m128i mm_max = _mm_max_epu8(regS, mm_alpha_ref);
+                __m128i mm_cmp = _mm_cmpeq_epi8(mm_max, mm_alpha_ref);
+                __m128i mm_andn = _mm_andnot_si128(mm_cmp, regP);
+                __m128i mm_andn_low = _mm_move_epi64(mm_andn);
+                __m128i mm_sad = _mm_sad_epu8(mm_andn_low, mm_zero);
+                if (_mm_cvtsi128_si32(mm_sad))
+                    return false;
+#else
                 __m64 mm_max = _mm_max_pu8(*(__m64*)S, mm_alpha_ref);
                 __m64 mm_cmp = _mm_cmpeq_pi8(mm_max, mm_alpha_ref);
                 __m64 mm_andn = _mm_andnot_si64(mm_cmp, *(__m64*)P);
@@ -74,12 +94,15 @@ bool Place_Perpixel(L_rect& R, lm_layer* D, BOOL bRotate)
                     _mm_empty();
                     return false;
                 }
+#endif
             }
             // remainder part
             for (; x < s_x; x++, P++, S++)
                 if ((*P) && (*S >= alpha_ref))
                 {
+#ifdef XR_X86
                     _mm_empty();
+#endif
                     return false;
                 }
         }
@@ -93,14 +116,18 @@ bool Place_Perpixel(L_rect& R, lm_layer* D, BOOL bRotate)
             for (x = 0; x < s_y; x++, P++)
                 if ((*P) && (lm[x * s_x + y] >= alpha_ref))
                 {
+#ifdef XR_X86
                     _mm_empty();
+#endif
                     return false;
                 }
         }
     }
 
     // It's OK to place it
+#ifdef XR_X86
     _mm_empty();
+#endif
     return true;
 }
 
@@ -121,6 +148,17 @@ BOOL _rect_place(L_rect& r, lm_layer* D)
             // accelerated part
             for (_X = 0; _X < x_max - 8;)
             {
+#ifdef _M_X64
+                __m128i init = _mm_set1_epi64x(*(temp_surf + _X));
+                __m128i m64_cmp = _mm_cmpeq_epi8(init, _mm_setzero_si128());
+                __m128i m64_cmp_low = _mm_move_epi64(m64_cmp);
+                __m128i m64_work = _mm_sad_epu8(m64_cmp_low, _mm_setzero_si128());
+
+                if (!_mm_cvtsi128_si32(m64_work)) {
+                    _X += 8;
+                    continue;
+                }
+#else
                 __m64 m64_cmp = _mm_cmpeq_pi8(*(__m64*)(temp_surf + _X), _mm_setzero_si64());
                 __m64 m64_work = _mm_sad_pu8(m64_cmp, _mm_setzero_si64());
 
@@ -129,7 +167,7 @@ BOOL _rect_place(L_rect& r, lm_layer* D)
                     _X += 8;
                     continue;
                 }
-
+#endif
                 if (temp_surf[_X])
                 {
                     _X++;
@@ -144,7 +182,9 @@ BOOL _rect_place(L_rect& r, lm_layer* D)
                 {
                     _rect_register(R, D, FALSE);
                     r.set(R);
+#ifdef XR_X86
                     _mm_empty();
+#endif
                     return TRUE;
                 }
             }
@@ -158,7 +198,9 @@ BOOL _rect_place(L_rect& r, lm_layer* D)
                 {
                     _rect_register(R, D, FALSE);
                     r.set(R);
+#ifdef XR_X86
                     _mm_empty();
+#endif
                     return TRUE;
                 }
             }
@@ -175,6 +217,17 @@ BOOL _rect_place(L_rect& r, lm_layer* D)
             // accelerated part
             for (_X = 0; _X < x_max - 8;)
             {
+#ifdef _M_X64
+                __m128i init = _mm_set1_epi64x(*(temp_surf + _X));
+                __m128i m64_cmp = _mm_cmpeq_epi8(init, _mm_setzero_si128());
+                __m128i m64_cmp_low = _mm_move_epi64(m64_cmp);
+                __m128i m64_work = _mm_sad_epu8(m64_cmp_low, _mm_setzero_si128());
+
+                if (!_mm_cvtsi128_si32(m64_work)) {
+                    _X += 8;
+                    continue;
+                }
+#else
                 __m64 m64_cmp = _mm_cmpeq_pi8(*(__m64*)(temp_surf + _X), _mm_setzero_si64());
                 __m64 m64_work = _mm_sad_pu8(m64_cmp, _mm_setzero_si64());
 
@@ -183,7 +236,7 @@ BOOL _rect_place(L_rect& r, lm_layer* D)
                     _X += 8;
                     continue;
                 }
-
+#endif
                 if (temp_surf[_X])
                 {
                     _X++;
@@ -198,7 +251,9 @@ BOOL _rect_place(L_rect& r, lm_layer* D)
                 {
                     _rect_register(R, D, TRUE);
                     r.set(R);
+#ifdef XR_X86
                     _mm_empty();
+#endif
                     return TRUE;
                 }
             }
@@ -212,13 +267,17 @@ BOOL _rect_place(L_rect& r, lm_layer* D)
                 {
                     _rect_register(R, D, TRUE);
                     r.set(R);
+#ifdef XR_X86
                     _mm_empty();
+#endif
                     return TRUE;
                 }
             }
         }
     }
 
+#ifdef XR_X86
     _mm_empty();
+#endif
     return FALSE;
 }
