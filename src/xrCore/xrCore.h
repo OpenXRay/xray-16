@@ -137,15 +137,15 @@ struct XRCORE_API xr_rtoken
 {
     shared_str name;
     int id;
-    xr_rtoken(LPCSTR _nm, int _id)
+
+    xr_rtoken(pcstr _nm, int _id)
     {
         name = _nm;
         id = _id;
     }
 
-public:
-    void rename(LPCSTR _nm) { name = _nm; }
-    bool equal(LPCSTR _nm) { return (0 == xr_strcmp(*name, _nm)); }
+    void rename(pcstr _nm) { name = _nm; }
+    bool equal(pcstr _nm) const { return (0 == xr_strcmp(*name, _nm)); }
 };
 
 #pragma pack(push, 1)
@@ -157,6 +157,7 @@ struct XRCORE_API xr_shortcut
         flCtrl = 0x40,
         flAlt = 0x80,
     };
+
     union
     {
         struct
@@ -166,22 +167,25 @@ struct XRCORE_API xr_shortcut
         };
         u16 hotkey;
     };
-    xr_shortcut(u8 k, BOOL a, BOOL c, BOOL s) : key(k)
+
+    xr_shortcut(u8 k, bool a, bool c, bool s) : key(k)
     {
         ext.assign(u8((a ? flAlt : 0) | (c ? flCtrl : 0) | (s ? flShift : 0)));
     }
+
     xr_shortcut()
     {
         ext.zero();
         key = 0;
     }
+
     bool similar(const xr_shortcut& v) const { return ext.equal(v.ext) && (key == v.key); }
 };
 #pragma pack(pop)
 
-DEFINE_VECTOR(shared_str, RStringVec, RStringVecIt);
-DEFINE_SET(shared_str, RStringSet, RStringSetIt);
-DEFINE_VECTOR(xr_rtoken, RTokenVec, RTokenVecIt);
+using RStringVec = xr_vector<shared_str>;
+using RStringSet = xr_set<shared_str>;
+using RTokenVec = xr_vector<xr_rtoken>;
 
 #define xr_pure_interface __interface
 
@@ -210,7 +214,7 @@ class destructor
 public:
     destructor(T* p) { ptr = p; }
     ~destructor() { xr_delete(ptr); }
-    IC T& operator()() { return *ptr; }
+    T& operator()() { return *ptr; }
 };
 
 // ********************************************** The Core definition
@@ -229,8 +233,8 @@ public:
     DWORD dwFrame;
     bool PluginMode;
 
-    void _initialize(
-    LPCSTR ApplicationName, LogCallback cb = 0, BOOL init_fs = TRUE, LPCSTR fs_fname = 0, bool plugin = false);
+    void Initialize(
+        pcstr ApplicationName, LogCallback cb = nullptr, bool init_fs = true, pcstr fs_fname = nullptr, bool plugin = false);
     void _destroy();
     const char* GetBuildDate() const { return buildDate; }
     u32 GetBuildId() const { return buildId; }

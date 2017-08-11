@@ -90,7 +90,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 {
     // Initialize debugging
     xrDebug::Initialize(false);
-    Core._initialize("xrDO");
+    Core.Initialize("xrDO");
     Startup(lpCmdLine);
 
     return 0;

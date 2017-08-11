@@ -1,3 +1,5 @@
+#pragma once
+
 template <bool _is_pm, typename T>
 struct xr_special_free
 {

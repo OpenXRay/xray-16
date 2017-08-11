@@ -332,7 +332,7 @@ int RunApplication(pcstr commandLine)
         u32 sz = xr_strlen(fsltx);
         sscanf(strstr(commandLine, fsltx) + sz, "%[^ ] ", fsgame);
     }
-    Core._initialize("xray", NULL, TRUE, *fsgame ? fsgame : nullptr);
+    Core.Initialize("xray", nullptr, true, *fsgame ? fsgame : nullptr);
     InitSettings();
     // Adjust player & computer name for Asian
     if (pSettings->line_exist("string_table", "no_native_input"))

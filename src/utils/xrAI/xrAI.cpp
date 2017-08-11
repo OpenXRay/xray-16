@@ -197,7 +197,7 @@ Factory_Destroy* destroy_entity = 0;
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     xrDebug::Initialize(false);
-    Core._initialize("xrai", 0);
+    Core.Initialize("xrai", 0);
     HMODULE hFactory;
     LPCSTR g_name = "xrSE_Factory";
     Log("Loading DLL:", g_name);

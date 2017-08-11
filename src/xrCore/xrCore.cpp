@@ -26,7 +26,7 @@ static u32 init_counter = 0;
 
 //. extern xr_vector<shared_str>* LogFile;
 
-void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs, LPCSTR fs_fname, bool plugin)
+void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pcstr fs_fname, bool plugin)
 {
     xr_strcpy(ApplicationName, _ApplicationName);
     if (0 == init_counter)
@@ -36,13 +36,13 @@ void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs, 
         // HRESULT co_res =
         Params = xr_strdup(GetCommandLine());
         if (!strstr(Params, "-editor"))
-            CoInitializeEx(NULL, COINIT_MULTITHREADED);
+            CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
         string_path fn, dr, di;
 
         // application path
         GetModuleFileName(GetModuleHandle("xrCore"), fn, sizeof(fn));
-        _splitpath(fn, dr, di, 0, 0);
+        _splitpath(fn, dr, di, nullptr, nullptr);
         strconcat(sizeof(ApplicationPath), ApplicationPath, dr, di);
 
 #ifdef _EDITOR
@@ -87,10 +87,10 @@ void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs, 
     }
     if (init_fs)
     {
-        u32 flags = 0;
-        if (0 != strstr(Params, "-build"))
+        u32 flags = 0u;
+        if (strstr(Params, "-build") != nullptr)
             flags |= CLocatorAPI::flBuildCopy;
-        if (0 != strstr(Params, "-ebuild"))
+        if (strstr(Params, "-ebuild") != nullptr)
             flags |= CLocatorAPI::flBuildCopy | CLocatorAPI::flEBuildCopy;
 #ifdef DEBUG
         if (strstr(Params, "-cache"))
@@ -105,11 +105,11 @@ void xrCore::_initialize(LPCSTR _ApplicationName, LogCallback cb, BOOL init_fs, 
 
 #ifndef _EDITOR
 #ifndef ELocatorAPIH
-        if (0 != strstr(Params, "-file_activity"))
+        if (strstr(Params, "-file_activity") != nullptr)
             flags |= CLocatorAPI::flDumpFileActivity;
 #endif
 #endif
-        FS._initialize(flags, 0, fs_fname);
+        FS._initialize(flags, nullptr, fs_fname);
         CalculateBuildId();
         Msg("'%s' build %d, %s\n", "xrCore", buildId, buildDate);
         EFS._initialize();
@@ -201,7 +201,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvRese
     break;
     case DLL_THREAD_ATTACH:
         if (!strstr(GetCommandLine(), "-editor"))
-            CoInitializeEx(NULL, COINIT_MULTITHREADED);
+            CoInitializeEx(nullptr, COINIT_MULTITHREADED);
         timeBeginPeriod(1);
         break;
     case DLL_THREAD_DETACH: break;

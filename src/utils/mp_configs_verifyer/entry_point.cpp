@@ -148,7 +148,7 @@ void run_configs_verifyer_server()
 
 void initialize_core()
 {
-    Core._initialize("mp_configs_info", LogCallback(xrcore_log_cb, nullptr), TRUE, "fsgame4mpu.ltx");
+    Core.Initialize("mp_configs_info", LogCallback(xrcore_log_cb, nullptr), TRUE, "fsgame4mpu.ltx");
 
     string_path fname;
     FS.update_path(fname, "$game_config$", "system.ltx");

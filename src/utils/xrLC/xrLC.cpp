@@ -155,7 +155,7 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR lpCmdLine, 
 {
     // Initialize debugging
     xrDebug::Initialize(false);
-    Core._initialize("xrLC");
+    Core.Initialize("xrLC");
 
     if (strstr(Core.Params, "-nosmg"))
         g_using_smooth_groups = false;
