@@ -360,6 +360,9 @@
     <ClCompile Include="Math\SkinXW_CPP.cpp">
       <Filter>Math</Filter>
     </ClCompile>
+    <ClCompile Include="Math\PLC_CPP.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">
@@ -756,6 +759,9 @@
       <Filter>Math\Extensions</Filter>
     </ClInclude>
     <ClInclude Include="Math\SkinXW_CPP.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\PLC_CPP.hpp">
       <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>

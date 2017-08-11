@@ -333,6 +333,7 @@
     <ClCompile Include="LocatorAPI_defs.cpp" />
     <ClCompile Include="log.cpp" />
     <ClCompile Include="LzHuf.cpp" />
+    <ClCompile Include="Math\PLC_CPP.cpp" />
     <ClCompile Include="Math\PLC_SSE.cpp" />
     <ClCompile Include="Math\SkinXW_CPP.cpp" />
     <ClCompile Include="Math\Skin4W_MT.cpp" />
@@ -501,6 +502,7 @@
     <ClInclude Include="LocatorAPI_defs.h" />
     <ClInclude Include="log.h" />
     <ClInclude Include="lzhuf.h" />
+    <ClInclude Include="Math\PLC_CPP.hpp" />
     <ClInclude Include="Math\PLC_SSE.hpp" />
     <ClInclude Include="Math\Random32.hpp" />
     <ClInclude Include="Math\Skin4W_MT.hpp" />
