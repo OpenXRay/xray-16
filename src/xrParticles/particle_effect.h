@@ -29,7 +29,10 @@ public:
         particles_allocated = max_particles;
 
         real_ptr = xr_malloc(sizeof(Particle) * (max_particles + 1));
-        particles = (Particle*)((DWORD)real_ptr + (64 - ((DWORD)real_ptr & 63)));
+        
+        particles = (Particle*)((uintptr_t)real_ptr + (64 - ((uintptr_t)real_ptr & 63)));
+        //particles = static_cast<Particle*>(real_ptr);
+
         // Msg( "Allocated %u bytes (%u particles) with base address 0x%p" , max_particles * sizeof( Particle ) ,
         // max_particles , particles );
     }
@@ -58,7 +61,7 @@ public:
             return max_particles;
         }
 
-        Particle* new_particles = (Particle*)((DWORD)new_real_ptr + (64 - ((DWORD)new_real_ptr & 63)));
+        Particle* new_particles = (Particle*)((uintptr_t)new_real_ptr + (64 - ((uintptr_t)new_real_ptr & 63)));
         // Msg( "Re-allocated %u bytes (%u particles) with base address 0x%p" , max_count * sizeof( Particle ) ,
         // max_count , new_particles );
 
