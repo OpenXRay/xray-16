@@ -118,9 +118,6 @@
     <Filter Include="XML">
       <UniqueIdentifier>{f365c098-99bb-41a7-858d-12ba18a1311e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="XML\TinyXML">
-      <UniqueIdentifier>{eb0bfab5-c514-4df4-a747-d14beb72f57b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="PCH">
       <UniqueIdentifier>{061cfd8f-ceab-42cf-83c5-bdfb65c5d322}</UniqueIdentifier>
     </Filter>
@@ -329,18 +326,6 @@
     </ClCompile>
     <ClCompile Include="Debug\StackTrace.cpp">
       <Filter>Debug core</Filter>
-    </ClCompile>
-    <ClCompile Include="XML\tinystr.cpp">
-      <Filter>XML\TinyXML</Filter>
-    </ClCompile>
-    <ClCompile Include="XML\tinyxml.cpp">
-      <Filter>XML\TinyXML</Filter>
-    </ClCompile>
-    <ClCompile Include="XML\tinyxmlerror.cpp">
-      <Filter>XML\TinyXML</Filter>
-    </ClCompile>
-    <ClCompile Include="XML\tinyxmlparser.cpp">
-      <Filter>XML\TinyXML</Filter>
     </ClCompile>
     <ClCompile Include="XML\XMLDocument.cpp">
       <Filter>XML</Filter>
@@ -730,12 +715,6 @@
     </ClInclude>
     <ClInclude Include="..\Common\Noncopyable.hpp">
       <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="XML\tinystr.h">
-      <Filter>XML\TinyXML</Filter>
-    </ClInclude>
-    <ClInclude Include="XML\tinyxml.h">
-      <Filter>XML\TinyXML</Filter>
     </ClInclude>
     <ClInclude Include="XML\XMLDocument.hpp">
       <Filter>XML</Filter>
