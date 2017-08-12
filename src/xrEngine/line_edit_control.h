@@ -10,8 +10,8 @@
 
 namespace text_editor
 {
-void remove_spaces(PSTR str); // in & out
-void split_cmd(PSTR first, PSTR second, LPCSTR str);
+void remove_spaces(pstr str); // in & out
+void split_cmd(pstr first, pstr second, pcstr str);
 
 class base;
 
@@ -46,9 +46,8 @@ enum init_mode
 
 class ENGINE_API line_edit_control
 {
-private:
-    typedef text_editor::base Base;
-    typedef fastdelegate::FastDelegate0<void> Callback;
+    using Base = text_editor::base;
+    using Callback = fastdelegate::FastDelegate0<void>;
 
 public:
     line_edit_control(u32 str_buffer_size);
@@ -65,18 +64,19 @@ public:
 
     void insert_character(char c);
 
-    IC bool get_key_state(key_state mask) const { return (mask) ? !!(m_key_state.test(mask)) : true; }
-    IC void set_key_state(key_state mask, bool value) { m_key_state.set(mask, value); }
-    IC bool cursor_view() const { return m_cursor_view; }
-    IC bool need_update() const { return m_need_update; }
-    IC LPCSTR str_edit() const { return m_edit_str; }
-    IC LPCSTR str_before_cursor() const { return m_buf0; }
-    IC LPCSTR str_before_mark() const { return m_buf1; }
-    IC LPCSTR str_mark() const { return m_buf2; }
-    IC LPCSTR str_after_mark() const { return m_buf3; }
-    void set_edit(LPCSTR str);
+    bool get_key_state(key_state mask) const { return mask ? !!m_key_state.test(mask) : true; }
+    void set_key_state(key_state mask, bool value) { m_key_state.set(mask, value); }
+    bool cursor_view() const { return m_cursor_view; }
+    bool need_update() const { return m_need_update; }
+    pcstr str_edit() const { return m_edit_str; }
+    pcstr str_before_cursor() const { return m_buf0; }
+    pcstr str_before_mark() const { return m_buf1; }
+    pcstr str_mark() const { return m_buf2; }
+    pcstr str_after_mark() const { return m_buf3; }
+    void set_edit(pcstr str);
     void set_selected_mode(bool status) { m_unselected_mode = !status; }
     bool get_selected_mode() const { return !m_unselected_mode; }
+
 private:
     line_edit_control(line_edit_control const&);
     line_edit_control const& operator=(line_edit_control const&);
