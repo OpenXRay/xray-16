@@ -165,9 +165,9 @@ void CPGDef::Save2(CInifile& ini)
         ini.w_string(
             buff, "on_play_child", (*it)->m_Flags.test(SEffect::flOnPlayChild) ? (*it)->m_OnPlayChildName.c_str() : "");
         ini.w_string(buff, "on_birth_child",
-            (*it)->m_Flags.test(SEffect::flOnBirthChild) ? (*it)->m_OnBirthChildName.c_str() : "");
+                     (*it)->m_Flags.test(SEffect::flOnBirthChild) ? (*it)->m_OnBirthChildName.c_str() : "");
         ini.w_string(buff, "on_death_child",
-            (*it)->m_Flags.test(SEffect::flOnDeadChild) ? (*it)->m_OnDeadChildName.c_str() : "");
+                     (*it)->m_Flags.test(SEffect::flOnDeadChild) ? (*it)->m_OnDeadChildName.c_str() : "");
         ini.w_float(buff, "time0", (*it)->m_Time0);
         ini.w_float(buff, "time1", (*it)->m_Time1);
         ini.w_u32(buff, "flags", (*it)->m_Flags.get());

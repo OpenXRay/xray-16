@@ -183,7 +183,7 @@
     <ClCompile Include="NET_utils.cpp">
       <Filter>FS</Filter>
     </ClCompile>
-    <ClCompile Include="Xr_ini.cpp">
+    <ClCompile Include="xr_ini.cpp">
       <Filter>FS</Filter>
     </ClCompile>
     <ClCompile Include="stream_reader.cpp">
