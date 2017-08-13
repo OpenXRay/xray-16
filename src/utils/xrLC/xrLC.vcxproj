@@ -159,7 +159,7 @@
     <Link>
       <ShowProgress>NotSet</ShowProgress>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\$(PlatformShortName);$(xrLibDir);$(xrSdkDir)libraries;$(xrExternals)FreeImage\Dist\$(PlatformShortName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\$(PlatformShortName);$(xrLibDir);$(xrSdkDir)libraries;$(xrExternals)FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
       <OptimizeReferences>true</OptimizeReferences>
@@ -207,7 +207,7 @@
     <Link>
       <ShowProgress>NotSet</ShowProgress>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\$(PlatformShortName);$(xrLibDir);$(xrSdkDir)libraries;$(xrExternals)FreeImage\Dist\$(PlatformShortName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\$(PlatformShortName);$(xrLibDir);$(xrSdkDir)libraries;$(xrExternals)FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
       <OptimizeReferences>true</OptimizeReferences>
@@ -245,7 +245,7 @@
     </ResourceCompile>
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\$(PlatformShortName);$(xrLibDir);$(xrSdkDir)libraries;$(xrExternals)FreeImage\Dist\$(PlatformShortName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\$(PlatformShortName);$(xrLibDir);$(xrSdkDir)libraries;$(xrExternals)FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
       <StackReserveSize>2097152</StackReserveSize>
       <LargeAddressAware>true</LargeAddressAware>
@@ -281,7 +281,7 @@
     </ResourceCompile>
     <Link>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\$(PlatformShortName);$(xrLibDir);$(xrSdkDir)libraries;$(xrExternals)FreeImage\Dist\$(PlatformShortName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\$(PlatformShortName);$(xrLibDir);$(xrSdkDir)libraries;$(xrExternals)FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
       <StackReserveSize>2097152</StackReserveSize>
       <LargeAddressAware>true</LargeAddressAware>
@@ -325,7 +325,7 @@
     <Link>
       <ShowProgress>NotSet</ShowProgress>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\$(PlatformShortName);$(xrLibDir);$(xrSdkDir)libraries;$(xrExternals)FreeImage\Dist\$(PlatformShortName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\$(PlatformShortName);$(xrLibDir);$(xrSdkDir)libraries;$(xrExternals)FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <MapExports>false</MapExports>
       <SubSystem>Windows</SubSystem>
@@ -372,7 +372,7 @@
     <Link>
       <ShowProgress>NotSet</ShowProgress>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\$(PlatformShortName);$(xrLibDir);$(xrSdkDir)libraries;$(xrExternals)FreeImage\Dist\$(PlatformShortName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(DXSDK_DIR)Lib\$(PlatformShortName);$(xrLibDir);$(xrSdkDir)libraries;$(xrExternals)FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <MapExports>false</MapExports>
       <SubSystem>Windows</SubSystem>
