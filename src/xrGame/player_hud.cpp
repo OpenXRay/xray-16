@@ -7,6 +7,8 @@
 #include "static_cast_checked.hpp"
 #include "actoreffector.h"
 #include "xrEngine/IGame_Persistent.h"
+#include "xrCore/xrDebug_macros.h" // only for pragma todo
+
 
 player_hud* g_player_hud = nullptr;
 Fvector _ancor_pos;
@@ -366,20 +368,21 @@ u32 attachable_hud_item::anim_play(const shared_str& anm_name_b, BOOL bMixIn, co
         VERIFY(current_actor);
         CEffectorCam* ec = current_actor->Cameras().GetCamEffector(eCEWeaponAction);
 
-        if (nullptr == ec)
+        if (ec)
+            current_actor->Cameras().RemoveCamEffector(eCEWeaponAction);
+
+        string_path ce_path;
+        string_path anm_name;
+#pragma todo("Xottab_DUTY: replace backslashes with slashes")
+        strconcat(sizeof(anm_name), anm_name, "camera_effects\\weapon\\", M.name.c_str(), ".anm");
+        if (FS.exist(ce_path, "$game_anims$", anm_name))
         {
-            string_path ce_path;
-            string_path anm_name;
-            strconcat(sizeof(anm_name), anm_name, "camera_effects\\weapon\\", M.name.c_str(), ".anm");
-            if (FS.exist(ce_path, "$game_anims$", anm_name))
-            {
-                CAnimatorCamEffector* e = new CAnimatorCamEffector();
-                e->SetType(eCEWeaponAction);
-                e->SetHudAffect(false);
-                e->SetCyclic(false);
-                e->Start(anm_name);
-                current_actor->Cameras().AddCamEffector(e);
-            }
+            CAnimatorCamEffector* e = new CAnimatorCamEffector();
+            e->SetType(eCEWeaponAction);
+            e->SetHudAffect(false);
+            e->SetCyclic(false);
+            e->Start(anm_name);
+            current_actor->Cameras().AddCamEffector(e);
         }
     }
     return ret;
