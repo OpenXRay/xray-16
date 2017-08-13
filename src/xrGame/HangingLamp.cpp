@@ -320,8 +320,7 @@ void CHangingLamp::TurnOff()
             make_string("can not Turn Off lamp: %s, visual %s - because all bones become invisible",
                 cNameVisual().c_str(), cName().c_str()));
     }
-    if (!PPhysicsShell()) // if we have physiccs_shell it will call processing deactivate when disable
-        processing_deactivate();
+    processing_deactivate();
     m_bState = 0;
 }
 
