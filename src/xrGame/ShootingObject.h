@@ -175,7 +175,7 @@ public:
     Fvector vLoadedShellPoint;
     float m_fPredBulletTime;
     float m_fTimeToAim;
-    BOOL m_bUseAimBullet;
+    bool m_bUseAimBullet;
 
 protected:
     //имя пратиклов для огня

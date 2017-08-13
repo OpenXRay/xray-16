@@ -74,8 +74,8 @@ IC void CTradeParameters::process(_action_type type, CInifile& ini_file, const s
     _action.clear();
 
     CInifile::Sect& S = ini_file.r_section(section);
-    CInifile::SectCIt I = S.Data.begin();
-    CInifile::SectCIt E = S.Data.end();
+    auto I = S.Data.cbegin();
+    auto E = S.Data.cend();
     for (; I != E; ++I)
     {
         if (!(*I).second.size())

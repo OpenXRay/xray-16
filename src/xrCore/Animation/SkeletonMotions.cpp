@@ -43,8 +43,8 @@ void CPartition::load(IKinematics* V, LPCSTR model_name)
         xr_sprintf(buff, sizeof(buff), "part_%d", i);
 
         CInifile::Sect S = ini.r_section(buff);
-        CInifile::SectCIt it = S.Data.begin();
-        CInifile::SectCIt it_e = S.Data.end();
+        auto it = S.Data.cbegin();
+        auto it_e = S.Data.cend();
         if (S.Data.size())
         {
             P[i].bones.clear_not_free();

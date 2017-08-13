@@ -53,24 +53,24 @@ CWeapon::CWeapon()
 
     m_zoom_params.m_fCurrentZoomFactor = g_fov;
     m_zoom_params.m_fZoomRotationFactor = 0.f;
-    m_zoom_params.m_pVision = NULL;
-    m_zoom_params.m_pNight_vision = NULL;
+    m_zoom_params.m_pVision = nullptr;
+    m_zoom_params.m_pNight_vision = nullptr;
 
-    m_pCurrentAmmo = NULL;
+    m_pCurrentAmmo = nullptr;
 
-    m_pFlameParticles2 = NULL;
-    m_sFlameParticles2 = NULL;
+    m_pFlameParticles2 = nullptr;
+    m_sFlameParticles2 = nullptr;
 
     m_fCurrentCartirdgeDisp = 1.f;
 
-    m_strap_bone0 = 0;
-    m_strap_bone1 = 0;
+    m_strap_bone0 = nullptr;
+    m_strap_bone1 = nullptr;
     m_StrapOffset.identity();
     m_strapped_mode = false;
     m_can_be_strapped = false;
     m_ef_main_weapon_type = u32(-1);
     m_ef_weapon_type = u32(-1);
-    m_UIScope = NULL;
+    m_UIScope = nullptr;
     m_set_next_ammoType_on_reload = undefined_ammo_type;
     m_crosshair_inertion = 0.f;
     m_activation_speed_is_overriden = false;
@@ -470,9 +470,9 @@ void CWeapon::Load(LPCSTR section)
         m_hit_probability[i] = READ_IF_EXISTS(pSettings, r_float, section, temp, 1.f);
     }
 
-    m_zoom_params.m_bUseDynamicZoom = READ_IF_EXISTS(pSettings, r_bool, section, "scope_dynamic_zoom", FALSE);
-    m_zoom_params.m_sUseZoomPostprocess = 0;
-    m_zoom_params.m_sUseBinocularVision = 0;
+    m_zoom_params.m_bUseDynamicZoom = READ_IF_EXISTS(pSettings, r_bool, section, "scope_dynamic_zoom", false);
+    m_zoom_params.m_sUseZoomPostprocess = nullptr;
+    m_zoom_params.m_sUseBinocularVision = nullptr;
 }
 
 void CWeapon::LoadFireParams(LPCSTR section)
@@ -810,7 +810,7 @@ void CWeapon::UpdateCL()
         if (pActor && !pActor->AnyMove() && this == pActor->inventory().ActiveItem())
         {
             if (hud_adj_mode == 0 && GetState() == eIdle && (Device.dwTimeGlobal - m_dw_curr_substate_time > 20000) &&
-                !IsZoomed() && g_player_hud->attached_item(1) == NULL)
+                !IsZoomed() && g_player_hud->attached_item(1) == nullptr)
             {
                 if (AllowBore())
                     SwitchState(eBore);
@@ -1346,7 +1346,7 @@ void CWeapon::OnZoomIn()
     if (GetHUDmode())
         GamePersistent().SetPickableEffectorDOF(true);
 
-    if (m_zoom_params.m_sUseBinocularVision.size() && IsScopeAttached() && NULL == m_zoom_params.m_pVision)
+    if (m_zoom_params.m_sUseBinocularVision.size() && IsScopeAttached() && nullptr == m_zoom_params.m_pVision)
         m_zoom_params.m_pVision = new CBinocularsVision(m_zoom_params.m_sUseBinocularVision /*"wpn_binoc"*/);
 
     if (m_zoom_params.m_sUseZoomPostprocess.size() && IsScopeAttached())
@@ -1354,7 +1354,7 @@ void CWeapon::OnZoomIn()
         CActor* pA = smart_cast<CActor*>(H_Parent());
         if (pA)
         {
-            if (NULL == m_zoom_params.m_pNight_vision)
+            if (nullptr == m_zoom_params.m_pNight_vision)
             {
                 m_zoom_params.m_pNight_vision =
                     new CNightVisionEffector(m_zoom_params.m_sUseZoomPostprocess /*"device_torch"*/);
@@ -1390,7 +1390,7 @@ CUIWindow* CWeapon::ZoomTexture()
     if (UseScopeTexture())
         return m_UIScope;
     else
-        return NULL;
+        return nullptr;
 }
 
 void CWeapon::SwitchState(u32 S)
@@ -1572,7 +1572,7 @@ CInventoryItem* CWeapon::can_kill(CInventory* inventory) const
             return (inventory_item);
     }
 
-    return (0);
+    return (nullptr);
 }
 
 const CInventoryItem* CWeapon::can_kill(const xr_vector<const CGameObject*>& items) const
@@ -1594,7 +1594,7 @@ const CInventoryItem* CWeapon::can_kill(const xr_vector<const CGameObject*>& ite
             return (inventory_item);
     }
 
-    return (0);
+    return (nullptr);
 }
 
 bool CWeapon::ready_to_kill() const
@@ -1767,7 +1767,7 @@ BOOL CWeapon::ParentMayHaveAimBullet()
 {
     IGameObject* O = H_Parent();
     CEntityAlive* EA = smart_cast<CEntityAlive*>(O);
-    return EA->cast_actor() != 0;
+    return EA->cast_actor() != nullptr;
 }
 
 BOOL CWeapon::ParentIsActor()
@@ -1780,7 +1780,7 @@ BOOL CWeapon::ParentIsActor()
     if (!EA)
         return FALSE;
 
-    return EA->cast_actor() != 0;
+    return EA->cast_actor() != nullptr;
 }
 
 extern u32 hud_adj_mode;
@@ -1844,7 +1844,7 @@ u8 CWeapon::GetCurrentHudOffsetIdx()
 
 void CWeapon::render_hud_mode() { RenderLight(); }
 bool CWeapon::MovingAnimAllowedNow() { return !IsZoomed(); }
-bool CWeapon::IsHudModeNow() { return (HudItemData() != NULL); }
+bool CWeapon::IsHudModeNow() { return (HudItemData() != nullptr); }
 void CWeapon::ZoomInc()
 {
     if (!IsScopeAttached())

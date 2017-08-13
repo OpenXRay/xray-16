@@ -100,7 +100,7 @@ void CLensFlareDescriptor::load(CInifile* pIni, LPCSTR sect)
             AddFlare(r, o, p, name, S);
         }
     }
-    m_Flags.set(flGradient, CInifile::IsBOOL(pIni->r_string(sect, "gradient")));
+    m_Flags.set(flGradient, CInifile::isBool(pIni->r_string(sect, "gradient")));
     if (m_Flags.is(flGradient))
     {
         LPCSTR S = pIni->r_string(sect, "gradient_shader");

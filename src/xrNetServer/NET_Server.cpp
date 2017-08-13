@@ -991,8 +991,8 @@ void IPureServer::BannedList_Load()
 
     CInifile ini(temp);
 
-    CInifile::RootIt it = ini.sections().begin();
-    CInifile::RootIt it_e = ini.sections().end();
+    auto it = ini.sections().begin();
+    auto it_e = ini.sections().end();
 
     for (; it != it_e; ++it)
     {

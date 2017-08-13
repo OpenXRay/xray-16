@@ -22,8 +22,8 @@
 
 bool CInventoryItem::has_upgrade_group(const shared_str& upgrade_group_id)
 {
-    Upgrades_type::iterator it = m_upgrades.begin();
-    Upgrades_type::iterator it_e = m_upgrades.end();
+    auto it = m_upgrades.cbegin();
+    auto it_e = m_upgrades.cend();
 
     for (; it != it_e; ++it)
     {
@@ -63,8 +63,8 @@ bool CInventoryItem::get_upgrades_str(string2048& res) const
 {
     int prop_count = 0;
     res[0] = 0;
-    Upgrades_type::const_iterator ib = m_upgrades.begin();
-    Upgrades_type::const_iterator ie = m_upgrades.end();
+    auto ib = m_upgrades.cbegin();
+    auto ie = m_upgrades.cend();
     inventory::upgrade::Upgrade* upgr;
     for (; ib != ie; ++ib)
     {
@@ -96,14 +96,14 @@ bool CInventoryItem::equal_upgrades(Upgrades_type const& other_upgrades) const
         return false;
     }
 
-    Upgrades_type::const_iterator ib = m_upgrades.begin();
-    Upgrades_type::const_iterator ie = m_upgrades.end();
+    auto ib = m_upgrades.cbegin();
+    auto ie = m_upgrades.cend();
     for (; ib != ie; ++ib)
     {
         shared_str const& name1 = (*ib);
         bool upg_equal = false;
-        Upgrades_type::const_iterator ib2 = other_upgrades.begin();
-        Upgrades_type::const_iterator ie2 = other_upgrades.end();
+        auto ib2 = other_upgrades.cbegin();
+        auto ie2 = other_upgrades.cend();
         for (; ib2 != ie2; ++ib2)
         {
             if (name1.equal((*ib2)))
@@ -124,8 +124,8 @@ bool CInventoryItem::equal_upgrades(Upgrades_type const& other_upgrades) const
 void CInventoryItem::log_upgrades()
 {
     Msg("* all upgrades of item = %s", m_section_id.c_str());
-    Upgrades_type::const_iterator ib = m_upgrades.begin();
-    Upgrades_type::const_iterator ie = m_upgrades.end();
+    auto ib = m_upgrades.cbegin();
+    auto ie = m_upgrades.cend();
     for (; ib != ie; ++ib)
     {
         Msg("    %s", (*ib).c_str());
@@ -145,8 +145,8 @@ void CInventoryItem::net_Spawn_install_upgrades(Upgrades_type saved_upgrades) //
 
     ai().alife().inventory_upgrade_manager().init_install(*this); // from pSettings
 
-    Upgrades_type::iterator ib = saved_upgrades.begin();
-    Upgrades_type::iterator ie = saved_upgrades.end();
+    auto ib = saved_upgrades.begin();
+    auto ie = saved_upgrades.end();
     for (; ib != ie; ++ib)
     {
         ai().alife().inventory_upgrade_manager().upgrade_install(*this, (*ib), true);
@@ -163,7 +163,7 @@ bool CInventoryItem::install_upgrade_impl(LPCSTR section, bool test)
     bool result2 = false;
     if (BaseSlot() != NO_ACTIVE_SLOT)
     {
-        BOOL value = m_flags.test(FRuckDefault);
+        bool value = m_flags.test(FRuckDefault);
         result2 = process_if_exists_set(section, "default_to_ruck", &CInifile::r_bool, value, test);
         if (result2 && !test)
         {
@@ -183,7 +183,7 @@ bool CInventoryItem::install_upgrade_impl(LPCSTR section, bool test)
             process_if_exists(section, "control_inertion_factor", &CInifile::r_float, m_fControlInertionFactor, test);
     }
 
-    LPCSTR str;
+    pcstr str;
     result2 = process_if_exists_set(section, "immunities_sect", &CInifile::r_string, str, test);
     if (result2 && !test)
         CHitImmunity::LoadImmunities(str, pSettings);

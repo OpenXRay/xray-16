@@ -171,7 +171,7 @@ void CLevelSoundManager::Load()
                 Msg("- Loading music tracks from '%s'...", music_sect);
 #endif // #ifdef DEBUG
                 CInifile::Sect& S = gameLtx.r_section(music_sect);
-                CInifile::SectCIt it = S.Data.begin(), end = S.Data.end();
+                auto it = S.Data.cbegin(), end = S.Data.cend();
                 m_MusicTracks.reserve(S.Data.size());
                 for (; it != end; it++)
                 {

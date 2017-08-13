@@ -18,9 +18,8 @@ void IGame_ObjectPool::prefetch()
     // prefetch objects
     strconcat(sizeof(section), section, "prefetch_objects_", g_pGamePersistent->m_game_params.m_game_type);
     CInifile::Sect const& sect = pSettings->r_section(section);
-    for (CInifile::SectCIt I = sect.Data.begin(); I != sect.Data.end(); I++)
+    for (const auto& item : sect.Data)
     {
-        const CInifile::Item& item = *I;
         CLASS_ID CLS = pSettings->r_clsid(item.first.c_str(), "class");
         p_count++;
         IGameObject* pObject = smart_cast<IGameObject*>(NEW_INSTANCE(CLS));

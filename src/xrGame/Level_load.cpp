@@ -106,7 +106,7 @@ bool CLevel::Load_GameSpecific_After()
         {
             CInifile::Sect& S = pSettings->r_section("sounds_random");
             Sounds_Random.reserve(S.Data.size());
-            for (CInifile::SectCIt I = S.Data.begin(); S.Data.end() != I; ++I)
+            for (auto I = S.Data.cbegin(); S.Data.cend() != I; ++I)
             {
                 Sounds_Random.push_back(ref_sound());
                 Sound->create(Sounds_Random.back(), *I->first, st_Effect, sg_SourceType);

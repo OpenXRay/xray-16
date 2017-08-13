@@ -165,8 +165,8 @@ void UIInvUpgPropertiesWnd::init_from_xml(LPCSTR xml_name)
     shared_str property_id;
 
     CInifile::Sect& inv_section = pSettings->r_section(properties_section);
-    CInifile::SectIt_ ib = inv_section.Data.begin();
-    CInifile::SectIt_ ie = inv_section.Data.end();
+    auto ib = inv_section.Data.begin();
+    auto ie = inv_section.Data.end();
     for (; ib != ie; ++ib)
     {
         UIProperty* ui_property = new UIProperty(); // load one time !!

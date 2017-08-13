@@ -30,11 +30,11 @@ bool is_enough_address_space_available() { return true; }
 int get_texture_load_lod(LPCSTR fn)
 {
     CInifile::Sect& sect = pSettings->r_section("reduce_lod_texture_list");
-    CInifile::SectCIt it_ = sect.Data.begin();
-    CInifile::SectCIt it_e_ = sect.Data.end();
+    auto it_ = sect.Data.cbegin();
+    auto it_e_ = sect.Data.cend();
 
-    CInifile::SectCIt it = it_;
-    CInifile::SectCIt it_e = it_e_;
+    auto it = it_;
+    auto it_e = it_e_;
 
     static bool enough_address_space_available = is_enough_address_space_available();
 

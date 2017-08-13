@@ -156,7 +156,7 @@ bool CHelmet::install_upgrade_impl(LPCSTR section, bool test)
     result |= process_if_exists(
         section, "telepatic_protection", &CInifile::r_float, m_HitTypeProtection[ALife::eHitTypeTelepatic], test);
     result |= process_if_exists(section, "chemical_burn_protection", &CInifile::r_float,
-        m_HitTypeProtection[ALife::eHitTypeChemicalBurn], test);
+                                m_HitTypeProtection[ALife::eHitTypeChemicalBurn], test);
     result |= process_if_exists(
         section, "explosion_protection", &CInifile::r_float, m_HitTypeProtection[ALife::eHitTypeExplosion], test);
     result |= process_if_exists(

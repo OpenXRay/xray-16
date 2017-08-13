@@ -941,7 +941,7 @@ void CCar::Init()
     if (ini->section_exist("damage_items"))
     {
         CInifile::Sect& data = ini->r_section("damage_items");
-        for (CInifile::SectCIt I = data.Data.begin(); I != data.Data.end(); I++)
+        for (auto I = data.Data.cbegin(); I != data.Data.cend(); I++)
         {
             const CInifile::Item& item = *I;
             u16 index = pKinematics->LL_BoneID(*item.first);
