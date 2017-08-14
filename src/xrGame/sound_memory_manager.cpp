@@ -454,17 +454,17 @@ void CSoundMemoryManager::load(IReader& packet)
 #ifdef USE_LEVEL_TIME
         VERIFY(Device.dwTimeGlobal >= object.m_level_time);
         object.m_level_time = packet.r_u32();
-        object.m_level_time += Device.dwTimeGlobal;
+        object.m_level_time = Device.dwTimeGlobal - object.m_level_time;
 #endif // USE_LEVEL_TIME
 #ifdef USE_LAST_LEVEL_TIME
         VERIFY(Device.dwTimeGlobal >= object.m_last_level_time);
         object.m_last_level_time = packet.r_u32();
-        object.m_last_level_time += Device.dwTimeGlobal;
+        object.m_last_level_time = Device.dwTimeGlobal - object.m_last_level_time;
 #endif // USE_LAST_LEVEL_TIME
 #ifdef USE_FIRST_LEVEL_TIME
         VERIFY(Device.dwTimeGlobal >= (*I).m_first_level_time);
         object.m_first_level_time = packet.r_u32();
-        object.m_first_level_time += Device.dwTimeGlobal;
+        object.m_first_level_time = Device.dwTimeGlobal - object.m_first_level_time;
 #endif // USE_FIRST_LEVEL_TIME
         object.m_sound_type = (ESoundTypes)packet.r_u32();
         object.m_power = packet.r_float();
