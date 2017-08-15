@@ -1,6 +1,6 @@
+#pragma once
 #ifndef SoundRender_CacheH
 #define SoundRender_CacheH
-#pragma once
 
 // --- just thoughts ---
 // 1. LRU scheme
@@ -50,7 +50,7 @@ private:
     void disconnect(); // disconnect from CATs
     void format(); // format structure (like filesystem)
 public:
-    BOOL request(cache_cat& cat, u32 id); // TRUE=need to fill, FALSE=cached info avail
+    bool request(cache_cat& cat, u32 id); // TRUE=need to fill, FALSE=cached info avail
     void purge(); // discard all contents of cache
 
     void* get_dataptr(cache_cat& cat, u32 id)
@@ -58,7 +58,7 @@ public:
         id %= cat.size;
         return c_storage[cat.table[id]].data;
     } //.
-    u32 get_linesize() { return _line; }
+    u32 get_linesize() const { return _line; }
     void cat_create(cache_cat& cat, u32 bytes);
     void cat_destroy(cache_cat& cat);
 

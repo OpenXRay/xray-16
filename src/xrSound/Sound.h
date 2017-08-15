@@ -24,7 +24,7 @@ class XRSOUND_EDITOR_API SoundEnvironment_LIB;
 #define XRSOUND_EDITOR_API
 #endif
 
-#define SNDENV_FILENAME "sEnvironment.xr"
+constexpr pcstr SNDENV_FILENAME = "sEnvironment.xr";
 #define OGG_COMMENT_VERSION 0x0003
 
 // refs
@@ -55,8 +55,8 @@ XRSOUND_API extern u32 snd_device_id;
 // Flags
 enum
 {
-    ss_Hardware = (1ul << 1ul), //!< Use hardware mixing only
-    ss_EAX = (1ul << 2ul), //!< Use eax
+    ss_Hardware = 1ul << 1ul, //!< Use hardware mixing only
+    ss_EAX = 1ul << 2ul, //!< Use eax
     ss_forcedword = u32(-1)
 };
 
@@ -68,18 +68,21 @@ enum
     sq_HIGH,
     sq_forcedword = u32(-1)
 };
+
 enum
 {
     sg_Undefined = 0,
     sg_SourceType = u32(-1),
     sg_forcedword = u32(-1),
 };
+
 enum
 {
-    sm_Looped = (1ul << 0ul), //!< Looped
-    sm_2D = (1ul << 1ul), //!< 2D mode
+    sm_Looped = 1ul << 0ul, //!< Looped
+    sm_2D = 1ul << 1ul, //!< 2D mode
     sm_forcedword = u32(-1),
 };
+
 enum esound_type
 {
     st_Effect = 0,
@@ -96,17 +99,18 @@ public:
     virtual void accept(CSound_UserDataVisitor*) = 0;
     virtual void invalidate() = 0;
 };
-typedef resptr_core<CSound_UserData, resptr_base<CSound_UserData>> CSound_UserDataPtr;
+
+using CSound_UserDataPtr = resptr_core<CSound_UserData, resptr_base<CSound_UserData>>;
 
 class ref_sound_data : public xr_resource
 {
 public:
     //shared_str nm;
     CSound_source* handle; //!< Pointer to wave-source interface
-    CSound_emitter* feedback; //!< Pointer to emitter, automaticaly clears on emitter-stop
+    CSound_emitter* feedback; //!< Pointer to emitter, automatically clears on emitter-stop
     esound_type s_type;
     int g_type; //!< Sound type, usually for AI
-    IGameObject* g_object; //!< Game object that emitts ref_sound
+    IGameObject* g_object; //!< Game object that emits ref_sound
     CSound_UserDataPtr g_userdata;
     shared_str fn_attached[2];
 
@@ -114,16 +118,18 @@ public:
     float fTimeTotal;
 
     ref_sound_data() throw();
-    ref_sound_data(LPCSTR fName, esound_type sound_type, int game_type);
+    ref_sound_data(pcstr fName, esound_type sound_type, int game_type);
     virtual ~ref_sound_data();
-    float get_length_sec() const { return fTimeTotal; };
+    float get_length_sec() const { return fTimeTotal; }
 };
+
 typedef resptr_core<ref_sound_data, resptr_base<ref_sound_data>> ref_sound_data_ptr;
+
 /*! \class ref_sound
 \brief Sound source + control
 
-The main class respresenting source/emitter interface
-This class infact just hides internals and redirect calls to
+The main class representing source/emitter interface
+This class in fact just hides internals and redirect calls to
 specific sub-systems
 */
 struct ref_sound
@@ -139,8 +145,8 @@ struct ref_sound
     esound_type _sound_type();
     CSound_UserDataPtr _g_userdata();
 
-    void create(LPCSTR name, esound_type sound_type, int game_type);
-    void attach_tail(LPCSTR name);
+    void create(pcstr name, esound_type sound_type, int game_type);
+    void attach_tail(pcstr name);
 
     void clone(const ref_sound& from, esound_type sound_type, int game_type);
 
@@ -148,8 +154,8 @@ struct ref_sound
 
     void play(IGameObject* O, u32 flags = 0, float delay = 0.f);
     void play_at_pos(IGameObject* O, const Fvector& pos, u32 flags = 0, float delay = 0.f);
-    void play_no_feedback(IGameObject* O, u32 flags = 0, float delay = 0.f, Fvector* pos = 0, float* vol = 0,
-        float* freq = 0, Fvector2* range = 0);
+    void play_no_feedback(IGameObject* O, u32 flags = 0, float delay = 0.f, Fvector* pos = nullptr, float* vol = nullptr,
+                          float* freq = nullptr, Fvector2* range = nullptr);
 
     void stop();
     void stop_deferred();
@@ -161,7 +167,7 @@ struct ref_sound
 
     const CSound_params* get_params();
     void set_params(CSound_params* p);
-    float get_length_sec() const { return _p ? _p->get_length_sec() : 0.0f; };
+    float get_length_sec() const { return _p ? _p->get_length_sec() : 0.0f; }
 };
 
 /// definition (Sound Source)
@@ -170,16 +176,14 @@ class XRSOUND_API CSound_source
 public:
     virtual float length_sec() const = 0;
     virtual u32 game_type() const = 0;
-    virtual LPCSTR file_name() const = 0;
+    virtual pcstr file_name() const = 0;
     virtual u16 channels_num() const = 0;
     virtual u32 bytes_total() const = 0;
 };
 
 /// definition (Sound Source)
 class XRSOUND_API CSound_environment
-{
-public:
-};
+{};
 
 /// definition (Sound Params)
 class XRSOUND_API CSound_params
@@ -198,7 +202,7 @@ public:
 class XRSOUND_API CSound_emitter
 {
 public:
-    virtual BOOL is_2D() = 0;
+    virtual bool is_2D() = 0;
     virtual void switch_to_2D() = 0;
     virtual void switch_to_3D() = 0;
     virtual void set_position(const Fvector& pos) = 0;
@@ -206,16 +210,14 @@ public:
     virtual void set_range(float min, float max) = 0;
     virtual void set_volume(float vol) = 0;
     virtual void set_priority(float vol) = 0;
-    virtual void stop(BOOL bDeffered) = 0;
+    virtual void stop(bool isDeffered) = 0;
     virtual const CSound_params* get_params() = 0;
     virtual u32 play_time() = 0;
 };
 
 /// definition (Sound Stream Interface)
 class XRSOUND_API CSound_stream_interface
-{
-public:
-};
+{};
 
 /// definition (Sound Stream Interface)
 class XRSOUND_API CSound_stats
@@ -239,12 +241,14 @@ public:
         esound_type type;
         int game_type;
         IGameObject* game_object;
+
         struct
         {
             u32 _3D : 1;
             u32 _rendered : 1;
         };
     };
+
     using item_vec = xr_vector<SItem>;
     item_vec items;
 
@@ -269,7 +273,7 @@ class XRSOUND_API CSound_manager_interface
 
 protected:
     friend class ref_sound_data;
-    virtual void _create_data(ref_sound_data& S, LPCSTR fName, esound_type sound_type, int game_type) = 0;
+    virtual void _create_data(ref_sound_data& S, pcstr fName, esound_type sound_type, int game_type) = 0;
     virtual void _destroy_data(ref_sound_data& S) = 0;
 
 public:
@@ -278,10 +282,10 @@ public:
     static void _destroy();
 
     virtual void _restart() = 0;
-    virtual BOOL i_locked() = 0;
+    virtual bool i_locked() = 0;
 
-    virtual void create(ref_sound& S, LPCSTR fName, esound_type sound_type, int game_type) = 0;
-    virtual void attach_tail(ref_sound& S, LPCSTR fName) = 0;
+    virtual void create(ref_sound& S, pcstr fName, esound_type sound_type, int game_type) = 0;
+    virtual void attach_tail(ref_sound& S, pcstr fName) = 0;
     virtual void clone(ref_sound& S, const ref_sound& from, esound_type sound_type, int game_type) = 0;
     virtual void destroy(ref_sound& S) = 0;
     virtual void stop_emitters() = 0;
@@ -289,8 +293,8 @@ public:
 
     virtual void play(ref_sound& S, IGameObject* O, u32 flags = 0, float delay = 0.f) = 0;
     virtual void play_at_pos(ref_sound& S, IGameObject* O, const Fvector& pos, u32 flags = 0, float delay = 0.f) = 0;
-    virtual void play_no_feedback(ref_sound& S, IGameObject* O, u32 flags = 0, float delay = 0.f, Fvector* pos = 0,
-        float* vol = 0, float* freq = 0, Fvector2* range = 0) = 0;
+    virtual void play_no_feedback(ref_sound& S, IGameObject* O, u32 flags = 0, float delay = 0.f, Fvector* pos = nullptr,
+                                  float* vol = nullptr, float* freq = nullptr, Fvector2* range = nullptr) = 0;
 
     virtual void set_master_volume(float f = 1.f) = 0;
     virtual void set_geometry_env(IReader* I) = 0;

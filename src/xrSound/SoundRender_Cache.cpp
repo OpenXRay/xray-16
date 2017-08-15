@@ -1,14 +1,13 @@
 #include "stdafx.h"
-#pragma hdrstop
 
 #include "SoundRender_Cache.h"
 
 CSoundRender_Cache::CSoundRender_Cache()
 {
-    data = NULL;
-    c_storage = NULL;
-    c_begin = NULL;
-    c_end = NULL;
+    data = nullptr;
+    c_storage = nullptr;
+    c_begin = nullptr;
+    c_end = nullptr;
     _total = 0;
     _line = 0;
     _count = 0;
@@ -34,7 +33,7 @@ void CSoundRender_Cache::move2top(cache_line* line)
         next->prev = prev;
 
     // register at top
-    line->prev = NULL;
+    line->prev = nullptr;
     line->next = c_begin;
 
     // track begin
@@ -46,7 +45,7 @@ void CSoundRender_Cache::move2top(cache_line* line)
     VERIFY(c_end->next == NULL);
 }
 
-BOOL CSoundRender_Cache::request(cache_cat& cat, u32 id)
+bool CSoundRender_Cache::request(cache_cat& cat, u32 id)
 {
     // 1. check if cached version available
     id %= cat.size;
@@ -58,7 +57,7 @@ BOOL CSoundRender_Cache::request(cache_cat& cat, u32 id)
         _stat_hit++;
         cache_line* L = c_storage + cptr;
         move2top(L);
-        return FALSE;
+        return false;
     }
 
     // 2. purge oldest item + move it to top
@@ -67,7 +66,7 @@ BOOL CSoundRender_Cache::request(cache_cat& cat, u32 id)
     if (c_begin->loopback)
     {
         *c_begin->loopback = CAT_FREE;
-        c_begin->loopback = NULL;
+        c_begin->loopback = nullptr;
     }
 
     // 3. associate
@@ -75,7 +74,7 @@ BOOL CSoundRender_Cache::request(cache_cat& cat, u32 id)
     c_begin->loopback = &cptr;
 
     // 4. fill with data
-    return TRUE;
+    return true;
 }
 
 void CSoundRender_Cache::initialize(u32 _total_kb_approx, u32 bytes_per_line)
@@ -85,7 +84,7 @@ void CSoundRender_Cache::initialize(u32 _total_kb_approx, u32 bytes_per_line)
 
     // calc
     _line = bytes_per_line;
-    _count = ((_total_kb_approx * 1024) / bytes_per_line + 1);
+    _count = _total_kb_approx * 1024 / bytes_per_line + 1;
     _total = _count * _line;
     R_ASSERT(_count < CAT_FREE);
     Msg("* sound : cache: %d kb, %d lines, %d bpl", _total / 1024, _count, _line);
@@ -107,7 +106,7 @@ void CSoundRender_Cache::disconnect()
         if (L->loopback)
         {
             *L->loopback = CAT_FREE;
-            L->loopback = NULL;
+            L->loopback = nullptr;
         }
     }
 }
@@ -118,11 +117,11 @@ void CSoundRender_Cache::format()
     for (u32 it = 0; it < _count; it++)
     {
         cache_line* L = c_storage + it;
-        L->prev = (0 == it) ? NULL : c_storage + it - 1;
-        L->next = ((_count - 1) == it) ? NULL : c_storage + it + 1;
+        L->prev = 0 == it ? nullptr : c_storage + it - 1;
+        L->next = _count - 1 == it ? nullptr : c_storage + it + 1;
         L->data = data + it * _line;
-        L->loopback = NULL;
-        L->id = u16(it);
+        L->loopback = nullptr;
+        L->id = (u16)it;
     }
 
     // start-end
@@ -141,8 +140,8 @@ void CSoundRender_Cache::destroy()
     disconnect();
     xr_free(data);
     xr_free(c_storage);
-    c_begin = NULL;
-    c_end = NULL;
+    c_begin = nullptr;
+    c_end = nullptr;
     _total = 0;
     _line = 0;
     _count = 0;
@@ -153,7 +152,7 @@ void CSoundRender_Cache::cat_create(cache_cat& cat, u32 bytes)
     cat.size = bytes / _line;
     if (bytes % _line)
         cat.size += 1;
-    u32 allocsize = (cat.size & 1) ? cat.size + 1 : cat.size;
+    u32 allocsize = cat.size & 1 ? cat.size + 1 : cat.size;
     cat.table = xr_alloc<u16>(allocsize);
     MemFill32(cat.table, 0xffffffff, allocsize / 2);
 }

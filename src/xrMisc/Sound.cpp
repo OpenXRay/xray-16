@@ -16,19 +16,19 @@ ref_sound_data::ref_sound_data() throw() :
     g_object(0)
 {}
 
-ref_sound_data::ref_sound_data(LPCSTR fName, esound_type sound_type, int game_type)
+ref_sound_data::ref_sound_data(pcstr fName, esound_type sound_type, int game_type)
 { ::Sound->_create_data(*this, fName, sound_type, game_type); }
 
 ref_sound_data::~ref_sound_data()
 { ::Sound->_destroy_data(*this); }
 
-void ref_sound::create(LPCSTR name, esound_type sound_type, int game_type)
+void ref_sound::create(pcstr name, esound_type sound_type, int game_type)
 {
     VerSndUnlocked();
     ::Sound->create(*this, name, sound_type, game_type);
 }
 
-void ref_sound::attach_tail(LPCSTR name)
+void ref_sound::attach_tail(pcstr name)
 {
     VerSndUnlocked();
     ::Sound->attach_tail(*this, name);
@@ -132,14 +132,14 @@ void ref_sound::stop()
 {
     VerSndUnlocked();
     if (_feedback())
-        _feedback()->stop(FALSE);
+        _feedback()->stop(false);
 }
 
 void ref_sound::stop_deferred()
 {
     VerSndUnlocked();
     if (_feedback())
-        _feedback()->stop(TRUE);
+        _feedback()->stop(true);
 }
 
 const CSound_params* ref_sound::get_params()

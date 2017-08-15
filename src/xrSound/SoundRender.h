@@ -1,6 +1,6 @@
+#pragma once
 #ifndef SoundRenderH
 #define SoundRenderH
-#pragma once
 
 #include "Sound.h"
 

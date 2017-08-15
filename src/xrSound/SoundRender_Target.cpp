@@ -1,20 +1,20 @@
 #include "stdafx.h"
-#pragma hdrstop
 
 #include "SoundRender_Target.h"
 #include "SoundRender_Core.h"
 #include "SoundRender_Emitter.h"
 #include "SoundRender_Source.h"
 
-CSoundRender_Target::CSoundRender_Target(void)
+CSoundRender_Target::CSoundRender_Target()
 {
-    m_pEmitter = 0;
-    rendering = FALSE;
-    wave = 0;
+    m_pEmitter = nullptr;
+    rendering = false;
+    wave = nullptr;
 }
 
-CSoundRender_Target::~CSoundRender_Target(void) { VERIFY(wave == 0); }
-BOOL CSoundRender_Target::_initialize()
+CSoundRender_Target::~CSoundRender_Target() { VERIFY(wave == 0); }
+
+bool CSoundRender_Target::_initialize()
 {
     /*
     // Calc format
@@ -25,18 +25,17 @@ BOOL CSoundRender_Target::_initialize()
     wfx.nBlockAlign			= wfx.nChannels * wfx.wBitsPerSample / 8;
     wfx.nAvgBytesPerSec		= wfx.nSamplesPerSec * wfx.nBlockAlign;
     wfx.cbSize				= 0;
-
     */
     /*
-            wfx.wFormatTag=WAVE_FORMAT_PCM;
-            wfx.nChannels=2;
-            wfx.wBitsPerSample=16;
-            wfx.nBlockAlign=4;
-            wfx.nSamplesPerSec=44100;
-            wfx.nAvgBytesPerSec=176400;
-            wfx.cbSize=0;
+    wfx.wFormatTag = WAVE_FORMAT_PCM;
+    wfx.nChannels = 2;
+    wfx.wBitsPerSample = 16;
+    wfx.nBlockAlign = 4;
+    wfx.nSamplesPerSec = 44100;
+    wfx.nAvgBytesPerSec = 176400;
+    wfx.cbSize = 0;
     */
-    return TRUE;
+    return true;
 }
 
 void CSoundRender_Target::start(CSoundRender_Emitter* E)
@@ -48,16 +47,16 @@ void CSoundRender_Target::start(CSoundRender_Emitter* E)
     // 4. Load 2 blocks of data (as much as possible)
     // 5. Deferred-play-signal (emitter-exist, rendering-false)
     m_pEmitter = E;
-    rendering = FALSE;
-    // attach		();
+    rendering = false;
+    //attach();
 }
 
-void CSoundRender_Target::render() { rendering = TRUE; }
+void CSoundRender_Target::render() { rendering = true; }
 void CSoundRender_Target::stop()
 {
-    dettach();
-    m_pEmitter = NULL;
-    rendering = FALSE;
+    detach();
+    m_pEmitter = nullptr;
+    rendering = false;
 }
 
 void CSoundRender_Target::rewind() { R_ASSERT(rendering); }
@@ -65,9 +64,8 @@ void CSoundRender_Target::update() { R_ASSERT(m_pEmitter); }
 void CSoundRender_Target::fill_parameters()
 {
     VERIFY(m_pEmitter);
-    //.	if (pEmitter->b2D){
-    //.		pEmitter->set_position(SoundRender->listener_position());
-    //.	}
+    //if (pEmitter->b2D)
+    //    pEmitter->set_position(SoundRender->listener_position());
 }
 
 extern int ov_seek_func(void* datasource, s64 offset, int whence);
@@ -82,11 +80,11 @@ void CSoundRender_Target::attach()
     ov_callbacks ovc = {ov_read_func, ov_seek_func, ov_close_func, ov_tell_func};
     wave = FS.r_open(m_pEmitter->source()->pname.c_str());
     R_ASSERT3(wave && wave->length(), "Can't open wave file:", m_pEmitter->source()->pname.c_str());
-    ov_open_callbacks(wave, &ovf, NULL, 0, ovc);
+    ov_open_callbacks(wave, &ovf, nullptr, 0, ovc);
     VERIFY(0 != wave);
 }
 
-void CSoundRender_Target::dettach()
+void CSoundRender_Target::detach()
 {
     if (wave)
     {

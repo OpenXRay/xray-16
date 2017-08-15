@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#pragma hdrstop
 
 #include "SoundRender.h"
 #include "SoundRender_Environment.h"
@@ -8,13 +7,13 @@
 #include <eax/eax.h>
 #pragma warning(pop)
 
-CSoundRender_Environment::CSoundRender_Environment(void)
+CSoundRender_Environment::CSoundRender_Environment()
 {
     version = sdef_env_version;
     set_default();
 }
 
-CSoundRender_Environment::~CSoundRender_Environment(void) {}
+CSoundRender_Environment::~CSoundRender_Environment() {}
 void CSoundRender_Environment::set_default()
 {
     Environment = EAX_ENVIRONMENT_GENERIC;
@@ -145,13 +144,13 @@ void CSoundRender_Environment::save(IWriter* fs)
 }
 
 //////////////////////////////////////////////////////////////////////////
-void SoundEnvironment_LIB::Load(LPCSTR name)
+void SoundEnvironment_LIB::Load(pcstr name)
 {
     R_ASSERT(library.empty());
     IReader* F = FS.r_open(name);
     IReader* C;
     library.reserve(256);
-    for (u32 chunk = 0; 0 != (C = F->open_chunk(chunk)); chunk++)
+    for (u32 chunk = 0; nullptr != (C = F->open_chunk(chunk)); chunk++)
     {
         CSoundRender_Environment* E = new CSoundRender_Environment();
         if (E->load(C))
@@ -160,7 +159,7 @@ void SoundEnvironment_LIB::Load(LPCSTR name)
     }
     FS.r_close(F);
 }
-bool SoundEnvironment_LIB::Save(LPCSTR name)
+bool SoundEnvironment_LIB::Save(pcstr name)
 {
     IWriter* F = FS.w_open(name);
     if (F)
@@ -182,14 +181,14 @@ void SoundEnvironment_LIB::Unload()
         xr_delete(library[chunk]);
     library.clear();
 }
-int SoundEnvironment_LIB::GetID(LPCSTR name)
+int SoundEnvironment_LIB::GetID(pcstr name)
 {
     for (auto it = library.begin(); it != library.end(); ++it)
         if (0 == _stricmp(name, *(*it)->name))
             return int(it - library.begin());
     return -1;
 }
-CSoundRender_Environment* SoundEnvironment_LIB::Get(LPCSTR name)
+CSoundRender_Environment* SoundEnvironment_LIB::Get(pcstr name)
 {
     for (const auto& it : library)
         if (0 == _stricmp(name, *it->name))
@@ -202,7 +201,7 @@ CSoundRender_Environment* SoundEnvironment_LIB::Append(CSoundRender_Environment*
     library.push_back(parent ? new CSoundRender_Environment(*parent) : new CSoundRender_Environment());
     return library.back();
 }
-void SoundEnvironment_LIB::Remove(LPCSTR name)
+void SoundEnvironment_LIB::Remove(pcstr name)
 {
     for (auto it = library.begin(); it != library.end(); ++it)
         if (0 == _stricmp(name, *(*it)->name))

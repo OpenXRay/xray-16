@@ -4,67 +4,68 @@
 #include "SoundRender_CoreA.h"
 #include "SoundRender_TargetA.h"
 
-CSoundRender_CoreA* SoundRenderA = 0;
+CSoundRender_CoreA* SoundRenderA = nullptr;
 
 CSoundRender_CoreA::CSoundRender_CoreA() : CSoundRender_Core()
 {
-    pDevice = 0;
-    pDeviceList = 0;
-    pContext = 0;
-    eaxSet = 0;
-    eaxGet = 0;
+    pDevice = nullptr;
+    pDeviceList = nullptr;
+    pContext = nullptr;
+    eaxSet = nullptr;
+    eaxGet = nullptr;
 }
 
 CSoundRender_CoreA::~CSoundRender_CoreA() {}
-BOOL CSoundRender_CoreA::EAXQuerySupport(BOOL bDeferred, const GUID* guid, u32 prop, void* val, u32 sz)
+
+bool CSoundRender_CoreA::EAXQuerySupport(bool isDeferred, const GUID* guid, u32 prop, void* val, u32 sz)
 {
     if (AL_NO_ERROR != eaxGet(guid, prop, 0, val, sz))
-        return FALSE;
-    if (AL_NO_ERROR != eaxSet(guid, (bDeferred ? DSPROPERTY_EAXLISTENER_DEFERRED : 0) | prop, 0, val, sz))
-        return FALSE;
-    return TRUE;
+        return false;
+    if (AL_NO_ERROR != eaxSet(guid, (isDeferred ? DSPROPERTY_EAXLISTENER_DEFERRED : 0) | prop, 0, val, sz))
+        return false;
+    return true;
 }
 
-BOOL CSoundRender_CoreA::EAXTestSupport(BOOL bDeferred)
+bool CSoundRender_CoreA::EAXTestSupport(bool isDeferred)
 {
     EAXLISTENERPROPERTIES ep;
     if (!EAXQuerySupport(
-            bDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ROOM, &ep.lRoom, sizeof(LONG)))
-        return FALSE;
+        isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ROOM, &ep.lRoom, sizeof(LONG)))
+        return false;
     if (!EAXQuerySupport(
-            bDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ROOMHF, &ep.lRoomHF, sizeof(LONG)))
-        return FALSE;
-    if (!EAXQuerySupport(bDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ROOMROLLOFFFACTOR,
-            &ep.flRoomRolloffFactor, sizeof(float)))
-        return FALSE;
-    if (!EAXQuerySupport(bDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_DECAYTIME,
-            &ep.flDecayTime, sizeof(float)))
-        return FALSE;
-    if (!EAXQuerySupport(bDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_DECAYHFRATIO,
-            &ep.flDecayHFRatio, sizeof(float)))
-        return FALSE;
-    if (!EAXQuerySupport(bDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_REFLECTIONS,
-            &ep.lReflections, sizeof(LONG)))
-        return FALSE;
-    if (!EAXQuerySupport(bDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_REFLECTIONSDELAY,
-            &ep.flReflectionsDelay, sizeof(float)))
-        return FALSE;
+        isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ROOMHF, &ep.lRoomHF, sizeof(LONG)))
+        return false;
+    if (!EAXQuerySupport(isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ROOMROLLOFFFACTOR,
+                         &ep.flRoomRolloffFactor, sizeof(float)))
+        return false;
+    if (!EAXQuerySupport(isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_DECAYTIME,
+                         &ep.flDecayTime, sizeof(float)))
+        return false;
+    if (!EAXQuerySupport(isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_DECAYHFRATIO,
+                         &ep.flDecayHFRatio, sizeof(float)))
+        return false;
+    if (!EAXQuerySupport(isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_REFLECTIONS,
+                         &ep.lReflections, sizeof(LONG)))
+        return false;
+    if (!EAXQuerySupport(isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_REFLECTIONSDELAY,
+                         &ep.flReflectionsDelay, sizeof(float)))
+        return false;
     if (!EAXQuerySupport(
-            bDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_REVERB, &ep.lReverb, sizeof(LONG)))
-        return FALSE;
-    if (!EAXQuerySupport(bDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_REVERBDELAY,
-            &ep.flReverbDelay, sizeof(float)))
-        return FALSE;
-    if (!EAXQuerySupport(bDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ENVIRONMENTDIFFUSION,
-            &ep.flEnvironmentDiffusion, sizeof(float)))
-        return FALSE;
-    if (!EAXQuerySupport(bDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_AIRABSORPTIONHF,
-            &ep.flAirAbsorptionHF, sizeof(float)))
-        return FALSE;
+        isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_REVERB, &ep.lReverb, sizeof(LONG)))
+        return false;
+    if (!EAXQuerySupport(isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_REVERBDELAY,
+                         &ep.flReverbDelay, sizeof(float)))
+        return false;
+    if (!EAXQuerySupport(isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ENVIRONMENTDIFFUSION,
+                         &ep.flEnvironmentDiffusion, sizeof(float)))
+        return false;
+    if (!EAXQuerySupport(isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_AIRABSORPTIONHF,
+                         &ep.flAirAbsorptionHF, sizeof(float)))
+        return false;
     if (!EAXQuerySupport(
-            bDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_FLAGS, &ep.dwFlags, sizeof(DWORD)))
-        return FALSE;
-    return TRUE;
+        isDeferred, &DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_FLAGS, &ep.dwFlags, sizeof(DWORD)))
+        return false;
+    return true;
 }
 
 void CSoundRender_CoreA::_restart() { inherited::_restart(); }
@@ -82,7 +83,7 @@ void CSoundRender_CoreA::_initialize()
     const ALDeviceDesc& deviceDesc = pDeviceList->GetDeviceDesc(snd_device_id);
     // OpenAL device
     pDevice = alcOpenDevice(deviceDesc.name);
-    if (pDevice == NULL)
+    if (pDevice == nullptr)
     {
         CHECK_OR_EXIT(0, "SOUND: OpenAL: Failed to create device.");
         bPresent = FALSE;
@@ -90,17 +91,16 @@ void CSoundRender_CoreA::_initialize()
     }
 
     // Get the device specifier.
-    const ALCchar* deviceSpecifier;
-    deviceSpecifier = alcGetString(pDevice, ALC_DEVICE_SPECIFIER);
+    const ALCchar* deviceSpecifier = alcGetString(pDevice, ALC_DEVICE_SPECIFIER);
 
     // Create context
-    pContext = alcCreateContext(pDevice, NULL);
-    if (0 == pContext)
+    pContext = alcCreateContext(pDevice, nullptr);
+    if (nullptr == pContext)
     {
         CHECK_OR_EXIT(0, "SOUND: OpenAL: Failed to create context.");
         bPresent = FALSE;
         alcCloseDevice(pDevice);
-        pDevice = 0;
+        pDevice = nullptr;
         return;
     }
 
@@ -121,23 +121,23 @@ void CSoundRender_CoreA::_initialize()
     // Check for EAX extension
     bEAX = deviceDesc.props.eax && !deviceDesc.props.eax_unwanted;
 
-    eaxSet = (EAXSet)alGetProcAddress((const ALchar*)"EAXSet");
-    if (eaxSet == NULL)
+    eaxSet = (EAXSet)alGetProcAddress((pcstr)"EAXSet");
+    if (eaxSet == nullptr)
         bEAX = false;
-    eaxGet = (EAXGet)alGetProcAddress((const ALchar*)"EAXGet");
-    if (eaxGet == NULL)
+    eaxGet = (EAXGet)alGetProcAddress((pcstr)"EAXGet");
+    if (eaxGet == nullptr)
         bEAX = false;
 
     if (bEAX)
     {
-        bDeferredEAX = EAXTestSupport(TRUE);
-        bEAX = EAXTestSupport(FALSE);
+        bDeferredEAX = EAXTestSupport(true);
+        bEAX = EAXTestSupport(false);
     }
 
     inherited::_initialize();
 
     // Pre-create targets
-    CSoundRender_Target* T = 0;
+    CSoundRender_Target* T = nullptr;
     for (u32 tit = 0; tit < u32(psSoundTargets); tit++)
     {
         T = new CSoundRender_TargetA();
@@ -158,16 +158,14 @@ void CSoundRender_CoreA::_initialize()
 void CSoundRender_CoreA::set_master_volume(float f)
 {
     if (bPresent)
-    {
         A_CHK(alListenerf(AL_GAIN, f));
-    }
 }
 
 void CSoundRender_CoreA::_clear()
 {
     inherited::_clear();
     // remove targets
-    CSoundRender_Target* T = 0;
+    CSoundRender_Target* T = nullptr;
     for (u32 tit = 0; tit < s_targets.size(); tit++)
     {
         T = s_targets[tit];
@@ -175,12 +173,12 @@ void CSoundRender_CoreA::_clear()
         xr_delete(T);
     }
     // Reset the current context to NULL.
-    alcMakeContextCurrent(NULL);
+    alcMakeContextCurrent(nullptr);
     // Release the context and the device.
     alcDestroyContext(pContext);
-    pContext = 0;
+    pContext = nullptr;
     alcCloseDevice(pDevice);
-    pDevice = 0;
+    pDevice = nullptr;
     xr_delete(pDeviceList);
 }
 

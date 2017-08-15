@@ -240,7 +240,7 @@ IC void volume_lerp(float& c, float t, float s, float dt)
 
 #include "xrServerEntities\ai_sounds.h"
 
-BOOL CSoundRender_Emitter::update_culling(float dt)
+bool CSoundRender_Emitter::update_culling(float dt)
 {
     if (b2D)
     {

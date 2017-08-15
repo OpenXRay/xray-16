@@ -12,14 +12,14 @@
         alGetError();                                              \
         expr;                                                      \
         ALenum error = alGetError();                               \
-        VERIFY2(error == AL_NO_ERROR, (LPCSTR)alGetString(error)); \
+        VERIFY2(error == AL_NO_ERROR, (pcstr)alGetString(error)); \
     }
 #define AC_CHK(expr)                                                          \
     {                                                                         \
         alcGetError(pDevice);                                                 \
         expr;                                                                 \
         ALCenum error = alcGetError(pDevice);                                 \
-        VERIFY2(error == ALC_NO_ERROR, (LPCSTR)alcGetString(pDevice, error)); \
+        VERIFY2(error == ALC_NO_ERROR, (pcstr)alcGetString(pDevice, error)); \
     }
 #else
 #define A_CHK(expr) \
@@ -46,27 +46,28 @@ class CSoundRender_CoreA : public CSoundRender_Core
         Fvector position;
         Fvector orientation[2];
     };
+
     SListener Listener;
 
-    BOOL EAXQuerySupport(BOOL bDeferred, const GUID* guid, u32 prop, void* val, u32 sz);
-    BOOL EAXTestSupport(BOOL bDeferred);
+    bool EAXQuerySupport(bool isDeferred, const GUID* guid, u32 prop, void* val, u32 sz);
+    bool EAXTestSupport(bool isDeferred);
 
 protected:
-    virtual void i_eax_set(const GUID* guid, u32 prop, void* val, u32 sz);
-    virtual void i_eax_get(const GUID* guid, u32 prop, void* val, u32 sz);
-    virtual void update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt);
+    void i_eax_set(const GUID* guid, u32 prop, void* val, u32 sz) override;
+    void i_eax_get(const GUID* guid, u32 prop, void* val, u32 sz) override;
+    void update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt) override;
 
 public:
     CSoundRender_CoreA();
     virtual ~CSoundRender_CoreA();
 
-    virtual void _initialize();
-    virtual void _clear();
-    virtual void _restart();
+    void _initialize() override;
+    void _clear() override;
+    void _restart() override;
 
-    virtual void set_master_volume(float f);
+    void set_master_volume(float f) override;
 
-    virtual const Fvector& listener_position() { return Listener.position; }
+    const Fvector& listener_position() override { return Listener.position; }
 };
 extern CSoundRender_CoreA* SoundRenderA;
 #endif

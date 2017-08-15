@@ -1,14 +1,13 @@
 #include "stdafx.h"
-#pragma hdrstop
 
 #include <msacm.h>
 
 #include "SoundRender_Core.h"
 #include "SoundRender_Source.h"
 
-//	SEEK_SET	0	File beginning
-//	SEEK_CUR	1	Current file pointer position
-//	SEEK_END	2	End-of-file
+//SEEK_SET 0 File beginning
+//SEEK_CUR 1 Current file pointer position
+//SEEK_END 2 End-of-file
 int ov_seek_func(void* datasource, s64 offset, int whence)
 {
     switch (whence)
@@ -34,7 +33,7 @@ void CSoundRender_Source::decompress(u32 line, OggVorbis_File* ovf)
     VERIFY(ovf);
     // decompression of one cache-line
     u32 line_size = SoundRender->cache.get_linesize();
-    char* dest = (char*)SoundRender->cache.get_dataptr(CAT, line);
+    auto dest = (pstr)SoundRender->cache.get_dataptr(CAT, line);
     u32 buf_offs = (line * line_size) / 2 / m_wformat.nChannels;
     u32 left_file = dwBytesTotal - buf_offs;
     u32 left = (u32)std::min(left_file, line_size);
@@ -48,7 +47,7 @@ void CSoundRender_Source::decompress(u32 line, OggVorbis_File* ovf)
     i_decompress_fr(ovf, dest, left);
 }
 
-void CSoundRender_Source::LoadWave(LPCSTR pName)
+void CSoundRender_Source::LoadWave(pcstr pName)
 {
     pname = pName;
 
@@ -57,7 +56,7 @@ void CSoundRender_Source::LoadWave(LPCSTR pName)
     ov_callbacks ovc = {ov_read_func, ov_seek_func, ov_close_func, ov_tell_func};
     IReader* wave = FS.r_open(pname.c_str());
     R_ASSERT3(wave && wave->length(), "Can't open wave file:", pname.c_str());
-    ov_open_callbacks(wave, &ovf, NULL, 0, ovc);
+    ov_open_callbacks(wave, &ovf, nullptr, 0, ovc);
 
     vorbis_info* ovi = ov_info(&ovf, -1);
     // verify
@@ -66,9 +65,7 @@ void CSoundRender_Source::LoadWave(LPCSTR pName)
 
 #ifdef DEBUG
     if (ovi->channels == 2)
-    {
         Msg("stereo sound source [%s]", pName);
-    }
 #endif // #ifdef DEBUG
 
     ZeroMemory(&m_wformat, sizeof(WAVEFORMATEX));
@@ -115,21 +112,17 @@ void CSoundRender_Source::LoadWave(LPCSTR pName)
             m_fMaxAIDist = F.r_float();
         }
         else
-        {
             Log("! Invalid ogg-comment version, file: ", pName);
-        }
     }
     else
-    {
         Log("! Missing ogg-comment, file: ", pName);
-    }
-    R_ASSERT3((m_fMaxAIDist >= 0.1f) && (m_fMaxDist >= 0.1f), "Invalid max distance.", pName);
+    R_ASSERT3(m_fMaxAIDist >= 0.1f && m_fMaxDist >= 0.1f, "Invalid max distance.", pName);
 
     ov_clear(&ovf);
     FS.r_close(wave);
 }
 
-void CSoundRender_Source::load(LPCSTR name)
+void CSoundRender_Source::load(pcstr name)
 {
     string_path fn, N;
     xr_strcpy(N, name);
@@ -145,9 +138,7 @@ void CSoundRender_Source::load(LPCSTR name)
 
 #ifdef _EDITOR
     if (!FS.exist(fn))
-    {
         FS.update_path(fn, "$game_sounds$", "$no_sound.ogg");
-    }
 #endif
     LoadWave(fn);
     SoundRender->cache.cat_create(CAT, dwBytesTotal);

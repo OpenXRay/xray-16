@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#pragma hdrstop
 
 #include "SoundRender_Core.h"
 #include "SoundRender_Source.h"
@@ -11,8 +10,8 @@ CSoundRender_Source::CSoundRender_Source()
     m_fMaxAIDist = 300.f;
     m_fBaseVolume = 1.f;
     m_uGameType = 0;
-    fname = 0;
-    CAT.table = 0;
+    fname = nullptr;
+    CAT.table = nullptr;
     CAT.size = 0;
 }
 
@@ -29,7 +28,7 @@ bool ov_error(int res)
             "return code is for informational purposes only.");
         return true;
     case OV_EBADLINK:
-        Msg("The given link exists in the Vorbis data stream, but is not decipherable due to garbacge or corruption.");
+        Msg("The given link exists in the Vorbis data stream, but is not decipherable due to garbage or corruption.");
         return true;
     // error
     case OV_FALSE: Msg("Not true, or no data available"); return false;
@@ -83,40 +82,44 @@ void CSoundRender_Source::i_decompress_fr(OggVorbis_File* ovf, char* _dest, u32 
 /*
 void CSoundRender_Source::i_decompress_fr(OggVorbis_File* ovf, char* _dest, u32 left)
 {
-
-    float **pcm;
+    float** pcm;
     int val;
-    long channels		= ov_info(ovf,-1)->channels;
-    long bytespersample	= 2 / channels ;
-    int					dummy;
-    left				/= bytespersample;
-    short* buffer  		= (short*)_dest;
-    while (left){
-        int samples		= ov_read_float	(ovf,&pcm,left,&dummy);
-        if (samples>0){
-            for(int i=0;i<channels;i++)
+    long channels = ov_info(ovf, -1)->channels;
+    long bytespersample = 2 / channels;
+    int dummy;
+    left /= bytespersample;
+    short* buffer = (short*)_dest;
+    while (left)
+    {
+        int samples = ov_read_float(ovf, &pcm, left, &dummy);
+        if (samples > 0)
+        {
+            for (int i = 0; i < channels; i++)
             {
-                float *src			= pcm[i];
-                short *dest			= ((short *)buffer)+i;
+                float* src = pcm[i];
+                short* dest = (short *)buffer + i;
 
-                for(int j=0;j<samples;j++)
+                for (int j = 0; j < samples; j++)
                 {
-                    val				= iFloor(src[j]*32768.f);
-                    if(val>32767)
-                        val			= 32767;
-                    else
-                    if(val<-32768)
-                        val			= -32768;
+                    val = iFloor(src[j] * 32768.f);
+                    if (val > 32767)
+                        val = 32767;
+                    else if (val < -32768)
+                        val = -32768;
 
-                    *dest			= short(val);
-                    dest			+=channels;
+                    *dest = short(val);
+                    dest += channels;
                 }
             }
-            left 	-= samples;
-            buffer	+= samples;
-        }else{
-            if (ov_error(samples)) continue; else break;
-        };
+            left -= samples;
+            buffer += samples;
+        }
+        else
+        {
+            if (ov_error(samples)) continue;
+            break;
+        }
     }
 }
 */
+

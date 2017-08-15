@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#pragma hdrstop
 
 #include "Common/LevelStructure.hpp"
 #include "SoundRender_Core.h"
@@ -22,27 +21,27 @@ float psSoundVFactor = 1.0f;
 float psSoundVMusic = 1.f;
 int psSoundCacheSizeMB = 32;
 // XXX: move to GlobalEnv
-CSoundRender_Core* SoundRender = 0;
-CSound_manager_interface* Sound = 0;
+CSoundRender_Core* SoundRender = nullptr;
+CSound_manager_interface* Sound = nullptr;
 
 CSoundRender_Core::CSoundRender_Core()
 {
-    bPresent = FALSE;
-    bEAX = FALSE;
-    bDeferredEAX = FALSE;
-    bUserEnvironment = FALSE;
-    geom_MODEL = NULL;
-    geom_ENV = NULL;
-    geom_SOM = NULL;
-    s_environment = NULL;
-    Handler = NULL;
+    bPresent = false;
+    bEAX = false;
+    bDeferredEAX = false;
+    bUserEnvironment = false;
+    geom_MODEL = nullptr;
+    geom_ENV = nullptr;
+    geom_SOM = nullptr;
+    s_environment = nullptr;
+    Handler = nullptr;
     s_targets_pu = 0;
     s_emitters_u = 0;
     e_current.set_identity();
     e_target.set_identity();
-    bListenerMoved = FALSE;
-    bReady = FALSE;
-    bLocked = FALSE;
+    bListenerMoved = false;
+    bReady = false;
+    isLocked = false;
     fTimer_Value = Timer.GetElapsed_sec();
     fTimer_Delta = 0.0f;
     m_iPauseCounter = 1;
@@ -68,19 +67,20 @@ void CSoundRender_Core::_initialize()
     // load environment
     env_load();
 
-    bPresent = TRUE;
+    bPresent = true;
 
     // Cache
     cache_bytes_per_line = (sdef_target_block / 8) * 276400 / 1000;
     cache.initialize(psSoundCacheSizeMB * 1024, cache_bytes_per_line);
 
-    bReady = TRUE;
+    bReady = true;
 }
 
 extern xr_vector<u8> g_target_temp_data;
+
 void CSoundRender_Core::_clear()
 {
-    bReady = FALSE;
+    bReady = false;
     cache.destroy();
     env_unload();
 
@@ -89,7 +89,7 @@ void CSoundRender_Core::_clear()
         xr_delete(s_sources[sit]);
     s_sources.clear();
 
-    // remove emmiters
+    // remove emitters
     for (u32 eit = 0; eit < s_emitters.size(); eit++)
         xr_delete(s_emitters[eit]);
     s_emitters.clear();
@@ -100,7 +100,7 @@ void CSoundRender_Core::_clear()
 void CSoundRender_Core::stop_emitters()
 {
     for (u32 eit = 0; eit < s_emitters.size(); eit++)
-        s_emitters[eit]->stop(FALSE);
+        s_emitters[eit]->stop(false);
 }
 
 int CSoundRender_Core::pause_emitters(bool val)
@@ -126,7 +126,7 @@ void CSoundRender_Core::env_load()
 
     // Load geometry
 
-    // Assosiate geometry
+    // Associate geometry
 }
 
 void CSoundRender_Core::env_unload()
@@ -148,6 +148,7 @@ void CSoundRender_Core::_restart()
 
 void CSoundRender_Core::set_handler(sound_event* E) { Handler = E; }
 void CSoundRender_Core::set_geometry_occ(CDB::MODEL* M) { geom_MODEL = M; }
+
 void CSoundRender_Core::set_geometry_som(IReader* I)
 {
 #ifdef _EDITOR
@@ -155,7 +156,7 @@ void CSoundRender_Core::set_geometry_som(IReader* I)
 #else
     xr_delete(geom_SOM);
 #endif
-    if (0 == I)
+    if (nullptr == I)
         return;
 
     // check version
@@ -174,7 +175,7 @@ void CSoundRender_Core::set_geometry_som(IReader* I)
         u32 b2sided;
         float occ;
     };
-// Create AABB-tree
+    // Create AABB-tree
 #ifdef _EDITOR
     CDB::Collector* CL = ETOOLS::create_collector();
     while (!geom->eof())
@@ -211,12 +212,12 @@ void CSoundRender_Core::set_geometry_env(IReader* I)
 #else
     xr_delete(geom_ENV);
 #endif
-    if (0 == I)
+    if (nullptr == I)
         return;
-    if (0 == s_environment)
+    if (nullptr == s_environment)
         return;
 
-    // Assosiate names
+    // Associate names
     xr_vector<u16> ids;
     IReader* names = I->open_chunk(0);
     while (!names->eof())
@@ -225,7 +226,7 @@ void CSoundRender_Core::set_geometry_env(IReader* I)
         names->r_stringZ(n, sizeof(n));
         int id = s_environment->GetID(n);
         R_ASSERT(id >= 0);
-        ids.push_back(u16(id));
+        ids.push_back((u16)id);
     }
     names->close();
 
@@ -263,14 +264,14 @@ void CSoundRender_Core::set_geometry_env(IReader* I)
     xr_free(_data);
 }
 
-void CSoundRender_Core::create(ref_sound& S, const char* fName, esound_type sound_type, int game_type)
+void CSoundRender_Core::create(ref_sound& S, pcstr fName, esound_type sound_type, int game_type)
 {
     if (!bPresent)
         return;
     S._p = new ref_sound_data(fName, sound_type, game_type);
 }
 
-void CSoundRender_Core::attach_tail(ref_sound& S, const char* fName)
+void CSoundRender_Core::attach_tail(ref_sound& S, pcstr fName)
 {
     if (!bPresent)
         return;
@@ -315,7 +316,7 @@ void CSoundRender_Core::clone(ref_sound& S, const ref_sound& from, esound_type s
 
 void CSoundRender_Core::play(ref_sound& S, IGameObject* O, u32 flags, float delay)
 {
-    if (!bPresent || 0 == S._handle())
+    if (!bPresent || nullptr == S._handle())
         return;
     S._p->g_object = O;
     if (S._feedback())
@@ -330,7 +331,7 @@ void CSoundRender_Core::play(ref_sound& S, IGameObject* O, u32 flags, float dela
 void CSoundRender_Core::play_no_feedback(
     ref_sound& S, IGameObject* O, u32 flags, float delay, Fvector* pos, float* vol, float* freq, Fvector2* range)
 {
-    if (!bPresent || 0 == S._handle())
+    if (!bPresent || nullptr == S._handle())
         return;
     ref_sound_data_ptr orig = S._p;
     S._p = new ref_sound_data();
@@ -360,7 +361,7 @@ void CSoundRender_Core::play_no_feedback(
 
 void CSoundRender_Core::play_at_pos(ref_sound& S, IGameObject* O, const Fvector& pos, u32 flags, float delay)
 {
-    if (!bPresent || 0 == S._handle())
+    if (!bPresent || nullptr == S._handle())
         return;
     S._p->g_object = O;
     if (S._feedback())
@@ -373,42 +374,44 @@ void CSoundRender_Core::play_at_pos(ref_sound& S, IGameObject* O, const Fvector&
     if (flags & sm_2D || S._handle()->channels_num() == 2)
         S._feedback()->switch_to_2D();
 }
+
 void CSoundRender_Core::destroy(ref_sound& S)
 {
     if (S._feedback())
     {
         CSoundRender_Emitter* E = (CSoundRender_Emitter*)S._feedback();
-        E->stop(FALSE);
+        E->stop(false);
     }
-    S._p = 0;
+    S._p = nullptr;
 }
 
-void CSoundRender_Core::_create_data(ref_sound_data& S, LPCSTR fName, esound_type sound_type, int game_type)
+void CSoundRender_Core::_create_data(ref_sound_data& S, pcstr fName, esound_type sound_type, int game_type)
 {
     string_path fn;
     xr_strcpy(fn, fName);
     if (strext(fn))
         *strext(fn) = 0;
     S.handle = (CSound_source*)SoundRender->i_create_source(fn);
-    S.g_type = (game_type == sg_SourceType) ? S.handle->game_type() : game_type;
+    S.g_type = game_type == sg_SourceType ? S.handle->game_type() : game_type;
     S.s_type = sound_type;
-    S.feedback = 0;
-    S.g_object = 0;
-    S.g_userdata = 0;
+    S.feedback = nullptr;
+    S.g_object = nullptr;
+    S.g_userdata = nullptr;
     S.dwBytesTotal = S.handle->bytes_total();
     S.fTimeTotal = S.handle->length_sec();
 }
+
 void CSoundRender_Core::_destroy_data(ref_sound_data& S)
 {
     if (S.feedback)
     {
         CSoundRender_Emitter* E = (CSoundRender_Emitter*)S.feedback;
-        E->stop(FALSE);
+        E->stop(false);
     }
-    R_ASSERT(0 == S.feedback);
+    R_ASSERT(nullptr == S.feedback);
     SoundRender->i_destroy_source((CSoundRender_Source*)S.handle);
 
-    S.handle = NULL;
+    S.handle = nullptr;
 }
 
 CSoundRender_Environment* CSoundRender_Core::get_environment(const Fvector& P)
@@ -419,11 +422,9 @@ CSoundRender_Environment* CSoundRender_Core::get_environment(const Fvector& P)
     {
         return &s_user_environment;
     }
-    else
+    if (geom_ENV)
     {
-        if (geom_ENV)
-        {
-            Fvector dir = {0, -1, 0};
+        Fvector dir = {0, -1, 0};
 #ifdef _EDITOR
             ETOOLS::ray_options(CDB::OPT_ONLYNEAREST);
             ETOOLS::ray_query(geom_ENV, P, dir, 1000.f);
@@ -431,58 +432,49 @@ CSoundRender_Environment* CSoundRender_Core::get_environment(const Fvector& P)
             {
                 CDB::RESULT* r = ETOOLS::r_begin();
 #else
-            geom_DB.ray_options(CDB::OPT_ONLYNEAREST);
-            geom_DB.ray_query(geom_ENV, P, dir, 1000.f);
-            if (geom_DB.r_count())
-            {
-                CDB::RESULT* r = geom_DB.r_begin();
-#endif
-                CDB::TRI* T = geom_ENV->get_tris() + r->id;
-                Fvector* V = geom_ENV->get_verts();
-                Fvector tri_norm;
-                tri_norm.mknormal(V[T->verts[0]], V[T->verts[1]], V[T->verts[2]]);
-                float dot = dir.dotproduct(tri_norm);
-                if (dot < 0)
-                {
-                    u16 id_front = (u16)((T->dummy & 0x0000ffff) >> 0); //	front face
-                    return s_environment->Get(id_front);
-                }
-                else
-                {
-                    u16 id_back = (u16)((T->dummy & 0xffff0000) >> 16); //	back face
-                    return s_environment->Get(id_back);
-                }
-            }
-            else
-            {
-                identity.set_identity();
-                return &identity;
-            }
-        }
-        else
+        geom_DB.ray_options(CDB::OPT_ONLYNEAREST);
+        geom_DB.ray_query(geom_ENV, P, dir, 1000.f);
+        if (geom_DB.r_count())
         {
-            identity.set_identity();
-            return &identity;
+            CDB::RESULT* r = geom_DB.r_begin();
+#endif
+            CDB::TRI* T = geom_ENV->get_tris() + r->id;
+            Fvector* V = geom_ENV->get_verts();
+            Fvector tri_norm;
+            tri_norm.mknormal(V[T->verts[0]], V[T->verts[1]], V[T->verts[2]]);
+            float dot = dir.dotproduct(tri_norm);
+            if (dot < 0)
+            {
+                u16 id_front = (u16)((T->dummy & 0x0000ffff) >> 0); //	front face
+                return s_environment->Get(id_front);
+            }
+            u16 id_back = (u16)((T->dummy & 0xffff0000) >> 16); //	back face
+            return s_environment->Get(id_back);
         }
+        identity.set_identity();
+        return &identity;
     }
+    identity.set_identity();
+    return &identity;
 }
 
 void CSoundRender_Core::env_apply()
 {
     /*
-        // Force all sounds to change their environment
-        // (set their positions to signal changes in environment)
-        for (u32 it=0; it<s_emitters.size(); it++)
-        {
-            CSoundRender_Emitter*	pEmitter	= s_emitters[it];
-            const CSound_params*	pParams		= pEmitter->get_params	();
-            pEmitter->set_position	(pParams->position);
-        }
+    // Force all sounds to change their environment
+    // (set their positions to signal changes in environment)
+    for (u32 it = 0; it < s_emitters.size(); it++)
+    {
+        CSoundRender_Emitter* pEmitter = s_emitters[it];
+        const CSound_params* pParams = pEmitter->get_params();
+        pEmitter->set_position(pParams->position);
+    }
     */
-    bListenerMoved = TRUE;
+    bListenerMoved = true;
 }
 
 void CSoundRender_Core::update_listener(const Fvector& P, const Fvector& D, const Fvector& N, float dt) {}
+
 void CSoundRender_Core::i_eax_listener_set(CSound_environment* _E)
 {
     VERIFY(bEAX);
@@ -508,22 +500,22 @@ void CSoundRender_Core::i_eax_listener_set(CSound_environment* _E)
     i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_ROOM, &ep.lRoom, sizeof(LONG));
     i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_ROOMHF, &ep.lRoomHF, sizeof(LONG));
     i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_ROOMROLLOFFFACTOR,
-        &ep.flRoomRolloffFactor, sizeof(float));
+              &ep.flRoomRolloffFactor, sizeof(float));
     i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_DECAYTIME, &ep.flDecayTime,
-        sizeof(float));
+              sizeof(float));
     i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_DECAYHFRATIO, &ep.flDecayHFRatio,
-        sizeof(float));
+              sizeof(float));
     i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_REFLECTIONS, &ep.lReflections,
-        sizeof(LONG));
+              sizeof(LONG));
     i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_REFLECTIONSDELAY,
-        &ep.flReflectionsDelay, sizeof(float));
+              &ep.flReflectionsDelay, sizeof(float));
     i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_REVERB, &ep.lReverb, sizeof(LONG));
     i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_REVERBDELAY, &ep.flReverbDelay,
-        sizeof(float));
+              sizeof(float));
     i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_ENVIRONMENTDIFFUSION,
-        &ep.flEnvironmentDiffusion, sizeof(float));
+              &ep.flEnvironmentDiffusion, sizeof(float));
     i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_AIRABSORPTIONHF,
-        &ep.flAirAbsorptionHF, sizeof(float));
+              &ep.flAirAbsorptionHF, sizeof(float));
     i_eax_set(&DSPROPSETID_EAX_ListenerProperties, deferred | DSPROPERTY_EAXLISTENER_FLAGS, &ep.dwFlags, sizeof(DWORD));
 }
 
@@ -552,7 +544,7 @@ void CSoundRender_Core::i_eax_commit_setting()
 {
     // commit eax
     if (bDeferredEAX)
-        i_eax_set(&DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_COMMITDEFERREDSETTINGS, NULL, 0);
+        i_eax_set(&DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_COMMITDEFERREDSETTINGS, nullptr, 0);
 }
 
 void CSoundRender_Core::object_relcase(IGameObject* obj)
@@ -578,11 +570,11 @@ void CSoundRender_Core::set_user_env(CSound_environment* E)
     if (E)
     {
         s_user_environment = *((CSoundRender_Environment*)E);
-        bUserEnvironment = TRUE;
+        bUserEnvironment = true;
     }
     else
     {
-        bUserEnvironment = FALSE;
+        bUserEnvironment = false;
     }
     env_apply();
 }
@@ -596,7 +588,7 @@ void CSoundRender_Core::refresh_env_library()
 void CSoundRender_Core::refresh_sources()
 {
     for (u32 eit = 0; eit < s_emitters.size(); eit++)
-        s_emitters[eit]->stop(FALSE);
+        s_emitters[eit]->stop(false);
     for (u32 sit = 0; sit < s_sources.size(); sit++)
     {
         CSoundRender_Source* s = s_sources[sit];
