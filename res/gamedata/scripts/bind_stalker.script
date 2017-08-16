@@ -36,9 +36,9 @@ function actor_binder:net_spawn(data)
 --	printf("actor net spawn")
 	level.show_indicators()
 	self.bCheckStart = true
-	self.weapon_hide = false -- 򰱿󡮮 鬨  ﱳ穥 𐱨 񡨣񣬍
+	self.weapon_hide = false -- спрятано или нет оружие при разговоре.
 	self.weapon_hide_in_dialog = false
-	weapon_hide = {} -- ������쩢᦬ 䬮⡫ 妴גּ硴졣.
+	weapon_hide = {} -- устанавливаем глобальный дефолтовый флаг.
 	if object_binder.net_spawn(self,data) == false then
 		return false
 	end
@@ -50,9 +50,9 @@ function actor_binder:net_spawn(data)
 	end
 	xr_s.on_game_load()                                    --' Distemper 03.2008 --
 	self.weather_manager:reset()
-	--' Ƞ䱳硥ꡭᲲ񯪪桤񯰠
+	--' Загружаем настройки дропа
 	death_manager.init_drop_settings()
-	--'Ա󡮠㬨㡥ꡱ򼬪񡮠 󡲪楦殍
+	--'Устанавливаем ссылку на таскменеджер
 	self.task_manager = task_manager.get_task_manager()
 	self.spawn_frame = device().frame
 	self.already_jumped = false
@@ -130,7 +130,7 @@ function actor_binder:reinit()
 	self.object:set_callback(callback.task_state, self.task_callback, self)
 	self.object:set_callback(callback.take_item_from_box, self.take_item_from_box, self)
 	self.object:set_callback(callback.use_object, self.use_inventory_item, self)
-	
+
 	----| aVo |--------------------------------------------------------------------
 	self.object:set_callback(callback.hit, self.actor_hit, self)
 	self.object:set_callback(callback.key_press, self.key_press, self)
@@ -144,8 +144,6 @@ function actor_binder:reinit()
 	----| end:aVo |----------------------------------------------------------------
 end
 ---------------------------------------------------------------------------------------------------------------------
-
-
 ----| aVo |--------------------------------------------------------------------
 -- actor hit callback
 function actor_binder:actor_hit(obj, amount, local_direction, who, bone_index)
@@ -155,50 +153,51 @@ end
 -- key press callback
 function actor_binder:key_press(key)
 	-- sm:call("key_press", key)
-	-- log1(string.format("key pressed %d", key))
+	-- log(string.format("key pressed %d", key))
 	if key == DIK_keys.DIK_F7 then
-		log1("F7 pressed")
+		log("F7 pressed")
 	end
 end
 -- key release callback (turn on in build_config_defines.h only if absolutely needed)
 function actor_binder:key_release(key)
 	-- sm:call("key_release", key)
-	-- log1(string.format("key released %d", key))
+	-- log(string.format("key released %d", key))
 	if key == DIK_keys.DIK_F7 then
-		log1("F7 released")
+		log("F7 released")
 	end
 end
 -- key hold callback (turn on in build_config_defines.h only if absolutely needed)
 function actor_binder:key_hold(key)
 	-- sm:call("key_hold", key)
-	-- log1(string.format("key hold %d", key))
+	-- log(string.format("key hold %d", key))
 	if key == DIK_keys.DIK_F7 then
-		log1("F7 hold")
+		log("F7 hold")
 	end
 end
 -- mouse move callback (turn on in build_config_defines.h only if absolutely needed)
 function actor_binder:mouse_move(dx, dy)
-	log1(string.format("mouse moved to: [%d]:[%d]", dx, dy))
+	log(string.format("mouse moved to: [%d]:[%d]", dx, dy))
 end
 -- mouse wheel callback (direction is 120 up and -120 down)
 function actor_binder:mouse_wheel(direction)
-	log1(string.format("mouse wheel moved %s", tostring(direction)))
+	log(string.format("mouse wheel moved %s", tostring(direction)))
 end
 -- item to ruck callback
 -- note: this is called on new game and level change
 function actor_binder:item_to_ruck(obj)
-	log1(string.format("item_to_ruck [%s]", obj:name()))
+	log(string.format("item_to_ruck [%s]", obj:name()))
 end
 -- item to belt callback
 -- note: this is called on new game and level change
 function actor_binder:item_to_belt(obj)
-	log1(string.format("item_to_belt [%s]", obj:name()))
+	log(string.format("item_to_belt [%s]", obj:name()))
 end
 -- item to slot callback
 -- note: this is called on new game and level change
 function actor_binder:item_to_slot(obj)
-	log1(string.format("item_to_slot [%s]", obj:name()))
+	log(string.format("item_to_slot [%s]", obj:name()))
 end
+----| end:aVo |---------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:take_item_from_box(box, item)
 	local box_name = box:name()
@@ -207,8 +206,9 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:info_callback(npc, info_id)
 	printf("*INFO*: npc='%s' id='%s'", npc:name(), info_id)
-	--' Ҿ禲
-	-- ϲ릠롰󣋊end
+	--' Сюжет
+	-- Отметки на карте
+end
 ----------------------------------------------------------------------------------------------------------------------
 function actor_binder:on_trade (item, sell_bye, money)
 	if sell_bye == true then
@@ -319,7 +319,7 @@ function actor_binder:update(delta)
 		return
 	end
 
-	-- û询 ᰤ檲ힺ���汥ힺ���䱮랠𐱮㯤揄
+	-- Вызов апдейта переноса игрока проводником
 	if travel_func ~= nil then
 		travel_func()
 	end
@@ -328,15 +328,16 @@ function actor_binder:update(delta)
 	--slowdown.update()
 	local time = time_global()
 	game_stats.update (delta, self.object)
-	-- ᰤ檲 𐯣糧
+	-- апдейт погоды
 	self.weather_manager:update()
 
 	self:check_detective_achievement()
 	self:check_mutant_hunter_achievement()
 
-	--' o妩𡲠������殥姥񞋊	xr_sound.update(self.object:id())
+	--' Апдейт саундменеджера
+	xr_sound.update(self.object:id())
 
-	-- ϡ즭飠ﳪ쿷殨 㣮垠흆���ᣨᳳ񹬍
+	-- Обновление отключения ввода с клавиатуры.
 	if self.st.disable_input_time ~= nil and
 		game.get_game_time():diffSec(self.st.disable_input_time) >= self.st.disable_input_idle
 		then
@@ -344,7 +345,8 @@ function actor_binder:update(delta)
 		self.st.disable_input_time = nil
 	end
 
-	-- o妩𡰰󡮨㡮񴧨 餰﫠 㬠㱥���婠쯣ힸ���	if self.object:is_talking() then
+	-- Апдейт прятание оружия игрока во время диалога
+	if self.object:is_talking() then
 		if self.weapon_hide_in_dialog == false then
 			self.object:hide_weapon()
 			printf("hiding weapon!!!")
@@ -357,7 +359,7 @@ function actor_binder:update(delta)
 			self.weapon_hide_in_dialog = false
 		end
 	end
-	-- o妩𡰰󡮨㡮񴧨 餰﫠 ࡧﮥ sr_no_weapon
+	-- Апдейт прятание оружия игрока в зоне sr_no_weapon
 	if check_for_weapon_hide_by_zones() == true then
 		if self.weapon_hide == false then
 			printf("hiding weapon!!!")
@@ -372,12 +374,13 @@ function actor_binder:update(delta)
 		end
 	end
 
-	-- 殨㡯򦮠
+	-- обновление пси-антенны
 	if sr_psy_antenna.psy_antenna then
 		sr_psy_antenna.psy_antenna:update(delta)
 	end
 --[[
-	--' û㯤 򯯡殨 졡לּ易񡥨ᷨ拊	if self.object.radiation >= 0.7 then
+	--' Вывод сообщения о большой радиации
+	if self.object.radiation >= 0.7 then
 		local hud = get_hud()
 		local custom_static = hud:GetCustomStatic("cs_radiation_danger")
 		if custom_static == nil then
@@ -426,7 +429,7 @@ function actor_binder:update(delta)
 		end
 		self.surge_manager:update()
 	end
-	-- o妩𡥮򳴯󦡤콠򩭳퀶馮
+	-- Апдейт доступности для симуляции.
 	simulation_objects.get_sim_obj_registry():update_avaliability(alife():actor())
 
 	if not self.loaded then
@@ -445,8 +448,9 @@ end
 function actor_binder:save(packet)
 	set_save_marker(packet, "save", false, "actor_binder")
 	object_binder.save(self, packet)
-	--' Ү������檠������殼 򬯦󦋊	packet:w_u8(level.get_game_difficulty())
-	--' Ү������檠塭 ﳪ쿷殭猪㣮壍
+	--' Сохраняем уровень сложности
+	packet:w_u8(level.get_game_difficulty())
+	--' Сохраняем данные об отключенном вводе
 	if self.st.disable_input_time == nil then
 		packet:w_bool(false)
 	else
@@ -511,7 +515,8 @@ end
 function actor_binder:load(reader)
 	set_save_marker(reader, "load", false, "actor_binder")
 	object_binder.load(self, reader)
-	--' Ƞ䱳硥ꡳ񯣥򬯦󦋊	local game_difficulty = reader:r_u8()
+	--' Загружаем уровень сложности
+	local game_difficulty = reader:r_u8()
 	printf("load game_difficulty %s", tostring(game_difficulty))
 	get_console():execute("g_game_difficulty "..game_difficulty_by_num[game_difficulty])
 	local stored_input_time = reader:r_u8()
@@ -564,7 +569,7 @@ function actor_binder:load(reader)
 end
 
 --*************************************************************
---*					Ю岯ᴭ 㦹槠ࡿ髨					  *
+--*					Подспаун вещей в ящики					  *
 --*************************************************************
 local detective_achievement_items 		= {	"medkit",
 											"antirad",
