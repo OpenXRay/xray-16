@@ -1826,26 +1826,16 @@ void CWeapon::OnStateSwitch(u32 S, u32 oldState)
     inherited::OnStateSwitch(S, oldState);
     m_BriefInfo_CalcFrame = 0;
 
-    if (GetState() == eReload)
+    if (S == eReload)
     {
-        if (iAmmoElapsed == 0)
-        {
-            if (H_Parent() == Level().CurrentEntity() && !fsimilar(m_zoom_params.m_ReloadEmptyDof.w, -1.0f))
-            {
-                CActor* current_actor = smart_cast<CActor*>(H_Parent());
-                if (current_actor)
+        CActor* current_actor = smart_cast<CActor*>(H_Parent());
+        if (current_actor && H_Parent() == Level().CurrentEntity())
+            if (iAmmoElapsed == 0)
+                if (!fsimilar(m_zoom_params.m_ReloadEmptyDof.w, -1.0f))
                     current_actor->Cameras().AddCamEffector(new CEffectorDOF(m_zoom_params.m_ReloadEmptyDof));
-            }
-        }
-        else
-        {
-            if (H_Parent() == Level().CurrentEntity() && !fsimilar(m_zoom_params.m_ReloadDof.w, -1.0f))
-            {
-                CActor* current_actor = smart_cast<CActor*>(H_Parent());
-                if (current_actor)
+            else
+                if (!fsimilar(m_zoom_params.m_ReloadDof.w, -1.0f))
                     current_actor->Cameras().AddCamEffector(new CEffectorDOF(m_zoom_params.m_ReloadDof));
-            }
-        }
     }
 }
 
