@@ -27,7 +27,7 @@
 
 ENGINE_API bool g_dedicated_server;
 
-CUIXml* pWpnScopeXml = NULL;
+CUIXml* pWpnScopeXml = nullptr;
 
 void createWpnScopeXML()
 {
@@ -48,8 +48,8 @@ CWeaponMagazined::CWeaponMagazined(ESoundTypes eSoundType) : CWeapon()
     m_eSoundReloadEmpty = ESoundTypes(SOUND_TYPE_WEAPON_RECHARGING | eSoundType);
     m_sounds_enabled = true;
 
-    m_sSndShotCurrent = NULL;
-    m_sSilencerFlameParticles = m_sSilencerSmokeParticles = NULL;
+    m_sSndShotCurrent = nullptr;
+    m_sSilencerFlameParticles = m_sSilencerSmokeParticles = nullptr;
 
     m_bFireSingleShot = false;
     m_iShotNum = 0;
@@ -207,14 +207,14 @@ bool CWeaponMagazined::TryReload()
 
         if (IsMisfire() && iAmmoElapsed)
         {
-            SetPending(TRUE);
+            SetPending(true);
             SwitchState(eReload);
             return true;
         }
 
         if (m_pCurrentAmmo || unlimited_ammo())
         {
-            SetPending(TRUE);
+            SetPending(true);
             SwitchState(eReload);
             return true;
         }
@@ -225,7 +225,7 @@ bool CWeaponMagazined::TryReload()
                 if (m_pCurrentAmmo)
                 {
                     m_set_next_ammoType_on_reload = i;
-                    SetPending(TRUE);
+                    SetPending(true);
                     SwitchState(eReload);
                     return true;
                 }
@@ -321,7 +321,7 @@ void CWeaponMagazined::ReloadMagazine()
 
     if (!m_bLockType)
     {
-        m_pCurrentAmmo = NULL;
+        m_pCurrentAmmo = nullptr;
     }
 
     if (!m_pInventory)
@@ -391,7 +391,7 @@ void CWeaponMagazined::ReloadMagazine()
 
     //выкинуть коробку патронов, если она пустая
     if (m_pCurrentAmmo && !m_pCurrentAmmo->m_boxCurr && OnServer())
-        m_pCurrentAmmo->SetDropManual(TRUE);
+        m_pCurrentAmmo->SetDropManual(true);
 
     if (iMagazineSize > iAmmoElapsed)
     {
@@ -501,14 +501,14 @@ void CWeaponMagazined::state_Fire(float dt)
 
         if (!H_Parent())
             return;
-        if (smart_cast<CMPPlayersBag*>(H_Parent()) != NULL)
+        if (smart_cast<CMPPlayersBag*>(H_Parent()) != nullptr)
         {
             Msg("! WARNING: state_Fire of object [%d][%s] while parent is CMPPlayerBag...", ID(), cNameSect().c_str());
             return;
         }
 
         CInventoryOwner* io = smart_cast<CInventoryOwner*>(H_Parent());
-        if (NULL == io->inventory().ActiveItem())
+        if (nullptr == io->inventory().ActiveItem())
         {
             Log("current_state", GetState());
             Log("next_state", GetNextState());
@@ -647,7 +647,7 @@ void CWeaponMagazined::switch2_Idle()
     if (m_fOldBulletSpeed != 0.f)
         SetBulletSpeed(m_fOldBulletSpeed);
 
-    SetPending(FALSE);
+    SetPending(false);
     PlayAnimIdle();
 }
 
@@ -749,7 +749,7 @@ void CWeaponMagazined::switch2_Reload()
 
     PlayReloadSound();
     PlayAnimReload();
-    SetPending(TRUE);
+    SetPending(true);
 }
 void CWeaponMagazined::switch2_Hiding()
 {
@@ -760,7 +760,7 @@ void CWeaponMagazined::switch2_Hiding()
         PlaySound("sndHide", get_LastFP());
 
     PlayAnimHide();
-    SetPending(TRUE);
+    SetPending(true);
 }
 
 void CWeaponMagazined::switch2_Hidden()
@@ -777,7 +777,7 @@ void CWeaponMagazined::switch2_Showing()
     if (m_sounds_enabled)
         PlaySound("sndShow", get_LastFP());
 
-    SetPending(TRUE);
+    SetPending(true);
     PlayAnimShow();
 }
 
@@ -1019,7 +1019,7 @@ void CWeaponMagazined::InitAddons()
             m_zoom_params.m_sUseZoomPostprocess =
                 READ_IF_EXISTS(pSettings, r_string, GetScopeName(), "scope_nightvision", 0);
             m_zoom_params.m_bUseDynamicZoom =
-                READ_IF_EXISTS(pSettings, r_bool, GetScopeName(), "scope_dynamic_zoom", FALSE);
+                READ_IF_EXISTS(pSettings, r_bool, GetScopeName(), "scope_dynamic_zoom", false);
             m_zoom_params.m_sUseBinocularVision =
                 READ_IF_EXISTS(pSettings, r_string, GetScopeName(), "scope_alive_detector", 0);
             m_fRTZoomFactor = m_zoom_params.m_fScopeZoomFactor;
@@ -1099,23 +1099,13 @@ void CWeaponMagazined::ResetSilencerKoeffs() { cur_silencer_koef.Reset(); }
 void CWeaponMagazined::PlayAnimShow()
 {
     VERIFY(GetState() == eShowing);
-    PlayHUDMotion("anm_show", FALSE, this, GetState());
+    PlayHUDMotion("anm_show", false, this, GetState());
 }
 
 void CWeaponMagazined::PlayAnimHide()
 {
     VERIFY(GetState() == eHiding);
-    if (iAmmoElapsed == 0)
-    {
-#ifdef NEW_ANIMS //AVO: new reload animation
-        if (isHUDAnimationExist("anm_reload_empty"))
-            PlayHUDMotion("anm_reload_empty", true, this, GetState());
-        else
-#endif //-NEW_ANIMS
-            PlayHUDMotion("anm_reload", true, this, GetState());
-    }
-    else
-        PlayHUDMotion("anm_reload", true, this, GetState());
+    PlayHUDMotion("anm_hide", true, this, GetState());
 }
 
 void CWeaponMagazined::PlayAnimReload()
@@ -1159,7 +1149,7 @@ void CWeaponMagazined::PlayAnimIdle()
 void CWeaponMagazined::PlayAnimShoot()
 {
     VERIFY(GetState() == eFire);
-    PlayHUDMotion("anm_shots", FALSE, this, GetState());
+    PlayHUDMotion("anm_shots", false, this, GetState());
 }
 
 void CWeaponMagazined::OnZoomIn()
