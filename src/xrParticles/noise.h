@@ -1,3 +1,4 @@
+#pragma once
 #ifndef noiseH
 #define noiseH
 

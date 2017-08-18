@@ -91,7 +91,7 @@ DEFINE_VECTOR(ListItem*, ListItemsVec, ListItemsIt);
 
 #include "xrCDB/xrCDB.h"
 #include "xrSound/Sound.h"
-#include <xrEngine/PSystem.h>
+#include <xrParticles/psystem.h>
 
 // DirectX headers
 #include <d3d9.h>

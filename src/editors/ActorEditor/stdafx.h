@@ -76,7 +76,7 @@ __inline float expf(float val) { return ::exp(val); }
 #define clMsg Msg
 
 // core
-#include <xrCore.h>
+#include <xrCore/xrCore.h>
 
 #ifdef _EDITOR
 class PropValue;
@@ -87,32 +87,32 @@ class ListItem;
 DEFINE_VECTOR(ListItem*, ListItemsVec, ListItemsIt);
 #endif
 
-#include "../../xrCDB/xrCDB.h"
-#include "../../xrSound/Sound.h"
-#include "../../xrEngine/PSystem.h"
+#include "xrCDB/xrCDB.h"
+#include "xrSound/Sound.h"
+#include "xrParticles/PSystem.h"
 
 // DirectX headers
 #include <d3d9.h>
 #include <d3dx9.h>
-#include "..\..\Layers\xrRender\xrD3dDefs.h"
+#include "Layers/xrRender/xrD3dDefs.h"
 #include <dinput.h>
 #include <dsound.h>
 
 // some user components
-#include "../../xrEngine/fmesh.h"
-#include "../../xrEngine/_d3d_extensions.h"
+#include "xrCore/FMesh.hpp"
+#include "Common/_d3d_extensions.h"
 
-#include "../ECore/editor/D3DX_Wrapper.h"
+#include "editors/ECore/editor/D3DX_Wrapper.h"
 
 DEFINE_VECTOR(AnsiString, AStringVec, AStringIt);
 DEFINE_VECTOR(AnsiString*, LPAStringVec, LPAStringIt);
 
-#include "../../xrServerEntities/xrEProps.h"
-#include "../../xrCore/Log.h"
-#include "../ECore/editor/engine.h"
-#include "../../xrEngine/defines.h"
+#include "xrServerEntities/xrEProps.h"
+#include "xrCore/log.h"
+#include "editors/ECore/editor/engine.h"
+#include "xrEngine/defines.h"
 
-#include "../../xrphysics/xrphysics.h"
+#include "xrPhysics/xrPhysics.h"
 
 struct str_pred : public std::binary_function<char*, char*, bool>
 {
@@ -137,15 +137,15 @@ struct astr_pred : public std::binary_function<const AnsiString&, const AnsiStri
 };
 
 #ifdef _EDITOR
-#include "../ECore/editor/device.h"
-#include "../../xrEngine/properties.h"
-#include "../ECore/editor/render.h"
+#include "editors/ECore/editor/device.h"
+#include "xrEngine/properties.h"
+#include "editors/ECore/editor/render.h"
 DEFINE_VECTOR(FVF::L, FLvertexVec, FLvertexIt);
 DEFINE_VECTOR(FVF::TL, FTLvertexVec, FTLvertexIt);
 DEFINE_VECTOR(FVF::LIT, FLITvertexVec, FLITvertexIt);
 DEFINE_VECTOR(shared_str, RStrVec, RStrVecIt);
 
-#include "../ECore/editor/EditorPreferences.h"
+#include "editors/ECore/editor/EditorPreferences.h"
 #endif
 
 #ifdef _LEVEL_EDITOR

@@ -805,7 +805,6 @@
     <ClInclude Include="property_collection.hpp" />
     <ClInclude Include="property_collection_forward.hpp" />
     <ClInclude Include="property_collection_inline.hpp" />
-    <ClInclude Include="psystem.h" />
     <ClInclude Include="PS_instance.h" />
     <ClInclude Include="pure.h" />
     <ClInclude Include="pure_relcase.h" />

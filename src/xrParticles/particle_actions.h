@@ -1,4 +1,4 @@
-//---------------------------------------------------------------------------
+#pragma once
 #ifndef particle_actionsH
 #define particle_actionsH
 
@@ -6,12 +6,14 @@ namespace PAPI
 {
 // refs
 struct ParticleEffect;
+
 struct PARTICLES_API ParticleAction
 {
     enum
     {
-        ALLOW_ROTATE = (1 << 1)
+        ALLOW_ROTATE = 1 << 1
     };
+
     Flags32 m_Flags;
     PActionEnum type; // Type field
     ParticleAction() { m_Flags.zero(); }
@@ -21,6 +23,7 @@ struct PARTICLES_API ParticleAction
     virtual void Load(IReader& F) = 0;
     virtual void Save(IWriter& F) = 0;
 };
+
 using PAVec = xr_vector<ParticleAction*>;
 using PAVecIt = PAVec::iterator;
 
@@ -35,12 +38,13 @@ public:
         actions.reserve(4);
         m_bLocked = false;
     }
+
     ~ParticleActions() { clear(); }
 
     void clear()
     {
         R_ASSERT(!m_bLocked);
-        for (PAVecIt it = actions.begin(); it != actions.end(); it++)
+        for (PAVecIt it = actions.begin(); it != actions.end(); ++it)
             xr_delete(*it);
         actions.clear();
     }
@@ -51,22 +55,25 @@ public:
         actions.push_back(pa);
     }
 
-    bool empty() { return actions.empty(); }
+    bool empty() const { return actions.empty(); }
     PAVecIt begin() { return actions.begin(); }
     PAVecIt end() { return actions.end(); }
-    int size() { return actions.size(); }
+    int size() const { return actions.size(); }
 
     void resize(int cnt)
     {
         R_ASSERT(!m_bLocked);
         actions.resize(cnt);
     }
+
     void copy(ParticleActions* src);
+
     void lock()
     {
         R_ASSERT(!m_bLocked);
         m_bLocked = true;
     }
+
     void unlock()
     {
         R_ASSERT(m_bLocked);
@@ -74,5 +81,6 @@ public:
     }
 };
 };
+
 //---------------------------------------------------------------------------
 #endif

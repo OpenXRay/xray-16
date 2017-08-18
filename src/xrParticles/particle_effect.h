@@ -1,4 +1,4 @@
-//---------------------------------------------------------------------------
+#pragma once
 #ifndef particle_effectH
 #define particle_effectH
 
@@ -17,7 +17,6 @@ struct ParticleEffect
     void* owner;
     u32 param;
 
-public:
     ParticleEffect(int mp)
     {
         owner = nullptr;
@@ -29,15 +28,16 @@ public:
         particles_allocated = max_particles;
 
         real_ptr = xr_malloc(sizeof(Particle) * (max_particles + 1));
-        
+
         particles = (Particle*)((uintptr_t)real_ptr + (64 - ((uintptr_t)real_ptr & 63)));
         //particles = static_cast<Particle*>(real_ptr);
 
-        // Msg( "Allocated %u bytes (%u particles) with base address 0x%p" , max_particles * sizeof( Particle ) ,
-        // max_particles , particles );
+        //Msg("Allocated %u bytes (%u particles) with base address 0x%p", max_particles * sizeof(Particle), max_particles, particles);
     }
+
     ~ParticleEffect() { xr_free(real_ptr); }
-    IC int Resize(u32 max_count)
+
+    int Resize(u32 max_count)
     {
         // Reducing max.
         if (particles_allocated >= max_count)
@@ -62,8 +62,7 @@ public:
         }
 
         Particle* new_particles = (Particle*)((uintptr_t)new_real_ptr + (64 - ((uintptr_t)new_real_ptr & 63)));
-        // Msg( "Re-allocated %u bytes (%u particles) with base address 0x%p" , max_count * sizeof( Particle ) ,
-        // max_count , new_particles );
+        Msg("Re-allocated %u bytes (%u particles) with base address 0x%p", max_count * sizeof(Particle), max_count, new_particles);
 
         CopyMemory(new_particles, particles, p_count * sizeof(Particle));
         xr_free(real_ptr);
@@ -75,7 +74,8 @@ public:
         particles_allocated = max_count;
         return max_count;
     }
-    IC void Remove(int i)
+
+    void Remove(int i)
     {
         if (0 == p_count)
             return;
@@ -83,34 +83,32 @@ public:
         if (d_cb)
             d_cb(owner, param, m, i);
         m = particles[--p_count]; // не менять правило удаления !!! (dependence ParticleGroup)
-        // Msg( "pDel() : %u" , p_count );
+        //Msg("pDel() : %u", p_count);
     }
 
-    IC BOOL Add(const pVector& pos, const pVector& posB, const pVector& size, const pVector& rot, const pVector& vel,
-        u32 color, const float age = 0.0f, u16 frame = 0, u16 flags = 0)
+    bool Add(const pVector& pos, const pVector& posB, const pVector& size, const pVector& rot, const pVector& vel,
+             u32 color, const float age = 0.0f, u16 frame = 0, u16 flags = 0)
     {
         if (p_count >= max_particles)
-            return FALSE;
-        else
-        {
-            Particle& P = particles[p_count];
-            P.pos = pos;
-            P.posB = posB;
-            P.size = size;
-            P.rot.x = rot.x;
-            P.vel = vel;
-            P.color = color;
-            P.age = age;
-            P.frame = frame;
-            P.flags.assign(flags);
-            if (b_cb)
-                b_cb(owner, param, P, p_count);
-            p_count++;
-            // Msg( "pAdd() : %u" , p_count );
-            return TRUE;
-        }
+            return false;
+        Particle& P = particles[p_count];
+        P.pos = pos;
+        P.posB = posB;
+        P.size = size;
+        P.rot.x = rot.x;
+        P.vel = vel;
+        P.color = color;
+        P.age = age;
+        P.frame = frame;
+        P.flags.assign(flags);
+        if (b_cb)
+            b_cb(owner, param, P, p_count);
+        p_count++;
+        //Msg("pAdd() : %u", p_count);
+        return true;
     }
 };
 };
+
 //---------------------------------------------------------------------------
 #endif

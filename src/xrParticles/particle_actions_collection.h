@@ -1,9 +1,10 @@
-//---------------------------------------------------------------------------
+#pragma once
 #ifndef particle_actions_collectionH
 #define particle_actions_collectionH
 
 #include "particle_actions.h"
 #include "particle_core.h"
+
 namespace PAPI
 {
 #define _METHODS                                                            \
@@ -223,6 +224,7 @@ struct PARTICLES_API PASource : public ParticleAction
         flVertexB_tracks = (1ul << 31ul), // True to get positionB from position.
         fl_FORCEDWORD = u32(-1)
     };
+
     pDomain positionL; // Choose a position in this domain. (local_space)
     pDomain velocityL; // Choose a velocity in this domain. (local_space)
     pDomain position; // Choose a position in this domain.

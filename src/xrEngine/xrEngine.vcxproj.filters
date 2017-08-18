@@ -255,9 +255,6 @@
     <ClInclude Include="resource.h">
       <Filter>General\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="psystem.h">
-      <Filter>Interfaces</Filter>
-    </ClInclude>
     <ClInclude Include="IInputReceiver.h">
       <Filter>Interfaces\Input</Filter>
     </ClInclude>
