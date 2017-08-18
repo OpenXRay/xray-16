@@ -34,16 +34,20 @@ struct XRNETSERVER_API ip_address
             u8 a3;
             u8 a4;
         };
+
         u32 data;
     } m_data;
-    void set(LPCSTR src_string);
+
+    void set(pcstr src_string);
     xr_string to_string() const;
 
     bool operator==(const ip_address& other) const
     {
-        return (m_data.data == other.m_data.data) ||
-            ((m_data.a1 == other.m_data.a1) && (m_data.a2 == other.m_data.a2) && (m_data.a3 == other.m_data.a3) &&
-                (m_data.a4 == 0));
+        return m_data.data == other.m_data.data ||
+            m_data.a1 == other.m_data.a1 &&
+            m_data.a2 == other.m_data.a2 &&
+            m_data.a3 == other.m_data.a3 &&
+            m_data.a4 == 0;
     }
 };
 
@@ -77,15 +81,15 @@ public:
 
     IPureServer* server;
 
-public:
     using MultipacketSender::SendPacket;
     using MultipacketSender::FlushSendBuffer;
 
 private:
-    virtual void _SendTo_LL(const void* data, u32 size, u32 flags, u32 timeout);
+    void _SendTo_LL(const void* data, u32 size, u32 flags, u32 timeout) override;
 };
 
 IC bool operator==(IClient const* pClient, ClientID const& ID) { return pClient->ID == ID; }
+
 class XRNETSERVER_API IServerStatistic
 {
 public:
@@ -117,7 +121,7 @@ public:
     {
         HAddr.m_data.data = 0;
         BanTime = 0;
-    };
+    }
     void Load(CInifile& ini, const shared_str& sect);
     void Save(CInifile& ini);
 
@@ -130,7 +134,7 @@ struct ClientIdSearchPredicate
 {
     ClientID clientId;
     ClientIdSearchPredicate(ClientID clientIdToSearch) : clientId(clientIdToSearch) {}
-    inline bool operator()(IClient* client) const { return client->ID == clientId; }
+    bool operator()(IClient* client) const { return client->ID == clientId; }
 };
 
 class CSE_Abstract;
@@ -140,8 +144,8 @@ class IServerGameState;
 // DPlay
 extern "C"
 {
-struct IDirectPlay8Server;
-struct IDirectPlay8Address;
+    struct IDirectPlay8Server;
+    struct IDirectPlay8Address;
 }
 
 class XRNETSERVER_API IPureServer : private MultipacketReciever
@@ -181,28 +185,28 @@ protected:
     // Statistic
     IServerStatistic stats;
     CTimer* device_timer;
-    BOOL m_bDedicated;
+    bool m_bDedicated;
 
     IClient* ID_to_client(ClientID ID, bool ScanAll = false);
 
     virtual IClient* new_client(SClientConnectData* cl_data) = 0;
-    bool GetClientAddress(IDirectPlay8Address* pClientAddress, ip_address& Address, DWORD* pPort = NULL);
+    bool GetClientAddress(IDirectPlay8Address* pClientAddress, ip_address& Address, DWORD* pPort = nullptr);
 
     IBannedClient* GetBannedClient(const ip_address& Address);
     void BannedList_Save();
     void BannedList_Load();
     void IpList_Load();
     void IpList_Unload();
-    LPCSTR GetBannedListName();
+    pcstr GetBannedListName() const;
 
     void UpdateBannedList();
 
 public:
-    IPureServer(CTimer* timer, BOOL Dedicated = FALSE);
+    IPureServer(CTimer* timer, bool Dedicated = false);
     virtual ~IPureServer();
     HRESULT net_Handler(u32 dwMessageType, PVOID pMessage);
 
-    virtual EConnect Connect(LPCSTR session_name, GameDescriptionData& game_descr);
+    virtual EConnect Connect(pcstr session_name, GameDescriptionData& game_descr);
     virtual void Disconnect();
 
     // send
@@ -215,7 +219,7 @@ public:
     virtual void SendBroadcast(ClientID exclude, NET_Packet& P, u32 dwFlags = 0x0008 /*DPNSEND_GUARANTEED*/);
 
     // statistic
-    const IServerStatistic* GetStatistic() { return &stats; }
+    const IServerStatistic* GetStatistic() const { return &stats; }
     void ClearStatistic();
     void UpdateClientStatistic(IClient* C);
 
@@ -223,62 +227,70 @@ public:
     virtual u32 OnMessage(NET_Packet& P, ClientID sender); // Non-Zero means broadcasting with "flags" as returned
     virtual void OnCL_Connected(IClient* C);
     virtual void OnCL_Disconnected(IClient* C);
-    virtual bool OnCL_QueryHost() { return true; };
+    virtual bool OnCL_QueryHost() { return true; }
     virtual IClient* client_Create() = 0; // create client info
     virtual void client_Replicate() = 0; // replicate current state to client
     virtual void client_Destroy(IClient* C) = 0; // destroy client info
 
-    // IC u32					client_Count		()			{ return net_Players.size(); }
-    // IC IClient*				client_Get			(u32 num)	{ return net_Players[num]; }
+    //u32 client_Count() { return net_Players.size(); }
+    //IClient* client_Get(u32 num) { return net_Players[num]; }
 
-    // IC u32					disconnected_client_Count		()			{ return net_Players_disconnected.size(); }
-    // IC IClient*				disconnected_client_Get			(u32 num)	{ return net_Players_disconnected[num]; }
+    //u32 disconnected_client_Count() { return net_Players_disconnected.size(); }
+    //IClient* disconnected_client_Get(u32 num) { return net_Players_disconnected[num]; }
 
-    BOOL HasBandwidth(IClient* C);
+    bool HasBandwidth(IClient* C);
 
-    IC int GetPort() { return psNET_Port; };
-    bool GetClientAddress(ClientID ID, ip_address& Address, DWORD* pPort = NULL);
-    //			bool			DisconnectClient		(IClient* C);
-    virtual bool DisconnectClient(IClient* C, LPCSTR Reason);
-    virtual bool DisconnectAddress(const ip_address& Address, LPCSTR reason);
+    int GetPort() const { return psNET_Port; }
+    bool GetClientAddress(ClientID ID, ip_address& Address, DWORD* pPort = nullptr);
+    //bool DisconnectClient(IClient* C);
+    virtual bool DisconnectClient(IClient* C, pcstr Reason);
+    virtual bool DisconnectAddress(const ip_address& Address, pcstr reason);
     virtual void BanClient(IClient* C, u32 BanTime);
     virtual void BanAddress(const ip_address& Address, u32 BanTime);
     virtual void UnBanAddress(const ip_address& Address);
     void Print_Banned_Addreses();
 
     virtual bool Check_ServerAccess(IClient* CL, string512& reason) { return true; }
-    virtual void Assign_ServerType(string512& res){};
-    virtual void GetServerInfo(CServerInfo* si){};
+    virtual void Assign_ServerType(string512& res) {}
+    virtual void GetServerInfo(CServerInfo* si) {}
 
     u32 GetClientsCount() { return net_players.ClientsCount(); };
-    IClient* GetServerClient() { return SV_Client; };
+    IClient* GetServerClient() const { return SV_Client; };
+
     template <typename SearchPredicate>
     IClient* FindClient(SearchPredicate const& predicate)
     {
         return net_players.GetFoundClient(predicate);
     }
+
     template <typename ActionFunctor>
     void ForEachClientDo(ActionFunctor& action)
     {
         net_players.ForEachClientDo(action);
     }
+
     template <typename SenderFunctor>
     void ForEachClientDoSender(SenderFunctor& action)
     {
         csMessage.Enter();
 #ifdef DEBUG
         sender_functor_invoked = true;
-#endif //#ifdef DEBUG
+#endif
         net_players.ForEachClientDo(action);
 #ifdef DEBUG
         sender_functor_invoked = false;
-#endif //#ifdef DEBUG
+#endif
         csMessage.Leave();
     }
-// template<typename ActionFunctor>
-// void					ForEachDisconnectedClientDo(ActionFunctor & action) {
-// net_players.ForEachDisconnectedClientDo(action);
-// };
+
+    /*
+    template <typename ActionFunctor>
+    void ForEachDisconnectedClientDo(ActionFunctor& action)
+    {
+        net_players.ForEachDisconnectedClientDo(action);
+    }
+    */
+
 #ifdef DEBUG
     bool IsPlayersMonitorLockedByMe() const
     {
@@ -286,29 +298,43 @@ public:
     };
 #endif
     bool IsPlayerIPDenied(u32 ip_address);
+
     // WARNING! very bad method :(
-    // IClient*				client_Get		(u32 index)							{return
-    // net_players.GetClientByIndex(index);};
-    IClient* GetClientByID(ClientID clientId) { return net_players.GetFoundClient(ClientIdSearchPredicate(clientId)); };
-    // IClient*				GetDisconnectedClientByID(ClientID clientId)		{return
-    // net_players.GetFoundDisconnectedClient(ClientIdSearchPredicate(clientId));}
+    /*
+    IClient* client_Get(u32 index)
+    {
+        return net_players.GetClientByIndex(index);
+    }
+    */
+
+    IClient* GetClientByID(ClientID clientId)
+    {
+        return net_players.GetFoundClient(ClientIdSearchPredicate(clientId));
+    }
+
+    /*
+    IClient* GetDisconnectedClientByID(ClientID clientId)
+    {
+        return net_players.GetFoundDisconnectedClient(ClientIdSearchPredicate(clientId));
+    }
+    */
 
     const shared_str& GetConnectOptions() const { return connect_options; }
     virtual IServerGameState* GetGameState() = 0;
     virtual u16 PerformIDgen(u16 ID) = 0;
     virtual void FreeID(u16 ID, u32 time) = 0;
 
-    virtual CSE_Abstract* entity_Create(LPCSTR name) = 0;
+    virtual CSE_Abstract* entity_Create(pcstr name) = 0;
     virtual void entity_Destroy(CSE_Abstract*& entity) = 0;
 
     virtual void Perform_destroy(CSE_Abstract* entity, u32 mode) = 0;
-    virtual CSE_Abstract* Process_spawn(NET_Packet& packet, ClientID sender, BOOL mainEntityAsParent = FALSE,
-        CSE_Abstract* currentEntity = nullptr) = 0;
+    virtual CSE_Abstract* Process_spawn(NET_Packet& packet, ClientID sender, bool mainEntityAsParent = false,
+                                        CSE_Abstract* currentEntity = nullptr) = 0;
 
 private:
 #ifdef DEBUG
     bool sender_functor_invoked;
 #endif
 
-    virtual void _Recieve(const void* data, u32 data_size, u32 param);
+    void _Recieve(const void* data, u32 data_size, u32 param) override;
 };

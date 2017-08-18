@@ -45,14 +45,15 @@ string64 PacketName[] = {"M_UPDATE", // DUAL: Update state
 
     "MSG_FORCEDWORD"};
 //---------------------------------------------------------
-INetLog::INetLog(LPCSTR sFileName, u32 dwStartTime)
 #ifdef CONFIG_PROFILE_LOCKS
-    : m_cs(MUTEX_PROFILE_ID(NET_Log))
-#endif // CONFIG_PROFILE_LOCKS
+INetLog::INetLog(pcstr sFileName, u32 dwStartTime) : m_cs(MUTEX_PROFILE_ID(NET_Log))
+#else
+INetLog::INetLog(pcstr sFileName, u32 dwStartTime)
+#endif
 {
     xr_strcpy(m_cFileName, sFileName);
 
-    m_pLogFile = NULL;
+    m_pLogFile = nullptr;
     m_pLogFile = fopen(sFileName, "wb");
     m_dwStartTime = 0; // dwStartTime;
 }
@@ -62,24 +63,24 @@ INetLog::~INetLog()
     FlushLog();
     if (m_pLogFile)
         fclose(m_pLogFile);
-    m_pLogFile = NULL;
+    m_pLogFile = nullptr;
 }
 
 void INetLog::FlushLog()
 {
     if (m_pLogFile)
     {
-        for (xr_vector<SLogPacket>::iterator it = m_aLogPackets.begin(); it != m_aLogPackets.end(); it++)
+        for (xr_vector<SLogPacket>::iterator it = m_aLogPackets.begin(); it != m_aLogPackets.end(); ++it)
         {
             SLogPacket* pLPacket = &(*it);
             if (pLPacket->m_u16Type >= sizeof(PacketName) / sizeof(PacketName[0]))
                 fprintf(m_pLogFile, "%s %10u %10u %10u\n", pLPacket->m_bIsIn ? "In:" : "Out:", pLPacket->m_u32Time,
-                    pLPacket->m_u16Type, pLPacket->m_u32Size);
+                        pLPacket->m_u16Type, pLPacket->m_u32Size);
             else
                 fprintf(m_pLogFile, "%s %10u %10s %10u\n", pLPacket->m_bIsIn ? "In:" : "Out:", pLPacket->m_u32Time,
-                    PacketName[pLPacket->m_u16Type], pLPacket->m_u32Size);
-        };
-    };
+                        PacketName[pLPacket->m_u16Type], pLPacket->m_u32Size);
+        }
+    }
 
     m_aLogPackets.clear();
 }
@@ -93,7 +94,7 @@ void INetLog::LogPacket(u32 Time, NET_Packet* pPacket, bool IsIn)
 
     SLogPacket NewPacket;
 
-    NewPacket.m_u16Type = *((u16*)&pPacket->B.data);
+    NewPacket.m_u16Type = *(u16*)&pPacket->B.data;
     NewPacket.m_u32Size = pPacket->B.count;
     NewPacket.m_u32Time = Time - m_dwStartTime;
     NewPacket.m_bIsIn = IsIn;
@@ -103,7 +104,7 @@ void INetLog::LogPacket(u32 Time, NET_Packet* pPacket, bool IsIn)
         FlushLog();
 
     m_cs.Leave();
-};
+}
 
 void INetLog::LogData(u32 Time, void* data, u32 size, bool IsIn)
 {
@@ -114,7 +115,7 @@ void INetLog::LogData(u32 Time, void* data, u32 size, bool IsIn)
 
     SLogPacket NewPacket;
 
-    NewPacket.m_u16Type = *((u16*)data);
+    NewPacket.m_u16Type = *(u16*)data;
     NewPacket.m_u32Size = size;
     NewPacket.m_u32Time = Time - m_dwStartTime;
     NewPacket.m_bIsIn = IsIn;

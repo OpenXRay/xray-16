@@ -3,41 +3,42 @@
 #include "NET_Common.h"
 #include "NET_Messages.h"
 
-/*#ifdef DEBUG
-void PrintParsedPacket(const char* message, u16 message_type, const void* packet_data, u32 packet_size)
+/*
+#ifdef DEBUG
+void PrintParsedPacket(pcstr message, u16 message_type, const void* packet_data, u32 packet_size)
 {
-    NET_Packet			tNetPacket;
-    tNetPacket.construct		( packet_data, packet_size );
+    NET_Packet tNetPacket;
+    tNetPacket.construct(packet_data, packet_size);
     u16 msg_type;
-    tNetPacket.r_begin			(msg_type);
+    tNetPacket.r_begin(msg_type);
     if (msg_type == message_type)
     {
         if (message_type == 1) //M_SPAWN
         {
-            shared_str			s_name;
-            tNetPacket.r_stringZ		(s_name			);
+            shared_str s_name;
+            tNetPacket.r_stringZ(s_name);
 
-            string256					temp;
-            tNetPacket.r_stringZ		(temp);
-            u8							temp_gt;
-            tNetPacket.r_u8				(temp_gt		);
-            u8							s_RP;
-            tNetPacket.r_u8				(s_RP			);
-            Fvector						o_Position, o_Angle;
-            tNetPacket.r_vec3			(o_Position		);
-            tNetPacket.r_vec3			(o_Angle		);
-            u16							RespawnTime, ID;
-            tNetPacket.r_u16			(RespawnTime	);
-            tNetPacket.r_u16			(ID				);
+            string256 temp;
+            tNetPacket.r_stringZ(temp);
+            u8 temp_gt;
+            tNetPacket.r_u8(temp_gt);
+            u8 s_RP;
+            tNetPacket.r_u8(s_RP);
+            Fvector o_Position, o_Angle;
+            tNetPacket.r_vec3(o_Position);
+            tNetPacket.r_vec3(o_Angle);
+            u16 RespawnTime, ID;
+            tNetPacket.r_u16(RespawnTime);
+            tNetPacket.r_u16(ID);
 
             Msg("%s M_SPAWN for [%s]-[%d]", message, s_name.c_str(), ID);
-        } else
-        {
-            Msg("%s NOT_IMPLEMENTED_PRINT type[%d]", message, message_type);
         }
+        else
+            Msg("%s NOT_IMPLEMENTED_PRINT type[%d]", message, message_type);
     }
 }
-#endif*/
+#endif
+*/
 //==============================================================================
 
 #pragma pack(push)
@@ -62,29 +63,31 @@ void MultipacketSender::SendPacket(const void* packet_data, u32 packet_sz, u32 f
 {
     _buf_cs.Enter();
 
-    // PrintParsedPacket("-- LL Sending:", 1, packet_data, packet_sz);
+    //PrintParsedPacket("-- LL Sending:", 1, packet_data, packet_sz);
 
     Buffer* buf = &_buf;
 
     switch (psNET_GuaranteedPacketMode)
     {
-    case NET_GUARANTEEDPACKET_IGNORE: { flags &= ~DPNSEND_GUARANTEED;
+    case NET_GUARANTEEDPACKET_IGNORE:
+    {
+        flags &= ~DPNSEND_GUARANTEED;
     }
-    break;
+        break;
 
     case NET_GUARANTEEDPACKET_SEPARATE:
     {
         if (flags & DPNSEND_GUARANTEED)
             buf = &_gbuf;
     }
-    break;
+        break;
     }
 
-    u32 old_flags = (buf->last_flags) & (~DPNSEND_IMMEDIATELLY);
+    u32 old_flags = buf->last_flags & ~DPNSEND_IMMEDIATELLY;
     u32 new_flags = flags & (~DPNSEND_IMMEDIATELLY);
 
-    if ((buf->buffer.B.count + packet_sz + sizeof(u16) >= NET_PacketSizeLimit) || (old_flags != new_flags) ||
-        (flags & DPNSEND_IMMEDIATELLY))
+    if (buf->buffer.B.count + packet_sz + sizeof(u16) >= NET_PacketSizeLimit || old_flags != new_flags ||
+        flags & DPNSEND_IMMEDIATELLY)
     {
         _FlushSendBuffer(timeout, buf);
     }
@@ -129,12 +132,12 @@ void MultipacketSender::_FlushSendBuffer(u32 timeout, Buffer* buf)
         R_ASSERT(comp_sz < 65535);
 
         comp_sz = Compressor.Compress(packet_data + sizeof(MultipacketHeader),
-            sizeof(packet_data) - sizeof(MultipacketHeader), buf->buffer.B.data, buf->buffer.B.count);
+                                      sizeof(packet_data) - sizeof(MultipacketHeader), buf->buffer.B.data, buf->buffer.B.count);
 
         header->tag = NET_TAG_MERGED;
         header->unpacked_size = (u16)buf->buffer.B.count;
 
-// dump/log if needed
+        // dump/log if needed
 
 #if NET_LOG_PACKETS
         Msg("#send %smulti-packet %u    flags= %08X", (buf->last_flags & DPNSEND_IMMEDIATELLY) ? "IMMEDIATE " : "",
@@ -207,7 +210,7 @@ void MultipacketReciever::RecievePacket(const void* packet_data, u32 packet_sz, 
 
     while (processed_sz < header->unpacked_size)
     {
-        u32 size = (is_multi_packet) ? u32(*((u16*)dat)) : header->unpacked_size;
+        u32 size = is_multi_packet ? u32(*(u16*)dat) : header->unpacked_size;
 
         if (is_multi_packet)
             dat += sizeof(u16);
@@ -216,7 +219,7 @@ void MultipacketReciever::RecievePacket(const void* packet_data, u32 packet_sz, 
         Msg("  packet %u", size);
 #endif
 
-        // PrintParsedPacket("-- LL Receiving:", 1, dat, size);
+        //PrintParsedPacket("-- LL Receiving:", 1, dat, size);
 
         _Recieve(dat, size, param);
 

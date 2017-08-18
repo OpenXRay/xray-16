@@ -380,7 +380,7 @@ public:
     virtual u32 GetRealPing() { return m_dwRealPing; }
 public:
     void remove_objects();
-    virtual void OnSessionTerminate(LPCSTR reason);
+    virtual void OnSessionTerminate(pcstr reason);
     file_transfer::client_site* m_file_transfer = nullptr;
     compression::ppmd_trained_stream* m_trained_stream = nullptr;
     compression::lzo_dictionary_buffer m_lzo_dictionary;

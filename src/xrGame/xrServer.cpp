@@ -782,7 +782,7 @@ void xrServer::SendBroadcast(ClientID exclude, NET_Packet& P, u32 dwFlags)
     net_players.ForFoundClientsDo(ClientExcluderPredicate(exclude), temp_functor);
 }
 //--------------------------------------------------------------------
-CSE_Abstract* xrServer::entity_Create(LPCSTR name) { return F_entity_Create(name); }
+CSE_Abstract* xrServer::entity_Create(pcstr name) { return F_entity_Create(name); }
 void xrServer::entity_Destroy(CSE_Abstract*& P)
 {
 #ifdef DEBUG

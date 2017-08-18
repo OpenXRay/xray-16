@@ -7,18 +7,14 @@
 #define XRNETSERVER_API XR_EXPORT
 #else
 #define XRNETSERVER_API XR_IMPORT
-
-#ifndef _EDITOR
-#pragma comment(lib, "xrNetServer")
-#endif
 #endif
 
 // XXX: review and delete
 //#include "xrCore/net_utils.h"
 //#include <dplay/dplay8.h>
-//#include "net_messages.h"
+//#include "NET_Messages.h"
 
-#include "net_compressor.h"
+#include "NET_Compressor.h"
 
 XRNETSERVER_API extern ClientID BroadcastCID;
 
@@ -31,22 +27,23 @@ XRNETSERVER_API extern int psNET_ServerUpdate;
 XRNETSERVER_API extern int get_psNET_ServerUpdate();
 XRNETSERVER_API extern int psNET_ServerPending;
 
-XRNETSERVER_API extern BOOL psNET_direct_connect;
+XRNETSERVER_API extern bool psNET_direct_connect;
 
 enum
 {
-    NETFLAG_MINIMIZEUPDATES = (1 << 0),
-    NETFLAG_DBG_DUMPSIZE = (1 << 1),
-    NETFLAG_LOG_SV_PACKETS = (1 << 2),
-    NETFLAG_LOG_CL_PACKETS = (1 << 3),
+    NETFLAG_MINIMIZEUPDATES = 1 << 0,
+    NETFLAG_DBG_DUMPSIZE = 1 << 1,
+    NETFLAG_LOG_SV_PACKETS = 1 << 2,
+    NETFLAG_LOG_CL_PACKETS = 1 << 3,
 };
 
 IC u32 TimeGlobal(CTimer* timer) { return timer->GetElapsed_ms(); }
 IC u32 TimerAsync(CTimer* timer) { return TimeGlobal(timer); }
+
 // DPlay
 extern "C"
 {
-typedef struct _DPN_CONNECTION_INFO DPN_CONNECTION_INFO;
+    typedef struct _DPN_CONNECTION_INFO DPN_CONNECTION_INFO;
 }
 
 class XRNETSERVER_API IClientStatistic

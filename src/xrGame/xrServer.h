@@ -177,8 +177,8 @@ public:
     void Perform_reject(CSE_Abstract* what, CSE_Abstract* from, int delta);
     virtual void Perform_destroy(CSE_Abstract* tpSE_Abstract, u32 mode) override;
 
-    virtual CSE_Abstract* Process_spawn(NET_Packet& P, ClientID sender,
-        BOOL bSpawnWithClientsMainEntityAsParent = FALSE, CSE_Abstract* tpExistedEntity = 0) override;
+    CSE_Abstract* Process_spawn(NET_Packet& P, ClientID sender,
+                                bool bSpawnWithClientsMainEntityAsParent = false, CSE_Abstract* tpExistedEntity = nullptr) override;
     void Process_update(NET_Packet& P, ClientID sender);
     void Process_save(NET_Packet& P, ClientID sender);
     void Process_event(NET_Packet& P, ClientID sender);
@@ -244,7 +244,7 @@ public:
     virtual void client_Destroy(IClient* C); // destroy client info
 
     // utilities
-    virtual CSE_Abstract* entity_Create(LPCSTR name) override;
+    virtual CSE_Abstract* entity_Create(pcstr name) override;
     virtual void entity_Destroy(CSE_Abstract*& P) override;
     u32 GetEntitiesNum() { return entities.size(); };
     CSE_Abstract* GetEntity(u32 Num);

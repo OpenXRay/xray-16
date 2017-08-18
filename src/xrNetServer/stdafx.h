@@ -3,10 +3,6 @@
 //      are changed infrequently
 //
 // Third generation by Oles.
-
-#ifndef stdafxH
-#define stdafxH
-
 #pragma once
 
 #include "xrCore/xrCore.h"
@@ -17,5 +13,3 @@
 #pragma warning(pop)
 
 #include "NET_Shared.h"
-
-#endif // stdafxH
