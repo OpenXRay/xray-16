@@ -14,10 +14,10 @@
 #include "Include/xrAPI/xrAPI.h"
 #include "ScriptExporter.hpp"
 
-void LuaLog(LPCSTR caMessage)
+void LuaLog(pcstr caMessage)
 {
     if (!GlobalEnv.ScriptEngine->m_stack_is_ready)
-        Log(caMessage); // Xottab_DUTY: temporary workaround to get lua log output
+        Msg("LUA: %s", caMessage); // Xottab_DUTY: temporary workaround to get lua log output
 
 #ifndef MASTER_GOLD
     GlobalEnv.ScriptEngine->script_log(LuaMessageType::Message, "%s", caMessage);
@@ -28,10 +28,10 @@ void LuaLog(LPCSTR caMessage)
 #endif
 }
 
-void ErrorLog(LPCSTR caMessage)
+void ErrorLog(pcstr caMessage)
 {
     if (!GlobalEnv.ScriptEngine->m_stack_is_ready)
-        Log(caMessage); // Xottab_DUTY: temporary workaround to get lua error output
+        Msg("LUA Error: %s", caMessage); // Xottab_DUTY: temporary workaround to get lua error output
 
     GlobalEnv.ScriptEngine->error_log("%s", caMessage);
 #ifdef DEBUG
@@ -85,7 +85,7 @@ inline int bit_xor(const int i, const int j) { return i ^ j; }
 inline int bit_not(const int i) { return ~i; }
 inline const char* user_name() { return Core.UserName; }
 
-void prefetch_module(LPCSTR file_name) { GlobalEnv.ScriptEngine->process_file(file_name); }
+void prefetch_module(pcstr file_name) { GlobalEnv.ScriptEngine->process_file(file_name); }
 
 struct profile_timer_script
 {
