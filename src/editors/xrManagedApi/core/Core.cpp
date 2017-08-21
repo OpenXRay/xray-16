@@ -24,10 +24,10 @@ void Core::Initialize(String ^ appName, LogCallback ^ logCallback, bool initFs, 
     if (fsFileName)
     {
         std::string fsFileNameC = msclr::interop::marshal_as<std::string>(fsFileName);
-        ::Core._initialize(appNameC.c_str(), ::LogCallback(LogCallbackWrapper, nullptr), initFs, fsFileNameC.c_str());
+        ::Core.Initialize(appNameC.c_str(), ::LogCallback(LogCallbackWrapper, nullptr), initFs, fsFileNameC.c_str());
     }
     else
-        ::Core._initialize(appNameC.c_str(), ::LogCallback(LogCallbackWrapper, nullptr), initFs, nullptr);
+        ::Core.Initialize(appNameC.c_str(), ::LogCallback(LogCallbackWrapper, nullptr), initFs, nullptr);
 }
 
 void Core::Initialize(String ^ appName, LogCallback ^ logCallback, bool initFs)
