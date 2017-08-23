@@ -22,6 +22,9 @@ public:
     static void Initialize(String ^ appName, LogCallback ^ logCallback);
     static void Initialize(String ^ appName);
     static void Destroy();
+
+    static const String ^ GetBuildDate();
+    static const UInt32 GetBuildId();
 };
 }
 }

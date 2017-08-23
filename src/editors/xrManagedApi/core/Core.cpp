@@ -1,6 +1,8 @@
 #include "Pch.hpp"
 #include "Core.hpp"
+#pragma unmanaged
 #include "xrCore/xrCore.h"
+#pragma managed
 #include <msclr/marshal_cppstd.h>
 
 namespace XRay
@@ -42,6 +44,11 @@ void Core::Initialize(String ^ appName, LogCallback ^ logCallback)
 
 void Core::Initialize(String ^ appName) { Core::Initialize(appName, nullptr, false, nullptr); }
 void Core::Destroy() { ::Core._destroy(); }
+
+const String ^ Core::GetBuildDate() { return msclr::interop::marshal_as<String^>(::Core.GetBuildDate()); }
+
+const UInt32 Core::GetBuildId() { return ::Core.GetBuildId(); }
+
 }
 }
 }
