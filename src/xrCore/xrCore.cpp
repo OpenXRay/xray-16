@@ -28,6 +28,7 @@ static u32 init_counter = 0;
 
 void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pcstr fs_fname, bool plugin)
 {
+    CalculateBuildId();
     xr_strcpy(ApplicationName, _ApplicationName);
     if (0 == init_counter)
     {
@@ -72,6 +73,7 @@ void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pc
         DUMP_PHASE;
 
         InitLog();
+        Msg("'%s' build %d, %s\n", "xrCore", buildId, buildDate);
         _initialize_cpu();
         R_ASSERT(CPU::ID.hasFeature(CpuFeature::Sse));
         ttapi_Init(CPU::ID);
@@ -110,8 +112,6 @@ void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pc
 #endif
 #endif
         FS._initialize(flags, nullptr, fs_fname);
-        CalculateBuildId();
-        Msg("'%s' build %d, %s\n", "xrCore", buildId, buildDate);
         EFS._initialize();
 #ifdef DEBUG
 #ifndef _EDITOR
