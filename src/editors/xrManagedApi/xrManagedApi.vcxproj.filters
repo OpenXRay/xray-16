@@ -19,6 +19,9 @@
     <ClInclude Include="core\PostProcessAnimator.hpp">
       <Filter>core</Filter>
     </ClInclude>
+    <ClInclude Include="core\Types.hpp">
+      <Filter>core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />

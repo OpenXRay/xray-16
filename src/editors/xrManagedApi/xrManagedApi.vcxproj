@@ -211,6 +211,7 @@
     <ClInclude Include="core\Core.hpp" />
     <ClInclude Include="core\fs\FS.hpp" />
     <ClInclude Include="core\PostProcessAnimator.hpp" />
+    <ClInclude Include="core\Types.hpp" />
     <ClInclude Include="Pch.hpp" />
   </ItemGroup>
   <ItemGroup>
