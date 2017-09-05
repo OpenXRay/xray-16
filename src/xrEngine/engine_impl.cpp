@@ -20,7 +20,7 @@
 
 ENGINE_API extern CConsole* Console;
 
-using editor::property_holder;
+using editor::property_holder_base;
 
 engine_impl::engine_impl() : m_input_receiver(new IInputReceiver()), m_input_captured(false) {}
 engine_impl::~engine_impl()
@@ -226,7 +226,7 @@ void engine_impl::track_weather(float const& time)
 }
 
 float engine_impl::track_weather() { return (g_pGamePersistent->Environment().GetGameTime() / (24 * 60 * 60)); }
-property_holder* engine_impl::current_frame_property_holder()
+property_holder_base* engine_impl::current_frame_property_holder()
 {
     CEnvironment& environment = g_pGamePersistent->Environment();
     if (!environment.Current[0])
@@ -235,7 +235,7 @@ property_holder* engine_impl::current_frame_property_holder()
     return (((editor::environment::weathers::time&)(*environment.Current[0])).object());
 }
 
-property_holder* engine_impl::blend_frame_property_holder()
+property_holder_base* engine_impl::blend_frame_property_holder()
 {
     CEnvironment& environment = g_pGamePersistent->Environment();
     if (!environment.CurrentEnv)
@@ -244,7 +244,7 @@ property_holder* engine_impl::blend_frame_property_holder()
     return (((editor::environment::weathers::time&)(*environment.CurrentEnv)).object());
 }
 
-property_holder* engine_impl::target_frame_property_holder()
+property_holder_base* engine_impl::target_frame_property_holder()
 {
     CEnvironment& environment = g_pGamePersistent->Environment();
     if (!environment.Current[1])

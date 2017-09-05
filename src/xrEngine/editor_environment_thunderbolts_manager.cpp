@@ -33,7 +33,7 @@ void property_collection<manager::thunderbolt_container_type, manager>::display_
 }
 
 template <>
-editor::property_holder* property_collection<manager::thunderbolt_container_type, manager>::create()
+editor::property_holder_base* property_collection<manager::thunderbolt_container_type, manager>::create()
 {
     thunderbolt* object = new thunderbolt(&m_holder, generate_unique_id("thunderbolt_unique_id_").c_str());
     object->fill(m_holder.environment(), this);
@@ -48,7 +48,7 @@ void property_collection<manager::collection_container_type, manager>::display_n
 }
 
 template <>
-editor::property_holder* property_collection<manager::collection_container_type, manager>::create()
+editor::property_holder_base* property_collection<manager::collection_container_type, manager>::create()
 {
     collection* object = new collection(m_holder, generate_unique_id("thunderbolt_collection_unique_id_").c_str());
     object->fill(this);
@@ -191,14 +191,14 @@ float manager::longitude_getter() const { return (rad2deg(m_environment.p_var_lo
 void manager::longitude_setter(float value) { m_environment.p_var_long = deg2rad(value); }
 float manager::tilt_getter() const { return (rad2deg(m_environment.p_tilt)); }
 void manager::tilt_setter(float value) { m_environment.p_tilt = deg2rad(value); }
-void manager::fill(editor::property_holder* holder)
+void manager::fill(editor::property_holder_base* holder)
 {
     VERIFY(holder);
 
-    typedef ::editor::property_holder::float_getter_type float_getter_type;
+    typedef ::editor::property_holder_base::float_getter_type float_getter_type;
     float_getter_type float_getter;
 
-    typedef ::editor::property_holder::float_setter_type float_setter_type;
+    typedef ::editor::property_holder_base::float_setter_type float_setter_type;
     float_setter_type float_setter;
 
     float_getter.bind(this, &manager::altitude_getter);

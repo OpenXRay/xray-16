@@ -12,12 +12,12 @@
 #ifdef INGAME_EDITOR
 
 #include "Common/Noncopyable.hpp"
-#include "Include/editor/property_holder.hpp"
+#include "Include/editor/property_holder_base.hpp"
 #include "thunderbolt.h"
 
 namespace editor
 {
-class property_holder;
+class property_holder_base;
 
 namespace environment
 {
@@ -33,7 +33,7 @@ public:
     void load(CInifile& config, shared_str const& section_id, LPCSTR prefix);
     void save(CInifile& config, shared_str const& section_id, LPCSTR prefix);
     void fill(
-        ::editor::environment::manager& environment, LPCSTR name, LPCSTR description, editor::property_holder& holder);
+        ::editor::environment::manager& environment, LPCSTR name, LPCSTR description, editor::property_holder_base& holder);
 
 private:
     LPCSTR xr_stdcall shader_getter() const;
@@ -43,7 +43,7 @@ private:
     void xr_stdcall texture_setter(LPCSTR value);
 
 private:
-    property_holder* m_property_holder;
+    property_holder_base* m_property_holder;
 }; // class gradient
 
 } // namespace thunderbolts

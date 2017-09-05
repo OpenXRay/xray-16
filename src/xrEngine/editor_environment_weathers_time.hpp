@@ -12,7 +12,8 @@
 #ifdef INGAME_EDITOR
 
 #include "Common/Noncopyable.hpp"
-#include "Include/editor/property_holder.hpp"
+#include "Include/editor/property_holder_base.hpp"
+#include "Include/editor/property_holder_base.hpp"
 #include "Environment.h"
 
 namespace editor
@@ -31,7 +32,7 @@ private:
     typedef CEnvDescriptorMixer inherited;
 
 public:
-    typedef editor::property_holder property_holder_type;
+    typedef editor::property_holder_base property_holder_type;
 
 public:
     time(editor::environment::manager* manager, weather const* weather, shared_str const& id);

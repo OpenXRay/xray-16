@@ -96,7 +96,7 @@ manager::manager()
         return;
 
     editor::ide& ide = *Device.editor();
-    editor::property_holder* holder = ide.create_property_holder();
+    editor::property_holder_base* holder = ide.create_property_holder();
     ide.active(holder);
 
     {
@@ -104,8 +104,8 @@ manager::manager()
     }
 
     {
-        editor::property_holder::integer_getter_type getter;
-        editor::property_holder::integer_setter_type setter;
+        editor::property_holder_base::integer_getter_type getter;
+        editor::property_holder_base::integer_setter_type setter;
 
         getter.bind(&s_test_property, &test_property::getter);
         setter.bind(&s_test_property, &test_property::setter);
@@ -113,8 +113,8 @@ manager::manager()
     }
 
     {
-        editor::property_holder::integer_getter_type getter;
-        editor::property_holder::integer_setter_type setter;
+        editor::property_holder_base::integer_getter_type getter;
+        editor::property_holder_base::integer_setter_type setter;
 
         getter.bind(&s_test_property_limited, &test_property::getter);
         setter.bind(&s_test_property_limited, &test_property::setter);
@@ -123,8 +123,8 @@ manager::manager()
     }
 
     {
-        editor::property_holder::integer_getter_type getter;
-        editor::property_holder::integer_setter_type setter;
+        editor::property_holder_base::integer_getter_type getter;
+        editor::property_holder_base::integer_setter_type setter;
 
         getter.bind(&s_test_property_values, &test_property::getter);
         setter.bind(&s_test_property_values, &test_property::setter);
@@ -133,8 +133,8 @@ manager::manager()
     }
 
     {
-        editor::property_holder::integer_getter_type getter;
-        editor::property_holder::integer_setter_type setter;
+        editor::property_holder_base::integer_getter_type getter;
+        editor::property_holder_base::integer_setter_type setter;
 
         getter.bind(&s_test_property_enum, &test_property::getter);
         setter.bind(&s_test_property_enum, &test_property::setter);
@@ -143,8 +143,8 @@ manager::manager()
     }
 
     {
-        editor::property_holder::string_getter_type getter;
-        editor::property_holder::string_setter_type setter;
+        editor::property_holder_base::string_getter_type getter;
+        editor::property_holder_base::string_setter_type setter;
 
         getter.bind(&s_test_property2, &test_property2::getter);
         setter.bind(&s_test_property2, &test_property2::setter);
@@ -154,8 +154,8 @@ manager::manager()
     }
 
     {
-        editor::property_holder::string_getter_type getter;
-        editor::property_holder::string_setter_type setter;
+        editor::property_holder_base::string_getter_type getter;
+        editor::property_holder_base::string_setter_type setter;
 
         getter.bind(&s_test_property3, &test_property2::getter);
         setter.bind(&s_test_property3, &test_property2::setter);
@@ -164,8 +164,8 @@ manager::manager()
     }
 
     {
-        editor::property_holder::boolean_getter_type getter;
-        editor::property_holder::boolean_setter_type setter;
+        editor::property_holder_base::boolean_getter_type getter;
+        editor::property_holder_base::boolean_setter_type setter;
 
         getter.bind(&s_test_property4, &test_property4::getter);
         setter.bind(&s_test_property4, &test_property4::setter);
@@ -173,8 +173,8 @@ manager::manager()
     }
 
     {
-        editor::property_holder::boolean_getter_type getter;
-        editor::property_holder::boolean_setter_type setter;
+        editor::property_holder_base::boolean_getter_type getter;
+        editor::property_holder_base::boolean_setter_type setter;
 
         getter.bind(&s_test_property5, &test_property4::getter);
         setter.bind(&s_test_property5, &test_property4::setter);
@@ -183,8 +183,8 @@ manager::manager()
     }
 
     {
-        editor::property_holder::color_getter_type getter;
-        editor::property_holder::color_setter_type setter;
+        editor::property_holder_base::color_getter_type getter;
+        editor::property_holder_base::color_setter_type setter;
 
         getter.bind(&s_test_property6, &test_property6::getter);
         setter.bind(&s_test_property6, &test_property6::setter);
@@ -192,8 +192,8 @@ manager::manager()
     }
 
     {
-        editor::property_holder::float_getter_type getter;
-        editor::property_holder::float_setter_type setter;
+        editor::property_holder_base::float_getter_type getter;
+        editor::property_holder_base::float_setter_type setter;
 
         getter.bind(&s_test_property7_limited, &test_property7::getter);
         setter.bind(&s_test_property7_limited, &test_property7::setter);
@@ -201,8 +201,8 @@ manager::manager()
     }
 
     {
-        editor::property_holder::float_getter_type getter;
-        editor::property_holder::float_setter_type setter;
+        editor::property_holder_base::float_getter_type getter;
+        editor::property_holder_base::float_setter_type setter;
 
         getter.bind(&s_test_property7, &test_property7::getter);
         setter.bind(&s_test_property7, &test_property7::setter);
@@ -211,8 +211,8 @@ manager::manager()
     }
 
     {
-        editor::property_holder::float_getter_type getter;
-        editor::property_holder::float_setter_type setter;
+        editor::property_holder_base::float_getter_type getter;
+        editor::property_holder_base::float_setter_type setter;
 
         getter.bind(&s_test_property7_values_enum, &test_property7::getter);
         setter.bind(&s_test_property7_values_enum, &test_property7::setter);

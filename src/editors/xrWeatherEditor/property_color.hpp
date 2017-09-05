@@ -15,8 +15,8 @@ public
 ref class property_color : public property_color_base
 {
 public:
-    typedef editor::property_holder::color_getter_type color_getter_type;
-    typedef editor::property_holder::color_setter_type color_setter_type;
+    typedef editor::property_holder_base::color_getter_type color_getter_type;
+    typedef editor::property_holder_base::color_setter_type color_setter_type;
     typedef property_color_base inherited;
 
 public:

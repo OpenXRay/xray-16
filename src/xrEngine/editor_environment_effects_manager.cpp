@@ -2,7 +2,7 @@
 
 #ifdef INGAME_EDITOR
 #include "editor_environment_effects_manager.hpp"
-#include "Include/editor/property_holder.hpp"
+#include "Include/editor/property_holder_base.hpp"
 #include "property_collection.hpp"
 #include "editor_environment_effects_effect.hpp"
 #include "editor_environment_detail.hpp"
@@ -19,7 +19,7 @@ void property_collection<manager::effect_container_type, manager>::display_name(
 }
 
 template <>
-editor::property_holder* property_collection<manager::effect_container_type, manager>::create()
+editor::property_holder_base* property_collection<manager::effect_container_type, manager>::create()
 {
     effect* object = new effect(m_holder, generate_unique_id("effect_unique_id_").c_str());
     object->fill(this);
@@ -76,7 +76,7 @@ void manager::save()
     xr_delete(config);
 }
 
-void manager::fill(editor::property_holder* holder)
+void manager::fill(editor::property_holder_base* holder)
 {
     VERIFY(holder);
     holder->add_property("effects", "ambients", "this option is resposible for effects", m_collection);

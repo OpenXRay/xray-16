@@ -44,9 +44,9 @@ private:
     virtual void track_weather(float const& time);
     virtual float track_weather();
 
-    virtual editor::property_holder* current_frame_property_holder();
-    virtual editor::property_holder* blend_frame_property_holder();
-    virtual editor::property_holder* target_frame_property_holder();
+    virtual editor::property_holder_base* current_frame_property_holder();
+    virtual editor::property_holder_base* blend_frame_property_holder();
+    virtual editor::property_holder_base* target_frame_property_holder();
 
     virtual void save_weathers();
 

@@ -55,13 +55,13 @@ void ide_impl::on_load_finished()
 }
 
 void ide_impl::pause() { m_window->view().pause(); }
-editor::property_holder* ide_impl::create_property_holder(
+editor::property_holder_base* ide_impl::create_property_holder(
     LPCSTR display_name, editor::property_holder_collection* collection, editor::property_holder_holder* holder)
 {
     return (new ::property_holder(m_engine, display_name, collection, holder));
 }
 
-void ide_impl::destroy(editor::property_holder*& property_holder)
+void ide_impl::destroy(editor::property_holder_base*& property_holder)
 {
     delete (property_holder);
     property_holder = 0;

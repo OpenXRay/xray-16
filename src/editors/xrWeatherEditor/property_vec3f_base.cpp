@@ -30,8 +30,8 @@ property_vec3f_base::property_vec3f_base(editor::vec3f const % vec3f)
     m_container = gcnew property_container(nullptr, this);
     m_components = new vec3f_components(this);
 
-    typedef editor::property_holder::float_getter_type float_getter_type;
-    typedef editor::property_holder::float_setter_type float_setter_type;
+    typedef editor::property_holder_base::float_getter_type float_getter_type;
+    typedef editor::property_holder_base::float_setter_type float_setter_type;
 
     float_getter_type getter;
     float_setter_type setter;

@@ -11,7 +11,7 @@
 
 namespace editor
 {
-class property_holder;
+class property_holder_base;
 class property_holder_collection;
 class property_holder_holder;
 
@@ -25,11 +25,11 @@ public:
     virtual void pause() = 0;
 
 public:
-    virtual property_holder* create_property_holder(
+    virtual property_holder_base* create_property_holder(
         LPCSTR display_name, property_holder_collection* collection = 0, property_holder_holder* holder = 0) = 0;
-    virtual void destroy(property_holder*& property_holder) = 0;
-    virtual void environment_levels(property_holder* property_holder) = 0;
-    virtual void environment_weathers(property_holder* property_holder) = 0;
+    virtual void destroy(property_holder_base*& property_holder) = 0;
+    virtual void environment_levels(property_holder_base* property_holder) = 0;
+    virtual void environment_weathers(property_holder_base* property_holder) = 0;
 
 public:
     typedef fastdelegate::FastDelegate0<LPCSTR const*> weathers_getter_type;

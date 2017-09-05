@@ -12,7 +12,7 @@
 #include "editor_environment_suns_manager.hpp"
 #include "editor_environment_suns_sun.hpp"
 #include "Include/editor/ide.hpp"
-#include "Include/editor/property_holder.hpp"
+#include "Include/editor/property_holder_base.hpp"
 #include "Common/object_broker.h"
 #include "ide.hpp"
 #include "property_collection.hpp"
@@ -30,7 +30,7 @@ void property_collection<manager::container_type, manager>::display_name(
 }
 
 template <>
-editor::property_holder* property_collection<manager::container_type, manager>::create()
+editor::property_holder_base* property_collection<manager::container_type, manager>::create()
 {
     sun* object = new sun(m_holder, generate_unique_id("sun_unique_id_").c_str());
     object->fill(this);
@@ -100,7 +100,7 @@ void manager::add(CInifile& config, shared_str const& section)
     m_suns.push_back(object);
 }
 
-void manager::fill(editor::property_holder* holder)
+void manager::fill(editor::property_holder_base* holder)
 {
     VERIFY(holder);
     holder->add_property("suns", "suns", "this option is resposible for sound channels", m_collection);

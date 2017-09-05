@@ -16,8 +16,8 @@ public
 ref class property_boolean : public IProperty
 {
 public:
-    typedef editor::property_holder::boolean_getter_type boolean_getter_type;
-    typedef editor::property_holder::boolean_setter_type boolean_setter_type;
+    typedef editor::property_holder_base::boolean_getter_type boolean_getter_type;
+    typedef editor::property_holder_base::boolean_setter_type boolean_setter_type;
 
 public:
     property_boolean(boolean_getter_type const& getter, boolean_setter_type const& setter);

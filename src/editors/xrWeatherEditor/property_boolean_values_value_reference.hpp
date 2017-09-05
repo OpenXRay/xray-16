@@ -15,8 +15,8 @@ public
 ref class property_boolean_values_value_reference : public property_boolean_reference
 {
 public:
-    typedef editor::property_holder::boolean_getter_type boolean_getter_type;
-    typedef editor::property_holder::boolean_setter_type boolean_setter_type;
+    typedef editor::property_holder_base::boolean_getter_type boolean_getter_type;
+    typedef editor::property_holder_base::boolean_setter_type boolean_setter_type;
 
 private:
     typedef property_boolean_reference inherited;

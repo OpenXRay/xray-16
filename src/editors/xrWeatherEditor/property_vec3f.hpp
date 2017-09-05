@@ -15,8 +15,8 @@ public
 ref class property_vec3f : public property_vec3f_base
 {
 public:
-    typedef editor::property_holder::vec3f_getter_type vec3f_getter_type;
-    typedef editor::property_holder::vec3f_setter_type vec3f_setter_type;
+    typedef editor::property_holder_base::vec3f_getter_type vec3f_getter_type;
+    typedef editor::property_holder_base::vec3f_setter_type vec3f_setter_type;
     typedef property_vec3f_base inherited;
 
 public:

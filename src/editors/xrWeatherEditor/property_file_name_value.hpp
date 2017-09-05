@@ -19,8 +19,8 @@ private:
     typedef property_string inherited;
 
 public:
-    typedef editor::property_holder::string_getter_type string_getter_type;
-    typedef editor::property_holder::string_setter_type string_setter_type;
+    typedef editor::property_holder_base::string_getter_type string_getter_type;
+    typedef editor::property_holder_base::string_setter_type string_setter_type;
 
 public:
     property_file_name_value(string_getter_type const& getter, string_setter_type const& setter,

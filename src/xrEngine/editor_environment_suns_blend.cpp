@@ -10,7 +10,7 @@
 
 #ifdef INGAME_EDITOR
 #include "editor_environment_suns_blend.hpp"
-#include "Include/editor/property_holder.hpp"
+#include "Include/editor/property_holder_base.hpp"
 
 using editor::environment::suns::blend;
 using editor::environment::suns::manager;
@@ -24,9 +24,9 @@ void blend::load(CInifile& config, shared_str const& section)
 }
 
 void blend::fill(
-    manager const& manager, editor::property_holder* holder, editor::property_holder_collection* collection)
+    manager const& manager, editor::property_holder_base* holder, editor::property_holder_collection* collection)
 {
-    editor::property_holder* properties = holder;
+    editor::property_holder_base* properties = holder;
     VERIFY(properties);
 
     properties->add_property(

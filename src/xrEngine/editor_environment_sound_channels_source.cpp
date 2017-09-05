@@ -31,7 +31,7 @@ void source::fill(editor::property_holder_collection* collection)
 
     m_property_holder->add_property("sound", "properties", "this option is resposible for sound", m_source.c_str(),
         m_source, ".ogg", "Sound files (*.ogg)|*.ogg", detail::real_path("$game_sounds$", "").c_str(),
-        "Select sound...", editor::property_holder::cannot_enter_text, editor::property_holder::remove_extension);
+        "Select sound...", editor::property_holder_base::cannot_enter_text, editor::property_holder_base::remove_extension);
 }
 
 source::property_holder_type* source::object() { return (m_property_holder); }

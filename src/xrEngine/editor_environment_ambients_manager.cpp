@@ -28,7 +28,7 @@ void property_collection<manager::ambient_container_type, manager>::display_name
 }
 
 template <>
-editor::property_holder* property_collection<manager::ambient_container_type, manager>::create()
+editor::property_holder_base* property_collection<manager::ambient_container_type, manager>::create()
 {
     ambient* object = new ambient(m_holder, generate_unique_id("ambient_unique_id_").c_str());
     object->fill(this);
@@ -86,7 +86,7 @@ void manager::save()
     xr_delete(config);
 }
 
-void manager::fill(editor::property_holder* holder)
+void manager::fill(editor::property_holder_base* holder)
 {
     VERIFY(holder);
     holder->add_property("ambients", "ambients", "this option is resposible for ambients", m_collection);

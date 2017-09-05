@@ -19,7 +19,7 @@ struct SThunderboltCollection;
 
 namespace editor
 {
-class property_holder;
+class property_holder_base;
 
 namespace environment
 {
@@ -38,7 +38,7 @@ public:
     ~manager();
     void load();
     void save();
-    void fill(editor::property_holder* holder);
+    void fill(editor::property_holder_base* holder);
     SThunderboltDesc* description(CInifile& config, shared_str const& section) const;
     SThunderboltCollection* get_collection(shared_str const& section);
 
@@ -64,7 +64,7 @@ private:
     void save_collections();
 
 private:
-    typedef editor::property_holder property_holder_type;
+    typedef editor::property_holder_base property_holder_type;
     typedef property_collection<thunderbolt_container_type, manager> thunderbolt_collection_type;
     typedef property_collection<collection_container_type, manager> collection_collection_type;
 

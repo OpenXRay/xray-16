@@ -59,7 +59,7 @@ void gradient::texture_setter(LPCSTR value)
 }
 
 void gradient::fill(
-    ::editor::environment::manager& environment, LPCSTR name, LPCSTR description, ::editor::property_holder& holder)
+    ::editor::environment::manager& environment, LPCSTR name, LPCSTR description, ::editor::property_holder_base& holder)
 {
     VERIFY(!m_property_holder);
     m_property_holder = ::ide().create_property_holder(name);
@@ -73,24 +73,24 @@ void gradient::fill(
     m_property_holder->add_property("maximum _radius", "properties",
         "this option is resposible for thunderbolt gradient maximum radius", fRadius.y, fRadius.y);
 
-    typedef ::editor::property_holder::string_getter_type string_getter_type;
+    typedef ::editor::property_holder_base::string_getter_type string_getter_type;
     string_getter_type string_getter;
     string_getter.bind(this, &gradient::shader_getter);
 
-    typedef ::editor::property_holder::string_setter_type string_setter_type;
+    typedef ::editor::property_holder_base::string_setter_type string_setter_type;
     string_setter_type string_setter;
     string_setter.bind(this, &gradient::shader_setter);
 
     m_property_holder->add_property("shader", "properties", "this option is resposible for thunderbolt gradient shader",
         shader.c_str(), string_getter, string_setter, &*environment.shader_ids().begin(),
-        environment.shader_ids().size(), editor::property_holder::value_editor_tree_view,
-        editor::property_holder::cannot_enter_text);
+        environment.shader_ids().size(), editor::property_holder_base::value_editor_tree_view,
+        editor::property_holder_base::cannot_enter_text);
 
     string_getter.bind(this, &gradient::texture_getter);
     string_setter.bind(this, &gradient::texture_setter);
     m_property_holder->add_property("texture", "", "this option is resposible for thunderbolt gradient texture",
         texture.c_str(), texture, ".dds", "Texture files (*.dds)|*.dds",
         detail::real_path("$game_textures$", "").c_str(), "Select texture...",
-        editor::property_holder::cannot_enter_text, editor::property_holder::remove_extension);
+        editor::property_holder_base::cannot_enter_text, editor::property_holder_base::remove_extension);
 }
 #endif // #ifdef INGAME_EDITOR

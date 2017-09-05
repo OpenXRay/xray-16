@@ -79,11 +79,11 @@ void thunderbolt::fill(::editor::environment::manager& environment, ::editor::pr
     VERIFY(!m_property_holder);
     m_property_holder = ::ide().create_property_holder(m_id.c_str(), collection, this);
 
-    typedef editor::property_holder::string_getter_type string_getter_type;
+    typedef editor::property_holder_base::string_getter_type string_getter_type;
     string_getter_type string_getter;
     string_getter.bind(this, &thunderbolt::id_getter);
 
-    typedef editor::property_holder::string_setter_type string_setter_type;
+    typedef editor::property_holder_base::string_setter_type string_setter_type;
     string_setter_type string_setter;
     string_setter.bind(this, &thunderbolt::id_setter);
 
@@ -92,14 +92,14 @@ void thunderbolt::fill(::editor::environment::manager& environment, ::editor::pr
     m_property_holder->add_property("color animator", "properties",
         "this option is resposible for thunderbolt color animator", m_color_animator.c_str(), m_color_animator,
         &*environment.light_animator_ids().begin(), environment.light_animator_ids().size(),
-        editor::property_holder::value_editor_tree_view, editor::property_holder::cannot_enter_text);
+        editor::property_holder_base::value_editor_tree_view, editor::property_holder_base::cannot_enter_text);
     m_property_holder->add_property("lighting model", "properties",
         "this option is resposible for thunderbolt lighting model", m_lighting_model.c_str(), m_lighting_model, ".dm",
         "Lighting model files (*.dm)|*.dm", detail::real_path("$game_meshes$", "").c_str(), "Select lighting model...",
-        editor::property_holder::cannot_enter_text, editor::property_holder::keep_extension);
+        editor::property_holder_base::cannot_enter_text, editor::property_holder_base::keep_extension);
     m_property_holder->add_property("sound", "properties", "this option is resposible for thunderbolt sound",
         m_sound.c_str(), m_sound, ".ogg", "Sound files (*.ogg)|*.ogg", detail::real_path("$game_sounds$", "").c_str(),
-        "Select sound...", editor::property_holder::cannot_enter_text, editor::property_holder::remove_extension);
+        "Select sound...", editor::property_holder_base::cannot_enter_text, editor::property_holder_base::remove_extension);
 
     m_center->fill(
         environment, "center", "this option is resposible for thunderbolt gradient center", *m_property_holder);

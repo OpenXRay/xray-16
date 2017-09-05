@@ -9,7 +9,7 @@
 #ifndef PROPERTY_COLLECTION_HPP_INCLUDED
 #define PROPERTY_COLLECTION_HPP_INCLUDED
 
-#include "Include/editor/property_holder.hpp"
+#include "Include/editor/property_holder_base.hpp"
 #include "Common/Noncopyable.hpp"
 #include "Common/object_broker.h"
 
@@ -17,7 +17,7 @@ template <typename container_type, typename holder_type>
 class property_collection : public editor::property_holder_collection, private Noncopyable
 {
 public:
-    typedef editor::property_holder property_holder;
+    typedef editor::property_holder_base property_holder;
 
 public:
     inline property_collection(container_type* container, holder_type* holder, bool* changed = 0);

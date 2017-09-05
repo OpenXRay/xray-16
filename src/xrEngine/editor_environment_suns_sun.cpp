@@ -19,7 +19,7 @@
 using editor::environment::suns::sun;
 using editor::environment::suns::flare;
 using editor::environment::suns::manager;
-using editor::property_holder;
+using editor::property_holder_base;
 
 sun::sun(manager const& manager, shared_str const& id)
     : m_manager(manager), m_id(id), m_use(false), m_ignore_color(false), m_radius(0.f), m_shader(""), m_texture(""),
@@ -67,14 +67,14 @@ void sun::fill(editor::property_holder_collection* collection)
 {
     VERIFY(!m_property_holder);
     m_property_holder = ::ide().create_property_holder(m_id.c_str(), collection, this);
-    editor::property_holder* properties = m_property_holder;
+    editor::property_holder_base* properties = m_property_holder;
     VERIFY(properties);
 
-    typedef editor::property_holder::string_getter_type string_getter_type;
+    typedef editor::property_holder_base::string_getter_type string_getter_type;
     string_getter_type string_getter;
     string_getter.bind(this, &sun::id_getter);
 
-    typedef editor::property_holder::string_setter_type string_setter_type;
+    typedef editor::property_holder_base::string_setter_type string_setter_type;
     string_setter_type string_setter;
     string_setter.bind(this, &sun::id_setter);
 
@@ -86,11 +86,11 @@ void sun::fill(editor::property_holder_collection* collection)
     properties->add_property("radius", "sun", "this option is resposible for sun radius", m_radius, m_radius);
     properties->add_property("shader", "sun", "this option is resposible for sun shader", m_shader.c_str(), m_shader,
         &*m_manager.m_environment.shader_ids().begin(), m_manager.m_environment.shader_ids().size(),
-        editor::property_holder::value_editor_tree_view, editor::property_holder::cannot_enter_text);
+        editor::property_holder_base::value_editor_tree_view, editor::property_holder_base::cannot_enter_text);
     properties->add_property("texture", "sun", "this option is resposible for sun texture", m_texture.c_str(),
         m_texture, ".dds", "Texture files (*.dds)|*.dds", detail::real_path("$game_textures$", "").c_str(),
-        "Select texture...", editor::property_holder::cannot_enter_text, editor::property_holder::remove_extension);
+        "Select texture...", editor::property_holder_base::cannot_enter_text, editor::property_holder_base::remove_extension);
 }
 
-property_holder* sun::object() { return (m_property_holder); }
+property_holder_base* sun::object() { return (m_property_holder); }
 #endif // #ifdef INGAME_EDITOR

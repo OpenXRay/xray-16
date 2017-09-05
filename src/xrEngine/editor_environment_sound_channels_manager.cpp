@@ -26,7 +26,7 @@ void property_collection<manager::channel_container_type, manager>::display_name
 }
 
 template <>
-editor::property_holder* property_collection<manager::channel_container_type, manager>::create()
+editor::property_holder_base* property_collection<manager::channel_container_type, manager>::create()
 {
     channel* object = new channel(m_holder, generate_unique_id("sound_channel_unique_id_").c_str());
     object->fill(this);
@@ -83,7 +83,7 @@ void manager::save()
     xr_delete(config);
 }
 
-void manager::fill(editor::property_holder* holder)
+void manager::fill(editor::property_holder_base* holder)
 {
     VERIFY(holder);
     holder->add_property("sound channels", "ambients", "this option is resposible for sound channels", m_collection);

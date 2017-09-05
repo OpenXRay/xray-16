@@ -245,11 +245,11 @@ void time::fill(editor::property_holder_collection* collection)
     VERIFY(!m_property_holder);
     m_property_holder = ::ide().create_property_holder(m_identifier.c_str(), collection, this);
 
-    typedef editor::property_holder::string_getter_type string_getter_type;
+    typedef editor::property_holder_base::string_getter_type string_getter_type;
     string_getter_type string_getter;
     string_getter.bind(this, &time::id_getter);
 
-    typedef editor::property_holder::string_setter_type string_setter_type;
+    typedef editor::property_holder_base::string_setter_type string_setter_type;
     string_setter_type string_setter;
     string_setter.bind(this, &time::id_setter);
 
@@ -261,11 +261,11 @@ void time::fill(editor::property_holder_collection* collection)
     m_property_holder->add_property("shafts intensity", "sun", "this option is resposible for sun shafts intensity",
         m_fSunShaftsIntensity, m_fSunShaftsIntensity, 0.f, 1.f);
 
-    typedef editor::property_holder::float_getter_type float_getter_type;
+    typedef editor::property_holder_base::float_getter_type float_getter_type;
     float_getter_type sun_altitude_getter;
     sun_altitude_getter.bind(this, &time::sun_altitude_getter);
 
-    typedef editor::property_holder::float_setter_type float_setter_type;
+    typedef editor::property_holder_base::float_setter_type float_setter_type;
     float_setter_type sun_altitude_setter;
     sun_altitude_setter.bind(this, &time::sun_altitude_setter);
 
@@ -281,17 +281,17 @@ void time::fill(editor::property_holder_collection* collection)
     m_property_holder->add_property("longitude", "sun", "this option is resposible for sun longitude (in degrees)",
         sun_longitude_getter(), sun_longitude_getter, sun_longitude_setter, -360.f, 360.f);
 
-    typedef editor::property_holder::string_collection_getter_type collection_getter_type;
+    typedef editor::property_holder_base::string_collection_getter_type collection_getter_type;
     collection_getter_type collection_getter;
 
-    typedef editor::property_holder::string_collection_size_getter_type collection_size_getter_type;
+    typedef editor::property_holder_base::string_collection_size_getter_type collection_size_getter_type;
     collection_size_getter_type collection_size_getter;
 
     collection_getter.bind(this, &time::suns_collection);
     collection_size_getter.bind(this, &time::suns_collection_size);
     m_property_holder->add_property("sun", "sun", "this option is resposible for ambient", m_sun.c_str(), m_sun,
-        collection_getter, collection_size_getter, editor::property_holder::value_editor_combo_box,
-        editor::property_holder::cannot_enter_text);
+        collection_getter, collection_size_getter, editor::property_holder_base::value_editor_combo_box,
+        editor::property_holder_base::cannot_enter_text);
 
     string_getter_type sky_texture_getter;
     sky_texture_getter.bind(this, &time::sky_texture_getter);
@@ -302,7 +302,7 @@ void time::fill(editor::property_holder_collection* collection)
     m_property_holder->add_property("texture", "hemisphere", "this option is resposible for sky texture",
         sky_texture_name.c_str(), sky_texture_getter, sky_texture_setter, ".dds", "Texture files (*.dds)|*.dds",
         detail::real_path("$game_textures$", "").c_str(), "Select texture...",
-        editor::property_holder::cannot_enter_text, editor::property_holder::remove_extension);
+        editor::property_holder_base::cannot_enter_text, editor::property_holder_base::remove_extension);
 
     m_property_holder->add_property("sky color", "hemisphere", "this option is resposible for sky color",
         (editor::color const&)sky_color, (editor::color&)sky_color);
@@ -310,10 +310,10 @@ void time::fill(editor::property_holder_collection* collection)
     m_property_holder->add_property("hemi color", "hemisphere", "this option is resposible for hemisphere color",
         (editor::color const&)hemi_color, (editor::color&)hemi_color);
 
-    typedef ::editor::property_holder::float_getter_type float_getter_type;
+    typedef ::editor::property_holder_base::float_getter_type float_getter_type;
     float_getter_type float_getter;
 
-    typedef ::editor::property_holder::float_setter_type float_setter_type;
+    typedef ::editor::property_holder_base::float_setter_type float_setter_type;
     float_setter_type float_setter;
 
     float_getter.bind(this, &time::sky_rotation_getter);
@@ -326,7 +326,7 @@ void time::fill(editor::property_holder_collection* collection)
     m_property_holder->add_property("texture", "clouds", "this option is resposible for clouds texture",
         clouds_texture_name.c_str(), string_getter, string_setter, ".dds", "Texture files (*.dds)|*.dds",
         detail::real_path("$game_textures$", "").c_str(), "Select texture...",
-        editor::property_holder::cannot_enter_text, editor::property_holder::remove_extension);
+        editor::property_holder_base::cannot_enter_text, editor::property_holder_base::remove_extension);
 
     m_property_holder->add_property("color", "clouds", "this option is resposible for clouds color",
         (editor::color const&)clouds_color, (editor::color&)clouds_color);
@@ -344,7 +344,7 @@ void time::fill(editor::property_holder_collection* collection)
     string_setter.bind(this, &time::ambient_setter);
     m_property_holder->add_property("ambient", "ambient", "this option is resposible for ambient", m_ambient.c_str(),
         string_getter, string_setter, collection_getter, collection_size_getter,
-        editor::property_holder::value_editor_combo_box, editor::property_holder::cannot_enter_text);
+        editor::property_holder_base::value_editor_combo_box, editor::property_holder_base::cannot_enter_text);
 
     m_property_holder->add_property("color", "fog", "this option is resposible for fog density (0..1)",
         (editor::color const&)fog_color, (editor::color&)fog_color);
@@ -366,7 +366,7 @@ void time::fill(editor::property_holder_collection* collection)
     collection_size_getter.bind(this, &time::thunderbolts_collection_size);
     m_property_holder->add_property("collection", "thunderbolts", "this option is resposible for ambient",
         m_thunderbolt_collection.c_str(), m_thunderbolt_collection, collection_getter, collection_size_getter,
-        editor::property_holder::value_editor_combo_box, editor::property_holder::cannot_enter_text);
+        editor::property_holder_base::value_editor_combo_box, editor::property_holder_base::cannot_enter_text);
 
     m_property_holder->add_property(
         "duration", "thunderbolts", "this option is resposible for thunderbolt duration", bolt_duration, bolt_duration);

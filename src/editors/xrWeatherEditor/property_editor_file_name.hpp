@@ -23,8 +23,8 @@ public
 ref class property_editor_file_name : public System::Drawing::Design::UITypeEditor
 {
 public:
-    typedef editor::property_holder::string_getter_type string_getter_type;
-    typedef editor::property_holder::string_setter_type string_setter_type;
+    typedef editor::property_holder_base::string_getter_type string_getter_type;
+    typedef editor::property_holder_base::string_setter_type string_setter_type;
 
 private:
     typedef System::Drawing::Design::UITypeEditor inherited;

@@ -20,7 +20,7 @@ class engine;
 class property_holder_collection;
 } // namespace editor
 
-class property_holder : public editor::property_holder
+class property_holder : public editor::property_holder_base
 {
 public:
     property_holder(editor::engine* engine, LPCSTR display_name, editor::property_holder_collection* collection,
@@ -185,7 +185,7 @@ public:
         notify_parent_on_change_enum const& notify_parent, password_char_enum const& password,
         refresh_grid_on_change_enum const& refresh_grid);
     virtual editor::property_value* add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
-        editor::property_holder* value, readonly_enum const& read_only,
+        editor::property_holder_base* value, readonly_enum const& read_only,
         notify_parent_on_change_enum const& notify_parent, password_char_enum const& password,
         refresh_grid_on_change_enum const& refresh_grid);
     virtual editor::property_value* add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,

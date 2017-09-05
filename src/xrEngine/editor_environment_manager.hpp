@@ -15,7 +15,7 @@
 
 namespace editor
 {
-class property_holder;
+class property_holder_base;
 
 namespace environment
 {
@@ -84,7 +84,7 @@ public:
     light_animator_ids_type const& light_animator_ids() const;
 
 public:
-    typedef editor::property_holder property_holder_type;
+    typedef editor::property_holder_base property_holder_type;
     typedef editor::environment::suns::manager suns_manager_type;
     typedef editor::environment::levels::manager levels_manager_type;
     typedef editor::environment::effects::manager effects_manager_type;

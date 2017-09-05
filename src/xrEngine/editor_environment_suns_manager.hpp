@@ -18,7 +18,7 @@ class CLensFlareDescriptor;
 
 namespace editor
 {
-class property_holder;
+class property_holder_base;
 
 namespace environment
 {
@@ -35,7 +35,7 @@ public:
     ~manager();
     void load();
     void save();
-    void fill(editor::property_holder* holder);
+    void fill(editor::property_holder_base* holder);
     shared_str unique_id(shared_str const& id) const;
     CLensFlareDescriptor* get_flare(shared_str const& id) const;
 

@@ -361,7 +361,7 @@
     <ClInclude Include="..\..\Include\editor\engine.hpp" />
     <ClInclude Include="..\..\Include\editor\ide.hpp" />
     <ClInclude Include="..\..\Include\editor\interfaces.hpp" />
-    <ClInclude Include="..\..\Include\editor\property_holder.hpp" />
+    <ClInclude Include="..\..\Include\editor\property_holder_base.hpp" />
     <ClInclude Include="engine_include.hpp" />
     <ClInclude Include="ide_impl.hpp" />
     <ClInclude Include="pch.hpp" />

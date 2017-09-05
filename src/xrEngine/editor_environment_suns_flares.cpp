@@ -10,7 +10,7 @@
 
 #ifdef INGAME_EDITOR
 #include "editor_environment_suns_flares.hpp"
-#include "Include/editor/property_holder.hpp"
+#include "Include/editor/property_holder_base.hpp"
 #include "property_collection.hpp"
 #include "editor_environment_suns_flare.hpp"
 #include "editor_environment_suns_manager.hpp"
@@ -29,7 +29,7 @@ void property_collection<flares::flares_type, flares>::display_name(
 }
 
 template <>
-editor::property_holder* property_collection<flares::flares_type, flares>::create()
+editor::property_holder_base* property_collection<flares::flares_type, flares>::create()
 {
     flare* object = new flare();
     object->fill(this);
@@ -91,15 +91,15 @@ void flares::load(CInifile& config, shared_str const& section)
 }
 
 void flares::fill(
-    manager const& manager, editor::property_holder* holder, editor::property_holder_collection* collection)
+    manager const& manager, editor::property_holder_base* holder, editor::property_holder_collection* collection)
 {
-    editor::property_holder* properties = holder;
+    editor::property_holder_base* properties = holder;
     VERIFY(properties);
 
     properties->add_property("use", "flares", "this option is resposible for the flares usage", m_use, m_use);
     properties->add_property("shader", "flares", "this option is resposible for flares shader", m_shader.c_str(),
         m_shader, &*manager.m_environment.shader_ids().begin(), manager.m_environment.shader_ids().size(),
-        editor::property_holder::value_editor_tree_view, editor::property_holder::cannot_enter_text);
+        editor::property_holder_base::value_editor_tree_view, editor::property_holder_base::cannot_enter_text);
     properties->add_property("flares", "flares", "this option is resposible for flares", m_collection);
 }
 

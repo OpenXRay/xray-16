@@ -12,12 +12,12 @@
 #ifdef INGAME_EDITOR
 
 #include "Common/Noncopyable.hpp"
-#include "Include/editor/property_holder.hpp"
+#include "Include/editor/property_holder_base.hpp"
 #include "xr_efflensflare.h"
 
 namespace editor
 {
-class property_holder;
+class property_holder_base;
 class property_holder_collection;
 
 namespace environment
@@ -42,14 +42,14 @@ private:
 
 public:
     inline shared_str const& id() const { return m_id; }
-    virtual property_holder* object();
+    virtual property_holder_base* object();
 
 private:
     shared_str m_id;
     shared_str m_shader;
     shared_str m_texture;
     manager const& m_manager;
-    editor::property_holder* m_property_holder;
+    editor::property_holder_base* m_property_holder;
     float m_radius;
     bool m_use;
     bool m_ignore_color;

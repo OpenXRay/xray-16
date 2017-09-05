@@ -11,7 +11,7 @@
 #ifdef INGAME_EDITOR
 
 #include "editor_environment_effects_effect.hpp"
-#include "Include/editor/property_holder.hpp"
+#include "Include/editor/property_holder_base.hpp"
 #include "editor_environment_manager.hpp"
 #include "ide.hpp"
 #include "editor_environment_effects_manager.hpp"
@@ -87,11 +87,11 @@ void effect::fill(editor::property_holder_collection* collection)
     VERIFY(!m_property_holder);
     m_property_holder = ::ide().create_property_holder(m_id.c_str(), collection, this);
 
-    typedef editor::property_holder::string_getter_type string_getter_type;
+    typedef editor::property_holder_base::string_getter_type string_getter_type;
     string_getter_type string_getter;
     string_getter.bind(this, &effect::id_getter);
 
-    typedef editor::property_holder::string_setter_type string_setter_type;
+    typedef editor::property_holder_base::string_setter_type string_setter_type;
     string_setter_type string_setter;
     string_setter.bind(this, &effect::id_setter);
 
@@ -103,15 +103,15 @@ void effect::fill(editor::property_holder_collection* collection)
         (vec3f const&)offset, (vec3f&)offset);
     m_property_holder->add_property("particles", "properties", "this option is resposible for effect particles",
         particles.c_str(), particles, &*m_manager.environment().particle_ids().begin(),
-        m_manager.environment().particle_ids().size(), editor::property_holder::value_editor_tree_view,
-        editor::property_holder::cannot_enter_text);
+        m_manager.environment().particle_ids().size(), editor::property_holder_base::value_editor_tree_view,
+        editor::property_holder_base::cannot_enter_text);
 
     string_getter.bind(this, &effect::sound_getter);
     string_setter.bind(this, &effect::sound_setter);
     m_property_holder->add_property("sound", "properties", "this option is resposible for effect sound",
         m_sound.c_str(), string_getter, string_setter, ".ogg", "Sound files (*.ogg)|*.ogg",
-        detail::real_path("$game_sounds$", "").c_str(), "Select sound...", editor::property_holder::cannot_enter_text,
-        editor::property_holder::remove_extension);
+        detail::real_path("$game_sounds$", "").c_str(), "Select sound...", editor::property_holder_base::cannot_enter_text,
+        editor::property_holder_base::remove_extension);
     m_property_holder->add_property("wind gust factor", "properties",
         "this option is resposible for effect wind gust factor", wind_gust_factor, wind_gust_factor);
     m_property_holder->add_property("wind blast strength", "properties",
@@ -123,10 +123,10 @@ void effect::fill(editor::property_holder_collection* collection)
         "this option is resposible for effect wind blast stop time", wind_blast_out_time, wind_blast_out_time, 0.f,
         1000.f);
 
-    typedef ::editor::property_holder::float_getter_type float_getter_type;
+    typedef ::editor::property_holder_base::float_getter_type float_getter_type;
     float_getter_type float_getter;
 
-    typedef ::editor::property_holder::float_setter_type float_setter_type;
+    typedef ::editor::property_holder_base::float_setter_type float_setter_type;
     float_setter_type float_setter;
 
     float_getter.bind(this, &effect::wind_blast_longitude_getter);
@@ -136,5 +136,5 @@ void effect::fill(editor::property_holder_collection* collection)
         360.f);
 }
 
-editor::property_holder* effect::object() { return (m_property_holder); }
+editor::property_holder_base* effect::object() { return (m_property_holder); }
 #endif // #ifdef INGAME_EDITOR

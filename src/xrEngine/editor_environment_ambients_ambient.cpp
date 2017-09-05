@@ -33,7 +33,7 @@ void property_collection<ambient::effect_container_type, ambient>::display_name(
 }
 
 template <>
-editor::property_holder* property_collection<ambient::effect_container_type, ambient>::create()
+editor::property_holder_base* property_collection<ambient::effect_container_type, ambient>::create()
 {
     effect_id* object = new effect_id(m_holder.effects_manager(), "");
     object->fill(this);
@@ -48,7 +48,7 @@ void property_collection<ambient::sound_container_type, ambient>::display_name(
 }
 
 template <>
-editor::property_holder* property_collection<ambient::sound_container_type, ambient>::create()
+editor::property_holder_base* property_collection<ambient::sound_container_type, ambient>::create()
 {
     sound_id* object = new sound_id(m_holder.sounds_manager(), "");
     object->fill(this);
@@ -176,11 +176,11 @@ void ambient::fill(editor::property_holder_collection* collection)
     VERIFY(!m_property_holder);
     m_property_holder = ::ide().create_property_holder(m_load_section.c_str(), collection, this);
 
-    typedef editor::property_holder::string_getter_type string_getter_type;
+    typedef editor::property_holder_base::string_getter_type string_getter_type;
     string_getter_type string_getter;
     string_getter.bind(this, &ambient::id_getter);
 
-    typedef editor::property_holder::string_setter_type string_setter_type;
+    typedef editor::property_holder_base::string_setter_type string_setter_type;
     string_setter_type string_setter;
     string_setter.bind(this, &ambient::id_setter);
 

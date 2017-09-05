@@ -28,7 +28,7 @@ void property_collection<weather::container_type, weather>::display_name(
 }
 
 template <>
-editor::property_holder* property_collection<weather::container_type, weather>::create()
+editor::property_holder_base* property_collection<weather::container_type, weather>::create()
 {
     using ::editor::environment::weathers::time;
     time* object = new time(&m_holder.m_manager, &m_holder, m_holder.generate_unique_id().c_str());
@@ -109,11 +109,11 @@ void weather::fill(editor::property_holder_collection* collection)
     VERIFY(!m_property_holder);
     m_property_holder = ::ide().create_property_holder(m_id.c_str(), collection, this);
 
-    typedef editor::property_holder::string_getter_type string_getter_type;
+    typedef editor::property_holder_base::string_getter_type string_getter_type;
     string_getter_type string_getter;
     string_getter.bind(this, &weather::id_getter);
 
-    typedef editor::property_holder::string_setter_type string_setter_type;
+    typedef editor::property_holder_base::string_setter_type string_setter_type;
     string_setter_type string_setter;
     string_setter.bind(this, &weather::id_setter);
 

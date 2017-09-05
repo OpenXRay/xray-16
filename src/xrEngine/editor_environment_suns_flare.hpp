@@ -12,7 +12,7 @@
 #ifdef INGAME_EDITOR
 
 #include "Common/Noncopyable.hpp"
-#include "Include/editor/property_holder.hpp"
+#include "Include/editor/property_holder_base.hpp"
 
 namespace editor
 {
@@ -28,7 +28,7 @@ public:
     void fill(editor::property_holder_collection* collection);
 
 public:
-    typedef editor::property_holder property_holder;
+    typedef editor::property_holder_base property_holder;
 
 public:
     virtual property_holder* object();

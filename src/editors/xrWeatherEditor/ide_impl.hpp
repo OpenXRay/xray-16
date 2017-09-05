@@ -29,7 +29,7 @@ class ide_impl : public editor::ide
 {
 public:
     typedef editor::window_ide window_ide;
-    typedef editor::property_holder property_holder;
+    typedef editor::property_holder_base property_holder;
 
 public:
     ide_impl(editor::engine* engine);

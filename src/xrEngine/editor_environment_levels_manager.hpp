@@ -16,7 +16,7 @@
 
 namespace editor
 {
-class property_holder;
+class property_holder_base;
 
 namespace environment
 {
@@ -59,7 +59,7 @@ private:
     ::editor::environment::weathers::manager& m_weathers;
     CInifile* m_config_single;
     CInifile* m_config_mp;
-    editor::property_holder* m_property_holder;
+    editor::property_holder_base* m_property_holder;
 }; // class levels_manager
 
 } // namespace levels

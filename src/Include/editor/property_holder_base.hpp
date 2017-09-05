@@ -1,5 +1,5 @@
 ////////////////////////////////////////////////////////////////////////////
-//	Module 		: property_holder.hpp
+//	Module 		: property_holder_base.hpp
 //	Created 	: 04.12.2007
 //  Modified 	: 04.12.2007
 //	Author		: Dmitriy Iassenev
@@ -25,12 +25,12 @@ struct vec3f
 };
 #pragma pack(pop)
 
-class property_holder;
+class property_holder_base;
 
 class property_holder_holder
 {
 public:
-    virtual property_holder* object() = 0;
+    virtual property_holder_base* object() = 0;
     virtual ~property_holder_holder() = 0 {}
 };
 
@@ -38,19 +38,19 @@ class property_holder_collection
 {
 public:
     virtual void clear() = 0;
-    virtual void insert(property_holder* holder, u32 const& position) = 0;
+    virtual void insert(property_holder_base* holder, u32 const& position) = 0;
     virtual void erase(u32 const& position) = 0;
-    virtual int index(property_holder* holder) = 0;
-    virtual property_holder* item(u32 const& position) = 0;
+    virtual int index(property_holder_base* holder) = 0;
+    virtual property_holder_base* item(u32 const& position) = 0;
     virtual u32 size() = 0;
     virtual void display_name(u32 const& item_index, char* const& buffer, u32 const& buffer_size) = 0;
-    virtual property_holder* create() = 0;
-    virtual void destroy(property_holder* holder) = 0;
+    virtual property_holder_base* create() = 0;
+    virtual void destroy(property_holder_base* holder) = 0;
 }; // class propery_holder_collection
 
 class property_value;
 
-class property_holder
+class property_holder_base
 {
 public:
     typedef fastdelegate::FastDelegate0<bool> boolean_getter_type;
@@ -321,7 +321,7 @@ public:
         notify_parent_on_change_enum const& notify_parent = do_not_notify_parent_on_change,
         password_char_enum const& password = no_password_char,
         refresh_grid_on_change_enum const& refresh_grid = do_not_refresh_grid_on_change) = 0;
-    virtual property_value* add_property(LPCSTR identifier, LPCSTR category, LPCSTR description, property_holder* value,
+    virtual property_value* add_property(LPCSTR identifier, LPCSTR category, LPCSTR description, property_holder_base* value,
         readonly_enum const& read_only = property_read_write,
         notify_parent_on_change_enum const& notify_parent = do_not_notify_parent_on_change,
         password_char_enum const& password = no_password_char,
@@ -337,15 +337,15 @@ public:
         notify_parent_on_change_enum const& notify_parent = do_not_notify_parent_on_change,
         password_char_enum const& password = no_password_char,
         refresh_grid_on_change_enum const& refresh_grid = do_not_refresh_grid_on_change) = 0;
-}; // class property_holder
+}; // class property_holder_base
 
 class property_value
 {
 public:
-    virtual void attribute(property_holder::readonly_enum const& read_only) = 0;
-    virtual void attribute(property_holder::notify_parent_on_change_enum const& notify_parent) = 0;
-    virtual void attribute(property_holder::password_char_enum const& password_char) = 0;
-    virtual void attribute(property_holder::refresh_grid_on_change_enum const& refresh_grid) = 0;
+    virtual void attribute(property_holder_base::readonly_enum const& read_only) = 0;
+    virtual void attribute(property_holder_base::notify_parent_on_change_enum const& notify_parent) = 0;
+    virtual void attribute(property_holder_base::password_char_enum const& password_char) = 0;
+    virtual void attribute(property_holder_base::refresh_grid_on_change_enum const& refresh_grid) = 0;
 }; // class property_value
 
 } // namespace editor

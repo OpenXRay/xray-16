@@ -12,7 +12,7 @@
 #ifdef INGAME_EDITOR
 
 #include "Common/Noncopyable.hpp"
-#include "Include/editor/property_holder.hpp"
+#include "Include/editor/property_holder_base.hpp"
 #include "property_collection_forward.hpp"
 #include "thunderbolt.h"
 
@@ -41,7 +41,7 @@ private:
     void xr_stdcall id_setter(LPCSTR value);
 
 private:
-    typedef editor::property_holder property_holder_type;
+    typedef editor::property_holder_base property_holder_type;
 
 public:
     virtual property_holder_type* object();

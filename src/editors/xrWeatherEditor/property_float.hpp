@@ -15,8 +15,8 @@ public
 ref class property_float : public XRay::SdkControls::IProperty, public XRay::SdkControls::IIncrementable
 {
 public:
-    typedef editor::property_holder::float_getter_type float_getter_type;
-    typedef editor::property_holder::float_setter_type float_setter_type;
+    typedef editor::property_holder_base::float_getter_type float_getter_type;
+    typedef editor::property_holder_base::float_setter_type float_setter_type;
 
 public:
     property_float(float_getter_type const& getter, float_setter_type const& setter, float const % increment_factor);

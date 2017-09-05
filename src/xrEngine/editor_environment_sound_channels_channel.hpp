@@ -12,7 +12,7 @@
 #ifdef INGAME_EDITOR
 
 #include "Common/Noncopyable.hpp"
-#include "Include/editor/property_holder.hpp"
+#include "Include/editor/property_holder_base.hpp"
 #include "property_collection_forward.hpp"
 #include "Environment.h"
 
@@ -49,7 +49,7 @@ public:
     typedef xr_vector<source*> sound_container_type;
 
 private:
-    typedef editor::property_holder property_holder_type;
+    typedef editor::property_holder_base property_holder_type;
     typedef property_collection<sound_container_type, channel> collection_type;
 
 public:

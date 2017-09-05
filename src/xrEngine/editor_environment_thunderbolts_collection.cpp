@@ -18,7 +18,7 @@
 using editor::environment::thunderbolts::thunderbolt_id;
 using editor::environment::thunderbolts::collection;
 using editor::environment::thunderbolts::manager;
-using editor::property_holder;
+using editor::property_holder_base;
 
 template <>
 void property_collection<collection::container_type, collection>::display_name(
@@ -28,7 +28,7 @@ void property_collection<collection::container_type, collection>::display_name(
 }
 
 template <>
-editor::property_holder* property_collection<collection::container_type, collection>::create()
+editor::property_holder_base* property_collection<collection::container_type, collection>::create()
 {
     thunderbolt_id* object = new thunderbolt_id(m_holder.m_manager, "");
     object->fill(this);
@@ -95,11 +95,11 @@ void collection::fill(editor::property_holder_collection* collection)
     VERIFY(!m_property_holder);
     m_property_holder = ::ide().create_property_holder(section.c_str());
 
-    typedef editor::property_holder::string_getter_type string_getter_type;
+    typedef editor::property_holder_base::string_getter_type string_getter_type;
     string_getter_type string_getter;
     string_getter.bind(this, &collection::id_getter);
 
-    typedef editor::property_holder::string_setter_type string_setter_type;
+    typedef editor::property_holder_base::string_setter_type string_setter_type;
     string_setter_type string_setter;
     string_setter.bind(this, &collection::id_setter);
 
@@ -109,5 +109,5 @@ void collection::fill(editor::property_holder_collection* collection)
         "thunderbolts", "properties", "this option is resposible for thunderbolts", m_collection);
 }
 
-property_holder* collection::object() { return (m_property_holder); }
+property_holder_base* collection::object() { return (m_property_holder); }
 #endif // #ifdef INGAME_EDITOR

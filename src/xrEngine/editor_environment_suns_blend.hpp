@@ -15,7 +15,7 @@
 
 namespace editor
 {
-class property_holder;
+class property_holder_base;
 class property_holder_collection;
 
 namespace environment
@@ -30,7 +30,7 @@ public:
     blend();
     void load(CInifile& config, shared_str const& section);
     void save(CInifile& config, shared_str const& section);
-    void fill(manager const& manager, editor::property_holder* holder, editor::property_holder_collection* collection);
+    void fill(manager const& manager, editor::property_holder_base* holder, editor::property_holder_collection* collection);
 
 private:
     float m_down_time;

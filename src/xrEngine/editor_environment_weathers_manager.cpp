@@ -12,7 +12,7 @@
 #include "editor_environment_weathers_manager.hpp"
 #include "editor_environment_detail.hpp"
 #include "ide.hpp"
-#include "Include/editor/property_holder.hpp"
+#include "Include/editor/property_holder_base.hpp"
 #include "Common/object_broker.h"
 #include "editor_environment_weathers_weather.hpp"
 #include "editor_environment_weathers_time.hpp"
@@ -31,7 +31,7 @@ void property_collection<manager::weather_container_type, manager>::display_name
 }
 
 template <>
-editor::property_holder* property_collection<manager::weather_container_type, manager>::create()
+editor::property_holder_base* property_collection<manager::weather_container_type, manager>::create()
 {
     weather* object = new weather(&m_holder.m_manager, generate_unique_id("weather_unique_id_").c_str());
     object->fill(this);

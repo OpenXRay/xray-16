@@ -43,8 +43,8 @@ property_color_base::property_color_base(editor::color const % color, array<Syst
 
     m_attributes[n] = gcnew System::ComponentModel::NotifyParentPropertyAttribute(true);
 
-    typedef editor::property_holder::float_getter_type float_getter_type;
-    typedef editor::property_holder::float_setter_type float_setter_type;
+    typedef editor::property_holder_base::float_getter_type float_getter_type;
+    typedef editor::property_holder_base::float_setter_type float_setter_type;
 
     float_getter_type getter;
     float_setter_type setter;

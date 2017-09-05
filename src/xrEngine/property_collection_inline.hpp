@@ -68,7 +68,7 @@ void PROPERTY_COLLECTION::erase(u32 const& position)
 }
 
 SPECIALIZATION
-editor::property_holder* PROPERTY_COLLECTION::item(u32 const& position) { return (m_container[position]->object()); }
+editor::property_holder_base* PROPERTY_COLLECTION::item(u32 const& position) { return (m_container[position]->object()); }
 SPECIALIZATION
 inline PROPERTY_COLLECTION::predicate::predicate(property_holder* holder) : m_holder(holder) {}
 SPECIALIZATION
@@ -89,7 +89,7 @@ int PROPERTY_COLLECTION::index(property_holder* holder)
 }
 
 SPECIALIZATION
-void PROPERTY_COLLECTION::destroy(editor::property_holder* holder) { delete_data(holder->holder()); }
+void PROPERTY_COLLECTION::destroy(editor::property_holder_base* holder) { delete_data(holder->holder()); }
 SPECIALIZATION
 inline PROPERTY_COLLECTION::unique_id_predicate::unique_id_predicate(LPCSTR id) : m_id(id) {}
 SPECIALIZATION
