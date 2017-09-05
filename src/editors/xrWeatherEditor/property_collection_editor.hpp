@@ -12,8 +12,7 @@
 ref class property_collection;
 ref class property_container;
 
-public
-ref class property_collection_editor : public System::ComponentModel::Design::CollectionEditor
+public ref class property_collection_editor : public System::ComponentModel::Design::CollectionEditor
 {
 public:
     typedef System::ComponentModel::Design::CollectionEditor inherited;

@@ -30,7 +30,7 @@ void property_collection<manager::container_type, manager>::display_name(
 }
 
 template <>
-editor::property_holder_base* property_collection<manager::container_type, manager>::create()
+XRay::Editor::property_holder_base* property_collection<manager::container_type, manager>::create()
 {
     sun* object = new sun(m_holder, generate_unique_id("sun_unique_id_").c_str());
     object->fill(this);
@@ -100,10 +100,10 @@ void manager::add(CInifile& config, shared_str const& section)
     m_suns.push_back(object);
 }
 
-void manager::fill(editor::property_holder_base* holder)
+void manager::fill(XRay::Editor::property_holder_base* holder)
 {
     VERIFY(holder);
-    holder->add_property("suns", "suns", "this option is resposible for sound channels", m_collection);
+    holder->add_property("suns", "suns", "this option is responsible for sound channels", m_collection);
 }
 
 shared_str manager::unique_id(shared_str const& id) const

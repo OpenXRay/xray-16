@@ -11,10 +11,16 @@
 
 class shared_str;
 
-namespace editor
+namespace XRay
+{
+namespace Editor
 {
 class property_holder_base;
+}
+}
 
+namespace editor
+{
 class engine
 {
 public:
@@ -44,9 +50,9 @@ public:
     virtual void track_weather(float const& time) = 0;
     virtual float track_weather() = 0;
 
-    virtual property_holder_base* current_frame_property_holder() = 0;
-    virtual property_holder_base* blend_frame_property_holder() = 0;
-    virtual property_holder_base* target_frame_property_holder() = 0;
+    virtual XRay::Editor::property_holder_base* current_frame_property_holder() = 0;
+    virtual XRay::Editor::property_holder_base* blend_frame_property_holder() = 0;
+    virtual XRay::Editor::property_holder_base* target_frame_property_holder() = 0;
 
     virtual void weather_paused(bool const& value) = 0;
     virtual bool weather_paused() = 0;

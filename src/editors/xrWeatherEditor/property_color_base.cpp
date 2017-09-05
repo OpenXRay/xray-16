@@ -31,7 +31,7 @@ float color_components::green_getter() { return (m_holder->get_value_raw().g); }
 void color_components::green_setter(float value) { m_holder->green(value); }
 float color_components::blue_getter() { return (m_holder->get_value_raw().b); }
 void color_components::blue_setter(float value) { m_holder->blue(value); }
-property_color_base::property_color_base(editor::color const % color, array<System::Attribute ^> ^ attributes)
+property_color_base::property_color_base(XRay::Editor::color const % color, array<System::Attribute ^> ^ attributes)
 {
     m_container = gcnew property_container(nullptr, this);
     m_components = new color_components(this);
@@ -43,8 +43,8 @@ property_color_base::property_color_base(editor::color const % color, array<Syst
 
     m_attributes[n] = gcnew System::ComponentModel::NotifyParentPropertyAttribute(true);
 
-    typedef editor::property_holder_base::float_getter_type float_getter_type;
-    typedef editor::property_holder_base::float_setter_type float_setter_type;
+    typedef XRay::Editor::property_holder_base::float_getter_type float_getter_type;
+    typedef XRay::Editor::property_holder_base::float_setter_type float_setter_type;
 
     float_getter_type getter;
     float_setter_type setter;
@@ -84,7 +84,7 @@ Object ^ property_color_base::GetValue() { return (m_container); }
 void property_color_base::SetValue(Object ^ object)
 {
     Color color = safe_cast<Color>(object);
-    editor::color value;
+    XRay::Editor::color value;
     value.r = color.r;
     value.g = color.g;
     value.b = color.b;
@@ -93,21 +93,21 @@ void property_color_base::SetValue(Object ^ object)
 
 void property_color_base::red(float value)
 {
-    editor::color current = get_value_raw();
+    XRay::Editor::color current = get_value_raw();
     current.r = value;
     set_value_raw(current);
 }
 
 void property_color_base::green(float value)
 {
-    editor::color current = get_value_raw();
+    XRay::Editor::color current = get_value_raw();
     current.g = value;
     set_value_raw(current);
 }
 
 void property_color_base::blue(float value)
 {
-    editor::color current = get_value_raw();
+    XRay::Editor::color current = get_value_raw();
     current.b = value;
     set_value_raw(current);
 }
@@ -117,7 +117,7 @@ void property_color_base::OnDoubleClick(XRay::SdkControls::PropertyGrid ^ proper
 #if 0
 	ColorDialog					^dialog = gcnew ColorDialog();
 	dialog->FullOpen			= true;
-	editor::color				color = get_value_raw();
+    XRay::Editor::color				color = get_value_raw();
 	dialog->Color				= System::Drawing::Color::FromArgb(255, int(255.f*color.r), int(255.f*color.g), int(255.f*color.b));
 	if (dialog->ShowDialog() == System::Windows::Forms::DialogResult::Cancel)
 		return;
@@ -143,7 +143,7 @@ static void increment_and_clamp(float& value, float const& increment)
 void property_color_base::Increment(float increment)
 {
     float increment_value = increment * s_increment_factor;
-    editor::color value = get_value_raw();
+    XRay::Editor::color value = get_value_raw();
     increment_and_clamp(value.r, increment_value);
     increment_and_clamp(value.g, increment_value);
     increment_and_clamp(value.b, increment_value);

@@ -36,7 +36,7 @@ class manager;
 class effect_id;
 class sound_id;
 
-class ambient : public CEnvAmbient, public editor::property_holder_holder, private Noncopyable
+class ambient : public CEnvAmbient, public XRay::Editor::property_holder_holder, private Noncopyable
 {
 private:
     typedef CEnvAmbient inherited;
@@ -47,7 +47,7 @@ public:
     virtual void load(CInifile& ambients_config, CInifile& sound_channels_config, CInifile& effects_config,
         const shared_str& section);
     void save(CInifile& config);
-    void fill(editor::property_holder_collection* collection);
+    void fill(XRay::Editor::property_holder_collection* collection);
     inline shared_str const& id() const { return m_load_section; }
     virtual SEffect* create_effect(CInifile& config, LPCSTR id);
     virtual SSndChannel* create_sound_channel(CInifile& config, LPCSTR id);
@@ -71,7 +71,7 @@ public:
     typedef property_collection<sound_container_type, ambient> sound_collection_type;
 
 private:
-    typedef editor::property_holder_base property_holder_type;
+    typedef XRay::Editor::property_holder_base property_holder_type;
 
 public:
     virtual property_holder_type* object();

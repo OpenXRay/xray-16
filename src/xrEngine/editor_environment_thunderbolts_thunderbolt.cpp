@@ -74,36 +74,39 @@ void thunderbolt::id_setter(LPCSTR value_)
     m_id = m_manager.unique_thunderbolt_id(value);
 }
 
-void thunderbolt::fill(::editor::environment::manager& environment, ::editor::property_holder_collection* collection)
+void thunderbolt::fill(::editor::environment::manager& environment, XRay::Editor::property_holder_collection* collection)
 {
     VERIFY(!m_property_holder);
     m_property_holder = ::ide().create_property_holder(m_id.c_str(), collection, this);
 
-    typedef editor::property_holder_base::string_getter_type string_getter_type;
+    typedef XRay::Editor::property_holder_base::string_getter_type string_getter_type;
     string_getter_type string_getter;
     string_getter.bind(this, &thunderbolt::id_getter);
 
-    typedef editor::property_holder_base::string_setter_type string_setter_type;
+    typedef XRay::Editor::property_holder_base::string_setter_type string_setter_type;
     string_setter_type string_setter;
     string_setter.bind(this, &thunderbolt::id_setter);
 
     m_property_holder->add_property(
-        "id", "properties", "this option is resposible for thunderbolt id", m_id.c_str(), string_getter, string_setter);
+        "id", "properties", "this option is responsible for thunderbolt id", m_id.c_str(), string_getter, string_setter);
+
     m_property_holder->add_property("color animator", "properties",
-        "this option is resposible for thunderbolt color animator", m_color_animator.c_str(), m_color_animator,
+        "this option is responsible for thunderbolt color animator", m_color_animator.c_str(), m_color_animator,
         &*environment.light_animator_ids().begin(), environment.light_animator_ids().size(),
-        editor::property_holder_base::value_editor_tree_view, editor::property_holder_base::cannot_enter_text);
+        XRay::Editor::property_holder_base::value_editor_tree_view, XRay::Editor::property_holder_base::cannot_enter_text);
+
     m_property_holder->add_property("lighting model", "properties",
-        "this option is resposible for thunderbolt lighting model", m_lighting_model.c_str(), m_lighting_model, ".dm",
+        "this option is responsible for thunderbolt lighting model", m_lighting_model.c_str(), m_lighting_model, ".dm",
         "Lighting model files (*.dm)|*.dm", detail::real_path("$game_meshes$", "").c_str(), "Select lighting model...",
-        editor::property_holder_base::cannot_enter_text, editor::property_holder_base::keep_extension);
-    m_property_holder->add_property("sound", "properties", "this option is resposible for thunderbolt sound",
+        XRay::Editor::property_holder_base::cannot_enter_text, XRay::Editor::property_holder_base::keep_extension);
+
+    m_property_holder->add_property("sound", "properties", "this option is responsible for thunderbolt sound",
         m_sound.c_str(), m_sound, ".ogg", "Sound files (*.ogg)|*.ogg", detail::real_path("$game_sounds$", "").c_str(),
-        "Select sound...", editor::property_holder_base::cannot_enter_text, editor::property_holder_base::remove_extension);
+        "Select sound...", XRay::Editor::property_holder_base::cannot_enter_text, XRay::Editor::property_holder_base::remove_extension);
 
     m_center->fill(
-        environment, "center", "this option is resposible for thunderbolt gradient center", *m_property_holder);
-    m_top->fill(environment, "top", "this option is resposible for thunderbolt gradient top", *m_property_holder);
+        environment, "center", "this option is responsible for thunderbolt gradient center", *m_property_holder);
+    m_top->fill(environment, "top", "this option is responsible for thunderbolt gradient top", *m_property_holder);
 }
 
 thunderbolt::property_holder_type* thunderbolt::object() { return (m_property_holder); }

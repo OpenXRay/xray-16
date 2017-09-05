@@ -25,14 +25,14 @@ namespace effects
 {
 class manager;
 
-class effect : public CEnvAmbient::SEffect, public editor::property_holder_holder, private Noncopyable
+class effect : public CEnvAmbient::SEffect, public XRay::Editor::property_holder_holder, private Noncopyable
 {
 public:
     effect(manager const& manager, shared_str const& id);
     virtual ~effect();
     void load(CInifile& config);
     void save(CInifile& config);
-    void fill(editor::property_holder_collection* collection);
+    void fill(XRay::Editor::property_holder_collection* collection);
     inline LPCSTR id() const { return m_id.c_str(); }
 private:
     LPCSTR xr_stdcall id_getter() const;
@@ -45,7 +45,7 @@ private:
     void xr_stdcall sound_setter(LPCSTR value);
 
 private:
-    typedef editor::property_holder_base property_holder_type;
+    typedef XRay::Editor::property_holder_base property_holder_type;
 
 public:
     virtual property_holder_type* object();

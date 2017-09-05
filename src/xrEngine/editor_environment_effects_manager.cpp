@@ -19,7 +19,7 @@ void property_collection<manager::effect_container_type, manager>::display_name(
 }
 
 template <>
-editor::property_holder_base* property_collection<manager::effect_container_type, manager>::create()
+XRay::Editor::property_holder_base* property_collection<manager::effect_container_type, manager>::create()
 {
     effect* object = new effect(m_holder, generate_unique_id("effect_unique_id_").c_str());
     object->fill(this);
@@ -76,10 +76,10 @@ void manager::save()
     xr_delete(config);
 }
 
-void manager::fill(editor::property_holder_base* holder)
+void manager::fill(XRay::Editor::property_holder_base* holder)
 {
     VERIFY(holder);
-    holder->add_property("effects", "ambients", "this option is resposible for effects", m_collection);
+    holder->add_property("effects", "ambients", "this option is responsible for effects", m_collection);
 }
 
 manager::effects_ids_type const& manager::effects_ids() const

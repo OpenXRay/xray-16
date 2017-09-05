@@ -82,59 +82,67 @@ float effect::wind_blast_longitude_getter() const
 }
 
 void effect::wind_blast_longitude_setter(float value) { wind_blast_direction.setHP(deg2rad(value), 0.f); }
-void effect::fill(editor::property_holder_collection* collection)
+void effect::fill(XRay::Editor::property_holder_collection* collection)
 {
     VERIFY(!m_property_holder);
     m_property_holder = ::ide().create_property_holder(m_id.c_str(), collection, this);
 
-    typedef editor::property_holder_base::string_getter_type string_getter_type;
+    typedef XRay::Editor::property_holder_base::string_getter_type string_getter_type;
     string_getter_type string_getter;
     string_getter.bind(this, &effect::id_getter);
 
-    typedef editor::property_holder_base::string_setter_type string_setter_type;
+    typedef XRay::Editor::property_holder_base::string_setter_type string_setter_type;
     string_setter_type string_setter;
     string_setter.bind(this, &effect::id_setter);
 
-    m_property_holder->add_property("id", "properties", "this option is resposible for effect identifier", m_id.c_str(),
+    m_property_holder->add_property("id", "properties", "this option is responsible for effect identifier", m_id.c_str(),
         string_getter, string_setter);
+
     m_property_holder->add_property("life time", "properties",
-        "this option is resposible for effect life time (in milliseconds)", (int const&)life_time, (int&)life_time);
-    m_property_holder->add_property("offset", "properties", "this option is resposible for effect offset (3D vector)",
-        (vec3f const&)offset, (vec3f&)offset);
-    m_property_holder->add_property("particles", "properties", "this option is resposible for effect particles",
+        "this option is responsible for effect life time (in milliseconds)", (int const&)life_time, (int&)life_time);
+
+    m_property_holder->add_property("offset", "properties", "this option is responsible for effect offset (3D vector)",
+        (XRay::Editor::vec3f const&)offset, (XRay::Editor::vec3f&)offset);
+
+    m_property_holder->add_property("particles", "properties", "this option is responsible for effect particles",
         particles.c_str(), particles, &*m_manager.environment().particle_ids().begin(),
-        m_manager.environment().particle_ids().size(), editor::property_holder_base::value_editor_tree_view,
-        editor::property_holder_base::cannot_enter_text);
+        m_manager.environment().particle_ids().size(), XRay::Editor::property_holder_base::value_editor_tree_view,
+                                    XRay::Editor::property_holder_base::cannot_enter_text);
 
     string_getter.bind(this, &effect::sound_getter);
     string_setter.bind(this, &effect::sound_setter);
-    m_property_holder->add_property("sound", "properties", "this option is resposible for effect sound",
+    m_property_holder->add_property("sound", "properties", "this option is responsible for effect sound",
         m_sound.c_str(), string_getter, string_setter, ".ogg", "Sound files (*.ogg)|*.ogg",
-        detail::real_path("$game_sounds$", "").c_str(), "Select sound...", editor::property_holder_base::cannot_enter_text,
-        editor::property_holder_base::remove_extension);
+        detail::real_path("$game_sounds$", "").c_str(), "Select sound...", XRay::Editor::property_holder_base::cannot_enter_text,
+        XRay::Editor::property_holder_base::remove_extension);
+
     m_property_holder->add_property("wind gust factor", "properties",
-        "this option is resposible for effect wind gust factor", wind_gust_factor, wind_gust_factor);
+        "this option is responsible for effect wind gust factor", wind_gust_factor, wind_gust_factor);
+
     m_property_holder->add_property("wind blast strength", "properties",
-        "this option is resposible for effect wind blast strength", wind_blast_strength, wind_blast_strength);
+        "this option is responsible for effect wind blast strength", wind_blast_strength, wind_blast_strength);
+
     m_property_holder->add_property("wind blast start time", "properties",
-        "this option is resposible for effect wind blast start time", wind_blast_in_time, wind_blast_in_time, 0.f,
-        1000.f);
-    m_property_holder->add_property("wind blast stop time", "properties",
-        "this option is resposible for effect wind blast stop time", wind_blast_out_time, wind_blast_out_time, 0.f,
+        "this option is responsible for effect wind blast start time", wind_blast_in_time, wind_blast_in_time, 0.f,
         1000.f);
 
-    typedef ::editor::property_holder_base::float_getter_type float_getter_type;
+    m_property_holder->add_property("wind blast stop time", "properties",
+        "this option is responsible for effect wind blast stop time", wind_blast_out_time, wind_blast_out_time, 0.f,
+        1000.f);
+
+    typedef XRay::Editor::property_holder_base::float_getter_type float_getter_type;
     float_getter_type float_getter;
 
-    typedef ::editor::property_holder_base::float_setter_type float_setter_type;
+    typedef XRay::Editor::property_holder_base::float_setter_type float_setter_type;
     float_setter_type float_setter;
 
     float_getter.bind(this, &effect::wind_blast_longitude_getter);
     float_setter.bind(this, &effect::wind_blast_longitude_setter);
+
     m_property_holder->add_property("wind blast longitude", "properties",
-        "this option is resposible for effect wind blast longitude", float_getter(), float_getter, float_setter, -360.f,
+        "this option is responsible for effect wind blast longitude", float_getter(), float_getter, float_setter, -360.f,
         360.f);
 }
 
-editor::property_holder_base* effect::object() { return (m_property_holder); }
+XRay::Editor::property_holder_base* effect::object() { return m_property_holder; }
 #endif // #ifdef INGAME_EDITOR

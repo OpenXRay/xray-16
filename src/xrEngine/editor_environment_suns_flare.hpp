@@ -20,15 +20,15 @@ namespace environment
 {
 namespace suns
 {
-class flare : public editor::property_holder_holder, private Noncopyable
+class flare : public XRay::Editor::property_holder_holder, private Noncopyable
 {
 public:
     flare();
     virtual ~flare();
-    void fill(editor::property_holder_collection* collection);
+    void fill(XRay::Editor::property_holder_collection* collection);
 
 public:
-    typedef editor::property_holder_base property_holder;
+    typedef XRay::Editor::property_holder_base property_holder;
 
 public:
     virtual property_holder* object();

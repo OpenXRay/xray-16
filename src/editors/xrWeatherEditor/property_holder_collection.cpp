@@ -13,9 +13,9 @@
 #include "property_collection_getter.hpp"
 
 using Flobbster::Windows::Forms::PropertySpec;
-using editor::property_holder_collection;
+using XRay::Editor::property_holder_collection;
 
-editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
+XRay::Editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
     property_holder_collection* collection, readonly_enum const& read_only,
     notify_parent_on_change_enum const& notify_parent, password_char_enum const& password,
     refresh_grid_on_change_enum const& refresh_grid)
@@ -27,7 +27,7 @@ editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR 
     return (nullptr);
 }
 
-editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
+XRay::Editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
     collection_getter_type const& collection_getter, readonly_enum const& read_only,
     notify_parent_on_change_enum const& notify_parent, password_char_enum const& password,
     refresh_grid_on_change_enum const& refresh_grid)

@@ -13,10 +13,16 @@
 
 #include "Environment.h"
 
-namespace editor
+namespace XRay
+{
+namespace Editor
 {
 class property_holder_base;
+}
+}
 
+namespace editor
+{
 namespace environment
 {
 namespace detail
@@ -84,7 +90,7 @@ public:
     light_animator_ids_type const& light_animator_ids() const;
 
 public:
-    typedef editor::property_holder_base property_holder_type;
+    typedef XRay::Editor::property_holder_base property_holder_type;
     typedef editor::environment::suns::manager suns_manager_type;
     typedef editor::environment::levels::manager levels_manager_type;
     typedef editor::environment::effects::manager effects_manager_type;

@@ -37,6 +37,7 @@ void PROPERTY_COLLECTION::clear()
 
 SPECIALIZATION
 u32 PROPERTY_COLLECTION::size() { return (m_container.size()); }
+
 SPECIALIZATION
 void PROPERTY_COLLECTION::insert(property_holder* holder, u32 const& position)
 {
@@ -45,7 +46,7 @@ void PROPERTY_COLLECTION::insert(property_holder* holder, u32 const& position)
 
     VERIFY(position <= m_container.size());
 
-    editor::property_holder_holder* value_raw = holder->holder();
+    XRay::Editor::property_holder_holder* value_raw = holder->holder();
     VERIFY(value_raw);
 
     typedef typename container_type::value_type value_type;
@@ -68,9 +69,11 @@ void PROPERTY_COLLECTION::erase(u32 const& position)
 }
 
 SPECIALIZATION
-editor::property_holder_base* PROPERTY_COLLECTION::item(u32 const& position) { return (m_container[position]->object()); }
+XRay::Editor::property_holder_base* PROPERTY_COLLECTION::item(u32 const& position) { return (m_container[position]->object()); }
+
 SPECIALIZATION
 inline PROPERTY_COLLECTION::predicate::predicate(property_holder* holder) : m_holder(holder) {}
+
 SPECIALIZATION
 inline bool PROPERTY_COLLECTION::predicate::operator()(typename container_type::value_type const& value) const
 {
@@ -89,9 +92,11 @@ int PROPERTY_COLLECTION::index(property_holder* holder)
 }
 
 SPECIALIZATION
-void PROPERTY_COLLECTION::destroy(editor::property_holder_base* holder) { delete_data(holder->holder()); }
+void PROPERTY_COLLECTION::destroy(XRay::Editor::property_holder_base* holder) { delete_data(holder->holder()); }
+
 SPECIALIZATION
 inline PROPERTY_COLLECTION::unique_id_predicate::unique_id_predicate(LPCSTR id) : m_id(id) {}
+
 SPECIALIZATION
 inline bool PROPERTY_COLLECTION::unique_id_predicate::operator()(typename container_type::value_type const& value) const
 {

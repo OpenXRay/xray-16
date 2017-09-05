@@ -20,8 +20,8 @@ private:
     typedef property_string_values_value_base::collection_type collection_type;
 
 public:
-    typedef editor::property_holder_base::string_getter_type string_getter_type;
-    typedef editor::property_holder_base::string_setter_type string_setter_type;
+    typedef XRay::Editor::property_holder_base::string_getter_type string_getter_type;
+    typedef XRay::Editor::property_holder_base::string_setter_type string_setter_type;
 
 public:
     property_string_values_value(string_getter_type const& getter, string_setter_type const& setter,

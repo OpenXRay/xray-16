@@ -84,11 +84,11 @@ void manager::fill()
     VERIFY(!m_property_holder);
     m_property_holder = ::ide().create_property_holder("levels");
 
-    typedef editor::property_holder_base::string_collection_getter_type collection_getter_type;
+    typedef XRay::Editor::property_holder_base::string_collection_getter_type collection_getter_type;
     collection_getter_type collection_getter;
     collection_getter.bind(this, &manager::collection);
 
-    typedef editor::property_holder_base::string_collection_size_getter_type collection_size_getter_type;
+    typedef XRay::Editor::property_holder_base::string_collection_size_getter_type collection_size_getter_type;
     collection_size_getter_type collection_size_getter;
     collection_size_getter.bind(this, &manager::collection_size);
 
@@ -101,7 +101,7 @@ void manager::fill()
         xr_strcat(description, (*i).first.c_str());
         m_property_holder->add_property((*i).first.c_str(), (*i).second.first, description, (*i).second.second.c_str(),
             (*i).second.second, collection_getter, collection_size_getter,
-            editor::property_holder_base::value_editor_combo_box, editor::property_holder_base::cannot_enter_text);
+            XRay::Editor::property_holder_base::value_editor_combo_box, XRay::Editor::property_holder_base::cannot_enter_text);
     }
 
     ::ide().environment_levels(m_property_holder);

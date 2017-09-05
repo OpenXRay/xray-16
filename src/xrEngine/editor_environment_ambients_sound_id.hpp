@@ -16,8 +16,6 @@
 
 namespace editor
 {
-class property_holder_collection;
-
 namespace environment
 {
 namespace sound_channels
@@ -27,15 +25,15 @@ class manager;
 
 namespace ambients
 {
-class sound_id : public editor::property_holder_holder, private Noncopyable
+class sound_id : public XRay::Editor::property_holder_holder, private Noncopyable
 {
 public:
     sound_id(sound_channels::manager const& manager, shared_str const& sound);
     virtual ~sound_id();
-    void fill(editor::property_holder_collection* collection);
+    void fill(XRay::Editor::property_holder_collection* collection);
     inline shared_str const& id() const { return m_id; }
 private:
-    typedef editor::property_holder_base property_holder_type;
+    typedef XRay::Editor::property_holder_base property_holder_type;
 
 public:
     virtual property_holder_type* object();

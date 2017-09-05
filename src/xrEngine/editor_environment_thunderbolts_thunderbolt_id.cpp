@@ -31,22 +31,22 @@ thunderbolt_id::~thunderbolt_id()
 
 LPCSTR const* thunderbolt_id::collection() { return (&*m_manager.thunderbolts_ids().begin()); }
 u32 thunderbolt_id::collection_size() { return (m_manager.thunderbolts_ids().size()); }
-void thunderbolt_id::fill(editor::property_holder_collection* collection)
+void thunderbolt_id::fill(XRay::Editor::property_holder_collection* collection)
 {
     VERIFY(!m_property_holder);
     m_property_holder = ::ide().create_property_holder(m_id.c_str(), collection, this);
 
-    typedef editor::property_holder_base::string_collection_getter_type collection_getter_type;
+    typedef XRay::Editor::property_holder_base::string_collection_getter_type collection_getter_type;
     collection_getter_type collection_getter;
     collection_getter.bind(this, &thunderbolt_id::collection);
 
-    typedef editor::property_holder_base::string_collection_size_getter_type collection_size_getter_type;
+    typedef XRay::Editor::property_holder_base::string_collection_size_getter_type collection_size_getter_type;
     collection_size_getter_type collection_size_getter;
     collection_size_getter.bind(this, &thunderbolt_id::collection_size);
 
     m_property_holder->add_property("thunderbolt", "properties", "this option is resposible for thunderbolt",
-        m_id.c_str(), m_id, collection_getter, collection_size_getter, editor::property_holder_base::value_editor_combo_box,
-        editor::property_holder_base::cannot_enter_text);
+        m_id.c_str(), m_id, collection_getter, collection_size_getter, XRay::Editor::property_holder_base::value_editor_combo_box,
+        XRay::Editor::property_holder_base::cannot_enter_text);
 }
 
 thunderbolt_id::property_holder_type* thunderbolt_id::object() { return (m_property_holder); }

@@ -16,21 +16,19 @@
 
 namespace editor
 {
-class property_holder_collection;
-
 namespace environment
 {
 namespace sound_channels
 {
-class source : public editor::property_holder_holder, private Noncopyable
+class source : public XRay::Editor::property_holder_holder, private Noncopyable
 {
 public:
     source(shared_str const& source);
     ~source();
-    void fill(editor::property_holder_collection* collection);
+    void fill(XRay::Editor::property_holder_collection* collection);
     inline LPCSTR id() const { return m_source.c_str(); }
 private:
-    typedef editor::property_holder_base property_holder_type;
+    typedef XRay::Editor::property_holder_base property_holder_type;
 
 public:
     virtual property_holder_type* object();

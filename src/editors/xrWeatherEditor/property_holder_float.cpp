@@ -22,7 +22,7 @@ ref class property_converter_float;
 using Flobbster::Windows::Forms::PropertySpec;
 using System::String;
 
-editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
+XRay::Editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
     float const& default_value, float_getter_type const& getter, float_setter_type const& setter,
     readonly_enum const& read_only, notify_parent_on_change_enum const& notify_parent,
     password_char_enum const& password, refresh_grid_on_change_enum const& refresh_grid)
@@ -35,7 +35,7 @@ editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR 
     return (nullptr);
 }
 
-editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
+XRay::Editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
     float const& default_value, float& value, readonly_enum const& read_only,
     notify_parent_on_change_enum const& notify_parent, password_char_enum const& password,
     refresh_grid_on_change_enum const& refresh_grid)
@@ -48,7 +48,7 @@ editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR 
     return (nullptr);
 }
 
-editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
+XRay::Editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
     float const& default_value, float_getter_type const& getter, float_setter_type const& setter,
     float const& min_value, float const& max_value, readonly_enum const& read_only,
     notify_parent_on_change_enum const& notify_parent, password_char_enum const& password,
@@ -62,7 +62,7 @@ editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR 
     return (nullptr);
 }
 
-editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
+XRay::Editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
     float const& default_value, float& value, float const& min_value, float const& max_value,
     readonly_enum const& read_only, notify_parent_on_change_enum const& notify_parent,
     password_char_enum const& password, refresh_grid_on_change_enum const& refresh_grid)
@@ -75,7 +75,7 @@ editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR 
     return (nullptr);
 }
 
-editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
+XRay::Editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
     float const& default_value, float_getter_type const& getter, float_setter_type const& setter,
     std::pair<float, LPCSTR>* values, u32 const& value_count, readonly_enum const& read_only,
     notify_parent_on_change_enum const& notify_parent, password_char_enum const& password,
@@ -89,7 +89,7 @@ editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR 
     return (nullptr);
 }
 
-editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
+XRay::Editor::property_value* property_holder::add_property(LPCSTR identifier, LPCSTR category, LPCSTR description,
     float const& default_value, float& value, std::pair<float, LPCSTR>* values, u32 const& value_count,
     readonly_enum const& read_only, notify_parent_on_change_enum const& notify_parent,
     password_char_enum const& password, refresh_grid_on_change_enum const& refresh_grid)

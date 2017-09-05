@@ -53,7 +53,7 @@ public
 ref class property_vec3f_base abstract : public XRay::SdkControls::IProperty, public property_container_holder
 {
 public:
-    property_vec3f_base(editor::vec3f const % vec3f);
+    property_vec3f_base(XRay::Editor::vec3f const % vec3f);
     virtual ~property_vec3f_base();
     !property_vec3f_base();
     void x(float value);
@@ -65,8 +65,8 @@ public:
     virtual void SetValue(System::Object ^ object);
 
 public:
-    virtual editor::vec3f get_value_raw() = 0;
-    virtual void set_value_raw(editor::vec3f vec3f) = 0;
+    virtual XRay::Editor::vec3f get_value_raw() = 0;
+    virtual void set_value_raw(XRay::Editor::vec3f vec3f) = 0;
 
 private:
     property_container ^ m_container;

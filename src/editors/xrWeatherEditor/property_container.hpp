@@ -14,8 +14,8 @@ ref class property_container_converter;
 
 interface class property_container_holder;
 
-[System::ComponentModel::TypeConverterAttribute(
-    property_container_converter::typeid)] public ref class property_container
+[System::ComponentModel::TypeConverterAttribute(property_container_converter::typeid)]
+public ref class property_container
     : public Flobbster::Windows::Forms::PropertyBag,
       public XRay::SdkControls::IPropertyContainer
 {

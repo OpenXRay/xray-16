@@ -35,7 +35,7 @@ Object ^ property_collection_enumerator::Current::get()
     if (m_cursor >= (int)m_collection->size())
         throw(gcnew InvalidOperationException());
 
-    editor::property_holder_base* holder_raw = m_collection->item((u32)m_cursor);
+    XRay::Editor::property_holder_base* holder_raw = m_collection->item((u32)m_cursor);
     property_holder* holder = dynamic_cast<property_holder*>(holder_raw);
     VERIFY(holder);
     return (holder->container());

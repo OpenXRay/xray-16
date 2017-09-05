@@ -14,10 +14,16 @@
 #include "Common/Noncopyable.hpp"
 #include "property_collection_forward.hpp"
 
-namespace editor
+namespace XRay
+{
+namespace Editor
 {
 class property_holder_base;
+}
+}
 
+namespace editor
+{
 namespace environment
 {
 class manager;
@@ -43,7 +49,7 @@ public:
     ~manager();
     void load();
     void save();
-    void fill(editor::property_holder_base* holder);
+    void fill(XRay::Editor::property_holder_base* holder);
     shared_str unique_id(shared_str const& id) const;
     ambient* get_ambient(shared_str const& id) const;
 
@@ -59,7 +65,7 @@ public:
     ambients_ids_type const& ambients_ids() const;
 
 private:
-    typedef editor::property_holder_base property_holder_type;
+    typedef XRay::Editor::property_holder_base property_holder_type;
     typedef property_collection<ambient_container_type, manager> collection_type;
 
 private:

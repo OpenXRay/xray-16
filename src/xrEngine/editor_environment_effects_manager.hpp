@@ -14,10 +14,16 @@
 #include "Common/Noncopyable.hpp"
 #include "property_collection_forward.hpp"
 
-namespace editor
+namespace XRay
+{
+namespace Editor
 {
 class property_holder_base;
+}
+}
 
+namespace editor
+{
 namespace environment
 {
 class manager;
@@ -33,7 +39,7 @@ public:
     ~manager();
     void load();
     void save();
-    void fill(editor::property_holder_base* holder);
+    void fill(XRay::Editor::property_holder_base* holder);
     shared_str unique_id(shared_str const& id) const;
 
 public:
@@ -46,7 +52,7 @@ public:
     effects_ids_type const& effects_ids() const;
 
 private:
-    typedef editor::property_holder_base property_holder_type;
+    typedef XRay::Editor::property_holder_base property_holder_type;
     typedef property_collection<effect_container_type, manager> collection_type;
 
 private:

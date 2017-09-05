@@ -33,7 +33,7 @@ void property_collection<manager::thunderbolt_container_type, manager>::display_
 }
 
 template <>
-editor::property_holder_base* property_collection<manager::thunderbolt_container_type, manager>::create()
+XRay::Editor::property_holder_base* property_collection<manager::thunderbolt_container_type, manager>::create()
 {
     thunderbolt* object = new thunderbolt(&m_holder, generate_unique_id("thunderbolt_unique_id_").c_str());
     object->fill(m_holder.environment(), this);
@@ -48,7 +48,7 @@ void property_collection<manager::collection_container_type, manager>::display_n
 }
 
 template <>
-editor::property_holder_base* property_collection<manager::collection_container_type, manager>::create()
+XRay::Editor::property_holder_base* property_collection<manager::collection_container_type, manager>::create()
 {
     collection* object = new collection(m_holder, generate_unique_id("thunderbolt_collection_unique_id_").c_str());
     object->fill(this);
@@ -191,47 +191,57 @@ float manager::longitude_getter() const { return (rad2deg(m_environment.p_var_lo
 void manager::longitude_setter(float value) { m_environment.p_var_long = deg2rad(value); }
 float manager::tilt_getter() const { return (rad2deg(m_environment.p_tilt)); }
 void manager::tilt_setter(float value) { m_environment.p_tilt = deg2rad(value); }
-void manager::fill(editor::property_holder_base* holder)
+void manager::fill(XRay::Editor::property_holder_base* holder)
 {
     VERIFY(holder);
 
-    typedef ::editor::property_holder_base::float_getter_type float_getter_type;
+    typedef XRay::Editor::property_holder_base::float_getter_type float_getter_type;
     float_getter_type float_getter;
 
-    typedef ::editor::property_holder_base::float_setter_type float_setter_type;
+    typedef XRay::Editor::property_holder_base::float_setter_type float_setter_type;
     float_setter_type float_setter;
 
     float_getter.bind(this, &manager::altitude_getter);
     float_setter.bind(this, &manager::altitude_setter);
-    holder->add_property("altitude", "thunderbolts", "this option is resposible for thunderbolts altitude (in degrees)",
+
+    holder->add_property("altitude", "thunderbolts", "this option is responsible for thunderbolts altitude (in degrees)",
         rad2deg(m_environment.p_var_alt), float_getter, float_setter, -360.0f, 360.f);
 
     float_getter.bind(this, &manager::longitude_getter);
     float_setter.bind(this, &manager::longitude_setter);
+
     holder->add_property("delta longitude", "thunderbolts",
-        "this option is resposible for thunderbolts delta longitude (in degrees)", m_environment.p_var_long,
+        "this option is responsible for thunderbolts delta longitude (in degrees)", m_environment.p_var_long,
         float_getter, float_setter, -360.0f, 360.f);
+
     holder->add_property("minimum distance factor", "thunderbolts",
-        "this option is resposible for thunderbolts minimum distance factor (distance from far plane)",
+        "this option is responsible for thunderbolts minimum distance factor (distance from far plane)",
         m_environment.p_min_dist, m_environment.p_min_dist, .0f, .95f);
 
     float_getter.bind(this, &manager::tilt_getter);
     float_setter.bind(this, &manager::tilt_setter);
-    holder->add_property("tilt", "thunderbolts", "this option is resposible for thunderbolts tilt (in degrees)",
+
+    holder->add_property("tilt", "thunderbolts", "this option is responsible for thunderbolts tilt (in degrees)",
         m_environment.p_tilt, float_getter, float_setter, 15.f, 30.f);
+
     holder->add_property("second probability", "thunderbolts",
-        "this option is resposible for thunderbolts second probability (0..1)", m_environment.p_second_prop,
+        "this option is responsible for thunderbolts second probability (0..1)", m_environment.p_second_prop,
         m_environment.p_second_prop, 0.f, 1.f);
-    holder->add_property("sky color", "thunderbolts", "this option is resposible for thunderbolts sky color (factor)",
+
+    holder->add_property("sky color", "thunderbolts", "this option is responsible for thunderbolts sky color (factor)",
         m_environment.p_sky_color, m_environment.p_sky_color, 0.f, 1.f);
-    holder->add_property("sun color", "thunderbolts", "this option is resposible for thunderbolts sun color (factor)",
+
+    holder->add_property("sun color", "thunderbolts", "this option is responsible for thunderbolts sun color (factor)",
         m_environment.p_sun_color, m_environment.p_sun_color, 0.f, 1.f);
-    holder->add_property("fog color", "thunderbolts", "this option is resposible for thunderbolts fog color (factor)",
+
+    holder->add_property("fog color", "thunderbolts", "this option is responsible for thunderbolts fog color (factor)",
         m_environment.p_fog_color, m_environment.p_fog_color, 0.f, 1.f);
+
     holder->add_property("thunderbolt collections", "thunderbolts",
-        "this option is resposible for thunderbolt collections", m_collections_collection);
+        "this option is responsible for thunderbolt collections", m_collections_collection);
+
     holder->add_property(
-        "thunderbolts", "thunderbolts", "this option is resposible for thunderbolts", m_thunderbolt_collection);
+        "thunderbolts", "thunderbolts", "this option is responsible for thunderbolts", m_thunderbolt_collection);
 }
 
 manager::thunderbolts_ids_type const& manager::thunderbolts_ids() const

@@ -23,8 +23,8 @@ ref class property_collection_converter;
       public System::Collections::IList
 {
 public:
-    typedef editor::property_holder_collection collection_type;
-    typedef editor::property_holder_base property_holder;
+    typedef XRay::Editor::property_holder_collection collection_type;
+    typedef XRay::Editor::property_holder_base property_holder;
     typedef System::Collections::IEnumerator IEnumerator;
     typedef System::Array Array;
     typedef System::Object Object;

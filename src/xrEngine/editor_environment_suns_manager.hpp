@@ -16,10 +16,16 @@
 
 class CLensFlareDescriptor;
 
-namespace editor
+namespace XRay
+{
+namespace Editor
 {
 class property_holder_base;
+}
+}
 
+namespace editor
+{
 namespace environment
 {
 class manager;
@@ -35,7 +41,7 @@ public:
     ~manager();
     void load();
     void save();
-    void fill(editor::property_holder_base* holder);
+    void fill(XRay::Editor::property_holder_base* holder);
     shared_str unique_id(shared_str const& id) const;
     CLensFlareDescriptor* get_flare(shared_str const& id) const;
 

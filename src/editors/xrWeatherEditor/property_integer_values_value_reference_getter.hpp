@@ -17,7 +17,7 @@ ref class property_integer_values_value_reference_getter : public property_integ
                                                            public property_integer_values_value_base
 {
 public:
-    typedef editor::property_holder_base property_holder;
+    typedef XRay::Editor::property_holder_base property_holder;
     typedef property_holder::integer_getter_type integer_getter_type;
     typedef property_holder::integer_setter_type integer_setter_type;
     typedef property_holder::string_collection_getter_type string_collection_getter_type;

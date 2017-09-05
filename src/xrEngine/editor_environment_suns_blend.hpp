@@ -13,11 +13,17 @@
 
 #include "Common/Noncopyable.hpp"
 
-namespace editor
+namespace XRay
+{
+namespace Editor
 {
 class property_holder_base;
 class property_holder_collection;
+}
+}
 
+namespace editor
+{
 namespace environment
 {
 namespace suns
@@ -30,7 +36,7 @@ public:
     blend();
     void load(CInifile& config, shared_str const& section);
     void save(CInifile& config, shared_str const& section);
-    void fill(manager const& manager, editor::property_holder_base* holder, editor::property_holder_collection* collection);
+    void fill(manager const& manager, XRay::Editor::property_holder_base* holder, XRay::Editor::property_holder_collection* collection);
 
 private:
     float m_down_time;

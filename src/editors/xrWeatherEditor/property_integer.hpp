@@ -15,8 +15,8 @@ public
 ref class property_integer : public XRay::SdkControls::IProperty
 {
 public:
-    typedef editor::property_holder_base::integer_getter_type integer_getter_type;
-    typedef editor::property_holder_base::integer_setter_type integer_setter_type;
+    typedef XRay::Editor::property_holder_base::integer_getter_type integer_getter_type;
+    typedef XRay::Editor::property_holder_base::integer_setter_type integer_setter_type;
 
 public:
     property_integer(integer_getter_type const& getter, integer_setter_type const& setter);

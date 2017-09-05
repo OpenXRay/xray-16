@@ -14,10 +14,16 @@
 #include "Common/Noncopyable.hpp"
 #include "property_collection_forward.hpp"
 
-namespace editor
+namespace XRay
+{
+namespace Editor
 {
 class property_holder_base;
+}
+}
 
+namespace editor
+{
 namespace environment
 {
 class manager;
@@ -33,7 +39,7 @@ public:
     ~manager();
     void load();
     void save();
-    void fill(::editor::property_holder_base* property_holder);
+    void fill(XRay::Editor::property_holder_base* property_holder);
     shared_str unique_id(shared_str const& id) const;
     bool save_current_blend(char* buffer, u32 const& buffer_size);
     bool paste_current_time_frame(char const* buffer, u32 const& buffer_size);
@@ -53,7 +59,7 @@ public:
     weather_ids_type const& weather_ids() const;
 
 private:
-    typedef editor::property_holder_base property_holder_type;
+    typedef XRay::Editor::property_holder_base property_holder_type;
     typedef property_collection<weather_container_type, manager> collection_type;
 
 private:

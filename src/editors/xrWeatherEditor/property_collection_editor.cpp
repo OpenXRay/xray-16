@@ -19,7 +19,6 @@ using System::Type;
 using System::String;
 using System::Object;
 using System::ComponentModel::PropertyDescriptor;
-using editor::property_holder_collection;
 using Flobbster::Windows::Forms::PropertyBag;
 using System::ComponentModel::Design::CollectionEditor;
 
@@ -44,7 +43,7 @@ String ^ property_collection_editor::GetDisplayText(Object ^ value)
 {
     property_container ^ container = safe_cast<property_container ^>(value);
 
-    property_holder_collection* collection = container->holder().collection();
+    XRay::Editor::property_holder_collection* collection = container->holder().collection();
     if (!collection)
         return (container->holder().display_name());
 
@@ -62,7 +61,7 @@ String ^ property_collection_editor::GetDisplayText(Object ^ value)
 void property_collection_editor::on_move(Object ^ sender, EventArgs ^ e) { g_ide->window()->view().Invalidate(); }
 property_collection_editor::CollectionForm ^ property_collection_editor::CreateCollectionForm()
 {
-    //	VERIFY						(!m_collection_form);
+    //VERIFY(!m_collection_form);
     m_collection_form = inherited::CreateCollectionForm();
     m_collection_form->Move += gcnew System::EventHandler(this, &property_collection_editor::on_move);
     return (m_collection_form);

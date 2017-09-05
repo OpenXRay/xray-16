@@ -26,13 +26,13 @@ namespace weathers
 {
 class weather;
 
-class time : public CEnvDescriptorMixer, public editor::property_holder_holder, private Noncopyable
+class time : public CEnvDescriptorMixer, public XRay::Editor::property_holder_holder, private Noncopyable
 {
 private:
     typedef CEnvDescriptorMixer inherited;
 
 public:
-    typedef editor::property_holder_base property_holder_type;
+    typedef XRay::Editor::property_holder_base property_holder_type;
 
 public:
     time(editor::environment::manager* manager, weather const* weather, shared_str const& id);
@@ -40,7 +40,7 @@ public:
     void load(CInifile& config);
     void load_from(shared_str const& id, CInifile& config, shared_str const& new_id);
     void save(CInifile& config);
-    void fill(::editor::property_holder_collection* holder);
+    void fill(XRay::Editor::property_holder_collection* holder);
     inline shared_str const& id() const { return m_identifier; }
     virtual property_holder_type* object() { return m_property_holder; }
     virtual void lerp(

@@ -18,7 +18,6 @@
 using editor::environment::thunderbolts::thunderbolt_id;
 using editor::environment::thunderbolts::collection;
 using editor::environment::thunderbolts::manager;
-using editor::property_holder_base;
 
 template <>
 void property_collection<collection::container_type, collection>::display_name(
@@ -28,7 +27,7 @@ void property_collection<collection::container_type, collection>::display_name(
 }
 
 template <>
-editor::property_holder_base* property_collection<collection::container_type, collection>::create()
+XRay::Editor::property_holder_base* property_collection<collection::container_type, collection>::create()
 {
     thunderbolt_id* object = new thunderbolt_id(m_holder.m_manager, "");
     object->fill(this);
@@ -90,24 +89,25 @@ void collection::id_setter(LPCSTR value_)
     section = m_manager.unique_collection_id(value);
 }
 
-void collection::fill(editor::property_holder_collection* collection)
+void collection::fill(XRay::Editor::property_holder_collection* collection)
 {
     VERIFY(!m_property_holder);
     m_property_holder = ::ide().create_property_holder(section.c_str());
 
-    typedef editor::property_holder_base::string_getter_type string_getter_type;
+    typedef XRay::Editor::property_holder_base::string_getter_type string_getter_type;
     string_getter_type string_getter;
     string_getter.bind(this, &collection::id_getter);
 
-    typedef editor::property_holder_base::string_setter_type string_setter_type;
+    typedef XRay::Editor::property_holder_base::string_setter_type string_setter_type;
     string_setter_type string_setter;
     string_setter.bind(this, &collection::id_setter);
 
-    m_property_holder->add_property("id", "properties", "this option is resposible for collection id", section.c_str(),
+    m_property_holder->add_property("id", "properties", "this option is responsible for collection id", section.c_str(),
         string_getter, string_setter);
+
     m_property_holder->add_property(
-        "thunderbolts", "properties", "this option is resposible for thunderbolts", m_collection);
+        "thunderbolts", "properties", "this option is responsible for thunderbolts", m_collection);
 }
 
-property_holder_base* collection::object() { return (m_property_holder); }
+XRay::Editor::property_holder_base* collection::object() { return m_property_holder; }
 #endif // #ifdef INGAME_EDITOR

@@ -17,9 +17,6 @@
 
 namespace editor
 {
-class property_holder_base;
-class property_holder_collection;
-
 namespace environment
 {
 namespace suns
@@ -27,14 +24,14 @@ namespace suns
 class flare;
 class manager;
 
-class sun : public CLensFlare, public editor::property_holder_holder, private Noncopyable
+class sun : public CLensFlare, public XRay::Editor::property_holder_holder, private Noncopyable
 {
 public:
     sun(manager const& manager, shared_str const& section);
     ~sun();
     void load(CInifile& config);
     void save(CInifile& config);
-    void fill(editor::property_holder_collection* collection);
+    void fill(XRay::Editor::property_holder_collection* collection);
 
 private:
     LPCSTR xr_stdcall id_getter() const;
@@ -42,14 +39,14 @@ private:
 
 public:
     inline shared_str const& id() const { return m_id; }
-    virtual property_holder_base* object();
+    virtual XRay::Editor::property_holder_base* object();
 
 private:
     shared_str m_id;
     shared_str m_shader;
     shared_str m_texture;
     manager const& m_manager;
-    editor::property_holder_base* m_property_holder;
+    XRay::Editor::property_holder_base* m_property_holder;
     float m_radius;
     bool m_use;
     bool m_ignore_color;

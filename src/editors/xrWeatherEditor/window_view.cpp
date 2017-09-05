@@ -258,7 +258,7 @@ Void window_view::ViewPanel_MouseClick(Object ^ sender, MouseEventArgs ^ e)
 
     HDC dc = GetWindowDC((HWND)ViewPanel->Handle.ToInt32());
     u32 pixel_color = GetPixel(dc, e->Location.X, e->Location.Y);
-    editor::color value;
+    XRay::Editor::color value;
     value.r = float((pixel_color & 0x000000ff) >> 0) / 255.f;
     value.g = float((pixel_color & 0x0000ff00) >> 8) / 255.f;
     value.b = float((pixel_color & 0x00ff0000) >> 16) / 255.f;

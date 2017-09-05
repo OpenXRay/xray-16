@@ -14,10 +14,10 @@
 #include "Common/object_broker.h"
 
 template <typename container_type, typename holder_type>
-class property_collection : public editor::property_holder_collection, private Noncopyable
+class property_collection : public XRay::Editor::property_holder_collection, private Noncopyable
 {
 public:
-    typedef editor::property_holder_base property_holder;
+    typedef XRay::Editor::property_holder_base property_holder;
 
 public:
     inline property_collection(container_type* container, holder_type* holder, bool* changed = 0);

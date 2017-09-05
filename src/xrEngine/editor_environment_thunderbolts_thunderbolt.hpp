@@ -26,7 +26,7 @@ namespace thunderbolts
 {
 class manager;
 
-class thunderbolt : public SThunderboltDesc, public editor::property_holder_holder, private Noncopyable
+class thunderbolt : public SThunderboltDesc, public XRay::Editor::property_holder_holder, private Noncopyable
 {
 private:
     typedef SThunderboltDesc inherited;
@@ -36,7 +36,7 @@ public:
     virtual ~thunderbolt();
     void load(CInifile& config);
     void save(CInifile& config);
-    void fill(::editor::environment::manager& environment, editor::property_holder_collection* collection);
+    void fill(::editor::environment::manager& environment, XRay::Editor::property_holder_collection* collection);
     inline LPCSTR id() const { return m_id.c_str(); }
     virtual void create_top_gradient(CInifile& pIni, shared_str const& sect);
     virtual void create_center_gradient(CInifile& pIni, shared_str const& sect);
@@ -46,7 +46,7 @@ private:
     void xr_stdcall id_setter(LPCSTR value);
 
 private:
-    typedef editor::property_holder_base property_holder_type;
+    typedef XRay::Editor::property_holder_base property_holder_type;
 
 public:
     virtual property_holder_type* object();

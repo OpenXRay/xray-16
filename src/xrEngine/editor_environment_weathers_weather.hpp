@@ -26,17 +26,17 @@ namespace weathers
 class manager;
 class time;
 
-class weather : public editor::property_holder_holder, private Noncopyable
+class weather : public XRay::Editor::property_holder_holder, private Noncopyable
 {
 public:
-    typedef editor::property_holder_base property_holder_type;
+    typedef XRay::Editor::property_holder_base property_holder_type;
 
 public:
     weather(environment::manager* manager, shared_str const& id);
     virtual ~weather();
     void load();
     void save();
-    void fill(::editor::property_holder_collection* holder);
+    void fill(XRay::Editor::property_holder_collection* holder);
     inline shared_str const& id() const { return m_id; }
     shared_str unique_id(shared_str const& current, shared_str const& id) const;
     shared_str generate_unique_id() const;

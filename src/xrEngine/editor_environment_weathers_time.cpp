@@ -23,9 +23,9 @@
 using editor::environment::weathers::time;
 using editor::environment::weathers::weather;
 
-static inline editor::color create_color(float const& r, float const& g, float const& b)
+static inline XRay::Editor::color create_color(float const& r, float const& g, float const& b)
 {
-    editor::color result;
+    XRay::Editor::color result;
     result.r = r;
     result.g = g;
     result.b = b;
@@ -240,36 +240,36 @@ float time::sky_rotation_getter() const { return (rad2deg(sky_rotation)); }
 void time::sky_rotation_setter(float value) { sky_rotation = deg2rad(value); }
 float time::wind_direction_getter() const { return (rad2deg(wind_direction)); }
 void time::wind_direction_setter(float value) { wind_direction = deg2rad(value); }
-void time::fill(editor::property_holder_collection* collection)
+void time::fill(XRay::Editor::property_holder_collection* collection)
 {
     VERIFY(!m_property_holder);
     m_property_holder = ::ide().create_property_holder(m_identifier.c_str(), collection, this);
 
-    typedef editor::property_holder_base::string_getter_type string_getter_type;
+    typedef XRay::Editor::property_holder_base::string_getter_type string_getter_type;
     string_getter_type string_getter;
     string_getter.bind(this, &time::id_getter);
 
-    typedef editor::property_holder_base::string_setter_type string_setter_type;
+    typedef XRay::Editor::property_holder_base::string_setter_type string_setter_type;
     string_setter_type string_setter;
     string_setter.bind(this, &time::id_setter);
 
-    m_property_holder->add_property("id", "properties", "this option is resposible for time interval",
+    m_property_holder->add_property("id", "properties", "this option is responsible for time interval",
         m_identifier.c_str(), string_getter, string_setter);
 
-    m_property_holder->add_property("color", "sun", "this option is resposible for sun color",
-        (editor::color const&)sun_color, (editor::color&)sun_color);
-    m_property_holder->add_property("shafts intensity", "sun", "this option is resposible for sun shafts intensity",
+    m_property_holder->add_property("color", "sun", "this option is responsible for sun color",
+        (XRay::Editor::color const&)sun_color, (XRay::Editor::color&)sun_color);
+    m_property_holder->add_property("shafts intensity", "sun", "this option is responsible for sun shafts intensity",
         m_fSunShaftsIntensity, m_fSunShaftsIntensity, 0.f, 1.f);
 
-    typedef editor::property_holder_base::float_getter_type float_getter_type;
+    typedef XRay::Editor::property_holder_base::float_getter_type float_getter_type;
     float_getter_type sun_altitude_getter;
     sun_altitude_getter.bind(this, &time::sun_altitude_getter);
 
-    typedef editor::property_holder_base::float_setter_type float_setter_type;
+    typedef XRay::Editor::property_holder_base::float_setter_type float_setter_type;
     float_setter_type sun_altitude_setter;
     sun_altitude_setter.bind(this, &time::sun_altitude_setter);
 
-    m_property_holder->add_property("altitude", "sun", "this option is resposible for sun altitude (in degrees)",
+    m_property_holder->add_property("altitude", "sun", "this option is responsible for sun altitude (in degrees)",
         sun_altitude_getter(), sun_altitude_getter, sun_altitude_setter, -360.f, 360.f);
 
     float_getter_type sun_longitude_getter;
@@ -278,20 +278,20 @@ void time::fill(editor::property_holder_collection* collection)
     float_setter_type sun_longitude_setter;
     sun_longitude_setter.bind(this, &time::sun_longitude_setter);
 
-    m_property_holder->add_property("longitude", "sun", "this option is resposible for sun longitude (in degrees)",
+    m_property_holder->add_property("longitude", "sun", "this option is responsible for sun longitude (in degrees)",
         sun_longitude_getter(), sun_longitude_getter, sun_longitude_setter, -360.f, 360.f);
 
-    typedef editor::property_holder_base::string_collection_getter_type collection_getter_type;
+    typedef XRay::Editor::property_holder_base::string_collection_getter_type collection_getter_type;
     collection_getter_type collection_getter;
 
-    typedef editor::property_holder_base::string_collection_size_getter_type collection_size_getter_type;
+    typedef XRay::Editor::property_holder_base::string_collection_size_getter_type collection_size_getter_type;
     collection_size_getter_type collection_size_getter;
 
     collection_getter.bind(this, &time::suns_collection);
     collection_size_getter.bind(this, &time::suns_collection_size);
-    m_property_holder->add_property("sun", "sun", "this option is resposible for ambient", m_sun.c_str(), m_sun,
-        collection_getter, collection_size_getter, editor::property_holder_base::value_editor_combo_box,
-        editor::property_holder_base::cannot_enter_text);
+    m_property_holder->add_property("sun", "sun", "this option is responsible for ambient", m_sun.c_str(), m_sun,
+        collection_getter, collection_size_getter, XRay::Editor::property_holder_base::value_editor_combo_box,
+        XRay::Editor::property_holder_base::cannot_enter_text);
 
     string_getter_type sky_texture_getter;
     sky_texture_getter.bind(this, &time::sky_texture_getter);
@@ -299,86 +299,86 @@ void time::fill(editor::property_holder_collection* collection)
     string_setter_type sky_texture_setter;
     sky_texture_setter.bind(this, &time::sky_texture_setter);
 
-    m_property_holder->add_property("texture", "hemisphere", "this option is resposible for sky texture",
+    m_property_holder->add_property("texture", "hemisphere", "this option is responsible for sky texture",
         sky_texture_name.c_str(), sky_texture_getter, sky_texture_setter, ".dds", "Texture files (*.dds)|*.dds",
         detail::real_path("$game_textures$", "").c_str(), "Select texture...",
-        editor::property_holder_base::cannot_enter_text, editor::property_holder_base::remove_extension);
+        XRay::Editor::property_holder_base::cannot_enter_text, XRay::Editor::property_holder_base::remove_extension);
 
-    m_property_holder->add_property("sky color", "hemisphere", "this option is resposible for sky color",
-        (editor::color const&)sky_color, (editor::color&)sky_color);
+    m_property_holder->add_property("sky color", "hemisphere", "this option is responsible for sky color",
+        (XRay::Editor::color const&)sky_color, (XRay::Editor::color&)sky_color);
 
-    m_property_holder->add_property("hemi color", "hemisphere", "this option is resposible for hemisphere color",
-        (editor::color const&)hemi_color, (editor::color&)hemi_color);
+    m_property_holder->add_property("hemi color", "hemisphere", "this option is responsible for hemisphere color",
+        (XRay::Editor::color const&)hemi_color, (XRay::Editor::color&)hemi_color);
 
-    typedef ::editor::property_holder_base::float_getter_type float_getter_type;
+    typedef XRay::Editor::property_holder_base::float_getter_type float_getter_type;
     float_getter_type float_getter;
 
-    typedef ::editor::property_holder_base::float_setter_type float_setter_type;
+    typedef XRay::Editor::property_holder_base::float_setter_type float_setter_type;
     float_setter_type float_setter;
 
     float_getter.bind(this, &time::sky_rotation_getter);
     float_setter.bind(this, &time::sky_rotation_setter);
-    m_property_holder->add_property("sky rotation", "hemisphere", "this option is resposible for sky rotation",
+    m_property_holder->add_property("sky rotation", "hemisphere", "this option is responsible for sky rotation",
         sky_rotation, float_getter, float_setter, -360.0f, 360.f);
 
     string_getter.bind(this, &time::clouds_texture_getter);
     string_setter.bind(this, &time::clouds_texture_setter);
-    m_property_holder->add_property("texture", "clouds", "this option is resposible for clouds texture",
+    m_property_holder->add_property("texture", "clouds", "this option is responsible for clouds texture",
         clouds_texture_name.c_str(), string_getter, string_setter, ".dds", "Texture files (*.dds)|*.dds",
         detail::real_path("$game_textures$", "").c_str(), "Select texture...",
-        editor::property_holder_base::cannot_enter_text, editor::property_holder_base::remove_extension);
+        XRay::Editor::property_holder_base::cannot_enter_text, XRay::Editor::property_holder_base::remove_extension);
 
-    m_property_holder->add_property("color", "clouds", "this option is resposible for clouds color",
-        (editor::color const&)clouds_color, (editor::color&)clouds_color);
+    m_property_holder->add_property("color", "clouds", "this option is responsible for clouds color",
+        (XRay::Editor::color const&)clouds_color, (XRay::Editor::color&)clouds_color);
 
-    m_property_holder->add_property("transparency", "clouds", "this option is resposible for clouds transparency",
+    m_property_holder->add_property("transparency", "clouds", "this option is responsible for clouds transparency",
         clouds_color.w, clouds_color.w, 0.f, 1.f);
 
-    m_property_holder->add_property("color", "ambient", "this option is resposible for ambient color",
-        (editor::color const&)ambient, (editor::color&)ambient);
+    m_property_holder->add_property("color", "ambient", "this option is responsible for ambient color",
+        (XRay::Editor::color const&)ambient, (XRay::Editor::color&)ambient);
 
     collection_getter.bind(this, &time::ambients_collection);
     collection_size_getter.bind(this, &time::ambients_collection_size);
 
     string_getter.bind(this, &time::ambient_getter);
     string_setter.bind(this, &time::ambient_setter);
-    m_property_holder->add_property("ambient", "ambient", "this option is resposible for ambient", m_ambient.c_str(),
+    m_property_holder->add_property("ambient", "ambient", "this option is responsible for ambient", m_ambient.c_str(),
         string_getter, string_setter, collection_getter, collection_size_getter,
-        editor::property_holder_base::value_editor_combo_box, editor::property_holder_base::cannot_enter_text);
+        XRay::Editor::property_holder_base::value_editor_combo_box, XRay::Editor::property_holder_base::cannot_enter_text);
 
-    m_property_holder->add_property("color", "fog", "this option is resposible for fog density (0..1)",
-        (editor::color const&)fog_color, (editor::color&)fog_color);
+    m_property_holder->add_property("color", "fog", "this option is responsible for fog density (0..1)",
+        (XRay::Editor::color const&)fog_color, (XRay::Editor::color&)fog_color);
     m_property_holder->add_property(
-        "far plane", "fog", "this option is resposible for far plane", far_plane, far_plane);
+        "far plane", "fog", "this option is responsible for far plane", far_plane, far_plane);
     m_property_holder->add_property("distance", "fog",
-        "this option is resposible for fog distance (shoudl be less than far plane)", fog_distance, fog_distance);
+        "this option is responsible for fog distance (should be less than far plane)", fog_distance, fog_distance);
     m_property_holder->add_property(
-        "density", "fog", "this option is resposible for fog density (0..1)", fog_density, fog_density, 0.f, 1.f);
-    m_property_holder->add_property("water intensity", "fog", "this option is resposible for water intensity (0..1)",
+        "density", "fog", "this option is responsible for fog density (0..1)", fog_density, fog_density, 0.f, 1.f);
+    m_property_holder->add_property("water intensity", "fog", "this option is responsible for water intensity (0..1)",
         m_fWaterIntensity, m_fWaterIntensity, 0.f, 1.f);
 
-    m_property_holder->add_property("rain color", "rain", "this option is resposible for rain color",
-        (editor::color const&)rain_color, (editor::color&)rain_color);
-    m_property_holder->add_property("rain density", "rain", "this option is resposible for rain density (0..1)",
+    m_property_holder->add_property("rain color", "rain", "this option is responsible for rain color",
+        (XRay::Editor::color const&)rain_color, (XRay::Editor::color&)rain_color);
+    m_property_holder->add_property("rain density", "rain", "this option is responsible for rain density (0..1)",
         rain_density, rain_density, 0.f, 1.f);
 
     collection_getter.bind(this, &time::thunderbolts_collection);
     collection_size_getter.bind(this, &time::thunderbolts_collection_size);
-    m_property_holder->add_property("collection", "thunderbolts", "this option is resposible for ambient",
+    m_property_holder->add_property("collection", "thunderbolts", "this option is responsible for ambient",
         m_thunderbolt_collection.c_str(), m_thunderbolt_collection, collection_getter, collection_size_getter,
-        editor::property_holder_base::value_editor_combo_box, editor::property_holder_base::cannot_enter_text);
+        XRay::Editor::property_holder_base::value_editor_combo_box, XRay::Editor::property_holder_base::cannot_enter_text);
 
     m_property_holder->add_property(
-        "duration", "thunderbolts", "this option is resposible for thunderbolt duration", bolt_duration, bolt_duration);
+        "duration", "thunderbolts", "this option is responsible for thunderbolt duration", bolt_duration, bolt_duration);
     m_property_holder->add_property(
-        "period", "thunderbolts", "this option is resposible for thunderbolt period", bolt_period, bolt_period);
+        "period", "thunderbolts", "this option is responsible for thunderbolt period", bolt_period, bolt_period);
 
     float_getter.bind(this, &time::wind_direction_getter);
     float_setter.bind(this, &time::wind_direction_setter);
-    m_property_holder->add_property("direction", "wind", "this option is resposible for wind direction (in degrees)",
+    m_property_holder->add_property("direction", "wind", "this option is responsible for wind direction (in degrees)",
         wind_direction, float_getter, float_setter, -360.f, 360.f);
     m_property_holder->add_property("velocity", "wind",
-        "this option is resposible for wind velocity (meters per second)", wind_velocity, wind_velocity, 0.f, 1000.f);
+        "this option is responsible for wind velocity (meters per second)", wind_velocity, wind_velocity, 0.f, 1000.f);
 }
 
 void time::lerp(CEnvironment* parent, CEnvDescriptor& A, CEnvDescriptor& B, float f, CEnvModifier& M, float m_power)

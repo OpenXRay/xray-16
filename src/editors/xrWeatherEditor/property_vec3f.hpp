@@ -15,16 +15,16 @@ public
 ref class property_vec3f : public property_vec3f_base
 {
 public:
-    typedef editor::property_holder_base::vec3f_getter_type vec3f_getter_type;
-    typedef editor::property_holder_base::vec3f_setter_type vec3f_setter_type;
+    typedef XRay::Editor::property_holder_base::vec3f_getter_type vec3f_getter_type;
+    typedef XRay::Editor::property_holder_base::vec3f_setter_type vec3f_setter_type;
     typedef property_vec3f_base inherited;
 
 public:
     property_vec3f(vec3f_getter_type const& getter, vec3f_setter_type const& setter);
     virtual ~property_vec3f();
     !property_vec3f();
-    virtual editor::vec3f get_value_raw() override;
-    virtual void set_value_raw(editor::vec3f value) override;
+    virtual XRay::Editor::vec3f get_value_raw() override;
+    virtual void set_value_raw(XRay::Editor::vec3f value) override;
 
 private:
     vec3f_getter_type* m_getter;

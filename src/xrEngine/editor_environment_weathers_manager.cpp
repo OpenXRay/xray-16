@@ -31,7 +31,7 @@ void property_collection<manager::weather_container_type, manager>::display_name
 }
 
 template <>
-editor::property_holder_base* property_collection<manager::weather_container_type, manager>::create()
+XRay::Editor::property_holder_base* property_collection<manager::weather_container_type, manager>::create()
 {
     weather* object = new weather(&m_holder.m_manager, generate_unique_id("weather_unique_id_").c_str());
     object->fill(this);

@@ -25,13 +25,13 @@ float vec3f_components::y_getter() { return (m_holder->get_value_raw().y); }
 void vec3f_components::y_setter(float value) { m_holder->y(value); }
 float vec3f_components::z_getter() { return (m_holder->get_value_raw().z); }
 void vec3f_components::z_setter(float value) { m_holder->z(value); }
-property_vec3f_base::property_vec3f_base(editor::vec3f const % vec3f)
+property_vec3f_base::property_vec3f_base(XRay::Editor::vec3f const % vec3f)
 {
     m_container = gcnew property_container(nullptr, this);
     m_components = new vec3f_components(this);
 
-    typedef editor::property_holder_base::float_getter_type float_getter_type;
-    typedef editor::property_holder_base::float_setter_type float_setter_type;
+    typedef XRay::Editor::property_holder_base::float_getter_type float_getter_type;
+    typedef XRay::Editor::property_holder_base::float_setter_type float_setter_type;
 
     float_getter_type getter;
     float_setter_type setter;
@@ -61,7 +61,7 @@ Object ^ property_vec3f_base::GetValue() { return (m_container); }
 void property_vec3f_base::SetValue(Object ^ object)
 {
     Vec3f vec3f = safe_cast<Vec3f>(object);
-    editor::vec3f value;
+    XRay::Editor::vec3f value;
     value.x = vec3f.x;
     value.y = vec3f.y;
     value.z = vec3f.z;
@@ -70,21 +70,21 @@ void property_vec3f_base::SetValue(Object ^ object)
 
 void property_vec3f_base::x(float value)
 {
-    editor::vec3f current = get_value_raw();
+    XRay::Editor::vec3f current = get_value_raw();
     current.x = value;
     set_value_raw(current);
 }
 
 void property_vec3f_base::y(float value)
 {
-    editor::vec3f current = get_value_raw();
+    XRay::Editor::vec3f current = get_value_raw();
     current.y = value;
     set_value_raw(current);
 }
 
 void property_vec3f_base::z(float value)
 {
-    editor::vec3f current = get_value_raw();
+    XRay::Editor::vec3f current = get_value_raw();
     current.z = value;
     set_value_raw(current);
 }

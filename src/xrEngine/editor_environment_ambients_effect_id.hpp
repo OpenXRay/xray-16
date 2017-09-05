@@ -16,8 +16,6 @@
 
 namespace editor
 {
-class property_holder_collection;
-
 namespace environment
 {
 namespace effects
@@ -27,15 +25,15 @@ class manager;
 
 namespace ambients
 {
-class effect_id : public editor::property_holder_holder, private Noncopyable
+class effect_id : public XRay::Editor::property_holder_holder, private Noncopyable
 {
 public:
     effect_id(effects::manager const& manager, shared_str const& id);
     virtual ~effect_id();
-    void fill(editor::property_holder_collection* collection);
+    void fill(XRay::Editor::property_holder_collection* collection);
     inline shared_str const& id() const { return m_id; }
 private:
-    typedef editor::property_holder_base property_holder_type;
+    typedef XRay::Editor::property_holder_base property_holder_type;
 
 public:
     virtual property_holder_type* object();

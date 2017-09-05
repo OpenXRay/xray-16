@@ -33,7 +33,7 @@ void property_collection<ambient::effect_container_type, ambient>::display_name(
 }
 
 template <>
-editor::property_holder_base* property_collection<ambient::effect_container_type, ambient>::create()
+XRay::Editor::property_holder_base* property_collection<ambient::effect_container_type, ambient>::create()
 {
     effect_id* object = new effect_id(m_holder.effects_manager(), "");
     object->fill(this);
@@ -48,7 +48,7 @@ void property_collection<ambient::sound_container_type, ambient>::display_name(
 }
 
 template <>
-editor::property_holder_base* property_collection<ambient::sound_container_type, ambient>::create()
+XRay::Editor::property_holder_base* property_collection<ambient::sound_container_type, ambient>::create()
 {
     sound_id* object = new sound_id(m_holder.sounds_manager(), "");
     object->fill(this);
@@ -171,29 +171,33 @@ void ambient::id_setter(LPCSTR value_)
     m_load_section = m_manager.unique_id(value);
 }
 
-void ambient::fill(editor::property_holder_collection* collection)
+void ambient::fill(XRay::Editor::property_holder_collection* collection)
 {
     VERIFY(!m_property_holder);
     m_property_holder = ::ide().create_property_holder(m_load_section.c_str(), collection, this);
 
-    typedef editor::property_holder_base::string_getter_type string_getter_type;
+    typedef XRay::Editor::property_holder_base::string_getter_type string_getter_type;
     string_getter_type string_getter;
     string_getter.bind(this, &ambient::id_getter);
 
-    typedef editor::property_holder_base::string_setter_type string_setter_type;
+    typedef XRay::Editor::property_holder_base::string_setter_type string_setter_type;
     string_setter_type string_setter;
     string_setter.bind(this, &ambient::id_setter);
 
-    m_property_holder->add_property("id", "properties", "this option is resposible for ambient identifier",
+    m_property_holder->add_property("id", "properties", "this option is responsible for ambient identifier",
         m_load_section.c_str(), string_getter, string_setter);
+
     m_property_holder->add_property("minimum period", "effects",
-        "this option is resposible for minimum effect period (in seconds)", m_effect_period.x, m_effect_period.x);
+        "this option is responsible for minimum effect period (in seconds)", m_effect_period.x, m_effect_period.x);
+
     m_property_holder->add_property("maximum period", "effects",
-        "this option is resposible for maximum effect period (in seconds)", m_effect_period.y, m_effect_period.y);
+        "this option is responsible for maximum effect period (in seconds)", m_effect_period.y, m_effect_period.y);
+
     m_property_holder->add_property(
-        "effects", "effects", "this option is resposible for maximum effects", m_effects_collection);
+        "effects", "effects", "this option is responsible for maximum effects", m_effects_collection);
+
     m_property_holder->add_property(
-        "sound channels", "sounds", "this option is resposible for sound channels", m_sounds_collection);
+        "sound channels", "sounds", "this option is responsible for sound channels", m_sounds_collection);
 }
 
 ambient::property_holder_type* ambient::object() { return (m_property_holder); }

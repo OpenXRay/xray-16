@@ -14,10 +14,16 @@
 #include "Common/Noncopyable.hpp"
 #include "xrCore/Containers/AssociativeVector.hpp"
 
-namespace editor
+namespace XRay
+{
+namespace Editor
 {
 class property_holder_base;
+}
+}
 
+namespace editor
+{
 namespace environment
 {
 namespace weathers
@@ -59,7 +65,7 @@ private:
     ::editor::environment::weathers::manager& m_weathers;
     CInifile* m_config_single;
     CInifile* m_config_mp;
-    editor::property_holder_base* m_property_holder;
+    XRay::Editor::property_holder_base* m_property_holder;
 }; // class levels_manager
 
 } // namespace levels

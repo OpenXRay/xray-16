@@ -20,7 +20,7 @@ void window_ide::custom_init(editor::engine* engine)
 
     m_engine = engine;
 
-    Extender::SetSchema(Editor, Extender::Schema::FromBase);
+    Extender::SetSchema(EditorDock, Extender::Schema::FromBase);
 
     m_view = gcnew window_view(*this);
     m_levels = gcnew window_levels(this);

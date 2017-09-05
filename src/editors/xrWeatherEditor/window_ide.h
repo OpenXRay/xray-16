@@ -67,7 +67,7 @@ protected:
 
 protected:
 private:
-    WeifenLuo::WinFormsUI::DockPanel ^ Editor;
+    WeifenLuo::WinFormsUI::DockPanel ^ EditorDock;
 
 private:
     /// <summary>
@@ -82,27 +82,27 @@ private:
     /// </summary>
     void InitializeComponent(void)
     {
-        this->Editor = (gcnew WeifenLuo::WinFormsUI::DockPanel());
+        this->EditorDock = (gcnew WeifenLuo::WinFormsUI::DockPanel());
         this->SuspendLayout();
         //
         // Editor
         //
-        this->Editor->ActiveAutoHideContent = nullptr;
-        this->Editor->Dock = System::Windows::Forms::DockStyle::Fill;
-        this->Editor->DocumentStyle = WeifenLuo::WinFormsUI::DocumentStyles::DockingSdi;
-        this->Editor->Font = (gcnew System::Drawing::Font(
+        this->EditorDock->ActiveAutoHideContent = nullptr;
+        this->EditorDock->Dock = System::Windows::Forms::DockStyle::Fill;
+        this->EditorDock->DocumentStyle = WeifenLuo::WinFormsUI::DocumentStyles::DockingSdi;
+        this->EditorDock->Font = (gcnew System::Drawing::Font(
             L"Tahoma", 11, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::World));
-        this->Editor->Location = System::Drawing::Point(0, 0);
-        this->Editor->Name = L"Editor";
-        this->Editor->Size = System::Drawing::Size(632, 453);
-        this->Editor->TabIndex = 17;
+        this->EditorDock->Location = System::Drawing::Point(0, 0);
+        this->EditorDock->Name = L"Editor";
+        this->EditorDock->Size = System::Drawing::Size(632, 453);
+        this->EditorDock->TabIndex = 17;
         //
         // window_ide
         //
         this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
         this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
         this->ClientSize = System::Drawing::Size(632, 453);
-        this->Controls->Add(this->Editor);
+        this->Controls->Add(this->EditorDock);
         this->Name = L"window_ide";
         this->StartPosition = System::Windows::Forms::FormStartPosition::Manual;
         this->Text = L"editor";

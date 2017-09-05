@@ -11,7 +11,7 @@
 
 #pragma unmanaged
 #include <windows.h>
-#include "xrcore/fastdelegate.h"
+#include "xrCore/fastdelegate.h"
 #include <utility>
 #include "include/editor/ide.hpp"
 #pragma managed
@@ -29,7 +29,7 @@ class ide_impl : public editor::ide
 {
 public:
     typedef editor::window_ide window_ide;
-    typedef editor::property_holder_base property_holder;
+    typedef XRay::Editor::property_holder_base property_holder;
 
 public:
     ide_impl(editor::engine* engine);
@@ -50,7 +50,7 @@ public:
 
 public:
     virtual property_holder* create_property_holder(
-        LPCSTR display_name, editor::property_holder_collection* collection, editor::property_holder_holder* holder);
+        LPCSTR display_name, XRay::Editor::property_holder_collection* collection, XRay::Editor::property_holder_holder* holder);
     virtual void destroy(property_holder*& property_holder);
     virtual void environment_levels(property_holder* property_holder);
     virtual void environment_weathers(property_holder* property_holder);
