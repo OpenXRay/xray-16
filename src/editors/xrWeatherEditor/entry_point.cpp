@@ -13,7 +13,7 @@
 private ref class window_ide_final : public editor::window_ide
 {
 public:
-    window_ide_final(editor::ide_base*& ide, editor::engine* engine) : editor::window_ide(engine)
+    window_ide_final(editor::ide_base*& ide, editor::engine_base* engine) : editor::window_ide(engine)
     {
         m_ide = ide;
         Application::Idle += gcnew System::EventHandler(this, &window_ide_final::on_idle);
@@ -60,7 +60,7 @@ private:
 
 ide_impl* g_ide = nullptr;
 
-static void initialize_impl(editor::ide_base*& ide, editor::engine* engine)
+static void initialize_impl(editor::ide_base*& ide, editor::engine_base* engine)
 {
     VERIFY(!g_ide);
     g_ide = new ide_impl(engine);
@@ -73,7 +73,7 @@ static void initialize_impl(editor::ide_base*& ide, editor::engine* engine)
 WINOLEAPI CoInitializeEx(IN LPVOID pvReserved, IN DWORD dwCoInit);
 #pragma comment(lib, "ole32.lib")
 
-extern "C" __declspec(dllexport) void initialize(editor::ide_base*& ide, editor::engine* engine)
+extern "C" __declspec(dllexport) void initialize(editor::ide_base*& ide, editor::engine_base* engine)
 {
     CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
     initialize_impl(ide, engine);

@@ -15,7 +15,7 @@ using Flobbster::Windows::Forms::PropertyBag;
 typedef PropertyBag::PropertySpecDescriptor PropertySpecDescriptor;
 
 using editor::window_weather_editor;
-using editor::engine;
+using editor::engine_base;
 
 using Microsoft::Win32::Registry;
 using Microsoft::Win32::RegistryKey;
@@ -23,20 +23,20 @@ using Microsoft::Win32::RegistryValueKind;
 
 struct engine_pauser_guard
 {
-    engine& m_engine;
+    engine_base& m_engine;
     bool m_weather_paused;
 
     // Non-copyable
     engine_pauser_guard(const engine_pauser_guard&) = delete;
     engine_pauser_guard& operator=(const engine_pauser_guard&) = delete;
 
-    inline engine_pauser_guard(engine& engine, bool const& value)
+    inline engine_pauser_guard(engine_base& engine, bool const& value)
         : m_engine(engine), m_weather_paused(engine.weather_paused())
     {
         engine.weather_paused(value);
     }
 
-    inline engine_pauser_guard(engine& engine) : m_engine(engine), m_weather_paused(engine.weather_paused()) {}
+    inline engine_pauser_guard(engine_base& engine) : m_engine(engine), m_weather_paused(engine.weather_paused()) {}
     inline ~engine_pauser_guard() { m_engine.weather_paused(m_weather_paused); }
 }; // struct engine_pauser_guard
 

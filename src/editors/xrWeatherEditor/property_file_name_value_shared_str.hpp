@@ -19,7 +19,7 @@ private:
     typedef property_string_shared_str inherited;
 
 public:
-    property_file_name_value_shared_str(editor::engine* engine, shared_str& value, System::String ^ DefaultExt_,
+    property_file_name_value_shared_str(editor::engine_base* engine, shared_str& value, System::String ^ DefaultExt_,
         System::String ^ Filter_, System::String ^ InitialDirectory_, System::String ^ Title_, bool remove_extension);
 
     virtual System::String ^ default_extension();

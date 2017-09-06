@@ -22,7 +22,7 @@ private:
 
 public:
     property_string_values_value_shared_str(
-        editor::engine* engine, shared_str& value, LPCSTR const* values, u32 const& value_count);
+        editor::engine_base* engine, shared_str& value, LPCSTR const* values, u32 const& value_count);
 
     virtual collection_type ^ values() { return m_collection; };
 

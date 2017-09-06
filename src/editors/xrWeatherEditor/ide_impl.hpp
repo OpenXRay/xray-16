@@ -21,7 +21,7 @@
 namespace editor
 {
 ref class window_ide;
-class engine;
+class engine_base;
 class property_holder_holder;
 } // namespace editor
 
@@ -32,7 +32,7 @@ public:
     typedef XRay::Editor::property_holder_base property_holder;
 
 public:
-    ide_impl(editor::engine* engine);
+    ide_impl(editor::engine_base* engine);
     virtual ~ide_impl();
     void window(window_ide ^ window);
     window_ide ^ window();
@@ -59,7 +59,7 @@ public:
         frames_size_getter_type const& frames_size_getter);
 
 private:
-    editor::engine* m_engine;
+    editor::engine_base* m_engine;
     gcroot<window_ide ^> m_window;
     bool m_paused;
     bool m_in_idle;

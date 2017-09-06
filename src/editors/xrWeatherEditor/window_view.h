@@ -181,7 +181,7 @@ public:
 
 private:
     window_ide ^ m_ide;
-    editor::engine* m_engine;
+    editor::engine_base* m_engine;
     PropertyGrid ^ m_property_grid;
     Point m_previous_location;
     bool m_loaded;

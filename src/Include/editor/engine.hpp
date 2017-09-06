@@ -21,7 +21,7 @@ class property_holder_base;
 
 namespace editor
 {
-class engine
+class engine_base
 {
 public:
     virtual bool on_message(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& result) = 0;

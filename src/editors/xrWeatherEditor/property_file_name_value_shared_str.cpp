@@ -11,7 +11,7 @@
 
 using System::String;
 
-property_file_name_value_shared_str::property_file_name_value_shared_str(editor::engine* engine, shared_str& value,
+property_file_name_value_shared_str::property_file_name_value_shared_str(editor::engine_base* engine, shared_str& value,
     System::String ^ DefaultExt_, System::String ^ Filter_, System::String ^ InitialDirectory_, System::String ^ Title_,
     bool remove_extension)
     : inherited(engine, value), DefaultExt(DefaultExt_), Filter(Filter_), InitialDirectory(InitialDirectory_),

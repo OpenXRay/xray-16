@@ -10,7 +10,7 @@
 #include "property_string_shared_str.hpp"
 #include "engine_include.hpp"
 
-property_string_shared_str::property_string_shared_str(editor::engine* engine, shared_str& value)
+property_string_shared_str::property_string_shared_str(editor::engine_base* engine, shared_str& value)
     : m_engine(engine), m_value(&value)
 {
 }

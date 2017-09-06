@@ -11,7 +11,7 @@ using namespace System::Drawing;
 
 namespace editor
 {
-class engine;
+class engine_base;
 ref class window_ide;
 /// <summary>
 /// Summary for window_weather_editor
@@ -25,7 +25,7 @@ ref class window_ide;
 public ref class window_weather_editor : public WeifenLuo::WinFormsUI::DockContent
 {
 public:
-    window_weather_editor(window_ide ^ ide, engine* engine)
+    window_weather_editor(window_ide ^ ide, engine_base* engine)
         : m_ide(ide), m_engine(*engine), m_weathers_getter(0), m_weathers_size_getter(0), m_frames_getter(0),
           m_frames_size_getter(0), m_update_enabled(true), m_load_finished(false), m_mouse_down(false),
           m_update_frames_combo_box(false), m_update_frame_trackbar(false), m_update_text_value(false),
@@ -971,7 +971,7 @@ private:
 
 private:
     window_ide ^ m_ide;
-    engine& m_engine;
+    engine_base& m_engine;
     weathers_getter_type* m_weathers_getter;
     weathers_size_getter_type* m_weathers_size_getter;
     frames_getter_type* m_frames_getter;

@@ -12,9 +12,9 @@
 namespace editor
 {
 class ide_base;
-class engine;
+class engine_base;
 
-typedef void(__cdecl* initialize_function_ptr)(ide_base*&, engine*);
+typedef void(__cdecl* initialize_function_ptr)(ide_base*&, engine_base*);
 typedef void(__cdecl* finalize_function_ptr)(ide_base*&);
 
 } // namespace editor

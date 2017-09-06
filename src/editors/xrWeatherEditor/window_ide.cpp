@@ -14,7 +14,7 @@ using editor::window_weather_editor;
 
 using VS2005Style::Extender;
 
-void window_ide::custom_init(editor::engine* engine)
+void window_ide::custom_init(editor::engine_base* engine)
 {
     SuspendLayout();
 
@@ -58,7 +58,7 @@ window_weather % window_ide::weather()
     return (*m_weather);
 }
 
-editor::engine& window_ide::engine()
+editor::engine_base& window_ide::engine()
 {
     VERIFY(m_engine);
     return (*m_engine);

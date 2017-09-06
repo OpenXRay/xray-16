@@ -27,7 +27,7 @@ public:
     typedef XRay::Editor::property_holder_base::string_collection_size_getter_type string_collection_size_getter_type;
 
 public:
-    property_string_values_value_shared_str_getter(editor::engine* engine, shared_str& value,
+    property_string_values_value_shared_str_getter(editor::engine_base* engine, shared_str& value,
         string_collection_getter_type const& collection_getter,
         string_collection_size_getter_type const& collection_size_getter);
     virtual ~property_string_values_value_shared_str_getter();

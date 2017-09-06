@@ -22,7 +22,7 @@ interface class IDockContent;
 
 namespace editor
 {
-class engine;
+class engine_base;
 class ide_base;
 
 ref class window_view;
@@ -43,7 +43,7 @@ public
 ref class window_ide : public System::Windows::Forms::Form
 {
 public:
-    window_ide(editor::engine* engine)
+    window_ide(editor::engine_base* engine)
     {
         InitializeComponent();
         //
@@ -116,7 +116,7 @@ private:
     }
 #pragma endregion
 protected:
-    editor::engine* m_engine;
+    editor::engine_base* m_engine;
 
 private:
     System::Drawing::Rectangle ^ m_window_rectangle;
@@ -133,7 +133,7 @@ protected:
 public:
     editor::ide_base& ide();
     window_view % view();
-    editor::engine& engine();
+    editor::engine_base& engine();
 
 public:
     window_levels % levels();
@@ -142,7 +142,7 @@ public:
     Microsoft::Win32::RegistryKey ^ base_registry_key();
 
 private:
-    void custom_init(editor::engine* engine);
+    void custom_init(editor::engine_base* engine);
     void custom_finalize();
     void save_on_exit();
     void load_on_create();
