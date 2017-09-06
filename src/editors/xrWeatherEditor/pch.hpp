@@ -3,11 +3,13 @@
 //	Created 	: 04.12.2007
 //  Modified 	: 04.12.2007
 //	Author		: Dmitriy Iassenev
-//	Description : preocmpiled header for editor library
+//	Description : precompiled header for editor library
 ////////////////////////////////////////////////////////////////////////////
 
 #ifndef PCH_HPP_INCLUDED
 #define PCH_HPP_INCLUDED
+
+#include "xrCommon/inlining_macros.h"
 
 #ifdef DEBUG
 #define VERIFY(expression) \
@@ -19,14 +21,14 @@
 #define NODEFAULT       \
     do                  \
     {                   \
-        __debugbreak(); \
+        DEBUG_BREAK;    \
     } while (0)
 #else // #ifdef DEBUG
 #define VERIFY(expression) \
     do                     \
     {                      \
     } while (0)
-#define NODEFAULT __assume(0)
+#define NODEFAULT XR_ASSUME(0)
 #endif // #ifdef DEBUG
 
 typedef unsigned int u32;

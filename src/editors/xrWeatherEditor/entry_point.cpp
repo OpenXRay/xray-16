@@ -2,6 +2,7 @@
 
 #pragma unmanaged
 #include <windows.h>
+#include "Common/xr_impexp_macros.h"
 #include "Include/editor/engine.hpp"
 #include "ide_impl.hpp"
 #pragma managed
@@ -10,10 +11,14 @@
 
 #pragma comment(lib, "user32.lib")
 
+namespace XRay
+{
+namespace Editor
+{
 private ref class window_ide_final : public editor::window_ide
 {
 public:
-    window_ide_final(XRay::Editor::ide_base*& ide, XRay::Editor::engine_base* engine) : editor::window_ide(engine)
+    window_ide_final(ide_base*& ide, engine_base* engine) : editor::window_ide(engine)
     {
         m_ide = ide;
         Application::Idle += gcnew System::EventHandler(this, &window_ide_final::on_idle);
@@ -44,7 +49,7 @@ protected:
 private:
     void on_idle(System::Object ^ sender, System::EventArgs ^ event_args)
     {
-        XRay::Editor::ide_impl* impl = dynamic_cast<XRay::Editor::ide_impl*>(m_ide);
+        ide_impl* impl = dynamic_cast<ide_impl*>(m_ide);
         impl->on_idle_start();
 
         MSG message;
@@ -52,37 +57,39 @@ private:
         {
             m_engine->on_idle();
             impl->on_idle();
-        } while (m_engine && !PeekMessage(&message, HWND(0), 0, 0, 0));
+        } while (m_engine&&!PeekMessage(&message, HWND(0), 0, 0, 0));
 
         impl->on_idle_end();
     }
 };
 
-XRay::Editor::ide_impl* g_ide = nullptr;
+ide_impl* g_ide = nullptr;
 
-static void initialize_impl(XRay::Editor::ide_base*& ide, XRay::Editor::engine_base* engine)
+static void initialize_impl(ide_base*& ide, engine_base* engine)
 {
     VERIFY(!g_ide);
-    g_ide = new XRay::Editor::ide_impl(engine);
+    g_ide = new ide_impl(engine);
     ide = g_ide;
     g_ide->window(gcnew window_ide_final(ide, engine));
 }
+} // namespace Editor
+} // namespace XRay
 
 #pragma unmanaged
 #include <objbase.h>
 WINOLEAPI CoInitializeEx(IN LPVOID pvReserved, IN DWORD dwCoInit);
 #pragma comment(lib, "ole32.lib")
 
-extern "C" __declspec(dllexport) void initialize(XRay::Editor::ide_base*& ide, XRay::Editor::engine_base* engine)
+extern "C" XR_EXPORT void initialize(XRay::Editor::ide_base*& ide, XRay::Editor::engine_base* engine)
 {
     CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
-    initialize_impl(ide, engine);
+    XRay::Editor::initialize_impl(ide, engine);
 }
 
-extern "C" __declspec(dllexport) void finalize(XRay::Editor::ide_base*& ide)
+extern "C" XR_EXPORT void finalize(XRay::Editor::ide_base*& ide)
 {
     delete (ide);
     ide = nullptr;
-    g_ide = nullptr;
+    XRay::Editor::g_ide = nullptr;
 }
 #pragma managed

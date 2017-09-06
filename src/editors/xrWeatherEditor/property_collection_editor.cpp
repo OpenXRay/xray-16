@@ -25,7 +25,13 @@ using System::ComponentModel::Design::CollectionEditor;
 typedef PropertyBag::PropertySpecDescriptor PropertySpecDescriptor;
 
 #pragma unmanaged
-extern XRay::Editor::ide_impl* g_ide;
+namespace XRay
+{
+namespace Editor
+{
+extern ide_impl* g_ide;
+}
+}
 #pragma managed
 
 property_collection_editor::property_collection_editor(Type ^ type) : inherited(type) {}
@@ -58,7 +64,7 @@ String ^ property_collection_editor::GetDisplayText(Object ^ value)
     return (to_string(buffer));
 }
 
-void property_collection_editor::on_move(Object ^ sender, EventArgs ^ e) { g_ide->window()->view().Invalidate(); }
+void property_collection_editor::on_move(Object ^ sender, EventArgs ^ e) { XRay::Editor::g_ide->window()->view().Invalidate(); }
 property_collection_editor::CollectionForm ^ property_collection_editor::CreateCollectionForm()
 {
     //VERIFY(!m_collection_form);
