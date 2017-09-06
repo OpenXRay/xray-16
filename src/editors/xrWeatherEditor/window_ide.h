@@ -7,6 +7,15 @@ using namespace System::Windows::Forms;
 using namespace System::Data;
 using namespace System::Drawing;
 
+namespace XRay
+{
+namespace Editor
+{
+class ide_base;
+class engine_base;
+} // namespace Editor
+} // namespace XRay
+
 namespace editor
 {
 ref class window_ide;
@@ -22,9 +31,6 @@ interface class IDockContent;
 
 namespace editor
 {
-class engine_base;
-class ide_base;
-
 ref class window_view;
 ref class window_levels;
 ref class window_weather;
@@ -39,11 +45,10 @@ ref class window_weather_editor;
 ///          the designers will not be able to interact properly with localized
 ///          resources associated with this form.
 /// </summary>
-public
-ref class window_ide : public System::Windows::Forms::Form
+public ref class window_ide : public System::Windows::Forms::Form
 {
 public:
-    window_ide(editor::engine_base* engine)
+    window_ide(XRay::Editor::engine_base* engine)
     {
         InitializeComponent();
         //
@@ -116,7 +121,7 @@ private:
     }
 #pragma endregion
 protected:
-    editor::engine_base* m_engine;
+    XRay::Editor::engine_base* m_engine;
 
 private:
     System::Drawing::Rectangle ^ m_window_rectangle;
@@ -128,12 +133,12 @@ private:
     window_weather_editor ^ m_weather_editor;
 
 protected:
-    editor::ide_base* m_ide;
+    XRay::Editor::ide_base* m_ide;
 
 public:
-    editor::ide_base& ide();
+    XRay::Editor::ide_base& ide();
     window_view % view();
-    editor::engine_base& engine();
+    XRay::Editor::engine_base& engine();
 
 public:
     window_levels % levels();
@@ -142,7 +147,7 @@ public:
     Microsoft::Win32::RegistryKey ^ base_registry_key();
 
 private:
-    void custom_init(editor::engine_base* engine);
+    void custom_init(XRay::Editor::engine_base* engine);
     void custom_finalize();
     void save_on_exit();
     void load_on_create();

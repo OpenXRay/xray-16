@@ -15,7 +15,7 @@
 
 class IInputReceiver;
 
-class engine_impl : public editor::engine_base
+class engine_impl : public XRay::Editor::engine_base
 {
 public:
     engine_impl();

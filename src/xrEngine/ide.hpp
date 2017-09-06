@@ -13,12 +13,15 @@
 
 #include "Include/editor/ide.hpp"
 
-namespace editor
+namespace XRay
 {
-class ide_base;
-} // namespace editor
+namespace Editor
+{
+//class ide_base;
+} // namespace Editor
+} // namespace XRay
 
-inline editor::ide_base& ide()
+inline XRay::Editor::ide_base& ide()
 {
     VERIFY(Device.editor());
     return (*Device.editor());

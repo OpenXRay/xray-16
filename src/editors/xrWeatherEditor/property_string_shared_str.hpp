@@ -11,23 +11,25 @@
 
 #include "property_holder_include.hpp"
 
-namespace editor
+namespace XRay
+{
+namespace Editor
 {
 class engine_base;
 } // namespace editor
+} // namespace XRay
 
-public
-ref class property_string_shared_str : public XRay::SdkControls::IProperty
+public ref class property_string_shared_str : public XRay::SdkControls::IProperty
 {
 public:
-    property_string_shared_str(editor::engine_base* engine, shared_str& value);
+    property_string_shared_str(XRay::Editor::engine_base* engine, shared_str& value);
     virtual ~property_string_shared_str();
     !property_string_shared_str();
     virtual System::Object ^ GetValue();
     virtual void SetValue(System::Object ^ object);
 
 private:
-    editor::engine_base* m_engine;
+    XRay::Editor::engine_base* m_engine;
     shared_str* m_value;
 }; // ref class property_string_shared_str
 

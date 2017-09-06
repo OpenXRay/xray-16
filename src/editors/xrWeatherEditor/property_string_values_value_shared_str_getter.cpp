@@ -11,7 +11,7 @@
 
 typedef property_string_values_value_shared_str_getter::collection_type collection_type;
 
-property_string_values_value_shared_str_getter::property_string_values_value_shared_str_getter(editor::engine_base* engine,
+property_string_values_value_shared_str_getter::property_string_values_value_shared_str_getter(XRay::Editor::engine_base* engine,
     shared_str& value, string_collection_getter_type const& collection_getter,
     string_collection_size_getter_type const& collection_size_getter)
     : inherited(engine, value), m_collection_getter(new string_collection_getter_type(collection_getter)),

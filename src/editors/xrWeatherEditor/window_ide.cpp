@@ -14,7 +14,7 @@ using editor::window_weather_editor;
 
 using VS2005Style::Extender;
 
-void window_ide::custom_init(editor::engine_base* engine)
+void window_ide::custom_init(XRay::Editor::engine_base* engine)
 {
     SuspendLayout();
 
@@ -58,7 +58,7 @@ window_weather % window_ide::weather()
     return (*m_weather);
 }
 
-editor::engine_base& window_ide::engine()
+XRay::Editor::engine_base& window_ide::engine()
 {
     VERIFY(m_engine);
     return (*m_engine);
@@ -111,7 +111,7 @@ Void window_ide::window_ide_FormClosing(System::Object ^ sender, System::Windows
     m_engine->disconnect();
 }
 
-editor::ide_base& window_ide::ide()
+XRay::Editor::ide_base& window_ide::ide()
 {
     VERIFY(m_ide);
     return (*m_ide);

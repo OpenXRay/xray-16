@@ -14,23 +14,28 @@
 ref class property_container;
 ref class property_holder_converter;
 
-
-namespace editor
+namespace XRay
+{
+namespace Editor
 {
 class engine_base;
+}
+}
+namespace editor
+{
+//class engine_base;
 //class property_holder_collection;
 }
-
 
 class property_holder : public XRay::Editor::property_holder_base
 {
 public:
-    property_holder(editor::engine_base* engine, LPCSTR display_name, XRay::Editor::property_holder_collection* collection,
+    property_holder(XRay::Editor::engine_base* engine, LPCSTR display_name, XRay::Editor::property_holder_collection* collection,
         XRay::Editor::property_holder_holder* holder);
     virtual ~property_holder();
     void on_dispose();
     property_container ^ container();
-    editor::engine_base& engine();
+    XRay::Editor::engine_base& engine();
 
 public:
     virtual XRay::Editor::property_holder_holder* holder();
@@ -209,7 +214,7 @@ private:
     gcroot<property_container ^> m_container;
     gcroot<System::String ^> m_display_name;
     collection_type* m_collection;
-    editor::engine_base* m_engine;
+    XRay::Editor::engine_base* m_engine;
     XRay::Editor::property_holder_holder* m_holder;
     bool m_disposing;
 }; // class property_holder

@@ -20,7 +20,7 @@
 
 using editor::window_ide;
 
-ide_impl::ide_impl(editor::engine_base* engine) : m_engine(engine), m_window(nullptr), m_paused(false), m_in_idle(false) {}
+ide_impl::ide_impl(XRay::Editor::engine_base* engine) : m_engine(engine), m_window(nullptr), m_paused(false), m_in_idle(false) {}
 ide_impl::~ide_impl() {}
 void ide_impl::window(window_ide ^ window) { m_window = window; }
 window_ide ^ ide_impl::window() { return (m_window); }

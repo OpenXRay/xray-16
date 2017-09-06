@@ -181,7 +181,7 @@ public:
 
 private:
     window_ide ^ m_ide;
-    editor::engine_base* m_engine;
+    XRay::Editor::engine_base* m_engine;
     PropertyGrid ^ m_property_grid;
     Point m_previous_location;
     bool m_loaded;

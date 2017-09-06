@@ -9,9 +9,16 @@ using namespace System::Windows::Forms;
 using namespace System::Data;
 using namespace System::Drawing;
 
-namespace editor
+namespace XRay
+{
+namespace Editor
 {
 class engine_base;
+}
+}
+
+namespace editor
+{
 ref class window_ide;
 /// <summary>
 /// Summary for window_weather_editor
@@ -25,7 +32,7 @@ ref class window_ide;
 public ref class window_weather_editor : public WeifenLuo::WinFormsUI::DockContent
 {
 public:
-    window_weather_editor(window_ide ^ ide, engine_base* engine)
+    window_weather_editor(window_ide ^ ide, XRay::Editor::engine_base* engine)
         : m_ide(ide), m_engine(*engine), m_weathers_getter(0), m_weathers_size_getter(0), m_frames_getter(0),
           m_frames_size_getter(0), m_update_enabled(true), m_load_finished(false), m_mouse_down(false),
           m_update_frames_combo_box(false), m_update_frame_trackbar(false), m_update_text_value(false),
@@ -948,10 +955,10 @@ private:
     }
 #pragma endregion
 public:
-    typedef editor::ide_base::weathers_getter_type weathers_getter_type;
-    typedef editor::ide_base::weathers_size_getter_type weathers_size_getter_type;
-    typedef editor::ide_base::frames_getter_type frames_getter_type;
-    typedef editor::ide_base::frames_size_getter_type frames_size_getter_type;
+    typedef XRay::Editor::ide_base::weathers_getter_type weathers_getter_type;
+    typedef XRay::Editor::ide_base::weathers_size_getter_type weathers_size_getter_type;
+    typedef XRay::Editor::ide_base::frames_getter_type frames_getter_type;
+    typedef XRay::Editor::ide_base::frames_size_getter_type frames_size_getter_type;
 
 public:
     void weathers_ids(weathers_getter_type const& weathers_getter,
@@ -971,7 +978,7 @@ private:
 
 private:
     window_ide ^ m_ide;
-    engine_base& m_engine;
+    XRay::Editor::engine_base& m_engine;
     weathers_getter_type* m_weathers_getter;
     weathers_size_getter_type* m_weathers_size_getter;
     frames_getter_type* m_frames_getter;

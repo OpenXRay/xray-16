@@ -18,21 +18,27 @@
 
 #include <vcclr.h>
 
+namespace XRay
+{
+namespace Editor
+{
+class engine_base;
+} //namespace Editor
+} //namespace XRay
+
 namespace editor
 {
 ref class window_ide;
-class engine_base;
-class property_holder_holder;
-} // namespace editor
+}
 
-class ide_impl : public editor::ide_base
+class ide_impl : public XRay::Editor::ide_base
 {
 public:
     typedef editor::window_ide window_ide;
     typedef XRay::Editor::property_holder_base property_holder;
 
 public:
-    ide_impl(editor::engine_base* engine);
+    ide_impl(XRay::Editor::engine_base* engine);
     virtual ~ide_impl();
     void window(window_ide ^ window);
     window_ide ^ window();
@@ -59,7 +65,7 @@ public:
         frames_size_getter_type const& frames_size_getter);
 
 private:
-    editor::engine_base* m_engine;
+    XRay::Editor::engine_base* m_engine;
     gcroot<window_ide ^> m_window;
     bool m_paused;
     bool m_in_idle;

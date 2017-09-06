@@ -11,8 +11,8 @@
 
 #include "pure.h"
 
-#include "xrCore/ftimer.h"
-#include "stats.h"
+#include "xrCore/FTimer.h"
+#include "Stats.h"
 #include "xrCore/Threading/Event.hpp"
 #include "xrCommon/xr_list.h"
 
@@ -261,18 +261,18 @@ private:
     virtual void RemoveSeqFrame(pureFrame* f);
 #ifdef INGAME_EDITOR
 public:
-    IC editor::ide_base* editor() const { return m_editor; }
+    IC XRay::Editor::ide_base* editor() const { return m_editor; }
 private:
     void initialize_editor();
     void message_loop_editor();
 
-    typedef editor::initialize_function_ptr initialize_function_ptr;
-    typedef editor::finalize_function_ptr finalize_function_ptr;
+    typedef XRay::Editor::initialize_function_ptr initialize_function_ptr;
+    typedef XRay::Editor::finalize_function_ptr finalize_function_ptr;
 
     HMODULE m_editor_module;
     initialize_function_ptr m_editor_initialize;
     finalize_function_ptr m_editor_finalize;
-    editor::ide_base* m_editor;
+    XRay::Editor::ide_base* m_editor;
     engine_impl* m_engine;
 #endif // #ifdef INGAME_EDITOR
 };

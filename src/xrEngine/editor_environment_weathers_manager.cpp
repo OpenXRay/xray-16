@@ -147,21 +147,21 @@ u32 manager::frames_size_getter(LPCSTR weather_id) const
 void manager::fill(property_holder_type* holder)
 {
     VERIFY(holder);
-    holder->add_property("weathers", "weathers", "this option is resposible for weathers", m_collection);
+    holder->add_property("weathers", "weathers", "this option is responsible for weathers", m_collection);
 
-    typedef ::editor::ide_base::weathers_getter_type weathers_getter_type;
+    typedef XRay::Editor::ide_base::weathers_getter_type weathers_getter_type;
     weathers_getter_type weathers_getter;
     weathers_getter.bind(this, &manager::weathers_getter);
 
-    typedef ::editor::ide_base::weathers_size_getter_type weathers_size_getter_type;
+    typedef XRay::Editor::ide_base::weathers_size_getter_type weathers_size_getter_type;
     weathers_size_getter_type weathers_size_getter;
     weathers_size_getter.bind(this, &manager::weathers_size_getter);
 
-    typedef ::editor::ide_base::frames_getter_type frames_getter_type;
+    typedef XRay::Editor::ide_base::frames_getter_type frames_getter_type;
     frames_getter_type frames_getter;
     frames_getter.bind(this, &manager::frames_getter);
 
-    typedef ::editor::ide_base::frames_size_getter_type frames_size_getter_type;
+    typedef XRay::Editor::ide_base::frames_size_getter_type frames_size_getter_type;
     frames_size_getter_type frames_size_getter;
     frames_size_getter.bind(this, &manager::frames_size_getter);
 
