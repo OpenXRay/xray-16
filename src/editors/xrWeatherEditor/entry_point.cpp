@@ -44,7 +44,7 @@ protected:
 private:
     void on_idle(System::Object ^ sender, System::EventArgs ^ event_args)
     {
-        ide_impl* impl = dynamic_cast<ide_impl*>(m_ide);
+        XRay::Editor::ide_impl* impl = dynamic_cast<XRay::Editor::ide_impl*>(m_ide);
         impl->on_idle_start();
 
         MSG message;
@@ -58,12 +58,12 @@ private:
     }
 };
 
-ide_impl* g_ide = nullptr;
+XRay::Editor::ide_impl* g_ide = nullptr;
 
 static void initialize_impl(XRay::Editor::ide_base*& ide, XRay::Editor::engine_base* engine)
 {
     VERIFY(!g_ide);
-    g_ide = new ide_impl(engine);
+    g_ide = new XRay::Editor::ide_impl(engine);
     ide = g_ide;
     g_ide->window(gcnew window_ide_final(ide, engine));
 }

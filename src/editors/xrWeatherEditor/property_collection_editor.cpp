@@ -25,7 +25,7 @@ using System::ComponentModel::Design::CollectionEditor;
 typedef PropertyBag::PropertySpecDescriptor PropertySpecDescriptor;
 
 #pragma unmanaged
-extern ide_impl* g_ide;
+extern XRay::Editor::ide_impl* g_ide;
 #pragma managed
 
 property_collection_editor::property_collection_editor(Type ^ type) : inherited(type) {}

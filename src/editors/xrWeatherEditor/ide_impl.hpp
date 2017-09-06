@@ -18,27 +18,24 @@
 
 #include <vcclr.h>
 
-namespace XRay
-{
-namespace Editor
-{
-class engine_base;
-} //namespace Editor
-} //namespace XRay
-
 namespace editor
 {
 ref class window_ide;
 }
 
-class ide_impl : public XRay::Editor::ide_base
+namespace XRay
+{
+namespace Editor
+{
+class engine_base;
+class ide_impl : public ide_base
 {
 public:
     typedef editor::window_ide window_ide;
-    typedef XRay::Editor::property_holder_base property_holder;
+    typedef property_holder_base property_holder;
 
 public:
-    ide_impl(XRay::Editor::engine_base* engine);
+    ide_impl(engine_base* engine);
     virtual ~ide_impl();
     void window(window_ide ^ window);
     window_ide ^ window();
@@ -56,19 +53,21 @@ public:
 
 public:
     virtual property_holder* create_property_holder(
-        LPCSTR display_name, XRay::Editor::property_holder_collection* collection, XRay::Editor::property_holder_holder* holder);
+        LPCSTR display_name, property_holder_collection* collection, property_holder_holder* holder);
     virtual void destroy(property_holder*& property_holder);
     virtual void environment_levels(property_holder* property_holder);
     virtual void environment_weathers(property_holder* property_holder);
     virtual void weather_editor_setup(weathers_getter_type const& weathers_getter,
-        weathers_size_getter_type const& weathers_size_getter, frames_getter_type const& frames_getter,
-        frames_size_getter_type const& frames_size_getter);
+                                      weathers_size_getter_type const& weathers_size_getter, frames_getter_type const& frames_getter,
+                                      frames_size_getter_type const& frames_size_getter);
 
 private:
-    XRay::Editor::engine_base* m_engine;
+    engine_base* m_engine;
     gcroot<window_ide ^> m_window;
     bool m_paused;
     bool m_in_idle;
 }; // class ide
+} //namespace Editor
+} //namespace XRay
 
 #endif // ifndef IDE_IMPL_HPP_INCLUDED

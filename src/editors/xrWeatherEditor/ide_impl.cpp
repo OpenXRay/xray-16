@@ -20,10 +20,16 @@
 
 using editor::window_ide;
 
-ide_impl::ide_impl(XRay::Editor::engine_base* engine) : m_engine(engine), m_window(nullptr), m_paused(false), m_in_idle(false) {}
+namespace XRay
+{
+namespace Editor
+{
+ide_impl::ide_impl(engine_base* engine) : m_engine(engine), m_window(nullptr), m_paused(false), m_in_idle(false) {}
 ide_impl::~ide_impl() {}
+
 void ide_impl::window(window_ide ^ window) { m_window = window; }
 window_ide ^ ide_impl::window() { return (m_window); }
+
 void ide_impl::on_idle_start()
 {
     VERIFY(!m_in_idle);
@@ -55,8 +61,8 @@ void ide_impl::on_load_finished()
 }
 
 void ide_impl::pause() { m_window->view().pause(); }
-XRay::Editor::property_holder_base* ide_impl::create_property_holder(
-    LPCSTR display_name, XRay::Editor::property_holder_collection* collection, XRay::Editor::property_holder_holder* holder)
+property_holder_base* ide_impl::create_property_holder(
+    LPCSTR display_name, property_holder_collection* collection, property_holder_holder* holder)
 {
     return (new ::property_holder(m_engine, display_name, collection, holder));
 }
@@ -82,8 +88,13 @@ void ide_impl::environment_weathers(property_holder* property_holder)
 }
 
 void ide_impl::weather_editor_setup(weathers_getter_type const& weathers_getter,
-    weathers_size_getter_type const& weathers_size_getter, frames_getter_type const& frames_getter,
-    frames_size_getter_type const& frames_size_getter)
+                                    weathers_size_getter_type const& weathers_size_getter, frames_getter_type const& frames_getter,
+                                    frames_size_getter_type const& frames_size_getter)
 {
     m_window->weather_editor().weathers_ids(weathers_getter, weathers_size_getter, frames_getter, frames_size_getter);
 }
+}
+}
+
+
+

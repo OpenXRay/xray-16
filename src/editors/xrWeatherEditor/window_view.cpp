@@ -167,7 +167,7 @@ Void window_view::window_view_KeyUp(System::Object ^ sender, System::Windows::Fo
 
 Void window_view::window_view_Paint(System::Object ^ sender, System::Windows::Forms::PaintEventArgs ^ e)
 {
-    if (dynamic_cast<ide_impl&>(m_ide->ide()).idle())
+    if (dynamic_cast<XRay::Editor::ide_impl&>(m_ide->ide()).idle())
         return;
 
     m_engine->on_idle();

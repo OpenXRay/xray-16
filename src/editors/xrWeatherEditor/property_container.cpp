@@ -17,8 +17,14 @@ using System::String;
 using System::Collections::ArrayList;
 
 #pragma unmanaged
+namespace XRay
+{
+namespace Editor
+{
 class ide_impl;
-extern ide_impl* g_ide;
+}
+}
+extern XRay::Editor::ide_impl* g_ide;
 #pragma managed
 
 property_container::property_container(property_holder* holder, property_container_holder ^ container_holder)
