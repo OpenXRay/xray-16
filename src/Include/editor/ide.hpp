@@ -21,7 +21,7 @@ class property_holder_holder;
 
 namespace editor
 {
-class ide
+class ide_base
 {
 public:
     virtual HWND main_handle() = 0;

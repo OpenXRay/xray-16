@@ -261,7 +261,7 @@ private:
     virtual void RemoveSeqFrame(pureFrame* f);
 #ifdef INGAME_EDITOR
 public:
-    IC editor::ide* editor() const { return m_editor; }
+    IC editor::ide_base* editor() const { return m_editor; }
 private:
     void initialize_editor();
     void message_loop_editor();
@@ -272,7 +272,7 @@ private:
     HMODULE m_editor_module;
     initialize_function_ptr m_editor_initialize;
     finalize_function_ptr m_editor_finalize;
-    editor::ide* m_editor;
+    editor::ide_base* m_editor;
     engine_impl* m_engine;
 #endif // #ifdef INGAME_EDITOR
 };

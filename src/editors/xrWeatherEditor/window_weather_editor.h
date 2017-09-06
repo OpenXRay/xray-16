@@ -22,8 +22,7 @@ ref class window_ide;
 ///          the designers will not be able to interact properly with localized
 ///          resources associated with this form.
 /// </summary>
-public
-ref class window_weather_editor : public WeifenLuo::WinFormsUI::DockContent
+public ref class window_weather_editor : public WeifenLuo::WinFormsUI::DockContent
 {
 public:
     window_weather_editor(window_ide ^ ide, engine* engine)
@@ -949,10 +948,10 @@ private:
     }
 #pragma endregion
 public:
-    typedef ::editor::ide::weathers_getter_type weathers_getter_type;
-    typedef ::editor::ide::weathers_size_getter_type weathers_size_getter_type;
-    typedef ::editor::ide::frames_getter_type frames_getter_type;
-    typedef ::editor::ide::frames_size_getter_type frames_size_getter_type;
+    typedef editor::ide_base::weathers_getter_type weathers_getter_type;
+    typedef editor::ide_base::weathers_size_getter_type weathers_size_getter_type;
+    typedef editor::ide_base::frames_getter_type frames_getter_type;
+    typedef editor::ide_base::frames_size_getter_type frames_size_getter_type;
 
 public:
     void weathers_ids(weathers_getter_type const& weathers_getter,

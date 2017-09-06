@@ -111,7 +111,7 @@ Void window_ide::window_ide_FormClosing(System::Object ^ sender, System::Windows
     m_engine->disconnect();
 }
 
-editor::ide& window_ide::ide()
+editor::ide_base& window_ide::ide()
 {
     VERIFY(m_ide);
     return (*m_ide);

@@ -15,10 +15,10 @@
 
 namespace editor
 {
-class ide;
+class ide_base;
 } // namespace editor
 
-inline editor::ide& ide()
+inline editor::ide_base& ide()
 {
     VERIFY(Device.editor());
     return (*Device.editor());

@@ -23,7 +23,7 @@ interface class IDockContent;
 namespace editor
 {
 class engine;
-class ide;
+class ide_base;
 
 ref class window_view;
 ref class window_levels;
@@ -128,10 +128,10 @@ private:
     window_weather_editor ^ m_weather_editor;
 
 protected:
-    editor::ide* m_ide;
+    editor::ide_base* m_ide;
 
 public:
-    editor::ide& ide();
+    editor::ide_base& ide();
     window_view % view();
     editor::engine& engine();
 

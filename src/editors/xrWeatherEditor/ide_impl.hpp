@@ -25,7 +25,7 @@ class engine;
 class property_holder_holder;
 } // namespace editor
 
-class ide_impl : public editor::ide
+class ide_impl : public editor::ide_base
 {
 public:
     typedef editor::window_ide window_ide;
