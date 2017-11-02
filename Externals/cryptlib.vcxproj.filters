@@ -392,6 +392,12 @@
     <ClCompile Include="cryptopp\zlib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="cryptopp\sha-simd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cryptopp\rijndael-simd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="cryptopp\Doxyfile">
@@ -822,5 +828,7 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="cryptopp\rdrand.asm" />
+    <CustomBuild Include="cryptopp\x64dll.asm" />
+    <CustomBuild Include="cryptopp\x64masm.asm" />
   </ItemGroup>
 </Project>

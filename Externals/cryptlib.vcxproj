@@ -23,6 +23,7 @@
     <RootNamespace>cryptlib</RootNamespace>
     <PlatformToolset>v141</PlatformToolset>
     <ConfigurationType>StaticLibrary</ConfigurationType>
+    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -218,6 +219,7 @@
     <ClCompile Include="cryptopp\rc6.cpp" />
     <ClCompile Include="cryptopp\rdrand.cpp" />
     <ClCompile Include="cryptopp\rdtables.cpp" />
+    <ClCompile Include="cryptopp\rijndael-simd.cpp" />
     <ClCompile Include="cryptopp\rijndael.cpp" />
     <ClCompile Include="cryptopp\ripemd.cpp" />
     <ClCompile Include="cryptopp\rng.cpp" />
@@ -228,6 +230,7 @@
     <ClCompile Include="cryptopp\seal.cpp" />
     <ClCompile Include="cryptopp\seed.cpp" />
     <ClCompile Include="cryptopp\serpent.cpp" />
+    <ClCompile Include="cryptopp\sha-simd.cpp" />
     <ClCompile Include="cryptopp\sha.cpp" />
     <ClCompile Include="cryptopp\sha3.cpp" />
     <ClCompile Include="cryptopp\shacal2.cpp" />
