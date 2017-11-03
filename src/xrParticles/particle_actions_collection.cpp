@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#pragma hdrstop
 
 #include "particle_actions_collection.h"
 #include "particle_effect.h"
@@ -631,7 +630,7 @@ void PABounce::Execute(ParticleEffect* effect, const float dt, float& tm_max)
             if (position.Within(pnext))
             {
                 // See if we were inside on previous timestep.
-                BOOL pinside = position.Within(m.pos);
+                const bool pinside = position.Within(m.pos);
 
                 // Normal to surface. This works for a sphere. Isn't
                 // computed quite right, should extrapolate particle
@@ -640,10 +639,10 @@ void PABounce::Execute(ParticleEffect* effect, const float dt, float& tm_max)
                 n.normalize_safe();
 
                 // Compute tangential and normal components of velocity
-                float nmag = m.vel * n;
+                const float nmag = m.vel * n;
 
-                pVector vn(n * nmag); // Normal Vn = (V.N)N
-                pVector vt = m.vel - vn; // Tangent Vt = V - Vn
+                const pVector vn(n * nmag); // Normal Vn = (V.N)N
+                const pVector vt = m.vel - vn; // Tangent Vt = V - Vn
 
                 if (pinside)
                 {
