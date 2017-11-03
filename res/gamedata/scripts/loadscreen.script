@@ -1,3 +1,5 @@
+math.randomseed(os.time())
+
 tips_table 	  =	{
 					[1] = "all",
 					[2] = "all",
