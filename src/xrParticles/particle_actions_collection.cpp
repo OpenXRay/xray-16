@@ -1755,7 +1755,7 @@ void PATurbulence::Execute(ParticleEffect* effect, const float dt, float& tm_max
 
     u32 nWorkers = ttapi_GetWorkerCount();
 
-    if (p_cnt < nWorkers * 20)
+    if (p_cnt < nWorkers * 64)
         nWorkers = 1;
 
     TES_PARAMS* tesParams = (TES_PARAMS*)_alloca(sizeof(TES_PARAMS) * nWorkers);

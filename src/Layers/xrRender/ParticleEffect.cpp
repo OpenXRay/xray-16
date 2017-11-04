@@ -589,7 +589,7 @@ void CParticleEffect::Render(float)
 
             u32 nWorkers = ttapi_GetWorkerCount();
 
-            if (p_cnt < nWorkers * 20)
+            if (p_cnt < nWorkers * 64)
                 nWorkers = 1;
 
             PRS_PARAMS* prsParams = (PRS_PARAMS*)_alloca(sizeof(PRS_PARAMS) * nWorkers);
