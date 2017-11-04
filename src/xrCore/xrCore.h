@@ -1,6 +1,4 @@
 #pragma once
-#ifndef xrCoreH
-#define xrCoreH
 
 // XXX: upgrade std hash structures
 #define _SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS
@@ -47,22 +45,8 @@
 #define XR_NOEXCEPT_OP(x) noexcept(x)
 #endif
 
-#include "Common/Platform.hpp"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <math.h>
-#include <string.h>
-#include <typeinfo.h>
-
-#ifdef _DEBUG
+#if !defined(DEBUG) && (defined(_DEBUG) || defined(MIXED))
 #define DEBUG
-#endif
-#ifdef MIXED
-# ifndef DEBUG
-#  define DEBUG
-# endif
 #endif
 
 #ifndef DEBUG
@@ -71,44 +55,23 @@
 #pragma intrinsic(abs, fabs, fmod, sin, cos, tan, asin, acos, atan, sqrt, exp, log, log10, strcat)
 #endif
 
-#include <time.h>
-
 // Warnings
-#pragma warning(disable : 4251) // object needs DLL interface
-#pragma warning(disable : 4201) // nonstandard extension used : nameless struct/union
 #pragma warning(disable : 4100) // unreferenced formal parameter
 #pragma warning(disable : 4127) // conditional expression is constant
-//#pragma warning (disable : 4530 ) // C++ exception handler used, but unwind semantics are not enabled
+#pragma warning(disable : 4201) // nonstandard extension used : nameless struct/union
+#pragma warning(disable : 4251) // object needs DLL interface
 #pragma warning(disable : 4345)
-#pragma warning(disable : 4714) // __forceinline not inlined
-#ifndef DEBUG
-#pragma warning(disable : 4189) // local variable is initialized but not refenced
-#endif // frequently in release code due to large amount of VERIFY
+//#pragma warning (disable : 4530 ) // C++ exception handler used, but unwind semantics are not enabled
 
-#ifdef _M_AMD64
+#ifdef XR_X64
 #pragma warning(disable : 4512)
 #endif
 
-// stl
-#pragma warning(push)
-#pragma warning(disable : 4702)
-#include <algorithm>
-#include <limits>
-#include <vector>
-#include <stack>
-#include <list>
-#include <set>
-#include <map>
+#pragma warning(disable : 4714) // __forceinline not inlined
 
-#include <hash_map>
-#include <hash_set>
-
-#include <cinttypes>
-#include <chrono>
-
-#include <string>
-#pragma warning(pop)
-#pragma warning(disable : 4100) // unreferenced formal parameter
+#ifndef DEBUG
+#pragma warning(disable : 4189) // local variable is initialized but not referenced
+#endif // frequently in release code due to large amount of VERIFY
 
 // Our headers
 #include "xrCore_impexp.h"
@@ -217,11 +180,11 @@ public:
     T& operator()() { return *ptr; }
 };
 
-// ********************************************** The Core definition
+// ***** The Core definition *****
 class XRCORE_API xrCore
 {
-    const char* buildDate;
-    u32 buildId;
+    const char* buildDate = "";
+    u32 buildId = 0;
 
 public:
     string64 ApplicationName;
@@ -238,10 +201,9 @@ public:
     void _destroy();
     const char* GetBuildDate() const { return buildDate; }
     u32 GetBuildId() const { return buildId; }
+
 private:
     void CalculateBuildId();
 };
 
 extern XRCORE_API xrCore Core;
-
-#endif

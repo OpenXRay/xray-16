@@ -7,6 +7,7 @@
 //#include "_stl_extensions.h"
 #include "_math.h"
 #include "log.h"
+#include <chrono>
 
 class CTimer_paused;
 
