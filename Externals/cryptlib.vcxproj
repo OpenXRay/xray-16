@@ -136,7 +136,11 @@
     <ClCompile Include="cryptopp\base64.cpp" />
     <ClCompile Include="cryptopp\basecode.cpp" />
     <ClCompile Include="cryptopp\bfinit.cpp" />
-    <ClCompile Include="cryptopp\blake2.cpp" />
+    <ClCompile Include="cryptopp\blake2.cpp">
+      <Optimization Condition="'$(Configuration)'=='Release'">Disabled</Optimization>
+      <InlineFunctionExpansion Condition="'$(Configuration)'=='Release'">Default</InlineFunctionExpansion>
+      <OmitFramePointers Condition="'$(Configuration)'=='Release'">false</OmitFramePointers>
+    </ClCompile>
     <ClCompile Include="cryptopp\blowfish.cpp" />
     <ClCompile Include="cryptopp\blumshub.cpp" />
     <ClCompile Include="cryptopp\camellia.cpp" />
