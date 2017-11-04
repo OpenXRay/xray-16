@@ -248,7 +248,7 @@ IC static int CollideIntoGroup(
         }
 
         if (pushing_neg)
-            surface.mu = dInfinity;
+            surface.mu = flt_max; // dInfinity
         if (do_collide && collided_contacts < MAX_CONTACTS)
         {
             ++collided_contacts;
