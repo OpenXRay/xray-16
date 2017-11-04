@@ -9,53 +9,29 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{E9DC16A3-D0FA-4924-AF6E-F6FDF3EA0661}</ProjectGuid>
     <OutputType>Library</OutputType>
+    <OutputPath>$(xrBinDir)</OutputPath>
+    <IntermediateOutputPath>$(xrIntDir)$(AssemblyName)</IntermediateOutputPath>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>XRay.SdkControls</RootNamespace>
     <AssemblyName>xrSdkControls</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>$(xrBinDir)</OutputPath>
-    <IntermediateOutputPath>$(xrIntDir)$(AssemblyName)</IntermediateOutputPath>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>$(xrBinDir)</OutputPath>
-    <IntermediateOutputPath>$(xrIntDir)$(AssemblyName)</IntermediateOutputPath>
+  <PropertyGroup Condition="'$(Configuration)' == 'Mixed'">
     <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Mixed|Win32'">
-    <OutputPath>bin\Win32\Mixed\</OutputPath>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Mixed|x86'">
-    <OutputPath>bin\x86\Mixed\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Mixed|x64'">
-    <OutputPath>bin\x64\Mixed\</OutputPath>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>..\..\..\bin\Win64\Release\</OutputPath>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <Optimize>true</Optimize>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Flobbster.Windows.Forms.PropertyGrid">

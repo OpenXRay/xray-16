@@ -1,8 +1,6 @@
 #include "Pch.hpp"
 #include "Core.hpp"
-#pragma unmanaged
 #include "xrCore/xrCore.h"
-#pragma managed
 #include <msclr/marshal_cppstd.h>
 
 namespace XRay
