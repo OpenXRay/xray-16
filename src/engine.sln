@@ -194,6 +194,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LuaJIT", "LuaJIT", "{DAEF6FB5-4F98-4B34-B049-8828EFEC9250}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BuildVm", "..\Externals\LuaJIT\src\BuildVm.vcxproj", "{58AE014E-0DA3-4D9B-9034-21984C305447}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CDC5E78D-FF1C-4164-AE72-3578F60A27BA} = {CDC5E78D-FF1C-4164-AE72-3578F60A27BA}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "minilua", "..\Externals\LuaJIT\src\minilua.vcxproj", "{CDC5E78D-FF1C-4164-AE72-3578F60A27BA}"
 EndProject
