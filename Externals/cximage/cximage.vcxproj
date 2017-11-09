@@ -337,8 +337,8 @@
     <ProjectReference Include="$(SolutionDir)xrCore\xrCore.vcxproj">
       <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\jpeg\libjpeg.vcxproj">
-      <Project>{938c5808-85a1-4b5a-8cb4-d2d9d7851cb8}</Project>
+    <ProjectReference Include="..\libjpeg.vcxproj">
+      <Project>{3593c424-83cc-4445-be1a-97dde88fe386}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
