@@ -6,7 +6,7 @@
 #include <intrin.h> // for __debugbreak
 #endif
 
-#include "xr_impexp_macros.h"
+#include "Common/ImportExportMacros.inl"
 #include "xrCommon/inlining_macros.h"
 
 #if defined(__GNUC__)
