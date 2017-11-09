@@ -2,7 +2,6 @@
 #ifndef PSystemH
 #define PSystemH
 
-#include "Common/Platform.hpp"
 #include "xrCore/_vector3d.h"
 
 #ifdef XR_PARTICLES_EXPORTS

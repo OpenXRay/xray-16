@@ -14,8 +14,6 @@ scope, so I didn’t wrap them with this class.
 #include <DbgHelp.h>
 #include <tchar.h>
 
-#include "Common/Platform.hpp"
-
 // Include these in case the user forgets to link against them.
 #pragma comment(lib, "dbghelp.lib")
 #pragma comment(lib, "version.lib")

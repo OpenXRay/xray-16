@@ -1,5 +1,4 @@
 #pragma once
-#include "Common/Platform.hpp"
 #include "xrCore/xrCore.h"
 #include "xrCore/_vector3d.h"
 

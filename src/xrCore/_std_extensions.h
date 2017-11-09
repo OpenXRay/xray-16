@@ -5,7 +5,6 @@
 #include <math.h>
 #include <float.h>
 #include <stdio.h>
-#include "Common/Platform.hpp"
 #include "xrCore/xrCore_impexp.h"
 #include "xrCommon/math_funcs_inline.h"
 

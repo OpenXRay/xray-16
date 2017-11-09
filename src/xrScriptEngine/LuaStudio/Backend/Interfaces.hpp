@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include "Common/Platform.hpp"
-
 #include "xrScriptEngine/LuaStudio/Config.hpp"
 
 #define CS_LUA_STUDIO_BACKEND_CALL __stdcall

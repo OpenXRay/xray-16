@@ -1,7 +1,6 @@
 #pragma once
 #ifndef logH
 #define logH
-#include "Common/Platform.hpp"
 #include "xrCore_impexp.h"
 #include "xrCommon/xr_vector.h"
 

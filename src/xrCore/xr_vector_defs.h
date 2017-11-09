@@ -1,7 +1,6 @@
 #pragma once
 #include "xrCore/_types.h"
 #include "xrCommon/xr_vector.h"
-#include "Common/Platform.hpp"
 #include "xrCore/_rect.h"
 #include "xrCore/_vector2.h"
 #include "xrCore/_vector3d.h"

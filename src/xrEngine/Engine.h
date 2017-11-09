@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Common/Platform.hpp"
-
 // you must define ENGINE_BUILD then building the engine itself
 // and not define it if you are about to build DLL
 

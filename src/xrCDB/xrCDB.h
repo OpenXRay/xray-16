@@ -2,7 +2,6 @@
 #ifndef XRCDB_H
 #define XRCDB_H
 
-#include "Common/Platform.hpp"
 #include "xrCore/Threading/Lock.hpp" // XXX: Remove from header. Put in .cpp.
 
 // The following ifdef block is the standard way of creating macros which make exporting

@@ -2,7 +2,6 @@
 #ifndef SoundH
 #define SoundH
 
-#include "Common/Platform.hpp"
 #include "xrCore/_types.h"
 #include "xrCore/_flags.h"
 #include "xrCore/xr_resource.h"

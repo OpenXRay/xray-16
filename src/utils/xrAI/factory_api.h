@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Common/Platform.hpp"
-
 extern "C" {
 typedef XR_IMPORT IServerEntity* __stdcall Factory_Create(LPCSTR section);
 typedef XR_IMPORT void __stdcall Factory_Destroy(IServerEntity*&);

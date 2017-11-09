@@ -3,8 +3,6 @@
 #include <d3d9caps.h>
 #include "IDirect3D9.h"
 
-#include "Common/Platform.hpp"
-
 #ifdef XRD3D9NULL_EXPORTS
 #define XRD3D9NULL_API XR_EXPORT
 #else

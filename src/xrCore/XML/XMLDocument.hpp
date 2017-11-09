@@ -2,8 +2,6 @@
 #ifndef xrXMLParserH
 #define xrXMLParserH
 
-#include "Common/Platform.hpp"
-
 #if !XRAY_EXCEPTIONS
 #define PUGIXML_NO_EXCEPTIONS
 #endif

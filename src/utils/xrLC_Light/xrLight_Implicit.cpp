@@ -1,7 +1,5 @@
 #include "stdafx.h"
 
-#include "Common/Platform.hpp"
-
 #include "xrLight_Implicit.h"
 #include "xrLight_ImplicitDeflector.h"
 #include "xrLight_ImplicitRun.h"

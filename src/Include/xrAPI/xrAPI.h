@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Common/Platform.hpp"
-
 #ifdef XRAPI_EXPORTS
 #define XRAPI_API XR_EXPORT
 #else

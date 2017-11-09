@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Common/Platform.hpp"
 #include "xrCore/_types.h"
 
 #ifdef XR_NETSERVER_EXPORTS

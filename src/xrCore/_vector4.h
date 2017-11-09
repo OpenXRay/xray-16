@@ -2,7 +2,6 @@
 #define _VECTOR4_H
 #pragma once
 
-#include "Common/Platform.hpp"
 #include "_types.h"
 
 template <class T>

@@ -1,5 +1,4 @@
 #pragma once
-#include "Common/Platform.hpp"
 
 #ifdef XRGAMESPY_EXPORTS
 #define XRGAMESPY_API XR_EXPORT

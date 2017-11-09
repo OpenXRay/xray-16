@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "Common/Platform.hpp"
 #include "SkinXW_SSE.hpp"
 #ifdef _EDITOR
 #include "SkeletonX.h"
