@@ -27,8 +27,12 @@
     <ClCompile Include="color.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="pch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="xrMisc_readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.hpp" />
   </ItemGroup>
 </Project>

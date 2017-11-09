@@ -1,11 +1,6 @@
-// stdafx.h : include file for standard system include files,
-//  or project specific include files that are used frequently, but
-//      are changed infrequently
-//
+#pragma once
 
-#ifndef stdafxH
-#define stdafxH
-//#pragma once
+#include "Common/Platform.hpp"
 
 #include "xrCore/xrCore.h"
 
@@ -66,5 +61,3 @@ IC void cdelete(T*& ptr)
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-#endif // stdafxH

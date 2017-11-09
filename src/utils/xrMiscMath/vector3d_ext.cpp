@@ -1,3 +1,4 @@
+#include "pch.hpp"
 #include "xrCore/_vector3d_ext.h"
 
 float dotproduct(const Fvector& v1, const Fvector& v2)

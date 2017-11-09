@@ -6,9 +6,9 @@
 //	Description : precompiled header for editor library
 ////////////////////////////////////////////////////////////////////////////
 
-#ifndef PCH_HPP_INCLUDED
-#define PCH_HPP_INCLUDED
+#pragma once
 
+#include "Common/Platform.hpp"
 #include "xrCommon/inlining_macros.h"
 
 #ifdef DEBUG
@@ -67,5 +67,3 @@ inline LPSTR to_string(System::String ^ string)
 }
 
 inline System::String ^ to_string(LPCSTR string) { return (gcnew System::String(string)); }
-
-#endif // #ifndef PCH_HPP_INCLUDED

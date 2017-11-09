@@ -1,3 +1,4 @@
+#include "pch.hpp"
 #include "xrCore/xrstring.h"
 #include "xrCore/xrMemory.h"
 

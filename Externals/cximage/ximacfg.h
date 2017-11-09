@@ -7,6 +7,7 @@ extern "C" void*	cxrealloc(void* ptr, size_t size);
 
 #ifdef CXIMAGE_AS_SHARED_LIBRARY //must be defined in Release_Shared configuration
 
+#include "Common/Platform.hpp"
 // XXX: dirty hack.
 #undef max
 #undef min

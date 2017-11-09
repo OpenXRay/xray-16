@@ -1,3 +1,4 @@
+#include "pch.hpp"
 // Implementation of Sound functions not exported from xrSound
 #include "xrSound/Sound.h"
 #include "xrCore/xrDebug_macros.h"

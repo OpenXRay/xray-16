@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "Common/Platform.hpp"
 #include "xrCore/xrCore.h"
 
 #define ENGINE_API

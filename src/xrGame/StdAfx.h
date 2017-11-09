@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Common/Platform.hpp"
+
 #pragma warning(push)
 #pragma warning(disable : 4995)
 #include "xrEngine/stdafx.h"

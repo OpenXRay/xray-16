@@ -1,3 +1,4 @@
+#include "pch.hpp"
 // xrMisc/xrMemory.cpp
 #ifndef BUILDING_XRMISC_LIB
 #error BUILDING_XRMISC_LIB MUST be defined when building xrMisc

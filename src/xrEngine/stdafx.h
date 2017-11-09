@@ -1,6 +1,6 @@
-#ifndef STDAFX_3DA
-#define STDAFX_3DA
 #pragma once
+
+#include "Common/Platform.hpp"
 
 #ifdef _EDITOR
 #include "editors/ECore/stdafx.h"
@@ -53,5 +53,4 @@ extern ENGINE_API CInifile* pGameIni;
 #define READ_IF_EXISTS(ltx, method, section, name, default_value) \
     (((ltx)->line_exist(section, name)) ? ((ltx)->method(section, name)) : (default_value))
 
-#endif // !M_BORLAND
-#endif // !defined STDAFX_3DA
+#endif // _EDITOR

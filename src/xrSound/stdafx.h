@@ -3,9 +3,8 @@
 // are changed infrequently
 //
 #pragma once
-#ifndef stdafxH
-#define stdafxH
 
+#include "Common/Platform.hpp"
 #include "xrCore/xrCore.h"
 
 // mmsystem.h
@@ -36,6 +35,4 @@
 
 #ifdef _EDITOR
 #include "utils/ETools/ETools.h"
-#endif
-// TODO: reference additional headers your program requires here
 #endif

@@ -112,6 +112,8 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <StringPooling>true</StringPooling>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -125,6 +127,8 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <StringPooling>true</StringPooling>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -140,6 +144,8 @@
       <StringPooling>true</StringPooling>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -159,6 +165,8 @@
       <StringPooling>true</StringPooling>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <FloatingPointModel>Fast</FloatingPointModel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -180,6 +188,8 @@
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -201,6 +211,8 @@
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.hpp</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -208,6 +220,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="color.cpp" />
     <ClCompile Include="Sound.cpp" />
     <ClCompile Include="string_functions.cpp" />
@@ -215,6 +230,9 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="xrMisc_readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,3 +1,4 @@
+#include "pch.hpp"
 #include <limits>
 #include "xrCore/vector.h"
 #include "xrCore/_vector3d.h"

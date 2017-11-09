@@ -1,3 +1,4 @@
+#include "pch.hpp"
 #include "xrCore/_quaternion.h"
 #include "xrCore/_matrix.h"
 

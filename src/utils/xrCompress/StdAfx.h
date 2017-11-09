@@ -2,9 +2,10 @@
 
 //. #define MOD_COMPRESS
 
+#include "Common/Platform.hpp"
 #include "xrCore/xrCore.h"
 
-#include "lzo\lzo1x.h"
+#include "lzo/lzo1x.h"
 #include <mmsystem.h>
 
 #pragma warning(push)
@@ -12,7 +13,7 @@
 #include <io.h>
 #include <direct.h>
 #include <fcntl.h>
-#include <sys\stat.h>
+#include <sys/stat.h>
 #include <malloc.h>
 #pragma warning(pop)
 

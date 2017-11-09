@@ -1,13 +1,6 @@
-// stdafx.h : include file for standard system include files,
-//  or project specific include files that are used frequently, but
-//      are changed infrequently
-//
-
-#if !defined(AFX_STDAFX_H__81632403_DFD8_4A42_A4D3_0AFDD8EA0D25__INCLUDED_)
-#define AFX_STDAFX_H__81632403_DFD8_4A42_A4D3_0AFDD8EA0D25__INCLUDED_7
-
 #pragma once
 
+#include "Common/Platform.hpp"
 #include "xrCore/xrCore.h"
 
 #pragma warning(push)
@@ -39,7 +32,6 @@ extern CThreadManager::ReportProgressFunc ProxyProgress;
 #ifdef AI_COMPILER
 #include "xrServerEntities/smart_cast.h"
 #endif
-// TODO: reference additional headers your program requires here
 
 #define READ_IF_EXISTS(ltx, method, section, name, default_value)\
     (ltx->line_exist(section, name)) ? ltx->method(section, name) : default_value
@@ -78,5 +70,3 @@ IC xr_string string2xr_string(LPCSTR s) { return s ? s : ""; }
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-
-#endif // !defined(AFX_STDAFX_H__81632403_DFD8_4A42_A4D3_0AFDD8EA0D25__INCLUDED_7)

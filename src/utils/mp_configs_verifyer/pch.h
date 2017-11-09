@@ -1,6 +1,6 @@
-#ifndef PCH_H_INCLUDED
-#define PCH_H_INCLUDED
+#pragma once
 
+#include "Common/Platform.hpp"
 #include "xrCore/xrCore.h"
 #include "xrCore/LocatorAPI.h"
 #include "xrCore/ppmd_compressor.h"
@@ -9,5 +9,3 @@
 #include <conio.h>
 #include "Common/object_broker.h"
 #include "xrCore/Containers/AssociativeVector.hpp"
-
-#endif // #define PCH_H_INCLUDED

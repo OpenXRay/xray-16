@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "Common/Platform.hpp"
+
 #define MTL_EXPORT_API
 #define ENGINE_API
 #define DLL_API

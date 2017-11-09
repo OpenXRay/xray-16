@@ -1,3 +1,4 @@
+#include "pch.hpp"
 #include "xrCore/_color.h"
 #include "xrCore/_bitwise.h" // iFloor
 #include "xrCore/_std_extensions.h" // _sqrt
