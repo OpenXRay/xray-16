@@ -1,9 +1,8 @@
 #pragma once
 
-using namespace System;
 using namespace System::ComponentModel;
 using namespace System::Collections;
-using namespace System::Windows::Forms;
+//using namespace System::Windows::Forms;
 using namespace System::Data;
 using namespace System::Drawing;
 
@@ -156,10 +155,10 @@ private:
     WeifenLuo::WinFormsUI::IDockContent ^ reload_content(System::String ^ persist_string);
 
 private:
-    Void window_ide_SizeChanged(System::Object ^ sender, System::EventArgs ^ e);
-    Void window_ide_LocationChanged(System::Object ^ sender, System::EventArgs ^ e);
-    Void window_ide_FormClosing(System::Object ^ sender, System::Windows::Forms::FormClosingEventArgs ^ e);
-    Void window_ide_Activated(System::Object ^ sender, System::EventArgs ^ e);
-    Void window_ide_Deactivate(System::Object ^ sender, System::EventArgs ^ e);
+    System::Void window_ide_SizeChanged(System::Object ^ sender, System::EventArgs ^ e);
+    System::Void window_ide_LocationChanged(System::Object ^ sender, System::EventArgs ^ e);
+    System::Void window_ide_FormClosing(System::Object ^ sender, System::Windows::Forms::FormClosingEventArgs ^ e);
+    System::Void window_ide_Activated(System::Object ^ sender, System::EventArgs ^ e);
+    System::Void window_ide_Deactivate(System::Object ^ sender, System::EventArgs ^ e);
 };
 }

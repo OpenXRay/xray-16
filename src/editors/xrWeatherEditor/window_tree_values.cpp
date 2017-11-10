@@ -29,7 +29,7 @@ public:
     }
 }; // ref class NodeSorter
 
-void window_tree_values::values(property_string_values_value_base::collection_type ^ values, String ^ current_value)
+void window_tree_values::values(property_string_values_value_base::collection_type ^ values, System::String ^ current_value)
 {
     TextBox->Text = current_value;
     Result = current_value;

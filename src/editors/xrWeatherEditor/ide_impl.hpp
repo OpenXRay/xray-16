@@ -10,7 +10,6 @@
 #define IDE_IMPL_HPP_INCLUDED
 
 #pragma unmanaged
-#include <windows.h>
 #include "xrCore/fastdelegate.h"
 #include <utility>
 #include "include/editor/ide.hpp"

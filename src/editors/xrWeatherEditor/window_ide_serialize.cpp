@@ -19,9 +19,9 @@ using Microsoft::Win32::RegistryValueKind;
 #define PRODUCT_NAME "S.T.A.L.K.E.R.: CLear Sky"
 
 template <typename T>
-inline static T registry_value(RegistryKey ^ key, String ^ value_id, const T& default_value)
+inline static T registry_value(RegistryKey ^ key, System::String ^ value_id, const T& default_value)
 {
-    array<String ^> ^ names = key->GetValueNames();
+    array<System::String ^> ^ names = key->GetValueNames();
     if (names->IndexOf(names, value_id) >= 0)
         return ((T)key->GetValue(value_id));
 
@@ -116,7 +116,7 @@ void window_ide::load_on_create()
     Width = 800;
     Height = 600;
 
-    m_window_rectangle = gcnew Drawing::Rectangle(Location, Size);
+    m_window_rectangle = gcnew System::Drawing::Rectangle(Location, Size);
 
     RegistryKey ^ product = base_registry_key();
     VERIFY(product);
@@ -139,7 +139,7 @@ void window_ide::load_on_create()
                 position->Close();
             }
 
-            m_window_rectangle = gcnew Drawing::Rectangle(Location, Size);
+            m_window_rectangle = gcnew System::Drawing::Rectangle(Location, Size);
 
             switch ((int)registry_value(ide, "window_state", 2))
             {

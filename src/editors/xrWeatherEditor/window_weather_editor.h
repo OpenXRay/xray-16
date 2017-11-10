@@ -2,7 +2,6 @@
 
 #include "ide_impl.hpp"
 
-using namespace System;
 using namespace System::ComponentModel;
 using namespace System::Collections;
 using namespace System::Windows::Forms;
@@ -992,34 +991,34 @@ private:
     bool m_update_weather_time;
 
 private:
-    Void window_weather_editor_Enter(Object ^ sender, EventArgs ^ e);
-    Void WeathersComboBox_SelectedIndexChanged(Object ^ sender, EventArgs ^ e);
-    Void FramesComboBox_SelectedIndexChanged(Object ^ sender, EventArgs ^ e);
-    Void PreviousFrameButton_Click(Object ^ sender, EventArgs ^ e);
-    Void NextFrameButton_Click(Object ^ sender, EventArgs ^ e);
-    Void CurrentTimeTrackBar_ValueChanged(Object ^ sender, EventArgs ^ e);
-    Void FramesComboBox_DropDown(Object ^ sender, EventArgs ^ e);
-    Void FramesComboBox_DropDownClosed(Object ^ sender, EventArgs ^ e);
-    Void PauseButton_Click(Object ^ sender, EventArgs ^ e);
-    Void TimeFactorNumericUpDown_ValueChanged(Object ^ sender, EventArgs ^ e);
+    System::Void window_weather_editor_Enter(Object ^ sender, System::EventArgs ^ e);
+    System::Void WeathersComboBox_SelectedIndexChanged(Object ^ sender, System::EventArgs ^ e);
+    System::Void FramesComboBox_SelectedIndexChanged(Object ^ sender, System::EventArgs ^ e);
+    System::Void PreviousFrameButton_Click(Object ^ sender, System::EventArgs ^ e);
+    System::Void NextFrameButton_Click(Object ^ sender, System::EventArgs ^ e);
+    System::Void CurrentTimeTrackBar_ValueChanged(Object ^ sender, System::EventArgs ^ e);
+    System::Void FramesComboBox_DropDown(Object ^ sender, System::EventArgs ^ e);
+    System::Void FramesComboBox_DropDownClosed(Object ^ sender, System::EventArgs ^ e);
+    System::Void PauseButton_Click(Object ^ sender, System::EventArgs ^ e);
+    System::Void TimeFactorNumericUpDown_ValueChanged(Object ^ sender, System::EventArgs ^ e);
 
 private:
-    Void CopyButton_Click(Object ^ sender, EventArgs ^ e);
-    Void PasteCurrentButton_Click(Object ^ sender, EventArgs ^ e);
-    Void PasteTargetButton_Click(Object ^ sender, EventArgs ^ e);
-    Void CreateFromButton_Click(Object ^ sender, EventArgs ^ e);
-    Void window_weather_editor_SizeChanged(Object ^ sender, EventArgs ^ e);
-    Void CurrentTimeTrackBar_MouseDown(Object ^ sender, MouseEventArgs ^ e);
-    Void CurrentTimeTrackBar_MouseUp(Object ^ sender, MouseEventArgs ^ e);
-    Void current_Leave(Object ^ sender, EventArgs ^ e);
-    Void target_Leave(Object ^ sender, EventArgs ^ e);
-    Void current_Enter(Object ^ sender, EventArgs ^ e);
-    Void target_Enter(Object ^ sender, EventArgs ^ e);
-    Void CurrentTimeTextBox_TextChanged(Object ^ sender, EventArgs ^ e);
-    Void WeatherTrackBar_ValueChanged(Object ^ sender, EventArgs ^ e);
-    Void WeatherTrackBar_MouseDown(Object ^ sender, MouseEventArgs ^ e);
-    Void WeatherTrackBar_MouseUp(Object ^ sender, MouseEventArgs ^ e);
-    Void ReloadCurrentButton_Click(Object ^ sender, EventArgs ^ e);
-    Void ReloadTargetButton_Click(Object ^ sender, EventArgs ^ e);
+    System::Void CopyButton_Click(Object ^ sender, System::EventArgs ^ e);
+    System::Void PasteCurrentButton_Click(Object ^ sender, System::EventArgs ^ e);
+    System::Void PasteTargetButton_Click(Object ^ sender, System::EventArgs ^ e);
+    System::Void CreateFromButton_Click(Object ^ sender, System::EventArgs ^ e);
+    System::Void window_weather_editor_SizeChanged(Object ^ sender, System::EventArgs ^ e);
+    System::Void CurrentTimeTrackBar_MouseDown(Object ^ sender, MouseEventArgs ^ e);
+    System::Void CurrentTimeTrackBar_MouseUp(Object ^ sender, MouseEventArgs ^ e);
+    System::Void current_Leave(Object ^ sender, System::EventArgs ^ e);
+    System::Void target_Leave(Object ^ sender, System::EventArgs ^ e);
+    System::Void current_Enter(Object ^ sender, System::EventArgs ^ e);
+    System::Void target_Enter(Object ^ sender, System::EventArgs ^ e);
+    System::Void CurrentTimeTextBox_TextChanged(Object ^ sender, System::EventArgs ^ e);
+    System::Void WeatherTrackBar_ValueChanged(Object ^ sender, System::EventArgs ^ e);
+    System::Void WeatherTrackBar_MouseDown(Object ^ sender, MouseEventArgs ^ e);
+    System::Void WeatherTrackBar_MouseUp(Object ^ sender, MouseEventArgs ^ e);
+    System::Void ReloadCurrentButton_Click(Object ^ sender, System::EventArgs ^ e);
+    System::Void ReloadTargetButton_Click(Object ^ sender, System::EventArgs ^ e);
 };
 }

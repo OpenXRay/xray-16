@@ -73,8 +73,7 @@ property_collection_editor::CollectionForm ^ property_collection_editor::CreateC
     return (m_collection_form);
 }
 
-Object ^
-    property_collection_editor::EditValue(ITypeDescriptorContext ^ context, IServiceProvider ^ provider, Object ^ value)
+Object^ property_collection_editor::EditValue(ITypeDescriptorContext ^ context, System::IServiceProvider ^ provider, Object ^ value)
 {
     if (!m_collection_form || !m_collection_form->Visible)
         return (inherited::EditValue(context, provider, value));

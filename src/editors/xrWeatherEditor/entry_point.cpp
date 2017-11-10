@@ -1,11 +1,9 @@
 #include "pch.hpp"
 
-#pragma unmanaged
-#include <windows.h>
-#include "Common/xr_impexp_macros.h"
+#pragma managed(push, off)
 #include "Include/editor/engine.hpp"
 #include "ide_impl.hpp"
-#pragma managed
+#pragma managed(pop)
 
 #include "window_ide.h"
 
@@ -21,18 +19,18 @@ public:
     window_ide_final(ide_base*& ide, engine_base* engine) : editor::window_ide(engine)
     {
         m_ide = ide;
-        Application::Idle += gcnew System::EventHandler(this, &window_ide_final::on_idle);
+        System::Windows::Forms::Application::Idle += gcnew System::EventHandler(this, &window_ide_final::on_idle);
     }
 
     ~window_ide_final()
     {
-        Application::Idle -= gcnew System::EventHandler(this, &window_ide_final::on_idle);
+        System::Windows::Forms::Application::Idle -= gcnew System::EventHandler(this, &window_ide_final::on_idle);
         m_engine = nullptr;
         m_ide = nullptr;
     }
 
 protected:
-    virtual void WndProc(Message % m) override
+    virtual void WndProc(System::Windows::Forms::Message % m) override
     {
         LONG_PTR result;
 #ifdef XR_X64

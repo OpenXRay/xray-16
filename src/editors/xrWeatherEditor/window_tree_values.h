@@ -2,7 +2,6 @@
 
 #include "property_string_values_value_base.hpp"
 
-using namespace System;
 using namespace System::ComponentModel;
 using namespace System::Collections;
 using namespace System::Windows::Forms;
@@ -297,15 +296,15 @@ public:
     typedef property_string_values_value_base::collection_type collection_type;
 
 public:
-    void values(collection_type ^ values, String ^ current_value);
+    void values(collection_type ^ values, System::String ^ current_value);
 
 public:
     System::String ^ Result;
 
 private:
-    Void TreeView_AfterCollapse(Object ^ sender, TreeViewEventArgs ^ e);
-    Void TreeView_AfterExpand(Object ^ sender, TreeViewEventArgs ^ e);
-    Void TreeView_MouseClick(Object ^ sender, MouseEventArgs ^ e);
-    Void TreeView_MouseDoubleClick(Object ^ sender, MouseEventArgs ^ e);
+    System::Void TreeView_AfterCollapse(Object ^ sender, TreeViewEventArgs ^ e);
+    System::Void TreeView_AfterExpand(Object ^ sender, TreeViewEventArgs ^ e);
+    System::Void TreeView_MouseClick(Object ^ sender, MouseEventArgs ^ e);
+    System::Void TreeView_MouseDoubleClick(Object ^ sender, MouseEventArgs ^ e);
 };
 }

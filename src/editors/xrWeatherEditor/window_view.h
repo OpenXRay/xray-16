@@ -1,6 +1,5 @@
 #pragma once
 
-using namespace System;
 using namespace System::ComponentModel;
 using namespace System::Collections;
 using namespace System::Windows::Forms;
@@ -174,10 +173,10 @@ public:
     void on_load_finished();
     void property_grid(PropertyGrid ^ property_grid);
     void on_idle();
-    IntPtr draw_handle();
-    Void window_view_LocationChanged(System::Object ^ sender, System::EventArgs ^ e);
-    Void window_view_Activated(System::Object ^ sender, System::EventArgs ^ e);
-    Void window_view_Deactivate(System::Object ^ sender, System::EventArgs ^ e);
+    System::IntPtr draw_handle();
+    System::Void window_view_LocationChanged(System::Object ^ sender, System::EventArgs ^ e);
+    System::Void window_view_Activated(System::Object ^ sender, System::EventArgs ^ e);
+    System::Void window_view_Deactivate(System::Object ^ sender, System::EventArgs ^ e);
 
 private:
     window_ide ^ m_ide;
@@ -194,17 +193,17 @@ private:
 
 private:
     void custom_init(window_ide % ide);
-    Void window_view_DoubleClick(Object ^ sender, EventArgs ^ e);
-    Void window_view_SizeChanged(Object ^ sender, EventArgs ^ e);
-    Void window_view_KeyUp(Object ^ sender, KeyEventArgs ^ e);
-    Void EditButton_Click(Object ^ sender, EventArgs ^ e);
-    Void PauseButton_Click(Object ^ sender, EventArgs ^ e);
-    Void window_view_Paint(Object ^ sender, PaintEventArgs ^ e);
-    Void ViewPanel_MouseMove(Object ^ sender, MouseEventArgs ^ e);
-    Void ViewPanel_MouseDown(Object ^ sender, MouseEventArgs ^ e);
-    Void ViewPanel_MouseLeave(Object ^ sender, EventArgs ^ e);
-    Void ViewPanel_MouseClick(Object ^ sender, MouseEventArgs ^ e);
-    Void window_view_KeyDown(Object ^ sender, KeyEventArgs ^ e);
+    System::Void window_view_DoubleClick(Object ^ sender, System::EventArgs ^ e);
+    System::Void window_view_SizeChanged(Object ^ sender, System::EventArgs ^ e);
+    System::Void window_view_KeyUp(Object ^ sender, KeyEventArgs ^ e);
+    System::Void EditButton_Click(Object ^ sender, System::EventArgs ^ e);
+    System::Void PauseButton_Click(Object ^ sender, System::EventArgs ^ e);
+    System::Void window_view_Paint(Object ^ sender, PaintEventArgs ^ e);
+    System::Void ViewPanel_MouseMove(Object ^ sender, MouseEventArgs ^ e);
+    System::Void ViewPanel_MouseDown(Object ^ sender, MouseEventArgs ^ e);
+    System::Void ViewPanel_MouseLeave(Object ^ sender, System::EventArgs ^ e);
+    System::Void ViewPanel_MouseClick(Object ^ sender, MouseEventArgs ^ e);
+    System::Void window_view_KeyDown(Object ^ sender, KeyEventArgs ^ e);
 }; // ref class window_view
 
 } // namespace editor

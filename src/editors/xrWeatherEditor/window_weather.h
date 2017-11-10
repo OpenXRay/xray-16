@@ -1,6 +1,5 @@
 #pragma once
 
-using namespace System;
 using namespace System::ComponentModel;
 using namespace System::Collections;
 using namespace System::Windows::Forms;
@@ -159,10 +158,10 @@ private:
 public:
     inline ::PropertyGrid ^ property_grid() { return this->PropertyGrid; }
 
-        private : Void window_weather_Leave(Object ^ sender, EventArgs ^ e);
-    Void SaveButton_Click(Object ^ sender, EventArgs ^ e);
-    Void ReloadWeatherButton_Click(Object ^ sender, EventArgs ^ e);
-    Void ReloadAllWeathersButton_Click(Object ^ sender, EventArgs ^ e);
+        private : System::Void window_weather_Leave(Object ^ sender, System::EventArgs ^ e);
+                  System::Void SaveButton_Click(Object ^ sender, System::EventArgs ^ e);
+                  System::Void ReloadWeatherButton_Click(Object ^ sender, System::EventArgs ^ e);
+                  System::Void ReloadAllWeathersButton_Click(Object ^ sender, System::EventArgs ^ e);
 }; // ref class window_weather
 
 } // namespace editor

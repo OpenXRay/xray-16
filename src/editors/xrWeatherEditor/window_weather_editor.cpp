@@ -160,7 +160,7 @@ void window_weather_editor::fill_frames(LPCSTR current_weather_id)
     m_update_frames_combo_box = false;
 }
 
-Void window_weather_editor::window_weather_editor_Enter(Object ^ sender, EventArgs ^ e)
+System::Void window_weather_editor::window_weather_editor_Enter(Object ^ sender, System::EventArgs ^ e)
 {
     if (!m_weathers_getter)
         return;
@@ -184,7 +184,7 @@ void window_weather_editor::on_load_finished()
     CurrentTimeTrackBar_ValueChanged(nullptr, nullptr);
 }
 
-Void window_weather_editor::WeathersComboBox_SelectedIndexChanged(Object ^ sender, EventArgs ^ e)
+System::Void window_weather_editor::WeathersComboBox_SelectedIndexChanged(Object ^ sender, System::EventArgs ^ e)
 {
     if (WeathersComboBox->SelectedIndex == -1)
         return;
@@ -198,7 +198,7 @@ Void window_weather_editor::WeathersComboBox_SelectedIndexChanged(Object ^ sende
     fill_frames(m_engine.weather());
 }
 
-Void window_weather_editor::FramesComboBox_SelectedIndexChanged(Object ^ sender, EventArgs ^ e)
+System::Void window_weather_editor::FramesComboBox_SelectedIndexChanged(Object ^ sender, System::EventArgs ^ e)
 {
     if (m_update_frames_combo_box)
         return;
@@ -216,7 +216,7 @@ Void window_weather_editor::FramesComboBox_SelectedIndexChanged(Object ^ sender,
     update_frame();
 }
 
-Void window_weather_editor::PreviousFrameButton_Click(Object ^ sender, EventArgs ^ e)
+System::Void window_weather_editor::PreviousFrameButton_Click(Object ^ sender, System::EventArgs ^ e)
 {
     if (FramesComboBox->SelectedIndex == -1)
         return;
@@ -227,7 +227,7 @@ Void window_weather_editor::PreviousFrameButton_Click(Object ^ sender, EventArgs
         FramesComboBox->SelectedIndex = FramesComboBox->SelectedIndex - 1;
 }
 
-Void window_weather_editor::NextFrameButton_Click(Object ^ sender, EventArgs ^ e)
+System::Void window_weather_editor::NextFrameButton_Click(Object ^ sender, System::EventArgs ^ e)
 {
     if (FramesComboBox->SelectedIndex == -1)
         return;
@@ -318,20 +318,20 @@ void window_weather_editor::on_idle()
         m_ide->view().property_grid(target);
 }
 
-Void window_weather_editor::FramesComboBox_DropDown(Object ^ sender, EventArgs ^ e) { m_update_enabled = false; }
-Void window_weather_editor::FramesComboBox_DropDownClosed(Object ^ sender, EventArgs ^ e) { m_update_enabled = true; }
-Void window_weather_editor::PauseButton_Click(Object ^ sender, EventArgs ^ e)
+System::Void window_weather_editor::FramesComboBox_DropDown(Object ^ sender, System::EventArgs ^ e) { m_update_enabled = false; }
+System::Void window_weather_editor::FramesComboBox_DropDownClosed(Object ^ sender, System::EventArgs ^ e) { m_update_enabled = true; }
+System::Void window_weather_editor::PauseButton_Click(Object ^ sender, System::EventArgs ^ e)
 {
     PauseButton->ImageIndex = (PauseButton->ImageIndex ^ 1);
     m_engine.weather_paused(PauseButton->ImageIndex ? true : false);
 }
 
-Void window_weather_editor::TimeFactorNumericUpDown_ValueChanged(Object ^ sender, EventArgs ^ e)
+System::Void window_weather_editor::TimeFactorNumericUpDown_ValueChanged(Object ^ sender, System::EventArgs ^ e)
 {
     m_engine.weather_time_factor(float(TimeFactorNumericUpDown->Value));
 }
 
-Void window_weather_editor::CopyButton_Click(Object ^ sender, EventArgs ^ e)
+System::Void window_weather_editor::CopyButton_Click(Object ^ sender, System::EventArgs ^ e)
 {
     char buffer[4096];
     if (!m_engine.save_time_frame(buffer, sizeof(buffer)))
@@ -340,7 +340,7 @@ Void window_weather_editor::CopyButton_Click(Object ^ sender, EventArgs ^ e)
     System::Windows::Forms::Clipboard::SetText(to_string(buffer));
 }
 
-Void window_weather_editor::PasteCurrentButton_Click(Object ^ sender, EventArgs ^ e)
+System::Void window_weather_editor::PasteCurrentButton_Click(Object ^ sender, System::EventArgs ^ e)
 {
     char* buffer = to_string(Clipboard::GetText());
     if (buffer)
@@ -351,7 +351,7 @@ Void window_weather_editor::PasteCurrentButton_Click(Object ^ sender, EventArgs 
     current->Refresh();
 }
 
-Void window_weather_editor::PasteTargetButton_Click(Object ^ sender, EventArgs ^ e)
+System::Void window_weather_editor::PasteTargetButton_Click(Object ^ sender, System::EventArgs ^ e)
 {
     char* buffer = to_string(Clipboard::GetText());
     if (buffer)
@@ -362,7 +362,7 @@ Void window_weather_editor::PasteTargetButton_Click(Object ^ sender, EventArgs ^
     target->Refresh();
 }
 
-Void window_weather_editor::CreateFromButton_Click(Object ^ sender, EventArgs ^ e)
+System::Void window_weather_editor::CreateFromButton_Click(Object ^ sender, System::EventArgs ^ e)
 {
     char buffer[4096];
     if (!m_engine.save_time_frame(buffer, sizeof(buffer)))
@@ -378,13 +378,13 @@ Void window_weather_editor::CreateFromButton_Click(Object ^ sender, EventArgs ^ 
     CurrentTimeTrackBar->Value = 1000;
 }
 
-Void window_weather_editor::window_weather_editor_SizeChanged(Object ^ sender, EventArgs ^ e)
+System::Void window_weather_editor::window_weather_editor_SizeChanged(Object ^ sender, System::EventArgs ^ e)
 {
     panel12->Width = int(Width * .4f);
     panel14->Width = int(Width * .4f);
 }
 
-Void window_weather_editor::CurrentTimeTrackBar_ValueChanged(Object ^ sender, EventArgs ^ e)
+System::Void window_weather_editor::CurrentTimeTrackBar_ValueChanged(Object ^ sender, System::EventArgs ^ e)
 {
     if (m_update_frame_trackbar)
         return;
@@ -397,7 +397,7 @@ Void window_weather_editor::CurrentTimeTrackBar_ValueChanged(Object ^ sender, Ev
         m_engine.on_idle();
 }
 
-Void window_weather_editor::CurrentTimeTrackBar_MouseDown(Object ^ sender, MouseEventArgs ^ e)
+System::Void window_weather_editor::CurrentTimeTrackBar_MouseDown(Object ^ sender, MouseEventArgs ^ e)
 {
     m_engine.weather_paused(true);
 
@@ -422,14 +422,14 @@ Void window_weather_editor::CurrentTimeTrackBar_MouseDown(Object ^ sender, Mouse
     m_mouse_down = true;
 }
 
-Void window_weather_editor::CurrentTimeTrackBar_MouseUp(Object ^ sender, MouseEventArgs ^ e)
+System::Void window_weather_editor::CurrentTimeTrackBar_MouseUp(Object ^ sender, MouseEventArgs ^ e)
 {
     m_engine.weather_paused(PauseButton->ImageIndex ? true : false);
     blend->Refresh();
     m_mouse_down = false;
 }
 
-Void window_weather_editor::WeatherTrackBar_ValueChanged(Object ^ sender, EventArgs ^ e)
+System::Void window_weather_editor::WeatherTrackBar_ValueChanged(Object ^ sender, System::EventArgs ^ e)
 {
     if (m_update_weather_time)
         return;
@@ -440,7 +440,7 @@ Void window_weather_editor::WeatherTrackBar_ValueChanged(Object ^ sender, EventA
     m_engine.on_idle();
 }
 
-Void window_weather_editor::WeatherTrackBar_MouseDown(Object ^ sender, MouseEventArgs ^ e)
+System::Void window_weather_editor::WeatherTrackBar_MouseDown(Object ^ sender, MouseEventArgs ^ e)
 {
     m_engine.weather_paused(true);
 
@@ -465,18 +465,18 @@ Void window_weather_editor::WeatherTrackBar_MouseDown(Object ^ sender, MouseEven
     m_mouse_down = true;
 }
 
-Void window_weather_editor::WeatherTrackBar_MouseUp(Object ^ sender, MouseEventArgs ^ e)
+System::Void window_weather_editor::WeatherTrackBar_MouseUp(Object ^ sender, MouseEventArgs ^ e)
 {
     m_engine.weather_paused(PauseButton->ImageIndex ? true : false);
     blend->Refresh();
     m_mouse_down = false;
 }
 
-Void window_weather_editor::current_Leave(Object ^ sender, EventArgs ^ e) { m_ide->view().property_grid(current); }
-Void window_weather_editor::target_Leave(Object ^ sender, EventArgs ^ e) { m_ide->view().property_grid(target); }
-Void window_weather_editor::current_Enter(Object ^ sender, EventArgs ^ e) { m_ide->view().property_grid(current); }
-Void window_weather_editor::target_Enter(Object ^ sender, EventArgs ^ e) { m_ide->view().property_grid(target); }
-Void window_weather_editor::CurrentTimeTextBox_TextChanged(Object ^ sender, EventArgs ^ e)
+System::Void window_weather_editor::current_Leave(Object ^ sender, System::EventArgs ^ e) { m_ide->view().property_grid(current); }
+System::Void window_weather_editor::target_Leave(Object ^ sender, System::EventArgs ^ e) { m_ide->view().property_grid(target); }
+System::Void window_weather_editor::current_Enter(Object ^ sender, System::EventArgs ^ e) { m_ide->view().property_grid(current); }
+System::Void window_weather_editor::target_Enter(Object ^ sender, System::EventArgs ^ e) { m_ide->view().property_grid(target); }
+System::Void window_weather_editor::CurrentTimeTextBox_TextChanged(Object ^ sender, System::EventArgs ^ e)
 {
     if (m_update_text_value)
         return;
@@ -495,13 +495,13 @@ Void window_weather_editor::CurrentTimeTextBox_TextChanged(Object ^ sender, Even
     blend->Refresh();
 }
 
-Void window_weather_editor::ReloadCurrentButton_Click(Object ^ sender, EventArgs ^ e)
+System::Void window_weather_editor::ReloadCurrentButton_Click(Object ^ sender, System::EventArgs ^ e)
 {
     m_engine.reload_current_time_frame();
     current->Refresh();
 }
 
-Void window_weather_editor::ReloadTargetButton_Click(Object ^ sender, EventArgs ^ e)
+System::Void window_weather_editor::ReloadTargetButton_Click(Object ^ sender, System::EventArgs ^ e)
 {
     m_engine.reload_target_time_frame();
     target->Refresh();

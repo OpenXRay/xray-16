@@ -47,7 +47,7 @@ void window_view::pause()
     EditButton_Click(this, nullptr);
 }
 
-IntPtr window_view::draw_handle() { return (ViewPanel->Handle); }
+System::IntPtr window_view::draw_handle() { return (ViewPanel->Handle); }
 void window_view::reclip_cursor()
 {
     if (EditButton->Checked)
@@ -69,7 +69,7 @@ void window_view::reclip_cursor()
     ClipCursor(&rectangle);
 }
 
-Void window_view::EditButton_Click(System::Object ^ sender, System::EventArgs ^ e)
+System::Void window_view::EditButton_Click(System::Object ^ sender, System::EventArgs ^ e)
 {
     EditButton->Checked = !EditButton->Checked;
     PauseButton->Enabled = EditButton->Checked;
@@ -89,13 +89,13 @@ Void window_view::EditButton_Click(System::Object ^ sender, System::EventArgs ^ 
     reclip_cursor();
 }
 
-Void window_view::PauseButton_Click(System::Object ^ sender, System::EventArgs ^ e)
+System::Void window_view::PauseButton_Click(System::Object ^ sender, System::EventArgs ^ e)
 {
     PauseButton->Checked = !PauseButton->Checked;
     m_engine->pause(PauseButton->Checked);
 }
 
-Void window_view::window_view_DoubleClick(System::Object ^ sender, System::EventArgs ^ e)
+System::Void window_view::window_view_DoubleClick(System::Object ^ sender, System::EventArgs ^ e)
 {
     if (!EditButton->Checked)
         return;
@@ -103,7 +103,7 @@ Void window_view::window_view_DoubleClick(System::Object ^ sender, System::Event
     EditButton_Click(this, nullptr);
 }
 
-Void window_view::window_view_SizeChanged(System::Object ^ sender, System::EventArgs ^ e)
+System::Void window_view::window_view_SizeChanged(System::Object ^ sender, System::EventArgs ^ e)
 {
     if (!components)
         return;
@@ -112,7 +112,7 @@ Void window_view::window_view_SizeChanged(System::Object ^ sender, System::Event
     reclip_cursor();
 }
 
-Void window_view::window_view_LocationChanged(System::Object ^ sender, System::EventArgs ^ e)
+System::Void window_view::window_view_LocationChanged(System::Object ^ sender, System::EventArgs ^ e)
 {
     if (!Parent)
         return;
@@ -123,7 +123,7 @@ Void window_view::window_view_LocationChanged(System::Object ^ sender, System::E
     reclip_cursor();
 }
 
-Void window_view::window_view_Activated(System::Object ^ sender, System::EventArgs ^ e)
+System::Void window_view::window_view_Activated(System::Object ^ sender, System::EventArgs ^ e)
 {
     if (!Parent)
         return;
@@ -135,7 +135,7 @@ Void window_view::window_view_Activated(System::Object ^ sender, System::EventAr
         return;
 }
 
-Void window_view::window_view_Deactivate(System::Object ^ sender, System::EventArgs ^ e)
+System::Void window_view::window_view_Deactivate(System::Object ^ sender, System::EventArgs ^ e)
 {
     if (!Parent)
         return;
@@ -151,7 +151,7 @@ Void window_view::window_view_Deactivate(System::Object ^ sender, System::EventA
         EditButton_Click(this, nullptr);
 }
 
-Void window_view::window_view_KeyUp(System::Object ^ sender, System::Windows::Forms::KeyEventArgs ^ e)
+System::Void window_view::window_view_KeyUp(System::Object ^ sender, System::Windows::Forms::KeyEventArgs ^ e)
 {
     if (!e->Alt)
         return;
@@ -165,7 +165,7 @@ Void window_view::window_view_KeyUp(System::Object ^ sender, System::Windows::Fo
     }
 }
 
-Void window_view::window_view_Paint(System::Object ^ sender, System::Windows::Forms::PaintEventArgs ^ e)
+System::Void window_view::window_view_Paint(System::Object ^ sender, System::Windows::Forms::PaintEventArgs ^ e)
 {
     if (dynamic_cast<XRay::Editor::ide_impl&>(m_ide->ide()).idle())
         return;
@@ -175,7 +175,7 @@ Void window_view::window_view_Paint(System::Object ^ sender, System::Windows::Fo
 
 void window_view::on_idle() { check_cursor(); }
 void window_view::property_grid(PropertyGrid ^ property_grid) { m_property_grid = property_grid; }
-Void window_view::ViewPanel_MouseDown(System::Object ^ sender, System::Windows::Forms::MouseEventArgs ^ e)
+System::Void window_view::ViewPanel_MouseDown(System::Object ^ sender, System::Windows::Forms::MouseEventArgs ^ e)
 {
     if (e->Button != System::Windows::Forms::MouseButtons::Middle)
         return;
@@ -183,7 +183,7 @@ Void window_view::ViewPanel_MouseDown(System::Object ^ sender, System::Windows::
     m_previous_location = e->Location;
 }
 
-Void window_view::ViewPanel_MouseMove(System::Object ^ sender, System::Windows::Forms::MouseEventArgs ^ e)
+System::Void window_view::ViewPanel_MouseMove(System::Object ^ sender, System::Windows::Forms::MouseEventArgs ^ e)
 {
     if (e->Location.X == m_previous_location.X)
         return;
@@ -221,12 +221,12 @@ Void window_view::ViewPanel_MouseMove(System::Object ^ sender, System::Windows::
     m_previous_location = e->Location;
 }
 
-Void window_view::ViewPanel_MouseLeave(System::Object ^ sender, System::EventArgs ^ e)
+System::Void window_view::ViewPanel_MouseLeave(System::Object ^ sender, System::EventArgs ^ e)
 {
     //	m_property_grid				= nullptr;
 }
 
-Void window_view::ViewPanel_MouseClick(Object ^ sender, MouseEventArgs ^ e)
+System::Void window_view::ViewPanel_MouseClick(Object ^ sender, MouseEventArgs ^ e)
 {
     if ((Control::ModifierKeys & Keys::Alt) != Keys::Alt)
         return;
@@ -267,7 +267,7 @@ Void window_view::ViewPanel_MouseClick(Object ^ sender, MouseEventArgs ^ e)
     m_property_grid->Refresh();
 }
 
-Void window_view::window_view_KeyDown(Object ^ sender, KeyEventArgs ^ e) { check_cursor(); }
+System::Void window_view::window_view_KeyDown(Object ^ sender, KeyEventArgs ^ e) { check_cursor(); }
 void window_view::pick_color_cursor(bool value)
 {
     if (!value)
@@ -277,7 +277,7 @@ void window_view::pick_color_cursor(bool value)
     }
 
     ViewPanel->Cursor = gcnew System::Windows::Forms::Cursor(
-        (IntPtr)LoadCursor((HINSTANCE)System::Runtime::InteropServices::Marshal::GetHINSTANCE(
+        (System::IntPtr)LoadCursor((HINSTANCE)System::Runtime::InteropServices::Marshal::GetHINSTANCE(
                                System::Reflection::Assembly::GetExecutingAssembly()->GetModules()[0])
                                .ToInt32(),
             MAKEINTRESOURCE(IDC_CURSOR1)));

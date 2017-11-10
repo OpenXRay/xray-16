@@ -1,6 +1,5 @@
 #pragma once
 
-using namespace System;
 using namespace System::ComponentModel;
 using namespace System::Collections;
 using namespace System::Windows::Forms;
@@ -99,7 +98,7 @@ private:
 public:
     inline ::PropertyGrid ^ property_grid() { return this->PropertyGrid; }
 
-        private : Void window_levels_Leave(System::Object ^ sender, System::EventArgs ^ e);
+        private : System::Void window_levels_Leave(System::Object ^ sender, System::EventArgs ^ e);
 }; // ref class window_levels
 
 } // namespace editor

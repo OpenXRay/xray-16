@@ -70,7 +70,7 @@ window_weather_editor % window_ide::weather_editor()
     return (*m_weather_editor);
 }
 
-Void window_ide::window_ide_SizeChanged(System::Object ^ sender, System::EventArgs ^ e)
+System::Void window_ide::window_ide_SizeChanged(System::Object ^ sender, System::EventArgs ^ e)
 {
     if (WindowState == System::Windows::Forms::FormWindowState::Maximized)
         return;
@@ -78,10 +78,10 @@ Void window_ide::window_ide_SizeChanged(System::Object ^ sender, System::EventAr
     if (WindowState == System::Windows::Forms::FormWindowState::Minimized)
         return;
 
-    m_window_rectangle = gcnew Drawing::Rectangle(Location, Size);
+    m_window_rectangle = gcnew System::Drawing::Rectangle(Location, Size);
 }
 
-Void window_ide::window_ide_LocationChanged(System::Object ^ sender, System::EventArgs ^ e)
+System::Void window_ide::window_ide_LocationChanged(System::Object ^ sender, System::EventArgs ^ e)
 {
     m_view->window_view_LocationChanged(sender, e);
 
@@ -91,20 +91,20 @@ Void window_ide::window_ide_LocationChanged(System::Object ^ sender, System::Eve
     if (WindowState == System::Windows::Forms::FormWindowState::Minimized)
         return;
 
-    m_window_rectangle = gcnew Drawing::Rectangle(Location, Size);
+    m_window_rectangle = gcnew System::Drawing::Rectangle(Location, Size);
 }
 
-Void window_ide::window_ide_Activated(System::Object ^ sender, System::EventArgs ^ e)
+System::Void window_ide::window_ide_Activated(System::Object ^ sender, System::EventArgs ^ e)
 {
     m_view->window_view_Activated(sender, e);
 }
 
-Void window_ide::window_ide_Deactivate(System::Object ^ sender, System::EventArgs ^ e)
+System::Void window_ide::window_ide_Deactivate(System::Object ^ sender, System::EventArgs ^ e)
 {
     m_view->window_view_Deactivate(sender, e);
 }
 
-Void window_ide::window_ide_FormClosing(System::Object ^ sender, System::Windows::Forms::FormClosingEventArgs ^ e)
+System::Void window_ide::window_ide_FormClosing(System::Object ^ sender, System::Windows::Forms::FormClosingEventArgs ^ e)
 {
     e->Cancel = true;
     save_on_exit();

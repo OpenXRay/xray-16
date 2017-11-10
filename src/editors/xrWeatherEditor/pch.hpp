@@ -8,8 +8,10 @@
 
 #pragma once
 
+#pragma managed(push, off)
 #include "Common/Platform.hpp"
 #include "xrCommon/inlining_macros.h"
+#pragma managed(pop)
 
 #ifdef DEBUG
 #define VERIFY(expression) \
@@ -35,9 +37,9 @@ typedef unsigned int u32;
 typedef char const* LPCSTR;
 typedef char* LPSTR;
 
-#pragma unmanaged
+#pragma managed(push, off)
 #include <malloc.h>
-#pragma managed
+#pragma managed(pop)
 
 #include <stdlib.h>
 #include <vcclr.h>
