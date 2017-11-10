@@ -2,7 +2,6 @@
 //
 
 #include "stdafx.h"
-#pragma hdrstop
 
 #include "xrCDB.h"
 
@@ -14,7 +13,7 @@ doug_lea_allocator g_collision_allocator(s_fake_array, s_arena_size, "collision"
 
 namespace Opcode
 {
-#include "OPC_TreeBuilders.h"
+#include "OPCODE/OPC_TreeBuilders.h"
 } // namespace Opcode
 
 using namespace CDB;

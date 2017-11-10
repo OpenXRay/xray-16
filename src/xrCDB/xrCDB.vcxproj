@@ -367,98 +367,6 @@
     <ClCompile Include="ISpatial_q_frustum.cpp" />
     <ClCompile Include="ISpatial_q_ray.cpp" />
     <ClCompile Include="ISpatial_verify.cpp" />
-    <ClCompile Include="Opcode.cpp">
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
-    </ClCompile>
-    <ClCompile Include="OPC_AABB.cpp">
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
-    </ClCompile>
-    <ClCompile Include="OPC_AABBCollider.cpp">
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
-    </ClCompile>
-    <ClCompile Include="OPC_AABBTree.cpp">
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
-    </ClCompile>
-    <ClCompile Include="OPC_Collider.cpp">
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
-    </ClCompile>
-    <ClCompile Include="OPC_Common.cpp">
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
-    </ClCompile>
-    <ClCompile Include="OPC_Container.cpp">
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
-    </ClCompile>
-    <ClCompile Include="OPC_Matrix3x3.cpp">
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
-    </ClCompile>
-    <ClCompile Include="OPC_Matrix4x4.cpp">
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
-    </ClCompile>
-    <ClCompile Include="OPC_Model.cpp">
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
-    </ClCompile>
-    <ClCompile Include="OPC_OBB.cpp">
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
-    </ClCompile>
-    <ClCompile Include="OPC_OBBCollider.cpp">
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
-    </ClCompile>
-    <ClCompile Include="OPC_OptimizedTree.cpp">
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
-    </ClCompile>
-    <ClCompile Include="OPC_Plane.cpp">
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
-    </ClCompile>
-    <ClCompile Include="OPC_PlanesCollider.cpp">
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
-    </ClCompile>
-    <ClCompile Include="OPC_Point.cpp">
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
-    </ClCompile>
-    <ClCompile Include="OPC_Ray.cpp">
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
-    </ClCompile>
-    <ClCompile Include="OPC_RayCollider.cpp">
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
-    </ClCompile>
-    <ClCompile Include="OPC_SphereCollider.cpp">
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
-    </ClCompile>
-    <ClCompile Include="OPC_TreeBuilders.cpp">
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
-    </ClCompile>
-    <ClCompile Include="OPC_TreeCollider.cpp">
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
-    </ClCompile>
-    <ClCompile Include="OPC_Triangle.cpp">
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
-    </ClCompile>
-    <ClCompile Include="OPC_VolumeCollider.cpp">
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</MinimalRebuild>
-      <MinimalRebuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</MinimalRebuild>
-    </ClCompile>
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -492,53 +400,11 @@
     <ClInclude Include="Intersect.hpp" />
     <ClInclude Include="Frustum.h" />
     <ClInclude Include="ISpatial.h" />
-    <ClInclude Include="Opcode.h" />
-    <ClInclude Include="OPC_AABB.h" />
-    <ClInclude Include="OPC_AABBCollider.h" />
-    <ClInclude Include="OPC_AABBTree.h" />
-    <ClInclude Include="OPC_BoundingSphere.h" />
-    <ClInclude Include="OPC_BoxBoxOverlap.h" />
-    <ClInclude Include="OPC_BVTCache.h" />
-    <ClInclude Include="OPC_Collider.h" />
-    <ClInclude Include="OPC_Common.h" />
-    <ClInclude Include="OPC_Container.h" />
-    <ClInclude Include="OPC_FPU.h" />
-    <ClInclude Include="OPC_Matrix3x3.h" />
-    <ClInclude Include="OPC_Matrix4x4.h" />
-    <ClInclude Include="OPC_MemoryMacros.h" />
-    <ClInclude Include="OPC_Model.h" />
-    <ClInclude Include="OPC_OBB.h" />
-    <ClInclude Include="OPC_OBBCollider.h" />
-    <ClInclude Include="OPC_OptimizedTree.h" />
-    <ClInclude Include="OPC_Plane.h" />
-    <ClInclude Include="OPC_PlanesAABBOverlap.h" />
-    <ClInclude Include="OPC_PlanesCollider.h" />
-    <ClInclude Include="OPC_PlanesTriOverlap.h" />
-    <ClInclude Include="OPC_Point.h" />
-    <ClInclude Include="OPC_Preprocessor.h" />
-    <ClInclude Include="OPC_Ray.h" />
-    <ClInclude Include="OPC_RayAABBOverlap.h" />
-    <ClInclude Include="OPC_RayCollider.h" />
-    <ClInclude Include="OPC_RayTriOverlap.h" />
-    <ClInclude Include="OPC_Settings.h" />
-    <ClInclude Include="OPC_SphereAABBOverlap.h" />
-    <ClInclude Include="OPC_SphereCollider.h" />
-    <ClInclude Include="OPC_SphereTriOverlap.h" />
-    <ClInclude Include="OPC_TreeBuilders.h" />
-    <ClInclude Include="OPC_TreeCollider.h" />
-    <ClInclude Include="OPC_Triangle.h" />
-    <ClInclude Include="OPC_TriBoxOverlap.h" />
-    <ClInclude Include="OPC_TriTriOverlap.h" />
-    <ClInclude Include="OPC_Types.h" />
-    <ClInclude Include="OPC_VolumeCollider.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="xrCDB.h" />
     <ClInclude Include="xrXRC.h" />
     <ClInclude Include="xr_area.h" />
     <ClInclude Include="xr_collide_defs.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)Layers\xrAPI\xrAPI.vcxproj">
@@ -548,6 +414,9 @@
     <ProjectReference Include="$(SolutionDir)xrCore\xrCore.vcxproj">
       <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Externals\OPCODE\OPCODE.vcxproj">
+      <Project>{bf40459f-302d-4128-a1b6-c965db90e7f0}</Project>
     </ProjectReference>
     <ProjectReference Include="..\utils\xrMiscMath\xrMiscMath.vcxproj">
       <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>

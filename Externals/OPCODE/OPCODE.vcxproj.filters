@@ -1,0 +1,208 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Sources">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Headers">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="OPC_AABB.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="OPC_AABBCollider.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="OPC_AABBTree.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="OPC_Collider.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="OPC_Common.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="OPC_Container.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="OPC_Matrix3x3.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="OPC_Matrix4x4.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="OPC_Model.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="OPC_OBB.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="OPC_OBBCollider.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="OPC_OptimizedTree.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="OPC_Plane.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="OPC_PlanesCollider.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="OPC_Point.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="OPC_Ray.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="OPC_RayCollider.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="OPC_SphereCollider.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="OPC_TreeBuilders.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="OPC_TreeCollider.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="OPC_Triangle.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="OPC_VolumeCollider.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Opcode.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="OPC_AABB.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_AABBCollider.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_AABBTree.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_BoundingSphere.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_BoxBoxOverlap.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_BVTCache.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_Collider.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_Common.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_Container.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_FPU.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_Matrix3x3.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_Matrix4x4.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_MemoryMacros.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_Model.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_OBB.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_OBBCollider.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_OptimizedTree.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_Plane.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_PlanesAABBOverlap.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_PlanesCollider.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_PlanesTriOverlap.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_Point.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_Preprocessor.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_Ray.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_RayAABBOverlap.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_RayCollider.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_RayTriOverlap.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_Settings.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_SphereAABBOverlap.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_SphereCollider.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_SphereTriOverlap.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_TreeBuilders.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_TreeCollider.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_Triangle.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_TriBoxOverlap.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_TriTriOverlap.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_Types.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="OPC_VolumeCollider.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Opcode.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.hpp" />
+  </ItemGroup>
+</Project>

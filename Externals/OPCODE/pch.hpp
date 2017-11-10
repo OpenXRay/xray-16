@@ -1,9 +1,9 @@
 #pragma once
 
+#include <algorithm>
+
 #include "Common/Platform.hpp"
-
 #include "xrCore/xrCore.h"
-
 #include "xrCore/doug_lea_allocator.h"
 #include "xrCore/memory_allocator_options.h"
 
@@ -55,9 +55,4 @@ IC void cdelete(T*& ptr)
 }
 
 #define ENGINE_API
-#include "OPCODE/Opcode.h"
-
-// TODO: reference additional headers your program requires here
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
+#include "opcode.h"
