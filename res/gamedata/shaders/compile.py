@@ -11,8 +11,8 @@ featureLevel = '3_0'
 workers = 8
 
 # Set the directory you want to start from
-shaders = 'gamedata/shaders/r2'
-objects = 'gamedata/shaders/r2/objects/r2'
+shaders = 'r2'
+objects = 'r2/objects/r2'
 
 # List all macro identifiers, excluding SMAP
 options = [
