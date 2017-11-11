@@ -104,7 +104,6 @@ void CHW::CreateD3D()
 void CHW::DestroyD3D()
 {
     _RELEASE(this->pD3D);
-    //hD3D->close();
 }
 
 //////////////////////////////////////////////////////////////////////
