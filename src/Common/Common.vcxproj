@@ -179,6 +179,7 @@
     <ClInclude Include="..\xrCommon\xr_stack.h" />
     <ClInclude Include="..\xrCommon\xr_string.h" />
     <ClInclude Include="..\xrCommon\xr_vector.h" />
+    <ClInclude Include="Common.hpp" />
     <ClInclude Include="Compiler.inl" />
     <ClInclude Include="Config.hpp" />
     <ClInclude Include="face_smoth_flags.h" />

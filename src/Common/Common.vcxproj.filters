@@ -84,6 +84,7 @@
     <ClInclude Include="ImportExportMacros.inl">
       <Filter>Platform</Filter>
     </ClInclude>
+    <ClInclude Include="Common.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="NvMender2003">
