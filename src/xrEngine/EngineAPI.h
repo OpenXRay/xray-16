@@ -59,6 +59,7 @@ public:
     VTResume* tune_resume;
     void Initialize();
 
+    void InitializeRenderers();
 #ifndef DEDICATED_SERVER
     void InitializeNotDedicated();
 #endif // DEDICATED_SERVER

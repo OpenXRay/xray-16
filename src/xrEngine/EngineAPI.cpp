@@ -98,10 +98,8 @@ void CEngineAPI::InitializeNotDedicated()
 }
 #endif // DEDICATED_SERVER
 
-void CEngineAPI::Initialize(void)
+void CEngineAPI::InitializeRenderers()
 {
-    //////////////////////////////////////////////////////////////////////////
-    // render
     constexpr pcstr r1_name = "xrRender_R1";
 
 #ifndef DEDICATED_SERVER
@@ -122,11 +120,18 @@ void CEngineAPI::Initialize(void)
         R_ASSERT(hRender);
         g_current_renderer = 1;
     }
+
     // ask current renderer to setup GlobalEnv
-    using SetupEnvFunc = void (*)();
+    using SetupEnvFunc = void(*)();
     auto setupEnv = (SetupEnvFunc)hRender->getProcAddress("SetupEnv");
     R_ASSERT(setupEnv);
     setupEnv();
+}
+
+void CEngineAPI::Initialize(void)
+{
+    InitializeRenderers();
+
     // game
     {
         constexpr pcstr g_name = "xrGame";
