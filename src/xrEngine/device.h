@@ -15,6 +15,7 @@
 #include "Stats.h"
 #include "xrCore/Threading/Event.hpp"
 #include "xrCommon/xr_list.h"
+#include "xrCore/ModuleLookup.hpp"
 
 #define VIEWPORT_NEAR 0.2f
 
@@ -179,7 +180,7 @@ public:
         : m_dwWindowStyle(0)
 #ifdef INGAME_EDITOR
           ,
-          m_editor_module(0), m_editor_initialize(0), m_editor_finalize(0), m_editor(0), m_engine(0)
+          m_editor_module(nullptr), m_editor_initialize(nullptr), m_editor_finalize(nullptr), m_editor(nullptr), m_engine(nullptr)
 #endif // #ifdef INGAME_EDITOR
     {
         m_hWnd = NULL;
@@ -269,7 +270,7 @@ private:
     typedef XRay::Editor::initialize_function_ptr initialize_function_ptr;
     typedef XRay::Editor::finalize_function_ptr finalize_function_ptr;
 
-    HMODULE m_editor_module;
+    std::unique_ptr<XRay::Module> m_editor_module;
     initialize_function_ptr m_editor_initialize;
     finalize_function_ptr m_editor_finalize;
     XRay::Editor::ide_base* m_editor;

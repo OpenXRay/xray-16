@@ -19,6 +19,7 @@
 #endif
 #include <stdarg.h>
 #include "Common/Noncopyable.hpp"
+#include "xrCore/ModuleLookup.hpp"
 
 Flags32 g_LuaDebug;
 
@@ -673,7 +674,6 @@ typedef cs::lua_studio::create_world_function_type create_world_function_type;
 typedef cs::lua_studio::destroy_world_function_type destroy_world_function_type;
 static create_world_function_type s_create_world = nullptr;
 static destroy_world_function_type s_destroy_world = nullptr;
-static HMODULE s_script_debugger_handle = nullptr;
 static LogCallback s_old_log_callback = nullptr;
 #endif
 #endif
@@ -694,23 +694,27 @@ void CScriptEngine::initialize_lua_studio(lua_State* state, cs::lua_studio::worl
     engine = 0;
     world = 0;
     u32 const old_error_mode = SetErrorMode(SEM_FAILCRITICALERRORS);
-    s_script_debugger_handle = LoadLibrary(CS_LUA_STUDIO_BACKEND_FILE_NAME);
+
+    const auto s_script_debugger_module = std::make_unique<XRay::Module>(CS_LUA_STUDIO_BACKEND_FILE_NAME);
     SetErrorMode(old_error_mode);
-    if (!s_script_debugger_handle)
+    if (!s_script_debugger_module->exist())
     {
         Msg("! cannot load %s dynamic library", CS_LUA_STUDIO_BACKEND_FILE_NAME);
         return;
     }
-    R_ASSERT2(s_script_debugger_handle, "can't load script debugger library");
-    s_create_world =
-    (create_world_function_type)GetProcAddress(s_script_debugger_handle, "_cs_lua_studio_backend_create_world@12");
+
+    s_create_world = 
+        (create_world_function_type)s_script_debugger_module->getProcAddress("_cs_lua_studio_backend_create_world@12");
     R_ASSERT2(s_create_world, "can't find function \"cs_lua_studio_backend_create_world\"");
-    s_destroy_world =
-    (destroy_world_function_type)GetProcAddress(s_script_debugger_handle, "_cs_lua_studio_backend_destroy_world@4");
+
+    s_destroy_world = 
+        (destroy_world_function_type)s_script_debugger_module->getProcAddress("_cs_lua_studio_backend_destroy_world@4");
     R_ASSERT2(s_destroy_world, "can't find function \"cs_lua_studio_backend_destroy_world\" in the library");
+
     engine = new lua_studio_engine();
     world = s_create_world(*engine, false, false);
     VERIFY(world);
+
     s_old_log_callback = SetLogCB(LogCallback(log_callback, this));
     RunJITCommand(state, "off()");
     world->add(state);
@@ -724,8 +728,6 @@ void CScriptEngine::finalize_lua_studio(lua_State* state, cs::lua_studio::world*
     world = nullptr;
     VERIFY(engine);
     xr_delete(engine);
-    FreeLibrary(s_script_debugger_handle);
-    s_script_debugger_handle = nullptr;
     SetLogCB(s_old_log_callback);
 }
 

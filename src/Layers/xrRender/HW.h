@@ -7,6 +7,7 @@
 #pragma once
 
 #include "HWCaps.h"
+#include "xrCore/ModuleLookup.hpp"
 
 #ifndef _MAYA_EXPORT
 #include "stats_manager.h"
@@ -88,7 +89,7 @@ public:
     D3D_FEATURE_LEVEL FeatureLevel;
 #else
 private:
-    HINSTANCE hD3D;
+    std::unique_ptr<XRay::Module> hD3D;
 
 public:
     IDirect3D9* pD3D; // D3D

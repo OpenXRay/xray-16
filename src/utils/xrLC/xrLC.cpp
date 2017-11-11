@@ -6,6 +6,7 @@
 #include "Common/FSMacros.hpp"
 #include "utils/xrLC_Light/xrLC_GlobalData.h"
 #include "utils/xrLCUtil/LevelCompilerLoggerWindow.hpp"
+#include "xrCore/ModuleLookup.hpp"
 
 #pragma comment(lib, "comctl32.lib")
 #pragma comment(lib, "d3dx9.lib")
@@ -116,12 +117,12 @@ void Startup(LPSTR lpCmdLine)
     if (bModifyOptions)
     {
         Logger.Phase("Project options...");
-        HMODULE L = LoadLibrary("xrLC_Options");
-        void* P = GetProcAddress(L, "_frmScenePropertiesRun");
-        R_ASSERT(P);
-        xrOptions* O = (xrOptions*)P;
-        int R = O(&Params, version, false);
-        FreeLibrary(L);
+        const auto L = std::make_unique<XRay::Module>("xrLC_Options");
+
+        const auto O = (xrOptions*)L->getProcAddress("_frmScenePropertiesRun");
+        R_ASSERT(O);
+
+        const int R = O(&Params, version, false);
         if (R == 2)
         {
             ExitProcess(0);

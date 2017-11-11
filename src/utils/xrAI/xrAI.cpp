@@ -28,6 +28,7 @@
 
 #include "utils/xrLCUtil/LevelCompilerLoggerWindow.hpp"
 #include "xrCore/cdecl_cast.hpp"
+#include "xrCore/ModuleLookup.hpp"
 
 LevelCompilerLoggerWindow& Logger = LevelCompilerLoggerWindow();
 
@@ -198,22 +199,23 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 {
     xrDebug::Initialize(false);
     Core.Initialize("xrai", 0);
-    HMODULE hFactory;
-    LPCSTR g_name = "xrSE_Factory";
-    Log("Loading DLL:", g_name);
-    hFactory = LoadLibrary(g_name);
-    if (0 == hFactory)
-        R_CHK(GetLastError());
-    R_ASSERT2(hFactory, "Factory DLL raised exception during loading or there is no factory DLL at all");
 
-    create_entity = (Factory_Create*)GetProcAddress(hFactory, "_create_entity@4");
+
+    constexpr pcstr g_name = "xrSE_Factory";
+    Log("Loading DLL:", g_name); 
+    const auto hFactory = std::make_unique<XRay::Module>(g_name);
+
+    if (!hFactory->exist())
+        R_CHK(GetLastError());
+    R_ASSERT2(hFactory->exist(), "Factory DLL raised exception during loading or there is no factory DLL at all");
+
+    create_entity = (Factory_Create*)hFactory->getProcAddress("_create_entity@4");
     R_ASSERT(create_entity);
-    destroy_entity = (Factory_Destroy*)GetProcAddress(hFactory, "_destroy_entity@4");
+
+    destroy_entity = (Factory_Destroy*)hFactory->getProcAddress("_destroy_entity@4");
     R_ASSERT(destroy_entity);
 
     Startup(lpCmdLine);
-
-    FreeLibrary(hFactory);
 
     Core._destroy();
 

@@ -13,6 +13,7 @@
 #include "xrScriptEngine/script_engine.hpp"
 #include "script_token_list.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
+#include "xrCore/ModuleLookup.hpp"
 
 using namespace luabind;
 
@@ -23,19 +24,20 @@ struct CChooseType
 typedef IPropHelper&(__stdcall* TPHelper)();
 
 TPHelper _PHelper = nullptr;
-HMODULE prop_helper_module = nullptr;
-LPCSTR prop_helper_library = "xrEPropsB", prop_helper_func = "PHelper";
+std::unique_ptr<XRay::Module> prop_helper_module;
+constexpr pcstr prop_helper_library = "xrEPropsB", prop_helper_func = "PHelper";
 CScriptPropertiesListHelper* g_property_list_helper = nullptr;
 
 void load_prop_helper()
 {
-    prop_helper_module = LoadLibrary(prop_helper_library);
-    if (!prop_helper_module)
+    prop_helper_module = std::make_unique<XRay::Module>(prop_helper_library);
+    if (!prop_helper_module->exist())
     {
         Msg("! Cannot find library %s", prop_helper_library);
         return;
     }
-    _PHelper = (TPHelper)GetProcAddress(prop_helper_module, prop_helper_func);
+
+    _PHelper = (TPHelper)prop_helper_module->getProcAddress(prop_helper_func);
     if (!_PHelper)
     {
         Msg("! Cannot find entry point of the function %s in the library %s", prop_helper_func, prop_helper_func);

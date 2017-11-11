@@ -89,23 +89,13 @@ void CHW::Reset(HWND hwnd)
 
 void CHW::CreateD3D()
 {
-    //#ifndef DEDICATED_SERVER
-    //  LPCSTR      _name           = "d3d9.dll";
-    //#else
-    //  LPCSTR      _name           = "xrD3D9-Null";
-    //#endif
+    const pcstr _name = GEnv.isDedicatedServer ? "xrD3D9-Null" : "d3d9.dll";
 
-    LPCSTR _name = "xrD3D9-Null";
+    hD3D = std::make_unique<XRay::Module>(_name);
 
-#ifndef _EDITOR
-    if (!GEnv.isDedicatedServer)
-#endif
-        _name = "d3d9.dll";
-
-    hD3D = LoadLibrary(_name);
-    R_ASSERT2(hD3D, "Can't find 'd3d9.dll'\nPlease install latest version of DirectX before running this program");
+    R_ASSERT2(hD3D->exist(), "Can't find 'd3d9.dll'\nPlease install latest version of DirectX before running this program");
     typedef IDirect3D9* WINAPI _Direct3DCreate9(UINT SDKVersion);
-    _Direct3DCreate9* createD3D = (_Direct3DCreate9*)GetProcAddress(hD3D, "Direct3DCreate9");
+    auto createD3D = (_Direct3DCreate9*)hD3D->getProcAddress("Direct3DCreate9");
     R_ASSERT(createD3D);
     this->pD3D = createD3D(D3D_SDK_VERSION);
     R_ASSERT2(this->pD3D, "Please install DirectX 9.0c");
@@ -114,7 +104,7 @@ void CHW::CreateD3D()
 void CHW::DestroyD3D()
 {
     _RELEASE(this->pD3D);
-    FreeLibrary(hD3D);
+    //hD3D->close();
 }
 
 //////////////////////////////////////////////////////////////////////

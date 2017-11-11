@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "xrCore/ModuleLookup.hpp"
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -12,20 +13,20 @@ typedef HRESULT(__stdcall* FuncPtrD3D11CreateDeviceAndSwapChain)(IDXGIAdapter* p
 
 bool TestDX11Present()
 {
-    HMODULE hD3D11 = LoadLibrary("d3d11.dll");
+    const auto hD3D11 = std::make_unique<XRay::Module>("d3d11.dll");
 
-    if (!hD3D11)
+    if (!hD3D11->exist())
     {
-        Msg("* DX11: failed to load d3d11.dll");
+        Log("* DX11: failed to load d3d11.dll");
         return false;
     }
 
-    FuncPtrD3D11CreateDeviceAndSwapChain pD3D11CreateDeviceAndSwapChain =
-        (FuncPtrD3D11CreateDeviceAndSwapChain)GetProcAddress(hD3D11, "D3D11CreateDeviceAndSwapChain");
+    auto pD3D11CreateDeviceAndSwapChain =
+        (FuncPtrD3D11CreateDeviceAndSwapChain)hD3D11->getProcAddress("D3D11CreateDeviceAndSwapChain");
 
     if (!pD3D11CreateDeviceAndSwapChain)
     {
-        Msg("* DX11: failed to get address of D3D11CreateDeviceAndSwapChain");
+        Log("* DX11: failed to get address of D3D11CreateDeviceAndSwapChain");
         return false;
     }
 
@@ -38,7 +39,7 @@ bool TestDX11Present()
     wcex.lpszClassName = "TestDX11WindowClass";
     if (!RegisterClassEx(&wcex))
     {
-        Msg("* DX11: failed to register window class");
+        Log("* DX11: failed to register window class");
         return false;
     }
 
@@ -88,8 +89,6 @@ bool TestDX11Present()
         pSwapChain->Release();
     if (pd3dDevice)
         pd3dDevice->Release();
-
-    FreeLibrary(hD3D11);
 
     DestroyWindow(hWnd);
 

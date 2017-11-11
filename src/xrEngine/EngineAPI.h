@@ -3,11 +3,12 @@
 //****************************************************************************
 // Support for extension DLLs
 //****************************************************************************
-
-#if !defined(AFX_ENGINEAPI_H__CF21372B_C8B8_4891_82FC_D872C84E1DD4__INCLUDED_)
-#define AFX_ENGINEAPI_H__CF21372B_C8B8_4891_82FC_D872C84E1DD4__INCLUDED_
 #pragma once
+#include <memory>
+
 #include "xrEngine/Engine.h"
+#include "xrCore/ModuleLookup.hpp"
+
 
 class IFactoryObject
 {
@@ -45,10 +46,9 @@ typedef void __cdecl VTResume(void);
 
 class ENGINE_API CEngineAPI
 {
-private:
-    HMODULE hGame;
-    HMODULE hRender;
-    HMODULE hTuner;
+    std::unique_ptr<XRay::Module> hGame;
+    std::unique_ptr<XRay::Module> hRender;
+    std::unique_ptr<XRay::Module> hTuner;
 
 public:
     BENCH_SEC_SCRAMBLEMEMBER1
@@ -79,5 +79,3 @@ ENGINE_API bool is_enough_address_space_available();
         Engine.External.pDestroy(a);\
         a = NULL;\
     }
-
-#endif // !defined(AFX_ENGINEAPI_H__CF21372B_C8B8_4891_82FC_D872C84E1DD4__INCLUDED_)
