@@ -117,10 +117,10 @@ CCustomMonster::~CCustomMonster()
 
 #ifdef DEBUG
     Msg("dumping client spawn manager stuff for object with id %d", ID());
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         Level().client_spawn_manager().dump(ID());
 #endif // DEBUG
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         Level().client_spawn_manager().clear(ID());
 }
 

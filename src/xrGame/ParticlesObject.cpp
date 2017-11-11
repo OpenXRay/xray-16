@@ -27,7 +27,7 @@ void CParticlesObject::Init(LPCSTR p_name, IRender_Sector* S, BOOL bAutoRemove)
     m_bAutoRemove = bAutoRemove;
     float time_limit = 0.0f;
 
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
     {
         // create visual
         renderable.visual = GEnv.Render->model_CreateParticles(p_name);
@@ -82,7 +82,7 @@ CParticlesObject::~CParticlesObject()
 
 void CParticlesObject::UpdateSpatial()
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
 
     // spatial	(+ workaround occasional bug inside particle-system)
@@ -118,7 +118,7 @@ void CParticlesObject::UpdateSpatial()
 
 const shared_str CParticlesObject::Name()
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return "";
 
     IParticleCustom* V = smart_cast<IParticleCustom*>(renderable.visual);
@@ -129,7 +129,7 @@ const shared_str CParticlesObject::Name()
 //----------------------------------------------------
 void CParticlesObject::Play(bool bHudMode)
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
 
     IParticleCustom* V = smart_cast<IParticleCustom*>(renderable.visual);
@@ -146,7 +146,7 @@ void CParticlesObject::Play(bool bHudMode)
 
 void CParticlesObject::play_at_pos(const Fvector& pos, BOOL xform)
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
 
     IParticleCustom* V = smart_cast<IParticleCustom*>(renderable.visual);
@@ -163,7 +163,7 @@ void CParticlesObject::play_at_pos(const Fvector& pos, BOOL xform)
 
 void CParticlesObject::Stop(BOOL bDefferedStop)
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
 
     IParticleCustom* V = smart_cast<IParticleCustom*>(renderable.visual);
@@ -176,7 +176,7 @@ void CParticlesObject::shedule_Update(u32 _dt)
 {
     inherited::shedule_Update(_dt);
 
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
 
     // Update
@@ -205,7 +205,7 @@ void CParticlesObject::shedule_Update(u32 _dt)
 
 void CParticlesObject::PerformAllTheWork(u32 _dt)
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
 
     // Update
@@ -222,7 +222,7 @@ void CParticlesObject::PerformAllTheWork(u32 _dt)
 
 void CParticlesObject::PerformAllTheWork_mt()
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
 
     if (0 == mt_dt)
@@ -235,7 +235,7 @@ void CParticlesObject::PerformAllTheWork_mt()
 
 void CParticlesObject::SetXFORM(const Fmatrix& m)
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
 
     IParticleCustom* V = smart_cast<IParticleCustom*>(renderable.visual);
@@ -247,7 +247,7 @@ void CParticlesObject::SetXFORM(const Fmatrix& m)
 
 void CParticlesObject::UpdateParent(const Fmatrix& m, const Fvector& vel)
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
 
     IParticleCustom* V = smart_cast<IParticleCustom*>(renderable.visual);
@@ -258,7 +258,7 @@ void CParticlesObject::UpdateParent(const Fmatrix& m, const Fvector& vel)
 
 Fvector& CParticlesObject::Position()
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
     {
         static Fvector _pos = Fvector().set(0, 0, 0);
         return _pos;
@@ -269,7 +269,7 @@ Fvector& CParticlesObject::Position()
 
 float CParticlesObject::shedule_Scale()
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return 5.0f;
 
     return Device.vCameraPosition.distance_to(Position()) / 200.f;
@@ -308,7 +308,7 @@ void CParticlesObject::SetAutoRemove(bool auto_remove)
 //остановки Stop партиклы могут еще доигрывать анимацию IsPlaying = true
 bool CParticlesObject::IsPlaying()
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return false;
 
     IParticleCustom* V = smart_cast<IParticleCustom*>(renderable.visual);

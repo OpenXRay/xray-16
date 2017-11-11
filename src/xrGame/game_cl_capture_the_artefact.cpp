@@ -108,7 +108,7 @@ void game_cl_CaptureTheArtefact::shedule_Update(u32 dt)
 {
     inherited::shedule_Update(dt);
 
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
 
     if ((Level().IsDemoPlayStarted() || Level().IsDemoPlayFinished()) && m_game_ui)
@@ -656,7 +656,7 @@ void game_cl_CaptureTheArtefact::net_import_update(NET_Packet& P)
 bool game_cl_CaptureTheArtefact::InWarmUp() const { return m_inWarmup; }
 CUIGameCustom* game_cl_CaptureTheArtefact::createGameUI()
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return NULL;
 
     m_game_ui = smart_cast<CUIGameCTA*>(NEW_INSTANCE(CLSID_GAME_UI_CAPTURETHEARTEFACT));
@@ -733,7 +733,7 @@ void game_cl_CaptureTheArtefact::OnGameMenuRespond_ChangeTeam(NET_Packet& P)
 
 void game_cl_CaptureTheArtefact::UpdateMapLocations()
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
     // updating firends indicator
     if (!local_player)
@@ -821,7 +821,7 @@ void game_cl_CaptureTheArtefact::OnSpawn(IGameObject* pObj)
 {
     inherited::OnSpawn(pObj);
 
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
 
     CArtefact* pArtefact = smart_cast<CArtefact*>(pObj);
@@ -1650,7 +1650,7 @@ void game_cl_CaptureTheArtefact::OnConnected()
     inherited::OnConnected();
     if (m_game_ui)
     {
-        VERIFY(!g_dedicated_server);
+        VERIFY(!GEnv.isDedicatedServer);
         m_game_ui = smart_cast<CUIGameCTA*>(CurrentGameUI());
         m_game_ui->SetClGame(this);
     }

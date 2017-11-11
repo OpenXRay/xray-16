@@ -17,7 +17,7 @@ void CBackend::OnFrameEnd()
 {
 //#ifndef DEDICATED_SERVER
 #ifndef _EDITOR
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
 #endif
     {
 #if defined(USE_DX10) || defined(USE_DX11)
@@ -41,7 +41,7 @@ void CBackend::OnFrameBegin()
 {
 //#ifndef DEDICATED_SERVER
 #ifndef _EDITOR
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
 #endif
     {
         PGO(Msg("PGO:*****frame[%d]*****", RDEVICE.dwFrame));

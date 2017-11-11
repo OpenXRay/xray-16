@@ -270,7 +270,7 @@ Shader* CResourceManager::_cpp_Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR
 {
 //#ifndef DEDICATED_SERVER
 #ifndef _EDITOR
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
 #endif
     {
 //	TODO: DX10: When all shaders are ready switch to common path
@@ -297,7 +297,7 @@ Shader* CResourceManager::Create(IBlender* B, LPCSTR s_shader, LPCSTR s_textures
 {
 //#ifndef DEDICATED_SERVER
 #ifndef _EDITOR
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
 #endif
     {
         return _cpp_Create(B, s_shader, s_textures, s_constants, s_matrices);
@@ -316,7 +316,7 @@ Shader* CResourceManager::Create(LPCSTR s_shader, LPCSTR s_textures, LPCSTR s_co
 {
 //#ifndef DEDICATED_SERVER
 #ifndef _EDITOR
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
 #endif
     {
 //	TODO: DX10: When all shaders are ready switch to common path

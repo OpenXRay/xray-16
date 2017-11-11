@@ -15,8 +15,6 @@
 #include "debug_renderer.h"
 #include "xrGameSpyServer.h"
 
-ENGINE_API bool g_dedicated_server;
-
 #define MAPROT_LIST_NAME "maprot_list.ltx"
 string_path MAPROT_LIST = "";
 BOOL net_sv_control_hit = FALSE;
@@ -291,7 +289,7 @@ void game_sv_GameState::net_Export_State(NET_Packet& P, ClientID to)
     P.w_u8(u8(g_bCollectStatisticData));
 
     // Players
-    //	u32	p_count			= get_players_count() - ((g_dedicated_server)? 1 : 0);
+    //	u32	p_count			= get_players_count() - ((GEnv.isDedicatedServer)? 1 : 0);
 
     xrClientData* tmp_client = static_cast<xrClientData*>(m_server->GetClientByID(to));
     game_PlayerState* tmp_ps = tmp_client->ps;
@@ -415,7 +413,7 @@ void game_sv_GameState::Create(shared_str& options)
         FS.r_close(F);
     }
 
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
     {
         // loading scripts
         auto& scriptEngine = ai().script_engine();
@@ -617,7 +615,7 @@ void game_sv_GameState::Update()
         m_item_respawner.update(Level().timeServer());
     }
 
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
     {
         if (Level().game)
         {
@@ -647,7 +645,7 @@ game_sv_GameState::game_sv_GameState()
 
 game_sv_GameState::~game_sv_GameState()
 {
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         ai().script_engine().remove_script_process(ScriptProcessor::Game);
     xr_delete(m_event_queue);
 
@@ -760,7 +758,7 @@ void game_sv_GameState::OnEvent(NET_Packet& tNetPacket, u16 type, u32 time, Clie
         if (Level().IsDemoPlay())
             break;
 
-        if (g_dedicated_server && (CL == m_server->GetServerClient()))
+        if (GEnv.isDedicatedServer && (CL == m_server->GetServerClient()))
             break;
 
         CheckNewPlayer(CL);

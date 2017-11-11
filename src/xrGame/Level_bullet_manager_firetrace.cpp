@@ -186,7 +186,7 @@ void CBulletManager::FireShotmark(SBullet* bullet, const Fvector& vDir, const Fv
                     //добавить отметку на материале
                     Fvector p;
                     p.mad(bullet->bullet_pos,bullet->dir,R.range-0.01f);
-                    if(!g_dedicated_server)
+                    if(!GEnv.isDedicatedServer)
                         GlobalEnv.Render->add_SkeletonWallmark	(	&R.O->renderable.xform,
                                                             PKinematics(R.O->Visual()),
                                                             &*mtl_pair->CollideMarks,

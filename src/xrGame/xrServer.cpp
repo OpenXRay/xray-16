@@ -49,7 +49,7 @@ void xrClientData::Clear()
 };
 
 xrClientData::~xrClientData() { xr_delete(ps); }
-xrServer::xrServer() : IPureServer(Device.GetTimerGlobal(), g_dedicated_server)
+xrServer::xrServer() : IPureServer(Device.GetTimerGlobal(), GEnv.isDedicatedServer)
 {
     m_file_transfers = NULL;
     m_aDelayedPackets.clear();
@@ -1160,7 +1160,7 @@ void xrServer::KickCheaters()
 
 void xrServer::MakeScreenshot(ClientID const& admin_id, ClientID const& cheater_id)
 {
-    if ((cheater_id == SV_Client->ID) && g_dedicated_server)
+    if ((cheater_id == SV_Client->ID) && GEnv.isDedicatedServer)
     {
         return;
     }
@@ -1177,7 +1177,7 @@ void xrServer::MakeScreenshot(ClientID const& admin_id, ClientID const& cheater_
 }
 void xrServer::MakeConfigDump(ClientID const& admin_id, ClientID const& cheater_id)
 {
-    if ((cheater_id == SV_Client->ID) && g_dedicated_server)
+    if ((cheater_id == SV_Client->ID) && GEnv.isDedicatedServer)
     {
         return;
     }

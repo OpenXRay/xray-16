@@ -295,9 +295,9 @@ public:
 int RunApplication(pcstr commandLine)
 {
 #ifdef DEDICATED_SERVER
-    g_dedicated_server = true;
+    GEnv.isDedicatedServer = true;
 #endif
-    xrDebug::Initialize(g_dedicated_server);
+    xrDebug::Initialize(GEnv.isDedicatedServer);
     if (!IsDebuggerPresent())
     {
         u32 heapFragmentation = 2;

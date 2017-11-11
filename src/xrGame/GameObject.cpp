@@ -52,8 +52,6 @@ extern MagicBox3 MagicMinBox(int iQuantity, const Fvector* akPoint);
 #include "PHDebug.h"
 #endif
 
-ENGINE_API bool g_dedicated_server;
-
 static const float base_spu_epsP = 0.05f;
 static const float base_spu_epsR = 0.05f;
 
@@ -81,7 +79,7 @@ CGameObject::CGameObject() : SpatialBase(g_SpatialSpace), scriptBinder(this)
     m_bCrPr_Activated = false;
     m_dwCrPr_ActivationStep = 0;
     m_spawn_time = 0;
-    m_ai_location = !g_dedicated_server ? new CAI_ObjectLocation() : 0;
+    m_ai_location = !GEnv.isDedicatedServer ? new CAI_ObjectLocation() : 0;
     m_server_flags.one();
 
     m_callbacks = new CALLBACK_MAP();
@@ -258,7 +256,7 @@ void CGameObject::init()
 void CGameObject::reinit()
 {
     m_visual_callback.clear();
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         ai_location().reinit();
 
     // clear callbacks
@@ -513,11 +511,11 @@ BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
     }
 
     reload(*cNameSect());
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         scriptBinder.reload(*cNameSect());
 
     reinit();
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         scriptBinder.reinit();
 #ifdef DEBUG
     if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && _stricmp(PH_DBG_ObjectTrackName(), *cName()) == 0)
@@ -1186,7 +1184,7 @@ void CGameObject::shedule_Update(u32 dt)
     else if (Device.vCameraPosition.distance_to_sqr(Position()) < CROW_RADIUS*CROW_RADIUS) MakeMeCrow ();
     */
     // ~
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         scriptBinder.shedule_Update(dt);
 }
 
@@ -1246,7 +1244,7 @@ u32 CGameObject::ef_detector_type() const
 
 void CGameObject::net_Relcase(IGameObject* O)
 {
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         scriptBinder.net_Relcase(O);
 }
 

@@ -303,7 +303,7 @@ void CSector::load(IReader& fs)
         count--;
     }
 
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         m_root = nullptr;
     else
     {

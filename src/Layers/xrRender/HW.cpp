@@ -48,7 +48,7 @@ void CHW::Reset(HWND hwnd)
     //  BOOL    bWindowed       = TRUE;
     //#endif
     BOOL bWindowed = TRUE;
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         bWindowed = !psDeviceFlags.is(rsFullscreen);
 
     selectResolution(DevPP.BackBufferWidth, DevPP.BackBufferHeight, bWindowed);
@@ -98,7 +98,7 @@ void CHW::CreateD3D()
     LPCSTR _name = "xrD3D9-Null";
 
 #ifndef _EDITOR
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
 #endif
         _name = "d3d9.dll";
 
@@ -174,7 +174,7 @@ void CHW::selectResolution(u32& dwWidth, u32& dwHeight, BOOL bWindowed)
 {
     fill_vid_mode_list(this);
 #ifndef _EDITOR
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
     {
         dwWidth = 640;
         dwHeight = 480;
@@ -222,7 +222,7 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     BOOL bWindowed = TRUE;
 
 #ifndef _EDITOR
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         bWindowed = !psDeviceFlags.is(rsFullscreen);
 #else
     bWindowed = 1;
@@ -534,7 +534,7 @@ void CHW::updateWindowProps(HWND m_hWnd)
 
     BOOL bWindowed = TRUE;
 #ifndef _EDITOR
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         bWindowed = !psDeviceFlags.is(rsFullscreen);
 #endif
 
@@ -580,7 +580,7 @@ void CHW::updateWindowProps(HWND m_hWnd)
     }
 
 #ifndef _EDITOR
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
     {
         ShowCursor(FALSE);
         SetForegroundWindow(m_hWnd);

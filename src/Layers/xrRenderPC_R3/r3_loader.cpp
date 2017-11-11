@@ -54,7 +54,7 @@ void CRender::level_Load(IReader* fs)
     Wallmarks = new CWallmarksEngine();
     Details = new CDetailManager();
 
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
     {
         // VB,IB,SWI
         //		g_pGamePersistent->LoadTitle("st_loading_geometry");

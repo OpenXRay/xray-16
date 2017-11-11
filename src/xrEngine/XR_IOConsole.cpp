@@ -239,7 +239,7 @@ void CConsole::OnRender()
     {
         bGame = true;
     }
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
     {
         bGame = false;
     }
@@ -624,14 +624,9 @@ extern CInput* pInput;
 
 void CConsole::Hide()
 {
-    if (!bVisible)
-    {
+    if (!bVisible || g_pGamePersistent && GEnv.isDedicatedServer)
         return;
-    }
-    if (g_pGamePersistent && g_dedicated_server)
-    {
-        return;
-    }
+
     // if ( g_pGameLevel ||
     // ( g_pGamePersistent && g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive() ))
 

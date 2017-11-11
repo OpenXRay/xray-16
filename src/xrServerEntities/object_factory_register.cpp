@@ -181,7 +181,6 @@
 #endif // NO_XR_GAME
 
 #ifndef NO_XR_GAME
-ENGINE_API bool g_dedicated_server;
 #define ADD(a, b, c, d) add<a, b>(c, d)
 #define ADD_MP(a, b, c, d, e, f) add(new CObjectItemClientServerSingleMp<a, b, c, d>(e, f))
 #else
@@ -398,7 +397,7 @@ void CObjectFactory::register_classes()
     // because we do not have scripts
     // and script functionality is not
     // needed here
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         return;
 
     ADD(CElectricBall, CSE_ALifeItemArtefact, TEXT2CLSID("SCRPTART"), "artefact_s");

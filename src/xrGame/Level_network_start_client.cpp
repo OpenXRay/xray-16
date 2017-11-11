@@ -208,7 +208,7 @@ bool CLevel::net_start_client5()
         // HUD
 
         // Textures
-        if (!g_dedicated_server)
+        if (!GEnv.isDedicatedServer)
         {
             g_pGamePersistent->LoadTitle();
             GEnv.Render->DeferredLoad(FALSE);
@@ -234,7 +234,7 @@ bool CLevel::net_start_client6()
             pApp->LoadEnd();
             return true;
         }
-        if (!g_dedicated_server)
+        if (!GEnv.isDedicatedServer)
         {
             g_hud->Load();
             g_hud->OnConnected();

@@ -169,7 +169,7 @@ void CTexture::Load()
     Preload();
 //#ifndef		DEDICATED_SERVER
 #ifndef _EDITOR
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
 #endif
     {
         // Check for OGM

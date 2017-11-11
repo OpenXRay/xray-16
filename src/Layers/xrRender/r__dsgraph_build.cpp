@@ -1003,7 +1003,7 @@ void D3DXRenderBase::OnDeviceCreate(const char* shName)
     m_Gamma.Update();
     Resources->OnDeviceCreate(shName);
     create();
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
     {
         m_WireShader.create("editor\\wire");
         m_SelectionShader.create("editor\\selection");

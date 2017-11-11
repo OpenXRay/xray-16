@@ -33,7 +33,8 @@ public:
     IRenderFactory* RenderFactory;
     CScriptEngine* ScriptEngine;
     AISpaceBase* AISpace;
+
+    bool isDedicatedServer;
 };
 
 extern XRAPI_API EngineGlobalEnvironment GEnv;
-extern XRAPI_API bool g_dedicated_server; // XXX: move to EngineGlobalEnvironment

@@ -327,7 +327,7 @@ public:
     CCC_Screenshot(LPCSTR N) : IConsole_Command(N){};
     virtual void Execute(LPCSTR args)
     {
-        if (g_dedicated_server)
+        if (GEnv.isDedicatedServer)
             return;
 
         string_path name;

@@ -59,7 +59,6 @@
 #include "LevelGraphDebugRender.hpp"
 #endif
 
-ENGINE_API bool g_dedicated_server;
 extern CUISequencer* g_tutorial;
 extern CUISequencer* g_tutorial2;
 
@@ -81,14 +80,14 @@ CLevel::CLevel()
     eEnvironment = Engine.Event.Handler_Attach("LEVEL:Environment", this);
     eEntitySpawn = Engine.Event.Handler_Attach("LEVEL:spawn", this);
     m_pBulletManager = new CBulletManager();
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
     {
         m_map_manager = new CMapManager();
         m_game_task_manager = new CGameTaskManager();
     }
     m_dwDeltaUpdate = u32(fixed_step * 1000);
     m_seniority_hierarchy_holder = new CSeniorityHierarchyHolder();
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
     {
         m_level_sound_manager = new CLevelSoundManager();
         m_space_restriction_manager = new CSpaceRestrictionManager();
@@ -150,7 +149,7 @@ CLevel::~CLevel()
     xr_delete(levelGraphDebugRender);
     xr_delete(m_debug_renderer);
 #endif
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         ai().script_engine().remove_script_process(ScriptProcessor::Level);
     xr_delete(game);
     xr_delete(game_events);
@@ -455,7 +454,7 @@ void CLevel::OnFrame()
     ProcessGameEvents();
     if (m_bNeed_CrPr)
         make_NetCorrectionPrediction();
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
     {
         if (g_mt_config.test(mtMap))
             Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(m_map_manager, &CMapManager::Update));
@@ -476,7 +475,7 @@ void CLevel::OnFrame()
     // Inherited update
     inherited::OnFrame();
     // Draw client/server stats
-    if (!g_dedicated_server && psDeviceFlags.test(rsStatistic))
+    if (!GEnv.isDedicatedServer && psDeviceFlags.test(rsStatistic))
     {
         CGameFont* F = UI().Font().pFontDI;
         if (!psNET_direct_connect)
@@ -555,7 +554,7 @@ void CLevel::OnFrame()
     g_pGamePersistent->Environment().m_paused = m_bEnvPaused;
 #endif
     g_pGamePersistent->Environment().SetGameTime(GetEnvironmentGameDayTimeSec(), game->GetEnvironmentGameTimeFactor());
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         ai().script_engine().script_process(ScriptProcessor::Level)->update();
     m_ph_commander->update();
     m_ph_commander_scripts->update();
@@ -563,7 +562,7 @@ void CLevel::OnFrame()
     BulletManager().CommitRenderSet();
     stats.BulletManagerCommit.End();
     // update static sounds
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
     {
         if (g_mt_config.test(mtLevelSounds))
         {
@@ -574,7 +573,7 @@ void CLevel::OnFrame()
             m_level_sound_manager->Update();
     }
     // defer LUA-GC-STEP
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
     {
         if (g_mt_config.test(mtLUA_GC))
             Device.seqParallel.push_back(fastdelegate::FastDelegate0<>(this, &CLevel::script_gc));

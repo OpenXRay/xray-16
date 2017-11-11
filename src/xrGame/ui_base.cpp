@@ -209,7 +209,7 @@ void ui_core::PopScissor()
 
 ui_core::ui_core()
 {
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
     {
         m_pUICursor = new CUICursor();
         m_pFontManager = new CFontManager();

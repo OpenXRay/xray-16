@@ -295,7 +295,7 @@ void CApplication::LoadDraw()
     if (!Device.Begin())
         return;
 
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         Console->OnRender();
     else
         load_draw_internal();

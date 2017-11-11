@@ -90,7 +90,7 @@ CMainMenu::CMainMenu()
     GetCDKeyFromRegistry();
     m_demo_info_loader = NULL;
 
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
     {
         g_btnHint = new CUIButtonHint();
         g_statHint = new CUIButtonHint();
@@ -175,7 +175,7 @@ void CMainMenu::Activate(bool bActivate)
 
     bool b_is_single = IsGameTypeSingle();
 
-    if (g_dedicated_server && bActivate)
+    if (GEnv.isDedicatedServer && bActivate)
         return;
 
     if (bActivate)

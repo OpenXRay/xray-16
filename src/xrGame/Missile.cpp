@@ -144,7 +144,7 @@ void CMissile::spawn_fake_missile()
     if (!getDestroy())
     {
         CSE_Abstract* object = Level().spawn_item(
-            *cNameSect(), Position(), (g_dedicated_server) ? u32(-1) : ai_location().level_vertex_id(), ID(), true);
+            *cNameSect(), Position(), (GEnv.isDedicatedServer) ? u32(-1) : ai_location().level_vertex_id(), ID(), true);
 
         CSE_ALifeObject* alife_object = smart_cast<CSE_ALifeObject*>(object);
         VERIFY(alife_object);

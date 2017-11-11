@@ -25,8 +25,6 @@
 
 #include "Common/Config.hpp"
 
-ENGINE_API bool g_dedicated_server;
-
 CUIXml* pWpnScopeXml = nullptr;
 
 void createWpnScopeXML()
@@ -1050,7 +1048,7 @@ void CWeaponMagazined::InitAddons()
                 xr_delete(m_UIScope);
             }
 
-            if (!g_dedicated_server)
+            if (!GEnv.isDedicatedServer)
             {
                 m_UIScope = new CUIWindow();
                 createWpnScopeXML();

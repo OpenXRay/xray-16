@@ -125,7 +125,7 @@ bool IGame_Level::Load(u32 dwNum)
     // Done
     FS.r_close(LL_Stream);
     bReady = true;
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         IR_Capture();
 #ifndef DEDICATED_SERVER
     Device.seqRender.Add(this);
@@ -154,7 +154,7 @@ void IGame_Level::OnRender()
 #endif // _GPA_ENABLED
 
     // Level render, only when no client output required
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
     {
         GEnv.Render->Calculate();
         GEnv.Render->Render();

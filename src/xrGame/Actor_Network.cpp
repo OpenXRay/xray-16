@@ -703,7 +703,7 @@ BOOL CActor::net_Spawn(CSE_Abstract* DC)
     callback.bind(this, &CActor::on_requested_spawn);
     m_holder_id = E->m_holderID;
     if (E->m_holderID != ALife::_OBJECT_ID(-1))
-        if (!g_dedicated_server)
+        if (!GEnv.isDedicatedServer)
             Level().client_spawn_manager().add(E->m_holderID, ID(), callback);
     // F
     //-------------------------------------------------------------
@@ -737,12 +737,12 @@ void CActor::net_Destroy()
     inherited::net_Destroy();
 
     if (m_holder_id != ALife::_OBJECT_ID(-1))
-        if (!g_dedicated_server)
+        if (!GEnv.isDedicatedServer)
             Level().client_spawn_manager().remove(m_holder_id, ID());
 
     delete_data(m_statistic_manager);
 
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         Level().MapManager().OnObjectDestroyNotify(ID());
 
 #pragma todo("Dima to MadMax : do not comment inventory owner net_Destroy!!!")
@@ -802,7 +802,7 @@ void CActor::net_Relcase(IGameObject* O)
     }
     inherited::net_Relcase(O);
 
-    if (!g_dedicated_server)
+    if (!GEnv.isDedicatedServer)
         memory().remove_links(O);
 
     m_pPhysics_support->in_NetRelcase(O);

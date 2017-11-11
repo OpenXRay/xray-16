@@ -293,7 +293,7 @@ void game_cl_ArtefactHunt::SetGameUI(CUIGameCustom* uigame)
 
 CUIGameCustom* game_cl_ArtefactHunt::createGameUI()
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return NULL;
 
     CLASS_ID clsid = CLSID_GAME_UI_ARTEFACTHUNT;
@@ -354,7 +354,7 @@ void game_cl_ArtefactHunt::shedule_Update(u32 dt)
 
     inherited::shedule_Update(dt);
 
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
 
     if (!m_game_ui)

@@ -118,7 +118,7 @@ void CLevel::g_sv_Spawn(CSE_Abstract* E)
     if (0 == O || (!O->net_Spawn(E)))
     {
         O->net_Destroy();
-        if (!g_dedicated_server)
+        if (!GEnv.isDedicatedServer)
             client_spawn_manager().clear(O->ID());
         Objects.Destroy(O);
         Msg("! Failed to spawn entity '%s'", *E->s_name);
@@ -131,7 +131,7 @@ void CLevel::g_sv_Spawn(CSE_Abstract* E)
 #ifdef DEBUG_MEMORY_MANAGER
         mem_alloc_gather_stats(!!psAI_Flags.test(aiDebugOnFrameAllocs));
 #endif // DEBUG_MEMORY_MANAGER
-        if (!g_dedicated_server)
+        if (!GEnv.isDedicatedServer)
             client_spawn_manager().callback(O);
         // Msg			("--spawn--SPAWN: %f ms",1000.f*T.GetAsync());
 

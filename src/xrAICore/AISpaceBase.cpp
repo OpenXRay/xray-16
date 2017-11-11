@@ -35,7 +35,7 @@ void AISpaceBase::Load(const char* levelName)
 
 void AISpaceBase::Unload(bool reload)
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
     xr_delete(m_graph_engine);
     xr_delete(m_level_graph);
@@ -45,7 +45,7 @@ void AISpaceBase::Unload(bool reload)
 
 void AISpaceBase::Initialize()
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
     VERIFY(!m_graph_engine);
     m_graph_engine = new CGraphEngine(1024);
@@ -87,7 +87,7 @@ void AISpaceBase::Validate(u32 levelId) const
 
 void AISpaceBase::patrol_path_storage_raw(IReader& stream)
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
     xr_delete(m_patrol_path_storage);
     m_patrol_path_storage = new CPatrolPathStorage();
@@ -96,7 +96,7 @@ void AISpaceBase::patrol_path_storage_raw(IReader& stream)
 
 void AISpaceBase::patrol_path_storage(IReader& stream)
 {
-    if (g_dedicated_server)
+    if (GEnv.isDedicatedServer)
         return;
     xr_delete(m_patrol_path_storage);
     m_patrol_path_storage = new CPatrolPathStorage();
