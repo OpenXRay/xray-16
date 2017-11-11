@@ -15,6 +15,29 @@
   <PropertyGroup Label="UserMacros" Condition="'$(xrPlatform)'==''">
     <xrPlatform>$(Platform)</xrPlatform>
   </PropertyGroup>
+
+  <!-- CxA – Configuration x Architecture -->
+  <PropertyGroup Label="UserMacros" Condition="'$(Configuration)'=='Debug'">
+    <xrBuildCxA>Mx64</xrBuildCxA>
+  </PropertyGroup>
+  <PropertyGroup Label="UserMacros" Condition="'$(Configuration)'=='Debug'">
+    <xrBuildCxA>Mx86</xrBuildCxA>
+  </PropertyGroup>
+
+  <PropertyGroup Label="UserMacros" Condition="'$(Configuration)|$(xrPlatform)'=='Debug|Win64'">
+    <xrBuildCxA>Dx64</xrBuildCxA>
+  </PropertyGroup>
+  <PropertyGroup Label="UserMacros" Condition="'$(Configuration)|$(xrPlatform)'=='Debug|Win32'">
+    <xrBuildCxA>Dx86</xrBuildCxA>
+  </PropertyGroup>
+
+  <PropertyGroup Label="UserMacros" Condition="'$(Configuration)|$(xrPlatform)'=='Release|Win64'">
+    <xrBuildCxA>Rx64</xrBuildCxA>
+  </PropertyGroup>
+  <PropertyGroup Label="UserMacros" Condition="'$(Configuration)|$(xrPlatform)'=='Release|Win32'">
+    <xrBuildCxA>Rx86</xrBuildCxA>
+  </PropertyGroup>
+
   <PropertyGroup Label="UserMacros">
     <xrBinRootDir>$(SolutionDir)..\bin\</xrBinRootDir>
     <xrLibRootDir>$(SolutionDir)..\lib\</xrLibRootDir>
