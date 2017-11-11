@@ -11,7 +11,7 @@ public:
     Module(pcstr moduleName, bool log = true);
     ~Module();
 
-    void* open(pcstr moduleName, bool log = true);;
+    void* open(pcstr moduleName, bool log = true);
     void close();
 
     bool exist() const;

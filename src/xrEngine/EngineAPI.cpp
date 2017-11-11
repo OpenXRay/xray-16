@@ -100,8 +100,7 @@ void CEngineAPI::InitializeNotDedicated()
 #endif // DEDICATED_SERVER
 
 void CEngineAPI::InitializeRenderers()
-{
-
+{    
 #ifndef DEDICATED_SERVER
     InitializeNotDedicated();
 #endif // DEDICATED_SERVER
@@ -172,10 +171,11 @@ void CEngineAPI::Destroy(void)
     XRC.r_clear_compact();
 }
 
-extern "C" {
-typedef bool __cdecl SupportsAdvancedRendering(void);
-typedef bool _declspec(dllexport) SupportsDX10Rendering();
-typedef bool _declspec(dllexport) SupportsDX11Rendering();
+extern "C"
+{
+    using SupportsAdvancedRendering = bool __cdecl();
+    using SupportsDX10Rendering = bool XR_EXPORT();
+    using SupportsDX11Rendering = bool XR_EXPORT();
 };
 
 void CEngineAPI::CreateRendererList()
