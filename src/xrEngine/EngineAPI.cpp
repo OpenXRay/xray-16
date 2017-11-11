@@ -11,6 +11,11 @@
 
 extern xr_token* vid_quality_token;
 
+constexpr pcstr r1_name = "xrRender_R1";
+constexpr pcstr r2_name = "xrRender_R2";
+constexpr pcstr r3_name = "xrRender_R3";
+constexpr pcstr r4_name = "xrRender_R4";
+
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
@@ -51,10 +56,6 @@ bool is_enough_address_space_available()
 
 void CEngineAPI::InitializeNotDedicated()
 {
-    constexpr pcstr r2_name = "xrRender_R2";
-    constexpr pcstr r3_name = "xrRender_R3";
-    constexpr pcstr r4_name = "xrRender_R4";
-
     if (psDeviceFlags.test(rsR4))
     {
         // try to initialize R4
@@ -100,7 +101,6 @@ void CEngineAPI::InitializeNotDedicated()
 
 void CEngineAPI::InitializeRenderers()
 {
-    constexpr pcstr r1_name = "xrRender_R1";
 
 #ifndef DEDICATED_SERVER
     InitializeNotDedicated();
@@ -204,10 +204,6 @@ void CEngineAPI::CreateRendererList()
     bool bSupports_r2_5 = false;
     bool bSupports_r3 = false;
     bool bSupports_r4 = false;
-
-    constexpr pcstr r2_name = "xrRender_R2";
-    constexpr pcstr r3_name = "xrRender_R3";
-    constexpr pcstr r4_name = "xrRender_R4";
 
     hRender = std::make_unique<XRay::Module>();
 
