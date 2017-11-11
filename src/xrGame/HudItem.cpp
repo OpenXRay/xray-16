@@ -52,7 +52,7 @@ void CHudItem::PlaySound(LPCSTR alias, const Fvector& position)
 void CHudItem::renderable_Render()
 {
     UpdateXForm();
-    BOOL _hud_render = GlobalEnv.Render->get_HUD() && GetHUDmode();
+    BOOL _hud_render = GEnv.Render->get_HUD() && GetHUDmode();
 
     if (_hud_render && !IsHidden())
     {

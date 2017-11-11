@@ -179,7 +179,7 @@ void screenshot_manager::shedule_Update(u32 dt)
     }
     else if (is_make_in_progress && (--m_defered_ssframe_counter == 0))
     {
-        GlobalEnv.Render->ScreenshotAsyncEnd(m_result_writer);
+        GEnv.Render->ScreenshotAsyncEnd(m_result_writer);
         /*	//---------
         #ifdef DEBUG
                 if (!m_result_writer.size())
@@ -224,7 +224,7 @@ void screenshot_manager::make_screenshot(complete_callback_t cb)
     m_state |= making_screenshot;
     m_defered_ssframe_counter = defer_framescount;
 
-    GlobalEnv.Render->ScreenshotAsyncBegin();
+    GEnv.Render->ScreenshotAsyncBegin();
 }
 
 void screenshot_manager::set_draw_downloads(bool draw)

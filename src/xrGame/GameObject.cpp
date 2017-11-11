@@ -130,7 +130,7 @@ void CGameObject::cNameVisual_set(shared_str N)
     {
         IRenderVisual* old_v = renderable.visual;
         NameVisual = N;
-        renderable.visual = GlobalEnv.Render->model_Create(*N);
+        renderable.visual = GEnv.Render->model_Create(*N);
         IKinematics* old_k = old_v ? old_v->dcast_PKinematics() : NULL;
         IKinematics* new_k = renderable.visual->dcast_PKinematics();
         /*
@@ -144,11 +144,11 @@ void CGameObject::cNameVisual_set(shared_str N)
             new_k->SetUpdateCallback(old_k->GetUpdateCallback());
             new_k->SetUpdateCallbackParam(old_k->GetUpdateCallbackParam());
         }
-        GlobalEnv.Render->model_Delete(old_v);
+        GEnv.Render->model_Delete(old_v);
     }
     else
     {
-        GlobalEnv.Render->model_Delete(renderable.visual);
+        GEnv.Render->model_Delete(renderable.visual);
         NameVisual = 0;
     }
     OnChangeVisual();
@@ -1058,8 +1058,8 @@ void CGameObject::renderable_Render()
     //
     MakeMeCrow();
     // ~
-    GlobalEnv.Render->set_Transform(&XFORM());
-    GlobalEnv.Render->add_Visual(Visual());
+    GEnv.Render->set_Transform(&XFORM());
+    GEnv.Render->add_Visual(Visual());
     Visual()->getVisData().hom_frame = Device.dwFrame;
 }
 

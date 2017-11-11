@@ -185,7 +185,7 @@ void CKinematics::Load(const char* N, IReader* data, u32 dwFlags)
             string_path lod_name;
             LD->r_string(lod_name, sizeof(lod_name));
             //.         strconcat       (sizeof(name_load),name_load, short_name, ":lod:", lod_name.c_str());
-            m_lod = (dxRender_Visual*)GlobalEnv.Render->model_CreateChild(lod_name, nullptr);
+            m_lod = (dxRender_Visual*)GEnv.Render->model_CreateChild(lod_name, nullptr);
 
             if (CKinematics* lod_kinematics = dynamic_cast<CKinematics*>(m_lod))
             {
@@ -421,7 +421,7 @@ void CKinematics::Copy(dxRender_Visual* P)
 
     CalculateBones_Invalidate();
 
-    m_lod = (pFrom->m_lod) ? (dxRender_Visual*)GlobalEnv.Render->model_Duplicate(pFrom->m_lod) : 0;
+    m_lod = (pFrom->m_lod) ? (dxRender_Visual*)GEnv.Render->model_Duplicate(pFrom->m_lod) : 0;
 }
 
 void CKinematics::CalculateBones_Invalidate()
@@ -745,7 +745,7 @@ void CKinematics::CalculateWallmarks()
             if (w < 1.f)
             {
                 // append wm to WallmarkEngine
-                if (GlobalEnv.Render->ViewBase.testSphere_dirty(wm->m_Bounds.P, wm->m_Bounds.R))
+                if (GEnv.Render->ViewBase.testSphere_dirty(wm->m_Bounds.P, wm->m_Bounds.R))
                     // GlobalEnv.Render->add_SkeletonWallmark   (wm);
                     ::RImplementation.add_SkeletonWallmark(wm);
             }

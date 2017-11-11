@@ -1464,10 +1464,10 @@ void dbg_draw_piramid(Fvector pos, Fvector dir, float size, float xdir, u32 colo
 
     if (!Double)
     {
-        GlobalEnv.DRender->dbg_DrawTRI(t, p0, p1, p4, color);
-        GlobalEnv.DRender->dbg_DrawTRI(t, p1, p2, p4, color);
-        GlobalEnv.DRender->dbg_DrawTRI(t, p2, p3, p4, color);
-        GlobalEnv.DRender->dbg_DrawTRI(t, p3, p0, p4, color);
+        GEnv.DRender->dbg_DrawTRI(t, p0, p1, p4, color);
+        GEnv.DRender->dbg_DrawTRI(t, p1, p2, p4, color);
+        GEnv.DRender->dbg_DrawTRI(t, p2, p3, p4, color);
+        GEnv.DRender->dbg_DrawTRI(t, p3, p0, p4, color);
         // RCache.dbg_DrawTRI(t, p0, p1, p4, color);
         // RCache.dbg_DrawTRI(t, p1, p2, p4, color);
         // RCache.dbg_DrawTRI(t, p2, p3, p4, color);
@@ -1495,7 +1495,7 @@ void dbg_draw_piramid(Fvector pos, Fvector dir, float size, float xdir, u32 colo
 void CActor::OnRender_Network()
 {
     // RCache.OnFrameEnd();
-    GlobalEnv.DRender->OnFrameEnd();
+    GEnv.DRender->OnFrameEnd();
 
     //-----------------------------------------------------------------------------------------------------
     float size = 0.2f;

@@ -157,7 +157,7 @@ void CLevel::IR_OnKeyboardPress(int key)
     switch (_curr)
     {
     case kSCREENSHOT:
-        GlobalEnv.Render->Screenshot();
+        GEnv.Render->Screenshot();
         return;
         break;
 
@@ -335,7 +335,7 @@ void CLevel::IR_OnKeyboardPress(int key)
     }
     case DIK_BACK:
         if (GameID() == eGameIDSingle)
-            GlobalEnv.DRender->NextSceneMode();
+            GEnv.DRender->NextSceneMode();
         // HW.Caps.SceneMode			= (HW.Caps.SceneMode+1)%3;
         return;
 

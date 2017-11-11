@@ -65,7 +65,7 @@ void CCustomRocket::reinit()
     inherited::reinit();
 
     m_pTrailLight.destroy();
-    m_pTrailLight = GlobalEnv.Render->light_create();
+    m_pTrailLight = GEnv.Render->light_create();
     m_pTrailLight->set_shadow(true);
 
     m_pEngineParticles = NULL;

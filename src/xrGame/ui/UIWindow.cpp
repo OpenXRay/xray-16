@@ -34,7 +34,7 @@ BOOL g_show_wnd_rect2 = FALSE;
 void clean_wnd_rects()
 {
 #ifdef DEBUG
-    GlobalEnv.DRender->DestroyDebugShader(IDebugRender::dbgShaderWindow);
+    GEnv.DRender->DestroyDebugShader(IDebugRender::dbgShaderWindow);
 #endif // DEBUG
 }
 
@@ -43,19 +43,19 @@ void draw_rect(Frect& r, u32 color)
 {
 #ifdef DEBUG
 
-    GlobalEnv.DRender->SetDebugShader(IDebugRender::dbgShaderWindow);
+    GEnv.DRender->SetDebugShader(IDebugRender::dbgShaderWindow);
 
     //.	GlobalEnv.UIRender->StartLineStrip	(5);
-    GlobalEnv.UIRender->StartPrimitive(5, IUIRender::ptLineStrip, UI().m_currentPointType);
+    GEnv.UIRender->StartPrimitive(5, IUIRender::ptLineStrip, UI().m_currentPointType);
 
-    GlobalEnv.UIRender->PushPoint(r.lt.x, r.lt.y, 0, color, 0, 0);
-    GlobalEnv.UIRender->PushPoint(r.rb.x, r.lt.y, 0, color, 0, 0);
-    GlobalEnv.UIRender->PushPoint(r.rb.x, r.rb.y, 0, color, 0, 0);
-    GlobalEnv.UIRender->PushPoint(r.lt.x, r.rb.y, 0, color, 0, 0);
-    GlobalEnv.UIRender->PushPoint(r.lt.x, r.lt.y, 0, color, 0, 0);
+    GEnv.UIRender->PushPoint(r.lt.x, r.lt.y, 0, color, 0, 0);
+    GEnv.UIRender->PushPoint(r.rb.x, r.lt.y, 0, color, 0, 0);
+    GEnv.UIRender->PushPoint(r.rb.x, r.rb.y, 0, color, 0, 0);
+    GEnv.UIRender->PushPoint(r.lt.x, r.rb.y, 0, color, 0, 0);
+    GEnv.UIRender->PushPoint(r.lt.x, r.lt.y, 0, color, 0, 0);
 
     //.	GlobalEnv.UIRender->FlushLineStrip();
-    GlobalEnv.UIRender->FlushPrimitive();
+    GEnv.UIRender->FlushPrimitive();
 
 #endif // DEBUG
 }

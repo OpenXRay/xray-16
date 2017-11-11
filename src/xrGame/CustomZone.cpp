@@ -317,7 +317,7 @@ BOOL CCustomZone::net_Spawn(CSE_Abstract* DC)
 
     if (m_zone_flags.test(eIdleLight) && render_ver_allowed)
     {
-        m_pIdleLight = GlobalEnv.Render->light_create();
+        m_pIdleLight = GEnv.Render->light_create();
         m_pIdleLight->set_shadow(!!m_zone_flags.test(eIdleLightShadow));
 
         if (m_zone_flags.test(eIdleLightVolumetric))
@@ -331,7 +331,7 @@ BOOL CCustomZone::net_Spawn(CSE_Abstract* DC)
 
     if (m_zone_flags.test(eBlowoutLight))
     {
-        m_pLight = GlobalEnv.Render->light_create();
+        m_pLight = GEnv.Render->light_create();
         m_pLight->set_shadow(true);
     }
     else

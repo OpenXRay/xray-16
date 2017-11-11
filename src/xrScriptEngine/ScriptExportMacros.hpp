@@ -50,7 +50,7 @@
 #define CAST_FAILED(v_func_name, ret_type)                                                                \
     catch (luabind::cast_failed exception)                                                                \
     {                                                                                                     \
-        GlobalEnv.ScriptEngine->script_log(LuaMessageType::Error,                                         \
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error,                                         \
             "SCRIPT RUNTIME ERROR : luabind::cast_failed in function %s (%s)!", #v_func_name, #ret_type); \
         return ((ret_type)(0));                                                                           \
     }

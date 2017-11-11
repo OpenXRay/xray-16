@@ -78,7 +78,7 @@ CObjectSpace* __stdcall mesh_create_object_space(
     os->Create(verts, tris, H, build_callback);
     return os;
 }
-void __stdcall set_mtl_lib(CGameMtlLibrary* l) { GlobalEnv.PGMLib = l; }
+void __stdcall set_mtl_lib(CGameMtlLibrary* l) { GEnv.PGMLib = l; }
 void __stdcall destroy_object_space(CObjectSpace*& os) { xr_delete(os); }
 void CPHMesh::Create(dSpaceID space, dWorldID world)
 {

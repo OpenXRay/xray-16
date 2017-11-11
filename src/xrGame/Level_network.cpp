@@ -87,10 +87,10 @@ void CLevel::remove_objects()
 
     stalker_animation_data_storage().clear();
 
-    VERIFY(GlobalEnv.Render);
-    GlobalEnv.Render->models_Clear(FALSE);
+    VERIFY(GEnv.Render);
+    GEnv.Render->models_Clear(FALSE);
 
-    GlobalEnv.Render->clear_static_wallmarks();
+    GEnv.Render->clear_static_wallmarks();
 
 #ifdef DEBUG
     if (!g_dedicated_server)

@@ -100,7 +100,7 @@ void CFlare::SwitchOn()
 {
     static int lt = 1; // IRender_Light::POINT
     static bool ls = true;
-    light_render = GlobalEnv.Render->light_create();
+    light_render = GEnv.Render->light_create();
     light_render->set_type((IRender_Light::LT)lt);
     light_render->set_shadow(ls);
     light_lanim = LALib.FindItem("flare_lanim_showing");

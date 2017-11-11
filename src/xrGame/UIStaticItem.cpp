@@ -2,8 +2,8 @@
 #include "UIStaticItem.h"
 #include "ui_base.h"
 
-void CreateUIGeom() { GlobalEnv.UIRender->CreateUIGeom(); }
-void DestroyUIGeom() { GlobalEnv.UIRender->DestroyUIGeom(); }
+void CreateUIGeom() { GEnv.UIRender->CreateUIGeom(); }
+void DestroyUIGeom() { GEnv.UIRender->DestroyUIGeom(); }
 CUIStaticItem::CUIStaticItem()
 {
     uFlags.zero();
@@ -39,7 +39,7 @@ void CUIStaticItem::RenderInternal(const Fvector2& in_pos)
     UI().AlignPixel(pos.y);
 
     Fvector2 ts;
-    GlobalEnv.UIRender->GetActiveTextureResolution(ts);
+    GEnv.UIRender->GetActiveTextureResolution(ts);
 
     if (!uFlags.test(flValidSize))
         SetSize(ts);
@@ -91,11 +91,11 @@ void CUIStaticItem::RenderInternal(const Fvector2& in_pos)
     {
         for (u32 k = 0; k < R->size() - 2; ++k)
         {
-            GlobalEnv.UIRender->PushPoint(
+            GEnv.UIRender->PushPoint(
                 (*R)[0 + 0].pt.x, (*R)[0 + 0].pt.y, 0, dwColor, (*R)[0 + 0].uv.x, (*R)[0 + 0].uv.y);
-            GlobalEnv.UIRender->PushPoint(
+            GEnv.UIRender->PushPoint(
                 (*R)[k + 1].pt.x, (*R)[k + 1].pt.y, 0, dwColor, (*R)[k + 1].uv.x, (*R)[k + 1].uv.y);
-            GlobalEnv.UIRender->PushPoint(
+            GEnv.UIRender->PushPoint(
                 (*R)[k + 2].pt.x, (*R)[k + 2].pt.y, 0, dwColor, (*R)[k + 2].uv.x, (*R)[k + 2].uv.y);
         }
     }
@@ -106,7 +106,7 @@ void CUIStaticItem::RenderInternal(float angle)
     Fvector2 ts;
     Fvector2 hp;
 
-    GlobalEnv.UIRender->GetActiveTextureResolution(ts);
+    GEnv.UIRender->GetActiveTextureResolution(ts);
     hp.set(0.5f / ts.x, 0.5f / ts.y);
 
     if (!uFlags.test(flValidSize))
@@ -166,11 +166,11 @@ void CUIStaticItem::RenderInternal(float angle)
     {
         for (u32 k = 0; k < R->size() - 2; k++)
         {
-            GlobalEnv.UIRender->PushPoint(
+            GEnv.UIRender->PushPoint(
                 (*R)[0 + 0].pt.x, (*R)[0 + 0].pt.y, 0, dwColor, (*R)[0 + 0].uv.x, (*R)[0 + 0].uv.y);
-            GlobalEnv.UIRender->PushPoint(
+            GEnv.UIRender->PushPoint(
                 (*R)[k + 1].pt.x, (*R)[k + 1].pt.y, 0, dwColor, (*R)[k + 1].uv.x, (*R)[k + 1].uv.y);
-            GlobalEnv.UIRender->PushPoint(
+            GEnv.UIRender->PushPoint(
                 (*R)[k + 2].pt.x, (*R)[k + 2].pt.y, 0, dwColor, (*R)[k + 2].uv.x, (*R)[k + 2].uv.y);
         }
     }
@@ -181,20 +181,20 @@ void CUIStaticItem::RenderInternal(float angle)
 void CUIStaticItem::Render()
 {
     VERIFY(g_bRendering);
-    GlobalEnv.UIRender->SetShader(*hShader);
-    GlobalEnv.UIRender->StartPrimitive(8, IUIRender::ptTriList, UI().m_currentPointType);
+    GEnv.UIRender->SetShader(*hShader);
+    GEnv.UIRender->StartPrimitive(8, IUIRender::ptTriList, UI().m_currentPointType);
     RenderInternal(vPos);
-    GlobalEnv.UIRender->FlushPrimitive();
+    GEnv.UIRender->FlushPrimitive();
 }
 
 void CUIStaticItem::Render(float angle)
 {
     VERIFY(g_bRendering);
 
-    GlobalEnv.UIRender->SetShader(*hShader);
-    GlobalEnv.UIRender->StartPrimitive(32, IUIRender::ptTriList, UI().m_currentPointType);
+    GEnv.UIRender->SetShader(*hShader);
+    GEnv.UIRender->StartPrimitive(32, IUIRender::ptTriList, UI().m_currentPointType);
     RenderInternal(angle);
-    GlobalEnv.UIRender->FlushPrimitive();
+    GEnv.UIRender->FlushPrimitive();
 }
 
 void CUIStaticItem::CreateShader(LPCSTR tex, LPCSTR sh)

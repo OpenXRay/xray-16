@@ -260,7 +260,7 @@ void CHUDTarget::Render()
     //отрендерить кружочек или крестик
     if (!m_bShowCrosshair)
     {
-        GlobalEnv.UIRender->StartPrimitive(6, IUIRender::ptTriList, UI().m_currentPointType);
+        GEnv.UIRender->StartPrimitive(6, IUIRender::ptTriList, UI().m_currentPointType);
 
         Fvector2 scr_size;
         scr_size.set(float(Device.dwWidth), float(Device.dwHeight));
@@ -278,17 +278,17 @@ void CHUDTarget::Render()
 
         //	TODO: return code back to indexed rendering since we use quads
         //	Tri 1
-        GlobalEnv.UIRender->PushPoint(cx - size_x, cy + size_y, 0, C, 0, 1);
-        GlobalEnv.UIRender->PushPoint(cx - size_x, cy - size_y, 0, C, 0, 0);
-        GlobalEnv.UIRender->PushPoint(cx + size_x, cy + size_y, 0, C, 1, 1);
+        GEnv.UIRender->PushPoint(cx - size_x, cy + size_y, 0, C, 0, 1);
+        GEnv.UIRender->PushPoint(cx - size_x, cy - size_y, 0, C, 0, 0);
+        GEnv.UIRender->PushPoint(cx + size_x, cy + size_y, 0, C, 1, 1);
         //	Tri 2
-        GlobalEnv.UIRender->PushPoint(cx + size_x, cy + size_y, 0, C, 1, 1);
-        GlobalEnv.UIRender->PushPoint(cx - size_x, cy - size_y, 0, C, 0, 0);
-        GlobalEnv.UIRender->PushPoint(cx + size_x, cy - size_y, 0, C, 1, 0);
+        GEnv.UIRender->PushPoint(cx + size_x, cy + size_y, 0, C, 1, 1);
+        GEnv.UIRender->PushPoint(cx - size_x, cy - size_y, 0, C, 0, 0);
+        GEnv.UIRender->PushPoint(cx + size_x, cy - size_y, 0, C, 1, 0);
 
         // unlock VB and Render it as triangle LIST
-        GlobalEnv.UIRender->SetShader(*hShader);
-        GlobalEnv.UIRender->FlushPrimitive();
+        GEnv.UIRender->SetShader(*hShader);
+        GEnv.UIRender->FlushPrimitive();
     }
     else
     {

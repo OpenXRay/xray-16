@@ -152,8 +152,8 @@ void IGame_Persistent::Prefetch()
     Log("Loading objects...");
     ObjectPool.prefetch();
     Log("Loading models...");
-    GlobalEnv.Render->models_Prefetch();
-    GlobalEnv.Render->ResourcesDeferredUpload();
+    GEnv.Render->models_Prefetch();
+    GEnv.Render->ResourcesDeferredUpload();
 
     p_time = 1000.f * Device.GetTimerGlobal()->GetElapsed_sec() - p_time;
     u32 p_mem = Memory.mem_usage() - mem_0;
@@ -167,7 +167,7 @@ void IGame_Persistent::OnGameEnd()
 {
 #ifndef _EDITOR
     ObjectPool.clear();
-    GlobalEnv.Render->models_Clear(TRUE);
+    GEnv.Render->models_Clear(TRUE);
 #endif
 }
 
@@ -247,7 +247,7 @@ void IGame_Persistent::destroy_particles(const bool& all_particles)
 void IGame_Persistent::OnAssetsChanged()
 {
 #ifndef _EDITOR
-    GlobalEnv.Render->OnAssetsChanged();
+    GEnv.Render->OnAssetsChanged();
 #endif
 }
 

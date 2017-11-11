@@ -31,6 +31,6 @@
 class CGameMtlLibrary;
 IC CGameMtlLibrary& GMLibrary()
 {
-    VERIFY(GlobalEnv.PGMLib);
-    return *GlobalEnv.PGMLib;
+    VERIFY(GEnv.PGMLib);
+    return *GEnv.PGMLib;
 }

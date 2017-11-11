@@ -16,33 +16,33 @@
 
 void LuaLog(pcstr caMessage)
 {
-    if (!GlobalEnv.ScriptEngine->m_stack_is_ready)
+    if (!GEnv.ScriptEngine->m_stack_is_ready)
         Msg("LUA: %s", caMessage); // Xottab_DUTY: temporary workaround to get lua log output
 
 #ifndef MASTER_GOLD
-    GlobalEnv.ScriptEngine->script_log(LuaMessageType::Message, "%s", caMessage);
+    GEnv.ScriptEngine->script_log(LuaMessageType::Message, "%s", caMessage);
 #endif
 #if defined(USE_DEBUGGER) && !defined(USE_LUA_STUDIO)
-    if (GlobalEnv.ScriptEngine->debugger())
-        GlobalEnv.ScriptEngine->debugger()->Write(caMessage);
+    if (GEnv.ScriptEngine->debugger())
+        GEnv.ScriptEngine->debugger()->Write(caMessage);
 #endif
 }
 
 void ErrorLog(pcstr caMessage)
 {
-    if (!GlobalEnv.ScriptEngine->m_stack_is_ready)
+    if (!GEnv.ScriptEngine->m_stack_is_ready)
         Msg("LUA Error: %s", caMessage); // Xottab_DUTY: temporary workaround to get lua error output
 
-    GlobalEnv.ScriptEngine->error_log("%s", caMessage);
+    GEnv.ScriptEngine->error_log("%s", caMessage);
 #ifdef DEBUG
-    GlobalEnv.ScriptEngine->print_stack();
+    GEnv.ScriptEngine->print_stack();
 #endif
 #if defined(USE_DEBUGGER) && !defined(USE_LUA_STUDIO)
-    if (GlobalEnv.ScriptEngine->debugger())
-        GlobalEnv.ScriptEngine->debugger()->Write(caMessage);
+    if (GEnv.ScriptEngine->debugger())
+        GEnv.ScriptEngine->debugger()->Write(caMessage);
 #endif
 #ifdef DEBUG
-    bool lua_studio_connected = !!GlobalEnv.ScriptEngine->debugger();
+    bool lua_studio_connected = !!GEnv.ScriptEngine->debugger();
     if (!lua_studio_connected)
         R_ASSERT2(0, caMessage);
 #else
@@ -53,7 +53,7 @@ void ErrorLog(pcstr caMessage)
 //AVO:
 void PrintStack()
 {
-    GlobalEnv.ScriptEngine->print_stack();
+    GEnv.ScriptEngine->print_stack();
 }
 //-AVO
 
@@ -61,13 +61,13 @@ void FlushLogs()
 {
 #ifdef DEBUG
     FlushLog();
-    GlobalEnv.ScriptEngine->flush_log();
+    GEnv.ScriptEngine->flush_log();
 #endif
 }
 
 void verify_if_thread_is_running()
 {
-    THROW2(GlobalEnv.ScriptEngine->current_thread(), "coroutine.yield() is called outside the LUA thread!");
+    THROW2(GEnv.ScriptEngine->current_thread(), "coroutine.yield() is called outside the LUA thread!");
 }
 
 bool is_editor()
@@ -85,7 +85,7 @@ inline int bit_xor(const int i, const int j) { return i ^ j; }
 inline int bit_not(const int i) { return ~i; }
 inline const char* user_name() { return Core.UserName; }
 
-void prefetch_module(pcstr file_name) { GlobalEnv.ScriptEngine->process_file(file_name); }
+void prefetch_module(pcstr file_name) { GEnv.ScriptEngine->process_file(file_name); }
 
 struct profile_timer_script
 {

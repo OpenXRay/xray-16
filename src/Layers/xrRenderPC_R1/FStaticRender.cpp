@@ -761,7 +761,7 @@ public:
         D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
     {
         string_path pname;
-        strconcat(sizeof(pname), pname, GlobalEnv.Render->getShaderPath(), pFileName);
+        strconcat(sizeof(pname), pname, GEnv.Render->getShaderPath(), pFileName);
         IReader* R = FS.r_open("$game_shaders$", pname);
         if (nullptr == R)
         {

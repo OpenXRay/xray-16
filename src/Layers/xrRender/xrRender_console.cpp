@@ -334,7 +334,7 @@ public:
         name[0] = 0;
         sscanf(args, "%s", name);
         LPCSTR image = xr_strlen(name) ? name : 0;
-        GlobalEnv.Render->Screenshot(IRender::SM_NORMAL, image);
+        GEnv.Render->Screenshot(IRender::SM_NORMAL, image);
     }
 };
 

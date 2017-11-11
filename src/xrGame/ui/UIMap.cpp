@@ -560,8 +560,8 @@ void CUIMiniMap::Draw()
 {
     u32 segments_count = 20;
 
-    GlobalEnv.UIRender->SetShader(*m_UIStaticItem.GetShader());
-    GlobalEnv.UIRender->StartPrimitive(segments_count * 3, IUIRender::ptTriList, UI().m_currentPointType);
+    GEnv.UIRender->SetShader(*m_UIStaticItem.GetShader());
+    GEnv.UIRender->StartPrimitive(segments_count * 3, IUIRender::ptTriList, UI().m_currentPointType);
 
     u32 color = m_UIStaticItem.GetTextureColor();
     float angle = GetHeading();
@@ -606,12 +606,12 @@ void CUIMiniMap::Draw()
 
     for (u32 idx = 0; idx < segments_count - 2; ++idx)
     {
-        GlobalEnv.UIRender->PushPoint(S[0 + 0].pt.x, S[0 + 0].pt.y, 0, color, S[0 + 0].uv.x, S[0 + 0].uv.y);
-        GlobalEnv.UIRender->PushPoint(S[idx + 2].pt.x, S[idx + 2].pt.y, 0, color, S[idx + 2].uv.x, S[idx + 2].uv.y);
-        GlobalEnv.UIRender->PushPoint(S[idx + 1].pt.x, S[idx + 1].pt.y, 0, color, S[idx + 1].uv.x, S[idx + 1].uv.y);
+        GEnv.UIRender->PushPoint(S[0 + 0].pt.x, S[0 + 0].pt.y, 0, color, S[0 + 0].uv.x, S[0 + 0].uv.y);
+        GEnv.UIRender->PushPoint(S[idx + 2].pt.x, S[idx + 2].pt.y, 0, color, S[idx + 2].uv.x, S[idx + 2].uv.y);
+        GEnv.UIRender->PushPoint(S[idx + 1].pt.x, S[idx + 1].pt.y, 0, color, S[idx + 1].uv.x, S[idx + 1].uv.y);
     }
 
-    GlobalEnv.UIRender->FlushPrimitive();
+    GEnv.UIRender->FlushPrimitive();
 
     //------------
     CUIWindow::Draw(); // draw childs

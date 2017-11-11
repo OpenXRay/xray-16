@@ -41,7 +41,7 @@ ref_light precache_light = 0;
 BOOL CRenderDevice::Begin()
 {
 #ifndef DEDICATED_SERVER
-    switch (GlobalEnv.Render->GetDeviceState())
+    switch (GEnv.Render->GetDeviceState())
     {
     case DeviceState::Normal: break;
     case DeviceState::Lost:
@@ -55,14 +55,14 @@ BOOL CRenderDevice::Begin()
         break;
     default: R_ASSERT(0);
     }
-    GlobalEnv.Render->Begin();
+    GEnv.Render->Begin();
     FPU::m24r();
     g_bRendering = TRUE;
 #endif
     return TRUE;
 }
 
-void CRenderDevice::Clear() { GlobalEnv.Render->Clear(); }
+void CRenderDevice::Clear() { GEnv.Render->Clear(); }
 extern void CheckPrivilegySlowdown();
 
 void CRenderDevice::End(void)
@@ -80,14 +80,14 @@ void CRenderDevice::End(void)
 #ifdef INGAME_EDITOR
             load_finished = true;
 #endif
-            GlobalEnv.Render->updateGamma();
+            GEnv.Render->updateGamma();
             if (precache_light)
             {
                 precache_light->set_active(false);
                 precache_light.destroy();
             }
             ::Sound->set_master_volume(1.f);
-            GlobalEnv.Render->ResourcesDestroyNecessaryTextures();
+            GEnv.Render->ResourcesDestroyNecessaryTextures();
             Memory.mem_compact();
             Msg("* MEMORY USAGE: %d K", Memory.mem_usage() / 1024);
             Msg("* End of synchronization A[%d] R[%d]", b_is_Active, b_is_Ready);
@@ -109,7 +109,7 @@ void CRenderDevice::End(void)
     // Present goes here, so call OA Frame end.
     if (g_SASH.IsBenchmarkRunning())
         g_SASH.DisplayFrame(Device.fTimeGlobal);
-    GlobalEnv.Render->End();
+    GEnv.Render->End();
 #ifdef INGAME_EDITOR
     if (load_finished && m_editor)
         m_editor->on_load_finished();
@@ -143,13 +143,13 @@ void CRenderDevice::PreCache(u32 amount, bool b_draw_loadscreen, bool b_wait_use
 #ifdef DEDICATED_SERVER
     amount = 0;
 #else
-    if (GlobalEnv.Render->GetForceGPU_REF())
+    if (GEnv.Render->GetForceGPU_REF())
         amount = 0;
 #endif
     dwPrecacheFrame = dwPrecacheTotal = amount;
     if (amount && !precache_light && g_pGameLevel && g_loading_events.empty())
     {
-        precache_light = GlobalEnv.Render->light_create();
+        precache_light = GEnv.Render->light_create();
         precache_light->set_shadow(false);
         precache_light->set_position(vCameraPosition);
         precache_light->set_color(255, 255, 255);
@@ -177,7 +177,7 @@ void CRenderDevice::CalcFrameStats()
         stats.fFPS = fInv * stats.fFPS + fOne * fps;
         if (stats.RenderTotal.result > EPS_S)
         {
-            u32 renderedPolys = GlobalEnv.Render->GetCacheStatPolys();
+            u32 renderedPolys = GEnv.Render->GetCacheStatPolys();
             stats.fTPS = fInv * stats.fTPS + fOne * float(renderedPolys) / (stats.RenderTotal.result * 1000.f);
             stats.fRFPS = fInv * stats.fRFPS + fOne * 1000.f / stats.RenderTotal.result;
         }
@@ -226,7 +226,7 @@ void CRenderDevice::on_idle()
     }
     // Matrices
     mFullTransform.mul(mProject, mView);
-    GlobalEnv.Render->SetCacheXform(mView, mProject);
+    GEnv.Render->SetCacheXform(mView, mProject);
     mInvFullTransform.invert(mFullTransform);
     vCameraPosition_saved = vCameraPosition;
     mFullTransform_saved = mFullTransform;
@@ -329,7 +329,7 @@ void CRenderDevice::Run()
     thread_spawn(SecondaryThreadProc, "X-RAY Secondary thread", 0, this);
     // Message cycle
     seqAppStart.Process(rp_AppStart);
-    GlobalEnv.Render->ClearTarget();
+    GEnv.Render->ClearTarget();
     message_loop();
     seqAppEnd.Process(rp_AppEnd);
     // Stop Balance-Thread

@@ -11,7 +11,7 @@
 void CResourceManager::reset_begin()
 {
     // destroy everything, renderer may use
-    GlobalEnv.Render->reset_begin();
+    GEnv.Render->reset_begin();
 
     // destroy state-blocks
     for (u32 _it = 0; _it < v_states.size(); _it++)
@@ -97,7 +97,7 @@ void CResourceManager::reset_end()
     }
 
     // create everything, renderer may use
-    GlobalEnv.Render->reset_end();
+    GEnv.Render->reset_end();
     Dump(true);
 }
 

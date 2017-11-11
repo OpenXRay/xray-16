@@ -15,7 +15,7 @@ ENGINE_API Fvector2 g_current_font_scale = {1.0f, 1.0f};
 
 CGameFont::CGameFont(LPCSTR section, u32 flags)
 {
-    pFontRender = GlobalEnv.RenderFactory->CreateFontRender();
+    pFontRender = GEnv.RenderFactory->CreateFontRender();
     fCurrentHeight = 0.0f;
     fXStep = 0.0f;
     fYStep = 0.0f;
@@ -37,7 +37,7 @@ CGameFont::CGameFont(LPCSTR section, u32 flags)
 
 CGameFont::CGameFont(LPCSTR shader, LPCSTR texture, u32 flags)
 {
-    pFontRender = GlobalEnv.RenderFactory->CreateFontRender();
+    pFontRender = GEnv.RenderFactory->CreateFontRender();
     fCurrentHeight = 0.0f;
     fXStep = 0.0f;
     fYStep = 0.0f;
@@ -179,11 +179,11 @@ CGameFont::~CGameFont()
         xr_free(TCMap);
 
     // Shading
-    GlobalEnv.RenderFactory->DestroyFontRender(pFontRender);
+    GEnv.RenderFactory->DestroyFontRender(pFontRender);
 }
 
-#define DI2PX(x) float(iFloor((x + 1) * float(GlobalEnv.Render->getTarget()->get_width()) * 0.5f))
-#define DI2PY(y) float(iFloor((y + 1) * float(GlobalEnv.Render->getTarget()->get_height()) * 0.5f))
+#define DI2PX(x) float(iFloor((x + 1) * float(GEnv.Render->getTarget()->get_width()) * 0.5f))
+#define DI2PY(y) float(iFloor((y + 1) * float(GEnv.Render->getTarget()->get_height()) * 0.5f))
 
 void CGameFont::OutSet(float x, float y)
 {

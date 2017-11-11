@@ -574,9 +574,9 @@ void CHW::selectResolution(u32& dwWidth, u32& dwHeight, BOOL bWindowed)
         string64 buff;
         xr_sprintf(buff, sizeof(buff), "%dx%d", psCurrentVidMode[0], psCurrentVidMode[1]);
 
-        if (_ParseItem(buff, GlobalEnv.vid_mode_token) == u32(-1)) // not found
+        if (_ParseItem(buff, GEnv.vid_mode_token) == u32(-1)) // not found
         { // select safe
-            xr_sprintf(buff, sizeof(buff), "vid_mode %s", GlobalEnv.vid_mode_token[0].name);
+            xr_sprintf(buff, sizeof(buff), "vid_mode %s", GEnv.vid_mode_token[0].name);
             Console->Execute(buff);
         }
 
@@ -765,17 +765,17 @@ struct _uniq_mode
 
 void free_vid_mode_list()
 {
-    for (int i = 0; GlobalEnv.vid_mode_token[i].name; i++)
+    for (int i = 0; GEnv.vid_mode_token[i].name; i++)
     {
-        xr_free(GlobalEnv.vid_mode_token[i].name);
+        xr_free(GEnv.vid_mode_token[i].name);
     }
-    xr_free(GlobalEnv.vid_mode_token);
-    GlobalEnv.vid_mode_token = NULL;
+    xr_free(GEnv.vid_mode_token);
+    GEnv.vid_mode_token = NULL;
 }
 
 void fill_vid_mode_list(CHW* _hw)
 {
-    if (GlobalEnv.vid_mode_token != NULL)
+    if (GEnv.vid_mode_token != NULL)
         return;
     xr_vector<LPCSTR> _tmp;
     xr_vector<DXGI_MODE_DESC> modes;
@@ -816,18 +816,18 @@ void fill_vid_mode_list(CHW* _hw)
     }
     u32 _cnt = _tmp.size() + 1;
 
-    GlobalEnv.vid_mode_token = xr_alloc<xr_token>(_cnt);
+    GEnv.vid_mode_token = xr_alloc<xr_token>(_cnt);
 
-    GlobalEnv.vid_mode_token[_cnt - 1].id = -1;
-    GlobalEnv.vid_mode_token[_cnt - 1].name = NULL;
+    GEnv.vid_mode_token[_cnt - 1].id = -1;
+    GEnv.vid_mode_token[_cnt - 1].name = NULL;
 
 #ifdef DEBUG
     Msg("Available video modes[%d]:", _tmp.size());
 #endif // DEBUG
     for (u32 i = 0; i < _tmp.size(); ++i)
     {
-        GlobalEnv.vid_mode_token[i].id = i;
-        GlobalEnv.vid_mode_token[i].name = _tmp[i];
+        GEnv.vid_mode_token[i].id = i;
+        GEnv.vid_mode_token[i].name = _tmp[i];
 #ifdef DEBUG
         Msg("[%s]", _tmp[i]);
 #endif // DEBUG

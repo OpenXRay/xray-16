@@ -560,7 +560,7 @@ int g_get_general_goodwill_between(u16 from, u16 to)
 }
 
 u32 vertex_id(Fvector position) { return (ai().level_graph().vertex_id(position)); }
-u32 render_get_dx_level() { return GlobalEnv.Render->get_dx_level(); }
+u32 render_get_dx_level() { return GEnv.Render->get_dx_level(); }
 CUISequencer* g_tutorial = NULL;
 CUISequencer* g_tutorial2 = NULL;
 

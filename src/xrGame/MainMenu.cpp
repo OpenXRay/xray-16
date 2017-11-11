@@ -346,7 +346,7 @@ void CMainMenu::IR_OnKeyboardPress(int dik)
     }
     if (DIK_F12 == dik)
     {
-        GlobalEnv.Render->Screenshot();
+        GEnv.Render->Screenshot();
         return;
     }
 
@@ -385,9 +385,9 @@ void CMainMenu::OnRender()
         return;
 
     if (g_pGameLevel)
-        GlobalEnv.Render->Calculate();
+        GEnv.Render->Calculate();
 
-    GlobalEnv.Render->Render();
+    GEnv.Render->Render();
     if (!OnRenderPPUI_query())
     {
         DoRenderDialogs();
@@ -456,7 +456,7 @@ void CMainMenu::OnFrame()
     if (m_Flags.test(flGameSaveScreenshot) && Device.dwFrame > m_screenshotFrame)
     {
         m_Flags.set(flGameSaveScreenshot, FALSE);
-        GlobalEnv.Render->Screenshot(IRender::SM_FOR_GAMESAVE, m_screenshot_name);
+        GEnv.Render->Screenshot(IRender::SM_FOR_GAMESAVE, m_screenshot_name);
 
         if (g_pGameLevel && m_Flags.test(flActive))
         {
@@ -499,7 +499,7 @@ void CMainMenu::Screenshot(IRender::ScreenshotMode mode, LPCSTR name)
 {
     if (mode != IRender::SM_FOR_GAMESAVE)
     {
-        GlobalEnv.Render->Screenshot(mode, name);
+        GEnv.Render->Screenshot(mode, name);
     }
     else
     {

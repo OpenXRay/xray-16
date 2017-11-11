@@ -597,7 +597,7 @@ void LevelGraphDebugRender::DrawNodes()
             linked.push_back(levelGraph->value(vid, it));
     }
     // render
-    GlobalEnv.DRender->SetShader(debugShader);
+    GEnv.DRender->SetShader(debugShader);
     font->SetColor(color_rgba(255, 255, 255, 255));
     Fvector minPos = Device.vCameraPosition;
     Fvector maxPos = Device.vCameraPosition;
@@ -630,7 +630,7 @@ void LevelGraphDebugRender::DrawNodes()
         if (Device.vCameraPosition.distance_to(vertexPos) > 30)
             continue;
         float sr = levelGraph->header().cell_size();
-        if (GlobalEnv.Render->ViewBase.testSphere_dirty(vertexPos, sr))
+        if (GEnv.Render->ViewBase.testSphere_dirty(vertexPos, sr))
         {
             u32 colorC = color_xrgb(0, 0, 255);
             u32 colorT = color_xrgb(255, 255, 255);
@@ -671,8 +671,8 @@ void LevelGraphDebugRender::DrawNodes()
             Fvector v3 = createVertex(PL, {vertexPos.x + st, vertexPos.y, vertexPos.z + st}); // maxX, maxZ
             Fvector v4 = createVertex(PL, {vertexPos.x - st, vertexPos.y, vertexPos.z + st}); // minX, maxZ
             // render quad
-            GlobalEnv.DRender->dbg_DrawTRI(Fidentity, v3, v2, v1, colorT);
-            GlobalEnv.DRender->dbg_DrawTRI(Fidentity, v1, v4, v3, colorT);
+            GEnv.DRender->dbg_DrawTRI(Fidentity, v3, v2, v1, colorT);
+            GEnv.DRender->dbg_DrawTRI(Fidentity, v1, v4, v3, colorT);
             // render center
             Level().debug_renderer().draw_aabb(vertexPos, sc, sc, sc, colorC);
             // render id

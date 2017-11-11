@@ -6,13 +6,13 @@
 #include "Navigation/PatrolPath/patrol_path_storage.h"
 #include "Include/xrAPI/xrAPI.h"
 
-AISpaceBase::AISpaceBase() { GlobalEnv.AISpace = this; }
+AISpaceBase::AISpaceBase() { GEnv.AISpace = this; }
 AISpaceBase::~AISpaceBase()
 {
     xr_delete(m_patrol_path_storage);
     xr_delete(m_graph_engine);
     VERIFY(!m_game_graph);
-    GlobalEnv.AISpace = nullptr;
+    GEnv.AISpace = nullptr;
 }
 
 void AISpaceBase::Load(const char* levelName)

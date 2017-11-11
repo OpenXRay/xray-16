@@ -415,7 +415,7 @@ public:
         }
     }
     virtual void Status(TStatus& S) { xr_sprintf(S, sizeof(S), "%dx%d", psCurrentVidMode[0], psCurrentVidMode[1]); }
-    virtual xr_token* GetToken() { return GlobalEnv.vid_mode_token; }
+    virtual xr_token* GetToken() { return GEnv.vid_mode_token; }
     virtual void Info(TInfo& I) { xr_strcpy(I, sizeof(I), "change screen resolution WxH"); }
     virtual void fill_tips(vecTips& tips, u32 mode)
     {
@@ -467,10 +467,10 @@ public:
     virtual void Execute(LPCSTR args)
     {
         CCC_Float::Execute(args);
-        GlobalEnv.Render->setGamma(ps_gamma);
-        GlobalEnv.Render->setBrightness(ps_brightness);
-        GlobalEnv.Render->setContrast(ps_contrast);
-        GlobalEnv.Render->updateGamma();
+        GEnv.Render->setGamma(ps_gamma);
+        GEnv.Render->setBrightness(ps_brightness);
+        GEnv.Render->setContrast(ps_contrast);
+        GEnv.Render->updateGamma();
     }
 };
 

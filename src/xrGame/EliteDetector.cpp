@@ -52,7 +52,7 @@ void CEliteDetector::render_item_3d_ui()
     inherited::render_item_3d_ui();
     ui().Draw();
     //	Restore cull mode
-    GlobalEnv.UIRender->CacheSetCullMode(IUIRender::cmCCW);
+    GEnv.UIRender->CacheSetCullMode(IUIRender::cmCCW);
 }
 
 void fix_ws_wnd_size(CUIWindow* w, float kx)
@@ -134,8 +134,8 @@ void CUIArtefactDetectorElite::Draw()
 
     UI().m_currentPointType = IUIRender::pttLIT;
 
-    GlobalEnv.UIRender->CacheSetXformWorld(LM);
-    GlobalEnv.UIRender->CacheSetCullMode(IUIRender::cmNONE);
+    GEnv.UIRender->CacheSetXformWorld(LM);
+    GEnv.UIRender->CacheSetCullMode(IUIRender::cmNONE);
 
     CUIWindow::Draw();
 

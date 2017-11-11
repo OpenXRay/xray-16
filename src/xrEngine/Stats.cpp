@@ -143,7 +143,7 @@ void CStats::Show()
         if (physics_world())
             physics_world()->DumpStatistics(font, alertPtr);
         font.OutSet(200, 0);
-        GlobalEnv.Render->DumpStatistics(font, alertPtr);
+        GEnv.Render->DumpStatistics(font, alertPtr);
         font.OutSkip();
         Sound->DumpStatistics(font, alertPtr);
         font.OutSkip();
@@ -224,12 +224,12 @@ void CStats::OnRender()
             const CSound_stats_ext::SItem& item = *_I;
             if (item._3D)
             {
-                GlobalEnv.DU->DrawCross(item.params.position, 0.5f, 0xFF0000FF, true);
+                GEnv.DU->DrawCross(item.params.position, 0.5f, 0xFF0000FF, true);
                 if (g_stats_flags.is(st_sound_min_dist))
-                    GlobalEnv.DU->DrawSphere(
+                    GEnv.DU->DrawSphere(
                         Fidentity, item.params.position, item.params.min_distance, 0x400000FF, 0xFF0000FF, true, true);
                 if (g_stats_flags.is(st_sound_max_dist))
-                    GlobalEnv.DU->DrawSphere(
+                    GEnv.DU->DrawSphere(
                         Fidentity, item.params.position, item.params.max_distance, 0x4000FF00, 0xFF008000, true, true);
 
                 xr_string out_txt = (out_txt.size() && g_stats_flags.is(st_sound_info_name)) ? item.name.c_str() : "";
@@ -237,7 +237,7 @@ void CStats::OnRender()
                 if (item.game_object)
                 {
                     if (g_stats_flags.is(st_sound_ai_dist))
-                        GlobalEnv.DU->DrawSphere(Fidentity, item.params.position, item.params.max_ai_distance,
+                        GEnv.DU->DrawSphere(Fidentity, item.params.position, item.params.max_ai_distance,
                             0x80FF0000, 0xFF800000, true, true);
                     if (g_stats_flags.is(st_sound_info_object))
                     {
@@ -247,7 +247,7 @@ void CStats::OnRender()
                     }
                 }
                 if (g_stats_flags.is_any(st_sound_info_name | st_sound_info_object) && item.name.size())
-                    GlobalEnv.DU->OutText(item.params.position, out_txt.c_str(), 0xFFFFFFFF, 0xFF000000);
+                    GEnv.DU->OutText(item.params.position, out_txt.c_str(), 0xFFFFFFFF, 0xFF000000);
             }
         }
     }

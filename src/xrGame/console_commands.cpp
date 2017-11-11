@@ -143,12 +143,12 @@ static void full_memory_stats()
 {
     Memory.mem_compact();
     u32 m_base = 0, c_base = 0, m_lmaps = 0, c_lmaps = 0;
-    GlobalEnv.Render->ResourcesGetMemoryUsage(m_base, c_base, m_lmaps, c_lmaps);
+    GEnv.Render->ResourcesGetMemoryUsage(m_base, c_base, m_lmaps, c_lmaps);
     log_vminfo();
     size_t _process_heap = ::Memory.mem_usage();
 #ifndef PURE_ALLOC
     u32 _game_lua = CScriptEngine::GetMemoryUsage();
-    u32 _render = GlobalEnv.Render->memory_usage();
+    u32 _render = GEnv.Render->memory_usage();
 #endif
     int _eco_strings = (int)g_pStringContainer->stat_economy();
     int _eco_smem = (int)g_pSharedMemoryContainer->stat_economy();
@@ -1557,11 +1557,11 @@ public:
             return;
         }
 
-        IRenderVisual* visual = GlobalEnv.Render->model_Create(arguments);
+        IRenderVisual* visual = GEnv.Render->model_Create(arguments);
         IKinematics* kinematics = smart_cast<IKinematics*>(visual);
         if (!kinematics)
         {
-            GlobalEnv.Render->model_Delete(visual);
+            GEnv.Render->model_Delete(visual);
             Msg("! Invalid visual type \"%s\" (not a IKinematics)", arguments);
             return;
         }
@@ -1570,7 +1570,7 @@ public:
         for (u16 i = 0, n = kinematics->LL_BoneCount(); i < n; ++i)
             Msg("%s", *kinematics->LL_GetData(i).name);
 
-        GlobalEnv.Render->model_Delete(visual);
+        GEnv.Render->model_Delete(visual);
     }
 };
 

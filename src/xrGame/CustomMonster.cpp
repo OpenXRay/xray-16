@@ -1063,7 +1063,7 @@ void draw_visiblity_rays(CCustomMonster* self, const IGameObject* object, collid
 
 void CCustomMonster::OnRender()
 {
-    GlobalEnv.DRender->OnFrameEnd();
+    GEnv.DRender->OnFrameEnd();
     // RCache.OnFrameEnd				();
 
     {

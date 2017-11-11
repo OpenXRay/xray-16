@@ -12,7 +12,7 @@ void IGame_ObjectPool::prefetch()
     R_ASSERT(m_PrefetchObjects.empty());
 
     int p_count = 0;
-    GlobalEnv.Render->model_Logging(FALSE);
+    GEnv.Render->model_Logging(FALSE);
 
     string256 section;
     // prefetch objects
@@ -29,7 +29,7 @@ void IGame_ObjectPool::prefetch()
     }
 
     // out statistic
-    GlobalEnv.Render->model_Logging(TRUE);
+    GEnv.Render->model_Logging(TRUE);
 }
 
 void IGame_ObjectPool::clear()

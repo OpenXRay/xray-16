@@ -478,7 +478,7 @@ void CEnvironment::OnFrame()
     //AVO: allow sun to move as defined in configs
 #ifndef CONFIG_SUN_MOVEMENT
     // Igor. Dynamic sun position.
-    if (!GlobalEnv.Render->is_sun_static())
+    if (!GEnv.Render->is_sun_static())
         calculate_dynamic_sun_dir();
 #endif
     //-AVO

@@ -121,15 +121,15 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
 {
     string_path name;
     xr_strcpy(name, _name);
-    if (0 == GlobalEnv.Render->m_skinning)
+    if (0 == GEnv.Render->m_skinning)
         xr_strcat(name, "_0");
-    if (1 == GlobalEnv.Render->m_skinning)
+    if (1 == GEnv.Render->m_skinning)
         xr_strcat(name, "_1");
-    if (2 == GlobalEnv.Render->m_skinning)
+    if (2 == GEnv.Render->m_skinning)
         xr_strcat(name, "_2");
-    if (3 == GlobalEnv.Render->m_skinning)
+    if (3 == GEnv.Render->m_skinning)
         xr_strcat(name, "_3");
-    if (4 == GlobalEnv.Render->m_skinning)
+    if (4 == GEnv.Render->m_skinning)
         xr_strcat(name, "_4");
     LPSTR N = LPSTR(name);
     map_VS::iterator I = m_vs.find(N);
@@ -156,7 +156,7 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
         }
 
         string_path cname;
-        strconcat(sizeof(cname), cname, GlobalEnv.Render->getShaderPath(), /*_name*/ shName, ".vs");
+        strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), /*_name*/ shName, ".vs");
         FS.update_path(cname, "$game_shaders$", cname);
         //		LPCSTR						target		= NULL;
 
@@ -168,7 +168,7 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
             string1024 tmp;
             xr_sprintf(tmp, "DX10: %s is missing. Replace with stub_default.vs", cname);
             Msg(tmp);
-            strconcat(sizeof(cname), cname, GlobalEnv.Render->getShaderPath(), "stub_default", ".vs");
+            strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), "stub_default", ".vs");
             FS.update_path(cname, "$game_shaders$", cname);
             file = FS.r_open(cname);
         }
@@ -197,7 +197,7 @@ SVS* CResourceManager::_CreateVS(LPCSTR _name)
             c_entry = "main_vs_2_0";
         }
 
-        HRESULT const _hr = GlobalEnv.Render->shader_compile(
+        HRESULT const _hr = GEnv.Render->shader_compile(
             name, (DWORD const*)data, size, c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_vs);
 
         VERIFY(SUCCEEDED(_hr));
@@ -240,21 +240,21 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
 {
     string_path name;
     xr_strcpy(name, _name);
-    if (0 == GlobalEnv.Render->m_MSAASample)
+    if (0 == GEnv.Render->m_MSAASample)
         xr_strcat(name, "_0");
-    if (1 == GlobalEnv.Render->m_MSAASample)
+    if (1 == GEnv.Render->m_MSAASample)
         xr_strcat(name, "_1");
-    if (2 == GlobalEnv.Render->m_MSAASample)
+    if (2 == GEnv.Render->m_MSAASample)
         xr_strcat(name, "_2");
-    if (3 == GlobalEnv.Render->m_MSAASample)
+    if (3 == GEnv.Render->m_MSAASample)
         xr_strcat(name, "_3");
-    if (4 == GlobalEnv.Render->m_MSAASample)
+    if (4 == GEnv.Render->m_MSAASample)
         xr_strcat(name, "_4");
-    if (5 == GlobalEnv.Render->m_MSAASample)
+    if (5 == GEnv.Render->m_MSAASample)
         xr_strcat(name, "_5");
-    if (6 == GlobalEnv.Render->m_MSAASample)
+    if (6 == GEnv.Render->m_MSAASample)
         xr_strcat(name, "_6");
-    if (7 == GlobalEnv.Render->m_MSAASample)
+    if (7 == GEnv.Render->m_MSAASample)
         xr_strcat(name, "_7");
     LPSTR N = LPSTR(name);
     map_PS::iterator I = m_ps.find(N);
@@ -279,7 +279,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
 
         // Open file
         string_path cname;
-        strconcat(sizeof(cname), cname, GlobalEnv.Render->getShaderPath(), /*_name*/ shName, ".ps");
+        strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), /*_name*/ shName, ".ps");
         FS.update_path(cname, "$game_shaders$", cname);
 
         // duplicate and zero-terminate
@@ -292,7 +292,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
             // Memory.mem_compact();
             xr_sprintf(tmp, "DX10: %s is missing. Replace with stub_default.ps", cname);
             Msg(tmp);
-            strconcat(sizeof(cname), cname, GlobalEnv.Render->getShaderPath(), "stub_default", ".ps");
+            strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), "stub_default", ".ps");
             FS.update_path(cname, "$game_shaders$", cname);
             file = FS.r_open(cname);
         }
@@ -332,7 +332,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
             c_entry = "main_ps_2_0";
         }
 
-        HRESULT const _hr = GlobalEnv.Render->shader_compile(
+        HRESULT const _hr = GEnv.Render->shader_compile(
             name, (DWORD const*)data, size, c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_ps);
 
         VERIFY(SUCCEEDED(_hr));
@@ -378,7 +378,7 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
 
         // Open file
         string_path cname;
-        strconcat(sizeof(cname), cname, GlobalEnv.Render->getShaderPath(), name, ".gs");
+        strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), name, ".gs");
         FS.update_path(cname, "$game_shaders$", cname);
 
         // duplicate and zero-terminate
@@ -391,7 +391,7 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
             // Memory.mem_compact();
             xr_sprintf(tmp, "DX10: %s is missing. Replace with stub_default.gs", cname);
             Msg(tmp);
-            strconcat(sizeof(cname), cname, GlobalEnv.Render->getShaderPath(), "stub_default", ".gs");
+            strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), "stub_default", ".gs");
             FS.update_path(cname, "$game_shaders$", cname);
             R = FS.r_open(cname);
         }
@@ -402,7 +402,7 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
         LPCSTR c_target = "gs_4_0";
         LPCSTR c_entry = "main";
 
-        HRESULT const _hr = GlobalEnv.Render->shader_compile(name, (DWORD const*)file->pointer(), file->length(),
+        HRESULT const _hr = GEnv.Render->shader_compile(name, (DWORD const*)file->pointer(), file->length(),
             c_entry, c_target, D3D10_SHADER_PACK_MATRIX_ROW_MAJOR, (void*&)_gs);
 
         VERIFY(SUCCEEDED(_hr));

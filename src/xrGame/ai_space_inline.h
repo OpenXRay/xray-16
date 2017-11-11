@@ -29,8 +29,8 @@ IC const CCoverManager& CAI_Space::cover_manager() const
 // XXX: [ai] delete
 IC CScriptEngine& CAI_Space::script_engine() const
 {
-    VERIFY(GlobalEnv.ScriptEngine);
-    return (*GlobalEnv.ScriptEngine);
+    VERIFY(GEnv.ScriptEngine);
+    return (*GEnv.ScriptEngine);
 }
 
 IC moving_objects& CAI_Space::moving_objects() const

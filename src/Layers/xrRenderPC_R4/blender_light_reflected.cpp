@@ -36,9 +36,9 @@ void CBlender_accum_reflected_msaa::Compile(CBlender_Compile& C)
     D3DBLEND dest = blend ? D3DBLEND_ONE : D3DBLEND_ZERO;
 
     if (Name)
-        GlobalEnv.Render->m_MSAASample = atoi(Definition);
+        GEnv.Render->m_MSAASample = atoi(Definition);
     else
-        GlobalEnv.Render->m_MSAASample = -1;
+        GEnv.Render->m_MSAASample = -1;
 
     C.r_Pass("accum_volume", "accum_indirect_msaa", false, FALSE, FALSE, blend, D3DBLEND_ONE, dest);
     // C.r_Sampler_rtf		("s_position",		r2_RT_P);
@@ -54,5 +54,5 @@ void CBlender_accum_reflected_msaa::Compile(CBlender_Compile& C)
     C.r_dx10Sampler("smp_material");
     C.r_End();
 
-    GlobalEnv.Render->m_MSAASample = -1;
+    GEnv.Render->m_MSAASample = -1;
 }

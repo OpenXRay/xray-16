@@ -13,7 +13,7 @@
 void CDebugRenderer::add_lines(
     Fvector const* vertices, u32 const& vertex_count, u16 const* pairs, u32 const& pair_count, u32 const& color)
 {
-    GlobalEnv.DRender->add_lines(vertices, vertex_count, pairs, pair_count, color);
+    GEnv.DRender->add_lines(vertices, vertex_count, pairs, pair_count, color);
 }
 
 void CDebugRenderer::draw_obb(const Fmatrix& matrix, const u32& color)

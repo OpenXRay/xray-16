@@ -1433,8 +1433,8 @@ bool CSE_ALifeObjectHangingLamp::match_configuration() const throw()
 {
     R_ASSERT3(flags.test(flR1) || flags.test(flR2), "no renderer type set for hanging-lamp ", name_replace());
 #ifdef XRGAME_EXPORTS
-    return ((flags.test(flR1) && (GlobalEnv.Render->get_generation() == IRender::GENERATION_R1)) ||
-    (flags.test(flR2) && (GlobalEnv.Render->get_generation() == IRender::GENERATION_R2)));
+    return ((flags.test(flR1) && (GEnv.Render->get_generation() == IRender::GENERATION_R1)) ||
+    (flags.test(flR2) && (GEnv.Render->get_generation() == IRender::GENERATION_R2)));
 #else
     return (true);
 #endif

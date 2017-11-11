@@ -205,7 +205,7 @@ void CBulletManager::FireShotmark(SBullet* bullet, const Fvector& vDir, const Fv
         if (mtl_pair && !mtl_pair->CollideMarks->empty() && ShowMark)
         {
             //добавить отметку на материале
-            GlobalEnv.Render->add_StaticWallmark(&*mtl_pair->CollideMarks, vEnd, bullet->wallmark_size, pTri, pVerts);
+            GEnv.Render->add_StaticWallmark(&*mtl_pair->CollideMarks, vEnd, bullet->wallmark_size, pTri, pVerts);
         }
     }
 

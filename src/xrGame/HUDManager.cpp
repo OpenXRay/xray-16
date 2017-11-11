@@ -170,10 +170,10 @@ void CHUDManager::Render_First()
         return;
 
     // only shadow
-    GlobalEnv.Render->set_Invisible(TRUE);
-    GlobalEnv.Render->set_Object(O->H_Root());
+    GEnv.Render->set_Invisible(TRUE);
+    GEnv.Render->set_Object(O->H_Root());
     O->renderable_Render();
-    GlobalEnv.Render->set_Invisible(FALSE);
+    GEnv.Render->set_Invisible(FALSE);
 }
 
 bool need_render_hud()
@@ -204,10 +204,10 @@ void CHUDManager::Render_Last()
 
     IGameObject* O = g_pGameLevel->CurrentViewEntity();
     // hud itself
-    GlobalEnv.Render->set_HUD(TRUE);
-    GlobalEnv.Render->set_Object(O->H_Root());
+    GEnv.Render->set_HUD(TRUE);
+    GEnv.Render->set_Object(O->H_Root());
     O->OnHUDDraw(this);
-    GlobalEnv.Render->set_HUD(FALSE);
+    GEnv.Render->set_HUD(FALSE);
 }
 
 void CHUDManager::Render_Actor_Shadow() // added by KD
@@ -223,7 +223,7 @@ void CHUDManager::Render_Actor_Shadow() // added by KD
     // KD: we need to render actor shadow only in first eye cam mode because
     // in other modes actor model already in scene graph and renders well
     if (actor->active_cam() != eacFirstEye) return;
-    GlobalEnv.Render->set_Object(object->H_Root());
+    GEnv.Render->set_Object(object->H_Root());
     object->renderable_Render();
 }
 

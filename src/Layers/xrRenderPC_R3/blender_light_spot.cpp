@@ -139,9 +139,9 @@ void CBlender_accum_spot_msaa::Compile(CBlender_Compile& C)
     D3DBLEND dest = blend ? D3DBLEND_ONE : D3DBLEND_ZERO;
 
     if (Name)
-        GlobalEnv.Render->m_MSAASample = atoi(Definition);
+        GEnv.Render->m_MSAASample = atoi(Definition);
     else
-        GlobalEnv.Render->m_MSAASample = -1;
+        GEnv.Render->m_MSAASample = -1;
 
     switch (C.iElement)
     {
@@ -254,7 +254,7 @@ void CBlender_accum_spot_msaa::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     }
-    GlobalEnv.Render->m_MSAASample = -1;
+    GEnv.Render->m_MSAASample = -1;
 }
 
 CBlender_accum_volumetric_msaa::CBlender_accum_volumetric_msaa() { description.CLS = 0; }
@@ -264,9 +264,9 @@ void CBlender_accum_volumetric_msaa::Compile(CBlender_Compile& C)
     IBlender::Compile(C);
 
     if (Name)
-        GlobalEnv.Render->m_MSAASample = atoi(Definition);
+        GEnv.Render->m_MSAASample = atoi(Definition);
     else
-        GlobalEnv.Render->m_MSAASample = -1;
+        GEnv.Render->m_MSAASample = -1;
 
     switch (C.iElement)
     {
@@ -283,5 +283,5 @@ void CBlender_accum_volumetric_msaa::Compile(CBlender_Compile& C)
         C.r_End();
         break;
     }
-    GlobalEnv.Render->m_MSAASample = -1;
+    GEnv.Render->m_MSAASample = -1;
 }

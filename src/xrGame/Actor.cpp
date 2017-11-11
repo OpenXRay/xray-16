@@ -1380,8 +1380,8 @@ void CActor::renderable_Render()
     inherited::renderable_Render();
 
     if ((cam_active == eacFirstEye && // first eye cam
-            GlobalEnv.Render->get_generation() == GlobalEnv.Render->GENERATION_R2 && // R2
-            GlobalEnv.Render->active_phase() == 1) // shadow map rendering on R2	
+            GEnv.Render->get_generation() == GEnv.Render->GENERATION_R2 && // R2
+            GEnv.Render->active_phase() == 1) // shadow map rendering on R2	
         ||
         !(IsFocused() && cam_active == eacFirstEye &&
             (!m_holder || (m_holder && m_holder->allowWeapon() && m_holder->HUDView())))
@@ -1478,7 +1478,7 @@ void CActor::RenderIndicator(Fvector dpos, float r1, float r2, const ui_shader& 
     if (!g_Alive())
         return;
 
-    GlobalEnv.UIRender->StartPrimitive(4, IUIRender::ptTriStrip, IUIRender::pttLIT);
+    GEnv.UIRender->StartPrimitive(4, IUIRender::ptTriStrip, IUIRender::pttLIT);
 
     CBoneInstance& BI = smart_cast<IKinematics*>(Visual())->LL_GetBoneInstance(u16(m_head));
     Fmatrix M;
@@ -1503,10 +1503,10 @@ void CActor::RenderIndicator(Fvector dpos, float r1, float r2, const ui_shader& 
     c.invert(a);
     d.invert(b);
 
-    GlobalEnv.UIRender->PushPoint(d.x + pos.x, d.y + pos.y, d.z + pos.z, 0xffffffff, 0.f, 1.f);
-    GlobalEnv.UIRender->PushPoint(a.x + pos.x, a.y + pos.y, a.z + pos.z, 0xffffffff, 0.f, 0.f);
-    GlobalEnv.UIRender->PushPoint(c.x + pos.x, c.y + pos.y, c.z + pos.z, 0xffffffff, 1.f, 1.f);
-    GlobalEnv.UIRender->PushPoint(b.x + pos.x, b.y + pos.y, b.z + pos.z, 0xffffffff, 1.f, 0.f);
+    GEnv.UIRender->PushPoint(d.x + pos.x, d.y + pos.y, d.z + pos.z, 0xffffffff, 0.f, 1.f);
+    GEnv.UIRender->PushPoint(a.x + pos.x, a.y + pos.y, a.z + pos.z, 0xffffffff, 0.f, 0.f);
+    GEnv.UIRender->PushPoint(c.x + pos.x, c.y + pos.y, c.z + pos.z, 0xffffffff, 1.f, 1.f);
+    GEnv.UIRender->PushPoint(b.x + pos.x, b.y + pos.y, b.z + pos.z, 0xffffffff, 1.f, 0.f);
     // pv->set         (d.x+pos.x,d.y+pos.y,d.z+pos.z, 0xffffffff, 0.f,1.f);        pv++;
     // pv->set         (a.x+pos.x,a.y+pos.y,a.z+pos.z, 0xffffffff, 0.f,0.f);        pv++;
     // pv->set         (c.x+pos.x,c.y+pos.y,c.z+pos.z, 0xffffffff, 1.f,1.f);        pv++;
@@ -1515,13 +1515,13 @@ void CActor::RenderIndicator(Fvector dpos, float r1, float r2, const ui_shader& 
     // dwCount 				= u32(pv-pv_start);
     // RCache.Vertex.Unlock	(dwCount,hFriendlyIndicator->vb_stride);
 
-    GlobalEnv.UIRender->CacheSetXformWorld(Fidentity);
+    GEnv.UIRender->CacheSetXformWorld(Fidentity);
     // RCache.set_xform_world		(Fidentity);
-    GlobalEnv.UIRender->SetShader(*IndShader);
+    GEnv.UIRender->SetShader(*IndShader);
     // RCache.set_Shader			(IndShader);
     // RCache.set_Geometry			(hFriendlyIndicator);
     // RCache.Render	   			(D3DPT_TRIANGLESTRIP,dwOffset,0, dwCount, 0, 2);
-    GlobalEnv.UIRender->FlushPrimitive();
+    GEnv.UIRender->FlushPrimitive();
 };
 
 static float mid_size = 0.097f;

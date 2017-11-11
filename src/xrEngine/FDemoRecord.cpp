@@ -146,7 +146,7 @@ void CDemoRecord::MakeScreenshotFace()
         psHUD_Flags.assign(0);
         break;
     case 1:
-        GlobalEnv.Render->Screenshot();
+        GEnv.Render->Screenshot();
         psHUD_Flags.assign(s_hud_flag);
         m_bMakeScreenshot = FALSE;
         break;
@@ -227,7 +227,7 @@ void CDemoRecord::MakeLevelMapProcess()
             }
         }
 
-        GlobalEnv.Render->Screenshot(IRender::SM_FOR_LEVELMAP, tmp);
+        GEnv.Render->Screenshot(IRender::SM_FOR_LEVELMAP, tmp);
 
         if (m_iLMScreenshotFragment == -1 || m_iLMScreenshotFragment == 4)
         {
@@ -267,10 +267,10 @@ void CDemoRecord::MakeCubeMapFace(Fvector& D, Fvector& N)
     case 5:
         N.set(cmNorm[m_Stage]);
         D.set(cmDir[m_Stage]);
-        GlobalEnv.Render->Screenshot(IRender::SM_FOR_CUBEMAP, _itoa(m_Stage, buf, 10));
+        GEnv.Render->Screenshot(IRender::SM_FOR_CUBEMAP, _itoa(m_Stage, buf, 10));
         break;
     case 6:
-        GlobalEnv.Render->Screenshot(IRender::SM_FOR_CUBEMAP, _itoa(m_Stage, buf, 10));
+        GEnv.Render->Screenshot(IRender::SM_FOR_CUBEMAP, _itoa(m_Stage, buf, 10));
         N.set(m_Camera.j);
         D.set(m_Camera.k);
         psHUD_Flags.assign(s_hud_flag);

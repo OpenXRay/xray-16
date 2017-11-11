@@ -217,7 +217,7 @@ BOOL CHelicopter::net_Spawn(CSE_Abstract* DC)
     m_stepRemains = 0.0f;
 
     // lighting
-    m_light_render = GlobalEnv.Render->light_create();
+    m_light_render = GEnv.Render->light_create();
     m_light_render->set_shadow(false);
     m_light_render->set_type(IRender_Light::POINT);
     m_light_render->set_range(m_light_range);

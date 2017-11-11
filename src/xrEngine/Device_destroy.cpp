@@ -10,14 +10,14 @@ void CRenderDevice::Destroy()
         return;
     Log("Destroying Direct3D...");
     ShowCursor(true);
-    GlobalEnv.Render->ValidateHW();
-    GlobalEnv.DU->OnDeviceDestroy();
+    GEnv.Render->ValidateHW();
+    GEnv.DU->OnDeviceDestroy();
     b_is_Ready = false;
     Statistic->OnDeviceDestroy();
-    GlobalEnv.Render->destroy();
-    GlobalEnv.Render->OnDeviceDestroy(false);
+    GEnv.Render->destroy();
+    GEnv.Render->OnDeviceDestroy(false);
     Memory.mem_compact();
-    GlobalEnv.Render->DestroyHW();
+    GEnv.Render->DestroyHW();
     seqRender.R.clear();
     seqAppActivate.R.clear();
     seqAppDeactivate.R.clear();
@@ -40,7 +40,7 @@ void CRenderDevice::Reset(bool precache)
     u32 dwHeight_before = dwHeight;
     ShowCursor(true);
     u32 tm_start = TimerAsync();
-    GlobalEnv.Render->Reset(m_hWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);
+    GEnv.Render->Reset(m_hWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);
     if (g_pGamePersistent)
         g_pGamePersistent->Environment().bNeed_re_create_env = true;
     _SetupStates();

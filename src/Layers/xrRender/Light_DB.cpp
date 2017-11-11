@@ -250,7 +250,7 @@ void CLight_DB::Update()
             E.sun_color.x * ps_r2_sun_lumscale, E.sun_color.y * ps_r2_sun_lumscale, E.sun_color.z * ps_r2_sun_lumscale);
         sun_adapted->set_range(600.f);
 
-        if (!GlobalEnv.Render->is_sun_static())
+        if (!GEnv.Render->is_sun_static())
         {
             sun_adapted->set_rotation(OD, _sun_original->right);
             sun_adapted->set_position(OP);

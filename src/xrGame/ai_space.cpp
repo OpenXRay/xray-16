@@ -48,15 +48,15 @@ void CAI_Space::init()
 
     VERIFY(!m_moving_objects);
     m_moving_objects = new ::moving_objects();
-    VERIFY(!GlobalEnv.ScriptEngine);
-    GlobalEnv.ScriptEngine = new CScriptEngine();
+    VERIFY(!GEnv.ScriptEngine);
+    GEnv.ScriptEngine = new CScriptEngine();
     SetupScriptEngine();
 }
 
 CAI_Space::~CAI_Space()
 {
     unload();
-    xr_delete(GlobalEnv.ScriptEngine); // XXX: wrapped into try..catch(...) in vanilla source
+    xr_delete(GEnv.ScriptEngine); // XXX: wrapped into try..catch(...) in vanilla source
     xr_delete(m_doors_manager);
     xr_delete(m_moving_objects);
     xr_delete(m_cover_manager);
@@ -127,7 +127,7 @@ void CAI_Space::LoadCommonScripts()
 void CAI_Space::SetupScriptEngine()
 {
     XRay::ScriptExporter::Reset(); // mark all nodes as undone
-    GlobalEnv.ScriptEngine->init(XRay::ScriptExporter::Export, true);
+    GEnv.ScriptEngine->init(XRay::ScriptExporter::Export, true);
     RegisterScriptClasses();
     object_factory().register_script();
     LoadCommonScripts();

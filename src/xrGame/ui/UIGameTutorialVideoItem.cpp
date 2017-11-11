@@ -160,7 +160,7 @@ void CUISequenceVideoItem::OnRender()
 {
     if (!m_texture->HasTexture() && m_wnd->GetShader() && m_wnd->GetShader()->inited())
     {
-        GlobalEnv.UIRender->SetShader(*m_wnd->GetShader());
+        GEnv.UIRender->SetShader(*m_wnd->GetShader());
         m_texture->CaptureTexture();
         m_texture->video_Stop();
     }

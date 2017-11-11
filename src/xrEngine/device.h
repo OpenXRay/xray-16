@@ -161,13 +161,13 @@ public:
             m_bNearer = FALSE;
             mProject._43 += EPS_L;
         }
-        GlobalEnv.Render->SetCacheXform(mView, mProject);
+        GEnv.Render->SetCacheXform(mView, mProject);
         // R_ASSERT(0);
         // TODO: re-implement set projection
         // RCache.set_xform_project (mProject);
     }
 
-    void DumpResourcesMemoryUsage() { GlobalEnv.Render->ResourcesDumpMemoryUsage(); }
+    void DumpResourcesMemoryUsage() { GEnv.Render->ResourcesDumpMemoryUsage(); }
 
     CRegistrator<pureFrame> seqFrameMT;
     CRegistrator<pureDeviceReset> seqDeviceReset;

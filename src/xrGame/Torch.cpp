@@ -32,15 +32,15 @@ ENGINE_API int g_current_renderer;
 
 CTorch::CTorch(void)
 {
-    light_render = GlobalEnv.Render->light_create();
+    light_render = GEnv.Render->light_create();
     light_render->set_type(IRender_Light::SPOT);
     light_render->set_shadow(true);
-    light_omni = GlobalEnv.Render->light_create();
+    light_omni = GEnv.Render->light_create();
     light_omni->set_type(IRender_Light::POINT);
     light_omni->set_shadow(false);
 
     m_switched_on = false;
-    glow_render = GlobalEnv.Render->glow_create();
+    glow_render = GEnv.Render->glow_create();
     lanim = 0;
     fBrightness = 1.f;
 
