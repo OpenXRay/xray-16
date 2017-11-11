@@ -8,12 +8,6 @@
 #include "xrCore/_vector3d.h"
 #include "xrCommon/xr_vector.h" // DEFINE_VECTOR
 
-#ifdef XRSOUND_EXPORTS
-#define XRSOUND_API XR_EXPORT
-#else
-#define XRSOUND_API XR_IMPORT
-#endif
-
 #ifdef __BORLANDC__
 #define XRSOUND_EDITOR_API XRSOUND_API
 

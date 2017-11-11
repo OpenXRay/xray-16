@@ -3,7 +3,6 @@
 #pragma once
 
 // TODO: tamlin: Get rid of _std_extensions.h as compile-time dependency, if possible.
-#include "xrCore_impexp.h"
 #include "_types.h"
 #include "_std_extensions.h"
 

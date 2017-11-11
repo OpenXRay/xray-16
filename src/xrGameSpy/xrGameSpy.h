@@ -1,11 +1,5 @@
 #pragma once
 
-#ifdef XRGAMESPY_EXPORTS
-#define XRGAMESPY_API XR_EXPORT
-#else
-#define XRGAMESPY_API XR_IMPORT
-#endif
-
 #include <GameSpy/Common/gsCommon.h>
 #include <GameSpy/Common/gsAvailable.h>
 #include <GameSpy/ghttp/ghttp.h>

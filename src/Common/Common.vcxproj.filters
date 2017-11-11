@@ -102,4 +102,7 @@
       <Filter>NvMender2003</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="CommonImportExport.inl" />
+  </ItemGroup>
 </Project>

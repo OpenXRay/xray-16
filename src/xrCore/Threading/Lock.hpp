@@ -1,6 +1,4 @@
 #pragma once
-#include "xrCore/xrCore_impexp.h"
-
 #include <mutex>
 #include <atomic>
 

@@ -3,7 +3,6 @@
 #define xrMemoryH
 
 #include "memory_monitor.h"
-#include "xrCore/xrCore_impexp.h"
 
 #ifdef USE_MEMORY_MONITOR
 #define DEBUG_MEMORY_NAME

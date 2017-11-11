@@ -210,6 +210,9 @@
   <ItemGroup>
     <ClCompile Include="NvMender2003\NVMeshMender.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="CommonImportExport.inl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

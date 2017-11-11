@@ -74,8 +74,6 @@
 #endif // frequently in release code due to large amount of VERIFY
 
 // Our headers
-#include "xrCore_impexp.h"
-
 #include "xrDebug.h"
 //#include "vector.h"
 

@@ -3,7 +3,6 @@
 #define xrsharedmemH
 
 //#include "_stl_extensions.h"
-#include "xrCore_impexp.h"
 #include "xrCommon/xr_vector.h"
 
 // fwd. decl.

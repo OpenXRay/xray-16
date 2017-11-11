@@ -4,7 +4,6 @@
 
 #include "_types.h"
 #include "cpuid.h"
-#include "xrCore_impexp.h"
 #include "xrCommon/inlining_macros.h"
 #ifdef _MSC_VER
 #include <intrin.h> // __rdtsc

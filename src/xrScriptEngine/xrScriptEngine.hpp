@@ -1,11 +1,5 @@
 #pragma once
 
-#ifdef XRSCRIPTENGINE_EXPORTS
-#define XRSCRIPTENGINE_API XR_EXPORT
-#else
-#define XRSCRIPTENGINE_API XR_IMPORT
-#endif
-
 #pragma warning(push)
 #pragma warning(disable : 4244)
 #pragma warning(disable : 4995)
