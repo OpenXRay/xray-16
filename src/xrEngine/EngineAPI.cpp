@@ -130,27 +130,21 @@ void CEngineAPI::InitializeRenderers()
 
 void CEngineAPI::Initialize(void)
 {
-    InitializeRenderers();
+    hGame = std::make_unique<XRay::Module>("xrGame");
 
-    // game
-    {
-        constexpr pcstr g_name = "xrGame";
-        hGame = std::make_unique<XRay::Module>(g_name);
+    if (!hGame->exist())
+        R_CHK(GetLastError());
+    R_ASSERT2(hGame, "Game DLL raised exception during loading or there is no game DLL at all");
 
-        if (!hGame->exist())
-            R_CHK(GetLastError());
-        R_ASSERT2(hGame, "Game DLL raised exception during loading or there is no game DLL at all");
+    pCreate = (Factory_Create*)hGame->getProcAddress("xrFactory_Create");
+    R_ASSERT(pCreate);
 
-        pCreate = (Factory_Create*)hGame->getProcAddress("xrFactory_Create");
-        R_ASSERT(pCreate);
-
-        pDestroy = (Factory_Destroy*)hGame->getProcAddress("xrFactory_Destroy");
-        R_ASSERT(pDestroy);
-    }
+    pDestroy = (Factory_Destroy*)hGame->getProcAddress("xrFactory_Destroy");
+    R_ASSERT(pDestroy);
 
     //////////////////////////////////////////////////////////////////////////
     // vTune
-    tune_enabled = FALSE;
+    tune_enabled = false;
     if (strstr(Core.Params, "-tune"))
     {
         constexpr pcstr g_name = "vTuneAPI";
@@ -194,11 +188,11 @@ void CEngineAPI::CreateRendererList()
     vid_quality_token[0].name = xr_strdup("renderer_r1");
 
     vid_quality_token[1].id = -1;
-    vid_quality_token[1].name = NULL;
+    vid_quality_token[1].name = nullptr;
 
 #else
     // TODO: ask renderers if they are supported!
-    if (vid_quality_token != NULL)
+    if (vid_quality_token != nullptr)
         return;
     bool bSupports_r2 = false;
     bool bSupports_r2_5 = false;

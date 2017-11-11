@@ -42,7 +42,6 @@ void InitEngine()
     Device.Initialize();
 }
 
-static void InitEngineExt() { Engine.External.Initialize(); }
 namespace
 {
 struct PathIncludePred
@@ -393,7 +392,8 @@ int RunApplication(pcstr commandLine)
 #else
     Console->Execute("renderer renderer_r1");
 #endif
-    InitEngineExt(); // load xrRender and xrGame
+    Engine.External.InitializeRenderers();
+    Engine.External.Initialize();
     Startup();
     Core._destroy();
     // check for need to execute something external
