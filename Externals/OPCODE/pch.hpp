@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "Common/Platform.hpp"
+#include "Common/Common.hpp"
 #include "xrCore/xrCore.h"
 #include "xrCore/doug_lea_allocator.h"
 #include "xrCore/memory_allocator_options.h"

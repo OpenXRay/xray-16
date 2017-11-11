@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Common/Platform.hpp"
+#include "Common/Common.hpp"
 
 #ifdef _EDITOR
 #include "editors/ECore/stdafx.h"

@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Common/Platform.hpp"
+#include "Common/Common.hpp"
 
 #define MTL_EXPORT_API
 #define ENGINE_API

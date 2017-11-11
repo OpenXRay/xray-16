@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Common/Platform.hpp"
+#include "Common/Common.hpp"
 
 #ifdef _DEBUG
 #define D3D_DEBUG_INFO

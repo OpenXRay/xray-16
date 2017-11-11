@@ -3,6 +3,7 @@
 #define NO_XRC_STATS
 
 #include "Common/Platform.hpp"
+#include "Common/Common.hpp"
 #include "xrCore/xrCore.h"
 
 #pragma warning(push)

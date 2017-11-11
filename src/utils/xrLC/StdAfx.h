@@ -1,5 +1,6 @@
 #pragma once
 #include "Common/Platform.hpp"
+#include "Common/Common.hpp"
 #include "utils/xrLC_Light/xrLC_Light.h"
 
 #define ENGINE_API // fake, to enable sharing with engine
