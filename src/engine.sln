@@ -59,6 +59,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrSE_Factory", "utils\xrSE_Factory\xrSE_Factory.vcxproj", "{3AD26FD3-4F52-4E22-A4CF-AD4C49E74C61}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrCDB", "xrCDB\xrCDB.vcxproj", "{A19B1DF2-82EC-4364-8BDF-85D13A1C89B5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DAFD6D98-3DCD-40AD-BC85-EC71797B6767} = {DAFD6D98-3DCD-40AD-BC85-EC71797B6767}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrCore", "xrCore\xrCore.vcxproj", "{A0F7D1FB-59A7-4717-A7E4-96F37E91998E}"
 EndProject
