@@ -17,7 +17,7 @@ extern "C" void XR_EXPORT SetupEnv()
 #ifdef DEBUG
     GEnv.DRender = &DebugRenderImpl;
 #endif
-    xrRender_initconsole();
+    xrRender_initconsole(); // XXX: Xottab_DUTY: move somewhere
 }
 
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
