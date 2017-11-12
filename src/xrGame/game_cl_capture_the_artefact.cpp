@@ -1289,7 +1289,7 @@ void game_cl_CaptureTheArtefact::OnVoteStart(NET_Packet& P)
     {
         if (!xr_strcmp(cmd_name, ttable[i][0]))
         {
-            str_c ted_str = st.translate(ttable[i][1]).c_str();
+            pcstr ted_str = st.translate(ttable[i][1]).c_str();
             VERIFY(ted_str);
             tcmd_len = xr_strlen(ted_str) + 1;
             tcmd_name = static_cast<char*>(_alloca(tcmd_len));
@@ -1312,7 +1312,7 @@ void game_cl_CaptureTheArtefact::OnVoteStart(NET_Packet& P)
         xr_strcat(vstr, vstr_size, " ");
         xr_strcat(vstr, vstr_size, st.translate(args[i]).c_str());
     }
-    str_c t_vote_str = st.translate("mp_voting_started").c_str();
+    pcstr t_vote_str = st.translate("mp_voting_started").c_str();
     VERIFY(t_vote_str);
     u32 fin_str_size = xr_strlen(t_vote_str) + vstr_size + xr_strlen(player) + 1;
     char* fin_str = static_cast<char*>(_alloca(fin_str_size));

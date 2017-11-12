@@ -144,7 +144,7 @@ str_container::str_container() :
 #endif
 {}
 
-str_value* str_container::dock(str_c value)
+str_value* str_container::dock(pcstr value)
 {
     if (0 == value)
         return 0;

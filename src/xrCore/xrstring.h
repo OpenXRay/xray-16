@@ -1,5 +1,3 @@
-#ifndef xrstringH
-#define xrstringH
 #pragma once
 
 // TODO: tamlin: Get rid of _std_extensions.h as compile-time dependency, if possible.
@@ -7,11 +5,6 @@
 #include "_std_extensions.h"
 
 #pragma pack(push, 4)
-//////////////////////////////////////////////////////////////////////////
-// TODO: tamlin: Get rid of this blobal namespace polluting silly typedef.
-typedef const char* str_c;
-
-//////////////////////////////////////////////////////////////////////////
 #pragma warning(push)
 #pragma warning(disable : 4200)
 struct XRCORE_API str_value
@@ -45,7 +38,7 @@ public:
     str_container();
     ~str_container();
 
-    str_value* dock(str_c value);
+    str_value* dock(pcstr value);
     void clean();
     void dump();
     void dump(IWriter* W);
@@ -60,7 +53,6 @@ XRCORE_API extern str_container* g_pStringContainer;
 //////////////////////////////////////////////////////////////////////////
 class shared_str
 {
-private:
     str_value* p_;
 
 protected:
@@ -75,7 +67,7 @@ protected:
     }
 
 public:
-    void _set(str_c rhs)
+    void _set(pcstr rhs)
     {
         str_value* v = g_pStringContainer->dock(rhs);
         if (0 != v)
@@ -98,7 +90,7 @@ public:
 public:
     // construction
     shared_str() { p_ = 0; }
-    shared_str(str_c rhs)
+    shared_str(pcstr rhs)
     {
         p_ = 0;
         _set(rhs);
@@ -110,7 +102,7 @@ public:
     }
     ~shared_str() { _dec(); }
     // assignment & accessors
-    shared_str& operator=(str_c rhs)
+    shared_str& operator=(pcstr rhs)
     {
         _set(rhs);
         return (shared_str&)*this;
@@ -121,10 +113,10 @@ public:
         return (shared_str&)*this;
     }
     // XXX tamlin: Remove operator*(). It may be convenient, but it's dangerous. Use 
-    str_c operator*() const { return p_ ? p_->value : 0; }
+    pcstr operator*() const { return p_ ? p_->value : 0; }
     bool operator!() const { return p_ == 0; }
     char operator[](size_t id) { return p_->value[id]; }
-    str_c c_str() const { return p_ ? p_->value : 0; }
+    pcstr c_str() const { return p_ ? p_->value : 0; }
     // misc func
     u32 size() const
     {
@@ -172,5 +164,3 @@ IC int xr_strcmp(const shared_str& a, const shared_str& b) throw()
 void xr_strlwr(shared_str& src);
 
 #pragma pack(pop)
-
-#endif
