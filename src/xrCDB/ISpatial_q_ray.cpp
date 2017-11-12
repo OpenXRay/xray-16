@@ -371,7 +371,7 @@ void ISpatial_DB::q_ray(
         }
     }
     else
-    { // XXX: delete this branch since we always have SSE feature
+    {
         if (_o & O_ONLYFIRST)
         {
             if (_o & O_ONLYNEAREST)

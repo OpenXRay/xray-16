@@ -15,7 +15,6 @@
 #define ENGINE_API
 #define ECORE_API
 #define DLL_API XR_EXPORT
-#define TIXML_USE_STL
 
 #include "clsid_game.h"
 

@@ -15,10 +15,6 @@
 #define __thread __declspec(thread)
 #endif
 
-// XXX: remove
-#define _inline inline
-#define __inline inline
-
 // XXX: remove IC/ICF/ICN
 #define IC inline
 #define ICF FORCE_INLINE

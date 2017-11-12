@@ -19,8 +19,6 @@
 #endif
 
 // global variables
-// XXX: use g_dedicated_server from xrAPI
-ENGINE_API bool g_dedicated_server = false;
 ENGINE_API CApplication* pApp = nullptr;
 ENGINE_API CInifile* pGameIni = nullptr;
 ENGINE_API bool g_bBenchmark = false;

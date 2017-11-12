@@ -69,7 +69,7 @@ private: // User declarations
 public: // User declarations
     __fastcall TfrmMain(TComponent* Owner);
     void __fastcall UpdateCaption();
-    __inline void SetHInst(HINSTANCE inst) { m_HInstance = inst; }
+    inline void SetHInst(HINSTANCE inst) { m_HInstance = inst; }
     bool IsFocused() { return D3DWindow->Focused(); }
 };
 //---------------------------------------------------------------------------

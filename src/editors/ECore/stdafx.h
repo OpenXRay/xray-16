@@ -1,8 +1,3 @@
-//----------------------------------------------------
-// file: stdafx.h
-//----------------------------------------------------
-#ifndef stdafxECOREH
-#define stdafxECOREH
 #pragma once
 
 #pragma warn - pck
@@ -29,7 +24,7 @@
 #include <process.h>
 #include <utime.h>
 
-// iseful macros
+// useful macros
 // MSC names for functions
 #ifdef _eof
 #undef _eof
@@ -170,9 +165,6 @@ DEFINE_VECTOR(shared_str, RStrVec, RStrVecIt);
 #define _omotions_ "$omotions$"
 #define _smotion_ "$smotion$"
 #define _detail_objects_ "$detail_objects$"
-#endif
 
 #define TEX_POINT_ATT "internal\\internal_light_attpoint"
 #define TEX_SPOT_ATT "internal\\internal_light_attclip"
-
-#pragma hdrstop
