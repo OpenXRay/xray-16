@@ -91,7 +91,7 @@ void CBlender_BmmD::Compile(CBlender_Compile& C)
     else
     {
         if (C.L_textures.size() < 2)
-            xrDebug::Fatal(DEBUG_INFO, "Not enought textures for shader, base tex: %s", *C.L_textures[0]);
+            xrDebug::Fatal(DEBUG_INFO, "Not enought textures for shader, base tex: %s", C.L_textures[0].c_str());
         switch (C.iElement)
         {
         case SE_R1_NORMAL_HQ:

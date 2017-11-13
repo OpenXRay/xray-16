@@ -48,7 +48,7 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
                     oAREF.value);
                 C.r_Sampler("s_base", C.L_textures[0]);
                 C.r_Sampler("s_lmap", C.L_textures[1]);
-                C.r_Sampler_clf("s_hemi", *C.L_textures[2]);
+                C.r_Sampler_clf("s_hemi", C.L_textures[2].c_str());
                 C.r_Sampler("s_env", r2_T_envs0, false, D3DTADDRESS_CLAMP);
                 C.r_End();
             }

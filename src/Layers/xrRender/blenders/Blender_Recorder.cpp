@@ -44,7 +44,7 @@ void CBlender_Compile::_cpp_Compile(ShaderElement* _SH)
     RS.Invalidate();
 
     //	TODO: Check if we need such wired system for
-    //	base texture name detection. Perhapse it's done for
+    //	base texture name detection. Perhaps it's done for
     //	optimization?
 
     // Analyze possibility to detail this shader
@@ -60,8 +60,8 @@ void CBlender_Compile::_cpp_Compile(ShaderElement* _SH)
         if (id >= 0)
         {
             if (id >= int(lst.size()))
-                xrDebug::Fatal(DEBUG_INFO, "Not enought textures for shader. Base texture: '%s'.", *lst[0]);
-            base = *lst[id];
+                xrDebug::Fatal(DEBUG_INFO, "Not enough textures for shader. Base texture: '%s'.", lst[0].c_str());
+            base = lst[id].c_str();
         }
         if (!RImplementation.Resources->m_textures_description.GetDetailTexture(base, detail_texture, detail_scaler))
             bDetail = false;
@@ -79,8 +79,8 @@ void CBlender_Compile::_cpp_Compile(ShaderElement* _SH)
             if (id >= 0)
             {
                 if (id >= int(lst.size()))
-                    xrDebug::Fatal(DEBUG_INFO, "Not enought textures for shader. Base texture: '%s'.", *lst[0]);
-                base = *lst[id];
+                    xrDebug::Fatal(DEBUG_INFO, "Not enough textures for shader. Base texture: '%s'.", lst[0].c_str());
+                base = lst[id].c_str();
             }
         }
         //	Igor
@@ -316,8 +316,8 @@ void CBlender_Compile::Stage_Texture(LPCSTR name, u32, u32 fmin, u32 fmip, u32 f
     if (id >= 0)
     {
         if (id >= int(lst.size()))
-            xrDebug::Fatal(DEBUG_INFO, "Not enought textures for shader. Base texture: '%s'.", *lst[0]);
-        N = *lst[id];
+            xrDebug::Fatal(DEBUG_INFO, "Not enough textures for shader. Base texture: '%s'.", lst[0].c_str());
+        N = lst[id].c_str();
     }
     passTextures.push_back(std::make_pair(Stage(), ref_texture(RImplementation.Resources->_CreateTexture(N))));
     //	i_Address				(Stage(),address);
@@ -328,7 +328,7 @@ void CBlender_Compile::Stage_Matrix(LPCSTR name, int iChannel)
 {
     sh_list& lst = L_matrices;
     int id = ParseName(name);
-    CMatrix* M = RImplementation.Resources->_CreateMatrix((id >= 0) ? *lst[id] : name);
+    CMatrix* M = RImplementation.Resources->_CreateMatrix((id >= 0) ? lst[id].c_str() : name);
     passMatrices.push_back(M);
 
     // Setup transform pipeline
@@ -354,5 +354,5 @@ void CBlender_Compile::Stage_Constant(LPCSTR name)
 {
     sh_list& lst = L_constants;
     int id = ParseName(name);
-    passConstants.push_back(RImplementation.Resources->_CreateConstant((id >= 0) ? *lst[id] : name));
+    passConstants.push_back(RImplementation.Resources->_CreateConstant((id >= 0) ? lst[id].c_str() : name));
 }

@@ -99,7 +99,7 @@ public:
     ~CPEDef();
 
     void SetName(LPCSTR name);
-    LPCSTR Name() const { return *m_Name; }
+    LPCSTR Name() const { return m_Name.c_str(); }
     void CreateShader();
     void DestroyShader();
 

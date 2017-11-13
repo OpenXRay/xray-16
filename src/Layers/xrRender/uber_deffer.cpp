@@ -7,7 +7,7 @@ void uber_deffer(CBlender_Compile& C, bool hq, LPCSTR _vspec, LPCSTR _pspec, BOO
 {
     // Uber-parse
     string256 fname, fnameA, fnameB;
-    xr_strcpy(fname, *C.L_textures[0]); //. andy if (strext(fname)) *strext(fname)=0;
+    xr_strcpy(fname, C.L_textures[0].c_str()); //. andy if (strext(fname)) *strext(fname)=0;
     fix_texture_name(fname);
     ref_texture _t;
     _t.create(fname);
@@ -238,7 +238,7 @@ void uber_shadow(CBlender_Compile& C, LPCSTR _vspec)
 {
     // Uber-parse
     string256 fname, fnameA, fnameB;
-    xr_strcpy(fname, *C.L_textures[0]); //. andy if (strext(fname)) *strext(fname)=0;
+    xr_strcpy(fname, C.L_textures[0].c_str()); //. andy if (strext(fname)) *strext(fname)=0;
     fix_texture_name(fname);
     ref_texture _t;
     _t.create(fname);

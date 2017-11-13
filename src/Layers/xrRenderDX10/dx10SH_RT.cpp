@@ -208,7 +208,7 @@ void CRT::destroy()
 #endif
 }
 void CRT::reset_begin() { destroy(); }
-void CRT::reset_end() { create(*cName, dwWidth, dwHeight, fmt); }
+void CRT::reset_end() { create(cName.c_str(), dwWidth, dwHeight, fmt); }
 #ifdef USE_DX11
 void resptrcode_crt::create(LPCSTR Name, u32 w, u32 h, D3DFORMAT f, u32 SampleCount, bool useUAV)
 {

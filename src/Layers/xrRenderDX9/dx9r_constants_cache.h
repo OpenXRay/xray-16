@@ -69,7 +69,7 @@ public:
             break;
         default:
 #ifdef DEBUG
-            xrDebug::Fatal(DEBUG_INFO, "Invalid constant run-time-type for '%s'", *C->name);
+            xrDebug::Fatal(DEBUG_INFO, "Invalid constant run-time-type for '%s'", C->name.c_str());
 #else
             NODEFAULT;
 #endif
@@ -117,7 +117,7 @@ public:
             break;
         default:
 #ifdef DEBUG
-            xrDebug::Fatal(DEBUG_INFO, "Invalid constant run-time-type for '%s'", *C->name);
+            xrDebug::Fatal(DEBUG_INFO, "Invalid constant run-time-type for '%s'", C->name.c_str());
 #else
             NODEFAULT;
 #endif

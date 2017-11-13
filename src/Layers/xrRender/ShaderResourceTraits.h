@@ -143,7 +143,7 @@ inline void CResourceManager::DestroyShader(const T* sh)
     if (0 == (sh->dwFlags & xr_resource_flagged::RF_REGISTERED))
         return;
 
-    LPSTR N = LPSTR(*sh->cName);
+    LPSTR N = LPSTR(sh->cName.c_str());
     typename ShaderTypeTraits<T>::MapType::iterator I = sh_map.find(N);
 
     if (I != sh_map.end())
@@ -151,7 +151,7 @@ inline void CResourceManager::DestroyShader(const T* sh)
         sh_map.erase(I);
         return;
     }
-    Msg("! ERROR: Failed to find compiled geometry shader '%s'", *sh->cName);
+    Msg("! ERROR: Failed to find compiled geometry shader '%s'", sh->cName.c_str());
 }
 
 #endif

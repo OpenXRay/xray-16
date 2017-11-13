@@ -413,8 +413,8 @@ ShaderElement* CBlender_Compile::_lua_Compile(LPCSTR namesp, LPCSTR name)
     RS.Invalidate();
 
     // Compile
-    LPCSTR t_0 = *L_textures[0] ? *L_textures[0] : "null";
-    LPCSTR t_1 = (L_textures.size() > 1) ? *L_textures[1] : "null";
+    LPCSTR t_0 = L_textures[0].c_str() ? L_textures[0].c_str() : "null";
+    LPCSTR t_1 = (L_textures.size() > 1) ? L_textures[1].c_str() : "null";
     LPCSTR t_d = detail_texture ? detail_texture : "null";
     object shader = RImplementation.Resources->ScriptEngine.name_space(namesp);
     functor<void> element = shader[name];

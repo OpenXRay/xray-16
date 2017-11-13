@@ -24,13 +24,13 @@ Lock UCalc_Mutex
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-bool pred_N(const std::pair<shared_str, u32>& N, LPCSTR B) { return xr_strcmp(*N.first, B) < 0; }
+bool pred_N(const std::pair<shared_str, u32>& N, LPCSTR B) { return xr_strcmp(N.first.c_str(), B) < 0; }
 u16 CKinematics::LL_BoneID(LPCSTR B)
 {
     accel::iterator I = std::lower_bound(bone_map_N->begin(), bone_map_N->end(), B, pred_N);
     if (I == bone_map_N->end())
         return BI_NONE;
-    if (0 != xr_strcmp(*(I->first), B))
+    if (0 != xr_strcmp(I->first.c_str(), B))
         return BI_NONE;
     return u16(I->second);
 }
@@ -51,7 +51,7 @@ LPCSTR CKinematics::LL_BoneName_dbg(u16 ID)
     CKinematics::accel::iterator _I, _E = bone_map_N->end();
     for (_I = bone_map_N->begin(); _I != _E; ++_I)
         if (_I->second == ID)
-            return *_I->first;
+            return _I->first.c_str();
     return nullptr;
 }
 
@@ -395,7 +395,7 @@ void CKinematics::LL_Validate()
                     BD.IK_data.ik_flags.set(SJointIKData::flBreakable, FALSE);
             }
 #ifdef DEBUG
-            Msg("! ERROR: Invalid breakable object: '%s'", *dbg_name);
+            Msg("! ERROR: Invalid breakable object: '%s'", dbg_name.c_str());
 #endif
         }
     }

@@ -74,7 +74,7 @@ void CBlender_default_aref::Compile(CBlender_Compile& C)
     else
     {
         if (C.L_textures.size() < 2)
-            xrDebug::Fatal(DEBUG_INFO, "Not enought textures for shader, base tex: %s", *C.L_textures[0]);
+            xrDebug::Fatal(DEBUG_INFO, "Not enough textures for shader, base tex: %s", C.L_textures[0].c_str());
         switch (C.iElement)
         {
         case SE_R1_NORMAL_HQ:
@@ -90,7 +90,7 @@ void CBlender_default_aref::Compile(CBlender_Compile& C)
             C.r_Sampler("s_base", C.L_textures[0]);
             C.r_Sampler("s_lmap", C.L_textures[1]);
             C.r_Sampler("s_detail", C.detail_texture);
-            C.r_Sampler_clf("s_hemi", *C.L_textures[2]);
+            C.r_Sampler_clf("s_hemi", C.L_textures[2].c_str());
             C.r_End();
         }
         break;
@@ -104,7 +104,7 @@ void CBlender_default_aref::Compile(CBlender_Compile& C)
                 C.r_Pass(sname, sname, TRUE, TRUE, TRUE, TRUE, D3DBLEND_ONE, D3DBLEND_ZERO, TRUE, oAREF.value);
             C.r_Sampler("s_base", C.L_textures[0]);
             C.r_Sampler("s_lmap", C.L_textures[1]);
-            C.r_Sampler_clf("s_hemi", *C.L_textures[2]);
+            C.r_Sampler_clf("s_hemi", C.L_textures[2].c_str());
             C.r_End();
         }
         break;
@@ -135,7 +135,7 @@ void CBlender_default_aref::Compile(CBlender_Compile& C)
             C.r_Pass("lmap_l", "lmap_l", FALSE);
             C.r_Sampler("s_base", C.L_textures[0]);
             C.r_Sampler("s_lmap", C.L_textures[1]);
-            C.r_Sampler_clf("s_hemi", *C.L_textures[2]);
+            C.r_Sampler_clf("s_hemi", C.L_textures[2].c_str());
             C.r_End();
             break;
         }

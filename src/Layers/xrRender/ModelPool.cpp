@@ -202,7 +202,7 @@ dxRender_Visual* CModelPool::Instance_Find(LPCSTR N)
     xr_vector<ModelDef>::iterator I;
     for (I = Models.begin(); I != Models.end(); I++)
     {
-        if (I->name[0] && (0 == xr_strcmp(*I->name, N)))
+        if (I->name[0] && (0 == xr_strcmp(I->name.c_str(), N)))
         {
             Model = I->model;
             break;
@@ -354,7 +354,7 @@ void CModelPool::Discard(dxRender_Visual*& V, BOOL b_complete)
         {
             if (I->name == name)
             {
-                if (b_complete || strchr(*name, '#'))
+                if (b_complete || strchr(name.c_str(), '#'))
                 {
                     VERIFY(I->refs > 0);
                     I->refs--;
