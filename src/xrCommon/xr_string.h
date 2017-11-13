@@ -3,7 +3,7 @@
 #include "xalloc.h"
 
 // string(char)
-typedef std::basic_string<char, std::char_traits<char>, xalloc<char>> xr_string;
+using xr_string = std::basic_string<char, std::char_traits<char>, xalloc<char>>;
 
 inline void xr_strlwr(xr_string& src)
 {
