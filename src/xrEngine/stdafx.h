@@ -18,7 +18,6 @@
 #endif // #ifdef INGAME_EDITOR
 
 #include "xrCore/xrCore.h"
-#include "Include/xrAPI/xrAPI.h"
 
 #define ECORE_API
 

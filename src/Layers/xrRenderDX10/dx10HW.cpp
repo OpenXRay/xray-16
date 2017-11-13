@@ -2,7 +2,6 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#pragma hdrstop
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
@@ -11,10 +10,9 @@
 
 #include "Layers/xrRender/HW.h"
 #include "xrEngine/XR_IOConsole.h"
-#include "Include/xrAPI/xrAPI.h"
 
-#include "StateManager\dx10SamplerStateCache.h"
-#include "StateManager\dx10StateCache.h"
+#include "StateManager/dx10SamplerStateCache.h"
+#include "StateManager/dx10StateCache.h"
 
 #ifndef _EDITOR
 void fill_vid_mode_list(CHW* _hw);
@@ -31,7 +29,7 @@ void free_render_mode_list() {}
 
 CHW HW;
 
-//  DX10: Don't neeed this?
+//  DX10: Don't need this?
 /*
 #ifdef DEBUG
 IDirect3DStateBlock9*   dwDebugSB = 0;

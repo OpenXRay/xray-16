@@ -1,9 +1,6 @@
-#ifndef FactoryPtr_included
-#define FactoryPtr_included
 #pragma once
 
 #include "RenderFactory.h"
-#include "Include/xrAPI/xrAPI.h"
 
 #define FACTORY_PTR_INSTANCIATE(Class)\
     template <>\
@@ -83,5 +80,3 @@ void FactoryPtr<IStatsRender>::DestroyObject(void)
     m_pObject = NULL;
 }
 */
-
-#endif // FactoryPtr_included

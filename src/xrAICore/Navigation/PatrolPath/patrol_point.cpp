@@ -15,7 +15,6 @@
 #include "Common/object_broker.h"
 #include "xrScriptEngine/DebugMacros.hpp"
 #include "AISpaceBase.hpp"
-#include "Include/xrAPI/xrAPI.h"
 #ifdef DEBUG
 #include "Navigation/PatrolPath/patrol_path.h"
 #endif

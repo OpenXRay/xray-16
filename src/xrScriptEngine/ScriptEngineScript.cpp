@@ -11,7 +11,6 @@
 #include "script_engine.hpp"
 #include "script_debugger.hpp"
 #include "DebugMacros.hpp"
-#include "Include/xrAPI/xrAPI.h"
 #include "ScriptExporter.hpp"
 
 void LuaLog(pcstr caMessage)

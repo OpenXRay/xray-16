@@ -11,7 +11,6 @@
 #include "script_process.hpp"
 #include "script_thread.hpp"
 #include "xrCore/doug_lea_allocator.h"
-#include "Include/xrAPI/xrAPI.h"
 #include "ScriptExporter.hpp"
 #include "BindingsDumper.hpp"
 #ifdef USE_DEBUGGER

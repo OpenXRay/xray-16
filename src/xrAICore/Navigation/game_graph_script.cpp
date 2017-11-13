@@ -10,7 +10,6 @@
 #include "game_graph.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 #include "xrScriptEngine/DebugMacros.hpp" // for THROW // XXX: move debug macros to xrCore
-#include "Include/xrAPI/xrAPI.h"
 #include "AISpaceBase.hpp"
 
 using namespace luabind;

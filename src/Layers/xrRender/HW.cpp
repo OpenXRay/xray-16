@@ -85,8 +85,6 @@ void CHW::Reset(HWND hwnd)
 #endif
 }
 
-#include "Include/xrAPI/xrAPI.h"
-
 void CHW::CreateD3D()
 {
     const pcstr _name = GEnv.isDedicatedServer ? "xrD3D9-Null" : "d3d9.dll";

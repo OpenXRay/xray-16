@@ -12,7 +12,6 @@
 #include "xrScriptEngine/script_engine.hpp"
 #include "xrScriptEngine/DebugMacros.hpp" // for THROW3 // XXX: move debug macros to xrCore
 #include "AISpaceBase.hpp"
-#include "Include/xrAPI/xrAPI.h"
 
 CPatrolPathParams::CPatrolPathParams(LPCSTR caPatrolPathToGo, EPatrolStartType tPatrolPathStart,
     EPatrolRouteType tPatrolPathStop, bool bRandom, u32 index)

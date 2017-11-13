@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "Common/Platform.hpp"
@@ -20,7 +19,6 @@
 
 #include "xrPhysics.h"
 
-#include "Include/xrAPI/xrapi.h"
 #ifdef DEBUG
 #include "d3d9types.h"
 #endif

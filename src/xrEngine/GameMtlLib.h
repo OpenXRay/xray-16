@@ -337,5 +337,3 @@ public:
 };
 
 extern MTL_EXPORT_API CGameMtlLibrary GMLib;
-
-#include "Include/xrAPI/xrAPI.h"
