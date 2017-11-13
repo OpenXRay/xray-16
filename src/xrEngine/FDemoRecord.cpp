@@ -211,9 +211,9 @@ void CDemoRecord::MakeLevelMapProcess()
 
         string_path tmp;
         if (m_iLMScreenshotFragment == -1)
-            xr_sprintf(tmp, sizeof(tmp), "map_%s", *g_pGameLevel->name());
+            xr_sprintf(tmp, sizeof(tmp), "map_%s", g_pGameLevel->name().c_str());
         else
-            xr_sprintf(tmp, sizeof(tmp), "map_%s#%d", *g_pGameLevel->name(), m_iLMScreenshotFragment);
+            xr_sprintf(tmp, sizeof(tmp), "map_%s#%d", g_pGameLevel->name().c_str(), m_iLMScreenshotFragment);
 
         if (m_iLMScreenshotFragment != -1)
         {

@@ -106,7 +106,7 @@ public:
     bool net_isCompleted_Sync() const { return net_Syncronised; }
     bool net_isDisconnected() const;
     GameDescriptionData const& get_net_DescriptionData() const { return m_game_description; }
-    pcstr net_SessionName() { return *net_Hosts.front().dpSessionName; }
+    pcstr net_SessionName() { return net_Hosts.front().dpSessionName.c_str(); }
     // receive
     void StartProcessQueue() { net_Queue.Lock(); } // WARNING ! after Start must be End !!! <-
     virtual NET_Packet* net_msg_Retreive() { return net_Queue.Retreive(); } //							|

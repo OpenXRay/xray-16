@@ -667,7 +667,7 @@ bool IPureClient::Connect(pcstr options)
                     net_csEnumeration.Enter();
                     // real connect
                     for (u32 I = 0; I < net_Hosts.size(); I++)
-                        Msg("* HOST #%d: %s\n", I + 1, *net_Hosts[I].dpSessionName);
+                        Msg("* HOST #%d: %s\n", I + 1, net_Hosts[I].dpSessionName.c_str());
 
                     R_CHK(net_Hosts.front().pHostAddress->Duplicate(&pHostAddress));
                     // dump_URL		("! c2s ",	pHostAddress);

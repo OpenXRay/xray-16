@@ -184,14 +184,14 @@ void SoundEnvironment_LIB::Unload()
 int SoundEnvironment_LIB::GetID(pcstr name)
 {
     for (auto it = library.begin(); it != library.end(); ++it)
-        if (0 == _stricmp(name, *(*it)->name))
+        if (0 == _stricmp(name, (*it)->name.c_str()))
             return int(it - library.begin());
     return -1;
 }
 CSoundRender_Environment* SoundEnvironment_LIB::Get(pcstr name)
 {
     for (const auto& it : library)
-        if (0 == _stricmp(name, *it->name))
+        if (0 == _stricmp(name, it->name.c_str()))
             return it;
     return nullptr;
 }
@@ -204,7 +204,7 @@ CSoundRender_Environment* SoundEnvironment_LIB::Append(CSoundRender_Environment*
 void SoundEnvironment_LIB::Remove(pcstr name)
 {
     for (auto it = library.begin(); it != library.end(); ++it)
-        if (0 == _stricmp(name, *(*it)->name))
+        if (0 == _stricmp(name, (*it)->name.c_str()))
         {
             xr_delete(*it);
             library.erase(it);

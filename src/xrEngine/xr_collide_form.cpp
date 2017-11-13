@@ -98,7 +98,7 @@ CCF_Skeleton::CCF_Skeleton(IGameObject* O) : ICollisionForm(O, cftObject)
     IRenderVisual* pVisual = O->Visual();
     // IKinematics* K = PKinematics(pVisual); VERIFY3(K,"Can't create skeleton without Kinematics.",*O->cNameVisual());
     IKinematics* K = PKinematics(pVisual);
-    VERIFY3(K, "Can't create skeleton without Kinematics.", *O->cNameVisual());
+    VERIFY3(K, "Can't create skeleton without Kinematics.", O->cNameVisual().c_str());
     // bv_box.set (K->vis.box);
     bv_box.set(pVisual->getVisData().box);
     bv_box.getsphere(bv_sphere.P, bv_sphere.R);
