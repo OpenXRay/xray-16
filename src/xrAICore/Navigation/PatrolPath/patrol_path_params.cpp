@@ -41,7 +41,7 @@ const Fvector& CPatrolPathParams::point(u32 index) const
     if (!m_path->vertex(index))
     {
         GEnv.ScriptEngine->script_log(LuaMessageType::Error,
-            "Can't get information about patrol point number %d in the patrol way %s", index, *m_path_name);
+            "Can't get information about patrol point number %d in the patrol way %s", index, m_path_name.c_str());
         index = (*m_path->vertices().begin()).second->vertex_id();
     }
     VERIFY(m_path->vertex(index));
@@ -83,7 +83,7 @@ Flags32 CPatrolPathParams::flags(u32 index) const
 LPCSTR CPatrolPathParams::name(u32 index) const
 {
     VERIFY(m_path->vertex(index));
-    return (*m_path->vertex(index)->data().name());
+    return (m_path->vertex(index)->data().name().c_str());
 }
 
 bool CPatrolPathParams::terminal(u32 index) const

@@ -32,7 +32,7 @@ void CPatrolPathStorage::load_raw(
         shared_str patrol_name;
         sub_chunk->r_stringZ(patrol_name);
         const_iterator I = m_registry.find(patrol_name);
-        VERIFY3(I == m_registry.end(), "Duplicated patrol path found", *patrol_name);
+        VERIFY3(I == m_registry.end(), "Duplicated patrol path found", patrol_name.c_str());
         m_registry.insert(std::make_pair(
             patrol_name, &(new CPatrolPath(patrol_name))->load_raw(level_graph, cross, game_graph, *sub_chunk)));
     }
@@ -70,7 +70,7 @@ void CPatrolPathStorage::load(IReader& stream)
         chunk1->close();
 
         const_iterator I = m_registry.find(pair.first);
-        VERIFY3(I == m_registry.end(), "Duplicated patrol path found ", *pair.first);
+        VERIFY3(I == m_registry.end(), "Duplicated patrol path found ", pair.first.c_str());
 
 #ifdef DEBUG
         pair.second->name(pair.first);

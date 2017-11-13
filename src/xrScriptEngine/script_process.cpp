@@ -19,11 +19,11 @@ CScriptProcess::CScriptProcess(CScriptEngine* scriptEngine, shared_str name, sha
     this->scriptEngine = scriptEngine;
     m_name = name;
 #ifdef DEBUG
-    Msg("* Initializing %s script process", *m_name);
+    Msg("* Initializing %s script process", m_name.c_str());
 #endif
     string256 I;
-    for (u32 i = 0, n = _GetItemCount(*scripts); i < n; i++)
-        add_script(_GetItem(*scripts, i, I), false, false);
+    for (u32 i = 0, n = _GetItemCount(scripts.c_str()); i < n; i++)
+        add_script(_GetItem(scripts.c_str(), i, I), false, false);
     m_iterator = 0;
 }
 
