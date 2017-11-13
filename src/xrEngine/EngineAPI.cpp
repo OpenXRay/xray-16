@@ -199,7 +199,7 @@ void CEngineAPI::CreateRendererList()
     bool bSupports_r3 = false;
     bool bSupports_r4 = false;
 
-    hRender = std::make_unique<XRay::Module>();
+    hRender = std::make_unique<XRay::Module>(true);
 
     if (strstr(Core.Params, "-perfhud_hack"))
     {

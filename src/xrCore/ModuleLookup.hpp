@@ -5,13 +5,14 @@ namespace XRay
 class XRCORE_API Module
 {
     void* handle;
+    bool dontUnload;
 
 public:
-    Module();
-    Module(pcstr moduleName, bool log = true);
+    Module(const bool dontUnload = false);
+    Module(pcstr moduleName, bool dontUnload = false);
     ~Module();
 
-    void* open(pcstr moduleName, bool log = true);
+    void* open(pcstr moduleName);
     void close();
 
     bool exist() const;

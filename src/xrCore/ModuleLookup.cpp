@@ -4,11 +4,11 @@
 
 namespace XRay
 {
-Module::Module() : handle(nullptr) {}
+Module::Module(const bool dontUnload) : handle(nullptr), dontUnload(dontUnload) {}
 
-Module::Module(pcstr moduleName, bool log /*= true*/)
+Module::Module(pcstr moduleName, bool dontUnload /*= false*/) : handle(nullptr)
 {
-    open(moduleName, log);
+    open(moduleName);
 }
 
 Module::~Module()
@@ -16,13 +16,12 @@ Module::~Module()
     close();
 }
 
-void* Module::open(pcstr moduleName, bool log /*= true*/)
+void* Module::open(pcstr moduleName)
 {
     if (exist())
         close();
-
-    if (log)
-        Log("Loading DLL:", moduleName);
+    
+    Log("Loading DLL:", moduleName);
 
     handle = ::LoadLibrary(moduleName);
     return handle;
@@ -30,6 +29,9 @@ void* Module::open(pcstr moduleName, bool log /*= true*/)
 
 void Module::close()
 {
+    if (dontUnload)
+        return;
+
     FreeLibrary(static_cast<HMODULE>(handle));
     handle = nullptr;
 }
