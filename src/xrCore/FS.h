@@ -45,7 +45,7 @@ public:
 
 public:
     IWriter() {}
-    virtual ~IWriter() { R_ASSERT3(chunk_pos.empty(), "Opened chunk not closed.", *fName); }
+    virtual ~IWriter() { R_ASSERT3(chunk_pos.empty(), "Opened chunk not closed.", fName.c_str()); }
     // kernel
     virtual void seek(u32 pos) = 0;
     virtual u32 tell() = 0;
@@ -71,12 +71,12 @@ public:
     IC void w_stringZ(const char* p) { w(p, (u32)xr_strlen(p) + 1); }
     IC void w_stringZ(const shared_str& p)
     {
-        w(*p ? *p : "", p.size());
+        w(p.c_str() ? p.c_str() : "", p.size());
         w_u8(0);
     }
     IC void w_stringZ(shared_str& p)
     {
-        w(*p ? *p : "", p.size());
+        w(p.c_str() ? p.c_str() : "", p.size());
         w_u8(0);
     }
     IC void w_stringZ(const xr_string& p)

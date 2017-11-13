@@ -150,14 +150,14 @@ IC bool operator>(shared_str const& a, shared_str const& b) { return a._get() > 
 // externally visible standard functionality
 IC void swap(shared_str& lhs, shared_str& rhs) { lhs.swap(rhs); }
 IC u32 xr_strlen(const shared_str& a) throw() { return a.size(); }
-IC int xr_strcmp(const shared_str& a, const char* b) throw() { return xr_strcmp(*a, b); }
-IC int xr_strcmp(const char* a, const shared_str& b) throw() { return xr_strcmp(a, *b); }
+IC int xr_strcmp(const shared_str& a, const char* b) throw() { return xr_strcmp(a.c_str(), b); }
+IC int xr_strcmp(const char* a, const shared_str& b) throw() { return xr_strcmp(a, b.c_str()); }
 IC int xr_strcmp(const shared_str& a, const shared_str& b) throw()
 {
     if (a.equal(b))
         return 0;
     else
-        return xr_strcmp(*a, *b);
+        return xr_strcmp(a.c_str(), b.c_str());
 }
 
 // void xr_strlwr(xr_string& src) // in xrCommon/xr_string.h, since it depends on xr_string defined there.

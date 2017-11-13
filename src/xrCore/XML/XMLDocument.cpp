@@ -50,7 +50,7 @@ void XMLDocument::Load(pcstr path_alias, pcstr path, pcstr _xml_filename)
     shared_str fn = correct_file_name(path, _xml_filename);
 
     string_path str;
-    xr_sprintf(str, "%s\\%s", path, *fn);
+    xr_sprintf(str, "%s\\%s", path, fn.c_str());
     return Load(path_alias, str);
 }
 
