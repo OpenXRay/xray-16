@@ -91,9 +91,8 @@ bool SortStringsByAlphabetPred(const shared_str& s1, const shared_str& s2)
     R_ASSERT(s2.size());
 
     return (xr_strcmp(s1, s2) < 0);
-}
+};
 
-#ifdef XRSE_FACTORY_EXPORTS
 struct story_name_predicate
 {
     IC bool operator()(const xr_rtoken& _1, const xr_rtoken& _2) const
@@ -101,10 +100,11 @@ struct story_name_predicate
         VERIFY(_1.name.size());
         VERIFY(_2.name.size());
 
-        return _1.name.compare(_2.name) < 0;
+        return (xr_strcmp(_1.name, _2.name) < 0);
     }
 };
 
+#ifdef XRSE_FACTORY_EXPORTS
 SFillPropData::SFillPropData() { counter = 0; };
 SFillPropData::~SFillPropData() { VERIFY(0 == counter); };
 void SFillPropData::load()
