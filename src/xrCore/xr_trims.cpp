@@ -510,11 +510,11 @@ shared_str _ListToSequence(const RStringVec& lst)
     xr_string out;
     if (lst.size())
     {
-        out = lst.front().c_str();
+        out = *lst.front();
         for (RStringVec::const_iterator s_it = lst.begin() + 1; s_it != lst.end(); s_it++)
         {
             out += ",";
-            out += (*s_it).c_str();
+            out += **s_it;
         }
     }
     return shared_str(out.c_str());

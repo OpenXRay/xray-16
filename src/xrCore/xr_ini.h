@@ -85,45 +85,45 @@ public:
     Root& sections() { return DATA; }
     Root const& sections() const { return DATA; }
     CLASS_ID r_clsid(pcstr S, pcstr L) const;
-    CLASS_ID r_clsid(const shared_str& S, pcstr L) const { return r_clsid(S.c_str(), L); }
+    CLASS_ID r_clsid(const shared_str& S, pcstr L) const { return r_clsid(*S, L); }
     pcstr r_string(pcstr S, pcstr L) const; // Left quotes in place
-    pcstr r_string(const shared_str& S, pcstr L) const { return r_string(S.c_str(), L); } // Left quotes in place
+    pcstr r_string(const shared_str& S, pcstr L) const { return r_string(*S, L); } // Left quotes in place
     shared_str r_string_wb(pcstr S, pcstr L) const; // Remove quotes
-    shared_str r_string_wb(const shared_str& S, pcstr L) const { return r_string_wb(S.c_str(), L); } // Remove quotes
+    shared_str r_string_wb(const shared_str& S, pcstr L) const { return r_string_wb(*S, L); } // Remove quotes
     u8 r_u8(pcstr S, pcstr L) const;
-    u8 r_u8(const shared_str& S, pcstr L) const { return r_u8(S.c_str(), L); }
+    u8 r_u8(const shared_str& S, pcstr L) const { return r_u8(*S, L); }
     u16 r_u16(pcstr S, pcstr L) const;
-    u16 r_u16(const shared_str& S, pcstr L) const { return r_u16(S.c_str(), L); }
+    u16 r_u16(const shared_str& S, pcstr L) const { return r_u16(*S, L); }
     u32 r_u32(pcstr S, pcstr L) const;
-    u32 r_u32(const shared_str& S, pcstr L) const { return r_u32(S.c_str(), L); }
+    u32 r_u32(const shared_str& S, pcstr L) const { return r_u32(*S, L); }
     u64 r_u64(pcstr S, pcstr L) const;
     s8 r_s8(pcstr S, pcstr L) const;
-    s8 r_s8(const shared_str& S, pcstr L) const { return r_s8(S.c_str(), L); }
+    s8 r_s8(const shared_str& S, pcstr L) const { return r_s8(*S, L); }
     s16 r_s16(pcstr S, pcstr L) const;
-    s16 r_s16(const shared_str& S, pcstr L) const { return r_s16(S.c_str(), L); }
+    s16 r_s16(const shared_str& S, pcstr L) const { return r_s16(*S, L); }
     s32 r_s32(pcstr S, pcstr L) const;
-    s32 r_s32(const shared_str& S, pcstr L) const { return r_s32(S.c_str(), L); }
+    s32 r_s32(const shared_str& S, pcstr L) const { return r_s32(*S, L); }
     s64 r_s64(pcstr S, pcstr L) const;
     float r_float(pcstr S, pcstr L) const;
-    float r_float(const shared_str& S, pcstr L) const { return r_float(S.c_str(), L); }
+    float r_float(const shared_str& S, pcstr L) const { return r_float(*S, L); }
     Fcolor r_fcolor(pcstr S, pcstr L) const;
-    Fcolor r_fcolor(const shared_str& S, pcstr L) const { return r_fcolor(S.c_str(), L); }
+    Fcolor r_fcolor(const shared_str& S, pcstr L) const { return r_fcolor(*S, L); }
     u32 r_color(pcstr S, pcstr L) const;
-    u32 r_color(const shared_str& S, pcstr L) const { return r_color(S.c_str(), L); }
+    u32 r_color(const shared_str& S, pcstr L) const { return r_color(*S, L); }
     Ivector2 r_ivector2(pcstr S, pcstr L) const;
-    Ivector2 r_ivector2(const shared_str& S, pcstr L) const { return r_ivector2(S.c_str(), L); }
+    Ivector2 r_ivector2(const shared_str& S, pcstr L) const { return r_ivector2(*S, L); }
     Ivector3 r_ivector3(pcstr S, pcstr L) const;
-    Ivector3 r_ivector3(const shared_str& S, pcstr L) const { return r_ivector3(S.c_str(), L); }
+    Ivector3 r_ivector3(const shared_str& S, pcstr L) const { return r_ivector3(*S, L); }
     Ivector4 r_ivector4(pcstr S, pcstr L) const;
-    Ivector4 r_ivector4(const shared_str& S, pcstr L) const { return r_ivector4(S.c_str(), L); }
+    Ivector4 r_ivector4(const shared_str& S, pcstr L) const { return r_ivector4(*S, L); }
     Fvector2 r_fvector2(pcstr S, pcstr L) const;
-    Fvector2 r_fvector2(const shared_str& S, pcstr L) const { return r_fvector2(S.c_str(), L); }
+    Fvector2 r_fvector2(const shared_str& S, pcstr L) const { return r_fvector2(*S, L); }
     Fvector3 r_fvector3(pcstr S, pcstr L) const;
-    Fvector3 r_fvector3(const shared_str& S, pcstr L) const { return r_fvector3(S.c_str(), L); }
+    Fvector3 r_fvector3(const shared_str& S, pcstr L) const { return r_fvector3(*S, L); }
     Fvector4 r_fvector4(pcstr S, pcstr L) const;
-    Fvector4 r_fvector4(const shared_str& S, pcstr L) const { return r_fvector4(S.c_str(), L); }
+    Fvector4 r_fvector4(const shared_str& S, pcstr L) const { return r_fvector4(*S, L); }
     bool r_bool(pcstr S, pcstr L) const;
-    bool r_bool(const shared_str& S, pcstr L) const { return r_bool(S.c_str(), L); }
+    bool r_bool(const shared_str& S, pcstr L) const { return r_bool(*S, L); }
     int r_token(pcstr S, pcstr L, const xr_token* token_list) const;
     bool r_line(pcstr S, int L, pcstr* N, pcstr* V) const;
     bool r_line(const shared_str& S, int L, pcstr* N, pcstr* V) const;

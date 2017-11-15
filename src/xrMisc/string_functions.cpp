@@ -4,9 +4,9 @@
 
 void xr_strlwr(shared_str& src)
 {
-    if (src.c_str())
+    if (*src)
     {
-        char* lp = xr_strdup(src.c_str());
+        char* lp = xr_strdup(*src);
         xr_strlwr(lp);
         src = lp;
         xr_free(lp);

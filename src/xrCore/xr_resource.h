@@ -38,7 +38,7 @@ public:
     const char* set_name(const char* name)
     {
         cName = name;
-        return cName.c_str();
+        return *cName;
     }
     xr_resource_named() : cName(0) {}
     ~xr_resource_named() {}

@@ -22,21 +22,21 @@ public:
     {
         R_ASSERT(name && name[0]);
         fName = name;
-        VerifyPath(fName.c_str());
+        VerifyPath(*fName);
         if (exclusive)
         {
-            int handle = _sopen(fName.c_str(), _O_WRONLY | _O_TRUNC | _O_CREAT | _O_BINARY, SH_DENYWR);
+            int handle = _sopen(*fName, _O_WRONLY | _O_TRUNC | _O_CREAT | _O_BINARY, SH_DENYWR);
 #ifdef _EDITOR
             if (handle == -1)
-                Msg("!Can't create file: '%s'. Error: '%s'.", fName.c_str(), _sys_errlist[errno]);
+                Msg("!Can't create file: '%s'. Error: '%s'.", *fName, _sys_errlist[errno]);
 #endif
             hf = _fdopen(handle, "wb");
         }
         else
         {
-            hf = fopen(fName.c_str(), "wb");
+            hf = fopen(*fName, "wb");
             if (hf == 0)
-                Msg("!Can't write file: '%s'. Error: '%s'.", fName.c_str(), _sys_errlist[errno]);
+                Msg("!Can't write file: '%s'. Error: '%s'.", *fName, _sys_errlist[errno]);
         }
     }
 
@@ -46,11 +46,11 @@ public:
         {
             fclose(hf);
             // release RO attrib
-            DWORD dwAttr = GetFileAttributes(fName.c_str());
+            DWORD dwAttr = GetFileAttributes(*fName);
             if ((dwAttr != u32(-1)) && (dwAttr & FILE_ATTRIBUTE_READONLY))
             {
                 dwAttr &= ~FILE_ATTRIBUTE_READONLY;
-                SetFileAttributes(fName.c_str(), dwAttr);
+                SetFileAttributes(*fName, dwAttr);
             }
         }
     }

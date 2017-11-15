@@ -31,7 +31,7 @@ void FlushLog()
         {
             for (u32 it = 0; it < LogFile->size(); it++)
             {
-                pcstr s = (*LogFile)[it].c_str();
+                LPCSTR s = *((*LogFile)[it]);
                 f->w_string(s ? s : "");
             }
             FS.w_close(f);

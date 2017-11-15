@@ -381,7 +381,7 @@ void CLocatorAPI::archive::open()
     if (hSrcFile && hSrcMap)
         return;
 
-    hSrcFile = CreateFile(path.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
+    hSrcFile = CreateFile(*path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
     R_ASSERT(hSrcFile != INVALID_HANDLE_VALUE);
     hSrcMap = CreateFileMapping(hSrcFile, nullptr, PAGE_READONLY, 0, 0, nullptr);
     R_ASSERT(hSrcMap != INVALID_HANDLE_VALUE);
@@ -1137,7 +1137,7 @@ void CLocatorAPI::file_from_archive(IReader*& R, pcstr fname, const file& desc)
     VERIFY3(ptr, "cannot create file mapping on file", fname);
 
     string512 temp;
-    xr_sprintf(temp, sizeof temp, "%s:%s", A.path.c_str(), fname);
+    xr_sprintf(temp, sizeof temp, "%s:%s", *A.path, fname);
 
 #ifdef FS_DEBUG
     register_file_mapping(ptr, sz, temp);
@@ -1371,7 +1371,7 @@ void CLocatorAPI::w_close(IWriter*& S)
     {
         R_ASSERT(S->fName.size());
         string_path fname;
-        xr_strcpy(fname, sizeof fname, S->fName.c_str());
+        xr_strcpy(fname, sizeof fname, *S->fName);
         bool bReg = S->valid();
         xr_delete(S);
 
