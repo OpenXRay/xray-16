@@ -47,7 +47,7 @@ IC void dx10ConstantBuffer::set(R_constant* C, R_constant_load& L, const Fmatrix
         break;
     default:
 #ifdef DEBUG
-        xrDebug::Fatal(DEBUG_INFO, "Invalid constant run-time-type for '%s'", C->name.c_str());
+        xrDebug::Fatal(DEBUG_INFO, "Invalid constant run-time-type for '%s'", *C->name);
 #else
         NODEFAULT;
 #endif
@@ -147,7 +147,7 @@ IC void dx10ConstantBuffer::seta(R_constant* C, R_constant_load& L, u32 e, const
         break;
     default:
 #ifdef DEBUG
-        xrDebug::Fatal(DEBUG_INFO, "Invalid constant run-time-type for '%s'", C->name.c_str());
+        xrDebug::Fatal(DEBUG_INFO, "Invalid constant run-time-type for '%s'", *C->name);
 #else
         NODEFAULT;
 #endif

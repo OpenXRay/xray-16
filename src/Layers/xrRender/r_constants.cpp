@@ -19,13 +19,13 @@
 R_constant_table::~R_constant_table() { RImplementation.Resources->_DeleteConstantTable(this); }
 void R_constant_table::fatal(LPCSTR S) { FATAL(S); }
 // predicates
-IC bool p_search(ref_constant C, LPCSTR S) { return xr_strcmp(C->name.c_str(), S) < 0; }
+IC bool p_search(ref_constant C, LPCSTR S) { return xr_strcmp(*C->name, S) < 0; }
 IC bool p_sort(ref_constant C1, ref_constant C2) { return xr_strcmp(C1->name, C2->name) < 0; }
 ref_constant R_constant_table::get(LPCSTR S)
 {
     // assumption - sorted by name
     c_table::iterator I = std::lower_bound(table.begin(), table.end(), S, p_search);
-    if (I == table.end() || (0 != xr_strcmp((*I)->name.c_str(), S)))
+    if (I == table.end() || (0 != xr_strcmp(*(*I)->name, S)))
         return nullptr;
     else
         return *I;
@@ -185,7 +185,7 @@ void R_constant_table::merge(R_constant_table* T)
     for (u32 it = 0; it < T->table.size(); it++)
     {
         ref_constant src = T->table[it];
-        ref_constant C = get(src->name.c_str());
+        ref_constant C = get(*src->name);
         if (!C)
         {
             C = new R_constant(); //.g_constant_allocator.create();

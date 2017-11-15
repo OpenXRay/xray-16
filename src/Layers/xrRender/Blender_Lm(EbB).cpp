@@ -87,7 +87,7 @@ void CBlender_LmEbB::Compile(CBlender_Compile& C)
     else
     {
         if (C.L_textures.size() < 2)
-            xrDebug::Fatal(DEBUG_INFO, "Not enough textures for shader, base tex: %s", C.L_textures[0].c_str());
+            xrDebug::Fatal(DEBUG_INFO, "Not enought textures for shader, base tex: %s", *C.L_textures[0]);
         switch (C.iElement)
         {
         case SE_R1_NORMAL_HQ:
@@ -113,7 +113,7 @@ void CBlender_LmEbB::Compile(CBlender_Compile& C)
                 C.r_Pass("lmapE", "lmapE", TRUE);
             C.r_Sampler("s_base", C.L_textures[0]);
             C.r_Sampler("s_lmap", C.L_textures[1]);
-            C.r_Sampler_clf("s_hemi", C.L_textures[2].c_str());
+            C.r_Sampler_clf("s_hemi", *C.L_textures[2]);
             C.r_Sampler("s_env", oT2_Name, false, D3DTADDRESS_CLAMP);
             C.r_End();
             // }
@@ -137,7 +137,7 @@ void CBlender_LmEbB::Compile(CBlender_Compile& C)
             C.r_Pass("lmap_l", "lmap_l", FALSE);
             C.r_Sampler("s_base", C.L_textures[0]);
             C.r_Sampler("s_lmap", C.L_textures[1]);
-            C.r_Sampler_clf("s_hemi", C.L_textures[2].c_str());
+            C.r_Sampler_clf("s_hemi", *C.L_textures[2]);
             C.r_End();
             break;
         }
@@ -155,7 +155,7 @@ void CBlender_LmEbB::Compile(CBlender_Compile& C)
         C.r_Pass("lmapE", "lmapE", TRUE);
     C.r_Sampler("s_base", C.L_textures[0]);
     C.r_Sampler("s_lmap", C.L_textures[1]);
-    C.r_Sampler_clf("s_hemi", C.L_textures[2].c_str());
+    C.r_Sampler_clf("s_hemi", *C.L_textures[2]);
     C.r_Sampler("s_env", oT2_Name, false, D3DTADDRESS_CLAMP);
     C.r_End();
 }
@@ -176,7 +176,7 @@ void CBlender_LmEbB::Compile(CBlender_Compile& C)
     C.r_dx10Texture("s_lmap", C.L_textures[1]);
     C.r_dx10Sampler("smp_linear");
     // C.r_Sampler_clf		("s_hemi",	*C.L_textures[2]);
-    C.r_dx10Texture("s_hemi", C.L_textures[2].c_str());
+    C.r_dx10Texture("s_hemi", *C.L_textures[2]);
     C.r_dx10Sampler("smp_rtlinear");
     // C.r_Sampler			("s_env",	oT2_Name,false,D3DTADDRESS_CLAMP);
     C.r_dx10Texture("s_env", oT2_Name);

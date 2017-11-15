@@ -158,9 +158,9 @@ void CTexture::Load()
 
     flags.bUser = false;
     flags.MemoryUsage = 0;
-    if (0 == _stricmp(cName.c_str(), "$null"))
+    if (0 == _stricmp(*cName, "$null"))
         return;
-    if (nullptr != strstr(cName.c_str(), "$user$"))
+    if (nullptr != strstr(*cName, "$user$"))
     {
         flags.bUser = true;
         return;
@@ -174,7 +174,7 @@ void CTexture::Load()
     {
         // Check for OGM
         string_path fn;
-        if (FS.exist(fn, "$game_textures$", cName.c_str(), ".ogm"))
+        if (FS.exist(fn, "$game_textures$", *cName, ".ogm"))
         {
             // AVI
             pTheora = new CTheoraSurface();
@@ -209,7 +209,7 @@ void CTexture::Load()
                 }
             }
         }
-        else if (FS.exist(fn, "$game_textures$", cName.c_str(), ".avi"))
+        else if (FS.exist(fn, "$game_textures$", *cName, ".avi"))
         {
             // AVI
             pAVI = new CAviPlayerCustom();
@@ -237,7 +237,7 @@ void CTexture::Load()
                 }
             }
         }
-        else if (FS.exist(fn, "$game_textures$", cName.c_str(), ".seq"))
+        else if (FS.exist(fn, "$game_textures$", *cName, ".seq"))
         {
             // Sequence
             string256 buffer;
@@ -277,7 +277,7 @@ void CTexture::Load()
         {
             // Normal texture
             u32 mem = 0;
-            pSurface = ::RImplementation.texture_load(cName.c_str(), mem);
+            pSurface = ::RImplementation.texture_load(*cName, mem);
 
             // Calc memory usage and preload into vid-mem
             if (pSurface)

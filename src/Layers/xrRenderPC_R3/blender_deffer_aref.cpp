@@ -53,7 +53,7 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
 
                 C.r_dx10Texture("s_base", C.L_textures[0]);
                 C.r_dx10Texture("s_lmap", C.L_textures[1]);
-                C.r_dx10Texture("s_hemi", C.L_textures[2].c_str());
+                C.r_dx10Texture("s_hemi", *C.L_textures[2]);
                 C.r_dx10Texture("s_env", r2_T_envs0);
 
                 C.r_dx10Sampler("smp_base");
