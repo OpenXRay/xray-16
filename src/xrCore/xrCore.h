@@ -96,20 +96,17 @@
 // stl ext
 struct XRCORE_API xr_rtoken
 {
-    xr_string name;
+    shared_str name;
     int id;
 
-    xr_rtoken(const pcstr _nm, const int _id)
+    xr_rtoken(pcstr _nm, int _id)
     {
         name = _nm;
         id = _id;
     }
 
-    void rename(const pcstr _nm) { name = _nm; }
-    bool equal(const pcstr _nm) const
-    {
-        return name.compare(_nm) == 0;
-    }
+    void rename(pcstr _nm) { name = _nm; }
+    bool equal(pcstr _nm) const { return (0 == xr_strcmp(*name, _nm)); }
 };
 
 #pragma pack(push, 1)
