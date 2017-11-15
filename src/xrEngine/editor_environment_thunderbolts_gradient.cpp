@@ -32,7 +32,7 @@ void gradient::load(CInifile& config, shared_str const& section_id, LPCSTR prefi
     texture = config.r_string(section_id, strconcat(sizeof(temp), temp, prefix, "_texture"));
     fOpacity = config.r_float(section_id, strconcat(sizeof(temp), temp, prefix, "_opacity"));
     fRadius = config.r_fvector2(section_id, strconcat(sizeof(temp), temp, prefix, "_radius"));
-    m_pFlare->CreateShader(shader.c_str(), texture.c_str());
+    m_pFlare->CreateShader(*shader, *texture);
 }
 
 void gradient::save(CInifile& config, shared_str const& section_id, LPCSTR prefix)
@@ -48,14 +48,14 @@ LPCSTR gradient::shader_getter() const { return (shader.c_str()); }
 void gradient::shader_setter(LPCSTR value)
 {
     shader = value;
-    m_pFlare->CreateShader(shader.c_str(), texture.c_str());
+    m_pFlare->CreateShader(*shader, *texture);
 }
 
 LPCSTR gradient::texture_getter() const { return (texture.c_str()); }
 void gradient::texture_setter(LPCSTR value)
 {
     texture = value;
-    m_pFlare->CreateShader(shader.c_str(), texture.c_str());
+    m_pFlare->CreateShader(*shader, *texture);
 }
 
 void gradient::fill(

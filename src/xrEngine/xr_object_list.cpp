@@ -139,7 +139,7 @@ void CObjectList::SingleUpdate(IGameObject* O)
 
     O->UpdateCL();
 
-    VERIFY3(O->GetDbgUpdateFrame() == Device.dwFrame, "Broken sequence of calls to 'UpdateCL'", O->cName().c_str());
+    VERIFY3(O->GetDbgUpdateFrame() == Device.dwFrame, "Broken sequence of calls to 'UpdateCL'", *O->cName());
 #if 0 // ndef DEBUG
     __try
     {
@@ -147,8 +147,8 @@ void CObjectList::SingleUpdate(IGameObject* O)
     if (O->H_Parent() && (O->H_Parent()->getDestroy() || O->H_Root()->getDestroy()))
     {
         // Push to destroy-queue if it isn't here already
-        Msg("! ERROR: incorrect destroy sequence for object[%d:%s], section[%s], parent[%d:%s]", O->ID(), O->cName().c_str(),
-            O->cNameSect().c_str(), O->H_Parent()->ID(), O->H_Parent()->cName().c_str());
+        Msg("! ERROR: incorrect destroy sequence for object[%d:%s], section[%s], parent[%d:%s]", O->ID(), *O->cName(),
+            *O->cNameSect(), O->H_Parent()->ID(), *O->H_Parent()->cName());
     }
 #if 0 // ndef DEBUG
     }
@@ -156,7 +156,7 @@ void CObjectList::SingleUpdate(IGameObject* O)
     {
         IGameObject* parent_obj = O->H_Parent();
         IGameObject* root_obj = O->H_Root();
-        Msg ("! ERROR: going to crush: [%d:%s], section[%s], parent_obj_addr[0x%08x], root_obj_addr[0x%08x]",O->ID(),O->cName().c_str(), O->cNameSect().c_str(), *((u32*)&parent_obj), *((u32*)&root_obj));
+        Msg ("! ERROR: going to crush: [%d:%s], section[%s], parent_obj_addr[0x%08x], root_obj_addr[0x%08x]",O->ID(),*O->cName(),*O->cNameSect(), *((u32*)&parent_obj), *((u32*)&root_obj));
         if (parent_obj)
         {
             __try
@@ -318,7 +318,7 @@ void CObjectList::Update(bool bForce)
 // Msg ("Object [%x]", O);
 #ifdef DEBUG
             if (debug_destroy)
-                Msg("Destroying object[%x][%x] [%d][%s] frame[%d]", dynamic_cast<void*>(O), O, O->ID(), O->cName().c_str(),
+                Msg("Destroying object[%x][%x] [%d][%s] frame[%d]", dynamic_cast<void*>(O), O, O->ID(), *O->cName(),
                     Device.dwFrame);
 #endif // DEBUG
             O->net_Destroy();
@@ -378,14 +378,14 @@ u32 CObjectList::net_Export(NET_Packet* _Packet, u32 start, u32 max_object_size)
                 if (size >= 256)
                 {
                     xrDebug::Fatal(DEBUG_INFO, "Object [%s][%d] exceed network-data limit\n size=%d, Pend=%d, Pstart=%d",
-                    P->cName().c_str(), P->ID(), size, Packet.w_tell(), position);
+                    *P->cName(), P->ID(), size, Packet.w_tell(), position);
                 }
             }
 #endif
             if (g_Dump_Export_Obj)
             {
                 u32 size = u32(Packet.w_tell() - position) - sizeof(u8);
-                Msg("* %s : %d", P->cNameSect().c_str(), size);
+                Msg("* %s : %d", *(P->cNameSect()), size);
             }
             Packet.w_chunk_close8(position);
             // if (0==(--count))
@@ -420,7 +420,7 @@ void CObjectList::net_Import(NET_Packet* Packet)
             P->net_Import(*Packet);
 
             if (g_Dump_Import_Obj)
-                Msg("* %s : %d - %d", P->cNameSect().c_str(), size, Packet->r_tell() - rsize);
+                Msg("* %s : %d - %d", *(P->cNameSect()), size, Packet->r_tell() - rsize);
         }
         else
             Packet->r_advance(size);
@@ -452,12 +452,12 @@ void CObjectList::Unload()
     while (objects_sleeping.size())
     {
         IGameObject* O = objects_sleeping.back();
-        Msg("! [%x] s[%4d]-[%s]-[%s]", O, O->ID(), O->cNameSect().c_str(), O->cName().c_str());
+        Msg("! [%x] s[%4d]-[%s]-[%s]", O, O->ID(), *O->cNameSect(), *O->cName());
         O->setDestroy(true);
 
 #ifdef DEBUG
         if (debug_destroy)
-            Msg("Destroying object [%d][%s]", O->ID(), O->cName().c_str());
+            Msg("Destroying object [%d][%s]", O->ID(), *O->cName());
 #endif
         O->net_Destroy();
         Destroy(O);
@@ -465,12 +465,12 @@ void CObjectList::Unload()
     while (objects_active.size())
     {
         IGameObject* O = objects_active.back();
-        Msg("! [%x] a[%4d]-[%s]-[%s]", O, O->ID(), O->cNameSect().c_str(), O->cName().c_str());
+        Msg("! [%x] a[%4d]-[%s]-[%s]", O, O->ID(), *O->cNameSect(), *O->cName());
         O->setDestroy(true);
 
 #ifdef DEBUG
         if (debug_destroy)
-            Msg("Destroying object [%d][%s]", O->ID(), O->cName().c_str());
+            Msg("Destroying object [%d][%s]", O->ID(), *O->cName());
 #endif
         O->net_Destroy();
         Destroy(O);

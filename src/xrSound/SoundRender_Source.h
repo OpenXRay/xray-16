@@ -39,7 +39,7 @@ public:
 
     float length_sec() const override { return fTimeTotal; }
     u32 game_type() const override { return m_uGameType; }
-    pcstr file_name() const override { return fname.c_str(); }
+    pcstr file_name() const override { return *fname; }
     virtual float base_volume() const { return m_fBaseVolume; }
     u16 channels_num() const override { return m_wformat.nChannels; }
     u32 bytes_total() const override { return dwBytesTotal; }

@@ -178,7 +178,7 @@ bool CSheduler::internal_Unregister(ISheduled* O, BOOL RT, bool warn_on_not_foun
 
 #ifdef DEBUG
     if (warn_on_not_found)
-        Msg("! scheduled object %s tries to unregister but is not registered", O->shedule_Name().c_str());
+        Msg("! scheduled object %s tries to unregister but is not registered", *O->shedule_Name());
 #endif // DEBUG
 
     return (false);

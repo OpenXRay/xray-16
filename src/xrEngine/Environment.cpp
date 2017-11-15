@@ -227,7 +227,7 @@ void CEnvironment::SetWeather(shared_str name, bool forced)
             Msg("! Invalid weather name: %s", name.c_str());
             return;
         }
-        R_ASSERT3(it != WeatherCycles.end(), "Invalid weather name.", name.c_str());
+        R_ASSERT3(it != WeatherCycles.end(), "Invalid weather name.", *name);
         CurrentCycleName = it->first;
         if (forced)
         {
@@ -261,7 +261,7 @@ bool CEnvironment::SetWeatherFX(shared_str name)
     if (name.size())
     {
         auto it = WeatherFXs.find(name);
-        R_ASSERT3(it != WeatherFXs.end(), "Invalid weather effect name.", name.c_str());
+        R_ASSERT3(it != WeatherFXs.end(), "Invalid weather effect name.", *name);
         EnvVec* PrevWeather = CurrentWeather;
         VERIFY(PrevWeather);
         CurrentWeather = &it->second;

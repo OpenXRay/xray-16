@@ -118,10 +118,10 @@ void CLensFlareDescriptor::load(CInifile* pIni, LPCSTR sect)
 void CLensFlareDescriptor::OnDeviceCreate()
 {
     // shaders
-    m_Gradient.m_pRender->CreateShader(m_Gradient.shader.c_str(), m_Gradient.texture.c_str());
-    m_Source.m_pRender->CreateShader(m_Source.shader.c_str(), m_Source.texture.c_str());
+    m_Gradient.m_pRender->CreateShader(*m_Gradient.shader, *m_Gradient.texture);
+    m_Source.m_pRender->CreateShader(*m_Source.shader, *m_Source.texture);
     for (auto it = m_Flares.begin(); it != m_Flares.end(); it++)
-        it->m_pRender->CreateShader(it->shader.c_str(), it->texture.c_str());
+        it->m_pRender->CreateShader(*it->shader, *it->texture);
     /*
     m_Gradient.hShader = CreateShader (*m_Gradient.texture,*m_Gradient.shader);
     m_Source.hShader = CreateShader (*m_Source.texture,*m_Source.shader);
@@ -609,7 +609,7 @@ shared_str CLensFlare::AppendDef(CEnvironment& environment, CInifile* pIni, LPCS
     if (!sect || (0 == sect[0]))
         return "";
     for (auto it = m_Palette.begin(); it != m_Palette.end(); it++)
-        if (0 == xr_strcmp((*it)->section.c_str(), sect))
+        if (0 == xr_strcmp(*(*it)->section, sect))
             return sect;
 
     environment.add_flare(m_Palette, sect);

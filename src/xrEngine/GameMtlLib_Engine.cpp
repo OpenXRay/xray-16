@@ -70,34 +70,34 @@ void SGameMtlPair::Load(IReader& fs)
     R_ASSERT(fs.find_chunk(GAMEMTLPAIR_CHUNK_BREAKING));
     fs.r_stringZ(buf);
 #ifdef GM_NON_GAME
-    BreakingSounds = buf.c_str() ? buf.c_str() : "";
+    BreakingSounds = *buf ? *buf : "";
 #else
-    CreateSounds(BreakingSounds, buf.c_str());
+    CreateSounds(BreakingSounds, *buf);
 #endif
     R_ASSERT(fs.find_chunk(GAMEMTLPAIR_CHUNK_STEP));
     fs.r_stringZ(buf);
 #ifdef GM_NON_GAME
-    StepSounds = buf.c_str() ? buf.c_str() : "";
+    StepSounds = *buf ? *buf : "";
 #else
-    CreateSounds(StepSounds, buf.c_str());
+    CreateSounds(StepSounds, *buf);
 #endif
     R_ASSERT(fs.find_chunk(GAMEMTLPAIR_CHUNK_COLLIDE));
     fs.r_stringZ(buf);
 #ifdef GM_NON_GAME
-    CollideSounds = buf.c_str() ? buf.c_str() : "";
+    CollideSounds = *buf ? *buf : "";
 #else
-    CreateSounds(CollideSounds, buf.c_str());
+    CreateSounds(CollideSounds, *buf);
 #endif
     fs.r_stringZ(buf);
 #ifdef GM_NON_GAME
-    CollideParticles = buf.c_str() ? buf.c_str() : "";
+    CollideParticles = *buf ? *buf : "";
 #else
-    CreatePSs(CollideParticles, buf.c_str());
+    CreatePSs(CollideParticles, *buf);
 #endif
     fs.r_stringZ(buf);
 #ifdef GM_NON_GAME
-    CollideMarks = buf.c_str() ? buf.c_str() : "";
+    CollideMarks = *buf ? *buf : "";
 #else
-    CreateMarks(&*CollideMarks, buf.c_str());
+    CreateMarks(&*CollideMarks, *buf);
 #endif
 }
