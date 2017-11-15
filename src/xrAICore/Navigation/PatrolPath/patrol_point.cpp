@@ -41,7 +41,7 @@ void CPatrolPoint::verify_vertex_id(
 
     VERIFY(m_path);
     string1024 temp;
-    xr_sprintf(temp, "\n! Patrol point %s in path %s is not on the level graph vertex!", m_name.c_str(), m_path->m_name.c_str());
+    xr_sprintf(temp, "\n! Patrol point %s in path %s is not on the level graph vertex!", *m_name, *m_path->m_name);
     THROW2(level_graph->valid_vertex_id(m_level_vertex_id), temp);
 }
 #endif

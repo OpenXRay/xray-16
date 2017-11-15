@@ -1258,7 +1258,7 @@ CScriptThread* CScriptEngine::CreateScriptThread(LPCSTR caNamespaceName, bool do
 void CScriptEngine::DestroyScriptThread(const CScriptThread* thread)
 {
 #ifdef DEBUG
-    Msg("* Destroying script thread %s", thread->script_name().c_str());
+    Msg("* Destroying script thread %s", *thread->script_name());
 #endif
     try
     {
