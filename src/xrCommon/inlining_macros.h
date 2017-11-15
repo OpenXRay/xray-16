@@ -1,6 +1,4 @@
 #pragma once
-#ifndef INLINING_MACROS_H
-#define INLINING_MACROS_H
 
 #if defined(__GNUC__)
 #define NO_INLINE __attribute__((noinline))
@@ -19,5 +17,3 @@
 #define IC inline
 #define ICF FORCE_INLINE
 #define ICN NO_INLINE
-
-#endif

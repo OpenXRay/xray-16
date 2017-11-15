@@ -81,9 +81,6 @@
     <ClInclude Include="..\xrCommon\xr_deque.h">
       <Filter>xrCommon</Filter>
     </ClInclude>
-    <ClInclude Include="ImportExportMacros.inl">
-      <Filter>Platform</Filter>
-    </ClInclude>
     <ClInclude Include="Common.hpp" />
   </ItemGroup>
   <ItemGroup>
