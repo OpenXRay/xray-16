@@ -1,6 +1,4 @@
 #pragma once
-#ifndef SoundRender_CacheH
-#define SoundRender_CacheH
 
 // --- just thoughts ---
 // 1. LRU scheme
@@ -74,4 +72,3 @@ public:
     CSoundRender_Cache();
     ~CSoundRender_Cache();
 };
-#endif

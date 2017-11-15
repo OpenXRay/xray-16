@@ -3,8 +3,6 @@
 //////////////////////////////////////////////////////////////////////
 
 #pragma once
-#if !defined(AFX_XRXRC_H__9AA25268_621F_4FCA_BD75_AF2E9822B8E3__INCLUDED_)
-#define AFX_XRXRC_H__9AA25268_621F_4FCA_BD75_AF2E9822B8E3__INCLUDED_
 
 #include "xrCDB/xrCDB.h"
 #include "xrCore/_fbox.h"
@@ -76,5 +74,3 @@ public:
     IC void r_clear() { CL.r_clear(); };
 };
 ENGINE_API extern xrXRC XRC;
-
-#endif // !defined(AFX_XRXRC_H__9AA25268_621F_4FCA_BD75_AF2E9822B8E3__INCLUDED_)

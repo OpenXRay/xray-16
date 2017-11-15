@@ -1,6 +1,4 @@
-//#pragma once
-#ifndef XRCDB_H
-#define XRCDB_H
+#pragma once
 
 #include "xrCore/Threading/Lock.hpp" // XXX: Remove from header. Put in .cpp.
 
@@ -229,7 +227,5 @@ public:
     void clear();
 };
 #pragma warning(pop)
-};
-
+}
 #pragma pack(pop)
-#endif

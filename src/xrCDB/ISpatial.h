@@ -1,6 +1,4 @@
 #pragma once
-#ifndef XRENGINE_ISPATIAL_H_INCLUDED
-#define XRENGINE_ISPATIAL_H_INCLUDED
 
 #include "xrCore/xrPool.h"
 //#include "xr_collide_defs.h"
@@ -16,7 +14,7 @@ Requirements:
 0. Generic
     * O(1) insertion
         - radius completely determines	"level"
-        - position completely detemines "node"
+        - position completely determines "node"
     * O(1) removal
     *
 1. Rendering
@@ -276,5 +274,3 @@ XRCDB_API extern ISpatial_DB* g_SpatialSpace;
 XRCDB_API extern ISpatial_DB* g_SpatialSpacePhysic;
 
 #pragma pack(pop)
-
-#endif // #ifndef XRENGINE_ISPATIAL_H_INCLUDED

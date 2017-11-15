@@ -1,6 +1,4 @@
 #pragma once
-#ifndef ALDEVICELIST_H
-#define ALDEVICELIST_H
 
 #include "openal/al.h"
 #include "openal/alc.h"
@@ -54,5 +52,3 @@ public:
     void GetDeviceVersion(u32 index, int* major, int* minor);
     void SelectBestDevice();
 };
-
-#endif // ALDEVICELIST_H

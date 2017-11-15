@@ -1,6 +1,4 @@
 #pragma once
-#ifndef SoundRender_SourceH
-#define SoundRender_SourceH
 
 #include "SoundRender_Cache.h"
 
@@ -44,4 +42,3 @@ public:
     u16 channels_num() const override { return m_wformat.nChannels; }
     u32 bytes_total() const override { return dwBytesTotal; }
 };
-#endif

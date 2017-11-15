@@ -1,6 +1,4 @@
 #pragma once
-#ifndef soundrender_environmentH
-#define soundrender_environmentH
 
 // refs
 class XRSOUND_EDITOR_API CSoundRender_Environment : public CSound_environment
@@ -53,4 +51,3 @@ public:
     void Remove(int id);
     SE_VEC& Library();
 };
-#endif

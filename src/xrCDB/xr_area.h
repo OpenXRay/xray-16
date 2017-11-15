@@ -1,6 +1,4 @@
-#ifndef __XR_AREA_H__
-#define __XR_AREA_H__
-
+#pragma once
 #include "xr_collide_defs.h"
 
 // refs
@@ -88,5 +86,3 @@ public:
 #endif
     void DumpStatistics(IGameFont& font, IPerformanceAlert* alert);
 };
-
-#endif //__XR_AREA_H__

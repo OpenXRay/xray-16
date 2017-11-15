@@ -1,7 +1,5 @@
-//---------------------------------------------------------------------------
 #pragma once
-#ifndef intersectH
-#define intersectH
+
 #include "xrCore/_matrix33.h"
 #include "xrCore/_obb.h"
 #include "xrCore/_sphere.h"
@@ -916,7 +914,4 @@ IC bool TestRayOBB(const Fvector3& origin, const Fvector3& direction, const Fobb
 
     return true;
 }
-//----------------------------------------------------------------------------
-};
-
-#endif
+} // namespace CDB

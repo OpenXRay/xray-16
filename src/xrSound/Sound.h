@@ -1,6 +1,4 @@
 #pragma once
-#ifndef SoundH
-#define SoundH
 
 #include "xrCore/_types.h"
 #include "xrCore/_flags.h"
@@ -315,5 +313,3 @@ public:
 
 class CSound_manager_interface;
 extern XRSOUND_API CSound_manager_interface* Sound;
-
-#endif // include guard

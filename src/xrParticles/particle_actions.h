@@ -1,6 +1,4 @@
 #pragma once
-#ifndef particle_actionsH
-#define particle_actionsH
 
 namespace PAPI
 {
@@ -80,7 +78,4 @@ public:
         m_bLocked = false;
     }
 };
-};
-
-//---------------------------------------------------------------------------
-#endif
+} // namespace PAPI

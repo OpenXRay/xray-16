@@ -1,6 +1,4 @@
 #pragma once
-#ifndef xr_collide_defsH
-#define xr_collide_defsH
 
 #include "xrCDB.h"
 
@@ -192,4 +190,3 @@ public:
 typedef BOOL rq_callback(rq_result& result, LPVOID user_data);
 typedef BOOL test_callback(const ray_defs& rd, IGameObject* object, LPVOID user_data);
 }
-#endif

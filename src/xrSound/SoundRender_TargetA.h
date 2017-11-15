@@ -1,5 +1,3 @@
-#ifndef SoundRender_TargetAH
-#define SoundRender_TargetAH
 #pragma once
 
 #include "Soundrender_Target.h"
@@ -34,4 +32,3 @@ public:
     void fill_parameters() override;
     void source_changed();
 };
-#endif

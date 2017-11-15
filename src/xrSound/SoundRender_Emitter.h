@@ -1,5 +1,3 @@
-#ifndef SoundRender_EmitterH
-#define SoundRender_EmitterH
 #pragma once
 
 #include "SoundRender.h"
@@ -119,4 +117,3 @@ public:
     CSoundRender_Emitter();
     ~CSoundRender_Emitter();
 };
-#endif

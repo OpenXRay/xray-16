@@ -1,6 +1,5 @@
 #pragma once
-#ifndef particle_managerH
-#define particle_managerH
+
 #include "particle_actions.h"
 
 namespace PAPI
@@ -48,7 +47,4 @@ public:
     u32 LoadActions(int alist_id, IReader& R) override;
     void SaveActions(int alist_id, IWriter& W) override;
 };
-}
-
-//---------------------------------------------------------------------------
-#endif
+} // namespace PAPI

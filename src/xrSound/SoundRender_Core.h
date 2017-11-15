@@ -1,6 +1,4 @@
 #pragma once
-#ifndef SoundRender_CoreH
-#define SoundRender_CoreH
 
 #include "SoundRender.h"
 #include "SoundRender_Environment.h"
@@ -147,4 +145,3 @@ public:
 };
 
 extern CSoundRender_Core* SoundRender;
-#endif

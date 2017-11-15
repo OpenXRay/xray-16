@@ -1,5 +1,3 @@
-#ifndef SoundRender_CoreAH
-#define SoundRender_CoreAH
 #pragma once
 
 #include "SoundRender_Core.h"
@@ -70,4 +68,3 @@ public:
     const Fvector& listener_position() override { return Listener.position; }
 };
 extern CSoundRender_CoreA* SoundRenderA;
-#endif
