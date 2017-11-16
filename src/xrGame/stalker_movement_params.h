@@ -73,7 +73,7 @@ public:
     IC cover_type const* cover() const;
 
 public:
-    IC void cover_loophole_id(shared_str const& loophole_id);
+    /*IC*/ void cover_loophole_id(shared_str const& loophole_id); // XXX: can't compile Release because of "inline"
     LPCSTR cover_loophole_id() const;
     loophole_type const* cover_loophole() const;
 

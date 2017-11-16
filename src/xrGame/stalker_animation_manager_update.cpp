@@ -14,7 +14,7 @@
 #include "xrEngine/profiler.h"
 #include "stalker_movement_manager_smart_cover.h"
 
-IC void CStalkerAnimationManager::play_delayed_callbacks()
+/*IC*/ void CStalkerAnimationManager::play_delayed_callbacks() // XXX: can't compile Release because of "inline"
 {
     if (m_call_script_callback)
     {
