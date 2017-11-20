@@ -561,7 +561,6 @@
     <ClInclude Include="profiler_inline.h">
       <Filter>General\Profiler</Filter>
     </ClInclude>
-    <ClInclude Include="Engine_impexp.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="defines.cpp">

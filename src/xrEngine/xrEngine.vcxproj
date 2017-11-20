@@ -760,7 +760,6 @@
     <ClInclude Include="EffectorPP.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="EngineAPI.h" />
-    <ClInclude Include="Engine_impexp.h" />
     <ClInclude Include="engine_impl.hpp" />
     <ClInclude Include="EnnumerateVertices.h" />
     <ClInclude Include="Environment.h" />

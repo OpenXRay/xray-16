@@ -26,8 +26,6 @@
 #include "xrCDB/xrCDB.h"
 #include "Sound.h"
 
-#undef ENGINE_API
-
 #include "xrCore/xr_resource.h"
 
 #ifdef _EDITOR

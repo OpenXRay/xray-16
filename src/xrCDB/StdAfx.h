@@ -55,7 +55,6 @@ IC void cdelete(T*& ptr)
     }
 }
 
-#define ENGINE_API
 #include "OPCODE/Opcode.h"
 
 //{{AFX_INSERT_LOCATION}}

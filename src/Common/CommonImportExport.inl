@@ -14,6 +14,7 @@
 
 #ifdef XRCDB_EXPORTS
 #define XRCDB_API XR_EXPORT
+#define NO_ENGINE_API
 #else
 #define XRCDB_API XR_IMPORT
 #endif
@@ -44,6 +45,7 @@
 
 #ifdef XRPHYSICS_EXPORTS
 #define XRPHYSICS_API XR_EXPORT
+#define NO_ENGINE_API
 #else
 #define XRPHYSICS_API XR_IMPORT
 #endif
@@ -59,3 +61,18 @@
 #else
 #define XRSOUND_API XR_IMPORT
 #endif
+
+#ifndef ENGINE_API
+#ifndef NO_ENGINE_API
+#ifdef ENGINE_BUILD
+#define DLL_API XR_IMPORT
+#define ENGINE_API XR_EXPORT
+#else
+#define DLL_API XR_EXPORT
+#define ENGINE_API XR_IMPORT
+#endif
+#else
+#define ENGINE_API
+#define DLL_API
+#endif // !NO_ENGINE_API
+#endif // !ENGINE_API

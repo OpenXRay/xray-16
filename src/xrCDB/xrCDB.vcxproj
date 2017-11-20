@@ -416,7 +416,7 @@
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="..\..\Externals\OPCODE\OPCODE.vcxproj">
-      <Project>{bf40459f-302d-4128-a1b6-c965db90e7f0}</Project>
+      <Project>{dafd6d98-3dcd-40ad-bc85-ec71797b6767}</Project>
     </ProjectReference>
     <ProjectReference Include="..\utils\xrMiscMath\xrMiscMath.vcxproj">
       <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>
