@@ -114,7 +114,8 @@ public:
     };
     void Resort(void)
     {
-        qsort(&*R.begin(), R.size(), sizeof(_REG_INFO), _REG_Compare);
+        if (R.size())
+            qsort(&*R.begin(), R.size(), sizeof(_REG_INFO), _REG_Compare);
         while ((R.size()) && (R[R.size() - 1].Prio == REG_PRIORITY_INVALID))
             R.pop_back();
         if (R.empty())
