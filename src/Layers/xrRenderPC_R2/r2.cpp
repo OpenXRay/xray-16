@@ -1098,6 +1098,8 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
         ++len;
     }
 
+    sh_name[len] = '\0';
+
     // finish
     defines[def_it].Name = 0;
     defines[def_it].Definition = 0;
