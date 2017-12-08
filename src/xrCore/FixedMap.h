@@ -16,6 +16,11 @@ public:
         K key;
         T val;
         TNode *left, *right;
+
+        static void *operator new  (size_t size) { return allocator::alloc(size); }
+        static void *operator new[](size_t size) { return allocator::alloc(size); }
+        static void  operator delete  (void *block) { allocator::dealloc(block); }
+        static void  operator delete[](void *block) { allocator::dealloc(block); }
     };
     typedef void __fastcall callback(TNode*);
     typedef bool __fastcall callback_cmp(TNode& N1, TNode& N2);
@@ -30,12 +35,11 @@ private:
     {
         u32 newLimit = limit + SG_REALLOC_ADVANCE;
         VERIFY(newLimit % SG_REALLOC_ADVANCE == 0);
-        TNode* newNodes = (TNode*)allocator::alloc(sizeof(TNode) * newLimit);
+        TNode* newNodes = new TNode[newLimit];
         VERIFY(newNodes);
 
-        ZeroMemory(newNodes, Size(newLimit));
         if (limit)
-            CopyMemory(newNodes, nodes, Size(limit));
+            std::copy(nodes, nodes + limit, newNodes);
 
         for (u32 I = 0; I < pool; I++)
         {
@@ -55,7 +59,7 @@ private:
             }
         }
         if (nodes)
-            allocator::dealloc(nodes);
+            delete[] nodes;
 
         nodes = newNodes;
         limit = newLimit;
@@ -139,11 +143,10 @@ public:
     void destroy()
     {
         if (nodes)
-        {
-            for (TNode* cur = begin(); cur != last(); cur++)
-                cur->~TNode();
-            allocator::dealloc(nodes);
-        }
+            delete[] nodes;
+        nodes = 0;
+        pool = 0;
+        limit = 0;
     }
     IC TNode* insert(const K& k)
     {
@@ -241,14 +244,6 @@ public:
         N->val = v;
         return N;
     }
-    IC void discard()
-    {
-        if (nodes)
-            allocator::dealloc(nodes);
-        nodes = 0;
-        pool = 0;
-        limit = 0;
-    }
     IC u32 allocated() { return this->limit; }
     IC void clear() { pool = 0; }
     IC TNode* begin() { return nodes; }
@@ -293,27 +288,12 @@ public:
         if (pool)
             getRL_P(nodes, D);
     }
-    IC void getANY(xr_vector<T, typename allocator::template helper<T>::result>& D)
-    {
-        TNode* _end = end();
-        for (TNode* cur = begin(); cur != _end; cur++)
-            D.push_back(cur->val);
-    }
     IC void getANY_P(xr_vector<TNode*, typename allocator::template helper<TNode*>::result>& D)
     {
-        D.resize(size());
-        TNode** _it = &*D.begin();
+        D.reserve(size());
         TNode* _end = end();
-        for (TNode *cur = begin(); cur != _end; cur++, _it++)
-            *_it = cur;
-    }
-    IC void getANY_P(xr_vector<void*, typename allocator::template helper<void*>::result>& D)
-    {
-        D.resize(size());
-        void** _it = &*D.begin();
-        TNode* _end = end();
-        for (TNode *cur = begin(); cur != _end; cur++, _it++)
-            *_it = cur;
+        for (TNode* cur = begin(); cur != _end; cur++)
+            D.push_back(cur);
     }
     IC void setup(callback CB)
     {
