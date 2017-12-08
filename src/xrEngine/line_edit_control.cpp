@@ -765,7 +765,7 @@ void remove_spaces(pstr str)
         while (b < str_size && str[b] != ' ')
             ++b;
 
-        strncpy_s(new_str + i, str_size + 1, str + a, b - a);
+        strncpy_s(new_str + i, str_size - i + 1, str + a, b - a);
         i += (b - a);
 
         if (i < str_size)
