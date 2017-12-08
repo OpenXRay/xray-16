@@ -13,8 +13,6 @@
 #include "xrCDB/xrCDB.h"
 #include "xrSound/sound.h"
 
-#pragma comment(lib, "xrCore.lib")
-
 #include "xrPhysics.h"
 
 #ifdef DEBUG

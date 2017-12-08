@@ -226,7 +226,6 @@
     </ProjectReference>
     <ProjectReference Include="LW_Server.vcxproj">
       <Project>{6ba3121a-acbc-4685-9246-4549ca1efffd}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
