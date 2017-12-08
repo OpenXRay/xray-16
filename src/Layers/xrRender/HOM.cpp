@@ -169,8 +169,8 @@ void CHOM::Render_DB(CFrustum& base)
         return;
 
     // Prepare
-    CDB::RESULT* it = xrc.r_begin();
-    CDB::RESULT* end = xrc.r_end();
+    auto it = xrc.r_get()->begin();
+    auto end = xrc.r_get()->end();
 
     Fvector COP = Device.vCameraPosition;
     end = std::remove_if(it, end, pred_fb(m_pTris));
@@ -185,10 +185,10 @@ void CHOM::Render_DB(CFrustum& base)
     stats.VisibleTriangleCount = 0;
 
     // Perfrom selection, sorting, culling
-    for (; it != end; it++)
+    for (auto &it : *xrc.r_get())
     {
         // Control skipping
-        occTri& T = m_pTris[it->id];
+        occTri& T = m_pTris[it.id];
         u32 next = _frame + ::Random.randI(3, 10);
 
         // Test for good occluder - should be improved :)
@@ -199,7 +199,7 @@ void CHOM::Render_DB(CFrustum& base)
         }
 
         // Access to triangle vertices
-        CDB::TRI& t = m_pModel->get_tris()[it->id];
+        CDB::TRI& t = m_pModel->get_tris()[it.id];
         Fvector* v = m_pModel->get_verts();
         src.clear();
         dst.clear();

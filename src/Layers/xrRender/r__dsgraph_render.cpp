@@ -26,10 +26,8 @@ void __fastcall mapNormal_Render(mapNormalItems& N)
 {
     // *** DIRECT ***
     std::sort(N.begin(), N.end(), cmp_normal_items);
-    _NormalItem *I = &*N.begin(), *E = &*N.end();
-    for (; I != E; I++)
+    for(auto &Ni : N)
     {
-        _NormalItem& Ni = *I;
         float LOD = calcLOD(Ni.ssa, Ni.pVisual->vis.sphere.R);
 #ifdef USE_DX11
         RCache.LOD.set_LOD(LOD);
@@ -44,10 +42,8 @@ void __fastcall mapMatrix_Render(mapMatrixItems& N)
 {
     // *** DIRECT ***
     std::sort(N.begin(), N.end(), cmp_matrix_items);
-    _MatrixItem *I = &*N.begin(), *E = &*N.end();
-    for (; I != E; I++)
+    for (auto &Ni : N)
     {
-        _MatrixItem& Ni = *I;
         RCache.set_xform_world(Ni.Matrix);
         RImplementation.apply_object(Ni.pObject);
         RImplementation.apply_lmaterial();
