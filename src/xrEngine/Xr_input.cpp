@@ -351,7 +351,7 @@ BOOL CInput::iGetAsyncKeyState(int dik)
 BOOL CInput::iGetAsyncBtnState(int btn) { return !!mouseState[btn]; }
 void CInput::ClipCursor(bool clip)
 {
-    HWND hwnd = Device.m_hWnd;
+    /*HWND hwnd = Device.m_hWnd;
     if (hwnd)
     {
         if (clip)
@@ -364,7 +364,7 @@ void CInput::ClipCursor(bool clip)
         }
         else
             ::ClipCursor(nullptr);
-    }
+    }*/
 }
 
 void CInput::MouseUpdate()
