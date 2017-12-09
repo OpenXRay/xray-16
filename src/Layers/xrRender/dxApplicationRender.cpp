@@ -24,7 +24,6 @@ void dxApplicationRender::destroy_loading_shaders()
 }
 
 void dxApplicationRender::setLevelLogo(LPCSTR pszLogoName) { hLevelLogo.create("hud\\default", pszLogoName); }
-void dxApplicationRender::KillHW() { ZeroMemory(&HW, sizeof(CHW)); }
 u32 calc_progress_color(u32, u32, int, int);
 
 void dxApplicationRender::load_draw_internal(CApplication& owner)
