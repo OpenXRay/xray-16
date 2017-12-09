@@ -17,6 +17,8 @@ public:
         T val;
         TNode *left, *right;
 
+        TNode() : key(), val(), left(nullptr), right(nullptr) {}
+
         static void *operator new  (size_t size) { return allocator::alloc(size); }
         static void *operator new[](size_t size) { return allocator::alloc(size); }
         static void  operator delete  (void *block) { allocator::dealloc(block); }
@@ -245,7 +247,7 @@ public:
         return N;
     }
     IC u32 allocated() { return this->limit; }
-    IC void clear() { pool = 0; }
+    IC void clear() { destroy(); }
     IC TNode* begin() { return nodes; }
     IC TNode* end() { return nodes + pool; }
     IC TNode* last() { return nodes + limit; } // for setup only
