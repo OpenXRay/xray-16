@@ -14,7 +14,7 @@ extern int psSkeletonUpdate;
 using namespace animation;
 //////////////////////////////////////////////////////////////////////////
 // BoneInstance methods
-void CBlendInstance::construct() { ZeroMemory(this, sizeof(*this)); }
+void CBlendInstance::construct() { Blend.clear(); }
 void CBlendInstance::blend_add(CBlend* H)
 {
     if (Blend.size() == MAX_BLENDED)
@@ -41,14 +41,14 @@ void CBlendInstance::blend_remove(CBlend* H)
 void CKinematicsAnimated::Bone_Motion_Start(CBoneData* bd, CBlend* handle)
 {
     LL_GetBlendInstance(bd->GetSelfID()).blend_add(handle);
-    for (vecBonesIt I = bd->children.begin(); I != bd->children.end(); I++)
-        Bone_Motion_Start(*I, handle);
+    for (auto &it : bd->children)
+        Bone_Motion_Start(it, handle);
 }
 void CKinematicsAnimated::Bone_Motion_Stop(CBoneData* bd, CBlend* handle)
 {
     LL_GetBlendInstance(bd->GetSelfID()).blend_remove(handle);
-    for (vecBonesIt I = bd->children.begin(); I != bd->children.end(); I++)
-        Bone_Motion_Stop(*I, handle);
+    for (auto &it : bd->children)
+        Bone_Motion_Stop(it, handle);
 }
 void CKinematicsAnimated::Bone_Motion_Start_IM(CBoneData* bd, CBlend* handle)
 {
@@ -64,10 +64,9 @@ void CKinematicsAnimated::Bone_Motion_Stop_IM(CBoneData* bd, CBlend* handle)
 std::pair<LPCSTR, LPCSTR> CKinematicsAnimated::LL_MotionDefName_dbg(MotionID ID)
 {
     shared_motions& s_mots = m_Motions[ID.slot].motions;
-    accel_map::iterator _I, _E = s_mots.motion_map()->end();
-    for (_I = s_mots.motion_map()->begin(); _I != _E; ++_I)
-        if (_I->second == ID.idx)
-            return std::make_pair(*_I->first, *s_mots.id());
+    for (auto &it : *s_mots.motion_map())
+        if (it.second == ID.idx)
+            return std::make_pair(*it.first, *s_mots.id());
     return std::make_pair((LPCSTR)nullptr, (LPCSTR)nullptr);
 }
 
@@ -110,9 +109,8 @@ static void dump_blend(CKinematicsAnimated* K, CBlend& B, u32 index)
 void CKinematicsAnimated::LL_DumpBlends_dbg()
 {
     Msg("==================dump blends=================================================");
-    CBlend *I = blend_pool.begin(), *E = blend_pool.end();
-    for (; I != E; I++)
-        dump_blend(this, *I, u32(I - blend_pool.begin()));
+    for (auto &it : blend_pool)
+        dump_blend(this, it, u32(&it - blend_pool.begin()));
 }
 
 #endif
@@ -126,10 +124,9 @@ CBlend* CKinematicsAnimated::LL_PartBlend(u32 bone_part_id, u32 n)
 }
 void CKinematicsAnimated::LL_IterateBlends(IterateBlendsCallback& callback)
 {
-    CBlend *I = blend_pool.begin(), *E = blend_pool.end();
-    for (; I != E; I++)
-        if (I->blend_state() != CBlend::eFREE_SLOT)
-            callback(*I);
+    for (auto &it : blend_pool)
+        if (it.blend_state() != CBlend::eFREE_SLOT)
+            callback(it);
 }
 /*
 LPCSTR CKinematicsAnimated::LL_MotionDefName_dbg	(LPVOID ptr)
@@ -705,10 +702,9 @@ CBlend* CKinematicsAnimated::IBlend_Create()
 {
     UpdateTracks();
     _DBG_SINGLE_USE_MARKER;
-    CBlend *I = blend_pool.begin(), *E = blend_pool.end();
-    for (; I != E; I++)
-        if (I->blend_state() == CBlend::eFREE_SLOT)
-            return I;
+    for (auto &it : blend_pool)
+        if (it.blend_state() == CBlend::eFREE_SLOT)
+            return &it;
     FATAL("Too many blended motions requisted");
     return nullptr;
 }
@@ -819,9 +815,9 @@ void CKinematicsAnimated::Load(const char* N, IReader* data, u32 dwFlags)
     m_Partition->load(this, N);
 
     // initialize motions
-    for (auto m_it = m_Motions.begin(); m_it != m_Motions.end(); m_it++)
+    for (auto &m_it : m_Motions)
     {
-        SMotionsSlot& MS = *m_it;
+        SMotionsSlot& MS = m_it;
         MS.bone_motions.resize(bones->size());
         for (u32 i = 0; i < bones->size(); i++)
         {
@@ -843,10 +839,10 @@ void CKinematicsAnimated::LL_BuldBoneMatrixDequatize(const CBoneData* bd, u8 cha
     CBlendInstance& BLEND_INST = LL_GetBlendInstance(SelfID);
     const CBlendInstance::BlendSVec& Blend = BLEND_INST.blend_vector();
     CKey BK[MAX_CHANNELS][MAX_BLENDED]; // base keys
-    BlendSVecCIt BI;
-    for (BI = Blend.begin(); BI != Blend.end(); BI++)
+
+    for (auto &it : Blend)
     {
-        CBlend* B = *BI;
+        CBlend* B = it;
         int& b_count = keys.chanel_blend_conts[B->channel];
         CKey* D = &keys.keys[B->channel][b_count];
         if (!(channel_mask & (1 << B->channel)))
