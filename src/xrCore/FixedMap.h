@@ -16,13 +16,6 @@ public:
         K key;
         T val;
         TNode *left, *right;
-
-        TNode() : key(), val(), left(nullptr), right(nullptr) {}
-
-        static void *operator new  (size_t size) { return allocator::alloc(size); }
-        static void *operator new[](size_t size) { return allocator::alloc(size); }
-        static void  operator delete  (void *block) { allocator::dealloc(block); }
-        static void  operator delete[](void *block) { allocator::dealloc(block); }
     };
     typedef void __fastcall callback(TNode*);
     typedef bool __fastcall callback_cmp(TNode& N1, TNode& N2);
@@ -32,14 +25,15 @@ private:
     u32 pool;
     u32 limit;
 
-    IC u32 Size(u32 Count) { return Count * sizeof(TNode); }
     void Realloc()
     {
         u32 newLimit = limit + SG_REALLOC_ADVANCE;
         VERIFY(newLimit % SG_REALLOC_ADVANCE == 0);
-        TNode* newNodes = new TNode[newLimit];
+        TNode* newNodes = (TNode*)allocator::alloc(sizeof(TNode) * newLimit);
         VERIFY(newNodes);
 
+        for (TNode* cur = newNodes + limit; cur != newNodes + newLimit; cur++)
+            new(cur) TNode();
         if (limit)
             std::copy(nodes, nodes + limit, newNodes);
 
@@ -61,7 +55,7 @@ private:
             }
         }
         if (nodes)
-            delete[] nodes;
+            allocator::dealloc(nodes);
 
         nodes = newNodes;
         limit = newLimit;
@@ -145,7 +139,11 @@ public:
     void destroy()
     {
         if (nodes)
-            delete[] nodes;
+        {
+            for (TNode* cur = begin(); cur != end(); cur++)
+                cur->~TNode();
+            allocator::dealloc(nodes);
+        }
         nodes = 0;
         pool = 0;
         limit = 0;
