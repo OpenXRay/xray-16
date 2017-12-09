@@ -564,11 +564,15 @@ enum EBoneCallbackType
 
 IC void CBoneInstance::construct()
 {
-    ZeroMemory(this, sizeof(*this));
     mTransform.identity();
-
     mRenderTransform.identity();
+
+    Callback = NULL;
+    Callback_Param = NULL;
     Callback_overwrite = FALSE;
+    Callback_type = 0;
+
+    ZeroMemory(&param, sizeof(param));
 }
 
 #endif
