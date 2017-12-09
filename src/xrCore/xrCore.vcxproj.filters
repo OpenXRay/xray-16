@@ -440,9 +440,6 @@
     <ClInclude Include="FixedMap.h">
       <Filter>Math\STLext</Filter>
     </ClInclude>
-    <ClInclude Include="FixedSet.h">
-      <Filter>Math\STLext</Filter>
-    </ClInclude>
     <ClInclude Include="FixedVector.h">
       <Filter>Math\STLext</Filter>
     </ClInclude>
