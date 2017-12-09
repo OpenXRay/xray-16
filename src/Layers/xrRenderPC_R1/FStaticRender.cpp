@@ -935,6 +935,8 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
     sh_name[len] = '0' + char(4 == m_skinning);
     ++len;
 
+    sh_name[len] = '\0';
+
     // finish
     defines[def_it].Name = nullptr;
     defines[def_it].Definition = nullptr;
