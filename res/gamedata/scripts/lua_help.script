@@ -7715,7 +7715,7 @@ C++ class game_object {
 
     function direction() const;
 
-    function kill(game_object*);
+    function kill(game_object*, boolean);
 
     function cost() const;
 
