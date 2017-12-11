@@ -601,30 +601,23 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
 #include "SkeletonCustom.h"
 #include "FLOD.h"
 
-void D3DXRenderBase::r_dsgraph_render_R1_box(IRender_Sector* _S, Fbox& BB, int sh)
+void D3DXRenderBase::r_dsgraph_render_R1_box(IRender_Sector* S, Fbox& BB, int sh)
 {
-    CSector* S = (CSector*)_S;
-    lstVisuals.clear();
-    lstVisuals.push_back(S->root());
+    xr_vector<dxRender_Visual*, render_alloc<dxRender_Visual*>> lstVisuals;
+    lstVisuals.push_back(((CSector*)S)->root());
 
-    for (u32 test = 0; test < lstVisuals.size(); test++)
+    for (auto &it : lstVisuals)
     {
-        dxRender_Visual* V = lstVisuals[test];
-
         // Visual is 100% visible - simply add it
-        xr_vector<dxRender_Visual *>::iterator I, E; // it may be usefull for 'hierrarhy' visuals
-
-        switch (V->Type)
+        switch (it->Type)
         {
         case MT_HIERRARHY:
         {
             // Add all children
-            FHierrarhyVisual* pV = (FHierrarhyVisual*)V;
-            I = pV->children.begin();
-            E = pV->children.end();
-            for (; I != E; I++)
+            FHierrarhyVisual* pV = (FHierrarhyVisual*)it;
+            for (auto &i : pV->children)
             {
-                dxRender_Visual* T = *I;
+                dxRender_Visual* T = i;
                 if (BB.intersect(T->vis.box))
                     lstVisuals.push_back(T);
             }
@@ -634,13 +627,11 @@ void D3DXRenderBase::r_dsgraph_render_R1_box(IRender_Sector* _S, Fbox& BB, int s
         case MT_SKELETON_RIGID:
         {
             // Add all children	(s)
-            CKinematics* pV = (CKinematics*)V;
+            CKinematics* pV = (CKinematics*)it;
             pV->CalculateBones(TRUE);
-            I = pV->children.begin();
-            E = pV->children.end();
-            for (; I != E; I++)
+            for (auto &i : pV->children)
             {
-                dxRender_Visual* T = *I;
+                dxRender_Visual* T = i;
                 if (BB.intersect(T->vis.box))
                     lstVisuals.push_back(T);
             }
@@ -648,12 +639,10 @@ void D3DXRenderBase::r_dsgraph_render_R1_box(IRender_Sector* _S, Fbox& BB, int s
         break;
         case MT_LOD:
         {
-            FLOD* pV = (FLOD*)V;
-            I = pV->children.begin();
-            E = pV->children.end();
-            for (; I != E; I++)
+            FLOD* pV = (FLOD*)it;
+            for (auto &i : pV->children)
             {
-                dxRender_Visual* T = *I;
+                dxRender_Visual* T = i;
                 if (BB.intersect(T->vis.box))
                     lstVisuals.push_back(T);
             }
@@ -662,13 +651,13 @@ void D3DXRenderBase::r_dsgraph_render_R1_box(IRender_Sector* _S, Fbox& BB, int s
         default:
         {
             // Renderable visual
-            ShaderElement* E2 = V->shader->E[sh]._get();
+            ShaderElement* E2 = it->shader->E[sh]._get();
             if (E2 && !(E2->flags.bDistort))
             {
                 for (u32 pass = 0; pass < E2->passes.size(); pass++)
                 {
                     RCache.set_Element(E2, pass);
-                    V->Render(-1.f);
+                    it->Render(-1.f);
                 }
             }
         }

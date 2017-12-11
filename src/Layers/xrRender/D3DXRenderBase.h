@@ -51,8 +51,6 @@ public:
     xr_vector<int, render_alloc<int>> lstLODgroups;
     xr_vector<ISpatial*> lstRenderables;
     xr_vector<ISpatial*> lstSpatial;
-    xr_vector<dxRender_Visual*, render_alloc<dxRender_Visual*>> lstVisuals;
-    xr_vector<dxRender_Visual*, render_alloc<dxRender_Visual*>> lstRecorded;
 
     u32 counter_S;
     u32 counter_D;
@@ -98,9 +96,6 @@ public:
         lstLODgroups.clear();
         lstRenderables.clear();
         lstSpatial.clear();
-        lstVisuals.clear();
-
-        lstRecorded.clear();
 
         for (int i = 0; i < SHADER_PASSES_MAX; ++i)
         {
