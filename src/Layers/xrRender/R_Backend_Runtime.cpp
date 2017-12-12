@@ -126,7 +126,6 @@ void CBackend::Invalidate()
     // Redundant call. Just no note that we need to unmap const
     // if we create dedicated class.
     StateManager.UnmapConstants();
-    SSManager.ResetDeviceState();
     SRVSManager.ResetDeviceState();
 
     for (u32 gs_it = 0; gs_it < mtMaxGeometryShaderTextures;)

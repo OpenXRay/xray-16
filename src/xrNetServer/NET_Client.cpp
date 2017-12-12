@@ -559,7 +559,6 @@ bool IPureClient::Connect(pcstr options)
 
                     // Create ONE node
                     HOST_NODE NODE;
-                    ZeroMemory(&NODE, sizeof(HOST_NODE));
 
                     // Copy the Host Address
                     R_CHK(net_Address_server->Duplicate(&NODE.pHostAddress));

@@ -5,12 +5,6 @@
 #include "xrPhysics.h"
 #include "ode/include/ode/memory.h"
 
-#pragma comment(lib, "ode.lib")
-#pragma comment(lib, "xrCDB.lib")
-#pragma comment(lib, "xrSound.lib")
-#pragma comment(lib, "xrAPI.lib")
-//#pragma comment(lib,"xrEngine.lib")
-
 #ifdef _MANAGED
 #pragma managed(push, off)
 #endif

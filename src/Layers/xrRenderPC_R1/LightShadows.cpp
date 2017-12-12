@@ -491,11 +491,11 @@ void CLightShadows::render()
 
             // Clip polys by frustum
             tess.clear();
-            for (CDB::RESULT* p = xrc.r_begin(); p != xrc.r_end(); p++)
+            for (auto &p : *xrc.r_get())
             {
-                VERIFY((p->id >= 0) && (p->id < DB->get_tris_count()));
+                VERIFY((p.id >= 0) && (p.id < DB->get_tris_count()));
                 //
-                CDB::TRI& t = TRIS[p->id];
+                CDB::TRI& t = TRIS[p.id];
                 if (t.suppress_shadows)
                     continue;
                 sPoly A, B;

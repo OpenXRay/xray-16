@@ -30,8 +30,8 @@ public:
     u32 mem_usage()
     {
         u32 sz = sizeof(*this);
-        for (BlendSVecIt it = Blend.begin(); it != Blend.end(); it++)
-            sz += (*it)->mem_usage();
+        for (auto &it : Blend)
+            sz += it->mem_usage();
         return sz;
     }
 };

@@ -68,7 +68,6 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8E48F5C4-3EBB-4930-86AC-9AE6F26410FC}</ProjectGuid>
     <RootNamespace>PPEditor</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">

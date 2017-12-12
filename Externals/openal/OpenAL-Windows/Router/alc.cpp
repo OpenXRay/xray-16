@@ -570,7 +570,7 @@ ALvoid CleanDeviceSpecifierList()
 	// create new list
 	while (strlen(list) > 0) 
 	{
-		strcpy_s		(newListPtr, MAX_PATH, list);
+		strcpy_s		(newListPtr, MAX_PATH - (newListPtr - newList), list);
 		advancePtr		= TRUE;
 		if (strstr(newListPtr, T2A("DirectSound3D")) != NULL) 
 		{

@@ -69,32 +69,26 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
     <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
     <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
     <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
     <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
     <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
     <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -102,11 +96,9 @@
     <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -129,7 +121,7 @@
       <PreprocessorDefinitions>MSAA_DX10_1;MSAA_SAMPLES=4;USE_MSAA;GBUFFER_OPTIMIZATION;USE_DX10;_USRDLL;XRRENDER_R3_EXPORTS;USE_RESOURCE_DEBUGGER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <FloatingPointModel>Fast</FloatingPointModel>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -138,7 +130,7 @@
       <AdditionalOptions>-Zm150 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>LuaJIT.lib;d3d9.lib;luabind.lib;nvapi.lib;oalib.lib;amd_ags_$(PlatformShortName).lib;dxguid.lib;d3dcompiler.lib;d3d10.lib;d3dx10.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;nvapi.lib;amd_ags_$(PlatformShortName).lib;dxguid.lib;d3dcompiler.lib;d3d10.lib;d3dx10.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)luajit\bin\$(PlatformShortName);$(xrExternals)AGS_SDK\ags_lib\lib;$(xrExternals)nvapi\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
@@ -158,7 +150,7 @@
       <AdditionalIncludeDirectories>$(xrExternals)OpenAutomate\inc;$(xrExternals)nvapi;$(xrExternals)AGS_SDK;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>MSAA_DX10_1;MSAA_SAMPLES=4;USE_MSAA;GBUFFER_OPTIMIZATION;USE_DX10;_USRDLL;XRRENDER_R3_EXPORTS;USE_RESOURCE_DEBUGGER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <FloatingPointModel>Fast</FloatingPointModel>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -167,7 +159,7 @@
       <AdditionalOptions>-Zm150 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>LuaJIT.lib;d3d9.lib;luabind.lib;nvapi64.lib;oalib.lib;amd_ags_$(PlatformShortName).lib;dxguid.lib;d3dcompiler.lib;d3d10.lib;d3dx10.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;nvapi64.lib;amd_ags_$(PlatformShortName).lib;dxguid.lib;d3dcompiler.lib;d3d10.lib;d3dx10.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)luajit\bin\$(PlatformShortName);$(xrExternals)AGS_SDK\ags_lib\lib;$(xrExternals)nvapi\amd64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
@@ -195,14 +187,13 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Fast</FloatingPointModel>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <AdditionalOptions>-Zm150 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>LuaJIT.lib;d3d9.lib;luabind.lib;nvapi.lib;oalib.lib;amd_ags_$(PlatformShortName).lib;dxguid.lib;d3dcompiler.lib;d3d10.lib;d3dx10.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;nvapi.lib;amd_ags_$(PlatformShortName).lib;dxguid.lib;d3dcompiler.lib;d3d10.lib;d3dx10.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)luajit\bin\$(PlatformShortName);$(xrExternals)AGS_SDK\ags_lib\lib;$(xrExternals)nvapi\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -233,14 +224,13 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Fast</FloatingPointModel>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
       <AdditionalOptions>-Zm150 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>LuaJIT.lib;d3d9.lib;luabind.lib;nvapi64.lib;oalib.lib;amd_ags_$(PlatformShortName).lib;dxguid.lib;d3dcompiler.lib;d3d10.lib;d3dx10.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;nvapi64.lib;amd_ags_$(PlatformShortName).lib;dxguid.lib;d3dcompiler.lib;d3d10.lib;d3dx10.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)luajit\bin\$(PlatformShortName);$(xrExternals)AGS_SDK\ags_lib\lib;$(xrExternals)nvapi\amd64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -272,11 +262,10 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalOptions>-Zm150 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>LuaJIT.lib;d3d9.lib;luabind.lib;nvapi.lib;oalib.lib;amd_ags_$(PlatformShortName).lib;dxguid.lib;d3dcompiler.lib;d3d10.lib;d3dx10.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;nvapi.lib;amd_ags_$(PlatformShortName).lib;dxguid.lib;d3dcompiler.lib;d3d10.lib;d3dx10.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)luajit\bin\$(PlatformShortName);$(xrExternals)AGS_SDK\ags_lib\lib;$(xrExternals)nvapi\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
@@ -307,11 +296,10 @@
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level4</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <AdditionalOptions>-Zm150 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>LuaJIT.lib;d3d9.lib;luabind.lib;nvapi64.lib;oalib.lib;amd_ags_$(PlatformShortName).lib;dxguid.lib;d3dcompiler.lib;d3d10.lib;d3dx10.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;nvapi64.lib;amd_ags_$(PlatformShortName).lib;dxguid.lib;d3dcompiler.lib;d3d10.lib;d3dx10.lib;dxgi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)luajit\bin\$(PlatformShortName);$(xrExternals)AGS_SDK\ags_lib\lib;$(xrExternals)nvapi\amd64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Windows</SubSystem>
       <LargeAddressAware>true</LargeAddressAware>
@@ -704,18 +692,30 @@
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)xrEngine\xrEngine.vcxproj">
       <Project>{2578c6d8-660d-48ae-9322-7422f8664f06}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)xrParticles\xrParticles.vcxproj">
       <Project>{94a1c366-3d19-48e6-8170-4adc2e70df97}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)Layers\xrAPI\xrAPI.vcxproj">
       <Project>{1daec516-e52c-4a3c-a4da-ae3553e6e0f8}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Externals\luabind\src\luabind.vcxproj">
+      <Project>{ccd4afae-aa10-42c6-a452-fdee497ccdf1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Externals\LuaJIT\src\LuaJIT.vcxproj">
+      <Project>{632aeeb6-dc06-4e15-9551-b2b09a4b73c5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Externals\oalib.vcxproj">
+      <Project>{61d4856f-fa82-4f02-bb88-909ddfb1fe74}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\utils\xrMiscMath\xrMiscMath.vcxproj">
       <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\xrCDB\xrCDB.vcxproj">
+      <Project>{a19b1df2-82ec-4364-8bdf-85d13a1c89b5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\xrCore\xrCore.vcxproj">
+      <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\xrScriptEngine\xrScriptEngine.vcxproj">
       <Project>{132c62de-de85-4978-9675-c78ed4da46f0}</Project>

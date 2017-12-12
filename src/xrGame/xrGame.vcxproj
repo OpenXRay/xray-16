@@ -68,32 +68,26 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
     <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
     <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
     <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
     <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
     <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
     <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -101,11 +95,9 @@
     <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
@@ -138,15 +130,12 @@
       <StringPooling>false</StringPooling>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
-      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <BrowseInformation />
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <DisableSpecificWarnings>4237;4250;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -156,11 +145,9 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/ignore:4075 %(AdditionalOptions)</AdditionalOptions>
-      <ShowProgress>NotSet</ShowProgress>
       <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)jpeg\libraries\Release;$(xrExternals)luajit\bin\$(PlatformShortName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <MapExports>false</MapExports>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <AdditionalDependencies>xrPhysics.lib;LuaJIT.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LargeAddressAware>true</LargeAddressAware>
       <SubSystem>Windows</SubSystem>
     </Link>
@@ -182,16 +169,13 @@
       <StringPooling>false</StringPooling>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
-      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <FloatingPointModel>Fast</FloatingPointModel>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <BrowseInformation>
       </BrowseInformation>
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <DisableSpecificWarnings>4237;4250;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -201,11 +185,9 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/ignore:4075 %(AdditionalOptions)</AdditionalOptions>
-      <ShowProgress>NotSet</ShowProgress>
       <AdditionalLibraryDirectories>$(xrExternals)OpenAutomate\libraries;$(xrExternals)jpeg\libraries\Release;$(xrExternals)luajit\bin\$(PlatformShortName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <MapExports>false</MapExports>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <AdditionalDependencies>xrPhysics.lib;LuaJIT.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LargeAddressAware>true</LargeAddressAware>
       <SubSystem>Windows</SubSystem>
     </Link>
@@ -249,7 +231,6 @@
       <LargeAddressAware>true</LargeAddressAware>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <ImportLibrary>$(xrLibDir)$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>xrPhysics.lib;LuaJIT.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -292,7 +273,6 @@
       <LargeAddressAware>true</LargeAddressAware>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <ImportLibrary>$(xrLibDir)$(TargetName).lib</ImportLibrary>
-      <AdditionalDependencies>xrPhysics.lib;LuaJIT.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -311,7 +291,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>$(SolutionDir)xrServerEntities;$(xrExternals)OpenAutomate\inc;$(xrExternals)CxImage;$(xrExternals)pugixml\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRGAME_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
@@ -338,9 +318,8 @@
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <LinkTimeCodeGeneration />
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <AdditionalDependencies>xrPhysics.lib;LuaJIT.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LargeAddressAware>true</LargeAddressAware>
     </Link>
   </ItemDefinitionGroup>
@@ -358,7 +337,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>$(SolutionDir)xrServerEntities;$(xrExternals)OpenAutomate\inc;$(xrExternals)CxImage;$(xrExternals)pugixml\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRGAME_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
@@ -386,10 +365,8 @@
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <LinkTimeCodeGeneration>
-      </LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <AdditionalDependencies>xrPhysics.lib;LuaJIT.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <LargeAddressAware>true</LargeAddressAware>
     </Link>
   </ItemDefinitionGroup>
@@ -4031,23 +4008,15 @@
   <ItemGroup>
     <ProjectReference Include="$(xrExternals)ode\contrib\msvc7\ode_default\default.vcxproj">
       <Project>{1bf75feb-87dd-486c-880b-227987d191c2}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)Layers\xrAPI\xrAPI.vcxproj">
       <Project>{1daec516-e52c-4a3c-a4da-ae3553e6e0f8}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)xrEngine\xrEngine.vcxproj">
-      <Project>{2578c6d8-660d-48ae-9322-7422f8664f06}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)xrGameSpy\xrGameSpy.vcxproj">
       <Project>{5535f6b4-7ae6-4b66-8aea-cc31c14d7ab7}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)xrNetServer\xrNetServer.vcxproj">
       <Project>{435bac9a-b225-457d-ab40-c9bd0cc8838c}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="$(xrExternals)cximage\cximage.vcxproj">
       <Project>{880cd250-ba77-4daf-a8d4-552f12dd3ae4}</Project>
@@ -4058,11 +4027,23 @@
     <ProjectReference Include="$(SolutionDir)xrAICore\xrAICore.vcxproj">
       <Project>{5cb057d8-4464-40a6-af10-c26b826d1d90}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\Externals\LuaJIT\src\LuaJIT.vcxproj">
+      <Project>{632aeeb6-dc06-4e15-9551-b2b09a4b73c5}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\Externals\pugixml_vs2017_static.vcxproj">
       <Project>{07cf01c0-b887-499d-ad9c-799cb6a9fe64}</Project>
     </ProjectReference>
     <ProjectReference Include="..\utils\xrMiscMath\xrMiscMath.vcxproj">
       <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\xrCDB\xrCDB.vcxproj">
+      <Project>{a19b1df2-82ec-4364-8bdf-85d13a1c89b5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\xrCore\xrCore.vcxproj">
+      <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\xrEngine\xrEngine.vcxproj">
+      <Project>{2578c6d8-660d-48ae-9322-7422f8664f06}</Project>
     </ProjectReference>
     <ProjectReference Include="..\xrMisc\xrMisc.vcxproj">
       <Project>{c964d17a-05a8-4bfa-b0a8-7af5c6b627ec}</Project>
@@ -4072,6 +4053,9 @@
     </ProjectReference>
     <ProjectReference Include="..\xrPhysics\xrPhysics.vcxproj">
       <Project>{98d24a3d-7666-4c11-9d6e-b10393ce8cba}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\xrSound\xrSound.vcxproj">
+      <Project>{ccca7859-eb86-493e-9b53-c4235f45b3c5}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

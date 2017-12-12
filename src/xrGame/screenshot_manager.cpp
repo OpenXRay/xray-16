@@ -13,8 +13,6 @@
 #include "ximage.h"
 #include "xmemfile.h"
 
-#pragma comment(lib, "libjpeg.lib")
-
 void* cxalloc(size_t size) { return xr_malloc(size); }
 void cxfree(void* ptr) { xr_free(ptr); }
 void* cxrealloc(void* ptr, size_t size) { return xr_realloc(ptr, size); }

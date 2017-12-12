@@ -22,7 +22,6 @@
     <ProjectName>ECore</ProjectName>
     <ProjectGuid>{226C6807-BB48-4A07-BF13-806C38FD8FBE}</ProjectGuid>
     <RootNamespace>ECore</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">

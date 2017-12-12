@@ -6,7 +6,6 @@
 #include "Layers/xrRender/dxDebugRender.h"
 
 #pragma comment(lib, "xrEngine.lib")
-#pragma comment(lib, "xrScriptEngine.lib")
 
 extern "C" void XR_EXPORT SetupEnv()
 {

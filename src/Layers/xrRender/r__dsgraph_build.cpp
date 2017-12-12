@@ -465,25 +465,21 @@ void CRender::add_leafs_Dynamic(dxRender_Visual* pVisual)
         return;
 
     // Visual is 100% visible - simply add it
-    xr_vector<dxRender_Visual *>::iterator I, E; // it may be useful for 'hierrarhy' visual
-
     switch (pVisual->Type)
     {
     case MT_PARTICLE_GROUP:
     {
         // Add all children, doesn't perform any tests
         PS::CParticleGroup* pG = (PS::CParticleGroup*)pVisual;
-        for (auto i_it = pG->items.begin(); i_it != pG->items.end(); i_it++)
+        for (auto &it : pG->items)
         {
-            PS::CParticleGroup::SItem& I = *i_it;
+            PS::CParticleGroup::SItem& I = it;
             if (I._effect)
                 add_leafs_Dynamic(I._effect);
-            for (xr_vector<dxRender_Visual*>::iterator pit = I._children_related.begin();
-                 pit != I._children_related.end(); pit++)
-                add_leafs_Dynamic(*pit);
-            for (xr_vector<dxRender_Visual*>::iterator pit = I._children_free.begin(); pit != I._children_free.end();
-                 pit++)
-                add_leafs_Dynamic(*pit);
+            for (auto &pit : I._children_related)
+                add_leafs_Dynamic(pit);
+            for (auto &pit : I._children_free)
+                add_leafs_Dynamic(pit);
         }
     }
         return;
@@ -491,10 +487,8 @@ void CRender::add_leafs_Dynamic(dxRender_Visual* pVisual)
     {
         // Add all children, doesn't perform any tests
         FHierrarhyVisual* pV = (FHierrarhyVisual*)pVisual;
-        I = pV->children.begin();
-        E = pV->children.end();
-        for (; I != E; I++)
-            add_leafs_Dynamic(*I);
+        for (auto &i : pV->children)
+            add_leafs_Dynamic(i);
     }
         return;
     case MT_SKELETON_ANIM:
@@ -520,10 +514,8 @@ void CRender::add_leafs_Dynamic(dxRender_Visual* pVisual)
         {
             pV->CalculateBones(TRUE);
             pV->CalculateWallmarks(); //. bug?
-            I = pV->children.begin();
-            E = pV->children.end();
-            for (; I != E; I++)
-                add_leafs_Dynamic(*I);
+            for (auto &i : pV->children)
+                add_leafs_Dynamic(i);
         }
     }
         return;
@@ -545,25 +537,21 @@ void CRender::add_leafs_Static(dxRender_Visual* pVisual)
         return;
 
     // Visual is 100% visible - simply add it
-    xr_vector<dxRender_Visual *>::iterator I, E; // it may be usefull for 'hierrarhy' visuals
-
     switch (pVisual->Type)
     {
     case MT_PARTICLE_GROUP:
     {
         // Add all children, doesn't perform any tests
         PS::CParticleGroup* pG = (PS::CParticleGroup*)pVisual;
-        for (auto i_it = pG->items.begin(); i_it != pG->items.end(); i_it++)
+        for (auto &it : pG->items)
         {
-            PS::CParticleGroup::SItem& I = *i_it;
+            PS::CParticleGroup::SItem& I = it;
             if (I._effect)
                 add_leafs_Dynamic(I._effect);
-            for (xr_vector<dxRender_Visual*>::iterator pit = I._children_related.begin();
-                 pit != I._children_related.end(); pit++)
-                add_leafs_Dynamic(*pit);
-            for (xr_vector<dxRender_Visual*>::iterator pit = I._children_free.begin(); pit != I._children_free.end();
-                 pit++)
-                add_leafs_Dynamic(*pit);
+            for (auto &pit : I._children_related)
+                add_leafs_Dynamic(pit);
+            for (auto &pit : I._children_free)
+                add_leafs_Dynamic(pit);
         }
     }
         return;
@@ -571,10 +559,8 @@ void CRender::add_leafs_Static(dxRender_Visual* pVisual)
     {
         // Add all children, doesn't perform any tests
         FHierrarhyVisual* pV = (FHierrarhyVisual*)pVisual;
-        I = pV->children.begin();
-        E = pV->children.end();
-        for (; I != E; I++)
-            add_leafs_Static(*I);
+        for (auto &i : pV->children)
+            add_leafs_Static(i);
     }
         return;
     case MT_SKELETON_ANIM:
@@ -583,10 +569,8 @@ void CRender::add_leafs_Static(dxRender_Visual* pVisual)
         // Add all children, doesn't perform any tests
         CKinematics* pV = (CKinematics*)pVisual;
         pV->CalculateBones(TRUE);
-        I = pV->children.begin();
-        E = pV->children.end();
-        for (; I != E; I++)
-            add_leafs_Static(*I);
+        for (auto &i : pV->children)
+            add_leafs_Static(i);
     }
         return;
     case MT_LOD:
@@ -610,10 +594,8 @@ void CRender::add_leafs_Static(dxRender_Visual* pVisual)
 #endif
         {
             // Add all children, doesn't perform any tests
-            I = pV->children.begin();
-            E = pV->children.end();
-            for (; I != E; I++)
-                add_leafs_Static(*I);
+            for (auto &i : pV->children)
+                add_leafs_Static(i);
         }
     }
         return;
@@ -648,38 +630,32 @@ BOOL CRender::add_Dynamic(dxRender_Visual* pVisual, u32 planes)
         return FALSE;
 
     // If we get here visual is visible or partially visible
-    xr_vector<dxRender_Visual *>::iterator I, E; // it may be usefull for 'hierrarhy' visuals
-
     switch (pVisual->Type)
     {
     case MT_PARTICLE_GROUP:
     {
         // Add all children, doesn't perform any tests
         PS::CParticleGroup* pG = (PS::CParticleGroup*)pVisual;
-        for (auto i_it = pG->items.begin(); i_it != pG->items.end(); i_it++)
+        for (auto &it : pG->items)
         {
-            PS::CParticleGroup::SItem& I = *i_it;
+            PS::CParticleGroup::SItem& I = it;
             if (fcvPartial == VIS)
             {
                 if (I._effect)
                     add_Dynamic(I._effect, planes);
-                for (xr_vector<dxRender_Visual*>::iterator pit = I._children_related.begin();
-                     pit != I._children_related.end(); pit++)
-                    add_Dynamic(*pit, planes);
-                for (xr_vector<dxRender_Visual*>::iterator pit = I._children_free.begin();
-                     pit != I._children_free.end(); pit++)
-                    add_Dynamic(*pit, planes);
+                for (auto &pit : I._children_related)
+                    add_Dynamic(pit, planes);
+                for (auto &pit : I._children_free)
+                    add_Dynamic(pit, planes);
             }
             else
             {
                 if (I._effect)
                     add_leafs_Dynamic(I._effect);
-                for (xr_vector<dxRender_Visual*>::iterator pit = I._children_related.begin();
-                     pit != I._children_related.end(); pit++)
-                    add_leafs_Dynamic(*pit);
-                for (xr_vector<dxRender_Visual*>::iterator pit = I._children_free.begin();
-                     pit != I._children_free.end(); pit++)
-                    add_leafs_Dynamic(*pit);
+                for (auto &pit : I._children_related)
+                    add_leafs_Dynamic(pit);
+                for (auto &pit : I._children_free)
+                    add_leafs_Dynamic(pit);
             }
         }
     }
@@ -688,17 +664,15 @@ BOOL CRender::add_Dynamic(dxRender_Visual* pVisual, u32 planes)
     {
         // Add all children
         FHierrarhyVisual* pV = (FHierrarhyVisual*)pVisual;
-        I = pV->children.begin();
-        E = pV->children.end();
         if (fcvPartial == VIS)
         {
-            for (; I != E; I++)
-                add_Dynamic(*I, planes);
+            for (auto &i : pV->children)
+                add_Dynamic(i, planes);
         }
         else
         {
-            for (; I != E; I++)
-                add_leafs_Dynamic(*I);
+            for (auto &i : pV->children)
+                add_leafs_Dynamic(i);
         }
     }
     break;
@@ -725,20 +699,9 @@ BOOL CRender::add_Dynamic(dxRender_Visual* pVisual, u32 planes)
         {
             pV->CalculateBones(TRUE);
             pV->CalculateWallmarks(); //. bug?
-            I = pV->children.begin();
-            E = pV->children.end();
-            for (; I != E; I++)
-                add_leafs_Dynamic(*I);
+            for (auto &i : pV->children)
+                add_leafs_Dynamic(i);
         }
-        /*
-        I = pV->children.begin      ();
-        E = pV->children.end        ();
-        if (fcvPartial==VIS) {
-            for (; I!=E; I++)   add_Dynamic         (*I,planes);
-        } else {
-            for (; I!=E; I++)   add_leafs_Dynamic   (*I);
-        }
-        */
     }
     break;
     default:
@@ -764,38 +727,32 @@ void CRender::add_Static(dxRender_Visual* pVisual, u32 planes)
         return;
 
     // If we get here visual is visible or partially visible
-    xr_vector<dxRender_Visual *>::iterator I, E; // it may be usefull for 'hierrarhy' visuals
-
     switch (pVisual->Type)
     {
     case MT_PARTICLE_GROUP:
     {
         // Add all children, doesn't perform any tests
         PS::CParticleGroup* pG = (PS::CParticleGroup*)pVisual;
-        for (auto i_it = pG->items.begin(); i_it != pG->items.end(); i_it++)
+        for (auto &it : pG->items)
         {
-            PS::CParticleGroup::SItem& I = *i_it;
+            PS::CParticleGroup::SItem& I = it;
             if (fcvPartial == VIS)
             {
                 if (I._effect)
                     add_Dynamic(I._effect, planes);
-                for (xr_vector<dxRender_Visual*>::iterator pit = I._children_related.begin();
-                     pit != I._children_related.end(); pit++)
-                    add_Dynamic(*pit, planes);
-                for (xr_vector<dxRender_Visual*>::iterator pit = I._children_free.begin();
-                     pit != I._children_free.end(); pit++)
-                    add_Dynamic(*pit, planes);
+                for (auto &pit : I._children_related)
+                    add_Dynamic(pit, planes);
+                for (auto &pit : I._children_free)
+                    add_Dynamic(pit, planes);
             }
             else
             {
                 if (I._effect)
                     add_leafs_Dynamic(I._effect);
-                for (xr_vector<dxRender_Visual*>::iterator pit = I._children_related.begin();
-                     pit != I._children_related.end(); pit++)
-                    add_leafs_Dynamic(*pit);
-                for (xr_vector<dxRender_Visual*>::iterator pit = I._children_free.begin();
-                     pit != I._children_free.end(); pit++)
-                    add_leafs_Dynamic(*pit);
+                for (auto &pit : I._children_related)
+                    add_leafs_Dynamic(pit);
+                for (auto &pit : I._children_free)
+                    add_leafs_Dynamic(pit);
             }
         }
     }
@@ -804,17 +761,15 @@ void CRender::add_Static(dxRender_Visual* pVisual, u32 planes)
     {
         // Add all children
         FHierrarhyVisual* pV = (FHierrarhyVisual*)pVisual;
-        I = pV->children.begin();
-        E = pV->children.end();
         if (fcvPartial == VIS)
         {
-            for (; I != E; I++)
-                add_Static(*I, planes);
+            for (auto &i : pV->children)
+                add_Static(i, planes);
         }
         else
         {
-            for (; I != E; I++)
-                add_leafs_Static(*I);
+            for (auto &i : pV->children)
+                add_leafs_Static(i);
         }
     }
     break;
@@ -824,17 +779,15 @@ void CRender::add_Static(dxRender_Visual* pVisual, u32 planes)
         // Add all children, doesn't perform any tests
         CKinematics* pV = (CKinematics*)pVisual;
         pV->CalculateBones(TRUE);
-        I = pV->children.begin();
-        E = pV->children.end();
         if (fcvPartial == VIS)
         {
-            for (; I != E; I++)
-                add_Static(*I, planes);
+            for (auto &i : pV->children)
+                add_Static(i, planes);
         }
         else
         {
-            for (; I != E; I++)
-                add_leafs_Static(*I);
+            for (auto &i : pV->children)
+                add_leafs_Static(i);
         }
     }
     break;
@@ -859,10 +812,8 @@ void CRender::add_Static(dxRender_Visual* pVisual, u32 planes)
 #endif
         {
             // Add all children, perform tests
-            I = pV->children.begin();
-            E = pV->children.end();
-            for (; I != E; I++)
-                add_leafs_Static(*I);
+            for (auto &i : pV->children)
+                add_leafs_Static(i);
         }
     }
     break;

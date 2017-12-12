@@ -14,8 +14,6 @@ public:
     virtual void destroy_loading_shaders() = 0;
     virtual void setLevelLogo(LPCSTR pszLogoName) = 0;
     virtual void load_draw_internal(CApplication& owner) = 0;
-    //	?????
-    virtual void KillHW() = 0;
 };
 
 #endif //	ApplicationRender_included

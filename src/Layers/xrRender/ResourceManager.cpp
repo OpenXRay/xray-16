@@ -110,7 +110,7 @@ void CResourceManager::_ParseList(sh_list& dest, LPCSTR names)
     if (nullptr == names || 0 == names[0])
         names = "$null";
 
-    ZeroMemory(&dest, sizeof(dest));
+    dest.clear();
     char* P = (char*)names;
     svector<char, 128> N;
 
