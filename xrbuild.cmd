@@ -1,5 +1,8 @@
 md res\bins\ 
 
+set CONFIGURATION=%1
+set PLATFORM=%2
+
 if %PLATFORM% == 'Debug' if %CONFIGURATION% == 'x86' goto :DX86 
 if %PLATFORM% == 'Debug' if %CONFIGURATION% == 'x64' goto :DX64 
 if %PLATFORM% == 'Release' if %CONFIGURATION% == 'x86' goto :RX86 
