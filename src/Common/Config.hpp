@@ -18,6 +18,7 @@
 
 // TWEAKS:
 //#define FP_DEATH // first person death view
+//#define ACTOR_BEFORE_DEATH_CALLBACK
 #define DEAD_BODY_COLLISION // restore collision with dead bodies (thanks malandrinus)
 #define NEW_ANIMS // use new animations. Please enclose any new animation addions with this define
 #define NEW_SOUNDS // use new sounds. Please enclose any new sound addions with this define

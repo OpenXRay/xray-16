@@ -66,7 +66,9 @@ enum ECallbackType
     eItemToSlot,
     eItemToRuck,
     // Actor
+#ifdef ACTOR_BEFORE_DEATH_CALLBACK
     eActorBeforeDeath,
+#endif
     //-AVO
 
     eDummy = u32(-1),
