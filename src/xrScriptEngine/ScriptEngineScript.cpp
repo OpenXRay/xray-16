@@ -15,9 +15,6 @@
 
 void LuaLog(pcstr caMessage)
 {
-    if (!GEnv.ScriptEngine->m_stack_is_ready)
-        Msg("LUA: %s", caMessage); // Xottab_DUTY: temporary workaround to get lua log output
-
 #ifndef MASTER_GOLD
     GEnv.ScriptEngine->script_log(LuaMessageType::Message, "%s", caMessage);
 #endif
