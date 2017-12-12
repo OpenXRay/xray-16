@@ -95,9 +95,7 @@ SCRIPT_EXPORT(CScriptGameObject, (), {
                 value("item_to_slot", int(GameObject::eItemToSlot)),
                 value("item_to_ruck", int(GameObject::eItemToRuck)),
                 // Actor
-#ifdef ACTOR_BEFORE_DEATH_CALLBACK
                 value("actor_before_death", int(GameObject::eActorBeforeDeath)),
-#endif
                 //-AVO
 
                 value("map_location_added", int(GameObject::eMapLocationAdded))],
