@@ -1,12 +1,9 @@
 md res\bins\ 
 
-set CONFIGURATION=%1
-set PLATFORM=%2
-
-if %PLATFORM% == 'Debug' if %CONFIGURATION% == 'x86' goto :DX86 
-if %PLATFORM% == 'Debug' if %CONFIGURATION% == 'x64' goto :DX64 
-if %PLATFORM% == 'Release' if %CONFIGURATION% == 'x86' goto :RX86 
-if %PLATFORM% == 'Release' if %CONFIGURATION% == 'x64' goto :RX64 
+if %CONFIGURATION%==Debug if %PLATFORM%==x86 goto :DX86 
+if %CONFIGURATION%==Debug if %PLATFORM%==x64 goto :DX64 
+if %CONFIGURATION%==Release if %PLATFORM%==x86 goto :RX86 
+if %CONFIGURATION%==Release if %PLATFORM%==x64 goto :RX64 
 
 echo FAIL
 goto :END 
