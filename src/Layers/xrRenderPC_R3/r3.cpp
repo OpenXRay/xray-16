@@ -14,8 +14,6 @@
 #include "Layers/xrRenderDX10/3DFluid/dx103DFluidManager.h"
 #include "D3DX10Core.h"
 
-#include "Common/Config.hpp"
-
 CRender RImplementation;
 
 //////////////////////////////////////////////////////////////////////////

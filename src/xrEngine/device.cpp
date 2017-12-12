@@ -28,8 +28,6 @@
 #include "IGame_Persistent.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
-#include "Common/Config.hpp"
-
 ENGINE_API CRenderDevice Device;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;
 

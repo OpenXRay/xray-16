@@ -15,8 +15,6 @@
 #include "Layers/xrRender/ShaderResourceTraits.h"
 #include "D3DX10Core.h"
 
-#include "Common/Config.hpp"
-
 CRender RImplementation;
 
 //////////////////////////////////////////////////////////////////////////

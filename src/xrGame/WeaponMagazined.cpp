@@ -23,8 +23,6 @@
 #include "script_game_object.h"
 #include "HudSound.h"
 
-#include "Common/Config.hpp"
-
 CUIXml* pWpnScopeXml = nullptr;
 
 void createWpnScopeXML()

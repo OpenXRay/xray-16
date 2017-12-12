@@ -2,7 +2,6 @@
 #pragma hdrstop
 
 #include "xrRender_console.h"
-#include "Common/Config.hpp"
 
 u32 ps_Preset = 2;
 xr_token qpreset_token[] = {{"Minimum", 0}, {"Low", 1}, {"Default", 2}, {"High", 3}, {"Extreme", 4}, {nullptr, 0}};

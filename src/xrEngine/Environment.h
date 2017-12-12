@@ -9,8 +9,6 @@
 #include "xrCommon/xr_vector.h"
 #include "xrCommon/xr_map.h"
 
-#include "Common/Config.hpp"
-
 // refs
 class ENGINE_API IRender_Visual;
 class ENGINE_API CInifile;

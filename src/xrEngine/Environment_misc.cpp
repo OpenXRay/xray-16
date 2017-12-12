@@ -10,8 +10,6 @@
 #include "Common/object_broker.h"
 #include "Common/LevelGameDef.h"
 
-#include "Common/Config.hpp"
-
 void CEnvModifier::load(IReader* fs, u32 version)
 {
     use_flags.one();

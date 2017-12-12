@@ -12,8 +12,6 @@
 #include "Layers/xrRender/dxWallMarkArray.h"
 #include "Layers/xrRender/dxUIShader.h"
 
-#include "Common/Config.hpp"
-
 CRender RImplementation;
 
 //////////////////////////////////////////////////////////////////////////

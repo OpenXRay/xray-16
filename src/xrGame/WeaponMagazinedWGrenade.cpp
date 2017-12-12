@@ -13,8 +13,6 @@
 #include "xrPhysics/MathUtils.h"
 #include "player_hud.h"
 
-#include "Common/Config.hpp"
-
 #ifdef DEBUG
 #include "PHDebug.h"
 #endif

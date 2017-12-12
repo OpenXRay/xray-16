@@ -73,8 +73,6 @@
 #include "ActorHelmet.h"
 #include "UI/UIDragDropReferenceList.h"
 
-#include "Common/Config.hpp"
-
 const u32 patch_frames = 50;
 const float respawn_delay = 1.f;
 const float respawn_auto = 7.f;

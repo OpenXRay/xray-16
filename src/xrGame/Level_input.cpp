@@ -24,7 +24,6 @@
 
 #include "Include/xrRender/DebugRender.h"
 
-#include "Common/Config.hpp"
 
 #ifdef DEBUG
 #include "ai/monsters/BaseMonster/base_monster.h"

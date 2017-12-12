@@ -7,8 +7,6 @@
 #include "xrCore/FMesh.hpp"
 #include "FTreeVisual.h"
 
-#include "Common/Config.hpp"
-
 shared_str m_xform;
 shared_str m_xform_v;
 shared_str c_consts;

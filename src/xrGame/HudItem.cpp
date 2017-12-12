@@ -11,7 +11,6 @@
 #include "player_hud.h"
 #include "xrCore/Animation/SkeletonMotions.hpp"
 
-#include "Common/Config.hpp"
 #include "ui_base.h"
 
 CHudItem::CHudItem()

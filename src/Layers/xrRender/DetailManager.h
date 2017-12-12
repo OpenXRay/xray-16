@@ -9,7 +9,6 @@
 #include "xrCore/xrPool.h"
 #include "DetailFormat.h"
 #include "DetailModel.h"
-#include "Common/Config.hpp"
 
 #ifdef _EDITOR
 //.	#include	"ESceneClassList.h"
