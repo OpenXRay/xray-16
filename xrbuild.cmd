@@ -13,7 +13,6 @@ cd bin\Win32\Debug
 copy *.dll ..\..\..\res\bins\ 
 copy *.exe ..\..\..\res\bins\ 
 cd ..\..\..\ 
-dir 
 copy License.txt .\res\ 
 copy README.md .\res\ 
 cd res\ 
@@ -25,7 +24,6 @@ cd bin\Win64\Debug
 copy *.dll ..\..\..\res\bins\ 
 copy *.exe ..\..\..\res\bins\ 
 cd ..\..\..\ 
-dir 
 copy License.txt .\res\ 
 copy README.md .\res\ 
 cd res\ 
@@ -33,11 +31,10 @@ cd res\
 goto :END 
 
 :RX86 
-cd bin\Win86\Release 
+cd bin\Win32\Release 
 copy *.dll ..\..\..\res\bins\ 
 copy *.exe ..\..\..\res\bins\ 
 cd ..\..\..\ 
-dir 
 copy License.txt .\res\ 
 copy README.md .\res\ 
 cd res\ 
@@ -49,7 +46,6 @@ cd bin\Win64\Release
 copy *.dll ..\..\..\res\bins\ 
 copy *.exe ..\..\..\res\bins\ 
 cd ..\..\..\ 
-dir 
 copy License.txt .\res\ 
 copy README.md .\res\ 
 cd res\ 
