@@ -273,8 +273,8 @@ void CPSLibrary::Reload()
 
 using PS::CPGDef;
 
-CPGDef const* const* CPSLibrary::particles_group_begin() const { return (m_PGDs.size() ? &*m_PGDs.begin() : 0); }
-CPGDef const* const* CPSLibrary::particles_group_end() const { return (m_PGDs.size() ? &*m_PGDs.end() : 0); }
+CPGDef const* const* CPSLibrary::particles_group_begin() const { return (m_PGDs.size() ? &m_PGDs.front() : 0); }
+CPGDef const* const* CPSLibrary::particles_group_end() const { return (m_PGDs.size() ? &m_PGDs.back() : 0); }
 void CPSLibrary::particles_group_next(PS::CPGDef const* const*& iterator) const
 {
     VERIFY(iterator);
