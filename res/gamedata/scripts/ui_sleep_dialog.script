@@ -35,7 +35,7 @@ function sleep_dialog:__init() super()
 	self:Register(self.btn_cancel, "btn_cancel")
 
 	self.sleep_mb = CUIMessageBoxEx()
-	self.sleep_mb:self:SetAutoDelete(true)
+	self.sleep_mb:SetAutoDelete(true)
 	self:Register(self.sleep_mb, "sleep_mb")
 --------------------------------------------------------------------------------
 	self:AddCallback("btn_sleep", ui_events.BUTTON_CLICKED, self.OnButtonSleep, self)
