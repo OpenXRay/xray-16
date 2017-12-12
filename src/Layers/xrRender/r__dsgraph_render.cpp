@@ -42,32 +42,32 @@ template <class T> IC bool cmp_ps_val_ssa(const T &lhs, const T &rhs)
 
 template <class T> IC bool cmp_textures_lex2(const T &lhs, const T &rhs)
 {
-    auto t1 = *lhs->key;
-    auto t2 = *rhs->key;
+    auto t1 = lhs->key;
+    auto t2 = rhs->key;
 
-    if (t1[0] < t2[0]) return true;
-    if (t1[0] > t2[0]) return false;
-    if (t1[1] < t2[1]) return true;
+    if ((*t1)[0] < (*t2)[0]) return true;
+    if ((*t1)[0] > (*t2)[0]) return false;
+    if ((*t1)[1] < (*t2)[1]) return true;
     else               return false;
 }
 template <class T> IC bool cmp_textures_lex3(const T &lhs, const T &rhs)
 {
-    auto t1 = *lhs->key;
-    auto t2 = *rhs->key;
+    auto t1 = lhs->key;
+    auto t2 = rhs->key;
 
-    if (t1[0] < t2[0]) return true;
-    if (t1[0] > t2[0]) return false;
-    if (t1[1] < t2[1]) return true;
-    if (t1[1] > t2[1]) return false;
-    if (t1[2] < t2[2]) return true;
+    if ((*t1)[0] < (*t2)[0]) return true;
+    if ((*t1)[0] > (*t2)[0]) return false;
+    if ((*t1)[1] < (*t2)[1]) return true;
+    if ((*t1)[1] > (*t2)[1]) return false;
+    if ((*t1)[2] < (*t2)[2]) return true;
     else               return false;
 }
 template <class T> IC bool cmp_textures_lexN(const T &lhs, const T &rhs)
 {
-    auto t1 = *lhs->key;
-    auto t2 = *rhs->key;
+    auto t1 = lhs->key;
+    auto t2 = rhs->key;
 
-    return std::lexicographical_compare(t1.begin(), t1.end(), t2.begin(), t2.end());
+    return std::lexicographical_compare(t1->begin(), t1->end(), t2->begin(), t2->end());
 }
 
 template <class T> void sort_tlist(xr_vector<T::template TNode*, render_alloc<T::template TNode*>>& lst, T& textures)
