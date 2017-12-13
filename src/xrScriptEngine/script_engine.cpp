@@ -564,7 +564,7 @@ struct raii_guard : private Noncopyable
 #endif
             if (!m_error_code)
                 return; // Check "lua_pcall_failed" before changing this!
-            return;
+
             if (break_on_assert)
                 R_ASSERT2(!m_error_code, m_error_description);
             else
