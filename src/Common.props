@@ -86,7 +86,7 @@
       <FloatingPointModel>Fast</FloatingPointModel>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel>Level1</WarningLevel>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(xrSdkDir)libraries;$(xrLibDir);$(xrSdkDir)DXSDK/Lib/$(PlatformShortName);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
