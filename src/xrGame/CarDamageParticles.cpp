@@ -1,11 +1,11 @@
 #include "stdafx.h"
-#include "cardamageparticles.h"
+#include "CarDamageParticles.h"
 #ifdef DEBUG
 
 #include "PHDebug.h"
 #endif
 #include "alife_space.h"
-#include "hit.h"
+#include "Hit.h"
 #include "PHDestroyable.h"
 #include "Car.h"
 #include "Include/xrRender/Kinematics.h"
@@ -46,22 +46,16 @@ void CCarDamageParticles::Init(CCar* car)
 void CCarDamageParticles::Play1(CCar* car)
 {
     if (*m_car_damage_particles1)
-    {
-        auto i = bones1.begin(), e = bones1.end();
-        for (; e != i; ++i)
-            car->StartParticles(m_car_damage_particles1, *i, Fvector().set(0, 1, 0), car->ID());
-    }
+        for (auto& bone : bones1)
+            car->StartParticles(m_car_damage_particles1, bone, Fvector().set(0, 1, 0), car->ID());
 }
 
 void CCarDamageParticles::Play2(CCar* car)
 {
     VERIFY(!physics_world()->Processing());
     if (*m_car_damage_particles2)
-    {
-        auto i = bones2.begin(), e = bones2.end();
-        for (; e != i; ++i)
-            car->StartParticles(m_car_damage_particles2, *i, Fvector().set(0, 1, 0), car->ID());
-    }
+        for (auto& bone : bones2)
+            car->StartParticles(m_car_damage_particles2, bone, Fvector().set(0, 1, 0), car->ID());
 }
 
 /***** added by Ray Twitty (aka Shadows) START *****/
@@ -69,7 +63,7 @@ void CCarDamageParticles::Play2(CCar* car)
 void CCarDamageParticles::Stop1(CCar* car)
 {
     if(*m_car_damage_particles1)
-        for (auto bone : bones1)
+        for (auto& bone : bones1)
             car->StopParticles(car->ID(), bone, false);
 }
 
@@ -77,7 +71,7 @@ void CCarDamageParticles::Stop2(CCar* car)
 {
     VERIFY(!physics_world()->Processing());
     if(*m_car_damage_particles2)
-        for (auto bone : bones2)
+        for (auto& bone : bones2)
             car->StopParticles(car->ID(), bone, false);
 }
 /***** added by Ray Twitty (aka Shadows) END *****/
