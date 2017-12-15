@@ -198,6 +198,10 @@
 	        <text align="c" complex_mode="0" font="graffiti19" r="238" g="155" b="23" a="150">ap</text>
 	    </static_ap_ammo>
 
+        <static_third_ammo x="980" y="704" width="26" height="15">
+            <text align="r" complex_mode="0" font="letterica16" r="238" g="155" b="23"  a="150">third</text>
+        </static_third_ammo>
+
 	    <static_grenade x="824" y="690" width="18" height="19">
 	        <text align="c" complex_mode="0" font="letterica16" color="ui_7" vert_align="c">gr</text>
 	    </static_grenade>
