@@ -9,6 +9,14 @@
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Mixed|Win32">
+      <Configuration>Mixed</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Mixed|x64">
+      <Configuration>Mixed</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
@@ -19,47 +27,43 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <SccProjectName />
-    <SccLocalPath />
     <ProjectGuid>{848E8AB3-9962-4C04-B813-5690399C8A3E}</ProjectGuid>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
-    <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
-    <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
-    <UseOfMfc>false</UseOfMfc>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>v141</PlatformToolset>
-    <UseOfMfc>false</UseOfMfc>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(SolutionDir)Common.props" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -69,121 +73,61 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(SolutionDir)Common.props" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Source\;$(xrExternals)FreeMagic\Source\Approximation2D;$(xrExternals)FreeMagic\Source\Approximation3D;$(xrExternals)FreeMagic\Source\Containment2D;$(xrExternals)FreeMagic\Source\Containment3D;$(xrExternals)FreeMagic\Source\Core;$(xrExternals)FreeMagic\Source\Core2D;$(xrExternals)FreeMagic\Source\Core3D;$(xrExternals)FreeMagic\Source\Curve2D;$(xrExternals)FreeMagic\Source\Curve3D;$(xrExternals)FreeMagic\Source\Distance2D;$(xrExternals)FreeMagic\Source\Distance3D;$(xrExternals)FreeMagic\Source\ImageAnalysis;$(xrExternals)FreeMagic\Source\Interpolation1D;$(xrExternals)FreeMagic\Source\Interpolation2D;$(xrExternals)FreeMagic\Source\Interpolation3D;$(xrExternals)FreeMagic\Source\Intersection2D;$(xrExternals)FreeMagic\Source\Intersection3D;$(xrExternals)FreeMagic\Source\Numerics;$(xrExternals)FreeMagic\Source\Projection;$(xrExternals)FreeMagic\Source\Surface;$(xrExternals)FreeMagic\Source\Tessellation2D;$(xrExternals)FreeMagic\Source\Tessellation3D;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;WIN32;_LIB;STRICT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <PrecompiledHeader />
-      <WarningLevel>Level3</WarningLevel>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <CompileAs>Default</CompileAs>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <Lib>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-    </Lib>
-    <PostBuildEvent>
-      <Command>
-      </Command>
-    </PostBuildEvent>
-    <ResourceCompile>
-      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <Culture>0x0409</Culture>
-    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Source\;$(xrExternals)FreeMagic\Source\Approximation2D;$(xrExternals)FreeMagic\Source\Approximation3D;$(xrExternals)FreeMagic\Source\Containment2D;$(xrExternals)FreeMagic\Source\Containment3D;$(xrExternals)FreeMagic\Source\Core;$(xrExternals)FreeMagic\Source\Core2D;$(xrExternals)FreeMagic\Source\Core3D;$(xrExternals)FreeMagic\Source\Curve2D;$(xrExternals)FreeMagic\Source\Curve3D;$(xrExternals)FreeMagic\Source\Distance2D;$(xrExternals)FreeMagic\Source\Distance3D;$(xrExternals)FreeMagic\Source\ImageAnalysis;$(xrExternals)FreeMagic\Source\Interpolation1D;$(xrExternals)FreeMagic\Source\Interpolation2D;$(xrExternals)FreeMagic\Source\Interpolation3D;$(xrExternals)FreeMagic\Source\Intersection2D;$(xrExternals)FreeMagic\Source\Intersection3D;$(xrExternals)FreeMagic\Source\Numerics;$(xrExternals)FreeMagic\Source\Projection;$(xrExternals)FreeMagic\Source\Surface;$(xrExternals)FreeMagic\Source\Tessellation2D;$(xrExternals)FreeMagic\Source\Tessellation3D;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;WIN32;_LIB;STRICT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <CompileAs>Default</CompileAs>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <Lib>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-    </Lib>
-    <PostBuildEvent>
-      <Command>
-      </Command>
-    </PostBuildEvent>
-    <ResourceCompile>
-      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <Culture>0x0409</Culture>
-    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Source\;$(xrExternals)FreeMagic\Source\Approximation2D;$(xrExternals)FreeMagic\Source\Approximation3D;$(xrExternals)FreeMagic\Source\Containment2D;$(xrExternals)FreeMagic\Source\Containment3D;$(xrExternals)FreeMagic\Source\Core;$(xrExternals)FreeMagic\Source\Core2D;$(xrExternals)FreeMagic\Source\Core3D;$(xrExternals)FreeMagic\Source\Curve2D;$(xrExternals)FreeMagic\Source\Curve3D;$(xrExternals)FreeMagic\Source\Distance2D;$(xrExternals)FreeMagic\Source\Distance3D;$(xrExternals)FreeMagic\Source\ImageAnalysis;$(xrExternals)FreeMagic\Source\Interpolation1D;$(xrExternals)FreeMagic\Source\Interpolation2D;$(xrExternals)FreeMagic\Source\Interpolation3D;$(xrExternals)FreeMagic\Source\Intersection2D;$(xrExternals)FreeMagic\Source\Intersection3D;$(xrExternals)FreeMagic\Source\Numerics;$(xrExternals)FreeMagic\Source\Projection;$(xrExternals)FreeMagic\Source\Surface;$(xrExternals)FreeMagic\Source\Tessellation2D;$(xrExternals)FreeMagic\Source\Tessellation3D;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Source\;$(xrExternals)FreeMagic\Source\Approximation2D;$(xrExternals)FreeMagic\Source\Approximation3D;$(xrExternals)FreeMagic\Source\Containment2D;$(xrExternals)FreeMagic\Source\Containment3D;$(xrExternals)FreeMagic\Source\Core;$(xrExternals)FreeMagic\Source\Core2D;$(xrExternals)FreeMagic\Source\Core3D;$(xrExternals)FreeMagic\Source\Curve2D;$(xrExternals)FreeMagic\Source\Curve3D;$(xrExternals)FreeMagic\Source\Distance2D;$(xrExternals)FreeMagic\Source\Distance3D;$(xrExternals)FreeMagic\Source\ImageAnalysis;$(xrExternals)FreeMagic\Source\Interpolation1D;$(xrExternals)FreeMagic\Source\Interpolation2D;$(xrExternals)FreeMagic\Source\Interpolation3D;$(xrExternals)FreeMagic\Source\Intersection2D;$(xrExternals)FreeMagic\Source\Intersection3D;$(xrExternals)FreeMagic\Source\Numerics;$(xrExternals)FreeMagic\Source\Projection;$(xrExternals)FreeMagic\Source\Surface;$(xrExternals)FreeMagic\Source\Tessellation2D;$(xrExternals)FreeMagic\Source\Tessellation3D;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Source\;$(xrExternals)FreeMagic\Source\Approximation2D;$(xrExternals)FreeMagic\Source\Approximation3D;$(xrExternals)FreeMagic\Source\Containment2D;$(xrExternals)FreeMagic\Source\Containment3D;$(xrExternals)FreeMagic\Source\Core;$(xrExternals)FreeMagic\Source\Core2D;$(xrExternals)FreeMagic\Source\Core3D;$(xrExternals)FreeMagic\Source\Curve2D;$(xrExternals)FreeMagic\Source\Curve3D;$(xrExternals)FreeMagic\Source\Distance2D;$(xrExternals)FreeMagic\Source\Distance3D;$(xrExternals)FreeMagic\Source\ImageAnalysis;$(xrExternals)FreeMagic\Source\Interpolation1D;$(xrExternals)FreeMagic\Source\Interpolation2D;$(xrExternals)FreeMagic\Source\Interpolation3D;$(xrExternals)FreeMagic\Source\Intersection2D;$(xrExternals)FreeMagic\Source\Intersection3D;$(xrExternals)FreeMagic\Source\Numerics;$(xrExternals)FreeMagic\Source\Projection;$(xrExternals)FreeMagic\Source\Surface;$(xrExternals)FreeMagic\Source\Tessellation2D;$(xrExternals)FreeMagic\Source\Tessellation3D;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;WIN32;_LIB;STRICT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <StringPooling>true</StringPooling>
-      <PrecompiledHeader />
-      <WarningLevel>Level3</WarningLevel>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <CompileAs>Default</CompileAs>
-      <BufferSecurityCheck>false</BufferSecurityCheck>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Fast</FloatingPointModel>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <OmitFramePointers>true</OmitFramePointers>
-      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <Lib>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-    </Lib>
-    <PostBuildEvent>
-      <Command>
-      </Command>
-    </PostBuildEvent>
-    <ResourceCompile>
-      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <Culture>0x0409</Culture>
-    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <AdditionalIncludeDirectories>$(xrExternals)FreeMagic\Source\;$(xrExternals)FreeMagic\Source\Approximation2D;$(xrExternals)FreeMagic\Source\Approximation3D;$(xrExternals)FreeMagic\Source\Containment2D;$(xrExternals)FreeMagic\Source\Containment3D;$(xrExternals)FreeMagic\Source\Core;$(xrExternals)FreeMagic\Source\Core2D;$(xrExternals)FreeMagic\Source\Core3D;$(xrExternals)FreeMagic\Source\Curve2D;$(xrExternals)FreeMagic\Source\Curve3D;$(xrExternals)FreeMagic\Source\Distance2D;$(xrExternals)FreeMagic\Source\Distance3D;$(xrExternals)FreeMagic\Source\ImageAnalysis;$(xrExternals)FreeMagic\Source\Interpolation1D;$(xrExternals)FreeMagic\Source\Interpolation2D;$(xrExternals)FreeMagic\Source\Interpolation3D;$(xrExternals)FreeMagic\Source\Intersection2D;$(xrExternals)FreeMagic\Source\Intersection3D;$(xrExternals)FreeMagic\Source\Numerics;$(xrExternals)FreeMagic\Source\Projection;$(xrExternals)FreeMagic\Source\Surface;$(xrExternals)FreeMagic\Source\Tessellation2D;$(xrExternals)FreeMagic\Source\Tessellation3D;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;WIN32;_LIB;STRICT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <StringPooling>true</StringPooling>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-      <CompileAs>Default</CompileAs>
-      <BufferSecurityCheck>false</BufferSecurityCheck>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <FloatingPointModel>Fast</FloatingPointModel>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <OmitFramePointers>true</OmitFramePointers>
-      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
-    <Lib>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
-    </Lib>
-    <PostBuildEvent>
-      <Command>
-      </Command>
-    </PostBuildEvent>
-    <ResourceCompile>
-      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <Culture>0x0409</Culture>
-    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="FreeMagic\Source\FreeMagic\Source\Approximation2D\MgcApproximation2D.pkg" />
