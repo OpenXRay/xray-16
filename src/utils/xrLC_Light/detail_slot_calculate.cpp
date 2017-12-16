@@ -388,8 +388,8 @@ bool detail_slot_calculate(
     DB.box_query(&gl_data.RCAST_Model, bbC, bbD);
 
     box_result.clear();
-    for (CDB::RESULT* I = DB.r_begin(); I != DB.r_end(); I++)
-        box_result.push_back(I->id);
+    for (auto &it : *DB.r_get())
+        box_result.push_back(it.id);
     if (box_result.empty())
         return false;
     // continue;

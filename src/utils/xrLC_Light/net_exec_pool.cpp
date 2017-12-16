@@ -195,17 +195,6 @@ run_task:;
     return;
 }
 
-struct exec_find
-{
-    u32 _id;
-    exec_find(u32 id) : _id(id) {}
-    bool operator()(net_execution* e)
-    {
-        R_ASSERT(e);
-        return e->id() == _id;
-    }
-};
-
 net_execution* exec_pool::receive_task(IAgent* agent, DWORD sessionId, IGenericStream* inStream)
 {
     __try
@@ -215,19 +204,21 @@ net_execution* exec_pool::receive_task(IAgent* agent, DWORD sessionId, IGenericS
         read_task_caption(inStream, id, type);
 
         send_receive_lock.Enter();
-        exec_find f(id);
-        xr_vector<net_execution*>::iterator i = std::find_if(pool.begin(), pool.end(), f);
 
-        if (i != pool.end())
+        for (size_t i = 0; i < pool.size(); i++)
         {
-            send_receive_lock.Leave();
-            return 0;
+            net_execution* it = pool[i];
+            R_ASSERT(it);
+            if (it->id() == id)
+            {
+                send_receive_lock.Leave();
+                return 0;
+            }
         }
 
         net_execution* e = execution_factory.create(type, id);
         pool.push_back(e);
         send_receive_lock.Leave();
-
         e->receive_task(agent, sessionId, inStream);
 
         return e;

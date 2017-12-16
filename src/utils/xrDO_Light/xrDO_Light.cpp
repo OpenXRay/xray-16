@@ -9,10 +9,6 @@
 
 #pragma comment(lib, "comctl32.lib")
 #pragma comment(lib, "winmm.LIB")
-#pragma comment(lib, "xrCDB.lib")
-#pragma comment(lib, "xrCore.lib")
-#pragma comment(lib, "xrLC_Light.lib")
-#pragma comment(lib, "xrLCUtil.lib")
 
 ILevelCompilerLogger& Logger = LevelCompilerLoggerWindow();
 
