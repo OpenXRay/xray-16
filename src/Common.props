@@ -68,8 +68,12 @@
 
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>.;$(SolutionDir);$(xrExternals);$(ProjectDir);$(xrSdkDir)include;$(xrSdkDir)DXSDK/Include;$(xrExternals)luajit/src;$(xrExternals)luabind;$(xrExternals)GameSpy/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <!-- Optimization is automatically enabled when <UseDebugLibraries>false</UseDebugLibraries>. That's why we'll turn it off manually -->
+      <AdditionalIncludeDirectories>.;$(SolutionDir);$(xrExternals);$(ProjectDir);$(xrSdkDir)include;$(xrSdkDir)DXSDK/Include;$(xrExternals)luajit\src;$(xrExternals)luabind;$(xrExternals)GameSpy\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <!-- MultiProcessorCompilation don't compatible with LinkIncremental and UseDebugLibraries -->
+      <MultiProcessorCompilation Condition="$(Configuration.StartsWith('Debug'  ))">false</MultiProcessorCompilation>
+      <MultiProcessorCompilation Condition="$(Configuration.StartsWith('Mixed'  ))">true</MultiProcessorCompilation>
+      <MultiProcessorCompilation Condition="$(Configuration.StartsWith('Release'))">true</MultiProcessorCompilation>
+      <!-- Optimization is automatically enabled when UseDebugLibraries == false. That's why we'll turn it off manually -->
       <Optimization Condition="$(Configuration.StartsWith('Mixed'))">Disabled</Optimization>
       <!--
         4251 : class 'x' needs to have dll-interface to be used by clients of class 'y'

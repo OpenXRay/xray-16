@@ -175,28 +175,28 @@
     <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Dedicated|Win32'">
-    <OutDir>$(xrBinDir)dedicated</OutDir>
-    <IntDir>$(xrIntDir)$(ProjectName)_dedicated</IntDir>
+    <IntDir>$(xrIntDir)$(ProjectName)_dedicated\</IntDir>
+    <TargetName>$(ProjectName)_dedicated</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_Dedicated|x64'">
-    <IntDir>$(xrIntDir)$(ProjectName)_dedicated</IntDir>
-    <OutDir>$(xrBinDir)dedicated</OutDir>
+    <IntDir>$(xrIntDir)$(ProjectName)_dedicated\</IntDir>
+    <TargetName>$(ProjectName)_dedicated</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed_Dedicated|Win32'">
-    <OutDir>$(xrBinDir)dedicated</OutDir>
-    <IntDir>$(xrIntDir)$(ProjectName)_dedicated</IntDir>
+    <IntDir>$(xrIntDir)$(ProjectName)_dedicated\</IntDir>
+    <TargetName>$(ProjectName)_dedicated</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed_Dedicated|x64'">
-    <OutDir>$(xrBinDir)dedicated</OutDir>
-    <IntDir>$(xrIntDir)$(ProjectName)_dedicated</IntDir>
+    <IntDir>$(xrIntDir)$(ProjectName)_dedicated\</IntDir>
+    <TargetName>$(ProjectName)_dedicated</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Dedicated|Win32'">
-    <OutDir>$(xrBinDir)dedicated</OutDir>
-    <IntDir>$(xrIntDir)$(ProjectName)_dedicated</IntDir>
+    <IntDir>$(xrIntDir)$(ProjectName)_dedicated\</IntDir>
+    <TargetName>$(ProjectName)_dedicated</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Dedicated|x64'">
-    <OutDir>$(xrBinDir)dedicated</OutDir>
-    <IntDir>$(xrIntDir)$(ProjectName)_dedicated</IntDir>
+    <IntDir>$(xrIntDir)$(ProjectName)_dedicated\</IntDir>
+    <TargetName>$(ProjectName)_dedicated</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -646,6 +646,9 @@
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)xrPhysics\xrPhysics.vcxproj">
       <Project>{98d24a3d-7666-4c11-9d6e-b10393ce8cba}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\xrMisc\xrMisc.vcxproj">
+      <Project>{c964d17a-05a8-4bfa-b0a8-7af5c6b627ec}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
