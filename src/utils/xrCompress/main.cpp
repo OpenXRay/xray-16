@@ -12,9 +12,6 @@ int __cdecl main(int argc, char* argv[])
     printf("\n\n");
 
     LPCSTR params = GetCommandLine();
-    xrCompressor C;
-
-    C.SetStoreFiles(NULL != strstr(params, "-store"));
 
 #ifndef MOD_COMPRESS
     if (strstr(params, "-diff"))
@@ -52,6 +49,9 @@ int __cdecl main(int argc, char* argv[])
         FS._initialize(CLocatorAPI::flTargetFolderOnly, folder);
         FS.append_path("$working_folder$", "", 0, false);
 
+        xrCompressor C;
+
+        C.SetStoreFiles(NULL != strstr(params, "-store"));
         C.SetFastMode(NULL != strstr(params, "-fast"));
         C.SetTargetName(argv[1]);
 

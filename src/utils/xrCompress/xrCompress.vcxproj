@@ -99,6 +99,7 @@
     </Link>
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(xrExternals)lzo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -107,6 +108,7 @@
     </Link>
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(xrExternals)lzo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -115,6 +117,7 @@
     </Link>
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(xrExternals)lzo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -123,6 +126,7 @@
     </Link>
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(xrExternals)lzo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
@@ -131,6 +135,7 @@
     </Link>
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(xrExternals)lzo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
@@ -139,145 +144,24 @@
     </Link>
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(xrExternals)lzo\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="lzo\alloc.c" />
-    <ClCompile Include="lzo\io.c" />
-    <ClCompile Include="lzo\lzo1.c" />
-    <ClCompile Include="lzo\lzo1a.c" />
-    <ClCompile Include="lzo\lzo1a_99.c" />
-    <ClCompile Include="lzo\lzo1b_1.c" />
-    <ClCompile Include="lzo\lzo1b_2.c" />
-    <ClCompile Include="lzo\lzo1b_3.c" />
-    <ClCompile Include="lzo\lzo1b_4.c" />
-    <ClCompile Include="lzo\lzo1b_5.c" />
-    <ClCompile Include="lzo\lzo1b_6.c" />
-    <ClCompile Include="lzo\lzo1b_7.c" />
-    <ClCompile Include="lzo\lzo1b_8.c" />
-    <ClCompile Include="lzo\lzo1b_9.c" />
-    <ClCompile Include="lzo\lzo1b_99.c" />
-    <ClCompile Include="lzo\lzo1b_9x.c" />
-    <ClCompile Include="lzo\lzo1b_cc.c" />
-    <ClCompile Include="lzo\lzo1b_d1.c" />
-    <ClCompile Include="lzo\lzo1b_d2.c" />
-    <ClCompile Include="lzo\lzo1b_rr.c" />
-    <ClCompile Include="lzo\lzo1b_xx.c" />
-    <ClCompile Include="lzo\lzo1c_1.c" />
-    <ClCompile Include="lzo\lzo1c_2.c" />
-    <ClCompile Include="lzo\lzo1c_3.c" />
-    <ClCompile Include="lzo\lzo1c_4.c" />
-    <ClCompile Include="lzo\lzo1c_5.c" />
-    <ClCompile Include="lzo\lzo1c_6.c" />
-    <ClCompile Include="lzo\lzo1c_7.c" />
-    <ClCompile Include="lzo\lzo1c_8.c" />
-    <ClCompile Include="lzo\lzo1c_9.c" />
-    <ClCompile Include="lzo\lzo1c_99.c" />
-    <ClCompile Include="lzo\lzo1c_9x.c" />
-    <ClCompile Include="lzo\lzo1c_cc.c" />
-    <ClCompile Include="lzo\lzo1c_d1.c" />
-    <ClCompile Include="lzo\lzo1c_d2.c" />
-    <ClCompile Include="lzo\lzo1c_rr.c" />
-    <ClCompile Include="lzo\lzo1c_xx.c" />
-    <ClCompile Include="lzo\lzo1f_1.c" />
-    <ClCompile Include="lzo\lzo1f_9x.c" />
-    <ClCompile Include="lzo\lzo1f_d1.c" />
-    <ClCompile Include="lzo\lzo1f_d2.c" />
-    <ClCompile Include="lzo\lzo1x_1.c" />
-    <ClCompile Include="lzo\lzo1x_1k.c" />
-    <ClCompile Include="lzo\lzo1x_1l.c" />
-    <ClCompile Include="lzo\lzo1x_1o.c" />
-    <ClCompile Include="lzo\lzo1x_9x.c" />
-    <ClCompile Include="lzo\lzo1x_d1.c" />
-    <ClCompile Include="lzo\lzo1x_d2.c" />
-    <ClCompile Include="lzo\lzo1x_d3.c" />
-    <ClCompile Include="lzo\lzo1x_o.c" />
-    <ClCompile Include="lzo\lzo1y_1.c" />
-    <ClCompile Include="lzo\lzo1y_9x.c" />
-    <ClCompile Include="lzo\lzo1y_d1.c" />
-    <ClCompile Include="lzo\lzo1y_d2.c" />
-    <ClCompile Include="lzo\lzo1y_d3.c" />
-    <ClCompile Include="lzo\lzo1y_o.c" />
-    <ClCompile Include="lzo\lzo1z_9x.c" />
-    <ClCompile Include="lzo\lzo1z_d1.c" />
-    <ClCompile Include="lzo\lzo1z_d2.c" />
-    <ClCompile Include="lzo\lzo1z_d3.c" />
-    <ClCompile Include="lzo\lzo1_99.c" />
-    <ClCompile Include="lzo\lzo2a_9x.c" />
-    <ClCompile Include="lzo\lzo2a_d1.c" />
-    <ClCompile Include="lzo\lzo2a_d2.c" />
-    <ClCompile Include="lzo\lzo_crc.c" />
-    <ClCompile Include="lzo\lzo_dll.c" />
-    <ClCompile Include="lzo\lzo_init.c" />
-    <ClCompile Include="lzo\lzo_ptr.c" />
-    <ClCompile Include="lzo\lzo_str.c" />
-    <ClCompile Include="lzo\lzo_util.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="xrCompress.cpp" />
     <ClCompile Include="xrCompressDifference.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="lzo\compr1b.h" />
-    <ClInclude Include="lzo\compr1c.h" />
-    <ClInclude Include="lzo\config1.h" />
-    <ClInclude Include="lzo\config1a.h" />
-    <ClInclude Include="lzo\config1b.h" />
-    <ClInclude Include="lzo\config1c.h" />
-    <ClInclude Include="lzo\config1f.h" />
-    <ClInclude Include="lzo\config1x.h" />
-    <ClInclude Include="lzo\config1y.h" />
-    <ClInclude Include="lzo\config1z.h" />
-    <ClInclude Include="lzo\config2a.h" />
-    <ClInclude Include="lzo\fake16.h" />
-    <ClInclude Include="lzo\lzo1.h" />
-    <ClInclude Include="lzo\lzo16bit.h" />
-    <ClInclude Include="lzo\lzo1a.h" />
-    <ClInclude Include="lzo\lzo1a_de.h" />
-    <ClInclude Include="lzo\lzo1b.h" />
-    <ClInclude Include="lzo\lzo1b_cc.h" />
-    <ClInclude Include="lzo\lzo1b_de.h" />
-    <ClInclude Include="lzo\lzo1c.h" />
-    <ClInclude Include="lzo\lzo1c_cc.h" />
-    <ClInclude Include="lzo\lzo1f.h" />
-    <ClInclude Include="lzo\lzo1x.h" />
-    <ClInclude Include="lzo\lzo1y.h" />
-    <ClInclude Include="lzo\lzo1z.h" />
-    <ClInclude Include="lzo\lzo2a.h" />
-    <ClInclude Include="lzo\lzoconf.h" />
-    <ClInclude Include="lzo\lzoutil.h" />
-    <ClInclude Include="lzo\lzo_conf.h" />
-    <ClInclude Include="lzo\lzo_dict.h" />
-    <ClInclude Include="lzo\lzo_ptr.h" />
-    <ClInclude Include="lzo\lzo_util.h" />
-    <ClInclude Include="lzo\stats1a.h" />
-    <ClInclude Include="lzo\stats1b.h" />
-    <ClInclude Include="lzo\stats1c.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="xrCompress.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="lzo\lzo1a_cm.ch" />
-    <None Include="lzo\lzo1a_cr.ch" />
-    <None Include="lzo\lzo1b_c.ch" />
-    <None Include="lzo\lzo1b_cm.ch" />
-    <None Include="lzo\lzo1b_cr.ch" />
-    <None Include="lzo\lzo1b_d.ch" />
-    <None Include="lzo\lzo1b_r.ch" />
-    <None Include="lzo\lzo1b_sm.ch" />
-    <None Include="lzo\lzo1b_tm.ch" />
-    <None Include="lzo\lzo1f_d.ch" />
-    <None Include="lzo\lzo1x_c.ch" />
-    <None Include="lzo\lzo1x_d.ch" />
-    <None Include="lzo\lzo1x_oo.ch" />
-    <None Include="lzo\lzo1_cm.ch" />
-    <None Include="lzo\lzo1_d.ch" />
-    <None Include="lzo\lzo2a_d.ch" />
-    <None Include="lzo\lzo_mchw.ch" />
-    <None Include="lzo\lzo_swd.ch" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="$(SolutionDir)xrCore\xrCore.vcxproj">
       <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Externals\lzo.vcxproj">
+      <Project>{614aa57f-58d7-45a8-a5ff-93f04b05fac6}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
