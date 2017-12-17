@@ -88,8 +88,8 @@ bool xrCompressor::testSKIP(LPCSTR path)
     if (0 == _stricmp(p_ext, ".rc"))
         return true;
 
-    for (xr_vector<shared_str>::iterator it = exclude_exts.begin(); it != exclude_exts.end(); ++it)
-        if (PatternMatch(p_ext, it->c_str()))
+    for (auto &it : exclude_exts)
+        if (PatternMatch(p_ext, it.c_str()))
             return true;
 
     return false;
@@ -352,15 +352,12 @@ void xrCompressor::OpenPack(LPCSTR tgt_folder, int num)
     {
         CMemoryWriter W;
         CInifile::Sect& S = config_ltx->r_section("header");
-        auto it = S.Data.cbegin();
-        auto it_e = S.Data.cend();
         string4096 buff;
         xr_sprintf(buff, "[%s]", S.Name.c_str());
         W.w_string(buff);
-        for (; it != it_e; ++it)
+        for (const auto &it : S.Data)
         {
-            const CInifile::Item& I = *it;
-            xr_sprintf(buff, "%s = %s", I.first.c_str(), I.second.c_str());
+            xr_sprintf(buff, "%s = %s", it.first.c_str(), it.second.c_str());
             W.w_string(buff);
         }
         W.seek(0);
@@ -433,16 +430,15 @@ void xrCompressor::PerformWork()
         int pack_num = 0;
         OpenPack(target_name.c_str(), pack_num++);
 
-        for (u32 it = 0; it < folders_list->size(); it++)
-            write_file_header((*folders_list)[it], 0, 0, 0, 0);
+        for (auto &it : *folders_list)
+            write_file_header(it, 0, 0, 0, 0);
 
         if (!bStoreFiles)
             c_heap = xr_alloc<u8>(LZO1X_999_MEM_COMPRESS);
 
         for (u32 it = 0; it < files_list->size(); it++)
         {
-            xr_sprintf(
-                caption, "Compress files: %d/%d - %d%%", it, files_list->size(), (it * 100) / files_list->size());
+            xr_sprintf(caption, "Compress files: %d/%d - %d%%", it, files_list->size(), (it * 100) / files_list->size());
             SetWindowText(GetConsoleWindow(), caption);
             printf("\n%-80s   ", (*files_list)[it]);
 
@@ -481,17 +477,15 @@ void xrCompressor::ProcessTargetFolder()
 
 void xrCompressor::GatherFiles(LPCSTR path)
 {
-    xr_vector<char*>* i_list = FS.file_list_open("$target_folder$", path, FS_ListFiles | FS_RootOnly);
+    auto i_list = FS.file_list_open("$target_folder$", path, FS_ListFiles | FS_RootOnly);
     if (!i_list)
     {
         Msg("ERROR: Unable to open file list:%s", path);
         return;
     }
-    xr_vector<char*>::iterator it = i_list->begin();
-    xr_vector<char*>::iterator itE = i_list->end();
-    for (; it != itE; ++it)
+    for (auto &it : *i_list)
     {
-        xr_string tmp_path = xr_string(path) + xr_string(*it);
+        xr_string tmp_path = xr_string(path) + xr_string(it);
         if (!testSKIP(tmp_path.c_str()))
         {
             files_list->push_back(xr_strdup(tmp_path.c_str()));
@@ -510,17 +504,17 @@ bool xrCompressor::IsFolderAccepted(CInifile& ltx, LPCSTR path, BOOL& recurse)
     if (ltx.section_exist("exclude_folders"))
     {
         CInifile::Sect& ef_sect = ltx.r_section("exclude_folders");
-        for (auto ef_it = ef_sect.Data.cbegin(); ef_it != ef_sect.Data.cend(); ef_it++)
+        for (auto &it : ef_sect.Data)
         {
-            recurse = CInifile::isBool(ef_it->second.c_str());
+            recurse = CInifile::isBool(it.second.c_str());
             if (recurse)
             {
-                if (path == strstr(path, ef_it->first.c_str()))
+                if (path == strstr(path, it.first.c_str()))
                     return false;
             }
             else
             {
-                if (0 == xr_strcmp(path, ef_it->first.c_str()))
+                if (0 == xr_strcmp(path, it.first.c_str()))
                     return false;
             }
         }
@@ -541,14 +535,13 @@ void xrCompressor::ProcessLTX(CInifile& ltx)
     if (ltx.section_exist("include_folders"))
     {
         CInifile::Sect& if_sect = ltx.r_section("include_folders");
-
-        for (auto if_it = if_sect.Data.cbegin(); if_it != if_sect.Data.cend(); ++if_it)
+        for (auto &it : if_sect.Data)
         {
-            BOOL ifRecurse = CInifile::isBool(if_it->second.c_str());
+            BOOL ifRecurse = CInifile::isBool(it.second.c_str());
             u32 folder_mask = FS_ListFolders | (ifRecurse ? 0 : FS_RootOnly);
 
             string_path path;
-            LPCSTR _path = 0 == xr_strcmp(if_it->first.c_str(), ".\\") ? "" : if_it->first.c_str();
+            LPCSTR _path = 0 == xr_strcmp(it.first.c_str(), ".\\") ? "" : it.first.c_str();
             xr_strcpy(path, _path);
             u32 path_len = xr_strlen(path);
             if ((0 != path_len) && (path[path_len - 1] != '\\'))
@@ -563,18 +556,16 @@ void xrCompressor::ProcessLTX(CInifile& ltx)
                 if (val)
                     GatherFiles(path);
 
-                xr_vector<char*>* i_fl_list = FS.file_list_open("$target_folder$", path, folder_mask);
+                auto i_fl_list = FS.file_list_open("$target_folder$", path, folder_mask);
                 if (!i_fl_list)
                 {
                     Msg("ERROR: Unable to open folder list:", path);
                     continue;
                 }
 
-                xr_vector<char*>::iterator it = i_fl_list->begin();
-                xr_vector<char*>::iterator itE = i_fl_list->end();
-                for (; it != itE; ++it)
+                for (auto &it : *i_fl_list)
                 {
-                    xr_string tmp_path = xr_string(path) + xr_string(*it);
+                    xr_string tmp_path = xr_string(path) + xr_string(it);
                     bool val = IsFolderAccepted(ltx, tmp_path.c_str(), efRecurse);
                     if (val)
                     {
@@ -601,25 +592,19 @@ void xrCompressor::ProcessLTX(CInifile& ltx)
     if (ltx.section_exist("include_files"))
     {
         CInifile::Sect& if_sect = ltx.r_section("include_files");
-        for (auto if_it = if_sect.Data.cbegin(); if_it != if_sect.Data.cend(); ++if_it)
-        {
-            files_list->push_back(xr_strdup(if_it->first.c_str()));
-        }
+        for (auto &it : if_sect.Data)
+            files_list->push_back(xr_strdup(it.first.c_str()));
     }
 
     PerformWork();
 
     // free
-    xr_vector<char*>::iterator it = files_list->begin();
-    xr_vector<char*>::iterator itE = files_list->end();
-    for (; it != itE; ++it)
-        xr_free(*it);
+    for (auto &it : *files_list)
+        xr_free(it);
     xr_delete(files_list);
 
-    it = folders_list->begin();
-    itE = folders_list->end();
-    for (; it != itE; ++it)
-        xr_free(*it);
+    for (auto &it : *folders_list)
+        xr_free(it);
     xr_delete(folders_list);
 
     exclude_exts.clear_and_free();
