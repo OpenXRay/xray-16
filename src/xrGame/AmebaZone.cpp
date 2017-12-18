@@ -27,9 +27,8 @@ bool CAmebaZone::BlowoutState()
     if (!result)
         UpdateBlowout();
 
-    // XXX: use range-based for
-    for (OBJECT_INFO_VEC::iterator it = m_ObjectInfoMap.begin(); m_ObjectInfoMap.end() != it; ++it)
-        Affect(&(*it));
+    for (auto& it : m_ObjectInfoMap)
+        Affect(&it);
 
     return result;
 }
@@ -66,10 +65,9 @@ void CAmebaZone::Affect(SZoneObjectInfo* O)
 
 void CAmebaZone::PhTune(float step)
 {
-    // XXX: use range-based for
-    for (OBJECT_INFO_VEC::iterator it = m_ObjectInfoMap.begin(); m_ObjectInfoMap.end() != it; ++it)
+    for (auto& it : m_ObjectInfoMap)
     {
-        CEntityAlive* EA = smart_cast<CEntityAlive*>((*it).object);
+        auto EA = smart_cast<CEntityAlive*>(it.object);
         if (EA)
         {
             CPHMovementControl* mc = EA->character_physics_support()->movement();

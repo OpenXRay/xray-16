@@ -589,12 +589,11 @@ bool CUIActorMenu::ToSlot(CUICellItem* itm, bool force_place, u16 slot_id)
         else
         {
             //Alundaio: Since the player's inventory is being used as a slot we need to search for cell with matching m_pData
-            CUICellContainer* c = slot_list->GetContainer();
-            WINDOW_LIST child_list = c->GetChildWndList();
-            // XXX: try to replace with range-based for
-            for (WINDOW_LIST::iterator it = child_list.begin(); child_list.end() != it; ++it)
+            auto container = slot_list->GetContainer();
+            auto child_list = container->GetChildWndList();
+            for (auto& it : child_list)
             {
-                CUICellItem* i = static_cast<CUICellItem*>(*it);
+                CUICellItem* i = static_cast<CUICellItem*>(it);
                 const PIItem pitm = static_cast<PIItem>(i->m_pData);
                 if (pitm == _iitem)
                 {

@@ -160,17 +160,14 @@ void add_online_impl(CSE_ALifeDynamicObject* object, const bool& update_registri
     clientID.set(
         object->alife().server().GetServerClient() ? object->alife().server().GetServerClient()->ID.value() : 0);
 
-    // XXX: Replace with range-based for
-    ALife::OBJECT_IT I = object->children.begin();
-    ALife::OBJECT_IT E = object->children.end();
-    for (; I != E; ++I)
+    for (auto& it : object->children)
     {
         //Alundaio:
-        if (*I == ai().alife().graph().actor()->ID)
+        if (it == ai().alife().graph().actor()->ID)
             continue;
         //-Alundaio
 
-        CSE_ALifeDynamicObject* l_tpALifeDynamicObject = ai().alife().objects().object(*I);
+        CSE_ALifeDynamicObject* l_tpALifeDynamicObject = ai().alife().objects().object(it);
         if (!l_tpALifeDynamicObject)
             continue;
 

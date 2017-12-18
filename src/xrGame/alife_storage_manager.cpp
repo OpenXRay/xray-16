@@ -129,24 +129,21 @@ void CALifeStorageManager::load(void* buffer, const u32& buffer_size, LPCSTR fil
 
     VERIFY(can_register_objects());
     can_register_objects(false);
-    // XXX: Replace with range-based for
-    CALifeObjectRegistry::OBJECT_REGISTRY::iterator B = objects().objects().begin();
-    CALifeObjectRegistry::OBJECT_REGISTRY::iterator E = objects().objects().end();
-    CALifeObjectRegistry::OBJECT_REGISTRY::iterator I;
-    for (I = B; I != E; ++I)
+
+    for (auto& object : objects().objects())
     {
-        ALife::_OBJECT_ID id = (*I).second->ID;
-        (*I).second->ID = server().PerformIDgen(id);
-        VERIFY(id == (*I).second->ID);
-        register_object((*I).second, false);
+        ALife::_OBJECT_ID id = object.second->ID;
+        object.second->ID = server().PerformIDgen(id);
+        VERIFY(id == object.second->ID);
+        register_object(object.second, false);
     }
 
     registry().load(source);
 
     can_register_objects(true);
 
-    for (I = B; I != E; ++I)
-        (*I).second->on_register();
+    for (auto& object : objects().objects())
+        object.second->on_register();
 
     if (!g_pGameLevel)
         return;

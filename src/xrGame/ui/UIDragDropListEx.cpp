@@ -499,16 +499,17 @@ bool CUICellContainer::AddSimilar(CUICellItem* itm)
 
 CUICellItem* CUICellContainer::FindSimilar(CUICellItem* itm)
 {
-    // XXX: try to replace with range-based for
-    for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
+    for (auto& it : m_ChildWndList)
     {
+        // XXX: Xottab_DUTY: find out why different casts used for different configurations
+        // and maybe use only one cast
 #ifdef DEBUG
-        CUICellItem* i = smart_cast<CUICellItem*>(*it);
+        auto i = smart_cast<CUICellItem*>(it);
 #else
-        CUICellItem* i = (CUICellItem*)(*it);
+        auto i = (CUICellItem*)it;
 #endif
         //Alundaio: Don't stack equipped items
-        PIItem iitem = static_cast<PIItem>(i->m_pData);
+        auto iitem = static_cast<PIItem>(i->m_pData);
         if (iitem && iitem->m_pInventory && iitem->m_pInventory->ItemFromSlot(iitem->BaseSlot()) == iitem)
             continue;
         //-Alundaio
@@ -519,7 +520,8 @@ CUICellItem* CUICellContainer::FindSimilar(CUICellItem* itm)
         if (i->EqualTo(itm))
             return i;
     }
-    return NULL;
+
+    return nullptr;
 }
 
 void CUICellContainer::PlaceItemAtPos(CUICellItem* itm, Ivector2& cell_pos)
