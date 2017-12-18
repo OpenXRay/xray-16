@@ -110,6 +110,8 @@ void destroySettings()
 {
     auto s = const_cast<CInifile**>(&pSettings);
     xr_delete(*s);
+    auto sa = const_cast<CInifile**>(&pSettingsAuth);
+    xr_delete(*sa);
     xr_delete(pGameIni);
 }
 
