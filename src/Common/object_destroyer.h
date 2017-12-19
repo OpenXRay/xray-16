@@ -11,8 +11,8 @@
 
 struct CDestroyer
 {
-    static void delete_data(LPCSTR /*data*/) {}
-    static void delete_data(LPSTR data) { xr_free(data); }
+    static void delete_data(pcstr /*data*/) {}
+    static void delete_data(pstr data) { xr_free(data); }
     template <typename T1, typename T2>
     static void delete_data(std::pair<T1, T2>& data)
     {
@@ -23,44 +23,37 @@ struct CDestroyer
     template <typename T, int size>
     static void delete_data(svector<T, size>& data)
     {
-        svector<T, size>::iterator I = data.begin();
-        svector<T, size>::iterator E = data.end();
-        for (; I != E; ++I)
-            delete_data(*I);
+        for (auto& it : data)
+            delete_data(it);
         data.clear();
     }
 
     template <typename T, int n>
     static void delete_data(T (&array)[n])
     {
-        T* I = array;
-        T* E = array + n;
-        for (; I != E; ++I)
-            delete_data(*I);
+        for (auto& it : array)
+            delete_data(it);
     }
 
     template <typename T1, typename T2>
     static void delete_data(std::queue<T1, T2>& data)
     {
-        std::queue<T1, T2> temp = data;
-        for (; !temp.empty(); temp.pop())
-            delete_data(temp.front());
+        for (auto& it : data)
+            delete_data(it);
     }
 
     template <template <typename TX1, typename TX2> class T1, typename T2, typename T3>
     static void delete_data(T1<T2, T3>& data, bool)
     {
-        T1<T2, T3> temp = data;
-        for (; !temp.empty(); temp.pop())
-            delete_data(temp.top());
+        for (auto& it : data)
+            delete_data(it);
     }
 
     template <template <typename TX1, typename TX2, typename TX3> class T1, typename T2, typename T3, typename T4>
     static void delete_data(T1<T2, T3, T4>& data, bool)
     {
-        T1<T2, T3, T4> temp = data;
-        for (; !temp.empty(); temp.pop())
-            delete_data(temp.top());
+        for (auto& it : data)
+            delete_data(it);
     }
 
     template <typename T1, typename T2>
@@ -113,10 +106,8 @@ struct CDestroyer
         template <typename T>
         static void delete_data(T& data)
         {
-            T::iterator I = data.begin();
-            T::iterator E = data.end();
-            for (; I != E; ++I)
-                CDestroyer::delete_data(*I);
+            for (auto& it : data)
+                CDestroyer::delete_data(it);
             data.clear();
         }
     };
