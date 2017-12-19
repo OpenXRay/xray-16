@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#ifndef DEBUG_MEMORY_MANAGER
+#ifdef DEBUG_MEMORY_MANAGER
 #include <malloc.h> // _alloca
 
 namespace
