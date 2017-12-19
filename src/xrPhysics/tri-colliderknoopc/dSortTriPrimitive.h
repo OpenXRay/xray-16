@@ -316,7 +316,7 @@ IC int dcTriListCollider::dSortTriPrimitiveCollide(
     }
 
     // if(intersect) ret=0;
-    xr_vector<Triangle>::iterator i;
+    //xr_vector<Triangle>::iterator i;
 
     if (intersect)
     {
@@ -324,17 +324,19 @@ IC int dcTriListCollider::dSortTriPrimitiveCollide(
         {
             bool include = true;
             if (no_last_pos)
-                for (i = pos_tries.begin(); pos_tries.end() != i; ++i)
+            {
+                for (auto& it : pos_tries)
                 {
                     VERIFY(neg_tri.T);
-                    if (TriContainPoint((dReal*)&V_array[i->T->verts[0]], (dReal*)&V_array[i->T->verts[1]],
-                            (dReal*)&V_array[i->T->verts[2]], i->norm, i->side0, i->side1, p))
-                        if (negative_tri_set_ignored_by_positive_tri(neg_tri, *i, V_array))
+                    if (TriContainPoint((dReal*)&V_array[it.T->verts[0]], (dReal*)&V_array[it.T->verts[1]],
+                        (dReal*)&V_array[it.T->verts[2]], it.norm, it.side0, it.side1, p))
+                        if (negative_tri_set_ignored_by_positive_tri(neg_tri, it, V_array))
                         {
                             include = false;
                             break;
                         }
-                };
+                }
+            }
 
             if (include)
             {
@@ -376,17 +378,17 @@ IC int dcTriListCollider::dSortTriPrimitiveCollide(
     {
         bool include = true;
         if (no_last_pos)
-            for (i = pos_tries.begin(); pos_tries.end() != i; ++i)
+        {
+            for (auto& it : pos_tries)
             {
                 VERIFY(b_neg_tri.T && b_neg_tri.dist != -dInfinity);
-                if (negative_tri_set_ignored_by_positive_tri(b_neg_tri, *i, V_array)
-
-                        )
+                if (negative_tri_set_ignored_by_positive_tri(b_neg_tri, it, V_array))
                 {
                     include = false;
                     break;
                 }
-            };
+            }
+        }
 
         if (include)
         {

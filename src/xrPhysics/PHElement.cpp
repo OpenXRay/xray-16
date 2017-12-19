@@ -151,6 +151,7 @@ void CPHElement::set_local_mass_center(const Fvector& mc)
 }
 dMass CPHElement::recursive_mass_summ(u16 start_geom, FRACTURE_I cur_fracture)
 {
+    // XXX: Review
     dMass end_mass;
     dMassSetZero(&end_mass);
     GEOM_I i_geom = m_geoms.begin() + start_geom, e = m_geoms.begin() + cur_fracture->m_start_geom_num;
