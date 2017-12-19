@@ -380,16 +380,10 @@ void CConsole::DrawBackgrounds(bool bGame)
         return;
     }
 
-    LPCSTR max_str = "xxxxx";
-    vecTipsEx::iterator itb = m_tips.begin();
-    vecTipsEx::iterator ite = m_tips.end();
-    for (; itb != ite; ++itb)
-    {
-        if (pFont->SizeOf_((*itb).text.c_str()) > pFont->SizeOf_(max_str))
-        {
-            max_str = (*itb).text.c_str();
-        }
-    }
+    pcstr max_str = "xxxxx";
+    for (auto& it : m_tips)
+        if (pFont->SizeOf_(it.text.c_str()) > pFont->SizeOf_(max_str))
+            max_str = it.text.c_str();
 
     float w1 = pFont->SizeOf_("_");
     float ioc_w = pFont->SizeOf_(ioc_prompt) - w1;
@@ -908,18 +902,17 @@ void CConsole::select_for_filter(LPCSTR filter_str, vecTips& in_v, vecTipsEx& ou
 
     bool all = (xr_strlen(filter_str) == 0);
 
-    vecTips::iterator itb = in_v.begin();
-    vecTips::iterator ite = in_v.end();
-    for (; itb != ite; ++itb)
+    //vecTips::iterator itb = in_v.begin();
+    //vecTips::iterator ite = in_v.end();
+    //for (; itb != ite; ++itb)
+    for (auto& it : in_v)
     {
-        shared_str const& str = (*itb);
+        shared_str const& str = it;
         if (all)
-        {
             out_v.push_back(TipString(str));
-        }
         else
         {
-            LPCSTR fd_str = strstr(str.c_str(), filter_str);
+            pcstr fd_str = strstr(str.c_str(), filter_str);
             if (fd_str)
             {
                 int fd_sz = str.size() - xr_strlen(fd_str);

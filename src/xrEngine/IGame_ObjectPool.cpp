@@ -35,10 +35,8 @@ void IGame_ObjectPool::prefetch()
 void IGame_ObjectPool::clear()
 {
     // Clear POOL
-    ObjectVecIt it = m_PrefetchObjects.begin();
-    ObjectVecIt itE = m_PrefetchObjects.end();
-    for (; it != itE; it++)
-        xr_delete(*it);
+    for (auto& it : m_PrefetchObjects)
+        xr_delete(it);
     m_PrefetchObjects.clear();
 }
 

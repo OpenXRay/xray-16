@@ -282,21 +282,19 @@ void IGame_Level::SoundEvent_Register(ref_sound_data_ptr S, float range)
     g_SpatialSpace->q_box(snd_ER, 0, STYPE_REACTTOSOUND, snd_position, bb_size);
 
     // Iterate
-    xr_vector<ISpatial*>::iterator it = snd_ER.begin();
-    xr_vector<ISpatial*>::iterator end = snd_ER.end();
-    for (; it != end; it++)
+    for (auto& it : snd_ER)
     {
-        Feel::Sound* L = (*it)->dcast_FeelSound();
+        Feel::Sound* L = it->dcast_FeelSound();
         if (0 == L)
             continue;
-        IGameObject* CO = (*it)->dcast_GameObject();
+        IGameObject* CO = it->dcast_GameObject();
         VERIFY(CO);
         if (CO->getDestroy())
             continue;
 
         // Energy and signal
-        VERIFY(_valid((*it)->GetSpatialData().sphere.P));
-        float dist = snd_position.distance_to((*it)->GetSpatialData().sphere.P);
+        VERIFY(_valid(it->GetSpatialData().sphere.P));
+        float dist = snd_position.distance_to(it->GetSpatialData().sphere.P);
         if (dist > p->max_ai_distance)
             continue;
         VERIFY(_valid(dist));
@@ -305,7 +303,7 @@ void IGame_Level::SoundEvent_Register(ref_sound_data_ptr S, float range)
         VERIFY(_valid(Power));
         if (Power > EPS_S)
         {
-            float occ = Sound->get_occlusion_to((*it)->GetSpatialData().sphere.P, snd_position);
+            float occ = Sound->get_occlusion_to(it->GetSpatialData().sphere.P, snd_position);
             VERIFY(_valid(occ));
             Power *= occ;
             if (Power > EPS_S)

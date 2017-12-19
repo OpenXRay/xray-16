@@ -433,8 +433,8 @@ void CEnvironment::lerp(float& current_weight)
 
     Fvector view = Device.vCameraPosition;
     float mpower = 0;
-    for (xr_vector<CEnvModifier>::iterator mit = Modifiers.begin(); mit != Modifiers.end(); mit++)
-        mpower += EM.sum(*mit, view);
+    for (auto& mit : Modifiers)
+        mpower += EM.sum(mit, view);
 
     // final lerp
     CurrentEnv->lerp(this, *Current[0], *Current[1], current_weight, EM, mpower);
@@ -600,33 +600,24 @@ SThunderboltCollection* CEnvironment::thunderbolt_collection(CInifile* pIni, CIn
 SThunderboltCollection* CEnvironment::thunderbolt_collection(
     xr_vector<SThunderboltCollection*>& collection, shared_str const& id)
 {
-    typedef xr_vector<SThunderboltCollection*> Container;
-    Container::iterator i = collection.begin();
-    Container::iterator e = collection.end();
-    for (; i != e; ++i)
-        if ((*i)->section == id)
-            return (*i);
+    for (auto& it : collection)
+        if (it->section == id)
+            return it;
 
     NODEFAULT;
 #ifdef DEBUG
-    return (0);
+    return nullptr;
 #endif // #ifdef DEBUG
 }
 
 CLensFlareDescriptor* CEnvironment::add_flare(xr_vector<CLensFlareDescriptor*>& collection, shared_str const& id)
 {
-    typedef xr_vector<CLensFlareDescriptor*> Flares;
-
-    Flares::const_iterator i = collection.begin();
-    Flares::const_iterator e = collection.end();
-    for (; i != e; ++i)
-    {
-        if ((*i)->section == id)
-            return (*i);
-    }
+    for (const auto& it: collection)
+        if (it->section == id)
+            return it;
 
     CLensFlareDescriptor* result = new CLensFlareDescriptor();
     result->load(m_suns_config, id.c_str());
     collection.push_back(result);
-    return (result);
+    return result;
 }
