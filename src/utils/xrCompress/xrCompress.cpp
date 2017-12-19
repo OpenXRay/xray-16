@@ -88,7 +88,7 @@ bool xrCompressor::testSKIP(LPCSTR path)
     if (0 == _stricmp(p_ext, ".rc"))
         return true;
 
-    for (auto &it : exclude_exts)
+    for (const auto &it : exclude_exts)
         if (PatternMatch(p_ext, it.c_str()))
             return true;
 
@@ -430,7 +430,7 @@ void xrCompressor::PerformWork()
         int pack_num = 0;
         OpenPack(target_name.c_str(), pack_num++);
 
-        for (auto &it : *folders_list)
+        for (const auto &it : *folders_list)
             write_file_header(it, 0, 0, 0, 0);
 
         if (!bStoreFiles)
@@ -483,7 +483,7 @@ void xrCompressor::GatherFiles(LPCSTR path)
         Msg("ERROR: Unable to open file list:%s", path);
         return;
     }
-    for (auto &it : *i_list)
+    for (const auto &it : *i_list)
     {
         xr_string tmp_path = xr_string(path) + xr_string(it);
         if (!testSKIP(tmp_path.c_str()))
@@ -504,7 +504,7 @@ bool xrCompressor::IsFolderAccepted(CInifile& ltx, LPCSTR path, BOOL& recurse)
     if (ltx.section_exist("exclude_folders"))
     {
         CInifile::Sect& ef_sect = ltx.r_section("exclude_folders");
-        for (auto &it : ef_sect.Data)
+        for (const auto &it : ef_sect.Data)
         {
             recurse = CInifile::isBool(it.second.c_str());
             if (recurse)
@@ -535,7 +535,7 @@ void xrCompressor::ProcessLTX(CInifile& ltx)
     if (ltx.section_exist("include_folders"))
     {
         CInifile::Sect& if_sect = ltx.r_section("include_folders");
-        for (auto &it : if_sect.Data)
+        for (const auto &it : if_sect.Data)
         {
             BOOL ifRecurse = CInifile::isBool(it.second.c_str());
             u32 folder_mask = FS_ListFolders | (ifRecurse ? 0 : FS_RootOnly);
@@ -563,7 +563,7 @@ void xrCompressor::ProcessLTX(CInifile& ltx)
                     continue;
                 }
 
-                for (auto &it : *i_fl_list)
+                for (const auto &it : *i_fl_list)
                 {
                     xr_string tmp_path = xr_string(path) + xr_string(it);
                     bool val = IsFolderAccepted(ltx, tmp_path.c_str(), efRecurse);
@@ -592,7 +592,7 @@ void xrCompressor::ProcessLTX(CInifile& ltx)
     if (ltx.section_exist("include_files"))
     {
         CInifile::Sect& if_sect = ltx.r_section("include_files");
-        for (auto &it : if_sect.Data)
+        for (const auto &it : if_sect.Data)
             files_list->push_back(xr_strdup(it.first.c_str()));
     }
 
