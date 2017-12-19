@@ -58,11 +58,9 @@ int CObjectSpace::GetNearest(xr_vector<ISpatial*>& q_spatial, xr_vector<IGameObj
     g_SpatialSpace->q_box(q_spatial, 0, STYPE_COLLIDEABLE, point, B);
 
     // Iterate
-    xr_vector<ISpatial*>::iterator it = q_spatial.begin();
-    xr_vector<ISpatial*>::iterator end = q_spatial.end();
-    for (; it != end; it++)
+    for (auto& it : q_spatial)
     {
-        IGameObject* O = (*it)->dcast_GameObject();
+        IGameObject* O = it->dcast_GameObject();
         if (0 == O)
             continue;
         if (O == ignore_object)
