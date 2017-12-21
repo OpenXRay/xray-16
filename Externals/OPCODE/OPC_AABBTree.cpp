@@ -347,7 +347,7 @@ AABBTree::AABBTree() : mIndices(nullptr), mTotalNbNodes(0) {}
  *	Destructor.
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-AABBTree::~AABBTree() { CFREE(mIndices); }
+AABBTree::~AABBTree() { xr_free(mIndices); }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *	Builds a generic AABB tree from a tree builder.
@@ -366,8 +366,8 @@ bool AABBTree::Build(AABBTreeBuilder* builder)
     builder->SetNbInvalidSplits(0);
 
     // Initialize indices. This list will be modified during build.
-    CFREE(mIndices);
-    mIndices = CALLOC(udword, builder->mNbPrimitives);
+    xr_free(mIndices);
+    mIndices = xr_alloc<udword>(builder->mNbPrimitives);
     CHECKALLOC(mIndices);
     for (udword i = 0; i < builder->mNbPrimitives; i++)
         mIndices[i] = i;

@@ -512,9 +512,6 @@
     <ClInclude Include="xrMemory_align.h">
       <Filter>Memory\Memory manager</Filter>
     </ClInclude>
-    <ClInclude Include="xrMemory_pure.h">
-      <Filter>Memory\Memory manager</Filter>
-    </ClInclude>
     <ClInclude Include="xrMemory_subst_borland.h">
       <Filter>Memory\Memory manager</Filter>
     </ClInclude>

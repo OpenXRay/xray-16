@@ -209,7 +209,7 @@ AABBCollisionTree::AABBCollisionTree() : mNodes(nullptr) {}
  *	Destructor.
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-AABBCollisionTree::~AABBCollisionTree() { CFREE(mNodes); }
+AABBCollisionTree::~AABBCollisionTree() { xr_free(mNodes); }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *	Builds the collision tree from a generic AABB tree.
@@ -230,7 +230,7 @@ bool AABBCollisionTree::Build(AABBTree* tree)
 
     // Get nodes
     mNbNodes = NbNodes;
-    mNodes = CALLOC(AABBCollisionNode, mNbNodes);
+    mNodes = xr_alloc<AABBCollisionNode>(mNbNodes);
     CHECKALLOC(mNodes);
     ZeroMemory(mNodes, mNbNodes * sizeof(AABBCollisionNode));
 
@@ -259,7 +259,7 @@ AABBNoLeafTree::AABBNoLeafTree() : mNodes(nullptr) {}
  *	Destructor.
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-AABBNoLeafTree::~AABBNoLeafTree() { CFREE(mNodes); }
+AABBNoLeafTree::~AABBNoLeafTree() { xr_free(mNodes); }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *	Builds the collision tree from a generic AABB tree.
@@ -280,7 +280,7 @@ bool AABBNoLeafTree::Build(AABBTree* tree)
 
     // Get nodes
     mNbNodes = NbTriangles - 1;
-    mNodes = CALLOC(AABBNoLeafNode, mNbNodes);
+    mNodes = xr_alloc<AABBNoLeafNode>(mNbNodes);
     CHECKALLOC(mNodes);
     ZeroMemory(mNodes, mNbNodes * sizeof(AABBNoLeafNode));
 
@@ -414,7 +414,7 @@ AABBQuantizedTree::AABBQuantizedTree() : mNodes(nullptr) {}
  *	Destructor.
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-AABBQuantizedTree::~AABBQuantizedTree() { CFREE(mNodes); }
+AABBQuantizedTree::~AABBQuantizedTree() { xr_free(mNodes); }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *	Builds the collision tree from a generic AABB tree.
@@ -435,7 +435,7 @@ bool AABBQuantizedTree::Build(AABBTree* tree)
 
     // Get nodes
     mNbNodes = NbNodes;
-    AABBCollisionNode* Nodes = CALLOC(AABBCollisionNode, mNbNodes);
+    AABBCollisionNode* Nodes = xr_alloc<AABBCollisionNode>(mNbNodes);
     CHECKALLOC(Nodes);
     ZeroMemory(Nodes, mNbNodes * sizeof(AABBCollisionNode));
 
@@ -445,7 +445,7 @@ bool AABBQuantizedTree::Build(AABBTree* tree)
 
     // Quantize
     {
-        mNodes = CALLOC(AABBQuantizedNode, mNbNodes);
+        mNodes = xr_alloc<AABBQuantizedNode>(mNbNodes);
         CHECKALLOC(mNodes);
         ZeroMemory(mNodes, mNbNodes * sizeof(AABBQuantizedNode));
 
@@ -463,7 +463,7 @@ bool AABBQuantizedTree::Build(AABBTree* tree)
             REMAP_DATA(mData)
         }
 
-        CFREE(Nodes);
+        xr_free(Nodes);
     }
 
 #ifdef __ICECORE_H__
@@ -485,7 +485,7 @@ AABBQuantizedNoLeafTree::AABBQuantizedNoLeafTree() : mNodes(nullptr) {}
  *	Destructor.
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-AABBQuantizedNoLeafTree::~AABBQuantizedNoLeafTree() { CFREE(mNodes); }
+AABBQuantizedNoLeafTree::~AABBQuantizedNoLeafTree() { xr_free(mNodes); }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *	Builds the collision tree from a generic AABB tree.
@@ -506,7 +506,7 @@ bool AABBQuantizedNoLeafTree::Build(AABBTree* tree)
 
     // Get nodes
     mNbNodes = NbTriangles - 1;
-    AABBNoLeafNode* Nodes = CALLOC(AABBNoLeafNode, mNbNodes);
+    AABBNoLeafNode* Nodes = xr_alloc<AABBNoLeafNode>(mNbNodes);
     CHECKALLOC(Nodes);
     ZeroMemory(Nodes, mNbNodes * sizeof(AABBNoLeafNode));
 
@@ -517,7 +517,7 @@ bool AABBQuantizedNoLeafTree::Build(AABBTree* tree)
 
     // Quantize
     {
-        mNodes = CALLOC(AABBQuantizedNoLeafNode, mNbNodes);
+        mNodes = xr_alloc<AABBQuantizedNoLeafNode>(mNbNodes);
         CHECKALLOC(mNodes);
         ZeroMemory(mNodes, mNbNodes * sizeof(AABBQuantizedNoLeafNode));
 
@@ -536,7 +536,7 @@ bool AABBQuantizedNoLeafTree::Build(AABBTree* tree)
             REMAP_DATA(mData2)
         }
 
-        CFREE(Nodes);
+        xr_free(Nodes);
     }
 
 #ifdef __ICECORE_H__

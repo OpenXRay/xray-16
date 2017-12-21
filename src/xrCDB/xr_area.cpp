@@ -24,7 +24,7 @@ CObjectSpace::CObjectSpace()
 {
 #ifdef DEBUG
     if (GEnv.RenderFactory)
-        m_pRender = CNEW(FactoryPtr<IObjectSpaceRender>)();
+        m_pRender = new FactoryPtr<IObjectSpaceRender>();
 
 // sh_debug.create				("debug\\wireframe","$null");
 #endif
@@ -39,7 +39,7 @@ CObjectSpace::~CObjectSpace()
 //
 #ifdef DEBUG
     // sh_debug.destroy			();
-    CDELETE(m_pRender);
+    xr_delete(m_pRender);
 #endif
 }
 //----------------------------------------------------------------------
@@ -92,10 +92,6 @@ IC int CObjectSpace::GetNearest(xr_vector<IGameObject*>& q_nearest, ICollisionFo
 void CObjectSpace::Load(CDB::build_callback build_callback) { Load("$level$", "level.cform", build_callback); }
 void CObjectSpace::Load(LPCSTR path, LPCSTR fname, CDB::build_callback build_callback)
 {
-#ifdef USE_ARENA_ALLOCATOR
-    Msg("CObjectSpace::Load, g_collision_allocator.get_allocated_size() - %d",
-        int(g_collision_allocator.get_allocated_size() / 1024.0 / 1024));
-#endif // #ifdef USE_ARENA_ALLOCATOR
     IReader* F = FS.r_open(path, fname);
     R_ASSERT(F);
     Load(F, build_callback);

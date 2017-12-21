@@ -148,19 +148,10 @@ static void full_memory_stats()
     GEnv.Render->ResourcesGetMemoryUsage(m_base, c_base, m_lmaps, c_lmaps);
     log_vminfo();
     size_t _process_heap = ::Memory.mem_usage();
-#ifndef PURE_ALLOC
-    u32 _game_lua = CScriptEngine::GetMemoryUsage();
-    u32 _render = GEnv.Render->memory_usage();
-#endif
     int _eco_strings = (int)g_pStringContainer->stat_economy();
     int _eco_smem = (int)g_pSharedMemoryContainer->stat_economy();
     Msg("* [ D3D ]: textures[%d K]", (m_base + m_lmaps) / 1024);
-#ifdef PURE_ALLOC
     Msg("* [x-ray]: process heap[%u K]", _process_heap / 1024);
-#else
-    Msg("* [x-ray]: process heap[%u K], game lua[%d K], render[%d K]", _process_heap / 1024, _game_lua / 1024,
-        _render / 1024);
-#endif
     Msg("* [x-ray]: economy: strings[%d K], smem[%d K]", _eco_strings / 1024, _eco_smem);
 #ifdef FS_DEBUG
     Msg("* [x-ray]: file mapping: memory[%d K], count[%d]", g_file_mapped_memory / 1024, g_file_mapped_count);

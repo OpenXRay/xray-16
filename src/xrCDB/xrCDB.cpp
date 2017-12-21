@@ -5,12 +5,6 @@
 
 #include "xrCDB.h"
 
-#ifdef USE_ARENA_ALLOCATOR
-static const u32 s_arena_size = (128 + 16) * 1024 * 1024;
-static char s_fake_array[s_arena_size];
-doug_lea_allocator g_collision_allocator(s_fake_array, s_arena_size, "collision");
-#endif // #ifdef USE_ARENA_ALLOCATOR
-
 namespace Opcode
 {
 #include "OPCODE/OPC_TreeBuilders.h"
@@ -48,10 +42,10 @@ MODEL::~MODEL()
 {
     syncronize(); // maybe model still in building
     status = S_INIT;
-    CDELETE(tree);
-    CFREE(tris);
+    xr_delete(tree);
+    xr_free(tris);
     tris_count = 0;
-    CFREE(verts);
+    xr_free(verts);
     verts_count = 0;
 }
 
@@ -106,12 +100,12 @@ void MODEL::build_internal(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callbac
 {
     // verts
     verts_count = Vcnt;
-    verts = CALLOC(Fvector, verts_count);
+    verts = xr_alloc<Fvector>(verts_count);
     CopyMemory(verts, V, verts_count * sizeof(Fvector));
 
     // tris
     tris_count = Tcnt;
-    tris = CALLOC(TRI, tris_count);
+    tris = xr_alloc<TRI>(tris_count);
     CopyMemory(tris, T, tris_count * sizeof(TRI));
 
     // callback
@@ -122,11 +116,11 @@ void MODEL::build_internal(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callbac
     status = S_BUILD;
 
     // Allocate temporary "OPCODE" tris + convert tris to 'pointer' form
-    u32* temp_tris = CALLOC(u32, tris_count * 3);
+    u32* temp_tris = xr_alloc<u32>(tris_count * 3);
     if (0 == temp_tris)
     {
-        CFREE(verts);
-        CFREE(tris);
+        xr_free(verts);
+        xr_free(tris);
         return;
     }
     u32* temp_ptr = temp_tris;
@@ -148,17 +142,17 @@ void MODEL::build_internal(Fvector* V, int Vcnt, TRI* T, int Tcnt, build_callbac
     OPCC.Quantized = false;
     // if (Memory.debug_mode) OPCC.KeepOriginal = true;
 
-    tree = CNEW(OPCODE_Model)();
+    tree = new OPCODE_Model();
     if (!tree->Build(OPCC))
     {
-        CFREE(verts);
-        CFREE(tris);
-        CFREE(temp_tris);
+        xr_free(verts);
+        xr_free(tris);
+        xr_free(temp_tris);
         return;
     };
 
     // Free temporary tris
-    CFREE(temp_tris);
+    xr_free(temp_tris);
     return;
 }
 

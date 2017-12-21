@@ -189,7 +189,6 @@ public:
 #endif
 #endif
     void collect_all_garbage();
-    static u32 GetMemoryUsage();
 
     CScriptProcess* CreateScriptProcess(shared_str name, shared_str scripts);
     CScriptThread* CreateScriptThread(LPCSTR caNamespaceName, bool do_string = false, bool reload = false);

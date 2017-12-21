@@ -170,10 +170,10 @@ OPCODE_Model::OPCODE_Model() : mSource(nullptr), mTree(nullptr), mNoLeaf(false),
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 OPCODE_Model::~OPCODE_Model()
 {
-    CDELETE(mSource);
-    CDELETE(mTree);
+    xr_delete(mSource);
+    xr_delete(mTree);
 #ifdef __MESHMERIZER_H__ // Collision hulls only supported within ICE !
-    CDELETE(mHull);
+    xr_delete(mHull);
 #endif // __MESHMERIZER_H__
 }
 
@@ -212,7 +212,7 @@ bool OPCODE_Model::Build(const OPCODECREATE& create)
     // We continue nonetheless....
 
     // 2) Build a generic AABB Tree.
-    mSource = CNEW(AABBTree)();
+    mSource = new AABBTree();
     CHECKALLOC(mSource);
 
     // 2-1) Setup a builder. Our primitives here are triangles from input mesh,
@@ -233,16 +233,16 @@ bool OPCODE_Model::Build(const OPCODECREATE& create)
     if (mNoLeaf)
     {
         if (mQuantized)
-            mTree = CNEW(AABBQuantizedNoLeafTree)();
+            mTree = new AABBQuantizedNoLeafTree();
         else
-            mTree = CNEW(AABBNoLeafTree)();
+            mTree = new AABBNoLeafTree();
     }
     else
     {
         if (mQuantized)
-            mTree = CNEW(AABBQuantizedTree)();
+            mTree = new AABBQuantizedTree();
         else
-            mTree = CNEW(AABBCollisionTree)();
+            mTree = new AABBCollisionTree();
     }
 
     // 3-2) Create optimized tree
@@ -253,7 +253,7 @@ bool OPCODE_Model::Build(const OPCODECREATE& create)
     if (!create.KeepOriginal)
     {
         mSource->destroy(&TB);
-        CDELETE(mSource);
+        xr_delete(mSource);
     }
 
 #ifdef __MESHMERIZER_H__
@@ -261,7 +261,7 @@ bool OPCODE_Model::Build(const OPCODECREATE& create)
     if (create.CollisionHull)
     {
         // Create hull
-        mHull = CNEW(CollisionHull)();
+        mHull = new CollisionHull();
         CHECKALLOC(mHull);
 
         CONVEXHULLCREATE CHC;

@@ -33,7 +33,6 @@ extern XRCORE_API void dump_phase();
 #endif // DEBUG_MEMORY_MANAGER
 
 #include "xrMemory_POOL.h"
-#include "xrMemory_pure.h"
 
 class XRCORE_API xrMemory
 {
@@ -150,7 +149,6 @@ const u32 mem_generic = mem_pools_count + 1;
 extern MEMPOOL mem_pools[mem_pools_count];
 extern bool mem_initialized;
 
-XRCORE_API void vminfo(size_t* _free, size_t* reserved, size_t* committed);
 XRCORE_API void log_vminfo();
 
 #endif // xrMemoryH

@@ -63,7 +63,7 @@ PlanesCollider::PlanesCollider() : mPlanes(nullptr), mNbPlanes(0) {}
  *  Destructor.
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-PlanesCollider::~PlanesCollider() { CFREE(mPlanes); }
+PlanesCollider::~PlanesCollider() { xr_free(mPlanes); }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *  Validates current settings. You should call this method after all the settings and callbacks have been defined.
@@ -140,8 +140,8 @@ BOOL PlanesCollider::InitQuery(PlanesCache& cache, const Plane* planes, udword n
     // 2) Compute planes in model space
     if (nb_planes > mNbPlanes)
     {
-        CFREE(mPlanes);
-        mPlanes = CALLOC(Plane, nb_planes);
+        xr_free(mPlanes);
+        mPlanes = xr_alloc<Plane>(nb_planes);
     }
     mNbPlanes = nb_planes;
 

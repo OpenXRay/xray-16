@@ -10,7 +10,6 @@
 #include "script_engine.hpp"
 #include "script_process.hpp"
 #include "script_thread.hpp"
-#include "xrCore/Memory/doug_lea_allocator.h"
 #include "ScriptExporter.hpp"
 #include "BindingsDumper.hpp"
 #ifdef USE_DEBUGGER
@@ -42,7 +41,6 @@ setfenv(1, this) ";
 
 static const char* file_header = nullptr;
 
-#ifdef PURE_ALLOC
 static void* lua_alloc(void* ud, void* ptr, size_t osize, size_t nsize)
 {
     (void)ud;
@@ -58,52 +56,6 @@ static void* lua_alloc(void* ud, void* ptr, size_t osize, size_t nsize)
     return Memory.mem_realloc(ptr, nsize);
 #endif
 }
-#else
-
-#include "xrCore/memory_allocator_options.h"
-
-#ifdef USE_ARENA_ALLOCATOR
-static const u32 s_arena_size = 96 * 1024 * 1024;
-static char s_fake_array[s_arena_size];
-static doug_lea_allocator s_allocator(s_fake_array, s_arena_size, "lua");
-#else
-static doug_lea_allocator s_allocator(nullptr, 0, "lua");
-#endif
-
-static void* lua_alloc(void* ud, void* ptr, size_t osize, size_t nsize)
-{
-#ifndef USE_MEMORY_MONITOR
-    (void)ud;
-    (void)osize;
-    if (!nsize)
-    {
-        s_allocator.free_impl(ptr);
-        return 0;
-    }
-    if (!ptr)
-        return s_allocator.malloc_impl((u32)nsize);
-    return s_allocator.realloc_impl(ptr, (u32)nsize);
-#else
-    if (!nsize)
-    {
-        memory_monitor::monitor_free(ptr);
-        s_allocator.free_impl(ptr);
-        return nullptr;
-    }
-    if (!ptr)
-    {
-        void* result = s_allocator.malloc_impl((u32)nsize);
-        memory_monitor::monitor_alloc(result, nsize, "LUA");
-        return result;
-    }
-    memory_monitor::monitor_free(ptr);
-    void* result = s_allocator.realloc_impl(ptr, (u32)nsize);
-    memory_monitor::monitor_alloc(result, nsize, "LUA");
-    return result;
-#endif
-}
-
-#endif // PURE_ALLOC
 
 static void* __cdecl luabind_allocator(void* context, const void* pointer, size_t const size)
 {
@@ -1219,15 +1171,6 @@ void CScriptEngine::collect_all_garbage()
 {
     lua_gc(lua(), LUA_GCCOLLECT, 0);
     lua_gc(lua(), LUA_GCCOLLECT, 0);
-}
-
-u32 CScriptEngine::GetMemoryUsage()
-{
-#ifdef USE_DL_ALLOCATOR
-    return s_allocator.get_allocated_size();
-#else
-    return 0;
-#endif
 }
 
 void CScriptEngine::on_error(lua_State* state)

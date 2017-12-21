@@ -116,7 +116,7 @@ public:
 #ifdef CONTAINER_STATS
         mUsedRam -= mMaxNbEntries * sizeof(udword);
 #endif
-        CFREE(mEntries);
+        xr_free(mEntries);
         mCurNbEntries = mMaxNbEntries = 0;
         return *this;
     }
