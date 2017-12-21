@@ -363,7 +363,7 @@
     <ClInclude Include="PPMd.h" />
     <ClInclude Include="PPMdType.h" />
     <ClInclude Include="ppmd_compressor.h" />
-    <ClInclude Include="ptmalloc3\malloc-2.8.3.h" />
+    <ClInclude Include="ptmalloc3\malloc.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="stream_reader.h" />

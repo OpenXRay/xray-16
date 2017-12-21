@@ -521,9 +521,6 @@
     <ClInclude Include="xrMemory_subst_msvc.h">
       <Filter>Memory manager</Filter>
     </ClInclude>
-    <ClInclude Include="ptmalloc3\malloc-2.8.3.h">
-      <Filter>Memory manager\dlmalloc\allocator</Filter>
-    </ClInclude>
     <ClInclude Include="doug_lea_allocator.h">
       <Filter>Memory manager\dlmalloc\wrapper</Filter>
     </ClInclude>
@@ -739,6 +736,9 @@
     </ClInclude>
     <ClInclude Include="Math\PLC_CPP.hpp">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="ptmalloc3\malloc.h">
+      <Filter>Memory manager\dlmalloc\allocator</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

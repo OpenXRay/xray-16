@@ -11,7 +11,7 @@
 #define MSPACES 1
 #define USE_OUT_OF_MEMORY_HANDLER
 #define USE_LOCKS 0
-#include "ptmalloc3/malloc-2.8.3.h"
+#include "ptmalloc3/malloc.h"
 
 static void __stdcall out_of_memory(mspace const space, void const* const parameter, int const first_time)
 {
