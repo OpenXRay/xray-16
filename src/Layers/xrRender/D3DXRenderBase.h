@@ -24,7 +24,7 @@ public:
     BOOL val_bRecordMP; // record nearest for multi-pass
     R_feedback* val_feedback; // feedback for geometry being rendered
     u32 val_feedback_breakp; // breakpoint
-    xr_vector<Fbox3, render_alloc<Fbox3>>* val_recorder; // coarse structure recorder
+    xr_vector<Fbox3>* val_recorder; // coarse structure recorder
     u32 phase;
     u32 marker;
     bool pmask[2];
@@ -47,8 +47,8 @@ public:
     R_dsgraph::mapSorted_T mapHUDEmissive;
 #endif
 
-    xr_vector<R_dsgraph::_LodItem, render_alloc<R_dsgraph::_LodItem>> lstLODs;
-    xr_vector<int, render_alloc<int>> lstLODgroups;
+    xr_vector<R_dsgraph::_LodItem> lstLODs;
+    xr_vector<int> lstLODgroups;
     xr_vector<ISpatial*> lstRenderables;
     xr_vector<ISpatial*> lstSpatial;
 
@@ -75,7 +75,7 @@ public:
         val_feedback_breakp = id;
         val_feedback = V;
     }
-    void set_Recorder(xr_vector<Fbox3, render_alloc<Fbox3>>* dest)
+    void set_Recorder(xr_vector<Fbox3>* dest)
     {
         val_recorder = dest;
         if (dest)

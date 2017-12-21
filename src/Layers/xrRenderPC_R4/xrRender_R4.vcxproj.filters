@@ -720,9 +720,6 @@
     <ClInclude Include="..\xrRender\light.h">
       <Filter>Lights</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrRender\RenderAllocator.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrRender\D3DXRenderBase.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -1312,9 +1309,6 @@
     </ClCompile>
     <ClCompile Include="..\xrRender\Debug\dxPixEventWrapper.cpp">
       <Filter>Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="..\xrRender\RenderAllocator.cpp">
-      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="r4_R_sun.cpp">
       <Filter>Core</Filter>

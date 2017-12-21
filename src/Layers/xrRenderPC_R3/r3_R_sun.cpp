@@ -248,7 +248,7 @@ struct DumbClipper
         return D3DXVECTOR3((i & 1) ? bb.vMin.x : bb.vMax.x, (i & 2) ? bb.vMin.y : bb.vMax.y, (i & 4) ? bb.vMin.z : bb.vMax.z);
     }
 
-    Fbox clipped_AABB(xr_vector<Fbox, render_alloc<Fbox3>>& src, Fmatrix& xf)
+    Fbox clipped_AABB(xr_vector<Fbox>& src, Fmatrix& xf)
     {
         Fbox3 result;
         result.invalidate();
@@ -292,7 +292,7 @@ struct DumbClipper
     }
 };
 
-xr_vector<Fbox, render_alloc<Fbox>> s_casters;
+xr_vector<Fbox> s_casters;
 
 D3DXVECTOR2 BuildTSMProjectionMatrix_caster_depth_bounds(D3DXMATRIX& lightSpaceBasis)
 {
@@ -427,7 +427,7 @@ void CRender::render_sun()
     }
 
     // Fill the database
-    xr_vector<Fbox3, render_alloc<Fbox3>>& s_receivers = main_coarse_structure;
+    xr_vector<Fbox3>& s_receivers = main_coarse_structure;
     s_casters.reserve(s_receivers.size());
     set_Recorder(&s_casters);
     r_dsgraph_render_subspace(cull_sector, &cull_frustum, cull_xform, cull_COP, TRUE);

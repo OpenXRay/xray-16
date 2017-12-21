@@ -1,7 +1,6 @@
 #pragma once
 
-#include "xrCore/fixedmap.h"
-#include "Layers/xrRender/RenderAllocator.hpp"
+#include "xrCore/FixedMap.h"
 
 class dxRender_Visual;
 
@@ -61,24 +60,24 @@ using ps_type = ID3DPixelShader* ;
 #endif
 
 // NORMAL
-using mapNormalDirect = xr_vector<_NormalItem, render_allocator::helper<_NormalItem>::result>;
+using mapNormalDirect = xr_vector<_NormalItem>;
 
 struct mapNormalItems : public mapNormalDirect
 {
     float ssa;
 };
 
-struct mapNormalTextures : public FixedMAP<STextureList*, mapNormalItems, render_allocator>
+struct mapNormalTextures : public FixedMAP<STextureList*, mapNormalItems>
 {
     float ssa;
 };
 
-struct mapNormalStates : public FixedMAP<ID3DState*, mapNormalTextures, render_allocator>
+struct mapNormalStates : public FixedMAP<ID3DState*, mapNormalTextures>
 {
     float ssa;
 };
 
-struct mapNormalCS : public FixedMAP<R_constant_table*, mapNormalStates, render_allocator>
+struct mapNormalCS : public FixedMAP<R_constant_table*, mapNormalStates>
 {
     float ssa;
 };
@@ -91,50 +90,50 @@ struct mapNormalAdvStages
     mapNormalCS mapCS;
 };
 
-struct mapNormalPS : public FixedMAP<ps_type, mapNormalAdvStages, render_allocator>
+struct mapNormalPS : public FixedMAP<ps_type, mapNormalAdvStages>
 {
     float ssa;
 };
 #else
-struct mapNormalPS : public FixedMAP<ps_type, mapNormalCS, render_allocator>
+struct mapNormalPS : public FixedMAP<ps_type, mapNormalCS>
 {
     float ssa;
 };
 #endif //	USE_DX11
 
 #if defined(USE_DX10) || defined(USE_DX11)
-struct mapNormalGS : public FixedMAP<gs_type, mapNormalPS, render_allocator>
+struct mapNormalGS : public FixedMAP<gs_type, mapNormalPS>
 {
     float ssa;
 };
 
-struct mapNormalVS : public FixedMAP<vs_type, mapNormalGS, render_allocator> {};
+struct mapNormalVS : public FixedMAP<vs_type, mapNormalGS> {};
 #else //	USE_DX10
-struct mapNormalVS : public FixedMAP<vs_type, mapNormalPS, render_allocator> {};
+struct mapNormalVS : public FixedMAP<vs_type, mapNormalPS> {};
 #endif //	USE_DX10
 
 using mapNormal_T = mapNormalVS;
 using mapNormalPasses_T = mapNormal_T[SHADER_PASSES_MAX];
 
 // MATRIX
-using mapMatrixDirect = xr_vector<_MatrixItem, render_allocator::helper<_MatrixItem>::result>;
+using mapMatrixDirect = xr_vector<_MatrixItem>;
 
 struct mapMatrixItems : public mapMatrixDirect
 {
     float ssa;
 };
 
-struct mapMatrixTextures : public FixedMAP<STextureList*, mapMatrixItems, render_allocator>
+struct mapMatrixTextures : public FixedMAP<STextureList*, mapMatrixItems>
 {
     float ssa;
 };
 
-struct mapMatrixStates : public FixedMAP<ID3DState*, mapMatrixTextures, render_allocator>
+struct mapMatrixStates : public FixedMAP<ID3DState*, mapMatrixTextures>
 {
     float ssa;
 };
 
-struct mapMatrixCS : public FixedMAP<R_constant_table*, mapMatrixStates, render_allocator>
+struct mapMatrixCS : public FixedMAP<R_constant_table*, mapMatrixStates>
 {
     float ssa;
 };
@@ -147,38 +146,38 @@ struct mapMatrixAdvStages
     mapMatrixCS mapCS;
 };
 
-struct mapMatrixPS : public FixedMAP<ps_type, mapMatrixAdvStages, render_allocator>
+struct mapMatrixPS : public FixedMAP<ps_type, mapMatrixAdvStages>
 {
     float ssa;
 };
 #else
-struct mapMatrixPS : public FixedMAP<ps_type, mapMatrixCS, render_allocator>
+struct mapMatrixPS : public FixedMAP<ps_type, mapMatrixCS>
 {
     float ssa;
 };
 #endif //	USE_DX11
 
 #if defined(USE_DX10) || defined(USE_DX11)
-struct mapMatrixGS : public FixedMAP<gs_type, mapMatrixPS, render_allocator>
+struct mapMatrixGS : public FixedMAP<gs_type, mapMatrixPS>
 {
     float ssa;
 };
 
-struct mapMatrixVS : public FixedMAP<vs_type, mapMatrixGS, render_allocator> {};
+struct mapMatrixVS : public FixedMAP<vs_type, mapMatrixGS> {};
 #else //	USE_DX10
-struct mapMatrixVS : public FixedMAP<vs_type, mapMatrixPS, render_allocator> {};
+struct mapMatrixVS : public FixedMAP<vs_type, mapMatrixPS> {};
 #endif //	USE_DX10
 
 using mapMatrix_T = mapMatrixVS;
 using mapMatrixPasses_T = mapMatrix_T[SHADER_PASSES_MAX];
 
 // Top level
-using mapSorted_T = FixedMAP<float, _MatrixItemS, render_allocator>;
+using mapSorted_T = FixedMAP<float, _MatrixItemS>;
 using mapSorted_Node = mapSorted_T::TNode;
 
-using mapHUD_T = FixedMAP<float, _MatrixItemS, render_allocator>;
+using mapHUD_T = FixedMAP<float, _MatrixItemS>;
 using mapHUD_Node = mapHUD_T::TNode;
 
-using mapLOD_T = FixedMAP<float, _LodItem, render_allocator>;
+using mapLOD_T = FixedMAP<float, _LodItem>;
 using mapLOD_Node = mapLOD_T::TNode;
 }

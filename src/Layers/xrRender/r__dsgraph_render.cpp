@@ -70,7 +70,7 @@ template <class T> IC bool cmp_textures_lexN(const T &lhs, const T &rhs)
     return std::lexicographical_compare(t1->begin(), t1->end(), t2->begin(), t2->end());
 }
 
-template <class T> void sort_tlist(xr_vector<T::template TNode*, render_alloc<T::template TNode*>>& lst, T& textures)
+template <class T> void sort_tlist(xr_vector<T::template TNode*>& lst, T& textures)
 {
     int amount = textures.begin()->key->size();
 
@@ -82,7 +82,7 @@ template <class T> void sort_tlist(xr_vector<T::template TNode*, render_alloc<T:
     }
     else
     {
-        xr_vector<T::template TNode*, render_alloc<T::template TNode*>> temp;
+        xr_vector<T::template TNode*> temp;
 
         // Split into 2 parts
         for (auto &it : textures)
@@ -123,7 +123,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
         {
             mapNormalVS& vs = mapNormalPasses[_priority][iPass];
 
-            xr_vector<mapNormalVS::TNode*, render_alloc<mapNormalVS::TNode*>> nrmVS;
+            xr_vector<mapNormalVS::TNode*> nrmVS;
             vs.getANY_P(nrmVS);
             std::sort(nrmVS.begin(), nrmVS.end(), cmp_val_ssa<mapNormalVS::TNode*>);
             for (auto & vs_it : nrmVS)
@@ -134,7 +134,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
                 //	GS setup
                 mapNormalGS& gs = vs_it->val;
 
-                xr_vector<mapNormalGS::TNode*, render_alloc<mapNormalGS::TNode*>> nrmGS;
+                xr_vector<mapNormalGS::TNode*> nrmGS;
                 gs.getANY_P(nrmGS);
                 std::sort(nrmGS.begin(), nrmGS.end(), cmp_val_ssa<mapNormalGS::TNode*>);
                 for (auto & gs_it : nrmGS)
@@ -145,7 +145,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 #else // USE_DX10
                     mapNormalPS& ps = vs_it->val;
 #endif // USE_DX10
-                    xr_vector<mapNormalPS::TNode*, render_alloc<mapNormalPS::TNode*>> nrmPS;
+                    xr_vector<mapNormalPS::TNode*> nrmPS;
                     ps.getANY_P(nrmPS);
                     std::sort(nrmPS.begin(), nrmPS.end(), cmp_ps_val_ssa<mapNormalPS::TNode*>);
                     for (auto &ps_it : nrmPS)
@@ -159,7 +159,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 #else
                         mapNormalCS& cs = ps_it->val;
 #endif
-                        xr_vector<mapNormalCS::TNode*, render_alloc<mapNormalCS::TNode*>> nrmCS;
+                        xr_vector<mapNormalCS::TNode*> nrmCS;
                         cs.getANY_P(nrmCS);
                         std::sort(nrmCS.begin(), nrmCS.end(), cmp_val_ssa<mapNormalCS::TNode*>);
                         for (auto &cs_it : nrmCS)
@@ -168,7 +168,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 
                             mapNormalStates& states = cs_it->val;
 
-                            xr_vector<mapNormalStates::TNode*, render_alloc<mapNormalStates::TNode*>> nrmStates;
+                            xr_vector<mapNormalStates::TNode*> nrmStates;
                             states.getANY_P(nrmStates);
                             std::sort(nrmStates.begin(), nrmStates.end(), cmp_val_ssa<mapNormalStates::TNode*>);
                             for (auto &state_it : nrmStates)
@@ -177,7 +177,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 
                                 mapNormalTextures& tex = state_it->val;
 
-                                xr_vector<mapNormalTextures::TNode*, render_alloc<mapNormalTextures::TNode*>> nrmTextures;
+                                xr_vector<mapNormalTextures::TNode*> nrmTextures;
                                 sort_tlist<mapNormalTextures>(nrmTextures, tex);
                                 for (auto &tex_it : nrmTextures)
                                 {
@@ -221,7 +221,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
     {
         mapMatrixVS& vs = mapMatrixPasses[_priority][iPass];
 
-        xr_vector<mapMatrixVS::TNode*, render_alloc<mapMatrixVS::TNode*>> matVS;
+        xr_vector<mapMatrixVS::TNode*> matVS;
         vs.getANY_P(matVS);
         std::sort(matVS.begin(), matVS.end(), cmp_val_ssa<mapMatrixVS::TNode*>);
         for (auto &vs_id : matVS)
@@ -231,7 +231,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 #if defined(USE_DX10) || defined(USE_DX11)
             mapMatrixGS& gs = vs_id->val;
 
-            xr_vector<mapMatrixGS::TNode*, render_alloc<mapMatrixGS::TNode*>> matGS;
+            xr_vector<mapMatrixGS::TNode*> matGS;
             gs.getANY_P(matGS);
             std::sort(matGS.begin(), matGS.end(), cmp_val_ssa<mapMatrixGS::TNode*>);
             for (auto &gs_it : matGS)
@@ -242,7 +242,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 #else // USE_DX10
                 mapMatrixPS& ps = vs_id->val;
 #endif // USE_DX10
-                xr_vector<mapMatrixPS::TNode *, render_alloc<mapMatrixPS::TNode *>> matPS;
+                xr_vector<mapMatrixPS::TNode *> matPS;
                 ps.getANY_P(matPS);
                 std::sort(matPS.begin(), matPS.end(), cmp_ps_val_ssa<mapMatrixPS::TNode *>);
                 for (auto &ps_it : matPS)
@@ -256,7 +256,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 #else
                     mapMatrixCS& cs = ps_it->val;
 #endif
-                    xr_vector<mapMatrixCS::TNode*, render_alloc<mapMatrixCS::TNode*>> matCS;
+                    xr_vector<mapMatrixCS::TNode*> matCS;
                     cs.getANY_P(matCS);
                     std::sort(matCS.begin(), matCS.end(), cmp_val_ssa<mapMatrixCS::TNode*>);
                     for (auto &cs_it : matCS)
@@ -265,7 +265,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 
                         mapMatrixStates& states = cs_it->val;
 
-                        xr_vector<mapMatrixStates::TNode*, render_alloc<mapMatrixStates::TNode*>> matStates;
+                        xr_vector<mapMatrixStates::TNode*> matStates;
                         states.getANY_P(matStates);
                         std::sort(matStates.begin(), matStates.end(), cmp_val_ssa<mapMatrixStates::TNode*>);
                         for (auto &state_it : matStates)
@@ -274,7 +274,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 
                             mapMatrixTextures& tex = state_it->val;
 
-                            xr_vector<mapMatrixTextures::TNode*, render_alloc<mapMatrixTextures::TNode*>> matTextures;
+                            xr_vector<mapMatrixTextures::TNode*> matTextures;
                             sort_tlist<mapMatrixTextures>(matTextures, tex);
                             for (auto &tex_it : matTextures)
                             {
@@ -603,7 +603,7 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
 
 void D3DXRenderBase::r_dsgraph_render_R1_box(IRender_Sector* S, Fbox& BB, int sh)
 {
-    xr_vector<dxRender_Visual*, render_alloc<dxRender_Visual*>> lstVisuals;
+    xr_vector<dxRender_Visual*> lstVisuals;
     lstVisuals.push_back(((CSector*)S)->root());
 
     for (auto &it : lstVisuals)
