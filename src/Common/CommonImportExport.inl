@@ -1,5 +1,9 @@
 #pragma once
 
+// XXX: Add remaining defines
+// XXX: Get rid of NO_ENGINE_API
+// XXX: Get rid of DLL_API (maybe)
+
 #ifdef XRAPI_EXPORTS
 #define XRAPI_API XR_EXPORT
 #else

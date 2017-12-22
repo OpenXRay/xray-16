@@ -4,7 +4,6 @@
 #define D3D_DEBUG_INFO
 #endif
 
-#include "Common/Platform.hpp"
 #include "Common/Common.hpp"
 #include <stdlib.h>
 #include <objbase.h>
