@@ -199,6 +199,7 @@ public:
     void _destroy();
     const char* GetBuildDate() const { return buildDate; }
     u32 GetBuildId() const { return buildId; }
+    static constexpr pcstr GetBuildConfiguration();
 
 private:
     void CalculateBuildId();

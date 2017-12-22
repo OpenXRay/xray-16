@@ -73,7 +73,7 @@ void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pc
         DUMP_PHASE;
 
         InitLog();
-        Msg("'%s' build %d, %s\n", "xrCore", buildId, buildDate);
+        Msg("%s %s build %d, %s\n", "xdOpenXRay", GetBuildConfiguration(), buildId, buildDate);
         _initialize_cpu();
         R_ASSERT(CPU::ID.hasFeature(CpuFeature::Sse));
         ttapi_Init(CPU::ID);
@@ -149,6 +149,29 @@ void xrCore::_destroy()
         xr_free(Params);
         Memory._destroy();
     }
+}
+
+constexpr pcstr xrCore::GetBuildConfiguration()
+{
+#ifdef NDEBUG
+#ifdef XR_X64
+    return "Rx64";
+#else
+    return "Rx86";
+#endif
+#elif defined(MIXED)
+#ifdef XR_X64
+    return "Mx64";
+#else
+    return "Mx86";
+#endif
+#else
+#ifdef XR_X64
+    return "Dx64";
+#else
+    return "Dx86";
+#endif
+#endif
 }
 
 void xrCore::CalculateBuildId()
