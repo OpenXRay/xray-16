@@ -11,7 +11,7 @@
 #define MSPACES 1
 #define USE_OUT_OF_MEMORY_HANDLER
 #define USE_LOCKS 0
-#include "ptmalloc3/malloc.h"
+#include "Memory/dlmalloc.h"
 
 static void __stdcall out_of_memory(mspace const space, void const* const parameter, int const first_time)
 {
@@ -22,7 +22,7 @@ static void __stdcall out_of_memory(mspace const space, void const* const parame
     xrDebug::Fatal(DEBUG_INFO, "not enough memory for arena [%s]", allocator->get_arena_id());
 }
 
-doug_lea_allocator::doug_lea_allocator(void* arena, u32 arena_size, LPCSTR arena_id) : m_arena_id(arena_id)
+doug_lea_allocator::doug_lea_allocator(void* arena, u32 arena_size, pcstr arena_id) : m_arena_id(arena_id)
 {
     VERIFY(m_arena_id);
 

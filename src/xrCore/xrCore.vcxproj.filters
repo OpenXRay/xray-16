@@ -28,18 +28,6 @@
     <Filter Include="FS\file_stream_reader">
       <UniqueIdentifier>{fd3c609d-f0ba-4a89-a568-ddcc8027b942}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Memory manager">
-      <UniqueIdentifier>{11d9158f-7330-4434-81b2-684eebee4c83}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Memory manager\dlmalloc">
-      <UniqueIdentifier>{4705fd61-ddd0-41fa-bc61-dd6c3614dba5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Memory manager\dlmalloc\allocator">
-      <UniqueIdentifier>{246cd5dd-abec-4430-8eba-4018828784a7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Memory manager\dlmalloc\wrapper">
-      <UniqueIdentifier>{5f3b8536-3170-4e5e-90f1-222d3a4a144a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Debug core">
       <UniqueIdentifier>{fb17db11-1c85-43ab-9226-0c82ece07b51}</UniqueIdentifier>
     </Filter>
@@ -48,9 +36,6 @@
     </Filter>
     <Filter Include="intrusive_ptr">
       <UniqueIdentifier>{93a7b313-9b86-4fd4-82a0-9d4a7ec4639f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="memory_monitor">
-      <UniqueIdentifier>{6672355e-6ec8-4680-bf06-19c4aada83ec}</UniqueIdentifier>
     </Filter>
     <Filter Include="Compression">
       <UniqueIdentifier>{31e40506-2e4e-4860-be44-290fb6f03c61}</UniqueIdentifier>
@@ -120,6 +105,24 @@
     </Filter>
     <Filter Include="PCH">
       <UniqueIdentifier>{061cfd8f-ceab-42cf-83c5-bdfb65c5d322}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory">
+      <UniqueIdentifier>{0173b19d-898c-495c-8d22-2cc3d8436008}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory\memory_monitor">
+      <UniqueIdentifier>{6672355e-6ec8-4680-bf06-19c4aada83ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory\Memory manager">
+      <UniqueIdentifier>{11d9158f-7330-4434-81b2-684eebee4c83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory\Memory manager\dlmalloc">
+      <UniqueIdentifier>{4705fd61-ddd0-41fa-bc61-dd6c3614dba5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory\Memory manager\dlmalloc\allocator">
+      <UniqueIdentifier>{246cd5dd-abec-4430-8eba-4018828784a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory\Memory manager\dlmalloc\wrapper">
+      <UniqueIdentifier>{5f3b8536-3170-4e5e-90f1-222d3a4a144a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -193,37 +196,28 @@
       <Filter>FS\file_stream_reader</Filter>
     </ClCompile>
     <ClCompile Include="memory_allocation_stats.cpp">
-      <Filter>Memory manager</Filter>
+      <Filter>Memory\Memory manager</Filter>
     </ClCompile>
     <ClCompile Include="memory_usage.cpp">
-      <Filter>Memory manager</Filter>
+      <Filter>Memory\Memory manager</Filter>
     </ClCompile>
     <ClCompile Include="xrMemory.cpp">
-      <Filter>Memory manager</Filter>
+      <Filter>Memory\Memory manager</Filter>
     </ClCompile>
     <ClCompile Include="xrMemory_align.cpp">
-      <Filter>Memory manager</Filter>
+      <Filter>Memory\Memory manager</Filter>
     </ClCompile>
     <ClCompile Include="xrMemory_debug.cpp">
-      <Filter>Memory manager</Filter>
+      <Filter>Memory\Memory manager</Filter>
     </ClCompile>
     <ClCompile Include="xrMemory_POOL.cpp">
-      <Filter>Memory manager</Filter>
+      <Filter>Memory\Memory manager</Filter>
     </ClCompile>
     <ClCompile Include="xrMemory_subst_borland.cpp">
-      <Filter>Memory manager</Filter>
+      <Filter>Memory\Memory manager</Filter>
     </ClCompile>
     <ClCompile Include="xrMemory_subst_msvc.cpp">
-      <Filter>Memory manager</Filter>
-    </ClCompile>
-    <ClCompile Include="ptmalloc3\malloc.c">
-      <Filter>Memory manager\dlmalloc\allocator</Filter>
-    </ClCompile>
-    <ClCompile Include="ptmalloc3\sysdeps\win32\win32.c">
-      <Filter>Memory manager\dlmalloc\allocator</Filter>
-    </ClCompile>
-    <ClCompile Include="doug_lea_allocator.cpp">
-      <Filter>Memory manager\dlmalloc\wrapper</Filter>
+      <Filter>Memory\Memory manager</Filter>
     </ClCompile>
     <ClCompile Include="crc32.cpp">
       <Filter>shared memory/string library</Filter>
@@ -238,7 +232,7 @@
       <Filter>shared memory/string library</Filter>
     </ClCompile>
     <ClCompile Include="memory_monitor.cpp">
-      <Filter>memory_monitor</Filter>
+      <Filter>Memory\memory_monitor</Filter>
     </ClCompile>
     <ClCompile Include="ppmd_compressor.cpp">
       <Filter>Compression\ppmd</Filter>
@@ -347,6 +341,12 @@
     </ClCompile>
     <ClCompile Include="Math\PLC_CPP.cpp">
       <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\dlmalloc.c">
+      <Filter>Memory\Memory manager\dlmalloc\allocator</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\doug_lea_allocator.cpp">
+      <Filter>Memory\Memory manager\dlmalloc\wrapper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -507,25 +507,22 @@
       <Filter>FS\file_stream_reader</Filter>
     </ClInclude>
     <ClInclude Include="xrMemory.h">
-      <Filter>Memory manager</Filter>
+      <Filter>Memory\Memory manager</Filter>
     </ClInclude>
     <ClInclude Include="xrMemory_align.h">
-      <Filter>Memory manager</Filter>
+      <Filter>Memory\Memory manager</Filter>
     </ClInclude>
     <ClInclude Include="xrMemory_pure.h">
-      <Filter>Memory manager</Filter>
+      <Filter>Memory\Memory manager</Filter>
     </ClInclude>
     <ClInclude Include="xrMemory_subst_borland.h">
-      <Filter>Memory manager</Filter>
+      <Filter>Memory\Memory manager</Filter>
     </ClInclude>
     <ClInclude Include="xrMemory_subst_msvc.h">
-      <Filter>Memory manager</Filter>
-    </ClInclude>
-    <ClInclude Include="doug_lea_allocator.h">
-      <Filter>Memory manager\dlmalloc\wrapper</Filter>
+      <Filter>Memory\Memory manager</Filter>
     </ClInclude>
     <ClInclude Include="memory_allocator_options.h">
-      <Filter>Memory manager\dlmalloc\wrapper</Filter>
+      <Filter>Memory\Memory manager\dlmalloc\wrapper</Filter>
     </ClInclude>
     <ClInclude Include="xrDebug.h">
       <Filter>Debug core</Filter>
@@ -549,7 +546,7 @@
       <Filter>intrusive_ptr</Filter>
     </ClInclude>
     <ClInclude Include="memory_monitor.h">
-      <Filter>memory_monitor</Filter>
+      <Filter>Memory\memory_monitor</Filter>
     </ClInclude>
     <ClInclude Include="ppmd_compressor.h">
       <Filter>Compression\ppmd</Filter>
@@ -726,7 +723,7 @@
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="xrMemory_POOL.h">
-      <Filter>Memory manager</Filter>
+      <Filter>Memory\Memory manager</Filter>
     </ClInclude>
     <ClInclude Include="xr_vector_defs.h">
       <Filter>Math\Extensions</Filter>
@@ -737,8 +734,14 @@
     <ClInclude Include="Math\PLC_CPP.hpp">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="ptmalloc3\malloc.h">
-      <Filter>Memory manager\dlmalloc\allocator</Filter>
+    <ClInclude Include="Memory\xalloc.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\dlmalloc.h">
+      <Filter>Memory\Memory manager\dlmalloc\allocator</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\doug_lea_allocator.h">
+      <Filter>Memory\Memory manager\dlmalloc\wrapper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

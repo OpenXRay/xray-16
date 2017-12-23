@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "xalloc.h"
+#include "xrCore/Memory/xalloc.h"
 #include "xrCore/xrDebug_macros.h"
 
 #ifdef _M_AMD64

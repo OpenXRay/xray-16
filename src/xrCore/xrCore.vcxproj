@@ -168,7 +168,6 @@
     <ClCompile Include="Debug\dxerr.cpp" />
     <ClCompile Include="Debug\MiniDump.cpp" />
     <ClCompile Include="Debug\StackTrace.cpp" />
-    <ClCompile Include="doug_lea_allocator.cpp" />
     <ClCompile Include="dump_string.cpp" />
     <ClCompile Include="FileSystem.cpp" />
     <ClCompile Include="FileSystem_borland.cpp" />
@@ -188,6 +187,12 @@
     <ClCompile Include="Math\SkinXW_SSE.cpp" />
     <ClCompile Include="Math\MathUtil.cpp" />
     <ClCompile Include="Media\Image.cpp" />
+    <ClCompile Include="Memory\dlmalloc.c">
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <DisableSpecificWarnings>4702</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Include="Memory\doug_lea_allocator.cpp" />
     <ClCompile Include="memory_allocation_stats.cpp" />
     <ClCompile Include="memory_monitor.cpp" />
     <ClCompile Include="memory_usage.cpp" />
@@ -216,40 +221,6 @@
     <ClCompile Include="PostProcess\PostProcess.cpp" />
     <ClCompile Include="PostProcess\PPInfo.cpp" />
     <ClCompile Include="ppmd_compressor.cpp" />
-    <ClCompile Include="ptmalloc3\malloc.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4702</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4702</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">4702</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">4702</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4702</DisableSpecificWarnings>
-      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4702</DisableSpecificWarnings>
-    </ClCompile>
-    <ClCompile Include="ptmalloc3\sysdeps\win32\win32.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -328,7 +299,6 @@
     <ClInclude Include="Debug\MiniDump.h" />
     <ClInclude Include="Debug\StackTrace.h" />
     <ClInclude Include="Debug\SymbolEngine.h" />
-    <ClInclude Include="doug_lea_allocator.h" />
     <ClInclude Include="dump_string.h" />
     <ClInclude Include="fastdelegate.h" />
     <CustomBuild Include="FileSystem.h" />
@@ -354,6 +324,9 @@
     <ClInclude Include="Math\MathUtil.hpp" />
     <ClInclude Include="math_constants.h" />
     <ClInclude Include="Media\Image.hpp" />
+    <ClInclude Include="Memory\dlmalloc.h" />
+    <ClInclude Include="Memory\doug_lea_allocator.h" />
+    <ClInclude Include="Memory\xalloc.h" />
     <ClInclude Include="memory_allocator_options.h" />
     <ClInclude Include="memory_monitor.h" />
     <ClInclude Include="net_utils.h" />
@@ -363,7 +336,6 @@
     <ClInclude Include="PPMd.h" />
     <ClInclude Include="PPMdType.h" />
     <ClInclude Include="ppmd_compressor.h" />
-    <ClInclude Include="ptmalloc3\malloc.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="stream_reader.h" />

@@ -14,7 +14,7 @@
 #include "_color.h"
 #include "_std_extensions.h"
 #include "xrMemory.h"
-#include "xrCommon/xalloc.h"
+#include "xrCore/Memory/xalloc.h"
 #include "xrCommon/xr_vector.h"
 #include "xrCommon/xr_map.h"
 #include "xrCommon/xr_set.h"

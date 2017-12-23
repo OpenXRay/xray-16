@@ -1,6 +1,6 @@
 #pragma once
 #include <list>
-#include "xalloc.h"
+#include "xrCore/Memory/xalloc.h"
 #include "xrCore/xrDebug_macros.h"
 
 template <typename T, typename allocator = xalloc<T>>

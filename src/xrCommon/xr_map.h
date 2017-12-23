@@ -1,6 +1,6 @@
 #pragma once
 #include <map>
-#include "xalloc.h"
+#include "xrCore/Memory/xalloc.h"
 #include "xrCore/xrDebug_macros.h"
 
 template <typename K, class V, class P = std::less<K>, typename allocator = xalloc<std::pair<K, V>>>

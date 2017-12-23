@@ -10,7 +10,7 @@
 #include "script_engine.hpp"
 #include "script_process.hpp"
 #include "script_thread.hpp"
-#include "xrCore/doug_lea_allocator.h"
+#include "xrCore/Memory/doug_lea_allocator.h"
 #include "ScriptExporter.hpp"
 #include "BindingsDumper.hpp"
 #ifdef USE_DEBUGGER
