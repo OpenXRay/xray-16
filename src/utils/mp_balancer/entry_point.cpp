@@ -2,8 +2,6 @@
 #include "wpn_collection.hpp"
 #include "statistics_collector.hpp"
 
-#pragma comment(lib, "xrCore.LIB")
-
 void main(int argc, char* argv[])
 {
     Core._initialize("mp_ballancer", NULL, TRUE, "fsgame4mpu.ltx");

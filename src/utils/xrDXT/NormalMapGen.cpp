@@ -9,7 +9,6 @@ using namespace xray_nvi;
 #ifdef XR_DXT_DBG_BUMP_STAGES_DIR
 #include "xrCore/Media/Image.hpp"
 using namespace XRay::Media;
-#pragma comment(lib, "xrCore.lib")
 #endif
 
 enum KernelType

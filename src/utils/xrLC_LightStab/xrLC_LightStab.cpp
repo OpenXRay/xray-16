@@ -3,8 +3,6 @@
 
 #include "utils/xrLC_Light/lightstab_interface.h"
 
-#pragma comment(lib, "xrLC_Light.lib")
-
 extern "C" XRLC_LIGHT_STUB_API bool __cdecl RunTask(
     IAgent* agent, DWORD sessionId, IGenericStream* inStream, IGenericStream* outStream)
 {

@@ -395,6 +395,12 @@
     <ProjectReference Include="..\..\..\Externals\zlib.vcxproj">
       <Project>{745dec58-ebb3-47a9-a9b8-4c6627c01bf8}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\xrDXT\DXT.vcxproj">
+      <Project>{ebf9b543-0830-4866-9b48-dc0740e87e8a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\xrLCUtil\xrLCUtil.vcxproj">
+      <Project>{b90bdc22-a891-4b33-b562-29d701f65dbd}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\xrMiscMath\xrMiscMath.vcxproj">
       <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>
     </ProjectReference>

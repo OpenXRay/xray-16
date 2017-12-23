@@ -290,7 +290,7 @@
     <ClCompile Include="xrPhase_GI.cpp" />
     <ClCompile Include="xrPhase_MergeGeometry.cpp" />
     <ClCompile Include="xrPhase_MergeLM.cpp" />
-    <ClCompile Include="xrPhase_MergeLM_Surface.cpp" />    
+    <ClCompile Include="xrPhase_MergeLM_Surface.cpp" />
     <ClCompile Include="xrPhase_ResolveMaterials.cpp" />
     <ClCompile Include="xrPhase_Subdivide.cpp" />
     <ClCompile Include="xrPhase_TangentBasis.cpp" />
@@ -302,8 +302,29 @@
     <ClCompile Include="xrT_Junction.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\Externals\MagicFM.vcxproj">
+      <Project>{848e8ab3-9962-4c04-b813-5690399c8a3e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\xrCDB\xrCDB.vcxproj">
+      <Project>{a19b1df2-82ec-4364-8bdf-85d13a1c89b5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\xrCore\xrCore.vcxproj">
+      <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ETools\ETools.vcxproj">
+      <Project>{65cbb9d0-fbc6-41a4-8316-f5e9b5d7fb33}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\xrLCUtil\xrLCUtil.vcxproj">
+      <Project>{b90bdc22-a891-4b33-b562-29d701f65dbd}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\xrLC_Light\xrLC_Light.vcxproj">
+      <Project>{efb76d6f-0092-439c-a783-c0be10bd17c9}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\xrMiscMath\xrMiscMath.vcxproj">
       <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\xrQSlim\xrQSlim.vcxproj">
+      <Project>{f1836ce2-59ef-4189-8b9c-d103a511cb27}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

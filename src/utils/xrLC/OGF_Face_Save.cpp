@@ -121,8 +121,6 @@ struct r1v_vert
 };
 #pragma pack(pop)
 
-#pragma comment(lib, "ETools.lib")
-
 void OGF::Save(IWriter& fs)
 {
     OGF_Base::Save(fs);

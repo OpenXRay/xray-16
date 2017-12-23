@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "configs_dump_verifyer.h"
 
-#pragma comment(lib, "xrCore.lib")
-
 static char const* help_msg =
     "Format: mp_configs_verifyer.exe [--file | --unpack | --io_filter | --help] [file name]\n"
     "Keys:\n"

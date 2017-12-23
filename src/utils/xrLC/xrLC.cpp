@@ -12,11 +12,7 @@
 #pragma comment(lib, "d3dx9.lib")
 #pragma comment(lib, "IMAGEHLP.LIB")
 #pragma comment(lib, "winmm.LIB")
-#pragma comment(lib, "xrCDB.lib")
 #pragma comment(lib, "FreeImage.lib")
-#pragma comment(lib, "xrCore.lib")
-#pragma comment(lib, "xrLC_Light.lib")
-#pragma comment(lib, "xrLCUtil.lib")
 
 CBuild* pBuild = NULL;
 u32 version = 0;
