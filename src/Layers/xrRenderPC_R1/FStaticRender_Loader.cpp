@@ -124,11 +124,11 @@ void CRender::level_Unload()
     // 2.
     for (I = 0; I < Sectors.size(); I++)
         xr_delete(Sectors[I]);
-    Sectors.clear_and_free();
+    Sectors.clear();
     // 3.
     for (I = 0; I < Portals.size(); I++)
         xr_delete(Portals[I]);
-    Portals.clear_and_free();
+    Portals.clear();
 
     //*** Lights
     L_Glows->Unload();
@@ -140,7 +140,7 @@ void CRender::level_Unload()
         Visuals[I]->Release();
         xr_delete(Visuals[I]);
     }
-    Visuals.clear_and_free();
+    Visuals.clear();
 
     //*** SWI
     for (I = 0; I < SWIs.size(); I++)
@@ -152,9 +152,9 @@ void CRender::level_Unload()
         _RELEASE(VB[I]);
     for (I = 0; I < IB.size(); I++)
         _RELEASE(IB[I]);
-    DCL.clear_and_free();
-    VB.clear_and_free();
-    IB.clear_and_free();
+    DCL.clear();
+    VB.clear();
+    IB.clear();
 
     //*** Components
     xr_delete(Details);
@@ -165,7 +165,7 @@ void CRender::level_Unload()
     xr_delete(L_Shadows);
 
     //*** Shaders
-    Shaders.clear_and_free();
+    Shaders.clear();
 
 #ifdef DEBUG
     Resources->DBG_VerifyGeoms();
@@ -374,7 +374,7 @@ void CRender::LoadSWIs(CStreamReader* base_fs)
         for (; it != it_e; ++it)
             xr_free((*it).sw);
 
-        SWIs.clear_not_free();
+        SWIs.clear();
 
         SWIs.resize(item_count);
         for (u32 c = 0; c < item_count; c++)

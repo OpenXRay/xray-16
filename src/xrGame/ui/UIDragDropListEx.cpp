@@ -730,7 +730,7 @@ Ivector2 CUICellContainer::GetItemPos(CUICellItem* itm)
 
 u32 CUICellContainer::GetCellsInRange(const Irect& rect, UI_CELLS_VEC& res)
 {
-    res.clear_not_free();
+    res.clear();
     for (int x = rect.x1; x <= rect.x2; ++x)
         for (int y = rect.y1; y <= rect.y2; ++y)
             res.push_back(GetCellAt(Ivector2().set(x, y)));

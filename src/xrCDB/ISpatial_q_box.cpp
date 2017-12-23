@@ -72,7 +72,7 @@ void ISpatial_DB::q_box(xr_vector<ISpatial*>& R, u32 _o, u32 _mask, const Fvecto
     cs.Enter();
     Stats.Query.Begin();
     q_result = &R;
-    q_result->clear_not_free();
+    q_result->clear();
     if (_o & O_ONLYFIRST)
     {
         walker<true> W(this, _mask, _center, _size);

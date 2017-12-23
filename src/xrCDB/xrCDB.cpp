@@ -184,4 +184,4 @@ RESULT& COLLIDER::r_add()
     return rd.back();
 }
 
-void COLLIDER::r_free() { rd.clear_and_free(); }
+void COLLIDER::r_free() { rd.clear(); }

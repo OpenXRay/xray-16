@@ -265,7 +265,7 @@ void CEnvelope::Optimize()
         new_keys.push_back(new st_Key(*keys.back()));
         for (KeyIt k_it = keys.begin(); k_it != keys.end(); k_it++)
             xr_delete(*k_it);
-        keys.clear_and_free();
+        keys.clear();
         keys = new_keys;
     }
 }

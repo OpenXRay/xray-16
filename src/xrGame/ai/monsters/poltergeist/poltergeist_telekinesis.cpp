@@ -182,7 +182,7 @@ bool CPolterTele::trace_object(IGameObject* obj, const Fvector& target)
 
 void CPolterTele::tele_find_objects(xr_vector<IGameObject*>& objects, const Fvector& pos)
 {
-    m_nearest.clear_not_free();
+    m_nearest.clear();
     Level().ObjectSpace.GetNearest(m_nearest, pos, m_pmt_radius, NULL);
 
     for (u32 i = 0; i < m_nearest.size(); i++)

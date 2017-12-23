@@ -60,9 +60,6 @@ public:
     xr_vector() : std::vector<T>() {}
     xr_vector(size_t _count, const T& _value) : std::vector<T>(_count, _value) {}
     explicit xr_vector(size_t _count) : std::vector<T>(_count) {}
-    void clear() { erase(begin(), end()); }
-    void clear_and_free() { std::vector<T>::clear(); }
-    void clear_not_free() { erase(begin(), end()); }
     ICF const_reference operator[](size_type _Pos) const
     {
         {
@@ -89,7 +86,6 @@ public:
     xr_vector<T>(size_t _count, const T& _value) : std::vector<T>(_count, _value) {}
     explicit xr_vector<T>(size_t _count) : std::vector<T>(_count) {}
     u32 size() const { return (u32)std::vector<T>::size(); }
-    void clear() { erase(begin(), end()); }
 };
 
 #else // M_NOSTDCONTAINERS_EXT

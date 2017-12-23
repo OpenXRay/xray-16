@@ -279,7 +279,7 @@ void CMovementManager::move_along_path(CPHMovementControl* movement_control, Fve
 
     // Физика устанавливает новую позицию
     // получить физ. объекты в радиусе
-    m_nearest_objects.clear_not_free();
+    m_nearest_objects.clear();
     Level().ObjectSpace.GetNearest(m_nearest_objects, dest_position,
         DISTANCE_PHISICS_ENABLE_CHARACTERS + (movement_control->IsCharacterEnabled() ? 0.5f : 0.f), &object());
 

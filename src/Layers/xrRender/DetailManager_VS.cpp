@@ -323,7 +323,7 @@ void CDetailManager::hw_Render_dump(ref_constant x_array, u32 var_id, u32 lod_id
                 RCache.stat.r.s_details.add(dwCNT_verts);
             }
             // Clean up
-            vis.clear_not_free();
+            vis.clear();
         }
         vOffset += hw_BatchSize * Object.number_vertices;
         iOffset += hw_BatchSize * Object.number_indices;

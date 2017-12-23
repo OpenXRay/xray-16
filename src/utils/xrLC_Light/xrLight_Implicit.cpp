@@ -222,7 +222,7 @@ void ImplicitLightingExec(BOOL b_net)
         else
             RunImplicitMultithread(defl);
 
-        defl.faces.clear_and_free();
+        defl.faces.clear();
 
         // Expand
         Logger.Status("Processing lightmap...");

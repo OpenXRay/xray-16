@@ -230,7 +230,7 @@ void CDetailManager::hw_Render_dump(
                 }
             }
             // Clean up
-            vis.clear_not_free();
+            vis.clear();
         }
         vOffset += hw_BatchSize * Object.number_vertices;
         iOffset += hw_BatchSize * Object.number_indices;

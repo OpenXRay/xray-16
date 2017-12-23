@@ -41,7 +41,7 @@ public:
         for (u32 y = 0; y < s_Y; y++)
             for (u32 x = 0; x < s_X; x++)
             {
-                table[y][x].clear_not_free();
+                table[y][x].clear();
                 table[y][x].reserve(apx);
             }
     };

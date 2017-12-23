@@ -313,7 +313,7 @@ void IGame_Level::SoundEvent_Register(ref_sound_data_ptr S, float range)
             }
         }
     }
-    snd_ER.clear_not_free();
+    snd_ER.clear();
 }
 
 void IGame_Level::SoundEvent_Dispatch()

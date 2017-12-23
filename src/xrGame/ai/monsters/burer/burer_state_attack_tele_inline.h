@@ -214,10 +214,10 @@ template <typename Object>
 void CStateBurerAttackTele<Object>::FindObjects()
 {
     u32 res_size = tele_objects.size();
-    tele_objects.clear_and_reserve();
+    tele_objects.clear();
 
     // получить список объектов вокруг врага
-    m_nearest.clear_not_free();
+    m_nearest.clear();
     m_nearest.reserve(res_size);
     FindFreeObjects(m_nearest, object->EnemyMan.get_enemy()->Position());
 
@@ -471,7 +471,7 @@ void CStateBurerAttackTele<Object>::HandleGrenades()
         return;
     }
 
-    m_nearest.clear_not_free();
+    m_nearest.clear();
     Level().ObjectSpace.GetNearest(m_nearest, object->Position(), object->m_tele_find_radius, NULL);
 
     for (u32 i = 0; i < m_nearest.size(); ++i)

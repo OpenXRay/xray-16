@@ -632,7 +632,7 @@ bool CExportSkeleton::PrepareGeometry(u8 influence)
 
                 {
                     SSkelVert v[3];
-                    tmp_bone_lst.clear_not_free();
+                    tmp_bone_lst.clear();
                     u32 link_type = _max(
                         MESH->m_SVertices[f_idx * 3 + 0].bones.size(), MESH->m_SVertices[f_idx * 3 + 1].bones.size());
                     link_type = _max(link_type, MESH->m_SVertices[f_idx * 3 + 2].bones.size());

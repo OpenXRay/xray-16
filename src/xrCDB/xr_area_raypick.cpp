@@ -184,7 +184,7 @@ BOOL CObjectSpace::RayQuery(collide::rq_results& dest, const collide::ray_defs& 
 {
     lock.Enter();
     BOOL _res = _RayQuery2(dest, R, CB, user_data, tb, ignore_object);
-    r_spatial.clear_not_free();
+    r_spatial.clear();
     lock.Leave();
     return (_res);
 }

@@ -195,7 +195,7 @@ u32 CGameFont::smart_strlen(const char* S) { return (IsMultibyte() ? mbhMulti2Wi
 void CGameFont::OnRender()
 {
     pFontRender->OnRender(*this);
-    strings.clear_not_free();
+    strings.clear();
 }
 
 u16 CGameFont::GetCutLengthPos(float fTargetWidth, const char* pszText)

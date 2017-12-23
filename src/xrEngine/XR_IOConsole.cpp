@@ -111,13 +111,13 @@ void CConsole::Initialize()
     m_last_cmd = NULL;
 
     m_cmd_history.reserve(m_cmd_history_max + 2);
-    m_cmd_history.clear_not_free();
+    m_cmd_history.clear();
     reset_cmd_history_idx();
 
     m_tips.reserve(MAX_TIPS_COUNT + 1);
-    m_tips.clear_not_free();
+    m_tips.clear();
     m_temp_tips.reserve(MAX_TIPS_COUNT + 1);
-    m_temp_tips.clear_not_free();
+    m_temp_tips.clear();
 
     m_tips_mode = 0;
     m_prev_length_str = 0;
@@ -804,8 +804,8 @@ bool CConsole::add_internal_cmds(LPCSTR in_str, vecTipsEx& out_v)
 
 void CConsole::update_tips()
 {
-    m_temp_tips.clear_not_free();
-    m_tips.clear_not_free();
+    m_temp_tips.clear();
+    m_tips.clear();
 
     m_cur_cmd = NULL;
     if (!bVisible)
@@ -893,7 +893,7 @@ void CConsole::update_tips()
 
 void CConsole::select_for_filter(LPCSTR filter_str, vecTips& in_v, vecTipsEx& out_v)
 {
-    out_v.clear_not_free();
+    out_v.clear();
     u32 in_count = in_v.size();
     if (in_count == 0 || !filter_str)
     {

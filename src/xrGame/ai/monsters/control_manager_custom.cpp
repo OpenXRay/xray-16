@@ -495,7 +495,7 @@ void CControlManagerCustom::check_jump_over_physics()
         const DetailPathManager::STravelPathPoint& travel_point = m_man->path_builder().detail().path()[i];
 
         // получить список объектов вокруг врага
-        m_nearest.clear_not_free();
+        m_nearest.clear();
         Level().ObjectSpace.GetNearest(m_nearest, travel_point.position, m_object->Radius(), NULL);
 
         for (u32 k = 0; k < m_nearest.size(); k++)

@@ -97,9 +97,9 @@ u32 VCPacked::add_vert(const Fvector& V)
 
 void VCPacked::clear()
 {
-    verts.clear_and_free();
+    verts.clear();
     for (GCHashIt it = VM.begin(); it != VM.end(); it++)
-        it->clear_and_free();
+        it->clear();
 }
 
 //------------------------------------------------------------------------------
@@ -119,7 +119,7 @@ void GCPacked::add_face(const Fvector& v0, const Fvector& v1, const Fvector& v2,
 void GCPacked::clear()
 {
     GCPacked::clear();
-    faces.clear_and_free();
+    faces.clear();
 }
 
 void GCPacked::calc_adjacency(U32Vec& dest)

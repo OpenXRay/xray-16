@@ -55,7 +55,7 @@ public:
     IConsole_Command(LPCSTR N BENCH_SEC_SIGN) : cName(N), bEnabled(TRUE), bLowerCaseArgs(TRUE), bEmptyArgsHandled(FALSE)
     {
         m_LRU.reserve(LRU_MAX_COUNT + 1);
-        m_LRU.clear_not_free();
+        m_LRU.clear();
     }
     virtual ~IConsole_Command()
     {

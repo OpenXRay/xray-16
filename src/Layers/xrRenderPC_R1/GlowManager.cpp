@@ -227,7 +227,7 @@ void CGlowManager::render_hw()
     // 0. query result from 'SelectedToTest_2'
     SelectedToTest_2 = SelectedToTest_1;
     SelectedToTest_1 = SelectedToTest_0;
-    SelectedToTest_0.clear_not_free();
+    SelectedToTest_0.clear();
 
     // 1. Sort into two parts - 1(selected-to-test)[to-test], 2(selected)[just-draw]
     // Fvector &start	= Device.vCameraPosition;
@@ -311,5 +311,5 @@ void CGlowManager::render_selected()
             RCache.Render(D3DPT_TRIANGLELIST, vOffset, 0, vCount, 0, vCount / 2);
         }
     }
-    Selected.clear_not_free();
+    Selected.clear();
 }

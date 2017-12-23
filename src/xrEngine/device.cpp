@@ -129,7 +129,7 @@ void CRenderDevice::SecondaryThreadProc(void* context)
         }
         for (u32 pit = 0; pit < device.seqParallel.size(); pit++)
             device.seqParallel[pit]();
-        device.seqParallel.clear_not_free();
+        device.seqParallel.clear();
         device.seqFrameMT.Process(rp_Frame);
         device.syncFrameDone.Set();
     }

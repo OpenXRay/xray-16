@@ -42,7 +42,7 @@ bool CStateMonsterHitObjectAbstract::check_start_conditions()
     target = 0;
 
     // получить физ. объекты в радиусе
-    m_nearest_objects.clear_not_free();
+    m_nearest_objects.clear();
     Level().ObjectSpace.GetNearest(m_nearest_objects, object->Position(), object->Radius() - 0.5f, object());
 
     xr_vector<IGameObject*>::iterator B = m_nearest_objects.begin();

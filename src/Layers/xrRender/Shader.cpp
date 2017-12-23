@@ -128,16 +128,6 @@ void STextureList::clear()
     erase(begin(), end());
 }
 
-void STextureList::clear_not_free()
-{
-    iterator it = begin();
-    iterator it_e = end();
-    for (; it != it_e; ++it)
-        (*it).second.destroy();
-
-    erase(begin(), end());
-}
-
 u32 STextureList::find_texture_stage(const shared_str& TexName) const
 {
     u32 dwTextureStage = 0;

@@ -207,7 +207,7 @@ struct Bullet_Check_Array
         NumTrue = 0;
         NumFalse = 0;
     };
-    ~Bullet_Check_Array() { Requests.clear_and_free(); };
+    ~Bullet_Check_Array() { Requests.clear(); };
 };
 
 using BChA = xr_vector<Bullet_Check_Array>;

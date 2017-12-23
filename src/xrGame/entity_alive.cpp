@@ -756,7 +756,7 @@ void CEntityAlive::fill_hit_bone_surface_areas() const
     VERIFY(kinematics);
     VERIFY(kinematics->LL_BoneCount());
 
-    m_hit_bone_surface_areas.clear_not_free();
+    m_hit_bone_surface_areas.clear();
 
     for (u16 i = 0, n = kinematics->LL_BoneCount(); i < n; ++i)
     {

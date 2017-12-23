@@ -169,9 +169,9 @@ void dx103DFluidObstacles::ProcessStaticObstacles(const dx103DFluidData& FluidDa
 void dx103DFluidObstacles::ProcessDynamicObstacles(
     const dx103DFluidData& FluidData, const Fmatrix& WorldToFluid, float timestep)
 {
-    m_lstRenderables.clear_not_free();
-    m_lstShells.clear_not_free();
-    m_lstElements.clear_not_free();
+    m_lstRenderables.clear();
+    m_lstShells.clear();
+    m_lstElements.clear();
 
     Fbox box;
     box.vMin = Fvector3().set(-0.5f, -0.5f, -0.5f);
