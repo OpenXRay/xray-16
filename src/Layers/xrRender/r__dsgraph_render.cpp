@@ -70,7 +70,7 @@ template <class T> IC bool cmp_textures_lexN(const T &lhs, const T &rhs)
     return std::lexicographical_compare(t1->begin(), t1->end(), t2->begin(), t2->end());
 }
 
-template <class T> void sort_tlist(xr_vector<T::template TNode*>& lst, T& textures)
+template <class T> void sort_tlist(xr_vector<T::template TNode*>& lst, xr_vector<T::template TNode*>& temp, T& textures)
 {
     int amount = textures.begin()->key->size();
 
@@ -82,8 +82,6 @@ template <class T> void sort_tlist(xr_vector<T::template TNode*>& lst, T& textur
     }
     else
     {
-        xr_vector<T::template TNode*> temp;
-
         // Split into 2 parts
         for (auto &it : textures)
         {
@@ -123,7 +121,6 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
         {
             mapNormalVS& vs = mapNormalPasses[_priority][iPass];
 
-            xr_vector<mapNormalVS::TNode*> nrmVS;
             vs.getANY_P(nrmVS);
             std::sort(nrmVS.begin(), nrmVS.end(), cmp_val_ssa<mapNormalVS::TNode*>);
             for (auto & vs_it : nrmVS)
@@ -133,8 +130,8 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 #if defined(USE_DX10) || defined(USE_DX11)
                 //	GS setup
                 mapNormalGS& gs = vs_it->val;
+                gs.ssa = 0;
 
-                xr_vector<mapNormalGS::TNode*> nrmGS;
                 gs.getANY_P(nrmGS);
                 std::sort(nrmGS.begin(), nrmGS.end(), cmp_val_ssa<mapNormalGS::TNode*>);
                 for (auto & gs_it : nrmGS)
@@ -145,7 +142,8 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 #else // USE_DX10
                     mapNormalPS& ps = vs_it->val;
 #endif // USE_DX10
-                    xr_vector<mapNormalPS::TNode*> nrmPS;
+                    ps.ssa = 0;
+
                     ps.getANY_P(nrmPS);
                     std::sort(nrmPS.begin(), nrmPS.end(), cmp_ps_val_ssa<mapNormalPS::TNode*>);
                     for (auto &ps_it : nrmPS)
@@ -159,7 +157,8 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 #else
                         mapNormalCS& cs = ps_it->val;
 #endif
-                        xr_vector<mapNormalCS::TNode*> nrmCS;
+                        cs.ssa = 0;
+
                         cs.getANY_P(nrmCS);
                         std::sort(nrmCS.begin(), nrmCS.end(), cmp_val_ssa<mapNormalCS::TNode*>);
                         for (auto &cs_it : nrmCS)
@@ -167,8 +166,8 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
                             RCache.set_Constants(cs_it->key);
 
                             mapNormalStates& states = cs_it->val;
+                            states.ssa = 0;
 
-                            xr_vector<mapNormalStates::TNode*> nrmStates;
                             states.getANY_P(nrmStates);
                             std::sort(nrmStates.begin(), nrmStates.end(), cmp_val_ssa<mapNormalStates::TNode*>);
                             for (auto &state_it : nrmStates)
@@ -176,15 +175,16 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
                                 RCache.set_States(state_it->key);
 
                                 mapNormalTextures& tex = state_it->val;
+                                tex.ssa = 0;
 
-                                xr_vector<mapNormalTextures::TNode*> nrmTextures;
-                                sort_tlist<mapNormalTextures>(nrmTextures, tex);
+                                sort_tlist<mapNormalTextures>(nrmTextures, nrmTexturesTemp, tex);
                                 for (auto &tex_it : nrmTextures)
                                 {
                                     RCache.set_Textures(tex_it->key);
                                     RImplementation.apply_lmaterial();
 
                                     mapNormalItems& items = tex_it->val;
+                                    items.ssa = 0;
 
                                     std::sort(items.begin(), items.end(), cmp_ssa<_NormalItem>);
                                     for (auto &it_it : items)
@@ -197,18 +197,25 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
                                     }
                                     items.clear();
                                 }
+                                nrmTexturesTemp.clear();
+                                nrmTextures.clear();
                                 tex.clear();
                             }
+                            nrmStates.clear();
                             states.clear();
                         }
+                        nrmCS.clear();
                         cs.clear();
                     }
+                    nrmPS.clear();
                     ps.clear();
 #if defined(USE_DX10) || defined(USE_DX11)
                 }
+                nrmGS.clear();
                 gs.clear();
 #endif // USE_DX10
             }
+            nrmVS.clear();
             vs.clear();
         }
     }
@@ -221,7 +228,6 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
     {
         mapMatrixVS& vs = mapMatrixPasses[_priority][iPass];
 
-        xr_vector<mapMatrixVS::TNode*> matVS;
         vs.getANY_P(matVS);
         std::sort(matVS.begin(), matVS.end(), cmp_val_ssa<mapMatrixVS::TNode*>);
         for (auto &vs_id : matVS)
@@ -230,8 +236,8 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 
 #if defined(USE_DX10) || defined(USE_DX11)
             mapMatrixGS& gs = vs_id->val;
+            gs.ssa = 0;
 
-            xr_vector<mapMatrixGS::TNode*> matGS;
             gs.getANY_P(matGS);
             std::sort(matGS.begin(), matGS.end(), cmp_val_ssa<mapMatrixGS::TNode*>);
             for (auto &gs_it : matGS)
@@ -242,7 +248,8 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 #else // USE_DX10
                 mapMatrixPS& ps = vs_id->val;
 #endif // USE_DX10
-                xr_vector<mapMatrixPS::TNode *> matPS;
+                ps.ssa = 0;
+
                 ps.getANY_P(matPS);
                 std::sort(matPS.begin(), matPS.end(), cmp_ps_val_ssa<mapMatrixPS::TNode *>);
                 for (auto &ps_it : matPS)
@@ -256,7 +263,8 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 #else
                     mapMatrixCS& cs = ps_it->val;
 #endif
-                    xr_vector<mapMatrixCS::TNode*> matCS;
+                    cs.ssa = 0;
+
                     cs.getANY_P(matCS);
                     std::sort(matCS.begin(), matCS.end(), cmp_val_ssa<mapMatrixCS::TNode*>);
                     for (auto &cs_it : matCS)
@@ -264,8 +272,8 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
                         RCache.set_Constants(cs_it->key);
 
                         mapMatrixStates& states = cs_it->val;
+                        states.ssa = 0;
 
-                        xr_vector<mapMatrixStates::TNode*> matStates;
                         states.getANY_P(matStates);
                         std::sort(matStates.begin(), matStates.end(), cmp_val_ssa<mapMatrixStates::TNode*>);
                         for (auto &state_it : matStates)
@@ -273,15 +281,16 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
                             RCache.set_States(state_it->key);
 
                             mapMatrixTextures& tex = state_it->val;
+                            tex.ssa = 0;
 
-                            xr_vector<mapMatrixTextures::TNode*> matTextures;
-                            sort_tlist<mapMatrixTextures>(matTextures, tex);
+                            sort_tlist<mapMatrixTextures>(matTextures, matTexturesTemp, tex);
                             for (auto &tex_it : matTextures)
                             {
                                 RCache.set_Textures(tex_it->key);
                                 RImplementation.apply_lmaterial();
 
                                 mapMatrixItems& items = tex_it->val;
+                                items.ssa = 0;
 
                                 std::sort(items.begin(), items.end(), cmp_ssa<_MatrixItem>);
                                 for (auto &ni_it : items)
@@ -298,18 +307,25 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
                                 }
                                 items.clear();
                             }
+                            matTexturesTemp.clear();
+                            matTextures.clear();
                             tex.clear();
                         }
+                        matStates.clear();
                         states.clear();
                     }
+                    matCS.clear();
                     cs.clear();
                 }
+                matPS.clear();
                 ps.clear();
 #if defined(USE_DX10) || defined(USE_DX11)
             }
+            matGS.clear();
             gs.clear();
 #endif // USE_DX10
         }
+        matVS.clear();
         vs.clear();
     }
 
@@ -603,7 +619,7 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
 
 void D3DXRenderBase::r_dsgraph_render_R1_box(IRender_Sector* S, Fbox& BB, int sh)
 {
-    xr_vector<dxRender_Visual*> lstVisuals;
+    lstVisuals.clear();
     lstVisuals.push_back(((CSector*)S)->root());
 
     for (auto &it : lstVisuals)

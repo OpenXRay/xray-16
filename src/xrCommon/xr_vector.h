@@ -1,13 +1,6 @@
 #pragma once
 #include <vector>
 #include "xrCore/Memory/xalloc.h"
-#include "xrCore/xrDebug_macros.h"
-
-#ifdef _M_AMD64
-#define M_DONTDEFERCLEAR_EXT
-#endif
-
-#define M_DONTDEFERCLEAR_EXT // for mem-debug only
 
 #define DEF_VECTOR(N, T)\
     typedef xr_vector<T> N;\
@@ -16,6 +9,9 @@
 #define DEFINE_VECTOR(T, N, I)\
     typedef xr_vector<T> N;\
     typedef N::iterator I;
+
+//template <typename T, typename allocator = xalloc<T>>
+//using xr_vector = class std::vector<T, allocator>;
 
 // vector
 template <typename T, typename allocator = xalloc<T>>
@@ -27,65 +23,9 @@ public:
     using allocator_type = allocator;
 
     xr_vector() : inherited() {}
+    xr_vector(size_t _count) : inherited(_count) {}
     xr_vector(size_t _count, const T& _value) : inherited(_count, _value) {}
-    explicit xr_vector(size_t _count) : inherited(_count) {}
-    u32 size() const throw() { return (u32)inherited::size(); }
-
-    void clear_and_free() throw() { inherited::clear(); }
-    void clear_not_free() { erase(begin(), end()); }
-    void clear_and_reserve()
-    {
-        if (capacity() <= size() + size()/4)
-            clear_not_free();
-        else
-        {
-            u32 old = size();
-            clear_and_free();
-            reserve(old);
-        }
-    }
-#ifdef M_DONTDEFERCLEAR_EXT // defined (or not) by xalloc.h
-    void clear() { clear_and_free(); }
-#else
-    void clear() { clear_not_free(); }
-#endif
-    const_reference operator[](size_type _Pos) const
-    {
-        check_idx(_Pos);
-        return *(begin()+_Pos);
-    }
-    reference operator[](size_type _Pos)
-    {
-        check_idx(_Pos);
-        return *(begin()+_Pos);
-    }
-
-private:
-    void check_idx(size_type _Pos) const
-    {
-        VERIFY2(_Pos < size(),
-            make_string("index is out of range: index requested[%d], size of container[%d]",
-            _Pos, size()).c_str());
-    }
-};
-
-// vector<bool>
-template <>
-class xr_vector<bool, xalloc<bool>> : public std::vector<bool, xalloc<bool>>
-{
-    using inherited = std::vector<bool, xalloc<bool>>;
-
-public:
-    u32 size() const { return (u32)inherited::size(); }
-    void clear() { erase(begin(), end()); }
-};
-
-template <typename allocator>
-class xr_vector<bool, allocator> : public std::vector<bool, allocator>
-{
-    using inherited = std::vector<bool, allocator>;
-
-public:
-    u32 size() const { return (u32)inherited::size(); }
-    void clear() { erase(begin(), end()); }
+    IC void clear_and_free()    { clear(); }
+    IC void clear_not_free()    { clear(); }
+    IC void clear_and_reserve() { clear(); }
 };
