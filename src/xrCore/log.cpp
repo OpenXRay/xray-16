@@ -133,6 +133,15 @@ void Log(const char* msg, u32 dop)
     Log(buf);
 }
 
+void Log(const char* msg, u64 dop)
+{
+    u32 buffer_size = (xr_strlen(msg) + 1 + 64 + 1) * sizeof(char);
+    PSTR buf = (PSTR)_alloca(buffer_size);
+
+    xr_sprintf(buf, buffer_size, "%s %d", msg, dop);
+    Log(buf);
+}
+
 void Log(const char* msg, int dop)
 {
     u32 buffer_size = (xr_strlen(msg) + 1 + 11 + 1) * sizeof(char);

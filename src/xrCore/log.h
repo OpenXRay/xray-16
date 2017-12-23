@@ -16,6 +16,7 @@ void XRCORE_API Log(LPCSTR msg);
 void XRCORE_API Log(LPCSTR msg);
 void XRCORE_API Log(LPCSTR msg, LPCSTR dop);
 void XRCORE_API Log(LPCSTR msg, u32 dop);
+void XRCORE_API Log(LPCSTR msg, u64 dop);
 void XRCORE_API Log(LPCSTR msg, int dop);
 void XRCORE_API Log(LPCSTR msg, float dop);
 void XRCORE_API Log(LPCSTR msg, const Fvector& dop);

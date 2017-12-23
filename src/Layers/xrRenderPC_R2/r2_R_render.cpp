@@ -337,7 +337,7 @@ void CRender::Render()
     LP_pending.clear();
     {
         // perform tests
-        u32 count = 0;
+        auto count = 0;
         light_Package& LP = Lights.package;
 
         // stats
@@ -349,7 +349,7 @@ void CRender::Render()
         count = _max(count, LP.v_point.size());
         count = _max(count, LP.v_spot.size());
         count = _max(count, LP.v_shadowed.size());
-        for (u32 it = 0; it < count; it++)
+        for (auto it = 0; it < count; it++)
         {
             if (it < LP.v_point.size())
             {

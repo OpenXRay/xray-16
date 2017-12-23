@@ -358,7 +358,7 @@ void CRender::Render()
     {
         PIX_EVENT(DEFER_TEST_LIGHT_VIS);
         // perform tests
-        u32 count = 0;
+        auto count = 0;
         light_Package& LP = Lights.package;
 
         // stats
@@ -370,7 +370,7 @@ void CRender::Render()
         count = _max(count, LP.v_point.size());
         count = _max(count, LP.v_spot.size());
         count = _max(count, LP.v_shadowed.size());
-        for (u32 it = 0; it < count; it++)
+        for (auto it = 0; it < count; it++)
         {
             if (it < LP.v_point.size())
             {
