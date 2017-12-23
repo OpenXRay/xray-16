@@ -57,6 +57,6 @@ void CUIDialogWnd::ShowDialog(bool bDoHideIndicators)
 
 void CUIDialogWnd::HideDialog()
 {
-    R_ASSERT2(IsShown(), "dialog already hidden");
-    GetHolder()->StopDialog(this);
+    if (IsShown())
+        GetHolder()->StopDialog(this);
 }
