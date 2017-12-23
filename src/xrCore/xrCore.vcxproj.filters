@@ -521,9 +521,6 @@
     <ClInclude Include="xrMemory_subst_msvc.h">
       <Filter>Memory\Memory manager</Filter>
     </ClInclude>
-    <ClInclude Include="memory_allocator_options.h">
-      <Filter>Memory\Memory manager\dlmalloc\wrapper</Filter>
-    </ClInclude>
     <ClInclude Include="xrDebug.h">
       <Filter>Debug core</Filter>
     </ClInclude>
@@ -741,6 +738,9 @@
       <Filter>Memory\Memory manager\dlmalloc\allocator</Filter>
     </ClInclude>
     <ClInclude Include="Memory\doug_lea_allocator.h">
+      <Filter>Memory\Memory manager\dlmalloc\wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\memory_allocator_options.h">
       <Filter>Memory\Memory manager\dlmalloc\wrapper</Filter>
     </ClInclude>
   </ItemGroup>

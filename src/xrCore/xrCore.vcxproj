@@ -326,8 +326,8 @@
     <ClInclude Include="Media\Image.hpp" />
     <ClInclude Include="Memory\dlmalloc.h" />
     <ClInclude Include="Memory\doug_lea_allocator.h" />
+    <ClInclude Include="Memory\memory_allocator_options.h" />
     <ClInclude Include="Memory\xalloc.h" />
-    <ClInclude Include="memory_allocator_options.h" />
     <ClInclude Include="memory_monitor.h" />
     <ClInclude Include="net_utils.h" />
     <ClInclude Include="os_clipboard.h" />

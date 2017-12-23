@@ -3,10 +3,7 @@
 // Author : Armen Abroyan
 // Copyright (C) GSC Game World - 2009
 ////////////////////////////////////////////////////////////////////////////
+#pragma once
 
-#ifndef MEMORY_ALLOCATOR_OPTIONS_H_INCLUDED
-#define MEMORY_ALLOCATOR_OPTIONS_H_INCLUDED
-
+#define USE_DOUG_LEA_ALLOCATOR_FOR_RENDER
 //#define USE_ARENA_ALLOCATOR
-
-#endif // #ifndef MEMORY_ALLOCATOR_OPTIONS_H_INCLUDED
