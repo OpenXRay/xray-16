@@ -8,7 +8,7 @@ CInifileEx* pSettingsEx = NULL;
 
 CInifileEx* CInifileEx::Create(const char* szFileName, BOOL ReadOnly)
 {
-    return xr_new<CInifileEx>(szFileName, ReadOnly);
+    return new CInifileEx(szFileName, ReadOnly);
 }
 
 void CInifileEx::Destroy(CInifileEx* ini) { xr_delete(ini); }
@@ -244,10 +244,10 @@ void CInifileEx::Load(IReader* F, LPCSTR path)
                 // store previous section
                 RootIt I = std::lower_bound(DATA.begin(), DATA.end(), *Current->Name, sect_pred);
                 if ((I != DATA.end()) && ((*I)->Name == Current->Name))
-                    Debug.fatal(DEBUG_INFO, "Duplicate section '%s' found.", *Current->Name);
+                    FATAL(make_string("Duplicate section '%s' found.", *Current->Name.c_str()).c_str());
                 DATA.insert(I, Current);
             }
-            Current = xr_new<Sect>();
+            Current = new Sect();
             Current->Name = 0;
             // start new section
             R_ASSERT3(strchr(str, ']'), "Bad ini section found: ", str);
@@ -343,7 +343,7 @@ void CInifileEx::Load(IReader* F, LPCSTR path)
     {
         RootIt I = std::lower_bound(DATA.begin(), DATA.end(), *Current->Name, sect_pred);
         if ((I != DATA.end()) && ((*I)->Name == Current->Name))
-            Debug.fatal(DEBUG_INFO, "Duplicate section '%s' found.", *Current->Name);
+            FATAL(make_string("Duplicate section '%s' found.", *Current->Name.c_str()).c_str());
         DATA.insert(I, Current);
     }
 }
@@ -467,7 +467,7 @@ CInifileEx::Sect& CInifileEx::r_section(LPCSTR S)
     strlwr(section);
     RootIt I = std::lower_bound(DATA.begin(), DATA.end(), section, sect_pred);
     if (!(I != DATA.end() && xr_strcmp(*(*I)->Name, section) == 0))
-        Debug.fatal(DEBUG_INFO, "Can't open section '%s'", S);
+        FATAL(make_string("Can't open section '%s'", S).c_str());
     return **I;
 }
 
@@ -478,7 +478,7 @@ LPCSTR CInifileEx::r_string(LPCSTR S, LPCSTR L)
     if (A != I.Data.end() && xr_strcmp(*A->first, L) == 0)
         return *A->second;
     else
-        Debug.fatal(DEBUG_INFO, "Can't find variable %s in [%s]", L, S);
+        FATAL(make_string("Can't find variable %s in [%s]", L, S).c_str());
     return 0;
 }
 
@@ -661,7 +661,7 @@ void CInifileEx::w_string(LPCSTR S, LPCSTR L, LPCSTR V, LPCSTR comment)
     if (!section_exist(sect))
     {
         // create _new_ section
-        Sect* NEW = xr_new<Sect>();
+        Sect* NEW = new Sect();
         NEW->Name = sect;
         RootIt I = std::lower_bound(DATA.begin(), DATA.end(), sect, sect_pred);
         DATA.insert(I, NEW);

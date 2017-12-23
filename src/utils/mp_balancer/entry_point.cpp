@@ -4,7 +4,8 @@
 
 void main(int argc, char* argv[])
 {
-    Core._initialize("mp_ballancer", NULL, TRUE, "fsgame4mpu.ltx");
+    xrDebug::Initialize(false);
+    Core.Initialize("mp_ballancer", NULL, TRUE, "fsgame.ltx");
 
     SetConsoleOutputCP(1251);
 
