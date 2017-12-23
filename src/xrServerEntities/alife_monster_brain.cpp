@@ -96,7 +96,7 @@ void CALifeMonsterBrain::process_task()
     movement().detail().target(*task);
 }
 
-void CALifeMonsterBrain::select_task()
+void CALifeMonsterBrain::select_task(const bool forced)
 {
     if (object().m_smart_terrain_id != 0xffff)
         return;
@@ -106,7 +106,7 @@ void CALifeMonsterBrain::select_task()
 
     ALife::_TIME_ID current_time = ai().alife().time_manager().game_time();
 
-    if (m_last_search_time + m_time_interval > current_time)
+    if (!forced && m_last_search_time + m_time_interval > current_time)
         return;
 
     m_last_search_time = current_time;
@@ -134,7 +134,7 @@ void CALifeMonsterBrain::select_task()
     }
 }
 
-void CALifeMonsterBrain::update()
+void CALifeMonsterBrain::update(const bool forced)
 {
 #if 0 // def DEBUG
 	if (!Level().MapManager().HasMapLocation("debug_stalker",object().ID)) {
@@ -148,7 +148,7 @@ void CALifeMonsterBrain::update()
 	}
 #endif
 
-    select_task();
+    select_task(forced);
 
     if (object().m_smart_terrain_id != 0xffff)
         process_task();
