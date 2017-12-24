@@ -375,11 +375,16 @@ using AA_VECTOR = xr_vector<SAAParam>;
 
 struct SCurrentAnimationInfo
 {
-    shared_str name;
-
     u8 index;
-
     TTime time_started;
+    float speed_change_vel;
+
+private:
+    EMotionAnim motion;
+
+public:
+    shared_str name;
+    CBlend* blend;
 
     struct
     {
@@ -392,21 +397,18 @@ struct SCurrentAnimationInfo
         {
             target = v;
             VERIFY2(_abs(v) < 1000, "_set_target(). monster speed is too big");
+            
         }
         IC float _get_current() { return current; }
         IC float _get_target() { return target; }
+
     private:
         float current;
         float target;
     } speed;
 
-    float speed_change_vel;
-    CBlend* blend;
-
     void set_motion(EMotionAnim new_motion);
     EMotionAnim get_motion() const { return motion; }
-private:
-    EMotionAnim motion;
 };
 
 //////////////////////////////////////////////////////////////////////////

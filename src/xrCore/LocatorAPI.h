@@ -44,7 +44,7 @@ class XRCORE_API CLocatorAPI
 public:
     struct file
     {
-        LPCSTR name; // low-case name
+        pcstr name; // low-case name
         u32 vfs; // 0xffffffff - standart file
         u32 crc; // contents CRC
         u32 ptr; // pointer inside vfs
@@ -55,12 +55,13 @@ public:
 
     struct archive
     {
+        u32 size;
+        u32 vfs_idx;
         shared_str path;
         void *hSrcFile, *hSrcMap;
-        u32 size;
         CInifile* header;
-        u32 vfs_idx;
-        archive() : hSrcFile(nullptr), hSrcMap(nullptr), header(nullptr), size(0), vfs_idx(u32(-1)) {}
+        
+        archive() : size(0), vfs_idx(u32(-1)), hSrcFile(nullptr), hSrcMap(nullptr), header(nullptr) {}
         void open();
         void close();
     };
