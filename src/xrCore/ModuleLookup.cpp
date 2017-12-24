@@ -6,7 +6,7 @@ namespace XRay
 {
 Module::Module(const bool dontUnload) : handle(nullptr), dontUnload(dontUnload) {}
 
-Module::Module(pcstr moduleName, bool dontUnload /*= false*/) : handle(nullptr)
+Module::Module(pcstr moduleName, bool dontUnload /*= false*/) : handle(nullptr), dontUnload(dontUnload)
 {
     open(moduleName);
 }

@@ -4,8 +4,6 @@
 
 #include "stdafx.h"
 #include "EngineAPI.h"
-#include "xrCDB/xrXRC.h"
-#include "xrScriptEngine/script_engine.hpp"
 
 #include "xrCore/ModuleLookup.hpp"
 
@@ -98,12 +96,10 @@ void CEngineAPI::InitializeRenderers()
     InitializeNotDedicated();
 #endif // DEDICATED_SERVER
 
-    if (!hRender->exist())
+    if ((!hRender->exist()) | (!psDeviceFlags.test(rsR4|rsR3|rsR2)))
     {
         // try to load R1
-        psDeviceFlags.set(rsR4, false);
-        psDeviceFlags.set(rsR3, false);
-        psDeviceFlags.set(rsR2, false);
+        psDeviceFlags.set(rsR4|rsR3|rsR2, false);
         renderer_value = 0; // con cmd
 
         hRender->open(r1_name);
@@ -158,18 +154,14 @@ void CEngineAPI::Initialize(void)
 
 void CEngineAPI::Destroy(void)
 {
-    pCreate = 0;
-    pDestroy = 0;
+    if (hGame) hGame->close();
+    if (hTuner) hTuner->close();
+    if (hRender) hRender->close();
+    pCreate = nullptr;
+    pDestroy = nullptr;
     Engine.Event._destroy();
     XRC.r_clear_compact();
 }
-
-extern "C"
-{
-    using SupportsAdvancedRendering = bool __cdecl();
-    using SupportsDX10Rendering = bool XR_EXPORT();
-    using SupportsDX11Rendering = bool XR_EXPORT();
-};
 
 void CEngineAPI::CreateRendererList()
 {
@@ -208,10 +200,10 @@ void CEngineAPI::CreateRendererList()
         if (hRender->exist())
         {
             bSupports_r2 = true;
-            auto test_rendering =
-                (SupportsAdvancedRendering*)hRender->getProcAddress("SupportsAdvancedRendering");
-            R_ASSERT(test_rendering);
-            bSupports_r2_5 = test_rendering();
+            using SupportsAdvancedRendering = bool(*)();
+            auto test = (SupportsAdvancedRendering)hRender->getProcAddress("SupportsAdvancedRendering");
+            R_ASSERT(test);
+            bSupports_r2_5 = test();
         }
 
         // try to initialize R3
@@ -222,10 +214,10 @@ void CEngineAPI::CreateRendererList()
         SetErrorMode(0);
         if (hRender->exist())
         {
-            auto test_dx10_rendering =
-                (SupportsDX10Rendering*)hRender->getProcAddress("SupportsDX10Rendering");
-            R_ASSERT(test_dx10_rendering);
-            bSupports_r3 = test_dx10_rendering();
+            using SupportsDX10Rendering = bool(*)();
+            auto test = (SupportsDX10Rendering)hRender->getProcAddress("SupportsDX10Rendering");
+            R_ASSERT(test);
+            bSupports_r3 = test();
         }
 
         // try to initialize R4
@@ -236,10 +228,10 @@ void CEngineAPI::CreateRendererList()
         SetErrorMode(0);
         if (hRender->exist())
         {
-            auto test_dx11_rendering =
-                (SupportsDX11Rendering*)hRender->getProcAddress("SupportsDX11Rendering");
-            R_ASSERT(test_dx11_rendering);
-            bSupports_r4 = test_dx11_rendering();
+            using SupportsDX11Rendering = bool(*)();
+            auto test = (SupportsDX11Rendering)hRender->getProcAddress("SupportsDX11Rendering");
+            R_ASSERT(test);
+            bSupports_r4 = test();
         }
     }
 

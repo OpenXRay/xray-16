@@ -1,5 +1,3 @@
-// xrRender_R2.cpp : Defines the entry point for the DLL application.
-//
 #include "stdafx.h"
 #include "Layers/xrRender/dxRenderFactory.h"
 #include "Layers/xrRender/dxUIRender.h"
@@ -16,26 +14,10 @@ extern "C" void XR_EXPORT SetupEnv()
 #ifdef DEBUG
     GEnv.DRender = &DebugRenderImpl;
 #endif
-    xrRender_initconsole();
+    xrRender_initconsole(); // XXX: Xottab_DUTY: move somewhere
 }
 
-BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
-{
-    switch (ul_reason_for_call)
-    {
-    case DLL_PROCESS_ATTACH: SetupEnv(); break;
-    case DLL_THREAD_ATTACH:
-    case DLL_THREAD_DETACH:
-    case DLL_PROCESS_DETACH: break;
-    }
-    return TRUE;
-}
-
-extern "C" {
-bool _declspec(dllexport) SupportsAdvancedRendering();
-};
-
-bool _declspec(dllexport) SupportsAdvancedRendering()
+extern "C" bool XR_EXPORT SupportsAdvancedRendering()
 {
     D3DCAPS9 caps;
     CHW _HW;

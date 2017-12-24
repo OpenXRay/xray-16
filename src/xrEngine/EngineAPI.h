@@ -47,8 +47,8 @@ typedef void __cdecl VTResume(void);
 class ENGINE_API CEngineAPI
 {
     std::unique_ptr<XRay::Module> hGame;
-    std::unique_ptr<XRay::Module> hRender;
     std::unique_ptr<XRay::Module> hTuner;
+    std::unique_ptr<XRay::Module> hRender;
 
 public:
     BENCH_SEC_SCRAMBLEMEMBER1
