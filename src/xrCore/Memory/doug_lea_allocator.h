@@ -33,7 +33,7 @@ private:
     void* m_dl_arena;
 };
 
-extern doug_lea_allocator common;
+extern doug_lea_allocator g_common_allocator;
 
 template <class T, doug_lea_allocator& _impl = common>
 class doug_lea_alloc
