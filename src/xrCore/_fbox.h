@@ -395,14 +395,14 @@ public:
             {
                 coord[0] = vMin[0];
                 Inside = false;
-                if (IntRref(dir[0])) MaxT[0] = (vMin[0] - origin[0]) / dir[0]; // Calculate T distances to candidate planes
+                if (IntRref(dir[0]))
                     MaxT[0] = (vMin[0] - origin[0]) / dir[0]; // Calculate T distances to candidate planes
             }
             else if (origin[0] > vMax[0])
             {
                 coord[0] = vMax[0];
                 Inside = false;
-                if (IntRref(dir[0])) MaxT[0] = (vMax[0] - origin[0]) / dir[0]; // Calculate T distances to candidate planes
+                if (IntRref(dir[0]))
                     MaxT[0] = (vMax[0] - origin[0]) / dir[0]; // Calculate T distances to candidate planes
             }
         }
@@ -411,14 +411,14 @@ public:
             {
                 coord[1] = vMin[1];
                 Inside = false;
-                if (IntRref(dir[1])) MaxT[1] = (vMin[1] - origin[1]) / dir[1]; // Calculate T distances to candidate planes
+                if (IntRref(dir[1]))
                     MaxT[1] = (vMin[1] - origin[1]) / dir[1]; // Calculate T distances to candidate planes
             }
             else if (origin[1] > vMax[1])
             {
                 coord[1] = vMax[1];
                 Inside = false;
-                if (IntRref(dir[1])) MaxT[1] = (vMax[1] - origin[1]) / dir[1]; // Calculate T distances to candidate planes
+                if (IntRref(dir[1]))
                     MaxT[1] = (vMax[1] - origin[1]) / dir[1]; // Calculate T distances to candidate planes
             }
         }
@@ -427,14 +427,14 @@ public:
             {
                 coord[2] = vMin[2];
                 Inside = false;
-                if (IntRref(dir[2])) MaxT[2] = (vMin[2] - origin[2]) / dir[2]; // Calculate T distances to candidate planes
+                if (IntRref(dir[2]))
                     MaxT[2] = (vMin[2] - origin[2]) / dir[2]; // Calculate T distances to candidate planes
             }
             else if (origin[2] > vMax[2])
             {
                 coord[2] = vMax[2];
                 Inside = false;
-                if (IntRref(dir[2])) MaxT[2] = (vMax[2] - origin[2]) / dir[2]; // Calculate T distances to candidate planes
+                if (IntRref(dir[2]))
                     MaxT[2] = (vMax[2] - origin[2]) / dir[2]; // Calculate T distances to candidate planes
             }
         }
