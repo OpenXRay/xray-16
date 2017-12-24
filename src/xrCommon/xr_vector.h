@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include "xrCore/Memory/xalloc.h"
+#include "xrCore/Memory/XRayAllocator.hpp"
 
 #define DEF_VECTOR(N, T)\
     typedef xr_vector<T> N;\
@@ -10,5 +10,5 @@
     typedef xr_vector<T> N;\
     typedef N::iterator I;
 
-template <typename T, typename allocator = xalloc<T>>
+template <typename T, typename allocator = XRay::xray_allocator<T>>
 using xr_vector = class std::vector<T, allocator>;

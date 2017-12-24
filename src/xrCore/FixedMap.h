@@ -1,8 +1,6 @@
-#ifndef _FIXEDMAP_H
-#define _FIXEDMAP_H
 #pragma once
 
-template <class K, class T, class allocator = xr_allocator>
+template <class K, class T, class allocator = XRay::xray_allocator_wrapper>
 class FixedMAP
 {
     enum
@@ -301,4 +299,3 @@ public:
             CB(nodes + i);
     }
 };
-#endif

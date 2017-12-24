@@ -5,8 +5,7 @@
 ////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "xrCore/Memory/memory_allocator_options.h"
-
+#ifdef USE_DOUG_LEA_ALLOCATOR
 class XRCORE_API doug_lea_allocator
 {
 public:
@@ -120,3 +119,4 @@ struct doug_lea_allocator_wrapper
         impl.free_impl((void*&)p);
     }
 };
+#endif // USE_DOUG_LEA_ALLOCATOR

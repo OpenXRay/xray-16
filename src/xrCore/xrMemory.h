@@ -1,7 +1,6 @@
 #pragma once
-#ifndef xrMemoryH
-#define xrMemoryH
 
+#include "Memory/memory_allocator_options.h"
 #include "memory_monitor.h"
 
 #ifdef USE_MEMORY_MONITOR
@@ -128,19 +127,17 @@ XRCORE_API void* xr_realloc(void* P, size_t size);
 XRCORE_API char* xr_strdup(const char* string);
 
 // Global new/delete override
-#if !(defined(__BORLANDC__) || defined(NO_XRNEW))
-#if defined(_MSC_VER)
-#ifndef BUILDING_XRMISC_LIB // Attempt to force the TU to include our version.
-#pragma comment(lib, "xrMisc")
+#ifndef NO_XRNEW
+#if !defined(BUILDING_XRMISC_LIB) && defined(_MSC_VER)
+#pragma comment(lib, "xrMisc") // Attempt to force the TU to include our version.
 #endif
-#endif // _MSC_VER
 // XXX: Implementations of operator new/delete are in xrMisc/xrMemory.cpp, since they need
 // to be in a static link library.
-void* operator new(size_t size); // XXX: throw(std::bad_alloc) ?
-void operator delete(void* p) throw();
-void* operator new[](size_t size); // XXX: throw(std::bad_alloc) ?
-void operator delete[](void* p) throw();
-#endif // __BORLANDC__ etc
+void* operator new(size_t size);
+void operator delete(void* p);
+void* operator new[](size_t size);
+void operator delete[](void* p);
+#endif
 
 // POOL-ing
 const u32 mem_pools_count = 54;
@@ -150,5 +147,3 @@ extern MEMPOOL mem_pools[mem_pools_count];
 extern bool mem_initialized;
 
 XRCORE_API void log_vminfo();
-
-#endif // xrMemoryH

@@ -1,9 +1,8 @@
 #pragma once
 #include <deque>
-#include "xrCore/Memory/xalloc.h"
-#include "xrCore/xrDebug_macros.h"
+#include "xrCore/Memory/XRayAllocator.hpp"
 
-template <typename T, typename allocator = xalloc<T>>
+template <typename T, typename allocator = XRay::xray_allocator<T>>
 class xr_deque : public std::deque<T, allocator>
 {
 public:

@@ -7,11 +7,12 @@
 #include "stdafx.h"
 #include "doug_lea_allocator.h"
 
+#ifdef USE_DOUG_LEA_ALLOCATOR
 #define USE_DL_PREFIX
 #define MSPACES 1
 #define USE_OUT_OF_MEMORY_HANDLER
 #define USE_LOCKS 0
-#include "Memory/dlmalloc.h"
+#include "dlmalloc.h"
 
 static void __stdcall out_of_memory(mspace const space, void const* const parameter, int const first_time)
 {
@@ -51,3 +52,4 @@ void doug_lea_allocator::free_impl(void*& pointer)
 }
 
 u32 doug_lea_allocator::get_allocated_size() const { return (u32)mspace_mallinfo(m_dl_arena).uordblks; }
+#endif // USE_DOUG_LEA_ALLOCATOR

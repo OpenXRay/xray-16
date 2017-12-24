@@ -14,7 +14,7 @@
 #include "_color.h"
 #include "_std_extensions.h"
 #include "xrMemory.h"
-#include "xrCore/Memory/xalloc.h"
+#include "xrCore/Memory/XRayAllocator.hpp"
 #include "xrCommon/xr_vector.h"
 #include "xrCommon/xr_map.h"
 #include "xrCommon/xr_set.h"
@@ -128,7 +128,7 @@ public:
 #endif
 #include <hash_map>
 template <typename K, class V, class _Traits = stdext::hash_compare<K, std::less<K>>,
-    typename allocator = xalloc<std::pair<K, V>>>
+    typename allocator = XRay::xray_allocator<std::pair<K, V>>>
 class xr_hash_map : public stdext::hash_map<K, V, _Traits, allocator>
 {
 public:

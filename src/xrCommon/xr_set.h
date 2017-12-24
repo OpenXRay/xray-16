@@ -1,16 +1,15 @@
 #pragma once
 #include <set>
-#include "xrCore/Memory/xalloc.h"
-#include "xrCore/xrDebug_macros.h"
+#include "xrCore/Memory/XRayAllocator.hpp"
 
-template <typename K, class P = std::less<K>, typename allocator = xalloc<K>>
+template <typename K, class P = std::less<K>, typename allocator = XRay::xray_allocator<K>>
 class xr_set : public std::set<K, P, allocator>
 {
 public:
     u32 size() const { return (u32)std::set<K, P, allocator>::size(); }
 };
 
-template <typename K, class P = std::less<K>, typename allocator = xalloc<K>>
+template <typename K, class P = std::less<K>, typename allocator = XRay::xray_allocator<K>>
 class xr_multiset : public std::multiset<K, P, allocator>
 {
 public:
