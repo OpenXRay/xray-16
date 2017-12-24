@@ -6,7 +6,7 @@
 
 #include <io.h>
 #include <fcntl.h>
-#include <sys\stat.h>
+#include <sys/stat.h>
 
 #define MODULE
 
@@ -77,7 +77,7 @@ public:
         *out_iterator++ = u8(c & 0xFF);
     }
 
-    LZfs()
+    LZfs() : getbuf(0), getlen(0), putbuf(0), putlen(0)
     {
         in_start = in_end = in_iterator = 0;
         out_start = out_end = out_iterator = 0;

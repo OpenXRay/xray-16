@@ -4,7 +4,7 @@
 
 xr_dsa_signer::xr_dsa_signer(u8 const p_number[crypto::xr_dsa::public_key_length],
     u8 const q_number[crypto::xr_dsa::private_key_length], u8 const g_number[crypto::xr_dsa::public_key_length])
-    : m_dsa(p_number, q_number, g_number)
+    : m_private_key(), m_dsa(p_number, q_number, g_number)
 {
     static_assert(crypto::xr_dsa::private_key_length == crypto::xr_sha256::digest_length,
         "Private key size must be equal to digest value size.");

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "xrCore/Threading/Lock.hpp" // XXX: Remove from header. Put in .cpp.
+#include "Common/Noncopyable.hpp"
 
 // forward declarations
 class CFrustum;
@@ -10,7 +11,7 @@ class OPCODE_Model;
 class AABBNoLeafNode;
 };
 template <class T> class _box3;
-typedef _box3<float> Fbox;
+using Fbox = _box3<float>;
 
 
 #pragma pack(push, 8)
@@ -181,21 +182,13 @@ public:
     }
 };
 
-struct non_copyable
-{
-    non_copyable() {}
-private:
-    non_copyable(const non_copyable&) {}
-    non_copyable& operator=(const non_copyable&) {}
-};
-
 #pragma warning(push)
 #pragma warning(disable : 4275)
 const u32 clpMX = 24, clpMY = 16, clpMZ = 24;
-class XRCDB_API CollectorPacked : public non_copyable
+class XRCDB_API CollectorPacked : public Noncopyable
 {
-    typedef xr_vector<u32> DWORDList;
-    typedef DWORDList::iterator DWORDIt;
+    using DWORDList = xr_vector<u32>;
+    using DWORDIt = DWORDList::iterator;
 
 private:
     xr_vector<Fvector> verts;

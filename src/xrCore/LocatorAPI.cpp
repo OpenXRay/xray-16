@@ -149,7 +149,7 @@ XRCORE_API void _dump_open_files(int mode)
     Log("----total count = ", g_open_files.size());
 }
 
-CLocatorAPI::CLocatorAPI() :
+CLocatorAPI::CLocatorAPI() : bNoRecurse(true), m_auth_code(0),
 #ifdef CONFIG_PROFILE_LOCKS
     m_auth_lock(new Lock(MUTEX_PROFILE_ID(CLocatorAPI::m_auth_lock)))
 #else

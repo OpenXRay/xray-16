@@ -20,17 +20,10 @@ constexpr pcstr r4_name = "xrRender_R4";
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-void __cdecl dummy(void){};
-CEngineAPI::CEngineAPI()
-{
-    hGame = 0;
-    hRender = 0;
-    hTuner = 0;
-    pCreate = 0;
-    pDestroy = 0;
-    tune_pause = dummy;
-    tune_resume = dummy;
-}
+void __cdecl dummy(void) {}
+
+CEngineAPI::CEngineAPI(): hGame(nullptr), hRender(nullptr), hTuner(nullptr), pCreate(nullptr), pDestroy(nullptr),
+                          tune_enabled(false), tune_pause(dummy), tune_resume(dummy) {}
 
 CEngineAPI::~CEngineAPI()
 {
@@ -222,7 +215,6 @@ void CEngineAPI::CreateRendererList()
         }
 
         // try to initialize R3
-        Log("Loading DLL:", r3_name);
         // Hide "d3d10.dll not found" message box for XP
         SetErrorMode(SEM_FAILCRITICALERRORS);
         hRender->open(r3_name);
@@ -237,7 +229,6 @@ void CEngineAPI::CreateRendererList()
         }
 
         // try to initialize R4
-        Log("Loading DLL:", r4_name);
         // Hide "d3d10.dll not found" message box for XP
         SetErrorMode(SEM_FAILCRITICALERRORS);
         hRender->open(r4_name);

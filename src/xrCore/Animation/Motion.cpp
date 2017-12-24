@@ -12,12 +12,7 @@
 //------------------------------------------------------------------------------------------
 // CCustomMotion
 //------------------------------------------------------------------------------------------
-CCustomMotion::CCustomMotion()
-{
-    iFrameStart = 0;
-    iFrameEnd = 0;
-    fFPS = 30.f;
-}
+CCustomMotion::CCustomMotion() : mtype(), iFrameStart(), iFrameEnd(), fFPS(30.) {}
 
 CCustomMotion::CCustomMotion(CCustomMotion* source) { *this = *source; }
 CCustomMotion::~CCustomMotion() {}

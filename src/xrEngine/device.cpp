@@ -497,7 +497,7 @@ SCRIPT_EXPORT(Device, (), {
         def("device", &get_device), def("is_enough_address_space_available", &is_enough_address_space_available)];
 });
 
-CLoadScreenRenderer::CLoadScreenRenderer() : b_registered(false) {}
+CLoadScreenRenderer::CLoadScreenRenderer() : b_registered(false), b_need_user_input(false) {}
 void CLoadScreenRenderer::start(bool b_user_input)
 {
     Device.seqRender.Add(this, 0);

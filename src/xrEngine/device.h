@@ -177,10 +177,11 @@ public:
     Fmatrix mInvFullTransform;
 
     CRenderDevice()
-        : m_dwWindowStyle(0)
+        : m_dwWindowStyle(0), fWidth_2(0), fHeight_2(0)
 #ifdef INGAME_EDITOR
           ,
-          m_editor_module(nullptr), m_editor_initialize(nullptr), m_editor_finalize(nullptr), m_editor(nullptr), m_engine(nullptr)
+          m_editor_module(nullptr), m_editor_initialize(nullptr),
+          m_editor_finalize(nullptr), m_editor(nullptr), m_engine(nullptr)
 #endif // #ifdef INGAME_EDITOR
     {
         m_hWnd = NULL;
