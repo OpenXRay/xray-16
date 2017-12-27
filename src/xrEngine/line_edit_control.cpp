@@ -578,10 +578,10 @@ void line_edit_control::add_inserted_text()
         m_inserted[m_buffer_size - 1 - m_p1] = 0;
         new_size = xr_strlen(m_inserted);
     }
-    strncpy_s(buf + m_p1, m_buffer_size, m_inserted, _min(new_size, m_buffer_size - m_p1)); // part 2
+    strncpy_s(buf + m_p1, m_buffer_size - m_p1, m_inserted, _min(new_size, m_buffer_size - m_p1)); // part 2
 
     u8 ds = (m_insert_mode && m_p2 < old_edit_size) ? 1 : 0;
-    strncpy_s(buf + m_p1 + new_size, m_buffer_size, m_edit_str + m_p2 + ds,
+    strncpy_s(buf + m_p1 + new_size, m_buffer_size - (m_p1 + new_size), m_edit_str + m_p2 + ds,
         _min(old_edit_size - m_p2 - ds, m_buffer_size - m_p1 - new_size)); // part 3
     buf[m_buffer_size] = 0;
 
