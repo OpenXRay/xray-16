@@ -43,7 +43,6 @@ bool valid_object_id(const CALifeSimulator* self, ALife::_OBJECT_ID object_id)
     return (object_id != 0xffff);
 }
 
-#ifdef DEBUG
 CSE_ALifeDynamicObject* alife_object(const CALifeSimulator* self, LPCSTR name)
 {
     VERIFY(self);
@@ -58,7 +57,6 @@ CSE_ALifeDynamicObject* alife_object(const CALifeSimulator* self, LPCSTR name)
 
     return (0);
 }
-#endif // #ifdef DEBUG
 
 CSE_ALifeDynamicObject* alife_object(const CALifeSimulator* self, ALife::_OBJECT_ID id, bool no_assert)
 {
@@ -322,6 +320,7 @@ SCRIPT_EXPORT(CALifeSimulator, (), {
                              (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_OBJECT_ID))(alife_object))
                          .def("object", (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_OBJECT_ID, bool))(
                                             alife_object))
+	                     .def("object", (CSE_ALifeDynamicObject *(*) (const CALifeSimulator*, LPCSTR))(alife_object))
                          .def("story_object", (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_STORY_ID))(
                                                   alife_story_object))
                          .def("set_switch_online",

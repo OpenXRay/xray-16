@@ -2293,6 +2293,9 @@
     <Filter Include="Core\Client\Objects\zones\Ameba">
       <UniqueIdentifier>{0ca5d322-0181-4fae-9706-95107e18fdc5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UI\Common\PDA\FractionWar">
+      <UniqueIdentifier>{49c6af0a-ea09-4212-bc7f-7cbcca7c5810}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -6664,6 +6667,18 @@
     <ClInclude Include="AmebaZone.h">
       <Filter>Core\Client\Objects\zones\Ameba</Filter>
     </ClInclude>
+    <ClInclude Include="ui\UIFactionWarWnd.h">
+      <Filter>UI\Common\PDA\FractionWar</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\FractionState.h">
+      <Filter>UI\Common\PDA\FractionWar</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\FactionState.h">
+      <Filter>UI\Common\PDA\FractionWar</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIWarState.h">
+      <Filter>UI\Common\PDA\FractionWar</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -10182,6 +10197,18 @@
     </ClCompile>
     <ClCompile Include="AmebaZone.cpp">
       <Filter>Core\Client\Objects\zones\Ameba</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIFactionWarWnd.cpp">
+      <Filter>UI\Common\PDA\FractionWar</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\FactionState.cpp">
+      <Filter>UI\Common\PDA\FractionWar</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\FractionState.cpp">
+      <Filter>UI\Common\PDA\FractionWar</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIWarState.cpp">
+      <Filter>UI\Common\PDA\FractionWar</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

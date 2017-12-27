@@ -174,27 +174,26 @@ void CBulletManager::FireShotmark(SBullet* bullet, const Fvector& vDir, const Fv
 
     if (R.O)
     {
-        /*  add_SkeletonWallmark not implemented now...
-                particle_dir		 = vDir;
-                particle_dir.invert	();
+        //add_SkeletonWallmark not implemented now...
+        particle_dir = vDir;
+        particle_dir.invert();
 
-                //на текущем актере отметок не ставим
-                if(Level().CurrentEntity() && Level().CurrentEntity()->ID() == R.O->ID()) return;
+        //на текущем актере отметок не ставим
+        if (Level().CurrentEntity() && Level().CurrentEntity()->ID() == R.O->ID()) return;
 
-                if (mtl_pair && !mtl_pair->CollideMarks->empty() && ShowMark)
-                {
-                    //добавить отметку на материале
-                    Fvector p;
-                    p.mad(bullet->bullet_pos,bullet->dir,R.range-0.01f);
-                    if(!GEnv.isDedicatedServer)
-                        GlobalEnv.Render->add_SkeletonWallmark	(	&R.O->renderable.xform,
-                                                            PKinematics(R.O->Visual()),
-                                                            &*mtl_pair->CollideMarks,
-                                                            p,
-                                                            bullet->dir,
-                                                            bullet->wallmark_size);
-                }
-        */
+        if (mtl_pair && !mtl_pair->CollideMarks->empty() && ShowMark)
+        {
+            //добавить отметку на материале
+            Fvector p;
+            p.mad(bullet->bullet_pos, bullet->dir, R.range - 0.01f);
+            if (!GEnv.isDedicatedServer)
+                GEnv.Render->add_SkeletonWallmark(&R.O->XFORM(),
+                                                  PKinematics(R.O->Visual()),
+                                                  &*mtl_pair->CollideMarks,
+                                                  p,
+                                                  bullet->dir,
+                                                  bullet->wallmark_size);
+        }
     }
     else
     {

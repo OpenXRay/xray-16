@@ -498,7 +498,7 @@ CBoneData::FacesVec& faces)
 */
 // Fill Vertices
 void CSkeletonX::_FillVerticesSoft1W(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal, float size,
-    u16* indices, CBoneData::FacesVec& faces)
+                                     u16* indices, CBoneData::FacesVec& faces)
 {
     VERIFY(*Vertices1W);
     for (auto it = faces.begin(); it != faces.end(); it++)
@@ -511,7 +511,12 @@ void CSkeletonX::_FillVerticesSoft1W(const Fmatrix& view, CSkeletonWallmark& wm,
             vertBoned1W& vert = Vertices1W[indices[idx + k]];
             F.bone_id[k][0] = (u16)vert.matrix;
             F.bone_id[k][1] = F.bone_id[k][0];
-            F.weight[k] = 0.f;
+            F.bone_id[k][2] = F.bone_id[k][0];
+            F.bone_id[k][3] = F.bone_id[k][0];
+            F.weight[k][0] = 0.f;
+            F.weight[k][1] = 0.f;
+            F.weight[k][2] = 0.f;
+
             const Fmatrix& xform = Parent->LL_GetBoneInstance(F.bone_id[k][0]).mRenderTransform;
             F.vert[k].set(vert.P);
             xform.transform_tiny(p[k], F.vert[k]);
@@ -535,8 +540,9 @@ void CSkeletonX::_FillVerticesSoft1W(const Fmatrix& view, CSkeletonWallmark& wm,
         }
     }
 }
+
 void CSkeletonX::_FillVerticesSoft2W(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal, float size,
-    u16* indices, CBoneData::FacesVec& faces)
+                                     u16* indices, CBoneData::FacesVec& faces)
 {
     VERIFY(*Vertices2W);
     for (auto it = faces.begin(); it != faces.end(); it++)
@@ -547,22 +553,116 @@ void CSkeletonX::_FillVerticesSoft2W(const Fmatrix& view, CSkeletonWallmark& wm,
         for (u32 k = 0; k < 3; k++)
         {
             Fvector P0, P1;
+
             vertBoned2W& vert = Vertices2W[indices[idx + k]];
             F.bone_id[k][0] = vert.matrix0;
             F.bone_id[k][1] = vert.matrix1;
-            F.weight[k] = vert.w;
+            F.bone_id[k][2] = F.bone_id[k][1];
+            F.bone_id[k][3] = F.bone_id[k][1];
+            F.weight[k][0] = vert.w;
+            F.weight[k][1] = 0.f;
+            F.weight[k][2] = 0.f;
+
             Fmatrix& xform0 = Parent->LL_GetBoneInstance(F.bone_id[k][0]).mRenderTransform;
             Fmatrix& xform1 = Parent->LL_GetBoneInstance(F.bone_id[k][1]).mRenderTransform;
             F.vert[k].set(vert.P);
             xform0.transform_tiny(P0, F.vert[k]);
             xform1.transform_tiny(P1, F.vert[k]);
-            p[k].lerp(P0, P1, F.weight[k]);
+            p[k].lerp(P0, P1, F.weight[k][0]);
         }
         Fvector test_normal;
         test_normal.mknormal(p[0], p[1], p[2]);
         float cosa = test_normal.dotproduct(normal);
         if (cosa < EPS)
             continue;
+        if (CDB::TestSphereTri(wm.ContactPoint(), size, p))
+        {
+            Fvector UV;
+            for (u32 k = 0; k < 3; k++)
+            {
+                Fvector2& uv = F.uv[k];
+                view.transform_tiny(UV, p[k]);
+                uv.x = (1 + UV.x) * .5f;
+                uv.y = (1 - UV.y) * .5f;
+            }
+            wm.m_Faces.push_back(F);
+        }
+    }
+}
+
+void CSkeletonX::_FillVerticesSoft3W(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal, float size,
+                                     u16* indices, CBoneData::FacesVec& faces)
+{
+    VERIFY(*Vertices3W);
+    for (auto it = faces.begin(); it != faces.end(); ++it)
+    {
+        Fvector p[3];
+        u32 idx = *it * 3;
+        CSkeletonWallmark::WMFace F;
+
+        for (u32 k = 0; k < 3; k++)
+        {
+            const vertBoned3W& vert = Vertices3W[indices[idx + k]];
+            F.bone_id[k][0] = vert.m[0];
+            F.bone_id[k][1] = vert.m[1];
+            F.bone_id[k][2] = vert.m[2];
+            F.bone_id[k][3] = F.bone_id[k][2];
+            F.weight[k][0] = vert.w[0];
+            F.weight[k][1] = vert.w[1];
+            F.weight[k][2] = 0.f;
+            vert.get_pos(F.vert[k]);
+            get_pos_bones(vert, p[k], Parent);
+        }
+        Fvector test_normal;
+        test_normal.mknormal(p[0], p[1], p[2]);
+        float cosa = test_normal.dotproduct(normal);
+        if (cosa < EPS)
+            continue;
+
+        if (CDB::TestSphereTri(wm.ContactPoint(), size, p))
+        {
+            Fvector UV;
+            for (u32 k = 0; k < 3; k++)
+            {
+                Fvector2& uv = F.uv[k];
+                view.transform_tiny(UV, p[k]);
+                uv.x = (1 + UV.x) * .5f;
+                uv.y = (1 - UV.y) * .5f;
+            }
+            wm.m_Faces.push_back(F);
+        }
+    }
+}
+
+void CSkeletonX::_FillVerticesSoft4W(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal, float size,
+                                     u16* indices, CBoneData::FacesVec& faces)
+{
+    VERIFY(*Vertices4W);
+    for (auto it = faces.begin(); it != faces.end(); ++it)
+    {
+        Fvector p[3];
+        u32 idx = *it * 3;
+        CSkeletonWallmark::WMFace F;
+
+        for (u32 k = 0; k < 3; k++)
+        {
+            const vertBoned4W& vert = Vertices4W[indices[idx + k]];
+            F.bone_id[k][0] = vert.m[0];
+            F.bone_id[k][1] = vert.m[1];
+            F.bone_id[k][2] = vert.m[2];
+            F.bone_id[k][3] = vert.m[3];
+            F.weight[k][0] = vert.w[0];
+            F.weight[k][1] = vert.w[1];
+            F.weight[k][2] = vert.w[2];
+            vert.get_pos(F.vert[k]);
+            get_pos_bones(vert, p[k], Parent);
+        }
+        Fvector test_normal;
+        test_normal.mknormal(p[0], p[1], p[2]);
+        float cosa = test_normal.dotproduct(normal);
+        if (cosa < EPS)
+            continue;
+
         if (CDB::TestSphereTri(wm.ContactPoint(), size, p))
         {
             Fvector UV;

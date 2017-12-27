@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch_script.h"
+#include "xrServer_Object_Base.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
@@ -29,7 +30,7 @@ ClientID r_clientID(NET_Packet* self)
     return clientID;
 }
 
-extern u16 script_server_object_version();
+//extern u16 script_server_object_version();
 
 SCRIPT_EXPORT(ClientID, (), {
     module(luaState)[class_<ClientID>("ClientID")

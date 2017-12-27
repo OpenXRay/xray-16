@@ -8,14 +8,16 @@
 
 #pragma once
 
+#include "movement_manager_space.h"
+
 class CMovementManagerHolder;
 class CALifeMonsterDetailPathManager;
 class CALifeMonsterPatrolPathManager;
 
-namespace MovementManager
-{
-enum EPathType;
-};
+//namespace MovementManager
+//{
+//enum EPathType;
+//};
 
 class CALifeMonsterMovementManager
 {

@@ -244,7 +244,11 @@ void stalker_movement_manager_smart_cover::reach_enter_location(u32 const& time_
     if (!object().sight().current_action().target_reached())
         return;
 
-    if (target_params().cover()->can_fire())
+    // morrey
+    // смарткаверы чн-ные не работали. заюзал из чн алгоритм
+    //if (target_params().cover()->can_fire()) // ЗП
+    //if (target_params().cover()->is_combat_cover()) // ЧН
+    if (target_params().cover()->can_fire() || target_params().cover()->is_combat_cover()) // Xottab_DUTY to morrey: а если так попробовать?
     {
         CInventoryItem const* const inventory_item = object().inventory().ActiveItem();
         if (!inventory_item)

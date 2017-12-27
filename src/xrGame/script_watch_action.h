@@ -9,11 +9,12 @@
 #pragma once
 
 #include "script_abstract_action.h"
-
+#include "sight_manager_space.h"
+/*
 namespace SightManager
 {
 enum ESightType;
-};
+};*/
 
 class CScriptGameObject;
 

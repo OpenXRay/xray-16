@@ -65,9 +65,17 @@ protected:
     virtual void _CollectBoneFaces(Fvisual* V, u32 iBase, u32 iCount) = 0;
 
     void _FillVerticesSoft1W(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal, float size,
-        u16* indices, CBoneData::FacesVec& faces);
+                             u16* indices, CBoneData::FacesVec& faces);
+
     void _FillVerticesSoft2W(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal, float size,
-        u16* indices, CBoneData::FacesVec& faces);
+                             u16* indices, CBoneData::FacesVec& faces);
+
+    void _FillVerticesSoft3W(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal, float size,
+                             u16* indices, CBoneData::FacesVec& faces);
+
+    void _FillVerticesSoft4W(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal, float size,
+                             u16* indices, CBoneData::FacesVec& faces);
+
     virtual void _FillVerticesHW1W(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal, float size,
         Fvisual* V, u16* indices, CBoneData::FacesVec& faces) = 0;
     virtual void _FillVerticesHW2W(const Fmatrix& view, CSkeletonWallmark& wm, const Fvector& normal, float size,

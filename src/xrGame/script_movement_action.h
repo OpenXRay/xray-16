@@ -9,11 +9,12 @@
 #pragma once
 
 #include "script_abstract_action.h"
+#include "detail_path_manager_space.h"
 
-namespace DetailPathManager
-{
-enum EDetailPathType;
-};
+//namespace DetailPathManager
+//{
+//enum EDetailPathType;
+//};
 
 namespace MonsterSpace
 {

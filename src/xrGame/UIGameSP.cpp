@@ -285,24 +285,38 @@ bool CChangeLevelWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
     return inherited::OnKeyboardAction(dik, keyboard_action);
 }
 
+// Не инициализировалась форма, поскольку виртуальная функция отличалась набором аргуметов 
+//morrey 
 bool g_block_pause = false;
-void CChangeLevelWnd::Show()
+
+void CChangeLevelWnd::Show(bool status)
 {
-    m_messageBox->InitMessageBox(
-        m_b_allow_change_level ? "message_box_change_level" : "message_box_change_level_disabled");
-    SetWndPos(m_messageBox->GetWndPos());
-    m_messageBox->SetWndPos(Fvector2().set(0.0f, 0.0f));
-    SetWndSize(m_messageBox->GetWndSize());
+    inherited::Show(status);
+    if (status)
+    {
+        m_messageBox->InitMessageBox(
+            m_b_allow_change_level ? "message_box_change_level" : "message_box_change_level_disabled");
+        SetWndPos(m_messageBox->GetWndPos());
+        m_messageBox->SetWndPos(Fvector2().set(0.0f, 0.0f));
+        SetWndSize(m_messageBox->GetWndSize());
 
-    m_messageBox->SetText(m_message_str.c_str());
+        m_messageBox->SetText(m_message_str.c_str());
 
-    g_block_pause = true;
-    Device.Pause(TRUE, TRUE, TRUE, "CChangeLevelWnd_show");
-    bShowPauseString = FALSE;
+        g_block_pause = true;
+        Device.Pause(TRUE, TRUE, TRUE, "CChangeLevelWnd_show");
+        bShowPauseString = FALSE;
+    }
+    else
+    {
+        g_block_pause = false;
+        Device.Pause(FALSE, TRUE, TRUE, "CChangeLevelWnd_hide");
+    }
 }
 
+//old 
 void CChangeLevelWnd::Hide()
 {
     g_block_pause = false;
     Device.Pause(FALSE, TRUE, TRUE, "CChangeLevelWnd_hide");
 }
+//morrey 

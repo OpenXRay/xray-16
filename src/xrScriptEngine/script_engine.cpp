@@ -1260,7 +1260,9 @@ void CScriptEngine::on_error(lua_State* state)
 }
 
 CScriptProcess* CScriptEngine::CreateScriptProcess(shared_str name, shared_str scripts)
-{ return new CScriptProcess(this, name, scripts); }
+{
+	return new CScriptProcess(this, name, scripts);
+}
 
 CScriptThread* CScriptEngine::CreateScriptThread(LPCSTR caNamespaceName, bool do_string, bool reload)
 {
