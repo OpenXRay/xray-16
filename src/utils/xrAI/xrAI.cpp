@@ -1,9 +1,6 @@
-// xrAI.cpp : Defines the entry point for the application.
-//
-
 #include "stdafx.h"
 #include "xrCore/xr_ini.h"
-#include "process.h"
+#include <process.h>
 #include "xrAI.h"
 
 #include "xr_graph_merge.h"
@@ -16,17 +13,8 @@
 
 #pragma comment(linker, "/STACK:0x800000,0x400000")
 
-#pragma comment(lib, "comctl32.lib")
-#pragma comment(lib, "d3dx9.lib")
-#pragma comment(lib, "IMAGEHLP.LIB")
 #pragma comment(lib, "winmm.LIB")
-#pragma comment(lib, "xrcdb.LIB")
-#pragma comment(lib, "MagicFM.LIB")
-#pragma comment(lib, "xrCore.LIB")
-#pragma comment(lib, "xrLCUtil.lib")
-#pragma comment(lib, "xrAICore.lib")
 
-#include "utils/xrLCUtil/LevelCompilerLoggerWindow.hpp"
 #include "xrCore/cdecl_cast.hpp"
 #include "xrCore/ModuleLookup.hpp"
 
@@ -49,14 +37,7 @@ CThreadManager::ReportStatusFunc ProxyStatus = cdecl_cast([](const char* format,
 CThreadManager::ReportProgressFunc ProxyProgress = cdecl_cast([](float progress) { Logger.Progress(progress); });
 
 extern void xrCompiler(LPCSTR name, bool draft_mode, bool pure_covers, LPCSTR out_name);
-extern void test_smooth_path(LPCSTR name);
-extern void test_hierarchy(LPCSTR name);
-extern void xrConvertMaps();
-extern void test_goap();
-extern void smart_cover(LPCSTR name);
 extern void verify_level_graph(LPCSTR name, bool verbose);
-extern void compare_graphs(LPCSTR level_name);
-extern void test_levels();
 
 static const char* h_str =
     "The following keys are supported / required:\n"
@@ -190,8 +171,6 @@ void Startup(LPSTR lpCmdLine)
 
 #include "factory_api.h"
 
-#include "xrGame/quadtree.h"
-
 Factory_Create* create_entity = 0;
 Factory_Destroy* destroy_entity = 0;
 
@@ -200,10 +179,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     xrDebug::Initialize(false);
     Core.Initialize("xrai", 0);
 
-
-    constexpr pcstr g_name = "xrSE_Factory";
-    Log("Loading DLL:", g_name); 
-    const auto hFactory = std::make_unique<XRay::Module>(g_name);
+    const auto hFactory = std::make_unique<XRay::Module>("xrSE_Factory");
 
     if (!hFactory->exist())
         R_CHK(GetLastError());

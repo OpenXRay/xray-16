@@ -266,13 +266,13 @@
     <ProjectReference Include="$(SolutionDir)xrCore\xrCore.vcxproj">
       <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Externals\MagicFM.vcxproj">
-      <Project>{848e8ab3-9962-4c04-b813-5690399c8a3e}</Project>
+    <ProjectReference Include="$(SolutionDir)xrCDB\xrCDB.vcxproj">
+      <Project>{a19b1df2-82ec-4364-8bdf-85d13a1c89b5}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\xrLCUtil\xrLCUtil.vcxproj">
+    <ProjectReference Include="$(SolutionDir)Utils\xrLCUtil\xrLCUtil.vcxproj">
       <Project>{b90bdc22-a891-4b33-b562-29d701f65dbd}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\xrMiscMath\xrMiscMath.vcxproj">
+    <ProjectReference Include="$(SolutionDir)Utils\xrMiscMath\xrMiscMath.vcxproj">
       <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>
     </ProjectReference>
   </ItemGroup>
