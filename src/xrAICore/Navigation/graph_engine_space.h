@@ -7,6 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
+
 #include "xrCore/xrCore.h"
 
 template <typename _condition_type, typename _value_type>
