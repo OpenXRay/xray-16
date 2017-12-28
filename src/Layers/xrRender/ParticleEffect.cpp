@@ -589,9 +589,8 @@ void CParticleEffect::Render(float)
 
             u32 nWorkers = ttapi.threads.size();
 
-            // XXX: Xottab_DUTY: Review this
-            if (p_cnt < nWorkers * 64)
-                nWorkers = 1;
+            if (p_cnt < nWorkers)
+                nWorkers = p_cnt;
 
             PRS_PARAMS* prsParams = (PRS_PARAMS*)_alloca(sizeof(PRS_PARAMS) * nWorkers);
 

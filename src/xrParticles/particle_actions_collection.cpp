@@ -1755,9 +1755,8 @@ void PATurbulence::Execute(ParticleEffect* effect, const float dt, float& tm_max
 
     u32 nWorkers = ttapi.threads.size();
 
-    // XXX: Xottab_DUTY: Review this
-    if (p_cnt < nWorkers * 64)
-        nWorkers = 1;
+    if (p_cnt < nWorkers)
+        nWorkers = p_cnt;
 
     TES_PARAMS* tesParams = (TES_PARAMS*)_alloca(sizeof(TES_PARAMS) * nWorkers);
 
