@@ -6,7 +6,7 @@
 //	Description : Patrol path
 ////////////////////////////////////////////////////////////////////////////
 
-#include "PCH.hpp"
+#include "pch.hpp"
 #include "patrol_path.h"
 #include "xrCore/xrCore.h"
 #include "Common/LevelGameDef.h"

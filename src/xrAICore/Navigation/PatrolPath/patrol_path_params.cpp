@@ -6,7 +6,7 @@
 //	Description : Patrol path parameters class
 ////////////////////////////////////////////////////////////////////////////
 
-#include "PCH.hpp"
+#include "pch.hpp"
 #include "patrol_path_params.h"
 #include "patrol_path_storage.h"
 #include "xrScriptEngine/script_engine.hpp"

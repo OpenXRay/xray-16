@@ -6,7 +6,7 @@
 //	Description : Script world state script export
 ////////////////////////////////////////////////////////////////////////////
 
-#include "PCH.hpp"
+#include "pch.hpp"
 #include "script_world_state.h"
 #include "condition_state.h"
 #include "xrScriptEngine/ScriptExporter.hpp"

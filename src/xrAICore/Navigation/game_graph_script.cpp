@@ -6,7 +6,7 @@
 //	Description : Game graph class script export
 ////////////////////////////////////////////////////////////////////////////
 
-#include "PCH.hpp"
+#include "pch.hpp"
 #include "game_graph.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 #include "xrScriptEngine/DebugMacros.hpp" // for THROW // XXX: move debug macros to xrCore

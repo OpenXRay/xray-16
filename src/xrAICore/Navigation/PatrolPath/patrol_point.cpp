@@ -6,7 +6,7 @@
 //	Description : Patrol point
 ////////////////////////////////////////////////////////////////////////////
 
-#include "PCH.hpp"
+#include "pch.hpp"
 #include "patrol_point.h"
 #include "Navigation/level_graph.h"
 #include "Navigation/level_graph.h"

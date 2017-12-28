@@ -6,7 +6,7 @@
 //	Description : Level graph
 ////////////////////////////////////////////////////////////////////////////
 
-#include "PCH.hpp"
+#include "pch.hpp"
 #include "level_graph.h"
 #include "xrEngine/profiler.h"
 
