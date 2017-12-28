@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "MathUtil.hpp"
-#include "Threading/ttapi.h"
+#include "Threading/ThreadPool.hpp"
 
 #ifdef _EDITOR
 #include "SkeletonX.h"
@@ -55,12 +55,15 @@ void Initialize()
     PLCCalc = PLCCalc_SSE;
     //PLCCalc = PLCCalc_CPP;
 #endif
+    // XXX: use PLC_energy and iCeil too
+    // SSE implementations of this functions is not used.
+    // Found duplicate implementation in src\Layers\xrRenderPC_R1\LightShadows.cpp
+    // Search for other duplicates
 
-    if (ttapi_GetWorkerCount() > 1)
+    if (ttapi.threads.size() > 1)
         Skin4W = Skin4W_MT;
 
     initialized = true;
 }
-
 } // namespace Math
 } // namespace XRay

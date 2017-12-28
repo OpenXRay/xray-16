@@ -273,9 +273,6 @@
     <ClCompile Include="Media\Image.cpp">
       <Filter>Media</Filter>
     </ClCompile>
-    <ClCompile Include="Threading\ttapi.cpp">
-      <Filter>Threading</Filter>
-    </ClCompile>
     <ClCompile Include="Math\PLC_SSE.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -347,6 +344,9 @@
     </ClCompile>
     <ClCompile Include="Memory\doug_lea_allocator.cpp">
       <Filter>Memory\Memory manager\dlmalloc\wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\ThreadPool.cpp">
+      <Filter>Threading</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -605,9 +605,6 @@
     <ClInclude Include="cdecl_cast.hpp">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="Threading\ttapi.h">
-      <Filter>Threading</Filter>
-    </ClInclude>
     <ClInclude Include="Math\PLC_SSE.hpp">
       <Filter>Math</Filter>
     </ClInclude>
@@ -742,6 +739,9 @@
     </ClInclude>
     <ClInclude Include="Memory\memory_allocator_options.h">
       <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\ThreadPool.hpp">
+      <Filter>Threading</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

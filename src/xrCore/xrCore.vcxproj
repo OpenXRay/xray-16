@@ -235,7 +235,7 @@
     <ClCompile Include="string_concatenations.cpp" />
     <ClCompile Include="Text\MbHelpers.cpp" />
     <ClCompile Include="Threading\Event.cpp" />
-    <ClCompile Include="Threading\ttapi.cpp" />
+    <ClCompile Include="Threading\ThreadPool.cpp" />
     <ClCompile Include="Threading\Lock.cpp" />
     <ClCompile Include="XML\XMLDocument.cpp" />
     <ClCompile Include="xrCore.cpp" />
@@ -346,7 +346,7 @@
     <ClInclude Include="SubAlloc.hpp" />
     <ClInclude Include="Text\MbHelpers.h" />
     <ClInclude Include="Threading\Event.hpp" />
-    <ClInclude Include="Threading\ttapi.h" />
+    <ClInclude Include="Threading\ThreadPool.hpp" />
     <ClInclude Include="Threading\Lock.hpp" />
     <ClInclude Include="vector.h" />
     <ClInclude Include="XML\XMLDocument.hpp" />
