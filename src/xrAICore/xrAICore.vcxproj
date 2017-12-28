@@ -126,7 +126,6 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir);$(xrSdkDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRAICORE_EXPORTS;XRGAME_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SmallerTypeCheck>false</SmallerTypeCheck>
       <PrecompiledHeaderFile>PCH.hpp</PrecompiledHeaderFile>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -134,7 +133,6 @@
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir);$(xrSdkDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_USRDLL;XRAICORE_EXPORTS;XRGAME_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <SmallerTypeCheck>false</SmallerTypeCheck>
       <PrecompiledHeaderFile>PCH.hpp</PrecompiledHeaderFile>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -245,40 +243,17 @@
     <ClInclude Include="Navigation\vertex_path.h" />
     <ClInclude Include="Navigation\vertex_path_inline.h" />
     <ClInclude Include="PCH.hpp" />
-    <ClInclude Include="ScriptPCH.hpp" />
-    <ClInclude Include="xrAICore.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AISpaceBase.cpp" />
-    <ClCompile Include="Components\script_world_property_script.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ScriptPCH.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ScriptPCH.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">ScriptPCH.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">ScriptPCH.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ScriptPCH.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ScriptPCH.hpp</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="Components\script_world_state_script.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ScriptPCH.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ScriptPCH.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">ScriptPCH.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">ScriptPCH.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ScriptPCH.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ScriptPCH.hpp</PrecompiledHeaderFile>
-    </ClCompile>
+    <ClCompile Include="Components\script_world_property_script.cpp" />
+    <ClCompile Include="Components\script_world_state_script.cpp" />
     <ClCompile Include="Navigation\game_graph_script.cpp" />
     <ClCompile Include="Navigation\level_graph.cpp" />
     <ClCompile Include="Navigation\level_graph_vertex.cpp" />
     <ClCompile Include="Navigation\PatrolPath\patrol_path.cpp" />
     <ClCompile Include="Navigation\PatrolPath\patrol_path_params.cpp" />
-    <ClCompile Include="Navigation\PatrolPath\patrol_path_params_script.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ScriptPCH.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ScriptPCH.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">ScriptPCH.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">ScriptPCH.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ScriptPCH.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ScriptPCH.hpp</PrecompiledHeaderFile>
-    </ClCompile>
+    <ClCompile Include="Navigation\PatrolPath\patrol_path_params_script.cpp" />
     <ClCompile Include="Navigation\PatrolPath\patrol_path_storage.cpp" />
     <ClCompile Include="Navigation\PatrolPath\patrol_point.cpp" />
     <ClCompile Include="PCH.cpp">
@@ -291,21 +266,6 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">PCH.hpp</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">PCH.hpp</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="ScriptPCH.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">ScriptPCH.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ScriptPCH.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">ScriptPCH.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">ScriptPCH.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">ScriptPCH.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ScriptPCH.hpp</PrecompiledHeaderFile>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="xrAICore.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

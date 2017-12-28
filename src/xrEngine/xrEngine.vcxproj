@@ -707,9 +707,6 @@
     <ProjectReference Include="$(SolutionDir)utils\xrMiscMath\xrMiscMath.vcxproj">
       <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)xrAICore\xrAICore.vcxproj">
-      <Project>{5cb057d8-4464-40a6-af10-c26b826d1d90}</Project>
-    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)xrCDB\xrCDB.vcxproj">
       <Project>{a19b1df2-82ec-4364-8bdf-85d13a1c89b5}</Project>
     </ProjectReference>

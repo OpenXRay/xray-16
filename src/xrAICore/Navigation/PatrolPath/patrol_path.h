@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #pragma once
-#include "xrAICore/xrAICore.hpp"
+
 #include "xrAICore/Navigation/graph_abstract.h"
 #include "xrAICore/Navigation/PatrolPath/patrol_point.h"
 

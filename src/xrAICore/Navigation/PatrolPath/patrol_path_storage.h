@@ -13,7 +13,6 @@ class CLevelGraph;
 class CGameLevelCrossTable;
 class CGameGraph;
 
-#include "xrAICore/xrAICore.hpp"
 #include "Common/object_interfaces.h"
 #include "xrCore/Containers/AssociativeVector.hpp"
 #include "xrScriptEngine/DebugMacros.hpp"

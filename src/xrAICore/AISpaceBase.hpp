@@ -1,5 +1,5 @@
 #pragma once
-#include "xrAICore/xrAICore.hpp"
+
 #include "xrCore/xrCore.h"
 
 class CGameGraph;
