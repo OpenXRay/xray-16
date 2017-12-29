@@ -1,0 +1,37 @@
+#include "common.h"
+#include "lmodel.h"
+#include "iostructs\p_rain_apply.h"
+
+#ifndef ISAMPLE
+#define ISAMPLE 0
+#endif
+
+uniform float3x4 m_sunmask;	// ortho-projection
+#ifndef USE_MSAA
+Texture2D	s_patched_normal;
+#else
+Texture2DMS	s_patched_normal;
+#endif
+
+#ifdef MSAA_OPTIMIZATION
+float4 _main ( float2 tc, float2 tcJ, uint iSample )
+#else
+float4 _main ( float2 tc, float2 tcJ )
+#endif
+{
+#ifndef USE_MSAA
+	float3 _N = tex2D( s_patched_normal, tc ).xyz;
+#else
+#ifndef MSAA_OPTIMIZATION
+	float3 _N = texelFetch( s_patched_normal, tc * pos_decompression_params2.xy, 0, ISAMPLE );
+#else
+	float3 _N = texelFetch( s_patched_normal, tc * pos_decompression_params2.xy, 0, iSample );
+#endif	
+#endif
+
+#ifndef GBUFFER_OPTIMIZATION	
+	return float4(_N,1);
+#else
+	return float4( gbuf_pack_normal( _N ), 0, 0 );
+#endif
+}
