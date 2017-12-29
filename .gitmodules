@@ -61,3 +61,6 @@
 [submodule "Externals/glew"]
 	path = Externals/glew
 	url = https://github.com/Armada651/glew
+[submodule "Externals/gli"]
+	path = Externals/gli
+	url = https://github.com/g-truc/gli.git
