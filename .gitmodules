@@ -58,3 +58,6 @@
 [submodule "Externals/pugixml"]
 	path = Externals/pugixml
 	url = https://github.com/zeux/pugixml.git
+[submodule "Externals/glew"]
+	path = Externals/glew
+	url = https://github.com/Armada651/glew
