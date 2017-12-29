@@ -366,6 +366,9 @@
 	<string id="renderer_r3">
 		<text>Enhanced full dyn. lighting (DX10)</text>
 	</string>
+	<string id="renderer_gl">
+		<text>Enhanced full dyn. lighting (OpenGL)</text>
+	</string>
 	<string id="server name">
 		<text>SERVER NAME</text>
 	</string>
@@ -922,7 +925,7 @@
 		<text>The unique nickname cannot contain spaces</text>
 	</string>
 	<string id="mp_gp_unique_nick_bad_first_symbol">
-		<text><![CDATA[The unique nickname may not begin with a number or any of the following symbols: '@', '+', ':' or ‘#’]]></text>
+		<text><![CDATA[The unique nickname may not begin with a number or any of the following symbols: '@', '+', ':' or '#']]></text>
 	</string>
 	<string id="st_opt_ultra">
 		<text>very high</text>

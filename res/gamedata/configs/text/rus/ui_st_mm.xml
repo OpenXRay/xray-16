@@ -366,6 +366,9 @@
 	<string id="renderer_r3">
 		<text>Ул. полное освещение (DX10)</text>
 	</string>
+	<string id="renderer_gl">
+		<text>Ул. полное освещение (OpenGL)</text>
+	</string>
 	<string id="server name">
 		<text>ИМЯ СЕРВЕРА</text>
 	</string>
