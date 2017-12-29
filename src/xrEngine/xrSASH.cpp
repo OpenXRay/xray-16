@@ -481,6 +481,7 @@ void xrSASH::TryInitEngine(bool bNoRun)
 
     InitInput();
 
+    Engine.External.InitializeRenderers();
     Engine.External.Initialize();
 
     Console->Execute("unbindall");
