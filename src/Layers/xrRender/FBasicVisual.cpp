@@ -46,7 +46,7 @@ void dxRender_Visual::Load(const char* N, IReader* data, u32)
     {
         R_ASSERT2(hdr.format_version == xrOGF_FormatVersion, "Invalid visual version");
         Type = hdr.type;
-        // if (hdr.shader_id)	shader	= GlobalEnv.Render->getShader	(hdr.shader_id);
+        // if (hdr.shader_id)	shader	= GEnv.Render->getShader	(hdr.shader_id);
         if (hdr.shader_id)
             shader = ::RImplementation.getShader(hdr.shader_id);
         vis.box.set(hdr.bb.min, hdr.bb.max);

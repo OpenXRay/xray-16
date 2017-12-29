@@ -197,7 +197,7 @@ void CKinematics::Load(const char* N, IReader* data, u32 dwFlags)
             //    m_lod->Type==MT_NORMAL,lod_name.c_str());
             /*
                 strconcat(name_load, short_name, ":lod:1");
-                m_lod = GlobalEnv.Render->model_CreateChild(name_load, LD);
+                m_lod = GEnv.Render->model_CreateChild(name_load, LD);
                 VERIFY(m_lod->Type==MT_SKELETON_GEOMDEF_PM || m_lod->Type==MT_SKELETON_GEOMDEF_ST);
             */
         }
@@ -746,7 +746,7 @@ void CKinematics::CalculateWallmarks()
             {
                 // append wm to WallmarkEngine
                 if (GEnv.Render->ViewBase.testSphere_dirty(wm->m_Bounds.P, wm->m_Bounds.R))
-                    // GlobalEnv.Render->add_SkeletonWallmark   (wm);
+                    // GEnv.Render->add_SkeletonWallmark   (wm);
                     ::RImplementation.add_SkeletonWallmark(wm);
             }
             else
