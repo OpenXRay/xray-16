@@ -13,6 +13,7 @@
 
 using namespace luabind;
 
+#ifdef XRGAME_EXPORTS
 LPCSTR profile_name_script(CSE_ALifeTraderAbstract* ta) { return *ta->character_profile(); }
 SCRIPT_EXPORT(CSE_ALifeTraderAbstract, (), {
     module(luaState)[class_<CSE_ALifeTraderAbstract>("cse_alife_trader_abstract")
@@ -22,6 +23,7 @@ SCRIPT_EXPORT(CSE_ALifeTraderAbstract, (), {
                          .def("rank", &CSE_ALifeTraderAbstract::Rank)
                          .def("reputation", &CSE_ALifeTraderAbstract::Reputation)];
 });
+#endif
 
 SCRIPT_EXPORT(CSE_ALifeTrader, (CSE_ALifeDynamicObjectVisual, CSE_ALifeTraderAbstract), {
     module(luaState)[luabind_class_dynamic_alife2(

@@ -19,7 +19,7 @@ void LevelCompilerLoggerWindow::Initialize(const char* name)
     InitCommonControls();
     Sleep(150);
     xr_strcpy(this->name, name);
-    thread_spawn(LogThreadProc, "log-update", 1024 * 1024, 0);
+    thread_spawn(LogThreadProc, "log-update", 1024 * 1024, this);
     while (!logWindow)
         Sleep(150);
     initialized = true;
@@ -56,7 +56,7 @@ void LevelCompilerLoggerWindow::LogThreadProc()
 {
     SetProcessPriorityBoost(GetCurrentProcess(), TRUE);
     logWindow =
-        CreateDialog(HINSTANCE(GetModuleHandle(0)), MAKEINTRESOURCE(IDD_LOG), 0, LevelCompilerLoggerWindowDlgProc);
+        CreateDialog(HINSTANCE(GetModuleHandle("xrLCUtil")), MAKEINTRESOURCE(IDD_LOG), 0, LevelCompilerLoggerWindowDlgProc);
     if (!logWindow)
         R_CHK(GetLastError());
     SetWindowText(logWindow, name);
