@@ -160,7 +160,7 @@ u32 CBlender_Compile::r_dx10Sampler(LPCSTR ResourceName)
         i_dx10Address(stage, D3DTADDRESS_CLAMP);
         i_dx10Filter(stage, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTEXF_LINEAR);
         RS.SetSAMP(stage, XRDX10SAMP_COMPARISONFILTER, TRUE);
-        RS.SetSAMP(stage, XRDX10SAMP_COMPARISONFUNC, D3D_COMPARISON_LESS_EQUAL);
+        RS.SetSAMP(stage, XRDX10SAMP_COMPARISONFUNC, (u32)D3D_COMPARISON_LESS_EQUAL);
     }
 
     if (0 == xr_strcmp(ResourceName, "smp_jitter"))
@@ -173,7 +173,7 @@ u32 CBlender_Compile::r_dx10Sampler(LPCSTR ResourceName)
 }
 
 void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOOL bZtest, BOOL bZwrite, BOOL bABlend,
-    D3DBLEND abSRC, D3DBLEND abDST, BOOL aTest, u32 aRef)
+                              D3DBLEND abSRC, D3DBLEND abDST, BOOL aTest, u32 aRef)
 {
     RS.Invalidate();
     ctable.clear();

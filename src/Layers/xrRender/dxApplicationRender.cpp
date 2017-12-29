@@ -13,7 +13,7 @@ void dxApplicationRender::LoadBegin()
     sh_progress.create("hud\\default", "ui\\ui_actor_loadgame_screen");
     hLevelLogo_Add.create("hud\\default", "ui\\ui_actor_widescreen_sidepanels.dds");
 
-    ll_hGeom2.create(FVF::F_TL, RCache.Vertex.Buffer(), nullptr);
+    ll_hGeom2.create(FVF::F_TL, RCache.Vertex.Buffer(), 0);
 }
 
 void dxApplicationRender::destroy_loading_shaders()
@@ -28,14 +28,14 @@ u32 calc_progress_color(u32, u32, int, int);
 
 void dxApplicationRender::load_draw_internal(CApplication& owner)
 {
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     //  TODO: DX10: remove this???
     RImplementation.rmNormal();
     RCache.set_RT(HW.pBaseRT);
     RCache.set_ZB(HW.pBaseZB);
 #endif //   USE_DX10
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     FLOAT ColorRGBA[4] = {0.0f, 0.0f, 0.0f, 0.0f};
     HW.pContext->ClearRenderTargetView(RCache.get_RT(), ColorRGBA);
 #else //    USE_DX10
@@ -47,7 +47,7 @@ void dxApplicationRender::load_draw_internal(CApplication& owner)
         return;
     }
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 //  TODO: DX10: remove this
 //  FLOAT ColorRGBA[4] = {0.0f, 0.0f, 1.0f, 0.0f};
 //  HW.pContext->ClearRenderTargetView( RCache.get_RT(), ColorRGBA);

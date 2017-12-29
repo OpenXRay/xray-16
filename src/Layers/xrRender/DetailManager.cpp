@@ -81,8 +81,8 @@ CDetailManager::CDetailManager() : xrc("detail manager")
     soft_Geom = nullptr;
     hw_Geom = nullptr;
     hw_BatchSize = 0;
-    hw_VB = nullptr;
-    hw_IB = nullptr;
+    hw_VB = 0;
+    hw_IB = 0;
     m_time_rot_1 = 0;
     m_time_rot_2 = 0;
     m_time_pos = 0;

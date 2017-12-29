@@ -157,6 +157,13 @@ void dxEnvironmentRender::OnFrame(CEnvironment& env)
     }
 
     //. Setup skybox textures, somewhat ugly
+#ifdef USE_OGL
+    GLuint e0 = mixRen.sky_r_textures[0].second->surface_get();
+    GLuint e1 = mixRen.sky_r_textures[1].second->surface_get();
+
+    tsky0->surface_set(GL_TEXTURE_CUBE_MAP, e0);
+    tsky1->surface_set(GL_TEXTURE_CUBE_MAP, e1);
+#else
     ID3DBaseTexture* e0 = mixRen.sky_r_textures[0].second->surface_get();
     ID3DBaseTexture* e1 = mixRen.sky_r_textures[1].second->surface_get();
 
@@ -164,9 +171,10 @@ void dxEnvironmentRender::OnFrame(CEnvironment& env)
     _RELEASE(e0);
     tsky1->surface_set(e1);
     _RELEASE(e1);
+#endif // USE_OGL
 
 // ******************** Environment params (setting)
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 //	TODO: DX10: Implement environment parameters setting for DX10 (if necessary)
 #else //	USE_DX10
 
@@ -307,8 +315,13 @@ void dxEnvironmentRender::OnDeviceCreate()
 
 void dxEnvironmentRender::OnDeviceDestroy()
 {
+#ifdef USE_OGL
+    tsky0->surface_set(GL_TEXTURE_CUBE_MAP, 0);
+    tsky1->surface_set(GL_TEXTURE_CUBE_MAP, 0);
+#else
     tsky0->surface_set(nullptr);
     tsky1->surface_set(nullptr);
+#endif // USE_OGL
 
     sh_2sky.destroy();
     sh_2geom.destroy();

@@ -7,7 +7,7 @@
 
 #pragma comment(lib, "xrEngine.lib")
 
-extern "C" void XR_EXPORT SetupEnv()
+void SetupEnvRGL()
 {
     GEnv.Render = &RImplementation;
     GEnv.RenderFactory = &RenderFactoryImpl;
@@ -18,3 +18,25 @@ extern "C" void XR_EXPORT SetupEnv()
 #endif
     xrRender_initconsole();
 }
+
+bool SupportsOpenGLRendering()
+{
+    // XXX: do a real check
+    return true;
+}
+
+// This must not be optimized by compiler
+static const volatile class GEnvHelper
+{
+public:
+    GEnvHelper()
+    {
+        GEnv.CheckRGL = SupportsOpenGLRendering;
+        GEnv.SetupRGL = SetupEnvRGL;
+    }
+    ~GEnvHelper()
+    {
+        GEnv.SetupRGL = nullptr;
+        GEnv.SetupRGL = nullptr;
+    }
+} helper;

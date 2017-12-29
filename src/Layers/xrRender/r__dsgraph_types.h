@@ -32,16 +32,23 @@ struct _LodItem
     dxRender_Visual* pVisual;
 };
 
-using ps_type = ID3DPixelShader *;
-#if defined(USE_DX10) || defined(USE_DX11) //	DX10 and DX11 needs shader signature to properly bind geometry to shader
+using state_type = SState*;
+#ifndef USE_OGL
+using ps_type = ID3DPixelShader*;
+#if defined(USE_DX10) || defined(USE_DX11) // DX10 and DX11 needs shader signature to properly bind geometry to shader
 using vs_type = SVS*;
-using gs_type = ID3DGeometryShader *;
+using gs_type = ID3DGeometryShader*;
 #else
-using vs_type = ID3DVertexShader *;
+using vs_type = ID3DVertexShader*;
 #endif
 #ifdef USE_DX11
-using hs_type = ID3D11HullShader *;
-using ds_type = ID3D11DomainShader *;
+using hs_type = ID3D11HullShader*;
+using ds_type = ID3D11DomainShader*;
+#endif
+#else
+using vs_type = GLuint;
+using ps_type = GLuint;
+using gs_type = GLuint;
 #endif
 
 // NORMAL
@@ -57,7 +64,7 @@ struct mapNormalTextures : public xr_unordered_map<STextureList*, mapNormalItems
     float ssa;
 };
 
-struct mapNormalStates : public xr_unordered_map<ID3DState*, mapNormalTextures>
+struct mapNormalStates : public xr_unordered_map<state_type, mapNormalTextures>
 {
     float ssa;
 };
@@ -86,7 +93,7 @@ struct mapNormalPS : public xr_unordered_map<ps_type, mapNormalCS>
 };
 #endif
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 struct mapNormalGS : public xr_unordered_map<gs_type, mapNormalPS>
 {
     float ssa;
@@ -113,7 +120,7 @@ struct mapMatrixTextures : public xr_unordered_map<STextureList*, mapMatrixItems
     float ssa;
 };
 
-struct mapMatrixStates : public xr_unordered_map<ID3DState*, mapMatrixTextures>
+struct mapMatrixStates : public xr_unordered_map<state_type, mapMatrixTextures>
 {
     float ssa;
 };
@@ -142,7 +149,7 @@ struct mapMatrixPS : public xr_unordered_map<ps_type, mapMatrixCS>
 };
 #endif
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 struct mapMatrixGS : public xr_unordered_map<gs_type, mapMatrixPS>
 {
     float ssa;

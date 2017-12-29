@@ -11,7 +11,7 @@
 #include "blender_luminance.h"
 #include "blender_ssao.h"
 #include "blender_fxaa.h"
-#include "dx10MinMaxSMBlender.h"
+#include "Layers/xrRenderDX10/dx10MinMaxSMBlender.h"
 #include "Layers/xrRenderDX10/msaa/dx10MSAABlender.h"
 #include "Layers/xrRenderDX10/DX10 Rain/dx10RainBlender.h"
 #include <D3DX10Tex.h>

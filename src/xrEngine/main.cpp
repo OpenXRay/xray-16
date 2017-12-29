@@ -391,7 +391,9 @@ int RunApplication(pcstr commandLine)
 
     if (!GEnv.isDedicatedServer)
     {
-        if (strstr(Core.Params, "-r4"))
+        if (strstr(Core.Params, "-gl"))
+            Console->Execute("renderer renderer_gl");
+        else if (strstr(Core.Params, "-r4"))
             Console->Execute("renderer renderer_r4");
         else if (strstr(Core.Params, "-r3"))
             Console->Execute("renderer renderer_r3");
@@ -401,6 +403,8 @@ int RunApplication(pcstr commandLine)
             Console->Execute("renderer renderer_r2a");
         else if (strstr(Core.Params, "-r2"))
             Console->Execute("renderer renderer_r2");
+        else if (strstr(Core.Params, "-r1"))
+            Console->Execute("renderer renderer_r1");
         else
         {
             CCC_LoadCFG_custom cmd("renderer ");

@@ -474,9 +474,9 @@ void CResourceManager::_DumpMemoryUsage()
 void CResourceManager::Evict()
 {
 //	TODO: DX10: check if we really need this method
-#if !defined(USE_DX10) && !defined(USE_DX11)
+#if !defined(USE_DX10) && !defined(USE_DX11) && !defined(USE_OGL)
     CHK_DX(HW.pDevice->EvictManagedResources());
-#endif //	USE_DX10
+#endif
 }
 /*
 BOOL	CResourceManager::_GetDetailTexture(LPCSTR Name,LPCSTR& T, R_constant_setup* &CS)

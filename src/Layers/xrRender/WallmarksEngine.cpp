@@ -58,7 +58,7 @@ CWallmarksEngine::CWallmarksEngine()
 {
     static_pool.reserve(256);
     marks.reserve(256);
-    hGeom.create(FVF::F_LIT, RCache.Vertex.Buffer(), nullptr);
+    hGeom.create(FVF::F_LIT, RCache.Vertex.Buffer(), 0);
 }
 
 CWallmarksEngine::~CWallmarksEngine()

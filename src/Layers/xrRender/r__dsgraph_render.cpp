@@ -129,7 +129,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
             {
                 RCache.set_VS(vs_it->first);
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
                 //	GS setup
                 mapNormalGS& gs = vs_it->second;
                 gs.ssa = 0;
@@ -215,7 +215,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
                     }
                     nrmPS.clear();
                     ps.clear();
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
                 }
                 nrmGS.clear();
                 gs.clear();
@@ -241,7 +241,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
         {
             RCache.set_VS(vs_id->first);
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
             mapMatrixGS& gs = vs_id->second;
             gs.ssa = 0;
 
@@ -330,7 +330,7 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
                 }
                 matPS.clear();
                 ps.clear();
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
             }
             matGS.clear();
             gs.clear();
@@ -429,7 +429,7 @@ void D3DXRenderBase::r_dsgraph_render_hud_ui()
     const ref_rt rt_null;
     RCache.set_RT(0, 1);
     RCache.set_RT(0, 2);
-#if (RENDER == R_R3) || (RENDER == R_R4)
+#if (RENDER == R_R3) || (RENDER == R_R4) || (RENDER==R_GL)
     if (!RImplementation.o.dx10_msaa)
     {
         if (RImplementation.o.albedo_wo)

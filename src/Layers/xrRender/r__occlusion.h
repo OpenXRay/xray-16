@@ -18,7 +18,11 @@ private:
     struct _Q
     {
         u32 order;
+#ifdef USE_OGL
+        GLuint Q;
+#else
         ID3DQuery* Q;
+#endif
     };
 
     static const u32 iInvalidHandle = 0xFFFFFFFF;

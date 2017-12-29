@@ -35,10 +35,12 @@ public:
     SupportCheck CheckR2;
     SupportCheck CheckR3;
     SupportCheck CheckR4;
+    SupportCheck CheckRGL;
     SetupEnv SetupR1;
     SetupEnv SetupR2;
     SetupEnv SetupR3;
     SetupEnv SetupR4;
+    SetupEnv SetupRGL;
     SetupEnv SetupCurrentRenderer;
 };
 

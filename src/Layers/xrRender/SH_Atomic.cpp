@@ -28,38 +28,48 @@
 
 ///////////////////////////////////////////////////////////////////////
 //  SVS
-SVS::SVS() : vs(nullptr)
+SVS::SVS() : vs(0)
 #if defined(USE_DX10) || defined(USE_DX11)
 //  ,signature(0)
-#endif //   USE_DX10
-{
-    ;
-}
+#endif // USE_DX10
+{}
 
 SVS::~SVS()
 {
     RImplementation.Resources->_DeleteVS(this);
 #if defined(USE_DX10) || defined(USE_DX11)
-//_RELEASE(signature);
-//  Now it is release automatically
-#endif //   USE_DX10
+    //_RELEASE(signature);
+    //	Now it is release automatically
+#endif //USE_DX10
+#ifdef USE_OGL
+    CHK_GL(glDeleteProgram(vs));
+#else
     _RELEASE(vs);
+#endif // USE_OGL
 }
 
 ///////////////////////////////////////////////////////////////////////
-//  SPS
+// SPS
 SPS::~SPS()
 {
+#ifdef USE_OGL
+    CHK_GL(glDeleteProgram(ps));
+#else
     _RELEASE(ps);
+#endif // USE_OGL
     RImplementation.Resources->_DeletePS(this);
 }
 
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
 ///////////////////////////////////////////////////////////////////////
-//  SGS
+// SGS
 SGS::~SGS()
 {
+#ifdef USE_OGL
+    CHK_GL(glDeleteProgram(gs));
+#else
     _RELEASE(gs);
+#endif // USE_OGL
     RImplementation.Resources->_DeleteGS(this);
 }
 
@@ -69,43 +79,50 @@ SHS::~SHS()
     _RELEASE(sh);
     RImplementation.Resources->_DeleteHS(this);
 }
+
 SDS::~SDS()
 {
     _RELEASE(sh);
     RImplementation.Resources->_DeleteDS(this);
 }
+
 SCS::~SCS()
 {
     _RELEASE(sh);
     RImplementation.Resources->_DeleteCS(this);
 }
 #endif
+#endif // USE_DX10
 
+#if defined(USE_DX10) || defined(USE_DX11)
 ///////////////////////////////////////////////////////////////////////
-//  SInputSignature
+//	SInputSignature
 SInputSignature::SInputSignature(ID3DBlob* pBlob)
 {
     VERIFY(pBlob);
     signature = pBlob;
     signature->AddRef();
 };
+
 SInputSignature::~SInputSignature()
 {
     _RELEASE(signature);
     RImplementation.Resources->_DeleteInputSignature(this);
 }
-#endif //   USE_DX10
+#endif	//	USE_DX10
 
 ///////////////////////////////////////////////////////////////////////
-//  SState
+//	SState
 SState::~SState()
 {
+#ifndef USE_OGL
     _RELEASE(state);
+#endif // !USE_OGL
     RImplementation.Resources->_DeleteState(this);
 }
 
 ///////////////////////////////////////////////////////////////////////
-//  SDeclaration
+//	SDeclaration
 SDeclaration::~SDeclaration()
 {
     RImplementation.Resources->_DeleteDecl(this);
@@ -114,11 +131,15 @@ SDeclaration::~SDeclaration()
     iLayout = vs_to_layout.begin();
     for (; iLayout != vs_to_layout.end(); ++iLayout)
     {
-        //  Release vertex layout
+        //	Release vertex layout
         _RELEASE(iLayout->second);
     }
-#else //    USE_DX10
-    //  Release vertex layout
+#else // USE_DX10
+    //	Release vertex layout
+#ifdef USE_OGL
+    glDeleteBuffers(1, &dcl);
+#else
     _RELEASE(dcl);
-#endif //   USE_DX10
+#endif // USE_OGL
+#endif // USE_DX10
 }

@@ -92,7 +92,7 @@ void dxDebugRender::CacheSetXformWorld(const Fmatrix& M) { RCache.set_xform_worl
 void dxDebugRender::CacheSetCullMode(CullMode m) { RCache.set_CullMode(CULL_NONE + m); }
 void dxDebugRender::SetAmbient(u32 colour)
 {
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     //	TODO: DX10: Check if need this for DX10
     VERIFY(!"Not implemented for DX10");
 #else //	USE_DX10

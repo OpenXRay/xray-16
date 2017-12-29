@@ -24,6 +24,7 @@ CEngineAPI::CEngineAPI()
     hRenderR2 = nullptr;
     hRenderR3 = nullptr;
     hRenderR4 = nullptr;
+    hRenderRGL = nullptr;
     pCreate = nullptr;
     pDestroy = nullptr;
     tune_enabled = false;
@@ -46,6 +47,20 @@ bool is_enough_address_space_available()
 void CEngineAPI::SetupCurrentRenderer()
 {
     GEnv.CurrentRenderer = -1;
+
+    if (psDeviceFlags.test(rsRGL))
+    {
+        if (hRenderRGL->exist())
+        {
+            GEnv.CurrentRenderer = 5;
+            GEnv.SetupCurrentRenderer = GEnv.SetupRGL;
+        }
+        else
+        {
+            psDeviceFlags.set(rsRGL, false);
+            psDeviceFlags.set(rsR4, true);
+        }
+    }
 
     if (psDeviceFlags.test(rsR4))
     {
@@ -125,7 +140,10 @@ void CEngineAPI::InitializeRenderers()
 
     // Now unload unused renderers
     // XXX: Unloading disabled due to typeids invalidation
-    /*if (GEnv.CurrentRenderer != 4)
+    /*if (GEnv.CurrentRenderer != 5)
+        hRenderRGL->close();
+    
+    if (GEnv.CurrentRenderer != 4)
         hRenderR4->close();
 
     if (GEnv.CurrentRenderer != 3)
@@ -180,6 +198,7 @@ void CEngineAPI::Destroy(void)
     hRenderR2 = nullptr;
     hRenderR3 = nullptr;
     hRenderR4 = nullptr;
+    hRenderRGL = nullptr;
     pCreate = nullptr;
     pDestroy = nullptr;
     Engine.Event._destroy();
@@ -209,6 +228,7 @@ void CEngineAPI::CreateRendererList()
     hRenderR2 = XRay::LoadModule("xrRender_R2");
     hRenderR3 = XRay::LoadModule("xrRender_R3");
     hRenderR4 = XRay::LoadModule("xrRender_R4");
+    hRenderRGL = XRay::LoadModule("xrRender_GL");
 
     // Restore error handling
     SetErrorMode(0);
@@ -240,6 +260,14 @@ void CEngineAPI::CreateRendererList()
             modes.push_back(xr_token("renderer_r4", 5));
         else
             hRenderR4->close();
+    }
+
+    if (hRenderRGL->exist())
+    {
+        if (GEnv.CheckRGL && GEnv.CheckRGL())
+            modes.push_back(xr_token("renderer_gl", 6));
+        else
+            hRenderRGL->close();
     }
     modes.push_back(xr_token(nullptr, -1));
 

@@ -9,6 +9,7 @@
 #include "xrEngine/Environment.h"
 #endif
 #include "Layers/xrRenderDX10/dx10BufferUtils.h"
+#include "Layers/xrRenderGL/glBufferUtils.h"
 
 const int quant = 16384;
 const int c_hdr = 10;
@@ -58,7 +59,7 @@ void CDetailManager::hw_Load_Geom()
     u32 vSize = sizeof(vertHW);
     Msg("* [DETAILS] %d v(%d), %d p", dwVerts, vSize, dwIndices / 3);
 
-#if !defined(USE_DX10) && !defined(USE_DX11)
+#if !defined(USE_DX10) && !defined(USE_DX11) && !defined(USE_OGL)
     // Determine POOL & USAGE
     u32 dwUsage = D3DUSAGE_WRITEONLY;
 
@@ -74,7 +75,7 @@ void CDetailManager::hw_Load_Geom()
     // Fill VB
     {
         vertHW* pV;
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
         vertHW* pVOriginal;
         pVOriginal = xr_alloc<vertHW>(dwVerts);
         pV = pVOriginal;
@@ -101,7 +102,10 @@ void CDetailManager::hw_Load_Geom()
                 }
             }
         }
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_OGL)
+        glBufferUtils::CreateVertexBuffer(&hw_VB, pVOriginal, dwVerts * vSize);
+        xr_free(pVOriginal);
+#elif defined(USE_DX10) || defined(USE_DX11)
         R_CHK(dx10BufferUtils::CreateVertexBuffer(&hw_VB, pVOriginal, dwVerts * vSize));
         HW.stats_manager.increment_stats_vb(hw_VB);
         xr_free(pVOriginal);
@@ -113,7 +117,7 @@ void CDetailManager::hw_Load_Geom()
     // Fill IB
     {
         u16* pI;
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
         u16* pIOriginal;
         pIOriginal = xr_alloc<u16>(dwIndices);
         pI = pIOriginal;
@@ -131,7 +135,10 @@ void CDetailManager::hw_Load_Geom()
                 offset = u16(offset + u16(D.number_vertices));
             }
         }
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_OGL)
+        glBufferUtils::CreateIndexBuffer(&hw_IB, pIOriginal, dwIndices * 2);
+        xr_free(pIOriginal);
+#elif defined(USE_DX10) || defined(USE_DX11)
         R_CHK(dx10BufferUtils::CreateIndexBuffer(&hw_IB, pIOriginal, dwIndices * 2));
         HW.stats_manager.increment_stats_ib(hw_IB);
         xr_free(pIOriginal);
@@ -148,13 +155,18 @@ void CDetailManager::hw_Unload()
 {
     // Destroy VS/VB/IB
     hw_Geom.destroy();
+#ifdef USE_OGL
+    GLuint buffers[] = { hw_IB, hw_VB };
+    glDeleteBuffers(2, buffers);
+#else
     HW.stats_manager.decrement_stats_vb(hw_VB);
     HW.stats_manager.decrement_stats_ib(hw_IB);
     _RELEASE(hw_IB);
     _RELEASE(hw_VB);
+#endif // USE_OGL
 }
 
-#if !defined(USE_DX10) && !defined(USE_DX11)
+#if !defined(USE_DX10) && !defined(USE_DX11) && !defined(USE_OGL)
 void CDetailManager::hw_Load_Shaders()
 {
     // Create shader to access constant storage

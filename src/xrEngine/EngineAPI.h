@@ -52,6 +52,7 @@ class ENGINE_API CEngineAPI
     XRay::Module hRenderR2;
     XRay::Module hRenderR3;
     XRay::Module hRenderR4;
+    XRay::Module hRenderRGL;
 
 public:
     BENCH_SEC_SCRAMBLEMEMBER1
