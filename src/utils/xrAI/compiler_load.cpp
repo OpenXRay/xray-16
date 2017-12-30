@@ -1,8 +1,9 @@
 #include "stdafx.h"
 #include "compiler.h"
-#include "Common/LevelGameDef.h"
-#include "xrAICore/Navigation/level_graph.h"
-#include "AIMapExport.h"
+
+// TODO: Do we really need this?
+Lights g_lights;
+Fbox LevelBB;
 
 IC const Fvector vertex_position(const CLevelGraph::CPosition& Psrc, const Fbox& bb, const SAIParams& params)
 {
@@ -54,19 +55,18 @@ extern void Surface_Init();
 void xrLoad(LPCSTR name, bool draft_mode)
 {
     FS.get_path("$level$")->_set((LPSTR)name);
-    string256 N;
+    string_path file_name;
     if (!draft_mode)
     {
         // shaders
-        string_path N;
-        FS.update_path(N, "$game_data$", "shaders_xrlc.xr");
+        FS.update_path(file_name, "$game_data$", "shaders_xrlc.xr");
         g_shaders_xrlc = new Shader_xrLC_LIB();
-        g_shaders_xrlc->Load(N);
+        g_shaders_xrlc->Load(file_name);
 
         // Load CFORM
         {
-            strconcat(sizeof(N), N, name, "build.cform");
-            IReader* fs = FS.r_open(N);
+            strconcat(sizeof(file_name), file_name, name, "build.cform");
+            IReader* fs = FS.r_open(file_name);
             R_ASSERT(fs->find_chunk(0));
 
             hdrCFORM H;
@@ -89,9 +89,8 @@ void xrLoad(LPCSTR name, bool draft_mode)
 
         // Load level data
         {
-            strconcat(sizeof(N), N, name, "build.prj");
-            IReader* fs = FS.r_open(N);
-            IReader* F;
+            strconcat(sizeof(file_name), file_name, name, "build.prj");
+            IReader* fs = FS.r_open(file_name);
 
             // Version
             u32 version;
@@ -111,7 +110,7 @@ void xrLoad(LPCSTR name, bool draft_mode)
             Logger.Status("Processing textures...");
             {
                 Surface_Init();
-                F = fs->open_chunk(EB_Textures);
+                IReader* F = fs->open_chunk(EB_Textures);
                 u32 tex_count = F->length() / sizeof(b_texture);
                 for (u32 t = 0; t < tex_count; t++)
                 {
@@ -176,8 +175,7 @@ void xrLoad(LPCSTR name, bool draft_mode)
                                 BT.pSurface = Surface_Load(N, w, h);
                                 R_ASSERT2(BT.pSurface, "Can't load surface");
                                 if ((w != BT.dwWidth) || (h != BT.dwHeight))
-                                    Msg("! THM doesn't correspond to the texture: %dx%d -> %dx%d", BT.dwWidth,
-                                        BT.dwHeight, w, h);
+                                    Msg("! THM doesn't correspond to the texture: %dx%d -> %dx%d", BT.dwWidth, BT.dwHeight, w, h);
                                 BT.Vflip();
                             }
                             else
@@ -195,9 +193,8 @@ void xrLoad(LPCSTR name, bool draft_mode)
     }
     // Load lights
     {
-        strconcat(sizeof(N), N, name, "build.prj");
-
-        IReader* F = FS.r_open(N);
+        strconcat(sizeof(file_name), file_name, name, "build.prj");
+        IReader* F = FS.r_open(file_name);
         R_ASSERT2(F, "There is no file 'build.prj'!");
         IReader& fs = *F;
 
@@ -256,10 +253,9 @@ void xrLoad(LPCSTR name, bool draft_mode)
     }
     // Load initial map from the Level Editor
     {
-        string_path file_name;
         strconcat(sizeof(file_name), file_name, name, "build.aimap");
         IReader* F = FS.r_open(file_name);
-        R_ASSERT2(F, file_name);
+        R_ASSERT2(F, "There is no file 'build.aimap'!");
 
         R_ASSERT(F->open_chunk(E_AIMAP_CHUNK_VERSION));
         R_ASSERT(F->r_u16() == E_AIMAP_VERSION);

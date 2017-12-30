@@ -1,5 +1,4 @@
-#ifndef AIMapExportH
-#define AIMapExportH
+#pragma once
 
 //----------------------------------------------------
 struct SAIParams
@@ -26,4 +25,3 @@ struct SAIParams
 #define E_AIMAP_CHUNK_PARAMS 0x0003
 #define E_AIMAP_CHUNK_NODES 0x0004
 //----------------------------------------------------
-#endif

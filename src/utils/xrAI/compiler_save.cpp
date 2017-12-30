@@ -44,11 +44,9 @@ float CalculateHeight(Fbox& BB)
     // All nodes
     BB.invalidate();
 
-    for (u32 i = 0; i < g_nodes.size(); i++)
-    {
-        vertex& N = g_nodes[i];
-        BB.modify(N.Pos);
-    }
+    for (auto &i : g_nodes)
+        BB.modify(i.Pos);
+
     return BB.vMax.y - BB.vMin.y + EPS_L;
 }
 
@@ -64,7 +62,7 @@ class CNodeRenumberer
             return (vertex0.p.xz() < vertex1.p.xz());
         }
 
-        IC bool operator()(u32 vertex_id0, u32 vertex_id1) const
+        IC bool operator()(const u32 vertex_id0, const u32 vertex_id1) const
         {
             return (compressed_nodes[vertex_id0].p.xz() < compressed_nodes[vertex_id1].p.xz());
         }
@@ -114,7 +112,6 @@ void xrSaveNodes(LPCSTR name, LPCSTR out_name)
 
     string_path fName;
     strconcat(sizeof(fName), fName, name, out_name);
-
     IWriter* fs = FS.w_open(fName);
 
     // Header
@@ -128,11 +125,10 @@ void xrSaveNodes(LPCSTR name, LPCSTR out_name)
     fs->w(&H, sizeof(H));
     // All nodes
     Logger.Status("Saving nodes...");
-    for (u32 i = 0; i < g_nodes.size(); ++i)
+    for (auto &i : g_nodes)
     {
-        vertex& N = g_nodes[i];
         NodeCompressed NC;
-        Compress(NC, N, H);
+        Compress(NC, i, H);
         compressed_nodes.push_back(NC);
     }
 
@@ -140,11 +136,9 @@ void xrSaveNodes(LPCSTR name, LPCSTR out_name)
     xr_vector<u32> renumbering;
     CNodeRenumberer A(compressed_nodes, sorted, renumbering);
 
-    for (u32 i = 0; i < g_nodes.size(); ++i)
-    {
-        fs->w(&compressed_nodes[i], sizeof(NodeCompressed));
-        Logger.Progress(float(i) / float(g_nodes.size()));
-    }
+    for (auto &i : compressed_nodes)
+        fs->w(&i, sizeof(NodeCompressed));
+
     // Stats
     u32 SizeTotal = fs->tell();
     Msg("%dK saved", SizeTotal / 1024);

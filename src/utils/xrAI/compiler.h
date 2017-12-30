@@ -1,9 +1,9 @@
 #pragma once
 
 #include "xrCDB/xrCDB.h"
-#include "Common/LevelStructure.hpp"
 #include "AIMapExport.h"
 #include "utils/Shader_xrLC.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "editors/LevelEditor/Engine/communicate.h"
 #include "Etextureparams.h"
 
@@ -43,17 +43,9 @@ struct vertex // definition of "patch" or "node"
     u32 nForward() { return n2; }
     u32 nRight() { return n3; }
     u32 nBack() { return n4; }
-    void PointLF(Fvector& D);
-    void PointFR(Fvector& D);
-    void PointRB(Fvector& D);
-    void PointBL(Fvector& D);
 };
 
 using DWORDs = xr_vector<u32>;
-
-#include "xrAICore/Navigation/level_graph.h"
-
-void Compress(CLevelGraph::CVertex& Dest, vertex& Src);
 
 #define LT_DIRECT 0
 #define LT_POINT 1
@@ -85,13 +77,9 @@ using Marks = xr_vector<BYTE>;
 using Lights = xr_vector<R_Light>;
 
 // data
-extern Nodes g_nodes;
-extern xr_vector<SCover> g_covers_palette;
-extern Lights g_lights;
-extern SAIParams g_params;
 extern CDB::MODEL Level;
-extern CDB::COLLIDER XRC;
-extern Fbox LevelBB;
+extern Nodes g_nodes;
+extern SAIParams g_params;
 
 struct b_BuildTexture : public b_texture
 {

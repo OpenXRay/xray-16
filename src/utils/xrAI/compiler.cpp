@@ -1,14 +1,9 @@
 #include "stdafx.h"
 #include "compiler.h"
-#include "xrCDB/Intersect.hpp"
 
 CDB::MODEL Level;
-CDB::COLLIDER XRC;
 Nodes g_nodes;
-xr_vector<SCover> g_covers_palette;
-Lights g_lights;
 SAIParams g_params;
-Fbox LevelBB;
 
 void mem_Optimize()
 {

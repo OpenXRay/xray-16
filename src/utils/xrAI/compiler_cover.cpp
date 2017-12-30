@@ -1,13 +1,11 @@
 #include "stdafx.h"
 #include "compiler.h"
 #include "xrCDB/Intersect.hpp"
-#include "utils/xrLCUtil/xrThread.hpp"
 #include <mmsystem.h>
 
 #include "xrGame/quadtree.h"
 #include "xrGame/cover_point.h"
 #include "Common/object_broker.h"
-#include "xrCore/_fbox2.h"
 
 Shader_xrLC_LIB* g_shaders_xrlc;
 xr_vector<b_material> g_materials;
@@ -266,10 +264,10 @@ public:
         Q.Perform(N);
 
         // main cycle: trace rays and compute counts
-        for (auto it = Q.q_List.begin(); it != Q.q_List.end(); it++)
+        for (auto &it : Q.q_List)
         {
             // calc dir & range
-            u32 ID = *it;
+            u32 ID = it;
             R_ASSERT(ID < g_nodes.size());
             if (N == ID)
                 continue;
