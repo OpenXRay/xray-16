@@ -193,6 +193,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
     Startup(lpCmdLine);
 
+    hFactory->close();
+
     Core._destroy();
 
     return (0);

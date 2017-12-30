@@ -50,7 +50,8 @@ void CAI_Space::RegisterScriptClasses()
 void CAI_Space::init()
 {
     VERIFY(!m_script_engine);
-    m_script_engine = new CScriptEngine();
+    VERIFY(!GEnv.ScriptEngine);
+    GEnv.ScriptEngine = m_script_engine = new CScriptEngine();
     XRay::ScriptExporter::Reset(); // mark all nodes as undone
     m_script_engine->init(XRay::ScriptExporter::Export, true);
     RegisterScriptClasses();

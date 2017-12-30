@@ -23,6 +23,16 @@ SCRIPT_EXPORT(CSE_ALifeTraderAbstract, (), {
                          .def("rank", &CSE_ALifeTraderAbstract::Rank)
                          .def("reputation", &CSE_ALifeTraderAbstract::Reputation)];
 });
+#else
+LPCSTR profile_name_script(CSE_ALifeTraderAbstract* ta) { return *ta->character_profile(); }
+SCRIPT_EXPORT(CSE_ALifeTraderAbstract, (), {
+    module(luaState)[class_<CSE_ALifeTraderAbstract>("cse_alife_trader_abstract")
+    //			.def(		constructor<LPCSTR>())
+    //.def("community", &CSE_ALifeTraderAbstract::CommunityName)
+    .def("profile_name", &profile_name_script)
+    //.def("rank", &CSE_ALifeTraderAbstract::Rank)
+    /*.def("reputation", &CSE_ALifeTraderAbstract::Reputation)*/];
+    });
 #endif
 
 SCRIPT_EXPORT(CSE_ALifeTrader, (CSE_ALifeDynamicObjectVisual, CSE_ALifeTraderAbstract), {
