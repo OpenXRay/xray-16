@@ -50,8 +50,8 @@ BOOL APIENTRY DllMain(HANDLE module_handle, DWORD call_reason, LPVOID reserved)
     case DLL_PROCESS_ATTACH:
     {
         //g_temporary_stuff = &trivial_encryptor::decode;
-        xrDebug::Initialize(false);
-        Core.Initialize("xrSE_Factory", nullptr, true, "fsfactory.ltx");
+        //xrDebug::Initialize(false);
+        //Core.Initialize("xrSE_Factory", nullptr, true, "fsfactory.ltx");
         string_path SYSTEM_LTX;
         FS.update_path(SYSTEM_LTX, "$game_config$", "system.ltx");
         pSettings = new CInifile(SYSTEM_LTX);
@@ -76,7 +76,7 @@ BOOL APIENTRY DllMain(HANDLE module_handle, DWORD call_reason, LPVOID reserved)
         xr_delete(g_object_factory);
         if (prop_helper_module)
             prop_helper_module->close();
-        Core._destroy();
+        //Core._destroy();
         break;
     }
     }

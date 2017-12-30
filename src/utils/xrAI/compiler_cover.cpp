@@ -516,16 +516,14 @@ void compute_non_covers()
 
         float cumulative_weight = 0.f;
         {
-            COVERS::const_iterator i = nearest.begin();
-            COVERS::const_iterator e = nearest.end();
-            for (; i != e; ++i)
+            for (auto &i : nearest)
             {
-                if (!vertex_in_direction(u32(I - B), (*i)->level_vertex_id()))
+                if (!vertex_in_direction(u32(I - B), i->level_vertex_id()))
                     continue;
 
-                float weight = 1.f / (*i)->position().distance_to((*I).Pos);
+                float weight = 1.f / i->position().distance_to((*I).Pos);
                 cumulative_weight += weight;
-                cover_pairs.push_back(std::make_pair(weight, *i));
+                cover_pairs.push_back(std::make_pair(weight, i));
             }
         }
 
@@ -552,12 +550,10 @@ void compute_non_covers()
             (*I).low_cover[j] = 0.f;
         }
 
-        COVER_PAIRS::const_iterator i = cover_pairs.begin();
-        COVER_PAIRS::const_iterator e = cover_pairs.end();
-        for (; i != e; ++i)
+        for (auto &i : cover_pairs)
         {
-            vertex& current = g_nodes[(*i).second->level_vertex_id()];
-            float factor = (*i).first / cumulative_weight;
+            vertex& current = g_nodes[i.second->level_vertex_id()];
+            float factor = i.first / cumulative_weight;
             for (int j = 0; j < 4; ++j)
             {
                 (*I).high_cover[j] += factor * current.high_cover[j];
@@ -565,7 +561,7 @@ void compute_non_covers()
             }
         }
 
-        for (int i2 = 0; i2 < 4; ++i)
+        for (int i2 = 0; i2 < 4; ++i2)
         {
             clamp((*I).high_cover[i2], 0.f, 1.f);
             clamp((*I).low_cover[i2], 0.f, 1.f);
