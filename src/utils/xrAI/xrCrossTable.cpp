@@ -30,17 +30,13 @@ void vfRecurseUpdate(u32 dwStartNodeID, u32 percent, u32 iVertexCount)
     Logger.Progress(float(percent) / float(iVertexCount));
     for (; !curr_fringe.empty();)
     {
-        auto I = curr_fringe.begin();
-        auto E = curr_fringe.end();
-        for (; I != E; ++I)
+        for (const auto &i : curr_fringe)
         {
-            (*g_tDistances)[*I] = curr_dist;
-            CLevelGraph::const_iterator i, e;
-            auto node = (*g_tMap).vertex(*I);
-            (*g_tMap).begin(*I, i, e);
-            for (; i != e; ++i)
+            (*g_tDistances)[i] = curr_dist;
+            auto node = (*g_tMap).vertex(i);
+            for (const auto &j : {0, 1, 2, 3})
             {
-                u32 dwNexNodeID = node->link(i);
+                u32 dwNexNodeID = node->link(j);
                 if (!(*g_tMap).valid_vertex_id(dwNexNodeID) || (*g_tMarks)[dwNexNodeID])
                     continue;
                 if ((*g_tDistances)[dwNexNodeID] > curr_dist)
@@ -50,10 +46,8 @@ void vfRecurseUpdate(u32 dwStartNodeID, u32 percent, u32 iVertexCount)
                 }
             }
         }
-        I = curr_fringe.begin();
-        E = curr_fringe.end();
-        for (; I != E; ++I)
-            (*g_tMarks)[*I] = false;
+        for (auto &i : curr_fringe)
+            (*g_tMarks)[i] = false;
 
         total_count += curr_fringe.size();
         curr_fringe = next_fringe;
@@ -66,7 +60,6 @@ void vfRecurseUpdate(u32 dwStartNodeID, u32 percent, u32 iVertexCount)
 
 void vfRecurseMark(const CLevelGraph& tMap, xr_vector<bool>& tMarks, u32 dwStartNodeID)
 {
-    CLevelGraph::const_iterator I, E;
     xr_vector<u32> l_stack;
     l_stack.reserve(8192);
     l_stack.push_back(dwStartNodeID);
@@ -76,11 +69,10 @@ void vfRecurseMark(const CLevelGraph& tMap, xr_vector<bool>& tMarks, u32 dwStart
         dwStartNodeID = l_stack.back();
         l_stack.resize(l_stack.size() - 1);
         auto node = tMap.vertex(dwStartNodeID);
-        tMap.begin(dwStartNodeID, I, E);
         tMarks[dwStartNodeID] = true;
-        for (; I != E; ++I)
+        for (const auto &j : { 0, 1, 2, 3 })
         {
-            u32 dwNexNodeID = node->link(I);
+            u32 dwNexNodeID = node->link(j);
             if (tMap.valid_vertex_id(dwNexNodeID) && !tMarks[dwNexNodeID])
                 l_stack.push_back(dwNexNodeID);
         }
@@ -118,17 +110,12 @@ CCrossTableBuilder::CCrossTableBuilder(LPCSTR caProjectName)
     }
 
     tDistances.resize(iVertexCount);
+
+    for (auto &i : tDistances)
     {
-        auto I = tDistances.begin();
-        auto E = tDistances.end();
-        for (; I != E; I++)
-        {
-            (*I).resize(iNodeCount);
-            auto i = (*I).begin();
-            auto e = (*I).end();
-            for (; i != e; i++)
-                *i = u32(-1);
-        }
+        i.resize(iNodeCount);
+        for (auto &j : i)
+            j = u32(-1);
     }
 
     Logger.Phase("Building cross table");
@@ -164,19 +151,21 @@ CCrossTableBuilder::CCrossTableBuilder(LPCSTR caProjectName)
     {
         for (int i = 0; i < iNodeCount; i++)
         {
-            auto I = tDistances.begin(), B = I;
-            auto E = tDistances.end();
             CGameLevelCrossTable::CCell tCrossTableCell;
             tCrossTableCell.fDistance = flt_max;
             tCrossTableCell.tGraphIndex = u16(-1);
-            for (; I != E; I++)
-                if (float((*I)[i]) * tMap.header().cell_size() < tCrossTableCell.fDistance)
+
+            for (auto &j : tDistances)
+            {
+                if (float(j[i]) * tMap.header().cell_size() < tCrossTableCell.fDistance)
                 {
-                    tCrossTableCell.fDistance = float((*I)[i]) * tMap.header().cell_size();
-                    tCrossTableCell.tGraphIndex = GameGraph::_GRAPH_ID(I - B);
+                    tCrossTableCell.fDistance = float(j[i]) * tMap.header().cell_size();
+                    tCrossTableCell.tGraphIndex = GameGraph::_GRAPH_ID(std::distance(&tDistances.front(), &j));
                 }
+            }
 
             for (int j = 0; j < iVertexCount; j++)
+            {
                 if ((tGraph.vertex(j)->level_vertex_id() == (u32)i) && (tCrossTableCell.tGraphIndex != j))
                 {
                     Msg("! Warning : graph points are too close, therefore cross table is automatically validated");
@@ -185,6 +174,8 @@ CCrossTableBuilder::CCrossTableBuilder(LPCSTR caProjectName)
                     tCrossTableCell.fDistance = float(tDistances[j][i]) * tMap.header().cell_size();
                     tCrossTableCell.tGraphIndex = (GameGraph::_GRAPH_ID)j;
                 }
+            }
+
             tMemoryStream.w(&tCrossTableCell, sizeof(tCrossTableCell));
         }
     }

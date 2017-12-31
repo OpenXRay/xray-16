@@ -133,9 +133,9 @@ void execute(LPSTR cmd)
             R_ASSERT2(hFactory->exist(), "Factory DLL raised exception during loading or there is no factory DLL at all");
 
             create_entity = (Factory_Create*)hFactory->getProcAddress("_create_entity@4");
-            R_ASSERT(create_entity);
-
             destroy_entity = (Factory_Destroy*)hFactory->getProcAddress("_destroy_entity@4");
+
+            R_ASSERT(create_entity);
             R_ASSERT(destroy_entity);
 
             CGameSpawnConstructor(name, output, start, !!no_separator_check);

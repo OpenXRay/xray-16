@@ -8,9 +8,6 @@
 
 #pragma once
 
-#include "Common/LevelStructure.hpp"
-#include "alife_space.h"
-#include "xrAICore/Navigation/game_level_cross_table.h"
 #include "xrAICore/Navigation/game_graph.h"
 #include "xrAICore/Navigation/level_graph.h"
 
