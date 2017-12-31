@@ -2,52 +2,8 @@
 
 #include "Common/Common.hpp"
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
 #include "xrEngine/stdafx.h"
 #include "DPlay/dplay8.h"
-#pragma warning(pop)
-
-#pragma warning(4 : 4018)
-#pragma warning(4 : 4244)
-#pragma warning(disable : 4505)
-
-#if XRAY_EXCEPTIONS
-#define THROW(expr)                                                          \
-    do                                                                       \
-    {                                                                        \
-        if (!(expr))                                                         \
-        {                                                                    \
-            string4096 assertion_info;                                       \
-            xrDebug::GatherInfo(assertion_info, DEBUG_INFO, #expr, 0, 0, 0); \
-            throw assertion_info;                                            \
-        }                                                                    \
-    } while (0)
-#define THROW2(expr, msg0)                                                      \
-    do                                                                          \
-    {                                                                           \
-        if (!(expr))                                                            \
-        {                                                                       \
-            string4096 assertion_info;                                          \
-            xrDebug::GatherInfo(assertion_info, DEBUG_INFO, #expr, msg0, 0, 0); \
-            throw assertion_info;                                               \
-        }                                                                       \
-    } while (0)
-#define THROW3(expr, msg0, msg1)                                                   \
-    do                                                                             \
-    {                                                                              \
-        if (!(expr))                                                               \
-        {                                                                          \
-            string4096 assertion_info;                                             \
-            xrDebug::GatherInfo(assertion_info, DEBUG_INFO, #expr, msg0, msg1, 0); \
-            throw assertion_info;                                                  \
-        }                                                                          \
-    } while (0)
-#else
-#define THROW VERIFY
-#define THROW2 VERIFY2
-#define THROW3 VERIFY3
-#endif
 
 #pragma region
 #include "xrEngine/gamefont.h"

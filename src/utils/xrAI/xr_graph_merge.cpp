@@ -566,8 +566,6 @@ CGraphMerger::CGraphMerger(LPCSTR game_graph_id, LPCSTR name, bool rebuild)
     Logger.Phase("Processing level graphs");
 
     CInifile* Ini = new CInifile(INI_FILE);
-    if (!Ini->section_exist("levels"))
-        THROW(false);
     R_ASSERT(Ini->section_exist("levels"));
 
     tGraphHeader.m_guid = generate_guid();

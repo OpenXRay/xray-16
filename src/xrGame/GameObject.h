@@ -10,6 +10,7 @@
 #include "xrServer_Space.h"
 #include "alife_space.h"
 #include "xrScriptEngine/script_space_forward.hpp"
+#include "xrScriptEngine/DebugMacros.hpp" // XXX: move debug macros to xrCore
 #include "script_binder.h"
 #include "Hit.h"
 #include "game_object_space.h"
