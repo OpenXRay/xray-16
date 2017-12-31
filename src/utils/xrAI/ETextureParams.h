@@ -1,8 +1,4 @@
-//----------------------------------------------------
-// file: TextureParam.h
-//----------------------------------------------------
-#ifndef ETextureParamsH
-#define ETextureParamsH
+#pragma once
 
 #pragma pack(push, 1)
 struct ECORE_API STextureParams
@@ -178,4 +174,3 @@ extern xr_token ttype_token[];
 #define THUMB_HEIGHT 128
 #define THUMB_SIZE THUMB_HEIGHT* THUMB_WIDTH
 //----------------------------------------------------
-#endif /*_INCDEF_TextureParams_H_*/
