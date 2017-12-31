@@ -1,15 +1,9 @@
 #include "stdafx.h"
-#include "xrCore/xr_ini.h"
-#include <process.h>
 #include "xrAI.h"
 
-#include "xr_graph_merge.h"
 #include "game_spawn_constructor.h"
-#include "xrCrossTable.h"
 
-#include "game_graph_builder.h"
 #include <mmsystem.h>
-#include "spawn_patcher.h"
 
 #pragma comment(linker, "/STACK:0x800000,0x400000")
 
@@ -17,6 +11,11 @@
 
 #include "xrCore/cdecl_cast.hpp"
 #include "xrCore/ModuleLookup.hpp"
+
+#include "factory_api.h"
+
+Factory_Create* create_entity = 0;
+Factory_Destroy* destroy_entity = 0;
 
 LevelCompilerLoggerWindow& Logger = LevelCompilerLoggerWindow();
 
@@ -126,7 +125,25 @@ void execute(LPSTR cmd)
             }
             char* no_separator_check = strstr(cmd, "-no_separator_check");
             clear_temp_folder();
+
+            const auto hFactory = std::make_unique<XRay::Module>("xrSE_Factory");
+
+            if (!hFactory->exist())
+                R_CHK(GetLastError());
+            R_ASSERT2(hFactory->exist(), "Factory DLL raised exception during loading or there is no factory DLL at all");
+
+            create_entity = (Factory_Create*)hFactory->getProcAddress("_create_entity@4");
+            R_ASSERT(create_entity);
+
+            destroy_entity = (Factory_Destroy*)hFactory->getProcAddress("_destroy_entity@4");
+            R_ASSERT(destroy_entity);
+
             CGameSpawnConstructor(name, output, start, !!no_separator_check);
+
+            hFactory->close();
+
+            create_entity = nullptr;
+            destroy_entity = nullptr;
         }
         else if (strstr(cmd, "-verify"))
         {
@@ -169,31 +186,12 @@ void Startup(LPSTR lpCmdLine)
     Logger.Destroy();
 }
 
-#include "factory_api.h"
-
-Factory_Create* create_entity = 0;
-Factory_Destroy* destroy_entity = 0;
-
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     xrDebug::Initialize(false);
     Core.Initialize("xrai", 0);
 
-    const auto hFactory = std::make_unique<XRay::Module>("xrSE_Factory");
-
-    if (!hFactory->exist())
-        R_CHK(GetLastError());
-    R_ASSERT2(hFactory->exist(), "Factory DLL raised exception during loading or there is no factory DLL at all");
-
-    create_entity = (Factory_Create*)hFactory->getProcAddress("_create_entity@4");
-    R_ASSERT(create_entity);
-
-    destroy_entity = (Factory_Destroy*)hFactory->getProcAddress("_destroy_entity@4");
-    R_ASSERT(destroy_entity);
-
     Startup(lpCmdLine);
-
-    hFactory->close();
 
     Core._destroy();
 
