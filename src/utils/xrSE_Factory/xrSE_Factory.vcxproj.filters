@@ -73,9 +73,6 @@
     <Filter Include="Scripts\ScriptClasses\ScriptReader">
       <UniqueIdentifier>{f53bea22-78b8-483b-b033-1e2240398964}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Scripts\ScriptDebugger">
-      <UniqueIdentifier>{8eab73bc-759b-4987-a1ac-0e6111512d31}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ServerStuff">
       <UniqueIdentifier>{e1bd4ff6-4a2e-4c3b-be26-8f826540d369}</UniqueIdentifier>
     </Filter>
@@ -263,12 +260,6 @@
     </ClInclude>
     <ClInclude Include="..\..\xrServerEntities\script_rtoken_list_inline.h">
       <Filter>Scripts\ScriptClasses\ScriptIniFile\ScriptRTokenList</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\xrScriptEngine\mslotutils.h">
-      <Filter>Scripts\ScriptDebugger</Filter>
-    </ClInclude>
-    <ClInclude Include="script_debugger_utils.h">
-      <Filter>Scripts\ScriptDebugger</Filter>
     </ClInclude>
     <ClInclude Include="..\..\xrServerEntities\alife_space.h">
       <Filter>ServerStuff\Common\ALifeStuff</Filter>
@@ -481,9 +472,6 @@
     </ClCompile>
     <ClCompile Include="..\..\xrServerEntities\script_reader_script.cpp">
       <Filter>Scripts\ScriptClasses\ScriptReader</Filter>
-    </ClCompile>
-    <ClCompile Include="script_debugger_utils.cpp">
-      <Filter>Scripts\ScriptDebugger</Filter>
     </ClCompile>
     <ClCompile Include="..\..\xrServerEntities\alife_space.cpp">
       <Filter>ServerStuff\Common\ALifeStuff</Filter>
