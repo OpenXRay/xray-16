@@ -210,7 +210,6 @@
     <ClInclude Include="..\..\xrNetServer\NET_Compressor.h" />
     <ClInclude Include="..\..\xrCore\net_utils.h" />
     <ClInclude Include="script_debugger_utils.h" />
-    <ClInclude Include="script_file.h" />
     <ClInclude Include="script_properties_list_helper.h" />
     <ClInclude Include="script_value.h" />
     <ClInclude Include="script_value_inline.h" />
@@ -645,7 +644,6 @@
     <ClCompile Include="ai_space.cpp" />
     <ClCompile Include="properties_list_helper_script.cpp" />
     <ClCompile Include="script_debugger_utils.cpp" />
-    <ClCompile Include="script_file.cpp" />
     <ClCompile Include="script_properties_list_helper.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
