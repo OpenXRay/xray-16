@@ -12,10 +12,9 @@
 #ifndef XRGAME_EXPORTS
 #include "xrSound/Sound.h"
 #endif
-#include "xrEProps.h"
-
+#include "xrServerEntities\xrEProps.h"
+#include "xrServerEntities\script_rtoken_list.h"
 #include "script_space.h"
-#include "script_rtoken_list.h"
 
 class CScriptTokenList;
 

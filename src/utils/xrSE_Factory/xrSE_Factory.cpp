@@ -9,14 +9,14 @@
 #include "stdafx.h"
 #include "xrSE_Factory.h"
 #include "ai_space.h"
+#include "xrCore/ModuleLookup.hpp"
 #include "xrScriptEngine/script_engine.hpp"
-#include "object_factory.h"
+#include "xrServerEntities/object_factory.h"
+#include "xrServerEntities/character_info.h"
+#include "xrServerEntities/specific_character.h"
 #include "xrSE_Factory_import_export.h"
 #include "script_properties_list_helper.h"
-#include "xrCore/ModuleLookup.hpp"
 
-#include "character_info.h"
-#include "specific_character.h"
 
 extern CSE_Abstract* F_entity_Create(LPCSTR section);
 

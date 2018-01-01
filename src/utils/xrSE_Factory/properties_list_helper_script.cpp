@@ -10,10 +10,10 @@
 #include "script_space.h"
 #include "script_properties_list_helper.h"
 #include "ai_space.h"
-#include "xrScriptEngine/script_engine.hpp"
-#include "script_token_list.h"
-#include "xrScriptEngine/ScriptExporter.hpp"
 #include "xrCore/ModuleLookup.hpp"
+#include "xrScriptEngine/script_engine.hpp"
+#include "xrScriptEngine/ScriptExporter.hpp"
+#include "xrServerEntities/script_token_list.h"
 
 using namespace luabind;
 
