@@ -253,7 +253,6 @@
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="xrAI.h" />
     <ClInclude Include="xrCrossTable.h" />
-    <ClInclude Include="xrShaderTypes.h" />
     <ClInclude Include="xr_graph_merge.h" />
   </ItemGroup>
   <ItemGroup>

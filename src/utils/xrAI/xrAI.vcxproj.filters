@@ -203,9 +203,6 @@
     <ClInclude Include="xrAI.h">
       <Filter>Compiler\Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="xrShaderTypes.h">
-      <Filter>Compiler\Kernel</Filter>
-    </ClInclude>
     <ClInclude Include="xrCrossTable.h">
       <Filter>ALife\Cross</Filter>
     </ClInclude>
