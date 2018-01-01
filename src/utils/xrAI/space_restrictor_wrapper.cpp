@@ -42,17 +42,17 @@ bool CSpaceRestrictorWrapper::inside(const Fvector& position, float radius) cons
     {
         switch (i.type)
         {
-        case 0:
+        case CShapeData::cfSphere:
         {
             Fsphere temp;
             m_xform.transform_tiny(temp.P, i.data.sphere.P);
             temp.R = i.data.sphere.R;
             if (sphere.intersect(temp))
-                return (true);
+                return true;
 
             continue;
         }
-        case 1:
+        case CShapeData::cfBox:
         {
             Fmatrix temp;
             temp.mul_43(m_xform, i.data.box);
@@ -97,7 +97,7 @@ bool CSpaceRestrictorWrapper::inside(const Fvector& position, float radius) cons
             plane.build(points[1], points[0], points[6]);
             if (plane.classify(sphere.P) > sphere.R)
                 break;
-            return (true);
+            return true;
         }
         default: NODEFAULT;
         }
@@ -135,7 +135,7 @@ void CSpaceRestrictorWrapper::fill_shape(const CShapeData::shape_def& shape)
     Fvector start, dest;
     switch (shape.type)
     {
-    case 0:
+    case CShapeData::cfSphere:
     {
         start.sub(Fvector().set(shape.data.sphere.P), Fvector().set(shape.data.sphere.R, 0.f, shape.data.sphere.R));
         dest.add(Fvector().set(shape.data.sphere.P), Fvector().set(shape.data.sphere.R, 0.f, shape.data.sphere.R));
@@ -143,7 +143,7 @@ void CSpaceRestrictorWrapper::fill_shape(const CShapeData::shape_def& shape)
         dest.add(object().o_Position);
         break;
     }
-    case 1:
+    case CShapeData::cfBox:
     {
         Fvector points[8] = {Fvector().set(-.5f, -.5f, -.5f), Fvector().set(-.5f, -.5f, +.5f),
             Fvector().set(-.5f, +.5f, -.5f), Fvector().set(-.5f, +.5f, +.5f), Fvector().set(+.5f, -.5f, -.5f),
@@ -207,7 +207,6 @@ struct sort_by_xz_predicate
 
 void CSpaceRestrictorWrapper::build_border()
 {
-    typedef CShapeData::ShapeVec ShapeVec;
     for (auto &i : object().shapes)
         fill_shape(i);
 
@@ -246,27 +245,30 @@ void CSpaceRestrictorWrapper::verify_connectivity()
 
     if (!level_graph().valid_vertex_id(start_vertex_id))
     {
-        Msg("Warning : restrictor %s covers the whole AI map");
+        Msg("Warning : restrictor %s covers the whole AI map", object().name_replace());
         return;
     }
 
-    level_graph().set_mask(m_border);
+    //level_graph().set_mask(m_border);
+    level_graph().set_mask(m_internal);
 
     xr_vector<u32> nodes;
 
     graph_engine().search(level_graph(), start_vertex_id, start_vertex_id, &nodes,
         GraphEngineSpace::CFlooder(GraphEngineSpace::_dist_type(6000), GraphEngineSpace::_iteration_type(-1), u32(-1)));
 
-    level_graph().clear_mask(m_border);
+    //level_graph().clear_mask(m_border);
+    level_graph().clear_mask(m_internal);
 
     VERIFY(nodes.size() + m_internal.size() <= level_graph().header().vertex_count());
     if (nodes.size() + m_internal.size() == level_graph().header().vertex_count())
         return;
 
-    Msg("! %d nodes are disconnected!", level_graph().header().vertex_count() - (nodes.size() + m_internal.size()));
+    Msg("! %7d nodes are disconnected! Restrictor '%s' separates AI map into several disconnected components",
+            level_graph().header().vertex_count() - (nodes.size() + m_internal.size()), object().name_replace());
 
-    R_ASSERT3(nodes.size() + m_internal.size() == level_graph().header().vertex_count(),
-        "Restrictor separates AI map into several disconnected components", object().name_replace());
+    //R_ASSERT3(nodes.size() + m_internal.size() == level_graph().header().vertex_count(),
+    //    "Restrictor separates AI map into several disconnected components", object().name_replace());
 }
 
 void CSpaceRestrictorWrapper::verify(CLevelGraph& level_graph, CGraphEngine& graph_engine, bool no_separator_check)

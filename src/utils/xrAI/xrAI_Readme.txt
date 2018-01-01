@@ -8,7 +8,7 @@ The following keys are supported / required:
 -s <NAME,...>  == build game spawn data
     -out <FILE>         == name of output file (default: 'NAME.spawn')
     -start <NAME>       == name of game start level
-    -no_separator_check == do not verify connectivity between levels
+    -no_separator_check == do not verify that restrictors separates AI map into several disconnected components
 -verify <NAME> == verify compiled 'level.ai'
     -noverbose          == do not print all single linked vertices (print only count)
 
