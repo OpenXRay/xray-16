@@ -61,9 +61,6 @@
     <Filter Include="ALife\Spawn\server_entity_wrapper">
       <UniqueIdentifier>{abd194f2-1c4c-45a2-a498-344b990c1c61}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ALife\Spawn\spawn_patcher">
-      <UniqueIdentifier>{bb8ce383-823f-4aed-ba06-4f466aa15ff3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ALife\Verify">
       <UniqueIdentifier>{1662641a-fb1b-4795-bf6e-272cfc78c210}</UniqueIdentifier>
     </Filter>
@@ -152,9 +149,6 @@
     </ClCompile>
     <ClCompile Include="server_entity_wrapper.cpp">
       <Filter>ALife\Spawn\server_entity_wrapper</Filter>
-    </ClCompile>
-    <ClCompile Include="spawn_patcher.cpp">
-      <Filter>ALife\Spawn\spawn_patcher</Filter>
     </ClCompile>
     <ClCompile Include="verify_level_graph.cpp">
       <Filter>ALife\Verify</Filter>
@@ -334,9 +328,6 @@
     </ClInclude>
     <ClInclude Include="server_entity_wrapper_inline.h">
       <Filter>ALife\Spawn\server_entity_wrapper</Filter>
-    </ClInclude>
-    <ClInclude Include="spawn_patcher.h">
-      <Filter>ALife\Spawn\spawn_patcher</Filter>
     </ClInclude>
     <ClInclude Include="guid_generator.h">
       <Filter>ALife\guid_generator</Filter>

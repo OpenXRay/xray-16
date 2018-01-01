@@ -178,7 +178,6 @@
     <ClCompile Include="level_spawn_constructor.cpp" />
     <ClCompile Include="server_entity_wrapper.cpp" />
     <ClCompile Include="space_restrictor_wrapper.cpp" />
-    <ClCompile Include="spawn_patcher.cpp" />
     <ClCompile Include="StdAfx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -248,7 +247,6 @@
     <ClInclude Include="space_restrictor_wrapper.h" />
     <ClInclude Include="space_restrictor_wrapper_inline.h" />
     <ClInclude Include="spawn_constructor_space.h" />
-    <ClInclude Include="spawn_patcher.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="xrAI.h" />
     <ClInclude Include="xr_graph_merge.h" />
