@@ -164,9 +164,6 @@
     <ClInclude Include="compiler.h">
       <Filter>Compiler</Filter>
     </ClInclude>
-    <ClInclude Include="ETextureParams.h">
-      <Filter>Compiler</Filter>
-    </ClInclude>
     <ClInclude Include="..\Shader_xrLC.h">
       <Filter>Compiler</Filter>
     </ClInclude>

@@ -228,7 +228,6 @@
     <ClInclude Include="compiler.h" />
     <ClInclude Include="cover_point.h" />
     <ClInclude Include="cover_point_inline.h" />
-    <ClInclude Include="ETextureParams.h" />
     <ClInclude Include="factory_api.h" />
     <ClInclude Include="game_graph_builder.h" />
     <ClInclude Include="game_graph_builder_inline.h" />

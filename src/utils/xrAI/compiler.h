@@ -5,7 +5,7 @@
 #include "utils/Shader_xrLC.h"
 #include "xrAICore/Navigation/level_graph.h"
 #include "editors/LevelEditor/Engine/communicate.h"
-#include "Etextureparams.h"
+#include "Layers/xrRender/ETextureParams.h"
 
 // base patch used all the time up to merging
 const u32 InvalidNode = (1 << 24) - 1;
