@@ -135,15 +135,11 @@ bool IGame_Level::Load(u32 dwNum)
     return true;
 }
 
-#ifndef _EDITOR
-#include "xrCore/Threading/ttapi.h"
-#endif
-
 int psNET_DedicatedSleep = 5;
 void IGame_Level::OnRender()
 {
 #ifndef DEDICATED_SERVER
-// if (_abs(Device.fTimeDelta)<EPS_S) return;
+    // if (_abs(Device.fTimeDelta)<EPS_S) return;
 
 #ifdef _GPA_ENABLED
     TAL_ID rtID = TAL_MakeID(1, Core.dwFrame, 0);
@@ -168,9 +164,9 @@ void IGame_Level::OnRender()
     TAL_RetireID(rtID);
 #endif // _GPA_ENABLED
 
-// Font
-// pApp->pFontSystem->SetSizeI(0.023f);
-// pApp->pFontSystem->OnRender ();
+    // Font
+    // pApp->pFontSystem->SetSizeI(0.023f);
+    // pApp->pFontSystem->OnRender();
 #endif
 }
 

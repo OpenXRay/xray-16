@@ -3,7 +3,7 @@
 #include "ParticleEffect.h"
 #ifndef _EDITOR
 #include <xmmintrin.h>
-#include "xrCore/Threading/ttapi.h"
+#include "xrCore/Threading/ThreadPool.hpp"
 #endif
 
 using namespace PAPI;
@@ -434,7 +434,7 @@ __forceinline void magnitude_sse(Fvector& vec, float& res)
     _mm_store_ss((float*)&res, tv);
 }
 
-void ParticleRenderStream(LPVOID lpvParams)
+void ParticleRenderStream(void* lpvParams)
 {
 #ifdef _GPA_ENABLED
     TAL_SCOPED_TASK_NAMED("ParticleRenderStream()");
@@ -587,10 +587,10 @@ void CParticleEffect::Render(float)
             FVF::LIT* pv_start = (FVF::LIT*)RCache.Vertex.Lock(p_cnt * 4 * 4, geom->vb_stride, dwOffset);
             FVF::LIT* pv = pv_start;
 
-            u32 nWorkers = ttapi_GetWorkerCount();
+            u32 nWorkers = ttapi.threads.size();
 
-            if (p_cnt < nWorkers * 64)
-                nWorkers = 1;
+            if (p_cnt < nWorkers)
+                nWorkers = p_cnt;
 
             PRS_PARAMS* prsParams = (PRS_PARAMS*)_alloca(sizeof(PRS_PARAMS) * nWorkers);
 
@@ -610,10 +610,10 @@ void CParticleEffect::Render(float)
                 prsParams[i].p_to = (i == (nWorkers - 1)) ? p_cnt : (prsParams[i].p_from + nStep);
                 prsParams[i].particles = particles;
                 prsParams[i].pPE = this;
-                ttapi_AddWorker(ParticleRenderStream, (LPVOID)&prsParams[i]);
+                ttapi.threads[i]->addJob([=] { ParticleRenderStream((void*)&prsParams[i]); });
             }
 
-            ttapi_Run();
+            ttapi.wait();
 
             dwCount = p_cnt << 2;
 

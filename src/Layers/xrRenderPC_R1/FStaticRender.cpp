@@ -15,9 +15,6 @@
 #include "Layers/xrRender/lighttrack.h"
 #include "Layers/xrRender/dxWallMarkArray.h"
 #include "Layers/xrRender/dxUIShader.h"
-#ifndef _EDITOR
-#include "xrCore/Threading/ttapi.h"
-#endif
 
 using namespace R_dsgraph;
 

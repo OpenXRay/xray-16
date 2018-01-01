@@ -6,7 +6,7 @@
 #include <mmsystem.h>
 #include <objbase.h>
 #include "xrCore.h"
-#include "Threading/ttapi.h"
+#include "Threading/ThreadPool.hpp"
 #include "Math/MathUtil.hpp"
 
 #pragma comment(lib, "winmm.lib")
@@ -76,7 +76,7 @@ void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pc
         Msg("%s %s build %d, %s\n", "xdOpenXRay", GetBuildConfiguration(), buildId, buildDate);
         _initialize_cpu();
         R_ASSERT(CPU::ID.hasFeature(CpuFeature::Sse));
-        ttapi_Init(CPU::ID);
+        ttapi.initialize();
         XRay::Math::Initialize();
         // xrDebug::Initialize ();
 
@@ -132,7 +132,6 @@ void xrCore::_destroy()
     --init_counter;
     if (0 == init_counter)
     {
-        ttapi_Done();
         FS._destroy();
         EFS._destroy();
         xr_delete(xr_FS);

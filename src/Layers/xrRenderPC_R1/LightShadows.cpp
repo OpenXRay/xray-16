@@ -4,9 +4,6 @@
 #include "xrEngine/xr_object.h"
 #include "Layers/xrRender/FBasicVisual.h"
 #include "xrEngine/CustomHUD.h"
-#ifndef _EDITOR
-#include "xrCore/Threading/ttapi.h"
-#endif
 #include "xrCore/Math/MathUtil.hpp"
 using namespace XRay::Math;
 
@@ -353,6 +350,7 @@ IC bool cache_search(const CLightShadows::cache_item& A, const CLightShadows::ca
     return false; // eq
 }
 
+// XXX: use PLC_energy from xrCore
 IC float PLC_energy(Fvector& P, Fvector& N, light* L, float E)
 {
     Fvector Ldir;
@@ -386,6 +384,7 @@ IC float PLC_energy(Fvector& P, Fvector& N, light* L, float E)
     }
 }
 
+// XXX: use PLC_calc from xrCore (maybe)
 IC int PLC_calc(Fvector& P, Fvector& N, light* L, float energy, Fvector& O)
 {
     float E = PLC_energy(P, N, L, energy);
