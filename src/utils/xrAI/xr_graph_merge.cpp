@@ -11,8 +11,8 @@
 #include "xrAI.h"
 #include "xrServer_Objects_ALife_All.h"
 #include "factory_api.h"
-#include "xrCrossTable.h"
 #include "Common/object_broker.h"
+#include "xrAICore/Navigation/level_graph.h"
 #include "spawn_constructor_space.h"
 #include "guid_generator.h"
 #include "game_graph_builder.h"
@@ -93,7 +93,7 @@ public:
         m_dwOffset = dwOffset;
         m_tpLevelPoints.clear();
 
-        FILE_NAME caFileName;
+        string_path caFileName;
 
         // loading graph
         xr_strcpy(caFileName, graph_file_name);

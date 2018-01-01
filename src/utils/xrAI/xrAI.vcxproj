@@ -189,7 +189,6 @@
     </ClCompile>
     <ClCompile Include="verify_level_graph.cpp" />
     <ClCompile Include="xrAI.cpp" />
-    <ClCompile Include="xrCrossTable.cpp" />
     <ClCompile Include="xr_graph_merge.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -252,7 +251,6 @@
     <ClInclude Include="spawn_patcher.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="xrAI.h" />
-    <ClInclude Include="xrCrossTable.h" />
     <ClInclude Include="xr_graph_merge.h" />
   </ItemGroup>
   <ItemGroup>

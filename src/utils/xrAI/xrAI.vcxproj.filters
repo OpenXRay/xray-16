@@ -16,9 +16,6 @@
     <Filter Include="ALife">
       <UniqueIdentifier>{d720c170-292f-489f-8660-5e5f3f895e3d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ALife\Cross">
-      <UniqueIdentifier>{89d213ba-d4f4-436e-831f-afd1d39dcb08}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ALife\Graph">
       <UniqueIdentifier>{f4a43bfd-7b1d-42d7-8fa1-7283b213c52e}</UniqueIdentifier>
     </Filter>
@@ -98,9 +95,6 @@
     </ClCompile>
     <ClCompile Include="xrAI.cpp">
       <Filter>Compiler\Kernel</Filter>
-    </ClCompile>
-    <ClCompile Include="xrCrossTable.cpp">
-      <Filter>ALife\Cross</Filter>
     </ClCompile>
     <ClCompile Include="game_graph_builder.cpp">
       <Filter>ALife\Graph</Filter>
@@ -202,9 +196,6 @@
     </ClInclude>
     <ClInclude Include="xrAI.h">
       <Filter>Compiler\Kernel</Filter>
-    </ClInclude>
-    <ClInclude Include="xrCrossTable.h">
-      <Filter>ALife\Cross</Filter>
     </ClInclude>
     <ClInclude Include="game_graph_builder.h">
       <Filter>ALife\Graph</Filter>
