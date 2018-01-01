@@ -144,19 +144,8 @@ void xrLoad(LPCSTR name, bool draft_mode)
                         IReader* THM = FS.r_open("$game_textures$", N);
                         R_ASSERT2(THM, N);
 
-                        // version
-                        u32 version = 0;
-                        R_ASSERT(THM->r_chunk(THM_CHUNK_VERSION, &version));
                         // analyze thumbnail information
-                        R_ASSERT(THM->find_chunk(THM_CHUNK_TEXTUREPARAM));
-                        THM->r(&BT.THM.fmt, sizeof(STextureParams::ETFormat));
-                        BT.THM.flags.assign(THM->r_u32());
-                        BT.THM.border_color = THM->r_u32();
-                        BT.THM.fade_color = THM->r_u32();
-                        BT.THM.fade_amount = THM->r_u32();
-                        BT.THM.mip_filter = THM->r_u32();
-                        BT.THM.width = THM->r_u32();
-                        BT.THM.height = THM->r_u32();
+                        BT.THM.Load(*THM);
                         BOOL bLOD = FALSE;
                         if (N[0] == 'l' && N[1] == 'o' && N[2] == 'd' && N[3] == '\\')
                             bLOD = TRUE;

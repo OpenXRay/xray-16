@@ -154,6 +154,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Layers\xrRender\ETextureParams.cpp" />
     <ClCompile Include="..\..\xrEngine\xrLoadSurface.cpp" />
     <ClCompile Include="..\..\xrServerEntities\alife_human_brain.cpp" />
     <ClCompile Include="..\..\xrServerEntities\alife_monster_brain.cpp" />
@@ -191,6 +192,7 @@
     <ClCompile Include="xr_graph_merge.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Layers\xrRender\ETextureParams.h" />
     <ClInclude Include="..\..\xrServerEntities\alife_human_brain.h" />
     <ClInclude Include="..\..\xrServerEntities\alife_human_brain_inline.h" />
     <ClInclude Include="..\..\xrServerEntities\alife_monster_brain.h" />
