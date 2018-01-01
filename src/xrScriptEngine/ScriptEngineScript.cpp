@@ -68,11 +68,7 @@ void verify_if_thread_is_running()
 
 bool is_editor()
 {
-#ifdef EDITOR
-    return true;
-#else
-    return false;
-#endif
+    return GEnv.ScriptEngine->is_editor();
 }
 
 inline int bit_and(const int i, const int j) { return i & j; }
