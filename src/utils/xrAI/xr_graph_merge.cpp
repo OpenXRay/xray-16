@@ -9,10 +9,8 @@
 #include "stdafx.h"
 #include "xr_graph_merge.h"
 #include "xrAI.h"
-#include "xrServer_Objects_ALife_All.h"
 #include "factory_api.h"
 #include "Common/object_broker.h"
-#include "xrAICore/Navigation/level_graph.h"
 #include "spawn_constructor_space.h"
 #include "guid_generator.h"
 #include "game_graph_builder.h"
@@ -22,8 +20,6 @@ extern LPCSTR GAME_CONFIG;
 
 using namespace SpawnConstructorSpace;
 using namespace ALife;
-
-class CLevelGameGraph;
 
 typedef struct tagSConnectionVertex
 {

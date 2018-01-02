@@ -8,14 +8,9 @@
 
 #include "stdafx.h"
 #include "level_spawn_constructor.h"
-#include "xrAICore/Navigation/graph_engine.h"
-#include "xrAICore/Navigation/PatrolPath/patrol_path_storage.h"
-#include "xrServer_Objects_ALife_All.h"
+#include "xrServerEntities/restriction_space.h"
+#include "xrServerEntities/clsid_game.h"
 #include "factory_api.h"
-#include "clsid_game.h"
-#include "game_spawn_constructor.h"
-#include "space_restrictor_wrapper.h"
-#include "restriction_space.h"
 
 #define IGNORE_ZERO_SPAWN_POSITIONS
 

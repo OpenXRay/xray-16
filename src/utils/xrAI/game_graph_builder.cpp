@@ -8,9 +8,7 @@
 
 #include "stdafx.h"
 #include "game_graph_builder.h"
-#include "xrAICore/Navigation/graph_abstract.h"
-#include "xrAICore/Navigation/graph_engine.h"
-#include "xrServer_Objects_ALife.h"
+#include "xrServerEntities/xrServer_Objects_ALife.h"
 #include "factory_api.h"
 #include "guid_generator.h"
 

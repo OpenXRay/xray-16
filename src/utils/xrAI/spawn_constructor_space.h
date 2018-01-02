@@ -9,8 +9,7 @@
 #pragma once
 
 #include "xrAICore/Navigation/game_graph.h"
-
-class CSE_ALifeLevelChanger;
+#include "xrServerEntities/xrServer_Objects_ALife_All.h"
 
 namespace SpawnConstructorSpace
 {

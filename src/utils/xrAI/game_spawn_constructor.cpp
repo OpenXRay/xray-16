@@ -8,10 +8,9 @@
 
 #include "stdafx.h"
 #include "game_spawn_constructor.h"
-#include "level_spawn_constructor.h"
-#include "xrServer_Objects_ALife_All.h"
 #include "xrAICore/Navigation/graph_engine.h"
 #include "xrAICore/Navigation/PatrolPath/patrol_path_storage.h"
+#include "level_spawn_constructor.h"
 #include "xrAI.h"
 
 extern LPCSTR GAME_CONFIG;
