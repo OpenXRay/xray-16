@@ -23,3 +23,11 @@
 #endif
 
 #define UNUSED(...) (void)(__VA_ARGS__)
+
+#ifndef _CPPUNWIND//def NDEBUG
+#define XR_NOEXCEPT throw()
+#define XR_NOEXCEPT_OP(x)
+#else
+#define XR_NOEXCEPT noexcept
+#define XR_NOEXCEPT_OP(x) noexcept(x)
+#endif

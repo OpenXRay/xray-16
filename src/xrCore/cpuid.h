@@ -2,17 +2,6 @@
 #ifndef _INC_CPUID
 #define _INC_CPUID
 
-#ifndef xrCoreH
-// If xrCore.h is not included then compilation fails
-// This fixes it.
-// XXX: Find a better solution
-#ifdef NDEBUG
-#define XR_NOEXCEPT throw()
-#else
-#define XR_NOEXCEPT noexcept
-#endif
-#endif
-
 enum class CpuFeature : u32
 {
     Mmx = 0x0001,
