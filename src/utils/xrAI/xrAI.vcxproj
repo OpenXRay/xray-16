@@ -226,7 +226,6 @@
     <ClInclude Include="..\..\xrServerEntities\xrServer_Objects_ALife_Monsters.h" />
     <ClInclude Include="..\..\xrServerEntities\xrServer_Object_Base.h" />
     <ClInclude Include="..\..\xrServerEntities\xrServer_Space.h" />
-    <ClInclude Include="AIMapExport.h" />
     <ClInclude Include="compiler.h" />
     <ClInclude Include="cover_point.h" />
     <ClInclude Include="cover_point_inline.h" />

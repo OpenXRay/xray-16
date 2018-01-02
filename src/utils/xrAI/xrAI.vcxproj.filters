@@ -161,9 +161,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AIMapExport.h">
-      <Filter>Compiler</Filter>
-    </ClInclude>
     <ClInclude Include="compiler.h">
       <Filter>Compiler</Filter>
     </ClInclude>
