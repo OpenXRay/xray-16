@@ -127,7 +127,7 @@ void execute(LPSTR cmd)
                 R_CHK(GetLastError());
             R_ASSERT2(hFactory->exist(), "Factory DLL raised exception during loading or there is no factory DLL at all");
 
-#ifdef _WIN64
+#ifdef XR_X64
             pcstr create_entity_name = "create_entity";
             pcstr destroy_entity_name = "destroy_entity";
 #else
