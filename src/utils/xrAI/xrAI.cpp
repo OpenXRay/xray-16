@@ -127,8 +127,15 @@ void execute(LPSTR cmd)
                 R_CHK(GetLastError());
             R_ASSERT2(hFactory->exist(), "Factory DLL raised exception during loading or there is no factory DLL at all");
 
-            create_entity = (Factory_Create*)hFactory->getProcAddress("_create_entity@4");
-            destroy_entity = (Factory_Destroy*)hFactory->getProcAddress("_destroy_entity@4");
+#ifdef _WIN64
+            pcstr create_entity_name = "create_entity";
+            pcstr destroy_entity_name = "destroy_entity";
+#else
+            pcstr create_entity_name = "_create_entity@4";
+            pcstr destroy_entity_name = "_destroy_entity@4";
+#endif
+            create_entity = (Factory_Create*)hFactory->getProcAddress(create_entity_name);
+            destroy_entity = (Factory_Destroy*)hFactory->getProcAddress(destroy_entity_name);
 
             R_ASSERT(create_entity);
             R_ASSERT(destroy_entity);

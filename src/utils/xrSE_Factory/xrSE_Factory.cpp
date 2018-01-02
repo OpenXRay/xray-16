@@ -17,7 +17,6 @@
 #include "xrSE_Factory_import_export.h"
 #include "script_properties_list_helper.h"
 
-
 extern CSE_Abstract* F_entity_Create(LPCSTR section);
 
 extern CScriptPropertiesListHelper* g_property_list_helper;
@@ -33,23 +32,12 @@ FACTORY_API void __stdcall destroy_entity(IServerEntity*& abstract)
 }
 };
 
-// !!!!!!! Very ugly fix !!!!!!!
-XRay::ScriptExporter::Node* XRay::ScriptExporter::Node::firstNode;
-XRay::ScriptExporter::Node* XRay::ScriptExporter::Node::lastNode;
-size_t XRay::ScriptExporter::Node::nodeCount;
-
-// typedef void DUMMY_STUFF (const void*,const u32&,void*);
-// XRCORE_API DUMMY_STUFF    *g_temporary_stuff;
-
-//#define TRIVIAL_ENCRYPTOR_DECODER
-
 BOOL APIENTRY DllMain(HANDLE module_handle, DWORD call_reason, LPVOID reserved)
 {
     switch (call_reason)
     {
     case DLL_PROCESS_ATTACH:
     {
-        //g_temporary_stuff = &trivial_encryptor::decode;
         //xrDebug::Initialize(false);
         //Core.Initialize("xrSE_Factory", nullptr, true, "fsfactory.ltx");
         string_path SYSTEM_LTX;

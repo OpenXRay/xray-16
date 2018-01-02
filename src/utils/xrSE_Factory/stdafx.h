@@ -8,9 +8,8 @@
 
 #pragma once
 
-#define ENGINE_API
+// Hack to Include\xrRender\DrawUtils.h (used and defined in editors)
 #define ECORE_API
-#define XRSCRIPTENGINE_EXPORTS
 
 #include "Common/Common.hpp"
 #include "xrCore/xrCore.h"
