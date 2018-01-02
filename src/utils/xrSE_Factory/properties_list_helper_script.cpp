@@ -10,10 +10,10 @@
 #include "script_space.h"
 #include "script_properties_list_helper.h"
 #include "ai_space.h"
-#include "xrScriptEngine/script_engine.hpp"
-#include "script_token_list.h"
-#include "xrScriptEngine/ScriptExporter.hpp"
 #include "xrCore/ModuleLookup.hpp"
+#include "xrScriptEngine/script_engine.hpp"
+#include "xrScriptEngine/ScriptExporter.hpp"
+#include "xrServerEntities/script_token_list.h"
 
 using namespace luabind;
 
@@ -99,11 +99,11 @@ SCRIPT_EXPORT(
                 .def("vector_on_after_edit", &CScriptPropertiesListHelper::FvectorRDOnAfterEdit)
                 .def("vector_on_before_edit", &CScriptPropertiesListHelper::FvectorRDOnBeforeEdit)
                 //			.def("vector_on_draw",			&CScriptPropertiesListHelper::FvectorRDOnDraw)
-                .def("float_on_after_edit", &CScriptPropertiesListHelper::floatRDOnAfterEdit)
-                .def("float_on_before_edit", &CScriptPropertiesListHelper::floatRDOnBeforeEdit)
+                .def("float_on_after_edit", &CScriptPropertiesListHelper::floatRDOnAfterEdit, luabind::policy::out_value<3>())
+                .def("float_on_before_edit", &CScriptPropertiesListHelper::floatRDOnBeforeEdit, luabind::policy::out_value<3>())
                 //			.def("float_on_draw",			&CScriptPropertiesListHelper::floatRDOnDraw)
-                .def("name_after_edit", &CScriptPropertiesListHelper::NameAfterEdit)
-                .def("name_before_edit", &CScriptPropertiesListHelper::NameBeforeEdit)
+                .def("name_after_edit", &CScriptPropertiesListHelper::NameAfterEdit, luabind::policy::pure_out_value<3>())
+                .def("name_before_edit", &CScriptPropertiesListHelper::NameBeforeEdit, luabind::policy::pure_out_value<3>())
                 //			.def("name_on_draw",			&CScriptPropertiesListHelper::NameDraw)
 
                 .def("create_caption", &CScriptPropertiesListHelper::CreateCaption)

@@ -6,22 +6,22 @@
 //  Description : Precompiled header creatore
 ////////////////////////////////////////////////////////////////////////////
 
-#include "pch_script.h"
+#include "stdafx.h"
 #include "xrSE_Factory.h"
 #include "ai_space.h"
+#include "xrCore/ModuleLookup.hpp"
 #include "xrScriptEngine/script_engine.hpp"
-#include "object_factory.h"
-#include "xrEProps.h"
+#include "xrServerEntities/object_factory.h"
+#include "xrServerEntities/character_info.h"
+#include "xrServerEntities/specific_character.h"
 #include "xrSE_Factory_import_export.h"
 #include "script_properties_list_helper.h"
 
-#include "character_info.h"
-#include "specific_character.h"
 
 extern CSE_Abstract* F_entity_Create(LPCSTR section);
 
 extern CScriptPropertiesListHelper* g_property_list_helper;
-extern HMODULE prop_helper_module;
+extern std::unique_ptr<XRay::Module> prop_helper_module;
 
 extern "C" {
 FACTORY_API IServerEntity* __stdcall create_entity(LPCSTR section) { return F_entity_Create(section); }
@@ -33,10 +33,13 @@ FACTORY_API void __stdcall destroy_entity(IServerEntity*& abstract)
 }
 };
 
+// !!!!!!! Very ugly fix !!!!!!!
+XRay::ScriptExporter::Node* XRay::ScriptExporter::Node::firstNode;
+XRay::ScriptExporter::Node* XRay::ScriptExporter::Node::lastNode;
+size_t XRay::ScriptExporter::Node::nodeCount;
+
 // typedef void DUMMY_STUFF (const void*,const u32&,void*);
 // XRCORE_API DUMMY_STUFF    *g_temporary_stuff;
-
-void setup_luabind_allocator();
 
 //#define TRIVIAL_ENCRYPTOR_DECODER
 
@@ -47,13 +50,11 @@ BOOL APIENTRY DllMain(HANDLE module_handle, DWORD call_reason, LPVOID reserved)
     case DLL_PROCESS_ATTACH:
     {
         //g_temporary_stuff = &trivial_encryptor::decode;
-        xrDebug::Initialize(false);
-        Core.Initialize("xrSE_Factory", nullptr, true, "fsfactory.ltx");
+        //xrDebug::Initialize(false);
+        //Core.Initialize("xrSE_Factory", nullptr, true, "fsfactory.ltx");
         string_path SYSTEM_LTX;
         FS.update_path(SYSTEM_LTX, "$game_config$", "system.ltx");
         pSettings = new CInifile(SYSTEM_LTX);
-
-        setup_luabind_allocator();
 
         CCharacterInfo::InitInternal();
         CSpecificCharacter::InitInternal();
@@ -74,8 +75,8 @@ BOOL APIENTRY DllMain(HANDLE module_handle, DWORD call_reason, LPVOID reserved)
         xr_delete(g_ai_space);
         xr_delete(g_object_factory);
         if (prop_helper_module)
-            FreeLibrary(prop_helper_module);
-        Core._destroy();
+            prop_helper_module->close();
+        //Core._destroy();
         break;
     }
     }

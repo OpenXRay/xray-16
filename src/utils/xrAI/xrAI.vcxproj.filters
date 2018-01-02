@@ -16,9 +16,6 @@
     <Filter Include="ALife">
       <UniqueIdentifier>{d720c170-292f-489f-8660-5e5f3f895e3d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ALife\Cross">
-      <UniqueIdentifier>{89d213ba-d4f4-436e-831f-afd1d39dcb08}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ALife\Graph">
       <UniqueIdentifier>{f4a43bfd-7b1d-42d7-8fa1-7283b213c52e}</UniqueIdentifier>
     </Filter>
@@ -64,9 +61,6 @@
     <Filter Include="ALife\Spawn\server_entity_wrapper">
       <UniqueIdentifier>{abd194f2-1c4c-45a2-a498-344b990c1c61}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ALife\Spawn\spawn_patcher">
-      <UniqueIdentifier>{bb8ce383-823f-4aed-ba06-4f466aa15ff3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ALife\Verify">
       <UniqueIdentifier>{1662641a-fb1b-4795-bf6e-272cfc78c210}</UniqueIdentifier>
     </Filter>
@@ -98,9 +92,6 @@
     </ClCompile>
     <ClCompile Include="xrAI.cpp">
       <Filter>Compiler\Kernel</Filter>
-    </ClCompile>
-    <ClCompile Include="xrCrossTable.cpp">
-      <Filter>ALife\Cross</Filter>
     </ClCompile>
     <ClCompile Include="game_graph_builder.cpp">
       <Filter>ALife\Graph</Filter>
@@ -159,24 +150,18 @@
     <ClCompile Include="server_entity_wrapper.cpp">
       <Filter>ALife\Spawn\server_entity_wrapper</Filter>
     </ClCompile>
-    <ClCompile Include="spawn_patcher.cpp">
-      <Filter>ALife\Spawn\spawn_patcher</Filter>
-    </ClCompile>
     <ClCompile Include="verify_level_graph.cpp">
       <Filter>ALife\Verify</Filter>
     </ClCompile>
     <ClCompile Include="guid_generator.cpp">
       <Filter>ALife\guid_generator</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Layers\xrRender\ETextureParams.cpp">
+      <Filter>Compiler</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AIMapExport.h">
-      <Filter>Compiler</Filter>
-    </ClInclude>
     <ClInclude Include="compiler.h">
-      <Filter>Compiler</Filter>
-    </ClInclude>
-    <ClInclude Include="ETextureParams.h">
       <Filter>Compiler</Filter>
     </ClInclude>
     <ClInclude Include="..\Shader_xrLC.h">
@@ -202,12 +187,6 @@
     </ClInclude>
     <ClInclude Include="xrAI.h">
       <Filter>Compiler\Kernel</Filter>
-    </ClInclude>
-    <ClInclude Include="xrShaderTypes.h">
-      <Filter>Compiler\Kernel</Filter>
-    </ClInclude>
-    <ClInclude Include="xrCrossTable.h">
-      <Filter>ALife\Cross</Filter>
     </ClInclude>
     <ClInclude Include="game_graph_builder.h">
       <Filter>ALife\Graph</Filter>
@@ -347,14 +326,14 @@
     <ClInclude Include="server_entity_wrapper_inline.h">
       <Filter>ALife\Spawn\server_entity_wrapper</Filter>
     </ClInclude>
-    <ClInclude Include="spawn_patcher.h">
-      <Filter>ALife\Spawn\spawn_patcher</Filter>
-    </ClInclude>
     <ClInclude Include="guid_generator.h">
       <Filter>ALife\guid_generator</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Layers\xrRender\ETextureParams.h">
+      <Filter>Compiler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

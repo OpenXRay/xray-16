@@ -15,6 +15,8 @@ class CAI_Space
 private:
     CScriptEngine* m_script_engine;
 
+    void RegisterScriptClasses();
+
 public:
     CAI_Space();
     virtual ~CAI_Space();

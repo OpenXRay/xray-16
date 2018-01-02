@@ -18,7 +18,9 @@ protected:
     typedef CObjectItemAbstract inherited;
 
 protected:
+#ifndef NO_XR_GAME
     mutable luabind::functor<ObjectFactory::ClientObjectBaseClass*, luabind::policy::adopt<0>> m_client_creator;
+#endif
     mutable luabind::functor<ObjectFactory::ServerObjectBaseClass*, luabind::policy::adopt<0>> m_server_creator;
 
 public:

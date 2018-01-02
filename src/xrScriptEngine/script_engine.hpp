@@ -86,6 +86,7 @@ private:
     bool bindingsDumped = false;
     char* scriptBuffer = nullptr;
     size_t scriptBufferSize = 0;
+    bool m_is_editor;
 
 protected:
     CScriptProcessStorage m_script_processes;
@@ -148,7 +149,7 @@ public:
     void print_stack();
 
     using ExporterFunc = XRay::ScriptExporter::Node::ExporterFunc;
-    CScriptEngine();
+    CScriptEngine(bool is_editor = false);
     virtual ~CScriptEngine();
     void init(ExporterFunc exporterFunc, bool loadGlobalNamespace);
     virtual void unload();
@@ -194,6 +195,7 @@ public:
     CScriptThread* CreateScriptThread(LPCSTR caNamespaceName, bool do_string = false, bool reload = false);
     // This function is called from CScriptThread destructor
     void DestroyScriptThread(const CScriptThread* thread);
+    bool is_editor();
 };
 
 template <typename TResult>

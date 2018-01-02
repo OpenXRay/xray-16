@@ -1,15 +1,9 @@
 #include "stdafx.h"
-#include "xrCore/xr_ini.h"
-#include <process.h>
 #include "xrAI.h"
 
-#include "xr_graph_merge.h"
 #include "game_spawn_constructor.h"
-#include "xrCrossTable.h"
 
-#include "game_graph_builder.h"
 #include <mmsystem.h>
-#include "spawn_patcher.h"
 
 #pragma comment(linker, "/STACK:0x800000,0x400000")
 
@@ -17,6 +11,11 @@
 
 #include "xrCore/cdecl_cast.hpp"
 #include "xrCore/ModuleLookup.hpp"
+
+#include "factory_api.h"
+
+Factory_Create* create_entity = 0;
+Factory_Destroy* destroy_entity = 0;
 
 LevelCompilerLoggerWindow& Logger = LevelCompilerLoggerWindow();
 
@@ -40,13 +39,10 @@ extern void xrCompiler(LPCSTR name, bool draft_mode, bool pure_covers, LPCSTR ou
 extern void verify_level_graph(LPCSTR name, bool verbose);
 
 static const char* h_str =
-    "The following keys are supported / required:\n"
-    "-? or -h   == this help\n"
-    "-f<NAME>   == compile level in gamedata/levels/<NAME>/\n"
-    "-o         == modify build options\n"
-    "-s         == build game spawn data\n"
-    "\n"
-    "NOTE: The last key is required for any functionality\n";
+    "-? or -h == this help\n"
+    "-f <NAME> == compile level.ai\n"
+    "-s <NAME,...> == build game spawn data\n"
+    "-verify <NAME> == verify compiled level.ai\n";
 
 void Help() { MessageBox(0, h_str, "Command line options", MB_OK | MB_ICONINFORMATION); }
 string_path INI_FILE;
@@ -64,8 +60,6 @@ void execute(LPSTR cmd)
         sscanf(strstr(cmd, "-f") + 2, "%s", name);
     else if (strstr(cmd, "-s"))
         sscanf(strstr(cmd, "-s") + 2, "%s", name);
-    else if (strstr(cmd, "-t"))
-        sscanf(strstr(cmd, "-t") + 2, "%s", name);
     else if (strstr(cmd, "-verify"))
         sscanf(strstr(cmd, "-verify") + xr_strlen("-verify"), "%s", name);
 
@@ -126,7 +120,25 @@ void execute(LPSTR cmd)
             }
             char* no_separator_check = strstr(cmd, "-no_separator_check");
             clear_temp_folder();
+
+            const auto hFactory = std::make_unique<XRay::Module>("xrSE_Factory");
+
+            if (!hFactory->exist())
+                R_CHK(GetLastError());
+            R_ASSERT2(hFactory->exist(), "Factory DLL raised exception during loading or there is no factory DLL at all");
+
+            create_entity = (Factory_Create*)hFactory->getProcAddress("_create_entity@4");
+            destroy_entity = (Factory_Destroy*)hFactory->getProcAddress("_destroy_entity@4");
+
+            R_ASSERT(create_entity);
+            R_ASSERT(destroy_entity);
+
             CGameSpawnConstructor(name, output, start, !!no_separator_check);
+
+            hFactory->close();
+
+            create_entity = nullptr;
+            destroy_entity = nullptr;
         }
         else if (strstr(cmd, "-verify"))
         {
@@ -139,7 +151,6 @@ void execute(LPSTR cmd)
 void Startup(LPSTR lpCmdLine)
 {
     string4096 cmd;
-    BOOL bModifyOptions = FALSE;
 
     xr_strcpy(cmd, lpCmdLine);
     _strlwr(cmd);
@@ -148,20 +159,16 @@ void Startup(LPSTR lpCmdLine)
         Help();
         return;
     }
-    if ((strstr(cmd, "-f") == 0) && (strstr(cmd, "-g") == 0) && (strstr(cmd, "-m") == 0) && (strstr(cmd, "-s") == 0) &&
-        (strstr(cmd, "-t") == 0) && (strstr(cmd, "-c") == 0) && (strstr(cmd, "-verify") == 0) &&
-        (strstr(cmd, "-patch") == 0))
+    if ((strstr(cmd, "-f") == 0) && (strstr(cmd, "-s") == 0) && (strstr(cmd, "-verify") == 0))
     {
         Help();
         return;
     }
-    if (strstr(cmd, "-o"))
-        bModifyOptions = TRUE;
     Logger.Initialize("xrAI");
     u32 dwStartupTime = timeGetTime();
     execute(cmd);
     // Show statistic
-    char stats[256];
+    string256 stats;
     u32 dwEndTime = timeGetTime();
     xr_sprintf(stats, "Time elapsed: %s", make_time((dwEndTime - dwStartupTime) / 1000).c_str());
     Logger.Success(stats);
@@ -169,31 +176,14 @@ void Startup(LPSTR lpCmdLine)
     Logger.Destroy();
 }
 
-#include "factory_api.h"
-
-Factory_Create* create_entity = 0;
-Factory_Destroy* destroy_entity = 0;
-
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     xrDebug::Initialize(false);
     Core.Initialize("xrai", 0);
 
-    const auto hFactory = std::make_unique<XRay::Module>("xrSE_Factory");
-
-    if (!hFactory->exist())
-        R_CHK(GetLastError());
-    R_ASSERT2(hFactory->exist(), "Factory DLL raised exception during loading or there is no factory DLL at all");
-
-    create_entity = (Factory_Create*)hFactory->getProcAddress("_create_entity@4");
-    R_ASSERT(create_entity);
-
-    destroy_entity = (Factory_Destroy*)hFactory->getProcAddress("_destroy_entity@4");
-    R_ASSERT(destroy_entity);
-
     Startup(lpCmdLine);
 
     Core._destroy();
 
-    return (0);
+    return 0;
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "xrServerEntities/xrServer_Object_Base.h"
+
 extern "C" {
 typedef XR_IMPORT IServerEntity* __stdcall Factory_Create(LPCSTR section);
 typedef XR_IMPORT void __stdcall Factory_Destroy(IServerEntity*&);

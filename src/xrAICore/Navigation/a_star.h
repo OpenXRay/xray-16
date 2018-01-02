@@ -11,6 +11,7 @@
 #include "xrAICore/Navigation/vertex_path.h"
 #include "xrAICore/Navigation/data_storage_constructor.h"
 #include "xrAICore/Navigation/dijkstra.h"
+#include "xrScriptEngine/DebugMacros.hpp" // XXX: move debug macros to xrCore
 
 template <typename TDistance, typename TVertexData>
 struct AStarVertexData

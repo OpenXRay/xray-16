@@ -1,13 +1,11 @@
 #include "stdafx.h"
 #include "compiler.h"
 #include "xrCDB/Intersect.hpp"
-#include "utils/xrLCUtil/xrThread.hpp"
 #include <mmsystem.h>
 
 #include "xrGame/quadtree.h"
 #include "xrGame/cover_point.h"
 #include "Common/object_broker.h"
-#include "xrCore/_fbox2.h"
 
 Shader_xrLC_LIB* g_shaders_xrlc;
 xr_vector<b_material> g_materials;
@@ -266,10 +264,10 @@ public:
         Q.Perform(N);
 
         // main cycle: trace rays and compute counts
-        for (auto it = Q.q_List.begin(); it != Q.q_List.end(); it++)
+        for (auto &it : Q.q_List)
         {
             // calc dir & range
-            u32 ID = *it;
+            u32 ID = it;
             R_ASSERT(ID < g_nodes.size());
             if (N == ID)
                 continue;
@@ -516,16 +514,14 @@ void compute_non_covers()
 
         float cumulative_weight = 0.f;
         {
-            COVERS::const_iterator i = nearest.begin();
-            COVERS::const_iterator e = nearest.end();
-            for (; i != e; ++i)
+            for (auto &i : nearest)
             {
-                if (!vertex_in_direction(u32(I - B), (*i)->level_vertex_id()))
+                if (!vertex_in_direction(u32(I - B), i->level_vertex_id()))
                     continue;
 
-                float weight = 1.f / (*i)->position().distance_to((*I).Pos);
+                float weight = 1.f / i->position().distance_to((*I).Pos);
                 cumulative_weight += weight;
-                cover_pairs.push_back(std::make_pair(weight, *i));
+                cover_pairs.push_back(std::make_pair(weight, i));
             }
         }
 
@@ -552,12 +548,10 @@ void compute_non_covers()
             (*I).low_cover[j] = 0.f;
         }
 
-        COVER_PAIRS::const_iterator i = cover_pairs.begin();
-        COVER_PAIRS::const_iterator e = cover_pairs.end();
-        for (; i != e; ++i)
+        for (auto &i : cover_pairs)
         {
-            vertex& current = g_nodes[(*i).second->level_vertex_id()];
-            float factor = (*i).first / cumulative_weight;
+            vertex& current = g_nodes[i.second->level_vertex_id()];
+            float factor = i.first / cumulative_weight;
             for (int j = 0; j < 4; ++j)
             {
                 (*I).high_cover[j] += factor * current.high_cover[j];
@@ -565,7 +559,7 @@ void compute_non_covers()
             }
         }
 
-        for (int i2 = 0; i2 < 4; ++i)
+        for (int i2 = 0; i2 < 4; ++i2)
         {
             clamp((*I).high_cover[i2], 0.f, 1.f);
             clamp((*I).low_cover[i2], 0.f, 1.f);

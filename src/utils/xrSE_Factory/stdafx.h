@@ -8,29 +8,16 @@
 
 #pragma once
 
-#include "Common/Common.hpp"
-#include "xrCore/xrCore.h"
-
 #define ENGINE_API
 #define ECORE_API
-#define DLL_API XR_EXPORT
+#define XRSCRIPTENGINE_EXPORTS
 
-#include "clsid_game.h"
+#include "Common/Common.hpp"
+#include "xrCore/xrCore.h"
+#include "xrCore/_fbox.h"
+#include "xrCore/_quaternion.h"
+#include "xrScriptEngine/DebugMacros.hpp" // XXX: move debug macros to xrCore
+#include "xrServerEntities/smart_cast.h"
 
-namespace std
-{
-class exception;
-}
-namespace boost
-{
-void throw_exception(std::exception const& A);
-}
-
-#include "smart_cast.h"
-
-#define READ_IF_EXISTS(ltx, method, section, name, default_value) \
+#define READ_IF_EXISTS(ltx, method, section, name, default_value)\
     (ltx->line_exist(section, name)) ? ltx->method(section, name) : default_value
-
-#if XRAY_EXCEPTIONS
-IC xr_string string2xr_string(LPCSTR s) { return s ? s : ""; }
-#endif

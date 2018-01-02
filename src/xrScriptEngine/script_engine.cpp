@@ -697,7 +697,7 @@ void CScriptEngine::disconnect_from_debugger()
 }
 #endif
 
-CScriptEngine::CScriptEngine()
+CScriptEngine::CScriptEngine(bool is_editor)
 {
     luabind::allocator = &luabind_allocator;
     luabind::allocator_context = nullptr;
@@ -720,6 +720,7 @@ CScriptEngine::CScriptEngine()
     m_lua_studio_engine = nullptr;
 #endif
 #endif
+    m_is_editor = is_editor;
 }
 
 CScriptEngine::~CScriptEngine()
@@ -1217,4 +1218,9 @@ void CScriptEngine::DestroyScriptThread(const CScriptThread* thread)
     {
     }
     UnregisterState(thread->lua());
+}
+
+bool CScriptEngine::is_editor()
+{
+    return m_is_editor;
 }

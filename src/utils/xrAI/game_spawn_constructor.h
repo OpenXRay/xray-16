@@ -8,19 +8,15 @@
 
 #pragma once
 
-#include "alife_space.h"
 #include "xr_graph_merge.h"
-#include "utils/xrLCUtil/xrThread.hpp"
 #include "xrAICore/Navigation/graph_abstract.h"
-#include "xrServer_Object_Base.h"
+#include "xrServerEntities/alife_space.h"
+#include "level_spawn_constructor.h"
 #include "spawn_constructor_space.h"
 #include "server_entity_wrapper.h"
 #include "guid_generator.h"
 
-class CSE_Abstract;
 class CLevelSpawnConstructor;
-class CSE_ALifeCreatureAbstract;
-class CPatrolPathStorage;
 
 class CGameSpawnConstructor
 {

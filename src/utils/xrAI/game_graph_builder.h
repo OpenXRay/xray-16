@@ -8,36 +8,14 @@
 
 #pragma once
 
-#include "Common/LevelStructure.hpp"
-#include "alife_space.h"
-#include <loki/EmptyType.h>
-
-class CLevelGraph;
-class CGameLevelCrossTable;
-
-template
-<
-    typename _data_type /*= Loki::EmptyType*/,
-    typename _edge_weight_type /*= float*/,
-    typename _vertex_id_type/* = u32*/,
-    typename _edge_data_type = Loki::EmptyType
->
-class CGraphAbstract;
-
-namespace GameGraph
-{
-struct CVertex;
-};
-
-class NET_Packet;
-
-class CGraphEngine;
+#include "xrAICore/Navigation/graph_abstract.h"
+#include "xrAICore/Navigation/graph_engine.h"
 
 class CGameGraphBuilder
 {
 private:
     typedef GameGraph::CVertex vertex_type;
-    typedef CGraphAbstract<vertex_type, float, u32> graph_type;
+    typedef CGraphAbstract<vertex_type, float, u32, Loki::EmptyType> graph_type;
     typedef xr_vector<xr_vector<u32>> DISTANCES;
     typedef std::pair<u32, u32> PAIR;
     typedef std::pair<float, PAIR> TRIPPLE;
