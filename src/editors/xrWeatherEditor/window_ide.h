@@ -6,6 +6,11 @@ using namespace System::Collections;
 using namespace System::Data;
 using namespace System::Drawing;
 
+namespace editor
+{
+ref class window_ide;
+}
+
 namespace XRay
 {
 namespace Editor
@@ -14,11 +19,6 @@ class ide_base;
 class engine_base;
 } // namespace Editor
 } // namespace XRay
-
-namespace editor
-{
-ref class window_ide;
-}
 
 namespace WeifenLuo
 {
@@ -88,21 +88,20 @@ private:
     {
         this->EditorDock = (gcnew WeifenLuo::WinFormsUI::DockPanel());
         this->SuspendLayout();
-        //
-        // Editor
-        //
+        // 
+        // EditorDock
+        // 
         this->EditorDock->ActiveAutoHideContent = nullptr;
         this->EditorDock->Dock = System::Windows::Forms::DockStyle::Fill;
         this->EditorDock->DocumentStyle = WeifenLuo::WinFormsUI::DocumentStyles::DockingSdi;
-        this->EditorDock->Font = (gcnew System::Drawing::Font(
-            L"Tahoma", 11, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::World));
+        this->EditorDock->Font = (gcnew System::Drawing::Font(L"Tahoma", 11, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::World));
         this->EditorDock->Location = System::Drawing::Point(0, 0);
-        this->EditorDock->Name = L"Editor";
+        this->EditorDock->Name = L"EditorDock";
         this->EditorDock->Size = System::Drawing::Size(632, 453);
         this->EditorDock->TabIndex = 17;
-        //
+        // 
         // window_ide
-        //
+        // 
         this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
         this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
         this->ClientSize = System::Drawing::Size(632, 453);
@@ -110,13 +109,13 @@ private:
         this->Name = L"window_ide";
         this->StartPosition = System::Windows::Forms::FormStartPosition::Manual;
         this->Text = L"editor";
-        this->Deactivate += gcnew System::EventHandler(this, &window_ide::window_ide_Deactivate);
-        this->SizeChanged += gcnew System::EventHandler(this, &window_ide::window_ide_SizeChanged);
         this->Activated += gcnew System::EventHandler(this, &window_ide::window_ide_Activated);
-        this->FormClosing +=
-            gcnew System::Windows::Forms::FormClosingEventHandler(this, &window_ide::window_ide_FormClosing);
+        this->Deactivate += gcnew System::EventHandler(this, &window_ide::window_ide_Deactivate);
+        this->FormClosing += gcnew System::Windows::Forms::FormClosingEventHandler(this, &window_ide::window_ide_FormClosing);
         this->LocationChanged += gcnew System::EventHandler(this, &window_ide::window_ide_LocationChanged);
+        this->SizeChanged += gcnew System::EventHandler(this, &window_ide::window_ide_SizeChanged);
         this->ResumeLayout(false);
+
     }
 #pragma endregion
 protected:

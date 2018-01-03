@@ -63,33 +63,27 @@ private:
     {
         this->PropertyGrid = (gcnew XRay::SdkControls::PropertyGrid());
         this->SuspendLayout();
-        //
-        // PropertyGrid
-        //
         this->PropertyGrid->Dock = System::Windows::Forms::DockStyle::Fill;
         this->PropertyGrid->Location = System::Drawing::Point(0, 0);
         this->PropertyGrid->Name = L"PropertyGrid";
         this->PropertyGrid->Size = System::Drawing::Size(292, 273);
         this->PropertyGrid->TabIndex = 0;
         this->PropertyGrid->ToolbarVisible = false;
-        //
-        // window_levels
-        //
         this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
         this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
         this->ClientSize = System::Drawing::Size(292, 273);
         this->Controls->Add(this->PropertyGrid);
-        this->DockableAreas = static_cast<WeifenLuo::WinFormsUI::DockAreas>(
-            ((((WeifenLuo::WinFormsUI::DockAreas::Float | WeifenLuo::WinFormsUI::DockAreas::DockLeft) |
-                  WeifenLuo::WinFormsUI::DockAreas::DockRight) |
-                 WeifenLuo::WinFormsUI::DockAreas::DockTop) |
-                WeifenLuo::WinFormsUI::DockAreas::DockBottom));
+        this->DockableAreas = static_cast<WeifenLuo::WinFormsUI::DockAreas>(((((WeifenLuo::WinFormsUI::DockAreas::Float | WeifenLuo::WinFormsUI::DockAreas::DockLeft)
+            | WeifenLuo::WinFormsUI::DockAreas::DockRight)
+            | WeifenLuo::WinFormsUI::DockAreas::DockTop)
+            | WeifenLuo::WinFormsUI::DockAreas::DockBottom));
         this->HideOnClose = true;
         this->Name = L"window_levels";
         this->TabText = L"level weathers";
         this->Text = L"level weathers";
         this->Leave += gcnew System::EventHandler(this, &window_levels::window_levels_Leave);
         this->ResumeLayout(false);
+
     }
 #pragma endregion
 private:

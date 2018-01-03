@@ -8,6 +8,11 @@ using namespace System::Windows::Forms;
 using namespace System::Data;
 using namespace System::Drawing;
 
+namespace editor
+{
+ref class window_weather_editor;
+}
+
 namespace XRay
 {
 namespace Editor

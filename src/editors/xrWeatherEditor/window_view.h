@@ -75,8 +75,7 @@ private:
     void InitializeComponent(void)
     {
         this->components = (gcnew System::ComponentModel::Container());
-        System::ComponentModel::ComponentResourceManager ^ resources =
-            (gcnew System::ComponentModel::ComponentResourceManager(window_view::typeid));
+        System::ComponentModel::ComponentResourceManager^  resources = (gcnew System::ComponentModel::ComponentResourceManager(window_view::typeid));
         this->MainToolBar = (gcnew System::Windows::Forms::ToolStrip());
         this->EditButton = (gcnew System::Windows::Forms::ToolStripButton());
         this->PauseButton = (gcnew System::Windows::Forms::ToolStripButton());
@@ -84,42 +83,28 @@ private:
         this->imageList1 = (gcnew System::Windows::Forms::ImageList(this->components));
         this->MainToolBar->SuspendLayout();
         this->SuspendLayout();
-        //
-        // MainToolBar
-        //
-        this->MainToolBar->Items->AddRange(
-            gcnew cli::array<System::Windows::Forms::ToolStripItem ^>(2){this->EditButton, this->PauseButton});
+        this->MainToolBar->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(2) { this->EditButton, this->PauseButton });
         this->MainToolBar->Location = System::Drawing::Point(0, 0);
         this->MainToolBar->Name = L"MainToolBar";
         this->MainToolBar->Size = System::Drawing::Size(292, 25);
         this->MainToolBar->TabIndex = 16;
         this->MainToolBar->Text = L"toolStrip1";
-        //
-        // EditButton
-        //
         this->EditButton->DisplayStyle = System::Windows::Forms::ToolStripItemDisplayStyle::Text;
-        this->EditButton->Image = (cli::safe_cast<System::Drawing::Image ^>(resources->GetObject(L"EditButton.Image")));
+        this->EditButton->Image = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"EditButton.Image")));
         this->EditButton->ImageTransparentColor = System::Drawing::Color::Magenta;
         this->EditButton->Name = L"EditButton";
         this->EditButton->Size = System::Drawing::Size(29, 22);
         this->EditButton->Text = L"Edit";
         this->EditButton->Click += gcnew System::EventHandler(this, &window_view::EditButton_Click);
-        //
-        // PauseButton
-        //
         this->PauseButton->Checked = true;
         this->PauseButton->CheckState = System::Windows::Forms::CheckState::Checked;
         this->PauseButton->DisplayStyle = System::Windows::Forms::ToolStripItemDisplayStyle::Text;
-        this->PauseButton->Image =
-            (cli::safe_cast<System::Drawing::Image ^>(resources->GetObject(L"PauseButton.Image")));
+        this->PauseButton->Image = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"PauseButton.Image")));
         this->PauseButton->ImageTransparentColor = System::Drawing::Color::Magenta;
         this->PauseButton->Name = L"PauseButton";
         this->PauseButton->Size = System::Drawing::Size(40, 22);
         this->PauseButton->Text = L"Pause";
         this->PauseButton->Click += gcnew System::EventHandler(this, &window_view::PauseButton_Click);
-        //
-        // ViewPanel
-        //
         this->ViewPanel->Dock = System::Windows::Forms::DockStyle::Fill;
         this->ViewPanel->Location = System::Drawing::Point(0, 25);
         this->ViewPanel->Name = L"ViewPanel";
@@ -127,22 +112,12 @@ private:
         this->ViewPanel->TabIndex = 17;
         this->ViewPanel->DoubleClick += gcnew System::EventHandler(this, &window_view::window_view_DoubleClick);
         this->ViewPanel->MouseLeave += gcnew System::EventHandler(this, &window_view::ViewPanel_MouseLeave);
-        this->ViewPanel->MouseDown +=
-            gcnew System::Windows::Forms::MouseEventHandler(this, &window_view::ViewPanel_MouseDown);
-        this->ViewPanel->MouseMove +=
-            gcnew System::Windows::Forms::MouseEventHandler(this, &window_view::ViewPanel_MouseMove);
-        this->ViewPanel->MouseClick +=
-            gcnew System::Windows::Forms::MouseEventHandler(this, &window_view::ViewPanel_MouseClick);
-        //
-        // imageList1
-        //
-        this->imageList1->ImageStream = (cli::safe_cast<System::Windows::Forms::ImageListStreamer ^>(
-            resources->GetObject(L"imageList1.ImageStream")));
+        this->ViewPanel->MouseDown += gcnew System::Windows::Forms::MouseEventHandler(this, &window_view::ViewPanel_MouseDown);
+        this->ViewPanel->MouseMove += gcnew System::Windows::Forms::MouseEventHandler(this, &window_view::ViewPanel_MouseMove);
+        this->ViewPanel->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &window_view::ViewPanel_MouseClick);
+        this->imageList1->ImageStream = (cli::safe_cast<System::Windows::Forms::ImageListStreamer^>(resources->GetObject(L"imageList1.ImageStream")));
         this->imageList1->TransparentColor = System::Drawing::Color::Fuchsia;
         this->imageList1->Images->SetKeyName(0, L"color_picker.bmp");
-        //
-        // window_view
-        //
         this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
         this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
         this->ClientSize = System::Drawing::Size(292, 273);
@@ -166,6 +141,7 @@ private:
         this->MainToolBar->PerformLayout();
         this->ResumeLayout(false);
         this->PerformLayout();
+
     }
 #pragma endregion
 public:

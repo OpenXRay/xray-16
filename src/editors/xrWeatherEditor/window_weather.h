@@ -72,8 +72,7 @@ private:
     /// </summary>
     void InitializeComponent(void)
     {
-        System::ComponentModel::ComponentResourceManager ^ resources =
-            (gcnew System::ComponentModel::ComponentResourceManager(window_weather::typeid));
+        System::ComponentModel::ComponentResourceManager^  resources = (gcnew System::ComponentModel::ComponentResourceManager(window_weather::typeid));
         this->toolStrip1 = (gcnew System::Windows::Forms::ToolStrip());
         this->SaveButton = (gcnew System::Windows::Forms::ToolStripButton());
         this->ReloadWeatherButton = (gcnew System::Windows::Forms::ToolStripButton());
@@ -81,62 +80,42 @@ private:
         this->PropertyGrid = (gcnew XRay::SdkControls::PropertyGrid());
         this->toolStrip1->SuspendLayout();
         this->SuspendLayout();
-        //
-        // toolStrip1
-        //
-        this->toolStrip1->Items->AddRange(gcnew cli::array<System::Windows::Forms::ToolStripItem ^>(3){
-            this->SaveButton, this->ReloadWeatherButton, this->ReloadAllWeathersButton});
+        this->toolStrip1->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(3) {
+            this->SaveButton, this->ReloadWeatherButton,
+                this->ReloadAllWeathersButton
+        });
         this->toolStrip1->Location = System::Drawing::Point(0, 0);
         this->toolStrip1->Name = L"toolStrip1";
         this->toolStrip1->Size = System::Drawing::Size(292, 25);
         this->toolStrip1->TabIndex = 1;
         this->toolStrip1->Text = L"toolStrip1";
-        //
-        // SaveButton
-        //
         this->SaveButton->DisplayStyle = System::Windows::Forms::ToolStripItemDisplayStyle::Image;
-        this->SaveButton->Image = (cli::safe_cast<System::Drawing::Image ^>(resources->GetObject(L"SaveButton.Image")));
+        this->SaveButton->Image = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"SaveButton.Image")));
         this->SaveButton->ImageTransparentColor = System::Drawing::Color::Magenta;
         this->SaveButton->Name = L"SaveButton";
         this->SaveButton->Size = System::Drawing::Size(23, 22);
         this->SaveButton->Text = L"save weathers";
         this->SaveButton->Click += gcnew System::EventHandler(this, &window_weather::SaveButton_Click);
-        //
-        // ReloadWeatherButton
-        //
         this->ReloadWeatherButton->DisplayStyle = System::Windows::Forms::ToolStripItemDisplayStyle::Image;
-        this->ReloadWeatherButton->Image =
-            (cli::safe_cast<System::Drawing::Image ^>(resources->GetObject(L"ReloadWeatherButton.Image")));
+        this->ReloadWeatherButton->Image = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"ReloadWeatherButton.Image")));
         this->ReloadWeatherButton->ImageTransparentColor = System::Drawing::Color::Magenta;
         this->ReloadWeatherButton->Name = L"ReloadWeatherButton";
         this->ReloadWeatherButton->Size = System::Drawing::Size(23, 22);
         this->ReloadWeatherButton->Text = L"Reload current weather only";
-        this->ReloadWeatherButton->Click +=
-            gcnew System::EventHandler(this, &window_weather::ReloadWeatherButton_Click);
-        //
-        // ReloadAllWeathersButton
-        //
+        this->ReloadWeatherButton->Click += gcnew System::EventHandler(this, &window_weather::ReloadWeatherButton_Click);
         this->ReloadAllWeathersButton->DisplayStyle = System::Windows::Forms::ToolStripItemDisplayStyle::Image;
-        this->ReloadAllWeathersButton->Image =
-            (cli::safe_cast<System::Drawing::Image ^>(resources->GetObject(L"ReloadAllWeathersButton.Image")));
+        this->ReloadAllWeathersButton->Image = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"ReloadAllWeathersButton.Image")));
         this->ReloadAllWeathersButton->ImageTransparentColor = System::Drawing::Color::Magenta;
         this->ReloadAllWeathersButton->Name = L"ReloadAllWeathersButton";
         this->ReloadAllWeathersButton->Size = System::Drawing::Size(23, 22);
         this->ReloadAllWeathersButton->Text = L"Reload all the weathers";
-        this->ReloadAllWeathersButton->Click +=
-            gcnew System::EventHandler(this, &window_weather::ReloadAllWeathersButton_Click);
-        //
-        // PropertyGrid
-        //
+        this->ReloadAllWeathersButton->Click += gcnew System::EventHandler(this, &window_weather::ReloadAllWeathersButton_Click);
         this->PropertyGrid->Dock = System::Windows::Forms::DockStyle::Fill;
         this->PropertyGrid->Location = System::Drawing::Point(0, 25);
         this->PropertyGrid->Name = L"PropertyGrid";
         this->PropertyGrid->Size = System::Drawing::Size(292, 248);
         this->PropertyGrid->TabIndex = 2;
         this->PropertyGrid->ToolbarVisible = false;
-        //
-        // window_weather
-        //
         this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
         this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
         this->ClientSize = System::Drawing::Size(292, 273);
@@ -150,6 +129,7 @@ private:
         this->toolStrip1->PerformLayout();
         this->ResumeLayout(false);
         this->PerformLayout();
+
     }
 #pragma endregion
 private:
