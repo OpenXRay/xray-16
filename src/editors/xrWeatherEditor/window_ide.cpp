@@ -12,7 +12,7 @@ using editor::window_levels;
 using editor::window_weather;
 using editor::window_weather_editor;
 
-using VS2005Style::Extender;
+//using WeifenLuo::WinFormsUI::Docking::VS2005Theme;
 
 void window_ide::custom_init(XRay::Editor::engine_base* engine)
 {
@@ -20,7 +20,7 @@ void window_ide::custom_init(XRay::Editor::engine_base* engine)
 
     m_engine = engine;
 
-    Extender::SetSchema(EditorDock, Extender::Schema::FromBase);
+    //Extender::SetSchema(EditorDock, Extender::Schema::FromBase);
 
     m_view = gcnew window_view(*this);
     m_levels = gcnew window_levels(this);

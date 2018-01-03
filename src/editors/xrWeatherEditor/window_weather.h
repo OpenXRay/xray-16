@@ -19,7 +19,7 @@ ref class window_ide;
 ///          resources associated with this form.
 /// </summary>
 public
-ref class window_weather : public WeifenLuo::WinFormsUI::DockContent
+ref class window_weather : public WeifenLuo::WinFormsUI::Docking::DockContent
 {
 public:
     window_weather(window_ide ^ ide) : m_ide(ide)

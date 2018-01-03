@@ -33,7 +33,7 @@ ref class window_ide;
 ///          the designers will not be able to interact properly with localized
 ///          resources associated with this form.
 /// </summary>
-public ref class window_weather_editor : public WeifenLuo::WinFormsUI::DockContent
+public ref class window_weather_editor : public WeifenLuo::WinFormsUI::Docking::DockContent
 {
 public:
     window_weather_editor(window_ide ^ ide, XRay::Editor::engine_base* engine)

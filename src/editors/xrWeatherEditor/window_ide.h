@@ -71,7 +71,7 @@ protected:
 
 protected:
 private:
-    WeifenLuo::WinFormsUI::DockPanel ^ EditorDock;
+    WeifenLuo::WinFormsUI::Docking::DockPanel ^ EditorDock;
 
 private:
     /// <summary>
@@ -86,14 +86,14 @@ private:
     /// </summary>
     void InitializeComponent(void)
     {
-        this->EditorDock = (gcnew WeifenLuo::WinFormsUI::DockPanel());
+        this->EditorDock = (gcnew WeifenLuo::WinFormsUI::Docking::DockPanel());
         this->SuspendLayout();
         // 
         // EditorDock
         // 
         this->EditorDock->ActiveAutoHideContent = nullptr;
         this->EditorDock->Dock = System::Windows::Forms::DockStyle::Fill;
-        this->EditorDock->DocumentStyle = WeifenLuo::WinFormsUI::DocumentStyles::DockingSdi;
+        this->EditorDock->DocumentStyle = WeifenLuo::WinFormsUI::Docking::DocumentStyle::DockingSdi;
         this->EditorDock->Font = (gcnew System::Drawing::Font(L"Tahoma", 11, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::World));
         this->EditorDock->Location = System::Drawing::Point(0, 0);
         this->EditorDock->Name = L"EditorDock";
@@ -151,7 +151,7 @@ private:
     void load_on_create();
 
 private:
-    WeifenLuo::WinFormsUI::IDockContent ^ reload_content(System::String ^ persist_string);
+    WeifenLuo::WinFormsUI::Docking::IDockContent ^ reload_content(System::String ^ persist_string);
 
 private:
     System::Void window_ide_SizeChanged(System::Object ^ sender, System::EventArgs ^ e);

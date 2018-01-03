@@ -19,7 +19,7 @@ ref class window_ide;
 ///          resources associated with this form.
 /// </summary>
 public
-ref class window_levels : public WeifenLuo::WinFormsUI::DockContent
+ref class window_levels : public WeifenLuo::WinFormsUI::Docking::DockContent
 {
 public:
     window_levels(window_ide ^ ide) : m_ide(ide)
@@ -73,10 +73,10 @@ private:
         this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
         this->ClientSize = System::Drawing::Size(292, 273);
         this->Controls->Add(this->PropertyGrid);
-        this->DockableAreas = static_cast<WeifenLuo::WinFormsUI::DockAreas>(((((WeifenLuo::WinFormsUI::DockAreas::Float | WeifenLuo::WinFormsUI::DockAreas::DockLeft)
-            | WeifenLuo::WinFormsUI::DockAreas::DockRight)
-            | WeifenLuo::WinFormsUI::DockAreas::DockTop)
-            | WeifenLuo::WinFormsUI::DockAreas::DockBottom));
+        this->DockAreas = static_cast<WeifenLuo::WinFormsUI::Docking::DockAreas>(((((WeifenLuo::WinFormsUI::Docking::DockAreas::Float | WeifenLuo::WinFormsUI::Docking::DockAreas::DockLeft)
+            | WeifenLuo::WinFormsUI::Docking::DockAreas::DockRight)
+            | WeifenLuo::WinFormsUI::Docking::DockAreas::DockTop)
+            | WeifenLuo::WinFormsUI::Docking::DockAreas::DockBottom));
         this->HideOnClose = true;
         this->Name = L"window_levels";
         this->TabText = L"level weathers";

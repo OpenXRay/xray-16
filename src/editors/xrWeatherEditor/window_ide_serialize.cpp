@@ -94,7 +94,7 @@ void window_ide::save_on_exit()
     product->Close();
 }
 
-WeifenLuo::WinFormsUI::IDockContent ^ window_ide::reload_content(System::String ^ persist_string)
+WeifenLuo::WinFormsUI::Docking::IDockContent ^ window_ide::reload_content(System::String ^ persist_string)
 {
     if (persist_string == "editor.window_view")
         return (m_view);
@@ -175,8 +175,7 @@ void window_ide::load_on_create()
             MemoryStream ^ stream = gcnew MemoryStream();
             stream->Write(safe_cast<array<unsigned char, 1> ^>(object), 0, object->Length);
             stream->Seek(0, System::IO::SeekOrigin::Begin);
-            EditorDock->LoadFromXml(
-                stream, gcnew WeifenLuo::WinFormsUI::DeserializeDockContent(this, &window_ide::reload_content));
+            EditorDock->LoadFromXml(stream, gcnew WeifenLuo::WinFormsUI::Docking::DeserializeDockContent(this, &window_ide::reload_content));
             delete (stream);
             return;
         }
@@ -188,10 +187,10 @@ void window_ide::load_on_create()
     product->Close();
     delete (product);
 
-    m_view->Show(EditorDock, WeifenLuo::WinFormsUI::DockState::Document);
-    m_levels->Show(EditorDock, WeifenLuo::WinFormsUI::DockState::DockRight);
-    m_weather->Show(EditorDock, WeifenLuo::WinFormsUI::DockState::DockRight);
-    m_weather_editor->Show(EditorDock, WeifenLuo::WinFormsUI::DockState::DockRight);
+    m_view->Show(EditorDock, WeifenLuo::WinFormsUI::Docking::DockState::Document);
+    m_levels->Show(EditorDock, WeifenLuo::WinFormsUI::Docking::DockState::DockRight);
+    m_weather->Show(EditorDock, WeifenLuo::WinFormsUI::Docking::DockState::DockRight);
+    m_weather_editor->Show(EditorDock, WeifenLuo::WinFormsUI::Docking::DockState::DockRight);
 
     this->WindowState = FormWindowState::Maximized;
 }
