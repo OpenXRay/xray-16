@@ -2,6 +2,17 @@
 #include "game_type.h"
 #include "Level.h"
 
-bool OnServer() throw() { return Level().IsServer(); }
-bool OnClient() throw() { return Level().IsClient(); }
-bool IsGameTypeSingle() throw() { return (g_pGamePersistent->GameType() == eGameIDSingle); }
+bool OnServer() noexcept
+{
+    return g_pGameLevel != nullptr ? Level().IsServer() : false;
+}
+
+bool OnClient() noexcept
+{
+    return g_pGameLevel != nullptr ? Level().IsClient() : false;
+}
+
+bool IsGameTypeSingle() throw()
+{
+    return g_pGamePersistent->GameType() == eGameIDSingle;
+}
