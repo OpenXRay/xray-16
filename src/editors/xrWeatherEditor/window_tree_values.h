@@ -10,6 +10,11 @@ using namespace System::Drawing;
 
 namespace editor
 {
+    ref class window_tree_values;
+}
+
+namespace editor
+{
 /// <summary>
 /// Summary for window_tree_values
 ///
@@ -43,57 +48,27 @@ protected:
         }
     }
 
-private:
-    System::Windows::Forms::Panel ^ panel2;
-
 protected:
-private:
-    System::Windows::Forms::Panel ^ panel3;
+private: System::Windows::Forms::Panel ^ panel2;
+private: System::Windows::Forms::Panel ^ panel3;
+private: System::Windows::Forms::Panel ^ panel4;
+private: System::Windows::Forms::Panel ^ panel1;
+private: System::Windows::Forms::Panel ^ panel5;
+private: System::Windows::Forms::Panel ^ panel6;
+private: System::Windows::Forms::TreeView ^ TreeView;
+private: System::Windows::Forms::Panel ^ panel7;
+private: System::Windows::Forms::ImageList ^ Images;
+private: System::Windows::Forms::Panel ^ panel10;
+private: System::Windows::Forms::TextBox ^ TextBox;
+private: System::Windows::Forms::Panel ^ panel8;
+private: System::Windows::Forms::Button ^ OK_Button;
+private: System::Windows::Forms::Button ^ Cancel_Button;
 
 private:
-    System::Windows::Forms::Panel ^ panel4;
-
-private:
-    System::Windows::Forms::Panel ^ panel1;
-
-private:
-    System::Windows::Forms::Panel ^ panel5;
-
-private:
-    System::Windows::Forms::Panel ^ panel6;
-
-private:
-    System::Windows::Forms::TreeView ^ TreeView;
-
-private:
-    System::Windows::Forms::Panel ^ panel7;
-
-private:
-    System::Windows::Forms::ImageList ^ Images;
-
-private:
-    System::Windows::Forms::Panel ^ panel10;
-
-private:
-    System::Windows::Forms::TextBox ^ TextBox;
-
-private:
-    System::Windows::Forms::Panel ^ panel8;
-
-private:
-    System::Windows::Forms::Button ^ OK_Button;
-
-private:
-    System::Windows::Forms::Button ^ Cancel_Button;
-
-private:
+    /// <summary>
+    /// Required designer variable.
+    /// </summary>
     System::ComponentModel::IContainer ^ components;
-
-protected:
-private:
-/// <summary>
-/// Required designer variable.
-/// </summary>
 
 #pragma region Windows Form Designer generated code
     /// <summary>
@@ -296,10 +271,9 @@ public:
 public:
     System::String ^ Result;
 
-private:
-    System::Void TreeView_AfterCollapse(Object ^ sender, TreeViewEventArgs ^ e);
-    System::Void TreeView_AfterExpand(Object ^ sender, TreeViewEventArgs ^ e);
-    System::Void TreeView_MouseClick(Object ^ sender, MouseEventArgs ^ e);
-    System::Void TreeView_MouseDoubleClick(Object ^ sender, MouseEventArgs ^ e);
+private: System::Void TreeView_AfterCollapse(Object ^ sender, TreeViewEventArgs ^ e);
+private: System::Void TreeView_AfterExpand(Object ^ sender, TreeViewEventArgs ^ e);
+private: System::Void TreeView_MouseClick(Object ^ sender, MouseEventArgs ^ e);
+private: System::Void TreeView_MouseDoubleClick(Object ^ sender, MouseEventArgs ^ e);
 };
 }

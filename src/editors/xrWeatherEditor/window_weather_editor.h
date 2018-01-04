@@ -61,178 +61,66 @@ protected:
     }
 
 protected:
-private:
-    System::Windows::Forms::ImageList ^ imageList1;
+private: System::Windows::Forms::ImageList ^ imageList1;
+private: System::Windows::Forms::Panel ^ panel23;
+private: System::Windows::Forms::Panel ^ panel1;
+private: System::Windows::Forms::Panel ^ panel4;
+private: System::Windows::Forms::TrackBar ^ CurrentTimeTrackBar;
+private: System::Windows::Forms::Panel ^ panel10;
+private: System::Windows::Forms::Button ^ NextFrameButton;
+private: System::Windows::Forms::Panel ^ panel9;
+private: System::Windows::Forms::Button ^ PauseButton;
+private: System::Windows::Forms::Button ^ PreviousFrameButton;
+private: System::Windows::Forms::Panel ^ panel3;
+private: System::Windows::Forms::Panel ^ panel8;
+private: System::Windows::Forms::ComboBox ^ WeathersComboBox;
+private: System::Windows::Forms::Panel ^ panel7;
+private: System::Windows::Forms::Label ^ label2;
+private: System::Windows::Forms::Panel ^ panel6;
+private: System::Windows::Forms::Label ^ label1;
+private: System::Windows::Forms::NumericUpDown ^ TimeFactorNumericUpDown;
+private: System::Windows::Forms::Panel ^ panel5;
+private: System::Windows::Forms::Label ^ label3;
+private: System::Windows::Forms::ComboBox ^ FramesComboBox;
+private: System::Windows::Forms::TrackBar ^ WeatherTrackBar;
+private: System::Windows::Forms::Panel ^ panel25;
+private: System::Windows::Forms::Panel ^ panel24;
+private: System::Windows::Forms::Label ^ label7;
+private: System::Windows::Forms::Panel ^ panel2;
+private: System::Windows::Forms::Panel ^ panel13;
+private: XRay::SdkControls::PropertyGrid ^ blend;
+private: System::Windows::Forms::Panel ^ panel15;
+private: System::Windows::Forms::Label ^ label6;
+private: System::Windows::Forms::Panel ^ panel22;
+private: System::Windows::Forms::Button ^ CopyButton;
+private: System::Windows::Forms::Panel ^ panel11;
+private: System::Windows::Forms::Button ^ CreateFromButton;
+private: System::Windows::Forms::Splitter ^ splitter2;
+private: System::Windows::Forms::Panel ^ panel14;
+private: XRay::SdkControls::PropertyGrid ^ target;
+private: System::Windows::Forms::Panel ^ panel20;
+private: System::Windows::Forms::Panel ^ panel17;
+private: System::Windows::Forms::Label ^ label5;
+private: System::Windows::Forms::Panel ^ panel18;
+private: System::Windows::Forms::Button ^ PasteTargetButton;
+private: System::Windows::Forms::Splitter ^ splitter1;
+private: System::Windows::Forms::Panel ^ panel12;
+private: XRay::SdkControls::PropertyGrid ^ current;
+private: System::Windows::Forms::Panel ^ panel19;
+private: System::Windows::Forms::Panel ^ panel16;
+private: System::Windows::Forms::Label ^ label4;
+private: System::Windows::Forms::Panel ^ panel21;
+private: System::Windows::Forms::Button ^ PasteCurrentButton;
+private: System::Windows::Forms::MaskedTextBox ^ CurrentTimeTextBox;
+private: System::Windows::Forms::Label ^ label8;
+private: System::Windows::Forms::Button ^ ReloadTargetButton;
+private: System::Windows::Forms::Button ^ ReloadCurrentButton;
 
 private:
-    System::Windows::Forms::Panel ^ panel23;
-
-private:
-    System::Windows::Forms::Panel ^ panel1;
-
-private:
-    System::Windows::Forms::Panel ^ panel4;
-
-private:
-    System::Windows::Forms::TrackBar ^ CurrentTimeTrackBar;
-
-private:
-    System::Windows::Forms::Panel ^ panel10;
-
-private:
-    System::Windows::Forms::Button ^ NextFrameButton;
-
-private:
-    System::Windows::Forms::Panel ^ panel9;
-
-private:
-    System::Windows::Forms::Button ^ PauseButton;
-
-private:
-    System::Windows::Forms::Button ^ PreviousFrameButton;
-
-private:
-    System::Windows::Forms::Panel ^ panel3;
-
-private:
-    System::Windows::Forms::Panel ^ panel8;
-
-private:
-    System::Windows::Forms::ComboBox ^ WeathersComboBox;
-
-private:
-    System::Windows::Forms::Panel ^ panel7;
-
-private:
-    System::Windows::Forms::Label ^ label2;
-
-private:
-    System::Windows::Forms::Panel ^ panel6;
-
-private:
-    System::Windows::Forms::Label ^ label1;
-
-private:
-    System::Windows::Forms::NumericUpDown ^ TimeFactorNumericUpDown;
-
-private:
-    System::Windows::Forms::Panel ^ panel5;
-
-private:
-    System::Windows::Forms::Label ^ label3;
-
-private:
-    System::Windows::Forms::ComboBox ^ FramesComboBox;
-
-private:
-    System::Windows::Forms::TrackBar ^ WeatherTrackBar;
-
-private:
-    System::Windows::Forms::Panel ^ panel25;
-
-private:
-    System::Windows::Forms::Panel ^ panel24;
-
-private:
-    System::Windows::Forms::Label ^ label7;
-
-private:
-    System::Windows::Forms::Panel ^ panel2;
-
-private:
-    System::Windows::Forms::Panel ^ panel13;
-
-private:
-    XRay::SdkControls::PropertyGrid ^ blend;
-
-private:
-    System::Windows::Forms::Panel ^ panel15;
-
-private:
-    System::Windows::Forms::Label ^ label6;
-
-private:
-    System::Windows::Forms::Panel ^ panel22;
-
-private:
-    System::Windows::Forms::Button ^ CopyButton;
-
-private:
-    System::Windows::Forms::Panel ^ panel11;
-
-private:
-    System::Windows::Forms::Button ^ CreateFromButton;
-
-private:
-    System::Windows::Forms::Splitter ^ splitter2;
-
-private:
-    System::Windows::Forms::Panel ^ panel14;
-
-private:
-    XRay::SdkControls::PropertyGrid ^ target;
-
-private:
-    System::Windows::Forms::Panel ^ panel20;
-
-private:
-    System::Windows::Forms::Panel ^ panel17;
-
-private:
-    System::Windows::Forms::Label ^ label5;
-
-private:
-    System::Windows::Forms::Panel ^ panel18;
-
-private:
-    System::Windows::Forms::Button ^ PasteTargetButton;
-
-private:
-    System::Windows::Forms::Splitter ^ splitter1;
-
-private:
-    System::Windows::Forms::Panel ^ panel12;
-
-private:
-    XRay::SdkControls::PropertyGrid ^ current;
-
-private:
-    System::Windows::Forms::Panel ^ panel19;
-
-private:
-    System::Windows::Forms::Panel ^ panel16;
-
-private:
-    System::Windows::Forms::Label ^ label4;
-
-private:
-    System::Windows::Forms::Panel ^ panel21;
-
-private:
-    System::Windows::Forms::Button ^ PasteCurrentButton;
-
-private:
-    System::Windows::Forms::MaskedTextBox ^ CurrentTimeTextBox;
-
-private:
-    System::Windows::Forms::Label ^ label8;
-
-private:
-    System::Windows::Forms::Button ^ ReloadTargetButton;
-
-private:
-    System::Windows::Forms::Button ^ ReloadCurrentButton;
-
-private:
+    /// <summary>
+    /// Required designer variable.
+    /// </summary>
     System::ComponentModel::IContainer ^ components;
-
-protected:
-protected:
-protected:
-private:
-/// <summary>
-/// Required designer variable.
-/// </summary>
 
 #pragma region Windows Form Designer generated code
     /// <summary>
@@ -995,35 +883,33 @@ private:
     bool m_update_text_value;
     bool m_update_weather_time;
 
-private:
-    System::Void window_weather_editor_Enter(Object ^ sender, System::EventArgs ^ e);
-    System::Void WeathersComboBox_SelectedIndexChanged(Object ^ sender, System::EventArgs ^ e);
-    System::Void FramesComboBox_SelectedIndexChanged(Object ^ sender, System::EventArgs ^ e);
-    System::Void PreviousFrameButton_Click(Object ^ sender, System::EventArgs ^ e);
-    System::Void NextFrameButton_Click(Object ^ sender, System::EventArgs ^ e);
-    System::Void CurrentTimeTrackBar_ValueChanged(Object ^ sender, System::EventArgs ^ e);
-    System::Void FramesComboBox_DropDown(Object ^ sender, System::EventArgs ^ e);
-    System::Void FramesComboBox_DropDownClosed(Object ^ sender, System::EventArgs ^ e);
-    System::Void PauseButton_Click(Object ^ sender, System::EventArgs ^ e);
-    System::Void TimeFactorNumericUpDown_ValueChanged(Object ^ sender, System::EventArgs ^ e);
+private: System::Void window_weather_editor_Enter(Object ^ sender, System::EventArgs ^ e);
+private: System::Void WeathersComboBox_SelectedIndexChanged(Object ^ sender, System::EventArgs ^ e);
+private: System::Void FramesComboBox_SelectedIndexChanged(Object ^ sender, System::EventArgs ^ e);
+private: System::Void PreviousFrameButton_Click(Object ^ sender, System::EventArgs ^ e);
+private: System::Void NextFrameButton_Click(Object ^ sender, System::EventArgs ^ e);
+private: System::Void CurrentTimeTrackBar_ValueChanged(Object ^ sender, System::EventArgs ^ e);
+private: System::Void FramesComboBox_DropDown(Object ^ sender, System::EventArgs ^ e);
+private: System::Void FramesComboBox_DropDownClosed(Object ^ sender, System::EventArgs ^ e);
+private: System::Void PauseButton_Click(Object ^ sender, System::EventArgs ^ e);
+private: System::Void TimeFactorNumericUpDown_ValueChanged(Object ^ sender, System::EventArgs ^ e);
 
-private:
-    System::Void CopyButton_Click(Object ^ sender, System::EventArgs ^ e);
-    System::Void PasteCurrentButton_Click(Object ^ sender, System::EventArgs ^ e);
-    System::Void PasteTargetButton_Click(Object ^ sender, System::EventArgs ^ e);
-    System::Void CreateFromButton_Click(Object ^ sender, System::EventArgs ^ e);
-    System::Void window_weather_editor_SizeChanged(Object ^ sender, System::EventArgs ^ e);
-    System::Void CurrentTimeTrackBar_MouseDown(Object ^ sender, MouseEventArgs ^ e);
-    System::Void CurrentTimeTrackBar_MouseUp(Object ^ sender, MouseEventArgs ^ e);
-    System::Void current_Leave(Object ^ sender, System::EventArgs ^ e);
-    System::Void target_Leave(Object ^ sender, System::EventArgs ^ e);
-    System::Void current_Enter(Object ^ sender, System::EventArgs ^ e);
-    System::Void target_Enter(Object ^ sender, System::EventArgs ^ e);
-    System::Void CurrentTimeTextBox_TextChanged(Object ^ sender, System::EventArgs ^ e);
-    System::Void WeatherTrackBar_ValueChanged(Object ^ sender, System::EventArgs ^ e);
-    System::Void WeatherTrackBar_MouseDown(Object ^ sender, MouseEventArgs ^ e);
-    System::Void WeatherTrackBar_MouseUp(Object ^ sender, MouseEventArgs ^ e);
-    System::Void ReloadCurrentButton_Click(Object ^ sender, System::EventArgs ^ e);
-    System::Void ReloadTargetButton_Click(Object ^ sender, System::EventArgs ^ e);
+private: System::Void CopyButton_Click(Object ^ sender, System::EventArgs ^ e);
+private: System::Void PasteCurrentButton_Click(Object ^ sender, System::EventArgs ^ e);
+private: System::Void PasteTargetButton_Click(Object ^ sender, System::EventArgs ^ e);
+private: System::Void CreateFromButton_Click(Object ^ sender, System::EventArgs ^ e);
+private: System::Void window_weather_editor_SizeChanged(Object ^ sender, System::EventArgs ^ e);
+private: System::Void CurrentTimeTrackBar_MouseDown(Object ^ sender, MouseEventArgs ^ e);
+private: System::Void CurrentTimeTrackBar_MouseUp(Object ^ sender, MouseEventArgs ^ e);
+private: System::Void current_Leave(Object ^ sender, System::EventArgs ^ e);
+private: System::Void target_Leave(Object ^ sender, System::EventArgs ^ e);
+private: System::Void current_Enter(Object ^ sender, System::EventArgs ^ e);
+private: System::Void target_Enter(Object ^ sender, System::EventArgs ^ e);
+private: System::Void CurrentTimeTextBox_TextChanged(Object ^ sender, System::EventArgs ^ e);
+private: System::Void WeatherTrackBar_ValueChanged(Object ^ sender, System::EventArgs ^ e);
+private: System::Void WeatherTrackBar_MouseDown(Object ^ sender, MouseEventArgs ^ e);
+private: System::Void WeatherTrackBar_MouseUp(Object ^ sender, MouseEventArgs ^ e);
+private: System::Void ReloadCurrentButton_Click(Object ^ sender, System::EventArgs ^ e);
+private: System::Void ReloadTargetButton_Click(Object ^ sender, System::EventArgs ^ e);
 };
 }

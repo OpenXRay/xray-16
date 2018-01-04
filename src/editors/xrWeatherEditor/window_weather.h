@@ -8,6 +8,11 @@ using namespace System::Drawing;
 
 namespace editor
 {
+ref class window_weather;
+}
+
+namespace editor
+{
 ref class window_ide;
 /// <summary>
 /// Summary for window_weather
@@ -42,23 +47,13 @@ protected:
         }
     }
 
-private:
-    System::Windows::Forms::ToolStrip ^ toolStrip1;
-
-private:
-    System::Windows::Forms::ToolStripButton ^ SaveButton;
-
-private:
-    XRay::SdkControls::PropertyGrid ^ PropertyGrid;
-
-private:
-    System::Windows::Forms::ToolStripButton ^ ReloadWeatherButton;
-
-private:
-    System::Windows::Forms::ToolStripButton ^ ReloadAllWeathersButton;
-
 protected:
-protected:
+private: System::Windows::Forms::ToolStrip ^ toolStrip1;
+private: System::Windows::Forms::ToolStripButton ^ SaveButton;
+private: XRay::SdkControls::PropertyGrid ^ PropertyGrid;
+private: System::Windows::Forms::ToolStripButton ^ ReloadWeatherButton;
+private: System::Windows::Forms::ToolStripButton ^ ReloadAllWeathersButton;
+
 private:
     /// <summary>
     /// Required designer variable.
@@ -138,10 +133,10 @@ private:
 public:
     inline ::PropertyGrid ^ property_grid() { return this->PropertyGrid; }
 
-        private : System::Void window_weather_Leave(Object ^ sender, System::EventArgs ^ e);
-                  System::Void SaveButton_Click(Object ^ sender, System::EventArgs ^ e);
-                  System::Void ReloadWeatherButton_Click(Object ^ sender, System::EventArgs ^ e);
-                  System::Void ReloadAllWeathersButton_Click(Object ^ sender, System::EventArgs ^ e);
+private: System::Void window_weather_Leave(Object ^ sender, System::EventArgs ^ e);
+private: System::Void SaveButton_Click(Object ^ sender, System::EventArgs ^ e);
+private: System::Void ReloadWeatherButton_Click(Object ^ sender, System::EventArgs ^ e);
+private: System::Void ReloadAllWeathersButton_Click(Object ^ sender, System::EventArgs ^ e);
 }; // ref class window_weather
 
 } // namespace editor

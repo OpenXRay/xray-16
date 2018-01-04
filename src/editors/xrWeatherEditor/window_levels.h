@@ -8,6 +8,11 @@ using namespace System::Drawing;
 
 namespace editor
 {
+ref class window_levels;
+}
+
+namespace editor
+{
 ref class window_ide;
 /// <summary>
 /// Summary for window_levels
@@ -42,12 +47,9 @@ protected:
         }
     }
 
-private:
-    XRay::SdkControls::PropertyGrid ^ PropertyGrid;
+protected:
+private: XRay::SdkControls::PropertyGrid ^ PropertyGrid;
 
-protected:
-protected:
-protected:
 private:
     /// <summary>
     /// Required designer variable.
@@ -92,7 +94,6 @@ private:
 public:
     inline ::PropertyGrid ^ property_grid() { return this->PropertyGrid; }
 
-        private : System::Void window_levels_Leave(System::Object ^ sender, System::EventArgs ^ e);
+private: System::Void window_levels_Leave(System::Object ^ sender, System::EventArgs ^ e);
 }; // ref class window_levels
-
 } // namespace editor

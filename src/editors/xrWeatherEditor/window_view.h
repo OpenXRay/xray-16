@@ -8,6 +8,11 @@ using namespace System::Drawing;
 
 namespace editor
 {
+    ref class window_view;
+}
+
+namespace editor
+{
 ref class window_ide;
 /// <summary>
 /// Summary for window_view
@@ -43,29 +48,18 @@ protected:
         }
     }
 
-private:
-    System::Windows::Forms::ToolStrip ^ MainToolBar;
-
 protected:
-private:
-    System::Windows::Forms::ToolStripButton ^ EditButton;
+private: System::Windows::Forms::ToolStrip ^ MainToolBar;
+private: System::Windows::Forms::ToolStripButton ^ EditButton;
+private: System::Windows::Forms::ToolStripButton ^ PauseButton;
+private: System::Windows::Forms::Panel ^ ViewPanel;
+private: System::Windows::Forms::ImageList ^ imageList1;
 
 private:
-    System::Windows::Forms::ToolStripButton ^ PauseButton;
-
-private:
-    System::Windows::Forms::Panel ^ ViewPanel;
-
-private:
-    System::Windows::Forms::ImageList ^ imageList1;
-
-private:
+    /// <summary>
+    /// Required designer variable.
+    /// </summary>
     System::ComponentModel::IContainer ^ components;
-
-private:
-/// <summary>
-/// Required designer variable.
-/// </summary>
 
 #pragma region Windows Form Designer generated code
     /// <summary>
@@ -169,17 +163,18 @@ private:
 
 private:
     void custom_init(window_ide % ide);
-    System::Void window_view_DoubleClick(Object ^ sender, System::EventArgs ^ e);
-    System::Void window_view_SizeChanged(Object ^ sender, System::EventArgs ^ e);
-    System::Void window_view_KeyUp(Object ^ sender, KeyEventArgs ^ e);
-    System::Void EditButton_Click(Object ^ sender, System::EventArgs ^ e);
-    System::Void PauseButton_Click(Object ^ sender, System::EventArgs ^ e);
-    System::Void window_view_Paint(Object ^ sender, PaintEventArgs ^ e);
-    System::Void ViewPanel_MouseMove(Object ^ sender, MouseEventArgs ^ e);
-    System::Void ViewPanel_MouseDown(Object ^ sender, MouseEventArgs ^ e);
-    System::Void ViewPanel_MouseLeave(Object ^ sender, System::EventArgs ^ e);
-    System::Void ViewPanel_MouseClick(Object ^ sender, MouseEventArgs ^ e);
-    System::Void window_view_KeyDown(Object ^ sender, KeyEventArgs ^ e);
+
+private: System::Void window_view_DoubleClick(Object ^ sender, System::EventArgs ^ e);
+private: System::Void window_view_SizeChanged(Object ^ sender, System::EventArgs ^ e);
+private: System::Void window_view_KeyUp(Object ^ sender, KeyEventArgs ^ e);
+private: System::Void EditButton_Click(Object ^ sender, System::EventArgs ^ e);
+private: System::Void PauseButton_Click(Object ^ sender, System::EventArgs ^ e);
+private: System::Void window_view_Paint(Object ^ sender, PaintEventArgs ^ e);
+private: System::Void ViewPanel_MouseMove(Object ^ sender, MouseEventArgs ^ e);
+private: System::Void ViewPanel_MouseDown(Object ^ sender, MouseEventArgs ^ e);
+private: System::Void ViewPanel_MouseLeave(Object ^ sender, System::EventArgs ^ e);
+private: System::Void ViewPanel_MouseClick(Object ^ sender, MouseEventArgs ^ e);
+private: System::Void window_view_KeyDown(Object ^ sender, KeyEventArgs ^ e);
 }; // ref class window_view
 
 } // namespace editor

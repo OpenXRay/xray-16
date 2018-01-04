@@ -70,8 +70,7 @@ protected:
     }
 
 protected:
-private:
-    WeifenLuo::WinFormsUI::Docking::DockPanel ^ EditorDock;
+private: WeifenLuo::WinFormsUI::Docking::DockPanel ^ EditorDock;
 
 private:
     /// <summary>
@@ -153,11 +152,10 @@ private:
 private:
     WeifenLuo::WinFormsUI::Docking::IDockContent ^ reload_content(System::String ^ persist_string);
 
-private:
-    System::Void window_ide_SizeChanged(System::Object ^ sender, System::EventArgs ^ e);
-    System::Void window_ide_LocationChanged(System::Object ^ sender, System::EventArgs ^ e);
-    System::Void window_ide_FormClosing(System::Object ^ sender, System::Windows::Forms::FormClosingEventArgs ^ e);
-    System::Void window_ide_Activated(System::Object ^ sender, System::EventArgs ^ e);
-    System::Void window_ide_Deactivate(System::Object ^ sender, System::EventArgs ^ e);
+private: System::Void window_ide_SizeChanged(System::Object ^ sender, System::EventArgs ^ e);
+private: System::Void window_ide_LocationChanged(System::Object ^ sender, System::EventArgs ^ e);
+private: System::Void window_ide_FormClosing(System::Object ^ sender, System::Windows::Forms::FormClosingEventArgs ^ e);
+private: System::Void window_ide_Activated(System::Object ^ sender, System::EventArgs ^ e);
+private: System::Void window_ide_Deactivate(System::Object ^ sender, System::EventArgs ^ e);
 };
 }
