@@ -98,41 +98,26 @@ private:
         this->panel10->SuspendLayout();
         this->panel8->SuspendLayout();
         this->SuspendLayout();
-        // 
-        // panel2
-        // 
         this->panel2->Dock = System::Windows::Forms::DockStyle::Left;
         this->panel2->Location = System::Drawing::Point(0, 0);
         this->panel2->Name = L"panel2";
         this->panel2->Size = System::Drawing::Size(10, 383);
         this->panel2->TabIndex = 1;
-        // 
-        // panel3
-        // 
         this->panel3->Dock = System::Windows::Forms::DockStyle::Right;
         this->panel3->Location = System::Drawing::Point(489, 0);
         this->panel3->Name = L"panel3";
         this->panel3->Size = System::Drawing::Size(10, 383);
         this->panel3->TabIndex = 2;
-        // 
-        // panel4
-        // 
         this->panel4->Dock = System::Windows::Forms::DockStyle::Bottom;
         this->panel4->Location = System::Drawing::Point(10, 373);
         this->panel4->Name = L"panel4";
         this->panel4->Size = System::Drawing::Size(479, 10);
         this->panel4->TabIndex = 3;
-        // 
-        // panel1
-        // 
         this->panel1->Dock = System::Windows::Forms::DockStyle::Top;
         this->panel1->Location = System::Drawing::Point(10, 0);
         this->panel1->Name = L"panel1";
         this->panel1->Size = System::Drawing::Size(479, 10);
         this->panel1->TabIndex = 4;
-        // 
-        // panel5
-        // 
         this->panel5->Controls->Add(this->TreeView);
         this->panel5->Controls->Add(this->panel7);
         this->panel5->Controls->Add(this->panel6);
@@ -141,9 +126,6 @@ private:
         this->panel5->Name = L"panel5";
         this->panel5->Size = System::Drawing::Size(479, 363);
         this->panel5->TabIndex = 5;
-        // 
-        // TreeView
-        // 
         this->TreeView->Dock = System::Windows::Forms::DockStyle::Fill;
         this->TreeView->HideSelection = false;
         this->TreeView->ImageIndex = 0;
@@ -157,25 +139,16 @@ private:
         this->TreeView->AfterExpand += gcnew System::Windows::Forms::TreeViewEventHandler(this, &window_tree_values::TreeView_AfterExpand);
         this->TreeView->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &window_tree_values::TreeView_MouseClick);
         this->TreeView->MouseDoubleClick += gcnew System::Windows::Forms::MouseEventHandler(this, &window_tree_values::TreeView_MouseDoubleClick);
-        // 
-        // Images
-        // 
         this->Images->ImageStream = (cli::safe_cast<System::Windows::Forms::ImageListStreamer^>(resources->GetObject(L"Images.ImageStream")));
         this->Images->TransparentColor = System::Drawing::Color::Fuchsia;
         this->Images->Images->SetKeyName(0, L"filter_closed.bmp");
         this->Images->Images->SetKeyName(1, L"filter_opened.bmp");
         this->Images->Images->SetKeyName(2, L"Document.bmp");
-        // 
-        // panel7
-        // 
         this->panel7->Dock = System::Windows::Forms::DockStyle::Bottom;
         this->panel7->Location = System::Drawing::Point(0, 327);
         this->panel7->Name = L"panel7";
         this->panel7->Size = System::Drawing::Size(479, 10);
         this->panel7->TabIndex = 1;
-        // 
-        // panel6
-        // 
         this->panel6->Controls->Add(this->panel10);
         this->panel6->Controls->Add(this->panel8);
         this->panel6->Dock = System::Windows::Forms::DockStyle::Bottom;
@@ -183,27 +156,18 @@ private:
         this->panel6->Name = L"panel6";
         this->panel6->Size = System::Drawing::Size(479, 26);
         this->panel6->TabIndex = 0;
-        // 
-        // panel10
-        // 
         this->panel10->Controls->Add(this->TextBox);
         this->panel10->Dock = System::Windows::Forms::DockStyle::Fill;
         this->panel10->Location = System::Drawing::Point(0, 0);
         this->panel10->Name = L"panel10";
         this->panel10->Size = System::Drawing::Size(313, 26);
         this->panel10->TabIndex = 6;
-        // 
-        // TextBox
-        // 
         this->TextBox->Dock = System::Windows::Forms::DockStyle::Fill;
         this->TextBox->Location = System::Drawing::Point(0, 0);
         this->TextBox->Name = L"TextBox";
         this->TextBox->ReadOnly = true;
         this->TextBox->Size = System::Drawing::Size(313, 21);
         this->TextBox->TabIndex = 6;
-        // 
-        // panel8
-        // 
         this->panel8->Controls->Add(this->OK_Button);
         this->panel8->Controls->Add(this->Cancel_Button);
         this->panel8->Dock = System::Windows::Forms::DockStyle::Right;
@@ -211,9 +175,6 @@ private:
         this->panel8->Name = L"panel8";
         this->panel8->Size = System::Drawing::Size(166, 26);
         this->panel8->TabIndex = 4;
-        // 
-        // OK_Button
-        // 
         this->OK_Button->DialogResult = System::Windows::Forms::DialogResult::OK;
         this->OK_Button->Location = System::Drawing::Point(8, 0);
         this->OK_Button->Name = L"OK_Button";
@@ -221,9 +182,6 @@ private:
         this->OK_Button->TabIndex = 3;
         this->OK_Button->Text = L"&OK";
         this->OK_Button->UseVisualStyleBackColor = true;
-        // 
-        // Cancel_Button
-        // 
         this->Cancel_Button->DialogResult = System::Windows::Forms::DialogResult::Cancel;
         this->Cancel_Button->Location = System::Drawing::Point(91, 0);
         this->Cancel_Button->Name = L"Cancel_Button";
@@ -231,9 +189,6 @@ private:
         this->Cancel_Button->TabIndex = 4;
         this->Cancel_Button->Text = L"&Cancel";
         this->Cancel_Button->UseVisualStyleBackColor = true;
-        // 
-        // window_tree_values
-        // 
         this->AcceptButton = this->OK_Button;
         this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
         this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
@@ -244,7 +199,7 @@ private:
         this->Controls->Add(this->panel4);
         this->Controls->Add(this->panel3);
         this->Controls->Add(this->panel2);
-        this->Font = (gcnew System::Drawing::Font(L"Tahoma", 8.25F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+        this->Font = (gcnew System::Drawing::Font(L"Tahoma", 8.25, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
             static_cast<System::Byte>(204)));
         this->MaximizeBox = false;
         this->MinimizeBox = false;

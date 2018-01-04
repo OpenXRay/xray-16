@@ -87,10 +87,6 @@ private:
     {
         this->EditorDock = (gcnew WeifenLuo::WinFormsUI::Docking::DockPanel());
         this->SuspendLayout();
-        // 
-        // EditorDock
-        // 
-        this->EditorDock->ActiveAutoHideContent = nullptr;
         this->EditorDock->Dock = System::Windows::Forms::DockStyle::Fill;
         this->EditorDock->DocumentStyle = WeifenLuo::WinFormsUI::Docking::DocumentStyle::DockingSdi;
         this->EditorDock->Font = (gcnew System::Drawing::Font(L"Tahoma", 11, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::World));
@@ -98,9 +94,6 @@ private:
         this->EditorDock->Name = L"EditorDock";
         this->EditorDock->Size = System::Drawing::Size(632, 453);
         this->EditorDock->TabIndex = 17;
-        // 
-        // window_ide
-        // 
         this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
         this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
         this->ClientSize = System::Drawing::Size(632, 453);

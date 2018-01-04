@@ -140,6 +140,7 @@
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
     <Reference Include="WeifenLuo.WinFormsUI.Docking, Version=3.0.3.0, Culture=neutral, PublicKeyToken=5cded1a1a0a7b481">
       <HintPath>..\..\..\sdk\binaries\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
     </Reference>
