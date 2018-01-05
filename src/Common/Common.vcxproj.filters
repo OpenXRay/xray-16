@@ -54,9 +54,6 @@
     <ClInclude Include="..\xrCommon\misc_math_types.h">
       <Filter>xrCommon</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrCommon\xalloc.h">
-      <Filter>xrCommon</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrCommon\xr_map.h">
       <Filter>xrCommon</Filter>
     </ClInclude>

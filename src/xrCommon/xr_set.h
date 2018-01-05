@@ -3,23 +3,15 @@
 #include "xrCore/Memory/XRayAllocator.hpp"
 
 template <typename K, class P = std::less<K>, typename allocator = XRay::xray_allocator<K>>
-class xr_set : public std::set<K, P, allocator>
-{
-public:
-    u32 size() const { return (u32)std::set<K, P, allocator>::size(); }
-};
+using xr_set = std::set<K, P, allocator>;
 
 template <typename K, class P = std::less<K>, typename allocator = XRay::xray_allocator<K>>
-class xr_multiset : public std::multiset<K, P, allocator>
-{
-public:
-    u32 size() const { return (u32)std::multiset<K, P, allocator>::size(); }
-};
+using xr_multiset = std::multiset<K, P, allocator>;
 
 #define DEFINE_SET(T, N, I)\
-    typedef xr_set<T> N;\
-    typedef N::iterator I;
+    using N = xr_set<T>;\
+    using I = N::iterator;
 
 #define DEFINE_SET_PRED(T, N, I, P)\
-    typedef xr_set<T, P> N;\
-    typedef N::iterator I;
+    using N = xr_set<T, P>;\
+    using I = N::iterator;
