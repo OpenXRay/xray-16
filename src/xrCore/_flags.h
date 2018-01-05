@@ -70,25 +70,25 @@ struct _flags
     bool is_any(const T mask) const throw() { return !!(flags & mask); }
     bool test(const T mask) const throw() { return !!(flags & mask); }
 
-    SelfRef or (const T mask) throw()
+    SelfRef _or(const T mask) throw()
     {
         flags |= mask;
         return *this;
     }
 
-    SelfRef or (const Self& f, const T mask) throw()
+    SelfRef _or(const Self& f, const T mask) throw()
     {
         flags = f.flags | mask;
         return *this;
     }
 
-    SelfRef and (const T mask) throw()
+    SelfRef _and(const T mask) throw()
     {
         flags &= mask;
         return *this;
     }
 
-    SelfRef and (const Self& f, const T mask) throw()
+    SelfRef _and(const Self& f, const T mask) throw()
     {
         flags = f.flags & mask;
         return *this;

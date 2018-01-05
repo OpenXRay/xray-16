@@ -55,11 +55,11 @@ void CALifeSwitchManager::add_online(CSE_ALifeDynamicObject* object, bool update
     NET_Packet tNetPacket;
     CSE_Abstract* l_tpAbstract = smart_cast<CSE_Abstract*>(object);
     server().entity_Destroy(l_tpAbstract);
-    object->s_flags.or (M_SPAWN_UPDATE);
+    object->s_flags._or (M_SPAWN_UPDATE);
     ClientID clientID;
     clientID.set(server().GetServerClient() ? server().GetServerClient()->ID.value() : 0);
     server().Process_spawn(tNetPacket, clientID, FALSE, l_tpAbstract);
-    object->s_flags.and (u16(-1) ^ M_SPAWN_UPDATE);
+    object->s_flags._and (u16(-1) ^ M_SPAWN_UPDATE);
 
     // Xottab_DUTY: Workaround for crash with corpses that end up outside AI map
     //R_ASSERT3(!object->used_ai_locations() || ai().level_graph().valid_vertex_id(object->m_tNodeID),

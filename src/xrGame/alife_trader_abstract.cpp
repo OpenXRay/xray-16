@@ -176,7 +176,7 @@ void add_online_impl(CSE_ALifeDynamicObject* object, const bool& update_registri
             continue;
 
         //R_ASSERT2(l_tpALifeInventoryItem, "Non inventory item object has parent?!");
-        l_tpALifeInventoryItem->base()->s_flags.or (M_SPAWN_UPDATE);
+        l_tpALifeInventoryItem->base()->s_flags._or (M_SPAWN_UPDATE);
         CSE_Abstract* l_tpAbstract = smart_cast<CSE_Abstract*>(l_tpALifeInventoryItem);
         object->alife().server().entity_Destroy(l_tpAbstract);
 
@@ -195,7 +195,7 @@ void add_online_impl(CSE_ALifeDynamicObject* object, const bool& update_registri
         l_tpALifeDynamicObject->o_Position = object->o_Position;
         l_tpALifeDynamicObject->m_tNodeID = object->m_tNodeID;
         object->alife().server().Process_spawn(tNetPacket, clientID, FALSE, l_tpALifeInventoryItem->base());
-        l_tpALifeDynamicObject->s_flags.and (u16(-1) ^ M_SPAWN_UPDATE);
+        l_tpALifeDynamicObject->s_flags._and (u16(-1) ^ M_SPAWN_UPDATE);
         l_tpALifeDynamicObject->m_bOnline = true;
     }
 

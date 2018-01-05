@@ -1501,7 +1501,7 @@ void CLevelMain::restore_rt_flags(CCustomObject* CO)
         u32 fl = m_rt_object_props->r_u32(LTools->m_LastFileName.c_str(), CO->Name);
         CO->m_RT_Flags.set(
             CCustomObject::flRT_Visible | CCustomObject::flRT_Selected | CCustomObject::flRT_SelectedLast, FALSE);
-        CO->m_RT_Flags.or (fl);
+        CO->m_RT_Flags._or (fl);
     }
 }
 
