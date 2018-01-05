@@ -43,7 +43,7 @@ public:
     void fill();
 
 private:
-    void fill_levels(CInifile& config, LPCSTR prefix, LPCSTR category);
+    void fill_levels(CInifile& config, LPCSTR section, LPCSTR category);
 
 private:
     LPCSTR const* xr_stdcall collection();
