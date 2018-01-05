@@ -1753,7 +1753,7 @@ void PATurbulence::Execute(ParticleEffect* effect, const float dt, float& tm_max
     if (!p_cnt)
         return;
 
-    u32 nWorkers = ttapi.threads.size();
+    auto nWorkers = ttapi.threads.size();
 
     if (p_cnt < nWorkers)
         nWorkers = p_cnt;
