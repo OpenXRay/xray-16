@@ -54,4 +54,4 @@ void property_float_enum_value_reference::SetValue(Object ^ object)
     inherited::SetValue(safe_cast<ValuePair ^>(m_collection[0])->first);
 }
 
-void property_float_enum_value_reference::Increment(float const % increment) {}
+void property_float_enum_value_reference::Increment(float value) {}
