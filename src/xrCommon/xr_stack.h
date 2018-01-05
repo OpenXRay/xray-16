@@ -1,6 +1,12 @@
 #pragma once
 #include "xr_vector.h"
+//#include <stack>
 
+// XXX: Use standard implementation?
+//template <typename T, class container = xr_vector<T>>
+//using xr_stack = std::stack<T, container>;
+
+// XXX: Use profiler or something to know if this is faster than std::stack
 template <typename _Ty, class _C = xr_vector<_Ty>>
 class xr_stack
 {
@@ -12,9 +18,11 @@ public:
 
     allocator_type get_allocator() const { return c.get_allocator(); }
     bool empty() const { return c.empty(); }
-    u32 size() const { return c.size(); }
+    size_type size() const { return c.size(); }
     value_type& top() { return c.back(); }
     const value_type& top() const { return c.back(); }
+    void emplace(value_type&& _X) { c.emplace_back(_X); }
+    void push(value_type&& _X) { c.push_back(std::move(_X)); }
     void push(const value_type& _X) { c.push_back(_X); }
     void pop() { c.pop_back(); }
     bool operator==(const _Myt& _X) const { return c == _X.c; }
