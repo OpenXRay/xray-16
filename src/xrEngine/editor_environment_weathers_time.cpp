@@ -96,7 +96,7 @@ void time::load(CInifile& config)
 
     // clouds_color = config.r_fvector4(m_identifier, "clouds_color");
 
-    // LPCSTR clouds = config.r_string(m_identifier, "clouds_color");
+    // pcstr clouds = config.r_string(m_identifier, "clouds_color");
     // VERIFY (_GetItemCount(clouds) == 5);
     // string256 temp;
     // ((Fvector&)clouds_color).mul(.5f*(float)atof(_GetItem(clouds,4,temp)));
@@ -134,8 +134,8 @@ void time::save(CInifile& config)
     config.w_fvector4(m_identifier.c_str(), "clouds_color", clouds_color);
 }
 
-LPCSTR time::id_getter() const { return (m_identifier.c_str()); }
-void time::id_setter(LPCSTR value_)
+pcstr time::id_getter() const { return (m_identifier.c_str()); }
+void time::id_setter(pcstr value_)
 {
     shared_str value = value_;
     if (m_identifier._get() == value._get())
@@ -147,11 +147,11 @@ void time::id_setter(LPCSTR value_)
         m_identifier = value;
 }
 
-LPCSTR const* time::ambients_collection() { return (&*m_manager.ambients().ambients_ids().begin()); }
+pcstr const* time::ambients_collection() { return (&*m_manager.ambients().ambients_ids().begin()); }
 u32 time::ambients_collection_size() { return (m_manager.ambients().ambients_ids().size()); }
-LPCSTR const* time::suns_collection() { return (&*m_manager.suns().suns_ids().begin()); }
+pcstr const* time::suns_collection() { return (&*m_manager.suns().suns_ids().begin()); }
 u32 time::suns_collection_size() { return (m_manager.suns().suns_ids().size()); }
-LPCSTR const* time::thunderbolts_collection() { return (&*m_manager.thunderbolts().collections_ids().begin()); }
+pcstr const* time::thunderbolts_collection() { return (&*m_manager.thunderbolts().collections_ids().begin()); }
 u32 time::thunderbolts_collection_size() { return (m_manager.thunderbolts().collections_ids().size()); }
 float time::sun_altitude_getter() const
 {
@@ -181,8 +181,8 @@ void time::sun_longitude_setter(float value)
     sun_dir.setHP(y, deg2rad(value));
 }
 
-LPCSTR time::ambient_getter() const { return (m_ambient.c_str()); }
-void time::ambient_setter(LPCSTR value)
+pcstr time::ambient_getter() const { return (m_ambient.c_str()); }
+void time::ambient_setter(pcstr value)
 {
     if (m_ambient._get() == shared_str(value)._get())
         return;
@@ -191,8 +191,8 @@ void time::ambient_setter(LPCSTR value)
     env_ambient = m_manager.AppendEnvAmb(value);
 }
 
-LPCSTR time::sun_getter() const { return (m_sun.c_str()); }
-void time::sun_setter(LPCSTR value)
+pcstr time::sun_getter() const { return (m_sun.c_str()); }
+void time::sun_setter(pcstr value)
 {
     if (m_sun._get() == shared_str(value)._get())
         return;
@@ -201,8 +201,8 @@ void time::sun_setter(LPCSTR value)
     lens_flare_id = m_manager.eff_LensFlare->AppendDef(m_manager, m_manager.m_suns_config, value);
 }
 
-LPCSTR time::thunderbolt_getter() const { return (m_thunderbolt_collection.c_str()); }
-void time::thunderbolt_setter(LPCSTR value)
+pcstr time::thunderbolt_getter() const { return (m_thunderbolt_collection.c_str()); }
+void time::thunderbolt_setter(pcstr value)
 {
     if (m_thunderbolt_collection._get() == shared_str(value)._get())
         return;
@@ -212,8 +212,8 @@ void time::thunderbolt_setter(LPCSTR value)
         m_manager, m_manager.m_thunderbolt_collections_config, m_manager.m_thunderbolts_config, value);
 }
 
-LPCSTR time::sky_texture_getter() const { return (sky_texture_name.c_str()); }
-void time::sky_texture_setter(LPCSTR value)
+pcstr time::sky_texture_getter() const { return (sky_texture_name.c_str()); }
+void time::sky_texture_setter(pcstr value)
 {
     if (sky_texture_name._get() == shared_str(value)._get())
         return;
@@ -226,8 +226,8 @@ void time::sky_texture_setter(LPCSTR value)
     m_pDescriptor->OnDeviceCreate(*this);
 }
 
-LPCSTR time::clouds_texture_getter() const { return (clouds_texture_name.c_str()); }
-void time::clouds_texture_setter(LPCSTR value)
+pcstr time::clouds_texture_getter() const { return (clouds_texture_name.c_str()); }
+void time::clouds_texture_setter(pcstr value)
 {
     if (clouds_texture_name._get() == shared_str(value)._get())
         return;

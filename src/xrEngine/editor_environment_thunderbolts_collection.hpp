@@ -33,10 +33,10 @@ public:
     void load(CInifile& config);
     void save(CInifile& config);
     void fill(XRay::Editor::property_holder_collection* collection);
-    inline LPCSTR id() const { return section.c_str(); }
+    inline pcstr id() const { return section.c_str(); }
 private:
-    LPCSTR xr_stdcall id_getter() const;
-    void xr_stdcall id_setter(LPCSTR value);
+    pcstr xr_stdcall id_getter() const;
+    void xr_stdcall id_setter(pcstr value);
 
 private:
     typedef XRay::Editor::property_holder_base property_holder_type;

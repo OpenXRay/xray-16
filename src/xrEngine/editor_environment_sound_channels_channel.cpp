@@ -21,7 +21,7 @@ using editor::environment::sound_channels::manager;
 
 template <>
 void property_collection<channel::sound_container_type, channel>::display_name(
-    u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
+    u32 const& item_index, pstr const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id());
 }
@@ -59,7 +59,7 @@ void channel::load(CInifile& config)
     inherited::load(config, m_load_section.c_str());
 
     VERIFY(m_sounds.empty());
-    LPCSTR sounds = config.r_string(m_load_section, "sounds");
+    pcstr sounds = config.r_string(m_load_section, "sounds");
     string_path sound;
     for (u32 i = 0, n = _GetItemCount(sounds); i < n; ++i)
     {
@@ -79,30 +79,24 @@ void channel::save(CInifile& config)
     config.w_s32(m_load_section.c_str(), "period3", m_sound_period.w);
 
     u32 count = 1;
-    sound_container_type::const_iterator b = m_sounds.begin(), i = b;
-    sound_container_type::const_iterator e = m_sounds.end();
-    for (; i != e; ++i)
-        count += xr_strlen((*i)->id()) + 2;
+    for (const auto &i : m_sounds)
+        count += xr_strlen(i->id()) + 2;
 
-    LPSTR temp = (LPSTR)_alloca(count * sizeof(char));
-    *temp = 0;
-    for (i = b; i != e; ++i)
+    pstr temp = (pstr)_alloca(count * sizeof(char));
+    *temp = '\0';
+    for (const auto &i : m_sounds)
     {
-        if (i == b)
-        {
-            xr_strcpy(temp, count, (*i)->id());
-            continue;
-        }
+        xr_strcat(temp, count, i->id());
 
-        xr_strcat(temp, count, ", ");
-        xr_strcat(temp, count, (*i)->id());
+        if (&i != &m_sounds.back())
+            xr_strcat(temp, count, ", ");
     }
 
     config.w_string(m_load_section.c_str(), "sounds", temp);
 }
 
-LPCSTR channel::id_getter() const { return (m_load_section.c_str()); }
-void channel::id_setter(LPCSTR value_)
+pcstr channel::id_getter() const { return (m_load_section.c_str()); }
+void channel::id_setter(pcstr value_)
 {
     shared_str value = value_;
     if (m_load_section._get() == value._get())

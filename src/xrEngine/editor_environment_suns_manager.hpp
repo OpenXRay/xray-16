@@ -50,7 +50,7 @@ private:
 
 public:
     typedef xr_vector<sun*> container_type;
-    typedef xr_vector<LPSTR> suns_ids_type;
+    typedef xr_vector<pstr> suns_ids_type;
 
 public:
     suns_ids_type const& suns_ids() const;

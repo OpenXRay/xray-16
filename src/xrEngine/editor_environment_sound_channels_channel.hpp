@@ -36,12 +36,12 @@ public:
     void load(CInifile& config);
     void save(CInifile& config);
     void fill(XRay::Editor::property_holder_collection* collection);
-    inline LPCSTR id() const { return m_load_section.c_str(); }
+    inline pcstr id() const { return m_load_section.c_str(); }
     virtual sounds_type& sounds();
 
 private:
-    LPCSTR xr_stdcall id_getter() const;
-    void xr_stdcall id_setter(LPCSTR value);
+    pcstr xr_stdcall id_getter() const;
+    void xr_stdcall id_setter(pcstr value);
 
 public:
     typedef xr_vector<source*> sound_container_type;

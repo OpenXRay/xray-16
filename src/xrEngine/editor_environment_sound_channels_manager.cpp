@@ -20,7 +20,7 @@ using editor::environment::detail::logical_string_predicate;
 
 template <>
 void property_collection<manager::channel_container_type, manager>::display_name(
-    u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
+    u32 const& item_index, pstr const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id());
 }
@@ -48,19 +48,17 @@ manager::~manager()
 void manager::load()
 {
     string_path file_name;
-    CInifile* config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment\\sound_channels.ltx"), TRUE, TRUE, FALSE);
+    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment\\sound_channels.ltx"), true, true, false);
 
     VERIFY(m_channels.empty());
 
     typedef CInifile::Root sections_type;
     sections_type& sections = config->sections();
     m_channels.reserve(sections.size());
-    sections_type::const_iterator i = sections.begin();
-    sections_type::const_iterator e = sections.end();
-    for (; i != e; ++i)
+
+    for (const auto &i : sections)
     {
-        channel* object = new channel(*this, (*i)->Name);
+        channel* object = new channel(*this, i->Name);
         object->load(*config);
         object->fill(m_collection);
         m_channels.push_back(object);
@@ -72,13 +70,10 @@ void manager::load()
 void manager::save()
 {
     string_path file_name;
-    CInifile* config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment\\sound_channels.ltx"), FALSE, FALSE, TRUE);
+    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment\\sound_channels.ltx"), false, false, true);
 
-    channel_container_type::iterator i = m_channels.begin();
-    channel_container_type::iterator e = m_channels.end();
-    for (; i != e; ++i)
-        (*i)->save(*config);
+    for (const auto &i : m_channels)
+        i->save(*config);
 
     xr_delete(config);
 }
@@ -100,11 +95,9 @@ manager::channels_ids_type const& manager::channels_ids() const
 
     m_channels_ids.resize(m_channels.size());
 
-    channel_container_type::const_iterator i = m_channels.begin();
-    channel_container_type::const_iterator e = m_channels.end();
-    channels_ids_type::iterator j = m_channels_ids.begin();
-    for (; i != e; ++i, ++j)
-        *j = xr_strdup((*i)->id());
+    auto j = m_channels_ids.begin();
+    for (const auto &i : m_channels)
+        *j++ = xr_strdup(i->id());
 
     std::sort(m_channels_ids.begin(), m_channels_ids.end(), logical_string_predicate());
 

@@ -39,7 +39,7 @@ public:
     virtual property_holder_type* object();
 
 private:
-    LPCSTR const* xr_stdcall collection();
+    pcstr const* xr_stdcall collection();
     u32 xr_stdcall collection_size();
 
 private:

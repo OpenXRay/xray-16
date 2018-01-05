@@ -52,8 +52,8 @@ void sun::save(CInifile& config)
     config.w_string(m_id.c_str(), "sun_texture", m_texture.c_str());
 }
 
-LPCSTR sun::id_getter() const { return (m_id.c_str()); }
-void sun::id_setter(LPCSTR value_)
+pcstr sun::id_getter() const { return (m_id.c_str()); }
+void sun::id_setter(pcstr value_)
 {
     shared_str value = value_;
     if (m_id._get() == value._get())

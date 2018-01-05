@@ -64,8 +64,8 @@ void thunderbolt::save(CInifile& config)
     config.w_string(m_id.c_str(), "sound", m_sound.c_str());
 }
 
-LPCSTR thunderbolt::id_getter() const { return (m_id.c_str()); }
-void thunderbolt::id_setter(LPCSTR value_)
+pcstr thunderbolt::id_getter() const { return (m_id.c_str()); }
+void thunderbolt::id_setter(pcstr value_)
 {
     shared_str value = value_;
     if (m_id._get() == value._get())

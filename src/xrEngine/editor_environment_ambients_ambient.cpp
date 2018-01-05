@@ -27,7 +27,7 @@ using editor::environment::effects::effect;
 
 template <>
 void property_collection<ambient::effect_container_type, ambient>::display_name(
-    u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
+    u32 const& item_index, pstr const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id().c_str());
 }
@@ -42,7 +42,7 @@ XRay::Editor::property_holder_base* property_collection<ambient::effect_containe
 
 template <>
 void property_collection<ambient::sound_container_type, ambient>::display_name(
-    u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
+    u32 const& item_index, pstr const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id().c_str());
 }
@@ -85,7 +85,7 @@ void ambient::load(
 
     {
         VERIFY(m_effects_ids.empty());
-        LPCSTR effects_string = READ_IF_EXISTS(&ambients_config, r_string, m_load_section, "effects", "");
+        pcstr effects_string = READ_IF_EXISTS(&ambients_config, r_string, m_load_section, "effects", "");
         for (u32 i = 0, n = _GetItemCount(effects_string); i < n; ++i)
         {
             string_path temp;
@@ -97,7 +97,7 @@ void ambient::load(
 
     {
         VERIFY(m_sound_channels_ids.empty());
-        LPCSTR sounds_string = READ_IF_EXISTS(&ambients_config, r_string, m_load_section, "sound_channels", "");
+        pcstr sounds_string = READ_IF_EXISTS(&ambients_config, r_string, m_load_section, "sound_channels", "");
         for (u32 i = 0, n = _GetItemCount(sounds_string); i < n; ++i)
         {
             string_path temp;
@@ -111,25 +111,19 @@ void ambient::load(
 void ambient::save(CInifile& config)
 {
     u32 count = 1;
-    LPSTR temp = 0;
+    pstr temp = 0;
     {
-        sound_container_type::const_iterator b = m_sound_channels_ids.begin(), i = b;
-        sound_container_type::const_iterator e = m_sound_channels_ids.end();
-        for (; i != e; ++i)
-            count += (*i)->id().size() + 2;
+        for (const auto &i : m_sound_channels_ids)
+            count += i->id().size() + 2;
 
-        temp = (LPSTR)_alloca(count * sizeof(char));
-        *temp = 0;
-        for (i = b; i != e; ++i)
+        temp = (pstr)_alloca(count * sizeof(char));
+        *temp = '\0';
+        for (const auto &i : m_sound_channels_ids)
         {
-            if (i == b)
-            {
-                xr_strcpy(temp, count, (*i)->id().c_str());
-                continue;
-            }
+            xr_strcat(temp, count, i->id().c_str());
 
-            xr_strcat(temp, count, ", ");
-            xr_strcat(temp, count, (*i)->id().c_str());
+            if (&i != &m_sound_channels_ids.back())
+                xr_strcat(temp, count, ", ");
         }
     }
 
@@ -139,30 +133,23 @@ void ambient::save(CInifile& config)
 
     {
         count = 1;
-        effect_container_type::const_iterator b = m_effects_ids.begin(), i = b;
-        effect_container_type::const_iterator e = m_effects_ids.end();
-        for (; i != e; ++i)
-            count += (*i)->id().size() + 2;
+        for (const auto &i : m_effects_ids)
+            count += i->id().size() + 2;
 
-        temp = (LPSTR)_alloca(count * sizeof(char));
-        *temp = 0;
-        for (i = b; i != e; ++i)
+        temp = (pstr)_alloca(count * sizeof(char));
+        *temp = '\0';
+        for (const auto &i : m_effects_ids)
         {
-            if (i == b)
-            {
-                xr_strcpy(temp, count, (*i)->id().c_str());
-                continue;
-            }
-
-            xr_strcat(temp, count, ", ");
-            xr_strcat(temp, count, (*i)->id().c_str());
+            xr_strcat(temp, count, i->id().c_str());
+            if (&i != &m_effects_ids.back())
+                xr_strcat(temp, count, ", ");
         }
     }
     config.w_string(m_load_section.c_str(), "effects", temp);
 }
 
-LPCSTR ambient::id_getter() const { return (m_load_section.c_str()); }
-void ambient::id_setter(LPCSTR value_)
+pcstr ambient::id_getter() const { return (m_load_section.c_str()); }
+void ambient::id_setter(pcstr value_)
 {
     shared_str value = value_;
     if (m_load_section._get() == value._get())
@@ -211,7 +198,7 @@ ambient::property_holder_type* ambient::object() { return (m_property_holder); }
     return (m_manager.sounds_manager());
 }
 
-ambient::SEffect* ambient::create_effect(CInifile& config, LPCSTR id)
+ambient::SEffect* ambient::create_effect(CInifile& config, pcstr id)
 {
     effect* result = new effect(m_manager.effects_manager(), id);
     result->load(config);
@@ -219,7 +206,7 @@ ambient::SEffect* ambient::create_effect(CInifile& config, LPCSTR id)
     return (result);
 }
 
-ambient::SSndChannel* ambient::create_sound_channel(CInifile& config, LPCSTR id)
+ambient::SSndChannel* ambient::create_sound_channel(CInifile& config, pcstr id)
 {
     channel* result = new channel(m_manager.sounds_manager(), id);
     result->load(config);

@@ -41,6 +41,10 @@ void effect::load(CInifile& config)
     particles = config.r_string(m_id, "particles");
     m_sound = config.r_string(m_id, "sound");
     wind_gust_factor = config.r_float(m_id, "wind_gust_factor");
+    wind_blast_in_time = config.r_float(m_id, "wind_blast_in_time");
+    wind_blast_out_time = config.r_float(m_id, "wind_blast_out_time");
+    wind_blast_strength = config.r_float(m_id, "wind_blast_strength");
+    wind_blast_direction.setHP(deg2rad(config.r_float(m_id, "wind_blast_longitude")), 0.f);
 }
 
 void effect::save(CInifile& config)
@@ -56,8 +60,8 @@ void effect::save(CInifile& config)
     config.w_float(m_id.c_str(), "wind_blast_longitude", rad2deg(wind_blast_direction.getH()));
 }
 
-LPCSTR effect::id_getter() const { return (m_id.c_str()); }
-void effect::id_setter(LPCSTR value_)
+pcstr effect::id_getter() const { return (m_id.c_str()); }
+void effect::id_setter(pcstr value_)
 {
     shared_str value = value_;
     if (m_id._get() == value._get())
@@ -66,8 +70,8 @@ void effect::id_setter(LPCSTR value_)
     m_id = m_manager.unique_id(value);
 }
 
-LPCSTR effect::sound_getter() { return (m_sound.c_str()); }
-void effect::sound_setter(LPCSTR value)
+pcstr effect::sound_getter() { return (m_sound.c_str()); }
+void effect::sound_setter(pcstr value)
 {
     m_sound = value;
     sound.destroy();

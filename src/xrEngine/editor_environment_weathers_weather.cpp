@@ -22,7 +22,7 @@ using editor::environment::weathers::time;
 
 template <>
 void property_collection<weather::container_type, weather>::display_name(
-    u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
+    u32 const& item_index, pstr const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id().c_str());
 }
@@ -65,11 +65,10 @@ void weather::load()
     typedef CInifile::Root sections_type;
     sections_type& sections = config->sections();
     m_times.reserve(sections.size());
-    sections_type::const_iterator i = sections.begin();
-    sections_type::const_iterator e = sections.end();
-    for (; i != e; ++i)
+
+    for (const auto &i : sections)
     {
-        time* object = new time(&m_manager, this, (*i)->Name);
+        time* object = new time(&m_manager, this, i->Name);
         object->load(*config);
         object->fill(m_collection);
         m_times.push_back(object);
@@ -84,18 +83,16 @@ void weather::save()
     string_path file_name;
     FS.update_path(file_name, "$game_weathers$", m_id.c_str());
     xr_strcat(file_name, ".ltx");
-    CInifile* config = new CInifile(file_name, FALSE, FALSE, TRUE);
+    CInifile* config = new CInifile(file_name, false, false, true);
 
-    container_type::iterator i = m_times.begin();
-    container_type::iterator e = m_times.end();
-    for (; i != e; ++i)
-        (*i)->save(*config);
+    for (const auto &i : m_times)
+        i->save(*config);
 
     CInifile::Destroy(config);
 }
 
-LPCSTR weather::id_getter() const { return (m_id.c_str()); }
-void weather::id_setter(LPCSTR value_)
+pcstr weather::id_getter() const { return (m_id.c_str()); }
+void weather::id_setter(pcstr value_)
 {
     shared_str value = value_;
     if (m_id._get() == value._get())
@@ -135,7 +132,7 @@ static inline bool is_digit(char const& test)
 
 bool weather::valid_id(shared_str const& id_) const
 {
-    LPCSTR id = id_.c_str();
+    pcstr id = id_.c_str();
     if (!is_digit(id[0]))
         return (false);
 
@@ -261,15 +258,13 @@ shared_str weather::generate_unique_id() const
 
 bool weather::save_time_frame(shared_str const& frame_id, char* buffer, u32 const& buffer_size)
 {
-    container_type::iterator i = m_times.begin();
-    container_type::iterator e = m_times.end();
-    for (; i != e; ++i)
+    for (const auto &i : m_times)
     {
-        if (frame_id._get() != (*i)->id()._get())
+        if (frame_id._get() != i->id()._get())
             continue;
 
-        CInifile temp(0, FALSE, FALSE, FALSE);
-        (*i)->save(temp);
+        CInifile temp(nullptr, false, false, false);
+        i->save(temp);
 
         CMemoryWriter writer;
         temp.save_as(writer);
@@ -286,11 +281,9 @@ bool weather::save_time_frame(shared_str const& frame_id, char* buffer, u32 cons
 
 bool weather::paste_time_frame(shared_str const& frame_id, char const* buffer, u32 const& buffer_size)
 {
-    container_type::iterator i = m_times.begin();
-    container_type::iterator e = m_times.end();
-    for (; i != e; ++i)
+    for (const auto &i : m_times)
     {
-        if (frame_id._get() != (*i)->id()._get())
+        if (frame_id._get() != i->id()._get())
             continue;
 
         IReader reader(const_cast<char*>(buffer), buffer_size);
@@ -298,7 +291,7 @@ bool weather::paste_time_frame(shared_str const& frame_id, char const* buffer, u
         if (temp.sections().empty())
             return (false);
 
-        (*i)->load_from((*temp.sections().begin())->Name, temp, shared_str((*i)->id()));
+        i->load_from((*temp.sections().begin())->Name, temp, shared_str(i->id()));
         return (true);
     }
 
@@ -313,10 +306,8 @@ bool weather::add_time_frame(char const* buffer, u32 const& buffer_size)
         return (false);
 
     shared_str const& section = (*temp.sections().begin())->Name;
-    container_type::const_iterator i = m_times.begin();
-    container_type::const_iterator e = m_times.end();
-    for (; i != e; ++i)
-        if (section._get() == (*i)->id()._get())
+    for (const auto &i : m_times)
+        if (section._get() == i->id()._get())
             return (false);
 
     time* object = new time(&m_manager, this, section);
@@ -331,7 +322,7 @@ bool weather::add_time_frame(char const* buffer, u32 const& buffer_size)
         }
     }; // struct id
 
-    container_type::iterator found = std::lower_bound(m_times.begin(), m_times.end(), section, &id::predicate);
+    auto found = std::lower_bound(m_times.begin(), m_times.end(), section, &id::predicate);
 
     u32 index = u32(found - m_times.begin());
     m_times.insert(found, object);
@@ -346,17 +337,15 @@ void weather::reload_time_frame(shared_str const& frame_id)
     xr_strcat(file_name, ".ltx");
     CInifile* config = CInifile::Create(file_name);
 
-    container_type::iterator i = m_times.begin();
-    container_type::iterator e = m_times.end();
-    for (; i != e; ++i)
+    for (const auto &i : m_times)
     {
-        if (frame_id._get() != (*i)->id()._get())
+        if (frame_id._get() != i->id()._get())
             continue;
 
-        if (!config->section_exist((*i)->id()))
+        if (!config->section_exist(i->id()))
             return;
 
-        (*i)->load_from((*i)->id(), *config, (*i)->id());
+        i->load_from(i->id(), *config, i->id());
         CInifile::Destroy(config);
         return;
     }

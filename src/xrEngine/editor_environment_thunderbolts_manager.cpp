@@ -27,7 +27,7 @@ using editor::environment::detail::logical_string_predicate;
 
 template <>
 void property_collection<manager::thunderbolt_container_type, manager>::display_name(
-    u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
+    u32 const& item_index, pstr const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id());
 }
@@ -42,7 +42,7 @@ XRay::Editor::property_holder_base* property_collection<manager::thunderbolt_con
 
 template <>
 void property_collection<manager::collection_container_type, manager>::display_name(
-    u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
+    u32 const& item_index, pstr const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id());
 }
@@ -85,17 +85,15 @@ void manager::load_thunderbolts()
     VERIFY(m_thunderbolts.empty());
 
     string_path file_name;
-    CInifile* config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment\\thunderbolts.ltx"), TRUE, TRUE, FALSE);
+    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment\\thunderbolts.ltx"), true, true, false);
 
     typedef CInifile::Root sections_type;
     sections_type& sections = config->sections();
     m_thunderbolts.reserve(sections.size());
-    sections_type::const_iterator i = sections.begin();
-    sections_type::const_iterator e = sections.end();
-    for (; i != e; ++i)
+
+    for (const auto &i : sections)
     {
-        thunderbolt* object = new thunderbolt(this, (*i)->Name);
+        thunderbolt* object = new thunderbolt(this, i->Name);
         object->load(*config);
         object->fill(m_environment, m_thunderbolt_collection);
         m_thunderbolts.push_back(object);
@@ -107,13 +105,10 @@ void manager::load_thunderbolts()
 void manager::save_thunderbolts()
 {
     string_path file_name;
-    CInifile* config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment\\thunderbolts.ltx"), FALSE, FALSE, TRUE);
+    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment\\thunderbolts.ltx"), false, false, true);
 
-    thunderbolt_container_type::const_iterator i = m_thunderbolts.begin();
-    thunderbolt_container_type::const_iterator e = m_thunderbolts.end();
-    for (; i != e; ++i)
-        (*i)->save(*config);
+    for (const auto &i : m_thunderbolts)
+        i->save(*config);
 
     xr_delete(config);
 }
@@ -123,17 +118,15 @@ void manager::load_collections()
     VERIFY(m_collections.empty());
 
     string_path file_name;
-    CInifile* config = new CInifile(
-        FS.update_path(file_name, "$game_config$", "environment\\thunderbolt_collections.ltx"), TRUE, TRUE, FALSE);
+    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment\\thunderbolt_collections.ltx"), true, true, false);
 
     typedef CInifile::Root sections_type;
     sections_type& sections = config->sections();
     m_collections.reserve(sections.size());
-    sections_type::const_iterator i = sections.begin();
-    sections_type::const_iterator e = sections.end();
-    for (; i != e; ++i)
+
+    for (const auto &i : sections)
     {
-        collection* object = new collection(*this, (*i)->Name);
+        collection* object = new collection(*this, i->Name);
         object->load(*config);
         object->fill(m_thunderbolt_collection);
         m_collections.push_back(object);
@@ -145,13 +138,10 @@ void manager::load_collections()
 void manager::save_collections()
 {
     string_path file_name;
-    CInifile* config = new CInifile(
-        FS.update_path(file_name, "$game_config$", "environment\\thunderbolt_collections.ltx"), FALSE, FALSE, TRUE);
+    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment\\thunderbolt_collections.ltx"), false, false, true);
 
-    collection_container_type::const_iterator i = m_collections.begin();
-    collection_container_type::const_iterator e = m_collections.end();
-    for (; i != e; ++i)
-        (*i)->save(*config);
+    for (const auto &i : m_collections)
+        i->save(*config);
 
     xr_delete(config);
 }
@@ -168,8 +158,7 @@ void manager::save()
     save_collections();
 
     string_path file_name;
-    CInifile* config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment\\environment.ltx"), FALSE, FALSE, TRUE);
+    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment\\environment.ltx"), false, false, true);
 
     CEnvironment& environment = g_pGamePersistent->Environment();
 
@@ -253,11 +242,9 @@ manager::thunderbolts_ids_type const& manager::thunderbolts_ids() const
 
     m_thunderbolts_ids.resize(m_thunderbolts.size());
 
-    thunderbolt_container_type::const_iterator i = m_thunderbolts.begin();
-    thunderbolt_container_type::const_iterator e = m_thunderbolts.end();
-    thunderbolts_ids_type::iterator j = m_thunderbolts_ids.begin();
-    for (; i != e; ++i, ++j)
-        *j = xr_strdup((*i)->id());
+    auto j = m_thunderbolts_ids.begin();
+    for (const auto &i : m_thunderbolts)
+        *j++ = xr_strdup(i->id());
 
     std::sort(m_thunderbolts_ids.begin(), m_thunderbolts_ids.end(), logical_string_predicate());
 
@@ -274,11 +261,9 @@ manager::thunderbolts_ids_type const& manager::collections_ids() const
     m_collections_ids.resize(m_collections.size() + 1);
     m_collections_ids[0] = xr_strdup("");
 
-    collection_container_type::const_iterator i = m_collections.begin();
-    collection_container_type::const_iterator e = m_collections.end();
-    collections_ids_type::iterator j = m_collections_ids.begin() + 1;
-    for (; i != e; ++i, ++j)
-        *j = xr_strdup((*i)->id());
+    auto j = m_collections_ids.begin() + 1;
+    for (const auto &i : m_collections)
+        *j++ = xr_strdup(i->id());
 
     std::sort(m_collections_ids.begin(), m_collections_ids.end(), logical_string_predicate());
 
@@ -304,11 +289,9 @@ shared_str manager::unique_collection_id(shared_str const& id) const
 
 SThunderboltDesc* manager::description(CInifile& config, shared_str const& section) const
 {
-    thunderbolt_container_type::const_iterator i = m_thunderbolts.begin();
-    thunderbolt_container_type::const_iterator e = m_thunderbolts.end();
-    for (; i != e; ++i)
-        if ((*i)->id() == section)
-            return (*i);
+    for (const auto &i : m_thunderbolts)
+        if (i->id() == section)
+            return i;
 
     NODEFAULT;
 #ifdef DEBUG
@@ -318,11 +301,9 @@ SThunderboltDesc* manager::description(CInifile& config, shared_str const& secti
 
 SThunderboltCollection* manager::get_collection(shared_str const& section)
 {
-    collection_container_type::iterator i = m_collections.begin();
-    collection_container_type::iterator e = m_collections.end();
-    for (; i != e; ++i)
-        if ((*i)->id() == section)
-            return (*i);
+    for (const auto &i : m_collections)
+        if (i->id() == section)
+            return i;
 
     NODEFAULT;
 #ifdef DEBUG

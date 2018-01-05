@@ -43,10 +43,10 @@ public:
     void fill();
 
 private:
-    void fill_levels(CInifile& config, LPCSTR prefix, LPCSTR category);
+    void fill_levels(CInifile& config, pcstr section, pcstr category);
 
 private:
-    LPCSTR const* xr_stdcall collection();
+    pcstr const* xr_stdcall collection();
     u32 xr_stdcall collection_size();
 
 private:
@@ -58,7 +58,7 @@ private:
         }
     }; // struct predicate
 
-    typedef AssociativeVector<shared_str, std::pair<LPCSTR, shared_str>, predicate> levels_container_type;
+    typedef AssociativeVector<shared_str, std::pair<pcstr, shared_str>, predicate> levels_container_type;
 
 private:
     levels_container_type m_levels;

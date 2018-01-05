@@ -13,7 +13,7 @@ using editor::environment::detail::logical_string_predicate;
 
 template <>
 void property_collection<manager::effect_container_type, manager>::display_name(
-    u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
+    u32 const& item_index, pstr const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id());
 }
@@ -41,19 +41,17 @@ manager::~manager()
 void manager::load()
 {
     string_path file_name;
-    CInifile* config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment\\effects.ltx"), TRUE, TRUE, FALSE);
+    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment\\effects.ltx"), true, true, false);
 
     VERIFY(m_effects.empty());
 
     typedef CInifile::Root sections_type;
     sections_type& sections = config->sections();
     m_effects.reserve(sections.size());
-    sections_type::const_iterator i = sections.begin();
-    sections_type::const_iterator e = sections.end();
-    for (; i != e; ++i)
+
+    for (const auto &i : sections)
     {
-        effect* object = new effect(*this, (*i)->Name);
+        effect* object = new effect(*this, i->Name);
         object->load(*config);
         object->fill(m_collection);
         m_effects.push_back(object);
@@ -65,13 +63,10 @@ void manager::load()
 void manager::save()
 {
     string_path file_name;
-    CInifile* config =
-        new CInifile(FS.update_path(file_name, "$game_config$", "environment\\effects.ltx"), FALSE, FALSE, TRUE);
+    CInifile* config = new CInifile(FS.update_path(file_name, "$game_config$", "environment\\effects.ltx"), false, false, true);
 
-    effect_container_type::iterator i = m_effects.begin();
-    effect_container_type::iterator e = m_effects.end();
-    for (; i != e; ++i)
-        (*i)->save(*config);
+    for (const auto &i : m_effects)
+        i->save(*config);
 
     xr_delete(config);
 }
@@ -93,11 +88,9 @@ manager::effects_ids_type const& manager::effects_ids() const
 
     m_effects_ids.resize(m_effects.size());
 
-    effect_container_type::const_iterator i = m_effects.begin();
-    effect_container_type::const_iterator e = m_effects.end();
-    effects_ids_type::iterator j = m_effects_ids.begin();
-    for (; i != e; ++i, ++j)
-        *j = xr_strdup((*i)->id());
+    auto j = m_effects_ids.begin();
+    for (const auto &i : m_effects)
+        *j++ = xr_strdup(i->id());
 
     std::sort(m_effects_ids.begin(), m_effects_ids.end(), logical_string_predicate());
 

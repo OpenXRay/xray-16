@@ -12,6 +12,7 @@
 #include "Common/Platform.hpp"
 #include "Common/Common.hpp"
 #include "xrCommon/inlining_macros.h"
+#include "xrCore/xrstring.h"
 #pragma managed(pop)
 
 #ifdef DEBUG

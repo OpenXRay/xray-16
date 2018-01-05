@@ -34,8 +34,8 @@ public:
     void fill(XRay::Editor::property_holder_collection* collection);
 
 private:
-    LPCSTR xr_stdcall id_getter() const;
-    void xr_stdcall id_setter(LPCSTR value);
+    pcstr xr_stdcall id_getter() const;
+    void xr_stdcall id_setter(pcstr value);
 
 public:
     inline shared_str const& id() const { return m_id; }

@@ -21,7 +21,7 @@ using editor::environment::thunderbolts::manager;
 
 template <>
 void property_collection<collection::container_type, collection>::display_name(
-    u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
+    u32 const& item_index, pstr const& buffer, u32 const& buffer_size)
 {
     xr_strcpy(buffer, buffer_size, m_container[item_index]->id());
 }
@@ -58,29 +58,25 @@ void collection::load(CInifile& config)
 {
     CInifile::Sect& items = config.r_section(section);
     m_ids.reserve(items.Data.size());
-    typedef CInifile::Items items_type;
-    items_type::const_iterator i = items.Data.begin();
-    items_type::const_iterator e = items.Data.end();
-    for (; i != e; ++i)
+
+    for (const auto &i : items.Data)
     {
-        thunderbolt_id* object = new thunderbolt_id(m_manager, (*i).first);
+        thunderbolt_id* object = new thunderbolt_id(m_manager, i.first);
         object->fill(m_collection);
         m_ids.push_back(object);
 
-        palette.push_back(m_manager.description(config, (*i).first));
+        palette.push_back(m_manager.description(config, i.first));
     }
 }
 
 void collection::save(CInifile& config)
 {
-    container_type::const_iterator i = m_ids.begin();
-    container_type::const_iterator e = m_ids.end();
-    for (; i != e; ++i)
-        config.w_string(section.c_str(), (*i)->id(), "");
+    for (const auto &i : m_ids)
+        config.w_string(section.c_str(), i->id(), "");
 }
 
-LPCSTR collection::id_getter() const { return (section.c_str()); }
-void collection::id_setter(LPCSTR value_)
+pcstr collection::id_getter() const { return (section.c_str()); }
+void collection::id_setter(pcstr value_)
 {
     shared_str value = value_;
     if (section._get() == value._get())

@@ -26,7 +26,7 @@ public:
     source(shared_str const& source);
     ~source();
     void fill(XRay::Editor::property_holder_collection* collection);
-    inline LPCSTR id() const { return m_source.c_str(); }
+    inline pcstr id() const { return m_source.c_str(); }
 private:
     typedef XRay::Editor::property_holder_base property_holder_type;
 

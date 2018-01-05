@@ -33,16 +33,16 @@ public:
     void load(CInifile& config);
     void save(CInifile& config);
     void fill(XRay::Editor::property_holder_collection* collection);
-    inline LPCSTR id() const { return m_id.c_str(); }
+    inline pcstr id() const { return m_id.c_str(); }
 private:
-    LPCSTR xr_stdcall id_getter() const;
-    void xr_stdcall id_setter(LPCSTR value);
+    pcstr xr_stdcall id_getter() const;
+    void xr_stdcall id_setter(pcstr value);
 
     float xr_stdcall wind_blast_longitude_getter() const;
     void xr_stdcall wind_blast_longitude_setter(float value);
 
-    LPCSTR xr_stdcall sound_getter();
-    void xr_stdcall sound_setter(LPCSTR value);
+    pcstr xr_stdcall sound_getter();
+    void xr_stdcall sound_setter(pcstr value);
 
 private:
     typedef XRay::Editor::property_holder_base property_holder_type;

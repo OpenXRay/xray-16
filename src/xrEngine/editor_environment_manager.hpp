@@ -67,9 +67,9 @@ class manager;
 class manager : public ::CEnvironment
 {
 public:
-    typedef xr_vector<LPCSTR> shader_ids_type;
-    typedef xr_vector<LPCSTR> particle_ids_type;
-    typedef xr_vector<LPCSTR> light_animator_ids_type;
+    typedef xr_vector<pcstr> shader_ids_type;
+    typedef xr_vector<pcstr> particle_ids_type;
+    typedef xr_vector<pcstr> light_animator_ids_type;
 
 public:
     manager();
@@ -80,7 +80,7 @@ public:
     virtual void create_mixer();
     virtual CEnvAmbient* AppendEnvAmb(const shared_str& sect);
     virtual SThunderboltDesc* thunderbolt_description(CInifile& config, shared_str const& section);
-    virtual SThunderboltCollection* thunderbolt_collection(CInifile* pIni, CInifile* thunderbolts, LPCSTR section);
+    virtual SThunderboltCollection* thunderbolt_collection(CInifile* pIni, CInifile* thunderbolts, pcstr section);
     virtual SThunderboltCollection* thunderbolt_collection(
         xr_vector<SThunderboltCollection*>& collection, shared_str const& id);
     virtual CLensFlareDescriptor* add_flare(xr_vector<CLensFlareDescriptor*>& collection, shared_str const& id);

@@ -22,7 +22,7 @@ using editor::environment::suns::flare;
 
 template <>
 void property_collection<flares::flares_type, flares>::display_name(
-    u32 const& item_index, LPSTR const& buffer, u32 const& buffer_size)
+    u32 const& item_index, pstr const& buffer, u32 const& buffer_size)
 {
     float position = m_container[item_index]->m_position;
     xr_sprintf(buffer, buffer_size, "flare [%f]", position);
@@ -77,7 +77,7 @@ void flares::load(CInifile& config, shared_str const& section)
             min_flare_count);
 
     u32 const buffer_size = max_string_count * sizeof(char);
-    LPSTR result = (LPSTR)_alloca(buffer_size);
+    pstr result = (pstr)_alloca(buffer_size);
     for (u32 i = 0; i < min_flare_count; ++i)
     {
         flare* object = new flare();

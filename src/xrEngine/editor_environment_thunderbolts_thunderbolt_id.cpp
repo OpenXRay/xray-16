@@ -29,7 +29,7 @@ thunderbolt_id::~thunderbolt_id()
     ::ide().destroy(m_property_holder);
 }
 
-LPCSTR const* thunderbolt_id::collection() { return (&*m_manager.thunderbolts_ids().begin()); }
+pcstr const* thunderbolt_id::collection() { return (&*m_manager.thunderbolts_ids().begin()); }
 u32 thunderbolt_id::collection_size() { return (m_manager.thunderbolts_ids().size()); }
 void thunderbolt_id::fill(XRay::Editor::property_holder_collection* collection)
 {
