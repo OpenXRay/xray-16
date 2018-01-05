@@ -37,13 +37,13 @@ public:
     void load(CInifile& config);
     void save(CInifile& config);
     void fill(::editor::environment::manager& environment, XRay::Editor::property_holder_collection* collection);
-    inline LPCSTR id() const { return m_id.c_str(); }
+    inline pcstr id() const { return m_id.c_str(); }
     virtual void create_top_gradient(CInifile& pIni, shared_str const& sect);
     virtual void create_center_gradient(CInifile& pIni, shared_str const& sect);
 
 private:
-    LPCSTR xr_stdcall id_getter() const;
-    void xr_stdcall id_setter(LPCSTR value);
+    pcstr xr_stdcall id_getter() const;
+    void xr_stdcall id_setter(pcstr value);
 
 private:
     typedef XRay::Editor::property_holder_base property_holder_type;

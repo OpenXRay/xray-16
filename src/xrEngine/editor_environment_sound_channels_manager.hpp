@@ -42,7 +42,7 @@ public:
 
 public:
     typedef xr_vector<channel*> channel_container_type;
-    typedef xr_vector<LPSTR> channels_ids_type;
+    typedef xr_vector<pstr> channels_ids_type;
 
 public:
     channels_ids_type const& channels_ids() const;

@@ -55,8 +55,8 @@ public:
 public:
     typedef xr_vector<thunderbolt*> thunderbolt_container_type;
     typedef xr_vector<collection*> collection_container_type;
-    typedef xr_vector<LPSTR> thunderbolts_ids_type;
-    typedef xr_vector<LPSTR> collections_ids_type;
+    typedef xr_vector<pstr> thunderbolts_ids_type;
+    typedef xr_vector<pstr> collections_ids_type;
 
 public:
     thunderbolts_ids_type const& thunderbolts_ids() const;

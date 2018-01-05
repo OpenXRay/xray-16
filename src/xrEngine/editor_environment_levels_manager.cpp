@@ -18,8 +18,8 @@
 
 using editor::environment::levels::manager;
 
-static LPCSTR s_default_weather_id = "[default]";
-static LPCSTR s_level_section_id = "levels";
+static pcstr s_default_weather_id = "[default]";
+static pcstr s_level_section_id = "levels";
 
 manager::manager(::editor::environment::weathers::manager* weathers) : m_weathers(*weathers), m_property_holder(0) {}
 manager::~manager()
@@ -38,7 +38,7 @@ manager::~manager()
     ::ide().destroy(m_property_holder);
 }
 
-void manager::fill_levels(CInifile& config, LPCSTR section, LPCSTR category)
+void manager::fill_levels(CInifile& config, pcstr section, pcstr category)
 {
     for (const auto &i : config.r_section(section).Data)
     {
@@ -52,7 +52,7 @@ void manager::fill_levels(CInifile& config, LPCSTR section, LPCSTR category)
             continue;
         }
 
-        LPCSTR weather_id = config.r_string(i.first, "weathers");
+        pcstr weather_id = config.r_string(i.first, "weathers");
         m_levels.insert(std::make_pair(i.first.c_str(), std::make_pair(category, weather_id)));
     }
 }
@@ -71,7 +71,7 @@ void manager::load()
     fill_levels(*m_config_mp    , "level_maps_mp"    , "multiplayer");
 }
 
-LPCSTR const* manager::collection() { return (&*m_weathers.weather_ids().begin()); }
+pcstr const* manager::collection() { return (&*m_weathers.weather_ids().begin()); }
 u32 manager::collection_size() { return (m_weathers.weather_ids().size()); }
 void manager::fill()
 {

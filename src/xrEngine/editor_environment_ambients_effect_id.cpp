@@ -29,7 +29,7 @@ effect_id::~effect_id()
     ::ide().destroy(m_property_holder);
 }
 
-LPCSTR const* effect_id::collection() { return (&*m_manager.effects_ids().begin()); }
+pcstr const* effect_id::collection() { return (&*m_manager.effects_ids().begin()); }
 u32 effect_id::collection_size() { return (m_manager.effects_ids().size()); }
 void effect_id::fill(XRay::Editor::property_holder_collection* collection)
 {

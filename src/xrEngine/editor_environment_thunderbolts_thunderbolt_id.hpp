@@ -28,7 +28,7 @@ public:
     thunderbolt_id(manager const& manager, shared_str const& thunderbolt);
     virtual ~thunderbolt_id();
     void fill(XRay::Editor::property_holder_collection* collection);
-    inline LPCSTR id() const { return m_id.c_str(); }
+    inline pcstr id() const { return m_id.c_str(); }
 private:
     typedef XRay::Editor::property_holder_base property_holder_type;
 
@@ -36,7 +36,7 @@ public:
     virtual property_holder_type* object();
 
 private:
-    LPCSTR const* xr_stdcall collection();
+    pcstr const* xr_stdcall collection();
     u32 xr_stdcall collection_size();
 
 private:

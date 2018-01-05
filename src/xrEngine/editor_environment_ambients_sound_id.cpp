@@ -25,7 +25,7 @@ sound_id::~sound_id()
     ::ide().destroy(m_property_holder);
 }
 
-LPCSTR const* sound_id::collection() { return (&*m_manager.channels_ids().begin()); }
+pcstr const* sound_id::collection() { return (&*m_manager.channels_ids().begin()); }
 u32 sound_id::collection_size() { return (m_manager.channels_ids().size()); }
 void sound_id::fill(XRay::Editor::property_holder_collection* collection)
 {

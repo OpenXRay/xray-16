@@ -46,7 +46,7 @@ public:
     inline ::editor::environment::manager& environment() const { return m_environment; }
 public:
     typedef xr_vector<effect*> effect_container_type;
-    typedef xr_vector<LPSTR> effects_ids_type;
+    typedef xr_vector<pstr> effects_ids_type;
 
 public:
     effects_ids_type const& effects_ids() const;

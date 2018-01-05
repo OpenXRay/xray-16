@@ -59,7 +59,7 @@ public:
 
 public:
     typedef xr_vector<ambient*> ambient_container_type;
-    typedef xr_vector<LPSTR> ambients_ids_type;
+    typedef xr_vector<pstr> ambients_ids_type;
 
 public:
     ambients_ids_type const& ambients_ids() const;

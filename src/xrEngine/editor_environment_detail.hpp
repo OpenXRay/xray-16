@@ -19,11 +19,11 @@ namespace detail
 {
 struct logical_string_predicate
 {
-    bool operator()(LPCSTR const& first, LPCSTR const& second) const;
+    bool operator()(pcstr const& first, pcstr const& second) const;
     bool operator()(shared_str const& first, shared_str const& second) const;
 }; // struct logical_string_predicate
 
-shared_str real_path(LPCSTR folder, LPCSTR path);
+shared_str real_path(pcstr folder, pcstr path);
 
 } // namespace detail
 } // namespace environment

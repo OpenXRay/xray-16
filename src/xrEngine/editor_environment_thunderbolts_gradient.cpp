@@ -25,7 +25,7 @@ gradient::~gradient()
     ::ide().destroy(m_property_holder);
 }
 
-void gradient::load(CInifile& config, shared_str const& section_id, LPCSTR prefix)
+void gradient::load(CInifile& config, shared_str const& section_id, pcstr prefix)
 {
     string_path temp;
     shader = config.r_string(section_id, strconcat(sizeof(temp), temp, prefix, "_shader"));
@@ -35,7 +35,7 @@ void gradient::load(CInifile& config, shared_str const& section_id, LPCSTR prefi
     m_pFlare->CreateShader(*shader, *texture);
 }
 
-void gradient::save(CInifile& config, shared_str const& section_id, LPCSTR prefix)
+void gradient::save(CInifile& config, shared_str const& section_id, pcstr prefix)
 {
     string_path temp;
     config.w_string(section_id.c_str(), strconcat(sizeof(temp), temp, prefix, "_shader"), shader.c_str());
@@ -44,22 +44,22 @@ void gradient::save(CInifile& config, shared_str const& section_id, LPCSTR prefi
     config.w_fvector2(section_id.c_str(), strconcat(sizeof(temp), temp, prefix, "_radius"), fRadius);
 }
 
-LPCSTR gradient::shader_getter() const { return (shader.c_str()); }
-void gradient::shader_setter(LPCSTR value)
+pcstr gradient::shader_getter() const { return (shader.c_str()); }
+void gradient::shader_setter(pcstr value)
 {
     shader = value;
     m_pFlare->CreateShader(*shader, *texture);
 }
 
-LPCSTR gradient::texture_getter() const { return (texture.c_str()); }
-void gradient::texture_setter(LPCSTR value)
+pcstr gradient::texture_getter() const { return (texture.c_str()); }
+void gradient::texture_setter(pcstr value)
 {
     texture = value;
     m_pFlare->CreateShader(*shader, *texture);
 }
 
 void gradient::fill(
-    ::editor::environment::manager& environment, LPCSTR name, LPCSTR description, XRay::Editor::property_holder_base& holder)
+    ::editor::environment::manager& environment, pcstr name, pcstr description, XRay::Editor::property_holder_base& holder)
 {
     VERIFY(!m_property_holder);
     m_property_holder = ::ide().create_property_holder(name);

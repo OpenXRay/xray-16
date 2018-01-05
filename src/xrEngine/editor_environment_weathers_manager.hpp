@@ -51,8 +51,8 @@ public:
     bool add_time_frame(char const* buffer, u32 const& buffer_size);
 
 public:
-    typedef xr_vector<LPCSTR> weather_ids_type;
-    typedef xr_vector<LPCSTR> times_ids_type;
+    typedef xr_vector<pcstr> weather_ids_type;
+    typedef xr_vector<pcstr> times_ids_type;
     typedef xr_vector<weather*> weather_container_type;
 
 public:
@@ -63,10 +63,10 @@ private:
     typedef property_collection<weather_container_type, manager> collection_type;
 
 private:
-    LPCSTR const* xr_stdcall weathers_getter() const;
+    pcstr const* xr_stdcall weathers_getter() const;
     u32 xr_stdcall weathers_size_getter() const;
-    LPCSTR const* xr_stdcall frames_getter(LPCSTR weather_id) const;
-    u32 xr_stdcall frames_size_getter(LPCSTR weather_id) const;
+    pcstr const* xr_stdcall frames_getter(pcstr weather_id) const;
+    u32 xr_stdcall frames_size_getter(pcstr weather_id) const;
 
 private:
     weather_container_type m_weathers;

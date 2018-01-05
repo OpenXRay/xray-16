@@ -11,9 +11,9 @@ struct test_property
 static test_property s_test_property;
 static test_property s_test_property_limited;
 
-LPCSTR s_properties[] = {"integer_property_0", "integer_property_1", "integer_property_2"};
+pcstr s_properties[] = {"integer_property_0", "integer_property_1", "integer_property_2"};
 
-std::pair<int, LPCSTR> s_properties_enum[] = {std::make_pair(10, "integer_property_0"),
+std::pair<int, pcstr> s_properties_enum[] = {std::make_pair(10, "integer_property_0"),
     std::make_pair(20, "integer_property_1"), std::make_pair(30, "integer_property_2")};
 
 static test_property s_test_property_values;
@@ -21,11 +21,11 @@ static test_property s_test_property_enum;
 
 struct test_property2
 {
-    LPSTR m_property;
+    pstr m_property;
 
     test_property2() : m_property(xr_strdup("")) {}
-    LPCSTR xr_stdcall getter() { return m_property; }
-    void xr_stdcall setter(LPCSTR value)
+    pcstr xr_stdcall getter() { return m_property; }
+    void xr_stdcall setter(pcstr value)
     {
         xr_free(m_property);
         m_property = xr_strdup(value);
@@ -34,7 +34,7 @@ struct test_property2
 
 static test_property2 s_test_property2;
 
-LPCSTR s_properties3[] = {"one", "two", "three"};
+pcstr s_properties3[] = {"one", "two", "three"};
 
 static test_property2 s_test_property3;
 
@@ -49,7 +49,7 @@ struct test_property4
 
 static test_property4 s_test_property4;
 
-LPCSTR s_properties5[] = {"bad", "good"};
+pcstr s_properties5[] = {"bad", "good"};
 
 static test_property4 s_test_property5;
 
@@ -84,7 +84,7 @@ static test_property7 s_test_property7_limited;
 
 static test_property7 s_test_property7_values_enum;
 
-std::pair<float, LPCSTR> s_properties7_enum[] = {std::make_pair(10.1f, "float_property_0"),
+std::pair<float, pcstr> s_properties7_enum[] = {std::make_pair(10.1f, "float_property_0"),
     std::make_pair(20.1f, "float_property_1"), std::make_pair(30.1f, "float_property_2")};
 
 using editor::environment::manager;

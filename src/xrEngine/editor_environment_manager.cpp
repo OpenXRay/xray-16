@@ -83,12 +83,12 @@ void manager::load_internal()
 void manager::save()
 {
     m_weathers->save();
-    // m_suns->save ();
+    //m_suns->save(); // На текущий момент сохраняются/загружаются не все параметры.
     m_ambients->save();
     m_effects->save();
     m_sound_channels->save();
     m_thunderbolts->save();
-    // m_levels->save ();
+    //m_levels->save(); // На текущий момент сохранение происходит во время выхода из редактора.
 }
 
 void manager::fill()
@@ -110,13 +110,10 @@ void manager::load_weathers()
 {
     m_weathers->load();
 
-    // sorting weather envs
-    auto _I = WeatherCycles.begin();
-    auto _E = WeatherCycles.end();
-    for (; _I != _E; _I++)
+    for (auto &i : WeatherCycles)
     {
-        R_ASSERT3(_I->second.size() > 1, "Environment in weather must >=2", *_I->first);
-        std::sort(_I->second.begin(), _I->second.end(), sort_env_etl_pred);
+        R_ASSERT3(i.second.size() > 1, "Environment in weather must >=2", *i.first);
+        std::sort(i.second.begin(), i.second.end(), sort_env_etl_pred);
     }
     R_ASSERT2(!WeatherCycles.empty(), "Empty weathers.");
     SetWeather((*WeatherCycles.begin()).first.c_str());
@@ -135,13 +132,12 @@ manager::shader_ids_type const& manager::shader_ids() const
 
     u32 count = stream->r_u32();
     m_shader_ids.resize(count);
-    shader_ids_type::iterator i = m_shader_ids.begin();
-    shader_ids_type::iterator e = m_shader_ids.end();
-    for (; i != e; ++i)
+
+    for (auto &i : m_shader_ids)
     {
         string_path buffer;
         stream->r_stringZ(buffer, sizeof(buffer));
-        *i = xr_strdup(buffer);
+        i = xr_strdup(buffer);
     }
 
     stream->close();
@@ -175,11 +171,10 @@ manager::light_animator_ids_type const& manager::light_animator_ids() const
     typedef LAItemVec container_type;
     container_type const& light_animators = LALib.Objects();
     m_light_animator_ids.resize(light_animators.size());
-    container_type::const_iterator i = light_animators.begin();
-    container_type::const_iterator e = light_animators.end();
-    light_animator_ids_type::iterator j = m_light_animator_ids.begin();
-    for (; i != e; ++i, ++j)
-        *j = xr_strdup((*i)->cName.c_str());
+
+    auto j = m_light_animator_ids.begin();
+    for (const auto &i : light_animators)
+        *j++ = xr_strdup(i->cName.c_str());
 
     std::sort(m_light_animator_ids.begin(), m_light_animator_ids.end(), logical_string_predicate());
 
@@ -189,8 +184,7 @@ manager::light_animator_ids_type const& manager::light_animator_ids() const
 void manager::create_mixer()
 {
     VERIFY(!CurrentEnv);
-    editor::environment::weathers::time* object =
-        new editor::environment::weathers::time(this, (editor::environment::weathers::weather const*)0, "");
+    editor::environment::weathers::time* object = new editor::environment::weathers::time(this, (editor::environment::weathers::weather const*)0, "");
     CurrentEnv = object;
     object->fill(0);
 }
@@ -209,7 +203,7 @@ SThunderboltDesc* manager::thunderbolt_description(CInifile& config, shared_str 
     return (m_thunderbolts->description(config, section));
 }
 
-SThunderboltCollection* manager::thunderbolt_collection(CInifile* pIni, CInifile* thunderbolts, LPCSTR section)
+SThunderboltCollection* manager::thunderbolt_collection(CInifile* pIni, CInifile* thunderbolts, pcstr section)
 {
     return (m_thunderbolts->get_collection(section));
 }
@@ -224,12 +218,9 @@ CLensFlareDescriptor* manager::add_flare(xr_vector<CLensFlareDescriptor*>& colle
 {
 #if 0
     // return (m_suns->get_flare(id));
-    typedef xr_vector<CLensFlareDescriptor*> container_type;
-    container_type::iterator i = collection.begin();
-    container_type::iterator e = collection.end();
-    for (; i != e; ++i)
-        if ((*i)->section == id)
-            return (*i);
+    for (const auto &i : collection)
+        if (i->section == id)
+            return i;
 
     NODEFAULT;
 #ifdef DEBUG

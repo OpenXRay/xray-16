@@ -49,14 +49,14 @@ public:
     void save(CInifile& config);
     void fill(XRay::Editor::property_holder_collection* collection);
     inline shared_str const& id() const { return m_load_section; }
-    virtual SEffect* create_effect(CInifile& config, LPCSTR id);
-    virtual SSndChannel* create_sound_channel(CInifile& config, LPCSTR id);
+    virtual SEffect* create_effect(CInifile& config, pcstr id);
+    virtual SSndChannel* create_sound_channel(CInifile& config, pcstr id);
     virtual EffectVec& effects();
     virtual SSndChannelVec& get_snd_channels();
 
 private:
-    LPCSTR xr_stdcall id_getter() const;
-    void xr_stdcall id_setter(LPCSTR value);
+    pcstr xr_stdcall id_getter() const;
+    void xr_stdcall id_setter(pcstr value);
 
 public:
     effects::manager const& effects_manager() const;
