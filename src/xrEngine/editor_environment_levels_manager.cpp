@@ -61,8 +61,8 @@ void manager::load()
 {
     string_path file_name;
 
-    // Обратите внимание: данные файлы будут перезаписаны при закрытии.
-    // Также: комментарии будут удалены и все секции отсортированы.
+    // РћР±СЂР°С‚РёС‚Рµ РІРЅРёРјР°РЅРёРµ: РґР°РЅРЅС‹Рµ С„Р°Р№Р»С‹ Р±СѓРґСѓС‚ РїРµСЂРµР·Р°РїРёСЃР°РЅС‹ РїСЂРё Р·Р°РєСЂС‹С‚РёРё.
+    // РўР°РєР¶Рµ: РєРѕРјРјРµРЅС‚Р°СЂРёРё Р±СѓРґСѓС‚ СѓРґР°Р»РµРЅС‹ Рё РІСЃРµ СЃРµРєС†РёРё РѕС‚СЃРѕСЂС‚РёСЂРѕРІР°РЅС‹.
     m_config_single = CInifile::Create(FS.update_path(file_name, "$game_config$", "game_maps_single.ltx"), false);
     m_config_mp     = CInifile::Create(FS.update_path(file_name, "$game_config$", "game_maps_mp.ltx"    ), false);
 
