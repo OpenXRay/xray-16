@@ -79,6 +79,9 @@
       <Filter>xrCommon</Filter>
     </ClInclude>
     <ClInclude Include="Common.hpp" />
+    <ClInclude Include="..\xrCommon\xr_unordered_map.h">
+      <Filter>xrCommon</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="NvMender2003">

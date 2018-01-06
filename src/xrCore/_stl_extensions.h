@@ -18,23 +18,12 @@
 #include "xrstring.h"
 #include "xrCommon/inlining_macros.h"
 #include "xrCommon/xr_string.h"
+#include "xrCommon/xr_unordered_map.h"
 #include "xrDebug_macros.h" // only for pragma todo. Remove once handled.
 
 #pragma todo("tamlin: This header includes pretty much every std collection there are. Compiler-hog! FIX!")
 
 using std::swap;
-
-#ifndef _SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS
-#define _SILENCE_STDEXT_HASH_DEPRECATION_WARNINGS
-#endif
-#include <hash_map>
-template <typename K, class V, class _Traits = stdext::hash_compare<K, std::less<K>>,
-    typename allocator = XRay::xray_allocator<std::pair<K, V>>>
-class xr_hash_map : public stdext::hash_map<K, V, _Traits, allocator>
-{
-public:
-    u32 size() const { return (u32) __super ::size(); }
-};
 
 #include "xrCommon/predicates.h"
 

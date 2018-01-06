@@ -13,7 +13,7 @@
 #include "xrScriptEngine/script_space_forward.hpp"
 #include "xrScriptEngine/Functor.hpp"
 #include "xrCore/Threading/Lock.hpp"
-#include "xrCore/_stl_extensions.h" // xr_hash_map
+#include "xrCommon/xr_unordered_map.h"
 
 struct lua_State;
 
