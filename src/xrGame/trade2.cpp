@@ -84,7 +84,7 @@ void CTrade::TransferItem(CInventoryItem* pItem, bool bBuying, bool bFree)
     CGameObject* O2 = smart_cast<CGameObject*>(pThis.inv_owner);
 
     if (!bBuying)
-        swap(O1, O2);
+        std::swap(O1, O2);
 
     NET_Packet P;
     O1->u_EventGen(P, GE_TRADE_SELL, O1->ID());

@@ -23,8 +23,6 @@
 
 #pragma todo("tamlin: This header includes pretty much every std collection there are. Compiler-hog! FIX!")
 
-using std::swap;
-
 #include "xrCommon/predicates.h"
 
 // tamlin: TODO (low priority, for a rainy day): Rename these macros from DEFINE_* to DECLARE_*
