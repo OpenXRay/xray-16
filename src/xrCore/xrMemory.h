@@ -101,12 +101,12 @@ extern XRCORE_API xrMemory Memory;
 #ifdef DEBUG_MEMORY_NAME
 #include "typeinfo.h"
 template <class T>
-IC T* xr_alloc(u32 count)
+IC T* xr_alloc(size_t count)
 { return (T*)Memory.mem_alloc(count*sizeof(T), typeid(T).name()); }
 
 #else
 template <class T>
-IC T* xr_alloc(u32 count)
+IC T* xr_alloc(size_t count)
 { return (T*)Memory.mem_alloc(count * sizeof(T)); }
 
 #endif
