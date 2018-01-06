@@ -416,7 +416,7 @@ void game_sv_GameState::Create(shared_str& options)
     if (!GEnv.isDedicatedServer)
     {
         // loading scripts
-        auto& scriptEngine = ai().script_engine();
+        auto& scriptEngine = *GEnv.ScriptEngine;
         scriptEngine.remove_script_process(ScriptProcessor::Game);
         string_path S;
         FS.update_path(S, "$game_config$", "script.ltx");
@@ -619,7 +619,7 @@ void game_sv_GameState::Update()
     {
         if (Level().game)
         {
-            CScriptProcess* script_process = ai().script_engine().script_process(ScriptProcessor::Game);
+            CScriptProcess* script_process = GEnv.ScriptEngine->script_process(ScriptProcessor::Game);
             if (script_process)
                 script_process->update();
         }
@@ -646,7 +646,7 @@ game_sv_GameState::game_sv_GameState()
 game_sv_GameState::~game_sv_GameState()
 {
     if (!GEnv.isDedicatedServer)
-        ai().script_engine().remove_script_process(ScriptProcessor::Game);
+        GEnv.ScriptEngine->remove_script_process(ScriptProcessor::Game);
     xr_delete(m_event_queue);
 
     SaveMapList();

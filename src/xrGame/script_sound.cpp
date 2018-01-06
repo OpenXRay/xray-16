@@ -22,7 +22,7 @@ CScriptSound::CScriptSound(LPCSTR caSoundName, ESoundTypes sound_type)
     if (FS.exist(l_caFileName, "$game_sounds$", caSoundName, ".ogg"))
         m_sound.create(caSoundName, st_Effect, sound_type);
     else
-        ai().script_engine().script_log(LuaMessageType::Error, "File not found \"%s\"!", l_caFileName);
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "File not found \"%s\"!", l_caFileName);
 }
 
 CScriptSound::~CScriptSound()
@@ -41,7 +41,7 @@ Fvector CScriptSound::GetPosition() const
         return (l_tpSoundParams->position);
     else
     {
-        ai().script_engine().script_log(LuaMessageType::Error, "Sound was not launched, can't get position!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "Sound was not launched, can't get position!");
         return (Fvector().set(0, 0, 0));
     }
 }

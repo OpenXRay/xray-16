@@ -1203,7 +1203,7 @@ CInventoryItem* CInventory::tpfGetObjectByIndex(int iIndex)
     }
     else
     {
-        ai().script_engine().script_log(LuaMessageType::Error, "invalid inventory index!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "invalid inventory index!");
         return (0);
     }
     R_ASSERT(false);

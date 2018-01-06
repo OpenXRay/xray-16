@@ -94,7 +94,7 @@ void CScriptEntity::SetScriptControl(const bool bScriptControl, shared_str caSci
     if (!(((m_bScriptControl && !bScriptControl) || (!m_bScriptControl && bScriptControl)) &&
             (bScriptControl || (xr_strlen(*m_caScriptName) && !xr_strcmp(caSciptName, m_caScriptName)))))
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "Invalid sequence of taking an entity under script control");
         return;
     }
@@ -112,10 +112,10 @@ void CScriptEntity::SetScriptControl(const bool bScriptControl, shared_str caSci
     /*
     #ifdef DEBUG
         if (bScriptControl)
-            ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeInfo,"Script %s set object %s
+            GEnv.ScriptEngine->script_log			(ScriptStorage::eLuaMessageTypeInfo,"Script %s set object %s
     under its control",*caSciptName,*object().cName());
         else
-            ai().script_engine().script_log			(ScriptStorage::eLuaMessageTypeInfo,"Script %s freed object %s
+            GEnv.ScriptEngine->script_log			(ScriptStorage::eLuaMessageTypeInfo,"Script %s freed object %s
     from its control",*caSciptName,*object().cName());
     #endif
     */
@@ -271,7 +271,7 @@ void CScriptEntity::ProcessScripts()
     {
 #ifdef DEBUG
         if (empty_queue)
-            ai().script_engine().script_log(
+            GEnv.ScriptEngine->script_log(
                 LuaMessageType::Info, "Object %s has an empty script queue!", *object().cName());
 #endif
         return;
@@ -456,7 +456,7 @@ bool CScriptEntity::bfAssignMovement(CScriptEntityAction* tpEntityAction)
 
     if (!m_monster)
     {
-        ai().script_engine().script_log(LuaMessageType::Error, "Cannot assign a movement action not to a monster!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "Cannot assign a movement action not to a monster!");
         return (true);
     }
 
@@ -563,7 +563,7 @@ LPCSTR CScriptEntity::GetPatrolPathName()
 #ifdef DEBUG
     if (!GetScriptControl())
     {
-        ai().script_engine().script_log(LuaMessageType::Error,
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error,
             "Object %s is not under script control while you are trying to get patrol path name!", *m_object->cName());
         return "";
     }

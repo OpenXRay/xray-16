@@ -1250,7 +1250,7 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
         if (functor_name)
         {
             luabind::functor<bool> funct1;
-            if (ai().script_engine().functor(functor_name, funct1))
+            if (GEnv.ScriptEngine->functor(functor_name, funct1))
             {
                 if (funct1(GO->lua_game_object()))
                     TryUseItem(cell_item);
@@ -1265,7 +1265,7 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
         if (functor_name)
         {
             luabind::functor<bool> funct2;
-            if (ai().script_engine().functor(functor_name, funct2))
+            if (GEnv.ScriptEngine->functor(functor_name, funct2))
             {
                 if (funct2(GO->lua_game_object()))
                     TryUseItem(cell_item);
@@ -1280,7 +1280,7 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
         if (functor_name)
         {
             luabind::functor<bool> funct3;
-            if (ai().script_engine().functor(functor_name, funct3))
+            if (GEnv.ScriptEngine->functor(functor_name, funct3))
             {
                 if (funct3(GO->lua_game_object()))
                     TryUseItem(cell_item);
@@ -1295,7 +1295,7 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
         if (functor_name)
         {
             luabind::functor<bool> funct4;
-            if (ai().script_engine().functor(functor_name, funct4))
+            if (GEnv.ScriptEngine->functor(functor_name, funct4))
             {
                 if (funct4(GO->lua_game_object()))
                     TryUseItem(cell_item);

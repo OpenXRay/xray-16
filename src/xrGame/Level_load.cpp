@@ -141,7 +141,7 @@ bool CLevel::Load_GameSpecific_After()
     if (!GEnv.isDedicatedServer)
     {
         // loading scripts
-        auto& scriptEngine = ai().script_engine();
+        auto& scriptEngine = *GEnv.ScriptEngine;
         scriptEngine.remove_script_process(ScriptProcessor::Level);
         shared_str scripts;
         if (pLevel->section_exist("level_scripts") && pLevel->line_exist("level_scripts", "script"))

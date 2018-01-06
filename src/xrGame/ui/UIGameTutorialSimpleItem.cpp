@@ -331,7 +331,7 @@ void CUISequenceSimpleItem::OnKeyboardPress(int dik)
         if (b)
         {
             luabind::functor<void> functor_to_call;
-            bool functor_exists = ai().script_engine().functor(itm.m_functor.c_str(), functor_to_call);
+            bool functor_exists = GEnv.ScriptEngine->functor(itm.m_functor.c_str(), functor_to_call);
             THROW3(functor_exists, "Cannot find script function described in tutorial item ", itm.m_functor.c_str());
             functor_to_call();
 

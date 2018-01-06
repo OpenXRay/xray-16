@@ -34,7 +34,7 @@ void CUIAchievements::Update()
         return;
 
     luabind::functor<bool> f;
-    R_ASSERT(ai().script_engine().functor(m_functor_str, f));
+    R_ASSERT(GEnv.ScriptEngine->functor(m_functor_str, f));
     if (f())
     {
         if (!ParentHasMe())

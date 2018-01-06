@@ -46,7 +46,7 @@ void Upgrade::construct(const shared_str& upgrade_id, Group& parental_group, Man
     LPCSTR precondition_functor_str = pSettings->r_string(id(), "precondition_functor");
     m_preconditions.parameter = pSettings->r_string(id(), "precondition_parameter");
     m_preconditions.parameter2 = m_section.c_str();
-    R_ASSERT2(ai().script_engine().functor(precondition_functor_str, m_preconditions.functr),
+    R_ASSERT2(GEnv.ScriptEngine->functor(precondition_functor_str, m_preconditions.functr),
         make_string(
             "Failed to get precondition functor in section[%s], functor[%s]", id_str(), precondition_functor_str));
     m_preconditions();
@@ -56,7 +56,7 @@ void Upgrade::construct(const shared_str& upgrade_id, Group& parental_group, Man
     m_effects.parameter = pSettings->r_string(id(), "effect_parameter");
     m_effects.parameter2 = m_section.c_str();
     m_effects.parameter3 = 1;
-    R_ASSERT2(ai().script_engine().functor(effect_functor_str, m_effects.functr),
+    R_ASSERT2(GEnv.ScriptEngine->functor(effect_functor_str, m_effects.functr),
         make_string("Failed to get effect functor in section[%s], functor[%s]", id_str(), effect_functor_str));
     m_effects();
 
@@ -66,12 +66,12 @@ void Upgrade::construct(const shared_str& upgrade_id, Group& parental_group, Man
     m_prerequisites.parameter = pSettings->r_string(id(), "prereq_params"); // prerequisites_params
     m_prerequisites.parameter2 = m_section.c_str();
     //	m_tooltip.parameter			= pSettings->r_string( id(), "prereq_params" );
-    R_ASSERT2(ai().script_engine().functor(prereq_functor_str, m_prerequisites.functr),
+    R_ASSERT2(GEnv.ScriptEngine->functor(prereq_functor_str, m_prerequisites.functr),
         make_string("Failed to get prerequisites functor in section[%s], functor[%s]", id_str(), prereq_functor_str));
     m_prerequisites();
 
     /*R_ASSERT2(
-        ai().script_engine().functor( tooltip_functor_str, m_tooltip.functr ),
+        GEnv.ScriptEngine->functor( tooltip_functor_str, m_tooltip.functr ),
         make_string( "Failed to get tooltip functor in section[%s], functor[%s]",
         id_str(), tooltip_functor_str
         )

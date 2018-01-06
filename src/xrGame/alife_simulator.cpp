@@ -61,7 +61,7 @@ CALifeSimulator::CALifeSimulator(IPureServer* server, shared_str* command_line)
 
     LPCSTR start_game_callback = pSettings->r_string(alife_section, "start_game_callback");
     luabind::functor<void> functor;
-    R_ASSERT2(ai().script_engine().functor(start_game_callback, functor), "failed to get start game callback");
+    R_ASSERT2(GEnv.ScriptEngine->functor(start_game_callback, functor), "failed to get start game callback");
     functor();
 
     load(p.m_game_or_spawn, !xr_strcmp(p.m_new_or_load, "load") ? false : true, !xr_strcmp(p.m_new_or_load, "new"));

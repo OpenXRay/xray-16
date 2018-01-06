@@ -20,16 +20,16 @@ void CObjectFactory::register_script_class(LPCSTR client_class, LPCSTR server_cl
 #endif
 #ifndef NO_XR_GAME
     luabind::object client;
-    if (!ai().script_engine().function_object(client_class, client, LUA_TUSERDATA))
+    if (!GEnv.ScriptEngine->function_object(client_class, client, LUA_TUSERDATA))
     {
-        ai().script_engine().script_log(LuaMessageType::Error, "Cannot register class %s", client_class);
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "Cannot register class %s", client_class);
         return;
     }
 #endif
     luabind::object server;
-    if (!ai().script_engine().function_object(server_class, server, LUA_TUSERDATA))
+    if (!GEnv.ScriptEngine->function_object(server_class, server, LUA_TUSERDATA))
     {
-        ai().script_engine().script_log(LuaMessageType::Error, "Cannot register class %s", server_class);
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "Cannot register class %s", server_class);
         return;
     }
 
@@ -46,9 +46,9 @@ void CObjectFactory::register_script_class(LPCSTR unknown_class, LPCSTR clsid, L
     Msg("* CObjectFactory: registering script class '%s'", clsid);
 #endif
     luabind::object creator;
-    if (!ai().script_engine().function_object(unknown_class, creator, LUA_TUSERDATA))
+    if (!GEnv.ScriptEngine->function_object(unknown_class, creator, LUA_TUSERDATA))
     {
-        ai().script_engine().script_log(LuaMessageType::Error, "Cannot register class %s", unknown_class);
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "Cannot register class %s", unknown_class);
         return;
     }
     add(new CObjectItemScript(
@@ -83,7 +83,7 @@ void CObjectFactory::register_script() const
     for (; I != E; ++I)
         instance.enum_("_clsid")[luabind::value(*(*I)->script_clsid(), int(I - B))];
 
-    luabind::module(ai().script_engine().lua())[instance];
+    luabind::module(GEnv.ScriptEngine->lua())[instance];
 }
 
 SCRIPT_EXPORT(CObjectFactory, (), {

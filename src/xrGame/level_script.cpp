@@ -64,7 +64,7 @@ CScriptGameObject* tpfGetActor()
 {
     static bool first_time = true;
     if (first_time)
-        ai().script_engine().script_log(LuaMessageType::Error, "Do not use level.actor function!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "Do not use level.actor function!");
     first_time = false;
 
     CActor* l_tpActor = smart_cast<CActor*>(Level().CurrentEntity());
@@ -78,7 +78,7 @@ CScriptGameObject* get_object_by_name(LPCSTR caObjectName)
 {
     static bool first_time = true;
     if (first_time)
-        ai().script_engine().script_log(LuaMessageType::Error, "Do not use level.object function!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "Do not use level.object function!");
     first_time = false;
 
     CGameObject* l_tpGameObject = smart_cast<CGameObject*>(Level().Objects.FindObjectByName(caObjectName));
@@ -550,7 +550,7 @@ int g_get_general_goodwill_between(u16 from, u16 to)
 
     if (!from_obj || !to_obj)
     {
-        ai().script_engine().script_log(LuaMessageType::Error,
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error,
             "RELATION_REGISTRY::get_general_goodwill_between  : cannot convert obj to CSE_ALifeTraderAbstract!");
         return (0);
     }

@@ -46,7 +46,7 @@ BOOL is_combat_cover(shared_str const& table_id)
     xr_strcat(temp, *table_id);
 
     luabind::object table, value;
-    bool result = ai().script_engine().function_object(temp, table, LUA_TTABLE);
+    bool result = GEnv.ScriptEngine->function_object(temp, table, LUA_TTABLE);
 
     VERIFY2(result, make_string("bad or missing description in smart_cover [%s]", table_id.c_str()));
     if (luabind::type(table) != LUA_TTABLE)
@@ -258,7 +258,7 @@ void CSE_SmartCover::check_enterable_loopholes(shared_str const& description)
     xr_strcat(temp, ".transitions");
 
     luabind::object transitions;
-    bool result = ai().script_engine().function_object(temp, transitions, LUA_TTABLE);
+    bool result = GEnv.ScriptEngine->function_object(temp, transitions, LUA_TTABLE);
     VERIFY2(result, make_string("bad or missing transitions table in smart_cover [%s]", temp));
 
     for (luabind::iterator I(transitions), E; I != E; ++I)
@@ -405,7 +405,7 @@ void CSE_SmartCover::load_draw_data()
     m_draw_data.clear();
 
     luabind::object loopholes;
-    bool result = ai().script_engine().function_object(temp, loopholes, LUA_TTABLE);
+    bool result = GEnv.ScriptEngine->function_object(temp, loopholes, LUA_TTABLE);
 
     if (!result)
     {

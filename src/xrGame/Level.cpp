@@ -150,7 +150,7 @@ CLevel::~CLevel()
     xr_delete(m_debug_renderer);
 #endif
     if (!GEnv.isDedicatedServer)
-        ai().script_engine().remove_script_process(ScriptProcessor::Level);
+        GEnv.ScriptEngine->remove_script_process(ScriptProcessor::Level);
     xr_delete(game);
     xr_delete(game_events);
     xr_delete(m_pBulletManager);
@@ -555,7 +555,7 @@ void CLevel::OnFrame()
 #endif
     g_pGamePersistent->Environment().SetGameTime(GetEnvironmentGameDayTimeSec(), game->GetEnvironmentGameTimeFactor());
     if (!GEnv.isDedicatedServer)
-        ai().script_engine().script_process(ScriptProcessor::Level)->update();
+        GEnv.ScriptEngine->script_process(ScriptProcessor::Level)->update();
     m_ph_commander->update();
     m_ph_commander_scripts->update();
     stats.BulletManagerCommit.Begin();
@@ -590,7 +590,7 @@ void CLevel::OnFrame()
 }
 
 int psLUA_GCSTEP = 10;
-void CLevel::script_gc() { lua_gc(ai().script_engine().lua(), LUA_GCSTEP, psLUA_GCSTEP); }
+void CLevel::script_gc() { lua_gc(GEnv.ScriptEngine->lua(), LUA_GCSTEP, psLUA_GCSTEP); }
 #ifdef DEBUG_PRECISE_PATH
 void test_precise_path();
 #endif

@@ -83,9 +83,9 @@ void CAI_Space::RegisterScriptClasses()
     {
         _GetItem(*registrators, i, I);
         luabind::functor<void> result;
-        if (!script_engine().functor(I, result))
+        if (!GEnv.ScriptEngine->functor(I, result))
         {
-            script_engine().script_log(LuaMessageType::Error, "Cannot load class registrator %s!", I);
+            GEnv.ScriptEngine->script_log(LuaMessageType::Error, "Cannot load class registrator %s!", I);
             continue;
         }
         result(const_cast<CObjectFactory*>(&object_factory()));
@@ -115,7 +115,7 @@ void CAI_Space::LoadCommonScripts()
         for (u32 i = 0; i < scriptCount; i++)
         {
             _GetItem(*scriptString, i, scriptName);
-            script_engine().load_file(scriptName, script_engine().GlobalNamespace);
+            GEnv.ScriptEngine->load_file(scriptName, CScriptEngine::GlobalNamespace);
         }
     }
     xr_delete(l_tpIniFile);
@@ -160,7 +160,7 @@ void CAI_Space::unload(bool reload)
 {
     if (GEnv.isDedicatedServer)
         return;
-    script_engine().unload();
+    GEnv.ScriptEngine->unload();
     xr_delete(m_doors_manager);
     AISpaceBase::Unload(reload);
 }

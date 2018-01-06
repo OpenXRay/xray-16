@@ -457,7 +457,7 @@ BOOL CGameObject::net_Spawn(CSE_Abstract* DC)
         //R_ASSERT(Level().Objects.net_Find(E->ID) == nullptr);
         if (Level().Objects.net_Find(E->ID) != nullptr)
         {
-            ai().script_engine().script_log(LuaMessageType::Error, "CGameObject:net_Spawn() | Level().Objects.net_Find(E->ID) != nullptr (This mean object already exist on level by this ID) ID=%s s_name=%s", E->ID, E->s_name);
+            GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CGameObject:net_Spawn() | Level().Objects.net_Find(E->ID) != nullptr (This mean object already exist on level by this ID) ID=%s s_name=%s", E->ID, E->s_name);
             return false;
         }
     }

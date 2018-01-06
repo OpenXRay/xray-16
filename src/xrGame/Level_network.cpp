@@ -82,7 +82,7 @@ void CLevel::remove_objects()
     g_b_ClearGameCaptions = true;
 
     if (!GEnv.isDedicatedServer)
-        ai().script_engine().collect_all_garbage();
+        GEnv.ScriptEngine->collect_all_garbage();
 
     stalker_animation_data_storage().clear();
 
@@ -163,7 +163,7 @@ void CLevel::net_Stop()
     }
 
     if (!GEnv.isDedicatedServer)
-        ai().script_engine().collect_all_garbage();
+        GEnv.ScriptEngine->collect_all_garbage();
 
 #ifdef DEBUG
     show_animation_stats();

@@ -813,12 +813,12 @@ void CGamePersistent::LoadTitle(bool change_tip, shared_str map_name)
         bool is_single = !xr_strcmp(m_game_params.m_game_type, "single");
         if (is_single)
         {
-            R_ASSERT(ai().script_engine().functor("loadscreen.get_tip_number", m_functor));
+            R_ASSERT(GEnv.ScriptEngine->functor("loadscreen.get_tip_number", m_functor));
             tip_num = m_functor(map_name.c_str());
         }
         else
         {
-            R_ASSERT(ai().script_engine().functor("loadscreen.get_mp_tip_number", m_functor));
+            R_ASSERT(GEnv.ScriptEngine->functor("loadscreen.get_mp_tip_number", m_functor));
             tip_num = m_functor(map_name.c_str());
         }
         //		tip_num = 83;

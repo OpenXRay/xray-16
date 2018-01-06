@@ -190,7 +190,7 @@ void SFillPropData::load()
 
     luabind::object table;
 
-    R_ASSERT(ai().script_engine().function_object("smart_covers.descriptions", table, LUA_TTABLE));
+    R_ASSERT(GEnv.ScriptEngine->function_object("smart_covers.descriptions", table, LUA_TTABLE));
 
     for (luabind::iterator I(table), E; I != E; ++I)
         smart_covers.push_back(luabind::object_cast<LPCSTR>(I.key()));

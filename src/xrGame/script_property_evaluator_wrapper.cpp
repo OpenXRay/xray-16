@@ -33,11 +33,11 @@ bool CScriptPropertyEvaluatorWrapper::evaluate()
     catch (luabind::cast_failed& exception)
     {
 #ifdef LOG_ACTION
-        ai().script_engine().script_log(LuaMessageType::Error,
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error,
             "SCRIPT RUNTIME ERROR : evaluator [%s] returns value with not a %s type!", m_evaluator_name,
             exception.info().name());
 #else
-        ai().script_engine().script_log(LuaMessageType::Error,
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error,
             "SCRIPT RUNTIME ERROR : evaluator returns value with not a %s type!", exception.info().name());
 #endif
     }
@@ -45,7 +45,7 @@ bool CScriptPropertyEvaluatorWrapper::evaluate()
     catch (...)
     {
         //Alundaio: m_evaluator_name
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "SCRIPT RUNTIME ERROR : evaluator [%s] returns value with not a bool type!", m_evaluator_name);
     }
     return (false);

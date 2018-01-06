@@ -24,15 +24,15 @@ struct SLuaWpnParams
 SLuaWpnParams::SLuaWpnParams()
 {
     bool functor_exists;
-    functor_exists = ai().script_engine().functor("ui_wpn_params.GetRPM", m_functorRPM);
+    functor_exists = GEnv.ScriptEngine->functor("ui_wpn_params.GetRPM", m_functorRPM);
     VERIFY(functor_exists);
-    functor_exists = ai().script_engine().functor("ui_wpn_params.GetDamage", m_functorDamage);
+    functor_exists = GEnv.ScriptEngine->functor("ui_wpn_params.GetDamage", m_functorDamage);
     VERIFY(functor_exists);
-    functor_exists = ai().script_engine().functor("ui_wpn_params.GetDamageMP", m_functorDamageMP);
+    functor_exists = GEnv.ScriptEngine->functor("ui_wpn_params.GetDamageMP", m_functorDamageMP);
     VERIFY(functor_exists);
-    functor_exists = ai().script_engine().functor("ui_wpn_params.GetHandling", m_functorHandling);
+    functor_exists = GEnv.ScriptEngine->functor("ui_wpn_params.GetHandling", m_functorHandling);
     VERIFY(functor_exists);
-    functor_exists = ai().script_engine().functor("ui_wpn_params.GetAccuracy", m_functorAccuracy);
+    functor_exists = GEnv.ScriptEngine->functor("ui_wpn_params.GetAccuracy", m_functorAccuracy);
     VERIFY(functor_exists);
 }
 

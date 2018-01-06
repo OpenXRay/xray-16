@@ -172,7 +172,7 @@ LPCSTR CPhraseDialog::GetPhraseText(const shared_str& phrase_id, bool current_sp
     if (ph->m_script_text_id.length() > 0)
     {
         luabind::functor<LPCSTR> lua_function;
-        bool functor_exists = ai().script_engine().functor(ph->m_script_text_id.c_str(), lua_function);
+        bool functor_exists = GEnv.ScriptEngine->functor(ph->m_script_text_id.c_str(), lua_function);
         THROW3(functor_exists, "Cannot find function", ph->m_script_text_id.c_str());
 
         ph->m_script_text_val =
@@ -225,7 +225,7 @@ void CPhraseDialog::load_shared(LPCSTR)
         LPCSTR func = pXML->Read(dialog_node, "init_func", 0, "");
 
         luabind::functor<void> lua_function;
-        bool functor_exists = ai().script_engine().functor(func, lua_function);
+        bool functor_exists = GEnv.ScriptEngine->functor(func, lua_function);
         THROW3(functor_exists, "Cannot find precondition", func);
         lua_function(this);
         return;

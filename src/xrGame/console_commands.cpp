@@ -849,7 +849,7 @@ public:
     {
         if (strstr(cName, "script_debug_break") == cName)
         {
-            CScriptDebugger* d = ai().script_engine().debugger();
+            CScriptDebugger* d = GEnv.ScriptEngine->debugger();
             if (d)
             {
                 if (d->Active())
@@ -862,11 +862,11 @@ public:
         }
         else if (strstr(cName, "script_debug_stop") == cName)
         {
-            ai().script_engine().stopDebugger();
+            GEnv.ScriptEngine->stopDebugger();
         }
         else if (strstr(cName, "script_debug_restart") == cName)
         {
-            ai().script_engine().restartDebugger();
+            GEnv.ScriptEngine->restartDebugger();
         };
     };
 
@@ -889,14 +889,14 @@ class CCC_ScriptLuaStudioConnect : public IConsole_Command
 {
 public:
     CCC_ScriptLuaStudioConnect(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args) { ai().script_engine().try_connect_to_debugger(); };
+    virtual void Execute(LPCSTR args) { GEnv.ScriptEngine->try_connect_to_debugger(); };
 };
 
 class CCC_ScriptLuaStudioDisconnect : public IConsole_Command
 {
 public:
     CCC_ScriptLuaStudioDisconnect(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = true; };
-    virtual void Execute(LPCSTR args) { ai().script_engine().disconnect_from_debugger(); };
+    virtual void Execute(LPCSTR args) { GEnv.ScriptEngine->disconnect_from_debugger(); };
 };
 #endif // #if defined(USE_DEBUGGER) && defined(USE_LUA_STUDIO)
 
@@ -1212,8 +1212,8 @@ public:
             P->m_Flags.set(FS_Path::flNeedRescan, TRUE);
             FS.rescan_pathes();
             // run script
-            if (ai().script_engine().script_process(ScriptProcessor::Level))
-                ai().script_engine().script_process(ScriptProcessor::Level)->add_script(args, false, true);
+            if (GEnv.ScriptEngine->script_process(ScriptProcessor::Level))
+                GEnv.ScriptEngine->script_process(ScriptProcessor::Level)->add_script(args, false, true);
         }
     }
 
@@ -1232,28 +1232,28 @@ public:
             Log("* Specify string to run!");
         else
         {
-            if (ai().script_engine().script_process(ScriptProcessor::Level))
+            if (GEnv.ScriptEngine->script_process(ScriptProcessor::Level))
             {
-                ai().script_engine().script_process(ScriptProcessor::Level)->add_script(args, true, true);
+                GEnv.ScriptEngine->script_process(ScriptProcessor::Level)->add_script(args, true, true);
                 return;
             }
 
             string4096 S;
             shared_str m_script_name = "console command";
             xr_sprintf(S, "%s\n", args);
-            int l_iErrorCode = luaL_loadbuffer(ai().script_engine().lua(), S, xr_strlen(S), "@console_command");
+            int l_iErrorCode = luaL_loadbuffer(GEnv.ScriptEngine->lua(), S, xr_strlen(S), "@console_command");
             if (!l_iErrorCode)
             {
-                l_iErrorCode = lua_pcall(ai().script_engine().lua(), 0, 0, 0);
+                l_iErrorCode = lua_pcall(GEnv.ScriptEngine->lua(), 0, 0, 0);
                 if (l_iErrorCode)
                 {
-                    ai().script_engine().print_output(ai().script_engine().lua(), *m_script_name, l_iErrorCode);
-                    ai().script_engine().on_error(ai().script_engine().lua());
+                    GEnv.ScriptEngine->print_output(GEnv.ScriptEngine->lua(), *m_script_name, l_iErrorCode);
+                    GEnv.ScriptEngine->on_error(GEnv.ScriptEngine->lua());
                     return;
                 }
             }
 
-            ai().script_engine().print_output(ai().script_engine().lua(), *m_script_name, l_iErrorCode);
+            GEnv.ScriptEngine->print_output(GEnv.ScriptEngine->lua(), *m_script_name, l_iErrorCode);
         }
     } // void	Execute
 

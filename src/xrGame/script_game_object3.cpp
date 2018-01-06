@@ -64,7 +64,7 @@ const CCoverPoint* CScriptGameObject::best_cover(const Fvector& position, const 
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
     {
-        ai().script_engine().script_log(LuaMessageType::Error, "CGameObject : cannot access class member best_cover!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CGameObject : cannot access class member best_cover!");
         return (0);
     }
     stalker->m_ce_best->setup(enemy_position, min_enemy_distance, max_enemy_distance, 0.f);
@@ -77,7 +77,7 @@ const CCoverPoint* CScriptGameObject::safe_cover(const Fvector& position, float 
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
     {
-        ai().script_engine().script_log(LuaMessageType::Error, "CGameObject : cannot access class member best_cover!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CGameObject : cannot access class member best_cover!");
         return (0);
     }
     stalker->m_ce_safe->setup(min_distance);
@@ -90,7 +90,7 @@ const xr_vector<MemorySpace::CVisibleObject>& CScriptGameObject::memory_visible_
     CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CGameObject : cannot access class member memory_visible_objects!");
         NODEFAULT;
     }
@@ -102,7 +102,7 @@ const xr_vector<MemorySpace::CSoundObject>& CScriptGameObject::memory_sound_obje
     CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CGameObject : cannot access class member memory_sound_objects!");
         NODEFAULT;
     }
@@ -114,7 +114,7 @@ const xr_vector<MemorySpace::CHitObject>& CScriptGameObject::memory_hit_objects(
     CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CGameObject : cannot access class member memory_hit_objects!");
         NODEFAULT;
     }
@@ -125,7 +125,7 @@ void CScriptGameObject::ChangeTeam(u8 team, u8 squad, u8 group)
 {
     CCustomMonster* custom_monster = smart_cast<CCustomMonster*>(&object());
     if (!custom_monster)
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CCustomMonster: cannot access class member ChangeTeam!");
     else
         custom_monster->ChangeTeam(team, squad, group);
@@ -135,7 +135,7 @@ void CScriptGameObject::SetVisualMemoryEnabled(bool enabled)
 {
     CCustomMonster* custom_monster = smart_cast<CCustomMonster*>(&object());
     if (!custom_monster)
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CCustomMonster: cannot access class member ChangeTeam!");
     else
         custom_monster->memory().visual().enable(enabled);
@@ -153,7 +153,7 @@ CScriptGameObject* CScriptGameObject::GetEnemy() const
     }
     else
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CScriptGameObject : cannot access class member GetEnemy!");
         return (0);
     }
@@ -169,7 +169,7 @@ CScriptGameObject* CScriptGameObject::GetCorpse() const
             return (0);
     else
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CScriptGameObject : cannot access class member GetCorpse!");
         return (0);
     }
@@ -182,7 +182,7 @@ bool CScriptGameObject::CheckTypeVisibility(const char* section_name)
         return (l_tpCustomMonster->CheckTypeVisibility(section_name));
     else
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CScriptGameObject : cannot access class member CheckTypeVisibility!");
         return (false);
     }
@@ -193,7 +193,7 @@ CScriptGameObject* CScriptGameObject::GetCurrentWeapon() const
     CAI_Stalker* l_tpStalker = smart_cast<CAI_Stalker*>(&object());
     if (!l_tpStalker)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CAI_Stalker : cannot access class member GetCurrentWeapon!");
         return (0);
     }
@@ -206,7 +206,7 @@ void CScriptGameObject::deadbody_closed(bool status)
     CInventoryOwner* inventoryOwner = smart_cast<CInventoryOwner*>(&object());
     if (!inventoryOwner)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CInventoryOwner : cannot access class member deadbody_closed!");
         return;
     }
@@ -218,7 +218,7 @@ bool CScriptGameObject::deadbody_closed_status()
     CInventoryOwner* inventoryOwner = smart_cast<CInventoryOwner*>(&object());
     if (!inventoryOwner)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CInventoryOwner : cannot access class member deadbody_closed_status!");
         return (0);
     }
@@ -230,7 +230,7 @@ void CScriptGameObject::can_select_weapon(bool status)
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CAI_Stalker : cannot access class member can_select_weapon!");
         return;
     }
@@ -242,7 +242,7 @@ bool CScriptGameObject::can_select_weapon() const
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CAI_Stalker : cannot access class member can_select_weapon!");
         return (0);
     }
@@ -254,7 +254,7 @@ void CScriptGameObject::deadbody_can_take(bool status)
     CInventoryOwner* inventoryOwner = smart_cast<CInventoryOwner*>(&object());
     if (!inventoryOwner)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CInventoryOwner : cannot access class member deadbody_can_take!");
         return;
     }
@@ -266,7 +266,7 @@ bool CScriptGameObject::deadbody_can_take_status()
     CInventoryOwner* inventoryOwner = smart_cast<CInventoryOwner*>(&object());
     if (!inventoryOwner)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CInventoryOwner : cannot access class member deadbody_can_take_status!");
         return (0);
     }
@@ -279,7 +279,7 @@ CScriptGameObject* CScriptGameObject::GetCurrentOutfit() const
     CInventoryOwner* inventoryOwner = smart_cast<CInventoryOwner*>(&object());
     if (!inventoryOwner)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CInventoryOwner : cannot access class member GetCurrentOutfit!");
         return (0);
     }
@@ -292,7 +292,7 @@ float CScriptGameObject::GetCurrentOutfitProtection(int hit_type)
     CInventoryOwner* inventoryOwner = smart_cast<CInventoryOwner*>(&object());
     if (!inventoryOwner)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CInventoryOwner : cannot access class member GetCurrentOutfitProtection!");
         return (0);
     }
@@ -309,7 +309,7 @@ CScriptGameObject* CScriptGameObject::GetFood() const
     CAI_Stalker* l_tpStalker = smart_cast<CAI_Stalker*>(&object());
     if (!l_tpStalker)
     {
-        ai().script_engine().script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member GetFood!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member GetFood!");
         return (0);
     }
     CGameObject* food = l_tpStalker->GetFood() ? &l_tpStalker->GetFood()->object() : 0;
@@ -321,7 +321,7 @@ CScriptGameObject* CScriptGameObject::GetMedikit() const
     CAI_Stalker* l_tpStalker = smart_cast<CAI_Stalker*>(&object());
     if (!l_tpStalker)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CAI_Stalker : cannot access class member GetCurrentWeapon!");
         return (0);
     }
@@ -337,7 +337,7 @@ LPCSTR CScriptGameObject::GetPatrolPathName()
         CScriptEntity* script_monster = smart_cast<CScriptEntity*>(&object());
         if (!script_monster)
         {
-            ai().script_engine().script_log(
+            GEnv.ScriptEngine->script_log(
                 LuaMessageType::Error, "CGameObject : cannot access class member GetPatrolPathName!");
             return ("");
         }
@@ -353,20 +353,20 @@ void CScriptGameObject::add_animation(LPCSTR animation, bool hand_usage, bool us
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CGameObject : cannot access class member add_animation!");
         return;
     }
 
     if (stalker->movement().current_params().cover())
     {
-        ai().script_engine().script_log(LuaMessageType::Error,
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error,
             "Cannot add animation [%s]: object [%s] is in smart_cover!", animation, stalker->cName().c_str());
     }
 
     if (stalker->animation().global_selector())
     {
-        ai().script_engine().script_log(LuaMessageType::Error,
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error,
             "Cannot add animation [%s]: global selector is set for object [%s], in_smart_cover returned [%s]!",
             animation, stalker->cName().c_str(), in_smart_cover() ? "true" : "false");
         return;
@@ -381,20 +381,20 @@ void CScriptGameObject::add_animation(
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CGameObject : cannot access class member add_animation!");
         return;
     }
 
     if (stalker->movement().current_params().cover())
     {
-        ai().script_engine().script_log(LuaMessageType::Error,
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error,
             "Cannot add animation [%s]: object [%s] is in smart_cover!", animation, stalker->cName().c_str());
     }
 
     if (stalker->animation().global_selector())
     {
-        ai().script_engine().script_log(LuaMessageType::Error,
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error,
             "Cannot add animation [%s]: global selector is set for object [%s], in_smart_cover returned [%s]!",
             animation, stalker->cName().c_str(), in_smart_cover() ? "true" : "false");
         return;
@@ -408,7 +408,7 @@ void CScriptGameObject::clear_animations()
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CGameObject : cannot access class member clear_animations!");
         return;
     }
@@ -420,7 +420,7 @@ int CScriptGameObject::animation_count() const
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CGameObject : cannot access class member clear_animations!");
         return (-1);
     }
@@ -447,7 +447,7 @@ void CScriptGameObject::set_patrol_path(
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
-        ai().script_engine().script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
     else
         stalker->movement().patrol().set_path(path_name, patrol_start_type, patrol_route_type, random);
 }
@@ -456,7 +456,7 @@ void CScriptGameObject::inactualize_patrol_path()
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
-        ai().script_engine().script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
     else
         stalker->movement().patrol().make_inactual();
 }
@@ -465,14 +465,14 @@ void CScriptGameObject::set_dest_level_vertex_id(u32 level_vertex_id)
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CAI_Stalker : cannot access class member set_dest_level_vertex_id!");
     else
     {
         if (!ai().level_graph().valid_vertex_id(level_vertex_id))
         {
 #ifdef DEBUG
-            ai().script_engine().script_log(LuaMessageType::Error,
+            GEnv.ScriptEngine->script_log(LuaMessageType::Error,
                 "CAI_Stalker : invalid vertex id being setup by action %s!",
                 stalker->brain().CStalkerPlanner::current_action().m_action_name);
 #endif
@@ -480,7 +480,7 @@ void CScriptGameObject::set_dest_level_vertex_id(u32 level_vertex_id)
         }
         if (!stalker->movement().restrictions().accessible(level_vertex_id))
         {
-            ai().script_engine().script_log(LuaMessageType::Error,
+            GEnv.ScriptEngine->script_log(LuaMessageType::Error,
                 "! you are trying to setup destination for the stalker %s, which is not accessible by its restrictors "
                 "in[%s] out[%s]",
                 stalker->cName().c_str(), Level().space_restriction_manager().in_restrictions(stalker->ID()).c_str(),
@@ -495,14 +495,14 @@ void CScriptGameObject::set_dest_game_vertex_id(GameGraph::_GRAPH_ID game_vertex
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CAI_Stalker : cannot access class member set_dest_game_vertex_id!");
     else
     {
         if (!ai().game_graph().valid_vertex_id(game_vertex_id))
         {
 #ifdef DEBUG
-            ai().script_engine().script_log(LuaMessageType::Error,
+            GEnv.ScriptEngine->script_log(LuaMessageType::Error,
                 "CAI_Stalker : invalid vertex id being setup by action %s!",
                 stalker->brain().CStalkerPlanner::current_action().m_action_name);
 #endif
@@ -515,7 +515,7 @@ void CScriptGameObject::set_movement_selection_type(ESelectionType selection_typ
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CAI_Stalker : cannot access class member set_movement_selection_type!");
     stalker->movement().game_selector().set_selection_type(selection_type);
 }
@@ -525,7 +525,7 @@ CHARACTER_RANK_VALUE CScriptGameObject::GetRank()
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
     {
-        ai().script_engine().script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member GetRank!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member GetRank!");
         return (CHARACTER_RANK_VALUE(0));
     }
     else
@@ -536,7 +536,7 @@ void CScriptGameObject::set_desired_position()
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
-        ai().script_engine().script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
     else
         stalker->movement().set_desired_position(0);
 }
@@ -545,7 +545,7 @@ void CScriptGameObject::set_desired_position(const Fvector* desired_position)
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
-        ai().script_engine().script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
     else
     {
         THROW2(desired_position || stalker->movement().restrictions().accessible(*desired_position), *stalker->cName());
@@ -557,7 +557,7 @@ void CScriptGameObject::set_desired_direction()
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
-        ai().script_engine().script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
     else
         stalker->movement().set_desired_direction(0);
 }
@@ -566,16 +566,16 @@ void CScriptGameObject::set_desired_direction(const Fvector* desired_direction)
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
-        ai().script_engine().script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
     else
     {
         if (fsimilar(desired_direction->magnitude(), 0.f))
-            ai().script_engine().script_log(LuaMessageType::Error,
+            GEnv.ScriptEngine->script_log(LuaMessageType::Error,
                 "CAI_Stalker : [%s] set_desired_direction - you passed zero direction!", stalker->cName().c_str());
         else
         {
             if (!fsimilar(desired_direction->magnitude(), 1.f))
-                ai().script_engine().script_log(LuaMessageType::Error,
+                GEnv.ScriptEngine->script_log(LuaMessageType::Error,
                     "CAI_Stalker : [%s] set_desired_direction - you passed non-normalized direction!",
                     stalker->cName().c_str());
         }
@@ -591,7 +591,7 @@ void CScriptGameObject::set_body_state(EBodyState body_state)
     THROW((body_state == eBodyStateStand) || (body_state == eBodyStateCrouch));
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
-        ai().script_engine().script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
     else
         stalker->movement().set_body_state(body_state);
 }
@@ -600,7 +600,7 @@ void CScriptGameObject::set_movement_type(EMovementType movement_type)
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
-        ai().script_engine().script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
     else
         stalker->movement().set_movement_type(movement_type);
 }
@@ -609,14 +609,14 @@ void CScriptGameObject::set_mental_state(EMentalState mental_state)
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
-        ai().script_engine().script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
     else
     {
 #if 0 // def DEBUG
 		if (mental_state != eMentalStateDanger) {
 			if (stalker->brain().initialized()) {
 				if (stalker->brain().current_action_id() == StalkerDecisionSpace::eWorldOperatorCombatPlanner) {
-					ai().script_engine().script_log	(LuaMessageType::Error,"CAI_Stalker : set_mental_state is used during universal combat!, object[%s]", stalker->cName().c_str());
+					GEnv.ScriptEngine->script_log	(LuaMessageType::Error,"CAI_Stalker : set_mental_state is used during universal combat!, object[%s]", stalker->cName().c_str());
 //					return;
 				}
 			}
@@ -630,7 +630,7 @@ void CScriptGameObject::set_path_type(MovementManager::EPathType path_type)
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
-        ai().script_engine().script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
     else
         stalker->movement().set_path_type(path_type);
 }
@@ -639,7 +639,7 @@ void CScriptGameObject::set_detail_path_type(DetailPathManager::EDetailPathType 
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
-        ai().script_engine().script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member movement!");
     else
         stalker->movement().set_detail_path_type(detail_path_type);
 }
@@ -649,7 +649,7 @@ MonsterSpace::EBodyState CScriptGameObject::body_state() const
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
     {
-        ai().script_engine().script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member body_state!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member body_state!");
         return (MonsterSpace::eBodyStateStand);
     }
     return (stalker->movement().body_state());
@@ -660,7 +660,7 @@ MonsterSpace::EBodyState CScriptGameObject::target_body_state() const
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
     {
-        ai().script_engine().script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member body_state!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member body_state!");
         return (MonsterSpace::eBodyStateStand);
     }
     return (stalker->movement().target_body_state());
@@ -671,7 +671,7 @@ MonsterSpace::EMovementType CScriptGameObject::movement_type() const
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CAI_Stalker : cannot access class member movement_type!");
         return (MonsterSpace::eMovementTypeStand);
     }
@@ -683,7 +683,7 @@ MonsterSpace::EMovementType CScriptGameObject::target_movement_type() const
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CAI_Stalker : cannot access class member target_movement_type!");
         return (MonsterSpace::eMovementTypeStand);
     }
@@ -695,7 +695,7 @@ MonsterSpace::EMentalState CScriptGameObject::mental_state() const
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CAI_Stalker : cannot access class member mental_state!");
         return (MonsterSpace::eMentalStateDanger);
     }
@@ -707,7 +707,7 @@ MonsterSpace::EMentalState CScriptGameObject::target_mental_state() const
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CAI_Stalker : cannot access class member mental_state!");
         return (MonsterSpace::eMentalStateDanger);
     }
@@ -719,7 +719,7 @@ MovementManager::EPathType CScriptGameObject::path_type() const
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
     {
-        ai().script_engine().script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member path_type!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member path_type!");
         return (MovementManager::ePathTypeNoPath);
     }
     return (stalker->movement().path_type());
@@ -730,7 +730,7 @@ DetailPathManager::EDetailPathType CScriptGameObject::detail_path_type() const
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CAI_Stalker : cannot access class member detail_path_type!");
         return (DetailPathManager::eDetailPathTypeSmooth);
     }
@@ -741,7 +741,7 @@ void CScriptGameObject::set_sight(SightManager::ESightType sight_type, Fvector* 
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
-        ai().script_engine().script_log(LuaMessageType::Error, "CSightManager : cannot access class member set_sight!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CSightManager : cannot access class member set_sight!");
     else
     {
         if ((sight_type == SightManager::eSightTypeDirection) && vector3d && (_abs(vector3d->magnitude() - 1.f) > .01f))
@@ -758,7 +758,7 @@ void CScriptGameObject::set_sight(SightManager::ESightType sight_type, bool tors
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
-        ai().script_engine().script_log(LuaMessageType::Error, "CSightManager : cannot access class member set_sight!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CSightManager : cannot access class member set_sight!");
     else
         stalker->sight().setup(sight_type, torso_look, path);
 }
@@ -767,7 +767,7 @@ void CScriptGameObject::set_sight(SightManager::ESightType sight_type, Fvector& 
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
-        ai().script_engine().script_log(LuaMessageType::Error, "CSightManager : cannot access class member set_sight!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CSightManager : cannot access class member set_sight!");
     else
     {
         if ((sight_type == SightManager::eSightTypeDirection) && (_abs(vector3d.magnitude() - 1.f) > .01f))
@@ -784,7 +784,7 @@ void CScriptGameObject::set_sight(SightManager::ESightType sight_type, Fvector* 
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
-        ai().script_engine().script_log(LuaMessageType::Error, "CSightManager : cannot access class member set_sight!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CSightManager : cannot access class member set_sight!");
     else
     {
         if ((sight_type == SightManager::eSightTypeDirection) && vector3d && (_abs(vector3d->magnitude() - 1.f) > .01f))
@@ -801,7 +801,7 @@ void CScriptGameObject::set_sight(CScriptGameObject* object_to_look)
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
-        ai().script_engine().script_log(LuaMessageType::Error, "CSightManager : cannot access class member set_sight!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CSightManager : cannot access class member set_sight!");
     else
         stalker->sight().setup(&object_to_look->object());
 }
@@ -810,7 +810,7 @@ void CScriptGameObject::set_sight(CScriptGameObject* object_to_look, bool torso_
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
-        ai().script_engine().script_log(LuaMessageType::Error, "CSightManager : cannot access class member set_sight!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CSightManager : cannot access class member set_sight!");
     else
         stalker->sight().setup(&object_to_look->object(), torso_look);
 }
@@ -819,7 +819,7 @@ void CScriptGameObject::set_sight(CScriptGameObject* object_to_look, bool torso_
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
-        ai().script_engine().script_log(LuaMessageType::Error, "CSightManager : cannot access class member set_sight!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CSightManager : cannot access class member set_sight!");
     else
         stalker->sight().setup(&object_to_look->object(), torso_look, fire_object);
 }
@@ -828,7 +828,7 @@ void CScriptGameObject::set_sight(CScriptGameObject* object_to_look, bool torso_
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
-        ai().script_engine().script_log(LuaMessageType::Error, "CSightManager : cannot access class member set_sight!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CSightManager : cannot access class member set_sight!");
     else
         stalker->sight().setup(CSightAction(&object_to_look->object(), torso_look, fire_object, no_pitch));
 }
@@ -837,7 +837,7 @@ void CScriptGameObject::set_sight(const CMemoryInfo* memory_object, bool torso_l
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
-        ai().script_engine().script_log(LuaMessageType::Error, "CSightManager : cannot access class member set_sight!");
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CSightManager : cannot access class member set_sight!");
     else
         stalker->sight().setup(memory_object, torso_look);
 }
@@ -854,7 +854,7 @@ u32 CScriptGameObject::GetInventoryObjectCount() const
         return (l_tpInventoryOwner->inventory().dwfGetObjectCount());
     else
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CScriptGameObject : cannot access class member obj_count!");
         return (0);
     }
@@ -870,7 +870,7 @@ CScriptGameObject* CScriptGameObject::GetActiveItem()
             return (0);
     else
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CScriptGameObject : cannot access class member activge_item!");
         return (0);
     }
@@ -890,7 +890,7 @@ CScriptGameObject* CScriptGameObject::GetObjectByName(LPCSTR caObjectName) const
     }
     else
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CScriptGameObject : cannot access class member object!");
         return (0);
     }
@@ -910,7 +910,7 @@ CScriptGameObject* CScriptGameObject::GetObjectByIndex(int iIndex) const
     }
     else
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CScriptGameObject : cannot access class member object!");
         return (0);
     }
@@ -949,7 +949,7 @@ bool CScriptGameObject::weapon_strapped() const
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CScriptGameObject : cannot access class member weapon_strapped!");
         return (false);
     }
@@ -966,7 +966,7 @@ bool CScriptGameObject::weapon_unstrapped() const
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CScriptGameObject : cannot access class member weapon_unstrapped!");
         return (false);
     }
@@ -982,7 +982,7 @@ bool CScriptGameObject::path_completed() const
     CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CScriptGameObject : cannot access class member path_completed!");
         return (false);
     }
@@ -994,7 +994,7 @@ void CScriptGameObject::patrol_path_make_inactual()
     CCustomMonster* monster = smart_cast<CCustomMonster*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CScriptGameObject : cannot access class member patrol_path_make_inactual!");
         return;
     }
@@ -1006,7 +1006,7 @@ Fvector CScriptGameObject::head_orientation() const
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
     if (!stalker)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CScriptGameObject : cannot access class member head_orientation!");
         return (Fvector().set(flt_max, flt_max, flt_max));
     }
@@ -1033,7 +1033,7 @@ void CScriptGameObject::jump(const Fvector& position, float factor)
     CBaseMonster* monster = smart_cast<CBaseMonster*>(&object());
     if (!monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CScriptGameObject : cannot process jump for not a monster!");
         return;
     }
@@ -1046,7 +1046,7 @@ void CScriptGameObject::make_object_visible_somewhen(CScriptGameObject* object)
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&this->object());
     if (!stalker)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CAI_Stalker : cannot access class member make_object_visible_somewhen!");
         return;
     }
@@ -1054,7 +1054,7 @@ void CScriptGameObject::make_object_visible_somewhen(CScriptGameObject* object)
     CEntityAlive* entity_alive = smart_cast<CEntityAlive*>(&object->object());
     if (!entity_alive)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CEntityAlive : cannot access class member make_object_visible_somewhen!");
         return;
     }
@@ -1067,7 +1067,7 @@ void CScriptGameObject::sell_condition(CScriptIniFile* ini_file, LPCSTR section)
     CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(&object());
     if (!inventory_owner)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CInventoryOwner : cannot access class member sell_condition!");
         return;
     }
@@ -1080,7 +1080,7 @@ void CScriptGameObject::sell_condition(float friend_factor, float enemy_factor)
     CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(&object());
     if (!inventory_owner)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CInventoryOwner : cannot access class member sell_condition!");
         return;
     }
@@ -1094,7 +1094,7 @@ void CScriptGameObject::buy_condition(CScriptIniFile* ini_file, LPCSTR section)
     CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(&object());
     if (!inventory_owner)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CInventoryOwner : cannot access class member buy_condition!");
         return;
     }
@@ -1107,7 +1107,7 @@ void CScriptGameObject::buy_condition(float friend_factor, float enemy_factor)
     CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(&object());
     if (!inventory_owner)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CInventoryOwner : cannot access class member buy_condition!");
         return;
     }
@@ -1121,7 +1121,7 @@ void CScriptGameObject::show_condition(CScriptIniFile* ini_file, LPCSTR section)
     CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(&object());
     if (!inventory_owner)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CInventoryOwner : cannot access class member show_condition!");
         return;
     }
@@ -1134,7 +1134,7 @@ void CScriptGameObject::buy_supplies(CScriptIniFile* ini_file, LPCSTR section)
     CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(&object());
     if (!inventory_owner)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CInventoryOwner : cannot access class member buy_condition!");
         return;
     }
@@ -1147,7 +1147,7 @@ void CScriptGameObject::buy_item_condition_factor(float factor)
     CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(&object());
     if (!inventory_owner)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CInventoryOwner : cannot access class member buy_item_condition_factor!");
         return;
     }
@@ -1187,7 +1187,7 @@ LPCSTR CScriptGameObject::sound_prefix() const
     CCustomMonster* custom_monster = smart_cast<CCustomMonster*>(&object());
     if (!custom_monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CCustomMonster : cannot access class member sound_prefix!");
         return (0);
     }
@@ -1200,7 +1200,7 @@ void CScriptGameObject::sound_prefix(LPCSTR sound_prefix)
     CCustomMonster* custom_monster = smart_cast<CCustomMonster*>(&object());
     if (!custom_monster)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CCustomMonster : cannot access class member sound_prefix!");
         return;
     }
@@ -1212,7 +1212,7 @@ bool CScriptGameObject::is_weapon_going_to_be_strapped(CScriptGameObject const* 
 {
     if (!object)
     {
-        ai().script_engine().script_log(LuaMessageType::Error,
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error,
             "CGameObject : cannot access class member is_weapon_going_to_be_strapped (object passed is null)!");
         return false;
     }
@@ -1220,7 +1220,7 @@ bool CScriptGameObject::is_weapon_going_to_be_strapped(CScriptGameObject const* 
     CAI_Stalker const* stalker = smart_cast<CAI_Stalker const*>(&this->object());
     if (!stalker)
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "CGameObject : cannot access class member is_weapon_going_to_be_strapped!");
         return false;
     }
@@ -1467,7 +1467,7 @@ void CScriptGameObject::ForceSetPosition(Fvector pos, bool bActivate)
             sh->character_physics_support()->ForceTransform(M);
     }
     else
-        ai().script_engine().script_log(LuaMessageType::Error, "force_set_position: object %s has no physics shell!",
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "force_set_position: object %s has no physics shell!",
                                         *object().cName());
 }
 

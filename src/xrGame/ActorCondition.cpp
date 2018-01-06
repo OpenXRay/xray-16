@@ -738,7 +738,7 @@ void CActorCondition::UpdateTutorialThresholds()
     if (!b)
     {
         luabind::functor<void> fl;
-        R_ASSERT(ai().script_engine().functor<void>(cb_name, fl));
+        R_ASSERT(GEnv.ScriptEngine->functor<void>(cb_name, fl));
         fl();
     }
 }

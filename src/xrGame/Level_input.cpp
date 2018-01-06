@@ -461,7 +461,7 @@ void CLevel::IR_OnKeyboardPress(int key)
 //			m_bSynchronization	= false;
 //		}
 //		luabind::functor<void>	functor;
-//		ai().script_engine().functor("alife_test.set_switch_online",functor);
+//		GEnv.ScriptEngine->functor("alife_test.set_switch_online",functor);
 //		functor(0,false);
 //	}
 //		return;

@@ -83,7 +83,7 @@ LPCSTR CDialogScriptHelper::GetScriptText(LPCSTR str_to_translate, const CGameOb
         return str_to_translate;
 
     luabind::functor<LPCSTR> lua_function;
-    bool functor_exists = ai().script_engine().functor(m_sScriptTextFunc.c_str(), lua_function);
+    bool functor_exists = GEnv.ScriptEngine->functor(m_sScriptTextFunc.c_str(), lua_function);
     THROW3(functor_exists, "Cannot find phrase script text ", m_sScriptTextFunc.c_str());
 
     LPCSTR res = lua_function(pSpeakerGO1->lua_game_object(), pSpeakerGO2->lua_game_object(), dialog_id, phrase_id);
@@ -108,7 +108,7 @@ bool CDialogScriptHelper::Precondition(const CGameObject* pSpeakerGO, LPCSTR dia
     {
         luabind::functor<bool> lua_function;
         THROW(*Preconditions()[i]);
-        bool functor_exists = ai().script_engine().functor(*Preconditions()[i], lua_function);
+        bool functor_exists = GEnv.ScriptEngine->functor(*Preconditions()[i], lua_function);
         THROW3(functor_exists, "Cannot find precondition", *Preconditions()[i]);
         predicate_result = lua_function(pSpeakerGO->lua_game_object());
         if (!predicate_result)
@@ -129,7 +129,7 @@ void CDialogScriptHelper::Action(const CGameObject* pSpeakerGO, LPCSTR dialog_id
     {
         luabind::functor<void> lua_function;
         THROW(*Actions()[i]);
-        bool functor_exists = ai().script_engine().functor(*Actions()[i], lua_function);
+        bool functor_exists = GEnv.ScriptEngine->functor(*Actions()[i], lua_function);
         THROW3(functor_exists, "Cannot find phrase dialog script function", *Actions()[i]);
         lua_function(pSpeakerGO->lua_game_object(), dialog_id);
     }
@@ -153,7 +153,7 @@ bool CDialogScriptHelper::Precondition(const CGameObject* pSpeakerGO1, const CGa
     {
         luabind::functor<bool> lua_function;
         THROW(*Preconditions()[i]);
-        bool functor_exists = ai().script_engine().functor(*Preconditions()[i], lua_function);
+        bool functor_exists = GEnv.ScriptEngine->functor(*Preconditions()[i], lua_function);
         THROW3(functor_exists, "Cannot find phrase precondition", *Preconditions()[i]);
         predicate_result = lua_function(
             pSpeakerGO1->lua_game_object(), pSpeakerGO2->lua_game_object(), dialog_id, phrase_id, next_phrase_id);
@@ -178,7 +178,7 @@ void CDialogScriptHelper::Action(
     {
         luabind::functor<void> lua_function;
         THROW(*Actions()[i]);
-        bool functor_exists = ai().script_engine().functor(*Actions()[i], lua_function);
+        bool functor_exists = GEnv.ScriptEngine->functor(*Actions()[i], lua_function);
         THROW3(functor_exists, "Cannot find phrase dialog script function", *Actions()[i]);
         try
         {

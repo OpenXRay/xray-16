@@ -61,8 +61,8 @@ void CScriptBinder::reinit()
 #ifdef DEBUG_MEMORY_MANAGER
     if (g_bMEMO)
     {
-        //		lua_gc				(ai().script_engine().lua(),LUA_GCCOLLECT,0);
-        //		lua_gc				(ai().script_engine().lua(),LUA_GCCOLLECT,0);
+        //		lua_gc				(GEnv.ScriptEngine->lua(),LUA_GCCOLLECT,0);
+        //		lua_gc				(GEnv.ScriptEngine->lua(),LUA_GCCOLLECT,0);
         Msg("CScriptBinder::reinit() : %d", Memory.mem_usage() - start);
     }
 #endif // DEBUG_MEMORY_MANAGER
@@ -81,9 +81,9 @@ void CScriptBinder::reload(LPCSTR section)
         return;
 
     luabind::functor<void> lua_function;
-    if (!ai().script_engine().functor(pSettings->r_string(section, "script_binding"), lua_function))
+    if (!GEnv.ScriptEngine->functor(pSettings->r_string(section, "script_binding"), lua_function))
     {
-        ai().script_engine().script_log(
+        GEnv.ScriptEngine->script_log(
             LuaMessageType::Error, "function %s is not loaded!", pSettings->r_string(section, "script_binding"));
         return;
     }
@@ -113,8 +113,8 @@ void CScriptBinder::reload(LPCSTR section)
 #ifdef DEBUG_MEMORY_MANAGER
     if (g_bMEMO)
     {
-        //		lua_gc				(ai().script_engine().lua(),LUA_GCCOLLECT,0);
-        //		lua_gc				(ai().script_engine().lua(),LUA_GCCOLLECT,0);
+        //		lua_gc				(GEnv.ScriptEngine->lua(),LUA_GCCOLLECT,0);
+        //		lua_gc				(GEnv.ScriptEngine->lua(),LUA_GCCOLLECT,0);
         Msg("CScriptBinder::reload() : %d", Memory.mem_usage() - start);
     }
 #endif // DEBUG_MEMORY_MANAGER
@@ -144,8 +144,8 @@ BOOL CScriptBinder::net_Spawn(CSE_Abstract* DC)
 #ifdef DEBUG_MEMORY_MANAGER
     if (g_bMEMO)
     {
-        //		lua_gc				(ai().script_engine().lua(),LUA_GCCOLLECT,0);
-        //		lua_gc				(ai().script_engine().lua(),LUA_GCCOLLECT,0);
+        //		lua_gc				(GEnv.ScriptEngine->lua(),LUA_GCCOLLECT,0);
+        //		lua_gc				(GEnv.ScriptEngine->lua(),LUA_GCCOLLECT,0);
         Msg("CScriptBinder::net_Spawn() : %d", Memory.mem_usage() - start);
     }
 #endif // DEBUG_MEMORY_MANAGER
