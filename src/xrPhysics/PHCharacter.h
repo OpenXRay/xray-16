@@ -7,7 +7,7 @@
 #include "xrServerEntities/PHSynchronize.h"
 #include "PHDisabling.h"
 
-#include "xrEngine/iphysicsshell.h"
+#include "xrEngine/IPhysicsShell.h"
 
 class IPhysicsShellHolder;
 class IClimableObject;
@@ -19,18 +19,16 @@ class CPHAICharacter;
 namespace ALife
 {
 enum EHitType;
-};
-static enum EEnvironment { peOnGround, peAtWall, peInAir };
+}
+enum EEnvironment { peOnGround, peAtWall, peInAir };
 
 class CPHCharacter :
     public CPHObject,
     public CPHSynchronize,
     public CPHDisablingTranslational,
     public IPhysicsElement
-#if 0
-#ifdef DEBUG
+#if 0//def DEBUG
     ,public pureRender
-#endif
 #endif
 {
 public:

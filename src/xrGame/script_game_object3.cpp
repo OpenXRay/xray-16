@@ -1427,7 +1427,7 @@ bool CScriptGameObject::IsBoneVisible(pcstr bone_name)
     if (bone_id == BI_NONE)
         return false;
 
-    return k->LL_GetBoneVisible(bone_id) == true ? true : false;
+    return k->LL_GetBoneVisible(bone_id);
 }
 
 float CScriptGameObject::GetLuminocityHemi()

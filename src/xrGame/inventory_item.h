@@ -104,7 +104,7 @@ public:
     virtual void OnEvent(NET_Packet& P, u16 type);
 
     virtual bool Useful() const; // !!! Переопределить. (см. в Inventory.cpp)
-    virtual bool IsUsingCondition() const { return (m_flags.test(FUsingCondition) > 0); }
+    virtual bool IsUsingCondition() const { return m_flags.test(FUsingCondition); }
     virtual bool Attach(PIItem pIItem, bool b_send_event) { return false; }
     virtual bool Detach(PIItem pIItem) { return false; }
     //при детаче спаунится новая вещь при заданно названии секции
