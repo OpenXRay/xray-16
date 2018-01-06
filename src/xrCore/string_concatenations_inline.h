@@ -80,11 +80,11 @@ public:
         return ((result + 1) * sizeof(*m_strings[0].first));
     }
 
-    inline void concat(LPCSTR const result) const
+    inline void concat(pcstr const result) const
     {
         VERIFY(m_count > 0);
 
-        LPSTR i = const_cast<LPSTR>(result);
+        pstr i = const_cast<pstr>(result);
         memcpy(i, m_strings[0].first, m_strings[0].second * sizeof(*m_strings[0].first));
         i += m_strings[0].second;
 
@@ -104,31 +104,28 @@ private:
         max_item_count = 6,
     };
 
-private:
     template <u32 index>
     struct helper
     {
-        static inline u32 length(LPCSTR string) { return (string ? (unsigned int)xr_strlen(string) : 0); }
-        static inline LPCSTR string(LPCSTR string) { return (string); }
+        static inline u32 length(pcstr string) { return (string ? (unsigned int)xr_strlen(string) : 0); }
+        static inline pcstr string(pcstr string) { return (string); }
         static inline u32 length(shared_str const& string) { return (string.size()); }
-        static inline LPCSTR string(shared_str const& string) { return (string.c_str()); }
-        static inline u32 length(xr_string const& string) { return (string.size()); }
-        static inline LPCSTR string(xr_string const& string) { return (string.c_str()); }
+        static inline pcstr string(shared_str const& string) { return (string.c_str()); }
+        static inline size_t length(xr_string const& string) { return (string.size()); }
+        static inline pcstr string(xr_string const& string) { return (string.c_str()); }
         template <typename T>
         static inline void add_string(string_tupples& self, T p)
         {
             static_assert(index < max_item_count, "Error invalid string index specified.");
 
-            LPCSTR cstr = string(p);
+            pcstr cstr = string(p);
             VERIFY(cstr);
             self.m_strings[index] = std::make_pair(cstr, length(p));
         }
     }; // struct helper
 
-private:
-    typedef std::pair<LPCSTR, u32> StringPair;
+    using StringPair = std::pair<pcstr, u32>;
 
-private:
     StringPair m_strings[max_item_count];
     u32 m_count;
 };
