@@ -110,7 +110,7 @@ bool RunJITCommand(lua_State* ls, const char* command)
 
 const char* const CScriptEngine::GlobalNamespace = SCRIPT_GLOBAL_NAMESPACE;
 Lock CScriptEngine::stateMapLock;
-xr_hash_map<lua_State*, CScriptEngine*>* CScriptEngine::stateMap = nullptr;
+xr_unordered_map<lua_State*, CScriptEngine*>* CScriptEngine::stateMap = nullptr;
 
 string4096 CScriptEngine::g_ca_stdout;
 
@@ -119,7 +119,7 @@ void CScriptEngine::reinit()
     stateMapLock.Enter();
     if (!stateMap)
     {
-        stateMap = new xr_hash_map<lua_State*, CScriptEngine*>();
+        stateMap = new xr_unordered_map<lua_State*, CScriptEngine*>();
         stateMap->reserve(32); // 32 lua states should be enough
     }
     stateMapLock.Leave();

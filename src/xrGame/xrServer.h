@@ -22,10 +22,10 @@
 
 class CSE_Abstract;
 
-const u32 NET_Latency = 50; // time in (ms)
+constexpr u32 NET_Latency = 50; // time in (ms)
 
-// t-defs
-typedef xr_hash_map<u16, CSE_Abstract*> xrS_entities;
+// XXX: check if u16 used for entity's id. If true, then this must be changed, if we want to increase the number of ID's.
+using xrS_entities = xr_unordered_map<u16, CSE_Abstract*>;
 
 class xrClientData : public IClient
 {
