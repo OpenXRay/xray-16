@@ -561,7 +561,6 @@ void CSoundRender_Core::object_relcase(IGameObject* obj)
     }
 }
 
-#ifdef _EDITOR
 void CSoundRender_Core::set_user_env(CSound_environment* E)
 {
     if (0 == E && !bUserEnvironment)
@@ -625,4 +624,3 @@ void CSoundRender_Core::set_environment(u32 id, CSound_environment** dst_env)
         i_eax_listener_get(DE);
     }
 }
-#endif

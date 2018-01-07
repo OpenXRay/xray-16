@@ -6,15 +6,6 @@
 #include "xrCore/_vector3d.h"
 #include "xrCommon/xr_vector.h" // DEFINE_VECTOR
 
-#ifdef __BORLANDC__
-#define XRSOUND_EDITOR_API XRSOUND_API
-
-// editor only refs
-class XRSOUND_EDITOR_API SoundEnvironment_LIB;
-#else
-#define XRSOUND_EDITOR_API
-#endif
-
 constexpr pcstr SNDENV_FILENAME = "sEnvironment.xr";
 #define OGG_COMMENT_VERSION 0x0003
 
@@ -25,6 +16,7 @@ class XRSOUND_API CSound_source;
 class XRSOUND_API CSound_emitter;
 class XRSOUND_API CSound_stream_interface;
 class XRSOUND_API CSound_environment;
+class XRSOUND_API SoundEnvironment_LIB; // editor only ref
 struct xr_token;
 class IReader;
 template <class T>
@@ -301,14 +293,13 @@ public:
 
     virtual void object_relcase(IGameObject* obj) = 0;
     virtual const Fvector& listener_position() = 0;
-#ifdef __BORLANDC__
+
     virtual SoundEnvironment_LIB* get_env_library() = 0;
     virtual void refresh_env_library() = 0;
     virtual void set_user_env(CSound_environment* E) = 0;
     virtual void refresh_sources() = 0;
     virtual void set_environment(u32 id, CSound_environment** dst_env) = 0;
     virtual void set_environment_size(CSound_environment* src_env, CSound_environment** dst_env) = 0;
-#endif
 };
 
 class CSound_manager_interface;

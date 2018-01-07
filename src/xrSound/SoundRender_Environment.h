@@ -1,7 +1,7 @@
 #pragma once
 
 // refs
-class XRSOUND_EDITOR_API CSoundRender_Environment : public CSound_environment
+class XRSOUND_API CSoundRender_Environment : public CSound_environment
 {
 public:
     u32 version;
@@ -31,7 +31,7 @@ public:
     void save(IWriter* fs);
 };
 
-class XRSOUND_EDITOR_API SoundEnvironment_LIB
+class XRSOUND_API SoundEnvironment_LIB
 {
 public:
     using SE_VEC = xr_vector<CSoundRender_Environment*>;

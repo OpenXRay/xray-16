@@ -5,7 +5,7 @@
 // refs
 struct OggVorbis_File;
 
-class XRSOUND_EDITOR_API CSoundRender_Source : public CSound_source
+class XRSOUND_API CSoundRender_Source : public CSound_source
 {
 public:
     shared_str pname;
