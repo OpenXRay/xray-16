@@ -82,11 +82,11 @@ void InitSettings()
 
 void InitConsole()
 {
-#ifdef DEDICATED_SERVER
-    Console = new CTextConsole();
-#else
-    Console = new CConsole();
-#endif
+    if (GEnv.isDedicatedServer)
+        Console = new CTextConsole();
+    else
+        Console = new CConsole();
+
     Console->Initialize();
     xr_strcpy(Console->ConfigFile, "user.ltx");
     if (strstr(Core.Params, "-ltx "))
@@ -293,9 +293,9 @@ public:
 
 int RunApplication(pcstr commandLine)
 {
-#ifdef DEDICATED_SERVER
-    GEnv.isDedicatedServer = true;
-#endif
+    if (strstr(commandLine, "-dedicated"))
+        GEnv.isDedicatedServer = true;
+
     xrDebug::Initialize(GEnv.isDedicatedServer);
     if (!IsDebuggerPresent())
     {
@@ -303,12 +303,15 @@ int RunApplication(pcstr commandLine)
         bool result = HeapSetInformation(
             GetProcessHeap(), HeapCompatibilityInformation, &heapFragmentation, sizeof(heapFragmentation));
         VERIFY2(result, "can't set process heap low fragmentation");
-        (void)result;
+        UNUSED(result);
     }
-#if !defined(DEDICATED_SERVER) && defined(NO_MULTI_INSTANCES)
-    CreateMutex(nullptr, TRUE, "Local\\STALKER-COP");
-    if (GetLastError() == ERROR_ALREADY_EXISTS)
-        return 2;
+#ifdef NO_MULTI_INSTANCES
+    if (!GEnv.isDedicatedServer)
+    {
+        CreateMutex(nullptr, TRUE, "Local\\STALKER-COP");
+        if (GetLastError() == ERROR_ALREADY_EXISTS)
+            return 2;
+    }
 #endif
     SetThreadAffinityMask(GetCurrentThread(), 1);
     logoWindow = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_STARTUP), nullptr, LogoWndProc);
@@ -341,10 +344,13 @@ int RunApplication(pcstr commandLine)
         xr_strcpy(Core.UserName, sizeof(Core.UserName), "Player");
         xr_strcpy(Core.CompName, sizeof(Core.CompName), "Computer");
     }
-#ifndef DEDICATED_SERVER
-    StickyKeyFilter filter;
-    (void)filter;
-#endif
+
+    if (GEnv.isDedicatedServer)
+    {
+        StickyKeyFilter filter;
+        UNUSED(filter);
+    }
+
     FPU::m24r();
     InitEngine();
     InitInput();
@@ -373,25 +379,27 @@ int RunApplication(pcstr commandLine)
         return 0;
     }
 
-#ifndef DEDICATED_SERVER
-    if (strstr(Core.Params, "-r4"))
-        Console->Execute("renderer renderer_r4");
-    else if (strstr(Core.Params, "-r3"))
-        Console->Execute("renderer renderer_r3");
-    else if (strstr(Core.Params, "-r2.5"))
-        Console->Execute("renderer renderer_r2.5");
-    else if (strstr(Core.Params, "-r2a"))
-        Console->Execute("renderer renderer_r2a");
-    else if (strstr(Core.Params, "-r2"))
-        Console->Execute("renderer renderer_r2");
-    else
+    if (!GEnv.isDedicatedServer)
     {
-        CCC_LoadCFG_custom cmd("renderer ");
-        cmd.Execute(Console->ConfigFile);
+        if (strstr(Core.Params, "-r4"))
+            Console->Execute("renderer renderer_r4");
+        else if (strstr(Core.Params, "-r3"))
+            Console->Execute("renderer renderer_r3");
+        else if (strstr(Core.Params, "-r2.5"))
+            Console->Execute("renderer renderer_r2.5");
+        else if (strstr(Core.Params, "-r2a"))
+            Console->Execute("renderer renderer_r2a");
+        else if (strstr(Core.Params, "-r2"))
+            Console->Execute("renderer renderer_r2");
+        else
+        {
+            CCC_LoadCFG_custom cmd("renderer ");
+            cmd.Execute(Console->ConfigFile);
+        }
     }
-#else
-    Console->Execute("renderer renderer_r1");
-#endif
+    else
+        Console->Execute("renderer renderer_r1");
+
     Engine.External.InitializeRenderers();
     Engine.External.Initialize();
     Startup();

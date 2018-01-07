@@ -167,10 +167,7 @@ void CTexture::Load()
     }
 
     Preload();
-//#ifndef		DEDICATED_SERVER
-#ifndef _EDITOR
     if (!GEnv.isDedicatedServer)
-#endif
     {
         // Check for OGM
         string_path fn;
@@ -286,7 +283,6 @@ void CTexture::Load()
                 flags.MemoryUsage = mem;
             }
         }
-        //#endif
     }
     PostLoad();
 }

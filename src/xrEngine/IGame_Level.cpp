@@ -125,11 +125,12 @@ bool IGame_Level::Load(u32 dwNum)
     // Done
     FS.r_close(LL_Stream);
     bReady = true;
+
     if (!GEnv.isDedicatedServer)
+    {
         IR_Capture();
-#ifndef DEDICATED_SERVER
-    Device.seqRender.Add(this);
-#endif
+        Device.seqRender.Add(this);
+    }
 
     Device.seqFrame.Add(this);
     return true;
@@ -138,7 +139,9 @@ bool IGame_Level::Load(u32 dwNum)
 int psNET_DedicatedSleep = 5;
 void IGame_Level::OnRender()
 {
-#ifndef DEDICATED_SERVER
+    if (GEnv.isDedicatedServer)
+        return;
+
     // if (_abs(Device.fTimeDelta)<EPS_S) return;
 
 #ifdef _GPA_ENABLED
@@ -167,7 +170,6 @@ void IGame_Level::OnRender()
     // Font
     // pApp->pFontSystem->SetSizeI(0.023f);
     // pApp->pFontSystem->OnRender();
-#endif
 }
 
 void IGame_Level::OnFrame()

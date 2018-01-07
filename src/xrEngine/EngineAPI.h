@@ -60,9 +60,7 @@ public:
     void Initialize();
 
     void InitializeRenderers();
-#ifndef DEDICATED_SERVER
     void InitializeNotDedicated();
-#endif // DEDICATED_SERVER
 
     void Destroy();
 

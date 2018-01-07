@@ -15,10 +15,7 @@
 
 void CBackend::OnFrameEnd()
 {
-//#ifndef DEDICATED_SERVER
-#ifndef _EDITOR
     if (!GEnv.isDedicatedServer)
-#endif
     {
 #if defined(USE_DX10) || defined(USE_DX11)
         HW.pContext->ClearState();
@@ -34,15 +31,11 @@ void CBackend::OnFrameEnd()
         Invalidate();
 #endif // USE_DX10
     }
-    //#endif
 }
 
 void CBackend::OnFrameBegin()
 {
-//#ifndef DEDICATED_SERVER
-#ifndef _EDITOR
     if (!GEnv.isDedicatedServer)
-#endif
     {
         PGO(Msg("PGO:*****frame[%d]*****", RDEVICE.dwFrame));
 #if defined(USE_DX10) || defined(USE_DX11)
@@ -57,7 +50,6 @@ void CBackend::OnFrameBegin()
         Index.Flush();
         set_Stencil(FALSE);
     }
-    //#endif
 }
 
 void CBackend::Invalidate()

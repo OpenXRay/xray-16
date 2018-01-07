@@ -568,7 +568,7 @@ public:
         return inherited::GetToken();
     }
 };
-#ifndef DEDICATED_SERVER
+
 class CCC_soundDevice : public CCC_Token
 {
     typedef CCC_Token inherited;
@@ -606,8 +606,9 @@ public:
         inherited::Save(F);
     }
 };
-#endif
+
 //-----------------------------------------------------------------------
+
 class CCC_ExclusiveMode : public IConsole_Command
 {
 private:
@@ -778,9 +779,9 @@ void CCC_Register()
 
     CMD1(CCC_r2, "renderer");
 
-#ifndef DEDICATED_SERVER
-    CMD1(CCC_soundDevice, "snd_device");
-#endif
+    if (!GEnv.isDedicatedServer)
+        CMD1(CCC_soundDevice, "snd_device");
+
     // psSoundRolloff = pSettings->r_float ("sound","rolloff"); clamp(psSoundRolloff, EPS_S, 2.f);
     psSoundOcclusionScale = pSettings->r_float("sound", "occlusion_scale");
     clamp(psSoundOcclusionScale, 0.1f, .5f);

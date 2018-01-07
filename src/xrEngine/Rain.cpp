@@ -132,9 +132,8 @@ void CEffect_Rain::OnFrame()
         return;
 #endif
 
-#ifdef DEDICATED_SERVER
-    return;
-#endif
+    if (GEnv.isDedicatedServer)
+        return;
 
     // Parse states
     float factor = g_pGamePersistent->Environment().CurrentEnv->rain_density;

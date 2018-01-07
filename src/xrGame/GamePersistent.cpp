@@ -761,7 +761,8 @@ void CGamePersistent::OnAppActivate()
     }
 
     bEntryFlag = TRUE;
-    pInput->ClipCursor(!GetUICursor().IsVisible());
+    if (!GEnv.isDedicatedServer)
+        pInput->ClipCursor(!GetUICursor().IsVisible());
 }
 
 void CGamePersistent::OnAppDeactivate()

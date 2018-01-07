@@ -38,7 +38,9 @@ ref_light precache_light = 0;
 
 BOOL CRenderDevice::Begin()
 {
-#ifndef DEDICATED_SERVER
+    if (GEnv.isDedicatedServer)
+        return TRUE;
+
     switch (GEnv.Render->GetDeviceState())
     {
     case DeviceState::Normal: break;
@@ -56,7 +58,7 @@ BOOL CRenderDevice::Begin()
     GEnv.Render->Begin();
     FPU::m24r();
     g_bRendering = TRUE;
-#endif
+
     return TRUE;
 }
 
@@ -65,7 +67,9 @@ extern void CheckPrivilegySlowdown();
 
 void CRenderDevice::End(void)
 {
-#ifndef DEDICATED_SERVER
+    if (GEnv.isDedicatedServer)
+        return;
+
 #ifdef INGAME_EDITOR
     bool load_finished = false;
 #endif // #ifdef INGAME_EDITOR
@@ -112,7 +116,6 @@ void CRenderDevice::End(void)
     if (load_finished && m_editor)
         m_editor->on_load_finished();
 #endif
-#endif // !DEDICATED_SERVER
 }
 
 void CRenderDevice::SecondaryThreadProc(void* context)
@@ -138,12 +141,11 @@ void CRenderDevice::SecondaryThreadProc(void* context)
 #include "IGame_Level.h"
 void CRenderDevice::PreCache(u32 amount, bool b_draw_loadscreen, bool b_wait_user_input)
 {
-#ifdef DEDICATED_SERVER
-    amount = 0;
-#else
-    if (GEnv.Render->GetForceGPU_REF())
+    if (GEnv.isDedicatedServer)
         amount = 0;
-#endif
+    else if (GEnv.Render->GetForceGPU_REF())
+        amount = 0;
+
     dwPrecacheFrame = dwPrecacheTotal = amount;
     if (amount && !precache_light && g_pGameLevel && g_loading_events.empty())
     {
@@ -194,9 +196,9 @@ void CRenderDevice::on_idle()
         Sleep(100);
         return;
     }
-#ifdef DEDICATED_SERVER
-    u32 FrameStartTime = TimerGlobal.GetElapsed_ms();
-#endif
+
+    const auto FrameStartTime = TimerGlobal.GetElapsed_ms();
+
     if (psDeviceFlags.test(rsStatistic))
         g_bEnableStatGather = TRUE; // XXX: why not use either rsStatistic or g_bEnableStatGather?
     else
@@ -246,30 +248,35 @@ void CRenderDevice::on_idle()
     Sleep(0);
 #endif // ECO_RENDER END
 
-#ifndef DEDICATED_SERVER
-    // all rendering is done here
-    CStatTimer renderTotalReal;
-    renderTotalReal.FrameStart();
-    renderTotalReal.Begin();
-    if (b_is_Active && Begin())
+    if (!GEnv.isDedicatedServer)
     {
-        seqRender.Process(rp_Render);
-        CalcFrameStats();
-        Statistic->Show();
-        End(); // Present goes here
+        // all rendering is done here
+        CStatTimer renderTotalReal;
+        renderTotalReal.FrameStart();
+        renderTotalReal.Begin();
+        if (b_is_Active && Begin())
+        {
+            seqRender.Process(rp_Render);
+            CalcFrameStats();
+            Statistic->Show();
+            End(); // Present goes here
+        }
+        renderTotalReal.End();
+        renderTotalReal.FrameEnd();
+        stats.RenderTotal.accum = renderTotalReal.accum;
     }
-    renderTotalReal.End();
-    renderTotalReal.FrameEnd();
-    stats.RenderTotal.accum = renderTotalReal.accum;
-#endif // #ifndef DEDICATED_SERVER
+
     syncFrameDone.Wait(); // wait until secondary thread finish its job
-#ifdef DEDICATED_SERVER
-    u32 FrameEndTime = TimerGlobal.GetElapsed_ms();
-    u32 FrameTime = (FrameEndTime - FrameStartTime);
-    u32 DSUpdateDelta = 1000 / g_svDedicateServerUpdateReate;
-    if (FrameTime < DSUpdateDelta)
-        Sleep(DSUpdateDelta - FrameTime);
-#endif
+
+    if (GEnv.isDedicatedServer)
+    {
+        const auto FrameEndTime = TimerGlobal.GetElapsed_ms();
+        const auto FrameTime = (FrameEndTime - FrameStartTime);
+        const auto DSUpdateDelta = 1000 / g_svDedicateServerUpdateReate;
+        if (FrameTime < DSUpdateDelta)
+            Sleep(DSUpdateDelta - FrameTime);
+    }
+
     if (!b_is_Active)
         Sleep(1);
 }
@@ -398,9 +405,9 @@ ENGINE_API BOOL bShowPauseString = TRUE;
 void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
 {
     static int snd_emitters_ = -1;
-    if (g_bBenchmark)
+    if (g_bBenchmark || GEnv.isDedicatedServer)
         return;
-#ifndef DEDICATED_SERVER
+
     if (bOn)
     {
         if (!Paused())
@@ -442,7 +449,6 @@ void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
             }
         }
     }
-#endif
 }
 
 BOOL CRenderDevice::Paused() { return g_pauseMngr()->Paused(); }
@@ -458,12 +464,12 @@ void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM lParam)
         {
             Device.seqAppActivate.Process(rp_AppActivate);
             app_inactive_time += TimerMM.GetElapsed_ms() - app_inactive_time_start;
-#ifndef DEDICATED_SERVER
 #ifdef INGAME_EDITOR
-            if (!editor())
-#endif // #ifdef INGAME_EDITOR
+            if (!editor() && !GEnv.isDedicatedServer)
+#else
+            if (!GEnv.isDedicatedServer)
+#endif
                 ShowCursor(FALSE);
-#endif // #ifndef DEDICATED_SERVER
         }
         else
         {

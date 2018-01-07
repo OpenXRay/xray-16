@@ -43,8 +43,6 @@ bool is_enough_address_space_available()
     return (*(u32*)&system_info.lpMaximumApplicationAddress) > 0x90000000;
 }
 
-#ifndef DEDICATED_SERVER
-
 void CEngineAPI::InitializeNotDedicated()
 {
     if (psDeviceFlags.test(rsR4))
@@ -88,13 +86,11 @@ void CEngineAPI::InitializeNotDedicated()
             g_current_renderer = 2;
     }
 }
-#endif // DEDICATED_SERVER
 
 void CEngineAPI::InitializeRenderers()
 {    
-#ifndef DEDICATED_SERVER
-    InitializeNotDedicated();
-#endif // DEDICATED_SERVER
+    if (!GEnv.isDedicatedServer)
+        InitializeNotDedicated();
 
     if ((!hRender->exist()) | (!psDeviceFlags.test(rsR4|rsR3|rsR2)))
     {
@@ -165,17 +161,21 @@ void CEngineAPI::Destroy(void)
 
 void CEngineAPI::CreateRendererList()
 {
-#ifdef DEDICATED_SERVER
+    hRender = std::make_unique<XRay::Module>(true);
 
-    vid_quality_token = xr_alloc<xr_token>(2);
+    if (GEnv.isDedicatedServer)
+    {
+        vid_quality_token = xr_alloc<xr_token>(2);
 
-    vid_quality_token[0].id = 0;
-    vid_quality_token[0].name = xr_strdup("renderer_r1");
+        vid_quality_token[0].id = 0;
+        vid_quality_token[0].name = xr_strdup("renderer_r1");
 
-    vid_quality_token[1].id = -1;
-    vid_quality_token[1].name = nullptr;
+        vid_quality_token[1].id = -1;
+        vid_quality_token[1].name = nullptr;
 
-#else
+        return;
+    }
+
     // TODO: ask renderers if they are supported!
     if (vid_quality_token != nullptr)
         return;
@@ -183,8 +183,6 @@ void CEngineAPI::CreateRendererList()
     bool bSupports_r2_5 = false;
     bool bSupports_r3 = false;
     bool bSupports_r4 = false;
-
-    hRender = std::make_unique<XRay::Module>(true);
 
     if (strstr(Core.Params, "-perfhud_hack"))
     {
@@ -322,5 +320,4 @@ Msg ("[%s]",_tmp[i]);
 #endif // DEBUG
 }
 */
-#endif //#ifndef DEDICATED_SERVER
 }

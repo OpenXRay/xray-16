@@ -50,9 +50,10 @@ void CRenderDevice::Reset(bool precache)
     Msg("*** RESET [%d ms]", tm_end - tm_start);
     // TODO: Remove this! It may hide crash
     Memory.mem_compact();
-#ifndef DEDICATED_SERVER
-    ShowCursor(false);
-#endif
+
+    if (!GEnv.isDedicatedServer)
+        ShowCursor(false);
+
     seqDeviceReset.Process(rp_DeviceReset);
     if (dwWidth_before != dwWidth || dwHeight_before != dwHeight)
         seqResolutionChanged.Process(rp_ScreenResolutionChanged);
