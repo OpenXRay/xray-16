@@ -1,44 +1,45 @@
 #pragma once
 #include "xrCore/xrMemory.h"
 
-template <class T>
+template <typename T>
 class xalloc
 {
 public:
-    typedef size_t size_type;
-    typedef std::ptrdiff_t difference_type;
-    typedef T* pointer;
-    typedef const T* const_pointer;
-    typedef T& reference;
-    typedef const T& const_reference;
-    typedef T value_type;
+    using size_type = size_t;
+    using difference_type = std::ptrdiff_t;
+    using pointer = T*;
+    using const_pointer = const T*;
+    using reference = T&;
+    using const_reference = const T&;
+    using value_type = T;
 
-public:
-    template<class _Other>
+    template<class Other>
     struct rebind
     {
-        typedef xalloc<_Other> other;
+        using other = xalloc<Other>;
     };
 
-public:
-    pointer address(reference _Val) const { return &_Val; }
-    const_pointer address(const_reference _Val) const { return &_Val; }
-    xalloc() {}
-    xalloc(const xalloc<T>&) {}
-    template<class _Other>
-    xalloc(const xalloc<_Other>&) {}
-    template<class _Other>
-    xalloc<T>& operator=(const xalloc<_Other>&) { return *this; }
-    pointer allocate(size_type n, const void* p = nullptr) const { return xr_alloc<T>(n); }
-    char* _charalloc(size_type n) { return (char*)allocate(n); }
-    void deallocate(pointer p, size_type n) const { xr_free(p); }
-    void deallocate(void* p, size_type n) const { xr_free(p); }
-    void construct(pointer p, const T& _Val) { new(p) T(_Val); }
+    pointer address(reference ref) const { return &ref; }
+    const_pointer address(const_reference ref) const { return &ref; }
+    
+    xalloc() = default;
+    xalloc(const xalloc<T>&) = default;
+
+    template<class Other>
+    xalloc(const xalloc<Other>&) {}
+
+    template<class Other>
+    xalloc& operator=(const xalloc<Other>&) { return *this; }
+
+    pointer allocate(const size_type n, const void* p = nullptr) const { return xr_alloc<T>(n); }
+    void deallocate(pointer p, const size_type /*n*/) const { xr_free(p); }
+    void deallocate(void* p, const size_type /*n*/) const { xr_free(p); }
+    void construct(pointer p, const T& ref) { new(p) T(ref); }
     void destroy(pointer p) { p->~T(); }
     size_type max_size() const
     {
-        size_type _Count = (size_type)(-1)/sizeof(T);
-        return 0<_Count ? _Count : 1;
+        constexpr auto count = std::numeric_limits<size_type>::max() / sizeof(T);
+        return 0 < count ? count : 1;
     }
 };
 
@@ -47,16 +48,16 @@ struct xr_allocator
     template <typename T>
     struct helper
     {
-        typedef xalloc<T> result;
+        using result = xalloc<T>;
     };
 
-    static void* alloc(const u32& n) { return xr_malloc((u32)n); }
+    static void* alloc(const size_t n) { return xr_malloc(n); }
     template <typename T>
     static void dealloc(T*& p) { xr_free(p); }
 };
 
-template <class _Ty, class _Other>
-inline bool operator==(const xalloc<_Ty>&, const xalloc<_Other>&) { return true; }
+template <class T, class Other>
+bool operator==(const xalloc<T>&, const xalloc<Other>&) { return true; }
 
-template <class _Ty, class _Other>
-inline bool operator!=(const xalloc<_Ty>&, const xalloc<_Other>&) { return false; }
+template <class T, class Other>
+bool operator!=(const xalloc<T>&, const xalloc<Other>&) { return false; }

@@ -117,7 +117,7 @@ IC void xr_free(T*& P) throw()
     if (P)
     {
         Memory.mem_free((void*)P);
-        P = NULL;
+        P = nullptr;
     };
 }
 
