@@ -24,8 +24,8 @@ void operator delete[](void* p) throw() { Memory.mem_free(p); }
 #ifdef USE_ARENA_ALLOCATOR
 constexpr static const u32 s_arena_size = 256 * 1024 * 1024;
 static char s_fake_array[s_arena_size];
-doug_lea_allocator g_common_allocator(s_fake_array, s_arena_size, "common");
+doug_lea_allocator g_common_doug_lea_allocator(s_fake_array, s_arena_size, "common");
 #else
-doug_lea_allocator g_common_allocator(nullptr, 0, "common");
+doug_lea_allocator g_common_doug_lea_allocator(nullptr, 0, "common");
 #endif
 #endif // USE_DOUG_LEA_ALLOCATOR

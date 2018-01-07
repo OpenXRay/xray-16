@@ -23,14 +23,14 @@ static void __stdcall out_of_memory(mspace const space, void const* const parame
     xrDebug::Fatal(DEBUG_INFO, "not enough memory for arena [%s]", allocator->get_arena_id());
 }
 
-doug_lea_allocator::doug_lea_allocator(void* arena, u32 arena_size, pcstr arena_id) : m_arena_id(arena_id)
+doug_lea_allocator::doug_lea_allocator(void* arena, size_t arena_size, pcstr arena_id) : m_arena_id(arena_id)
 {
     VERIFY(m_arena_id);
 
     if (arena && arena_size)
         m_dl_arena = create_mspace_with_base(arena, arena_size, 0, &out_of_memory, (void*)this);
     else
-        m_dl_arena = create_mspace(0, 0, 0, 0);
+        m_dl_arena = create_mspace(0, 0, nullptr, nullptr);
 }
 
 doug_lea_allocator::~doug_lea_allocator()
@@ -39,8 +39,8 @@ doug_lea_allocator::~doug_lea_allocator()
     destroy_mspace(m_dl_arena);
 }
 
-void* doug_lea_allocator::malloc_impl(u32 size) { return mspace_malloc(m_dl_arena, size); }
-void* doug_lea_allocator::realloc_impl(void* pointer, u32 new_size)
+void* doug_lea_allocator::malloc_impl(size_t size) { return mspace_malloc(m_dl_arena, size); }
+void* doug_lea_allocator::realloc_impl(void* pointer, size_t new_size)
 {
     return mspace_realloc(m_dl_arena, pointer, new_size);
 }
@@ -48,8 +48,8 @@ void* doug_lea_allocator::realloc_impl(void* pointer, u32 new_size)
 void doug_lea_allocator::free_impl(void*& pointer)
 {
     mspace_free(m_dl_arena, pointer);
-    pointer = 0;
+    pointer = nullptr;
 }
 
-u32 doug_lea_allocator::get_allocated_size() const { return (u32)mspace_mallinfo(m_dl_arena).uordblks; }
+size_t doug_lea_allocator::get_allocated_size() const { return mspace_mallinfo(m_dl_arena).uordblks; }
 #endif // USE_DOUG_LEA_ALLOCATOR
