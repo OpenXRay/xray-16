@@ -104,8 +104,8 @@ void InitInput()
 }
 
 void destroyInput() { xr_delete(pInput); }
-void InitSound() { CSound_manager_interface::_create(); }
-void destroySound() { CSound_manager_interface::_destroy(); }
+void InitSound() { ISoundManager::_create(); }
+void destroySound() { ISoundManager::_destroy(); }
 void destroySettings()
 {
     auto s = const_cast<CInifile**>(&pSettings);

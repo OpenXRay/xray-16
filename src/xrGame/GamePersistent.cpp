@@ -186,7 +186,7 @@ void CGamePersistent::Disconnect()
 
     super::Disconnect();
     // stop all played emitters
-    ::Sound->stop_emitters();
+    GEnv.Sound->stop_emitters();
     m_game_params.m_e_game_type = eGameIDNoGame;
 }
 

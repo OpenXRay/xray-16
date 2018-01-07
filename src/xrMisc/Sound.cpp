@@ -5,7 +5,7 @@
 
 namespace
 {
-static inline void VerSndUnlocked() { VERIFY(!::Sound->i_locked()); }
+static inline void VerSndUnlocked() { VERIFY(!GEnv.Sound->i_locked()); }
 }
 
 /// ********* Sound ********* (utils, accessors, helpers)
@@ -18,21 +18,21 @@ ref_sound_data::ref_sound_data() throw() :
 {}
 
 ref_sound_data::ref_sound_data(pcstr fName, esound_type sound_type, int game_type)
-{ ::Sound->_create_data(*this, fName, sound_type, game_type); }
+{ GEnv.Sound->_create_data(*this, fName, sound_type, game_type); }
 
 ref_sound_data::~ref_sound_data()
-{ ::Sound->_destroy_data(*this); }
+{ GEnv.Sound->_destroy_data(*this); }
 
 void ref_sound::create(pcstr name, esound_type sound_type, int game_type)
 {
     VerSndUnlocked();
-    ::Sound->create(*this, name, sound_type, game_type);
+    GEnv.Sound->create(*this, name, sound_type, game_type);
 }
 
 void ref_sound::attach_tail(pcstr name)
 {
     VerSndUnlocked();
-    ::Sound->attach_tail(*this, name);
+    GEnv.Sound->attach_tail(*this, name);
 }
 
 CSound_source* ref_sound::_handle() const { return _p ? _p->handle : 0; }
@@ -66,32 +66,32 @@ CSound_UserDataPtr ref_sound::_g_userdata()
 void ref_sound::clone(const ref_sound& from, esound_type sound_type, int game_type)
 {
     VerSndUnlocked();
-    ::Sound->clone(*this, from, sound_type, game_type);
+    GEnv.Sound->clone(*this, from, sound_type, game_type);
 }
 
 void ref_sound::destroy()
 {
     VerSndUnlocked();
-    ::Sound->destroy(*this);
+    GEnv.Sound->destroy(*this);
 }
 
 void ref_sound::play(IGameObject* O, u32 flags, float d)
 {
     VerSndUnlocked();
-    ::Sound->play(*this, O, flags, d);
+    GEnv.Sound->play(*this, O, flags, d);
 }
 
 void ref_sound::play_at_pos(IGameObject* O, const Fvector& pos, u32 flags, float d)
 {
     VerSndUnlocked();
-    ::Sound->play_at_pos(*this, O, pos, flags, d);
+    GEnv.Sound->play_at_pos(*this, O, pos, flags, d);
 }
 
 void ref_sound::play_no_feedback(
     IGameObject* O, u32 flags, float d, Fvector* pos, float* vol, float* freq, Fvector2* range)
 {
     VerSndUnlocked();
-    ::Sound->play_no_feedback(*this, O, flags, d, pos, vol, freq, range);
+    GEnv.Sound->play_no_feedback(*this, O, flags, d, pos, vol, freq, range);
 }
 
 void ref_sound::set_position(const Fvector& pos)

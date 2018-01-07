@@ -975,9 +975,9 @@ CCommandVar CommandRefreshSnapObjects(CCommandVar p1, CCommandVar p2)
 /*
 CCommandVar CommandRefreshSoundEnvs(CCommandVar p1, CCommandVar p2)
 {
-    ::Sound->refresh_env_library();
+    GEnv.Sound->refresh_env_library();
     return 						TRUE;
-//		::Sound->_restart();
+//		GEnv.Sound->_restart();
 }
 */
 

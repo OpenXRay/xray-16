@@ -71,7 +71,7 @@ void CRenderDevice::End(void)
 #endif // #ifdef INGAME_EDITOR
     if (dwPrecacheFrame)
     {
-        ::Sound->set_master_volume(0.f);
+        GEnv.Sound->set_master_volume(0.f);
         dwPrecacheFrame--;
         if (!dwPrecacheFrame)
         {
@@ -84,7 +84,7 @@ void CRenderDevice::End(void)
                 precache_light->set_active(false);
                 precache_light.destroy();
             }
-            ::Sound->set_master_volume(1.f);
+            GEnv.Sound->set_master_volume(1.f);
             GEnv.Render->ResourcesDestroyNecessaryTextures();
             Memory.mem_compact();
             Msg("* MEMORY USAGE: %d K", Memory.mem_usage() / 1024);
@@ -420,8 +420,8 @@ void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
                 TimerGlobal.Pause(FALSE);
 #endif
         }
-        if (bSound && ::Sound)
-            snd_emitters_ = ::Sound->pause_emitters(true);
+        if (bSound && GEnv.Sound)
+            snd_emitters_ = GEnv.Sound->pause_emitters(true);
     }
     else
     {
@@ -433,11 +433,11 @@ void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
         if (bSound)
         {
             if (snd_emitters_ > 0) // avoid crash
-                snd_emitters_ = ::Sound->pause_emitters(false);
+                snd_emitters_ = GEnv.Sound->pause_emitters(false);
             else
             {
 #ifdef DEBUG
-                Log("Sound->pause_emitters underflow");
+                Log("GEnv.Sound->pause_emitters underflow");
 #endif
             }
         }

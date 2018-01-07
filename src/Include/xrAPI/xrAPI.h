@@ -10,6 +10,7 @@ class CGameMtlLibrary;
 class CRender;
 class CScriptEngine;
 class AISpaceBase;
+class ISoundManager;
 
 class XRAPI_API EngineGlobalEnvironment
 {
@@ -27,6 +28,7 @@ public:
     IRenderFactory* RenderFactory;
     CScriptEngine* ScriptEngine;
     AISpaceBase* AISpace;
+    ISoundManager* Sound;
 
     bool isDedicatedServer;
 };

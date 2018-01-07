@@ -446,7 +446,7 @@ void CCar::VisualUpdate(float fov)
     Fvector C, V;
     Center(C);
     V.set(lin_vel);
-
+    
     m_car_sound->Update();
     if (Owner())
     {

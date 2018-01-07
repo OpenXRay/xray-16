@@ -249,7 +249,7 @@ class MODEL;
 
 /// definition (Sound Manager Interface)
 // XXX tamlin: Tag NOVTABLE ?
-class XRSOUND_API CSound_manager_interface
+class XRSOUND_API ISoundManager
 {
     virtual void _initialize() = 0;
     virtual void _clear() = 0;
@@ -260,7 +260,7 @@ protected:
     virtual void _destroy_data(ref_sound_data& S) = 0;
 
 public:
-    virtual ~CSound_manager_interface() {}
+    virtual ~ISoundManager() {}
     static void _create();
     static void _destroy();
 
@@ -301,6 +301,3 @@ public:
     virtual void set_environment(u32 id, CSound_environment** dst_env) = 0;
     virtual void set_environment_size(CSound_environment* src_env, CSound_environment** dst_env) = 0;
 };
-
-class CSound_manager_interface;
-extern XRSOUND_API CSound_manager_interface* Sound;

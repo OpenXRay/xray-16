@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+#include "Include/xrAPI/xrAPI.h"
 #include "Common/LevelStructure.hpp"
 #include "SoundRender_Core.h"
 #include "SoundRender_Source.h"
@@ -20,9 +21,7 @@ float psSoundVFactor = 1.0f;
 
 float psSoundVMusic = 1.f;
 int psSoundCacheSizeMB = 32;
-// XXX: move to GlobalEnv
 CSoundRender_Core* SoundRender = nullptr;
-CSound_manager_interface* Sound = nullptr;
 
 CSoundRender_Core::CSoundRender_Core()
 {

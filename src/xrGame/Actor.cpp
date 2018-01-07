@@ -386,13 +386,13 @@ void CActor::Load(LPCSTR section)
             }
             char buf[256];
 
-            ::Sound->create(
+            GEnv.Sound->create(
                 sndDie[0], strconcat(sizeof(buf), buf, *cName(), "\\die0"), st_Effect, SOUND_TYPE_MONSTER_DYING);
-            ::Sound->create(
+            GEnv.Sound->create(
                 sndDie[1], strconcat(sizeof(buf), buf, *cName(), "\\die1"), st_Effect, SOUND_TYPE_MONSTER_DYING);
-            ::Sound->create(
+            GEnv.Sound->create(
                 sndDie[2], strconcat(sizeof(buf), buf, *cName(), "\\die2"), st_Effect, SOUND_TYPE_MONSTER_DYING);
-            ::Sound->create(
+            GEnv.Sound->create(
                 sndDie[3], strconcat(sizeof(buf), buf, *cName(), "\\die3"), st_Effect, SOUND_TYPE_MONSTER_DYING);
 
             m_HeavyBreathSnd.create(
@@ -808,7 +808,7 @@ void CActor::Die(IGameObject* who)
 
     if (!GEnv.isDedicatedServer)
     {
-        ::Sound->play_at_pos(sndDie[Random.randI(SND_DIE_COUNT)], this, Position());
+        GEnv.Sound->play_at_pos(sndDie[Random.randI(SND_DIE_COUNT)], this, Position());
 
         m_HeavyBreathSnd.stop();
         m_BloodSnd.stop();

@@ -42,8 +42,8 @@ IGame_Level::~IGame_Level()
     Device.seqFrame.Remove(this);
     CCameraManager::ResetPP();
     ///////////////////////////////////////////
-    Sound->set_geometry_occ(NULL);
-    Sound->set_handler(NULL);
+    GEnv.Sound->set_geometry_occ(nullptr);
+    GEnv.Sound->set_handler(nullptr);
     Device.DumpResourcesMemoryUsage();
 
     u32 m_base = 0, c_base = 0, m_lmaps = 0, c_lmaps = 0;
@@ -101,9 +101,9 @@ bool IGame_Level::Load(u32 dwNum)
     // g_pGamePersistent->LoadTitle ("st_loading_cform");
     g_pGamePersistent->LoadTitle();
     ObjectSpace.Load(build_callback);
-    // Sound->set_geometry_occ ( &Static );
-    Sound->set_geometry_occ(ObjectSpace.GetStaticModel());
-    Sound->set_handler(_sound_event);
+    // GEnv.Sound->set_geometry_occ ( &Static );
+    GEnv.Sound->set_geometry_occ(ObjectSpace.GetStaticModel());
+    GEnv.Sound->set_handler(_sound_event);
 
     pApp->LoadSwitch();
 
@@ -264,7 +264,7 @@ void IGame_Level::SoundEvent_Register(ref_sound_data_ptr S, float range)
     Fvector snd_position = p->position;
     if (S->feedback->is_2D())
     {
-        snd_position.add(Sound->listener_position());
+        snd_position.add(GEnv.Sound->listener_position());
     }
 
     VERIFY(p && _valid(range));
@@ -299,7 +299,7 @@ void IGame_Level::SoundEvent_Register(ref_sound_data_ptr S, float range)
         VERIFY(_valid(Power));
         if (Power > EPS_S)
         {
-            float occ = Sound->get_occlusion_to(it->GetSpatialData().sphere.P, snd_position);
+            float occ = GEnv.Sound->get_occlusion_to(it->GetSpatialData().sphere.P, snd_position);
             VERIFY(_valid(occ));
             Power *= occ;
             if (Power > EPS_S)

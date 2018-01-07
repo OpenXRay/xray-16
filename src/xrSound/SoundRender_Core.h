@@ -4,7 +4,7 @@
 #include "SoundRender_Environment.h"
 #include "SoundRender_Cache.h"
 
-class CSoundRender_Core : public CSound_manager_interface
+class CSoundRender_Core : public ISoundManager
 {
 protected:
     struct SoundStatistics

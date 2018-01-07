@@ -34,8 +34,8 @@ CObjectSpace::CObjectSpace()
 CObjectSpace::~CObjectSpace()
 {
 // moved to ~IGameLevel
-//	Sound->set_geometry_occ		(NULL);
-//	Sound->set_handler			(NULL);
+//	GEnv.Sound->set_geometry_occ		(NULL);
+//	GEnv.Sound->set_handler			(NULL);
 //
 #ifdef DEBUG
     // sh_debug.destroy			();
@@ -114,8 +114,8 @@ void CObjectSpace::Create(Fvector* verts, CDB::TRI* tris, const hdrCFORM& H, CDB
     m_BoundingVolume.set(H.aabb);
     g_SpatialSpace->initialize(m_BoundingVolume);
     g_SpatialSpacePhysic->initialize(m_BoundingVolume);
-    // Sound->set_geometry_occ				( &Static );
-    // Sound->set_handler					( _sound_event );
+    // GEnv.Sound->set_geometry_occ				( &Static );
+    // GEnv.Sound->set_handler					( _sound_event );
 }
 
 //----------------------------------------------------------------------

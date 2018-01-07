@@ -333,7 +333,7 @@ void CExplosive::Explode()
     //	Msg("---------CExplosive Explode [%d] frame[%d]",cast_game_object()->ID(), Device.dwFrame);
     OnBeforeExplosion();
     //играем звук взрыва
-    Sound->play_at_pos(sndExplode, 0, pos, false);
+    GEnv.Sound->play_at_pos(sndExplode, 0, pos, false);
 
     //показываем эффекты
 

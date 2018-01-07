@@ -31,7 +31,7 @@ struct _SoundProcessor : public pureFrame
     virtual void OnFrame()
     {
         // Msg ("------------- sound: %d [%3.2f,%3.2f,%3.2f]",u32(Device.dwFrame),VPUSH(Device.vCameraPosition));
-        ::Sound->update(Device.vCameraPosition, Device.vCameraDirection, Device.vCameraTop);
+        GEnv.Sound->update(Device.vCameraPosition, Device.vCameraDirection, Device.vCameraTop);
     }
 } SoundProcessor;
 
@@ -282,7 +282,7 @@ void CApplication::destroy_loading_shaders()
     m_pRender->destroy_loading_shaders();
     // hLevelLogo.destroy ();
     // sh_progress.destroy ();
-    //. ::Sound->mute (false);
+    //. GEnv.Sound->mute (false);
 }
 
 void CApplication::LoadDraw()

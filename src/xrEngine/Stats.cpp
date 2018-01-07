@@ -145,7 +145,7 @@ void CStats::Show()
         font.OutSet(200, 0);
         GEnv.Render->DumpStatistics(font, alertPtr);
         font.OutSkip();
-        Sound->DumpStatistics(font, alertPtr);
+        GEnv.Sound->DumpStatistics(font, alertPtr);
         font.OutSkip();
         pInput->DumpStatistics(font, alertPtr);
         font.OutSkip();
@@ -216,7 +216,7 @@ void CStats::OnRender()
     if (g_stats_flags.is(st_sound))
     {
         CSound_stats_ext snd_stat_ext;
-        ::Sound->statistic(0, &snd_stat_ext);
+        GEnv.Sound->statistic(0, &snd_stat_ext);
         auto _I = snd_stat_ext.items.begin();
         auto _E = snd_stat_ext.items.end();
         for (; _I != _E; _I++)

@@ -326,14 +326,14 @@ void __fastcall CSHSoundEnvTools::OnEnvSizeChange(PropValue *sender)
     test_env.Reverb = m_EnvSrc.Reverb;
     test_env.ReverbDelay = m_EnvSrc.ReverbDelay;
     CSound_environment *E = m_Env;
-    Sound->set_environment_size(&test_env, &E);
+    GEnv.Sound->set_environment_size(&test_env, &E);
     ExecCommand(COMMAND_UPDATE_PROPERTIES);
 }
 
 void __fastcall CSHSoundEnvTools::OnEnvChange(PropValue *sender)
 {
     CSound_environment *E = m_Env;
-    Sound->set_environment(m_Env->Environment, &E);
+    GEnv.Sound->set_environment(m_Env->Environment, &E);
     m_EnvSrc = *m_Env;
     ExecCommand(COMMAND_UPDATE_PROPERTIES);
 }
