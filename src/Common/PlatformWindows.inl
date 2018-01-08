@@ -4,8 +4,8 @@
 #define DIRECTINPUT_VERSION 0x0800 //
 
 #ifndef _WIN32_WINNT
-// Request Windows XP functionality
-#define _WIN32_WINNT 0x0501
+// Windows Server 2003 with SP1, Windows XP with SP2
+#define _WIN32_WINNT _WIN32_WINNT_WS03
 #endif
 
 #include <sys/utime.h>
@@ -27,8 +27,5 @@
 #define DOSWIN32
 #define _WIN32_DCOM
 
-#pragma warning(push)
-#pragma warning(disable : 4005) // macro redefinition
 #include <windows.h>
 #include <windowsx.h>
-#pragma warning(pop)

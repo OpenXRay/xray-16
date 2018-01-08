@@ -230,7 +230,7 @@ public:
         TimerGlobal.time_factor(time_factor);
     }
 
-    IC const float& time_factor() const
+    IC const float time_factor() const
     {
         VERIFY(Timer.time_factor() == TimerGlobal.time_factor());
         return (Timer.time_factor());

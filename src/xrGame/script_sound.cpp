@@ -27,9 +27,9 @@ CScriptSound::CScriptSound(LPCSTR caSoundName, ESoundTypes sound_type)
 
 CScriptSound::~CScriptSound()
 {
-    // Compiler warning C4297: function assumed not to throw an exception but does.
-    THROW3(!m_sound._feedback(), "playing sound is not completed, but is destroying",
-        m_sound._handle() ? m_sound._handle()->file_name() : "unknown");
+    if (m_sound._feedback())
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "Playing sound is not completed, but is destroying \"%s\"!", 
+            m_sound._handle() ? m_sound._handle()->file_name() : "unknown");
     m_sound.destroy();
 }
 
