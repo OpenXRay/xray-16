@@ -117,7 +117,7 @@ enum nvSharpenFilterTypes
     kSharpenFilterCustom,
 };
 
-typedef enum nvMipMapGeneration
+enum nvMipMapGeneration
 {
     kGenerateMipMaps = 30,
     kUseExistingMipMaps = 31,
@@ -125,7 +125,7 @@ typedef enum nvMipMapGeneration
     kCompleteMipMapChain = 33, // fill in missing MIP maps
 };
 
-typedef enum nvMipFilterTypes
+enum nvMipFilterTypes
 {
     kMipFilterPoint,
     kMipFilterBox,

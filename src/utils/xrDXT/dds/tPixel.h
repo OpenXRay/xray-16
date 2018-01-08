@@ -5,8 +5,6 @@
 #include <dds/tVector.h>
 #include <dds/nvErrorCodes.h>
 
-#pragma warning(disable : 4201)
-
 namespace nv
 {
 // modulo value x between [lo,hi]

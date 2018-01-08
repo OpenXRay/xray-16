@@ -21,11 +21,11 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     {
     case DLL_PROCESS_ATTACH:
     {
-        xrDebug::Initialize(false);
-        bool init_log = (0 != xr_strcmp(Core.ApplicationName, "XRayEditorTools"));
-        Core.Initialize("xrLC_Light", 0, FALSE);
-        if (init_log)
-            CreateLog();
+        //xrDebug::Initialize(false);
+        //bool init_log = (0 != xr_strcmp(Core.ApplicationName, "XRayEditorTools"));
+        //Core.Initialize("xrLC_Light", 0, FALSE);
+        //if (init_log)
+            //CreateLog();
 
         // FPU::m64r ();
         break;
@@ -35,7 +35,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID lpReserv
     case DLL_PROCESS_DETACH:
         if (inlc_global_data())
             destroy_global_data();
-        Core._destroy();
+        //Core._destroy();
         break;
     }
     return TRUE;

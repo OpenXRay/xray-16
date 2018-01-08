@@ -8,10 +8,7 @@
 #include "utils/xrLCUtil/LevelCompilerLoggerWindow.hpp"
 #include "xrCore/ModuleLookup.hpp"
 
-#pragma comment(lib, "comctl32.lib")
 #pragma comment(lib, "d3dx9.lib")
-#pragma comment(lib, "IMAGEHLP.LIB")
-#pragma comment(lib, "winmm.LIB")
 #pragma comment(lib, "FreeImage.lib")
 
 CBuild* pBuild = NULL;
