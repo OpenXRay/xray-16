@@ -115,7 +115,7 @@
       <PreprocessorDefinitions>LEVEL_COMPILER;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <StackReserveSize>2097152</StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
@@ -125,7 +125,7 @@
       <PreprocessorDefinitions>LEVEL_COMPILER;_USE_MATH_DEFINES;FORCE_NO_EXCEPTIONS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrLibDir);$(xrSdkDir)libraries;$(xrExternals)FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <StackReserveSize>2097152</StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
@@ -135,7 +135,7 @@
       <PreprocessorDefinitions>LEVEL_COMPILER;_USE_MATH_DEFINES;FORCE_NO_EXCEPTIONS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrLibDir);$(xrSdkDir)libraries;$(xrExternals)FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <StackReserveSize>2097152</StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
@@ -146,7 +146,7 @@
       <PreprocessorDefinitions>LEVEL_COMPILER;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrLibDir);$(xrSdkDir)libraries;$(xrExternals)FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <StackReserveSize>2097152</StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
@@ -157,7 +157,7 @@
       <PreprocessorDefinitions>LEVEL_COMPILER;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(xrLibDir);$(xrSdkDir)libraries;$(xrExternals)FreeImage\Dist\x32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(xrExternals)FreeImage\Dist\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <StackReserveSize>2097152</StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
