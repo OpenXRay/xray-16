@@ -6,16 +6,9 @@
 #define D3D_DEBUG_INFO
 #endif
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
 #include "xrEngine/stdafx.h"
 #include <d3d9.h>
 #include <d3dx9.h>
-#pragma warning(pop)
-
-#pragma warning(disable : 4714)
-#pragma warning(4 : 4018)
-#pragma warning(4 : 4244)
 
 #include "Layers/xrRender/xrD3DDefs.h"
 #include "Layers/xrRender/HW.h"
@@ -35,8 +28,8 @@
 #include "Common/_d3d_extensions.h"
 #ifndef _EDITOR
 #include "xrEngine/IGame_Level.h"
-#include "Layers/xrRender/blenders\Blender.h"
-#include "Layers/xrRender/blenders\Blender_CLSID.h"
+#include "Layers/xrRender/blenders/Blender.h"
+#include "Layers/xrRender/blenders/Blender_CLSID.h"
 #include "xrParticles/psystem.h"
 #include "Layers/xrRender/xrRender_console.h"
 #include "FStaticRender.h"

@@ -6,23 +6,14 @@
 #define D3D_DEBUG_INFO
 #endif
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
 #include "xrEngine/stdafx.h"
 #include <d3dx9.h>
-#pragma warning(pop)
-
-#pragma warning(disable : 4714)
-#pragma warning(4 : 4018)
-#pragma warning(4 : 4244)
-#pragma warning(disable : 4237)
 
 #include <D3D11.h>
 #include <D3Dx11core.h>
 #include <D3DCompiler.h>
 
 #include "Layers/xrRender/xrD3DDefs.h"
-
 #include "Layers/xrRender/Debug/dxPixEventWrapper.h"
 
 #define R_R1 1
@@ -32,20 +23,17 @@
 #define RENDER R_R4
 
 #include "xrParticles/psystem.h"
-
 #include "Layers/xrRender/HW.h"
 #include "Layers/xrRender/Shader.h"
 #include "Layers/xrRender/R_Backend.h"
 #include "Layers/xrRender/R_Backend_Runtime.h"
-
 #include "Layers/xrRender/ResourceManager.h"
-
 #include "xrEngine/vis_common.h"
 #include "xrEngine/Render.h"
 #include "Common/_d3d_extensions.h"
 #include "xrEngine/IGame_Level.h"
-#include "Layers/xrRender/blenders\blender.h"
-#include "Layers/xrRender/blenders\blender_clsid.h"
+#include "Layers/xrRender/blenders/Blender.h"
+#include "Layers/xrRender/blenders/Blender_CLSID.h"
 #include "Layers/xrRender/xrRender_console.h"
 #include "r4.h"
 

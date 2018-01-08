@@ -374,7 +374,6 @@ void CRender::reset_begin()
     }
     //-AVO
 
-
     xr_delete(Target);
     HWOCC.occq_destroy();
     //_RELEASE					(q_sync_point[1]);
@@ -629,8 +628,7 @@ void CRender::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     Sectors_xrc.DumpStatistics(font, alert);
 }
 
-static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name,
-    void*& result, bool const disasm)
+static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name, void*& result, bool const disasm)
 {
     HRESULT _result = E_FAIL;
     if (pTarget[0] == 'p')
@@ -657,7 +655,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
             Msg("! D3DXFindShaderComment hr == 0x%08x", _result);
         }
     }
-    else
+    else if (pTarget[0] == 'v')
     {
         SVS* svs_result = (SVS*)result;
         _result = HW.pDevice->CreateVertexShader(buffer, &svs_result->vs);
@@ -681,6 +679,10 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
             Msg("! D3DXFindShaderComment hr == 0x%08x", _result);
         }
     }
+    else
+    {
+        NODEFAULT;
+    }
 
     if (disasm)
     {
@@ -696,9 +698,6 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
 
     return _result;
 }
-
-static inline bool match_shader_id(
-    LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result);
 
 class includer : public ID3DXInclude
 {
@@ -735,6 +734,9 @@ public:
     }
 };
 
+static inline bool match_shader_id(
+    LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result);
+
 HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcDataLen, LPCSTR pFunctionName,
     LPCSTR pTarget, DWORD Flags, void*& result)
 {
@@ -748,7 +750,6 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
 
     char sh_name[MAX_PATH] = "";
     u32 len = 0;
-
     // options
     {
         xr_sprintf(c_smapsize, "%04d", u32(o.smapsize));

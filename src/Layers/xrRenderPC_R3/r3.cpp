@@ -451,7 +451,6 @@ void CRender::destroy()
     //_RELEASE					(q_sync_point[0]);
     for (u32 i = 0; i < HW.Caps.iGPUNum; ++i)
         _RELEASE(q_sync_point[i]);
-
     HWOCC.occq_destroy();
     xr_delete(Models);
     xr_delete(Target);
@@ -531,15 +530,7 @@ void CRender::reset_end()
     // that some data is not ready in the first frame (for example device camera position)
     m_bFirstFrameAfterReset = true;
 }
-/*
-void CRender::OnFrame()
-{
-    Models->DeleteQueue			();
-    if (ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))	{
-        Device.seqParallel.insert	(Device.seqParallel.begin(),
-            fastdelegate::FastDelegate0<>(&HOM,&CHOM::MT_RENDER));
-    }
-}*/
+
 void CRender::OnFrame()
 {
     Models->DeleteQueue();
@@ -564,7 +555,7 @@ void CRender::model_Delete(IRenderVisual*& V, BOOL bDiscard)
 {
     dxRender_Visual* pVisual = (dxRender_Visual*)V;
     Models->Delete(pVisual, bDiscard);
-    V = 0;
+    V = nullptr;
 }
 IRender_DetailModel* CRender::model_CreateDM(IReader* F)
 {
@@ -579,7 +570,7 @@ void CRender::model_Delete(IRender_DetailModel*& F)
         CDetail* D = (CDetail*)F;
         D->Unload();
         xr_delete(D);
-        F = NULL;
+        F = nullptr;
     }
 }
 IRenderVisual* CRender::model_CreatePE(LPCSTR name)
@@ -919,7 +910,6 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     return _result;
 }
 
-//--------------------------------------------------------------------------------------------------------------
 class includer : public ID3DInclude
 {
 public:
@@ -929,11 +919,11 @@ public:
         string_path pname;
         strconcat(sizeof(pname), pname, GEnv.Render->getShaderPath(), pFileName);
         IReader* R = FS.r_open("$game_shaders$", pname);
-        if (0 == R)
+        if (nullptr == R)
         {
             // possibly in shared directory or somewhere else - open directly
             R = FS.r_open("$game_shaders$", pFileName);
-            if (0 == R)
+            if (nullptr == R)
                 return E_FAIL;
         }
 
@@ -1454,33 +1444,32 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
     sh_name[len] = '\0';
 
     // finish
-    defines[def_it].Name = 0;
-    defines[def_it].Definition = 0;
+    defines[def_it].Name = nullptr;
+    defines[def_it].Definition = nullptr;
     def_it++;
 
-    //
     if (0 == xr_strcmp(pFunctionName, "main"))
     {
         if ('v' == pTarget[0])
         {
             if (HW.pDevice1 == 0)
-                pTarget = D3D10GetVertexShaderProfile(HW.pDevice); // vertex	"vs_4_0"; //
+                pTarget = D3D10GetVertexShaderProfile(HW.pDevice); // vertex	"vs_4_0";
             else
-                pTarget = "vs_4_1"; // pixel	"ps_4_0"; //
+                pTarget = "vs_4_1"; // pixel	"ps_4_0";
         }
         else if ('p' == pTarget[0])
         {
             if (HW.pDevice1 == 0)
-                pTarget = D3D10GetPixelShaderProfile(HW.pDevice); // pixel	"ps_4_0"; //
+                pTarget = D3D10GetPixelShaderProfile(HW.pDevice); // pixel	"ps_4_0";
             else
-                pTarget = "ps_4_1"; // pixel	"ps_4_0"; //
+                pTarget = "ps_4_1"; // pixel	"ps_4_0";
         }
         else if ('g' == pTarget[0])
         {
             if (HW.pDevice1 == 0)
-                pTarget = D3D10GetGeometryShaderProfile(HW.pDevice); // geometry	"gs_4_0"; //
+                pTarget = D3D10GetGeometryShaderProfile(HW.pDevice); // geometry	"gs_4_0";
             else
-                pTarget = "gs_4_1"; // pixel	"ps_4_0"; //
+                pTarget = "gs_4_1"; // pixel	"ps_4_0";
         }
     }
 
@@ -1549,12 +1538,11 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
             file->w(pShaderBuf->GetBufferPointer(), (u32)pShaderBuf->GetBufferSize());
             FS.w_close(file);
 
-            _result = create_shader(pTarget, (DWORD*)pShaderBuf->GetBufferPointer(), (u32)pShaderBuf->GetBufferSize(),
+            _result = create_shader(pTarget, (DWORD*)pShaderBuf->GetBufferPointer(), pShaderBuf->GetBufferSize(),
                 file_name, result, o.disasm);
         }
         else
         {
-            //			Msg						( "! shader compilation failed" );
             Log("! ", file_name);
             if (pErrorBuf)
                 Log("! error: ", (LPCSTR)pErrorBuf->GetBufferPointer());
