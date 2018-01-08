@@ -153,6 +153,7 @@ void IGame_Persistent::Prefetch()
     ObjectPool.prefetch();
     Log("Loading models...");
     GEnv.Render->models_Prefetch();
+    Log("Loading textures...");
     GEnv.Render->ResourcesDeferredUpload();
 
     p_time = 1000.f * Device.GetTimerGlobal()->GetElapsed_sec() - p_time;

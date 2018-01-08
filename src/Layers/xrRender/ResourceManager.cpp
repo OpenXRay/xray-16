@@ -12,8 +12,8 @@
 
 #include "ResourceManager.h"
 #include "tss.h"
-#include "blenders\blender.h"
-#include "blenders\blender_recorder.h"
+#include "blenders/blender.h"
+#include "blenders/blender_recorder.h"
 #include "xrCore/Threading/ThreadPool.hpp"
 
 //	Already defined in Texture.cpp
@@ -358,7 +358,9 @@ void CResourceManager::DeferredUpload()
     if (!RDEVICE.b_is_Ready)
         return;
 
+#ifdef DEBUG
     Msg("%s, amount of textures = %d", __FUNCTION__ , m_textures.size());
+#endif
 
     CTimer timer;
     timer.Start();
@@ -375,7 +377,10 @@ void CResourceManager::DeferredUpload()
     ttapi.wait();
 
     textures_to_load.clear();
+
+#ifdef DEBUG
     Msg("%s, texture loading time = %d", __FUNCTION__, timer.GetElapsed_ms());
+#endif
 }
 /*
 void	CResourceManager::DeferredUnload	()
