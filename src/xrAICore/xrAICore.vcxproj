@@ -137,9 +137,6 @@
     <ProjectReference Include="$(SolutionDir)xrCore\xrCore.vcxproj">
       <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(xrExternals)luabind\src\luabind.vcxproj">
-      <Project>{ccd4afae-aa10-42c6-a452-fdee497ccdf1}</Project>
-    </ProjectReference>
     <ProjectReference Include="$(xrExternals)LuaJIT\src\LuaJIT.vcxproj">
       <Project>{632aeeb6-dc06-4e15-9551-b2b09a4b73c5}</Project>
     </ProjectReference>
@@ -148,6 +145,9 @@
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)xrScriptEngine\xrScriptEngine.vcxproj">
       <Project>{132c62de-de85-4978-9675-c78ed4da46f0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(xrExternals)luabind.vcxproj">
+      <Project>{ccd4afae-aa10-42c6-a452-fdee497ccdf1}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

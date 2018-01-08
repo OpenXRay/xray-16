@@ -150,7 +150,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrAICore", "xrAICore\xrAICo
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrScriptEngine", "xrScriptEngine\xrScriptEngine.vcxproj", "{132C62DE-DE85-4978-9675-C78ED4DA46F0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "luabind", "..\Externals\luabind\src\luabind.vcxproj", "{CCD4AFAE-AA10-42C6-A452-FDEE497CCDF1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "luabind", "..\Externals\luabind.vcxproj", "{CCD4AFAE-AA10-42C6-A452-FDEE497CCDF1}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LevelEditor", "editors\LevelEditor\LevelEditor.vcxproj", "{136857E3-D61B-4A03-A4E9-7F73ED946C41}"
 EndProject
