@@ -1,3 +1,4 @@
+// This file is excluded from build
 
 struct test_property
 {
