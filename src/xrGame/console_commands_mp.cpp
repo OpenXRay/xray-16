@@ -1226,7 +1226,7 @@ public:
             exclude_raid_from_args(args, tmp_dest, sizeof(tmp_dest));
             if (xr_strlen(tmp_dest))
             {
-                sscanf_s(tmp_dest, "%s", filter_string, _countof(filter_string));
+                sscanf_s(tmp_dest, "%s", filter_string, sizeof(filter_string));
                 tmp_functor.filter_string = filter_string;
             }
         }
@@ -1323,7 +1323,7 @@ public:
         exclude_raid_from_args(args, tmp_dest, sizeof(tmp_dest));
         if (xr_strlen(tmp_dest))
         {
-            sscanf_s(tmp_dest, "%s", filter_dest, _countof(filter_dest));
+            sscanf_s(tmp_dest, "%s", filter_dest, sizeof(filter_dest));
         }
         tmp_sv_game->PrintBanList(filter_dest);
         Level().Server->Print_Banned_Addreses();
