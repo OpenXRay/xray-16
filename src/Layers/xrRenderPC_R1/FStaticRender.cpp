@@ -1,22 +1,16 @@
-// CRender.cpp: implementation of the CRender class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
+#include "FStaticRender.h"
+#include "Layers/xrRender/FBasicVisual.h"
+#include "xrEngine/xr_object.h"
+#include "xrEngine/CustomHUD.h"
 #include "xrEngine/IGame_Persistent.h"
 #include "xrEngine/Environment.h"
-#include "Layers/xrRender/FBasicVisual.h"
-#include "xrEngine/CustomHUD.h"
-#include "xrEngine/xr_object.h"
 #include "xrEngine/GameFont.h"
 #include "xrEngine/PerformanceAlert.hpp"
-#include "xrCore/FMesh.hpp"
 #include "Layers/xrRender/SkeletonCustom.h"
-#include "Layers/xrRender/lighttrack.h"
+#include "Layers/xrRender/LightTrack.h"
 #include "Layers/xrRender/dxWallMarkArray.h"
 #include "Layers/xrRender/dxUIShader.h"
-
-using namespace R_dsgraph;
 
 CRender RImplementation;
 
@@ -98,10 +92,8 @@ void CRender::create()
 
     m_bMakeAsyncSS = false;
 
-    //---------
-    Target = new CRenderTarget();
-    //---------
-    //
+    Target = new CRenderTarget(); // Main target
+
     Models = new CModelPool();
     L_Dynamic = new CLightR_Manager();
     PSLibrary.OnCreate();
@@ -124,7 +116,6 @@ void CRender::destroy()
     //*** Components
     xr_delete(Target);
     Device.seqFrame.Remove(this);
-
     r_dsgraph_destroy();
 }
 
@@ -153,7 +144,11 @@ void CRender::reset_end()
     m_bFirstFrameAfterReset = true;
 }
 
-void CRender::OnFrame() { Models->DeleteQueue(); }
+void CRender::OnFrame()
+{
+    Models->DeleteQueue();
+}
+
 // Implementation
 IRender_ObjectSpecific* CRender::ros_create(IRenderable* parent) { return new CROS_impl(); }
 void CRender::ros_destroy(IRender_ObjectSpecific*& p) { xr_delete(p); }
@@ -188,7 +183,6 @@ IRenderVisual* CRender::model_CreatePE(LPCSTR name)
     R_ASSERT3(SE, "Particle effect doesn't exist", name);
     return Models->CreatePE(SE);
 }
-
 IRenderVisual* CRender::model_CreateParticles(LPCSTR name)
 {
     PS::CPEDef* SE = PSLibrary.FindPED(name);
@@ -239,25 +233,19 @@ IDirect3DIndexBuffer9* CRender::getIB(int id)
     VERIFY(id < int(IB.size()));
     return IB[id];
 }
-IRender_Target* CRender::getTarget() { return Target; }
 FSlideWindowItem* CRender::getSWI(int id)
 {
     VERIFY(id < int(SWIs.size()));
     return &SWIs[id];
 }
-
+IRender_Target* CRender::getTarget() { return Target; }
 IRender_Light* CRender::light_create() { return L_DB->Create(); }
 IRender_Glow* CRender::glow_create() { return new CGlow(); }
 void CRender::flush() { r_dsgraph_render_graph(0); }
 BOOL CRender::occ_visible(vis_data& P) { return HOM.visible(P); }
 BOOL CRender::occ_visible(sPoly& P) { return HOM.visible(P); }
 BOOL CRender::occ_visible(Fbox& P) { return HOM.visible(P); }
-ENGINE_API extern BOOL g_bRendering;
-void CRender::add_Visual(IRenderVisual* V)
-{
-    VERIFY(g_bRendering);
-    add_leafs_Dynamic((dxRender_Visual*)V);
-}
+void CRender::add_Visual(IRenderVisual* V) { add_leafs_Dynamic((dxRender_Visual*)V); }
 void CRender::add_Geometry(IRenderVisual* V) { add_Static((dxRender_Visual*)V, View->getMask()); }
 void CRender::add_StaticWallmark(ref_shader& S, const Fvector& P, float s, CDB::TRI* T, Fvector* verts)
 {
@@ -281,12 +269,7 @@ void CRender::add_StaticWallmark(const wm_shader& S, const Fvector& P, float s, 
     add_StaticWallmark(pShader->hShader, P, s, T, V);
 }
 
-void CRender::clear_static_wallmarks()
-{
-    if (Wallmarks)
-        Wallmarks->clear();
-}
-
+void CRender::clear_static_wallmarks() { Wallmarks->clear(); }
 void CRender::add_SkeletonWallmark(intrusive_ptr<CSkeletonWallmark> wm) { Wallmarks->AddSkeletonWallmark(wm); }
 void CRender::add_SkeletonWallmark(
     const Fmatrix* xf, CKinematics* obj, ref_shader& sh, const Fvector& start, const Fvector& dir, float size)
@@ -301,16 +284,11 @@ void CRender::add_SkeletonWallmark(
     if (pShader)
         add_SkeletonWallmark(xf, (CKinematics*)obj, *pShader, start, dir, size);
 }
-void CRender::add_Occluder(Fbox2& bb_screenspace)
-{
-    VERIFY(_valid(bb_screenspace));
-    HOM.occlude(bb_screenspace);
-}
+void CRender::add_Occluder(Fbox2& bb_screenspace) { HOM.occlude(bb_screenspace); }
 
 #include "xrEngine/PS_instance.h"
 void CRender::set_Object(IRenderable* O)
 {
-    VERIFY(g_bRendering);
     val_pObject = O; // NULL is OK, trust me :)
     if (val_pObject)
     {
@@ -369,6 +347,25 @@ IC void gm_SetNearer(BOOL bNearer)
         else
             RImplementation.rmNormal();
     }
+}
+
+void CRender::rmNear()
+{
+    IRender_Target* T = getTarget();
+    D3DVIEWPORT9 VP = {0, 0, T->get_width(), T->get_height(), 0, 0.02f};
+    CHK_DX(HW.pDevice->SetViewport(&VP));
+}
+void CRender::rmFar()
+{
+    IRender_Target* T = getTarget();
+    D3DVIEWPORT9 VP = {0, 0, T->get_width(), T->get_height(), 0.99999f, 1.f};
+    CHK_DX(HW.pDevice->SetViewport(&VP));
+}
+void CRender::rmNormal()
+{
+    IRender_Target* T = getTarget();
+    D3DVIEWPORT9 VP = {0, 0, T->get_width(), T->get_height(), 0, 1.f};
+    CHK_DX(HW.pDevice->SetViewport(&VP));
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -600,25 +597,6 @@ void CRender::Calculate()
     BasicStats.Culling.End();
 }
 
-void CRender::rmNear()
-{
-    IRender_Target* T = getTarget();
-    D3DVIEWPORT9 VP = {0, 0, T->get_width(), T->get_height(), 0, 0.02f};
-    CHK_DX(HW.pDevice->SetViewport(&VP));
-}
-void CRender::rmFar()
-{
-    IRender_Target* T = getTarget();
-    D3DVIEWPORT9 VP = {0, 0, T->get_width(), T->get_height(), 0.99999f, 1.f};
-    CHK_DX(HW.pDevice->SetViewport(&VP));
-}
-void CRender::rmNormal()
-{
-    IRender_Target* T = getTarget();
-    D3DVIEWPORT9 VP = {0, 0, T->get_width(), T->get_height(), 0, 1.f};
-    CHK_DX(HW.pDevice->SetViewport(&VP));
-}
-
 extern u32 g_r;
 void CRender::Render()
 {
@@ -745,47 +723,6 @@ void CRender::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     Sectors_xrc.DumpStatistics(font, alert);
 }
 
-#pragma comment(lib, "d3dx9.lib")
-
-static inline bool match_shader_id(
-    LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result);
-
-//--------------------------------------------------------------------------------------------------------------
-class includer : public ID3DXInclude
-{
-public:
-    HRESULT __stdcall Open(
-        D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
-    {
-        string_path pname;
-        strconcat(sizeof(pname), pname, GEnv.Render->getShaderPath(), pFileName);
-        IReader* R = FS.r_open("$game_shaders$", pname);
-        if (nullptr == R)
-        {
-            // possibly in shared directory or somewhere else - open directly
-            R = FS.r_open("$game_shaders$", pFileName);
-            if (nullptr == R)
-                return E_FAIL;
-        }
-
-        // duplicate and zero-terminate
-        u32 size = R->length();
-        u8* data = xr_alloc<u8>(size + 1);
-        CopyMemory(data, R->pointer(), size);
-        data[size] = 0;
-        FS.r_close(R);
-
-        *ppData = data;
-        *pBytes = size;
-        return D3D_OK;
-    }
-    HRESULT __stdcall Close(LPCVOID pData)
-    {
-        xr_free(pData);
-        return D3D_OK;
-    }
-};
-
 static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name,
     void*& result, bool const disasm)
 {
@@ -854,6 +791,44 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     return _result;
 }
 
+static inline bool match_shader_id(
+    LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result);
+
+class includer : public ID3DXInclude
+{
+public:
+    HRESULT __stdcall Open(
+        D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
+    {
+        string_path pname;
+        strconcat(sizeof(pname), pname, GEnv.Render->getShaderPath(), pFileName);
+        IReader* R = FS.r_open("$game_shaders$", pname);
+        if (nullptr == R)
+        {
+            // possibly in shared directory or somewhere else - open directly
+            R = FS.r_open("$game_shaders$", pFileName);
+            if (nullptr == R)
+                return E_FAIL;
+        }
+
+        // duplicate and zero-terminate
+        u32 size = R->length();
+        u8* data = xr_alloc<u8>(size + 1);
+        CopyMemory(data, R->pointer(), size);
+        data[size] = 0;
+        FS.r_close(R);
+
+        *ppData = data;
+        *pBytes = size;
+        return D3D_OK;
+    }
+    HRESULT __stdcall Close(LPCVOID pData)
+    {
+        xr_free(pData);
+        return D3D_OK;
+    }
+};
+
 HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcDataLen, LPCSTR pFunctionName,
     LPCSTR pTarget, DWORD Flags, void*& result)
 {
@@ -873,6 +848,7 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
     sh_name[len] = '0' + char(o.forceskinw);
     ++len;
 
+    // skinning
     if (m_skinning < 0)
     {
         defines[def_it].Name = "SKIN_NONE";
