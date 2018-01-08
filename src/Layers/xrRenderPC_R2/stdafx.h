@@ -6,17 +6,9 @@
 #define D3D_DEBUG_INFO
 #endif
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
 #include "xrEngine/stdafx.h"
 #include <d3d9.h>
 #include <d3dx9.h>
-#pragma warning(pop)
-
-#pragma warning(disable : 4714)
-#pragma warning(4 : 4018)
-#pragma warning(4 : 4244)
-#pragma warning(disable : 4237)
 
 #include "Layers/xrRender/xrD3DDefs.h"
 #include "Layers/xrRender/HW.h"
