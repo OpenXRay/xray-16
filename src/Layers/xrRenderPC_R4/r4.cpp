@@ -779,16 +779,6 @@ void CRender::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     Sectors_xrc.DumpStatistics(font, alert);
 }
 
-/////////
-#pragma comment(lib, "d3dx9.lib")
-/*
-extern "C"
-{
-LPCSTR WINAPI	D3DXGetPixelShaderProfile	(LPDIRECT3DDEVICE9  pDevice);
-LPCSTR WINAPI	D3DXGetVertexShaderProfile	(LPDIRECT3DDEVICE9	pDevice);
-};
-*/
-
 void CRender::addShaderOption(const char* name, const char* value)
 {
     D3D_SHADER_MACRO macro = {name, value};
@@ -803,7 +793,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
 
     ID3DShaderReflection* pReflection = 0;
 
-    HRESULT const _hr = D3DReflect(buffer, buffer_size, IID_ID3D11ShaderReflection, (void**)&pReflection);
+    HRESULT const _hr = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
     if (SUCCEEDED(_hr) && pReflection)
     {
         // Parse constant table data
@@ -819,8 +809,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
     return _hr;
 }
 
-static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name,
-    void*& result, bool const disasm)
+static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name, void*& result, bool const disasm)
 {
     HRESULT _result = E_FAIL;
     if (pTarget[0] == 'p')
@@ -841,7 +830,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
         ID3DShaderReflection* pReflection = 0;
 
 #ifdef USE_DX11
-        _result = D3DReflect(buffer, buffer_size, IID_ID3D11ShaderReflection, (void**)&pReflection);
+        _result = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
 #else
         _result = D3D10ReflectShader(buffer, buffer_size, &pReflection);
 #endif
@@ -879,7 +868,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
 
         ID3DShaderReflection* pReflection = 0;
 #ifdef USE_DX11
-        _result = D3DReflect(buffer, buffer_size, IID_ID3D11ShaderReflection, (void**)&pReflection);
+        _result = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
 #else
         _result = D3D10ReflectShader(buffer, buffer_size, &pReflection);
 #endif
@@ -930,7 +919,7 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
         ID3DShaderReflection* pReflection = 0;
 
 #ifdef USE_DX11
-        _result = D3DReflect(buffer, buffer_size, IID_ID3D11ShaderReflection, (void**)&pReflection);
+        _result = D3DReflect(buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
 #else
         _result = D3D10ReflectShader(buffer, buffer_size, &pReflection);
 #endif
@@ -950,42 +939,6 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
             Msg("! D3DReflectShader hr == 0x%08x", _result);
         }
     }
-    //	else if (pTarget[0] == 'c') {
-    //		SCS* scs_result = (SCS*)result;
-    //#ifdef USE_DX11
-    //		_result			= HW.pDevice->CreateComputeShader(buffer, buffer_size, 0, &scs_result->sh);
-    //#else // #ifdef USE_DX11
-    //		_result			= HW.pDevice->CreateComputeShader(buffer, buffer_size, &scs_result->sh);
-    //#endif // #ifdef USE_DX11
-    //		if ( !SUCCEEDED(_result) ) {
-    //			Log			("! CS: ", file_name);
-    //			Msg			("! CreateComputeShaderhr == 0x%08x", _result);
-    //			return		E_FAIL;
-    //		}
-    //
-    //		ID3DShaderReflection *pReflection = 0;
-    //
-    //#ifdef USE_DX11
-    //		_result			= D3DReflect( buffer, buffer_size, IID_ID3DShaderReflection, (void**)&pReflection);
-    //#else
-    //		_result			= D3D10ReflectShader( buffer, buffer_size, &pReflection);
-    //#endif
-    //
-    //		//	Parse constant, texture, sampler binding
-    //		//	Store input signature blob
-    //		if (SUCCEEDED(_result) && pReflection)
-    //		{
-    //			//	Let constant table parse it's data
-    //			scs_result->constants.parse(pReflection,RC_dest_pixel);
-    //
-    //			_RELEASE(pReflection);
-    //		}
-    //		else
-    //		{
-    //			Log	("! PS: ", file_name);
-    //			Msg	("! D3DReflectShader hr == 0x%08x", _result);
-    //		}
-    //	}
     else if (pTarget[0] == 'c')
     {
         _result = create_shader(pTarget, buffer, buffer_size, file_name, (SCS*&)result, disasm);
@@ -1576,7 +1529,7 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
         ++len;
     }
 
-    sh_name[len] = 0;
+    sh_name[len] = '\0';
 
     // finish
     defines[def_it].Name = 0;

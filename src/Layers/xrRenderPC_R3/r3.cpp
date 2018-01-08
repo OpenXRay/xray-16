@@ -420,9 +420,9 @@ void CRender::create()
 
     rmNormal();
     marker = 0;
-    D3D10_QUERY_DESC qdesc;
+    D3D_QUERY_DESC qdesc;
     qdesc.MiscFlags = 0;
-    qdesc.Query = D3D10_QUERY_EVENT;
+    qdesc.Query = D3D_QUERY_EVENT;
     ZeroMemory(q_sync_point, sizeof(q_sync_point));
     // R_CHK						(HW.pDevice->CreateQuery(&qdesc,&q_sync_point[0]));
     // R_CHK						(HW.pDevice->CreateQuery(&qdesc,&q_sync_point[1]));
@@ -500,9 +500,9 @@ void CRender::reset_begin()
 
 void CRender::reset_end()
 {
-    D3D10_QUERY_DESC qdesc;
+    D3D_QUERY_DESC qdesc;
     qdesc.MiscFlags = 0;
-    qdesc.Query = D3D10_QUERY_EVENT;
+    qdesc.Query = D3D_QUERY_EVENT;
     // R_CHK						(HW.pDevice->CreateQuery(&qdesc,&q_sync_point[0]));
     // R_CHK						(HW.pDevice->CreateQuery(&qdesc,&q_sync_point[1]));
     for (u32 i = 0; i < HW.Caps.iGPUNum; ++i)
@@ -767,20 +767,7 @@ void CRender::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     Sectors_xrc.DumpStatistics(font, alert);
 }
 
-static inline bool match_shader_id(
-    LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result);
-
-/////////
-#pragma comment(lib, "d3dx9.lib")
-/*
-extern "C"
-{
-LPCSTR WINAPI	D3DXGetPixelShaderProfile	(LPDIRECT3DDEVICE9  pDevice);
-LPCSTR WINAPI	D3DXGetVertexShaderProfile	(LPDIRECT3DDEVICE9	pDevice);
-};
-*/
-static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name,
-    void*& result, bool const disasm)
+static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 const buffer_size, LPCSTR const file_name, void*& result, bool const disasm)
 {
     HRESULT _result = E_FAIL;
     if (pTarget[0] == 'p')
@@ -910,6 +897,10 @@ static HRESULT create_shader(LPCSTR const pTarget, DWORD const* buffer, u32 cons
             Msg("! D3DReflectShader hr == 0x%08x", _result);
         }
     }
+    else
+    {
+        NODEFAULT;
+    }
 
     if (disasm)
     {
@@ -963,6 +954,9 @@ public:
         return D3D_OK;
     }
 };
+
+static inline bool match_shader_id(
+    LPCSTR const debug_shader_id, LPCSTR const full_shader_id, FS_FileSet const& file_set, string_path& result);
 
 HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcDataLen, LPCSTR pFunctionName,
     LPCSTR pTarget, DWORD Flags, void*& result)
@@ -1351,14 +1345,16 @@ HRESULT CRender::shader_compile(LPCSTR name, DWORD const* pSrcData, UINT SrcData
     sh_name[len] = '0' + char(o.dx10_minmax_sm != 0);
     ++len;
 
+    // Be carefull!!!!! this should be at the end to correctly generate
+    // compiled shader name;
     // add a #define for DX10_1 MSAA support
     if (o.dx10_msaa)
     {
-        static char samples[2];
-
         defines[def_it].Name = "USE_MSAA";
         defines[def_it].Definition = "1";
         def_it++;
+
+        static char samples[2];
 
         defines[def_it].Name = "MSAA_SAMPLES";
         samples[0] = char(o.dx10_msaa_samples) + '0';
