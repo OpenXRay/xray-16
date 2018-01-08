@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include "Common/Common.hpp"
 #include "utils/xrLC_Light/xrLC_Light.h"
 
