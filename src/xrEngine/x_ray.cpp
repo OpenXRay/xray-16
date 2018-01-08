@@ -304,6 +304,11 @@ void CApplication::LoadDraw()
     Device.End();
 }
 
+void CApplication::SetLoadStageTitle(pcstr _ls_title)
+{
+    xr_strcpy(ls_title, _ls_title);
+}
+
 void CApplication::LoadTitleInt(LPCSTR str1, LPCSTR str2, LPCSTR str3)
 {
     xr_strcpy(ls_header, str1);

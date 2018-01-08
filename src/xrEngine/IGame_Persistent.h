@@ -135,6 +135,7 @@ public:
     ICF u32 GameType() { return m_game_params.m_e_game_type; };
     virtual void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert);
     virtual void LoadTitle(bool /*change_tip*/ = false, shared_str /*map_name*/ = "") {}
+    virtual void SetLoadStageTitle(pcstr /*ls_title*/) {}
     virtual bool CanBePaused() { return true; }
 };
 

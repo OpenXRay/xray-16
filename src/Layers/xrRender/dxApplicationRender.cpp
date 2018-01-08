@@ -233,7 +233,11 @@ void dxApplicationRender::load_draw_internal(CApplication& owner)
         logo_tex_coords.rb.set(1.0f, 0.77926f);
 
         draw_face(hLevelLogo, r, logo_tex_coords, Fvector2().set(1, 1));
+        owner.pFontSystem->SetColor(color_rgba(180, 180, 180, 200));
     }
+
+    owner.pFontSystem->OutI(0.f, 0.385f, owner.ls_title); // XXX: 0.385f <- hardcoded coordinates
+    owner.pFontSystem->OnRender();
 }
 
 void dxApplicationRender::draw_face(ref_shader& sh, Frect& coords, Frect& tex_coords, const Fvector2& tsz)

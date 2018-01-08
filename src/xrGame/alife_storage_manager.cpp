@@ -190,12 +190,12 @@ bool CALifeStorageManager::load(LPCSTR save_name_no_check)
 
     CHECK_OR_EXIT(CSavedGameWrapper::valid_saved_game(*stream),
         make_string("%s\nSaved game version mismatch or saved game is corrupted", file_name));
-    /*
-        string512					temp;
-        strconcat					(sizeof(temp),temp,CStringTable().translate("st_loading_saved_game").c_str(),"
-       \"",save_name,SAVE_EXTENSION,"\"");
-        g_pGamePersistent->LoadTitle(temp);
-    */
+
+    string512 temp;
+    strconcat(sizeof(temp), temp, CStringTable().translate("st_loading_saved_game").c_str(),
+        "\"", save_name,SAVE_EXTENSION, "\"");
+
+    g_pGamePersistent->SetLoadStageTitle(temp);
     g_pGamePersistent->LoadTitle();
 
     unload();
