@@ -352,7 +352,7 @@ int RunApplication(pcstr commandLine)
     }
     
     StickyKeyFilter filter;
-    if (GEnv.isDedicatedServer)
+    if (!GEnv.isDedicatedServer)
         filter.initialize();
 
     FPU::m24r();
