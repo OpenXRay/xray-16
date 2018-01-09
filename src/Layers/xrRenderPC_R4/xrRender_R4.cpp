@@ -37,7 +37,6 @@ bool SupportsDX11Rendering()
 }
 
 // This must not be optimized by compiler
-#pragma optimize("", off)
 static const volatile class GEnvHelper
 {
 public:
@@ -46,5 +45,9 @@ public:
         GEnv.CheckR4 = SupportsDX11Rendering;
         GEnv.SetupR4 = SetupEnvR4;
     }
+    ~GEnvHelper()
+    {
+        GEnv.CheckR4 = nullptr;
+        GEnv.SetupR4 = nullptr;
+    }
 } helper;
-#pragma optimize("", on)

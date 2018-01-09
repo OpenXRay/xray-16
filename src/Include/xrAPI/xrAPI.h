@@ -16,17 +16,14 @@ class XRAPI_API EngineGlobalEnvironment
 {
     using SupportCheck = bool(*)();
     using SetupEnv = void(*)();
+
 public:
-#ifdef _EDITOR
-    CRender* Render;
-#else
     IRender* Render;
     IDebugRender* DRender;
     CDUInterface* DU;
     xr_token* vid_mode_token;
     IUIRender* UIRender;
     CGameMtlLibrary* PGMLib;
-#endif
     IRenderFactory* RenderFactory;
     CScriptEngine* ScriptEngine;
     AISpaceBase* AISpace;
@@ -34,6 +31,7 @@ public:
 
     bool isDedicatedServer;
 
+    int CurrentRenderer;
     SupportCheck CheckR2;
     SupportCheck CheckR3;
     SupportCheck CheckR4;

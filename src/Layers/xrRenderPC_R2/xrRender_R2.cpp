@@ -33,7 +33,6 @@ bool SupportsAdvancedRendering()
 }
 
 // This must not be optimized by compiler
-#pragma optimize("", off)
 static const volatile class GEnvHelper
 {
 public:
@@ -42,5 +41,9 @@ public:
         GEnv.CheckR2 = SupportsAdvancedRendering;
         GEnv.SetupR2 = SetupEnvR2;
     }
+    ~GEnvHelper()
+    {
+        GEnv.CheckR2 = nullptr;
+        GEnv.SetupR2 = nullptr;
+    }
 } helper;
-#pragma optimize("", on)

@@ -18,7 +18,6 @@ void SetupEnvR1()
 }
 
 // This must not be optimized by compiler
-#pragma optimize("", off)
 static const volatile class GEnvHelper
 {
 public:
@@ -26,6 +25,8 @@ public:
     {
         GEnv.SetupR1 = SetupEnvR1;
     }
+    ~GEnvHelper()
+    {
+        GEnv.SetupR1 = nullptr;
+    }
 } helper;
-#pragma optimize("", on)
-

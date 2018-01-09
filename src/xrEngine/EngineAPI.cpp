@@ -41,7 +41,6 @@ CEngineAPI::~CEngineAPI()
 }
 
 extern u32 renderer_value; // con cmd
-ENGINE_API int g_current_renderer = 0;
 
 bool is_enough_address_space_available()
 {
@@ -54,10 +53,9 @@ void CEngineAPI::InitializeNotDedicated()
 {
     if (psDeviceFlags.test(rsR4))
     {
-        
         if (hRenderR4->exist())
         {
-            g_current_renderer = 4;
+            GEnv.CurrentRenderer = 4;
             GEnv.SetupCurrentRenderer = GEnv.SetupR4;
         }
         else
@@ -65,15 +63,13 @@ void CEngineAPI::InitializeNotDedicated()
             psDeviceFlags.set(rsR4, false);
             psDeviceFlags.set(rsR3, true);
         }
-            
-            
     }
 
     if (psDeviceFlags.test(rsR3))
     {
         if (hRenderR3->exist())
         {
-            g_current_renderer = 3;
+            GEnv.CurrentRenderer = 3;
             GEnv.SetupCurrentRenderer = GEnv.SetupR3;
         }
         else
@@ -85,10 +81,9 @@ void CEngineAPI::InitializeNotDedicated()
 
     if (psDeviceFlags.test(rsR2))
     {
-        
         if (hRenderR2->exist())
         {
-            g_current_renderer = 2;
+            GEnv.CurrentRenderer = 2;
             GEnv.SetupCurrentRenderer = GEnv.SetupR2;
         }
         else
@@ -105,7 +100,7 @@ void CEngineAPI::InitializeRenderers()
     {
         R_ASSERT(hRenderR1);
         renderer_value = 0; // con cmd
-        g_current_renderer = 1;
+        GEnv.CurrentRenderer = 1;
         GEnv.SetupCurrentRenderer = GEnv.SetupR1;
     }
 
@@ -117,9 +112,6 @@ void CEngineAPI::InitializeRenderers()
 void CEngineAPI::Initialize(void)
 {
     hGame = std::make_unique<XRay::Module>("xrGame");
-
-    if (!hGame->exist())
-        R_CHK(GetLastError());
     R_ASSERT2(hGame, "Game DLL raised exception during loading or there is no game DLL at all");
 
     pCreate = (Factory_Create*)hGame->getProcAddress("xrFactory_Create");

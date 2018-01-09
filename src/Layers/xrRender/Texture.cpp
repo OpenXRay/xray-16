@@ -20,7 +20,6 @@ void fix_texture_name(LPSTR fn)
     }
 }
 
-ENGINE_API int g_current_renderer;
 #ifndef _EDITOR
 ENGINE_API bool is_enough_address_space_available();
 #else
@@ -44,7 +43,7 @@ int get_texture_load_lod(LPCSTR fn)
         {
             if (psTextureLOD < 1)
             {
-                if (enough_address_space_available || (g_current_renderer < 2))
+                if (enough_address_space_available || GEnv.CurrentRenderer < 2)
                     return 0;
                 else
                     return 1;
@@ -58,7 +57,7 @@ int get_texture_load_lod(LPCSTR fn)
 
     if (psTextureLOD < 2)
     {
-        //if (enough_address_space_available || g_current_renderer<2)
+        //if (enough_address_space_available || GEnv.CurrentRenderer < 2)
         return 0;
         //else
         //    return 1;

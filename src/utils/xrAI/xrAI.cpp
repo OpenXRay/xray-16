@@ -123,8 +123,6 @@ void execute(LPSTR cmd)
 
             const auto hFactory = std::make_unique<XRay::Module>("xrSE_Factory");
 
-            if (!hFactory->exist())
-                R_CHK(GetLastError());
             R_ASSERT2(hFactory->exist(), "Factory DLL raised exception during loading or there is no factory DLL at all");
 
 #ifdef XR_X64

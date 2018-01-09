@@ -36,7 +36,6 @@ bool SupportsDX10Rendering()
 }
 
 // This must not be optimized by compiler
-#pragma optimize("", off)
 static const volatile class GEnvHelper
 {
 public:
@@ -45,5 +44,9 @@ public:
         GEnv.CheckR3 = SupportsDX10Rendering;
         GEnv.SetupR3 = SetupEnvR3;
     }
+    ~GEnvHelper()
+    {
+        GEnv.CheckR3 = nullptr;
+        GEnv.SetupR3 = nullptr;
+    }
 } helper;
-#pragma optimize("", on)
