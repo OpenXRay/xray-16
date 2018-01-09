@@ -67,7 +67,6 @@ public:
     xr_vector<R_dsgraph::mapMatrixStates::value_type *> matStates;
     xr_vector<R_dsgraph::mapMatrixTextures::value_type *> matTextures;
     xr_vector<R_dsgraph::mapMatrixTextures::value_type *> matTexturesTemp;
-    xr_vector<R_dsgraph::_LodItem> lstLODs;
     xr_vector<int> lstLODgroups;
     xr_vector<ISpatial*> lstRenderables;
     xr_vector<ISpatial*> lstSpatial;
@@ -127,7 +126,6 @@ public:
         matTextures.clear();
         matTexturesTemp.clear();
 
-        lstLODs.clear();
         lstLODgroups.clear();
         lstRenderables.clear();
         lstSpatial.clear();
@@ -142,7 +140,7 @@ public:
         }
         mapSorted.destroy();
         mapHUD.destroy();
-        mapLOD.destroy();
+        mapLOD.clear();
         mapDistort.destroy();
 
 #if RENDER != R_R1

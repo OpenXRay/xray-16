@@ -163,6 +163,5 @@ using mapSorted_Node = mapSorted_T::TNode;
 using mapHUD_T = FixedMAP<float, _MatrixItemS>;
 using mapHUD_Node = mapHUD_T::TNode;
 
-using mapLOD_T = FixedMAP<float, _LodItem>;
-using mapLOD_Node = mapLOD_T::TNode;
+using mapLOD_T = xr_vector<std::pair<float, _LodItem>>;
 }

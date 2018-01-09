@@ -108,7 +108,6 @@ void CRender::level_Load(IReader* fs)
     pApp->LoadEnd();
 
     // sanity-clear
-    lstLODs.clear();
     lstLODgroups.clear();
     mapLOD.clear();
 

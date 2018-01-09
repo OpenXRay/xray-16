@@ -519,9 +519,7 @@ void CRender::add_leafs_Static(dxRender_Visual* pVisual)
         {
             if (ssa < r_ssaDISCARD)
                 return;
-            mapLOD_Node* N = mapLOD.insertInAnyWay(D);
-            N->val.ssa = ssa;
-            N->val.pVisual = pVisual;
+            mapLOD.emplace_back(std::make_pair(D, _LodItem({ ssa, pVisual })));
         }
 #if RENDER != R_R1
         if (ssa > r_ssaLOD_B || phase == PHASE_SMAP)
@@ -737,9 +735,7 @@ void CRender::add_Static(dxRender_Visual* pVisual, u32 planes)
         {
             if (ssa < r_ssaDISCARD)
                 return;
-            mapLOD_Node* N = mapLOD.insertInAnyWay(D);
-            N->val.ssa = ssa;
-            N->val.pVisual = pVisual;
+            mapLOD.emplace_back(std::make_pair(D, _LodItem({ ssa, pVisual })));
         }
 #if RENDER != R_R1
         if (ssa > r_ssaLOD_B || phase == PHASE_SMAP)
