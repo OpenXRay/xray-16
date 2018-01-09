@@ -99,8 +99,6 @@ void CEngineAPI::InitializeRenderers()
         renderer_value = 0; // con cmd
 
         hRender->open(r1_name);
-        if (!hRender->exist())
-            R_CHK(GetLastError());
         R_ASSERT(hRender);
         g_current_renderer = 1;
     }

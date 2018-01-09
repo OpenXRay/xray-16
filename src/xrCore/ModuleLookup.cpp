@@ -24,6 +24,10 @@ void* Module::open(pcstr moduleName)
     Log("Loading DLL:", moduleName);
 
     handle = ::LoadLibrary(moduleName);
+
+    if (handle == nullptr)
+        Msg("Failed to load DLL: %d", GetLastError());
+
     return handle;
 }
 
