@@ -2,10 +2,11 @@
 #include "Layers/xrRender/dxRenderFactory.h"
 #include "Layers/xrRender/dxUIRender.h"
 #include "Layers/xrRender/dxDebugRender.h"
+#include "Include/xrAPI/xrAPI.h"
 
 #pragma comment(lib, "xrEngine.lib")
 
-extern "C" void XR_EXPORT SetupEnv()
+void SetupEnvR4()
 {
     GEnv.Render = &RImplementation;
     GEnv.RenderFactory = &RenderFactoryImpl;
@@ -14,10 +15,10 @@ extern "C" void XR_EXPORT SetupEnv()
 #ifdef DEBUG
     GEnv.DRender = &DebugRenderImpl;
 #endif
-    xrRender_initconsole(); // XXX: Xottab_DUTY: move somewhere
+    xrRender_initconsole();
 }
 
-extern "C" bool XR_EXPORT SupportsDX11Rendering()
+bool SupportsDX11Rendering()
 {
     return xrRender_test_hw() ? true : false;
     /*
@@ -34,3 +35,16 @@ extern "C" bool XR_EXPORT SupportsDX11Rendering()
         return true;
     */
 }
+
+// This must not be optimized by compiler
+#pragma optimize("", off)
+static const volatile class GEnvHelper
+{
+public:
+    GEnvHelper()
+    {
+        GEnv.CheckR4 = SupportsDX11Rendering;
+        GEnv.SetupR4 = SetupEnvR4;
+    }
+} helper;
+#pragma optimize("", on)

@@ -5,7 +5,7 @@
 
 #pragma comment(lib, "xrEngine.lib")
 
-extern "C" void XR_EXPORT SetupEnv()
+void SetupEnvR3()
 {
     GEnv.Render = &RImplementation;
     GEnv.RenderFactory = &RenderFactoryImpl;
@@ -14,10 +14,10 @@ extern "C" void XR_EXPORT SetupEnv()
 #ifdef DEBUG
     GEnv.DRender = &DebugRenderImpl;
 #endif
-    xrRender_initconsole(); // XXX: Xottab_DUTY: move somewhere
+    xrRender_initconsole();
 }
 
-extern "C" bool XR_EXPORT SupportsDX10Rendering()
+bool SupportsDX10Rendering()
 {
     return xrRender_test_hw() ? true : false;
     /*
@@ -34,3 +34,16 @@ extern "C" bool XR_EXPORT SupportsDX10Rendering()
         return true;
     */
 }
+
+// This must not be optimized by compiler
+#pragma optimize("", off)
+static const volatile class GEnvHelper
+{
+public:
+    GEnvHelper()
+    {
+        GEnv.CheckR3 = SupportsDX10Rendering;
+        GEnv.SetupR3 = SetupEnvR3;
+    }
+} helper;
+#pragma optimize("", on)

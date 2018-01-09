@@ -14,6 +14,8 @@ class ISoundManager;
 
 class XRAPI_API EngineGlobalEnvironment
 {
+    using SupportCheck = bool(*)();
+    using SetupEnv = void(*)();
 public:
 #ifdef _EDITOR
     CRender* Render;
@@ -31,6 +33,15 @@ public:
     ISoundManager* Sound;
 
     bool isDedicatedServer;
+
+    SupportCheck CheckR2;
+    SupportCheck CheckR3;
+    SupportCheck CheckR4;
+    SetupEnv SetupR1;
+    SetupEnv SetupR2;
+    SetupEnv SetupR3;
+    SetupEnv SetupR4;
+    SetupEnv SetupCurrentRenderer;
 };
 
 extern XRAPI_API EngineGlobalEnvironment GEnv;

@@ -48,7 +48,10 @@ class ENGINE_API CEngineAPI
 {
     std::unique_ptr<XRay::Module> hGame;
     std::unique_ptr<XRay::Module> hTuner;
-    std::unique_ptr<XRay::Module> hRender;
+    std::unique_ptr<XRay::Module> hRenderR1;
+    std::unique_ptr<XRay::Module> hRenderR2;
+    std::unique_ptr<XRay::Module> hRenderR3;
+    std::unique_ptr<XRay::Module> hRenderR4;
 
 public:
     BENCH_SEC_SCRAMBLEMEMBER1
