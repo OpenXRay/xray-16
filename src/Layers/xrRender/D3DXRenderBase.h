@@ -48,25 +48,25 @@ public:
 #endif
 
     // Runtime structures
-    xr_vector<R_dsgraph::mapNormalVS::TNode*> nrmVS;
+    xr_vector<R_dsgraph::mapNormalVS::value_type *> nrmVS;
 #if defined(USE_DX10) || defined(USE_DX11)
-    xr_vector<R_dsgraph::mapNormalGS::TNode*> nrmGS;
+    xr_vector<R_dsgraph::mapNormalGS::value_type *> nrmGS;
 #endif //	USE_DX10
-    xr_vector<R_dsgraph::mapNormalPS::TNode*> nrmPS;
-    xr_vector<R_dsgraph::mapNormalCS::TNode*> nrmCS;
-    xr_vector<R_dsgraph::mapNormalStates::TNode*> nrmStates;
-    xr_vector<R_dsgraph::mapNormalTextures::TNode*> nrmTextures;
-    xr_vector<R_dsgraph::mapNormalTextures::TNode*> nrmTexturesTemp;
+    xr_vector<R_dsgraph::mapNormalPS::value_type *> nrmPS;
+    xr_vector<R_dsgraph::mapNormalCS::value_type *> nrmCS;
+    xr_vector<R_dsgraph::mapNormalStates::value_type *> nrmStates;
+    xr_vector<R_dsgraph::mapNormalTextures::value_type *> nrmTextures;
+    xr_vector<R_dsgraph::mapNormalTextures::value_type *> nrmTexturesTemp;
 
-    xr_vector<R_dsgraph::mapMatrixVS::TNode*> matVS;
+    xr_vector<R_dsgraph::mapMatrixVS::value_type *> matVS;
 #if defined(USE_DX10) || defined(USE_DX11)
-    xr_vector<R_dsgraph::mapMatrixGS::TNode*> matGS;
+    xr_vector<R_dsgraph::mapMatrixGS::value_type *> matGS;
 #endif //	USE_DX10
-    xr_vector<R_dsgraph::mapMatrixPS::TNode*> matPS;
-    xr_vector<R_dsgraph::mapMatrixCS::TNode*> matCS;
-    xr_vector<R_dsgraph::mapMatrixStates::TNode*> matStates;
-    xr_vector<R_dsgraph::mapMatrixTextures::TNode*> matTextures;
-    xr_vector<R_dsgraph::mapMatrixTextures::TNode*> matTexturesTemp;
+    xr_vector<R_dsgraph::mapMatrixPS::value_type *> matPS;
+    xr_vector<R_dsgraph::mapMatrixCS::value_type *> matCS;
+    xr_vector<R_dsgraph::mapMatrixStates::value_type *> matStates;
+    xr_vector<R_dsgraph::mapMatrixTextures::value_type *> matTextures;
+    xr_vector<R_dsgraph::mapMatrixTextures::value_type *> matTexturesTemp;
     xr_vector<R_dsgraph::_LodItem> lstLODs;
     xr_vector<int> lstLODgroups;
     xr_vector<ISpatial*> lstRenderables;
@@ -135,10 +135,10 @@ public:
 
         for (int i = 0; i < SHADER_PASSES_MAX; ++i)
         {
-            mapNormalPasses[0][i].destroy();
-            mapNormalPasses[1][i].destroy();
-            mapMatrixPasses[0][i].destroy();
-            mapMatrixPasses[1][i].destroy();
+            mapNormalPasses[0][i].clear();
+            mapNormalPasses[1][i].clear();
+            mapMatrixPasses[0][i].clear();
+            mapMatrixPasses[1][i].clear();
         }
         mapSorted.destroy();
         mapHUD.destroy();
