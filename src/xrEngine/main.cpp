@@ -404,7 +404,6 @@ int RunApplication(pcstr commandLine)
     else
         Console->Execute("renderer renderer_r1");
 
-    Engine.External.InitializeRenderers();
     Engine.External.Initialize();
     Startup();
     Core._destroy();

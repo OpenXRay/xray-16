@@ -63,7 +63,7 @@ public:
     void Initialize();
 
     void InitializeRenderers();
-    void InitializeNotDedicated();
+    void SetupCurrentRenderer();
 
     void Destroy();
 

@@ -4,10 +4,11 @@
 
 #include "stdafx.h"
 #include "EngineAPI.h"
+#include "XR_IOConsole.h"
 
 #include "xrCore/ModuleLookup.hpp"
 
-extern xr_token* vid_quality_token;
+extern xr_vector<xr_token> vid_quality_token;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -32,15 +33,8 @@ CEngineAPI::CEngineAPI()
 
 CEngineAPI::~CEngineAPI()
 {
-    // destroy quality token here
-    if (vid_quality_token)
-    {
-        xr_free(vid_quality_token);
-        vid_quality_token = NULL;
-    }
+    vid_quality_token.clear();
 }
-
-extern u32 renderer_value; // con cmd
 
 bool is_enough_address_space_available()
 {
@@ -49,8 +43,10 @@ bool is_enough_address_space_available()
     return (*(u32*)&system_info.lpMaximumApplicationAddress) > 0x90000000;
 }
 
-void CEngineAPI::InitializeNotDedicated()
+void CEngineAPI::SetupCurrentRenderer()
 {
+    GEnv.CurrentRenderer = -1;
+
     if (psDeviceFlags.test(rsR4))
     {
         if (hRenderR4->exist())
@@ -87,30 +83,51 @@ void CEngineAPI::InitializeNotDedicated()
             GEnv.SetupCurrentRenderer = GEnv.SetupR2;
         }
         else
+        {
             psDeviceFlags.set(rsR2, false);
+            psDeviceFlags.set(rsR1, true);
+        }
+    }
+
+    if (psDeviceFlags.test(rsR1))
+    {
+        if (hRenderR2->exist())
+        {
+            GEnv.CurrentRenderer = 1;
+            GEnv.SetupCurrentRenderer = GEnv.SetupR1;
+        }
+        else
+            psDeviceFlags.set(rsR1, false);
     }
 }
 
 void CEngineAPI::InitializeRenderers()
-{    
-    if (!GEnv.isDedicatedServer)
-        InitializeNotDedicated();
+{
+    SetupCurrentRenderer();
 
-    if (!psDeviceFlags.test(rsR4|rsR3|rsR2))
+    if (GEnv.SetupCurrentRenderer == nullptr
+        && vid_quality_token[0].id != -1)
     {
-        R_ASSERT(hRenderR1);
-        renderer_value = 0; // con cmd
-        GEnv.CurrentRenderer = 1;
-        GEnv.SetupCurrentRenderer = GEnv.SetupR1;
+        // if engine failed to load renderer
+        // but there is at least one available
+        // then try again
+        string32 buf;
+        xr_sprintf(buf, "renderer %s", vid_quality_token[0].name);
+        Console->Execute(buf);
+
+        // Second attempt
+        InitializeRenderers();
     }
 
     // ask current renderer to setup GlobalEnv
-    R_ASSERT(GEnv.SetupCurrentRenderer);
+    R_ASSERT2(GEnv.SetupCurrentRenderer, "Can't setup renderer");
     GEnv.SetupCurrentRenderer();
 }
 
 void CEngineAPI::Initialize(void)
 {
+    InitializeRenderers();
+
     hGame = std::make_unique<XRay::Module>("xrGame");
     R_ASSERT2(hGame, "Game DLL raised exception during loading or there is no game DLL at all");
 
@@ -159,20 +176,18 @@ void CEngineAPI::CreateRendererList()
 {
     hRenderR1 = std::make_unique<XRay::Module>("xrRender_R1");
 
-    if (GEnv.isDedicatedServer)
+    xr_vector<xr_token> modes;
+    // load only R1 for dedicated server,
+    // but if it's unavailable, then try other renderers
+    if (GEnv.isDedicatedServer && hRenderR1->exist())
     {
-        vid_quality_token = xr_alloc<xr_token>(2);
-
-        vid_quality_token[0].id = 0;
-        vid_quality_token[0].name = xr_strdup("renderer_r1");
-
-        vid_quality_token[1].id = -1;
-        vid_quality_token[1].name = nullptr;
-
+        modes.push_back(xr_token("renderer_r1", 0));
+        modes.push_back(xr_token(nullptr, -1));
+        vid_quality_token = std::move(modes);
         return;
     }
 
-    if (vid_quality_token != nullptr)
+    if (!vid_quality_token.empty())
         return;
 
     // Hide "d3d10.dll not found" message box for XP
@@ -185,127 +200,40 @@ void CEngineAPI::CreateRendererList()
     // Restore error handling
     SetErrorMode(0);
 
-    bool bSupports_r2 = false;
-    bool bSupports_r2_5 = false;
-    bool bSupports_r3 = false;
-    bool bSupports_r4 = false;
-
-    if (strstr(Core.Params, "-perfhud_hack"))
+    if (hRenderR1->exist())
     {
-        bSupports_r2 = true;
-        bSupports_r2_5 = true;
-        bSupports_r3 = true;
-        bSupports_r4 = true;
-    }
-    else
-    {
-        if (hRenderR2->exist())
-        {
-            bSupports_r2 = true;
-            if (GEnv.CheckR2 && GEnv.CheckR2())
-                bSupports_r2_5 = true;
-        }
-        if (hRenderR3->exist())
-        {
-            if (GEnv.CheckR3 && GEnv.CheckR3())
-                bSupports_r3 = true;
-            else
-                hRenderR3->close();
-        }
-        if (hRenderR4->exist())
-        {
-            if (GEnv.CheckR4 && GEnv.CheckR4())
-                bSupports_r4 = true;
-            else
-                hRenderR4->close();
-        }
+        modes.push_back(xr_token("renderer_r1", 0));
     }
 
-    bool proceed = true;
-    xr_vector<pcstr> tmp;
-    tmp.push_back("renderer_r1");
-    if (proceed &= bSupports_r2, proceed)
+    if (hRenderR2->exist())
     {
-        tmp.push_back("renderer_r2a");
-        tmp.push_back("renderer_r2");
-    }
-    if (proceed &= bSupports_r2_5, proceed)
-        tmp.push_back("renderer_r2.5");
-    if (proceed &= bSupports_r3, proceed)
-        tmp.push_back("renderer_r3");
-    if (proceed &= bSupports_r4, proceed)
-        tmp.push_back("renderer_r4");
-    u32 _cnt = tmp.size() + 1;
-    vid_quality_token = xr_alloc<xr_token>(_cnt);
-
-    vid_quality_token[_cnt - 1].id = -1;
-    vid_quality_token[_cnt - 1].name = NULL;
-
-    Msg("Available render modes[%d]:", tmp.size());
-    for (u32 i = 0; i < tmp.size(); ++i)
-    {
-        vid_quality_token[i].id = i;
-        vid_quality_token[i].name = tmp[i];
-        Msg("[%s]", tmp[i]);
+        modes.push_back(xr_token("renderer_r2a", 1));
+        modes.push_back(xr_token("renderer_r2", 2));
+        if (GEnv.CheckR2 && GEnv.CheckR2())
+            modes.push_back(xr_token("renderer_r2.5", 3));
     }
 
-/*
-if(vid_quality_token != NULL) return;
+    if (hRenderR3->exist())
+    {
+        if (GEnv.CheckR3 && GEnv.CheckR3())
+            modes.push_back(xr_token("renderer_r3", 4));
+        else
+            hRenderR3->close();
+    }
 
-D3DCAPS9 caps;
-CHW _HW;
-_HW.CreateD3D ();
-_HW.pD3D->GetDeviceCaps (D3DADAPTER_DEFAULT,D3DDEVTYPE_HAL,&caps);
-_HW.DestroyD3D ();
-u16 ps_ver_major = u16 ( u32(u32(caps.PixelShaderVersion)&u32(0xf << 8ul))>>8 );
+    if (hRenderR4->exist())
+    {
+        if (GEnv.CheckR4 && GEnv.CheckR4())
+            modes.push_back(xr_token("renderer_r4", 5));
+        else
+            hRenderR4->close();
+    }
+    modes.push_back(xr_token(nullptr, -1));
 
-xr_vector<LPCSTR> _tmp;
-u32 i = 0;
-for(; i<5; ++i)
-{
-bool bBreakLoop = false;
-switch (i)
-{
-case 3: //"renderer_r2.5"
-if (ps_ver_major < 3)
-bBreakLoop = true;
-break;
-case 4: //"renderer_r_dx10"
-bBreakLoop = true;
-break;
-default: ;
-}
+    Msg("Available render modes[%d]:", modes.size());
+    for (auto& mode : modes)
+        if (mode.name)
+            Log(mode.name);
 
-if (bBreakLoop) break;
-
-_tmp.push_back (NULL);
-LPCSTR val = NULL;
-switch (i)
-{
-case 0: val ="renderer_r1"; break;
-case 1: val ="renderer_r2a"; break;
-case 2: val ="renderer_r2"; break;
-case 3: val ="renderer_r2.5"; break;
-case 4: val ="renderer_r_dx10"; break; // -)
-}
-_tmp.back() = xr_strdup(val);
-}
-u32 _cnt = _tmp.size()+1;
-vid_quality_token = xr_alloc<xr_token>(_cnt);
-
-vid_quality_token[_cnt-1].id = -1;
-vid_quality_token[_cnt-1].name = NULL;
-
-#ifdef DEBUG
-Msg("Available render modes[%d]:",_tmp.size());
-#endif // DEBUG
-for(u32 i=0; i<_tmp.size();++i)
-{
-vid_quality_token[i].id = i;
-vid_quality_token[i].name = _tmp[i];
-#ifdef DEBUG
-Msg ("[%s]",_tmp[i]);
-#endif // DEBUG
-}
-*/
+    vid_quality_token = std::move(modes);
 }

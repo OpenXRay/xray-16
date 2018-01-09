@@ -13,7 +13,7 @@
 #include "xr_object.h"
 #include "xr_object_list.h"
 
-xr_token* vid_quality_token = NULL;
+xr_vector<xr_token> vid_quality_token;
 
 xr_token vid_bpp_token[] = {{"16", 16}, {"32", 32}, {0, 0}};
 //-----------------------------------------------------------------------
@@ -537,13 +537,14 @@ public:
     virtual ~CCC_r2() {}
     virtual void Execute(LPCSTR args)
     {
-        // vid_quality_token must be already created!
-        tokens = vid_quality_token;
+        tokens = vid_quality_token.data();
 
         inherited::Execute(args);
         // 0 - r1
         // 1..3 - r2
         // 4 - r3
+        // 5 - r4
+        psDeviceFlags.set(rsR1, renderer_value == 0);
         psDeviceFlags.set(rsR2, ((renderer_value > 0) && renderer_value < 4));
         psDeviceFlags.set(rsR3, (renderer_value == 4));
         psDeviceFlags.set(rsR4, (renderer_value >= 5));
@@ -556,15 +557,12 @@ public:
     virtual void Save(IWriter* F)
     {
         // fill_render_mode_list ();
-        tokens = vid_quality_token;
-        if (!strstr(Core.Params, "-r2"))
-        {
-            inherited::Save(F);
-        }
+        tokens = vid_quality_token.data();
+        inherited::Save(F);
     }
     virtual xr_token* GetToken()
     {
-        tokens = vid_quality_token;
+        tokens = vid_quality_token.data();
         return inherited::GetToken();
     }
 };
