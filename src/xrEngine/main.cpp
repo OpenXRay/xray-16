@@ -231,9 +231,6 @@ public:
     StickyKeyFilter()
     {
         screensaverState = false;
-        SystemParametersInfo(SPI_GETSCREENSAVEACTIVE, 0, &screensaverState, 0);
-        if (screensaverState)
-            SystemParametersInfo(SPI_SETSCREENSAVEACTIVE, FALSE, nullptr, 0);
         stickyKeysFlags = 0;
         filterKeysFlags = 0;
         toggleKeysFlags = 0;
@@ -243,6 +240,15 @@ public:
         stickyKeys.cbSize = sizeof(stickyKeys);
         filterKeys.cbSize = sizeof(filterKeys);
         toggleKeys.cbSize = sizeof(toggleKeys);
+    }
+
+    void initialize()
+    {
+        SystemParametersInfo(SPI_GETSCREENSAVEACTIVE, 0, &screensaverState, 0);
+
+        if (screensaverState)
+            SystemParametersInfo(SPI_SETSCREENSAVEACTIVE, FALSE, nullptr, 0);
+
         SystemParametersInfo(SPI_GETSTICKYKEYS, sizeof(stickyKeys), &stickyKeys, 0);
         SystemParametersInfo(SPI_GETFILTERKEYS, sizeof(filterKeys), &filterKeys, 0);
         SystemParametersInfo(SPI_GETTOGGLEKEYS, sizeof(toggleKeys), &toggleKeys, 0);
@@ -344,12 +350,10 @@ int RunApplication(pcstr commandLine)
         xr_strcpy(Core.UserName, sizeof(Core.UserName), "Player");
         xr_strcpy(Core.CompName, sizeof(Core.CompName), "Computer");
     }
-
+    
+    StickyKeyFilter filter;
     if (GEnv.isDedicatedServer)
-    {
-        StickyKeyFilter filter;
-        UNUSED(filter);
-    }
+        filter.initialize();
 
     FPU::m24r();
     InitEngine();
