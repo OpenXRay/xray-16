@@ -122,6 +122,20 @@ void CEngineAPI::InitializeRenderers()
     // ask current renderer to setup GlobalEnv
     R_ASSERT2(GEnv.SetupCurrentRenderer, "Can't setup renderer");
     GEnv.SetupCurrentRenderer();
+
+    // Now unload unused renderers
+    // XXX: Unloading disabled due to typeids invalidation
+    /*if (GEnv.CurrentRenderer != 4)
+        hRenderR4->close();
+
+    if (GEnv.CurrentRenderer != 3)
+        hRenderR3->close();
+
+    if (GEnv.CurrentRenderer != 2)
+        hRenderR2->close();
+
+    if (GEnv.CurrentRenderer != 1)
+        hRenderR1->close();*/
 }
 
 void CEngineAPI::Initialize(void)
@@ -160,12 +174,12 @@ void CEngineAPI::Initialize(void)
 
 void CEngineAPI::Destroy(void)
 {
-    if (hGame) hGame->close();
-    if (hTuner) hTuner->close();
-    if (hRenderR1) hRenderR1->close();
-    if (hRenderR2) hRenderR2->close();
-    if (hRenderR3) hRenderR3->close();
-    if (hRenderR4) hRenderR4->close();
+    hGame = nullptr;
+    hTuner = nullptr;
+    hRenderR1 = nullptr;
+    hRenderR2 = nullptr;
+    hRenderR3 = nullptr;
+    hRenderR4 = nullptr;
     pCreate = nullptr;
     pDestroy = nullptr;
     Engine.Event._destroy();
