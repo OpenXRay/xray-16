@@ -517,20 +517,42 @@ void CInput::MouseUpdate()
         }
     }
 
-    if (mouseState[0] && mouse_prev[0])
-    {
-        cbStack.back()->IR_OnMouseHold(0);
-    }
+    // Giperion: double check mouse buttons state
+    DIMOUSESTATE2 MouseState;
+    hr = pMouse->GetDeviceState(sizeof(MouseState), &MouseState);
 
-    if (mouseState[1] && mouse_prev[1])
+    auto RecheckMouseButtonFunc = [&](int i)
     {
-        cbStack.back()->IR_OnMouseHold(1);
-    }
+        if (MouseState.rgbButtons[i] & 0x80 && mouseState[i] == FALSE)
+        {
+            mouseState[i] = TRUE;
+            cbStack.back()->IR_OnMousePress(i);
+        }
+        else if (!(MouseState.rgbButtons[i] & 0x80) && mouseState[i] == TRUE)
+        {
+            mouseState[i] = FALSE;
+            cbStack.back()->IR_OnMouseRelease(i);
+        }
+    };
 
-    if (mouseState[2] && mouse_prev[2])
+    if (hr == S_OK)
     {
-        cbStack.back()->IR_OnMouseHold(2);
+        RecheckMouseButtonFunc(0);
+        RecheckMouseButtonFunc(1);
+        RecheckMouseButtonFunc(2);
     }
+    //-Giperion
+
+    auto isButtonOnHold = [&](int i)
+    {
+        if (mouseState[i] && mouse_prev[i])
+            cbStack.back()->IR_OnMouseHold(i);
+    };
+
+    isButtonOnHold(0);
+    isButtonOnHold(1);
+    isButtonOnHold(2);
+
     if (dwElements)
     {
         if (offs[0] || offs[1])
