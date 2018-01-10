@@ -341,6 +341,7 @@ void CResourceManager::Delete(const Shader* S)
     Msg("! ERROR: Failed to find complete shader");
 }
 
+#ifndef USE_OGL
 xr_vector<CTexture*> textures_to_load;
 
 void LoadTextures(const size_t thread_num, const size_t textures_per_worker)
@@ -366,6 +367,7 @@ void LoadTextures(const size_t thread_num, const size_t textures_per_worker)
     Msg("Thread %d, texture loading time = %d", thread_num, timer.GetElapsed_ms());
 #endif
 }
+#endif
 
 void CResourceManager::DeferredUpload()
 {
@@ -379,6 +381,7 @@ void CResourceManager::DeferredUpload()
     timer.Start();
 #endif
 
+#ifndef USE_OGL
     const auto nWorkers = ttapi.threads.size();
     const auto textures_per_worker = m_textures.size() / nWorkers;
 
@@ -391,6 +394,10 @@ void CResourceManager::DeferredUpload()
     ttapi.wait();
 
     textures_to_load.clear();
+#else
+    for (auto& texture : m_textures)
+        texture.second->Load();
+#endif
 
 #ifndef MASTER_GOLD
     Msg("%s, texture loading time = %d", __FUNCTION__, timer.GetElapsed_ms());
