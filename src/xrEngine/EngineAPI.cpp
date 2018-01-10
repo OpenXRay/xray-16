@@ -191,10 +191,9 @@ void CEngineAPI::CreateRendererList()
     hRenderR1 = std::make_unique<XRay::Module>("xrRender_R1");
 
     xr_vector<xr_token> modes;
-    // load only R1 for dedicated server,
-    // but if it's unavailable, then try other renderers
-    if (GEnv.isDedicatedServer && hRenderR1->exist())
+    if (GEnv.isDedicatedServer)
     {
+        R_ASSERT2(hRenderR1->exist(), "Dedicated server needs xrRender_R1 to work");
         modes.push_back(xr_token("renderer_r1", 0));
         modes.push_back(xr_token(nullptr, -1));
         vid_quality_token = std::move(modes);
