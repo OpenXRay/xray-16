@@ -9,6 +9,7 @@
 #include "stdafx.h"
 #include "game_graph_builder.h"
 #include "xrServerEntities/xrServer_Objects_ALife.h"
+#include "xrServerEntities/xrMessages.h"
 #include "factory_api.h"
 #include "guid_generator.h"
 

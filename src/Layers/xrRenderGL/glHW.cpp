@@ -193,78 +193,54 @@ void CHW::Reset (HWND hwnd)
 
 void CHW::updateWindowProps(HWND m_hWnd)
 {
-	//	BOOL	bWindowed				= strstr(Core.Params,"-dedicated") ? TRUE : !psDeviceFlags.is	(rsFullscreen);
-	BOOL	bWindowed = !psDeviceFlags.is(rsFullscreen);
+    bool bWindowed = true;
+#ifndef _EDITOR
+    if (!GEnv.isDedicatedServer)
+        bWindowed = !psDeviceFlags.is(rsFullscreen);
+#endif
 
-	u32		dwWindowStyle = 0;
-	// Set window properties depending on what mode were in.
-	if (bWindowed)		{
-		if (strstr(Core.Params, "-no_dialog_header"))
-			SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle = (WS_BORDER | WS_VISIBLE));
-		else
-			SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle = (WS_BORDER | WS_DLGFRAME | WS_VISIBLE | WS_SYSMENU | WS_MINIMIZEBOX));
+    u32 dwWindowStyle = 0;
+    // Set window properties depending on what mode were in.
+    if (bWindowed)
+    {
+        if (m_move_window)
+        {
+            dwWindowStyle = WS_BORDER | WS_VISIBLE;
+            if (!strstr(Core.Params, "-no_dialog_header"))
+                dwWindowStyle |= WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX;
+            SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle);
+            // When moving from fullscreen to windowed mode, it is important to
+            // adjust the window size after recreating the device rather than
+            // beforehand to ensure that you get the window size you want.  For
+            // example, when switching from 640x480 fullscreen to windowed with
+            // a 1000x600 window on a 1024x768 desktop, it is impossible to set
+            // the window size to 1000x600 until after the display mode has
+            // changed to 1024x768, because windows cannot be larger than the
+            // desktop.
 
-		// Change to default resolution
-		ChangeDisplaySettings(nullptr, CDS_FULLSCREEN);
-	}
-	else {
-		SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle = (WS_POPUP | WS_VISIBLE));
+            RECT m_rcWindowBounds;
+            RECT DesktopRect;
 
-		DEVMODE dmScreenSettings;
-		memset(&dmScreenSettings, 0, sizeof(dmScreenSettings));
-		dmScreenSettings.dmSize = sizeof(dmScreenSettings);
-		dmScreenSettings.dmPelsWidth = psCurrentVidMode[0];
-		dmScreenSettings.dmPelsHeight = psCurrentVidMode[1];
-		dmScreenSettings.dmBitsPerPel = 32;
-		dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+            GetClientRect(GetDesktopWindow(), &DesktopRect);
 
-		// Try To Set Selected Mode And Get Results.  NOTE: CDS_FULLSCREEN Gets Rid Of Start Bar.
-		ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN);
-	}
+            SetRect(&m_rcWindowBounds,
+                (DesktopRect.right - psCurrentVidMode[0]) / 2,
+                (DesktopRect.bottom - psCurrentVidMode[1]) / 2,
+                (DesktopRect.right + psCurrentVidMode[0]) / 2,
+                (DesktopRect.bottom + psCurrentVidMode[1]) / 2);
 
-	if (m_move_window) {
-		// When moving from fullscreen to windowed mode, it is important to
-		// adjust the window size after recreating the device rather than
-		// beforehand to ensure that you get the window size you want.  For
-		// example, when switching from 640x480 fullscreen to windowed with
-		// a 1000x600 window on a 1024x768 desktop, it is impossible to set
-		// the window size to 1000x600 until after the display mode has
-		// changed to 1024x768, because windows cannot be larger than the
-		// desktop.
+            AdjustWindowRect(&m_rcWindowBounds, dwWindowStyle, FALSE);
 
-		RECT			m_rcWindowBounds;
-		BOOL			bCenter = FALSE;
-		if (strstr(Core.Params, "-center_screen"))	bCenter = TRUE;
-
-		if (bCenter) {
-			RECT				DesktopRect;
-
-			GetClientRect(GetDesktopWindow(), &DesktopRect);
-
-			SetRect(&m_rcWindowBounds,
-				(DesktopRect.right - psCurrentVidMode[0]) / 2,
-				(DesktopRect.bottom - psCurrentVidMode[1]) / 2,
-				(DesktopRect.right + psCurrentVidMode[0]) / 2,
-				(DesktopRect.bottom + psCurrentVidMode[1]) / 2);
-		}
-		else {
-			SetRect(&m_rcWindowBounds,
-				0,
-				0,
-				psCurrentVidMode[0],
-				psCurrentVidMode[1]);
-		}
-
-		AdjustWindowRect(&m_rcWindowBounds, dwWindowStyle, FALSE);
-
-		SetWindowPos(m_hWnd,
-			HWND_TOP,
-			m_rcWindowBounds.left,
-			m_rcWindowBounds.top,
-			(m_rcWindowBounds.right - m_rcWindowBounds.left),
-			(m_rcWindowBounds.bottom - m_rcWindowBounds.top),
-			SWP_SHOWWINDOW | SWP_NOCOPYBITS | SWP_DRAWFRAME);
-	}
+            SetWindowPos(m_hWnd, HWND_NOTOPMOST, m_rcWindowBounds.left, m_rcWindowBounds.top,
+                (m_rcWindowBounds.right - m_rcWindowBounds.left),
+                (m_rcWindowBounds.bottom - m_rcWindowBounds.top),
+                SWP_SHOWWINDOW | SWP_NOCOPYBITS | SWP_DRAWFRAME);
+        }
+    }
+    else
+    {
+        SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle = (WS_POPUP | WS_VISIBLE));
+    }
 
 	ShowCursor(FALSE);
 	SetForegroundWindow(m_hWnd);

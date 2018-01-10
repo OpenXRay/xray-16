@@ -7,6 +7,8 @@
 #include "Common/Common.hpp"
 #include "xrCore/xrCore.h"
 
+#include <memory>
+
 #include <d3dx9.h>
 #include "Common/_d3d_extensions.h"
 

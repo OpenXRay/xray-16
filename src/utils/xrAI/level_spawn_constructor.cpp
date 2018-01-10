@@ -10,6 +10,7 @@
 #include "level_spawn_constructor.h"
 #include "xrServerEntities/restriction_space.h"
 #include "xrServerEntities/clsid_game.h"
+#include "xrServerEntities/xrMessages.h"
 #include "factory_api.h"
 
 #define IGNORE_ZERO_SPAWN_POSITIONS

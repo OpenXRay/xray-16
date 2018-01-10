@@ -1,7 +1,10 @@
 #pragma once
 
+#include <cstdio>
+
 #include "_types.h"
 #include "xrCommon/inlining_macros.h"
+#include "xrMemory.h"
 
 #define BREAK_AT_STRCMP
 #ifndef DEBUG
