@@ -319,7 +319,7 @@ int RunApplication(pcstr commandLine)
             return 2;
     }
 #endif
-    SetThreadAffinityMask(GetCurrentThread(), 1);
+    //SetThreadAffinityMask(GetCurrentThread(), 1);
     logoWindow = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_STARTUP), nullptr, LogoWndProc);
     HWND logoPicture = GetDlgItem(logoWindow, IDC_STATIC_LOGO);
     RECT logoRect;
