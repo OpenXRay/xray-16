@@ -91,7 +91,7 @@ void CEngineAPI::SetupCurrentRenderer()
 
     if (psDeviceFlags.test(rsR1))
     {
-        if (hRenderR2->exist())
+        if (hRenderR1->exist())
         {
             GEnv.CurrentRenderer = 1;
             GEnv.SetupCurrentRenderer = GEnv.SetupR1;
