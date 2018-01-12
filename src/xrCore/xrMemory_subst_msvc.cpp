@@ -12,8 +12,6 @@ extern void save_stack_trace();
 
 MEMPOOL mem_pools[mem_pools_count];
 
-constexpr pcstr _name = "_noname_";
-
 // MSVC
 ICF u8* acc_header(void* P) { return (u8*)P - 1; }
 ICF u32 get_header(void* P) { return (u32)*acc_header(P); }
@@ -41,9 +39,6 @@ void* xrMemory::mem_alloc(size_t size)
     if (g_use_pure_alloc)
     {
         void* result = malloc(size);
-#if defined(USE_MEMORY_MONITOR) && defined(DEBUG_MEMORY_NAME)
-        memory_monitor::monitor_alloc(result, size, _name);
-#endif
         return result;
     }
 #ifdef DEBUG_MEMORY_MANAGER
@@ -88,18 +83,12 @@ void* xrMemory::mem_alloc(size_t size)
     if (mem_initialized)
         debug_cs.Leave();
 #endif
-#if defined(USE_MEMORY_MONITOR) && defined(DEBUG_MEMORY_NAME)
-    memory_monitor::monitor_alloc(_ptr, size, _name);
-#endif
     return _ptr;
 }
 
 void xrMemory::mem_free(void* P)
 {
     stat_calls++;
-#ifdef USE_MEMORY_MONITOR
-    memory_monitor::monitor_free(P);
-#endif
     if (g_use_pure_alloc)
     {
         free(P);
@@ -140,10 +129,6 @@ void* xrMemory::mem_realloc(void* P, size_t size)
     if (g_use_pure_alloc)
     {
         void* result = realloc(P, size);
-#ifdef USE_MEMORY_MONITOR
-        memory_monitor::monitor_free(P);
-        memory_monitor::monitor_alloc(result, size, _name);
-#endif
         return result;
     }
     if (!P)
@@ -187,10 +172,6 @@ void* xrMemory::mem_realloc(void* P, size_t size)
 #ifdef DEBUG_MEMORY_MANAGER
         if (debug_mode)
             dbg_register(_ptr, size, _name);
-#endif
-#ifdef USE_MEMORY_MONITOR
-        memory_monitor::monitor_free(P);
-        memory_monitor::monitor_alloc(_ptr, size, _name);
 #endif
     }
     else if (p_mode == 1)

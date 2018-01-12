@@ -228,9 +228,6 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvRese
         break;
     case DLL_THREAD_DETACH: break;
     case DLL_PROCESS_DETACH:
-#ifdef USE_MEMORY_MONITOR
-        memory_monitor::flush_each_time(true);
-#endif // USE_MEMORY_MONITOR
         break;
     }
     return TRUE;
