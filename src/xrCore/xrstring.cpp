@@ -183,12 +183,7 @@ str_value* str_container::dock(pcstr value)
 #endif // DEBUG
         )
     {
-        result = (str_value*)Memory.mem_alloc(sizeof(str_value) + s_len_with_zero
-#ifdef DEBUG_MEMORY_NAME
-            ,
-            "storage: sstring"
-#endif // DEBUG_MEMORY_NAME
-            );
+        result = (str_value*)Memory.mem_alloc(sizeof(str_value) + s_len_with_zero);
 
 #ifdef DEBUG
         static int num_leaked_string = 0;

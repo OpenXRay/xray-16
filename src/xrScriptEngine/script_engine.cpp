@@ -50,11 +50,7 @@ static void* lua_alloc(void* ud, void* ptr, size_t osize, size_t nsize)
         xr_free(ptr);
         return nullptr;
     }
-#ifdef DEBUG_MEMORY_NAME
-    return Memory.mem_realloc(ptr, nsize, "LUA");
-#else
     return Memory.mem_realloc(ptr, nsize);
-#endif
 }
 
 static void* __cdecl luabind_allocator(void* context, const void* pointer, size_t const size)
@@ -67,18 +63,10 @@ static void* __cdecl luabind_allocator(void* context, const void* pointer, size_
     }
     if (!pointer)
     {
-#ifdef DEBUG_MEMORY_NAME
-        return Memory.mem_alloc(size, "luabind");
-#else
         return Memory.mem_alloc(size);
-#endif
     }
     void* non_const_pointer = const_cast<LPVOID>(pointer);
-#ifdef DEBUG_MEMORY_NAME
-    return Memory.mem_realloc(non_const_pointer, size, "luabind");
-#else
     return Memory.mem_realloc(non_const_pointer, size);
-#endif
 }
 
 namespace

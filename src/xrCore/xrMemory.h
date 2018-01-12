@@ -72,12 +72,9 @@ public:
     u32 mem_counter_get() { return stat_counter; }
 #ifdef DEBUG_MEMORY_NAME
     void mem_statistic(const char* fn);
-    void* mem_alloc(size_t size, const char* _name);
-    void* mem_realloc(void* p, size_t size, const char* _name);
-#else // DEBUG_MEMORY_NAME
+#endif // DEBUG_MEMORY_NAME
     void* mem_alloc(size_t size);
     void* mem_realloc(void* p, size_t size);
-#endif // DEBUG_MEMORY_NAME
     void mem_free(void* p);
 };
 
@@ -98,18 +95,10 @@ extern XRCORE_API xrMemory Memory;
 #endif
 
 // generic "C"-like allocations/deallocations
-#ifdef DEBUG_MEMORY_NAME
-#include "typeinfo.h"
-template <class T>
-IC T* xr_alloc(size_t count)
-{ return (T*)Memory.mem_alloc(count*sizeof(T), typeid(T).name()); }
-
-#else
 template <class T>
 IC T* xr_alloc(size_t count)
 { return (T*)Memory.mem_alloc(count * sizeof(T)); }
 
-#endif
 
 template <class T>
 IC void xr_free(T*& P) throw()

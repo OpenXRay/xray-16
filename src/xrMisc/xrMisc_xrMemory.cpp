@@ -8,13 +8,8 @@
 #endif
 
 #ifndef NO_XRNEW
-#ifdef DEBUG_MEMORY_NAME
-void* operator new(size_t size) { return Memory.mem_alloc(size, "C++ NEW"); }
-void* operator new[](size_t size) { return Memory.mem_alloc(size, "C++ NEW[]"); }
-#else
 void* operator new(size_t size) { return Memory.mem_alloc(size); }
 void* operator new[](size_t size) { return Memory.mem_alloc(size); }
-#endif
 
 void operator delete(void* p) throw() { Memory.mem_free(p); }
 void operator delete[](void* p) throw() { Memory.mem_free(p); }

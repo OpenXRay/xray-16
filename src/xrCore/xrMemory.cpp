@@ -260,12 +260,7 @@ char* xr_strdup(const char* string)
 {
     VERIFY(string);
     u32 len = u32(xr_strlen(string)) + 1;
-    char* memory = (char*)Memory.mem_alloc(len
-#ifdef DEBUG_MEMORY_NAME
-        ,
-        "strdup"
-#endif // DEBUG_MEMORY_NAME
-        );
+    char* memory = (char*)Memory.mem_alloc(len);
     CopyMemory(memory, string, len);
     return memory;
 }
@@ -279,10 +274,5 @@ XRCORE_API BOOL is_stack_ptr(void* _ptr)
     return (difference < (512 * 1024));
 }
 
-#ifdef DEBUG_MEMORY_NAME
-XRCORE_API void* xr_malloc(size_t size) { return Memory.mem_alloc(size, "xr_malloc"); }
-XRCORE_API void* xr_realloc(void* P, size_t size) { return Memory.mem_realloc(P, size, "xr_realloc"); }
-#else
 XRCORE_API void* xr_malloc(size_t size) { return Memory.mem_alloc(size); }
 XRCORE_API void* xr_realloc(void* P, size_t size) { return Memory.mem_realloc(P, size); }
-#endif

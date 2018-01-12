@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "xrMemory_align.h"
 
-#ifndef __BORLANDC__
-
 #ifndef DEBUG_MEMORY_MANAGER
 #define debug_mode 0
 #endif
@@ -13,6 +11,8 @@ extern void save_stack_trace();
 #endif
 
 MEMPOOL mem_pools[mem_pools_count];
+
+constexpr pcstr _name = "_noname_";
 
 // MSVC
 ICF u8* acc_header(void* P) { return (u8*)P - 1; }
@@ -27,11 +27,7 @@ ICF u32 get_pool(size_t size)
 
 static bool g_use_pure_alloc = false;
 
-#ifdef DEBUG_MEMORY_NAME
-void* xrMemory::mem_alloc(size_t size, const char* _name)
-#else
 void* xrMemory::mem_alloc(size_t size)
-#endif
 {
     if (!size)
         size = 1; // While allocationg 0 bytes is valid, let's mimic the old code for now.
@@ -138,11 +134,7 @@ void xrMemory::mem_free(void* P)
 
 extern BOOL g_bDbgFillMemory;
 
-#ifdef DEBUG_MEMORY_NAME
-void* xrMemory::mem_realloc(void* P, size_t size, const char* _name)
-#else
 void* xrMemory::mem_realloc(void* P, size_t size)
-#endif
 {
     stat_calls++;
     if (g_use_pure_alloc)
@@ -156,11 +148,7 @@ void* xrMemory::mem_realloc(void* P, size_t size)
     }
     if (!P)
     {
-#ifdef DEBUG_MEMORY_NAME
-        return mem_alloc(size, _name);
-#else
         return mem_alloc(size);
-#endif
     }
 #ifdef DEBUG_MEMORY_MANAGER
     if (g_globalCheckAddr == P)
@@ -212,11 +200,7 @@ void* xrMemory::mem_realloc(void* P, size_t size)
         u32 s_current = mem_pools[p_current].get_element();
         u32 s_dest = (u32)size;
         void* p_old = P;
-#ifdef DEBUG_MEMORY_NAME
-        void* p_new = mem_alloc(size, _name);
-#else
         void* p_new = mem_alloc(size);
-#endif
         // Igor: Reserve 1 byte for xrMemory header
         // Don't bother in this case?
         memcpy(p_new, p_old, std::min(s_current - 1, s_dest));
@@ -227,11 +211,7 @@ void* xrMemory::mem_realloc(void* P, size_t size)
     {
         // relocate into another mmgr(pooled) from real
         void* p_old = P;
-#ifdef DEBUG_MEMORY_NAME
-        void* p_new = mem_alloc(size, _name);
-#else
         void* p_new = mem_alloc(size);
-#endif
         memcpy(p_new, p_old, (u32)size);
         mem_free(p_old);
         _ptr = p_new;
@@ -244,5 +224,3 @@ void* xrMemory::mem_realloc(void* P, size_t size)
 #endif
     return _ptr;
 }
-
-#endif // __BORLANDC__

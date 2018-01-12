@@ -122,12 +122,7 @@ bool file_handle_internal(LPCSTR file_name, u32& size, int& file_handle)
 
 void* FileDownload(LPCSTR file_name, const int& file_handle, u32& file_size)
 {
-    void* buffer = Memory.mem_alloc(file_size
-#ifdef DEBUG_MEMORY_NAME
-        ,
-        "FILE in memory"
-#endif // DEBUG_MEMORY_NAME
-        );
+    void* buffer = Memory.mem_alloc(file_size);
 
     int r_bytes = _read(file_handle, buffer, file_size);
     R_ASSERT3(
@@ -204,19 +199,9 @@ void CMemoryWriter::w(const void* ptr, u32 count)
         while (mem_size <= (position + count))
             mem_size *= 2;
         if (0 == data)
-            data = (BYTE*)Memory.mem_alloc(mem_size
-#ifdef DEBUG_MEMORY_NAME
-                ,
-                "CMemoryWriter - storage"
-#endif // DEBUG_MEMORY_NAME
-                );
+            data = (BYTE*)Memory.mem_alloc(mem_size);
         else
-            data = (BYTE*)Memory.mem_realloc(data, mem_size
-#ifdef DEBUG_MEMORY_NAME
-                ,
-                "CMemoryWriter - storage"
-#endif // DEBUG_MEMORY_NAME
-                );
+            data = (BYTE*)Memory.mem_realloc(data, mem_size);
     }
     CopyMemory(data + position, ptr, count);
     position += count;

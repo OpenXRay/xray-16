@@ -213,9 +213,6 @@
     <ClCompile Include="xrMemory_POOL.cpp">
       <Filter>Memory\Memory manager</Filter>
     </ClCompile>
-    <ClCompile Include="xrMemory_subst_borland.cpp">
-      <Filter>Memory\Memory manager</Filter>
-    </ClCompile>
     <ClCompile Include="xrMemory_subst_msvc.cpp">
       <Filter>Memory\Memory manager</Filter>
     </ClCompile>
@@ -510,9 +507,6 @@
       <Filter>Memory\Memory manager</Filter>
     </ClInclude>
     <ClInclude Include="xrMemory_align.h">
-      <Filter>Memory\Memory manager</Filter>
-    </ClInclude>
-    <ClInclude Include="xrMemory_subst_borland.h">
       <Filter>Memory\Memory manager</Filter>
     </ClInclude>
     <ClInclude Include="xrMemory_subst_msvc.h">
