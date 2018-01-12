@@ -1,0 +1,221 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Mixed|Win32">
+      <Configuration>Mixed</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Mixed|x64">
+      <Configuration>Mixed</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{02F61511-D5B6-46E6-B4BB-DEAA96E6BCC7}</ProjectGuid>
+    <RootNamespace>tbbmalloc_proxy</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)Common.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules />
+    <CodeAnalysisRuleAssemblies />
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions> /c /MDd /Od /Ob0 /Zi /EHsc /GR /DTBB_USE_DEBUG /D__TBB_LIB_NAME=tbb_debug.lib /DDO_ITT_NOTIFY /GS /DUSE_WINTHREAD /D_CRT_SECURE_NO_DEPRECATE /D_WIN32_WINNT=0x0502 /W4 /D__TBBMALLOC_BUILD=1 /Itbb/src /Itbb/src/rml/include /Itbb/include /Itbb/src/tbbmalloc /Itbb/src/tbbmalloc</AdditionalOptions>
+      <AdditionalIncludeDirectories>tbb/build/vs2013;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <Link>
+      <AdditionalOptions>/DLL /MAP /DEBUG /fixed:no %(AdditionalOptions)</AdditionalOptions>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+    </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>tbb\build\vs2013;</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalOptions> /c /MDd /Od /Ob0 /Zi /EHsc /GR /DTBB_USE_DEBUG /D__TBB_LIB_NAME=tbb_debug.lib /DDO_ITT_NOTIFY /GS /DUSE_WINTHREAD /D_CRT_SECURE_NO_DEPRECATE /D_WIN32_WINNT=0x0502 /W4 /D__TBBMALLOC_BUILD=1 /Itbb/src /Itbb/src/rml/include /Itbb/include /Itbb/src/tbbmalloc /Itbb/src/tbbmalloc</AdditionalOptions>
+      <AdditionalIncludeDirectories>tbb/build/vs2013;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <Link>
+      <AdditionalOptions>/nologo /DLL /MAP /DEBUG /fixed:no /INCREMENTAL:NO %(AdditionalOptions)</AdditionalOptions>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+    </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>tbb\build\vs2013;</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalOptions> /c /MD /O2 /Zi /EHsc /GR /D__TBB_LIB_NAME=tbb.lib /DDO_ITT_NOTIFY /GS /DUSE_WINTHREAD /D_CRT_SECURE_NO_DEPRECATE /D_WIN32_WINNT=0x0502 /W4 /D__TBBMALLOC_BUILD=1 /Itbb/src /Itbb/src/rml/include /Itbb/include /Itbb/src/tbbmalloc /Itbb/src/tbbmalloc</AdditionalOptions>
+      <AdditionalIncludeDirectories>tbb/build/vs2013;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <Link>
+      <AdditionalOptions>/nologo /DLL /MAP /DEBUG /fixed:no  %(AdditionalOptions)</AdditionalOptions>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+    </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>tbb\build\vs2013;</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|Win32'">
+    <ClCompile>
+      <AdditionalOptions> /c /MD /O2 /Zi /EHsc /GR /D__TBB_LIB_NAME=tbb.lib /DDO_ITT_NOTIFY /GS /DUSE_WINTHREAD /D_CRT_SECURE_NO_DEPRECATE /D_WIN32_WINNT=0x0502 /W4 /D__TBBMALLOC_BUILD=1 /Itbb/src /Itbb/src/rml/include /Itbb/include /Itbb/src/tbbmalloc /Itbb/src/tbbmalloc</AdditionalOptions>
+      <AdditionalIncludeDirectories>tbb/build/vs2013;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <Link>
+      <AdditionalOptions>/nologo /DLL /MAP /DEBUG /fixed:no  %(AdditionalOptions)</AdditionalOptions>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+    </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>tbb\build\vs2013;</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalOptions> /c /MD /O2 /Zi /EHsc /GR /D__TBB_LIB_NAME=tbb.lib /DDO_ITT_NOTIFY /GS /DUSE_WINTHREAD /D_CRT_SECURE_NO_DEPRECATE /D_WIN32_WINNT=0x0502 /W4 /D__TBBMALLOC_BUILD=1 /Itbb/src /Itbb/src/rml/include /Itbb/include /Itbb/src/tbbmalloc /Itbb/src/tbbmalloc</AdditionalOptions>
+      <AdditionalIncludeDirectories>tbb/build/vs2013;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <Link>
+      <AdditionalOptions>/nologo /DLL /MAP /DEBUG /fixed:no /INCREMENTAL:NO %(AdditionalOptions)</AdditionalOptions>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+    </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>tbb\build\vs2013;</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Mixed|x64'">
+    <ClCompile>
+      <AdditionalOptions> /c /MD /O2 /Zi /EHsc /GR /D__TBB_LIB_NAME=tbb.lib /DDO_ITT_NOTIFY /GS /DUSE_WINTHREAD /D_CRT_SECURE_NO_DEPRECATE /D_WIN32_WINNT=0x0502 /W4 /D__TBBMALLOC_BUILD=1 /Itbb/src /Itbb/src/rml/include /Itbb/include /Itbb/src/tbbmalloc /Itbb/src/tbbmalloc</AdditionalOptions>
+      <AdditionalIncludeDirectories>tbb/build/vs2013;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <Link>
+      <AdditionalOptions>/nologo /DLL /MAP /DEBUG /fixed:no /INCREMENTAL:NO %(AdditionalOptions)</AdditionalOptions>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+    </Link>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>tbb\build\vs2013;</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectReference Include="tbbmalloc.vcxproj">
+      <Project>{b15f131e-328a-4d42-adc2-9ff4ca6306d8}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="tbb\src\tbbmalloc\proxy.h" />
+    <ClInclude Include="tbb\src\tbbmalloc\tbb_function_replacement.h" />
+    <ClInclude Include="tbb\include\tbb\tbbmalloc_proxy.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="tbb\src\tbbmalloc\tbbmalloc.rc">
+      <AdditionalOptions>/Itbb/src /Itbb/include /DDO_ITT_NOTIFY /DUSE_WINTHREAD /D_CRT_SECURE_NO_DEPRECATE /D_WIN32_WINNT=0x0400 %(AdditionalOptions)</AdditionalOptions>
+    </ResourceCompile>
+    <ClCompile Include="tbb\src\tbbmalloc\proxy.cpp" />
+    <ClCompile Include="tbb\src\tbbmalloc\tbb_function_replacement.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
+  </ImportGroup>
+</Project>
