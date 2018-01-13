@@ -171,13 +171,12 @@ IC s32 _max(s32 x, s32 y) { return x - ((x - y) & ((x - y) >> (sizeof(s32) * 8 -
 IC s64 _abs(s64 x) { return (x >= 0) ? x : s64(-x); }
 IC s64 _min(s64 x, s64 y) { return y + ((x - y) & ((x - y) >> (sizeof(s64) * 8 - 1))); };
 IC s64 _max(s64 x, s64 y) { return x - ((x - y) & ((x - y) >> (sizeof(s64) * 8 - 1))); };
-IC u32 xr_strlen(const char* S);
 
 // string management
 
 // return pointer to ".ext"
 IC char* strext(const char* S) { return (char*)strrchr(S, '.'); }
-IC u32 xr_strlen(const char* S) { return (u32)strlen(S); }
+IC size_t xr_strlen(const char* S) { return strlen(S); }
 IC char* xr_strupr(char* S) { return _strupr(S); }
 IC char* xr_strlwr(char* S) { return _strlwr(S); }
 #ifdef BREAK_AT_STRCMP

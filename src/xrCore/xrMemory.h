@@ -69,7 +69,7 @@ public:
     void mem_statistic(const char* fn);
 #endif // DEBUG_MEMORY_NAME
     void* mem_alloc(size_t size);
-    void* mem_realloc(void* p, size_t size);
+    void* mem_realloc(void* p, const size_t size);
     void mem_free(void* p);
 };
 
@@ -79,7 +79,7 @@ extern XRCORE_API xrMemory Memory;
 #undef CopyMemory
 #undef FillMemory
 #define ZeroMemory(a, b) memset(a, 0, b)
-#define CopyMemory(a, b, c) memcpy(a, b, c) //. CopyMemory(a,b,c)
+#define CopyMemory(a, b, c) memcpy(a, b, c)
 #define FillMemory(a, b, c) memset(a, c, b)
 
 // delete
@@ -91,24 +91,23 @@ extern XRCORE_API xrMemory Memory;
 
 // generic "C"-like allocations/deallocations
 template <class T>
-IC T* xr_alloc(size_t count)
+T* xr_alloc(const size_t count)
 { return (T*)Memory.mem_alloc(count * sizeof(T)); }
 
 
 template <class T>
-IC void xr_free(T*& P) throw()
+void xr_free(T*& P) throw()
 {
     if (P)
     {
         Memory.mem_free((void*)P);
         P = nullptr;
-    };
+    }
 }
+inline void* xr_malloc(const size_t size) { return Memory.mem_alloc(size); }
+inline void* xr_realloc(void* P, const size_t size) { return Memory.mem_realloc(P, size); }
 
-XRCORE_API void* xr_malloc(size_t size);
-XRCORE_API void* xr_realloc(void* P, size_t size);
-
-XRCORE_API char* xr_strdup(const char* string);
+XRCORE_API pstr xr_strdup(pcstr string);
 
 // Global new/delete override
 #ifndef NO_XRNEW
@@ -117,9 +116,9 @@ XRCORE_API char* xr_strdup(const char* string);
 #endif
 // XXX: Implementations of operator new/delete are in xrMisc/xrMemory.cpp, since they need
 // to be in a static link library.
-void* operator new(size_t size);
+void* operator new(const size_t size);
 void operator delete(void* p);
-void* operator new[](size_t size);
+void* operator new[](const size_t size);
 void operator delete[](void* p);
 #endif
 

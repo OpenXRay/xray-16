@@ -123,7 +123,7 @@ void xrMemory::mem_free(void* P)
 
 extern BOOL g_bDbgFillMemory;
 
-void* xrMemory::mem_realloc(void* P, size_t size)
+void* xrMemory::mem_realloc(void* P, const size_t size)
 {
     stat_calls++;
     if (g_use_pure_alloc)

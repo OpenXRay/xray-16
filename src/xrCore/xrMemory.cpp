@@ -256,10 +256,10 @@ void xrMemory::mem_statistic(const char* fn)
 #endif // DEBUG_MEMORY_MANAGER
 
 // xr_strdup
-char* xr_strdup(const char* string)
+pstr xr_strdup(pcstr string)
 {
     VERIFY(string);
-    u32 len = u32(xr_strlen(string)) + 1;
+    size_t len = xr_strlen(string) + 1;
     char* memory = (char*)Memory.mem_alloc(len);
     CopyMemory(memory, string, len);
     return memory;
@@ -273,6 +273,3 @@ XRCORE_API BOOL is_stack_ptr(void* _ptr)
     ptrdiff_t difference = (ptrdiff_t)_abs(s64(ptrdiff_t(ptr_local) - ptrdiff_t(ptr_refsound)));
     return (difference < (512 * 1024));
 }
-
-XRCORE_API void* xr_malloc(size_t size) { return Memory.mem_alloc(size); }
-XRCORE_API void* xr_realloc(void* P, size_t size) { return Memory.mem_realloc(P, size); }
