@@ -194,7 +194,6 @@
     </ClCompile>
     <ClCompile Include="Memory\doug_lea_allocator.cpp" />
     <ClCompile Include="memory_allocation_stats.cpp" />
-    <ClCompile Include="memory_monitor.cpp" />
     <ClCompile Include="memory_usage.cpp" />
     <ClCompile Include="Model.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -328,7 +327,6 @@
     <ClInclude Include="Memory\memory_allocator_options.h" />
     <ClInclude Include="Memory\xalloc.h" />
     <ClInclude Include="Memory\XRayAllocator.hpp" />
-    <ClInclude Include="memory_monitor.h" />
     <ClInclude Include="net_utils.h" />
     <ClInclude Include="os_clipboard.h" />
     <ClInclude Include="PostProcess\PostProcess.hpp" />

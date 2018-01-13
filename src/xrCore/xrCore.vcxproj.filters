@@ -109,9 +109,6 @@
     <Filter Include="Memory">
       <UniqueIdentifier>{0173b19d-898c-495c-8d22-2cc3d8436008}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Memory\memory_monitor">
-      <UniqueIdentifier>{6672355e-6ec8-4680-bf06-19c4aada83ec}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Memory\Memory manager">
       <UniqueIdentifier>{11d9158f-7330-4434-81b2-684eebee4c83}</UniqueIdentifier>
     </Filter>
@@ -227,9 +224,6 @@
     </ClCompile>
     <ClCompile Include="xrstring.cpp">
       <Filter>shared memory/string library</Filter>
-    </ClCompile>
-    <ClCompile Include="memory_monitor.cpp">
-      <Filter>Memory\memory_monitor</Filter>
     </ClCompile>
     <ClCompile Include="ppmd_compressor.cpp">
       <Filter>Compression\ppmd</Filter>
@@ -532,9 +526,6 @@
     </ClInclude>
     <ClInclude Include="intrusive_ptr.h">
       <Filter>intrusive_ptr</Filter>
-    </ClInclude>
-    <ClInclude Include="memory_monitor.h">
-      <Filter>Memory\memory_monitor</Filter>
     </ClInclude>
     <ClInclude Include="ppmd_compressor.h">
       <Filter>Compression\ppmd</Filter>
