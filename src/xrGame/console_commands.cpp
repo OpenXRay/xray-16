@@ -169,16 +169,7 @@ public:
     };
     virtual void Execute(LPCSTR args) { full_memory_stats(); }
 };
-#ifdef DEBUG
-class CCC_MemCheckpoint : public IConsole_Command
-{
-public:
-    CCC_MemCheckpoint(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = FALSE; };
-    virtual void Execute(LPCSTR args) { memory_monitor::make_checkpoint(args); }
-    virtual void Save(IWriter* F) {}
-};
 
-#endif // #ifdef DEBUG
 // console commands
 class CCC_GameDifficulty : public CCC_Token
 {
@@ -1740,9 +1731,6 @@ void CCC_RegisterCommands()
     g_OptConCom.Init();
 
     CMD1(CCC_MemStats, "stat_memory");
-#ifdef DEBUG
-    CMD1(CCC_MemCheckpoint, "stat_memory_checkpoint");
-#endif //#ifdef DEBUG
     // game
     CMD3(CCC_Mask, "g_crouch_toggle", &psActorFlags, AF_CROUCH_TOGGLE);
     CMD1(CCC_GameDifficulty, "g_game_difficulty");
@@ -1783,7 +1771,7 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "hud_crosshair", &psHUD_Flags, HUD_CROSSHAIR);
     CMD3(CCC_Mask, "hud_crosshair_dist", &psHUD_Flags, HUD_CROSSHAIR_DIST);
 
-#ifdef DEBUG
+#if !defined(MASTER_GOLD) || defined(DEBUG)
     CMD4(CCC_Float, "hud_fov", &psHUD_FOV, 0.1f, 1.0f);
     CMD4(CCC_Float, "fov", &g_fov, 5.0f, 180.0f);
 #endif // DEBUG
