@@ -120,7 +120,7 @@ void CScriptEngine::reinit()
     m_virtual_machine = luaL_newstate();
     if (!m_virtual_machine)
     {
-        Msg("! ERROR : Cannot initialize script virtual machine!");
+        Log("! ERROR : Cannot initialize script virtual machine!");
         return;
     }
     RegisterState(m_virtual_machine, this);
@@ -134,9 +134,8 @@ void CScriptEngine::reinit()
 
 int CScriptEngine::vscript_log(LuaMessageType luaMessageType, LPCSTR caFormat, va_list marker)
 {
-#ifdef DEBUG
-    if (!g_LuaDebug.test(1) && luaMessageType != LuaMessageType::Error)
-        return 0;
+    //if (!g_LuaDebug.test(1) && luaMessageType != LuaMessageType::Error)
+    //    return 0;
     LPCSTR S = "", SS = "";
     LPSTR S1;
     string4096 S2;
@@ -186,17 +185,19 @@ int CScriptEngine::vscript_log(LuaMessageType luaMessageType, LPCSTR caFormat, v
     xr_strcat(S2, "\r\n");
     m_output.w(S2, xr_strlen(S2));
     return l_iResult;
-#else
-    return 0;
-#endif
 }
 
-void CScriptEngine::print_stack()
+void CScriptEngine::print_stack(lua_State* L)
 {
-    if (!m_stack_is_ready)
+    if (!m_stack_is_ready || logReenterability)
         return;
+
+    logReenterability = true;
     m_stack_is_ready = false;
-    lua_State* L = lua();
+
+    if (L == nullptr)
+        L = lua();
+
     lua_Debug l_tDebugInfo;
     for (int i = 0; lua_getstack(L, i, &l_tDebugInfo); i++)
     {
@@ -213,7 +214,102 @@ void CScriptEngine::print_stack()
             script_log(LuaMessageType::Error, "%2d : [%s] %s(%d) : %s", i, l_tDebugInfo.what, l_tDebugInfo.short_src,
             l_tDebugInfo.currentline, l_tDebugInfo.name);
         }
+        // Giperion: verbose log
+        Msg("\tLocals: ");
+        pcstr name = nullptr;
+        int VarID = 1;
+        while ((name = lua_getlocal(L, &l_tDebugInfo, VarID++)) != nullptr)
+        {
+            LogVariable(L, name, 1, true);
+
+            lua_pop(L, 1);  /* remove variable value */
+        }
+        Msg("\tEnd");
+        // -Giperion
     }
+
+    m_stack_is_ready = true;
+    logReenterability = false;
+}
+
+void CScriptEngine::LogTable(lua_State* luaState, pcstr S, int level)
+{
+    if (!lua_istable(luaState, -1))
+        return;
+
+    lua_pushnil(luaState); /* first key */
+    while (lua_next(luaState, -2) != 0)
+    {
+        char sname[256];
+        char sFullName[256];
+        xr_sprintf(sname, "%s", lua_tostring(luaState, -2));
+        xr_sprintf(sFullName, "%s.%s", S, sname);
+        LogVariable(luaState, sFullName, level + 1, false);
+
+        lua_pop(luaState, 1); /* removes `value'; keeps `key' for next iteration */
+    }
+}
+
+void CScriptEngine::LogVariable(lua_State* luaState, pcstr name, int level, bool bOpenTable)
+{
+    const int ntype = lua_type(luaState, -1);
+    const pcstr type = lua_typename(luaState, ntype);
+
+    char tabBuffer[32] = {0};
+    memset(tabBuffer, '\t', level);
+
+    char value[128];
+
+    switch (ntype)
+    {
+    case LUA_TNUMBER:
+        xr_sprintf(value, "%f", lua_tonumber(luaState, -1));
+        break;
+
+    case LUA_TBOOLEAN:
+        xr_sprintf(value, "%s", lua_toboolean(luaState, -1) ? "true" : "false");
+        break;
+
+    case LUA_TSTRING:
+        xr_sprintf(value, "%.127s", lua_tostring(luaState, -1));
+        break;
+
+    case LUA_TTABLE:
+    {
+        if (bOpenTable)
+        {
+            Msg("%s Table: %s", tabBuffer, name);
+            LogTable(luaState, name, level + 1);
+            return;
+        }
+        xr_sprintf(value, "[...]");
+    }
+        break;
+
+    case LUA_TUSERDATA:
+    {
+        /*luabind::detail::object_rep* obj = static_cast<luabind::detail::object_rep*>(lua_touserdata(luaState, -1));
+        luabind::detail::lua_reference& r = obj->get_lua_table(); // XXX: No such method
+        if (r.is_valid())
+        {
+            r.get(luaState);
+            Msg("%s Userdata: %s", tabBuffer, name);
+            LogTable(luaState, name, level + 1);
+            lua_pop(luaState, 1); //Remove userobject
+            return;
+        }*/
+        Msg("%s TODO: Fix userdata retrieval", tabBuffer);
+        xr_strcpy(value, "[not available]");
+    }
+        break;
+
+    default:
+        xr_strcpy(value, "[not available]");
+        break;
+    }
+
+
+    Msg("%s %s %s : %s", tabBuffer, type, name, value);
 }
 
 int CScriptEngine::script_log(LuaMessageType message, LPCSTR caFormat, ...)
@@ -222,14 +318,10 @@ int CScriptEngine::script_log(LuaMessageType message, LPCSTR caFormat, ...)
     va_start(marker, caFormat);
     int result = vscript_log(message, caFormat, marker);
     va_end(marker);
-#ifdef DEBUG
-    if (message == LuaMessageType::Error && !logReenterability)
-    {
-        logReenterability = true;
+
+    if (message == LuaMessageType::Error)
         print_stack();
-        logReenterability = false;
-    }
-#endif
+
     return result;
 }
 
@@ -290,9 +382,7 @@ lua_State* L, LPCSTR caBuffer, size_t tSize, LPCSTR caScriptName, LPCSTR caNameS
         l_iErrorCode = luaL_loadbuffer(L, caBuffer, tSize, caScriptName);
     if (l_iErrorCode)
     {
-#ifdef DEBUG
         print_output(L, caScriptName, l_iErrorCode);
-#endif
         on_error(L);
         return false;
     }
@@ -345,9 +435,7 @@ bool CScriptEngine::do_file(LPCSTR caScriptName, LPCSTR caNameSpaceName)
 #endif
     if (l_iErrorCode)
     {
-#ifdef DEBUG
         print_output(lua(), caScriptName, l_iErrorCode);
-#endif
         on_error(lua());
         lua_settop(lua(), start);
         return false;
@@ -478,20 +566,18 @@ luabind::object CScriptEngine::name_space(LPCSTR namespace_name)
 
 struct raii_guard : private Noncopyable
 {
-    CScriptEngine* scriptEngine;
+    CScriptEngine* m_script_engine;
     int m_error_code;
     const char*& m_error_description;
 
     raii_guard(CScriptEngine* scriptEngine, int error_code, const char*& error_description)
-        : m_error_code(error_code), m_error_description(error_description)
-    {
-        this->scriptEngine = scriptEngine;
-    }
+        : m_script_engine(scriptEngine), m_error_code(error_code), m_error_description(error_description)
+    {}
 
     ~raii_guard()
     {
 #ifdef DEBUG
-        bool lua_studio_connected = !!scriptEngine->debugger();
+        const bool lua_studio_connected = !!m_script_engine->debugger();
         if (!lua_studio_connected)
 #endif
         {
@@ -519,8 +605,9 @@ bool CScriptEngine::print_output(lua_State* L, LPCSTR caScriptFileName, int erro
     VERIFY(scriptEngine);
     if (errorCode)
         print_error(L, errorCode);
-    LPCSTR S = "see call_stack for details!";
-    raii_guard guard(scriptEngine, errorCode, S);
+    scriptEngine->print_stack(L);
+    pcstr S = "see call_stack for details!";
+    raii_guard guard(scriptEngine, errorCode, caErrorText ? caErrorText : S);
     if (!lua_isstring(L, -1))
         return false;
     S = lua_tostring(L, -1);
@@ -690,9 +777,7 @@ CScriptEngine::CScriptEngine(bool is_editor)
     luabind::allocator = &luabind_allocator;
     luabind::allocator_context = nullptr;
     m_current_thread = nullptr;
-#ifdef DEBUG
     m_stack_is_ready = false;
-#endif
     m_virtual_machine = nullptr;
     m_stack_level = 0;
     m_reload_modules = false;
@@ -740,16 +825,17 @@ void CScriptEngine::unload()
 
 int CScriptEngine::lua_panic(lua_State* L)
 {
-    print_output(L, "PANIC", LUA_ERRRUN);
+    print_output(L, "", LUA_ERRRUN, "PANIC");
     return 0;
 }
 
 void CScriptEngine::lua_error(lua_State* L)
 {
-    print_output(L, "", LUA_ERRRUN);
+    pcstr err = lua_tostring(L, -1);
+    print_output(L, "", LUA_ERRRUN, err);
     on_error(L);
 #if !XRAY_EXCEPTIONS
-    xrDebug::Fatal(DEBUG_INFO, "LUA error: %s", lua_tostring(L, -1));
+    xrDebug::Fatal(DEBUG_INFO, "LUA error: %s", err);
 #else
     throw lua_tostring(L, -1);
 #endif
@@ -779,8 +865,9 @@ int CScriptEngine::lua_pcall_failed(lua_State* L)
 #if !XRAY_EXCEPTIONS
 void CScriptEngine::lua_cast_failed(lua_State* L, const luabind::type_id& info)
 {
-    print_output(L, "", LUA_ERRRUN);
-    xrDebug::Fatal(DEBUG_INFO, "LUA error: cannot cast lua value to %s", info.name());
+    string128 buf;
+    xr_sprintf(buf, "LUA error: cannot cast lua value to %s", info.name());
+    print_output(L, "", LUA_ERRRUN,buf);
 }
 #endif
 
@@ -901,7 +988,7 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
     luajit::open_lib(lua(), LUA_STRLIBNAME, luaopen_string);
     luajit::open_lib(lua(), LUA_BITLIBNAME, luaopen_bit);
     luajit::open_lib(lua(), LUA_FFILIBNAME, luaopen_ffi);
-#ifdef DEBUG
+#if 1//def DEBUG
     luajit::open_lib(lua(), LUA_DBLIBNAME, luaopen_debug);
 #endif
     // XXX nitrocaster: with vanilla scripts, '-nojit' option requires script profiler to be disabled. The reason
@@ -928,9 +1015,8 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
     }
 #endif
     setup_auto_load();
-#ifdef DEBUG
     m_stack_is_ready = true;
-#endif
+
 #if defined(DEBUG) && !defined(USE_LUA_STUDIO)
 #if defined(USE_DEBUGGER)
     if (!debugger() || !debugger()->Active())

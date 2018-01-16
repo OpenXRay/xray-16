@@ -26,13 +26,8 @@ void LuaLog(pcstr caMessage)
 
 void ErrorLog(pcstr caMessage)
 {
-    if (!GEnv.ScriptEngine->m_stack_is_ready)
-        Msg("LUA Error: %s", caMessage); // Xottab_DUTY: temporary workaround to get lua error output
-
     GEnv.ScriptEngine->error_log("%s", caMessage);
-#ifdef DEBUG
     GEnv.ScriptEngine->print_stack();
-#endif
 #if defined(USE_DEBUGGER) && !defined(USE_LUA_STUDIO)
     if (GEnv.ScriptEngine->debugger())
         GEnv.ScriptEngine->debugger()->Write(caMessage);

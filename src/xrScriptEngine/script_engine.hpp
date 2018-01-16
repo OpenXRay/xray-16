@@ -146,7 +146,10 @@ public:
     static void on_error(lua_State* state);
 
     void flush_log();
-    void print_stack();
+    void print_stack(lua_State* L = nullptr);
+
+    void LogTable(lua_State* l, pcstr S, int level);
+    void LogVariable(lua_State* l, pcstr name, int level, bool bOpenTable);
 
     using ExporterFunc = XRay::ScriptExporter::Node::ExporterFunc;
     CScriptEngine(bool is_editor = false);
