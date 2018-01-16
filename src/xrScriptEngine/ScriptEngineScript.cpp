@@ -143,19 +143,32 @@ inline profile_timer_script operator+(const profile_timer_script& portion0, cons
 }
 
 std::ostream& operator<<(std::ostream& os, const profile_timer_script& pt) { return os << pt.time(); }
-SCRIPT_EXPORT(CScriptEngine, (), {
+SCRIPT_EXPORT(CScriptEngine, (),
+{
     using namespace luabind;
-    module(luaState)[class_<profile_timer_script>("profile_timer")
-                         .def(constructor<>())
-                         .def(constructor<profile_timer_script&>())
-                         .def(const_self + profile_timer_script())
-                         .def(const_self < profile_timer_script())
-                         .def(tostring(self))
-                         .def("start", &profile_timer_script::start)
-                         .def("stop", &profile_timer_script::stop)
-                         .def("time", &profile_timer_script::time),
-        def("log", &LuaLog), def("error_log", &ErrorLog), def("flush", &FlushLogs), def("print_stack", &PrintStack),
-        def("prefetch", &prefetch_module), def("verify_if_thread_is_running", &verify_if_thread_is_running),
-        def("bit_and", &bit_and), def("bit_or", &bit_or), def("bit_xor", &bit_xor), def("bit_not", &bit_not),
-        def("editor", &is_editor), def("user_name", &user_name)];
+    module(luaState)
+    [
+        class_<profile_timer_script>("profile_timer")
+            .def(constructor<>())
+            .def(constructor<profile_timer_script&>())
+            .def(const_self + profile_timer_script())
+            .def(const_self < profile_timer_script())
+            .def(tostring(self))
+            .def("start", &profile_timer_script::start)
+            .def("stop", &profile_timer_script::stop)
+            .def("time", &profile_timer_script::time),
+
+        def("log", &LuaLog),
+        def("error_log", &ErrorLog),
+        def("flush", &FlushLogs),
+        def("print_stack", &PrintStack),
+        def("prefetch", &prefetch_module),
+        def("verify_if_thread_is_running", &verify_if_thread_is_running),
+        def("bit_and", &bit_and),
+        def("bit_or", &bit_or),
+        def("bit_xor", &bit_xor),
+        def("bit_not", &bit_not),
+        def("editor", &is_editor),
+        def("user_name", &user_name)
+    ];
 });
