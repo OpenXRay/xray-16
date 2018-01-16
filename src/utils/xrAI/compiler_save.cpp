@@ -105,17 +105,17 @@ public:
 
 void xrSaveNodes(LPCSTR name, LPCSTR out_name)
 {
-    Msg("NS: %d, CNS: %d, ratio: %f%%", sizeof(vertex), sizeof(CLevelGraph::CVertex),
-        100 * float(sizeof(CLevelGraph::CVertex)) / float(sizeof(vertex)));
+    Logger.Status("Saving nodes...");
 
-    Msg("Renumbering nodes...");
+    Logger.clMsg("NS: %d, CNS: %d, ratio: %f%%", sizeof(vertex), sizeof(CLevelGraph::CVertex),
+        100 * float(sizeof(CLevelGraph::CVertex)) / float(sizeof(vertex)));
 
     string_path fName;
     strconcat(sizeof(fName), fName, name, out_name);
     IWriter* fs = FS.w_open(fName);
 
     // Header
-    Logger.Status("Saving header...");
+    Logger.clMsg("Saving header...");
     hdrNODES H;
     H.version = XRAI_CURRENT_VERSION;
     H.count = g_nodes.size();
@@ -124,7 +124,7 @@ void xrSaveNodes(LPCSTR name, LPCSTR out_name)
     H.guid = generate_guid();
     fs->w(&H, sizeof(H));
     // All nodes
-    Logger.Status("Saving nodes...");
+    Logger.clMsg("Compressing nodes...");
     for (auto &i : g_nodes)
     {
         NodeCompressed NC;
@@ -134,14 +134,16 @@ void xrSaveNodes(LPCSTR name, LPCSTR out_name)
 
     xr_vector<u32> sorted;
     xr_vector<u32> renumbering;
+    Logger.clMsg("Renumbering nodes...");
     CNodeRenumberer A(compressed_nodes, sorted, renumbering);
 
+    Logger.clMsg("Saving nodes...");
     for (auto &i : compressed_nodes)
         fs->w(&i, sizeof(NodeCompressed));
 
     // Stats
     u32 SizeTotal = fs->tell();
-    Msg("%dK saved", SizeTotal / 1024);
+    Logger.clMsg("%dK saved", SizeTotal / 1024);
 
     FS.w_close(fs);
 }
