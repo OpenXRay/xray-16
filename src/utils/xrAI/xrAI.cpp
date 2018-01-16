@@ -47,7 +47,7 @@ static const char* h_str =
 void Help() { MessageBox(0, h_str, "Command line options", MB_OK | MB_ICONINFORMATION); }
 string_path INI_FILE;
 
-extern LPCSTR GAME_CONFIG;
+LPCSTR GAME_CONFIG = "game.ltx";
 
 extern void clear_temp_folder();
 

@@ -2,8 +2,7 @@
 #include "compiler.h"
 
 // TODO: Do we really need this?
-Lights g_lights;
-Fbox LevelBB;
+//Lights g_lights;
 
 IC const Fvector vertex_position(const CLevelGraph::CPosition& Psrc, const Fbox& bb, const SAIParams& params)
 {
@@ -83,7 +82,6 @@ void xrLoad(LPCSTR name, bool draft_mode)
             R_ASSERT(fs->find_chunk(1));
             fs->r(&*g_rc_faces.begin(), g_rc_faces.size() * sizeof(b_rc_face));
 
-            LevelBB.set(H.aabb);
             FS.r_close(fs);
         }
 
@@ -104,7 +102,7 @@ void xrLoad(LPCSTR name, bool draft_mode)
 
             // Load level data
             transfer("materials", g_materials, *fs, EB_Materials);
-            transfer("shaders_xrlc", g_shader_compile, *fs, EB_Shaders_Compile);
+            //transfer("shaders_xrlc", g_shader_compile, *fs, EB_Shaders_Compile);
 
             // process textures
             Logger.Status("Processing textures...");
@@ -181,7 +179,7 @@ void xrLoad(LPCSTR name, bool draft_mode)
         }
     }
     // Load lights
-    {
+    /*{
         strconcat(sizeof(file_name), file_name, name, "build.prj");
         IReader* F = FS.r_open(file_name);
         R_ASSERT2(F, "There is no file 'build.prj'!");
@@ -239,7 +237,7 @@ void xrLoad(LPCSTR name, bool draft_mode)
             }
             F->close();
         }
-    }
+    }*/
     // Load initial map from the Level Editor
     {
         strconcat(sizeof(file_name), file_name, name, "build.aimap");
@@ -248,6 +246,8 @@ void xrLoad(LPCSTR name, bool draft_mode)
 
         R_ASSERT(F->open_chunk(E_AIMAP_CHUNK_VERSION));
         R_ASSERT(F->r_u16() == E_AIMAP_VERSION);
+
+        Fbox LevelBB;
 
         R_ASSERT(F->open_chunk(E_AIMAP_CHUNK_BOX));
         F->r(&LevelBB, sizeof(LevelBB));

@@ -9,8 +9,8 @@
 
 Shader_xrLC_LIB* g_shaders_xrlc;
 xr_vector<b_material> g_materials;
-xr_vector<b_shader> g_shader_render;
-xr_vector<b_shader> g_shader_compile;
+//xr_vector<b_shader> g_shader_render;
+//xr_vector<b_shader> g_shader_compile;
 xr_vector<b_BuildTexture> g_textures;
 xr_vector<b_rc_face> g_rc_faces;
 
@@ -40,7 +40,7 @@ IC float getLastRP_Scale(CDB::COLLIDER* DB, RayCache& C)
             b_rc_face& F = g_rc_faces[rpinf.id];
 
             if (F.dwMaterial >= g_materials.size())
-                Msg("[%d] -> [%d]", F.dwMaterial, g_materials.size());
+                Logger.clMsg("[%d] -> [%d]", F.dwMaterial, g_materials.size());
             b_material& M = g_materials[F.dwMaterial];
             b_texture& T = g_textures[M.surfidx];
             Shader_xrLCVec& LIB = g_shaders_xrlc->Library();
@@ -89,7 +89,7 @@ IC float getLastRP_Scale(CDB::COLLIDER* DB, RayCache& C)
     }
     //	X_CATCH
     //	{
-    //		clMsg("* ERROR: getLastRP_Scale");
+    //		Logger.clMsg("* ERROR: getLastRP_Scale");
     //	}
 
     return scale;
@@ -587,7 +587,7 @@ void xrCover(bool pure_covers)
         Threads.start(
             new CoverThread(thID, thID * stride, thID * stride + ((thID == (NUM_THREADS - 1)) ? last : stride)));
     Threads.wait();
-    Msg("%d seconds elapsed.", (timeGetTime() - start_time) / 1000);
+    Logger.clMsg("%d seconds elapsed.", (timeGetTime() - start_time) / 1000);
 
     if (!pure_covers)
     {
