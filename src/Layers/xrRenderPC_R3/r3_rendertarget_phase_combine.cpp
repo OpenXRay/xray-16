@@ -343,6 +343,14 @@ void CRenderTarget::phase_combine()
        }
        */
 
+    //FXAA
+    if (ps_r3_fxaa)
+    {
+        PIX_EVENT(FXAA);
+        phase_fxaa();
+        RCache.set_Stencil(FALSE);
+    }
+
     // PP enabled ?
     //	Render to RT texture to be able to copy RT even in windowed mode.
     BOOL PP_Complex = u_need_PP() | (BOOL)RImplementation.m_bMakeAsyncSS;
@@ -472,7 +480,9 @@ void CRenderTarget::phase_combine()
     RCache.set_Stencil(FALSE);
 
     //	if FP16-BLEND !not! supported - draw flares here, overwise they are already in the bloom target
-    /* if (!RImplementation.o.fp16_blend)*/ g_pGamePersistent->Environment().RenderFlares(); // lens-flares
+    /* if (!RImplementation.o.fp16_blend)*/
+    PIX_EVENT(LENS_FLARES);
+    g_pGamePersistent->Environment().RenderFlares(); // lens-flares
 
     //	PP-if required
     if (PP_Complex)

@@ -702,6 +702,9 @@
     <ClInclude Include="..\xrRender\D3DXRenderBase.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="blender_fxaa.h">
+      <Filter>Shading templates</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1276,6 +1279,12 @@
     </ClCompile>
     <ClCompile Include="r3_R_sun.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="blender_fxaa.cpp">
+      <Filter>Shading templates</Filter>
+    </ClCompile>
+    <ClCompile Include="r3_rendertarget_phase_FXAA.cpp">
+      <Filter>Core_Target</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -48,6 +48,8 @@ public:
     IBlender* b_accum_reflected_msaa[8];
     IBlender* b_ssao;
     IBlender* b_ssao_msaa[8];
+    IBlender* b_fxaa;
+
 #ifdef DEBUG
     struct dbg_line_t
     {
@@ -118,6 +120,10 @@ private:
     ref_rt rt_half_depth;
     ref_shader s_ssao;
     ref_shader s_ssao_msaa[8];
+
+    //FXAA
+    ref_shader s_fxaa;
+    ref_geom g_fxaa;
 
     // Accum
     ref_shader s_accum_mask;
@@ -252,6 +258,7 @@ public:
     void phase_scene_end();
     void phase_occq();
     void phase_ssao();
+    void phase_fxaa();
     void phase_downsamp();
     void phase_wallmarks();
     void phase_smap_direct(light* L, u32 sub_phase);
