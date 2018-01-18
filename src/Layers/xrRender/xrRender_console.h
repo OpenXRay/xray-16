@@ -24,7 +24,7 @@ extern ECORE_API xr_token qmsaa__atest_token[];
 extern ECORE_API u32 ps_r3_minmax_sm; //	=	0;
 extern ECORE_API xr_token qminmax_sm_token[];
 
-extern ECORE_API int ps_r3_fxaa;
+extern ECORE_API int ps_r2_fxaa;
 
 extern ENGINE_API int ps_r__Supersample;
 extern ECORE_API int ps_r__LightSleepFrames;

@@ -11,6 +11,7 @@
 #include "blender_bloom_build.h"
 #include "blender_luminance.h"
 #include "blender_ssao.h"
+#include "blender_fxaa.h"
 
 void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, IDirect3DSurface9* zb)
 {
@@ -219,6 +220,9 @@ CRenderTarget::CRenderTarget()
     b_luminance = new CBlender_luminance();
     b_combine = new CBlender_combine();
 
+    //FXAA
+    b_fxaa = new CBlender_FXAA();
+
     //  NORMAL
     {
         u32 w = Device.dwWidth, h = Device.dwHeight;
@@ -369,6 +373,10 @@ CRenderTarget::CRenderTarget()
         rt_half_depth.create(r2_RT_half_depth, w, h, fmt);
         s_ssao.create(b_ssao, "r2\\ssao");
     }
+
+    //FXAA
+    s_fxaa.create(b_fxaa, "r3\\fxaa");
+    g_fxaa.create(FVF::F_V, RCache.Vertex.Buffer(), RCache.QuadIB);
 
     // SSAO
     if (RImplementation.o.ssao_blur_on)
@@ -660,6 +668,7 @@ CRenderTarget::~CRenderTarget()
     xr_delete(b_luminance);
     xr_delete(b_bloom);
     xr_delete(b_ssao);
+    xr_delete(b_fxaa); //FXAA
     xr_delete(b_accum_reflected);
     xr_delete(b_accum_spot);
     xr_delete(b_accum_point);

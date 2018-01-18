@@ -11,6 +11,7 @@
 #include <d3dx9.h>
 
 #include "Layers/xrRender/xrD3DDefs.h"
+#include "Layers/xrRender/Debug/dxPixEventWrapper.h"
 #include "Layers/xrRender/HW.h"
 #include "Layers/xrRender/Shader.h"
 #include "Layers/xrRender/R_Backend.h"
