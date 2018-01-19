@@ -310,6 +310,7 @@ void CWallmarksEngine::AddSkeletonWallmark(
     if (0 == g_r || ::RImplementation.phase != CRender::PHASE_NORMAL)
         return;
     // optimization cheat: don't allow wallmarks more than 50 m from viewer/actor
+    // XXX: Make console command for this
     if (xf->c.distance_to_sqr(Device.vCameraPosition) > _sqr(50.f))
         return;
 
