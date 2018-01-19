@@ -528,7 +528,7 @@ void CGamePersistent::OnFrame()
 {
     if (Device.dwPrecacheFrame == 5 && m_intro_event.empty())
     {
-        SetLoadStageTitle("");
+        SetLoadStageTitle();
         m_intro_event.bind(this, &CGamePersistent::game_loaded);
     }
 
@@ -840,10 +840,14 @@ void CGamePersistent::LoadTitle(bool change_tip, shared_str map_name)
 
 void CGamePersistent::SetLoadStageTitle(pcstr ls_title)
 {
-    string512 buff;
-    constexpr pcstr dots = "..."; // if title is empty don't insert dots
-    sprintf_s(buff, "%s%s", CStringTable().translate(ls_title).c_str(), ls_title ? dots : "");
-    pApp->SetLoadStageTitle(buff);
+    string256 buff;
+    if (ls_title)
+    {
+        xr_sprintf(buff, "%s%s", CStringTable().translate(ls_title).c_str(), "...");
+        pApp->SetLoadStageTitle(buff);
+    }
+    else
+        pApp->SetLoadStageTitle("");
 }
 
 bool CGamePersistent::CanBePaused() { return IsGameTypeSingle() || (g_pGameLevel && Level().IsDemoPlay()); }

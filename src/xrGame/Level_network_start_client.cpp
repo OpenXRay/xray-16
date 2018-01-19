@@ -37,8 +37,8 @@ bool CLevel::net_start_client1()
                CStringTable().translate("st_client_connecting_to").c_str(),
                name_of_server);
 
-    g_pGamePersistent->SetLoadStageTitle(temp);
-    g_pGamePersistent->LoadTitle();
+    pApp->SetLoadStageTitle(temp);
+    pApp->LoadStage();
     return true;
 }
 
