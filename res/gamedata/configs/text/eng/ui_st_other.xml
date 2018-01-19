@@ -60,6 +60,18 @@
 	<string id="st_loading_textures">
 		<text>Loading textures</text>
 	</string>
+	<string id="st_loading_lights">
+		<text>Loading lights</text>
+	</string>
+	<string id="st_client_connecting_to">
+		<text>CLIENT: Connecting to</text>
+	</string>
+	<string id="st_client_spawning">
+		<text>CLIENT: Spawning</text>
+	</string>
+	<string id="st_client_synchronising">
+		<text>CLIENT: Synchronizing</text>
+	</string>
 	<string id="st_mp_direct_ip">
 		<text>Direct IP</text>
 	</string>
