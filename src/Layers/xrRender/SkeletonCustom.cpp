@@ -726,7 +726,6 @@ void CKinematics::AddWallmark(
     wallmarks.push_back(wm);
 }
 
-static const float LIFE_TIME = 30.f;
 struct zero_wm_pred : public std::unary_function<intrusive_ptr<CSkeletonWallmark>, bool>
 {
     bool operator()(const intrusive_ptr<CSkeletonWallmark> x) { return x == nullptr; }
@@ -741,7 +740,7 @@ void CKinematics::CalculateWallmarks()
         for (auto it = wallmarks.begin(); it != wallmarks.end(); it++)
         {
             intrusive_ptr<CSkeletonWallmark>& wm = *it;
-            float w = (RDEVICE.fTimeGlobal - wm->TimeStart()) / LIFE_TIME;
+            float w = (RDEVICE.fTimeGlobal - wm->TimeStart()) / ps_r__WallmarkTTL;
             if (w < 1.f)
             {
                 // append wm to WallmarkEngine
@@ -777,7 +776,7 @@ void CKinematics::RenderWallmark(intrusive_ptr<CSkeletonWallmark> wm, FVF::LIT*&
     for (u32 f_idx = 0; f_idx < wm->m_Faces.size(); f_idx++)
     {
         CSkeletonWallmark::WMFace F = wm->m_Faces[f_idx];
-        float w = (RDEVICE.fTimeGlobal - wm->TimeStart()) / LIFE_TIME;
+        float w = (RDEVICE.fTimeGlobal - wm->TimeStart()) / ps_r__WallmarkTTL;
         for (u32 k = 0; k < 3; k++)
         {
             Fvector P;

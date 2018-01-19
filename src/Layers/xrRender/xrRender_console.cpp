@@ -677,7 +677,7 @@ void xrRender_initconsole()
     CMD4(CCC_Float, "r__wallmark_shift_v", &ps_r__WallmarkSHIFT_V, 0.0f, 1.f);
     CMD1(CCC_ModelPoolStat, "stat_models");
 #endif // DEBUG
-    CMD4(CCC_Float, "r__wallmark_ttl", &ps_r__WallmarkTTL, 1.0f, 5.f * 60.f);
+    CMD4(CCC_Float, "r__wallmark_ttl", &ps_r__WallmarkTTL, 1.0f, 10.f * 60.f);
 
     CMD4(CCC_Integer, "r__supersample", &ps_r__Supersample, 1, 8);
 
