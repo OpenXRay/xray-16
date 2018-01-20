@@ -1,0 +1,14 @@
+-- called from engine!
+function CALifeStorageManager_before_save(fname)
+
+end 
+
+-- called from engine!
+function CALifeStorageManager_save(fname)
+
+end 
+
+-- called from engine
+function CALifeStorageManager_load(fname)
+
+end
