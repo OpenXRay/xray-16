@@ -30,7 +30,7 @@
 	url = https://github.com/OpenXRay/libjpeg.git
 [submodule "Externals/BugTrap"]
 	path = Externals/BugTrap
-	url = https://github.com/OpenXRay/BugTrap.git
+	url = https://github.com/Xottab-DUTY/BugTrap.git
 [submodule "Externals/FreeImage"]
 	path = Externals/FreeImage
 	url = https://github.com/OpenXRay/ext-win-freeimage.git
