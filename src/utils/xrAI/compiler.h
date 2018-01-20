@@ -45,13 +45,13 @@ struct vertex // definition of "patch" or "node"
     u32 nBack() { return n4; }
 };
 
-using DWORDs = xr_vector<u32>;
+//using DWORDs = xr_vector<u32>;
 
-#define LT_DIRECT 0
-#define LT_POINT 1
-#define LT_SECONDARY 2
+//#define LT_DIRECT 0
+//#define LT_POINT 1
+//#define LT_SECONDARY 2
 
-struct R_Light
+/*struct R_Light
 {
     u32 type; // Type of light source
     float amount; // Diffuse color of light
@@ -64,7 +64,7 @@ struct R_Light
     float attenuation2; // Quadratic attenuation
 
     Fvector tri[3]; // Cached triangle for ray-testing
-};
+};*/
 
 struct SCover
 {
@@ -74,7 +74,7 @@ struct SCover
 using Nodes = xr_vector<vertex>;
 using Vectors = xr_vector<Fvector>;
 using Marks = xr_vector<BYTE>;
-using Lights = xr_vector<R_Light>;
+//using Lights = xr_vector<R_Light>;
 
 // data
 extern CDB::MODEL Level;
