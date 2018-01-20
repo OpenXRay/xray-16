@@ -334,6 +334,13 @@ void WINAPI xrDebug::PreErrorHandler(INT_PTR)
     BT_AddLogFile(temp);
     if (*BugReportFile)
         BT_AddLogFile(BugReportFile);
+
+    string_path dumpPath;
+    if (FS.path_exist("$app_data_root$"))
+        FS.update_path(dumpPath, "$app_data_root$", dumpPath);
+    xr_strcat(dumpPath, "reports");
+
+    BT_SetReportFilePath(dumpPath);
     BT_SaveSnapshot(nullptr);
 }
 
