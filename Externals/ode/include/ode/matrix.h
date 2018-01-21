@@ -25,7 +25,7 @@
 #ifndef _ODE_MATRIX_H_
 #define _ODE_MATRIX_H_
 
-#include "common.h"
+#include <ode/common.h>
 
 
 #ifdef __cplusplus

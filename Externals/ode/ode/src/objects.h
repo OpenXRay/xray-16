@@ -26,9 +26,9 @@
 #ifndef _ODE_OBJECT_H_
 #define _ODE_OBJECT_H_
 
-#include "../../include/ode/common.h"
-#include "../../include/ode/memory.h"
-#include "../../include/ode/mass.h"
+#include <ode/common.h>
+#include <ode/memory.h>
+#include <ode/mass.h>
 #include "array.h"
 
 
@@ -76,7 +76,7 @@ struct dxAutoDisable {
 // quick-step parameters
 struct dxQuickStepParameters {
   int num_iterations;		// number of SOR iterations to perform
-  dReal w;				// the SOR over-relaxation parameter
+  dReal w;			// the SOR over-relaxation parameter
 };
 
 
@@ -98,7 +98,7 @@ struct dxBody : public dObject {
   dQuaternion q;		// orientation quaternion
   dMatrix3 R;			// rotation matrix, always corresponds to q
   dVector3 lvel,avel;		// linear and angular velocity of POR
-  dVector3 facc,tacc;		// force and torque accululators
+  dVector3 facc,tacc;		// force and torque accumulators
   dVector3 finite_rot_axis;	// finite rotation axis, unit length or 0=none
 
   // auto-disable information

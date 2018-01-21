@@ -23,9 +23,9 @@
 #ifndef _ODE_OBJECTS_H_
 #define _ODE_OBJECTS_H_
 
-#include "common.h"
-#include "mass.h"
-#include "contact.h"
+#include <ode/common.h>
+#include <ode/mass.h>
+#include <ode/contact.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -94,12 +94,12 @@ void  dBodySetAutoDisableDefaults (dBodyID);
 
 /* bodies */
 
-dBodyID dBodyCreate		(dWorldID);
-void dBodyDestroy		(dBodyID);
-void dWorldAddBody		(dWorldID,dBodyID);
-void dWorldAddJoint		(dWorldID,dJointID);
-void dWorldRemoveBody	(dWorldID,dBodyID);
-void dWorldRemoveJoint	(dWorldID,dJointID);
+dBodyID dBodyCreate (dWorldID);
+void dBodyDestroy (dBodyID);
+void dWorldAddBody     (dWorldID,dBodyID);
+void dWorldAddJoint    (dWorldID,dJointID);
+void dWorldRemoveBody  (dWorldID,dBodyID);
+void dWorldRemoveJoint (dWorldID,dJointID);
 
 void  dBodySetData (dBodyID, void *data);
 void *dBodyGetData (dBodyID);
@@ -213,7 +213,7 @@ void dJointSetUniversalAxis2 (dJointID, dReal x, dReal y, dReal z);
 void dJointSetUniversalParam (dJointID, int parameter, dReal value);
 void dJointAddUniversalTorques(dJointID joint, dReal torque1, dReal torque2);
 void dJointSetFixed (dJointID);
-void dJointSetFixedQuaternionPos (dJointID joint,dQuaternion quaternion,dReal* pos);
+void dJointSetFixedQuaternionPos (dJointID joint, dQuaternion quaternion, dReal* pos);
 void dJointSetAMotorNumAxes (dJointID, int num);
 void dJointSetAMotorAxis (dJointID, int anum, int rel,
 			  dReal x, dReal y, dReal z);

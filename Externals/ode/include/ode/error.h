@@ -25,7 +25,7 @@
 #ifndef _ODE_ERROR_H_
 #define _ODE_ERROR_H_
 
-#include "config.h"
+#include <ode/config.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -54,9 +54,7 @@ dMessageFunction *dGetMessageHandler();
 void _cdecl dError (int num, const char *msg, ...);
 void _cdecl dDebug (int num, const char *msg, ...);
 void _cdecl dMessage (int num, const char *msg, ...);
-//#define dError(a,b)
-//#define dDebug(a,b)
-//#define dMessage(a,b)
+
 
 #ifdef __cplusplus
 }

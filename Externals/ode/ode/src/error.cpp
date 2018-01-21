@@ -66,7 +66,6 @@ extern "C" dMessageFunction *dGetMessageHandler()
 }
 
 
-
 static void printMessage (int num, const char *msg1, const char *msg2,
 			  va_list ap)
 {

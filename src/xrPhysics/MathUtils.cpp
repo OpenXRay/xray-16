@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "MathUtils.h"
 #include "xrCore/_cylinder.h"
-#include "ode/include/ode/common.h"
+#include <ode/common.h>
 
 XRPHYSICS_API const float phInfinity = dInfinity;
 /*

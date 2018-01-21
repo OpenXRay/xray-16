@@ -23,7 +23,7 @@
 #ifndef _ODE_TIMER_H_
 #define _ODE_TIMER_H_
 
-#include "config.h"
+#include <ode/config.h>
 
 #ifdef __cplusplus
 extern "C" {

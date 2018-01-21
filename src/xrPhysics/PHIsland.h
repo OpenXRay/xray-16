@@ -7,7 +7,7 @@
 #include "ode/ode/src/objects.h"
 #include "ode/ode/src/joint.h"
 #pragma warning(pop)
-#include "ode/include/ode/objects.h"
+#include <ode/objects.h>
 #include "PhysicsCommon.h"
 
 class CPHIslandFlags

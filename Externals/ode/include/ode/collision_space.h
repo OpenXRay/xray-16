@@ -23,7 +23,7 @@
 #ifndef _ODE_COLLISION_SPACE_H_
 #define _ODE_COLLISION_SPACE_H_
 
-#include "../../include/ode/common.h"
+#include <ode/common.h>
 
 #ifdef __cplusplus
 extern "C" {

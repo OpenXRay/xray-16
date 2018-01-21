@@ -23,8 +23,8 @@
 #ifndef _ODE_COMMON_H_
 #define _ODE_COMMON_H_
 
-#include "config.h"
-#include "error.h"
+#include <ode/config.h>
+#include <ode/error.h>
 
 #ifdef __cplusplus
 extern "C" {

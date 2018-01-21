@@ -2,7 +2,7 @@
 #ifndef PHINTERPOLATON_H
 #define PHINTERPOLATON_H
 #include "CycleConstStorage.h"
-#include "ode/include/ode/common.h"
+#include <ode/common.h>
 #include "xrCore/_vector3d.h"
 #include "xrCore/_quaternion.h"
 

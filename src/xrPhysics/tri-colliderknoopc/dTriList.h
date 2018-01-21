@@ -1,5 +1,5 @@
-
-#include "ode/include/ode/common.h"
+#pragma once
+#include <ode/common.h>
 
 /* Class ID */
 

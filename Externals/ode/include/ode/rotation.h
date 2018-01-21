@@ -23,8 +23,8 @@
 #ifndef _ODE_ROTATION_H_
 #define _ODE_ROTATION_H_
 
-#include "common.h"
-#include "compatibility.h"
+#include <ode/common.h>
+#include <ode/compatibility.h>
 
 #ifdef __cplusplus
 extern "C" {

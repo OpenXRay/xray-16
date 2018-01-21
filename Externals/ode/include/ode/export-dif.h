@@ -23,7 +23,7 @@
 #ifndef _ODE_EXPORT_DIF_
 #define _ODE_EXPORT_DIF_
 
-#include "common.h"
+#include <ode/common.h>
 
 
 void dWorldExportDIF (dWorldID w, FILE *file, const char *world_name);

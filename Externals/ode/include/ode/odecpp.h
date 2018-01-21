@@ -27,7 +27,7 @@
 #define _ODE_ODECPP_H_
 #ifdef __cplusplus
 
-#include "error.h"
+#include <ode/error.h>
 
 
 class dWorld {

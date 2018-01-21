@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #include "xrPhysics.h"
-#include "ode/include/ode/memory.h"
+#include <ode/memory.h>
 
 #ifdef _MANAGED
 #pragma managed(push, off)

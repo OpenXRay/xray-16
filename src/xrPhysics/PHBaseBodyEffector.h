@@ -1,7 +1,7 @@
 #ifndef PH_BASE_BODY_EFFECTOR_H
 #define PH_BASE_BODY_EFFECTOR_H
 
-#include "ode/include/ode/common.h"
+#include <ode/common.h>
 
 class CPHBaseBodyEffector
 {

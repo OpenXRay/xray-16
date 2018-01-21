@@ -6,8 +6,8 @@
 #endif
 #include "PHObject.h"
 
-#include "ode/include/ode/common.h"
-#include "ode/include/ode/collision.h"
+#include <ode/common.h>
+#include <ode/collision.h>
 #include "physicscommon.h"
 #include "MathUtils.h"
 #ifdef DEBUG

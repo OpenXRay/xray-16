@@ -29,7 +29,7 @@
 // macros and constants
 
 #define ROUND_UP_OFFSET_TO_EFFICIENT_SIZE(arena,ofs) \
-  ofs = (unsigned int) (dEFFICIENT_SIZE( ((intP)(arena)) + ofs ) - ((intP)(arena)) );
+  ofs = (size_t) (dEFFICIENT_SIZE( ((intP)(arena)) + ofs ) - ((intP)(arena)) );
 
 #define MAX_ALLOC_SIZE \
   ((size_t)(dOBSTACK_ARENA_SIZE - sizeof (Arena) - EFFICIENT_ALIGNMENT + 1))
