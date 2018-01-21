@@ -17,80 +17,66 @@ xr_vector<b_rc_face> g_rc_faces;
 typedef xr_vector<bool> COVER_NODES;
 COVER_NODES g_cover_nodes;
 
-typedef CQuadTree<CCoverPoint> CPointQuadTree;
-static CPointQuadTree* g_covers = nullptr;
-typedef xr_vector<CCoverPoint*> COVERS;
-
 // -------------------------------- Ray pick
 typedef Fvector RayCache[3];
 
 IC float getLastRP_Scale(CDB::COLLIDER* DB, RayCache& C)
 {
-    u32 tris_count = DB->r_count();
     float scale = 1.f;
-    Fvector B;
 
-    //	X_TRY
+    for (u32 I = 0; I < DB->r_count(); I++)
     {
-        for (u32 I = 0; I < tris_count; I++)
+        CDB::RESULT& rpinf = DB->r_begin()[I];
+        // Access to texture
+        b_rc_face& F = g_rc_faces[rpinf.id];
+
+        if (F.dwMaterial >= g_materials.size())
+            Logger.clMsg("[%d] -> [%d]", F.dwMaterial, g_materials.size());
+        b_material& M = g_materials[F.dwMaterial];
+        b_texture& T = g_textures[M.surfidx];
+        Shader_xrLCVec& LIB = g_shaders_xrlc->Library();
+        if (M.shader_xrlc >= LIB.size())
+            return 0; //. hack
+        Shader_xrLC& SH = LIB[M.shader_xrlc];
+        if (!SH.flags.bLIGHT_CastShadow)
+            continue;
+
+        if (T.pSurface == nullptr || T.bHasAlpha == false)
         {
-            CDB::RESULT& rpinf = DB->r_begin()[I];
-            // Access to texture
-            Level.get_tris()[rpinf.id];
-            b_rc_face& F = g_rc_faces[rpinf.id];
+            T.bHasAlpha = false;
 
-            if (F.dwMaterial >= g_materials.size())
-                Logger.clMsg("[%d] -> [%d]", F.dwMaterial, g_materials.size());
-            b_material& M = g_materials[F.dwMaterial];
-            b_texture& T = g_textures[M.surfidx];
-            Shader_xrLCVec& LIB = g_shaders_xrlc->Library();
-            if (M.shader_xrlc >= LIB.size())
-                return 0; //. hack
-            Shader_xrLC& SH = LIB[M.shader_xrlc];
-            if (!SH.flags.bLIGHT_CastShadow)
-                continue;
-
-            if (T.pSurface == nullptr)
-                T.bHasAlpha = false;
-
-            if (!T.bHasAlpha)
-            {
-                // Opaque poly - cache it
-                C[0].set(rpinf.verts[0]);
-                C[1].set(rpinf.verts[1]);
-                C[2].set(rpinf.verts[2]);
-                return 0;
-            }
-
-            // barycentric coords
-            // note: W,U,V order
-            B.set(1.0f - rpinf.u - rpinf.v, rpinf.u, rpinf.v);
-
-            // calc UV
-            auto cuv = F.t;
-            Fvector2 uv;
-            uv.x = cuv[0].x * B.x + cuv[1].x * B.y + cuv[2].x * B.z;
-            uv.y = cuv[0].y * B.x + cuv[1].y * B.y + cuv[2].y * B.z;
-
-            int U = iFloor(uv.x * float(T.dwWidth) + .5f);
-            int V = iFloor(uv.y * float(T.dwHeight) + .5f);
-            U %= T.dwWidth;
-            if (U < 0)
-                U += T.dwWidth;
-            V %= T.dwHeight;
-            if (V < 0)
-                V += T.dwHeight;
-
-            u32 pixel = T.pSurface[V * T.dwWidth + U];
-            u32 pixel_a = color_get_A(pixel);
-            float opac = 1.f - float(pixel_a) / 255.f;
-            scale *= opac;
+            // Opaque poly - cache it
+            C[0].set(rpinf.verts[0]);
+            C[1].set(rpinf.verts[1]);
+            C[2].set(rpinf.verts[2]);
+            return 0;
         }
+
+        // barycentric coords
+        // note: W,U,V order
+        Fvector B;
+        B.set(1.0f - rpinf.u - rpinf.v, rpinf.u, rpinf.v);
+
+        // calc UV
+        auto cuv = F.t;
+        Fvector2 uv;
+        uv.x = cuv[0].x * B.x + cuv[1].x * B.y + cuv[2].x * B.z;
+        uv.y = cuv[0].y * B.x + cuv[1].y * B.y + cuv[2].y * B.z;
+
+        int U = iFloor(uv.x * float(T.dwWidth) + .5f);
+        int V = iFloor(uv.y * float(T.dwHeight) + .5f);
+        U %= T.dwWidth;
+        if (U < 0)
+            U += T.dwWidth;
+        V %= T.dwHeight;
+        if (V < 0)
+            V += T.dwHeight;
+
+        u32 pixel = T.pSurface[V * T.dwWidth + U];
+        u32 pixel_a = color_get_A(pixel);
+        float opac = 1.f - float(pixel_a) / 255.f;
+        scale *= opac;
     }
-    //	X_CATCH
-    //	{
-    //		Logger.clMsg("* ERROR: getLastRP_Scale");
-    //	}
 
     return scale;
 }
@@ -225,8 +211,8 @@ public:
 
     IC void Clear()
     {
-        for (auto it = q_Clear.begin(); it != q_Clear.end(); ++it)
-            q_Marks[*it] = false;
+        for (auto &i : q_Clear)
+            q_Marks[i] = false;
     }
 };
 struct RC
@@ -244,7 +230,7 @@ class CoverThread : public CThread
     typedef float Cover[4];
 
 public:
-    CoverThread(u32 ID, u32 _start, u32 _end) : CThread(ID, ProxyMsg)
+    CoverThread(u32 ID, u32 _start, u32 _end) : CThread(ID, ProxyMsg), Q()
     {
         Nstart = _start;
         Nend = _end;
@@ -256,7 +242,7 @@ public:
         Fvector TestPos = BasePos;
         TestPos.y += cover_height;
 
-        float c_total[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+        int   c_total[8] = {0, 0, 0, 0, 0, 0, 0, 0};
         float c_passed[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
         // perform volumetric query
@@ -280,7 +266,7 @@ public:
 
             // raytrace
             int sector = calcSphereSector(Dir);
-            c_total[sector] += 1.f;
+            c_total [sector] += 1;
             c_passed[sector] += rayTrace(&DB, TestPos, Dir, range, cache[ID].C); //
         }
         Q.Clear();
@@ -293,13 +279,8 @@ public:
             if (c_total[dirs] == 0)
                 value[dirs] = 0;
             else
-                value[dirs] = float(c_passed[dirs]) / float(c_total[dirs]);
+                value[dirs] = c_passed[dirs] / float(c_total[dirs]);
             clamp(value[dirs], 0.f, 1.f);
-        }
-
-        if (value[0] < .999f)
-        {
-            value[0] = value[0];
         }
 
         cover[0] = (value[2] + value[3] + value[4] + value[5]) / 4.f;
@@ -361,37 +342,24 @@ bool cover(const vertex& v, u32 index0, u32 index1)
 bool critical_point(const vertex& v, u32 index, u32 index0, u32 index1)
 {
     return (!valid_vertex_id(v.n[index]) && (!valid_vertex_id(v.n[index0]) || !valid_vertex_id(v.n[index1]) ||
-                                                cover(v, index0, index) || cover(v, index1, index)));
+                                                   cover(v, index0, index) || cover(v, index1, index)));
 }
 
 bool is_cover(const vertex& v)
 {
-    return (critical_point(v, 0, 1, 3) || critical_point(v, 2, 1, 3) || critical_point(v, 1, 0, 2) ||
-        critical_point(v, 3, 0, 2));
+    return (critical_point(v, 0, 1, 3)
+         || critical_point(v, 2, 1, 3)
+         || critical_point(v, 1, 0, 2)
+         || critical_point(v, 3, 0, 2));
 }
-
-extern float CalculateHeight(Fbox& BB);
 
 void compute_cover_nodes()
 {
-    Fbox aabb;
-    CalculateHeight(aabb);
-    VERIFY(!g_covers);
-    g_covers = new CPointQuadTree(aabb, g_params.fPatchSize * .5f, 8 * 65536, 4 * 65536);
-
     g_cover_nodes.assign(g_nodes.size(), false);
 
-    Nodes::const_iterator B = g_nodes.begin(), I = B;
-    Nodes::const_iterator E = g_nodes.end();
-    COVER_NODES::iterator J = g_cover_nodes.begin();
-    for (; I != E; ++I, ++J)
-    {
-        if (!is_cover(*I))
-            continue;
-
-        *J = true;
-        g_covers->insert(new CCoverPoint((*I).Pos, u32(I - B)));
-    }
+    auto J = g_cover_nodes.begin();
+    for (auto &I : g_nodes)
+        *J++ = is_cover(I);
 }
 
 bool vertex_in_direction(const u32& start_vertex_id, const u32& target_vertex_id)
@@ -447,64 +415,53 @@ bool vertex_in_direction(const u32& start_vertex_id, const u32& target_vertex_id
     }
 }
 
+extern float CalculateHeight(Fbox& BB);
+
 void compute_non_covers()
 {
-    VERIFY(g_covers);
+    Fbox aabb;
+    CalculateHeight(aabb);
 
-    COVERS nearest;
+    CQuadTree<CCoverPoint> covers(aabb, g_params.fPatchSize * .5f, 8 * 65536, 4 * 65536);
 
-    {
-        g_covers->all(nearest);
-        delete_data(nearest);
-        xr_delete(g_covers);
-
-        Fbox aabb;
-        CalculateHeight(aabb);
-        VERIFY(!g_covers);
-        g_covers = new CPointQuadTree(aabb, g_params.fPatchSize * .5f, 8 * 65536, 4 * 65536);
-
-        auto B = g_nodes.begin(), I = B;
-        auto E = g_nodes.end();
-        auto J = g_cover_nodes.begin();
-        for (; I != E; ++I, ++J)
-        {
-            if (!*J)
-                continue;
-
-            if (((*I).high_cover[0] + (*I).high_cover[1] + (*I).high_cover[2] + (*I).high_cover[3]) >= 4 * .999f)
-            {
-                if (((*I).low_cover[0] + (*I).low_cover[1] + (*I).low_cover[2] + (*I).low_cover[3]) >= 4 * .999f)
-                    continue;
-            }
-
-            g_covers->insert(new CCoverPoint((*I).Pos, u32(I - B)));
-        }
-
-        VERIFY(g_covers->size());
-    }
-
-    typedef std::pair<float, CCoverPoint*> COVER_PAIR;
-    typedef xr_vector<COVER_PAIR> COVER_PAIRS;
-    COVER_PAIRS cover_pairs;
-
-    auto B = g_nodes.begin(), I = B;
-    auto E = g_nodes.end();
     auto J = g_cover_nodes.begin();
-    for (; I != E; ++I, ++J)
+    for (auto &I : g_nodes)
     {
-        if (*J)
+        if (!*J++)
             continue;
 
-        g_covers->nearest((*I).Pos, cover_distance, nearest);
+        if ((I.high_cover[0] + I.high_cover[1] + I.high_cover[2] + I.high_cover[3]) >= 4 * .999f)
+            if ((I.low_cover[0] + I.low_cover[1] + I.low_cover[2] + I.low_cover[3]) >= 4 * .999f)
+                continue;
+
+        covers.insert(new CCoverPoint(I.Pos, std::distance(&g_nodes.front(), &I)));
+    }
+
+    VERIFY(covers.size());
+
+    using COVERS = xr_vector<CCoverPoint*>;
+    using COVER_PAIR = std::pair<float, CCoverPoint*>;
+    using COVER_PAIRS = xr_vector<COVER_PAIR>;
+
+    COVERS nearest;
+    COVER_PAIRS cover_pairs;
+
+    auto K = g_cover_nodes.begin();
+    for (auto &I : g_nodes)
+    {
+        if (*K++)
+            continue;
+
+        covers.nearest(I.Pos, cover_distance, nearest);
         if (nearest.empty())
         {
             for (int i = 0; i < 4; ++i)
             {
-                VERIFY((*I).high_cover[i] == flt_max);
-                (*I).high_cover[i] = 1.f;
+                VERIFY(I.high_cover[i] == flt_max);
+                I.high_cover[i] = 1.f;
 
-                VERIFY((*I).low_cover[i] == flt_max);
-                (*I).low_cover[i] = 1.f;
+                VERIFY(I.low_cover[i] == flt_max);
+                I.low_cover[i] = 1.f;
             }
             continue;
         }
@@ -513,16 +470,15 @@ void compute_non_covers()
         cover_pairs.reserve(nearest.size());
 
         float cumulative_weight = 0.f;
-        {
-            for (auto &i : nearest)
-            {
-                if (!vertex_in_direction(u32(I - B), i->level_vertex_id()))
-                    continue;
 
-                float weight = 1.f / i->position().distance_to((*I).Pos);
-                cumulative_weight += weight;
-                cover_pairs.push_back(std::make_pair(weight, i));
-            }
+        for (auto &i : nearest)
+        {
+            if (!vertex_in_direction(std::distance(&g_nodes.front(), &I), i->level_vertex_id()))
+                continue;
+
+            float weight = 1.f / i->position().distance_to(I.Pos);
+            cumulative_weight += weight;
+            cover_pairs.push_back(std::make_pair(weight, i));
         }
 
         // this is incorrect
@@ -530,22 +486,22 @@ void compute_non_covers()
         {
             for (int i = 0; i < 4; ++i)
             {
-                VERIFY((*I).high_cover[i] == flt_max);
-                (*I).high_cover[i] = 1.f;
+                VERIFY(I.high_cover[i] == flt_max);
+                I.high_cover[i] = 1.f;
 
-                VERIFY((*I).low_cover[i] == flt_max);
-                (*I).low_cover[i] = 1.f;
+                VERIFY(I.low_cover[i] == flt_max);
+                I.low_cover[i] = 1.f;
             }
             continue;
         }
 
         for (int j = 0; j < 4; ++j)
         {
-            VERIFY((*I).high_cover[j] == flt_max);
-            (*I).high_cover[j] = 0.f;
+            VERIFY(I.high_cover[j] == flt_max);
+            I.high_cover[j] = 0.f;
 
-            VERIFY((*I).low_cover[j] == flt_max);
-            (*I).low_cover[j] = 0.f;
+            VERIFY(I.low_cover[j] == flt_max);
+            I.low_cover[j] = 0.f;
         }
 
         for (auto &i : cover_pairs)
@@ -554,17 +510,20 @@ void compute_non_covers()
             float factor = i.first / cumulative_weight;
             for (int j = 0; j < 4; ++j)
             {
-                (*I).high_cover[j] += factor * current.high_cover[j];
-                (*I).low_cover[j] += factor * current.low_cover[j];
+                I.high_cover[j] += factor * current.high_cover[j];
+                I.low_cover[j] += factor * current.low_cover[j];
             }
         }
 
         for (int i2 = 0; i2 < 4; ++i2)
         {
-            clamp((*I).high_cover[i2], 0.f, 1.f);
-            clamp((*I).low_cover[i2], 0.f, 1.f);
+            clamp(I.high_cover[i2], 0.f, 1.f);
+            clamp(I.low_cover[i2], 0.f, 1.f);
         }
     }
+
+    covers.all(nearest);
+    delete_data(nearest);
 }
 
 #define NUM_THREADS 3
@@ -592,41 +551,36 @@ void xrCover(bool pure_covers)
     if (!pure_covers)
     {
         compute_non_covers();
-
-        COVERS nearest;
-        VERIFY(g_covers);
-        g_covers->all(nearest);
-        delete_data(nearest);
-        xr_delete(g_covers);
-        return;
     }
-
-    // Smooth
-    Logger.Status("Smoothing coverage mask...");
-    mem_Optimize();
-    auto Old = g_nodes;
-    for (u32 N = 0; N < g_nodes.size(); N++)
+    else
     {
-        vertex& Base = Old[N];
-        vertex& Dest = g_nodes[N];
-
-        for (int dir = 0; dir < 4; dir++)
+        // Smooth
+        Logger.Status("Smoothing coverage mask...");
+        mem_Optimize();
+        auto Old = g_nodes;
+        for (u32 N = 0; N < g_nodes.size(); N++)
         {
-            float val = 2 * Base.high_cover[dir];
-            float val2 = 2 * Base.low_cover[dir];
-            float cnt = 2;
+            vertex& Base = Old[N];
+            vertex& Dest = g_nodes[N];
 
-            for (int nid = 0; nid < 4; nid++)
+            for (int dir = 0; dir < 4; dir++)
             {
-                if (Base.n[nid] != InvalidNode)
+                float val = 2 * Base.high_cover[dir];
+                float val2 = 2 * Base.low_cover[dir];
+                float cnt = 2;
+
+                for (int nid = 0; nid < 4; nid++)
                 {
-                    val += Old[Base.n[nid]].high_cover[dir];
-                    val2 += Old[Base.n[nid]].low_cover[dir];
-                    cnt += 1.f;
+                    if (Base.n[nid] != InvalidNode)
+                    {
+                        val += Old[Base.n[nid]].high_cover[dir];
+                        val2 += Old[Base.n[nid]].low_cover[dir];
+                        cnt += 1.f;
+                    }
                 }
+                Dest.high_cover[dir] = val / cnt;
+                Dest.low_cover[dir] = val2 / cnt;
             }
-            Dest.high_cover[dir] = val / cnt;
-            Dest.low_cover[dir] = val2 / cnt;
         }
     }
 }

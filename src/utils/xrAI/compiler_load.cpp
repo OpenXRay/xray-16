@@ -66,6 +66,7 @@ void xrLoad(LPCSTR name, bool draft_mode)
         {
             strconcat(sizeof(file_name), file_name, name, "build.cform");
             IReader* fs = FS.r_open(file_name);
+            R_ASSERT2(fs, "There is no file 'build.cform'!");
             R_ASSERT(fs->find_chunk(0));
 
             hdrCFORM H;
@@ -89,6 +90,7 @@ void xrLoad(LPCSTR name, bool draft_mode)
         {
             strconcat(sizeof(file_name), file_name, name, "build.prj");
             IReader* fs = FS.r_open(file_name);
+            R_ASSERT2(fs, "There is no file 'build.prj'!");
 
             // Version
             u32 version;
@@ -114,6 +116,9 @@ void xrLoad(LPCSTR name, bool draft_mode)
                 {
                     Logger.Progress(float(t) / float(tex_count));
 
+                    // В данном месте в случае 64-битной сборки происходит чтение лишних 4 байт из файла потому,
+                    // что читается структура с указателем, размер которого разный для 32 и 64-битных систем.
+                    // Как следствие, продолжение работы компилятора невозможно.
                     b_texture TEX;
                     F->r(&TEX, sizeof(TEX));
 
@@ -162,12 +167,12 @@ void xrLoad(LPCSTR name, bool draft_mode)
                                 BT.pSurface = Surface_Load(N, w, h);
                                 R_ASSERT2(BT.pSurface, "Can't load surface");
                                 if ((w != BT.dwWidth) || (h != BT.dwHeight))
+                                {
                                     Msg("! THM doesn't correspond to the texture: %dx%d -> %dx%d", BT.dwWidth, BT.dwHeight, w, h);
+                                    BT.dwWidth = w;
+                                    BT.dwHeight = h;
+                                }
                                 BT.Vflip();
-                            }
-                            else
-                            {
-                                // Free surface memory
                             }
                         }
                     }

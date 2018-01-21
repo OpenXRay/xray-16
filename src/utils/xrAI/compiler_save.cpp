@@ -54,7 +54,6 @@ xr_vector<NodeCompressed> compressed_nodes;
 
 class CNodeRenumberer
 {
-    IC bool operator=(const CNodeRenumberer&) {}
     struct SSortNodesPredicate
     {
         IC bool operator()(const NodeCompressed& vertex0, const NodeCompressed& vertex1) const
@@ -76,7 +75,7 @@ public:
     CNodeRenumberer(xr_vector<NodeCompressed>& nodes, xr_vector<u32>& sorted, xr_vector<u32>& renumbering)
         : m_nodes(nodes), m_sorted(sorted), m_renumbering(renumbering)
     {
-        u32 N = (u32)m_nodes.size();
+        u32 N = m_nodes.size();
         m_sorted.resize(N);
         m_renumbering.resize(N);
 
@@ -88,14 +87,14 @@ public:
         for (u32 i = 0; i < N; ++i)
             m_renumbering[m_sorted[i]] = i;
 
-        for (u32 i = 0; i < N; ++i)
+        for (auto &i : m_nodes)
         {
-            for (u32 j = 0; j < 4; ++j)
+            for (u8 j = 0; j < 4; ++j)
             {
-                u32 vertex_id = m_nodes[i].link(u8(j));
+                u32 vertex_id = i.link(j);
                 if (vertex_id >= N)
                     continue;
-                m_nodes[i].link(u8(j), m_renumbering[vertex_id]);
+                i.link(j, m_renumbering[vertex_id]);
             }
         }
 
@@ -125,6 +124,7 @@ void xrSaveNodes(LPCSTR name, LPCSTR out_name)
     fs->w(&H, sizeof(H));
     // All nodes
     Logger.clMsg("Compressing nodes...");
+    compressed_nodes.reserve(g_nodes.size());
     for (auto &i : g_nodes)
     {
         NodeCompressed NC;
