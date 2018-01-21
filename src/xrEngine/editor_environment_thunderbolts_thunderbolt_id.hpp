@@ -5,11 +5,7 @@
 // Author : Dmitriy Iassenev
 // Description : editor environment thunderbolts thunderbolt identifier class
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef EDITOR_WEATHER_THUNDERBOLTS_THUNDERBOLT_ID_HPP_INCLUDED
-#define EDITOR_WEATHER_THUNDERBOLTS_THUNDERBOLT_ID_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 #include "Common/Noncopyable.hpp"
 #include "Include/editor/property_holder_base.hpp"
@@ -39,7 +35,6 @@ private:
     pcstr const* xr_stdcall collection();
     u32 xr_stdcall collection_size();
 
-private:
     property_holder_type* m_property_holder;
     manager const& m_manager;
     shared_str m_id;
@@ -47,7 +42,3 @@ private:
 } // namespace thunderbolts
 } // namespace environment
 } // namespace editor
-
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_WEATHER_THUNDERBOLTS_THUNDERBOLT_ID_HPP_INCLUDED

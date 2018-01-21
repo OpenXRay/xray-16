@@ -5,11 +5,7 @@
 // Author : Dmitriy Iassenev
 // Description : editor ide function
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef IDE_HPP_INCLUDED
-#define IDE_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 #include "Include/editor/ide.hpp"
 
@@ -26,7 +22,3 @@ inline XRay::Editor::ide_base& ide()
     VERIFY(Device.editor());
     return (*Device.editor());
 }
-
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef IDE_HPP_INCLUDED

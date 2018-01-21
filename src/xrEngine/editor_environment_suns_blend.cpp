@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_suns_blend.hpp"
 #include "Include/editor/property_holder_base.hpp"
 
@@ -37,5 +36,3 @@ void blend::fill(
 
     properties->add_property("time", "blend", "this option is responsible for the blend time", m_time, m_time);
 }
-
-#endif // #ifdef INGAME_EDITOR

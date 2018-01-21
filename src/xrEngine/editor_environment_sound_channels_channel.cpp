@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_sound_channels_channel.hpp"
 #include "ide.hpp"
 #include "property_collection.hpp"
@@ -145,4 +144,3 @@ void channel::fill(XRay::Editor::property_holder_collection* collection)
 
 channel::property_holder_type* channel::object() { return (m_property_holder); }
 CEnvAmbient::SSndChannel::sounds_type& channel::sounds() { return (inherited::sounds()); }
-#endif // #ifdef INGAME_EDITOR

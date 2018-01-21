@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_ambients_manager.hpp"
 #include "ide.hpp"
 #include "property_collection.hpp"
@@ -132,4 +131,3 @@ ambient* manager::get_ambient(shared_str const& id) const
 #endif // #ifdef DEBUG
 }
 
-#endif // #ifdef INGAME_EDITOR

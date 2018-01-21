@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_suns_gradient.hpp"
 #include "Include/editor/property_holder_base.hpp"
 #include "editor_environment_suns_manager.hpp"
@@ -71,4 +70,3 @@ void gradient::fill(manager const& manager, XRay::Editor::property_holder_base* 
         "Select texture...", XRay::Editor::property_holder_base::cannot_enter_text, XRay::Editor::property_holder_base::remove_extension);
 }
 
-#endif // #ifdef INGAME_EDITOR

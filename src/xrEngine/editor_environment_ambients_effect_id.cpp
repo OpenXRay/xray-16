@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_ambients_effect_id.hpp"
 #include "ide.hpp"
 #include "editor_environment_effects_manager.hpp"
@@ -54,4 +53,3 @@ effect_id::property_holder_type* effect_id::object() { return (m_property_holder
 } // namespace environment
 } //namespace editor
 
-#endif // #ifdef INGAME_EDITOR

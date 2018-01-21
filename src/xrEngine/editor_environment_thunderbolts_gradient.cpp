@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_thunderbolts_gradient.hpp"
 #include "ide.hpp"
 #include "editor_environment_manager.hpp"
@@ -96,4 +95,3 @@ void gradient::fill(
         detail::real_path("$game_textures$", "").c_str(), "Select texture...",
         XRay::Editor::property_holder_base::cannot_enter_text, XRay::Editor::property_holder_base::remove_extension);
 }
-#endif // #ifdef INGAME_EDITOR

@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_manager.hpp"
 #include "editor_environment_suns_manager.hpp"
 #include "editor_environment_levels_manager.hpp"
@@ -230,4 +229,3 @@ CLensFlareDescriptor* manager::add_flare(xr_vector<CLensFlareDescriptor*>& colle
     return (inherited::add_flare(collection, id));
 }
 
-#endif // #ifdef INGAME_EDITOR

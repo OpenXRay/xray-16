@@ -5,11 +5,7 @@
 // Author : Dmitriy Iassenev
 // Description : editor environment sound channels channel class
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef EDITOR_WEATHER_SOUND_CHANNELS_CHANNEL_HPP_INCLUDED
-#define EDITOR_WEATHER_SOUND_CHANNELS_CHANNEL_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 #include "Common/Noncopyable.hpp"
 #include "Include/editor/property_holder_base.hpp"
@@ -27,8 +23,7 @@ class manager;
 
 class channel : public CEnvAmbient::SSndChannel, public XRay::Editor::property_holder_holder, private Noncopyable
 {
-private:
-    typedef CEnvAmbient::SSndChannel inherited;
+    using inherited = CEnvAmbient::SSndChannel;
 
 public:
     channel(manager const& manager, shared_str const& id);
@@ -44,11 +39,11 @@ private:
     void xr_stdcall id_setter(pcstr value);
 
 public:
-    typedef xr_vector<source*> sound_container_type;
+    using sound_container_type = xr_vector<source*>;
 
 private:
-    typedef XRay::Editor::property_holder_base property_holder_type;
-    typedef property_collection<sound_container_type, channel> collection_type;
+    using property_holder_type = XRay::Editor::property_holder_base;
+    using collection_type = property_collection<sound_container_type, channel>;
 
 public:
     virtual property_holder_type* object();
@@ -62,7 +57,3 @@ private:
 } // namespace sound_channels
 } // namespace environment
 } // namespace editor
-
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_WEATHER_SOUND_CHANNELS_CHANNEL_HPP_INCLUDED

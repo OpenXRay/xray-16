@@ -5,11 +5,7 @@
 // Author : Dmitriy Iassenev
 // Description : editor environment effects effect class
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef EDITOR_WEATHER_EFFECTS_EFFECT_HPP_INCLUDED
-#define EDITOR_WEATHER_EFFECTS_EFFECT_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 #include "Common/Noncopyable.hpp"
 #include "Include/editor/property_holder_base.hpp"
@@ -34,6 +30,7 @@ public:
     void save(CInifile& config);
     void fill(XRay::Editor::property_holder_collection* collection);
     inline pcstr id() const { return m_id.c_str(); }
+
 private:
     pcstr xr_stdcall id_getter() const;
     void xr_stdcall id_setter(pcstr value);
@@ -44,8 +41,7 @@ private:
     pcstr xr_stdcall sound_getter();
     void xr_stdcall sound_setter(pcstr value);
 
-private:
-    typedef XRay::Editor::property_holder_base property_holder_type;
+    using property_holder_type = XRay::Editor::property_holder_base;
 
 public:
     virtual property_holder_type* object();
@@ -63,6 +59,3 @@ public:
 } // namespace environment
 } // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_WEATHER_EFFECTS_EFFECT_HPP_INCLUDED

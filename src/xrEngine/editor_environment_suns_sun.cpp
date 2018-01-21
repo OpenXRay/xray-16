@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_suns_sun.hpp"
 #include "Include/editor/ide.hpp"
 #include "editor_environment_manager.hpp"
@@ -97,4 +96,3 @@ void sun::fill(XRay::Editor::property_holder_collection* collection)
 }
 
 XRay::Editor::property_holder_base* sun::object() { return (m_property_holder); }
-#endif // #ifdef INGAME_EDITOR

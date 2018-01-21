@@ -5,11 +5,7 @@
 // Author : Dmitriy Iassenev
 // Description : editor environment weathers weather class
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef EDITOR_ENVIRONMENT_WEATHERS_WEATHER_HPP_INCLUDED
-#define EDITOR_ENVIRONMENT_WEATHERS_WEATHER_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 #include "Common/Noncopyable.hpp"
 #include "Include/editor/property_holder_base.hpp"
@@ -29,9 +25,8 @@ class time;
 class weather : public XRay::Editor::property_holder_holder, private Noncopyable
 {
 public:
-    typedef XRay::Editor::property_holder_base property_holder_type;
+    using property_holder_type = XRay::Editor::property_holder_base;
 
-public:
     weather(environment::manager* manager, shared_str const& id);
     virtual ~weather();
     void load();
@@ -79,6 +74,3 @@ public:
 } // namespace environment
 } // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_ENVIRONMENT_WEATHERS_WEATHER_HPP_INCLUDED

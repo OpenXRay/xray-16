@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_ambients_ambient.hpp"
 #include "ide.hpp"
 #include "property_collection.hpp"
@@ -216,4 +215,3 @@ ambient::SSndChannel* ambient::create_sound_channel(CInifile& config, pcstr id)
 
 CEnvAmbient::EffectVec& ambient::effects() { return (inherited::effects()); }
 CEnvAmbient::SSndChannelVec& ambient::get_snd_channels() { return (inherited::get_snd_channels()); }
-#endif // #ifdef INGAME_EDITOR

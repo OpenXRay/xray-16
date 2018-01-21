@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_effects_manager.hpp"
 #include "Include/editor/property_holder_base.hpp"
 #include "property_collection.hpp"
@@ -105,4 +104,3 @@ shared_str manager::unique_id(shared_str const& id) const
     return (m_collection->generate_unique_id(id.c_str()));
 }
 
-#endif // #ifdef INGAME_EDITOR

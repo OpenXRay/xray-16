@@ -8,8 +8,6 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
-
 #include "editor_environment_levels_manager.hpp"
 #include "editor_environment_weathers_manager.hpp"
 #include "Include/editor/property_holder_base.hpp"
@@ -99,4 +97,3 @@ void manager::fill()
     ::ide().environment_levels(m_property_holder);
 }
 
-#endif // #ifdef INGAME_EDITOR

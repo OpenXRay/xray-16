@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_thunderbolts_collection.hpp"
 #include "ide.hpp"
 #include "property_collection.hpp"
@@ -106,4 +105,3 @@ void collection::fill(XRay::Editor::property_holder_collection* collection)
 }
 
 XRay::Editor::property_holder_base* collection::object() { return m_property_holder; }
-#endif // #ifdef INGAME_EDITOR

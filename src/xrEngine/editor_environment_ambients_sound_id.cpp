@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_ambients_sound_id.hpp"
 #include "ide.hpp"
 #include "editor_environment_sound_channels_manager.hpp"
@@ -46,4 +45,3 @@ void sound_id::fill(XRay::Editor::property_holder_collection* collection)
 }
 
 sound_id::property_holder_type* sound_id::object() { return (m_property_holder); }
-#endif // #ifdef INGAME_EDITOR

@@ -5,11 +5,7 @@
 // Author : Dmitriy Iassenev
 // Description : editor environment suns manager class
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef EDITOR_WEATHER_SUNS_MANAGER_HPP_INCLUDED
-#define EDITOR_WEATHER_SUNS_MANAGER_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 #include "Common/Noncopyable.hpp"
 #include "property_collection_forward.hpp"
@@ -72,6 +68,3 @@ public:
 } // namespace environment
 } // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_WEATHER_SUNS_MANAGER_HPP_INCLUDED

@@ -5,11 +5,7 @@
 // Author : Dmitriy Iassenev
 // Description : editor environment weathers time class
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef EDITOR_ENVIRONMENT_WEATHERS_TIME_HPP_INCLUDED
-#define EDITOR_ENVIRONMENT_WEATHERS_TIME_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 #include "Common/Noncopyable.hpp"
 #include "Include/editor/property_holder_base.hpp"
@@ -28,11 +24,10 @@ class weather;
 
 class time : public CEnvDescriptorMixer, public XRay::Editor::property_holder_holder, private Noncopyable
 {
-private:
-    typedef CEnvDescriptorMixer inherited;
+    using inherited = CEnvDescriptorMixer;
 
 public:
-    typedef XRay::Editor::property_holder_base property_holder_type;
+    using property_holder_type = XRay::Editor::property_holder_base;
 
 public:
     time(editor::environment::manager* manager, weather const* weather, shared_str const& id);
@@ -81,7 +76,6 @@ private:
     shared_str m_sun;
     shared_str m_thunderbolt_collection;
 
-private:
     editor::environment::manager& m_manager;
     weather const* m_weather;
     property_holder_type* m_property_holder;
@@ -89,7 +83,3 @@ private:
 } // namespace weathers
 } // namespace environment
 } // namespace editor
-
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_ENVIRONMENT_WEATHERS_TIME_HPP_INCLUDED

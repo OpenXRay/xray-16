@@ -5,11 +5,7 @@
 // Author : Dmitriy Iassenev
 // Description : editor environment weathers manager class
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef EDITOR_ENVIRONMENT_WEATHERS_MANAGER_HPP_INCLUDED
-#define EDITOR_ENVIRONMENT_WEATHERS_MANAGER_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 #include "Common/Noncopyable.hpp"
 #include "property_collection_forward.hpp"
@@ -82,6 +78,3 @@ public:
 } // namespace environment
 } // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_ENVIRONMENT_WEATHERS_MANAGER_HPP_INCLUDED

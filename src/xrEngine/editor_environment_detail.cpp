@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_detail.hpp"
 #include <shlwapi.h>
 
@@ -64,4 +63,3 @@ shared_str editor::environment::detail::real_path(pcstr folder, pcstr path)
     return (result);
 }
 
-#endif // #ifdef INGAME_EDITOR

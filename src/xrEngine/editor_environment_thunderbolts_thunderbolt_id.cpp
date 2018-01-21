@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_thunderbolts_thunderbolt_id.hpp"
 #include "ide.hpp"
 #include "editor_environment_thunderbolts_manager.hpp"
@@ -50,4 +49,3 @@ void thunderbolt_id::fill(XRay::Editor::property_holder_collection* collection)
 }
 
 thunderbolt_id::property_holder_type* thunderbolt_id::object() { return (m_property_holder); }
-#endif // #ifdef INGAME_EDITOR

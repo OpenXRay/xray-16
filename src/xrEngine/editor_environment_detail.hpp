@@ -5,11 +5,7 @@
 // Author : Dmitriy Iassenev
 // Description : editor environment detail namespace
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef EDITOR_ENVIRONMENT_DETAIL_HPP_INCLUDED
-#define EDITOR_ENVIRONMENT_DETAIL_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 namespace editor
 {
@@ -28,7 +24,3 @@ shared_str real_path(pcstr folder, pcstr path);
 } // namespace detail
 } // namespace environment
 } // namespace editor
-
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_ENVIRONMENT_DETAIL_HPP_INCLUDED

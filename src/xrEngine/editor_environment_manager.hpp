@@ -5,11 +5,7 @@
 // Author : Dmitriy Iassenev
 // Description : editor environment manager class
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef EDITOR_ENVIRONMENT_MANAGER_HPP_INCLUDED
-#define EDITOR_ENVIRONMENT_MANAGER_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 #include "Environment.h"
 
@@ -90,14 +86,14 @@ public:
     light_animator_ids_type const& light_animator_ids() const;
 
 public:
-    typedef XRay::Editor::property_holder_base property_holder_type;
-    typedef editor::environment::suns::manager suns_manager_type;
-    typedef editor::environment::levels::manager levels_manager_type;
-    typedef editor::environment::effects::manager effects_manager_type;
-    typedef editor::environment::sound_channels::manager sound_channels_manager_type;
-    typedef editor::environment::ambients::manager ambients_manager_type;
-    typedef editor::environment::thunderbolts::manager thunderbolts_manager_type;
-    typedef editor::environment::weathers::manager weathers_manager_type;
+    using property_holder_type = XRay::Editor::property_holder_base;
+    using suns_manager_type = editor::environment::suns::manager;
+    using levels_manager_type = editor::environment::levels::manager;
+    using effects_manager_type = editor::environment::effects::manager;
+    using sound_channels_manager_type = editor::environment::sound_channels::manager;
+    using ambients_manager_type = editor::environment::ambients::manager;
+    using thunderbolts_manager_type = editor::environment::thunderbolts::manager;
+    using weathers_manager_type = editor::environment::weathers::manager;
 
 public:
     inline suns_manager_type const& suns() const
@@ -160,7 +156,3 @@ private:
 }; // class manager
 } // namespace environment
 } // namespace editor
-
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_ENVIRONMENT_MANAGER_HPP_INCLUDED

@@ -1,24 +1,18 @@
 #include "stdafx.h"
 #include "resource.h"
-#ifdef INGAME_EDITOR
 #include "Include/editor/ide.hpp"
 #include "engine_impl.hpp"
-#endif
 #include "GameFont.h"
 #include "PerformanceAlert.hpp"
 #include "xrCore/ModuleLookup.hpp"
 
 extern LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-#ifdef INGAME_EDITOR
 void CRenderDevice::initialize_editor()
 {
     m_editor_module = std::make_unique<XRay::Module>("xrWeatherEditor");
     if (!m_editor_module->exist())
-    {
-        Msg("! cannot load library \"xrWeatherEditor\"");
         return;
-    }
 
     m_editor_initialize = (initialize_function_ptr)m_editor_module->getProcAddress("initialize");
     VERIFY(m_editor_initialize);
@@ -33,17 +27,16 @@ void CRenderDevice::initialize_editor()
     m_hWnd = m_editor->view_handle();
     VERIFY(m_hWnd != INVALID_HANDLE_VALUE);
 }
-#endif // #ifdef INGAME_EDITOR
 
 void CRenderDevice::Initialize()
 {
     Log("Initializing Engine...");
     TimerGlobal.Start();
     TimerMM.Start();
-#ifdef INGAME_EDITOR
+
     if (strstr(Core.Params, "-editor"))
         initialize_editor();
-#endif
+
     // Unless a substitute hWnd has been specified, create a window to render into
     if (!m_hWnd)
     {

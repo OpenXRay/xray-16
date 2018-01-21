@@ -98,51 +98,36 @@ CScriptGameObject* get_object_by_id(u16 id)
     return pGameObject->lua_game_object();
 }
 
-LPCSTR get_weather() { return (*g_pGamePersistent->Environment().GetWeather()); }
-void set_weather(LPCSTR weather_name, bool forced)
+LPCSTR get_weather() { return *g_pGamePersistent->Environment().GetWeather(); }
+void set_weather(pcstr const weather_name, const bool forced)
 {
-#ifdef INGAME_EDITOR
     if (!Device.editor())
-#endif // #ifdef INGAME_EDITOR
         g_pGamePersistent->Environment().SetWeather(weather_name, forced);
 }
 
-bool set_weather_fx(LPCSTR weather_name)
+bool set_weather_fx(pcstr const weather_name)
 {
-#ifdef INGAME_EDITOR
     if (!Device.editor())
-#endif // #ifdef INGAME_EDITOR
-        return (g_pGamePersistent->Environment().SetWeatherFX(weather_name));
+        return g_pGamePersistent->Environment().SetWeatherFX(weather_name);
 
-#ifdef INGAME_EDITOR
-    return (false);
-#endif // #ifdef INGAME_EDITOR
+    return false;
 }
 
-bool start_weather_fx_from_time(LPCSTR weather_name, float time)
+bool start_weather_fx_from_time(pcstr const weather_name, const float time)
 {
-#ifdef INGAME_EDITOR
     if (!Device.editor())
-#endif // #ifdef INGAME_EDITOR
-        return (g_pGamePersistent->Environment().StartWeatherFXFromTime(weather_name, time));
+        return g_pGamePersistent->Environment().StartWeatherFXFromTime(weather_name, time);
 
-#ifdef INGAME_EDITOR
-    return (false);
-#endif // #ifdef INGAME_EDITOR
+    return false;
 }
 
 bool is_wfx_playing() { return (g_pGamePersistent->Environment().IsWFXPlaying()); }
 float get_wfx_time() { return (g_pGamePersistent->Environment().wfx_time); }
 void stop_weather_fx() { g_pGamePersistent->Environment().StopWFX(); }
-void set_time_factor(float time_factor)
+void set_time_factor(const float time_factor)
 {
-    if (!OnServer())
+    if (!OnServer() || Device.editor())
         return;
-
-#ifdef INGAME_EDITOR
-    if (Device.editor())
-        return;
-#endif // #ifdef INGAME_EDITOR
 
     Level().Server->GetGameState()->SetGameTimeFactor(time_factor);
 }

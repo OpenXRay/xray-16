@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_suns_manager.hpp"
 #include "editor_environment_suns_sun.hpp"
 #include "Include/editor/ide.hpp"
@@ -146,4 +145,3 @@ CLensFlareDescriptor* manager::get_flare(shared_str const& id) const
     return (0);
 }
 
-#endif // #ifdef INGAME_EDITOR

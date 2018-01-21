@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_sound_channels_manager.hpp"
 #include "property_collection.hpp"
 #include "editor_environment_sound_channels_channel.hpp"
@@ -112,4 +111,3 @@ shared_str manager::unique_id(shared_str const& id) const
     return (m_collection->generate_unique_id(id.c_str()));
 }
 
-#endif // #ifdef INGAME_EDITOR

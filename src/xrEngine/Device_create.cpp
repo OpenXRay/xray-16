@@ -34,11 +34,7 @@ void CRenderDevice::Create()
 #endif
     fFOV = 90.f;
     fASPECT = 1.f;
-#ifdef INGAME_EDITOR
-    bool noEd = !editor();
-#else
-    bool noEd = true;
-#endif
+    const bool noEd = !editor();
     GEnv.Render->Create(m_hWnd, dwWidth, dwHeight, fWidth_2, fHeight_2, noEd);
     Memory.mem_compact();
     b_is_Ready = TRUE;

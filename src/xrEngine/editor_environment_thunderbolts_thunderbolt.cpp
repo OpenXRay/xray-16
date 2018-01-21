@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_thunderbolts_thunderbolt.hpp"
 #include "ide.hpp"
 #include "editor_environment_manager.hpp"
@@ -110,4 +109,3 @@ void thunderbolt::fill(::editor::environment::manager& environment, XRay::Editor
 }
 
 thunderbolt::property_holder_type* thunderbolt::object() { return (m_property_holder); }
-#endif // #ifdef INGAME_EDITOR

@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_suns_flare.hpp"
 #include "Include/editor/ide.hpp"
 #include "ide.hpp"
@@ -45,4 +44,3 @@ void flare::fill(XRay::Editor::property_holder_collection* collection)
     properties->add_property("radius", "flare", "this option is responsible for gradient radius", m_radius, m_radius);
 }
 
-#endif // #ifdef INGAME_EDITOR

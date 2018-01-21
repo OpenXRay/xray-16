@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_weathers_weather.hpp"
 #include "ide.hpp"
 #include "editor_environment_weathers_manager.hpp"
@@ -359,4 +358,3 @@ void weather::reload()
     load();
 }
 
-#endif // #ifdef INGAME_EDITOR

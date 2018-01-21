@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "engine_impl.hpp"
 #include "XR_IOConsole.h"
 #include "xr_input.h"
@@ -377,4 +376,3 @@ void engine_impl::reload_weathers()
         g_pGamePersistent->Environment().SelectEnvs(game_time + .1f);
 }
 
-#endif // #ifdef INGAME_EDITOR

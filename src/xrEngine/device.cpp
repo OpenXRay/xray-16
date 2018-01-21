@@ -19,10 +19,8 @@
 #define INCLUDE_FROM_ENGINE
 #include "xrCore/FS_impl.h"
 
-#ifdef INGAME_EDITOR
 #include "Include/editor/ide.hpp"
 #include "engine_impl.hpp"
-#endif // #ifdef INGAME_EDITOR
 
 #include "xrSASH.h"
 #include "IGame_Persistent.h"
@@ -70,18 +68,14 @@ void CRenderDevice::End(void)
     if (GEnv.isDedicatedServer)
         return;
 
-#ifdef INGAME_EDITOR
     bool load_finished = false;
-#endif // #ifdef INGAME_EDITOR
     if (dwPrecacheFrame)
     {
         GEnv.Sound->set_master_volume(0.f);
         dwPrecacheFrame--;
         if (!dwPrecacheFrame)
         {
-#ifdef INGAME_EDITOR
             load_finished = true;
-#endif
             GEnv.Render->updateGamma();
             if (precache_light)
             {
@@ -112,10 +106,9 @@ void CRenderDevice::End(void)
     if (g_SASH.IsBenchmarkRunning())
         g_SASH.DisplayFrame(Device.fTimeGlobal);
     GEnv.Render->End();
-#ifdef INGAME_EDITOR
+
     if (load_finished && m_editor)
         m_editor->on_load_finished();
-#endif
 }
 
 void CRenderDevice::SecondaryThreadProc(void* context)
@@ -281,24 +274,21 @@ void CRenderDevice::on_idle()
         Sleep(1);
 }
 
-#ifdef INGAME_EDITOR
 void CRenderDevice::message_loop_editor()
 {
     m_editor->run();
     m_editor_finalize(m_editor);
     xr_delete(m_engine);
 }
-#endif // #ifdef INGAME_EDITOR
 
 void CRenderDevice::message_loop()
 {
-#ifdef INGAME_EDITOR
     if (editor())
     {
         message_loop_editor();
         return;
     }
-#endif
+
     MSG msg;
     PeekMessage(&msg, NULL, 0U, 0U, PM_NOREMOVE);
     while (msg.message != WM_QUIT)
@@ -412,9 +402,7 @@ void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
     {
         if (!Paused())
             bShowPauseString =
-#ifdef INGAME_EDITOR
                 editor() ? FALSE :
-#endif // #ifdef INGAME_EDITOR
 #ifdef DEBUG
                            !xr_strcmp(reason, "li_pause_key_no_clip") ? FALSE :
 #endif // DEBUG
@@ -464,11 +452,7 @@ void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM lParam)
         {
             Device.seqAppActivate.Process(rp_AppActivate);
             app_inactive_time += TimerMM.GetElapsed_ms() - app_inactive_time_start;
-#ifdef INGAME_EDITOR
             if (!editor() && !GEnv.isDedicatedServer)
-#else
-            if (!GEnv.isDedicatedServer)
-#endif
                 ShowCursor(FALSE);
         }
         else

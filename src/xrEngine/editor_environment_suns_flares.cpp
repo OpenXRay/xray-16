@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_suns_flares.hpp"
 #include "Include/editor/property_holder_base.hpp"
 #include "property_collection.hpp"
@@ -105,4 +104,3 @@ void flares::fill(
     properties->add_property("flares", "flares", "this option is responsible for flares", m_collection);
 }
 
-#endif // #ifdef INGAME_EDITOR

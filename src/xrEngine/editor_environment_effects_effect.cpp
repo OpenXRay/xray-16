@@ -8,8 +8,6 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
-
 #include "editor_environment_effects_effect.hpp"
 #include "Include/editor/property_holder_base.hpp"
 #include "editor_environment_manager.hpp"
@@ -149,4 +147,3 @@ void effect::fill(XRay::Editor::property_holder_collection* collection)
 }
 
 XRay::Editor::property_holder_base* effect::object() { return m_property_holder; }
-#endif // #ifdef INGAME_EDITOR

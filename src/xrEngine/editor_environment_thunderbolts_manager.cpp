@@ -8,7 +8,6 @@
 
 #include "stdafx.h"
 
-#ifdef INGAME_EDITOR
 #include "editor_environment_thunderbolts_manager.hpp"
 #include "ide.hpp"
 #include "property_collection.hpp"
@@ -311,4 +310,3 @@ SThunderboltCollection* manager::get_collection(shared_str const& section)
 #endif // #ifdef DEBUG
 }
 
-#endif // #ifdef INGAME_EDITOR

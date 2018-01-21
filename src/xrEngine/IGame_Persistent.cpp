@@ -15,13 +15,7 @@
 #include "CustomHUD.h"
 #endif
 
-#ifdef _EDITOR
-bool g_dedicated_server = false;
-#endif
-
-#ifdef INGAME_EDITOR
 #include "editor_environment_manager.hpp"
-#endif // INGAME_EDITOR
 
 ENGINE_API IGame_Persistent* g_pGamePersistent = nullptr;
 
@@ -41,16 +35,10 @@ IGame_Persistent::IGame_Persistent()
 
     m_pMainMenu = nullptr;
 
-#ifndef INGAME_EDITOR
-#ifndef _EDITOR
-    pEnvironment = new CEnvironment();
-#endif
-#else // #ifdef INGAME_EDITOR
     if (RDEVICE.editor())
         pEnvironment = new editor::environment::manager();
     else
         pEnvironment = new CEnvironment();
-#endif // #ifdef INGAME_EDITOR
 }
 
 IGame_Persistent::~IGame_Persistent()

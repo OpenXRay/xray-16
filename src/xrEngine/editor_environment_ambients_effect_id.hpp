@@ -5,11 +5,7 @@
 // Author : Dmitriy Iassenev
 // Description : editor environment ambients effect identifier class
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef EDITOR_WEATHER_AMBIENTS_EFFECT_ID_HPP_INCLUDED
-#define EDITOR_WEATHER_AMBIENTS_EFFECT_ID_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 #include "Common/Noncopyable.hpp"
 #include "Include/editor/property_holder_base.hpp"
@@ -32,8 +28,9 @@ public:
     virtual ~effect_id();
     void fill(XRay::Editor::property_holder_collection* collection);
     inline shared_str const& id() const { return m_id; }
+
 private:
-    typedef XRay::Editor::property_holder_base property_holder_type;
+    using property_holder_type = XRay::Editor::property_holder_base;
 
 public:
     virtual property_holder_type* object();
@@ -42,7 +39,6 @@ private:
     pcstr const* xr_stdcall collection();
     u32 xr_stdcall collection_size();
 
-private:
     property_holder_type* m_property_holder;
     effects::manager const& m_manager;
     shared_str m_id;
@@ -51,6 +47,3 @@ private:
 } // namespace environment
 } // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_WEATHER_AMBIENTS_EFFECT_ID_HPP_INCLUDED

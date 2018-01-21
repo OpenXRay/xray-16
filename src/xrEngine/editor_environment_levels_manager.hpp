@@ -5,11 +5,7 @@
 // Author : Dmitriy Iassenev
 // Description : editor environment levels manager class
 ////////////////////////////////////////////////////////////////////////////
-
-#ifndef EDITOR_WEATHER_LEVELS_MANAGER_HPP_INCLUDED
-#define EDITOR_WEATHER_LEVELS_MANAGER_HPP_INCLUDED
-
-#ifdef INGAME_EDITOR
+#pragma once
 
 #include "Common/Noncopyable.hpp"
 #include "xrCore/Containers/AssociativeVector.hpp"
@@ -45,7 +41,6 @@ public:
 private:
     void fill_levels(CInifile& config, pcstr section, pcstr category);
 
-private:
     pcstr const* xr_stdcall collection();
     u32 xr_stdcall collection_size();
 
@@ -67,11 +62,7 @@ private:
     CInifile* m_config_mp;
     XRay::Editor::property_holder_base* m_property_holder;
 }; // class levels_manager
-
 } // namespace levels
 } // namespace environment
 } // namespace editor
 
-#endif // #ifdef INGAME_EDITOR
-
-#endif // ifndef EDITOR_WEATHER_LEVELS_MANAGER_HPP_INCLUDED
