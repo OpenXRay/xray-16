@@ -137,10 +137,11 @@ public:
     luabind::object name_space(LPCSTR namespace_name);
     int error_log(LPCSTR caFormat, ...);
     int script_log(LuaMessageType message, LPCSTR caFormat, ...);
-    static bool print_output(lua_State* L, LPCSTR caScriptName, int iErrorCode = 0, const char* caErrorText = NULL);
+    static bool print_output(lua_State* L, pcstr caScriptName, int iErrorCode = 0, pcstr caErrorText = nullptr);
 
 private:
     static void print_error(lua_State* L, int iErrorCode);
+    static void onErrorCallback(lua_State* L, pcstr scriptName, int errorCode, pcstr err = nullptr);
 
 public:
     static void on_error(lua_State* state);

@@ -201,6 +201,7 @@ void CScriptEngine::print_stack(lua_State* L)
     lua_Debug l_tDebugInfo;
     for (int i = 0; lua_getstack(L, i, &l_tDebugInfo); i++)
     {
+        Log("\nSCRIPT ERROR");
         lua_getinfo(L, "nSlu", &l_tDebugInfo);
         if (!l_tDebugInfo.name)
         {
@@ -214,17 +215,31 @@ void CScriptEngine::print_stack(lua_State* L)
             script_log(LuaMessageType::Error, "%2d : [%s] %s(%d) : %s", i, l_tDebugInfo.what, l_tDebugInfo.short_src,
             l_tDebugInfo.currentline, l_tDebugInfo.name);
         }
+
+        pcstr lua_error_text = lua_tostring(L, -1); // lua-error text
+        luaL_traceback(L, L, make_string("! [LUA][Error]: %s\n", lua_error_text).c_str(), 1); // add lua traceback to it
+        pcstr sErrorText = lua_tostring(L, -1); // get combined error text from lua stack
+        Log(sErrorText);
+        lua_pop(L, 1); // restore lua stack
+
         // Giperion: verbose log
-        Msg("\tLocals: ");
+        Log("\nLua state dump:\n\tLocals: ");
         pcstr name = nullptr;
         int VarID = 1;
-        while ((name = lua_getlocal(L, &l_tDebugInfo, VarID++)) != nullptr)
+        try
         {
-            LogVariable(L, name, 1, true);
+            while ((name = lua_getlocal(L, &l_tDebugInfo, VarID++)) != nullptr)
+            {
+                LogVariable(L, name, 1, true);
 
-            lua_pop(L, 1);  /* remove variable value */
+                lua_pop(L, 1); /* remove variable value */
+            }
         }
-        Msg("\tEnd");
+        catch (...)
+        {
+            Log("Can't dump lua state - Engine corrupted");
+        }
+        Log("\tEnd\nEnd of Lua state dump.\n");
         // -Giperion
     }
 
@@ -298,8 +313,7 @@ void CScriptEngine::LogVariable(lua_State* luaState, pcstr name, int level, bool
             lua_pop(luaState, 1); //Remove userobject
             return;
         }*/
-        Msg("%s TODO: Fix userdata retrieval", tabBuffer);
-        xr_strcpy(value, "[not available]");
+        xr_strcpy(value, "[TODO: Fix userdata retrieval]");
     }
         break;
 
@@ -319,8 +333,10 @@ int CScriptEngine::script_log(LuaMessageType message, LPCSTR caFormat, ...)
     int result = vscript_log(message, caFormat, marker);
     va_end(marker);
 
+#ifdef DEBUG
     if (message == LuaMessageType::Error)
         print_stack();
+#endif
 
     return result;
 }
@@ -382,8 +398,7 @@ lua_State* L, LPCSTR caBuffer, size_t tSize, LPCSTR caScriptName, LPCSTR caNameS
         l_iErrorCode = luaL_loadbuffer(L, caBuffer, tSize, caScriptName);
     if (l_iErrorCode)
     {
-        print_output(L, caScriptName, l_iErrorCode);
-        on_error(L);
+        onErrorCallback(L, caScriptName, l_iErrorCode);
         return false;
     }
     return true;
@@ -435,9 +450,7 @@ bool CScriptEngine::do_file(LPCSTR caScriptName, LPCSTR caNameSpaceName)
 #endif
     if (l_iErrorCode)
     {
-        print_output(lua(), caScriptName, l_iErrorCode);
-        on_error(lua());
-        lua_settop(lua(), start);
+        onErrorCallback(lua(), caScriptName, l_iErrorCode);
         return false;
     }
     return true;
@@ -599,7 +612,7 @@ struct raii_guard : private Noncopyable
     }
 };
 
-bool CScriptEngine::print_output(lua_State* L, LPCSTR caScriptFileName, int errorCode, const char* caErrorText)
+bool CScriptEngine::print_output(lua_State* L, pcstr caScriptFileName, int errorCode, pcstr caErrorText)
 {
     CScriptEngine* scriptEngine = GetInstance(L);
     VERIFY(scriptEngine);
@@ -823,42 +836,38 @@ void CScriptEngine::unload()
     *m_last_no_file = 0;
 }
 
+void CScriptEngine::onErrorCallback(lua_State* L, pcstr scriptName, int errorCode, pcstr err)
+{
+    print_output(L, scriptName, errorCode, err);
+    on_error(L);
+
+#if !XRAY_EXCEPTIONS
+    xrDebug::Fatal(DEBUG_INFO, "LUA error: %s", err);
+#else
+    throw err;
+#endif
+}
+
 int CScriptEngine::lua_panic(lua_State* L)
 {
-    print_output(L, "", LUA_ERRRUN, "PANIC");
+    onErrorCallback(L, "", LUA_ERRRUN, "PANIC");
     return 0;
 }
 
 void CScriptEngine::lua_error(lua_State* L)
 {
     pcstr err = lua_tostring(L, -1);
-    print_output(L, "", LUA_ERRRUN, err);
-    on_error(L);
-#if !XRAY_EXCEPTIONS
-    xrDebug::Fatal(DEBUG_INFO, "LUA error: %s", err);
-#else
-    throw lua_tostring(L, -1);
-#endif
+    onErrorCallback(L, "", LUA_ERRRUN, err);
 }
 
 int CScriptEngine::lua_pcall_failed(lua_State* L)
 {
-    const char* sErrorText = NULL;
+    const bool isString = lua_isstring(L, -1);
+    const pcstr err = isString ? lua_tostring(L, -1) : "";
 
-#ifndef DEBUG // Debug already do it
-    const char* lua_error_text = lua_tostring(L, -1); // lua-error text
-    luaL_traceback(L, L, make_string("[LUA][Error]: %s\n", lua_error_text).c_str(), 1); // add lua traceback to it
-    sErrorText = lua_tostring(L, -1); // get combined error text from lua stack
-    lua_pop(L, 1); // restore lua stack
-#endif
+    onErrorCallback(L, "", LUA_ERRRUN, err);
 
-    print_output(L, "", LUA_ERRRUN, sErrorText);
-    on_error(L);
-
-#if !XRAY_EXCEPTIONS
-    xrDebug::Fatal(DEBUG_INFO, "LUA error: %s", lua_isstring(L, -1) ? lua_tostring(L, -1) : "");
-#endif
-    if (lua_isstring(L, -1))
+    if (isString)
         lua_pop(L, 1);
     return LUA_ERRRUN;
 }
@@ -867,7 +876,7 @@ void CScriptEngine::lua_cast_failed(lua_State* L, const luabind::type_id& info)
 {
     string128 buf;
     xr_sprintf(buf, "LUA error: cannot cast lua value to %s", info.name());
-    print_output(L, "", LUA_ERRRUN,buf);
+    onErrorCallback(L, "", LUA_ERRRUN, buf);
 }
 #endif
 
@@ -988,7 +997,7 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
     luajit::open_lib(lua(), LUA_STRLIBNAME, luaopen_string);
     luajit::open_lib(lua(), LUA_BITLIBNAME, luaopen_bit);
     luajit::open_lib(lua(), LUA_FFILIBNAME, luaopen_ffi);
-#if 1//def DEBUG
+#ifdef DEBUG
     luajit::open_lib(lua(), LUA_DBLIBNAME, luaopen_debug);
 #endif
     // XXX nitrocaster: with vanilla scripts, '-nojit' option requires script profiler to be disabled. The reason
@@ -1261,7 +1270,7 @@ void CScriptEngine::on_error(lua_State* state)
 
 CScriptProcess* CScriptEngine::CreateScriptProcess(shared_str name, shared_str scripts)
 {
-	return new CScriptProcess(this, name, scripts);
+    return new CScriptProcess(this, name, scripts);
 }
 
 CScriptThread* CScriptEngine::CreateScriptThread(LPCSTR caNamespaceName, bool do_string, bool reload)
