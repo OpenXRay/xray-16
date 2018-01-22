@@ -458,7 +458,7 @@ Fvector& CPhysicsShellHolder::ObjectPosition() { return Position(); }
 LPCSTR CPhysicsShellHolder::ObjectName() const { return cName().c_str(); }
 LPCSTR CPhysicsShellHolder::ObjectNameVisual() const { return cNameVisual().c_str(); }
 LPCSTR CPhysicsShellHolder::ObjectNameSect() const { return cNameSect().c_str(); }
-bool CPhysicsShellHolder::ObjectGetDestroy() const { return !!getDestroy(); }
+bool CPhysicsShellHolder::ObjectGetDestroy() const { return !!CGameObject::getDestroy(); }
 ICollisionHitCallback* CPhysicsShellHolder::ObjectGetCollisionHitCallback() { return get_collision_hit_callback(); }
 u16 CPhysicsShellHolder::ObjectID() const { return ID(); }
 ICollisionForm* CPhysicsShellHolder::ObjectCollisionModel()
