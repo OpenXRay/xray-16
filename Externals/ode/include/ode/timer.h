@@ -47,7 +47,7 @@ double dStopwatchTime (dStopwatch *);	/* returns total time in secs */
 
 void dTimerStart (const char *description);	/* pass a static string here */
 void dTimerNow (const char *description);	/* pass a static string here */
-void dTimerEnd();
+void dTimerEnd(void);
 
 /* print out a timer report. if `average' is nonzero, print out the average
  * time for each slot (this is only meaningful if the same start-now-end
@@ -61,12 +61,12 @@ void dTimerReport (FILE *fout, int average);
 /* returns the timer ticks per second implied by the timing hardware or API.
  * the actual timer resolution may not be this great.
  */
-double dTimerTicksPerSecond();
+double dTimerTicksPerSecond(void);
 
 /* returns an estimate of the actual timer resolution, in seconds. this may
  * be greater than 1/ticks_per_second.
  */
-double dTimerResolution();
+double dTimerResolution(void);
 
 
 #ifdef __cplusplus
