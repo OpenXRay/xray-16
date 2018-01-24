@@ -10,10 +10,10 @@
 #include <d3dx9.h>
 #include "Common/_d3d_extensions.h"
 
-#include "utils/xrLCUtil/LevelCompilerLoggerWindow.hpp"
+#include "utils/xrLCUtil/ILevelCompilerLogger.hpp"
 #include "utils/xrLCUtil/xrThread.hpp"
 
-extern LevelCompilerLoggerWindow& Logger;
+extern ILevelCompilerLogger& Logger;
 extern CThread::LogFunc ProxyMsg;
 extern CThreadManager::ReportStatusFunc ProxyStatus;
 extern CThreadManager::ReportProgressFunc ProxyProgress;

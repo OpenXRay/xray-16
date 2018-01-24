@@ -1,8 +1,5 @@
-// stdafx.cpp : source file that includes just the standard includes
-// xrLC_Light.pch will be the pre-compiled header
-// stdafx.obj will contain the pre-compiled type information
-
 #include "stdafx.h"
+#include "xrCore/cdecl_cast.hpp"
 #include "utils/xrLCUtil/LevelCompilerLoggerWindow.hpp"
 
 ILevelCompilerLogger& Logger = LevelCompilerLoggerWindow::instance();
