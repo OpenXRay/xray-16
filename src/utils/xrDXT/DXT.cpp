@@ -2,19 +2,19 @@
 #include "dxtlib.h"
 #include <nvtt/nvtt.h>
 #include "ETextureParams.h"
-#include "dds.h"
+//#include "dds.h"
 
-BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved) { return TRUE; }
+//BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved) { return TRUE; }
 static HFILE gFileOut;
 static HFILE gFileIn;
 
-const u32 fcc_DXT1 = MAKEFOURCC('D', 'X', 'T', '1');
+/*const u32 fcc_DXT1 = MAKEFOURCC('D', 'X', 'T', '1');
 const u32 fcc_DXT2 = MAKEFOURCC('D', 'X', 'T', '2');
 const u32 fcc_DXT3 = MAKEFOURCC('D', 'X', 'T', '3');
 const u32 fcc_DXT4 = MAKEFOURCC('D', 'X', 'T', '4');
-const u32 fcc_DXT5 = MAKEFOURCC('D', 'X', 'T', '5');
+const u32 fcc_DXT5 = MAKEFOURCC('D', 'X', 'T', '5');*/
 
-void __cdecl WriteDTXnFile(DWORD count, void* buffer, void* userData)
+/*void __cdecl WriteDTXnFile(DWORD count, void* buffer, void* userData)
 {
     if (count == sizeof(DDS_HEADER))
     {
@@ -32,7 +32,7 @@ void __cdecl WriteDTXnFile(DWORD count, void* buffer, void* userData)
         }
     }
     _write(gFileOut, buffer, count);
-}
+}*/
 
 class DDSWriter : public nvtt::OutputHandler
 {
@@ -48,7 +48,7 @@ DDSWriter::DDSWriter(HFILE& file) : file(file) {}
 void DDSWriter::beginImage(int size, int width, int height, int depth, int face, int miplevel) {}
 bool DDSWriter::writeData(const void* data, int size)
 {
-    if (size == sizeof(DDS_HEADER))
+    /*if (size == sizeof(DDS_HEADER))
     {
         DDS_HEADER* hdr = (DDS_HEADER*)data;
         if (hdr->dwSize == size)
@@ -62,7 +62,7 @@ bool DDSWriter::writeData(const void* data, int size)
             case fcc_DXT5: hdr->ddspf.dwRGBBitCount = 0; break;
             }
         }
-    }
+    }*/
     _write(file, data, size);
     return true;
 }
@@ -89,15 +89,15 @@ void DDSErrorHandler::error(nvtt::Error e)
     MessageBox(0, msg, "DXT compress error", MB_ICONERROR | MB_OK);
 }
 
-void __cdecl ReadDTXnFile(DWORD count, void* buffer, void* userData) { _read(gFileIn, buffer, count); }
+/*void __cdecl ReadDTXnFile(DWORD count, void* buffer, void* userData) { _read(gFileIn, buffer, count); }
 HRESULT WriteCompressedData(void* data, int miplevel, u32 size)
 {
     _write(gFileOut, data, size);
     FillMemory(data, size, 0xff);
     return 0;
-}
+}*/
 
-ENGINE_API u32* Build32MipLevel(u32& _w, u32& _h, u32& _p, u32* pdwPixelSrc, STextureParams* fmt, float blend)
+/*ENGINE_API*/ u32* Build32MipLevel(u32& _w, u32& _h, u32& _p, u32* pdwPixelSrc, STextureParams* fmt, float blend)
 {
     R_ASSERT(pdwPixelSrc);
     R_ASSERT(_w % 2 == 0);
@@ -260,7 +260,7 @@ int DXTCompressImage(LPCSTR out_name, u8* raw_data, u32 w, u32 h, u32 pitch, STe
         u8* pixel = pImagePixels;
         for (u32 k = 0; k < w * 2 * h; k++, pixel += 4)
         {
-            pixels[k].set(pixel[2], pixel[1], pixel[0], pixel[3]);
+            pixels[k].set(pixel[0], pixel[1], pixel[2], pixel[3]);
         }
         inOpt.setMipmapData(pixels, w, h);
         result = nvtt::Compressor().process(inOpt, compOpt, outOpt);
@@ -272,7 +272,7 @@ int DXTCompressImage(LPCSTR out_name, u8* raw_data, u32 w, u32 h, u32 pitch, STe
         rgba_t* pixels = pImage.pixels();
         u8* pixel = raw_data;
         for (u32 k = 0; k < w * h; k++, pixel += 4)
-            pixels[k].set(pixel[2], pixel[1], pixel[0], pixel[3]);
+            pixels[k].set(pixel[0], pixel[1], pixel[2], pixel[3]);
         inOpt.setMipmapData(pixels, w, h);
         result = nvtt::Compressor().process(inOpt, compOpt, outOpt);
     }

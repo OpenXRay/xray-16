@@ -1,11 +1,11 @@
 // xrLC.cpp : Defines the entry point for the application.
 //
 #include "stdafx.h"
+#include <memory>
 #include "math.h"
 #include "build.h"
 #include "Common/FSMacros.hpp"
 #include "utils/xrLC_Light/xrLC_GlobalData.h"
-#include "utils/xrLCUtil/LevelCompilerLoggerWindow.hpp"
 #include "xrCore/ModuleLookup.hpp"
 
 #pragma comment(lib, "d3dx9.lib")
@@ -13,23 +13,6 @@
 
 CBuild* pBuild = NULL;
 u32 version = 0;
-ILevelCompilerLogger& Logger = LevelCompilerLoggerWindow();
-
-CThread::LogFunc ProxyMsg = cdecl_cast([](const char* format, ...) {
-    va_list args;
-    va_start(args, format);
-    Logger.clMsgV(format, args);
-    va_end(args);
-});
-
-CThreadManager::ReportStatusFunc ProxyStatus = cdecl_cast([](const char* format, ...) {
-    va_list args;
-    va_start(args, format);
-    Logger.StatusV(format, args);
-    va_end(args);
-});
-
-CThreadManager::ReportProgressFunc ProxyProgress = cdecl_cast([](float progress) { Logger.Progress(progress); });
 
 static const char* h_str =
     "The following keys are supported / required:\n"
@@ -155,6 +138,7 @@ int APIENTRY WinMain(HINSTANCE hInst, HINSTANCE hPrevInstance, LPSTR lpCmdLine, 
         g_using_smooth_groups = false;
 
     Startup(lpCmdLine);
+
     Core._destroy();
 
     return 0;

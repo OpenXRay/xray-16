@@ -9,31 +9,12 @@
 
 #pragma comment(lib, "winmm.LIB")
 
-#include "xrCore/cdecl_cast.hpp"
 #include "xrCore/ModuleLookup.hpp"
 
 #include "factory_api.h"
 
 Factory_Create* create_entity = 0;
 Factory_Destroy* destroy_entity = 0;
-
-LevelCompilerLoggerWindow& Logger = LevelCompilerLoggerWindow();
-
-CThread::LogFunc ProxyMsg = cdecl_cast([](const char* format, ...) {
-    va_list args;
-    va_start(args, format);
-    Logger.clMsgV(format, args);
-    va_end(args);
-});
-
-CThreadManager::ReportStatusFunc ProxyStatus = cdecl_cast([](const char* format, ...) {
-    va_list args;
-    va_start(args, format);
-    Logger.StatusV(format, args);
-    va_end(args);
-});
-
-CThreadManager::ReportProgressFunc ProxyProgress = cdecl_cast([](float progress) { Logger.Progress(progress); });
 
 extern void xrCompiler(LPCSTR name, bool draft_mode, bool pure_covers, LPCSTR out_name);
 extern void verify_level_graph(LPCSTR name, bool verbose);
@@ -184,7 +165,7 @@ void Startup(LPSTR lpCmdLine)
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     xrDebug::Initialize(false);
-    Core.Initialize("xrai", 0);
+    Core.Initialize("xrAI");
 
     Startup(lpCmdLine);
 
