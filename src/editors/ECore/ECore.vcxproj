@@ -185,6 +185,7 @@
     <ClInclude Include="Engine\nv_math.h" />
     <ClInclude Include="Engine\nv_mathdecl.h" />
     <ClInclude Include="Engine\Texture.h" />
+    <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Editor\bone.cpp" />
@@ -262,6 +263,7 @@
     <ClCompile Include="Engine\Image.cpp" />
     <ClCompile Include="Engine\NVMeshMender.cpp" />
     <ClCompile Include="Engine\nv_algebra.cpp" />
+    <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -9,7 +9,6 @@
 #pragma once
 
 #pragma managed(push, off)
-#include "Common/Platform.hpp"
 #include "Common/Common.hpp"
 #include "xrCommon/inlining_macros.h"
 #include "xrCore/xrstring.h"

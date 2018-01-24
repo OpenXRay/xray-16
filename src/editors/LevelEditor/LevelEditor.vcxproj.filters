@@ -142,9 +142,6 @@
     <ClInclude Include="Splash.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="stdafx.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="TopBar.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -325,6 +322,7 @@
     <ClInclude Include="Edit\SceneSummaryInfo.h">
       <Filter>Scene</Filter>
     </ClInclude>
+    <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BottomBar.cpp">
@@ -430,9 +428,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Splash.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TopBar.cpp">
@@ -720,6 +715,7 @@
     <ClCompile Include="Edit\SceneUtil.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
+    <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="LevelEditor.todo" />

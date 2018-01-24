@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Common/Common.hpp"
+
 #pragma warn - pck
 
 #define sqrtf(a) sqrt(a)

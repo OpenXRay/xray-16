@@ -1,5 +1,8 @@
 #pragma once
 
+#define NO_ENGINE_API
+#include "Common/Common.hpp"
+
 #include <xrCore/xrCore.h>
 
 #define smart_cast dynamic_cast
@@ -13,8 +16,6 @@ class MODEL;
 #include "xrServerEntities/xrEProps.h"
 
 #include "FolderLib.h"
-
-#include "Common/Platform.hpp"
 
 #define ENGINE_API
 #define DLL_API XR_IMPORT

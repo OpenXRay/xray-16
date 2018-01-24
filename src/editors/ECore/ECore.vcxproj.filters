@@ -175,6 +175,7 @@
     <ClInclude Include="Engine\Texture.h">
       <Filter>engine</Filter>
     </ClInclude>
+    <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Editor\bone.cpp">
@@ -375,5 +376,6 @@
     <ClCompile Include="Engine\NVMeshMender.cpp">
       <Filter>engine</Filter>
     </ClCompile>
+    <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
 </Project>
