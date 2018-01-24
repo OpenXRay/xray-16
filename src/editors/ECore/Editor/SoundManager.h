@@ -13,8 +13,8 @@ public:
     void MakeGameSound(ESoundThumbnail* THM, LPCSTR src_name, LPCSTR game_name);
     CSoundManager() {}
     virtual ~CSoundManager() { ; }
-    BOOL__stdcall RemoveSound(LPCSTR fname, EItemType type);
-    void__stdcall RenameSound(LPCSTR p0, LPCSTR p1, EItemType type);
+    BOOL __stdcall RemoveSound(LPCSTR fname, EItemType type);
+    void __stdcall RenameSound(LPCSTR p0, LPCSTR p1, EItemType type);
 
     // texture routines
     int GetSounds(FS_FileSet& files, BOOL bFolders = FALSE);

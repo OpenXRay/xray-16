@@ -2,9 +2,9 @@
 
 #include "Common/Common.hpp"
 
-#pragma warn - pck
+//#pragma warn - pck
 
-#define sqrtf(a) sqrt(a)
+//#define sqrtf(a) sqrt(a)
 
 #define smart_cast dynamic_cast
 
@@ -19,15 +19,17 @@
 #define RENDER R_R1
 
 // Std C++ headers
-#include <fastmath.h>
+//#include <fastmath.h>
+//#include "math.h"
 #include <io.h>
 #include <fcntl.h>
-#include <sys\stat.h>
+#include <sys/stat.h>
 #include <process.h>
-#include <utime.h>
+#include <sys/utime.h>
 
 // useful macros
 // MSC names for functions
+/*
 #ifdef _eof
 #undef _eof
 #endif
@@ -53,8 +55,7 @@ __inline float modff(float a, float* b)
     *b = x;
     return float(y);
 }
-__inline float expf(float val) { return ::exp(val); }
-#include "xrCore/Platform.h"
+__inline float expf(float val) { return ::exp(val); }*/
 
 #ifdef _ECOREB
 #define ECORE_API XR_EXPORT
@@ -72,8 +73,34 @@ __inline float expf(float val) { return ::exp(val); }
 
 #define clMsg Msg
 
+enum TMsgDlgType
+{
+    mtWarning,
+    mtError,
+    mtInformation,
+    mtConfirmation,
+    mtCustom
+};
+enum TMsgDlgBtn
+{
+    mbYes,
+    mbNo,
+    mbOK,
+    mbCancel,
+    mbAbort,
+    mbRetry,
+    mbIgnore,
+    mbAll,
+    mbNoToAll,
+    mbYesToAll,
+    mbHelp
+};
+typedef TMsgDlgBtn TMsgDlgButtons[mbHelp];
+
 // core
 #include <xrCore/xrCore.h>
+
+#define AnsiString xr_string
 
 #ifdef _EDITOR
 class PropValue;
@@ -86,7 +113,7 @@ DEFINE_VECTOR(ListItem*, ListItemsVec, ListItemsIt);
 
 #include "xrCDB/xrCDB.h"
 #include "xrSound/Sound.h"
-#include "xrEngine/PSystem.h"
+#include "xrParticles/psystem.h"
 
 // DirectX headers
 #include <d3d9.h>
@@ -100,12 +127,12 @@ DEFINE_VECTOR(ListItem*, ListItemsVec, ListItemsIt);
 #include "xrCore/FMesh.hpp"
 #include "Common/_d3d_extensions.h"
 
-#include "D3DX_Wrapper.h"
+//#include "D3DX_Wrapper.h"
 
 DEFINE_VECTOR(AnsiString, AStringVec, AStringIt);
 DEFINE_VECTOR(AnsiString*, LPAStringVec, LPAStringIt);
 
-#include "xrServerEntities\xrEProps.h"
+#include "xrServerEntities/xrEProps.h"
 #include "xrCore/Log.h"
 #include "Editor/engine.h"
 #include "xrEngine/defines.h"
