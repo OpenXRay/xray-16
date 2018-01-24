@@ -29,8 +29,9 @@ private:
     bool bPhaseChange = false;
     u32 phase_total_time = 0;
 
-public:
+protected:
     LevelCompilerLoggerWindow();
+public:
     virtual void Initialize(const char* name) override;
     virtual void Destroy() override;
     virtual void clMsg(const char* format, ...) override;
@@ -43,6 +44,7 @@ public:
     virtual void Success(const char* msg) override;
     virtual void Failure(const char* msg) override;
     HWND GetWindow() const;
+    static LevelCompilerLoggerWindow& instance();
 
 private:
     static void LogThreadProc(void* context);

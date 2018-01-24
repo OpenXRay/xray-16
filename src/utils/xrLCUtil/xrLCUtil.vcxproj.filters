@@ -24,9 +24,6 @@
     <ClCompile Include="LevelCompilerLoggerWindow.cpp">
       <Filter>Log</Filter>
     </ClCompile>
-    <ClCompile Include="LevelCompilerLoggerConsole.cpp">
-      <Filter>Log</Filter>
-    </ClCompile>
     <ClCompile Include="xrLCUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -43,9 +40,6 @@
       <Filter>Resources</Filter>
     </ClInclude>
     <ClInclude Include="LevelCompilerLoggerWindow.hpp">
-      <Filter>Log</Filter>
-    </ClInclude>
-    <ClInclude Include="LevelCompilerLoggerConsole.hpp">
       <Filter>Log</Filter>
     </ClInclude>
     <ClInclude Include="xrLCUtil.hpp" />

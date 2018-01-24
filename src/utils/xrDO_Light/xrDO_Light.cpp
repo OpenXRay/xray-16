@@ -10,7 +10,7 @@
 #pragma comment(lib, "comctl32.lib")
 #pragma comment(lib, "winmm.LIB")
 
-ILevelCompilerLogger& Logger = LevelCompilerLoggerWindow();
+ILevelCompilerLogger& Logger = LevelCompilerLoggerWindow::instance();
 
 CThread::LogFunc ProxyMsg = cdecl_cast([](const char* format, ...) {
     va_list args;

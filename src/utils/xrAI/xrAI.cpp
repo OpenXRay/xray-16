@@ -17,7 +17,7 @@
 Factory_Create* create_entity = 0;
 Factory_Destroy* destroy_entity = 0;
 
-LevelCompilerLoggerWindow& Logger = LevelCompilerLoggerWindow();
+LevelCompilerLoggerWindow& Logger = LevelCompilerLoggerWindow::instance();
 
 CThread::LogFunc ProxyMsg = cdecl_cast([](const char* format, ...) {
     va_list args;

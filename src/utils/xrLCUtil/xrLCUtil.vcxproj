@@ -158,7 +158,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="LevelCompilerLoggerConsole.cpp" />
     <ClCompile Include="LevelCompilerLoggerWindow.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -181,7 +180,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ILevelCompilerLogger.hpp" />
-    <ClInclude Include="LevelCompilerLoggerConsole.hpp" />
     <ClInclude Include="LevelCompilerLoggerWindow.hpp" />
     <ClInclude Include="pch.hpp" />
     <ClInclude Include="xrThread.hpp" />

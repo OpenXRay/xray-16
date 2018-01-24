@@ -252,3 +252,9 @@ void LevelCompilerLoggerWindow::Success(const char* msg)
 
 void LevelCompilerLoggerWindow::Failure(const char* msg) { MessageBox(logWindow, msg, "Error!", MB_OK | MB_ICONERROR); }
 HWND LevelCompilerLoggerWindow::GetWindow() const { return logWindow; }
+
+LevelCompilerLoggerWindow & LevelCompilerLoggerWindow::instance()
+{
+    static LevelCompilerLoggerWindow instance;
+    return instance;
+}

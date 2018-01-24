@@ -13,7 +13,7 @@
 
 CBuild* pBuild = NULL;
 u32 version = 0;
-ILevelCompilerLogger& Logger = LevelCompilerLoggerWindow();
+ILevelCompilerLogger& Logger = LevelCompilerLoggerWindow::instance();
 
 CThread::LogFunc ProxyMsg = cdecl_cast([](const char* format, ...) {
     va_list args;
