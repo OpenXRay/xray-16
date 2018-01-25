@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "dxtlib.h"
 #include <nvtt/nvtt.h>
-#include "ETextureParams.h"
+#include "Layers/xrRender/ETextureParams.h"
 //#include "dds.h"
 
 //BOOL APIENTRY DllMain(HANDLE hModule, u32 ul_reason_for_call, LPVOID lpReserved) { return TRUE; }

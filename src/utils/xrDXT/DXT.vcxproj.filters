@@ -12,9 +12,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ETextureParams.h">
-      <Filter>Shared</Filter>
-    </ClInclude>
     <ClInclude Include="Image_DXTC.h">
       <Filter>NormalMap</Filter>
     </ClInclude>
@@ -37,13 +34,13 @@
     <ClInclude Include="dxtlib.h">
       <Filter>Convert</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Layers\xrRender\ETextureParams.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXT.cpp">
       <Filter>Convert</Filter>
-    </ClCompile>
-    <ClCompile Include="ETextureParams.cpp">
-      <Filter>Shared</Filter>
     </ClCompile>
     <ClCompile Include="Image_DXTC.cpp">
       <Filter>NormalMap</Filter>
@@ -58,5 +55,8 @@
       <Filter>NormalMap</Filter>
     </ClCompile>
     <ClCompile Include="StdAfx.cpp" />
+    <ClCompile Include="..\..\Layers\xrRender\ETextureParams.cpp">
+      <Filter>Shared</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
