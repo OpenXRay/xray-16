@@ -147,6 +147,11 @@ void xrLoad(LPCSTR name, bool draft_mode)
                         IReader* THM = FS.r_open("$game_textures$", N);
                         R_ASSERT2(THM, N);
 
+                        // version
+                        //u32 version = 0;
+                        //R_ASSERT2(THM->r_chunk(THM_CHUNK_VERSION, &version), N);
+                        //if (version != THM_CURRENT_VERSION) FATAL("Unsupported version of THM file.");
+
                         // analyze thumbnail information
                         BT.THM.Load(*THM);
                         BOOL bLOD = FALSE;
@@ -169,8 +174,8 @@ void xrLoad(LPCSTR name, bool draft_mode)
                                 if ((w != BT.dwWidth) || (h != BT.dwHeight))
                                 {
                                     Msg("! THM doesn't correspond to the texture: %dx%d -> %dx%d", BT.dwWidth, BT.dwHeight, w, h);
-                                    BT.dwWidth = w;
-                                    BT.dwHeight = h;
+                                    BT.dwWidth = BT.THM.width = w;
+                                    BT.dwHeight = BT.THM.height = h;
                                 }
                                 BT.Vflip();
                             }

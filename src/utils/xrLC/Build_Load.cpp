@@ -323,20 +323,12 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
                 R_ASSERT2(THM, th_name);
 
                 // version
-                u32 version = 0;
-                R_ASSERT2(THM->r_chunk(THM_CHUNK_VERSION, &version), th_name);
-                // if( version!=THM_CURRENT_VERSION )	FATAL	("Unsupported version of THM file.");
+                //u32 version = 0;
+                //R_ASSERT2(THM->r_chunk(THM_CHUNK_VERSION, &version), th_name);
+                //if (version != THM_CURRENT_VERSION) FATAL("Unsupported version of THM file.");
 
                 // analyze thumbnail information
-                R_ASSERT2(THM->find_chunk(THM_CHUNK_TEXTUREPARAM), th_name);
-                THM->r(&BT.THM.fmt, sizeof(STextureParams::ETFormat));
-                BT.THM.flags.assign(THM->r_u32());
-                BT.THM.border_color = THM->r_u32();
-                BT.THM.fade_color = THM->r_u32();
-                BT.THM.fade_amount = THM->r_u32();
-                BT.THM.mip_filter = THM->r_u32();
-                BT.THM.width = THM->r_u32();
-                BT.THM.height = THM->r_u32();
+                BT.THM.Load(*THM);
                 BOOL bLOD = FALSE;
                 if (N[0] == 'l' && N[1] == 'o' && N[2] == 'd' && N[3] == '\\')
                     bLOD = TRUE;
@@ -347,8 +339,7 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
                 BT.bHasAlpha = BT.THM.HasAlphaChannel();
                 if (!bLOD)
                 {
-                    if (BT.bHasAlpha || BT.THM.flags.test(STextureParams::flImplicitLighted) ||
-                        g_build_options.b_radiosity)
+                    if (BT.bHasAlpha || BT.THM.flags.test(STextureParams::flImplicitLighted) || g_build_options.b_radiosity)
                     {
                         Logger.clMsg("- loading: %s", N);
                         u32 w = 0, h = 0;
@@ -357,8 +348,7 @@ void CBuild::Load(const b_params& Params, const IReader& _in_FS)
                         R_ASSERT2(BT.pSurface, "Can't load surface");
                         if ((w != BT.dwWidth) || (h != BT.dwHeight))
                         {
-                            Msg("! THM doesn't correspond to the texture: %dx%d -> %dx%d", BT.dwWidth, BT.dwHeight, w,
-                                h);
+                            Msg("! THM doesn't correspond to the texture: %dx%d -> %dx%d", BT.dwWidth, BT.dwHeight, w, h);
                             BT.dwWidth = BT.THM.width = w;
                             BT.dwHeight = BT.THM.height = h;
                         }
