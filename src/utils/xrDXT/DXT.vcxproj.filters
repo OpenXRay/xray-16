@@ -24,19 +24,16 @@
     <ClInclude Include="NVI_Image.h">
       <Filter>NormalMap</Filter>
     </ClInclude>
-    <ClInclude Include="dds.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="dds\ConvertColor.h" />
     <ClInclude Include="dds\ddsTypes.h" />
     <ClInclude Include="dds\nvErrorCodes.h" />
     <ClInclude Include="dds\tPixel.h" />
     <ClInclude Include="dds\tVector.h" />
-    <ClInclude Include="dxtlib.h">
-      <Filter>Convert</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Layers\xrRender\ETextureParams.h">
       <Filter>Shared</Filter>
     </ClInclude>
+    <ClInclude Include="dds.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXT.cpp">
