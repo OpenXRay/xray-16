@@ -36,7 +36,7 @@ void r_vector(INetReader& r, xr_vector<T>& v)
 {
     u32 cnt = r.r_u32();
     v.resize(cnt);
-    xr_vector<T>::iterator i = v.begin(), e = v.end();
+    typename xr_vector<T>::iterator i = v.begin(), e = v.end();
     for (; i != e; ++i)
         i->read(r);
 }
@@ -46,7 +46,7 @@ void w_vector(IWriter& w, const xr_vector<T>& v)
 {
     u32 cnt = v.size();
     w.w_u32(cnt);
-    xr_vector<T>::const_iterator i = v.begin(), e = v.end();
+    typename xr_vector<T>::const_iterator i = v.cbegin(), e = v.cend();
     for (; i != e; ++i)
         i->write(w);
 }
@@ -76,7 +76,7 @@ void r_vector(INetReader& r, svector<T, dim>& v)
 {
     u32 cnt = r.r_u32();
     v.resize(cnt);
-    svector<T, dim>::iterator i = v.begin(), e = v.end();
+    typename svector<T, dim>::iterator i = v.begin(), e = v.end();
     for (; i != e; ++i)
         i->read(r);
 }
@@ -86,7 +86,7 @@ void w_vector(IWriter& w, const svector<T, dim>& v)
 {
     u32 cnt = v.size();
     w.w_u32(cnt);
-    svector<T, dim>::const_iterator i = v.begin(), e = v.end();
+    typename svector<T, dim>::const_iterator i = v.cbegin(), e = v.cend();
     for (; i != e; ++i)
         i->write(w);
 }
@@ -104,7 +104,7 @@ public:
     {
         if (f == 0)
             return id_none;
-        xr_vector<type*>::const_iterator F = std::find(vec.begin(), vec.end(), f);
+        const auto F = std::find(vec.cbegin(), vec.cend(), f);
         VERIFY(F != vec.end());
         return u32(F - vec.begin());
     }
@@ -149,8 +149,8 @@ private:
 
     void write(IWriter& w) const
     {
-        xr_vector<T *>::const_iterator i = vec.begin(), e = vec.end();
         w.w_u32(vec.size());
+        typename xr_vector<T *>::const_iterator i = vec.cbegin(), e = vec.cend();
         for (; i != e; ++i)
             (*i)->write(w);
     }
@@ -165,7 +165,7 @@ private:
     void write_ref(IWriter& w, const xr_vector<T*>& ref_vec) const
     {
         w.w_u32(ref_vec.size());
-        xr_vector<T *>::const_iterator i = ref_vec.begin(), e = ref_vec.end();
+        typename xr_vector<T *>::const_iterator i = ref_vec.cbegin(), e = ref_vec.cend();
         for (; i != e; ++i)
             write(w, *i);
     }

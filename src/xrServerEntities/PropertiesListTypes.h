@@ -546,16 +546,16 @@ public:
 public:
     NumericValue(T* val) : CustomValue<T>(val)
     {
-        value = val;
-        init_value = *value;
+        this->value = val;
+        this->init_value = *this->value;
         dec = 0;
     };
     NumericValue(T* val, T mn, T mx, T increm, int decim)
         : CustomValue<T>(val), lim_mn(mn), lim_mx(mx), inc(increm), dec(decim)
     {
         clamp(*val, lim_mn, lim_mx);
-        value = val;
-        init_value = *value;
+        this->value = val;
+        this->init_value = *this->value;
     };
     bool ApplyValue(const T& _val)
     {
@@ -569,7 +569,7 @@ public:
         if (!OnDrawText.empty())
             OnDrawText(this, draw_val);
         else
-            draw_sprintf(draw_val, *value, dec);
+            draw_sprintf(draw_val, *this->value, dec);
         return draw_val;
     }
 };

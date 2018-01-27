@@ -13,6 +13,7 @@ IC s32 clamp_to_8bit(const s32 val) throw()
     return val;
 }
 
+// XXX: maybe make functions constexpr
 // maps unsigned 8 bits/channel to D3DCOLOR
 ICF u32 color_argb(u32 a, u32 r, u32 g, u32 b) throw()
 { return ((a & 0xff) << 24) | ((r & 0xff) << 16) | ((g & 0xff) << 8) | (b & 0xff); }

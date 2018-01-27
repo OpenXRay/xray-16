@@ -125,7 +125,7 @@ void xrServer::OnCL_Connected(IClient* _CL)
     game->OnPlayerConnect(CL->ID);
 }
 
-void xrServer::SendConnectResult(IClient* CL, u8 res, u8 res1, char* ResultStr)
+void xrServer::SendConnectResult(IClient* CL, u8 res, u8 res1, pcstr ResultStr)
 {
     NET_Packet P;
     P.w_begin(M_CLIENT_CONNECT_RESULT);

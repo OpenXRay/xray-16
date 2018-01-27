@@ -35,9 +35,9 @@ TEMPLATE_SPECIALIZATION
 IC bool CGameVertexTypePathManager::is_goal_reached(const _index_type& /*node_index*/)
 {
     VERIFY(m_evaluator);
-    if (graph->vertex(data_storage->get_best().index())->level_id() == m_evaluator->m_level_id)
+    if (this->graph->vertex(this->data_storage->get_best().index())->level_id() == m_evaluator->m_level_id)
     {
-        m_evaluator->m_vertex_id = data_storage->get_best().index();
+        m_evaluator->m_vertex_id = this->data_storage->get_best().index();
         return (true);
     }
     return (false);
@@ -47,7 +47,7 @@ TEMPLATE_SPECIALIZATION
 template <typename T>
 IC void CGameVertexTypePathManager::create_path(T& vertex)
 {
-    if (path)
+    if (this->path)
         inherited::create_path(vertex);
 }
 

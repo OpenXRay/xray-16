@@ -173,7 +173,7 @@ void xrServer::ProcessClientDigest(xrClientData* xrCL, NET_Packet* P)
         }
         else
         {
-            message_to_user = "";
+            STRCONCAT(message_to_user, "");
         }
         SendConnectResult(tmp_client, 0, ecr_have_been_banned, message_to_user);
         return;

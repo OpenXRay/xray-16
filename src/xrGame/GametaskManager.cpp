@@ -349,15 +349,13 @@ u32 CGameTaskManager::GetTaskCount(ETaskState state)
     return res;
 }
 
-char* sTaskStates[] = {"eTaskStateFail", "TaskStateInProgress", "TaskStateCompleted", "TaskStateDummy"};
+constexpr pcstr sTaskStates[] = { "eTaskStateFail", "TaskStateInProgress", "TaskStateCompleted", "TaskStateDummy" };
 
 void CGameTaskManager::DumpTasks()
 {
-    auto it = GetGameTasks().begin();
-    auto it_e = GetGameTasks().end();
-    for (; it != it_e; ++it)
+    for (auto& it : GetGameTasks())
     {
-        const CGameTask* gt = (*it).game_task;
+        const CGameTask* gt = it.game_task;
         Msg(" ID=[%s] state=[%s] prio=[%d] ", gt->m_ID.c_str(), sTaskStates[gt->GetTaskState()], gt->m_priority);
     }
 }

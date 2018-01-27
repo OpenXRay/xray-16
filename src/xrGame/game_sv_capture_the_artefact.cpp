@@ -1146,7 +1146,7 @@ void game_sv_CaptureTheArtefact::CheckAnomalyUpdate(u32 currentTime)
         ReStartRandomAnomaly();
 }
 
-s32 game_sv_CaptureTheArtefact::GetMoneyAmount(const shared_str& caSection, char* caMoneyStr)
+s32 game_sv_CaptureTheArtefact::GetMoneyAmount(const shared_str& caSection, pcstr caMoneyStr)
 {
     if (pSettings->line_exist(caSection, caMoneyStr))
         return pSettings->r_s32(caSection, caMoneyStr);

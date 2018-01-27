@@ -61,7 +61,7 @@ inline bool CBucketList::is_opened_empty()
             while (m_min_bucket_id < BucketCount)
             {
                 auto bucket = m_buckets[m_min_bucket_id];
-                if (!bucket || bucket->m_path_id != current_path_id() || bucket->m_bucket_id != m_min_bucket_id)
+                if (!bucket || bucket->m_path_id != this->current_path_id() || bucket->m_bucket_id != m_min_bucket_id)
                 {
                     m_min_bucket_id++;
                     continue;
@@ -100,12 +100,12 @@ inline void CBucketList::verify_buckets() const
         if (!j)
             continue;
         auto index = indexes[j->index()];
-        if (index.m_path_id!=current_path_id() || index.vertex!=j)
+        if (index.m_path_id!= this->current_path_id() || index.vertex!=j)
             continue;
         u32 count1 = 0, count2 = 0;
         for (; j; k = j, j = j->next(), count1++)
         {
-            VERIFY(indexes[j->index()].m_path_id==current_path_id());
+            VERIFY(indexes[j->index()].m_path_id== this->current_path_id());
             VERIFY(compute_bucket_id(*j)==i);
             VERIFY(!j->prev() || j==j->prev()->next());
             VERIFY(!j->next() || j==j->next()->prev());
@@ -114,7 +114,7 @@ inline void CBucketList::verify_buckets() const
         }
         for (; k; k = k->prev(), count2++)
         {
-            VERIFY(indexes[k->index()].m_path_id==current_path_id());
+            VERIFY(indexes[k->index()].m_path_id== this->current_path_id());
             VERIFY(compute_bucket_id(*k)==i);
             VERIFY(!k->prev() || k==k->prev()->next());
             VERIFY(!k->next() || k==k->next()->prev());
@@ -132,17 +132,17 @@ inline void CBucketList::add_to_bucket(Vertex& vertex, u32 m_bucket_id)
     if (m_bucket_id < m_min_bucket_id)
         m_min_bucket_id = m_bucket_id;
     Vertex* i = m_buckets[m_bucket_id];
-    if (!i || !ClearBuckets && (i->m_path_id != current_path_id() || i->m_bucket_id != m_bucket_id))
+    if (!i || !ClearBuckets && (i->m_path_id != this->current_path_id() || i->m_bucket_id != m_bucket_id))
     {
         vertex.m_bucket_id = m_bucket_id;
-        vertex.m_path_id = current_path_id();
+        vertex.m_path_id = this->current_path_id();
         m_buckets[m_bucket_id] = &vertex;
         vertex.next() = vertex.prev() = 0;
         verify_buckets();
         return;
     }
     vertex.m_bucket_id = m_bucket_id;
-    vertex.m_path_id = current_path_id();
+    vertex.m_path_id = this->current_path_id();
     if (i->f() >= vertex.f())
     {
         m_buckets[m_bucket_id] = &vertex;
@@ -223,7 +223,7 @@ inline void CBucketList::remove_best_opened()
 {
     VERIFY(!is_opened_empty());
     verify_buckets();
-    VERIFY(m_buckets[m_min_bucket_id] && is_visited(m_buckets[m_min_bucket_id]->index()));
+    VERIFY(m_buckets[m_min_bucket_id] && this->is_visited(m_buckets[m_min_bucket_id]->index()));
     m_buckets[m_min_bucket_id] = m_buckets[m_min_bucket_id]->next();
     if (m_buckets[m_min_bucket_id])
         m_buckets[m_min_bucket_id]->prev() = 0;

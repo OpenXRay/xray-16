@@ -273,6 +273,7 @@ IC u32 it_height_rev_base(u32 d, u32 s)
 
 ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize)
 {
+    HRESULT result;
     ID3DTexture2D* pTexture2D = nullptr;
     IDirect3DCubeTexture9* pTextureCUBE = nullptr;
     string_path fn;
@@ -323,7 +324,7 @@ _DDS:
 #endif // DEBUG
     img_size = S->length();
     R_ASSERT(S);
-    HRESULT const result = D3DXGetImageInfoFromFileInMemory(S->pointer(), S->length(), &IMG);
+    result = D3DXGetImageInfoFromFileInMemory(S->pointer(), S->length(), &IMG);
     if (FAILED(result))
     {
         Msg("! Can't get image info for texture '%s'", fn);
@@ -342,7 +343,7 @@ _DDS:
 
 _DDS_CUBE:
 {
-    HRESULT const result = D3DXCreateCubeTextureFromFileInMemoryEx(HW.pDevice, S->pointer(), S->length(), D3DX_DEFAULT,
+    result = D3DXCreateCubeTextureFromFileInMemoryEx(HW.pDevice, S->pointer(), S->length(), D3DX_DEFAULT,
         IMG.MipLevels, 0, IMG.Format, D3DPOOL_MANAGED, D3DX_DEFAULT, D3DX_DEFAULT, 0, &IMG, nullptr, &pTextureCUBE);
     FS.r_close(S);
 

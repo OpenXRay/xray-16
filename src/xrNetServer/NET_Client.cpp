@@ -858,7 +858,7 @@ bool IPureClient::Connect(pcstr options)
                     default:
                     {
 #if 1
-                        pstr msg = "";
+                        pcstr msg = "";
                         switch (dwMessageType)
                         {
                         case DPN_MSGID_ADD_PLAYER_TO_GROUP: msg = "DPN_MSGID_ADD_PLAYER_TO_GROUP";

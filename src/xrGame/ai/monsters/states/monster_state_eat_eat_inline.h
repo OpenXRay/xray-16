@@ -21,17 +21,17 @@ void CStateMonsterEatingAbstract::initialize()
 TEMPLATE_SPECIALIZATION
 void CStateMonsterEatingAbstract::execute()
 {
-    if (object->CorpseMan.get_corpse() != corpse)
+    if (this->object->CorpseMan.get_corpse() != corpse)
         return;
 
-    object->set_action(ACT_EAT);
-    object->set_state_sound(MonsterSound::eMonsterSoundEat);
+    this->object->set_action(ACT_EAT);
+    this->object->set_state_sound(MonsterSound::eMonsterSoundEat);
 
     // съесть часть
-    if (time_last_eat + u32(1000 / object->db().m_fEatFreq) < Device.dwTimeGlobal)
+    if (time_last_eat + u32(1000 / this->object->db().m_fEatFreq) < Device.dwTimeGlobal)
     {
-        object->ChangeSatiety(object->db().m_fEatSlice);
-        corpse->m_fFood -= object->db().m_fEatSliceWeight;
+        this->object->ChangeSatiety(this->object->db().m_fEatSlice);
+        corpse->m_fFood -= this->object->db().m_fEatSliceWeight;
         time_last_eat = Device.dwTimeGlobal;
     }
 }
@@ -39,19 +39,19 @@ void CStateMonsterEatingAbstract::execute()
 TEMPLATE_SPECIALIZATION
 bool CStateMonsterEatingAbstract::check_start_conditions()
 {
-    corpse = const_cast<CEntityAlive*>(object->CorpseMan.get_corpse());
+    corpse = const_cast<CEntityAlive*>(this->object->CorpseMan.get_corpse());
     VERIFY(corpse);
 
     Fvector nearest_bone_pos;
-    if ((corpse->m_pPhysicsShell == NULL) || (!corpse->m_pPhysicsShell->isActive()))
+    if (corpse->m_pPhysicsShell == nullptr || !corpse->m_pPhysicsShell->isActive())
     {
         nearest_bone_pos = corpse->Position();
     }
     else
-        nearest_bone_pos = object->character_physics_support()->movement()->PHCaptureGetNearestElemPos(corpse);
+        nearest_bone_pos = this->object->character_physics_support()->movement()->PHCaptureGetNearestElemPos(corpse);
 
-    float dist = nearest_bone_pos.distance_to(object->Position());
-    float dist_to_corpse = object->db().m_fDistToCorpse;
+    const float dist = nearest_bone_pos.distance_to(this->object->Position());
+    const float dist_to_corpse = this->object->db().m_fDistToCorpse;
 
     if (dist + 0.5f < dist_to_corpse)
         return true;
@@ -61,21 +61,21 @@ bool CStateMonsterEatingAbstract::check_start_conditions()
 TEMPLATE_SPECIALIZATION
 bool CStateMonsterEatingAbstract::check_completion()
 {
-    if (time_state_started + TIME_TO_EAT < time())
+    if (this->time_state_started + TIME_TO_EAT < time())
         return true;
-    if (object->CorpseMan.get_corpse() != corpse)
+    if (this->object->CorpseMan.get_corpse() != corpse)
         return true;
 
     Fvector nearest_bone_pos;
-    if ((corpse->m_pPhysicsShell == NULL) || (!corpse->m_pPhysicsShell->isActive()))
+    if (corpse->m_pPhysicsShell == nullptr || !corpse->m_pPhysicsShell->isActive())
     {
         nearest_bone_pos = corpse->Position();
     }
     else
-        nearest_bone_pos = object->character_physics_support()->movement()->PHCaptureGetNearestElemPos(corpse);
+        nearest_bone_pos = this->object->character_physics_support()->movement()->PHCaptureGetNearestElemPos(corpse);
 
-    float dist = nearest_bone_pos.distance_to(object->Position());
-    float dist_to_corpse = object->db().m_fDistToCorpse;
+    const float dist = nearest_bone_pos.distance_to(this->object->Position());
+    const float dist_to_corpse = this->object->db().m_fDistToCorpse;
     if (dist > dist_to_corpse + 0.5f)
         return true;
 
@@ -86,7 +86,7 @@ TEMPLATE_SPECIALIZATION
 void CStateMonsterEatingAbstract::remove_links(IGameObject* object)
 {
     if (corpse == object)
-        corpse = 0;
+        corpse = nullptr;
 }
 
 #undef TEMPLATE_SPECIALIZATION

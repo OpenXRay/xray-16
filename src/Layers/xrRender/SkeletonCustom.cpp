@@ -726,7 +726,7 @@ void CKinematics::AddWallmark(
     wallmarks.push_back(wm);
 }
 
-struct zero_wm_pred : public std::unary_function<intrusive_ptr<CSkeletonWallmark>, bool>
+struct zero_wm_pred
 {
     bool operator()(const intrusive_ptr<CSkeletonWallmark> x) { return x == nullptr; }
 };

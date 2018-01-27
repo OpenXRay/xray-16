@@ -218,7 +218,7 @@ void CCustomOutfit::ApplySkinModel(CActor* pActor, bool bDress, bool bHUDOnly)
         if (!bHUDOnly && m_ActorVisual.size())
         {
             shared_str NewVisual = NULL;
-            char* TeamSection = Game().getTeamSection(pActor->g_Team());
+            const auto TeamSection = Game().getTeamSection(pActor->g_Team());
             if (TeamSection)
             {
                 if (pSettings->line_exist(TeamSection, *cNameSect()))

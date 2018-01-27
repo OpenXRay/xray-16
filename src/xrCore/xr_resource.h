@@ -111,7 +111,7 @@ public:
     // assignment
     self& operator=(const self& rhs)
     {
-        _set(rhs);
+        this->_set(rhs);
         return (self&)*this;
     }
 
@@ -125,9 +125,7 @@ public:
     // fast swapping
     void swap(self& rhs)
     {
-        T* tmp = C::p_;
-        C::p_ = rhs.p_;
-        rhs.p_ = tmp;
+        std::swap(this->p_, rhs.p_);
     }
 };
 

@@ -11,18 +11,18 @@ CStateMonsterAttackCampStealOutAbstract::CStateMonsterAttackCampStealOut(_Object
 TEMPLATE_SPECIALIZATION
 void CStateMonsterAttackCampStealOutAbstract::execute()
 {
-    if (object->EnemyMan.get_my_vertex_enemy_last_seen() == u32(-1))
+    if (this->object->EnemyMan.get_my_vertex_enemy_last_seen() == u32(-1))
         return;
 
-    object->path().set_target_point(object->EnemyMan.get_my_vertex_enemy_last_seen());
-    object->path().set_rebuild_time(0);
-    object->path().set_distance_to_end(0.f);
-    object->path().set_use_covers(false);
+    this->object->path().set_target_point(this->object->EnemyMan.get_my_vertex_enemy_last_seen());
+    this->object->path().set_rebuild_time(0);
+    this->object->path().set_distance_to_end(0.f);
+    this->object->path().set_use_covers(false);
 
-    object->set_action(ACT_STEAL);
-    object->anim().accel_deactivate();
-    object->anim().accel_set_braking(false);
-    object->set_state_sound(MonsterSound::eMonsterSoundSteal);
+    this->object->set_action(ACT_STEAL);
+    this->object->anim().accel_deactivate();
+    this->object->anim().accel_set_braking(false);
+    this->object->set_state_sound(MonsterSound::eMonsterSoundSteal);
 }
 
 #define STATE_EXECUTE_TIME 8000
@@ -30,17 +30,17 @@ void CStateMonsterAttackCampStealOutAbstract::execute()
 TEMPLATE_SPECIALIZATION
 bool CStateMonsterAttackCampStealOutAbstract::check_completion()
 {
-    if (object->EnemyMan.get_my_vertex_enemy_last_seen() == u32(-1))
+    if (this->object->EnemyMan.get_my_vertex_enemy_last_seen() == u32(-1))
         return true;
-    if (object->EnemyMan.see_enemy_now())
+    if (this->object->EnemyMan.see_enemy_now())
         return true;
-    if (object->HitMemory.get_last_hit_time() > time_state_started)
+    if (this->object->HitMemory.get_last_hit_time() > this->time_state_started)
         return true;
-    if (time_state_started + STATE_EXECUTE_TIME < time())
+    if (this->time_state_started + STATE_EXECUTE_TIME < time())
         return true;
 
-    Fvector pos = ai().level_graph().vertex_position(object->EnemyMan.get_my_vertex_enemy_last_seen());
-    if ((object->Position().distance_to(pos) < 2.f) && object->control().path_builder().is_path_end(0.f))
+    Fvector pos = ai().level_graph().vertex_position(this->object->EnemyMan.get_my_vertex_enemy_last_seen());
+    if ((this->object->Position().distance_to(pos) < 2.f) && this->object->control().path_builder().is_path_end(0.f))
         return true;
 
     return false;
@@ -49,9 +49,9 @@ bool CStateMonsterAttackCampStealOutAbstract::check_completion()
 TEMPLATE_SPECIALIZATION
 bool CStateMonsterAttackCampStealOutAbstract::check_start_conditions()
 {
-    if (object->EnemyMan.get_my_vertex_enemy_last_seen() == u32(-1))
+    if (this->object->EnemyMan.get_my_vertex_enemy_last_seen() == u32(-1))
         return false;
-    if (object->EnemyMan.see_enemy_now())
+    if (this->object->EnemyMan.see_enemy_now())
         return false;
     return true;
 }

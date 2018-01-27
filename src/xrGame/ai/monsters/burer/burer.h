@@ -149,7 +149,7 @@ public:
 
     bool need_shotmark() const { return !m_shield_active; }
     virtual bool ability_distant_feel() { return true; }
-    virtual char* get_monster_class_name() { return "burer"; }
+    pcstr get_monster_class_name() override { return "burer"; }
 #ifdef DEBUG
     virtual CBaseMonster::SDebugInfo show_debug_info();
 #endif

@@ -1245,7 +1245,7 @@ void game_cl_CaptureTheArtefact::OnVoteStart(NET_Packet& P)
     char* player = static_cast<char*>(_alloca(psize));
     char* cmd_name = static_cast<char*>(_alloca(psize));
     char* tcmd_name = cmd_name;
-    static char* scans_format = "%s %s %s %s %s";
+    static constexpr pcstr scans_format = "%s %s %s %s %s";
 
     char* args[MAX_VOTE_PARAMS];
     for (u32 i = 0; i < MAX_VOTE_PARAMS; ++i)
@@ -1622,7 +1622,8 @@ bool game_cl_CaptureTheArtefact::PlayerCanSprint(CActor* pActor)
 }
 
 bool game_cl_CaptureTheArtefact::CanActivateArtefact() const { return m_bCanActivateArtefact; }
-char* game_cl_CaptureTheArtefact::getTeamSection(int Team)
+
+pcstr game_cl_CaptureTheArtefact::getTeamSection(int Team)
 {
     switch (Team)
     {

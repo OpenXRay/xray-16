@@ -181,46 +181,42 @@ TEMPLATE_SPECIALIZATION
 IC void CAbstractGraph::save(IWriter& stream)
 {
     stream.open_chunk(0);
-    stream.w_u32((u32)vertices().size());
+    stream.w_u32((u32)this->vertices().size());
     stream.close_chunk();
 
     stream.open_chunk(1);
-    const_vertex_iterator I = vertices().begin();
-    const_vertex_iterator E = vertices().end();
-    for (int i = 0; I != E; ++I, ++i)
+    size_t index = 0;
+    for (const auto& it : this->vertices())
     {
-        stream.open_chunk(i);
+        stream.open_chunk(index);
         {
             stream.open_chunk(0);
-            save_data((*I).second->vertex_id(), stream);
+            save_data(it.second->vertex_id(), stream);
             stream.close_chunk();
 
             stream.open_chunk(1);
-            save_data((*I).second->data(), stream);
+            save_data(it.second->data(), stream);
             stream.close_chunk();
         }
         stream.close_chunk();
+        ++index;
     }
     stream.close_chunk();
 
     stream.open_chunk(2);
     {
-        const_vertex_iterator I2 = vertices().begin();
-        const_vertex_iterator E2 = vertices().end();
-        for (; I2 != E2; ++I2)
+        for (const auto& it : this->vertices())
         {
-            if ((*I2).second->edges().empty())
+            if (it.second->edges().empty())
                 continue;
 
-            save_data((*I2).second->vertex_id(), stream);
+            save_data(it.second->vertex_id(), stream);
 
-            stream.w_u32((u32)(*I2).second->edges().size());
-            const_iterator i = (*I2).second->edges().begin();
-            const_iterator e = (*I2).second->edges().end();
-            for (; i != e; ++i)
+            stream.w_u32((u32)it.second->edges().size());
+            for (const auto& it2 : it.second->edges())
             {
-                save_data((*i).vertex_id(), stream);
-                save_data((*i).weight(), stream);
+                save_data(it2.vertex_id(), stream);
+                save_data(it2.weight(), stream);
             }
         }
     }
@@ -230,7 +226,7 @@ IC void CAbstractGraph::save(IWriter& stream)
 TEMPLATE_SPECIALIZATION
 IC void CAbstractGraph::load(IReader& stream)
 {
-    clear();
+    this->clear();
 
     u32 id;
     _data_type data;
@@ -253,7 +249,7 @@ IC void CAbstractGraph::load(IReader& stream)
         load_data(data, *chunk2);
         chunk2->close();
 
-        add_vertex(data, vertex_id);
+        this->add_vertex(data, vertex_id);
     }
     chunk0->close();
 
@@ -276,7 +272,7 @@ IC void CAbstractGraph::load(IReader& stream)
             _edge_weight_type edge_weight;
             load_data(edge_weight, *chunk0);
 
-            add_edge(vertex_id0, vertex_id1, edge_weight);
+            this->add_edge(vertex_id0, vertex_id1, edge_weight);
         }
     }
     chunk0->close();

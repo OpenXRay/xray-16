@@ -963,8 +963,8 @@ void game_sv_mp::OnPrevMap()
 
 struct _votecommands
 {
-    char* name;
-    char* command;
+    pcstr name;
+    pcstr command;
     u16 flag;
 };
 

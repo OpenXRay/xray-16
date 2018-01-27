@@ -14,26 +14,26 @@ TEMPLATE_SPECIALIZATION
 void CStateMonsterRestSleepAbstract::initialize()
 {
     inherited::initialize();
-    object->fall_asleep();
+    this->object->fall_asleep();
 }
 
 TEMPLATE_SPECIALIZATION
 void CStateMonsterRestSleepAbstract::execute()
 {
-    object->set_action(ACT_SLEEP);
-    object->set_state_sound(MonsterSound::eMonsterSoundIdle);
+    this->object->set_action(ACT_SLEEP);
+    this->object->set_state_sound(MonsterSound::eMonsterSoundIdle);
 }
 
 TEMPLATE_SPECIALIZATION
 void CStateMonsterRestSleepAbstract::finalize()
 {
     inherited::finalize();
-    object->wake_up();
+    this->object->wake_up();
 }
 
 TEMPLATE_SPECIALIZATION
 void CStateMonsterRestSleepAbstract::critical_finalize()
 {
     inherited::critical_finalize();
-    object->wake_up();
+    this->object->wake_up();
 }

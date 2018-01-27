@@ -29,7 +29,7 @@ CUIGameCustom* game_cl_Single::createGameUI()
     return pUIGame;
 }
 
-char* game_cl_Single::getTeamSection(int Team) { return NULL; };
+pcstr game_cl_Single::getTeamSection(int Team) { return NULL; };
 void game_cl_Single::OnDifficultyChanged() { Actor()->OnDifficultyChanged(); }
 ALife::_TIME_ID game_cl_Single::GetGameTime()
 {

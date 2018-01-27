@@ -87,15 +87,15 @@ enum_best_score_type get_best_score_type_by_sname(char const* stat_name);
 
 typedef AssociativeVector<enum_best_score_type, s32> all_best_scores_t;
 
-extern char* profile_table_name;
+constexpr pcstr profile_table_name = "PlayerStats_v1";
 
-extern char* profile_store_file_name;
-extern char* award_count_line;
-extern char* award_rdate_line;
-extern char* best_score_value_line;
-extern char* profile_data_section;
-extern char* profile_id_line;
-extern char* profile_last_submit_time;
+constexpr pcstr profile_store_file_name = "mp_profile.ltx";
+constexpr pcstr award_count_line = "count";
+constexpr pcstr award_rdate_line = "rdate";
+constexpr pcstr best_score_value_line = "value";
+constexpr pcstr profile_data_section = "profile_data";
+constexpr pcstr profile_id_line = "id";
+constexpr pcstr profile_last_submit_time = "last_submit";
 
 } // namespace gamespy_profile
 

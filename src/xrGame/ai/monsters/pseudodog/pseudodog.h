@@ -39,7 +39,8 @@ public:
     virtual void HitEntityInJump(const CEntity* pEntity);
 
     virtual IStateManagerBase* create_state_manager();
-    virtual char* get_monster_class_name() { return "pseudodog"; }
+    pcstr get_monster_class_name() override { return "pseudodog"; }
+
 private:
 #ifdef _DEBUG
     virtual void debug_on_key(int key);

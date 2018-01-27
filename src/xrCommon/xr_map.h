@@ -2,10 +2,10 @@
 #include <map>
 #include "xrCore/Memory/XRayAllocator.hpp"
 
-template <typename K, class V, class P = std::less<K>, typename allocator = XRay::xray_allocator<std::pair<K, V>>>
+template <typename K, class V, class P = std::less<K>, typename allocator = XRay::xray_allocator<std::pair<const K, V>>>
 using xr_map = std::map<K, V, P, allocator>;
 
-template <typename K, class V, class P = std::less<K>, typename allocator = XRay::xray_allocator<std::pair<K, V>>>
+template <typename K, class V, class P = std::less<K>, typename allocator = XRay::xray_allocator<std::pair<const K, V>>>
 using xr_multimap = std::multimap<K, V, P, allocator>;
 
 #define DEF_MAP(N, K, T)\

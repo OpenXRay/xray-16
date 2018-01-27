@@ -14,14 +14,24 @@ template <typename _object_type>
 class CPropertyEvaluatorConst : public CPropertyEvaluator<_object_type>
 {
 protected:
-    typedef CPropertyEvaluator<_object_type> inherited;
+    using inherited = CPropertyEvaluator<_object_type>;
+
+public:
+    using _value_type = typename inherited::_value_type;
 
 protected:
     _value_type m_value;
 
 public:
-    IC CPropertyEvaluatorConst(_value_type value, LPCSTR evaluator_name = "");
-    virtual _value_type evaluate();
-};
+    CPropertyEvaluatorConst(_value_type value, LPCSTR evaluator_name = "") : m_value(value)
+    {
+#if 1//def LOG_ACTION //Alundaio: m_evaluator_name
+        this->m_evaluator_name = evaluator_name;
+#endif
+    }
 
-#include "property_evaluator_const_inline.h"
+    virtual _value_type evaluate()
+    {
+        return m_value;
+    }
+};

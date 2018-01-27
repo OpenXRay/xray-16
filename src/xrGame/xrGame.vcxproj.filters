@@ -2382,9 +2382,6 @@
     <ClInclude Include="property_evaluator_const.h">
       <Filter>AI\AComponents\DecisionManagement\ActionManagement\WorldPropertyEvaluator\const</Filter>
     </ClInclude>
-    <ClInclude Include="property_evaluator_const_inline.h">
-      <Filter>AI\AComponents\DecisionManagement\ActionManagement\WorldPropertyEvaluator\const</Filter>
-    </ClInclude>
     <ClInclude Include="property_evaluator_member.h">
       <Filter>AI\AComponents\DecisionManagement\ActionManagement\WorldPropertyEvaluator\member</Filter>
     </ClInclude>
@@ -9351,7 +9348,7 @@
     <ClCompile Include="..\xrServerEntities\xrServer_Objects_ALife_Monsters_script2.cpp">
       <Filter>Core\Server\ServerEntities\objects_alife_monsters</Filter>
     </ClCompile>
-    <ClCompile Include="..\xrServerEntities\xrserver_objects_alife_monsters_script3.cpp">
+    <ClCompile Include="..\xrServerEntities\xrServer_Objects_ALife_Monsters_script3.cpp">
       <Filter>Core\Server\ServerEntities\objects_alife_monsters</Filter>
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\xrServer_Objects_ALife_Monsters_script4.cpp">

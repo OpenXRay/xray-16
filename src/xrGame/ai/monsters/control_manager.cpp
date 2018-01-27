@@ -14,7 +14,7 @@ enum EActiveComAction
     eAdd
 };
 
-char* make_xrstr(ControlCom::EControlType e)
+constexpr pcstr make_xrstr(ControlCom::EControlType e)
 {
     switch (e)
     {
@@ -87,27 +87,25 @@ void CControl_Manager::reinit()
     // todo: make it simpler
     // reinit pure first, base second, custom third
 
-    for (auto it = m_control_elems.begin(); it != m_control_elems.end(); ++it)
-        if (is_pure(it->second))
-            it->second->reinit();
+    for (auto& it : m_control_elems)
+        if (is_pure(it.second))
+            it.second->reinit();
 
-    for (auto it = m_control_elems.begin(); it != m_control_elems.end(); ++it)
-        if (is_base(it->second))
-            it->second->reinit();
+    for (auto& it : m_control_elems)
+        if (is_base(it.second))
+            it.second->reinit();
 
-    for (auto it = m_control_elems.begin(); it != m_control_elems.end(); ++it)
-        if (!is_pure(it->second) && !is_base(it->second))
-            it->second->reinit();
+    for (auto& it : m_control_elems)
+        if (!is_pure(it.second) && !is_base(it.second))
+            it.second->reinit();
 
-    // fill active elems
+    // fill active elements
     m_active_elems.clear();
     m_active_elems.reserve(ControlCom::eControllersCount);
-    for (auto it = m_control_elems.begin(); it != m_control_elems.end(); ++it)
+    for (auto& it : m_control_elems)
     {
-        if (it->second->is_active() && !is_locked(it->second))
-        {
-            m_active_elems.push_back(it->second);
-        }
+        if (it.second->is_active() && !is_locked(it.second))
+            m_active_elems.push_back(it.second);
     }
 }
 
@@ -121,11 +119,11 @@ void CControl_Manager::update_frame()
     if (!m_object->g_Alive())
         return;
 
-    for (auto it = m_active_elems.begin(); it != m_active_elems.end(); ++it)
+    for (auto& it : m_active_elems)
     {
         // update coms
-        if ((*it))
-            (*it)->update_frame();
+        if (it)
+            it->update_frame();
     }
 
     m_active_elems.erase(
@@ -137,11 +135,11 @@ void CControl_Manager::update_schedule()
     if (!m_object->g_Alive())
         return;
 
-    for (auto it = m_active_elems.begin(); it != m_active_elems.end(); ++it)
+    for (auto& it : m_active_elems)
     {
         // update coms
-        if ((*it))
-            (*it)->update_schedule();
+        if (it)
+            it->update_schedule();
     }
 
     m_active_elems.erase(
@@ -150,9 +148,9 @@ void CControl_Manager::update_schedule()
 
 ControlCom::EControlType CControl_Manager::com_type(CControl_Com* com)
 {
-    for (auto it = m_control_elems.begin(); it != m_control_elems.end(); ++it)
-        if (it->second == com)
-            return it->first;
+    for (auto& it : m_control_elems)
+        if (it.second == com)
+            return it.first;
 
     return ControlCom::eControlInvalid;
 }

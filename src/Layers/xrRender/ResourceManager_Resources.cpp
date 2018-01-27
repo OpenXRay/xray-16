@@ -42,9 +42,9 @@ void simplify_texture(string_path& fn)
 template <class T>
 BOOL reclaim(xr_vector<T*>& vec, const T* ptr)
 {
-    xr_vector<T*>::iterator it = vec.begin();
-    xr_vector<T*>::iterator end = vec.end();
-    for (; it != end; it++)
+    auto it = vec.begin();
+    auto end = vec.end();
+    for (; it != end; ++it)
         if (*it == ptr)
         {
             vec.erase(it);

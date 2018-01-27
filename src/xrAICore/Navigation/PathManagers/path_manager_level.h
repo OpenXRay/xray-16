@@ -39,6 +39,8 @@ protected:
     _Graph::CVertex* best_node;
 
 public:
+    using const_iterator = typename inherited::const_iterator;
+
     virtual ~CPathManager();
     IC void setup(const _Graph* graph, _DataStorage* _data_storage, xr_vector<_index_type>* _path,
         const _index_type& _start_node_index, const _index_type& _goal_node_index, const _Parameters& params);

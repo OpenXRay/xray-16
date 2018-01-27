@@ -190,7 +190,7 @@ public:
         const u16 id_entity, bool send_message = true);
 
     xrClientData* SelectBestClientToMigrateTo(CSE_Abstract* E, BOOL bForceAnother = FALSE);
-    void SendConnectResult(IClient* CL, u8 res, u8 res1, char* ResultStr);
+    void SendConnectResult(IClient* CL, u8 res, u8 res1, pcstr ResultStr);
     void __stdcall SendConfigFinished(ClientID const& clientId);
     void SendProfileCreationError(IClient* CL, char const* reason);
     void AttachNewClient(IClient* CL);

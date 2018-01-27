@@ -149,7 +149,7 @@ public:
     ICF float Power() { return Dequantize(power); }
     bool StopAtEnd();
 };
-struct accel_str_pred : public std::binary_function<shared_str, shared_str, bool>
+struct accel_str_pred
 {
     IC bool operator()(const shared_str& x, const shared_str& y) const { return xr_strcmp(x, y) < 0; }
 };

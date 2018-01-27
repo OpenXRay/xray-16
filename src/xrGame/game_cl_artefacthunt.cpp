@@ -579,20 +579,16 @@ bool game_cl_ArtefactHunt::CanBeReady()
     return true;
 };
 
-char* game_cl_ArtefactHunt::getTeamSection(int Team)
+pcstr game_cl_ArtefactHunt::getTeamSection(int Team)
 {
     switch (Team)
     {
-    case 1: { return "artefacthunt_team1";
-    }
-    break;
-    case 2: { return "artefacthunt_team2";
-    }
-    break;
+    case 1: return "artefacthunt_team1";
+    case 2: return "artefacthunt_team2";
     default: NODEFAULT;
-    };
+    }
 #ifdef DEBUG
-    return NULL;
+    return nullptr;
 #endif
 };
 

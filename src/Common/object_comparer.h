@@ -43,8 +43,8 @@ struct CComparer
         if (v1.size() != v2.size())
             return p();
 
-        svector<T, size>::const_iterator I = v1.begin(), J = v2.begin();
-        svector<T, size>::const_iterator E = v1.end();
+        auto I = v1.cbegin(), J = v2.cbegin();
+        auto E = v1.end();
         for (; I != E; ++I, ++J)
             if (!compare(*I, *J, p))
                 return false;

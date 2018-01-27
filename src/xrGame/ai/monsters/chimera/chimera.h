@@ -16,7 +16,7 @@ public:
     virtual void jump(Fvector const& position, float factor);
 
 private:
-    virtual char* get_monster_class_name() { return "chimera"; }
+    pcstr get_monster_class_name() override { return "chimera"; }
     virtual EAction CustomVelocityIndex2Action(u32 velocity_index);
 
     typedef CBaseMonster inherited;

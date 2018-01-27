@@ -204,13 +204,13 @@ IC void delete_data(const CGraphAbstract<_data_type, _edge_weight_type, _vertex_
 
     Vertices& verts = graph.vertices();
 
-    for (Vertices::iterator vi = verts.begin(); vi != verts.end(); ++vi)
+    for (auto vi = verts.begin(); vi != verts.end(); ++vi)
     {
         Graph::CVertex* vert = (*vi).second;
         delete_data(vert->data());
 
         Edges& edges = const_cast<Edges&>(vert->edges());
-        for (Edges::iterator ei = edges.begin(); ei != edges.end(); ++ei)
+        for (auto ei = edges.begin(); ei != edges.end(); ++ei)
         {
             Graph::CEdge& edge = (*ei);
             delete_data(edge.data());

@@ -1248,7 +1248,7 @@ void game_sv_Deathmatch::LoadTeams()
     LoadTeamData("deathmatch_team0");
 };
 
-s32 game_sv_Deathmatch::GetMoneyAmount(const shared_str& caSection, char* caMoneyStr)
+s32 game_sv_Deathmatch::GetMoneyAmount(const shared_str& caSection, pcstr caMoneyStr)
 {
     if (pSettings->line_exist(caSection, caMoneyStr))
         return pSettings->r_s32(caSection, caMoneyStr);
@@ -1494,7 +1494,7 @@ void game_sv_Deathmatch::LoadAnomalySets()
     if (!g_pGameLevel || !Level().pLevel)
         return;
 
-    char* ASetBaseName = GetAnomalySetBaseName();
+    const auto ASetBaseName = GetAnomalySetBaseName();
 
     string1024 SetName, AnomaliesNames, AnomalyName;
     ANOMALIES AnomalySingleSet;
@@ -1528,8 +1528,8 @@ void game_sv_Deathmatch::LoadAnomalySets()
     if (Level().pLevel->line_exist(ASetBaseName, "permanent"))
     {
         xr_strcpy(AnomaliesNames, Level().pLevel->r_string(ASetBaseName, "permanent"));
-        u32 count = _GetItemCount(AnomaliesNames);
-        for (u32 j = 0; j < count; j++)
+        int count = _GetItemCount(AnomaliesNames);
+        for (int j = 0; j < count; j++)
         {
             _GetItem(AnomaliesNames, j, AnomalyName);
             m_AnomaliesPermanent.push_back(AnomalyName);

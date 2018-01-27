@@ -127,7 +127,7 @@ void xrDebug::GatherInfo(char* assertionInfo, const ErrorLocation& loc, const ch
     if (!expr)
         expr = "<no expression>";
     bool extendedDesc = desc && strchr(desc, '\n');
-    char* prefix = "[error] ";
+    pcstr prefix = "[error] ";
     buffer += sprintf(buffer, "\nFATAL ERROR\n\n");
     buffer += sprintf(buffer, "%sExpression    : %s\n", prefix, expr);
     buffer += sprintf(buffer, "%sFunction      : %s\n", prefix, loc.Function);

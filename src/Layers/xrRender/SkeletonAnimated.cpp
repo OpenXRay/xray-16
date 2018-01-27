@@ -837,10 +837,9 @@ void CKinematicsAnimated::LL_BuldBoneMatrixDequatize(const CBoneData* bd, u8 cha
 {
     u16 SelfID = bd->GetSelfID();
     CBlendInstance& BLEND_INST = LL_GetBlendInstance(SelfID);
-    const CBlendInstance::BlendSVec& Blend = BLEND_INST.blend_vector();
     CKey BK[MAX_CHANNELS][MAX_BLENDED]; // base keys
 
-    for (auto &it : Blend)
+    for (auto &it : BLEND_INST.blend_vector())
     {
         CBlend* B = it;
         int& b_count = keys.chanel_blend_conts[B->channel];

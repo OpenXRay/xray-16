@@ -42,7 +42,7 @@ struct CLoader
         template <>
         static void load_data<true>(T& data, M& stream, const P& p)
         {
-            CLoader<M, P>::load_data(*(data = new object_type_traits::remove_pointer<T>::type()), stream, p);
+            CLoader<M, P>::load_data(*(data = new typename object_type_traits::remove_pointer<T>::type()), stream, p);
         }
     };
 
@@ -101,7 +101,7 @@ struct CLoader
             const u32 count = stream.r_u32();
             for (u32 i = 0; i < count; ++i)
             {
-                T::value_type temp;
+                typename T::value_type temp;
                 CLoader<M, P>::load_data(temp, stream, p);
                 if (p(data, temp))
                     add(data, temp);
@@ -144,11 +144,11 @@ struct CLoader
     template <typename T1, typename T2>
     static void load_data(std::pair<T1, T2>& data, M& stream, const P& p)
     {
-        if (p(data, const_cast<object_type_traits::remove_const<T1>::type&>(data.first), true))
+        if (p(data, const_cast<typename object_type_traits::remove_const<T1>::type&>(data.first), true))
         {
             const bool value = object_type_traits::is_same<T1, LPCSTR>::value;
             VERIFY(!value);
-            load_data(const_cast<object_type_traits::remove_const<T1>::type&>(data.first), stream, p);
+            load_data(const_cast<typename object_type_traits::remove_const<T1>::type&>(data.first), stream, p);
         }
         if (p(data, data.second, false))
             load_data(data.second, stream, p);
@@ -183,7 +183,7 @@ struct CLoader
         const u32 count = stream.r_u32();
         for (u32 i = 0; i < count; ++i)
         {
-            svector<T, size>::value_type temp;
+            typename svector<T, size>::value_type temp;
             CLoader<M, P>::load_data(temp, stream, p);
             if (p(data, temp))
                 data.push_back(temp);
@@ -202,7 +202,7 @@ struct CLoader
         const u32 count = stream.r_u32();
         for (u32 i = 0; i < count; ++i)
         {
-            std::queue<T1, T2>::value_type t;
+            typename std::queue<T1, T2>::value_type t;
             CLoader<M, P>::load_data(t, stream, p);
             if (p(temp, t))
                 temp.push(t);
@@ -223,7 +223,7 @@ struct CLoader
         const u32 count = stream.r_u32();
         for (u32 i = 0; i < count; ++i)
         {
-            T1<T2, T3>::value_type t;
+            typename  T1<T2, T3>::value_type t;
             CLoader<M, P>::load_data(t, stream, p);
             if (p(temp, t))
                 temp.push(t);
@@ -244,7 +244,7 @@ struct CLoader
         u32 count = stream.r_u32();
         for (u32 i = 0; i < count; ++i)
         {
-            T1<T2, T3, T4>::value_type t;
+            typename T1<T2, T3, T4>::value_type t;
             CLoader<M, P>::load_data(t, stream, p);
             if (p(temp, t))
                 temp.push(t);

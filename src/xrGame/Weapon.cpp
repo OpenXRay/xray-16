@@ -595,7 +595,7 @@ void CWeapon::net_Import(NET_Packet& P)
     P.r_u8(wstate);
 
     u8 Zoom;
-    P.r_u8((u8)Zoom);
+    P.r_u8(Zoom);
 
     if (H_Parent() && H_Parent()->Remote())
     {

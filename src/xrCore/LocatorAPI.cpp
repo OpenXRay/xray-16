@@ -118,7 +118,7 @@ void _unregister_open_file(T* _r)
     Lock _lock;
     _lock.Enter();
 
-    xr_vector<_open_file>::iterator it = std::find_if(g_open_files.begin(), g_open_files.end(), eq_pointer<T>(_r));
+    auto it = std::find_if(g_open_files.begin(), g_open_files.end(), eq_pointer<T>(_r));
     VERIFY(it != g_open_files.end());
     _open_file& _of = *it;
     _of._reader = nullptr;

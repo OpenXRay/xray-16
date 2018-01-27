@@ -38,6 +38,9 @@ class CAStar : public CDijkstra<TDistance, TPriorityQueue, TVertexManager, TVert
 protected:
     using Inherited = CDijkstra<TDistance, TPriorityQueue, TVertexManager, TVertexAllocator, EuclidianHeuristics,
         TPathBuilder, TIteration, AStarVertexData<TDistance, TVertexData>>;
+    using Vertex = typename Inherited::Vertex;
+    using Distance = typename Vertex::Distance;
+    using Index = typename Vertex::Index;
 
 protected:
     template <typename TPathManager>

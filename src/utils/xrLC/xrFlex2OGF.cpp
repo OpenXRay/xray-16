@@ -40,8 +40,8 @@ void Face2OGF_Vertices(const Face& FF, OGF_Vertex V[3])
     }
 
     // Normal order
-    svector<_TCF, 2>::const_iterator TC = FF.tc.begin();
-    for (; TC != FF.tc.end(); TC++)
+    svector<_TCF, 2>::const_iterator TC = FF.tc.cbegin();
+    for (; TC != FF.tc.cend(); TC++)
     {
         V[0].UV.push_back(TC->uv[0]);
         V[1].UV.push_back(TC->uv[1]);

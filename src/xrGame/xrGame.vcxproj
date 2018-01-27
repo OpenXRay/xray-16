@@ -1099,7 +1099,6 @@
     <ClInclude Include="profile_store.h" />
     <ClInclude Include="property_evaluator.h" />
     <ClInclude Include="property_evaluator_const.h" />
-    <ClInclude Include="property_evaluator_const_inline.h" />
     <ClInclude Include="property_evaluator_inline.h" />
     <ClInclude Include="property_evaluator_member.h" />
     <ClInclude Include="property_evaluator_member_inline.h" />
@@ -1711,7 +1710,7 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
-    <ClCompile Include="..\xrServerEntities\xrserver_objects_alife_monsters_script3.cpp">
+    <ClCompile Include="..\xrServerEntities\xrServer_Objects_ALife_Monsters_script3.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>

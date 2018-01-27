@@ -714,16 +714,14 @@ void game_sv_TeamDeathmatch::OnDetachItem(CSE_ActorMP* actor, CSE_Abstract* item
             }
         }
 
-        xr_vector<CSE_Abstract*>::const_iterator tr_it_e = to_transfer.end();
-
         NET_Packet EventPack;
         NET_Packet PacketReject;
         NET_Packet PacketTake;
         EventPack.w_begin(M_EVENT_PACK);
 
-        for (xr_vector<CSE_Abstract*>::const_iterator tr_it = to_transfer.begin(); tr_it != tr_it_e; ++tr_it)
+        for (const auto& it : to_transfer)
         {
-            m_server->Perform_transfer(PacketReject, PacketTake, *tr_it, actor, item);
+            m_server->Perform_transfer(PacketReject, PacketTake, it, actor, item);
             EventPack.w_u8(u8(PacketReject.B.count));
             EventPack.w(&PacketReject.B.data, PacketReject.B.count);
             EventPack.w_u8(u8(PacketTake.B.count));
@@ -733,12 +731,12 @@ void game_sv_TeamDeathmatch::OnDetachItem(CSE_ActorMP* actor, CSE_Abstract* item
         if (EventPack.B.count > 2)
             u_EventSend(EventPack);
 
-        std::for_each(to_destroy.begin(), to_destroy.end(),
-            std::bind1st(std::mem_fun<void, game_sv_mp, CSE_Abstract*>(&game_sv_mp::DestroyGameItem), this));
+        for (auto& it : to_destroy)
+            DestroyGameItem(it);
 
-        std::for_each(to_reject.begin(), to_reject.end(),
-            std::bind1st(std::mem_fun<void, game_sv_mp, CSE_Abstract*>(&game_sv_mp::RejectGameItem), this));
-    };
+        for (auto& it : to_reject)
+            DestroyGameItem(it);
+    }
 }
 
 BOOL game_sv_TeamDeathmatch::OnTouch(u16 eid_who, u16 eid_what, BOOL bForced)

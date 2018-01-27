@@ -92,8 +92,8 @@ struct CSaver
     IC static void save_data(const xr_vector<bool>& data, M& stream, const P& /*p*/)
     {
         stream.w_u32((u32)data.size());
-        xr_vector<bool>::const_iterator I = data.begin();
-        xr_vector<bool>::const_iterator E = data.end();
+        auto I = data.cbegin();
+        auto E = data.cend();
         u32 mask = 0;
         if (I != E)
         {
@@ -116,8 +116,8 @@ struct CSaver
     IC static void save_data(const svector<T, size>& data, M& stream, const P& p)
     {
         stream.w_u32((u32)data.size());
-        svector<T, size>::const_iterator I = data.begin();
-        svector<T, size>::const_iterator E = data.end();
+        auto I = data.cbegin();
+        auto E = data.cend();
         for (; I != E; ++I)
             if (p(data, *I))
                 CSaver<M, P>::save_data(*I, stream, p);

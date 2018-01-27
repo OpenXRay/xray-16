@@ -285,7 +285,7 @@ void xrSASH::GetAllOptions()
     // r1 only
     Option.Dependency.ParentName = TEXT("renderer");
     Option.Dependency.ComparisonOp = OA_COMP_OP_EQUAL;
-    Option.Dependency.ComparisonVal.Enum = TEXT("renderer_r1");
+    Option.Dependency.ComparisonVal.Enum = (oaString)"renderer_r1";
     Option.Dependency.ComparisonValType = GetOptionType("renderer");
     {
         DescribeOption("r__supersample", Option.Dependency);
@@ -509,7 +509,7 @@ void xrSASH::ReleaseEngine()
     destroyEngine();
 }
 
-oaOptionDataType xrSASH::GetOptionType(char* pszOptionName)
+oaOptionDataType xrSASH::GetOptionType(pcstr pszOptionName)
 {
     CConsole::vecCMD_IT I = Console->Commands.find(pszOptionName);
     if (I == Console->Commands.end())
@@ -540,7 +540,7 @@ oaOptionDataType xrSASH::GetOptionType(char* pszOptionName)
     }
 }
 
-void xrSASH::DescribeOption(char* pszOptionName, const oaOptionDependency& Dependency)
+void xrSASH::DescribeOption(pcstr pszOptionName, const oaOptionDependency& Dependency)
 {
     oaNamedOptionStruct Option;
     oaInitOption(&Option);
@@ -608,7 +608,7 @@ void xrSASH::DescribeOption(char* pszOptionName, const oaOptionDependency& Depen
     }
 }
 
-void xrSASH::GetOption(char* pszOptionName)
+void xrSASH::GetOption(pcstr pszOptionName)
 {
     oaValue Val;
 
