@@ -131,23 +131,22 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Layers\xrRender\ETextureParams.h" />
+    <ClInclude Include="dds.h" />
     <ClInclude Include="dds\ConvertColor.h" />
     <ClInclude Include="dds\ddsTypes.h" />
     <ClInclude Include="dds\nvErrorCodes.h" />
     <ClInclude Include="dds\tPixel.h" />
     <ClInclude Include="dds\tVector.h" />
-    <ClInclude Include="dxtlib.h" />
-    <ClInclude Include="ETextureParams.h" />
     <ClInclude Include="Image_DXTC.h" />
     <ClInclude Include="NV_Common.h" />
     <ClInclude Include="NVI_Convolution.h" />
     <ClInclude Include="NVI_Image.h" />
-    <ClInclude Include="dds.h" />
     <ClInclude Include="StdAfx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Layers\xrRender\ETextureParams.cpp" />
     <ClCompile Include="DXT.cpp" />
-    <ClCompile Include="ETextureParams.cpp" />
     <ClCompile Include="Image_DXTC.cpp" />
     <ClCompile Include="NormalMapGen.cpp" />
     <ClCompile Include="NVI_Convolution.cpp" />

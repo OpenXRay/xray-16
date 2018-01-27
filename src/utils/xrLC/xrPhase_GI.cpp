@@ -8,7 +8,6 @@
 #include "xrCore/Threading/Lock.hpp"
 #include "xrCDB/xrCDB.h"
 
-#define GI_THREADS 2
 const u32 gi_num_photons = 32;
 const float gi_optimal_range = 15.f;
 const float gi_reflect = 0.9f;
@@ -118,7 +117,7 @@ public:
                 dst.type = LT_SECONDARY;
                 dst.level++;
                 task_it++;
-                thProgress = float(task_it) / float(task->size()) / float(GI_THREADS);
+                thProgress = float(task_it) / float(task->size()) / float(NUM_THREADS);
             }
             task_cs.Leave();
             if (dst.level > gi_maxlevel)
@@ -227,7 +226,7 @@ void CBuild::xrPhase_Radiosity()
 
     // perform all the work
     u32 setup_old = task->size();
-    for (int t = 0; t < GI_THREADS; t++)
+    for (int t = 0; t < NUM_THREADS; t++)
     {
         gi.start(new CGI(t));
         Sleep(10);

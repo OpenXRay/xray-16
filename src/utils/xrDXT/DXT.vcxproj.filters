@@ -12,9 +12,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ETextureParams.h">
-      <Filter>Shared</Filter>
-    </ClInclude>
     <ClInclude Include="Image_DXTC.h">
       <Filter>NormalMap</Filter>
     </ClInclude>
@@ -27,23 +24,20 @@
     <ClInclude Include="NVI_Image.h">
       <Filter>NormalMap</Filter>
     </ClInclude>
-    <ClInclude Include="dds.h" />
     <ClInclude Include="StdAfx.h" />
     <ClInclude Include="dds\ConvertColor.h" />
     <ClInclude Include="dds\ddsTypes.h" />
     <ClInclude Include="dds\nvErrorCodes.h" />
     <ClInclude Include="dds\tPixel.h" />
     <ClInclude Include="dds\tVector.h" />
-    <ClInclude Include="dxtlib.h">
-      <Filter>Convert</Filter>
+    <ClInclude Include="..\..\Layers\xrRender\ETextureParams.h">
+      <Filter>Shared</Filter>
     </ClInclude>
+    <ClInclude Include="dds.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DXT.cpp">
       <Filter>Convert</Filter>
-    </ClCompile>
-    <ClCompile Include="ETextureParams.cpp">
-      <Filter>Shared</Filter>
     </ClCompile>
     <ClCompile Include="Image_DXTC.cpp">
       <Filter>NormalMap</Filter>
@@ -58,5 +52,8 @@
       <Filter>NormalMap</Filter>
     </ClCompile>
     <ClCompile Include="StdAfx.cpp" />
+    <ClCompile Include="..\..\Layers\xrRender\ETextureParams.cpp">
+      <Filter>Shared</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -6,8 +6,6 @@
 #include "lightthread.h"
 #include "xrLightDoNet.h"
 
-#define NUM_THREADS 3
-
 void xrLight()
 {
     u32 range = gl_data.slots_data.size_z();

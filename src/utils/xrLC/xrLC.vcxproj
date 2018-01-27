@@ -168,6 +168,7 @@
     <ClInclude Include="..\..\common\NvMender2003\NVMeshMender.h" />
     <ClInclude Include="..\..\common\NvMender2003\remove_isolated_verts.h" />
     <ClInclude Include="..\Shader_xrLC.h" />
+    <ClInclude Include="..\xrLC_Light\ETextureParams.h" />
     <ClInclude Include="..\xrLC_Light\itterate_adjacents.h" />
     <ClInclude Include="ArbitraryList.h" />
     <ClInclude Include="Build.h" />
@@ -246,6 +247,7 @@
       <XMLDocumentationFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.xdc</XMLDocumentationFileName>
     </ClCompile>
     <ClCompile Include="..\..\xrEngine\xrLoadSurface.cpp" />
+    <ClCompile Include="..\xrLC_Light\ETextureParams.cpp" />
     <ClCompile Include="Build.cpp" />
     <ClCompile Include="Build_Load.cpp" />
     <ClCompile Include="fmesh.cpp" />
