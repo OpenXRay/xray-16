@@ -132,7 +132,18 @@ public:
         rhs.p_ = tmp;
     }
     bool equal(const shared_str& rhs) const { return (p_ == rhs.p_); }
-    shared_str& __cdecl printf(const char* format, ...);
+    shared_str& __cdecl printf(const char* format, ...)
+    {
+        string4096 buf;
+        va_list p;
+        va_start(p, format);
+        int vs_sz = vsnprintf(buf, sizeof(buf) - 1, format, p);
+        buf[sizeof(buf) - 1] = 0;
+        va_end(p);
+        if (vs_sz)
+            _set(buf);
+        return (shared_str&)*this;
+    }
 };
 
 // res_ptr == res_ptr
@@ -160,7 +171,15 @@ IC int xr_strcmp(const shared_str& a, const shared_str& b) throw()
         return xr_strcmp(*a, *b);
 }
 
-// void xr_strlwr(xr_string& src) // in xrCommon/xr_string.h, since it depends on xr_string defined there.
-void xr_strlwr(shared_str& src);
+IC void xr_strlwr(shared_str& src)
+{
+    if (*src)
+    {
+        char* lp = xr_strdup(*src);
+        xr_strlwr(lp);
+        src = lp;
+        xr_free(lp);
+    }
+}
 
 #pragma pack(pop)
