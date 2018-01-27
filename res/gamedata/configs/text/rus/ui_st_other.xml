@@ -102,6 +102,9 @@
 	<string id="st_client_synchronising">
 		<text>Клиент: Синхронизация</text>
 	</string>
+	<string id="st_creating_new_game">
+		<text>Создание новой игры</text>
+	</string>
 	<string id="st_mp_direct_ip">
 		<text>Прямой IP</text>
 	</string>

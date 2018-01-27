@@ -72,6 +72,9 @@
 	<string id="st_client_synchronising">
 		<text>CLIENT: Synchronizing</text>
 	</string>
+	<string id="st_creating_new_game">
+		<text>Creating new game</text>
+	</string>
 	<string id="st_mp_direct_ip">
 		<text>Direct IP</text>
 	</string>
