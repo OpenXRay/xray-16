@@ -526,7 +526,6 @@ void compute_non_covers()
     delete_data(nearest);
 }
 
-#define NUM_THREADS 3
 extern void mem_Optimize();
 void xrCover(bool pure_covers)
 {

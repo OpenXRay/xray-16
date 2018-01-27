@@ -155,7 +155,6 @@ namespace lc_net
 {
 void RunLightVertexNet();
 }
-#define NUM_THREADS 4
 void LightVertex(bool net)
 {
     g_trans = new mapVert();

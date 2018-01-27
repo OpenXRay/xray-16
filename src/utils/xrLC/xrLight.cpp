@@ -87,10 +87,9 @@ void CBuild::LMapsLocal()
     // Main process (4 threads)
     Logger.Status("Lighting...");
     CThreadManager threads(ProxyStatus, ProxyProgress);
-    const u32 thNUM = 6;
     CTimer start_time;
     start_time.Start();
-    for (int L = 0; L < thNUM; L++)
+    for (int L = 0; L < NUM_THREADS; L++)
         threads.start(new CLMThread(L));
     threads.wait(500);
     Logger.clMsg("%f seconds", start_time.GetElapsed_sec());
