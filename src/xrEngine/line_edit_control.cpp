@@ -646,14 +646,14 @@ void line_edit_control::delete_selected(bool back)
         {
             u8 dp = ((m_p1 == m_p2) && m_p1 > 0) ? 1 : 0;
             strncpy_s(m_undo_buf, m_buffer_size, m_edit_str + m_p1 - dp, m_p2 - m_p1 + dp);
-            strncpy_s(m_edit_str + m_p1 - dp, m_buffer_size, m_edit_str + m_p2, edit_len - m_p2);
+            strncpy_s(m_edit_str + m_p1 - dp, m_buffer_size - (m_p1 - dp), m_edit_str + m_p2, edit_len - m_p2);
             m_cur_pos = m_p1 - dp;
         }
         else
         {
             u8 dn = ((m_p1 == m_p2) && m_p2 < edit_len) ? 1 : 0;
             strncpy_s(m_undo_buf, m_buffer_size, m_edit_str + m_p1, m_p2 - m_p1 + dn);
-            strncpy_s(m_edit_str + m_p1, m_buffer_size, m_edit_str + m_p2 + dn, edit_len - m_p2 - dn);
+            strncpy_s(m_edit_str + m_p1, m_buffer_size - m_p1, m_edit_str + m_p2 + dn, edit_len - m_p2 - dn);
             m_cur_pos = m_p1;
         }
         clamp_cur_pos();
