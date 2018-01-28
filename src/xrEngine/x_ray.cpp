@@ -281,7 +281,6 @@ void CApplication::LoadEnd()
         Msg("* phase cmem: %d K", Memory.mem_usage() / 1024);
         Console->Execute("stat_memory");
         loaded = true;
-        // DUMP_PHASE;
     }
 }
 

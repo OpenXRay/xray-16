@@ -6,6 +6,3 @@
 #pragma once
 
 //#define NO_XRNEW
-
-//#define USE_DOUG_LEA_ALLOCATOR // Includes the dlmalloc implementation
-//#define USE_ARENA_ALLOCATOR // Useless when USE_DOUG_LEA_ALLOCATOR is undefined

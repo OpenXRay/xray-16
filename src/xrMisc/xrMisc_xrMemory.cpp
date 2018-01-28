@@ -14,13 +14,3 @@ void* operator new[](const size_t size) { return Memory.mem_alloc(size); }
 void operator delete(void* p) throw() { Memory.mem_free(p); }
 void operator delete[](void* p) throw() { Memory.mem_free(p); }
 #endif
-
-#ifdef USE_DOUG_LEA_ALLOCATOR
-#ifdef USE_ARENA_ALLOCATOR
-constexpr static const u32 s_arena_size = 256 * 1024 * 1024;
-static char s_fake_array[s_arena_size];
-doug_lea_allocator g_common_doug_lea_allocator(s_fake_array, s_arena_size, "common");
-#else
-doug_lea_allocator g_common_doug_lea_allocator(nullptr, 0, "common");
-#endif
-#endif // USE_DOUG_LEA_ALLOCATOR

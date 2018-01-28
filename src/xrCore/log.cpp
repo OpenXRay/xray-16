@@ -52,10 +52,8 @@ void AddOne(const char* split)
     OutputDebugString("\n");
 #endif
 
-    // DUMP_PHASE;
     {
         shared_str temp = shared_str(split);
-        // DUMP_PHASE;
         LogFile->push_back(temp);
     }
 

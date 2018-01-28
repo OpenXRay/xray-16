@@ -1,9 +1,6 @@
 #pragma once
 #include "memory_allocator_options.h"
 #include "xalloc.h"
-#ifdef USE_DOUG_LEA_ALLOCATOR
-#include "doug_lea_allocator.h"
-#endif
 
 namespace XRay
 {

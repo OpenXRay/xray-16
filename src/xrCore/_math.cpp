@@ -195,8 +195,6 @@ void _initialize_cpu()
     Msg("* Detected CPU: %s [%s], F%d/M%d/S%d, 'rdtsc'", CPU::ID.modelName,
         +CPU::ID.vendor, CPU::ID.family, CPU::ID.model, CPU::ID.stepping);
 
-    //DUMP_PHASE;
-
     string256 features;
     xr_strcpy(features, sizeof(features), "RDTSC");
     if (CPU::ID.hasFeature(CpuFeature::Mmx)) xr_strcat(features, ", MMX");

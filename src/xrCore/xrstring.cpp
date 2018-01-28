@@ -151,10 +151,6 @@ str_value* str_container::dock(pcstr value)
 
     impl->cs.Enter();
 
-#ifdef DEBUG_MEMORY_MANAGER
-    Memory.stat_strdock++;
-#endif // DEBUG_MEMORY_MANAGER
-
     str_value* result = 0;
 
     // calc len
@@ -288,10 +284,6 @@ str_value* str_container::dock(str_c value)
 // find_chunk_auto_timer timer;
 // //#endif // FIND_CHUNK_BENCHMARK_ENABLE
 
-#ifdef DEBUG_MEMORY_MANAGER
-    Memory.stat_strdock++;
-#endif // DEBUG_MEMORY_MANAGER
-
     str_value* result = 0;
 
     // calc len
@@ -331,7 +323,6 @@ str_value* str_container::dock(str_c value)
     if (0 == result || is_leaked_string)
     {
         // Insert string
-        // DUMP_PHASE;
 
         result = (str_value*)Memory.mem_alloc(sizeof(str_value) + s_len_with_zero
 #ifdef DEBUG_MEMORY_NAME
@@ -347,8 +338,6 @@ str_value* str_container::dock(str_c value)
             ++num11;
             Msg("leaked_string: %d 0x%08x", num11, result);
         }
-
-        // DUMP_PHASE;
 
         result->dwReference = 0;
         result->dwLength = sv->dwLength;

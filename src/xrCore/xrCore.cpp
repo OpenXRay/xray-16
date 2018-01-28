@@ -68,9 +68,7 @@ void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pc
         // Mathematics & PSI detection
         CPU::Detect();
 
-        Memory._initialize(strstr(Params, "-mem_debug") ? true : false);
-
-        DUMP_PHASE;
+        Memory._initialize();
 
         InitLog();
         Msg("%s %s build %d, %s\n", "xdOpenXRay", GetBuildConfiguration(), buildId, buildDate);
