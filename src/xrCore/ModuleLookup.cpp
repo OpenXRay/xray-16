@@ -4,19 +4,19 @@
 
 namespace XRay
 {
-Module::Module(const bool dontUnload) : handle(nullptr), dontUnload(dontUnload) {}
+ModuleHandle::ModuleHandle(const bool dontUnload) : handle(nullptr), dontUnload(dontUnload) {}
 
-Module::Module(pcstr moduleName, bool dontUnload /*= false*/) : handle(nullptr), dontUnload(dontUnload)
+ModuleHandle::ModuleHandle(pcstr moduleName, bool dontUnload /*= false*/) : handle(nullptr), dontUnload(dontUnload)
 {
     open(moduleName);
 }
 
-Module::~Module()
+ModuleHandle::~ModuleHandle()
 {
     close();
 }
 
-void* Module::open(pcstr moduleName)
+void* ModuleHandle::open(pcstr moduleName)
 {
     if (exist())
         close();
@@ -31,7 +31,7 @@ void* Module::open(pcstr moduleName)
     return handle;
 }
 
-void Module::close()
+void ModuleHandle::close()
 {
     if (dontUnload)
         return;
@@ -40,18 +40,18 @@ void Module::close()
     handle = nullptr;
 }
 
-bool Module::exist() const
+bool ModuleHandle::exist() const
 {
     return handle != nullptr;
 }
 
-void* Module::operator()() const
+void* ModuleHandle::operator()() const
 {
     return handle;
 }
 
-void* Module::getProcAddress(pcstr procName) const
+void* ModuleHandle::getProcAddress(pcstr procName) const
 {
-    return ::GetProcAddress(static_cast<HMODULE>(handle), procName);
+    return GetProcAddress(static_cast<HMODULE>(handle), procName);
 }
 }

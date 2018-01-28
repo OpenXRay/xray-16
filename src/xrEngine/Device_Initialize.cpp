@@ -10,7 +10,7 @@ extern LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 
 void CRenderDevice::initialize_editor()
 {
-    m_editor_module = std::make_unique<XRay::Module>("xrWeatherEditor");
+    m_editor_module = XRay::LoadModule("xrWeatherEditor");
     if (!m_editor_module->exist())
         return;
 

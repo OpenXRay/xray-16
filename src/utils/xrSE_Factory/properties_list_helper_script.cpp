@@ -21,16 +21,16 @@ struct CChooseType
 {
 };
 
-typedef IPropHelper&(__stdcall* TPHelper)();
+using TPHelper = IPropHelper&(__stdcall* )();
 
 TPHelper _PHelper = nullptr;
-std::unique_ptr<XRay::Module> prop_helper_module;
+XRay::Module prop_helper_module;
 constexpr pcstr prop_helper_library = "xrEPropsB", prop_helper_func = "PHelper";
 CScriptPropertiesListHelper* g_property_list_helper = nullptr;
 
 void load_prop_helper()
 {
-    prop_helper_module = std::make_unique<XRay::Module>(prop_helper_library);
+    prop_helper_module = XRay::LoadModule(prop_helper_library);
     if (!prop_helper_module->exist())
     {
         Msg("! Cannot find library %s", prop_helper_library);

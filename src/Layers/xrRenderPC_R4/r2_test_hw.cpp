@@ -13,7 +13,7 @@ typedef HRESULT(__stdcall* FuncPtrD3D11CreateDeviceAndSwapChain)(IDXGIAdapter* p
 
 bool TestDX11Present()
 {
-    const auto hD3D11 = std::make_unique<XRay::Module>("d3d11.dll");
+    const auto hD3D11 = XRay::LoadModule("d3d11.dll");
 
     if (!hD3D11->exist())
     {

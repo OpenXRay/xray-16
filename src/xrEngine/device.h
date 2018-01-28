@@ -267,7 +267,7 @@ private:
     using initialize_function_ptr = XRay::Editor::initialize_function_ptr;
     using finalize_function_ptr = XRay::Editor::finalize_function_ptr;
 
-    std::unique_ptr<XRay::Module> m_editor_module;
+    XRay::Module m_editor_module;
     initialize_function_ptr m_editor_initialize;
     finalize_function_ptr m_editor_finalize;
     XRay::Editor::ide_base* m_editor;

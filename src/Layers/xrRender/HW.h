@@ -89,7 +89,7 @@ public:
     D3D_FEATURE_LEVEL FeatureLevel;
 #else
 private:
-    std::unique_ptr<XRay::Module> hD3D;
+    XRay::Module hD3D;
 
 public:
     IDirect3D9* pD3D; // D3D

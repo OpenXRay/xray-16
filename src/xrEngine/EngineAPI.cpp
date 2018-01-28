@@ -142,7 +142,7 @@ void CEngineAPI::Initialize(void)
 {
     InitializeRenderers();
 
-    hGame = std::make_unique<XRay::Module>("xrGame");
+    hGame = XRay::LoadModule("xrGame");
     R_ASSERT2(hGame, "Game DLL raised exception during loading or there is no game DLL at all");
 
     pCreate = (Factory_Create*)hGame->getProcAddress("xrFactory_Create");
@@ -156,7 +156,7 @@ void CEngineAPI::Initialize(void)
     tune_enabled = false;
     if (strstr(Core.Params, "-tune"))
     {
-        hTuner = std::make_unique<XRay::Module>("vTuneAPI");
+        hTuner = XRay::LoadModule("vTuneAPI");
         tune_pause = (VTPause*)hTuner->getProcAddress("VTPause");
         tune_resume = (VTResume*)hTuner->getProcAddress("VTResume");
 
@@ -188,7 +188,7 @@ void CEngineAPI::Destroy(void)
 
 void CEngineAPI::CreateRendererList()
 {
-    hRenderR1 = std::make_unique<XRay::Module>("xrRender_R1");
+    hRenderR1 = XRay::LoadModule("xrRender_R1");
 
     xr_vector<xr_token> modes;
     if (GEnv.isDedicatedServer)
@@ -206,9 +206,9 @@ void CEngineAPI::CreateRendererList()
     // Hide "d3d10.dll not found" message box for XP
     SetErrorMode(SEM_FAILCRITICALERRORS);
 
-    hRenderR2 = std::make_unique<XRay::Module>("xrRender_R2");
-    hRenderR3 = std::make_unique<XRay::Module>("xrRender_R3");
-    hRenderR4 = std::make_unique<XRay::Module>("xrRender_R4");
+    hRenderR2 = XRay::LoadModule("xrRender_R2");
+    hRenderR3 = XRay::LoadModule("xrRender_R3");
+    hRenderR4 = XRay::LoadModule("xrRender_R4");
 
     // Restore error handling
     SetErrorMode(0);

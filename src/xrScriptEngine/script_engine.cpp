@@ -734,7 +734,7 @@ void CScriptEngine::initialize_lua_studio(lua_State* state, cs::lua_studio::worl
     world = 0;
     u32 const old_error_mode = SetErrorMode(SEM_FAILCRITICALERRORS);
 
-    const auto s_script_debugger_module = std::make_unique<XRay::Module>(CS_LUA_STUDIO_BACKEND_FILE_NAME);
+    const auto s_script_debugger_module = XRay::LoadModule(CS_LUA_STUDIO_BACKEND_FILE_NAME);
     SetErrorMode(old_error_mode);
     if (!s_script_debugger_module->exist())
     {

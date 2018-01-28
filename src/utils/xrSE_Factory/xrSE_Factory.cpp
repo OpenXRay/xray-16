@@ -20,7 +20,7 @@
 extern CSE_Abstract* F_entity_Create(LPCSTR section);
 
 extern CScriptPropertiesListHelper* g_property_list_helper;
-extern std::unique_ptr<XRay::Module> prop_helper_module;
+extern XRay::Module prop_helper_module;
 
 extern "C" {
 FACTORY_API IServerEntity* __stdcall create_entity(LPCSTR section) { return F_entity_Create(section); }

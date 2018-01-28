@@ -34,24 +34,24 @@ public:
 
 // Class creation/destroying interface
 extern "C" {
-typedef DLL_API IFactoryObject* __cdecl Factory_Create(CLASS_ID CLS_ID);
-typedef DLL_API void __cdecl Factory_Destroy(IFactoryObject* O);
+using Factory_Create = DLL_API IFactoryObject* __cdecl(CLASS_ID CLS_ID);
+using Factory_Destroy = DLL_API void __cdecl(IFactoryObject* O);
 };
 
 // Tuning interface
 extern "C" {
-typedef void __cdecl VTPause(void);
-typedef void __cdecl VTResume(void);
+using VTPause = void __cdecl(void);
+using VTResume = void __cdecl(void);
 };
 
 class ENGINE_API CEngineAPI
 {
-    std::unique_ptr<XRay::Module> hGame;
-    std::unique_ptr<XRay::Module> hTuner;
-    std::unique_ptr<XRay::Module> hRenderR1;
-    std::unique_ptr<XRay::Module> hRenderR2;
-    std::unique_ptr<XRay::Module> hRenderR3;
-    std::unique_ptr<XRay::Module> hRenderR4;
+    XRay::Module hGame;
+    XRay::Module hTuner;
+    XRay::Module hRenderR1;
+    XRay::Module hRenderR2;
+    XRay::Module hRenderR3;
+    XRay::Module hRenderR4;
 
 public:
     BENCH_SEC_SCRAMBLEMEMBER1

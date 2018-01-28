@@ -84,7 +84,7 @@ void CHW::CreateD3D()
 {
     const pcstr _name = GEnv.isDedicatedServer ? "xrD3D9-Null" : "d3d9.dll";
 
-    hD3D = std::make_unique<XRay::Module>(_name);
+    hD3D = XRay::LoadModule(_name);
 
     R_ASSERT2(hD3D->exist(), "Can't find 'd3d9.dll'\nPlease install latest version of DirectX before running this program");
     typedef IDirect3D9* WINAPI _Direct3DCreate9(UINT SDKVersion);

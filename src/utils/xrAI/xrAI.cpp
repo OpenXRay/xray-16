@@ -102,7 +102,7 @@ void execute(LPSTR cmd)
             char* no_separator_check = strstr(cmd, "-no_separator_check");
             clear_temp_folder();
 
-            const auto hFactory = std::make_unique<XRay::Module>("xrSE_Factory");
+            const auto hFactory = XRay::LoadModule("xrSE_Factory");
 
             R_ASSERT2(hFactory->exist(), "Factory DLL raised exception during loading or there is no factory DLL at all");
 

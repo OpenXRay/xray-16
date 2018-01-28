@@ -93,7 +93,7 @@ void Startup(LPSTR lpCmdLine)
     if (bModifyOptions)
     {
         Logger.Phase("Project options...");
-        const auto L = std::make_unique<XRay::Module>("xrLC_Options");
+        const auto L = XRay::LoadModule("xrLC_Options");
 
         const auto O = (xrOptions*)L->getProcAddress("_frmScenePropertiesRun");
         R_ASSERT(O);
