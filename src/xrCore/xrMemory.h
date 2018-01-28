@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Memory/memory_allocator_options.h"
 #include "_types.h"
 
 class XRCORE_API xrMemory
@@ -90,18 +89,5 @@ inline void* xr_malloc(const size_t size) { return Memory.mem_alloc(size); }
 inline void* xr_realloc(void* P, const size_t size) { return Memory.mem_realloc(P, size); }
 
 XRCORE_API pstr xr_strdup(pcstr string);
-
-// Global new/delete override
-#ifndef NO_XRNEW
-#if !defined(BUILDING_XRMISC_LIB) && defined(_MSC_VER)
-#pragma comment(lib, "xrMisc") // Attempt to force the TU to include our version.
-#endif
-// XXX: Implementations of operator new/delete are in xrMisc/xrMemory.cpp, since they need
-// to be in a static link library.
-void* operator new(const size_t size);
-void operator delete(void* p);
-void* operator new[](const size_t size);
-void operator delete[](void* p);
-#endif
 
 XRCORE_API void log_vminfo();

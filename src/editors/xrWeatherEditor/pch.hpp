@@ -8,9 +8,6 @@
 
 #pragma once
 
-// Конфликт при использовании встроенного в движок аллокатора
-#define NO_XRNEW
-
 #pragma managed(push, off)
 #include "Common/Common.hpp"
 #include "xrCommon/inlining_macros.h"

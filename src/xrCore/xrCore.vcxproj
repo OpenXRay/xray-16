@@ -311,7 +311,6 @@
     <ClInclude Include="Math\MathUtil.hpp" />
     <ClInclude Include="math_constants.h" />
     <ClInclude Include="Media\Image.hpp" />
-    <ClInclude Include="Memory\memory_allocator_options.h" />
     <ClInclude Include="Memory\xalloc.h" />
     <ClInclude Include="Memory\XRayAllocator.hpp" />
     <ClInclude Include="net_utils.h" />
@@ -398,9 +397,6 @@
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)utils\xrMiscMath\xrMiscMath.vcxproj">
       <Project>{7885cf3c-ee04-4c67-9467-1fbf9a36b037}</Project>
-    </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)xrMisc\xrMisc.vcxproj">
-      <Project>{c964d17a-05a8-4bfa-b0a8-7af5c6b627ec}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

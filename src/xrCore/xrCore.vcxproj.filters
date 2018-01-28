@@ -674,9 +674,6 @@
     <ClInclude Include="Memory\XRayAllocator.hpp">
       <Filter>Memory</Filter>
     </ClInclude>
-    <ClInclude Include="Memory\memory_allocator_options.h">
-      <Filter>Memory</Filter>
-    </ClInclude>
     <ClInclude Include="Threading\ThreadPool.hpp">
       <Filter>Threading</Filter>
     </ClInclude>
