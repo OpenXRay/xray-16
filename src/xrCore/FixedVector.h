@@ -2,6 +2,7 @@
 #ifndef FixedVectorH
 #define FixedVectorH
 
+// deprecated, use xr_array instead
 template <class T, std::size_t dim>
 class svector
 {
@@ -15,7 +16,7 @@ public:
 
 private:
     value_type array[dim];
-    size_t count;
+    u32 count;
 
 public:
     svector() : count(0) {}
@@ -26,7 +27,7 @@ public:
     IC const_iterator end() const { return array + count; }
     IC const_iterator cbegin() const { return array; }
     IC const_iterator cend() const { return array + count; }
-    IC size_t size() const { return count; }
+    IC u32 size() const { return count; }
     IC void clear() { count = 0; }
 
     IC void resize(int c)
@@ -49,13 +50,13 @@ public:
         count--;
     }
 
-    IC reference operator[](size_t id)
+    IC reference operator[](u32 id)
     {
         VERIFY(id < count);
         return array[id];
     }
 
-    IC const_reference operator[](size_t id) const
+    IC const_reference operator[](u32 id) const
     {
         VERIFY(id < count);
         return array[id];
@@ -80,16 +81,16 @@ public:
 
     IC void inc() { count++; }
     IC bool empty() const { return 0 == count; }
-    IC void erase(size_t id)
+    IC void erase(u32 id)
     {
         VERIFY(id < count);
         count--;
-        for (size_t i = id; i < count; i++)
+        for (u32 i = id; i < count; i++)
             array[i] = array[i + 1];
     }
 
-    IC void erase(iterator it) { erase(it - begin()); }
-    IC void insert(size_t id, reference V)
+    IC void erase(iterator it) { erase(u32(it - begin())); }
+    IC void insert(u32 id, reference V)
     {
         VERIFY(id < count);
         for (int i = count; i > int(id); i--)
@@ -107,11 +108,10 @@ public:
     {
         if (size() != base.size())
             return false;
-        for (size_t cmp = 0; cmp < size(); cmp++)
+        for (u32 cmp = 0; cmp < size(); cmp++)
             if ((*this)[cmp] != base[cmp])
                 return false;
         return true;
     }
 };
-
 #endif

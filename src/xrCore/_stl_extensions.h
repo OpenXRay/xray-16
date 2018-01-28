@@ -9,6 +9,7 @@
 #include "_std_extensions.h"
 #include "xrMemory.h"
 #include "xrCore/Memory/XRayAllocator.hpp"
+#include "xrCommon/xr_array.h"
 #include "xrCommon/xr_vector.h"
 #include "xrCommon/xr_map.h"
 #include "xrCommon/xr_set.h"
@@ -29,9 +30,6 @@
 // Xottab_DUTY: TODO: or maybe use Im-Dex variant (Get rid of this DEFINE macroses)
 
 // STL extensions
-#define DEFINE_SVECTOR(T, C, N, I) \
-    typedef svector<T, C> N;       \
-    typedef N::iterator I;
 #include "FixedVector.h"
 #include "buffer_vector.h"
 #include "xr_vector_defs.h"
