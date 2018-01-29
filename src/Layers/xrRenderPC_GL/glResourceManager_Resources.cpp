@@ -197,6 +197,7 @@ SVS*	CResourceManager::_CreateVS		(LPCSTR _name)
 		//	TODO: OGL: HACK: Implement all shaders. Remove this for PS
 		if (!file)
 		{
+		fallback:
 			string1024			tmp;
 			xr_sprintf			(tmp, "OGL: %s is missing. Replace with stub_default.vs", cname);
 			Msg					(tmp);
@@ -216,6 +217,12 @@ SVS*	CResourceManager::_CreateVS		(LPCSTR _name)
 		HRESULT	const _hr		= GEnv.Render->shader_compile(name,(DWORD const*)data,size, NULL, NULL, NULL, _result );
 
 		VERIFY(SUCCEEDED(_hr));
+
+		if (!SUCCEEDED(_hr))
+		{
+			Log("Can't create shader, replacing it with stub..");
+			goto fallback;
+		}
 
 		//	Parse constant, texture, sampler binding
 		if (SUCCEEDED(_hr))
