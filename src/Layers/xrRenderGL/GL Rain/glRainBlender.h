@@ -1,33 +1,34 @@
 #ifndef	dx10RainBlender_included
 #define	dx10RainBlender_included
 
-class CBlender_rain : public IBlender  
+class CBlender_rain : public IBlender
 {
 public:
-	virtual		LPCSTR		getComment()	{ return "INTERNAL: DX10 rain blender";	}
-	virtual		BOOL		canBeDetailed()	{ return FALSE;	}
-	virtual		BOOL		canBeLMAPped()	{ return FALSE;	}
+    LPCSTR getComment() override { return "INTERNAL: DX10 rain blender"; }
+    BOOL canBeDetailed() override { return FALSE; }
+    BOOL canBeLMAPped() override { return FALSE; }
 
-	virtual		void		Compile			(CBlender_Compile& C);
+    void Compile(CBlender_Compile& C) override;
 };
 
-class CBlender_rain_msaa : public IBlender  
+class CBlender_rain_msaa : public IBlender
 {
 public:
-   CBlender_rain_msaa()
-   {
-      Name = 0;
-      Definition = 0;
-   }
-	virtual		LPCSTR		getComment()	{ return "INTERNAL: DX10 MSAA rain blender";	}
-	virtual		BOOL		canBeDetailed()	{ return FALSE;	}
-	virtual		BOOL		canBeLMAPped()	{ return FALSE;	}
+    CBlender_rain_msaa()
+    {
+        Name = nullptr;
+        Definition = nullptr;
+    }
 
-	virtual		void		Compile			(CBlender_Compile& C);
-  virtual   void    SetDefine( LPCSTR Name, LPCSTR Definition );
+    LPCSTR getComment() override { return "INTERNAL: DX10 MSAA rain blender"; }
+    BOOL canBeDetailed() override { return FALSE; }
+    BOOL canBeLMAPped() override { return FALSE; }
 
-   LPCSTR Name;
-   LPCSTR Definition;
+    void Compile(CBlender_Compile& C) override;
+    virtual void SetDefine(LPCSTR Name, LPCSTR Definition);
+
+    LPCSTR Name;
+    LPCSTR Definition;
 };
 
 #endif	//	dx10RainBlender_included

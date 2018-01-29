@@ -1,37 +1,37 @@
 #pragma once
 
-class CBlender_accum_direct_mask : public IBlender  
+class CBlender_accum_direct_mask : public IBlender
 {
 public:
-	virtual		LPCSTR		getComment()	{ return "INTERNAL: mask direct light";	}
-	virtual		BOOL		canBeDetailed()	{ return FALSE;	}
-	virtual		BOOL		canBeLMAPped()	{ return FALSE;	}
+    LPCSTR getComment() override { return "INTERNAL: mask direct light"; }
+    BOOL canBeDetailed() override { return FALSE; }
+    BOOL canBeLMAPped() override { return FALSE; }
 
-	virtual		void		Compile			(CBlender_Compile& C);
+    void Compile(CBlender_Compile& C) override;
 
-	CBlender_accum_direct_mask();
-	virtual ~CBlender_accum_direct_mask();
+    CBlender_accum_direct_mask();
+    virtual ~CBlender_accum_direct_mask();
 };
 
-class CBlender_accum_direct_mask_msaa : public IBlender  
+class CBlender_accum_direct_mask_msaa : public IBlender
 {
 public:
 
-	virtual		LPCSTR	getComment()	{ return "INTERNAL: mask direct light msaa";	}
-	virtual		BOOL		canBeDetailed()	{ return FALSE;	}
-	virtual		BOOL		canBeLMAPped()	{ return FALSE;	}
-  virtual  void     SetDefine( LPCSTR Name, LPCSTR Definition )
-  {
-      this->Name = Name;
-      this->Definition = Definition;
-  }
+    LPCSTR getComment() override { return "INTERNAL: mask direct light msaa"; }
+    BOOL canBeDetailed() override { return FALSE; }
+    BOOL canBeLMAPped() override { return FALSE; }
 
-	virtual		void		Compile			(CBlender_Compile& C);
+    virtual void SetDefine(LPCSTR Name, LPCSTR Definition)
+    {
+        this->Name = Name;
+        this->Definition = Definition;
+    }
 
-	CBlender_accum_direct_mask_msaa();
-	virtual ~CBlender_accum_direct_mask_msaa();
+    void Compile(CBlender_Compile& C) override;
 
-  LPCSTR Name;
-  LPCSTR Definition;
+    CBlender_accum_direct_mask_msaa();
+    virtual ~CBlender_accum_direct_mask_msaa();
+
+    LPCSTR Name;
+    LPCSTR Definition;
 };
-

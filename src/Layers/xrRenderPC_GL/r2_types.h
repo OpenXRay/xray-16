@@ -15,8 +15,8 @@
 #define		r2_T_envs0			"$user$env_s0"			// ---
 #define		r2_T_envs1			"$user$env_s1"			// ---
 
-#define		r2_T_sky0			"$user$sky0" 
-#define		r2_T_sky1			"$user$sky1" 
+#define		r2_T_sky0			"$user$sky0"
+#define		r2_T_sky1			"$user$sky1"
 
 #define		r2_RT_ssao_temp		"$user$ssao_temp"		//temporary rt for ssao calculation
 #define		r2_RT_half_depth	"$user$half_depth"		//temporary rt for ssao calculation
@@ -40,7 +40,7 @@
 
 #define		r2_RT_smap_surf		"$user$smap_surf"		// --- directional
 #define		r2_RT_smap_depth	"$user$smap_depth"		// ---directional
-#define		r2_RT_smap_depth_minmax	"$user$smap_depth_minmax"	
+#define		r2_RT_smap_depth_minmax	"$user$smap_depth_minmax"
 
 #define		r2_material			"$user$material"		// ---
 #define		r2_ds2_fade			"$user$ds2_fade"		// ---
@@ -53,21 +53,21 @@
 
 #define		JITTER(a) r2_jitter #a
 
-const		float				SMAP_near_plane		= .1f	;
+const float SMAP_near_plane = .1f;
 
-const		u32					SMAP_adapt_min		= 32	;
-const		u32					SMAP_adapt_optimal	= 768	;
-const		u32					SMAP_adapt_max		= 1536	;
+const u32 SMAP_adapt_min = 32;
+const u32 SMAP_adapt_optimal = 768;
+const u32 SMAP_adapt_max = 1536;
 
-const		u32					TEX_material_LdotN	= 128	;	// diffuse,		X, almost linear = small res
-const		u32					TEX_material_LdotH	= 256	;	// specular,	Y
-const		u32					TEX_material_Count	= 4		;	// Number of materials,	Z
-const		u32					TEX_jitter			= 64	;
-const		u32					TEX_jitter_count	= 5		;	// for HBAO
+const u32 TEX_material_LdotN = 128; // diffuse,		X, almost linear = small res
+const u32 TEX_material_LdotH = 256; // specular,	Y
+const u32 TEX_material_Count = 4; // Number of materials,	Z
+const u32 TEX_jitter = 64;
+const u32 TEX_jitter_count = 5; // for HBAO
 
-const		u32					BLOOM_size_X		= 256	;
-const		u32					BLOOM_size_Y		= 256	;
-const		u32					LUMINANCE_size		= 16	;
+const u32 BLOOM_size_X = 256;
+const u32 BLOOM_size_Y = 256;
+const u32 LUMINANCE_size = 16;
 
 // deffer
 #define		SE_R2_NORMAL_HQ		0	// high quality/detail
@@ -98,7 +98,11 @@ const		u32					LUMINANCE_size		= 16	;
 //	For rain R3 rendering
 #define		SE_SUN_RAIN_SMAP	5
 
-extern		float	ps_r2_gloss_factor;
-IC	float	u_diffuse2s	(float x, float y, float z)	{ float	v = (x+y+z)/3.f;	return ps_r2_gloss_factor * ((v<1)?powf(v,2.f/3.f):v); }
-IC	float	u_diffuse2s	(Fvector3& c)				{ return u_diffuse2s(c.x,c.y,c.z);					}
+extern float ps_r2_gloss_factor;
+IC float u_diffuse2s(float x, float y, float z)
+{
+    float v = (x + y + z) / 3.f;
+    return ps_r2_gloss_factor * (v < 1 ? powf(v, 2.f / 3.f) : v);
+}
 
+IC float u_diffuse2s(Fvector3& c) { return u_diffuse2s(c.x, c.y, c.z); }

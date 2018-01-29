@@ -1,41 +1,40 @@
 #pragma once
 
-class CBlender_bloom_build : public IBlender  
+class CBlender_bloom_build : public IBlender
 {
 public:
-	virtual		LPCSTR		getComment()	{ return "INTERNAL: combine to bloom target";	}
-	virtual		BOOL		canBeDetailed()	{ return FALSE;	}
-	virtual		BOOL		canBeLMAPped()	{ return FALSE;	}
+    LPCSTR getComment() override { return "INTERNAL: combine to bloom target"; }
+    BOOL canBeDetailed() override { return FALSE; }
+    BOOL canBeLMAPped() override { return FALSE; }
 
-	virtual		void		Compile			(CBlender_Compile& C);
+    void Compile(CBlender_Compile& C) override;
 
-	CBlender_bloom_build();
-	virtual ~CBlender_bloom_build();
+    CBlender_bloom_build();
+    virtual ~CBlender_bloom_build();
 };
 
-class CBlender_bloom_build_msaa : public IBlender  
+class CBlender_bloom_build_msaa : public IBlender
 {
 public:
-   virtual		LPCSTR		getComment()	{ return "INTERNAL: combine to bloom target msaa";	}
-   virtual		BOOL		canBeDetailed()	{ return FALSE;	}
-   virtual		BOOL		canBeLMAPped()	{ return FALSE;	}
+    LPCSTR getComment() override { return "INTERNAL: combine to bloom target msaa"; }
+    BOOL canBeDetailed() override { return FALSE; }
+    BOOL canBeLMAPped() override { return FALSE; }
 
-   virtual		void		Compile			(CBlender_Compile& C);
+    void Compile(CBlender_Compile& C) override;
 
-   CBlender_bloom_build_msaa();
-   virtual ~CBlender_bloom_build_msaa();
+    CBlender_bloom_build_msaa();
+    virtual ~CBlender_bloom_build_msaa();
 };
 
-class CBlender_postprocess_msaa : public IBlender  
+class CBlender_postprocess_msaa : public IBlender
 {
 public:
-   virtual		LPCSTR		getComment()	{ return "INTERNAL: combine to bloom target msaa";	}
-   virtual		BOOL		canBeDetailed()	{ return FALSE;	}
-   virtual		BOOL		canBeLMAPped()	{ return FALSE;	}
+    LPCSTR getComment() override { return "INTERNAL: combine to bloom target msaa"; }
+    BOOL canBeDetailed() override { return FALSE; }
+    BOOL canBeLMAPped() override { return FALSE; }
 
-   virtual		void		Compile			(CBlender_Compile& C);
+    void Compile(CBlender_Compile& C) override;
 
-   CBlender_postprocess_msaa();
-   virtual ~CBlender_postprocess_msaa();
+    CBlender_postprocess_msaa();
+    virtual ~CBlender_postprocess_msaa();
 };
-

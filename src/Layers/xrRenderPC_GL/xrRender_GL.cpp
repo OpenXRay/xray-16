@@ -34,6 +34,7 @@ public:
         GEnv.CheckRGL = SupportsOpenGLRendering;
         GEnv.SetupRGL = SetupEnvRGL;
     }
+
     ~GEnvHelper()
     {
         GEnv.SetupRGL = nullptr;

@@ -1,34 +1,36 @@
 #pragma once
 
-class CBlender_accum_point : public IBlender  
+class CBlender_accum_point : public IBlender
 {
 public:
-	virtual		LPCSTR		getComment()	{ return "INTERNAL: accumulate point light";	}
-	virtual		BOOL		canBeDetailed()	{ return FALSE;	}
-	virtual		BOOL		canBeLMAPped()	{ return FALSE;	}
+    LPCSTR getComment() override { return "INTERNAL: accumulate point light"; }
+    BOOL canBeDetailed() override { return FALSE; }
+    BOOL canBeLMAPped() override { return FALSE; }
 
-	virtual		void		Compile			(CBlender_Compile& C);
+    void Compile(CBlender_Compile& C) override;
 
-	CBlender_accum_point();
-	virtual ~CBlender_accum_point();
+    CBlender_accum_point();
+    virtual ~CBlender_accum_point();
 };
 
-class CBlender_accum_point_msaa : public IBlender  
+class CBlender_accum_point_msaa : public IBlender
 {
 public:
-	virtual		LPCSTR		getComment()	{ return "INTERNAL: accumulate point light msaa";	}
-	virtual		BOOL		canBeDetailed()	{ return FALSE;	}
-	virtual		BOOL		canBeLMAPped()	{ return FALSE;	}
+    LPCSTR getComment() override { return "INTERNAL: accumulate point light msaa"; }
+    BOOL canBeDetailed() override { return FALSE; }
+    BOOL canBeLMAPped() override { return FALSE; }
 
-	virtual		void		Compile			(CBlender_Compile& C);
+    void Compile(CBlender_Compile& C) override;
 
-	CBlender_accum_point_msaa();
-	virtual ~CBlender_accum_point_msaa();
-	virtual   void    SetDefine( LPCSTR Name, LPCSTR Definition )
-		{
-		this->Name = Name;
-		this->Definition = Definition;
-		}
-	LPCSTR Name;
-	LPCSTR Definition;
+    CBlender_accum_point_msaa();
+    virtual ~CBlender_accum_point_msaa();
+
+    virtual void SetDefine(LPCSTR Name, LPCSTR Definition)
+    {
+        this->Name = Name;
+        this->Definition = Definition;
+    }
+
+    LPCSTR Name;
+    LPCSTR Definition;
 };

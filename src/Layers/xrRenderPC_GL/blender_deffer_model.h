@@ -1,22 +1,22 @@
 #pragma once
 
-class CBlender_deffer_model : public IBlender  
+class CBlender_deffer_model : public IBlender
 {
 public:
-	xrP_Integer	oAREF;
-	xrP_BOOL	oBlend;
+    xrP_Integer oAREF;
+    xrP_BOOL oBlend;
 public:
-	virtual		LPCSTR		getComment()	{ return "LEVEL: deffer-model-flat";	}
-	virtual		BOOL		canBeDetailed()	{ return TRUE;	}
-	virtual		BOOL		canBeLMAPped()	{ return FALSE;	}
+    LPCSTR getComment() override { return "LEVEL: deffer-model-flat"; }
+    BOOL canBeDetailed() override { return TRUE; }
+    BOOL canBeLMAPped() override { return FALSE; }
 
-	virtual		void		Save			(IWriter&	fs);
-	virtual		void		Load			(IReader&	fs, u16 version);
-	virtual		void		Compile			(CBlender_Compile& C);
+    void Save(IWriter& fs) override;
+    void Load(IReader& fs, u16 version) override;
+    void Compile(CBlender_Compile& C) override;
 
-	CBlender_deffer_model();
-	virtual ~CBlender_deffer_model();
+    CBlender_deffer_model();
+    virtual ~CBlender_deffer_model();
 
 private:
-	xrP_TOKEN	oTessellation;
+    xrP_TOKEN oTessellation;
 };

@@ -4,7 +4,7 @@
 
 namespace glTextureUtils
 {
-	GLenum	ConvertTextureFormat(D3DFORMAT dx9FMT);
+GLenum ConvertTextureFormat(D3DFORMAT dx9FMT);
 }
 
 #endif // USE_OGL

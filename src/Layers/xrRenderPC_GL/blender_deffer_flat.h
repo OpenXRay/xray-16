@@ -1,20 +1,20 @@
 #pragma once
 
-class CBlender_deffer_flat : public IBlender  
+class CBlender_deffer_flat : public IBlender
 {
 public:
-	virtual		LPCSTR		getComment()	{ return "LEVEL: defer-base-normal";	}
-	virtual		BOOL		canBeDetailed()	{ return TRUE;	}
-	virtual		BOOL		canBeLMAPped()	{ return FALSE;	}
-	virtual		BOOL		canUseSteepParallax	()	{ return TRUE; }
+    LPCSTR getComment() override { return "LEVEL: defer-base-normal"; }
+    BOOL canBeDetailed() override { return TRUE; }
+    BOOL canBeLMAPped() override { return FALSE; }
+    BOOL canUseSteepParallax() override { return TRUE; }
 
-	virtual		void		Save			(IWriter&	fs);
-	virtual		void		Load			(IReader&	fs, u16 version);
-	virtual		void		Compile			(CBlender_Compile& C);
+    void Save(IWriter& fs) override;
+    void Load(IReader& fs, u16 version) override;
+    void Compile(CBlender_Compile& C) override;
 
-	CBlender_deffer_flat();
-	virtual ~CBlender_deffer_flat();
+    CBlender_deffer_flat();
+    virtual ~CBlender_deffer_flat();
 
 private:
-	xrP_TOKEN	oTessellation;
+    xrP_TOKEN oTessellation;
 };

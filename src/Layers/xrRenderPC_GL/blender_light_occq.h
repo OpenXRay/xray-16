@@ -1,14 +1,14 @@
 #pragma once
 
-class CBlender_light_occq	: public IBlender  
+class CBlender_light_occq : public IBlender
 {
 public:
-	virtual		LPCSTR		getComment()	{ return "INTERNAL: occlusion testing";	}
-	virtual		BOOL		canBeDetailed()	{ return FALSE;	}
-	virtual		BOOL		canBeLMAPped()	{ return FALSE;	}
+    LPCSTR getComment() override { return "INTERNAL: occlusion testing"; }
+    BOOL canBeDetailed() override { return FALSE; }
+    BOOL canBeLMAPped() override { return FALSE; }
 
-	virtual		void		Compile			(CBlender_Compile& C);
+    void Compile(CBlender_Compile& C) override;
 
-	CBlender_light_occq();
-	virtual ~CBlender_light_occq();
+    CBlender_light_occq();
+    virtual ~CBlender_light_occq();
 };
