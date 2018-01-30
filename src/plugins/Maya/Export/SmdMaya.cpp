@@ -289,7 +289,7 @@ MStatus CXRaySkinExport::reader(const MFileObject& file, const MString& options,
 CSurface* CEditableObject::CreateSurface(MObject shader)
 {
     CSurface* S = 0;
-    for (SurfaceIt s_it = m_Surfaces.begin(); s_it != m_Surfaces.end(); s_it++)
+    for (SurfaceIt s_it = m_Surfaces.begin(); s_it != m_Surfaces.end(); ++s_it)
         if ((*s_it)->tag == *((int*)&shader))
             return *s_it;
     if (!S)
@@ -331,11 +331,11 @@ MStatus CXRaySkinExport::gotoBindPose(void)
     MStatus status;
     if (m_bReferenceFile)
     {
-        for (SmdBoneIt itBones = m_boneList.begin(); itBones != m_boneList.end(); itBones++)
+        for (auto& itBones : m_boneList)
         {
-            if ((*itBones)->parentId == -1)
+            if (itBones->parentId == -1)
             {
-                MFnTransform fnJoint = (*itBones)->path.node(&status);
+                MFnTransform fnJoint = itBones->path.node(&status);
                 if (!status)
                 {
                     Msg("!Unable to cast as Transform!");
@@ -394,14 +394,14 @@ MStatus CXRaySkinExport::exportObject(LPCSTR fn, bool b_ogf)
         MESH->m_Vertices = xr_alloc<Fvector>(MESH->m_VertCount);
         Fvector* pt_it = _points;
 
-        for (SmdVertIt it = m_vertList.begin(); it != m_vertList.end(); it++, pt_it++)
+        for (auto& it : m_vertList)
         {
             // convert from internal units to the current ui units
-            MDistance dst_x((*it)->pos.x);
-            MDistance dst_y((*it)->pos.y);
-            MDistance dst_z((*it)->pos.z);
+            MDistance dst_x(it->pos.x);
+            MDistance dst_y(it->pos.y);
+            MDistance dst_z(it->pos.z);
             pt_it->set((float)dst_x.asMeters(), (float)dst_y.asMeters(), (float)dst_z.asMeters());
-            VM_UV->appendUV((*it)->uv.x, (*it)->uv.y);
+            VM_UV->appendUV(it->uv.x, it->uv.y);
         }
     }
 
@@ -415,10 +415,10 @@ MStatus CXRaySkinExport::exportObject(LPCSTR fn, bool b_ogf)
 
         int f_id = 0;
         CSurface* surf = 0;
-        for (SmdTriIt it = m_triList.begin(); it != m_triList.end(); it++, f_id++)
+        for (auto& it : m_triList)
         {
             // FACES
-            _sgs[f_id] = ((*it)->sm_group);
+            _sgs[f_id] = (it->sm_group);
 
             // set_smooth
             // set_smoth_flags( _sgs.back(), rgint );
@@ -426,7 +426,7 @@ MStatus CXRaySkinExport::exportObject(LPCSTR fn, bool b_ogf)
             st_Face& F = _faces[f_id];
             for (int k = 0; k < 3; k++)
             {
-                int v_idx = (*it)->v[k];
+                int v_idx = it->v[k];
                 st_FaceVert& vt = F.pv[k];
                 SmdVertex* V = m_vertList[v_idx];
                 vt.pindex = v_idx;
@@ -435,7 +435,7 @@ MStatus CXRaySkinExport::exportObject(LPCSTR fn, bool b_ogf)
                 vm_lst.pts = xr_alloc<st_VMapPt>(vm_lst.count);
                 vm_lst.pts[0].vmap_index = VM_UV_idx;
                 vm_lst.pts[0].index = vt.pindex;
-                for (WBIt vd_it = V->influence.begin(); vd_it != V->influence.end(); vd_it++)
+                for (auto vd_it = V->influence.begin(); vd_it != V->influence.end(); ++vd_it)
                 {
                     u32 idx = vd_it - V->influence.begin() + 1;
                     st_VMap* vm = _vmaps[vd_it->bone];
@@ -446,7 +446,7 @@ MStatus CXRaySkinExport::exportObject(LPCSTR fn, bool b_ogf)
                 vt.vmref = vt.pindex;
             }
             SXRShaderData D;
-            surf = MESH->Parent()->CreateSurface((*it)->shader);
+            surf = MESH->Parent()->CreateSurface(it->shader);
             if (!surf)
                 return MStatus::kFailure;
             _surf_faces[surf].push_back(f_id);
@@ -462,18 +462,17 @@ MStatus CXRaySkinExport::exportObject(LPCSTR fn, bool b_ogf)
         MGlobal::executeCommand("doEnableNodeItems true all");
         return status;
     }
-    for (SmdBoneIt boneIt = m_boneList.begin(); boneIt != m_boneList.end(); ++boneIt)
+    for (auto& boneIt : m_boneList)
     {
         float length = 0.5f;
         Fvector offset, rotate;
-        offset.set((*boneIt)->trans);
-        rotate.set((*boneIt)->orient);
+        offset.set(boneIt->trans);
+        rotate.set(boneIt->orient);
         OBJECT->Bones().push_back(new CBone());
         CBone* BONE = OBJECT->Bones().back();
-        BONE->SetWMap((*boneIt)->name);
-        BONE->SetName((*boneIt)->name);
-        BONE->SetParentName(
-            (*boneIt)->parentId > -1 ? m_boneList[(*boneIt)->parentId]->name : 0); //. need convert space
+        BONE->SetWMap(boneIt->name);
+        BONE->SetName(boneIt->name);
+        BONE->SetParentName(boneIt->parentId > -1 ? m_boneList[boneIt->parentId]->name : 0); //. need convert space
         BONE->SetRestParams(length, offset, rotate);
     }
 
@@ -556,10 +555,8 @@ MStatus CXRaySkinExport::exportMotion(LPCSTR fn, const MMatrix& locator)
         BoneMotionVec& BMVec = MOT->BoneMotions();
         BMVec.reserve(m_boneList.size());
 
-        for (SmdBoneIt boneIt = m_boneList.begin(); boneIt != m_boneList.end(); boneIt++)
+        for (auto& bone : m_boneList)
         {
-            SmdBone* bone = *boneIt;
-
             BMVec.push_back(st_BoneMotion());
             st_BoneMotion& BM = BMVec.back();
             BM.SetName(bone->name);
@@ -600,7 +597,7 @@ MStatus CXRaySkinExport::exportMotion(LPCSTR fn, const MMatrix& locator)
             float displacedTime = (float)tmNew.as(MTime::kSeconds);
 
             st_Key *X, *Y, *Z, *H, *P, *B;
-            for (SmdBoneIt boneIt = m_boneList.begin(); boneIt != m_boneList.end(); boneIt++)
+            for (auto boneIt = m_boneList.begin(); boneIt != m_boneList.end(); ++boneIt)
             {
                 SmdBone* bone = *boneIt;
                 st_BoneMotion& BM = BMVec[boneIt - m_boneList.begin()];
@@ -660,7 +657,7 @@ MStatus CXRaySkinExport::exportMotion(LPCSTR fn, const MMatrix& locator)
 
 int CXRaySkinExport::AppendVertex(MPoint pt, float u, float v, const WBVec& wb)
 {
-    for (SmdVertIt it = m_vertList.begin(); it != m_vertList.end(); it++)
+    for (auto it = m_vertList.begin(); it != m_vertList.end(); ++it)
     {
         if ((*it)->similar(pt.x, pt.y, pt.z, u, v, wb))
             return it - m_vertList.begin();
@@ -1219,9 +1216,9 @@ MStatus CXRaySkinExport::getBoneData(const MMatrix& locator)
 
     if (status == MS::kSuccess)
     {
-        for (SmdBoneIt itBones = m_boneList.begin(); itBones != m_boneList.end(); itBones++)
+        for (auto& itBones : m_boneList)
         {
-            MFnTransform fnJoint = (*itBones)->path.node(&status);
+            MFnTransform fnJoint = itBones->path.node(&status);
             LPCSTR nm = fnJoint.name().asChar();
             if (!status)
             {
@@ -1237,7 +1234,7 @@ MStatus CXRaySkinExport::getBoneData(const MMatrix& locator)
                 return status;
             }
 
-            if ((*itBones)->parentId == -1)
+            if (itBones->parentId == -1)
             {
                 MMatrix FT = CalculateFullTransform(fnJoint);
                 MMatrix FT2;
@@ -1245,7 +1242,7 @@ MStatus CXRaySkinExport::getBoneData(const MMatrix& locator)
                 mat = FT2;
             }
 
-            ParseMatrix(mat, (*itBones)->trans, (*itBones)->orient, (*itBones)->parentId == -1);
+            ParseMatrix(mat, itBones->trans, itBones->orient, itBones->parentId == -1);
         }
     }
 
@@ -1268,9 +1265,9 @@ MStatus CXRaySkinExport::parseBoneGeometry()
 
     if (MStatus::kSuccess == status)
     {
-        for (SmdBoneIt itBones = m_boneList.begin(); itBones != m_boneList.end(); itBones++)
+        for (auto& itBones : m_boneList)
         {
-            MFnDagNode fnJoint = (*itBones)->path.node(&status);
+            MFnDagNode fnJoint = itBones->path.node(&status);
             // go through children looking for geometry
             for (unsigned int i = 0; i < fnJoint.childCount(&status); i++)
             {
@@ -1331,7 +1328,7 @@ MStatus CXRaySkinExport::parseBoneGeometry()
 
                 // now iterate through all polygons and set up that data
                 MItMeshPolygon piter(path, MObject::kNullObj, &status);
-                parsePolySet(piter, rgShaders, rgFaces, (*itBones)->id);
+                parsePolySet(piter, rgShaders, rgFaces, itBones->id);
 
                 destroyEdgeTable(); // Free up the edge table
             }
@@ -1390,20 +1387,15 @@ MStatus CXRaySkinExport::parseShape(MDagPath path)
 // reset all data tables in between function calls
 void CXRaySkinExport::clearData(void)
 {
-    for (SmdTriIt t_it = m_triList.begin(); t_it != m_triList.end(); t_it++)
-    {
-        xr_delete(*t_it);
-    }
+    for (auto& t_it : m_triList)
+        xr_delete(t_it);
 
-    for (SmdVertIt v_it = m_vertList.begin(); v_it != m_vertList.end(); v_it++)
-    {
-        xr_delete(*v_it);
-    }
+    for (auto& v_it : m_vertList)
+        xr_delete(v_it);
 
-    for (SmdBoneIt b_it = m_boneList.begin(); b_it != m_boneList.end(); b_it++)
-    {
-        xr_delete(*b_it);
-    }
+    for (auto& b_it : m_boneList)
+        xr_delete(b_it);
+
     xr_delete(m_rgWeights);
     xr_free(polySmoothingGroups);
 
@@ -1419,7 +1411,7 @@ void CXRaySkinExport::CreateSMGFacegroups(MFnMesh& fnMesh)
 {
     // Now create a polyId->smoothingGroup table
     //
-    int numPolygons = fnMesh.numPolygons();
+    const int numPolygons = fnMesh.numPolygons();
     polySmoothingGroups = xr_alloc<int>(numPolygons); //(int*)malloc( sizeof(int) *  numPolygons );
     for (int i = 0; i < numPolygons; i++)
     {

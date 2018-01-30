@@ -58,7 +58,7 @@ private:
     BOOL Capture();
     int AddVert(const st_VERT& pTestV)
     {
-        for (ExpVertIt vI = m_ExpVertices.begin(); vI != m_ExpVertices.end(); vI++)
+        for (auto vI = m_ExpVertices.begin(); vI != m_ExpVertices.end(); ++vI)
             if ((*vI)->similar(pTestV))
                 return vI - m_ExpVertices.begin();
 

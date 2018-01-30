@@ -1,9 +1,7 @@
 //----------------------------------------------------
 // file: NetDeviceLog.cpp
 //----------------------------------------------------
-
 #include "stdafx.h"
-#pragma hdrstop
 
 #include "NetDeviceLog.h"
 #include "MeshExpUtility.h"
@@ -14,11 +12,8 @@
 CExportConsole EConsole;
 
 //----------------------------------------------------
-BOOL CALLBACK ConsoleDialogProc(HWND hw, UINT msg, WPARAM wp, LPARAM lp)
+INT_PTR CALLBACK ConsoleDialogProc(HWND hw, UINT msg, WPARAM wp, LPARAM lp)
 {
-    std::list<CExportConsole::_ConsoleMsg>::iterator _F;
-    std::list<CExportConsole::_ConsoleMsg>::iterator _E;
-
     switch (msg)
     {
     case WM_INITDIALOG:
@@ -27,11 +22,9 @@ BOOL CALLBACK ConsoleDialogProc(HWND hw, UINT msg, WPARAM wp, LPARAM lp)
         EnterCriticalSection(&EConsole.m_CSection);
         if (!EConsole.m_Messages.empty())
         {
-            _F = EConsole.m_Messages.begin();
-            _E = EConsole.m_Messages.end();
-            for (; _F != _E; _F++)
+            for (auto& it : EConsole.m_Messages)
             {
-                int k = SendDlgItemMessage(hw, IDC_MESSAGES, LB_ADDSTRING, 0, (LPARAM)_F->buf);
+                int k = SendDlgItemMessage(hw, IDC_MESSAGES, LB_ADDSTRING, 0, (LPARAM)it.buf);
                 SendDlgItemMessage(hw, IDC_MESSAGES, LB_SETCURSEL, k, 0);
             }
             SendDlgItemMessage(hw, IDC_PROGRESS, PBM_SETRANGE, 0, MAKELPARAM(0, 100));

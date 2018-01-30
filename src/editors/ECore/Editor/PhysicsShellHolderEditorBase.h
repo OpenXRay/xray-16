@@ -3,6 +3,8 @@
 
 #include "xrPhysics/IPhysicsShellHolder.h"
 
+class IGameObject;
+
 class ECORE_API CPhysicsShellHolderEditorBase : public IPhysicsShellHolder
 {
 public:

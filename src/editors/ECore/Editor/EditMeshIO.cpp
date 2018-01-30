@@ -59,21 +59,21 @@ void CEditableMesh::SaveMesh(IWriter& F)
 
     F.open_chunk(EMESH_CHUNK_VMREFS);
     F.w_u32(m_VMRefs.size());
-    for (VMRefsIt r_it = m_VMRefs.begin(); r_it != m_VMRefs.end(); r_it++)
+    for (auto& it : m_VMRefs)
     {
-        int sz = r_it->count;
+        int sz = it.count;
         VERIFY(sz <= 255);
         F.w_u8((u8)sz);
-        F.w(r_it->pts, sizeof(st_VMapPt) * sz);
+        F.w(it.pts, sizeof(st_VMapPt) * sz);
     }
     F.close_chunk();
 
     F.open_chunk(EMESH_CHUNK_SFACE);
     F.w_u16((u16)m_SurfFaces.size()); /* surface polygon count*/
-    for (SurfFacesPairIt plp_it = m_SurfFaces.begin(); plp_it != m_SurfFaces.end(); plp_it++)
+    for (auto& it : m_SurfFaces)
     {
-        F.w_stringZ(plp_it->first->_Name()); /* surface name*/
-        IntVec& pol_lst = plp_it->second;
+        F.w_stringZ(it.first->_Name()); /* surface name*/
+        IntVec& pol_lst = it.second;
         F.w_u32(pol_lst.size()); /* surface-polygon indices*/
         F.w(&*pol_lst.begin(), sizeof(int) * pol_lst.size());
     }
@@ -81,17 +81,17 @@ void CEditableMesh::SaveMesh(IWriter& F)
 
     F.open_chunk(EMESH_CHUNK_VMAPS_2);
     F.w_u32(m_VMaps.size());
-    for (VMapIt vm_it = m_VMaps.begin(); vm_it != m_VMaps.end(); vm_it++)
+    for (auto& it : m_VMaps)
     {
-        F.w_stringZ((*vm_it)->name);
-        F.w_u8((*vm_it)->dim);
-        F.w_u8((u8)(*vm_it)->polymap);
-        F.w_u8((*vm_it)->type);
-        F.w_u32((*vm_it)->size());
-        F.w((*vm_it)->getVMdata(), (*vm_it)->VMdatasize());
-        F.w((*vm_it)->getVIdata(), (*vm_it)->VIdatasize());
-        if ((*vm_it)->polymap)
-            F.w((*vm_it)->getPIdata(), (*vm_it)->PIdatasize());
+        F.w_stringZ(it->name);
+        F.w_u8(it->dim);
+        F.w_u8(it->polymap);
+        F.w_u8(it->type);
+        F.w_u32(it->size());
+        F.w(it->getVMdata(), it->VMdatasize());
+        F.w(it->getVIdata(), it->VIdatasize());
+        if (it->polymap)
+            F.w(it->getPIdata(), it->PIdatasize());
     }
     F.close_chunk();
 }
@@ -103,7 +103,7 @@ bool CEditableMesh::LoadMesh(IReader& F)
     R_ASSERT(F.r_chunk(EMESH_CHUNK_VERSION, &version));
     if (version != EMESH_CURRENT_VERSION)
     {
-        ELog.DlgMsg(mtError, "CEditableMesh: unsuported file version. Mesh can't load.");
+        ELog.DlgMsg(mtError, "CEditableMesh: unsupported file version. Mesh can't load.");
         return false;
     }
 
@@ -146,11 +146,11 @@ bool CEditableMesh::LoadMesh(IReader& F)
     R_ASSERT(F.find_chunk(EMESH_CHUNK_VMREFS));
     m_VMRefs.resize(F.r_u32());
     int sz_vmpt = sizeof(st_VMapPt);
-    for (VMRefsIt r_it = m_VMRefs.begin(); r_it != m_VMRefs.end(); r_it++)
+    for (auto& it : m_VMRefs)
     {
-        r_it->count = F.r_u8();
-        r_it->pts = xr_alloc<st_VMapPt>(r_it->count);
-        F.r(r_it->pts, sz_vmpt * r_it->count);
+        it.count = F.r_u8();
+        it.pts = xr_alloc<st_VMapPt>(it.count);
+        F.r(it.pts, sz_vmpt * it.count);
     }
 
     R_ASSERT(F.find_chunk(EMESH_CHUNK_SFACE));
@@ -176,7 +176,7 @@ bool CEditableMesh::LoadMesh(IReader& F)
     if (F.find_chunk(EMESH_CHUNK_VMAPS_2))
     {
         m_VMaps.resize(F.r_u32());
-        for (VMapIt vm_it = m_VMaps.begin(); vm_it != m_VMaps.end(); vm_it++)
+        for (auto vm_it = m_VMaps.begin(); vm_it != m_VMaps.end(); ++vm_it)
         {
             *vm_it = new st_VMap();
             F.r_stringZ((*vm_it)->name);
@@ -195,7 +195,7 @@ bool CEditableMesh::LoadMesh(IReader& F)
         if (F.find_chunk(EMESH_CHUNK_VMAPS_1))
         {
             m_VMaps.resize(F.r_u32());
-            for (VMapIt vm_it = m_VMaps.begin(); vm_it != m_VMaps.end(); vm_it++)
+            for (auto vm_it = m_VMaps.begin(); vm_it != m_VMaps.end(); ++vm_it)
             {
                 *vm_it = new st_VMap();
                 F.r_stringZ((*vm_it)->name);
@@ -209,7 +209,7 @@ bool CEditableMesh::LoadMesh(IReader& F)
         {
             R_ASSERT(F.find_chunk(EMESH_CHUNK_VMAPS_0));
             m_VMaps.resize(F.r_u32());
-            for (VMapIt vm_it = m_VMaps.begin(); vm_it != m_VMaps.end(); vm_it++)
+            for (auto vm_it = m_VMaps.begin(); vm_it != m_VMaps.end(); ++vm_it)
             {
                 *vm_it = new st_VMap();
                 F.r_stringZ((*vm_it)->name);

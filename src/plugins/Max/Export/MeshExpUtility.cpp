@@ -11,7 +11,7 @@
 //-------------------------------------------------------------------
 //  Dialog Handler for Utility
 
-static BOOL CALLBACK DefaultDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+static INT_PTR CALLBACK DefaultDlgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
     {
@@ -109,9 +109,8 @@ void MeshExpUtility::RefreshExportList()
 void MeshExpUtility::UpdateSelectionListBox()
 {
     SendMessage(hItemList, LB_RESETCONTENT, 0, 0);
-    ExportItemIt it = m_Items.begin();
-    for (; it != m_Items.end(); it++)
-        SendMessage(hItemList, LB_ADDSTRING, 0, (LPARAM)it->pNode->GetName());
+    for (auto& it : m_Items)
+        SendMessage(hItemList, LB_ADDSTRING, 0, (LPARAM)it.pNode->GetName());
 }
 //-------------------------------------------------------------------
 
@@ -128,21 +127,18 @@ BOOL MeshExpUtility::BuildObject(CEditableObject*& exp_obj, LPCSTR m_ExportName)
     exp_obj = new CEditableObject(fname);
     exp_obj->SetVersionToCurrent(TRUE, TRUE);
 
-    ExportItemIt it = m_Items.begin();
-    for (; it != m_Items.end(); it++)
+    for (auto& it : m_Items)
     {
         CEditableMesh* submesh = new CEditableMesh(exp_obj);
-        ELog.Msg(mtInformation, "Converting node '%s'...", it->pNode->GetName());
-        if (submesh->Convert(it->pNode))
+        ELog.Msg(mtInformation, "Converting node '%s'...", it.pNode->GetName());
+        if (submesh->Convert(it.pNode))
         {
-            // transform
-            Matrix3 mMatrix;
-            mMatrix = it->pNode->GetNodeTM(0) * Inverse(it->pNode->GetParentNode()->GetNodeTM(0));
+            const Matrix3 mMatrix = it.pNode->GetNodeTM(0) * Inverse(it.pNode->GetParentNode()->GetNodeTM(0));
 
-            Point3 r1 = mMatrix.GetRow(0);
-            Point3 r2 = mMatrix.GetRow(1);
-            Point3 r3 = mMatrix.GetRow(2);
-            Point3 r4 = mMatrix.GetRow(3);
+            const Point3 r1 = mMatrix.GetRow(0);
+            const Point3 r2 = mMatrix.GetRow(1);
+            const Point3 r3 = mMatrix.GetRow(2);
+            const Point3 r4 = mMatrix.GetRow(3);
             Fmatrix m;
             m.identity();
             m.i.set(r1.x, r1.z, r1.y);
@@ -160,12 +156,12 @@ BOOL MeshExpUtility::BuildObject(CEditableObject*& exp_obj, LPCSTR m_ExportName)
                 submesh->FlipFaces();
             submesh->RecomputeBBox();
             // append mesh
-            submesh->SetName(it->pNode->GetName());
+            submesh->SetName(it.pNode->GetName());
             exp_obj->m_Meshes.push_back(submesh);
         }
         else
         {
-            ELog.Msg(mtError, "! can't convert", it->pNode->GetName());
+            ELog.Msg(mtError, "! can't convert", it.pNode->GetName());
             xr_delete(submesh);
             bResult = false;
             break;

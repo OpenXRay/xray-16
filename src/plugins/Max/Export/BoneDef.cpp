@@ -5,7 +5,7 @@
 
 CBoneDef::CBoneDef(INode* pNode)
 {
-    parent = 0;
+    parent = nullptr;
     pBone = pNode;
     name = Helper::ConvertSpace(string(pBone->GetName()));
 

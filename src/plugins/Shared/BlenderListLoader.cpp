@@ -8,7 +8,7 @@
 IC bool str_pred(LPCSTR x, LPCSTR y) { return xr_strcmp(x, y) < 0; }
 void ClearList(LPSTRVec& lst)
 {
-    for (LPSTRIt it = lst.begin(); it != lst.end(); it++)
+    for (LPSTRIt it = lst.begin(); it != lst.end(); ++it)
         xr_free(*it);
 }
 
@@ -26,7 +26,7 @@ int LoadBlenderList(LPSTRVec& lst)
 
     xr_string buf;
     lst.resize(fs->r_u32());
-    for (LPSTRIt it = lst.begin(); it != lst.end(); it++)
+    for (LPSTRIt it = lst.begin(); it != lst.end(); ++it)
     {
         fs->r_stringZ(buf);
         *it = xr_strdup(buf.c_str());
@@ -47,9 +47,12 @@ int LoadShaderLCList(LPSTRVec& lst)
     LIB.Load(fn);
 
     lst.resize(LIB.Library().size());
-    LPSTRIt s_it = lst.begin();
-    for (Shader_xrLCIt l_it = LIB.Library().begin(); l_it != LIB.Library().end(); l_it++, s_it++)
-        *s_it = xr_strdup(l_it->Name);
+    auto s_it = lst.begin();
+    for (auto& l_it : LIB.Library())
+    {
+        *s_it = xr_strdup(l_it.Name);
+        ++s_it;
+    }
     LIB.Unload();
     std::sort(lst.begin(), lst.end(), str_pred);
     return lst.size();
@@ -62,8 +65,8 @@ int LoadGameMtlList(LPSTRVec& lst)
     GMLib.Load();
 
     lst.resize(GMLib.CountMaterial());
-    LPSTRIt s_it = lst.begin();
-    for (GameMtlIt gm_it = GMLib.FirstMaterial(); gm_it != GMLib.LastMaterial(); gm_it++, s_it++)
+    auto s_it = lst.begin();
+    for (auto gm_it = GMLib.FirstMaterial(); gm_it != GMLib.LastMaterial(); ++gm_it, ++s_it)
         *s_it = xr_strdup(*(*gm_it)->m_Name);
     GMLib.Unload();
     std::sort(lst.begin(), lst.end(), str_pred);

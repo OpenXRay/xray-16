@@ -1,43 +1,18 @@
-//----------------------------------------------------
-// file: stdafx.h
-//----------------------------------------------------
 #pragma once
-#ifndef __INCDEF_STDAFX_H_
-#define __INCDEF_STDAFX_H_
 
-#define _WIN32_WINNT 0x0500
+#include <algorithm>
+
+#include "Common/Common.hpp"
 
 #pragma warning(push)
 #pragma warning(disable : 4995)
+
+using std::min;
+using std::max;
+
 #include "Max.h"
 
 #include "xrCore/xrCore.h"
-
-#undef _MIN
-#undef _MAX
-#define _MIN(a, b) (a) < (b) ? (a) : (b)
-#define _MAX(a, b) (a) > (b) ? (a) : (b)
-template <class T>
-T min(T a, T b)
-{
-    return _MIN(a, b);
-}
-template <class T>
-T max(T a, T b)
-{
-    return _MAX(a, b);
-}
-using std::string;
-#undef _MIN
-#undef _MAX
-
-#define FLT_MAX flt_max
-
-#ifdef FLT_MIN
-#undef FLT_MIN
-#endif
-
-#define FLT_MIN flt_max
 
 #include <io.h>
 #include <sys/stat.h>
@@ -89,6 +64,7 @@ typedef TMsgDlgBtn TMsgDlgButtons[mbHelp];
 
 #define AnsiString string
 using AStringVec = xr_vector<std::string>;
+using std::string;
 
 #include "plugins/Shared/ELog.h"
 
@@ -106,5 +82,3 @@ using AStringVec = xr_vector<std::string>;
 #define _game_data_ "$game_data$"
 
 #pragma warning(pop)
-
-#endif /*_INCDEF_STDAFX_H_*/

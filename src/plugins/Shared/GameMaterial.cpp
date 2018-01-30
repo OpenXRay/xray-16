@@ -1415,7 +1415,11 @@ public:
         }
         return REF_SUCCEED;
     }
-    void DeleteThis() { xr_delete((SingleRefMaker*)this); }
+    void DeleteThis()
+    {
+        auto _this = this;
+        xr_delete(_this);
+    }
     SClass_ID SuperClassID() { return SRM_CLASS_ID; }
     // From ref
     int NumRefs() { return 1; }
@@ -1655,8 +1659,8 @@ public:
     }
     void DeleteThis()
     {
-        SwitchSamplerRestore* ptr = this;
-        xr_delete(ptr);
+        auto _this = this;
+        xr_delete(_this);
     }
 
     // From ref
@@ -2382,7 +2386,11 @@ void XRayMtl::SetTransparencyType(int type)
     }
 }
 
-void XRayMtl::DeleteThis() { xr_delete((XRayMtl*)this); }
+void XRayMtl::DeleteThis()
+{
+    auto _this = this;
+    xr_delete(_this);
+}
 TSTR XRayMtl::SubAnimName(int i)
 {
     switch (i)
@@ -3159,7 +3167,8 @@ public:
     void proc(ILoad* iload)
     {
         m->OldVerFix(loadVersion);
-        xr_delete((NewStdMtl2UpdateCB*)this);
+        auto _this = this;
+        xr_delete(_this);
     }
 };
 
@@ -3190,7 +3199,8 @@ public:
     void proc(ILoad* iload)
     {
         m->BumpFix();
-        xr_delete((NewStdMtl2BumpFixCB*)this);
+        auto _this = this;
+        xr_delete(_this);
     }
 };
 
@@ -3233,7 +3243,8 @@ public:
         //		i.SetInfinite();
         //		m->Update(0, i);
 
-        xr_delete((NewStdMtl2CB*)this);
+        auto _this = this;
+        xr_delete(_this);
     }
 };
 

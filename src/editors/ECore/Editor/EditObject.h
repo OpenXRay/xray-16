@@ -31,6 +31,11 @@ struct SXRShaderData;
 struct ogf_desc;
 class CCustomObject;
 
+namespace KinematicsABT
+{
+struct additional_bone_transform;
+}
+
 #ifndef _EDITOR
 class PropValue;
 #define ref_shader LPVOID
@@ -324,8 +329,8 @@ public:
     IC int BonePartCount() { return m_BoneParts.size(); }
     IC BPIt BonePart(CBone* B);
 
-    IC BoneIt FirstBone() { return m_Bones.begin(); }
-    IC BoneIt LastBone() { return m_Bones.end(); }
+    auto FirstBone() { return m_Bones.begin(); }
+    auto LastBone() { return m_Bones.end(); }
     IC BoneVec& Bones() { return m_Bones; }
     IC int BoneCount() const { return m_Bones.size(); }
     shared_str BoneNameByID(int id);
@@ -452,7 +457,7 @@ public:
     bool ContainsMesh(const CEditableMesh* m);
     CSurface* FindSurfaceByName(LPCSTR surf_name, int* s_id = 0);
     int FindBoneByNameIdx(LPCSTR name);
-    BoneIt FindBoneByNameIt(LPCSTR name);
+    auto FindBoneByNameIt(LPCSTR name);
     CBone* FindBoneByName(LPCSTR name);
     int GetSelectedBones(BoneVec& sel_bones);
     u16 GetBoneIndexByWMap(LPCSTR wm_name);
@@ -574,7 +579,7 @@ private:
     virtual u64 LL_GetBonesVisible() { return u64(-1); }
     virtual void LL_SetBonesVisible(u64 mask) { VERIFY(false); }
 
-    virtual void LL_AddTransformToBone(KinematicsABT::additional_bone_transform& offset){}; //--#SM+#--
+    virtual void LL_AddTransformToBone(KinematicsABT::additional_bone_transform& offset) {} //--#SM+#--
     virtual void LL_ClearAdditionalTransform(u16 bone_id){}; //--#SM+#--
 
     // Main functionality

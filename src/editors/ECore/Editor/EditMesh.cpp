@@ -59,12 +59,12 @@ void CEditableMesh::Clear()
 
     xr_free(m_Vertices);
     xr_free(m_Faces);
-    for (VMapIt vm_it = m_VMaps.begin(); vm_it != m_VMaps.end(); vm_it++)
-        xr_delete(*vm_it);
+    for (auto& vm_it : m_VMaps)
+        xr_delete(vm_it);
     m_VMaps.clear();
     m_SurfFaces.clear();
-    for (VMRefsIt ref_it = m_VMRefs.begin(); ref_it != m_VMRefs.end(); ref_it++)
-        xr_free(ref_it->pts);
+    for (auto& ref_it : m_VMRefs)
+        xr_free(ref_it.pts);
     m_VMRefs.clear();
 }
 
@@ -415,12 +415,12 @@ void CEditableMesh::GenerateAdjacency()
 CSurface* CEditableMesh::GetSurfaceByFaceID(u32 fid)
 {
     R_ASSERT(fid < m_FaceCount);
-    for (SurfFacesPairIt sp_it = m_SurfFaces.begin(); sp_it != m_SurfFaces.end(); sp_it++)
+    for (auto& it : m_SurfFaces)
     {
-        IntVec& face_lst = sp_it->second;
+        IntVec& face_lst = it.second;
         IntIt f_it = std::lower_bound(face_lst.begin(), face_lst.end(), (int)fid);
-        if ((f_it != face_lst.end()) && (*f_it == (int)fid))
-            return sp_it->first;
+        if (f_it != face_lst.end() && *f_it == (int)fid)
+            return it.first;
         //.		if (std::find(face_lst.begin(),face_lst.end(),fid)!=face_lst.end()) return sp_it->first;
     }
     return 0;
@@ -449,22 +449,22 @@ void CEditableMesh::GetFacePT(u32 fid, const Fvector* pt[3])
 int CEditableMesh::GetFaceCount(bool bMatch2Sided, bool bIgnoreOCC)
 {
     int f_cnt = 0;
-    for (SurfFacesPairIt sp_it = m_SurfFaces.begin(); sp_it != m_SurfFaces.end(); sp_it++)
+    for (auto& it : m_SurfFaces)
     {
-        CSurface* S = sp_it->first;
+        CSurface* S = it.first;
         if (S->m_GameMtlName == "materials\\occ" && bIgnoreOCC)
             continue;
 
         if (bMatch2Sided)
         {
             if (S->m_Flags.is(CSurface::sf2Sided))
-                f_cnt += sp_it->second.size() * 2;
+                f_cnt += it.second.size() * 2;
             else
-                f_cnt += sp_it->second.size();
+                f_cnt += it.second.size();
         }
         else
         {
-            f_cnt += sp_it->second.size();
+            f_cnt += it.second.size();
         }
     }
     return f_cnt;
@@ -472,7 +472,7 @@ int CEditableMesh::GetFaceCount(bool bMatch2Sided, bool bIgnoreOCC)
 
 float CEditableMesh::CalculateSurfaceArea(CSurface* surf, bool bMatch2Sided)
 {
-    SurfFacesPairIt sp_it = m_SurfFaces.find(surf);
+    auto sp_it = m_SurfFaces.find(surf);
     if (sp_it == m_SurfFaces.end())
         return 0;
     float area = 0;
@@ -492,7 +492,7 @@ float CEditableMesh::CalculateSurfaceArea(CSurface* surf, bool bMatch2Sided)
 
 float CEditableMesh::CalculateSurfacePixelArea(CSurface* surf, bool bMatch2Sided)
 {
-    SurfFacesPairIt sp_it = m_SurfFaces.find(surf);
+    auto sp_it = m_SurfFaces.find(surf);
     if (sp_it == m_SurfFaces.end())
         return 0;
     float area = 0;
@@ -514,7 +514,7 @@ float CEditableMesh::CalculateSurfacePixelArea(CSurface* surf, bool bMatch2Sided
 
 int CEditableMesh::GetSurfFaceCount(CSurface* surf, bool bMatch2Sided)
 {
-    SurfFacesPairIt sp_it = m_SurfFaces.find(surf);
+    auto sp_it = m_SurfFaces.find(surf);
     if (sp_it == m_SurfFaces.end())
         return 0;
     int f_cnt = sp_it->second.size();
@@ -541,9 +541,9 @@ void CEditableMesh::DumpAdjacency()
 
 int CEditableMesh::FindVMapByName(VMapVec& vmaps, const char* name, u8 t, bool polymap)
 {
-    for (VMapIt vm_it = vmaps.begin(); vm_it != vmaps.end(); vm_it++)
+    for (auto vm_it = vmaps.begin(); vm_it != vmaps.end(); vm_it++)
     {
-        if (((*vm_it)->type == t) && (xr_stricmp((*vm_it)->name.c_str(), name) == 0) && (polymap == (*vm_it)->polymap))
+        if ((*vm_it)->type == t && xr_stricmp((*vm_it)->name.c_str(), name) == 0 && polymap == (*vm_it)->polymap)
             return vm_it - vmaps.begin();
     }
     return -1;

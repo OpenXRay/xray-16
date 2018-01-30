@@ -1,15 +1,9 @@
-// stdafx.h : include file for standard system include files,
-//  or project specific include files that are used frequently, but
-//      are changed infrequently
-
-#ifndef StdafxH
-#define StdafxH
-
 #pragma once
+
+#include "Common/Common.hpp"
 
 #include "xrCore/xrCore.h"
 #include "xrCore/_std_extensions.h"
-#pragma comment(lib, "xrCore.lib")
 
 #define ENGINE_API
 
@@ -64,5 +58,3 @@ using AStringVec = xr_vector<std::string>;
 
 #define GAMEMTL_NONE u32(-1)
 #define _game_data_ "$game_data$"
-
-#endif // StdafxH

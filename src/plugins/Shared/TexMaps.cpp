@@ -150,7 +150,11 @@ void Texmaps::SetReference(int i, RefTargetHandle rtarg)
     }
 }
 
-void Texmaps::DeleteThis() { xr_delete((Texmaps*)this); }
+void Texmaps::DeleteThis()
+{
+    auto _this = this;
+    xr_delete(_this);
+}
 RefResult Texmaps::NotifyRefChanged(Interval changeInt, RefTargetHandle hTarget, PartID& partID, RefMessage message)
 {
     switch (message)
@@ -254,7 +258,8 @@ public:
     void proc(ILoad* iload)
     {
         tm->loadingOld = FALSE;
-        xr_delete((TexmapsPostLoad*)this);
+        auto _this = this;
+        xr_delete(_this);
     }
 };
 

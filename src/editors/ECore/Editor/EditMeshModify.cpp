@@ -63,10 +63,10 @@ void CEditableMesh::RebuildVMaps()
     // refs copy to new
     {
         nVMRefs.resize(m_VMRefs.size());
-        for (VMRefsIt o_it = m_VMRefs.begin(), n_it = nVMRefs.begin(); o_it != m_VMRefs.end(); o_it++, n_it++)
+        for (auto& it : m_VMRefs)
         {
-            n_it->count = o_it->count;
-            n_it->pts = xr_alloc<st_VMapPt>(n_it->count);
+            it.count = it.count;
+            it.pts = xr_alloc<st_VMapPt>(it.count);
         }
     }
 
@@ -155,14 +155,14 @@ void CEditableMesh::RebuildVMaps()
             }
         }
     }
-    for (VMapIt vm_it = m_VMaps.begin(); vm_it != m_VMaps.end(); vm_it++)
-        xr_delete(*vm_it);
+    for (auto& it : m_VMaps)
+        xr_delete(it);
 
     m_VMaps.clear();
     m_VMaps = nVMaps;
     // clear refs
-    for (VMRefsIt ref_it = m_VMRefs.begin(); ref_it != m_VMRefs.end(); ref_it++)
-        xr_free(ref_it->pts);
+    for (auto& it : m_VMRefs)
+        xr_free(it.pts);
     m_VMRefs.clear();
     m_VMRefs = nVMRefs;
 }
@@ -315,9 +315,9 @@ void CEditableMesh::OptimizeMesh(BOOL NoOpt)
             {
                 if (faces_mark[dk])
                 {
-                    for (SurfFacesPairIt plp_it = m_SurfFaces.begin(); plp_it != m_SurfFaces.end(); ++plp_it)
+                    for (auto it : m_SurfFaces)
                     {
-                        IntVec& pol_lst = plp_it->second;
+                        IntVec& pol_lst = it.second;
                         for (int k = 0; k < int(pol_lst.size()); ++k)
                         {
                             int& f = pol_lst[k];

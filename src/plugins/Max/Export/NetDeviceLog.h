@@ -1,9 +1,9 @@
 //----------------------------------------------------
 // file: NetDeviceLog.h
 //----------------------------------------------------
+#pragma once
 
-#ifndef _INCDEF_NETDEVICELOG_H_
-#define _INCDEF_NETDEVICELOG_H_
+#include <list>
 
 // -------
 #define NLOG_CONSOLE_OUT
@@ -57,5 +57,3 @@ public:
 };
 
 extern CExportConsole EConsole;
-
-#endif /*_INCDEF_NETDEVICELOG_H_*/
