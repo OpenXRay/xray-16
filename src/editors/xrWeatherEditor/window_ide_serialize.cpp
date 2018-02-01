@@ -16,7 +16,7 @@ using Microsoft::Win32::RegistryKey;
 using Microsoft::Win32::RegistryValueKind;
 
 #define COMPANY_NAME "GSC Game World"
-#define PRODUCT_NAME "S.T.A.L.K.E.R.: CLear Sky"
+#define PRODUCT_NAME "S.T.A.L.K.E.R.: Call of Pripyat"
 
 template <typename T>
 inline static T registry_value(RegistryKey ^ key, System::String ^ value_id, const T& default_value)
