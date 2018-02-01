@@ -1,11 +1,11 @@
 #pragma once
 #include <map>
-#include "xrCore/Memory/XRayAllocator.hpp"
+#include "xrCore/xrMemory.h"
 
-template <typename K, class V, class P = std::less<K>, typename allocator = XRay::xray_allocator<std::pair<K, V>>>
+template <typename K, class V, class P = std::less<K>, typename allocator = tbb::tbb_allocator<std::pair<K, V>>>
 using xr_map = std::map<K, V, P, allocator>;
 
-template <typename K, class V, class P = std::less<K>, typename allocator = XRay::xray_allocator<std::pair<K, V>>>
+template <typename K, class V, class P = std::less<K>, typename allocator = tbb::tbb_allocator<std::pair<K, V>>>
 using xr_multimap = std::multimap<K, V, P, allocator>;
 
 #define DEF_MAP(N, K, T)\

@@ -2,6 +2,9 @@
 
 #include "_types.h"
 
+#include "tbb/tbb_allocator.h"
+#include "tbb/tbbmalloc_proxy.h"
+
 class XRCORE_API xrMemory
 {
 public:

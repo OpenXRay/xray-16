@@ -1,11 +1,11 @@
 #pragma once
 #include <set>
-#include "xrCore/Memory/XRayAllocator.hpp"
+#include "xrCore/xrMemory.h"
 
-template <typename K, class P = std::less<K>, typename allocator = XRay::xray_allocator<K>>
+template <typename K, class P = std::less<K>, typename allocator = tbb::tbb_allocator<K>>
 using xr_set = std::set<K, P, allocator>;
 
-template <typename K, class P = std::less<K>, typename allocator = XRay::xray_allocator<K>>
+template <typename K, class P = std::less<K>, typename allocator = tbb::tbb_allocator<K>>
 using xr_multiset = std::multiset<K, P, allocator>;
 
 #define DEFINE_SET(T, N, I)\

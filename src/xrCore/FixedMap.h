@@ -1,6 +1,19 @@
 #pragma once
 
-template <class K, class T, class allocator = XRay::xray_allocator_wrapper>
+struct FixedMAP_allocator_wrapper
+{
+    template <typename T>
+    struct helper
+    {
+        using result = tbb::tbb_allocator<T>;
+    };
+
+    static void* allocate(const size_t n) { return xr_malloc(n); }
+    template <typename T>
+    static void deallocate(T*& p) { xr_free(p); }
+};
+
+template <class K, class T, class allocator = FixedMAP_allocator_wrapper>
 class FixedMAP
 {
     enum
@@ -27,7 +40,7 @@ private:
     {
         u32 newLimit = limit + SG_REALLOC_ADVANCE;
         VERIFY(newLimit % SG_REALLOC_ADVANCE == 0);
-        TNode* newNodes = (TNode*)allocator::alloc(sizeof(TNode) * newLimit);
+        TNode* newNodes = (TNode*)allocator::allocate(sizeof(TNode) * newLimit);
         VERIFY(newNodes);
 
         for (TNode* cur = newNodes + limit; cur != newNodes + newLimit; cur++)
@@ -53,7 +66,7 @@ private:
             }
         }
         if (nodes)
-            allocator::dealloc(nodes);
+            allocator::deallocate(nodes);
 
         nodes = newNodes;
         limit = newLimit;
@@ -140,7 +153,7 @@ public:
         {
             for (TNode* cur = begin(); cur != last(); cur++)
                 cur->~TNode();
-            allocator::dealloc(nodes);
+            allocator::deallocate(nodes);
         }
         nodes = 0;
         pool = 0;

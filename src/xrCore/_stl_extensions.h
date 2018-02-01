@@ -8,7 +8,7 @@
 #include "_color.h"
 #include "_std_extensions.h"
 #include "xrMemory.h"
-#include "xrCore/Memory/XRayAllocator.hpp"
+#include "xrCore/xrMemory.h"
 #include "xrCommon/xr_vector.h"
 #include "xrCommon/xr_map.h"
 #include "xrCommon/xr_set.h"

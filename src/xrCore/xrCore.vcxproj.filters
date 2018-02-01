@@ -109,9 +109,6 @@
     <Filter Include="Memory">
       <UniqueIdentifier>{0173b19d-898c-495c-8d22-2cc3d8436008}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Memory\Memory manager">
-      <UniqueIdentifier>{11d9158f-7330-4434-81b2-684eebee4c83}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FTimer.cpp">
@@ -182,9 +179,6 @@
     </ClCompile>
     <ClCompile Include="file_stream_reader.cpp">
       <Filter>FS\file_stream_reader</Filter>
-    </ClCompile>
-    <ClCompile Include="xrMemory.cpp">
-      <Filter>Memory\Memory manager</Filter>
     </ClCompile>
     <ClCompile Include="crc32.cpp">
       <Filter>shared memory/string library</Filter>
@@ -305,6 +299,9 @@
     </ClCompile>
     <ClCompile Include="Threading\ThreadPool.cpp">
       <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="xrMemory.cpp">
+      <Filter>Memory</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -463,9 +460,6 @@
     </ClInclude>
     <ClInclude Include="file_stream_reader.h">
       <Filter>FS\file_stream_reader</Filter>
-    </ClInclude>
-    <ClInclude Include="xrMemory.h">
-      <Filter>Memory\Memory manager</Filter>
     </ClInclude>
     <ClInclude Include="xrDebug.h">
       <Filter>Debug core</Filter>
@@ -668,14 +662,11 @@
     <ClInclude Include="Math\PLC_CPP.hpp">
       <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="Memory\xalloc.h">
-      <Filter>Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="Memory\XRayAllocator.hpp">
-      <Filter>Memory</Filter>
-    </ClInclude>
     <ClInclude Include="Threading\ThreadPool.hpp">
       <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="xrMemory.h">
+      <Filter>Memory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
