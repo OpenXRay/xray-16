@@ -64,9 +64,6 @@
 [submodule "Externals/gli"]
 	path = Externals/gli
 	url = https://github.com/g-truc/gli.git
-[submodule "Externals/tbb"]
-	path = Externals/tbb
-	url = https://github.com/01org/tbb.git
 [submodule "Externals/glslang"]
 	path = Externals/glslang
 	url = https://github.com/KhronosGroup/glslang.git
