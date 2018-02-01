@@ -3820,9 +3820,6 @@
     <ProjectReference Include="$(SolutionDir)xrEngine\xrEngine.vcxproj">
       <Project>{2578c6d8-660d-48ae-9322-7422f8664f06}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)xrMisc\xrMisc.vcxproj">
-      <Project>{c964d17a-05a8-4bfa-b0a8-7af5c6b627ec}</Project>
-    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)xrScriptEngine\xrScriptEngine.vcxproj">
       <Project>{132c62de-de85-4978-9675-c78ed4da46f0}</Project>
     </ProjectReference>

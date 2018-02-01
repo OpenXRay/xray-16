@@ -61,44 +61,6 @@ public:
     }
 };
 //-----------------------------------------------------------------------
-#ifdef DEBUG_MEMORY_MANAGER
-class CCC_MemStat : public IConsole_Command
-{
-public:
-    CCC_MemStat(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR args)
-    {
-        string_path fn;
-        if (args && args[0])
-            xr_sprintf(fn, sizeof(fn), "%s.dump", args);
-        else
-            strcpy_s_s(fn, sizeof(fn), "x:\\$memory$.dump");
-        Memory.mem_statistic(fn);
-        // g_pStringContainer->dump ();
-        // g_pSharedMemoryContainer->dump ();
-    }
-};
-#endif // DEBUG_MEMORY_MANAGER
-
-#ifdef DEBUG_MEMORY_MANAGER
-class CCC_DbgMemCheck : public IConsole_Command
-{
-public:
-    CCC_DbgMemCheck(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
-    virtual void Execute(LPCSTR args)
-    {
-        if (Memory.debug_mode)
-        {
-            Memory.dbg_check();
-        }
-        else
-        {
-            Msg("~ Run with -mem_debug options.");
-        }
-    }
-};
-#endif // DEBUG_MEMORY_MANAGER
-
 class CCC_DbgStrCheck : public IConsole_Command
 {
 public:
@@ -112,7 +74,6 @@ public:
     CCC_DbgStrDump(LPCSTR N) : IConsole_Command(N) { bEmptyArgsHandled = TRUE; };
     virtual void Execute(LPCSTR args) { g_pStringContainer->dump(); }
 };
-
 //-----------------------------------------------------------------------
 class CCC_MotionsStat : public IConsole_Command
 {
@@ -681,11 +642,6 @@ void CCC_Register()
     CMD1(CCC_MotionsStat, "stat_motions");
     CMD1(CCC_TexturesStat, "stat_textures");
 #endif // DEBUG
-
-#ifdef DEBUG_MEMORY_MANAGER
-    CMD1(CCC_MemStat, "dbg_mem_dump");
-    CMD1(CCC_DbgMemCheck, "dbg_mem_check");
-#endif // DEBUG_MEMORY_MANAGER
 
 #ifdef DEBUG
     CMD3(CCC_Mask, "mt_particles", &psDeviceFlags, mtParticles);

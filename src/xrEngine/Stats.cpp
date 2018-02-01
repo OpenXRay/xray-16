@@ -149,15 +149,8 @@ void CStats::Show()
         font.OutSkip();
         pInput->DumpStatistics(font, alertPtr);
         font.OutSkip();
-#ifdef DEBUG_MEMORY_MANAGER
-        font.OutNext("str: cmp[%3d], dock[%3d], qpc[%3d]", Memory.stat_strcmp, Memory.stat_strdock, CPU::qpc_counter);
-        Memory.stat_strcmp = 0;
-        Memory.stat_strdock = 0;
-        CPU::qpc_counter = 0;
-#else
         font.OutNext("QPC: %u", CPU::qpc_counter);
         CPU::qpc_counter = 0;
-#endif
     }
     if (psDeviceFlags.test(rsCameraPos))
     {
