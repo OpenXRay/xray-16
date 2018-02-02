@@ -138,14 +138,14 @@ public:
             mapMatrixPasses[0][i].clear();
             mapMatrixPasses[1][i].clear();
         }
-        mapSorted.destroy();
-        mapHUD.destroy();
+        mapSorted.clear();
+        mapHUD.clear();
         mapLOD.clear();
-        mapDistort.destroy();
+        mapDistort.clear();
 
 #if RENDER != R_R1
-        mapWmark.destroy();
-        mapEmissive.destroy();
+        mapWmark.clear();
+        mapEmissive.clear();
 #endif
     }
 

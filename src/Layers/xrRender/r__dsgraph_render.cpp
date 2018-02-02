@@ -16,16 +16,16 @@ ICF float calcLOD(float ssa /*fDistSq*/, float /*R*/)
 }
 
 // ALPHA
-void __fastcall sorted_L1(mapSorted_Node* N)
+void __fastcall sorted_L1(mapSorted_T::value_type &N)
 {
     VERIFY(N);
-    dxRender_Visual* V = N->val.pVisual;
+    dxRender_Visual* V = N.second.pVisual;
     VERIFY(V && V->shader._get());
-    RCache.set_Element(N->val.se);
-    RCache.set_xform_world(N->val.Matrix);
-    RImplementation.apply_object(N->val.pObject);
+    RCache.set_Element(N.second.se);
+    RCache.set_xform_world(N.second.Matrix);
+    RImplementation.apply_object(N.second.pObject);
     RImplementation.apply_lmaterial();
-    V->Render(calcLOD(N->key, V->vis.sphere.R));
+    V->Render(calcLOD(N.first, V->vis.sphere.R));
 }
 
 template <class T> IC bool cmp_second_ssa(const T &lhs, const T &rhs) { return (lhs->second.ssa > rhs->second.ssa); }
@@ -343,6 +343,9 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
     BasicStats.Primitives.End();
 }
 
+
+template <class T> IC bool cmp_first_l(const T &lhs, const T &rhs) { return (lhs.first < rhs.first); }
+template <class T> IC bool cmp_first_h(const T &lhs, const T &rhs) { return (lhs.first > rhs.first); }
 //////////////////////////////////////////////////////////////////////////
 // HUD render
 void D3DXRenderBase::r_dsgraph_render_hud()
@@ -362,7 +365,9 @@ void D3DXRenderBase::r_dsgraph_render_hud()
 
     // Rendering
     rmNear();
-    mapHUD.traverseLR(sorted_L1);
+    std::sort(mapHUD.begin(), mapHUD.end(), cmp_first_l<R_dsgraph::mapHUD_T::value_type>); // front-to-back
+    for (auto &i : mapHUD)
+        sorted_L1(i);
     mapHUD.clear();
 
 #if RENDER == R_R1
@@ -468,8 +473,9 @@ void D3DXRenderBase::r_dsgraph_render_hud_ui()
 // strict-sorted render
 void D3DXRenderBase::r_dsgraph_render_sorted()
 {
-    // Sorted (back to front)
-    mapSorted.traverseRL(sorted_L1);
+    std::sort(mapSorted.begin(), mapSorted.end(), cmp_first_h<R_dsgraph::mapSorted_T::value_type>); // back-to-front
+    for (auto &i : mapSorted)
+        sorted_L1(i);
     mapSorted.clear();
 }
 
@@ -478,8 +484,9 @@ void D3DXRenderBase::r_dsgraph_render_sorted()
 void D3DXRenderBase::r_dsgraph_render_emissive()
 {
 #if RENDER != R_R1
-    // Sorted (back to front)
-    mapEmissive.traverseLR(sorted_L1);
+    std::sort(mapEmissive.begin(), mapEmissive.end(), cmp_first_l<R_dsgraph::mapSorted_T::value_type>); // front-to-back
+    for (auto &i : mapEmissive)
+        sorted_L1(i);
     mapEmissive.clear();
 
     //	HACK: Calculate this only once
@@ -497,8 +504,9 @@ void D3DXRenderBase::r_dsgraph_render_emissive()
 
     // Rendering
     rmNear();
-    // Sorted (back to front)
-    mapHUDEmissive.traverseLR(sorted_L1);
+    std::sort(mapHUDEmissive.begin(), mapHUDEmissive.end(), cmp_first_l<R_dsgraph::mapSorted_T::value_type>); // front-to-back
+    for (auto &i : mapHUDEmissive)
+        sorted_L1(i);
     mapHUDEmissive.clear();
 
     rmNormal();
@@ -515,8 +523,9 @@ void D3DXRenderBase::r_dsgraph_render_emissive()
 void D3DXRenderBase::r_dsgraph_render_wmarks()
 {
 #if RENDER != R_R1
-    // Sorted (back to front)
-    mapWmark.traverseLR(sorted_L1);
+    std::sort(mapWmark.begin(), mapWmark.end(), cmp_first_l<R_dsgraph::mapSorted_T::value_type>); // front-to-back
+    for (auto &i : mapWmark)
+        sorted_L1(i);
     mapWmark.clear();
 #endif
 }
@@ -525,8 +534,9 @@ void D3DXRenderBase::r_dsgraph_render_wmarks()
 // strict-sorted render
 void D3DXRenderBase::r_dsgraph_render_distort()
 {
-    // Sorted (back to front)
-    mapDistort.traverseRL(sorted_L1);
+    std::sort(mapDistort.begin(), mapDistort.end(), cmp_first_h<R_dsgraph::mapSorted_T::value_type>); // back-to-front
+    for (auto &i : mapDistort)
+        sorted_L1(i);
     mapDistort.clear();
 }
 

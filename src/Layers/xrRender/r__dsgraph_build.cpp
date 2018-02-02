@@ -57,15 +57,10 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
     // a) Allow to optimize RT order
     // b) Should be rendered to special distort buffer in another pass
     VERIFY(pVisual->shader._get());
-    ShaderElement* sh_d = &*pVisual->shader->E[4];
+    ShaderElement* sh_d = &*pVisual->shader->E[4]; // 4=L_special
     if (RImplementation.o.distortion && sh_d && sh_d->flags.bDistort && pmask[sh_d->flags.iPriority / 2])
     {
-        mapSorted_Node* N = mapDistort.insertInAnyWay(distSQ);
-        N->val.ssa = SSA;
-        N->val.pObject = RI.val_pObject;
-        N->val.pVisual = pVisual;
-        N->val.Matrix = *RI.val_pTransform;
-        N->val.se = sh_d; // 4=L_special
+        mapDistort.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh_d }))); // sh_d -> L_special
     }
 
     // Select shader
@@ -75,49 +70,27 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
     if (!pmask[sh->flags.iPriority / 2])
         return;
 
-    // Create common node
-    // NOTE: Invisible elements exist only in R1
-    _MatrixItem item = {SSA, RI.val_pObject, pVisual, *RI.val_pTransform};
-
     // HUD rendering
     if (RI.val_bHUD)
     {
         if (sh->flags.bStrictB2F)
         {
-            mapSorted_Node* N = mapSorted.insertInAnyWay(distSQ);
-            N->val.ssa = SSA;
-            N->val.pObject = RI.val_pObject;
-            N->val.pVisual = pVisual;
-            N->val.Matrix = *RI.val_pTransform;
-            N->val.se = sh;
-            return;
+            mapSorted.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh })));
         }
         else
         {
-            mapHUD_Node* N = mapHUD.insertInAnyWay(distSQ);
-            N->val.ssa = SSA;
-            N->val.pObject = RI.val_pObject;
-            N->val.pVisual = pVisual;
-            N->val.Matrix = *RI.val_pTransform;
-            N->val.se = sh;
+            mapHUD.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh })));
 #if RENDER != R_R1
             if (sh->flags.bEmissive)
-            {
-                mapSorted_Node* N2 = mapHUDEmissive.insertInAnyWay(distSQ);
-                N2->val.ssa = SSA;
-                N2->val.pObject = RI.val_pObject;
-                N2->val.pVisual = pVisual;
-                N2->val.Matrix = *RI.val_pTransform;
-                N2->val.se = &*pVisual->shader->E[4]; // 4=L_special
-            }
-#endif //   RENDER!=R_R1
-            return;
+                mapHUDEmissive.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh_d }))); // sh_d -> L_special
+#endif // RENDER!=R_R1
         }
+        return;
     }
 
 // Shadows registering
 #if RENDER == R_R1
-    RI.L_Shadows->add_element(item);
+    RI.L_Shadows->add_element(_MatrixItem{ SSA, RI.val_pObject, pVisual, *RI.val_pTransform });
 #endif
     if (RI.val_bInvisible)
         return;
@@ -125,12 +98,7 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
     // strict-sorting selection
     if (sh->flags.bStrictB2F)
     {
-        mapSorted_Node* N = mapSorted.insertInAnyWay(distSQ);
-        N->val.ssa = SSA;
-        N->val.pObject = RI.val_pObject;
-        N->val.pVisual = pVisual;
-        N->val.Matrix = *RI.val_pTransform;
-        N->val.se = sh;
+        mapSorted.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh })));
         return;
     }
 
@@ -142,24 +110,18 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
     // d) Should be rendered to accumulation buffer in the second pass
     if (sh->flags.bEmissive)
     {
-        mapSorted_Node* N = mapEmissive.insertInAnyWay(distSQ);
-        N->val.ssa = SSA;
-        N->val.pObject = RI.val_pObject;
-        N->val.pVisual = pVisual;
-        N->val.Matrix = *RI.val_pTransform;
-        N->val.se = &*pVisual->shader->E[4]; // 4=L_special
+        mapEmissive.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh_d }))); // sh_d -> L_special
     }
     if (sh->flags.bWmark && pmask_wmark)
     {
-        mapSorted_Node* N = mapWmark.insertInAnyWay(distSQ);
-        N->val.ssa = SSA;
-        N->val.pObject = RI.val_pObject;
-        N->val.pVisual = pVisual;
-        N->val.Matrix = *RI.val_pTransform;
-        N->val.se = sh;
+        mapWmark.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh })));
         return;
     }
 #endif
+
+    // Create common node
+    // NOTE: Invisible elements exist only in R1
+    _MatrixItem item = { SSA, RI.val_pObject, pVisual, *RI.val_pTransform };
 
     for (u32 iPass = 0; iPass < sh->passes.size(); ++iPass)
     {
@@ -262,15 +224,10 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
     // a) Allow to optimize RT order
     // b) Should be rendered to special distort buffer in another pass
     VERIFY(pVisual->shader._get());
-    ShaderElement* sh_d = &*pVisual->shader->E[4];
+    ShaderElement* sh_d = &*pVisual->shader->E[4]; // 4=L_special
     if (RImplementation.o.distortion && sh_d && sh_d->flags.bDistort && pmask[sh_d->flags.iPriority / 2])
     {
-        mapSorted_Node* N = mapDistort.insertInAnyWay(distSQ);
-        N->val.ssa = SSA;
-        N->val.pObject = nullptr;
-        N->val.pVisual = pVisual;
-        N->val.Matrix = Fidentity;
-        N->val.se = &*pVisual->shader->E[4]; // 4=L_special
+        mapDistort.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, nullptr, pVisual, Fidentity, sh_d }))); // sh_d -> L_special
     }
 
     // Select shader
@@ -283,11 +240,9 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
     // strict-sorting selection
     if (sh->flags.bStrictB2F)
     {
-        mapSorted_Node* N = mapSorted.insertInAnyWay(distSQ);
-        N->val.pObject = nullptr;
-        N->val.pVisual = pVisual;
-        N->val.Matrix = Fidentity;
-        N->val.se = sh;
+        // TODO: Выяснить, почему в единственном месте параметр ssa не используется
+        // Визуально различий не замечено
+        mapSorted.emplace_back(std::make_pair(distSQ, _MatrixItemS({ /*0*/SSA, nullptr, pVisual, Fidentity, sh })));
         return;
     }
 
@@ -299,21 +254,11 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
     // d) Should be rendered to accumulation buffer in the second pass
     if (sh->flags.bEmissive)
     {
-        mapSorted_Node* N = mapEmissive.insertInAnyWay(distSQ);
-        N->val.ssa = SSA;
-        N->val.pObject = NULL;
-        N->val.pVisual = pVisual;
-        N->val.Matrix = Fidentity;
-        N->val.se = &*pVisual->shader->E[4]; // 4=L_special
+        mapEmissive.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, nullptr, pVisual, Fidentity, sh_d }))); // sh_d -> L_special
     }
     if (sh->flags.bWmark && pmask_wmark)
     {
-        mapSorted_Node* N = mapWmark.insertInAnyWay(distSQ);
-        N->val.ssa = SSA;
-        N->val.pObject = NULL;
-        N->val.pVisual = pVisual;
-        N->val.Matrix = Fidentity;
-        N->val.se = sh;
+        mapWmark.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, nullptr, pVisual, Fidentity, sh })));
         return;
     }
 #endif
@@ -323,14 +268,14 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
 
     counter_S++;
 
-    _NormalItem item = {SSA, pVisual};
+    _NormalItem item = { SSA, pVisual };
 
     for (u32 iPass = 0; iPass < sh->passes.size(); ++iPass)
     {
         auto &pass = *sh->passes[iPass];
         auto &map = mapNormalPasses[sh->flags.iPriority / 2][iPass];
 
-#if defined(USE_OGL)
+#ifdef USE_OGL
         auto &Nvs = map[pass.vs->vs];
         auto &Ngs = Nvs[pass.gs->gs];
         auto &Nps = Ngs[pass.ps->ps];
@@ -351,7 +296,6 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
 #else
         auto &Ncs = Nps[pass.constants._get()];
 #endif
-        //auto &Nstate = Ncs[pass.state->state];
         auto &Nstate = Ncs[&*pass.state];
         auto &Ntex = Nstate[pass.T._get()];
         Ntex.push_back(item);
@@ -375,7 +319,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
                     {
                         Nps.ssa = SSA;
 #endif
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
                         if (SSA > Ngs.ssa)
                         {
                             Ngs.ssa = SSA;
@@ -384,7 +328,7 @@ void D3DXRenderBase::r_dsgraph_insert_static(dxRender_Visual* pVisual)
                             {
                                 Nvs.ssa = SSA;
                             }
-#if defined(USE_DX10) || defined(USE_DX11)
+#if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
                         }
 #endif
                     }

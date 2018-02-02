@@ -321,7 +321,6 @@
     <ClInclude Include="fastdelegate.h" />
     <CustomBuild Include="FileSystem.h" />
     <ClInclude Include="file_stream_reader.h" />
-    <ClInclude Include="FixedMap.h" />
     <ClInclude Include="FixedVector.h" />
     <ClInclude Include="FMesh.hpp" />
     <ClInclude Include="FS.h" />
