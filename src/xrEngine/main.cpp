@@ -1,16 +1,20 @@
+// Entry point is in xr_3da/entry_point.cpp
 #include "stdafx.h"
+#include "xr_3da/resource.h"
+
+#include <process.h>
+#include <locale.h>
+
 #include "IGame_Persistent.h"
 #include "xrNetServer/NET_AuthCheck.h"
 #include "xr_input.h"
 #include "XR_IOConsole.h"
 #include "x_ray.h"
 #include "std_classes.h"
-#include "resource.h"
+
 #include "LightAnimLibrary.h"
 #include "xrCDB/ISpatial.h"
 #include "Text_Console.h"
-#include <process.h>
-#include <locale.h>
 #include "xrSASH.h"
 #include "xr_ioc_cmd.h"
 
@@ -300,7 +304,7 @@ public:
     }
 };
 
-int RunApplication(pcstr commandLine)
+XR_EXPORT int RunApplication(pcstr commandLine)
 {
     if (strstr(commandLine, "-dedicated"))
         GEnv.isDedicatedServer = true;
@@ -464,27 +468,4 @@ void RunBenchmark(pcstr name)
         Startup();
     }
 }
-
-int StackoverflowFilter(int exceptionCode)
-{
-    if (exceptionCode == EXCEPTION_STACK_OVERFLOW)
-        return EXCEPTION_EXECUTE_HANDLER;
-    return EXCEPTION_CONTINUE_SEARCH;
-}
-}
-
-int APIENTRY WinMain(HINSTANCE inst, HINSTANCE prevInst, char* commandLine, int cmdShow)
-{
-    int result = 0;
-    // BugTrap can't handle stack overflow exception, so handle it here
-    __try
-    {
-        result = RunApplication(commandLine);
-    }
-    __except (StackoverflowFilter(GetExceptionCode()))
-    {
-        _resetstkoflw();
-        FATAL("stack overflow");
-    }
-    return result;
 }

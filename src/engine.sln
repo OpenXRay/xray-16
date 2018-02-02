@@ -255,6 +255,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OSDependent", "..\Externals
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SPIRV", "..\Externals\SPIRV.vcxproj", "{3AF44175-2EED-3C67-B324-93B1572B7EDD}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xr_3da", "xr_3da\xr_3da.vcxproj", "{F4757631-E6E8-469B-AD5A-516BAA01DABD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -1168,6 +1170,18 @@ Global
 		{3AF44175-2EED-3C67-B324-93B1572B7EDD}.Release|x64.Build.0 = Release|x64
 		{3AF44175-2EED-3C67-B324-93B1572B7EDD}.Release|x86.ActiveCfg = Release|Win32
 		{3AF44175-2EED-3C67-B324-93B1572B7EDD}.Release|x86.Build.0 = Release|Win32
+		{F4757631-E6E8-469B-AD5A-516BAA01DABD}.Debug|x64.ActiveCfg = Debug|x64
+		{F4757631-E6E8-469B-AD5A-516BAA01DABD}.Debug|x64.Build.0 = Debug|x64
+		{F4757631-E6E8-469B-AD5A-516BAA01DABD}.Debug|x86.ActiveCfg = Debug|Win32
+		{F4757631-E6E8-469B-AD5A-516BAA01DABD}.Debug|x86.Build.0 = Debug|Win32
+		{F4757631-E6E8-469B-AD5A-516BAA01DABD}.Mixed|x64.ActiveCfg = Mixed|x64
+		{F4757631-E6E8-469B-AD5A-516BAA01DABD}.Mixed|x64.Build.0 = Mixed|x64
+		{F4757631-E6E8-469B-AD5A-516BAA01DABD}.Mixed|x86.ActiveCfg = Mixed|Win32
+		{F4757631-E6E8-469B-AD5A-516BAA01DABD}.Mixed|x86.Build.0 = Mixed|Win32
+		{F4757631-E6E8-469B-AD5A-516BAA01DABD}.Release|x64.ActiveCfg = Release|x64
+		{F4757631-E6E8-469B-AD5A-516BAA01DABD}.Release|x64.Build.0 = Release|x64
+		{F4757631-E6E8-469B-AD5A-516BAA01DABD}.Release|x86.ActiveCfg = Release|Win32
+		{F4757631-E6E8-469B-AD5A-516BAA01DABD}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
