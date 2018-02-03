@@ -18,7 +18,6 @@ ICF float calcLOD(float ssa /*fDistSq*/, float /*R*/)
 // ALPHA
 void __fastcall sorted_L1(mapSorted_T::value_type &N)
 {
-    VERIFY(N);
     dxRender_Visual* V = N.second.pVisual;
     VERIFY(V && V->shader._get());
     RCache.set_Element(N.second.se);
