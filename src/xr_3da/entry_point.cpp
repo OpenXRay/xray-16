@@ -1,7 +1,34 @@
 #include "stdafx.h"
+#include "resource.h"
+
+#include "StickyKeyFilter.hpp"
+#include "xrCore/xrCore.h"
 #include "xrCore/xrDebug_macros.h"
 
 extern ENGINE_API int RunApplication(pcstr);
+
+int entry_point(pcstr commandLine)
+{
+    if (strstr(commandLine, "-dedicated"))
+        GEnv.isDedicatedServer = true;
+
+    xrDebug::Initialize(GEnv.isDedicatedServer);
+
+    StickyKeyFilter filter;
+    if (!GEnv.isDedicatedServer)
+        filter.initialize();
+
+    pcstr fsltx = "-fsltx ";
+    string_path fsgame = "";
+    if (strstr(commandLine, fsltx))
+    {
+        const u32 sz = xr_strlen(fsltx);
+        sscanf(strstr(commandLine, fsltx) + sz, "%[^ ] ", fsgame);
+    }
+    Core.Initialize("OpenXRay", nullptr, true, *fsgame ? fsgame : nullptr);
+
+    return RunApplication(commandLine);
+}
 
 int StackoverflowFilter(const int exceptionCode)
 {
@@ -16,7 +43,7 @@ int APIENTRY WinMain(HINSTANCE inst, HINSTANCE prevInst, char* commandLine, int 
     // BugTrap can't handle stack overflow exception, so handle it here
     __try
     {
-        result = RunApplication(commandLine);
+        result = entry_point(commandLine);
     }
     __except (StackoverflowFilter(GetExceptionCode()))
     {

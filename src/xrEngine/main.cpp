@@ -173,7 +173,6 @@ void Startup()
     if (loadArgs)
         Console->Execute(loadArgs + 1);
     // Initialize APP
-    ShowWindow(Device.m_hWnd, SW_SHOWNORMAL);
     Device.Create();
     LALib.OnCreate();
     pApp = new CApplication();
@@ -181,12 +180,15 @@ void Startup()
     R_ASSERT(g_pGamePersistent);
     g_SpatialSpace = new ISpatial_DB("Spatial obj");
     g_SpatialSpacePhysic = new ISpatial_DB("Spatial phys");
-    // Destroy LOGO
+
+    // Show main window and destroy splash
+    ShowWindow(Device.m_hWnd, SW_SHOWNORMAL);
     if (logoWindow != nullptr)
     {
         DestroyWindow(logoWindow);
         logoWindow = nullptr;
     }
+
     // Main cycle
     Memory.mem_usage();
     Device.Run();
@@ -224,92 +226,24 @@ static INT_PTR CALLBACK LogoWndProc(HWND hw, UINT msg, WPARAM wp, LPARAM lp)
     return true;
 }
 
-class StickyKeyFilter
-{
-    bool screensaverState;
-    STICKYKEYS stickyKeys;
-    FILTERKEYS filterKeys;
-    TOGGLEKEYS toggleKeys;
-    DWORD stickyKeysFlags;
-    DWORD filterKeysFlags;
-    DWORD toggleKeysFlags;
-
-public:
-    StickyKeyFilter()
-    {
-        screensaverState = false;
-        stickyKeysFlags = 0;
-        filterKeysFlags = 0;
-        toggleKeysFlags = 0;
-        stickyKeys = {};
-        filterKeys = {};
-        toggleKeys = {};
-        stickyKeys.cbSize = sizeof(stickyKeys);
-        filterKeys.cbSize = sizeof(filterKeys);
-        toggleKeys.cbSize = sizeof(toggleKeys);
-    }
-
-    void initialize()
-    {
-        SystemParametersInfo(SPI_GETSCREENSAVEACTIVE, 0, &screensaverState, 0);
-
-        if (screensaverState)
-            SystemParametersInfo(SPI_SETSCREENSAVEACTIVE, FALSE, nullptr, 0);
-
-        SystemParametersInfo(SPI_GETSTICKYKEYS, sizeof(stickyKeys), &stickyKeys, 0);
-        SystemParametersInfo(SPI_GETFILTERKEYS, sizeof(filterKeys), &filterKeys, 0);
-        SystemParametersInfo(SPI_GETTOGGLEKEYS, sizeof(toggleKeys), &toggleKeys, 0);
-
-        if (stickyKeys.dwFlags & SKF_AVAILABLE)
-        {
-            stickyKeysFlags = stickyKeys.dwFlags;
-            stickyKeys.dwFlags = 0;
-            SystemParametersInfo(SPI_SETSTICKYKEYS, sizeof(stickyKeys), &stickyKeys, 0);
-        }
-
-        if (filterKeys.dwFlags & FKF_AVAILABLE)
-        {
-            filterKeysFlags = filterKeys.dwFlags;
-            filterKeys.dwFlags = 0;
-            SystemParametersInfo(SPI_SETFILTERKEYS, sizeof(filterKeys), &filterKeys, 0);
-        }
-
-        if (toggleKeys.dwFlags & TKF_AVAILABLE)
-        {
-            toggleKeysFlags = toggleKeys.dwFlags;
-            toggleKeys.dwFlags = 0;
-            SystemParametersInfo(SPI_SETTOGGLEKEYS, sizeof(toggleKeys), &toggleKeys, 0);
-        }
-    }
-
-    ~StickyKeyFilter()
-    {
-        if (screensaverState)
-            SystemParametersInfo(SPI_SETSCREENSAVEACTIVE, TRUE, nullptr, 0);
-        if (stickyKeysFlags)
-        {
-            stickyKeys.dwFlags = stickyKeysFlags;
-            SystemParametersInfo(SPI_SETSTICKYKEYS, sizeof(stickyKeys), &stickyKeys, 0);
-        }
-        if (filterKeysFlags)
-        {
-            filterKeys.dwFlags = filterKeysFlags;
-            SystemParametersInfo(SPI_SETFILTERKEYS, sizeof(filterKeys), &filterKeys, 0);
-        }
-        if (toggleKeysFlags)
-        {
-            toggleKeys.dwFlags = toggleKeysFlags;
-            SystemParametersInfo(SPI_SETTOGGLEKEYS, sizeof(toggleKeys), &toggleKeys, 0);
-        }
-    }
-};
-
 XR_EXPORT int RunApplication(pcstr commandLine)
 {
-    if (strstr(commandLine, "-dedicated"))
-        GEnv.isDedicatedServer = true;
+    if (strstr(commandLine, "-nosplash") == 0)
+    {
+        logoWindow = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_STARTUP), nullptr, LogoWndProc);
+        const HWND logoPicture = GetDlgItem(logoWindow, IDC_STATIC_LOGO);
+        RECT logoRect;
+        GetWindowRect(logoPicture, &logoRect);
+#ifndef DEBUG
+        HWND prevWindow = (strstr(commandLine, "-splashnotop") == NULL) ? HWND_TOPMOST : HWND_NOTOPMOST;
+#else
+        const HWND prevWindow = HWND_NOTOPMOST;
+#endif
+        SetWindowPos(logoWindow, prevWindow, 0, 0, logoRect.right - logoRect.left, logoRect.bottom - logoRect.top,
+            SWP_NOMOVE | SWP_SHOWWINDOW);
+        UpdateWindow(logoWindow);
+    }
 
-    xrDebug::Initialize(GEnv.isDedicatedServer);
     if (!IsDebuggerPresent())
     {
         u32 heapFragmentation = 2;
@@ -326,33 +260,9 @@ XR_EXPORT int RunApplication(pcstr commandLine)
             return 2;
     }
 #endif
-    //SetThreadAffinityMask(GetCurrentThread(), 1);
-    if (strstr(commandLine, "-nosplash") == 0)
-    {
-        logoWindow = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_STARTUP), nullptr, LogoWndProc);
-        HWND logoPicture = GetDlgItem(logoWindow, IDC_STATIC_LOGO);
-        RECT logoRect;
-        GetWindowRect(logoPicture, &logoRect);
-#ifndef DEBUG
-        HWND prevWindow = (strstr(commandLine, "-splashnotop") == NULL) ? HWND_TOPMOST : HWND_NOTOPMOST;
-#else
-        HWND prevWindow = HWND_NOTOPMOST;
-#endif
-        SetWindowPos(logoWindow, prevWindow, 0, 0, logoRect.right - logoRect.left, logoRect.bottom - logoRect.top,
-            SWP_NOMOVE | SWP_SHOWWINDOW);
-        UpdateWindow(logoWindow);
-    }
     *g_sLaunchOnExit_app = 0;
     *g_sLaunchOnExit_params = 0;
 
-    pcstr fsltx = "-fsltx ";
-    string_path fsgame = "";
-    if (strstr(commandLine, fsltx))
-    {
-        u32 sz = xr_strlen(fsltx);
-        sscanf(strstr(commandLine, fsltx) + sz, "%[^ ] ", fsgame);
-    }
-    Core.Initialize("xray", nullptr, true, *fsgame ? fsgame : nullptr);
     InitSettings();
     // Adjust player & computer name for Asian
     if (pSettings->line_exist("string_table", "no_native_input"))
@@ -360,17 +270,12 @@ XR_EXPORT int RunApplication(pcstr commandLine)
         xr_strcpy(Core.UserName, sizeof(Core.UserName), "Player");
         xr_strcpy(Core.CompName, sizeof(Core.CompName), "Computer");
     }
-    
-    StickyKeyFilter filter;
-    if (!GEnv.isDedicatedServer)
-        filter.initialize();
 
     FPU::m24r();
     InitEngine();
     InitInput();
     InitConsole();
     Engine.External.CreateRendererList();
-    Msg("command line %s", commandLine);
 
     pcstr benchName = "-batch_benchmark ";
     if (strstr(commandLine, benchName))
