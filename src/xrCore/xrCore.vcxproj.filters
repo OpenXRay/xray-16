@@ -395,9 +395,6 @@
     <ClInclude Include="cpuid.h">
       <Filter>Math\CPU</Filter>
     </ClInclude>
-    <ClInclude Include="FixedMap.h">
-      <Filter>Math\STLext</Filter>
-    </ClInclude>
     <ClInclude Include="FixedVector.h">
       <Filter>Math\STLext</Filter>
     </ClInclude>

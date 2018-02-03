@@ -1,7 +1,5 @@
 #pragma once
 
-#include "xrCore/FixedMap.h"
-
 class dxRender_Visual;
 
 namespace R_dsgraph
@@ -21,8 +19,16 @@ struct _MatrixItem
     Fmatrix Matrix; // matrix (copy)
 };
 
-struct _MatrixItemS : public _MatrixItem
+struct _MatrixItemS
 {
+    // Хак для использования списков инициализации
+    // Не используем наследование
+    // _MatrixItem begin
+    float ssa;
+    IRenderable* pObject;
+    dxRender_Visual* pVisual;
+    Fmatrix Matrix; // matrix (copy)
+    // _MatrixItem end
     ShaderElement* se;
 };
 
@@ -164,11 +170,7 @@ using mapMatrix_T = mapMatrixVS;
 using mapMatrixPasses_T = mapMatrix_T[SHADER_PASSES_MAX];
 
 // Top level
-using mapSorted_T = FixedMAP<float, _MatrixItemS>;
-using mapSorted_Node = mapSorted_T::TNode;
-
-using mapHUD_T = FixedMAP<float, _MatrixItemS>;
-using mapHUD_Node = mapHUD_T::TNode;
-
-using mapLOD_T = xr_vector<std::pair<float, _LodItem>>;
+using mapSorted_T = xr_vector<std::pair<float, _MatrixItemS>>;
+using mapHUD_T    = xr_vector<std::pair<float, _MatrixItemS>>;
+using mapLOD_T    = xr_vector<std::pair<float, _LodItem>>;
 }

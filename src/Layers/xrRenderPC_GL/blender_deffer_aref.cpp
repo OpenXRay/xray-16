@@ -47,7 +47,7 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
         case SE_R2_NORMAL_LQ:
             if (lmapped)
             {
-                C.r_Pass("lmapE", "lmapE", true,TRUE,FALSE,TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE,
+                C.r_Pass("lmapE", "lmapE", TRUE,TRUE,FALSE,TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE,
                          oAREF.value);
                 C.r_Sampler("s_base", C.L_textures[0]);
                 C.r_Sampler("s_lmap", C.L_textures[1]);
@@ -57,7 +57,7 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
             }
             else
             {
-                C.r_Pass("vert", "vert", true,TRUE,FALSE,TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE,
+                C.r_Pass("vert", "vert", TRUE,TRUE,FALSE,TRUE, D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA, TRUE,
                          oAREF.value);
                 C.r_Sampler("s_base", C.L_textures[0]);
                 C.r_End();
@@ -126,7 +126,7 @@ void CBlender_deffer_aref::Compile(CBlender_Compile& C)
         case SE_R2_SHADOW: // smap
             //			if (RImplementation.o.HW_smap)	C.r_Pass	("shadow_direct_base_aref","shadow_direct_base_aref",FALSE,TRUE,TRUE,FALSE,D3DBLEND_ZERO,D3DBLEND_ONE,TRUE,220);
             //			else							C.r_Pass	("shadow_direct_base_aref","shadow_direct_base_aref",FALSE);
-            C.r_Pass("shadow_direct_base_aref", "shadow_direct_base_aref", nullptr, true,TRUE,FALSE);
+            C.r_Pass("shadow_direct_base_aref", "shadow_direct_base_aref", FALSE, TRUE,TRUE,FALSE);
             C.r_Sampler("s_base", C.L_textures[0]);
             C.r_ColorWriteEnable(false, false, false, false);
             C.r_End();
