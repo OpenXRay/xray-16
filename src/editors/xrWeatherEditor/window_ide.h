@@ -69,8 +69,7 @@ protected:
         }
     }
 
-protected:
-private: WeifenLuo::WinFormsUI::Docking::DockPanel ^ EditorDock;
+private: WeifenLuo::WinFormsUI::Docking::DockPanel^ EditorDock;
 
 private:
     /// <summary>
