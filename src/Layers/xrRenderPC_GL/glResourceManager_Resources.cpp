@@ -292,6 +292,7 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
     //	TODO: DX10: HACK: Implement all shaders. Remove this for PS
     if (!file)
     {
+    fallback:
         string1024 tmp;
         //	TODO: HACK: Test failure
         //Memory.mem_compact();
@@ -314,6 +315,12 @@ SPS* CResourceManager::_CreatePS(LPCSTR _name)
     HRESULT const _hr = GEnv.Render->shader_compile(name, (DWORD const*)data, size, nullptr, nullptr, NULL, _result);
 
     VERIFY(SUCCEEDED(_hr));
+
+    if (!SUCCEEDED(_hr))
+    {
+        Log("Can't create shader, replacing it with stub..");
+        goto fallback;
+    }
 
     //	Parse constant, texture, sampler binding
     if (SUCCEEDED(_hr))
@@ -368,6 +375,7 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
     //	TODO: DX10: HACK: Implement all shaders. Remove this for PS
     if (!file)
     {
+    fallback:
         string1024 tmp;
         //	TODO: HACK: Test failure
         //Memory.mem_compact();
@@ -386,6 +394,12 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
                                                     nullptr, NULL, _result);
 
     VERIFY(SUCCEEDED(_hr));
+
+    if (!SUCCEEDED(_hr))
+    {
+        Log("Can't create shader, replacing it with stub..");
+        goto fallback;
+    }
 
     //	Parse constant, texture, sampler binding
     if (SUCCEEDED(_hr))
