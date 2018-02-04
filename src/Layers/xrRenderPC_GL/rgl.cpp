@@ -1265,9 +1265,9 @@ HRESULT CRender::shader_compile(
     sprintf_s(name_comment, "// %s\n", name);
     const char** sources = xr_alloc<const char*>(sources_len);
 #ifdef DEBUG
-	sources[0] = "#version 410\n#pragma optimize (off)\n";
+	sources[0] = "#version 450\n#pragma optimize (off)\n";
 #else
-    sources[0] = "#version 410\n";
+    sources[0] = "#version 450\n";
 #endif
     sources[1] = name_comment;
     memcpy(sources + 2, defines, def_len * sizeof(char*));
@@ -1326,11 +1326,28 @@ HRESULT CRender::shader_compile(
 
     if ((GLboolean)status == GL_FALSE)
     {
+#ifdef DEBUG
+        GLint srcLen;
+        CHK_GL(glGetShaderiv(shader, GL_SHADER_SOURCE_LENGTH, &srcLen));
+        GLchar* shaderSrc = xr_alloc<GLchar>(srcLen);
+        CHK_GL(glGetShaderSource(shader, srcLen, nullptr, shaderSrc));
+#endif
+
         Msg("! shader compilation failed");
         Log("! ", name);
         if (_pErrorMsgs)
             Log("! error: ", _pErrorMsgs);
 
+#ifdef DEBUG
+        if (shaderSrc)
+        {
+            Log("Shader source:");
+            Log(shaderSrc);
+            Log("Shader source end.");
+        }
+#endif
+
+        CHK_GL(glDeleteShader(shader));
         return E_FAIL;
     }
 

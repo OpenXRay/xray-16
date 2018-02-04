@@ -50,6 +50,7 @@ void CBlender_Compile::r_Sampler_cmp(LPCSTR name, LPCSTR texture, bool b_ps1x_Pr
 void CBlender_Compile::r_Pass(LPCSTR _vs, LPCSTR _gs, LPCSTR _ps, bool bFog, BOOL bZtest, BOOL bZwrite, BOOL bABlend,
                               D3DBLEND abSRC, D3DBLEND abDST, BOOL aTest, u32 aRef)
 {
+    R_ASSERT2(_ps, "Probably you are using wrong r_Pass");
     RS.Invalidate();
     ctable.clear();
     passTextures.clear();

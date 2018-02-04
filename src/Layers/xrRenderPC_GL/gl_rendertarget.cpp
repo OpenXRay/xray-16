@@ -16,9 +16,14 @@
 
 void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3, GLuint zb)
 {
-    VERIFY(_1);
-    dwWidth = _1->dwWidth;
-    dwHeight = _1->dwHeight;
+    if (_1)
+    {
+        dwWidth = _1->dwWidth;
+        dwHeight = _1->dwHeight;
+    }
+    else
+        VERIFY3(false, __FUNCTION__, "TODO: implement 'else' path");
+
     GLenum buffers[3] = {GL_NONE};
     if (_1)
     {
@@ -44,9 +49,14 @@ void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, const ref_rt& _3
 
 void CRenderTarget::u_setrt(const ref_rt& _1, const ref_rt& _2, GLuint zb)
 {
-    VERIFY(_1);
-    dwWidth = _1->dwWidth;
-    dwHeight = _1->dwHeight;
+    if (_1)
+    {
+        dwWidth = _1->dwWidth;
+        dwHeight = _1->dwHeight;
+    }
+    else
+        VERIFY3(false, __FUNCTION__, "TODO: implement 'else' path");
+
     GLenum buffers[2] = {GL_NONE};
     if (_1)
     {
