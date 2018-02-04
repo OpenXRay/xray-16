@@ -555,6 +555,7 @@
     <ClInclude Include="profiler_inline.h">
       <Filter>General\Profiler</Filter>
     </ClInclude>
+    <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="defines.cpp">

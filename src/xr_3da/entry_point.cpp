@@ -1,11 +1,8 @@
 #include "stdafx.h"
 #include "resource.h"
-
 #include "StickyKeyFilter.hpp"
-#include "xrCore/xrCore.h"
-#include "xrCore/xrDebug_macros.h"
 
-extern ENGINE_API int RunApplication(pcstr);
+#include "xrEngine/main.h"
 
 int entry_point(pcstr commandLine)
 {

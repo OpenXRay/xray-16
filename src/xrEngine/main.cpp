@@ -1,5 +1,6 @@
 // Entry point is in xr_3da/entry_point.cpp
 #include "stdafx.h"
+#include "main.h"
 #include "xr_3da/resource.h"
 
 #include <process.h>
@@ -38,7 +39,7 @@ HWND logoWindow = nullptr;
 void RunBenchmark(pcstr name);
 }
 
-void InitEngine()
+ENGINE_API void InitEngine()
 {
     Engine.Initialize();
     Device.Initialize();
@@ -62,7 +63,7 @@ public:
 };
 }
 
-void InitSettings()
+ENGINE_API void InitSettings()
 {
     string_path fname;
     FS.update_path(fname, "$game_config$", "system.ltx");
@@ -84,7 +85,7 @@ void InitSettings()
         make_string("Cannot find file %s.\nReinstalling application may fix this problem.", fname));
 }
 
-void InitConsole()
+ENGINE_API void InitConsole()
 {
     if (GEnv.isDedicatedServer)
         Console = new CTextConsole();
@@ -101,16 +102,16 @@ void InitConsole()
     }
 }
 
-void InitInput()
+ENGINE_API void InitInput()
 {
     bool captureInput = !strstr(Core.Params, "-i");
     pInput = new CInput(captureInput);
 }
 
-void destroyInput() { xr_delete(pInput); }
-void InitSound() { ISoundManager::_create(); }
-void destroySound() { ISoundManager::_destroy(); }
-void destroySettings()
+ENGINE_API void destroyInput() { xr_delete(pInput); }
+ENGINE_API void InitSound() { ISoundManager::_create(); }
+ENGINE_API void destroySound() { ISoundManager::_destroy(); }
+ENGINE_API void destroySettings()
 {
     auto s = const_cast<CInifile**>(&pSettings);
     xr_delete(*s);
@@ -119,14 +120,14 @@ void destroySettings()
     xr_delete(pGameIni);
 }
 
-void destroyConsole()
+ENGINE_API void destroyConsole()
 {
     Console->Execute("cfg_save");
     Console->Destroy();
     xr_delete(Console);
 }
 
-void destroyEngine()
+ENGINE_API void destroyEngine()
 {
     Device.Destroy();
     Engine.Destroy();
@@ -161,7 +162,7 @@ void CheckPrivilegySlowdown()
 #endif
 }
 
-void Startup()
+ENGINE_API void Startup()
 {
     execUserScript();
     InitSound();
@@ -226,7 +227,7 @@ static INT_PTR CALLBACK LogoWndProc(HWND hw, UINT msg, WPARAM wp, LPARAM lp)
     return true;
 }
 
-XR_EXPORT int RunApplication(pcstr commandLine)
+ENGINE_API int RunApplication(pcstr commandLine)
 {
     if (strstr(commandLine, "-nosplash") == 0)
     {
