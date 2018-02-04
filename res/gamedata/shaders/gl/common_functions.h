@@ -239,7 +239,7 @@ gbuffer_data gbuffer_load_data( float2 tc, float4 pos2d, uint iSample )
 #ifndef USE_MSAA
 	float4 P	= tex2D( s_position, tc );
 #else
-	float4 P	= texelFetch( s_position, int2( pos2d ), 0, iSample );
+	float4 P	= texelFetch( s_position, int2( pos2d ), int(iSample) );
 #endif
 
 	// 3d view space pos reconstruction math
@@ -264,7 +264,7 @@ gbuffer_data gbuffer_load_data( float2 tc, float4 pos2d, uint iSample )
 #ifndef USE_MSAA
    float4	C	= tex2D( s_diffuse, tc );
 #else
-   float4	C	= texelFetch( s_diffuse, int2( pos2d ), 0, iSample );
+   float4	C	= texelFetch( s_diffuse, int2( pos2d ), int(iSample) );
 #endif
 
 	gbd.C		= C.xyz;
@@ -300,7 +300,7 @@ gbuffer_data gbuffer_load_data( float2 tc, uint iSample )
 #ifndef USE_MSAA
 	float4 P	= tex2D( s_position, tc );
 #else
-   float4 P		= texelFetch( s_position, int2( tc * pos_decompression_params2.xy ), 0, iSample );
+   float4 P		= texelFetch( s_position, int2( tc * pos_decompression_params2.xy ), int(iSample) );
 #endif
 
 	gbd.P		= P.xyz;
@@ -309,7 +309,7 @@ gbuffer_data gbuffer_load_data( float2 tc, uint iSample )
 #ifndef USE_MSAA
 	float4 N	= tex2D( s_normal, tc );
 #else
-	float4 N	= texelFetch( s_normal, int2( tc * pos_decompression_params2.xy ), 0, iSample );
+	float4 N	= texelFetch( s_normal, int2( tc * pos_decompression_params2.xy ), int(iSample) );
 #endif
 
 	gbd.N		= N.xyz;
@@ -318,7 +318,7 @@ gbuffer_data gbuffer_load_data( float2 tc, uint iSample )
 #ifndef USE_MSAA
 	float4	C	= tex2D( s_diffuse, tc );
 #else
-	float4	C	= texelFetch( s_diffuse, int2( tc * pos_decompression_params2.xy ), 0, iSample );
+	float4	C	= texelFetch( s_diffuse, int2( tc * pos_decompression_params2.xy ), int(iSample) );
 #endif
 
 

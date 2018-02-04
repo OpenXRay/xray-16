@@ -77,9 +77,9 @@ _out _main ( _input I, uint iSample )
 	float4	L = tex2D( s_accumulator, I.tc0.xy);	// diffuse.specular
 #else
 #	ifdef GBUFFER_OPTIMIZATION
-	float4	L = texelFetch( s_accumulator, I.pos2d.xy, 0, ISAMPLE);	// diffuse.specular
+	float4	L = texelFetch( s_accumulator, int2(I.pos2d.xy), int(ISAMPLE));	// diffuse.specular
 #	else
-	float4   L = texelFetch( s_accumulator, I.tc0 * pos_decompression_params2.xy, 0, ISAMPLE );
+	float4   L = texelFetch( s_accumulator, int2(I.tc0 * pos_decompression_params2.xy), int(ISAMPLE) );
 #	endif
 #endif
 

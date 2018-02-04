@@ -113,10 +113,10 @@ float4 GatherZSamples( float2 f2TexCoord )
 	float2 f2InvRTSize = float2(1.0f) / pos_decompression_params2.xy;
 	
 #ifdef USE_MSAA
-	f4Ret.x = texelFetchOffset( g_txDepth, int2( f2TexCoord * g_f2RTSize), 0, MSAA_SAMPLE_INDEX, int2( 1,0 ) ).z;
-	f4Ret.y = texelFetchOffset( g_txDepth, int2( f2TexCoord * g_f2RTSize), 0, MSAA_SAMPLE_INDEX, int2( 1,1 ) ).z;
-	f4Ret.z = texelFetchOffset( g_txDepth, int2( f2TexCoord * g_f2RTSize), 0, MSAA_SAMPLE_INDEX, int2( 0,1 ) ).z;
-	f4Ret.w = texelFetchOffset( g_txDepth, int2( f2TexCoord * g_f2RTSize), 0, MSAA_SAMPLE_INDEX, int2( 0,0 ) ).z;
+	f4Ret.x = texelFetchOffset( g_txDepth, int2( f2TexCoord * g_f2RTSize), MSAA_SAMPLE_INDEX, int2( 1,0 ) ).z;
+	f4Ret.y = texelFetchOffset( g_txDepth, int2( f2TexCoord * g_f2RTSize), MSAA_SAMPLE_INDEX, int2( 1,1 ) ).z;
+	f4Ret.z = texelFetchOffset( g_txDepth, int2( f2TexCoord * g_f2RTSize), MSAA_SAMPLE_INDEX, int2( 0,1 ) ).z;
+	f4Ret.w = texelFetchOffset( g_txDepth, int2( f2TexCoord * g_f2RTSize), MSAA_SAMPLE_INDEX, int2( 0,0 ) ).z;
 #else  // !USE_MSAA
 #ifndef SM_5
 	f4Ret.x = texelFetchOffset( g_txDepth, int2( f2TexCoord * g_f2RTSize), 0, int2( 1,0 ) ).z;
@@ -130,15 +130,15 @@ float4 GatherZSamples( float2 f2TexCoord )
 
 #ifdef USE_MSAA
     #ifdef GBUFFER_OPTIMIZATION
-	f4Ret.x += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), 0, MSAA_SAMPLE_INDEX, int2( 1,0 ) ).x;
-	f4Ret.y += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), 0, MSAA_SAMPLE_INDEX, int2( 1,1 ) ).x;
-	f4Ret.z += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), 0, MSAA_SAMPLE_INDEX, int2( 0,1 ) ).x;
-	f4Ret.w += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), 0, MSAA_SAMPLE_INDEX, int2( 0,0 ) ).x;
+	f4Ret.x += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), MSAA_SAMPLE_INDEX, int2( 1,0 ) ).x;
+	f4Ret.y += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), MSAA_SAMPLE_INDEX, int2( 1,1 ) ).x;
+	f4Ret.z += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), MSAA_SAMPLE_INDEX, int2( 0,1 ) ).x;
+	f4Ret.w += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), MSAA_SAMPLE_INDEX, int2( 0,0 ) ).x;
 	#else
-	f4Ret.x += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), 0, MSAA_SAMPLE_INDEX, int2( 1,0 ) ).z;
-	f4Ret.y += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), 0, MSAA_SAMPLE_INDEX, int2( 1,1 ) ).z;
-	f4Ret.z += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), 0, MSAA_SAMPLE_INDEX, int2( 0,1 ) ).z;
-	f4Ret.w += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), 0, MSAA_SAMPLE_INDEX, int2( 0,0 ) ).z;
+	f4Ret.x += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), MSAA_SAMPLE_INDEX, int2( 1,0 ) ).z;
+	f4Ret.y += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), MSAA_SAMPLE_INDEX, int2( 1,1 ) ).z;
+	f4Ret.z += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), MSAA_SAMPLE_INDEX, int2( 0,1 ) ).z;
+	f4Ret.w += g_fHDAOZDispScale * texelFetchOffset( g_txNormal, int2( f2TexCoord * g_f2RTSize), MSAA_SAMPLE_INDEX, int2( 0,0 ) ).z;
 	#endif
 #else  // !USE_MSAA
 #ifndef SM_5
@@ -191,9 +191,9 @@ float HDAOValleyAngle( uint2 u2ScreenCoord )
 	
 #ifdef USE_MSAA
 #ifdef GBUFFER_OPTIMIZATION
-	float3 N = gbuf_unpack_normal( texelFetch( g_txNormal, int2( u2ScreenCoord ), 0, MSAA_SAMPLE_INDEX ).xy );
+	float3 N = gbuf_unpack_normal( texelFetch( g_txNormal, int2( u2ScreenCoord ), MSAA_SAMPLE_INDEX ).xy );
 #else
-	float3 N = texelFetch( g_txNormal, int2( u2ScreenCoord ), 0, MSAA_SAMPLE_INDEX ).xyz;
+	float3 N = texelFetch( g_txNormal, int2( u2ScreenCoord ), MSAA_SAMPLE_INDEX ).xyz;
 #endif
 #else  // !USE_MSAA
 #ifdef GBUFFER_OPTIMIZATION
@@ -217,13 +217,13 @@ float HDAOValleyAngle( uint2 u2ScreenCoord )
 		
 #ifdef USE_MSAA
 #ifdef GBUFFER_OPTIMIZATION
-		f3N1.xy  = texelFetch( g_txNormal, i2OffsetScreenCoord, 0, MSAA_SAMPLE_INDEX ).xy;
+		f3N1.xy  = texelFetch( g_txNormal, i2OffsetScreenCoord, MSAA_SAMPLE_INDEX ).xy;
 		f3N1.xyz = gbuf_unpack_normal( f3N1.xy );
-		f3N2.xy  = texelFetch( g_txNormal, i2MirrorOffsetScreenCoord, 0, MSAA_SAMPLE_INDEX ).xy;				
+		f3N2.xy  = texelFetch( g_txNormal, i2MirrorOffsetScreenCoord, MSAA_SAMPLE_INDEX ).xy;				
 		f3N2.xyz = gbuf_unpack_normal( f3N2.xy );
 #else
-		f3N1.xy  = texelFetch( g_txNormal, i2OffsetScreenCoord, 0, MSAA_SAMPLE_INDEX ).xyz;
-		f3N2.xy  = texelFetch( g_txNormal, i2MirrorOffsetScreenCoord, 0, MSAA_SAMPLE_INDEX ).xyz;				
+		f3N1.xy  = texelFetch( g_txNormal, i2OffsetScreenCoord, MSAA_SAMPLE_INDEX ).xyz;
+		f3N2.xy  = texelFetch( g_txNormal, i2MirrorOffsetScreenCoord, MSAA_SAMPLE_INDEX ).xyz;				
 #endif
 #else  // !USE_MSAA
 #ifdef GBUFFER_OPTIMIZATION

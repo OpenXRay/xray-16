@@ -39,7 +39,7 @@ float3	dof(float2 center)
 #ifndef USE_MSAA
 	float 	depth		= tex2D(s_position,center).z;
 #else
-	float 	depth		= texelFetch(s_position, int2( center * pos_decompression_params2.xy ), 0, 0).z;
+	float 	depth		= texelFetch(s_position, int2( center * pos_decompression_params2.xy ), 0).z;
 #endif
 	if (depth <= EPSDEPTHDOF)	depth = dof_params.w;
 	float	blur 		= DOFFactor(depth);
@@ -79,7 +79,7 @@ float3	dof(float2 center)
 #ifndef USE_MSAA
 		float 	tap_depth 	= tex2D	(s_position,tap).z;
 #else
-		float 	tap_depth 	= texelFetch(s_position, int2( tap* pos_decompression_params2.xy ), 0, 0).z;
+		float 	tap_depth 	= texelFetch(s_position, int2( tap* pos_decompression_params2.xy ), 0).z;
 #endif
 		if (tap_depth <= EPSDEPTHDOF)	tap_depth = dof_params.w;
 		float 	tap_contrib	= DOFFactor(tap_depth);

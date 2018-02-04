@@ -377,9 +377,9 @@ float ValleyAngle( uint2 u2ScreenCoord )
 	int2 i2MirrorOffsetScreenCoord;
 	
     #ifdef GBUFFER_OPTIMIZATION
-	float3 N = gbuf_unpack_normal( texelFetch( g_txNormal, int2( u2ScreenCoord ), 0, MSAA_SAMPLE_INDEX ).xy );
+	float3 N = gbuf_unpack_normal( texelFetch( g_txNormal, int2( u2ScreenCoord ), MSAA_SAMPLE_INDEX ).xy );
 	#else
-	float3 N = texelFetch( g_txNormal, int2( u2ScreenCoord ), 0, MSAA_SAMPLE_INDEX ).xyz;
+	float3 N = texelFetch( g_txNormal, int2( u2ScreenCoord ), MSAA_SAMPLE_INDEX ).xyz;
 	#endif
 
 	for( int iNormal=0; iNormal<NUM_NORMAL_LOADS; iNormal++ )
@@ -395,13 +395,13 @@ float ValleyAngle( uint2 u2ScreenCoord )
 		i2MirrorOffsetScreenCoord = ( i2MirrorOffsetScreenCoord < 0 ) ? ( 0 ) : ( i2MirrorOffsetScreenCoord );
 						
     #ifdef GBUFFER_OPTIMIZATION
-		f3N1.xy  = texelFetch( g_txNormal, i2OffsetScreenCoord, 0, MSAA_SAMPLE_INDEX ).xy;
+		f3N1.xy  = texelFetch( g_txNormal, i2OffsetScreenCoord, MSAA_SAMPLE_INDEX ).xy;
 		f3N1.xyz = gbuf_unpack_normal( f3N1.xy );
-		f3N2.xy  = texelFetch( g_txNormal, i2MirrorOffsetScreenCoord, 0, MSAA_SAMPLE_INDEX ).xy;				
+		f3N2.xy  = texelFetch( g_txNormal, i2MirrorOffsetScreenCoord, MSAA_SAMPLE_INDEX ).xy;				
 		f3N2.xyz = gbuf_unpack_normal( f3N2.xy );
     #else
-		f3N1.xyz  = texelFetch( g_txNormal, i2OffsetScreenCoord, 0, MSAA_SAMPLE_INDEX ).xyz;
-		f3N2.xyz  = texelFetch( g_txNormal, i2MirrorOffsetScreenCoord, 0, MSAA_SAMPLE_INDEX ).xyz;				
+		f3N1.xyz  = texelFetch( g_txNormal, i2OffsetScreenCoord, MSAA_SAMPLE_INDEX ).xyz;
+		f3N2.xyz  = texelFetch( g_txNormal, i2MirrorOffsetScreenCoord, MSAA_SAMPLE_INDEX ).xyz;				
     #endif
 		
 		fDot = dot( f3N1, N );
@@ -530,21 +530,21 @@ float ValleyAngle( uint2 u2ScreenCoord )
 
                     f2Coord    = float2( f2ScreenCoord.x + float( uGather * 2 ), f2ScreenCoord.y );
                    
-                    f4Depth.x  = texelFetchOffset( g_txDepth, int2( f2Coord ), 0, MSAA_SAMPLE_INDEX, int3( 0, 1, 0 ) ).z;
-	                f4Depth.y  = texelFetchOffset( g_txDepth, int2( f2Coord ), 0, MSAA_SAMPLE_INDEX, int3( 1, 1, 0 ) ).z;
-	                f4Depth.z  = texelFetchOffset( g_txDepth, int2( f2Coord ), 0, MSAA_SAMPLE_INDEX, int3( 1, 0, 0 ) ).z;
-	                f4Depth.w  = texelFetchOffset( g_txDepth, int2( f2Coord ), 0, MSAA_SAMPLE_INDEX, int3( 0, 0, 0 ) ).z;
+                    f4Depth.x  = texelFetchOffset( g_txDepth, int2( f2Coord ), MSAA_SAMPLE_INDEX, int3( 0, 1, 0 ) ).z;
+	                f4Depth.y  = texelFetchOffset( g_txDepth, int2( f2Coord ), MSAA_SAMPLE_INDEX, int3( 1, 1, 0 ) ).z;
+	                f4Depth.z  = texelFetchOffset( g_txDepth, int2( f2Coord ), MSAA_SAMPLE_INDEX, int3( 1, 0, 0 ) ).z;
+	                f4Depth.w  = texelFetchOffset( g_txDepth, int2( f2Coord ), MSAA_SAMPLE_INDEX, int3( 0, 0, 0 ) ).z;
                     
                     #ifdef GBUFFER_OPTIMIZATION
-                        f4Normal.x = texelFetchOffset( g_txNormal, int2( f2Coord ), 0, MSAA_SAMPLE_INDEX, int3( 0, 1, 0 ) ).x;
-                        f4Normal.y = texelFetchOffset( g_txNormal, int2( f2Coord ), 0, MSAA_SAMPLE_INDEX, int3( 1, 1, 0 ) ).x;
-	                    f4Normal.z = texelFetchOffset( g_txNormal, int2( f2Coord ), 0, MSAA_SAMPLE_INDEX, int3( 1, 0, 0 ) ).x;
-	                    f4Normal.w = texelFetchOffset( g_txNormal, int2( f2Coord ), 0, MSAA_SAMPLE_INDEX, int3( 0, 0, 0 ) ).x;
+                        f4Normal.x = texelFetchOffset( g_txNormal, int2( f2Coord ), MSAA_SAMPLE_INDEX, int3( 0, 1, 0 ) ).x;
+                        f4Normal.y = texelFetchOffset( g_txNormal, int2( f2Coord ), MSAA_SAMPLE_INDEX, int3( 1, 1, 0 ) ).x;
+	                    f4Normal.z = texelFetchOffset( g_txNormal, int2( f2Coord ), MSAA_SAMPLE_INDEX, int3( 1, 0, 0 ) ).x;
+	                    f4Normal.w = texelFetchOffset( g_txNormal, int2( f2Coord ), MSAA_SAMPLE_INDEX, int3( 0, 0, 0 ) ).x;
 	                #else
-                        f4Normal.x = texelFetchOffset( g_txNormal, int2( f2Coord ), 0, MSAA_SAMPLE_INDEX, int3( 0, 1, 0 ) ).z;
-                        f4Normal.y = texelFetchOffset( g_txNormal, int2( f2Coord ), 0, MSAA_SAMPLE_INDEX, int3( 1, 1, 0 ) ).z;
-	                    f4Normal.z = texelFetchOffset( g_txNormal, int2( f2Coord ), 0, MSAA_SAMPLE_INDEX, int3( 1, 0, 0 ) ).z;
-	                    f4Normal.w = texelFetchOffset( g_txNormal, int2( f2Coord ), 0, MSAA_SAMPLE_INDEX, int3( 0, 0, 0 ) ).z;
+                        f4Normal.x = texelFetchOffset( g_txNormal, int2( f2Coord ), MSAA_SAMPLE_INDEX, int3( 0, 1, 0 ) ).z;
+                        f4Normal.y = texelFetchOffset( g_txNormal, int2( f2Coord ), MSAA_SAMPLE_INDEX, int3( 1, 1, 0 ) ).z;
+	                    f4Normal.z = texelFetchOffset( g_txNormal, int2( f2Coord ), MSAA_SAMPLE_INDEX, int3( 1, 0, 0 ) ).z;
+	                    f4Normal.w = texelFetchOffset( g_txNormal, int2( f2Coord ), MSAA_SAMPLE_INDEX, int3( 0, 0, 0 ) ).z;
 	                #endif
                 #else
 
@@ -626,27 +626,27 @@ float	calc_new_hdao( float3 P, float3 N, float2 tc, float2 tcJ, uint iSample)
 	fDot = ValleyAngle( u2CenterScreenCoord );
 
 	// Sample center texel, convert to camera space and add normal
-	float fDepth = texelFetch( g_txDepth, u2CenterScreenCoord, 0, MSAA_SAMPLE_INDEX ).z;
+	float fDepth = texelFetch( g_txDepth, u2CenterScreenCoord, MSAA_SAMPLE_INDEX ).z;
     #ifdef GBUFFER_OPTIMIZATION
-        fCenterZ = fDepth + ( texelFetch( g_txNormal, u2CenterScreenCoord, 0, MSAA_SAMPLE_INDEX ).x * g_fHDAONormalScale );
+        fCenterZ = fDepth + ( texelFetch( g_txNormal, u2CenterScreenCoord, MSAA_SAMPLE_INDEX ).x * g_fHDAONormalScale );
     #else
-        fCenterZ = fDepth + ( texelFetch( g_txNormal, u2CenterScreenCoord, 0, MSAA_SAMPLE_INDEX ).z * g_fHDAONormalScale );
+        fCenterZ = fDepth + ( texelFetch( g_txNormal, u2CenterScreenCoord, MSAA_SAMPLE_INDEX ).z * g_fHDAONormalScale );
     #endif
 	
 	// Loop through each valley
 	for( iValley = 0; iValley < NUM_VALLEYS; iValley ++ )
 	{
 		// Sample depth & convert to camera space
-        f2SampledZ.x = texelFetch( g_txDepth, ( u2CenterScreenCoord + g_i2HDAOSamplePattern[iValley] ), 0, MSAA_SAMPLE_INDEX ).z;
-		f2SampledZ.y = texelFetch( g_txDepth, ( u2CenterScreenCoord - g_i2HDAOSamplePattern[iValley] ), 0, MSAA_SAMPLE_INDEX ).z;
+        f2SampledZ.x = texelFetch( g_txDepth, ( u2CenterScreenCoord + g_i2HDAOSamplePattern[iValley] ), MSAA_SAMPLE_INDEX ).z;
+		f2SampledZ.y = texelFetch( g_txDepth, ( u2CenterScreenCoord - g_i2HDAOSamplePattern[iValley] ), MSAA_SAMPLE_INDEX ).z;
 
         // Sample normal and do a scaled add
         #ifdef GBUFFER_OPTIMIZATION
-	        f2SampledZ.x += ( texelFetch( g_txNormal, ( u2CenterScreenCoord + g_i2HDAOSamplePattern[iValley] ), 0, MSAA_SAMPLE_INDEX ).x * g_fHDAONormalScale ); 
-	        f2SampledZ.y += ( texelFetch( g_txNormal, ( u2CenterScreenCoord - g_i2HDAOSamplePattern[iValley] ), 0, MSAA_SAMPLE_INDEX ).x * g_fHDAONormalScale );
+	        f2SampledZ.x += ( texelFetch( g_txNormal, ( u2CenterScreenCoord + g_i2HDAOSamplePattern[iValley] ), MSAA_SAMPLE_INDEX ).x * g_fHDAONormalScale ); 
+	        f2SampledZ.y += ( texelFetch( g_txNormal, ( u2CenterScreenCoord - g_i2HDAOSamplePattern[iValley] ), MSAA_SAMPLE_INDEX ).x * g_fHDAONormalScale );
 	    #else
-	        f2SampledZ.x += ( texelFetch( g_txNormal, ( u2CenterScreenCoord + g_i2HDAOSamplePattern[iValley] ), 0, MSAA_SAMPLE_INDEX ).z * g_fHDAONormalScale ); 
-	        f2SampledZ.y += ( texelFetch( g_txNormal, ( u2CenterScreenCoord - g_i2HDAOSamplePattern[iValley] ), 0, MSAA_SAMPLE_INDEX ).z * g_fHDAONormalScale );
+	        f2SampledZ.x += ( texelFetch( g_txNormal, ( u2CenterScreenCoord + g_i2HDAOSamplePattern[iValley] ), MSAA_SAMPLE_INDEX ).z * g_fHDAONormalScale ); 
+	        f2SampledZ.y += ( texelFetch( g_txNormal, ( u2CenterScreenCoord - g_i2HDAOSamplePattern[iValley] ), MSAA_SAMPLE_INDEX ).z * g_fHDAONormalScale );
 	    #endif
 
 		// Detect valleys 
