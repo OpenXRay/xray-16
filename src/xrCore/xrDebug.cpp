@@ -378,8 +378,8 @@ void xrDebug::SetupExceptionHandler(const bool& dedicated)
 #endif
 #endif
     BT_SetDumpType(minidumpFlags);
-    // XXX nitrocaster: use some other email?
-    BT_SetSupportEMail("cop-crash-report@stalker-game.com");
+    //BT_SetSupportEMail("cop-crash-report@stalker-game.com");
+    BT_SetSupportEMail("openxray@yahoo.com");
 }
 #endif // USE_BUG_TRAP
 
