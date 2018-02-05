@@ -47,18 +47,21 @@ static BOOL bException = FALSE;
 
 namespace
 {
-#ifdef XR_X64
-    extern "C" void * _ReturnAddress(void);
-    DWORD_PTR GetInstructionPtr()
-    {
-        return (DWORD_PTR)_ReturnAddress();
-    }
-#else
-void __declspec(naked, noinline) * __cdecl GetInstructionPtr()
+
+ICN void* GetInstructionPtr()
 {
-    _asm mov eax, [esp] _asm retn
-}
+#ifdef _MSC_VER
+    return _ReturnAddress();
+#else
+#ifdef _WIN64
+    _asm mov rax, [rsp]
+    _asm retn
+#else
+    _asm mov eax, [esp]
+    _asm retn
 #endif
+#endif
+}
 }
 
 xrDebug::UnhandledExceptionFilter xrDebug::PrevFilter = nullptr;
@@ -90,7 +93,7 @@ size_t xrDebug::BuildStackTrace(char* buffer, size_t capacity, size_t lineCapaci
     if (GetThreadContext(GetCurrentThread(), &context))
     {
 #if defined(XR_X64)
-        context.Rip = GetInstructionPtr();
+        context.Rip = (DWORD64)GetInstructionPtr();
         context.Rbp = (DWORD64)&ebp;
         context.Rsp = (DWORD64)&context;
 #elif defined(XR_X86)
@@ -337,7 +340,7 @@ void WINAPI xrDebug::PreErrorHandler(INT_PTR)
 
     string_path dumpPath;
     if (FS.path_exist("$app_data_root$"))
-        FS.update_path(dumpPath, "$app_data_root$", dumpPath);
+        FS.update_path(dumpPath, "$app_data_root$", "");
     xr_strcat(dumpPath, "reports");
 
     BT_SetReportFilePath(dumpPath);
@@ -468,7 +471,7 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
         if (OnDialog)
             OnDialog(true);
         MessageBox(NULL,
-            "Fatal error occured\n\n"
+            "Fatal error occurred\n\n"
             "Press OK to abort program execution",
             "Fatal error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
     }
