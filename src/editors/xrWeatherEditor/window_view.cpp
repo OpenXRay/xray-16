@@ -256,7 +256,11 @@ System::Void window_view::ViewPanel_MouseClick(Object ^ sender, MouseEventArgs ^
     if (!color)
         return;
 
+#ifdef XR_X64
+    HDC dc = GetWindowDC((HWND)ViewPanel->Handle.ToInt64());
+#else
     HDC dc = GetWindowDC((HWND)ViewPanel->Handle.ToInt32());
+#endif
     u32 pixel_color = GetPixel(dc, e->Location.X, e->Location.Y);
     XRay::Editor::color value;
     value.r = float((pixel_color & 0x000000ff) >> 0) / 255.f;
@@ -279,7 +283,11 @@ void window_view::pick_color_cursor(bool value)
     ViewPanel->Cursor = gcnew System::Windows::Forms::Cursor(
         (System::IntPtr)LoadCursor((HINSTANCE)System::Runtime::InteropServices::Marshal::GetHINSTANCE(
                                System::Reflection::Assembly::GetExecutingAssembly()->GetModules()[0])
+#ifdef XR_X64
+                               .ToInt64(),
+#else
                                .ToInt32(),
+#endif
             MAKEINTRESOURCE(IDC_CURSOR1)));
 }
 

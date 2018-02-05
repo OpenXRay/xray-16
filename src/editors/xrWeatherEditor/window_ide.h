@@ -70,6 +70,7 @@ protected:
     }
 
 private: WeifenLuo::WinFormsUI::Docking::DockPanel^ EditorDock;
+private: WeifenLuo::WinFormsUI::Docking::VS2015LightTheme^ EditorTheme;
 
 private:
     /// <summary>
@@ -85,6 +86,7 @@ private:
     void InitializeComponent(void)
     {
         this->EditorDock = (gcnew WeifenLuo::WinFormsUI::Docking::DockPanel());
+        this->EditorTheme = (gcnew WeifenLuo::WinFormsUI::Docking::VS2015LightTheme());
         this->SuspendLayout();
         this->EditorDock->Dock = System::Windows::Forms::DockStyle::Fill;
         this->EditorDock->DocumentStyle = WeifenLuo::WinFormsUI::Docking::DocumentStyle::DockingSdi;

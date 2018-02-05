@@ -51,8 +51,13 @@ void ide_impl::on_idle_end()
 }
 
 bool ide_impl::idle() const { return (m_in_idle); }
+#ifdef XR_X64
+HWND ide_impl::main_handle() { return ((HWND)m_window->Handle.ToInt64()); }
+HWND ide_impl::view_handle() { return ((HWND)m_window->view().draw_handle().ToInt64()); }
+#else
 HWND ide_impl::main_handle() { return ((HWND)m_window->Handle.ToInt32()); }
 HWND ide_impl::view_handle() { return ((HWND)m_window->view().draw_handle().ToInt32()); }
+#endif
 void ide_impl::run() { Application::Run(m_window); }
 void ide_impl::on_load_finished()
 {

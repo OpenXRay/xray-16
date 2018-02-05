@@ -27,6 +27,8 @@ void window_ide::custom_init(XRay::Editor::engine_base* engine)
     m_weather = gcnew window_weather(this);
     m_weather_editor = gcnew window_weather_editor(this, m_engine);
 
+    EditorDock->Theme = EditorTheme;
+
     load_on_create();
 
     ResumeLayout();
