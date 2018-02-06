@@ -1,3 +1,5 @@
+math.randomseed(os.time())
+
 if (jit == nil) then
 	profiler.setup_hook	()
 end
