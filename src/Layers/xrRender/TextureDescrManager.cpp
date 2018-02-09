@@ -1,5 +1,7 @@
 #include "stdafx.h"
-#pragma hdrstop
+
+#include <tbb/parallel_for_each.h>
+
 #include "TextureDescrManager.h"
 #include "ETextureParams.h"
 
@@ -28,27 +30,25 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial)
 {
     FS_FileSet flist;
     FS.file_list(flist, initial, FS_ListFiles, "*.thm");
-#ifdef DEBUG
-    Msg("count of .thm files=%d", flist.size());
-#endif // #ifdef DEBUG
-    auto It = flist.begin();
-    auto It_e = flist.end();
-    STextureParams tp;
-    string_path fn;
-    for (; It != It_e; ++It)
-    {
-#ifdef DEBUG
-        //Alundaio: Print list of *.thm to find bad .thms!
-        Msg("%s", (*It).name.c_str());
+#ifndef MASTER_GOLD
+    Msg("%s, count of .thm files: %d", __FUNCTION__, flist.size());
 #endif
-        FS.update_path(fn, initial, (*It).name.c_str());
+
+    tbb::parallel_for_each(flist, [&](auto& it)
+    {
+#if 0//def DEBUG // XXX: make it as an option
+        //Alundaio: Print list of *.thm to find bad .thms!
+        Msg("%s", it.name.c_str());
+#endif
+        string_path fn;
+        FS.update_path(fn, initial, it.name.c_str());
         IReader* F = FS.r_open(fn);
-        xr_strcpy(fn, (*It).name.c_str());
+        xr_strcpy(fn, it.name.c_str());
         fix_texture_thm_name(fn);
 
         R_ASSERT(F->find_chunk(THM_CHUNK_TYPE));
         F->r_u32();
-        tp.Clear();
+        STextureParams tp;
         tp.Load(*F);
         FS.r_close(F);
         if (STextureParams::ttImage == tp.type || STextureParams::ttTerrain == tp.type ||
@@ -95,43 +95,38 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial)
                 desc.m_spec->m_use_steep_parallax = true;
             }
         }
-    }
+    });
 }
 
 void CTextureDescrMngr::Load()
 {
-#ifdef DEBUG
-    CTimer TT;
-    TT.Start();
+#ifndef MASTER_GOLD
+    CTimer timer;
+    timer.Start();
 #endif // #ifdef DEBUG
 
     LoadTHM("$game_textures$");
     LoadTHM("$level$");
 
-#ifdef DEBUG
-    Msg("load time=%d ms", TT.GetElapsed_ms());
-#endif // #ifdef DEBUG
+#ifndef MASTER_GOLD
+    Msg("%s, .thm loading time: %d ms", __FUNCTION__, timer.GetElapsed_ms());
+#endif
 }
 
 void CTextureDescrMngr::UnLoad()
 {
-    map_TD::iterator I = m_texture_details.begin();
-    map_TD::iterator E = m_texture_details.end();
-    for (; I != E; ++I)
+    for (auto& it : m_texture_details)
     {
-        xr_delete(I->second.m_assoc);
-        xr_delete(I->second.m_spec);
+        xr_delete(it.second.m_assoc);
+        xr_delete(it.second.m_spec);
     }
     m_texture_details.clear();
 }
 
 CTextureDescrMngr::~CTextureDescrMngr()
 {
-    map_CS::iterator I = m_detail_scalers.begin();
-    map_CS::iterator E = m_detail_scalers.end();
-
-    for (; I != E; ++I)
-        xr_delete(I->second);
+    for (auto& it : m_detail_scalers)
+        xr_delete(it.second);
 
     m_detail_scalers.clear();
 }

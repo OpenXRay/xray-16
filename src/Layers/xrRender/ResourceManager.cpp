@@ -349,7 +349,7 @@ void CResourceManager::DeferredUpload()
         return;
 
 #ifndef MASTER_GOLD
-    Msg("%s, amount of textures = %d", __FUNCTION__, m_textures.size());
+    Msg("%s, amount of textures: %d", __FUNCTION__, m_textures.size());
 
     CTimer timer;
     timer.Start();
@@ -363,7 +363,7 @@ void CResourceManager::DeferredUpload()
 #endif
 
 #ifndef MASTER_GOLD
-    Msg("%s, texture loading time = %d", __FUNCTION__, timer.GetElapsed_ms());
+    Msg("%s, texture loading time: %d ms", __FUNCTION__, timer.GetElapsed_ms());
 #endif
 }
 /*
