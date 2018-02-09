@@ -2,8 +2,8 @@
 #ifndef renderH
 #define renderH
 
-#include "xrCDB\Frustum.h"
-#include "vis_common.h"
+#include "xrCDB/Frustum.h"
+#include "xrEngine/vis_common.h"
 
 #include "Layers/xrRender/blenders/Blender.h"
 #include "Layers/xrRender/blenders/Blender_CLSID.h"
@@ -16,14 +16,14 @@
 #include "Include/xrAPI/xrAPI.h"
 
 // definition (Renderer)
-class CRenderTarget /*:public IRender_Target*/
+class CRenderTarget : public IRender_Target
 {
 public:
     virtual u32 get_width() { return EDevice.dwWidth; }
     virtual u32 get_height() { return EDevice.dwHeight; }
 };
 
-class IRender
+class IERender
 {
 public:
     enum GenerationLevel
@@ -39,9 +39,7 @@ public:
     virtual GenerationLevel get_generation() = 0;
 };
 
-class ECORE_API CRender :
-
-    public IRender
+class ECORE_API CRender : public IERender
 {
     CRenderTarget* Target;
     Fmatrix current_matrix;

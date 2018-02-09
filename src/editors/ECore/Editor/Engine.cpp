@@ -8,6 +8,7 @@
 #include "Engine.h"
 #include "ui_main.h"
 
+/*
 CEngine Engine;
 
 //////////////////////////////////////////////////////////////////////
@@ -48,7 +49,7 @@ void CEngine::Initialize(void)
 
     xrBinder* bindCPU = (xrBinder*)GetProcAddress(hPSGP, "xrBind_PSGP");
     R_ASSERT(bindCPU);
-    bindCPU(&PSGP, CPU::ID.feature /*& CPU::ID.os_support*/);
+    bindCPU(&PSGP, CPU::ID.feature / *& CPU::ID.os_support* /);
     // for compliance with editor
     PSGP.skin1W = xrSkin1W_x86;
     PSGP.skin2W = xrSkin2W_x86;
@@ -75,3 +76,4 @@ void CEngine::Destroy()
         hPSGP = 0;
     }
 }
+*/

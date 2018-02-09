@@ -48,7 +48,7 @@ enum ETFlags
 
 class ECORE_API CToolCustom
 {
-    friendclass CCustomPreferences;
+    friend class CCustomPreferences;
 
 protected:
     bool m_bReady;
@@ -82,7 +82,7 @@ public:
     u32 dwFogColor;
 
 public:
-    AnsiString m_LastFileName;
+    xr_string m_LastFileName;
 
 public:
     struct SDebugDraw
@@ -220,13 +220,13 @@ public:
 
     virtual void OnShowHint(AStringVec& SS) = 0;
 
-    virtual bool__fastcall MouseStart(TShiftState Shift) = 0;
-    virtual bool__fastcall MouseEnd(TShiftState Shift) = 0;
-    virtual void__fastcall MouseMove(TShiftState Shift) = 0;
-    virtual bool__fastcall HiddenMode() { return m_bHiddenMode; }
-    virtual bool__fastcall KeyDown(WORD Key, TShiftState Shift) { return false; }
-    virtual bool__fastcall KeyUp(WORD Key, TShiftState Shift) { return false; }
-    virtual bool__fastcall KeyPress(WORD Key, TShiftState Shift) { return false; }
+    virtual bool MouseStart(TShiftState Shift) = 0;
+    virtual bool MouseEnd(TShiftState Shift) = 0;
+    virtual void MouseMove(TShiftState Shift) = 0;
+    virtual bool HiddenMode() { return m_bHiddenMode; }
+    virtual bool KeyDown(WORD Key, TShiftState Shift) { return false; }
+    virtual bool KeyUp(WORD Key, TShiftState Shift) { return false; }
+    virtual bool KeyPress(WORD Key, TShiftState Shift) { return false; }
     virtual bool Pick(TShiftState Shift) = 0;
     virtual bool RayPick(const Fvector& start, const Fvector& dir, float& dist, Fvector* pt = 0, Fvector* n = 0) = 0;
 
@@ -234,7 +234,7 @@ public:
     virtual void UpdateProperties(BOOL bForced = FALSE) = 0;
     virtual void RefreshProperties() = 0;
 
-    const AnsiString& GetEditFileName() { return m_LastFileName; }
+    const xr_string& GetEditFileName() { return m_LastFileName; }
     CEditableObject* m_pAxisMoveObject;
     Fmatrix m_axis_xform;
 

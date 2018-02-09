@@ -96,6 +96,7 @@ public:
     // Dependent classes
     CResourceManager* Resources;
     CEStats* Statistic;
+    RenderDeviceStatictics stats;
 
     CGameFont* pSystemFont;
 
@@ -131,6 +132,9 @@ public:
     void Initialize(void);
     void ShutDown(void);
     void Reset(IReader* F, BOOL bKeepTextures);
+
+    const RenderDeviceStatictics& GetStats() const override { return stats; }
+    void DumpStatistics(class IGameFont& font, class IPerformanceAlert* alert) override {}
 
     IC CTimer* GetTimerGlobal() { return &TimerGlobal; }
     IC float GetRenderArea() { return m_RenderArea; }
@@ -175,9 +179,9 @@ public:
     Shader_xrLC_LIB ShaderXRLC;
 
 private:
-    virtual CStatsPhysics* _BCL StatPhysics() { return Statistic; }
-    virtual void _BCL AddSeqFrame(pureFrame* f, bool mt) { seqFrame.Add(f, REG_PRIORITY_LOW); }
-    virtual void _BCL RemoveSeqFrame(pureFrame* f) { seqFrame.Remove(f); }
+    virtual CStats* StatPhysics() { return Statistic; }
+    virtual void AddSeqFrame(pureFrame* f, bool mt) { seqFrame.Add(f, REG_PRIORITY_LOW); }
+    virtual void RemoveSeqFrame(pureFrame* f) { seqFrame.Remove(f); }
 };
 
 extern ECORE_API CEditorRenderDevice EDevice;

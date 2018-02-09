@@ -29,6 +29,12 @@
 #define XRCORE_API XR_IMPORT
 #endif
 
+#ifdef XRECORE_EXPORTS
+#define XRECORE_API XR_EXPORT
+#else
+#define XRECORE_API XR_IMPORT
+#endif
+
 #ifdef XRGAMESPY_EXPORTS
 #define XRGAMESPY_API XR_EXPORT
 #else

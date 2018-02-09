@@ -72,7 +72,7 @@ void CCustomPreferences::ApplyValues()
 
 //---------------------------------------------------------------------------
 
-void __stdcall CCustomPreferences::OnClose() { ApplyValues(); }
+void CCustomPreferences::OnClose() { ApplyValues(); }
 //---------------------------------------------------------------------------
 
 void CheckValidate(ShortcutValue*, const xr_shortcut& new_val, bool& result)

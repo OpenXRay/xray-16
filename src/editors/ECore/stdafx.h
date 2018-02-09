@@ -98,7 +98,13 @@ enum TMsgDlgBtn
 typedef TMsgDlgBtn TMsgDlgButtons[mbHelp];
 
 // core
-#include <xrCore/xrCore.h>
+#include "xrCore/xrCore.h"
+#include "xrCore/_stl_extensions.h"
+#include "xrCore/_types.h"
+#include "xrCore/_fbox.h"
+#include "xrCommon/xr_vector.h"
+#include "xrCore/Animation/Bone.hpp"
+#include "xrCore/Animation/Motion.hpp"
 
 #define AnsiString xr_string
 
@@ -139,19 +145,22 @@ DEFINE_VECTOR(AnsiString*, LPAStringVec, LPAStringIt);
 
 #include "xrPhysics/xrPhysics.h"
 
-struct str_pred : public std::binary_function<char*, char*, bool>
+struct str_pred
 {
-    IC bool operator()(LPCSTR x, LPCSTR y) const { return strcmp(x, y) < 0; }
-};
-struct astr_pred : public std::binary_function<const AnsiString&, const AnsiString&, bool>
-{
-    IC bool operator()(const AnsiString& x, const AnsiString& y) const { return x < y; }
+    bool operator()(LPCSTR x, LPCSTR y) const { return strcmp(x, y) < 0; }
 };
 
+struct astr_pred
+{
+    bool operator()(const AnsiString& x, const AnsiString& y) const { return x < y; }
+};
+
+enum TShiftState { ssShift, ssAlt, ssCtrl, ssLeft, ssRight, ssMiddle, ssDouble };
+
 #ifdef _EDITOR
-#include "Editor\device.h"
-#include "xrEngine\properties.h"
-#include "Editor\render.h"
+#include "Editor/device.h"
+#include "xrEngine/properties.h"
+#include "Editor/render.h"
 DEFINE_VECTOR(FVF::L, FLvertexVec, FLvertexIt);
 DEFINE_VECTOR(FVF::TL, FTLvertexVec, FTLvertexIt);
 DEFINE_VECTOR(FVF::LIT, FLITvertexVec, FLITvertexIt);

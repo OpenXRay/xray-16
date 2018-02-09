@@ -54,6 +54,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <PreprocessorDefinitions>EDITOR;_EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)Editor;$(ProjectDir)Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -75,7 +76,6 @@
     <ClInclude Include="Editor\ELog.h" />
     <ClInclude Include="Editor\engine.h" />
     <ClInclude Include="Editor\EStats.h" />
-    <ClInclude Include="Editor\ETextureParams.h" />
     <ClInclude Include="Editor\EThumbnail.h" />
     <ClInclude Include="Editor\ExportObjectOGF.h" />
     <ClInclude Include="Editor\ExportSkeleton.h" />
@@ -115,7 +115,6 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Editor\bone.cpp" />
     <ClCompile Include="Editor\BoneEditor.cpp" />
     <ClCompile Include="Editor\ColorPicker.cpp" />
     <ClCompile Include="Editor\c_dinput.cpp" />
@@ -144,7 +143,6 @@
     <ClCompile Include="Editor\ELog.cpp" />
     <ClCompile Include="Editor\Engine.cpp" />
     <ClCompile Include="Editor\EStats.cpp" />
-    <ClCompile Include="Editor\ETextureParams.cpp" />
     <ClCompile Include="Editor\EThumbnail.cpp" />
     <ClCompile Include="Editor\EThumbnailGroup.cpp" />
     <ClCompile Include="Editor\EThumbnailObject.cpp" />
@@ -184,6 +182,11 @@
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\xrCore\xrCore.vcxproj">
+      <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

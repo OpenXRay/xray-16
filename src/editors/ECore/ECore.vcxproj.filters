@@ -64,9 +64,6 @@
     <ClInclude Include="Editor\EStats.h">
       <Filter>editor</Filter>
     </ClInclude>
-    <ClInclude Include="Editor\ETextureParams.h">
-      <Filter>editor</Filter>
-    </ClInclude>
     <ClInclude Include="Editor\EThumbnail.h">
       <Filter>editor</Filter>
     </ClInclude>
@@ -178,9 +175,6 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Editor\bone.cpp">
-      <Filter>editor</Filter>
-    </ClCompile>
     <ClCompile Include="Editor\BoneEditor.cpp">
       <Filter>editor</Filter>
     </ClCompile>
@@ -263,9 +257,6 @@
       <Filter>editor</Filter>
     </ClCompile>
     <ClCompile Include="Editor\EStats.cpp">
-      <Filter>editor</Filter>
-    </ClCompile>
-    <ClCompile Include="Editor\ETextureParams.cpp">
       <Filter>editor</Filter>
     </ClCompile>
     <ClCompile Include="Editor\EThumbnail.cpp">
