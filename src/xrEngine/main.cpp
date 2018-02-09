@@ -18,13 +18,13 @@
 #include "Text_Console.h"
 #include "xrSASH.h"
 #include "xr_ioc_cmd.h"
+#include "splash.h"
 
 #ifdef MASTER_GOLD
 #define NO_MULTI_INSTANCES
 #endif
 
 // global variables
-ENGINE_API CApplication* pApp = nullptr;
 ENGINE_API CInifile* pGameIni = nullptr;
 ENGINE_API bool g_bBenchmark = false;
 string512 g_sBenchmarkName;
@@ -34,8 +34,6 @@ ENGINE_API string_path g_sLaunchWorkingFolder;
 
 namespace
 {
-HWND logoWindow = nullptr;
-
 void RunBenchmark(pcstr name);
 }
 
@@ -166,6 +164,7 @@ ENGINE_API void Startup()
 {
     execUserScript();
     InitSound();
+
     // ...command line for auto start
     pcstr startArgs = strstr(Core.Params, "-start ");
     if (startArgs)
@@ -173,6 +172,7 @@ ENGINE_API void Startup()
     pcstr loadArgs = strstr(Core.Params, "-load ");
     if (loadArgs)
         Console->Execute(loadArgs + 1);
+
     // Initialize APP
     Device.Create();
     LALib.OnCreate();
@@ -183,12 +183,8 @@ ENGINE_API void Startup()
     g_SpatialSpacePhysic = new ISpatial_DB("Spatial phys");
 
     // Show main window and destroy splash
+    splash::hide();
     ShowWindow(Device.m_hWnd, SW_SHOWNORMAL);
-    if (logoWindow != nullptr)
-    {
-        DestroyWindow(logoWindow);
-        logoWindow = nullptr;
-    }
 
     // Main cycle
     Memory.mem_usage();
@@ -212,39 +208,8 @@ ENGINE_API void Startup()
     destroySound();
 }
 
-static INT_PTR CALLBACK LogoWndProc(HWND hw, UINT msg, WPARAM wp, LPARAM lp)
-{
-    switch (msg)
-    {
-    case WM_DESTROY: break;
-    case WM_CLOSE: DestroyWindow(hw); break;
-    case WM_COMMAND:
-        if (LOWORD(wp) == IDCANCEL)
-            DestroyWindow(hw);
-        break;
-    default: return false;
-    }
-    return true;
-}
-
 ENGINE_API int RunApplication(pcstr commandLine)
 {
-    if (strstr(commandLine, "-nosplash") == 0)
-    {
-        logoWindow = CreateDialog(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_STARTUP), nullptr, LogoWndProc);
-        const HWND logoPicture = GetDlgItem(logoWindow, IDC_STATIC_LOGO);
-        RECT logoRect;
-        GetWindowRect(logoPicture, &logoRect);
-#ifndef DEBUG
-        HWND prevWindow = (strstr(commandLine, "-splashnotop") == NULL) ? HWND_TOPMOST : HWND_NOTOPMOST;
-#else
-        const HWND prevWindow = HWND_NOTOPMOST;
-#endif
-        SetWindowPos(logoWindow, prevWindow, 0, 0, logoRect.right - logoRect.left, logoRect.bottom - logoRect.top,
-            SWP_NOMOVE | SWP_SHOWWINDOW);
-        UpdateWindow(logoWindow);
-    }
-
     if (!IsDebuggerPresent())
     {
         u32 heapFragmentation = 2;

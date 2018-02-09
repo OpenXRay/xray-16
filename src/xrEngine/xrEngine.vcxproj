@@ -268,6 +268,7 @@
     <ClInclude Include="pure_relcase.h" />
     <ClInclude Include="Rain.h" />
     <ClInclude Include="Render.h" />
+    <ClInclude Include="splash.h" />
     <ClInclude Include="StatGraph.h" />
     <ClInclude Include="Stats.h" />
     <ClInclude Include="stdafx.h" />
@@ -375,6 +376,7 @@
     <ClCompile Include="pure_relcase.cpp" />
     <ClCompile Include="Rain.cpp" />
     <ClCompile Include="Render.cpp" />
+    <ClCompile Include="splash.cpp" />
     <ClCompile Include="StatGraph.cpp" />
     <ClCompile Include="Stats.cpp" />
     <ClCompile Include="stdafx.cpp">

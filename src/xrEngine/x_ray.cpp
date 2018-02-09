@@ -20,6 +20,7 @@
 
 //---------------------------------------------------------------------
 
+ENGINE_API CApplication* pApp = nullptr;
 extern CRenderDevice Device;
 
 #ifdef MASTER_GOLD

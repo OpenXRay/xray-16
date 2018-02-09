@@ -556,6 +556,9 @@
       <Filter>General\Profiler</Filter>
     </ClInclude>
     <ClInclude Include="main.h" />
+    <ClInclude Include="splash.h">
+      <Filter>General</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="defines.cpp">
@@ -872,6 +875,9 @@
     </ClCompile>
     <ClCompile Include="profiler.cpp">
       <Filter>General\Profiler</Filter>
+    </ClCompile>
+    <ClCompile Include="splash.cpp">
+      <Filter>General</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

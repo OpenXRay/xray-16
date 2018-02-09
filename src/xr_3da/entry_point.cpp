@@ -3,9 +3,20 @@
 #include "StickyKeyFilter.hpp"
 
 #include "xrEngine/main.h"
+#include "xrEngine/splash.h"
 
 int entry_point(pcstr commandLine)
 {
+    if (strstr(commandLine, "-nosplash") == nullptr)
+    {
+#ifndef DEBUG
+        const bool topmost = strstr(commandLine, "-splashnotop") == nullptr ? true : false;
+#else
+        constexpr bool topmost = false;
+#endif
+        splash::show(topmost);
+    }
+
     if (strstr(commandLine, "-dedicated"))
         GEnv.isDedicatedServer = true;
 
