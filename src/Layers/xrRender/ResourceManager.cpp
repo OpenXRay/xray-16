@@ -10,6 +10,8 @@
 #include <d3dx9.h>
 #pragma warning(pop)
 
+#include <tbb/parallel_for_each.h>
+
 #include "ResourceManager.h"
 #include "tss.h"
 #include "blenders/blender.h"
@@ -341,59 +343,20 @@ void CResourceManager::Delete(const Shader* S)
     Msg("! ERROR: Failed to find complete shader");
 }
 
-#ifndef USE_OGL
-xr_vector<CTexture*> textures_to_load;
-
-void LoadTextures(const size_t thread_num, const size_t textures_per_worker)
-{
-#ifdef DEBUG
-    Msg("Thread %d, amount of textures = %d", thread_num, textures_per_worker);
-
-    CTimer timer;
-    timer.Start();
-#endif
-
-    const auto upperbound = thread_num * textures_per_worker;
-    const auto lowerbound = upperbound - textures_per_worker;
-    for (auto i = lowerbound; i < upperbound; i++)
-    {
-        if (i < textures_to_load.size())
-            textures_to_load[i]->Load();
-        else
-            break;
-    }
-
-#ifdef DEBUG
-    Msg("Thread %d, texture loading time = %d", thread_num, timer.GetElapsed_ms());
-#endif
-}
-#endif
-
 void CResourceManager::DeferredUpload()
 {
     if (!RDEVICE.b_is_Ready)
         return;
 
 #ifndef MASTER_GOLD
-    Msg("%s, amount of textures = %d", __FUNCTION__ , m_textures.size());
+    Msg("%s, amount of textures = %d", __FUNCTION__, m_textures.size());
 
     CTimer timer;
     timer.Start();
 #endif
 
 #ifndef USE_OGL
-    const auto nWorkers = ttapi.threads.size();
-    const auto textures_per_worker = m_textures.size() / nWorkers;
-
-    for (auto& t : m_textures)
-        textures_to_load.push_back(t.second);
-
-    for (auto i = 1; i <= nWorkers; ++i)
-        ttapi.threads[i-1]->addJob([=] { LoadTextures(i, textures_per_worker); });
-
-    ttapi.wait();
-
-    textures_to_load.clear();
+    tbb::parallel_for_each(m_textures, [&](auto m_tex) { m_tex.second->Load(); });
 #else
     for (auto& texture : m_textures)
         texture.second->Load();
