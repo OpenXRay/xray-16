@@ -206,8 +206,6 @@ void dxApplicationRender::load_draw_internal(CApplication& owner)
     float fTargetWidth = 600.0f * k.x * (b_ws ? 0.8f : 1.0f);
     draw_multiline_text(owner.pFontSystem, fTargetWidth, owner.ls_tip);
 
-    owner.pFontSystem->OnRender();
-
     // draw level-specific screenshot
     if (hLevelLogo)
     {
@@ -233,10 +231,11 @@ void dxApplicationRender::load_draw_internal(CApplication& owner)
         logo_tex_coords.rb.set(1.0f, 0.77926f);
 
         draw_face(hLevelLogo, r, logo_tex_coords, Fvector2().set(1, 1));
-        owner.pFontSystem->SetColor(color_rgba(180, 180, 180, 200));
+        if (ps_rs_loading_stages)
+            owner.pFontSystem->SetColor(color_rgba(180, 180, 180, 200));
     }
-
-    owner.pFontSystem->OutI(0.f, 0.385f, owner.ls_title); // XXX: 0.385f <- hardcoded coordinates
+    if (ps_rs_loading_stages)
+        owner.pFontSystem->OutI(0.f, 0.385f, owner.ls_title); // XXX: 0.385f <- hardcoded coordinates
     owner.pFontSystem->OnRender();
 }
 
