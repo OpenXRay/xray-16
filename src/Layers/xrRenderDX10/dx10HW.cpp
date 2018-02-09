@@ -705,8 +705,7 @@ BOOL CHW::support(D3DFORMAT fmt, DWORD type, DWORD usage)
 
 void CHW::updateWindowProps(HWND m_hWnd)
 {
-    //  BOOL    bWindowed               = strstr(Core.Params,"-dedicated") ? TRUE : !psDeviceFlags.is   (rsFullscreen);
-    BOOL bWindowed = !psDeviceFlags.is(rsFullscreen);
+    const bool bWindowed = !psDeviceFlags.is(rsFullscreen);
 
     u32 dwWindowStyle = 0;
     // Set window properties depending on what mode were in.
@@ -714,9 +713,9 @@ void CHW::updateWindowProps(HWND m_hWnd)
     {
         if (m_move_window)
         {
-            bool bBordersMode = strstr(Core.Params, "-draw_borders");
+            const bool drawBorders = strstr(Core.Params, "-draw_borders");
             dwWindowStyle = WS_VISIBLE;
-            if (bBordersMode)
+            if (drawBorders)
                 dwWindowStyle |= WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX;
             SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle);
             // When moving from fullscreen to windowed mode, it is important to
@@ -730,38 +729,40 @@ void CHW::updateWindowProps(HWND m_hWnd)
 
             RECT m_rcWindowBounds;
             float fYOffset = 0.f;
-            bool bCenter = false;
+            bool centerScreen = false;
             if (strstr(Core.Params, "-center_screen"))
-                bCenter = true;
+                centerScreen = true;
 
-            if (bCenter)
+            if (centerScreen)
             {
                 RECT DesktopRect;
-
                 GetClientRect(GetDesktopWindow(), &DesktopRect);
 
-                SetRect(&m_rcWindowBounds, (DesktopRect.right - m_ChainDesc.BufferDesc.Width) / 2,
+                SetRect(&m_rcWindowBounds,
+                    (DesktopRect.right - m_ChainDesc.BufferDesc.Width) / 2,
                     (DesktopRect.bottom - m_ChainDesc.BufferDesc.Height) / 2,
                     (DesktopRect.right + m_ChainDesc.BufferDesc.Width) / 2,
                     (DesktopRect.bottom + m_ChainDesc.BufferDesc.Height) / 2);
             }
             else
             {
-                if (bBordersMode)
+                if (drawBorders)
                     fYOffset = GetSystemMetrics(SM_CYCAPTION); // size of the window title bar
                 SetRect(&m_rcWindowBounds, 0, 0, m_ChainDesc.BufferDesc.Width, m_ChainDesc.BufferDesc.Height);
             };
 
             AdjustWindowRect(&m_rcWindowBounds, dwWindowStyle, FALSE);
 
-            SetWindowPos(m_hWnd, HWND_NOTOPMOST, m_rcWindowBounds.left, m_rcWindowBounds.top + fYOffset,
-                (m_rcWindowBounds.right - m_rcWindowBounds.left), (m_rcWindowBounds.bottom - m_rcWindowBounds.top),
-                SWP_SHOWWINDOW | SWP_NOCOPYBITS | SWP_DRAWFRAME);
+            SetWindowPos(m_hWnd, HWND_NOTOPMOST,
+                         m_rcWindowBounds.left, m_rcWindowBounds.top + fYOffset,
+                         m_rcWindowBounds.right - m_rcWindowBounds.left,
+                         m_rcWindowBounds.bottom - m_rcWindowBounds.top,
+                         SWP_HIDEWINDOW | SWP_NOCOPYBITS | SWP_DRAWFRAME);
         }
     }
     else
     {
-        SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle = (WS_POPUP | WS_VISIBLE));
+        SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle = WS_POPUP | WS_VISIBLE);
     }
 
     ShowCursor(FALSE);

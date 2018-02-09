@@ -529,13 +529,8 @@ void CHW::updateWindowProps(HWND m_hWnd)
             RECT m_rcWindowBounds;
             float fYOffset = 0.f;
             bool bCenter = false;
-            if (strstr(Core.Params, "-center_screen"))
+            if (GEnv.isDedicatedServer || strstr(Core.Params, "-center_screen"))
                 bCenter = true;
-
-#ifndef _EDITOR
-            if (GEnv.isDedicatedServer)
-                bCenter = true;
-#endif
 
             if (bCenter)
             {
@@ -543,8 +538,10 @@ void CHW::updateWindowProps(HWND m_hWnd)
 
                 GetClientRect(GetDesktopWindow(), &DesktopRect);
 
-                SetRect(&m_rcWindowBounds, (DesktopRect.right - DevPP.BackBufferWidth) / 2,
-                    (DesktopRect.bottom - DevPP.BackBufferHeight) / 2, (DesktopRect.right + DevPP.BackBufferWidth) / 2,
+                SetRect(&m_rcWindowBounds,
+                    (DesktopRect.right - DevPP.BackBufferWidth) / 2,
+                    (DesktopRect.bottom - DevPP.BackBufferHeight) / 2,
+                    (DesktopRect.right + DevPP.BackBufferWidth) / 2,
                     (DesktopRect.bottom + DevPP.BackBufferHeight) / 2);
             }
             else
@@ -556,9 +553,11 @@ void CHW::updateWindowProps(HWND m_hWnd)
 
             AdjustWindowRect(&m_rcWindowBounds, dwWindowStyle, FALSE);
 
-            SetWindowPos(m_hWnd, HWND_NOTOPMOST, m_rcWindowBounds.left, m_rcWindowBounds.top + fYOffset,
-                (m_rcWindowBounds.right - m_rcWindowBounds.left), (m_rcWindowBounds.bottom - m_rcWindowBounds.top),
-                SWP_SHOWWINDOW | SWP_NOCOPYBITS | SWP_DRAWFRAME);
+            SetWindowPos(m_hWnd, HWND_NOTOPMOST,
+                m_rcWindowBounds.left, m_rcWindowBounds.top + fYOffset,
+                m_rcWindowBounds.right - m_rcWindowBounds.left,
+                m_rcWindowBounds.bottom - m_rcWindowBounds.top,
+                SWP_HIDEWINDOW | SWP_NOCOPYBITS | SWP_DRAWFRAME);
         }
     }
     else

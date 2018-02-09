@@ -35,7 +35,7 @@ int entry_point(pcstr commandLine)
     }
     Core.Initialize("OpenXRay", nullptr, true, *fsgame ? fsgame : nullptr);
 
-    return RunApplication(commandLine);
+    return RunApplication();
 }
 
 int StackoverflowFilter(const int exceptionCode)

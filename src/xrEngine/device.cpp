@@ -321,6 +321,7 @@ void CRenderDevice::Run()
     }
     // Start all threads
     mt_bMustExit = FALSE;
+    ShowWindow(m_hWnd, SW_SHOWNORMAL);
     thread_spawn(SecondaryThreadProc, "X-RAY Secondary thread", 0, this);
     // Message cycle
     seqAppStart.Process(rp_AppStart);
@@ -481,10 +482,17 @@ void CRenderDevice::RemoveSeqFrame(pureFrame* f)
 CRenderDevice* get_device() { return &Device; }
 u32 script_time_global() { return Device.dwTimeGlobal; }
 u32 script_time_global_async() { return Device.TimerAsync_MMT(); }
-SCRIPT_EXPORT(Device, (), {
+
+SCRIPT_EXPORT(Device, (),
+{
     using namespace luabind;
-    module(luaState)[def("time_global", &script_time_global), def("time_global_async", &script_time_global_async),
-        def("device", &get_device), def("is_enough_address_space_available", &is_enough_address_space_available)];
+    module(luaState)
+    [
+        def("time_global", &script_time_global),
+        def("time_global_async", &script_time_global_async),
+        def("device", &get_device),
+        def("is_enough_address_space_available", &is_enough_address_space_available)
+    ];
 });
 
 CLoadScreenRenderer::CLoadScreenRenderer() : b_registered(false), b_need_user_input(false) {}

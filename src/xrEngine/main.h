@@ -16,4 +16,4 @@ ENGINE_API void InitSound();
 ENGINE_API void destroySound();
 
 ENGINE_API void Startup();
-ENGINE_API int RunApplication(pcstr commandLine);
+ENGINE_API int RunApplication();

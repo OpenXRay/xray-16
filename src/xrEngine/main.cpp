@@ -182,11 +182,8 @@ ENGINE_API void Startup()
     g_SpatialSpace = new ISpatial_DB("Spatial obj");
     g_SpatialSpacePhysic = new ISpatial_DB("Spatial phys");
 
-    // Show main window and destroy splash
-    splash::hide();
-    ShowWindow(Device.m_hWnd, SW_SHOWNORMAL);
-
     // Main cycle
+    splash::hide();
     Memory.mem_usage();
     Device.Run();
     // Destroy APP
@@ -208,8 +205,10 @@ ENGINE_API void Startup()
     destroySound();
 }
 
-ENGINE_API int RunApplication(pcstr commandLine)
+ENGINE_API int RunApplication()
 {
+    R_ASSERT2(Core.Params, "Core must be initialized");
+
     if (!IsDebuggerPresent())
     {
         u32 heapFragmentation = 2;
@@ -244,7 +243,7 @@ ENGINE_API int RunApplication(pcstr commandLine)
     Engine.External.CreateRendererList();
 
     pcstr benchName = "-batch_benchmark ";
-    if (strstr(commandLine, benchName))
+    if (strstr(Core.Params, benchName))
     {
         u32 sz = xr_strlen(benchName);
         string64 benchmarkName;
@@ -254,7 +253,7 @@ ENGINE_API int RunApplication(pcstr commandLine)
     }
 
     pcstr sashName = "-openautomate ";
-    if (strstr(commandLine, sashName))
+    if (strstr(Core.Params, sashName))
     {
         u32 sz = xr_strlen(sashName);
         string512 sashArg;
