@@ -5,8 +5,6 @@
 #include "Layers/xrRender/dxUIRender.h"
 #include "Layers/xrRender/dxDebugRender.h"
 
-#pragma comment(lib, "xrEngine.lib")
-
 void SetupEnvRGL()
 {
     GEnv.Render = &RImplementation;

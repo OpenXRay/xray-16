@@ -15,18 +15,6 @@ ICF float calcLOD(float ssa /*fDistSq*/, float /*R*/)
     return _sqrt(clampr((ssa - r_ssaGLOD_end) / (r_ssaGLOD_start - r_ssaGLOD_end), 0.f, 1.f));
 }
 
-// ALPHA
-void __fastcall sorted_L1(mapSorted_T::value_type &N)
-{
-    dxRender_Visual* V = N.second.pVisual;
-    VERIFY(V && V->shader._get());
-    RCache.set_Element(N.second.se);
-    RCache.set_xform_world(N.second.Matrix);
-    RImplementation.apply_object(N.second.pObject);
-    RImplementation.apply_lmaterial();
-    V->Render(calcLOD(N.first, V->vis.sphere.R));
-}
-
 template <class T> IC bool cmp_second_ssa(const T &lhs, const T &rhs) { return (lhs->second.ssa > rhs->second.ssa); }
 template <class T> IC bool cmp_ssa       (const T &lhs, const T &rhs) { return (lhs.ssa         > rhs.ssa        ); }
 
@@ -107,7 +95,7 @@ template <class T> void sort_tlist(xr_vector<T::template value_type *>& lst, xr_
 
 void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 {
-    // PIX_EVENT(r_dsgraph_render_graph);
+    PIX_EVENT(r_dsgraph_render_graph);
     BasicStats.Primitives.Begin();
 
     // **************************************************** NORMAL
@@ -342,140 +330,133 @@ void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
     BasicStats.Primitives.End();
 }
 
+//////////////////////////////////////////////////////////////////////////
+// Helper classes and functions
+
+/*
+Предназначен для установки режима отрисовки HUD и возврата оригинального после отрисовки.
+*/
+class hud_transform_helper
+{
+    Fmatrix Pold;
+    Fmatrix FTold;
+
+public:
+    hud_transform_helper()
+    {
+        extern ENGINE_API float psHUD_FOV;
+
+        // Change projection
+        Pold  = Device.mProject;
+        FTold = Device.mFullTransform;
+        Device.mProject.build_projection(deg2rad(psHUD_FOV * Device.fFOV /* *Device.fASPECT*/), Device.fASPECT,
+            VIEWPORT_NEAR, g_pGamePersistent->Environment().CurrentEnv->far_plane);
+
+        Device.mFullTransform.mul(Device.mProject, Device.mView);
+        RCache.set_xform_project(Device.mProject);
+
+        RImplementation.rmNear();
+    }
+
+    ~hud_transform_helper()
+    {
+        RImplementation.rmNormal();
+
+        // Restore projection
+        Device.mProject = Pold;
+        Device.mFullTransform = FTold;
+        RCache.set_xform_project(Device.mProject);
+    }
+};
+
+template<class T>
+IC void render_item(T &item)
+{
+    dxRender_Visual* V = item.second.pVisual;
+    VERIFY(V && V->shader._get());
+    RCache.set_Element(item.second.se);
+    RCache.set_xform_world(item.second.Matrix);
+    RImplementation.apply_object(item.second.pObject);
+    RImplementation.apply_lmaterial();
+    V->Render(calcLOD(item.first, V->vis.sphere.R));
+}
 
 template <class T> IC bool cmp_first_l(const T &lhs, const T &rhs) { return (lhs.first < rhs.first); }
 template <class T> IC bool cmp_first_h(const T &lhs, const T &rhs) { return (lhs.first > rhs.first); }
+
+template<class T>
+IC void sort_front_to_back_render_and_clean(T &vec)
+{
+    std::sort(vec.begin(), vec.end(), cmp_first_l<T::value_type>); // front-to-back
+    for (auto &i : vec)
+        render_item(i);
+    vec.clear();
+}
+
+template<class T>
+IC void sort_back_to_front_render_and_clean(T &vec)
+{
+    std::sort(vec.begin(), vec.end(), cmp_first_h<T::value_type>); // back-to-front
+    for (auto &i : vec)
+        render_item(i);
+    vec.clear();
+}
+
 //////////////////////////////////////////////////////////////////////////
 // HUD render
 void D3DXRenderBase::r_dsgraph_render_hud()
 {
-    extern ENGINE_API float psHUD_FOV;
+    PIX_EVENT(r_dsgraph_render_hud);
 
-    // PIX_EVENT(r_dsgraph_render_hud);
+    hud_transform_helper helper;
 
-    // Change projection
-    Fmatrix Pold = Device.mProject;
-    Fmatrix FTold = Device.mFullTransform;
-    Device.mProject.build_projection(deg2rad(psHUD_FOV * Device.fFOV /* *Device.fASPECT*/), Device.fASPECT,
-        VIEWPORT_NEAR, g_pGamePersistent->Environment().CurrentEnv->far_plane);
-
-    Device.mFullTransform.mul(Device.mProject, Device.mView);
-    RCache.set_xform_project(Device.mProject);
-
-    // Rendering
-    rmNear();
-    std::sort(mapHUD.begin(), mapHUD.end(), cmp_first_l<R_dsgraph::mapHUD_T::value_type>); // front-to-back
-    for (auto &i : mapHUD)
-        sorted_L1(i);
-    mapHUD.clear();
+    sort_front_to_back_render_and_clean(mapHUD);
 
 #if RENDER == R_R1
     if (g_hud && g_hud->RenderActiveItemUIQuery())
         r_dsgraph_render_hud_ui(); // hud ui
 #endif
-    /*
-    if(g_hud && g_hud->RenderActiveItemUIQuery())
-    {
-#if	RENDER!=R_R1
-        // Targets, use accumulator for temporary storage
-        const ref_rt	rt_null;
-        //	Reset all rt.
-        //RCache.set_RT(0,	0);
-        RCache.set_RT(0,	1);
-        RCache.set_RT(0,	2);
-        //if (RImplementation.o.albedo_wo)	RCache.set_RT(RImplementation.Target->rt_Accumulator->pRT,	0);
-        //else								RCache.set_RT(RImplementation.Target->rt_Color->pRT,	0);
-        if (RImplementation.o.albedo_wo)	RImplementation.Target->u_setrt
-(RImplementation.Target->rt_Accumulator,	rt_null,	rt_null,	HW.pBaseZB);
-        else								RImplementation.Target->u_setrt		(RImplementation.Target->rt_Color,
-rt_null,	rt_null,	HW.pBaseZB);
-        //	View port is reset in DX9 when you change rt
-        rmNear						();
-#endif
-        g_hud->RenderActiveItemUI	();
-
-#if	RENDER!=R_R1
-        //RCache.set_RT(0,	0);
-        // Targets, use accumulator for temporary storage
-        if (RImplementation.o.albedo_wo)	RImplementation.Target->u_setrt		(RImplementation.Target->rt_Position,
-RImplementation.Target->rt_Normal,	RImplementation.Target->rt_Accumulator,	HW.pBaseZB);
-        else								RImplementation.Target->u_setrt		(RImplementation.Target->rt_Position,
-RImplementation.Target->rt_Normal,	RImplementation.Target->rt_Color,		HW.pBaseZB);
-#endif
-    }
-    */
-
-    rmNormal();
-
-    // Restore projection
-    Device.mProject = Pold;
-    Device.mFullTransform = FTold;
-    RCache.set_xform_project(Device.mProject);
 }
 
 void D3DXRenderBase::r_dsgraph_render_hud_ui()
 {
     VERIFY(g_hud && g_hud->RenderActiveItemUIQuery());
 
-    extern ENGINE_API float psHUD_FOV;
+    PIX_EVENT(r_dsgraph_render_hud_ui);
 
-    // Change projection
-    Fmatrix Pold = Device.mProject;
-    Fmatrix FTold = Device.mFullTransform;
-    Device.mProject.build_projection(deg2rad(psHUD_FOV * Device.fFOV /* *Device.fASPECT*/), Device.fASPECT,
-        VIEWPORT_NEAR, g_pGamePersistent->Environment().CurrentEnv->far_plane);
-
-    Device.mFullTransform.mul(Device.mProject, Device.mView);
-    RCache.set_xform_project(Device.mProject);
+    hud_transform_helper helper;
 
 #if RENDER != R_R1
     // Targets, use accumulator for temporary storage
     const ref_rt rt_null;
     RCache.set_RT(0, 1);
     RCache.set_RT(0, 2);
+    auto zb = HW.pBaseZB;
+
 #if (RENDER == R_R3) || (RENDER == R_R4) || (RENDER==R_GL)
-    if (!RImplementation.o.dx10_msaa)
-    {
-        if (RImplementation.o.albedo_wo)
-            RImplementation.Target->u_setrt(RImplementation.Target->rt_Accumulator, rt_null, rt_null, HW.pBaseZB);
-        else
-            RImplementation.Target->u_setrt(RImplementation.Target->rt_Color, rt_null, rt_null, HW.pBaseZB);
-    }
-    else
-    {
-        if (RImplementation.o.albedo_wo)
-            RImplementation.Target->u_setrt(
-                RImplementation.Target->rt_Accumulator, rt_null, rt_null, RImplementation.Target->rt_MSAADepth->pZRT);
-        else
-            RImplementation.Target->u_setrt(
-                RImplementation.Target->rt_Color, rt_null, rt_null, RImplementation.Target->rt_MSAADepth->pZRT);
-    }
-#else // (RENDER==R_R3) || (RENDER==R_R4)
-    if (RImplementation.o.albedo_wo)
-        RImplementation.Target->u_setrt(RImplementation.Target->rt_Accumulator, rt_null, rt_null, HW.pBaseZB);
-    else
-        RImplementation.Target->u_setrt(RImplementation.Target->rt_Color, rt_null, rt_null, HW.pBaseZB);
-#endif // (RENDER==R_R3) || (RENDER==R_R4)
+    if (RImplementation.o.dx10_msaa)
+        zb = RImplementation.Target->rt_MSAADepth->pZRT;
+#endif
+
+    RImplementation.Target->u_setrt(
+        RImplementation.o.albedo_wo ? RImplementation.Target->rt_Accumulator : RImplementation.Target->rt_Color,
+        rt_null, rt_null, zb);
 #endif // RENDER!=R_R1
 
-    rmNear();
     g_hud->RenderActiveItemUI();
-    rmNormal();
-
-    // Restore projection
-    Device.mProject = Pold;
-    Device.mFullTransform = FTold;
-    RCache.set_xform_project(Device.mProject);
 }
 
 //////////////////////////////////////////////////////////////////////////
 // strict-sorted render
 void D3DXRenderBase::r_dsgraph_render_sorted()
 {
-    std::sort(mapSorted.begin(), mapSorted.end(), cmp_first_h<R_dsgraph::mapSorted_T::value_type>); // back-to-front
-    for (auto &i : mapSorted)
-        sorted_L1(i);
-    mapSorted.clear();
+    PIX_EVENT(r_dsgraph_render_sorted);
+
+    sort_back_to_front_render_and_clean(mapSorted);
+
+    hud_transform_helper helper;
+
+    sort_back_to_front_render_and_clean(mapHUDSorted);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -483,37 +464,13 @@ void D3DXRenderBase::r_dsgraph_render_sorted()
 void D3DXRenderBase::r_dsgraph_render_emissive()
 {
 #if RENDER != R_R1
-    std::sort(mapEmissive.begin(), mapEmissive.end(), cmp_first_l<R_dsgraph::mapSorted_T::value_type>); // front-to-back
-    for (auto &i : mapEmissive)
-        sorted_L1(i);
-    mapEmissive.clear();
+    PIX_EVENT(r_dsgraph_render_emissive);
 
-    //	HACK: Calculate this only once
+    sort_front_to_back_render_and_clean(mapEmissive);
 
-    extern ENGINE_API float psHUD_FOV;
+    hud_transform_helper helper;
 
-    // Change projection
-    Fmatrix Pold = Device.mProject;
-    Fmatrix FTold = Device.mFullTransform;
-    Device.mProject.build_projection(deg2rad(psHUD_FOV * Device.fFOV /* *Device.fASPECT*/), Device.fASPECT,
-        VIEWPORT_NEAR, g_pGamePersistent->Environment().CurrentEnv->far_plane);
-
-    Device.mFullTransform.mul(Device.mProject, Device.mView);
-    RCache.set_xform_project(Device.mProject);
-
-    // Rendering
-    rmNear();
-    std::sort(mapHUDEmissive.begin(), mapHUDEmissive.end(), cmp_first_l<R_dsgraph::mapSorted_T::value_type>); // front-to-back
-    for (auto &i : mapHUDEmissive)
-        sorted_L1(i);
-    mapHUDEmissive.clear();
-
-    rmNormal();
-
-    // Restore projection
-    Device.mProject = Pold;
-    Device.mFullTransform = FTold;
-    RCache.set_xform_project(Device.mProject);
+    sort_front_to_back_render_and_clean(mapHUDEmissive);
 #endif
 }
 
@@ -522,10 +479,9 @@ void D3DXRenderBase::r_dsgraph_render_emissive()
 void D3DXRenderBase::r_dsgraph_render_wmarks()
 {
 #if RENDER != R_R1
-    std::sort(mapWmark.begin(), mapWmark.end(), cmp_first_l<R_dsgraph::mapSorted_T::value_type>); // front-to-back
-    for (auto &i : mapWmark)
-        sorted_L1(i);
-    mapWmark.clear();
+    PIX_EVENT(r_dsgraph_render_wmarks);
+
+    sort_front_to_back_render_and_clean(mapWmark);
 #endif
 }
 
@@ -533,10 +489,9 @@ void D3DXRenderBase::r_dsgraph_render_wmarks()
 // strict-sorted render
 void D3DXRenderBase::r_dsgraph_render_distort()
 {
-    std::sort(mapDistort.begin(), mapDistort.end(), cmp_first_h<R_dsgraph::mapSorted_T::value_type>); // back-to-front
-    for (auto &i : mapDistort)
-        sorted_L1(i);
-    mapDistort.clear();
+    PIX_EVENT(r_dsgraph_render_distort);
+
+    sort_back_to_front_render_and_clean(mapDistort);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -554,6 +509,7 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
     Fvector& _cop, BOOL _dynamic, BOOL _precise_portals)
 {
     VERIFY(_sector);
+    PIX_EVENT(r_dsgraph_render_subspace);
     RImplementation.marker++; // !!! critical here
 
     // Save and build new frustum, disable HOM
@@ -639,6 +595,8 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
 
 void D3DXRenderBase::r_dsgraph_render_R1_box(IRender_Sector* S, Fbox& BB, int sh)
 {
+    PIX_EVENT(r_dsgraph_render_R1_box);
+
     lstVisuals.clear();
     lstVisuals.push_back(((CSector*)S)->root());
 
