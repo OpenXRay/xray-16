@@ -107,7 +107,7 @@ template <class T> void sort_tlist(xr_vector<T::template value_type *>& lst, xr_
 
 void D3DXRenderBase::r_dsgraph_render_graph(u32 _priority)
 {
-    // PIX_EVENT(r_dsgraph_render_graph);
+    PIX_EVENT(r_dsgraph_render_graph);
     BasicStats.Primitives.Begin();
 
     // **************************************************** NORMAL
@@ -351,7 +351,7 @@ void D3DXRenderBase::r_dsgraph_render_hud()
 {
     extern ENGINE_API float psHUD_FOV;
 
-    // PIX_EVENT(r_dsgraph_render_hud);
+    PIX_EVENT(r_dsgraph_render_hud);
 
     // Change projection
     Fmatrix Pold = Device.mProject;
@@ -419,6 +419,8 @@ void D3DXRenderBase::r_dsgraph_render_hud_ui()
 
     extern ENGINE_API float psHUD_FOV;
 
+    PIX_EVENT(r_dsgraph_render_hud_ui);
+
     // Change projection
     Fmatrix Pold = Device.mProject;
     Fmatrix FTold = Device.mFullTransform;
@@ -472,6 +474,7 @@ void D3DXRenderBase::r_dsgraph_render_hud_ui()
 // strict-sorted render
 void D3DXRenderBase::r_dsgraph_render_sorted()
 {
+    PIX_EVENT(r_dsgraph_render_sorted);
     std::sort(mapSorted.begin(), mapSorted.end(), cmp_first_h<R_dsgraph::mapSorted_T::value_type>); // back-to-front
     for (auto &i : mapSorted)
         sorted_L1(i);
@@ -483,6 +486,7 @@ void D3DXRenderBase::r_dsgraph_render_sorted()
 void D3DXRenderBase::r_dsgraph_render_emissive()
 {
 #if RENDER != R_R1
+    PIX_EVENT(r_dsgraph_render_emissive);
     std::sort(mapEmissive.begin(), mapEmissive.end(), cmp_first_l<R_dsgraph::mapSorted_T::value_type>); // front-to-back
     for (auto &i : mapEmissive)
         sorted_L1(i);
@@ -522,6 +526,7 @@ void D3DXRenderBase::r_dsgraph_render_emissive()
 void D3DXRenderBase::r_dsgraph_render_wmarks()
 {
 #if RENDER != R_R1
+    PIX_EVENT(r_dsgraph_render_wmarks);
     std::sort(mapWmark.begin(), mapWmark.end(), cmp_first_l<R_dsgraph::mapSorted_T::value_type>); // front-to-back
     for (auto &i : mapWmark)
         sorted_L1(i);
@@ -533,6 +538,7 @@ void D3DXRenderBase::r_dsgraph_render_wmarks()
 // strict-sorted render
 void D3DXRenderBase::r_dsgraph_render_distort()
 {
+    PIX_EVENT(r_dsgraph_render_distort);
     std::sort(mapDistort.begin(), mapDistort.end(), cmp_first_h<R_dsgraph::mapSorted_T::value_type>); // back-to-front
     for (auto &i : mapDistort)
         sorted_L1(i);
@@ -554,6 +560,7 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
     Fvector& _cop, BOOL _dynamic, BOOL _precise_portals)
 {
     VERIFY(_sector);
+    PIX_EVENT(r_dsgraph_render_subspace);
     RImplementation.marker++; // !!! critical here
 
     // Save and build new frustum, disable HOM
@@ -639,6 +646,8 @@ void D3DXRenderBase::r_dsgraph_render_subspace(IRender_Sector* _sector, CFrustum
 
 void D3DXRenderBase::r_dsgraph_render_R1_box(IRender_Sector* S, Fbox& BB, int sh)
 {
+    PIX_EVENT(r_dsgraph_render_R1_box);
+
     lstVisuals.clear();
     lstVisuals.push_back(((CSector*)S)->root());
 
