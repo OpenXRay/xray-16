@@ -74,17 +74,14 @@ void D3DXRenderBase::r_dsgraph_insert_dynamic(dxRender_Visual* pVisual, Fvector&
     if (RI.val_bHUD)
     {
         if (sh->flags.bStrictB2F)
-        {
-            mapSorted.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh })));
-        }
+            mapHUDSorted.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh })));
         else
-        {
-            mapHUD.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh })));
+            mapHUD      .emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh })));
+
 #if RENDER != R_R1
-            if (sh->flags.bEmissive)
-                mapHUDEmissive.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh_d }))); // sh_d -> L_special
-#endif // RENDER!=R_R1
-        }
+        if (sh->flags.bEmissive)
+            mapHUDEmissive.emplace_back(std::make_pair(distSQ, _MatrixItemS({ SSA, RI.val_pObject, pVisual, *RI.val_pTransform, sh_d }))); // sh_d -> L_special
+#endif
         return;
     }
 

@@ -40,6 +40,7 @@ public:
     R_dsgraph::mapHUD_T mapHUD;
     R_dsgraph::mapLOD_T mapLOD;
     R_dsgraph::mapSorted_T mapDistort;
+    R_dsgraph::mapHUD_T    mapHUDSorted;
 
 #if RENDER != R_R1
     R_dsgraph::mapSorted_T mapWmark; // sorted
@@ -142,10 +143,12 @@ public:
         mapHUD.clear();
         mapLOD.clear();
         mapDistort.clear();
+        mapHUDSorted.clear();
 
 #if RENDER != R_R1
         mapWmark.clear();
         mapEmissive.clear();
+        mapHUDEmissive.clear();
 #endif
     }
 
