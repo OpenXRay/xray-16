@@ -78,6 +78,7 @@ void CHW::Reset(HWND hwnd)
 #endif
 #ifndef _EDITOR
     updateWindowProps(hwnd);
+    ShowWindow(hwnd, SW_SHOWNORMAL);
 #endif
 }
 

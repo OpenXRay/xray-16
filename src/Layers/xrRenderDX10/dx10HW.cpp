@@ -512,6 +512,7 @@ void CHW::Reset(HWND hwnd)
     //#endif
 
     updateWindowProps(hwnd);
+    ShowWindow(hwnd, SW_SHOWNORMAL);
 
     /*
 #ifdef DEBUG

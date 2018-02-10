@@ -185,6 +185,7 @@ void CHW::Reset(HWND hwnd)
     UpdateViews();
 
     updateWindowProps(hwnd);
+    ShowWindow(hwnd, SW_SHOWNORMAL);
 }
 
 void CHW::updateWindowProps(HWND m_hWnd)
