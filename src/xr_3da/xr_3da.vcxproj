@@ -94,6 +94,9 @@
     <Link>
       <ProgramDatabaseFile>$(OutDir)$(ProjectName).pdb</ProgramDatabaseFile>
     </Link>
+    <Manifest>
+      <AdditionalManifestFiles>as-invoker-manifest-part.xml %(AdditionalManifestFiles)</AdditionalManifestFiles>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="entry_point.cpp" />
@@ -102,10 +105,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)xrCore\xrCore.vcxproj">
+    <ProjectReference Include="..\xrCore\xrCore.vcxproj">
       <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)xrEngine\xrEngine.vcxproj">
+    <ProjectReference Include="..\xrEngine\xrEngine.vcxproj">
       <Project>{2578c6d8-660d-48ae-9322-7422f8664f06}</Project>
     </ProjectReference>
     <ProjectReference Include="..\Layers\xrAPI\xrAPI.vcxproj">
