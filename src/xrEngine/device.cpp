@@ -25,6 +25,7 @@
 #include "xrSASH.h"
 #include "IGame_Persistent.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
+#include "xr_input.h"
 
 ENGINE_API CRenderDevice Device;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;
@@ -444,23 +445,35 @@ BOOL CRenderDevice::Paused() { return g_pauseMngr()->Paused(); }
 void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
 {
     u16 fActive = LOWORD(wParam);
-    BOOL fMinimized = (BOOL)HIWORD(wParam);
-    BOOL bActive = ((fActive != WA_INACTIVE) && (!fMinimized)) ? TRUE : FALSE;
-    if (bActive != Device.b_is_Active)
+    const BOOL fMinimized = (BOOL)HIWORD(wParam);
+
+    const BOOL isWndActive = (fActive != WA_INACTIVE && !fMinimized) ? TRUE : FALSE;
+    if (!editor() && !GEnv.isDedicatedServer && isWndActive)
     {
-        Device.b_is_Active = bActive;
+        pInput->ClipCursor(true);
+        ShowCursor(FALSE);
+    }
+    else
+    {
+        pInput->ClipCursor(false);
+        ShowCursor(TRUE);
+    }
+
+    extern int ps_always_active;
+    const BOOL isGameActive = ps_always_active || isWndActive;
+
+    if (isGameActive != Device.b_is_Active)
+    {
+        Device.b_is_Active = isGameActive;
         if (Device.b_is_Active)
         {
             Device.seqAppActivate.Process(rp_AppActivate);
             app_inactive_time += TimerMM.GetElapsed_ms() - app_inactive_time_start;
-            if (!editor() && !GEnv.isDedicatedServer)
-                ShowCursor(FALSE);
         }
         else
         {
             app_inactive_time_start = TimerMM.GetElapsed_ms();
             Device.seqAppDeactivate.Process(rp_AppDeactivate);
-            ShowCursor(TRUE);
         }
     }
 }
