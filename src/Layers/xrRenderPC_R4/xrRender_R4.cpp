@@ -4,8 +4,6 @@
 #include "Layers/xrRender/dxDebugRender.h"
 #include "Include/xrAPI/xrAPI.h"
 
-#pragma comment(lib, "xrEngine.lib")
-
 void SetupEnvR4()
 {
     GEnv.Render = &RImplementation;

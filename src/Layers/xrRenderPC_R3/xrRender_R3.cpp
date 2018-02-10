@@ -3,8 +3,6 @@
 #include "Layers/xrRender/dxUIRender.h"
 #include "Layers/xrRender/dxDebugRender.h"
 
-#pragma comment(lib, "xrEngine.lib")
-
 void SetupEnvR3()
 {
     GEnv.Render = &RImplementation;
