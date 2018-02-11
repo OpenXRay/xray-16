@@ -36,6 +36,8 @@ void CRenderDevice::Create()
     fASPECT = 1.f;
     const bool noEd = !editor();
     GEnv.Render->Create(m_hWnd, dwWidth, dwHeight, fWidth_2, fHeight_2, noEd);
+    GetWindowRect(m_hWnd, &m_rcWindowBounds);
+    GetClientRect(m_hWnd, &m_rcWindowClient);
     Memory.mem_compact();
     b_is_Ready = TRUE;
     _SetupStates();
