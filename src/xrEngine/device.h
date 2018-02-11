@@ -58,8 +58,15 @@ public:
 class ENGINE_API CRenderDeviceData
 {
 public:
+    // Rendering resolution
     u32 dwWidth;
     u32 dwHeight;
+
+    // Real application window resolution
+    RECT m_rcWindowBounds;
+
+    // Real game window resolution 
+    RECT m_rcWindowClient;
 
     u32 dwPrecacheFrame;
     BOOL b_is_Ready;
@@ -124,8 +131,6 @@ class ENGINE_API CRenderDevice : public CRenderDeviceBase
 {
     // Main objects used for creating and rendering the 3D scene
     u32 m_dwWindowStyle;
-    RECT m_rcWindowBounds;
-    RECT m_rcWindowClient;
     CTimer TimerMM;
     RenderDeviceStatictics stats;
 

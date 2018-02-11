@@ -38,6 +38,8 @@ void CRenderDevice::Reset(bool precache)
 {
     u32 dwWidth_before = dwWidth;
     u32 dwHeight_before = dwHeight;
+    GetWindowRect(m_hWnd, &m_rcWindowBounds);
+    GetClientRect(m_hWnd, &m_rcWindowClient);
     ShowCursor(true);
     u32 tm_start = TimerAsync();
     GEnv.Render->Reset(m_hWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);

@@ -53,8 +53,8 @@ void window_view::reclip_cursor()
     if (EditButton->Checked)
         return;
 
-    if (!m_loaded)
-        return;
+    //if (!m_loaded)
+    //    return;
 
     while (ShowCursor(FALSE) >= 0)
         ;
@@ -81,16 +81,19 @@ System::Void window_view::EditButton_Click(System::Object ^ sender, System::Even
         ClipCursor(nullptr);
         while (ShowCursor(TRUE) <= 0)
             ;
-        return;
     }
-
-    m_engine->pause(false);
-    m_engine->capture_input(false);
-    reclip_cursor();
+    else
+    {
+        m_engine->pause(false);
+        m_engine->capture_input(false);
+        reclip_cursor();
+    }
 }
 
 System::Void window_view::PauseButton_Click(System::Object ^ sender, System::EventArgs ^ e)
 {
+    if (!PauseButton->Enabled)
+        return;
     PauseButton->Checked = !PauseButton->Checked;
     m_engine->pause(PauseButton->Checked);
 }
@@ -131,8 +134,10 @@ System::Void window_view::window_view_Activated(System::Object ^ sender, System:
     while (ShowCursor(TRUE) <= 0)
         ;
 
-    if (!m_loaded)
-        return;
+    //if (!m_loaded)
+    //    return;
+
+    reclip_cursor();
 }
 
 System::Void window_view::window_view_Deactivate(System::Object ^ sender, System::EventArgs ^ e)
@@ -140,8 +145,8 @@ System::Void window_view::window_view_Deactivate(System::Object ^ sender, System
     if (!Parent)
         return;
 
-    if (!m_loaded)
-        return;
+    //if (!m_loaded)
+    //    return;
 
     ClipCursor(nullptr);
     while (ShowCursor(TRUE) <= 0)
