@@ -214,8 +214,8 @@ void CEngineAPI::CreateRendererList()
     if (GEnv.isDedicatedServer)
     {
         R_ASSERT2(hRenderR1->exist(), "Dedicated server needs xrRender_R1 to work");
-        modes.push_back(xr_token("renderer_r1", 0));
-        modes.push_back(xr_token(nullptr, -1));
+        modes.emplace_back(xr_token("renderer_r1", 0));
+        modes.emplace_back(xr_token(nullptr, -1));
         vid_quality_token = std::move(modes);
         return;
     }
@@ -236,21 +236,21 @@ void CEngineAPI::CreateRendererList()
 
     if (hRenderR1->exist())
     {
-        modes.push_back(xr_token("renderer_r1", 0));
+        modes.emplace_back(xr_token("renderer_r1", 0));
     }
 
     if (hRenderR2->exist())
     {
-        modes.push_back(xr_token("renderer_r2a", 1));
-        modes.push_back(xr_token("renderer_r2", 2));
+        modes.emplace_back(xr_token("renderer_r2a", 1));
+        modes.emplace_back(xr_token("renderer_r2", 2));
         if (GEnv.CheckR2 && GEnv.CheckR2())
-            modes.push_back(xr_token("renderer_r2.5", 3));
+            modes.emplace_back(xr_token("renderer_r2.5", 3));
     }
 
     if (hRenderR3->exist())
     {
         if (GEnv.CheckR3 && GEnv.CheckR3())
-            modes.push_back(xr_token("renderer_r3", 4));
+            modes.emplace_back(xr_token("renderer_r3", 4));
         else
             hRenderR3->close();
     }
@@ -258,7 +258,7 @@ void CEngineAPI::CreateRendererList()
     if (hRenderR4->exist())
     {
         if (GEnv.CheckR4 && GEnv.CheckR4())
-            modes.push_back(xr_token("renderer_r4", 5));
+            modes.emplace_back(xr_token("renderer_r4", 5));
         else
             hRenderR4->close();
     }
@@ -266,11 +266,11 @@ void CEngineAPI::CreateRendererList()
     if (hRenderRGL->exist())
     {
         if (GEnv.CheckRGL && GEnv.CheckRGL())
-            modes.push_back(xr_token("renderer_gl", 6));
+            modes.emplace_back(xr_token("renderer_gl", 6));
         else
             hRenderRGL->close();
     }
-    modes.push_back(xr_token(nullptr, -1));
+    modes.emplace_back(xr_token(nullptr, -1));
 
     Msg("Available render modes[%d]:", modes.size());
     for (auto& mode : modes)
