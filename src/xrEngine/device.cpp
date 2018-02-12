@@ -275,7 +275,7 @@ void CRenderDevice::on_idle()
         Sleep(1);
 }
 
-void CRenderDevice::message_loop_editor()
+void CRenderDevice::message_loop_weather_editor()
 {
     m_editor->run();
     m_editor_finalize(m_editor);
@@ -286,7 +286,7 @@ void CRenderDevice::message_loop()
 {
     if (editor())
     {
-        message_loop_editor();
+        message_loop_weather_editor();
         return;
     }
 

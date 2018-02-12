@@ -29,6 +29,7 @@ public:
     AISpaceBase* AISpace;
     ISoundManager* Sound;
 
+    bool isEditor;
     bool isDedicatedServer;
 
     int CurrentRenderer;

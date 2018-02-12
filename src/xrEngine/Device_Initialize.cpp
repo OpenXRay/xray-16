@@ -9,7 +9,7 @@
 
 extern LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-void CRenderDevice::initialize_editor()
+void CRenderDevice::initialize_weather_editor()
 {
     m_editor_module = XRay::LoadModule("xrWeatherEditor");
     if (!m_editor_module->exist())
@@ -27,6 +27,8 @@ void CRenderDevice::initialize_editor()
 
     m_hWnd = m_editor->view_handle();
     VERIFY(m_hWnd != INVALID_HANDLE_VALUE);
+
+    GEnv.isEditor = true;
 }
 
 void CRenderDevice::Initialize()
@@ -35,13 +37,13 @@ void CRenderDevice::Initialize()
     TimerGlobal.Start();
     TimerMM.Start();
 
-    if (strstr(Core.Params, "-editor"))
-        initialize_editor();
+    if (strstr(Core.Params, "-weather"))
+        initialize_weather_editor();
 
     // Unless a substitute hWnd has been specified, create a window to render into
     if (!m_hWnd)
     {
-        const char* wndclass = "_XRAY_1.5";
+        const char* wndclass = "_XRAY_1.6";
         // Register the windows class
         HINSTANCE hInstance = (HINSTANCE)GetModuleHandle(0);
         WNDCLASS wndClass = {0, WndProc, 0, 0, hInstance, LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1)),
