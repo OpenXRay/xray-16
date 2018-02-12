@@ -34,7 +34,7 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial)
     Msg("%s, count of .thm files: %d", __FUNCTION__, flist.size());
 #endif
 
-    tbb::parallel_for_each(flist, [&](auto& it)
+    for (auto& it : flist)
     {
 #if 0//def DEBUG // XXX: make it as an option
         //Alundaio: Print list of *.thm to find bad .thms!
@@ -95,7 +95,7 @@ void CTextureDescrMngr::LoadTHM(LPCSTR initial)
                 desc.m_spec->m_use_steep_parallax = true;
             }
         }
-    });
+    }
 }
 
 void CTextureDescrMngr::Load()
