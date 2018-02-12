@@ -228,7 +228,6 @@ void CUICellItem::UpdateConditionProgressBar()
                     else
                         cond = (float)remaining_uses * 0.125f - 0.0625f;
 
-                    m_pConditionState->m_bNoLerp = true;
                     m_pConditionState->m_bUseGradient = false;
                 }
             }

@@ -228,7 +228,7 @@ protected:
     EDDListType GetListType(CUIDragDropListEx* l);
 
 public:
-    CUIDragDropListEx* GetListByType(EDDListType t); //Alundaio: Make public
+    CUIDragDropListEx* GetListByType(EDDListType t); //Alundaio: Made public
 
 protected:
     CUIDragDropListEx* GetSlotList(u16 slot_idx);
