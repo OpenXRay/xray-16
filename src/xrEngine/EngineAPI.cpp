@@ -132,7 +132,7 @@ void CEngineAPI::InitializeRenderers()
         Console->Execute(buf);
 
         // Second attempt
-        InitializeRenderers();
+        SetupCurrentRenderer();
     }
 
     // ask current renderer to setup GlobalEnv
