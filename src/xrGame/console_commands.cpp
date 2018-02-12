@@ -102,7 +102,10 @@ int g_keypress_on_start = 1;
 
 ENGINE_API extern float g_console_sensitive;
 
-extern BOOL g_ai_die_in_anomaly; //Alundaio
+//Alundaio
+extern BOOL g_ai_die_in_anomaly;
+int g_inv_highlight_equipped = 0;
+//-Alundaio
 
 void register_mp_console_commands();
 //-----------------------------------------------------------
@@ -1898,6 +1901,7 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "g_autopickup", &psActorFlags, AF_AUTOPICKUP);
     CMD3(CCC_Mask, "g_dynamic_music", &psActorFlags, AF_DYNAMIC_MUSIC);
     CMD3(CCC_Mask, "g_important_save", &psActorFlags, AF_IMPORTANT_SAVE);
+    CMD3(CCC_Integer, "g_inv_highlight_equipped", &g_inv_highlight_equipped, 0, 1);
 
 #ifdef DEBUG
     CMD1(CCC_ShowSmartCastStats, "show_smart_cast_stats");

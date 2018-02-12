@@ -482,9 +482,13 @@ bool CUICellContainer::AddSimilar(CUICellItem* itm)
         return false;
 
     //Alundaio: Don't stack equipped items
-    const PIItem iitem = static_cast<PIItem>(itm->m_pData);
-    if (iitem && iitem->m_pInventory && iitem->m_pInventory->ItemFromSlot(iitem->BaseSlot()) == iitem)
-        return false;
+    extern int g_inv_highlight_equipped;
+    if (g_inv_highlight_equipped)
+    {
+        const PIItem iitem = static_cast<PIItem>(itm->m_pData);
+        if (iitem && iitem->m_pInventory && iitem->m_pInventory->ItemFromSlot(iitem->BaseSlot()) == iitem)
+            return false;
+    }
     //-Alundaio
 
     CUICellItem* i = FindSimilar(itm);
@@ -509,9 +513,13 @@ CUICellItem* CUICellContainer::FindSimilar(CUICellItem* itm)
         auto i = (CUICellItem*)it;
 #endif
         //Alundaio: Don't stack equipped items
-        auto iitem = static_cast<PIItem>(i->m_pData);
-        if (iitem && iitem->m_pInventory && iitem->m_pInventory->ItemFromSlot(iitem->BaseSlot()) == iitem)
-            continue;
+        extern int g_inv_highlight_equipped;
+        if (g_inv_highlight_equipped)
+        {
+            auto iitem = static_cast<PIItem>(i->m_pData);
+            if (iitem && iitem->m_pInventory && iitem->m_pInventory->ItemFromSlot(iitem->BaseSlot()) == iitem)
+                continue;
+        }
         //-Alundaio
 
         if (i == itm)
@@ -831,8 +839,8 @@ void CUICellContainer::Draw()
     UI().ClientToScreenScaled(drawLT, drawLT.x, drawLT.y);
 
     const Fvector2 pts[6] = {{0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f}};
-#define ty 1.0f
-#define tx 0.25f
+    constexpr auto ty = 1.0f;
+    constexpr auto tx = 0.25f;
     const Fvector2 uvs[6] = {{0.0f, 0.0f}, {tx, 0.0f}, {tx, ty}, {0.0f, 0.0f}, {tx, ty}, {0.0f, ty}};
 
     // calculate cell size in screen pixels
@@ -871,9 +879,13 @@ void CUICellContainer::Draw()
                 else
                 {
                     //Alundaio: Highlight equipped items
-                    PIItem iitem = static_cast<PIItem>(ui_cell.m_item->m_pData);
-                    if (iitem && iitem->m_pInventory && iitem->m_pInventory->ItemFromSlot(iitem->BaseSlot()) == iitem)
-                        select_mode = 2;
+                    extern int g_inv_highlight_equipped;
+                    if (g_inv_highlight_equipped)
+                    {
+                        PIItem iitem = static_cast<PIItem>(ui_cell.m_item->m_pData);
+                        if (iitem && iitem->m_pInventory && iitem->m_pInventory->ItemFromSlot(iitem->BaseSlot()) == iitem)
+                            select_mode = 2;
+                    }
                     //-Alundaio
                 }
             }
