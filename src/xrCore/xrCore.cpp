@@ -132,6 +132,7 @@ void xrCore::_destroy()
     --init_counter;
     if (0 == init_counter)
     {
+        ttapi.destroy();
         FS._destroy();
         EFS._destroy();
         xr_delete(xr_FS);

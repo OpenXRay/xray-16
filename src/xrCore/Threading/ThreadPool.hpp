@@ -51,12 +51,19 @@ public:
         setThreadCount(num_threads);
     }
 
+    void destroy()
+    {
+        wait();
+        threads.clear();
+    }
+
     // Sets the number of threads to be allocated in this pool
     void setThreadCount(const uint32_t count)
     {
         threads.clear();
+        threads.reserve(count);
         for (auto i = 0; i < count; i++)
-            threads.push_back(std::make_unique<Thread>());
+            threads.emplace_back(std::make_unique<Thread>());
     }
 
     // Wait until all threads have finished their work items
