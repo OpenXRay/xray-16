@@ -18,7 +18,7 @@ static Lock logCS(MUTEX_PROFILE_ID(log));
 #else // CONFIG_PROFILE_LOCKS
 static Lock logCS;
 #endif // CONFIG_PROFILE_LOCKS
-xr_vector<shared_str>* LogFile = NULL;
+xr_vector<xr_string> LogFile;
 static LogCallback LogCB = 0;
 
 void FlushLog()
@@ -29,9 +29,9 @@ void FlushLog()
         IWriter* f = FS.w_open(logFName);
         if (f)
         {
-            for (u32 it = 0; it < LogFile->size(); it++)
+            for (const auto &i : LogFile)
             {
-                LPCSTR s = *((*LogFile)[it]);
+                LPCSTR s = i.c_str();
                 f->w_string(s ? s : "");
             }
             FS.w_close(f);
@@ -42,9 +42,6 @@ void FlushLog()
 
 void AddOne(const char* split)
 {
-    if (!LogFile)
-        return;
-
     logCS.Enter();
 
 #ifdef DEBUG
@@ -52,10 +49,7 @@ void AddOne(const char* split)
     OutputDebugString("\n");
 #endif
 
-    {
-        shared_str temp = shared_str(split);
-        LogFile->push_back(temp);
-    }
+    LogFile.push_back(split);
 
     // exec CallBack
     if (LogExecCB && LogCB)
@@ -191,9 +185,7 @@ LogCallback SetLogCB(const LogCallback& cb)
 LPCSTR log_name() { return (log_file_name); }
 void InitLog()
 {
-    R_ASSERT(LogFile == NULL);
-    LogFile = new xr_vector<shared_str>();
-    LogFile->reserve(1000);
+    LogFile.reserve(1000);
 }
 
 void CreateLog(BOOL nl)
@@ -217,6 +209,5 @@ void CreateLog(BOOL nl)
 void CloseLog(void)
 {
     FlushLog();
-    LogFile->clear();
-    xr_delete(LogFile);
+    LogFile.clear();
 }

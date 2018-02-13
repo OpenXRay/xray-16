@@ -1371,7 +1371,7 @@ void CLocatorAPI::w_close(IWriter*& S)
     {
         R_ASSERT(S->fName.size());
         string_path fname;
-        xr_strcpy(fname, sizeof fname, *S->fName);
+        xr_strcpy(fname, sizeof fname, S->fName.c_str());
         bool bReg = S->valid();
         xr_delete(S);
 
