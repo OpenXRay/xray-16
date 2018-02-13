@@ -19,6 +19,7 @@ public:
 
 private:
     void CreateVertexBuffers();
+    void DestroyVertexBuffers();
 
     void InitScreenSlice(VS_INPUT_FLUIDSIM_STRUCT** vertices, int z, int& index);
     void InitSlice(int z, VS_INPUT_FLUIDSIM_STRUCT** vertices, int& index);
