@@ -380,9 +380,9 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
         FS.update_path(cname, "$game_shaders$", cname);
 
         // duplicate and zero-terminate
-        IReader* R = FS.r_open(cname);
+        IReader* file = FS.r_open(cname);
         //	TODO: DX10: HACK: Implement all shaders. Remove this for PS
-        if (!R)
+        if (!file)
         {
             string1024 tmp;
             //	TODO: HACK: Test failure
@@ -391,9 +391,8 @@ SGS* CResourceManager::_CreateGS(LPCSTR name)
             Msg(tmp);
             strconcat(sizeof(cname), cname, GEnv.Render->getShaderPath(), "stub_default", ".gs");
             FS.update_path(cname, "$game_shaders$", cname);
-            R = FS.r_open(cname);
+            file = FS.r_open(cname);
         }
-        IReader* file = FS.r_open(cname);
         R_ASSERT2(file, cname);
 
         // Select target
