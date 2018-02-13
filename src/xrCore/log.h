@@ -2,9 +2,9 @@
 #ifndef logH
 #define logH
 #include "xrCommon/xr_vector.h"
+#include "xrCommon/xr_string.h"
 
 // fwd. decl.
-class shared_str;
 template <class T> struct _vector3; typedef _vector3<float> Fvector;
 template <class T> struct _matrix; typedef _matrix<float> Fmatrix;
 
