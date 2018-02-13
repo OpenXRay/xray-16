@@ -547,10 +547,11 @@ void CTexture::Load()
             // pSurface->SetPriority	(PRIORITY_NORMAL);
             flags.MemoryUsage = mem;
         }
+
+        if (pSurface && bCreateView)
+            CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, NULL, &m_pSRView));
     }
 
-    if (pSurface && bCreateView)
-        CHK_DX(HW.pDevice->CreateShaderResourceView(pSurface, NULL, &m_pSRView));
     PostLoad();
 }
 
