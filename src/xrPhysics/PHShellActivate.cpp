@@ -231,7 +231,7 @@ void CPHShell::Deactivate()
     {
         VERIFY(PhysicsRefObject());
         PhysicsRefObject()->ObjectProcessingDeactivate();
-        xr_delete<CPhysicsShellAnimator>(m_pPhysicsShellAnimatorC);
+        xr_delete/*<CPhysicsShellAnimator>*/(m_pPhysicsShellAnimatorC);
     }
 
     if (!isActive())

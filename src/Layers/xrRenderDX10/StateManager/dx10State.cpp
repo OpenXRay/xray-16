@@ -78,7 +78,7 @@ HRESULT dx10State::Apply()
 void dx10State::Release()
 {
     dx10State* pState = this;
-    xr_delete<dx10State>(pState);
+    xr_delete/*<dx10State>*/(pState);
 }
 
 void dx10State::InitSamplers(tSamplerHArray& SamplerArray, SimulatorStates& state_code, int iBaseSamplerIndex)

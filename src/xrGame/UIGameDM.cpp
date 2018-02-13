@@ -136,7 +136,9 @@ void CUIGameDM::SetWarmUpCaption(LPCSTR str) { m_warm_up_caption->SetTextST(str)
 void CUIGameDM::SetVoteMessage(LPCSTR str)
 {
     if (!str)
+    {
         xr_delete(m_voteStatusWnd);
+    }
     else
     {
         if (!m_voteStatusWnd)

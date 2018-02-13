@@ -11,9 +11,6 @@ class ENGINE_API CPS_Instance : public SpatialBase, public ScheduledBase, public
 {
     friend class IGame_Persistent;
 
-    template <bool _is_pm, typename T>
-    friend struct xr_special_free;
-
 private:
     bool m_destroy_on_game_load;
 
