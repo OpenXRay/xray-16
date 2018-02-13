@@ -9,17 +9,17 @@
 #include "malloc.h"
 #endif
 
-extern BOOL LogExecCB = TRUE;
-static string_path logFName = "engine.log";
-static string_path log_file_name = "engine.log";
-static BOOL no_log = TRUE;
+BOOL LogExecCB = TRUE;
+string_path logFName = "engine.log";
+string_path log_file_name = "engine.log";
+BOOL no_log = TRUE;
 #ifdef CONFIG_PROFILE_LOCKS
-static Lock logCS(MUTEX_PROFILE_ID(log));
+Lock logCS(MUTEX_PROFILE_ID(log));
 #else // CONFIG_PROFILE_LOCKS
-static Lock logCS;
+Lock logCS;
 #endif // CONFIG_PROFILE_LOCKS
 xr_vector<xr_string> LogFile;
-static LogCallback LogCB = 0;
+LogCallback LogCB = 0;
 
 void FlushLog()
 {
