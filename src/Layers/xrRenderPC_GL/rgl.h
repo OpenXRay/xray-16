@@ -378,8 +378,18 @@ public:
     // Constructor/destructor/loader
     CRender();
     virtual ~CRender();
+
+    void addShaderOption(pcstr name, pcstr value);
+    void clearAllShaderOptions() { m_ShaderOptions.clear(); }
+
+private:
+    xr_string m_ShaderOptions;
+
 protected:
     void ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer) override;
+
+private:
+    FS_FileSet m_file_set;
 };
 
 extern CRender RImplementation;

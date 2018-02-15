@@ -71,6 +71,7 @@ public:
     GLuint pCFB;
 
     CHWCaps Caps;
+    TBuiltInResource resources;
 
     HWND m_hWnd;
     HDC m_hDC;
@@ -127,6 +128,9 @@ public:
 
 #if !defined(_MAYA_EXPORT) && !defined(USE_OGL)
     stats_manager stats_manager;
+#endif
+#ifdef USE_OGL
+    void InitResources(TBuiltInResource& Resources);
 #endif
 #if defined(USE_DX10) || defined(USE_DX11) || defined(USE_OGL)
     void UpdateViews();

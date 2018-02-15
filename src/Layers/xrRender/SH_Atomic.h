@@ -68,11 +68,15 @@ struct ECORE_API SGS : public xr_resource_named
 typedef resptr_core<SGS, resptr_base<SGS>> ref_gs;
 #endif //	USE_DX10
 
-#ifdef USE_DX11
+#if defined(USE_DX11) || defined(USE_OGL)
 
 struct ECORE_API SHS : public xr_resource_named
 {
+#ifdef USE_OGL
+    GLuint sh;
+#else
     ID3D11HullShader* sh;
+#endif
     R_constant_table constants;
     ~SHS();
 };
@@ -80,7 +84,11 @@ typedef resptr_core<SHS, resptr_base<SHS>> ref_hs;
 
 struct ECORE_API SDS : public xr_resource_named
 {
+#ifdef USE_OGL
+    GLuint sh;
+#else
     ID3D11DomainShader* sh;
+#endif
     R_constant_table constants;
     ~SDS();
 };
@@ -88,7 +96,11 @@ typedef resptr_core<SDS, resptr_base<SDS>> ref_ds;
 
 struct ECORE_API SCS : public xr_resource_named
 {
+#ifdef USE_OGL
+    GLuint sh;
+#else
     ID3D11ComputeShader* sh;
+#endif
     R_constant_table constants;
     ~SCS();
 };
