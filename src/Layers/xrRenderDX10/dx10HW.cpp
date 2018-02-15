@@ -139,24 +139,6 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
 
     m_DriverType = Caps.bForceGPU_REF ? D3D_DRIVER_TYPE_REFERENCE : D3D_DRIVER_TYPE_HARDWARE;
 
-    //  For DirectX 10 adapter is already created in create D3D.
-    /*
-    //. #ifdef DEBUG
-    // Look for 'NVIDIA NVPerfHUD' adapter
-    // If it is present, override default settings
-    for (UINT Adapter=0;Adapter<pD3D->GetAdapterCount();Adapter++)  {
-        D3DADAPTER_IDENTIFIER9 Identifier;
-        HRESULT Res=pD3D->GetAdapterIdentifier(Adapter,0,&Identifier);
-        if (SUCCEEDED(Res) && (xr_strcmp(Identifier.Description,"NVIDIA PerfHUD")==0))
-        {
-            DevAdapter  =Adapter;
-            DevT        =D3DDEVTYPE_REF;
-            break;
-        }
-    }
-    //. #endif
-    */
-
     // Display the name of video board
     DXGI_ADAPTER_DESC Desc;
     R_CHK(m_pAdapter->GetDesc(&Desc));
