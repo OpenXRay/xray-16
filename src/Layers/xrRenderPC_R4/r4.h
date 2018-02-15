@@ -111,6 +111,7 @@ public:
         u32 forceskinw : 1;
         float forcegloss_v;
     } o;
+
     struct RenderR4Statistics
     {
         u32 l_total;

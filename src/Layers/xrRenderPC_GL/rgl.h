@@ -54,6 +54,7 @@ public:
         u32 ssao_half_data : 1;
         u32 ssao_hbao : 1;
         u32 ssao_hdao : 1;
+        u32 ssao_ultra : 1;
         u32 hbao_vectorized : 1;
 
         u32 smapsize : 16;
@@ -97,6 +98,8 @@ public:
 
         u32 dx10_minmax_sm : 2;
         u32 dx10_minmax_sm_screenarea_threshold;
+
+        u32 dx11_enable_tessellation : 1;
 
         u32 forcegloss : 1;
         u32 forceskinw : 1;
@@ -220,7 +223,6 @@ public:
     void init_cacades();
     void render_sun_cascades();
 
-public:
     ShaderElement* rimp_select_sh_static(dxRender_Visual* pVisual, float cdist_sq);
     ShaderElement* rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq);
     D3DVERTEXELEMENT9* getVB_Format(int id, BOOL _alt = FALSE);
@@ -240,8 +242,10 @@ public:
 
     ICF void apply_object(IRenderable* O)
     {
-        if (nullptr == O) return;
-        if (nullptr == O->renderable_ROS()) return;
+        if (nullptr == O)
+            return;
+        if (nullptr == O->renderable_ROS())
+            return;
         CROS_impl& LT = *(CROS_impl*)O->renderable_ROS();
         LT.update_smooth(O);
         o_hemi = 0.75f * LT.get_hemi();
@@ -253,14 +257,16 @@ public:
     void apply_lmaterial()
     {
         R_constant* C = &*RCache.get_c(c_sbase); // get sampler
-        if (nullptr == C) return;
+        if (nullptr == C)
+            return;
         VERIFY (RC_dest_sampler == C->destination);
         VERIFY (RC_sampler == C->type);
         CTexture* T = RCache.get_ActiveTexture(u32(C->samp.index));
         VERIFY (T);
         float mtl = T->m_material;
 #ifdef	DEBUG
-		if (ps_r2_ls_flags.test(R2FLAG_GLOBALMATERIAL))	mtl=ps_r2_gmaterial;
+        if (ps_r2_ls_flags.test(R2FLAG_GLOBALMATERIAL))
+            mtl=ps_r2_gmaterial;
 #endif
         RCache.hemi.set_material(o_hemi, o_sun, 0, (mtl + .5f) / 4.f);
         RCache.hemi.set_pos_faces(o_hemi_cube[CROS_impl::CUBE_FACE_POS_X],
