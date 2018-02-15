@@ -88,7 +88,6 @@ public:
 
     D3D_DRIVER_TYPE m_DriverType; //	DevT equivalent
     DXGI_SWAP_CHAIN_DESC m_ChainDesc; //	DevPP equivalent
-    bool m_bUsePerfhud;
     D3D_FEATURE_LEVEL FeatureLevel;
 #elif defined(USE_DX10)
 public:
@@ -105,7 +104,6 @@ public:
 
     D3D10_DRIVER_TYPE m_DriverType; //	DevT equivalent
     DXGI_SWAP_CHAIN_DESC m_ChainDesc; //	DevPP equivalent
-    bool m_bUsePerfhud;
     D3D_FEATURE_LEVEL FeatureLevel;
 #else
 private:
