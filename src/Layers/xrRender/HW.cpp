@@ -1,15 +1,6 @@
-// HW.cpp: implementation of the CHW class.
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
-#pragma hdrstop
 
-#pragma warning(push)
-#pragma warning(disable : 4995)
-#include <d3dx9.h>
-#pragma warning(pop)
-
-#include "HW.h"
+#include "Layers/xrRender/HW.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "xrCore/xr_token.h"
 
@@ -28,167 +19,35 @@ void free_render_mode_list() {}
 
 CHW HW;
 
-#ifdef DEBUG
-IDirect3DStateBlock9* dwDebugSB = nullptr;
-#endif
-
-CHW::CHW() : hD3D(nullptr), pD3D(nullptr), pDevice(nullptr), pBaseRT(nullptr), pBaseZB(nullptr), m_move_window(true), maxRefreshRate(200)/*ECO_RENDER*/ {}
-CHW::~CHW() {}
-void CHW::Reset(HWND hwnd)
+CHW::CHW()
 {
-#ifdef DEBUG
-    _RELEASE(dwDebugSB);
-#endif
-    _RELEASE(pBaseZB);
-    _RELEASE(pBaseRT);
 
-#ifndef _EDITOR
-    bool bWindowed = true;
-    if (!GEnv.isDedicatedServer)
-        bWindowed = !psDeviceFlags.is(rsFullscreen);
-
-    selectResolution(DevPP.BackBufferWidth, DevPP.BackBufferHeight, bWindowed);
-    // Windoze
-    DevPP.SwapEffect = bWindowed ? D3DSWAPEFFECT_COPY : D3DSWAPEFFECT_DISCARD;
-    DevPP.Windowed = bWindowed;
-    if (!bWindowed)
-    {
-        DevPP.PresentationInterval = selectPresentInterval(); // Vsync (R1\R2)
-        DevPP.FullScreen_RefreshRateInHz = selectRefresh(DevPP.BackBufferWidth, DevPP.BackBufferHeight, Caps.fTarget);
-    }
-    else
-    {
-        DevPP.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
-        DevPP.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
-    }
-#endif
-
-    while (true)
-    {
-        HRESULT _hr = HW.pDevice->Reset(&DevPP);
-        if (SUCCEEDED(_hr))
-            break;
-        Msg("! ERROR: [%dx%d]: %s", DevPP.BackBufferWidth, DevPP.BackBufferHeight, xrDebug::ErrorToString(_hr));
-        Sleep(100);
-    }
-    R_CHK(pDevice->GetRenderTarget(0, &pBaseRT));
-    R_CHK(pDevice->GetDepthStencilSurface(&pBaseZB));
-#ifdef DEBUG
-    R_CHK(pDevice->CreateStateBlock(D3DSBT_ALL, &dwDebugSB));
-#endif
-#ifndef _EDITOR
-    updateWindowProps(hwnd);
-    ShowWindow(hwnd, SW_SHOWNORMAL);
-#endif
 }
 
-void CHW::CreateD3D()
+CHW::~CHW()
 {
-    const pcstr _name = GEnv.isDedicatedServer ? "xrD3D9-Null" : "d3d9.dll";
 
-    hD3D = XRay::LoadModule(_name);
-
-    R_ASSERT2(hD3D->exist(), "Can't find 'd3d9.dll'\nPlease install latest version of DirectX before running this program");
-    typedef IDirect3D9* WINAPI _Direct3DCreate9(UINT SDKVersion);
-    auto createD3D = (_Direct3DCreate9*)hD3D->getProcAddress("Direct3DCreate9");
-    R_ASSERT(createD3D);
-    this->pD3D = createD3D(D3D_SDK_VERSION);
-    R_ASSERT2(this->pD3D, "Please install DirectX 9.0c");
-}
-
-void CHW::DestroyD3D()
-{
-    _RELEASE(this->pD3D);
 }
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-D3DFORMAT CHW::selectDepthStencil(D3DFORMAT fTarget)
+void CHW::CreateD3D()
 {
-// R2 hack
-#pragma todo("R2 need to specify depth format")
-    if (GEnv.CurrentRenderer == 2)
-        return D3DFMT_D24S8;
+    hD3D = XRay::LoadModule(GEnv.isDedicatedServer ? "xrD3D9-Null" : "d3d9.dll");
+    R_ASSERT2(hD3D->exist(), "Can't find 'd3d9.dll'\nPlease install latest version of DirectX before running this program");
 
-    // R1 usual
-    static D3DFORMAT fDS_Try1[6] = {D3DFMT_D24S8, D3DFMT_D24X4S4, D3DFMT_D32, D3DFMT_D24X8, D3DFMT_D16, D3DFMT_D15S1};
-
-    D3DFORMAT* fDS_Try = fDS_Try1;
-    int fDS_Cnt = 6;
-
-    for (int it = 0; it < fDS_Cnt; it++)
-    {
-        if (SUCCEEDED(pD3D->CheckDeviceFormat(
-                DevAdapter, DevT, fTarget, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, fDS_Try[it])))
-        {
-            if (SUCCEEDED(pD3D->CheckDepthStencilMatch(DevAdapter, DevT, fTarget, fTarget, fDS_Try[it])))
-            {
-                return fDS_Try[it];
-            }
-        }
-    }
-    return D3DFMT_UNKNOWN;
+    typedef IDirect3D9* WINAPI _Direct3DCreate9(UINT SDKVersion);
+    auto createD3D = (_Direct3DCreate9*)hD3D->getProcAddress("Direct3DCreate9");
+    R_ASSERT(createD3D);
+    pD3D = createD3D(D3D_SDK_VERSION);
+    R_ASSERT2(pD3D, "Please install DirectX 9.0c");
 }
 
-void CHW::DestroyDevice()
+void CHW::DestroyD3D()
 {
-    _SHOW_REF("refCount:pBaseZB", pBaseZB);
-    _RELEASE(pBaseZB);
-
-    _SHOW_REF("refCount:pBaseRT", pBaseRT);
-    _RELEASE(pBaseRT);
-#ifdef DEBUG
-    _SHOW_REF("refCount:dwDebugSB", dwDebugSB);
-    _RELEASE(dwDebugSB);
-#endif
-#ifdef _EDITOR
-    _RELEASE(HW.pDevice);
-#else
-    _SHOW_REF("DeviceREF:", HW.pDevice);
-    _RELEASE(HW.pDevice);
-#endif
-    DestroyD3D();
-
-#ifndef _EDITOR
-    free_vid_mode_list();
-#endif
-}
-void CHW::selectResolution(u32& dwWidth, u32& dwHeight, BOOL bWindowed)
-{
-    fill_vid_mode_list(this);
-#ifndef _EDITOR
-    if (GEnv.isDedicatedServer)
-    {
-        dwWidth = 640;
-        dwHeight = 480;
-    }
-    else
-#endif
-    {
-        if (bWindowed)
-        {
-            dwWidth = psCurrentVidMode[0];
-            dwHeight = psCurrentVidMode[1];
-        }
-        else // check
-        {
-#ifndef _EDITOR
-            string64 buff;
-            xr_sprintf(buff, sizeof(buff), "%dx%d", psCurrentVidMode[0], psCurrentVidMode[1]);
-
-            if (_ParseItem(buff, GEnv.vid_mode_token) == u32(-1)) // not found
-            { // select safe
-                xr_sprintf(buff, sizeof(buff), "vid_mode %s", GEnv.vid_mode_token[0].name);
-                Console->Execute(buff);
-            }
-
-            dwWidth = psCurrentVidMode[0];
-            dwHeight = psCurrentVidMode[1];
-#endif
-        }
-    }
-    //#endif
+    _SHOW_REF("refCount:pD3D", pD3D);
+    _RELEASE(pD3D);
 }
 
 void CHW::CreateDevice(HWND m_hWnd, bool move_window)
@@ -196,25 +55,26 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     m_move_window = move_window;
     CreateD3D();
 
-    bool bWindowed = true;
+    bool bWindowed = !psDeviceFlags.is(rsFullscreen);
 
 #ifndef _EDITOR
-    if (!GEnv.isDedicatedServer)
-        bWindowed = !psDeviceFlags.is(rsFullscreen);
+    if (GEnv.isDedicatedServer)
+        bWindowed = true;
 #endif
 
+    m_DriverType = Caps.bForceGPU_REF ? D3DDEVTYPE_REF : D3DDEVTYPE_HAL;
+
     DevAdapter = D3DADAPTER_DEFAULT;
-    DevT = Caps.bForceGPU_REF ? D3DDEVTYPE_REF : D3DDEVTYPE_HAL;
 
     // Display the name of video board
     D3DADAPTER_IDENTIFIER9 adapterID;
     R_CHK(pD3D->GetAdapterIdentifier(DevAdapter, 0, &adapterID));
     Msg("* GPU [vendor:%X]-[device:%X]: %s", adapterID.VendorId, adapterID.DeviceId, adapterID.Description);
 
-    u16 drv_Product = HIWORD(adapterID.DriverVersion.HighPart);
-    u16 drv_Version = LOWORD(adapterID.DriverVersion.HighPart);
+    u16 drv_Product    = HIWORD(adapterID.DriverVersion.HighPart);
+    u16 drv_Version    = LOWORD(adapterID.DriverVersion.HighPart);
     u16 drv_SubVersion = HIWORD(adapterID.DriverVersion.LowPart);
-    u16 drv_Build = LOWORD(adapterID.DriverVersion.LowPart);
+    u16 drv_Build      = LOWORD(adapterID.DriverVersion.LowPart);
     Msg("* GPU driver: %d.%d.%d.%d", u32(drv_Product), u32(drv_Version), u32(drv_SubVersion), u32(drv_Build));
 
     Caps.id_vendor = adapterID.VendorId;
@@ -230,7 +90,7 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     if (bWindowed)
     {
         fTarget = mWindowed.Format;
-        R_CHK(pD3D->CheckDeviceType(DevAdapter, DevT, fTarget, fTarget, TRUE));
+        R_CHK(pD3D->CheckDeviceType(DevAdapter, m_DriverType, fTarget, fTarget, TRUE));
         fDepth = selectDepthStencil(fTarget);
     }
     else
@@ -239,26 +99,26 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
         {
         case 32:
             fTarget = D3DFMT_X8R8G8B8;
-            if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, DevT, fTarget, fTarget, FALSE)))
+            if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, m_DriverType, fTarget, fTarget, FALSE)))
                 break;
             fTarget = D3DFMT_A8R8G8B8;
-            if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, DevT, fTarget, fTarget, FALSE)))
+            if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, m_DriverType, fTarget, fTarget, FALSE)))
                 break;
             fTarget = D3DFMT_R8G8B8;
-            if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, DevT, fTarget, fTarget, FALSE)))
+            if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, m_DriverType, fTarget, fTarget, FALSE)))
                 break;
             fTarget = D3DFMT_UNKNOWN;
             break;
         case 16:
         default:
             fTarget = D3DFMT_R5G6B5;
-            if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, DevT, fTarget, fTarget, FALSE)))
+            if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, m_DriverType, fTarget, fTarget, FALSE)))
                 break;
             fTarget = D3DFMT_X1R5G5B5;
-            if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, DevT, fTarget, fTarget, FALSE)))
+            if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, m_DriverType, fTarget, fTarget, FALSE)))
                 break;
             fTarget = D3DFMT_X4R4G4B4;
-            if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, DevT, fTarget, fTarget, FALSE)))
+            if (SUCCEEDED(pD3D->CheckDeviceType(DevAdapter, m_DriverType, fTarget, fTarget, FALSE)))
                 break;
             fTarget = D3DFMT_UNKNOWN;
             break;
@@ -305,26 +165,26 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     P.Flags = 0; //. D3DPRESENTFLAG_DISCARD_DEPTHSTENCIL;
 
     // Refresh rate
-    if (!bWindowed)
-    {
-        P.PresentationInterval = selectPresentInterval(); // Vsync (R1\R2)
-        P.FullScreen_RefreshRateInHz = selectRefresh(P.BackBufferWidth, P.BackBufferHeight, fTarget);
-    }
-    else
+    if (bWindowed)
     {
         P.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
         P.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
     }
+    else
+    {
+        P.PresentationInterval = selectPresentInterval(); // Vsync (R1\R2)
+        P.FullScreen_RefreshRateInHz = selectRefresh(P.BackBufferWidth, P.BackBufferHeight, fTarget);
+    }
 
     // Create the device
     u32 GPU = selectGPU();
-    HRESULT R = HW.pD3D->CreateDevice(DevAdapter, DevT, m_hWnd,
+    HRESULT R = HW.pD3D->CreateDevice(DevAdapter, m_DriverType, m_hWnd,
         GPU | D3DCREATE_MULTITHREADED, //. ? locks at present
         &P, &pDevice);
 
     if (FAILED(R))
     {
-        R = HW.pD3D->CreateDevice(DevAdapter, DevT, m_hWnd,
+        R = HW.pD3D->CreateDevice(DevAdapter, m_DriverType, m_hWnd,
             GPU | D3DCREATE_MULTITHREADED, //. ? locks at present
             &P, &pDevice);
     }
@@ -339,14 +199,13 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
             MB_OK | MB_ICONERROR);
         TerminateProcess(GetCurrentProcess(), 0);
     };
-    R_CHK(R);
 
     _SHOW_REF("* CREATE: DeviceREF:", HW.pDevice);
     switch (GPU)
     {
-    case D3DCREATE_SOFTWARE_VERTEXPROCESSING: Log("* Vertex Processor: SOFTWARE"); break;
-    case D3DCREATE_MIXED_VERTEXPROCESSING: Log("* Vertex Processor: MIXED"); break;
-    case D3DCREATE_HARDWARE_VERTEXPROCESSING: Log("* Vertex Processor: HARDWARE"); break;
+    case D3DCREATE_SOFTWARE_VERTEXPROCESSING:                        Log("* Vertex Processor: SOFTWARE"     ); break;
+    case D3DCREATE_MIXED_VERTEXPROCESSING:                           Log("* Vertex Processor: MIXED"        ); break;
+    case D3DCREATE_HARDWARE_VERTEXPROCESSING:                        Log("* Vertex Processor: HARDWARE"     ); break;
     case D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_PUREDEVICE: Log("* Vertex Processor: PURE HARDWARE"); break;
     }
 
@@ -357,18 +216,155 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     R_CHK(pDevice->GetRenderTarget(0, &pBaseRT));
     R_CHK(pDevice->GetDepthStencilSurface(&pBaseZB));
     u32 memory = pDevice->GetAvailableTextureMem();
-    Msg("*     Texture memory: %d M", memory / (1024 * 1024));
-    Msg("*          DDI-level: %2.1f", float(D3DXGetDriverLevel(pDevice)) / 100.f);
+    Msg("*   Texture memory: %d M", memory / (1024 * 1024));
+    Msg("*        DDI-level: %2.1f", float(D3DXGetDriverLevel(pDevice)) / 100.f);
 #ifndef _EDITOR
     updateWindowProps(m_hWnd);
     fill_vid_mode_list(this);
 #endif
 }
 
+void CHW::DestroyDevice()
+{
+    _SHOW_REF("refCount:pBaseZB", pBaseZB);
+    _RELEASE(pBaseZB);
+
+    _SHOW_REF("refCount:pBaseRT", pBaseRT);
+    _RELEASE(pBaseRT);
+#ifdef DEBUG
+    _SHOW_REF("refCount:dwDebugSB", dwDebugSB);
+    _RELEASE(dwDebugSB);
+#endif
+    _SHOW_REF("DeviceREF:", HW.pDevice);
+    _RELEASE(HW.pDevice);
+
+    DestroyD3D();
+
+#ifndef _EDITOR
+    free_vid_mode_list();
+#endif
+}
+
+//////////////////////////////////////////////////////////////////////
+// Resetting device
+//////////////////////////////////////////////////////////////////////
+void CHW::Reset(HWND hwnd)
+{
+#ifdef DEBUG
+    _RELEASE(dwDebugSB);
+#endif
+    _SHOW_REF("refCount:pBaseZB", pBaseZB);
+    _SHOW_REF("refCount:pBaseRT", pBaseRT);
+    _RELEASE(pBaseZB);
+    _RELEASE(pBaseRT);
+
+#ifndef _EDITOR
+    bool bWindowed = true;
+    if (!GEnv.isDedicatedServer)
+        bWindowed = !psDeviceFlags.is(rsFullscreen);
+
+    selectResolution(DevPP.BackBufferWidth, DevPP.BackBufferHeight, bWindowed);
+    // Windoze
+    DevPP.SwapEffect = bWindowed ? D3DSWAPEFFECT_COPY : D3DSWAPEFFECT_DISCARD;
+    DevPP.Windowed = bWindowed;
+    if (!bWindowed)
+    {
+        DevPP.PresentationInterval = selectPresentInterval(); // Vsync (R1\R2)
+        DevPP.FullScreen_RefreshRateInHz = selectRefresh(DevPP.BackBufferWidth, DevPP.BackBufferHeight, Caps.fTarget);
+    }
+    else
+    {
+        DevPP.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+        DevPP.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
+    }
+#endif
+
+    while (true)
+    {
+        HRESULT _hr = HW.pDevice->Reset(&DevPP);
+        if (SUCCEEDED(_hr))
+            break;
+        Msg("! ERROR: [%dx%d]: %s", DevPP.BackBufferWidth, DevPP.BackBufferHeight, xrDebug::ErrorToString(_hr));
+        Sleep(100);
+    }
+    R_CHK(pDevice->GetRenderTarget(0, &pBaseRT));
+    R_CHK(pDevice->GetDepthStencilSurface(&pBaseZB));
+#ifdef DEBUG
+    R_CHK(pDevice->CreateStateBlock(D3DSBT_ALL, &dwDebugSB));
+#endif
+#ifndef _EDITOR
+    updateWindowProps(hwnd);
+    ShowWindow(hwnd, SW_SHOWNORMAL);
+#endif
+}
+
+D3DFORMAT CHW::selectDepthStencil(D3DFORMAT fTarget)
+{
+    // R2 hack
+#pragma todo("R2 need to specify depth format")
+    if (GEnv.CurrentRenderer == 2)
+        return D3DFMT_D24S8;
+
+    // R1 usual
+    static D3DFORMAT fDS_Try1[6] = { D3DFMT_D24S8, D3DFMT_D24X4S4, D3DFMT_D32, D3DFMT_D24X8, D3DFMT_D16, D3DFMT_D15S1 };
+
+    D3DFORMAT* fDS_Try = fDS_Try1;
+    int fDS_Cnt = 6;
+
+    for (int it = 0; it < fDS_Cnt; it++)
+    {
+        if (SUCCEEDED(pD3D->CheckDeviceFormat(
+            DevAdapter, m_DriverType, fTarget, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, fDS_Try[it])))
+        {
+            if (SUCCEEDED(pD3D->CheckDepthStencilMatch(DevAdapter, m_DriverType, fTarget, fTarget, fDS_Try[it])))
+            {
+                return fDS_Try[it];
+            }
+        }
+    }
+    return D3DFMT_UNKNOWN;
+}
+
+void CHW::selectResolution(u32& dwWidth, u32& dwHeight, BOOL bWindowed)
+{
+    fill_vid_mode_list(this);
+#ifndef _EDITOR
+    if (GEnv.isDedicatedServer)
+    {
+        dwWidth = 640;
+        dwHeight = 480;
+    }
+    else
+#endif
+    {
+        if (bWindowed)
+        {
+            dwWidth = psCurrentVidMode[0];
+            dwHeight = psCurrentVidMode[1];
+        }
+        else // check
+        {
+#ifndef _EDITOR
+            string64 buff;
+            xr_sprintf(buff, sizeof(buff), "%dx%d", psCurrentVidMode[0], psCurrentVidMode[1]);
+
+            if (_ParseItem(buff, GEnv.vid_mode_token) == u32(-1)) // not found
+            { // select safe
+                xr_sprintf(buff, sizeof(buff), "vid_mode %s", GEnv.vid_mode_token[0].name);
+                Console->Execute(buff);
+            }
+
+            dwWidth = psCurrentVidMode[0];
+            dwHeight = psCurrentVidMode[1];
+#endif
+        }
+    }
+}
+
 u32 CHW::selectPresentInterval()
 {
     D3DCAPS9 caps;
-    pD3D->GetDeviceCaps(DevAdapter, DevT, &caps);
+    pD3D->GetDeviceCaps(DevAdapter, m_DriverType, &caps);
 
     if (!psDeviceFlags.test(rsVSync))
     {
@@ -430,7 +426,7 @@ u32 CHW::selectGPU()
         return D3DCREATE_SOFTWARE_VERTEXPROCESSING;
 
     D3DCAPS9 caps;
-    pD3D->GetDeviceCaps(DevAdapter, DevT, &caps);
+    pD3D->GetDeviceCaps(DevAdapter, m_DriverType, &caps);
 
     if (caps.DevCaps & D3DDEVCAPS_HWTRANSFORMANDLIGHT)
     {
@@ -452,7 +448,9 @@ u32 CHW::selectGPU()
 u32 CHW::selectRefresh(u32 dwWidth, u32 dwHeight, D3DFORMAT fmt)
 {
     if (psDeviceFlags.is(rsRefresh60hz))
+    {
         return D3DPRESENT_RATE_DEFAULT;
+    }
     else
     {
         u32 selected = D3DPRESENT_RATE_DEFAULT;
@@ -475,7 +473,7 @@ u32 CHW::selectRefresh(u32 dwWidth, u32 dwHeight, D3DFORMAT fmt)
 
 BOOL CHW::support(D3DFORMAT fmt, DWORD type, DWORD usage)
 {
-    HRESULT hr = pD3D->CheckDeviceFormat(DevAdapter, DevT, Caps.fTarget, usage, (D3DRESOURCETYPE)type, fmt);
+    HRESULT hr = pD3D->CheckDeviceFormat(DevAdapter, m_DriverType, Caps.fTarget, usage, (D3DRESOURCETYPE)type, fmt);
     if (FAILED(hr))
         return FALSE;
     else
@@ -484,11 +482,11 @@ BOOL CHW::support(D3DFORMAT fmt, DWORD type, DWORD usage)
 
 void CHW::updateWindowProps(HWND m_hWnd)
 {
-    bool bWindowed = true;
+    bool bWindowed = !psDeviceFlags.is(rsFullscreen);
 
 #ifndef _EDITOR
-    if (!GEnv.isDedicatedServer)
-        bWindowed = !psDeviceFlags.is(rsFullscreen);
+    if (GEnv.isDedicatedServer)
+        bWindowed = true;
 #endif
 
     u32 dwWindowStyle = 0;
@@ -497,9 +495,9 @@ void CHW::updateWindowProps(HWND m_hWnd)
     {
         if (m_move_window)
         {
-            bool bBordersMode = strstr(Core.Params, "-draw_borders");
+            const bool drawBorders = strstr(Core.Params, "-draw_borders");
             dwWindowStyle = WS_VISIBLE;
-            if (bBordersMode)
+            if (drawBorders)
                 dwWindowStyle |= WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX;
             SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle);
             // When moving from fullscreen to windowed mode, it is important to
@@ -513,11 +511,11 @@ void CHW::updateWindowProps(HWND m_hWnd)
 
             RECT m_rcWindowBounds;
             float fYOffset = 0.f;
-            bool bCenter = false;
+            bool centerScreen = false;
             if (GEnv.isDedicatedServer || strstr(Core.Params, "-center_screen"))
-                bCenter = true;
+                centerScreen = true;
 
-            if (bCenter)
+            if (centerScreen)
             {
                 RECT DesktopRect;
 
@@ -531,7 +529,7 @@ void CHW::updateWindowProps(HWND m_hWnd)
             }
             else
             {
-                if (bBordersMode)
+                if (drawBorders)
                     fYOffset = GetSystemMetrics(SM_CYCAPTION); // size of the window title bar
                 SetRect(&m_rcWindowBounds, 0, 0, DevPP.BackBufferWidth, DevPP.BackBufferHeight);
             };
@@ -584,19 +582,24 @@ void fill_vid_mode_list(CHW* _hw)
     if (GEnv.vid_mode_token != nullptr)
         return;
     xr_vector<LPCSTR> _tmp;
-    u32 cnt = _hw->pD3D->GetAdapterModeCount(_hw->DevAdapter, _hw->Caps.fTarget);
+    xr_vector<D3DDISPLAYMODE> modes;
 
-    u32 i;
-    for (i = 0; i < cnt; ++i)
+    // Get the number of display modes available
+    UINT cnt = _hw->pD3D->GetAdapterModeCount(_hw->DevAdapter, _hw->Caps.fTarget);
+
+    // Get the list of display modes
+    modes.resize(cnt);
+    for (auto i = 0; i < cnt; ++i)
+        _hw->pD3D->EnumAdapterModes(_hw->DevAdapter, _hw->Caps.fTarget, i, &modes[i]);
+
+    for (auto &i : modes)
     {
-        D3DDISPLAYMODE Mode;
         string32 str;
 
-        _hw->pD3D->EnumAdapterModes(_hw->DevAdapter, _hw->Caps.fTarget, i, &Mode);
-        if (Mode.Width < 800)
+        if (i.Width < 800)
             continue;
 
-        xr_sprintf(str, sizeof(str), "%dx%d", Mode.Width, Mode.Height);
+        xr_sprintf(str, sizeof(str), "%dx%d", i.Width, i.Height);
 
         if (_tmp.end() != std::find_if(_tmp.begin(), _tmp.end(), _uniq_mode(str)))
             continue;
@@ -615,7 +618,7 @@ void fill_vid_mode_list(CHW* _hw)
 #ifdef DEBUG
     Msg("Available video modes[%d]:", _tmp.size());
 #endif // DEBUG
-    for (i = 0; i < _tmp.size(); ++i)
+    for (auto i = 0; i < _tmp.size(); ++i)
     {
         GEnv.vid_mode_token[i].id = i;
         GEnv.vid_mode_token[i].name = _tmp[i];
