@@ -155,7 +155,7 @@ _action* action_name_to_ptr(pcstr _name)
             return &actions[idx];
         ++idx;
     }
-    Msg("! cant find corresponding [id] for action_name", _name);
+    Msg("! cant find corresponding [id] for '%s'", _name);
     return NULL;
 }
 
