@@ -98,18 +98,14 @@ bool RunJITCommand(lua_State* ls, const char* command)
 
 const char* const CScriptEngine::GlobalNamespace = SCRIPT_GLOBAL_NAMESPACE;
 Lock CScriptEngine::stateMapLock;
-xr_unordered_map<lua_State*, CScriptEngine*>* CScriptEngine::stateMap = nullptr;
+xr_unordered_map<lua_State*, CScriptEngine*> CScriptEngine::stateMap;
 
 string4096 CScriptEngine::g_ca_stdout;
 
 void CScriptEngine::reinit()
 {
     stateMapLock.Enter();
-    if (!stateMap)
-    {
-        stateMap = new xr_unordered_map<lua_State*, CScriptEngine*>();
-        stateMap->reserve(32); // 32 lua states should be enough
-    }
+    stateMap.reserve(32); // 32 lua states should be enough
     stateMapLock.Leave();
     if (m_virtual_machine)
     {
@@ -1192,12 +1188,9 @@ CScriptEngine* CScriptEngine::GetInstance(lua_State* state)
 {
     CScriptEngine* instance = nullptr;
     stateMapLock.Enter();
-    if (stateMap)
-    {
-        auto it = stateMap->find(state);
-        if (it != stateMap->end())
-            instance = it->second;
-    }
+    auto it = stateMap.find(state);
+    if (it != stateMap.end())
+        instance = it->second;
     stateMapLock.Leave();
     return instance;
 }
@@ -1206,14 +1199,11 @@ bool CScriptEngine::RegisterState(lua_State* state, CScriptEngine* scriptEngine)
 {
     bool result = false;
     stateMapLock.Enter();
-    if (stateMap)
+    auto it = stateMap.find(state);
+    if (it == stateMap.end())
     {
-        auto it = stateMap->find(state);
-        if (it == stateMap->end())
-        {
-            stateMap->insert({state, scriptEngine});
-            result = true;
-        }
+        stateMap.insert({state, scriptEngine});
+        result = true;
     }
     stateMapLock.Leave();
     return result;
@@ -1225,14 +1215,11 @@ bool CScriptEngine::UnregisterState(lua_State* state)
         return true;
     bool result = false;
     stateMapLock.Enter();
-    if (stateMap)
+    auto it = stateMap.find(state);
+    if (it != stateMap.end())
     {
-        auto it = stateMap->find(state);
-        if (it != stateMap->end())
-        {
-            stateMap->erase(it);
-            result = true;
-        }
+        stateMap.erase(it);
+        result = true;
     }
     stateMapLock.Leave();
     return result;

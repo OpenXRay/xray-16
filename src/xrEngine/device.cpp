@@ -411,7 +411,7 @@ void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
                                                                         TRUE;
         if (bTimer && (!g_pGamePersistent || g_pGamePersistent->CanBePaused()))
         {
-            g_pauseMngr()->Pause(TRUE);
+            g_pauseMngr().Pause(TRUE);
 #ifdef DEBUG
             if (!xr_strcmp(reason, "li_pause_key_no_clip"))
                 TimerGlobal.Pause(FALSE);
@@ -422,10 +422,10 @@ void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
     }
     else
     {
-        if (bTimer && g_pauseMngr()->Paused())
+        if (bTimer && g_pauseMngr().Paused())
         {
             fTimeDelta = EPS_S + EPS_S;
-            g_pauseMngr()->Pause(FALSE);
+            g_pauseMngr().Pause(FALSE);
         }
         if (bSound)
         {
@@ -441,7 +441,7 @@ void CRenderDevice::Pause(BOOL bOn, BOOL bTimer, BOOL bSound, LPCSTR reason)
     }
 }
 
-BOOL CRenderDevice::Paused() { return g_pauseMngr()->Paused(); }
+BOOL CRenderDevice::Paused() { return g_pauseMngr().Paused(); }
 void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
 {
     u16 fActive = LOWORD(wParam);

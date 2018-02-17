@@ -206,22 +206,6 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     DevAdapter = D3DADAPTER_DEFAULT;
     DevT = Caps.bForceGPU_REF ? D3DDEVTYPE_REF : D3DDEVTYPE_HAL;
 
-#ifndef MASTER_GOLD
-    // Look for 'NVIDIA NVPerfHUD' adapter
-    // If it is present, override default settings
-    for (UINT Adapter = 0; Adapter < pD3D->GetAdapterCount(); Adapter++)
-    {
-        D3DADAPTER_IDENTIFIER9 Identifier;
-        HRESULT Res = pD3D->GetAdapterIdentifier(Adapter, 0, &Identifier);
-        if (SUCCEEDED(Res) && (xr_strcmp(Identifier.Description, "NVIDIA PerfHUD") == 0))
-        {
-            DevAdapter = Adapter;
-            DevT = D3DDEVTYPE_REF;
-            break;
-        }
-    }
-#endif //   MASTER_GOLD
-
     // Display the name of video board
     D3DADAPTER_IDENTIFIER9 adapterID;
     R_CHK(pD3D->GetAdapterIdentifier(DevAdapter, 0, &adapterID));
