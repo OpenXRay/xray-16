@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Props">
+      <UniqueIdentifier>{d033d54c-f62f-4d60-bf0e-e8158fb1c7d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Props\NumericVector">
+      <UniqueIdentifier>{91092487-7732-4643-9283-8ce048d56247}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="Props\NumericVector.cpp">
+      <Filter>Props\NumericVector</Filter>
+    </ClCompile>
+    <ClCompile Include="xrEProps.cpp">
+      <Filter>Props</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="pch.hpp" />
+    <ClInclude Include="Props\NumericVector.h">
+      <Filter>Props\NumericVector</Filter>
+    </ClInclude>
+    <ClInclude Include="xrEProps.h">
+      <Filter>Props</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Props\NumericVector.resx" />
+  </ItemGroup>
+</Project>
