@@ -7,6 +7,9 @@
     <Filter Include="Props\NumericVector">
       <UniqueIdentifier>{91092487-7732-4643-9283-8ce048d56247}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Props\ShaderFunction">
+      <UniqueIdentifier>{56d7edeb-5e87-435e-b603-082c4d95413f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -15,6 +18,9 @@
     </ClCompile>
     <ClCompile Include="xrEProps.cpp">
       <Filter>Props</Filter>
+    </ClCompile>
+    <ClCompile Include="Props\ShaderFunction.cpp">
+      <Filter>Props\ShaderFunction</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -25,8 +31,12 @@
     <ClInclude Include="xrEProps.h">
       <Filter>Props</Filter>
     </ClInclude>
+    <ClInclude Include="Props\ShaderFunction.h">
+      <Filter>Props\ShaderFunction</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Props\NumericVector.resx" />
+    <EmbeddedResource Include="Props\ShaderFunction.resx" />
   </ItemGroup>
 </Project>

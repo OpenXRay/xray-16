@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -70,22 +70,32 @@
     <Reference Include="Flobbster.Windows.Forms.PropertyGrid">
       <HintPath>Flobbster.Windows.Forms.PropertyGrid</HintPath>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
+    <Reference Include="UIAutomationProvider" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Props\NumericVector.cpp" />
+    <ClCompile Include="Props\ShaderFunction.cpp" />
     <ClCompile Include="xrEProps.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.hpp" />
     <ClInclude Include="Props\NumericVector.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="Props\ShaderFunction.h">
       <FileType>CppForm</FileType>
     </ClInclude>
     <ClInclude Include="xrEProps.h" />
@@ -98,6 +108,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Props\NumericVector.resx">
       <DependentUpon>Props\NumericVector.h</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Props\ShaderFunction.resx">
+      <DependentUpon>Props\ShaderFunction.h</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
