@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 #pragma once
 
-#include "WaveForm.h"
+#include "xrEngine/WaveForm.h"
 #include "gametype_chooser.h"
 #include "xrCommon/xr_string.h"
 #include "xrCommon/xr_vector.h"

@@ -5565,9 +5565,6 @@
     <ClInclude Include="..\xrServerEntities\ItemListTypes.h">
       <Filter>Core\Server\Editor</Filter>
     </ClInclude>
-    <ClInclude Include="..\xrServerEntities\WaveForm.h">
-      <Filter>Core\Server\Editor</Filter>
-    </ClInclude>
     <ClInclude Include="..\xrServerEntities\xrEProps.h">
       <Filter>Core\Server\Editor</Filter>
     </ClInclude>
@@ -6674,6 +6671,9 @@
       <Filter>UI\Common\PDA\FractionWar</Filter>
     </ClInclude>
     <ClInclude Include="game_type.h" />
+    <ClInclude Include="..\xrEngine\WaveForm.h">
+      <Filter>Core\Server\Editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">

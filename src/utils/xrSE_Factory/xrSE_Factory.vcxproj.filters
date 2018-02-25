@@ -360,9 +360,6 @@
     <ClInclude Include="..\..\xrServerEntities\PropertiesListTypes.h">
       <Filter>ServerStuff\ServerEntities\editor_properties</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\xrServerEntities\WaveForm.h">
-      <Filter>ServerStuff\ServerEntities\editor_properties</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\xrServerEntities\xrEProps.h">
       <Filter>ServerStuff\ServerEntities\editor_properties</Filter>
     </ClInclude>
@@ -401,6 +398,9 @@
     </ClInclude>
     <ClInclude Include="..\..\xrServerEntities\alife_movement_manager_holder.h">
       <Filter>ServerStuff\ServerEntities\movement_manager_holder</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\xrEngine\WaveForm.h">
+      <Filter>ServerStuff\ServerEntities\editor_properties</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,8 @@
 #pragma once
-#ifndef WAVEFORM_H
-#define WAVEFORM_H
+#include <math.h>
+#include "xrCore/_types.h"
+#include "xrCore/math_constants.h"
+#include "xrCommon/math_funcs_inline.h"
 
 #pragma pack(push, 4)
 struct WaveForm
@@ -68,6 +70,4 @@ public:
         return true;
     }
 };
-
 #pragma pack(pop)
-#endif
