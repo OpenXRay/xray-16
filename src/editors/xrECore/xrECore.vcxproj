@@ -98,9 +98,13 @@
     <ClInclude Include="Props\ShaderFunction.h">
       <FileType>CppForm</FileType>
     </ClInclude>
+    <ClInclude Include="Token.h" />
     <ClInclude Include="xrEProps.h" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\xrCore\xrCore.vcxproj">
+      <Project>{a0f7d1fb-59a7-4717-a7e4-96f37e91998e}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\xrSdkControls\xrSdkControls.csproj">
       <Project>{e9dc16a3-d0fa-4924-af6e-f6fdf3ea0661}</Project>
     </ProjectReference>

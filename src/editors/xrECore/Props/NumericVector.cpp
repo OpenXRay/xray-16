@@ -5,6 +5,8 @@ namespace XRay
 {
 namespace ECore
 {
+namespace Props
+{
 bool NumericVector::Run(pcstr title, Fvector* data, int decimal, Fvector* resetValue, Fvector* min, Fvector* max, int* X, int* Y)
 {
     System::String^ str = gcnew System::String(title);
@@ -97,6 +99,6 @@ System::Void NumericVector::OnValueChanged(System::Object^ sender, System::Event
     if (checkImmediate->Checked)
         buttonApply_Click(sender, e);
 }
-
+} // namespace Props
 } // namespace ECore
 } // namespace XRay

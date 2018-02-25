@@ -8,11 +8,19 @@ ref class ShaderFunction;
 }
 }
 
-class WaveForm;
+struct WaveForm;
+struct xr_token;
+
+namespace XRay
+{
+ref class Token;
+}
 
 namespace XRay
 {
 namespace ECore
+{
+namespace Props
 {
 using namespace System;
 using namespace System::ComponentModel;
@@ -24,10 +32,7 @@ using namespace System::Drawing;
 public ref class ShaderFunction : public System::Windows::Forms::Form
 {
 public:
-	ShaderFunction(void)
-	{
-		InitializeComponent();
-	}
+	ShaderFunction(void);
 
 protected:
 	~ShaderFunction()
@@ -37,6 +42,26 @@ protected:
 			delete components;
 		}
 	}
+
+private:
+    bool bLoadMode;
+
+    WaveForm* currentFunc;
+    WaveForm* saveFunc;
+
+    void GetFuncData();
+    void UpdateFuncData();
+    void DrawGraph();
+
+public:
+    bool Run(WaveForm* func);
+    void FillFunctionsFromToken(const xr_token* tokens);
+    XRay::Token^ GetTokenFromValue(int val);
+
+private: System::Void ShaderFunction_KeyPress(System::Object^ sender, System::Windows::Forms::KeyPressEventArgs^ e);
+private: System::Void numArgX_KeyPress(System::Object^ sender, System::Windows::Forms::KeyPressEventArgs^ e);
+private: System::Void buttonOk_Click(System::Object^  sender, System::EventArgs^  e);
+private: System::Void buttonCancel_Click(System::Object^ sender, System::EventArgs^ e);
 
 private: System::Windows::Forms::Label^ label1;
 private: System::Windows::Forms::Label^ label2;
@@ -60,7 +85,7 @@ private: XRay::SdkControls::NumericSpinner^ numScale;
 private: System::Windows::Forms::Panel^ panelLeft;
 private: System::Windows::Forms::Panel^ panelRight;
 
-private: System::Windows::Forms::ComboBox^ comboBox1;
+private: System::Windows::Forms::ComboBox^ comboFunctions;
 private: System::Windows::Forms::PictureBox^ pbDraw;
 
 private: System::Windows::Forms::Button^ buttonOk;
@@ -83,7 +108,7 @@ private:
         this->numArg4 = (gcnew XRay::SdkControls::NumericSpinner());
         this->label6 = (gcnew System::Windows::Forms::Label());
         this->panelLeft = (gcnew System::Windows::Forms::Panel());
-        this->comboBox1 = (gcnew System::Windows::Forms::ComboBox());
+        this->comboFunctions = (gcnew System::Windows::Forms::ComboBox());
         this->panelRight = (gcnew System::Windows::Forms::Panel());
         this->numScale = (gcnew XRay::SdkControls::NumericSpinner());
         this->pbDraw = (gcnew System::Windows::Forms::PictureBox());
@@ -140,6 +165,7 @@ private:
         this->numArg1->TabIndex = 5;
         this->numArg1->TextAlign = System::Windows::Forms::HorizontalAlignment::Left;
         this->numArg1->Value = System::Decimal(gcnew cli::array< System::Int32 >(4) { 0, 0, 0, 0 });
+        this->numArg1->KeyPress += gcnew System::Windows::Forms::KeyPressEventHandler(this, &ShaderFunction::numArgX_KeyPress);
         this->numArg2->DecimalPlaces = 5;
         this->numArg2->Hexadecimal = false;
         this->numArg2->Location = System::Drawing::Point(89, 57);
@@ -152,6 +178,7 @@ private:
         this->numArg2->TabIndex = 6;
         this->numArg2->TextAlign = System::Windows::Forms::HorizontalAlignment::Left;
         this->numArg2->Value = System::Decimal(gcnew cli::array< System::Int32 >(4) { 0, 0, 0, 0 });
+        this->numArg2->KeyPress += gcnew System::Windows::Forms::KeyPressEventHandler(this, &ShaderFunction::numArgX_KeyPress);
         this->numArg3->DecimalPlaces = 5;
         this->numArg3->Hexadecimal = false;
         this->numArg3->Location = System::Drawing::Point(89, 84);
@@ -164,6 +191,7 @@ private:
         this->numArg3->TabIndex = 7;
         this->numArg3->TextAlign = System::Windows::Forms::HorizontalAlignment::Left;
         this->numArg3->Value = System::Decimal(gcnew cli::array< System::Int32 >(4) { 0, 0, 0, 0 });
+        this->numArg3->KeyPress += gcnew System::Windows::Forms::KeyPressEventHandler(this, &ShaderFunction::numArgX_KeyPress);
         this->numArg4->DecimalPlaces = 5;
         this->numArg4->Hexadecimal = false;
         this->numArg4->Location = System::Drawing::Point(89, 111);
@@ -176,13 +204,14 @@ private:
         this->numArg4->TabIndex = 8;
         this->numArg4->TextAlign = System::Windows::Forms::HorizontalAlignment::Left;
         this->numArg4->Value = System::Decimal(gcnew cli::array< System::Int32 >(4) { 0, 0, 0, 0 });
+        this->numArg4->KeyPress += gcnew System::Windows::Forms::KeyPressEventHandler(this, &ShaderFunction::numArgX_KeyPress);
         this->label6->AutoSize = true;
         this->label6->Location = System::Drawing::Point(44, 5);
         this->label6->Name = L"label6";
         this->label6->Size = System::Drawing::Size(192, 13);
         this->label6->TabIndex = 10;
         this->label6->Text = L"y = arg1 + arg2*func((time + arg3)*arg4)";
-        this->panelLeft->Controls->Add(this->comboBox1);
+        this->panelLeft->Controls->Add(this->comboFunctions);
         this->panelLeft->Controls->Add(this->label1);
         this->panelLeft->Controls->Add(this->label2);
         this->panelLeft->Controls->Add(this->numArg4);
@@ -196,11 +225,11 @@ private:
         this->panelLeft->Name = L"panelLeft";
         this->panelLeft->Size = System::Drawing::Size(205, 140);
         this->panelLeft->TabIndex = 11;
-        this->comboBox1->FormattingEnabled = true;
-        this->comboBox1->Location = System::Drawing::Point(89, 1);
-        this->comboBox1->Name = L"comboBox1";
-        this->comboBox1->Size = System::Drawing::Size(115, 21);
-        this->comboBox1->TabIndex = 9;
+        this->comboFunctions->FormattingEnabled = true;
+        this->comboFunctions->Location = System::Drawing::Point(89, 1);
+        this->comboFunctions->Name = L"comboFunctions";
+        this->comboFunctions->Size = System::Drawing::Size(115, 21);
+        this->comboFunctions->TabIndex = 9;
         this->panelRight->Controls->Add(this->numScale);
         this->panelRight->Controls->Add(this->pbDraw);
         this->panelRight->Controls->Add(this->labelEnd);
@@ -270,12 +299,14 @@ private:
         this->buttonOk->TabIndex = 14;
         this->buttonOk->Text = L"Ok";
         this->buttonOk->UseVisualStyleBackColor = true;
+        this->buttonOk->Click += gcnew System::EventHandler(this, &ShaderFunction::buttonOk_Click);
         this->buttonCancel->Location = System::Drawing::Point(88, 140);
         this->buttonCancel->Name = L"buttonCancel";
         this->buttonCancel->Size = System::Drawing::Size(116, 22);
         this->buttonCancel->TabIndex = 13;
         this->buttonCancel->Text = L"Cancel";
         this->buttonCancel->UseVisualStyleBackColor = true;
+        this->buttonCancel->Click += gcnew System::EventHandler(this, &ShaderFunction::buttonCancel_Click);
         this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
         this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
         this->ClientSize = System::Drawing::Size(441, 162);
@@ -295,8 +326,7 @@ private:
 
     }
 #pragma endregion
-
-public: bool Run(WaveForm* func);
 };
+} // namespace Props
 } // namespace ECore
 } // namespace XRay

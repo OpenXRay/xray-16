@@ -16,6 +16,8 @@ namespace XRay
 {
 namespace ECore
 {
+namespace Props
+{
 using namespace System;
 using namespace System::ComponentModel;
 using namespace System::Collections;
@@ -206,5 +208,6 @@ private: System::Void NumericVector_KeyPress(System::Object^ sender, System::Win
 
 private: System::Void OnValueChanged(System::Object^ sender, System::EventArgs^ e);
 };
+} // namespace Props
 } // namespace ECore
 } // namespace XRay

@@ -10,6 +10,9 @@
     <Filter Include="Props\ShaderFunction">
       <UniqueIdentifier>{56d7edeb-5e87-435e-b603-082c4d95413f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{5ef41f0f-a8ef-4194-ae46-068b92e5bbd3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -33,6 +36,9 @@
     </ClInclude>
     <ClInclude Include="Props\ShaderFunction.h">
       <Filter>Props\ShaderFunction</Filter>
+    </ClInclude>
+    <ClInclude Include="Token.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
