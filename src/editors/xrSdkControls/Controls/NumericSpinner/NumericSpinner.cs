@@ -104,11 +104,18 @@ namespace XRay.SdkControls
             if (!isDragging || mouseX == e.X)
                 return;
 
+            bool increasing;
             var newValue = numSpinner.Value;
             if (mouseX > e.X)
+            {
+                increasing = false;
                 newValue -= (mouseX - e.X) * Precision;
+            }
             else
+            {
+                increasing = true;
                 newValue += (e.X - mouseX) * Precision;
+            }
 
             if (newValue > numSpinner.Maximum)
                 numSpinner.Value = numSpinner.Maximum;
@@ -117,12 +124,15 @@ namespace XRay.SdkControls
             else
                 numSpinner.Value = newValue;
 
-            if (accumulation > 9)
+            if (accumulation > 1 || accumulation < -1)
             {
                 Cursor.Position = mousePos;
                 accumulation = 0;
             }
-            ++accumulation;
+            if (increasing)
+                ++accumulation;
+            else
+                --accumulation;
         }
     }
 }
