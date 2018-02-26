@@ -56,6 +56,7 @@ XRay::Token^ ShaderFunction::GetTokenFromValue(int val)
     }
 
     NODEFAULT;
+    return nullptr;
 }
 
 System::Void ShaderFunction::ShaderFunction_KeyPress(System::Object^ sender, System::Windows::Forms::KeyPressEventArgs^ e)
@@ -71,7 +72,6 @@ System::Void ShaderFunction::ShaderFunction_KeyPress(System::Object^ sender, Sys
 System::Void ShaderFunction::buttonCancel_Click(System::Object^ sender, System::EventArgs^ e)
 {
     CopyMemory(currentFunc, saveFunc, sizeof(WaveForm));
-    this->Close();
 }
 
 System::Void ShaderFunction::numArgX_KeyPress(System::Object^ sender, System::Windows::Forms::KeyPressEventArgs^ e)

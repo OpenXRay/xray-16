@@ -13,6 +13,9 @@
     <Filter Include="Core">
       <UniqueIdentifier>{5ef41f0f-a8ef-4194-ae46-068b92e5bbd3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Props\GameType">
+      <UniqueIdentifier>{6990b14a-937f-44c1-9ca3-1f83ab512b84}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -24,6 +27,9 @@
     </ClCompile>
     <ClCompile Include="Props\ShaderFunction.cpp">
       <Filter>Props\ShaderFunction</Filter>
+    </ClCompile>
+    <ClCompile Include="Props\GameType.cpp">
+      <Filter>Props\GameType</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -40,9 +46,19 @@
     <ClInclude Include="Token.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="Props\GameType.h">
+      <Filter>Props\GameType</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Props\NumericVector.resx" />
-    <EmbeddedResource Include="Props\ShaderFunction.resx" />
+    <EmbeddedResource Include="Props\NumericVector.resx">
+      <Filter>Props\NumericVector</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Props\ShaderFunction.resx">
+      <Filter>Props\ShaderFunction</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Props\GameType.resx">
+      <Filter>Props\GameType</Filter>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

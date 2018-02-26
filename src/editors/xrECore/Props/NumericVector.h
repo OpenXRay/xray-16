@@ -49,7 +49,6 @@ protected:
 
 private: System::Void buttonApply_Click(System::Object^ sender, System::EventArgs^ e);
 private: System::Void buttonOk_Click(System::Object^ sender, System::EventArgs^ e);
-private: System::Void buttonCancel_Click(System::Object^ sender, System::EventArgs^ e);
 private: System::Void buttonReset_Click(System::Object^ sender, System::EventArgs^ e);
 private: System::Void buttonImmediate_Click(System::Object^ sender, System::EventArgs^ e);
 private: System::Void NumericVector_KeyPress(System::Object^ sender, System::Windows::Forms::KeyPressEventArgs^ e);
@@ -91,6 +90,7 @@ private:
         this->buttonImmediate = (gcnew System::Windows::Forms::Button());
         this->checkImmediate = (gcnew System::Windows::Forms::CheckBox());
         this->SuspendLayout();
+        this->buttonOk->DialogResult = System::Windows::Forms::DialogResult::OK;
         this->buttonOk->Location = System::Drawing::Point(136, 21);
         this->buttonOk->Name = L"buttonOk";
         this->buttonOk->Size = System::Drawing::Size(50, 22);
@@ -98,13 +98,13 @@ private:
         this->buttonOk->Text = L"Ok";
         this->buttonOk->UseVisualStyleBackColor = true;
         this->buttonOk->Click += gcnew System::EventHandler(this, &NumericVector::buttonOk_Click);
+        this->buttonCancel->DialogResult = System::Windows::Forms::DialogResult::Cancel;
         this->buttonCancel->Location = System::Drawing::Point(136, 42);
         this->buttonCancel->Name = L"buttonCancel";
         this->buttonCancel->Size = System::Drawing::Size(50, 22);
         this->buttonCancel->TabIndex = 1;
         this->buttonCancel->Text = L"Cancel";
         this->buttonCancel->UseVisualStyleBackColor = true;
-        this->buttonCancel->Click += gcnew System::EventHandler(this, &NumericVector::buttonCancel_Click);
         this->buttonReset->Location = System::Drawing::Point(136, 63);
         this->buttonReset->Name = L"buttonReset";
         this->buttonReset->Size = System::Drawing::Size(50, 22);
@@ -184,8 +184,10 @@ private:
         this->checkImmediate->Size = System::Drawing::Size(15, 14);
         this->checkImmediate->TabIndex = 11;
         this->checkImmediate->UseVisualStyleBackColor = true;
+        this->AcceptButton = this->buttonOk;
         this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
         this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
+        this->CancelButton = this->buttonCancel;
         this->ClientSize = System::Drawing::Size(186, 85);
         this->Controls->Add(this->checkImmediate);
         this->Controls->Add(this->buttonImmediate);

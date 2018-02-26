@@ -296,6 +296,7 @@ private:
         this->labelMax->TabIndex = 11;
         this->labelMax->Text = L"Max";
         this->labelMax->TextAlign = System::Drawing::ContentAlignment::TopRight;
+        this->buttonOk->DialogResult = System::Windows::Forms::DialogResult::OK;
         this->buttonOk->Location = System::Drawing::Point(0, 140);
         this->buttonOk->Name = L"buttonOk";
         this->buttonOk->Size = System::Drawing::Size(89, 22);
@@ -303,6 +304,7 @@ private:
         this->buttonOk->Text = L"Ok";
         this->buttonOk->UseVisualStyleBackColor = true;
         this->buttonOk->Click += gcnew System::EventHandler(this, &ShaderFunction::buttonOk_Click);
+        this->buttonCancel->DialogResult = System::Windows::Forms::DialogResult::Cancel;
         this->buttonCancel->Location = System::Drawing::Point(88, 140);
         this->buttonCancel->Name = L"buttonCancel";
         this->buttonCancel->Size = System::Drawing::Size(116, 22);
@@ -310,8 +312,10 @@ private:
         this->buttonCancel->Text = L"Cancel";
         this->buttonCancel->UseVisualStyleBackColor = true;
         this->buttonCancel->Click += gcnew System::EventHandler(this, &ShaderFunction::buttonCancel_Click);
+        this->AcceptButton = this->buttonOk;
         this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
         this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
+        this->CancelButton = this->buttonCancel;
         this->ClientSize = System::Drawing::Size(441, 162);
         this->Controls->Add(this->buttonOk);
         this->Controls->Add(this->buttonCancel);

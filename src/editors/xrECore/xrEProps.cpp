@@ -2,6 +2,7 @@
 #include "xrEProps.h"
 #include "Props/NumericVector.h"
 #include "Props/ShaderFunction.h"
+#include "Props/GameType.h"
 #include "xrEngine/WaveForm.h"
 
 namespace XRay
@@ -20,6 +21,12 @@ bool ShaderFunctionRun(WaveForm* func)
 {
     auto form = gcnew ShaderFunction();
     return form->Run(func);
+}
+
+bool GameTypeRun(pcstr title, GameTypeChooser* data)
+{
+    auto form = gcnew GameType();
+    return form->Run(title, data);
 }
 } // namespace Props
 } // namespace ECore

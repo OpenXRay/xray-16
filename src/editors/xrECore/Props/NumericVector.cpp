@@ -81,16 +81,9 @@ System::Void NumericVector::buttonApply_Click(System::Object^ sender, System::Ev
     Value->set((float)numX->Value, (float)numY->Value, (float)numZ->Value);
 }
 
-
 System::Void NumericVector::buttonOk_Click(System::Object^ sender, System::EventArgs^ e)
 {
     buttonApply_Click(sender, e);
-    this->Close();
-}
-
-System::Void NumericVector::buttonCancel_Click(System::Object^ sender, System::EventArgs^ e)
-{
-    this->Close();
 }
 
 System::Void NumericVector::buttonReset_Click(System::Object^ sender, System::EventArgs^ e)
@@ -110,13 +103,13 @@ System::Void NumericVector::NumericVector_KeyPress(System::Object^ sender, Syste
     switch (e->KeyChar)
     {
     case (Char)Keys::Space:
-        buttonApply_Click(sender, e);
+        buttonApply->PerformClick();
         break;
     case (Char)Keys::Enter:
-        buttonOk_Click(sender, e);
+        buttonOk->PerformClick();
         break;
     case (Char)Keys::Escape:
-        buttonCancel_Click(sender, e);
+        buttonCancel->PerformClick();
         break;
     }
 }
