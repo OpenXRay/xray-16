@@ -155,8 +155,6 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
         D3D_DRIVER_TYPE_UNKNOWN, // Если мы выбираем конкретный адаптер, то мы обязаны использовать D3D_DRIVER_TYPE_UNKNOWN.
         NULL, createDeviceFlags, pFeatureLevels, sizeof(pFeatureLevels) / sizeof(pFeatureLevels[0]),
         D3D11_SDK_VERSION, &pDevice, &FeatureLevel, &pContext);
-
-    R_CHK(m_pFactory->CreateSwapChain(pDevice, &sd, &m_pSwapChain));
 #else
     R = D3D10CreateDevice(m_pAdapter, m_DriverType, NULL, createDeviceFlags, D3D10_SDK_VERSION, &pDevice);
 
@@ -225,7 +223,7 @@ void CHW::DestroyDevice()
 #ifndef USE_DX11
     _RELEASE(HW.pDevice1);
 #endif
-    _SHOW_REF("DeviceREF:", HW.pDevice);
+    _SHOW_REF("refCount:HW.pDevice:", HW.pDevice);
     _RELEASE(HW.pDevice);
 
     DestroyD3D();
