@@ -4,7 +4,10 @@ namespace XRay
 {
 namespace ECore
 {
+namespace Props
+{
 ref class NumericVector;
+}
 }
 }
 
@@ -44,23 +47,30 @@ protected:
         }
     }
 
+private: System::Void buttonApply_Click(System::Object^ sender, System::EventArgs^ e);
+private: System::Void buttonOk_Click(System::Object^ sender, System::EventArgs^ e);
+private: System::Void buttonCancel_Click(System::Object^ sender, System::EventArgs^ e);
+private: System::Void buttonReset_Click(System::Object^ sender, System::EventArgs^ e);
+private: System::Void buttonImmediate_Click(System::Object^ sender, System::EventArgs^ e);
+private: System::Void NumericVector_KeyPress(System::Object^ sender, System::Windows::Forms::KeyPressEventArgs^ e);
+
+private: System::Void OnValueChanged(System::Object^ sender, System::EventArgs^ e);
+
+
 private: Fvector* Value;
 private: Fvector* ResetValue;
 private: System::Windows::Forms::Button^ buttonOk;
 private: System::Windows::Forms::Button^ buttonCancel;
-private: System::Windows::Forms::Button^  buttonReset;
+private: System::Windows::Forms::Button^ buttonReset;
+private: System::Windows::Forms::Button^ buttonApply;
+private: System::Windows::Forms::Button^ buttonImmediate;
+private: System::Windows::Forms::CheckBox^ checkImmediate;
 private: XRay::SdkControls::NumericSpinner^ numX;
 private: XRay::SdkControls::NumericSpinner^ numY;
 private: XRay::SdkControls::NumericSpinner^ numZ;
 private: System::Windows::Forms::Label^ labelX;
 private: System::Windows::Forms::Label^ labelY;
 private: System::Windows::Forms::Label^ labelZ;
-private: System::Windows::Forms::Button^  button1;
-private: System::Windows::Forms::Button^  button2;
-private: System::Windows::Forms::CheckBox^  checkImmediate;
-
-private: System::Windows::Forms::Button^  buttonApply;
-private: System::Windows::Forms::Button^  buttonImmediate;
 
 private:
     System::ComponentModel::Container^ components;
@@ -199,14 +209,6 @@ private:
 
     }
 #pragma endregion
-private: System::Void buttonApply_Click(System::Object^ sender, System::EventArgs^ e);
-private: System::Void buttonOk_Click(System::Object^ sender, System::EventArgs^ e);
-private: System::Void buttonCancel_Click(System::Object^ sender, System::EventArgs^ e);
-private: System::Void buttonReset_Click(System::Object^ sender, System::EventArgs^ e);
-private: System::Void buttonImmediate_Click(System::Object^ sender, System::EventArgs^ e);
-private: System::Void NumericVector_KeyPress(System::Object^ sender, System::Windows::Forms::KeyPressEventArgs^ e);
-
-private: System::Void OnValueChanged(System::Object^ sender, System::EventArgs^ e);
 };
 } // namespace Props
 } // namespace ECore

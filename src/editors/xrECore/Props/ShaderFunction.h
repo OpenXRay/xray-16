@@ -4,7 +4,10 @@ namespace XRay
 {
 namespace ECore
 {
+namespace Props
+{
 ref class ShaderFunction;
+}
 }
 }
 

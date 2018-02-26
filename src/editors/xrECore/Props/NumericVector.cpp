@@ -13,6 +13,15 @@ bool NumericVector::Run(pcstr title, Fvector* data, int decimal, Fvector* resetV
     this->Text = str;
     Value = data;
     ResetValue = resetValue;
+    buttonReset->Enabled = !!resetValue;
+
+    numX->DecimalPlaces = decimal;
+    numY->DecimalPlaces = decimal;
+    numZ->DecimalPlaces = decimal;
+
+    numX->Value = (Decimal)data->x;
+    numY->Value = (Decimal)data->y;
+    numZ->Value = (Decimal)data->z;
 
     if (min)
     {
@@ -42,7 +51,25 @@ bool NumericVector::Run(pcstr title, Fvector* data, int decimal, Fvector* resetV
 
     }
 
-    buttonReset_Click(nullptr, nullptr);
+    if (!X || !Y)
+    {
+        POINT pt;
+        GetCursorPos(&pt);
+        int w = GetSystemMetrics(SM_CXSCREEN);
+        int h = GetSystemMetrics(SM_CYSCREEN);
+        Left = pt.x - (Width * 0.5f);
+        Top = pt.y;
+        if (((Left + Width * 0.5f) > w) || ((Top + Height) > h))
+        {
+            Left = w * 0.5f - Width * 0.5f;
+            Top = h * 0.5f;
+        }
+    }
+    else
+    {
+        Left = *X - (Width * 0.5f);
+        Top = *Y;
+    }
 
     numX->ValueChanged += gcnew EventHandler(this, &NumericVector::OnValueChanged);
 

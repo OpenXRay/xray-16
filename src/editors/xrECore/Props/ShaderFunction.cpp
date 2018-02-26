@@ -132,6 +132,56 @@ void ShaderFunction::DrawGraph()
 
     // XXX: Draw
     //System::Windows::Controls::Canvas canvas;
+
+#if 0 // Taken from xrEProps/ShaderFunction.cpp
+    int w = imDraw->Width - 4;
+    int h = imDraw->Height - 4;
+
+    TRect r;
+    r.Left = 0;
+    r.Top = 0;
+    r.Right = w + 4;
+    r.Bottom = h + 4;
+    TCanvas* C = imDraw->Canvas;
+    C->Brush->Color = clBlack;
+    C->FillRect(r);
+    C->Pen->Color = TColor(0x00006600);
+    // draw center
+    C->Pen->Color = clLime;
+    C->Pen->Style = psDot;
+    C->MoveTo(2, h / 2 + 2);
+    C->LineTo(w + 2, h / 2 + 2);
+    // draw rect
+    C->Pen->Color = TColor(0x00006600);
+    C->Pen->Style = psSolid;
+    C->MoveTo(0, 0);
+    C->LineTo(w + 3, 0);
+    C->LineTo(w + 3, h + 3);
+    C->LineTo(0, h + 3);
+    C->LineTo(0, 0);
+    // draw graph
+    C->Pen->Color = clYellow;
+
+    float t_cost = 1.f / w;
+    float tm = 0;
+    float y = m_CurFunc->Calculate(tm) - m_CurFunc->arg[0];
+    float delta = m_CurFunc->arg[1] * 2;
+    delta = delta ? (h / delta) : 0;
+    float yy = h - (delta * y + h / 2);
+    C->MoveTo(2, yy + 2);
+    for (int t = 1; t < w; t++)
+    {
+        tm = seScale->Value * t * t_cost / (fis_zero(m_CurFunc->arg[3]) ? 1.f : m_CurFunc->arg[3]);
+        y = m_CurFunc->Calculate(tm) - m_CurFunc->arg[0];
+        yy = h - (delta * y + h / 2);
+        C->LineTo(t + 2, yy + 2);
+    }
+    // draw X-axis
+    C->Pen->Color = clGreen;
+    float AxisX = h - (delta * (-m_CurFunc->arg[0]) + h / 2);
+    C->MoveTo(2, AxisX + 2);
+    C->LineTo(w + 2, AxisX + 2);
+#endif
 }
 } // namespace Props
 } // namespace ECore
