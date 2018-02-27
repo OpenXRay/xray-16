@@ -50,7 +50,7 @@ static void* lua_alloc(void* ud, void* ptr, size_t osize, size_t nsize)
         xr_free(ptr);
         return nullptr;
     }
-    return Memory.mem_realloc(ptr, nsize);
+    return xr_realloc(ptr, nsize);
 }
 
 static void* __cdecl luabind_allocator(void* context, const void* pointer, size_t const size)
@@ -63,10 +63,10 @@ static void* __cdecl luabind_allocator(void* context, const void* pointer, size_
     }
     if (!pointer)
     {
-        return Memory.mem_alloc(size);
+        return xr_malloc(size);
     }
     void* non_const_pointer = const_cast<LPVOID>(pointer);
-    return Memory.mem_realloc(non_const_pointer, size);
+    return xr_realloc(non_const_pointer, size);
 }
 
 namespace

@@ -96,18 +96,18 @@ CDetailManager::CDetailManager() : xrc("detail manager")
     dm_cache_size = dm_current_cache_size;
     dm_fade = dm_current_fade;
     ps_r__Detail_density = ps_current_detail_density;
-    cache_level1 = (CacheSlot1**)Memory.mem_alloc(dm_cache1_line * sizeof(CacheSlot1*));
+    cache_level1 = (CacheSlot1**)xr_malloc(dm_cache1_line * sizeof(CacheSlot1*));
     for (u32 i = 0; i < dm_cache1_line; ++i)
     {
-        cache_level1[i] = (CacheSlot1*)Memory.mem_alloc(dm_cache1_line * sizeof(CacheSlot1));
+        cache_level1[i] = (CacheSlot1*)xr_malloc(dm_cache1_line * sizeof(CacheSlot1));
         for (u32 j = 0; j < dm_cache1_line; ++j)
             new(&cache_level1[i][j]) CacheSlot1();
     }
-    cache = (Slot***)Memory.mem_alloc(dm_cache_line * sizeof(Slot**));
+    cache = (Slot***)xr_malloc(dm_cache_line * sizeof(Slot**));
     for (u32 i = 0; i < dm_cache_line; ++i)
-        cache[i] = (Slot**)Memory.mem_alloc(dm_cache_line * sizeof(Slot*));
+        cache[i] = (Slot**)xr_malloc(dm_cache_line * sizeof(Slot*));
         
-    cache_pool = (Slot *)Memory.mem_alloc(dm_cache_size * sizeof(Slot));
+    cache_pool = (Slot *)xr_malloc(dm_cache_size * sizeof(Slot));
     
     for (u32 i = 0; i < dm_cache_size; ++i)
         new(&cache_pool[i]) Slot();
@@ -124,19 +124,19 @@ CDetailManager::~CDetailManager()
 #ifdef DETAIL_RADIUS
     for (u32 i = 0; i < dm_cache_size; ++i)
         cache_pool[i].~Slot();
-    Memory.mem_free(cache_pool);
+    xr_free(cache_pool);
 
     for (u32 i = 0; i < dm_cache_line; ++i)
-        Memory.mem_free(cache[i]);
-    Memory.mem_free(cache);
+        xr_free(cache[i]);
+    xr_free(cache);
 
     for (u32 i = 0; i < dm_cache1_line; ++i)
     {
         for (u32 j = 0; j < dm_cache1_line; ++j)
             cache_level1[i][j].~CacheSlot1();
-        Memory.mem_free(cache_level1[i]);
+        xr_free(cache_level1[i]);
     }
-    Memory.mem_free(cache_level1);
+    xr_free(cache_level1);
 #endif
 }
 /*

@@ -86,7 +86,7 @@ void net_task_manager::create_global_data_write(LPCSTR save_path)
 
     // g_net_data = new CVirtualFileRW(global_data_file_name);
 
-    // dbg_buf = Memory.mem_alloc( 560000000, "dbg_buf" );
+    // dbg_buf = xr_malloc( 560000000, "dbg_buf" );
     ////////////////
     /*{
         string_path			 blfile_name;
