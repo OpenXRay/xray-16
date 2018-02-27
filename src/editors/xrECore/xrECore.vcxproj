@@ -89,6 +89,7 @@
     <ClCompile Include="Props\GameType.cpp" />
     <ClCompile Include="Props\NumericVector.cpp" />
     <ClCompile Include="Props\ShaderFunction.cpp" />
+    <ClCompile Include="Props\TextEdit.cpp" />
     <ClCompile Include="xrEProps.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -100,6 +101,9 @@
       <FileType>CppForm</FileType>
     </ClInclude>
     <ClInclude Include="Props\ShaderFunction.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="Props\TextEdit.h">
       <FileType>CppForm</FileType>
     </ClInclude>
     <ClInclude Include="Token.h" />
@@ -122,6 +126,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Props\ShaderFunction.resx">
       <DependentUpon>Props\ShaderFunction.h</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Props\TextEdit.resx">
+      <DependentUpon>Props\TextEdit.h</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

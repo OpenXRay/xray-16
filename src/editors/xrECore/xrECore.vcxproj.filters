@@ -16,6 +16,9 @@
     <Filter Include="Props\GameType">
       <UniqueIdentifier>{6990b14a-937f-44c1-9ca3-1f83ab512b84}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Props\Text">
+      <UniqueIdentifier>{d6664b68-d033-492a-9771-83f3129cd1af}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -30,6 +33,9 @@
     </ClCompile>
     <ClCompile Include="Props\GameType.cpp">
       <Filter>Props\GameType</Filter>
+    </ClCompile>
+    <ClCompile Include="Props\TextEdit.cpp">
+      <Filter>Props\Text</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -49,6 +55,9 @@
     <ClInclude Include="Props\GameType.h">
       <Filter>Props\GameType</Filter>
     </ClInclude>
+    <ClInclude Include="Props\TextEdit.h">
+      <Filter>Props\Text</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Props\NumericVector.resx">
@@ -59,6 +68,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Props\GameType.resx">
       <Filter>Props\GameType</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Props\TextEdit.resx">
+      <Filter>Props\Text</Filter>
     </EmbeddedResource>
   </ItemGroup>
 </Project>
