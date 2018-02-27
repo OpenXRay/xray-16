@@ -1,16 +1,11 @@
 #include "stdafx.h"
-#pragma hdrstop
 
-#include "xrsharedmem.h"
-#include "xrCore/_std_extensions.h"
+#include <Psapi.h>
+#include "tbb/scalable_allocator.h"
 
 xrMemory Memory;
 // Also used in src\xrCore\xrDebug.cpp to prevent use of g_pStringContainer before it initialized
 bool shared_str_initialized = false;
-
-// fake fix of memory corruptions in multiplayer game :(
-// XXX nitrocaster: to be removed
-XRCORE_API bool g_allow_heap_min = true;
 
 xrMemory::xrMemory()
 {
@@ -57,32 +52,20 @@ XRCORE_API void log_vminfo()
 
 size_t xrMemory::mem_usage()
 {
-    _HEAPINFO hinfo = {};
-    int status;
-    size_t bytesUsed = 0;
-    while ((status = _heapwalk(&hinfo)) == _HEAPOK)
+    PROCESS_MEMORY_COUNTERS pmc = {};
+    if (HANDLE h = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, GetCurrentProcessId()))
     {
-        if (hinfo._useflag == _USEDENTRY)
-            bytesUsed += hinfo._size;
+        GetProcessMemoryInfo(h, &pmc, sizeof(pmc));
+        CloseHandle(h);
     }
-    switch (status)
-    {
-    case _HEAPEMPTY: break;
-    case _HEAPEND: break;
-    case _HEAPBADPTR: FATAL("bad pointer to heap"); break;
-    case _HEAPBADBEGIN: FATAL("bad start of heap"); break;
-    case _HEAPBADNODE: FATAL("bad node in heap"); break;
-    }
-    return bytesUsed;
+    return pmc.PagefileUsage;
 }
 
 void xrMemory::mem_compact()
 {
     RegFlushKey(HKEY_CLASSES_ROOT);
     RegFlushKey(HKEY_CURRENT_USER);
-    if (g_allow_heap_min)
-        _heapmin();
-    HeapCompact(GetProcessHeap(), 0);
+    scalable_allocation_command(TBBMALLOC_CLEAN_ALL_BUFFERS, NULL);
     if (g_pStringContainer)
         g_pStringContainer->clean();
     if (g_pSharedMemoryContainer)
@@ -94,19 +77,19 @@ void xrMemory::mem_compact()
 void* xrMemory::mem_alloc(size_t size)
 {
     stat_calls++;
-    return malloc(size);
+    return scalable_malloc(size);
 }
 
 void xrMemory::mem_free(void* P)
 {
     stat_calls++;
-    free(P);
+    scalable_free(P);
 }
 
 void* xrMemory::mem_realloc(void* P, const size_t size)
 {
     stat_calls++;
-    return realloc(P, size);
+    return scalable_realloc(P, size);
 }
 
 // xr_strdup
@@ -114,7 +97,7 @@ pstr xr_strdup(pcstr string)
 {
     VERIFY(string);
     size_t len = xr_strlen(string) + 1;
-    char* memory = (char*)Memory.mem_alloc(len);
+    char* memory = (char*)xr_malloc(len);
     CopyMemory(memory, string, len);
     return memory;
 }

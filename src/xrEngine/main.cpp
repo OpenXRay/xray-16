@@ -184,7 +184,6 @@ ENGINE_API void Startup()
 
     // Main cycle
     splash::hide();
-    Memory.mem_usage();
     Device.Run();
     // Destroy APP
     xr_delete(g_SpatialSpacePhysic);
