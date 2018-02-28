@@ -9,8 +9,7 @@ namespace Props
 {
 bool NumericVector::Run(pcstr title, Fvector* data, int decimal, Fvector* resetValue, Fvector* min, Fvector* max, int* X, int* Y)
 {
-    System::String^ str = gcnew System::String(title);
-    this->Text = str;
+    this->Text = gcnew System::String(title);
     Value = data;
     ResetValue = resetValue;
     buttonReset->Enabled = !!resetValue;

@@ -30,7 +30,6 @@ System::Void GameType::buttonOk_Click(System::Object^ sender, System::EventArgs^
     gameTypes->m_GameType.set(eGameIDArtefactHunt, checkAfHunt->Checked);
     gameTypes->m_GameType.set(eGameIDCaptureTheArtefact, checkCTA->Checked);
 }
-
 } // namespace Props
 } // namespace ECore
 } // namespace XRay
