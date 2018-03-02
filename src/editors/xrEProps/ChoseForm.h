@@ -19,7 +19,7 @@
 #include "mxPlacemnt.hpp"
 #include "ElXPThemedControl.hpp"
 #include "Gradient.hpp"
-#include "ChooseTypes.H"
+#include "xrCore/ChooseTypes.H"
 
 //---------------------------------------------------------------------------
 // refs
