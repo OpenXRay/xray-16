@@ -1,4 +1,14 @@
 #pragma once
+namespace XRay
+{
+namespace ECore
+{
+namespace Props
+{
+ref class TextEdit;
+}
+}
+}
 
 namespace XRay
 {
@@ -15,11 +25,18 @@ using namespace System::Drawing;
 
 public ref class TextEdit : public System::Windows::Forms::Form
 {
+    using TOnApplyClick = fastdelegate::FastDelegate1<pcstr, bool>;
+    using TOnCloseClick = fastdelegate::FastDelegate0<bool>;
+    using TOnCodeInsight = fastdelegate::FastDelegate3<const xr_string&, xr_string&, bool&>;
+
 public:
     TextEdit(void)
     {
         InitializeComponent();
     }
+
+    TextEdit(xr_string& text, pcstr caption, bool read_only, int lim, pcstr apply_name,
+        TOnApplyClick on_apply, TOnCloseClick on_close, TOnCodeInsight on_insight);
 
 protected:
     ~TextEdit()
@@ -32,18 +49,22 @@ protected:
 
 private:
     xr_string* m_text;
-    delegate void TOnApplyClick(pcstr, bool);
-    delegate void TOnCloseClick(bool);
-    delegate void TOnCodeInsight(const xr_string&, xr_string&, bool&);
+    TOnApplyClick* onApplyClick;
+    TOnCloseClick* onCloseClick;
+    TOnCodeInsight* onCodeInsight;
 
 public:
     bool Run(xr_string& text, pcstr caption, bool read_only, int lim,
-        pcstr apply_name, TOnApplyClick^ on_apply, TOnCloseClick^ on_close,
-        TOnCodeInsight^ on_insight);
-
+        pcstr apply_name, TOnApplyClick on_apply, TOnCloseClick on_close,
+        TOnCodeInsight on_insight);
 
 private: System::Void buttonOk_Click(System::Object^ sender, System::EventArgs^ e);
 private: System::Void buttonClear_Click(System::Object^ sender, System::EventArgs^ e);
+private: System::Void buttonApply_Click(System::Object^ sender, System::EventArgs^ e);
+private: System::Void buttonLoad_Click(System::Object^ sender, System::EventArgs^ e);
+private: System::Void buttonSave_Click(System::Object^ sender, System::EventArgs^ e);
+
+private: System::Void textBox1_KeyPress(System::Object^ sender, System::Windows::Forms::KeyPressEventArgs^ e);
 private: System::Void textBox1_SelectionChanged(System::Object^ sender, System::EventArgs^ e);
 
 private: System::Windows::Forms::Button^ buttonOk;
@@ -93,6 +114,7 @@ private:
         this->textBox1->TabIndex = 0;
         this->textBox1->Text = L"";
         this->textBox1->SelectionChanged += gcnew System::EventHandler(this, &TextEdit::textBox1_SelectionChanged);
+        this->textBox1->KeyPress += gcnew System::Windows::Forms::KeyPressEventHandler(this, &TextEdit::textBox1_KeyPress);
         this->buttonOk->Anchor = System::Windows::Forms::AnchorStyles::Top;
         this->buttonOk->AutoSizeMode = System::Windows::Forms::AutoSizeMode::GrowAndShrink;
         this->buttonOk->DialogResult = System::Windows::Forms::DialogResult::OK;
@@ -118,6 +140,7 @@ private:
         this->buttonApply->TabIndex = 3;
         this->buttonApply->Text = L"Apply";
         this->buttonApply->UseVisualStyleBackColor = true;
+        this->buttonApply->Click += gcnew System::EventHandler(this, &TextEdit::buttonApply_Click);
         this->buttonLoad->Anchor = System::Windows::Forms::AnchorStyles::Top;
         this->buttonLoad->Location = System::Drawing::Point(222, 0);
         this->buttonLoad->Name = L"buttonLoad";
@@ -125,6 +148,7 @@ private:
         this->buttonLoad->TabIndex = 4;
         this->buttonLoad->Text = L"Load";
         this->buttonLoad->UseVisualStyleBackColor = true;
+        this->buttonLoad->Click += gcnew System::EventHandler(this, &TextEdit::buttonLoad_Click);
         this->buttonSave->Anchor = System::Windows::Forms::AnchorStyles::Top;
         this->buttonSave->Location = System::Drawing::Point(296, 0);
         this->buttonSave->Name = L"buttonSave";
@@ -132,6 +156,7 @@ private:
         this->buttonSave->TabIndex = 5;
         this->buttonSave->Text = L"Save";
         this->buttonSave->UseVisualStyleBackColor = true;
+        this->buttonSave->Click += gcnew System::EventHandler(this, &TextEdit::buttonSave_Click);
         this->buttonClear->Anchor = System::Windows::Forms::AnchorStyles::Top;
         this->buttonClear->Location = System::Drawing::Point(370, 0);
         this->buttonClear->Name = L"buttonClear";
@@ -169,9 +194,8 @@ private:
         this->toolStripStatusLabel2->Size = System::Drawing::Size(0, 17);
         this->toolStripStatusLabel3->BorderStyle = System::Windows::Forms::Border3DStyle::RaisedInner;
         this->toolStripStatusLabel3->Name = L"toolStripStatusLabel3";
-        this->toolStripStatusLabel3->Size = System::Drawing::Size(376, 17);
+        this->toolStripStatusLabel3->Size = System::Drawing::Size(345, 17);
         this->toolStripStatusLabel3->Spring = true;
-        this->toolStripStatusLabel3->Text = L"Description";
         this->AcceptButton = this->buttonOk;
         this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
         this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;

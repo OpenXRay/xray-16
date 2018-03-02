@@ -36,10 +36,8 @@ bool TextEditRun(xr_string& text, pcstr caption /*= "Text"*/, bool read_only /*=
                  TOnCodeInsight on_insight /*= 0*/)
 {
     auto form = gcnew TextEdit();
-    return false;
-    //return form->Run(text, caption, read_only, lim, apply_name, on_apply, on_close, on_insight);
+    return form->Run(text, caption, read_only, lim, apply_name, on_apply, on_close, on_insight);
 }
-
 } // namespace Props
 } // namespace ECore
 } // namespace XRay
