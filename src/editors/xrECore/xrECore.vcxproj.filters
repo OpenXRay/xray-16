@@ -16,7 +16,16 @@
     <Filter Include="Props\GameType">
       <UniqueIdentifier>{6990b14a-937f-44c1-9ca3-1f83ab512b84}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Props\Text">
+    <Filter Include="Props\PropertiesList">
+      <UniqueIdentifier>{8e7aaac2-2ec7-45eb-81af-f73fad7a009e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Props\ItemList">
+      <UniqueIdentifier>{df5445f5-5310-41bc-abd3-0ff4dc5f4d8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Props\SelectItem">
+      <UniqueIdentifier>{1ad2122a-1bb6-4d35-ac47-50cd5cadb647}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Props\TextEdit">
       <UniqueIdentifier>{d6664b68-d033-492a-9771-83f3129cd1af}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -35,7 +44,16 @@
       <Filter>Props\GameType</Filter>
     </ClCompile>
     <ClCompile Include="Props\TextEdit.cpp">
-      <Filter>Props\Text</Filter>
+      <Filter>Props\TextEdit</Filter>
+    </ClCompile>
+    <ClCompile Include="Props\PropertiesList.cpp">
+      <Filter>Props\PropertiesList</Filter>
+    </ClCompile>
+    <ClCompile Include="Props\ItemList.cpp">
+      <Filter>Props\ItemList</Filter>
+    </ClCompile>
+    <ClCompile Include="SelectItem.cpp">
+      <Filter>Props\SelectItem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -56,10 +74,25 @@
       <Filter>Props\GameType</Filter>
     </ClInclude>
     <ClInclude Include="Props\TextEdit.h">
-      <Filter>Props\Text</Filter>
+      <Filter>Props\TextEdit</Filter>
+    </ClInclude>
+    <ClInclude Include="Props\PropertiesList.h">
+      <Filter>Props\PropertiesList</Filter>
+    </ClInclude>
+    <ClInclude Include="Props\ItemList.h">
+      <Filter>Props\ItemList</Filter>
+    </ClInclude>
+    <ClInclude Include="Props\SelectItem.h">
+      <Filter>Props\SelectItem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Props\ItemList.resx">
+      <Filter>Props\ItemList</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Props\PropertiesList.resx">
+      <Filter>Props\PropertiesList</Filter>
+    </EmbeddedResource>
     <EmbeddedResource Include="Props\NumericVector.resx">
       <Filter>Props\NumericVector</Filter>
     </EmbeddedResource>
@@ -70,7 +103,10 @@
       <Filter>Props\GameType</Filter>
     </EmbeddedResource>
     <EmbeddedResource Include="Props\TextEdit.resx">
-      <Filter>Props\Text</Filter>
+      <Filter>Props\TextEdit</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Props\SelectItem.resx">
+      <Filter>Props\SelectItem</Filter>
     </EmbeddedResource>
   </ItemGroup>
 </Project>

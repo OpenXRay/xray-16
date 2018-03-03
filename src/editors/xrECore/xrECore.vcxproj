@@ -83,9 +83,12 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Props\GameType.cpp" />
+    <ClCompile Include="Props\ItemList.cpp" />
     <ClCompile Include="Props\NumericVector.cpp" />
+    <ClCompile Include="Props\PropertiesList.cpp" />
     <ClCompile Include="Props\ShaderFunction.cpp" />
     <ClCompile Include="Props\TextEdit.cpp" />
+    <ClCompile Include="SelectItem.cpp" />
     <ClCompile Include="xrEProps.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -93,13 +96,22 @@
     <ClInclude Include="Props\GameType.h">
       <FileType>CppForm</FileType>
     </ClInclude>
+    <ClInclude Include="Props\ItemList.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
     <ClInclude Include="Props\NumericVector.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="Props\PropertiesList.h">
       <FileType>CppForm</FileType>
     </ClInclude>
     <ClInclude Include="Props\ShaderFunction.h">
       <FileType>CppForm</FileType>
     </ClInclude>
     <ClInclude Include="Props\TextEdit.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="Props\SelectItem.h">
       <FileType>CppForm</FileType>
     </ClInclude>
     <ClInclude Include="Token.h" />
@@ -114,11 +126,20 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Props\ItemList.resx">
+      <DependentUpon>Props\ItemList.h</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Props\PropertiesList.resx">
+      <DependentUpon>Props\PropertiesList.h</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Props\GameType.resx">
       <DependentUpon>Props\GameType.h</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Props\NumericVector.resx">
       <DependentUpon>Props\NumericVector.h</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Props\SelectItem.resx">
+      <DependentUpon>Props\SelectItem.h</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Props\ShaderFunction.resx">
       <DependentUpon>Props\ShaderFunction.h</DependentUpon>

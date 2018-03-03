@@ -194,7 +194,7 @@ private:
         this->toolStripStatusLabel2->Size = System::Drawing::Size(0, 17);
         this->toolStripStatusLabel3->BorderStyle = System::Windows::Forms::Border3DStyle::RaisedInner;
         this->toolStripStatusLabel3->Name = L"toolStripStatusLabel3";
-        this->toolStripStatusLabel3->Size = System::Drawing::Size(345, 17);
+        this->toolStripStatusLabel3->Size = System::Drawing::Size(376, 17);
         this->toolStripStatusLabel3->Spring = true;
         this->AcceptButton = this->buttonOk;
         this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
@@ -205,6 +205,7 @@ private:
         this->Controls->Add(this->panel1);
         this->Controls->Add(this->textBox1);
         this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::SizableToolWindow;
+        this->MinimumSize = System::Drawing::Size(461, 300);
         this->Name = L"TextEdit";
         this->Text = L"TextEdit";
         this->panel1->ResumeLayout(false);
