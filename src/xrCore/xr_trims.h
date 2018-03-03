@@ -17,9 +17,6 @@ XRCORE_API LPCSTR _CopyVal(LPCSTR src, AnsiString& dst, char separator = ',');
 XRCORE_API AnsiString _ListToSequence(const AStringVec& lst);
 XRCORE_API AnsiString _ListToSequence2(const AStringVec& lst);
 XRCORE_API void _SequenceToList(AStringVec& lst, LPCSTR in, char separator = ',');
-XRCORE_API AnsiString& _ReplaceItem(LPCSTR src, int index, LPCSTR new_item, AnsiString& dst, char separator);
-XRCORE_API AnsiString& _ReplaceItems(
-    LPCSTR src, int idx_start, int idx_end, LPCSTR new_items, AnsiString& dst, char separator);
 XRCORE_API AnsiString FloatTimeToStrTime(float v, bool h = true, bool m = true, bool s = true, bool ms = false);
 XRCORE_API float StrTimeToFloatTime(LPCSTR buf, bool h = true, bool m = true, bool s = true, bool ms = false);
 #endif
@@ -44,7 +41,9 @@ XRCORE_API LPSTR _ChangeSymbol(LPSTR name, char src, char dest);
 XRCORE_API u32 _ParseItem(LPCSTR src, xr_token* token_list);
 XRCORE_API u32 _ParseItem(LPSTR src, int ind, xr_token* token_list);
 XRCORE_API LPSTR _ReplaceItem(LPCSTR src, int index, LPCSTR new_item, LPSTR dst, char separator);
+XRCORE_API xr_string& _ReplaceItem(pcstr src, int index, pcstr new_item, xr_string& dst, char separator);
 XRCORE_API LPSTR _ReplaceItems(LPCSTR src, int idx_start, int idx_end, LPCSTR new_items, LPSTR dst, char separator);
+XRCORE_API xr_string& _ReplaceItems(pcstr src, int idx_start, int idx_end, pcstr new_items, xr_string& dst, char separator);
 XRCORE_API void _SequenceToList(LPSTRVec& lst, LPCSTR in, char separator = ',');
 XRCORE_API void _SequenceToList(RStringVec& lst, LPCSTR in, char separator = ',');
 XRCORE_API void _SequenceToList(SStringVec& lst, LPCSTR in, char separator = ',');
@@ -57,3 +56,4 @@ XRCORE_API LPCSTR _CopyVal(LPCSTR src, xr_string& dst, char separator = ',');
 XRCORE_API LPCSTR _GetItem(LPCSTR src, int, xr_string& p, char separator = ',', LPCSTR = "", bool trim = true);
 XRCORE_API xr_string _ListToSequence(const SStringVec& lst);
 XRCORE_API shared_str _ListToSequence(const RStringVec& lst);
+

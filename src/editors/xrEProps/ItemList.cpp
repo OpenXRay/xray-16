@@ -126,8 +126,8 @@ void TItemList::ClearParams(TElTreeItem* node)
             }
         }
         // real clear
-        for (ListItemsIt it = m_Items.begin(); it != m_Items.end(); it++)
-            xr_delete(*it);
+        for (auto& it : m_Items)
+            xr_delete();
         m_Items.clear();
         // fill list
         LockUpdating();
