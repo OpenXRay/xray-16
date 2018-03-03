@@ -88,7 +88,7 @@
     <ClCompile Include="Props\PropertiesList.cpp" />
     <ClCompile Include="Props\ShaderFunction.cpp" />
     <ClCompile Include="Props\TextEdit.cpp" />
-    <ClCompile Include="SelectItem.cpp" />
+    <ClCompile Include="Props\SelectItem.cpp" />
     <ClCompile Include="xrEProps.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -52,7 +52,7 @@
     <ClCompile Include="Props\ItemList.cpp">
       <Filter>Props\ItemList</Filter>
     </ClCompile>
-    <ClCompile Include="SelectItem.cpp">
+    <ClCompile Include="Props\SelectItem.cpp">
       <Filter>Props\SelectItem</Filter>
     </ClCompile>
   </ItemGroup>
