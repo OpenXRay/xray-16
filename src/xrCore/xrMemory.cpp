@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 #include <Psapi.h>
-#include "tbb/scalable_allocator.h"
 
 xrMemory Memory;
 // Also used in src\xrCore\xrDebug.cpp to prevent use of g_pStringContainer before it initialized
@@ -80,24 +79,6 @@ void xrMemory::mem_compact()
         g_pSharedMemoryContainer->clean();
     if (strstr(Core.Params, "-swap_on_compact"))
         SetProcessWorkingSetSize(GetCurrentProcess(), size_t(-1), size_t(-1));
-}
-
-void* xrMemory::mem_alloc(size_t size)
-{
-    stat_calls++;
-    return scalable_malloc(size);
-}
-
-void xrMemory::mem_free(void* P)
-{
-    stat_calls++;
-    scalable_free(P);
-}
-
-void* xrMemory::mem_realloc(void* P, const size_t size)
-{
-    stat_calls++;
-    return scalable_realloc(P, size);
 }
 
 // xr_strdup
