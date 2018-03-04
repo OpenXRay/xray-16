@@ -1,7 +1,5 @@
 #include "pch.hpp"
 
-#include <msclr/marshal.h>
-
 #include "TextEdit.h"
 
 namespace XRay
