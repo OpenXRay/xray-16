@@ -10,7 +10,7 @@
 class ENGINE_API CLAItem
 {
 public:
-    shared_str cName;
+    xr_string cName;
     float fFPS;
     using KeyMap = xr_map<int, u32>;
     KeyMap Keys;

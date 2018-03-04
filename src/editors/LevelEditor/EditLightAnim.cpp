@@ -5,7 +5,7 @@
 
 #include "EditLightAnim.h"
 #include "Scene.h"
-#include "LightAnimLibrary.h"
+#include "xrEngine/LightAnimLibrary.h"
 #include "editors/ECore/Editor/ColorPicker.h"
 #include "editors/ECore/Editor/ui_main.h"
 //---------------------------------------------------------------------------
@@ -162,7 +162,7 @@ void TfrmEditLightAnim::InitItems()
 {
     ListItemsVec items;
     for (LAItemIt it = LALib.Items.begin(); it != LALib.Items.end(); it++)
-        LHelper().CreateItem(items, *(*it)->cName, 0, 0, 0);
+        LHelper().CreateItem(items, (*it)->cName.c_str(), 0, 0, 0);
     m_Items->AssignItems(items, false, true);
 }
 
@@ -255,7 +255,7 @@ void __fastcall TfrmEditLightAnim::ebAddAnimClick(TObject* Sender)
         pref.c_str(), 2, fastdelegate::bind<TFindObjectByName>(this, &TfrmEditLightAnim::FindItemByName), false, true);
     CLAItem* I = LALib.AppendItem(name.c_str(), 0);
     InitItems();
-    m_Items->SelectItem(*I->cName, true, false, true);
+    m_Items->SelectItem(I->cName.c_str(), true, false, true);
     OnModified();
 }
 
@@ -271,7 +271,7 @@ void __fastcall TfrmEditLightAnim::ebCloneClick(TObject* Sender)
             fastdelegate::bind<TFindObjectByName>(this, &TfrmEditLightAnim::FindItemByName), false, true);
         CLAItem* I = LALib.AppendItem(name.c_str(), m_CurrentItem);
         InitItems();
-        m_Items->SelectItem(*I->cName, true, false, true);
+        m_Items->SelectItem(I->cName.c_str(), true, false, true);
         OnModified();
     }
     else
