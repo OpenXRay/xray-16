@@ -28,6 +28,9 @@
     <Filter Include="Props\TextEdit">
       <UniqueIdentifier>{d6664b68-d033-492a-9771-83f3129cd1af}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Props\FolderLib">
+      <UniqueIdentifier>{6ad9d22d-603b-4687-a95e-216adf62c562}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -54,6 +57,9 @@
     </ClCompile>
     <ClCompile Include="Props\SelectItem.cpp">
       <Filter>Props\SelectItem</Filter>
+    </ClCompile>
+    <ClCompile Include="Props\FolderLib.cpp">
+      <Filter>Props\FolderLib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -84,6 +90,9 @@
     </ClInclude>
     <ClInclude Include="Props\SelectItem.h">
       <Filter>Props\SelectItem</Filter>
+    </ClInclude>
+    <ClInclude Include="Props\FolderLib.h">
+      <Filter>Props\FolderLib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -11,6 +11,9 @@ ref class ItemList;
 }
 }
 
+class ListItem;
+using ListItemsVec = xr_vector<ListItem*>;
+
 namespace XRay
 {
 namespace ECore
@@ -23,6 +26,22 @@ using namespace System::Collections;
 using namespace System::Windows::Forms;
 using namespace System::Data;
 using namespace System::Drawing;
+
+enum
+{
+    // set
+    ilEditMenu = (1 << 0),
+    ilMultiSelect = (1 << 1),
+    ilDragAllowed = (1 << 2),
+    ilDragCustom = (1 << 3),
+    ilFolderStore = (1 << 4),
+    ilSuppressIcon = (1 << 5),
+    ilSuppressStatus = (1 << 6),
+
+    // internal
+    ilRT_FullExpand = (1 << 30),
+    //        ilRT_UpdateLocked=(1<<31),
+};
 
 public ref class ItemList : public System::Windows::Forms::Form
 {
@@ -41,20 +60,61 @@ protected:
         }
     }
 
+public:
+    void AssignItems(ListItemsVec& new_items, bool full_expand, bool full_sort);
+
 private:
-    System::ComponentModel::Container ^components;
+    Flags32* flags;
+    ListItemsVec* items;
+
+private: System::Windows::Forms::StatusStrip^ statusStrip1;
+private: System::Windows::Forms::ToolStripStatusLabel^ toolStripStatusLabel1;
+private: System::Windows::Forms::ToolStripStatusLabel^ toolStripStatusLabel2;
+private: System::Windows::Forms::TreeView^ viewItems;
+
+private:
+    System::ComponentModel::Container^ components;
 
 #pragma region Windows Form Designer generated code
     void InitializeComponent(void)
     {
+        this->statusStrip1 = (gcnew System::Windows::Forms::StatusStrip());
+        this->toolStripStatusLabel1 = (gcnew System::Windows::Forms::ToolStripStatusLabel());
+        this->toolStripStatusLabel2 = (gcnew System::Windows::Forms::ToolStripStatusLabel());
+        this->viewItems = (gcnew System::Windows::Forms::TreeView());
+        this->statusStrip1->SuspendLayout();
         this->SuspendLayout();
+        this->statusStrip1->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(2) {
+            this->toolStripStatusLabel1,
+                this->toolStripStatusLabel2
+        });
+        this->statusStrip1->Location = System::Drawing::Point(0, 242);
+        this->statusStrip1->Name = L"statusStrip1";
+        this->statusStrip1->Size = System::Drawing::Size(284, 22);
+        this->statusStrip1->TabIndex = 0;
+        this->statusStrip1->Text = L"statusStrip1";
+        this->toolStripStatusLabel1->Name = L"toolStripStatusLabel1";
+        this->toolStripStatusLabel1->Size = System::Drawing::Size(78, 17);
+        this->toolStripStatusLabel1->Text = L"Items count:";
+        this->toolStripStatusLabel2->Name = L"toolStripStatusLabel2";
+        this->toolStripStatusLabel2->Size = System::Drawing::Size(0, 17);
+        this->viewItems->Dock = System::Windows::Forms::DockStyle::Fill;
+        this->viewItems->Location = System::Drawing::Point(0, 0);
+        this->viewItems->Name = L"viewItems";
+        this->viewItems->Size = System::Drawing::Size(284, 242);
+        this->viewItems->TabIndex = 1;
         this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
         this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
         this->ClientSize = System::Drawing::Size(284, 264);
+        this->Controls->Add(this->viewItems);
+        this->Controls->Add(this->statusStrip1);
         this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::SizableToolWindow;
         this->Name = L"ItemList";
         this->Text = L"Item List";
+        this->statusStrip1->ResumeLayout(false);
+        this->statusStrip1->PerformLayout();
         this->ResumeLayout(false);
+        this->PerformLayout();
 
     }
 #pragma endregion
