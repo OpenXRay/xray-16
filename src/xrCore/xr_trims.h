@@ -12,7 +12,6 @@ using string64Vec = xr_vector<string64>;
 #ifdef __BORLANDC__
 XRCORE_API AnsiString& _Trim(AnsiString& str);
 XRCORE_API LPCSTR _GetItem(LPCSTR src, int, AnsiString& p, char separator = ',', LPCSTR = "", bool trim = true);
-XRCORE_API LPCSTR _GetItems(LPCSTR src, int idx_start, int idx_end, AnsiString& dst, char separator);
 XRCORE_API LPCSTR _CopyVal(LPCSTR src, AnsiString& dst, char separator = ',');
 XRCORE_API AnsiString _ListToSequence(const AStringVec& lst);
 XRCORE_API AnsiString _ListToSequence2(const AStringVec& lst);
@@ -32,6 +31,7 @@ inline LPSTR _GetItem(
 }
 
 XRCORE_API LPSTR _GetItems(LPCSTR, int, int, LPSTR, char separator = ',');
+XRCORE_API pcstr _GetItems(pcstr, int, int, xr_string&, char);
 XRCORE_API LPCSTR _SetPos(LPCSTR src, u32 pos, char separator = ',');
 XRCORE_API LPCSTR _CopyVal(LPCSTR src, LPSTR dst, char separator = ',');
 XRCORE_API LPSTR _Trim(LPSTR str);

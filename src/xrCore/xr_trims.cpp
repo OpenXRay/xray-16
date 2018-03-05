@@ -108,6 +108,21 @@ LPSTR _GetItems(LPCSTR src, int idx_start, int idx_end, LPSTR dst, char separato
     return dst;
 }
 
+pcstr _GetItems(pcstr src, int idx_start, int idx_end, xr_string& dst, char separator)
+{
+    int level = 0;
+    for (pcstr p = src; *p != 0; p++)
+    {
+        if ((level >= idx_start) && (level < idx_end))
+            dst += *p;
+        if (*p == separator)
+            level++;
+        if (level >= idx_end)
+            break;
+    }
+    return dst.c_str();
+}
+
 u32 _ParseItem(LPCSTR src, xr_token* token_list)
 {
     for (int i = 0; token_list[i].name; i++)
@@ -270,20 +285,7 @@ LPCSTR _CopyVal(LPCSTR src, AnsiString& dst, char separator)
     return dst.c_str();
 }
 
-LPCSTR _GetItems(LPCSTR src, int idx_start, int idx_end, AnsiString& dst, char separator)
-{
-    int level = 0;
-    for (LPCSTR p = src; *p != 0; p++)
-    {
-        if ((level >= idx_start) && (level < idx_end))
-            dst += *p;
-        if (*p == separator)
-            level++;
-        if (level >= idx_end)
-            break;
-    }
-    return dst.c_str();
-}
+
 
 LPCSTR _GetItem(LPCSTR src, int index, AnsiString& dst, char separator, LPCSTR def, bool trim)
 {
