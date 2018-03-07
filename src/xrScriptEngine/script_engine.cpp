@@ -219,23 +219,26 @@ void CScriptEngine::print_stack(lua_State* L)
         lua_pop(L, 1); // restore lua stack
 
         // Giperion: verbose log
-        Log("\nLua state dump:\n\tLocals: ");
-        pcstr name = nullptr;
-        int VarID = 1;
-        try
+        if (strstr(Core.Params, "-luadumpstate"))
         {
-            while ((name = lua_getlocal(L, &l_tDebugInfo, VarID++)) != nullptr)
+            Log("\nLua state dump:\n\tLocals: ");
+            pcstr name = nullptr;
+            int VarID = 1;
+            try
             {
-                LogVariable(L, name, 1, true);
+                while ((name = lua_getlocal(L, &l_tDebugInfo, VarID++)) != nullptr)
+                {
+                    LogVariable(L, name, 1, true);
 
-                lua_pop(L, 1); /* remove variable value */
+                    lua_pop(L, 1); /* remove variable value */
+                }
             }
+            catch (...)
+            {
+                Log("Can't dump lua state - Engine corrupted");
+            }
+            Log("\tEnd\nEnd of Lua state dump.\n");
         }
-        catch (...)
-        {
-            Log("Can't dump lua state - Engine corrupted");
-        }
-        Log("\tEnd\nEnd of Lua state dump.\n");
         // -Giperion
     }
 
@@ -273,6 +276,10 @@ void CScriptEngine::LogVariable(lua_State* luaState, pcstr name, int level, bool
 
     switch (ntype)
     {
+    case LUA_TNIL:
+        xr_strcpy(value, "nil");
+        break;
+
     case LUA_TNUMBER:
         xr_sprintf(value, "%f", lua_tonumber(luaState, -1));
         break;
@@ -294,8 +301,8 @@ void CScriptEngine::LogVariable(lua_State* luaState, pcstr name, int level, bool
             return;
         }
         xr_sprintf(value, "[...]");
-    }
         break;
+    }
 
     case LUA_TUSERDATA:
     {
@@ -310,14 +317,13 @@ void CScriptEngine::LogVariable(lua_State* luaState, pcstr name, int level, bool
             return;
         }*/
         xr_strcpy(value, "[TODO: Fix userdata retrieval]");
-    }
         break;
+    }
 
     default:
         xr_strcpy(value, "[not available]");
         break;
     }
-
 
     Msg("%s %s %s : %s", tabBuffer, type, name, value);
 }
