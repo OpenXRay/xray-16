@@ -281,7 +281,6 @@ ENGINE_API int RunApplication()
 
     Engine.External.Initialize();
     Startup();
-    Core._destroy();
     // check for need to execute something external
     if (/*xr_strlen(g_sLaunchOnExit_params) && */ xr_strlen(g_sLaunchOnExit_app))
     {
