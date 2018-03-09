@@ -1,9 +1,3 @@
-// HW.h: interface for the CHW class.
-//
-//////////////////////////////////////////////////////////////////////
-
-#if !defined(AFX_HW_H__0E25CF4A_FFEC_11D3_B4E3_4854E82A090D__INCLUDED_)
-#define AFX_HW_H__0E25CF4A_FFEC_11D3_B4E3_4854E82A090D__INCLUDED_
 #pragma once
 
 #include "HWCaps.h"
@@ -78,49 +72,53 @@ public:
     HGLRC m_hRC;
 #elif defined(USE_DX11)
 public:
-    IDXGIAdapter* m_pAdapter; //	pD3D equivalent
-    ID3D11Device* pDevice; //	combine with DX9 pDevice via typedef
-    ID3D11DeviceContext* pContext; //	combine with DX9 pDevice via typedef
-    IDXGISwapChain* m_pSwapChain;
-    ID3D11RenderTargetView* pBaseRT; //	combine with DX9 pBaseRT via typedef
-    ID3D11DepthStencilView* pBaseZB;
+    IDXGIFactory1*       m_pFactory = nullptr;
+    IDXGIAdapter1*       m_pAdapter = nullptr; //	pD3D equivalent
+    ID3D11Device*           pDevice = nullptr; //	combine with DX9 pDevice via typedef
+    ID3D11DeviceContext*   pContext = nullptr; //	combine with DX9 pDevice via typedef
+    IDXGISwapChain*    m_pSwapChain = nullptr;
+    ID3D11RenderTargetView* pBaseRT = nullptr; //	combine with DX9 pBaseRT via typedef
+    ID3D11DepthStencilView* pBaseZB = nullptr;
 
     CHWCaps Caps;
 
-    D3D_DRIVER_TYPE m_DriverType; //	DevT equivalent
+    D3D_DRIVER_TYPE m_DriverType;
     DXGI_SWAP_CHAIN_DESC m_ChainDesc; //	DevPP equivalent
     D3D_FEATURE_LEVEL FeatureLevel;
 #elif defined(USE_DX10)
 public:
-    IDXGIAdapter* m_pAdapter; //	pD3D equivalent
-    ID3D10Device1* pDevice1; //	combine with DX9 pDevice via typedef
-    ID3D10Device* pDevice; //	combine with DX9 pDevice via typedef
-    ID3D10Device1* pContext1; //	combine with DX9 pDevice via typedef
-    ID3D10Device* pContext; //	combine with DX9 pDevice via typedef
-    IDXGISwapChain* m_pSwapChain;
-    ID3D10RenderTargetView* pBaseRT; //	combine with DX9 pBaseRT via typedef
-    ID3D10DepthStencilView* pBaseZB;
+    IDXGIFactory1*       m_pFactory = nullptr;
+    IDXGIAdapter1*       m_pAdapter = nullptr; //	pD3D equivalent
+    ID3D10Device1*         pDevice1 = nullptr; //	combine with DX9 pDevice via typedef
+    ID3D10Device*           pDevice = nullptr; //	combine with DX9 pDevice via typedef
+    ID3D10Device1*        pContext1 = nullptr; //	combine with DX9 pDevice via typedef
+    ID3D10Device*          pContext = nullptr; //	combine with DX9 pDevice via typedef
+    IDXGISwapChain*    m_pSwapChain = nullptr;
+    ID3D10RenderTargetView* pBaseRT = nullptr; //	combine with DX9 pBaseRT via typedef
+    ID3D10DepthStencilView* pBaseZB = nullptr;
 
     CHWCaps Caps;
 
-    D3D10_DRIVER_TYPE m_DriverType; //	DevT equivalent
+    D3D10_DRIVER_TYPE m_DriverType;
     DXGI_SWAP_CHAIN_DESC m_ChainDesc; //	DevPP equivalent
     D3D_FEATURE_LEVEL FeatureLevel;
 #else
 private:
-    XRay::Module hD3D;
+#ifdef DEBUG
+    IDirect3DStateBlock9* dwDebugSB = nullptr;
+#endif
+    XRay::Module hD3D = nullptr;
 
 public:
-    IDirect3D9* pD3D; // D3D
-    IDirect3DDevice9* pDevice; // render device
-
-    IDirect3DSurface9* pBaseRT;
-    IDirect3DSurface9* pBaseZB;
+    IDirect3D9*           pD3D = nullptr; // D3D
+    IDirect3DDevice9*  pDevice = nullptr; // render device
+    IDirect3DSurface9* pBaseRT = nullptr;
+    IDirect3DSurface9* pBaseZB = nullptr;
 
     CHWCaps Caps;
 
     UINT DevAdapter;
-    D3DDEVTYPE DevT;
+    D3DDEVTYPE m_DriverType;
     D3DPRESENT_PARAMETERS DevPP;
 #endif //	USE_DX10
 
@@ -147,12 +145,10 @@ public:
     HRESULT Present(UINT SyncInterval, UINT Flags);
 #endif // USE_OGL
 
-    int maxRefreshRate; //ECO_RENDER add
+    int maxRefreshRate = 200; //ECO_RENDER add
 
 private:
-    bool m_move_window;
+    bool m_move_window = true;
 };
 
 extern ECORE_API CHW HW;
-
-#endif // !defined(AFX_HW_H__0E25CF4A_FFEC_11D3_B4E3_4854E82A090D__INCLUDED_)

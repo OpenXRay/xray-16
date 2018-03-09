@@ -184,7 +184,6 @@ ENGINE_API void Startup()
 
     // Main cycle
     splash::hide();
-    Memory.mem_usage();
     Device.Run();
     // Destroy APP
     xr_delete(g_SpatialSpacePhysic);
@@ -209,14 +208,6 @@ ENGINE_API int RunApplication()
 {
     R_ASSERT2(Core.Params, "Core must be initialized");
 
-    if (!IsDebuggerPresent())
-    {
-        u32 heapFragmentation = 2;
-        bool result = HeapSetInformation(
-            GetProcessHeap(), HeapCompatibilityInformation, &heapFragmentation, sizeof(heapFragmentation));
-        VERIFY2(result, "can't set process heap low fragmentation");
-        UNUSED(result);
-    }
 #ifdef NO_MULTI_INSTANCES
     if (!GEnv.isDedicatedServer)
     {

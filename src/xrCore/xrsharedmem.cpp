@@ -61,7 +61,7 @@ smem_value* smem_container::dock(u32 dwCRC, u32 dwLength, void* ptr)
     // if not found - create new entry
     if (0 == result)
     {
-        result = (smem_value*)Memory.mem_alloc(4 * sizeof(u32) + dwLength);
+        result = (smem_value*)xr_malloc(4 * sizeof(u32) + dwLength);
         result->dwReference = 0;
         result->dwCRC = dwCRC;
         result->dwLength = dwLength;
