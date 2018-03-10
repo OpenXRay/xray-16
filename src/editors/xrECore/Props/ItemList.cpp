@@ -11,16 +11,24 @@ namespace ECore
 {
 namespace Props
 {
-void ItemList::AssignItems(ListItemsVec& new_items, bool full_expand, bool full_sort /*= false*/)
+void ItemList::AssignItems(ListItemsVec& newItems, bool fullExpand, bool fullSort /*= false*/)
 {
-    /*// begin fill mode
     viewItems->BeginUpdate();
+
+    viewItems->Nodes->Clear();
+
+    for (const auto& item : newItems)
+    {
+        viewItems->AddItem(BackSlashToSlash(item->Key()));
+    }
+    /*// begin fill mode
+    
     // clear values
     //    if (tvItems->Selected) FHelper.MakeFullName(tvItems->Selected,0,last_selected_item);
     //if (!items->empty())
     //    ClearParams();
     // fill values
-    items = &new_items;
+    items = &newItems;
     for (auto& prop : *items)
     {
         if (prop->Key.size() && (prop->Key[prop->Key.size() - 1] == '\\'))
@@ -62,7 +70,7 @@ void ItemList::AssignItems(ListItemsVec& new_items, bool full_expand, bool full_
     }
 
     // end fill mode
-    if (full_expand)
+    if (fullExpand)
         viewItems->ExpandAll();
 
     // folder restore
@@ -88,7 +96,7 @@ void ItemList::AssignItems(ListItemsVec& new_items, bool full_expand, bool full_
     }
 
     // sorting
-    if (full_sort)
+    if (fullSort)
     {
         viewItems->Sort();
     }
@@ -105,15 +113,18 @@ void ItemList::AssignItems(ListItemsVec& new_items, bool full_expand, bool full_
     for (RStringVecIt s_it = last_selected_items.begin(); s_it != last_selected_items.end(); s_it++)
         FHelper.ExpandItem(tvItems, **s_it);
 
-    viewItems->EndUpdate();
-
-    // restore selection
-    viewItems->SelectedNode = nullptr;
+    
 
     for (RStringVecIt s_it = last_selected_items.begin(); s_it != last_selected_items.end(); s_it++)
         FHelper.RestoreSelection(tvItems, **s_it, true);
+    */
+    
+    // restore selection
+    viewItems->SelectedNode = nullptr;
 
-    toolStripStatusLabel2->Text = items->size().ToString();*/
+    toolStripStatusLabel2->Text = newItems.size().ToString();
+
+    viewItems->EndUpdate();
 }
 } // namespace Props
 } // namespace ECore

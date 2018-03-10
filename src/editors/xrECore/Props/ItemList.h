@@ -61,27 +61,27 @@ protected:
     }
 
 public:
-    void AssignItems(ListItemsVec& new_items, bool full_expand, bool full_sort);
+    void AssignItems(ListItemsVec& newItems, bool fullExpand, bool fullSort);
 
 private:
     Flags32* flags;
     ListItemsVec* items;
 
+private: XRay::SdkControls::TreeView^ viewItems;
 private: System::Windows::Forms::StatusStrip^ statusStrip1;
 private: System::Windows::Forms::ToolStripStatusLabel^ toolStripStatusLabel1;
 private: System::Windows::Forms::ToolStripStatusLabel^ toolStripStatusLabel2;
-private: System::Windows::Forms::TreeView^ viewItems;
+private: System::ComponentModel::IContainer^ components;
 
 private:
-    System::ComponentModel::Container^ components;
-
 #pragma region Windows Form Designer generated code
     void InitializeComponent(void)
     {
+        this->components = (gcnew System::ComponentModel::Container());
         this->statusStrip1 = (gcnew System::Windows::Forms::StatusStrip());
         this->toolStripStatusLabel1 = (gcnew System::Windows::Forms::ToolStripStatusLabel());
         this->toolStripStatusLabel2 = (gcnew System::Windows::Forms::ToolStripStatusLabel());
-        this->viewItems = (gcnew System::Windows::Forms::TreeView());
+        this->viewItems = (gcnew XRay::SdkControls::TreeView());
         this->statusStrip1->SuspendLayout();
         this->SuspendLayout();
         this->statusStrip1->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(2) {
@@ -98,10 +98,16 @@ private:
         this->toolStripStatusLabel1->Text = L"Items count:";
         this->toolStripStatusLabel2->Name = L"toolStripStatusLabel2";
         this->toolStripStatusLabel2->Size = System::Drawing::Size(0, 17);
+        this->viewItems->AutoExpandOnFilter = false;
         this->viewItems->Dock = System::Windows::Forms::DockStyle::Fill;
+        this->viewItems->FilterVisible = false;
         this->viewItems->Location = System::Drawing::Point(0, 0);
+        this->viewItems->MultiSelect = true;
+        this->viewItems->SelectableGroups = false;
         this->viewItems->Name = L"viewItems";
+        this->viewItems->PathSeparator = L"/";
         this->viewItems->Size = System::Drawing::Size(284, 242);
+        this->viewItems->Source = nullptr;
         this->viewItems->TabIndex = 1;
         this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
         this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;

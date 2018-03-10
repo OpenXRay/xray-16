@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace XRay.SdkControls
 {
-    public sealed partial class NumericSpinner : UserControl
+    public partial class NumericSpinner : UserControl
     {
         private bool ignoreOnChanged;
 

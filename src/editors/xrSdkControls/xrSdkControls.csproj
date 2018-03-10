@@ -40,6 +40,7 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controls\NumericSlider\NumericSlider.cs">
@@ -80,6 +81,32 @@
     <Compile Include="Controls\PropertyGrid.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\TreeNode\TreeNode.cs" />
+    <Compile Include="Controls\Interfaces\ITreeViewSource.cs" />
+    <Compile Include="Controls\TreeViewFilterPanel\TreeViewFilterPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\TreeViewFilterPanel\TreeViewFilterPanel.Designer.cs">
+      <DependentUpon>TreeViewFilterPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\TreeViewSearchPanel\TreeViewSearchPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\TreeViewSearchPanel\TreeViewSearchPanel.Designer.cs">
+      <DependentUpon>TreeViewSearchPanel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\TreeView\TreeViewCallbacks.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\TreeView\TreeView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\TreeView\TreeView.Designer.cs">
+      <DependentUpon>TreeView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\TreeView\TreeViewSelection.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Controls\Interfaces\IPropertyContainer.cs" />
     <Compile Include="Controls\Interfaces\IIncrementable.cs" />
@@ -108,6 +135,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\NumericSpinner\NumericSpinner.resx">
       <DependentUpon>NumericSpinner.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\TreeViewFilterPanel\TreeViewFilterPanel.resx">
+      <DependentUpon>TreeViewFilterPanel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\TreeViewSearchPanel\TreeViewSearchPanel.resx">
+      <DependentUpon>TreeViewSearchPanel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

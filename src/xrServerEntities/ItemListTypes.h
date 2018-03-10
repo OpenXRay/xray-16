@@ -50,7 +50,7 @@ public:
     IC BOOL Visible() const { return !m_Flags.test(flHidden); }
     IC int Type() { return type; }
     IC void* Item() { return item; }
-    IC LPCSTR Key() { return *key; }
+    IC LPCSTR Key() { return key.c_str(); }
     IC void SetIcon(int index) { icon_index = index; }
 };
 

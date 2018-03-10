@@ -6,11 +6,7 @@
 #include "Props/TextEdit.h"
 #include "xrEngine/WaveForm.h"
 
-namespace XRay
-{
-namespace ECore
-{
-namespace Props
+namespace XRay::ECore::Props
 {
 bool NumericVectorRun(pcstr title, Fvector* data, int decimal, Fvector* reset_value, Fvector* min, Fvector* max, int* X, int* Y)
 {
@@ -38,6 +34,4 @@ bool TextEditRun(xr_string& text, pcstr caption /*= "Text"*/, bool read_only /*=
     auto form = gcnew TextEdit();
     return form->Run(text, caption, read_only, lim, apply_name, on_apply, on_close, on_insight);
 }
-} // namespace Props
-} // namespace ECore
-} // namespace XRay
+} // XRay::ECore::Props
