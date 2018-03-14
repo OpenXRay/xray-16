@@ -82,17 +82,8 @@ void xrDebug::SetBugReportFile(const char* fileName) { strcpy_s(BugReportFile, f
 
 bool xrDebug::GetNextStackFrameString(LPSTACKFRAME stackFrame, PCONTEXT threadCtx, xr_string& frameStr)
 {
-    BOOL result = StackWalk(
-        MACHINE_TYPE,
-        GetCurrentProcess(),
-        GetCurrentThread(),
-        stackFrame,
-        threadCtx,
-        nullptr,
-        SymFunctionTableAccess,
-        SymGetModuleBase,
-        nullptr
-    );
+    BOOL result = StackWalk(MACHINE_TYPE, GetCurrentProcess(), GetCurrentThread(), stackFrame, threadCtx, nullptr,
+        SymFunctionTableAccess, SymGetModuleBase, nullptr);
 
     if (result == FALSE || stackFrame->AddrPC.Offset == 0)
     {
@@ -127,12 +118,7 @@ bool xrDebug::GetNextStackFrameString(LPSTACKFRAME stackFrame, PCONTEXT threadCt
     functionInfo->MaxNameLength = sizeof(arrSymBuffer) - sizeof(*functionInfo) + 1;
     DWORD_PTR dwFunctionOffset;
 
-    result = SymGetSymFromAddr(
-        GetCurrentProcess(),
-        stackFrame->AddrPC.Offset,
-        &dwFunctionOffset,
-        functionInfo
-    );
+    result = SymGetSymFromAddr(GetCurrentProcess(), stackFrame->AddrPC.Offset, &dwFunctionOffset, functionInfo);
 
     if (result)
     {
@@ -154,25 +140,14 @@ bool xrDebug::GetNextStackFrameString(LPSTACKFRAME stackFrame, PCONTEXT threadCt
     IMAGEHLP_LINE sourceInfo = { 0 };
     sourceInfo.SizeOfStruct = sizeof(sourceInfo);
 
-    result = SymGetLineFromAddr(
-        GetCurrentProcess(),
-        stackFrame->AddrPC.Offset,
-        &dwLineOffset,
-        &sourceInfo
-    );
+    result = SymGetLineFromAddr(GetCurrentProcess(), stackFrame->AddrPC.Offset, &dwLineOffset, &sourceInfo);
 
     if (result)
     {
         if (dwLineOffset)
         {
-            xr_sprintf(
-                formatBuff,
-                _countof(formatBuff),
-                " in %s line %u + %u byte(s)",
-                sourceInfo.FileName,
-                sourceInfo.LineNumber,
-                dwLineOffset
-            );
+            xr_sprintf(formatBuff, _countof(formatBuff), " in %s line %u + %u byte(s)", sourceInfo.FileName, 
+                sourceInfo.LineNumber, dwLineOffset);
         }
         else
         {
@@ -242,11 +217,7 @@ xr_vector<xr_string> xrDebug::BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesC
 #	error CPU architecture is not supported.
 #endif
 
-    while (
-        GetNextStackFrameString(&stackFrame, threadCtx, frameStr)
-        &&
-        traceResult.size() <= maxFramesCount
-        )
+    while (GetNextStackFrameString(&stackFrame, threadCtx, frameStr) && traceResult.size() <= maxFramesCount)
     {
         traceResult.push_back(frameStr);
     }
