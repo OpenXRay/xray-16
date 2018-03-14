@@ -1,16 +1,13 @@
 #pragma once
 #include "xrCore/_types.h"
+#include "xrCommon/xr_string.h"
+#include "xrCommon/xr_vector.h"
 #include <string>
 
-struct StackTraceInfo
-{
-    static const size_t Capacity = 100;
-    static const size_t LineCapacity = 256;
-    char Frames[Capacity * LineCapacity];
-    size_t Count;
-
-    char* operator[](size_t i) { return Frames + i * LineCapacity; }
-};
+#pragma warning(push)
+#pragma warning(disable : 4091)	/// 'typedef ': ignored on left of '' when no variable is declared
+#include <DbgHelp.h>
+#pragma warning(pop)
 
 class ErrorLocation
 {
@@ -44,13 +41,14 @@ public:
     using UnhandledExceptionFilter = LONG(WINAPI*)(EXCEPTION_POINTERS* exPtrs);
 
 private:
+	static const u16 MaxFramesCountDefault = 512;
+
     static UnhandledExceptionFilter PrevFilter;
     static OutOfMemoryCallbackFunc OutOfMemoryCallback;
     static CrashHandler OnCrash;
     static DialogHandler OnDialog;
     static string_path BugReportFile;
     static bool ErrorAfterDialog;
-    static StackTraceInfo StackTrace;
 
 public:
     xrDebug() = delete;
@@ -64,9 +62,7 @@ public:
     static DialogHandler GetDialogHandler() { return OnDialog; }
     static void SetDialogHandler(DialogHandler handler) { OnDialog = handler; }
     static const char* ErrorToString(long code);
-    static void SetBugReportFile(const char* fileName);
-    static void LogStackTrace(const char* header);
-    static size_t BuildStackTrace(char* buffer, size_t capacity, size_t lineCapacity);
+    static void SetBugReportFile(const char* fileName);    
     static void GatherInfo(char* assertionInfo, const ErrorLocation& loc, const char* expr, const char* desc,
         const char* arg1 = nullptr, const char* arg2 = nullptr);
     static void Fatal(const ErrorLocation& loc, const char* format, ...);
@@ -78,13 +74,27 @@ public:
         const char* arg1 = nullptr, const char* arg2 = nullptr);
     static void DoExit(const std::string& message);
 
+	///
+	/// Note: DbgHelp is singlethreaded, so you must synchronize calls to these functions
+	///
+	static void LogStackTrace(const char* header);
+	static xr_vector<xr_string> BuildStackTrace(u16 maxFramesCount = MaxFramesCountDefault);
 private:
     static void FormatLastError(char* buffer, const size_t& bufferSize);
-    static size_t BuildStackTrace(EXCEPTION_POINTERS* exPtrs, char* buffer, size_t capacity, size_t lineCapacity);
     static void SetupExceptionHandler(const bool& dedicated);
     static LONG WINAPI UnhandledFilter(EXCEPTION_POINTERS* exPtrs);
     static void WINAPI PreErrorHandler(INT_PTR);
     static void SaveMiniDump(EXCEPTION_POINTERS* exPtrs);
+
+	///
+	/// Next members relates to stack tracing
+	///
+	static bool m_SymEngineInitialized;
+
+	static xr_vector<xr_string> BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesCount);
+	static bool GetNextStackFrameSring(LPSTACKFRAME stackFrame, PCONTEXT threadCtx, xr_string& frameStr);
+	static bool InitializeSymbolEngine();
+	static void DeinitializeSymbolEngine(void);
 };
 
 // for debug purposes only

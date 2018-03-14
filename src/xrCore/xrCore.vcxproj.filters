@@ -273,9 +273,6 @@
     <ClCompile Include="Debug\MiniDump.cpp">
       <Filter>Debug core</Filter>
     </ClCompile>
-    <ClCompile Include="Debug\StackTrace.cpp">
-      <Filter>Debug core</Filter>
-    </ClCompile>
     <ClCompile Include="XML\XMLDocument.cpp">
       <Filter>XML</Filter>
     </ClCompile>
@@ -627,12 +624,6 @@
       <Filter>Math\RNG</Filter>
     </ClInclude>
     <ClInclude Include="Debug\MiniDump.h">
-      <Filter>Debug core</Filter>
-    </ClInclude>
-    <ClInclude Include="Debug\StackTrace.h">
-      <Filter>Debug core</Filter>
-    </ClInclude>
-    <ClInclude Include="Debug\SymbolEngine.h">
       <Filter>Debug core</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\Noncopyable.hpp">
