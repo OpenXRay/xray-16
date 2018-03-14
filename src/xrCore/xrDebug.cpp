@@ -54,7 +54,6 @@ static BOOL bException = FALSE;
 
 namespace
 {
-
 ICN void* GetInstructionPtr()
 {
 #ifdef _MSC_VER
@@ -81,200 +80,200 @@ bool xrDebug::m_SymEngineInitialized = false;
 
 void xrDebug::SetBugReportFile(const char* fileName) { strcpy_s(BugReportFile, fileName); }
 
-bool xrDebug::GetNextStackFrameSring(LPSTACKFRAME stackFrame, PCONTEXT threadCtx, xr_string& frameStr)
+bool xrDebug::GetNextStackFrameString(LPSTACKFRAME stackFrame, PCONTEXT threadCtx, xr_string& frameStr)
 {
-	BOOL result = StackWalk(
-		MACHINE_TYPE,
-		GetCurrentProcess(),
-		GetCurrentThread(),
-		stackFrame,
-		threadCtx,
-		nullptr,
-		SymFunctionTableAccess,
-		SymGetModuleBase,
-		nullptr
-	);
+    BOOL result = StackWalk(
+        MACHINE_TYPE,
+        GetCurrentProcess(),
+        GetCurrentThread(),
+        stackFrame,
+        threadCtx,
+        nullptr,
+        SymFunctionTableAccess,
+        SymGetModuleBase,
+        nullptr
+    );
 
-	if (result == FALSE || stackFrame->AddrPC.Offset == 0)
-	{
-		return false;
-	}
+    if (result == FALSE || stackFrame->AddrPC.Offset == 0)
+    {
+        return false;
+    }
 
-	frameStr.clear();
-	string512 formatBuff;
+    frameStr.clear();
+    string512 formatBuff;
 
-	///
-	/// Module name
-	///
-	HINSTANCE hModule = (HINSTANCE)SymGetModuleBase(GetCurrentProcess(), stackFrame->AddrPC.Offset);
-	if (hModule && GetModuleFileName(hModule, formatBuff, _countof(formatBuff)))
-	{
-		frameStr.append(formatBuff);
-	}
+    ///
+    /// Module name
+    ///
+    HINSTANCE hModule = (HINSTANCE)SymGetModuleBase(GetCurrentProcess(), stackFrame->AddrPC.Offset);
+    if (hModule && GetModuleFileName(hModule, formatBuff, _countof(formatBuff)))
+    {
+        frameStr.append(formatBuff);
+    }
 
-	///
-	/// Address
-	///
-	xr_sprintf(formatBuff, _countof(formatBuff), " at %p", stackFrame->AddrPC.Offset);
-	frameStr.append(formatBuff);
+    ///
+    /// Address
+    ///
+    xr_sprintf(formatBuff, _countof(formatBuff), " at %p", stackFrame->AddrPC.Offset);
+    frameStr.append(formatBuff);
 
-	///
-	/// Function info
-	///
-	BYTE arrSymBuffer[512];
-	ZeroMemory(arrSymBuffer, sizeof(arrSymBuffer));
-	PIMAGEHLP_SYMBOL functionInfo = reinterpret_cast<PIMAGEHLP_SYMBOL>(arrSymBuffer);
-	functionInfo->SizeOfStruct = sizeof(*functionInfo);
-	functionInfo->MaxNameLength = sizeof(arrSymBuffer) - sizeof(*functionInfo) + 1;
-	DWORD_PTR dwFunctionOffset;
+    ///
+    /// Function info
+    ///
+    BYTE arrSymBuffer[512];
+    ZeroMemory(arrSymBuffer, sizeof(arrSymBuffer));
+    PIMAGEHLP_SYMBOL functionInfo = reinterpret_cast<PIMAGEHLP_SYMBOL>(arrSymBuffer);
+    functionInfo->SizeOfStruct = sizeof(*functionInfo);
+    functionInfo->MaxNameLength = sizeof(arrSymBuffer) - sizeof(*functionInfo) + 1;
+    DWORD_PTR dwFunctionOffset;
 
-	result = SymGetSymFromAddr(
-		GetCurrentProcess(),
-		stackFrame->AddrPC.Offset,
-		&dwFunctionOffset,
-		functionInfo
-	);
+    result = SymGetSymFromAddr(
+        GetCurrentProcess(),
+        stackFrame->AddrPC.Offset,
+        &dwFunctionOffset,
+        functionInfo
+    );
 
-	if (result)
-	{
-		if (dwFunctionOffset)
-		{
-			xr_sprintf(formatBuff, _countof(formatBuff), " %s() + %Iu byte(s)", functionInfo->Name, dwFunctionOffset);
-		}
-		else
-		{
-			xr_sprintf(formatBuff, _countof(formatBuff), " %s()", functionInfo->Name);
-		}
-		frameStr.append(formatBuff);
-	}
+    if (result)
+    {
+        if (dwFunctionOffset)
+        {
+            xr_sprintf(formatBuff, _countof(formatBuff), " %s() + %Iu byte(s)", functionInfo->Name, dwFunctionOffset);
+        }
+        else
+        {
+            xr_sprintf(formatBuff, _countof(formatBuff), " %s()", functionInfo->Name);
+        }
+        frameStr.append(formatBuff);
+    }
 
-	///
-	/// Source info
-	///
-	DWORD dwLineOffset;
-	IMAGEHLP_LINE sourceInfo = { 0 };
-	sourceInfo.SizeOfStruct = sizeof(sourceInfo);
+    ///
+    /// Source info
+    ///
+    DWORD dwLineOffset;
+    IMAGEHLP_LINE sourceInfo = { 0 };
+    sourceInfo.SizeOfStruct = sizeof(sourceInfo);
 
-	result = SymGetLineFromAddr(
-		GetCurrentProcess(),
-		stackFrame->AddrPC.Offset,
-		&dwLineOffset,
-		&sourceInfo
-	);
+    result = SymGetLineFromAddr(
+        GetCurrentProcess(),
+        stackFrame->AddrPC.Offset,
+        &dwLineOffset,
+        &sourceInfo
+    );
 
-	if (result)
-	{
-		if (dwLineOffset)
-		{
-			xr_sprintf(
-				formatBuff, 
-				_countof(formatBuff), 
-				" in %s line %u + %u byte(s)",
-				sourceInfo.FileName, 
-				sourceInfo.LineNumber, 
-				dwLineOffset
-			);
-		}
-		else
-		{
-			xr_sprintf(formatBuff, _countof(formatBuff), " in %s line %u", sourceInfo.FileName, sourceInfo.LineNumber);
-		}
-		frameStr.append(formatBuff);
-	}
+    if (result)
+    {
+        if (dwLineOffset)
+        {
+            xr_sprintf(
+                formatBuff,
+                _countof(formatBuff),
+                " in %s line %u + %u byte(s)",
+                sourceInfo.FileName,
+                sourceInfo.LineNumber,
+                dwLineOffset
+            );
+        }
+        else
+        {
+            xr_sprintf(formatBuff, _countof(formatBuff), " in %s line %u", sourceInfo.FileName, sourceInfo.LineNumber);
+        }
+        frameStr.append(formatBuff);
+    }
 
-	return true;
+    return true;
 }
 
 bool xrDebug::InitializeSymbolEngine()
 {
-	if (!m_SymEngineInitialized)
-	{
-		DWORD dwOptions = SymGetOptions();
-		SymSetOptions(dwOptions | SYMOPT_DEFERRED_LOADS | SYMOPT_LOAD_LINES | SYMOPT_UNDNAME);
+    if (!m_SymEngineInitialized)
+    {
+        DWORD dwOptions = SymGetOptions();
+        SymSetOptions(dwOptions | SYMOPT_DEFERRED_LOADS | SYMOPT_LOAD_LINES | SYMOPT_UNDNAME);
 
-		if (SymInitialize(GetCurrentProcess(), nullptr, TRUE))
-		{
-			m_SymEngineInitialized = true;
-		}
-	}
+        if (SymInitialize(GetCurrentProcess(), nullptr, TRUE))
+        {
+            m_SymEngineInitialized = true;
+        }
+    }
 
-	return m_SymEngineInitialized;
+    return m_SymEngineInitialized;
 }
 
 void xrDebug::DeinitializeSymbolEngine(void)
 {
-	if (m_SymEngineInitialized)
-	{
-		SymCleanup(GetCurrentProcess());
+    if (m_SymEngineInitialized)
+    {
+        SymCleanup(GetCurrentProcess());
 
-		m_SymEngineInitialized = false;
-	}
+        m_SymEngineInitialized = false;
+    }
 }
 
 xr_vector<xr_string> xrDebug::BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesCount)
 {
-	SStringVec traceResult;
-	STACKFRAME stackFrame = { 0 };
-	xr_string frameStr;
+    SStringVec traceResult;
+    STACKFRAME stackFrame = { 0 };
+    xr_string frameStr;
 
-	if (!InitializeSymbolEngine())
-	{
-		Msg("[xrDebug::BuildStackTrace]InitializeSymbolEngine failed with error: %d", GetLastError());
-		return traceResult;
-	}
+    if (!InitializeSymbolEngine())
+    {
+        Msg("[xrDebug::BuildStackTrace]InitializeSymbolEngine failed with error: %d", GetLastError());
+        return traceResult;
+    }
 
-	traceResult.reserve(maxFramesCount);
+    traceResult.reserve(maxFramesCount);
 
 #if defined XR_X64
-	stackFrame.AddrPC.Mode = AddrModeFlat;
-	stackFrame.AddrPC.Offset = threadCtx->Rip;
-	stackFrame.AddrStack.Mode = AddrModeFlat;
-	stackFrame.AddrStack.Offset = threadCtx->Rsp;
-	stackFrame.AddrFrame.Mode = AddrModeFlat;
-	stackFrame.AddrFrame.Offset = threadCtx->Rbp;
+    stackFrame.AddrPC.Mode = AddrModeFlat;
+    stackFrame.AddrPC.Offset = threadCtx->Rip;
+    stackFrame.AddrStack.Mode = AddrModeFlat;
+    stackFrame.AddrStack.Offset = threadCtx->Rsp;
+    stackFrame.AddrFrame.Mode = AddrModeFlat;
+    stackFrame.AddrFrame.Offset = threadCtx->Rbp;
 #elif defined XR_X86	
-	stackFrame.AddrPC.Mode = AddrModeFlat;
-	stackFrame.AddrPC.Offset = threadCtx->Eip;
-	stackFrame.AddrStack.Mode = AddrModeFlat;
-	stackFrame.AddrStack.Offset = threadCtx->Esp;
-	stackFrame.AddrFrame.Mode = AddrModeFlat;
-	stackFrame.AddrFrame.Offset = threadCtx->Ebp;
+    stackFrame.AddrPC.Mode = AddrModeFlat;
+    stackFrame.AddrPC.Offset = threadCtx->Eip;
+    stackFrame.AddrStack.Mode = AddrModeFlat;
+    stackFrame.AddrStack.Offset = threadCtx->Esp;
+    stackFrame.AddrFrame.Mode = AddrModeFlat;
+    stackFrame.AddrFrame.Offset = threadCtx->Ebp;
 #else
 #	error CPU architecture is not supported.
 #endif
 
-	while (
-		GetNextStackFrameSring(&stackFrame, threadCtx, frameStr)
-		&&
-		traceResult.size() <= maxFramesCount
-		)
-	{
-		traceResult.push_back(frameStr);
-	}
+    while (
+        GetNextStackFrameString(&stackFrame, threadCtx, frameStr)
+        &&
+        traceResult.size() <= maxFramesCount
+        )
+    {
+        traceResult.push_back(frameStr);
+    }
 
-	DeinitializeSymbolEngine();
+    DeinitializeSymbolEngine();
 
-	return traceResult;
+    return traceResult;
 }
 
 SStringVec xrDebug::BuildStackTrace(u16 maxFramesCount)
-{	
-	CONTEXT currentThreadCtx = { 0 };	
+{
+    CONTEXT currentThreadCtx = { 0 };
 
-	RtlCaptureContext(&currentThreadCtx);	/// GetThreadContext cann't be used on the current thread 
-	currentThreadCtx.ContextFlags = CONTEXT_FULL;
+    RtlCaptureContext(&currentThreadCtx);	/// GetThreadContext cann't be used on the current thread 
+    currentThreadCtx.ContextFlags = CONTEXT_FULL;
 
-	return BuildStackTrace(&currentThreadCtx, maxFramesCount);
+    return BuildStackTrace(&currentThreadCtx, maxFramesCount);
 }
 
 void xrDebug::LogStackTrace(const char* header)
 {
-	SStringVec stackTrace = BuildStackTrace();
-	Msg("%s", header);
-	for each (const auto& frame in stackTrace)
-	{
-		Msg("%s", frame.c_str());
-	}
+    SStringVec stackTrace = BuildStackTrace();
+    Msg("%s", header);
+    for(const auto& frame : stackTrace)
+    {
+        Msg("%s", frame.c_str());
+    }
 }
 
 void xrDebug::GatherInfo(char* assertionInfo, const ErrorLocation& loc, const char* expr, const char* desc,
@@ -585,7 +584,7 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
     if (!ErrorAfterDialog && !strstr(GetCommandLine(), "-no_call_stack_assert"))
     {
         CONTEXT save = *exPtrs->ContextRecord;
-		xr_vector<xr_string> stackTrace = BuildStackTrace(exPtrs->ContextRecord, 1024);
+        xr_vector<xr_string> stackTrace = BuildStackTrace(exPtrs->ContextRecord, 1024);
         *exPtrs->ContextRecord = save;
         if (shared_str_initialized)
             Msg("stack trace:\n");
@@ -682,7 +681,7 @@ static void invalid_parameter_handler(
         line = __LINE__;
         xr_strcpy(mbFile, __FILE__);
     }
-    xrDebug::Fail(ignoreAlways, {mbFile, int(line), mbFunction}, mbExpression, "invalid parameter");
+    xrDebug::Fail(ignoreAlways, { mbFile, int(line), mbFunction }, mbExpression, "invalid parameter");
 }
 
 static void pure_call_handler() { handler_base("pure virtual function call"); }
@@ -699,7 +698,7 @@ void xrDebug::OnThreadSpawn()
 #ifdef USE_BUG_TRAP
     BT_SetTerminate();
 #else
-// std::set_terminate(_terminate);
+    // std::set_terminate(_terminate);
 #endif
     _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
     signal(SIGABRT, abort_handler);
