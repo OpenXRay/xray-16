@@ -43,8 +43,6 @@ public:
     using UnhandledExceptionFilter = LONG(WINAPI*)(EXCEPTION_POINTERS *exPtrs);
 
 private:
-    static const u16 MaxFramesCountDefault = 512;
-
     static UnhandledExceptionFilter PrevFilter;
     static OutOfMemoryCallbackFunc OutOfMemoryCallback;
     static CrashHandler OnCrash;
@@ -77,20 +75,15 @@ public:
     static void DoExit(const std::string &message);
 
     static void LogStackTrace(const char *header);
-    static xr_vector<xr_string> BuildStackTrace(u16 maxFramesCount = MaxFramesCountDefault);
+    static xr_vector<xr_string> BuildStackTrace(u16 maxFramesCount = 512);
 private:
+    static bool symEngineInitialized;
+    static Lock dbgHelpLock;
     static void FormatLastError(char *buffer, const size_t &bufferSize);
     static void SetupExceptionHandler(const bool &dedicated);
     static LONG WINAPI UnhandledFilter(EXCEPTION_POINTERS *exPtrs);
     static void WINAPI PreErrorHandler(INT_PTR);
-    static void SaveMiniDump(EXCEPTION_POINTERS *exPtrs);
-
-    ///
-    /// Next members relates to stack tracing
-    ///
-    static bool symEngineInitialized;
-    static Lock dbgHelpLock;
-
+    static void SaveMiniDump(EXCEPTION_POINTERS *exPtrs);    
     static xr_vector<xr_string> BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesCount);
     static bool GetNextStackFrameString(LPSTACKFRAME stackFrame, PCONTEXT threadCtx, xr_string &frameStr);
     static bool InitializeSymbolEngine();
