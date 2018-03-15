@@ -4,7 +4,8 @@
 #include "xrDebug.h"
 #include "os_clipboard.h"
 #include "Debug/dxerr.h"
-#include "xrCore/Threading/Lock.hpp"
+#include "Threading/ScopeLock.h"
+
 #pragma warning(push)
 #pragma warning(disable : 4091) // 'typedef ': ignored on left of '' when no variable is declared
 #include "Debug/MiniDump.h"
@@ -76,7 +77,9 @@ xrDebug::CrashHandler xrDebug::OnCrash = nullptr;
 xrDebug::DialogHandler xrDebug::OnDialog = nullptr;
 string_path xrDebug::BugReportFile;
 bool xrDebug::ErrorAfterDialog = false;
+
 bool xrDebug::m_SymEngineInitialized = false;
+Lock xrDebug::m_DbgHelpLock;
 
 void xrDebug::SetBugReportFile(const char* fileName) { strcpy_s(BugReportFile, fileName); }
 
@@ -187,6 +190,8 @@ void xrDebug::DeinitializeSymbolEngine(void)
 
 xr_vector<xr_string> xrDebug::BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesCount)
 {
+    ScopeLock Lock(&m_DbgHelpLock);
+
     SStringVec traceResult;
     STACKFRAME stackFrame = { 0 };
     xr_string frameStr;

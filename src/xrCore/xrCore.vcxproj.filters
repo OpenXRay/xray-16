@@ -668,6 +668,9 @@
     <ClInclude Include="xrMemory.h">
       <Filter>Memory</Filter>
     </ClInclude>
+    <ClInclude Include="Threading\ScopeLock.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xrCore.rc">

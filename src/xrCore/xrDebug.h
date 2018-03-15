@@ -2,6 +2,8 @@
 #include "xrCore/_types.h"
 #include "xrCommon/xr_string.h"
 #include "xrCommon/xr_vector.h"
+#include "Threading/Lock.hpp"
+
 #include <string>
 
 #pragma warning(push)
@@ -74,9 +76,6 @@ public:
         const char* arg1 = nullptr, const char* arg2 = nullptr);
     static void DoExit(const std::string& message);
 
-    ///
-    /// Note: DbgHelp is singlethreaded, so you must synchronize calls to these functions
-    ///
     static void LogStackTrace(const char* header);
     static xr_vector<xr_string> BuildStackTrace(u16 maxFramesCount = MaxFramesCountDefault);
 private:
@@ -90,6 +89,7 @@ private:
     /// Next members relates to stack tracing
     ///
     static bool m_SymEngineInitialized;
+    static Lock m_DbgHelpLock;
 
     static xr_vector<xr_string> BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesCount);
     static bool GetNextStackFrameString(LPSTACKFRAME stackFrame, PCONTEXT threadCtx, xr_string& frameStr);

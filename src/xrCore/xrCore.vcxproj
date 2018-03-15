@@ -354,6 +354,7 @@
     <ClInclude Include="SubAlloc.hpp" />
     <ClInclude Include="Text\MbHelpers.h" />
     <ClInclude Include="Threading\Event.hpp" />
+    <ClInclude Include="Threading\ScopeLock.h" />
     <ClInclude Include="Threading\ThreadPool.hpp" />
     <ClInclude Include="Threading\Lock.hpp" />
     <ClInclude Include="vector.h" />
