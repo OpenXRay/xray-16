@@ -78,12 +78,12 @@ xrDebug::DialogHandler xrDebug::OnDialog = nullptr;
 string_path xrDebug::BugReportFile;
 bool xrDebug::ErrorAfterDialog = false;
 
-bool xrDebug::m_SymEngineInitialized = false;
-Lock xrDebug::m_DbgHelpLock;
+bool xrDebug::symEngineInitialized = false;
+Lock xrDebug::dbgHelpLock;
 
-void xrDebug::SetBugReportFile(const char* fileName) { strcpy_s(BugReportFile, fileName); }
+void xrDebug::SetBugReportFile(const char *fileName) { strcpy_s(BugReportFile, fileName); }
 
-bool xrDebug::GetNextStackFrameString(LPSTACKFRAME stackFrame, PCONTEXT threadCtx, xr_string& frameStr)
+bool xrDebug::GetNextStackFrameString(LPSTACKFRAME stackFrame, PCONTEXT threadCtx, xr_string &frameStr)
 {
     BOOL result = StackWalk(MACHINE_TYPE, GetCurrentProcess(), GetCurrentThread(), stackFrame, threadCtx, nullptr,
         SymFunctionTableAccess, SymGetModuleBase, nullptr);
@@ -140,7 +140,7 @@ bool xrDebug::GetNextStackFrameString(LPSTACKFRAME stackFrame, PCONTEXT threadCt
     /// Source info
     ///
     DWORD dwLineOffset;
-    IMAGEHLP_LINE sourceInfo = { 0 };
+    IMAGEHLP_LINE sourceInfo = {};
     sourceInfo.SizeOfStruct = sizeof(sourceInfo);
 
     result = SymGetLineFromAddr(GetCurrentProcess(), stackFrame->AddrPC.Offset, &dwLineOffset, &sourceInfo);
@@ -164,36 +164,36 @@ bool xrDebug::GetNextStackFrameString(LPSTACKFRAME stackFrame, PCONTEXT threadCt
 
 bool xrDebug::InitializeSymbolEngine()
 {
-    if (!m_SymEngineInitialized)
+    if (!symEngineInitialized)
     {
         DWORD dwOptions = SymGetOptions();
         SymSetOptions(dwOptions | SYMOPT_DEFERRED_LOADS | SYMOPT_LOAD_LINES | SYMOPT_UNDNAME);
 
         if (SymInitialize(GetCurrentProcess(), nullptr, TRUE))
         {
-            m_SymEngineInitialized = true;
+            symEngineInitialized = true;
         }
     }
 
-    return m_SymEngineInitialized;
+    return symEngineInitialized;
 }
 
 void xrDebug::DeinitializeSymbolEngine(void)
 {
-    if (m_SymEngineInitialized)
+    if (symEngineInitialized)
     {
         SymCleanup(GetCurrentProcess());
 
-        m_SymEngineInitialized = false;
+        symEngineInitialized = false;
     }
 }
 
 xr_vector<xr_string> xrDebug::BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesCount)
 {
-    ScopeLock Lock(&m_DbgHelpLock);
+    ScopeLock Lock(&dbgHelpLock);
 
     SStringVec traceResult;
-    STACKFRAME stackFrame = { 0 };
+    STACKFRAME stackFrame = {};
     xr_string frameStr;
 
     if (!InitializeSymbolEngine())
@@ -234,7 +234,7 @@ xr_vector<xr_string> xrDebug::BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesC
 
 SStringVec xrDebug::BuildStackTrace(u16 maxFramesCount)
 {
-    CONTEXT currentThreadCtx = { 0 };
+    CONTEXT currentThreadCtx = {};
 
     RtlCaptureContext(&currentThreadCtx);	/// GetThreadContext cann't be used on the current thread 
     currentThreadCtx.ContextFlags = CONTEXT_FULL;
@@ -242,20 +242,20 @@ SStringVec xrDebug::BuildStackTrace(u16 maxFramesCount)
     return BuildStackTrace(&currentThreadCtx, maxFramesCount);
 }
 
-void xrDebug::LogStackTrace(const char* header)
+void xrDebug::LogStackTrace(const char *header)
 {
     SStringVec stackTrace = BuildStackTrace();
     Msg("%s", header);
-    for(const auto& frame : stackTrace)
+    for (const auto &frame : stackTrace)
     {
         Msg("%s", frame.c_str());
     }
 }
 
-void xrDebug::GatherInfo(char* assertionInfo, const ErrorLocation& loc, const char* expr, const char* desc,
-    const char* arg1, const char* arg2)
+void xrDebug::GatherInfo(char *assertionInfo, const ErrorLocation &loc, const char *expr, const char *desc,
+    const char *arg1, const char *arg2)
 {
-    char* buffer = assertionInfo;
+    char *buffer = assertionInfo;
     if (!expr)
         expr = "<no expression>";
     bool extendedDesc = desc && strchr(desc, '\n');
@@ -317,7 +317,7 @@ void xrDebug::GatherInfo(char* assertionInfo, const ErrorLocation& loc, const ch
     os_clipboard::copy_to_clipboard(assertionInfo);
 }
 
-void xrDebug::Fatal(const ErrorLocation& loc, const char* format, ...)
+void xrDebug::Fatal(const ErrorLocation &loc, const char *format, ...)
 {
     string1024 desc;
     va_list args;
@@ -328,14 +328,14 @@ void xrDebug::Fatal(const ErrorLocation& loc, const char* format, ...)
     Fail(ignoreAlways, loc, nullptr, "fatal error", desc);
 }
 
-void xrDebug::Fail(
-    bool& ignoreAlways, const ErrorLocation& loc, const char* expr, long hresult, const char* arg1, const char* arg2)
+void xrDebug::Fail(bool &ignoreAlways, const ErrorLocation &loc, const char *expr, long hresult, const char *arg1,
+    const char *arg2)
 {
     Fail(ignoreAlways, loc, expr, xrDebug::ErrorToString(hresult), arg1, arg2);
 }
 
-void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const char* desc, const char* arg1,
-    const char* arg2)
+void xrDebug::Fail(bool &ignoreAlways, const ErrorLocation &loc, const char *expr, const char *desc, const char *arg1,
+    const char *arg2)
 {
 #ifdef PROFILE_CRITICAL_SECTIONS
     static Lock lock(MUTEX_PROFILE_ID(xrDebug::Backend));
@@ -393,13 +393,13 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
     lock.Leave();
 }
 
-void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const std::string& desc,
-    const char* arg1, const char* arg2)
+void xrDebug::Fail(bool &ignoreAlways, const ErrorLocation &loc, const char *expr, const std::string &desc,
+    const char *arg1, const char *arg2)
 {
     Fail(ignoreAlways, loc, expr, desc.c_str(), arg1, arg2);
 }
 
-void xrDebug::DoExit(const std::string& message)
+void xrDebug::DoExit(const std::string &message)
 {
     FlushLog();
     MessageBox(NULL, message.c_str(), "Error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
@@ -408,7 +408,7 @@ void xrDebug::DoExit(const std::string& message)
 
 LPCSTR xrDebug::ErrorToString(long code)
 {
-    const char* result = nullptr;
+    const char *result = nullptr;
     static string1024 descStorage;
     DXGetErrorDescription(code, descStorage, sizeof(descStorage));
     if (!result)
@@ -476,7 +476,7 @@ void WINAPI xrDebug::PreErrorHandler(INT_PTR)
     BT_SaveSnapshot(nullptr);
 }
 
-void xrDebug::SetupExceptionHandler(const bool& dedicated)
+void xrDebug::SetupExceptionHandler(const bool &dedicated)
 {
     // disable 'appname has stopped working' popup dialog
     UINT prevMode = SetErrorMode(SEM_NOGPFAULTERRORBOX);
@@ -516,7 +516,7 @@ void xrDebug::SetupExceptionHandler(const bool& dedicated)
 #endif // USE_BUG_TRAP
 
 #ifdef USE_OWN_MINI_DUMP
-void xrDebug::SaveMiniDump(EXCEPTION_POINTERS* exPtrs)
+void xrDebug::SaveMiniDump(EXCEPTION_POINTERS *exPtrs)
 {
     string64 dateStr;
     timestamp(dateStr);
@@ -537,7 +537,7 @@ void xrDebug::SaveMiniDump(EXCEPTION_POINTERS* exPtrs)
 }
 #endif
 
-void xrDebug::FormatLastError(char* buffer, const size_t& bufferSize)
+void xrDebug::FormatLastError(char *buffer, const size_t &bufferSize)
 {
     int lastErr = GetLastError();
     if (lastErr == ERROR_SUCCESS)
@@ -545,7 +545,7 @@ void xrDebug::FormatLastError(char* buffer, const size_t& bufferSize)
         *buffer = 0;
         return;
     }
-    void* msg = nullptr;
+    void *msg = nullptr;
     FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, nullptr, lastErr,
         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&msg, 0, nullptr);
     // XXX nitrocaster: check buffer overflow
@@ -553,7 +553,7 @@ void xrDebug::FormatLastError(char* buffer, const size_t& bufferSize)
     LocalFree(msg);
 }
 
-LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
+LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS *exPtrs)
 {
     string256 errMsg;
     FormatLastError(errMsg, sizeof(errMsg));
@@ -628,14 +628,14 @@ void _terminate()
 }
 #endif // USE_BUG_TRAP
 
-static void handler_base(const char* reason)
+static void handler_base(const char *reason)
 {
     bool ignoreAlways = false;
     xrDebug::Fail(ignoreAlways, DEBUG_INFO, nullptr, reason, nullptr, nullptr);
 }
 
-static void invalid_parameter_handler(
-    const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t reserved)
+static void invalid_parameter_handler(const wchar_t *expression, const wchar_t *function, const wchar_t *file,
+    unsigned int line, uintptr_t reserved)
 {
     bool ignoreAlways = false;
     string4096 mbExpression;
@@ -657,7 +657,7 @@ static void invalid_parameter_handler(
         line = __LINE__;
         xr_strcpy(mbFile, __FILE__);
     }
-    xrDebug::Fail(ignoreAlways, { mbFile, int(line), mbFunction }, mbExpression, "invalid parameter");
+    xrDebug::Fail(ignoreAlways, {mbFile, int(line), mbFunction}, mbExpression, "invalid parameter");
 }
 
 static void pure_call_handler() { handler_base("pure virtual function call"); }
@@ -692,7 +692,7 @@ void xrDebug::OnThreadSpawn()
 #endif
 }
 
-void xrDebug::Initialize(const bool& dedicated)
+void xrDebug::Initialize(const bool &dedicated)
 {
     *BugReportFile = 0;
     OnThreadSpawn();

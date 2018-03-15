@@ -4,24 +4,24 @@
 #include "Threading/Lock.hpp"
 #include "xrDebug.h"
 
-class ScopeLock: Noncopyable
+class ScopeLock : Noncopyable
 {
 public:
-    ScopeLock(Lock* SyncObject);
+    ScopeLock(Lock *SyncObject);
     ~ScopeLock();
 
 private:
-    Lock * m_SyncObject;
+    Lock *syncObject;
 };
 
-ScopeLock::ScopeLock(Lock* SyncObject): m_SyncObject(SyncObject)
+ScopeLock::ScopeLock(Lock *SyncObject) : syncObject(SyncObject)
 {
-    VERIFY(m_SyncObject);
+    VERIFY(syncObject);
 
-    m_SyncObject->Enter();
+    syncObject->Enter();
 }
 
 ScopeLock::~ScopeLock()
 {
-    m_SyncObject->Leave();
+    syncObject->Leave();
 }
