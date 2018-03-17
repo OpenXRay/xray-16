@@ -223,8 +223,6 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvRese
     //. LogFile.reserve (256);
     break;
     case DLL_THREAD_ATTACH:
-        if (!strstr(GetCommandLine(), "-editor"))
-            CoInitializeEx(nullptr, COINIT_MULTITHREADED);
         timeBeginPeriod(1);
         break;
     case DLL_THREAD_DETACH: break;
