@@ -82,9 +82,9 @@ void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pc
 
         rtc_initialize();
 
-        xr_FS = new CLocatorAPI();
+        xr_FS = std::make_unique<CLocatorAPI>();
 
-        xr_EFS = new EFS_Utils();
+        xr_EFS = std::make_unique<EFS_Utils>();
         //. R_ASSERT (co_res==S_OK);
     }
     if (init_fs)
@@ -135,8 +135,8 @@ void xrCore::_destroy()
         ttapi.destroy();
         FS._destroy();
         EFS._destroy();
-        xr_delete(xr_FS);
-        xr_delete(xr_EFS);
+        xr_FS.reset();
+        xr_EFS.reset();
 
 #ifndef _EDITOR
         if (trained_model)

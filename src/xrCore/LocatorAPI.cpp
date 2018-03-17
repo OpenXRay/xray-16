@@ -19,7 +19,7 @@
 
 const u32 BIG_FILE_READER_WINDOW_SIZE = 1024 * 1024;
 
-CLocatorAPI* xr_FS = nullptr;
+std::unique_ptr<CLocatorAPI> xr_FS;
 
 #ifdef _EDITOR
 static constexpr pcstr FSLTX = "fs.ltx"
