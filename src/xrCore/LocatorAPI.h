@@ -212,5 +212,5 @@ public:
     void unlock_rescan();
 };
 
-extern XRCORE_API CLocatorAPI* xr_FS;
+extern XRCORE_API std::unique_ptr<CLocatorAPI> xr_FS;
 #define FS (*xr_FS)
