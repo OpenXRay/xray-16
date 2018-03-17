@@ -203,7 +203,6 @@ void xrCore::CalculateBuildId()
         buildId -= daysInMonth[i];
 }
 
-//. why ???
 #ifdef _EDITOR
 BOOL WINAPI DllEntryPoint(HINSTANCE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvReserved)
 #else
@@ -212,12 +211,23 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD ul_reason_for_call, LPVOID lpvRese
 {
     switch (ul_reason_for_call)
     {
-    case DLL_PROCESS_ATTACH: break;
-    case DLL_THREAD_ATTACH:
-        timeBeginPeriod(1);
-        break;
-    case DLL_THREAD_DETACH:  break;
-    case DLL_PROCESS_DETACH: break;
+    /*
+    По сути это не рекомендуемый Microsoft, но повсеместно используемый способ повышения точности
+    соблюдения и измерения временных интревалов функциями Sleep, QueryPerformanceCounter,
+    timeGetTime и GetTickCount.
+    Функция действует на всю операционную систему в целом (!) и нет необходимости вызывать её при
+    старте нового потока. Вызов timeEndPeriod специалисты Microsoft считают обязательным.
+    Есть подозрения, что Windows сама устанавливает максимальную точность при старте таких
+    приложений как, например, игры. Тогда есть шанс, что вызов timeBeginPeriod здесь бессмысленен.
+    Недостатком данного способа является то, что он приводит к общему замедлению работы как
+    текущего приложения, так и всей операционной системы.
+    Ещё можно посмотреть ссылки:
+        https://msdn.microsoft.com/en-us/library/vs/alm/dd757624(v=vs.85).aspx
+        https://users.livejournal.com/-winnie/151099.html
+        https://github.com/tebjan/TimerTool
+    */
+    case DLL_PROCESS_ATTACH: timeBeginPeriod(1); break;
+    case DLL_PROCESS_DETACH: timeEndPeriod  (1); break;
     }
     return TRUE;
 }
