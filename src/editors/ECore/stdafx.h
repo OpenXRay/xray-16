@@ -57,13 +57,17 @@ __inline float modff(float a, float* b)
 }
 __inline float expf(float val) { return ::exp(val); }*/
 
+/*
 #ifdef _ECOREB
 #define ECORE_API XR_EXPORT
 #define ENGINE_API XR_EXPORT
 #else
 #define ECORE_API XR_IMPORT
 #define ENGINE_API XR_IMPORT
-#endif
+#endif*/
+
+#define ECORE_API XR_EXPORT
+#define ENGINE_API XR_IMPORT
 
 #define DLL_API XR_IMPORT
 #define PropertyGP(a, b) __declspec(property(get = a, put = b))
@@ -102,7 +106,9 @@ typedef TMsgDlgBtn TMsgDlgButtons[mbHelp];
 #include "xrCore/_stl_extensions.h"
 #include "xrCore/_types.h"
 #include "xrCore/_fbox.h"
+#include "xrCore/xr_token.h"
 #include "xrCommon/xr_vector.h"
+#include "xrCommon/xr_string.h"
 #include "xrCore/Animation/Bone.hpp"
 #include "xrCore/Animation/Motion.hpp"
 

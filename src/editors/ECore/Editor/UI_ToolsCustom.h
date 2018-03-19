@@ -2,8 +2,8 @@
 #ifndef UI_ToolsCustomH
 #define UI_ToolsCustomH
 
-#include "eltree.hpp"
-#include "mxplacemnt.hpp"
+//#include "eltree.hpp"
+//#include "mxplacemnt.hpp"
 #include "editors/xrEProps/ItemListHelper.h"
 #include "EditObject.h"
 

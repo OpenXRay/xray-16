@@ -63,12 +63,10 @@
     <ClInclude Include="Editor\D3DUtils.h" />
     <ClInclude Include="Editor\D3DX_Wrapper.h" />
     <ClInclude Include="Editor\device.h" />
-    <ClInclude Include="Editor\DrawUtils.h" />
     <ClInclude Include="Editor\du_box.h" />
     <ClInclude Include="Editor\du_cone.h" />
     <ClInclude Include="Editor\du_cylinder.h" />
     <ClInclude Include="Editor\du_sphere.h" />
-    <ClInclude Include="Editor\du_sphere_part.h" />
     <ClInclude Include="Editor\EDetailModel.h" />
     <ClInclude Include="Editor\EditMesh.h" />
     <ClInclude Include="Editor\EditObject.h" />
@@ -102,15 +100,8 @@
     <ClInclude Include="Editor\UI_MainCommand.h" />
     <ClInclude Include="Editor\UI_ToolsCustom.h" />
     <ClInclude Include="Engine\ai_sounds.h" />
-    <ClInclude Include="Engine\cl_collector.h" />
-    <ClInclude Include="Engine\cl_intersect.h" />
-    <ClInclude Include="Engine\GameMtlLib.h" />
     <ClInclude Include="Engine\guid_generator.h" />
     <ClInclude Include="Engine\Image.h" />
-    <ClInclude Include="Engine\NVMeshMender.h" />
-    <ClInclude Include="Engine\nv_algebra.h" />
-    <ClInclude Include="Engine\nv_math.h" />
-    <ClInclude Include="Engine\nv_mathdecl.h" />
     <ClInclude Include="Engine\Texture.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
@@ -125,7 +116,6 @@
     <ClCompile Include="Editor\du_cone.cpp" />
     <ClCompile Include="Editor\du_cylinder.cpp" />
     <ClCompile Include="Editor\du_sphere.cpp" />
-    <ClCompile Include="Editor\du_sphere_part.cpp" />
     <ClCompile Include="Editor\EDetailModel.cpp" />
     <ClCompile Include="Editor\EditMesh.cpp" />
     <ClCompile Include="Editor\EditMeshIO.cpp" />
@@ -169,16 +159,9 @@
     <ClCompile Include="Editor\UI_MainCommand.cpp" />
     <ClCompile Include="Editor\UI_MainMail.cpp" />
     <ClCompile Include="Editor\UI_ToolsCustom.cpp" />
-    <ClCompile Include="Editor\xrLoadSurface.cpp" />
     <ClCompile Include="Engine\ai_sounds.cpp" />
-    <ClCompile Include="Engine\bone.cpp" />
-    <ClCompile Include="Engine\cl_collector.cpp" />
-    <ClCompile Include="Engine\GameMtlLib.cpp" />
-    <ClCompile Include="Engine\GameMtlLib_Engine.cpp" />
     <ClCompile Include="Engine\guid_generator.cpp" />
     <ClCompile Include="Engine\Image.cpp" />
-    <ClCompile Include="Engine\NVMeshMender.cpp" />
-    <ClCompile Include="Engine\nv_algebra.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>

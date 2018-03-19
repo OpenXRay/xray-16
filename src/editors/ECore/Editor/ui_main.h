@@ -2,9 +2,9 @@
 #ifndef UI_MainH
 #define UI_MainH
 
-#include "RenderWindow.hpp"
+//#include "RenderWindow.hpp"
 #include "UI_MainCommand.h"
-#include "IInputReceiver.h"
+#include "xrEngine/IInputReceiver.h"
 
 // refs
 class CCustomObject;
@@ -41,9 +41,12 @@ public:
 typedef xr_vector<EEditorState> EStateList;
 typedef EStateList::iterator EStateIt;
 
-class ECORE_API TUI :
-
-    public IInputReceiver
+// XXX: Get rid of
+class TD3DWindow;
+class TPanel;
+class THintWindow;
+class TForm;
+class ECORE_API TUI : public IInputReceiver
 {
 protected:
     friend class CCustomPreferences;
@@ -142,7 +145,7 @@ public:
     virtual ~TUI();
 
     void Quit() { m_Flags.set(flNeedQuit, TRUE); }
-    IC HANDLE GetHWND() { return m_D3DWindow->Handle; }
+    IC HANDLE GetHWND() { return nullptr /*m_D3DWindow->Handle*/; }
     int GetRenderWidth() { return EDevice.dwWidth; }
     int GetRenderHeight() { return EDevice.dwHeight; }
     int GetRealWidth() { return EDevice.m_RealWidth; }
@@ -223,7 +226,7 @@ public:
 
     bool NeedAbort()
     {
-        Application->ProcessMessages();
+        //Application->ProcessMessages();
         return bNeedAbort;
     }
     void NeedBreak() { bNeedAbort = true; }
@@ -281,6 +284,7 @@ void ECORE_API ResetActionToSelect();
         ExecCommand(cmd, p0); \
         bExec = true;         \
     }
+class TObject;
 extern ECORE_API void __fastcall PanelMinMax(TPanel* pa);
 extern ECORE_API void __fastcall PanelMinimize(TPanel* pa);
 extern ECORE_API void __fastcall PanelMaximize(TPanel* pa);

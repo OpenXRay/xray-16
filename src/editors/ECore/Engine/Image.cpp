@@ -1,10 +1,6 @@
-// Image.cpp: implementation of the CImage class.
-//
-//////////////////////////////////////////////////////////////////////
-
 #include "stdafx.h"
-#pragma hdrstop
 
+/*
 #include "Image.h"
 #include "../../../Layers/xrRender/tga.h"
 
@@ -124,7 +120,7 @@ void CImage::Grayscale()
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-/*
+/ *
 #pragma pack(push,8)
 struct _fileT {
     D3DFORMAT      fmt;
@@ -153,7 +149,7 @@ void CImage::LoadT(char *name)
 
     xr_free(data);
 }
-*/
+* /
 
 //-----------------------------------------------------------------------------
 //    Load an TGA file
@@ -308,7 +304,7 @@ bool CImage::LoadTGA(LPCSTR name)
             }
         }
     }
-    /*
+    / *
         if (hdr.pixsize==24)
         {	// 24bpp
             bAlpha = FALSE;
@@ -329,7 +325,7 @@ bool CImage::LoadTGA(LPCSTR name)
             bAlpha = TRUE;
             TGA.r(pData,hdr.width*hdr.height*4);
         }
-    */
+    * /
     if (vflip)
         Vflip();
     if (hflip)
@@ -337,3 +333,4 @@ bool CImage::LoadTGA(LPCSTR name)
 
     return true;
 }
+*/

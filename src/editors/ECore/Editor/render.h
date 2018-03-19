@@ -134,6 +134,6 @@ IC
 }
 
 extern ECORE_API CRender RImplementation;
-//.extern ECORE_API CRender*	Render;
+extern ECORE_API CRender* Render;
 
 #endif

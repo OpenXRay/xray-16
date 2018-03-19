@@ -20,10 +20,10 @@ xrGUID generate_guid()
 {
     xrGUID result;
 #ifdef WINVER
-    STATIC_CHECK(sizeof(xrGUID) == sizeof(GUID), Different_GUID_types);
+    static_assert(sizeof(xrGUID) == sizeof(GUID), "Different GUID types");
     GUID _result;
     RPC_STATUS gen_result = UuidCreate(&_result);
-    Memory.mem_copy(&result, &_result, sizeof(_result));
+    CopyMemory(&result, &_result, sizeof(_result));
     switch (gen_result)
     {
     case RPC_S_OK: return (result);
@@ -32,9 +32,9 @@ xrGUID generate_guid()
     default: break;
     }
 #endif
-    STATIC_CHECK(sizeof(result) >= sizeof(u64), GUID_must_have_size_greater_or_equal_to_the_long_long);
+    static_assert(sizeof(result) >= sizeof(u64), "GUID must have size greater or equal to the long long");
     ZeroMemory(&result, sizeof(result));
     u64 temp = CPU::GetCLK();
-    Memory.mem_copy(&result, &temp, sizeof(temp));
+    CopyMemory(&result, &temp, sizeof(temp));
     return (result);
 }

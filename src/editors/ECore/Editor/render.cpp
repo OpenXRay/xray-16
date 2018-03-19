@@ -8,10 +8,8 @@
 float ssaDISCARD = 4.f;
 float ssaDONTSORT = 32.f;
 
-ECORE_API
-float r_ssaDISCARD;
-ECORE_API
-float g_fSCREEN;
+ECORE_API float r_ssaDISCARD;
+ECORE_API float g_fSCREEN;
 
 CRender RImplementation;
 ECORE_API CRender* Render = &RImplementation;
@@ -53,7 +51,7 @@ void CRender::Calculate()
 }
 
 #include "xrEngine/IGame_Persistent.h"
-#include "environment.h"
+#include "xrEngine/Environment.h"
 
 void CRender::Render() {}
 IRender_DetailModel* CRender::model_CreateDM(IReader* F)

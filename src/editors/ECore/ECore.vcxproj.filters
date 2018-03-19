@@ -25,9 +25,6 @@
     <ClInclude Include="Editor\device.h">
       <Filter>editor</Filter>
     </ClInclude>
-    <ClInclude Include="Editor\DrawUtils.h">
-      <Filter>editor</Filter>
-    </ClInclude>
     <ClInclude Include="Editor\du_box.h">
       <Filter>editor</Filter>
     </ClInclude>
@@ -38,9 +35,6 @@
       <Filter>editor</Filter>
     </ClInclude>
     <ClInclude Include="Editor\du_sphere.h">
-      <Filter>editor</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor\du_sphere_part.h">
       <Filter>editor</Filter>
     </ClInclude>
     <ClInclude Include="Editor\EDetailModel.h">
@@ -142,31 +136,10 @@
     <ClInclude Include="Engine\ai_sounds.h">
       <Filter>engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\cl_collector.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\cl_intersect.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\GameMtlLib.h">
-      <Filter>engine</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\guid_generator.h">
       <Filter>engine</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Image.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\nv_algebra.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\nv_math.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\nv_mathdecl.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\NVMeshMender.h">
       <Filter>engine</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Texture.h">
@@ -203,9 +176,6 @@
       <Filter>editor</Filter>
     </ClCompile>
     <ClCompile Include="Editor\du_sphere.cpp">
-      <Filter>editor</Filter>
-    </ClCompile>
-    <ClCompile Include="Editor\du_sphere_part.cpp">
       <Filter>editor</Filter>
     </ClCompile>
     <ClCompile Include="Editor\EDetailModel.cpp">
@@ -337,34 +307,13 @@
     <ClCompile Include="Editor\UI_ToolsCustom.cpp">
       <Filter>editor</Filter>
     </ClCompile>
-    <ClCompile Include="Editor\xrLoadSurface.cpp">
-      <Filter>editor</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\ai_sounds.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\bone.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\cl_collector.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GameMtlLib.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\GameMtlLib_Engine.cpp">
       <Filter>engine</Filter>
     </ClCompile>
     <ClCompile Include="Engine\guid_generator.cpp">
       <Filter>engine</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Image.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\nv_algebra.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\NVMeshMender.cpp">
       <Filter>engine</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp" />

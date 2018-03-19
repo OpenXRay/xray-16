@@ -4,7 +4,7 @@
 #include "Layers/xrRender/ETextureParams.h"
 #include "xrServerEntities/PropertiesListHelper.h"
 
-#include "MXCtrls.hpp"
+//#include "MXCtrls.hpp"
 //------------------------------------------------------------------------------
 // Custom class
 //------------------------------------------------------------------------------

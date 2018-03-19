@@ -1,7 +1,7 @@
 #ifndef STRING_CONCATENATIONS_H
 #define STRING_CONCATENATIONS_H
 
-#ifndef _EDITOR
+#if 1//ndef _EDITOR
 
 pstr XRCORE_API strconcat(int dest_sz, pstr dest, pcstr S1, pcstr S2);
 pstr XRCORE_API strconcat(int dest_sz, pstr dest, pcstr S1, pcstr S2, pcstr S3);

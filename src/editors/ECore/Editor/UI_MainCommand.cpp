@@ -21,7 +21,7 @@
 #include "xrEngine/IGame_Persistent.h"
 #include "editors/xrEProps/NumericVector.h"
 
-#include "editors/xrEProps/TextForm.h"
+//#include "editors/xrEProps/TextForm.h"
 
 ECommandVec ECommands;
 BOOL bAllowReceiveCommand = FALSE;

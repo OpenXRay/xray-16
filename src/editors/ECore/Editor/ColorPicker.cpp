@@ -4,6 +4,7 @@
 
 #include "ColorPicker.h"
 
+/*
 class CTCD
 {
 public:
@@ -19,13 +20,15 @@ public:
     ~CTCD() { xr_delete(cdColor); }
 };
 
-static CTCD TCD;
+static CTCD TCD;*/
 
+// XXX: Find and delete.
 extern "C" DLL_API bool FSColorPickerExecute(u32* currentColor, LPDWORD originalColor, const int initialExpansionState);
 
-bool SelectColor(u32* currentcolor, bool bDefaultPicker)
+[[deprecated]] bool SelectColor(u32* currentcolor, bool bDefaultPicker)
 {
-    VERIFY(currentcolor);
+    return false;
+    /*VERIFY(currentcolor);
     if (bDefaultPicker)
     {
         TCD.cdColor->Color = TColor(rgb2bgr(*currentcolor));
@@ -45,12 +48,13 @@ bool SelectColor(u32* currentcolor, bool bDefaultPicker)
             return true;
         }
         return false;
-    }
+    }*/
 }
 
-bool SelectColorWin(u32* currentcolor, bool bDefaultPicker)
+[[deprecated]] bool SelectColorWin(u32* currentcolor, bool bDefaultPicker)
 {
-    VERIFY(currentcolor);
+    return false;
+    /*VERIFY(currentcolor);
     if (bDefaultPicker)
     {
         TCD.cdColor->Color = TColor(*currentcolor);
@@ -70,5 +74,5 @@ bool SelectColorWin(u32* currentcolor, bool bDefaultPicker)
             return true;
         }
         return false;
-    }
+    }*/
 }

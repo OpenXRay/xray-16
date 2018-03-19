@@ -167,7 +167,7 @@ protected:
     {
         bool expand;
     };
-    DEFINE_MAP(AnsiString, SFolderStore, FolderStoreMap, FolderStorePairIt);
+    DEFINE_MAP(xr_string, SFolderStore, FolderStoreMap, FolderStorePairIt);
     FolderStoreMap FolderStorage;
     void FolderStore();
     void FolderRestore();
