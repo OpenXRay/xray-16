@@ -228,7 +228,7 @@ void CScriptEngine::print_stack(lua_State* L)
             {
                 while ((name = lua_getlocal(L, &l_tDebugInfo, VarID++)) != nullptr)
                 {
-                    LogVariable(L, name, 1, true);
+                    LogVariable(L, name, 1);
 
                     lua_pop(L, 1); /* remove variable value */
                 }
@@ -258,13 +258,13 @@ void CScriptEngine::LogTable(lua_State* luaState, pcstr S, int level)
         char sFullName[256];
         xr_sprintf(sname, "%s", lua_tostring(luaState, -2));
         xr_sprintf(sFullName, "%s.%s", S, sname);
-        LogVariable(luaState, sFullName, level + 1, false);
+        LogVariable(luaState, sFullName, level + 1);
 
         lua_pop(luaState, 1); /* removes `value'; keeps `key' for next iteration */
     }
 }
 
-void CScriptEngine::LogVariable(lua_State* luaState, pcstr name, int level, bool bOpenTable)
+void CScriptEngine::LogVariable(lua_State* luaState, pcstr name, int level)
 {
     const int ntype = lua_type(luaState, -1);
     const pcstr type = lua_typename(luaState, ntype);
@@ -278,6 +278,14 @@ void CScriptEngine::LogVariable(lua_State* luaState, pcstr name, int level, bool
     {
     case LUA_TNIL:
         xr_strcpy(value, "nil");
+        break;
+
+    case LUA_TFUNCTION:
+        xr_strcpy(value, "[function]");
+        break;
+
+    case LUA_TTHREAD:
+        xr_strcpy(value, "[thread]");
         break;
 
     case LUA_TNUMBER:
@@ -294,7 +302,7 @@ void CScriptEngine::LogVariable(lua_State* luaState, pcstr name, int level, bool
 
     case LUA_TTABLE:
     {
-        if (bOpenTable)
+        if (level <= 3)
         {
             Msg("%s Table: %s", tabBuffer, name);
             LogTable(luaState, name, level + 1);
@@ -304,20 +312,19 @@ void CScriptEngine::LogVariable(lua_State* luaState, pcstr name, int level, bool
         break;
     }
 
+    // XXX: can we process lightuserdata like userdata? In other words, is this fallthrough allowed?
+    // case LUA_TLIGHTUSERDATA:
     case LUA_TUSERDATA:
     {
-        /*luabind::detail::object_rep* obj = static_cast<luabind::detail::object_rep*>(lua_touserdata(luaState, -1));
-        luabind::detail::lua_reference& r = obj->get_lua_table(); // XXX: No such method
-        if (r.is_valid())
+        lua_getmetatable(luaState, -1); // Maybe we can do this in another way
+        if (lua_istable(luaState, -1))
         {
-            r.get(luaState);
             Msg("%s Userdata: %s", tabBuffer, name);
             LogTable(luaState, name, level + 1);
             lua_pop(luaState, 1); //Remove userobject
             return;
-        }*/
-        xr_strcpy(value, "[TODO: Fix userdata retrieval]");
-        break;
+        }
+        //[[fallthrough]]
     }
 
     default:
@@ -800,7 +807,7 @@ CScriptEngine::CScriptEngine(bool is_editor)
     *m_last_no_file = 0;
 #ifdef USE_DEBUGGER
 #ifndef USE_LUA_STUDIO
-    STATIC_CHECK(false, Do_Not_Define_USE_LUA_STUDIO_macro_without_USE_DEBUGGER_macro);
+    static_assert(false, "Do not define USE_LUA_STUDIO macro without USE_DEBUGGER macro");
     m_scriptDebugger = nullptr;
     restartDebugger();
 #else
