@@ -3,6 +3,8 @@
 #include "Common/Common.hpp"
 #include "Common/FSMacros.hpp"
 #include "xrCore/xrCore.h"
+#include "xrCommon/xr_vector.h"
+#include "xrCommon/xr_string.h"
 
 #include "xrServerEntities/xrEProps.h"
 #include "xrEProps.h"

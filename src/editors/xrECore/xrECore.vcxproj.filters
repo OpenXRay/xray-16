@@ -1,121 +1,181 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Props">
-      <UniqueIdentifier>{d033d54c-f62f-4d60-bf0e-e8158fb1c7d5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Props\NumericVector">
-      <UniqueIdentifier>{91092487-7732-4643-9283-8ce048d56247}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Props\ShaderFunction">
-      <UniqueIdentifier>{56d7edeb-5e87-435e-b603-082c4d95413f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core">
       <UniqueIdentifier>{5ef41f0f-a8ef-4194-ae46-068b92e5bbd3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Props\GameType">
-      <UniqueIdentifier>{6990b14a-937f-44c1-9ca3-1f83ab512b84}</UniqueIdentifier>
+    <Filter Include="Props &amp; Windows">
+      <UniqueIdentifier>{d033d54c-f62f-4d60-bf0e-e8158fb1c7d5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Props\PropertiesList">
-      <UniqueIdentifier>{8e7aaac2-2ec7-45eb-81af-f73fad7a009e}</UniqueIdentifier>
+    <Filter Include="Props &amp; Windows\WindowView">
+      <UniqueIdentifier>{2ff23dd0-a4e5-409f-8ece-366eda459d2f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Props\ItemList">
-      <UniqueIdentifier>{df5445f5-5310-41bc-abd3-0ff4dc5f4d8f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Props\SelectItem">
+    <Filter Include="Props &amp; Windows\SelectItem">
       <UniqueIdentifier>{1ad2122a-1bb6-4d35-ac47-50cd5cadb647}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Props\TextEdit">
+    <Filter Include="Props &amp; Windows\ShaderFunction">
+      <UniqueIdentifier>{56d7edeb-5e87-435e-b603-082c4d95413f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Props &amp; Windows\WindowSplash">
+      <UniqueIdentifier>{4fa3af5d-dd57-4613-a525-040526ee8ca3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Props &amp; Windows\TextEdit">
       <UniqueIdentifier>{d6664b68-d033-492a-9771-83f3129cd1af}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Props\FolderLib">
+    <Filter Include="Props &amp; Windows\PropertiesList">
+      <UniqueIdentifier>{8e7aaac2-2ec7-45eb-81af-f73fad7a009e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Props &amp; Windows\FolderLib">
       <UniqueIdentifier>{6ad9d22d-603b-4687-a95e-216adf62c562}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Props &amp; Windows\GameType">
+      <UniqueIdentifier>{6990b14a-937f-44c1-9ca3-1f83ab512b84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Props &amp; Windows\ItemList">
+      <UniqueIdentifier>{df5445f5-5310-41bc-abd3-0ff4dc5f4d8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Props &amp; Windows\WindowLog">
+      <UniqueIdentifier>{ec01fc91-102b-42d1-bf07-9ac5f3e20a55}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Props &amp; Windows\NumericVector">
+      <UniqueIdentifier>{91092487-7732-4643-9283-8ce048d56247}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Props &amp; Windows\WindowIDE">
+      <UniqueIdentifier>{417ebcd4-5c96-4d26-b3aa-f634ec4eb59d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="Props\NumericVector.cpp">
-      <Filter>Props\NumericVector</Filter>
+      <Filter>Props &amp; Windows\NumericVector</Filter>
     </ClCompile>
     <ClCompile Include="xrEProps.cpp">
-      <Filter>Props</Filter>
+      <Filter>Props &amp; Windows</Filter>
     </ClCompile>
     <ClCompile Include="Props\ShaderFunction.cpp">
-      <Filter>Props\ShaderFunction</Filter>
+      <Filter>Props &amp; Windows\ShaderFunction</Filter>
     </ClCompile>
     <ClCompile Include="Props\GameType.cpp">
-      <Filter>Props\GameType</Filter>
+      <Filter>Props &amp; Windows\GameType</Filter>
     </ClCompile>
     <ClCompile Include="Props\TextEdit.cpp">
-      <Filter>Props\TextEdit</Filter>
+      <Filter>Props &amp; Windows\TextEdit</Filter>
     </ClCompile>
     <ClCompile Include="Props\PropertiesList.cpp">
-      <Filter>Props\PropertiesList</Filter>
+      <Filter>Props &amp; Windows\PropertiesList</Filter>
     </ClCompile>
     <ClCompile Include="Props\ItemList.cpp">
-      <Filter>Props\ItemList</Filter>
+      <Filter>Props &amp; Windows\ItemList</Filter>
     </ClCompile>
     <ClCompile Include="Props\SelectItem.cpp">
-      <Filter>Props\SelectItem</Filter>
+      <Filter>Props &amp; Windows\SelectItem</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\UI_MainCommand.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ELog.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Props\FolderLib.cpp">
-      <Filter>Props\FolderLib</Filter>
+      <Filter>Props &amp; Windows\FolderLib</Filter>
+    </ClCompile>
+    <ClCompile Include="Props\WindowView.cpp">
+      <Filter>Props &amp; Windows\WindowView</Filter>
+    </ClCompile>
+    <ClCompile Include="Props\WindowSplash.cpp">
+      <Filter>Props &amp; Windows\WindowSplash</Filter>
+    </ClCompile>
+    <ClCompile Include="Props\WindowIDE.cpp">
+      <Filter>Props &amp; Windows\WindowIDE</Filter>
+    </ClCompile>
+    <ClCompile Include="Props\WindowLog.cpp">
+      <Filter>Props &amp; Windows\WindowLog</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.hpp" />
     <ClInclude Include="Props\NumericVector.h">
-      <Filter>Props\NumericVector</Filter>
+      <Filter>Props &amp; Windows\NumericVector</Filter>
     </ClInclude>
     <ClInclude Include="xrEProps.h">
-      <Filter>Props</Filter>
+      <Filter>Props &amp; Windows</Filter>
     </ClInclude>
     <ClInclude Include="Props\ShaderFunction.h">
-      <Filter>Props\ShaderFunction</Filter>
-    </ClInclude>
-    <ClInclude Include="Token.h">
-      <Filter>Core</Filter>
+      <Filter>Props &amp; Windows\ShaderFunction</Filter>
     </ClInclude>
     <ClInclude Include="Props\GameType.h">
-      <Filter>Props\GameType</Filter>
+      <Filter>Props &amp; Windows\GameType</Filter>
     </ClInclude>
     <ClInclude Include="Props\TextEdit.h">
-      <Filter>Props\TextEdit</Filter>
+      <Filter>Props &amp; Windows\TextEdit</Filter>
     </ClInclude>
     <ClInclude Include="Props\PropertiesList.h">
-      <Filter>Props\PropertiesList</Filter>
+      <Filter>Props &amp; Windows\PropertiesList</Filter>
     </ClInclude>
     <ClInclude Include="Props\ItemList.h">
-      <Filter>Props\ItemList</Filter>
+      <Filter>Props &amp; Windows\ItemList</Filter>
     </ClInclude>
     <ClInclude Include="Props\SelectItem.h">
-      <Filter>Props\SelectItem</Filter>
+      <Filter>Props &amp; Windows\SelectItem</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\UI_MainCommand.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ELog.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Token.h">
+      <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Props\FolderLib.h">
-      <Filter>Props\FolderLib</Filter>
+      <Filter>Props &amp; Windows\FolderLib</Filter>
+    </ClInclude>
+    <ClInclude Include="Props\WindowView.h">
+      <Filter>Props &amp; Windows\WindowView</Filter>
+    </ClInclude>
+    <ClInclude Include="Props\WindowSplash.h">
+      <Filter>Props &amp; Windows\WindowSplash</Filter>
+    </ClInclude>
+    <ClInclude Include="Props\WindowIDE.h">
+      <Filter>Props &amp; Windows\WindowIDE</Filter>
+    </ClInclude>
+    <ClInclude Include="Props\WindowLog.h">
+      <Filter>Props &amp; Windows\WindowLog</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Props\ItemList.resx">
-      <Filter>Props\ItemList</Filter>
+      <Filter>Props &amp; Windows\ItemList</Filter>
     </EmbeddedResource>
     <EmbeddedResource Include="Props\PropertiesList.resx">
-      <Filter>Props\PropertiesList</Filter>
+      <Filter>Props &amp; Windows\PropertiesList</Filter>
     </EmbeddedResource>
     <EmbeddedResource Include="Props\NumericVector.resx">
-      <Filter>Props\NumericVector</Filter>
+      <Filter>Props &amp; Windows\NumericVector</Filter>
     </EmbeddedResource>
     <EmbeddedResource Include="Props\ShaderFunction.resx">
-      <Filter>Props\ShaderFunction</Filter>
+      <Filter>Props &amp; Windows\ShaderFunction</Filter>
     </EmbeddedResource>
     <EmbeddedResource Include="Props\GameType.resx">
-      <Filter>Props\GameType</Filter>
+      <Filter>Props &amp; Windows\GameType</Filter>
     </EmbeddedResource>
     <EmbeddedResource Include="Props\TextEdit.resx">
-      <Filter>Props\TextEdit</Filter>
+      <Filter>Props &amp; Windows\TextEdit</Filter>
     </EmbeddedResource>
     <EmbeddedResource Include="Props\SelectItem.resx">
-      <Filter>Props\SelectItem</Filter>
+      <Filter>Props &amp; Windows\SelectItem</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Props\WindowView.resx">
+      <Filter>Props &amp; Windows\WindowView</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Props\WindowSplash.resx">
+      <Filter>Props &amp; Windows\WindowSplash</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Props\WindowIDE.resx">
+      <Filter>Props &amp; Windows\WindowIDE</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Props\WindowLog.resx">
+      <Filter>Props &amp; Windows\WindowLog</Filter>
     </EmbeddedResource>
   </ItemGroup>
 </Project>

@@ -29,7 +29,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{87D068EC-1789-4F09-A9EC-54CF276955E0}</ProjectGuid>
-    <RootNamespace>ECore</RootNamespace>
+    <RootNamespace>XRay.ECore</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -71,10 +71,21 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="UIAutomationProvider" />
+    <Reference Include="WeifenLuo.WinFormsUI.Docking">
+      <HintPath>..\..\..\sdk\binaries\WeifenLuo.WinFormsUI.Docking.dll</HintPath>
+    </Reference>
+    <Reference Include="WeifenLuo.WinFormsUI.Docking.ThemeVS2015">
+      <HintPath>..\..\..\sdk\binaries\WeifenLuo.WinFormsUI.Docking.ThemeVS2015.dll</HintPath>
+    </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Core\ELog.cpp" />
+    <ClCompile Include="Core\UI_MainCommand.cpp">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Props\WindowIDE.cpp" />
+    <ClCompile Include="Props\WindowLog.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -86,9 +97,20 @@
     <ClCompile Include="Props\ShaderFunction.cpp" />
     <ClCompile Include="Props\TextEdit.cpp" />
     <ClCompile Include="Props\SelectItem.cpp" />
+    <ClCompile Include="Props\WindowView.cpp" />
+    <ClCompile Include="Props\WindowSplash.cpp" />
     <ClCompile Include="xrEProps.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Core\ELog.h" />
+    <ClInclude Include="Core\Token.h" />
+    <ClInclude Include="Core\UI_MainCommand.h" />
+    <ClInclude Include="Props\WindowIDE.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="Props\WindowLog.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
     <ClInclude Include="pch.hpp" />
     <ClInclude Include="Props\FolderLib.h" />
     <ClInclude Include="Props\GameType.h">
@@ -112,7 +134,12 @@
     <ClInclude Include="Props\SelectItem.h">
       <FileType>CppForm</FileType>
     </ClInclude>
-    <ClInclude Include="Token.h" />
+    <ClInclude Include="Props\WindowView.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="Props\WindowSplash.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
     <ClInclude Include="xrEProps.h" />
   </ItemGroup>
   <ItemGroup>
@@ -124,6 +151,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Props\WindowIDE.resx">
+      <DependentUpon>Props\WindowIDE.h</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Props\WindowLog.resx">
+      <DependentUpon>Props\WindowLog.h</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Props\ItemList.resx">
       <DependentUpon>Props\ItemList.h</DependentUpon>
       <SubType>Designer</SubType>
@@ -145,6 +178,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Props\TextEdit.resx">
       <DependentUpon>Props\TextEdit.h</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Props\WindowView.resx">
+      <DependentUpon>Props\WindowView.h</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Props\WindowSplash.resx">
+      <DependentUpon>Props\WindowSplash.h</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

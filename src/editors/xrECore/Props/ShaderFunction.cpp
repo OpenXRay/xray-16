@@ -2,7 +2,7 @@
 #include "ShaderFunction.h"
 #include "xrEngine/WaveForm.h"
 #include "xrCore/xr_token.h"
-#include "Token.h"
+#include "Core/Token.h"
 
 xr_token function_token[] =
 {

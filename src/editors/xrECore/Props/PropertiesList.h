@@ -7,6 +7,7 @@ namespace ECore
 namespace Props
 {
 ref class PropertiesList;
+ref class ItemList;
 }
 }
 }
@@ -40,6 +41,8 @@ protected:
 			delete components;
 		}
 	}
+
+private: ItemList^ itemList;
 
 private:
 	System::ComponentModel::Container^ components;
