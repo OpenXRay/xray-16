@@ -29,7 +29,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{87D068EC-1789-4F09-A9EC-54CF276955E0}</ProjectGuid>
-    <RootNamespace>XRay.ECore</RootNamespace>
+    <RootNamespace>XRay.Editor</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -84,62 +84,62 @@
     <ClCompile Include="Core\UI_MainCommand.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Props\DockPanelSerializer.cpp" />
-    <ClCompile Include="Props\WindowIDE.cpp" />
-    <ClCompile Include="Props\WindowLog.cpp" />
+    <ClCompile Include="Controls\DockPanelSerializer.cpp" />
+    <ClCompile Include="Windows\WindowIDE.cpp" />
+    <ClCompile Include="Windows\WindowLog.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Props\FolderLib.cpp" />
-    <ClCompile Include="Props\GameType.cpp" />
-    <ClCompile Include="Props\ItemList.cpp" />
-    <ClCompile Include="Props\NumericVector.cpp" />
-    <ClCompile Include="Props\PropertiesList.cpp" />
-    <ClCompile Include="Props\ShaderFunction.cpp" />
-    <ClCompile Include="Props\TextEdit.cpp" />
-    <ClCompile Include="Props\SelectItem.cpp" />
-    <ClCompile Include="Props\WindowView.cpp" />
-    <ClCompile Include="Props\WindowSplash.cpp" />
+    <ClCompile Include="Controls\FolderLib.cpp" />
+    <ClCompile Include="Controls\GameType.cpp" />
+    <ClCompile Include="Controls\ItemList.cpp" />
+    <ClCompile Include="Controls\NumericVector.cpp" />
+    <ClCompile Include="Controls\PropertiesList.cpp" />
+    <ClCompile Include="Controls\ShaderFunction.cpp" />
+    <ClCompile Include="Controls\TextEdit.cpp" />
+    <ClCompile Include="Controls\SelectItem.cpp" />
+    <ClCompile Include="Windows\WindowView.cpp" />
+    <ClCompile Include="Windows\WindowSplash.cpp" />
     <ClCompile Include="xrEProps.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\ELog.h" />
     <ClInclude Include="Core\Token.h" />
     <ClInclude Include="Core\UI_MainCommand.h" />
-    <ClInclude Include="Props\DockPanelSerializer.h" />
-    <ClInclude Include="Props\WindowIDE.h">
+    <ClInclude Include="Controls\DockPanelSerializer.h" />
+    <ClInclude Include="Windows\WindowIDE.h">
       <FileType>CppForm</FileType>
     </ClInclude>
-    <ClInclude Include="Props\WindowLog.h">
+    <ClInclude Include="Windows\WindowLog.h">
       <FileType>CppForm</FileType>
     </ClInclude>
     <ClInclude Include="pch.hpp" />
-    <ClInclude Include="Props\FolderLib.h" />
-    <ClInclude Include="Props\GameType.h">
+    <ClInclude Include="Controls\FolderLib.h" />
+    <ClInclude Include="Controls\GameType.h">
       <FileType>CppForm</FileType>
     </ClInclude>
-    <ClInclude Include="Props\ItemList.h">
+    <ClInclude Include="Controls\ItemList.h">
       <FileType>CppForm</FileType>
     </ClInclude>
-    <ClInclude Include="Props\NumericVector.h">
+    <ClInclude Include="Controls\NumericVector.h">
       <FileType>CppForm</FileType>
     </ClInclude>
-    <ClInclude Include="Props\PropertiesList.h">
+    <ClInclude Include="Controls\PropertiesList.h">
       <FileType>CppForm</FileType>
     </ClInclude>
-    <ClInclude Include="Props\ShaderFunction.h">
+    <ClInclude Include="Controls\ShaderFunction.h">
       <FileType>CppForm</FileType>
     </ClInclude>
-    <ClInclude Include="Props\TextEdit.h">
+    <ClInclude Include="Controls\TextEdit.h">
       <FileType>CppForm</FileType>
     </ClInclude>
-    <ClInclude Include="Props\SelectItem.h">
+    <ClInclude Include="Controls\SelectItem.h">
       <FileType>CppForm</FileType>
     </ClInclude>
-    <ClInclude Include="Props\WindowView.h">
+    <ClInclude Include="Windows\WindowView.h">
       <FileType>CppForm</FileType>
     </ClInclude>
-    <ClInclude Include="Props\WindowSplash.h">
+    <ClInclude Include="Windows\WindowSplash.h">
       <FileType>CppForm</FileType>
     </ClInclude>
     <ClInclude Include="xrEProps.h" />
@@ -153,39 +153,39 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Props\WindowIDE.resx">
-      <DependentUpon>Props\WindowIDE.h</DependentUpon>
+    <EmbeddedResource Include="Windows\WindowIDE.resx">
+      <DependentUpon>Windows\WindowIDE.h</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Props\WindowLog.resx">
-      <DependentUpon>Props\WindowLog.h</DependentUpon>
+    <EmbeddedResource Include="Windows\WindowLog.resx">
+      <DependentUpon>Windows\WindowLog.h</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Props\ItemList.resx">
-      <DependentUpon>Props\ItemList.h</DependentUpon>
+    <EmbeddedResource Include="Controls\ItemList.resx">
+      <DependentUpon>Controls\ItemList.h</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Props\PropertiesList.resx">
-      <DependentUpon>Props\PropertiesList.h</DependentUpon>
+    <EmbeddedResource Include="Controls\PropertiesList.resx">
+      <DependentUpon>Controls\PropertiesList.h</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Props\GameType.resx">
-      <DependentUpon>Props\GameType.h</DependentUpon>
+    <EmbeddedResource Include="Controls\GameType.resx">
+      <DependentUpon>Controls\GameType.h</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Props\NumericVector.resx">
-      <DependentUpon>Props\NumericVector.h</DependentUpon>
+    <EmbeddedResource Include="Controls\NumericVector.resx">
+      <DependentUpon>Controls\NumericVector.h</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Props\SelectItem.resx">
-      <DependentUpon>Props\SelectItem.h</DependentUpon>
+    <EmbeddedResource Include="Controls\SelectItem.resx">
+      <DependentUpon>Controls\SelectItem.h</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Props\ShaderFunction.resx">
-      <DependentUpon>Props\ShaderFunction.h</DependentUpon>
+    <EmbeddedResource Include="Controls\ShaderFunction.resx">
+      <DependentUpon>Controls\ShaderFunction.h</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Props\TextEdit.resx">
-      <DependentUpon>Props\TextEdit.h</DependentUpon>
+    <EmbeddedResource Include="Controls\TextEdit.resx">
+      <DependentUpon>Controls\TextEdit.h</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Props\WindowView.resx">
-      <DependentUpon>Props\WindowView.h</DependentUpon>
+    <EmbeddedResource Include="Windows\WindowView.resx">
+      <DependentUpon>Windows\WindowView.h</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Props\WindowSplash.resx">
-      <DependentUpon>Props\WindowSplash.h</DependentUpon>
+    <EmbeddedResource Include="Windows\WindowSplash.resx">
+      <DependentUpon>Windows\WindowSplash.h</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

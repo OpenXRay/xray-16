@@ -1,10 +1,10 @@
 #include "pch.hpp"
 #include "ELog.h"
-#include "Props/WindowLog.h"
+#include "Windows/WindowLog.h"
 
 gcroot<EditorLog^> ELog;
 
-using namespace XRay::ECore::Props;
+using namespace XRay::Editor::Windows;
 
 XRECORE_API void ELogCallback(void* context, pcstr message)
 {

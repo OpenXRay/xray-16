@@ -2,9 +2,9 @@
 
 namespace XRay
 {
-namespace ECore
+namespace Editor
 {
-namespace Props
+namespace Windows
 {
 public ref class WindowSplash : public System::Windows::Forms::Form
 {
@@ -92,6 +92,6 @@ private:
     }
 #pragma endregion
 };
-} // namespace Props
-} // namespace ECore
+} // namespace Windows
+} // namespace Editor
 } // namespace XRay

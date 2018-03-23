@@ -2,11 +2,14 @@
 #include "editors/xrECore/Core/ELog.h"
 
 using namespace XRay;
+using namespace XRay::Editor;
+using namespace XRay::Editor::Controls;
+using namespace XRay::Editor::Windows;
 
 int entry_point(pcstr commandLine)
 {
     System::Windows::Forms::Application::EnableVisualStyles();
-    auto splash = gcnew ECore::Props::WindowSplash();
+    auto splash = gcnew WindowSplash();
     splash->Show();
 
     splash->SetStatus("Loading xrDebug...");
@@ -18,7 +21,7 @@ int entry_point(pcstr commandLine)
     splash->SetStatus("Loading finished.");
     splash->Close();
 
-    auto windowMain = gcnew ECore::Props::WindowIDE();
+    auto windowMain = gcnew WindowIDE();
     System::Windows::Forms::Application::Run(windowMain);
     Core._destroy();
     return 0;

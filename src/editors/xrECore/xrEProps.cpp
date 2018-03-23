@@ -1,12 +1,12 @@
 #include "pch.hpp"
 #include "xrEProps.h"
-#include "Props/NumericVector.h"
-#include "Props/ShaderFunction.h"
-#include "Props/GameType.h"
-#include "Props/TextEdit.h"
+#include "Controls/NumericVector.h"
+#include "Controls/ShaderFunction.h"
+#include "Controls/GameType.h"
+#include "Controls/TextEdit.h"
 #include "xrEngine/WaveForm.h"
 
-namespace XRay::ECore::Props
+namespace XRay::Editor::Controls
 {
 bool NumericVectorRun(pcstr title, Fvector* data, int decimal, Fvector* reset_value, Fvector* min, Fvector* max, int* X, int* Y)
 {
@@ -34,4 +34,4 @@ bool TextEditRun(xr_string& text, pcstr caption /*= "Text"*/, bool read_only /*=
     auto form = gcnew TextEdit();
     return form->Run(text, caption, read_only, lim, apply_name, on_apply, on_close, on_insight);
 }
-} // XRay::ECore::Props
+} // namespace XRay::Editor::Controls

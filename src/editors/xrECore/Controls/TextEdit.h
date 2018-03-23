@@ -1,28 +1,15 @@
 #pragma once
-namespace XRay
-{
-namespace ECore
-{
-namespace Props
-{
-ref class TextEdit;
-}
-}
-}
 
 namespace XRay
 {
-namespace ECore
+namespace Editor
 {
-namespace Props
+namespace Controls
 {
 using namespace System;
-using namespace System::ComponentModel;
-using namespace System::Collections;
 using namespace System::Windows::Forms;
 using namespace System::Data;
 using namespace System::Drawing;
-
 public ref class TextEdit : public System::Windows::Forms::Form
 {
     using TOnApplyClick = fastdelegate::FastDelegate1<pcstr, bool>;
@@ -217,6 +204,6 @@ private:
     }
 #pragma endregion
 };
-} // namespace Props
-} // namespace ECore
+} // namespace Controls
+} // namespace Editor
 } // namespace XRay

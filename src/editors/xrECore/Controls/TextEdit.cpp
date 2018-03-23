@@ -1,12 +1,7 @@
 #include "pch.hpp"
-
 #include "TextEdit.h"
 
-namespace XRay
-{
-namespace ECore
-{
-namespace Props
+namespace XRay::Editor::Controls
 {
 System::Void TextEdit::buttonClear_Click(System::Object^ sender, System::EventArgs^ e)
 {
@@ -144,6 +139,4 @@ System::Void TextEdit::buttonSave_Click(System::Object^ sender, System::EventArg
         toolStripStatusLabel3->Text = "Error: can't save file";
 
 }
-} // namespace Props
-} // namespace ECore
-} // namespace XRay
+} // namespace XRay::Editor::Controls

@@ -2,9 +2,9 @@
 
 namespace XRay
 {
-namespace ECore
+namespace Editor
 {
-namespace Props
+namespace Controls
 {
 ref class ShaderFunction;
 }
@@ -21,9 +21,9 @@ ref class Token;
 
 namespace XRay
 {
-namespace ECore
+namespace Editor
 {
-namespace Props
+namespace Controls
 {
 using namespace System;
 using namespace System::ComponentModel;
@@ -331,6 +331,6 @@ private:
     }
 #pragma endregion
 };
-} // namespace Props
-} // namespace ECore
+} // namespace Controls
+} // namespace Editor
 } // namespace XRay

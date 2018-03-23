@@ -15,11 +15,7 @@ xr_token function_token[] =
     { nullptr, 0 }
 };
 
-namespace XRay
-{
-namespace ECore
-{
-namespace Props
+namespace XRay::Editor::Controls
 {
 ShaderFunction::ShaderFunction(void)
 {
@@ -180,6 +176,4 @@ void ShaderFunction::DrawGraph()
 
     //pbDraw->Invalidate(); // Redraw everything just in case
 }
-} // namespace Props
-} // namespace ECore
-} // namespace XRay
+} // namespace XRay::Editor::Controls

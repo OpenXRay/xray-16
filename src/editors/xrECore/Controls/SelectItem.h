@@ -2,28 +2,10 @@
 
 namespace XRay
 {
-namespace ECore
+namespace Editor
 {
-namespace Props
+namespace Controls
 {
-ref class SelectItem;
-}
-}
-}
-
-namespace XRay
-{
-namespace ECore
-{
-namespace Props
-{
-using namespace System;
-using namespace System::ComponentModel;
-using namespace System::Collections;
-using namespace System::Windows::Forms;
-using namespace System::Data;
-using namespace System::Drawing;
-
 public ref class SelectItem : public System::Windows::Forms::Form
 {
 public:
@@ -67,6 +49,6 @@ private:
     }
 #pragma endregion
 };
-} // namespace Props
-} // namespace ECore
+} // namespace Controls
+} // namespace Editor
 } // namespace XRay

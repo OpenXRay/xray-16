@@ -2,11 +2,7 @@
 #include "GameType.h"
 #include "xrServerEntities/gametype_chooser.h"
 
-namespace XRay
-{
-namespace ECore
-{
-namespace Props
+namespace XRay::Editor::Controls
 {
 bool GameType::Run(pcstr title, GameTypeChooser* data)
 {
@@ -30,6 +26,4 @@ System::Void GameType::buttonOk_Click(System::Object^ sender, System::EventArgs^
     gameTypes->m_GameType.set(eGameIDArtefactHunt, checkAfHunt->Checked);
     gameTypes->m_GameType.set(eGameIDCaptureTheArtefact, checkCTA->Checked);
 }
-} // namespace Props
-} // namespace ECore
-} // namespace XRay
+} // namespace XRay::Editor::Controls

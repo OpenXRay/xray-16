@@ -2,9 +2,9 @@
 #include "WindowIDE.h"
 #include "WindowView.h"
 #include "WindowLog.h"
-#include "DockPanelSerializer.h"
+#include "Controls/DockPanelSerializer.h"
 
-namespace XRay::ECore::Props
+namespace XRay::Editor::Windows
 {
 void WindowIDE::Initialize()
 {
@@ -40,4 +40,4 @@ WeifenLuo::WinFormsUI::Docking::IDockContent^ WindowIDE::reloadContent(System::S
 
     return result;
 }
-} // namespace XRay::ECore::Props
+} // namespace XRay::Editor::Windows

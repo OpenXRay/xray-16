@@ -2,28 +2,10 @@
 
 namespace XRay
 {
-namespace ECore
+namespace Editor
 {
-namespace Props
+namespace Windows
 {
-ref class WindowView;
-}
-}
-}
-
-namespace XRay
-{
-namespace ECore
-{
-namespace Props
-{
-using namespace System;
-using namespace System::ComponentModel;
-using namespace System::Collections;
-using namespace System::Windows::Forms;
-using namespace System::Data;
-using namespace System::Drawing;
-
 public ref class WindowView : public WeifenLuo::WinFormsUI::Docking::DockContent
 {
 public:
@@ -68,6 +50,6 @@ private: System::ComponentModel::Container^ components;
     }
 #pragma endregion
 };
-} // namespace Props
-} // namespace ECore
+} // namespace Windows
+} // namespace Editor
 } // namespace XRay

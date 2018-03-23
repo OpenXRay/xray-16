@@ -1,11 +1,7 @@
 #include "pch.hpp"
 #include "NumericVector.h"
 
-namespace XRay
-{
-namespace ECore
-{
-namespace Props
+namespace XRay::Editor::Controls
 {
 bool NumericVector::Run(pcstr title, Fvector* data, int decimal, Fvector* resetValue, Fvector* min, Fvector* max, int* X, int* Y)
 {
@@ -118,6 +114,4 @@ System::Void NumericVector::OnValueChanged(System::Object^ sender, System::Event
     if (checkImmediate->Checked)
         buttonApply_Click(sender, e);
 }
-} // namespace Props
-} // namespace ECore
-} // namespace XRay
+} // namespace XRay::Editor::Controls

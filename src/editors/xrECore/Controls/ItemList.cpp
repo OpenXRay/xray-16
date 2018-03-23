@@ -5,11 +5,7 @@
 
 #include <sstream>
 
-namespace XRay
-{
-namespace ECore
-{
-namespace Props
+namespace XRay::Editor::Controls
 {
 void ItemList::AssignItems(ListItemsVec& newItems, bool fullExpand, bool fullSort /*= false*/)
 {
@@ -126,6 +122,4 @@ void ItemList::AssignItems(ListItemsVec& newItems, bool fullExpand, bool fullSor
 
     viewItems->EndUpdate();
 }
-} // namespace Props
-} // namespace ECore
-} // namespace XRay
+} // namespace XRay::Editor::Controls

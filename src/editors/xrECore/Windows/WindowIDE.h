@@ -2,9 +2,9 @@
 
 namespace XRay
 {
-namespace ECore
+namespace Editor
 {
-namespace Props
+namespace Windows
 {
 ref class WindowIDE;
 ref class WindowView;
@@ -15,13 +15,11 @@ ref class WindowLog;
 
 namespace XRay
 {
-namespace ECore
+namespace Editor
 {
-namespace Props
+namespace Windows
 {
 using namespace System;
-using namespace System::ComponentModel;
-using namespace System::Collections;
 using namespace System::Windows::Forms;
 using namespace System::Data;
 using namespace System::Drawing;
@@ -89,6 +87,6 @@ private: System::ComponentModel::Container^ components;
     }
 #pragma endregion
 };
-} // namespace Props
-} // namespace ECore
+} // namespace Windows
+} // namespace Editor
 } // namespace XRay

@@ -2,11 +2,7 @@
 #include "WindowLog.h"
 #include "Core/ELog.h"
 
-namespace XRay
-{
-namespace ECore
-{
-namespace Props
+namespace XRay::Editor::Windows
 {
 void WindowLog::AddDialogMessage(MessageType type, System::String^ message)
 {
@@ -91,6 +87,4 @@ System::Void WindowLog::LogForm_KeyDown(System::Object^ sender, System::Windows:
         break;
     }
 }
-} // namespace Props
-} // namespace ECore
-} // namespace XRay
+} // namespace XRay::Editor::Windows

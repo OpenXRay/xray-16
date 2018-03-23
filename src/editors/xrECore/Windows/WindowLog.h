@@ -2,9 +2,9 @@
 
 namespace XRay
 {
-namespace ECore
+namespace Editor
 {
-namespace Props
+namespace Windows
 {
 ref class WindowLog;
 }
@@ -26,9 +26,9 @@ ref class DockContent;
 
 namespace XRay
 {
-namespace ECore
+namespace Editor
 {
-namespace Props
+namespace Windows
 {
 using namespace System;
 using namespace System::ComponentModel;
@@ -168,6 +168,6 @@ private:
     }
 #pragma endregion
 };
-} // namespace Props
-} // namespace ECore
+} // namespace Windows
+} // namespace Editor
 } // namespace XRay
