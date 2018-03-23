@@ -43,6 +43,9 @@
     <Filter Include="Props &amp; Windows\WindowIDE">
       <UniqueIdentifier>{417ebcd4-5c96-4d26-b3aa-f634ec4eb59d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Props &amp; Windows\DockPanelSerializer">
+      <UniqueIdentifier>{7f8665bb-1582-4101-a123-3e0a52973049}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -90,6 +93,9 @@
     </ClCompile>
     <ClCompile Include="Props\WindowLog.cpp">
       <Filter>Props &amp; Windows\WindowLog</Filter>
+    </ClCompile>
+    <ClCompile Include="Props\DockPanelSerializer.cpp">
+      <Filter>Props &amp; Windows\DockPanelSerializer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -141,6 +147,9 @@
     </ClInclude>
     <ClInclude Include="Props\WindowLog.h">
       <Filter>Props &amp; Windows\WindowLog</Filter>
+    </ClInclude>
+    <ClInclude Include="Props\DockPanelSerializer.h">
+      <Filter>Props &amp; Windows\DockPanelSerializer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

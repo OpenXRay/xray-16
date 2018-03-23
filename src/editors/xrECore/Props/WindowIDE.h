@@ -29,24 +29,27 @@ using namespace System::Drawing;
 public ref class WindowIDE : public System::Windows::Forms::Form
 {
 public:
-	WindowIDE(void)
-	{
-		InitializeComponent();
+    WindowIDE(void)
+    {
+        InitializeComponent();
         Initialize();
-	}
+    }
 
 protected:
-	~WindowIDE()
-	{
-		if (components)
-		{
-			delete components;
-		}
-	}
+    ~WindowIDE()
+    {
+        if (components)
+        {
+            delete components;
+        }
+    }
 
 private:
     void Initialize();
-    
+    WeifenLuo::WinFormsUI::Docking::IDockContent^ reloadContent(System::String^ persistString);
+
+private: System::Void WindowIDE_FormClosing(System::Object^  sender, System::Windows::Forms::FormClosingEventArgs^  e);
+
 private: WeifenLuo::WinFormsUI::Docking::DockPanel^ editorDock;
 private: WeifenLuo::WinFormsUI::Docking::VS2015LightTheme^ editorTheme;
 private: WindowView^ windowView;
@@ -56,8 +59,9 @@ private: WindowLog^ windowLog;
 private: System::ComponentModel::Container^ components;
 
 #pragma region Windows Form Designer generated code
-	void InitializeComponent(void)
-	{
+    void InitializeComponent(void)
+    {
+        System::ComponentModel::ComponentResourceManager^  resources = (gcnew System::ComponentModel::ComponentResourceManager(WindowIDE::typeid));
         this->editorTheme = (gcnew WeifenLuo::WinFormsUI::Docking::VS2015LightTheme());
         this->editorDock = (gcnew WeifenLuo::WinFormsUI::Docking::DockPanel());
         this->SuspendLayout();
@@ -76,8 +80,10 @@ private: System::ComponentModel::Container^ components;
         this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
         this->ClientSize = System::Drawing::Size(284, 264);
         this->Controls->Add(this->editorDock);
+        this->Icon = (cli::safe_cast<System::Drawing::Icon^>(resources->GetObject(L"$this.Icon")));
         this->Name = L"WindowIDE";
         this->Text = L"OpenXRay Editor";
+        this->FormClosing += gcnew System::Windows::Forms::FormClosingEventHandler(this, &WindowIDE::WindowIDE_FormClosing);
         this->ResumeLayout(false);
 
     }

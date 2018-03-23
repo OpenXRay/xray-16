@@ -84,6 +84,7 @@
     <ClCompile Include="Core\UI_MainCommand.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Props\DockPanelSerializer.cpp" />
     <ClCompile Include="Props\WindowIDE.cpp" />
     <ClCompile Include="Props\WindowLog.cpp" />
     <ClCompile Include="pch.cpp">
@@ -105,6 +106,7 @@
     <ClInclude Include="Core\ELog.h" />
     <ClInclude Include="Core\Token.h" />
     <ClInclude Include="Core\UI_MainCommand.h" />
+    <ClInclude Include="Props\DockPanelSerializer.h" />
     <ClInclude Include="Props\WindowIDE.h">
       <FileType>CppForm</FileType>
     </ClInclude>
