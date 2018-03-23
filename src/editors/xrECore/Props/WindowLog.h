@@ -55,14 +55,12 @@ protected:
 
 public:
     void AddMessage(MessageType type, System::String^ message);
-    inline void AddMessage(MessageType type, pcstr message) { AddMessage(type, gcnew System::String(message)); }
-    inline void AddMessage(pcstr message) { AddMessage(MessageType::Custom, gcnew System::String(message)); }
     inline void AddMessage(System::String^ message) { AddMessage(MessageType::Custom, message); }
 
     void AddDialogMessage(MessageType type, System::String^ message);
-    inline void AddDialogMessage(MessageType type, pcstr message) { AddDialogMessage(type, gcnew System::String(message)); }
-    inline void AddDialogMessage(pcstr message) { AddDialogMessage(MessageType::Custom, gcnew System::String(message)); }
     inline void AddDialogMessage(System::String^ message) { AddDialogMessage(MessageType::Custom, message); }
+
+    delegate void AddMessageDelegate(MessageType type, System::String^ text);
 
 private: System::Void buttonClose_Click(System::Object^ sender, System::EventArgs^ e);
 private: System::Void buttonFlush_Click(System::Object^ sender, System::EventArgs^ e);

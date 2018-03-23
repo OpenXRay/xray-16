@@ -15,7 +15,5 @@ void WindowIDE::Initialize()
 
     auto cb = LogCallback(ELogCallback, windowLog->Handle.ToPointer());
     SetLogCB(cb);
-
-    Log("Priviet");
 }
 } // namespace XRay::ECore::Props

@@ -10,20 +10,37 @@ XRECORE_API void ELogCallback(void* context, pcstr message)
 {
     if (0 == message[0])
         return;
-    bool isDialog = ('#' == message[0]) || ((0 != message[1]) && ('#' == message[1]));
-    MessageType type = ('!' == message[0]) || ((0 != message[1]) && ('!' == message[1])) ? MessageType::Error : MessageType::Information;
-    if (('!' == message[0]) || ('#' == message[0]))
+
+    bool isDialog = false;
+    MessageType type = MessageType::Information;
+
+    switch (message[0])
+    {
+    case '!':
+        type = MessageType::Error;
         message++;
-    if (('!' == message[0]) || ('#' == message[0]))
+        break;
+
+    case '#':
+        isDialog = true;
+        type = MessageType::Confirmation;
         message++;
+        break;
+    }
 
     auto windowLog = safe_cast<WindowLog^>(Form::FromHandle(IntPtr(context)));
 
     if (windowLog)
     {
         if (isDialog)
-            windowLog->AddDialogMessage(type, message);
+        {
+            auto d = gcnew WindowLog::AddMessageDelegate(windowLog, &WindowLog::AddDialogMessage);
+            windowLog->Invoke(d, gcnew array<Object^> { (int)type, gcnew String(message) });
+        }
         else
-            windowLog->AddMessage(type, message);
+        {
+            auto d = gcnew WindowLog::AddMessageDelegate(windowLog, &WindowLog::AddMessage);
+            windowLog->Invoke(d, gcnew array<Object^> { (int)type, gcnew String(message) });
+        }
     }
 }

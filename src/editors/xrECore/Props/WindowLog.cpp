@@ -27,11 +27,11 @@ void WindowLog::AddMessage(MessageType type, System::String^ message)
         break;
 
     case MessageType::Error:
-        newMessage->BackColor = Color::Red;
+        newMessage->BackColor = Color::Crimson;
         break;
 
     case MessageType::Confirmation:
-        newMessage->BackColor = Color::Green;
+        newMessage->BackColor = Color::LightGreen;
         break;
 
     case MessageType::Custom:
