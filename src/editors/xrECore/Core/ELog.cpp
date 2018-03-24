@@ -56,15 +56,22 @@ XRECORE_API void ELogCallback(void* context, pcstr message)
 
     if (windowLog)
     {
+
         if (isDialog)
         {
             auto d = gcnew WindowLog::AddMessageDelegate(windowLog, &WindowLog::AddDialogMessage);
-            windowLog->Invoke(d, gcnew array<Object^> { (int)type, gcnew String(message) });
+            if (windowLog->InvokeRequired)
+                windowLog->BeginInvoke(d, gcnew array<Object^> { (int)type, gcnew String(message) });
+            else
+                d(type, gcnew String(message));;
         }
         else
         {
             auto d = gcnew WindowLog::AddMessageDelegate(windowLog, &WindowLog::AddMessage);
-            windowLog->Invoke(d, gcnew array<Object^> { (int)type, gcnew String(message) });
+            if (windowLog->InvokeRequired)
+                windowLog->BeginInvoke(d, gcnew array<Object^> { (int)type, gcnew String(message) });
+            else
+                d(type, gcnew String(message));
         }
     }
 }
