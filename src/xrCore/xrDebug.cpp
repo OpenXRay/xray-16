@@ -235,8 +235,7 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
     else
     {
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
-        int result = MessageBox(
-            GetTopWindow(NULL), assertionInfo, "Fatal error", MB_CANCELTRYCONTINUE | MB_ICONERROR | MB_SYSTEMMODAL);
+        int result = MessageBox(NULL, assertionInfo, "Fatal error", MB_CANCELTRYCONTINUE | MB_ICONERROR | MB_SYSTEMMODAL);
         switch (result)
         {
         case IDCANCEL:
