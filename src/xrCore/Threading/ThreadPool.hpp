@@ -42,7 +42,7 @@ public:
 class ThreadPool
 {
 public:
-    std::vector<std::unique_ptr<Thread>> threads;
+    xr_vector<std::unique_ptr<Thread>> threads;
 
     void initialize()
     {
