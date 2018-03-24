@@ -169,7 +169,7 @@ void ALDeviceList::Enumerate()
             GetDeviceDesc(j).props.eax, GetDeviceDesc(j).props.efx ? "yes" : "no",
             GetDeviceDesc(j).props.xram ? "yes" : "no");
     }
-    if (!strstr(GetCommandLine(), "-editor"))
+    if (!strstr(GetCommandLine(), "-weather"))
         CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 }
 

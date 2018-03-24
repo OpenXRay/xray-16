@@ -37,7 +37,7 @@ void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pc
         // Init COM so we can use CoCreateInstance
         // HRESULT co_res =
         Params = xr_strdup(GetCommandLine());
-        if (!strstr(Params, "-editor"))
+        if (!strstr(Params, "-weather"))
             CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
         string_path fn, dr, di;
