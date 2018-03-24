@@ -4,10 +4,10 @@
 #include "xrDebug.h"
 #include "os_clipboard.h"
 #include "Debug/dxerr.h"
-#include "xrCore/Threading/Lock.hpp"
+#include "Threading/ScopeLock.h"
+
 #pragma warning(push)
 #pragma warning(disable : 4091) // 'typedef ': ignored on left of '' when no variable is declared
-#include "Debug/StackTrace.h"
 #include "Debug/MiniDump.h"
 #pragma warning(pop)
 #include <malloc.h>
@@ -45,9 +45,16 @@ static BOOL bException = FALSE;
 #define USE_OWN_MINI_DUMP
 #endif
 
+#if defined XR_X64
+#	define MACHINE_TYPE IMAGE_FILE_MACHINE_AMD64
+#elif defined XR_X86	
+#	define MACHINE_TYPE IMAGE_FILE_MACHINE_I386
+#else
+#	error CPU architecture is not supported.
+#endif
+
 namespace
 {
-
 ICN void* GetInstructionPtr()
 {
 #ifdef _MSC_VER
@@ -70,63 +77,185 @@ xrDebug::CrashHandler xrDebug::OnCrash = nullptr;
 xrDebug::DialogHandler xrDebug::OnDialog = nullptr;
 string_path xrDebug::BugReportFile;
 bool xrDebug::ErrorAfterDialog = false;
-StackTraceInfo xrDebug::StackTrace = {};
 
-void xrDebug::SetBugReportFile(const char* fileName) { strcpy_s(BugReportFile, fileName); }
-void xrDebug::LogStackTrace(const char* header)
+bool xrDebug::symEngineInitialized = false;
+Lock xrDebug::dbgHelpLock;
+
+void xrDebug::SetBugReportFile(const char *fileName) { strcpy_s(BugReportFile, fileName); }
+
+bool xrDebug::GetNextStackFrameString(LPSTACKFRAME stackFrame, PCONTEXT threadCtx, xr_string &frameStr)
 {
-    if (!shared_str_initialized)
-        return;
-    StackTrace.Count = BuildStackTrace(StackTrace.Frames, StackTrace.Capacity, StackTrace.LineCapacity);
-    Msg("%s", header);
-    for (size_t i = 1; i < StackTrace.Count; i++)
-        Msg("%s", StackTrace[i]);
+    BOOL result = StackWalk(MACHINE_TYPE, GetCurrentProcess(), GetCurrentThread(), stackFrame, threadCtx, nullptr,
+        SymFunctionTableAccess, SymGetModuleBase, nullptr);
+
+    if (result == FALSE || stackFrame->AddrPC.Offset == 0)
+    {
+        return false;
+    }
+
+    frameStr.clear();
+    string512 formatBuff;
+
+    ///
+    /// Module name
+    ///
+    HINSTANCE hModule = (HINSTANCE)SymGetModuleBase(GetCurrentProcess(), stackFrame->AddrPC.Offset);
+    if (hModule && GetModuleFileName(hModule, formatBuff, _countof(formatBuff)))
+    {
+        frameStr.append(formatBuff);
+    }
+
+    ///
+    /// Address
+    ///
+    xr_sprintf(formatBuff, _countof(formatBuff), " at %p", stackFrame->AddrPC.Offset);
+    frameStr.append(formatBuff);
+
+    ///
+    /// Function info
+    ///
+    BYTE arrSymBuffer[512];
+    ZeroMemory(arrSymBuffer, sizeof(arrSymBuffer));
+    PIMAGEHLP_SYMBOL functionInfo = reinterpret_cast<PIMAGEHLP_SYMBOL>(arrSymBuffer);
+    functionInfo->SizeOfStruct = sizeof(*functionInfo);
+    functionInfo->MaxNameLength = sizeof(arrSymBuffer) - sizeof(*functionInfo) + 1;
+    DWORD_PTR dwFunctionOffset;
+
+    result = SymGetSymFromAddr(GetCurrentProcess(), stackFrame->AddrPC.Offset, &dwFunctionOffset, functionInfo);
+
+    if (result)
+    {
+        if (dwFunctionOffset)
+        {
+            xr_sprintf(formatBuff, _countof(formatBuff), " %s() + %Iu byte(s)", functionInfo->Name, dwFunctionOffset);
+        }
+        else
+        {
+            xr_sprintf(formatBuff, _countof(formatBuff), " %s()", functionInfo->Name);
+        }
+        frameStr.append(formatBuff);
+    }
+
+    ///
+    /// Source info
+    ///
+    DWORD dwLineOffset;
+    IMAGEHLP_LINE sourceInfo = {};
+    sourceInfo.SizeOfStruct = sizeof(sourceInfo);
+
+    result = SymGetLineFromAddr(GetCurrentProcess(), stackFrame->AddrPC.Offset, &dwLineOffset, &sourceInfo);
+
+    if (result)
+    {
+        if (dwLineOffset)
+        {
+            xr_sprintf(formatBuff, _countof(formatBuff), " in %s line %u + %u byte(s)", sourceInfo.FileName, 
+                sourceInfo.LineNumber, dwLineOffset);
+        }
+        else
+        {
+            xr_sprintf(formatBuff, _countof(formatBuff), " in %s line %u", sourceInfo.FileName, sourceInfo.LineNumber);
+        }
+        frameStr.append(formatBuff);
+    }
+
+    return true;
 }
 
-size_t xrDebug::BuildStackTrace(char* buffer, size_t capacity, size_t lineCapacity)
+bool xrDebug::InitializeSymbolEngine()
 {
-    // XXX: add support for x86_64
-    CONTEXT context;
-    EXCEPTION_POINTERS ex_ptrs;
-    void* ebp;
-    context.ContextFlags = CONTEXT_FULL;
-    if (GetThreadContext(GetCurrentThread(), &context))
+    if (!symEngineInitialized)
     {
-#if defined(XR_X64)
-        context.Rip = (DWORD64)GetInstructionPtr();
-        context.Rbp = (DWORD64)&ebp;
-        context.Rsp = (DWORD64)&context;
-#elif defined(XR_X86)
-        context.Eip = (DWORD)GetInstructionPtr();
-        context.Ebp = (DWORD)&ebp;
-        context.Esp = (DWORD)&context;
+        DWORD dwOptions = SymGetOptions();
+        SymSetOptions(dwOptions | SYMOPT_DEFERRED_LOADS | SYMOPT_LOAD_LINES | SYMOPT_UNDNAME);
+
+        if (SymInitialize(GetCurrentProcess(), nullptr, TRUE))
+        {
+            symEngineInitialized = true;
+        }
+    }
+
+    return symEngineInitialized;
+}
+
+void xrDebug::DeinitializeSymbolEngine(void)
+{
+    if (symEngineInitialized)
+    {
+        SymCleanup(GetCurrentProcess());
+
+        symEngineInitialized = false;
+    }
+}
+
+xr_vector<xr_string> xrDebug::BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesCount)
+{
+    ScopeLock Lock(&dbgHelpLock);
+
+    SStringVec traceResult;
+    STACKFRAME stackFrame = {};
+    xr_string frameStr;
+
+    if (!InitializeSymbolEngine())
+    {
+        Msg("[xrDebug::BuildStackTrace]InitializeSymbolEngine failed with error: %d", GetLastError());
+        return traceResult;
+    }
+
+    traceResult.reserve(maxFramesCount);
+
+#if defined XR_X64
+    stackFrame.AddrPC.Mode = AddrModeFlat;
+    stackFrame.AddrPC.Offset = threadCtx->Rip;
+    stackFrame.AddrStack.Mode = AddrModeFlat;
+    stackFrame.AddrStack.Offset = threadCtx->Rsp;
+    stackFrame.AddrFrame.Mode = AddrModeFlat;
+    stackFrame.AddrFrame.Offset = threadCtx->Rbp;
+#elif defined XR_X86	
+    stackFrame.AddrPC.Mode = AddrModeFlat;
+    stackFrame.AddrPC.Offset = threadCtx->Eip;
+    stackFrame.AddrStack.Mode = AddrModeFlat;
+    stackFrame.AddrStack.Offset = threadCtx->Esp;
+    stackFrame.AddrFrame.Mode = AddrModeFlat;
+    stackFrame.AddrFrame.Offset = threadCtx->Ebp;
+#else
+#	error CPU architecture is not supported.
 #endif
-        ex_ptrs.ContextRecord = &context;
-        ex_ptrs.ExceptionRecord = 0;
-        return BuildStackTrace(&ex_ptrs, buffer, capacity, lineCapacity);
-    }
-    return 0;
-}
 
-size_t xrDebug::BuildStackTrace(EXCEPTION_POINTERS* exPtrs, char* buffer, size_t capacity, size_t lineCapacity)
-{
-    memset(buffer, 0, capacity*lineCapacity);
-    auto flags = GSTSO_MODULE | GSTSO_SYMBOL | GSTSO_SRCLINE;
-    auto traceDump = GetFirstStackTraceString(flags, exPtrs);
-    int frameCount = 0;
-    while (traceDump)
+    while (GetNextStackFrameString(&stackFrame, threadCtx, frameStr) && traceResult.size() <= maxFramesCount)
     {
-        lstrcpy(buffer + frameCount * lineCapacity, traceDump);
-        frameCount++;
-        traceDump = GetNextStackTraceString(flags, exPtrs);
+        traceResult.push_back(frameStr);
     }
-    return frameCount;
+
+    DeinitializeSymbolEngine();
+
+    return traceResult;
 }
 
-void xrDebug::GatherInfo(char* assertionInfo, const ErrorLocation& loc, const char* expr, const char* desc,
-    const char* arg1, const char* arg2)
+SStringVec xrDebug::BuildStackTrace(u16 maxFramesCount)
 {
-    char* buffer = assertionInfo;
+    CONTEXT currentThreadCtx = {};
+
+    RtlCaptureContext(&currentThreadCtx);	/// GetThreadContext cann't be used on the current thread 
+    currentThreadCtx.ContextFlags = CONTEXT_FULL;
+
+    return BuildStackTrace(&currentThreadCtx, maxFramesCount);
+}
+
+void xrDebug::LogStackTrace(const char *header)
+{
+    SStringVec stackTrace = BuildStackTrace();
+    Msg("%s", header);
+    for (const auto &frame : stackTrace)
+    {
+        Msg("%s", frame.c_str());
+    }
+}
+
+void xrDebug::GatherInfo(char *assertionInfo, const ErrorLocation &loc, const char *expr, const char *desc,
+    const char *arg1, const char *arg2)
+{
+    char *buffer = assertionInfo;
     if (!expr)
         expr = "<no expression>";
     bool extendedDesc = desc && strchr(desc, '\n');
@@ -174,13 +303,13 @@ void xrDebug::GatherInfo(char* assertionInfo, const ErrorLocation& loc, const ch
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
     buffer += sprintf(buffer, "stack trace:\n\n");
 #endif // USE_OWN_ERROR_MESSAGE_WINDOW
-    BuildStackTrace(StackTrace.Frames, StackTrace.Capacity, StackTrace.LineCapacity);
-    for (size_t i = 2; i < StackTrace.Count; i++)
+    xr_vector<xr_string> stackTrace = BuildStackTrace();
+    for (size_t i = 2; i < stackTrace.size(); i++)
     {
         if (shared_str_initialized)
-            Log(StackTrace[i]);
+            Log(stackTrace[i].c_str());
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
-        buffer += sprintf(buffer, "%s\n", StackTrace[i]);
+        buffer += sprintf(buffer, "%s\n", stackTrace[i].c_str());
 #endif // USE_OWN_ERROR_MESSAGE_WINDOW
     }
     if (shared_str_initialized)
@@ -188,7 +317,7 @@ void xrDebug::GatherInfo(char* assertionInfo, const ErrorLocation& loc, const ch
     os_clipboard::copy_to_clipboard(assertionInfo);
 }
 
-void xrDebug::Fatal(const ErrorLocation& loc, const char* format, ...)
+void xrDebug::Fatal(const ErrorLocation &loc, const char *format, ...)
 {
     string1024 desc;
     va_list args;
@@ -199,14 +328,14 @@ void xrDebug::Fatal(const ErrorLocation& loc, const char* format, ...)
     Fail(ignoreAlways, loc, nullptr, "fatal error", desc);
 }
 
-void xrDebug::Fail(
-    bool& ignoreAlways, const ErrorLocation& loc, const char* expr, long hresult, const char* arg1, const char* arg2)
+void xrDebug::Fail(bool &ignoreAlways, const ErrorLocation &loc, const char *expr, long hresult, const char *arg1,
+    const char *arg2)
 {
     Fail(ignoreAlways, loc, expr, xrDebug::ErrorToString(hresult), arg1, arg2);
 }
 
-void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const char* desc, const char* arg1,
-    const char* arg2)
+void xrDebug::Fail(bool &ignoreAlways, const ErrorLocation &loc, const char *expr, const char *desc, const char *arg1,
+    const char *arg2)
 {
 #ifdef PROFILE_CRITICAL_SECTIONS
     static Lock lock(MUTEX_PROFILE_ID(xrDebug::Backend));
@@ -263,13 +392,13 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
     lock.Leave();
 }
 
-void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const std::string& desc,
-    const char* arg1, const char* arg2)
+void xrDebug::Fail(bool &ignoreAlways, const ErrorLocation &loc, const char *expr, const std::string &desc,
+    const char *arg1, const char *arg2)
 {
     Fail(ignoreAlways, loc, expr, desc.c_str(), arg1, arg2);
 }
 
-void xrDebug::DoExit(const std::string& message)
+void xrDebug::DoExit(const std::string &message)
 {
     FlushLog();
     MessageBox(NULL, message.c_str(), "Error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
@@ -278,7 +407,7 @@ void xrDebug::DoExit(const std::string& message)
 
 LPCSTR xrDebug::ErrorToString(long code)
 {
-    const char* result = nullptr;
+    const char *result = nullptr;
     static string1024 descStorage;
     DXGetErrorDescription(code, descStorage, sizeof(descStorage));
     if (!result)
@@ -346,7 +475,7 @@ void WINAPI xrDebug::PreErrorHandler(INT_PTR)
     BT_SaveSnapshot(nullptr);
 }
 
-void xrDebug::SetupExceptionHandler(const bool& dedicated)
+void xrDebug::SetupExceptionHandler(const bool &dedicated)
 {
     // disable 'appname has stopped working' popup dialog
     UINT prevMode = SetErrorMode(SEM_NOGPFAULTERRORBOX);
@@ -386,7 +515,7 @@ void xrDebug::SetupExceptionHandler(const bool& dedicated)
 #endif // USE_BUG_TRAP
 
 #ifdef USE_OWN_MINI_DUMP
-void xrDebug::SaveMiniDump(EXCEPTION_POINTERS* exPtrs)
+void xrDebug::SaveMiniDump(EXCEPTION_POINTERS *exPtrs)
 {
     string64 dateStr;
     timestamp(dateStr);
@@ -407,7 +536,7 @@ void xrDebug::SaveMiniDump(EXCEPTION_POINTERS* exPtrs)
 }
 #endif
 
-void xrDebug::FormatLastError(char* buffer, const size_t& bufferSize)
+void xrDebug::FormatLastError(char *buffer, const size_t &bufferSize)
 {
     int lastErr = GetLastError();
     if (lastErr == ERROR_SUCCESS)
@@ -415,7 +544,7 @@ void xrDebug::FormatLastError(char* buffer, const size_t& bufferSize)
         *buffer = 0;
         return;
     }
-    void* msg = nullptr;
+    void *msg = nullptr;
     FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, nullptr, lastErr,
         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&msg, 0, nullptr);
     // XXX nitrocaster: check buffer overflow
@@ -423,25 +552,25 @@ void xrDebug::FormatLastError(char* buffer, const size_t& bufferSize)
     LocalFree(msg);
 }
 
-LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
+LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS *exPtrs)
 {
     string256 errMsg;
     FormatLastError(errMsg, sizeof(errMsg));
     if (!ErrorAfterDialog && !strstr(GetCommandLine(), "-no_call_stack_assert"))
     {
         CONTEXT save = *exPtrs->ContextRecord;
-        StackTrace.Count = BuildStackTrace(exPtrs, StackTrace.Frames, StackTrace.Capacity, StackTrace.LineCapacity);
+        xr_vector<xr_string> stackTrace = BuildStackTrace(exPtrs->ContextRecord, 1024);
         *exPtrs->ContextRecord = save;
         if (shared_str_initialized)
             Msg("stack trace:\n");
         if (!IsDebuggerPresent())
             os_clipboard::copy_to_clipboard("stack trace:\r\n\r\n");
         string4096 buffer;
-        for (size_t i = 0; i < StackTrace.Count; i++)
+        for (size_t i = 0; i < stackTrace.size(); i++)
         {
             if (shared_str_initialized)
-                Log(StackTrace[i]);
-            sprintf(buffer, "%s\r\n", StackTrace[i]);
+                Log(stackTrace[i].c_str());
+            sprintf(buffer, "%s\r\n", stackTrace[i].c_str());
 #ifdef DEBUG
             if (!IsDebuggerPresent())
                 os_clipboard::update_clipboard(buffer);
@@ -498,14 +627,14 @@ void _terminate()
 }
 #endif // USE_BUG_TRAP
 
-static void handler_base(const char* reason)
+static void handler_base(const char *reason)
 {
     bool ignoreAlways = false;
     xrDebug::Fail(ignoreAlways, DEBUG_INFO, nullptr, reason, nullptr, nullptr);
 }
 
-static void invalid_parameter_handler(
-    const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t reserved)
+static void invalid_parameter_handler(const wchar_t *expression, const wchar_t *function, const wchar_t *file,
+    unsigned int line, uintptr_t reserved)
 {
     bool ignoreAlways = false;
     string4096 mbExpression;
@@ -544,7 +673,7 @@ void xrDebug::OnThreadSpawn()
 #ifdef USE_BUG_TRAP
     BT_SetTerminate();
 #else
-// std::set_terminate(_terminate);
+    // std::set_terminate(_terminate);
 #endif
     _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
     signal(SIGABRT, abort_handler);
@@ -562,7 +691,7 @@ void xrDebug::OnThreadSpawn()
 #endif
 }
 
-void xrDebug::Initialize(const bool& dedicated)
+void xrDebug::Initialize(const bool &dedicated)
 {
     *BugReportFile = 0;
     OnThreadSpawn();
