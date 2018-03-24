@@ -303,6 +303,9 @@
     <ClCompile Include="xrMemory.cpp">
       <Filter>Memory</Filter>
     </ClCompile>
+    <ClCompile Include="Threading\ScopeLock.cpp">
+      <Filter>Threading</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FTimer.h">
@@ -668,7 +671,7 @@
     <ClInclude Include="xrMemory.h">
       <Filter>Memory</Filter>
     </ClInclude>
-    <ClInclude Include="Threading\ScopeLock.h">
+    <ClInclude Include="Threading\ScopeLock.hpp">
       <Filter>Threading</Filter>
     </ClInclude>
   </ItemGroup>

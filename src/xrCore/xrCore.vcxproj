@@ -256,6 +256,7 @@
     <ClCompile Include="string_concatenations.cpp" />
     <ClCompile Include="Text\MbHelpers.cpp" />
     <ClCompile Include="Threading\Event.cpp" />
+    <ClCompile Include="Threading\ScopeLock.cpp" />
     <ClCompile Include="Threading\ThreadPool.cpp" />
     <ClCompile Include="Threading\Lock.cpp" />
     <ClCompile Include="XML\XMLDocument.cpp" />
@@ -354,7 +355,7 @@
     <ClInclude Include="SubAlloc.hpp" />
     <ClInclude Include="Text\MbHelpers.h" />
     <ClInclude Include="Threading\Event.hpp" />
-    <ClInclude Include="Threading\ScopeLock.h" />
+    <ClInclude Include="Threading\ScopeLock.hpp" />
     <ClInclude Include="Threading\ThreadPool.hpp" />
     <ClInclude Include="Threading\Lock.hpp" />
     <ClInclude Include="vector.h" />

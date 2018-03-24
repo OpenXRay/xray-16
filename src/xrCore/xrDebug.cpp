@@ -4,7 +4,7 @@
 #include "xrDebug.h"
 #include "os_clipboard.h"
 #include "Debug/dxerr.h"
-#include "Threading/ScopeLock.h"
+#include "Threading/ScopeLock.hpp"
 
 #pragma warning(push)
 #pragma warning(disable : 4091) // 'typedef ': ignored on left of '' when no variable is declared
@@ -47,7 +47,7 @@ static BOOL bException = FALSE;
 
 #if defined XR_X64
 #	define MACHINE_TYPE IMAGE_FILE_MACHINE_AMD64
-#elif defined XR_X86	
+#elif defined XR_X86
 #	define MACHINE_TYPE IMAGE_FILE_MACHINE_I386
 #else
 #	error CPU architecture is not supported.
@@ -81,12 +81,12 @@ bool xrDebug::ErrorAfterDialog = false;
 bool xrDebug::symEngineInitialized = false;
 Lock xrDebug::dbgHelpLock;
 
-void xrDebug::SetBugReportFile(const char *fileName) { strcpy_s(BugReportFile, fileName); }
+void xrDebug::SetBugReportFile(const char* fileName) { strcpy_s(BugReportFile, fileName); }
 
-bool xrDebug::GetNextStackFrameString(LPSTACKFRAME stackFrame, PCONTEXT threadCtx, xr_string &frameStr)
+bool xrDebug::GetNextStackFrameString(LPSTACKFRAME stackFrame, PCONTEXT threadCtx, xr_string& frameStr)
 {
     BOOL result = StackWalk(MACHINE_TYPE, GetCurrentProcess(), GetCurrentThread(), stackFrame, threadCtx, nullptr,
-        SymFunctionTableAccess, SymGetModuleBase, nullptr);
+                            SymFunctionTableAccess, SymGetModuleBase, nullptr);
 
     if (result == FALSE || stackFrame->AddrPC.Offset == 0)
     {
@@ -149,8 +149,8 @@ bool xrDebug::GetNextStackFrameString(LPSTACKFRAME stackFrame, PCONTEXT threadCt
     {
         if (dwLineOffset)
         {
-            xr_sprintf(formatBuff, _countof(formatBuff), " in %s line %u + %u byte(s)", sourceInfo.FileName, 
-                sourceInfo.LineNumber, dwLineOffset);
+            xr_sprintf(formatBuff, _countof(formatBuff), " in %s line %u + %u byte(s)", sourceInfo.FileName,
+                       sourceInfo.LineNumber, dwLineOffset);
         }
         else
         {
@@ -211,7 +211,7 @@ xr_vector<xr_string> xrDebug::BuildStackTrace(PCONTEXT threadCtx, u16 maxFramesC
     stackFrame.AddrStack.Offset = threadCtx->Rsp;
     stackFrame.AddrFrame.Mode = AddrModeFlat;
     stackFrame.AddrFrame.Offset = threadCtx->Rbp;
-#elif defined XR_X86	
+#elif defined XR_X86
     stackFrame.AddrPC.Mode = AddrModeFlat;
     stackFrame.AddrPC.Offset = threadCtx->Eip;
     stackFrame.AddrStack.Mode = AddrModeFlat;
@@ -236,26 +236,26 @@ SStringVec xrDebug::BuildStackTrace(u16 maxFramesCount)
 {
     CONTEXT currentThreadCtx = {};
 
-    RtlCaptureContext(&currentThreadCtx);	/// GetThreadContext cann't be used on the current thread 
+    RtlCaptureContext(&currentThreadCtx); /// GetThreadContext can't be used on the current thread 
     currentThreadCtx.ContextFlags = CONTEXT_FULL;
 
     return BuildStackTrace(&currentThreadCtx, maxFramesCount);
 }
 
-void xrDebug::LogStackTrace(const char *header)
+void xrDebug::LogStackTrace(const char* header)
 {
     SStringVec stackTrace = BuildStackTrace();
     Msg("%s", header);
-    for (const auto &frame : stackTrace)
+    for (const auto& frame : stackTrace)
     {
         Msg("%s", frame.c_str());
     }
 }
 
-void xrDebug::GatherInfo(char *assertionInfo, const ErrorLocation &loc, const char *expr, const char *desc,
-    const char *arg1, const char *arg2)
+void xrDebug::GatherInfo(char* assertionInfo, const ErrorLocation& loc, const char* expr, const char* desc,
+                         const char* arg1, const char* arg2)
 {
-    char *buffer = assertionInfo;
+    char* buffer = assertionInfo;
     if (!expr)
         expr = "<no expression>";
     bool extendedDesc = desc && strchr(desc, '\n');
@@ -317,7 +317,7 @@ void xrDebug::GatherInfo(char *assertionInfo, const ErrorLocation &loc, const ch
     os_clipboard::copy_to_clipboard(assertionInfo);
 }
 
-void xrDebug::Fatal(const ErrorLocation &loc, const char *format, ...)
+void xrDebug::Fatal(const ErrorLocation& loc, const char* format, ...)
 {
     string1024 desc;
     va_list args;
@@ -328,14 +328,14 @@ void xrDebug::Fatal(const ErrorLocation &loc, const char *format, ...)
     Fail(ignoreAlways, loc, nullptr, "fatal error", desc);
 }
 
-void xrDebug::Fail(bool &ignoreAlways, const ErrorLocation &loc, const char *expr, long hresult, const char *arg1,
-    const char *arg2)
+void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, long hresult, const char* arg1,
+                   const char* arg2)
 {
     Fail(ignoreAlways, loc, expr, xrDebug::ErrorToString(hresult), arg1, arg2);
 }
 
-void xrDebug::Fail(bool &ignoreAlways, const ErrorLocation &loc, const char *expr, const char *desc, const char *arg1,
-    const char *arg2)
+void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const char* desc, const char* arg1,
+                   const char* arg2)
 {
 #ifdef PROFILE_CRITICAL_SECTIONS
     static Lock lock(MUTEX_PROFILE_ID(xrDebug::Backend));
@@ -348,11 +348,11 @@ void xrDebug::Fail(bool &ignoreAlways, const ErrorLocation &loc, const char *exp
     GatherInfo(assertionInfo, loc, expr, desc, arg1, arg2);
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
     strcat(assertionInfo,
-        "\r\n"
-        "Press CANCEL to abort execution\r\n"
-        "Press TRY AGAIN to continue execution\r\n"
-        "Press CONTINUE to continue execution and ignore all the errors of this type\r\n"
-        "\r\n");
+           "\r\n"
+           "Press CANCEL to abort execution\r\n"
+           "Press TRY AGAIN to continue execution\r\n"
+           "Press CONTINUE to continue execution and ignore all the errors of this type\r\n"
+           "\r\n");
 #endif
     if (OnCrash)
         OnCrash();
@@ -364,7 +364,8 @@ void xrDebug::Fail(bool &ignoreAlways, const ErrorLocation &loc, const char *exp
     else
     {
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
-        int result = MessageBox(NULL, assertionInfo, "Fatal error", MB_CANCELTRYCONTINUE | MB_ICONERROR | MB_SYSTEMMODAL);
+        int result = MessageBox(NULL, assertionInfo, "Fatal error",
+                                MB_CANCELTRYCONTINUE | MB_ICONERROR | MB_SYSTEMMODAL);
         switch (result)
         {
         case IDCANCEL:
@@ -373,7 +374,8 @@ void xrDebug::Fail(bool &ignoreAlways, const ErrorLocation &loc, const char *exp
 #endif
             DEBUG_BREAK;
             break;
-        case IDTRYAGAIN: ErrorAfterDialog = false; break;
+        case IDTRYAGAIN: ErrorAfterDialog = false;
+            break;
         case IDCONTINUE:
             ErrorAfterDialog = false;
             ignoreAlways = true;
@@ -392,13 +394,13 @@ void xrDebug::Fail(bool &ignoreAlways, const ErrorLocation &loc, const char *exp
     lock.Leave();
 }
 
-void xrDebug::Fail(bool &ignoreAlways, const ErrorLocation &loc, const char *expr, const std::string &desc,
-    const char *arg1, const char *arg2)
+void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const std::string& desc,
+                   const char* arg1, const char* arg2)
 {
     Fail(ignoreAlways, loc, expr, desc.c_str(), arg1, arg2);
 }
 
-void xrDebug::DoExit(const std::string &message)
+void xrDebug::DoExit(const std::string& message)
 {
     FlushLog();
     MessageBox(NULL, message.c_str(), "Error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
@@ -407,7 +409,7 @@ void xrDebug::DoExit(const std::string &message)
 
 LPCSTR xrDebug::ErrorToString(long code)
 {
-    const char *result = nullptr;
+    const char* result = nullptr;
     static string1024 descStorage;
     DXGetErrorDescription(code, descStorage, sizeof(descStorage));
     if (!result)
@@ -475,7 +477,7 @@ void WINAPI xrDebug::PreErrorHandler(INT_PTR)
     BT_SaveSnapshot(nullptr);
 }
 
-void xrDebug::SetupExceptionHandler(const bool &dedicated)
+void xrDebug::SetupExceptionHandler(const bool& dedicated)
 {
     // disable 'appname has stopped working' popup dialog
     UINT prevMode = SetErrorMode(SEM_NOGPFAULTERRORBOX);
@@ -486,11 +488,11 @@ void xrDebug::SetupExceptionHandler(const bool &dedicated)
     else
         BT_SetActivityType(BTA_SAVEREPORT);
     BT_SetDialogMessage(BTDM_INTRO2,
-        "This is X-Ray Engine v1.6 crash reporting client. "
-        "To help the development process, "
-        "please Submit Bug or save report and email it manually (button More...)."
-        "\r\n"
-        "Many thanks in advance and sorry for the inconvenience.");
+                        "This is X-Ray Engine v1.6 crash reporting client. "
+                        "To help the development process, "
+                        "please Submit Bug or save report and email it manually (button More...)."
+                        "\r\n"
+                        "Many thanks in advance and sorry for the inconvenience.");
     BT_SetPreErrHandler(PreErrorHandler, 0);
     BT_SetAppName("X-Ray Engine");
     BT_SetReportFormat(BTRF_TEXT);
@@ -536,7 +538,7 @@ void xrDebug::SaveMiniDump(EXCEPTION_POINTERS *exPtrs)
 }
 #endif
 
-void xrDebug::FormatLastError(char *buffer, const size_t &bufferSize)
+void xrDebug::FormatLastError(char* buffer, const size_t& bufferSize)
 {
     int lastErr = GetLastError();
     if (lastErr == ERROR_SUCCESS)
@@ -544,15 +546,15 @@ void xrDebug::FormatLastError(char *buffer, const size_t &bufferSize)
         *buffer = 0;
         return;
     }
-    void *msg = nullptr;
+    void* msg = nullptr;
     FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, nullptr, lastErr,
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&msg, 0, nullptr);
+                  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&msg, 0, nullptr);
     // XXX nitrocaster: check buffer overflow
     sprintf(buffer, "[error][%8d]: %s", lastErr, (char*)msg);
     LocalFree(msg);
 }
 
-LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS *exPtrs)
+LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS* exPtrs)
 {
     string256 errMsg;
     FormatLastError(errMsg, sizeof(errMsg));
@@ -599,9 +601,9 @@ LONG WINAPI xrDebug::UnhandledFilter(EXCEPTION_POINTERS *exPtrs)
         if (OnDialog)
             OnDialog(true);
         MessageBox(NULL,
-            "Fatal error occurred\n\n"
-            "Press OK to abort program execution",
-            "Fatal error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
+                   "Fatal error occurred\n\n"
+                   "Press OK to abort program execution",
+                   "Fatal error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
     }
 #endif
     ReportFault(exPtrs, 0);
@@ -627,14 +629,14 @@ void _terminate()
 }
 #endif // USE_BUG_TRAP
 
-static void handler_base(const char *reason)
+static void handler_base(const char* reason)
 {
     bool ignoreAlways = false;
     xrDebug::Fail(ignoreAlways, DEBUG_INFO, nullptr, reason, nullptr, nullptr);
 }
 
-static void invalid_parameter_handler(const wchar_t *expression, const wchar_t *function, const wchar_t *file,
-    unsigned int line, uintptr_t reserved)
+static void invalid_parameter_handler(const wchar_t* expression, const wchar_t* function, const wchar_t* file,
+                                      unsigned int line, uintptr_t reserved)
 {
     bool ignoreAlways = false;
     string4096 mbExpression;
@@ -668,6 +670,7 @@ static void abort_handler(int signal) { handler_base("application is aborting");
 static void floating_point_handler(int signal) { handler_base("floating point error"); }
 static void illegal_instruction_handler(int signal) { handler_base("illegal instruction"); }
 static void termination_handler(int signal) { handler_base("termination with exit code 3"); }
+
 void xrDebug::OnThreadSpawn()
 {
 #ifdef USE_BUG_TRAP
@@ -691,7 +694,7 @@ void xrDebug::OnThreadSpawn()
 #endif
 }
 
-void xrDebug::Initialize(const bool &dedicated)
+void xrDebug::Initialize(const bool& dedicated)
 {
     *BugReportFile = 0;
     OnThreadSpawn();
