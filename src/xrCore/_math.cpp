@@ -108,16 +108,6 @@ u64 __fastcall GetCLK(void)
 }
 #endif
 
-void Detect()
-{
-    // General CPU identification
-    if (!query_processor_info(&ID))
-    {
-        // Core.Fatal ("Fatal error: can't detect CPU/FPU.");
-        abort();
-    }
-}
-
 } // namespace CPU
 
 bool g_initialize_cpu_called = false;
@@ -125,6 +115,10 @@ bool g_initialize_cpu_called = false;
 //------------------------------------------------------------------------------------
 void _initialize_cpu()
 {
+    // General CPU identification
+    if (!query_processor_info(&CPU::ID))
+        FATAL("Can't detect CPU/FPU.");
+
     Msg("* Detected CPU: %s [%s], F%d/M%d/S%d, 'rdtsc'", CPU::ID.modelName,
         +CPU::ID.vendor, CPU::ID.family, CPU::ID.model, CPU::ID.stepping);
 

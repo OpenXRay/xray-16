@@ -12,20 +12,9 @@
 
 #pragma comment(lib, "winmm.lib")
 
-#ifdef DEBUG
-#include <malloc.h>
-#endif // DEBUG
-
 XRCORE_API xrCore Core;
 
-namespace CPU
-{
-extern void Detect();
-}
-
 static u32 init_counter = 0;
-
-//. extern xr_vector<shared_str>* LogFile;
 
 void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pcstr fs_fname, bool plugin)
 {
@@ -65,9 +54,6 @@ void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pc
 
         DWORD sz_comp = sizeof(CompName);
         GetComputerName(CompName, &sz_comp);
-
-        // Mathematics & PSI detection
-        CPU::Detect();
 
         Memory._initialize();
 
