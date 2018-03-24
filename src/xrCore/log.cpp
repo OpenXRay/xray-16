@@ -18,7 +18,7 @@ Lock logCS(MUTEX_PROFILE_ID(log));
 #else // CONFIG_PROFILE_LOCKS
 Lock logCS;
 #endif // CONFIG_PROFILE_LOCKS
-xr_vector<xr_string> LogFile(1000);
+xr_vector<xr_string> LogFile;
 LogCallback LogCB = 0;
 
 void FlushLog()
@@ -186,6 +186,8 @@ LPCSTR log_name() { return (log_file_name); }
 
 void CreateLog(BOOL nl)
 {
+    LogFile.reserve(1000);
+
     no_log = nl;
     strconcat(sizeof(log_file_name), log_file_name, Core.ApplicationName, "_", Core.UserName, ".log");
     if (FS.path_exist("$logs$"))
