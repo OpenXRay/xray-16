@@ -110,7 +110,7 @@ private:
         this->logList->UseCompatibleStateImageBehavior = false;
         this->logList->View = System::Windows::Forms::View::Details;
         this->logList->Resize += gcnew System::EventHandler(this, &WindowLog::logList_Resize);
-        this->columnHeader1->Width = 121;
+        this->columnHeader1->Width = 333;
         this->buttonClose->Location = System::Drawing::Point(0, 0);
         this->buttonClose->Name = L"buttonClose";
         this->buttonClose->Size = System::Drawing::Size(85, 23);

@@ -2,10 +2,11 @@
 
 enum class MessageType
 {
-    Information,
-    Warning,
-    Error,
-    Confirmation,
+    Information,  // *
+    Warning,      // ~
+    Error,        // !
+    Confirmation, // #, -
+    UserInput,    // @
     Custom
 };
 

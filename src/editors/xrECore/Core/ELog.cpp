@@ -12,10 +12,20 @@ XRECORE_API void ELogCallback(void* context, pcstr message)
         return;
 
     bool isDialog = false;
-    MessageType type = MessageType::Information;
 
+    MessageType type;
     switch (message[0])
     {
+    case '*':
+        type = MessageType::Information;
+        message++;
+        break;
+
+    case '~':
+        type = MessageType::Warning;
+        message++;
+        break;
+
     case '!':
         type = MessageType::Error;
         message++;
@@ -25,6 +35,20 @@ XRECORE_API void ELogCallback(void* context, pcstr message)
         isDialog = true;
         type = MessageType::Confirmation;
         message++;
+        break;
+
+    case '@':
+        type = MessageType::UserInput;
+        message++;
+        break;
+
+    case '-':
+        type = MessageType::Confirmation;
+        message++;
+        break;
+
+    default:
+        type = MessageType::Custom;
         break;
     }
 

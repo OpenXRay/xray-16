@@ -18,8 +18,12 @@ void WindowLog::AddMessage(MessageType type, System::String^ message)
 
     switch (type)
     {
+    case MessageType::Information:
+        newMessage->BackColor = Color::LightGray;
+        break;
+
     case MessageType::Warning:
-        newMessage->BackColor = Color::Yellow;
+        newMessage->BackColor = Color::LightGoldenrodYellow;
         break;
 
     case MessageType::Error:
@@ -30,12 +34,13 @@ void WindowLog::AddMessage(MessageType type, System::String^ message)
         newMessage->BackColor = Color::LightGreen;
         break;
 
-    case MessageType::Custom:
-        newMessage->BackColor = Color::LightYellow;
+    case MessageType::UserInput:
+        newMessage->BackColor = Color::LightBlue;
         break;
     }
 
     logList->Items->Add(newMessage);
+    newMessage->EnsureVisible();
 
     if (type == MessageType::Error)
         Focus();
@@ -64,7 +69,7 @@ System::Void WindowLog::buttonClearSelected_Click(System::Object^ sender, System
 
 System::Void WindowLog::logList_Resize(System::Object^ sender, System::EventArgs^ e)
 {
-    columnHeader1->Width = logList->Size.Width;
+    columnHeader1->AutoResize(ColumnHeaderAutoResizeStyle::HeaderSize);
 }
 
 System::Void WindowLog::LogForm_Closing(System::Object^ sender, System::Windows::Forms::FormClosingEventArgs^ e)
