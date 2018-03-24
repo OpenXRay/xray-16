@@ -18,7 +18,7 @@ Lock logCS(MUTEX_PROFILE_ID(log));
 #else // CONFIG_PROFILE_LOCKS
 Lock logCS;
 #endif // CONFIG_PROFILE_LOCKS
-xr_vector<xr_string> LogFile;
+xr_vector<xr_string> LogFile(1000);
 LogCallback LogCB = 0;
 
 void FlushLog()
@@ -183,10 +183,6 @@ LogCallback SetLogCB(const LogCallback& cb)
 }
 
 LPCSTR log_name() { return (log_file_name); }
-void InitLog()
-{
-    LogFile.reserve(1000);
-}
 
 void CreateLog(BOOL nl)
 {
