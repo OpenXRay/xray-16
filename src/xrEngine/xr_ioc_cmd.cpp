@@ -4,8 +4,9 @@
 #include "x_ray.h"
 #include "XR_IOConsole.h"
 #include "xr_ioc_cmd.h"
+#include "xrSASH.h"
 
-#include "cameramanager.h"
+#include "CameraManager.h"
 #include "Environment.h"
 #include "xr_input.h"
 #include "CustomHUD.h"
@@ -16,6 +17,18 @@
 xr_vector<xr_token> vid_quality_token;
 
 const xr_token vid_bpp_token[] = {{"16", 16}, {"32", 32}, {0, 0}};
+
+void IConsole_Command::InvalidSyntax()
+{
+    TInfo I;
+    Info(I);
+    Msg("~ Invalid syntax in call to '%s'", cName);
+    Msg("~ Valid arguments: %s", I);
+
+    g_SASH.OnConsoleInvalidSyntax(false, "~ Invalid syntax in call to '%s'", cName);
+    g_SASH.OnConsoleInvalidSyntax(true, "~ Valid arguments: %s", I);
+}
+
 //-----------------------------------------------------------------------
 
 void IConsole_Command::add_to_LRU(shared_str const& arg)

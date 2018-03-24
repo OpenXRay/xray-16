@@ -26,7 +26,6 @@
         Console->AddCommand(&x##cls);      \
     }
 
-#include "xrSASH.h"
 #include "xrCore/xrCore_benchmark_macros.h"
 #include "xrCore/xr_token.h"
 
@@ -68,16 +67,7 @@ public:
     BENCH_SEC_SCRAMBLEVTBL3
 
     LPCSTR Name() { return cName; }
-    void InvalidSyntax()
-    {
-        TInfo I;
-        Info(I);
-        Msg("~ Invalid syntax in call to '%s'", cName);
-        Msg("~ Valid arguments: %s", I);
-
-        g_SASH.OnConsoleInvalidSyntax(false, "~ Invalid syntax in call to '%s'", cName);
-        g_SASH.OnConsoleInvalidSyntax(true, "~ Valid arguments: %s", I);
-    }
+    void InvalidSyntax();
     virtual void Execute(LPCSTR args) = 0;
     virtual void Status(TStatus& S) { S[0] = 0; }
     virtual void Info(TInfo& I) { xr_strcpy(I, "(no arguments)"); }
