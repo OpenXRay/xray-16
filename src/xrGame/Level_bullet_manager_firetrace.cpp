@@ -25,6 +25,7 @@
 
 //константы ShootFactor, определяющие
 //поведение пули при столкновении с объектом
+// XXX: review
 #define RICOCHET_THRESHOLD 0.1
 #define STUCK_THRESHOLD 0.4
 
@@ -174,12 +175,13 @@ void CBulletManager::FireShotmark(SBullet* bullet, const Fvector& vDir, const Fv
 
     if (R.O)
     {
-        //add_SkeletonWallmark not implemented now...
         particle_dir = vDir;
         particle_dir.invert();
 
-        //на текущем актере отметок не ставим
-        if (Level().CurrentEntity() && Level().CurrentEntity()->ID() == R.O->ID()) return;
+        // XXX: review
+        // на текущем актере отметок не ставим
+        if (Level().CurrentEntity() && Level().CurrentEntity()->ID() == R.O->ID())
+            return;
 
         if (mtl_pair && !mtl_pair->CollideMarks->empty() && ShowMark)
         {
