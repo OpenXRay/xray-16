@@ -33,6 +33,9 @@ public:
         Initialize();
     }
 
+    WindowView% View() { return *windowView; }
+    WindowLog% Log() { return *windowLog; }
+
 protected:
     ~WindowIDE()
     {
