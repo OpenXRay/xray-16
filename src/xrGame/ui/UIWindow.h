@@ -2,6 +2,8 @@
 #include "xr_level_controller.h"
 
 // fwd. decl.
+class UIHint;
+class CScriptXmlInit;
 class CUIWindow;
 struct _12b
 {

@@ -17,6 +17,8 @@
 #include "UIHint.h"
 #include "map_hint.h"
 #include "uicursor.h"
+#include "UIPropertiesBox.h"
+#include "UIListBoxItem.h"
 #include "xrEngine/xr_input.h" //remove me !!!
 
 CUIMapWnd* g_map_wnd = NULL; // quick temporary solution -(
@@ -188,6 +190,15 @@ void CUIMapWnd::Init(LPCSTR xml_name, LPCSTR start_from)
     m_ActionPlanner = new CMapActionPlanner();
     m_ActionPlanner->setup(this);
     m_view_actor = true;
+
+#ifdef COC_MAP_SPOT_PROPS_BOX
+    m_UIPropertiesBox = new CUIPropertiesBox();
+    m_UIPropertiesBox->SetAutoDelete(true);
+    m_UIPropertiesBox->InitPropertiesBox(Fvector2().set(0, 0), Fvector2().set(300, 300));
+    AttachChild(m_UIPropertiesBox);
+    m_UIPropertiesBox->Hide();
+    m_UIPropertiesBox->SetWindowName("property_box");
+#endif
 }
 
 void CUIMapWnd::Show(bool status)
@@ -426,6 +437,11 @@ bool CUIMapWnd::OnMouseAction(float x, float y, EUIMessages mouse_action)
     {
         switch (mouse_action)
         {
+#ifdef COC_MAP_SPOT_PROPS_BOX
+        case WINDOW_RBUTTON_UP:
+            ActivatePropertiesBox(NULL);
+            break;
+#endif
         case WINDOW_MOUSE_MOVE:
             if (pInput->iGetAsyncBtnState(0))
             {
@@ -487,9 +503,43 @@ bool CUIMapWnd::UpdateZoom(bool b_zoom_in)
 
 void CUIMapWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
-    //	inherited::SendMessage( pWnd, msg, pData);
     CUIWndCallback::OnEvent(pWnd, msg, pData);
+#ifdef COC_MAP_SPOT_PROPS_BOX
+    if (pWnd == m_UIPropertiesBox && msg == PROPERTY_CLICKED && m_UIPropertiesBox->GetClickedItem())
+    {
+        luabind::functor<void> funct;
+        if (GEnv.ScriptEngine->functor("pda.property_box_clicked", funct))
+            funct(m_UIPropertiesBox);
+    }
+#endif
 }
+
+#ifdef COC_MAP_SPOT_PROPS_BOX
+void CUIMapWnd::ActivatePropertiesBox(CUIWindow* w)
+{
+    m_UIPropertiesBox->RemoveAll();
+    luabind::functor<void> funct;
+    if (GEnv.ScriptEngine->functor("pda.property_box_add_properties", funct))
+    {
+        CMapSpot* sp = smart_cast<CMapSpot*>(w);
+        if (sp)
+            funct(m_UIPropertiesBox, sp->MapLocation()->ObjectID(), (LPCSTR)sp->MapLocation()->GetLevelName().c_str(), (LPCSTR)sp->MapLocation()->GetHint());
+    }
+
+    if (m_UIPropertiesBox->GetItemsCount() > 0)
+    {
+        m_UIPropertiesBox->AutoUpdateSize();
+
+        Fvector2 cursor_pos;
+        Frect vis_rect;
+
+        GetAbsoluteRect(vis_rect);
+        cursor_pos = GetUICursor().GetCursorPosition();
+        cursor_pos.sub(vis_rect.lt);
+        m_UIPropertiesBox->Show(vis_rect, cursor_pos);
+    }
+}
+#endif
 
 CUICustomMap* CUIMapWnd::GetMapByIdx(u16 idx)
 {

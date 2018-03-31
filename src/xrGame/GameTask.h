@@ -68,8 +68,6 @@ private:
     void CallAllFuncs(const task_state_functors& v);
     bool CheckFunctions(const task_state_functors& v) const;
 
-    void CreateMapLocation(bool on_load);
-
     CGameTask(const CGameTask&);
 
 public:
@@ -112,6 +110,8 @@ public:
     void SetMapHint_script(LPCSTR _hint) { m_map_hint = _hint; }
     void SetMapLocation_script(LPCSTR _mls) { m_map_location = _mls; }
     void SetMapObjectID_script(int _id) { m_map_object_id = (u16)_id; }
+    LPCSTR GetMapLocation_script() { return m_map_location.c_str(); }
+    u16 GetMapObjectID_script() { return m_map_object_id; }
     void AddCompleteInfo_script(LPCSTR _str);
     void AddFailInfo_script(LPCSTR _str);
     void AddOnCompleteInfo_script(LPCSTR _str);
@@ -122,4 +122,7 @@ public:
     void AddOnFailFunc_script(LPCSTR _str);
 
     void CommitScriptHelperContents();
+
+    // made public
+    void CreateMapLocation(bool on_load);
 };

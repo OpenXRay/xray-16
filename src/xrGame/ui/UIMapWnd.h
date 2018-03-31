@@ -19,6 +19,7 @@ class CMapSpot;
 class CGameTask;
 class CUIXml;
 class UIHint;
+class CUIPropertiesBox;
 
 using GameMaps = xr_map<shared_str, CUICustomMap*>;
 
@@ -100,6 +101,10 @@ public:
     void MoveScrollV(float dy);
     void MoveScrollH(float dx);
 
+#ifdef COC_MAP_SPOT_PROPS_BOX
+    void ActivatePropertiesBox(CUIWindow* w);
+#endif
+
 public:
     CUICustomMap* m_tgtMap;
     Fvector2 m_tgtCenter;
@@ -109,6 +114,10 @@ protected:
     void init_xml_nav(CUIXml& xml);
     void ShowHint(bool extra = false);
     void Activated();
+
+#ifdef COC_MAP_SPOT_PROPS_BOX
+    CUIPropertiesBox* m_UIPropertiesBox;
+#endif
 
 public:
     CUIMapWnd();

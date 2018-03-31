@@ -86,6 +86,13 @@ bool CMapSpot::OnMouseDown(int mouse_btn)
         }
         return false;
     }
+#ifdef COC_MAP_SPOT_PROPS_BOX
+    else if (mouse_btn == MOUSE_2)
+    {
+        GetMessageTarget()->SendMessage(this, MAP_SELECT_SPOT2);
+        return true;
+    }
+#endif
     else
     {
         return false;

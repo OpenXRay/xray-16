@@ -93,7 +93,7 @@ void CUIActorMenu::InitDeadBodySearchMode()
     CBaseMonster* monster = smart_cast<CBaseMonster*>(m_pPartnerInvOwner);
 
     // only for partner, box = no, monster = no
-    if (m_pPartnerInvOwner && !monster)
+    if (m_pPartnerInvOwner && !monster && !m_pPartnerInvOwner->is_alive())
     {
         CInfoPortionWrapper known_info_registry;
         known_info_registry.registry().init(m_pPartnerInvOwner->object_id());

@@ -96,7 +96,7 @@ static Fbox bbCrouchBox;
 static Fvector vFootCenter;
 static Fvector vFootExt;
 
-Flags32 psActorFlags = {AF_GODMODE_RT | AF_AUTOPICKUP | AF_RUN_BACKWARD | AF_IMPORTANT_SAVE};
+Flags32 psActorFlags = {AF_GODMODE_RT | AF_AUTOPICKUP | AF_RUN_BACKWARD | AF_IMPORTANT_SAVE | AF_USE_TRACERS };
 int psActorSleepTime = 1;
 
 CActor::CActor() : CEntityAlive(), current_ik_cam_shift(0)

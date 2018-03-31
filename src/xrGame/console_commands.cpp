@@ -1898,6 +1898,7 @@ void CCC_RegisterCommands()
     CMD1(CCC_TimeFactor, "time_factor");
 #endif // MASTER_GOLD
 
+    CMD3(CCC_Mask, "g_use_tracers", &psActorFlags, AF_USE_TRACERS);
     CMD3(CCC_Mask, "g_autopickup", &psActorFlags, AF_AUTOPICKUP);
     CMD3(CCC_Mask, "g_dynamic_music", &psActorFlags, AF_DYNAMIC_MUSIC);
     CMD3(CCC_Mask, "g_important_save", &psActorFlags, AF_IMPORTANT_SAVE);

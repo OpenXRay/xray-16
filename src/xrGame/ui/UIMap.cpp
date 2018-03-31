@@ -533,6 +533,10 @@ void CUILevelMap::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     }
     else if (msg == MAP_SELECT_SPOT)
         MapWnd()->SpotSelected(pWnd);
+#ifdef COC_MAP_SPOT_PROPS_BOX
+    else if (msg == MAP_SELECT_SPOT2)
+        MapWnd()->ActivatePropertiesBox(pWnd);
+#endif
 }
 
 void CUILevelMap::OnFocusLost()

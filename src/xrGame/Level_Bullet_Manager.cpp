@@ -36,9 +36,8 @@ float g_bullet_time_factor = 1.f;
 SBullet::SBullet() {}
 SBullet::~SBullet() {}
 void SBullet::Init(const Fvector& position, const Fvector& direction, float starting_speed, float power,
-    //.				   float power_critical,
     float impulse, u16 sender_id, u16 sendersweapon_id, ALife::EHitType e_hit_type, float maximum_distance,
-    const CCartridge& cartridge, float const air_resistance_factor, bool SendHit)
+    const CCartridge& cartridge, float const air_resistance_factor, bool SendHit, int iShotNum)
 {
     flags._storage = 0;
     bullet_pos = position;
@@ -74,6 +73,12 @@ void SBullet::Init(const Fvector& position, const Fvector& direction, float star
     VERIFY(u16(-1) != bullet_material_idx);
 
     flags.allow_tracer = !!cartridge.m_flags.test(CCartridge::cfTracer);
+
+    //Alundaio: Tracer for every 5th bullet
+    if (flags.allow_tracer && cartridge.m_4to1_tracer && iShotNum % 5 != 0)
+        flags.allow_tracer = false;
+    //-Alundaio
+
     flags.allow_ricochet = !!cartridge.m_flags.test(CCartridge::cfRicochet);
     flags.explosive = !!cartridge.m_flags.test(CCartridge::cfExplosive);
     flags.magnetic_beam = !!cartridge.m_flags.test(CCartridge::cfMagneticBeam);
@@ -179,9 +184,8 @@ void CBulletManager::Clear()
 }
 
 void CBulletManager::AddBullet(const Fvector& position, const Fvector& direction, float starting_speed, float power,
-    //.							   float power_critical,
     float impulse, u16 sender_id, u16 sendersweapon_id, ALife::EHitType e_hit_type, float maximum_distance,
-    const CCartridge& cartridge, float const air_resistance_factor, bool SendHit, bool AimBullet)
+    const CCartridge& cartridge, float const air_resistance_factor, bool SendHit, bool AimBullet, int iShotNum)
 {
     VERIFY(m_thread_id == GetCurrentThreadId());
 
@@ -191,7 +195,7 @@ void CBulletManager::AddBullet(const Fvector& position, const Fvector& direction
     m_Bullets.push_back(SBullet());
     SBullet& bullet = m_Bullets.back();
     bullet.Init(position, direction, starting_speed, power, /*power_critical,*/ impulse, sender_id, sendersweapon_id,
-        e_hit_type, maximum_distance, cartridge, air_resistance_factor, SendHit);
+        e_hit_type, maximum_distance, cartridge, air_resistance_factor, SendHit, iShotNum);
     //	bullet.frame_num			= Device.dwFrame;
     bullet.flags.aim_bullet = AimBullet;
     if (!IsGameTypeSingle())
@@ -847,6 +851,9 @@ void CBulletManager::Render()
     {
         SBullet* bullet = &(*it);
         if (!bullet->flags.allow_tracer)
+            continue;
+
+        if (!psActorFlags.test(AF_USE_TRACERS))
             continue;
 
         if (!bullet->CanBeRenderedNow())

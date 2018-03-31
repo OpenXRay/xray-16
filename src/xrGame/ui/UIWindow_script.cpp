@@ -9,6 +9,9 @@
 #include "UIMMShniaga.h"
 #include "UITextureMaster.h"
 #include "UIScrollView.h"
+#include "UIHint.h"
+#include "ScriptXMLInit.h"
+#include "UICursor.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 CFontManager& mngr() { return UI().Font(); }
@@ -26,9 +29,15 @@ CGameFont* GetFontGraffiti50Russian() { return mngr().pFontGraffiti50Russian; }
 CGameFont* GetFontLetterica25() { return mngr().pFontLetterica25; }
 int GetARGB(u16 a, u16 r, u16 g, u16 b) { return color_argb(a, r, g, b); }
 const Fvector2 get_wnd_pos(CUIWindow* w) { return w->GetWndPos(); }
+
+Fvector2 GetCursorPosition_script() { return GetUICursor().GetCursorPosition(); }
+
+void SetCursorPosition_script(Fvector2& pos) { GetUICursor().SetUICursorPosition(pos); }
+
 using namespace luabind;
 using namespace luabind::policy;
 
+// clang-format off
 SCRIPT_EXPORT(CUIWindow, (), {
     module(luaState)[def("GetARGB", &GetARGB), def("GetFontSmall", &GetFontSmall), def("GetFontMedium", &GetFontMedium),
         def("GetFontDI", &GetFontDI), def("GetFontGraffiti19Russian", &GetFontGraffiti19Russian),
@@ -36,7 +45,11 @@ SCRIPT_EXPORT(CUIWindow, (), {
         def("GetFontLetterica16Russian", &GetFontLetterica16Russian),
         def("GetFontLetterica18Russian", &GetFontLetterica18Russian),
         def("GetFontGraffiti32Russian", &GetFontGraffiti32Russian),
-        def("GetFontGraffiti50Russian", &GetFontGraffiti50Russian), def("GetFontLetterica25", &GetFontLetterica25),
+        def("GetFontGraffiti50Russian", &GetFontGraffiti50Russian),
+        def("GetFontLetterica25", &GetFontLetterica25),
+        def("GetCursorPosition", &GetCursorPosition_script),
+        def("SetCursorPosition", &SetCursorPosition_script),
+        def("FitInRect", &fit_in_rect),
 
         class_<CUIWindow>("CUIWindow")
             .def(constructor<>())
@@ -44,6 +57,10 @@ SCRIPT_EXPORT(CUIWindow, (), {
             .def("DetachChild", &CUIWindow::DetachChild)
             .def("SetAutoDelete", &CUIWindow::SetAutoDelete)
             .def("IsAutoDelete", &CUIWindow::IsAutoDelete)
+
+            .def("IsCursorOverWindow", &CUIWindow::CursorOverWindow)
+            .def("FocusReceiveTime", &CUIWindow::FocusReceiveTime)
+            .def("GetAbsoluteRect", &CUIWindow::GetAbsoluteRect)
 
             .def("SetWndRect", (void (CUIWindow::*)(Frect)) & CUIWindow::SetWndRect_script)
             .def("SetWndPos", (void (CUIWindow::*)(Fvector2)) & CUIWindow::SetWndPos_script)
@@ -90,6 +107,18 @@ SCRIPT_EXPORT(CUIFrameLineWnd, (CUIWindow), {
                          .def("SetWidth", &CUIFrameLineWnd::SetWidth)
                          .def("SetHeight", &CUIFrameLineWnd::SetHeight)
                          .def("SetColor", &CUIFrameLineWnd::SetTextureColor)];
+});
+
+SCRIPT_EXPORT(UIHint, (CUIWindow), {
+    module(luaState)
+    [
+        class_<UIHint, CUIWindow>("UIHint")
+            .def(constructor<>())
+            .def("SetWidth", &UIHint::SetWidth)
+            .def("SetHeight", &UIHint::SetHeight)
+            .def("SetHintText", &UIHint::set_text)
+            .def("GetHintText", &UIHint::get_text)
+    ];
 });
 
 SCRIPT_EXPORT(CUIMMShniaga, (CUIWindow), {
@@ -173,3 +202,4 @@ SCRIPT_EXPORT(EnumUIMessages, (), {
                              // CMainMenu
                              value("MAIN_MENU_RELOADED", int(MAIN_MENU_RELOADED))]];
 });
+// clang-format on

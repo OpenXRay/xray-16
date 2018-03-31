@@ -33,6 +33,10 @@ SCRIPT_EXPORT(CGameTask, (), {
             .def("set_map_location", &CGameTask::SetMapLocation_script)
             .def("set_map_object_id", &CGameTask::SetMapObjectID_script)
 
+            .def("get_map_location", &CGameTask::GetMapLocation_script)
+            .def("get_map_object_id", &CGameTask::GetMapObjectID_script)
+            .def("create_map_location", &CGameTask::CreateMapLocation)
+
             .def("add_complete_info", &CGameTask::AddCompleteInfo_script)
             .def("add_fail_info", &CGameTask::AddFailInfo_script)
             .def("add_on_complete_info", &CGameTask::AddOnCompleteInfo_script)

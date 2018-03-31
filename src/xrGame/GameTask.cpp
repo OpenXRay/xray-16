@@ -91,12 +91,7 @@ void CGameTask::CreateMapLocation(bool on_load)
     {
         m_linked_map_location = Level().MapManager().AddMapLocation(m_map_location, m_map_object_id);
         m_linked_map_location->m_owner_task_id = m_ID;
-    }
 
-    VERIFY(m_linked_map_location);
-
-    if (!on_load)
-    {
         if (m_map_hint.size())
         {
             m_linked_map_location->SetHint(m_map_hint);
@@ -104,6 +99,8 @@ void CGameTask::CreateMapLocation(bool on_load)
         m_linked_map_location->DisablePointer();
         m_linked_map_location->SetSerializable(true);
     }
+
+    VERIFY(m_linked_map_location);
 
     if (m_linked_map_location->complex_spot())
     {

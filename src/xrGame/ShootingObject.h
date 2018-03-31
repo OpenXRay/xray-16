@@ -45,7 +45,7 @@ protected:
     virtual void LoadFireParams(LPCSTR section); //сила выстрела
     virtual bool SendHitAllowed(IGameObject* pUser);
     virtual void FireBullet(const Fvector& pos, const Fvector& dir, float fire_disp, const CCartridge& cartridge,
-        u16 parent_id, u16 weapon_id, bool send_hit);
+        u16 parent_id, u16 weapon_id, bool send_hit, int iShotNum = 0);
     void SetBulletSpeed(float new_speed) { m_fStartBulletSpeed = new_speed; }
     float GetBulletSpeed() { return m_fStartBulletSpeed; }
     virtual void FireStart();

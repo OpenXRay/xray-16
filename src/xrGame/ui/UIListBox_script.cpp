@@ -31,6 +31,8 @@ SCRIPT_EXPORT(CUIListBox, (CUIScrollView), {
                          .def("GetSelectedItem", &CUIListBox::GetSelectedItem)
                          .def("GetSelectedIndex", &CUIListBox::GetSelectedIDX)
 
+                        .def("SetItemHeight", &CUIListBox::SetItemHeight)
+                        .def("GetItemHeight", &CUIListBox::GetItemHeight)
                          .def("GetItemByIndex", &CUIListBox::GetItemByIDX)
                          .def("GetItem", &CUIListBox::GetItem)
                          .def("RemoveItem", &CUIListBox::RemoveWindow)

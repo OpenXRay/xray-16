@@ -18,6 +18,11 @@ SCRIPT_EXPORT(CUILines, (), {
 SCRIPT_EXPORT(CUIStatic, (CUIWindow), {
     module(luaState)[class_<CUIStatic, CUIWindow>("CUIStatic")
                          .def(constructor<>())
+                         .def("SetTextureColor", &CUIStatic::SetTextureColor)
+                         .def("GetTextureColor", &CUIStatic::GetTextureColor)
+                         .def("AdjustHeightToText", &CUIStatic::AdjustHeightToText)
+                         .def("AdjustWidthToText", &CUIStatic::AdjustWidthToText)
+                         .def("GetStretchTexture", &CUIStatic::GetStretchTexture)
                          .def("TextControl", &CUIStatic::TextItemControl)
                          .def("InitTexture", &CUIStatic::InitTexture)
                          .def("SetTextureRect", &CUIStatic::SetTextureRect_script)

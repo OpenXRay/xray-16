@@ -38,7 +38,7 @@ bool CUIDialogWnd::IR_process()
     if (!IsEnabled())
         return false;
 
-    if (GetHolder()->IgnorePause())
+    if (GetHolder() && GetHolder()->IgnorePause())
         return true;
 
     if (Device.Paused() && !WorkInPause())
@@ -57,6 +57,6 @@ void CUIDialogWnd::ShowDialog(bool bDoHideIndicators)
 
 void CUIDialogWnd::HideDialog()
 {
-    if (IsShown())
+    if (IsShown() && GetHolder())
         GetHolder()->StopDialog(this);
 }

@@ -445,7 +445,7 @@ bool CShootingObject::SendHitAllowed(IGameObject* pUser)
 extern void random_dir(Fvector& tgt_dir, const Fvector& src_dir, float dispersion);
 
 void CShootingObject::FireBullet(const Fvector& pos, const Fvector& shot_dir, float fire_disp,
-    const CCartridge& cartridge, u16 parent_id, u16 weapon_id, bool send_hit)
+    const CCartridge& cartridge, u16 parent_id, u16 weapon_id, bool send_hit, int iShotNum)
 {
     Fvector dir;
     random_dir(dir, shot_dir, fire_disp);
@@ -505,8 +505,9 @@ void CShootingObject::FireBullet(const Fvector& pos, const Fvector& shot_dir, fl
 
     Level().BulletManager().AddBullet(pos, dir, m_fStartBulletSpeed * cur_silencer_koef.bullet_speed,
         l_fHitPower * cur_silencer_koef.hit_power, fHitImpulse * cur_silencer_koef.hit_impulse, parent_id, weapon_id,
-        ALife::eHitTypeFireWound, fireDistance, cartridge, m_air_resistance_factor, send_hit, aim_bullet);
+        ALife::eHitTypeFireWound, fireDistance, cartridge, m_air_resistance_factor, send_hit, aim_bullet, iShotNum);
 }
+
 void CShootingObject::FireStart() { bWorking = true; }
 void CShootingObject::FireEnd() { bWorking = false; }
 void CShootingObject::StartShotParticles()
