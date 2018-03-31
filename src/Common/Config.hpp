@@ -35,6 +35,9 @@
 #define NEW_SOUNDS // use new sounds. Please enclose any new sound additions with this define
 #define LAYERED_SND_SHOOT// see comment down below
 
+
+#define COC_DEBUG_BEHAVIOUR // Enables CoC debug behaviour when the game crashes
+
 /* LAYERED_SND_SHOOT by Alundaio
 When defined, it will allow you to play a group of sounds from a specified section for snd_shoot.
 You can have as many layers as you want, but you must follow naming convention,

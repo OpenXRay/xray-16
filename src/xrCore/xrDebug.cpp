@@ -344,6 +344,8 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
 #endif
     lock.Enter();
     ErrorAfterDialog = true;
+    bool needTerminate = false;
+
     string4096 assertionInfo;
     GatherInfo(assertionInfo, loc, expr, desc, arg1, arg2);
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
@@ -356,15 +358,19 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
 #endif
     if (OnCrash)
         OnCrash();
-    if (OnDialog)
-        OnDialog(true);
+    //if (OnDialog)
+    //    OnDialog(true);
     FlushLog();
+
+    while (ShowCursor(true) < 0);
+    ShowWindow(GetActiveWindow(), SW_FORCEMINIMIZE);
+
     if (Core.PluginMode)
         MessageBox(NULL, assertionInfo, "X-Ray error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
     else
     {
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
-        int result = MessageBox(NULL, assertionInfo, "Fatal error",
+        int result = MessageBox(GetTopWindow(NULL), assertionInfo, "Fatal error",
                                 MB_CANCELTRYCONTINUE | MB_ICONERROR | MB_SYSTEMMODAL);
         switch (result)
         {
@@ -373,6 +379,7 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
             BT_SetUserMessage(assertionInfo);
 #endif
             DEBUG_BREAK;
+            needTerminate = true;
             break;
         case IDTRYAGAIN: ErrorAfterDialog = false;
             break;
@@ -389,8 +396,11 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
         DEBUG_BREAK;
 #endif
     }
-    if (OnDialog)
-        OnDialog(false);
+    //if (OnDialog)
+    //    OnDialog(false);
+    if (needTerminate)
+        TerminateProcess(GetCurrentProcess(), 1);
+
     lock.Leave();
 }
 
