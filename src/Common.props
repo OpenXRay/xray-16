@@ -39,12 +39,12 @@
   </PropertyGroup>
 
   <PropertyGroup Label="UserMacros">
-    <xrBinRootDir>$(SolutionDir)..\bin\</xrBinRootDir>
-    <xrLibRootDir>$(SolutionDir)..\lib\</xrLibRootDir>
-    <xrBinDir>$(SolutionDir)..\bin\$(xrPlatform)\$(Configuration)\</xrBinDir>
-    <xrPlugBinDir>$(SolutionDir)..\bin\$(xrPlatform)\$(Configuration)\plugins\</xrPlugBinDir>
-    <xrLibDir>$(SolutionDir)..\lib\$(xrPlatform)\$(Configuration)\</xrLibDir>
-    <xrIntDir>$(SolutionDir)..\intermediate\$(xrPlatform)\$(Configuration)\</xrIntDir>
+    <xrBinRootDir>$(SolutionDir)..\_build\bin\</xrBinRootDir>
+    <xrLibRootDir>$(SolutionDir)..\_build\lib\</xrLibRootDir>
+    <xrBinDir>$(SolutionDir)..\_build\bin\$(xrPlatform)\$(Configuration)\</xrBinDir>
+    <xrPlugBinDir>$(SolutionDir)..\_build\bin\$(xrPlatform)\$(Configuration)\plugins\</xrPlugBinDir>
+    <xrLibDir>$(SolutionDir)..\_build\lib\$(xrPlatform)\$(Configuration)\</xrLibDir>
+    <xrIntDir>$(SolutionDir)..\_build\intermediate\$(xrPlatform)\$(Configuration)\</xrIntDir>
     <xrSdkDir>$(SolutionDir)..\sdk\</xrSdkDir>
     <xrExternals>$(SolutionDir)..\Externals\</xrExternals>
   </PropertyGroup>
