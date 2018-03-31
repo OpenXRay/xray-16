@@ -55,6 +55,9 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     m_move_window = move_window;
     CreateD3D();
 
+    if (strstr(Core.Params, "-wnd_mode"))
+        psDeviceFlags.set(rsFullscreen, false);
+
     bool bWindowed = !psDeviceFlags.is(rsFullscreen);
 
 #ifndef _EDITOR
@@ -260,6 +263,9 @@ void CHW::Reset(HWND hwnd)
 
 #ifndef _EDITOR
     bool bWindowed = true;
+    if (strstr(Core.Params, "-wnd_mode"))
+        psDeviceFlags.set(rsFullscreen, false);
+
     if (!GEnv.isDedicatedServer)
         bWindowed = !psDeviceFlags.is(rsFullscreen);
 
@@ -482,6 +488,9 @@ BOOL CHW::support(D3DFORMAT fmt, DWORD type, DWORD usage)
 
 void CHW::updateWindowProps(HWND m_hWnd)
 {
+    if (strstr(Core.Params, "-wnd_mode"))
+        psDeviceFlags.set(rsFullscreen, false);
+
     bool bWindowed = !psDeviceFlags.is(rsFullscreen);
 
 #ifndef _EDITOR

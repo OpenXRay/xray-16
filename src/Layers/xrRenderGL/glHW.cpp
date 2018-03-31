@@ -175,6 +175,9 @@ void CHW::DestroyDevice()
 //////////////////////////////////////////////////////////////////////
 void CHW::Reset(HWND hwnd)
 {
+    if (strstr(Core.Params, "-wnd_mode"))
+        psDeviceFlags.set(rsFullscreen, false);
+
     BOOL bWindowed = !psDeviceFlags.is(rsFullscreen);
 
     CHK_GL(glDeleteProgramPipelines(1, &pPP));
@@ -192,6 +195,9 @@ void CHW::Reset(HWND hwnd)
 
 void CHW::updateWindowProps(HWND m_hWnd)
 {
+    if (strstr(Core.Params, "-wnd_mode"))
+        psDeviceFlags.set(rsFullscreen, false);
+
     const bool bWindowed = !psDeviceFlags.is(rsFullscreen);
 
     u32 dwWindowStyle = 0;

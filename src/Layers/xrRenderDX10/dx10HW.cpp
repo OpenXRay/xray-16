@@ -76,6 +76,9 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     m_move_window = move_window;
     CreateD3D();
 
+    if (strstr(Core.Params, "-wnd_mode"))
+        psDeviceFlags.set(rsFullscreen, false);
+
     bool bWindowed = !psDeviceFlags.is(rsFullscreen);
 
     m_DriverType = Caps.bForceGPU_REF ? D3D_DRIVER_TYPE_REFERENCE : D3D_DRIVER_TYPE_HARDWARE;
@@ -239,6 +242,10 @@ void CHW::DestroyDevice()
 void CHW::Reset(HWND hwnd)
 {
     DXGI_SWAP_CHAIN_DESC& cd = m_ChainDesc;
+
+    if (strstr(Core.Params, "-wnd_mode"))
+        psDeviceFlags.set(rsFullscreen, false);
+
     BOOL bWindowed = !psDeviceFlags.is(rsFullscreen);
     cd.Windowed = bWindowed;
     m_pSwapChain->SetFullscreenState(!bWindowed, NULL);
@@ -354,6 +361,9 @@ BOOL CHW::support(D3DFORMAT fmt, DWORD type, DWORD usage)
 
 void CHW::updateWindowProps(HWND m_hWnd)
 {
+    if (strstr(Core.Params, "-wnd_mode"))
+        psDeviceFlags.set(rsFullscreen, false);
+
     bool bWindowed = !psDeviceFlags.is(rsFullscreen);
 
     u32 dwWindowStyle = 0;
