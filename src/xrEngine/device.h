@@ -225,6 +225,7 @@ public:
 
 private:
     static void SecondaryThreadProc(void* context);
+    static void RenderThreadProc(void* context);
 
 public:
     // Scene control
@@ -266,7 +267,8 @@ public:
     }
 
 private:
-    Event syncProcessFrame, syncFrameDone, syncThreadExit;
+    Event syncProcessFrame, syncFrameDone, syncThreadExit; // Secondary thread events
+    Event renderProcessFrame, renderFrameDone, renderThreadExit; // Render thread events
 
 public:
     volatile BOOL mt_bMustExit;

@@ -113,6 +113,23 @@ void CRenderDevice::End(void)
         m_editor->on_load_finished();
 }
 
+void CRenderDevice::RenderThreadProc(void* context)
+{
+    auto& device = *static_cast<CRenderDevice*>(context);
+    while (true)
+    {
+        device.renderProcessFrame.Wait();
+        if (device.mt_bMustExit)
+        {
+            device.renderThreadExit.Set();
+            return;
+        }
+
+        device.seqRender.Process(rp_Render);
+        device.renderFrameDone.Set();
+    }
+}
+
 void CRenderDevice::SecondaryThreadProc(void* context)
 {
     auto& device = *static_cast<CRenderDevice*>(context);
@@ -251,7 +268,8 @@ void CRenderDevice::on_idle()
         renderTotalReal.Begin();
         if (b_is_Active && Begin())
         {
-            seqRender.Process(rp_Render);
+            renderProcessFrame.Set(); // allow render thread to do its job
+            renderFrameDone.Wait(); // wait until render thread finish its job
             CalcFrameStats();
             Statistic->Show();
             End(); // Present goes here
@@ -324,6 +342,7 @@ void CRenderDevice::Run()
     // Start all threads
     mt_bMustExit = FALSE;
     thread_spawn(SecondaryThreadProc, "X-RAY Secondary thread", 0, this);
+    thread_spawn(RenderThreadProc, "X-RAY Render thread", 0, this);
     // Message cycle
     seqAppStart.Process(rp_AppStart);
     GEnv.Render->ClearTarget();
@@ -333,8 +352,11 @@ void CRenderDevice::Run()
     seqAppEnd.Process(rp_AppEnd);
     // Stop Balance-Thread
     mt_bMustExit = TRUE;
+    renderProcessFrame.Set();
+    renderThreadExit.Wait();
     syncProcessFrame.Set();
     syncThreadExit.Wait();
+
     while (mt_bMustExit)
         Sleep(0);
 }
