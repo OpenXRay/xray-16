@@ -112,7 +112,7 @@ void CEnvironment::RenderSky()
     clouds_geom.create (v_clouds_fvf,RCache.Vertex.Buffer(), RCache.Index.Buffer());
     bNeed_re_create_env = FALSE;
     }
-    GlobalEnv.Render->rmFar ();
+    GEnv.Render->rmFar ();
 
     // draw sky box
     Fmatrix mSky;
@@ -141,7 +141,7 @@ void CEnvironment::RenderSky()
     RCache.Render (D3DPT_TRIANGLELIST,v_offset,0,12,i_offset,20);
 
     // Sun
-    GlobalEnv.Render->rmNormal ();
+    GEnv.Render->rmNormal ();
     eff_LensFlare->Render (TRUE,FALSE,FALSE);
     */
 }
@@ -159,7 +159,7 @@ void CEnvironment::RenderClouds()
     m_pRender->RenderClouds(*this);
     /*
 
-    GlobalEnv.Render->rmFar ();
+    GEnv.Render->rmFar ();
 
     Fmatrix mXFORM, mScale;
     mScale.scale (10,0.4f,10);
@@ -195,7 +195,7 @@ void CEnvironment::RenderClouds()
     RCache.set_Textures (&CurrentEnv->clouds_r_textures);
     RCache.Render (D3DPT_TRIANGLELIST,v_offset,0,CloudsVerts.size(),i_offset,CloudsIndices.size()/3);
 
-    GlobalEnv.Render->rmNormal ();
+    GEnv.Render->rmNormal ();
     */
 }
 

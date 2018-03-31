@@ -120,7 +120,7 @@
       <AdditionalDependencies>PowrProf.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>for /r "$(xrSdkDir)binaries/$(PlatformShortName)" %%f in (*.dll *.pdb) do @xcopy /Q /D "%%f" "$(OutDir)"</Command>
+      <Command>for /r "$(xrSdkDir)binaries\$(PlatformShortName)\" %%f in (*.dll *.pdb) do copy /y "%%f" "$(OutDir)"</Command>
       <Message>Copying the required libraries ...</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -148,7 +148,7 @@
       <AdditionalDependencies>PowrProf.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>for /r "$(xrSdkDir)binaries/$(PlatformShortName)" %%f in (*.dll *.pdb) do @xcopy /Q /D "%%f" "$(OutDir)"</Command>
+      <Command>for /r "$(xrSdkDir)binaries\$(PlatformShortName)\" %%f in (*.dll *.pdb) do copy /y "%%f" "$(OutDir)"</Command>
       <Message>Copying the required libraries ...</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -176,7 +176,7 @@
       <AdditionalDependencies>PowrProf.lib;DbgHelp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>for /r "$(xrSdkDir)binaries/$(PlatformShortName)" %%f in (*.dll *.pdb) do @xcopy /Q /D "%%f" "$(OutDir)"</Command>
+      <Command>for /r "$(xrSdkDir)binaries\$(PlatformShortName)\" %%f in (*.dll *.pdb) do copy /y "%%f" "$(OutDir)"</Command>
       <Message>Copying the required libraries ...</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>

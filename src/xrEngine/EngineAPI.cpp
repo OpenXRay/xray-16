@@ -135,7 +135,7 @@ void CEngineAPI::InitializeRenderers()
         SetupCurrentRenderer();
     }
 
-    // ask current renderer to setup GlobalEnv
+    // ask current renderer to setup GEnv
     R_ASSERT2(GEnv.SetupCurrentRenderer, "Can't setup renderer");
     GEnv.SetupCurrentRenderer();
 

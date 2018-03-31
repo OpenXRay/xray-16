@@ -412,7 +412,7 @@ void CEntityAlive::PlaceBloodWallmark(const Fvector& dir, const Fvector& start_p
             VERIFY(!pwallmarks_vector->empty());
             {
                 //добавить отметку на материале
-                // GlobalEnv.Render->add_StaticWallmark(wallmarkShader, end_point, wallmark_size, pTri, pVerts);
+                // GEnv.Render->add_StaticWallmark(wallmarkShader, end_point, wallmark_size, pTri, pVerts);
                 GEnv.Render->add_StaticWallmark(pwallmarks_vector, end_point, wallmark_size, pTri, pVerts);
             }
         }

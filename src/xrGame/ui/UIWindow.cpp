@@ -46,7 +46,7 @@ void draw_rect(Frect& r, u32 color)
 
     GEnv.DRender->SetDebugShader(IDebugRender::dbgShaderWindow);
 
-    //.	GlobalEnv.UIRender->StartLineStrip	(5);
+    //.	GEnv.UIRender->StartLineStrip	(5);
     GEnv.UIRender->StartPrimitive(5, IUIRender::ptLineStrip, UI().m_currentPointType);
 
     GEnv.UIRender->PushPoint(r.lt.x, r.lt.y, 0, color, 0, 0);
@@ -55,7 +55,7 @@ void draw_rect(Frect& r, u32 color)
     GEnv.UIRender->PushPoint(r.lt.x, r.rb.y, 0, color, 0, 0);
     GEnv.UIRender->PushPoint(r.lt.x, r.lt.y, 0, color, 0, 0);
 
-    //.	GlobalEnv.UIRender->FlushLineStrip();
+    //.	GEnv.UIRender->FlushLineStrip();
     GEnv.UIRender->FlushPrimitive();
 
 #endif // DEBUG

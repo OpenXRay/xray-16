@@ -46,7 +46,7 @@ CEffect_Rain::CEffect_Rain()
     /*
     IReader* F = FS.r_open("$game_meshes$","dm\\rain.dm");
     VERIFY3 (F,"Can't open file.","dm\\rain.dm");
-    DM_Drop = GlobalEnv.Render->model_CreateDM (F);
+    DM_Drop = GEnv.Render->model_CreateDM (F);
 
     //
     SH_Rain.create ("effects\\rain","fx\\fx_rain");
@@ -64,7 +64,7 @@ CEffect_Rain::~CEffect_Rain()
     // Cleanup
     p_destroy();
     // Moved to p_Render destructor
-    // GlobalEnv.Render->model_Delete (DM_Drop);
+    // GEnv.Render->model_Delete (DM_Drop);
 }
 
 // Born
@@ -291,7 +291,7 @@ void CEffect_Rain::Render()
     sC.mul (.5f);
     sR = sC.magnitude();
     sC.add (pos_trail);
-    if (!GlobalEnv.Render->ViewBase.testSphere_dirty(sC,sR)) continue;
+    if (!GEnv.Render->ViewBase.testSphere_dirty(sC,sR)) continue;
 
     static Fvector2 UV[2][4]={
     {{0,1},{0,0},{1,1},{1,0}},
@@ -353,7 +353,7 @@ void CEffect_Rain::Render()
     }
 
     // Render
-    if (GlobalEnv.Render->ViewBase.testSphere_dirty(P->bounds.P, P->bounds.R))
+    if (GEnv.Render->ViewBase.testSphere_dirty(P->bounds.P, P->bounds.R))
     {
     // Build matrix
     float scale = P->time / particles_time;

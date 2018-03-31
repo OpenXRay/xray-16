@@ -192,7 +192,7 @@ void xrSASH::ReportNative(LPCSTR pszTestName)
     }
 
     // res.w_float ("general","test float", float(1.0f)/10.f, "dx-level required" );
-    // res.w_float ("general","renderer", float(GlobalEnv.Render->get_generation())/10.f, "dx-level required" );
+    // res.w_float ("general","renderer", float(GEnv.Render->get_generation())/10.f, "dx-level required" );
     // res.w_float ("general","average", rfps_average, "average for this run" );
     // res.w_float ("general","middle", rfps_middlepoint, "per-frame middle-point");
     float fTotal = 0;

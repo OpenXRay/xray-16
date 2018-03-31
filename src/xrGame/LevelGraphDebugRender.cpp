@@ -379,8 +379,8 @@ void LevelGraphDebugRender::DrawGameGraph()
 	xform.transform_tiny(vertices[2], {center.x-bounds.x, center.y-bounds.y, center.z-bounds.z});
 	xform.transform_tiny(vertices[3], {center.x+bounds.x, center.y-bounds.y, center.z-bounds.z});
     u32 backColor = color_xrgb(0, 0, 0);
-    GlobalEnv.DRender->dbg_DrawTRI(Fidentity, vertices[0], vertices[2], vertices[1], backColor);
-    GlobalEnv.DRender->dbg_DrawTRI(Fidentity, vertices[1], vertices[2], vertices[3], backColor);
+    GEnv.DRender->dbg_DrawTRI(Fidentity, vertices[0], vertices[2], vertices[1], backColor);
+    GEnv.DRender->dbg_DrawTRI(Fidentity, vertices[1], vertices[2], vertices[3], backColor);
 #endif
     // draw vertices
     UpdateCurrentInfo();

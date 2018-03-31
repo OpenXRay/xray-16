@@ -39,7 +39,7 @@ void CWalmarkManager::AddWallmark(const Fvector& dir, const Fvector& start_pos, 
         if (pWallmarkShader)
         {
             //добавить отметку на материале
-            GlobalEnv.Render->add_StaticWallmark(*pWallmarkShader, end_point, wallmark_size, pTri, pVerts);
+            GEnv.Render->add_StaticWallmark(*pWallmarkShader, end_point, wallmark_size, pTri, pVerts);
         }
         */
     }

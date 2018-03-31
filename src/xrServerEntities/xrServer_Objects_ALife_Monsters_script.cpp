@@ -15,6 +15,8 @@
 using namespace luabind;
 
 pcstr profile_name_script(CSE_ALifeTraderAbstract* ta) { return *ta->character_profile(); }
+
+#ifdef XRGAME_EXPORTS
 void profile_name_set_script(CSE_ALifeTraderAbstract* ta, const pcstr str) { ta->set_character_profile(str); }
 pcstr character_name_script(CSE_ALifeTraderAbstract* ta) { return ta->m_character_name.c_str(); }
 void set_character_name_script(CSE_ALifeTraderAbstract* ta, const pcstr str) { ta->m_character_name = str; }
@@ -30,6 +32,7 @@ pcstr icon_name_script(CSE_ALifeTraderAbstract* ta)
 	}
 	return *ta->m_icon_name;
 }
+#endif
 
 #ifdef XRGAME_EXPORTS
 SCRIPT_EXPORT(CSE_ALifeTraderAbstract, (),

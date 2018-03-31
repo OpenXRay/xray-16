@@ -20,7 +20,7 @@ SThunderboltDesc::SThunderboltDesc() : m_GradientTop(0), m_GradientCenter(0) {}
 SThunderboltDesc::~SThunderboltDesc()
 {
     m_pRender->DestroyModel();
-    // GlobalEnv.Render->model_Delete (l_model);
+    // GEnv.Render->model_Delete (l_model);
     m_GradientTop->m_pFlare->DestroyShader();
     m_GradientCenter->m_pFlare->DestroyShader();
     // m_GradientTop.hShader.destroy ();
@@ -68,7 +68,7 @@ void SThunderboltDesc::load(CInifile& pIni, shared_str const& sect)
     /*
     IReader* F = 0;
     F = FS.r_open("$game_meshes$",m_name); R_ASSERT2(F,"Empty 'lightning_model'.");
-    l_model = GlobalEnv.Render->model_CreateDM(F);
+    l_model = GEnv.Render->model_CreateDM(F);
     FS.r_close (F);
     */
 
