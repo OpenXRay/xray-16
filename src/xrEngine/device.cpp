@@ -26,6 +26,7 @@
 #include "IGame_Persistent.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 #include "xr_input.h"
+#include "splash.h"
 
 ENGINE_API CRenderDevice Device;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;
@@ -322,11 +323,12 @@ void CRenderDevice::Run()
     }
     // Start all threads
     mt_bMustExit = FALSE;
-    ShowWindow(m_hWnd, SW_SHOWNORMAL);
     thread_spawn(SecondaryThreadProc, "X-RAY Secondary thread", 0, this);
     // Message cycle
     seqAppStart.Process(rp_AppStart);
     GEnv.Render->ClearTarget();
+    splash::hide();
+    ShowWindow(m_hWnd, SW_SHOWNORMAL);
     message_loop();
     seqAppEnd.Process(rp_AppEnd);
     // Stop Balance-Thread

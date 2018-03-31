@@ -18,7 +18,6 @@
 #include "Text_Console.h"
 #include "xrSASH.h"
 #include "xr_ioc_cmd.h"
-#include "splash.h"
 
 #ifdef MASTER_GOLD
 #define NO_MULTI_INSTANCES
@@ -183,7 +182,6 @@ ENGINE_API void Startup()
     g_SpatialSpacePhysic = new ISpatial_DB("Spatial phys");
 
     // Main cycle
-    splash::hide();
     Device.Run();
     // Destroy APP
     xr_delete(g_SpatialSpacePhysic);
