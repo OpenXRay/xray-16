@@ -32,6 +32,15 @@ public:
     virtual void set_color(float r, float g, float b) {}
 };
 
+bool CRender::is_sun()
+{
+    if (o.sunstatic)
+        return FALSE;
+
+    Fcolor sun_color = ((light*)Lights.sun_adapted._get())->color;
+    return (ps_r2_ls_flags.test(R2FLAG_SUN) && (u_diffuse2s(sun_color.r, sun_color.g, sun_color.b)>EPS));
+}
+
 float r_dtex_range = 50.f;
 //////////////////////////////////////////////////////////////////////////
 ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq)
@@ -117,7 +126,7 @@ void CRender::create()
     m_skinning = -1;
 
     // hardware
-    o.smapsize = 2048;
+    o.smapsize = 1024;
     o.mrt = (HW.Caps.raster.dwMRT_count >= 3);
     o.mrtmixdepth = (HW.Caps.raster.b_MRT_mixdepth);
 
@@ -253,6 +262,12 @@ void CRender::create()
         Msg("* NV-DBT supported and used");
 
     // options (smap-pool-size)
+    if (strstr(Core.Params, "-smap256"))
+        o.smapsize = 256;
+    if (strstr(Core.Params, "-smap512"))
+        o.smapsize = 512;
+    if (strstr(Core.Params, "-smap1024"))
+        o.smapsize = 1024;
     if (strstr(Core.Params, "-smap1536"))
         o.smapsize = 1536;
     if (strstr(Core.Params, "-smap2048"))

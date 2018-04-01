@@ -173,7 +173,7 @@ void CLevel::net_Stop()
 
 void CLevel::ClientSend()
 {
-    if (GameID() == eGameIDSingle || OnClient())
+    if (GameID() != eGameIDSingle || OnClient())
     {
         if (!net_HasBandwidth())
             return;

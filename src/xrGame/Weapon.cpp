@@ -1823,7 +1823,7 @@ void CWeapon::debug_draw_firedeps()
 const float& CWeapon::hit_probability() const
 {
     VERIFY((g_SingleGameDifficulty >= egdNovice) && (g_SingleGameDifficulty <= egdMaster));
-    return (m_hit_probability[egdNovice]);
+    return (m_hit_probability[g_SingleGameDifficulty]);
 }
 
 void CWeapon::OnStateSwitch(u32 S, u32 oldState)

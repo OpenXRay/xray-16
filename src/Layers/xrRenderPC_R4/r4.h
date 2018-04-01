@@ -371,6 +371,8 @@ public:
     CRender();
     virtual ~CRender();
 
+    bool is_sun();
+
     void addShaderOption(const char* name, const char* value);
     void clearAllShaderOptions() { m_ShaderOptions.clear(); }
 private:

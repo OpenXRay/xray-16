@@ -2,23 +2,30 @@
 #include "UIGameCustom.h"
 #include "Level.h"
 #include "ui/uistatic.h"
+#include "UIDialogHolder.h"
+#include "ui/UIDialogWnd.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 
 using namespace luabind;
 
 CUIGameCustom* get_hud() { return CurrentGameUI(); }
 SCRIPT_EXPORT(CUIGameCustom, (), {
-    module(luaState)[class_<StaticDrawableWrapper>("StaticDrawableWrapper")
-                         .def_readwrite("m_endTime", &StaticDrawableWrapper::m_endTime)
-                         .def("wnd", &StaticDrawableWrapper::wnd),
+    module(luaState)
+    [
+        class_<StaticDrawableWrapper>("StaticDrawableWrapper")
+            .def_readwrite("m_endTime", &StaticDrawableWrapper::m_endTime)
+            .def("wnd", &StaticDrawableWrapper::wnd),
 
         class_<CUIGameCustom>("CUIGameCustom")
+            .def("TopInputReceiver", &CUIGameCustom::TopInputReceiver)
+            .def("SetMainInputReceiver", &CUIGameCustom::SetMainInputReceiver)
             .def("AddDialogToRender", &CUIGameCustom::AddDialogToRender)
             .def("RemoveDialogToRender", &CUIGameCustom::RemoveDialogToRender)
             .def("AddCustomStatic", &CUIGameCustom::AddCustomStatic)
             .def("RemoveCustomStatic", &CUIGameCustom::RemoveCustomStatic)
             .def("HideActorMenu", &CUIGameCustom::HideActorMenu)
              //Alundaio
+			 .def("ShowActorMenu", &CUIGameCustom::ShowActorMenu)
             .def("UpdateActorMenu", &CUIGameCustom::UpdateActorMenu)
             .def("CurrentItemAtCell", &CUIGameCustom::CurrentItemAtCell)
             //-Alundaio

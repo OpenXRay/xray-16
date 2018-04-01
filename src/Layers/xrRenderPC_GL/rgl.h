@@ -382,6 +382,8 @@ public:
     CRender();
     virtual ~CRender();
 
+    bool is_sun();
+
     void addShaderOption(pcstr name, pcstr value);
     void clearAllShaderOptions() { m_ShaderOptions.clear(); }
 

@@ -229,8 +229,9 @@ void CDetailManager::hw_Render_dump(
                     RCache.stat.r.s_details.add(dwCNT_verts);
                 }
             }
-            // Clean up
-            vis.clear();
+            // Grass Shadows when r2_sun_detail on and ps_grass_shadow on
+            if (ps_grass_shadow == 0 || !ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS) || ((RImplementation.PHASE_SMAP == RImplementation.phase) || (RImplementation.PHASE_NORMAL == RImplementation.phase) && (!RImplementation.is_sun())))
+                vis.clear();
         }
         vOffset += hw_BatchSize * Object.number_vertices;
         iOffset += hw_BatchSize * Object.number_indices;

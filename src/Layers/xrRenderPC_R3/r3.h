@@ -365,6 +365,8 @@ public:
     CRender();
     virtual ~CRender();
 
+    bool is_sun();
+
 protected:
     virtual void ScreenshotImpl(ScreenshotMode mode, LPCSTR name, CMemoryWriter* memory_writer);
 

@@ -5,6 +5,8 @@
 // CONFIG_SCRIPT_ENGINE_LOG_EXPORTS
 // CONFIG_SCRIPT_ENGINE_LOG_SKIPPED_EXPORTS
 
+#define COC_EDITION
+
 /* Callbacks */
 #define EXTENDED_ITEM_CALLBACKS // (eItemToBelt, eItemToSlot, eItemToRuck)
 #define EXTENDED_WEAPON_CALLBACKS // (eOnWeaponZoomIn, eOnWeaponZoomOut, eOnWeaponJammed)
@@ -21,6 +23,7 @@
 
 /* Visual */
 #define DETAIL_RADIUS // detail draw radius (by K.D.)
+#define GRASS_SHADOWS // enable grass shadows (by K.D.)
 #define ECO_RENDER // limit FPS in menu to prevent video card overheat (by alpet)
 #define TREE_WIND_EFFECT // configurable tree sway, can be used to have trees sway more during storms or lightly on clear days.
 
@@ -29,16 +32,22 @@
 #define DEAD_BODY_COLLISION // restore collision with dead bodies (thanks malandrinus)
 #define NEW_ANIMS // use new animations. Please enclose any new animation additions with this define
 //#define CONFIG_SUN_MOVEMENT // With this defined sun will move as configured in weather ltx files
-#define CALLOFCHERNOBYL_RANKING // Enables Call of Chernobyl ranking system instead of original Call of Pripyat system
-#define COC_USER_SPOT // Enable user spot on the map from CoC
-#define COC_MAP_SPOT_PROPS_BOX
+#ifdef COC_EDITION
+#   define CALLOFCHERNOBYL_RANKING // Enables Call of Chernobyl ranking system instead of original Call of Pripyat system
+#   define COC_USER_SPOT // Enable user spot on the map from CoC
+#   define COC_MAP_SPOT_PROPS_BOX
+#   define COC_ENABLE_AUTOSAVE // Enable autosave manager
+//#   define COC_DISABLE_ANOMALY_AND_ITEMS_PLANNER // need editing xr_* scripts!
+//#   define COC_SPRINT_FIX
+#endif
 
 /* Sound: */
 #define NEW_SOUNDS // use new sounds. Please enclose any new sound additions with this define
 #define LAYERED_SND_SHOOT// see comment down below
 
-
-#define COC_DEBUG_BEHAVIOUR // Enables CoC debug behaviour when the game crashes
+#ifdef COC_EDITION
+#   define COC_DEBUG_BEHAVIOUR // Enables CoC debug behaviour when the game crashes
+#endif
 
 /* LAYERED_SND_SHOOT by Alundaio
 When defined, it will allow you to play a group of sounds from a specified section for snd_shoot.

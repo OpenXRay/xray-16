@@ -113,6 +113,7 @@ Flags32 ps_r2_ls_flags_ext = {
 
 BOOL ps_clear_models_on_unload	= 0; //Alundaio
 BOOL ps_use_precompiled_shaders = 0; //Alundaio
+BOOL ps_grass_shadow = 0; //Alundaio
 
 float ps_r2_df_parallax_h = 0.02f;
 float ps_r2_df_parallax_range = 75.f;
@@ -884,6 +885,7 @@ void xrRender_initconsole()
 
     CMD4(CCC_Integer, "r__clear_models_on_unload", &ps_clear_models_on_unload, 0, 1); //Alundaio
     CMD4(CCC_Integer, "r__use_precompiled_shaders", &ps_use_precompiled_shaders, 0, 1); //Alundaio
+    CMD4(CCC_Integer, "r__enable_grass_shadow", &ps_grass_shadow, 0, 1); //Alundaio
 
 //  Allow real-time fog config reload
 #if (RENDER == R_R3) || (RENDER == R_R4)

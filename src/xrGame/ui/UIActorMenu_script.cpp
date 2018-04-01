@@ -24,6 +24,8 @@
 
 #include "UIPdaWnd.h"
 #include "UITabControl.h"
+#include "UIActorMenu.h"
+#include "InventoryBox.h"
 
 using namespace luabind;
 
@@ -41,6 +43,44 @@ u8 GrabMenuMode()
 {
     return (u8)CurrentGameUI()->GetActorMenu().GetMenuMode();
 }
+
+void ActorMenuSetPartner_script(CUIActorMenu* menu, CScriptGameObject* GO)
+{
+    CInventoryOwner* io = GO->object().cast_inventory_owner();
+    if (io)
+        menu->SetPartner(io);
+}
+
+void ActorMenuSetInvbox_script(CUIActorMenu* menu, CScriptGameObject* GO)
+{
+    CInventoryBox* inv_box = smart_cast<CInventoryBox*>(&GO->object());
+    if (inv_box)
+        menu->SetInvBox(inv_box);
+}
+
+void ActorMenuSetActor_script(CUIActorMenu* menu, CScriptGameObject* GO)
+{
+    menu->SetActor(Actor()->cast_inventory_owner());
+}
+
+CScriptGameObject* ActorMenuGetPartner_script(CUIActorMenu* menu)
+{
+    CInventoryOwner* io = menu->GetPartner();
+    if (io)
+        return io->cast_game_object()->lua_game_object();
+
+    return (0);
+}
+
+CScriptGameObject* ActorMenuGetInvbox_script(CUIActorMenu* menu)
+{
+    CInventoryBox* inv_box = menu->GetInvBox();
+    if (inv_box)
+        return inv_box->cast_game_object()->lua_game_object();
+
+    return (0);
+}
+
 
 void CUIActorMenu::TryRepairItem(CUIWindow* w, void* d)
 {
@@ -271,7 +311,14 @@ SCRIPT_EXPORT(CUIActorMenu, (),
             .def("ShowDialog", &CUIActorMenu::ShowDialog)
             .def("HideDialog", &CUIActorMenu::HideDialog)
             .def("ToSlot", &CUIActorMenu::ToSlotScript)
-            .def("ToBelt", &CUIActorMenu::ToBeltScript),
+            .def("ToBelt", &CUIActorMenu::ToBeltScript)
+            .def("SetMenuMode", &CUIActorMenu::SetMenuMode)
+            .def("GetMenuMode", &CUIActorMenu::GetMenuMode)
+            .def("GetPartner", &ActorMenuGetPartner_script)
+            .def("GetInvBox", &ActorMenuGetInvbox_script)
+            .def("SetPartner", &ActorMenuSetPartner_script)
+            .def("SetInvBox", &ActorMenuSetInvbox_script)
+            .def("SetActor", &ActorMenuSetActor_script),
 
         class_< CUIPdaWnd, CUIDialogWnd>("CUIPdaWnd")
             .def(constructor<>())

@@ -334,8 +334,11 @@ void CDetailManager::hw_Render_dump(ref_constant x_array, u32 var_id, u32 lod_id
                 RCache.Render(D3DPT_TRIANGLELIST, vOffset, 0, dwCNT_verts, iOffset, dwCNT_prims);
                 RCache.stat.r.s_details.add(dwCNT_verts);
             }
-            // Clean up
-            vis.clear();
+#if RENDER==R_R2
+            // Grass Shadows when r2_sun_detail on and ps_grass_shadow on
+            if (ps_grass_shadow == 0 || !ps_r2_ls_flags.test(R2FLAG_SUN_DETAILS) || ((RImplementation.PHASE_SMAP == RImplementation.phase) || (RImplementation.PHASE_NORMAL == RImplementation.phase) && (!RImplementation.is_sun())))
+#endif
+                vis.clear();
         }
         vOffset += hw_BatchSize * Object.number_vertices;
         iOffset += hw_BatchSize * Object.number_indices;

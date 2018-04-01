@@ -6,6 +6,7 @@
 //Alundaio
 extern ECORE_API BOOL ps_clear_models_on_unload;
 extern ECORE_API BOOL ps_use_precompiled_shaders;
+extern ECORE_API BOOL ps_grass_shadow;
 //-Alundaio
 
 extern ECORE_API u32 ps_r_sun_shafts; //=	0;
