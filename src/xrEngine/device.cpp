@@ -125,7 +125,23 @@ void CRenderDevice::RenderThreadProc(void* context)
             return;
         }
 
-        device.seqRender.Process(rp_Render);
+        if (!GEnv.isDedicatedServer)
+        {
+            // all rendering is done here
+            CStatTimer renderTotalReal;
+            renderTotalReal.FrameStart();
+            renderTotalReal.Begin();
+            if (device.b_is_Active && device.Begin())
+            {
+                device.seqRender.Process(rp_Render);
+                device.CalcFrameStats();
+                device.Statistic->Show();
+                device.End(); // Present goes here
+            }
+            renderTotalReal.End();
+            renderTotalReal.FrameEnd();
+            device.stats.RenderTotal.accum = renderTotalReal.accum;
+        }
         device.renderFrameDone.Set();
     }
 }
@@ -209,12 +225,11 @@ void CRenderDevice::on_idle()
         return;
     }
 
-    const auto FrameStartTime = TimerGlobal.GetElapsed_ms();
-
     if (psDeviceFlags.test(rsStatistic))
         g_bEnableStatGather = TRUE; // XXX: why not use either rsStatistic or g_bEnableStatGather?
     else
         g_bEnableStatGather = FALSE;
+
     if (g_loading_events.size())
     {
         if (g_loading_events.front()())
@@ -222,9 +237,14 @@ void CRenderDevice::on_idle()
         pApp->LoadDraw();
         return;
     }
+
+    const auto frameStartTime = TimerGlobal.GetElapsed_ms();
+
     if (!Device.dwPrecacheFrame && !g_SASH.IsBenchmarkRunning() && g_bLoaded)
         g_SASH.StartBenchmark();
+
     FrameMove();
+
     // Precache
     if (dwPrecacheFrame)
     {
@@ -244,51 +264,23 @@ void CRenderDevice::on_idle()
     mFullTransform_saved = mFullTransform;
     mView_saved = mView;
     mProject_saved = mProject;
+
+    renderProcessFrame.Set(); // allow render thread to do its job
     syncProcessFrame.Set(); // allow secondary thread to do its job
 
-#ifdef ECO_RENDER // ECO_RENDER START
-    static u32 time_frame = 0;
-    u32 time_curr = timeGetTime();
-    u32 time_diff = time_curr - time_frame;
-    time_frame = time_curr;
-    u32 optimal = 10;
-    if (Device.Paused() || IGame_Persistent::IsMainMenuActive())
-        optimal = 32;
-    if (time_diff < optimal)
-        Sleep(optimal - time_diff);
-#else
-    Sleep(0);
-#endif // ECO_RENDER END
+    const auto frameEndTime = TimerGlobal.GetElapsed_ms();
+    const auto frameTime = frameEndTime - frameStartTime;
 
-    if (!GEnv.isDedicatedServer)
-    {
-        // all rendering is done here
-        CStatTimer renderTotalReal;
-        renderTotalReal.FrameStart();
-        renderTotalReal.Begin();
-        if (b_is_Active && Begin())
-        {
-            renderProcessFrame.Set(); // allow render thread to do its job
-            renderFrameDone.Wait(); // wait until render thread finish its job
-            CalcFrameStats();
-            Statistic->Show();
-            End(); // Present goes here
-        }
-        renderTotalReal.End();
-        renderTotalReal.FrameEnd();
-        stats.RenderTotal.accum = renderTotalReal.accum;
-    }
+    // Eco render (by alpet)
+    u32 updateDelta = 10;
+    if (GEnv.isDedicatedServer)
+        updateDelta = 1000 / g_svDedicateServerUpdateReate;
+
+    if (frameTime < updateDelta)
+        Sleep(updateDelta - frameTime);
 
     syncFrameDone.Wait(); // wait until secondary thread finish its job
-
-    if (GEnv.isDedicatedServer)
-    {
-        const auto FrameEndTime = TimerGlobal.GetElapsed_ms();
-        const auto FrameTime = (FrameEndTime - FrameStartTime);
-        const auto DSUpdateDelta = 1000 / g_svDedicateServerUpdateReate;
-        if (FrameTime < DSUpdateDelta)
-            Sleep(DSUpdateDelta - FrameTime);
-    }
+    renderFrameDone.Wait(); // wait until render thread finish its job
 
     if (!b_is_Active)
         Sleep(1);
