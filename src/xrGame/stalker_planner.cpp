@@ -126,8 +126,10 @@ void CStalkerPlanner::add_evaluators()
     add_evaluator(eWorldPropertyEnemy, new CStalkerPropertyEvaluatorEnemies(m_object, "is_there_enemies",
                                            CStalkerCombatPlanner::POST_COMBAT_WAIT_INTERVAL));
     add_evaluator(eWorldPropertyDanger, new CStalkerPropertyEvaluatorDangers(m_object, "is_there_danger"));
+#ifndef COC_DISABLE_ANOMALY_AND_ITEMS_PLANNER
     add_evaluator(eWorldPropertyAnomaly, new CStalkerPropertyEvaluatorAnomaly(m_object, "is_there_anomalies"));
     add_evaluator(eWorldPropertyItems, new CStalkerPropertyEvaluatorItems(m_object, "is_there_items_to_pick_up"));
+#endif
 }
 
 void CStalkerPlanner::add_actions()
@@ -143,9 +145,13 @@ void CStalkerPlanner::add_actions()
     planner = new CStalkerALifePlanner(m_object, "alife_planner");
     add_condition(planner, eWorldPropertyAlive, true);
     add_condition(planner, eWorldPropertyEnemy, false);
+#ifndef COC_DISABLE_ANOMALY_AND_ITEMS_PLANNER
     add_condition(planner, eWorldPropertyAnomaly, false);
+#endif
     add_condition(planner, eWorldPropertyDanger, false);
+#ifndef COC_DISABLE_ANOMALY_AND_ITEMS_PLANNER
     add_condition(planner, eWorldPropertyItems, false);
+#endif
     add_condition(planner, eWorldPropertyPuzzleSolved, false);
     add_effect(planner, eWorldPropertyPuzzleSolved, true);
     add_operator(eWorldOperatorALifePlanner, planner);
@@ -153,7 +159,9 @@ void CStalkerPlanner::add_actions()
     planner = new CStalkerCombatPlanner(m_object, "combat_planner");
     //	planner					= new CStalkerCombatPlannerNew(m_object,"combat_planner_new");
     add_condition(planner, eWorldPropertyAlive, true);
+#ifndef COC_DISABLE_ANOMALY_AND_ITEMS_PLANNER
     add_condition(planner, eWorldPropertyAnomaly, false);
+#endif
     add_condition(planner, eWorldPropertyEnemy, true);
     add_effect(planner, eWorldPropertyEnemy, false);
     add_operator(eWorldOperatorCombatPlanner, planner);
@@ -161,11 +169,14 @@ void CStalkerPlanner::add_actions()
     planner = new CStalkerDangerPlanner(m_object, "danger_planner");
     add_condition(planner, eWorldPropertyAlive, true);
     add_condition(planner, eWorldPropertyEnemy, false);
+#ifndef COC_DISABLE_ANOMALY_AND_ITEMS_PLANNER
     add_condition(planner, eWorldPropertyAnomaly, false);
+#endif
     add_condition(planner, eWorldPropertyDanger, true);
     add_effect(planner, eWorldPropertyDanger, false);
     add_operator(eWorldOperatorDangerPlanner, planner);
 
+#ifndef COC_DISABLE_ANOMALY_AND_ITEMS_PLANNER
     planner = new CStalkerAnomalyPlanner(m_object, "anomaly_planner");
     add_condition(planner, eWorldPropertyAlive, true);
     add_condition(planner, eWorldPropertyAnomaly, true);
@@ -182,4 +193,5 @@ void CStalkerPlanner::add_actions()
     add_condition(action, eWorldPropertyItems, true);
     add_effect(action, eWorldPropertyItems, false);
     add_operator(eWorldOperatorGatherItems, action);
+#endif
 }

@@ -17,7 +17,7 @@ protected:
 
 public:
     CScriptIniFile(IReader* F, LPCSTR path = nullptr);
-    CScriptIniFile(LPCSTR szFileName, BOOL ReadOnly = TRUE, BOOL bLoadAtStart = TRUE, BOOL SaveAtEnd = TRUE);
+    CScriptIniFile(LPCSTR szFileName, BOOL ReadOnly = TRUE, BOOL bLoadAtStart = TRUE, BOOL SaveAtEnd = TRUE, LPCSTR path = NULL);
     virtual ~CScriptIniFile();
     bool line_exist(LPCSTR S, LPCSTR L);
     bool section_exist(LPCSTR S);

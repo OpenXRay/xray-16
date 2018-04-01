@@ -155,12 +155,12 @@ float CDangerManager::do_evaluate(const CDangerObject& object) const
     {
     case CDangerObject::eDangerTypeBulletRicochet:
     { // I perceived bullet(knife) ricochet
-        result += 3000.f;
+        result += 2500.f;
         break;
     }
     case CDangerObject::eDangerTypeAttackSound:
     { // someone is shooting
-        result += 2500.f;
+        result += 2300.f;
         break;
     }
     case CDangerObject::eDangerTypeEntityAttacked:
@@ -170,27 +170,27 @@ float CDangerManager::do_evaluate(const CDangerObject& object) const
     }
     case CDangerObject::eDangerTypeEntityDeath:
     { // someone becomes dead
-        result += 3000.f;
+        result += 2500.f;
         break;
     }
     case CDangerObject::eDangerTypeFreshEntityCorpse:
     { // I see a corpse
-        result += 2250.f;
+        result += 4000.f;
         break;
     }
     case CDangerObject::eDangerTypeAttacked:
     { // someone is attacked
-        result += 2000.f;
+        result += 1000.f;
         break;
     }
     case CDangerObject::eDangerTypeGrenade:
     { // grenade to explode nearby
-        result += 1000.f;
+        result += 500.f;
         break;
     }
     case CDangerObject::eDangerTypeEnemySound:
     { // grenade to explode nearby
-        result += 1000.f;
+        result += 1500.f;
         break;
     }
     default: NODEFAULT;

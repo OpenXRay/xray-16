@@ -560,6 +560,8 @@ void CActor::g_SetAnimation(u32 mstate_rl)
                 }
             }
         }
+        else
+            M_torso = ST->m_torso[4].moving[moving_idx]; //Alundaio: Fix torso animations for no weapon
     }
     MotionID mid = smart_cast<IKinematicsAnimated*>(Visual())->ID_Cycle("norm_idle_0");
 

@@ -77,5 +77,14 @@ MotionID CStalkerAnimationManager::assign_global_animation(bool& animation_movem
     if (fis_zero(object().movement().speed(object().character_physics_support()->movement())))
         return (MotionID());
 
+#ifdef COC_SPRINT_FIX
+    //Alun: Fix stalker sprint
+    EBodyState b_state = body_state();
+    if (eMovementTypeRun == object().movement().movement_type() && b_state == eBodyStateStand)
+        return (MotionID());
+
+    return global().select(m_data_storage->m_part_animations.A[b_state].m_global.A[1].A);
+#else
     return (global().select(m_data_storage->m_part_animations.A[body_state()].m_global.A[1].A));
+#endif
 }

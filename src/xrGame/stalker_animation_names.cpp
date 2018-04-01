@@ -28,11 +28,30 @@ LPCSTR weapon_action_names[] = {"draw_", // 0
     "unstrap_", // 12
     "look_beack_ls_", // 13
     "look_beack_rs_", // 14
+#ifdef COC_SPRINT_FIX
+    "escape_",			// 15 Alun sprint fix
+#endif
     0};
 
-LPCSTR movement_names[] = {"walk_", "run_", 0};
+LPCSTR movement_names[] = {
+    "walk_",
+    "run_",
+#ifdef COC_SPRINT_FIX
+    "escape_",			//2 Alun sprint fix
+#endif
+    0
+};
 
-LPCSTR movement_action_names[] = {"fwd_", "back_", "ls_", "rs_", 0};
+LPCSTR movement_action_names[] = {
+    "fwd_",
+    "back_",
+    "ls_",
+    "rs_",
+#ifdef COC_SPRINT_FIX
+    "0",				//4 Alun sprint fix
+#endif
+    0
+};
 
 LPCSTR in_place_names[] = {"idle_0", "idle_1", "turn_right_0", "turn_left_0", "turn_right_1", "turn_left_1",
     "jump_begin", "jump_idle", "jump_end", "jump_end_1", 0};

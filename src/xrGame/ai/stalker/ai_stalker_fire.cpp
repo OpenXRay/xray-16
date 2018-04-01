@@ -380,25 +380,25 @@ void CAI_Stalker::update_best_item_info_impl()
     luabind::functor<CScriptGameObject*> funct;
     if (GEnv.ScriptEngine->functor("ai_stalker.update_best_weapon", funct))
     {
-        CGameObject* cur_itm = smart_cast<CGameObject*>(m_best_item_to_kill);
-        CScriptGameObject* GO = funct(this->lua_game_object(), cur_itm ? cur_itm->lua_game_object() : nullptr);
-        CInventoryItem* bw = GO ? smart_cast<CInventoryItem*>(&GO->object()) : nullptr;
-        if (bw)
+        CScriptGameObject* GO = funct(this->lua_game_object(), m_best_item_to_kill ? m_best_item_to_kill->cast_game_object()->lua_game_object() : NULL);
+        if (GO)
         {
-            m_best_item_to_kill = bw;
-            m_best_ammo = bw;
-            return;
+            CInventoryItem* bw = GO->object().cast_inventory_item();
+            if (bw)
+            {
+                m_best_item_to_kill = bw;
+                m_best_ammo = bw;
+            }
         }
     }
 
     ai().ef_storage().alife_evaluation(false);
 
-    /* Alundaio: This is what causes stalkers to switch weapons during combat; It's stupid
     if (m_item_actuality && m_best_item_to_kill && m_best_item_to_kill->can_kill())
     {
-        if (!memory().enemy().selected())
+        //if (!memory().enemy().selected())
             return;
-
+        /*
         ai().ef_storage().non_alife().member() = this;
         ai().ef_storage().non_alife().enemy() = memory().enemy().selected() ? memory().enemy().selected() : this;
         ai().ef_storage().non_alife().member_item() = &m_best_item_to_kill->object();
@@ -406,7 +406,8 @@ void CAI_Stalker::update_best_item_info_impl()
         value = ai().ef_storage().m_pfWeaponEffectiveness->ffGetValue();
         if (fsimilar(value, m_best_item_value))
             return;
-    }*/
+        */
+    }
 
     // initialize parameters
     m_item_actuality = true;
@@ -720,8 +721,12 @@ void CAI_Stalker::update_can_kill_info()
 
 bool CAI_Stalker::undetected_anomaly()
 {
+#ifdef COC_DISABLE_ANOMALY_AND_ITEMS_PLANNER
+    return inside_anomaly();
+#else
     return (
         inside_anomaly() || brain().CStalkerPlanner::m_storage.property(StalkerDecisionSpace::eWorldPropertyAnomaly));
+#endif
 }
 
 bool CAI_Stalker::inside_anomaly()
@@ -731,7 +736,11 @@ bool CAI_Stalker::inside_anomaly()
     for (; I != E; ++I)
     {
         CCustomZone* zone = smart_cast<CCustomZone*>(*I);
+#ifdef COC_EDITION
+        if (zone)
+#else
         if (zone && (zone->restrictor_type() != RestrictionSpace::eRestrictorTypeNone))
+#endif
         {
             if (smart_cast<CRadioactiveZone*>(zone))
                 continue;

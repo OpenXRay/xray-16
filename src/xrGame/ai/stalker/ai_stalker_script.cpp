@@ -188,4 +188,12 @@ SCRIPT_EXPORT(CStalkerPlanner, (CScriptActionPlanner), {
 });
 
 SCRIPT_EXPORT(CAI_Stalker, (CGameObject),
-    { module(luaState)[class_<CAI_Stalker, CGameObject>("CAI_Stalker").def(constructor<>())]; });
+{
+    module(luaState)
+    [
+        class_<CAI_Stalker, CGameObject>("CAI_Stalker")
+            .def(constructor<>())
+            .def("inside_anomaly", &CAI_Stalker::inside_anomaly)
+            .def("GetWeaponAccuracy", &CAI_Stalker::GetWeaponAccuracy)
+    ];
+});
