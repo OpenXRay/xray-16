@@ -268,6 +268,7 @@ class_<CScriptGameObject>& script_register_game_object1(class_<CScriptGameObject
         .def("set_patrol_path", &CScriptGameObject::set_patrol_path)
         .def("inactualize_patrol_path", &CScriptGameObject::inactualize_patrol_path)
         .def("set_dest_level_vertex_id", &CScriptGameObject::set_dest_level_vertex_id)
+        .def("get_dest_level_vertex_id", &CScriptGameObject::get_dest_level_vertex_id)
         .def("set_dest_game_vertex_id", &CScriptGameObject::set_dest_game_vertex_id)
         .def("set_movement_selection_type", &CScriptGameObject::set_movement_selection_type)
         .def("level_vertex_id", &CScriptGameObject::level_vertex_id)

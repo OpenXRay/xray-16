@@ -12,6 +12,7 @@
 #define _DECLARE_FUNCTION11(A, D, F) D A(F f)
 #define _DECLARE_FUNCTION12(A, D, F, G) D A(F f, G g)
 #define _DECLARE_FUNCTION13(A, D, F, G, H) D A(F f, G g, H h)
+#define _DECLARE_FUNCTION14(A,D) D* A ()
 
 #define DECLARE_FUNCTION10(A, D) \
     _DECLARE_FUNCTION10(A, D)    \

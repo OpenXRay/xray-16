@@ -81,9 +81,15 @@ SCRIPT_EXPORT(CUIWindow, (), {
 });
 
 SCRIPT_EXPORT(CDialogHolder, (), {
-    module(luaState)[class_<CDialogHolder>("CDialogHolder")
-                         .def("AddDialogToRender", &CDialogHolder::AddDialogToRender)
-                         .def("RemoveDialogToRender", &CDialogHolder::RemoveDialogToRender)];
+    module(luaState)
+    [
+        class_<CDialogHolder>("CDialogHolder")
+            .def(constructor<>())
+            .def("TopInputReceiver", &CDialogHolder::TopInputReceiver)
+            .def("SetMainInputReceiver", &CDialogHolder::SetMainInputReceiver)
+            .def("AddDialogToRender", &CDialogHolder::AddDialogToRender)
+            .def("RemoveDialogToRender", &CDialogHolder::RemoveDialogToRender)
+    ];
 });
 
 SCRIPT_EXPORT(CUIDialogWnd, (CUIWindow), {

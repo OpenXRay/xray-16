@@ -996,10 +996,19 @@ int CLocatorAPI::file_list(FS_FileSet& dest, pcstr path, u32 flags, pcstr mask)
                     continue;
             }
             FS_File file;
-            if (flags & FS_ClampExt)
-                file.name = EFS.ChangeFileExt(entry_begin, "");
+            if (flags & FS_FullName) //Alundaio: Ability to get a file list with full path names
+            {
+                string_path full_name;
+                strconcat(sizeof(full_name), full_name, N, entry_begin);
+                file.name = full_name;
+            }
             else
-                file.name = entry_begin;
+            {
+                if (flags & FS_ClampExt)
+                    file.name = EFS.ChangeFileExt(entry_begin, "");
+                else
+                    file.name = entry_begin;
+            }
             u32 fl = entry.vfs != 0xffffffff ? FS_File::flVFS : 0;
             file.size = entry.size_real;
             file.time_write = entry.modif;

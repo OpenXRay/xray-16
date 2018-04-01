@@ -44,8 +44,10 @@ void CAutosaveManager::shedule_Update(u32 dt)
 {
     inherited::shedule_Update(dt);
 #pragma todo("Plecha to Plecha : AUTOSAVE (do not forgive to enable it in release version:-))))!!!!")
+#ifndef COC_ENABLE_AUTOSAVE
     if (true)
         return;
+#endif
     if (!ai().get_alife())
         return;
 

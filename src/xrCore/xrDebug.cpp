@@ -358,20 +358,29 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
 #endif
     if (OnCrash)
         OnCrash();
-    //if (OnDialog)
-    //    OnDialog(true);
+#ifndef COC_DEBUG_BEHAVIOUR
+    if (OnDialog)
+        OnDialog(true);
+#endif
     FlushLog();
 
+#ifdef COC_DEBUG_BEHAVIOUR
     while (ShowCursor(true) < 0);
     ShowWindow(GetActiveWindow(), SW_FORCEMINIMIZE);
+#endif
 
     if (Core.PluginMode)
         MessageBox(NULL, assertionInfo, "X-Ray error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
     else
     {
 #ifdef USE_OWN_ERROR_MESSAGE_WINDOW
+#ifdef COC_DEBUG_BEHAVIOUR
         int result = MessageBox(GetTopWindow(NULL), assertionInfo, "Fatal error",
                                 MB_CANCELTRYCONTINUE | MB_ICONERROR | MB_SYSTEMMODAL);
+#else
+        int result = MessageBox(NULL, assertionInfo, "Fatal error",
+            MB_CANCELTRYCONTINUE | MB_ICONERROR | MB_SYSTEMMODAL);
+#endif
         switch (result)
         {
         case IDCANCEL:
@@ -396,10 +405,13 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
         DEBUG_BREAK;
 #endif
     }
-    //if (OnDialog)
-    //    OnDialog(false);
+#ifndef COC_DEBUG_BEHAVIOUR
+    if (OnDialog)
+        OnDialog(false);
+#else
     if (needTerminate)
         TerminateProcess(GetCurrentProcess(), 1);
+#endif
 
     lock.Leave();
 }

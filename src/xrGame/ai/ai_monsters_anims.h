@@ -29,6 +29,7 @@ public:
 
     IC void Load(IKinematicsAnimated* tpKinematics, LPCSTR caBaseName)
     {
+        bool bDbg = strstr(Core.Params, "-dbganim") != NULL;
         A.clear();
         string256 S;
         int j = 0;
@@ -39,6 +40,13 @@ public:
         {
             strconcat(sizeof(S), S, caBaseName, caBaseNames[i]);
             A[i] = tpKinematics->ID_Cycle_Safe(S);
+            if (bDbg)
+            {
+                if (A[i])
+                    Msg("* Loaded animation %s", S);
+                else
+                    Msg("* WARNING: Failed Loading animation %s", S);
+            }
 #ifdef DEBUG
             if (A[i] && psAI_Flags.test(aiAnimation))
                 Msg("* Loaded animation %s", S);

@@ -150,7 +150,7 @@ void CAI_Stalker::feel_touch_new(IGameObject* O)
     // Now, test for game specific logical objects to minimize traffic
     CInventoryItem* I = smart_cast<CInventoryItem*>(O);
 
-    if (!wounded() && !critically_wounded() && I && I->useful_for_NPC() && can_take(I))
+    if (I && I->useful_for_NPC() && can_take(I) && !wounded() && !critically_wounded())
     {
 #ifndef SILENCE
         Msg("Taking item %s (%d)!", I->object().cName().c_str(), I->object().ID());

@@ -463,6 +463,17 @@ void CScriptGameObject::inactualize_patrol_path()
         stalker->movement().patrol().make_inactual();
 }
 
+u32 CScriptGameObject::get_dest_level_vertex_id()
+{
+    CAI_Stalker *stalker = smart_cast<CAI_Stalker*>(&object());
+    if (!stalker)
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member get_dest_level_vertex_id!");
+    else
+        return stalker->movement().level_dest_vertex_id();
+
+    return (-1);
+}
+
 void CScriptGameObject::set_dest_level_vertex_id(u32 level_vertex_id)
 {
     CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());

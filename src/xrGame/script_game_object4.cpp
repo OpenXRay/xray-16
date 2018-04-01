@@ -23,6 +23,26 @@
 #include "physicobject.h"
 #include "artefact.h"
 #include "stalker_sound_data.h"
+#include "level_changer.h"
+
+#include "eatable_item.h"
+#include "car.h"
+#include "helicopter.h"
+#include "actor.h"
+#include "customoutfit.h"
+#include "customzone.h"
+#include "ai\monsters\basemonster\base_monster.h"
+#include "medkit.h"
+#include "antirad.h"
+#include "scope.h"
+#include "silencer.h"
+#include "torch.h"
+#include "GrenadeLauncher.h"
+#include "searchlight.h"
+#include "WeaponAmmo.h"
+#include "grenade.h"
+#include "BottleItem.h"
+#include "WeaponMagazinedWGrenade.h"
 
 class CWeapon;
 
@@ -309,7 +329,7 @@ bool CScriptGameObject::inv_box_can_take_status()
 CZoneCampfire* CScriptGameObject::get_campfire() { return smart_cast<CZoneCampfire*>(&object()); }
 CArtefact* CScriptGameObject::get_artefact() { return smart_cast<CArtefact*>(&object()); }
 CPhysicObject* CScriptGameObject::get_physics_object() { return smart_cast<CPhysicObject*>(&object()); }
-#include "level_changer.h"
+
 void CScriptGameObject::enable_level_changer(bool b)
 {
     CLevelChanger* lch = smart_cast<CLevelChanger*>(&object());
@@ -372,7 +392,6 @@ void CScriptGameObject::stop_particles(LPCSTR pname, LPCSTR bone)
             LuaMessageType::Error, "Cant stop particles, bone [%s] is not visible now", bone);
 }
 
-#ifdef GAME_OBJECT_TESTING_EXPORTS
 //AVO: directly set entity health instead of going through normal health property which operates on delta
 void CScriptGameObject::SetHealthEx(float hp)
 {
@@ -383,326 +402,78 @@ void CScriptGameObject::SetHealthEx(float hp)
 }
 //-AVO
 
-// AVO: functions for testing object class
-// Credits: KD
-//#include "Car.h"
-//#include "helicopter.h"
-#include "Actor.h"
-#include "CustomOutfit.h"
-//#include "CustomZone.h"
-#include "ai/Monsters/BaseMonster/base_monster.h"
-//#include "medkit.h"
-//#include "antirad.h"
-#include "Scope.h"
-#include "Silencer.h"
-//#include "Torch.h"
-#include "GrenadeLauncher.h"
-#include "searchlight.h"
-//#include "WeaponAmmo.h"
-//#include "Grenade.h"
-//#include "BottleItem.h"
-#include "WeaponMagazinedWGrenade.h"
-
-// Xottab_DUTY: commented this macro, because of substituting it
-/*
-#define TEST_OBJECT_CLASS(A, B)\
-bool A() const\
+#define SPECIFIC_CAST(A,B)\
+B* A ()\
 {\
-    auto l_tpEntity = smart_cast<B*>(&object());\
+    B				*l_tpEntity = smart_cast<B*>(&object());\
     if (!l_tpEntity)\
-        return false;\
-    return true;\
-}\
-*/
+        return (0);\
+                else\
+        return l_tpEntity;\
+};\
 
-/*
-bool CScriptGameObject::isGameObject() const
+SPECIFIC_CAST(CScriptGameObject::cast_GameObject, CScriptGameObject);
+SPECIFIC_CAST(CScriptGameObject::cast_Car, CCar);
+SPECIFIC_CAST(CScriptGameObject::cast_Heli, CHelicopter);
+SPECIFIC_CAST(CScriptGameObject::cast_HolderCustom, CHolderCustom);
+SPECIFIC_CAST(CScriptGameObject::cast_EntityAlive, CEntityAlive);
+SPECIFIC_CAST(CScriptGameObject::cast_InventoryItem, CInventoryItem);
+SPECIFIC_CAST(CScriptGameObject::cast_InventoryOwner, CInventoryOwner);
+SPECIFIC_CAST(CScriptGameObject::cast_Actor, CActor);
+SPECIFIC_CAST(CScriptGameObject::cast_Weapon, CWeapon);
+CMedkit* CScriptGameObject::cast_Medkit()
 {
-    auto l_tpEntity = smart_cast<CGameObject*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
+    CInventoryItem* ii = object().cast_inventory_item();
+    return ii ? smart_cast<CMedkit*>(ii) : (0);
 }
-*/
+CEatableItem* CScriptGameObject::cast_EatableItem()
+{
+    CInventoryItem* ii = object().cast_inventory_item();
+    return ii ? ii->cast_eatable_item() : (0);
+}
+CAntirad* CScriptGameObject::cast_Antirad()
+{
+    CInventoryItem* ii = object().cast_inventory_item();
+    return ii ? smart_cast<CAntirad*>(ii) : (0);
+}
+SPECIFIC_CAST(CScriptGameObject::cast_CustomOutfit, CCustomOutfit);
+SPECIFIC_CAST(CScriptGameObject::cast_Scope, CScope);
+SPECIFIC_CAST(CScriptGameObject::cast_Silencer, CSilencer);
+SPECIFIC_CAST(CScriptGameObject::cast_GrenadeLauncher, CGrenadeLauncher);
+SPECIFIC_CAST(CScriptGameObject::cast_WeaponMagazined, CWeaponMagazined);
+SPECIFIC_CAST(CScriptGameObject::cast_SpaceRestrictor, CSpaceRestrictor);
+SPECIFIC_CAST(CScriptGameObject::cast_Stalker, CAI_Stalker);
+SPECIFIC_CAST(CScriptGameObject::cast_CustomZone, CCustomZone);
+SPECIFIC_CAST(CScriptGameObject::cast_Monster, CCustomMonster);
+SPECIFIC_CAST(CScriptGameObject::cast_Explosive, CExplosive);
+SPECIFIC_CAST(CScriptGameObject::cast_ScriptZone, CScriptZone);
+//SPECIFIC_CAST(CScriptGameObject::cast_Projector, CProjector);
+SPECIFIC_CAST(CScriptGameObject::cast_Trader, CAI_Trader);
+CHudItem* CScriptGameObject::cast_HudItem()
+{
+    CInventoryItem* ii = object().cast_inventory_item();
+    return ii ? smart_cast<CHudItem*>(ii) : (0);
+}
+CFoodItem* CScriptGameObject::cast_FoodItem()
+{
+    CInventoryItem* ii = object().cast_inventory_item();
+    return ii ? ii->cast_food_item() : (0);
+}
+SPECIFIC_CAST(CScriptGameObject::cast_Artefact, CArtefact);
+SPECIFIC_CAST(CScriptGameObject::cast_Ammo, CWeaponAmmo);
+//SPECIFIC_CAST(CScriptGameObject::cast_Missile, CMissile);
+SPECIFIC_CAST(CScriptGameObject::cast_PhysicsShellHolder, CPhysicsShellHolder);
+//SPECIFIC_CAST(CScriptGameObject::cast_Grenade, CGrenade);
+CBottleItem* CScriptGameObject::cast_BottleItem()
+{
+    CInventoryItem* ii = object().cast_inventory_item();
+    return ii ? smart_cast<CBottleItem*>(ii) : (0);
+}
+CTorch* CScriptGameObject::cast_Torch()
+{
 
-/*
-bool CScriptGameObject::isCar() const
-{
-    auto l_tpEntity = smart_cast<CCar*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
+    CInventoryItem* ii = object().cast_inventory_item();
+    return ii ? smart_cast<CTorch*>(ii) : (0);
 }
-*/
-
-/*
-bool CScriptGameObject::isHeli() const
-{
-    auto l_tpEntity = smart_cast<CHelicopter*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-*/
-
-/*
-bool CScriptGameObject::isHolderCustom() const
-{
-    auto l_tpEntity = smart_cast<CHolderCustom*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-*/
-
-bool CScriptGameObject::isEntityAlive() const
-{
-    auto l_tpEntity = smart_cast<CEntityAlive*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-
-bool CScriptGameObject::isInventoryItem() const
-{
-    auto l_tpEntity = smart_cast<CInventoryItem*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-
-bool CScriptGameObject::isInventoryOwner() const
-{
-    auto l_tpEntity = smart_cast<CInventoryOwner*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-
-bool CScriptGameObject::isActor() const
-{
-    auto l_tpEntity = smart_cast<CActor*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-
-bool CScriptGameObject::isCustomMonster() const
-{
-    auto l_tpEntity = smart_cast<CCustomMonster*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-
-bool CScriptGameObject::isWeapon() const
-{
-    auto l_tpEntity = smart_cast<CWeapon*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-/*
-bool CScriptGameObject::isMedkit() const
-{
-    auto l_tpEntity = smart_cast<CMedkit*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-*/
-
-/*
-bool CScriptGameObject::isEatableItem() const
-{
-    auto l_tpEntity = smart_cast<CEatableItem*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-*/
-
-/*
-bool CScriptGameObject::isAntirad() const
-{
-    auto l_tpEntity = smart_cast<CAntirad*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-*/
-
-bool CScriptGameObject::isCustomOutfit() const
-{
-    auto l_tpEntity = smart_cast<CCustomOutfit*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-
-bool CScriptGameObject::isScope() const
-{
-    auto l_tpEntity = smart_cast<CScope*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-
-bool CScriptGameObject::isSilencer() const
-{
-    auto l_tpEntity = smart_cast<CSilencer*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-
-bool CScriptGameObject::isGrenadeLauncher() const
-{
-    auto l_tpEntity = smart_cast<CGrenadeLauncher*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-
-bool CScriptGameObject::isWeaponMagazined() const
-{
-    auto l_tpEntity = smart_cast<CWeaponMagazined*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-
-bool CScriptGameObject::isSpaceRestrictor() const
-{
-    auto l_tpEntity = smart_cast<CSpaceRestrictor*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-
-bool CScriptGameObject::isStalker() const
-{
-    auto l_tpEntity = smart_cast<CAI_Stalker*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-
-bool CScriptGameObject::isAnomaly() const
-{
-    auto l_tpEntity = smart_cast<CCustomZone*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-
-bool CScriptGameObject::isMonster() const
-{
-    auto l_tpEntity = smart_cast<CBaseMonster*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-
-/*
-bool CScriptGameObject::isExplosive() const
-{
-    auto l_tpEntity = smart_cast<CExplosive*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-*/
-
-/*
-bool CScriptGameObject::isScriptZone() const
-{
-    auto l_tpEntity = smart_cast<CScriptZone*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-*/
-
-/*
-bool CScriptGameObject::isProjector() const
-{
-    auto l_tpEntity = smart_cast<CProjector*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-*/
-
-bool CScriptGameObject::isTrader() const
-{
-    auto l_tpEntity = smart_cast<CAI_Trader*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-
-bool CScriptGameObject::isHudItem() const
-{
-    auto l_tpEntity = smart_cast<CHudItem*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-
-/*
-bool CScriptGameObject::isFoodItem() const
-{
-    auto l_tpEntity = smart_cast<CFoodItem*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-*/
-
-bool CScriptGameObject::isArtefact() const
-{
-    auto l_tpEntity = smart_cast<CArtefact*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-
-bool CScriptGameObject::isAmmo() const
-{
-    auto l_tpEntity = smart_cast<CWeaponAmmo*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-
-/*
-bool CScriptGameObject::isMissile() const
-{
-    auto l_tpEntity = smart_cast<CMissile*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-*/
-
-/*
-bool CScriptGameObject::isPhysicsShellHolder() const
-{
-    auto l_tpEntity = smart_cast<CPhysicsShellHolder*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-*/
-
-/*
-bool CScriptGameObject::isGrenade() const
-{
-    auto l_tpEntity = smart_cast<CGrenade*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-*/
-
-/*
-bool CScriptGameObject::isBottleItem() const
-{
-    auto l_tpEntity = smart_cast<CBottleItem*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-*/
-
-/*
-bool CScriptGameObject::isTorch() const
-{
-    auto l_tpEntity = smart_cast<CTorch*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-*/
-
-bool CScriptGameObject::isWeaponGL() const
-{
-    auto l_tpEntity = smart_cast<CWeaponMagazinedWGrenade*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-
-bool CScriptGameObject::isInventoryBox() const
-{
-    auto l_tpEntity = smart_cast<CInventoryBox*>(&object());
-    if (!l_tpEntity) return false;
-    return true;
-}
-#endif
-//-AVO
+SPECIFIC_CAST(CScriptGameObject::cast_WeaponMagazinedWGrenade, CWeaponMagazinedWGrenade);
+SPECIFIC_CAST(CScriptGameObject::cast_InventoryBox, CInventoryBox);

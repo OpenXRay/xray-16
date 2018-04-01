@@ -101,9 +101,6 @@ void CALifeMonsterBrain::select_task(const bool forced)
     if (object().m_smart_terrain_id != 0xffff)
         return;
 
-    if (!can_choose_alife_tasks())
-        return;
-
     ALife::_TIME_ID current_time = ai().alife().time_manager().game_time();
 
     if (!forced && m_last_search_time + m_time_interval > current_time)
@@ -148,12 +145,14 @@ void CALifeMonsterBrain::update(const bool forced)
 	}
 #endif
 
-    select_task(forced);
-
-    if (object().m_smart_terrain_id != 0xffff)
-        process_task();
-    else
-        default_behaviour();
+    if (can_choose_alife_tasks())
+    {
+        select_task(forced);
+        if (object().m_smart_terrain_id != 0xffff)
+            process_task();
+        else
+            default_behaviour();
+    }
 
     movement().update();
 }

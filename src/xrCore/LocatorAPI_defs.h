@@ -9,6 +9,7 @@ enum FS_List
     FS_ListFolders = (1 << 1),
     FS_ClampExt = (1 << 2),
     FS_RootOnly = (1 << 3),
+    FS_FullName = (1 << 4), //Alundaio: full path name
     FS_forcedword = u32(-1)
 };
 
