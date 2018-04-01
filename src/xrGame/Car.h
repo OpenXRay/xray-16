@@ -531,6 +531,8 @@ public:
     }
 
     bool isActiveEngine	();
+    float GetRPM() { return m_current_rpm; }
+    void SetRPM(float val) { m_current_rpm = val; }
     /***** added by Ray Twitty (aka Shadows) END *****/
   
 

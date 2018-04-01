@@ -132,17 +132,21 @@ SCRIPT_EXPORT(CUIMMShniaga, (CUIWindow), {
 });
 
 SCRIPT_EXPORT(CUIScrollView, (CUIWindow), {
-    module(luaState)[class_<CUIScrollView, CUIWindow>("CUIScrollView")
-                         .def(constructor<>())
-                         .def("AddWindow", &CUIScrollView::AddWindow)
-                         .def("RemoveWindow", &CUIScrollView::RemoveWindow)
-                         .def("Clear", &CUIScrollView::Clear)
-                         .def("ScrollToBegin", &CUIScrollView::ScrollToBegin)
-                         .def("ScrollToEnd", &CUIScrollView::ScrollToEnd)
-                         .def("GetMinScrollPos", &CUIScrollView::GetMinScrollPos)
-                         .def("GetMaxScrollPos", &CUIScrollView::GetMaxScrollPos)
-                         .def("GetCurrentScrollPos", &CUIScrollView::GetCurrentScrollPos)
-                         .def("SetScrollPos", &CUIScrollView::SetScrollPos)];
+    module(luaState)
+    [
+        class_<CUIScrollView, CUIWindow>("CUIScrollView")
+            .def(constructor<>())
+            .def("AddWindow", &CUIScrollView::AddWindow)
+            .def("RemoveWindow", &CUIScrollView::RemoveWindow)
+            .def("Clear", &CUIScrollView::Clear)
+            .def("ScrollToBegin", &CUIScrollView::ScrollToBegin)
+            .def("ScrollToEnd", &CUIScrollView::ScrollToEnd)
+            .def("GetMinScrollPos", &CUIScrollView::GetMinScrollPos)
+            .def("GetMaxScrollPos", &CUIScrollView::GetMaxScrollPos)
+            .def("GetCurrentScrollPos", &CUIScrollView::GetCurrentScrollPos)
+            .def("SetFixedScrollBar", &CUIScrollView::SetFixedScrollBar)
+            .def("SetScrollPos", &CUIScrollView::SetScrollPos)
+    ];
 });
 
 SCRIPT_EXPORT(EnumUIMessages, (), {

@@ -217,7 +217,7 @@ void CInifile::Load(IReader* F, pcstr path, allow_include_func_t allow_include_f
             }
         }
 
-        if (str[0] && str[0] == '#' && strstr(str, "#include")) // handle includes
+        if (str[0] && _Trim(str)[0] == '#' && strstr(str, "#include")) // handle includes
         {
             string_path inc_name;
             R_ASSERT(path && path[0]);

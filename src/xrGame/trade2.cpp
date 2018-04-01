@@ -216,6 +216,9 @@ u32 CTrade::GetItemPrice(PIItem pItem, bool b_buying, bool bFree)
     clamp(action_factor, _min(trade_factors.enemy_factor(), trade_factors.friend_factor()),
         _max(trade_factors.enemy_factor(), trade_factors.friend_factor()));
 
+    if (action_factor == 0)
+        return 0;
+
 // computing deficit_factor
 #if 0
 	float					deficit_factor = partner.inv_owner->deficit_factor(pItem->object().cNameSect());
@@ -225,6 +228,7 @@ u32 CTrade::GetItemPrice(PIItem pItem, bool b_buying, bool bFree)
 
     // total price calculation
     u32 result = iFloor(base_cost * condition_factor * action_factor * deficit_factor);
+
     // use some script discounts
     luabind::functor<float> func;
     if (b_buying)

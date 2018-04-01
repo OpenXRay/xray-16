@@ -499,7 +499,11 @@ void CSE_ALifeItemWeapon::UPDATE_Read(NET_Packet& tNetPacket)
     tNetPacket.r_u8(m_bZoom);
 }
 
-void CSE_ALifeItemWeapon::clone_addons(CSE_ALifeItemWeapon* parent) { m_addon_flags = parent->m_addon_flags; }
+void CSE_ALifeItemWeapon::clone_addons(CSE_ALifeItemWeapon* parent)
+{
+    m_addon_flags.flags = parent->m_addon_flags.get();
+}
+
 void CSE_ALifeItemWeapon::UPDATE_Write(NET_Packet& tNetPacket)
 {
     inherited::UPDATE_Write(tNetPacket);

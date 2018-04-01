@@ -17,7 +17,7 @@ void ParseFile(pcstr path, CMemoryWriter& W, IReader* F, XMLDocument* xml)
     {
         F->r_string(str, sizeof str);
 
-        if (str[0] && str[0] == '#' && strstr(str, "#include"))
+        if (str[0] && _Trim(str)[0] == '#' && strstr(str, "#include"))
         {
             string256 inc_name;
             if (_GetItem(str, 1, inc_name, '"'))

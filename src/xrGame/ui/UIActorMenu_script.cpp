@@ -23,6 +23,7 @@
 #include "eatable_item.h"
 
 #include "UIPdaWnd.h"
+#include "UITabControl.h"
 
 using namespace luabind;
 
@@ -277,10 +278,11 @@ SCRIPT_EXPORT(CUIActorMenu, (),
             .def("IsShown", &CUIPdaWnd::IsShown)
             .def("ShowDialog", &CUIPdaWnd::ShowDialog)
             .def("HideDialog", &CUIPdaWnd::HideDialog)
-            .def("SetActiveSubdialog", &CUIPdaWnd::SetActiveSubdialog)
+            .def("SetActiveSubdialog", &CUIPdaWnd::SetActiveSubdialog_script)
             .def("SetActiveDialog", &CUIPdaWnd::SetActiveDialog)
             .def("GetActiveDialog", &CUIPdaWnd::GetActiveDialog)
             .def("GetActiveSection", &CUIPdaWnd::GetActiveSection)
+            .def("GetTabControl", &CUIPdaWnd::GetTabControl)
     ];
 
     module(luaState, "ActorMenu")

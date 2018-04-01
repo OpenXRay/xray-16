@@ -584,6 +584,16 @@ void g_send(NET_Packet& P, bool bReliable = false, bool bSequential = true, bool
     Level().Send(P, net_flags(bReliable, bSequential, bHighPriority, bSendImmediately));
 }
 
+void u_event_gen(NET_Packet& P, u32 _event, u32 _dest)
+{
+    CGameObject::u_EventGen(P, _event, _dest);
+}
+
+void u_event_send(NET_Packet& P)
+{
+    CGameObject::u_EventSend(P);
+}
+
 //can spawn entities like bolts, phantoms, ammo, etc. which normally crash when using alife():create()
 void spawn_section(pcstr sSection, Fvector3 vPosition, u32 LevelVertexID, u16 ParentID, bool bReturnItem = false)
 {
@@ -672,11 +682,13 @@ IC static void CLevel_Export(lua_State* luaState)
 
         class_<CEnvironment>("CEnvironment").def("current", current_environment);
 
-    module(luaState, "level")[
+    module(luaState, "level")
+    [
         //Alundaio: Extend level namespace exports
 #ifdef NAMESPACE_LEVEL_EXPORTS
         def("send", &g_send) , //allow the ability to send netpacket to level
-        //def("ray_pick",g_ray_pick),
+        def("u_event_gen", &u_event_gen), //Send events via packet
+        def("u_event_send", &u_event_send),
         def("get_target_obj", &g_get_target_obj), //intentionally named to what is in xray extensions
         def("get_target_dist", &g_get_target_dist),
         def("get_target_element", &g_get_target_element), //Can get bone cursor is targeting
@@ -689,38 +701,56 @@ IC static void CLevel_Export(lua_State* luaState)
         // obsolete\deprecated
         def("object_by_id", get_object_by_id),
 #ifdef DEBUG
-        def("debug_object", get_object_by_name), def("debug_actor", tpfGetActor), def("check_object", check_object),
+        def("debug_object", get_object_by_name),
+        def("debug_actor", tpfGetActor),
+        def("check_object", check_object),
 #endif
 
-        def("get_weather", get_weather), def("set_weather", set_weather), def("set_weather_fx", set_weather_fx),
-        def("start_weather_fx_from_time", start_weather_fx_from_time), def("is_wfx_playing", is_wfx_playing),
-        def("get_wfx_time", get_wfx_time), def("stop_weather_fx", stop_weather_fx),
+        def("get_weather", get_weather),
+        def("set_weather", set_weather),
+        def("set_weather_fx", set_weather_fx),
+        def("start_weather_fx_from_time", start_weather_fx_from_time),
+        def("is_wfx_playing", is_wfx_playing),
+        def("get_wfx_time", get_wfx_time),
+        def("stop_weather_fx", stop_weather_fx),
 
         def("environment", environment),
 
-        def("set_time_factor", set_time_factor), def("get_time_factor", get_time_factor),
+        def("set_time_factor", set_time_factor),
+        def("get_time_factor", get_time_factor),
 
-        def("set_game_difficulty", set_game_difficulty), def("get_game_difficulty", get_game_difficulty),
+        def("set_game_difficulty", set_game_difficulty),
+        def("get_game_difficulty", get_game_difficulty),
 
-        def("get_time_days", get_time_days), def("get_time_hours", get_time_hours),
-        def("get_time_minutes", get_time_minutes), def("change_game_time", change_game_time),
+        def("get_time_days", get_time_days),
+        def("get_time_hours", get_time_hours),
+        def("get_time_minutes", get_time_minutes),
+        def("change_game_time", change_game_time),
 
-        def("high_cover_in_direction", high_cover_in_direction), def("low_cover_in_direction", low_cover_in_direction),
-        def("vertex_in_direction", vertex_in_direction), def("rain_factor", rain_factor),
-        def("patrol_path_exists", patrol_path_exists), def("vertex_position", vertex_position), def("name", get_name),
+        def("high_cover_in_direction", high_cover_in_direction),
+        def("low_cover_in_direction", low_cover_in_direction),
+        def("vertex_in_direction", vertex_in_direction),
+        def("rain_factor", rain_factor),
+        def("patrol_path_exists", patrol_path_exists),
+        def("vertex_position", vertex_position),
+        def("name", get_name),
         def("prefetch_sound", prefetch_sound),
 
         def("client_spawn_manager", get_client_spawn_manager),
 
-        def("map_add_object_spot_ser", map_add_object_spot_ser), def("map_add_object_spot", map_add_object_spot),
-        //-		def("map_add_object_spot_complex",		map_add_object_spot_complex),
-        def("map_remove_object_spot", map_remove_object_spot), def("map_has_object_spot", map_has_object_spot),
+        def("map_add_object_spot_ser", map_add_object_spot_ser),
+        def("map_add_object_spot", map_add_object_spot),
+        def("map_remove_object_spot", map_remove_object_spot),
+        def("map_has_object_spot", map_has_object_spot),
         def("map_change_spot_hint", map_change_spot_hint),
 
-        def("add_dialog_to_render", add_dialog_to_render), def("remove_dialog_to_render", remove_dialog_to_render),
-        def("hide_indicators", hide_indicators), def("hide_indicators_safe", hide_indicators_safe),
+        def("add_dialog_to_render", add_dialog_to_render),
+        def("remove_dialog_to_render", remove_dialog_to_render),
+        def("hide_indicators", hide_indicators),
+        def("hide_indicators_safe", hide_indicators_safe),
 
-        def("show_indicators", show_indicators), def("show_weapon", show_weapon),
+        def("show_indicators", show_indicators),
+        def("show_weapon", show_weapon),
         def("add_call", ((void (*)(const luabind::functor<bool>&, const luabind::functor<void>&)) & add_call)),
         def("add_call",
             ((void (*)(const luabind::object&, const luabind::functor<bool>&, const luabind::functor<void>&)) &

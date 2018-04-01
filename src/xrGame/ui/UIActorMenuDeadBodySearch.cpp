@@ -70,7 +70,7 @@ void CUIActorMenu::InitDeadBodySearchMode()
     TIItemContainer items_list;
     if (m_pPartnerInvOwner)
     {
-        m_pPartnerInvOwner->inventory().AddAvailableItems(items_list, false); // true
+        m_pPartnerInvOwner->inventory().AddAvailableItems(items_list, false, m_pPartnerInvOwner->is_alive()); // true
         UpdatePartnerBag();
     }
     else

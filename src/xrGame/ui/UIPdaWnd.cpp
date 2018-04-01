@@ -179,9 +179,6 @@ void CUIPdaWnd::Update()
 
 void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
 {
-    if (m_sActiveSection == section)
-        return;
-
     if (m_pActiveDialog)
     {
         if (UIMainPdaFrame->IsChild(m_pActiveDialog))
@@ -215,7 +212,6 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
     {
         if (!UIMainPdaFrame->IsChild(m_pActiveDialog))
             UIMainPdaFrame->AttachChild(m_pActiveDialog);
-
         m_pActiveDialog->Show(true);
         m_sActiveSection = section;
         SetActiveCaption();
@@ -335,12 +331,13 @@ void RearrangeTabButtons(CUITabControl* pTab)
 
 bool CUIPdaWnd::OnKeyboardAction(int dik, EUIMessages keyboard_action)
 {
-    if (is_binded(kACTIVE_JOBS, dik))
+    if (WINDOW_KEY_PRESSED == keyboard_action && IsShown())
     {
-        if (WINDOW_KEY_PRESSED == keyboard_action)
+        if (is_binded(kACTIVE_JOBS, dik))
+        {
             HideDialog();
-
-        return true;
+            return true;
+        }
     }
 
     return inherited::OnKeyboardAction(dik, keyboard_action);

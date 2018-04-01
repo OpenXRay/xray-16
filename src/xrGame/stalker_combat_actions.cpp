@@ -1069,11 +1069,17 @@ void CStalkerActionSuddenAttack::execute()
 
     const CEntityAlive* enemy = object().memory().enemy().selected();
     if (!enemy)
+    {
+        m_storage->set_property(eWorldPropertyUseSuddenness, false);
         return;
+    }
 
     CMemoryInfo mem_object = object().memory().memory(enemy);
     if (!mem_object.m_object)
+    {
+        m_storage->set_property(eWorldPropertyUseSuddenness, false);
         return;
+    }
 
     //Alundaio: Don't aim at ceiling or floor
     bool visible_now = object().memory().visual().visible_now(enemy);
@@ -1106,7 +1112,7 @@ void CStalkerActionSuddenAttack::execute()
             ai().level_graph().vertex_position(mem_object.m_object_params.m_level_vertex_id),
             mem_object.m_object_params.m_level_vertex_id);
 
-    if (!visible_now)
+/*    if (!visible_now)
     {
         u32 target_vertex_id = object().movement().level_path().dest_vertex_id();
         if (object().ai_location().level_vertex_id() == target_vertex_id)
@@ -1114,7 +1120,7 @@ void CStalkerActionSuddenAttack::execute()
             m_storage->set_property(eWorldPropertyUseSuddenness, false);
             return;
         }
-    }
+    }*/
 
     float distance = object().Position().distance_to(mem_object.m_object_params.m_position);
     if (distance >= 15.f)

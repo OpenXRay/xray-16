@@ -36,7 +36,13 @@ SCRIPT_EXPORT(KeyBindings, (),
                 value("kCUSTOM4", int(kCUSTOM4)), value("kCUSTOM5", int(kCUSTOM5)), value("kCUSTOM6", int(kCUSTOM6)),
                 value("kCUSTOM7", int(kCUSTOM7)), value("kCUSTOM8", int(kCUSTOM8)), value("kCUSTOM9", int(kCUSTOM9)),
                 value("kCUSTOM10", int(kCUSTOM10)), value("kCUSTOM11", int(kCUSTOM11)), value("kCUSTOM12", int(kCUSTOM12)),
-                value("kCUSTOM13", int(kCUSTOM13)), value("kCUSTOM14", int(kCUSTOM14)), value("kCUSTOM15", int(kCUSTOM15))
+                value("kCUSTOM13", int(kCUSTOM13)), value("kCUSTOM14", int(kCUSTOM14)), value("kCUSTOM15", int(kCUSTOM15)),
+                value("kPDA_TAB1", int(kPDA_TAB1)),
+                value("kPDA_TAB2", int(kPDA_TAB2)),
+                value("kPDA_TAB3", int(kPDA_TAB3)),
+                value("kPDA_TAB4", int(kPDA_TAB4)),
+                value("kPDA_TAB5", int(kPDA_TAB5)),
+                value("kPDA_TAB6", int(kPDA_TAB6))
             ],
         class_<KeyBindingRegistrator>("DIK_keys")
             .enum_("dik_keys")

@@ -63,6 +63,12 @@ _action actions[] = {{"left", kLEFT, _both}, {"right", kRIGHT, _both}, {"up", kU
     { "custom14", kCUSTOM14, _sp },
     { "custom15", kCUSTOM15, _sp },
     { "cam_autoaim", kCAM_AUTOAIM, _sp },
+    { "pda_tab1", kPDA_TAB1, _sp },
+    { "pda_tab2", kPDA_TAB2, _sp },
+    { "pda_tab3", kPDA_TAB3, _sp },
+    { "pda_tab4", kPDA_TAB4, _sp },
+    { "pda_tab5", kPDA_TAB5, _sp },
+    { "pda_tab6", kPDA_TAB6, _sp },
 
     {NULL, kLASTACTION, _both}};
 

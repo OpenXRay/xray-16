@@ -1,0 +1,69 @@
+-- called from engine!
+--[[
+ Refers to when an icon is dragged onto another icon in Actor Inventory Menu
+ 
+ passed parameters:
+	itm1 is the object being dragged; may be nil
+	itm2 is the object the item is being dragged onto; may be nil
+	from_slot is the number value of the slot itm1 is being dragged from;  0 or EDDListType.iInvalid is invalid 
+	to_slot is the number value of the slot itm2 is occupying;  0 or EDDListType.iInvalid is invalid 
+	
+from_slot and to_slot values:
+		EDDListType.iInvalid			= 0
+		EDDListType.iActorSlot			= 1
+		EDDListType.iActorBag			= 2
+		EDDListType.iActorBelt			= 3
+
+		EDDListType.iActorTrade			= 4
+		EDDListType.iPartnerTradeBag	= 5
+		EDDListType.iPartnerTrade		= 6
+		EDDListType.iDeadBodyBag		= 7
+		EDDListType.iQuickSlot			= 8
+		EDDListType.iTrashSlot			= 9
+		
+ex. if (to_slot == EDDListType.iActorSlot) then 
+		printf("dragging item to slot!")
+	end
+	
+--]]
+function CUIActorMenu_OnItemDropped(itm1,itm2,from_slot,to_slot)
+	--printf("itm1=%s itm2=%s from_slot=%s to_slot=%s",itm1 and itm1:name(),itm2 and itm2:name(),from_slot,to_slot)
+	
+	if (itm1 and itm2) then
+		-- do stuff
+	end
+	
+	return true
+end
+--[[
+-- called from engine! when item icon is hovered over
+function CUIActorMenu_OnItemFocusReceive(itm)
+	if itm then
+	
+	end
+end
+
+-- called from engine!
+function CUIActorMenu_OnItemFocusLost(itm)
+	if itm then
+	
+	end
+end
+]]
+-- called from engine!
+-- useful for when doing npc:use(db.actor) when NPC is alive
+-- basically what is available in the corpse loot menu while npc is alive
+function CInventory_ItemAvailableToTrade(npc,item)
+	return true
+end
+
+-- called from engine during trade
+function CUIActorMenu_CanMoveToPartner(obj,itm,actor_weight,partner_weight,item_weight,partner_total_weight,partner_max_carry_weight)
+	--printf("%s [%s actor_weight=%s partner_weight=%s item_weight=%s partner_total_weight=%s partner_max_carry_weight=%s]",obj:name(),itm:name(),actor_weight,partner_weight,item_weight,partner_total_weight,partner_max_carry_weight)
+	return true
+end
+
+-- called from engine during donation. return false to refuse or return true to donate
+function CUIActorMenu_DonateCurrentItem(obj,itm)
+	return true
+end

@@ -380,3 +380,68 @@ function change_anomalies_names()
 		end
 	end
 end
+
+-- CoCray
+----------------------------------------------------------------------------
+-- Engine->lua function calls 
+----------------------------------------------------------------------------
+
+-- PDA Tabs 
+-- It's now possible to add new button tabs to pda*.xml.
+-- You can use ActorMenu.get_pda_menu():GetActiveSection() to find out active pda tab
+-- UI returned must be CUIScriptWnd
+function set_active_subdialog(section)
+	--printf("section=%s",section)
+	if (section == "eptTasks") then 
+	
+	elseif (section == "eptRanking") then 
+	
+	elseif (section == "eptLogs") then 
+	
+	elseif (section == "eptRelations") then 
+		--return ui_pda_relations_tab.get_ui()
+	elseif (section == "eptContacts") then
+		--return ui_pda_contacts_tab.get_ui()
+	elseif (section == "eptEncyclopedia") then
+		--return ui_pda_encyclopedia_tab.get_ui()
+	end
+end 
+
+function property_box_clicked(property_ui)
+	-- See CoC for implmentation
+end 
+
+function property_box_add_properties(property_ui,id,level_name,hint)
+	-- See CoC for implmentation
+end
+
+-- called from engine! It's how many character rankings to display! u8 (max 255)
+function get_rankings_array_size()
+	return 1
+end	
+
+-- called from engine! must return bool!
+function coc_rankings_can_show(index)
+	return false
+end
+
+-- called from engine! must return string!
+function coc_rankings_set_name(index)
+	return ""
+end
+
+-- called from engine! must return string!
+function coc_rankings_set_hint(index)
+	return ""
+end
+
+-- called from engine! must return string!
+function coc_rankings_set_description(index)
+	return ""
+end
+
+-- called from engine! must return string!
+function coc_rankings_set_icon(index)
+	return ""
+end
+-- //
