@@ -253,6 +253,9 @@ public:
     bool use_Holder(CHolderCustom* holder);
     bool use_Vehicle(CHolderCustom* object);
     void ActorUse();
+#ifdef COC_KICK
+    void actorKick();
+#endif
 
 protected:
     BOOL m_bAnimTorsoPlayed;

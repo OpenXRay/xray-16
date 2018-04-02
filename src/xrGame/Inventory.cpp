@@ -329,7 +329,7 @@ bool CInventory::Slot(u16 slot_id, PIItem pIItem, bool bNotActivate, bool strict
 {
     VERIFY(pIItem);
 
-    if (ItemFromSlot(slot_id) == pIItem)
+    if (slot_id == NO_ACTIVE_SLOT || ItemFromSlot(slot_id) == pIItem)
         return false;
 
     if (!IsGameTypeSingle())

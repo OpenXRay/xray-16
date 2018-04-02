@@ -109,6 +109,10 @@ enum EGameActions
     kPDA_TAB5,
     kPDA_TAB6,
 
+#ifdef COC_KICK
+    kKICK, // alpet: kick dynamic objects
+#endif
+
     kLASTACTION,
     kNOTBINDED,
     kFORCEDWORD = u32(-1)

@@ -69,6 +69,9 @@ _action actions[] = {{"left", kLEFT, _both}, {"right", kRIGHT, _both}, {"up", kU
     { "pda_tab4", kPDA_TAB4, _sp },
     { "pda_tab5", kPDA_TAB5, _sp },
     { "pda_tab6", kPDA_TAB6, _sp },
+#ifdef COC_KICK
+    { "kick", kKICK, _sp },
+#endif
 
     {NULL, kLASTACTION, _both}};
 

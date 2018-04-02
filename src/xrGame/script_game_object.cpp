@@ -156,7 +156,12 @@ const CScriptEntityAction* CScriptGameObject::GetActionByIndex(u32 action_index)
 
 u16 CScriptGameObject::get_bone_id(LPCSTR bone_name) const
 {
-    return object().Visual()->dcast_PKinematics()->LL_BoneID(bone_name);
+    u16	bone_id;
+    if (xr_strlen(bone_name))
+        bone_id = smart_cast<IKinematics*>(object().Visual())->LL_BoneID(bone_name);
+    else
+        bone_id = smart_cast<IKinematics*>(object().Visual())->LL_GetBoneRoot();
+    return bone_id;
 }
 
 cphysics_shell_scripted* CScriptGameObject::get_physics_shell() const
@@ -315,6 +320,12 @@ Fvector CScriptGameObject::bone_position(LPCSTR bone_name) const
         bone_id = smart_cast<IKinematics*>(object().Visual())->LL_BoneID(bone_name);
     else
         bone_id = smart_cast<IKinematics*>(object().Visual())->LL_GetBoneRoot();
+
+    if (bone_id == BI_NONE)
+    {
+        xrDebug::LogStackTrace("CGameObject::bone_position | bone does not exist");
+        GEnv.ScriptEngine->print_stack();
+    }
 
     Fmatrix matrix;
     matrix.mul_43(

@@ -135,6 +135,13 @@ void CSE_ALifeInventoryItem::UPDATE_Write(NET_Packet& tNetPacket)
         return;
     }
 
+    //Alundaio: Bug workaround
+    if (tNetPacket.r_elapsed() < 52)
+    {
+        tNetPacket.r_advance(tNetPacket.r_elapsed());
+        return;
+    }
+
     mask_num_items num_items;
     num_items.mask = 0;
     num_items.num_items = m_u8NumItems;

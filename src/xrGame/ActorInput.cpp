@@ -195,6 +195,11 @@ void CActor::IR_OnKeyboardPress(int cmd)
         }
     }
     break;
+#ifdef COC_KICK
+    case kKICK:
+        actorKick();
+        break;
+#endif
     }
 }
 
@@ -651,6 +656,66 @@ void CActor::SwitchTorch()
         }
     }
 }
+
+#ifdef COC_KICK
+void CActor::actorKick()
+{
+    CGameObject* O = ObjectWeLookingAt();
+    if (O)
+    {
+        CEntityAlive* EA = smart_cast<CEntityAlive*>(O);
+        if (EA && EA->g_Alive())
+            return;
+
+        static float kick_impulse = READ_IF_EXISTS(pSettings, r_float, "actor", "kick_impulse", 250.f);
+        Fvector dir = Direction();
+        dir.y = sin(15.f * PI / 180.f);
+        dir.normalize();
+        float mass_f = 1.f;
+        CPhysicsShellHolder* sh = smart_cast<CPhysicsShellHolder*>(O);
+        if (sh)
+            mass_f = sh->GetMass();
+
+        PIItem itm = smart_cast<PIItem>(O);
+        if (itm)
+            mass_f = itm->Weight();
+
+        CInventoryOwner* io = smart_cast<CInventoryOwner*>(O);
+        if (io)
+            mass_f += io->inventory().TotalWeight();
+
+        if (mass_f < 1)
+            mass_f = 1;
+
+        u16 bone_id = 0;
+        collide::rq_result& RQ = HUD().GetCurrentRayQuery();
+        if (RQ.O == O && RQ.element != 0xffff)
+            bone_id = (u16)RQ.element;
+
+        clamp<float>(mass_f, 0.1f, 100.f); // ограничить параметры хита
+
+                                           // shell->applyForce(dir, kick_power * conditions().GetPower());
+        Fvector h_pos = O->Position();
+        SHit hit = SHit(0.001f * mass_f, dir, this, bone_id, h_pos, kick_impulse, ALife::eHitTypeStrike, 0.f, false);
+        O->Hit(&hit);
+        if (EA)
+        {
+            static float alive_kick_power = 3.f;
+            float real_imp = kick_impulse / mass_f;
+            dir.mul(pow(real_imp, alive_kick_power));
+            EA->character_physics_support()->movement()->AddControlVel(dir);
+            EA->character_physics_support()->movement()->ApplyImpulse(dir.normalize(), kick_impulse * alive_kick_power);
+        }
+
+        conditions().ConditionJump(mass_f / 50);
+        if (mass_f > 5)
+        {
+            hit.boneID = 0;  // пока не ясно, куда лушче ГГ ударить (в ногу надо?)
+            this->Hit(&hit); // сила действия равна силе противодействия
+        }
+    }
+}
+#endif
 
 #ifdef DEBUG
 void CActor::NoClipFly(int cmd)

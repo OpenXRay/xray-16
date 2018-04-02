@@ -1230,7 +1230,7 @@ CScriptGameObject* CScriptGameObject::item_in_slot(u32 slot_id) const
         return (0);
     }
 
-    CInventoryItem* result = inventory_owner->inventory().ItemFromSlot((u16)slot_id);
+    CInventoryItem* result = slot_id != NO_ACTIVE_SLOT ? inventory_owner->inventory().ItemFromSlot((u16)slot_id) : (0);
     return (result ? result->object().lua_game_object() : 0);
 }
 

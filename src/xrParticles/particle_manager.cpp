@@ -97,14 +97,17 @@ void CParticleManager::PlayEffect(int effect_id, int alist_id)
     for (auto& it : *pa)
     {
         VERIFY(it);
-        switch (it->type)
+        if (it)
         {
-        case PASourceID: static_cast<PASource*>(it)->m_Flags.set(PASource::flSilent, false);
-            break;
-        case PAExplosionID: static_cast<PAExplosion*>(it)->age = 0.f;
-            break;
-        case PATurbulenceID: static_cast<PATurbulence*>(it)->age = 0.f;
-            break;
+            switch (it->type)
+            {
+            case PASourceID: static_cast<PASource*>(it)->m_Flags.set(PASource::flSilent, false);
+                break;
+            case PAExplosionID: static_cast<PAExplosion*>(it)->age = 0.f;
+                break;
+            case PATurbulenceID: static_cast<PATurbulence*>(it)->age = 0.f;
+                break;
+            }
         }
     }
     pa->unlock();
@@ -122,10 +125,13 @@ void CParticleManager::StopEffect(int effect_id, int alist_id, bool deffered)
     // Step through all the actions in the action list.
     for (auto& it : *pa)
     {
-        switch (it->type)
+        if (it)
         {
-        case PASourceID: static_cast<PASource*>(it)->m_Flags.set(PASource::flSilent, true);
-            break;
+            switch (it->type)
+            {
+            case PASourceID: static_cast<PASource*>(it)->m_Flags.set(PASource::flSilent, true);
+                break;
+            }
         }
     }
     if (!deffered)
@@ -153,7 +159,8 @@ void CParticleManager::Update(int effect_id, int alist_id, float dt)
     for (auto& it : *pa)
     {
         VERIFY(it);
-        it->Execute(pe, dt, kill_old_time);
+        if (it)
+            it->Execute(pe, dt, kill_old_time);
     }
     pa->unlock();
 }
@@ -179,6 +186,9 @@ void CParticleManager::Transform(int alist_id, const Fmatrix& full, const Fvecto
     // Step through all the actions in the action list.
     for (auto& it : *pa)
     {
+        if (!it)
+            continue;
+
         bool r = it->m_Flags.is(ParticleAction::ALLOW_ROTATE);
         const Fmatrix& m = r ? full : mT;
         it->Transform(m);
@@ -329,6 +339,11 @@ void CParticleManager::SaveActions(int alist_id, IWriter& W)
     pa->lock();
     W.w_u32(pa->size());
     for (auto& it : *pa)
+    {
+        if (!it)
+            continue;
+
         it->Save(W);
+    }
     pa->unlock();
 }
