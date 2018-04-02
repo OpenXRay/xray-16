@@ -38,6 +38,7 @@ void SLocationKey::save(IWriter& stream)
     stream.w(&object_id, sizeof(object_id));
 
     stream.w_stringZ(spot_type);
+    stream.w_u8(location->IsUserDefined() ? 1 : 0);
     stream.w_u8(0);
     location->save(stream);
 }
@@ -47,14 +48,29 @@ void SLocationKey::load(IReader& stream)
     stream.r(&object_id, sizeof(object_id));
 
     stream.r_stringZ(spot_type);
+    u8 bUserDefined = stream.r_u8();
     stream.r_u8();
 
-    location = new CMapLocation(*spot_type, object_id);
+    if (bUserDefined)
+    {
+        Level().Server->PerformIDgen(object_id);
+        location = new CMapLocation(*spot_type, object_id, true);
+    }
+    else
+    {
+        location = new CMapLocation(*spot_type, object_id);
+    }
 
     location->load(stream);
 }
 
-void SLocationKey::destroy() { delete_data(location); }
+void SLocationKey::destroy()
+{
+    if (location && location->IsUserDefined())
+        Level().Server->FreeID(object_id, 0);
+
+    delete_data(location);
+}
 void CMapLocationRegistry::save(IWriter& stream)
 {
     stream.w_u32((u32)objects().size());
@@ -121,6 +137,16 @@ CMapLocation* CMapManager::AddRelationLocation(CInventoryOwner* pInvOwner)
     R_ASSERT(!HasMapLocation(sname, pInvOwner->object_id()));
     CMapLocation* l = new CRelationMapLocation(sname, pInvOwner->object_id(), pActor->object_id());
     Locations().push_back(SLocationKey(sname, pInvOwner->object_id()));
+    Locations().back().location = l;
+    return l;
+}
+
+CMapLocation* CMapManager::AddUserLocation(const shared_str& spot_type, const shared_str& level_name, Fvector position)
+{
+    u16 _id = Level().Server->PerformIDgen(0xffff);
+    CMapLocation* l = new CMapLocation(spot_type.c_str(), _id, true);
+    l->InitUserSpot(level_name, position);
+    Locations().push_back(SLocationKey(spot_type, _id));
     Locations().back().location = l;
     return l;
 }

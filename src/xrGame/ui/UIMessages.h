@@ -131,4 +131,8 @@ enum EUIMessages
 
     //CUITrackBar
     TRACK_VALUE_CHANGED,
+
+    //CUIMapWnd
+    MAP_CHANGE_SPOT_HINT_ACT,
+    MAP_REMOVE_SPOT_ACT,
 };

@@ -19,6 +19,7 @@ public:
     /*ICF */ Locations& Locations(); //{return *m_locations;}
     CMapLocation* AddMapLocation(const shared_str& spot_type, u16 id);
     CMapLocation* AddRelationLocation(CInventoryOwner* pInvOwner);
+    CMapLocation* AddUserLocation(const shared_str& spot_type, const shared_str& level_name, Fvector position);
     void RemoveMapLocation(const shared_str& spot_type, u16 id);
     bool HasMapLocation(const shared_str& spot_type, u16 id);
     void RemoveMapLocationByObjectID(u16 id); // call on destroy object

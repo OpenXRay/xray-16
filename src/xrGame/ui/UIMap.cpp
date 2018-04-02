@@ -503,6 +503,23 @@ bool CUILevelMap::OnMouseAction(float x, float y, EUIMessages mouse_action)
     if (MapWnd()->GlobalMap()->Locked())
         return true;
 
+#ifdef COC_USER_SPOT
+    if (mouse_action == WINDOW_LBUTTON_DB_CLICK)
+    {
+        Fvector RealPosition;
+
+        if (MapWnd()->ConvertCursorPosToMap(&RealPosition, this))
+        {
+            CMapLocation* _mapLoc = MapWnd()->UnderSpot(RealPosition, this);
+            if (_mapLoc == nullptr)
+            {
+                MapWnd()->CreateSpotWindow(RealPosition, MapName());
+                return true;
+            }
+        }
+    }
+#endif
+
     if (mouse_action == WINDOW_MOUSE_MOVE && (FALSE == pInput->iGetAsyncBtnState(0)))
     {
         if (MapWnd())

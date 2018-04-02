@@ -943,6 +943,10 @@ int CScriptEngine::auto_load(lua_State* L)
     return 1;
 }
 
+//Alun: Allow directory structuring for scripts
+using script_list_type = xr_map<xr_string, xr_string>;
+static script_list_type xray_scripts;
+
 void CScriptEngine::setup_auto_load()
 {
     luaL_newmetatable(lua(), "XRAY_AutoLoadMetaTable");
@@ -955,6 +959,25 @@ void CScriptEngine::setup_auto_load()
     lua_setmetatable(lua(), -2);
     //. ??????????
     // lua_settop(lua(), 0);
+
+    //Alun: Allow directory structuring for scripts
+    xray_scripts.clear();
+
+    FS_FileSet fset;
+    FS.file_list(fset, "$game_scripts$", FS_ListFiles, "*.script");
+    FS_FileSet::iterator fit = fset.begin();
+    FS_FileSet::iterator fit_e = fset.end();
+
+    for (; fit != fit_e; ++fit)
+    {
+        string_path	fn1, fn2;
+        _splitpath((*fit).name.c_str(), 0, fn1, fn2, 0);
+
+        FS.update_path(fn1, "$game_scripts$", fn1);
+        strconcat(sizeof(fn1), fn1, fn1, fn2, ".script");
+
+        xray_scripts.insert({ xr_string(fn2), xr_string(fn1) });
+    }
 }
 
 void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
@@ -1081,33 +1104,25 @@ bool CScriptEngine::load_file(const char* scriptName, const char* namespaceName)
 
 bool CScriptEngine::process_file_if_exists(LPCSTR file_name, bool warn_if_not_exist)
 {
-    u32 string_length = xr_strlen(file_name);
-    if (!warn_if_not_exist && no_file_exists(file_name, string_length))
+    if (!*file_name)
         return false;
-    string_path S, S1;
-    if (m_reload_modules || *file_name && !namespace_loaded(file_name))
+
+    if (!m_reload_modules && namespace_loaded(file_name))
+        return false;
+
+    script_list_type::iterator it = xray_scripts.find(xr_string(file_name));
+    if (it != xray_scripts.end())
     {
-        FS.update_path(S, "$game_scripts$", strconcat(sizeof(S1), S1, file_name, ".script"));
-        if (!warn_if_not_exist && !FS.exist(S))
-        {
-#ifdef DEBUG
-            if (false) // XXX: restore (check script engine flags)
-            {
-                print_stack();
-                Msg("! WARNING: Access to nonexistent variable '%s' or loading nonexistent script '%s'", file_name, S1);
-                m_stack_is_ready = true;
-            }
-#endif
-            add_no_file(file_name, string_length);
-            return false;
-        }
-#ifndef MASTER_GOLD
-        Msg("* Loading script: %s", S1);
-#endif
+        Msg("* loading script %s.script", file_name);
         m_reload_modules = false;
-        return load_file_into_namespace(S, *file_name ? file_name : GlobalNamespace);
+
+        return load_file_into_namespace(it->second.c_str(), strcmp(file_name, "_g") == 0 ? "_G" : file_name);
     }
-    return true;
+
+    if (warn_if_not_exist)
+        Msg("Variable %s not found; No script by this name exists, either.", file_name);
+
+    return false;
 }
 
 bool CScriptEngine::process_file(LPCSTR file_name) { return process_file_if_exists(file_name, true); }

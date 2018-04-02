@@ -20,6 +20,7 @@ class CGameTask;
 class CUIXml;
 class UIHint;
 class CUIPropertiesBox;
+class CUIPdaSpot;
 
 using GameMaps = xr_map<shared_str, CUICustomMap*>;
 
@@ -46,6 +47,8 @@ private:
     CMapActionPlanner* m_ActionPlanner;
     //	CUIFrameLineWnd*			UIMainMapHeader;
     CUIMapLocationHint* m_map_location_hint;
+
+    CUIPdaSpot* m_UserSpotWnd;
 
 #ifdef DEBUG
 //	CUIStatic*					m_dbg_text_hint;
@@ -92,7 +95,16 @@ private:
 
     void ResetActionPlanner();
 
+    // qweasdd: from lost alpha
+    CMapLocation* m_cur_location;
+
 public:
+    // qweasdd: from lost alpha
+    bool ConvertCursorPosToMap(Fvector*, CUILevelMap*);
+    void CreateSpotWindow(Fvector, shared_str);
+    void ShowSettingsWindow(u16 id, Fvector position, shared_str levelName);
+    CMapLocation* UnderSpot(Fvector RealPosition, CUILevelMap*);
+    //-qweasdd
     void ViewGlobalMap();
     void ViewActor();
     void ViewZoomIn();
