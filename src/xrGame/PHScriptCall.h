@@ -18,7 +18,12 @@ public:
     virtual bool is_true();
     virtual bool obsolete() const;
     virtual bool compare(const CPHReqComparerV* v) const { return v->compare(this); }
-    virtual bool compare(const CPHScriptCondition* v) const { return *m_lua_function == *(v->m_lua_function); }
+    virtual bool compare(const CPHScriptCondition* v) const
+    {
+        const auto& lhs = static_cast<const luabind::adl::object&>(*m_lua_function);
+        const auto& rhs = static_cast<const luabind::adl::object&>(*v->m_lua_function);
+        return lhs == rhs;
+    }
 };
 
 class CPHScriptAction : public CPHAction, public CPHReqComparerV
@@ -35,7 +40,9 @@ public:
     virtual bool compare(const CPHReqComparerV* v) const { return v->compare(this); }
     virtual bool compare(const CPHScriptAction* v) const
     {
-        return *m_lua_function == *(v->m_lua_function);
+        const auto& lhs = static_cast<const luabind::adl::object&>(*m_lua_function);
+        const auto& rhs = static_cast<const luabind::adl::object&>(*v->m_lua_function);
+        return lhs == rhs;
     }
 };
 

@@ -33,7 +33,9 @@ CUIMapWnd::CUIMapWnd()
     m_currentZoom = 1.0f;
     m_map_location_hint = NULL;
     m_map_move_step = 10.0f;
+#ifdef COC_USER_SPOT
     m_UserSpotWnd = nullptr;
+#endif
 
     //	UIMainMapHeader			= NULL;
     m_scroll_mode = false;
@@ -198,9 +200,11 @@ void CUIMapWnd::Init(LPCSTR xml_name, LPCSTR start_from)
     m_UIPropertiesBox->SetWindowName("property_box");
 #endif
 
+#ifdef COC_USER_SPOT
     m_UserSpotWnd = new CUIPdaSpot();
     m_UserSpotWnd->SetAutoDelete(true);
     AttachChild(m_UserSpotWnd);
+#endif
 }
 
 void CUIMapWnd::Show(bool status)
@@ -240,7 +244,9 @@ void CUIMapWnd::Show(bool status)
         InventoryUtilities::SendInfoToActor("ui_pda_map_local");
     }
     HideCurHint();
+#ifdef COC_USER_SPOT
     m_UserSpotWnd->Exit();
+#endif
 }
 
 void CUIMapWnd::Activated()
@@ -806,6 +812,7 @@ void CUIMapWnd::SpotSelected(CUIWindow* w)
     }
 }
 
+#ifdef COC_USER_SPOT
 // -------------------------------------------------------------
 // qweasdd: Following functions from Lost Alpha
 //Alun: Correct now. All you need is relative mouse position to absolute pos of uilevelmap, then remove widescreen scale on X before local-to-world convert
@@ -876,3 +883,4 @@ void CUIMapWnd::CreateSpotWindow(Fvector RealPosition, shared_str map_name)
     m_UserSpotWnd->Init(u16(-1), map_name.c_str(), RealPosition, true);
     m_UserSpotWnd->ShowDialog(true);
 }
+#endif

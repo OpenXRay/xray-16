@@ -48,7 +48,9 @@ private:
     //	CUIFrameLineWnd*			UIMainMapHeader;
     CUIMapLocationHint* m_map_location_hint;
 
+#ifdef COC_USER_SPOT
     CUIPdaSpot* m_UserSpotWnd;
+#endif
 
 #ifdef DEBUG
 //	CUIStatic*					m_dbg_text_hint;
@@ -99,12 +101,14 @@ private:
     CMapLocation* m_cur_location;
 
 public:
+#ifdef COC_USER_SPOT
     // qweasdd: from lost alpha
     bool ConvertCursorPosToMap(Fvector*, CUILevelMap*);
     void CreateSpotWindow(Fvector, shared_str);
     void ShowSettingsWindow(u16 id, Fvector position, shared_str levelName);
     CMapLocation* UnderSpot(Fvector RealPosition, CUILevelMap*);
     //-qweasdd
+#endif
     void ViewGlobalMap();
     void ViewActor();
     void ViewZoomIn();

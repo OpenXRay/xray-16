@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "UIPdaSpot.h"
+#ifdef COC_USER_SPOT
 #include <dinput.h>
 #include "Level.h"
 #include "map_manager.h"
@@ -137,3 +138,4 @@ void CUIPdaSpot::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
     CUIWndCallback::OnEvent(pWnd, msg, pData);
 }
+#endif

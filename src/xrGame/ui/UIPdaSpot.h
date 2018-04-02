@@ -1,4 +1,5 @@
 #pragma once
+#ifdef COC_USER_SPOT
 #include "UIDialogWnd.h"
 #include "UIWndCallback.h"
 
@@ -37,3 +38,4 @@ public:
     virtual bool OnKeyboardAction(int dik, EUIMessages keyboard_action);
     virtual void SendMessage(CUIWindow* pWnd, s16 msg, void* pData = NULL);
 };
+#endif

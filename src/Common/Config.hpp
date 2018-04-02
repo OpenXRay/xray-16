@@ -34,7 +34,7 @@
 //#define CONFIG_SUN_MOVEMENT // With this defined sun will move as configured in weather ltx files
 #ifdef COC_EDITION
 #   define CALLOFCHERNOBYL_RANKING // Enables Call of Chernobyl ranking system instead of original Call of Pripyat system
-#   define COC_USER_SPOT // Enable user spot on the map from CoC
+//#   define COC_USER_SPOT // Enable user spot on the map from CoC
 #   define COC_MAP_SPOT_PROPS_BOX
 #   define COC_ENABLE_AUTOSAVE // Enable autosave manager
 #   define COC_KICK

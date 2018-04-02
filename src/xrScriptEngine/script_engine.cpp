@@ -1068,7 +1068,7 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
     {
         bool save = m_reload_modules;
         m_reload_modules = true;
-        process_file_if_exists(GlobalNamespace, false);
+        process_file_if_exists("_g", false);
         m_reload_modules = save;
     }
     m_stack_level = lua_gettop(lua());
