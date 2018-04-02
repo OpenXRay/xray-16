@@ -24,19 +24,31 @@ bool CActor::use_HolderEx(CHolderCustom* object, bool bForce)
         {
             if (!object || m_holder == object)
             {
-                m_holder->detach_Actor();
+                SetWeaponHideState(INV_STATE_CAR, false);
 
                 CGameObject* go = smart_cast<CGameObject*>(m_holder);
                 if (go)
                     this->callback(GameObject::eDetachVehicle)(go->lua_game_object());
 
+                m_holder->detach_Actor();
+
                 character_physics_support()->movement()->CreateCharacter();
+                character_physics_support()->movement()->SetPosition(m_holder->ExitPosition());
+                character_physics_support()->movement()->SetVelocity(m_holder->ExitVelocity());
+
+                r_model_yaw = -m_holder->Camera()->yaw;
+                r_torso.yaw = r_model_yaw;
+                r_model_yaw_dest = r_model_yaw;
+
+                SetCallbacks();
+
                 m_holder = nullptr;
+                m_holderID = u16(-1);
             }
         }
         return true;
     }
-    CCar* car = smart_cast<CCar*>(m_holder);
+    CCar* car = smart_cast<CCar*>(object);
     if (car)
     {
         attach_Vehicle(object);
@@ -46,25 +58,27 @@ bool CActor::use_HolderEx(CHolderCustom* object, bool bForce)
     {
         Fvector center;
         Center(center);
-        if (object->Use(Device.vCameraPosition, Device.vCameraDirection, center))
+        if (object->Use(Device.vCameraPosition, Device.vCameraDirection, center) && object->attach_Actor(this))
         {
-            if (object->attach_Actor(this))
+            SetWeaponHideState(INV_STATE_CAR, true);
+
+            // destroy actor character
+            character_physics_support()->movement()->DestroyCharacter();
+
+            m_holder = object;
+            IGameObject* oHolder = smart_cast<IGameObject*>(object);
+            m_holderID = oHolder->ID();
+
+            if (pCamBobbing)
             {
-                // destroy actor character
-                character_physics_support()->movement()->DestroyCharacter();
-
-                m_holder = object;
-                if (pCamBobbing)
-                {
-                    Cameras().RemoveCamEffector(eCEBobbing);
-                    pCamBobbing = nullptr;
-                }
-
-                CGameObject* go = smart_cast<CGameObject*>(m_holder);
-                if (go)
-                    this->callback(GameObject::eAttachVehicle)(go->lua_game_object());
-                return true;
+                Cameras().RemoveCamEffector(eCEBobbing);
+                pCamBobbing = nullptr;
             }
+
+            CGameObject* go = smart_cast<CGameObject*>(object);
+            if (go)
+                this->callback(GameObject::eAttachVehicle)(go->lua_game_object());
+            return true;
         }
     }
     return false;

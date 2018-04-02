@@ -49,6 +49,7 @@ SCRIPT_EXPORT(CHelicopter, (CGameObject), {
                 .def("GoPatrolByPatrolPath", &CHelicopter::goPatrolByPatrolPath)
                 .def("GoPatrolByRoundPath", &CHelicopter::goByRoundPath)
                 .def("SetDestPosition", &CHelicopter::SetDestPosition)
+                .def("GetDestPosition", &CHelicopter::GetDestPosition)
                 .def("LookAtPoint", &CHelicopter::LookAtPoint)
                 .def("SetFireTrailLength", &CHelicopter::SetFireTrailLength)
                 .def("SetBarrelDirTolerance", &CHelicopter::SetBarrelDirTolerance)
@@ -61,6 +62,13 @@ SCRIPT_EXPORT(CHelicopter, (CGameObject), {
                 .def("Explode", &CHelicopter::ExplodeHelicopter)
 
                 .def("isVisible", &CHelicopter::isVisible)
+
+                .def("SetCameraType", &CHelicopter::OnCameraChange)
+                .def("GetCameraType", &CHelicopter::ActiveCameraTag)
+                .def("GetEnemy", &CHelicopter::GetEnemy)
+                .def("AlreadyOnPoint", &CHelicopter::AlreadyOnPoint)
+                .def("GetPosition", &CHelicopter::GetPosition)
+                .def("GetPathAltitude", &CHelicopter::getPathAltitude)
 
                 .def("GetRealAltitude", &CHelicopter::GetRealAltitude)
                 .def("GetSafeAltitude", &CHelicopter::GetSafeAltitude)

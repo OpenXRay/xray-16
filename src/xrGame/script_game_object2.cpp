@@ -37,6 +37,7 @@
 #include "car.h"
 #include "movement_manager.h"
 #include "detail_path_manager.h"
+#include "CharacterPhysicsSupport.h"
 
 void CScriptGameObject::explode(u32 level_time)
 {
@@ -339,15 +340,29 @@ void CScriptGameObject::RestoreDefaultStartDialog()
     pDialogManager->RestoreDefaultStartDialog();
 }
 
-void CScriptGameObject::SetActorPosition(Fvector pos)
+void CScriptGameObject::SetActorPosition(Fvector pos, bool bskip_collision_correct)
 {
     CActor* actor = smart_cast<CActor*>(&object());
     if (actor)
     {
-        Fmatrix F = actor->XFORM();
-        F.c = pos;
-        actor->ForceTransform(F);
-        //		actor->XFORM().c = pos;
+        if (bskip_collision_correct)
+        {
+            Fmatrix F = actor->XFORM();
+            F.c = pos;
+            actor->XFORM().set(F);
+            if (actor->character_physics_support()->movement()->CharacterExist())
+            {
+                actor->character_physics_support()->movement()->SetPosition(F.c);
+                actor->character_physics_support()->movement()->SetVelocity(0.f, 0.f, 0.f);
+            }
+        }
+        else
+        {
+            Fmatrix F = actor->XFORM();
+            F.c = pos;
+            actor->ForceTransform(F);
+            //		actor->XFORM().c = pos;
+        }
     }
     else
         GEnv.ScriptEngine->script_log(

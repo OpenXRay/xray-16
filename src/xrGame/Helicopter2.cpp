@@ -133,6 +133,17 @@ void CHelicopter::SetEnemy(Fvector* pos)
     m_enemy.destEnemyPos = *pos;
 }
 
+CScriptGameObject* CHelicopter::GetEnemy()
+{
+    if (m_enemy.type == eEnemyEntity && m_enemy.destEnemyID < 65535)
+    {
+        CGameObject* pGameObject = smart_cast<CGameObject*>(Level().Objects.net_Find(m_enemy.destEnemyID));
+        if (pGameObject)
+            return pGameObject->lua_game_object();
+    }
+    return (0);
+}
+
 float CHelicopter::GetCurrVelocity() { return m_movement.curLinearSpeed; }
 void CHelicopter::SetMaxVelocity(float v) { m_movement.maxLinearSpeed = v; }
 float CHelicopter::GetMaxVelocity() { return m_movement.maxLinearSpeed; }
@@ -247,6 +258,9 @@ void CHelicopter::DieHelicopter()
     if (state() == CHelicopter::eDead)
         return;
     CEntity::Die(NULL);
+
+    if (OwnerActor())
+        OwnerActor()->use_HolderEx(NULL, false);
 
     m_engineSound.stop();
 

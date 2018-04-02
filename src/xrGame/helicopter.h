@@ -11,6 +11,10 @@
 #include "xrAICore/Navigation/PatrolPath/patrol_path.h"
 #include "PHDestroyable.h"
 #include "Explosive.h"
+#include "holder_custom.h"
+#include "cameralook.h"
+#include "CameraFirstEye.h"
+#include "phcollisiondamagereceiver.h"
 
 class CScriptGameObject;
 class CLAItem;
@@ -138,6 +142,7 @@ public:
     float GetDistanceToDestPosition();
     void getPathAltitude(Fvector& point, float base_altitude);
     void SetDestPosition(Fvector* pos);
+    Fvector* GetDestPosition() { return &desiredPoint; };
     void goPatrolByPatrolPath(LPCSTR path_name, int start_idx);
     void CreateRoundPoints(Fvector center, float radius, float start_h, float end_h, xr_vector<STmpPt>& round_points);
     void save(NET_Packet& output_packet);
@@ -151,6 +156,7 @@ class CHelicopter : public CEntity,
                     public CRocketLauncher,
                     public CPHSkeleton,
                     public CPHDestroyable,
+                    public CHolderCustom,
                     public CHitImmunity,
                     public CExplosive
 #ifdef DEBUG
@@ -168,6 +174,34 @@ public:
         eDead,
         eForce = u32(-1)
     };
+
+    //holder
+    virtual bool			allowWeapon() const { return false; };
+    virtual Fvector			ExitPosition() { return Fvector(XFORM().c).add(m_exit_position); }
+    virtual Fvector			ExitVelocity();
+    void					cam_Update(float dt, float fov);
+    void					detach_Actor();
+    bool					attach_Actor(CGameObject* actor);
+    void					UpdateEx(float fov);
+    void					OnCameraChange(int type);
+    int						ActiveCameraTag() { return active_camera->tag; };
+    virtual bool			HUDView() const;
+    CCameraBase*			Camera() { return active_camera; }
+
+    CCameraBase*			camera[3];
+    CCameraBase*			active_camera;
+
+    xr_vector <Fvector>		m_camera_position;
+    Fvector					m_exit_position;
+
+    virtual void			OnMouseMove(int x, int y);
+    virtual void			OnKeyboardPress(int dik);
+    virtual void			OnKeyboardRelease(int dik);
+    virtual void			OnKeyboardHold(int dik);
+    bool					Use(const Fvector& pos, const Fvector& dir, const Fvector& foot_pos);
+    CInventory*				GetInventory() { return (0); }
+    static	void 			ActorObstacleCallback(bool& do_colide, bool bo1, dContact& c, SGameMtl* material_1, SGameMtl* material_2);
+    //-holder
 
     // heli weapons
     bool m_use_rocket_on_attack;
@@ -323,6 +357,10 @@ public:
 
     virtual CGameObject* cast_game_object() { return this; }
     virtual CExplosive* cast_explosive() { return this; }
+    virtual CPhysicsShellHolder* cast_physics_shell_holder() { return this; }
+    virtual CParticlesPlayer* cast_particles_player() { return this; }
+    virtual IDamageSource* cast_IDamageSource() { return this; }
+    virtual CHolderCustom* cast_holder_custom() { return this; }
     virtual CPHSkeleton* PHSkeleton() { return this; }
 public:
     // for scripting
@@ -333,8 +371,12 @@ public:
     void goByRoundPath(Fvector center, float radius, bool clockwise);
     void LookAtPoint(Fvector point, bool do_it);
     void SetDestPosition(Fvector* pos);
+    Fvector* GetDestPosition() { return m_movement.GetDestPosition(); };
     float GetDistanceToDestPosition();
 
+    Fvector* GetPosition() { return &XFORM().c; };
+    Fvector* getPathAltitude(Fvector& pos, float base_alt);
+    bool AlreadyOnPoint() { return m_movement.AlreadyOnPoint(); };
     void SetSpeedInDestPoint(float sp);
     float GetSpeedInDestPoint(float sp);
 
@@ -351,6 +393,7 @@ public:
     void SetBarrelDirTolerance(float val) { m_barrel_dir_tolerance = val; };
     void SetEnemy(CScriptGameObject* e);
     void SetEnemy(Fvector* pos);
+    CScriptGameObject* GetEnemy();
     void UnSetEnemy();
     void SetFireTrailLength(float val);
     bool UseFireTrail();

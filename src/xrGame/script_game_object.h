@@ -254,7 +254,7 @@ public:
     void AddAction(const CScriptEntityAction* tpEntityAction, bool bHighPriority = false);
     void ResetActionQueue();
     // Actor only
-    void SetActorPosition(Fvector pos);
+    void SetActorPosition(Fvector pos, bool bskip_collision_correct = false);
     void SetActorDirection(float dir);
     void SetNpcPosition(Fvector pos);
     void DisableHitMarks(bool disable);

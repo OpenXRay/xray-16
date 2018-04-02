@@ -253,15 +253,6 @@ bool patrol_path_exists(LPCSTR patrol_path) { return (!!ai().patrol_paths().path
 LPCSTR get_name() { return (*Level().name()); }
 void prefetch_sound(LPCSTR name) { Level().PrefetchSound(name); }
 CClientSpawnManager& get_client_spawn_manager() { return (Level().client_spawn_manager()); }
-/*
-void start_stop_menu(CUIDialogWnd* pDialog, bool bDoHideIndicators)
-{
-    if(pDialog->IsShown())
-        pDialog->HideDialog();
-    else
-        pDialog->ShowDialog(bDoHideIndicators);
-}
-*/
 
 void add_dialog_to_render(CUIDialogWnd* pDialog) { CurrentGameUI()->AddDialogToRender(pDialog); }
 void remove_dialog_to_render(CUIDialogWnd* pDialog) { CurrentGameUI()->RemoveDialogToRender(pDialog); }
@@ -681,6 +672,22 @@ void reload_language()
     CStringTable().ReloadLanguage();
 }
 
+CScriptGameObject* get_view_entity_script()
+{
+    CGameObject* pGameObject = smart_cast<CGameObject*>(Level().CurrentViewEntity());
+    if (!pGameObject)
+        return (0);
+
+    return pGameObject->lua_game_object();
+}
+
+void set_view_entity_script(CScriptGameObject* go)
+{
+    IGameObject* o = smart_cast<IGameObject*>(&go->object());
+    if (o)
+        Level().SetViewEntity(o);
+}
+
 // XXX nitrocaster: one can export enum like class, without defining dummy type
 template<typename T>
 struct EnumCallbackType {};
@@ -703,6 +710,8 @@ IC static void CLevel_Export(lua_State* luaState)
         def("get_target_obj", &g_get_target_obj), //intentionally named to what is in xray extensions
         def("get_target_dist", &g_get_target_dist),
         def("get_target_element", &g_get_target_element), //Can get bone cursor is targeting
+        def("get_view_entity", &get_view_entity_script),
+        def("set_view_entity", &set_view_entity_script),
         def("spawn_item", &spawn_section),
         def("get_active_cam", &get_active_cam),
         def("set_active_cam", &set_active_cam),

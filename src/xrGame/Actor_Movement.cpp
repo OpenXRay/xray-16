@@ -331,26 +331,28 @@ void CActor::g_cl_CheckControls(u32 mstate_wf, Fvector& vControlAccel, float& Ju
         if (state_anm)
         { // play moving cam effect
             CActor* control_entity = smart_cast<CActor*>(Level().CurrentControlEntity());
-            R_ASSERT2(control_entity, "current control entity is NULL");
-            CEffectorCam* ec = control_entity->Cameras().GetCamEffector(eCEActorMoving);
-            if (NULL == ec)
+            if (control_entity)
             {
-                string_path eff_name;
-                xr_sprintf(eff_name, sizeof(eff_name), "%s.anm", state_anm);
-                string_path ce_path;
-                string_path anm_name;
-                strconcat(sizeof(anm_name), anm_name, "camera_effects\\actor_move\\", eff_name);
-                if (FS.exist(ce_path, "$game_anims$", anm_name))
+                CEffectorCam* ec = control_entity->Cameras().GetCamEffector(eCEActorMoving);
+                if (NULL == ec)
                 {
-                    CAnimatorCamLerpEffectorConst* e = new CAnimatorCamLerpEffectorConst();
-                    float max_scale = 70.0f;
-                    float factor = cam_eff_factor / max_scale;
-                    e->SetFactor(factor);
-                    e->SetType(eCEActorMoving);
-                    e->SetHudAffect(false);
-                    e->SetCyclic(false);
-                    e->Start(anm_name);
-                    control_entity->Cameras().AddCamEffector(e);
+                    string_path eff_name;
+                    xr_sprintf(eff_name, sizeof(eff_name), "%s.anm", state_anm);
+                    string_path ce_path;
+                    string_path anm_name;
+                    strconcat(sizeof(anm_name), anm_name, "camera_effects\\actor_move\\", eff_name);
+                    if (FS.exist(ce_path, "$game_anims$", anm_name))
+                    {
+                        CAnimatorCamLerpEffectorConst* e = new CAnimatorCamLerpEffectorConst();
+                        float max_scale = 70.0f;
+                        float factor = cam_eff_factor / max_scale;
+                        e->SetFactor(factor);
+                        e->SetType(eCEActorMoving);
+                        e->SetHudAffect(false);
+                        e->SetCyclic(false);
+                        e->Start(anm_name);
+                        control_entity->Cameras().AddCamEffector(e);
+                    }
                 }
             }
         }

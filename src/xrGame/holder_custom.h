@@ -44,7 +44,7 @@ public:
     virtual void SetEnterLocked(const bool v) { m_bEnterLocked = v; }
     virtual void SetExitLocked(const bool v) { m_bExitLocked = v; }
 
-    virtual bool Use(const Fvector& pos, const Fvector& dir, const Fvector& foot_pos) = 0;
+    virtual bool Use(const Fvector& pos, const Fvector& dir, const Fvector& foot_pos) { return true; }
     virtual bool attach_Actor(CGameObject* actor);
     virtual void detach_Actor();
     virtual bool allowWeapon() const = 0;

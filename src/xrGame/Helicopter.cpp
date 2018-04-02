@@ -11,6 +11,16 @@
 #include "script_game_object.h"
 #include "xrEngine/LightAnimLibrary.h"
 #include "ui_base.h"
+
+#include "holder_custom.h"
+#include "cameralook.h"
+#include "camerafirsteye.h"
+#include "Actor.h"
+#include "ActorEffector.h"
+#include "CharacterPhysicsSupport.h"
+#include "xr_level_controller.h"
+#include "script_callback_ex.h"
+
 #ifdef DEBUG
 #include "xrEngine/GameFont.h"
 #endif
@@ -30,6 +40,22 @@ CHelicopter::CHelicopter()
 
     m_movement.parent = this;
     m_body.parent = this;
+
+    m_exit_position = Fvector().set(0.0f, 0.0f, 0.0f);
+
+    active_camera = 0;
+    camera[eacFirstEye] = new CCameraFirstEye(this, CCameraBase::flRelativeLink | CCameraBase::flPositionRigid);
+    camera[eacFirstEye]->tag = eacFirstEye;
+    camera[eacFirstEye]->Load("heli_firsteye_cam");
+
+    camera[eacLookAt] = new CCameraLook(this, CCameraBase::flRelativeLink);
+    camera[eacLookAt]->tag = eacLookAt;
+    camera[eacLookAt]->Load("heli_look_cam");
+
+    camera[eacFreeLook] = new CCameraLook(this);
+    camera[eacFreeLook]->tag = eacFreeLook;
+    camera[eacFreeLook]->Load("heli_free_cam");
+    OnCameraChange(eacFirstEye);
 }
 
 CHelicopter::~CHelicopter()
@@ -78,6 +104,12 @@ void CHelicopter::Load(LPCSTR section)
     m_movement.Load(section);
     m_body.Load(section);
     m_enemy.Load(section);
+
+    m_exit_position = READ_IF_EXISTS(pSettings, r_fvector3, section, "exit_pos", Fvector().set(0.0f, 0.0f, 0.0f));
+    m_camera_position.clear();
+    m_camera_position.push_back(READ_IF_EXISTS(pSettings, r_fvector3, section, "camera_first", Fvector().set(0.0f, 0.0f, 0.0f)));
+    m_camera_position.push_back(READ_IF_EXISTS(pSettings, r_fvector3, section, "camera_look", Fvector().set(0.0f, 0.0f, 0.0f)));
+    m_camera_position.push_back(READ_IF_EXISTS(pSettings, r_fvector3, section, "camera_free", Fvector().set(0.0f, 0.0f, 0.0f)));
 
     m_death_ang_vel = pSettings->r_fvector3(section, "death_angular_vel");
     m_death_lin_vel_k = pSettings->r_float(section, "death_lin_vel_koeff");
@@ -251,6 +283,14 @@ void CHelicopter::net_Destroy()
     CParticlesObject::Destroy(m_pParticle);
     m_light_render.destroy();
     m_movement.net_Destroy();
+    m_camera_position.clear();
+    if (m_pPhysicsShell)
+    {
+        m_pPhysicsShell->Deactivate();
+        m_pPhysicsShell->ZeroCallbacks();
+        xr_delete(m_pPhysicsShell);
+    }
+    CHolderCustom::detach_Actor();
 #ifdef DEBUG
     Device.seqRender.Remove(this);
 #endif
@@ -422,6 +462,14 @@ void CHelicopter::UpdateCL()
 
     IKinematics* K = smart_cast<IKinematics*>(Visual());
     K->CalculateBones();
+
+    if (OwnerActor() && OwnerActor()->IsMyCamera())
+    {
+        cam_Update(Device.fTimeDelta, g_fov);
+        OwnerActor()->Cameras().UpdateFromCamera(Camera());
+        if (eacFirstEye == active_camera->tag && !Level().Cameras().GetCamEffector(cefDemo))
+            OwnerActor()->Cameras().ApplyDevice(VIEWPORT_NEAR);
+    }
 }
 
 void CHelicopter::shedule_Update(u32 time_delta)
@@ -494,4 +542,157 @@ void CHelicopter::net_Relcase(IGameObject* O)
 {
     CExplosive::net_Relcase(O);
     inherited::net_Relcase(O);
+}
+
+void CHelicopter::ActorObstacleCallback(bool& do_colide, bool bo1, dContact& c, SGameMtl* material_1, SGameMtl* material_2)
+{
+    if (!do_colide)
+    {
+        if (material_1&&material_1->Flags.test(SGameMtl::flActorObstacle))do_colide = true;
+        if (material_2&&material_2->Flags.test(SGameMtl::flActorObstacle))do_colide = true;
+    }
+}
+
+void CHelicopter::detach_Actor()
+{
+    if (Owner())
+        Owner()->setVisible(1);
+    CHolderCustom::detach_Actor();
+    PPhysicsShell()->remove_ObjectContactCallback(ActorObstacleCallback);
+    PPhysicsShell()->EnableCollision();
+    processing_deactivate();
+}
+
+bool CHelicopter::attach_Actor(CGameObject* actor)
+{
+    if (state() == CHelicopter::eDead || CPHDestroyable::Destroyed())
+        return false;
+    CHolderCustom::attach_Actor(actor);
+    Owner()->setVisible(0);
+    PPhysicsShell()->Enable();
+    PPhysicsShell()->add_ObjectContactCallback(ActorObstacleCallback);
+    processing_activate();
+    OnCameraChange(eacLookAt);
+    return true;
+}
+
+void CHelicopter::UpdateEx(float fov)
+{
+    if (OwnerActor())
+    {
+        OwnerActor()->XFORM().c.set(XFORM().c);
+        if (OwnerActor()->character_physics_support()->movement()->CharacterExist())
+        {
+            OwnerActor()->character_physics_support()->movement()->SetPosition(XFORM().c);
+            OwnerActor()->character_physics_support()->movement()->SetVelocity(0.f, 0.f, 0.f);
+        }
+    }
+}
+
+Fvector	CHelicopter::ExitVelocity()
+{
+    CPhysicsShell *P = PPhysicsShell();
+    if (!P || !P->isActive())
+        return Fvector().set(0, 0, 0);
+    CPhysicsElement *E = P->get_ElementByStoreOrder(0);
+    Fvector v = ExitPosition();
+    E->GetPointVel(v, v);
+    return v;
+}
+
+void CHelicopter::cam_Update(float dt, float fov)
+{
+    Fvector P, Da;
+    Da.set(0, 0, 0);
+
+    XFORM().transform_tiny(P, m_camera_position[active_camera->tag]);
+
+    active_camera->f_fov = fov;
+    active_camera->Update(P, Da);
+    Level().Cameras().UpdateFromCamera(active_camera);
+}
+
+bool CHelicopter::HUDView() const
+{
+    return false;
+}
+
+void CHelicopter::OnCameraChange(int type)
+{
+    if (!active_camera || active_camera->tag != type) {
+        active_camera = camera[type];
+        if (eacFreeLook == type) {
+            Fvector xyz;
+            XFORM().getXYZi(xyz);
+            active_camera->yaw = xyz.y;
+        }
+    }
+}
+
+bool CHelicopter::Use(const Fvector& pos, const Fvector& dir, const Fvector& foot_pos)
+{
+    return true;
+}
+
+void CHelicopter::OnMouseMove(int dx, int dy)
+{
+    if (Remote())					return;
+
+    CCameraBase* C = active_camera;
+    float scale = (C->f_fov / g_fov)*psMouseSens * psMouseSensScale / 50.f;
+    if (dx) {
+        float d = float(dx)*scale;
+        C->Move((d<0) ? kLEFT : kRIGHT, _abs(d));
+    }
+    if (dy) {
+        float d = ((psMouseInvert.test(1)) ? -1 : 1)*float(dy)*scale*3.f / 4.f;
+        C->Move((d>0) ? kUP : kDOWN, _abs(d));
+    }
+}
+
+void CHelicopter::OnKeyboardPress(int cmd)
+{
+    if (Remote())
+        return;
+
+    switch (cmd)
+    {
+    case kCAM_1:	OnCameraChange(eacFirstEye);	break;
+    case kCAM_2:	OnCameraChange(eacLookAt);		break;
+    case kCAM_3:	OnCameraChange(eacFreeLook);	break;
+    };
+
+    this->callback(GameObject::eKeyPress)(cmd);
+}
+
+void CHelicopter::OnKeyboardRelease(int cmd)
+{
+    if (Remote())
+        return;
+
+    this->callback(GameObject::eKeyRelease)(cmd);
+}
+
+void CHelicopter::OnKeyboardHold(int cmd)
+{
+    if (Remote())
+        return;
+
+    switch (cmd)
+    {
+    case kCAM_ZOOM_IN:
+    case kCAM_ZOOM_OUT:
+    case kUP:
+    case kDOWN:
+    case kLEFT:
+    case kRIGHT:	active_camera->Move(cmd);	break;
+    };
+
+    this->callback(GameObject::eKeyHold)(cmd);
+}
+
+Fvector* CHelicopter::getPathAltitude(Fvector& pos, float base_alt)
+{
+    m_movement.getPathAltitude(pos, base_alt);
+    return &pos;
 }
