@@ -107,13 +107,13 @@ protected:
 
 public:
     // Registrators
-    CRegistrator<pureRender> seqRender;
-    CRegistrator<pureAppActivate> seqAppActivate;
-    CRegistrator<pureAppDeactivate> seqAppDeactivate;
-    CRegistrator<pureAppStart> seqAppStart;
-    CRegistrator<pureAppEnd> seqAppEnd;
-    CRegistrator<pureFrame> seqFrame;
-    CRegistrator<pureScreenResolutionChanged> seqResolutionChanged;
+    MessageRegistry<pureRender> seqRender;
+    MessageRegistry<pureAppActivate> seqAppActivate;
+    MessageRegistry<pureAppDeactivate> seqAppDeactivate;
+    MessageRegistry<pureAppStart> seqAppStart;
+    MessageRegistry<pureAppEnd> seqAppEnd;
+    MessageRegistry<pureFrame> seqFrame;
+    MessageRegistry<pureScreenResolutionChanged> seqResolutionChanged;
 
     HWND m_hWnd;
 };
@@ -197,8 +197,8 @@ public:
 
     void DumpResourcesMemoryUsage() { GEnv.Render->ResourcesDumpMemoryUsage(); }
 
-    CRegistrator<pureFrame> seqFrameMT;
-    CRegistrator<pureDeviceReset> seqDeviceReset;
+    MessageRegistry<pureFrame> seqFrameMT;
+    MessageRegistry<pureDeviceReset> seqDeviceReset;
     xr_vector<fastdelegate::FastDelegate0<>> seqParallel;
 	CSecondVPParams m_SecondViewport;	//--#SM+#-- +SecondVP+
 
