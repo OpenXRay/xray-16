@@ -524,7 +524,8 @@ void CConsole::ExecuteCommand(LPCSTR cmd_str, bool record_cmd)
     reset_cmd_history_idx();
     reset_selected_tip();
 
-    text_editor::remove_spaces(edt);
+    //text_editor::remove_spaces(edt);
+    _Trim(edt);
     if (edt[0] == 0)
     {
         return;

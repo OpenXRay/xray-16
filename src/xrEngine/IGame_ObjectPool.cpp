@@ -44,6 +44,12 @@ IGameObject* IGame_ObjectPool::create(LPCSTR name)
 {
     CLASS_ID CLS = pSettings->r_clsid(name, "class");
     IGameObject* O = smart_cast<IGameObject*>(NEW_INSTANCE(CLS));
+    if (!O)
+    {
+        xrDebug::LogStackTrace("");
+        Msg("xrFactory_Create | failed to create %s by clsid %d", name, CLS);
+        return nullptr;
+    }
     O->cNameSect_set(name);
     O->Load(name);
     O->PostLoad(name); //--#SM+#--

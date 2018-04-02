@@ -283,7 +283,7 @@ public:
     virtual void Execute(LPCSTR args)
     {
         Fvector v;
-        if (3 != sscanf(args, "%f,%f,%f", &v.x, &v.y, &v.z))
+        if ((3 != sscanf(args, "%f,%f,%f", &v.x, &v.y, &v.z)) && (3 != sscanf(args, "(%f, %f, %f)", &v.x, &v.y, &v.z)))
         {
             InvalidSyntax();
             return;

@@ -26,12 +26,15 @@
 #include "Torch.h"
 #include "xrNetServer/NET_Messages.h"
 #include "xrCore/xr_token.h"
+#include "CameraLook.h"
 
 #define WEAPON_REMOVE_TIME 60000
 #define ROTATION_TIME 0.25f
 
 BOOL b_toggle_weapon_aim = FALSE;
 extern CUIXml* pWpnScopeXml;
+
+static bool m_freelook_switch_back = false;
 
 CWeapon::CWeapon()
 {
@@ -252,7 +255,7 @@ void CWeapon::Load(LPCSTR section)
     float temp_f = 0.0f;
     temp_f = pSettings->r_float(section, "cam_relax_speed");
     cam_recoil.RelaxSpeed = _abs(deg2rad(temp_f));
-    VERIFY(!fis_zero(cam_recoil.RelaxSpeed));
+    //VERIFY(!fis_zero(cam_recoil.RelaxSpeed));
     if (fis_zero(cam_recoil.RelaxSpeed))
     {
         cam_recoil.RelaxSpeed = EPS_L;
@@ -271,7 +274,7 @@ void CWeapon::Load(LPCSTR section)
     }
     temp_f = pSettings->r_float(section, "cam_max_angle");
     cam_recoil.MaxAngleVert = _abs(deg2rad(temp_f));
-    VERIFY(!fis_zero(cam_recoil.MaxAngleVert));
+    //VERIFY(!fis_zero(cam_recoil.MaxAngleVert));
     if (fis_zero(cam_recoil.MaxAngleVert))
     {
         cam_recoil.MaxAngleVert = EPS;
@@ -279,7 +282,7 @@ void CWeapon::Load(LPCSTR section)
 
     temp_f = pSettings->r_float(section, "cam_max_angle_horz");
     cam_recoil.MaxAngleHorz = _abs(deg2rad(temp_f));
-    VERIFY(!fis_zero(cam_recoil.MaxAngleHorz));
+    //VERIFY(!fis_zero(cam_recoil.MaxAngleHorz));
     if (fis_zero(cam_recoil.MaxAngleHorz))
     {
         cam_recoil.MaxAngleHorz = EPS;
@@ -1339,7 +1342,7 @@ void CWeapon::OnZoomIn()
 {
     //Alun: Force switch to first-person for zooming
     CActor* pA = smart_cast<CActor*>(H_Parent());
-    if (pA->active_cam() == eacLookAt)
+    if (pA && pA->active_cam() == eacLookAt && pA->cam_Active()->m_look_cam_fp_zoom == true)
     {
         pA->cam_Set(eacFirstEye);
         m_freelook_switch_back = true;

@@ -102,7 +102,11 @@ void CLevel::g_sv_Spawn(CSE_Abstract* E)
 // Msg				("--spawn--CREATE: %f ms",1000.f*T.GetAsync());
 
 //	T.Start		();
-    if (0 == O || (!O->net_Spawn(E)))
+    if (O == 0)
+    {
+        Msg("! Failed to spawn entity '%s'", *E->s_name);
+    }
+    else if (!O->net_Spawn(E))
     {
         O->net_Destroy();
         if (!GEnv.isDedicatedServer)

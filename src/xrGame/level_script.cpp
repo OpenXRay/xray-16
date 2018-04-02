@@ -206,7 +206,21 @@ u32 vertex_in_direction(u32 level_vertex_id, Fvector direction, float max_distan
     return (ai().level_graph().valid_vertex_id(result) ? result : level_vertex_id);
 }
 
-Fvector vertex_position(u32 level_vertex_id) { return (ai().level_graph().vertex_position(level_vertex_id)); }
+Fvector vertex_position(u32 level_vertex_id)
+{
+    if (!ai().level_graph().valid_vertex_id(level_vertex_id))
+    {
+        GEnv.ScriptEngine->print_stack();
+        Msg("level.vertex_position | Invalid vertex id %d", level_vertex_id);
+    }
+    return (ai().level_graph().vertex_position(level_vertex_id));
+}
+
+bool valid_vertex(u32 level_vertex_id)
+{
+    return ai().level_graph().valid_vertex_id(level_vertex_id);
+}
+
 void map_add_object_spot(u16 id, LPCSTR spot_type, LPCSTR text)
 {
     CMapLocation* ml = Level().MapManager().AddMapLocation(spot_type, id);
@@ -701,6 +715,7 @@ IC static void CLevel_Export(lua_State* luaState)
         def("get_active_cam", &get_active_cam),
         def("set_active_cam", &set_active_cam),
         def("get_start_time", &get_start_time),
+        def("valid_vertex", &valid_vertex),
 #endif
         //Alundaio: END
         // obsolete\deprecated

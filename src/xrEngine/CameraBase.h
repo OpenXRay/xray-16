@@ -47,6 +47,7 @@ public:
     IC float Fov() const { return f_fov; }
     IC float Aspect() const { return f_aspect; }
     int tag;
+    bool m_look_cam_fp_zoom;
 
 public:
     CCameraBase(IGameObject* p, u32 flags);
