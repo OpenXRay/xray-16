@@ -235,6 +235,8 @@ void CWeaponStatMgun::UpdateBarrelDir()
 
 void CWeaponStatMgun::cam_Update(float dt, float fov)
 {
+    camera->f_fov = g_fov;
+
     Fvector P, Da;
     Da.set(0, 0, 0);
 
@@ -300,6 +302,9 @@ void CWeaponStatMgun::SetParam(int id, Fvector2 val)
 
 bool CWeaponStatMgun::attach_Actor(CGameObject* actor)
 {
+    CActor* real_actor = actor->cast_actor();
+    assert(real_actor);
+    real_actor->cam_Set(eacFirstEye);
     inheritedHolder::attach_Actor(actor);
     SetBoneCallbacks();
     FireEnd();

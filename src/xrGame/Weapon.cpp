@@ -78,6 +78,7 @@ CWeapon::CWeapon()
     m_activation_speed_is_overriden = false;
     m_cur_scope = NULL;
     m_bRememberActorNVisnStatus = false;
+    m_freelook_switch_back = false;
 }
 
 CWeapon::~CWeapon()
@@ -1336,6 +1337,14 @@ float CWeapon::CurrentZoomFactor()
 void GetZoomData(const float scope_factor, float& delta, float& min_zoom_factor);
 void CWeapon::OnZoomIn()
 {
+    //Alun: Force switch to first-person for zooming
+    CActor* pA = smart_cast<CActor*>(H_Parent());
+    if (pA->active_cam() == eacLookAt)
+    {
+        pA->cam_Set(eacFirstEye);
+        m_freelook_switch_back = true;
+    }
+
     m_zoom_params.m_bIsZoomModeNow = true;
     if (m_zoom_params.m_bUseDynamicZoom)
         SetZoomFactor(m_fRTZoomFactor);
@@ -1353,22 +1362,27 @@ void CWeapon::OnZoomIn()
     if (m_zoom_params.m_sUseBinocularVision.size() && IsScopeAttached() && nullptr == m_zoom_params.m_pVision)
         m_zoom_params.m_pVision = new CBinocularsVision(m_zoom_params.m_sUseBinocularVision /*"wpn_binoc"*/);
 
-    if (m_zoom_params.m_sUseZoomPostprocess.size() && IsScopeAttached())
+    if (pA && m_zoom_params.m_sUseZoomPostprocess.size() && IsScopeAttached())
     {
-        CActor* pA = smart_cast<CActor*>(H_Parent());
-        if (pA)
+        if (nullptr == m_zoom_params.m_pNight_vision)
         {
-            if (nullptr == m_zoom_params.m_pNight_vision)
-            {
-                m_zoom_params.m_pNight_vision =
-                    new CNightVisionEffector(m_zoom_params.m_sUseZoomPostprocess /*"device_torch"*/);
-            }
+            m_zoom_params.m_pNight_vision = new CNightVisionEffector(m_zoom_params.m_sUseZoomPostprocess);
         }
     }
 }
 
 void CWeapon::OnZoomOut()
 {
+    //Alun: Switch back to third-person if was forced
+    if (m_freelook_switch_back)
+    {
+        CActor* pA = smart_cast<CActor*>(H_Parent());
+        if (pA)
+            pA->cam_Set(eacLookAt);
+
+        m_freelook_switch_back = false;
+    }
+
     m_zoom_params.m_bIsZoomModeNow = false;
     m_fRTZoomFactor = GetZoomFactor(); // store current
     m_zoom_params.m_fCurrentZoomFactor = g_fov;
