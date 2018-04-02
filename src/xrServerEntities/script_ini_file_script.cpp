@@ -41,6 +41,11 @@ CScriptIniFile* create_ini_file(LPCSTR ini_string)
     return ((CScriptIniFile*)new CInifile(
         &IReader((void*)ini_string, xr_strlen(ini_string)), FS.get_path("$game_config$")->m_Path));
 }
+
+CScriptIniFile *create_ini_file(LPCSTR ini_string, LPCSTR path)
+{
+    return (CScriptIniFile*)new CInifile(&IReader((void*)ini_string, xr_strlen(ini_string)), path);
+}
 #pragma warning(pop)
 
 //Alundaio: The extended ability to reload system ini after application launch
@@ -121,7 +126,9 @@ static void CScriptIniFile_Export(lua_State* luaState)
             //Alundaio: extend
             def("reload_system_ini", &reload_system_ini),
             //-Alundaio
-            def("system_ini", &get_system_ini), def("create_ini_file", &create_ini_file, adopt<0>())
+            def("system_ini", &get_system_ini),
+        def("create_ini_file", (CScriptIniFile*(*)(LPCSTR))&create_ini_file, adopt<0>()),
+        def("create_ini_file", (CScriptIniFile*(*)(LPCSTR, LPCSTR))(&create_ini_file), adopt<0>())
     ];
 }
 

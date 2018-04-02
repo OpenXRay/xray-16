@@ -2296,6 +2296,9 @@
     <Filter Include="UI\Common\PDA\FractionWar">
       <UniqueIdentifier>{49c6af0a-ea09-4212-bc7f-7cbcca7c5810}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UI\Common\PDA\PDA Spot">
+      <UniqueIdentifier>{a7d65344-add1-4f20-95fe-a56eb4ab622e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -6683,6 +6686,9 @@
     <ClInclude Include="StaticHolderEntity.h">
       <Filter>Core\Client\Objects\base\GameObject\Holder</Filter>
     </ClInclude>
+    <ClInclude Include="ui\UIPdaSpot.h">
+      <Filter>UI\Common\PDA\PDA Spot</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -10223,6 +10229,9 @@
     </ClCompile>
     <ClCompile Include="HolderEntityObject.cpp">
       <Filter>Core\Client\Objects\base\GameObject\Holder</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIPdaSpot.cpp">
+      <Filter>UI\Common\PDA\PDA Spot</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
