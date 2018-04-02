@@ -479,7 +479,7 @@ void CEnvDescriptorMixer::lerp(
     sun_dir.lerp(A.sun_dir, B.sun_dir, f).normalize();
     R_ASSERT(_valid(sun_dir));
 
-    VERIFY2(sun_dir.y < 0, "Invalid sun direction settings while lerp");
+    //VERIFY2(sun_dir.y < 0, "Invalid sun direction settings while lerp");
 }
 
 //-----------------------------------------------------------------------------
