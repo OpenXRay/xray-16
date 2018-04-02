@@ -670,6 +670,11 @@ xrTime get_start_time()
     return xrTime(Level().GetStartGameTime());
 }
 
+void reload_language()
+{
+    CStringTable().ReloadLanguage();
+}
+
 // XXX nitrocaster: one can export enum like class, without defining dummy type
 template<typename T>
 struct EnumCallbackType {};
@@ -826,15 +831,22 @@ IC static void CLevel_Export(lua_State* luaState)
 
         def("community_relation", &g_get_community_relation), def("set_community_relation", &g_set_community_relation),
         def("get_general_goodwill_between", &g_get_general_goodwill_between)];
-    module(
-        luaState, "game")[class_<xrTime>("CTime")
-                              .enum_("date_format")[value("DateToDay", int(InventoryUtilities::edpDateToDay)),
-                                  value("DateToMonth", int(InventoryUtilities::edpDateToMonth)),
-                                  value("DateToYear", int(InventoryUtilities::edpDateToYear))]
-                              .enum_("time_format")[value("TimeToHours", int(InventoryUtilities::etpTimeToHours)),
-                                  value("TimeToMinutes", int(InventoryUtilities::etpTimeToMinutes)),
-                                  value("TimeToSeconds", int(InventoryUtilities::etpTimeToSeconds)),
-                                  value("TimeToMilisecs", int(InventoryUtilities::etpTimeToMilisecs))]
+    module(luaState, "game")
+    [
+        class_<xrTime>("CTime")
+            .enum_("date_format")
+            [
+                value("DateToDay", int(InventoryUtilities::edpDateToDay)),
+                value("DateToMonth", int(InventoryUtilities::edpDateToMonth)),
+                value("DateToYear", int(InventoryUtilities::edpDateToYear))
+            ]
+            .enum_("time_format")
+            [
+                value("TimeToHours", int(InventoryUtilities::etpTimeToHours)),
+                value("TimeToMinutes", int(InventoryUtilities::etpTimeToMinutes)),
+                value("TimeToSeconds", int(InventoryUtilities::etpTimeToSeconds)),
+                value("TimeToMilisecs", int(InventoryUtilities::etpTimeToMilisecs))
+            ]
                               .def(constructor<>())
                               .def(constructor<const xrTime&>())
                               .def(const_self < xrTime())
@@ -861,8 +873,12 @@ IC static void CLevel_Export(lua_State* luaState)
         //		def("get_surge_time",	Game::get_surge_time),
         //		def("get_object_by_name",Game::get_object_by_name),
 
-        def("start_tutorial", &start_tutorial), def("stop_tutorial", &stop_tutorial),
-        def("has_active_tutorial", &has_active_tutotial), def("translate_string", &translate_string)
+        def("start_tutorial", &start_tutorial),
+        def("stop_tutorial", &stop_tutorial),
+        def("has_active_tutorial", &has_active_tutotial),
+        def("translate_string", &translate_string),
+        def("reload_language", &reload_language),
+        def("log_stack_trace", &xrDebug::LogStackTrace)
 
     ];
 };

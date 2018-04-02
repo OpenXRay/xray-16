@@ -289,22 +289,7 @@ bool CGrenade::Action(u16 cmd, u32 flags)
         if (flags & CMD_START)
         {
             if (m_pInventory)
-            {
-                TIItemContainer::iterator it = m_pInventory->m_ruck.begin();
-                TIItemContainer::iterator it_e = m_pInventory->m_ruck.end();
-                for (; it != it_e; ++it)
-                {
-                    CGrenade* pGrenade = smart_cast<CGrenade*>(*it);
-                    if (pGrenade && xr_strcmp(pGrenade->cNameSect(), cNameSect()))
-                    {
-                        m_pInventory->Ruck(this);
-                        m_pInventory->SetActiveSlot(NO_ACTIVE_SLOT);
-                        m_pInventory->Slot(pGrenade->BaseSlot(), pGrenade);
-                        return true;
-                    }
-                }
-                return true;
-            }
+                m_pInventory->ActivateDeffered();
         }
         return true;
     };

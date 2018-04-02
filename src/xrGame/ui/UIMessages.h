@@ -128,4 +128,7 @@ enum EUIMessages
 
     MAIN_MENU_RELOADED,
     MAP_SELECT_SPOT2,
+
+    //CUITrackBar
+    TRACK_VALUE_CHANGED,
 };

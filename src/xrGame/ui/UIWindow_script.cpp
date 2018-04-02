@@ -159,8 +159,11 @@ SCRIPT_EXPORT(EnumUIMessages, (), {
     class EnumUIMessages
     {
     };
-    module(luaState)[class_<EnumUIMessages>("ui_events")
-                         .enum_("events")[
+    module(luaState)
+    [
+        class_<EnumUIMessages>("ui_events")
+        .enum_("events")
+        [
                              // CUIWindow
                              value("WINDOW_LBUTTON_DOWN", int(WINDOW_LBUTTON_DOWN)),
                              value("WINDOW_RBUTTON_DOWN", int(WINDOW_RBUTTON_DOWN)),
@@ -210,6 +213,10 @@ SCRIPT_EXPORT(EnumUIMessages, (), {
 
                              value("EDIT_TEXT_COMMIT", int(EDIT_TEXT_COMMIT)),
                              // CMainMenu
-                             value("MAIN_MENU_RELOADED", int(MAIN_MENU_RELOADED))]];
+                             value("MAIN_MENU_RELOADED", int(MAIN_MENU_RELOADED)),
+                             // CUITrackBar
+                             value("TRACK_VALUE_CHANGED", int(TRACK_VALUE_CHANGED))
+                         ]
+    ];
 });
 // clang-format on

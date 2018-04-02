@@ -274,7 +274,7 @@ void stalker_movement_manager_base::setup_movement_params(stalker_movement_param
             else
             {
                 u32 vertex_id = level_path().dest_vertex_id();
-                Fvector vertex_position = ai().level_graph().vertex_position(level_path().dest_vertex_id());
+                Fvector vertex_position = ai().level_graph().vertex_position(vertex_id);
                 VERIFY2(restrictions().accessible(vertex_position) || show_restrictions(&restrictions()),
                     make_string("vertex_id[%d],position[%f][%f][%f],object[%s]", vertex_id, VPUSH(vertex_position),
                         *object().cName()));

@@ -267,9 +267,12 @@ class_<CScriptGameObject>& script_register_game_object1(class_<CScriptGameObject
             (void (CScriptGameObject::*)(const Fvector*))(&CScriptGameObject::set_desired_direction))
         .def("set_patrol_path", &CScriptGameObject::set_patrol_path)
         .def("inactualize_patrol_path", &CScriptGameObject::inactualize_patrol_path)
+        .def("inactualize_level_path", &CScriptGameObject::inactualize_level_path)
+        .def("inactualize_game_path", &CScriptGameObject::inactualize_game_path)
         .def("set_dest_level_vertex_id", &CScriptGameObject::set_dest_level_vertex_id)
         .def("get_dest_level_vertex_id", &CScriptGameObject::get_dest_level_vertex_id)
         .def("set_dest_game_vertex_id", &CScriptGameObject::set_dest_game_vertex_id)
+        .def("get_dest_game_vertex_id", &CScriptGameObject::get_dest_game_vertex_id)
         .def("set_movement_selection_type", &CScriptGameObject::set_movement_selection_type)
         .def("level_vertex_id", &CScriptGameObject::level_vertex_id)
         .def("game_vertex_id", &CScriptGameObject::game_vertex_id)
@@ -368,16 +371,16 @@ class_<CScriptGameObject>& script_register_game_object1(class_<CScriptGameObject
         .def("set_smart_cover_target_default", &CScriptGameObject::set_smart_cover_target_default)
 
         .def("idle_min_time", (void (CScriptGameObject::*)(float)) & CScriptGameObject::idle_min_time)
-        .def("idle_min_time", (float (CScriptGameObject::*)() const) & CScriptGameObject::idle_min_time)
+        .def("idle_min_time", (float const (CScriptGameObject::*)() const) & CScriptGameObject::idle_min_time)
 
         .def("idle_max_time", (void (CScriptGameObject::*)(float)) & CScriptGameObject::idle_max_time)
-        .def("idle_max_time", (float (CScriptGameObject::*)() const) & CScriptGameObject::idle_max_time)
+        .def("idle_max_time", (float const (CScriptGameObject::*)() const) & CScriptGameObject::idle_max_time)
 
         .def("lookout_min_time", (void (CScriptGameObject::*)(float)) & CScriptGameObject::lookout_min_time)
-        .def("lookout_min_time", (float (CScriptGameObject::*)() const) & CScriptGameObject::lookout_min_time)
+        .def("lookout_min_time", (float const (CScriptGameObject::*)() const) & CScriptGameObject::lookout_min_time)
 
         .def("lookout_max_time", (void (CScriptGameObject::*)(float)) & CScriptGameObject::lookout_max_time)
-        .def("lookout_max_time", (float (CScriptGameObject::*)() const) & CScriptGameObject::lookout_max_time)
+        .def("lookout_max_time", (float const (CScriptGameObject::*)() const) & CScriptGameObject::lookout_max_time)
 
         .def("in_loophole_fov", &CScriptGameObject::in_loophole_fov)
         .def("in_current_loophole_fov", &CScriptGameObject::in_current_loophole_fov)

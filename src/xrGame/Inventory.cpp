@@ -93,11 +93,7 @@ CInventory::CInventory()
 
     InitPriorityGroupsForQSwitch();
     m_next_item_iteration_time = 0;
-
-    for (u16 i = 0; i < LAST_SLOT + 1; ++i)
-    {
-        m_blocked_slots[i] = 0;
-    }
+    m_change_after_deactivate = false;
 }
 
 CInventory::~CInventory() {}
@@ -312,8 +308,19 @@ bool CInventory::DropItem(CGameObject* pObj, bool just_before_destroy, bool dont
 
         if (Level().CurrentViewEntity() == pActor_owner)
             CurrentGameUI()->OnInventoryAction(pIItem, GE_OWNERSHIP_REJECT);
-    };
-    pObj->H_SetParent(0, dont_create_shell);
+    }
+
+    if (smart_cast<CWeapon*>(pObj))
+    {
+        Fvector dir = Actor()->Direction();
+        dir.y = sin(-45.f * PI / 180.f);
+        dir.normalize();
+        smart_cast<CWeapon*>(pObj)->SetActivationSpeedOverride(dir.mul(7));
+        pObj->H_SetParent(nullptr, dont_create_shell);
+    }
+    else
+        pObj->H_SetParent(nullptr, dont_create_shell);
+
     return true;
 }
 
@@ -817,6 +824,9 @@ void CInventory::Update()
                 }
             }
 
+            if (m_change_after_deactivate)
+                ActivateNextGrenage();
+
             if (GetNextActiveSlot() != NO_ACTIVE_SLOT)
             {
                 PIItem tmp_next_active = ItemFromSlot(GetNextActiveSlot());
@@ -834,17 +844,9 @@ void CInventory::Update()
                 }
             }
 
-            //			if ( m_iActiveSlot != GetNextActiveSlot() ) {
-            //				LPCSTR const name = smart_cast<CGameObject const*>(m_pOwner)->cName().c_str();
-            //				if ( !xr_strcmp("jup_b43_stalker_assistant_pri6695", name) )
-            //					LogStackTrace	("");
-            //				Msg					("[%6d][%s] CInventory::Activate changing active slot from %d to next active
-            //slot
-            //%d", Device.dwTimeGlobal, name, m_iActiveSlot, GetNextActiveSlot() );
-            //			}
             m_iActiveSlot = GetNextActiveSlot();
         }
-        if ((GetNextActiveSlot() != NO_ACTIVE_SLOT) && ActiveItem() && ActiveItem()->cast_hud_item()->IsHidden())
+        else if ((GetNextActiveSlot() != NO_ACTIVE_SLOT) && ActiveItem() && ActiveItem()->cast_hud_item()->IsHidden())
             ActiveItem()->ActivateItem();
     }
     UpdateDropTasks();

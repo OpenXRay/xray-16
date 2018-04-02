@@ -452,6 +452,9 @@ bool CInifile::section_exist(const shared_str& S) const { return section_exist(*
 //--------------------------------------------------------------------------------------
 CInifile::Sect& CInifile::r_section(pcstr S) const
 {
+    if (!S)
+        xrDebug::LogStackTrace("CInifile::r_section | section is nil!");
+
     char section[256];
     xr_strcpy(section, sizeof section, S);
     xr_strlwr(section);

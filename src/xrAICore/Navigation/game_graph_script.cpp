@@ -31,6 +31,15 @@ Fvector CVertex__game_point(const CGameGraph::CVertex* vertex)
     return (vertex->game_point());
 }
 
+LPCSTR CVertex__vertex_type(const CGameGraph::CVertex *vertex)
+{
+    THROW(vertex);
+    const u8* vertex_type = vertex->vertex_type();
+    char buffer[12];
+    sprintf(buffer, "%d,%d,%d,%d", vertex_type[0], vertex_type[1], vertex_type[2], vertex_type[3]);
+    return buffer;
+}
+
 GameGraph::LEVEL_MAP const& get_levels(CGameGraph const* graph)
 {
     THROW(graph);
@@ -57,5 +66,7 @@ SCRIPT_EXPORT(CGameGraph, (), {
             .def("level_point", &CVertex__level_point)
             .def("game_point", &CVertex__game_point)
             .def("level_id", &CVertex::level_id)
-            .def("level_vertex_id", &CVertex::level_vertex_id)];
+            .def("level_vertex_id", &CVertex::level_vertex_id)
+            .def("mask", &CVertex__vertex_type)
+    ];
 });
