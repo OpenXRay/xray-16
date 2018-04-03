@@ -179,7 +179,7 @@ void CEngineAPI::Initialize(void)
         tune_pause = (VTPause*)hTuner->getProcAddress("VTPause");
         tune_resume = (VTResume*)hTuner->getProcAddress("VTResume");
 
-        if (!tune_pause || !tune_pause)
+        if (!tune_pause || !tune_resume)
         {
             Log("Can't initialize Intel vTune");
             tune_pause = dummy;
