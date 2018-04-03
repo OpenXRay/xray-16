@@ -18,7 +18,7 @@ public:
     void SetInfo(const CInventoryItem& pInvItem);
 
 protected:
-    static constexpr u32 af_immunity_count = 9;
+    static constexpr u32 af_immunity_count = 8;
     UIArtefactParamItem* m_immunity_item[af_immunity_count];
     UIArtefactParamItem* m_restore_item[ALife::eRestoreTypeMax];
     UIArtefactParamItem* m_additional_weight;

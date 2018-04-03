@@ -575,8 +575,12 @@ BOOL CBulletManager::firetrace_callback(collide::rq_result& result, LPVOID param
     Fvector& collide_position = data.collide_position;
     collide_position = Fvector().mad(bullet.bullet_pos, bullet.dir, result.range);
 
+#ifdef COC_EDITION
+    float const air_resistance = bullet.air_resistance;
+#else
     float const air_resistance =
         (GameID() == eGameIDSingle) ? Level().BulletManager().m_fAirResistanceK : bullet.air_resistance;
+#endif
 
     CBulletManager& bullet_manager = Level().BulletManager();
     Fvector const gravity = {0.f, -bullet_manager.m_fGravityConst, 0.f};
@@ -688,26 +692,12 @@ bool CBulletManager::process_bullet(collide::rq_results& storage, SBullet& bulle
     float const time_delta = delta_time / 1000.f;
     Fvector const gravity = Fvector().set(0.f, -m_fGravityConst, 0.f);
 
+#ifdef COC_EDITION
+    float const air_resistance = bullet.air_resistance;
+#else
     float const air_resistance = (GameID() == eGameIDSingle) ? m_fAirResistanceK : bullet.air_resistance;
-    bullet.tracer_start_position = bullet.bullet_pos;
-
-#if 0 // def DEBUG
-	extern BOOL g_bDrawBulletHit;
-	if (g_bDrawBulletHit)
-	{
-		Msg	(
-			"free fly velocity: %f",
-			trajectory_velocity(
-				bullet.start_velocity,
-				gravity,
-				air_resistance,
-				fis_zero(air_resistance) ?
-				0.f :
-				(1.f/air_resistance - air_resistance_epsilon)
-			).magnitude()
-		);
-	}
 #endif
+    bullet.tracer_start_position = bullet.bullet_pos;
 
     Fvector const& start_position = bullet.bullet_pos;
     Fvector previous_position = start_position;
@@ -981,18 +971,12 @@ void CBulletManager::RegisterEvent(
             //	bullet->targetID = R.O->ID();
 
             E.Repeated = (R.O->ID() == E.bullet.targetID);
-            if (GameID() == eGameIDSingle)
+            //Alun: Enable BonePassBullet for singleplayer, good for bullets going through finger bones
+            if (bullet->targetID != R.O->ID())
             {
-                bullet->targetID = R.O->ID();
-            }
-            else
-            {
-                if (bullet->targetID != R.O->ID())
-                {
-                    CGameObject* pGO = smart_cast<CGameObject*>(R.O);
-                    if (!pGO || !pGO->BonePassBullet(R.element))
-                        bullet->targetID = R.O->ID();
-                }
+                CGameObject* pGO = smart_cast<CGameObject*>(R.O);
+                if (!pGO || !pGO->BonePassBullet(R.element))
+                    bullet->targetID = R.O->ID();
             }
         };
     }

@@ -541,14 +541,12 @@ void CWeaponMagazined::state_Fire(float dt)
 {
     if (iAmmoElapsed > 0)
     {
-        VERIFY(fOneShotTime > 0.f);
-
-        Fvector p1, d;
-        p1.set(get_LastFP());
-        d.set(get_LastFD());
-
         if (!H_Parent())
+        {
+            StopShooting();
             return;
+        }
+
         if (smart_cast<CMPPlayersBag*>(H_Parent()) != nullptr)
         {
             Msg("! WARNING: state_Fire of object [%d][%s] while parent is CMPPlayerBag...", ID(), cNameSect().c_str());
@@ -556,21 +554,24 @@ void CWeaponMagazined::state_Fire(float dt)
         }
 
         CInventoryOwner* io = smart_cast<CInventoryOwner*>(H_Parent());
-        if (nullptr == io->inventory().ActiveItem())
+        if (!io->inventory().ActiveItem())
         {
-            Log("current_state", GetState());
-            Log("next_state", GetNextState());
-            Log("item_sect", cNameSect().c_str());
-            Log("H_Parent", H_Parent()->cNameSect().c_str());
             StopShooting();
-            return; //Alundaio: This is not supposed to happen but it does. GSC was aware but why no return here? Known to cause crash on game load if NPC immediately enters combat.
+            return;
         }
 
         CEntity* E = smart_cast<CEntity*>(H_Parent());
-        E->g_fireParams(this, p1, d);
-
         if (!E->g_stateFire())
+        {
             StopShooting();
+            return;
+        }
+
+        Fvector p1, d;
+        p1.set(get_LastFP());
+        d.set(get_LastFD());
+
+        E->g_fireParams(this, p1, d);
 
         if (m_iShotNum == 0)
         {
@@ -593,7 +594,7 @@ void CWeaponMagazined::state_Fire(float dt)
 
             //Alundaio: Use fModeShotTime instead of fOneShotTime if current fire mode is 2-shot burst
             //Alundaio: Cycle down RPM after two shots; used for Abakan/AN-94
-            if (GetCurrentFireMode() == 2 || (cycleDown == true && m_iShotNum <= 1))
+            if (GetCurrentFireMode() == 2 || (cycleDown == true && m_iShotNum < 1))
                 fShotTimeCounter = modeShotTime;
             else
                 fShotTimeCounter = fOneShotTime;

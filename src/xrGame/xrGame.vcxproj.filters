@@ -5328,18 +5328,6 @@
     <ClInclude Include="CustomOutfit.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
     </ClInclude>
-    <ClInclude Include="ExoOutfit.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
-    </ClInclude>
-    <ClInclude Include="MilitaryOutfit.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
-    </ClInclude>
-    <ClInclude Include="ScientificOutfit.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
-    </ClInclude>
-    <ClInclude Include="StalkerOutfit.h">
-      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
-    </ClInclude>
     <ClInclude Include="InfoDocument.h">
       <Filter>Core\Client\Objects\items &amp; weapons\Documents</Filter>
     </ClInclude>
@@ -6688,6 +6676,9 @@
     </ClInclude>
     <ClInclude Include="ui\UIPdaSpot.h">
       <Filter>UI\Common\PDA\PDA Spot</Filter>
+    </ClInclude>
+    <ClInclude Include="ActorBackpack.h">
+      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -8746,18 +8737,6 @@
     <ClCompile Include="CustomOutfit.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
     </ClCompile>
-    <ClCompile Include="ExoOutfit.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
-    </ClCompile>
-    <ClCompile Include="MilitaryOutfit.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
-    </ClCompile>
-    <ClCompile Include="ScientificOutfit.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
-    </ClCompile>
-    <ClCompile Include="StalkerOutfit.cpp">
-      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
-    </ClCompile>
     <ClCompile Include="InfoDocument.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Documents</Filter>
     </ClCompile>
@@ -10232,6 +10211,12 @@
     </ClCompile>
     <ClCompile Include="ui\UIPdaSpot.cpp">
       <Filter>UI\Common\PDA\PDA Spot</Filter>
+    </ClCompile>
+    <ClCompile Include="ActorBackpack.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomOutfit_script.cpp">
+      <Filter>Core\Client\Objects\items &amp; weapons\Outfit</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -62,6 +62,7 @@ CInventoryItem::CInventoryItem()
     m_Description = "";
     m_section_id = 0;
     m_flags.set(FIsHelperItem, FALSE);
+    m_flags.set(FCanStack, TRUE);
 }
 
 CInventoryItem::~CInventoryItem()
@@ -110,6 +111,7 @@ void CInventoryItem::Load(LPCSTR section)
     m_flags.set(FCanTake, READ_IF_EXISTS(pSettings, r_bool, section, "can_take", TRUE));
     m_flags.set(FCanTrade, m_can_trade);
     m_flags.set(FIsQuestItem, READ_IF_EXISTS(pSettings, r_bool, section, "quest_item", FALSE));
+    m_flags.set(FCanStack, READ_IF_EXISTS(pSettings, r_bool, section, "can_stack", TRUE));
 
     // Added by Axel, to enable optional condition use on any item
     m_flags.set(FUsingCondition, READ_IF_EXISTS(pSettings, r_bool, section, "use_condition", false));

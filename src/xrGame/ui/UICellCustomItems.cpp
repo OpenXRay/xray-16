@@ -123,7 +123,7 @@ void CUIInventoryCellItem::Update()
 {
     bool b = Heading();
     inherited::Update();
-    inherited::UpdateConditionProgressBar(); //Alundaio
+    UpdateConditionProgressBar(); //Alundaio
     UpdateItemText();
 
     u32 color = GetTextureColor();

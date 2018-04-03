@@ -1108,20 +1108,21 @@ bool CInventory::Eat(PIItem pIItem)
         if (IsGameTypeSingle())
             Actor()->callback(GameObject::eUseObject)(smart_cast<CGameObject*>(pIItem)->lua_game_object());
 
-        if (pItemToEat->IsUsingCondition() && pItemToEat->GetRemainingUses() < 1 && pItemToEat->CanDelete())
-            CurrentGameUI()->GetActorMenu().RefreshCurrentItemCell();
+        //if (pItemToEat->IsUsingCondition() && pItemToEat->GetRemainingUses() < 1 && pItemToEat->CanDelete())
+        //    CurrentGameUI()->GetActorMenu().RefreshCurrentItemCell();
 
         CurrentGameUI()->GetActorMenu().SetCurrentItem(nullptr);
     }
         
 
-    if (pItemToEat->Empty())
+    if (pItemToEat->GetMaxUses() < 255) // If uses 255, then skip the decrement for infinite usages
     {
-        if (!pItemToEat->CanDelete())
-            return false;
-
-        pIItem->SetDropManual(true);
+        u8 remaining = pItemToEat->GetRemainingUses();
+        pItemToEat->SetRemainingUses(remaining - 1);
     }
+
+    if (pItemToEat->Empty() && pItemToEat->CanDelete())
+        pIItem->SetDropManual(true);
 
     return true;
 }

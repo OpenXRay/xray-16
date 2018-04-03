@@ -159,12 +159,15 @@ void CUIDragDropListEx::OnItemDrop(CUIWindow* w, void* pData)
     if (old_owner && new_owner && !b)
     {
         CUICellItem* i = old_owner->RemoveItem(itm, (old_owner == new_owner));
-        while (i->ChildsCount())
+        if (new_owner->CanSetItem(i))
         {
-            CUICellItem* _chld = i->PopChild(NULL);
-            new_owner->SetItem(_chld, old_owner->GetDragItemPosition());
+            while (i->ChildsCount())
+            {
+                CUICellItem* _chld = i->PopChild(NULL);
+                new_owner->SetItem(_chld, old_owner->GetDragItemPosition());
+            }
+            new_owner->SetItem(i, old_owner->GetDragItemPosition());
         }
-        new_owner->SetItem(i, old_owner->GetDragItemPosition());
     }
     DestroyDragItem();
 }
@@ -500,8 +503,7 @@ bool CUICellContainer::AddSimilar(CUICellItem* itm)
         if (iitem && iitem->m_pInventory && iitem->m_pInventory->ItemFromSlot(iitem->BaseSlot()) == iitem)
             return false;
 
-        if (pSettings->line_exist(iitem->m_section_id, "dont_stack") &&
-            pSettings->r_bool(iitem->m_section_id, "dont_stack") == true)
+        if (!iitem->CanStack())
             return false;
     }
     //-Alundaio
@@ -527,6 +529,12 @@ CUICellItem* CUICellContainer::FindSimilar(CUICellItem* itm)
 #else
         auto i = (CUICellItem*)it;
 #endif
+        if (i == itm)
+            continue;
+        
+        if (!i->EqualTo(itm))
+            continue;
+
         //Alundaio: Don't stack equipped items
         extern int g_inv_highlight_equipped;
         if (g_inv_highlight_equipped)
@@ -535,17 +543,12 @@ CUICellItem* CUICellContainer::FindSimilar(CUICellItem* itm)
             if (iitem && iitem->m_pInventory && iitem->m_pInventory->ItemFromSlot(iitem->BaseSlot()) == iitem)
                 continue;
 
-            if (pSettings->line_exist(iitem->m_section_id, "dont_stack") &&
-                pSettings->r_bool(iitem->m_section_id, "dont_stack") == true)
+            if (!iitem->CanStack())
                 continue;
         }
         //-Alundaio
 
-        if (i == itm)
-            continue;
-
-        if (i->EqualTo(itm))
-            return i;
+        return i;
     }
 
     return nullptr;

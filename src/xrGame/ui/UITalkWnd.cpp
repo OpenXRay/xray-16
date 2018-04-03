@@ -316,10 +316,6 @@ void CUITalkWnd::SwitchToTrade()
         CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(CurrentGameUI());
         if (pGameSP)
         {
-            /*			if ( pGameSP->MainInputReceiver() )
-                        {
-                            pGameSP->MainInputReceiver()->HideDialog();
-                        }*/
             pGameSP->StartTrade(m_pOurInvOwner, m_pOthersInvOwner);
         } // pGameSP
     }
@@ -327,15 +323,10 @@ void CUITalkWnd::SwitchToTrade()
 
 void CUITalkWnd::SwitchToUpgrade()
 {
-    // if ( m_pOurInvOwner->IsInvUpgradeEnabled() && m_pOthersInvOwner->IsInvUpgradeEnabled() )
     {
         CUIGameSP* pGameSP = smart_cast<CUIGameSP*>(CurrentGameUI());
         if (pGameSP)
         {
-            /*			if ( pGameSP->MainInputReceiver() )
-                        {
-                            pGameSP->MainInputReceiver()->HideDialog();
-                        }*/
             pGameSP->StartUpgrade(m_pOurInvOwner, m_pOthersInvOwner);
         }
     }

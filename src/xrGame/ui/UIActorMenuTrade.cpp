@@ -557,6 +557,15 @@ void CUIActorMenu::DonateCurrentItem(CUICellItem* cell_item)
     if (!item)
         return;
 
+    //Alundaio: 
+    luabind::functor<bool> funct;
+    if (GEnv.ScriptEngine->functor("actor_menu_inventory.CUIActorMenu_DonateCurrentItem", funct))
+    {
+        if (funct(m_pPartnerInvOwner->cast_game_object()->lua_game_object(), item->object().lua_game_object()) == false)
+            return;
+    }
+    //-Alundaio
+
     CUICellItem* itm = invlist->RemoveItem(cell_item, false);
 
     m_partner_trade->TransferItem(item, true, true);

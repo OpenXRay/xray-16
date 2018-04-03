@@ -802,6 +802,24 @@ void CGamePersistent::LoadTitle(bool change_tip, shared_str map_name)
     pApp->LoadStage();
     if (change_tip)
     {
+#ifdef COC_LOADSCREEN
+        LPCSTR tip_header;
+        LPCSTR tip_title;
+        LPCSTR tip_text;
+
+        luabind::functor<LPCSTR> m_functor;
+
+        R_ASSERT(GEnv.ScriptEngine->functor("loadscreen.get_tip_header", m_functor));
+        tip_header = m_functor(map_name.c_str());
+
+        R_ASSERT(GEnv.ScriptEngine->functor("loadscreen.get_tip_title", m_functor));
+        tip_title = m_functor(map_name.c_str());
+
+        R_ASSERT(GEnv.ScriptEngine->functor("loadscreen.get_tip_text", m_functor));
+        tip_text = m_functor(map_name.c_str());
+
+        pApp->LoadTitleInt(tip_header, tip_title, tip_text);
+#else
         string512 buff;
         u8 tip_num;
         luabind::functor<u8> m_functor;
@@ -827,6 +845,7 @@ void CGamePersistent::LoadTitle(bool change_tip, shared_str map_name)
 
         pApp->LoadTitleInt(
             CStringTable().translate("ls_header").c_str(), tmp.c_str(), CStringTable().translate(buff).c_str());
+#endif
     }
 }
 

@@ -20,6 +20,7 @@ enum
     TORCH_SLOT, // torch
     ARTEFACT_SLOT, // artefact
     HELMET_SLOT,
+    BACKPACK_SLOT,
     //Alundaio: More slots for custom uses
     CUSTOM_SLOT_1,
     CUSTOM_SLOT_2,

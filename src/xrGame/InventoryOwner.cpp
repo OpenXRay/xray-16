@@ -27,6 +27,7 @@
 #include "CustomOutfit.h"
 #include "Bolt.h"
 #include "xrNetServer/NET_Messages.h"
+#include "ActorBackpack.h"
 
 CInventoryOwner::CInventoryOwner()
 {
@@ -335,6 +336,12 @@ float CInventoryOwner::MaxCarryWeight() const
     const CCustomOutfit* outfit = GetOutfit();
     if (outfit)
         ret += outfit->m_additional_weight2;
+
+#ifdef COC_BACKPACK
+    CBackpack* pBackpack = smart_cast<CBackpack*>(inventory().ItemFromSlot(BACKPACK_SLOT));
+    if (pBackpack)
+        ret += pBackpack->m_additional_weight2;
+#endif
 
     return ret;
 }

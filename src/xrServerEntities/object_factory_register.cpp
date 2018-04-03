@@ -111,11 +111,9 @@
 #include "infodocument.h"
 #include "attachable_item.h"
 
-#include "ScientificOutfit.h"
-#include "StalkerOutfit.h"
-#include "MilitaryOutfit.h"
-#include "ExoOutfit.h"
+#include "CustomOutfit.h"
 #include "ActorHelmet.h"
+#include "ActorBackpack.h"
 
 #include "f1.h"
 #include "rgd5.h"
@@ -326,11 +324,9 @@ void CObjectFactory::register_classes()
     ADD(CInventoryItemObject, CSE_ALifeItem, CLSID_IITEM_ATTACH, "obj_attachable");
 
     // Equipment outfit
-    ADD(CScientificOutfit, CSE_ALifeItemCustomOutfit, CLSID_EQUIPMENT_SCIENTIFIC, "equ_scientific");
-    ADD(CStalkerOutfit, CSE_ALifeItemCustomOutfit, CLSID_EQUIPMENT_STALKER, "equ_stalker");
-    ADD(CMilitaryOutfit, CSE_ALifeItemCustomOutfit, CLSID_EQUIPMENT_MILITARY, "equ_military");
-    ADD(CExoOutfit, CSE_ALifeItemCustomOutfit, CLSID_EQUIPMENT_EXO, "equ_exo");
+    ADD(CCustomOutfit, CSE_ALifeItemCustomOutfit, CLSID_EQUIPMENT_STALKER, "equ_stalker");
     ADD(CHelmet, CSE_ALifeItem, CLSID_EQUIPMENT_HELMET, "helmet");
+    ADD(CBackpack, CSE_ALifeItem, CLSID_EQUIPMENT_BACKPACK, "equ_backpack");
 
     // Grenades
     ADD(CF1, CSE_ALifeItemGrenade, CLSID_GRENADE_F1, "wpn_grenade_f1");
@@ -405,7 +401,7 @@ void CObjectFactory::register_classes()
     ADD(CElectricBall, CSE_ALifeItemArtefact, TEXT2CLSID("SCRPTART"), "artefact_s");
     //	ADD(CtaGameArtefact			,CSE_ALifeItemArtefact			,TEXT2CLSID("AF_CTA")			,"ctaartefact_s");
     ADD(CTorch, CSE_ALifeItemTorch, TEXT2CLSID("TORCH_S"), "device_torch_s");
-    ADD(CStalkerOutfit, CSE_ALifeItemCustomOutfit, TEXT2CLSID("E_STLK"), "equ_stalker_s");
+    ADD(CCustomOutfit, CSE_ALifeItemCustomOutfit, TEXT2CLSID("E_STLK"), "equ_stalker_s");
     ADD(CScope, CSE_ALifeItem, TEXT2CLSID("WP_SCOPE"), "wpn_scope_s");
     ADD(CWeaponAK74, CSE_ALifeItemWeaponMagazinedWGL, TEXT2CLSID("WP_AK74"), "wpn_ak74_s");
     ADD(CWeaponLR300, CSE_ALifeItemWeaponMagazined, TEXT2CLSID("WP_LR300"), "wpn_lr300_s");

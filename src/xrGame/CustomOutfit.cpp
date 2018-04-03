@@ -85,7 +85,7 @@ void CCustomOutfit::Load(LPCSTR section)
 
     m_ef_equipment_type = pSettings->r_u32(section, "ef_equipment_type");
     m_fPowerLoss = READ_IF_EXISTS(pSettings, r_float, section, "power_loss", 1.0f);
-    clamp(m_fPowerLoss, 0.0f, 1.0f);
+    clamp(m_fPowerLoss, EPS, 1.0f);
 
     m_additional_weight = pSettings->r_float(section, "additional_inventory_weight");
     m_additional_weight2 = pSettings->r_float(section, "additional_inventory_weight2");
@@ -96,7 +96,6 @@ void CCustomOutfit::Load(LPCSTR section)
     m_fPowerRestoreSpeed = READ_IF_EXISTS(pSettings, r_float, section, "power_restore_speed", 0.0f);
     m_fBleedingRestoreSpeed = READ_IF_EXISTS(pSettings, r_float, section, "bleeding_restore_speed", 0.0f);
 
-    m_full_icon_name = pSettings->r_string(section, "full_icon_name");
     m_artefact_count = READ_IF_EXISTS(pSettings, r_u32, section, "artefact_count", 0);
     clamp(m_artefact_count, (u32)0, (u32)5);
 
@@ -111,7 +110,7 @@ void CCustomOutfit::ReloadBonesProtection()
 {
     IGameObject* parent = H_Parent();
     if (IsGameTypeSingle())
-        parent = smart_cast<IGameObject*>(Level().CurrentViewEntity());
+        parent = smart_cast<IGameObject*>(Level().CurrentViewEntity()); //TODO: FIX THIS OR NPC Can't wear outfit without resetting actor
 
     if (parent && parent->Visual() && m_BonesProtectionSect.size())
         m_boneProtection->reload(m_BonesProtectionSect, smart_cast<IKinematics*>(parent->Visual()));
@@ -142,7 +141,7 @@ float CCustomOutfit::HitThroughArmor(float hit_power, s16 element, float ap, boo
     if (hit_type == ALife::eHitTypeFireWound)
     {
         float ba = GetBoneArmor(element);
-        if (ba < 0.0f)
+        if (ba <= 0.0f)
             return NewHitPower;
 
         float BoneArmor = ba * GetCondition();
@@ -342,7 +341,7 @@ void CCustomOutfit::AddBonesProtection(LPCSTR bones_section)
 {
     IGameObject* parent = H_Parent();
     if (IsGameTypeSingle())
-        parent = smart_cast<IGameObject*>(Level().CurrentViewEntity());
+        parent = smart_cast<IGameObject*>(Level().CurrentViewEntity()); //TODO: FIX THIS OR NPC Can't wear outfit without resetting actor
 
     if (parent && parent->Visual() && m_BonesProtectionSect.size())
         m_boneProtection->add(bones_section, smart_cast<IKinematics*>(parent->Visual()));

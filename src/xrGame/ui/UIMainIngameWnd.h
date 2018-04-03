@@ -165,6 +165,7 @@ protected:
 
 public:
     void SetPickUpItem(CInventoryItem* PickUpItem);
+    CInventoryItem* GetPickUpItem() { return m_pPickUpItem; }
 #ifdef DEBUG
     void draw_adjust_mode();
 #endif

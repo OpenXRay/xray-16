@@ -371,7 +371,6 @@ bool CActor::use_Holder(CHolderCustom* holder)
     else
     {
         bool b = false;
-        CGameObject* holderGO = smart_cast<CGameObject*>(holder);
         if (smart_cast<CCar*>(holder))
             b = use_Vehicle(holder);
         else

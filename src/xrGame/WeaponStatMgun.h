@@ -100,7 +100,7 @@ public:
     virtual void detach_Actor();
     virtual bool allowWeapon() const { return false; };
     virtual bool HUDView() const { return true; };
-    virtual Fvector ExitPosition() { return Fvector().set(0.0f, 0.0f, 0.0f); };
+    virtual Fvector ExitPosition();
     virtual CCameraBase* Camera() { return camera; };
     virtual void Action(u16 id, u32 flags);
     virtual void SetParam(int id, Fvector2 val);

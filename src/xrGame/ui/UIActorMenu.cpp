@@ -219,7 +219,8 @@ void CUIActorMenu::Update()
     }
 
     inherited::Update();
-    m_ItemInfo->Update();
+    if (m_ItemInfo->CurrentItem())
+        m_ItemInfo->Update();
     m_hint_wnd->Update();
 }
 
@@ -270,16 +271,11 @@ EDDListType CUIActorMenu::GetListType(CUIDragDropListEx* l)
     if (l == m_pInventoryBeltList)
         return iActorBelt;
 
-    if (l == m_pInventoryAutomaticList)
-        return iActorSlot;
-    if (l == m_pInventoryPistolList)
-        return iActorSlot;
-    if (l == m_pInventoryOutfitList)
-        return iActorSlot;
-    if (l == m_pInventoryHelmetList)
-        return iActorSlot;
-    if (l == m_pInventoryDetectorList)
-        return iActorSlot;
+    for (u8 i = 1; i <= m_slot_count; ++i)
+    {
+        if (m_pInvList[i] && m_pInvList[i] == l)
+            return iActorSlot;
+    }
 
     if (l == m_pTradeActorBagList)
         return iActorBag;
@@ -347,7 +343,7 @@ void CUIActorMenu::SetCurrentItem(CUICellItem* itm)
 
 void CUIActorMenu::InfoCurItem(CUICellItem* cell_item)
 {
-    if (!cell_item)
+    if (!cell_item || !cell_item->m_pData)
     {
         m_ItemInfo->InitItem(NULL);
         return;
@@ -433,11 +429,12 @@ void CUIActorMenu::UpdateItemsPlace()
 
 void CUIActorMenu::clear_highlight_lists()
 {
-    m_InvSlot2Highlight->Show(false);
-    m_InvSlot3Highlight->Show(false);
-    m_HelmetSlotHighlight->Show(false);
-    m_OutfitSlotHighlight->Show(false);
-    m_DetectorSlotHighlight->Show(false);
+    for (u8 i = 1; i <= m_slot_count; ++i)
+    {
+        if (m_pInvSlotHighlight[i])
+            m_pInvSlotHighlight[i]->Show(false);
+    }
+
     for (u8 i = 0; i < 4; i++)
         m_QuickSlotsHighlight[i]->Show(false);
     for (u8 i = 0; i < e_af_count; i++)
@@ -469,35 +466,24 @@ void CUIActorMenu::highlight_item_slot(CUICellItem* cell_item)
     if (CUIDragDropListEx::m_drag_item)
         return;
 
-    CWeapon* weapon = smart_cast<CWeapon*>(item);
-    CHelmet* helmet = smart_cast<CHelmet*>(item);
-    CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(item);
-    CCustomDetector* detector = smart_cast<CCustomDetector*>(item);
-    CEatableItem* eatable = smart_cast<CEatableItem*>(item);
-    CArtefact* artefact = smart_cast<CArtefact*>(item);
-
     u16 slot_id = item->BaseSlot();
-    if (weapon && (slot_id == INV_SLOT_2 || slot_id == INV_SLOT_3))
+    if (slot_id == INV_SLOT_2 || slot_id == INV_SLOT_3)
     {
-        m_InvSlot2Highlight->Show(true);
-        m_InvSlot3Highlight->Show(true);
+        if (m_pInvSlotHighlight[INV_SLOT_2])
+            m_pInvSlotHighlight[INV_SLOT_2]->Show(true);
+
+        if (m_pInvSlotHighlight[INV_SLOT_3])
+            m_pInvSlotHighlight[INV_SLOT_3]->Show(true);
         return;
     }
-    if (helmet && slot_id == HELMET_SLOT)
+
+    if (m_pInvSlotHighlight[slot_id])
     {
-        m_HelmetSlotHighlight->Show(true);
+        m_pInvSlotHighlight[slot_id]->Show(true);
         return;
     }
-    if (outfit && slot_id == OUTFIT_SLOT)
-    {
-        m_OutfitSlotHighlight->Show(true);
-        return;
-    }
-    if (detector && slot_id == DETECTOR_SLOT)
-    {
-        m_DetectorSlotHighlight->Show(true);
-        return;
-    }
+
+    CEatableItem* eatable = smart_cast<CEatableItem*>(item);
     if (eatable)
     {
         if (cell_item->OwnerList() && GetListType(cell_item->OwnerList()) == iQuickSlot)
@@ -507,6 +493,8 @@ void CUIActorMenu::highlight_item_slot(CUICellItem* cell_item)
             m_QuickSlotsHighlight[i]->Show(true);
         return;
     }
+
+    CArtefact* artefact = smart_cast<CArtefact*>(item);
     if (artefact)
     {
         if (cell_item->OwnerList() && GetListType(cell_item->OwnerList()) == iActorBelt)
@@ -760,13 +748,14 @@ void CUIActorMenu::highlight_weapons_for_addon(PIItem addon_item, CUIDragDropLis
 void CUIActorMenu::ClearAllLists()
 {
     m_pInventoryBagList->ClearAll(true);
-
     m_pInventoryBeltList->ClearAll(true);
-    m_pInventoryOutfitList->ClearAll(true);
-    m_pInventoryHelmetList->ClearAll(true);
-    m_pInventoryDetectorList->ClearAll(true);
-    m_pInventoryPistolList->ClearAll(true);
-    m_pInventoryAutomaticList->ClearAll(true);
+    
+    for (u8 i = 1; i <= m_slot_count; ++i)
+    {
+        if (m_pInvList[i])
+            m_pInvList[i]->ClearAll(true);
+    }
+
     m_pQuickSlot->ClearAll(true);
 
     m_pTradeActorBagList->ClearAll(true);
@@ -818,23 +807,29 @@ void CUIActorMenu::UpdateActorMP()
 
 bool CUIActorMenu::CanSetItemToList(PIItem item, CUIDragDropListEx* l, u16& ret_slot)
 {
-    u16 item_slot = item->BaseSlot();
-    if (GetSlotList(item_slot) == l)
+    u16 baseItemSlot = item->BaseSlot();
+    if (GetSlotList(baseItemSlot) == l)
     {
-        ret_slot = item_slot;
+        ret_slot = baseItemSlot;
         return true;
     }
 
-    if (item_slot == INV_SLOT_3 && l == m_pInventoryPistolList)
+    if (baseItemSlot == INV_SLOT_2)
     {
-        ret_slot = INV_SLOT_2;
-        return true;
+        if (l == m_pInvList[INV_SLOT_3])
+        {
+            ret_slot = INV_SLOT_3;
+            return true;
+        }
     }
 
-    if (item_slot == INV_SLOT_2 && l == m_pInventoryAutomaticList)
+    if (baseItemSlot == INV_SLOT_3)
     {
-        ret_slot = INV_SLOT_3;
-        return true;
+        if (l == m_pInvList[INV_SLOT_2])
+        {
+            ret_slot = INV_SLOT_2;
+            return true;
+        }
     }
 
     return false;
@@ -842,31 +837,12 @@ bool CUIActorMenu::CanSetItemToList(PIItem item, CUIDragDropListEx* l, u16& ret_
 
 void CUIActorMenu::UpdateConditionProgressBars()
 {
-    PIItem itm = m_pActorInvOwner->inventory().ItemFromSlot(INV_SLOT_2);
-    if (itm)
+    for (u8 i = 1; i <= m_slot_count; ++i)
     {
-        m_WeaponSlot1_progress->SetProgressPos(iCeil(itm->GetCondition() * 10.0f) / 10.0f);
+        PIItem itm = m_pActorInvOwner->inventory().ItemFromSlot(i);
+        if (m_pInvSlotProgress[i])
+            m_pInvSlotProgress[i]->SetProgressPos(itm ? iCeil(itm->GetCondition()*10.f) / 10.f : 0);
     }
-    else
-        m_WeaponSlot1_progress->SetProgressPos(0);
-
-    itm = m_pActorInvOwner->inventory().ItemFromSlot(INV_SLOT_3);
-    if (itm)
-        m_WeaponSlot2_progress->SetProgressPos(iCeil(itm->GetCondition() * 10.0f) / 10.0f);
-    else
-        m_WeaponSlot2_progress->SetProgressPos(0);
-
-    itm = m_pActorInvOwner->inventory().ItemFromSlot(OUTFIT_SLOT);
-    if (itm)
-        m_Outfit_progress->SetProgressPos(iCeil(itm->GetCondition() * 10.0f) / 10.0f);
-    else
-        m_Outfit_progress->SetProgressPos(0);
-
-    itm = m_pActorInvOwner->inventory().ItemFromSlot(HELMET_SLOT);
-    if (itm)
-        m_Helmet_progress->SetProgressPos(iCeil(itm->GetCondition() * 10.0f) / 10.0f);
-    else
-        m_Helmet_progress->SetProgressPos(0);
 
     //Highlight 'equipped' items in actor bag
     CUIDragDropListEx* slot_list = m_pInventoryBagList;

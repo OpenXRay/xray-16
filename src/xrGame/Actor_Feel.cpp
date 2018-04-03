@@ -124,15 +124,6 @@ void CActor::PickupModeUpdate()
     if (!IsGameTypeSingle())
         return;
 
-    //подбирание объекта
-    if (m_pObjectWeLookingAt && m_pObjectWeLookingAt->cast_inventory_item() &&
-        m_pObjectWeLookingAt->cast_inventory_item()->Useful() && m_pUsableObject &&
-        !m_pUsableObject->nonscript_usable() && !Level().m_feel_deny.is_object_denied(m_pObjectWeLookingAt))
-    {
-        m_pUsableObject->use(this);
-        Game().SendPickUpEvent(ID(), m_pObjectWeLookingAt->ID());
-    }
-
     feel_touch_update(Position(), m_fPickupInfoRadius);
 
     CFrustum frustum;
@@ -143,16 +134,31 @@ void CActor::PickupModeUpdate()
         if (CanPickItem(frustum, Device.vCameraPosition, *it))
             PickupInfoDraw(*it);
     }
+
+    CInventoryItem* pPickUpItem = smart_cast<CInventoryItem*>(m_pObjectWeLookingAt);
+    if (!pPickUpItem)
+        return;
+    
+    if (Level().m_feel_deny.is_object_denied(m_pObjectWeLookingAt))
+        return;
+    
+    if (m_pUsableObject)
+        m_pUsableObject->use(this);
+    
+    Game().SendPickUpEvent(ID(), m_pObjectWeLookingAt->ID());
 }
 
 #include "xrEngine/CameraBase.h"
-BOOL g_b_COD_PickUpMode = TRUE; // XXX: allow to change this via console
+BOOL g_b_COD_PickUpMode = FALSE; // XXX: allow to change this via console
 void CActor::PickupModeUpdate_COD()
 {
-    if (Level().CurrentViewEntity() != this || !g_b_COD_PickUpMode)
+    if (!g_b_COD_PickUpMode)
         return;
 
-    if (!g_Alive() || eacFirstEye != cam_active)
+    if (Level().CurrentViewEntity() != this)
+        return;
+
+    if (eacFirstEye != cam_active)
     {
         CurrentGameUI()->UIMainIngameWnd->SetPickUpItem(NULL);
         return;

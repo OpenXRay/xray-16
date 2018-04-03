@@ -35,7 +35,6 @@ protected:
     HitImmunity::HitTypeSVec m_HitTypeProtection;
 
     shared_str m_ActorVisual;
-    shared_str m_full_icon_name;
     SBoneProtections* m_boneProtection;
 
 protected:
@@ -60,7 +59,6 @@ public:
 
     virtual u32 ef_equipment_type() const;
     virtual BOOL BonePassBullet(int boneID);
-    const shared_str& GetFullIconName() const { return m_full_icon_name; }
     u32 get_artefact_count() const { return m_artefact_count; }
     virtual BOOL net_Spawn(CSE_Abstract* DC);
     virtual void net_Export(NET_Packet& P);
