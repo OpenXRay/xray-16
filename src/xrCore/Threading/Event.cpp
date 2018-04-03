@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Event.hpp"
-#include <windows.h>
 
 Event::Event() noexcept { handle = (void*)CreateEvent(NULL, FALSE, FALSE, NULL); }
 Event::~Event() noexcept { CloseHandle(handle); }
