@@ -279,7 +279,7 @@ void CEntityAlive::Hit(SHit* pHDS)
             StartBloodDrops(pWound);
     }
 
-    if (HDS.hit_type != ALife::eHitTypeTelepatic)
+    if (HDS.hit_type != ALife::eHitTypeTelepatic && HDS.hit_type != ALife::eHitTypeRadiation)
     {
         //добавить кровь на стены
         if (!use_simplified_visual())

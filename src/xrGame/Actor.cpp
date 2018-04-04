@@ -104,7 +104,7 @@ CActor::CActor() : CEntityAlive(), current_ik_cam_shift(0)
 {
     game_news_registry = new CGameNewsRegistryWrapper();
     // Cameras
-    cameras[eacFirstEye] = new CCameraFirstEye(this);
+    cameras[eacFirstEye] = new CCameraFirstEye(this, CCameraBase::flKeepPitch);
     cameras[eacFirstEye]->Load("actor_firsteye_cam");
 
     if (strstr(Core.Params, "-psp"))
@@ -967,6 +967,7 @@ float CActor::currentFOV()
     }
 }
 
+static bool bLook_cam_fp_zoom = false;
 void CActor::UpdateCL()
 {
     if (g_Alive() && Level().CurrentViewEntity() == this)
@@ -1033,6 +1034,21 @@ void CActor::UpdateCL()
                 S->SetParams(full_fire_disp);
 
             SetZoomAimingMode(true);
+            //Alun: Force switch to first-person for zooming
+            if (!bLook_cam_fp_zoom && cam_active == eacLookAt && cam_Active()->m_look_cam_fp_zoom == true)
+            {
+                cam_Set(eacFirstEye);
+                bLook_cam_fp_zoom = true;
+            }
+        }
+        else
+        {
+            //Alun: Switch back to third-person if was forced
+            if (bLook_cam_fp_zoom && cam_active == eacFirstEye)
+            {
+                cam_Set(eacLookAt);
+                bLook_cam_fp_zoom = false;
+            }
         }
 
         if (Level().CurrentEntity() && this->ID() == Level().CurrentEntity()->ID())
@@ -1080,6 +1096,13 @@ void CActor::UpdateCL()
         {
             HUD().SetCrosshairDisp(0.f);
             HUD().ShowCrosshair(false);
+
+            //Alun: Switch back to third-person if was forced
+            if (bLook_cam_fp_zoom && cam_active == eacFirstEye)
+            {
+                cam_Set(eacLookAt);
+                bLook_cam_fp_zoom = false;
+            }
 
             // Очищаем информацию об оружии в шейдерах
             g_pGamePersistent->m_pGShaderConstants->hud_params.set(0.f, 0.f, 0.f, 0.f); //--#SM+#--
@@ -1359,7 +1382,8 @@ void CActor::shedule_Update(u32 DT)
     //что актер видит перед собой
     collide::rq_result& RQ = HUD().GetCurrentRayQuery();
 
-    if (!input_external_handler_installed() && RQ.O && RQ.O->getVisible() && RQ.range < 2.0f)
+    float fAcquistionRange = cam_active == eacFirstEye ? 2.0f : 3.0f;
+    if (!input_external_handler_installed() && RQ.O && RQ.O->getVisible() && RQ.range < fAcquistionRange)
     {
         CGameObject* game_object = smart_cast<CGameObject*>(RQ.O);
         m_pObjectWeLookingAt = game_object;

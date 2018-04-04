@@ -664,6 +664,7 @@ void CActorCondition::BoostTelepaticProtection(const float value) { m_fBoostTele
 void CActorCondition::BoostChemicalBurnProtection(const float value) { m_fBoostChemicalBurnProtection += value; }
 void CActorCondition::UpdateTutorialThresholds()
 {
+#ifndef COC_EDITION
     string256 cb_name;
     static float _cPowerThr = pSettings->r_float("tutorial_conditions_thresholds", "power");
     static float _cPowerMaxThr = pSettings->r_float("tutorial_conditions_thresholds", "max_power");
@@ -741,6 +742,7 @@ void CActorCondition::UpdateTutorialThresholds()
         R_ASSERT(GEnv.ScriptEngine->functor<void>(cb_name, fl));
         fl();
     }
+#endif
 }
 
 bool CActorCondition::DisableSprint(SHit* pHDS)
@@ -833,7 +835,12 @@ bool CActorCondition::ApplyBooster(const SBooster& B, const shared_str& sect)
 
         BOOSTER_MAP::iterator it = m_booster_influences.find(B.m_type);
         if (it != m_booster_influences.end())
+        {
+            if (B.fBoostValue*B.fBoostTime < (*it).second.fBoostValue*(*it).second.fBoostTime)
+                return true;
+
             DisableBoostParameters((*it).second);
+        }
 
         m_booster_influences[B.m_type] = B;
         BoostParameters(B);

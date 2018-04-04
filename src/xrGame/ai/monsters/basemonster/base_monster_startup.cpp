@@ -136,6 +136,11 @@ void CBaseMonster::Load(LPCSTR section)
         m_fSkinArmor = READ_IF_EXISTS(pSettings, r_float, protections_sect, "skin_armor", 0.f);
         m_fHitFracMonster = READ_IF_EXISTS(pSettings, r_float, protections_sect, "hit_fraction_monster", 0.1f);
     }
+    else
+    {
+        m_fSkinArmor = READ_IF_EXISTS(pSettings, r_float, section, "skin_armor", 0.f);
+        m_fHitFracMonster = READ_IF_EXISTS(pSettings, r_float, section, "hit_fraction_monster", 0.1f);
+    }
 
     m_force_anti_aim = false;
 }
