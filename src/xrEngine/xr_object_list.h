@@ -108,8 +108,12 @@ public:
     {
         if (_it < objects_active.size())
             return objects_active[_it];
-        else
-            return objects_sleeping[_it - objects_active.size()];
+
+        _it = _it - objects_active.size();
+        if (_it < objects_sleeping.size())
+            return objects_sleeping[_it];
+
+        return nullptr;
     }
     bool dump_all_objects();
 
