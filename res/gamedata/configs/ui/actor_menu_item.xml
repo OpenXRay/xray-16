@@ -76,6 +76,32 @@
 		<cap_rpm x="22" y="66" width="100" height="8">
 			<text font="letterica16" r="170" g="170" b="170" align="l">ui_inv_rate_of_fire</text>
 		</cap_rpm>
+		
+		<!-- for weapon comparison -->
+		<cap_accuracy_inc x="130" y="13" width="128" height="9" light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+			<text font="arial_14" r="255" g="255" b="255" align="c" >dummy</text>
+		</cap_accuracy_inc>
+		<cap_accuracy_inc_shadow x="131" y="13" width="128" height="9" light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+			<text font="arial_14" r="0" g="0" b="0" align="c" >dummy</text>
+		</cap_accuracy_inc_shadow>
+		<cap_handling_inc x="130" y="31" width="128" height="9" light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+			<text font="arial_14" r="255" g="255" b="255" align="c">dummy</text>
+		</cap_handling_inc>
+		<cap_handling_inc_shadow x="131" y="31" width="128" height="9" light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+			<text font="arial_14" r="0" g="0" b="0" align="c">dummy</text>
+		</cap_handling_inc_shadow>
+		<cap_damage_inc x="130" y="49" width="128" height="9" light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+			<text font="arial_14" r="255" g="255" b="255" align="c">dummy</text>
+		</cap_damage_inc>
+		<cap_damage_inc_shadow x="131" y="49" width="128" height="9" light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+			<text font="arial_14" r="0" g="0" b="0" align="c">dummy</text>
+		</cap_damage_inc_shadow>
+		<cap_rpm_inc x="130" y="67" width="128" height="9" light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+			<text font="arial_14" r="255" g="255" b="255" align="c">dummy</text>
+		</cap_rpm_inc>
+		<cap_rpm_inc_shadow x="131" y="67" width="128" height="9" light_anim="" la_cyclic="1" la_texture="1" la_alpha="1">
+			<text font="arial_14" r="0" g="0" b="0" align="c">dummy</text>
+		</cap_rpm_inc_shadow>
 
 		<progress_accuracy x="130" y="14" width="128" height="9" horz="1">
 			<progress>

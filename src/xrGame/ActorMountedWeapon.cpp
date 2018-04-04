@@ -40,6 +40,8 @@ bool CActor::use_HolderEx(CHolderCustom* object, bool bForce)
                 r_torso.yaw = r_model_yaw;
                 r_model_yaw_dest = r_model_yaw;
 
+                cam_Active()->Direction().set(m_holder->Camera()->Direction());
+
                 SetCallbacks();
 
                 m_holder = nullptr;

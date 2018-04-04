@@ -307,6 +307,9 @@ void CRender::add_Occluder(Fbox2& bb_screenspace) { HOM.occlude(bb_screenspace);
 void CRender::set_Object(IRenderable* O)
 {
     val_pObject = O; // NULL is OK, trust me :)
+    if (!dynamic_cast<IGameObject*>(O) && !dynamic_cast<CPS_Instance*>(O))
+        val_pObject = NULL; //Alun: Hack!
+
     if (val_pObject)
     {
         VERIFY(dynamic_cast<IGameObject*>(O) || dynamic_cast<CPS_Instance*>(O));
@@ -340,6 +343,8 @@ void CRender::apply_object(IRenderable* O)
     {
         CROS_impl& LT = *((CROS_impl*)O->GetRenderData().pROS);
         VERIFY(dynamic_cast<IGameObject*>(O) || dynamic_cast<CPS_Instance*>(O));
+        if (!dynamic_cast<IGameObject*>(O) && !dynamic_cast<CPS_Instance*>(O))
+            return; //Alun: Hack!
         VERIFY(dynamic_cast<CROS_impl*>(O->GetRenderData().pROS));
         float o_hemi = 0.5f * LT.get_hemi();
         float o_sun = 0.5f * LT.get_sun();

@@ -41,6 +41,15 @@ protected:
     CUIStatic m_stAmmoType1;
     CUIStatic m_stAmmoType2;
     CUIStatic m_Prop_line;
+
+    CUITextWnd m_textAccuracy_inc;
+    CUITextWnd m_textHandling_inc;
+    CUITextWnd m_textDamage_inc;
+    CUITextWnd m_textRPM_inc;
+    CUITextWnd m_textAccuracy_inc_shadow;
+    CUITextWnd m_textHandling_inc_shadow;
+    CUITextWnd m_textDamage_inc_shadow;
+    CUITextWnd m_textRPM_inc_shadow;
 };
 
 // -------------------------------------------------------------------------------------------------

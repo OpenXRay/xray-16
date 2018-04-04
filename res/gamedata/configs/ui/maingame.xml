@@ -185,6 +185,10 @@
 		        <texture>ui_inGame2_Patroni_HUD_blue_bar</texture>
 	        </progress>
 	    </progress_bar_stamina>
+		
+		<!-- For ammo text -->
+		<active_ammo_color r="238" g="155" b="23" a="255"/>
+		<inactive_ammo_color r="238" g="155" b="23" a="150"/>
 
 		<static_cur_ammo x="852" y="690" width="68" height="37">
 			<text complex_mode="0" font="graffiti32" color="ui_7" align="c" vert_align="c">ammo</text>

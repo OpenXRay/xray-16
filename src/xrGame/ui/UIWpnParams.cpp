@@ -73,6 +73,15 @@ CUIWpnParams::CUIWpnParams()
     AttachChild(&m_textAmmoUsedType);
     AttachChild(&m_stAmmoType1);
     AttachChild(&m_stAmmoType2);
+
+    AttachChild(&m_textAccuracy_inc_shadow);
+    AttachChild(&m_textDamage_inc_shadow);
+    AttachChild(&m_textHandling_inc_shadow);
+    AttachChild(&m_textRPM_inc_shadow);
+    AttachChild(&m_textAccuracy_inc);
+    AttachChild(&m_textDamage_inc);
+    AttachChild(&m_textHandling_inc);
+    AttachChild(&m_textRPM_inc);
 }
 
 CUIWpnParams::~CUIWpnParams() {}
@@ -107,6 +116,15 @@ void CUIWpnParams::InitFromXml(CUIXml& xml_doc)
         CUIXmlInit::InitTextWnd(xml_doc, "wpn_params:cap_ammo_used_type", 0, &m_textAmmoUsedType);
         CUIXmlInit::InitStatic(xml_doc, "wpn_params:static_ammo_type1", 0, &m_stAmmoType1);
         CUIXmlInit::InitStatic(xml_doc, "wpn_params:static_ammo_type2", 0, &m_stAmmoType2);
+
+        CUIXmlInit::InitTextWnd(xml_doc, "wpn_params:cap_accuracy_inc", 0, &m_textAccuracy_inc);
+        CUIXmlInit::InitTextWnd(xml_doc, "wpn_params:cap_damage_inc", 0, &m_textDamage_inc);
+        CUIXmlInit::InitTextWnd(xml_doc, "wpn_params:cap_handling_inc", 0, &m_textHandling_inc);
+        CUIXmlInit::InitTextWnd(xml_doc, "wpn_params:cap_rpm_inc", 0, &m_textRPM_inc);
+        CUIXmlInit::InitTextWnd(xml_doc, "wpn_params:cap_accuracy_inc_shadow", 0, &m_textAccuracy_inc_shadow);
+        CUIXmlInit::InitTextWnd(xml_doc, "wpn_params:cap_damage_inc_shadow", 0, &m_textDamage_inc_shadow);
+        CUIXmlInit::InitTextWnd(xml_doc, "wpn_params:cap_handling_inc_shadow", 0, &m_textHandling_inc_shadow);
+        CUIXmlInit::InitTextWnd(xml_doc, "wpn_params:cap_rpm_inc_shadow", 0, &m_textRPM_inc_shadow);
     }
 }
 
@@ -146,6 +164,35 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
         slot_damage = (GameID() == eGameIDSingle) ?
             iFloor(g_lua_wpn_params->m_functorDamage(slot_section, str_upgrades) * 34.0f) / 34.0f :
             iFloor(g_lua_wpn_params->m_functorDamageMP(slot_section, str_upgrades) * 34.0f) / 34.0f;
+
+        string128 str_value;
+        float adj_value = cur_accur - slot_accur;
+        xr_sprintf(str_value, sizeof(str_value), adj_value>0 ? "+%.1f%%" : "%.1f%%", adj_value);
+        m_textAccuracy_inc.SetText(str_value);
+        m_textAccuracy_inc_shadow.SetText(str_value);
+        adj_value = cur_damage - slot_damage;
+        xr_sprintf(str_value, sizeof(str_value), adj_value>0 ? "+%.1f%%" : "%.1f%%", adj_value);
+        m_textDamage_inc.SetText(str_value);
+        m_textDamage_inc_shadow.SetText(str_value);
+        adj_value = cur_hand - slot_hand;
+        xr_sprintf(str_value, sizeof(str_value), adj_value>0 ? "+%.1f%%" : "%.1f%%", adj_value);
+        m_textHandling_inc.SetText(str_value);
+        m_textHandling_inc_shadow.SetText(str_value);
+        adj_value = cur_rpm - slot_rpm;
+        xr_sprintf(str_value, sizeof(str_value), adj_value>0 ? "+%.1f%%" : "%.1f%%", adj_value);
+        m_textRPM_inc.SetText(str_value);
+        m_textRPM_inc_shadow.SetText(str_value);
+    }
+    else
+    {
+        m_textAccuracy_inc.SetText("");
+        m_textDamage_inc.SetText("");
+        m_textHandling_inc.SetText("");
+        m_textRPM_inc.SetText("");
+        m_textAccuracy_inc_shadow.SetText("");
+        m_textDamage_inc_shadow.SetText("");
+        m_textHandling_inc_shadow.SetText("");
+        m_textRPM_inc_shadow.SetText("");
     }
 
     m_progressAccuracy.SetTwoPos(cur_accur, slot_accur);

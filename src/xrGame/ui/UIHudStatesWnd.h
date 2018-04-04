@@ -28,6 +28,8 @@ private:
     //	CUIStatic*			m_resist_back[it_max];
     CUIStatic* m_indik[it_max];
 
+    u32 m_ui_weapon_ammo_color_active;
+    u32 m_ui_weapon_ammo_color_inactive;
     CUITextWnd* m_ui_weapon_cur_ammo;
     CUITextWnd* m_ui_weapon_fmj_ammo;
     CUITextWnd* m_ui_weapon_ap_ammo;
