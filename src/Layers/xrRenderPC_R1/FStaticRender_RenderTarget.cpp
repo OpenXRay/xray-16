@@ -28,7 +28,7 @@ CRenderTarget::CRenderTarget()
     param_color_map_influence = 0.0f;
     param_color_map_interpolate = 0.0f;
 
-    im_noise_time = 1 / 100.0f;
+    im_noise_time = 1.f / 100.0f;
     im_noise_shift_w = 0;
     im_noise_shift_h = 0;
 
