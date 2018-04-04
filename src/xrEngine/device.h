@@ -91,11 +91,14 @@ public:
     Fmatrix mFullTransform;
 
     // Copies of corresponding members. Used for synchronization.
-    Fvector vCameraPosition_saved;
+    Fvector vCameraPositionSaved;
+    Fvector vCameraDirectionSaved;
+    Fvector vCameraTopSaved;
+    Fvector vCameraRightSaved;
 
-    Fmatrix mView_saved;
-    Fmatrix mProject_saved;
-    Fmatrix mFullTransform_saved;
+    Fmatrix mViewSaved;
+    Fmatrix mProjectSaved;
+    Fmatrix mFullTransformSaved;
 
     float fFOV;
     float fASPECT;

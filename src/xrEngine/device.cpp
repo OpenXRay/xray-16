@@ -260,10 +260,15 @@ void CRenderDevice::on_idle()
     mFullTransform.mul(mProject, mView);
     GEnv.Render->SetCacheXform(mView, mProject);
     mInvFullTransform.invert(mFullTransform);
-    vCameraPosition_saved = vCameraPosition;
-    mFullTransform_saved = mFullTransform;
-    mView_saved = mView;
-    mProject_saved = mProject;
+
+    vCameraPositionSaved = vCameraPosition;
+    vCameraDirectionSaved = vCameraDirection;
+    vCameraTopSaved = vCameraTop;
+    vCameraRightSaved = vCameraRight;
+
+    mFullTransformSaved = mFullTransform;
+    mViewSaved = mView;
+    mProjectSaved = mProject;
 
     renderProcessFrame.Set(); // allow render thread to do its job
     syncProcessFrame.Set(); // allow secondary thread to do its job
