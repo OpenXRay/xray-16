@@ -393,11 +393,9 @@ void CScriptGameObject::SetActorDirection(float dir)
     if (actor)
     {
         actor->cam_Active()->Set(dir, 0, 0);
-        //		actor->XFORM().setXYZ(0,dir,0);
+        return;
     }
-    else
-        GEnv.ScriptEngine->script_log(
-            LuaMessageType::Error, "ScriptGameObject : attempt to call SetActorDirection method for non-actor object");
+    object().XFORM().setXYZ(0, dir, 0);
 }
 
 void CScriptGameObject::DisableHitMarks(bool disable)

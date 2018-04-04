@@ -1757,6 +1757,29 @@ void CScriptGameObject::Weapon_AddonDetach(pcstr item_section)
         weapon->Detach(item_section, true);
 }
 
+void CScriptGameObject::Weapon_SetCurrentScope(u8 type)
+{
+    CWeaponMagazined* weapon = smart_cast<CWeaponMagazined*>(&object());
+    if (!weapon)
+    {
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CWeaponMagazined : cannot access class member Weapon_SetCurrentScope!");
+        return;
+    }
+
+    weapon->m_cur_scope = type;
+}
+
+u8 CScriptGameObject::Weapon_GetCurrentScope()
+{
+    CWeaponMagazined* weapon = smart_cast<CWeaponMagazined*>(&object());
+    if (!weapon)
+    {
+        GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CWeaponMagazined : cannot access class member Weapon_GetCurrentScope!");
+        return 255;
+    }
+    return weapon->m_cur_scope;
+}
+
 bool CScriptGameObject::InstallUpgrade(pcstr upgrade)
 {
     CInventoryItem* item = smart_cast<CInventoryItem*>(&object());
