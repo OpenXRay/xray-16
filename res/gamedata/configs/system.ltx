@@ -102,12 +102,13 @@ files =  npc_profile
 specific_characters_files = character_desc_general, character_desc_zaton, character_desc_pripyat, character_desc_jupiter, character_desc_underpass
 
 
+;New in CoC: You can have as many slots as you want, simply create slot_active_* and slot_persistent_* for it in sequential order
+;Set slot_persistent_* = false to treat actor inventory as a 'slot'. Setting highlight_equipped = true in the item section will highlight equipped items in inventory
 [inventory]
 take_dist   	= 2
 max_weight    	= 50
 max_ruck    	= 56
 max_belt    	= 5 ;16
-slots_count   	= 17 ; count +1 (zero)
 
 slot_persistent_1   = true   ;knife
 slot_active_1       = true
