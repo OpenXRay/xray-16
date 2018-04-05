@@ -51,7 +51,7 @@ CWeaponMagazined::CWeaponMagazined(ESoundTypes eSoundType) : CWeapon()
 
     m_bFireSingleShot = false;
     m_iShotNum = 0;
-    m_fOldBulletSpeed = 0;
+    m_fOldBulletSpeed = 0.f;
     m_iQueueSize = WEAPON_ININITE_QUEUE;
     m_bLockType = false;
 }
@@ -1099,7 +1099,7 @@ void CWeaponMagazined::LoadAddons()
 void CWeaponMagazined::InitAddons()
 {
     m_zoom_params.m_fIronSightZoomFactor =
-        READ_IF_EXISTS(pSettings, r_float, cNameSect(), "ironsight_zoom_factor", 50.0f);
+        READ_IF_EXISTS(pSettings, r_float, cNameSect(), "ironsight_zoom_factor", 1.03f);
     if (IsScopeAttached())
     {
         shared_str scope_tex_name;

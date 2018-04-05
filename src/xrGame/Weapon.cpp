@@ -54,7 +54,7 @@ CWeapon::CWeapon()
 
     eHandDependence = hdNone;
 
-    m_zoom_params.m_fCurrentZoomFactor = g_fov;
+    m_zoom_params.m_fCurrentZoomFactor = 1.f;
     m_zoom_params.m_fZoomRotationFactor = 0.f;
     m_zoom_params.m_pVision = nullptr;
     m_zoom_params.m_pNight_vision = nullptr;
@@ -83,6 +83,8 @@ CWeapon::CWeapon()
 
 CWeapon::~CWeapon()
 {
+    if (m_zoom_params.m_pVision)
+        xr_delete(m_zoom_params.m_pVision);
     xr_delete(m_UIScope);
     delete_data(m_scopes);
 }
@@ -473,8 +475,8 @@ void CWeapon::Load(LPCSTR section)
     }
 
     m_zoom_params.m_bUseDynamicZoom = READ_IF_EXISTS(pSettings, r_bool, section, "scope_dynamic_zoom", false);
-    m_zoom_params.m_sUseZoomPostprocess = nullptr;
-    m_zoom_params.m_sUseBinocularVision = nullptr;
+    m_zoom_params.m_sUseZoomPostprocess = READ_IF_EXISTS(pSettings, r_string, section, "scope_nightvision", 0);
+    m_zoom_params.m_sUseBinocularVision = READ_IF_EXISTS(pSettings, r_string, section, "scope_alive_detector", 0);
 
     // Added by Axel, to enable optional condition use on any item
     m_flags.set(FUsingCondition, READ_IF_EXISTS(pSettings, r_bool, section, "use_condition", true));
@@ -1368,7 +1370,7 @@ void CWeapon::OnZoomOut()
 {
     m_zoom_params.m_bIsZoomModeNow = false;
     m_fRTZoomFactor = GetZoomFactor(); // store current
-    m_zoom_params.m_fCurrentZoomFactor = g_fov;
+    m_zoom_params.m_fCurrentZoomFactor = 1.f;
     EnableHudInertion(TRUE);
 
     GamePersistent().RestoreEffectorDOF();
@@ -1378,7 +1380,9 @@ void CWeapon::OnZoomOut()
 
     ResetSubStateTime();
 
-    xr_delete(m_zoom_params.m_pVision);
+    if (m_zoom_params.m_pVision)
+        xr_delete(m_zoom_params.m_pVision);
+
     if (m_zoom_params.m_pNight_vision)
     {
         m_zoom_params.m_pNight_vision->Stop(100000.0f, false);
@@ -1869,8 +1873,8 @@ void CWeapon::ZoomInc()
     float delta, min_zoom_factor;
     GetZoomData(m_zoom_params.m_fScopeZoomFactor, delta, min_zoom_factor);
 
-    float f = GetZoomFactor() - delta;
-    clamp(f, m_zoom_params.m_fScopeZoomFactor, min_zoom_factor);
+    float f = GetZoomFactor() + delta;
+    clamp(f, min_zoom_factor, m_zoom_params.m_fScopeZoomFactor);
     SetZoomFactor(f);
 }
 
@@ -1883,8 +1887,8 @@ void CWeapon::ZoomDec()
     float delta, min_zoom_factor;
     GetZoomData(m_zoom_params.m_fScopeZoomFactor, delta, min_zoom_factor);
 
-    float f = GetZoomFactor() + delta;
-    clamp(f, m_zoom_params.m_fScopeZoomFactor, min_zoom_factor);
+    float f = GetZoomFactor() - delta;
+    clamp(f, min_zoom_factor, m_zoom_params.m_fScopeZoomFactor);
     SetZoomFactor(f);
 }
 u32 CWeapon::Cost() const
