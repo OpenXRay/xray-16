@@ -1,0 +1,334 @@
+[wpn_vintorez]:identity_immunities,weapon_probability,default_weapon_params
+GroupControlSection     = spawn_group
+$spawn						= "weapons\vintorez"                ; option for Level Editor
+$npc                    = off                                ; option for Level Editor
+$prefetch               = 8
+scheduled               = off                                ; option for ALife Simulator
+cform                   = skeleton
+class                   = WP_AK74
+description             = st_wpn_vintorez_descr
+
+ef_main_weapon_type     = 3
+ef_weapon_type          = 7
+
+default_to_ruck         = false
+sprint_allowed       	= true
+
+;-------------------------------------------------------------------------------
+cost                    = 12000
+weapon_class            = sniper_rifle        ; Type of the weapon
+inv_weight              = 3.2
+
+upgrades                = up_gr_firstab_vintorez, up_gr_seconab_vintorez, up_gr_thirdab_vintorez, up_gr_fourtab_vintorez, up_gr_fourtcd_vintorez, up_gr_fourtef_vintorez
+installed_upgrades      =
+upgrade_scheme          = upgrade_scheme_vintorez
+
+;-TTX-----------------------------------------------------------------------------
+hit_power				= 0.42,0.42, 0.42, 0.42
+hit_impulse				= 100
+hit_type				= fire_wound
+
+fire_distance           = 200
+bullet_speed            = 290
+rpm                     = 580
+rpm_empty_click         = 200
+
+use_aim_bullet          = false                ;Поддерживается ли первая суппер пуля
+time_to_aim             = 1.0
+;-------------------------------------------------------------------------------
+
+misfire_probability        = 0.005 ;вероятность осечки при максимальном износе  !!!old - now not working
+;изношенность, при которой появляется шанс осечки
+misfire_start_condition		= 0.6
+;изношеность при которой шанс осечки становится константным
+misfire_end_condition		= 0.1
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= 0.005
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= 0.063
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= 0.0011
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= 0.0013
+
+ammo_elapsed            = 10
+ammo_mag_size           = 10
+
+ammo_class              = ammo_9x39_pab9, ammo_9x39_ap
+grenade_class           = ammo_m209
+fire_modes              = 1, -1
+launch_speed            = 0
+hand_dependence         = 1
+single_handed           = 0
+
+;-------------------------------------------------------------------------------
+;базовая дисперсия
+fire_dispersion_base    = 0.17        ;угол (в градусах) базовой дисперсии оружия (оружия зажатого в тисках)
+control_inertion_factor = 1.2f
+crosshair_inertion		= 6.10
+
+;отдача
+cam_return				= 0
+cam_relax_speed         = 3.5        ;скорость возврата в исходное положение
+cam_relax_speed_ai      = 360		;скорость возврата в исходное положение
+cam_dispersion          = 0.4        ;увеличения угла (в градусах) с каждым выстрелом
+cam_dispersion_inc      = 0.2        ;увеличениe cam_dispersion с каждым выстрелом
+cam_dispersion_frac     = 1.0        ;ствол будет подыматься на cam_dispersion*cam_dispersion_frac +- cam_dispersion*(1-cam_dispersion_frac)
+cam_max_angle           = 50.0        ;максимальный угол отдачи
+cam_max_angle_horz      = 50.0        ;(degree) maximum shot horizontal degree
+cam_step_angle_horz     = 0.5        ;(degree) size of step camera moved in horizontal position while shooting
+
+PDM_disp_base 				= 0.5
+PDM_disp_vel_factor 		= 1.5
+PDM_disp_accel_factor 		= 1.5
+PDM_disp_crouch	 			= 1.0
+PDM_disp_crouch_no_acc 		= 1.0
+
+zoom_cam_relax_speed        = 3.5    ; scope & ironsight
+zoom_cam_relax_speed_ai     = 120.75
+zoom_cam_dispersion         = 0.2
+zoom_cam_dispersion_inc     = 0.1
+zoom_cam_dispersion_frac    = 1.0
+zoom_cam_max_angle          = 50.0
+zoom_cam_max_angle_horz     = 50.0
+zoom_cam_step_angle_horz    = 0.25
+
+fire_dispersion_condition_factor = 10        ;увеличение дисперсии в процентах при максимальном износе
+
+;---DOF-------------------------------------------------------------------------
+;zoom_dof						= 0.5, 1.0, 180
+reload_dof					= 0.0, 0.5, 5, 2
+;-------------------------------------------------------------------------------
+holder_range_modifier   = 2.0                       ; во сколько раз увеличивается eye_range
+holder_fov_modifier     = 1.0              ; во сколько раз увеличивается eye_fov
+
+min_radius              = 50
+max_radius              = 150
+
+hit_probability_gd_novice  = 1.0
+hit_probability_gd_stalker = 1.0
+hit_probability_gd_veteran = 1.0
+hit_probability_gd_master  = 1.0
+;-------------------------------------------------------------------------------
+hud                     = wpn_vintorez_hud
+
+slot                    = 2                ; // secondary
+animation_slot          = 2                ; type of the animation that will be used
+
+inv_name                = st_wpn_vintorez
+inv_name_short          = st_wpn_vintorez
+
+inv_grid_width          = 5
+inv_grid_height         = 2
+inv_grid_x              = 0
+inv_grid_y              = 4
+
+upgr_icon_x			= 8
+upgr_icon_y			= 395
+upgr_icon_width		= 290
+upgr_icon_height   	= 78
+
+kill_msg_x              = 98
+kill_msg_y              = 0
+kill_msg_width          = 78
+kill_msg_height         = 25
+
+;---------------------------------------------------------------------------------
+position                = -0.026, -0.097, 0.0
+orientation             = 0, 0, 0
+
+fire_point              = 0.000000,0.137000,0.649000
+fire_point2             = 0.0, 0.097, 0.722
+
+;flame_particles         = weapons\generic_weapon05
+smoke_particles         = weapons\generic_shoot_00
+grenade_flame_particles = weapons\generic_weapon01
+
+shell_point             = -0.020000,0.167000,0.082000
+shell_dir               = 0.0, 0.0, 0.4
+shell_particles         = weapons\generic_shells
+
+;--STRAP PARAMETERS-----------------------------------------------------------------
+;под мишкой
+strap_position          = -0.26,-0.11,0.25                        	; position (offset) and orientation of the weapon when it is strapped
+strap_orientation       = -15,-9,110                                	; (3rd person view in degrees)
+strap_bone0             = bip01_spine2
+strap_bone1             = bip01_spine1
+
+startup_ammo            = 90
+visual                  = dynamics\weapons\wpn_vintorez\wpn_vintorez.ogf
+
+light_disabled				= true
+light_color             = 0.6,0.5,0.3
+light_range             = 0.01
+light_var_color         = 0.05
+light_var_range         = 0.5
+light_time              = 0.2
+
+ph_mass                 = 4
+
+;addons
+scope_status            = 1
+silencer_status         = 1
+grenade_launcher_status = 0
+
+scope_texture				= wpn_crosshair
+
+zoom_enabled			= true
+zoom_rotate_time		= 0.25
+scope_zoom_factor	    = 15		;ПСО-1 4X
+
+scope_name              = wpn_addon_scope
+scope_x                 = 78
+scope_y                 = 0
+silencer_name           = wpn_addon_silencer
+silencer_x              = 221
+silencer_y              = 16
+grenade_launcher_name   = wpn_addon_grenade_launcher_m203
+grenade_launcher_x      = 109
+grenade_launcher_y      = 30
+
+;звуки
+snd_draw                = weapons\generic_draw
+snd_holster             = weapons\generic_holster
+snd_shoot				= weapons\n_vintorez_shot
+
+snd_empty               = weapons\gen_empty, 0.5
+snd_reload              = weapons\groza_reload, 0.7
+snd_shoot_grenade       = weapons\gen_grenshoot
+snd_reload_grenade      = weapons\gen_grenload, 1.0, 0.8
+snd_switch              = weapons\groza_switch, 1.0, 0.5
+
+;silencer_flame_particles  = weapons\generic_weapon01
+silencer_smoke_particles   = weapons\generic_shoot_00
+
+snd_silncer_shot        = weapons\w_ak74_shot1
+
+silencer_light_color    = 0.6,0.5,0.3
+silencer_light_range    = 0.01
+silencer_light_var_color= 0.05
+silencer_light_var_range= 0.5
+silencer_light_time     = 0.2
+
+[wpn_vintorez_hud]:hud_base
+zoom_hide_crosshair	= true
+attach_place_idx	= 0
+item_visual		= dynamics\weapons\wpn_vintorez\wpn_vintorez_hud.ogf
+
+
+hands_position				= -0.053000,-0.196500,0.250499
+hands_orientation			= 0.300000,1.849999,-0.000001
+
+
+hands_position_16x9				= -0.047500,-0.203500,0.194999
+hands_orientation_16x9			= 0.800000,1.650000,-2.500000
+
+aim_hud_offset_pos	= -0.112000,0.029500,-0.118000
+aim_hud_offset_rot	= 0.010000,0.002500,-0.010000
+
+aim_hud_offset_pos_16x9		= -0.092000,0.0149500,-0.038000
+aim_hud_offset_rot_16x9		= 0.010000,0.002500,-0.010000
+
+
+
+item_position				= 0.007119,0.019630,0.009658
+item_orientation			= -15.646272,-3.230760,364.546112
+
+shell_point					= 0.023,0.042,0.129
+shell_dir               = 0.0, 1.0, 0.0
+shell_bone					= wpn_body
+
+fire_point		= 0,0.037,0.626
+fire_bone      	      = wpn_body
+fire_point2					= -0.014000,0.010000,-0.037000
+fire_bone2					= wpn_body
+
+anm_show             	= vintorez_draw
+anm_hide             	= vintorez_holster
+anm_idle             	= vintorez_idle
+anm_idle_sprint         = vintorez_idle_sprint
+anm_idle_moving 			= vintorez_idle_moving
+anm_shots               = vintorez_shoot
+anm_reload              = vintorez_reload
+anm_idle_aim           	= vintorez_idle_aim
+
+;anm_switch              = vintorez_switch_off
+;anm_switch_g            = vintorez_switch_on
+anm_bore						= vintorez_idle_bore
+
+;anm_hide_w_gl           = vintorez_holster_w_gl
+;anm_show_w_gl           = vintorez_draw_w_gl
+;anm_idle_w_gl           = vintorez_idle_w_gl
+;anm_shots_w_gl          = vintorez_shoot_w_gl
+;anm_reload_w_gl         = vintorez_reload_w_gl
+;anm_idle_w_gl_aim       = vintorez_idle_w_gl_aim
+;anm_idle_sprint_w_gl		= vintorez_idle_sprint_w_gl
+;anm_idle_moving_w_gl		= vintorez_idle_moving_w_gl
+;anm_bore_w_gl				= vintorez_idle_bore
+
+;anm_show_g         	   = vintorez_draw_grenade
+;anm_hide_g         	   = vintorez_holster_grenade
+;anm_idle_g         	   = vintorez_idle_grenade
+;anm_reload_g       	   = vintorez_reload_grenade
+;anm_idle_g_aim     	   = vintorez_idle_grenade
+;anm_shots_g        	   = vintorez_shoot_grenade
+;anm_idle_sprint_g			= vintorez_idle_sprint_grenade
+;anm_idle_moving_g			= vintorez_idle_moving_grenade
+;anm_bore_g					= vintorez_idle_bore
+
+
+
+gl_hud_offset_pos	= -0.053000,-0.059000,0.000000
+gl_hud_offset_rot	= -0.145000,0.000000,0.000000
+
+lean_hud_offset_pos	= 0,0,0
+lean_hud_offset_rot	= 0,0,0
+
+grenade_bone            = grenade
+
+;-----------------------------------------------------------------------------
+; Уникальные
+;-----------------------------------------------------------------------------
+[wpn_vintorez_nimble]:wpn_vintorez
+$spawn						= "weapons\unique\vintorez_nimble"                ; option for Level Editor
+inv_name				= st_wpn_vintorez_nimble
+description					= st_wpn_vintorez_nimble_descr
+
+cost                    = 15000
+
+hit_power				= 0.65, 0.65, 0.65, 0.65
+hit_impulse				= 140
+bullet_speed            = 320
+rpm                     = 375
+
+fire_dispersion_base    = 0.12        ;угол (в градусах) базовой дисперсии оружия (оружия зажатого в тисках)
+control_inertion_factor = 1.2f
+crosshair_inertion		= 6
+
+;отдача
+cam_return				= 1
+cam_relax_speed         = 3.5        ;скорость возврата в исходное положение
+cam_relax_speed_ai      = 360		;скорость возврата в исходное положение
+cam_dispersion          = 0.32        ;увеличения угла (в градусах) с каждым выстрелом
+cam_dispersion_inc      = 0.17        ;увеличениe cam_dispersion с каждым выстрелом
+cam_dispersion_frac     = 1.0        ;ствол будет подыматься на cam_dispersion*cam_dispersion_frac +- cam_dispersion*(1-cam_dispersion_frac)
+cam_max_angle           = 50.0        ;максимальный угол отдачи
+cam_max_angle_horz      = 50.0        ;(degree) maximum shot horizontal degree
+cam_step_angle_horz     = 0.5        ;(degree) size of step camera moved in horizontal position while shooting
+
+PDM_disp_base           = 0.6
+PDM_disp_vel_factor     = 2.4
+PDM_disp_accel_factor   = 2.4
+PDM_disp_crouch         = 1.0
+PDM_disp_crouch_no_acc  = 1.0
+
+zoom_cam_relax_speed        = 3.5    ; scope & ironsight
+zoom_cam_relax_speed_ai     = 120.75
+zoom_cam_dispersion         = 0.18
+zoom_cam_dispersion_inc     = 0.1
+zoom_cam_dispersion_frac    = 1.0
+zoom_cam_max_angle          = 50.0
+zoom_cam_max_angle_horz     = 50.0
+zoom_cam_step_angle_horz    = 0.25
+
+fire_dispersion_condition_factor = 5        ;увеличение дисперсии в процентах при максимальном износе

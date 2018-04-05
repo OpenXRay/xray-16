@@ -1,0 +1,660 @@
+[up_sect_firsta_groza]
+;—корострельность(1)10%
+;----------------------
+cost		      		= 1000
+value					= +10
+rpm                     = +75 ;650
+
+
+[up_sect_firstc_groza]
+;ќтдача(2)-20%
+;_------------
+cost	      	     	= 1600
+value					= -20
+
+cam_dispersion              = -0.068	;0.4
+cam_dispersion_inc         	= -0.028	;0.4
+cam_step_angle_horz        	= -0.22		;1.0 [0.46 в остатке]
+
+zoom_cam_dispersion          = -0.073		;0.3
+zoom_cam_dispersion_inc      = -0.033	;0.3
+zoom_cam_step_angle_horz     = -0.23 	;0.7 [0.17 в остатке]
+
+
+[up_sect_firstd_groza]
+;Ќадежность(2)15%
+;_---------------
+cost		      		= 1600
+value					= +15
+
+;увеличение дисперсии в процентах при максимальном износе
+fire_dispersion_condition_factor    = -1 ;15
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= -0.0001 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= -0.0001 ;0.0011
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= -0.001
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= -0.01 ;0.03
+
+[up_sect_firste_groza]
+;—корострельность(3)25%
+;----------------------
+cost		      		= 2200
+value					= +25
+
+rpm                     = +135 ;650
+
+[up_sect_firstf_groza]
+;“очность(3)30%
+cost		      		= 2200
+value					= +30
+fire_dispersion_base    = -0.05 ;0.09;0.048 
+fire_dispersion_condition_factor    = -1 ;15
+
+[up_sect_secona_groza]
+;ќтдача(1)-10%
+;_------------
+cost		      		= 1000
+value					= -10
+
+cam_dispersion              = -0.042	;0.4
+cam_dispersion_inc         	= -0.022	;0.4
+cam_step_angle_horz        	= -0.12		;1.0 [0.46 в остатке]
+
+zoom_cam_dispersion          = -0.048		;0.3
+zoom_cam_dispersion_inc      = -0.023	;0.3
+zoom_cam_step_angle_horz     = -0.11 	;0.7 [0.17 в остатке]
+
+
+[up_sect_seconc_groza]
+;Ќастильность(2)20%
+;------------------
+cost		      		= 1600
+value					= +20
+bullet_speed			= +60   ;300
+fire_dispersion_base    = -0.01 
+hit_impulse				= +20
+
+[up_sect_secone_groza]
+;ќтдача(3)-30%
+;_------------
+cost		      		= 2200
+value					= -30
+
+cam_dispersion              = -0.075	;0.4
+cam_dispersion_inc         	= -0.045	;0.4
+cam_step_angle_horz        	= -0.3		;1.0 [0.46 в остатке]
+
+zoom_cam_dispersion          = -0.09		;0.3
+zoom_cam_dispersion_inc      = -0.05	;0.3
+zoom_cam_step_angle_horz     = -0.32 	;0.7 [0.17 в остатке]
+
+
+[up_sect_seconf_groza]
+;“очность(3)30%
+cost		      		= 2200
+value					= +30
+fire_dispersion_base    = -0.05 ;0.09;0.048 
+fire_dispersion_condition_factor    = -1 ;15
+
+[up_sect_thirda_groza]
+;ќтдача(1)-10%
+;_------------
+cost		      		= 1000
+value					= -10
+
+cam_dispersion              = -0.042	;0.4
+cam_dispersion_inc         	= -0.022	;0.4
+cam_step_angle_horz        	= -0.12		;1.0 [0.46 в остатке]
+
+zoom_cam_dispersion          = -0.048		;0.3
+zoom_cam_dispersion_inc      = -0.023	;0.3
+zoom_cam_step_angle_horz     = -0.11 	;0.7 [0.17 в остатке]
+
+[up_sect_thirdc_groza]
+;“очность(2)20%
+cost		      		= 1600
+value					= +20
+fire_dispersion_base    = -0.03 ;0.09;0.048 
+fire_dispersion_condition_factor    = -1 ;15
+
+[up_sect_thirdd_groza]
+;Ќадежность(2)15%
+;_---------------
+cost		      		= 1600
+value					= +15
+
+;увеличение дисперсии в процентах при максимальном износе
+fire_dispersion_condition_factor    = -1 ;15
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= -0.0001 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= -0.0001 ;0.0011
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= -0.001
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= -0.01 ;0.03
+
+[up_sect_thirde_groza]
+;—корострельность(3)25%
+;----------------------
+cost		      		= 2200
+value					= +25
+
+rpm                     = +135 ;650
+
+
+
+[up_sect_thirdf_groza]
+;Ќастильность(3)30%
+;------------------
+cost		      		= 2200
+value					= +30
+bullet_speed			= +80   ;270
+fire_dispersion_base    = -0.02 
+hit_impulse				= +30
+
+[up_sect_fourta_groza]
+;ќтдача(1)-10%
+;_-----------
+cost		      		= 1000
+value					= -10
+
+cam_dispersion              = -0.042	;0.4
+cam_dispersion_inc         	= -0.022	;0.4
+cam_step_angle_horz        	= -0.12		;1.0 [0.46 в остатке]
+
+zoom_cam_dispersion          = -0.048		;0.3
+zoom_cam_dispersion_inc      = -0.023	;0.3
+zoom_cam_step_angle_horz     = -0.11 	;0.7 [0.17 в остатке]
+
+
+
+[up_sect_fourtc_groza]
+;”добство(2)15%
+;_-------------
+cost		      		= 1600
+value					= +15
+
+crosshair_inertion		   = -2.5
+ 
+PDM_disp_base 				= -0.15 ;0.5
+PDM_disp_vel_factor 		= -0.4 ;1.5
+PDM_disp_accel_factor 		= -0.4 ;1.5
+
+
+[up_sect_fourte_groza]
+;Ќадежность(3)25%
+;_--------------
+cost		      		= 2200
+value					= +25
+
+;увеличение дисперсии в процентах при максимальном износе
+fire_dispersion_condition_factor    = -1 ;15
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= -0.0002 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= -0.0002 ;0.0011
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= -0.0015
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= -0.02 ;0.03
+
+[up_sect_fourtf_groza]
+;Ќастильность(3)30%
+;------------------
+cost		      		= 2200
+value					= +30
+bullet_speed			= +80 ;300
+fire_dispersion_base    = -0.02 
+hit_impulse				= +30
+
+[up_sect_fiftha_groza]
+;ќбъем магазина +10
+;--------------------
+cost		      		= 1800
+value					= +10
+ammo_mag_size        	= 10
+
+[up_firsta_groza]
+scheme_index            = 0, 0
+known                   = 1
+;;invented                = 1                							; 0
+effects                 = up_gr_firstcd_groza
+section                 = up_sect_firsta_groza
+property                = prop_rpm
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_zat_a3_name
+description             = st_up_zat_a3_descr
+icon                    = ui_inGame2_upgrade_GromS14_1
+
+[up_firstc_groza]
+scheme_index            = 1, 0
+known                   = 1
+effects                 = up_gr_firstef_groza
+section                 = up_sect_firstc_groza
+property                = prop_recoil
+
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_zat_b2_name
+description             = st_up_zat_b2_descr
+icon                    = ui_inGame2_upgrade_GromS14_2
+
+[up_firstd_groza]
+scheme_index            = 1, 1
+known                   = 1
+effects                 = up_gr_firstef_groza
+section                 = up_sect_firstd_groza
+property                = prop_reliability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_zat_b3_name
+description             = st_up_zat_b3_descr
+icon                    = ui_inGame2_upgrade_GromS14_3
+
+[up_firste_groza]
+scheme_index            = 2, 0
+known                   = 1
+effects                 =
+section                 = up_sect_firste_groza
+property                = prop_rpm
+
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_zat_c4_name
+description             = st_up_zat_c4_descr
+icon                    = ui_inGame2_upgrade_GromS14_4
+
+[up_firstf_groza]
+scheme_index            = 2, 1
+known                   = 1
+effects                 =
+section                 = up_sect_firstf_groza
+property                = prop_dispersion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 	
+name                    = st_up_zat_c5_name
+description             = st_up_zat_c5_descr
+icon                    = ui_inGame2_upgrade_GromS14_5
+
+[up_secona_groza]
+scheme_index            = 0, 1
+known                   = 1
+effects                 = up_gr_seconcd_groza
+section                 = up_sect_secona_groza
+property                = prop_recoil
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_auto_a1_name
+description             = st_up_auto_a1_descr
+icon                    = ui_inGame2_upgrade_GromS14_6
+
+[up_seconc_groza]
+scheme_index            = 1, 2
+known                   = 1
+effects                 = up_gr_seconef_groza
+section                 = up_sect_seconc_groza
+property                = prop_bullet_speed
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_auto_b2_name
+description             = st_up_auto_b2_descr
+icon                    = ui_inGame2_upgrade_GromS14_7
+
+[up_secone_groza]
+scheme_index            = 2, 2
+known                   = 1
+effects                 =
+section                 = up_sect_secone_groza
+property                = prop_recoil
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here_h
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_auto_c1_name
+description             = st_up_auto_c1_descr
+icon                    = ui_inGame2_upgrade_GromS14_8
+
+[up_seconf_groza]
+scheme_index            = 2, 3
+known                   = 1
+effects                 =
+section                 = up_sect_seconf_groza
+property                = prop_dispersion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_auto_c5_name
+description             = st_up_auto_c5_descr
+icon                    = ui_inGame2_upgrade_GromS14_9
+
+
+[up_thirda_groza]
+scheme_index            = 0, 2
+known                   = 1
+effects                 = up_gr_thirdcd_groza
+section                 = up_sect_thirda_groza
+property                = prop_recoil
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_ret_a3_name
+description             = st_up_ret_a3_descr
+icon                    = ui_inGame2_upgrade_GromS14_10
+
+[up_thirdc_groza]
+scheme_index            = 1, 3
+known                   = 1
+effects                 = up_gr_thirdef_groza
+section                 = up_sect_thirdc_groza
+property                = prop_dispersion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_ret_b3_name
+description             = st_up_ret_b3_descr
+icon                    = ui_inGame2_upgrade_GromS14_11
+
+
+[up_thirdd_groza]
+scheme_index            = 1, 4
+known                   = 1
+effects                 = up_gr_thirdef_groza
+section                 = up_sect_thirdd_groza
+property                = prop_reliability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_ret_b1_name
+description             = st_up_ret_b1_descr
+icon                    = ui_inGame2_upgrade_GromS14_12
+
+[up_thirde_groza]
+scheme_index            = 2, 4
+known                   = 1
+effects                 =
+section                 = up_sect_thirde_groza
+property                = prop_rpm
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_ret_c2_name
+description             = st_up_ret_c2_descr
+icon                    = ui_inGame2_upgrade_GromS14_13
+
+[up_thirdf_groza]
+scheme_index            = 2, 5
+effects                 =
+section                 = up_sect_thirdf_groza
+property                = prop_bullet_speed
+
+known                   = 1
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_ret_c1_name
+description             = st_up_ret_c1_descr
+icon                    = ui_inGame2_upgrade_GromS14_14
+
+[up_fourta_groza]
+scheme_index            = 0, 3
+effects                 = up_gr_fourtcd_groza
+section                 = up_sect_fourta_groza
+property                = prop_recoil
+
+known                   = 1
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_stk_a3_name
+description             = st_up_stk_a3_descr
+icon                    = ui_inGame2_upgrade_GromS14_15
+
+
+[up_fourtc_groza]
+scheme_index            = 1, 5
+effects                 = up_gr_fourtef_groza
+section                 = up_sect_fourtc_groza
+property                = prop_inertion
+
+known                   = 1
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_stk_b2_name
+description             = st_up_stk_b2_descr
+icon                    = ui_inGame2_upgrade_GromS14_16
+
+[up_fourte_groza]
+scheme_index            = 2, 6
+effects                 =
+section                 = up_sect_fourte_groza
+property                = prop_reliability
+
+known                   = 1
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_stk_c1_name
+description             = st_up_stk_c1_descr
+icon                    = ui_inGame2_upgrade_GromS14_17
+
+
+[up_fourtf_groza]
+scheme_index            = 2, 7
+effects                 =
+section                 = up_sect_fourtf_groza
+property                = prop_bullet_speed
+
+known                   = 1
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_stk_c2_name
+description             = st_up_stk_c2_descr
+icon                    = ui_inGame2_upgrade_GromS14_18
+
+[up_fiftha_groza]
+scheme_index            = 0, 4
+effects                 =
+section                 = up_sect_fiftha_groza
+property                = prop_ammo_size 
+
+known                   = 1
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_add_a4_name
+description             = st_up_add_a4_descr
+icon                    = ui_inGame2_upgrade_GromS14_19
+
+
+[up_gr_firstab_groza]
+elements                = up_firsta_groza
+
+[up_gr_firstcd_groza]
+elements                = up_firstc_groza, up_firstd_groza
+
+[up_gr_firstef_groza]
+elements                = up_firste_groza, up_firstf_groza
+
+[up_gr_seconab_groza]
+elements                = up_secona_groza
+
+[up_gr_seconcd_groza]
+elements                = up_seconc_groza
+
+[up_gr_seconef_groza]
+elements                = up_secone_groza, up_seconf_groza
+
+[up_gr_thirdab_groza]
+elements                = up_thirda_groza
+
+[up_gr_thirdcd_groza]
+elements                = up_thirdc_groza, up_thirdd_groza
+
+[up_gr_thirdef_groza]
+elements                = up_thirde_groza, up_thirdf_groza
+
+[up_gr_fourtab_groza]
+elements                = up_fourta_groza
+
+[up_gr_fourtcd_groza]
+elements                = up_fourtc_groza
+
+[up_gr_fourtef_groza]
+elements                = up_fourte_groza, up_fourtf_groza
+
+[up_gr_fifthab_groza]
+elements                = up_fiftha_groza
+

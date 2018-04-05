@@ -1,0 +1,284 @@
+[wpn_ak74u]:identity_immunities,weapon_probability,default_weapon_params
+GroupControlSection     = spawn_group
+$spawn               	= "weapons\ak-74u"   ; name and section in level editor
+$npc              		= on
+$prefetch               = 8
+scheduled               = off                                ; option for ALife Simulator
+cform                   = skeleton
+class                = WP_AK74         ; class of the weapon that corresponding to CPP class
+description          = st_wpn_ak74u_descr
+
+ef_main_weapon_type     = 2
+ef_weapon_type          = 6
+
+default_to_ruck         = false
+sprint_allowed          = true
+
+;-------------------------------------------------------------------------------
+cost              		= 3000            ; the price of the item
+weapon_class            = assault_rifle      ; the type of the box that will be used in buy-menu in multiplayer mode
+inv_weight				= 2.7								; weight in inventory
+
+upgrades                = up_gr_firstab_ak74u, up_gr_seconab_ak74u, up_gr_thirdab_ak74u, up_gr_fourtab_ak74u, up_gr_fifthab_ak74u
+installed_upgrades      =
+upgrade_scheme          = upgrade_scheme_ak74u
+;-ТТХ---------------------------------------------------------------------------
+
+hit_power            	= 0.3, 0.3, 0.3, 0.3
+hit_impulse          	= 100    ; size of physic impulse by bullet
+hit_type            	= fire_wound            ; [] type of the wound
+fire_distance           = 200    ; maximum fire distance that bullet can fly
+bullet_speed            = 410    ; starting bullet speed
+rpm                     = 575    ; max round per minute
+rpm_empty_click         = 200
+
+use_aim_bullet          = false                ;Поддерживается ли первая суппер пуля
+time_to_aim             = 1.0
+
+hud                        = wpn_ak74u_hud            ; name of the section of the hud
+
+misfire_probability        = 0.005 ;вероятность осечки при максимальном износе  !!!old - now not working
+;изношенность, при которой появляется шанс осечки
+misfire_start_condition		= 0.6
+;изношеность при которой шанс осечки становится константным
+misfire_end_condition		= 0.1
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= 0.003
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= 0.047
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= 0.0014
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= 0.0015
+
+
+ammo_elapsed            = 30           ; obsolete
+ammo_mag_size        	= 30           ; clip (magazine) size
+fire_modes           	= 1, -1
+
+ammo_class           	= ammo_5.45x39_fmj, ammo_5.45x39_ap  ; name of the ltx-section of used ammo
+grenade_class        	= ammo_vog-25         ; name of the ltx-section of used grenades
+
+launch_speed            = 0
+hand_dependence         = 1
+single_handed           = 0
+
+;---DOF-------------------------------------------------------------------------
+zoom_dof             = 0.5, 1.0, 180
+reload_dof           = 0.0, 0.5, 5, 2
+
+;----Дисперсия---------------------------------------------------------------------------
+fire_dispersion_base       = 0.35 ;0.19      ;угол (в градусах) базовой дисперсии оружия (оружия зажатого в тисках)
+control_inertion_factor    = 1.1
+crosshair_inertion		   = 5.50
+
+;params of weapon recoil
+cam_return              = 0
+cam_relax_speed         = 10			;скорость возврата в исходное положение
+cam_relax_speed_ai     	= 120.75
+cam_dispersion          = 1.2		;увеличения угла (в градусах) с первым выстрелом
+cam_dispersion_inc      = 0.6	;увеличениe cam_dispersion с каждым выстрелом
+cam_dispersion_frac     = 1.0	    ;ствол будет подыматься на cam_dispersion*cam_dispersion_frac +- cam_dispersion*(1-cam_dispersion_frac)
+cam_max_angle			= 50.0      ;максимальный угол отдачи
+cam_max_angle_horz      = 5.0      ;(degree) maximum shot horizontal degree
+cam_step_angle_horz     = 1.5		;(degree) size of step camera moved in horizontal position while shooting
+
+zoom_cam_relax_speed         = 10	    ; scope & ironsight
+zoom_cam_relax_speed_ai      = 360
+zoom_cam_dispersion          = 1.0
+zoom_cam_dispersion_inc      = 0.5
+zoom_cam_dispersion_frac     = 1.0
+zoom_cam_max_angle           = 50.0
+zoom_cam_max_angle_horz      = 5.0
+zoom_cam_step_angle_horz     = 1.0
+fire_dispersion_condition_factor    = 10         ;увеличение дисперсии в процентах при максимальном износе
+
+PDM_disp_base 				= 0.5
+PDM_disp_vel_factor 		= 1.5
+PDM_disp_accel_factor 		= 1.5
+PDM_disp_crouch	 			= 1.0
+PDM_disp_crouch_no_acc 		= 1.0
+
+;------- for AI ------------------------------------------------------------------------
+holder_range_modifier   = 1.0              ; во сколько раз увеличивается eye_range
+holder_fov_modifier     = 1.0              ; во сколько раз увеличивается eye_fov
+
+min_radius           = 30           ; [] for AI
+max_radius           = 100          ; [] for AI
+
+hit_probability_gd_novice  = 0.80
+hit_probability_gd_stalker = 0.80
+hit_probability_gd_veteran = 0.80
+hit_probability_gd_master  = 0.80
+
+;-------------------------------------------------------------------------------
+slot                = 2                ; // secondary
+animation_slot      = 8                ; type of the animation that will be used
+
+inv_name          	= st_wpn_ak74u                    ; name in inventory
+inv_name_short      = st_wpn_ak74u
+inv_grid_width		= 4	 ; position and size of the icon that will be used to display weapon in the inventory menu
+inv_grid_height		= 2	 ; all icons are on the texture ui_icon_equipment.dds,
+inv_grid_x			= 0  ; position and size are in terms of 64x64 squares
+inv_grid_y			= 16
+
+upgr_icon_x			= 300
+upgr_icon_y			= 129
+upgr_icon_width		= 258
+upgr_icon_height   	= 138
+
+kill_msg_x			= 0
+kill_msg_y			= 123
+kill_msg_width		= 69
+kill_msg_height		= 30
+
+position           	= -0.026,-0.215,0        ; position (offset) and orientation of the weapon in the hands of character
+orientation         = 0,0,0                  ; (3rd person view)
+
+fire_point          =  0.0, 0.262, 0.447		; position (3rd person view) for particles of fire
+fire_point2         =  0.0, 0.262, 0.547		; position (3rd person view) for particles of fire (when shooting with secondary fire)
+
+flame_particles         = weapons\generic_weapon05 ; particles for shooting effects
+smoke_particles         = weapons\generic_shoot_00
+grenade_flame_particles = weapons\generic_weapon01
+
+shell_point		 		= 0.00, 0.262, 0.189			; position (3rd person view) for shell to throw out
+shell_particles	 		= weapons\generic_shells	; name of the particles for shells
+
+;--STRAP PARAMETERS-----------------------------------------------------------------
+;под мишкой
+strap_position         	= -0.18,-0.45,0.2			; position (offset) and orientation of the weapon when it is strapped
+strap_orientation      	= -10,-5,10					; (3rd person view in degrees)
+strap_bone0             = bip01_spine2
+strap_bone1             = bip01_spine1
+
+startup_ammo            = 90
+visual                  = dynamics\weapons\wpn_ak74u\wpn_ak74u.ogf
+
+light_disabled                                = false
+light_color             = 0.6,0.5,0.3
+light_range             = 5
+light_var_color         = 0.05
+light_var_range         = 0.5
+light_time              = 0.2
+
+ph_mass                 = 4
+
+;addons
+scope_status               = 0                   ; 0 - no addon
+silencer_status            = 0                   ; 1 - permanent
+grenade_launcher_status    = 0                   ; 2 - attachable
+
+zoom_enabled            = true                                                ; (on,off)zoom mode (right mouse button)
+zoom_rotate_time        = 0.25
+scope_zoom_factor       = 50                                                ; fov for zoom mode
+
+silencer_name           = wpn_addon_silencer    ; section name for the attachable silencer
+silencer_x 					= 178							; offset in inventory icon
+silencer_y 					= -2
+
+;звуки
+snd_draw                = weapons\ak74_draw
+snd_holster             = weapons\generic_holster
+snd_shoot               = weapons\n_ak74u_shot
+
+snd_empty               = weapons\gen_empty, 0.5
+snd_reload              = weapons\groza_reload, 0.7
+snd_shoot_grenade       = weapons\gen_grenshoot
+snd_reload_grenade      = weapons\gen_grenload, 1.0, 0.8
+snd_switch              = weapons\groza_switch, 1.0, 0.5
+snd_bore		= weapons\ak74_bore, 0.7
+
+;silencer_flame_particles  = weapons\generic_weapon01
+silencer_smoke_particles   = weapons\generic_shoot_00
+
+snd_silncer_shot        = weapons\w_ak74_shot1
+
+silencer_light_color    = 0.6,0.5,0.3
+silencer_light_range    = 0.01
+silencer_light_var_color= 0.05
+silencer_light_var_range= 0.5
+silencer_light_time     = 0.2
+
+[wpn_ak74u_hud]
+zoom_hide_crosshair        = true
+attach_place_idx        = 0
+item_visual                = dynamics\weapons\wpn_ak74u\wpn_ak74u_hud.ogf
+
+hands_position				= -0.115000,-0.195999,0.145000
+hands_orientation			= -2.649998,0.400000,-4.099998
+
+hands_position_16x9				= -0.106500,-0.196000,0.092500
+hands_orientation_16x9			= -0.400000,2.299999,-2.550000
+
+item_position				= 0.004111,0.008527,-0.005906
+item_orientation			= -15.488927,-3.320898,367.220154
+
+shell_point                = 0.018,0.06,0.188
+shell_dir               = 0.0, 1.0, 0.0
+shell_bone                = wpn_body
+
+fire_point			= 0,0.048,0.466
+fire_bone                            = wpn_body
+fire_point2                        = 0.0,-0.011,0.553
+fire_bone2                = wpn_body
+
+anm_show						= ak74u_draw
+anm_hide                = ak74u_holster
+anm_idle                = ak74u_idle
+anm_idle_sprint         = ak74u_idle_sprint
+anm_idle_moving         = ak74u_idle_moving
+anm_shots               = ak74u_shoot
+anm_reload              = ak74u_reload
+anm_idle_aim            = ak74u_idle_aim
+;anm_switch              = ak74u_switch_off
+;anm_switch_g            = ak74u_switch_on
+anm_bore                = ak74u_idle_bore
+
+;anm_hide_w_gl           = ak74_holster_w_gl
+;anm_show_w_gl           = ak74_draw_w_gl
+;anm_idle_w_gl           = ak74_idle_w_gl
+;anm_shots_w_gl          = ak74_shoot_w_gl
+;anm_reload_w_gl         = ak74_reload_w_gl
+;anm_idle_w_gl_aim       = ak74_idle_aim_w_gl
+;anm_idle_sprint_w_gl    = ak74_idle_sprint_w_gl
+;anm_idle_moving_w_gl    = ak74_idle_moving_w_gl
+;anm_bore_w_gl           = ak74_idle_bore_w_gl
+
+;anm_show_g              = ak74_draw_w_gl							;abakan_draw_grenade
+;anm_hide_g              = ak74_holster_w_gl						;abakan_holster_grenade
+;anm_idle_g              = ak74_idle_w_gl							;abakan_idle_grenade
+;anm_reload_g            = ak74_reload_grenade
+;anm_idle_g_aim          = ak74_idle_aim_w_gl						;abakan_idle_grenade
+;anm_shots_g             = ak74_shoot_grenade
+;anm_idle_sprint_g       = ak74_idle_sprint_w_gl					;abakan_idle_sprint_grenade
+;anm_idle_moving_g       = ak74_idle_moving_w_gl					;abakan_idle_moving_grenade
+;anm_bore_g              = ak74_idle_bore_w_gl
+
+
+aim_hud_offset_pos				= -0.104000,0.003000,-0.018000
+aim_hud_offset_rot				= -0.047500,-0.030000,0.002500
+
+aim_hud_offset_pos_16x9				= -0.121000,0.017000,0.029000
+aim_hud_offset_rot_16x9				= -0.007500,0.007500,0.020000
+
+gl_hud_offset_pos               = 0,0,0;-0.053000,-0.059000,0.000000
+gl_hud_offset_rot               = 0,0,0;-0.145000,0.000000,0.000000
+
+gl_hud_offset_pos_16x9            = 0,0,0;-0.130000,0.003500,0.000500
+gl_hud_offset_rot_16x9            = 0,0,0;0.052500,0.045000,-0.010000
+
+lean_hud_offset_pos        = 0,0,0
+lean_hud_offset_rot        = 0,0,0
+
+;-----------------------------------------------------------------------------
+; Уникальные
+;-----------------------------------------------------------------------------
+[wpn_ak74u_snag]:wpn_ak74u ;zaton b33
+$spawn                  	= "weapons\wpn_ak74u_snag"		; option for Level Editor
+
+cost              		= 3200
+
+upgrades                = up_gr_firstab_ak74u, up_gr_seconab_ak74u, up_gr_thirdab_ak74u, up_gr_fourtab_ak74u, up_gr_fifthab_ak74u
+installed_upgrades      = up_fiftha_ak74u
+upgrade_scheme          = upgrade_scheme_ak74u

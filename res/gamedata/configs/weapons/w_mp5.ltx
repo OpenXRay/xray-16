@@ -1,0 +1,306 @@
+[wpn_mp5]:identity_immunities,weapon_probability,default_weapon_params
+GroupControlSection     = spawn_group
+$spawn                  = "weapons\mp5"               ; option for Level Editor
+$npc              = on           ; option for Level Editor
+$prefetch               = 8
+scheduled               = off                                ; option for ALife Simulator
+cform                   = skeleton
+class                   = WP_LR300
+description          	= st_wpn_mp5_descr
+ef_main_weapon_type     = 2
+ef_weapon_type          = 6
+
+default_to_ruck         = false
+sprint_allowed          = true
+control_inertion_factor = 1.0
+
+;-------------------------------------------------------------------------------
+cost              = 3600            ; the price of the item
+weapon_class      = assault_rifle      ; the type of the box that will be used in buy-menu in multiplayer mode
+inv_weight        = 2.5
+
+upgrades                = up_gr_firstab_mp5, up_gr_seconab_mp5, up_gr_thirdab_mp5, up_gr_fourtab_mp5, up_gr_fifthab_mp5, up_gr_fifthcd_mp5
+installed_upgrades      =
+upgrade_scheme          = upgrade_scheme_mp5
+
+;----TTX--------------------------------------------------------------------------
+hit_power            = 0.35, 0.35, 0.35, 0.35
+hit_impulse          = 100    ; size of physic impulse by bullet
+hit_type             = fire_wound            ; [] type of the wound
+fire_distance           = 200                  ; maximum fire distance that bullet can fly
+bullet_speed            = 270                ; starting bullet speed
+rpm                     = 620
+rpm_empty_click         = 200
+
+use_aim_bullet          = false                ;Поддерживается ли первая суппер пуля
+time_to_aim             = 3.0
+
+hud                     = wpn_mp5_hud
+
+misfire_probability        = 0.005 ;вероятность осечки при максимальном износе  !!!old - now not working
+;изношенность, при которой появляется шанс осечки
+misfire_start_condition		= 0.6
+;изношеность при которой шанс осечки становится константным
+misfire_end_condition		= 0.1
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= 0.004
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= 0.057
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= 0.0012
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= 0.0014
+
+ammo_elapsed      = 30
+ammo_mag_size     = 30           ; clip (magazine) size
+fire_modes		  = 1, 3, -1
+ammo_class		  = ammo_9x19_fmj, ammo_9x19_pbp
+grenade_class     = ammo_vog-25         ; name of the ltx-section of used grenades
+
+launch_speed      = 0
+hand_dependence   = 1
+single_handed     = 0
+
+;---DOF-------------------------------------------------------------------------
+zoom_dof             = 0.5, 1.0, 180
+reload_dof           = 0.0, 0.5, 5, 2
+
+;---дисперсия---------------------------------------------------------------------------
+;базовая дисперсия
+fire_dispersion_base    = 0.32  ;угол (в градусах) базовой дисперсии оружия (оружия зажатого в тисках)
+control_inertion_factor = 1.1f
+crosshair_inertion   	= 4.35
+
+;отдача
+cam_return			 = 0
+cam_relax_speed      = 5		;скорость возврата в исходное положение
+cam_relax_speed_ai   = 120.75
+cam_dispersion       = 0.5		;увеличения угла (в градусах) с каждым выстрелом
+cam_dispersion_inc   = 0.25		;увеличениe cam_dispersion с каждым выстрелом
+cam_dispersion_frac  = 1.0		;ствол будет подыматься на cam_dispersion*cam_dispersion_frac +- cam_dispersion*(1-cam_dispersion_frac)
+cam_max_angle        = 50.0		;максимальный угол отдачи
+cam_max_angle_horz   = 50.0		;(degree) maximum shot horizontal degree
+cam_step_angle_horz  = 1.5		;(degree) size of step camera moved in horizontal position while shooting
+
+PDM_disp_base 				= 0.5
+PDM_disp_vel_factor 		= 1.5
+PDM_disp_accel_factor 		= 1.5
+PDM_disp_crouch	 			= 1.0
+PDM_disp_crouch_no_acc 		= 1.0
+
+zoom_cam_relax_speed        = 10    ; scope & ironsight
+zoom_cam_relax_speed_ai     = 120.75
+zoom_cam_dispersion         = 0.5
+zoom_cam_dispersion_inc     = 0.25
+zoom_cam_dispersion_frac    = 1.0
+zoom_cam_max_angle          = 50.0
+zoom_cam_max_angle_horz     = 50.0
+zoom_cam_step_angle_horz    = 1.5
+
+fire_dispersion_condition_factor = 9        ;увеличение дисперсии в процентах при максимальном износе
+
+;-------------------------------------------------------------------------------
+holder_range_modifier   = 1.0                       ; во сколько раз увеличивается eye_range
+holder_fov_modifier     = 1.0              ; во сколько раз увеличивается eye_fov
+
+min_radius              = 0
+max_radius              = 50
+
+hit_probability_gd_novice  = 0.80
+hit_probability_gd_stalker = 0.80
+hit_probability_gd_veteran = 0.80
+hit_probability_gd_master  = 0.80
+
+;-------------------------------------------------------------------------------
+slot              = 2                ; // secondary
+animation_slot    = 8                ; type of the animation that will be used
+inv_name          = st_wpn_mp5               ; name in inventory
+inv_name_short    = st_wpn_mp5
+
+inv_grid_width    = 3
+inv_grid_height   = 1
+inv_grid_x        = 5
+inv_grid_y        = 11
+
+upgr_icon_x			= 561
+upgr_icon_y			= 129
+upgr_icon_width		= 292
+upgr_icon_height   	= 114
+
+kill_msg_x        = 72
+kill_msg_y        = 82
+kill_msg_width    = 56
+kill_msg_height   = 23
+
+;-------------------------------------------------------------------------------
+position                = -0.026, -0.125, -0.03
+orientation             = 0, -10, 0
+
+fire_point              = 0.0, 0.188, 0.392
+fire_point2             = 0.0, 0.188, 0.392
+
+flame_particles         = weapons\generic_weapon05
+smoke_particles         = weapons\generic_shoot_00
+grenade_flame_particles = weapons\generic_weapon01
+
+shell_point          = 0.0, 0.188, 0.082
+shell_dir            = 0.0, 1.0, 0.0
+
+shell_particles         = weapons\generic_shells
+
+;--STRAP PARAMETERS-----------------------------------------------------------------
+;под мишкой
+strap_position         	= -0.16,-0.36,0.15			; position (offset) and orientation of the weapon when it is strapped
+strap_orientation      	= -10,-5,10					; (3rd person view in degrees)
+strap_bone0             = bip01_spine2
+strap_bone1             = bip01_spine1
+
+startup_ammo            = 90
+visual                  = dynamics\weapons\wpn_mp5\wpn_mp5.ogf
+
+light_disabled                                = false
+light_color             = 0.6,0.5,0.3
+light_range             = 5
+light_var_color         = 0.05
+light_var_range         = 0.5
+light_time              = 0.2
+
+ph_mass                 = 3
+
+;addons
+scope_status            = 0                   ; 0 - no addon
+silencer_status         = 2                   ; 1 - permanent
+grenade_launcher_status = 0                   ; 2 - attachable
+
+zoom_enabled            = true                                                ; (on,off)zoom mode (right mouse button)
+zoom_rotate_time        = 0.25
+scope_zoom_factor       = 50                                                ; fov for zoom mode
+
+scope_name              = wpn_addon_scope       ; section name for the attachable scope
+scope_x              	= 47                 ; offset in inventory icon
+scope_y                 = 0
+silencer_name           = wpn_addon_silencer    ; section name for the attachable silencer
+silencer_x              = 130 ;218                ; offset in inventory icon
+silencer_y              = -13
+grenade_launcher_name   = wpn_addon_grenade_launcher; section name for the attachable grenade launcher
+grenade_launcher_x      = 126                ; offset in inventory icon
+grenade_launcher_y      = 24
+
+;звуки
+snd_draw                = weapons\ak74_draw
+snd_holster             = weapons\generic_holster
+snd_shoot               = weapons\n_mp5_shot
+
+snd_empty               = weapons\gen_empty, 0.5
+snd_reload              = weapons\mp5_reload
+snd_shoot_grenade       = weapons\gen_grenshoot
+snd_reload_grenade      = weapons\gen_grenload, 1.0, 0.8
+snd_switch              = weapons\groza_switch, 1.0, 0.5
+snd_bore				= weapons\draw_silent
+snd_bore1				= weapons\mp5_bore
+
+;silencer_flame_particles  = weapons\generic_weapon01
+silencer_smoke_particles   = weapons\generic_shoot_00
+
+snd_silncer_shot        = weapons\w_ak74_shot1
+
+silencer_light_color    = 0.6,0.5,0.3
+silencer_light_range    = 0.01
+silencer_light_var_color= 0.05
+silencer_light_var_range= 0.5
+silencer_light_time     = 0.2
+
+
+[wpn_mp5_hud]
+zoom_hide_crosshair     = true
+attach_place_idx        = 0
+item_visual             = dynamics\weapons\wpn_mp5\wpn_mp5_hud.ogf
+
+hands_position				= -0.106500,-0.162000,0.113001
+hands_orientation			= -6.700007,-0.800001,-5.400002
+hands_position_16x9				= -0.100500,-0.191500,0.135500
+hands_orientation_16x9			= -3.999999,3.199998,-6.000006
+
+item_position				= 0.014173,-0.001619,-0.004513
+item_orientation			= 4.899572,0.078592,366.138245
+
+shell_point             = 0.021,0.099,0.286
+shell_dir               = 0.0, 1.0, 0.0
+shell_bone              = wpn_body
+
+fire_point				= 0,0.068,0.439
+fire_bone               = wpn_body
+fire_point2			= -0.030000,0.074500,-0.037000
+fire_bone2                = wpn_body
+
+anm_show                     = mp5_draw
+anm_hide                     = mp5_holster
+anm_idle                     = mp5_idle
+anm_idle_sprint         = mp5_idle_sprint
+anm_idle_moving         = mp5_idle_moving
+anm_shots               = mp5_shoot
+anm_reload              = mp5_reload
+anm_idle_aim            = mp5_idle_aim
+anm_bore                = mp5_idle_bore
+
+;anm_switch              = mp5_switch_off ;mp5_switch_off
+;anm_switch_g            = mp5_switch_on ;mp5_switch_on
+
+
+;anm_hide_w_gl           = mp5_holster_w_gl
+;anm_show_w_gl           = mp5_draw_w_gl
+;anm_idle_w_gl           = mp5_idle_w_gl
+;anm_shots_w_gl          = mp5_shoot_w_gl
+;anm_reload_w_gl         = mp5_reload_w_gl
+;anm_idle_w_gl_aim       = mp5_idle_aim_w_gl
+;anm_idle_sprint_w_gl                = mp5_idle_sprint_w_gl
+;anm_idle_moving_w_gl                = mp5_idle_moving_w_gl
+;anm_bore_w_gl                                = mp5_idle_bore_w_gl
+
+;anm_show_g                         = mp5_draw_w_gl;mp5_draw_grenade
+;anm_hide_g                         = mp5_holster_w_gl;mp5_holster_grenade
+;anm_idle_g                         = mp5_idle_w_gl;mp5_idle_grenade
+;anm_reload_g                       = mp5_reload_grenade
+;anm_idle_g_aim                     = mp5_idle_aim_w_gl;mp5_idle_grenade
+;anm_shots_g                        = mp5_shoot_grenade
+;anm_idle_sprint_g                        = mp5_idle_sprint_w_gl;mp5_idle_sprint_grenade
+;anm_idle_moving_g                        = mp5_idle_moving_w_gl;mp5_idle_moving_grenade
+;anm_bore_g                                        = mp5_idle_bore_grenade
+
+
+aim_hud_offset_pos				= -0.080500,0.002500,-0.018000
+aim_hud_offset_rot				= -0.035000,-0.032500,0.010000
+
+aim_hud_offset_pos_16x9				= -0.088000,0.037500,0.029000
+aim_hud_offset_rot_16x9				= 0.035000,0.015000,-0.017500
+
+gl_hud_offset_pos       	= 0,0,0;-0.053000,-0.059000,0.000000
+gl_hud_offset_rot       	= 0,0,0;-0.145000,0.000000,0.000000
+
+gl_hud_offset_pos_16x9    	= 0,0,0;-0.130000,0.003500,0.000500
+gl_hud_offset_rot_16x9    	= 0,0,0;0.052500,0.045000,-0.010000
+
+lean_hud_offset_pos        = 0,0,0
+lean_hud_offset_rot        = 0,0,0
+
+;-----------------------------------------------------------------------------
+; Уникальные
+;-----------------------------------------------------------------------------
+[wpn_mp5_nimble]:wpn_mp5
+$spawn                  	= "weapons\wpn_mp5_nimble"		; option for Level Editor
+inv_name				= st_wpn_mp5_nimble
+description					= st_wpn_mp5_nimble_descr
+
+cost              = 5500
+
+hit_power				= 0.44, 0.44, 0.44, 0.44
+
+fire_dispersion_base    = 0.26
+rpm                     = 700
+
+ammo_class		  = ammo_11.43x23_fmj, ammo_11.43x23_hydro
+fire_modes		  = 1, -1
+
+upgrades                = up_gr_firstab_mp5, up_gr_seconab_mp5, up_gr_thirdab_mp5, up_gr_fourtab_mp5, up_gr_fifthab_mp5
+installed_upgrades      =
+upgrade_scheme          = upgrade_scheme_mp5_nimble

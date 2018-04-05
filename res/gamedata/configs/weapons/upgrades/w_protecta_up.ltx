@@ -1,0 +1,493 @@
+[up_sect_firsta_protecta]
+;Надежность(1)10%
+;---------------
+cost		      		= 800
+value					= +10
+
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= -0.00045 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= -0.00045 ;0.0011
+
+[up_sect_firstc_protecta]
+;Настильность(2)20%
+;------------------
+cost		      		= 1250
+value					= +20
+
+bullet_speed            = +80
+hit_impulse      		= +20
+fire_dispersion_base	= -0.02
+
+[up_sect_firstd_protecta]
+;Надежность(2)15%
+;---------------
+cost		      		= 1250
+value					= +15
+
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= -0.0006 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= -0.0006 ;0.0011
+
+[up_sect_firste_protecta]
+;Отдача(3)-30%
+;------------
+cost		      		= 1700
+value					= -30
+
+
+cam_dispersion              = -0.7		;0.7
+cam_dispersion_inc         	= -0.7		;0.7
+cam_step_angle_horz        	= -0.7		;0.7
+
+zoom_cam_dispersion          = -0.7		;0.6
+zoom_cam_dispersion_inc      = -0.7		;0.6
+zoom_cam_step_angle_horz     = -0.7		;0.6
+
+[up_sect_firstf_protecta]
+;Скорострельность(3)25%
+;----------------------
+cost		      		= 1700
+value					= +25
+
+rpm                     = +35
+
+[up_sect_secona_protecta]
+;Отдача(1)-10%
+;------------
+cost		      		= 800
+value					= -10
+
+cam_dispersion              = -0.25    ;3.0
+cam_dispersion_inc         	= -0.25    ;3.0
+cam_step_angle_horz        	= -0.25    ;3.0
+
+zoom_cam_dispersion          = -0.25     ;3.0
+zoom_cam_dispersion_inc      = -0.25  	;3.0
+zoom_cam_step_angle_horz     = -0.25     ;3.0
+
+[up_sect_seconc_protecta]
+;Удобство(2)15%
+;--------------
+cost		      		= 1250
+value					= +15
+
+crosshair_inertion			= -1.5
+
+PDM_disp_base 				= -0.1
+PDM_disp_vel_factor 		= -0.5
+PDM_disp_accel_factor 		= -0.5
+
+[up_sect_second_protecta]
+;Отдача(2)-20%
+;------------
+cost		      		= 1250
+value					= -20
+
+cam_dispersion              = -0.4		;3.0
+cam_dispersion_inc         	= -0.4		;3.0
+cam_step_angle_horz        	= -0.4		;3.0
+
+zoom_cam_dispersion          = -0.4     ;3.0
+zoom_cam_dispersion_inc      = -0.4  	;3.0
+zoom_cam_step_angle_horz     = -0.4     ;3.0
+
+[up_sect_thirda_protecta]
+;Надежность(1)10%
+;---------------
+cost		      		= 800
+value					= +10
+
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= -0.00045 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= -0.00045 ;0.0011
+
+[up_sect_thirdc_protecta]
+;Отдача(2)-20%
+;------------
+cost		      		= 1250
+value					= -20
+
+cam_dispersion              = -0.4		;3.0
+cam_dispersion_inc         	= -0.4		;3.0
+cam_step_angle_horz        	= -0.4		;3.0
+
+zoom_cam_dispersion          = -0.4     ;3.0
+zoom_cam_dispersion_inc      = -0.4  	;3.0
+zoom_cam_step_angle_horz     = -0.4     ;3.0
+
+[up_sect_thirdd_protecta]
+;Скорострельность(2)15%
+;----------------------
+cost		      		= 2250
+value					= +15
+;value2					= st_new_fire_mode
+
+rpm                     = +25
+fire_modes              = 1, -1
+
+[up_sect_thirde_protecta]
+;Точность(3)30%
+;---------------
+cost		      		= 1700
+value					= +30
+
+fire_dispersion_base	= -0.1
+fire_dispersion_condition_factor = -0.05
+
+[up_sect_fourta_protecta]
+;Отдача(1)-10%
+;------------
+cost		      		= 800
+value					= -10
+
+cam_dispersion              = -0.25    ;3.0
+cam_dispersion_inc         	= -0.25    ;3.0
+cam_step_angle_horz        	= -0.25    ;3.0
+
+zoom_cam_dispersion          = -0.25     ;3.0
+zoom_cam_dispersion_inc      = -0.25  	;3.0
+zoom_cam_step_angle_horz     = -0.25     ;3.0
+
+[up_sect_fourtc_protecta]
+;Скорострельность(2)15%
+;----------------------
+cost		      		= 1250
+value					= +15
+
+rpm                     = +25
+
+[up_firsta_protecta]
+scheme_index            = 0, 0
+known                   = 1
+effects                 = up_gr_firstcd_protecta
+section                 = up_sect_firsta_protecta
+property                = prop_reliability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_bard_a1_name
+description             = st_up_bard_a1_descr
+icon                    = ui_inGame2_upgrade_Protecta_1
+
+[up_firstc_protecta]
+scheme_index            = 1, 0
+known                   = 1
+effects                 = up_gr_firstef_protecta
+section                 = up_sect_firstc_protecta
+property                = prop_bullet_speed
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_bard_b5_name
+description             = st_up_bard_b5_descr
+icon                    = ui_inGame2_upgrade_Protecta_2
+
+
+[up_firstd_protecta]
+scheme_index            = 1, 1
+known                   = 1
+effects                 = up_gr_firstef_protecta
+section                 = up_sect_firstd_protecta
+property                = prop_reliability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_bard_b6_name
+description             = st_up_bard_b6_descr
+icon                    = ui_inGame2_upgrade_Protecta_4
+
+
+[up_firste_protecta]
+scheme_index            = 2, 0
+known                   = 1
+effects                 = 
+section                 = up_sect_firste_protecta
+property                = prop_recoil
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_bard_c5_name
+description             = st_up_bard_c5_descr
+icon                    = ui_inGame2_upgrade_Protecta_3
+
+[up_firstf_protecta]
+scheme_index            = 2, 1
+known                   = 1
+effects                 = 
+section                 = up_sect_firstf_protecta
+property                = prop_rpm
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_bard_c4_name
+description             = st_up_bard_c4_descr
+icon                    = ui_inGame2_upgrade_Protecta_5
+
+[up_secona_protecta]
+scheme_index            = 0, 1
+known                   = 1
+effects                 = up_gr_seconcd_protecta
+section                 = up_sect_secona_protecta
+property                = prop_recoil
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_stvd_b1_name
+description             = st_up_stvd_b1_descr
+icon                    = ui_inGame2_upgrade_Protecta_6
+
+[up_seconc_protecta]
+scheme_index            = 1, 2
+known                   = 1
+effects                 = 
+section                 = up_sect_seconc_protecta
+property                = prop_inertion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_stvd_b2_name
+description             = st_up_stvd_b2_descr
+icon                    = ui_inGame2_upgrade_Protecta_7
+
+
+[up_second_protecta]
+scheme_index            = 1, 3
+known                   = 1
+effects                 = 
+section                 = up_sect_second_protecta
+property                = prop_recoil
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_stvd_b3_name
+description             = st_up_stvd_b3_descr
+icon                    = ui_inGame2_upgrade_Protecta_8
+
+[up_thirda_protecta]
+scheme_index            = 0, 2
+known                   = 1
+effects                 = up_gr_thirdcd_protecta
+section                 = up_sect_thirda_protecta
+property                = prop_reliability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_autd_a2_name
+description             = st_up_autd_a2_descr
+icon                    = ui_inGame2_upgrade_Protecta_9
+
+
+[up_thirdc_protecta]
+scheme_index            = 1, 4
+known                   = 1
+effects                 = up_gr_thirdef_protecta
+section                 = up_sect_thirdc_protecta
+property                = prop_recoil
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_autd_b1_name
+description             = st_up_autd_b1_descr
+icon                    = ui_inGame2_upgrade_Protecta_10
+
+
+
+[up_thirdd_protecta]
+scheme_index            = 1, 5
+known                   = 1
+effects                 = up_gr_thirdef_protecta
+section                 = up_sect_thirdd_protecta
+property                = prop_rpm, prop_autofire
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_autd_b5_name
+description             = st_up_autd_b5_descr
+icon                    = ui_inGame2_upgrade_Protecta_12
+
+[up_thirde_protecta]
+scheme_index            = 2, 2
+known                   = 1
+effects                 = 
+section                 = up_sect_thirde_protecta
+property                = prop_dispersion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_autd_c5_name
+description             = st_up_autd_c5_descr
+icon                    = ui_inGame2_upgrade_Protecta_11
+
+
+
+[up_fourta_protecta]
+scheme_index            = 0, 3
+known                   = 1
+effects                 = up_gr_fourtcd_protecta
+section                 = up_sect_fourta_protecta
+property                = prop_recoil
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_roun_a1_name
+description             = st_up_roun_a1_descr
+icon                    = ui_inGame2_upgrade_Protecta_13
+
+
+[up_fourtc_protecta]
+scheme_index            = 1, 6
+known                   = 1
+effects                 = 
+section                 = up_sect_fourtc_protecta
+property                = prop_rpm
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_roun_a2_name
+description             = st_up_roun_a2_descr
+icon                    = ui_inGame2_upgrade_Protecta_14
+
+[up_gr_firstab_protecta]
+elements                = up_firsta_protecta
+
+[up_gr_firstcd_protecta]
+elements                = up_firstc_protecta, up_firstd_protecta
+
+[up_gr_firstef_protecta]
+elements                = up_firste_protecta, up_firstf_protecta
+
+[up_gr_seconab_protecta]
+elements                = up_secona_protecta
+
+[up_gr_seconcd_protecta]
+elements                = up_seconc_protecta, up_second_protecta
+
+[up_gr_thirdab_protecta]
+elements                = up_thirda_protecta
+
+[up_gr_thirdcd_protecta]
+elements                = up_thirdc_protecta, up_thirdd_protecta
+
+[up_gr_thirdef_protecta]
+elements                = up_thirde_protecta
+
+[up_gr_fourtab_protecta]
+elements                = up_fourta_protecta
+
+[up_gr_fourtcd_protecta]
+elements                = up_fourtc_protecta

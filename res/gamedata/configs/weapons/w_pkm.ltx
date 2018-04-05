@@ -1,0 +1,271 @@
+[wpn_pkm]:identity_immunities,weapon_probability,default_weapon_params
+GroupControlSection     = spawn_group
+$spawn                                                = "weapons\pkm"                ; option for Level Editor
+$npc                    = on                                ; option for Level Editor
+$prefetch               = 8
+scheduled               = off                                ; option for ALife Simulator
+cform                   = skeleton
+class                   = WP_AK74
+min_radius              = 30
+max_radius              = 100
+description             = st_wpn_rp_descr
+
+ef_main_weapon_type     = 2
+ef_weapon_type          = 10
+
+default_to_ruck         = false
+sprint_allowed          = false
+
+;-------------------------------------------------------
+cost                    = 20000
+weapon_class            = assault_rifle        ; Type of the weapon
+inv_weight              = 7.5
+
+upgrades                = up_gr_firstab_pkm, up_gr_seconab_pkm, up_gr_thirdab_pkm, up_gr_fourtab_pkm, up_gr_fifthab_pkm
+installed_upgrades      =
+upgrade_scheme          = upgrade_scheme_pkm
+
+;--TTX----------------------------------------------------------------------------
+hit_power              = 0.5, 0.5, 0.5, 0.5
+hit_impulse            = 120
+hit_type               = fire_wound
+fire_distance           = 150
+bullet_speed            = 600        ;начальная скорость пули
+rpm                     = 525
+rpm_empty_click         = 200
+
+use_aim_bullet          = false ;true                ;Поддерживается ли первая суппер пуля
+time_to_aim             = 5.0
+
+hud                     = wpn_pkm_hud
+
+misfire_probability        = 0.005 ;вероятность осечки при максимальном износе  !!!old - now not working
+;изношенность, при которой появляется шанс осечки
+misfire_start_condition		= 0.6
+;изношеность при которой шанс осечки становится константным
+misfire_end_condition		= 0.1
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= 0.002
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= 0.03
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= 0.001
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= 0.0012
+
+ammo_elapsed            = 100
+ammo_mag_size           = 100
+
+ammo_class              = ammo_pkm_100
+grenade_class           = ammo_m209
+fire_modes              = 1, -1
+launch_speed            = 0
+hand_dependence         = 1
+single_handed           = 0
+
+;-дисперсия-----------------------------------------------------------------------------
+;базовая дисперсия
+fire_dispersion_base    = 0.32        ;угол (в градусах) базовой дисперсии оружия (оружия зажатого в тисках)
+control_inertion_factor = 3.0f ; 2.2f
+crosshair_inertion		= 7.70
+
+;отдача
+cam_return				= 0
+cam_relax_speed         = 15               ;скорость возврата в исходное положение
+cam_relax_speed_ai      = 360                ;скорость возврата в исходное положение у АИ
+cam_dispersion          = 0.33                ;увеличения угла (в градусах) с каждым выстрелом
+cam_dispersion_inc      = 0.23                ;увеличениe cam_dispersion с каждым выстрелом
+cam_dispersion_frac     = 1.0                ;ствол будет подыматься на cam_dispersion*cam_dispersion_frac +- cam_dispersion*(1-cam_dispersion_frac)
+cam_max_angle           = 10.0                ;максимальный угол отдачи
+cam_max_angle_horz      = 50.0                ;(degree) maximum shot horizontal degree
+cam_step_angle_horz     = 1.65                    ;(degree) size of step camera moved in horizontal position while shooting
+
+PDM_disp_base           = 1.0
+PDM_disp_vel_factor     = 3.0
+PDM_disp_accel_factor   = 3.0
+PDM_disp_crouch         = 1.0
+PDM_disp_crouch_no_acc  = 1.0
+
+fire_dispersion_condition_factor = 15        ;увеличение дисперсии в процентах при максимальном износе
+
+;---DOF------------------------------------------------------------------------
+zoom_dof                = 0.5, 1.0, 180
+reload_dof              = 0.0, 0.5, 5, 1.7
+;-------------------------------------------------------------------------------
+holder_range_modifier   = 1.0                       ; во сколько раз увеличивается eye_range
+holder_fov_modifier     = 1.0                       ; во сколько раз увеличивается eye_fov
+
+min_radius              = 30
+max_radius              = 100
+
+hit_probability_gd_novice  = 0.80
+hit_probability_gd_stalker = 0.80
+hit_probability_gd_veteran = 0.80
+hit_probability_gd_master  = 0.80
+
+;-------------------------------------------------------------------------------
+slot                    = 2                ; // secondary
+animation_slot          = 2                ; type of the animation that will be used
+
+inv_name                = st_wpn_rp
+inv_name_short          = st_wpn_rp
+
+inv_grid_width          = 6
+inv_grid_height         = 2
+inv_grid_x              = 0
+inv_grid_y              = 36
+
+upgr_icon_x			= 8
+upgr_icon_y			= 593
+upgr_icon_width		= 294
+upgr_icon_height   	= 83
+
+kill_msg_x              = 80
+kill_msg_y              = 59
+kill_msg_width          = 87
+kill_msg_height         = 24
+
+;-------------------------------------------------------------------------------
+position                = -0.027, -0.097, 0.042
+orientation             = 0, -2, 0
+
+fire_point              = 0.0, 0.158, 0.845 ;0.000000,0.137000,0.649000
+fire_point2             = 0.0, 0.097, 0.722
+
+flame_particles         = weapons\generic_weapon05
+smoke_particles         = weapons\generic_shoot_00
+grenade_flame_particles = weapons\generic_weapon01
+
+shell_point             = -0.020000,0.167000,0.082000
+shell_dir               = 0.0, 0.0, 0.4
+shell_particles         = weapons\generic_shells
+
+;--STRAP PARAMETERS-----------------------------------------------------------------
+;под мишкой
+strap_position          = -0.26,-0.11,0.25                                ; position (offset) and orientation of the weapon when it is strapped
+strap_orientation       = -15,-9,110                                        ; (3rd person view in degrees)
+strap_bone0             = bip01_spine2
+strap_bone1             = bip01_spine1
+
+startup_ammo            = 90
+visual                  = dynamics\weapons\wpn_pkm\wpn_pkm.ogf
+
+light_disabled                                = false
+light_color             = 0.6,0.5,0.3
+light_range             = 5
+light_var_color         = 0.05
+light_var_range         = 0.5
+light_time              = 0.2
+
+ph_mass                 = 4
+;cost                   = 2100
+
+;addons
+scope_status            = 0
+silencer_status         = 0
+grenade_launcher_status = 0
+
+zoom_enabled            = false                                                ; (on,off)zoom mode (right mouse button)
+zoom_rotate_time        = 0.5
+scope_zoom_factor       = 50   
+
+;звуки
+snd_draw                = weapons\ak74_draw
+snd_holster             = weapons\generic_holster
+snd_shoot                                        = weapons\pkm_shot
+;snd_shoot1                                        = weapons\pkm_shot
+;snd_shoot2                                        = weapons\pkm_shot
+;snd_shoot3                                        = weapons\pkm_shot
+
+
+snd_empty               = weapons\gen_empty, 0.5
+snd_reload              = weapons\pkm_reload, 0.7
+snd_shoot_grenade       = weapons\gen_grenshoot
+snd_reload_grenade      = weapons\gen_grenload, 1.0, 0.8
+snd_switch              = weapons\groza_switch, 1.0, 0.5
+
+
+;настройки для глушителя
+silencer_hit_power      = 0.55, 0.55, 0.55, 0.55
+silencer_hit_impulse    = 120
+silencer_fire_distance  = 250
+silencer_bullet_speed   = 600
+
+;silencer_flame_particles  = weapons\generic_weapon01
+silencer_smoke_particles   = weapons\generic_shoot_00
+
+snd_silncer_shot        = weapons\w_ak74_shot1
+
+silencer_light_color    = 0.6,0.5,0.3
+silencer_light_range    = 0.01
+silencer_light_var_color= 0.05
+silencer_light_var_range= 0.5
+silencer_light_time     = 0.2
+
+
+[wpn_pkm_hud]:hud_base
+zoom_hide_crosshair        = true
+attach_place_idx        = 0
+item_visual                = dynamics\weapons\wpn_pkm\wpn_pkm_hud
+
+hands_position				= -0.075500,-0.163000,0.139500
+hands_orientation			= -1.750000,5.400002,-8.100014
+
+
+hands_position_16x9				= -0.051000,-0.173500,0.173999
+hands_orientation_16x9			= -0.850000,5.400002,-6.450006
+
+item_position                                = 0.000908,0.001413,0.001031
+item_orientation                        = 2.090982,-0.985601,361.809204
+
+shell_point			= 0.013,0.033,0.128
+shell_dir               = 0.0, 1.0, 0.0
+shell_bone                = wpn_body
+
+
+fire_point				= 0.0,0.053,0.931
+fire_bone                            = wpn_body
+fire_point2                = -0.014000,0.010000,-0.037000
+fire_bone2                = wpn_body
+
+anm_show                     = pkm_draw
+anm_hide                     = pkm_holster
+anm_idle                     = pkm_idle
+anm_idle_sprint         = pkm_idle_sprint
+anm_idle_moving                         = pkm_idle_moving
+anm_shots               = pkm_shoot
+anm_reload              = pkm_reload
+anm_idle_aim                   = pkm_idle_aim
+anm_bore                                                = pkm_idle_bore
+
+
+aim_hud_offset_pos        = 0,0,0
+aim_hud_offset_rot        = 0,0,0
+
+gl_hud_offset_pos        = -0.053000,-0.059000,0.000000
+gl_hud_offset_rot        = -0.145000,0.000000,0.000000
+
+lean_hud_offset_pos        = 0,0,0
+lean_hud_offset_rot        = 0,0,0
+
+aim_hud_offset_pos_16x9   = -0.032000,-0.185000,0.102500
+aim_hud_offset_rot_16x9  = 1.300000,8.400014,-6.450007
+
+
+;********************************************************
+;********************************************************
+
+[wpn_pkm_zulus]:wpn_pkm
+$spawn                      = "weapons\uniq\wpn_pkm_zulus"
+
+description             = st_wpn_pkm_zulus_descr
+inv_name                = st_wpn_pkm_zulus
+
+cost                    = 25000
+
+inv_weight              = 10
+ammo_mag_size = 150
+
+condition_shot_dec      	= 0.0007
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= 0.0008

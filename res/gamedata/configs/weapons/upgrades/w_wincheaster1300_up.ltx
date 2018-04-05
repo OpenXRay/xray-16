@@ -1,0 +1,490 @@
+[up_sect_firsta_wincheaster1300]
+;Надежность(1)10%
+;---------------
+cost		      		= 500
+value					= +10
+
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= -0.0003 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= -0.0003 ;0.0011
+
+[up_sect_firstc_wincheaster1300]
+;Настильность(2)20%
+;------------------
+cost		      		= 700
+value					= +20
+
+bullet_speed            = +80
+hit_impulse      		= +20
+fire_dispersion_base	= -0.02
+
+[up_sect_firstd_wincheaster1300]
+;Отдача(2)-20%
+;------------
+cost		      		= 700
+value					= -20
+
+cam_dispersion              = -0.3		;0.7
+cam_dispersion_inc         	= -0.3		;0.7
+cam_step_angle_horz        	= -0.3		;0.7
+
+zoom_cam_dispersion          = -0.3		;0.6
+zoom_cam_dispersion_inc      = -0.3		;0.6
+zoom_cam_step_angle_horz     = -0.3		;0.6
+
+
+[up_sect_firste_wincheaster1300]
+;Точность(3)30%
+;---------------
+cost		      		= 900
+value					= +30
+
+fire_dispersion_base	= -0.07
+fire_dispersion_condition_factor    = -0.2
+
+[up_sect_secona_wincheaster1300]
+;Уменьшение веса
+;---------------
+cost		      		= 500
+value					= -1
+
+inv_weight 					= -1
+crosshair_inertion			= -0.5
+
+PDM_disp_vel_factor 		= -0.2
+PDM_disp_accel_factor 		= -0.2
+
+[up_sect_seconc_wincheaster1300]
+;Удобство(2)15%
+;--------------
+cost		      		= 700
+value					= +15
+
+crosshair_inertion			= -1.5
+
+PDM_disp_base 				= -0.1
+PDM_disp_vel_factor 		= -0.5
+PDM_disp_accel_factor 		= -0.5
+
+[up_sect_second_wincheaster1300]
+;Надежность(2)15%
+;---------------
+cost		      		= 700
+value					= +15
+
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= -0.0005 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= -0.0005 ;0.0011
+
+
+[up_sect_secone_wincheaster1300]
+;Отдача(3)-30%
+;------------
+cost		      		= 900
+value					= -30
+
+cam_dispersion              = -0.5		;0.7
+cam_dispersion_inc         	= -0.5		;0.7
+cam_step_angle_horz        	= -0.5		;0.7
+
+zoom_cam_dispersion          = -0.6		;0.6
+zoom_cam_dispersion_inc      = -0.6		;0.6
+zoom_cam_step_angle_horz     = -0.6		;0.6
+
+[up_sect_thirda_wincheaster1300]
+;Надежность(1)10%
+;---------------
+cost		      		= 500
+value					= +10
+
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= -0.0003 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= -0.0003 ;0.0011
+
+[up_sect_thirdc_wincheaster1300]
+;Точность(2)20%
+;---------------
+cost		      		= 700
+value					= +20
+
+fire_dispersion_base	= -0.04
+fire_dispersion_condition_factor    = -0.2
+
+[up_sect_thirdd_wincheaster1300]
+;Отдача(2)-20%
+;------------
+cost		      		= 700
+value					= -20
+
+cam_dispersion              = -0.3		;0.7
+cam_dispersion_inc         	= -0.3		;0.7
+cam_step_angle_horz        	= -0.3		;0.7
+
+zoom_cam_dispersion          = -0.3		;0.6
+zoom_cam_dispersion_inc      = -0.3		;0.6
+zoom_cam_step_angle_horz     = -0.3		;0.6
+
+[up_sect_thirde_wincheaster1300]
+;Надежность(3)30%
+;---------------
+cost		      		= 900
+value					= +30
+
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= -0.0007 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= -0.0007 ;0.0011
+
+[up_sect_thirdf_wincheaster1300]
+;Скорострельность(3)25%
+;----------------------
+cost		      		= 1500
+value					= +25
+
+rpm                     = +35
+fire_modes              = 1, -1
+
+[up_sect_fourta_wincheaster1300]
+;Расширенный объем магазина
+;----------------------
+cost		      		= 1200
+value					= +2
+
+ammo_mag_size		 		= 2
+
+[up_firsta_wincheaster1300]
+scheme_index            = 0, 0
+known                   = 1
+effects                 = up_gr_firstcd_wincheaster1300
+section                 = up_sect_firsta_wincheaster1300
+property                = prop_reliability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_bard_a1_name
+description             = st_up_bard_a1_descr
+icon                    = ui_inGame2_upgrade_Cheyser_13_1
+
+[up_firstc_wincheaster1300]
+scheme_index            = 1, 0
+known                   = 1
+effects                 = up_gr_firstef_wincheaster1300
+section                 = up_sect_firstc_wincheaster1300
+property                = prop_bullet_speed
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_bard_b5_name
+description             = st_up_bard_b5_descr
+icon                    = ui_inGame2_upgrade_Cheyser_13_2
+
+
+[up_firstd_wincheaster1300]
+scheme_index            = 1, 1
+known                   = 1
+effects                 = up_gr_firstef_wincheaster1300
+section                 = up_sect_firstd_wincheaster1300
+property                = prop_recoil
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_bard_b4_name
+description             = st_up_bard_b4_descr
+icon                    = ui_inGame2_upgrade_Cheyser_13_3
+
+
+[up_firste_wincheaster1300]
+scheme_index            = 2, 0
+known                   = 1
+effects                 =
+section                 = up_sect_firste_wincheaster1300
+property                = prop_dispersion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_bard_c3_name
+description             = st_up_bard_c3_descr
+icon                    = ui_inGame2_upgrade_Cheyser_13_4
+
+[up_secona_wincheaster1300]
+scheme_index            = 0, 1
+known                   = 1
+effects                 = up_gr_seconcd_wincheaster1300
+section                 = up_sect_secona_wincheaster1300
+property                = prop_weight
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_stvd_a3_name
+description             = st_up_stvd_a3_descr
+icon                    = ui_inGame2_upgrade_Cheyser_13_5
+
+[up_seconc_wincheaster1300]
+scheme_index            = 1, 2
+known                   = 1
+effects                 = up_gr_seconef_wincheaster1300
+section                 = up_sect_seconc_wincheaster1300
+property                = prop_inertion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_stvd_b2_name
+description             = st_up_stvd_b2_descr
+icon                    = ui_inGame2_upgrade_Cheyser_13_6
+
+
+[up_second_wincheaster1300]
+scheme_index            = 1, 3
+known                   = 1
+effects                 = up_gr_seconef_wincheaster1300
+section                 = up_sect_second_wincheaster1300
+property                = prop_reliability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_stvd_b5_name
+description             = st_up_stvd_b5_descr
+icon                    = ui_inGame2_upgrade_Cheyser_13_7
+
+
+
+[up_secone_wincheaster1300]
+scheme_index            = 2, 1
+known                   = 1
+effects                 =
+section                 = up_sect_secone_wincheaster1300
+property                = prop_recoil
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_stvd_c2_name
+description             = st_up_stvd_c2_descr
+icon                    = ui_inGame2_upgrade_Cheyser_13_8
+
+
+[up_thirda_wincheaster1300]
+scheme_index            = 0, 2
+known                   = 1
+effects                 = up_gr_thirdcd_wincheaster1300
+section                 = up_sect_thirda_wincheaster1300
+property                = prop_reliability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_autd_a2_name
+description             = st_up_autd_a2_descr
+icon                    = ui_inGame2_upgrade_Cheyser_13_9
+
+
+[up_thirdc_wincheaster1300]
+scheme_index            = 1, 4
+known                   = 1
+effects                 = up_gr_thirdef_wincheaster1300
+section                 = up_sect_thirdc_wincheaster1300
+property                = prop_dispersion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_autd_b2_name
+description             = st_up_autd_b2_descr
+icon                    = ui_inGame2_upgrade_Cheyser_13_10
+
+
+
+[up_thirdd_wincheaster1300]
+scheme_index            = 1, 5
+known                   = 1
+effects                 = up_gr_thirdef_wincheaster1300
+section                 = up_sect_thirdd_wincheaster1300
+property                = prop_recoil
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_autd_b1_name
+description             = st_up_autd_b1_descr
+icon                    = ui_inGame2_upgrade_Cheyser_13_11
+
+[up_thirde_wincheaster1300]
+scheme_index            = 2, 2
+known                   = 1
+effects                 =
+section                 = up_sect_thirde_wincheaster1300
+property                = prop_reliability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_autd_c1_name
+description             = st_up_autd_c1_descr
+icon                    = ui_inGame2_upgrade_Cheyser_13_12
+
+[up_thirdf_wincheaster1300]
+scheme_index            = 2, 3
+known                   = 1
+effects                 =
+section                 = up_sect_thirdf_wincheaster1300
+property                = prop_rpm, prop_autofire
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_autd_c3_name
+description             = st_up_autd_c3_descr
+icon                    = ui_inGame2_upgrade_Cheyser_13_13
+
+
+[up_fourta_wincheaster1300]
+scheme_index            = 0, 3
+known                   = 1
+effects                 =
+section                 = up_sect_fourta_wincheaster1300
+property                = prop_ammo_size 
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_addd_a1_name
+description             = st_up_addd_a1_descr
+icon                    = ui_inGame2_upgrade_Cheyser_13_14
+
+[up_gr_firstab_wincheaster1300]
+elements                = up_firsta_wincheaster1300
+
+[up_gr_firstcd_wincheaster1300]
+elements                = up_firstc_wincheaster1300, up_firstd_wincheaster1300
+
+[up_gr_firstef_wincheaster1300]
+elements                = up_firste_wincheaster1300
+
+[up_gr_seconab_wincheaster1300]
+elements                = up_secona_wincheaster1300
+
+[up_gr_seconcd_wincheaster1300]
+elements                = up_seconc_wincheaster1300, up_second_wincheaster1300
+
+[up_gr_seconef_wincheaster1300]
+elements                = up_secone_wincheaster1300
+
+[up_gr_thirdab_wincheaster1300]
+elements                = up_thirda_wincheaster1300
+
+[up_gr_thirdcd_wincheaster1300]
+elements                = up_thirdc_wincheaster1300, up_thirdd_wincheaster1300
+
+[up_gr_thirdef_wincheaster1300]
+elements                = up_thirde_wincheaster1300, up_thirdf_wincheaster1300
+
+[up_gr_fourtab_wincheaster1300]
+elements                = up_fourta_wincheaster1300

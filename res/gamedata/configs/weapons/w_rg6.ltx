@@ -1,0 +1,217 @@
+[wpn_rg-6]:zero_immunities,weapon_probability,default_weapon_params
+GroupControlSection		= spawn_group
+discovery_dependency 	=
+$spawn                  = "weapons\rg-6"		; option for Level Editor
+$npc			 				= on						; option for Level Editor
+$prefetch 		 			= 2
+scheduled               = off    				; option for ALife Simulator
+cform                   = skeleton
+class                   = WP_RG6
+description				= st_wpn_rg6_descr
+
+ef_main_weapon_type		= 4
+ef_weapon_type			= 12
+
+;-------------------------------------------------------------------------------
+cost						= 20000
+weapon_class				= heavy_weapon
+inv_weight				= 6.2
+
+;----TTX--------------------------------------------------------------------------
+hit_power        			= 0.75, 0.75, 0.75, 0.75
+hit_impulse      			= 150
+hit_type 					= fire_wound
+fire_distance       		= 100
+bullet_speed				= 32 ;76
+rpm                 		= 100
+
+hud                     = wpn_rg-6_hud
+
+misfire_probability        = 0.005 ;вероятность осечки при максимальном износе  !!!old - now not working
+;изношенность, при которой появляется шанс осечки
+misfire_start_condition		= 0.6
+;изношеность при которой шанс осечки становится константным
+misfire_end_condition		= 0.1
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= 0.001
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= 0.02
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= 0.00001
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= 0.00002
+
+tri_state_reload			= on
+
+ammo_limit		 			= 60
+ammo_current		 		= 10
+ammo_elapsed		 		= 0
+
+ammo_mag_size		 		= 6
+ammo_class		 			= ammo_vog-25
+launch_speed				= 32 ;76
+sprint_allowed				= true
+
+;------дисперсия------------------------------------------------------------------------
+;базовая дисперсия
+fire_dispersion_base	= 1.0  	;угол (в градусах) базовой дисперсии оружия (оружия зажатого в тисках)
+control_inertion_factor	= 1.7f
+crosshair_inertion   	= 8.25
+
+PDM_disp_base 				= 1.0
+PDM_disp_vel_factor 		= 1.1
+PDM_disp_accel_factor 	= 1.1
+PDM_disp_crouch	 				= 1.0
+PDM_disp_crouch_no_acc 		= 1.0
+
+;отдача
+cam_relax_speed         = 7.0		;скорость возврата в исходное положение
+cam_relax_speed_ai      = 360
+cam_dispersion          = 5.0 	;увеличения угла (в градусах) с каждым выстрелом
+cam_dispersion_inc		= 5.0 	;увеличениe cam_dispersion с каждым выстрелом
+cam_dispersion_frac		= 0.1 	;ствол будет подыматься на cam_dispersion*cam_dispersion_frac +- cam_dispersion*(1-cam_dispersion_frac)
+cam_max_angle			= 15 		;максимальный угол отдачи
+cam_max_angle_horz		= 5 		;(degree) maximum shot horizontal degree
+cam_step_angle_horz		= 5.0 	;(degree) size of step camera moved in horizontal position while shooting
+
+fire_dispersion_condition_factor = 5	;увеличение дисперсии в процентах при максимальном износе
+
+;---DOF-------------------------------------------------------------------------
+zoom_dof			         = 0.5, 1.0, 180
+reload_dof  				= 0.0, 0.5,5, 1.3
+
+;-------------------------------------------------------------------------------
+holder_range_modifier	= 1.0     ; во сколько раз увеличивается eye_range
+holder_fov_modifier		= 1.0     ; во сколько раз увеличивается eye_fov
+
+min_radius              = 0
+max_radius              = 50
+
+hit_probability_gd_novice		= 0.80
+hit_probability_gd_stalker		= 0.80
+hit_probability_gd_veteran		= 0.80
+hit_probability_gd_master		= 0.80
+
+;-------------------------------------------------------------------------------
+
+position                = -0.026, -0.111, 0.
+orientation             = 0, 0, 0
+
+shell_point				= 0.0, 0.120, 0.20
+fire_point              = 0.0, 0.120, 0.452
+fire_point2             = 0.0, 0.120, 0.452
+
+hand_dependence 		= 1
+single_handed			= 0
+
+slot 					= 2
+animation_slot			= 10
+
+
+inv_name				= st_wpn_rg6
+inv_name_short			= st_wpn_rg6
+inv_grid_width			= 4
+inv_grid_height			= 2
+inv_grid_x				= 0
+inv_grid_y				= 8
+
+upgr_icon_x			= 596
+upgr_icon_y			= 864
+upgr_icon_width		= 290
+upgr_icon_height   	= 141
+
+kill_msg_x				= 0
+kill_msg_y				= 172
+kill_msg_width			= 68
+kill_msg_height			= 30
+
+flame_particles		   = weapons\generic_weapon05
+smoke_particles		   = weapons\generic_shoot_00
+rpm_empty_click 	   	= 200
+
+;--STRAP PARAMETERS-----------------------------------------------------------------
+;под мишкой
+strap_position         	= -0.26,-0.11,0.15
+strap_orientation      	= -15,-9,110
+;на спине
+strap_bone0					= bip01_spine2
+strap_bone1					= bip01_spine1
+
+startup_ammo            = 0
+visual                  = dynamics\weapons\wpn_rg6\wpn_rg6.ogf
+
+light_color		 			= 0.6,0.5,0.3
+light_range		 			= 6.0
+light_var_color		 	= 0.05
+light_var_range		 	= 0.5
+light_time 		 			= 0.2
+
+ph_mass			 			= 3
+;cost			 				= 900
+
+;addons
+scope_status				= 0
+silencer_status			= 0
+grenade_launcher_status	= 0
+
+zoom_enabled				= true
+scope_zoom_factor	    	= 55
+
+;звуки
+snd_draw				      = weapons\generic_draw
+snd_holster			      = weapons\generic_holster
+snd_shoot			      = weapons\n_toz34_shot
+snd_empty			      = weapons\generic_empty
+snd_reload			      = weapons\rg6_reload
+snd_shoot_duplet			= weapons\n_toz34_shot
+snd_open_weapon			= weapons\rg6_reload_start
+snd_add_cartridge			= weapons\rg6_reload
+snd_close_weapon			= weapons\rg6_reload_end
+snd_shoot_1			      = weapons\n_toz34_shot
+snd_reload_1		      = weapons\bm16_reload_one		;reload left
+
+[wpn_rg-6_hud]:hud_base
+zoom_hide_crosshair		= true
+
+hands_position				= -0.013000,-0.176999,0.118000
+hands_orientation			= 6.250005,-0.649999,0.000000
+hands_position_16x9				= -0.029000,-0.186000,0.112000
+hands_orientation_16x9			= 1.699999,0.000001,0.600000
+
+item_position				= -0.003178,0.002246,0.000581
+item_orientation			= -181.191742,180.482727,-180.330688
+
+shell_point					= 0,0,0
+shell_dir               = 0.0, 1.0, 0.0
+shell_bone					= wpn_body
+
+
+fire_point				= -0.0,0.0,0.513
+fire_bone               = wpn_body
+
+attach_place_idx		= 0
+item_visual					= dynamics\weapons\wpn_rg6\wpn_rg6_hud.ogf
+
+anm_show			      	= rg6_draw
+anm_hide			      	= rg6_holster
+anm_idle			      	= rg6_idle
+anm_idle_aim			   = rg6_idle_aim
+anm_idle_moving		   = rg6_idle_moving
+anm_idle_sprint		   = rg6_idle_sprint
+anm_open				= rg6_reload_start
+anm_add_cartridge			= rg6_reload
+anm_close					= rg6_reload_end
+anm_shots					= rg6_shoot
+anm_bore						= rg6_idle_bore
+
+
+aim_hud_offset_pos				= -0.125001,0.006000,0.156500
+aim_hud_offset_rot				= 0.015000,0.085000,-0.002500
+aim_hud_offset_pos_16x9				= -0.091000,0.000500,0.120000
+aim_hud_offset_rot_16x9				= -0.010000,-0.010000,0.000000
+
+gl_hud_offset_pos			= 0,0,0
+gl_hud_offset_rot			= 0,0,0
+
+lean_hud_offset_pos		= 0,0,0
+lean_hud_offset_rot		= 0,0,0

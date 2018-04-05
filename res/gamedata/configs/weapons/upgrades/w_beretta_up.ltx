@@ -1,0 +1,551 @@
+[up_sect_firsta_beretta]
+;Скорострельность(1)10%
+;----------------------
+cost		      		= 300
+value					= +10
+
+rpm						= 35
+
+[up_sect_firstc_beretta]
+;Надежность(2)15%
+;---------------
+cost		      		= 600
+value					= +15
+
+;увеличение дисперсии в процентах при максимальном износе
+fire_dispersion_condition_factor    = -1 ;15
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= -0.0008 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= -0.0008 ;0.0011
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= -0.0013
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= -0.013 ;0.03
+
+[up_sect_firstd_beretta]
+;Отдача(2)-20%
+;------------
+cost		      		= 600
+value					= -20
+
+cam_dispersion         		= -0.2		;0.5
+cam_dispersion_inc			= -0.2		;0.5
+cam_step_angle_horz			= -0.15;    ;1.0
+
+zoom_cam_dispersion         = -0.05
+zoom_cam_dispersion_inc     = -0.2
+zoom_cam_step_angle_horz    = -0.3
+
+[up_sect_firste_beretta]
+;Режим полностью автоматического огня
+;---------------
+cost		      		= 1900
+;value					= +20
+
+fire_modes		  = 1, -1
+
+rpm               = 300
+
+cam_dispersion         		= -0.3		;0.5
+cam_dispersion_inc			= -0.3		;0.5
+cam_step_angle_horz			= -0.1;    ;1.0
+
+zoom_cam_dispersion         = -0.05
+zoom_cam_dispersion_inc     = -0.15
+zoom_cam_step_angle_horz    = -0.5
+
+[up_sect_secona_beretta]
+;Скорострельность(1)10%
+;----------------------
+cost		      		= 300
+value					= +10
+
+rpm						= 35
+
+[up_sect_seconc_beretta]
+;Настильность(2)20%
+;------------------
+cost		      		= 600
+value					= +20
+
+bullet_speed		 	= +50
+fire_dispersion_base	= -0.01 
+
+[up_sect_second_beretta]
+;Надежность(2)15%
+;---------------
+cost		      		= 600
+value					= +15
+
+;увеличение дисперсии в процентах при максимальном износе
+fire_dispersion_condition_factor    = -1 ;15
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= -0.0008 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= -0.0008 ;0.0011
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= -0.0013
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= -0.013 ;0.03
+
+[up_sect_secone_beretta]
+;Скорострельность(3)25%
+;----------------------
+cost		      		= 900
+value					= +25
+
+rpm						= 65
+
+[up_sect_thirda_beretta]
+;Надежность(1)10%
+;---------------
+cost		      		= 300
+value					= +10
+
+;увеличение дисперсии в процентах при максимальном износе
+fire_dispersion_condition_factor    = -1 ;15
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= -0.0005 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= -0.0005 ;0.0011
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= -0.0006
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= -0.006 ;0.03
+
+[up_sect_thirdc_beretta]
+;Удобство(2)15%
+;--------------
+cost		      		= 600
+value					= +15
+
+crosshair_inertion			= -1
+
+PDM_disp_base 				= -0.2
+PDM_disp_vel_factor 		= -0.35
+PDM_disp_accel_factor 		= -0.35
+
+[up_sect_thirdd_beretta]
+;Отдача(2)-20%
+;------------
+cost		      		= 600
+value					= -20
+
+cam_dispersion         		= -0.2		;0.5
+cam_dispersion_inc			= -0.2		;0.5
+cam_step_angle_horz			= -0.15;    ;1.0
+
+zoom_cam_dispersion         = -0.05
+zoom_cam_dispersion_inc     = -0.2
+zoom_cam_step_angle_horz    = -0.3
+
+[up_sect_fourta_beretta]
+;Точность(1)10%
+;---------------
+cost		      		= 300
+value					= +10
+
+fire_dispersion_base	= -0.04
+fire_dispersion_condition_factor  = -1
+
+[up_sect_fourtc_beretta]
+;Надежность(2)15%
+;---------------
+cost		      		= 600
+value					= +15
+
+;увеличение дисперсии в процентах при максимальном износе
+fire_dispersion_condition_factor    = -1 ;15
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= -0.0008 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= -0.0008 ;0.0011
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= -0.0013
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= -0.013 ;0.03
+
+[up_sect_fiftha_beretta]
+;Нанесение наружной резьбы на ствол
+;---------------
+cost		      		= 700
+;value					= +20
+
+snd_silncer_shot			= weapons\n_pb_shot
+silencer_status             = 2
+silencer_name  				= wpn_addon_silencer		; section name for the attachable silencer
+silencer_x 					= 56					; offset in inventory icon
+silencer_y 					= -15
+
+[up_sect_fifthc_beretta]
+;Смена калибра на 9х18
+;---------------
+cost		      		= 1500
+value					= "9x18"
+
+ammo_class		 		= ammo_9x18_fmj, ammo_9x18_pmm
+
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= 0.0001 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= 0.0001 ;0.0011
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= 0.0008
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= 0.008 ;0.03
+
+[up_firsta_beretta]
+scheme_index            = 0, 0
+known                   = 1
+;;invented                = 1                							; 0
+effects                 = up_gr_firstcd_beretta
+section                 = up_sect_firsta_beretta
+property                = prop_rpm
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_zatp_a1_name
+description             = st_up_zatp_a1_descr
+icon                    = ui_inGame2_upgrade_Marta_1
+
+;;...
+[up_firstc_beretta]
+scheme_index            = 1, 0
+known                   = 1
+effects                 = up_gr_firstef_beretta
+section                 = up_sect_firstc_beretta
+property                = prop_reliability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_zatp_b5_name
+description             = st_up_zatp_b5_descr
+icon                    = ui_inGame2_upgrade_Marta_2
+
+[up_firstd_beretta]
+scheme_index            = 1, 1
+known                   = 1
+effects                 = up_gr_firstef_beretta
+section                 = up_sect_firstd_beretta
+property                = prop_recoil
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_zatp_b7_name
+description             = st_up_zatp_b7_descr
+icon                    = ui_inGame2_upgrade_Marta_3
+
+[up_firste_beretta]
+scheme_index            = 2, 0
+known                   = 1
+effects                 =
+section                 = up_sect_firste_beretta
+property                = prop_autofire
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_zatp_c6_name
+description             = st_up_zatp_c6_descr
+icon                    = ui_inGame2_upgrade_Marta_4
+
+
+
+[up_secona_beretta]
+scheme_index            = 0, 1
+known                   = 1
+effects                 = up_gr_seconcd_beretta
+section                 = up_sect_secona_beretta
+property                = prop_rpm
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_barp_a3_name
+description             = st_up_barp_a3_descr
+icon                    = ui_inGame2_upgrade_Marta_5
+
+[up_seconc_beretta]
+scheme_index            = 1, 2
+known                   = 1
+effects                 = up_gr_seconef_beretta
+section                 = up_sect_seconc_beretta
+property                = prop_bullet_speed
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_barp_b4_name
+description             = st_up_barp_b4_descr
+icon                    = ui_inGame2_upgrade_Marta_6
+
+[up_second_beretta]
+scheme_index            = 1, 3
+known                   = 1
+effects                 = up_gr_seconef_beretta
+section                 = up_sect_second_beretta
+property                = prop_reliability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_barp_b1_name
+description             = st_up_barp_b1_descr
+icon                    = ui_inGame2_upgrade_Marta_7
+
+
+[up_secone_beretta]
+scheme_index            = 2, 1
+known                   = 1
+effects                 =
+section                 = up_sect_secone_beretta
+property                = prop_rpm
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_barp_c1_name
+description             = st_up_barp_c1_descr
+icon                    = ui_inGame2_upgrade_Marta_8
+
+
+[up_thirda_beretta]
+scheme_index            = 0, 2
+known                   = 1
+effects                 = up_gr_thirdcd_beretta
+section                 = up_sect_thirda_beretta
+property                = prop_reliability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_stvp_a2_name
+description             = st_up_stvp_a2_descr
+icon                    = ui_inGame2_upgrade_Marta_9
+
+[up_thirdc_beretta]
+scheme_index            = 1, 4
+known                   = 1
+effects                 =
+section                 = up_sect_thirdc_beretta
+property                = prop_inertion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_stvp_b5_name
+description             = st_up_stvp_b5_descr
+icon                    = ui_inGame2_upgrade_Marta_10
+
+[up_thirdd_beretta]
+scheme_index            = 1, 5
+known                   = 1
+effects                 =
+section                 = up_sect_thirdd_beretta
+property                = prop_recoil
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_stvp_b3_name
+description             = st_up_stvp_b3_descr
+icon                    = ui_inGame2_upgrade_Marta_11
+
+[up_fourta_beretta]
+scheme_index            = 0, 3
+known                   = 1
+effects                 = up_gr_fourtcd_beretta
+section                 = up_sect_fourta_beretta
+property                = prop_dispersion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_usmp_b1_name
+description             = st_up_usmp_b1_descr
+icon                    = ui_inGame2_upgrade_Marta_12
+
+
+[up_fourtc_beretta]
+scheme_index            = 1, 6
+known                   = 1
+effects                 =
+section                 = up_sect_fourtc_beretta
+property                = prop_reliability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_usmp_b4_name
+description             = st_up_usmp_b4_descr
+icon                    = ui_inGame2_upgrade_Marta_13
+
+
+[up_fiftha_beretta]
+scheme_index            = 0, 4
+known                   = 1
+effects                 =
+section                 = up_sect_fiftha_beretta
+property                = prop_silencer
+
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_add_a1_name
+description             = st_up_add_a1_descr
+icon                    = ui_inGame2_upgrade_Marta_14
+
+[up_fifthc_beretta]
+scheme_index            = 1, 7
+known                   = 1
+effects                 =
+section                 = up_sect_fifthc_beretta
+property                = prop_calibre
+
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_add_b3_name
+description             = st_up_add_b3_descr
+icon                    = ui_inGame2_upgrade_Marta_15
+
+
+[up_gr_firstab_beretta]
+elements                = up_firsta_beretta
+
+[up_gr_firstcd_beretta]
+elements                = up_firstc_beretta, up_firstd_beretta
+
+[up_gr_firstef_beretta]
+elements                = up_firste_beretta
+
+[up_gr_seconab_beretta]
+elements                = up_secona_beretta
+
+[up_gr_seconcd_beretta]
+elements                = up_seconc_beretta, up_second_beretta
+
+[up_gr_seconef_beretta]
+elements                = up_secone_beretta
+
+[up_gr_thirdab_beretta]
+elements                = up_thirda_beretta
+
+[up_gr_thirdcd_beretta]
+elements                = up_thirdc_beretta, up_thirdd_beretta
+
+[up_gr_fourtab_beretta]
+elements                = up_fourta_beretta
+
+[up_gr_fourtcd_beretta]
+elements                = up_fourtc_beretta
+
+[up_gr_fifthab_beretta]
+elements                = up_fiftha_beretta
+
+[up_gr_fifthcd_beretta]
+elements                = up_fifthc_beretta

@@ -1,0 +1,578 @@
+[up_sect_firsta_vintorez]
+;Надежность(1)10%
+;--------------
+cost		      		= 1000
+value					= +10
+
+;увеличение дисперсии в процентах при максимальном износе
+fire_dispersion_condition_factor    = -1 ;15
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= -0.001
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= -0.013 ;0.03
+
+[up_sect_firstc_vintorez]
+;Отдача(2)-15%
+cost		      		= 1500
+value					= -20
+
+cam_dispersion              = -0.1		;0.1
+cam_dispersion_inc         	= -0.04		;0.6
+cam_step_angle_horz        	= -0.15		;0.6
+
+zoom_cam_dispersion          = -0.04	;0.1
+zoom_cam_dispersion_inc      = -0.02	;0.5
+zoom_cam_step_angle_horz     = -0.06	;0.5
+
+
+[up_sect_firstd_vintorez]
+;Настильность(2)20%
+;------------------
+cost		      		= 1500
+value					= +20
+
+bullet_speed            = +85
+fire_dispersion_base    = -0.01 
+
+[up_sect_firste_vintorez]
+;Удобство(3)25%
+;--------------
+cost		      		= 2000
+value					= +25
+
+crosshair_inertion			= -1.5
+
+PDM_disp_base 				= -0.2
+PDM_disp_vel_factor 		= -0.4
+PDM_disp_accel_factor 		= -0.4
+
+[up_sect_firstf_vintorez]
+;Точность(3)30%
+;--------------
+cost		      		= 2000
+value					= +30
+
+fire_dispersion_base	= -0.03 ;0.7
+fire_dispersion_condition_factor    = -1 ;15
+
+[up_sect_secona_vintorez]
+;Настильность(1)10%
+;------------------
+cost		      		= 1000
+value					= +10
+
+bullet_speed            = +55
+
+[up_sect_seconc_vintorez]
+;Надежность(2)15%
+;---------------
+cost		      		= 1500
+value					= +15
+
+;увеличение дисперсии в процентах при максимальном износе
+fire_dispersion_condition_factor    = -1 ;15
+;увеличение изношености при выстреле очередью
+condition_queue_shot_dec	= -0.0001 ;0.0013
+;увеличение изношености при одиночном выстреле
+condition_shot_dec      	= -0.0001 ;0.0011
+;шанс осечки при изношености больше чем misfireStartCondition
+misfire_start_prob	     	= -0.002
+;шанс осечки при изношености больше чем misfireEndCondition
+misfire_end_prob	     	= -0.023 ;0.03
+
+[up_sect_second_vintorez]
+;Точность(2)20%
+;--------------
+cost		      		= 1500
+value					= +20
+
+fire_dispersion_base	= -0.02 ;0.7
+fire_dispersion_condition_factor    = -1 ;15
+
+[up_sect_secone_vintorez]
+;Настильность(3)30%
+;------------------
+cost		      		= 2000
+value					= +30
+
+bullet_speed            = +125
+fire_dispersion_base    = -0.02
+' 
+[up_sect_thirda_vintorez]
+;Отдача(1)-10%
+;------------
+cost		      		= 1000
+value					= -10
+
+cam_dispersion              = -0.05		;0.1
+cam_dispersion_inc         	= -0.03		;0.6
+cam_step_angle_horz        	= -0.1		;0.6
+
+zoom_cam_dispersion          = -0.03	;0.1
+zoom_cam_dispersion_inc      = -0.01	;0.5
+zoom_cam_step_angle_horz     = -0.04	;0.5
+
+[up_sect_thirdc_vintorez]
+;Удобство(2)15%
+;--------------
+cost		      		= 1500
+value					= +15
+
+crosshair_inertion			= -1.5
+
+PDM_disp_base 				= -0.08
+PDM_disp_vel_factor 		= -0.2
+PDM_disp_accel_factor 		= -0.2
+
+[up_sect_thirde_vintorez]
+;Удобство(3)25%
+;--------------
+cost		      		= 2000
+value					= +25
+
+crosshair_inertion			= -1.5
+
+PDM_disp_base 				= -0.1
+PDM_disp_vel_factor 		= -0.4
+PDM_disp_accel_factor 		= -0.4
+
+[up_sect_thirdf_vintorez]
+;Отдача(3)-30%
+;------------
+cost		      		= 2000
+value					= -30
+
+cam_dispersion              = -0.15		;0.1
+cam_dispersion_inc         	= -0.08		;0.6
+cam_step_angle_horz        	= -0.2		;0.6
+
+zoom_cam_dispersion          = -0.08	;0.1
+zoom_cam_dispersion_inc      = -0.03	;0.5
+zoom_cam_step_angle_horz     = -0.1	;0.5
+
+[up_sect_fourta_vintorez]
+;Оптика 4.0икс
+;------------------
+cost		      		= 1500
+
+scope_zoom_factor       = -5  
+
+[up_sect_fourtc_vintorez]
+;Контрастный прицел
+;------------------
+cost		      		= 3000
+
+scope_nightvision = scope_contrast
+
+[up_sect_fourte_vintorez]
+;ПНВ
+;------------------
+cost		      		= 4500
+
+scope_nightvision = scope_nightvision
+
+[up_sect_fourtf_vintorez]
+;Тепловизор
+;------------------
+cost		      		= 10000
+
+scope_alive_detector = scope_detector
+
+[up_firsta_vintorez]
+scheme_index            = 0, 0
+known                   = 1
+effects                 = up_gr_firstcd_vintorez
+section                 = up_sect_firsta_vintorez
+property                = prop_reliability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_auto_a2_name
+description             = st_up_auto_a2_descr
+icon                    = ui_inGame2_upgrade_Vintar_VS_1
+
+[up_firstc_vintorez]
+scheme_index            = 1, 0
+known                   = 1
+effects                 = up_gr_firstef_vintorez
+section                 = up_sect_firstc_vintorez
+property                = prop_recoil
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_auto_c1_name
+description             = st_up_auto_c1_descr
+icon                    = ui_inGame2_upgrade_Vintar_VS_2
+
+[up_firstd_vintorez]
+scheme_index            = 1, 1
+known                   = 1
+effects                 = up_gr_firstef_vintorez
+section                 = up_sect_firstd_vintorez
+property                = prop_bullet_speed
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_auto_b3_name
+description             = st_up_auto_b3_descr
+icon                    = ui_inGame2_upgrade_Vintar_VS_3
+
+[up_firste_vintorez]
+scheme_index            = 2, 0
+known                   = 1
+effects                 =
+section                 = up_sect_firste_vintorez
+property                = prop_inertion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_auto_c6_name
+description             = st_up_auto_c6_descr
+icon                    = ui_inGame2_upgrade_Vintar_VS_4
+
+[up_firstf_vintorez]
+scheme_index            = 2, 1
+known                   = 1
+effects                 =
+section                 = up_sect_firstf_vintorez
+property                = prop_dispersion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_auto_c5_name
+description             = st_up_auto_c5_descr
+icon                    = ui_inGame2_upgrade_Vintar_VS_5
+
+
+[up_secona_vintorez]
+scheme_index            = 0, 1
+known                   = 1
+effects                 = up_gr_seconcd_vintorez
+section                 = up_sect_secona_vintorez
+property                = prop_bullet_speed
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_ret_a1_name
+description             = st_up_ret_a1_descr
+icon                    = ui_inGame2_upgrade_Vintar_VS_6
+
+[up_seconc_vintorez]
+scheme_index            = 1, 2
+known                   = 1
+effects                 = up_gr_seconef_vintorez
+section                 = up_sect_seconc_vintorez
+property                = prop_reliability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_ret_b1_name
+description             = st_up_ret_b1_descr
+icon                    = ui_inGame2_upgrade_Vintar_VS_7
+
+[up_second_vintorez]
+scheme_index            = 1, 3
+known                   = 1
+effects                 = up_gr_seconef_vintorez
+section                 = up_sect_second_vintorez
+property                = prop_dispersion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_ret_b3_name
+description             = st_up_ret_b3_descr
+icon                    = ui_inGame2_upgrade_Vintar_VS_8
+
+[up_secone_vintorez]
+scheme_index            = 2, 2
+known                   = 1
+effects                 =
+section                 = up_sect_secone_vintorez
+property                = prop_bullet_speed
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_ret_c1_name
+description             = st_up_ret_c1_descr
+icon                    = ui_inGame2_upgrade_Vintar_VS_9
+
+
+
+
+[up_thirda_vintorez]
+scheme_index            = 0, 2
+known                   = 1
+effects                 = up_gr_thirdcd_vintorez
+section                 = up_sect_thirda_vintorez
+property                = prop_recoil
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_pri_a1_name
+description             = st_up_pri_a1_descr
+icon                    = ui_inGame2_upgrade_Vintar_VS_10
+
+[up_thirdc_vintorez]
+scheme_index            = 1, 4
+known                   = 1
+effects                 = up_gr_thirdef_vintorez
+section                 = up_sect_thirdc_vintorez
+property                = prop_inertion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_pri_b2_name
+description             = st_up_pri_b2_descr
+icon                    = ui_inGame2_upgrade_Vintar_VS_11
+
+[up_thirde_vintorez]
+scheme_index            = 2, 3
+known                   = 1
+effects                 =
+section                 = up_sect_thirde_vintorez
+property                = prop_inertion
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_pri_c3_name
+description             = st_up_pri_c3_descr
+icon                    = ui_inGame2_upgrade_Vintar_VS_12
+
+[up_thirdf_vintorez]
+scheme_index            = 2, 4
+known                   = 1
+effects                 =
+section                 = up_sect_thirdf_vintorez
+property                = prop_recoil
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_pri_c1_name
+description             = st_up_pri_c1_descr
+icon                    = ui_inGame2_upgrade_Vintar_VS_13
+
+
+[up_fourta_vintorez]
+scheme_index            = 0, 3
+known                   = 1
+effects                 = 
+section                 = up_sect_fourta_vintorez
+property                = prop_scope_5x
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_opt_a3_name
+description             = st_up_opt_a3_descr
+icon                    = ui_inGame2_upgrade_Vintar_VS_14
+
+[up_fourtc_vintorez]
+scheme_index            = 1, 5
+known                   = 1
+effects                 = 
+section                 = up_sect_fourtc_vintorez
+property                = prop_contrast
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_opt_b1_name
+description             = st_up_opt_b1_descr
+icon                    = ui_inGame2_upgrade_Vintar_VS_15
+
+[up_fourte_vintorez]
+scheme_index            = 2, 5
+known                   = 1
+effects                 =
+section                 = up_sect_fourte_vintorez
+property                = prop_nightvision
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_opt_c2_name
+description             = st_up_opt_c2_descr
+icon                    = ui_inGame2_upgrade_Vintar_VS_16
+
+[up_fourtf_vintorez]
+scheme_index            = 2, 6
+known                   = 1
+effects                 =
+section                 = up_sect_fourtf_vintorez
+property                = prop_autolockscope 
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_opt_c1_name
+description             = st_up_opt_c1_descr
+icon                    = ui_inGame2_upgrade_Vintar_VS_17
+
+
+
+[up_gr_firstab_vintorez]
+elements                = up_firsta_vintorez
+
+[up_gr_firstcd_vintorez]
+elements                = up_firstc_vintorez, up_firstd_vintorez
+
+[up_gr_firstef_vintorez]
+elements                = up_firste_vintorez, up_firstf_vintorez
+
+[up_gr_seconab_vintorez]
+elements                = up_secona_vintorez
+
+[up_gr_seconcd_vintorez]
+elements                = up_seconc_vintorez, up_second_vintorez
+
+[up_gr_seconef_vintorez]
+elements                = up_secone_vintorez
+
+
+[up_gr_thirdab_vintorez]
+elements                = up_thirda_vintorez
+
+[up_gr_thirdcd_vintorez]
+elements                = up_thirdc_vintorez
+
+[up_gr_thirdef_vintorez]
+elements                = up_thirde_vintorez, up_thirdf_vintorez
+
+[up_gr_fourtab_vintorez]
+elements                = up_fourta_vintorez
+
+[up_gr_fourtcd_vintorez]
+elements                = up_fourtc_vintorez
+
+[up_gr_fourtef_vintorez]
+elements                = up_fourte_vintorez, up_fourtf_vintorez

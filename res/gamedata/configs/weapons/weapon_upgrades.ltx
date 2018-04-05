@@ -1,0 +1,524 @@
+[upgrade_section_a]
+cost		      		= 17
+ammo_mag_size			= 4777
+hit_power               = 0.71, 0.72, 0.73, 0.74
+bullet_speed        	= 6100
+rpm                     = 6000
+
+[upgrade_section_b]
+cost		      		= 51
+hit_power               = 0.81
+
+[upgrade_section_c]
+cost		      		= 51
+hit_power               = 0.82
+ammo_limit              = 1589
+rpm                     = 1000
+hit_impulse             = 45
+
+[upgrade_section_d]
+cost		      		= 51
+hit_power               = 0.83
+
+[upgrade_section_e]
+cost		      		= 51
+hit_power               = 0.84
+
+[upgrade_section_f]
+cost		      		= 51
+hit_power               = 0.85
+
+[upgrade_section_g]
+cost	      	     	= 51
+hit_power               = 0.86
+
+[upgrade_section_h]
+cost		      		= 51
+hit_power               = 0.87
+
+[upgrade_section_i]
+cost		      		= 52
+hit_power               = 0.88
+rpm                     = 1105
+
+[upgrade_section_j]
+cost		      		= 53
+hit_power               = 0.89
+
+
+[upgrade_section_ac]
+cost		      		= 44
+
+[upgrade_section_bd]
+cost		      		= 51
+
+[upgrade_section_eg]
+cost		      		= 51
+
+[upgrade_section_fh]
+cost		      		= 8851
+
+[upgrade_section_i2]
+cost		      		= 61
+
+[upgrade_section_j2]
+cost		      		= 62
+
+[upgrade_section_aceg]
+cost		      		= 77751
+
+[upgrade_section_bdfh]
+cost		      		= 151
+
+[upgrade_section_i3]
+cost		      		= 151
+
+[upgrade_section_j3]
+cost		      		= 151
+
+[upgrade_a]
+scheme_index            = 0, 0
+known                   = 1
+effects                 = upgrade_group_exclusive_ac
+section                 = upgrade_section_a
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = money(1000), item(habar)
+name                    = st_upgrade_name_a
+description             = "st_description_a inventory_upgrades prereq _tooltip _functor_a in ventory_ upgrades. prereq_t oolti p_functor_a inven tory_upgrades. prereq_to oltip_functor_a inventory_upgrade .prereq_tooltip_functor_a inventory_up rades .prereq_tooltip_functor_a inventor y_upgra des.p rer eq_tooltip_ functor_a invento ry_up grades.pre req_toolti p_functor_a"
+icon                    = ui_temp_item_01  ;;icon_string_from_xml
+
+[upgrade_b]
+scheme_index            = 0, 1
+known                   = 1
+effects                 = upgrade_group_exclusive_bd
+section                 = upgrade_section_b
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = money(1000), item(habar)
+name                    = st_upgrade_name_b
+description             = st_description_b
+icon                    = ui_temp_item_02
+
+[upgrade_c]
+scheme_index            = 0, 2
+known                   = 1
+effects                 = upgrade_group_exclusive_ac
+section                 = upgrade_section_c
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = money(1000), item(habar)
+name                    = st_upgrade_name_c
+description             = st_description_c
+icon                    = ui_temp_item_03
+
+[upgrade_d]
+scheme_index            = 0, 3
+known                   = 0
+effects                 = upgrade_group_exclusive_bd
+section                 = upgrade_section_d
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = money(1000), item(habar)
+name                    = st_upgrade_name_d
+description             = st_description_d
+icon                    = ui_temp_item_02
+
+[upgrade_e]
+scheme_index            = 0, 4
+known                   = 1
+effects                 = upgrade_group_exclusive_eg
+section                 = upgrade_section_e
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = money(1000), item(habar)
+name                    = st_upgrade_name_e
+description             = st_description_e
+icon                    = ui_temp_item_01
+
+[upgrade_f]
+scheme_index            = 0, 5
+known                   = 0
+effects                 = upgrade_group_exclusive_fh
+section                 = upgrade_section_f
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = money(1000), item(habar)
+name                    = st_upgrade_name_f
+description             = st_description_f
+icon                    = ui_temp_item_03
+
+[upgrade_g]
+scheme_index            = 0, 6
+known                   = 1
+effects                 = upgrade_group_exclusive_eg
+section                 = upgrade_section_g
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = money(1000), item(habar)
+name                    = st_upgrade_name_g
+description             = st_description_g
+icon                    = ui_temp_item_01
+
+[upgrade_h]
+scheme_index            = 0, 7
+known                   = 0
+effects                 = upgrade_group_exclusive_fh
+section                 = upgrade_section_h
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here_h
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = money(1000), item(habar)
+name                    = st_upgrade_name_h
+description             = st_description_h
+icon                    = ui_temp_item_02
+
+[upgrade_i]
+scheme_index            = 0, 8
+known                   = 1
+effects                 = upgrade_group_exclusive_i2
+section                 = upgrade_section_i
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = money(1000), item(habar)
+name                    = st_upgrade_name_i
+description             = st_description_i
+icon                    = ui_temp_item_01
+
+[upgrade_j]
+scheme_index            = 0, 9
+known                   = 0
+effects                 = upgrade_group_exclusive_j2
+section                 = upgrade_section_j
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = money(1000), item(habar)
+name                    = st_upgrade_name_j
+description             = st_description_j
+icon                    = ui_temp_item_03
+
+
+[upgrade_ac]
+scheme_index            = 1, 0
+known                   = 1
+effects                 = upgrade_group_exclusive_aceg
+section                 = upgrade_section_ac
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = money(1000), item(habar)
+name                    = st_upgrade_name_ac
+description             = st_description_ac
+icon                    = ui_temp_item_03
+
+[upgrade_bd]
+scheme_index            = 1, 1
+known                   = 0
+effects                 = upgrade_group_exclusive_bdfh
+section                 = upgrade_section_bd
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = money(1000), item(habar)
+name                    = st_upgrade_name_bd
+description             = st_description_bd
+icon                    = ui_temp_item_02
+
+[upgrade_eg]
+scheme_index            = 1, 2
+effects                 = upgrade_group_exclusive_aceg
+section                 = upgrade_section_eg
+
+known                   = 1
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = money(1000), item(habar)
+name                    = st_upgrade_name_eg
+description             = st_description_eg
+icon                    = ui_temp_item_01
+
+[upgrade_fh]
+scheme_index            = 1, 3
+effects                 = upgrade_group_exclusive_bdfh
+section                 = upgrade_section_fh
+
+known                   = 1
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = money(1000), item(habar)
+name                    = st_upgrade_name_fh
+description             = st_description_fh
+icon                    = ui_temp_item_02
+
+[upgrade_i2]
+scheme_index            = 1, 4
+effects                 = upgrade_group_exclusive_i3
+section                 = upgrade_section_i2
+
+known                   = 0
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = money(1000), item(habar)
+name                    = st_upgrade_name_i2
+description             = st_description_2
+icon                    = ui_temp_item_03
+
+[upgrade_j2]
+scheme_index            = 1, 5
+effects                 = upgrade_group_exclusive_j3
+section                 = upgrade_section_j2
+
+known                   = 1
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = money(1000), item(habar)
+name                    = st_upgrade_name_j2
+description             = "st_description_j2fff"
+icon                    = ui_temp_item_02
+
+
+
+[upgrade_aceg]
+scheme_index            = 2, 0
+effects                 =
+section                 = upgrade_section_aceg
+
+known                   = 1
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = money(1000), item(habar)
+name                    = st_upgrade_name_aceg
+description             = st_description_aceg
+icon                    = ui_temp_item_03
+
+[upgrade_bdfh]
+scheme_index            = 2, 1
+effects                 =
+section                 = upgrade_section_bdfh
+
+known                   = 0
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = money(1000), item(habar)
+name                    = st_upgrade_name_bdfh
+description             = st_description_bdfh
+icon                    = ui_temp_item_02
+
+[upgrade_i3]
+scheme_index            = 2, 2
+effects                 =
+section                 = upgrade_section_i3
+
+known                   = 0
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = money(1000), item(habar)
+name                    = st_upgrade_name_i3
+description             = st_description_i3
+icon                    = ui_temp_item_01
+
+[upgrade_j3]
+scheme_index            = 2, 3
+effects                 =
+section                 = upgrade_section_j3
+
+known                   = 0
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = money(1000), item(habar)
+name                    = st_upgrade_name_j3
+description             = st_description_j3
+icon                    = ui_temp_item_02
+
+
+[upgrade_group_exclusive_ab]
+elements                = upgrade_a, upgrade_b
+
+[upgrade_group_exclusive_cd]
+elements                = upgrade_c, upgrade_d
+
+[upgrade_group_exclusive_ef]
+elements                = upgrade_e, upgrade_f
+
+[upgrade_group_exclusive_gh]
+elements                = upgrade_g, upgrade_h
+
+[upgrade_group_exclusive_i]
+elements                = upgrade_i
+
+[upgrade_group_exclusive_j]
+elements                = upgrade_j
+
+
+[upgrade_group_exclusive_ac]
+elements                = upgrade_ac
+
+[upgrade_group_exclusive_bd]
+elements                = upgrade_bd
+
+[upgrade_group_exclusive_eg]
+elements                = upgrade_eg
+
+[upgrade_group_exclusive_fh]
+elements                = upgrade_fh
+
+[upgrade_group_exclusive_i2]
+elements                = upgrade_i2
+
+[upgrade_group_exclusive_j2]
+elements                = upgrade_j2
+
+[upgrade_group_exclusive_aceg]
+elements                = upgrade_aceg
+
+[upgrade_group_exclusive_bdfh]
+elements                = upgrade_bdfh
+
+[upgrade_group_exclusive_i3]
+elements                = upgrade_i3
+
+[upgrade_group_exclusive_j3]
+elements                = upgrade_j3
+
+;[weapon_section]
+;upgrades                = upgrade_group_exclusive_ab, upgrade_group_exclusive_cd, upgrade_group_exclusive_ef, upgrade_group_exclusive_gh, upgrade_group_exclusive_i, upgrade_group_exclusive_j
+;installed_upgrades      = upgrade_c, upgrade_a
+;upgrade_scheme          = upgrade_scheme_u20
+
