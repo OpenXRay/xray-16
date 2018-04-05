@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="base.cpp" />
+    <ClCompile Include="lfs.c" />
+    <ClCompile Include="lmarshal.c" />
+    <ClCompile Include="script_additional_libs.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="lfs.h" />
+    <ClInclude Include="lmarshal.h" />
+    <ClInclude Include="script_additional_libs.h" />
+  </ItemGroup>
+</Project>

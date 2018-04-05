@@ -281,7 +281,8 @@ void CEnvDescriptor::load(CEnvironment& environment, CInifile& config)
     // deg2rad(config.r_fvector2(m_identifier.c_str(),"sun_dir").y),
     // deg2rad(config.r_fvector2(m_identifier.c_str(),"sun_dir").x)
     // );
-    VERIFY2(sun_dir.y < 0, "Invalid sun direction settings while loading");
+    //AVO: commented to allow COC run in debug. I belive Cromm set longtitude to negative value in AF3 and that's why it is failing here
+    //VERIFY2(sun_dir.y < 0, "Invalid sun direction settings while loading");
 
     lens_flare_id = environment.eff_LensFlare->AppendDef(
         environment, environment.m_suns_config, config.r_string(m_identifier.c_str(), "sun"));

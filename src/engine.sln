@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2024
+VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 14.0.25420.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "utils", "utils", "{89F6A7EE-3BBE-45D3-A8A8-5D9366CD987B}"
 EndProject
@@ -261,6 +261,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrECore", "editors\xrECore\xrECore.vcxproj", "{87D068EC-1789-4F09-A9EC-54CF276955E0}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xrEditor", "editors\xrEditor\xrEditor.vcxproj", "{BE4B23E7-2CA8-4607-A473-116C4242F23D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua_extensions", "..\Externals\lua-extensions\lua_extensions.vcxproj", "{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1211,6 +1213,16 @@ Global
 		{BE4B23E7-2CA8-4607-A473-116C4242F23D}.Release|x64.Build.0 = Release|x64
 		{BE4B23E7-2CA8-4607-A473-116C4242F23D}.Release|x86.ActiveCfg = Release|Win32
 		{BE4B23E7-2CA8-4607-A473-116C4242F23D}.Release|x86.Build.0 = Release|Win32
+		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Debug|x64.ActiveCfg = Debug|x64
+		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Debug|x64.Build.0 = Debug|x64
+		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Debug|x86.ActiveCfg = Debug|x64
+		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Mixed|x64.ActiveCfg = Mixed|x64
+		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Mixed|x64.Build.0 = Mixed|x64
+		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Mixed|x86.ActiveCfg = Release|x64
+		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Mixed|x86.Build.0 = Release|x64
+		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Release|x64.ActiveCfg = Release|x64
+		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Release|x64.Build.0 = Release|x64
+		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE}.Release|x86.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1289,6 +1301,7 @@ Global
 		{3AF44175-2EED-3C67-B324-93B1572B7EDD} = {8F5855A5-9F00-40E5-8B2A-EBDB4A31077D}
 		{87D068EC-1789-4F09-A9EC-54CF276955E0} = {CB0C814D-FB4E-453B-B7A0-716F4A1EACA4}
 		{BE4B23E7-2CA8-4607-A473-116C4242F23D} = {CB0C814D-FB4E-453B-B7A0-716F4A1EACA4}
+		{44F716E7-05BD-4390-AB02-5F7DAF7FEFDE} = {2BFC806B-CE92-4EA4-8FE8-5F2EA54BA348}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C5A32302-94F5-41B8-9606-017BB6BA69A6}
