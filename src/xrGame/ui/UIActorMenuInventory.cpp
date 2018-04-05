@@ -539,8 +539,6 @@ bool CUIActorMenu::ToSlot(CUICellItem* itm, bool force_place, u16 slot_id)
     if (m_pActorInvOwner->inventory().CanPutInSlot(iitem, slot_id))
     {
         CUIDragDropListEx* new_owner = GetSlotList(slot_id);
-
-        //Alundaio
         if (!new_owner)
             return true;
 
@@ -569,6 +567,9 @@ bool CUIActorMenu::ToSlot(CUICellItem* itm, bool force_place, u16 slot_id)
             old_owner->SetItem(child);
         }
 
+        if (!new_owner->CanSetItem(i))
+            return ToSlot(i, true, slot_id);
+
         new_owner->SetItem(i);
 
         SendEvent_Item2Slot(iitem, m_pActorInvOwner->object_id(), slot_id);
@@ -590,6 +591,31 @@ bool CUIActorMenu::ToSlot(CUICellItem* itm, bool force_place, u16 slot_id)
         if (m_pActorInvOwner->inventory().SlotIsPersistent(slot_id) && slot_id != DETECTOR_SLOT)
             return false;
 
+#ifdef COC_SLOTS
+        if (slot_id == INV_SLOT_2)
+        {
+            if (m_pActorInvOwner->inventory().CanPutInSlot(iitem, INV_SLOT_3) && !iitem->BaseSlot() == KNIFE_SLOT)
+                return ToSlot(itm, force_place, INV_SLOT_3);
+            if (m_pActorInvOwner->inventory().CanPutInSlot(iitem, KNIFE_SLOT))
+                return ToSlot(itm, force_place, KNIFE_SLOT);
+        }
+        else if (slot_id == INV_SLOT_3)
+        {
+            if (m_pActorInvOwner->inventory().CanPutInSlot(iitem, INV_SLOT_2))
+                return ToSlot(itm, force_place, INV_SLOT_2);
+        }
+        else if (slot_id == KNIFE_SLOT)
+        {
+            if (m_pActorInvOwner->inventory().CanPutInSlot(iitem, INV_SLOT_2))
+                return ToSlot(itm, force_place, INV_SLOT_2);
+        }
+
+        CUIDragDropListEx* slot_list;
+        if (CUIDragDropListEx::m_drag_item && CUIDragDropListEx::m_drag_item->BackList())
+            slot_list = CUIDragDropListEx::m_drag_item->BackList();
+        else
+            slot_list = GetSlotList(slot_id);
+#else
         if (slot_id == INV_SLOT_2 && m_pActorInvOwner->inventory().CanPutInSlot(iitem, INV_SLOT_3))
             return ToSlot(itm, force_place, INV_SLOT_3);
 
@@ -597,22 +623,25 @@ bool CUIActorMenu::ToSlot(CUICellItem* itm, bool force_place, u16 slot_id)
             return ToSlot(itm, force_place, INV_SLOT_2);
 
         CUIDragDropListEx* slot_list = GetSlotList(slot_id);
+#endif
         if (!slot_list)
             return false;
 
         const PIItem _iitem = m_pActorInvOwner->inventory().ItemFromSlot(slot_id);
 
-        CUIDragDropListEx* invlist = GetListByType(iActorBag);
-        if (invlist != slot_list)
+        if (slot_list != GetListByType(iActorBag))
         {
             if (!slot_list->ItemsCount() == 1)
                 return false;
 
             CUICellItem* slot_cell = slot_list->GetItemIdx(0);
-            if (!(slot_cell && static_cast<PIItem>(slot_cell->m_pData) == _iitem))
+            if (!slot_cell)
                 return false;
 
-            if (ToBag(slot_cell, false) == false)
+            if (static_cast<PIItem>(slot_cell->m_pData) != _iitem)
+                return false;
+
+            if (!ToBag(slot_cell, false))
                 return false;
         }
         else
@@ -636,14 +665,19 @@ bool CUIActorMenu::ToSlot(CUICellItem* itm, bool force_place, u16 slot_id)
             return ToSlot(itm, false, slot_id);
         }
 
-        bool result = ToSlot(itm, false, slot_id);
-        if (b_own_item && result && slot_id == DETECTOR_SLOT)
+        if (b_own_item && slot_id == DETECTOR_SLOT)
         {
-            CCustomDetector* det = smart_cast<CCustomDetector*>(iitem);
-            det->ToggleDetector(g_player_hud->attached_item(0) != NULL);
+            if (ToSlot(itm, false, slot_id))
+            {
+                CCustomDetector* det = smart_cast<CCustomDetector*>(iitem);
+                if (det)
+                    det->ToggleDetector(g_player_hud->attached_item(0) != NULL);
+                return true;
+            }
+            return false;
         }
 
-        return result;
+        return ToSlot(itm, false, slot_id);
     }
 }
 
