@@ -104,6 +104,7 @@ ENGINE_API extern float g_console_sensitive;
 
 //Alundaio
 extern BOOL g_ai_die_in_anomaly;
+extern BOOL g_invert_zoom;
 int g_inv_highlight_equipped = 0;
 //-Alundaio
 
@@ -2113,6 +2114,7 @@ void CCC_RegisterCommands()
     CMD4(CCC_Integer, "ai_use_old_vision", &g_ai_use_old_vision, 0, 1);
 
     CMD4(CCC_Integer, "ai_die_in_anomaly", &g_ai_die_in_anomaly, 0, 1); //Alundaio
+    CMD4(CCC_Integer, "g_invert_zoom", &g_invert_zoom, 0, 1); //Alundaio
 
     CMD4(CCC_Float, "ai_aim_predict_time", &g_aim_predict_time, 0.f, 10.f);
 

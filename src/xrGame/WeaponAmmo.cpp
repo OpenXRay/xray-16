@@ -17,8 +17,10 @@ CCartridge::CCartridge()
 {
     m_flags.assign(cfTracer | cfRicochet);
     m_ammoSect = NULL;
+    m_InvShortName = NULL;
     param_s.Init();
     bullet_material_idx = u16(-1);
+    m_4to1_tracer = false;
 }
 
 void CCartridge::Load(LPCSTR section, u8 LocalAmmoType)
@@ -34,6 +36,7 @@ void CCartridge::Load(LPCSTR section, u8 LocalAmmoType)
     param_s.kAP = pSettings->r_float(section, "k_ap");
     param_s.u8ColorID = READ_IF_EXISTS(pSettings, r_u8, section, "tracer_color_ID", 0);
 
+    param_s.kBulletSpeed = READ_IF_EXISTS(pSettings, r_float, section, "k_bullet_speed", 1.0f);
     if (pSettings->line_exist(section, "k_air_resistance"))
         param_s.kAirRes = pSettings->r_float(section, "k_air_resistance");
     else
@@ -89,7 +92,14 @@ float CCartridge::Weight() const
     return res;
 }
 
-CWeaponAmmo::CWeaponAmmo(void) {}
+CWeaponAmmo::CWeaponAmmo(void)
+{
+    m_4to1_tracer = false;
+    m_boxSize = 0;
+    m_boxCurr = 0;
+    cartridge_param.Init();
+}
+
 CWeaponAmmo::~CWeaponAmmo(void) {}
 void CWeaponAmmo::Load(LPCSTR section)
 {
@@ -112,6 +122,8 @@ void CWeaponAmmo::Load(LPCSTR section)
 
     if (pSettings->line_exist(section, "4to1_tracer"))
         m_4to1_tracer = !!pSettings->r_bool(section, "4to1_tracer");
+
+    cartridge_param.kBulletSpeed = READ_IF_EXISTS(pSettings, r_float, section, "k_bullet_speed", 1.0f);
 
     cartridge_param.buckShot = pSettings->r_s32(section, "buck_shot");
     cartridge_param.impair = pSettings->r_float(section, "impair");

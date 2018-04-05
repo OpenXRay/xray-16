@@ -136,7 +136,7 @@ void CActor::PickupModeUpdate()
     }
 
     CInventoryItem* pPickUpItem = smart_cast<CInventoryItem*>(m_pObjectWeLookingAt);
-    if (!pPickUpItem)
+    if (!pPickUpItem || !pPickUpItem->Useful() || !pPickUpItem->CanTake())
         return;
     
     if (Level().m_feel_deny.is_object_denied(m_pObjectWeLookingAt))

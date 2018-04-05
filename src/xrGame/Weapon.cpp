@@ -521,6 +521,9 @@ BOOL CWeapon::net_Spawn(CSE_Abstract* DC)
     SetState(E->wpn_state);
     SetNextState(E->wpn_state);
 
+    if (!m_ammoTypes[m_ammoType])
+        m_ammoType = 0;
+
     m_DefaultCartridge.Load(m_ammoTypes[m_ammoType].c_str(), m_ammoType);
     if (iAmmoElapsed)
     {
@@ -910,6 +913,7 @@ void CWeapon::UpdatePosition(const Fmatrix& trans)
     VERIFY(!fis_zero(DET(renderable.xform)));
 }
 
+BOOL g_invert_zoom = 0;
 bool CWeapon::Action(u16 cmd, u32 flags)
 {
     if (inherited::Action(cmd, flags))
@@ -977,10 +981,20 @@ bool CWeapon::Action(u16 cmd, u32 flags)
     case kWPN_ZOOM_DEC:
         if (IsZoomEnabled() && IsZoomed() && (flags&CMD_START) )
         {
-            if (cmd == kWPN_ZOOM_INC)
-                ZoomInc();
+            if (g_invert_zoom == 0)
+            {
+                if (cmd == kWPN_ZOOM_INC)
+                    ZoomInc();
+                else
+                    ZoomDec();
+            }
             else
-                ZoomDec();
+            {
+                if (cmd == kWPN_ZOOM_INC)
+                    ZoomDec();
+                else
+                    ZoomInc();
+            }
             return true;
         }
         else

@@ -67,7 +67,10 @@ CScriptGameObject* ActorMenuGetPartner_script(CUIActorMenu* menu)
 {
     CInventoryOwner* io = menu->GetPartner();
     if (io)
-        return io->cast_game_object()->lua_game_object();
+    {
+        CGameObject* GO = smart_cast<CGameObject*>(io);
+        return GO->lua_game_object();
+    }
 
     return (0);
 }
@@ -76,7 +79,10 @@ CScriptGameObject* ActorMenuGetInvbox_script(CUIActorMenu* menu)
 {
     CInventoryBox* inv_box = menu->GetInvBox();
     if (inv_box)
-        return inv_box->cast_game_object()->lua_game_object();
+    {
+        CGameObject* GO = smart_cast<CGameObject*>(inv_box);
+        return GO->lua_game_object();
+    }
 
     return (0);
 }
@@ -221,7 +227,7 @@ void CUIActorMenu::HighlightSectionInSlot(pcstr section, u8 type, u16 slot_id /*
     m_highlight_clear = false;
 }
 
-void CUIActorMenu::HighlightForEachInSlot(functor<bool> functor, u8 type, u16 slot_id)
+void CUIActorMenu::HighlightForEachInSlot(const luabind::functor<bool>& functor, u8 type, u16 slot_id)
 {
     if (!functor)
         return;
