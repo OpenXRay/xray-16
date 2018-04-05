@@ -49,6 +49,7 @@ public:
     virtual bool is_useful(const CDangerObject& object) const;
     virtual float evaluate(const CDangerObject& object) const;
     virtual float do_evaluate(const CDangerObject& object) const;
+    void remove(const CDangerObject &object);
     void remove_links(const IGameObject* object);
     IC void reset();
 

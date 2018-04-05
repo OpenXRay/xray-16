@@ -3,7 +3,7 @@
 
 struct HUD_SOUND_ITEM
 {
-    HUD_SOUND_ITEM() : m_activeSnd(NULL), m_b_exclusive(false) {}
+    HUD_SOUND_ITEM() : m_activeSnd(NULL), m_b_exclusive(false), m_alias(NULL) {}
     static void LoadSound(LPCSTR section, LPCSTR line, ref_sound& hud_snd, int type = sg_SourceType,
         float* volume = NULL, float* delay = NULL);
 
@@ -57,6 +57,7 @@ public:
     ~HUD_SOUND_COLLECTION();
 
 #ifdef LAYERED_SND_SHOOT
+    HUD_SOUND_COLLECTION() :m_alias(NULL) {};
     shared_str m_alias; //Alundaio: For use when it's part of a layered Collection
 #endif
 

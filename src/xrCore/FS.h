@@ -342,7 +342,13 @@ protected:
     int iterpos;
 
 public:
-    IC IReader() { Pos = 0; }
+    IC IReader()
+    {
+        data = NULL;
+        Size = 0;
+        iterpos = 0;
+        Pos = 0;
+    }
     virtual ~IReader() {}
     IC IReader(void* _data, int _size, int _iterpos = 0)
     {

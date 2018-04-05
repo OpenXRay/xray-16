@@ -518,7 +518,7 @@ void CUIMapWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
     {
         luabind::functor<void> funct;
         if (GEnv.ScriptEngine->functor("pda.property_box_clicked", funct))
-            funct(m_UIPropertiesBox/*,m_cur_location*/); //TODO: Fix m_cur_location
+            funct(m_UIPropertiesBox, m_cur_location);
 #ifdef COC_USER_SPOT
         //-----------------------
         switch (m_UIPropertiesBox->GetClickedItem()->GetTAG())
@@ -557,7 +557,7 @@ void CUIMapWnd::ActivatePropertiesBox(CUIWindow* w)
     luabind::functor<void> funct;
     if (GEnv.ScriptEngine->functor("pda.property_box_add_properties", funct))
     {
-        funct(m_UIPropertiesBox, m_cur_location->ObjectID(), (LPCSTR)m_cur_location->GetLevelName().c_str() /*,m_cur_location*/); //TODO: Fix m_cur_location
+        funct(m_UIPropertiesBox, m_cur_location->ObjectID(), (LPCSTR)m_cur_location->GetLevelName().c_str(), m_cur_location);
     }
 
     // Только для меток игрока

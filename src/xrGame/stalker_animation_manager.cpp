@@ -23,9 +23,9 @@
 //    * script
 
 CStalkerAnimationManager::CStalkerAnimationManager(CAI_Stalker* object)
-    : m_object(object), m_global(object), m_head(object), m_torso(object), m_legs(object), m_script(object),
-      m_start_new_script_animation(false)
+    : m_object(object), m_global(object), m_head(object), m_torso(object), m_legs(object), m_script(object)
 {
+    reinit();
 }
 
 void CStalkerAnimationManager::reinit()
@@ -33,6 +33,7 @@ void CStalkerAnimationManager::reinit()
     m_direction_start = 0;
     m_current_direction = eMovementDirectionForward;
     m_target_direction = eMovementDirectionForward;
+    m_previous_speed_direction = eMovementDirectionForward;
 
     m_change_direction_time = 0;
     m_looking_back = 0;
@@ -55,12 +56,17 @@ void CStalkerAnimationManager::reinit()
     m_script.global_animation(true);
 
     m_call_script_callback = false;
+    m_call_global_callback = false;
+    m_start_new_script_animation = false;
 
     m_previous_speed = 0.f;
     m_target_speed = 0.f;
-    m_last_non_zero_speed = m_target_speed;
+    m_last_non_zero_speed = 0.f;
 
     m_special_danger_move = false;
+
+    m_crouch_state_config = 0;
+    m_crouch_state = 0;
 }
 
 void CStalkerAnimationManager::reload()

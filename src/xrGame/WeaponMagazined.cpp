@@ -54,6 +54,9 @@ CWeaponMagazined::CWeaponMagazined(ESoundTypes eSoundType) : CWeapon()
     m_fOldBulletSpeed = 0.f;
     m_iQueueSize = WEAPON_ININITE_QUEUE;
     m_bLockType = false;
+    m_bHasDifferentFireModes = false;
+    m_iCurFireMode = -1;
+    m_iPrefferedFireMode = -1;
 }
 
 CWeaponMagazined::~CWeaponMagazined()

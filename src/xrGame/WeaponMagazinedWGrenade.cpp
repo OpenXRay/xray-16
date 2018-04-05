@@ -21,6 +21,8 @@ CWeaponMagazinedWGrenade::CWeaponMagazinedWGrenade(ESoundTypes eSoundType) : CWe
 {
     m_ammoType2 = 0;
     m_bGrenadeMode = false;
+    iMagazineSize2 = 0;
+    iAmmoElapsed2 = 0;
 }
 
 CWeaponMagazinedWGrenade::~CWeaponMagazinedWGrenade() {}

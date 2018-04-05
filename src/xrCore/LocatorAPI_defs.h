@@ -66,7 +66,7 @@ struct XRCORE_API FS_File
     void set(const xr_string& nm, long sz, time_t modif, unsigned attr);
 
 public:
-    FS_File() {}
+    FS_File() { attrib = 0; time_write = 0; size = 0; }
     FS_File(const xr_string& nm);
     FS_File(const _FINDDATA_T& f);
     FS_File(const xr_string& nm, const _FINDDATA_T& f);
