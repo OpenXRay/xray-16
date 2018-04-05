@@ -157,6 +157,9 @@ str_value* str_container::dock(pcstr value)
     // calc len
     u32 s_len = xr_strlen(value);
     u32 s_len_with_zero = (u32)s_len + 1;
+    if (sizeof(str_value) + s_len_with_zero >= 4096)
+        xrDebug::LogStackTrace("ERROR: sizeof(str_value) + s_len_with_zero >= 4096");
+
     VERIFY(sizeof(str_value) + s_len_with_zero < 4096);
 
     // setup find structure

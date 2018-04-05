@@ -159,11 +159,6 @@ void CUIActorMenu::Construct()
     m_takeall_button = UIHelper::Create3tButton(uiXml, "takeall_button", this);
     m_exit_button = UIHelper::Create3tButton(uiXml, "exit_button", this);
 
-    m_ActorStateInfo = new ui_actor_state_wnd();
-    m_ActorStateInfo->init_from_xml(uiXml, "actor_state_info");
-    m_ActorStateInfo->SetAutoDelete(true);
-    AttachChild(m_ActorStateInfo);
-
     //Alun: Dynamic UI slots bro
     for (u8 i = 0; i <= LAST_SLOT; ++i)
     {
@@ -209,6 +204,11 @@ void CUIActorMenu::Construct()
     }
     uiXml.SetLocalRoot(stored_root);
     //-Alun
+
+    m_ActorStateInfo = new ui_actor_state_wnd();
+    m_ActorStateInfo->init_from_xml(uiXml, "actor_state_info");
+    m_ActorStateInfo->SetAutoDelete(true);
+    AttachChild(m_ActorStateInfo);
 
     stored_root = uiXml.GetLocalRoot();
     uiXml.SetLocalRoot(uiXml.NavigateToNode("action_sounds", 0));

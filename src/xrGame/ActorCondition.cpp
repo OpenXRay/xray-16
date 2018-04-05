@@ -453,6 +453,9 @@ void CActorCondition::PowerHit(float power, bool apply_outfit)
 // weight - "удельный" вес от 0..1
 void CActorCondition::ConditionJump(float weight)
 {
+    if (GodMode())
+        return;
+
     float power = m_fJumpPower;
     power += m_fJumpWeightPower * weight * (weight > 1.f ? m_fOverweightJumpK : 1.f);
     m_fPower -= HitPowerEffect(power);

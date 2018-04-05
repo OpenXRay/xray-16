@@ -62,6 +62,7 @@ SCRIPT_EXPORT(CStalkerPlanner, (CScriptActionPlanner), {
                     luabind::value("property_anomaly", StalkerDecisionSpace::eWorldPropertyAnomaly),
                     luabind::value("property_inside_anomaly", StalkerDecisionSpace::eWorldPropertyInsideAnomaly),
                     luabind::value("property_pure_enemy", StalkerDecisionSpace::eWorldPropertyPureEnemy),
+                    luabind::value("property_in_smart_cover", StalkerDecisionSpace::eWorldPropertyInSmartCover),
                     luabind::value("property_script", StalkerDecisionSpace::eWorldPropertyScript)]
 
                 .enum_("action")[luabind::value("action_dead", StalkerDecisionSpace::eWorldOperatorDead),
@@ -149,6 +150,7 @@ SCRIPT_EXPORT(CStalkerPlanner, (CScriptActionPlanner), {
                     luabind::value("action_anomaly_planner", StalkerDecisionSpace::eWorldOperatorAnomalyPlanner),
                     luabind::value("action_danger_planner", StalkerDecisionSpace::eWorldOperatorDangerPlanner),
                     luabind::value("action_post_combat_wait", StalkerDecisionSpace::eWorldOperatorPostCombatWait),
+                    luabind::value("action_in_smart_cover", StalkerDecisionSpace::eWorldOperatorInSmartCover),
                     luabind::value("action_script", StalkerDecisionSpace::eWorldOperatorScript)]
 
                 .enum_("sounds")[luabind::value("sound_die", StalkerSpace::eStalkerSoundDie),

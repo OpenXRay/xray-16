@@ -377,7 +377,7 @@ void time::fill(XRay::Editor::property_holder_collection* collection)
     m_property_holder->add_property("direction", "wind", "this option is responsible for wind direction (in degrees)",
         wind_direction, float_getter, float_setter, -360.f, 360.f);
     m_property_holder->add_property("velocity", "wind",
-        "this option is responsible for wind velocity (meters per second)", wind_velocity, wind_velocity, 0.f, 1000.f);
+        "this option is responsible for wind velocity (meters per second)", wind_velocity, wind_velocity, 0.f, 100.f);
 }
 
 void time::lerp(CEnvironment* parent, CEnvDescriptor& A, CEnvDescriptor& B, float f, CEnvModifier& M, float m_power)

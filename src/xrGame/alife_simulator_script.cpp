@@ -349,20 +349,43 @@ bool dont_has_info(const CALifeSimulator* self, const ALife::_OBJECT_ID& id, LPC
     return (!has_info(self, id, info_id));
 }
 
+void AlifeGiveInfo(const CALifeSimulator *alife, const ALife::_OBJECT_ID &id, LPCSTR info_id)
+{
+    KNOWN_INFO_VECTOR *known_info = alife->registry(info_portions).object(id, true);
+    if (!known_info)
+        return;
+
+    if (std::find_if(known_info->begin(), known_info->end(), CFindByIDPred(info_id)) == known_info->end())
+    {
+        known_info->push_back(info_id);
+    }
+
+    return;
+}
+
+void AlifeRemoveInfo(const CALifeSimulator *alife, const ALife::_OBJECT_ID &id, LPCSTR info_id)
+{
+    KNOWN_INFO_VECTOR	*known_info = alife->registry(info_portions).object(id, true);
+    if (!known_info)
+        return;
+    known_info->erase(std::find_if(known_info->begin(), known_info->end(), CFindByIDPred(info_id)), known_info->end());
+}
+
 //Alundaio: teleport object
 void teleport_object(CALifeSimulator* alife, ALife::_OBJECT_ID id, GameGraph::_GRAPH_ID game_vertex_id, u32 level_vertex_id, const Fvector& position)
 {
     alife->teleport_object(id, game_vertex_id, level_vertex_id, position);
 }
 
-void IterateInfo(const CALifeSimulator* alife, const ALife::_OBJECT_ID& id, functor<void> functor)
+void IterateInfo(const CALifeSimulator* alife, const ALife::_OBJECT_ID& id, const luabind::functor<bool>& functor)
 {
     const auto known_info = registry(alife, id);
     if (!known_info)
         return;
 
     for (const auto& it : *known_info)
-        functor(id, it.c_str());
+        if (functor(id, it.c_str()) == true)
+            return;
 }
 
 CSE_Abstract* reprocess_spawn(CALifeSimulator* self, CSE_Abstract* object)
@@ -461,6 +484,8 @@ SCRIPT_EXPORT(CALifeSimulator, (), {
                          .def("actor", &get_actor)
                          .def("has_info", &has_info)
                          .def("dont_has_info", &dont_has_info)
+                         .def("give_info", &AlifeGiveInfo)
+                         .def("disable_info", &AlifeRemoveInfo)
                          .def("switch_distance", &CALifeSimulator::switch_distance)
                          .def("set_switch_distance", &CALifeSimulator::set_switch_distance) //Alundaio: renamed to set_switch_distance from switch_distance
                          //Alundaio: extend alife simulator exports

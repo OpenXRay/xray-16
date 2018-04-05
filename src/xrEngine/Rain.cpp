@@ -23,10 +23,10 @@ static const float sink_offset = -(max_distance - source_offset);
 static const float drop_length = 5.f;
 static const float drop_width = 0.30f;
 static const float drop_angle = 3.0f;
-static const float drop_max_angle = deg2rad(10.f);
-static const float drop_max_wind_vel = 20.0f;
+static const float drop_max_angle = deg2rad(89.f);
+static const float drop_max_wind_vel = 100.0f;
 static const float drop_speed_min = 40.f;
-static const float drop_speed_max = 80.f;
+static const float drop_speed_max = 85.f;
 
 const int max_particles = 1000;
 const int particles_cache = 400;
@@ -72,7 +72,7 @@ void CEffect_Rain::Born(Item& dest, float radius)
 {
     Fvector axis;
     axis.set(0, -1, 0);
-    float gust = g_pGamePersistent->Environment().wind_strength_factor / 10.f;
+    float gust = g_pGamePersistent->Environment().wind_strength_factor;
     float k = g_pGamePersistent->Environment().CurrentEnv->wind_velocity * gust / drop_max_wind_vel;
     clamp(k, 0.f, 1.f);
     float pitch = drop_max_angle * k - PI_DIV_2;
