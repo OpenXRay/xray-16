@@ -229,7 +229,7 @@ bool CScriptGameObject::IsInvUpgradeEnabled()
     return pInventoryOwner->IsInvUpgradeEnabled();
 }
 
-void CScriptGameObject::ForEachInventoryItems(const luabind::functor<void>& functor)
+void CScriptGameObject::ForEachInventoryItems(const luabind::functor<bool>& functor)
 {
     CInventoryOwner* owner = smart_cast<CInventoryOwner*>(&object());
     if (!owner)
@@ -249,7 +249,8 @@ void CScriptGameObject::ForEachInventoryItems(const luabind::functor<void>& func
         CGameObject* inv_go = smart_cast<CGameObject*>(*it);
         if (inv_go)
         {
-            functor(inv_go->lua_game_object(), this);
+            if (functor(inv_go->lua_game_object(), this) == true)
+                return;
         }
     }
 }
@@ -1810,14 +1811,15 @@ bool CScriptGameObject::HasUpgrade(pcstr upgrade) const
     return item->has_upgrade(upgrade);
 }
 
-void CScriptGameObject::IterateInstalledUpgrades(luabind::functor<void> functor)
+void CScriptGameObject::IterateInstalledUpgrades(const luabind::functor<bool>& functor)
 {
     CInventoryItem* Item = smart_cast<CInventoryItem*>(&object());
     if (!Item)
         return;
 
     for (auto upgrade : Item->get_upgrades())
-        functor(upgrade.c_str(), object().lua_game_object());
+        if (functor(upgrade.c_str(), object().lua_game_object()) == true)
+            return;
 }
 
 CScriptGameObject* CScriptGameObject::ItemOnBelt(u32 item_id) const

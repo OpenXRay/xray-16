@@ -37,7 +37,7 @@ LPCSTR CVertex__vertex_type(const CGameGraph::CVertex *vertex)
     const u8* vertex_type = vertex->vertex_type();
     char buffer[12];
     sprintf(buffer, "%d,%d,%d,%d", vertex_type[0], vertex_type[1], vertex_type[2], vertex_type[3]);
-    return buffer;
+    return &buffer[0];
 }
 
 GameGraph::LEVEL_MAP const& get_levels(CGameGraph const* graph)
@@ -60,6 +60,7 @@ SCRIPT_EXPORT(CGameGraph, (), {
             .def("valid_vertex_id", &CGameGraph::valid_vertex_id)
             .def("vertex", &CGameGraph::vertex)
             .def("vertex_id", &CGameGraph::vertex_id)
+            .def("distance", &CGameGraph::distance)
             .def("levels", &get_levels, return_stl_iterator()),
 
         class_<CVertex>("GameGraph__CVertex")

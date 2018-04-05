@@ -42,9 +42,9 @@ void CRender::level_Load(IReader* fs)
             xr_strcpy(n_tlist, delim + 1);
 
             //Alundaio: Fix Static Renderer issue with 'default' shader! Force change to 'def_shaders\def_vertex'
-            //if (xr_strcmp(n_sh, "default") == 0)
-            //    Shaders[i] = Resources->Create("def_shaders\\def_vertex", n_tlist);
-            //else
+            if (!xr_strcmp(n_sh, "default") && xr_strcmp(n_tlist, ","))
+                Shaders[i] = Resources->Create("def_shaders\\def_vertex", n_tlist);
+            else
                 Shaders[i] = Resources->Create(n_sh, n_tlist);
         }
         chunk->close();
