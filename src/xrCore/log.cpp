@@ -18,30 +18,34 @@ Lock logCS(MUTEX_PROFILE_ID(log));
 #else // CONFIG_PROFILE_LOCKS
 Lock logCS;
 #endif // CONFIG_PROFILE_LOCKS
-xr_vector<xr_string> LogFile;
+xr_vector<xr_string>* LogFile = nullptr;
 LogCallback LogCB = 0;
+
+// alpet: выставить в true если лог все же записывается плохо при вылете.
+// Слишком частая запись лога вредит SSD и снижает производительность.
+bool force_flush_log = false;
+// RvP
+IWriter* LogWriter;
+size_t cached_log = 0;
 
 void FlushLog()
 {
     if (!no_log)
     {
         logCS.Enter();
-        IWriter* f = FS.w_open(logFName);
-        if (f)
-        {
-            for (const auto &i : LogFile)
-            {
-                LPCSTR s = i.c_str();
-                f->w_string(s ? s : "");
-            }
-            FS.w_close(f);
-        }
+        if (LogWriter)
+            LogWriter->flush();
+        cached_log = 0;
         logCS.Leave();
     }
 }
 
+extern bool shared_str_initialized;
 void AddOne(const char* split)
 {
+    if (!LogFile)
+        return;
+
     logCS.Enter();
 
 #ifdef DEBUG
@@ -49,11 +53,38 @@ void AddOne(const char* split)
     OutputDebugString("\n");
 #endif
 
-    LogFile.push_back(split);
-
     // exec CallBack
     if (LogExecCB && LogCB)
         LogCB(split);
+
+    if (shared_str_initialized)
+        LogFile->push_back(split);
+
+    if (LogWriter)
+    {
+        switch (*split)
+        {
+        case 0x21:
+        case 0x23:
+        case 0x25:
+            split++; // пропустить первый символ, т.к. это вероятно цветовой тег
+            break;
+        }
+
+        char buf[64];
+        SYSTEMTIME lt;
+        GetLocalTime(&lt);
+
+        sprintf_s(buf, 64, "[%02d:%02d:%02d.%03d] ", lt.wHour, lt.wMinute, lt.wSecond, lt.wMilliseconds);
+        LogWriter->w_printf("%s%s\r\n", buf, split);
+        cached_log += xr_strlen(buf);
+        cached_log += xr_strlen(split) + 2;
+
+        if (force_flush_log || cached_log >= 32768)
+            FlushLog();
+
+        //-RvP
+    }
 
     logCS.Leave();
 }
@@ -184,10 +215,14 @@ LogCallback SetLogCB(const LogCallback& cb)
 
 LPCSTR log_name() { return (log_file_name); }
 
+void InitLog()
+{
+    R_ASSERT(LogFile == nullptr);
+    LogFile = new xr_vector<xr_string>();
+}
+
 void CreateLog(BOOL nl)
 {
-    LogFile.reserve(1000);
-
     no_log = nl;
     strconcat(sizeof(log_file_name), log_file_name, Core.ApplicationName, "_", Core.UserName, ".log");
     if (FS.path_exist("$logs$"))
@@ -199,18 +234,38 @@ void CreateLog(BOOL nl)
         FS.file_rename(logFName, backup_logFName.c_str(), true);
         //-Alun
 
-        IWriter* f = FS.w_open(logFName);
-        if (f == NULL)
+        LogWriter = FS.w_open(logFName);
+        if (LogWriter == NULL)
         {
             MessageBox(NULL, "Can't create log file.", "Error", MB_ICONERROR);
             abort();
         }
-        FS.w_close(f);
+
+        time_t t = time(NULL);
+        tm* ti = localtime(&t);
+        char buf[64];
+        strftime(buf, 64, "[%x %X]\t", ti);
+
+        for (u32 it = 0; it < LogFile->size(); it++)
+        {
+            LPCSTR s = (*LogFile)[it].c_str();
+            LogWriter->w_printf("%s%s\n", buf, s ? s : "");
+        }
+        LogWriter->flush();
     }
+
+    LogFile->reserve(128);
+
+    if (strstr(Core.Params, "-force_flushlog"))
+        force_flush_log = true;
 }
 
 void CloseLog(void)
 {
     FlushLog();
-    LogFile.clear();
+    if (LogWriter)
+        FS.w_close(LogWriter);
+
+    LogFile->clear();
+    xr_delete(LogFile);
 }

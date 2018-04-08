@@ -56,8 +56,10 @@ void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pc
         GetComputerName(CompName, &sz_comp);
 
         Memory._initialize();
+        
+        InitLog();
 
-        Msg("%s %s build %d, %s\n", "OpenXRay", GetBuildConfiguration(), buildId, buildDate);
+        Msg("%s %s build %d, %s", "OpenXRay", GetBuildConfiguration(), buildId, buildDate);
         Msg("command line %s\n", Params);
         _initialize_cpu();
         R_ASSERT(CPU::ID.hasFeature(CpuFeature::Sse));

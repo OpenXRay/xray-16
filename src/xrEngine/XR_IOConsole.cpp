@@ -329,7 +329,7 @@ void CConsole::OnRender()
     }
 
     // ---------------------
-    u32 log_line = LogFile.size() - 1;
+    u32 log_line = LogFile->size() - 1;
     ypos -= LDIST;
     for (int i = log_line - scroll_delta; i >= 0; --i)
     {
@@ -338,7 +338,7 @@ void CConsole::OnRender()
         {
             break;
         }
-        LPCSTR ls = LogFile[i].c_str();
+        LPCSTR ls = (*LogFile)[i].c_str();
 
         if (!ls)
         {
