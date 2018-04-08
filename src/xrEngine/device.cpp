@@ -34,6 +34,7 @@ ENGINE_API BOOL g_bRendering = FALSE;
 
 BOOL g_bLoaded = FALSE;
 ref_light precache_light = 0;
+int g_dwFPSlimit = 121;
 
 BOOL CRenderDevice::Begin()
 {
@@ -191,6 +192,18 @@ void CRenderDevice::on_idle()
         return;
     }
 
+    // FPS Lock
+    if (g_dwFPSlimit > 0)
+    {
+        static DWORD dwLastFrameTime = 0;
+        DWORD dwCurrentTime = timeGetTime();
+
+        if ((dwCurrentTime - dwLastFrameTime) < (1000 / g_dwFPSlimit))
+            return;
+
+        dwLastFrameTime = dwCurrentTime;
+    }
+
     const auto FrameStartTime = TimerGlobal.GetElapsed_ms();
 
     if (psDeviceFlags.test(rsStatistic))
@@ -227,20 +240,6 @@ void CRenderDevice::on_idle()
     mView_saved = mView;
     mProject_saved = mProject;
     syncProcessFrame.Set(); // allow secondary thread to do its job
-
-#ifdef ECO_RENDER // ECO_RENDER START
-    static u32 time_frame = 0;
-    u32 time_curr = timeGetTime();
-    u32 time_diff = time_curr - time_frame;
-    time_frame = time_curr;
-    u32 optimal = 10;
-    if (Device.Paused() || IGame_Persistent::IsMainMenuActive())
-        optimal = 32;
-    if (time_diff < optimal)
-        Sleep(optimal - time_diff);
-#else
-    Sleep(0);
-#endif // ECO_RENDER END
 
     if (!GEnv.isDedicatedServer)
     {
@@ -324,6 +323,19 @@ void CRenderDevice::Run()
     mt_bMustExit = FALSE;
     ShowWindow(m_hWnd, SW_SHOWNORMAL);
     thread_spawn(SecondaryThreadProc, "X-RAY Secondary thread", 0, this);
+
+    // Load FPS Lock
+    if (Core.ParamFlags.test(Core.nofpslock))
+        g_dwFPSlimit = -1;
+    else if (Core.ParamFlags.test(Core.fpslock60))
+        g_dwFPSlimit = 61;
+    else if (Core.ParamFlags.test(Core.fpslock120))
+        g_dwFPSlimit = 121;
+    else if (Core.ParamFlags.test(Core.fpslock144))
+        g_dwFPSlimit = 145;
+    else if (Core.ParamFlags.test(Core.fpslock240))
+        g_dwFPSlimit = 241;
+
     // Message cycle
     seqAppStart.Process(rp_AppStart);
     GEnv.Render->ClearTarget();

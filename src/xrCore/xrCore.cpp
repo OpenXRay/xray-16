@@ -108,6 +108,36 @@ void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pc
     init_counter++;
 }
 
+void xrCore::initParamFlags()
+{
+    if (strstr(Params, "-dbg"))
+        ParamFlags.set(ParamFlag::dbg, TRUE);
+
+    if (strstr(Params, "-dbgdev"))
+        ParamFlags.set(ParamFlag::dbgdev, TRUE);
+
+    if (strstr(Params, "-dbgact"))
+        ParamFlags.set(ParamFlag::dbgact, TRUE);
+
+    if (strstr(Params, "-dbganim"))
+        ParamFlags.set(ParamFlag::dbganim, TRUE);
+
+    if (strstr(Params, "-nofpslock"))
+        ParamFlags.set(ParamFlag::nofpslock, TRUE);
+
+    if (strstr(Params, "-fpslock60"))
+        ParamFlags.set(ParamFlag::fpslock60, TRUE);
+
+    if (strstr(Params, "-fpslock120"))
+        ParamFlags.set(ParamFlag::fpslock120, TRUE);
+
+    if (strstr(Params, "-fpslock144"))
+        ParamFlags.set(ParamFlag::fpslock144, TRUE);
+
+    if (strstr(Params, "-fpslock240"))
+        ParamFlags.set(ParamFlag::fpslock240, TRUE);
+}
+
 #ifndef _EDITOR
 #include "compression_ppmd_stream.h"
 extern compression::ppmd::stream* trained_model;

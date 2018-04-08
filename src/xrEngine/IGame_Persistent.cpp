@@ -19,7 +19,6 @@
 
 ENGINE_API IGame_Persistent* g_pGamePersistent = nullptr;
 
-//ECO_RENDER add
 bool IGame_Persistent::IsMainMenuActive()
 {
     return g_pGamePersistent && g_pGamePersistent->m_pMainMenu && g_pGamePersistent->m_pMainMenu->IsActive();

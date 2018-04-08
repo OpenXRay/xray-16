@@ -130,8 +130,22 @@ public:
     DWORD dwFrame;
     bool PluginMode;
 
+    Flags16 ParamFlags; //Alun: TODO: Add all params
+    enum ParamFlag {
+        dbg = (1 << 0),
+        dbgact = (1 << 1),
+        dbganim = (1 << 2),
+        dbgdev = (1 << 3),
+        fpslock60 = (1 << 4),
+        fpslock120 = (1 << 5),
+        fpslock144 = (1 << 6),
+        fpslock240 = (1 << 7),
+        nofpslock = (1 << 8),
+    };
+
     void Initialize(
         pcstr ApplicationName, LogCallback cb = nullptr, bool init_fs = true, pcstr fs_fname = nullptr, bool plugin = false);
+    void initParamFlags();
     void _destroy();
     const char* GetBuildDate() const { return buildDate; }
     u32 GetBuildId() const { return buildId; }
