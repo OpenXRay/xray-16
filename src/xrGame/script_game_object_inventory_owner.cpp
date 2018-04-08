@@ -229,7 +229,7 @@ bool CScriptGameObject::IsInvUpgradeEnabled()
     return pInventoryOwner->IsInvUpgradeEnabled();
 }
 
-void CScriptGameObject::ForEachInventoryItems(const luabind::functor<bool>& functor)
+void CScriptGameObject::ForEachInventoryItems(const luabind::functor<void>& functor)
 {
     CInventoryOwner* owner = smart_cast<CInventoryOwner*>(&object());
     if (!owner)
@@ -249,14 +249,13 @@ void CScriptGameObject::ForEachInventoryItems(const luabind::functor<bool>& func
         CGameObject* inv_go = smart_cast<CGameObject*>(*it);
         if (inv_go)
         {
-            if (functor(inv_go->lua_game_object(), this) == true)
-                return;
+            functor(inv_go->lua_game_object(), this);
         }
     }
 }
 
 // 1
-void CScriptGameObject::IterateInventory(luabind::functor<bool> functor, luabind::object object)
+void CScriptGameObject::IterateInventory(luabind::functor<void> functor, luabind::object object)
 {
     CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(&this->object());
     if (!inventory_owner)
@@ -271,7 +270,7 @@ void CScriptGameObject::IterateInventory(luabind::functor<bool> functor, luabind
 }
 
 #include "InventoryBox.h"
-void CScriptGameObject::IterateInventoryBox(luabind::functor<bool> functor, luabind::object object)
+void CScriptGameObject::IterateInventoryBox(luabind::functor<void> functor, luabind::object object)
 {
     CInventoryBox* inventory_box = smart_cast<CInventoryBox*>(&this->object());
     if (!inventory_box)
@@ -284,8 +283,7 @@ void CScriptGameObject::IterateInventoryBox(luabind::functor<bool> functor, luab
     for (auto& item : inventory_box->m_items)
     {
         CGameObject* GO = smart_cast<CGameObject*>(Level().Objects.net_Find(item));
-        if (functor(object, GO->lua_game_object()) == true)
-            return;
+        functor(object, GO->lua_game_object());
     }
 }
 
@@ -1811,15 +1809,14 @@ bool CScriptGameObject::HasUpgrade(pcstr upgrade) const
     return item->has_upgrade(upgrade);
 }
 
-void CScriptGameObject::IterateInstalledUpgrades(const luabind::functor<bool>& functor)
+void CScriptGameObject::IterateInstalledUpgrades(const luabind::functor<void>& functor)
 {
     CInventoryItem* Item = smart_cast<CInventoryItem*>(&object());
     if (!Item)
         return;
 
     for (auto upgrade : Item->get_upgrades())
-        if (functor(upgrade.c_str(), object().lua_game_object()) == true)
-            return;
+        functor(upgrade.c_str(), object().lua_game_object());
 }
 
 CScriptGameObject* CScriptGameObject::ItemOnBelt(u32 item_id) const
@@ -2026,7 +2023,7 @@ void CScriptGameObject::SetAdditionalMaxWalkWeight(float add_max_walk_weight)
     if (pBackpack)
         pBackpack->m_additional_weight = add_max_walk_weight;
 #else
-    outfit->m_additional_weight = add_max_weight;
+    outfit->m_additional_weight = add_max_walk_weight;
 #endif
 }
 

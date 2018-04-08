@@ -25,7 +25,11 @@
 #include "UICharacterInfo.h"
 #include "ui_base.h"
 
+#ifdef CALLOFCHERNOBYL_RANKING
 #define PDA_RANKING_XML "pda_ranking.xml"
+#else
+#define PDA_RANKING_XML "pda_ranking_orig.xml"
+#endif
 
 CUIRankingWnd::CUIRankingWnd()
 {

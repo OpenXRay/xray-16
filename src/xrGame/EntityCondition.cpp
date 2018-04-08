@@ -331,7 +331,7 @@ float CEntityCondition::HitPowerEffect(float power_loss)
     CBackpack* pBackpack = (CBackpack*)pInvOwner->inventory().ItemFromSlot(BACKPACK_SLOT);
     return power_loss * (0.5f + (pOutfit ? pOutfit->m_fPowerLoss : EPS) + (pHelmet ? pHelmet->m_fPowerLoss : EPS) + (pBackpack ? pBackpack->m_fPowerLoss : EPS));
 #else
-    return power_loss * (0.5f + (pOutfit ? pOutfit->m_fPowerLoss : EPS) + (pHelmet ? pHelmet->m_fPowerLoss : EPS);
+    return power_loss * (0.5f + (pOutfit ? pOutfit->m_fPowerLoss : EPS) + (pHelmet ? pHelmet->m_fPowerLoss : EPS));
 #endif
 }
 

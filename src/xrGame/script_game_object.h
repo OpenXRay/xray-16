@@ -373,15 +373,15 @@ public:
     bool IsInvUpgradeEnabled();
 
     void ActorLookAtPoint(Fvector point);
-    void IterateInventory(luabind::functor<bool> functor, luabind::object object);
-    void IterateInventoryBox(luabind::functor<bool> functor, luabind::object object);
+    void IterateInventory(luabind::functor<void> functor, luabind::object object);
+    void IterateInventoryBox(luabind::functor<void> functor, luabind::object object);
     void MarkItemDropped(CScriptGameObject* item, bool flag = true);
     bool MarkedDropped(CScriptGameObject* item);
     void UnloadMagazine();
 
     void DropItem(CScriptGameObject* pItem);
     void DropItemAndTeleport(CScriptGameObject* pItem, Fvector position);
-    void ForEachInventoryItems(const luabind::functor<bool>& functor);
+    void ForEachInventoryItems(const luabind::functor<void>& functor);
     void TransferItem(CScriptGameObject* pItem, CScriptGameObject* pForWho);
     void TransferMoney(int money, CScriptGameObject* pForWho);
     void GiveMoney(int money);
@@ -861,7 +861,7 @@ public:
     void StartTrade(CScriptGameObject* obj);
     void StartUpgrade(CScriptGameObject* obj);
     void SetWeight(float w);
-    void IterateFeelTouch(const luabind::functor<bool>& functor);
+    void IterateFeelTouch(const luabind::functor<void>& functor);
     u32 GetSpatialType();
     void SetSpatialType(u32 sptype);
     u8 GetRestrictionType();
@@ -890,7 +890,7 @@ public:
     //Weapon & Outfit
     bool InstallUpgrade(pcstr upgrade);
     bool HasUpgrade(pcstr upgrade) const;
-    void IterateInstalledUpgrades(const luabind::functor<bool>& functor);
+    void IterateInstalledUpgrades(const luabind::functor<void>& functor);
     bool WeaponInGrenadeMode();
 
     //Car

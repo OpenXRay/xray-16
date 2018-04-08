@@ -2094,8 +2094,10 @@ float CActor::GetRestoreSpeed(ALife::EConditionRestoreType const& type)
         CHelmet* pHelmet = (CHelmet*)inventory().ItemFromSlot(HELMET_SLOT);
 #ifdef COC_BACKPACK
         CBackpack* pBackpack = (CBackpack*)inventory().ItemFromSlot(BACKPACK_SLOT);
-#endif
         if (!outfit && !pHelmet && !pBackpack)
+#else
+        if (!outfit && !pHelmet)
+#endif
             res /= 0.5f;
         else
         {

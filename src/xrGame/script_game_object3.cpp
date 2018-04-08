@@ -1597,7 +1597,7 @@ u8 CScriptGameObject::GetMaxUses()
     return eItm->GetMaxUses();
 }
 
-void CScriptGameObject::IterateFeelTouch(const luabind::functor<bool>& functor)
+void CScriptGameObject::IterateFeelTouch(const luabind::functor<void>& functor)
 {
     Feel::Touch* touch = smart_cast<Feel::Touch*>(&object());
     if (touch)
@@ -1607,8 +1607,7 @@ void CScriptGameObject::IterateFeelTouch(const luabind::functor<bool>& functor)
             // Xottab_DUTY: Do we need this cast from IGameObject* to IGameObject* ?
             IGameObject* o = smart_cast<IGameObject*>(game_object);
             if (o)
-                if (functor(o->ID()) == true)
-                    return;
+                functor(o->ID());
         }
     }
 }

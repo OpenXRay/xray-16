@@ -5,7 +5,7 @@
 // CONFIG_SCRIPT_ENGINE_LOG_EXPORTS
 // CONFIG_SCRIPT_ENGINE_LOG_SKIPPED_EXPORTS
 
-#define COC_EDITION
+//#define COC_EDITION
 
 /* Callbacks */
 #define EXTENDED_ITEM_CALLBACKS // (eItemToBelt, eItemToSlot, eItemToRuck)
