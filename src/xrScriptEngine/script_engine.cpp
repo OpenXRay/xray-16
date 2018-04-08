@@ -112,7 +112,7 @@ void CScriptEngine::reinit()
         lua_close(m_virtual_machine);
         UnregisterState(m_virtual_machine);
     }
-    //m_virtual_machine = lua_newstate(lua_alloc, nullptr);
+
     m_virtual_machine = luaL_newstate();
     if (!m_virtual_machine)
     {
@@ -606,9 +606,7 @@ struct raii_guard : private Noncopyable
 #ifdef DEBUG
             static const bool break_on_assert = !!strstr(Core.Params, "-break_on_assert");
 #else
-            static const bool break_on_assert = true; // xxx: there is no point to set it true\false in Release, since
-                                                      // game will crash anyway in most cases due to XRAY_EXCEPTIONS
-                                                      // disabled in Release build.
+            static const bool break_on_assert = false; //Alundaio: Can't get a proper stack trace with this enabled
 #endif
             if (!m_error_code)
                 return; // Check "lua_pcall_failed" before changing this!
@@ -850,7 +848,7 @@ void CScriptEngine::onErrorCallback(lua_State* L, pcstr scriptName, int errorCod
     print_output(L, scriptName, errorCode, err);
     on_error(L);
 
-#if !XRAY_EXCEPTIONS
+#if 1 //!XRAY_EXCEPTIONS
     xrDebug::Fatal(DEBUG_INFO, "LUA error: %s", err);
 #else
     throw err;
@@ -880,7 +878,7 @@ int CScriptEngine::lua_pcall_failed(lua_State* L)
         lua_pop(L, 1);
     return LUA_ERRRUN;
 }
-#if !XRAY_EXCEPTIONS
+#if 1 //!XRAY_EXCEPTIONS
 void CScriptEngine::lua_cast_failed(lua_State* L, const luabind::type_id& info)
 {
     string128 buf;
