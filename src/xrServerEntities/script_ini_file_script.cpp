@@ -58,15 +58,14 @@ CScriptIniFile* reload_system_ini()
     return (CScriptIniFile*)pSettings;
 }
 
-void section_for_each(CScriptIniFile* self, luabind::functor<bool> functor)
+void section_for_each(CScriptIniFile* self, const luabind::functor<void>& functor)
 {
     using sections_type = CInifile::Root;
     sections_type& sections = self->sections();
 
     for (auto& section : sections)
     {
-        if (functor(section->Name.c_str()) == true)
-            return;
+        functor(section->Name.c_str());
     }
 }
 //-Alundaio
@@ -104,7 +103,7 @@ static void CScriptIniFile_Export(lua_State* luaState)
             .def("remove_line", &CScriptIniFile::remove_line)
             .def("set_override_names", &CScriptIniFile::set_override_names)
             .def("section_count", &CScriptIniFile::section_count)
-            .def("section_for_each", &section_for_each)
+            .def("section_for_each", (void (*)(CScriptIniFile*, const luabind::functor<void>&))&section_for_each)
             .def("set_readonly", &CScriptIniFile::set_readonly)
             //Alundaio: END
             .def("section_exist", &CScriptIniFile::section_exist)

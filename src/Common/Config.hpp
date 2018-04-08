@@ -49,7 +49,7 @@
 #define NEW_SOUNDS // use new sounds. Please enclose any new sound additions with this define
 #define LAYERED_SND_SHOOT// see comment down below
 
-#ifdef COC_EDITION
+#if defined(COC_EDITION) && defined(DEBUG)
 #   define COC_DEBUG_BEHAVIOUR // Enables CoC debug behaviour when the game crashes
 #endif
 
