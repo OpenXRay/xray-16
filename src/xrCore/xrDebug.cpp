@@ -364,10 +364,8 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
 #endif
     FlushLog();
 
-#ifdef COC_DEBUG_BEHAVIOUR
     while (ShowCursor(true) < 0);
     ShowWindow(GetActiveWindow(), SW_FORCEMINIMIZE);
-#endif
 
     if (Core.PluginMode)
         MessageBox(NULL, assertionInfo, "X-Ray error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
