@@ -9,3 +9,10 @@ end
 function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 	return false
 end
+
+function evaluate_cover_point(obj, point)
+	if point then
+		return true
+	end
+	return false
+end

@@ -1,0 +1,177 @@
+<w>
+	<main_wnd x="0" y="0" width="1024" height="768"/>
+
+	<background x="35" y="41" width="955" height="198">
+        <texture>ui_inGame2_pda_buttons_background</texture>
+        <auto_frameline x="40" y="95" width="885" height="1" vertical="0">
+            <texture>ui_inGame2_pda_line_horizontal</texture>
+        </auto_frameline>
+        <auto_frameline x="40" y="130" width="885" height="1" vertical="0">
+            <texture>ui_inGame2_pda_line_horizontal</texture>
+        </auto_frameline>
+        <auto_frameline x="40" y="165" width="885" height="1" vertical="0">
+            <texture>ui_inGame2_pda_line_horizontal</texture>
+        </auto_frameline>
+        <auto_frameline x="233" y="95" width="1" height="95" vertical="1">
+            <texture>ui_inGame2_pda_line_vertical</texture>
+        </auto_frameline>
+        <auto_frameline x="467" y="95" width="1" height="95" vertical="1">
+            <texture>ui_inGame2_pda_line_vertical</texture>
+        </auto_frameline>
+        <auto_frameline x="702" y="95" width="1" height="95" vertical="1">
+            <texture>ui_inGame2_pda_line_vertical</texture>
+        </auto_frameline>
+		<!-- Separates actor in leaderboard -->
+        <auto_frameline x="537" y="576" width="399" height="1" vertical="0">
+            <texture>ui_inGame2_pda_line_horizontal</texture>
+        </auto_frameline>
+    </background>
+
+	<actor_ch_info x="70" y="92" width="169" height="138">
+		<name_static x="2" y="112" width="165" height="26">
+			<text align="c" vert_align="c" font="graffiti19" color="ui_2"/>
+		</name_static>
+		<icon x="2" y="2" width="165" height="108" stretch="1"/>
+	</actor_ch_info>
+	<actor_icon_over x="70" y="92" width="169" height="138">
+		<texture>ui_inGame2_pda_ranking_icon_over</texture>
+	</actor_icon_over>
+
+	<stat_info>
+		<value color="ui_1"/>
+
+		<stat x="105" y="103" width="30" height="16">
+			<text align="l" font="letterica18" r="220" g="220" b="220">pda_stat_1</text>       <!-- Time elapsed -->
+		</stat>
+		<stat x="330" y="103" width="30" height="16">
+			<text align="l" font="letterica18" r="220" g="220" b="220">pda_stat_2</text>       <!-- Emissions survived -->
+		</stat>
+		<stat x="330" y="179" width="24" height="16">
+			<text align="l" font="letterica18" r="220" g="220" b="220">pda_stat_3</text>       <!-- Tasks completed -->
+		</stat>
+		<stat x="105" y="144" width="30" height="16">
+			<text align="l" font="letterica18" r="220" g="220" b="220">pda_stat_4</text>       <!-- Mutants killed -->
+		</stat>
+		<stat x="105" y="179" width="30" height="16">
+			<text align="l" font="letterica18" r="220" g="220" b="220">pda_stat_5</text>       <!-- Stalkers killed -->
+		</stat>
+		<stat x="555" y="144" width="30" height="16">
+			<text align="l" font="letterica18" r="220" g="220" b="220">pda_stat_6</text>       <!-- Boxes smashed -->
+		</stat>
+		<stat x="330" y="214" width="30" height="16">
+			<text align="l" font="letterica18" r="220" g="220" b="220">pda_stat_7</text>       <!-- Stashes found -->
+		</stat>
+		<stat x="555" y="103" width="30" height="16">
+			<text align="l" font="letterica18" r="220" g="220" b="220">pda_stat_8</text>       <!-- Psi-storms survived -->
+		</stat>
+		<stat x="330" y="144" width="30" height="16">
+			<text align="l" font="letterica18" r="220" g="220" b="220">pda_stat_9</text>       <!-- PDAs delivered -->
+		</stat>
+		<stat x="105" y="214" width="30" height="16">
+			<text align="l" font="letterica18" r="220" g="220" b="220">pda_stat_10</text>       <!-- Helicopters downed -->
+		</stat>
+		<stat x="555" y="179" width="24" height="16">
+			<text align="l" font="letterica18" r="220" g="220" b="220">pda_stat_11</text>       <!-- Artefacts detected -->
+		</stat>
+		<stat x="555" y="214" width="24" height="16">
+			<text align="l" font="letterica18" r="220" g="220" b="220">pda_stat_12</text>       <!-- Wounded helped -->
+		</stat>
+		<stat x="785" y="144" width="24" height="16">
+			<text align="l" font="letterica18" r="220" g="220" b="220">pda_stat_13</text>       <!-- Level changes -->
+		</stat>
+		<stat x="785" y="179" width="24" height="16">
+			<text align="l" font="letterica18" r="220" g="220" b="220">pda_stat_14</text>       <!-- Enemies surrendered -->
+		</stat>
+		<stat x="785" y="214" width="24" height="16">
+			<text align="l" font="letterica18" r="220" g="220" b="220">pda_stat_15</text>       <!-- Field dressings -->
+		</stat>
+		<stat x="670" y="264" width="24" height="16">
+			<text align="l" font="letterica18" r="220" g="220" b="220">pda_stat_16</text>       <!-- Favourite weapon -->
+		</stat>
+		<stat x="217" y="264" width="24" height="16">
+			<text align="l" font="letterica18" r="220" g="220" b="220">pda_stat_17</text>       <!-- Achievements -->
+		</stat>
+		<stat x="442" y="264" width="24" height="16">
+			<text align="l" font="letterica18" r="220" g="220" b="220">pda_stat_18</text>       <!-- Levels visited -->
+		</stat>
+		<stat x="785" y="103" width="100" height="16">
+			<text align="l" font="letterica18" r="220" g="220" b="220">pda_stat_money</text>       <!-- Money -->
+		</stat>
+	</stat_info>
+
+	<down_background x="35" y="245" width="955" height="463">
+		<texture>ui_inGame2_pda_buttons_background</texture>
+		<auto_frameline x="7" y="15" width="941" height="23" vertical="0">
+			<texture>ui_inGame2_pda_ranking_center_caption</texture>
+		</auto_frameline>
+	</down_background>
+
+    <achievements_background x="52" y="294" width="504" height="401">
+        <texture>ui_inGame2_pda_ranking_icon_over</texture>
+    </achievements_background>
+	<achievements_wnd x="73" y="304" width="468" height="381" always_show_scroll="0" stretch="1"/>
+    <achievements_itm x="0" y="0" width="468" height="127" inverse_dir="1">
+        <name x="133" y="3" width="320" height="20">
+            <text align="l" font="letterica18" r="200" g="200" b="200">test</text>
+        </name>
+        <icon x="3" y="3" width="121" height="121"/>
+        <descr x="133" y="26" width="320" height="90" complex_mode="1">
+            <text align="l" font="letterica16" r="150" g="150" b="150">test</text>
+        </descr>
+	    <hint_wnd x="0" y="0" width="210" height="120">
+	        <background x="0" y="0" width="210" height="100" border="5">
+	            <texture a="200">ui_icons_PDA_tooltips</texture>
+	        </background>
+	        <text x="10" y="10" width="190" height="100">
+	            <text font="letterica16" r="150" g="150" b="150" complex_mode="1" align="l" vert_align="t"/>
+	        </text>
+	    </hint_wnd>
+    </achievements_itm>
+	
+	<!-- CoC Rankings -->
+    <coc_ranking_background x="572" y="294" width="399" height="401">
+        <texture>ui_inGame2_pda_ranking_icon_over</texture>
+    </coc_ranking_background>
+	<coc_ranking_wnd x="574" y="299" width="395" height="311" always_show_scroll="0" stretch="1"/>
+    <coc_ranking_itm x="0" y="0" width="300" height="80" inverse_dir="1">
+        <name x="75" y="3" width="256" height="25" complex_mode="1">
+            <text align="l" font="letterica18" r="200" g="200" b="200" complex_mode="1">test</text>
+        </name>
+        <icon x="5" y="3" width="64" height="64" stretch="1"/>
+        <descr x="100" y="26" width="256" height="25" complex_mode="1">
+            <text align="l" font="letterica16" r="150" g="150" b="150" complex_mode="1">test</text>
+        </descr>
+	    <hint_wnd x="0" y="0" width="256" height="120">
+	        <background x="0" y="0" width="256" height="100" border="5" stretch="1">
+	            <texture a="200">ui_icons_PDA_tooltips</texture>
+	        </background>
+	        <text x="8" y="10" width="252" height="100" complex_mode="1">
+	            <text font="letterica16" r="150" g="150" b="150" complex_mode="1" align="l" vert_align="t"/>
+	        </text>
+	    </hint_wnd>
+		<border x="0" y="0" width="300" height="80" stretch="1">
+			<texture>ui_inGame2_servers_list_frame</texture>
+		</border>
+    </coc_ranking_itm>
+	<coc_ranking_wnd_actor x="574" y="620" width="395" height="80" always_show_scroll="0" stretch="1"/>
+    <coc_ranking_itm_actor x="574" y="620" width="395" height="80" inverse_dir="1">
+        <name x="75" y="3" width="256" height="25" complex_mode="1">
+            <text align="l" font="letterica18" r="200" g="200" b="200" complex_mode="1">test</text>
+        </name>
+        <icon x="5" y="3" width="64" height="64" stretch="1"/>
+        <descr x="100" y="26" width="256" height="25" complex_mode="1">
+            <text align="l" font="letterica16" r="150" g="150" b="150" complex_mode="1">test</text>
+        </descr>
+	    <hint_wnd x="0" y="0" width="256" height="120">
+	        <background x="0" y="0" width="256" height="100" border="5" stretch="1">
+	            <texture a="200">ui_icons_PDA_tooltips</texture>
+	        </background>
+	        <text x="8" y="10" width="252" height="100" complex_mode="1">
+	            <text font="letterica16" r="150" g="150" b="150" complex_mode="1" align="l" vert_align="t"/>
+	        </text>
+	    </hint_wnd>
+		<border x="0" y="0" width="300" height="80" stretch="1">
+			<texture>ui_inGame2_servers_list_frame</texture>
+		</border>
+    </coc_ranking_itm_actor>
+</w>

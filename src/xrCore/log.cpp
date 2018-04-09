@@ -40,7 +40,6 @@ void FlushLog()
     }
 }
 
-extern bool shared_str_initialized;
 void AddOne(const char* split)
 {
     if (!LogFile)
@@ -57,8 +56,7 @@ void AddOne(const char* split)
     if (LogExecCB && LogCB)
         LogCB(split);
 
-    if (shared_str_initialized)
-        LogFile->push_back(split);
+    LogFile->push_back(split);
 
     if (LogWriter)
     {
