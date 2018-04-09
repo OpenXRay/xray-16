@@ -194,7 +194,7 @@ CSE_Abstract* CALifeSimulator__spawn_item2(CALifeSimulator* self, LPCSTR section
 }
 
 //Alundaio: Allows to call alife():register(se_obj) manually afterward so that packet editing can be done safely when spawning object with a parent
-CSE_Abstract* CALifeSimulator__spawn_item3s(CALifeSimulator* self, pcstr section, const Fvector& position,
+CSE_Abstract* CALifeSimulator__spawn_item3(CALifeSimulator* self, pcstr section, const Fvector& position,
                                            u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id,
                                            ALife::_OBJECT_ID id_parent, bool reg /*= true*/)
 {
