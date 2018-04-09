@@ -576,7 +576,23 @@ bool has_active_tutotial() { return (g_tutorial != NULL); }
 //Alundaio: namespace level exports extension
 #ifdef NAMESPACE_LEVEL_EXPORTS
 //ability to update level netpacket
-void g_send(NET_Packet& P, bool bReliable = false, bool bSequential = true, bool bHighPriority = false, bool bSendImmediately = false)
+void g_send(NET_Packet& P)
+{
+    Level().Send(P, net_flags(false, true, false, false));
+}
+void g_send(NET_Packet& P, bool bReliable)
+{
+    Level().Send(P, net_flags(bReliable, true, false, false));
+}
+void g_send(NET_Packet& P, bool bReliable, bool bSequential)
+{
+    Level().Send(P, net_flags(bReliable, bSequential, false, false));
+}
+void g_send(NET_Packet& P, bool bReliable, bool bSequential, bool bHighPriority)
+{
+    Level().Send(P, net_flags(bReliable, bSequential, bHighPriority, false));
+}
+void g_send(NET_Packet& P, bool bReliable, bool bSequential, bool bHighPriority, bool bSendImmediately)
 {
     Level().Send(P, net_flags(bReliable, bSequential, bHighPriority, bSendImmediately));
 }
@@ -704,7 +720,11 @@ IC static void CLevel_Export(lua_State* luaState)
     [
         //Alundaio: Extend level namespace exports
 #ifdef NAMESPACE_LEVEL_EXPORTS
-        def("send", &g_send) , //allow the ability to send netpacket to level
+        def("send", (void(*)(NET_Packet&))&g_send),
+        def("send", (void(*)(NET_Packet&, bool))&g_send),
+        def("send", (void(*)(NET_Packet&, bool, bool))&g_send),
+        def("send", (void(*)(NET_Packet&, bool, bool, bool))&g_send),
+        def("send", (void(*)(NET_Packet&, bool, bool, bool, bool))&g_send), //allow the ability to send netpacket to level
         def("u_event_gen", &u_event_gen), //Send events via packet
         def("u_event_send", &u_event_send),
         def("get_target_obj", &g_get_target_obj), //intentionally named to what is in xray extensions

@@ -128,6 +128,10 @@ CScriptEntityAction* CScriptGameObject::GetCurrentAction() const
     return (0);
 }
 
+void CScriptGameObject::AddAction(const CScriptEntityAction* tpEntityAction)
+{
+    AddAction(tpEntityAction, false);
+}
 void CScriptGameObject::AddAction(const CScriptEntityAction* tpEntityAction, bool bHighPriority)
 {
     CScriptEntity* l_tpScriptMonster = smart_cast<CScriptEntity*>(&object());
@@ -137,6 +141,7 @@ void CScriptGameObject::AddAction(const CScriptEntityAction* tpEntityAction, boo
         l_tpScriptMonster->AddAction(tpEntityAction, bHighPriority);
 }
 
+const CScriptEntityAction* CScriptGameObject::GetActionByIndex() { return GetActionByIndex(0); }
 const CScriptEntityAction* CScriptGameObject::GetActionByIndex(u32 action_index)
 {
     CScriptEntity* l_tpScriptMonster = smart_cast<CScriptEntity*>(&object());

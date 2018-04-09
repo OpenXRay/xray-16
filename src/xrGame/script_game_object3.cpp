@@ -1386,7 +1386,8 @@ void CScriptGameObject::SetArtefactBleedingRestoreSpeed(float value)
     artefact->SetBleedingPower(value);
 }
 
-void CScriptGameObject::AttachVehicle(CScriptGameObject* veh, bool bForce)
+void CScriptGameObject::AttachVehicle(CScriptGameObject* veh) { AttachVehicle(veh, false); }
+void CScriptGameObject::AttachVehicle(CScriptGameObject* veh, const bool bForce)
 {
     CActor* actor = smart_cast<CActor*>(&object());
     if (actor)
@@ -1399,7 +1400,8 @@ void CScriptGameObject::AttachVehicle(CScriptGameObject* veh, bool bForce)
     }
 }
 
-void CScriptGameObject::DetachVehicle(bool bForce)
+void CScriptGameObject::DetachVehicle() { DetachVehicle(false); }
+void CScriptGameObject::DetachVehicle(const bool bForce)
 {
     CActor* actor = smart_cast<CActor*>(&object());
     if (actor)
@@ -1488,6 +1490,7 @@ bool CScriptGameObject::WeaponInGrenadeMode()
     return wpn->m_bGrenadeMode;
 }
 
+void CScriptGameObject::SetBoneVisible(pcstr bone_name, bool bVisibility) { SetBoneVisible(bone_name, bVisibility, true); }
 void CScriptGameObject::SetBoneVisible(pcstr bone_name, bool bVisibility, bool bRecursive)
 {
     IKinematics* k = object().Visual()->dcast_PKinematics();
@@ -1533,6 +1536,7 @@ float CScriptGameObject::GetLuminocity()
     return e->renderable_ROS()->get_luminocity();
 }
 
+void CScriptGameObject::ForceSetPosition(Fvector pos) { ForceSetPosition(pos, false); }
 void CScriptGameObject::ForceSetPosition(Fvector pos, bool bActivate)
 {
     CPhysicsShellHolder* sh = object().cast_physics_shell_holder();

@@ -287,6 +287,7 @@ void CScriptGameObject::IterateInventoryBox(luabind::functor<void> functor, luab
     }
 }
 
+void CScriptGameObject::MarkItemDropped(CScriptGameObject* item) { MarkItemDropped(item, true); }
 void CScriptGameObject::MarkItemDropped(CScriptGameObject* item, bool flag)
 {
     CInventoryOwner* inventory_owner = smart_cast<CInventoryOwner*>(&object());

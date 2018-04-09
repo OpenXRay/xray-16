@@ -93,8 +93,8 @@ class_<CScriptGameObject>& script_register_game_object1(class_<CScriptGameObject
         .def("group", &CScriptGameObject::Group)
         .def("change_team", (void (CScriptGameObject::*)(u8, u8, u8))(&CScriptGameObject::ChangeTeam))
         .def("set_visual_memory_enabled", &CScriptGameObject::SetVisualMemoryEnabled)
-        .def("kill", &CScriptGameObject::Kill)
-        .def("kill", (void (CScriptGameObject::*)(CScriptGameObject*))(&CScriptGameObject::Kill))
+        .def("kill", (void (CScriptGameObject::*)(CScriptGameObject*))&CScriptGameObject::Kill)
+        .def("kill", (void (CScriptGameObject::*)(CScriptGameObject*,bool))(&CScriptGameObject::Kill))
         .def("hit", &CScriptGameObject::Hit)
         .def("play_cycle", (void (CScriptGameObject::*)(LPCSTR))(&CScriptGameObject::play_cycle))
         .def("play_cycle", (void (CScriptGameObject::*)(LPCSTR, bool))(&CScriptGameObject::play_cycle))
@@ -112,7 +112,8 @@ class_<CScriptGameObject>& script_register_game_object1(class_<CScriptGameObject
         .def("who_hit_section_name", &CScriptGameObject::WhoHitSectionName)
 
         .def("rank", &CScriptGameObject::GetRank)
-        .def("command", &CScriptGameObject::AddAction)
+        .def("command", (void (CScriptGameObject::*)(const CScriptEntityAction*))&CScriptGameObject::AddAction)
+        .def("command", (void (CScriptGameObject::*)(const CScriptEntityAction*,bool))&CScriptGameObject::AddAction)
         .def("action", &CScriptGameObject::GetCurrentAction, adopt<0>())
         .def("object_count", &CScriptGameObject::GetInventoryObjectCount)
         .def("object", (CScriptGameObject * (CScriptGameObject::*)(LPCSTR))(&CScriptGameObject::GetObjectByName))
@@ -166,7 +167,8 @@ class_<CScriptGameObject>& script_register_game_object1(class_<CScriptGameObject
         .def("best_enemy", &CScriptGameObject::GetBestEnemy)
         .def("best_item", &CScriptGameObject::GetBestItem)
         .def("action_count", &CScriptGameObject::GetActionCount)
-        .def("action_by_index", &CScriptGameObject::GetActionByIndex)
+        .def("action_by_index", (const CScriptEntityAction* (CScriptGameObject::*)())&CScriptGameObject::GetActionByIndex)
+        .def("action_by_index", (const CScriptEntityAction* (CScriptGameObject::*)(u32))&CScriptGameObject::GetActionByIndex)
 
         //.def("set_hear_callback",			(void (CScriptGameObject::*)(const luabind::object &,
         // LPCSTR))(&CScriptGameObject::SetSoundCallback))

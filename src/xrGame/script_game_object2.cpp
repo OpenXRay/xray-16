@@ -340,6 +340,11 @@ void CScriptGameObject::RestoreDefaultStartDialog()
     pDialogManager->RestoreDefaultStartDialog();
 }
 
+void CScriptGameObject::SetActorPosition(Fvector pos)
+{
+    SetActorPosition(pos, false);
+}
+
 void CScriptGameObject::SetActorPosition(Fvector pos, bool bskip_collision_correct)
 {
     CActor* actor = smart_cast<CActor*>(&object());
@@ -361,7 +366,6 @@ void CScriptGameObject::SetActorPosition(Fvector pos, bool bskip_collision_corre
             Fmatrix F = actor->XFORM();
             F.c = pos;
             actor->ForceTransform(F);
-            //		actor->XFORM().c = pos;
         }
     }
     else
@@ -384,7 +388,7 @@ void CScriptGameObject::SetNpcPosition(Fvector pos)
     }
     else
         GEnv.ScriptEngine->script_log(LuaMessageType::Error,
-            "ScriptGameObject : attempt to call SetActorPosition method for non-CCustomMonster object");
+            "ScriptGameObject : attempt to call SetNpcPosition method for non-CCustomMonster object");
 }
 
 void CScriptGameObject::SetActorDirection(float dir)

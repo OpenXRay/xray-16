@@ -322,7 +322,8 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
 
         .def("iterate_inventory", &CScriptGameObject::IterateInventory)
         .def("iterate_inventory_box", &CScriptGameObject::IterateInventoryBox)
-        .def("mark_item_dropped", &CScriptGameObject::MarkItemDropped)
+        .def("mark_item_dropped", (void (CScriptGameObject::*)(CScriptGameObject*))&CScriptGameObject::MarkItemDropped)
+        .def("mark_item_dropped", (void (CScriptGameObject::*)(CScriptGameObject*,bool))&CScriptGameObject::MarkItemDropped)
         .def("marked_dropped", &CScriptGameObject::MarkedDropped)
         .def("unload_magazine", &CScriptGameObject::UnloadMagazine)
 
@@ -360,8 +361,10 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
 
         //Alundaio: Extended exports
         //For Car
-        .def("attach_vehicle", &CScriptGameObject::AttachVehicle)
-        .def("detach_vehicle", &CScriptGameObject::DetachVehicle)
+        .def("attach_vehicle", (void (CScriptGameObject::*)(CScriptGameObject*))&CScriptGameObject::AttachVehicle)
+        .def("attach_vehicle", (void (CScriptGameObject::*)(CScriptGameObject*,const bool))&CScriptGameObject::AttachVehicle)
+        .def("detach_vehicle", (void (CScriptGameObject::*)())&CScriptGameObject::DetachVehicle)
+        .def("detach_vehicle", (void (CScriptGameObject::*)(const bool))&CScriptGameObject::DetachVehicle)
         .def("get_attached_vehicle", &CScriptGameObject::GetAttachedVehicle)
 
 #ifdef GAME_OBJECT_EXTENDED_EXPORTS
@@ -370,9 +373,11 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("get_luminocity_hemi", &CScriptGameObject::GetLuminocityHemi)
         .def("get_luminocity", &CScriptGameObject::GetLuminocity)
         .def("bone_visible", &CScriptGameObject::IsBoneVisible)
-        .def("set_bone_visible", &CScriptGameObject::SetBoneVisible)
+        .def("set_bone_visible", (void (CScriptGameObject::*)(pcstr,bool))&CScriptGameObject::SetBoneVisible)
+        .def("set_bone_visible", (void (CScriptGameObject::*)(pcstr,bool,bool))&CScriptGameObject::SetBoneVisible)
         .def("set_health_ex", &CScriptGameObject::SetHealthEx) // AVO
-        .def("force_set_position", &CScriptGameObject::ForceSetPosition)
+        .def("force_set_position", (void (CScriptGameObject::*)(Fvector))&CScriptGameObject::ForceSetPosition)
+        .def("force_set_position", (void (CScriptGameObject::*)(Fvector, bool))&CScriptGameObject::ForceSetPosition)
         .def("set_spatial_type", &CScriptGameObject::SetSpatialType)
         .def("get_spatial_type", &CScriptGameObject::GetSpatialType)
 

@@ -194,9 +194,9 @@ CSE_Abstract* CALifeSimulator__spawn_item2(CALifeSimulator* self, LPCSTR section
 }
 
 //Alundaio: Allows to call alife():register(se_obj) manually afterward so that packet editing can be done safely when spawning object with a parent
-CSE_Abstract* CALifeSimulator__spawn_item3(CALifeSimulator* self, pcstr section, const Fvector& position,
+CSE_Abstract* CALifeSimulator__spawn_item3s(CALifeSimulator* self, pcstr section, const Fvector& position,
                                            u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id,
-                                           ALife::_OBJECT_ID id_parent, bool reg = true)
+                                           ALife::_OBJECT_ID id_parent, bool reg /*= true*/)
 {
     if (reg == true)
         return CALifeSimulator__spawn_item2(self, section, position, level_vertex_id, game_vertex_id, id_parent);
@@ -434,6 +434,11 @@ CSE_Abstract* try_to_clone_object(CALifeSimulator* self, CSE_Abstract* object, p
 
     return nullptr;
 }
+CSE_Abstract* try_to_clone_object(CALifeSimulator* self, CSE_Abstract* object, pcstr section, const Fvector& position,
+    u32 level_vertex_id, GameGraph::_GRAPH_ID game_vertex_id, ALife::_OBJECT_ID id_parent)
+{
+    return try_to_clone_object(self, object, section, position, level_vertex_id, game_vertex_id, id_parent, true);
+}
 
 void set_objects_per_update(CALifeSimulator* self, u32 count)
 {
@@ -446,58 +451,60 @@ void set_process_time(CALifeSimulator* self, int micro)
 }
 //-Alundaio
 
+// clang-format off
 SCRIPT_EXPORT(CALifeSimulator, (), {
-    module(luaState)[class_<CALifeSimulator>("alife_simulator")
-                         .def("valid_object_id", &valid_object_id)
-                         .def("level_id", &get_level_id)
-                         .def("level_name", &get_level_name)
-                         .def("object",
-                             (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_OBJECT_ID))(alife_object))
-                         .def("object", (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_OBJECT_ID, bool))(
-                                            alife_object))
-	                     .def("object", (CSE_ALifeDynamicObject *(*) (const CALifeSimulator*, LPCSTR))(alife_object))
-                         .def("story_object", (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_STORY_ID))(
-                                                  alife_story_object))
-                         .def("set_switch_online",
-                             (void (CALifeSimulator::*)(ALife::_OBJECT_ID, bool))(&CALifeSimulator::set_switch_online))
-                         .def("set_switch_offline",
-                             (void (CALifeSimulator::*)(ALife::_OBJECT_ID, bool))(&CALifeSimulator::set_switch_offline))
-                         .def("set_interactive",
-                             (void (CALifeSimulator::*)(ALife::_OBJECT_ID, bool))(&CALifeSimulator::set_interactive))
-                         .def("kill_entity", &CALifeSimulator::kill_entity)
-                         .def("kill_entity", &kill_entity0)
-                         .def("kill_entity", &kill_entity1)
-                         .def("add_in_restriction", &add_in_restriction)
-                         .def("add_out_restriction", &add_out_restriction)
-                         .def("remove_in_restriction", &remove_in_restriction)
-                         .def("remove_out_restriction", &remove_out_restriction)
-                         .def("remove_all_restrictions", &CALifeSimulator::remove_all_restrictions)
-                         .def("create", &CALifeSimulator__create)
-                         .def("create", &CALifeSimulator__spawn_item3)
-                         .def("create", &CALifeSimulator__spawn_item2)
-                         .def("create", &CALifeSimulator__spawn_item)
-                         .def("create_ammo", &CALifeSimulator__spawn_ammo)
-                         .def("release", &CALifeSimulator__release)
-                         .def("release", &CALifeSimulator__release2)
-                         .def("spawn_id", &CALifeSimulator__spawn_id)
-                         .def("actor", &get_actor)
-                         .def("has_info", &has_info)
-                         .def("dont_has_info", &dont_has_info)
-                         .def("give_info", &AlifeGiveInfo)
-                         .def("disable_info", &AlifeRemoveInfo)
-                         .def("switch_distance", &CALifeSimulator::switch_distance)
-                         .def("set_switch_distance", &CALifeSimulator::set_switch_distance) //Alundaio: renamed to set_switch_distance from switch_distance
-                         //Alundaio: extend alife simulator exports
-                         .def("teleport_object", &teleport_object)
-                         .def("iterate_info", &IterateInfo)
-                         .def("clone_weapon", &try_to_clone_object)
-                         .def("register", &reprocess_spawn)
-                         .def("set_objects_per_update", &set_objects_per_update)
-                         .def("set_process_time", &set_process_time)
-                         //Alundaio: END
+    module(luaState)
+    [
+        class_<CALifeSimulator>("alife_simulator")
+            .def("valid_object_id", &valid_object_id)
+            .def("level_id", &get_level_id)
+            .def("level_name", &get_level_name)
+            .def("object", (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_OBJECT_ID))(alife_object))
+            .def("object", (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_OBJECT_ID, bool))(alife_object))
+	        .def("object", (CSE_ALifeDynamicObject *(*) (const CALifeSimulator*, LPCSTR))(alife_object))
+            .def("story_object", (CSE_ALifeDynamicObject * (*)(const CALifeSimulator*, ALife::_STORY_ID))(alife_story_object))
+            .def("set_switch_online", (void (CALifeSimulator::*)(ALife::_OBJECT_ID, bool))(&CALifeSimulator::set_switch_online))
+            .def("set_switch_offline", (void (CALifeSimulator::*)(ALife::_OBJECT_ID, bool))(&CALifeSimulator::set_switch_offline))
+            .def("set_interactive", (void (CALifeSimulator::*)(ALife::_OBJECT_ID, bool))(&CALifeSimulator::set_interactive))
+            .def("kill_entity", &CALifeSimulator::kill_entity)
+            .def("kill_entity", &kill_entity0)
+            .def("kill_entity", &kill_entity1)
+            .def("add_in_restriction", &add_in_restriction)
+            .def("add_out_restriction", &add_out_restriction)
+            .def("remove_in_restriction", &remove_in_restriction)
+            .def("remove_out_restriction", &remove_out_restriction)
+            .def("remove_all_restrictions", &CALifeSimulator::remove_all_restrictions)
+            .def("create", &CALifeSimulator__create)
+            .def("create", (CSE_Abstract* (*)(CALifeSimulator*, pcstr, const Fvector&, u32, GameGraph::_GRAPH_ID,
+                ALife::_OBJECT_ID, bool))&CALifeSimulator__spawn_item3)
+            .def("create", &CALifeSimulator__spawn_item2)
+            .def("create", &CALifeSimulator__spawn_item)
+            .def("create_ammo", &CALifeSimulator__spawn_ammo)
+            .def("release", &CALifeSimulator__release)
+            .def("release", &CALifeSimulator__release2)
+            .def("spawn_id", &CALifeSimulator__spawn_id)
+            .def("actor", &get_actor)
+            .def("has_info", &has_info)
+            .def("dont_has_info", &dont_has_info)
+            .def("give_info", &AlifeGiveInfo)
+            .def("disable_info", &AlifeRemoveInfo)
+            .def("switch_distance", &CALifeSimulator::switch_distance)
+            .def("set_switch_distance", &CALifeSimulator::set_switch_distance) //Alundaio: renamed to set_switch_distance from switch_distance
+            //Alundaio: extend alife simulator exports
+            .def("teleport_object", &teleport_object)
+            .def("iterate_info", &IterateInfo)
+            .def("clone_weapon", (CSE_Abstract* (*)(CALifeSimulator*, CSE_Abstract*, pcstr, const Fvector&, u32,
+                GameGraph::_GRAPH_ID, ALife::_OBJECT_ID))&try_to_clone_object)
+            .def("clone_weapon", (CSE_Abstract* (*)(CALifeSimulator*, CSE_Abstract*, pcstr, const Fvector&, u32,
+                GameGraph::_GRAPH_ID, ALife::_OBJECT_ID, bool))&try_to_clone_object)
+            .def("register", &reprocess_spawn)
+            .def("set_objects_per_update", &set_objects_per_update)
+            .def("set_process_time", &set_process_time)
+            //Alundaio: END
 
-                         ,
-        def("alife", &alife)];
+        ,
+        def("alife", &alife)
+    ];
     class CALifeSimulatorExporter1
     {
     };
@@ -535,6 +542,7 @@ SCRIPT_EXPORT(CALifeSimulator, (), {
         luabind::module(luaState)[instance];
     }
 });
+// clang-format on
 
 #if 0 // def DEBUG
 struct dummy {

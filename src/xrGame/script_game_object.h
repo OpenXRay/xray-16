@@ -215,7 +215,8 @@ public:
     _DECLARE_FUNCTION10(Squad, int);
     _DECLARE_FUNCTION10(Group, int);
 
-    void Kill(CScriptGameObject* who, bool bypass_actor_check = false /*AVO: added for actor before death callback*/);
+    void Kill(CScriptGameObject* who);
+    void Kill(CScriptGameObject* who, bool bypass_actor_check /*= false*/);
 
     // CEntityAlive
     _DECLARE_FUNCTION10(GetFOV, float);
@@ -251,10 +252,12 @@ public:
     _DECLARE_FUNCTION10(can_script_capture, bool);
 
     CScriptEntityAction* GetCurrentAction() const;
-    void AddAction(const CScriptEntityAction* tpEntityAction, bool bHighPriority = false);
+    void AddAction(const CScriptEntityAction* tpEntityAction);
+    void AddAction(const CScriptEntityAction* tpEntityAction, bool bHighPriority /*= false*/);
     void ResetActionQueue();
     // Actor only
-    void SetActorPosition(Fvector pos, bool bskip_collision_correct = false);
+    void SetActorPosition(Fvector pos);
+    void SetActorPosition(Fvector pos, bool bskip_collision_correct /*= false*/);
     void SetActorDirection(float dir);
     void SetNpcPosition(Fvector pos);
     void DisableHitMarks(bool disable);
@@ -375,7 +378,8 @@ public:
     void ActorLookAtPoint(Fvector point);
     void IterateInventory(luabind::functor<void> functor, luabind::object object);
     void IterateInventoryBox(luabind::functor<void> functor, luabind::object object);
-    void MarkItemDropped(CScriptGameObject* item, bool flag = true);
+    void MarkItemDropped(CScriptGameObject* item);
+    void MarkItemDropped(CScriptGameObject* item, bool flag /*= true*/);
     bool MarkedDropped(CScriptGameObject* item);
     void UnloadMagazine();
 
@@ -480,7 +484,8 @@ public:
 
     _DECLARE_FUNCTION10(GetActionCount, u32);
 
-    const CScriptEntityAction* GetActionByIndex(u32 action_index = 0);
+    const CScriptEntityAction* GetActionByIndex();
+    const CScriptEntityAction* GetActionByIndex(u32 action_index /*= 0*/);
 
     //////////////////////////////////////////////////////////////////////////
     // Inventory Owner
@@ -895,8 +900,10 @@ public:
 
     //Car
     CScriptGameObject* GetAttachedVehicle();
-    void AttachVehicle(CScriptGameObject* veh, const bool bForce = false);
-    void DetachVehicle(const bool bForce = false);
+    void AttachVehicle(CScriptGameObject* veh);
+    void AttachVehicle(CScriptGameObject* veh, const bool bForce /*= false*/);
+    void DetachVehicle();
+    void DetachVehicle(const bool bForce /*= false*/);
 
     //Any class that is derived from CHudItem
     u32 PlayHudMotion(pcstr M, bool mixIn, u32 state);
@@ -905,12 +912,14 @@ public:
 
     //Works for anything with visual
     bool IsBoneVisible(pcstr bone_name);
+    void SetBoneVisible(pcstr bone_name, bool bVisibility);
     void SetBoneVisible(pcstr bone_name, bool bVisibility, bool bRecursive = true);
 
     //CAI_Stalker
     void ResetBoneProtections(pcstr imm_sect, pcstr bone_sect);
 
     //Anything with PPhysicShell (ie. car, actor, stalker, monster, heli)
+    void ForceSetPosition(Fvector pos);
     void ForceSetPosition(Fvector pos, bool bActivate = false);
 
     float GetArtefactHealthRestoreSpeed();
