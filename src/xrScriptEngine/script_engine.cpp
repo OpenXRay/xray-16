@@ -343,7 +343,7 @@ int CScriptEngine::script_log(LuaMessageType message, LPCSTR caFormat, ...)
     int result = vscript_log(message, caFormat, marker);
     va_end(marker);
 
-#ifdef DEBUG
+#if defined(DEBUG) || defined(COC_EDITION)
     if (message == LuaMessageType::Error)
         print_stack();
 #endif
@@ -823,7 +823,7 @@ CScriptEngine::~CScriptEngine()
         lua_close(m_virtual_machine);
     while (!m_script_processes.empty())
         remove_script_process(m_script_processes.begin()->first);
-#ifdef DEBUG
+#if defined(DEBUG) || defined(COC_EDITION)
     flush_log();
 #endif
 #ifdef USE_DEBUGGER

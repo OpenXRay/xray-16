@@ -35,31 +35,34 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
 #pragma warning(pop)
 
     // Alundaio: This will spawn a single random section listed in [spawn_loadout]
-    // No need to spawn ammo, this will automatically spawn 1 box for weapon and if ammo_type is specified it will spawn that type
+    // No need to spawn ammo, this will automatically spawn 1 box for weapon and if ammo_type is specficied it will spawn that type
     // count is used only for ammo boxes (ie wpn_pm = 3) will spawn 3 boxes, not 3 wpn_pm
     // Usage: to create random weapon loadouts
-    pcstr loadout_section = "spawn_loadout";
+    LPCSTR loadout_section = "spawn_loadout";
     u8 iItr = 1;
     while (ini.section_exist(loadout_section))
     {
-        pcstr itmSection, V;
+        LPCSTR itmSection, V;
         xr_vector<u32> OnlyOne;
-
-        pcstr lname = *ai().game_graph().header().level(ai().game_graph().vertex(m_tGraphID)->level_id()).name();
+        OnlyOne.clear();
+        LPCSTR lname = *ai().game_graph().header().level(ai().game_graph().vertex(m_tGraphID)->level_id()).name();
 
         for (u32 k = 0; ini.r_line(loadout_section, k, &itmSection, &V); k++)
         {
             // If level=<lname> then only spawn items if object on that level
-            if (strstr(V, "level=") != nullptr)
-                if (strstr(V, lname) != nullptr)
+            if (strstr(V, "level=") != NULL)
+            {
+                if (strstr(V, lname) != NULL)
                     OnlyOne.push_back(k);
-            else
+            }
+            else {
                 OnlyOne.push_back(k);
+            }
         }
 
         if (!OnlyOne.empty())
         {
-            s32 sel = Random.randI(0, OnlyOne.size() - 1);
+            s32 sel = ::Random.randI(0, OnlyOne.size() - 1);
             if (ini.r_line(loadout_section, OnlyOne.at(sel), &itmSection, &V))
             {
                 VERIFY(xr_strlen(itmSection));
@@ -72,8 +75,7 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
                     float f_cond = 1.0f;
                     int i_ammo_type = 0, n = 0;
 
-                    if (V && xr_strlen(V))
-                    {
+                    if (V && xr_strlen(V)) {
                         n = _GetItemCount(V);
                         if (n > 0)
                         {
@@ -81,13 +83,13 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
                             spawn_count = atoi(_GetItem(V, 0, tmp)); //count
                         }
 
-                        if (!spawn_count) spawn_count = 1;
-                        if (nullptr != strstr(V, "cond="))
-                            f_cond = static_cast<float>(atof(strstr(V, "cond=") + 5));
-                        bScope = nullptr != strstr(V, "scope");
-                        bSilencer = nullptr != strstr(V, "silencer");
-                        bLauncher = nullptr != strstr(V, "launcher");
-                        if (nullptr != strstr(V, "ammo_type="))
+                        if (!spawn_count)	spawn_count = 1;
+                        if (NULL != strstr(V, "cond="))
+                            f_cond = (float)atof(strstr(V, "cond=") + 5);
+                        bScope = (NULL != strstr(V, "scope"));
+                        bSilencer = (NULL != strstr(V, "silencer"));
+                        bLauncher = (NULL != strstr(V, "launcher"));
+                        if (NULL != strstr(V, "ammo_type="))
                             i_ammo_type = atoi(strstr(V, "ammo_type=") + 10);
                     }
 
@@ -106,8 +108,8 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
                         //spawn count box(es) of the correct ammo for weapon
                         if (pSettings->line_exist(itmSection, "ammo_class"))
                         {
-                            pcstr ammo_class = pSettings->r_string(itmSection, "ammo_class");
-                            pcstr ammoSec = "";
+                            LPCSTR ammo_class = pSettings->r_string(itmSection, "ammo_class");
+                            LPCSTR ammoSec = "";
                             for (int i = 0, n = _GetItemCount(ammo_class); i < n; ++i)
                             {
                                 string128 tmp;
@@ -116,8 +118,10 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
                                     break;
                             }
                             if (xr_strlen(ammoSec) && pSettings->section_exist(ammoSec))
+                            {
                                 for (u32 i = 1; i <= spawn_count; ++i)
                                     alife().spawn_item(ammoSec, o_Position, m_tNodeID, m_tGraphID, ID);
+                            }
                         }
                     }
                     CSE_ALifeInventoryItem* IItem = smart_cast<CSE_ALifeInventoryItem*>(E);
@@ -129,7 +133,7 @@ void CSE_ALifeObject::spawn_supplies(LPCSTR ini_string)
 
         iItr++;
         string32 buf;
-        loadout_section = strconcat(sizeof buf, buf, "spawn_loadout", std::to_string(iItr).c_str());
+        loadout_section = strconcat(sizeof(buf), buf, "spawn_loadout", std::to_string(iItr).c_str());
     }
     //-Alundaio
 
