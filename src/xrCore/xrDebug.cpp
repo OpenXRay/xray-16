@@ -39,7 +39,7 @@ static BOOL bException = FALSE;
 #include <errorrep.h> // ReportFault
 #pragma comment(lib, "FaultRep.lib")
 
-#ifdef DEBUG
+#if defined(DEBUG) || defined(COC_EDITION)
 #define USE_OWN_ERROR_MESSAGE_WINDOW
 #else
 #define USE_OWN_MINI_DUMP

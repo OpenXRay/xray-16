@@ -13,7 +13,14 @@ SCRIPT_EXPORT(CWeaponAK74, (CGameObject),
     { module(luaState)[class_<CWeaponAK74, CGameObject>("CWeaponAK74").def(constructor<>())]; });
 
 SCRIPT_EXPORT(CWeapon, (CGameObject),
-    { module(luaState)[class_<CWeapon, CGameObject>("CWeapon").def(constructor<>())]; });
+{
+    module(luaState)
+    [
+        class_<CWeapon, CGameObject>("CWeapon")
+            .def(constructor<>())
+            .def("can_kill", (bool (CWeapon::*)() const)&CWeapon::can_kill)
+    ];
+});
 
 SCRIPT_EXPORT(CWeaponMagazined, (CGameObject),
     { module(luaState)[class_<CWeaponMagazined, CGameObject>("CWeaponMagazined").def(constructor<>())]; });

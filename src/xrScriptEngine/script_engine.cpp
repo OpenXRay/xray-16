@@ -193,34 +193,31 @@ void CScriptEngine::print_stack(lua_State* L)
 
     if (L == nullptr)
         L = lua();
-
-    lua_Debug l_tDebugInfo;
-    for (int i = 0; lua_getstack(L, i, &l_tDebugInfo); i++)
+    
+    if (strstr(Core.Params, "-luadumpstate"))
     {
         Log("\nSCRIPT ERROR");
-        lua_getinfo(L, "nSlu", &l_tDebugInfo);
-        if (!l_tDebugInfo.name)
+        lua_Debug l_tDebugInfo;
+        for (int i = 0; lua_getstack(L, i, &l_tDebugInfo); i++)
         {
-            script_log(LuaMessageType::Error, "%2d : [%s] %s(%d) : %s", i, l_tDebugInfo.what, l_tDebugInfo.short_src,
-            l_tDebugInfo.currentline, "");
-        }
-        else if (!xr_strcmp(l_tDebugInfo.what, "C"))
-            script_log(LuaMessageType::Error, "%2d : [C  ] %s", i, l_tDebugInfo.name);
-        else
-        {
-            script_log(LuaMessageType::Error, "%2d : [%s] %s(%d) : %s", i, l_tDebugInfo.what, l_tDebugInfo.short_src,
-            l_tDebugInfo.currentline, l_tDebugInfo.name);
-        }
+            lua_getinfo(L, "nSlu", &l_tDebugInfo);
+            if (!l_tDebugInfo.name)
+            {
+                script_log(LuaMessageType::Error, "%2d : [%s] %s(%d) : %s", i, l_tDebugInfo.what, l_tDebugInfo.short_src,
+                    l_tDebugInfo.currentline, "");
+            }
+            else if (!xr_strcmp(l_tDebugInfo.what, "C"))
+                script_log(LuaMessageType::Error, "%2d : [C  ] %s", i, l_tDebugInfo.name);
+            else
+            {
+                script_log(LuaMessageType::Error, "%2d : [%s] %s(%d) : %s", i, l_tDebugInfo.what, l_tDebugInfo.short_src,
+                    l_tDebugInfo.currentline, l_tDebugInfo.name);
+            }
 
-        pcstr lua_error_text = lua_tostring(L, -1); // lua-error text
-        luaL_traceback(L, L, make_string("! [LUA][Error]: %s\n", lua_error_text).c_str(), 1); // add lua traceback to it
-        pcstr sErrorText = lua_tostring(L, -1); // get combined error text from lua stack
-        Log(sErrorText);
-        lua_pop(L, 1); // restore lua stack
+            if (i < 2)
+                continue;
 
-        // Giperion: verbose log
-        if (strstr(Core.Params, "-luadumpstate"))
-        {
+            // Giperion: verbose log
             Log("\nLua state dump:\n\tLocals: ");
             pcstr name = nullptr;
             int VarID = 1;
@@ -238,8 +235,15 @@ void CScriptEngine::print_stack(lua_State* L)
                 Log("Can't dump lua state - Engine corrupted");
             }
             Log("\tEnd\nEnd of Lua state dump.\n");
+            // -Giperion
         }
-        // -Giperion
+    }
+    else
+    {
+        luaL_traceback(L, L, nullptr, 1); // add lua traceback to it
+        pcstr sErrorText = lua_tostring(L, -1); // get combined error text from lua stack
+        Log(sErrorText);
+        lua_pop(L, 1); // restore lua stack
     }
 
     m_stack_is_ready = true;
@@ -606,7 +610,7 @@ struct raii_guard : private Noncopyable
 #ifdef DEBUG
             static const bool break_on_assert = !!strstr(Core.Params, "-break_on_assert");
 #else
-            static const bool break_on_assert = false; //Alundaio: Can't get a proper stack trace with this enabled
+            static const bool break_on_assert = true; //Alundaio: Can't get a proper stack trace with this enabled
 #endif
             if (!m_error_code)
                 return; // Check "lua_pcall_failed" before changing this!

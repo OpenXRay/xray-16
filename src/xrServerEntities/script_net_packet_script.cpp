@@ -77,7 +77,7 @@ SCRIPT_EXPORT(NET_Packet, (), {
             .def("r_seek", &NET_Packet::r_seek)
             .def("r_tell", &NET_Packet::r_tell)
             // XXX: used as r_vec3(vec) -- remove pure_out_value?
-            .def("r_vec3", (void (NET_Packet::*)(Fvector&))(&NET_Packet::r_vec3), pure_out_value<2>())
+            .def("r_vec3", (void (NET_Packet::*)(Fvector&))(&NET_Packet::r_vec3))
             .def("r_bool", &r_bool)
             .def("r_float", (float (NET_Packet::*)())(&NET_Packet::r_float))
             .def("r_u64", (u64(NET_Packet::*)())(&NET_Packet::r_u64))
