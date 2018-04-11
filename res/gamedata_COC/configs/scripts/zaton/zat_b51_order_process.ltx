@@ -1,0 +1,14 @@
+[logic]
+active = nil ;sr_idle@waiting_intro
+
+[sr_idle@waiting_intro]
+on_info = {+zat_b51_nimble_intro} sr_idle@no_scientific
+
+[sr_idle@no_scientific]
+on_info = {+jup_a9_tech_way_info +jup_a9_tech_conservation_info} sr_idle@waiting_category %-zat_b51_finished_categories_all%, {+zat_b51_finished_category_1 +zat_b51_finished_category_2 +zat_b51_finished_category_3 +zat_b51_finished_category_4 +zat_b51_finished_category_5 +zat_b51_finished_category_7} sr_idle@need_scientific %+zat_b51_finished_categories_all%
+
+[sr_idle@need_scientific]
+on_info = {+jup_a9_tech_way_info +jup_a9_tech_conservation_info} sr_idle@waiting_category %-zat_b51_finished_categories_all%
+
+[sr_idle@waiting_category]
+on_info = {+zat_b51_finished_category_1 +zat_b51_finished_category_2 +zat_b51_finished_category_3 +zat_b51_finished_category_4 +zat_b51_finished_category_5 +zat_b51_finished_category_6 +zat_b51_finished_category_7} nil %+zat_b51_finished_categories_all%

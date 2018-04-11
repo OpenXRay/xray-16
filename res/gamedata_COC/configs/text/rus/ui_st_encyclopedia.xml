@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+
+	<!-- PDA -->
+	<string id="pda_btn_encyclopedia">
+		<text>Справочник</text>
+	</string>
+	
+	<string id="pda_btn_encyclopedia_hint">
+		<text>Прочитать</text>
+	</string>
+	
+	<string id="pda_btn_encyclopedia_title">
+		<text>Справочник сталкера</text>
+	</string>
+	
+	<string id="pda_btn_encyclopedia_notify">
+		<text>Статья недоступна</text>
+	</string>
+	
+	<string id="pda_btn_encyclopedia_locked">
+		<text>
+			Вы ещё не разблокировали эту статью.\n
+			\n Статьи могут быть разблокированы следующим образом:\n
+			\n• Поиск и использование карт памяти.
+		</text>
+	</string>
+	
+</string_table>

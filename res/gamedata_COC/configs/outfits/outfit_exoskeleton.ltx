@@ -1,0 +1,797 @@
+[outfit_exo_base]
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+class                                    = EQU_STLK ;Change to E_STLK if you want to use se_item.se_outfit script binding
+cform                                    = skeleton
+
+additional_inventory_weight              = 0 ; +max_walk_weight
+additional_inventory_weight2             = 0 ;	+40 kg
+player_hud_section                       = actor_hud_05
+
+power_restore_speed = 0
+
+discovery_dependency                     =
+installed_upgrades                       =
+
+ef_equipment_type                        = 5
+slot                                     = 6
+
+full_scale_icon                          = 2,11
+
+sprint_allowed                           = false
+helmet_avaliable                         = false
+default_to_ruck                          = false
+
+hit_fraction_actor                       = 0.45
+control_inertion_factor                  = 2.5
+power_loss                               = 0.5
+additional_inventory_weight              = 40
+additional_inventory_weight2             = 40
+
+upgrades                                 = up_gr_firstab_exo_outfit, up_gr_seconab_exo_outfit, up_gr_thirdab_exo_outfit, up_gr_fourtab_exo_outfit, up_gr_fifthab_exo_outfit
+upgrade_scheme                           = upgrade_scheme_exo_outfit
+
+bones_koeff_protection                   = actor_armor_exo
+
+burn_protection                          = 0.045
+shock_protection                         = 0.135
+radiation_protection                     = 0.015
+chemical_burn_protection                 = 0.045
+telepatic_protection                     = 0.03
+strike_protection                        = 0.36
+explosion_protection                     = 0.36
+wound_protection                         = 0.3
+
+immunities_sect                          = sect_exo_outfit_immunities
+
+inv_grid_width                           = 2
+inv_grid_height                          = 3
+
+mask_hud                                 = helm_exo ;mask_hud.script   
+
+[sect_exo_outfit_immunities]
+burn_immunity                            = 0.04
+strike_immunity                          = 0.005
+shock_immunity                           = 0.07
+wound_immunity                           = 0.025
+radiation_immunity                       = 0.0
+telepatic_immunity                       = 0.0
+chemical_burn_immunity                   = 0.04
+explosion_immunity                       = 0.025
+fire_wound_immunity                      = 0.015
+
+[sect_exo_outfit_immunities_add]
+burn_immunity                            = -0.011
+strike_immunity                          = -0.001
+shock_immunity                           = -0.015
+wound_immunity                           = -0.007
+radiation_immunity                       = 0.0
+telepatic_immunity                       = 0.0
+chemical_burn_immunity                   = -0.011
+explosion_immunity                       = -0.009
+fire_wound_immunity                      = -0.005
+
+;---------------------------------------------------------------------------------------------
+;		FREEDOM EXOSKELETON
+;---------------------------------------------------------------------------------------------
+[svoboda_exo_outfit]:outfit_exo_base
+$spawn                                   = "outfit\freedom_exo_outfit"
+visual                                   = dynamics\outfit\freedom_exo_outfit
+actor_visual                             = actors\stalker_freedom\stalker_freedom_4.ogf
+npc_visual                               = actors\stalker_freedom\stalker_freedom_4.ogf
+player_hud_section                       = actor_hud_freedom_exo
+
+inv_name                                 = svoboda_exo_outfit_name
+inv_name_short                           = svoboda_exo_outfit_name
+description                              = svoboda_exo_outfit_description
+
+inv_weight                               = 22
+
+inv_grid_x                               = 12
+inv_grid_y                               = 18
+
+upgr_icon_x                              = 935
+upgr_icon_y                              = 670
+upgr_icon_width                          = 304
+upgr_icon_height                         = 159
+
+cost                                     = 115000
+
+upgrades                                 = up_gr_firstab_svoboda_exo_outfit, up_gr_seconab_svoboda_exo_outfit, up_gr_thirdab_svoboda_exo_outfit, up_gr_fourtab_svoboda_exo_outfit, up_gr_fifthab_svoboda_exo_outfit
+
+burn_protection                          = 0.05
+shock_protection                         = 0.15
+radiation_protection                     = 0.016
+chemical_burn_protection                 = 0.05
+strike_protection                        = 0.32
+explosion_protection                     = 0.32
+wound_protection                         = 0.265
+
+immunities_sect                          = sect_svoboda_exo_outfit_immunities
+
+bones_koeff_protection                   = actor_armor_freedom_exo
+
+hit_fraction_actor                       = 0.47
+
+power_loss                               = 0.48
+
+artefact_count                           = 1
+
+character_portrait                       = ui_inGame2_Freedom_4
+
+[sect_svoboda_exo_outfit_immunities]
+burn_immunity                            = 0.038
+strike_immunity                          = 0.005
+shock_immunity                           = 0.065
+wound_immunity                           = 0.027
+radiation_immunity                       = 0.0
+telepatic_immunity                       = 0.0
+chemical_burn_immunity                   = 0.038
+explosion_immunity                       = 0.0275
+fire_wound_immunity                      = 0.0175
+
+[sect_svoboda_exo_outfit_immunities_add]
+burn_immunity                            = -0.011
+strike_immunity                          = -0.001
+shock_immunity                           = -0.015
+wound_immunity                           = -0.0075
+radiation_immunity                       = 0.0
+telepatic_immunity                       = 0.0
+chemical_burn_immunity                   = -0.011
+explosion_immunity                       = -0.01
+fire_wound_immunity                      = -0.006
+
+;---------------------------------------------------------------------------------------------
+;		BANDIT EXOSKELETON
+;---------------------------------------------------------------------------------------------
+[bandit_exo_outfit]:outfit_exo_base
+$spawn                                   = "outfit\bandit_exo_outfit"
+visual                                   = dynamics\outfit\bandit_exo_outfit
+actor_visual                             = actors\stalker_bandit\stalker_bandit_exo.ogf
+npc_visual                               = actors\stalker_bandit\stalker_bandit_exo.ogf
+player_hud_section                       = actor_hud_bandit_exo
+
+inv_name                                 = bandit_exo_outfit_name
+inv_name_short                           = bandit_exo_outfit_name
+description                              = bandit_exo_outfit_description
+
+inv_weight                               = 23
+
+inv_grid_x                               = 2
+inv_grid_y                               = 36
+
+upgr_icon_x                              = 2500
+upgr_icon_y                              = 0
+upgr_icon_width                          = 350
+upgr_icon_height                         = 200
+
+cost                                     = 105000
+
+burn_protection                          = 0.04
+shock_protection                         = 0.12
+radiation_protection                     = 0.014
+chemical_burn_protection                 = 0.04
+strike_protection                        = 0.33
+explosion_protection                     = 0.33
+wound_protection                         = 0.27
+
+immunities_sect                          = sect_bandit_exo_outfit_immunities
+
+bones_koeff_protection                   = actor_armor_bandit_exo
+
+hit_fraction_actor                       = 0.46
+
+power_loss                               = 0.48
+
+artefact_count                           = 1
+
+character_portrait                       = ui_inGame2_merc_4
+
+[sect_bandit_exo_outfit_immunities]
+burn_immunity                            = 0.041
+strike_immunity                          = 0.005
+shock_immunity                           = 0.07
+wound_immunity                           = 0.027
+radiation_immunity                       = 0.0
+telepatic_immunity                       = 0.0
+chemical_burn_immunity                   = 0.041
+explosion_immunity                       = 0.027
+fire_wound_immunity                      = 0.017
+
+;---------------------------------------------------------------------------------------------
+;		EXOSKELETON
+;---------------------------------------------------------------------------------------------
+[exo_outfit]:outfit_exo_base
+$spawn                                   = "outfit\exo_outfit"
+visual                                   = dynamics\outfit\exo_outfit
+actor_visual                             = actors\stalker_neutral\stalker_neutral_4.ogf
+npc_visual                               = actors\stalker_neutral\stalker_neutral_4.ogf
+player_hud_section                       = actor_hud_exo
+
+inv_name                                 = exo_outfit_name
+inv_name_short                           = exo_outfit_name
+description                              = exo_outfit_description
+
+inv_weight                               = 25.0
+
+inv_grid_x                               = 14
+inv_grid_y                               = 15
+
+upgr_icon_x                              = 334
+upgr_icon_y                              = 450
+upgr_icon_width                          = 303
+upgr_icon_height                         = 159
+
+cost                                     = 110000
+
+artefact_count                           = 1
+
+character_portrait                       = ui_inGame2_neutral_4
+
+;---------------------------------------------------------------------------------------------
+;		MERCENARY EXOSKELETON
+;---------------------------------------------------------------------------------------------
+[merc_exo_outfit]:outfit_exo_base
+$spawn                                   = "outfit\merc_exo_outfit"
+visual                                   = dynamics\outfit\merc_exo_outfit
+actor_visual                             = actors\stalker_merc\stalker_merc_4.ogf
+npc_visual                               = actors\stalker_merc\stalker_merc_4.ogf
+player_hud_section                       = actor_hud_merc_exo
+
+inv_name                                 = merc_exo_outfit_name
+inv_name_short                           = merc_exo_outfit_name
+description                              = merc_exo_outfit_description
+
+inv_weight                               = 25.0
+
+inv_grid_x                               = 16
+inv_grid_y                               = 17
+
+upgr_icon_x                              = 1550
+upgr_icon_y                              = 670
+upgr_icon_width                          = 304
+upgr_icon_height                         = 159
+
+cost                                     = 115000
+
+upgrades                                 = up_gr_firstab_merc_exo_outfit, up_gr_seconab_merc_exo_outfit, up_gr_thirdab_merc_exo_outfit, up_gr_fourtab_merc_exo_outfit, up_gr_fifthab_merc_exo_outfit
+
+artefact_count                           = 2
+
+character_portrait                       = ui_inGame2_merc_4
+
+;---------------------------------------------------------------------------------------------
+;		MONOLITH EXOSKELETON
+;---------------------------------------------------------------------------------------------
+[monolith_exo_outfit]:outfit_exo_base
+$spawn                                   = "outfit\monolith_exo_outfit"
+visual                                   = dynamics\outfit\monolith_exo_outfit
+actor_visual                             = actors\stalker_monolith\stalker_monolith_4.ogf
+npc_visual                               = actors\stalker_monolith\stalker_monolith_4.ogf
+player_hud_section                       = actor_hud_monolith_exo
+
+inv_name                                 = monolith_exo_outfit_name
+inv_name_short                           = monolith_exo_outfit_name
+description                              = monolith_exo_outfit_description
+
+inv_weight                               = 25.0
+
+inv_grid_x                               = 4
+inv_grid_y                               = 36
+
+upgr_icon_x                              = 1540
+upgr_icon_y                              = 510
+upgr_icon_width                          = 304
+upgr_icon_height                         = 159
+
+cost                                     = 115000
+
+upgrades                                 = up_gr_firstab_monolith_exo_outfit, up_gr_seconab_monolith_exo_outfit, up_gr_thirdab_monolith_exo_outfit, up_gr_fourtab_monolith_exo_outfit, up_gr_fifthab_monolith_exo_outfit
+
+radiation_protection                     = 0.021
+telepatic_protection                     = 0.0
+
+artefact_count                           = 2
+
+character_portrait                       = ui_inGame2_monolit_4
+
+;---------------------------------------------------------------------------------------------
+;		DUTY EXOSKELETON
+;---------------------------------------------------------------------------------------------
+[dolg_exo_outfit]:outfit_exo_base
+$spawn                                   = "outfit\duty_exo_outfit"
+visual                                   = dynamics\outfit\dolg_exo_outfit
+actor_visual                             = actors\stalker_dolg\stalker_dolg_4.ogf
+npc_visual                               = actors\stalker_dolg\stalker_dolg_4.ogf
+player_hud_section                       = actor_hud_dolg_exo
+
+inv_name                                 = dolg_exo_outfit_name
+inv_name_short                           = dolg_exo_outfit_name
+description                              = dolg_exo_outfit_description
+
+inv_weight                               = 27.5
+
+inv_grid_x                               = 2
+inv_grid_y                               = 15
+
+upgr_icon_x                              = 1242
+upgr_icon_y                              = 670
+upgr_icon_width                          = 304
+upgr_icon_height                         = 159
+
+cost                                     = 115000
+
+upgrades                                 = up_gr_firstab_dolg_exo_outfit, up_gr_seconab_dolg_exo_outfit, up_gr_thirdab_dolg_exo_outfit, up_gr_fourtab_dolg_exo_outfit, up_gr_fifthab_dolg_exo_outfit
+
+burn_protection                          = 0.04
+shock_protection                         = 0.12
+radiation_protection                     = 0.014
+chemical_burn_protection                 = 0.04
+strike_protection                        = 0.40
+explosion_protection                     = 0.40
+wound_protection                         = 0.33
+
+immunities_sect                          = sect_dolg_exo_outfit_immunities
+
+bones_koeff_protection                   = actor_armor_duty_exo
+
+hit_fraction_actor                       = 0.43
+
+power_loss                               = 0.52
+
+artefact_count                           = 0
+
+character_portrait                       = ui_inGame2_Dolg_4
+
+[sect_dolg_exo_outfit_immunities]
+burn_immunity                            = 0.042
+strike_immunity                          = 0.006
+shock_immunity                           = 0.075
+wound_immunity                           = 0.023
+radiation_immunity                       = 0.0
+telepatic_immunity                       = 0.0
+chemical_burn_immunity                   = 0.042
+explosion_immunity                       = 0.023
+fire_wound_immunity                      = 0.014
+
+[sect_dolg_exo_outfit_immunities_add]
+burn_immunity                            = -0.0115
+strike_immunity                          = -0.001
+shock_immunity                           = -0.015
+wound_immunity                           = -0.0065
+radiation_immunity                       = 0.0
+telepatic_immunity                       = 0.0
+chemical_burn_immunity                   = -0.0115
+explosion_immunity                       = -0.009
+fire_wound_immunity                      = -0.005
+
+;---------------------------------------------------------------------------------------------
+;		MILITARY EXOSKELETON
+;---------------------------------------------------------------------------------------------
+[military_exo_outfit]:outfit_exo_base
+$spawn                                   = "outfit\military_exo_outfit"
+visual                                   = dynamics\outfit\military_exo_outfit
+actor_visual                             = actors\stalker_soldier\stalker_military_exo.ogf
+npc_visual                               = actors\stalker_soldier\stalker_military_exo.ogf
+player_hud_section                       = actor_hud_military_exo
+
+inv_name                                 = military_exo_outfit_name
+inv_name_short                           = military_exo_outfit_name
+description                              = military_exo_outfit_description
+
+inv_weight                               = 30.0
+
+inv_grid_x                               = 0
+inv_grid_y                               = 36
+
+upgr_icon_x                              = 1850
+upgr_icon_y                              = 1000
+upgr_icon_width                          = 350
+upgr_icon_height                         = 200
+
+cost                                     = 125000
+
+burn_protection                          = 0.035
+shock_protection                         = 0.105
+radiation_protection                     = 0.022
+chemical_burn_protection                 = 0.035
+strike_protection                        = 0.43
+explosion_protection                     = 0.43
+wound_protection                         = 0.355
+
+immunities_sect                          = sect_military_exo_outfit_immunities
+
+bones_koeff_protection                   = actor_armor_military_exo
+
+hit_fraction_actor                       = 0.4
+
+power_loss                               = 0.55
+
+artefact_count                           = 0
+
+character_portrait                       = ui_inGame2_monolit_4
+
+[sect_military_exo_outfit_immunities]
+burn_immunity                            = 0.044
+strike_immunity                          = 0.007
+shock_immunity                           = 0.08
+wound_immunity                           = 0.02
+radiation_immunity                       = 0.0
+telepatic_immunity                       = 0.0
+chemical_burn_immunity                   = 0.044
+explosion_immunity                       = 0.021
+fire_wound_immunity                      = 0.012
+
+[sect_military_exo_outfit_immunities_add]
+burn_immunity                            = -0.0115
+strike_immunity                          = -0.0015
+shock_immunity                           = -0.017
+wound_immunity                           = -0.0065
+radiation_immunity                       = 0.0
+telepatic_immunity                       = 0.0
+chemical_burn_immunity                   = -0.0115
+explosion_immunity                       = -0.0085
+fire_wound_immunity                      = -0.0045
+
+;---------------------------------------------------------------------------------------------
+;		Radiation Suit
+;---------------------------------------------------------------------------------------------
+[radiation_outfit]
+$spawn                                   = "outfit\radiation_outfit"
+visual                                   = dynamics\outfit\stalker_rad_outfit
+actor_visual                             = actors\stalker_neutral\stalker_neutral_3.ogf
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+class                                    = EQU_STLK ;Change to E_STLK if you want to use se_item.se_outfit script binding
+cform                                    = skeleton
+player_hud_section                       = actor_hud_radiation
+
+power_restore_speed = 0
+
+discovery_dependency                     =
+installed_upgrades                       =
+
+ef_equipment_type                        = 5
+slot                                     = 6
+
+full_scale_icon                          = 2,11
+
+inv_name                                 = radiation_outfit_name
+inv_name_short                           = radiation_outfit_name
+description                              = radiation_outfit_description
+
+inv_weight                               = 17
+
+inv_grid_x                               = 6
+inv_grid_y                               = 36
+inv_grid_width                           = 2
+inv_grid_height                          = 3
+
+upgr_icon_x                              = 935
+upgr_icon_y                              = 509
+upgr_icon_width                          = 298
+upgr_icon_height                         = 156
+
+cost                                     = 75000
+
+helmet_avaliable                         = false
+power_loss                               = 0.3
+hit_fraction_actor                       = 0.575
+control_inertion_factor                  = 2.5
+sprint_allowed                           = true
+default_to_ruck                          = false
+additional_inventory_weight              = 10
+additional_inventory_weight2             = 10
+
+burn_protection                          = 0.06
+shock_protection                         = 0.3
+radiation_protection                     = 0.018
+chemical_burn_protection                 = 0.06
+telepatic_protection                     = 0.04
+strike_protection                        = 0.27
+explosion_protection                     = 0.27
+wound_protection                         = 0.225
+
+immunities_sect                          = sect_rad_outfit_immunities
+
+bones_koeff_protection                   = actor_armor_rad
+
+artefact_count                           = 1
+
+upgrades                                 = up_gr_firstab_rad_outfit, up_gr_seconab_rad_outfit, up_gr_thirdab_rad_outfit, up_gr_fourtab_rad_outfit
+upgrade_scheme                           = upgrade_scheme_rad_outfit
+
+character_portrait                       = ui_inGame2_neutral_3
+mask_hud                                 = helm_respirator
+
+[sect_rad_outfit_immunities]
+burn_immunity                            = 0.036
+strike_immunity                          = 0.0
+shock_immunity                           = 0.014
+wound_immunity                           = 0.035
+radiation_immunity                       = 0.0
+telepatic_immunity                       = 0.0
+chemical_burn_immunity                   = 0.036
+explosion_immunity                       = 0.034
+fire_wound_immunity                      = 0.018
+
+[sect_rad_outfit_immunities_add]
+burn_immunity                            = -0.018
+strike_immunity                          = 0.0
+shock_immunity                           = -0.009
+wound_immunity                           = -0.015
+radiation_immunity                       = 0.0
+telepatic_immunity                       = 0.0
+chemical_burn_immunity                   = -0.018
+explosion_immunity                       = -0.018
+fire_wound_immunity                      = -0.009
+
+;---------------------------------------------------------------------------------------------
+;		Duty Radiation Suit
+;---------------------------------------------------------------------------------------------
+[dolg_radiation_outfit]:radiation_outfit
+$spawn                                   = "outfit\dolg_radiation_outfit"
+visual                                   = dynamics\outfit\duty_rad_outfit
+actor_visual                             = actors\stalker_dolg\stalker_dolgexo_4.ogf
+player_hud_section                       = actor_hud_duty_radiation
+
+inv_name                                 = dolg_radiation_outfit_name
+inv_name_short                           = dolg_radiation_outfit_name
+description                              = dolg_radiation_outfit_description
+
+inv_weight                               = 18.5
+
+inv_grid_x                               = 10
+inv_grid_y                               = 36
+
+upgr_icon_x                              = 1858
+upgr_icon_y                              = 676
+upgr_icon_width                          = 290
+upgr_icon_height                         = 153
+
+cost                                     = 77500
+
+power_loss                               = 0.32
+
+hit_fraction_actor                       = 0.55
+
+burn_protection                          = 0.055
+shock_protection                         = 0.275
+radiation_protection                     = 0.018
+chemical_burn_protection                 = 0.055
+strike_protection                        = 0.3
+explosion_protection                     = 0.3
+wound_protection                         = 0.25
+
+immunities_sect                          = sect_dolg_rad_outfit_immunities
+
+bones_koeff_protection                   = actor_armor_duty_rad
+
+artefact_count                           = 0
+
+upgrades                                 = up_gr_firstab_dolg_rad_outfit, up_gr_seconab_dolg_rad_outfit, up_gr_thirdab_dolg_rad_outfit, up_gr_fourtab_dolg_rad_outfit
+
+character_portrait                       = ui_inGame2_Dolg_4e
+
+[sect_dolg_rad_outfit_immunities]
+burn_immunity                            = 0.038
+strike_immunity                          = 0.0
+shock_immunity                           = 0.015
+wound_immunity                           = 0.033
+radiation_immunity                       = 0.0
+telepatic_immunity                       = 0.0
+chemical_burn_immunity                   = 0.038
+explosion_immunity                       = 0.033
+fire_wound_immunity                      = 0.017
+
+;---------------------------------------------------------------------------------------------
+;		Freedom Radiation Suit
+;---------------------------------------------------------------------------------------------
+[svoboda_radiation_outfit]:radiation_outfit
+$spawn                                   = "outfit\svoboda_radiation_outfit"
+visual                                   = dynamics\outfit\freedom_rad_outfit
+actor_visual                             = actors\stalker_freedom\stalker_freedom_5.ogf
+player_hud_section                       = actor_hud_freedom_radiation
+
+inv_name                                 = svoboda_radiation_outfit_name
+inv_name_short                           = svoboda_radiation_outfit_name
+description                              = svoboda_radiation_outfit_description
+
+inv_weight                               = 16.0
+
+inv_grid_x                               = 12
+inv_grid_y                               = 36
+
+upgr_icon_x                              = 1861
+upgr_icon_y                              = 842
+upgr_icon_width                          = 298
+upgr_icon_height                         = 157
+
+cost                                     = 77500
+
+power_loss                               = 0.29
+
+hit_fraction_actor                       = 0.6
+
+burn_protection                          = 0.065
+shock_protection                         = 0.325
+radiation_protection                     = 0.018
+chemical_burn_protection                 = 0.065
+strike_protection                        = 0.25
+explosion_protection                     = 0.25
+wound_protection                         = 0.21
+
+immunities_sect                          = sect_free_rad_outfit_immunities
+
+bones_koeff_protection                   = actor_armor_free_rad
+
+upgrades                                 = up_gr_firstab_svoboda_rad_outfit, up_gr_seconab_svoboda_rad_outfit, up_gr_thirdab_svoboda_rad_outfit, up_gr_fourtab_svoboda_rad_outfit
+
+character_portrait                       = ui_inGame2_Freedom_5
+
+[sect_free_rad_outfit_immunities]
+burn_immunity                            = 0.034
+strike_immunity                          = 0.0
+shock_immunity                           = 0.013
+wound_immunity                           = 0.037
+radiation_immunity                       = 0.0
+telepatic_immunity                       = 0.0
+chemical_burn_immunity                   = 0.034
+explosion_immunity                       = 0.035
+fire_wound_immunity                      = 0.019
+
+;---------------------------------------------------------------------------------------------
+;		Merc Radiation Suit
+;---------------------------------------------------------------------------------------------
+[merc_radiation_outfit]:radiation_outfit
+$spawn                                   = "outfit\merc_radiation_outfit"
+visual                                   = dynamics\outfit\killer_rad_outfit
+actor_visual                             = actors\stalker_merc\stalker_mercexo_4
+player_hud_section                       = actor_hud_merc_radiation
+
+inv_name                                 = merc_radiation_outfit_name
+inv_name_short                           = merc_radiation_outfit_name
+description                              = merc_radiation_outfit_description
+
+inv_grid_x                               = 14
+inv_grid_y                               = 36
+
+upgr_icon_x                              = 1857
+upgr_icon_y                              = 507
+upgr_icon_width                          = 293
+upgr_icon_height                         = 157
+
+cost                                     = 77500
+
+artefact_count                           = 2
+
+upgrades                                 = up_gr_firstab_merc_rad_outfit, up_gr_seconab_merc_rad_outfit, up_gr_thirdab_merc_rad_outfit, up_gr_fourtab_merc_rad_outfit
+
+character_portrait                       = ui_inGame2_merc_4a
+
+;---------------------------------------------------------------------------------------------
+;		Monolith Radiation Suit
+;---------------------------------------------------------------------------------------------
+[monolith_radiation_outfit]:radiation_outfit
+$spawn                                   = "outfit\monolith_radiation_outfit"
+visual                                   = dynamics\outfit\monolith_rad_outfit
+actor_visual                             = actors\stalker_monolith\stalker_monolith_3.ogf
+player_hud_section                       = actor_hud_monolith_radiation
+
+inv_name                                 = monolith_radiation_outfit_name
+inv_name_short                           = monolith_radiation_outfit_name
+description                              = monolith_radiation_outfit_description
+
+inv_grid_x                               = 8
+inv_grid_y                               = 36
+
+upgr_icon_x                              = 1240
+upgr_icon_y                              = 509
+upgr_icon_width                          = 296
+upgr_icon_height                         = 157
+
+cost                                     = 77500
+
+artefact_count                           = 2
+
+radiation_protection                     = 0.024
+telepatic_protection                     = 0.01
+
+upgrades                                 = up_gr_firstab_monolith_rad_outfit, up_gr_seconab_monolith_rad_outfit, up_gr_thirdab_monolith_rad_outfit, up_gr_fourtab_monolith_rad_outfit
+
+character_portrait                       = ui_inGame2_monolit_3
+mask_hud                                 = helm_respirator
+
+;---------------------------------------------------------------------------------------------
+;		Clear Sky EXOSKELETON
+;---------------------------------------------------------------------------------------------
+[cs_exo_outfit]:outfit_exo_base
+$spawn                                   = "outfit\cs_exo_outfit"
+visual                                   = dynamics\outfit\cs_exo_outfit
+actor_visual                             = actors\stalker_nebo\stalker_nebo_exo_1.ogf
+npc_visual                               = actors\stalker_nebo\stalker_nebo_exo_1.ogf
+player_hud_section                       = actor_hud_merc_exo
+
+inv_name                                 = cs_exo_outfit_name
+inv_name_short                           = cs_exo_outfit_name
+description                              = cs_exo_outfit_description
+
+inv_weight                               = 25.0
+
+inv_grid_x                               = 16
+inv_grid_y                               = 36
+
+upgr_icon_x                              = 938
+upgr_icon_y                              = 1000
+upgr_icon_width                          = 296
+upgr_icon_height                         = 154
+
+cost                                     = 110000
+
+artefact_count                           = 1
+
+character_portrait                       = ui_inGame2_csky_exo
+
+;---------------------------------------------------------------------------------------------
+;		PROTO EXOSKELETON
+;---------------------------------------------------------------------------------------------
+[exo_proto_outfit]:outfit_exo_base
+$spawn                                   = "outfit\exo_proto_outfit"
+visual                                   = dynamics\outfit\exo_outfit
+actor_visual                             = actors\stalker_neutral\stalker_neutral_exo_proto.ogf
+npc_visual                               = actors\stalker_neutral\stalker_neutral_exo_proto.ogf
+player_hud_section                       = actor_hud_exo
+
+inv_name                                 = exo_proto_outfit_name
+inv_name_short                           = exo_proto_outfit_name
+description                              = exo_proto_outfit_description
+
+inv_weight                               = 13.5
+
+inv_grid_x                               = 24
+inv_grid_y                               = 33
+
+upgr_icon_x                              = 624
+upgr_icon_y                              = 1150
+upgr_icon_width                          = 302
+upgr_icon_height                         = 157
+
+cost                                     = 80000
+
+power_loss                               = 0.4
+
+hit_fraction_actor                       = 0.7
+
+artefact_count                           = 1
+
+helmet_avaliable                         = true
+sprint_allowed                           = true
+character_portrait                       = ui_inGame2_neutral_protoexo
+
+upgrades                                 = up_gr_firstab_stalker_outfit, up_gr_seconab_stalker_outfit, up_gr_thirdab_stalker_outfit
+installed_upgrades                       =
+upgrade_scheme                           = upgrade_scheme_stalker_outfit
+
+burn_protection                          = 0.035
+shock_protection                         = 0.14
+radiation_protection                     = 0.0075
+chemical_burn_protection                 = 0.035
+telepatic_protection                     = 0.0
+strike_protection                        = 0.18
+explosion_protection                     = 0.18
+wound_protection                         = 0.15
+
+bones_koeff_protection                   = actor_armor_suit
+
+immunities_sect                          = sect_exo_proto_outfit_immunities
+
+[sect_exo_proto_outfit_immunities]
+burn_immunity                            = 0.045
+strike_immunity                          = 0.0
+shock_immunity                           = 0.06
+wound_immunity                           = 0.04
+radiation_immunity                       = 0.0
+telepatic_immunity                       = 0.0
+chemical_burn_immunity                   = 0.045
+explosion_immunity                       = 0.04
+fire_wound_immunity                      = 0.022

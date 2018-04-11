@@ -1,0 +1,139 @@
+;--------------------------------------------------------------------------------------------------
+; ESCORT ECOGS TASK-
+
+[yan_ecolog_semenov_task_1]
+icon = ui_inGame2_PD_Opitniy_stalker
+prior = 30
+storyline = false
+title = yan_ecolog_semenov_task_1_name
+descr = yan_ecolog_semenov_task_1_text
+job_descr = yan_ecolog_semenov_task_1_about
+target_functor = yan_ecolog_semenov_task_target
+status_functor = task_type_ecolog_gathered_tissue_samples
+stage_complete = 2
+task_complete_descr = yan_ecolog_semenov_task_1_finish
+on_init = %=pstor_set(yan_ecolog_semenov_task_1_tissue_need:5) =add_task_companion(yan_ecolog_semenov_squad) +yan_ecolog_semenov_task_1_started -yan_ecolog_semenov_task_1_completed%
+; precondition = {=random_chance(50)} true, false
+repeat_timeout = 86400
+on_complete = %=complete_task_inc_goodwill(50:ecolog) =reward_random_money(6000:7500) =reward_stash(true) =inc_task_stage(yan_ecolog_semenov_task_1) =pstor_reset(yan_ecolog_semenov_task_1_tissue_need) =pstor_reset(yan_ecolog_semenov_task_1_tissue_count) -yan_ecolog_semenov_task_1_started -yan_ecolog_semenov_task_1_completed%
+on_fail = %=remove_task_companion(yan_ecolog_semenov_squad) =fail_task_dec_goodwill(25:ecolog)%
+on_cancel = %=remove_task_companion(yan_ecolog_semenov_squad)%
+condlist_0 = {!squad_exist(yan_ecolog_semenov_squad)} fail
+condlist_1 = {=check_task_stage(yan_ecolog_semenov_task_1:1)} %+yan_ecolog_semenov_task_1_completed =inc_task_stage(yan_ecolog_semenov_task_1) =remove_task_companion(yan_ecolog_semenov_squad)%
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND MUTANT PARTS FOR ECOGS TASK-
+
+[yan_stalker_sakharov_task_1]
+icon = ui_inGame2_Nochnaya_ohota
+prior = 50
+storyline = false
+title = yan_stalker_sakharov_task_1_name
+title_functor = general_fetch_task
+descr = yan_stalker_sakharov_task_1_text
+descr_functor = general_fetch_task
+job_descr = yan_stalker_sakharov_task_1_about
+fetch_descr = yan_stalker_sakharov_task_1_fetch_about
+fetch_func = %=setup_rare_mutant_fetch_task(yan_stalker_sakharov_task_1_fetch)%
+stage_complete = 1
+; precondition = {=random_chance(50)} true, false
+repeat_timeout = 172800
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = yan_stalker_sakharov_task_1_fetch_finish
+on_complete = %=complete_task_inc_goodwill(50:ecolog) =reward_stash(true) =reward_item_cost_mult_and_remove(yan_stalker_sakharov_task_1_fetch:4) =inc_task_stage(yan_stalker_sakharov_task_1)%
+
+
+;--------------------------------------------------------------------------------------------------
+; WAIT FOR PSI HELMET CALIBRATION TASK-
+
+[yan_stalker_sakharov_psi_helmet_upgrade]
+icon = ui_inGame2_PD_Opitniy_stalker
+prior = 30
+storyline = true
+title = yan_stalker_sakharov_psi_helmet_upgrade_name
+descr = yan_stalker_sakharov_psi_helmet_upgrade_text
+status_functor = check_if_enough_time_passed
+status_functor_params = 172800 ;2 days
+target = {=has_task_on_stage(yan_stalker_sakharov_psi_helmet_upgrade:2)} yan_stalker_sakharov
+on_init = %+yan_stalker_sakharov_psi_helmet_upgrade%
+on_complete = %=erase_pstor_ctime(yan_stalker_sakharov_psi_helmet_upgrade) -yan_stalker_sakharov_psi_helmet_upgrade%
+
+
+;--------------------------------------------------------------------------------------------------
+; TURN OFF MIRACLE MACHINE TASK-
+
+[turn_off_brain_machine]
+icon = ui_iconsTotal_yan_kill_brain_task
+prior = 104
+storyline = true
+title = brain_machine_deactivate_name
+descr = brain_machine_deactivate_text
+target = yan_space_restrictor_to_x16
+condlist_0 = {+yan_labx16_switcher_primary_off} complete
+
+;--------------------------------------------------------------------------------------------------
+; FIND LEVEL 1 TOOLKIT FOR KRUGLOV TASK-
+
+[yan_ecolog_kruglov_task_1]
+icon = ui_inGame2_Instrumenti
+prior = 10
+storyline = false
+title = yan_ecolog_kruglov_task_1_name
+title_functor = general_fetch_task
+descr = yan_ecolog_kruglov_task_1_text
+descr_functor = general_fetch_task
+job_descr = yan_ecolog_kruglov_task_1_about
+fetch_descr = yan_ecolog_kruglov_task_1_fetch_about
+fetch_func = %=setup_generic_fetch_task(yan_ecolog_kruglov_task_1_fetch:1:itm_repairkit_tier_1)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = yan_ecolog_kruglov_task_1_fetch_finish
+on_complete = %+yan_ecolog_kruglov_upgrade_tier_1 =complete_task_inc_goodwill(50:ecolog) =reward_item_cost_mult_and_remove(yan_ecolog_kruglov_task_1_fetch:1.0) =inc_task_stage(yan_ecolog_kruglov_task_1)%
+precondition = {-yan_ecolog_kruglov_upgrade_tier_1} true, false
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND LEVEL 2 TOOLKIT FOR KRUGLOV TASK-
+
+[yan_ecolog_kruglov_task_2]
+icon = ui_inGame2_Instrumenti
+prior = 10
+storyline = false
+title = yan_ecolog_kruglov_task_2_name
+title_functor = general_fetch_task
+descr = yan_ecolog_kruglov_task_2_text
+descr_functor = general_fetch_task
+job_descr = yan_ecolog_kruglov_task_2_about
+fetch_descr = yan_ecolog_kruglov_task_2_fetch_about
+fetch_func = %=setup_generic_fetch_task(yan_ecolog_kruglov_task_2_fetch:1:itm_repairkit_tier_2)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = yan_ecolog_kruglov_task_2_fetch_finish
+on_complete = %+yan_ecolog_kruglov_upgrade_tier_2 =complete_task_inc_goodwill(50:ecolog) =reward_item_cost_mult_and_remove(yan_ecolog_kruglov_task_2_fetch:1.0) =inc_task_stage(yan_ecolog_kruglov_task_2)%
+precondition = {+yan_ecolog_kruglov_upgrade_tier_1 -yan_ecolog_kruglov_upgrade_tier_2} true, false
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND LEVEL 3 TOOLKIT FOR KRUGLOV TASK-
+
+[yan_ecolog_kruglov_task_3]
+icon = ui_inGame2_Instrumenti
+prior = 10
+storyline = false
+title = yan_ecolog_kruglov_task_3_name
+title_functor = general_fetch_task
+descr = yan_ecolog_kruglov_task_3_text
+descr_functor = general_fetch_task
+job_descr = yan_ecolog_kruglov_task_3_about
+fetch_descr = yan_ecolog_kruglov_task_3_fetch_about
+fetch_func = %=setup_generic_fetch_task(yan_ecolog_kruglov_task_3_fetch:1:itm_repairkit_tier_3)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = yan_ecolog_kruglov_task_3_fetch_finish
+on_complete = %+yan_ecolog_kruglov_upgrade_tier_3 =complete_task_inc_goodwill(50:ecolog) =reward_item_cost_mult_and_remove(yan_ecolog_kruglov_task_3_fetch:1.0) =inc_task_stage(yan_ecolog_kruglov_task_3)%
+precondition = {+yan_ecolog_kruglov_upgrade_tier_2 -yan_ecolog_kruglov_upgrade_tier_3} true, false

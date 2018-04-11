@@ -1,0 +1,40 @@
+#include "profiles\profiles.ltx"
+
+[trader]
+buy_condition                                      = buy_condition_beard
+buy_item_condition_factor                          = 0.7
+buy_supplies                                       = supplies_generic
+discounts                                          = {=actor_goodwill_ge(stalker:2000)} discount_10, {=actor_goodwill_ge(stalker:1800)} discount_9, {=actor_goodwill_ge(stalker:1600)} discount_8, {=actor_goodwill_ge(stalker:1400)} discount_7, {=actor_goodwill_ge(stalker:1200)} discount_6, {=actor_goodwill_ge(stalker:1000)} discount_5, {=actor_goodwill_ge(stalker:800)} discount_4, {=actor_goodwill_ge(stalker:600)} discount_3, {=actor_goodwill_ge(stalker:400)} discount_2, {=actor_goodwill_ge(stalker:200)} discount_1, discount_0
+sell_condition                                     = sell_condition_medic_and_misc
+
+[supplies_generic]
+;Devices
+detector_simple                                    = 1, 1
+detector_advanced                                  = 1, 0.3
+
+;Medical
+medkit                                             = 5, 0.5
+antirad                                            = 3, 0.5
+bandage                                            = 3, 0.5
+
+;Drugs
+drug_anabiotic                                     = 3, 0.5
+drug_antidot                                       = 3, 0.5
+drug_booster                                       = 3, 0.5
+drug_coagulant                                     = 3, 0.5
+drug_psy_blockade                                  = 3, 0.5
+drug_radioprotector                                = 3, 0.5
+
+;Food
+bread                                              = 6, 0.4
+conserva                                           = 6, 0.4
+kolbasa                                            = 6, 0.4
+energy_drink                                       = 6, 0.4
+vodka                                              = 6, 0.4
+
+;Misc
+itm_sleepbag                                       = 1, 0.5
+itm_gunsmith_toolkit                               = 3, 0.5
+itm_outfit_toolkit                                 = 3, 0.5
+wood_stove										   = 1, 0.3
+charcoal										   = 2, 0.4

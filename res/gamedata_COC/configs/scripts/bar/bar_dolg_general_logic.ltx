@@ -1,0 +1,135 @@
+[logic@bar_dolg_general_animpoint_kamp1]
+active = animpoint@bar_dolg_general_animpoint_kamp1
+suitable = {=npc_community(dolg) !surge_started} true
+prior = 45
+
+[logic@bar_dolg_general_animpoint_kamp2]
+active = animpoint@bar_dolg_general_animpoint_kamp2
+suitable = {=npc_community(dolg) !surge_started} true
+prior = 45
+
+[logic@bar_dolg_general_animpoint_kamp3]
+active = animpoint@bar_dolg_general_animpoint_kamp3
+suitable = {=npc_community(dolg) !surge_started} true
+prior = 45
+
+[logic@bar_dolg_general_animpoint_kamp4]
+active = animpoint@bar_dolg_general_animpoint_kamp4
+suitable = {=npc_community(dolg) !surge_started} true
+prior = 45
+
+
+[animpoint@bar_dolg_general_animpoint_kamp1]
+cover_name = bar_dolg_general_animpoint_kamp1
+use_camp = true
+on_info = {=surge_started} walker@hide_1
+turn_on_campfire = true 
+meet = meet@bar_dolg_general_animpoint
+
+[walker@hide_1]
+path_walk = surge_11_walk
+;path_look =
+on_info = {=surge_complete} animpoint@bar_dolg_general_animpoint_kamp1
+turn_on_campfire = true 
+
+[animpoint@bar_dolg_general_animpoint_kamp2]
+cover_name = bar_dolg_general_animpoint_kamp2
+use_camp = true
+on_info = {=surge_started} walker@hide_2
+turn_on_campfire = true 
+meet = meet@bar_dolg_general_animpoint
+
+[walker@hide_2]
+path_walk = surge_12_walk
+;path_look =
+on_info = {=surge_complete} animpoint@bar_dolg_general_animpoint_kamp2
+
+[animpoint@bar_dolg_general_animpoint_kamp3]
+cover_name = bar_dolg_general_animpoint_kamp3
+use_camp = true
+on_info = {=surge_started} walker@hide_3
+turn_on_campfire = true 
+meet = meet@bar_dolg_general_animpoint
+
+[walker@hide_3]
+path_walk = surge_13_walk
+;path_look =
+on_info = {=surge_complete} animpoint@bar_dolg_general_animpoint_kamp3
+
+[animpoint@bar_dolg_general_animpoint_kamp4]
+cover_name = bar_dolg_general_animpoint_kamp4
+use_camp = true
+on_info = {=surge_started} walker@hide_4
+turn_on_campfire = true 
+
+[walker@hide_4]
+path_walk = surge_14_walk
+;path_look =
+on_info = {=surge_complete} animpoint@bar_dolg_general_animpoint_kamp4
+
+[logic@bar_dolg_general_zoneguard]
+suitable = {=check_npc_name(bar_dolg_general_zoneguard_stalker)} true
+prior = 200
+active = walker@zoneguard
+
+[walker@zoneguard]
+path_walk = angar_zoneguard_walk
+path_look = angar_zoneguard_look
+meet = meet@zoneguard
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+on_actor_in_zone = bar_angar_warn_zone | %=play_sound(bar_dolg_hangar_bridge_hello)%
+;turn_on_campfire = true 
+
+[meet@zoneguard]
+use = true
+use_wpn = true
+;meet_dialog = bar_dolg_zastava
+
+[meet@bar_dolg_general_animpoint]
+close_snd_hello = {=check_npc_name(monolith)} nil, {=is_wounded} nil, {!is_squad_commander} nil, {=actor_enemy} nil, {=actor_has_weapon} meet_hide_weapon, meet_hello
+close_snd_bye 	= {=check_npc_name(monolith)} nil, {=is_wounded} nil, {!is_squad_commander} nil, {=actor_enemy} nil, {=actor_has_weapon} nil, meet_hello
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance 	= 0
+far_distance 	= 0
+use = {=actor_enemy} false, {=dist_to_actor_le(3)} true, false
+snd_on_use = {!dist_to_actor_le(3)} nil
+meet_on_talking = false
+
+;duty trader
+[logic@bar_dolg_general_petrenko]
+suitable = {=check_npc_name(bar_dolg_general_petrenko_stalker)} true
+prior = 200
+active = animpoint@stand
+level_spot = trader
+trade = misc\trade\trade_dolg_petrenko.ltx
+can_select_weapon = false
+dont_keep_items = true
+
+[animpoint@stand]
+cover_name = bar_dolg_general_petrenko_smart_cover
+reach_movement = walk_noweap
+avail_animations = jup_b41_novikov_stand
+use_camp = false
+meet = meet@trader
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+reach_distance = 10
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet@trader]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_distance = 3
+use = {=actor_enemy} false, true

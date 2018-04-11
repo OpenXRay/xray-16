@@ -1,0 +1,21 @@
+[smart_terrain]
+squad_id = 1
+max_population = 3
+respawn_params = respawn@bar_dolg_bunker
+respawn_idle = 86400
+
+
+[respawn@bar_dolg_bunker]
+spawn_duty@advanced
+spawn_duty@veteran
+
+[spawn_duty@advanced]
+spawn_squads = duty_sim_squad_advanced, duty_sim_squad_advanced, duty_sim_squad_novice
+spawn_num = 2
+
+[spawn_duty@veteran]
+spawn_squads = duty_sim_squad_advanced, duty_sim_squad_advanced, duty_sim_squad_veteran
+spawn_num = 1
+
+[exclusive]
+bar_dolg_leader = bar\bar_dolg_bunker_logic.ltx

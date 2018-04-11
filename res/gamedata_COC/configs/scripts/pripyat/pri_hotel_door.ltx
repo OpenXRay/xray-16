@@ -1,0 +1,21 @@
+[logic]
+active = ph_door@check_story
+
+[ph_door@check_story]
+on_info = {+story_mode_disabled} ph_door@closed, ph_door@locked
+
+[ph_door@locked]
+locked = true
+closed = true
+show_tips = false
+on_info = {+cit_jail_doctor_pryp_task} ph_door@closed
+
+[ph_door@closed]
+locked = false
+closed = true
+on_use = ph_door@open
+
+[ph_door@open]
+locked = false
+closed = false
+on_use = ph_door@closed

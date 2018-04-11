@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="st_cap_af_weather_options">
+		<text>Weather</text>
+	</string>
+	<string id="st_cap_af_event_options">
+		<text>Event</text>
+	</string>
+	<string id="st_cap_af_moon_options">
+		<text>Night</text>
+	</string>
+	<string id="st_cap_af_default_options">
+		<text>Other</text>
+	</string>
+	<string id="st_cap_af_blowout">
+		<text>Emissions</text>
+	</string>
+	<string id="st_cap_af_fallout">
+		<text>Fallouts</text>
+	</string>
+	<string id="st_cap_af_psi_storm">
+		<text>Psi-storms</text>
+	</string>
+	<string id="st_cap_check_enable_blowout">
+		<text>Emissions enabled</text>
+	</string>
+	<string id="st_cap_check_enable_fallout">
+		<text>Fallouts enabled</text>
+	</string>
+	<string id="st_cap_check_enable_psi_storm">
+		<text>Psi-storms enabled</text>
+	</string>
+
+	<string id="st_cap_fate">
+		<text>NPCs fate</text>
+	</string>
+	<string id="st_cap_warning">
+		<text>Warnings</text>
+	</string>
+	<string id="st_cap_task">
+		<text>Tasks</text>
+	</string>
+	<string id="st_cap_freq">
+		<text>Frequency</text>
+	</string>
+	
+	<string id="st_list_freq_12">
+		<text>every 6 - 12 hours</text>
+	</string>
+	<string id="st_list_freq_24">
+		<text>every 12 - 24 hours</text>
+	</string>
+	<string id="st_list_freq_48">
+		<text>every 1 - 2 days</text>
+	</string>
+	<string id="st_list_freq_96">
+		<text>every 2 - 4 days</text>
+	</string>
+
+	<string id="st_list_fate_killatend">
+		<text>Kill at the end</text>
+	</string>
+	<string id="st_list_fate_killatwave">
+		<text>Kill as wave advances</text>
+	</string>
+	<string id="st_list_fate_turntozombie">
+		<text>Turn to zombie</text>
+	</string>
+	<string id="st_list_fate_explode">
+		<text>Rip apart</text>
+	</string>
+	<string id="st_list_fate_poison">
+		<text>Rad./chem. poisoning</text>
+	</string>
+	<string id="st_list_fate_none">
+		<text>Unhurt</text>
+	</string>
+	<string id="st_list_fate_kill">
+		<text>Kill on vortex discharge</text>
+	</string>
+	<string id="st_list_fate_killorturn">
+		<text>Kill or turn to zombie</text>
+	</string>
+	<string id="st_list_warning_radio_siren">
+		<text>Radio and siren</text>
+	</string>
+	<string id="st_list_warning_radio">
+		<text>Radio</text>
+	</string>
+	<string id="st_list_warning_siren">
+		<text>Siren</text>
+	</string>
+	<string id="st_list_warning_none">
+		<text>No warning</text>
+	</string>
+	<string id="st_list_task_give">
+		<text>Give task</text>
+	</string>
+	<string id="st_list_task_none">
+		<text>Don't give task</text>
+	</string>
+	<string id="st_cap_moon_phases">
+		<text>Moon phases</text>
+	</string>
+	<string id="st_cap_night_brightness">
+		<text>Ambient night brightness</text>
+	</string>
+	<string id="st_list_night_brightness_dark">
+		<text>Dark nights</text>
+	</string>
+	<string id="st_list_night_brightness_slight">
+		<text>Slightly brighter nights</text>
+	</string>
+	<string id="st_list_night_brightness_medium">
+		<text>Medium bright nights</text>
+	</string>
+	<string id="st_list_night_brightness_bright">
+		<text>Very bright nights</text>
+	</string>
+	<string id="st_cap_weather_presets">
+		<text>Presets:</text>
+	</string>
+	<string id="st_cap_weather_balance_presets">
+		<text>Balance</text>
+	</string>
+	<string id="st_cap_weather_length_presets">
+		<text>Length</text>
+	</string>
+	<string id="st_period_length_2h">
+		<text>2h</text>
+	</string>
+	<string id="st_period_length_3h">
+		<text>3h</text>
+	</string>
+	<string id="st_period_length_4h">
+		<text>4h</text>
+	</string>
+	<string id="st_period_length_5h">
+		<text>5h</text>
+	</string>
+	<string id="st_period_length_6h">
+		<text>6h</text>
+	</string>
+	<string id="st_period_length_7h">
+		<text>7h</text>
+	</string>
+	<string id="st_period_length_8h">
+		<text>8h</text>
+	</string>
+	<string id="st_period_length_9h">
+		<text>9h</text>
+	</string>
+	<string id="st_period_length_10h">
+		<text>10h</text>
+	</string>
+	<string id="st_period_length_11h">
+		<text>11h</text>
+	</string>
+	<string id="st_period_length_12h">
+		<text>12h</text>
+	</string>
+	<string id="st_period_length">
+		<text>Period length</text>
+	</string>
+	<string id="st_cap_moon_cycle_length">
+		<text>Moon cycle length</text>
+	</string>
+	<string id="st_cap_moon_cycle_length_8">
+		<text>8 days</text>
+	</string>
+	<string id="st_cap_moon_cycle_length_28">
+		<text>28 days</text>
+	</string>
+	<string id="st_cap_moon_static">
+		<text>Don't change and show</text>
+	</string>
+	<string id="st_cap_moon_phase_0">
+		<text>New moon</text>
+	</string>
+	<string id="st_cap_moon_phase_1">
+		<text>Waxing crescent</text>
+	</string>
+	<string id="st_cap_moon_phase_2">
+		<text>1st quarter</text>
+	</string>
+	<string id="st_cap_moon_phase_3">
+		<text>Waxing gibbous</text>
+	</string>
+	<string id="st_cap_moon_phase_4">
+		<text>Full moon</text>
+	</string>
+	<string id="st_cap_moon_phase_5">
+		<text>Waning gibbous</text>
+	</string>
+	<string id="st_cap_moon_phase_6">
+		<text>3rd quarter</text>
+	</string>
+	<string id="st_cap_moon_phase_7">
+		<text>Waning crescent</text>
+	</string>
+	<string id="st_list_weather_balance_preset_default">
+		<text>Various balances</text>
+	</string>
+	<string id="st_list_weather_balance_preset_good">
+		<text>Mostly good</text>
+	</string>
+	<string id="st_list_weather_balance_preset_bad">
+		<text>Mostly bad</text>
+	</string>
+	<string id="st_list_weather_balance_preset_custom">
+		<text>Custom</text>
+	</string>
+	<string id="st_list_weather_length_preset_default">
+		<text>Various period lengths</text>
+	</string>
+	<string id="st_list_weather_length_preset_short">
+		<text>Short</text>
+	</string>
+	<string id="st_list_weather_length_preset_long">
+		<text>Long</text>
+	</string>
+	<string id="st_list_weather_length_preset_custom">
+		<text>Custom</text>
+	</string>
+	<string id="st_list_periods_clear">
+		<text>Sunny</text>
+	</string>
+	<string id="st_list_periods_clear_foggy">
+		<text>Sunny / Foggy</text>
+	</string>
+	<string id="st_list_periods_foggy">
+		<text>Foggy</text>
+	</string>
+	<string id="st_list_periods_foggy_rainy">
+		<text>Foggy / Rainy</text>
+	</string>
+	<string id="st_list_periods_rainy">
+		<text>Rainy</text>
+	</string>
+	<string id="st_list_periods_stormy">
+		<text>Stormy</text>
+	</string>
+	<string id="st_btn_load_color_balance">
+		<text>Load default colour balance and brightness settings</text>
+	</string>
+	<string id="st_btn_load_default_settings">
+		<text>Restore default weather, event and moon settings</text>
+	</string>
+	<string id="st_msg_after_save">
+		<text>The settings will be stored with the next save game</text>
+	</string>
+	<string id="st_msg_load_user">
+		<text>Do you want to load default console colour balance and brightness settings?</text>
+	</string>
+	<string id="st_msg_load_default_settings">
+		<text>Do you want to load default weather, event and moon settings?</text>
+	</string>
+	<string id="st_msg_load_user_done">
+		<text>Default console colour balance and brightness settings have been loaded</text>
+	</string>
+	<string id="st_msg_load_default_settings_done">
+		<text>Default weather, event and moon settings have been restored</text>
+	</string>
+</string_table>

@@ -1,0 +1,23 @@
+[smart_terrain];mar_smart_terrain_6_8
+squad_id = 18
+max_population = 1
+respawn_params = respawn@mar_smart_terrain_6_8
+respawn_idle = 86400
+
+
+[respawn@mar_smart_terrain_6_8]
+spawn_flesh
+spawn_boar
+spawn_cat
+
+[spawn_flesh]
+spawn_squads = simulation_flesh, simulation_flesh, simulation_mix_boar_flesh
+spawn_num = 2
+
+[spawn_boar]
+spawn_squads = simulation_boar, simulation_boar, simulation_mix_boar_flesh
+spawn_num = 1
+
+[spawn_cat]
+spawn_squads = simulation_cat
+spawn_num = 1

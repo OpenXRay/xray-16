@@ -1,0 +1,13 @@
+[logic@jup_a10_bandit_leader]
+suitable = {=check_npc_name(jup_a10_bandit_leader)}
+prior = 100
+active = animpoint@valet
+
+[animpoint@valet]
+meet = no_meet
+on_info = {=surge_started} walker@surge
+cover_name = jup_a10_bandit_leader_sit_animpoint
+
+[walker@surge]
+on_info = {=surge_complete} animpoint@valet
+meet = no_meet

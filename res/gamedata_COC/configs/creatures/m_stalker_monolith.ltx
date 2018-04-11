@@ -1,0 +1,38 @@
+[stalker_monolith]:stalker
+
+;---LEVEL EDITOR------------------------------------------------------
+$spawn							= "stalkers\stalker_monolith"	; option for Level Editor
+panic_threshold					= 0
+
+;---CRITICAL WOUND------------------------------------------------------------------
+critical_wound_threshold		= 1.1
+critical_wound_decrease_quant	= 0.
+body_parts_section_id			= critical_wound_body_parts_section
+
+species							= zombie
+
+;---SOUND PLAYER------------------------------------------------------
+sound_death						= fight\death\death_
+sound_anomaly_death				= fight\death\death_
+sound_hit						= fight\hit\hit_
+sound_humming					= states\idle\idle_
+sound_alarm						= fight\enemy\enemy_
+sound_backup					= fight\backup\backup_,fight\threat\threat_close_
+sound_detour					= fight\detour\detour_,fight\fire\fire_,fight\threat\threat_close_
+sound_friendly_fire				= 
+sound_panic_human				= 
+sound_panic_monster				= 
+sound_tolls						= fight\tolls\tolls_
+sound_grenade_alarm				= fight\grenade\grenade_
+sound_friendly_grenade_alarm	= 
+sound_need_backup				= fight\cover_fire\cover_fire_
+sound_running_in_danger			= 
+sound_walking_in_danger			= 
+sound_kill_wounded				= help\wounded\kill_wounded_
+sound_enemy_critically_wounded	= fight\enemy_hit\enemy_hit_
+sound_enemy_killed_or_wounded	= fight\enemy_down\enemy_down_
+sound_attack_no_allies				= fight\fire\fire_,fight\threat\threat_distant_
+sound_attack_allies_single_enemy	= fight\attack\attack_,fight\attack\attack_one_,fight\fire\fire_
+sound_attack_allies_several_enemies	= fight\attack\attack_,fight\attack\attack_many_,fight\fire\fire_
+sound_search1_no_allies				= fight\threat\threat_distant_
+sound_search1_with_allies			= fight\searching_enemy\search_,fight\searching_enemy\enemy_lost_

@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	
+	<string id="st_achievement_1_name">
+		<text>Heavy Pockets</text>
+	</string>
+	<string id="st_achievement_1_hint">
+		<text>Traders may offer you more rare and expensive goods.</text>
+	</string>
+	<string id="st_achievement_1_descr">
+		<text>Through trading, looting and stealing you have accumulated a small fortune. Your personal wealth is well known and traders will favour your patronage.</text>
+	</string>
+	<string id="st_achievement_1_unlock">
+		<text>You have unlocked the "Heavy Pockets" achievement.</text>
+	</string>
+	
+	<string id="st_achievement_2_name">
+		<text>Radiotherapy</text>
+	</string>
+	<string id="st_achievement_2_hint">
+		<text>You have a chance of surviving emissions and psi-vortexes.</text>
+	</string>
+	<string id="st_achievement_2_descr">
+		<text>Strangely, you no longer feel haunted by the groans of an approaching emission. You believe there to be a chance they may be more forgiving towards you.</text>
+	</string>
+	<string id="st_achievement_2_unlock">
+		<text>You have unlocked the "Radiotherapy" achievement.</text>
+	</string>
+	
+	<string id="st_achievement_3_name">
+		<text>Infopreneur</text>
+	</string>
+	<string id="st_achievement_3_hint">
+		<text>Traders will now pay you a small additional bonus for each PDA delivered to them.</text>
+	</string>
+	<string id="st_achievement_3_descr">
+		<text>Whether selling or buying, to many people information is just as valuable as artefacts. Word has spread that you are a reliable source of such a commodity.</text>
+	</string>
+	<string id="st_achievement_3_unlock">
+		<text>You have unlocked the "Infopreneur" achievement.</text>
+	</string>
+	
+	<string id="st_achievement_4_name">
+		<text>Duga Free</text>
+	</string>
+	<string id="st_achievement_4_hint">
+		<text>Paths through Yantar and Radar are now easier to access.</text>
+	</string>
+	<string id="st_achievement_4_descr">
+		<text>After seeing what reckless experimentation has brought to the Zone you have taken action into your own hands. Paths through Yantar and Radar are now open since disabling the Miracle Machine and Brain Scorcher.</text>
+	</string>
+	<string id="st_achievement_4_unlock">
+		<text>You have unlocked the "Duga Free" achievement.</text>
+	</string>
+	
+	<string id="st_achievement_5_name">
+		<text>Well Dressed</text>
+	</string>
+	<string id="st_achievement_5_hint">
+		<text>There is a small chance of field dressing additional body parts from slain mutants.</text>
+	</string>
+	<string id="st_achievement_5_descr">
+		<text>Rightly so does the Zone's wildlife fear you - more than a fair share has fallen at your hands. Lately, you have noticed your bloody harvest has become more bountiful than usual.</text>
+	</string>
+	<string id="st_achievement_5_unlock">
+		<text>You have unlocked the "Well Dressed" achievement.</text>
+	</string>
+	
+	<string id="st_achievement_6_name">
+		<text>Silver or Lead</text>
+	</string>
+	<string id="st_achievement_6_hint">
+		<text>Surrendering stalkers may occasionally reveal the location of a second stash.</text>
+	</string>
+	<string id="st_achievement_6_descr">
+		<text>Bodies and bullet casings litter the tracks behind you. The stories you leave are infamous. You often wonder why some place possessions above their lives. Perhaps things will soon begin to change.</text>
+	</string>
+	<string id="st_achievement_6_unlock">
+		<text>You have unlocked the "Silver or Lead" achievement.</text>
+	</string>
+	
+	<string id="st_achievement_7_name">
+		<text>Mechanized Warfare</text>
+	</string>
+	<string id="st_achievement_7_hint">
+		<text>You are able to fully upgrade equipment at a technician other than Forester.</text>
+	</string>
+	<string id="st_achievement_7_descr">
+		<text>Forester's services have never been cheap, but at least now he has some competition. That mechanic should make good use of those tools you brought him.</text>
+	</string>
+	<string id="st_achievement_7_unlock">
+		<text>You have unlocked the "Mechanized Warfare" achievement.</text>
+	</string>
+	
+	<string id="st_achievement_8_name">
+		<text>Tourist</text>
+	</string>
+	<string id="st_achievement_8_hint">
+		<text>You recall seeing some curious stashes during earlier journeys.</text>
+	</string>
+	<string id="st_achievement_8_descr">
+		<text>Despite the dangers, you have explored all accessible parts of the Zone. From the murky depths of the Great Swamp to the metal maze of the Truck Cemetery - you know the Zone like the back of your hand.</text>
+	</string>
+	<string id="st_achievement_8_unlock">
+		<text>You have unlocked the "Tourist" achievement.</text>
+	</string>
+	
+	<string id="st_achievement_9_name">
+		<text>Rag and Bone</text>
+	</string>
+	<string id="st_achievement_9_hint">
+		<text>Your luck with future stashes has slightly increased.</text>
+	</string>
+	<string id="st_achievement_9_descr">
+		<text>What's theirs is yours, or so you like to think. You have a knack for finding other people's stashes. Despite some misfortune here and there, you feel that for the most part your luck is improving.</text>
+	</string>
+	<string id="st_achievement_9_unlock">
+		<text>You have unlocked the "Rag and Bone" achievement.</text>
+	</string>
+	
+	<string id="st_achievement_10_name">
+		<text>Completionist</text>
+	</string>
+	<string id="st_achievement_10_hint">
+		<text>All available achievements have been unlocked.</text>
+	</string>
+	<string id="st_achievement_10_descr">
+		<text>All there is to achieve has been achieved. You know the Zone better than the Zone knows itself. And despite all odds being stacked against you and every threat you've faced - you still remain undefeated.</text>
+	</string>
+	<string id="st_achievement_10_unlock">
+		<text>You have unlocked the "Completionist" achievement.</text>
+	</string>
+	
+	<string id="st_achievement_11_name">
+		<text>Wishful Thinking</text>
+	</string>
+	<string id="st_achievement_11_hint">
+		<text>Your rank and reputation has greatly increased.</text>
+	</string>
+	<string id="st_achievement_11_descr">
+		<text>At first you heard the rumours, then you saw it for yourself, and then you destroyed it. There will always who will doubt what you accomplished, but the fact remains. The Wish Granter is no more.</text>
+	</string>
+	<string id="st_achievement_11_unlock">
+		<text>You have unlocked the "Wishful Thinking" achievement.</text>
+	</string>
+	
+	<string id="st_achievement_12_name">
+		<text>Down to Earth</text>
+	</string>
+	<string id="st_achievement_12_hint">
+		<text>Mi-2 helicopters will replace destroyed Mi-24s.</text>
+	</string>
+	<string id="st_achievement_12_descr">
+		<text>The higher they fly the harder they fall. Not willing to waste any more expensive equipment, the Zone's helicopters now seem to be of a much weaker variety. But are no less tempting to destroy.</text>
+	</string>
+	<string id="st_achievement_12_unlock">
+		<text>You have unlocked the "Down to Earth" achievement.</text>
+	</string>
+	
+	<string id="st_achievement_13_name">
+		<text>Geologist</text>
+	</string>
+	<string id="st_achievement_13_hint">
+		<text>Artefacts have an increased chance of respawning.</text>
+	</string>
+	<string id="st_achievement_13_descr">
+		<text>Humming, buzzing and spitting - the anomalies of the Zone do not scare you any longer. After so many successful endeavours, you can't help but notice that artefacts seem more numerous than ever before.</text>
+	</string>
+	<string id="st_achievement_13_unlock">
+		<text>You have unlocked the "Geologist" achievement.</text>
+	</string>
+	
+	<string id="st_achievement_14_name">
+		<text>Patriarch</text>
+	</string>
+	<string id="st_achievement_14_hint">
+		<text>You can recruit more stalkers as companions.</text>
+	</string>
+	<string id="st_achievement_14_descr">
+		<text>Destroyer of helicopters. Deliverer of PDAs. Stories of your experiences and abilities are renowned throughout the Zone. You have become immortalised; your tales forever spoken of over the Zone's many campfires.</text>
+	</string>
+	<string id="st_achievement_14_unlock">
+		<text>You have unlocked the "Patriarch" achievement.</text>
+	</string>
+	
+	<string id="st_achievement_15_name">
+		<text>Bookworm Food</text>
+	</string>
+	<string id="st_achievement_15_hint">
+		<text>Add text to this later - I'm unsure what the reward should be.</text>
+	</string>
+	<string id="st_achievement_15_descr">
+		<text>Add text to this later - achievement is unlocked for unlocking all encyclopedia articles.</text>
+	</string>
+	<string id="st_achievement_15_unlock">
+		<text>You have unlocked the "Bookworm Food" achievement.</text>
+	</string>
+	
+</string_table>

@@ -1,0 +1,1566 @@
+﻿<?xml version='1.0' encoding="UTF-8"?>
+
+<xml>
+	<!-- НОВЫЕ ПРОФИЛЯ -->
+	<character id="actor">
+		<class>actor</class>
+		<specific_character>actor</specific_character>
+	</character>
+	
+	<character id="actor_stalker">
+		<class>actor</class>
+		<specific_character>actor_stalker</specific_character>
+	</character>
+	<character id="actor_bandit">
+		<class>actor</class>
+		<specific_character>actor_bandit</specific_character>
+	</character>
+	<character id="actor_csky">
+		<class>actor</class>
+		<specific_character>actor_csky</specific_character>
+	</character>
+	<character id="actor_dolg">
+		<class>actor</class>
+		<specific_character>actor_dolg</specific_character>
+	</character>
+	<character id="actor_freedom">
+		<class>actor</class>
+		<specific_character>actor_freedom</specific_character>
+	</character>
+	<character id="actor_killer">
+		<class>actor</class>
+		<specific_character>actor_killer</specific_character>
+	</character>
+	<character id="actor_army">
+		<class>actor</class>
+		<specific_character>actor_army</specific_character>
+	</character>
+	<character id="actor_ecolog">
+		<class>actor</class>
+		<specific_character>actor_ecolog</specific_character>
+	</character>
+	<character id="actor_monolith">
+		<class>actor</class>
+		<specific_character>actor_monolith</specific_character>
+	</character>
+	<character id="actor_zombied">
+		<class>actor</class>
+		<specific_character>actor_zombied</specific_character>
+	</character>
+	
+	<character id="default">
+		<class>Stalker_general</class>
+	</character>
+
+	<character id="actor_visual_stalker">
+		<class>actor_visual_stalker</class>
+	</character>
+	
+	<!-- sim profiles -->
+	<!-- sim duty -->
+	<character id="sim_default_duty_0">
+		<class>sim_default_duty_0</class>
+	</character>
+	<character id="sim_default_duty_1">
+		<class>sim_default_duty_1</class>
+	</character>
+	<character id="sim_default_duty_2">
+		<class>sim_default_duty_2</class>
+	</character>
+	<character id="sim_default_duty_3">
+		<class>sim_default_duty_3</class>
+	</character>
+	<character id="sim_default_duty_4">
+		<class>sim_default_duty_4</class>
+	</character>
+	<!-- sim monolith -->
+	<character id="sim_default_monolith_0">
+		<class>sim_default_monolith_0</class>
+	</character>
+	<character id="sim_default_monolith_1">
+		<class>sim_default_monolith_1</class>
+	</character>
+	<character id="sim_default_monolith_2">
+		<class>sim_default_monolith_2</class>
+	</character>
+	<character id="sim_default_monolith_3">
+		<class>sim_default_monolith_3</class>
+	</character>
+	<character id="sim_default_monolith_4">
+		<class>sim_default_monolith_4</class>
+	</character>
+	<character id="sim_monolith_specnaz_rg6">
+		<class>sim_monolith_specnaz_rg6</class>
+	</character>
+	<character id="sim_monolith_sniper">
+		<class>sim_monolith_sniper</class>
+	</character>
+	<character id="sim_monolith_sniper_gauss">
+		<class>sim_monolith_sniper_gauss</class>
+	</character>
+
+
+	<!-- sim freedom -->
+	<character id="sim_default_freedom_0">
+		<class>sim_default_freedom_0</class>
+	</character>
+	<character id="sim_default_freedom_1">
+		<class>sim_default_freedom_1</class>
+	</character>
+	<character id="sim_default_freedom_2">
+		<class>sim_default_freedom_2</class>
+	</character>
+	<character id="sim_default_freedom_3">
+		<class>sim_default_freedom_3</class>
+	</character>
+	<character id="sim_default_freedom_4">
+		<class>sim_default_freedom_4</class>
+	</character>
+
+	<!-- sim bandit -->
+	<character id="sim_default_bandit_0">
+		<class>sim_default_bandit_0</class>
+	</character>
+	<character id="sim_default_bandit_1">
+		<class>sim_default_bandit_1</class>
+	</character>
+	<character id="sim_default_bandit_2">
+		<class>sim_default_bandit_2</class>
+	</character>
+	<character id="sim_default_bandit_3">
+		<class>sim_default_bandit_3</class>
+	</character>
+	<character id="sim_default_bandit_4">
+		<class>sim_default_bandit_4</class>
+	</character>
+
+	<!-- sim stalker -->
+	<character id="sim_default_stalker_0">
+		<class>sim_default_stalker_0</class>
+	</character>
+	<character id="sim_default_stalker_1">
+		<class>sim_default_stalker_1</class>
+	</character>
+	<character id="sim_default_stalker_2">
+		<class>sim_default_stalker_2</class>
+	</character>
+	<character id="sim_default_stalker_3">
+		<class>sim_default_stalker_3</class>
+	</character>
+	<character id="sim_default_stalker_4">
+		<class>sim_default_stalker_4</class>
+	</character>
+
+	<!-- sim military -->
+	<character id="sim_default_military_0">
+		<class>sim_default_military_0</class>
+	</character>
+	<character id="sim_default_military_1">
+		<class>sim_default_military_1</class>
+	</character>
+	<character id="sim_default_military_2">
+		<class>sim_default_military_2</class>
+	</character>
+	<character id="sim_default_military_3">
+		<class>sim_default_military_3</class>
+	</character>
+	<character id="sim_default_military_3_sniper">
+		<class>sim_default_military_3_sniper</class>
+	</character>
+	<character id="sim_default_military_4">
+		<class>sim_default_military_4</class>
+	</character>
+	<character id="sim_default_military_3_sniper_1">
+		<class>sim_default_military_3_sniper_1</class>
+	</character>
+	<character id="sim_default_military_3_sniper_2">
+		<class>sim_default_military_3_sniper_2</class>
+	</character>
+	<character id="sim_default_military_3_sniper_3">
+		<class>sim_default_military_3_sniper_3</class>
+	</character>
+
+	<!-- sim mercenery -->
+	<character id="sim_default_killer_0">
+		<class>sim_default_killer_0</class>
+	</character>
+	<character id="sim_default_killer_1">
+		<class>sim_default_killer_1</class>
+	</character>
+	<character id="sim_default_killer_2">
+		<class>sim_default_killer_2</class>
+	</character>
+	<character id="sim_default_killer_3">
+		<class>sim_default_killer_3</class>
+	</character>
+	<character id="sim_default_killer_4">
+		<class>sim_default_killer_4</class>
+	</character>
+
+	<!-- sim zombied -->
+	<character id="sim_default_zombied_1">
+		<class>sim_default_zombied_1</class>
+	</character>
+	<character id="sim_default_zombied_2">
+		<class>sim_default_zombied_2</class>
+	</character>
+	<character id="sim_default_zombied_3">
+		<class>sim_default_zombied_3</class>
+	</character>
+	<character id="sim_default_zombied_4">
+		<class>sim_default_zombied_4</class>
+	</character>
+
+	<!-- sim ecolog -->
+    <character id="sim_default_ecolog_0">
+		<class>sim_default_ecolog_0</class>
+	</character>
+	
+	<character id="sim_default_ecolog_1">
+		<class>sim_default_ecolog_1</class>
+	</character>
+	
+	<character id="sim_default_ecolog_2">
+		<class>sim_default_ecolog_2</class>
+	</character>
+	
+	<character id="sim_default_ecolog_3">
+		<class>sim_default_ecolog_3</class>
+	</character>
+
+	<!-- sim clear sky -->
+	<character id="sim_default_csky_0">
+		<class>sim_default_csky_0</class>
+	</character>
+	<character id="sim_default_csky_1">
+		<class>sim_default_csky_1</class>
+	</character>
+	<character id="sim_default_csky_2">
+		<class>sim_default_csky_2</class>
+	</character>
+	<character id="sim_default_csky_3">
+		<class>sim_default_csky_3</class>
+	</character>
+	<character id="sim_default_csky_4">
+		<class>sim_default_csky_4</class>
+	</character>
+
+<!-- Marsh -->
+
+	<character id="mar_smart_terrain_base_doctor">
+		<class>mar_smart_terrain_base_doctor</class>
+	</character>
+	
+	<character id="mar_smart_terrain_doc_doctor">
+		<class>mar_smart_terrain_doc_doctor</class>
+	</character>
+
+	<character id="mar_base_stalker_barmen">
+		<class>mar_base_stalker_barmen</class>
+	</character>
+
+	<character id="mar_base_owl_stalker_trader">
+		<class>mar_base_owl_stalker_trader</class>
+	</character>
+
+	<character id="mar_base_stalker_tech">
+		<class>mar_base_stalker_tech</class>
+	</character>
+
+
+	<!-- Escape -->
+	<character id="esc_2_12_stalker_trader">
+	<class>stalker</class>
+	<specific_character>esc_2_12_stalker_trader</specific_character>
+	</character>
+	<character id="esc_2_12_stalker_nimble">
+		<class>esc_2_12_stalker_nimble</class>
+	</character>
+	<character id="esc_2_12_stalker_wolf">
+		<class>esc_2_12_stalker_wolf</class>
+	</character>
+	<character id="esc_2_12_stalker_fanat">
+		<class>esc_2_12_stalker_fanat</class>
+	</character>
+	<character id="esc_smart_terrain_5_7_loner_mechanic_stalker">
+        <class>stalker</class>
+	<specific_character>esc_smart_terrain_5_7_loner_mechanic_stalker</specific_character>
+    </character>
+	
+	<!-- Agroprom -->
+	<character id="agr_smart_terrain_1_6_near_2_military_colonel_kovalski">
+		<class>agr_smart_terrain_1_6_near_2_military_colonel_kovalski</class>
+	</character>
+	<character id="agr_smart_terrain_1_6_army_trader_stalker">
+	    <class>army</class>
+	<specific_character>agr_smart_terrain_1_6_army_trader_stalker</specific_character>
+    </character>
+    <character id="agr_smart_terrain_1_6_army_mechanic_stalker">
+        <class>army</class>
+	<specific_character>agr_smart_terrain_1_6_army_mechanic_stalker</specific_character>
+    </character>
+	
+	<!-- Dark Valley -->
+    <character id="val_smart_terrain_7_4_bandit_trader_stalker">
+	    <class>bandit</class>
+	<specific_character>val_smart_terrain_7_4_bandit_trader_stalker</specific_character>
+    </character>
+    <character id="val_smart_terrain_7_3_bandit_mechanic_stalker">
+        <class>bandit</class>
+	<specific_character>val_smart_terrain_7_3_bandit_mechanic_stalker</specific_character>
+    </character>
+	
+	<!-- LAB X-18 -->
+	<character id="dar_corpse_1">
+		<class>dar_corpse_1</class>
+	</character>
+	<character id="dar_corpse_2">
+		<class>dar_corpse_2</class>
+	</character>
+	<character id="dar_corpse_ecolog_guard">
+		<class>dar_corpse_ecolog_guard</class>
+	</character>
+	<character id="dar_corpse_kalugin">
+		<class>dar_corpse_kalugin</class>
+	</character>
+	
+	<!-- Bar -->
+	<character id="bar_visitors_barman_stalker_trader">
+		<class>bar_visitors_barman_stalker_trader</class>
+	</character>
+	<character id="bar_visitors_garik_stalker_guard">
+		<class>bar_visitors_garik_stalker_guard</class>
+	</character>
+	<character id="bar_visitors_zhorik_stalker_guard2">
+		<class>bar_visitors_zhorik_stalker_guard2</class>
+	</character>
+	<character id="bar_dolg_leader">
+		<class>bar_dolg_leader</class>
+	</character>
+	<character id="bar_zastava_2_commander">
+		<class>bar_zastava_2_commander</class>
+	</character>
+	<character id="bar_visitors_stalker_mechanic">
+		<class>bar_visitors_stalker_mechanic</class>
+	</character>
+	<character id="bar_duty_security_squad_leader">
+		<class>bar_duty_security_squad_leader</class>
+	</character>
+	<character id="bar_dolg_general_zoneguard_stalker">
+		<class>bar_dolg_general_zoneguard_stalker</class>
+	</character>
+	 <character id="bar_dolg_general_petrenko_stalker">
+        <class>dolg</class>
+	<specific_character>bar_dolg_general_petrenko_stalker</specific_character>
+    </character>
+	<character id="bar_arena_manager">
+		<class>bar_arena_manager</class>
+	</character>
+	<character id="bar_arena_guard">
+		<class>bar_arena_guard</class>
+	</character>
+	<character id="bar_arena_savage">
+		<class>bar_arena_savage</class>
+	</character>
+	
+	<!--ARENA-->
+
+	<character id="bar_arena_stalker_1">
+		<class>bar_arena_stalker_1</class>
+	</character>
+	
+	<character id="bar_arena_stalker_2">
+		<class>bar_arena_stalker_2</class>
+	</character>
+	
+	<character id="bar_arena_stalker_3_1">
+		<class>bar_arena_stalker_3_1</class>
+	</character>
+
+	<character id="bar_arena_stalker_3_2">
+		<class>bar_arena_stalker_3_2</class>
+	</character>
+	
+	<character id="bar_arena_stalker_4_1">
+		<class>bar_arena_stalker_4_1</class>
+	</character>
+
+	<character id="bar_arena_stalker_4_2">
+		<class>bar_arena_stalker_4_2</class>
+	</character>
+
+	<character id="bar_arena_stalker_4_3">
+		<class>bar_arena_stalker_4_3</class>
+	</character>
+	
+	<character id="bar_arena_stalker_4_4">
+		<class>bar_arena_stalker_4_4</class>
+	</character>
+	
+	<character id="bar_arena_stalker_4_5">
+		<class>bar_arena_stalker_4_5</class>
+	</character>
+	
+	<character id="bar_arena_stalker_5_1">
+		<class>bar_arena_stalker_5_1</class>
+	</character>
+	
+	<character id="bar_arena_stalker_5_2">
+		<class>bar_arena_stalker_5_2</class>
+	</character>
+	
+	<character id="bar_arena_stalker_6_1">
+		<class>bar_arena_stalker_6_1</class>
+	</character>
+		
+	<character id="bar_arena_stalker_6_2">
+		<class>bar_arena_stalker_6_2</class>
+	</character>
+	
+	<character id="bar_arena_stalker_6_3">
+		<class>bar_arena_stalker_6_3</class>
+	</character>	
+	
+	<character id="bar_arena_stalker_6_4">
+		<class>bar_arena_stalker_6_4</class>
+	</character>	
+	
+	<character id="bar_arena_stalker_6_5">
+		<class>bar_arena_stalker_6_5</class>
+	</character>	
+	
+	<character id="bar_arena_stalker_6_6">
+		<class>bar_arena_stalker_6_6</class>
+	</character>	
+			
+	<character id="bar_arena_stalker_7">
+		<class>bar_arena_stalker_7</class>
+	</character>
+	
+	<character id="bar_arena_stalker_8_1">
+		<class>bar_arena_stalker_8_1</class>
+	</character>
+	
+	<character id="bar_arena_stalker_8_2">
+		<class>bar_arena_stalker_8_2</class>
+	</character>
+
+	<character id="bar_arena_stalker_8_3">
+		<class>bar_arena_stalker_8_3</class>
+	</character>
+
+	<character id="bar_arena_stalker_8_4">
+		<class>bar_arena_stalker_8_4</class>
+	</character>
+
+	<!-- Yantar -->
+	<character id="yan_stalker_sakharov">
+		<class>yan_stalker_sakharov</class>
+	</character>
+	<character id="yan_ecolog_kruglov">
+		<class>yan_ecolog_kruglov</class>
+	</character>
+	<character id="yan_ecolog_semenov">
+		<class>yan_ecolog_semenov</class>
+	</character>
+	<character id="yan_ecolog_vasilyev">
+		<class>yan_ecolog_vasilyev</class>
+	</character>
+   <character id="yan_merc_01">
+		<class>yan_merc_01</class>
+   </character>
+   <character id="yan_merc_02">
+		<class>yan_merc_02</class>
+   </character>
+   <character id="yan_merc_03">
+		<class>yan_merc_03</class>
+   </character>
+   
+   <!-- Army warehouses -->
+    <character id="mil_smart_terrain_7_10_freedom_trader_stalker">
+        <class>freedom</class>
+	<specific_character>mil_smart_terrain_7_10_freedom_trader_stalker</specific_character>
+    </character>	
+	<character id="mil_smart_terrain_7_7_freedom_mechanic_stalker">
+        <class>freedom</class>
+	<specific_character>mil_smart_terrain_7_7_freedom_mechanic_stalker</specific_character>
+    </character>
+	<character id="mil_smart_terrain_7_7_freedom_bodyguard_stalker">
+		<class>mil_smart_terrain_7_7_freedom_bodyguard_stalker</class>
+	</character>
+	<character id="mil_smart_terrain_7_7_freedom_bodyguard2_stalker">
+		<class>mil_smart_terrain_7_7_freedom_bodyguard2_stalker</class>
+	</character>
+		<character id="mil_smart_terrain_7_7_freedom_leader_stalker">
+		<class>mil_smart_terrain_7_7_freedom_leader_stalker</class>
+	</character>
+	
+    <!-- Dead City -->
+    <character id="cit_killers_merc_trader_stalker">
+        <class>killer</class>
+	<specific_character>cit_killers_merc_trader_stalker</specific_character>
+    </character>	
+	<character id="cit_killers_merc_mechanic_stalker">
+        <class>killer</class>
+	<specific_character>cit_killers_merc_mechanic_stalker</specific_character>
+    </character>	
+	
+	<!-- SOC Pripyat -->
+    <character id="pri_monolith_monolith_trader_stalker">
+        <class>monolith</class>
+	<specific_character>pri_monolith_monolith_trader_stalker</specific_character>
+    </character>	
+	<character id="pri_monolith_monolith_mechanic_stalker">
+        <class>monolith</class>
+	<specific_character>pri_monolith_monolith_mechanic_stalker</specific_character>
+    </character>
+	
+	<!-- Sarcofag -->
+	<character id="sar_monolith_commander">
+		<class>sar_monolith_commander</class>
+	</character>
+
+	
+	<!-- Red Forest -->
+	<character id="red_forester">
+	<class>red_forester</class>
+	<specific_character>red_forester_tech</specific_character>
+    </character>
+
+	<!-- Hospital -->
+	<character id="kat_enemy_soldier">
+		<class>kat_enemy_soldier</class>
+	</character>
+	<character id="kat_enemy_grenadier">
+		<class>kat_enemy_grenadier</class>
+	</character>
+	<character id="kat_enemy_sniper">
+		<class>kat_enemy_sniper</class>
+	</character>
+	<character id="kat_enemy_sniper_strong">
+		<class>kat_enemy_sniper_strong</class>
+	</character>
+	
+	<character id="mar_smart_terrain_base_stalker_leader_marsh">
+	<class>mar_smart_terrain_base_stalker_leader_marsh</class>
+	</character>
+
+	<!--  ZATON -->
+  <!-- Zaton B106 -->
+
+	<character id="zat_b106_stalker_gonta">
+		<class>zat_b106_stalker_gonta</class>
+	</character>
+	<character id="zat_b14_stalker_1">
+		<class>zat_b14_stalker_1</class>
+	</character>
+	<character id="zat_b38_stalker_cop">
+		<class>zat_b38_stalker_cop</class>
+	</character>
+	<character id="zat_b38_stalker_corpse_1">
+		<class>zat_b38_stalker_corpse_1</class>
+	</character>
+	<character id="zat_b38_stalker_corpse_2">
+		<class>zat_b38_stalker_corpse_2</class>
+	</character>
+	<character id="zat_b38_stalker_corpse_3">
+		<class>zat_b38_stalker_corpse_3</class>
+	</character>
+	<character id="zat_b38_stalker_cop_dead">
+		<class>zat_b38_stalker_cop_dead</class>
+	</character>
+	<character id="zat_b38_stalker_hunter">
+		<class>zat_b38_stalker_hunter</class>
+	</character>
+	<character id="zat_b30_owl_stalker_trader">
+		<class>zat_b30_owl_stalker_trader</class>
+	</character>
+	<character id="zat_b7_duty_illicit_dealer">
+		<class>zat_b7_duty_illicit_dealer</class>
+	</character>
+	<character id="zat_b5_stalker_raider_1">
+		<class>zat_b5_stalker_raider_1</class>
+	</character>
+	<character id="zat_b5_stalker_raider_2">
+		<class>zat_b5_stalker_raider_2</class>
+	</character>
+	<character id="zat_b5_stalker_raider_3">
+		<class>zat_b5_stalker_raider_3</class>
+	</character>
+	<character id="zat_b5_stalker_raider_4">
+		<class>zat_b5_stalker_raider_4</class>
+	</character>
+	<character id="zat_b5_stalker_raider_leader">
+		<class>zat_b5_stalker_raider_leader</class>
+	</character>
+	<character id="zat_b7_bandit_boss_dead">
+		<class>zat_b7_bandit_boss_dead</class>
+	</character>
+	<character id="zat_b5_stalker_commander">
+		<class>zat_b5_stalker_commander</class>
+	</character>
+	<character id="zat_b5_stalker_commander_b7">
+    <class>zat_b5_stalker_commander_b7</class> 
+    </character>
+	<character id="zat_b5_stalker_1">
+		<class>zat_b5_stalker_1</class>
+	</character>
+	<character id="zat_b5_stalker_2">
+		<class>zat_b5_stalker_2</class>
+	</character>
+	<character id="zat_b5_stalker_3">
+		<class>zat_b5_stalker_3</class>
+	</character>
+	<character id="zat_b5_stalker_4">
+		<class>zat_b5_stalker_4</class>
+	</character>
+	<character id="zat_b5_dealer_assistant_1">
+		<class>zat_b5_dealer_assistant_1</class>
+	</character>
+	<character id="zat_b5_dealer_assistant_2">
+		<class>zat_b5_dealer_assistant_2</class>
+	</character>
+	<character id="zat_b7_bandit_boss_sultan">
+		<class>zat_b7_bandit_boss_sultan</class>
+	</character>
+
+   <!-- Zaton B18 -->
+
+   <character id="zat_b18_noah">
+		<class>zat_b18_noah</class>
+   </character>
+   
+
+	<!--- Pripyat a17 -->
+	<character id="pri_a17_military_captain_tarasov">
+		<class>pri_a17_military_captain_tarasov</class>
+	</character>
+	<character id="pri_a17_military_prapor_valentyr">
+		<class>pri_a17_military_prapor_valentyr</class>
+	</character>
+	<character id="pri_a17_military_sergeant_morozov">
+		<class>pri_a17_military_sergeant_morozov</class>
+	</character>
+	<character id="pri_a17_military_lieutenant_podorojniy">
+		<class>pri_a17_military_lieutenant_podorojniy</class>
+	</character>
+	<character id="pri_a17_monolith_preacher">
+		<class>pri_a17_monolith_preacher</class>
+	</character>
+	<character id="pri_a17_military_colonel_kovalski">
+		<class>pri_a17_military_colonel_kovalski</class>
+	</character>
+
+	<!--- Pripyat a20 -->
+	<character id="pri_a15_military_recon_leader">
+		<class>pri_a15_military_recon_leader</class>
+	</character>
+	<character id="pri_a15_military_recon_1">
+		<class>pri_a15_military_recon_1</class>
+	</character>
+	<character id="pri_a15_military_recon_2">
+		<class>pri_a15_military_recon_2</class>
+	</character>
+	<character id="pri_a15_military_recon_3">
+		<class>pri_a15_military_recon_3</class>
+	</character>
+
+	<!--- Pripyat a18 -->
+	<character id="jup_b218_vano_in_suit">
+		<class>jup_b218_vano_in_suit</class>
+	</character>
+	<character id="pri_a15_sokolov">
+		<class>pri_a15_sokolov</class>
+	</character>
+	<character id="pri_a15_sokolov_sci">
+		<class>pri_a15_sokolov_sci</class>
+	</character>
+	<character id="pri_a15_sokolov_sci_head">
+		<class>pri_a15_sokolov_sci_head</class>
+	</character>
+	<character id="pri_a22_military_merkulov">
+		<class>pri_a22_military_merkulov</class>
+	</character>
+	<character id="pri_a22_military_skelja">
+		<class>pri_a22_military_skelja</class>
+	</character>
+
+	<!--- Pripyat a21 -->
+	<character id="pri_a21_sentry_lieutenant_stecenko">
+		<class>pri_a21_sentry_lieutenant_stecenko</class>
+	</character>
+	
+	<!--- Jupiter A12 -->
+	<character id="jup_a12_stalker_assaulter">
+		<class>jup_a12_stalker_assaulter</class>
+	</character>
+	<character id="jup_a12_stalker_diplomat">
+		<class>jup_a12_stalker_diplomat</class>
+	</character>
+	<character id="jup_a12_stalker_prisoner">
+		<class>jup_a12_stalker_prisoner</class>
+	</character>
+	<character id="jup_a12_bandit_chief">
+		<class>jup_a12_bandit_chief</class>
+	</character>
+	<character id="jup_a12_bandit_guard">
+		<class>jup_a12_bandit_guard</class>
+	</character>
+	<character id="jup_a12_bandit_cashier">
+		<class>jup_a12_bandit_cashier</class>
+	</character>
+	<character id="jup_a12_merc_cover">
+		<class>jup_a12_merc_cover</class>
+	</character>
+
+	<!--- Jupiter B207 -->
+	<character id="jup_b207_merc_illicit_dealer">
+		<class>jup_b207_merc_illicit_dealer</class>
+	</character>
+	<character id="jup_b207_merc_leader">
+		<class>jup_b207_merc_leader</class>
+	</character>
+	<character id="jup_b207_duty_security_squad_leader">
+		<class>jup_b207_duty_security_squad_leader</class>
+	</character>
+	<character id="jup_b207_freedom_recon_squad_leader">
+		<class>jup_b207_freedom_recon_squad_leader</class>
+	</character>
+	<character id="jup_b207_freedom_assault_squad_leader">
+		<class>jup_b207_freedom_assault_squad_leader</class>
+	</character>
+
+	<!--- Jupiter A10 -->
+	<character id="jup_a10_bandit_leader">
+		<class>jup_a10_bandit_leader</class>
+	</character>
+	<character id="jup_a10_stalker_vano">
+		<class>jup_a10_stalker_vano</class>
+	</character>
+
+
+	<!--- Jupiter b16 -->
+	<character id="jup_b6_scientist_biochemist">
+		<class>jup_b6_scientist_biochemist</class>
+	</character>
+
+	<character id="jup_b6_scientist_nuclear_physicist">
+		<class>jup_b6_scientist_nuclear_physicist</class>
+	</character>
+	<!--- Jupiter B9 -->
+
+	<character id="jup_b9_shliachin">
+		<class>jup_b9_shliachin</class>
+	</character>
+
+	<!--- Jupiter B200 -->
+
+	<character id="jup_b217_stalker_tech">
+		<class>jup_b217_stalker_tech</class>
+	</character>
+
+	<!--- Jupiter B10 -->
+
+	<character id="jup_b10_stalker_drunk">
+		<class>jup_b10_stalker_drunk</class>
+	</character>
+
+	<character id="jup_b10_stalker_drunk_dead">
+		<class>jup_b10_stalker_drunk_dead</class>
+	</character>
+
+	<!--- Jupiter B220 -->
+
+	<character id="jup_b220_trapper">
+		<class>jup_b220_trapper</class>
+	</character>
+
+	<!--- Jupiter B4 -->
+
+	<character id="jup_b4_monolith_squad_leader_monolith_skin">
+		<class>jup_b4_monolith_squad_leader_monolith_skin</class>
+	</character>
+
+	<character id="jup_b4_monolith_squad_leader_duty_skin">
+		<class>jup_b4_monolith_squad_leader_duty_skin</class>
+	</character>
+
+	<character id="jup_b4_monolith_squad_leader_freedom_skin">
+		<class>jup_b4_monolith_squad_leader_freedom_skin</class>
+	</character>
+
+	<character id="jup_b4_monolith_squad_leader_freedom_mon_skin">
+		<class>jup_b4_monolith_squad_leader_freedom_mon_skin</class>
+	</character>
+
+	<character id="jup_b4_monolith_squad_leader_duty_mon_skin">
+		<class>jup_b4_monolith_squad_leader_duty_mon_skin</class>
+	</character>
+
+	<character id="jup_b4_monolith_squad_soldier_1_monolith_skin">
+		<class>jup_b4_monolith_squad_soldier_1_monolith_skin</class>
+	</character>
+
+	<character id="jup_b4_monolith_squad_soldier_1_duty_skin">
+		<class>jup_b4_monolith_squad_soldier_1_duty_skin</class>
+	</character>
+
+	<character id="jup_b4_monolith_squad_soldier_1_freedom_skin">
+		<class>jup_b4_monolith_squad_soldier_1_freedom_skin</class>
+	</character>
+
+	<character id="jup_b4_monolith_squad_soldier_2_monolith_skin">
+		<class>jup_b4_monolith_squad_soldier_2_monolith_skin</class>
+	</character>
+
+	<character id="jup_b4_monolith_squad_soldier_2_duty_skin">
+		<class>jup_b4_monolith_squad_soldier_2_duty_skin</class>
+	</character>
+
+	<character id="jup_b4_monolith_squad_soldier_2_freedom_skin">
+		<class>jup_b4_monolith_squad_soldier_2_freedom_skin</class>
+	</character>
+
+	<character id="jup_b4_monolith_squad_soldier_3_monolith_skin">
+		<class>jup_b4_monolith_squad_soldier_3_monolith_skin</class>
+	</character>
+
+	<character id="jup_b4_monolith_squad_soldier_3_duty_skin">
+		<class>jup_b4_monolith_squad_soldier_3_duty_skin</class>
+	</character>
+
+	<character id="jup_b4_monolith_squad_soldier_3_freedom_skin">
+		<class>jup_b4_monolith_squad_soldier_3_freedom_skin</class>
+	</character>
+
+	<character id="jup_b4_monolith_squad_soldier_4_monolith_skin">
+		<class>jup_b4_monolith_squad_soldier_4_monolith_skin</class>
+	</character>
+
+	<character id="jup_b4_monolith_squad_soldier_4_duty_skin">
+		<class>jup_b4_monolith_squad_soldier_4_duty_skin</class>
+	</character>
+
+	<character id="jup_b4_monolith_squad_soldier_4_freedom_skin">
+		<class>jup_b4_monolith_squad_soldier_4_freedom_skin</class>
+	</character>
+
+	<character id="jup_b4_monolith_squad_soldier_5_monolith_skin">
+		<class>jup_b4_monolith_squad_soldier_5_monolith_skin</class>
+	</character>
+
+	<character id="jup_b4_monolith_squad_soldier_5_duty_skin">
+		<class>jup_b4_monolith_squad_soldier_5_duty_skin</class>
+	</character>
+
+	<character id="jup_b4_monolith_squad_soldier_5_freedom_skin">
+		<class>jup_b4_monolith_squad_soldier_5_freedom_skin</class>
+	</character>
+
+	<character id="jup_b4_freedom_help">
+		<class>jup_b4_freedom_help</class>
+	</character>
+
+	<character id="jup_b4_duty_help">
+		<class>jup_b4_duty_help</class>
+	</character>
+
+	<character id="jup_b4_freedom_leader">
+		<class>jup_b4_freedom_leader</class>
+	</character>
+
+	<!-- unused -->
+	<character id="jup_b4_duty_leader">
+		<class>jup_b4_duty_leader</class>
+	</character>
+	
+	<character id="jup_a6_freedom_trader_ashot">
+		<class>jup_a6_freedom_trader_ashot</class>
+	</character>
+
+	<!--- Jupiter B1 -->
+	<character id="jup_b6_scientist_tech">
+		<class>jup_b6_scientist_tech</class>
+	</character>
+	<character id="jup_b1_stalker_1">
+		<class>jup_b1_stalker_1</class>
+	</character>
+	<character id="jup_b1_stalker_2">
+		<class>jup_b1_stalker_2</class>
+	</character>
+	<character id="jup_b1_stalker_3">
+		<class>jup_b1_stalker_3</class>
+	</character>
+	<character id="jup_b1_stalker_4">
+		<class>jup_b1_stalker_4</class>
+	</character>
+	<character id="jup_b1_pro_stalker_1">
+		<class>jup_b1_pro_stalker_1</class>
+	</character>
+	<character id="jup_b1_pro_stalker_2">
+		<class>jup_b1_pro_stalker_2</class>
+	</character>
+	<character id="jup_b1_pro_stalker_3">
+		<class>jup_b1_pro_stalker_3</class>
+	</character>
+	<character id="jup_b1_pro_stalker_4">
+		<class>jup_b1_pro_stalker_4</class>
+	</character>
+
+	<character id="jup_b6_freedom_stalker_1">
+		<class>jup_b6_freedom_stalker_1</class>
+	</character>
+	<character id="jup_b6_freedom_stalker_2">
+		<class>jup_b6_freedom_stalker_2</class>
+	</character>
+	<character id="jup_b6_freedom_stalker_3">
+		<class>jup_b6_freedom_stalker_3</class>
+	</character>
+	<character id="jup_b6_freedom_stalker_4">
+		<class>jup_b6_freedom_stalker_4</class>
+	</character>
+
+	<character id="jup_b6_duty_stalker_1">
+		<class>jup_b6_duty_stalker_1</class>
+	</character>
+	<character id="jup_b6_duty_stalker_2">
+		<class>jup_b6_duty_stalker_2</class>
+	</character>
+	<character id="jup_b6_duty_stalker_3">
+		<class>jup_b6_duty_stalker_3</class>
+	</character>
+	<character id="jup_b6_duty_stalker_4">
+		<class>jup_b6_duty_stalker_4</class>
+	</character>
+
+	<character id="jup_b6_stalker_prisoner">
+		<class>jup_b6_stalker_prisoner</class>
+	</character>
+	<character id="jup_b6_stalker_assaulter">
+		<class>jup_b6_stalker_assaulter</class>
+	</character>
+	<character id="jup_b6_stalker_diplomat">
+		<class>jup_b6_stalker_diplomat</class>
+	</character>
+
+	<character id="jup_b6_stalker_gonta">
+		<class>jup_b6_stalker_gonta</class>
+	</character>
+	<character id="jup_b6_stalker_garmata">
+		<class>jup_b6_stalker_garmata</class>
+	</character>
+	<character id="jup_b6_stalker_crab">
+		<class>jup_b6_stalker_crab</class>
+	</character>
+
+        <!--- Zaton A2 -->
+        
+   	<character id="zat_a2_stalker_barmen">
+		<class>zat_a2_stalker_barmen</class>
+	</character>
+    	<character id="zat_a2_stalker_mechanic">
+		<class>zat_a2_stalker_mechanic</class>
+	</character>
+    	<character id="zat_a2_stalker_nimble">
+		<class>zat_a2_stalker_nimble</class>
+	</character>
+
+	<!--- Zaton B22 -->
+   	<character id="zat_b22_stalker_medic">
+		<class>zat_b22_stalker_medic</class>
+   	</character>
+
+	<!--- Jupiter B25 -->
+  	<character id="jup_b25_stalker_senya">
+		<class>jup_b25_stalker_senya</class>
+   	</character>
+	<character id="jup_b25_freedom_flint">
+		<class>jup_b25_freedom_flint</class>
+	</character>
+
+   	<!--- Zaton B103 -->
+   	<character id="zat_b103_lost_merc_leader">
+		<class>zat_b103_lost_merc_leader</class>
+	</character>
+   	<character id="zat_b103_lost_merc_1">
+		<class>zat_b103_lost_merc_1</class>
+   	</character>
+   	<character id="zat_b103_lost_merc_2">
+		<class>zat_b103_lost_merc_2</class>
+   	</character>
+   	<character id="zat_b103_lost_merc_3">
+		<class>zat_b103_lost_merc_3</class>
+   	</character>
+   	<character id="zat_b103_lost_merc_4">
+		<class>zat_b103_lost_merc_4</class>
+   	</character>
+   	<character id="zat_b103_lost_merc_5">
+		<class>zat_b103_lost_merc_5</class>
+   	</character>
+   	<character id="zat_b103_lost_merc_6">
+		<class>zat_b103_lost_merc_6</class>
+   	</character>
+   	<character id="zat_b103_lost_merc_7">
+		<class>zat_b103_lost_merc_7</class>
+   	</character>
+
+   <!-- Zaton B7 -->
+   <character id="zat_b7_stalker_raider_leader">
+		<class>zat_b7_stalker_raider_leader</class>
+   </character>
+   <character id="zat_b7_stalker_raider_1">
+		<class>zat_b7_stalker_raider_1</class>
+   </character>
+   <character id="zat_b7_stalker_raider_2">
+		<class>zat_b7_stalker_raider_2</class>
+   </character>
+   <character id="zat_b7_stalker_raider_3">
+		<class>zat_b7_stalker_raider_3</class>
+   </character>
+   <character id="zat_b7_stalker_victim_1">
+		<class>zat_b7_stalker_victim_1</class>
+   </character>
+
+   <!-- Zaton B33 -->
+
+   <character id="zat_b33_stalker_snag">
+		<class>zat_b33_stalker_snag</class>
+   </character>
+   <!-- Zaton B28 -->
+
+   <character id="zat_b28_draper">
+		<class>zat_b28_draper</class>
+   </character>
+   <character id="zat_b28_umerov">
+		<class>zat_b28_umerov</class>
+   </character>
+   <character id="zat_b28_smoliak">
+		<class>zat_b28_smoliak</class>
+   </character>
+
+   <!-- Zaton B100 -->
+
+   <character id="zat_b100_military_1">
+		<class>zat_b100_military_1</class>
+   </character>
+   <character id="zat_b100_military_2">
+		<class>zat_b100_military_2</class>
+   </character>
+   <character id="zat_b100_military_3">
+		<class>zat_b100_military_3</class>
+   </character>
+
+	<!--- Jupiter B42 -->
+
+	<character id="zat_b42_mayron">
+		<class>zat_b42_mayron</class>
+	</character>
+
+   <!-- Zaton B29 -->
+
+   <character id="zat_b29_stalker_rival_1">
+		<class>zat_b29_stalker_rival_1</class>
+   </character>
+   <character id="zat_b29_stalker_rival_2">
+		<class>zat_b29_stalker_rival_2</class>
+   </character>
+   <character id="zat_b29_stalker_rival_default_1">
+		<class>zat_b29_stalker_rival_default_1</class>
+   </character>
+   <character id="zat_b29_stalker_rival_default_2">
+		<class>zat_b29_stalker_rival_default_2</class>
+   </character>
+
+   <character id="zat_b52_port_bandit_leader">
+		<class>zat_b52_port_bandit_leader</class>
+   </character>
+
+  <!-- Jupiter B202 -->
+
+   <character id="jup_a6_stalker_medik">
+		<class>jup_a6_stalker_medik</class>
+   </character>
+   <character id="jup_b15_zulus">
+		<class>jup_b15_zulus</class>
+   </character>
+   <character id="jup_b202_stalker_snag">
+		<class>jup_b202_stalker_snag</class>
+   </character>
+   <character id="jup_a6_stalker_barmen">
+		<class>jup_a6_stalker_barmen</class>
+   </character>
+   <character id="jup_b202_bandit">
+		<class>jup_b202_bandit</class>
+   </character>
+
+  <!-- Jupiter B19 -->
+
+   <character id="jup_b19_freedom_yar">
+		<class>jup_b19_freedom_yar</class>
+   </character>
+   <character id="jup_b19_merc_1">
+		<class>jup_b19_merc_1</class>
+   </character>
+   <character id="jup_b19_merc_2">
+		<class>jup_b19_merc_2</class>
+   </character>
+   <character id="jup_b19_merc_3">
+		<class>jup_b19_merc_3</class>
+   </character>
+   <character id="jup_b19_merc_4">
+		<class>jup_b19_merc_4</class>
+   </character>
+   <character id="jup_b19_merc_5">
+		<class>jup_b19_merc_5</class>
+   </character>
+
+  <!-- Jupiter B43 -->
+
+   <character id="jup_b43_stalker_assistant">
+		<class>jup_b43_stalker_assistant</class>
+   </character>
+
+  <!-- Zaton-Jupiter B 215 -->
+
+   <character id="zat_b215_stalker_guide">
+		<class>zat_b215_stalker_guide</class>
+   </character>
+
+  <!-- pri_a25 -->
+
+   <character id="pri_a25_army_medic">
+		<class>pri_a25_army_medic</class>
+   </character>
+
+   <!-- Pripyat A15 -->
+
+   <character id="pri_a15_actor">
+		<class>pri_a15_actor</class>
+   </character>
+   <character id="pri_a15_vano">
+		<class>pri_a15_vano</class>
+   </character>
+   <character id="pri_a15_sokolov_scene">
+		<class>pri_a15_sokolov_scene</class>
+   </character>
+   <character id="pri_a15_zulus">
+		<class>pri_a15_zulus</class>
+   </character>
+   <character id="pri_a15_wanderer">
+		<class>pri_a15_wanderer</class>
+   </character>
+   <character id="pri_a15_military_tarasov">
+		<class>pri_a15_military_tarasov</class>
+   </character>
+   <character id="pri_a15_military_2">
+		<class>pri_a15_military_2</class>
+   </character>
+   <character id="pri_a15_military_3">
+		<class>pri_a15_military_3</class>
+   </character>
+   <character id="pri_a15_military_4">
+		<class>pri_a15_military_4</class>
+   </character>
+
+   <!-- Pripyat B35 -->
+
+   <character id="pri_a22_army_signaller">
+		<class>pri_a22_army_signaller</class>
+   </character>
+   <character id="pri_b35_merc_leader">
+		<class>pri_b35_merc_leader</class>
+   </character>
+   <character id="pri_b35_merc_grenade_launcher_1">
+		<class>pri_b35_merc_grenade_launcher_1</class>
+   </character>
+   <character id="pri_b35_merc_grenade_launcher_2">
+		<class>pri_b35_merc_grenade_launcher_2</class>
+   </character>
+   <character id="pri_b35_envoy">
+		<class>pri_b35_envoy</class>
+   </character>
+   <character id="pri_b35_guard_envoy_1">
+		<class>pri_b35_guard_envoy_1</class>
+   </character>
+   <character id="pri_b35_guard_envoy_2">
+		<class>pri_b35_guard_envoy_2</class>
+   </character>
+
+   <!-- Pripyat B306 -->
+
+   <character id="pri_b306_envoy">
+		<class>pri_b306_envoy</class>
+   </character>
+
+  <!-- Jupiter B46 -->
+   <character id="jup_b46_duty_founder">
+		<class>jup_b46_duty_founder</class>
+   </character>
+   <character id="jup_b46_duty_founder_squad_01">
+		<class>jup_b46_duty_founder_squad_01</class>
+   </character>
+   <character id="jup_b46_duty_founder_squad_02">
+		<class>jup_b46_duty_founder_squad_02</class>
+   </character>
+   <character id="jup_b46_duty_founder_squad_03">
+		<class>jup_b46_duty_founder_squad_03</class>
+   </character>
+   <character id="jup_b46_duty_founder_squad_04">
+		<class>jup_b46_duty_founder_squad_04</class>
+   </character>
+   <character id="jup_a6_freedom_leader">
+		<class>jup_a6_freedom_leader</class>
+   </character>
+   <character id="jup_a6_duty_leader">
+		<class>jup_a6_duty_leader</class>
+   </character>
+ 
+	<!-- Zaton B40 -->
+   <character id="zat_b40_merc_squad_leader_1">
+		<class>zat_b40_merc_squad_leader_1</class>
+   </character>
+   <character id="zat_b40_merc_squad_leader_2">
+		<class>zat_b40_merc_squad_leader_2</class>
+   </character>
+
+	<!-- Zaton B20 -->
+   <character id="zat_b20_noah_teleport">
+		<class>zat_b20_noah_teleport</class>
+   </character>
+
+	<!-- Zaton B44 -->
+   <character id="zat_b44_stalker_barge">
+		<class>zat_b44_stalker_barge</class>
+   </character>
+
+	<!-- Pripyat b36 -->
+   <character id="pri_b36_monolith_sniper">
+		<class>pri_b36_monolith_sniper</class>
+   </character>
+   <character id="pri_b36_monolith_master_hiding_place">
+		<class>pri_b36_monolith_master_hiding_place</class>
+   </character>
+   <character id="pri_b36_monolith_marine_sniper">
+		<class>pri_b36_monolith_marine_sniper</class>
+   </character>
+
+	<!-- Zaton B53 -->
+   <character id="zat_b53_artefact_hunter_1">
+		<class>zat_b53_artefact_hunter_1</class>
+   </character>
+   <character id="zat_b53_artefact_hunter_2">
+		<class>zat_b53_artefact_hunter_2</class>
+   </character>
+
+	<!-- Pripyat a22 -->
+   <character id="pri_a22_military_yarmoshuk">
+		<class>pri_a22_military_yarmoshuk</class>
+   </character>
+
+	<!-- Стрелок -->
+   <character id="pri_b305_strelok">
+		<class>pri_b305_strelok</class>
+   </character>
+
+	<!-- Командир группы эвакуации Майор Дегтярев  -->
+   <character id="pri_a28_evac_com">
+		<class>pri_a28_evac_com</class>
+   </character>
+
+  <!-- Zaton b106 -->
+- <character id="zat_b106_stalker_garmata">
+  <class>zat_b106_stalker_garmata</class> 
+  </character>
+- <character id="zat_b106_stalker_crab">
+  <class>zat_b106_stalker_crab</class> 
+  </character>
+
+  <!-- Jupiter b47 -->
+   <character id="jup_b47_merc_01">
+		<class>jup_b47_merc_01</class>
+   </character>
+   <character id="jup_b47_merc_02">
+		<class>jup_b47_merc_02</class>
+   </character>
+   <character id="jup_b47_merc_03">
+		<class>jup_b47_merc_03</class>
+   </character>
+   <character id="jup_b47_merc_04">
+		<class>jup_b47_merc_04</class>
+   </character>
+   <character id="jup_b47_merc_05">
+		<class>jup_b47_merc_05</class>
+   </character>
+   <character id="jup_b47_merc_06">
+		<class>jup_b47_merc_06</class>
+   </character>
+   <character id="jup_b47_merc_07">
+		<class>jup_b47_merc_07</class>
+   </character>
+  <!-- Jupiter b219 -->
+   <character id="jup_b219_stalker_tech">
+		<class>jup_b219_stalker_tech</class>
+   </character>
+   <character id="jup_b219_monolith_squad_leader_freedom_skin">
+		<class>jup_b219_monolith_squad_leader_freedom_skin</class>
+   </character>
+  <character id="jup_b219_vano">
+		<class>jup_b219_vano</class>
+   </character>
+  <character id="jup_b219_soldier">
+		<class>jup_b219_soldier</class>
+   </character>
+  <character id="jup_b219_zulus">
+		<class>jup_b219_zulus</class>
+   </character>
+
+   <!-- Jupiter underground -->
+
+   <character id="pas_b400_vano">
+		<class>pas_b400_vano</class>
+   </character>
+   <character id="pas_b400_sokolov">
+		<class>pas_b400_sokolov</class>
+   </character>
+   <character id="pas_b400_zulus">
+		<class>pas_b400_zulus</class>
+   </character>
+   <character id="pas_b400_wanderer">
+		<class>pas_b400_wanderer</class>
+   </character>
+   <character id="pas_b400_monolith_sniper">
+		<class>pas_b400_monolith_sniper</class>
+   </character>
+
+	<character id="sim_default_stalker_pri_a16">
+		<class>sim_default_stalker_pri_a16</class>
+	</character>
+
+	<character id="pri_medic_stalker">
+		<class>pri_medic_stalker</class>
+   </character>
+
+   <!-- O-Soznanie -->
+	<character id="osoznanie">
+		<class>trader</class>
+	<specific_character>osoznanie</specific_character>
+	</character>
+	
+	<character id="warlab_pod_1_stalker">
+		<class>trader</class>
+	<specific_character>warlab_pod_1_stalker</specific_character>
+	</character>
+	<character id="warlab_pod_2_stalker">
+		<class>trader</class>
+	<specific_character>warlab_pod_2_stalker</specific_character>
+	</character>
+	<character id="warlab_pod_3_stalker">
+		<class>trader</class>
+	<specific_character>warlab_pod_3_stalker</specific_character>
+	</character>
+	<character id="warlab_pod_4_stalker">
+		<class>trader</class>
+	<specific_character>warlab_pod_4_stalker</specific_character>
+	</character>
+	<character id="warlab_pod_5_stalker">
+		<class>trader</class>
+	<specific_character>warlab_pod_5_stalker</specific_character>
+	</character>
+	<character id="warlab_pod_6_stalker">
+		<class>trader</class>
+	<specific_character>warlab_pod_6_stalker</specific_character>
+	</character>
+	<character id="warlab_pod_7_stalker">
+		<class>trader</class>
+	<specific_character>warlab_pod_7_stalker</specific_character>
+	</character>
+	<character id="warlab_invisible_stalker">
+		<class>trader</class>
+	<specific_character>warlab_invisible_stalker</specific_character>
+	</character>
+
+	<!-- Sarcofag2 -->	
+	<character id="sar2_wolf">
+		<class>sar2_wolf</class>
+	</character>
+	<character id="sar2_fanat">
+		<class>sar2_fanat</class>
+	</character>
+	<character id="sar2_fox">
+		<class>sar2_fox</class>
+	</character>
+	<character id="sar2_tutorial_wounded">
+		<class>sar2_tutorial_wounded</class>
+	</character>
+	<character id="sar2_ranger">
+		<class>sar2_ranger</class>
+	</character>
+	<character id="sar2_esc_soldier_commander">
+		<class>sar2_esc_soldier_commander</class>
+	</character>
+	<character id="sar2_seriy">
+		<class>sar2_seriy</class>
+	</character>
+	<character id="sar2_dram_novice">
+		<class>sar2_dram_novice</class>
+	</character>
+	<character id="sar2_hellcar">
+		<class>sar2_hellcar</class>
+	</character>
+	<character id="sar2_bandit_leader">
+		<class>sar2_bandit_leader</class>
+	</character>
+	<character id="sar2_gar_dolg_blokpost_commander">
+		<class>sar2_gar_dolg_blokpost_commander</class>
+	</character>
+	<character id="sar2_krot">
+		<class>sar2_krot</class>
+	</character>
+	<character id="sar2_ratcatcher">
+		<class>sar2_ratcatcher</class>
+	</character>
+	<character id="sar2_bandit_borov">
+		<class>sar2_bandit_borov</class>
+	</character>
+	<character id="sar2_stalker_explorer">
+		<class>sar2_stalker_explorer</class>
+	</character>
+	<character id="sar2_psih">
+		<class>sar2_psih</class>
+	</character>
+	<character id="sar2_arena_manager">
+		<class>sar2_arena_manager</class>
+	</character>
+	<character id="sar2_arena_savage">
+		<class>sar2_arena_savage</class>
+	</character>
+	<character id="sar2_dolg_leader">
+		<class>sar2_dolg_leader</class>
+	</character>
+	<character id="sar2_dolg_petrenko">
+		<class>sar2_dolg_petrenko</class>
+	</character>
+	<character id="sar2_dolg_ivancov">
+		<class>sar2_dolg_ivancov</class>
+	</character>
+	<character id="sar2_dolg_guard_commander">
+		<class>sar2_dolg_guard_commander</class>
+	</character>
+	<character id="sar2_zastava_commander_1">
+		<class>sar2_zastava_commander_1</class>
+	</character>
+	<character id="sar2_ecolog_professor">
+		<class>sar2_ecolog_professor</class>
+	</character>
+	<character id="sar2_svoboda_attack_commander">
+		<class>sar2_svoboda_attack_commander</class>
+	</character>
+	<character id="sar2_killer_ambush_tiran">
+		<class>sar2_killer_ambush_tiran</class>
+	</character>
+	<character id="sar2_crazy_veterans_lucky">
+		<class>sar2_crazy_veterans_lucky</class>
+	</character>
+	<character id="sar2_stalker_freeman">
+		<class>sar2_stalker_freeman</class>
+	</character>
+	<character id="sar2_svoboda_engineer">
+		<class>sar2_svoboda_engineer</class>
+	</character>
+	<character id="sar2_svoboda_stukach">
+		<class>sar2_svoboda_stukach</class>
+	</character>
+	<character id="sar2_svoboda_bodyguard">
+		<class>sar2_svoboda_bodyguard</class>
+	</character>
+	<character id="sar2_svoboda_leader">
+		<class>sar2_svoboda_leader</class>
+	</character>
+	<character id="sar2_svoboda_trader">
+		<class>sar2_svoboda_trader</class>
+	</character>
+	<character id="sar2_svoboda_master_max">
+		<class>sar2_svoboda_master_max</class>
+	</character>
+	<character id="sar2_svoboda_cook">
+		<class>sar2_svoboda_cook</class>
+	</character>
+	<character id="sar2_svoboda_blockpost_leader">
+		<class>sar2_svoboda_blockpost_leader</class>
+	</character>
+	<character id="sar2_svoboda_master_ugrumiy">
+		<class>sar2_svoboda_master_ugrumiy</class>
+	</character>
+	<character id="sar2_dolg_specnaz_cherep">
+		<class>sar2_dolg_specnaz_cherep</class>
+	</character>
+	<character id="sar2_killer_informator">
+		<class>sar2_killer_informator</class>
+	</character>
+	<character id="sar2_svoboda_zombi_stalker">
+		<class>sar2_svoboda_zombi_stalker</class>
+	</character>
+	<character id="sar2_doctor">
+		<class>sar2_doctor</class>
+	</character>
+	<character id="sar2_monolith_leader">
+		<class>sar2_monolith_leader</class>
+	</character>
+	<character id="sar2_bandit_novice">
+		<class>sar2_bandit_novice</class>
+	</character>
+	<character id="sar2_bandit_general">
+		<class>sar2_bandit_general</class>
+	</character>
+	<character id="sar2_bandit_veteran">
+		<class>sar2_bandit_veteran</class>
+	</character>
+	<character id="sar2_soldier_regular">
+		<class>sar2_soldier_regular</class>
+	</character>
+	<character id="sar2_soldier_specnaz">
+		<class>sar2_soldier_specnaz</class>
+	</character>
+	<character id="sar2_soldier_stalker">
+		<class>sar2_soldier_stalker</class>
+	</character>
+	<character id="sar2_killer_regular">
+		<class>sar2_killer_regular</class>
+	</character>
+	<character id="sar2_killer_specnaz">
+		<class>sar2_killer_specnaz</class>
+	</character>
+	<character id="sar2_killer_exo">
+		<class>sar2_killer_exo</class>
+	</character>
+	<character id="sar2_zombied_novice">
+		<class>sar2_zombied_novice</class>
+	</character>
+	<character id="sar2_zombied_stalker">
+		<class>sar2_zombied_stalker</class>
+	</character>
+	<character id="sar2_zombied_exo">
+		<class>sar2_zombied_exo</class>
+	</character>
+	<character id="sar2_monolith_regular">
+		<class>sar2_monolith_regular</class>
+	</character>
+	<character id="sar2_monolith_regular2">
+		<class>sar2_monolith_regular2</class>
+	</character>
+	<character id="sar2_monolith_specnaz">
+		<class>sar2_monolith_specnaz</class>
+	</character>
+	<character id="sar2_monolith_specnaz2">
+		<class>sar2_monolith_specnaz2</class>
+	</character>
+	<character id="sar2_monolith_exo">
+		<class>sar2_monolith_exo</class>
+	</character>
+	<character id="sar2_monolith_exo2">
+		<class>sar2_monolith_exo2</class>
+	</character>
+	<character id="yan_ghost">
+		<class>yan_ghost</class>
+	</character>
+</xml>

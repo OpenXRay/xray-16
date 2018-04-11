@@ -1,0 +1,17 @@
+[logic@pri_a22_military_yarmoshuk]
+active = walker@base
+suitable = {-pri_a25_task_start =check_npc_name(pri_a22_military_yarmoshuk)} true
+prior = 200
+
+[walker@base]
+path_walk = yarmoshuk_walk
+path_look = yarmoshuk_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+meet = no_meet
+out_restr = pri_a16_sr_noweap
+use_camp = false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false

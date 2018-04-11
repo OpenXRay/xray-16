@@ -1,0 +1,44 @@
+	<enemy_location hint="enemy" no_offline="1">
+		<mini_map  spot="enemy_mini_spot"/>
+	</enemy_location>
+
+	<neutral_location hint="neutral">
+		<mini_map  spot="neutral_mini_spot"/>
+	</neutral_location>
+
+	<friend_location hint="friend">
+		<mini_map  spot="friend_mini_spot"/>
+	</friend_location>
+
+	<deadbody_location hint="deadbody">
+		<mini_map  spot="deadbody_mini_spot"/>
+	</deadbody_location>
+
+	<enemy_mini_spot width="7" height="7" stretch="1" alignment="c" >
+		<texture r="255" g="0" b="0">ui_mmap_common_actor</texture>
+	</enemy_mini_spot>
+
+	<neutral_mini_spot width="7" height="7" stretch="1" alignment="c">
+		<texture r="255" g="200" b="0">ui_mmap_common_actor</texture>
+	</neutral_mini_spot>
+
+	<friend_mini_spot width="7" height="7" stretch="1" alignment="c">
+		<texture r="50" g="255" b="0">ui_mmap_common_actor</texture>
+	</friend_mini_spot>
+
+	<deadbody_mini_spot width="7" height="7" stretch="1" alignment="c">
+		<texture r="117" g="162" b="188">ui_mmap_common_actor</texture>
+	</deadbody_mini_spot>
+
+
+<!-- map_spot_new_xform
+
+  <location_squad_attack_point>
+    <mini_map spot="location_squad_attack_point_spot_mini"/>
+  </location_squad_attack_point>
+  <location_squad_attack_point_spot_mini x="0" y="0" width="9" height="9" alignment="c" stretch="1" scale_min="3.0" scale_max="5.1" scale="0" location_level="10">
+    <texture r="11" g="178" b="248">ui_mmap_common_actor</texture>
+  </location_squad_attack_point_spot_mini>
+
+
+-->

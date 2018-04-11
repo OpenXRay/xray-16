@@ -1,0 +1,10 @@
+[logic]
+active = nil;sr_idle@start
+
+[sr_idle@start]
+on_actor_inside = sr_idle@timer %+pri_b304_tushkano_corridor_attack =create_squad(pri_b304_tushkano_5:pri_b304_monsters_smart_terrain)%
+
+[sr_idle@timer]
+on_game_timer = 20 | sr_idle@free %=create_squad(pri_b304_tushkano_6:pri_b304_monsters_smart_terrain)%
+
+[sr_idle@free]

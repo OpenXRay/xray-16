@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding="windows-1251"?>
+<xml>
+#include "gameplay\character_desc_general_actor.xml"
+#include "gameplay\character_desc_general_army.xml"
+#include "gameplay\character_desc_general_bandit.xml"
+#include "gameplay\character_desc_general_csky.xml"
+#include "gameplay\character_desc_general_dolg.xml"
+#include "gameplay\character_desc_general_ecolog.xml"
+#include "gameplay\character_desc_general_freedom.xml"
+#include "gameplay\character_desc_general_killer.xml"
+#include "gameplay\character_desc_general_monolith.xml"
+#include "gameplay\character_desc_general_stalker.xml"
+#include "gameplay\character_desc_general_zombied.xml"
+</xml>

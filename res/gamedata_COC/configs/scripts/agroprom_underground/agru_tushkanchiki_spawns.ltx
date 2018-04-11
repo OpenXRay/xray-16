@@ -1,0 +1,22 @@
+[logic]
+active = sr_idle@line_0
+
+[sr_idle@line_0]
+on_game_timer = 20 | sr_idle@line_1 %=spawn_object(agru_tushkanchik_1:agru_tushkanchiks_spawn_1:0) =spawn_object(agru_tushkanchik_1:agru_tushkanchiks_spawn_2:0) =spawn_object(agru_tushkanchik_1:agru_tushkanchiks_spawn_3:0)%
+
+[sr_idle@line_1]
+on_game_timer = 20 | sr_idle@line_2
+
+[sr_idle@line_2]
+on_game_timer = 20 | sr_idle@line_3 %=spawn_object(agru_tushkanchik_2:agru_tushkanchiks_spawn_1:0) =spawn_object(agru_tushkanchik_1:agru_tushkanchiks_spawn_1:0) =spawn_object(agru_tushkanchik_1:agru_tushkanchiks_spawn_2:0) =spawn_object(agru_tushkanchik_1:agru_tushkanchiks_spawn_3:0)%
+
+[sr_idle@line_3]
+on_game_timer = 25 | sr_idle@line_4
+
+[sr_idle@line_4]
+on_game_timer = 20 | sr_idle@line_5 %=spawn_object(agru_tushkanchik_3:agru_tushkanchiks_spawn_3:0) =spawn_object(agru_tushkanchik_1:agru_tushkanchiks_spawn_1:0)%
+
+[sr_idle@line_5]
+on_game_timer = 20 | sr_idle@line_6
+
+[sr_idle@line_6]

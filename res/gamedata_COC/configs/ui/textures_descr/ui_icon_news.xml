@@ -1,0 +1,12 @@
+<w>
+
+<file name="ui\icon_news">
+<texture id="ui_icon_news_deth" x="426" y="467" width="83" height="45" />
+<texture id="ui_icon_news_all" x="339" y="463" width="82" height="46" />
+<texture id="ui_icon_news_news_dolg" x="150" y="469" width="80" height="43" />
+<texture id="ui_icon_news_news_svoboda" x="58" y="468" width="82" height="43" />
+<texture id="ui_icon_news_news_naim" x="240" y="469" width="90" height="42" />
+<texture id="ui_icon_news_news_bandos" x="431" y="420" width="76" height="40" />
+<texture id="ui_icon_news_news_voen_stalk" x="339" y="420" width="82" height="42" />
+</file>
+</w>

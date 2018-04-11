@@ -1,0 +1,22 @@
+[logic]
+active = nil;sr_idle@wait
+
+[sr_idle@wait]
+on_info = {+jup_b219_start_sound} sr_idle@timer 
+            
+[sr_idle@timer]
+on_game_timer = 70 | sr_idle@looped %=play_sound(jup_b219_generator_start)%
+  
+[sr_idle@looped]            
+on_signal = sound_end | sr_idle@stop_looped %+jup_b219_generator_looped_done =play_sound_looped(jup_b219_generator_looped)%
+
+[sr_idle@stop_looped]
+on_info = {+jup_b219_destroy_actor} sr_idle@timer_to_stop 
+            
+[sr_idle@timer_to_stop]
+on_timer = 6000 | sr_idle@nil %=stop_sound_looped%
+            
+            
+
+
+[sr_idle@nil]

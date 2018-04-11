@@ -1,0 +1,89 @@
+[logic@jup_b4_duty_leader]
+suitable = {=check_npc_name(jup_b4_duty_leader)}
+active = walker@1
+prior = 100
+on_hit = hit
+on_death = death
+
+[walker@1]
+use_camp = false
+path_walk = duty_leader_1_walk
+path_look = duty_leader_1_look
+combat_ignore_cond = {-jup_b4_monolith_squad_out} true
+on_info = {+jup_b4_duty_start_speech -jup_b4_monolith_squad_in_duty -jup_b4_monolith_squad_in_freedom -jup_b4_monolith_squad_out} walker@2
+meet = no_meet
+
+[walker@2]
+use_camp = false
+path_walk = duty_leader_2_walk
+path_look = duty_leader_2_look
+combat_ignore_cond = {-jup_b4_monolith_squad_out} true
+on_signal = align | {-jup_b4_aling} walker@3 %=play_sound(jup_b4_duty_squad_leader_align) +jup_b4_aling%
+on_info = {+jup_b4_monolith_squad_out -jup_b4_duty_leader_stop_sound} %=stop_sound +jup_b4_duty_leader_stop_sound%
+on_info2 = {+jup_b4_aling} walker@3
+meet = no_meet
+
+[walker@3]
+use_camp = false
+path_walk = duty_leader_2_walk
+path_look = duty_leader_2_look
+combat_ignore_cond = {-jup_b4_monolith_squad_out} true
+on_info = {+jup_b4_duty_aling1 +jup_b4_duty_aling2 +jup_b4_duty_aling3 +jup_b4_duty_aling4 +jup_b4_duty_aling5 +jup_b4_duty_aling6} walker@4 %=play_sound(jup_b4_duty_squad_leader_align_line) +jup_b4_aling_line%
+on_info2 = {+jup_b4_monolith_squad_out -jup_b4_duty_leader_stop_sound} %=stop_sound +jup_b4_duty_leader_stop_sound%
+meet = no_meet
+
+[walker@4]
+use_camp = false
+path_walk = duty_leader_3_walk
+path_look = duty_leader_3_look
+combat_ignore_cond = {-jup_b4_monolith_squad_out} true
+on_signal = jup_b4_duty_walk_3 | walker@5 
+meet = no_meet
+
+[walker@5]
+use_camp = false
+path_walk = duty_leader_4_walk
+path_look = duty_leader_4_look
+combat_ignore_cond = {-jup_b4_monolith_squad_out} true
+on_signal = jup_b4_duty_walk_4 | {-jup_b4_duty_squad_leader_praise_sound} %=play_sound(jup_b4_duty_squad_leader_praise) +jup_b4_duty_squad_leader_praise_sound%
+on_signal1 = jup_b4_duty_speech | {-jup_b4_duty_squad_leader_speech_sound} walker@remark %=play_sound(jup_b4_duty_squad_leader_speech) +jup_b4_duty_squad_leader_speech_sound%
+;on_signal2 = jup_b4_duty_prisiaga | walker@final_sound %+jup_b4_duty_prisiaga%
+on_info = {+jup_b4_monolith_squad_out -jup_b4_duty_leader_stop_sound} %=stop_sound +jup_b4_duty_leader_stop_sound%
+meet = no_meet
+
+[walker@remark]
+use_camp = false
+path_walk = duty_leader_5_walk
+path_look = duty_leader_5_look
+combat_ignore_cond = {-jup_b4_monolith_squad_out} true
+on_signal = sound_end | walker@final_sound %+jup_b4_duty_prisiaga%
+on_info = {+jup_b4_monolith_squad_out -jup_b4_duty_leader_stop_sound} %=stop_sound +jup_b4_duty_leader_stop_sound%
+meet = no_meet
+
+[walker@final_sound]
+use_camp = false
+path_walk = duty_leader_5_walk
+path_look = duty_leader_5_look
+combat_ignore_cond = {-jup_b4_monolith_squad_out} true
+on_timer = 2500 | %=play_sound(jup_b4_duty_squad_leader_final)%
+on_signal = sound_end | %+jup_b4_duty_squad_leader_final_sound_end%
+on_info = {+jup_b4_monolith_squad_out -jup_b4_duty_leader_stop_sound} %=stop_sound +jup_b4_duty_leader_stop_sound%
+on_info2 = {+jup_b4_monolith_squad_in_duty} walker@6
+meet = no_meet
+
+[walker@6]
+use_camp = false
+path_walk = duty_leader_1_walk
+path_look = duty_leader_1_look
+combat_ignore_cond = {-jup_b4_monolith_squad_out} true
+on_info = {+jup_b4_monolith_squad_out -jup_b4_duty_leader_stop_sound} %=stop_sound +jup_b4_duty_leader_stop_sound%
+meet = meet
+
+[meet]
+meet_dialog = jup_b4_duty_squad_start_dialog
+
+[hit]
+on_info = {-jup_b4_monolith_squad_in_duty =hitted_by(actor)} %+jup_b4_monolith_squad_out%
+
+[death]
+on_info = {-jup_b4_monolith_squad_in_duty} %+jup_b4_monolith_squad_out%

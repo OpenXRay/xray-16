@@ -1,0 +1,36 @@
+[zone_no_gravity]:zone_base
+GroupControlSection	= spawn_group_zone
+$spawn 			= "zones\scenes\no_gravity"
+class			= ZS_NGRAV
+
+ef_anomaly_type			= 7
+ef_weapon_type			= 19
+
+hit_impulse_scale	= 0.5
+postprocess		= postprocess_new
+
+;----------- Anomaly settings -----------------------
+max_start_power		= 1.00
+attenuation			= 1
+
+hit_type		= shock
+
+disable_time		= -1	;время игнорирования неживого объекта в зоне (-1 если не нужно)
+disable_time_small	= 500		;время игнорирования маленького неживого объекта в зоне (-1 если не нужно)
+disable_idle_time	= -1	;время отключения idle партиклов
+
+ignore_nonalive		= false;
+ignore_small		= false;
+ignore_artefacts	= false;
+
+awaking_time				= 500
+blowout_time				= 1000
+accamulate_time				= 5000
+
+blowout_light		= off
+idle_light			= off
+
+blowout_wind		= off
+
+shape_transp_color		= 255, 0, 0, 60
+shape_edge_color		= 32, 32, 32, 255

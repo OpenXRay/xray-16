@@ -1,0 +1,39 @@
+;-------------------------------------------------------------------------------
+;------ disable params ---------------------------------------------------------
+
+[disable]
+linear_factor		= 1.0
+angular_factor		= 1.0
+
+;-------------------------------------------------------------------------------
+;------ particle bones ---------------------------------------------------------
+
+[particle_bones]
+head				= 0,0,0
+chest				= 0,0,0
+spine		 		= 0,0,0
+
+;-------------------------------------------------------------------------------
+;------ foot bones -------------------------------------------------------------
+
+[foot_bones]
+front_left 			= left_foot
+front_right 		= right_foot
+
+;-------------------------------------------------------------------------------
+;------ capture params ---------------------------------------------------------
+
+[capture]
+bone				= head			; bone for capture
+distance			= 0.05			; distance - less this distance between bone and capture taget object is captured
+time_limit       	= 5			   	; max time for trying to capture object "sec"
+pull_force       	= 12000000		; max force used to bring the taget to capture bone
+pull_distance   	= 1.4			; max distance taget can be puled
+velocity_scale   	= 1				; velocity scale for pulling 1- normal
+capture_force    	= 65000000		; max force for holding taget
+
+[capture_used_bones]
+bones = left_arm, right_arm, left_forearm, right_forearm
+
+;-------------------------------------------------------------------------------
+;------ End params -------------------------------------------------------------

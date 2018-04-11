@@ -1,0 +1,7 @@
+[logic]
+active = sr_idle
+
+[sr_idle]
+on_actor_inside = {+jup_b16_oasis_art} %=oasis_heal -jup_b16_row_complete_4  -jup_b16_row_complete_3 -jup_b16_row_complete_2 -jup_b16_row_complete_1 -jup_b16_no_teleport%, {-jup_b16_oasis_art} %+jup_b16_oasis_art -jup_b16_row_complete_4  -jup_b16_row_complete_3 -jup_b16_row_complete_2 -jup_b16_row_complete_1 -jup_b16_no_teleport%
+on_info = {-actor_has_af_oasis_heart =actor_has_item(af_oasis_heart)} %+actor_has_af_oasis_heart +jup_b16_oasis_art =spawn_object(jup_b16_oasis_karlik:jup_b16_spawn_psy_dog:0:270)%
+on_info2 = {-save_jup_b16_passed_labyrinth =actor_in_zone(jup_b16_teleport) +jup_b16_no_teleport} %+save_jup_b16_passed_labyrinth =scenario_autosave(st_save_jup_b16_passed_labyrinth)%

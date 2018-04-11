@@ -1,0 +1,149 @@
+;------ работы у всех аналогичные -------
+[logic@zat_b39_dog_1]
+active = mob_home@zat_b39_dog_1
+suitable = {=is_monster_dog} true
+monster_job = true
+prior = 70
+
+;------ все собаки из сквада присутствуют на холме, постояли, поохраняли, перешли на следюющий холм, и так по кругу ------
+[mob_home@zat_b39_dog_1]
+path_home = dogs_home_1
+home_min_radius = 12
+home_max_radius = 18
+on_info = {=npc_in_zone(zat_b39_dogs_home_1_restrictor)} %+zat_b39_dog_1_in_home_1%
+on_info2 = %-zat_b39_dog_1_in_home_3%
+on_info3 = {+zat_b39_dog_1_in_home_1 +zat_b39_dog_2_in_home_1 +zat_b39_dog_3_in_home_1} mob_home@dog_1_timer_1
+
+[mob_home@dog_1_timer_1]
+path_home = dogs_home_1
+home_min_radius = 12
+home_max_radius = 18
+on_game_timer = 400 | mob_home@zat_b39_dog_1_2
+
+[mob_home@zat_b39_dog_1_2]
+path_home = dogs_home_2
+home_min_radius = 12
+home_max_radius = 18
+on_info = %-zat_b39_dog_1_in_home_1%
+on_info2 = {=npc_in_zone(zat_b39_dogs_home_2_restrictor)} %+zat_b39_dog_1_in_home_2%
+on_info3 = {+zat_b39_dog_1_in_home_2 +zat_b39_dog_2_in_home_2 +zat_b39_dog_3_in_home_2} mob_home@dog_1_timer_2
+
+[mob_home@dog_1_timer_2]
+path_home = dogs_home_2
+home_min_radius = 12
+home_max_radius = 18
+on_game_timer = 400 |  mob_home@zat_b39_dog_1_3
+
+[mob_home@zat_b39_dog_1_3]
+path_home = dogs_home_3
+home_min_radius = 12
+home_max_radius = 18
+on_info = %-zat_b39_dog_1_in_home_2%
+on_info2 = {=npc_in_zone(zat_b39_dogs_home_3_restrictor)} %+zat_b39_dog_1_in_home_3%
+on_info3 = {+zat_b39_dog_1_in_home_3 +zat_b39_dog_2_in_home_3 +zat_b39_dog_3_in_home_3} mob_home@dog_1_timer_3
+
+[mob_home@dog_1_timer_3]
+path_home = dogs_home_3
+home_min_radius = 12
+home_max_radius = 18
+on_game_timer = 400 |  mob_home@zat_b39_dog_1
+
+;----------------------------------------------------
+
+[logic@zat_b39_dog_2]
+active = mob_home@zat_b39_dog_2
+suitable = {=is_monster_dog} true
+monster_job = true
+prior = 70
+
+[mob_home@zat_b39_dog_2]
+path_home = dogs_home_1
+home_min_radius = 12
+home_max_radius = 18
+on_info = {=npc_in_zone(zat_b39_dogs_home_1_restrictor)} %+zat_b39_dog_2_in_home_1%
+on_info2 = %-zat_b39_dog_2_in_home_3%
+on_info3 = {+zat_b39_dog_1_in_home_1 +zat_b39_dog_2_in_home_1 +zat_b39_dog_3_in_home_1} mob_home@dog_2_timer_1
+
+[mob_home@dog_2_timer_1]
+path_home = dogs_home_1
+home_min_radius = 12
+home_max_radius = 18
+on_game_timer = 400 | mob_home@zat_b39_dog_2_2
+
+[mob_home@zat_b39_dog_2_2]
+path_home = dogs_home_2
+home_min_radius = 12
+home_max_radius = 18
+on_info = %-zat_b39_dog_2_in_home_1%
+on_info2 = {=npc_in_zone(zat_b39_dogs_home_2_restrictor)} %+zat_b39_dog_2_in_home_2%
+on_info3 = {+zat_b39_dog_1_in_home_2 +zat_b39_dog_2_in_home_2 +zat_b39_dog_3_in_home_2} mob_home@dog_2_timer_2
+
+[mob_home@dog_2_timer_2]
+path_home = dogs_home_2
+home_min_radius = 12
+home_max_radius = 18
+on_game_timer = 400 |  mob_home@zat_b39_dog_2_3
+
+[mob_home@zat_b39_dog_2_3]
+path_home = dogs_home_3
+home_min_radius = 12
+home_max_radius = 18
+on_info = %-zat_b39_dog_2_in_home_2%
+on_info2 = {=npc_in_zone(zat_b39_dogs_home_3_restrictor)} %+zat_b39_dog_2_in_home_3%
+on_info3 = {+zat_b39_dog_1_in_home_3 +zat_b39_dog_2_in_home_3 +zat_b39_dog_3_in_home_3} mob_home@dog_2_timer_3
+
+[mob_home@dog_2_timer_3]
+path_home = dogs_home_3
+home_min_radius = 12
+home_max_radius = 18
+on_game_timer = 400 |  mob_home@zat_b39_dog_2
+
+;----------------------------------------------------
+
+[logic@zat_b39_dog_3]
+active = mob_home@zat_b39_dog_3
+suitable = {=is_monster_dog} true
+monster_job = true
+prior = 70
+
+[mob_home@zat_b39_dog_3]
+path_home = dogs_home_1
+home_min_radius = 12
+home_max_radius = 18
+on_info = {=npc_in_zone(zat_b39_dogs_home_1_restrictor)} %+zat_b39_dog_3_in_home_1%
+on_info2 = %-zat_b39_dog_3_in_home_3%
+on_info3 = {+zat_b39_dog_1_in_home_1 +zat_b39_dog_2_in_home_1 +zat_b39_dog_3_in_home_1} mob_home@dog_3_timer_1
+
+[mob_home@dog_3_timer_1]
+path_home = dogs_home_1
+home_min_radius = 12
+home_max_radius = 18
+on_game_timer = 400 |  mob_home@zat_b39_dog_3_2
+
+[mob_home@zat_b39_dog_3_2]
+path_home = dogs_home_2
+home_min_radius = 12
+home_max_radius = 18
+on_info = %-zat_b39_dog_3_in_home_1%
+on_info2 = {=npc_in_zone(zat_b39_dogs_home_2_restrictor)} %+zat_b39_dog_3_in_home_2%
+on_info3 = {+zat_b39_dog_1_in_home_2 +zat_b39_dog_2_in_home_2 +zat_b39_dog_3_in_home_2} mob_home@dog_3_timer_2
+
+[mob_home@dog_3_timer_2]
+path_home = dogs_home_2
+home_min_radius = 12
+home_max_radius = 18
+on_game_timer = 400 |  mob_home@zat_b39_dog_3_3
+
+[mob_home@zat_b39_dog_3_3]
+path_home = dogs_home_3
+home_min_radius = 12
+home_max_radius = 18
+on_info = %-zat_b39_dog_3_in_home_2%
+on_info2 = {=npc_in_zone(zat_b39_dogs_home_3_restrictor)} %+zat_b39_dog_3_in_home_3%
+on_info3 = {+zat_b39_dog_1_in_home_3 +zat_b39_dog_2_in_home_3 +zat_b39_dog_3_in_home_3} mob_home@dog_3_timer_3
+
+[mob_home@dog_3_timer_3]
+path_home = dogs_home_3
+home_min_radius = 12
+home_max_radius = 18
+on_game_timer = 400 |  mob_home@zat_b39_dog_3

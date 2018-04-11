@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	
+	<string id="encyclopedia_features">
+		<text>Features</text>
+	</string>
+	
+	<string id="encyclopedia_features_artefact_degradation">
+		<text>Artefact degradation</text>
+	</string>
+	<string id="encyclopedia_features_artefact_degradation_text">
+		<text>Artefact degradation causes artefact abilities and bonuses to degrade when activated.\n
+			\nWith this feature enabled having the best artefacts is no-longer the end of the line for artefact hunters. Artefacts will become weaker the more they are used, promoting further artefact hunting and accumulation instead of becoming just a quick source of income.\n
+			\nThis feature can be toggled from the game options menu and is disabled by default.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_features_azazel_mode">
+		<text>Azazel mode</text>
+	</string>
+	<string id="encyclopedia_features_azazel_mode_text">
+		<text>
+			Azazel mode allows you to continue playing as another character after death.\n
+			\nIn Azazel mode death is not the end - upon the demise of your character you will posses the body of a random stalker who was previously controlled by the AI.\n
+			\nShould you have companions at the time of your death, they will be given priority and you will continue playing as one of them instead.\n
+			\nThis mode can only be enabled from the character creation screen.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_features_delayed_repairs">
+		<text>Delayed repairs</text>
+	</string>
+	<string id="encyclopedia_features_delayed_repairs_text">
+		<text>
+			Delayed repairs allows mechanics to retain your equipment.\n
+			\nWith this feature enabled, broken weapons, outfits, and headgear which you bring to a mechanic will be kept in their possession until they have completed all repairs.\n
+			\nAfter handing over your items you can speak with the mechanic again to ask whether they are ready for pick-up, to which they will either return them or tell you how much time they still require.\n
+			\nThis adds a somewhat realistic enhancement to the mechanic-based repair system suitable for players seeking a harder experience, as it will no-longer work instantaneously and instead emphasise the use of gunsmith and sewing kits.\n
+			\nThis feature can be toggled from the game options menu and is disabled by default.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_features_dynamic_news">
+		<text>Dynamic news</text>
+	</string>
+	<string id="encyclopedia_features_dynamic_news_text">
+		<text>
+			Dynamic news allows stalkers to report on their experiences in the Zone.\n
+			\nStalkers will comment on events that they have seen or heard near their location, or on their current activities, using the PDA communications network.\n
+			\nThese events and activities can range from something as mundane as complaining about the price of goods sold by a trader, to requesting help from faction allies when under attack.\n
+			\nMany other features also tie into the system; stalkers may comment on suspicious activity when you are hunting a bounty, giving you an idea where your target is, or may mention if somebody has a job available.\n
+			\nThis feature can be toggled from the game options menu and is enabled by default.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_features_extended_hud">
+		<text>Extended HUD</text>
+	</string>
+	<string id="encyclopedia_features_extended_hud_text">
+		<text>
+			Extended HUD allows the display of additional on-screen information.\n
+			\nWith this feature enabled brief companion information and a miniaturised version of the artefact belt are made visible on the heads-up display.\n
+			\nThis feature can be toggled from the UI/HUD options menu and is disabled by default.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_features_hardcore_ai_aim">
+		<text>Hardcore AI aim</text>
+	</string>
+	<string id="encyclopedia_features_hardcore_ai_aim_text">
+		<text>
+			Hardcore AI aim increases AI aim predictability and decreases reaction times.\n
+			\nWith this feature enabled it becomes harder for you to avoid being hit whilst strafing and sprinting, with the use of cover becoming much more essential to your long-term survival.\n
+			\nThis feature can be toggled from the game options menu and is disabled by default.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_features_helicopter_patrols">
+		<text>Helicopter patrols</text>
+	</string>
+	<string id="encyclopedia_features_helicopter_patrols_text">
+		<text>
+			Helicopter patrols enables factions the use of air support to defend strategic areas.\n
+			\nFactions who have friendly aircraft patrolling in the area will be able to call on them for support in attacking, or defending from, enemy stalkers (including the player) and mutants.\n
+			\nDespite their intimidating appearance they can be easily taken down after receiving a light amount of damage to the tail rotor.\n
+			\nThis feature can be toggled from the game options menu and is enabled by default.\n
+			\nThere are currently five locations where helicopter patrols are present:\n
+			\n• Agroprom\n• Cordon\n• Darkscape\n• Great Swamp\n• Limansk
+		</text>
+	</string>
+	
+	<string id="encyclopedia_features_ironman_mode">
+		<text>Ironman mode</text>
+	</string>
+	<string id="encyclopedia_features_ironman_mode_text">
+		<text>
+			Ironman mode enforces a permanent end to your character when they die.\n
+			\nIronman mode adds an indirect layer of difficulty to gameplay, whereby all of your saved games for a character are deleted upon their death.\n
+			\nShould Azazel mode be enabled at the same time you will be allowed to continue playing as whoever you switched to, but saves made as your deceased character will be deleted as per usual.\n
+			\nIt should be noted that only saves for the current playthrough are deleted, as they are each tagged with a unique identifier to tell them apart.\n
+			\nThis mode can only be enabled from the character creation screen.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_features_online_exclusion">
+		<text>Online exclusion</text>
+	</string>
+	<string id="encyclopedia_features_online_exclusion_text">
+		<text>
+			Online exclusion creates a no-spawn zone around the player character.\n
+			\nAs you explore near the edges of levels and their entry/exit points you could be attacked by enemies arriving from other levels. With online exclusion enabled these spawns are delayed until you are safely out of the way.\n
+			\nIt should be noted that this system revolves entirely around the player; any enemies already at a location whilst you are changing levels will not be de-spawned upon your arrival.\n
+			\nThis feature can be adjusted from the game options menu and is set to 25 by default.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_features_population_factors">
+		<text>Population factors</text>
+	</string>
+	<string id="encyclopedia_features_population_factors_text">
+		<text>
+			Population factors modify the number of stalkers and mutants found in the Zone.\n
+			\nStalker and mutant population factors can be adjusted independently from one another, allowing you to decide how wild or settled the Zone should be without the need to modify any of the game's files.\n
+			\nIt should be noted that the effect is greatest when starting a new character, as if the factors are changed during a playthrough in progress, they will only be realised as stalkers and/or mutants die and then respawn in greater or smaller numbers.\n
+			\nThese features can be adjusted from the game options menu and are set to 0.5 by default.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_features_portrait_by_outfit">
+		<text>Portrait by outfit</text>
+	</string>
+	<string id="encyclopedia_features_portrait_by_outfit_text">
+		<text>
+			Portrait by outfit changes your portrait based on your current outfit.\n
+			\nWith this feature enabled, every time you equip or unequip an outfit (excluding headgear) your character's portrait will be updated to reflect this, mimicking how portraits for the AI match with how they look.\n
+			\nThis feature can be toggled from the UI/HUD options menu and is disabled by default.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_features_radio_music">
+		<text>Radio music</text>
+	</string>
+	<string id="encyclopedia_features_radio_music_text">
+		<text>
+			Radio music allows for custom music tracks to be played at certain locations.\n
+			\nCertain relaxed areas within the Zone have radios installed nearby, with each playing a selection of musical tracks to keep stalkers entertained.\n
+			\nThis feature can be toggled from the game options menu and is enabled by default.\n
+			\nThere are currently five locations where radio music is played:\n
+			\n• Agroprom - Military base\n• Cordon - Sidorovich's bunker\n• Great Swamp - Clear Sky base\n• Dark Valley - Bandit base\n• Rostok - 100 Rads\n• Red Forest - Forester's tower
+		</text>
+	</string>
+	
+	<string id="encyclopedia_features_rank">
+		<text>Rank</text>
+	</string>
+	<string id="encyclopedia_features_rank_text">
+		<text>
+			Rank is a score system based on what a stalker has accomplished in the Zone.\n
+			\nActions which you perform throughout your playthrough are recorded and each grant a varying number of points depending on the action in question.\n
+			\nAs you accumulate more and more points your rank will gradually change as you pass through every milestone, with each requiring an additional 1000 points on top of the requirements of its predecessor.\n
+			\nMost of these actions are logged in the statistics tab of the PDA, which also contains an in-game leaderboard that keeps track of the current top-100 highest ranking stalkers.\n
+			\nThere are currently eight total ranks available:\n
+			\n• Rookie (0)\n• Trainee (1000) (+1000)\n• Experienced (3000) (+2000)\n• Professional (6000) (+3000)\n• Veteran (10000) (+4000)\n• Expert (15000) (+5000)\n• Master (21000) (+6000)\n• Legend (28000) (+7000)
+		</text>
+	</string>
+	
+	<string id="encyclopedia_features_reputation">
+		<text>Reputation</text>
+	</string>
+	<string id="encyclopedia_features_reputation_text">
+		<text>
+			Reputation is a representation of how a stalker interacts with others.\n
+			\nReputation is similar to rank but differs in that it isn't quite so linear - being able to both increase and decrease - and that it is based on your interactions with other stalkers rather than the environment.\n
+			\nThe easiest ways to increase reputation are by completing tasks, providing first-aid, and killing your faction's enemies, whilst inversely the easiest ways to lose it are by cancelling or failing tasks, and killing neutral or friendly stalkers.\n
+			\nIt should be noted that reputation is not to be confused with goodwill, which handles all stalker and faction relations. Reputation is largely an immersion-focused feature for the benefit of the player.\n
+			\nThere are currently nine total reputations available:\n
+			\n• Terrible (-2000) (-500)\n• Dreary (-1500) (-500)\n• Awful (-1000) (-500)\n• Bad (-500) (-500)\n• Neutral (0)\n• Good (500) (+500)\n• Great (1000) (+500)\n• Brilliant (1500) (+500)\n• Excellent (2000) (+500)
+		</text>
+	</string>
+	
+	<string id="encyclopedia_features_sleep_deprivation">
+		<text>Sleep deprivation</text>
+	</string>
+	<string id="encyclopedia_features_sleep_deprivation_text">
+		<text>
+			Sleep deprivation allows time and the use of consumables to fatigue the player.\n
+			\nThroughout the Zone you will find many beds and sleeping bags, normally they are only used to allow the player to skip time by sleeping, however with this feature enabled they become an essential part of gameplay.\n
+			\nAs time passes your character will slowly begin to feel tired, with the screen beginning to blur and shake. These effects will proceed to get worse until you find a suitable place to rest or the effects of sleep deprivation cause you to collapse from exhaustion.\n
+			\nTiredness can be accelerated through consumable items such as medical kits and vodka, and negated with those such as high-caffeine energy drinks - however using too much will leave you unable to rest until their effects wear off.\n
+			\nThis feature can be toggled from the game options menu and is disabled by default.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_features_story_mode">
+		<text>Story mode</text>
+	</string>
+	<string id="encyclopedia_features_story_mode_text">
+		<text>
+			\nStory mode enables a non-linear story based on the events of Shadow of Chernobyl.\n
+			\nWith this mode enabled you start the game with the 'Mysteries of the Zone' storyline and the tasks of disabling the Brain Scorcher and Miracle Machine.\n
+			\nTo begin the story you will need to find an important individual hiding somewhere within the Zone, who after a brief dialogue will provide with multiple tasks which you can complete it any order.\n
+			\nThis mode can only be enabled from the character creation screen.\n
+			\nThis mode is only available to the following factions:\n
+			\n• Clear Sky\n• Duty\n• Ecologist\n• Freedom\n• Loner\n• Mercenary
+		</text>
+	</string>
+	
+	<string id="encyclopedia_features_survival_mode">
+		<text>Survival mode</text>
+	</string>
+	<string id="encyclopedia_features_survival_mode_text">
+		<text>
+			Survival mode turns the Zone into a hunting ground - where you are the prey.\n
+			\nWith this mode enabled all spawns are replaced with zombified stalkers and mutants, who will slowly stumble towards your location in an attempt to kill you.\n
+			\nExclusive to this gameplay mode are zombies themselves, the last devolution of zombified stalkers who have lost the ability to operate mechanical devices such as firearms.\n
+			\nOnly a few traders and stalker squads can be found, meaning you will have to survive off of what you can scavenge in the world.\n
+			\nThis mode can only be enabled from the character creation screen.
+		</text>
+	</string>
+	
+</string_table>

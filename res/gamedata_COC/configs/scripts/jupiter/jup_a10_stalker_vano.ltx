@@ -1,0 +1,36 @@
+[logic@jup_a10_stalker_vano]
+suitable = {=check_npc_name(jup_a10_stalker_vano)}
+active = animpoint@vano
+prior = 200
+
+[animpoint@vano]
+cover_name = jup_a6_animpoint_vano
+use_camp = false
+on_info = {+jup_a10_vano_give_task -give_jup_a10_task} %=give_task(jup_a10_actor_agree_back_vano_duties) +give_jup_a10_task%
+on_info2 = {=dist_to_actor_ge(150) +jup_a10_fals} %=destroy_object(story:jup_a10_stalker_vano)%
+on_info3 = {+jup_a10_vano_give_task_end -jup_a10_vano_max_simpathy} %=actor_friend +jup_a10_vano_max_simpathy%
+on_actor_dist_le = 2 | {-jup_a10_vano_give_task -jup_a10_vano_need_help_infoporshin +jup_b217_welcome_tech_talked} %=play_sound(jup_a10_vano_need_help) +jup_a10_vano_need_help_infoporshin%
+on_actor_dist_ge_nvis = 100 | {+jup_a10_vano_need_help_infoporshin} %-jup_a10_vano_need_help_infoporshin%
+meet = meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+corpse_detection_enabled = false
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+snd_on_use = nil
+use = {+jup_a10_fals} false, {=actor_enemy} false, true
+allow_break = false
+trade_enable = false
+meet_dialog	= jup_a10_vano_help_dialog
+meet_on_talking = false

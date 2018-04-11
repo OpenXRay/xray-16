@@ -1,0 +1,23 @@
+[logic]
+active = nil;sr_idle@start
+
+[sr_idle@start]
+on_info = sr_idle@wait %=anomaly_turn_off(jup_b206_anomal_zone)%
+
+[sr_idle@wait]
+on_info = {+jup_b206_anomalous_grove_started} sr_idle@use %=give_task(jup_b206_anomalous_grove) =spawn_object(jup_b206_plant_ph:jup_b206_plant_point)%
+
+[sr_idle@use]
+on_info = {=actor_in_zone(jup_b206_sr_quest_line) -jup_b206_anomalous_grove_has_plant} sr_idle@place %=run_tutorial(jup_b206_plant)%
+on_info2 = {+jup_b206_anomalous_grove_has_plant} sr_idle@after
+
+[sr_idle@place]
+on_info = {+jup_b206_anomalous_grove_has_plant} sr_idle@after
+on_info2 = {!actor_in_zone(jup_b206_sr_quest_line)} sr_idle@use %=stop_tutorial%
+on_info3 = {!has_active_tutorial} sr_idle@use
+
+[sr_idle@after]
+on_info = {-jup_b206_got_anomalous_plant} %+jup_b206_got_anomalous_plant =scenario_autosave(st_save_jup_b206_got_anomalous_plant)%
+on_info2 = {+jup_b206_got_anomalous_plant} sr_idle@nil %=anomaly_turn_on(jup_b206_anomal_zone)%
+
+[sr_idle@nil]

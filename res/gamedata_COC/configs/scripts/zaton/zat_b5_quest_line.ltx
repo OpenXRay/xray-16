@@ -1,0 +1,127 @@
+[logic]
+active = nil ;sr_idle@wait
+
+[sr_idle@wait]
+on_info = {+zat_b5_actor_with_bandits} sr_idle@with_bandits %=give_task(zat_b5_come_to_bandits) +zat_b5_task_start%
+on_info2 = {+zat_b5_actor_with_stalkers} sr_idle@with_stalkers %=give_task(zat_b5_come_to_stalkers) +zat_b5_task_start%
+on_info3 = {+zat_b5_actor_with_dealer} sr_idle@with_dealer %=give_task(zat_b5_come_to_dealer) +zat_b5_task_start%
+
+;-----------------------------------
+[sr_idle@with_bandits]
+on_game_timer = 10800 | {=dist_to_actor_ge(200)} sr_idle@destroy_bandits %+zat_b5_leave_for_bandit_quest%
+on_info = {+zat_b5_come_to_bandits_complete} sr_idle@set
+
+[sr_idle@set]
+on_info = {+zat_b5_stalker_death +zat_b5_dealer_squad_death} sr_idle@nil %+zat_b5_witness_dead% ;%+zat_b5_killer_death%
+on_info2 = {=is_squad_enemy_to_actor(zat_b5_bandit_squad)} sr_idle@nil, {+zat_b5_sultan_dead} sr_idle@nil, {+zat_b5_task_end} sr_idle@nil
+on_info3 = {=dist_to_actor_ge(200) -zat_b5_sultan_close_by_trader} sr_idle@check_bandits_distance
+
+[sr_idle@check_bandits_distance]
+on_game_timer = 900 | sr_idle@bandits_kill_stalker %+zat_b5_leave_for_bandit_quest =set_squad_enemy_to_actor(zat_b5_bandit_squad) =remove_npc(zat_b5_dealer_assistant_1) =remove_npc(zat_b5_dealer_assistant_2) =remove_npc(zat_b7_duty_illicit_dealer)%
+on_info = {=dist_to_actor_le(200)} sr_idle@set
+
+[sr_idle@bandits_kill_stalker]
+on_game_timer = 20 | sr_idle@nil %=spawn_corpse(zat_b5_stalker_commander:zat_b5_smart_terrain_zat_b5_bandit_squad_sultan_fight_1_walk) =spawn_corpse(zat_b5_stalker_1:zat_b5_smart_terrain_zat_b5_stalker_commander_6_look) =spawn_corpse(zat_b5_stalker_2:zat_b5_smart_terrain_zat_b5_stalker_commander_b_4_look) =spawn_corpse(zat_b5_stalker_3:zat_b5_smart_terrain_zat_b5_stalker_2_walker_6_look) =spawn_corpse(zat_b5_stalker_4:zat_b5_smart_terrain_zat_b5_stalker_commander_b_4_walk)%
+
+;[sr_idle@hit_on_bone]
+;on_info = {=dist_to_actor_le(110)} | sr_idle@nil %=hit_obj(zat_b5_stalker_commander:bip01_l_foot:3:1000:zat_b5_smart_terrain_zat_b5_bandit_squad_sultan_fight_1_walk) =hit_obj(zat_b5_stalker_1:bip01_l_foot:3:1000:zat_b5_smart_terrain_zat_b5_stalker_commander_6_walk) =hit_obj(zat_b5_stalker_2:bip01_spine1:3:1000:zat_b5_smart_terrain_zat_b5_stalker_commander_6_walk) =hit_obj(zat_b5_stalker_3:bip01_spine1:3:1000:zat_b5_smart_terrain_zat_b5_stalker_commander_6_walk) =hit_obj(zat_b5_stalker_4:bip01_spine1:3:1000:zat_b5_smart_terrain_zat_b5_stalker_commander_6_walk) =hit_obj(zat_b5_stalker_5:bip01_spine1:3:1000:zat_b5_smart_terrain_zat_b5_stalker_commander_6_walk)%
+
+[sr_idle@destroy_bandits]
+on_info = {=squad_exist(zat_b5_bandit_squad)} sr_idle@nil %=remove_squad(zat_b5_bandit_squad)%, {!squad_exist(zat_b5_bandit_squad)} sr_idle@nil
+
+
+
+;------------------------
+[sr_idle@with_dealer]
+on_info = {+zat_b5_actor_go_to_trader} sr_idle@cover_dealer %+zat_b5_come_to_dealer_done%
+on_info2 = {+zat_b5_dolg_enemy} sr_idle@nil %=set_squad_enemy_to_actor(zat_b5_dolg_assist_squad) =set_squad_enemy_to_actor(zat_b5_dolg_squad)%
+on_game_timer = 10800 | {=dist_to_actor_ge(200)} sr_idle@destroy %+zat_b5_leave_for_trader_quest%
+
+
+[sr_idle@cover_dealer]
+on_info = {+zat_b5_meat} sr_idle@protect_dealer %+zat_b5_cover_dealer_done%
+on_info2 = {+zat_b5_dolg_enemy} sr_idle@nil %=set_squad_enemy_to_actor(zat_b5_dolg_assist_squad) =set_squad_enemy_to_actor(zat_b5_dolg_squad)%
+on_info3 = {=dist_to_actor_ge(200) -zat_b5_dealer_close_by_trader} sr_idle@check_timer
+on_info4 = {+zat_b5_task_end} sr_idle@nil
+
+[sr_idle@check_timer]
+on_game_timer = 900 | sr_idle@spawn_corpse  
+on_info = {=dist_to_actor_le(200)} sr_idle@cover_dealer
+on_info2 = {+zat_b5_task_end} sr_idle@nil
+
+
+[sr_idle@spawn_corpse]
+on_game_timer = 20 | {!squad_exist(zat_b5_bandit_squad)} sr_idle@spawn_corpse_2 %+zat_b5_leave_for_trader_quest =spawn_corpse(zat_b5_stalker_raider_1:zat_b5_smart_terrain_zat_b5_bandit_3_walker_2_look) =spawn_corpse(zat_b5_stalker_raider_2:zat_b5_smart_terrain_zat_b5_dolg_trader_4_look) =spawn_corpse(zat_b5_stalker_raider_3:zat_b5_smart_terrain_zat_b5_bandit_4_walker_2_walk) =spawn_corpse(zat_b5_stalker_raider_4:zat_b5_smart_terrain_zat_b5_dolg_trader_3_walk) =spawn_corpse(zat_b7_bandit_boss_dead:zat_b5_smart_terrain_zat_b5_bandit_sultan_2_walk)%, {=squad_exist(zat_b5_bandit_squad)} sr_idle@clear_bandits %=remove_squad(zat_b5_bandit_squad)%
+
+[sr_idle@clear_bandits]
+on_game_timer = 20 | sr_idle@spawn_corpse 
+
+[sr_idle@spawn_corpse_2]
+on_game_timer = 20 | sr_idle@remove_dolg %=spawn_corpse(zat_b5_stalker_commander:zat_b5_smart_terrain_zat_b5_bandit_squad_sultan_fight_1_walk) =spawn_corpse(zat_b5_stalker_1:zat_b5_smart_terrain_zat_b5_stalker_commander_6_look) =spawn_corpse(zat_b5_stalker_2:zat_b5_smart_terrain_zat_b5_stalker_commander_b_4_look) =spawn_corpse(zat_b5_stalker_3:zat_b5_smart_terrain_zat_b5_stalker_2_walker_6_look) =spawn_corpse(zat_b5_stalker_4:zat_b5_smart_terrain_zat_b5_stalker_commander_b_4_walk)%
+
+
+[sr_idle@remove_dolg]
+on_info = {=squad_exist(zat_b5_dolg_squad)} sr_idle@remove_dolg_assist %=remove_squad(zat_b5_dolg_squad)%, {!squad_exist(zat_b5_dolg_squad)} sr_idle@remove_dolg_assist
+
+[sr_idle@remove_dolg_assist]
+on_game_timer = 20 | {=squad_exist(zat_b5_dolg_assist_squad)} sr_idle@nil %=remove_squad(zat_b5_dolg_assist_squad)%, {!squad_exist(zat_b5_dolg_assist_squad)} sr_idle@nil
+
+[sr_idle@protect_dealer]
+on_info = {+zat_b5_bandits_death +zat_b5_stalker_death} sr_idle@speak_dealer %+zat_b5_protect_dealer_done%
+on_info2 = {+zat_b5_dolg_enemy} sr_idle@nil %=set_squad_enemy_to_actor(zat_b5_dolg_assist_squad) =set_squad_enemy_to_actor(zat_b5_dolg_squad)%
+
+[sr_idle@speak_dealer]
+on_info = {+zat_b5_actor_help_dealer} sr_idle@check_assist %+zat_b5_speak_dealer_done%
+on_info2 = {+zat_b5_dolg_enemy} sr_idle@nil %=set_squad_enemy_to_actor(zat_b5_dolg_assist_squad) =set_squad_enemy_to_actor(zat_b5_dolg_squad)%
+
+[sr_idle@check_dist]
+on_info = {=dist_to_actor_ge(150)} sr_idle@check_timer %+zat_b5_task_end%
+
+[sr_idle@destroy]
+on_info = {=squad_exist(zat_b5_dolg_squad)} sr_idle@destroy_assist %=remove_squad(zat_b5_dolg_squad)%, {!squad_exist(zat_b5_dolg_squad)} sr_idle@destroy_assist
+
+[sr_idle@destroy_assist]
+on_info = {=squad_exist(zat_b5_dolg_assist_squad)} sr_idle@nil %=remove_squad(zat_b5_dolg_assist_squad)%, {!squad_exist(zat_b5_dolg_assist_squad)} sr_idle@nil
+
+[sr_idle@check_assist]
+on_info = {=squad_exist(zat_b5_dolg_assist_squad)} sr_idle@nil %=set_squad_goodwill(zat_b5_dolg_assist_squad:friend)%, {!squad_exist(zat_b5_dolg_assist_squad)} sr_idle@nil
+
+;-------------------------------
+[sr_idle@with_stalkers]
+on_game_timer = 10800 | {=dist_to_actor_ge(200)} sr_idle@destroy_stalkers %+zat_b5_time_is_out%
+on_info = {+zat_b5_actor_stalker_go_to_trader} sr_idle@stalker_wait
+
+
+[sr_idle@stalker_wait]
+on_info = {+zat_b5_destroy_enemy +zat_b7_actor_now_duty_illicit_dealer +zat_b5_dolg_enemy} sr_idle@reward %+zat_b5_actor_help_stalkers%
+on_info2 = {+zat_b5_destroy_enemy +zat_b7_actor_now_duty_illicit_dealer -zat_b5_dolg_enemy -zat_b5_bandit_hit} sr_idle@reward %+zat_b5_actor_help_stalkers +zat_b5_time_is_out%
+on_info3 = {+zat_b5_destroy_enemy +zat_b7_actor_now_duty_illicit_dealer +zat_b5_bandit_hit} sr_idle@reward %+zat_b5_actor_help_stalkers%
+on_info4 = {=dist_to_actor_ge(200) -zat_b5_start_quest_stalkers} sr_idle@check_stalker_distance
+on_info5 = {+zat_b5_task_end} sr_idle@nil
+
+[sr_idle@check_stalker_distance]
+on_game_timer = 900 | sr_idle@stalker_kill_bandits %+zat_b5_time_is_out +zat_b5_task_end%
+on_info = {=dist_to_actor_le(200)} sr_idle@stalker_wait
+on_info2 = {+zat_b5_task_end} sr_idle@nil
+
+[sr_idle@stalker_kill_bandits]
+on_game_timer = 10 | {=squad_exist(zat_b5_bandit_squad)} sr_idle@stalker_remove_item %=kill_squad(zat_b5_bandit_squad)%, {!squad_exist(zat_b5_bandit_squad)} stalker_remove_item ;sr_idle@stalker_kill_dealer
+
+
+[sr_idle@stalker_remove_item]
+on_info = {=squad_exist(zat_b5_dolg_squad)} sr_idle@stalker_kill_dealer %=kill_squad(zat_b5_dolg_squad)%, {!squad_exist(zat_b5_dolg_squad)} sr_idle@stalker_kill_dealer 
+;on_info2 = {+zat_b5_task_end} sr_idle@nil
+
+;[sr_idle@stalker_remove_item]
+;on_info = {=squad_exist(zat_b5_dolg_squad)} sr_idle@stalker_kill_dealer %=destroy_object(story:device_pda_zat_b5_dealer_id)%, {!squad_exist(zat_b5_dolg_squad)} sr_idle@nil %=kill_squad(zat_b5_dolg_assist_squad)%
+
+[sr_idle@stalker_kill_dealer]
+on_info  = {=squad_exist(zat_b5_dolg_assist_squad)}  sr_idle@nil %=kill_squad(zat_b5_dolg_assist_squad)%, {!squad_exist(zat_b5_dolg_assist_squad)} sr_idle@nil
+
+[sr_idle@destroy_stalkers]
+on_info = {=squad_exist(zat_b5_stalkers_squad)} sr_idle@nil %+zat_b5_task_end =remove_squad(zat_b5_stalkers_squad)%, {!squad_exist(zat_b5_stalkers_squad)} sr_idle@nil
+
+[sr_idle@reward]
+on_info = {+zat_b5_actor_help_stalkers_pric} sr_idle@nil %=give_task(zat_b5_barmen_reward)%
+
+[sr_idle@nil]

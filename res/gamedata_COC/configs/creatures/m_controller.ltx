@@ -1,0 +1,544 @@
+[m_controller_e]:monster_base
+GroupControlSection	= spawn_group
+SpaceRestrictionSection = space_restrictor,zone_mosquito_bald
+$spawn               = "monsters\old\controller"	; option for Level Editor
+$npc			     = on						; option for Level Editor
+$prefetch 			 = 16
+Scheduled		     = on						; option for ALife Simulator
+Human		     	 = off						; option for ALife Simulator
+Health			     = 600						; option for ALife Simulator
+MinSpeed		     = 1.0						; option for ALife Simulator
+MaxSpeed		     = 5.0						; option for ALife Simulator
+going_speed          = 3;4.5                      ; option for ALife Simulator
+current_level_going_speed		= 3;2					; option for ALife Simulator
+search_speed         = 1.5                       ; option for ALife Simulator
+visual				 = monsters\controller\controller_1
+corpse_visual		 = monsters\controller\controller_dead
+icon				 = ui_npc_monster_controller
+MaxHealthValue		     = 200			; range [0..200]
+DynamicObjectsCount	 = 32
+smart_terrain_choose_interval	= 00:15:00
+
+spawn_phantom 		= m_phantom_controller
+can_spawn_phantom 	= false
+
+ef_creature_type	 = 12						; option for evaluation functions
+ef_weapon_type		 = 3
+ef_detector_type			 = 1
+panic_threshold		= 0.1
+
+cform                = skeleton					; collision class
+class                = SM_CONTR					; AI class
+
+script_binding  	= bind_monster.bind
+
+bone_torso			 = bip01_spine1 			; bone name
+bone_head			 = bip01_head				; bone name
+bone_fire			 = bip01_head				; bone name
+weapon_usage		 = 0						; boolean
+
+stamina_hit		=	0.2;
+
+hit_fraction_monster = 0.4
+skin_armor = 0.15
+
+;------------------------------------------------------------------------
+; Influences
+;------------------------------------------------------------------------
+
+fire_max_distance		=	0
+fire_max_power			=	5
+fire_linear_factor		=	0
+fire_quadratic_factor	=	0.025
+
+psy_linear_factor		=	0.5
+psy_quadratic_factor	=	0.0
+psy_max_distance		=	12.0
+psy_max_power			=	0.2
+psy_sound				=	anomaly\psy_voices_1_l		;monsters\controller\controller_presence_l
+psy_pp_effector_name	= 	psy_antenna 				;postprocess_psi
+psy_pp_highest_at		= 	0.1
+
+radiation_max_distance		=	0
+radiation_max_power			=	0.02
+radiation_linear_factor		=	1
+radiation_quadratic_factor	=	1
+
+;---------------------------------------------------------------------
+; Physics
+;---------------------------------------------------------------------
+ph_box0_center 		 = 0.0,  0.9,  0.0
+ph_box0_size 		 = 0.45, 0.9,  0.45
+ph_box1_center 		 = 0.0,  0.6,  0.0
+ph_box1_size 		 = 0.45, 0.6,  0.45
+ph_crash_speed_min			= 100
+ph_crash_speed_max			= 300
+ph_collision_damage_factor	= 0.1
+ph_mass 		     = 90; 170.
+
+destroyed_vis_name	 = dynamics\Dead_Body\skelet_crash
+
+;---------------------------------------------------------------------
+ph_skeleton_airr_lin_factor   = 2.0 ;550.0 (изменно из-за того, что убрано домножение коэффициент 0.002 из кода)
+ph_skeleton_airr_ang_factor   = 0.0 ;0.0 (изменно из-за того, что убрано домножение на коэффициент 0.3 из кода (0.0*0.3=0.0))
+ph_skeleton_hinger_factor1    = 1.0 ;1.0 (изменно из-за того, что убрано домножение на коэффициент 5.0 из кода)
+ph_skeleton_ddelay	     	  = 15.0 ;Время изменения значения трения в суставе с момента создания шелла, сек
+
+ph_skel_fatal_impulse_factor  = 6.0
+ph_after_death_velocity_factor= 0.75
+ph_skel_shot_up_factor        = 0.25
+;---------------------------------------------------------------------
+
+;----------------------------------------------------------------------------
+; Movement::Velocities & Acceleration
+;----------------------------------------------------------------------------
+; speed factors			linear | angular_real | angular_path | min |  max
+
+Velocity_Stand			= 0,		2.4,			2.4,		1,		1
+Velocity_WalkFwdNormal	= 1.5,		6.0,			6.0,		0.02,	2.0
+Velocity_RunFwdNormal	= 5.0,		4.6,			4.6,		0.25,	1
+Velocity_WalkFwdDamaged	= 1.5,		6.0,			6.0,		0.5,	2.0
+Velocity_RunFwdDamaged	= 4.0,  	4.0,			4.0,		0.2,	1
+Velocity_Drag			= -5.0,		0.1,			0.1,		1,		1
+Velocity_Steal			= 0.7,		1.3,			1.3,		1,		1
+Velocity_MoveFwd		= 5.0,		0.1,			0.1,		1,		1
+Velocity_MoveBkwd		= -5.0,		0.1,			0.1,		1,		1
+
+; acceleration
+Accel_Generic			= 1.5
+Accel_Calm				= 2.5
+Accel_Aggressive		= 12.5
+
+;--------------------------------------------------------------------------
+; Attack parameters
+;--------------------------------------------------------------------------
+MinAttackDist		= 1.5	;0.5
+MaxAttackDist		= 2.6	;3.8
+
+as_min_dist				= 0.8
+as_step					= 0.5
+
+DayTime_Begin		= 21		; начала дня для монстра
+DayTime_End			= 5  		; конец дня для монстра
+Min_Satiety			= 0.00055	; мин. норма сытости (меньше - уже голодный)
+Max_Satiety			= 0.9		; макс. норма сытости (больше - очень сытый)
+
+distance_to_corpse	= 1.2		; дист. до трупа, при которой он переходит в состояние еды
+
+;                           fSearchRange,fOptEnemyDistance,fOptEnemyDistanceWeight,fMinEnemyDistance,fMinEnemyDistanceWeight,fMaxEnemyDistance,fMaxEnemyDistanceWeight
+selector_free_hunting    =      20.0,            20.0,                 1000.0,                 0.0,               10000.0,               1000.0,               10000.0,
+;                           fSearchRange,fCoverFromEnemyWeight,fOptEnemyDistance,fOptEnemyDistanceWeight,fMinEnemyDistance,fMinEnemyDistanceWeight,fMaxEnemyDistance,fMaxEnemyDistanceWeight
+selector_cover           =      20.0,            -1000.0,                30.0,                 0.0,                  0.0,              100000.0,             100000.0,               1000.0,
+selector_hear_sound		=      20.0,            1.0,				1000.0,              0.0,               0.0,              1000.0,               10000.0,
+
+selector_getaway		=      20.0,            20.0,                1000.0,             0.0,               10000.0,		  1000.0,				10000.0,
+selector_approach		=      20.0,            1.0,                 1000.0,             0.0,               0.0,              1000.0,				10000.0,
+;							  fSearchRange,fOptEnemyDistance,fOptEnemyDistanceWeight,fMinEnemyDistance,fMinEnemyDistanceWeight,fMaxEnemyDistance,fMaxEnemyDistanceWeight
+selector_walk_around	=      20.0,            6.0,                 1000.0,             4.0,               5000.0,					8.0,				5000.0,
+
+terrain				 = controller_terrain
+
+hit_type = wound
+
+;-------------------------------------------------------------------------
+; Entity Conditions
+;-------------------------------------------------------------------------
+satiety_v =           0.0005;0.01		;скорость уменьшения сытости со временем
+radiation_v =        0.00001;0.004		;скорость уменьшения радиации
+satiety_power_v =      0.001;0.01		;увеличение силы при уменьшении сытости
+satiety_health_v =     0.001;0.03		;увеличение здоровья при уменьшении сытости
+satiety_critical =      -1.0;0.25		;критическое значения сытости (в процентах от 0..1) когда здоровье начианает уменьшаться
+radiation_health_v =    0.01;0.006		;уменьшение здоровья при воздействии радиации
+morale_v			=    0.1			;скорость восстановления морали
+health_hit_part =        0.25;0.1;0.8	;процент хита, уходящий на отнимание здоровья
+power_hit_part =         0.1;0.9		;процент хита, уходящий на отнимание силы
+psy_health_v =           0.1			;скорость восстановления psy-здоровья
+
+immunities_sect				= controller_immunities
+
+;открытые раны
+bleeding_v					= 0.04						;потеря крови при номинальной ране в секунду
+wound_incarnation_v			= 0.05				;крутизна кривой заживления (какой процент раны останется после заживления в игровую секунду)
+min_wound_size				= 0.01
+
+sleep_health = 1.0		;1.5				;коэффициенты скоростей изменения параметров во время сна
+sleep_power = 1.0		;1.5
+sleep_satiety = 1.0		;0.8
+sleep_radiation = 1.0	;1.1
+sleep_psy_health			= 1.0
+
+eat_freq			=	5.0		; частота укусов в сек
+eat_slice			=	0.04	; увеличение сытости при 1 укусе
+eat_slice_weight	=	10.0	; уменьшение еды у трупа
+
+satiety_threshold		= 0.5							; below this value monster fill hunger
+;-------------------------------------------------------------------------
+; Morale
+;-------------------------------------------------------------------------
+Morale_Hit_Quant				= 0.05
+Morale_Attack_Success_Quant		= 0.1
+Morale_Take_Heart_Speed			= 0.1
+Morale_Despondent_Speed			= 0.1
+Morale_Stable_Speed				= 0.02
+Morale_Despondent_Threashold	= 0.5
+
+;---------------------------------------------------------
+; Sounds and sound parameters
+;---------------------------------------------------------
+sound_idle				= monsters\controller\controller_idle_
+sound_eat				= monsters\controller\controller_eat_
+sound_aggressive		= monsters\controller\controller_attack_
+sound_attack_hit		= monsters\controller\controller_attack_hit_
+sound_take_damage		= monsters\controller\controller_hit_
+sound_die				= monsters\controller\controller_die_
+sound_threaten			= monsters\boar\boar_threaten_
+sound_landing			= monsters\boar\landing_
+sound_steal				= monsters\biting\def_
+sound_panic				= monsters\controller\controller_panic_
+sound_growling			= monsters\biting\def_
+sound_bkgnd				= monsters\biting\def_
+sound_die_in_anomaly	= monsters\controller\controller_die_
+
+killer_clsids				= Z_MINCER,Z_GALANT,ZS_BFUZZ,ZS_MBALD,ZS_GALAN,ZS_MINCE
+
+idle_sound_delay		= 12000
+eat_sound_delay			= 10000
+attack_sound_delay		= 5000
+
+sound_distant_idle			= monsters\controller\controller_idle_
+distant_idle_sound_delay	= 80000
+distant_idle_sound_range	= 100.0
+
+sound_control_start		= monsters\controller\controller_control1
+sound_control_hit		= monsters\controller\controller_control2
+
+SoundThreshold		 = 0.06             ; range [0..1]
+max_hear_dist		 = 60;
+
+;-------------------------------------------------------------------------
+
+critical_wound_threshold		= 0.4
+critical_wound_decrease_quant	= 0.
+
+critical_wound_anim_head	= stand_attack_0
+critical_wound_bones_head	= controller_critical_wound_bones_head
+
+critical_wound_anim_torso	= stand_attack_0
+critical_wound_bones_torso	= controller_critical_wound_bones_torso
+
+critical_wound_anim_legs	= stand_attack_0
+critical_wound_bones_legs	= controller_critical_wound_bones_legs
+
+DamagedThreshold		= 0.1
+
+material				= creatures\medium
+
+attack_effector			= m_controller_attack_effector
+
+attack_params			= m_controller_attack_params
+step_params				= m_controller_step_params
+
+LegsCount				= 2
+damage					= m_controller_damage
+
+;---------- FIRE---------;
+tube_damage		    		= 0.25
+tube_condition_see_duration = 10	;50
+tube_condition_min_delay    = 2000 ;10000
+tube_condition_min_distance = 5
+tube_at_once			    = false ; true for test-mode
+
+control_fx_texture		= act\act_controller_hit
+control_fx_texture2		= act\act_controller_hit1
+
+; Controlling ability properties
+Max_Controlled_Count	= 10;4
+
+control_effector			= controller_control_effector
+
+Friend_Community_Overrides	= monolith
+
+;-------------------------------------------------------------------------
+; Anti-aim Ability
+;-------------------------------------------------------------------------
+;anti_aim_timeout				=	4 ; sec
+;anti_aim_effectors				=	effector_monster_hit_1, effector_monster_hit_2, effector_monster_hit_3, effector_monster_hit_4
+;anti_aim_animation				=	stand_attack_
+;anti_aim_max_angle				=	0.5
+;anti_aim_detection_gain_speed	=	1
+;anti_aim_detection_loose_speed	=	0.1
+
+;-------------------------------------------------------------------------
+Control_Hit					= weapons\generic_weapon_controller
+
+;species of monster
+species						= controller
+rank						= 18
+spec_rank					= normal
+community					= controller
+
+;-------------------------------------------------------------------------
+; Vision
+;-------------------------------------------------------------------------
+eye_fov				 = 110	;150
+eye_range			 = 60	;100
+
+vision_free_section			= controller_vision_free
+vision_danger_section		= controller_vision_danger
+
+; ЗНАЧЕНИЯ visibility_threshold ДОЛЖНЫ БЫТЬ РАВНЫ для денжера и фри,
+; иначе возникают артефакты с потерей видимости при переходе от денжера во фри.
+
+[controller_vision_free]
+min_view_distance   		= 0.4				; min range of cone based on eye_range
+max_view_distance	 		= 0.7				; max range of cone based on eye_range
+visibility_threshold	 	= 210				;Threshold in which object becomes visible based on factors
+always_visible_distance 	= 0					;Distance object is always considered visible (float)
+time_quant					= 0.001				;step increment to for sight calculations
+decrease_value				= 0.01 				;Decrease over time to overall threshold
+velocity_factor		     	= 0.7				;Higher value = greater bonus to detection speed when target is moving (depended on movement speed)
+luminocity_factor			= 1.0				;Low value = easier to see at night
+transparency_threshold	 	= 0.7 			    ;Low value = easier to see through objects
+still_visible_time          = 0 				;The time (milliseconds) that the object is still considered visible , even if it is not in the frustum (u32)
+
+[controller_vision_danger]
+min_view_distance   		= 0.4				; min range of cone based on eye_range
+max_view_distance	 		= 1.0				; max range of cone based on eye_range
+visibility_threshold	 	= 210				;Threshold in which object becomes visible based on factors
+always_visible_distance 	= 0					;Distance object is always considered visible (float)
+time_quant					= 0.001				;step increment to for sight calculations
+decrease_value				= 0.01 				;Decrease over time to overall threshold
+velocity_factor		     	= 1.0				;Higher value = greater bonus to detection speed when target is moving (depended on movement speed)
+luminocity_factor			= 0.8				;Low value = easier to see at night
+transparency_threshold	 	= 0.4				;Low value = easier to see through objects (if greater then 1 then enemies are blind)
+still_visible_time          = 0					;The time (milliseconds) that the object is still considered visible , even if it is not in the frustum (u32)
+
+;===========================================================================
+; Step Events
+;===========================================================================
+[m_controller_step_params]
+;---------------------------------------------------------------------------
+;	anim			| Cycles | time1 | power1 | time2 | power2 |
+;---------------------------------------------------------------------------
+stand_walk_fwd_0 	=	    1,	   0.01,     1,     0.25,    0.7,
+stand_walk_dmg_0 	=	    1,	   0.01,     1,     0.25,    0.7,
+stand_run_fwd_0	 	=	    1,	   0.01,     1,	    0.25,    0.6,
+stand_run_dmg_0	 	=	    1,	   0.01,     1,	    0.25,    0.6,
+
+;===========================================================================
+; IMMUNITIES
+;===========================================================================
+[controller_immunities]
+burn_immunity 						= 1.0
+strike_immunity 					= 0.9
+shock_immunity 						= 1.0
+wound_immunity 						= 0.7
+radiation_immunity 					= 0.0
+telepatic_immunity 					= 0.0
+chemical_burn_immunity 				= 0.9
+explosion_immunity 					= 1.0
+fire_wound_immunity  				= 1.0
+
+;=========================================================================================
+; CONTROL Effector
+;==========================================================================================
+[controller_control_effector]
+duality_h		= 0.1	;0.31
+duality_v		= 0.2	;0.31
+blur			= 0.01
+gray			= 0.5	;0.5
+noise_intensity = 1.0
+noise_grain		= 0.9
+noise_fps		= 30
+color_base		= 1.1,1.1,1	;0.1,0.15,0.4
+color_gray		= 1,1,1		;0.333,0.333,0.333
+color_add		= 0.2,0.2,0.1
+time			= 1.0		;1.5
+time_attack		= 0.3		;0.5		; fade in
+time_release	= 0.5		; fade out
+
+; camera effects
+ce_time				= 1.0	;1.5
+ce_amplitude		= 20.0
+ce_period_number	= 1.0
+ce_power			= 0.7
+
+;==========================================================================================
+; Psy Attack Effector
+;==========================================================================================
+[m_controller_attack_effector]
+
+duality_h		= 0.01
+duality_v		= 0.01
+blur			= 0.01
+gray			= 0.5
+noise_intensity = 0.0
+noise_grain		= 1
+noise_fps		= 30
+color_base		= 0.65,0.15,0.1
+color_gray		= 0.333,0.333,0.333
+color_add		= 0,0,0
+time			= 0.3
+time_attack		= 0.05		; fade in
+time_release	        = 0.25		; fade out
+
+; camera effects
+ce_time				= 0.45 ;time
+ce_amplitude		= -15.0
+ce_period_number	= 1.5 ;2.0
+ce_power			= 1.5 ;0.7 ; power
+
+;=========================================================================================
+; Aura PP Effector
+;=========================================================================================
+[controller_aura_pp_effector_section]
+;duality_h		= 0.001
+;duality_v		= 0.001
+;blur			= 10
+;gray			= 0.5
+;noise_intensity = 1.0 ;0.5
+;noise_grain		= 1
+;noise_fps		= 5
+;color_base		= 0.999,0.433,0.0999
+;color_gray		= 0.333,0.3330,0.3330
+;color_add		= 0.999,0.433,0.0999 ;0.00,0.01,0.00
+
+duality_h		= 0.00
+duality_v		= 0.00
+blur			= 10
+gray			= 0.0
+noise_intensity = 10.0
+noise_grain		= 1
+noise_fps		= 25
+;color_base		= 0.5,0.5,0.5;0.2,0.2,0.2
+;color_gray		= 0.33,0.33,0.33
+;color_add		= 0.30,0.30,0.30
+color_base		= 0.9,0.9,1.0
+color_gray		= 0.33,0.330,0.33
+color_add		= 0.00,0.00,0.015
+
+;===========================================================================
+; Attack Animation Parameters
+;===========================================================================
+[m_controller_attack_params]
+
+;---------------------------------------------------------------------------------------------------------------------------------------------
+;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, bottom, top ) |	Test Dist
+;---------------------------------------------------------------------------------------------------------------------------------------------
+;Right hand Strike
+stand_attack_0 =	  	0.45,		0.55,		   100,        2.0, 0.4, 0.5,		 -1.6, 1.6, -1.6, 1.6,				  3.0
+;RightLeft combo strike
+stand_attack_1 =	  	0.25,		0.5,		    75,        2.0, 0.4, 0.5,		 -1.6, 1.6, -1.6, 1.6,				  3.0
+;stand_attack_1 =	  	0.45,		0.55,		    100,        0.0, 1.0, 0.0,		 -1.6, 1.6, -1.6, 1.6,				  3.0
+
+;=================================================================================
+; Terrain
+;=================================================================================
+[controller_terrain]
+	255,000,255,255
+	
+;=================================================================================
+; CONTROLLER Damage
+;=================================================================================
+[m_Controller_damage]
+;bone_name		 = <hit_scale>,-1,<wound_scale>
+;<hit_scale>	- коэфф. изменения хита (уменьшения здоровья)
+;<wound_scale>	- коэфф. изменения величины открытой раны
+default				= 1.0, -1, 0.1
+
+bip01_pelvis 		= 1.0, -1, 0.5
+bip01_spine 		= 1.0, -1, 0.5
+bip01_spine1 		= 1.0, -1, 0.5
+bip01_neck 			= 1.0, -1, 1.0
+bip01_head 			= 2.0, -1, 0.5, 10
+
+;*********************************************************************************
+; NORMAL PROFILE 1
+;*********************************************************************************
+
+[m_controller_normal]:m_controller_e
+$spawn              = "monsters\old\controller_normal"
+visual				= monsters\controller\controller_1
+corpse_visual		 = monsters\controller\controller_dead
+icon				= ui_npc_monster_controller
+spec_rank			= normal
+rank				= 18
+community			= controller
+
+;*********************************************************************************
+; NORMAL PROFILE 2
+;*********************************************************************************
+[m_controller_normal2]:m_controller_e
+$spawn				= "monsters\controller\controller_02_normal"
+visual				= monsters\controller\controller2a
+corpse_visual			= monsters\controller\controller2a
+icon				= ui_npc_monster_controller
+panic_threshold			= 0.1
+rank				= 18
+immunities_sect		= controller_immunities
+attack_params		= m_controller_attack_params
+spec_rank			= normal
+community			= controller
+
+;*********************
+; NORMAL PSY 
+;*********************
+[m_controller_psy]:m_controller_normal2
+can_spawn_phantom = true
+
+
+[controller_critical_wound_bones_head]
+bip01_neck
+bip01_head
+bip01_ponytail1
+bip01_ponytail2
+bone01
+bone03
+bone05
+bone07
+bone09
+
+[controller_critical_wound_bones_torso]
+bip01_spine
+bip01_spine1
+bip01_spine2
+bip01_spine3
+bip01_pelvis
+bip01_l_clavicle
+bip01_l_upperarm
+bip01_l_forearm
+bip01_l_hand
+bip01_l_finger0
+bip01_l_finger01
+bip01_l_finger1
+bip01_l_finger11
+bip01_l_finger2
+bip01_l_finger21
+bip01_l_finger3
+bip01_l_finger31
+bip01_l_finger4
+bip01_l_finger41
+bip01_r_clavicle
+bip01_r_upperarm
+bip01_r_forearm
+bip01_r_hand
+bip01_r_finger0
+bip01_r_finger01
+bip01_r_finger1
+bip01_r_finger11
+bip01_r_finger2
+bip01_r_finger21
+bip01_r_finger3
+bip01_r_finger31
+bip01_r_finger4
+bip01_r_finger41
+
+[controller_critical_wound_bones_legs]
+bip01_l_thigh
+bip01_l_calf
+bip01_l_foot
+bip01_l_toe1
+bip01_r_thigh
+bip01_r_calf
+bip01_r_foot
+bip01_r_toe1

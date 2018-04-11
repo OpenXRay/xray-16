@@ -1,0 +1,12 @@
+[logic]
+active = nil ;sr_idle
+
+[sr_idle]
+on_info = {+zat_b106_forwarding} sr_light
+on_info2 = {+zat_b106_gonta_dead} sr_idle@nil
+
+[sr_light]
+light_on = false
+on_info = {+zat_b106_chimera_dead} sr_idle@nil, {+zat_b106_garmata_dead +zat_b106_gonta_dead} sr_idle@nil
+
+[sr_idle@nil]

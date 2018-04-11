@@ -1,0 +1,54 @@
+[logic]
+active = nil;sr_idle@jup_b25_start
+
+[sr_idle@jup_b25_start]
+on_info = {-jup_b25_flint_squad_spawned +zat_b106_search_soroka} sr_idle@jup_b25_scene %+jup_b25_flint_squad_spawned =create_squad(jup_b25_freedom_flint_squad:jup_a6)%
+
+[sr_idle@jup_b25_scene]
+on_info1 = {+jup_b25_first_blame -jup_b25_accuse_flint_gived} %+jup_b25_accuse_flint_gived =give_task(jup_b25_accuse_flint)%
+on_info2 = {=jup_b25_senya_spawn_condition -jup_b25_senya_spawned} %=create_squad(jup_b25_stalker_senya_squad:jup_b25) +jup_b25_senya_spawned%
+on_info3 = {+jup_b25_first_blame -jup_b25_accuse_flint_gived} %+jup_b25_accuse_flint_gived =give_task(jup_b25_accuse_flint)%
+on_info4 = {-jup_b25_freedom_flint_gone =jup_b25_flint_gone_condition =distance_to_obj_ge(jup_b25_freedom_flint:150)} %+jup_b25_freedom_flint_gone%, {-jup_b25_freedom_flint_gone =jup_b25_flint_gone_condition +zat_b215_guide_to_zaton} %+jup_b25_freedom_flint_gone%, {-jup_b25_freedom_flint_gone +zat_b106_found_soroka_done} %+jup_b25_freedom_flint_gone%
+on_info5 = {+jup_b25_freedom_flint_gone =story_object_exist(jup_b25_freedom_flint)} sr_idle@jup_b221_scene %=destroy_object(story:jup_b25_freedom_flint)%, {+jup_b25_freedom_flint_gone} sr_idle@jup_b221_scene
+
+
+[sr_idle@jup_b221_scene]
+on_game_timer = 3600 | {=jup_b221_who_will_start(ability)} sr_idle@choose
+
+[sr_idle@choose]
+on_info = {=jup_b221_who_will_start(choose)} sr_idle@a, sr_idle@d
+
+[sr_idle@a]
+on_info = {+jup_b221_spawn_more_freedom} %=create_squad(jup_b221_freedom_squad:jup_a6) -jup_b221_spawn_more_freedom%, {+jup_b221_spawn_more_duty} %=create_squad(jup_b221_duty_squad:jup_a6) -jup_b221_spawn_more_duty%;“ŒÀ‹ Œ ƒÀﬂ “≈—“¿! 
+on_actor_inside = {=obj_on_job(logic@jup_b221_duty_01:jup_a6) =obj_on_job(logic@jup_b221_duty_02:jup_a6) =obj_on_job(logic@jup_b221_duty_03:jup_a6) =obj_on_job(logic@jup_b221_freedom_01:jup_a6) =obj_on_job(logic@jup_b221_freedom_02:jup_a6) =obj_on_job(logic@jup_b221_freedom_02:jup_a6)} sr_idle@b %+jup_b221_duty_main%
+
+[sr_idle@b]
+on_info = {-jup_b221_duty_main} sr_idle@c1 
+
+[sr_idle@c1] 
+on_game_timer = 2 | {-jup_b221_duty_reply} sr_idle@c2 %+jup_b221_duty_reaction_01%, sr_idle@g
+
+[sr_idle@c2]
+on_game_timer = 10 | {-jup_b221_duty_reply} sr_idle@c3 %+jup_b221_duty_reaction_02%, sr_idle@g
+
+[sr_idle@c3]
+on_game_timer = 10 | {-jup_b221_duty_reply} sr_idle@d, sr_idle@g 
+
+[sr_idle@d]
+on_actor_inside = {=obj_on_job(logic@jup_b221_duty_01:jup_a6) =obj_on_job(logic@jup_b221_duty_02:jup_a6) =obj_on_job(logic@jup_b221_duty_03:jup_a6) =obj_on_job(logic@jup_b221_freedom_01:jup_a6) =obj_on_job(logic@jup_b221_freedom_02:jup_a6) =obj_on_job(logic@jup_b221_freedom_02:jup_a6)} sr_idle@e %+jup_b221_freedom_main%
+
+[sr_idle@e]
+on_info = {-jup_b221_freedom_main} sr_idle@f1 
+
+[sr_idle@f1]
+on_game_timer = 3 | {-jup_b221_freedom_reply} sr_idle@f2 %+jup_b221_freedom_reaction_01%, sr_idle@g
+
+[sr_idle@f2]
+on_game_timer = 10 | {-jup_b221_freedom_reply} sr_idle@f3 %+jup_b221_freedom_reaction_02%, sr_idle@g
+
+[sr_idle@f3]
+on_game_timer = 10 | {-jup_b221_freedom_reply} sr_idle@a, sr_idle@g
+
+[sr_idle@g]
+on_info = {=distance_to_obj_ge(jup_b202_actor_treasure:150)} sr_idle@jup_b221_scene
+on_game_timer = 3600 | sr_idle@jup_b221_scene

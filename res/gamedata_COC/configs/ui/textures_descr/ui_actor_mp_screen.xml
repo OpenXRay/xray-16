@@ -1,0 +1,57 @@
+<w>
+    <file name="ui\ui_actor_MP_screen">
+
+	    <texture id="ui_inGame2_Mp_screen_main_window" x="0" y="0" width="724" height="526" />
+	    <texture id="ui_inGame2_Mp_screen_skin_window" x="728" y="0" width="111" height="232" />
+	    <texture id="ui_inGame2_Mp_screen_skin_window_H" x="843" y="0" width="95" height="216" />
+	    <texture id="ui_inGame2_Mp_screen_map_window" x="0" y="528" width="324" height="234" />
+	    <texture id="ui_inGame2_Mp_screen_sponsor_window" x="327" y="528" width="658" height="234" />
+	    <texture id="ui_inGame2_Mp_screen_mapinfo_window" x="0" y="765" width="324" height="234" />
+
+	    <texture id="ui_inGame2_Mp_HUD_art_hunt" x="881" y="242" width="54" height="63" />
+	    <texture id="ui_inGame2_Mp_HUD_DM" x="728" y="285" width="114" height="41" />
+	    <texture id="ui_inGame2_Mp_HUD_left_panel" x="728" y="366" width="175" height="32" />
+	    <texture id="ui_inGame2_Mp_HUD_right_panel" x="728" y="330" width="175" height="32" />
+	    <texture id="ui_inGame2_Mp_HUD_money_panel" x="728" y="242" width="146" height="42" />
+
+	    <texture id="ui_inGame2_demo_player_main_window" x="330" y="770" width="452" height="87" />
+	    <texture id="ui_inGame2_demo_player_progress_bar" x="330" y="861" width="402" height="4" />
+
+	    <texture id="ui_inGame2_demo_player_button_1_e" x="943" y="4" width="77" height="27" />
+	    <texture id="ui_inGame2_demo_player_button_2_e" x="943" y="34" width="77" height="27" />
+	    <texture id="ui_inGame2_demo_player_button_3_e" x="943" y="64" width="49" height="27" />
+	    <texture id="ui_inGame2_demo_player_button_4_e" x="943" y="94" width="77" height="27" />
+
+	    <texture id="ui_inGame2_demo_player_button_1_t" x="943" y="124" width="77" height="27" />
+	    <texture id="ui_inGame2_demo_player_button_2_t" x="943" y="154" width="77" height="27" />
+	    <texture id="ui_inGame2_demo_player_button_3_t" x="943" y="184" width="49" height="27" />
+	    <texture id="ui_inGame2_demo_player_button_4_t" x="943" y="214" width="77" height="27" />
+
+	    <texture id="ui_inGame2_demo_player_button_1_h" x="943" y="244" width="77" height="27" />
+	    <texture id="ui_inGame2_demo_player_button_2_h" x="943" y="274" width="77" height="27" />
+	    <texture id="ui_inGame2_demo_player_button_3_h" x="943" y="304" width="49" height="27" />
+	    <texture id="ui_inGame2_demo_player_button_4_h" x="943" y="334 " width="77" height="27" />
+
+	    <texture id="ui_inGame2_demo_player_button_1_d" x="943" y="4" width="77" height="27" />
+	    <texture id="ui_inGame2_demo_player_button_2_d" x="943" y="34" width="77" height="27" />
+	    <texture id="ui_inGame2_demo_player_button_3_d" x="943" y="64" width="49" height="27" />
+	    <texture id="ui_inGame2_demo_player_button_4_d" x="943" y="94" width="77" height="27" />
+
+	    <texture id="ui_inGame2_demo_player_info_window_lt" x="728" y="402" width="11" height="11" />
+	    <texture id="ui_inGame2_demo_player_info_window_t" x="739" y="402" width="36" height="11" />
+	    <texture id="ui_inGame2_demo_player_info_window_rt" x="938" y="402" width="11" height="11" />
+
+	    <texture id="ui_inGame2_demo_player_info_window_l" x="728" y="413" width="11" height="18" />
+	    <texture id="ui_inGame2_demo_player_info_window_back" x="739" y="413" width="36" height="18" />
+	    <texture id="ui_inGame2_demo_player_info_window_r" x="938" y="413" width="11" height="18" />
+
+	    <texture id="ui_inGame2_demo_player_info_window_lb" x="728" y="501" width="11" height="11" />
+	    <texture id="ui_inGame2_demo_player_info_window_b" x="739" y="501" width="36" height="11" />
+	    <texture id="ui_inGame2_demo_player_info_window_rb" x="938" y="501" width="11" height="11" />
+
+		<texture id="ui_listline_b" 	x="907" y="380" width="4" height="18" />
+		<texture id="ui_listline_back" 	x="911" y="380" width="28" height="18" />
+		<texture id="ui_listline_e" 	x="939" y="380" width="4" height="18" />
+   </file>
+</w>
+

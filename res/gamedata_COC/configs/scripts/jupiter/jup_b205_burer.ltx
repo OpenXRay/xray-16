@@ -1,0 +1,22 @@
+[logic@burer_work]
+suitable = {=is_monster_burer}
+prior = 200
+monster_job = true
+active = mob_walker@passive
+
+[mob_walker@passive]
+path_walk = burer_02_walk
+path_look = burer_02_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {!npc_in_zone(jup_b205_burer_zone)} %=teleport_npc(jup_b205_monster_01_spawn_point)%
+on_info2 = {=actor_in_zone(jup_b205_burer_zone)} mob_home@active
+out_restr = jup_b205_burer_zone
+aggressive = true
+
+[mob_home@active]
+path_home = burer_01_walk
+home_min_radius = 5
+home_max_radius = 60
+aggressive = true
+out_restr = jup_b205_burer_zone
+;on_info = {!actor_in_zone(jup_b205_burer_zone)} mob_walker@passive

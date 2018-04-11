@@ -1,0 +1,114 @@
+[logic]
+active = sr_idle@start
+
+[sr_idle@start]
+on_info = {+pri_b305_fifth_cam_end =actor_in_zone(pri_a28_scene_end_zone) +pri_a28_strelok_can_leave} sr_idle@helis_reached_save
+on_info2 = {+pri_b305_fifth_cam_end =actor_in_zone(pri_a28_scene_end_zone) +pri_a28_strelok_dead} sr_idle@helis_reached_save
+on_info3 = {+pri_b305_fifth_cam_end +pri_a28_squad_dead} sr_idle@helis_want_to_leave
+on_info4 = {+pri_a28_helis_leave !actor_in_zone(pri_a28_scene_end_zone)} sr_idle@cut_2_save
+;затычка
+on_info5 = {+pri_a28_cutscene_start} sr_idle@cut_1_save %=clear_smart_terrain(pri_sim_2)% 
+
+
+
+[sr_idle@helis_want_to_leave]
+on_game_timer = 30 | %=play_sound(pri_a28_evac_com_helicopter_run_time)%
+on_signal = sound_end | sr_timer@got_one_minute
+
+[sr_timer@got_one_minute]
+type = dec
+start_value = 60000
+on_value = 0 | {+pri_a28_evacuation_end =actor_in_zone(pri_a28_scene_end_zone)} sr_idle@cut_1_save, %+pri_a28_helis_leave%
+on_info = {-pri_a28_evacuation_end =actor_in_zone(pri_a28_scene_end_zone)} %+pri_a28_evacuation_end =scenario_autosave(st_save_pri_a28_evacuation_end)%
+on_info2 = {+pri_a28_helis_leave !actor_in_zone(pri_a28_scene_end_zone)} sr_idle@cut_2_save
+
+
+
+[sr_idle@helis_reached_save]
+on_info = {-pri_a28_evacuation_end =actor_alive} %+pri_a28_evacuation_end =scenario_autosave(st_save_pri_a28_evacuation_end)%
+on_info2 = {+pri_a28_evacuation_end +pri_a28_waves_end =actor_in_zone(pri_a28_scene_end_zone)} sr_idle@cut_1_save
+on_info3 = {+pri_a28_helis_leave !actor_in_zone(pri_a28_scene_end_zone)} sr_idle@cut_2_save
+
+
+
+[sr_idle@cut_1_save]
+on_info = {-pri_a28_evacuation_heli =actor_alive} %+pri_a28_evacuation_heli =scenario_autosave(st_save_pri_a28_evacuation_heli)%
+on_info2 = {+pri_a28_evacuation_heli} sr_idle@cut_1_start %=disable_ui =run_postprocess(black:3009:true) +pri_a28_scene_end =save_actor_position%
+
+[sr_idle@cut_1_start]
+on_game_timer = 18 | sr_idle@check_squad %=create_cutscene_actor_with_weapon(pri_a28_cutscene_actor:pri_a28_cutscene_actor_walk:0:0:3)%
+
+[sr_idle@check_squad]
+on_info = {=squad_exist(pri_a16_military_squad)} sr_idle@check_commander %+pri_a28_somebody_alive%, sr_idle@check_commander
+
+[sr_idle@check_commander]
+on_info = {=is_alive(pri_a28_evac_com)} sr_idle@add_commander %=remove_npc(pri_a28_evac_com)%, sr_idle@add_commander
+
+[sr_idle@add_commander]
+on_info = sr_idle@check_strelok %=spawn_object(pri_a28_cutscene_commander:pri_a28_cutscene_commander_walk)%
+
+[sr_idle@check_strelok]
+on_info = {=is_alive(pri_b305_strelok)} sr_idle@add_strelok %=remove_npc(pri_b305_strelok)%, sr_cutscene@cut_1 %+pri_a28_strelok_dead%
+
+[sr_idle@add_strelok]
+on_info = sr_cutscene@cut_1 %=spawn_object(pri_a28_cutscene_strelok:pri_a28_cutscene_strelok_walk)%
+
+[sr_cutscene@cut_1]
+point = pri_a28_actor_hide_walk
+look = pri_a28_actor_hide_look
+global_cameffect = true
+enable_ui_on_end = false
+outdoor = true
+cam_effector = scenario_cam\pripyat\pri_a28_evac_cam_1
+on_signal = cam_effector_stop | sr_idle@freeplay_dialog %=run_postprocess(black:3009:true) -pri_a28_cam_started%
+on_signal2 = cameff_end | sr_idle@freeplay_dialog %+pri_a28_cut_1_end =run_postprocess(black:3009:true) -pri_a28_cam_started% 
+on_info = {-pri_a28_cam_started} %+pri_a28_cam_started =stop_postprocess(3009)%
+on_info2 = {+pri_a28_cut_1_end} %=stop_sr_cutscene%
+
+[sr_idle@freeplay_dialog]
+on_game_timer = 10 | {-pri_a28_show_freeplay_dialog} %+pri_a28_show_freeplay_dialog =enable_ui =show_freeplay_dialog(st_freeplay_text_yes_no:true)%
+on_info = {+pri_a28_actor_in_zone_stay} sr_idle@check_sokolov %+pri_a28_helis_leave =disable_ui%
+on_info2 = {+pri_a28_actor_in_zone_leave} sr_idle@check_sokolov %+pri_a28_helis_leave =disable_ui%
+
+
+
+[sr_idle@cut_2_save]
+on_info = {-pri_a28_evacuation_heli =actor_alive} %+pri_a28_evacuation_heli =scenario_autosave(st_save_pri_a28_evacuation_heli)%
+on_info2 = {+pri_a28_evacuation_heli} sr_idle@check_sokolov %=disable_ui =run_postprocess(black:3009:true) =save_actor_position%
+
+[sr_idle@check_sokolov]
+on_info = {-pri_a28_sokolov_left_alive =is_alive(pri_a15_sokolov_sci_head)} %+pri_a28_sokolov_left_alive%
+on_info2 = {-pri_a28_army_leaved_alive -pri_a28_strelok_dead =squad_npc_count_ge(pri_a16_military_squad:5)} %+pri_a28_army_leaved_alive%
+on_info3 = {-pri_a28_army_leaved_alive +pri_a28_strelok_dead =squad_npc_count_ge(pri_a16_military_squad:4)} %+pri_a28_army_leaved_alive%
+on_info4 = sr_idle@cut_2_start
+
+[sr_idle@cut_2_start]
+on_info = {=squad_exist(pri_a16_military_squad)} %=remove_squad(pri_a16_military_squad)%
+on_info2 = {=squad_exist(pri_a28_evac_squad)} %=remove_squad(pri_a28_evac_squad)%
+on_game_timer = 18 | {+pri_a28_helis_added} sr_cutscene@cut_2 %=destroy_object(story:pri_a28_earth_helli_1) =destroy_object(story:pri_a28_earth_helli_2)%, sr_cutscene@cut_2
+
+[sr_cutscene@cut_2]
+point = pri_a28_actor_hide_walk
+look = pri_a28_actor_hide_look
+global_cameffect = true
+enable_ui_on_end = false
+outdoor = true
+cam_effector = scenario_cam\pripyat\pri_a28_evac_cam_heli
+on_signal = cam_effector_stop | sr_idle@hellis_fly_cutscene_end %=run_postprocess(black:3009:true)%
+on_signal = cameff_end | sr_idle@hellis_fly_cutscene_end %=run_postprocess(black:3009:true)%
+on_info = {-pri_a28_cam_started} %+pri_a28_cam_started =stop_postprocess(3009)%
+on_game_timer = 200 | %=stop_sr_cutscene%
+
+[sr_idle@hellis_fly_cutscene_end]
+on_game_timer = 10 | {-pri_a28_actor_in_zone_stay -pri_a28_actor_in_zone_leave} sr_idle@wait_for_ok %=enable_ui =show_freeplay_dialog(st_freeplay_text_ok)%
+on_info = {+pri_a28_actor_in_zone_stay} sr_idle@announce_continue %=restore_actor_position =stop_postprocess(3009) =enable_ui%
+on_info2 = {+pri_a28_actor_in_zone_leave} sr_idle@nil %=restore_actor_position =enable_ui =run_tutorial(outro_game)%
+
+[sr_idle@wait_for_ok]
+on_info = {+pri_a28_actor_in_zone_stay} sr_idle@announce_continue %=restore_actor_position =stop_postprocess(3009)%
+
+[sr_idle@announce_continue]
+on_info = {!dist_to_story_obj_ge(pri_surge_hide_a16:100)} sr_idle@nil %=play_sound(pri_a28_continuation)%
+on_game_timer = 50 | {-pri_a28_cutscenes_end} %+pri_a28_cutscenes_end%
+
+[sr_idle@nil]

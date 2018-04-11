@@ -1,0 +1,64 @@
+[logic@jup_b19_freedom_yar]
+active = animpoint@start
+suitable = {=check_npc_name(jup_b19_freedom_yar)}
+prior = 200
+post_combat_time = 5,5
+level_spot = quest_npc
+
+[animpoint@start]
+cover_name = jup_a6_animpoint_yar
+use_camp = false
+on_info = {+jup_b19_yar_switch_smart_terrain} animpoint@back              
+meet = meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+[animpoint@back]
+cover_name = jup_a6_animpoint_yar
+use_camp = false
+on_info = {=npc_in_zone(jup_a6_sr_light)} animpoint@back_done
+combat_ignore_cond = {=npc_in_zone(jup_a6_sr_light)} true, {=check_enemy_name(jup_b19_zombied_)} true
+meet = no_meet
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+[animpoint@back_done]
+cover_name = jup_a6_animpoint_yar
+use_camp = false
+meet = meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded
+
+[wounded]
+hp_state 		= 0|wounded_heavy@help_heavy
+hp_state_see 	= 0|wounded_heavy@help_heavy
+hp_victim 		= 0|nil
+hp_fight 		= 0|false
+hp_cover		= 0|false
+
+[meet]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+use = {=actor_enemy} false, true
+allow_break = false
+trade_enable = false
+meet_on_talking = false

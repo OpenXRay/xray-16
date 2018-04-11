@@ -1,0 +1,19 @@
+[logic]
+active = animpoint@jup_b9_animpoint_actor
+on_hit = hit
+
+[animpoint@jup_b9_animpoint_actor]
+avail_animations = zat_b100_heli_2_serch
+cover_name = jup_b9_animpoint_actor
+on_info = {+jup_b9_heli_1_searched} %=destroy_object% 
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[hit]
+on_info = %+jup_b9_actor_hit =destroy_object%

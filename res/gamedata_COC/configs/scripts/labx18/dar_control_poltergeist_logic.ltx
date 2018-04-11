@@ -1,0 +1,22 @@
+[logic@com_center_poltergeist]
+active = mob_walker@com_center_poltergeist
+suitable = {=target_squad_name(dar_control_poltergeist_squad)} true
+monster_job = true
+prior = 200
+on_death = mob_death@com_center_poltergeist
+
+[mob_death@com_center_poltergeist]
+on_info =%+dar_door3_free%
+
+[mob_walker@com_center_poltergeist]
+path_walk = walk_1
+braindead = true
+on_actor_in_zone = dar_close_door_zone | mob_home@com_center_actor_inside %=play_sound(poltergeist_die_0)%
+out_restr = dar_poltergeist_territory
+
+[mob_home@com_center_actor_inside]
+path_home = home
+home_min_radius = 20
+home_max_radius = 25
+on_actor_not_in_zone = dar_poltergeist_territory | mob_walker@com_center_poltergeist
+out_restr = dar_poltergeist_territory

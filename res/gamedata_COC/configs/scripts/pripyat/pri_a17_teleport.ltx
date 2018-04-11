@@ -1,0 +1,19 @@
+[logic]
+active = nil;sr_idle@teleport_to
+
+[sr_idle@teleport_to] 
+on_info = {+pri_a17_teleport_military_recon} sr_idle@teleportin %=run_postprocess(fade_in) =disable_ui%
+
+[sr_idle@teleportin]
+on_game_timer = 20 | %=run_postprocess(black:8710:true) +pri_a17_teleport_step_1%
+on_info = {+pri_a17_teleport_step_1} sr_idle@teleport_post %=teleport_actor(pri_a17_actor_teleport_stay:pri_a17_actor_teleport_look) =teleport_squad(pri_a17_recon_squad:pri_a17_recon_teleport)%
+
+[sr_idle@teleport_post]
+on_info =  %=teleport_npc_by_story_id(pri_a17_military_captain_tarasov:pri_a17_taras_stay_idle)%
+on_info2 = %=teleport_npc_by_story_id(pri_a17_military_prapor_valentyr:pri_a17_val_start)%
+on_info3 = %=teleport_npc_by_story_id(pri_a17_military_lieutenant_podorojniy:pri_a17_pod_start)%
+on_info4 = %=teleport_npc_by_story_id(pri_a17_military_sergeant_morozov:pri_a17_ice_stay)%
+on_game_timer = 60 | %+pri_a17_ui%
+on_info5 = {+pri_a17_ui} sr_idle@nil %=stop_postprocess(8710) =enable_ui() -pri_a17_ui%
+
+[sr_idle@nil]

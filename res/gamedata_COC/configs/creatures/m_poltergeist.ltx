@@ -1,0 +1,625 @@
+[m_poltergeist_e]:monster_base
+GroupControlSection	= spawn_group
+SpaceRestrictionSection = space_restrictor,zone_mosquito_bald,zone_radioactive
+$spawn               = "monsters\old\poltergeist"		; option for Level Editor
+$npc			     = on						; option for Level Editor
+;$prefetch 			 = 16
+Scheduled		     = on						; option for ALife Simulator
+Human		     	 = off						; option for ALife Simulator
+Health			     = 300						; option for ALife Simulator
+MinSpeed		     = 1.0						; option for ALife Simulator
+MaxSpeed		     = 1.5						; option for ALife Simulator
+going_speed          = 4.0                      ; option for ALife Simulator
+current_level_going_speed		= 4;2					; option for ALife Simulator
+search_speed         = .5                       ; option for ALife Simulator
+visual				 = monsters\poltergeist\poltergeist
+corpse_visual		 = monsters\poltergeist\poltergeist_dead
+icon				 = ui_npc_monster_poltergeist
+MaxHealthValue		 = 150			; range [0..200]
+smart_terrain_choose_interval	= 00:15:00
+
+cform                = skeleton					; collision class
+class                = SM_POLTR					; AI class
+
+ef_creature_type	 = 5 	;10					; option for evaluation functions
+ef_weapon_type		 = 3
+ef_detector_type	 = 1
+panic_threshold		 = 0.1
+
+script_binding  	 = bind_monster.bind
+
+bone_torso			 = bip01_spine1 			; bone name
+bone_head			 = bip01_head				; bone name
+bone_fire			 = bip01_head				; bone name
+
+weapon_usage		 = 0						; boolean
+
+type				 = flamer
+
+hit_fraction_monster = 1
+
+;------------------------------------------------------------------------
+; Influences
+;------------------------------------------------------------------------
+
+fire_max_distance			=	0
+fire_max_power				=	0.1
+fire_linear_factor			=	1
+fire_quadratic_factor		=	1
+pp_effector_name			= 	postprocess_thermal
+pp_highest_at				= 	0.02
+
+
+psy_max_distance			=	0
+psy_max_power				=	5
+psy_linear_factor			=	0.05
+psy_quadratic_factor		=	0
+
+radiation_max_distance		=	0
+radiation_max_power			=	0.02
+radiation_linear_factor		=	1
+radiation_quadratic_factor	=	1
+
+;---------------------------------------------------------------------
+; Physics
+;---------------------------------------------------------------------
+ph_box0_center 		 = 0.0,  0.2,  0.0	;0.0,  0.9,  0.0
+ph_box0_size 		 = 0.50, 0.4,  0.50
+ph_box1_center 		 = 0.0,  0.2,  0.0
+ph_box1_size 		 = 0.50, 0.4,  0.50
+ph_crash_speed_min			= 10
+ph_crash_speed_max			= 30
+ph_collision_damage_factor	= 0.1
+ph_mass 		     = 80						; also it's the food
+
+destroyed_vis_name	 = dynamics\Dead_Body\skelet_crash
+
+;---------------------------------------------------------------------
+ph_skeleton_airr_lin_factor   = 2.0 ;550.0 (изменно из-за того, что убрано домножение коэффициент 0.002 из кода)
+ph_skeleton_airr_ang_factor   = 0.0 ;0.0 (изменно из-за того, что убрано домножение на коэффициент 0.3 из кода (0.0*0.3=0.0))
+ph_skeleton_hinger_factor1    = 1.0 ;1.0 (изменно из-за того, что убрано домножение на коэффициент 5.0 из кода)
+ph_skeleton_ddelay	     	  = 15.0 ;Время изменения значения трения в суставе с момента создания шелла, сек
+
+ph_skel_fatal_impulse_factor  = 6.0
+ph_after_death_velocity_factor= 0.75
+ph_skel_shot_up_factor        = 0.25
+;---------------------------------------------------------------------
+
+
+;----------------------------------------------------------------------------
+; Movement::Velocities & Acceleration
+;----------------------------------------------------------------------------
+; speed factors			linear | angular_real | angular_path | min |  max
+Velocity_Stand			= 0,		5.0,			5.0,		0.2,	0.5
+Velocity_WalkFwdNormal	= 1.7,		2.0,			2.0,		0.2,	2.0
+Velocity_WalkFwdDamaged	= 1.5,		3.0,			3.0,		0.8,	2.0
+Velocity_RunFwdNormal	= 4.0,		3.0,			3.0,		0.4,	1.0
+Velocity_RunFwdDamaged	= 2.5,  	3.2,			3.2,		0.4,	1
+Velocity_Drag			= 0.6,		3.0,			3.0,		1,		1
+Velocity_Steal			= 1.5,		3.0,			3.0,		1,		1
+
+; Speed factors while invisible
+Velocity_Invisible_Linear		= 5.0
+Velocity_Invisible_Angular		= 3.5
+
+; acceleration
+Accel_Generic			= 	1.5
+Accel_Calm				= 	2.5
+Accel_Aggressive		= 	3.0
+
+Height_Change_Velocity	=	0.5
+Height_Change_Min_Time	=	3000
+Height_Change_Max_Time	=	10000
+Height_Min				=	0.4
+Height_Max				=	2.0
+
+;--------------------------------------------------------------------------
+; Attack parameters
+;--------------------------------------------------------------------------
+;attack parameters
+MinAttackDist		= 0.5	;2.1
+MaxAttackDist		= 2.0
+
+as_min_dist				= 0.1
+as_step					= 0.3
+
+;-------------------------------------------------------------------------
+; Entity Conditions
+;-------------------------------------------------------------------------
+DayTime_Begin		= 0
+DayTime_End			= 21
+Min_Satiety			= 0.7
+Max_Satiety			= 0.95
+
+distance_to_corpse	= 1.8
+
+terrain				 = poltergeist_terrain
+hit_type = strike
+
+;entity condition
+
+satiety_v 			= 0.0001				;скорость уменьшения сытости со временем
+radiation_v 		= 0.00001				;скорость уменьшения радиации
+satiety_power_v 	= 0.005					;увеличение силы при уменьшении сытости
+satiety_health_v 	= 0.001					;увеличение здоровья при уменьшении сытости
+satiety_critical 	= -1.0					;критическое значения сытости (в процентах от 0..1) когда здоровье начианает уменьшаться
+radiation_health_v 	= 0.0001				;уменьшение здоровья при воздействии радиации
+morale_v			= 0.1					;скорость восстановления морали
+health_hit_part 	= 1.0					;процент хита, уходящий на отнимание здоровья
+power_hit_part 		= 1.0					;процент хита, уходящий на отнимание силы
+psy_health_v 		= 0.1					;скорость восстановления psy-здоровья
+
+immunities_sect		= poltergeist_immunities
+
+;открытые раны
+bleeding_v			= 0						;потеря крови при номинальной ране в секунду
+wound_incarnation_v	= 0.3				;крутизна кривой заживления (какой процент раны останется после заживления в игровую секунду)
+min_wound_size		= 0.01
+
+sleep_health 		= 1.0
+sleep_power 		= 1.0
+sleep_satiety 		= 1.0
+sleep_radiation 	= 1.0
+sleep_psy_health 	= 1.0
+
+eat_freq			=	5.0
+eat_slice			=	0.01
+eat_slice_weight	=	10.0
+
+satiety_threshold	= 0.5							; below this value monster fill hunger
+
+;---------------------------------------------------------
+; Sounds and sound parameters
+;---------------------------------------------------------
+sound_idle				= monsters\biting\def_
+sound_eat				= monsters\biting\def_
+sound_aggressive		= monsters\biting\def_
+sound_attack_hit		= monsters\biting\def_
+sound_take_damage		= monsters\biting\def_
+sound_die				= monsters\biting\def_
+sound_threaten			= monsters\biting\def_
+sound_landing			= monsters\biting\def_
+sound_steal				= monsters\biting\def_
+sound_panic				= monsters\biting\def_
+sound_growling			= monsters\biting\def_
+sound_die_in_anomaly	= monsters\biting\def_
+
+killer_clsids			= Z_MINCER,Z_GALANT,ZS_BFUZZ,ZS_MBALD,ZS_GALAN,ZS_MINCE
+
+
+idle_sound_delay		= 0
+eat_sound_delay			= 0
+attack_sound_delay		= 0
+
+sound_distant_idle			= monsters\biting\def_
+distant_idle_sound_delay	= 80000
+distant_idle_sound_range	= 100.0
+
+SoundThreshold		 = 0.06						; range [0..1]
+max_hear_dist		 = 60
+
+;-------------------------------------------------------------------------
+; Morale
+;-------------------------------------------------------------------------
+Morale_Hit_Quant				= 0.01
+Morale_Attack_Success_Quant		= 0.3
+Morale_Take_Heart_Speed			= 0.1
+Morale_Despondent_Speed			= 0.1
+Morale_Stable_Speed				= 0.3
+Morale_Despondent_Threashold	= 0.5
+
+;-------------------------------------------------------------------------
+; Other Stuff (refactoring needed)
+;-------------------------------------------------------------------------
+DamagedThreshold		= 0.4
+
+material				= creatures\large	;objects\bullet
+
+
+squad_attack_algorithm	= 1
+attack_effector			= m_poltergeist_attack_effector
+
+attack_params			= m_poltergeist_attack_params
+step_params				= m_poltergeist_step_params
+
+anger_hunger_threshold	= 0.1
+anger_loud_threshold	= 0.7
+
+LegsCount				= 2
+damage					= m_poltergeist_damage
+
+;---------------------------
+
+Invisible_Energy_Restore_Velocity				= 0.1
+Invisible_Energy_Decline_Velocity				= 0.0
+Invisible_Energy_Critical_Value					= 0.01
+Invisible_Energy_Activate_Value					= 0.99
+Invisible_Energy_Aggressive_Restore_Velocity	= 0.1
+
+Particles_Damage				= monsters\polter_damage
+Particles_Death					= monsters\polter_death_00
+Particles_Idle					= monsters\polter_idle_00
+Particles_Hidden				= monsters\polter_linza_00
+
+;-- Delays -------------------
+
+Delay_Flame_Min			= 30000
+Delay_Flame_Normal		= 30001
+Delay_Flame_Aggressive	= 30001
+
+Delay_Tele_Min			= 100
+Delay_Tele_Normal		= 300
+Delay_Tele_Aggressive	= 200
+
+Delay_Scare_Min			= 30000
+Delay_Scare_Normal		= 30001
+Delay_Scare_Aggressive	= 30001
+
+;---------------------------
+
+;species of monster
+species					= poltergeist
+rank					= 11
+spec_rank				= normal
+community				= poltergeist
+
+critical_wound_threshold		= -1
+critical_wound_decrease_quant	= 0.
+
+;-------------------------------------------------------------------------
+; Vision
+;-------------------------------------------------------------------------
+eye_fov				 = 100	;120
+eye_range			 = 60 ;60
+
+DynamicObjectsCount		= 32
+
+vision_free_section			= poltergeist_vision_free
+vision_danger_section		= poltergeist_vision_danger
+
+; ЗНАЧЕНИЯ visibility_threshold ДОЛЖНЫ БЫТЬ РАВНЫ для денжера и фри,
+; иначе возникают артефакты с потерей видимости при переходе от денжера во фри.
+
+[poltergeist_vision_free]
+min_view_distance   		= 0.8				; коэффициент, который множится на eye_range, в зависимости от угла
+max_view_distance	 		= 1.0				; коэффициент, который множится на eye_range, в зависимости от угла
+visibility_threshold	 	= 100.0				; значение, при достижении суммой которого объект считается видимым
+always_visible_distance 	= 0.2
+time_quant					= 0.006
+decrease_value				= 0.01				; значение, на которое уменьшается вес, если объект попал в фрустум, но отсёкся по каким-то причинам
+velocity_factor		     	= 1.6
+luminocity_factor			= 0.5 				; фактор освещения (только для Актёра)
+transparency_threshold		= 0.35
+
+[poltergeist_vision_danger]
+min_view_distance   		= 0.8				; коэффициент, который множится на eye_range, в зависимости от угла
+max_view_distance	 		= 1.0				; коэффициент, который множится на eye_range, в зависимости от угла
+visibility_threshold	 	= 100.0				; значение, при достижении суммой которого объект считается видимым
+always_visible_distance 	= 0.2
+time_quant					= 0.006
+decrease_value				= 0.01				; значение, на которое уменьшается вес, если объект попал в фрустум, но отсёкся по каким-то причинам
+velocity_factor		     	= 1.6
+luminocity_factor			= 0.5 				; фактор освещения (только для Актёра)
+transparency_threshold		= 0.35
+
+[m_Poltergeist_damage]
+;bone_name		 = <hit_scale>,-1,<wound_scale>
+;<hit_scale>	- коэфф. изменения хита (уменьшения здоровья)
+;<wound_scale>	- коэфф. изменения величины открытой раны
+
+default				= 1.0,	-1,	0.1
+
+bip01_pelvis 		= 1.0, -1, 0.2
+bip01_spine 		= 1.0, -1, 0.2
+bip01_spine1 		= 1.0, -1, 0.2
+bip01_neck 			= 1.0, -1, 0.5
+bip01_head 			= 2.0, -1, 0.3
+[m_poltergeist_attack_params]
+;---------------------------------------------------------------------------------------------------------------------------------------------
+;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, top, bottom) |	Test Dist
+;---------------------------------------------------------------------------------------------------------------------------------------------
+;Left hand Strike
+stand_attack_0	=	  	0.30,		0.20,		    50,        0.0, 1.0, 1.0,		 -1.6, 1.6, -1.6, 1.6,							  3.5
+;Left hand Strike2
+stand_attack_1	=	  	0.30,		0.15,		    50,        0.0, 1.0, 1.0,		 -1.6, 1.6, -1.6, 1.6,							  3.5
+
+[m_poltergeist_attack_effector]
+
+duality_h		= 0.01
+duality_v		= 0.01
+blur			= 0.01
+gray			= 0.5
+noise_intensity = 0.0
+noise_grain		= 1
+noise_fps		= 30
+color_base		= 0.65,0.15,0.1
+color_gray		= 0.333,0.333,0.333
+color_add		= 0,0,0
+time			= 0.3
+time_attack		= 0.05		; fade in
+time_release	 = 0.25		; fade out
+
+; camera effects
+ce_time				= 0.45 ;time
+ce_amplitude		= -15.0
+ce_period_number	= 1.5 ;2.0
+ce_power			= 1.5 ;0.7 ; power
+
+[m_poltergeist_step_params]                left             right            right           left
+;------------------------------------------------------------------------------------------------------------------
+;	anim					cycles |	time1 | power1 |	time2 | power2 | time3 | power3 | time4     | power4 |
+;-----------------------------------------------------------------------------------------------------------------
+stand_walk_fwd_0		=   	1,		0.1,      1,	  	0.34,    1,		 0.6,	 1,			0.84,		1
+stand_walk_dmg_0	=   	1,		0.2,      1,	  	0.25,    1,		 0.5,	 1,			0.7,		1
+stand_run_fwd_0				=		1,		0.1,      1,	  	0.3,     1,		 0.5,	 1,			0.55,		1
+stand_run_dmg_0			=		1,		0.2,      1,	  	0.25,    1,		 0.7,	 1,			0.75,		1
+
+;===========================================================================
+; TERRAIN
+;===========================================================================
+[poltergeist_terrain]
+	255,000,255,255
+
+;===========================================================================
+; IMMUNITIES
+;===========================================================================
+[poltergeist_immunities]
+burn_immunity 		= 0.1
+strike_immunity 	= 0.1
+shock_immunity 		= 0.1
+wound_immunity 		= 0.5
+radiation_immunity 	= 0.0
+telepatic_immunity 	= 0.0
+chemical_burn_immunity 	= 0.1
+explosion_immunity 	= 1.0
+fire_wound_immunity = 1.0
+
+;===========================================================================
+; TELE
+;===========================================================================
+[m_poltergeist_normal_tele]:m_poltergeist_e
+$spawn               = "monsters\poltergeists\poltergeist_normal_tele"
+rank					= 11
+spec_rank				= normal
+
+detection_pp_effector_name  =	poltergeist_detection_effector
+detection_near_range_factor	=	2
+detection_far_range_factor	=	1
+detection_far_range			=	50
+detection_speed_factor		=	4.0
+detection_loose_speed		=	2.0
+detection_success_level		=	10.0
+detection_max_level			=   15.0
+detection_fly_around_level	=	5.0
+detection_fly_around_distance	= 30.0
+detection_fly_around_change_direction_time	= 5 ; sec
+
+type				= telekinetic
+immunities_sect		= poltergeist_tele_immunities
+
+Tele_Fly_Time					= 0.30
+Tele_Fly_Velocity				= 30
+
+Tele_Find_Radius				= 30
+Tele_Object_Min_Mass			= 20
+Tele_Object_Max_Mass			= 5000
+Tele_Object_Count				= 2
+Tele_Hold_Time					= 2000
+Tele_Wait_Time					= 4000
+Tele_Delay_Between_Objects_Time	= 1000
+Tele_Distance					= 50
+Tele_Object_Height				= 3
+Tele_Time_Object_Keep			= 6000
+Tele_Raise_Speed				= 5
+Tele_Delay_Between_Objects_Raise_Time	= 1000
+Tele_Collision_Damage				= 0.4
+
+
+Particles_Damage				= monsters\polter_damage
+Particles_Death					= monsters\polter_death
+Particles_Idle					= monsters\polter_idle
+Particles_Hidden				= monsters\polter_linza
+
+
+Hidden_Particles				= monsters\polter_linza
+;Hide_Particles					= monsters\polter_yadro;monsters\polter_hide
+
+Sound_Idle						= monsters\poltergeist\tele_idle_0
+sound_take_damage				= monsters\poltergeist\tele_damage_
+sound_die						= monsters\poltergeist\tele_death_
+
+sound_tele_hold					= monsters\burer\burer_tele_hold
+sound_tele_throw				= monsters\burer\burer_tele_throw
+
+[poltergeist_tele_immunities]
+burn_immunity 		= 0.1
+strike_immunity 	= 0
+shock_immunity 		= 0.1
+wound_immunity 		= 0.5
+radiation_immunity 	= 0.0
+telepatic_immunity 	= 0.0
+chemical_burn_immunity 	= 0.1
+explosion_immunity 	= 1.0
+fire_wound_immunity = 1.0
+
+;===========================================================================
+; FLAMER
+;===========================================================================
+
+[m_poltergeist_normal_flame]:m_poltergeist_e
+$spawn               = "monsters\poltergeists\poltergeist_normal_flame"
+rank					= 12
+spec_rank				= normal
+
+fire_max_distance			=	5
+fire_max_power				=	0.1
+
+detection_pp_effector_name  =	poltergeist_detection_effector
+detection_near_range_factor	=	2
+detection_far_range_factor	=	1
+detection_far_range			=	50
+detection_speed_factor		=	4.0
+detection_loose_speed		=	2.0
+detection_success_level		=	10.0
+detection_max_level			=   15.0
+detection_fly_around_level	=	5.0
+detection_fly_around_distance	= 8.0
+detection_fly_around_change_direction_time	= 5 ; sec
+
+type					= flamer
+immunities_sect		= poltergeist_flame_immunities
+
+flame_sound				= monsters\poltergeist\attack_hit_flame
+flame_particles_prepare	= monsters\polter_yadro
+flame_particles_fire	= static\monsters_fire_idle
+flame_particles_stop	= static\monsters_fire_stop
+flame_fire_time_delay	= 1000 ;2400							; don't change - for programmers only
+flame_fire_time_play	= 6000
+flame_length			= 8.0
+flame_hit_value			= 0.7
+flame_hit_delay			= 200
+flames_count			= 3
+flames_delay			= 2000	;3500	;2000
+flame_aura_radius		= 10
+
+flame_scan_radius		= 0
+flame_scan_sound			= monsters\burer\burer_scan_affect_0
+flame_scan_effector_section	= m_poltergeist_scan_effector
+flame_scan_delay_min_max	= 5000,10000
+
+flame_min_dist			= 2
+flame_max_dist			= 30
+flame_min_height		= 0.5
+flame_max_height		= 1.0
+
+Particles_Damage				= monsters\polter_damage
+Particles_Death					= monsters\polter_death_00
+Particles_Idle					= monsters\polter_idle_00
+Particles_Hidden				= monsters\polter_linza_00
+
+
+Hidden_Particles				= monsters\polter_linza_00	;monsters\polter_hidden
+Sound_Idle						= monsters\poltergeist\fire_idle_0
+
+[poltergeist_flame_immunities]
+burn_immunity 		= 0
+strike_immunity 	= 0.1
+shock_immunity 		= 0.1
+wound_immunity 		= 0.5
+radiation_immunity 	= 0.0
+telepatic_immunity 	= 0.0
+chemical_burn_immunity 	= 0.1
+explosion_immunity 	= 1.0
+fire_wound_immunity = 1.0
+
+
+[m_poltergeist_scan_effector]
+duality_h			= 0.003
+duality_v			= 0.002
+blur				= 1.5
+gray				= 0.3
+noise_intensity		= 0.0
+noise_grain			= 2
+noise_fps			= 8
+color_base			= 0.55,0.5,0.5;0.637,0.442,0.456
+color_gray			= 0.333,0.333,0.333
+color_add			= 0.05,0.0,0.0
+time				= 10.00
+time_attack			= 0.3		; fade in
+time_release		= 0.85		; fade out
+
+
+[pri_a25_poltergeist]:m_poltergeist_normal_tele
+$spawn               = "monsters\poltergeists\pri_a25_poltergeist"
+detection_linear_factor		=	18.0
+detection_loose_speed		=	4.0;
+
+[labx8_poltergeist]:m_poltergeist_normal_tele
+$spawn               = "monsters\poltergeists\labx8_poltergeist"
+Tele_Find_Radius				= 145
+Tele_Object_Count				= 1 ;4;7
+
+detection_far_range			=	145
+detection_speed_factor		=	6.0 ;4.0
+detection_loose_speed		=	4.0 ;2.0
+
+detection_near_range_factor	=	1
+detection_far_range_factor	=	1
+
+Tele_Time_Object_Keep			= 18000 ;5000
+Height_Min				=	0.4
+Height_Max				=	0.9
+
+
+;===========================================================================
+; Black poltergeist - Borovos 2014
+;===========================================================================
+
+[m_poltergeist_normal_black]:m_poltergeist_normal_flame
+$spawn               = "monsters\poltergeists\poltergeist_normal_black"
+rank					= 12
+spec_rank				= normal
+
+fire_max_distance			=	0
+fire_max_power				=	0.1
+
+detection_pp_effector_name  =	poltergeist_detection_effector
+detection_near_range_factor	=	2
+detection_far_range_factor	=	1
+detection_far_range			=	10
+detection_speed_factor		=	4.0
+detection_loose_speed		=	2.0
+detection_success_level		=	0.0
+detection_max_level			=   0.0
+detection_fly_around_level	=	5.0
+detection_fly_around_distance	= 8.0
+detection_fly_around_change_direction_time	= 5 ; sec
+
+type					= flamer
+immunities_sect		= poltergeist_black_immunities
+
+flame_sound				= anomaly\gravi_blowout5
+flame_particles_prepare	= monsters\polter_black_prepare_attack
+flame_particles_fire	= monsters\polter_black_attack
+flame_particles_stop	= monsters\polter_black_stop_attack
+flame_fire_time_delay	= 1000 ;2400							; don't change - for programmers only
+flame_fire_time_play	= 6000
+flame_length			= 8.0
+flame_hit_value			= 0.7
+flame_hit_delay			= 200
+flames_count			= 3
+flames_delay			= 2000	;3500	;2000
+flame_aura_radius		= 10
+
+flame_scan_radius		= 0
+flame_scan_sound			= monsters\burer\burer_scan_affect_0
+flame_scan_delay_min_max	= 5000,10000
+
+flame_min_dist			= 2
+flame_max_dist			= 10
+flame_min_height		= 0.5
+flame_max_height		= 1.0
+
+
+
+Particles_Damage				= monsters\polter_black_damage
+Particles_Death					= monsters\polter_black_death
+Particles_Idle					= monsters\polter_black_idle
+Particles_Hidden				= monsters\polter_black_hidden
+
+sound_tele_hold					= monsters\burer\burer_tele_hold
+sound_tele_throw				= monsters\burer\burer_tele_throw
+
+Hidden_Particles				= monsters\polter_black_hidden; monsters\polter_linza_00	;monsters\polter_hidden
+Sound_Idle						= anomaly\gravi_rumble1
+
+[poltergeist_black_immunities]
+burn_immunity 		= 0.1
+strike_immunity 	= 0.1
+shock_immunity 		= 0.1
+wound_immunity 		= 0.4
+radiation_immunity 	= 0.0
+telepatic_immunity 	= 0.0
+chemical_burn_immunity 	= 0.1
+explosion_immunity 	= 0.7
+fire_wound_immunity = 0.7

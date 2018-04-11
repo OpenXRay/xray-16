@@ -1,0 +1,67 @@
+[logic@yan_saharov]
+suitable = {=check_npc_name(yan_stalker_sakharov)} true
+active = walker
+trade = misc\trade\trade_ecolog_sakharov.ltx
+prior = 200
+can_select_weapon = false
+level_spot = trader
+dont_keep_items = true
+
+[walker]
+meet = meet
+path_walk = yan_walker_saharov_walk
+path_look = yan_walker_saharov_look
+on_info = {+yan_actor_away_saharov} camper@1
+on_actor_in_zone = yan_smart_terrain_6_4_base_defense_quest | %=play_sound(yan_stalker_sakharov_idle)%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+out_restr = yan_space_restrictor_no_weapon_actor_base_cut2
+aggressive = false
+
+[camper@default]
+meet = meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+out_restr = yan_space_restrictor_no_weapon_actor_base_cut2
+aggressive = false
+
+[camper@1]:camper@default
+path_walk = yan_camper_saharov_walk
+path_look = yan_camper_saharov_look
+on_info = {-yan_actor_away_saharov} walker
+
+[camper@2]:camper@default
+path_walk = yan_camper_saharov_walk
+path_look = yan_camper_saharov_look
+
+[camper@3]:camper@default
+path_walk = yan_walker_saharov_walk
+path_look = yan_walker_saharov_look
+on_info = {+yan_actor_away_saharov} camper@3_1
+
+[camper@3_1]:camper@default
+path_walk = yan_walker_saharov_walk
+path_look = yan_walker_saharov_look
+on_info = {-yan_actor_away_saharov} walker
+
+[meet]
+close_snd_hello = yan_stalker_sakharov_greeting
+close_snd_bye = yan_stalker_sakharov_farewell
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 2
+far_distance 	= 6
+close_snd_distance = 3
+use = {=actor_enemy} false, true
+allow_break = false
+trade_enable = true

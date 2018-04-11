@@ -1,0 +1,22 @@
+;Note: Ignore distance is only checked if danger was produced by game_object.enemy with the exception of grenade and ent. corpse
+
+[danger_inertion] ;May use condlists from xr_condition
+grenade 		= 6000
+entity_corpse 	= 120000
+entity_attacked = 30000
+attacked 		= 126000
+bullet_ricochet = 30000
+enemy_sound 	= 45000
+attack_sound 	= 45000
+entity_death 	= 30000
+
+[danger_object] ;Ignore distances squared -- May use condlists from xr_condition
+grenade 		= {=anim_state(sleep)} 0, 400
+entity_corpse 	= 2500
+entity_attacked = {=anim_state(sleep)} 350, {=is_dark_night} 900, {=is_heavy_rain} 625, {=is_rain} 900, 2500
+attacked 		= 90000
+bullet_ricochet = 90000
+enemy_sound 	= {=anim_state(sleep)} 625,{=is_rain} 900, 5625
+attack_sound 	= {=anim_state(sleep)} 625,{=is_rain} 900, 2500
+entity_death 	= {=anim_state(sleep)} 0, {=is_rain} 900, 2500
+

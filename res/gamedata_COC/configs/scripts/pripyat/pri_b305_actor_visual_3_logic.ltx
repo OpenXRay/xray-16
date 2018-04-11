@@ -1,0 +1,51 @@
+[logic]
+active = animpoint@search
+on_hit = hit
+
+; ************************* 3 *****************************
+[animpoint@search]
+cover_name = pri_b305_sc_cam_3
+avail_animations = pri_b305_actor
+on_info = {+pri_b305_third_cam_end} %=destroy_object -pri_b305_3_cam_actor%
+on_info2 = {+pri_b305_kirilov_signal_next_to_actor_done_end -pri_b305_actor_dont_see_anyone_done} %=play_sound(pri_b305_actor_dont_see_anyone) +pri_b305_actor_dont_see_anyone_done% 
+on_signal = sound_end | animpoint@search2 %+pri_b305_actor_dont_see_anyone_done_end%
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@search2]
+cover_name = pri_b305_sc_cam_3
+avail_animations = pri_b305_actor
+on_info = {+pri_b305_third_cam_end} %=destroy_object -pri_b305_3_cam_actor%
+;on_info2 = {+pri_b305_actor_dont_see_anyone_done_end -pri_b305_kirilov_source_is_near_done} %=play_sound(pri_b305_kirilov_source_is_near) +pri_b305_kirilov_source_is_near_done%
+on_info2 = {+pri_b305_kirilov_source_is_near_done_end} animpoint@search_timer
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@search_timer]
+cover_name = pri_b305_sc_cam_3
+avail_animations = pri_b305_actor
+on_info = {+pri_b305_third_cam_end} %=destroy_object -pri_b305_3_cam_actor%
+on_game_timer = 40 | {-pri_b305_actor_it_is_underground_done} %=play_sound(pri_b305_actor_it_is_underground) +pri_b305_actor_it_is_underground_done%
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[hit]
+on_info = %+pri_b305_cut_3_actor_hit =destroy_object -pri_b305_3_cam_actor%

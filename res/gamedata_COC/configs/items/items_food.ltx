@@ -1,0 +1,213 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;	FOOD
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[bread]:booster_script
+$spawn                                   = "food and drugs\bread"
+visual                                   = dynamics\devices\dev_bred\dev_bred.ogf
+description                              = st_bread_descr
+
+inv_name                                 = st_bread
+inv_name_short                           = st_bread
+inv_weight                               = 0.3 ;0.2               
+
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 18
+inv_grid_y                               = 1
+cost                                     = 150
+
+attach_angle_offset                      = -0.287979, 1.560923, 1.544060
+attach_position_offset                   = 0.096910, -0.013594, 0.107925
+attach_bone_name                         = bip01_r_hand
+auto_attach                              = false
+
+
+bone_name                                = bip01_r_hand
+position_offset                          = 0.0,0.0,0.0
+angle_offset                             = 1.570790,1.570790,3.92699
+
+boost_time                               = 5
+boost_health_restore                     = 0.0002
+eat_satiety                              = 0.3
+eat_alcohol                              = -0.03
+
+use_sound                                = interface\inv_food
+
+[kolbasa]:booster_script
+$spawn                                   = "food and drugs\kolbasa"
+visual                                   = dynamics\devices\dev_kolbasa\dev_kolbasa.ogf
+description                              = st_kolbasa_descr
+
+inv_name                                 = st_kolbasa
+inv_name_short                           = st_kolbasa
+inv_weight                               = 0.4
+
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 7
+inv_grid_y                               = 2
+cost                                     = 200
+
+attach_angle_offset                      = 0.440521, 1.378287, -0.644026
+attach_position_offset                   = 0.104196, -0.010821, 0.076969
+attach_bone_name                         = bip01_r_hand
+auto_attach                              = false
+
+
+bone_name                                = bip01_r_hand
+position_offset                          = 0.0,0.0,0.0
+angle_offset                             = 1.570790,1.570790,3.92699
+
+boost_time                               = 5
+boost_health_restore                     = 0.0002
+eat_satiety                              = 0.4
+eat_alcohol                              = -0.04
+
+use_sound                                = interface\inv_food
+
+[conserva]:booster_script
+$spawn                                   = "food and drugs\conserva"
+visual                                   = dynamics\devices\dev_conserv\dev_conserv.ogf
+description                              = st_conserva_descr
+
+inv_name                                 = st_conserva
+inv_name_short                           = st_conserva
+inv_weight                               = 0.5
+
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 19
+inv_grid_y                               = 1
+cost                                     = 250
+
+boost_time                               = 10
+boost_health_restore                     = 0.0002
+eat_satiety                              = 0.5
+eat_alcohol                              = -0.05
+
+attach_angle_offset                      = 0.440521, 1.378287, -0.644026
+attach_position_offset                   = 0.104196, -0.010821, 0.076969
+attach_bone_name                         = bip01_r_hand
+auto_attach                              = false
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;; ZONE-PRODUCED FOOD ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[meat_base]:booster
+attach_angle_offset                      = 0.440521, 1.378287, -0.644026
+attach_position_offset                   = 0.104196, -0.010821, 0.076969
+attach_bone_name                         = bip01_r_hand
+auto_attach                              = false
+bone_name                                = bip01_r_hand
+position_offset                          = 0.0,0.0,0.0 0.117
+angle_offset                             = 1.570790,1.570790,3.92699
+use_sound                                = interface\inv_food
+eat_alcohol                              = -0.03
+
+[meat_tushkano]:meat_base
+$spawn                                   = "food and drugs\meat_tushkano"
+visual                                   = dynamics\zpf\meat_tushkano.ogf
+inv_weight                               = 0.08
+inv_name_short                           = st_meat_tushkano
+inv_name                                 = st_meat_tushkano
+inv_grid_height                          = 1
+inv_grid_width                           = 1
+inv_grid_x                               = 12
+inv_grid_y                               = 32
+eat_satiety                              = 0.1
+eat_radiation                            = 0.01
+description                              = st_meat_tushkano_descr
+cost                                     = 300
+eat_alcohol                              = -0.01
+
+[meat_dog]:meat_base
+$spawn                                   = "food and drugs\meat_dog"
+visual                                   = dynamics\zpf\meat_dog.ogf
+inv_weight                               = 0.15
+inv_name_short                           = st_meat_dog
+inv_name                                 = st_meat_dog
+inv_grid_height                          = 1
+inv_grid_width                           = 1
+inv_grid_x                               = 13
+inv_grid_y                               = 32
+eat_satiety                              = 0.2
+eat_radiation                            = 0.02
+description                              = st_meat_dog_descr
+cost                                     = 300
+
+[meat_pseudodog]:meat_base
+$spawn                                   = "food and drugs\meat_pseudodog"
+visual                                   = dynamics\zpf\meat_pseudodog.ogf
+inv_weight                               = 0.25
+inv_name_short                           = st_meat_pseudodog
+inv_name                                 = st_meat_pseudodog
+inv_grid_height                          = 1
+inv_grid_width                           = 1
+inv_grid_x                               = 14
+inv_grid_y                               = 32
+eat_satiety                              = 0.3
+eat_radiation                            = 0.03
+description                              = st_meat_pseudodog_descr
+cost                                     = 400
+
+[meat_flesh]:meat_base
+$spawn                                   = "food and drugs\meat_flesh"
+visual                                   = dynamics\zpf\meat_flesh.ogf
+inv_weight                               = 0.33
+inv_name_short                           = st_meat_flesh
+inv_name                                 = st_meat_flesh
+inv_grid_height                          = 1
+inv_grid_width                           = 1
+inv_grid_x                               = 15
+inv_grid_y                               = 32
+eat_satiety                              = 0.4
+eat_radiation                            = 0.03
+description                              = st_meat_flesh_descr
+cost                                     = 200
+
+[meat_boar]:meat_base
+$spawn                                   = "food and drugs\meat_boar"
+visual                                   = dynamics\zpf\meat_boar.ogf
+inv_weight                               = 0.36
+inv_name_short                           = st_meat_boar
+inv_name                                 = st_meat_boar
+inv_grid_height                          = 1
+inv_grid_width                           = 1
+inv_grid_x                               = 16
+inv_grid_y                               = 32
+eat_satiety                              = 0.45
+eat_radiation                            = 0.04
+description                              = st_meat_boar_descr
+cost                                     = 500
+
+[meat_bloodsucker]:meat_base
+$spawn                                   = "food and drugs\meat_bloodsucker"
+visual                                   = dynamics\zpf\meat_bloodsucker.ogf
+inv_weight                               = 0.35
+inv_name_short                           = st_meat_bloodsucker
+inv_name                                 = st_meat_bloodsucker
+inv_grid_height                          = 1
+inv_grid_width                           = 1
+inv_grid_x                               = 14
+inv_grid_y                               = 32
+eat_satiety                              = 0.4
+eat_radiation                            = 0.04
+description                              = st_meat_bloodsucker_descr
+cost                                     = 750
+
+[meat_chimera]:meat_base
+$spawn                                   = "food and drugs\meat_chimera"
+visual                                   = dynamics\zpf\chimera_food.ogf
+inv_weight                               = 0.5
+inv_name_short                           = st_meat_chimera
+inv_name                                 = st_meat_chimera
+inv_grid_height                          = 1
+inv_grid_width                           = 1
+inv_grid_x                               = 16
+inv_grid_y                               = 31
+eat_satiety                              = 0.5
+eat_radiation                            = 0.06
+description                              = st_meat_chimera_descr
+cost                                     = 2000
+eat_alcohol                              = -0.04

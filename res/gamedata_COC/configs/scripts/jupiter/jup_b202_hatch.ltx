@@ -1,0 +1,7 @@
+[logic]
+active = nil;ph_idle@wait
+
+[ph_idle@wait]
+on_info = {+jup_b202_actor_items_stolen} ph_idle@nil %=destroy_object =spawn_object(hatch_01:jup_b202_hatch_spawn)%
+
+[ph_idle@nil]

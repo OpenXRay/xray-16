@@ -1,0 +1,662 @@
+function AddToMotivator(npc)
+	npc:bind_object(this.motivator_binder(npc))
+end
+
+-- CScriptGameObject Binder for CAIStalker
+class "motivator_binder" (object_binder)
+function motivator_binder:__init (obj) super(obj)
+	self.loaded = false
+	self.opened_doors = {}
+	self.first_update = false
+	self.object = obj
+end
+
+function motivator_binder:extrapolate_callback(cur_pt)
+	if (self.object == nil) then
+		printf("CRITICAL ERROR: game object is nil! %s",self.name)
+		return false
+	end
+	if (self.st.active_section and self.st.active_scheme) then
+		xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "extrapolate_callback")
+		if (self.st.move_mgr) then
+			self.st.move_mgr:extrapolate_callback(self.object)
+		end
+	end
+
+	local ptr = self.object:patrol() and patrol(self.object:patrol())
+	if ptr and ptr:flags(cur_pt):get() == 0 then
+		return true
+	end
+	return false
+end
+
+function motivator_binder:reinit()
+	--alun_utils.debug_write(self.object:name()..":motivator_reinit() start")
+	--printf("motivator_binder:reinit() %s",self.object:name())
+	object_binder.reinit(self)
+
+	self.st = {}
+	db.storage[self.object:id()] = self.st
+
+	self.object:enable_vision(false)
+		
+	if (USE_MARSHAL) then
+		RegisterScriptCallback("save_state",self)
+	end
+	--alun_utils.debug_write(self.object:name()..":motivator_reinit() end")
+end
+----------------------------------------------------------------------------------------------------------------------
+-- Note: Do not make mistake in thinking that se_abstract is the same as se_obj. It is casted as cse_abstract and not cse_alife_human_stalker!!!
+-- Therefore cse_alife_human_stalker specific properties are not available from it, like group_id
+function motivator_binder:net_spawn(se_abstract)
+	--alun_utils.debug_write(strformat("\n----%s:net_spawn()---%s visual=%s",self.object:name(),self.object:character_name(),self.object:get_visual_name()),true)
+	if not object_binder.net_spawn(self, se_abstract) then
+		return false
+	end
+	
+	local se_obj = alife_object(self.object:id())
+	if not (se_obj) then
+		return false 
+	end
+
+	local npc = self.object
+
+	-- Enable if you need it, CoC doesn't have story for actor_visual and ini read from HDD not good
+	--[[
+	local visual = system_ini():r_string_ex(npc:section(),"set_visual")
+	if (visual and visual ~= "") then
+		if visual == "actor_visual" then
+			npc:set_visual_name(db.actor:get_visual_name())
+		else
+			npc:set_visual_name(visual)
+		end
+	end
+	--]]
+	
+	-- overrides
+	local m_data = alife_storage_manager.get_se_obj_state(se_obj)
+	if (m_data) then 
+		if (m_data.visual) then 
+			npc:set_visual_name(m_data.visual)
+		end  
+		if (m_data.icon_name) then 
+			npc:set_character_icon(m_data.icon_name)
+		end
+	end
+
+	npc:apply_loophole_direction_distance(1.0)
+
+	npc:set_callback(callback.use_object, self.use_callback, self)
+	npc:set_callback(callback.on_item_take, self.on_item_take, self)
+	npc:set_callback(callback.on_item_drop, self.on_item_drop, self)
+	
+	db.add_obj(npc)
+	if not npc:alive() then
+		npc:death_sound_enabled(false)
+		--alun_utils.debug_write(se_obj:name()..":net_spawn() Moving dead body...")
+		release_body_manager.get_release_body_manager():moving_dead_body(npc,true)
+		--alun_utils.debug_write(se_obj:name()..":net_spawn() Moving dead body done")
+		
+		if not (self.loaded) then
+			local ini = npc:spawn_ini()
+			local filename = ini and ini:r_string_ex("logic","cfg")
+			ini = filename and ini_file(filename) or ini
+			if (ini) then
+				self:setup_known_info(npc,ini,ini:r_string_ex("logic","known_info"))
+			end
+		end
+		
+		-- fix for 'Invalid vertex for object'
+		if not (se_obj.m_level_vertex_id < 4294967295 and npc:accessible(se_obj.m_level_vertex_id)) then
+			printf("npc %s has invalid spawning vertex, correcting",se_obj:name())
+			local v_id = npc:accessible_nearest(level.vertex_position(se_obj.m_level_vertex_id), vector():set(0,0,0))
+			npc:set_npc_position(level.vertex_position(v_id))
+		end
+		
+		--xr_logic.initialize_obj(npc, self.st, self.loaded, db.actor, modules.stype_stalker)
+		return true
+	end
+	
+	npc:enable_vision(true)
+	
+	self.st.state_mgr = state_mgr.bind_manager(npc)
+	self.st.move_mgr = move_mgr.move_mgr(npc)
+	self.st.move_mgr:initialize()
+	
+	npc:set_patrol_extrapolate_callback(motivator_binder.extrapolate_callback, self)
+	npc:set_callback(callback.hit, motivator_binder.hit_callback, self)
+	npc:set_callback(callback.death, motivator_binder.death_callback, self)
+	npc:set_callback(callback.sound, motivator_binder.hear_callback, self)
+	npc:set_callback(callback.take_item_from_box, self.take_item_from_box, self)
+		
+	db.add_enemy(npc)
+
+	local sympathy = db.goodwill.sympathy and db.goodwill.sympathy[npc:id()]
+	if (sympathy) then
+		game_relations.set_npc_sympathy(npc, sympathy)
+	end
+
+	sound_theme.init_npc_sound(npc)
+
+	-- HACK! Not sure why this is needed now. If this isn't here then there will be
+	-- Cannot build GAME path! error
+	npc:set_dest_game_vertex_id(npc:game_vertex_id()) 
+	
+	xr_reach_task.add_reach_task_action(npc)
+	
+	local squad = se_obj.group_id and se_obj.group_id ~= 65535 and alife_object(se_obj.group_id)
+	if (squad and axr_companions.companion_squads[squad.id]) then
+		axr_companions.setup_companion_logic(npc,self.st,self.loaded)
+	elseif (debug_cmd_list.debug_visuals and debug_cmd_list.debug_visuals[npc:id()]) then
+		npc:set_visual_name(debug_cmd_list.debug_visuals[npc:id()])
+		debug_cmd_list.setup_debug_logic(npc,self.st,self.loaded)
+	else
+		npc:disable_info_portion("npcx_is_companion")
+		npc:disable_info_portion("npcx_beh_cannot_dismiss")
+		smart_terrain.setup_gulag_and_logic_on_spawn(npc, self.st, se_obj, modules.stype_stalker, self.loaded)
+	end
+	
+	local id = se_obj.id
+	local force_set_position
+	
+	if (db.offline_objects[id] and db.offline_objects[id].level_vertex_id) then
+		force_set_position = level.vertex_position(db.offline_objects[id].level_vertex_id)
+		db.offline_objects[id].level_vertex_id = nil
+	elseif (db.spawned_vertex_by_id[id]) then
+		force_set_position = level.vertex_position(db.spawned_vertex_by_id[id])
+		db.spawned_vertex_by_id[id] = nil
+	end
+
+	if (force_set_position) then
+		npc:set_npc_position(force_set_position)
+	end
+
+	if character_community(npc) ~= "zombied" then
+		post_combat_idle.add_post_combat_idle(npc)
+	end
+
+	npc:group_throw_time_interval(2000)
+
+	-- start [Alundaio]
+	SendScriptCallback("npc_on_net_spawn",npc,se_obj)
+	-- End [Alundaio]
+
+	--alun_utils.debug_write(se_obj:name()..":net_spawn() end")
+	return true
+end
+function motivator_binder:on_item_take(item)
+	if not (self.object) then
+		return
+	end
+	-- Alundaio
+	SendScriptCallback("npc_on_item_take",self.object,item)
+	-- End Alundaio
+end
+
+--Alundaio
+function motivator_binder:take_item_from_box(box,item)
+	if not (self.object) then
+		return
+	end
+	SendScriptCallback("npc_on_item_take_from_box",self.object,box,item)
+end
+--Alundaio
+
+function motivator_binder:on_item_drop(item)
+	if not (self.object) then
+		return
+	end
+	-- Alundaio
+	SendScriptCallback("npc_on_item_drop",self.object,item)
+	-- End Alundaio
+end
+function motivator_binder:net_destroy()
+	--printf("%s:net_destroy()",self.object:name())
+	self.object:set_callback(callback.use_object,nil)
+	self.object:set_callback(callback.on_item_take,nil)
+	self.object:set_callback(callback.on_item_drop,nil)
+	self.object:set_patrol_extrapolate_callback(nil)
+	self.object:set_callback(callback.hit,nil)
+	self.object:set_callback(callback.death,nil)
+	self.object:set_callback(callback.sound,nil)
+	self.object:set_callback(callback.take_item_from_box,nil)
+	-- start [Alundaio]
+	SendScriptCallback("npc_on_net_destroy",self.object)
+	-- end [Alundaio]
+	xr_combat_ignore.fighting_with_actor_npcs[self.object:id()] = nil
+
+	xr_sound.stop_sounds_by_id(self.object:id())
+	
+	if (self.object:is_talking()) then
+		db.actor:stop_talk()
+		self.object:stop_talk()
+	end
+
+	if (self.st) then
+		if (self.st.active_scheme) then
+			xr_logic.issue_event(self.object, self.st[self.st.active_scheme], "net_destroy", self.object)
+		end
+		if (self.st.reach_task) then
+			xr_logic.issue_event(self.object, self.st.reach_task, "net_destroy", self.object)
+		end
+		if (self.st.overrides and self.st.overrides.on_offline_condlist) then
+			xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.overrides.on_offline_condlist)
+		end
+	end
+
+	if db.offline_objects[self.object:id()] then
+		db.offline_objects[self.object:id()].level_vertex_id = self.object:level_vertex_id()
+		db.offline_objects[self.object:id()].active_section = db.storage[self.object:id()].active_section
+	end
+
+	if (USE_MARSHAL) then
+		UnregisterScriptCallback("save_state",self)
+	end
+
+	db.del_obj(self.object)
+	db.delete_enemy(self.object)
+	
+	local m_data = alife_storage_manager.get_state()
+	if (m_data.game_object) then
+		m_data.game_object[self.object:id()] = nil
+	end
+	
+	trade_manager.on_npc_death(self.object)
+	
+	object_binder.net_destroy(self)
+end
+
+function motivator_binder:hit_callback(obj, amount, local_direction, who, bone_index)
+	--alun_utils.debug_write(strformat("START motivator_binder:hit_callback %s",obj and obj:name()))
+	if (amount <= 0 or who == nil) then
+		--alun_utils.debug_write(strformat("END motivator_binder:hit_callback %s",obj and obj:name()))
+		return 
+	end
+	
+	if (who:id() == 0) then
+		xr_statistic.set_best_weapon(amount)
+	end
+	
+	-- Only wound the stalker from powerful attacks if not a head hit and not already wounded
+	if (bone_index ~= 15 and amount > 15 and amount >= obj.health*100 and not IsWounded(obj)) then
+		local skip_wound
+		if (who:id() == 0) then 
+			-- Surprise attacks with knife don't force wound
+			if (self.object:target_mental_state() == anim.free) then 
+				local active_item = who:active_item()
+				if (active_item and active_item:clsid() == clsid.wpn_knife_s) then 
+					skip_wound = true
+				end
+			end
+			
+			-- surrendered victims should die instantly, not re-wound
+			if (utils.load_var(self.object,"victim_surrender",false) == true) then
+				skip_wound = true
+			end
+		end
+		if not (skip_wound) then
+			obj.health = 0.15
+		end
+	end
+
+	if (self.st.active_section and self.st.active_scheme) then
+		xr_logic.issue_event(obj, self.st[self.st.active_scheme], "hit_callback", obj, amount, local_direction, who, bone_index)
+	end
+	if self.st.combat_ignore then
+		xr_logic.issue_event(obj, self.st.combat_ignore, "hit_callback", obj, amount, local_direction, who, bone_index)
+	end
+	if self.st.combat then
+		xr_logic.issue_event(obj, self.st.combat, "hit_callback", obj, amount, local_direction, who, bone_index)
+	end
+	if self.st.hit then
+		xr_logic.issue_event(obj, self.st.hit, "hit_callback", obj, amount, local_direction, who, bone_index)
+	end
+
+	xr_wounded.hit_callback(obj:id())
+	if (who and IsHelicopter(who)) then
+		--printf("hit by helicopter")
+		local squad = get_object_squad(obj)
+		if (squad and not xr_combat_ignore.safe_zone_npcs[squad.id]) then
+			for o in squad:squad_members() do
+				if (db.storage[o.id]) then
+					db.storage[o.id].heli_enemy_flag = true
+				end
+			end
+		elseif not (xr_combat_ignore.safe_zone_npcs[obj:id()]) then
+			db.storage[obj:id()].heli_enemy_flag = true
+		end
+	end
+
+	-- start [Alundaio]
+	SendScriptCallback("npc_on_hit_callback",obj,amount,local_direction,who,bone_index)
+	-- end [Alundaio]
+	
+	--alun_utils.debug_write(strformat("END motivator_binder:hit_callback %s",obj and obj:name()))
+end
+
+function motivator_binder:death_callback(victim, who)
+	--alun_utils.debug_write(strformat("START motivator_binder:death_callback %s",victim and victim:name()))
+	if (self.object == nil or victim == nil) then
+		callstack()
+		abort(strformat("CRITICAL ERROR: motivator_binder:death_callback : Game Object is nil and binder is not! %s",self.name),2)
+		--alun_utils.debug_write(strformat("END motivator_binder:death_callback %s",victim and victim:name()))
+		return 
+	end
+	
+	if (victim:has_info("npcx_is_companion")) then 
+		xr_statistic.inc_actor_reputation(-75) -- lose rep for companion death, nobody would want to hang out with a loser!
+	elseif (who and who:id() == 0) then
+		if (utils.load_var(victim,"victim_surrender",false) == true) then
+			local state = tostring(utils.load_var(victim, "wounded_state"))
+			if (state ~= "nil") then
+				xr_statistic.inc_actor_reputation(-25) -- lose rep for killing still wounded surrendered victim
+			end
+		end
+	end
+	
+	self.object:enable_vision(false)
+	
+	local known_info = self.st.ini and self.st.section_logic and self.st.ini:r_string_ex(self.st.section_logic,"known_info")
+	if (known_info) then
+		self:setup_known_info(self.object,self.st.ini,known_info)
+	end
+	
+	trade_manager.on_npc_death(self.object)
+	self:hit_callback(victim, 1, VEC_ZERO, who, "from_death_callback")
+
+	local id = victim:id()
+	xr_combat_ignore.fighting_with_actor_npcs[id] = nil
+
+	death_manager.decide_items_to_keep(self.object)
+
+	stalker_generic.remove_level_spot(id)
+
+	if (who and IsStalker(who) and who:alive()) then
+		local count = utils.load_var(who,"s_kill_count") or 0
+		if (count >= 255) then
+			count = 254
+		end
+		utils.save_var(who,"s_kill_count",count)
+		
+		-- npc_statistic
+		local se_obj = alife_object(who:id())
+		if (se_obj) then
+			local m_data = alife_storage_manager.get_se_obj_state(se_obj)
+			if (m_data) then
+				m_data.stalkers_killed = m_data.stalkers_killed and m_data.stalkers_killed + 1 or 1
+			end
+		end
+	end
+
+	if (self.st.state_mgr) then
+		self.st.state_mgr.animation:set_state(nil, true)
+		self.st.state_mgr = nil
+	end
+
+	if self.st.reach_task then
+		xr_logic.issue_event(victim, self.st.reach_task, "death_callback", victim, who)
+	end
+	if self.st.death then
+		xr_logic.issue_event(victim, self.st.death, "death_callback", victim, who)
+	end
+	if self.st.active_section then
+		xr_logic.issue_event(victim, self.st[self.st.active_scheme], "death_callback", victim, who)
+	end
+
+	sr_light.check_light(victim)
+
+	db.delete_enemy(victim)
+
+	release_body_manager.get_release_body_manager():moving_dead_body(victim)
+	if (who and bone_index ~= "from_death_callback") and (IsStalker(who) or IsMonster(who)) then
+		-- Start [Alundaio]
+		SendScriptCallback("npc_on_death_callback",victim,who)
+		db.storage[id].death_time = game.get_game_time()
+		db.storage[id].death_by_id = who:id()
+		-- End [Alundaio]
+	end
+	victim:set_callback(callback.hit,nil)
+	victim:set_callback(callback.death,nil)
+	victim:set_callback(callback.sound,nil)
+	victim:set_patrol_extrapolate_callback(nil)
+	
+	--alun_utils.debug_write(strformat("END motivator_binder:death_callback %s",victim and victim:name()))
+end
+
+function motivator_binder:use_callback(obj, who)
+	--alun_utils.debug_write(strformat("motivator_binder:use_callback %s",obj and obj:name()))
+	if not obj:alive() then
+		death_manager.create_release_item(obj)
+		if lootmoney then
+			lootmoney.lootmoney(obj)
+        end
+		return
+	end
+	trade_manager.update(obj)
+	inventory_upgrades.victim_id = obj:id()
+	xr_meet.notify_on_use(obj, who)
+	dialog_manager.disabled_phrases[obj:id()] = nil
+	dialog_manager.RandomVal = math.random(1,3)
+	if (self.st.active_scheme) then
+		xr_logic.issue_event(obj, self.st[self.st.active_scheme], "use_callback", obj, who)
+	end
+	-- start [Alundaio]
+	SendScriptCallback("npc_on_use",obj,who)
+	-- end [Alundaio]
+end
+
+function motivator_binder:update(delta)
+	object_binder.update(self, delta)
+	--alun_utils.debug_write(strformat("motivator_bind:update %s START",self.object and self.object:name()))
+
+	local object = self.object
+	local id = object:id()
+
+	--alun_utils.debug_nearest(object,"motivator_binder:update(%s)",delta)
+	
+	xr_sound.update(id)
+	
+	-- check dead
+	local object_alive = object:alive()
+	if not (object_alive) then
+		if not (self.first_update) then
+			death_manager.decide_items_to_keep(object)
+		end
+		self.first_update = true
+		
+		object:set_tip_text_default()
+		
+		if (self.st.active_scheme) then
+			xr_logic.try_switch_to_another_section(object, self.st[self.st.active_scheme], db.actor)
+		end
+		--alun_utils.debug_write(strformat("motivator_bind:update %s END 1",self.object and self.object:name()))
+		return
+	end
+	
+	xr_meet.process_npc_usability(object)
+	sr_light.check_light(object)
+	
+	if not (object:best_enemy()) then
+		xr_combat_ignore.fighting_with_actor_npcs[id] = nil
+	end
+	
+	self.squad = self.squad or get_object_squad(object)
+	if (self.squad and self.squad:commander_id() == id) then
+		self.squad:update()
+	end
+	
+	if (self.st.state_mgr) then
+		self.st.state_mgr:update()
+	end
+	
+	-- Start [Alundaio]
+	SendScriptCallback("npc_on_update",object,db.storage[id])
+	-- End [Alundaio]
+	
+	local tg = time_global()
+	if (self.__tmr and tg < self.__tmr) then
+		--alun_utils.debug_write(strformat("motivator_bind:update %s END 2",self.object and self.object:name()))
+		return
+	end
+	self.__tmr = tg+500
+	
+	-- DOOR
+	ph_door.try_to_open_door(self.object, self.opened_doors)
+	ph_door.try_to_close_door(self.object, self.opened_doors)
+	
+	stalker_generic.update_invulnerability(object)
+
+	if (self.st.active_scheme) then
+		local switched
+		if (self.st.combat) then
+			if (self.st.overrides and self.st.overrides.on_combat) then
+				local mgr = object:motivation_action_manager()
+				if (mgr and mgr:initialized() and mgr:current_action_id() == stalker_ids.action_combat_planner) then
+					if (self.st.overrides.on_combat) then
+						xr_logic.pick_section_from_condlist(db.actor,object,self.st.overrides.on_combat.condlist)
+					end
+					if (xr_logic.try_switch_to_another_section(object,self.st.combat,db.actor)) then
+						switched = true
+					elseif (self.st.overrides.combat_type) then
+						xr_combat.set_combat_type(object,db.actor,self.st.overrides)
+					else 
+						xr_combat.set_combat_type(object, db.actor, self.st.combat)
+					end
+				end
+			else 
+				xr_combat.set_combat_type(object, db.actor, self.st.combat)
+			end
+		end
+		
+		if not switched then
+			xr_logic.try_switch_to_another_section(object, self.st[self.st.active_scheme], db.actor)
+		end
+	elseif (self.st.combat) then
+		xr_combat.set_combat_type(object, db.actor, self.st.combat)
+	end
+	--alun_utils.debug_write(strformat("motivator_bind:update %s BEFORE AXR_MAIN",self.object and self.object:name()))
+
+	--alun_utils.debug_write(strformat("motivator_bind:update %s END 3 AFTER AXR_MAIN",self.object and self.object:name()))
+end
+
+function motivator_binder:reload(section)
+	object_binder.reload(self, section)
+end
+
+function motivator_binder:net_save_relevant()
+	return true
+end
+
+function motivator_binder:save(packet)
+	set_save_marker(packet, "save", false, "motivator_binder")
+	object_binder.save(self, packet)
+	set_save_marker(packet, "save", true, "motivator_binder")
+	if (USE_MARSHAL) then
+		return
+	end
+	--alun_utils.debug_write("\n-------motivator save start------ "..self.object:name(),true)
+	xr_logic.save_obj(self.object, packet)
+	trade_manager.save(self.object, packet)
+	xr_sound.save_npc(packet, self.object:id())
+
+	--alun_utils.debug_write("\nmotivator save end------ "..self.object:name(),true)
+end
+
+function motivator_binder:load(reader)
+	set_save_marker(reader, "load", false, "motivator_binder")
+	object_binder.load(self, reader)
+	set_save_marker(reader, "load", true, "motivator_binder")
+	self.loaded = true
+	if (USE_MARSHAL) then
+		if (self.object) then
+			self:load_state() -- fake because binder not ready when real load_state made
+		end
+		return
+	end
+	--alun_utils.debug_write("\nmotivator load start "..self.object:name(),true)	
+	xr_logic.load_obj(self.object, reader)
+	trade_manager.load(self.object, reader)
+	xr_sound.load_npc(reader, self.object:id())
+	--alun_utils.debug_write("\nmotivator load END "..self.object:name())
+end
+
+function motivator_binder:hear_callback(npc, who_id, sound_type, sound_position, sound_power)
+	--alun_utils.debug_write(strformat("motivator_binder:hear_callback %s",npc and npc:name()))
+	if not (npc:alive()) then
+		return
+	end
+
+	if who_id == npc:id() then
+		return
+	end
+	xr_hear.hear_callback(npc, who_id, sound_type, sound_position, sound_power)
+end
+
+----------------------------------------------------------------------------------
+function motivator_binder:save_state(m_data)
+	--alun_utils.debug_write(strformat("motivator_binder:save_state %s BEFORE",self.object:name()))
+	local id = self.object and self.object:id()
+	local st = id and db.storage[id]
+	if not (st and m_data) then
+		return
+	end
+	local state = alife_storage_manager.get_game_object_state(self.object,true)
+	state.xr_logic = empty_table(state.xr_logic)
+	--state.xr_logic.job_ini = st.job_ini
+	state.xr_logic.ini_filename = st.ini_filename
+	state.xr_logic.section_logic = st.section_logic
+	state.xr_logic.active_section = st.active_section
+	state.xr_logic.gulag_name = st.gulag_name
+	state.xr_logic.activation_time = (st.activation_time or time_global()) - time_global()
+	state.xr_logic.activation_game_time = st.activation_game_time
+
+	xr_sound.npc_save_state(id,state)
+	trade_manager.save_state(id,state)
+	db.storage[id].pstor = db.storage[id].pstor or {}
+	--alun_utils.debug_write(strformat("motivator_binder:save_state %s AFTER",self.object:name()))
+end
+
+function motivator_binder:load_state()
+	local state = alife_storage_manager.get_game_object_state(self.object)
+	if not (state and state.xr_logic) then
+		return
+	end
+	
+	local id = self.object:id()
+	db.storage[id] = db.storage[id] or {}
+	local st = db.storage[id]
+	st.object = self.object
+	--alun_utils.debug_write(strformat("motivator_binder:load_state %s BEFORE",id))
+	--st.job_ini = state.xr_logic.job_ini
+	st.loaded_ini_filename = state.xr_logic.ini_filename
+	st.loaded_section_logic = state.xr_logic.section_logic
+	st.loaded_active_section = state.xr_logic.active_section
+	st.loaded_gulag_name = state.xr_logic.gulag_name or ""
+	st.activation_time = time_global() + (state.xr_logic.activation_time or 0)
+	st.activation_game_time = state.xr_logic.activation_game_time or game.get_game_time()
+	state.xr_logic = nil
+	xr_sound.npc_load_state(id,state)
+	trade_manager.load_state(id,state)
+	if (state.pstor_all) then
+		db.storage[id].pstor = state.pstor_all
+		state.pstor_all = nil
+	end
+
+	if (state.pstor_ctime) then
+		db.storage[id].pstor_ctime = state.pstor_ctime
+		state.pstor_ctime = nil
+	end
+	--alun_utils.debug_write(strformat("motivator_binder:load_state %s AFTER",id))
+end
+
+----------------------------------
+function motivator_binder:setup_known_info(npc,char_ini,known_info)
+	known_info = known_info or "known_info"
+	if char_ini:section_exist(known_info) then
+		local n = char_ini:line_count(known_info)
+		for i=0,n-1 do
+			local result, id, value = char_ini:r_line(known_info,i,"","")
+			npc:give_info_portion(id)
+		end
+	end
+end

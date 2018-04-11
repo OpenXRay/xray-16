@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="st_itm_artefact_container_name">
+		<text>Контейнер для артефактов</text>
+	</string>
+	<string id="st_itm_backpack_name">
+		<text>Рюкзак</text>
+			</string>
+	<string id="st_itm_backpack_desc">
+		<text>Рюкзак из прочного материала, способный выдержать самые суровые погодные условия.\n \n%c[255,255,255,0]Используйте двойной клик, чтобы сбросить на землю.</text>
+			</string>
+	<string id="st_itm_sleepbag_name">
+		<text>Спальный мешок</text>
+			</string>
+	<string id="st_itm_sleepbag_desc">
+		<text>Походный спальный мешок, достаточно тёплый, чтобы пережить ночь в Зоне.\n \n%c[255,255,255,0]Используйте двойной клик, чтобы расстелить мешок.</text>
+			</string>
+	<string id="st_sleep">
+		<text>Спать</text>
+			</string>
+	<string id="st_itm_actor_backpack_name">
+		<text>Полевой рюкзак</text>
+			</string>
+	<string id="st_itm_actor_backpack_desc">
+		<text>Прочный рюкзак с множеством подсумков и отделений, оснащенный быстро отцепляющимися лямками, что дает возможность сбросить его в любой момент.</text>
+	</string>
+	<string id="st_itm_gunsmith_toolkit">
+		<text>Ремнабор</text>
+	</string>
+	<string id="st_itm_gunsmith_toolkit_descr">
+		<text>Набор инструментов и масел для базового ухода за оружием. Весьма полезная вещь, однако, довольно тяжёлая.\n\n%c[255,255,255,0]Перетащите на элемент, который вы хотите восстановить.</text>
+	</string>
+	<string id="st_itm_outfit_toolkit">
+		<text>Швейный набор</text>
+	</string>
+	<string id="st_itm_outfit_toolkit_descr">
+		<text>Набор швейных инструментов и материалов для ухода за обмундированием. Весьма полезная вещь для залатывания дыр и разрывов в броне.\n\n%c[255,255,255,0]Перетащите на элемент, который вы хотите восстановить.</text>
+	</string>
+	<string id="st_itm_repairkit_tier_1_name">
+		<text>Инструменты для грубой работы</text>
+	</string>
+	<string id="st_itm_repairkit_tier_1_descr">
+		<text>Набор инструментов «Юный техник». Вряд ли подойдёт для работы, в которой нужна тонкость, но в условиях тотальной нехватки инструментов в Зоне может пригодиться экономному технику.</text>
+	</string>
+	<string id="st_itm_repairkit_tier_2_name">
+		<text>Инструменты для тонкой работы</text>
+	</string>
+	<string id="st_itm_repairkit_tier_2_descr">
+		<text>Неплохой набор инструментов. Судя по всему, тщательно подобран опытным мастером «под себя, родного». Несмотря на годы, весь инструментарий хорошо сохранился.</text>
+	</string>
+	<string id="st_itm_repairkit_tier_3_name">
+		<text>Инструменты для калибровки</text>
+	</string>
+	<string id="st_itm_repairkit_tier_3_descr">
+		<text>Профессиональный набор инструментов для тонкой доводки оборудования. Надпись на ящике гласит, что набор произведён в ГДР. Того, что включено в комплект, достаточно для проведения почти любых работ по настройке и калибровке.</text>
+	</string>
+	<string id="st_repair_mod_message_box_ask">
+		<text>Точно хотите отремонтировать: %s?\n\n%c[255,1,255,1]+%s%</text>
+	</string>
+	<string id="st_repair_mod_message_box_condition_to_low">
+		<text>Нельзя отремонтировать этим набором.</text>
+	</string>
+	<string id="st_repair_mod_message_box_condition_to_high">
+		<text>Ремнабора не достаточно для проведения ремонта.</text>
+	</string>
+	<string id="st_itm_stash">
+		<text>тайник</text>
+	</string>
+	<string id="st_itm_stash_of_character">
+		<text>%s. Его тайник</text>
+	</string>
+</string_table>

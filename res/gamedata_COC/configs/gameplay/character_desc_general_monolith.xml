@@ -1,0 +1,1118 @@
+<specific_character id="sim_default_monolith_0_default_0" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_0</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>1428</rank>
+    <reputation>-1640</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_2</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_1.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_0_default_1" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolith1gas</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_0</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>1718</rank>
+    <reputation>2443</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith1</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_1.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_0_default_2" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolith1gas</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_0</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>2830</rank>
+    <reputation>-346</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith1b</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_1.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_0_default_3" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_0</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>1264</rank>
+    <reputation>-210</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith2</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_1.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_0_default_4" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_mono_old</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_0</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>12148</rank>
+    <reputation>593</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_2_old</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_2.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_0_default_5" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_mono_old</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_0</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>14842</rank>
+    <reputation>563</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith2a_old</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_2.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_0_default_6" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_mono_old</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_0</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>12182</rank>
+    <reputation>2330</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith2b_old</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_2.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_0_default_7" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolith2_gp5</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_0</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>7610</rank>
+    <reputation>1146</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith0_gp5</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_2.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_0_default_8" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolith2_gp5</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_0</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>9866</rank>
+    <reputation>-1906</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith1_gp5</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_2.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_0_default_9" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolith2_gp5</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_0</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>6068</rank>
+    <reputation>-2381</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith2_gp5</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_2.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_1_default_0" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolith1gas</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_1</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>1268</rank>
+    <reputation>790</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith1</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_1.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_1_default_1" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_1</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>1266</rank>
+    <reputation>1320</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_2</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_1.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_1_default_2" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolith1gas</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_1</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>1082</rank>
+    <reputation>-2319</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith1b</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_1.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_1_default_3" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_1</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>1612</rank>
+    <reputation>1103</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith2</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_1.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_1_default_4" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_mono_old</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_1</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>11950</rank>
+    <reputation>1889</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_2_old</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_3.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_1_default_5" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_mono_old</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_1</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>10824</rank>
+    <reputation>251</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith2a_old</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_3.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_1_default_6" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_mono_old</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_1</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>14500</rank>
+    <reputation>1292</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith2b_old</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_3.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_1_default_7" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolith2_gp5</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_1</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>8082</rank>
+    <reputation>415</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith0_gp5</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_2.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_1_default_8" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolith2_gp5</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_1</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>9988</rank>
+    <reputation>-435</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith1_gp5</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_2.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_1_default_9" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolith2_gp5</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_1</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>8774</rank>
+    <reputation>2043</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith2_gp5</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_2.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_2_default_0" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolith1gas</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_2</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>2634</rank>
+    <reputation>2284</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith1b</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_1.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_2_default_1" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_1</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_2</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>10774</rank>
+    <reputation>-144</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_1</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_3.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_2_default_10" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_mono_old</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_2</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>12474</rank>
+    <reputation>-242</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith2a_old</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_3.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_2_default_11" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_mono_old</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_2</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>10748</rank>
+    <reputation>-633</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith2b_old</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_3.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_2_default_12" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolith2_gp5</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_2</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>7534</rank>
+    <reputation>-2218</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith0_gp5</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_2.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_2_default_13" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolith2_gp5</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_2</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>9738</rank>
+    <reputation>80</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith1_gp5</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_2.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_2_default_14" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolith2_gp5</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_2</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>7800</rank>
+    <reputation>-367</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith2_gp5</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_2.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_2_default_2" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_1</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_2</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>13896</rank>
+    <reputation>1749</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_1</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_3.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_2_default_3" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_2</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>1738</rank>
+    <reputation>-2484</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_2</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_1.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_2_default_4" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_2</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>1512</rank>
+    <reputation>-169</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith2</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_1.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_2_default_5" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolith1gas</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_2</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>2528</rank>
+    <reputation>85</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith1</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_1.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_2_default_6" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_2</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>2262</rank>
+    <reputation>1312</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_2</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_1.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_2_default_7" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_2</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>2028</rank>
+    <reputation>1993</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith2</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_1.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_2_default_8" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolith1gas</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_2</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>2896</rank>
+    <reputation>-2233</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith1</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_1.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_2_default_9" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_mono_old</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_2</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>14324</rank>
+    <reputation>972</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_2_old</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_3.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_3_default_0" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_3</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\monolith\</snd_config>
+    <rank>1740</rank>
+    <reputation>-73</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_2</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_1.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_sci.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_3_default_1" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_mono_old</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_3</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\monolith\</snd_config>
+    <rank>12764</rank>
+    <reputation>2423</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_2_old</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_3.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_sci.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_3_default_2" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_3</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\monolith\</snd_config>
+    <rank>15182</rank>
+    <reputation>-2310</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_3</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_3.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_sci.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_3_default_3" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_1</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_3</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\monolith\</snd_config>
+    <rank>12258</rank>
+    <reputation>-505</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_1</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_3.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_sci.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_3_default_4" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_3a</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_3</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\monolith\</snd_config>
+    <rank>20580</rank>
+    <reputation>-1355</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith3a</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_3.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_sci.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_3_default_5" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_3</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\monolith\</snd_config>
+    <rank>20452</rank>
+    <reputation>-1852</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith3b</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_3.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_sci.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_4_default_0" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_4</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\monolith\</snd_config>
+    <rank>1768</rank>
+    <reputation>79</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_2</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_1.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_4_default_1" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_4</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_4</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\monolith\</snd_config>
+    <rank>21900</rank>
+    <reputation>-1235</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_4</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_4.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_4_default_2" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_4a</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_4</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\monolith\</snd_config>
+    <rank>26854</rank>
+    <reputation>-2252</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith4a</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_4.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_4_default_3" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_4</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_4</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\monolith\</snd_config>
+    <rank>23846</rank>
+    <reputation>-2245</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith4b</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_4.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_4_default_4" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_4</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\monolith\</snd_config>
+    <rank>16988</rank>
+    <reputation>140</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_3</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_3.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_4_default_5" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_3a</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_4</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\monolith\</snd_config>
+    <rank>15952</rank>
+    <reputation>2365</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith3a</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_3.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_default_monolith_4_default_6" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_monolith_4</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\monolith\</snd_config>
+    <rank>19816</rank>
+    <reputation>755</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith3b</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_3.ltx"
+        [spawn] \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_monolith_sniper" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="3" y="0"></map_icon>
+    <bio>No data. He's dangerous.</bio>
+    <class>sim_monolith_sniper</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>1772</rank>
+    <reputation>-1799</reputation>
+    <panic_threshold>0.0</panic_threshold>
+    <snd_config>characters_voice\human_02\monolith\</snd_config>
+    <crouch_type>-1</crouch_type>
+    <visual>actors\stalker_monolith\stalker_monolith_2</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_1.ltx"
+        [spawn] \n
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_monolith_sniper_gauss" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="3" y="0"></map_icon>
+    <bio>No data. He's dangerous.</bio>
+    <class>sim_monolith_sniper_gauss</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>1964</rank>
+    <reputation>14</reputation>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <crouch_type>-1</crouch_type>
+    <panic_threshold>0.0</panic_threshold>
+    <visual>actors\stalker_monolith\stalker_monolith_2</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_1.ltx"
+        [spawn] \n
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="sim_monolith_specnaz_rg6" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="3" y="0"></map_icon>
+    <bio>No data. He's dangerous.</bio>
+    <class>sim_monolith_specnaz_rg6</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>2338</rank>
+    <reputation>1948</reputation>
+    <snd_config>characters_voice\human_03\monolith\</snd_config>
+    <crouch_type>-1</crouch_type>
+    <visual>actors\stalker_monolith\stalker_monolith_2</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_1.ltx"
+        [spawn] \n
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+<specific_character id="stalker_monolith_default" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>stalker_monolith_default</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>2984</rank>
+    <reputation>-293</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_2</visual>
+    <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_tier_1.ltx"
+        [spawn] \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>

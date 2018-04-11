@@ -1,0 +1,89 @@
+#include "pri_a28_general.ltx"
+
+[logic@pri_a28_evac_military_1]
+active = camper@pri_a28_evac_military_1_wait
+suitable = {+pri_b305_fifth_cam_end =check_npc_name(pri_a28_evac_com)} true, {+pri_b305_fifth_cam_end !is_alive(pri_a28_evac_com) =target_squad_name(pri_a28_evac_squad) =is_squad_commander} true
+prior = 200
+post_combat_time = 0,0
+
+[camper@pri_a28_evac_military_1_wait]:walker@ignore
+path_walk = evac_military_1_walk
+path_look = evac_military_1_look
+def_state_standing = hide_na
+out_restr = pri_a28_scene_end_zone
+invulnerable = {!actor_enemy} true, false
+on_info = {+pri_a28_squad_dead} camper@pri_a28_evac_military_1 %=clear_smart_terrain(pri_sim_2) +pri_a28_evac_squad_active%
+on_info2 = {=dist_to_actor_le(150)} camper@pri_a28_evac_military_1 %=clear_smart_terrain(pri_sim_2) +pri_a28_evac_squad_active%
+on_info3 = {+pri_a28_evac_done} camper@pri_a28_evac_military_1 %=clear_smart_terrain(pri_sim_2) +pri_a28_evac_squad_active%
+
+[camper@pri_a28_evac_military_1]:walker@fight
+path_walk = evac_military_1_walk
+path_look = evac_military_1_look
+def_state_standing = hide_na
+out_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_evac_come_close} %=play_sound(pri_a28_evac_come_close)%
+on_info2 = {+pri_a28_evac_com_to_helicopter} %=play_sound(pri_a28_evac_com_to_helicopter)%
+on_signal = sound_end | {-pri_a28_evac_come_close_done} %+pri_a28_evac_come_close_done%
+
+
+
+[logic@pri_a28_evac_military_2]
+active = camper@pri_a28_evac_military_2_wait
+suitable = {+pri_b305_fifth_cam_end =target_squad_name(pri_a28_evac_squad) !check_npc_name(pri_a28_evac_com)} true, {+pri_b305_fifth_cam_end !is_alive(pri_a28_evac_com) =target_squad_name(pri_a28_evac_squad) !is_squad_commander} true
+prior = 200
+post_combat_time = 0,0
+
+[camper@pri_a28_evac_military_2_wait]:walker@ignore
+path_walk = evac_military_2_walk
+path_look = evac_military_2_look
+def_state_standing = hide_na
+out_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_evac_squad_active} camper@pri_a28_evac_military_2
+
+[camper@pri_a28_evac_military_2]:walker@fight
+path_walk = evac_military_2_walk
+path_look = evac_military_2_look
+def_state_standing = hide_na
+out_restr = pri_a28_scene_end_zone
+
+
+
+[logic@pri_a28_evac_military_3]
+active = camper@pri_a28_evac_military_3_wait
+suitable = {+pri_b305_fifth_cam_end =target_squad_name(pri_a28_evac_squad) !check_npc_name(pri_a28_evac_com)} true, {+pri_b305_fifth_cam_end !is_alive(pri_a28_evac_com) =target_squad_name(pri_a28_evac_squad) !is_squad_commander} true
+prior = 200
+post_combat_time = 0,0
+
+[camper@pri_a28_evac_military_3_wait]:walker@ignore
+path_walk = evac_military_3_walk
+path_look = evac_military_3_look
+def_state_standing = hide_na
+out_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_evac_squad_active} camper@pri_a28_evac_military_3
+
+[camper@pri_a28_evac_military_3]:walker@fight
+path_walk = evac_military_3_walk
+path_look = evac_military_3_look
+def_state_standing = hide_na
+out_restr = pri_a28_scene_end_zone
+
+
+
+[logic@pri_a28_evac_military_4]
+active = camper@pri_a28_evac_military_4_wait
+suitable = {+pri_b305_fifth_cam_end =target_squad_name(pri_a28_evac_squad) !check_npc_name(pri_a28_evac_com)} true, {+pri_b305_fifth_cam_end !is_alive(pri_a28_evac_com) =target_squad_name(pri_a28_evac_squad) !is_squad_commander} true
+prior = 200
+post_combat_time = 0,0
+
+[camper@pri_a28_evac_military_4_wait]:walker@ignore
+path_walk = evac_military_4_walk
+path_look = evac_military_4_look
+def_state_standing = hide_na
+out_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_evac_squad_active} camper@pri_a28_evac_military_4
+
+[camper@pri_a28_evac_military_4]:walker@fight
+path_walk = evac_military_4_walk
+path_look = evac_military_4_look
+def_state_standing = hide_na
+out_restr = pri_a28_scene_end_zone

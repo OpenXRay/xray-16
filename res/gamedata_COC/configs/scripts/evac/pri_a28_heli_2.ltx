@@ -1,0 +1,71 @@
+[logic]
+active = heli_move@under_level
+
+[heli_move@under_level]
+path_move = pri_a28_heli_under_level_2
+path_look = pri_a28_heli_way_2
+max_velocity = 100
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+engine_sound = false
+on_info = {+pri_b305_fifth_cam_end} heli_move@start
+on_info2 = {+pri_a28_cutscene_start} heli_move@land
+
+[heli_move@start]
+path_move = pri_a28_heli_start_2
+path_look = pri_a28_heli_way_2
+max_velocity = 100
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+engine_sound = false
+on_info = {+pri_a28_update_task_cover_strelok} heli_move@wait
+
+[heli_move@wait]
+path_move = pri_a28_heli_start_2
+path_look = pri_a28_heli_way_2
+max_velocity = 100
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+on_game_timer = 100 | heli_move@flyby
+
+[heli_move@flyby]
+path_move = pri_a28_heli_way_2
+path_look = pri_a28_heli_cutscene_move_2
+max_velocity = 100
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+on_info = {-pri_a28_heli_near_base =npc_in_zone(pri_a28_heli_near_base)} %+pri_a28_heli_near_base%
+on_info2 = {=npc_in_zone(pri_a28_heli_landing_zone)} heli_move@land
+
+[heli_move@land]
+path_move = pri_a28_heli_land_move_2
+path_look = pri_a28_heli_land_look_2
+max_velocity = 100
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+engine_sound = false
+on_info = {+pri_a28_helis_leave} heli_move@cutscene
+
+[heli_move@cutscene]
+path_move = pri_a28_heli_cutscene_move_2
+path_look = pri_a28_heli_cutscene_move_2_2
+max_velocity = 100
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+on_info = {=npc_in_zone(pri_a28_helli_start_away_zone)} heli_move@fly_over %+pri_a28_heli_fly_over%
+;on_info2 = {+pri_a28_heli_fly_over} heli_move@fly_over
+
+[heli_move@fly_over]
+path_move = pri_a28_heli_cutscene_move_2_2
+path_look = pri_a28_heli_cutscene_move_away_2
+max_velocity = 100
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+on_game_timer = 45 | heli_move@cutscene_away
+
+[heli_move@cutscene_away]
+path_move = pri_a28_heli_cutscene_move_away_2
+max_velocity = 100
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+on_info = {=npc_in_zone(pri_a28_scene_end_hellis_destroy_zone)} %=destroy_object%

@@ -1,0 +1,115 @@
+[meet]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+use = {=actor_enemy} false, true
+allow_break = false
+trade_enable = false
+meet_on_talking = false
+
+;*******************************
+
+[logic@jup_b218_vano_in_suit]
+suitable = {=check_npc_name(jup_b218_vano_in_suit)}
+prior = 200
+active = walker@vano_arrive
+
+[walker@vano_arrive]
+path_walk = jup_b218_squad_member_arrive_walk
+path_look = jup_b218_squad_member_arrive_look
+def_state_standing = ward_noweap
+meet = no_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+on_game_timer = 50 | animpoint@vano_tower %=actor_friend%
+out_restr = jup_a6_sr_noweap_zulus
+on_info = {!npc_in_zone(jup_b15_sr_light)} %=teleport_npc(jup_a6_jup_b218_squad_member_arrive_walk)%
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@vano_tower]
+cover_name = jup_b218_sc_vano
+meet = meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_a6_sr_noweap_zulus
+on_info = {!npc_in_zone(jup_b15_sr_light)} %=teleport_npc(jup_a6_jup_b218_squad_member_arrive_walk)%
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+;*******************************
+
+[logic@jup_b218_monolith_squad_leader]
+suitable = {=check_npc_name(jup_b4_monolith_squad_leader_duty_mon_skin) +jup_b218_monolith_hired} true, {=check_npc_name(jup_b4_monolith_squad_leader_freedom_mon_skin) +jup_b218_monolith_hired} true;, {=check_npc_name(jup_b4_monolith_squad_leader_freedom) +jup_b218_monolith_hired} true 
+prior = 200
+active = walker@monolith_arrive
+
+[walker@monolith_arrive]
+path_walk = jup_b218_squad_member_arrive_walk
+path_look = jup_b218_squad_member_arrive_look
+on_info66 = {-jup_b218_monolith_new_friend} %+jup_b218_monolith_new_friend =actor_friend%
+def_state_standing = ward_noweap
+meet = no_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+on_game_timer = 50 | animpoint@monolith_tower
+out_restr = jup_a6_sr_noweap_zulus
+on_info = {!npc_in_zone(jup_b15_sr_light)} %=teleport_npc(jup_a6_jup_b218_squad_member_arrive_walk)%
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+
+[animpoint@monolith_tower]
+cover_name = jup_b218_sc_monolith
+meet = meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_a6_sr_noweap_zulus
+on_info = {!npc_in_zone(jup_b15_sr_light)} %=teleport_npc(jup_a6_jup_b218_squad_member_arrive_walk)%
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+;*******************************
+
+[logic@jup_b218_sokolov_sci]
+suitable = {=check_npc_name(pri_a15_sokolov_sci)}
+prior = 200
+active = walker@sokolov_arrive
+
+[walker@sokolov_arrive]
+path_walk = jup_b218_squad_member_arrive_walk
+path_look = jup_b218_squad_member_arrive_look
+def_state_standing = ward_noweap
+meet = no_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+on_game_timer = 50 | animpoint@sokolov_tower
+out_restr = jup_a6_sr_noweap_zulus
+on_info = {!npc_in_zone(jup_b15_sr_light)} %=teleport_npc(jup_a6_jup_b218_squad_member_arrive_walk)%
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@sokolov_tower]
+cover_name = jup_b218_sc_sokolov
+meet = meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_a6_sr_noweap_zulus
+on_info = {!npc_in_zone(jup_b15_sr_light)} %=teleport_npc(jup_a6_jup_b218_squad_member_arrive_walk)%
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false

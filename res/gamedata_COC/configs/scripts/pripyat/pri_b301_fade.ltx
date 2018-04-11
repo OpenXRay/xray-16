@@ -1,0 +1,21 @@
+[logic]
+active = nil;sr_idle@attack_timer
+
+[sr_idle@attack_timer]
+on_info = {+pri_b301_snork_attack_1 -pri_b301_snork_attack_2} sr_idle@attack_timer2
+on_info2 = {+pri_b301_go_on_base} sr_idle@teleport %=run_postprocess(fade_in:7810) =disable_ui%
+
+[sr_idle@attack_timer2]
+on_game_timer = 70 | sr_idle@attack_timer %+pri_b301_snork_attack_2%
+on_info = {+pri_b301_go_on_base} sr_idle@teleport %=run_postprocess(fade_in:7810) =disable_ui%
+
+[sr_idle@wait_fade]
+on_info = {+pri_b301_go_on_base} sr_idle@teleport %=run_postprocess(fade_in:7810) =disable_ui%
+
+[sr_idle@teleport]
+on_game_timer = 10 | sr_idle@ui %=run_postprocess(black:7811:true) +pri_b301_zulus_teleport =teleport_actor(pri_actor_arrive_walk:pri_actor_arrive_look) +pri_b301_reward_dialog_unable%
+
+[sr_idle@ui]
+on_game_timer = 30 | sr_idle@end %=stop_postprocess(7810) =stop_postprocess(7811) =enable_ui%
+
+[sr_idle@end]

@@ -1,0 +1,23 @@
+[smart_terrain]
+squad_id = 2
+max_population = 3
+;;arrive_dist = 100000
+respawn_params = respawn@pas_b400_downstairs
+respawn_idle = 86400
+
+
+[respawn@pas_b400_downstairs]
+spawn_tushkano
+
+[spawn_tushkano]
+spawn_squads = simulation_tushkano
+spawn_num = {+actor_pass_jupiter_exit_find +actor_pass_pripyat_exit_find} 3, 0
+
+[exclusive]
+pas_b400_zulus_downstairs = underpass\pas_b400_downstairs.ltx
+pas_b400_vano_downstairs = underpass\pas_b400_downstairs.ltx
+pas_b400_sokolov_downstairs = underpass\pas_b400_downstairs.ltx
+pas_b400_wanderer_downstairs = underpass\pas_b400_downstairs.ltx
+
+pas_b400_tushkano_downstairs_1 = underpass\pas_b400_downstairs_monsters.ltx
+pas_b400_tushkano_downstairs_2 = underpass\pas_b400_downstairs_monsters.ltx

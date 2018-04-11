@@ -1,0 +1,39 @@
+---------------------------------------------------------------------------------------------
+--' Space restrictor scheme for non-start combat music ----------------------
+--' Made by Distemper ----------------------------------------------------------------
+--' 03.08 --------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------
+
+class "CSilence_zone"
+-- Class constructor
+function CSilence_zone:__init(obj, storage)
+
+    self.object = obj
+    self.st = storage
+
+end
+-- On scheme switch resets all self params
+function CSilence_zone:reset_scheme()
+
+end
+-- Class update
+function CSilence_zone:update()
+
+end
+--------------------------------------------------------------------------------
+-- Standart functions
+--------------------------------------------------------------------------------
+function add_to_binder(npc, ini, scheme, section, storage)
+    xr_logic.subscribe_action_for_events(npc, storage, CSilence_zone(npc, storage))
+end
+function set_scheme(obj, ini, scheme, section, gulag_name)
+-- standart lines: assigning new storage and binding our space restrictor
+    local st = xr_logic.assign_storage_and_bind(obj, ini, scheme, section)
+    st.logic = xr_logic.cfg_get_switch_conditions(ini, section, obj)
+	
+	if db.storage.silence_zone_table == nil then
+		db.storage.silence_zone_table = {}
+	end
+--' записываем все обькты с данной схемой в таблицу
+	db.storage.silence_zone_table[obj:id()] = obj:name()
+end

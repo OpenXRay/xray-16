@@ -1,0 +1,25 @@
+[smart_terrain];esc_smart_terrain_5_9
+squad_id = 16
+max_population = 3
+respawn_params = respawn@esc_smart_terrain_5_9
+respawn_idle = 86400
+
+
+[respawn@esc_smart_terrain_5_9]
+spawn_bandit@novice
+spawn_bandit@advanced
+
+[spawn_bandit@novice]
+spawn_squads = bandit_sim_squad_novice
+spawn_num = 2
+
+[spawn_bandit@advanced]
+spawn_squads = bandit_sim_squad_novice, bandit_sim_squad_advanced
+spawn_num = 1
+
+[exclusive]
+esc_smart_terrain_5_9_camp_work_1 = escape\esc_smart_terrain_5_9_smart_logic.ltx
+esc_smart_terrain_5_9_camp_work_2 = escape\esc_smart_terrain_5_9_smart_logic.ltx
+esc_smart_terrain_5_9_camp_work_3 = escape\esc_smart_terrain_5_9_smart_logic.ltx
+esc_smart_terrain_5_9_camp_work_4 = escape\esc_smart_terrain_5_9_smart_logic.ltx
+esc_smart_terrain_5_9_camp_work_5 = escape\esc_smart_terrain_5_9_smart_logic.ltx

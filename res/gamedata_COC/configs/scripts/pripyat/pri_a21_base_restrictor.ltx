@@ -1,0 +1,57 @@
+[logic] ;логика для сцены В305, Явление Стрелка
+active = nil;sr_idle@wait 
+
+[sr_idle@actor_spawn]
+on_info = {+pri_b305_4_cam_actor} sr_idle@timer_cam4 %=run_postprocess(black:8811:true) =disable_ui%
+on_info2 = {+pri_b305_5_cam_actor} sr_idle@timer_cam5 %=create_cutscene_actor_with_weapon(pri_b305_actor_visual_5:pri_a28_cutscene_actor_base_walk:0:90)%
+
+[sr_idle@wait]
+on_actor_inside = {+pri_b305_third_cam_end} sr_idle@timer %=run_postprocess(fade_in:8810) +pri_b305_quest_completed +pri_a16_wait_for_stalkers =create_cutscene_actor_with_weapon(pri_b305_actor_visual_4:pri_a16_pri_b305_actor_strelok_operation_walk:0:0:3)%
+
+[sr_idle@timer]
+on_game_timer = 10 | {+leader_achievement_gained} sr_idle@actor_spawn %=create_squad_member(pri_b305_strelok_strong:pri_a16_military_squad:pri_a16_pri_b305_strelok_spawn) +pri_b305_forth_cam_start +pri_b305_4_cam_actor%, sr_idle@actor_spawn %=run_postprocess(black:8811:true) =create_squad_member(pri_b305_strelok:pri_a16_military_squad:pri_a16_pri_b305_strelok_spawn) +pri_b305_forth_cam_start +pri_b305_4_cam_actor%
+
+[sr_idle@timer_cam4]
+on_game_timer = 20 | sr_cutscene@cam4 %=stop_postprocess(8811) =stop_postprocess(8810)%
+
+[sr_cutscene@cam4]
+point = pri_a28_cutscene_actor_base_walk
+look = pri_a16_pri_b305_kovalskiy_walk
+cam_effector = scenario_cam\pripyat\pri_b305_catscene_4_strelok_came	
+global_cameffect = true
+enable_ui_on_end = false
+outdoor = true
+on_game_timer = 80 | {-pri_b305_strelok_give_up_done} %=play_sound(pri_b305_strelok_give_up) +pri_b305_strelok_give_up_done%
+on_info = {+pri_b305_kovalskiy_talk_in_safe_place_done_end} %=stop_sr_cutscene =run_postprocess(fade_in)%
+on_signal = sound_end | {-pri_b305_strelok_give_up_done_end} %+pri_b305_strelok_give_up_done_end%
+on_signal2 = cameff_end | sr_idle@timer2 %+pri_b305_forth_cam_end =run_postprocess(black:8812:true)%	
+
+[sr_idle@timer2]
+on_game_timer = 20 | sr_idle@actor_spawn %+pri_b305_fifth_cam_start +pri_b305_5_cam_actor%
+
+[sr_idle@timer_cam5]
+on_game_timer = 40 | sr_cutscene@cam5_1 %=stop_postprocess(8812)%
+
+[sr_cutscene@cam5_1]
+point = pri_a28_cutscene_actor_base_walk
+look = pri_a16_pri_b305_kovalskiy_walk
+cam_effector = pri_b305_camera_5
+global_cameffect = true
+on_info = {+pri_b305_kovalskiy_let_center_know_done_end} %=stop_sr_cutscene%
+on_signal = cameff_end | sr_idle@keeper_of_secrets_archievement %+pri_b305_fifth_cam_end =enable_ui%	
+
+;*************************************************************************************************************
+; Логика бонуса за ачивку "Лидер"
+;*************************************************************************************************************
+
+[sr_idle@keeper_of_secrets_archievement]
+on_info = {+leader_achievement_gained} sr_idle@mysquad_regeneration_timer, sr_idle@nil
+
+[sr_idle@mysquad_regeneration_timer]
+on_game_timer = 150 | sr_idle@mysquad_regeneration  
+
+[sr_idle@mysquad_regeneration]
+on_info = sr_idle@mysquad_regeneration_timer %=heal_squad(pri_a16_military_squad)% 
+;*************************************************************************************************************
+
+[sr_idle@nil]

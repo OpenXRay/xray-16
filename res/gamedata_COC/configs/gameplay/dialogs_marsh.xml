@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<game_dialogs>
+    <!------------- ecolog_companion_task_1 ----------->
+    <dialog id="ecolog_companion_task_1_dialog">
+        <phrase_list>
+            <phrase id="0">
+                <text />
+                <next>1</next>
+            </phrase>
+            <phrase id="1">
+                <text />
+                <next>111</next>
+                <next>112</next>
+                <next>113</next>
+            </phrase>
+            <phrase id="111">
+                <dont_has_info>ecolog_companion_task_1_started</dont_has_info>
+                <precondition>dialogs_marsh.ecolog_companion_task_1_not_complete</precondition>
+                <text>ecolog_companion_task_1_start_dialog_1</text>
+                <give_info>ecolog_companion_task_1_started</give_info>
+                <next>1111</next>
+            </phrase>
+            <phrase id="112">
+                <has_info>ecolog_companion_task_1_started</has_info>
+                <precondition>dialogs_marsh.ecolog_companion_task_1_not_complete</precondition>
+                <text>ecolog_companion_task_1_start_dialog_2</text>
+                <give_info>ecolog_companion_task_1_started</give_info>
+                <next>1111</next>
+            </phrase>
+            <phrase id="113">
+                <precondition>dialogs_marsh.ecolog_companion_task_1_complete</precondition>
+                <text>ecolog_companion_task_1_complete</text>
+                <next>1113</next>
+            </phrase>
+            <phrase id="1111">
+                <text>ecolog_companion_task_1_actor_reply</text>
+            </phrase>
+            <phrase id="1113">
+                <text>ecolog_companion_task_1_actor_reply</text>
+                <action>dialogs_marsh.ecolog_companion_task_1_give_reward</action>
+                <action>dialogs_marsh.ecolog_companion_task_1_complete_task</action>
+            </phrase>
+        </phrase_list>
+    </dialog>
+    <!------------- mar_base_owl_stalker_trader ---------->
+    <dialog id="mar_base_owl_stalker_trader_start_dialog">
+        <phrase_list>
+            <phrase id="0">
+                <text>mar_base_owl_stalker_trader_start_dialog_1</text>
+            </phrase>
+        </phrase_list>
+    </dialog>
+	<dialog id="mar_smart_terrain_base_trader_background">
+		<phrase_list>
+			<phrase id="0">
+				<text>dm_dialog_character_history</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>marsh_stalker_trader_background</text>
+			</phrase>
+		</phrase_list>
+	</dialog>
+    <!------------- marsh_stalker_barmen ---------------->
+    <dialog id="marsh_stalker_barmen_start_dialog">
+        <phrase_list>
+            <phrase id="0">
+                <text />
+                <next>1</next>
+            </phrase>
+            <phrase id="1">
+                <text />
+                <next>111</next>
+                <next>112</next>
+            </phrase>
+            <phrase id="111">
+                <dont_has_info>marsh_stalker_barmen_setup</dont_has_info>
+                <text>marsh_stalker_barmen_start_dialog_1</text>
+                <give_info>marsh_stalker_barmen_setup</give_info>
+            </phrase>
+            <phrase id="112">
+                <has_info>marsh_stalker_barmen_setup</has_info>
+                <text>marsh_stalker_barmen_start_dialog_2</text>
+            </phrase>
+        </phrase_list>
+    </dialog>
+	<dialog id="mar_smart_terrain_base_barman_background">
+		<phrase_list>
+			<phrase id="0">
+				<text>dm_dialog_character_history</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>marsh_stalker_barman_background</text>
+			</phrase>
+		</phrase_list>
+	</dialog>
+    <!------------------- marsh_stalker_tech -------------------->
+    <dialog id="marsh_stalker_tech_start">
+        <phrase_list>
+            <phrase id="0">
+                <text>marsh_stalker_tech_start_1</text>
+            </phrase>
+        </phrase_list>
+    </dialog>
+	<dialog id="mar_smart_terrain_base_tech_background">
+		<phrase_list>
+			<phrase id="0">
+				<text>dm_dialog_character_history</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>marsh_stalker_tech_background</text>
+			</phrase>
+		</phrase_list>
+	</dialog>
+	<!------------------ marsh_stalker_leader ------------------------>
+    <dialog id="mar_smart_terrain_base_leader_background">
+        <phrase_list>
+			<phrase id="0">
+				<text>dm_dialog_character_history</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>marsh_stalker_leader_background</text>
+			</phrase>
+        </phrase_list>
+    </dialog>
+	<dialog id="mar_smart_terrain_base_leader_csky_history">
+		<phrase_list>
+			<phrase id="0">
+				<text>marsh_csky_history_ask1</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>marsh_csky_history_ask2</text>
+				<next>100</next>
+			</phrase>
+			
+			<phrase id="2">
+				<text>marsh_csky_history_destroyed1</text>
+				<next>22</next>
+			</phrase>
+			<phrase id="22">
+				<text>marsh_csky_history_destroyed2</text>
+				<next>100</next>
+			</phrase>
+
+			<phrase id="99">
+				<text>dm_universal_actor_exit</text>
+			</phrase>
+			
+			<phrase id="100">
+				<text></text>
+				<next>101</next>
+			</phrase>
+			<phrase id="101">
+				<text></text>
+				<next>2</next>
+				<next>99</next>
+			</phrase>
+		</phrase_list>
+	</dialog>
+    <!----------------------------- mar_smart_terrain_base_doctor --------->
+    <dialog id="mar_smart_terrain_base_doctor_start">
+        <phrase_list>
+            <phrase id="0">
+                <text>mar_smart_terrain_base_doctor_start_1</text>
+            </phrase>
+        </phrase_list>
+    </dialog>
+    <dialog id="mar_smart_terrain_base_doctor_need_health_care">
+        <phrase_list>
+            <phrase id="11">
+                <text>mar_smart_terrain_base_doctor_need_health_care_11</text>
+                <action>dialogs.medic_magic_potion</action>
+                <next>111</next>
+            </phrase>
+            <phrase id="111">
+                <text>mar_smart_terrain_base_doctor_need_health_care_111</text>
+            </phrase>
+            <phrase id="1">
+                <text>mar_smart_terrain_base_doctor_need_health_care_1</text>
+                <precondition>dialogs.actor_needs_bless</precondition>
+                <next>11</next>
+            </phrase>
+            <phrase id="2">
+                <text>mar_smart_terrain_base_doctor_need_health_care_2</text>
+                <precondition>dialogs.actor_is_damn_healthy</precondition>
+            </phrase>
+            <phrase id="0">
+                <text>mar_smart_terrain_base_doctor_need_health_care_0</text>
+                <next>1</next>
+                <next>2</next>
+            </phrase>
+        </phrase_list>
+    </dialog>
+	<dialog id="mar_smart_terrain_base_doctor_background">
+		<phrase_list>
+			<phrase id="0">
+				<text>dm_dialog_character_history</text>
+				<next>1</next>
+			</phrase>
+			<phrase id="1">
+				<text>marsh_stalker_medic_background</text>
+			</phrase>
+		</phrase_list>
+	</dialog>
+    <!----------------------------- mar_smart_terrain_base_stalker_guide_marsh --------->
+    <dialog id="cit_doctor_hello_dialog">
+        <dont_has_info>story_mode_disabled</dont_has_info>
+        <phrase_list>
+            <phrase id="2">
+                <text></text>
+                <has_info>cit_jail_doctor_pryp_task</has_info>
+                <next>21</next>
+            </phrase>
+            <phrase id="1">
+                <text></text>
+                <dont_has_info>cit_jail_doctor_pryp_task</dont_has_info>
+                <next>11</next>
+            </phrase>
+            <phrase id="21">
+                <text>cit_doctor_hello_dialog_21</text>
+            </phrase>
+            <phrase id="11">
+                <text>cit_doctor_hello_dialog_11</text>
+            </phrase>
+            <phrase id="0">
+                <text></text>
+                <next>1</next>
+                <next>2</next>
+            </phrase>
+        </phrase_list>
+    </dialog>
+    <dialog id="cit_doctor_main_dialog">
+		<dont_has_info>story_mode_disabled</dont_has_info>
+        <dont_has_info>cit_jail_doctor_pryp_task</dont_has_info>
+        <phrase_list>
+            <phrase id="6">
+                <text></text>
+                <give_info>cit_doctor_meet_conclusion_info</give_info>
+            </phrase>
+            <phrase id="0">
+                <text>cit_doctor_main_dialog_0</text>
+                <next>1</next>
+            </phrase>
+            <phrase id="1">
+                <text>cit_doctor_main_dialog_1</text>
+                <give_info>cit_fail_first_task</give_info>
+                <next>11</next>
+            </phrase>
+            <phrase id="11">
+                <text>cit_doctor_main_dialog_11</text>
+                <next>2</next>
+            </phrase>
+            <phrase id="2">
+                <text>cit_doctor_main_dialog_2</text>
+                <next>21</next>
+            </phrase>
+            <phrase id="21">
+                <text>cit_doctor_main_dialog_21</text>
+                <next>3</next>
+            </phrase>
+            <phrase id="3">
+                <text>cit_doctor_main_dialog_3</text>
+                <next>31</next>
+            </phrase>
+            <phrase id="31">
+                <text>cit_doctor_main_dialog_31</text>
+                <next>4</next>
+            </phrase>
+            <phrase id="41">
+                <text>cit_doctor_main_dialog_41</text>
+                <next>5</next>
+            </phrase>
+            <phrase id="5">
+                <text>cit_doctor_main_dialog_5</text>
+                <give_info>cit_doctor_meet_conclusion_info</give_info>
+            </phrase>
+            <phrase id="4">
+                <text>cit_doctor_main_dialog_4</text>
+                <action>dialogs_marsh.take_key</action>
+                <give_info>cit_jail_doctor_pryp_task</give_info>
+                <give_info>mar_doctor_found</give_info>
+                <next>41</next>
+            </phrase>
+        </phrase_list>
+    </dialog>
+</game_dialogs>

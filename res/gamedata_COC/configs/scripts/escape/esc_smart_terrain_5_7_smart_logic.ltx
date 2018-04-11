@@ -1,0 +1,93 @@
+;camping
+[logic@esc_smart_terrain_5_7_camp_work_1]
+active = animpoint@esc_smart_terrain_5_7_camp_work_1
+suitable = {!surge_started} true
+prior = 45
+
+[logic@esc_smart_terrain_5_7_camp_work_2]
+active = animpoint@esc_smart_terrain_5_7_camp_work_2
+suitable = {!surge_started} true
+prior = 45
+
+[logic@esc_smart_terrain_5_7_camp_work_3]
+active = animpoint@esc_smart_terrain_5_7_camp_work_3
+suitable = {!surge_started} true
+prior = 45
+
+[logic@esc_smart_terrain_5_7_camp_work_4]
+active = animpoint@esc_smart_terrain_5_7_camp_work_4
+suitable = {!surge_started} true
+prior = 45
+
+[logic@esc_smart_terrain_5_7_camp_work_5]
+active = animpoint@esc_smart_terrain_5_7_camp_work_5
+suitable = {!surge_started} true
+prior = 45
+
+
+[animpoint@esc_smart_terrain_5_7_camp_work_1]
+cover_name = esc_smart_terrain_5_7_animpoint_kamp1
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@esc_smart_terrain_5_7_camp_work_2]
+cover_name = esc_smart_terrain_5_7_animpoint_kamp2
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@esc_smart_terrain_5_7_camp_work_3]
+cover_name = esc_smart_terrain_5_7_animpoint_kamp3
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@esc_smart_terrain_5_7_camp_work_4]
+cover_name = esc_smart_terrain_5_7_animpoint_kamp4
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@esc_smart_terrain_5_7_camp_work_5]
+cover_name = esc_smart_terrain_5_7_animpoint_kamp5
+use_camp = true
+turn_on_campfire = true
+
+;loner mechanic
+[logic@esc_smart_terrain_5_7_loner_mechanic]
+suitable = {=check_npc_name(esc_smart_terrain_5_7_loner_mechanic_stalker)} true
+prior = 200
+active = animpoint@stand
+level_spot = mechanic
+can_select_weapon = false
+
+[animpoint@stand]
+cover_name = esc_smart_terrain_5_7_smart_cover_mechanic
+avail_animations = ward
+use_camp = false
+meet = meet@mechanic
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+reach_distance = 10
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet@mechanic]
+close_snd_hello = esc_mech_meet
+close_snd_bye = esc_mech_meet_bye
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_distance = 3
+use = {=actor_enemy} false, true
+meet_on_talking = false
+allow_break = false
+
+
+
+
+
+
+

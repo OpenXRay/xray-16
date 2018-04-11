@@ -1,0 +1,78 @@
+[disable]
+
+linear_factor         = 1
+angular_factor        = 1
+
+[collide]
+not_collide_parts = 1
+
+;--[destroyed part]---------------------------
+;---------------------------------------------
+[destroyed]
+
+dynamics\vehicles\veh_Zaz\part\veh_zaz_u_01_part1
+dynamics\vehicles\veh_Zaz\part\veh_zaz_u_01_part2
+dynamics\vehicles\veh_Zaz\part\veh_zaz_u_01_part3
+dynamics\vehicles\veh_Zaz\part\veh_zaz_u_01_part4
+dynamics\vehicles\veh_Zaz\part\veh_zaz_u_01_part5
+dynamics\vehicles\veh_Zaz\part\veh_zaz_u_01_part6
+
+[autoremove_parts]
+time					  = 30
+
+;---------------------------------------------
+
+;------ damage params ------------------------
+;---------------------------------------------
+[collision_damage]
+root                     = 0.0001
+
+;---------------------------------------------
+[particles]
+destroy_particles        = explosions\explosion_barrel
+
+;---------------------------------------------
+[particle_bones]
+root                     =  0.0, 0.0, 0.0
+
+;---------------------------------------------
+[sound]
+break_sound              =  material\metal_box\collide\big_metal_2
+
+;---------------------------------------------
+[damage_bones]
+
+;bone_name               = <hit_scale>,<-1>,<wound_scale>
+;<hit_scale>             - коэфф. изменения хита (уменьшения здоровья)
+;<wound_scale>           - коэфф. изменения величины открытой раны - незадействован
+
+;---------------------------------------------
+
+default                  = 1.0, -1, 0.0
+
+[immunities]
+burn_immunity         	= 0.5       ;коэффициенты иммунитета
+strike_immunity       	= 0.1
+shock_immunity        	= 0.0
+wound_immunity        	= 0.01
+radiation_immunity    	= 0.0
+telepatic_immunity    	= 0.0
+chemical_burn_immunity 	= 0.0
+explosion_immunity    	= 0.5
+fire_wound_immunity   	= 0.001
+
+;-------------------------------------------------------------------------------
+;--- impulse_transition --------------------------------------------------------
+;-------------------------------------------------------------------------------
+
+[impulse_transition_to_parts]
+random_min               = 10.0    ; величина случайно направленного импульса пропорционально массе нового объекта
+random_hit_imp           = 1.0     ; величина случайно направленного импульса пропорционально разрушающему хиту
+;ref_bone                          ; кость из по которой определяется скорость для частей у который связь не задана, по умолчанию рут
+imp_transition_factor    = 1.0     ; фактор с которым прикладывается хит по исходному объекту ко всем частям 
+lv_transition_factor     = 0.5     ; коэффициент передачи линейной скорости
+av_transition_factor     = 0.5     ; коэффициент передачи угловой скорости
+
+;-------------------------------------------------------------------------------
+;------ End params -------------------------------------------------------------
+;-------------------------------------------------------------------------------

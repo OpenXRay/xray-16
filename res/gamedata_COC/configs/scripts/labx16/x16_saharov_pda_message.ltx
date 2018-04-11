@@ -1,0 +1,10 @@
+[logic]
+active = sr_idle
+
+[sr_idle]
+on_actor_inside = {-story_mode_disabled -yan_find_laboratory_end} sr_idle@2 %+yan_find_laboratory_end =yan_saharov_message(1)%
+
+[sr_idle@2]
+on_timer = 12000 | sr_idle@nil %+yantar_vasilyev_info =yan_saharov_message(2)%
+
+[sr_idle@nil]

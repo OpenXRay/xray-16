@@ -1,0 +1,166 @@
+;--------------------------------------------------------------------------------------------------
+; FIND WEAPON FOR NIMBLE TASK-
+
+[esc_2_12_stalker_nimble_task_1]
+icon = ui_inGame2_Osobiy_zakaz
+prior = 35
+storyline = false
+title = esc_2_12_stalker_nimble_task_1_name
+title_functor = general_fetch_task
+descr = esc_2_12_stalker_nimble_task_1_text
+descr_functor = general_fetch_task
+job_descr = esc_2_12_stalker_nimble_task_1_about
+fetch_descr = esc_2_12_stalker_nimble_task_1_fetch_about
+fetch_func = %=setup_weapon_fetch_task(esc_2_12_stalker_nimble_task_1_fetch)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = esc_2_12_stalker_nimble_task_1_fetch_finish
+repeat_timeout = 172800
+on_complete = %=complete_task_inc_goodwill(50:stalker) =reward_item_cost_mult_and_remove(esc_2_12_stalker_nimble_task_1_fetch:1.2) =reward_stash(true) =inc_task_stage(esc_2_12_stalker_nimble_task_1)%
+on_fail = %=fail_task_dec_goodwill(25:stalker)%
+
+
+;--------------------------------------------------------------------------------------------------
+; ASSAULT BANDIT BASE FOR SIDOROVICH TASK-
+
+[esc_m_trader_task_1]
+icon = ui_inGame2_Issledovanie_anomaliy
+prior = 25
+storyline = false
+title = esc_m_trader_task_1_name
+descr = esc_m_trader_task_1_text
+job_descr = esc_m_trader_task_1_about
+task_complete_descr = esc_m_trader_task_1_finish
+status_functor = check_specific_smart_under_faction_control_staged
+status_functor_params = esc_smart_terrain_7_11, bandit
+stage_complete = 1
+repeat_timeout = 86400
+target_functor = esc_m_trader_task_target
+on_complete = %=reward_random_money(5000:6000) =reward_stash(true) =inc_task_stage(esc_m_trader_task_1) =complete_task_inc_goodwill(50:trader) =remove_task_companion(esc_2_12_stalker_fanat_squad)%
+on_fail = %=remove_task_companion(esc_2_12_stalker_fanat_squad) =fail_task_dec_goodwill(25:stalker)%
+on_cancel = %=remove_task_companion(esc_2_12_stalker_fanat_squad)%
+precondition = {=sim_avail(esc_smart_terrain_7_11) =smart_stayed_squad_count_ge_by_faction(esc_smart_terrain_7_11:1:nil:false:bandit)} true, false
+condlist_0 = {!sim_avail(esc_smart_terrain_7_11)} fail
+
+
+;--------------------------------------------------------------------------------------------------
+; ASSASSINATION FOR SIDOROVICH TASK-
+
+[esc_m_trader_task_2]
+icon = ui_inGame2_Odin_vistrel
+prior = 35
+storyline = false
+title = esc_m_trader_task_2_name
+descr = esc_m_trader_task_2_text
+job_descr = esc_m_trader_task_2_about
+task_complete_descr = esc_m_trader_task_2_finish
+repeat_timeout = 172800
+status_functor = bounty_task
+target_functor = general_bounty_task
+stage_complete = 1
+on_job_descr = %=on_init_bounty_hunt(esc_m_trader_task_2:stalker:killer:bandit)%
+on_complete = %=reward_random_money(9000:10000) =reward_stash(true) =inc_task_stage(esc_m_trader_task_2) =complete_task_inc_goodwill(50:trader)%
+precondition = true
+
+
+;--------------------------------------------------------------------------------------------------
+; ELIMINATE MUTANTS FOR WOLF TASK-
+
+[esc_2_12_stalker_wolf_task_1]
+icon = ui_inGame2_Nochnaya_ohota
+prior = 35
+storyline = false
+title = esc_2_12_stalker_wolf_task_1_name
+descr = esc_2_12_stalker_wolf_task_1_text
+job_descr = esc_2_12_stalker_wolf_task_1_about
+task_complete_descr = esc_2_12_stalker_wolf_task_1_finish
+target_functor = general_under_faction_control
+status_functor = check_smart_under_faction_control_staged
+status_functor_params = monster
+on_init = %=find_smart_under_faction_control(esc_2_12_stalker_wolf_task_1_id:monster)%
+precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction(1:nil:false:monster)} true, false
+repeat_timeout = 86400
+stage_complete = 1
+on_complete = %=complete_task_inc_goodwill(50:stalker) =reward_random_money(3500:4500) =reward_stash(true) =inc_task_stage(esc_2_12_stalker_wolf_task_1) =pstor_reset(esc_2_12_stalker_wolf_task_1_id) =pstor_reset(esc_2_12_stalker_wolf_task_1_target_id)%
+on_fail = %=pstor_reset(esc_2_12_stalker_wolf_task_1_id) =pstor_reset(esc_2_12_stalker_wolf_task_1_target_id) =fail_task_dec_goodwill(25:stalker)%
+on_cancel = %=pstor_reset(esc_2_12_stalker_wolf_task_1_id) =pstor_reset(esc_2_12_stalker_wolf_task_1_target_id)%
+
+;--------------------------------------------------------------------------------------------------
+; FIND LEVEL 1 TOOLS FOR XENOTECH TASK-
+
+[esc_smart_terrain_5_7_loner_mechanic_stalker_task_1]
+icon = ui_inGame2_Instrumenti
+prior = 35
+storyline = false
+title = esc_smart_terrain_5_7_loner_mechanic_stalker_task_1_name
+title_functor = general_fetch_task
+descr = esc_smart_terrain_5_7_loner_mechanic_stalker_task_1_text
+descr_functor = general_fetch_task
+job_descr = esc_smart_terrain_5_7_loner_mechanic_stalker_task_1_about
+fetch_descr = esc_smart_terrain_5_7_loner_mechanic_stalker_task_1_fetch_about
+fetch_func = %=setup_generic_fetch_task(esc_smart_terrain_5_7_loner_mechanic_stalker_task_1_fetch:1:itm_repairkit_tier_1)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = esc_smart_terrain_5_7_loner_mechanic_stalker_task_1_fetch_finish
+on_complete = %+esc_smart_terrain_5_7_loner_mechanic_stalker_upgrade_tier_1 =complete_task_inc_goodwill(50:stalker) =reward_item_cost_mult_and_remove(esc_smart_terrain_5_7_loner_mechanic_stalker_task_1_fetch:1.0) =inc_task_stage(esc_smart_terrain_5_7_loner_mechanic_stalker_task_1)%
+precondition = {-esc_smart_terrain_5_7_loner_mechanic_stalker_upgrade_tier_1} true, false
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND LEVEL 2 TOOLS FOR XENOTECH TASK-
+
+[esc_smart_terrain_5_7_loner_mechanic_stalker_task_2]
+icon = ui_inGame2_Instrumenti
+prior = 35
+storyline = false
+title = esc_smart_terrain_5_7_loner_mechanic_stalker_task_2_name
+title_functor = general_fetch_task
+descr = esc_smart_terrain_5_7_loner_mechanic_stalker_task_2_text
+descr_functor = general_fetch_task
+job_descr = esc_smart_terrain_5_7_loner_mechanic_stalker_task_2_about
+fetch_descr = esc_smart_terrain_5_7_loner_mechanic_stalker_task_2_fetch_about
+fetch_func = %=setup_generic_fetch_task(esc_smart_terrain_5_7_loner_mechanic_stalker_task_2_fetch:1:itm_repairkit_tier_2)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = esc_smart_terrain_5_7_loner_mechanic_stalker_task_2_fetch_finish
+on_complete = %+esc_smart_terrain_5_7_loner_mechanic_stalker_upgrade_tier_2 =complete_task_inc_goodwill(50:stalker) =reward_item_cost_mult_and_remove(esc_smart_terrain_5_7_loner_mechanic_stalker_task_2_fetch:1.0) =inc_task_stage(esc_smart_terrain_5_7_loner_mechanic_stalker_task_2)%
+precondition = {+esc_smart_terrain_5_7_loner_mechanic_stalker_upgrade_tier_1 -esc_smart_terrain_5_7_loner_mechanic_stalker_upgrade_tier_2} true, false
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND LEVEL 3 TOOLS FOR XENOTECH TASK-
+
+[esc_smart_terrain_5_7_loner_mechanic_stalker_task_3]
+icon = ui_inGame2_Instrumenti
+prior = 35
+storyline = false
+title = esc_smart_terrain_5_7_loner_mechanic_stalker_task_3_name
+title_functor = general_fetch_task
+descr = esc_smart_terrain_5_7_loner_mechanic_stalker_task_3_text
+descr_functor = general_fetch_task
+job_descr = esc_smart_terrain_5_7_loner_mechanic_stalker_task_3_about
+fetch_descr = esc_smart_terrain_5_7_loner_mechanic_stalker_task_3_fetch_about
+fetch_func = %=setup_generic_fetch_task(esc_smart_terrain_5_7_loner_mechanic_stalker_task_3_fetch:1:itm_repairkit_tier_3)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = esc_smart_terrain_5_7_loner_mechanic_stalker_task_3_fetch_finish
+on_complete = %+esc_smart_terrain_5_7_loner_mechanic_stalker_upgrade_tier_3 =complete_task_inc_goodwill(50:stalker) =reward_item_cost_mult_and_remove(esc_smart_terrain_5_7_loner_mechanic_stalker_task_3_fetch:1.0) =inc_task_stage(esc_smart_terrain_5_7_loner_mechanic_stalker_task_3)%
+precondition = {+esc_smart_terrain_5_7_loner_mechanic_stalker_upgrade_tier_2 -esc_smart_terrain_5_7_loner_mechanic_stalker_upgrade_tier_3} true, false
+
+
+;--------------------------------------------------------------------------------------------------
+; WAIT FOR NIMBLE ORDER TASK-
+
+[esc_2_12_nimble_items]
+icon = ui_inGame2_Osobiy_zakaz
+prior = 35
+storyline = false
+title = {-esc_2_12_order_ready_task} esc_2_12_nimble_items_wait_order_name, esc_2_12_nimble_items_get_order_name
+descr = {-esc_2_12_order_ready_task} esc_2_12_nimble_items_wait_order_text, esc_2_12_nimble_items_get_order_text
+target = {-esc_2_12_order_ready_task} nil, esc_2_12_stalker_nimble
+condlist_0 = {-esc_2_12_order_in_process -esc_2_12_order_refused} complete
+condlist_1 = {-esc_2_12_order_in_process +esc_2_12_order_refused} reversed

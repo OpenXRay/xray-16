@@ -1,0 +1,37 @@
+[logic]
+active = sr_idle@check_story
+
+[sr_idle@check_story]
+on_info = {+story_mode_disabled} sr_idle@nil, sr_psy_antenna@no_helmet
+
+[sr_psy_antenna@no_helmet]
+eff_intensity = 100
+hit_intensity = 100
+on_info = {+bar_deactivate_radar_done} sr_idle@nil
+on_info2 = {=actor_community(actor_monolith)} sr_idle@nil, {=actor_community(actor_zombied)} sr_idle@nil
+on_info3 = {=actor_has_item(good_psy_helmet) =rad_pass_time} sr_psy_antenna@good_helmet, {=actor_has_item(bad_psy_helmet) =rad_pass_time} sr_psy_antenna@bad_helmet
+phantom_prob = 40
+min_phantom_idle = 3000
+max_phantom_idle = 5000
+
+[sr_psy_antenna@bad_helmet]
+eff_intensity = 100
+hit_intensity = 30
+on_info = {+bar_deactivate_radar_done} sr_idle@nil
+on_info2 = {=actor_community(actor_monolith)} sr_idle@nil, {=actor_community(actor_zombied)} sr_idle@nil
+on_info3 = {=actor_has_item(good_psy_helmet)} sr_psy_antenna@good_helmet, {!actor_has_item(bad_psy_helmet)} sr_psy_antenna@no_helmet
+phantom_prob = 30
+min_phantom_idle = 3000
+max_phantom_idle = 5000
+
+[sr_psy_antenna@good_helmet]
+eff_intensity = 100
+hit_intensity = 20
+on_info = {+bar_deactivate_radar_done} sr_idle@nil
+on_info2 = {=actor_community(actor_monolith)} sr_idle@nil, {=actor_community(actor_zombied)} sr_idle@nil
+on_info3 = {=actor_has_item(bad_psy_helmet)} sr_psy_antenna@bad_helmet, {!actor_has_item(good_psy_helmet)} sr_psy_antenna@no_helmet
+phantom_prob = 20
+min_phantom_idle = 3000
+max_phantom_idle = 5000
+
+[sr_idle@nil]

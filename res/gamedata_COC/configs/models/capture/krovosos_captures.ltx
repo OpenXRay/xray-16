@@ -1,0 +1,42 @@
+\;-------------------------------------------------------------------------------
+;------ disable params ---------------------------------------------------------
+
+[disable]
+linear_factor   = 1.0
+angular_factor    = 1.0
+
+;-------------------------------------------------------------------------------
+;------ particle bones ---------------------------------------------------------
+
+[particle_bones]
+bip01_head        = 0,0,0
+bip01_spine       = 0,0,0
+bip01_r_thigh     = 0,0,0
+bip01_l_thigh     = 0,0,0
+bip01_l_upperarm  = 0,0,0
+bip01_r_upperarm  = 0,0,0
+
+;-------------------------------------------------------------------------------
+;------ foot bones -------------------------------------------------------------
+
+[foot_bones]
+front_left        = bip01_l_toe1
+front_right       = bip01_r_toe1
+
+;-------------------------------------------------------------------------------
+;------ capture params ---------------------------------------------------------
+
+[capture]
+bone        = bip01_r_finger2         ; bone for capture
+distance      = 0.05        ; distance - less this distance between bone and capture taget object is captured
+time_limit        = 5               ; max time for trying to capture object "sec"
+pull_force        = 12000000          ; max force used to bring the taget to capture bone
+pull_distance     = 5        ; max distance taget can be puled
+velocity_scale    = 1         ; velocity scale for pulling 1- normal
+capture_force     = 65000000          ; max force for holding taget
+
+[capture_used_bones]
+bones = bip01_r_calf, bip01_l_calf, bip01_r_forearm, bip01_l_forearm
+
+;-------------------------------------------------------------------------------
+;------ End params -------------------------------------------------------------

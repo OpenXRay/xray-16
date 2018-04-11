@@ -1,0 +1,18 @@
+[smart_terrain]
+squad_id = 22
+max_population = 1
+respawn_params = respawn@jup_b32
+respawn_idle = 86400
+ 
+
+[respawn@jup_b32]
+spawn_stalker@advanced
+spawn_zombied
+
+[spawn_zombied]
+spawn_squads = zombied_sim_squad_novice, zombied_sim_squad_advanced, zombied_sim_squad_veteran
+spawn_num = {-bar_deactivate_radar_done} 1, 0
+
+[spawn_stalker@advanced]
+spawn_squads = stalker_sim_squad_advanced, ecolog_sim_squad_advanced, freedom_sim_squad_advanced
+spawn_num = {+bar_deactivate_radar_done} 1, 0

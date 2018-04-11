@@ -1,0 +1,132 @@
+#include "profiles\profiles.ltx"
+
+[trader]
+buy_condition                                      = buy_condition_generic
+buy_item_condition_factor                          = 0.7
+buy_supplies                                       = {=actor_goodwill_ge(trader:1500)} supplies_special, supplies_generic
+discounts                                          = {=actor_goodwill_ge(trader:1200)} discount_5, {=actor_goodwill_ge(trader:1000)} discount_4, {=actor_goodwill_ge(trader:800)} discount_3, {=actor_goodwill_ge(trader:600)} discount_2, {=actor_goodwill_ge(trader:400)} discount_1, {=actor_goodwill_ge(trader:200)} discount_0, discount_sid
+sell_condition                                     = sell_condition_generic
+
+[supplies_generic]
+;Weapons
+wpn_abakan                                         = 1, 0.1
+wpn_ak74                                           = 1, 0.5
+wpn_ak74u                                          = 1, 0.7
+wpn_binoc                                          = 1, 0.4
+wpn_fort                                           = 1, 0.7
+wpn_groza                                          = 1, 0.2
+wpn_knife                                          = 1, 0.4
+wpn_mine                                           = 8, 0.4
+wpn_mp5                                            = 1, 0.7
+wpn_pb                                             = 1, 0.7
+wpn_pkm                                            = 1, 0.1
+wpn_pm                                             = 1, 0.8
+wpn_protecta                                       = 1, 0.2
+wpn_spas12                                         = 1, 0.4
+wpn_svd                                            = 1, 0.05
+wpn_svu                                            = 1, 0.1
+wpn_toz34                                          = 1, 0.7
+wpn_val                                            = 1, 0.1
+wpn_vintorez                                       = 1, 0.1
+
+;Weapon Addons
+wpn_addon_grenade_launcher                         = 1, 0.3
+wpn_addon_grenade_launcher_m203                    = 1, 0.3
+wpn_addon_scope                                    = 1, 0.3
+wpn_addon_scope_susat                              = 1, 0.2
+wpn_addon_scope_susat_x1.6                         = 1, 0.2
+wpn_addon_scope_x2.7                               = 1, 0.2
+wpn_addon_silencer                                 = 1, 0.6
+
+;Ammo
+ammo_11.43x23_fmj                                  = 4, 0.7
+ammo_11.43x23_hydro                                = 4, 0.2
+ammo_12x70_buck                                    = 4, 0.7
+ammo_12x76_zhekan                                  = 4, 0.2
+ammo_5.45x39_ap                                    = 4, 0.2
+ammo_5.45x39_fmj                                   = 4, 0.7
+ammo_5.56x45_ap                                    = 4, 0.2
+ammo_5.56x45_ss190                                 = 4, 0.7
+ammo_7.62x54_7h1                                   = 4, 0.2
+ammo_9x18_fmj                                      = 4, 0.7
+ammo_9x18_pmm                                      = 4, 0.2
+ammo_9x19_fmj                                      = 4, 0.7
+ammo_9x19_pbp                                      = 4, 0.2
+ammo_9x39_ap                                       = 4, 0.2
+ammo_9x39_pab9                                     = 4, 0.6
+ammo_m209                                          = 4, 0.4
+ammo_og-7b                                         = 4, 0.4
+ammo_pkm_100                                       = 4, 0.4
+ammo_vog-25                                        = 4, 0.4
+
+;Grenades
+grenade_f1                                         = 3, 0.5
+grenade_gd-05                                      = 3, 0.5
+
+;Devices
+detector_simple                                    = 1, 1
+
+;Medical
+medkit                                             = 5, 0.5
+antirad                                            = 3, 0.5
+bandage                                            = 3, 0.5
+
+;Food
+bread                                              = 4, 0.4
+conserva                                           = 4, 0.4
+kolbasa                                            = 4, 0.4
+energy_drink                                       = 4, 0.4
+vodka                                              = 4, 0.4
+
+;Misc
+itm_sleepbag                                       = 1, 0.5
+itm_gunsmith_toolkit                               = 1, 0.5
+itm_outfit_toolkit                                 = 1, 0.5
+wood_stove										   = 1, 0.3
+charcoal										   = 2, 0.4
+equ_backpack									   = 4, 0.5
+equ_military_pack								   = 1, 0.01
+equ_small_pack									   = 1, 0.4
+
+;Outfits
+merc_outfit                                        = 1, 0.1
+specops_outfit                                     = 1, 0.2
+stalker_outfit                                     = 1, 0.8
+nbc_outfit                                         = 1, 0.3
+novice_2_outfit                                    = 1, 0.6
+novice_outfit                                      = 1, 1
+radiation_outfit                                   = 1, 0.1
+scientific_heavy_outfit                            = 1, 0.1
+scientific_outfit                                  = 1, 0.3
+
+;Helmets
+helm_facemask                                      = 1, 0.8
+helm_hardhat                                       = 1, 0.7
+helm_respirator                                    = 1, 0.4
+helm_respirator_2                                  = 1, 0.5
+helm_respirator_gp5                                = 1, 0.3
+helm_respirator_half                               = 1, 0.5
+
+
+[supplies_special]:supplies_generic
+
+;Outfits
+exo_outfit                                         = 1, 0.3
+exo_proto_outfit                                   = 1, 0.1
+
+;Helmets
+helm_battle                                        = 1, 0.3
+helm_facemask                                      = 1, 0.9
+helm_hardhat                                       = 1, 0.8
+helm_m40                                           = 1, 0.6
+helm_protective                                    = 1, 0.3
+helm_respirator                                    = 1, 0.6
+helm_respirator_2                                  = 1, 0.8
+helm_respirator_gp5                                = 1, 0.4
+helm_respirator_half                               = 1, 0.7
+helm_tactic                                        = 1, 0.3
+helm_tactic_2                                      = 1, 0.1
+
+wpn_rg-6                                           = 1, 0.15
+wpn_rpg7                                           = 1, 0.15
+ammo_og-7b                                         = 4, 0.2

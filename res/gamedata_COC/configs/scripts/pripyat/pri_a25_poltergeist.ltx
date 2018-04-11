@@ -1,0 +1,69 @@
+[logic@pri_a25_poltergeist_1]
+suitable = {=target_squad_name(pri_a25_poltergeist_1_squad)} true
+monster_job = true
+prior = 70
+active = mob_walker@1
+
+[mob_walker@1]
+path_walk = pri_a25_poltergeist_2_spawn_point
+out_restr = pri_a25_poltergeist_out_restr
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {=npc_in_zone(pri_a25_poltergeist_2_spawn_restrictor)} mob_walker@1_2
+on_info2 = {+pri_a25_hit_barrier_objects} %=destroy_object%
+
+[mob_walker@1_2]
+path_walk = pri_a25_poltergeist_1_spawn_point
+out_restr = pri_a25_poltergeist_out_restr
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {=npc_in_zone(pri_a25_poltergeist_1_spawn_restrictor)} mob_walker@1
+on_info2 = {+pri_a25_hit_barrier_objects} %=destroy_object%
+
+;-----------------------------------
+
+[logic@pri_a25_poltergeist_2]
+suitable = {=target_squad_name(pri_a25_poltergeist_2_squad)} true
+monster_job = true
+prior = 70
+active = mob_walker@2
+on_death = death
+
+[mob_walker@2]
+path_walk = pri_a25_poltergeist_1_spawn_point
+out_restr = pri_a25_poltergeist_out_restr
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {=npc_in_zone(pri_a25_poltergeist_1_spawn_restrictor)} mob_walker@2_2
+on_info2 = {+pri_a25_hit_barrier_objects} %=destroy_object%
+
+[mob_walker@2_2]
+path_walk = pri_a25_poltergeist_2_spawn_point
+out_restr = pri_a25_poltergeist_out_restr
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {=npc_in_zone(pri_a25_poltergeist_2_spawn_restrictor)} mob_walker@2
+on_info2 = {+pri_a25_hit_barrier_objects} %=destroy_object%
+
+
+[death]
+on_info = %+pri_a25_poltergeist_2_dead%
+
+;-----------------------------------
+
+[logic@pri_a25_poltergeist_3]
+suitable = {=target_squad_name(pri_a25_poltergeist_3_squad)} true
+monster_job = true
+prior = 70
+active = mob_walker@3
+
+[mob_walker@3]
+path_walk = pri_a25_poltergeist_1_spawn_point
+out_restr = pri_a25_poltergeist_out_restr
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {=npc_in_zone(pri_a25_poltergeist_1_spawn_restrictor)} mob_walker@3_2
+on_info2 = {+pri_a25_hit_barrier_objects} %=destroy_object%
+
+[mob_walker@3_2]
+path_walk = pri_a25_poltergeist_2_spawn_point
+out_restr = pri_a25_poltergeist_out_restr
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {=npc_in_zone(pri_a25_poltergeist_2_spawn_restrictor)} mob_walker@3
+on_info2 = {+pri_a25_hit_barrier_objects} %=destroy_object%
+

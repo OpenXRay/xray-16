@@ -1,0 +1,35 @@
+[logic@jup_b220_trapper]
+suitable = {=check_npc_name(jup_b220_trapper)} true
+active = animpoint@default
+prior = 200
+
+[animpoint@default]
+cover_name = jup_a6_animpoint_trapper
+avail_animations = ward_noweap		;animpoint_sit_normal
+use_camp = false
+meet = meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_a6_sr_noweap
+on_info = {-jup_b212_jupiter_chimera_hunt_mentioned -jup_b212_jupiter_chimera_hunt_told +jup_b220_trapper_about_retire_told +jup_b208_burers_hunt_done -jup_b212_trapper_found_chimera_play =dist_to_actor_ge(100)} %=play_sound(jup_b212_trapper_found_chimera) +jup_b212_jupiter_chimera_hunt_mentioned%
+on_info2 = {!npc_in_zone(jup_a6_trapper_zone)} %=teleport_npc(jup_a6_trapper_walk)%
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet]
+close_snd_hello = jup_b220_trapper_greeting
+close_snd_bye 	= jup_b220_trapper_farewell
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_distance = 3
+use = {=actor_enemy} false, true
+allow_break = false
+trade_enable = false
+meet_dialog	= jup_b220_trapper_start
+meet_on_talking = false

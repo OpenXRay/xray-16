@@ -1,0 +1,94 @@
+; сюда «улуса не переводить
+[animpoint@zulus_basic]
+cover_name = jup_b15_sc_zulus
+avail_animations = jup_b15_zulus_sit_idle
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info33 = {!npc_in_zone(jup_b15_sr_light)} %=teleport_npc(jup_a6_jup_b218_squad_member_arrive_walk)%
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+use_camp = false
+meet = meet
+out_restr = jup_a6_sr_noweap_zulus
+reach_distance = 2
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[logic@stalker_zulus]
+suitable = {=check_npc_name(jup_b15_zulus)} true
+prior = 200
+active = animpoint@zulus_home
+
+[animpoint@zulus_home]:animpoint@zulus_basic
+reach_movement = sprint
+on_actor_in_zone = jup_b15_logic | {+jup_b218_gather_squad} animpoint@b15, {+jup_b218_pripyat_group_gathering} animpoint@wait
+on_info = {-jup_b15_zulus_has_vodka} %=spawn_object_in(vodka:jup_b15_zulus) +jup_b15_zulus_has_vodka%
+
+[animpoint@b15]:animpoint@zulus_basic
+on_info = {+jup_b15_come_to_und_told} animpoint@drink
+on_actor_not_in_zone = jup_b15_logic | animpoint@zulus_home
+
+[animpoint@drink]:animpoint@zulus_basic
+avail_animations = jup_b15_zulus_sit_idle_short
+on_info2 = {+jup_b15_actor_drink} animpoint@drink_anim
+on_info3 = {+jup_b15_cameff_end} animpoint@wait %=play_sound(jup_b15_zulus_ready) +jup_b218_pripyat_group_gathering%
+on_info4 = {-jup_b15_actor_drink +jup_b15_zulus_drink_anim_info} %-jup_b15_zulus_drink_anim_info%
+meet = meet@drink
+
+[animpoint@drink_anim]:animpoint@zulus_basic
+avail_animations = jup_b15_zulus_sit_drink 
+on_info = {+jup_b15_zulus_drink_anim_info} animpoint@drink
+on_game_timer = 180 | {-jup_b15_zulus_drink_anim_info} %+jup_b15_zulus_drink_anim_info%
+meet = no_meet
+
+[animpoint@wait]:animpoint@zulus_basic
+on_info2  = {+jup_b218_vano_tp +jup_b218_pause_done -jup_b218_zulus_see_vano} animpoint@timer %+jup_b218_zulus_see_vano -jup_b218_pause_done%
+on_info3 = {+jup_b218_sokolov_tp +jup_b218_pause_done -jup_b218_zulus_see_sokolov} animpoint@timer %+jup_b218_zulus_see_sokolov -jup_b218_pause_done%
+on_info4 = {+jup_b218_monolith_fr_tp +jup_b218_pause_done -jup_b218_zulus_see_monolith} animpoint@timer %+jup_b218_zulus_see_monolith -jup_b218_pause_done%
+on_info5 = {+jup_b218_monolith_du_tp +jup_b218_pause_done -jup_b218_zulus_see_monolith} animpoint@timer %+jup_b218_zulus_see_monolith -jup_b218_pause_done%
+
+[animpoint@timer]:animpoint@zulus_basic
+on_game_timer = 50 | {+jup_b218_vano_tp -jup_b218_vano_tp_pause} animpoint@vano %+jup_b218_vano_tp_pause =enable_ui%, {+jup_b218_sokolov_tp -jup_b218_sokolov_tp_pause} animpoint@sokolov %+jup_b218_sokolov_tp_pause =enable_ui%, {+jup_b218_monolith_fr_tp -jup_b218_monolith_fr_tp_pause} animpoint@monolith %+jup_b218_monolith_fr_tp_pause =enable_ui%,  {+jup_b218_monolith_du_tp -jup_b218_monolith_du_tp_pause} animpoint@monolith %+jup_b218_monolith_du_tp_pause =enable_ui%
+
+[animpoint@vano]:animpoint@zulus_basic
+meet = meet@vano
+on_info2 = {+jup_b15_zulus_group_stalker_start_told} animpoint@wait
+
+[animpoint@sokolov]:animpoint@zulus_basic
+meet = meet@sokolov
+on_info2 = {+jup_b15_zulus_group_soldier_start_told} animpoint@wait
+
+[animpoint@monolith]:animpoint@zulus_basic
+meet = meet@monolith
+on_info2 = {+jup_b15_zulus_group_monolith_start_told} animpoint@wait
+
+[meet]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_distance = 3
+close_snd_hello = {+jup_b218_gather_squad} jup_b15_zulus_greeting, nil
+close_snd_bye   = nil
+use = {=actor_enemy} false, true
+allow_break = false
+trade_enable = false
+meet_on_talking = false
+
+[meet@drink]:meet
+use = {+jup_b15_can_talk} self, true
+allow_break = false
+
+[meet@vano]:meet
+use = {!actor_enemy} self
+meet_dialog     = jup_b15_zulus_group_stalker_start
+
+[meet@sokolov]:meet
+use = {!actor_enemy} self
+meet_dialog     = jup_b15_zulus_group_soldier_start
+
+[meet@monolith]:meet
+use = {!actor_enemy} self
+meet_dialog     = jup_b15_zulus_group_monolith_start

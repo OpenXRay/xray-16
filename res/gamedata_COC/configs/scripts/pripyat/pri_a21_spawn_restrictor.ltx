@@ -1,0 +1,38 @@
+[logic]
+active = nil;sr_idle@wait
+
+[sr_idle@wait]
+on_info = {+zat_a23_actor_has_gauss_rifle_documentation +pri_a20_talk_with_colonel_complete} sr_idle@chasovoi_recreate %=clear_smart_terrain(pri_a21_smart_terrain)%
+on_info2 = {+pri_a21_start} %+zat_a23_actor_has_gauss_rifle_documentation +pri_a20_talk_with_colonel_complete%
+
+[sr_idle@chasovoi_recreate]
+on_game_timer = 25 | {!squad_exist(pri_a21_chasovoi)} sr_idle@give_task %+pri_a21_task_start =create_squad(pri_a21_chasovoi:pri_a21_smart_terrain)%
+
+[sr_idle@give_task]
+on_info = {-pri_a21_task_give_from_a20 !actor_in_zone(pri_surge_hide_a16) -pri_a21_sound_koval_base_about_task} sr_idle@give_task_after_sound %+pri_a21_give_task_no_base =play_sound(pri_a21_colonel_give_sentry_task)%
+on_info2 = {+pri_a21_give_task_base} sr_idle@after %+pri_a21_colonel_give_sentry_task =give_task(pri_a21_find_sentry_task)%
+on_info3 = {+pri_a21_task_give_from_a20} sr_idle@after %+pri_a21_give_task_no_base +pri_a21_colonel_give_sentry_task =give_task(pri_a21_find_sentry_task)%
+
+[sr_idle@give_task_after_sound]
+on_game_timer = 120 | sr_idle@after %+pri_a21_colonel_give_sentry_task =give_task(pri_a21_find_sentry_task)%
+
+[sr_idle@after]
+on_info = {+pri_a21_chasovoi_dead =distance_to_obj_le(pri_a21_chasovoi_target:3)} sr_idle@wait_for_kontro %=create_squad(pri_a21_kontroler_squad:pri_a21_smart_terrain) +pri_a21_spawn_kontroler%
+
+[sr_idle@wait_for_kontro]
+on_info = {+pri_a21_from_kontroler_100_m -pri_a21_kill_kontroler} %=play_sound(pri_a21_actor_to_base_find_controller)%
+on_info2 = {+pri_a21_kontro_dead} sr_idle@task_done
+on_signal = sound_end | sr_idle@base_give_task_kill_kontro
+
+[sr_idle@base_give_task_kill_kontro]
+on_game_timer = 10 | %=play_sound(pri_a21_base_to_actor_terminate_controller)%
+on_signal = sound_end | sr_idle@task_done %+pri_a21_kill_kontroler%
+
+[sr_idle@task_done]
+on_signal = sound_end | sr_idle@timer %+pri_a21_cam_end%
+on_info = {+pri_a21_actor_talk_after_done} %=play_sound(pri_a21_base_to_actor_find_and_terminate_controller)%
+
+[sr_idle@timer]
+on_game_timer = 20 | sr_idle@nil %+pri_a21_cam_stop%
+
+[sr_idle@nil]

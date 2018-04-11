@@ -1,0 +1,34 @@
+[logic]
+active = ph_door@horror_knock
+
+[ph_door@horror_knock]
+locked = true
+closed = true
+on_info = {~60 =actor_in_zone(second_door_marker)} ph_door@horror_wait %=hit_npc(x18_point_knock:door:0:1500) =play_particle_on_path(hit_fx\hit_stucco_statik:dar_knock_points:70) =play_sound(trader_door_close_stop)%, ph_door@horror_silence
+on_info2 = {+dar_codelock2_unlock} ph_door@open %+dar_open_door2 =play_sound(trader_door_unlock)%
+tip_open = jup_b205_tip_door_closed
+tip_close = 
+
+[ph_door@horror_wait]
+locked = true
+closed = true
+on_timer = 2500| ph_door@horror_knock
+on_info = {+dar_codelock2_unlock} ph_door@open %+dar_open_door2 =play_sound(trader_door_unlock)%
+on_use = {+dar_codelock2_unlock} ph_door@open %+dar_door2_closed%
+tip_open = jup_b205_tip_door_closed
+tip_close = 
+
+[ph_door@horror_silence]
+locked = true
+closed = true
+on_timer = 2000| ph_door@horror_knock
+on_info = {+dar_codelock2_unlock} ph_door@open %+dar_open_door2 =play_sound(trader_door_unlock)%
+on_use = {+dar_codelock2_unlock} ph_door@open %+dar_door2_closed%
+tip_open = jup_b205_tip_door_closed
+tip_close = 
+
+[ph_door@open]
+locked = false
+closed = false
+tip_open = 
+tip_close = 

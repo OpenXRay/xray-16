@@ -1,0 +1,104 @@
+[m_phantom]:monster_base
+GroupControlSection		= spawn_group
+$spawn                  = "monsters\phantom"		; option for Level Editor
+spawn 	                = on	;
+cform                   = skeleton
+class                   = AI_PHANT
+rank					= 100
+visuals                 = monsters\phantom\pseudodog_0 ,monsters\phantom\tushkano_0, monsters\phantom\mutant_boar_0, monsters\phantom\krovosos_0, monsters\phantom\snork_0, monsters\phantom\zombi_0, monsters\phantom\flesh_0, monsters\phantom\karlik_0
+
+speed                   = 2.0
+angular_speed           = 3.5
+contact_hit				= 0.1
+
+ef_creature_type		= -1
+species					= arena_monstr
+
+script_binding  		= phantom_manager.bind
+
+; state BIRTH
+particles_birth 		= monsters\phantom_birth
+sound_birth 			= monsters\poltergeist\attack_hit_0
+; state FLY
+particles_fly	 		= monsters\phantom_fly
+sound_fly	 			= monsters\poltergeist\die_0
+; state CONTACT
+particles_contact 		= monsters\phantom_death
+sound_contact 			= monsters\poltergeist\hit_0
+; state SHOOT
+particles_shoot 		= monsters\phantom_death
+sound_shoot				= monsters\biting\def_0
+
+material				= creatures\phantom
+
+;------------------------------------------------------------------------
+; Influences
+;------------------------------------------------------------------------
+
+fire_max_distance			=	0
+fire_max_power				=	5
+fire_linear_factor			=	0
+fire_quadratic_factor		=	0.025
+
+psy_max_distance			=	0
+psy_max_power				=	5
+psy_linear_factor			=	0.05
+psy_quadratic_factor		=	0
+
+radiation_max_distance		=	3
+radiation_max_power			=	0.02
+radiation_linear_factor		=	1
+radiation_quadratic_factor	=	1
+
+[m_phantom_bloodsucker]:m_phantom
+visuals 				= monsters\phantom\krovosos_0
+script_binding  		= phantom_manager.bind_phantom
+psy_max_distance		= 10
+
+[m_phantom_tushkano]:m_phantom
+visuals 				= monsters\phantom\tushkano_0
+script_binding  		= phantom_manager.bind_phantom
+
+[m_phantom_controller]:m_phantom
+visuals 				= monsters\phantom\kontroler_0
+script_binding			= phantom_manager.bind_phantom
+
+[m_phantom_zombi]:m_phantom
+visuals 				= monsters\phantom\zombi_0
+script_binding			= phantom_manager.bind_phantom
+
+[m_phantom_snork]:m_phantom
+visuals 				= monsters\phantom\snork_0
+script_binding			= phantom_manager.bind_phantom
+
+[m_phantom_boar]:m_phantom
+visuals 				= monsters\phantom\mutant_boar_0
+script_binding			= phantom_manager.bind_phantom
+
+[m_phantom_flesh]:m_phantom
+visuals 				= monsters\phantom\flesh_0
+script_binding			= phantom_manager.bind_phantom
+
+[m_phantom_dog]:m_phantom
+visuals 				= monsters\phantom\dog_0
+script_binding			= phantom_manager.bind_phantom
+
+[m_phantom_pseudodog]:m_phantom
+visuals 				= monsters\phantom\pseudodog_0
+script_binding			= phantom_manager.bind_phantom
+
+[m_phantom_cat]:m_phantom
+visuals 				= monsters\phantom\cat_0
+script_binding			= phantom_manager.bind_phantom
+
+[m_phantom_chimera]:m_phantom
+visuals 				= monsters\phantom\chimera_0
+script_binding			= phantom_manager.bind_phantom
+
+[m_phantom_gigant]:m_phantom
+visuals 				= monsters\phantom\psevdogigant_0
+script_binding			= phantom_manager.bind_phantom
+
+[m_phantom_karlik]:m_phantom
+visuals 				= monsters\phantom\karlik_0
+script_binding			= phantom_manager.bind_phantom

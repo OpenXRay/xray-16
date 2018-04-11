@@ -1,0 +1,223 @@
+;------ Car UserData -----------------------------------------------------------
+
+[disable]
+linear_factor		= 0.3
+angular_factor		= 0.3
+
+;-------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
+
+[car_definition]
+
+camera_pos			= -0.4, 1.45, 0.2
+damage				= damage_bones
+driving_wheels		= back_left_wheel,back_right_wheel,front_left_wheel,front_right_wheel   ; aaaouea eie?na
+steering_wheels		= front_left_wheel,front_right_wheel                                    ; ?oeaaua eie?na
+breaking_wheels		= front_left_wheel,front_right_wheel,back_left_wheel,back_right_wheel   ; oi?iicyuea eie?na
+doors				= left_door,right_door                                                  ; aaa?e
+steer				= stearing_wheel                                                        ; ?oeu
+driver_place		= seat_left                                                             ; ianoi aiaeoaey
+exhausts			= exhausts                                                              ; auoeiiiay o?oaa
+;exhaust_particles	= vehiclefx\exhaust_1
+
+;-------------------------------------------------------------------------------
+;------ Factory parameters of Engine -------------------------------------------
+
+fuel_tank		= 40		; L
+fuel_consumption	= 11.43		; L / (100k R); liters per 100 000 rotations
+engine_power		= 40		; horse_power (kW=hp*0.808) max power
+max_power_rpm		= 5000		; (nominal rpm ) on this rpm value engine power reaches maximum
+max_torque_rpm		= 4500		; on this rpm engine torque reaches maximum
+
+power_increment_factor	= 0.01
+power_decrement_factor	= 0.03
+rpm_increment_factor	= 0.01
+rpm_decrement_factor	= 0.01
+; additional engine parameters
+
+max_engine_rpm		= 7000		; rpm (5000) rpm will never be more
+idling_engine_rpm	= 2000		; rpm (750) min rpm - starts from this rpm value
+
+
+;-------------------------------------------------------------------------------
+;------ Adjustment a wheel -----------------------------------------------------
+
+reference_radius	= 0.35		; ?aaeon eieana, eniieucoaiue i?e i?in??oa aaeaaoaey
+axle_friction		= 0.01		; Ineaaeaiea nei?inoe a iaao?aeuiie iiceoee. (N*m)
+steering_speed		= 0.9		; A?aiy iiai?ioa ?oeaaiai eieana, a iaeneioi. rps (1)
+steering_torque		= 90000		; Neea aea?ioneeeoaey ?oey. (N*m)
+break_torque		= 0.05		; Neea oi?iiciuo eieiaie. (N*m)
+break_time		= 0.7		; a?aiy ia?anoaiey neeu oi?ii?aiey ai iaeneioia, i?e iiaoi?ia?eaaiee (no?aeea iacaa)
+hand_break_torque	= 0.07		; neea oi?ii?aiey i?iaaeii (ii oiie?aie? = break_torque)
+
+;-------------------------------------------------------------------------------
+;------ Gearbox ----------------------------------------------------------------
+
+main_gear_ratio		= 4.1		; Ia?aaaoi?iia ioiioaiea
+auto_transmission	= on		; Aaoiiaoe?aneay ei?iaea (on/off)
+
+
+
+[transmission_gear_ratio]
+
+R                  	= 4.02, 4000,6000;740,  3000	; shift down/ shift up. (rpm, iaiaoiaeiia aey ia?aee??aiey)
+N1                 	= 6.38, 4000,6000;740,  1500
+N2                 	= 3.29, 4000,6000;1200, 2750
+N3                 	= 2.04, 4000,6000;2050, 2850
+N4                 	= 1.25, 4000,6000;2200, 3000
+
+
+
+;-------------------------------------------------------------------------------
+;------ Rest Adjustment --------------------------------------------------------
+
+[lights]
+headlights		= f1,f2
+
+[f1]
+bone			= left_light
+color			= 0.6,0.6,0.6,0.5
+range			= 25
+cone_angle		= 80
+spot_texture		= lights\lights_blamplight
+glow_texture		= glow\glow_Yellow
+glow_radius		= 0.5
+
+[f2]
+bone			= right_light
+color			= 0.6,0.6,0.6,0.6
+range			= 25
+cone_angle		= 80
+spot_texture		= lights\lights_blamplight
+glow_texture		= glow\glow_Yellow
+glow_radius		= 0.5
+
+[car_sound]
+snd_volume		= 1.0
+snd_name		= car\car1 ;car\car_litlle_idle
+transmission_switch	= car\car_gearchange
+explosion_sound		= weapons\heli_explosion
+relative_pos		= 0.,0.5,1.5.
+
+;-------------------------------------------------------------------------------
+;------ animations params ------------------------------------------------------
+
+[doors]
+open_torque_factor	= 3.		;iii?eoaeu iiiaioa nee aey ioe?uaaiey aaa?e (default = 2)
+
+[animations]
+driver_animation_type	= 0		;oei aieiaoee aeoa?a aey aaiiie iaoeiu.
+
+;-------------------------------------------------------------------------------
+;------ damage params ----------------------------------------------------------
+
+[damage_particles]
+
+explosion_particles	= explosions\expl_car
+car_damage_particles1	= explosions\expl_car_smoke_small
+car_damage_particles2	= explosions\expl_car_smoke_big
+wheels_damage_particles1	= vehiclefx\exhaust_1
+wheels_damage_particles2	= vehiclefx\exhaust_1
+
+particle_bones1		= front_bamper
+particle_bones2		= root
+
+;-------------------------------------------------------------------------------
+;------ particle bones ---------------------------------------------------------
+
+[particle_bones]
+root			= 0,-0.5,1
+front_bamper		= 0,0,0
+
+;-------------------------------------------------------------------------------
+;------ damage items -----------------------------------------------------------
+
+[damage_items]
+back_left_wheel		= 5000
+back_right_wheel	= 5000
+front_left_wheel	= 5000
+front_right_wheel	= 5000
+left_door		= 2000
+right_door		= 2000
+
+;-------------------------------------------------------------------------------
+;------ collisiondamage --------------------------------------------------------
+
+[collision_damage]
+root			= 0.0001
+front_bamper		= 0.001
+kabina			= 0.0001
+left_door		= 0.0001
+right_door		= 0.0001
+back_door		= 0.0001
+back_left_wheel		= 0.00001
+back_right_wheel	= 0.00001
+front_left_wheel	= 0.00001
+front_right_wheel	= 0.00001
+
+;-------------------------------------------------------------------------------
+;------ damage bones -----------------------------------------------------------
+
+[damage_bones]           		;aiaeiae?ii naeoee a aeoa?a, ii aac aieiaoee
+;bone_name		= <hit_scale>
+default			= 1
+
+[immunities]
+burn_immunity         	= 0.5       ;коэффициенты иммунитета
+strike_immunity       	= 0.1
+shock_immunity        	= 0.0
+wound_immunity        	= 0.01
+radiation_immunity    	= 0.0
+telepatic_immunity    	= 0.0
+chemical_burn_immunity 	= 0.0
+explosion_immunity    	= 0.5
+fire_wound_immunity   	= 0.001
+
+;-------------------------------------------------------------------------------
+;----------------explosion params-----------------------------------------------
+
+[explosion]
+blast			= 1
+blast_r			= 15
+blast_impulse		= 350
+frags		        = 15
+frags_r			= 20
+frag_hit		= 0.45
+frag_hit_impulse	= 250
+hit_type_blast		= explosion
+hit_type_frag		= fire_wound
+up_throw_factor		= 1.4
+wm_size			= 0.1
+explode_particles	= explosions\expl_car
+light_color		= 0.6,0.5,0.3
+light_range		= 15.0
+light_time		= 1.0
+
+fragment_speed				= 76
+fragment_tracer_max_length	= 3
+explode_duration			= 50
+
+snd_explode		= weapons\heli_explosion
+wallmark_section=explosion_marks
+[explode_effector]
+effect_sect_name= effector_explode_hit
+
+[wheels_params]
+damping_factor          =  100;
+spring_factor           =  10;
+friction_factor         =  0.8;
+
+[air_resistance]
+linear_factor           =  20000.f;
+angular_factor          =  0.f;
+
+[front_left_wheel]
+break_torque		= 0.05		; Neea oi?iiciuo eieiaie. (N*m)
+hand_break_torque	= 0		; neea oi?ii?aiey i?iaaeii (ii oiie?aie? = break_torque)
+
+[front_right_wheel]
+break_torque		= 0.05		; Neea oi?iiciuo eieiaie. (N*m)
+hand_break_torque	= 0		; neea oi?ii?aiey i?iaaeii (ii oiie?aie? = break_torque)
+
+;-------------------------------------------------------------------------------
+;------ End params -------------------------------------------------------------f

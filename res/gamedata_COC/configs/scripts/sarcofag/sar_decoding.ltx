@@ -1,0 +1,13 @@
+[logic]
+;active = sr_idle
+active = sr_idle@nil
+
+;[sr_idle]
+;on_info = {+sar_access_decoding} sr_timer %+sar_start_teleport%
+
+;[sr_timer]
+;type = dec
+;start_value = 30000
+;on_value = 27000|%+sar_monolith_spawn1%| 23000|%+sar_monolith_spawn2%| 19000|%+sar_monolith_spawn3%| 15000|%+sar_monolith_spawn4%| 11000|%+sar_monolith_spawn5%|  8000|%+sar_monolith_spawn6%| 6000|%+sar_monolith_spawn7%| 5000|%+sar_monolith_spawn8 +sar_end_teleport%| 0| sr_idle@nil %+sar_finish_decoding%
+
+[sr_idle@nil]

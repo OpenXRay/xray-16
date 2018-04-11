@@ -1,0 +1,7 @@
+[logic]
+active = nil;sr_idle@give_task
+
+[sr_idle@give_task]
+on_info = {+jup_b208_burers_hunt_started -jup_b208_burers_hunt_give} nil %=give_task(jup_b208_burers_hunt) +jup_b208_burers_hunt_give%
+on_info2 = {+jup_b208_burers_hunt_done} nil
+

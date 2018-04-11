@@ -1,0 +1,286 @@
+[mob_walker@def_sleep]
+path_look = sleeper_bloodsuckers_spawn
+out_restr = zat_b38_sleepers_territory
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_sound  = actor|WPN_shoot|10|0.9| %+zat_b38_bloodscukers_sleepers_stand_up% ;Услышит все, кроме пистолета с глушителем
+on_sound2 = actor|WPN_hit|10|0| %+zat_b38_bloodscukers_sleepers_stand_up%
+on_sound3 = actor|MST_damage|10|0.9| %+zat_b38_bloodscukers_sleepers_stand_up%
+on_sound4 = actor|MST_step|10|0.1| %+zat_b38_bloodscukers_sleepers_stand_up%
+on_sound5 = actor|MST_die|10|0| %+zat_b38_bloodscukers_sleepers_stand_up%
+on_sound6 = actor|WPN_empty|10|0.3| %+zat_b38_bloodscukers_sleepers_stand_up% ;Примерно с 3х метров услышит
+on_sound7 = actor|WPN_reload|10|0.3| %+zat_b38_bloodscukers_sleepers_stand_up% ;Примерно с 3х метров услышит
+on_info66 = {+zat_b57_roar_play} %=kill_npc()%
+
+[death]
+on_info = %=inc_counter(zat_b57_terminated)%
+
+;****************************< 1 >***************************
+[logic@sleeper_bloodsucker_1]
+active = mob_walker@pre_sleep_1
+suitable = {=target_squad_name(zat_b38_bloodsuckers_sleepers)} true
+monster_job = true
+prior = 200
+on_death = death
+
+[mob_walker@pre_sleep_1]
+path_walk = sleeper_bloodsucker_1_walk_1
+path_look = sleeper_bloodsuckers_spawn
+out_restr = zat_b38_sleepers_territory
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+zat_b38_underground_door_open} mob_walker@sleep_1 %=teleport_npc(zat_b38u_sleeper_bloodsucker_1_walk_1)%
+on_info2 = {-zat_b38_sleeper_state_1} %=set_bloodsucker_state(2) +zat_b38_sleeper_state_1 =teleport_npc(zat_b38u_sleeper_bloodsucker_1_walk_1) =set_visual_memory_enabled(0)%
+ 
+[mob_walker@sleep_1]:mob_walker@def_sleep
+path_walk = sleeper_bloodsucker_1_walk_1
+on_info = {+zat_b38_bloodscukers_sleepers_stand_up} mob_home@fight_1 %=set_bloodsucker_state(default) =release_force_sleep_animation =set_visual_memory_enabled(1)%
+on_info2 = %=set_force_sleep_animation(0)%
+
+[mob_home@fight_1]
+path_home = sleeper_bloodsuckers_spawn
+out_restr = zat_b38_sleepers_territory
+aggressive = true
+home_min_radius = 3
+home_max_radius = 80
+on_info = {=npc_in_zone(zat_b38_sleepers_territory) +zat_b57_roar_play} %=kill_npc()%
+on_actor_not_in_zone = zat_b38_sleepers_territory | mob_walker@sleep_1 %-zat_b38_bloodscukers_sleepers_stand_up -zat_b38_forced_anim_1 =teleport_npc(zat_b38u_sleeper_bloodsucker_1_walk_1)%
+
+;****************************< 2 >***************************
+[logic@sleeper_bloodsucker_2]
+active = mob_walker@pre_sleep_2
+suitable = {=target_squad_name(zat_b38_bloodsuckers_sleepers)} true
+monster_job = true
+prior = 200
+on_death = death
+
+[mob_walker@pre_sleep_2]
+path_walk = sleeper_bloodsucker_2_walk_1
+path_look = sleeper_bloodsuckers_spawn
+out_restr = zat_b38_sleepers_territory
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+zat_b38_underground_door_open} mob_walker@sleep_2 %=teleport_npc(zat_b38u_sleeper_bloodsucker_2_walk_1)%
+on_info2 = {-zat_b38_sleeper_state_2} %=set_bloodsucker_state(2) +zat_b38_sleeper_state_2 =teleport_npc(zat_b38u_sleeper_bloodsucker_2_walk_1) =set_visual_memory_enabled(0)%
+
+[mob_walker@sleep_2]:mob_walker@def_sleep
+path_walk = sleeper_bloodsucker_2_walk_1
+on_info = {+zat_b38_bloodscukers_sleepers_stand_up} mob_home@fight_2 %=set_bloodsucker_state(default) =release_force_sleep_animation =set_visual_memory_enabled(1)%
+on_info2 = %=set_force_sleep_animation(1)%
+
+[mob_home@fight_2]
+path_home = sleeper_bloodsuckers_spawn
+out_restr = zat_b38_sleepers_territory
+aggressive = true
+home_min_radius = 3
+home_max_radius = 80
+on_info = {=npc_in_zone(zat_b38_sleepers_territory) +zat_b57_roar_play} %=kill_npc()%
+on_actor_not_in_zone = zat_b38_sleepers_territory | mob_walker@sleep_2 %-zat_b38_bloodscukers_sleepers_stand_up -zat_b38_forced_anim_2 =teleport_npc(zat_b38u_sleeper_bloodsucker_2_walk_1)%
+
+;****************************< 3 >***************************
+[logic@sleeper_bloodsucker_3]
+active = mob_walker@pre_sleep_3
+suitable = {=target_squad_name(zat_b38_bloodsuckers_sleepers)} true
+monster_job = true
+prior = 200
+on_death = death
+
+[mob_walker@pre_sleep_3]
+path_walk = sleeper_bloodsucker_3_walk_1
+path_look = sleeper_bloodsuckers_spawn
+out_restr = zat_b38_sleepers_territory
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+zat_b38_underground_door_open} mob_walker@sleep_3 %=teleport_npc(zat_b38u_sleeper_bloodsucker_3_walk_1)%
+on_info2 = {-zat_b38_sleeper_state_3} %=set_bloodsucker_state(2) =teleport_npc(zat_b38u_sleeper_bloodsucker_3_walk_1) =set_visual_memory_enabled(0) +zat_b38_sleeper_state_3%
+
+[mob_walker@sleep_3]:mob_walker@def_sleep
+path_walk = sleeper_bloodsucker_3_walk_1
+on_info = {+zat_b38_bloodscukers_sleepers_stand_up} mob_home@fight_3 %=set_bloodsucker_state(default) =release_force_sleep_animation =set_visual_memory_enabled(1)%
+on_info2 = %=set_force_sleep_animation(0)%
+
+[mob_home@fight_3]
+path_home = sleeper_bloodsuckers_spawn
+out_restr = zat_b38_sleepers_territory
+aggressive = true
+home_min_radius = 3
+home_max_radius = 80
+on_info = {=npc_in_zone(zat_b38_sleepers_territory) +zat_b57_roar_play} %=kill_npc()%
+on_actor_not_in_zone = zat_b38_sleepers_territory | mob_walker@sleep_3 %-zat_b38_bloodscukers_sleepers_stand_up -zat_b38_forced_anim_3 =teleport_npc(zat_b38u_sleeper_bloodsucker_3_walk_1)%
+
+;****************************< 4 >***************************
+[logic@sleeper_bloodsucker_4]
+active = mob_walker@pre_sleep_4
+suitable = {=target_squad_name(zat_b38_bloodsuckers_sleepers)} true
+monster_job = true
+prior = 200
+on_death = death
+
+[mob_walker@pre_sleep_4]
+path_walk = sleeper_bloodsucker_4_walk_1
+path_look = sleeper_bloodsuckers_spawn
+out_restr = zat_b38_sleepers_territory
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+zat_b38_underground_door_open} mob_walker@sleep_4 %=teleport_npc(zat_b38u_sleeper_bloodsucker_4_walk_1)%
+on_info2 = {-zat_b38_sleeper_state_4} %=set_bloodsucker_state(2) =teleport_npc(zat_b38u_sleeper_bloodsucker_4_walk_1) =set_visual_memory_enabled(0) +zat_b38_sleeper_state_4%
+
+[mob_walker@sleep_4]:mob_walker@def_sleep
+path_walk = sleeper_bloodsucker_4_walk_1
+on_info = {+zat_b38_bloodscukers_sleepers_stand_up} mob_home@fight_4 %=set_bloodsucker_state(default) =release_force_sleep_animation =set_visual_memory_enabled(1)%
+on_info2 = %=set_force_sleep_animation(0)%
+
+[mob_home@fight_4]
+path_home = sleeper_bloodsuckers_spawn
+out_restr = zat_b38_sleepers_territory
+aggressive = true
+home_min_radius = 3
+home_max_radius = 80
+on_info = {=npc_in_zone(zat_b38_sleepers_territory) +zat_b57_roar_play} %=kill_npc()%
+on_actor_not_in_zone = zat_b38_sleepers_territory | mob_walker@sleep_4 %-zat_b38_bloodscukers_sleepers_stand_up -zat_b38_forced_anim_4 =teleport_npc(zat_b38u_sleeper_bloodsucker_4_walk_1)%
+
+;****************************< 5 >***************************
+[logic@sleeper_bloodsucker_5]
+active = mob_walker@pre_sleep_5
+suitable = {=target_squad_name(zat_b38_bloodsuckers_sleepers)} true
+monster_job = true
+prior = 200
+on_death = death
+
+[mob_walker@pre_sleep_5]
+path_walk = sleeper_bloodsucker_5_walk_1
+path_look = sleeper_bloodsuckers_spawn
+out_restr = zat_b38_sleepers_territory
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+zat_b38_underground_door_open} mob_walker@sleep_5 %=teleport_npc(zat_b38u_sleeper_bloodsucker_5_walk_1)%
+on_info2 = {-zat_b38_sleeper_state_5} %=set_bloodsucker_state(2) =teleport_npc(zat_b38u_sleeper_bloodsucker_5_walk_1) =set_visual_memory_enabled(0) +zat_b38_sleeper_state_5%
+
+[mob_walker@sleep_5]:mob_walker@def_sleep
+path_walk = sleeper_bloodsucker_5_walk_1
+on_info = {+zat_b38_bloodscukers_sleepers_stand_up} mob_home@fight_5 %=set_bloodsucker_state(default) =release_force_sleep_animation =set_visual_memory_enabled(1)%
+on_info2 = %=set_force_sleep_animation(1)%
+
+[mob_home@fight_5]
+path_home = sleeper_bloodsuckers_spawn
+out_restr = zat_b38_sleepers_territory
+aggressive = true
+home_min_radius = 3
+home_max_radius = 80
+on_info = {=npc_in_zone(zat_b38_sleepers_territory) +zat_b57_roar_play} %=kill_npc()%
+on_actor_not_in_zone = zat_b38_sleepers_territory | mob_walker@sleep_5 %-zat_b38_bloodscukers_sleepers_stand_up -zat_b38_forced_anim_5 =teleport_npc(zat_b38u_sleeper_bloodsucker_5_walk_1)%
+
+;****************************< 6 >***************************
+[logic@sleeper_bloodsucker_6]
+active = mob_walker@pre_sleep_6
+suitable = {=target_squad_name(zat_b38_bloodsuckers_sleepers)} true
+monster_job = true
+prior = 200
+on_death = death
+
+[mob_walker@pre_sleep_6]
+path_walk = sleeper_bloodsucker_6_walk_1
+path_look = sleeper_bloodsuckers_spawn
+out_restr = zat_b38_sleepers_territory
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+zat_b38_underground_door_open} mob_walker@sleep_6 %=teleport_npc(zat_b38u_sleeper_bloodsucker_6_walk_1)%
+on_info2 = {-zat_b38_sleeper_state_6} %=set_bloodsucker_state(2) =teleport_npc(zat_b38u_sleeper_bloodsucker_6_walk_1) =set_visual_memory_enabled(0) +zat_b38_sleeper_state_6%
+
+[mob_walker@sleep_6]:mob_walker@def_sleep
+path_walk = sleeper_bloodsucker_6_walk_1
+on_info = {+zat_b38_bloodscukers_sleepers_stand_up} mob_home@fight_6 %=set_bloodsucker_state(default) =release_force_sleep_animation =set_visual_memory_enabled(1)%
+on_info2 = %=set_force_sleep_animation(0)%
+
+[mob_home@fight_6]
+path_home = sleeper_bloodsuckers_spawn
+out_restr = zat_b38_sleepers_territory
+aggressive = true
+home_min_radius = 3
+home_max_radius = 80
+on_info = {=npc_in_zone(zat_b38_sleepers_territory) +zat_b57_roar_play} %=kill_npc()%
+on_actor_not_in_zone = zat_b38_sleepers_territory | mob_walker@sleep_6 %-zat_b38_bloodscukers_sleepers_stand_up -zat_b38_forced_anim_6 =teleport_npc(zat_b38u_sleeper_bloodsucker_6_walk_1)%
+
+;****************************< 7 >***************************
+[logic@sleeper_bloodsucker_7]
+active = mob_walker@pre_sleep_7
+suitable = {=target_squad_name(zat_b38_bloodsuckers_sleepers)} true
+monster_job = true
+prior = 200
+on_death = death
+
+[mob_walker@pre_sleep_7]
+path_walk = sleeper_bloodsucker_7_walk_1
+path_look = sleeper_bloodsuckers_spawn
+out_restr = zat_b38_sleepers_territory
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+zat_b38_underground_door_open} mob_walker@sleep_7 %=teleport_npc(zat_b38u_sleeper_bloodsucker_7_walk_1)%
+on_info2 = {-zat_b38_sleeper_state_7} %=set_bloodsucker_state(2) =teleport_npc(zat_b38u_sleeper_bloodsucker_7_walk_1) =set_visual_memory_enabled(0) +zat_b38_sleeper_state_7%
+
+[mob_walker@sleep_7]:mob_walker@def_sleep
+path_walk = sleeper_bloodsucker_7_walk_1
+on_info = {+zat_b38_bloodscukers_sleepers_stand_up} mob_home@fight_7 %=set_bloodsucker_state(default) =release_force_sleep_animation =set_visual_memory_enabled(1)%
+on_info2 = %=set_force_sleep_animation(1)%
+
+[mob_home@fight_7]
+path_home = sleeper_bloodsuckers_spawn
+out_restr = zat_b38_sleepers_territory
+aggressive = true
+home_min_radius = 3
+home_max_radius = 80
+on_info = {=npc_in_zone(zat_b38_sleepers_territory) +zat_b57_roar_play} %=kill_npc()%
+on_actor_not_in_zone = zat_b38_sleepers_territory | mob_walker@sleep_7 %-zat_b38_bloodscukers_sleepers_stand_up -zat_b38_forced_anim_7 =teleport_npc(zat_b38u_sleeper_bloodsucker_7_walk_1)%
+
+;****************************< 8 >***************************
+[logic@sleeper_bloodsucker_8]
+active = mob_walker@pre_sleep_8
+suitable = {=target_squad_name(zat_b38_bloodsuckers_sleepers)} true
+monster_job = true
+prior = 200
+on_death = death
+
+[mob_walker@pre_sleep_8]
+path_walk = sleeper_bloodsucker_8_walk_1
+path_look = sleeper_bloodsuckers_spawn
+out_restr = zat_b38_sleepers_territory
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+zat_b38_underground_door_open} mob_walker@sleep_8 %=teleport_npc(zat_b38u_sleeper_bloodsucker_8_walk_1)%
+on_info2 = {-zat_b38_sleeper_state_8} %=set_bloodsucker_state(2) =teleport_npc(zat_b38u_sleeper_bloodsucker_8_walk_1) =set_visual_memory_enabled(0) +zat_b38_sleeper_state_8%
+
+[mob_walker@sleep_8]:mob_walker@def_sleep
+path_walk = sleeper_bloodsucker_8_walk_1
+on_info = {+zat_b38_bloodscukers_sleepers_stand_up} mob_home@fight_8 %=set_bloodsucker_state(default) =release_force_sleep_animation =set_visual_memory_enabled(1)%
+on_info2 = %=set_force_sleep_animation(1)%
+
+[mob_home@fight_8]
+path_home = sleeper_bloodsuckers_spawn
+out_restr = zat_b38_sleepers_territory
+aggressive = true
+home_min_radius = 3
+home_max_radius = 80
+on_info = {=npc_in_zone(zat_b38_sleepers_territory) +zat_b57_roar_play} %=kill_npc()%
+on_actor_not_in_zone = zat_b38_sleepers_territory | mob_walker@sleep_8 %-zat_b38_bloodscukers_sleepers_stand_up -zat_b38_forced_anim_8 =teleport_npc(zat_b38u_sleeper_bloodsucker_8_walk_1)%
+
+;****************************< 9 >***************************
+[logic@sleeper_bloodsucker_9]
+active = mob_walker@pre_sleep_9
+suitable = {=target_squad_name(zat_b38_bloodsuckers_sleepers)} true
+monster_job = true
+prior = 200
+on_death = death
+
+[mob_walker@pre_sleep_9]
+path_walk = sleeper_bloodsucker_9_walk_1
+path_look = sleeper_bloodsuckers_spawn
+out_restr = zat_b38_sleepers_territory
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+zat_b38_underground_door_open} mob_walker@sleep_9 %=teleport_npc(zat_b38u_sleeper_bloodsucker_9_walk_1)%
+on_info2 = {-zat_b38_sleeper_state_9} %=set_bloodsucker_state(2) =teleport_npc(zat_b38u_sleeper_bloodsucker_9_walk_1) =set_visual_memory_enabled(0) +zat_b38_sleeper_state_9%
+
+[mob_walker@sleep_9]:mob_walker@def_sleep
+path_walk = sleeper_bloodsucker_9_walk_1
+on_info = {+zat_b38_bloodscukers_sleepers_stand_up} mob_home@fight_9 %=set_bloodsucker_state(default) =release_force_sleep_animation =set_visual_memory_enabled(1)%
+on_info2 = %=set_force_sleep_animation(0)%
+
+[mob_home@fight_9]
+path_home = sleeper_bloodsuckers_spawn
+out_restr = zat_b38_sleepers_territory
+aggressive = true
+home_min_radius = 3
+home_max_radius = 80
+on_info = {=npc_in_zone(zat_b38_sleepers_territory) +zat_b57_roar_play} %=kill_npc()%
+on_actor_not_in_zone = zat_b38_sleepers_territory | mob_walker@sleep_9 %-zat_b38_bloodscukers_sleepers_stand_up -zat_b38_forced_anim_9 =teleport_npc(zat_b38u_sleeper_bloodsucker_9_walk_1)%
+

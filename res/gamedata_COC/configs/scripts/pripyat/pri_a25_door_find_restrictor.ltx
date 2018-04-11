@@ -1,0 +1,41 @@
+[logic]
+active = nil;sr_idle@kindergarten_door_find
+
+[sr_idle@kindergarten_door_find]
+on_info = {+pri_a19_lab_x8_investigated +pri_a22_scene_done} sr_idle@check_door_find_with_or_with_out_explosive
+
+[sr_idle@check_door_find_with_or_with_out_explosive]
+on_info = {=actor_in_zone(pri_a25_door_find_restrictor) =actor_has_item(pri_a25_explosive_charge_item)} sr_idle@check_actor_antena_find %+pri_a25_blow_up_door%
+on_info2 = {=actor_in_zone(pri_a25_door_find_restrictor) !actor_has_item(pri_a25_explosive_charge_item)} sr_idle@cutscene_timer %=disable_ui =run_postprocess(fade_in:4410)%
+
+[sr_idle@cutscene_timer]
+on_game_timer = 20 | sr_cutscene@start %=run_postprocess(black:4411) =create_cutscene_actor_with_weapon(pri_a25_cutscene_actor:pri_a25_smart_terrain_cutscene_actor_walk:0:300)%
+
+[sr_cutscene@start]
+enable_ui_on_end = false
+global_cameffect = true
+outdoor = true
+point = pri_a25_actor_walk 
+look = pri_a25_actor_look
+cam_effector = scenario_cam\pripyat\pri_a25_find_door_without_explosive_cameff
+on_game_timer = 10 | sr_cutscene@start %=stop_postprocess(4410) =stop_postprocess(4411)%
+on_signal = cameff_end | sr_idle@cutscene_end_postprocess %=run_postprocess(black:4413:true) +pri_a25_destr_cutsc_actor =teleport_actor(pri_a25_smart_terrain_cutscene_actor_walk:pri_a25_smart_terrain_cutscene_actor_look)% 
+on_info = {+pri_a25_find_explosive -pri_a25_fade} %=run_postprocess(fade_in:4412) +pri_a25_fade%
+on_info2 = {+pri_a25_cam_stop} %=stop_sr_cutscene%
+
+[sr_idle@cutscene_end_postprocess]
+on_game_timer = 10 | sr_idle@actor_has_explosive_check %=stop_postprocess(4413) =stop_postprocess(4412) =enable_ui%
+
+[sr_idle@actor_has_explosive_check]
+on_info = {=actor_has_item(pri_a25_explosive_charge_item)} sr_idle@check_actor_antena_find %+pri_a25_blow_up_door%
+
+[sr_idle@check_actor_antena_find]
+on_info = {=actor_in_zone(pri_a25_find_antenna_restrictor)} sr_idle@check_antena_destroy %+pri_a25_destroy_antenna%
+
+[sr_idle@check_antena_destroy]
+on_info = {+pri_a19_lab_x8_investigated +pri_a22_scene_done +pri_a25_wood_board_hit} sr_idle@make_explosion %=spawn_object(pri_a25_antenna_grenade:pri_a25_smart_terrain_pri_a25_antenna_grenade_spawn_point) +pri_a25_antenna_destroyed%
+
+[sr_idle@make_explosion]
+on_info = {=object_exist(pri_a25_antenna_grenade)} sr_idle@nil %=barrel_explode(pri_a25_antenna_grenade) +pri_a25_hit_barrier_objects%
+
+[sr_idle@nil]

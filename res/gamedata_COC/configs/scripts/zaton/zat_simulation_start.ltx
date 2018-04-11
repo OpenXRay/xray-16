@@ -1,0 +1,11 @@
+[logic]
+active = nil ;sr_idle
+
+[sr_idle]
+on_info = {+zat_a1_game_start} sr_idle@dog_atack 
+
+[sr_idle@dog_atack]
+on_game_timer = 10 | sr_idle@nil %+zat_a1_atack_from_zat_sim_15%
+
+[sr_idle@nil]
+

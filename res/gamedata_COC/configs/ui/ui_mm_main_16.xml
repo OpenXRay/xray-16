@@ -1,0 +1,128 @@
+<w>
+  	<background x="0" y="0" width="1024" height="768">
+		<auto_static x="0" y="0" width="1024" height="768" stretch="1">
+			<texture x="0" y="0" width="1920" height="1080">ui\ui_background_new</texture>
+		</auto_static>
+	    <auto_static x="102" y="0" width="819" height="768" stretch="1">
+			<texture>ui_inGame2_background</texture>
+		</auto_static>
+	    <auto_static x="967" y="5" width="52" height="64" stretch="1">
+			<texture>ui\teamEPIC_logo</texture>
+		</auto_static>
+	    <auto_static x="15" y="666" width="55" height="64" stretch="1">
+			<texture>ui\moty2015</texture>
+		</auto_static>
+	    <auto_static x="75" y="666" width="55" height="64" stretch="1">
+			<texture>ui\moty2016</texture>
+		</auto_static>
+    </background>
+
+	<shniaga_wnd x="590" y="419" width="392" height="280">
+		<buttons_region	x="110" y="0" width="164" height="280" always_show_scroll="true"/>
+		
+		<shniaga x="92" y="5" width="202" height="73" stretch="1">
+			<texture>ui_inGame2_slider</texture>
+			<magnifire x="12" y="18" width="178" height="36" stretch="1">
+				<texture>ui\ui_magnifier</texture>
+				<y_offset>-5</y_offset>
+			</magnifire>
+		</shniaga>		
+	</shniaga_wnd>
+
+  <button h="24"/>
+
+	<menu_main btn_height="34" font="graffiti19">
+    	<btn name="btn_new_game"	caption="ui_mm_newgame" />
+		<btn name="btn_load"		caption="ui_mm_load_game" />
+		<btn name="btn_lastsave"	caption="ui_mm_last_save" />
+		<btn name="btn_options"		caption="ui_mm_options_n" />
+		<btn name="btn_af_options"	caption="ui_mm_weather_options" />
+		<btn name="btn_credits"		caption="ui_mm_credits" />
+		<btn name="btn_quit"		caption="ui_mm_quit2windows" />
+	</menu_main>
+
+  <menu_network_game btn_height="30" font="graffiti22" a="255" r="255" g="255" b="255">
+    <btn name="btn_internet"		caption="ui_mp_internet" />
+    <btn name="btn_localnet"		caption="ui_mp_localnet" />
+    <btn name="btn_new_back"    caption="ui_mm_back" />
+  </menu_network_game>
+
+  <menu_main_logout btn_height="30" font="graffiti22" a="255" r="255" g="255" b="255">
+  	<btn name="btn_new_game"	  caption="ui_mm_newgame" />
+		<btn name="btn_load"		  caption="ui_mm_load_game" />
+		<btn name="btn_logout"		  caption="ui_mm_logout" />
+		<btn name="btn_options"		  caption="ui_mm_options_n" />
+		<btn name="btn_af_options"	caption="ui_mm_weather_options" />
+		<btn name="btn_credits"		  caption="ui_mm_credits" />
+		<btn name="btn_quit"		  caption="ui_mm_quit2windows" />
+  </menu_main_logout>
+
+
+
+  <menu_main_last_save btn_height="30" font="graffiti19" a="255" r="255" g="255" b="255">
+		<btn name="btn_new_game"	caption="ui_mm_newgame" />
+		<btn name="btn_load"		caption="ui_mm_load_game" />
+		<btn name="btn_lastsave"	caption="ui_mm_last_save" />
+		<btn name="btn_options"		caption="ui_mm_options_n" />
+		<btn name="btn_af_options"	caption="ui_mm_weather_options" />
+		<btn name="btn_credits"		caption="ui_mm_credits" />
+		<btn name="btn_quit"		caption="ui_mm_quit2windows" />
+	</menu_main_last_save>
+
+	<menu_new_game btn_height="34" font="graffiti19">
+	    <btn name="btn_novice"		caption="ui_mm_novice" />
+		<btn name="btn_stalker"		caption="ui_mm_stalker" />
+		<btn name="btn_veteran"		caption="ui_mm_veteran" />
+		<btn name="btn_master"		caption="ui_mm_master" />
+		<btn name="btn_new_back"	caption="ui_mm_back" />
+	</menu_new_game>
+
+	<menu_main_single btn_height="34" font="graffiti19">
+    	<btn name="btn_ret"			caption="ui_mm_return_game" />
+		<btn name="btn_lastsave"	caption="ui_mm_last_save" />
+		<btn name="btn_load"		caption="ui_mm_load_game" />
+		<btn name="btn_save"		caption="ui_mm_save_game" />
+		<btn name="btn_options"		caption="ui_mm_options_n" />
+		<btn name="btn_af_options"	caption="ui_mm_weather_options" />
+		<btn name="btn_credits"		caption="ui_mm_credits" />
+		<btn name="btn_quit_to_mm"	caption="ui_mm_quit_game" />
+		<btn name="btn_quit"		caption="ui_mm_quit2windows" />
+	</menu_main_single>
+
+	<menu_main_single_dead btn_height="34" font="graffiti19">
+	    <btn name="btn_lastsave"	caption="ui_mm_last_save" />
+		<btn name="btn_load"		caption="ui_mm_load_game" />
+		<btn name="btn_options"		caption="ui_mm_options_n" />
+		<btn name="btn_af_options"	caption="ui_mm_weather_options" />
+		<btn name="btn_credits"		caption="ui_mm_credits" />
+		<btn name="btn_quit_to_mm"	caption="ui_mm_quit_game" />
+		<btn name="btn_quit"		caption="ui_mm_quit2windows" />
+	</menu_main_single_dead>
+
+	<menu_main_mm btn_height="34" font="graffiti19">
+	    <btn name="btn_ret"         caption="ui_mm_return_game" />
+	    <btn name="btn_options"     caption="ui_mm_options_n" />
+	    <btn name="btn_credits"     caption="ui_mm_credits" />
+	    <btn name="btn_quit_to_mm"  caption="ui_mm_disconnect" />
+	    <btn name="btn_quit"        caption="ui_mm_quit2windows" />
+	</menu_main_mm>
+
+	<!-- Official theme by Noxx -->
+	<!-- https://www.youtube.com/watch?v=zP-SQJuSFos -->
+	<menu_sound random="0" >
+		<menu_music>music\menu</menu_music>
+    </menu_sound>
+
+	<static_version x="14" y="740">
+		<text align="l" font="graffiti22" r="0" g="0" b="0" complex_mode="0"/>
+	</static_version>
+	
+	<msg_wnd x="0" y="0" width="210" height="100">
+	    <background x="0" y="0" width="210" height="100">
+		    <texture>ui_icons_PDA_tooltips</texture>
+	    </background>
+	    <text x="20" y="20" width="190" height="100">
+	    	<text font="letterica16" color="ui_6" complex_mode="1" align="l" vert_align="t"/>
+	    </text>
+	</msg_wnd>
+</w>

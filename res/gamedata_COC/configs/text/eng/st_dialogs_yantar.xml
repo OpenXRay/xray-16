@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+<!-- yan_ecolog_kruglov   -->
+	<string id="yan_ecolog_kruglov_start_dialog_1">
+		<text>Greetings, stalker.</text>
+	</string>
+<!-- yan_ecolog_semenov   -->
+	<string id="yan_ecolog_semenov_start_dialog_1">
+		<text>Ah, stalker, what do you need?</text>
+	</string>
+	<string id="yan_ecolog_semenov_start_dialog_yan_ecolog_semenov_task_1">
+		<text>I still have more data to collect. Let's go find some more mutants.</text>
+	</string>
+<!-- yan_ecolog_vasilyev   -->
+	<string id="yan_ecolog_vasilyev_start_dialog_1">
+		<text>Greetings, stalker.</text>
+	</string>
+<!-- yan_stalker_sakharov -->
+	<string id="st_yan_saharov_message_free_upgrade">
+		<text>Stalker, you saved us! Our bunker would have met certain doom if you didn't step in to help. To show my gratitude come to me for a free ugprade to your psi-helmet!</text>
+	</string>
+	<string id="yan_stalker_sakharov_start_1">
+		<text>Hello, stalker. What brings you here?</text>
+	</string>
+	<string id="yan_stalker_sakharov_player_query_brain_scorcher">
+		<text>What can you tell me about the Brain Scorcher?</text>
+	</string>
+	<string id="yan_stalker_sakharov_npc_query_brain_scorcher">
+		<text>Hmmm, well the field researchers only skirt the edge of the facility so the little we know is mostly hearsay; second hand. What we do know is its effects. It seems to invade the mind of any who journey too close. The symptoms include migraines, hallucinations, tunnel vision - and without sounding unprofessional, zombification. If I had to give a scientific estimation; I'd call it a remote psi transmitter; though I'd have to conduct more invasive research before settling on that conclusion.</text>
+	</string>
+	<string id="yan_stalker_sakharov_player_query_psi_helmet">
+		<text>Professor, I need a psi-protection helmet. My task requires me to move through the Brain Scorcher area and without it, I won't be able to complete it.</text>
+	</string>
+	<string id="yan_stalker_sakharov_npc_query_psi_helmet">
+		<text>I assume you understand the risk of going through these psychically volatile areas, do you? ...Oh, alright, I think you do, you wouldn't ask me about it otherwise... Well, there has been this one model we've been carefully working on, but it's still unfinished and it lacks final calibrations. We can give you the psi-helmet right now as it is for a humble sum of 10,000 RU, but then you'd have to deal with the risk of using untested hardware! There's one more possibility though - we can speed up the calibration progress, but that would require us to use more funds, and you to wait - it would cost you about 17,500 RU, once you give it to us we'll start utilizing these funds immediately to finish our calibrations which should take approximately two days, give or take.</text>
+	</string>
+	<string id="yan_stalker_sakharov_npc_query_psi_helmet_free">
+		<text>I assume you understand the risk of going through these psychically volatile areas, do you? ...Oh, alright, I think you do, you wouldn't ask me about it otherwise... Well, there has been this one model we've been carefully working on, but it's still unfinished and it lacks final calibrations.</text>
+	</string>
+	<string id="yan_stalker_sakharov_player_psi_helmet_1_1">
+		<text>I'm in a hurry - I'll take the prototype.</text>
+	</string>
+	<string id="yan_stalker_sakharov_npc_psi_helmet_1_1">
+		<text>If you insist... I am pretty sure your job requires your equipment to be in perfect operational state... Oh, I almost forgot - you can always take it back to us for final calibration. Once you feel something is wrong, head straight to us. We can't afford any losses! ...So, it will be about 10,000 RU.</text>
+	</string>
+	
+	<string id="yan_stalker_sakharov_player_psi_helmet_1_2">
+		<text>Here's the money. Thank you, professor.</text>
+	</string>
+	<string id="yan_stalker_sakharov_npc_psi_helmet_1_2">
+		<text>Very well. But I would like you to test it first. You can help us by disabling the psi-emitter in the laboratory just north of here. Let's hope it will guard your consciousness well...</text>
+	</string>
+	
+	<string id="yan_stalker_sakharov_player_psi_helmet_1_3">
+		<text>I've decided to let you finish your work. Please calibrate this helmet thoroughly.</text>
+	</string>
+	<string id="yan_stalker_sakharov_npc_psi_helmet_1_3">
+		<text>You don't know how much relief this brings to me and my colleagues. Letting us do final calibrations will greatly minimize the risk of your death, and we really don't want to feel guilty of it because we supplied you with untested gear... So, since you've already aided our cause financially, final calibration should cost you about 8,000 RU then, and you'll need to wait about two days.</text>
+	</string>
+	
+	<string id="yan_stalker_sakharov_player_psi_helmet_2_1">
+		<text>I hope my patience will be worth the fully calibrated version.</text>
+	</string>
+	<string id="yan_stalker_sakharov_npc_psi_helmet_2_1">
+		<text>Indeed it will be. Once we finish working on this helmet you'll be able to wander around the Zone freely, without taking any risks at all, as its psi-protective potential will be maximized. So... It will be around 17,500 RU.</text>
+	</string>
+	<string id="yan_stalker_sakharov_npc_psi_helmet_2_1_free">
+		<text>Indeed it will be. Once we finish working on this helmet you'll be able to wander around the Zone freely, without taking any risks at all, as its psi-protective potential will be maximized. Since you helped us out, I'll give you the device for free.</text>
+	</string>
+	
+	<string id="yan_stalker_sakharov_player_psi_helmet_2_2">
+		<text>Alright, I'll wait for the fully calibrated psi-helmet. Work your magic.</text>
+	</string>
+	<string id="yan_stalker_sakharov_npc_psi_helmet_2_2">
+		<text>Thank you, stalker. I shall commence final calibrations now. Come and visit me in a couple days.</text>
+	</string>
+	
+	<string id="yan_stalker_sakharov_player_psi_helmet_2_3">
+		<text>Is it ready, yet?</text>
+	</string>
+	<string id="yan_stalker_sakharov_npc_psi_helmet_2_3">
+		<text>Yes! Here you go. But I would like you to test it first. You can help us by disabling the psi-emitter in the laboratory just north of here. Let's hope it will guard your consciousness well...</text>
+	</string>
+	<string id="yan_stalker_sakharov_npc_psi_helmet_2_3_1">
+		<text>Not yet. Please, come back later.</text>
+	</string>
+	
+	<string id="yan_stalker_sakharov_player_psi_helmet_3_1">
+		<text>I need to think about it.</text>
+	</string>
+	<string id="yan_stalker_sakharov_npc_psi_helmet_3_1">
+		<text>Very well. Don't worry, we'll keep the psi-helmet for later.</text>
+	</string>
+<!-- yan_merc_guards -->
+	<string id="yan_merc_guards_start_2">
+		<text>You're in the wrong place, buddy! And you better leave before we make it the wrong time, too.</text>
+	</string>
+	<string id="yan_merc_guards_start_3">
+		<text>You looking for trouble or something? Get out of here before you find it!</text>
+	</string>
+	<string id="yan_merc_guards_start_4">
+		<text>Get lost, buddy. Do that, and we'll keep it peaceful.</text>
+	</string>
+</string_table>

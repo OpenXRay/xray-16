@@ -1,0 +1,95 @@
+[logic]
+active = nil;sr_idle@select
+
+[sr_idle@select]
+on_info1 = {=actor_in_zone(jup_a9_cam_1) =actor_has_item(jup_a9_way_info) -jup_a9_cam_1_end} sr_idle@cam_1_spawn %=run_postprocess(fade_in:7918) +jup_a9_way_info%
+on_info2 = {=actor_in_zone(jup_a9_cam_2) =actor_has_item(jup_a9_conservation_info) -jup_a9_cam_2_end} sr_idle@cam_2_spawn %=run_postprocess(fade_in:7922) +jup_a9_conservation_info%
+on_info3 = {=actor_in_zone(jup_a9_cam_3) =actor_has_item(jup_a9_power_info) -jup_a9_cam_3_end} sr_idle@cam_3_spawn %=run_postprocess(fade_in:7926) +jup_a9_power_info% 
+on_info4 = {+jup_a9_cam_1_end +jup_a9_cam_2_end +jup_a9_cam_3_end} sr_idle@end
+
+;cam_1
+
+[sr_idle@cam_1_spawn]
+on_game_timer = 20 | sr_idle@cam_1_disable %=run_postprocess(black:7919:true) =create_cutscene_actor_with_weapon(jup_a9_actor:jup_a9_temp_actor_walk:0:90:3)%
+
+[sr_idle@cam_1_disable]
+on_info = sr_idle@cam_1_time %=disable_ui%
+
+[sr_idle@cam_1_time]
+on_game_timer = 50 | sr_cutscene@cam_1_start %=stop_postprocess(7918) =stop_postprocess(7919) =play_sound(jup_a9_actor_way_info)%
+
+[sr_cutscene@cam_1_start]
+point = jup_a9_cam_1_actor_walk
+look = jup_a9_cam_1_actor_look
+global_cameffect = true
+enable_ui_on_end = false
+outdoor = true
+cam_effector = scenario_cam\jupiter\jup_a9_actor_way_info_cam
+on_signal1 = theme_end | {-jup_a9_cam_1_end} %+jup_a9_cam_1_end =stop_sr_cutscene =run_postprocess(fade_in:7920)%
+on_signal2 = cameff_end | {+jup_a9_cam_1_end} sr_idle@cam_1_destroy
+
+[sr_idle@cam_1_destroy]
+on_game_timer = 20 | {=story_object_exist(jup_a9_actor)} sr_idle@cam_1_end %=run_postprocess(black:7921:true) =destroy_object(story:jup_a9_actor) =destroy_object(story:jup_a9_way_info_fake) =teleport_actor(jup_a9_cam_1_actor_walk:jup_a9_cam_1_actor_look)%, sr_idle@cam_1_end %=run_postprocess(black:7921:true) =destroy_object(story:jup_a9_way_info_fake) =teleport_actor(jup_a9_cam_1_actor_walk:jup_a9_cam_1_actor_look)%  
+
+[sr_idle@cam_1_end]
+on_game_timer = 20 | sr_idle@select %=stop_postprocess(7920) =stop_postprocess(7921) =enable_ui%
+
+;cam_2
+
+[sr_idle@cam_2_spawn]
+on_game_timer = 20 | sr_idle@cam_2_disable %=run_postprocess(black:7923:true) =create_cutscene_actor_with_weapon(jup_a9_actor:jup_a9_temp_actor_walk:0:90:3)% 
+
+[sr_idle@cam_2_disable]
+on_info = sr_idle@cam_2_time %=disable_ui%
+
+[sr_idle@cam_2_time]
+on_game_timer = 50 | sr_cutscene@cam_2_start %=stop_postprocess(7922) =stop_postprocess(7923) =play_sound(jup_a9_actor_conservation_info)%
+
+[sr_cutscene@cam_2_start]
+point = jup_a9_cam_2_actor_walk
+look = jup_a9_cam_2_actor_look
+global_cameffect = true
+enable_ui_on_end = false
+cam_effector = scenario_cam\jupiter\jup_a9_actor_conservation_info_cam
+on_signal1 = theme_end | {-jup_a9_cam_2_end} %+jup_a9_cam_2_end =stop_sr_cutscene =run_postprocess(fade_in:7924)%
+on_signal2 = cameff_end | {+jup_a9_cam_2_end} sr_idle@cam_2_destroy
+
+[sr_idle@cam_2_destroy]
+on_game_timer = 20 | {=story_object_exist(jup_a9_actor)} sr_idle@cam_2_end %=run_postprocess(black:7925:true) =destroy_object(story:jup_a9_actor) =destroy_object(story:jup_a9_conservation_info_fake) =teleport_actor(jup_a9_cam_2_actor_walk:jup_a9_cam_2_actor_look)%, sr_idle@cam_2_end %=run_postprocess(black:7925:true) =destroy_object(story:jup_a9_conservation_info_fake) =teleport_actor(jup_a9_cam_2_actor_walk:jup_a9_cam_2_actor_look)%  
+
+[sr_idle@cam_2_end]
+on_game_timer = 20 | sr_idle@select %=stop_postprocess(7924) =stop_postprocess(7925) =enable_ui%
+
+;cam_3
+
+[sr_idle@cam_3_spawn]
+on_game_timer = 20 | sr_idle@cam_3_disable %=run_postprocess(black:7927:true) =create_cutscene_actor_with_weapon(jup_a9_actor:jup_a9_temp_actor_walk:0:270:3)%
+
+[sr_idle@cam_3_disable]
+on_info = sr_idle@cam_3_time %=disable_ui%
+
+[sr_idle@cam_3_time]
+on_game_timer = 50 | sr_cutscene@cam_3_start %=stop_postprocess(7926) =stop_postprocess(7927) =play_sound(jup_a9_actor_power_info)%
+
+[sr_cutscene@cam_3_start]
+point = jup_a9_cam_3_actor_walk
+look = jup_a9_cam_3_actor_look
+global_cameffect = true
+enable_ui_on_end = false
+cam_effector = scenario_cam\jupiter\jup_a9_actor_power_info_cam
+on_signal1 = theme_end | {-jup_a9_cam_3_end} %+jup_a9_cam_3_end =stop_sr_cutscene =run_postprocess(fade_in:7928)%
+on_signal2 = cameff_end | {+jup_a9_cam_3_end} sr_idle@cam_3_destroy
+
+[sr_idle@cam_3_destroy]
+on_game_timer = 20 | {=story_object_exist(jup_a9_actor)} sr_idle@cam_3_end %=run_postprocess(black:7929:true) =destroy_object(story:jup_a9_actor) =destroy_object(story:jup_a9_power_info_fake) =teleport_actor(jup_a9_cam_3_actor_walk:jup_a9_cam_3_actor_look)%, sr_idle@cam_3_end %=run_postprocess(black:7929:true) =destroy_object(story:jup_a9_power_info_fake) =teleport_actor(jup_a9_cam_3_actor_walk:jup_a9_cam_3_actor_look)%  
+
+[sr_idle@cam_3_end]
+on_game_timer = 20 | sr_idle@select %=stop_postprocess(7928) =stop_postprocess(7929) =enable_ui%
+
+;end
+
+[sr_idle@end]
+on_info = {-jup_a9_scenari_save_after_three_docs} %+jup_a9_scenari_save_after_three_docs =scenario_autosave(st_save_jup_a9_got_underpass_docs)%
+on_info2 = {+jup_a9_scenari_save_after_three_docs} sr_idle@nil
+
+[sr_idle@nil]

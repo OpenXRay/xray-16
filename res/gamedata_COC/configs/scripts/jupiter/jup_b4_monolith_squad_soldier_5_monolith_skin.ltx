@@ -1,0 +1,66 @@
+[logic@jup_b4_monolith_squad_soldier_5_monolith_skin]
+suitable = {=check_npc_name(jup_b4_monolith_squad_soldier_5_monolith_skin)}
+active = animpoint@begin
+prior = 100
+on_hit = hit
+on_death = death
+
+[animpoint@begin]
+cover_name = jup_b4_animpoint_3
+combat_ignore_cond = {-jup_b4_monolith_squad_hit} true, false
+use_camp = false
+reach_distance = 1.5
+on_info = {-task_jup_b4_monolith_squad_help +jup_b4_monolith_talking_5} %=play_sound(jup_b4_monolith_talking_5)%
+on_info2 = {+jup_b4_aling} walker@1
+on_info3 = {+jup_b4_freedom_squad_leader_lets_talk_sound} animpoint@freedom_1
+on_info4 = {+jup_b4_monolith_squad_out} walker@out
+meet = meet_speak_boos
+
+[walker@out]
+path_walk = monolith_squad_soldier_5_monolith_skin_2_walk
+path_look = monolith_squad_soldier_5_monolith_skin_2_look
+meet = no_meet
+
+;--------------------------------------------------------------------------------
+;--------------------------------------------------------------------------------
+
+[walker@1]
+use_camp = false
+path_walk = monolith_squad_soldier_5_monolith_skin_2_walk
+path_look = monolith_squad_soldier_5_monolith_skin_2_look
+combat_ignore_cond = {-jup_b4_monolith_squad_hit} true, false
+on_signal = align5 | %+jup_b4_duty_aling5%
+on_info = {+jup_b4_aling_line} walker@dolg_aling_line
+meet = meet_speak_boos
+
+[walker@dolg_aling_line]
+use_camp = false
+path_walk = monolith_squad_soldier_5_monolith_skin_1_walk
+path_look = monolith_squad_soldier_5_monolith_skin_1_look
+combat_ignore_cond = {-jup_b4_monolith_squad_hit} true, false
+on_info = {+jup_b4_duty_prisiaga -jup_b4_recruit_5_serve_duty_sound} %=play_sound(jup_b4_recruit_2_serve_duty) +jup_b4_recruit_5_serve_duty_sound%
+on_info2 = {+jup_b4_monolith_squad_out -jup_b4_ms5_stop_sound} %=stop_sound +jup_b4_ms5_stop_sound%
+meet = meet_speak_boos
+
+;--------------------------------------------------------------------------------
+;--------------------------------------------------------------------------------
+
+[animpoint@freedom_1]
+cover_name = jup_b4_animpoint_3
+use_camp = false
+reach_distance = 1.5
+combat_ignore_cond = {-jup_b4_monolith_squad_hit} true, false
+on_info = {+jup_b4_recruit_1_cool_freedom_sound} %=play_sound(jup_b4_recruit_2_cool_freedom)%
+on_info2 = {+jup_b4_monolith_squad_out -jup_b4_ms5_stop_sound} %=stop_sound +jup_b4_ms5_stop_sound%
+on_signal = sound_end | %+jup_b4_recruit_2_cool_freedom_sound%
+meet = meet_speak_boos
+
+[hit]
+on_info = %+jup_b4_monolith_squad_hit%
+
+[death]
+on_info = %+jup_b4_soldier_5_death +jup_b4_duty_aling5 +jup_b4_recruit_5_serve_duty_sound +jup_b4_recruit_2_cool_freedom_sound%
+
+[meet_speak_boos]
+use				= false
+snd_on_use 		= jup_b4_monolith_talk_to_commander

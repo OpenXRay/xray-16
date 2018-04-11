@@ -1,0 +1,30 @@
+[logic@zat_b7_duty_illicit_dealer]
+active = animpoint@zat_b7_duty_illicit_dealer
+suitable = {=check_npc_name(zat_b7_duty_illicit_dealer)} true
+prior = 200
+
+[animpoint@zat_b7_duty_illicit_dealer]
+cover_name = jup_a6_animpoint_morgan
+use_camp = false
+meet = meet@zat_b7_duty_illicit_dealer
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet@zat_b7_duty_illicit_dealer]
+close_snd_hello = nil
+close_snd_bye 	= nil
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+use = {=actor_enemy} false, true
+allow_break = false
+trade_enable = false
+meet_on_talking = false

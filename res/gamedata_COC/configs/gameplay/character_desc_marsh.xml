@@ -1,0 +1,181 @@
+﻿<?xml version='1.0' encoding="windows-1251"?>
+<xml>
+    <!-------------------------- DOCTOR ------------------------>
+    <specific_character id="mar_smart_terrain_base_doctor" team_default = "1">
+    <name>cit_doctor_name</name>
+    <icon>ui_inGame2_trodnik</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Doctor.</bio>
+    <class>mar_smart_terrain_base_doctor</class>
+    <community>csky</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <rank>14430</rank>
+    <reputation>1403</reputation>
+    <money min="1000000" max="1000000" infinitive="1" />
+    <visual>actors\stalker_nebo\stalker_nebo_1</visual>
+    <supplies>
+        [spawn] \n
+        wpn_ak74u = 1 \n
+        ammo_5.45x39_fmj = 1 \n
+    </supplies>
+    <start_dialog>mar_smart_terrain_base_doctor_start</start_dialog>
+    <actor_dialog>mar_smart_terrain_base_doctor_need_health_care</actor_dialog>
+    <actor_dialog>mar_smart_terrain_base_doctor_background</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-------------------------- THE REAL DOC ------------------------>
+    <specific_character id="mar_smart_terrain_doc_doctor" team_default = "1">
+    <name>marsh_doctor_name</name>
+    <icon>ui_inGame2_doc</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Doctor.</bio>
+    <class>mar_smart_terrain_doc_doctor</class>
+    <community>trader</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <rank>31506</rank>
+    <reputation>2485</reputation>
+    <money min="10000" max="10000" infinitive="0" />
+    <visual>actors\izgoy\izgoy</visual>
+    <supplies>
+        [spawn] \n
+        cit_doctors_key = 1 \n
+        cit_doctors_pda = 1 \n
+    </supplies>
+    <start_dialog>cit_doctor_hello_dialog</start_dialog>
+    <actor_dialog>cit_doctor_main_dialog</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-------------------------- CSKY BARMAN ------------------------>
+    <specific_character id="mar_base_stalker_barmen" team_default="1">
+    <name>mar_base_stalker_barmen_name</name>
+    <icon>ui_inGame2_librarian</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Îïûòíûé ñòàëêåð. Äåòàëüíàÿ èíôîðìàöèÿ îòñóòñòâóåò.</bio>
+    <class>mar_base_stalker_barmen</class>
+    <community>csky</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\csky\</snd_config>
+    <rank>12280</rank>
+    <reputation>1246</reputation>
+    <money min="1000000" max="1000000" infinitive="1" />
+    <visual>actors\stalker_nebo\stalker_nebo_smask1</visual>
+    <supplies>
+        [spawn] \n
+        wpn_sig550 \n
+        ammo_5.56x45_ap = 1 \n
+        wpn_beretta \n
+        ammo_9x19_fmj = 1 \n
+#include "gameplay\character_items_3.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <start_dialog>marsh_stalker_barmen_start_dialog</start_dialog>
+    <actor_dialog>dm_ordered_task_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+    <actor_dialog>mar_smart_terrain_base_barman_background</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <!-------------------------- CSKY TRADER ------------------------>
+    <specific_character id="mar_base_owl_stalker_trader" team_default="1">
+    <name>mar_base_owl_stalker_trader_name</name>
+    <icon>ui_inGame2_csky_trade</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Îïûòíûé ñòàëêåð. Äåòàëüíàÿ èíôîðìàöèÿ îòñóòñòâóåò.</bio>
+    <class>mar_base_owl_stalker_trader</class>
+    <community>csky</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\csky\</snd_config>
+    <rank>21786</rank>
+    <reputation>1559</reputation>
+    <money min="1000000" max="1000000" infinitive="1" />
+    <visual>actors\stalker_nebo\stalker_trader_nebo</visual>
+    <supplies></supplies>
+#include "gameplay\character_criticals.xml"
+        <start_dialog>mar_base_owl_stalker_trader_start_dialog</start_dialog>
+        <actor_dialog>dm_ordered_task_dialog</actor_dialog>
+        <actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+        <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+        <actor_dialog>mar_smart_terrain_base_trader_background</actor_dialog>
+		<actor_dialog>dm_broker_dialog</actor_dialog>
+        <actor_dialog>actor_break_dialog</actor_dialog>
+        </specific_character>
+        
+        <!-------------------------- CSKY MECHANIC ------------------------>
+        <specific_character id="mar_base_stalker_tech" team_default = "1">
+        <name>mar_base_stalker_tech_name</name>
+        <icon>ui_inGame2_Novikov</icon>
+        <map_icon x="1" y="0">
+        </map_icon>
+        <bio>Îïûòíûé ñòàëêåð. Òåõíèê Àçîò.</bio>
+        <class>mar_base_stalker_tech</class>
+        <community>csky</community>
+        <mechanic_mode>1</mechanic_mode>
+        <terrain_sect>stalker_terrain</terrain_sect>
+        <snd_config>characters_voice\human_01\csky\</snd_config>
+        <rank>14994</rank>
+        <reputation>1891</reputation>
+        <money min="10000" max="10000" infinitive="0" />
+        <visual>actors\stalker_nebo\stalker_nebo_2_face_3</visual>
+        <supplies>
+        [spawn] \n
+        wpn_fort \n
+        ammo_9x18_pmm = 1 \n
+#include "gameplay\character_items_2.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+    </supplies>
+    <start_dialog>marsh_stalker_tech_start</start_dialog>
+    <actor_dialog>dm_tech_repair</actor_dialog>
+    <actor_dialog>dm_ordered_task_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+    <actor_dialog>mar_smart_terrain_base_tech_background</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-------------------------- LIDER_MARCH ------------------------>
+    <specific_character id="mar_smart_terrain_base_stalker_leader_marsh" team_default = "1">
+    <name>mar_smart_terrain_base_stalker_leader_marsh_name</name>
+    <icon>ui_inGame2_cold</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>ќпытный сталкер. ƒетальна¤ информаци¤ отсутствует.</bio>
+    <class>mar_smart_terrain_base_stalker_leader_marsh</class>
+    <community>csky</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\csky\</snd_config>
+    <rank>27344</rank>
+    <reputation>2314</reputation>
+    <visual>actors\stalker_nebo\stalker_nebo_2_face_4</visual>
+    <supplies>
+        [spawn] \n
+        wpn_desert_eagle = 1 \n
+        ammo_11.43x23_fmj = 1 \n
+        wpn_ak74 = 1 \n
+        ammo_5.45x39_fmj = 1 \n
+#include "gameplay\character_items_3.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <start_dialog>hello_dialog</start_dialog>
+    <actor_dialog>mar_smart_terrain_base_leader_background</actor_dialog>
+    <actor_dialog>mar_smart_terrain_base_leader_csky_history</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+</xml>

@@ -1,0 +1,11 @@
+[logic]
+active = sr_idle
+
+[sr_idle]
+;on_actor_inside = {+agr_u_controller_start} sr_idle@2 , sr_idle@2 %+agr_u_controller_start =play_snd_from_obj(397:monsters\controller\controller_script_attack_0)% 
+on_actor_inside = %=create_squad(agr_u_soldiers_controller_squad:agr_u_soldiers)% sr_idle@nil
+
+;[sr_idle@2]
+;on_actor_inside = nil {+agr_krot_secret_info +agr_gunslinger_flash_have} %+agr_find_gunslinger_cache_final%
+
+[sr_idle@nil]

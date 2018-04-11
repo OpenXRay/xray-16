@@ -1,0 +1,428 @@
+;Guards
+[logic@zat_a2_guarder_1]
+active = walker@guarder_1 
+suitable = {!surge_started} true
+prior = 120
+
+[walker@guarder_1]
+path_walk = guarder_1_walk
+path_look = guarder_1_look
+on_info = {!actor_enemy =see_actor !npc_in_zone(zat_a2_sr_light) =actor_has_weapon =actor_in_zone(zat_a2_sr_noweap) =dist_to_actor_le(35)} remark@guarder_1
+combat_ignore_cond = {!is_enemy_actor_or_companion =npc_in_zone(zat_a2_sr_light)} true, false
+out_restr = zat_a2_sr_noweap
+in_restr = zat_a2_sr_light
+use_camp = false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[remark@guarder_1]
+anim = threat
+target = story | actor
+on_info = {-zat_a2_base_guard} %+zat_a2_base_guard =play_sound(zat_a2_base_guard)%
+on_game_timer = 75 | walker@guarder_1 %-zat_a2_base_guard%
+combat_ignore_cond = {!is_enemy_actor_or_companion =npc_in_zone(zat_a2_sr_light)} true, false
+out_restr = zat_a2_sr_noweap
+in_restr = zat_a2_sr_light
+
+
+
+[logic@zat_a2_guarder_2]
+active = walker@guarder_2 
+suitable = {!surge_started} true
+prior = 100
+
+[walker@guarder_2]:walker@guarder_1
+path_walk = guarder_2_walk
+path_look = guarder_2_look
+on_info = {!actor_enemy =see_actor !npc_in_zone(zat_a2_sr_light) =actor_has_weapon =actor_in_zone(zat_a2_sr_noweap) =dist_to_actor_le(35)} remark@guarder_2
+
+[remark@guarder_2]:remark@guarder_1
+on_game_timer = 75 | walker@guarder_2
+
+
+
+[logic@zat_a2_guarder_3]
+active = walker@guarder_3 
+suitable = {!surge_started} true
+prior = 100
+
+[walker@guarder_3]:walker@guarder_1
+path_walk = guarder_3_walk
+path_look = guarder_3_look
+on_info = {!actor_enemy =see_actor !npc_in_zone(zat_a2_sr_light) =actor_has_weapon =actor_in_zone(zat_a2_sr_noweap) =dist_to_actor_le(35)} remark@guarder_3
+
+[remark@guarder_3]:remark@guarder_1
+on_game_timer = 75 | walker@guarder_3
+
+
+
+;Spartacus 
+[logic@zat_b7_stalker_victim_leader]
+active = animpoint@zat_b7_stalker_victim_leader 
+suitable = {=check_npc_name(zat_b7_stalker_victim_1)} true
+prior = 150
+
+[animpoint@zat_b7_stalker_victim_leader]
+reach_movement = walk_noweap
+cover_name = zat_a2_sc_zat_b7_stalker_victim_leader
+use_camp = false 
+meet = meet@base_zat_b7_stalker_victim_leader
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet@base_zat_b7_stalker_victim_leader]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+use = {=actor_enemy} false, {=dist_to_actor_le(3)} true, false
+snd_on_use = {!dist_to_actor_le(3)} nil
+meet_on_talking = false
+
+
+
+;animpoints
+[logic@zat_a2_guarder_4]
+active = animpoint@guarder_4 
+suitable = true
+prior = 100
+
+[logic@zat_a2_guarder_5]
+active = animpoint@guarder_5 
+suitable = true
+prior = 100
+
+[logic@zat_a2_guarder_6]
+active = animpoint@guarder_6 
+suitable = true
+prior = 100
+
+[logic@zat_a2_animp_1]
+active = animpoint@zat_a2_animp_1 
+suitable = true
+prior = 100
+
+[logic@zat_a2_animp_2]
+active = animpoint@zat_a2_animp_2 
+suitable = true
+prior = 90
+
+[logic@zat_a2_animp_3]
+active = animpoint@zat_a2_animp_3
+suitable = true
+prior = 90
+
+[logic@zat_a2_animp_4]
+active = animpoint@zat_a2_animp_4 
+suitable = true
+prior = 100
+
+[logic@zat_a2_animp_5]
+active = animpoint@zat_a2_animp_5 
+suitable = true
+prior = 100
+
+[logic@zat_a2_animp_6]
+active = animpoint@zat_a2_animp_6 
+suitable = true
+prior = 90
+
+[logic@zat_a2_animp_7]
+active = animpoint@zat_a2_animp_7 
+suitable = true
+prior = 90
+
+[logic@zat_a2_animp_8]
+active = animpoint@zat_a2_animp_8 
+suitable = true
+prior = 90
+
+[logic@zat_a2_animp_9]
+active = animpoint@zat_a2_animp_9 
+suitable = true
+prior = 100
+
+[logic@zat_a2_animp_10]
+active = animpoint@zat_a2_animp_10
+suitable = true
+prior = 100
+
+[logic@zat_a2_animp_11]
+active = animpoint@zat_a2_animp_11 
+suitable = true
+prior = 100
+
+[logic@zat_a2_animp_12]
+active = animpoint@zat_a2_animp_12 
+suitable = true
+prior = 90
+
+[logic@zat_a2_animp_13]
+active = animpoint@zat_a2_animp_13 
+suitable = true
+prior = 90
+
+[logic@zat_a2_animp_14]
+active = animpoint@zat_a2_animp_14 
+suitable = true
+prior = 100
+
+[logic@zat_a2_animp_15]
+active = animpoint@zat_a2_animp_15 
+suitable = true
+prior = 100
+
+[logic@zat_a2_animp_16]
+active = animpoint@zat_a2_animp_16 
+suitable = true
+prior = 100
+
+[logic@zat_a2_animp_17]
+active = animpoint@zat_a2_animp_17 
+suitable = true
+prior = 90
+
+[logic@zat_a2_animp_18]
+active = animpoint@zat_a2_animp_18 
+suitable = true
+prior = 90
+
+[logic@zat_a2_animp_19]
+active = animpoint@zat_a2_animp_19 
+suitable = true
+prior = 100
+
+[logic@zat_a2_animp_20]
+active = animpoint@zat_a2_animp_20 
+suitable = true
+prior = 100
+
+[logic@zat_a2_animp_21]
+active = animpoint@zat_a2_animp_21 
+suitable = true
+prior = 105
+
+[logic@zat_a2_animp_22]
+active = animpoint@zat_a2_animp_22 
+suitable = true
+prior = 100
+
+[meet@zat_a2_animpoint_meet]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance 	= 0
+far_distance 	= 0
+use = {=actor_enemy} false, {=dist_to_actor_le(3)} true, false
+snd_on_use = {!dist_to_actor_le(3)} nil
+meet_on_talking = false
+
+[animpoint@zat_a2_animp_gen]
+reach_movement = walk_noweap
+use_camp = true
+meet = meet@zat_a2_animpoint_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@zat_a2_animp_gen_reach]:animpoint@zat_a2_animp_gen
+combat_ignore_keep_when_attacked = false
+invulnerable = false
+
+[animpoint@guarder_4]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_sc_guarder_4
+on_info = {=npc_in_zone(zat_a2_sr_light)} animpoint@guarder_4_reached
+
+[animpoint@guarder_5]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_sc_guarder_5
+meet = no_meet
+use_camp = false
+on_info = {=npc_in_zone(zat_a2_sr_light)} animpoint@guarder_5_reached
+
+[animpoint@guarder_6]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_sc_guarder_6
+meet = no_meet
+use_camp = false
+on_info = {=npc_in_zone(zat_a2_sr_light)} animpoint@guarder_6_reached
+
+[animpoint@zat_a2_animp_1]:animpoint@zat_a2_animp_gen_reach
+cover_name = zat_a2_animpoint_1
+on_info = {=npc_in_zone(zat_a2_sr_light)} animpoint@zat_a2_animp_1_reached
+
+[animpoint@zat_a2_animp_2]:animpoint@zat_a2_animp_gen_reach
+cover_name = zat_a2_animpoint_2
+on_info = {=npc_in_zone(zat_a2_sr_light)} animpoint@zat_a2_animp_2_reached
+
+[animpoint@zat_a2_animp_3]:animpoint@zat_a2_animp_gen_reach
+cover_name = zat_a2_animpoint_3
+on_info = {=npc_in_zone(zat_a2_sr_light)} animpoint@zat_a2_animp_3_reached
+
+[animpoint@zat_a2_animp_4]:animpoint@zat_a2_animp_gen_reach
+cover_name = zat_a2_animpoint_4
+on_info = {=npc_in_zone(zat_a2_sr_light)} animpoint@zat_a2_animp_4_reached
+
+[animpoint@zat_a2_animp_5]:animpoint@zat_a2_animp_gen_reach
+cover_name = zat_a2_animpoint_5
+on_info = {=npc_in_zone(zat_a2_sr_light)} animpoint@zat_a2_animp_5_reached
+
+[animpoint@zat_a2_animp_6]:animpoint@zat_a2_animp_gen_reach
+cover_name = zat_a2_animpoint_6
+on_info = {=npc_in_zone(zat_a2_sr_light)} animpoint@zat_a2_animp_6_reached
+
+[animpoint@zat_a2_animp_7]:animpoint@zat_a2_animp_gen_reach
+cover_name = zat_a2_animpoint_7
+on_info = {=npc_in_zone(zat_a2_sr_light)} animpoint@zat_a2_animp_7_reached
+
+[animpoint@zat_a2_animp_8]:animpoint@zat_a2_animp_gen_reach
+cover_name = zat_a2_animpoint_8
+on_info = {=npc_in_zone(zat_a2_sr_light)} animpoint@zat_a2_animp_8_reached
+
+[animpoint@zat_a2_animp_9]:animpoint@zat_a2_animp_gen_reach
+cover_name = zat_a2_animpoint_9
+on_info = {=npc_in_zone(zat_a2_sr_light)} animpoint@zat_a2_animp_9_reached
+
+[animpoint@zat_a2_animp_10]:animpoint@zat_a2_animp_gen_reach
+cover_name = zat_a2_animpoint_10
+on_info = {=npc_in_zone(zat_a2_sr_light)} animpoint@zat_a2_animp_10_reached
+
+[animpoint@zat_a2_animp_11]:animpoint@zat_a2_animp_gen_reach
+cover_name = zat_a2_animpoint_11
+on_info = {=npc_in_zone(zat_a2_sr_light)} animpoint@zat_a2_animp_11_reached
+
+[animpoint@zat_a2_animp_12]:animpoint@zat_a2_animp_gen_reach
+cover_name = zat_a2_animpoint_12
+on_info = {=npc_in_zone(zat_a2_sr_light)} animpoint@zat_a2_animp_12_reached
+
+[animpoint@zat_a2_animp_13]:animpoint@zat_a2_animp_gen_reach
+cover_name = zat_a2_animpoint_13
+on_info = {=npc_in_zone(zat_a2_sr_light)} animpoint@zat_a2_animp_13_reached
+
+[animpoint@zat_a2_animp_14]:animpoint@zat_a2_animp_gen_reach
+cover_name = zat_a2_animpoint_14
+on_info = {=npc_in_zone(zat_a2_sr_light)} animpoint@zat_a2_animp_14_reached
+
+[animpoint@zat_a2_animp_15]:animpoint@zat_a2_animp_gen_reach
+cover_name = zat_a2_animpoint_15
+on_info = {=npc_in_zone(zat_a2_sr_light)} animpoint@zat_a2_animp_15_reached
+
+[animpoint@zat_a2_animp_16]:animpoint@zat_a2_animp_gen_reach
+cover_name = zat_a2_animpoint_16
+on_info = {=npc_in_zone(zat_a2_sr_light)} animpoint@zat_a2_animp_16_reached
+
+[animpoint@zat_a2_animp_17]:animpoint@zat_a2_animp_gen_reach
+cover_name = zat_a2_animpoint_17
+on_info = {=npc_in_zone(zat_a2_sr_light)} animpoint@zat_a2_animp_17_reached
+
+[animpoint@zat_a2_animp_18]:animpoint@zat_a2_animp_gen_reach
+cover_name = zat_a2_animpoint_18
+on_info = {=npc_in_zone(zat_a2_sr_light)} animpoint@zat_a2_animp_18_reached
+
+[animpoint@zat_a2_animp_19]:animpoint@zat_a2_animp_gen_reach
+cover_name = zat_a2_animpoint_19
+on_info = {=npc_in_zone(zat_a2_sr_light)} animpoint@zat_a2_animp_19_reached
+
+[animpoint@zat_a2_animp_20]:animpoint@zat_a2_animp_gen_reach
+cover_name = zat_a2_animpoint_20
+on_info = {=npc_in_zone(zat_a2_sr_light)} animpoint@zat_a2_animp_20_reached
+
+[animpoint@zat_a2_animp_21]:animpoint@zat_a2_animp_gen_reach
+cover_name = zat_a2_animpoint_21
+on_info = {=npc_in_zone(zat_a2_sr_light)} animpoint@zat_a2_animp_21_reached
+
+[animpoint@zat_a2_animp_22]:animpoint@zat_a2_animp_gen_reach
+cover_name = zat_a2_animpoint_22
+on_info = {=npc_in_zone(zat_a2_sr_light)} animpoint@zat_a2_animp_22_reached
+
+
+
+[animpoint@guarder_4_reached]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_sc_guarder_4
+
+[animpoint@guarder_5_reached]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_sc_guarder_5
+meet = no_meet
+use_camp = false
+
+[animpoint@guarder_6_reached]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_sc_guarder_6
+meet = no_meet
+use_camp = false
+
+[animpoint@zat_a2_animp_1_reached]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_animpoint_1
+
+[animpoint@zat_a2_animp_2_reached]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_animpoint_2
+
+[animpoint@zat_a2_animp_3_reached]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_animpoint_3
+
+[animpoint@zat_a2_animp_4_reached]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_animpoint_4
+
+[animpoint@zat_a2_animp_5_reached]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_animpoint_5
+
+[animpoint@zat_a2_animp_6_reached]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_animpoint_6
+
+[animpoint@zat_a2_animp_7_reached]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_animpoint_7
+
+[animpoint@zat_a2_animp_8_reached]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_animpoint_8
+
+[animpoint@zat_a2_animp_9_reached]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_animpoint_9
+
+[animpoint@zat_a2_animp_10_reached]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_animpoint_10
+
+[animpoint@zat_a2_animp_11_reached]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_animpoint_11
+
+[animpoint@zat_a2_animp_12_reached]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_animpoint_12
+
+[animpoint@zat_a2_animp_13_reached]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_animpoint_13
+
+[animpoint@zat_a2_animp_14_reached]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_animpoint_14
+
+[animpoint@zat_a2_animp_15_reached]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_animpoint_15
+
+[animpoint@zat_a2_animp_16_reached]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_animpoint_16
+
+[animpoint@zat_a2_animp_17_reached]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_animpoint_17
+
+[animpoint@zat_a2_animp_18_reached]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_animpoint_18
+
+[animpoint@zat_a2_animp_19_reached]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_animpoint_19
+
+[animpoint@zat_a2_animp_20_reached]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_animpoint_20
+
+[animpoint@zat_a2_animp_21_reached]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_animpoint_21
+
+[animpoint@zat_a2_animp_22_reached]:animpoint@zat_a2_animp_gen
+cover_name = zat_a2_animpoint_22

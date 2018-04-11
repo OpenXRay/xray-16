@@ -1,0 +1,16 @@
+[smart_terrain]
+squad_id = 3
+max_population = 2
+respawn_params = respawn@agr_u_bloodsucker_2
+respawn_idle = 86400
+respawn_radius = 300
+
+[respawn@agr_u_bloodsucker_2]
+spawn_bloodsucker
+
+[spawn_bloodsucker]
+spawn_squads = simulation_bloodsucker
+spawn_num = {+agru_add_reward_1} 1, 0
+
+[exclusive]
+agr_u_bloodsucker_2 = agroprom_underground\agru_bloodsucker.ltx

@@ -1,0 +1,13 @@
+[logic]
+active = nil;sr_idle@1
+
+[sr_idle@1]
+on_actor_inside = {+pri_b305_second_cam_end} sr_idle@timer 
+
+[sr_idle@timer]
+on_game_timer = 45 | sr_idle@3_cam %+pri_b305_mooving_signal =play_sound(pri_b305_kirilov_give_new_coordinates)%
+
+[sr_idle@3_cam]
+on_actor_in_zone = pri_b305_mooving_signal_end | {+pri_b305_kirilov_signal_lost_done} sr_idle@nil %+pri_b305_third_cam_go%
+
+[sr_idle@nil]

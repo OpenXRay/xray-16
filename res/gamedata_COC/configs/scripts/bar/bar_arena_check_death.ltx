@@ -1,0 +1,11 @@
+[logic]
+;active = sr_territory@1
+active = sr_idle@nil
+
+[sr_territory@1]
+territory_death = sr_idle@1 %+bar_arena_territory_death%
+
+[sr_idle@1]
+on_info = {-bar_arena_territory_death} sr_territory@1
+
+[sr_idle@nil]

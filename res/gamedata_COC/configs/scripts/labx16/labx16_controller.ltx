@@ -1,0 +1,13 @@
+[logic]
+active = mob_home
+
+[mob_home]
+path_home = x16_controller_home_1
+home_min_radius = 50
+home_max_radius = 150
+on_actor_in_zone = controller_scream | mob_home@2 %=hit_npc_from_actor =play_sound(controller_script_attack)%
+
+[mob_home@2]
+path_home = x16_controller_home_1
+home_min_radius = 50
+home_max_radius = 150

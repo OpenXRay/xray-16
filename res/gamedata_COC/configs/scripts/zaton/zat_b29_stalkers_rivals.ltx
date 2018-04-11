@@ -1,0 +1,100 @@
+[meet@rival]
+meet_dialog = {!is_wounded =zat_b29_rivals_dialog_precond} zat_b29_rivals_start_dialog
+
+[logic@zat_b29_stalker_rival_leader]
+suitable = {=check_npc_name(zat_b29_stalker_rival)} true
+prior = 200
+active = walker@stalker_rival_leader
+
+[walker@stalker_rival_leader]
+path_walk = leader_walk
+path_look = leader_look
+def_state_moving = walk
+def_state_standing = probe_stand
+meet = meet@rival
+on_info = {!npc_has_item(detector_advanced) !npc_has_item(detector_scientific)} %=give_item(detector_advanced)%
+
+
+[logic@zat_b29_stalker_rival_2]
+suitable = {=target_squad_name(zat_b29_stalker_rival) !check_npc_name(zat_b29_stalker_rival)} true
+prior = 200
+active = walker@stalker_rival_2
+
+[walker@stalker_rival_2]
+path_walk = 2_walk
+path_look = 2_look
+def_state_moving = walk
+def_state_standing = probe_crouch
+meet = meet@rival
+on_info = {!npc_has_item(detector_elite) !npc_has_item(detector_scientific)} %=give_item(detector_elite)%
+
+[logic@zat_b29_stalker_rival_3]
+suitable = {=target_squad_name(zat_b29_stalker_rival) !check_npc_name(zat_b29_stalker_rival)} true
+prior = 200
+active = walker@stalker_rival_3
+
+[walker@stalker_rival_3]
+path_walk = 3_walk
+path_look = 3_look
+def_state_moving = walk
+def_state_standing = probe_crouch
+meet = meet@rival
+on_info = {!npc_has_item(detector_advanced) !npc_has_item(detector_scientific)} %=give_item(detector_advanced)%
+
+
+;On stalkers base, with af
+[logic@zat_b29_stalker_rival]
+suitable = {=check_npc_name(zat_b29_stalker_rival) -zat_b29_linker_take_af_from_rival +zat_b29_adv_task_given +zat_b29_stalkers_rivals_found_af} true
+prior = 200
+active = walker@stalker_rival_base_reach
+
+[walker@stalker_rival_base_reach]
+path_walk = b29_rival_leader_walk
+path_look = b29_rival_leader_look
+on_signal = path_end | walker@wait_for_actor
+on_info = {=npc_in_zone(zat_a2_sr_light)} walker@stalker_rival_base
+out_restr = zat_a2_sr_noweap
+
+[walker@stalker_rival_base]
+path_walk = b29_rival_leader_walk
+path_look = b29_rival_leader_look
+on_signal = path_end | walker@wait_for_actor
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = zat_a2_sr_noweap
+def_state_moving = walk_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = false
+
+[walker@wait_for_actor]
+path_walk = b29_rival_leader_walk
+path_look = b29_rival_leader_look
+on_info = {=dist_to_actor_le(20)} remark@transfer_af
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = false
+
+[remark@transfer_af]
+target = story | zat_a2_stalker_barmen
+anim = zat_b14_give_artefact_idle
+on_info = {-zat_b29_rival_sound_played =check_npc_name(zat_b29_stalker_rival_1)} %=play_sound(zat_b29_stalker_rival_1_order_ready)%
+on_info2 = {-zat_b29_rival_sound_played =check_npc_name(zat_b29_stalker_rival_2)} %=play_sound(zat_b29_stalker_rival_2_order_ready)%
+on_info3 = {-zat_b29_rival_sound_played =check_npc_name(zat_b29_stalker_rival_default_1)} %=play_sound(zat_b29_stalker_rival_1_order_ready)%
+on_info4 = {-zat_b29_rival_sound_played =check_npc_name(zat_b29_stalker_rival_default_2)} %=play_sound(zat_b29_stalker_rival_2_order_ready)%
+on_signal = sound_end | %+zat_b29_rival_sound_played%
+meet = no_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false

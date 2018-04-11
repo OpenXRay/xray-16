@@ -1,0 +1,61 @@
+[logic]
+active = nil;sr_idle@quest
+
+[sr_idle@quest]
+on_info = {+pri_b305_signal_lost -pri_b305_kirilov_signal_lost_done} %=play_sound(pri_b305_kirilov_signal_lost) +pri_b305_kirilov_signal_lost_done%
+on_info2 = {+pri_b305_third_cam_go} sr_idle@third_cam 
+
+[sr_idle@third_cam]
+on_info = {-pri_b305_third_cam_prepare} sr_idle@remove_squads %+pri_b305_third_cam_prepare +pri_b305_3_cam_actor =run_postprocess(fade_in) =create_cutscene_actor_with_weapon(pri_b305_actor_visual_3:pri_b305_cam3_actor_prespawn:0:0:3)%
+
+[sr_idle@remove_squads]
+on_info = {-pri_a28_tarasov_alive =is_alive(pri_a17_military_captain_tarasov)} %+pri_a28_tarasov_alive%
+on_info2 = {-pri_a28_valentyr_alive =is_alive(pri_a17_military_prapor_valentyr)} %+pri_a28_valentyr_alive%
+on_info3 = {-pri_a28_podorojniy_alive =is_alive(pri_a17_military_lieutenant_podorojniy)} %+pri_a28_podorojniy_alive%
+on_info4 = sr_idle@remove_other_parts %=remove_squad(pri_a17_recon_squad) =disable_ui%
+
+[sr_idle@remove_other_parts]
+on_info = {=squad_exist(pri_a16_sokolov_squad)} sr_idle@clear_smart %+pri_a28_sokolov_alive =remove_squad(pri_a16_sokolov_squad)%, sr_idle@clear_smart
+
+[sr_idle@clear_smart]
+on_info = sr_idle@actor_spawn %=clear_smart_terrain(pri_a16)%
+
+[sr_idle@actor_spawn]
+on_info = {+pri_b305_3_cam_actor} sr_idle@third_cam_timer %=run_postprocess(black:5614:true) =teleport_npc_by_story_id(pri_b305_actor_visual_3:pri_b305_actor_cam_3_walk)%
+
+[sr_idle@third_cam_timer]
+on_game_timer = 10 | sr_cutscene@third_cam %+pri_b305_third_cam_start =stop_postprocess(5614)%
+
+[sr_cutscene@third_cam]
+point = pri_b305_actor_collector_walk
+look = pri_b305_actor_collector_look
+outdoor = true
+cam_effector = scenario_cam\pripyat\pri_b305_catscene_3_lost_signal	
+global_cameffect = true
+enable_ui_on_end = true
+on_signal = cameff_end | sr_idle@add_squad %=play_sound(pri_b305_kovalskiy_attack_case_prepare) +pri_b305_third_cam_end%
+on_signal2 = cam_effector_stop | sr_idle@add_squad %=play_sound(pri_b305_kovalskiy_attack_case_prepare) +pri_b305_third_cam_end%
+on_info = {+pri_b305_cut_3_actor_hit} %=stop_sr_cutscene +pri_b305_actor_dont_see_anyone_done +pri_b305_actor_dont_see_anyone_done_end +pri_b305_kirilov_source_is_near_done_end +pri_b305_actor_it_is_underground_done%
+
+[sr_idle@add_squad]
+on_info = {+leader_achievement_gained} sr_idle@add_strong_parts %=create_squad(pri_a16_military_squad_strong:pri_a16)% 
+on_info2 = {-leader_achievement_gained} sr_idle@add_parts %=create_squad(pri_a16_military_squad:pri_a16)% 
+
+[sr_idle@add_strong_parts]
+on_info = {+pri_a28_tarasov_alive} %-pri_a28_tarasov_alive =create_squad_member(pri_a17_military_captain_tarasov_strong:pri_a16_military_squad)%
+on_info2 = {+pri_a28_valentyr_alive} %-pri_a28_valentyr_alive =create_squad_member(pri_a17_military_prapor_valentyr_strong:pri_a16_military_squad)%
+on_info3 = {+pri_a28_podorojniy_alive} %-pri_a28_podorojniy_alive =create_squad_member(pri_a17_military_lieutenant_podorojniy_strong:pri_a16_military_squad)%
+on_info4 = {+pri_a28_sokolov_alive} %-pri_a28_sokolov_alive =create_squad_member(pri_a15_sokolov_sci_head_strong:pri_a16_military_squad)%
+on_info5 = sr_idle@set_goodwill
+
+[sr_idle@add_parts]
+on_info = {+pri_a28_tarasov_alive} %-pri_a28_tarasov_alive =create_squad_member(pri_a17_military_captain_tarasov:pri_a16_military_squad)%
+on_info2 = {+pri_a28_valentyr_alive} %-pri_a28_valentyr_alive =create_squad_member(pri_a17_military_prapor_valentyr:pri_a16_military_squad)%
+on_info3 = {+pri_a28_podorojniy_alive} %-pri_a28_podorojniy_alive =create_squad_member(pri_a17_military_lieutenant_podorojniy:pri_a16_military_squad)%
+on_info4 = {+pri_a28_sokolov_alive} %-pri_a28_sokolov_alive =create_squad_member(pri_a15_sokolov_sci_head:pri_a16_military_squad)%
+on_info5 = sr_idle@set_goodwill
+
+[sr_idle@set_goodwill]
+on_info = {=squad_exist(pri_a16_military_squad)} sr_idle@nil %=set_squad_goodwill(pri_a16_military_squad:friend)%
+
+[sr_idle@nil]

@@ -1,0 +1,101 @@
+<w>
+	<itm_backpack>
+		<background x="400" y="335" width="600" height="300">
+			<auto_static x="-5" y="0" width="240" height="85" stretch="1">
+				<texture>ui_inGame2_message_box</texture>
+			</auto_static>
+		</background>
+
+		<btn_cancel x="45" y="64" width="70" height="28" check_mode="0">
+			<text font="letterica18">ui_inv_cancel</text>
+			<texture>ui_inGame2_Mp_bigbuttone</texture>
+		</btn_cancel>
+
+		<btn_ok x="115" y="64" width="70" height="28" check_mode="0">
+			<text font="letterica18">ui_inv_ok</text>
+			<texture>ui_inGame2_Mp_bigbuttone</texture>
+		</btn_ok>
+
+		<input x="415" y="355" width="200" height="30">
+			<text x="5" font="letterica16" vert_align="c" align="l"/>
+			<texture>ui_inGame2_edit_box_2</texture>
+		</input>
+	</itm_backpack>
+
+	<itm_repair>
+		<file_item>
+			<main width="550" height="18"/>
+			<fn width="200" height="18"/>
+			<fd width="50" height="18"/>
+		</file_item>
+		<form x="100" y="150" width="563" height="509" stretch="1">
+			<frame x="0" y="0" width="563" height="509">
+				<texture>ui_inGame2_hint_wnd_main_window</texture>
+			</frame>
+
+			<icon x="128" y="250" width="128" height="128" stretch="1">
+			</icon>
+			<icon_parts x="128" y="112" width="128" height="128" stretch="1">
+			</icon_parts>
+			<icon_tool x="300" y="418" width="128" height="128" stretch="1">
+			</icon_tool>
+
+			<caption_repair x="285" y="186" width="195" height="50" complex_mode="1">
+				<text font="letterica18">ui_st_repairable_equipment</text>
+			</caption_repair>
+			<list_frame x="265" y="202" width="284" height="107">
+				<texture>ui_inGame2_servers_list_frame</texture>
+			</list_frame>
+			<list x="272" y="205" width="275" height="102" item_height="18" can_select="1">
+				<font font="letterica16"/>
+			</list>
+
+			<caption_parts x="285" y="32" width="195" height="20">
+				<text font="letterica18">ui_st_usable_parts</text>
+			</caption_parts>
+			<list_frame_parts x="265" y="48" width="284" height="107">
+				<texture>ui_inGame2_servers_list_frame</texture>
+			</list_frame_parts>
+			<list_parts x="272" y="50" width="275" height="102" item_height="18" can_select="1">
+				<font font="letterica16"/>
+			</list_parts>
+
+			<btn_repair x="25" y="427" width="80" height="40">
+				<texture>ui_button_main01</texture>
+				<text font="letterica18">kb_repair</text>
+			</btn_repair>
+			<btn_cancel x="130" y="427" width="80" height="40">
+				<texture>ui_button_main01</texture>
+				<text font="letterica18">ui_mm_cancel</text>
+			</btn_cancel>
+		</form>
+	</itm_repair>
+
+	<loot>
+		<file_item>
+			<main width="490" height="18"/>
+			<fn width="145" height="18"/>
+			<fd width="50" height="18"/>
+		</file_item>
+		<form x="360" y="110" width="305" height="460" stretch="1">
+			<texture>ui_loot_window</texture>
+			<image  x="6" y="6" width="295" height="150" stretch="1">
+			</image>
+			<icon  x="149" y="220" width="128" height="128" stretch="1">
+			</icon>
+			<caption  x="200" y="185" width="245" height="30">
+				<text font="letterica18" align="c"/>
+			</caption>
+			<list_frame x="6" y="285" width="295" height="145">
+				<texture>ui_inGame2_servers_list_frame</texture>
+			</list_frame>
+			<list x="9" y="285" width="290" height="143" item_height="18" can_select="1">
+				<font font="letterica16"/>
+			</list>
+			<btn_ok x="109" y="430" width="80" height="26">
+				<texture>ui_button_main01</texture>
+				<text font="letterica18">ui_inv_ok</text>
+			</btn_ok>
+		</form>
+	</loot>
+</w>

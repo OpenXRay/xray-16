@@ -1,0 +1,282 @@
+[stalker_zombied_vision_free]
+min_view_distance   		= 0.1				; min range of cone based on eye_range
+max_view_distance	 		= 0.5				; max range of cone based on eye_range
+visibility_threshold	 	= 40				;Threshold in which object becomes visible based on factors
+always_visible_distance 	= 0					;Distance object is always considered visible (float)
+time_quant					= 0.005				;step increment to for sight calculations
+decrease_value				= 0.1 				;Decrease over time to overall threshold
+velocity_factor		     	= 0.4				;Higher value = greater bonus to detection speed when target is moving (depended on movement speed)
+luminocity_factor			= 0.70				;Low value = easier to see at night
+transparency_threshold	 	= 0.6 			    ;Low value = easier to see through objects
+still_visible_time          = 0 				;The time (milliseconds) that the object is still considered visible , even if it is not in the frustum (u32)
+
+[stalker_zombied_vision_danger]
+min_view_distance   		= 0.4				; min range of cone based on eye_range
+max_view_distance	 		= 0.8				; max range of cone based on eye_range
+visibility_threshold	 	= 40				;Threshold in which object becomes visible based on factors
+always_visible_distance 	= 0					;Distance object is always considered visible (float)
+time_quant					= 0.005				;step increment to for sight calculations
+decrease_value				= 0.1 				;Decrease over time to overall threshold
+velocity_factor		     	= 0.4				;Higher value = greater bonus to detection speed when target is moving (depended on movement speed)
+luminocity_factor			= 0.70				;Low value = easier to see at night
+transparency_threshold	 	= 0.6 			    ;Low value = easier to see through objects
+still_visible_time          = 0 				;The time (milliseconds) that the object is still considered visible , even if it is not in the frustum (u32)
+
+[stalker_zombied_condition]
+satiety_v					= 0.00001				;скорость уменьшения сытости со временем
+radiation_v					= 0.0001				;скорость уменьшения радиации
+satiety_power_v				= 0.0005				;увеличение силы при уменьшении сытости 
+satiety_health_v			= 0.001					;увеличение здоровья при уменьшении сытости 
+satiety_critical			= 0.0					;критическое значения сытости (в процентах от 0..1) когда здоровье начианает уменьшаться
+radiation_health_v			= 0.001					;уменьшение здоровья при воздействии радиации
+morale_v					= 0.0001				;скорость восстановления морали
+health_hit_part				= 1.0					;процент хита, уходящий на отнимание здоровья
+power_hit_part				= 0.0					;процент хита, уходящий на отнимание силы
+psy_health_v				= 0.1					;скорость восстановления psy-здоровья
+health_restore_v			= 0.001					;скорость восстановления здоровья
+
+sleep_health				= 1.0					;коэффициенты скоростей изменения параметров во время сна
+sleep_power					= 1.0
+sleep_satiety				= 1.0
+sleep_radiation 			= 1.0
+sleep_psy_health			= 1.0
+
+;---LIMPING STATE-----------------------------------------------------
+use_limping_state			= on ;off
+limping_threshold			= 0.5
+feel_enemy_who_just_hit_max_distance = 200
+
+
+;открытые раны
+bleeding_v					= 0						;потеря крови при номинальной ране в секунду
+wound_incarnation_v			= 0.0					;крутизна кривой заживления (какой процент раны останется после заживления в игровую секунду)
+min_wound_size				= 0.01
+
+[stalker_zombied_immunities]:stalker_immunities
+telepatic_immunity 			= 0.0
+burn_immunity 				= 0.0				;коэффициенты иммунитета 
+strike_immunity 			= 0.0
+shock_immunity 				= 0.0
+wound_immunity				= 0.0
+radiation_immunity 			= 0.0
+chemical_burn_immunity 		= 0.0
+explosion_immunity 			= 0.0
+fire_wound_immunity  		= 1.5 
+wound_2_immunity  			= 0.0
+
+[stalker_zombied_movement_speeds]
+; zombied stalkers can't crouch or run
+	; danger
+	;; crouch
+	;;; walk
+	danger_crouch_walk_forward	= 0.8
+	danger_crouch_walk_backward	= 0.575
+	danger_crouch_walk_left		= 0.8
+	danger_crouch_walk_right	= 0.8
+	;;; run						  
+	danger_crouch_run_forward	= 0.8
+	danger_crouch_run_backward	= 0.575
+	danger_crouch_run_left		= 0.8
+	danger_crouch_run_right		= 0.8
+	;; stand
+	;;; walk
+	danger_stand_walk_forward	= 0.8
+	danger_stand_walk_backward	= 0.8
+	danger_stand_walk_left		= 0.8
+	danger_stand_walk_right		= 0.8
+	;;; run
+	danger_stand_run_forward	= 0.8
+	danger_stand_run_backward	= 0.8
+	danger_stand_run_left		= 0.8
+	danger_stand_run_right		= 0.8
+	; free
+	;; stand
+	;;; forward
+	free_stand_walk_forward		= 0.8
+	free_stand_run_forward		= 0.8
+	; panic
+	;; stand
+	;;; run
+	;;;; forward
+	panic_stand_run_forward		= 7.0
+
+[stalker_zombied]:stalker
+;---LEVEL EDITOR------------------------------------------------------
+$spawn							= "stalkers\stalker_zombied"	; option for Level Editor
+attachable_items				= device_torch,attachable_item
+
+;---SECTIONS----------------------------------------------------------
+condition_sect					= stalker_zombied_condition
+;---IMMUNITIES -------------------------------------------------------
+immunities_sect					= stalker_zombied_immunities
+;---VISIBILITY--------------------------------------------------------
+vision_danger_section			= stalker_zombied_vision_danger
+vision_free_section				= stalker_zombied_vision_free
+eye_fov							= 90
+eye_range						= 90
+;---ENEMY------------------------------------------------------------
+ignore_monster_threshold		= 0.8
+max_ignore_distance				= 30.0
+panic_threshold					= 0
+sound_threshold					= 0.7
+
+;---SOUND PLAYER------------------------------------------------------
+sound_death						= fight\death\death_
+sound_anomaly_death				= fight\death\death_
+sound_hit						= fight\hit\hit_
+sound_humming					= states\idle\idle_
+
+sound_backup					= ;fight\attack\attack_ ;fight\backup\stalker\backup_
+sound_detour					= ;fight\enemy\enemy_ ;fight\detour\stalker\detour_
+sound_search					= ;fight\attack\attack_ ;fight\searching_enemy\stalker\search_
+sound_friendly_fire				= ;fight\friendly_fire\stalker\friendly_fire_
+sound_panic_human				= ;states\panic_human\stalker\panic_
+sound_panic_monster				= ;states\panic_monster\stalker\panic_
+sound_tolls						= ;fight\tolls\tolls_
+sound_grenade_alarm				= ;fight\grenade\grenade_
+sound_friendly_grenade_alarm	= ;fight\friendly_grenade\friendly_grenade_
+sound_need_backup               = ;fight\attack\attack_ ;fight\cover_fire\cover_fire_
+sound_running_in_danger			= ;states\breath\stalker\breath_1
+sound_walking_in_danger			= ;states\breath\stalker\breath_2
+
+sound_kill_wounded				= ;help\wounded\kill_wounded_
+sound_enemy_critically_wounded	= ;fight\enemy_hit\enemy_hit_
+sound_enemy_killed_or_wounded	= ;fight\enemy_down\enemy_down_
+
+sound_attack_no_allies				= ;fight\fire\fire_,fight\threat\threat_distant_
+sound_attack_allies_single_enemy	= ;fight\attack\attack_,fight\attack\attack_one_,fight\fire\fire_
+sound_attack_allies_several_enemies	= ;fight\attack\attack_,fight\attack\attack_many_,fight\fire\fire_
+sound_search1_no_allies				= ;fight\threat\threat_distant_
+sound_search1_with_allies			= ;fight\searching_enemy\search_,fight\searching_enemy\enemy_lost_
+sound_throw_grenade					= ;fight\grenade\grenade_ready_
+
+
+;---MOVEMENT----------------------------------------------------------
+movement_speeds					= stalker_zombied_movement_speeds;
+
+;---FIRE DISPERSIONS--------------------------------------------------
+disp_walk_stand					= 20
+disp_walk_crouch				= 20	
+disp_run_stand					= 25
+disp_run_crouch					= 25
+disp_stand_stand				= 15
+disp_stand_crouch				= 15
+disp_stand_stand_zoom			= 15
+disp_stand_crouch_zoom			= 15
+
+;----------- MONSTR SPECIES ----------------------------
+species							= zombie
+
+;---CRITICAL WOUND------------------------------------------------------------------
+critical_wound_threshold		= 1.1
+critical_wound_decrease_quant	= 0.
+body_parts_section_id			= critical_wound_body_parts_section
+
+[stalker_fresh_zombied]:stalker_zombied
+;---LEVEL EDITOR------------------------------------------------------
+$spawn							= "stalkers\stalker_fresh_zombied"	; option for Level Editor
+
+;---MOVEMENT----------------------------------------------------------
+movement_speeds					= stalker_movement_speeds
+
+;---CRITICAL WOUND------------------------------------------------------------------
+critical_wound_threshold		= 1.1
+critical_wound_decrease_quant	= 0.
+body_parts_section_id			= critical_wound_body_parts_section
+
+;---FIRE QUEUE PARAMETERS
+
+
+[fire_queue_params_zombied]  ; min < 15 < medium < 30 < max
+pstl_min_queue_size_far			= 1
+pstl_max_queue_size_far			= 1
+pstl_min_queue_interval_far		= 275
+pstl_max_queue_interval_far		= 420
+
+pstl_min_queue_size_medium		= 1
+pstl_max_queue_size_medium		= 1
+pstl_min_queue_interval_medium	= 185
+pstl_max_queue_interval_medium	= 275
+
+pstl_min_queue_size_close		= 1
+pstl_max_queue_size_close		= 1
+pstl_min_queue_interval_close	= 95
+pstl_max_queue_interval_close	= 185
+
+shtg_min_queue_size_far			= 1
+shtg_max_queue_size_far			= 1
+shtg_min_queue_interval_far		= 360
+shtg_max_queue_interval_far		= 540
+
+shtg_min_queue_size_medium		= 1
+shtg_max_queue_size_medium		= 1
+shtg_min_queue_interval_medium	= 240
+shtg_max_queue_interval_medium	= 360
+
+shtg_min_queue_size_close		= 1
+shtg_max_queue_size_close		= 3
+shtg_min_queue_interval_close	= 120
+shtg_max_queue_interval_close	= 240
+
+snp_min_queue_size_far			= 1
+snp_max_queue_size_far			= 1
+snp_min_queue_interval_far		= 500
+snp_max_queue_interval_far		= 750
+
+snp_min_queue_size_medium		= 1
+snp_max_queue_size_medium		= 1
+snp_min_queue_interval_medium	= 260
+snp_max_queue_interval_medium	= 440
+
+snp_min_queue_size_close		= 1
+snp_max_queue_size_close		= 1
+snp_min_queue_interval_close	= 290
+snp_max_queue_interval_close	= 700
+
+auto_min_queue_size_far			= 25
+auto_max_queue_size_far			= 30
+auto_min_queue_interval_far		= 440
+auto_max_queue_interval_far		= 715
+
+auto_min_queue_size_medium		= 25
+auto_max_queue_size_medium		= 30
+auto_min_queue_interval_medium	= 260
+auto_max_queue_interval_medium	= 440
+
+auto_min_queue_size_close		= 25
+auto_max_queue_size_close		= 30
+auto_min_queue_interval_close	= 240
+auto_max_queue_interval_close	= 360
+
+mchg_min_queue_size_far			= 25
+mchg_max_queue_size_far			= 30
+mchg_min_queue_interval_far		= 440
+mchg_max_queue_interval_far		= 715
+
+mchg_min_queue_size_medium		= 25
+mchg_max_queue_size_medium		= 30
+mchg_min_queue_interval_medium	= 260
+mchg_max_queue_interval_medium	= 440
+
+mchg_min_queue_size_close		= 25
+mchg_max_queue_size_close		= 30
+mchg_min_queue_interval_close	= 240
+mchg_max_queue_interval_close	= 360
+
+[armed_zombied_immunities]:stalker_immunities
+telepatic_immunity 			= 0.0
+burn_immunity 				= 0.0				;коэффициенты иммунитета 
+strike_immunity 			= 0.0
+shock_immunity 				= 0.0
+wound_immunity				= 0.0
+radiation_immunity 			= 0.0
+chemical_burn_immunity 		        = 0.0
+explosion_immunity 			= 0.0
+fire_wound_immunity  		        = 1.3 
+wound_2_immunity  			= 0.0
+
+[armed_zombied]:stalker_zombied
+$spawn          = "stalkers\armed_zombied"
+fire_queue_section = fire_queue_params_zombied
+immunities_sect	= armed_zombied_immunities
+allow_release   = true

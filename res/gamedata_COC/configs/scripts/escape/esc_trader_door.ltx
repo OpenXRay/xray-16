@@ -1,0 +1,35 @@
+[logic]
+active = ph_door@close
+
+[ph_door@locked]
+locked = true
+closed = true
+snd_open_start = metal_small_open
+snd_close_start = metal_small_close_start
+snd_close_stop = metal_small_close_stop
+
+[ph_door@close]
+locked = false
+closed = true
+snd_open_start = metal_small_open
+snd_close_start = metal_small_close_start
+snd_close_stop = metal_small_close_stop
+on_use = ph_door@open
+on_actor_in_zone = esc_space_restrictor_trader_door_into | ph_door@near
+
+[ph_door@near]
+locked = false
+closed = true
+snd_open_start = metal_small_open
+snd_close_start = metal_small_close_start
+snd_close_stop = metal_small_close_stop
+on_use = ph_door@open
+
+[ph_door@open]
+locked = false
+closed = false
+snd_open_start = metal_small_open
+snd_close_start = metal_small_close_start
+snd_close_stop = metal_small_close_stop
+on_use = ph_door@near
+on_actor_not_in_zone = esc_space_restrictor_trader_door_into | ph_door@close

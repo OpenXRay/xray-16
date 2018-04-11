@@ -1,0 +1,13 @@
+[smart_terrain]
+squad_id = 7
+max_population = 2
+respawn_params = respawn@dar_smart_snork
+respawn_idle = 86400
+respawn_radius = 300
+
+[respawn@dar_smart_snork]
+spawn_snorks
+
+[spawn_snorks]
+spawn_squads = simulation_snork
+spawn_num = {+dar_military_scout_squad_killed} 2, 0

@@ -1,0 +1,35 @@
+[logic]
+active = walker@start
+
+[walker@start]
+path_walk = zat_b5_smart_terrain_actor_with_bandits_walk
+path_look = zat_b5_smart_terrain_actor_with_bandits_look
+def_state_standing = guard
+def_state_moving1 = rush
+def_state_moving2 = rush
+def_state_moving3 = rush
+on_timer = 500 | walker@walk
+meet = no_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+danger = danger
+invulnerable = {!actor_enemy} true, false
+
+
+[walker@walk]  
+path_walk = zat_b5_smart_terrain_actor_after_bandits_cutscene_walk
+path_look = zat_b5_smart_terrain_actor_after_bandits_cutscene_look
+def_state_standing = guard
+def_state_moving1 = rush
+def_state_moving2 = rush
+def_state_moving3 = rush
+on_info = {+zat_b5_bandits_cutscene_end} %=destroy_object%
+meet = no_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+danger = danger
+invulnerable = {!actor_enemy} true, false
+
+
+[danger]
+ignore_distance = 0

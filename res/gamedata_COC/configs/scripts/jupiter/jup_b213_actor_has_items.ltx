@@ -1,0 +1,19 @@
+[logic]
+active = nil;sr_idle@wait
+
+[sr_idle@wait]
+on_info = {=actor_in_zone(jup_b213_close_to_toolkit) =actor_has_item(toolkit_1)} sr_idle@with_toolkit
+on_info2 = {=actor_in_zone(jup_b213_close_to_toolkit) !actor_has_item(toolkit_1)} sr_idle@get_toolkit
+
+[sr_idle@get_toolkit]
+on_info = {!actor_in_zone(jup_b213_close_to_toolkit)} sr_idle@wait
+on_info2 = {=actor_has_item(toolkit_1)} sr_idle@got_toolkit
+
+[sr_idle@got_toolkit]
+on_info = {!actor_in_zone(jup_b213_close_to_toolkit)} sr_idle@nil %+jup_b213_toolkit_1_on_board%
+
+[sr_idle@with_toolkit]
+on_info = {!actor_in_zone(jup_b213_close_to_toolkit)} sr_idle@wait
+on_info2 = {=actor_has_item_count(toolkit_1:2)} sr_idle@got_toolkit
+
+[sr_idle@nil]

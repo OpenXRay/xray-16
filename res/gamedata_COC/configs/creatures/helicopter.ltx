@@ -1,0 +1,333 @@
+[helicopter]:default_weapon_params
+
+GroupControlSection		= spawn_group
+$spawn					= "vehicles\helicopter"
+$prefetch				= 1
+cform                   = skeleton
+class					= C_HLCP_S
+script_binding          = bind_heli.bind
+visual                  = dynamics\vehicles\mi24\veh_mi24_army.ogf
+
+;holder custom offsets
+camera_first 				= 0.0, 3.2, 3.2
+camera_look 				= 0.0, -6.0, 0.0
+camera_free 				= 0.0, 0.0, 0.0
+exit_pos 					= 0.8, 0.0, 0.0
+
+;wallmarks
+wallmark_section		= explosion_marks
+
+//параметры построения пути
+path_linear_acc_fw				=  6	;8; 3;5; 3.0 ;m/s  ; линейное ускорение при разгоне
+path_linear_acc_bk				=  4	;2;4; 0.5; 3;  3.5;3 ;8.0 ;m/s	; линейное ускорение торможения
+flag_by_new_acc					= 1	;если не задавать, или 0 - ускорение не будет рассчитываться автоматически при смене схемы
+
+path_angular_sp_pitch			= 0.35 ;0.35; 0.65; 0.85; 0.45	; скорость изменения высоты пути при скорости "velocity"
+path_angular_sp_pitch_0			= 0.2		; скорость изменения высоты пути при скорости "0"
+path_angular_sp_heading			= 0.75 ;0.5 ;0.75 ; угловая скорость пути при скорости "velocity"
+path_angular_sp_heading_0		= 1;0.9		    ; угловая скорость пути при скорости "0"m/s
+
+magic_angle						= 0.3
+
+//пфраметры наклона модели 
+model_angular_sp_bank			= 0.5 ;0.4 ; скорость поворота модели по оси Z (как быстро модель повернется по курсу движения с учетом угловой скорости)
+model_angular_sp_pitch			= 0.1 ;     ; скорость поворота модели по оси X в зависимости от текущей линейной скорости
+model_pitch_koef				= 0.016;0.012;0.018 ;   ; коэф наклона модели по оси X в зависимости от текущей линейной скорости
+model_bank_koef					= 0.018 ;0.02    ; коэф наклона модели по оси Z в зависимости от текущих линейной и угловой скоростей
+on_point_range_dist				= 10.0    ; служебная информация
+
+
+;default, can be redefined by script
+velocity					= 30;25					;m/sec   скорость, с которой патрулировать
+min_altitude				= 15;30 ;15 20	;20.0		;m		 min altitude in free state
+;attack_velocity			= 15.0; 15; 10					;m/sec    скорость, с которой атаковать врага
+;altitude					= 50	;20.0			;m		 высота, на которой патрулировать
+safe_altitude				= 3.0					; level_bound+5.0
+
+use_rocket					= true			;              использовать ракеты при атаке
+use_mgun					= true			;              использовать пулемет при атаке
+use_aim_bullet				= false			; Использовать ли первую "Сильную" пулю
+min_mgun_attack_dist		= 15 ;30 ;15.0	;m   мин расстояние при котором можно исп пулемет
+max_mgun_attack_dist		= 300			;m   макс расстояние при котором можно исп пулемет
+min_rocket_attack_dist		= 100.0	;m   мин расстояние при котором можно исп ракеты
+max_rocket_attack_dist		= 250 ;150.0 ;m   макс расстояние при котором можно исп ракеты
+time_between_rocket_attack	= 8000 ; 1500 ; msec  задержка между ракетами
+syncronize_rocket			= false ; true        пускать ракеты парами или по очереди (лев-прав-лев-прав)
+fire_trail_length			= 50 ;m
+use_fire_trail				= true
+barrel_dir_tolerance		= 2 ; degrees. допустимый угол, когда считаем, что дуло направлено в цель
+
+death_angular_vel			= 0.1,6.0,0.2  ; при гибели в воздухе дать угловую скорость модели      
+death_lin_vel_koeff			= 1          ; при гибели в воздухе умножить собственную лин скорость на коэфф
+
+flame_start_health			= 0.5  ; уровень здоровья, ниже которого вертолёт начинает дымить
+
+fire_time			= 1.5; время очереди, если меньше нуля - таймауты отключаются
+no_fire_time			= 0.3; время таймаута между очередями, если меньше нуля - таймауты отключаются
+
+
+; ------------------------- параметры для универсальной боевой схемы
+flyby_attack_dist           = 200
+search_attack_dist          = 70
+
+search_velocity				= 9  ; скорость (м/с) облёта врага по кругу в режиме поиска
+round_velocity				= 15 ; скорость (м/с) облёта врага в режиме атаки
+
+vis_time_quant				= 200 ;интервал (в мс) между проверками видимости
+vis_threshold				= 100  ; какой процент видимости нужен, чтоб наблюдаемый объект считался видимым
+vis_inc						= 30  ; на сколько процентов увеличится видимость объекта за 1с
+vis_dec						= 30  ; на сколько процентов уменьшитя  видимость объекта за 1с
+
+forget_timeout				= 60  			; seconds
+; ------------------------------------------------------------------
+
+; light, particles etc
+light_range							= 10.0
+light_brightness					= 5.0
+light_color							= 0.9,0.9,0.5
+light_color_animmator				= koster_00
+
+smoke_particle						= damage_fx\heli_burn			;партиклы при ранении
+explode_particle					= explosions\expl_mushroom_01	;партиклы при взрыве
+explode_sound						= weapons\heli_explosion		;звук собственного взрыва
+
+;------------------------------все для пулемета
+snd_shoot_rocket					= weapons\heli_rocket_shoot		;звук выстрела ракетой   
+
+fire_dispersion_base	= 3.0;1.0
+fire_dispersion_null	= 1.0;0.5
+fire_trace_width		= 1.0
+rpm                     = 750
+hit_power               = 0.75
+hit_impulse		 		= 25
+fire_distance           = 500
+bullet_speed			= 900			;начальная скорость пули
+light_color				= 0.9,0.8,0.4
+light_range				= 5
+light_var_color			= 0.05
+light_var_range			= 0.5
+light_time 				= 0.2
+ammo_class				= ammo_12x76_zhekan_heli ;ammo_12x70_buck
+flame_particles		    = weapons\heli_weapon
+;smoke_particles		= weapons\generic_shoot_00
+shell_point				= 0.05, 0.22, 0.06
+shell_particles			= weapons\generic_shells
+snd_shoot				= weapons\weapon_heli
+
+broken_snd				= vehicles\helicopter\helicopter_down
+
+;------------------------------все для ракетницы
+rocket_class			= helicopter_missile ;wpn_rpg7_missile 
+launch_speed			= 60 ;45 ;50 ;60 ;76 ;500
+wallmark_section		= explosion_marks
+;------------------------------коэффициенты иммунитета 
+immunities_sect			= sect_heli_immunities
+
+
+[sect_heli_immunities]
+burn_immunity			= 0.01	
+strike_immunity			= 1
+shock_immunity			= 0.0
+wound_immunity			= 0.0
+radiation_immunity		= 0.0
+telepatic_immunity		= 0.0
+chemical_burn_immunity	= 0.0
+fire_wound_immunity		= 0.01
+explosion_immunity		= 0.1
+
+[sect_heli_immunities_weak_mi2]
+burn_immunity			= 0.01	
+strike_immunity			= 1
+shock_immunity			= 0.0
+wound_immunity			= 0.0
+radiation_immunity		= 0.0
+telepatic_immunity		= 0.0
+chemical_burn_immunity	= 0.0
+fire_wound_immunity		= 0.02
+explosion_immunity		= 0.2
+
+[sect_heli_immunities_weak]
+burn_immunity			= 0.01	
+strike_immunity			= 1
+shock_immunity			= 0.0
+wound_immunity			= 0.0
+radiation_immunity		= 0.0
+telepatic_immunity		= 0.0
+chemical_burn_immunity	= 0.0
+fire_wound_immunity		= 0.015
+explosion_immunity		= 0.2
+
+[sect_heli_immunities_strong]
+burn_immunity			= 0.01	
+strike_immunity			= 1
+shock_immunity			= 0.0
+wound_immunity			= 0.0
+radiation_immunity		= 0.0
+telepatic_immunity		= 0.0
+chemical_burn_immunity	= 0.0
+fire_wound_immunity		= 0.01
+explosion_immunity		= 0.2
+
+[helicopter_missile]:default_weapon_params
+GroupControlSection		= spawn_group
+discovery_dependency	= 
+visual                  = dynamics\weapons\wpn_rpg7\wpn_rpg7_grenade.ogf
+cform                   = skeleton
+class                   = G_RPG7
+
+
+immunities_sect			= sect_hm_immunities
+
+cost					= 200
+;---------------------------------------------------------------
+blast				= 5
+blast_r				= 10
+blast_impulse		= 350
+;delete
+blast_impulse_factor = 1
+
+frags				= 0
+frags_r				= 10
+frag_hit			= 100
+frag_hit_impulse	= 400
+
+hit_type_blast		= explosion
+hit_type_frag		= fire_wound
+
+up_throw_factor		= 1.5 ;1.3
+;---------------------------------------------------------------
+
+wm_size             = 0.3
+
+
+light_color		    = 1.9,1.6,0.5
+light_range		    = 30.0
+light_time 		    = 0.5
+
+
+ph_mass				= 7
+engine_f			= 530
+engine_u			= 90
+
+jump_height			= 0
+
+explode_particles	= explosions\explosion_heli_rocket_01; 
+
+
+;трассы от осколков
+fragment_speed				= 100
+fragment_tracer_max_length	= 4
+explode_duration	 = 2		;подолжительность взрыва (с)
+;wallmarks
+wallmark_section		= explosion_marks
+;звуки
+snd_explode			= weapons\rpg7_explode
+snd_fly_sound		= weapons\rocket_fly
+
+;свойства которые читаются, но не используются (надо убрать)
+inv_name		= "VOG-25"
+inv_name_short	= "VOG-25"
+inv_weight		= .2
+
+inv_grid_width		= 1
+inv_grid_height		= 1
+inv_grid_x			= 19
+inv_grid_y			= 9
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Свойства CustomRocket
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+engine_present		= true		;присутствует ли в ракете двигатель
+engine_work_time	= 5000		;время работы двигателя (в милисекундах)
+engine_impulse		= 1000		;
+engine_impulse_up	= 137.34 ;215.58;137.34 = 2*9.81*7 - значение этого параметра (который является некой подъемной силой, вопреки названию),
+									;при котором ракета массой 7кг не опускается под дейсвием 
+									;гравитации. 2*9.8=19.62 - ускорение свободного падения в мире сталкеров
+									;при меньших значениях ракета будет опускаться, при больших подниматься
+
+lights_enabled = TRUE			;свет вокруг ракеты, во время полета
+trail_light_color = 0.7,0.6,0.3
+trail_light_range = 20.0
+
+engine_particles = weapons\rpg_trail_01
+;fly_particles	 = weapons\rpg_trail_01
+
+force_explode_time			= 10000; msec
+
+[sect_hm_immunities]
+burn_immunity			= 1.0
+strike_immunity			= 1.0
+shock_immunity			= 1.0
+wound_immunity			= 1.0		
+radiation_immunity		= 1.0
+telepatic_immunity		= 1.0
+chemical_burn_immunity	= 1.0
+explosion_immunity		= 1.0
+fire_wound_immunity		= 0.01
+
+[sect_hm_immunities_strong]
+burn_immunity			= 1.0
+strike_immunity			= 1.0
+shock_immunity			= 1.0
+wound_immunity			= 1.0		
+radiation_immunity		= 1.0
+telepatic_immunity		= 1.0
+chemical_burn_immunity	= 1.0
+explosion_immunity		= 0.7
+fire_wound_immunity		= 0.001
+
+;====================================================================
+;							SIMULATION HELI
+;====================================================================
+; unused dynamics\vehicles\mi2\veh_mi2_01.ogf
+[simulation_helicopter_weak]:helicopter
+visual                  	= dynamics\vehicles\mi2\veh_mi2_army.ogf
+faction						= army
+player_id					= army_heli
+safe_altitude				= 1.0
+velocity					= 20
+immunities_sect				= sect_heli_immunities_weak_mi2
+use_rocket					= false
+combat_use_mgun				= true
+combat_use_rocket			= false
+rpm                     	= 500
+
+[simulation_helicopter_strong]:helicopter
+visual                  	= dynamics\vehicles\mi24\veh_mi24_army.ogf
+faction						= army
+player_id					= army_heli
+safe_altitude				= 2.75
+velocity					= 30
+time_between_rocket_attack	= 30000
+immunities_sect				= sect_heli_immunities_strong
+use_rocket					= true
+combat_use_mgun				= true
+combat_use_rocket			= false
+kill_with_achievement		= true
+
+[simulation_mono_helicopter_weak]:helicopter
+visual                  	= dynamics\vehicles\mi2\veh_mi2_mono.ogf
+faction						= monolith
+player_id					= monolith_heli
+safe_altitude				= 1.0
+velocity					= 20
+immunities_sect				= sect_heli_immunities_weak_mi2
+use_rocket					= false
+actor_always_enemy			= true
+combat_use_mgun				= true 
+combat_use_rocket			= false
+rpm                     	= 500
+
+[simulation_mono_helicopter_strong]:helicopter
+visual                  	= dynamics\vehicles\mi24\veh_mi24_mono.ogf
+faction						= monolith
+player_id					= monolith_heli
+safe_altitude				= 2.75
+velocity					= 30
+time_between_rocket_attack	= 20000
+immunities_sect				= sect_heli_immunities_strong
+actor_always_enemy			= true
+use_rocket					= true
+combat_use_mgun				= true
+combat_use_rocket			= false
+kill_with_achievement		= true

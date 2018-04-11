@@ -1,0 +1,370 @@
+[wounded@no_wound]
+hp_state = 0 | wounded_heavy@help_heavy
+hp_state_see = 0 | wounded_heavy@help_heavy
+hp_victim = 0 | nil
+hp_cover = 0 | false
+hp_fight = 0 | false
+
+
+
+[logic@jup_a12_stalker_prisoner]
+active = walker@stand_prisoner
+on_hit = hit
+on_death = death
+suitable = {=check_npc_name(jup_a12_stalker_prisoner) -jup_a12_stalker_prisoner_free_dialog_done} true
+prior = 200
+post_combat_time = 0, 0
+
+[walker@stand_prisoner]
+path_walk = stalker_prisoner_stand_prisoner_walk
+path_look = stalker_prisoner_stand_prisoner_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+meet = no_meet
+on_info = {+jup_a12_stalker_prisoner_free} walker@stand_up %-jup_a12_prisoner_invul%, {+jup_a12_bandit_out +jup_a12_actor_choose_power} walker@stand_up %+jup_a12_prisoner_free_with_stalkers -jup_a12_prisoner_invul%, {+jup_a12_bandit_out} walker@stand_up %+jup_a12_stalker_prisoner_free -jup_a12_prisoner_invul%, {+jup_a12_chief_bandit_kill_prisoner} remark@get_killed %-jup_a12_prisoner_invul%, {+jup_a12_stalker_prisoner_dead} %=kill_npc%
+on_info2 = {=actor_in_zone(jup_a12_sr_threat_prisoner_zone)} walker@stand_prisoner_true
+on_info3 = {!npc_in_zone(jup_a12_sr_threat_prisoner_zone)} %=teleport_npc(jup_a12_stalker_prisoner_stand_prisoner_walk)%
+on_info4 = {-jup_a12_prisoner_invul} %+jup_a12_prisoner_invul%
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+out_restr = jup_a12_sr_threat_prisoner_zone
+
+[walker@stand_prisoner_true]
+path_walk = stalker_prisoner_stand_prisoner_walk
+path_look = stalker_prisoner_stand_prisoner_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+meet = no_meet
+on_info = {=quest_npc_enemy_actor(jup_a12_stalker_prisoner)} walker@quick_get_out_of_base %+jup_a12_actor_enemy_to_bandits +jup_a12_stalker_prisoner_says_we_can_run_from_here%
+on_info2 = {+jup_a12_stalker_prisoner_free} walker@stand_up, {+jup_a12_bandit_out +jup_a12_actor_choose_power} walker@stand_up %+jup_a12_prisoner_free_with_stalkers%, {+jup_a12_bandit_out} walker@stand_up %+jup_a12_stalker_prisoner_free%, {+jup_a12_chief_bandit_kill_prisoner} remark@get_killed, {+jup_a12_stalker_prisoner_dead} %=kill_npc%
+on_info3 = {!actor_in_zone(jup_a12_sr_threat_prisoner_zone)} walker@stand_prisoner
+on_info4 = {+jup_a12_prisoner_invul} %-jup_a12_prisoner_invul%
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+out_restr = jup_a12_sr_threat_prisoner_zone
+wounded = wounded@no_wound
+
+[remark@get_killed]
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+meet = no_meet
+on_info = {+jup_a12_bandit_out +jup_a12_actor_choose_power} walker@stand_up %+jup_a12_prisoner_free_with_stalkers%, {+jup_a12_bandit_out} walker@stand_up %+jup_a12_stalker_prisoner_free%
+anim = prisoner
+target = story | jup_a12_bandit_chief
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+out_restr = jup_a12_sr_threat_prisoner_zone
+wounded = wounded@no_wound
+
+[walker@stand_up]
+path_walk = stalker_prisoner_stand_up_walk
+path_look = stalker_prisoner_stand_up_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+meet = no_meet
+on_game_timer = 50 | %+jup_a12_stalker_prisoner_stood_up +pri_a12_stalker_prisoner_free +jup_a12_actor_is_ready%
+on_info = {+jup_a12_stalker_prisoner_stood_up +jup_a12_actor_enemy_to_bandits} walker@hide_until_walk_out, {+jup_a12_stalker_prisoner_stood_up -jup_a12_actor_enemy_to_bandits} walker@out_of_prison
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+out_restr = jup_a12_sr_threat_prisoner_zone
+wounded = wounded@no_wound
+
+[walker@hide_until_walk_out]
+path_walk = stalker_prisoner_hide_until_walk_out_walk
+path_look = stalker_prisoner_hide_until_walk_out_look
+on_info = {+jup_a12_stalker_prisoner_hide_end} walker@out_of_containers %+jup_a12_stalker_prisoner_wait_for_dialog =set_squad_goodwill(jup_a12_prisoner:friend)%
+on_info2 = {=actor_enemy} walker@quick_get_out_of_base
+on_info3 = {=dist_to_actor_ge(120)} %+jup_a12_stalker_prisoner_hide_end%
+on_info4 = %=play_sound(jup_a12_stalker_prisoner_thanks_actor)%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+meet = meet@hide_until_walk_out_meet
+def_state_standing = hide_na
+help_wounded_enabled = false
+out_restr = jup_a12_sr_threat_prisoner_zone
+wounded = wounded@no_wound
+
+[meet@hide_until_walk_out_meet]
+close_victim = actor
+close_anim = nil
+meet_dialog = jup_a12_stalker_prisoner_hide_until_walk_out_dialog
+trade_enable = false
+snd_on_use = nil
+close_snd_hello = nil
+close_snd_bye 	= nil
+use		   = {=is_wounded} false, {=actor_enemy} false, true
+
+[walker@out_of_prison]
+path_walk = stalker_prisoner_thank_to_actor_walk
+path_look = stalker_prisoner_thank_to_actor_look
+combat_ignore_cond = {!actor_enemy} true, {-jup_a12_actor_enemy_to_bandits} true, false
+combat_ignore_keep_when_attacked = true
+meet = no_meet
+def_state_moving = run
+on_signal = path_end | %+jup_a12_stalker_prisoner_out_of_prison%
+on_info = {+jup_a12_stalker_prisoner_out_of_prison} remark@thank_to_actor, {+jup_a12_stalker_prisoner_hit_by_actor} walker@quick_get_out_of_base
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+
+[remark@thank_to_actor]
+target = story | actor
+on_signal = sound_end | %+jup_a12_stalker_prisoner_wait_for_dialog%
+on_info = %=play_sound(jup_a12_stalker_prisoner_thanks_actor)% 
+on_info2 = {+jup_a12_stalker_prisoner_wait_for_dialog} walker@thank_to_actor
+combat_ignore_cond = {!actor_enemy} true, {-jup_a12_actor_enemy_to_bandits} true, false
+combat_ignore_keep_when_attacked = true
+meet = no_meet
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+
+[walker@thank_to_actor]
+path_walk = stalker_prisoner_thank_to_actor_walk
+path_look = stalker_prisoner_thank_to_actor_look
+combat_ignore_cond = {!actor_enemy} true, {-jup_a12_actor_enemy_to_bandits} true, false
+combat_ignore_keep_when_attacked = true
+def_state_moving = run
+on_game_timer = 300 | %+jup_a12_stalker_prisoner_thanked_actor%
+on_info = {+jup_a12_stalker_prisoner_thanked_actor} walker@out_of_hangar %=set_squad_goodwill(jup_a12_prisoner:1000)%, {+jup_a12_stalker_prisoner_hit_by_actor} walker@quick_get_out_of_base, {+jup_a12_actor_did_not_pay_to_cashier} %+jup_a12_stalker_prisoner_thanked_actor +jup_a12_stalker_prisoner_out_of_hangar%
+meet = meet@thank_to_actor
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+
+[meet@thank_to_actor]
+close_snd_hello = nil
+close_snd_bye 	= nil
+close_victim = actor
+close_anim = wait_na
+meet_dialog = jup_a12_stalker_prisoner_thank_bandits_base_dialog
+trade_enable = false
+snd_on_use = nil
+use		   = {=is_wounded} false, {=actor_enemy} false, {=has_enemy} false, {=actor_has_weapon} false, true
+
+[walker@out_of_hangar]
+path_walk = stalker_prisoner_out_of_hangar_walk
+path_look = stalker_prisoner_out_of_hangar_look
+combat_ignore_cond = {!actor_enemy} true, {-jup_a12_actor_enemy_to_bandits} true, false
+combat_ignore_keep_when_attacked = true
+def_state_moving = assault
+on_signal = path_end | %+jup_a12_stalker_prisoner_out_of_hangar%
+on_info = {+jup_a12_bandit_out} walker@out_of_containers %+jup_a12_stalker_prisoner_out_of_hangar%
+on_info2 = {+jup_a12_bandit_cashier_dead} walker@quick_get_out_of_base
+on_info3 = {+jup_a12_stalker_prisoner_out_of_hangar +jup_a12_actor_paid_to_cashier} walker@out_of_containers
+on_info4 = {+jup_a12_actor_did_not_pay_to_cashier} walker@hide %+jup_a12_stalker_prisoner_out_of_hangar =disable_memory_object%
+on_info5 = {+jup_a12_stalker_prisoner_hit_by_actor} walker@quick_get_out_of_base
+on_info6 = {+jup_a12_stalker_prisoner_out_of_hangar !is_alive(jup_a12_bandit_cashier)} walker@out_of_containers
+meet = no_meet 
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+
+[walker@hide]
+path_walk = stalker_prisoner_battle_walk
+path_look = stalker_prisoner_battle_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+def_state_moving = sprint
+def_state_standing = hide_na
+meet = meet@hide_until_walk_out_meet
+out_restr = jup_a12_sr_prisoner_hide
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+on_info = {+jup_a12_stalker_prisoner_hide_end} walker@out_of_containers %=set_squad_goodwill(jup_a12_prisoner:friend)%
+on_info2 = {=actor_enemy} walker@quick_get_out_of_base
+on_info3 = {=dist_to_actor_ge(120)} %+jup_a12_stalker_prisoner_hide_end%
+on_info4 = {=has_enemy} %=disable_memory_object%
+wounded = wounded@no_wound
+
+[walker@quick_get_out_of_base]
+path_walk = merc_stalker_prisoner_out_of_containers_walk
+path_look = merc_stalker_prisoner_out_of_containers_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+def_state_moving = sprint
+on_signal = path_end | %+jup_a12_stalker_prisoner_out_of_containers%
+on_info = {+jup_a12_stalker_prisoner_out_of_containers} walker@out_of_containers
+;on_info2 = {-jup_a12_stalker_prisoner_says_we_can_run_from_here} %+jup_a12_stalker_prisoner_says_we_can_run_from_here =play_sound(jup_a12_stalker_prisoner_says_we_can_run_from_here)%
+on_info3 = {-jup_a12_stalker_prisoner_out_of_containers =npc_in_zone(jup_a12_sr_containers_warnzone)} %+jup_a12_stalker_prisoner_out_of_containers%
+meet = no_meet 
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+
+[walker@out_of_containers]
+path_walk = merc_stalker_prisoner_out_of_containers_walk
+path_look = merc_stalker_prisoner_out_of_containers_look
+combat_ignore_cond = {!actor_enemy} true, {-jup_a12_actor_enemy_to_bandits} true, false
+combat_ignore_keep_when_attacked = true
+def_state_moving = assault
+on_signal = path_end | %+jup_a12_stalker_prisoner_out_of_containers%
+on_info = {-jup_a12_stalker_prisoner_free_dialog_done +jup_a12_stalker_prisoner_hit_by_actor} %+jup_a12_stalker_prisoner_free_dialog_done%
+on_info2 = {-jup_a12_stalker_prisoner_free_dialog_done =actor_enemy} %+jup_a12_stalker_prisoner_free_dialog_done%
+on_info3 = {-jup_a12_stalker_prisoner_out_of_containers =npc_in_zone(jup_a12_sr_containers_warnzone)} %+jup_a12_stalker_prisoner_out_of_containers%
+meet = meet@going_out_of_containers_meet
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+
+[meet@going_out_of_containers_meet]
+close_snd_hello = nil
+close_snd_bye 	= nil
+close_victim = nil
+close_distance = 0
+far_distance = 0
+meet_dialog = {+jup_a12_stalker_prisoner_out_of_containers} jup_a12_stalker_prisoner_free_dialog, jup_a12_stalker_prisoner_thank_bandits_base_dialog 
+trade_enable = false
+allow_break = false
+snd_on_use = nil
+use		   = {=is_wounded} false, {=actor_enemy} false, {=has_enemy} false, {=actor_has_weapon} false, true
+
+
+[hit]
+on_info = {+jup_a12_prisoner_invul}, {-jup_a12_stalker_prisoner_free -jup_a12_prisoner_free_with_stalkers -jup_a12_stalker_prisoner_dead} %+jup_a12_stalker_prisoner_dead =kill_npc%
+
+[death]
+on_info = %+jup_a12_stalker_prisoner_dead +pri_a12_stalker_prisoner_free +jup_a12_stalker_prisoner_free%
+
+
+
+
+
+
+
+
+[logic@jup_a12_prisoner_free]
+active = walker@already_out_of_containers
+on_hit = hit
+on_death = death
+suitable = {=check_npc_name(jup_a12_stalker_prisoner)} true
+prior = 200
+post_combat_time = 0, 0
+
+[walker@already_out_of_containers]
+path_walk = stalker_prisoner_out_of_containers_walk
+path_look = stalker_prisoner_out_of_containers_look
+combat_ignore_cond = {!actor_enemy} true, {-jup_a12_actor_enemy_to_bandits} true, false
+combat_ignore_keep_when_attacked = true
+def_state_moving = assault
+on_signal = path_end | %+jup_a12_stalker_prisoner_out_of_containers%
+;on_game_timer = 1200 | %+jup_a12_stalker_prisoner_free_dialog_done%
+on_info = {-jup_a12_stalker_prisoner_free_dialog_done +jup_a12_stalker_prisoner_hit_by_actor} %+jup_a12_stalker_prisoner_free_dialog_done%
+on_info2 = {-jup_a12_stalker_prisoner_free_dialog_done =actor_enemy} %+jup_a12_stalker_prisoner_free_dialog_done%
+on_info3 = {+jup_a12_stalker_prisoner_out_of_containers =dist_to_actor_le(10)} remark@out_of_containers
+on_info4 = {+jup_a12_stalker_prisoner_free_dialog_done} walker@get_out_far_away
+on_info5 = {-jup_a12_stalker_prisoner_out_of_containers =npc_in_zone(jup_a12_sr_containers_warnzone)} %+jup_a12_stalker_prisoner_out_of_containers%
+on_info6 = {-jup_a12_stalker_prisoner_free_dialog_done =dist_to_actor_ge(75)} %+jup_a12_stalker_prisoner_free_dialog_done%
+meet = meet@going_out_of_containers_meet
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+
+[remark@out_of_containers]
+target = story | actor
+on_info = %=play_sound(jup_a12_stalkers_to_actor_meet_on_base)% 
+on_info2 = {+jup_a12_stalker_prisoner_free_dialog_done} walker@get_out_far_away
+on_info3 = {-jup_a12_stalker_prisoner_free_dialog_done =dist_to_actor_ge(75)} %+jup_a12_stalker_prisoner_free_dialog_done%
+combat_ignore_cond = {!actor_enemy} true, {-jup_a12_actor_enemy_to_bandits} true, false
+combat_ignore_keep_when_attacked = true
+meet = meet@out_of_containers_meet
+;on_game_timer = 300 | %+jup_a12_stalker_prisoner_free_dialog_done%
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+
+[meet@out_of_containers_meet]
+close_snd_hello = nil
+close_snd_bye 	= nil
+close_victim = actor
+close_anim = wait_na
+meet_dialog = {+jup_a12_stalker_prisoner_out_of_containers} jup_a12_stalker_prisoner_free_dialog, jup_a12_stalker_prisoner_thank_bandits_base_dialog 
+trade_enable = false
+allow_break = false
+snd_on_use = nil
+use		   = {=is_wounded} false, {=actor_enemy} false, {=has_enemy} false, {=dist_to_actor_le(3) +jup_a12_stalker_prisoner_out_of_containers -jup_a12_stalker_prisoner_free_dialog_done !actor_has_weapon} self, {!actor_enemy =actor_has_weapon} true, true
+
+[walker@get_out_far_away]
+path_walk = stalker_prisoner_base_walk
+combat_ignore_cond = {!actor_enemy} true, {=check_enemy_smart(jup_a12)} true, false
+combat_ignore_keep_when_attacked = true
+def_state_moving = assault
+on_info = {-jup_a12_stalkers_on_base =npc_in_zone(jup_a6_sr_light)} %+jup_a12_stalkers_on_base +jup_a12_stalker_prisoner_cheats_to_base%
+on_info2 = {-jup_a12_stalker_prisoner_cheats_to_base -jup_a12_actor_guided_base =dist_to_actor_ge(100)} %+jup_a12_stalker_prisoner_cheats_to_base%
+on_info3 = {!has_enemy =dist_to_actor_le(5)} remark@wait_while_walking
+meet = meet@out_of_containers_meet
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+out_restr = jup_a6_sr_noweap
+wounded = wounded@no_wound
+
+[remark@wait_while_walking]
+target = story | actor
+combat_ignore_cond = {!actor_enemy} true, {-jup_a12_actor_enemy_to_bandits} true, false
+combat_ignore_keep_when_attacked = true
+meet = meet@out_of_containers_meet
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+on_info = {=has_enemy} walker@get_out_far_away, {=dist_to_actor_ge(5)} walker@get_out_far_away
+wounded = wounded@no_wound
+
+
+
+
+
+
+
+[logic@jup_a12_stalker_prisoner_base]
+active = animpoint@go_to_base_done
+on_hit = hit
+on_death = death
+suitable = {=check_npc_name(jup_a12_stalker_prisoner) +jup_a12_stalkers_on_base} true, {=check_npc_name(jup_a12_stalker_prisoner) +jup_a12_stalker_prisoner_cheats_to_base} true
+prior = 200
+post_combat_time = 0, 0
+
+[animpoint@go_to_base_done]
+reach_movement = assault
+cover_name = jup_a6_animp_prisoner
+use_camp = false
+meet = meet@base_meet
+on_info = {-jup_a12_stalkers_on_base =npc_in_zone(jup_a6_sr_light)} %+jup_a12_stalkers_on_base +jup_a12_stalker_prisoner_cheats_to_base%
+on_info2 = {-jup_a12_stalker_prisoner_cheats_to_base -jup_a12_actor_guided_base =dist_to_actor_ge(100)} %+jup_a12_stalker_prisoner_cheats_to_base%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+
+[meet@base_meet]
+close_snd_hello = nil
+close_snd_bye 	= nil
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+use = {=actor_enemy} false, true
+allow_break = false
+trade_enable = false
+meet_dialog = jup_a12_stalker_prisoner_free_dialog
+meet_on_talking = false

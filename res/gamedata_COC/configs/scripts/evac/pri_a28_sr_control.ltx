@@ -1,0 +1,149 @@
+[logic]
+active = sr_idle@give_task
+
+[sr_idle@give_task]
+on_info = {+pri_b305_fifth_cam_end} sr_idle@start_surge %=give_task(pri_a28_evacuation) =set_counter(pri_a28_friendly_hit:0) =set_counter(pri_a28_heli_mono_cnt:12)%
+on_info2 = {+pri_a28_evacuation_start -pri_b305_fifth_cam_end} sr_idle@clear_smart %+pri_b305_fifth_cam_end +pri_a25_rfi_source_eliminated +pri_a16_wait_for_stalkers =set_counter(pri_a28_friendly_hit:0) =set_counter(pri_a28_heli_mono_cnt:12)%
+
+[sr_idle@start_surge]
+on_info = {!surge_started} sr_idle@stop_surge %=set_surge_mess_and_task(empty:empty) =start_surge%, sr_idle@stop_surge %=set_surge_mess_and_task(empty:empty)%
+
+[sr_idle@stop_surge]
+on_info = {=surge_complete} sr_idle@base_zombied_add %+pri_a28_surge_end =clear_smart_terrain(pri_a15)%
+on_info2 = {+pri_a28_update_task_cover_strelok} %=stop_surge%
+
+
+
+;skip of previous scenes
+[sr_idle@clear_smart]
+on_info = sr_idle@add_squad %=clear_smart_terrain(pri_a16)%
+
+[sr_idle@add_squad]
+on_info = sr_idle@add_strong_parts %=create_squad(pri_a16_military_squad_strong:pri_a16) +pri_a28_strelok_alive +pri_a28_tarasov_alive +pri_a28_valentyr_alive +pri_a28_podorojniy_alive +pri_a28_sokolov_alive% 
+
+[sr_idle@add_strong_parts]
+on_info = {+pri_a28_tarasov_alive} %-pri_a28_tarasov_alive =create_squad_member(pri_a17_military_captain_tarasov_strong:pri_a16_military_squad)%
+on_info2 = {+pri_a28_valentyr_alive} %-pri_a28_valentyr_alive =create_squad_member(pri_a17_military_prapor_valentyr_strong:pri_a16_military_squad)%
+on_info3 = {+pri_a28_podorojniy_alive} %-pri_a28_podorojniy_alive =create_squad_member(pri_a17_military_lieutenant_podorojniy_strong:pri_a16_military_squad)%
+on_info4 = {+pri_a28_sokolov_alive} %-pri_a28_sokolov_alive =create_squad_member(pri_a15_sokolov_sci_head_strong:pri_a16_military_squad)%
+on_info5 = {+pri_a28_strelok_alive} %-pri_a28_strelok_alive =create_squad_member(pri_b305_strelok_strong:pri_a16_military_squad)%
+on_info6 = {=is_alive(pri_b305_strelok)} sr_idle@give_task
+
+
+
+;main theme again
+[sr_idle@base_zombied_add]
+on_info = sr_idle@school_snork_spawn_start %=create_squad(pri_a28_base_zombied:pri_a28_base) =create_squad(pri_a28_base_zombied_2:pri_a28_base:pri_a16) =create_squad(pri_a28_shop_zombied:pri_a28_shop) =create_squad(pri_a28_shop_zombied_2:pri_a28_shop) =create_squad(pri_a28_shop_zombied_3:pri_a28_shop) =create_squad(pri_a28_arch_zombied:pri_a28_arch)%
+
+[sr_idle@school_snork_spawn_start]
+on_info = sr_idle@add_snorks %=clear_smart_terrain(pri_b301)%
+
+[sr_idle@add_snorks]
+on_info = {!squad_npc_count_ge(pri_a16_military_squad:4)} sr_idle@wait_for_base_exit %=create_squad(pri_a28_school_snorks_1:pri_a28_school) =create_squad(pri_a28_school_snorks_2:pri_a28_school)%
+on_info2 = {=squad_npc_count_ge(pri_a16_military_squad:4)} sr_idle@wait_for_base_exit %=create_squad(pri_a28_school_snorks_1_strong:pri_a28_school) =create_squad(pri_a28_school_snorks_2_strong:pri_a28_school)% 
+
+[sr_idle@wait_for_base_exit]
+on_info = {+pri_a28_update_task_cover_strelok -pri_a28_evacutaion_start} %+pri_a28_evacutaion_start =scenario_autosave(st_save_pri_a28_evacutaion_start)%
+on_info2 = {+pri_a28_update_task_cover_strelok +pri_a28_evacutaion_start} sr_idle@add_mono %=clear_smart_terrain(pri_sim_2) =create_squad(pri_a28_evac_squad:pri_a28_heli)%
+
+
+
+[sr_idle@add_mono]
+on_info = sr_idle@check_base_out %=create_squad(pri_a28_heli_mono_default:pri_a28_heli) =create_squad(pri_a28_heli_mono_snipers:pri_a28_heli)%
+
+
+
+[sr_idle@check_base_out]
+on_info = {=squad_in_zone(pri_a16_military_squad:pri_a28_sr_shop_1)} %+pri_a28_base_done%
+on_info2 = {-pri_a28_colonel_about_heli !is_alive(pri_a17_military_colonel_kovalski)} %+pri_a28_colonel_about_heli%
+on_info3 = {+pri_a28_army_zombied_first -pri_a28_colonel_zombied_first !is_alive(pri_a17_military_colonel_kovalski)} sr_idle@check_base_out_koval_dead
+on_info4 = {+pri_a28_colonel_zombied_first !is_alive(pri_a17_military_colonel_kovalski)} sr_idle@check_base_out_koval_dead_go
+on_info5 = {+pri_a28_colonel_about_heli -pri_a28_army_zombied_first !is_alive(pri_a22_army_signaller)} %+pri_a28_army_zombied_first%
+on_info6 = {+pri_a28_base_done} sr_idle@check_shop_start
+
+[sr_idle@check_base_out_koval_dead]
+on_game_timer = 30 | {-pri_a28_colonel_zombied_first} sr_idle@check_base_out_koval_dead_go %+pri_a28_colonel_zombied_first%
+on_info = {=squad_in_zone(pri_a16_military_squad:pri_a28_sr_shop_1)} sr_idle@check_shop_start %+pri_a28_base_done%
+
+[sr_idle@check_base_out_koval_dead_go]
+on_game_timer = 80 | {-pri_a28_base_leave} %+pri_a28_base_leave%
+on_game_timer2 = 150 | {-pri_a28_base_done} %+pri_a28_base_done%
+on_info = {=squad_in_zone(pri_a16_military_squad:pri_a28_sr_shop_1)} %+pri_a28_base_done%
+on_info2 = {+pri_a28_base_done} sr_idle@check_shop_start
+
+
+
+[sr_idle@check_shop_start]
+on_info = {+pri_a28_colonel_go_left} sr_idle@check_shop_out
+on_info2 = {-pri_a28_army_zombied_in_building !is_alive(pri_a25_base_medic)} %+pri_a28_army_zombied_in_building%
+on_info3 = {+pri_a28_army_zombied_in_building -pri_a28_colonel_go_left !is_alive(pri_a17_military_colonel_kovalski)} sr_idle@check_shop_out
+on_info4 = {+pri_a28_shop_done} sr_idle@check_arch_out
+on_info5 = {-pri_a28_shop_1_leave !squad_exist(pri_a28_shop_zombied)} %+pri_a28_shop_1_leave%
+on_info6 = {+pri_a28_shop_1_leave -pri_a28_shop_3_leave !squad_exist(pri_a28_shop_zombied_2) !squad_exist(pri_a28_shop_zombied_3)} %+pri_a28_shop_2_leave +pri_a28_shop_3_leave%
+
+[sr_idle@check_shop_out]
+on_game_timer = 40 | {-pri_a28_colonel_go_left} %+pri_a28_colonel_go_left%
+on_info = {-pri_a28_shop_1_leave =squad_in_zone(pri_a16_military_squad:pri_a28_sr_shop_2_small)} %+pri_a28_shop_1_leave% 
+on_info2 = {-pri_a28_shop_2_leave =squad_in_zone(pri_a16_military_squad:pri_a28_sr_shop_3_small)} %+pri_a28_shop_2_leave% 
+on_info3 = {-pri_a28_shop_3_leave =squad_in_zone(pri_a16_military_squad:pri_a28_sr_arch_1)} %+pri_a28_shop_3_leave% 
+on_info4 = {+pri_a28_shop_3_leave -pri_a28_shop_done !is_alive(pri_a17_military_colonel_kovalski)} %+pri_a28_shop_done%
+on_info5 = {+pri_a28_shop_done} sr_idle@check_arch_out
+on_info6 = {-pri_a28_shop_1_leave !squad_exist(pri_a28_shop_zombied)} %+pri_a28_shop_1_leave%
+on_info7 = {+pri_a28_shop_1_leave -pri_a28_shop_3_leave !squad_exist(pri_a28_shop_zombied_2) !squad_exist(pri_a28_shop_zombied_3)} %+pri_a28_shop_2_leave +pri_a28_shop_3_leave%
+
+
+
+[sr_idle@check_arch_out]
+on_info = {+pri_a28_arch_done} sr_idle@check_school_out
+on_info2 = {-pri_a28_strelok_go_over_anomaly !is_alive(pri_b305_strelok)} %+pri_a28_strelok_go_over_anomaly%
+on_info3 = {-pri_a28_colonel_ok_go_here !is_alive(pri_a17_military_colonel_kovalski)} %+pri_a28_colonel_ok_go_here%
+on_info4 = {+pri_a28_evac_com_where_you -pri_a28_colonel_we_close !is_alive(pri_a17_military_colonel_kovalski)} %+pri_a28_colonel_we_close%
+on_info5 = {+pri_a28_evac_com_cant_wait -pri_a28_arch_done !is_alive(pri_a17_military_colonel_kovalski)} %+pri_a28_arch_done%
+on_info6 = {-pri_a28_arch_leave !squad_exist(pri_a28_arch_zombied)} %+pri_a28_arch_leave%
+
+
+
+[sr_idle@check_school_out]
+on_info = {+pri_a28_school_done} sr_idle@check_horror_out
+on_info2 = {-pri_a28_school_1_leave =squad_in_zone(pri_a28_school_snorks_1:pri_a28_sr_school_2)} %+pri_a28_school_1_leave%
+on_info3 = {-pri_a28_school_1_leave =squad_in_zone_all(pri_a16_military_squad:pri_a28_sr_school_1)} %+pri_a28_school_1_leave%
+on_info4 = {-pri_a28_school_2_leave !squad_exist(pri_a28_school_snorks_1)} %+pri_a28_school_2_leave%
+on_info5 = {-pri_a28_school_done !squad_exist(pri_a28_school_snorks_1) !squad_exist(pri_a28_school_snorks_2)} %+pri_a28_school_done%
+on_info6 = {+pri_a28_school_1_leave -pri_a28_medic_about_snork !is_alive(pri_a25_base_medic)} %+pri_a28_medic_about_snork%
+on_info7 = {+pri_a28_medic_about_snork -pri_a28_colonel_about_snork !is_alive(pri_a17_military_colonel_kovalski)} %+pri_a28_colonel_about_snork%
+on_info8 = {+pri_a28_school_2_leave -pri_a28_colonel_fire_will !is_alive(pri_a17_military_colonel_kovalski)} %+pri_a28_colonel_fire_will%
+
+
+
+[sr_idle@check_horror_out]
+on_info = {+pri_a28_strelok_run} sr_idle@check_evac_out %-pri_a28_colonel_wait_actor +pri_a28_evac_come_close%
+on_info2 = {-pri_a28_horror_start =squad_in_zone(pri_a16_military_squad:pri_a28_sr_horror) !is_alive(pri_a25_base_medic)} %+pri_a28_horror_start +pri_a28_medic_recovered%
+on_info3 = {+pri_a28_horror_start -pri_a28_strelok_dont_stop !is_alive(pri_b305_strelok)} %+pri_a28_strelok_dont_stop%
+on_info4 = {+pri_a28_strelok_dont_stop -pri_a28_army_its_here !is_alive(pri_a25_base_medic)} %+pri_a28_army_its_here +pri_a28_medic_recovered%
+on_info5 = {+pri_a28_army_its_here -pri_a28_strelok_run !is_alive(pri_b305_strelok)} %+pri_a28_strelok_run%
+
+
+
+[sr_idle@check_evac_out]
+on_info = {+pri_a28_evac_done} sr_idle@evac_point
+on_info2 = {-pri_a28_evac_leave =actor_in_zone(pri_a28_sr_big)} sr_idle@check_evac_out_go %+pri_a28_evac_leave%
+on_info3 = {=squad_in_zone(pri_a16_military_squad:pri_a28_sr_big)} sr_idle@check_evac_out_go %+pri_a28_evac_leave%
+on_info4 = {+pri_a28_evac_leave =actor_in_zone(pri_a28_sr_big)} sr_idle@check_evac_out_go
+on_info5 = {-pri_a28_evac_leave !is_alive(pri_a17_military_colonel_kovalski) =squad_in_zone_all(pri_a16_military_squad:pri_a28_sr_evac_1)} sr_idle@check_evac_out_go %+pri_a28_evac_leave%
+on_info6 = {-pri_a28_evac_come_close_done !is_alive(pri_a28_evac_com)} %+pri_a28_evac_come_close_done%
+
+[sr_idle@check_evac_out_go]
+on_info = {+pri_a28_evac_done} sr_idle@evac_point
+on_info2 = {-pri_a28_evac_com_to_helicopter =actor_in_zone(pri_a28_sr_small)} %+pri_a28_evac_com_to_helicopter%
+on_info3 = {-pri_a28_evac_com_to_helicopter =squad_in_zone(pri_a16_military_squad:pri_a28_sr_small)} %+pri_a28_evac_com_to_helicopter%
+on_info4 = {-pri_a28_evac_come_close_done !is_alive(pri_a28_evac_com)} %+pri_a28_evac_come_close_done%
+
+
+
+[sr_idle@evac_point]
+on_info = {+pri_a28_evac_com_to_helicopter} sr_idle@nil
+on_info2 = {-pri_a28_evac_com_to_helicopter =actor_in_zone(pri_a28_sr_small)} %+pri_a28_evac_com_to_helicopter%
+on_info3 = {-pri_a28_evac_com_to_helicopter =squad_in_zone(pri_a16_military_squad:pri_a28_sr_small)} %+pri_a28_evac_com_to_helicopter%
+
+
+[sr_idle@nil]

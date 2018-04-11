@@ -1,0 +1,68 @@
+[logic@pri_a16_tarasov]
+suitable = {-pri_b305_fifth_cam_end =check_npc_name(pri_a17_military_captain_tarasov)} true
+prior = 200
+active = walker@home_1 
+
+[walker@home_1]
+def_state_standing = wait_na
+def_state_moving = walk_noweap
+path_walk = taras_base_stay
+path_look = taras_base_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+meet = meet@recon_squad_ambush_dialog_1
+out_restr = pri_a16_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+on_info = {+pri_a17_military_recon_squad_ambush_actor_instruct !npc_talking} walker@home_2
+on_info2 = {-pri_a17_actor_taras_hello =dist_to_actor_le(3)} remark@salut %+pri_a17_actor_taras_hello%
+use_camp = false
+
+[remark@salut]
+target = story | actor
+anim = salut_free
+on_game_timer = 5 | walker@home_1
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = pri_a16_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+meet = no_meet
+use_camp = false
+
+[walker@home_2]
+def_state_standing = wait_na
+def_state_moving = walk_noweap
+path_walk = taras_base_stay
+path_look = taras_base_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+meet = meet@recon_squad_ambush_dialog_2
+out_restr = pri_a16_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = false
+
+[meet@recon_squad_ambush_dialog_1]
+meet_dialog	= pri_a17_military_recon_squad_ambush_dialog 
+close_anim      = nil
+far_anim      	= nil
+close_victim    = actor
+trade_enable 	= false
+allow_break 	= false
+use 			= {=actor_enemy} false, true
+
+[meet@recon_squad_ambush_dialog_2]
+meet_dialog	= pri_a17_military_recon_squad_ambush_dialog_second 
+close_anim      = nil
+far_anim      	= nil
+close_victim    = actor
+trade_enable 	= false
+allow_break 	= false
+use 			= {=actor_enemy} false, true

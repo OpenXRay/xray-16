@@ -1,0 +1,32 @@
+[logic]
+active = nil;sr_idle
+
+[sr_idle]
+on_info =  {-jup_b6_anom_1_count_end +jup_b6_anom_1} sr_idle@count_1 %=set_counter(jup_b6_anom_1_st_count:0)%
+on_info2 = {-jup_b6_anom_2_count_end +jup_b6_anom_2} sr_idle@count_2 %=set_counter(jup_b6_anom_2_st_count:0)%
+on_info3 = {+jup_b6_two_anomaly_learned} sr_idle@end
+on_info4 = {+jup_b6_task_fail} sr_idle@end
+
+[sr_idle@count_1]
+on_info =  {=counter_equal(jup_b6_anom_1_st_count:4) -jup_b6_anom_1_count_1_end} %=inc_counter(jup_b6_anom_1_count_1:8)%, {=counter_equal(jup_b6_anom_1_st_count:3) -jup_b6_anom_1_count_1_end} %=inc_counter(jup_b6_anom_1_count_1:6)%, {=counter_equal(jup_b6_anom_1_st_count:2) -jup_b6_anom_1_count_1_end} %=inc_counter(jup_b6_anom_1_count_1:4)%, {=counter_equal(jup_b6_anom_1_st_count:1) -jup_b6_anom_1_count_1_end} %=inc_counter(jup_b6_anom_1_count_1:2)%
+on_info2 = {=counter_equal(jup_b6_anom_1_st_count:4) -jup_b6_anom_1_count_2_end +jup_b6_anom_1_count_1_end} %=inc_counter(jup_b6_anom_1_count_2:8)%, {=counter_equal(jup_b6_anom_1_st_count:3) -jup_b6_anom_1_count_2_end +jup_b6_anom_1_count_1_end} %=inc_counter(jup_b6_anom_1_count_2:6)%, {=counter_equal(jup_b6_anom_1_st_count:2) -jup_b6_anom_1_count_2_end +jup_b6_anom_1_count_1_end} %=inc_counter(jup_b6_anom_1_count_2:4)%, {=counter_equal(jup_b6_anom_1_st_count:1) -jup_b6_anom_1_count_2_end +jup_b6_anom_1_count_1_end} %=inc_counter(jup_b6_anom_1_count_2:2)%
+on_info3 = {=counter_equal(jup_b6_anom_1_st_count:4) -jup_b6_anom_1_count_3_end +jup_b6_anom_1_count_2_end} %=inc_counter(jup_b6_anom_1_count_3:8)%, {=counter_equal(jup_b6_anom_1_st_count:3) -jup_b6_anom_1_count_3_end +jup_b6_anom_1_count_2_end} %=inc_counter(jup_b6_anom_1_count_3:6)%, {=counter_equal(jup_b6_anom_1_st_count:2) -jup_b6_anom_1_count_3_end +jup_b6_anom_1_count_2_end} %=inc_counter(jup_b6_anom_1_count_3:4)%, {=counter_equal(jup_b6_anom_1_st_count:1) -jup_b6_anom_1_count_3_end +jup_b6_anom_1_count_2_end} %=inc_counter(jup_b6_anom_1_count_3:2)%
+on_info4 = {=counter_equal(jup_b6_anom_1_st_count:4) -jup_b6_anom_1_count_4_end +jup_b6_anom_1_count_3_end} %=inc_counter(jup_b6_anom_1_count_4:8)%, {=counter_equal(jup_b6_anom_1_st_count:3) -jup_b6_anom_1_count_4_end +jup_b6_anom_1_count_3_end} %=inc_counter(jup_b6_anom_1_count_4:6)%, {=counter_equal(jup_b6_anom_1_st_count:2) -jup_b6_anom_1_count_4_end +jup_b6_anom_1_count_3_end} %=inc_counter(jup_b6_anom_1_count_4:4)%, {=counter_equal(jup_b6_anom_1_st_count:1) -jup_b6_anom_1_count_4_end +jup_b6_anom_1_count_3_end} %=inc_counter(jup_b6_anom_1_count_4:2)%
+on_info5 = {+jup_b6_task_fail} sr_idle@end, {+jup_b6_anom_1_count_end} sr_idle, sr_idle@count_idle_1
+
+[sr_idle@count_2]
+on_info =  {=counter_equal(jup_b6_anom_2_st_count:4) -jup_b6_anom_2_count_1_end} %=inc_counter(jup_b6_anom_2_count_1:8)%, {=counter_equal(jup_b6_anom_2_st_count:3) -jup_b6_anom_2_count_1_end} %=inc_counter(jup_b6_anom_2_count_1:6)%, {=counter_equal(jup_b6_anom_2_st_count:2) -jup_b6_anom_2_count_1_end} %=inc_counter(jup_b6_anom_2_count_1:4)%, {=counter_equal(jup_b6_anom_2_st_count:1) -jup_b6_anom_2_count_1_end} %=inc_counter(jup_b6_anom_2_count_1:2)%
+on_info2 = {=counter_equal(jup_b6_anom_2_st_count:4) -jup_b6_anom_2_count_2_end +jup_b6_anom_2_count_1_end} %=inc_counter(jup_b6_anom_2_count_2:8)%, {=counter_equal(jup_b6_anom_2_st_count:3) -jup_b6_anom_2_count_2_end +jup_b6_anom_2_count_1_end} %=inc_counter(jup_b6_anom_2_count_2:6)%, {=counter_equal(jup_b6_anom_2_st_count:2) -jup_b6_anom_2_count_2_end +jup_b6_anom_2_count_1_end} %=inc_counter(jup_b6_anom_2_count_2:4)%, {=counter_equal(jup_b6_anom_2_st_count:1) -jup_b6_anom_2_count_2_end +jup_b6_anom_2_count_1_end} %=inc_counter(jup_b6_anom_2_count_2:2)%
+on_info3 = {=counter_equal(jup_b6_anom_2_st_count:4) -jup_b6_anom_2_count_3_end +jup_b6_anom_2_count_2_end} %=inc_counter(jup_b6_anom_2_count_3:8)%, {=counter_equal(jup_b6_anom_2_st_count:3) -jup_b6_anom_2_count_3_end +jup_b6_anom_2_count_2_end} %=inc_counter(jup_b6_anom_2_count_3:6)%, {=counter_equal(jup_b6_anom_2_st_count:2) -jup_b6_anom_2_count_3_end +jup_b6_anom_2_count_2_end} %=inc_counter(jup_b6_anom_2_count_3:4)%, {=counter_equal(jup_b6_anom_2_st_count:1) -jup_b6_anom_2_count_3_end +jup_b6_anom_2_count_2_end} %=inc_counter(jup_b6_anom_2_count_3:2)%
+on_info4 = {=counter_equal(jup_b6_anom_2_st_count:4) -jup_b6_anom_2_count_4_end +jup_b6_anom_2_count_3_end} %=inc_counter(jup_b6_anom_2_count_4:8)%, {=counter_equal(jup_b6_anom_2_st_count:3) -jup_b6_anom_2_count_4_end +jup_b6_anom_2_count_3_end} %=inc_counter(jup_b6_anom_2_count_4:6)%, {=counter_equal(jup_b6_anom_2_st_count:2) -jup_b6_anom_2_count_4_end +jup_b6_anom_2_count_3_end} %=inc_counter(jup_b6_anom_2_count_4:4)%, {=counter_equal(jup_b6_anom_2_st_count:1) -jup_b6_anom_2_count_4_end +jup_b6_anom_2_count_3_end} %=inc_counter(jup_b6_anom_2_count_4:2)%
+on_info5 = {+jup_b6_task_fail} sr_idle@end, {+jup_b6_anom_2_count_end} sr_idle, sr_idle@count_idle_2
+
+[sr_idle@count_idle_1]
+on_game_timer = 20 | sr_idle@count_1
+
+[sr_idle@count_idle_2]
+on_game_timer = 20 | sr_idle@count_2
+
+[sr_idle@end]
+
+

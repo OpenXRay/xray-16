@@ -1,0 +1,30 @@
+[smart_terrain]
+squad_id = 9
+max_population = 2
+respawn_params = respawn@jup_b200   
+respawn_idle = 86400
+
+
+[respawn@jup_b200]
+spawn_freedom@advanced
+spawn_freedom@veteran
+spawn_zombied
+
+[spawn_zombied]
+spawn_squads = zombied_sim_squad_novice, zombied_sim_squad_advanced, zombied_sim_squad_veteran
+spawn_num = {-bar_deactivate_radar_done} 1, 0
+
+[spawn_freedom@advanced]
+spawn_squads =  freedom_sim_squad_advanced, freedom_sim_squad_advanced, freedom_sim_squad_novice
+spawn_num = {+bar_deactivate_radar_done} 1, 0
+
+[spawn_freedom@veteran]
+spawn_squads =  freedom_sim_squad_advanced, freedom_sim_squad_advanced, freedom_sim_squad_veteran
+spawn_num = {+bar_deactivate_radar_done} 1, 0
+
+;[exclusive]
+;jup_b200_stalker = jupiter\jup_b200_stalker.ltx
+;jup_b200_stalker1 = jupiter\jup_b200_stalker.ltx
+;jup_b200_stalker2 = jupiter\jup_b200_stalker.ltx
+;jup_b200_stalker3 = jupiter\jup_b200_stalker.ltx
+;jup_b200_stalker4 = jupiter\jup_b200_stalker.ltx

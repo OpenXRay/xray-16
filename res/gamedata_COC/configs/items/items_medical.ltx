@@ -1,0 +1,124 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;	MEDICAL
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[bandage]:booster
+$spawn                                   = "food and drugs\bandage"
+visual                                   = dynamics\devices\dev_bandage\dev_bandage.ogf
+description                              = st_bandage_descr
+
+inv_name                                 = st_bandage
+inv_name_short                           = st_bandage
+inv_weight                               = 0.05 ;0.2               
+cost                                     = 80
+
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 17
+inv_grid_y                               = 1
+
+boost_time                               = 10.0
+boost_bleeding_restore                   = 0.01
+
+use_sound                                = interface\inv_bandage
+
+;antirad new
+[antirad]:booster
+$spawn                                   = "food and drugs\antirad"
+visual                                   = dynamics\devices\dev_antirad\dev_antirad.ogf
+inv_name                                 = st_antirad
+inv_name_short                           = st_antirad
+description                              = st_antirad_descr
+inv_weight                               = 0.01
+
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 16
+inv_grid_y                               = 1
+cost                                     = 250
+
+;eatable item
+;eat_radiation = -0.5
+
+boost_time                               = 10.0
+boost_radiation_restore                  = 0.01
+
+use_sound                                = interface\inv_pills
+
+[medkit]:booster_script
+$spawn                                   = "food and drugs\medkit"
+visual                                   = dynamics\devices\dev_aptechka\dev_aptechka_low.ogf
+inv_name                                 = st_medkit
+inv_name_short                           = st_medkit
+description                              = st_medkit_descr
+inv_weight                               = 0.1
+
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 8
+inv_grid_y                               = 2
+cost                                     = 250
+
+boost_time                               = 20.0
+boost_health_restore                     = 0.005
+boost_radiation_restore                  = 0.0
+boost_bleeding_restore                   = 0.001
+
+use_sound                                = interface\inv_medkit
+
+use_condition                            = true
+max_uses                                 = 2
+remove_after_use                         = true
+empty_weight                             = 0.02
+
+[medkit_army]:booster_script
+$spawn                                   = "food and drugs\medkit_army"
+visual                                   = dynamics\devices\dev_aptechka\dev_aptechka_high.ogf
+inv_name                                 = st_medkit_army
+inv_name_short                           = st_medkit_army
+description                              = st_medkit_army_descr
+inv_weight                               = 0.1
+
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 9
+inv_grid_y                               = 2
+cost                                     = 650
+
+boost_time                               = 10.0
+boost_health_restore                     = 0.01
+boost_radiation_restore                  = 0.0
+boost_bleeding_restore                   = 0.002
+
+use_sound                                = interface\inv_medkit
+
+use_condition                            = true
+max_uses                                 = 2
+remove_after_use                         = true
+empty_weight                             = 0.02
+
+[medkit_scientic]:booster_script
+$spawn                                   = "food and drugs\medkit_scientic"
+visual                                   = dynamics\devices\dev_aptechka\dev_aptechka_mid.ogf
+inv_name                                 = st_medkit_science
+inv_name_short                           = st_medkit_science
+description                              = st_medkit_science_descr
+inv_weight                               = 0.1
+
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 10
+inv_grid_y                               = 2
+cost                                     = 800
+
+boost_time                               = 20.0
+boost_health_restore                     = 0.005
+boost_radiation_restore                  = 0.01
+boost_bleeding_restore                   = 0.001
+
+use_sound                                = interface\inv_medkit
+
+use_condition                            = true
+max_uses                                 = 2
+remove_after_use                         = true
+empty_weight                             = 0.02

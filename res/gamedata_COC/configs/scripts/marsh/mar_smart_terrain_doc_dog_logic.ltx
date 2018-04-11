@@ -1,0 +1,50 @@
+[logic@mar_smart_terrain_doc_dog]
+active = mob_walker@stand
+suitable = {=check_npc_name(mar_smart_terrain_doc_dog)} true
+prior = 200
+monster_job = true
+;on_hit = hit
+
+[mob_walker@stand]
+path_walk = dog_1_walk 
+path_look = dog_1_look
+;out_restr = 
+actor_friendly = true
+combat_ignore_cond = {=check_enemy_name(mar_smart_terrain_doc_doctor)} true, {=check_enemy_name(actor)} true
+aggressive = false
+on_info = {!is_day} mob_walker@waiting_sleep
+
+[mob_walker@waiting_sleep]
+path_walk = dog_1_walk 
+path_look = dog_1_look
+;out_restr = 
+actor_friendly = true
+on_timer = 3500 | {~50} mob_walker@sleep, mob_walker@sit
+combat_ignore_cond = {=check_enemy_name(mar_smart_terrain_doc_doctor)} true, {=check_enemy_name(actor)} true
+aggressive = false
+
+[mob_walker@sit]
+path_walk = dog_1_walk 
+path_look = dog_sit_look
+on_timer = 30000 | mob_walker@waiting_sleep
+aggressive = false
+on_actor_dist_le_nvis = 2 | mob_walker@waiting_sleep
+combat_ignore_cond = {=check_enemy_name(mar_smart_terrain_doc_doctor)} true, {=check_enemy_name(actor)} true
+actor_friendly = true
+
+[mob_walker@sleep]
+path_walk = dog_1_walk
+path_look = dog_sleep_look
+on_timer = 30000 | mob_walker@waiting_sleep
+aggressive = false
+on_actor_dist_le_nvis = 2 | mob_walker@waiting_sleep
+;out_restr = 
+combat_ignore_cond = {=check_enemy_name(mar_smart_terrain_doc_doctor)} true, {=check_enemy_name(actor)} true
+on_info = {=is_day} mob_walker@stand
+actor_friendly = true
+
+;[hit]
+;on_info = {=hit_by_actor -marsh_actor_enemy} %+marsh_actor_enemy%
+
+;[physics]
+;controller_can_be_moved_by_player = false

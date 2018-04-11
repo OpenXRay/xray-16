@@ -1,0 +1,26 @@
+[logic]
+active = walker@bar_arena_monstr_savage
+on_death = death@bar_arena_monstr_savage
+
+[walker@bar_arena_monstr_savage]
+path_walk = bar_arena_monstr_walk_2
+path_look = bar_arena_monstr_look
+on_info = {+bar_arena_state_1} camper@bar_arena_monstr_savage_2
+
+[camper@bar_arena_monstr_savage_2]
+path_walk = bar_arena_monstr_walk
+path_look = bar_arena_monstr_look
+on_signal = arrived | camper@bar_arena_monstr_savage_3 %+bar_arena_monstr_ready =bar_arena_hit%
+danger = danger@bar_arena_monstr_savage
+
+[camper@bar_arena_monstr_savage_3]
+path_walk = bar_arena_monstr_walk
+path_look = bar_arena_monstr_look
+danger = danger@bar_arena_monstr_savage
+
+[danger@bar_arena_monstr_savage]
+ignore_distance = 0
+ignore_types = grenade, hit, corpse, sound
+
+[death@bar_arena_monstr_savage]
+on_info = %+bar_arena_savage_defeated +bar_arena_monstr_dead%

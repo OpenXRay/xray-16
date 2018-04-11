@@ -1,0 +1,483 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Artefacts Shadow of Chernobyl for S.I. mod by ARayKo60 ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+[af_base_1]:identity_immunities
+GroupControlSection                      = spawn_group
+cform                                    = skeleton
+hud                                      = artefact_hud
+invisible                                = false
+animation_slot                           = 11
+allow_inertion                           = true
+attach_angle_offset                      = 0,0,0
+attach_position_offset                   = -0.1,-0.1,0
+attach_bone_name                         = bip01_root
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+belt                                     = true
+slot                                     = -1	                                       ;10
+default_to_ruck                          = true
+af_actor_properties                      = on
+actor_properties                         = on	                                       ;??????? ????????? ?? ????? ? ??????
+det_show_particles                       = anomaly2\plasma_generator_death
+det_hide_particles                       = anomaly2\plasma_generator_death
+
+det_show_snd                             = anomaly\bfuzz_blowout
+det_hide_snd                             = anomaly\pux_blast
+
+af_rank                                  = 0
+can_be_controlled                        = true
+script_binding                           = bind_artefact.bind
+particles_bone                           = link
+additional_inventory_weight              = 0
+idle_light_shadow                        = false
+lights_enabled                           = false	                                       ;???? ?????? ??????, ?? ????? ??????
+
+health_restore_speed                     = 0
+radiation_restore_speed                  = 0
+satiety_restore_speed                    = 0
+power_restore_speed                      = 0
+bleeding_restore_speed                   = 0
+
+hit_absorbation_sect                     = af_base_1_absorbation
+degrade_rate							 = 1.0	;Artefact Degradation
+
+[af_base_1_absorbation]
+burn_immunity                            = 0
+strike_immunity                          = 0
+shock_immunity                           = 0
+wound_immunity                           = 0
+wound_2_immunity                         = 0
+radiation_immunity                       = 0
+telepatic_immunity                       = 0
+chemical_burn_immunity                   = 0
+explosion_immunity                       = 0
+fire_wound_immunity                      = 0
+
+;------------------------------------------------------------------------------------------
+;------------------ Artifacts for thermal anomalies -------------------------------------
+;------------------------------------------------------------------------------------------
+
+;-------------- (drops) -------------;
+[af_drops]:af_base
+
+GroupControlSection                      = spawn_group
+$spawn                                   = "artifacts\zharka drops"
+$npc                                     = on	                                       ; option for Level Editor
+;$prefetch 		= 3
+cform                                    = skeleton
+class                                    = SCRPTART
+
+visual                                   = dynamics\artefacts\artefact_kaply.ogf
+description                              = st_af-drops_descr
+inv_name                                 = af_drops
+inv_name_short                           = af_drops
+inv_weight                               = 0.5
+
+inv_grid_x                               = 7
+inv_grid_y                               = 0
+
+cost                                     = 7000
+jump_height                              = .1
+
+particles                                = anomaly2\artefact\artefact_zharka
+det_show_particles                       = artefact\af_thermal_show
+det_hide_particles                       = artefact\af_thermal_hide
+lights_enabled                           = true
+trail_light_color                        = 0.6,0.7,0.5
+trail_light_range                        = 0.5
+
+
+health_restore_speed                     = 0
+radiation_restore_speed                  = -0.00225
+satiety_restore_speed                    = 0
+power_restore_speed                      = -0.00125
+bleeding_restore_speed                   = 0
+hit_absorbation_sect                     = af_drops_absorbation
+
+[af_drops_absorbation]
+burn_immunity                            = 0
+strike_immunity                          = 0
+shock_immunity                           = 0
+wound_immunity                           = 0
+radiation_immunity                       = 0
+telepatic_immunity                       = 0
+chemical_burn_immunity                   = 0
+explosion_immunity                       = 0
+fire_wound_immunity                      = 0
+
+
+;----------------------------------------------------------------
+;--------------- Artifacts for anomalies "Ameba" -----------------
+;----------------------------------------------------------------
+
+;------------ (ameba slime) ------------;
+[af_ameba_slime]:af_base
+GroupControlSection                      = spawn_group
+$spawn                                   = "artifacts\ameba slime"
+
+$prefetch                                = 64
+cform                                    = skeleton
+class                                    = SCRPTART
+
+visual                                   = dynamics\artefacts\artefact_ameba3.ogf
+description                              = st_af_ameba_slime_descr
+inv_name                                 = af_ameba_slime
+inv_name_short                           = af_ameba_slime
+inv_weight                               = 0.5
+
+inv_grid_x                               = 1
+inv_grid_y                               = 0
+
+cost                                     = 7000
+
+jump_height                              = .0
+
+particles                                = anomaly2\artefact\artefact_ameba
+
+det_show_particles                       = artefact\af_gravi_show
+det_hide_particles                       = artefact\af_gravi_hide
+
+lights_enabled                           = false
+
+
+health_restore_speed                     = 0.0
+radiation_restore_speed                  = 0.0
+satiety_restore_speed                    = 0.0
+power_restore_speed                      = 0.0
+bleeding_restore_speed                   = 0.003
+hit_absorbation_sect                     = af_ameba_slime_absorbation
+
+[af_ameba_slime_absorbation]
+burn_immunity                            = -0.011
+strike_immunity                          = 0
+shock_immunity                           = 0
+wound_immunity                           = 0
+radiation_immunity                       = 0
+telepatic_immunity                       = 0
+chemical_burn_immunity                   = -0.011
+explosion_immunity                       = 0
+fire_wound_immunity                      = 0
+
+
+;------------ (slug) -------------;
+[af_ameba_slug]:af_base
+GroupControlSection                      = spawn_group
+$spawn                                   = "artifacts\ameba slug"
+
+$prefetch                                = 64
+cform                                    = skeleton
+class                                    = SCRPTART
+
+visual                                   = dynamics\artefacts\artefact_ameba2.ogf
+description                              = st_af_ameba_slug_descr
+inv_name                                 = af_ameba_slug
+inv_name_short                           = af_ameba_slug
+inv_weight                               = 0.5
+
+inv_grid_x                               = 2
+inv_grid_y                               = 0
+
+cost                                     = 10000
+
+jump_height                              = .1
+
+particles                                = anomaly2\artefact\artefact_ameba
+
+det_show_particles                       = artefact\af_gravi_show
+det_hide_particles                       = artefact\af_gravi_hide
+
+lights_enabled                           = true
+trail_light_color                        = 0.6,0.6,0.5
+trail_light_range                        = 1.0
+
+health_restore_speed                     = 0
+radiation_restore_speed                  = 0
+satiety_restore_speed                    = 0
+power_restore_speed                      = 0
+bleeding_restore_speed                   = 0.00425
+hit_absorbation_sect                     = af_ameba_absorbation
+
+[af_ameba_absorbation]
+burn_immunity                            = -0.0125
+strike_immunity                          = 0
+shock_immunity                           = 0
+wound_immunity                           = 0
+radiation_immunity                       = 0
+telepatic_immunity                       = 0
+chemical_burn_immunity                   = -0.0125
+explosion_immunity                       = 0
+fire_wound_immunity                      = 0
+
+
+;------------- (mica) ------------;
+[af_ameba_mica]:af_base
+GroupControlSection                      = spawn_group
+$spawn                                   = "artifacts\ameba mica"
+
+$prefetch                                = 64
+cform                                    = skeleton
+class                                    = SCRPTART
+
+visual                                   = dynamics\artefacts\artefact_ameba1.ogf
+description                              = st_af_ameba_mica_descr
+inv_name                                 = af_ameba_mica
+inv_name_short                           = af_ameba_mica
+inv_weight                               = 0.5
+
+inv_grid_x                               = 0
+inv_grid_y                               = 0
+
+cost                                     = 15000
+
+jump_height                              = .1
+
+particles                                = anomaly2\artefact\artefact_ameba
+
+det_show_particles                       = artefact\af_gravi_show
+det_hide_particles                       = artefact\af_gravi_hide
+
+lights_enabled                           = true
+trail_light_color                        = 0.6,0.7,0.6
+trail_light_range                        = 1
+
+health_restore_speed                     = 0
+radiation_restore_speed                  = 0
+satiety_restore_speed                    = 0
+power_restore_speed                      = 0
+bleeding_restore_speed                   = 0.006
+hit_absorbation_sect                     = af_ameba_mica_absorbation
+
+[af_ameba_mica_absorbation]
+burn_immunity                            = -0.015
+strike_immunity                          = 0
+shock_immunity                           = 0
+wound_immunity                           = 0
+radiation_immunity                       = 0
+telepatic_immunity                       = 0
+chemical_burn_immunity                   = -0.015
+explosion_immunity                       = 0
+fire_wound_immunity                      = 0
+
+
+;----------------------------------------------------------------
+;------------------- "Dummy" ---------------------------------
+;----------------------------------------------------------------
+
+;------------ (spring) --------------;
+[af_dummy_spring]:af_base
+GroupControlSection                      = spawn_group
+$spawn                                   = "artifacts\dummy spring"
+$npc                                     = on	                                       ; option for Level Editor
+;$prefetch 		= 3
+cform                                    = skeleton
+class                                    = SCRPTART
+
+visual                                   = dynamics\artefacts\artefact_pustishka.ogf
+description                              = st_af_dummy_spring_descr
+inv_name                                 = af_dummy_spring
+inv_name_short                           = af_dummy_spring
+inv_weight                               = 0.5
+
+inv_grid_x                               = 12
+inv_grid_y                               = 0
+
+cost                                     = 21000
+jump_height                              = .2
+
+lights_enabled                           = false
+
+health_restore_speed                     = 0
+radiation_restore_speed                  = 0.0025
+satiety_restore_speed                    = 0
+power_restore_speed                      = 0.00375
+bleeding_restore_speed                   = 0
+hit_absorbation_sect                     = af_dummy_spring_absorbation
+
+[af_dummy_spring_absorbation]
+burn_immunity                            = 0
+strike_immunity                          = -0.05
+shock_immunity                           = 0
+wound_immunity                           = 0
+radiation_immunity                       = 0
+telepatic_immunity                       = 0
+chemical_burn_immunity                   = 0
+explosion_immunity                       = 0
+fire_wound_immunity                      = 0
+
+;----------------- (pellicle) ----------------;
+[af_dummy_pellicle]:af_base_1
+GroupControlSection                      = spawn_group
+$spawn                                   = "artifacts\dummy pellicle"
+$npc                                     = on	                                       ; option for Level Editor
+;$prefetch 		= 3
+cform                                    = skeleton
+class                                    = SCRPTART
+
+visual                                   = dynamics\artefacts\artefact_plenka_coc.ogf
+description                              = st_af_dummy_pellicle_descr
+inv_name                                 = af_dummy_pellicle
+inv_name_short                           = af_dummy_pellicle
+inv_weight                               = 0.5
+
+inv_grid_x                               = 11
+inv_grid_y                               = 0
+
+jump_height                              = .2
+
+cost                                     = 30000	                                       ;200
+particles                                = anomaly2\artefact\artefact_ameba
+det_show_particles                       = artefact\af_acidic_show
+det_hide_particles                       = artefact\af_acidic_hide
+
+lights_enabled                           = false
+
+
+health_restore_speed                     = 0
+radiation_restore_speed                  = 0
+satiety_restore_speed                    = 0
+power_restore_speed                      = 0
+bleeding_restore_speed                   = 0
+hit_absorbation_sect                     = af_dummy_pellicle_absorbation
+
+[af_dummy_pellicle_absorbation]
+burn_immunity                            = 0
+strike_immunity                          = 0
+shock_immunity                           = 0
+wound_immunity                           = 0
+radiation_immunity                       = 0
+telepatic_immunity                       = 0
+chemical_burn_immunity                   = 0.05
+explosion_immunity                       = 0
+fire_wound_immunity                      = 0
+
+;-----------------------------------------------------------------
+;------------ Artifacts anomalies Rusty hair ---------------
+;--------------- (thorn) -----------------;
+[af_rusty_thorn]:af_base
+GroupControlSection                      = spawn_group
+$spawn                                   = "artifacts\rusty thorn"
+$npc                                     = on	                                       ; option for Level Editor
+;$prefetch 		= 3
+cform                                    = skeleton
+class                                    = SCRPTART
+
+visual                                   = dynamics\artefacts\artefact_needles1.ogf
+description                              = st_af_rusty_thorn_descr
+inv_name                                 = af_rusty_thorn
+inv_name_short                           = af_rusty_thorn
+inv_weight                               = 0.5
+
+inv_grid_x                               = 5
+inv_grid_y                               = 1
+
+cost                                     = 7000
+jump_height                              = .3
+
+lights_enabled                           = false
+det_show_particles                       = artefact\af_acidic_show
+det_hide_particles                       = artefact\af_acidic_hide
+
+health_restore_speed                     = 0
+radiation_restore_speed                  = -0.002
+satiety_restore_speed                    = 0
+power_restore_speed                      = 0
+bleeding_restore_speed                   = -0.003
+hit_absorbation_sect                     = af_rusty_thorn_absorbation
+
+[af_rusty_thorn_absorbation]
+burn_immunity                            = 0
+strike_immunity                          = 0
+shock_immunity                           = 0
+wound_immunity                           = 0
+radiation_immunity                       = 0
+telepatic_immunity                       = 0
+chemical_burn_immunity                   = 0
+explosion_immunity                       = 0
+fire_wound_immunity                      = 0
+
+
+;---------- (cristall thorn) ---------;
+[af_rusty_kristall]:af_base
+GroupControlSection                      = spawn_group
+$spawn                                   = "artifacts\rusty cristall"
+$npc                                     = on	                                       ; option for Level Editor
+;$prefetch 		= 3
+cform                                    = skeleton
+class                                    = SCRPTART
+
+visual                                   = dynamics\artefacts\artefact_needles2.ogf
+description                              = st_af_rusty_kristall_descr
+inv_name                                 = af_rusty_kristall
+inv_name_short                           = af_rusty_kristall
+inv_weight                               = 0.5
+
+inv_grid_x                               = 3
+inv_grid_y                               = 1
+
+cost                                     = 12000	                                       ;100
+jump_height                              = .4
+
+lights_enabled                           = false
+
+
+health_restore_speed                     = 0
+radiation_restore_speed                  = -0.00375
+satiety_restore_speed                    = 0
+power_restore_speed                      = 0
+bleeding_restore_speed                   = -0.00349
+hit_absorbation_sect                     = af_rusty_kristall_absorbation
+
+[af_rusty_kristall_absorbation]
+burn_immunity                            = 0
+strike_immunity                          = 0
+shock_immunity                           = 0
+wound_immunity                           = 0
+radiation_immunity                       = 0
+telepatic_immunity                       = 0
+chemical_burn_immunity                   = 0
+explosion_immunity                       = 0
+fire_wound_immunity                      = 0
+
+
+;-------------- (urchin) ---------------;
+[af_rusty_sea]:af_base
+GroupControlSection                      = spawn_group
+$spawn                                   = "artifacts\rusty sea-urchin"
+$npc                                     = on	                                       ; option for Level Editor
+;$prefetch 		= 3
+cform                                    = skeleton
+class                                    = SCRPTART
+
+visual                                   = dynamics\artefacts\af_rusty_sea_urchin.ogf
+description                              = st_af_rusty_sea_urchin_descr
+inv_name                                 = af_rusty_sea_urchin
+inv_name_short                           = af_rusty_sea_urchin
+inv_weight                               = 0.5
+
+inv_grid_x                               = 4
+inv_grid_y                               = 1
+
+cost                                     = 18000
+jump_height                              = .5
+
+lights_enabled                           = false
+
+
+health_restore_speed                     = 0
+radiation_restore_speed                  = -0.005
+satiety_restore_speed                    = 0
+power_restore_speed                      = 0
+bleeding_restore_speed                   = -0.004
+hit_absorbation_sect                     = af_rusty_sea_absorbation
+
+[af_rusty_sea_absorbation]
+burn_immunity                            = 0
+strike_immunity                          = 0
+shock_immunity                           = 0
+wound_immunity                           = 0
+radiation_immunity                       = 0
+telepatic_immunity                       = 0
+chemical_burn_immunity                   = 0
+explosion_immunity                       = 0
+fire_wound_immunity                      = 0

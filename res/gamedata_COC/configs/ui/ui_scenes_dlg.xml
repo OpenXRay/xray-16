@@ -1,0 +1,92 @@
+<w>
+
+  <background x="100" y="100" width="560" height="460">
+    <texture>ui_menu_options_dlg</texture>
+    <text x="60" font="graffiti32">Scenes list</text>
+  </background>
+
+  <list x="70" y="50" width="460" height="340" item_height="22" can_select="1">
+    <font font="graffiti22" r="216" g="186" b="140" />
+  </list>
+
+   <btn_create x="190" y="390" width="157" height="48">
+    <texture>ui_button_main02</texture>
+    <text font="graffiti22">Start</text>
+    <text_color>
+      <e r="227" g="199" b="178"/> <t r="180" g="153" b="155"/> <d r="106" g="95" b="91"/> <h r="0" g="0" b="0"/> </text_color>
+  </btn_create>
+
+  <check_teleport_actor x="40" y="380" width="32" height="21">
+    <text font="letterica16" r="115" g="114" b="112" vert_align="c">Teleport to scene</text>
+  </check_teleport_actor>
+ <check_spawn_items x="40" y="400" width="32" height="21">
+    <text font="letterica16" r="115" g="114" b="112" vert_align="c">Spawn items</text>
+  </check_spawn_items>
+
+  <btn_close x="370" y="390" width="157" height="48">
+    <texture>ui_button_main02</texture>
+    <text font="graffiti22">Close</text>
+    <text_color>
+      <e r="227" g="199" b="178"/> <t r="180" g="153" b="155"/> <d r="106" g="95" b="91"/> <h r="0" g="0" b="0"/>
+    </text_color>
+  </btn_close>
+
+
+  <__form x="415" y="168" width="560" height="460">
+		<texture>ui_menu_options_dlg</texture>
+
+    <caption x="65" y="10" width="500" height="25" complex_mode="0">
+		  <text font="graffiti22" r="184" g="168" b="131">ui_mm_load_game</text>
+	  </caption>
+
+	  <picture x="105" y="71" width="128" height="128">
+		  <texture width="128" height="128">ui\ui_noise</texture>
+	  </picture>
+
+    <file_info	x="47" y="55" width="501" height="180">
+      <auto_static width="501" height="180">
+        <texture>ui_inGame2_load_info</texture>
+      </auto_static>
+    </file_info>
+
+	  <file_caption x="299" y="109" width="512" height="20" complex_mode="1">
+		  <text font="graffiti22" r="238" g="155" b="23"/>
+	  </file_caption>
+
+	  <file_data x="299" y="129" width="512" height="50" complex_mode="1">
+		  <text font="graffiti22" r="216" g="186" b="140"/>
+	  </file_data>
+
+	  <list_frame x="65" y="221" width="449" height="200">
+		  <texture>ui_tablist_textbox</texture>
+	  </list_frame>
+
+	  <list x="75" y="231" width="429" height="180" item_height="18">
+		  <font font="graffiti22" r="216" g="186" b="140" />
+	  </list>
+
+	  <btn_load x="65" y="427" width="157" height="48">
+		  <texture>ui_button_main02</texture>
+		  <text font="graffiti22">ui_mm_load</text>
+		  <text_color>
+			  <e r="227" g="199" b="178"/> <t r="180" g="153" b="155"/> <d r="106" g="95" b="91"/> <h r="0" g="0" b="0"/>
+		  </text_color>
+	  </btn_load>
+
+	  <btn_delete x="221" y="427" width="157" height="48">
+		  <texture>ui_button_main02</texture>
+		  <text font="graffiti22">ui_mm_delete</text>
+		  <text_color>
+			  <e r="227" g="199" b="178"/> <t r="180" g="153" b="155"/> <d r="106" g="95" b="91"/> <h r="0" g="0" b="0"/>
+		  </text_color>
+	  </btn_delete>
+
+	  <btn_cancel x="377" y="427" width="157" height="48">
+		  <texture>ui_button_main02</texture>
+		  <text font="graffiti22">ui_mm_cancel</text>
+		  <text_color>
+			  <e r="227" g="199" b="178"/> <t r="180" g="153" b="155"/> <d r="106" g="95" b="91"/> <h r="0" g="0" b="0"/>
+		  </text_color>
+	  </btn_cancel>
+  </__form>
+</w>

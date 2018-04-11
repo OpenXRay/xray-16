@@ -1,0 +1,17 @@
+[logic@jup_a12_bandit_bodyguard_1]
+active = walker@guard
+prior = 150
+suitable = {=check_npc_name(sim_default_bandit_1)} true
+
+[walker@guard]
+path_walk = bandit_bodyguard_1_walk
+path_look = bandit_bodyguard_1_look
+on_info = {=surge_started} walker@surge
+meet = no_meet
+
+
+[walker@surge]
+path_walk = bandit_bodyguard_1_walk
+path_look  = bandit_bodyguard_1_look
+on_info = {=surge_complete} walker@guard
+meet = no_meet

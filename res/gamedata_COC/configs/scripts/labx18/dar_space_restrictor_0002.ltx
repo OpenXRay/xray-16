@@ -1,0 +1,14 @@
+[logic]
+active = sr_idle
+
+[sr_idle]
+on_info = {+dar_door3_free} sr_idle@_nil, {+dar_door3_closed} sr_idle@2
+
+[sr_idle@2]
+on_timer = 2000 | sr_idle@sound
+
+[sr_idle@sound]
+on_info = %=play_sound_looped(x18_firedoor)%
+on_info2 = {+dar_door3_free} sr_idle@_nil %=stop_sound_looped%
+
+[sr_idle@_nil]

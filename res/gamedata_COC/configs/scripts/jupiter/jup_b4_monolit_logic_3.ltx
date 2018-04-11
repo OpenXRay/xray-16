@@ -1,0 +1,8 @@
+[logic]
+active = nil;sr_idle@1
+
+[sr_idle@1]
+on_info =  {+jup_b4_duty_go_to_monolit_squad +jup_b4_teleport_to_monolit -jup_b4_monolith_squad_in_duty +jup_b4_actor_go_away} sr_idle@2 %+jup_b4_monolith_squad_in_duty =remove_squad(jup_b4_squad) =create_squad(jup_b4_squad_duty:jup_b4) =create_squad(jup_b4_squad_duty_leader:jup_b4) +jup_b4_duty_go_home_alone%
+on_info2 = {+jup_b4_freedom_go_to_monolit_squad +jup_b4_teleport_to_monolit -jup_b4_monolith_squad_in_freedom +jup_b4_actor_go_away} sr_idle@2 %+jup_b4_monolith_squad_in_freedom =remove_squad(jup_b4_squad) =create_squad(jup_b4_squad_freedom:jup_b4) =create_squad(jup_b4_squad_freedom_leader:jup_b4) +jup_b4_freedom_go_home_alone%
+
+[sr_idle@2]

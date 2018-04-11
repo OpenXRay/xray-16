@@ -1,0 +1,910 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<game_dialogs>
+<!-- esc_2_12_stalker_trader -->
+   <dialog id="esc_2_12_stalker_trader_start_dialog">
+        <phrase_list>
+		    <phrase id="0">
+                <text/>
+				<next>1</next>
+            </phrase>
+		    <phrase id="1">
+                <text/>
+				<next>1111</next>
+				<next>1112</next>
+            </phrase>
+		    <phrase id="1111">
+				<dont_has_info>esc_m_trader_on_first_meet</dont_has_info>
+                <text>esc_2_12_stalker_trader_start_dialog_1</text>
+				<give_info>esc_m_trader_on_first_meet</give_info>
+            </phrase>
+		    <phrase id="1112">
+				<has_info>esc_m_trader_on_first_meet</has_info>
+                <text>esc_2_12_stalker_trader_start_dialog_2</text>
+            </phrase>
+          </phrase_list>
+    </dialog>
+<!-- esc_2_12_stalker_wolf_start -->
+   <dialog id="esc_2_12_stalker_wolf_start_dialog">
+        <phrase_list>
+		    <phrase id="0">
+                <text/>
+				<next>1</next>
+            </phrase>
+		    <phrase id="1">
+                <text/>
+				<next>1111</next>
+            </phrase>
+		    <phrase id="1111">
+                <text>esc_2_12_stalker_wolf_start_dialog_1</text>
+            </phrase>
+          </phrase_list>
+    </dialog>
+<!--------------------------- esc_2_12_stalker_fanat ------------>
+   <dialog id="esc_2_12_stalker_fanat_start_dialog">
+        <phrase_list>
+		    <phrase id="0">
+                <text/>
+				<next>1</next>
+            </phrase>
+		    <phrase id="1">
+                <text/>
+				<next>1111</next>
+				<next>1112</next>
+            </phrase>
+		    <phrase id="1111">
+				<precondition>dialogs_escape.actor_dont_has_esc_m_trader_task_2</precondition>
+                <text>esc_2_12_stalker_fanat_start_dialog_1</text>
+            </phrase>
+			<phrase id="1112">
+				<precondition>dialogs_escape.actor_has_esc_m_trader_task_2</precondition>
+                <text>esc_2_12_stalker_fanat_start_dialog_esc_m_trader_task_2</text>
+            </phrase>
+          </phrase_list>
+    </dialog>
+	<dialog id="esc_2_12_stalker_fanat_about_quest">
+		<precondition>dialogs_escape.esc_2_12_stalker_fanat_about_quest</precondition>
+		<phrase_list>
+			<phrase id="0">							<!-- actor -->
+				<text>esc_2_12_stalker_fanat_about_esc_m_trader_task_2_0</text>
+				<next>1</next>
+			</phrase>
+		    <phrase id="1">							<!-- npc -->
+                <text>esc_2_12_stalker_fanat_about_esc_m_trader_task_2_1</text>
+				<action>dialogs_escape.set_esc_2_12_stalker_fanat_as_companion</action>
+            </phrase>
+		</phrase_list>
+	</dialog>
+<!--------------------------- esc_2_12_stalker_nimble ----------->
+   <dialog id="esc_2_12_stalker_nimble_get_order">
+        <has_info>esc_2_12_order_ready</has_info>
+        <phrase_list>
+            <phrase id="22">
+                <text />
+                <has_info>esc_2_12_ordered_item_2_2</has_info>
+                <next>221</next>
+                <next>222</next>
+            </phrase>
+            <phrase id="33">
+                <text />
+                <has_info>esc_2_12_ordered_item_3_3</has_info>
+                <next>331</next>
+                <next>332</next>
+            </phrase>
+            <phrase id="42">
+                <text />
+                <has_info>esc_2_12_ordered_item_4_2</has_info>
+                <next>421</next>
+                <next>422</next>
+            </phrase>
+            <phrase id="43">
+                <text />
+                <has_info>esc_2_12_ordered_item_4_3</has_info>
+                <next>431</next>
+                <next>432</next>
+            </phrase>
+            <phrase id="51">
+                <text />
+                <has_info>esc_2_12_ordered_item_5_1</has_info>
+                <next>511</next>
+                <next>512</next>
+            </phrase>
+            <phrase id="61">
+                <text />
+                <has_info>esc_2_12_ordered_item_6_1</has_info>
+                <next>611</next>
+                <next>612</next>
+            </phrase>
+            <phrase id="2">
+                <text />
+                <has_info>esc_2_12_processing_category_2</has_info>
+                <next>21</next>
+                <next>22</next>
+                <next>23</next>
+            </phrase>
+            <phrase id="5">
+                <text />
+                <has_info>esc_2_12_processing_category_5</has_info>
+                <next>51</next>
+            </phrase>
+            <phrase id="6">
+                <text />
+                <has_info>esc_2_12_processing_category_6</has_info>
+                <next>61</next>
+            </phrase>
+            <phrase id="3">
+                <text />
+                <has_info>esc_2_12_processing_category_3</has_info>
+                <next>31</next>
+                <next>32</next>
+                <next>33</next>
+            </phrase>
+            <phrase id="31">
+                <text />
+                <has_info>esc_2_12_ordered_item_3_1</has_info>
+                <next>311</next>
+                <next>312</next>
+            </phrase>
+            <phrase id="23">
+                <text />
+                <has_info>esc_2_12_ordered_item_2_3</has_info>
+                <next>231</next>
+                <next>232</next>
+            </phrase>
+            <phrase id="71">
+                <text />
+                <has_info>esc_2_12_ordered_item_7_1</has_info>
+                <next>711</next>
+                <next>712</next>
+            </phrase>
+            <phrase id="7">
+                <text />
+                <has_info>esc_2_12_processing_category_7</has_info>
+                <next>71</next>
+            </phrase>
+            <phrase id="4">
+                <text />
+                <has_info>esc_2_12_processing_category_4</has_info>
+                <next>41</next>
+                <next>42</next>
+                <next>43</next>
+            </phrase>
+            <phrase id="41">
+                <text />
+                <has_info>esc_2_12_ordered_item_4_1</has_info>
+                <next>411</next>
+                <next>412</next>
+            </phrase>
+            <phrase id="32">
+                <text />
+                <has_info>esc_2_12_ordered_item_3_2</has_info>
+                <next>321</next>
+                <next>322</next>
+            </phrase>
+            <phrase id="11">
+                <text />
+                <has_info>esc_2_12_ordered_item_1_1</has_info>
+                <next>111</next>
+                <next>112</next>
+            </phrase>
+            <phrase id="0">
+                <text>esc_2_12_stalker_nimble_get_order_0</text>
+                <next>1</next>
+                <next>2</next>
+                <next>3</next>
+                <next>4</next>
+                <next>5</next>
+                <next>6</next>
+                <next>7</next>
+            </phrase>
+            <phrase id="1">
+                <text />
+                <has_info>esc_2_12_processing_category_1</has_info>
+                <next>11</next>
+                <next>12</next>
+                <next>13</next>
+            </phrase>
+            <phrase id="1113111">
+                <text>esc_2_12_stalker_nimble_get_order_1113111</text>
+            </phrase>
+            <phrase id="11141">
+                <text>esc_2_12_stalker_nimble_get_order_11141</text>
+            </phrase>
+            <phrase id="12">
+                <text />
+                <has_info>esc_2_12_ordered_item_1_2</has_info>
+                <next>121</next>
+                <next>122</next>
+            </phrase>
+            <phrase id="121">
+                <text>esc_2_12_stalker_nimble_get_order_121</text>
+                <dont_has_info>esc_2_12_told_about_item_1_2</dont_has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="11111">
+                <text>esc_2_12_stalker_nimble_get_order_11111</text>
+            </phrase>
+            <phrase id="1112">
+                <text>esc_2_12_stalker_nimble_get_order_1112</text>
+                <precondition>dialogs_escape.esc_2_12_hasnt_item_cost</precondition>
+                <next>11121</next>
+            </phrase>
+            <phrase id="11121">
+                <text>esc_2_12_stalker_nimble_get_order_11121</text>
+            </phrase>
+            <phrase id="122">
+                <text>esc_2_12_stalker_nimble_get_order_122</text>
+                <has_info>esc_2_12_told_about_item_1_2</has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="13">
+                <text />
+                <has_info>esc_2_12_ordered_item_1_3</has_info>
+                <next>131</next>
+                <next>132</next>
+            </phrase>
+            <phrase id="1111">
+                <text>esc_2_12_stalker_nimble_get_order_1111</text>
+                <precondition>dialogs_escape.esc_2_12_has_item_cost</precondition>
+                <action>dialogs_escape.esc_2_12_buy_item</action>
+                <disable_info>esc_2_12_order_refused</disable_info>
+                <disable_info>esc_2_12_order_ready</disable_info>
+                <disable_info>esc_2_12_order_in_process</disable_info>
+                <next>11111</next>
+            </phrase>
+            <phrase id="132">
+                <text>esc_2_12_stalker_nimble_get_order_132</text>
+                <has_info>esc_2_12_told_about_item_1_3</has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="21">
+                <text />
+                <has_info>esc_2_12_ordered_item_2_1</has_info>
+                <next>211</next>
+                <next>212</next>
+            </phrase>
+            <phrase id="212">
+                <text>esc_2_12_stalker_nimble_get_order_212</text>
+                <has_info>esc_2_12_told_about_item_2_1</has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="222">
+                <text>esc_2_12_stalker_nimble_get_order_222</text>
+                <has_info>esc_2_12_told_about_item_2_2</has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="1114">
+                <text>esc_2_12_stalker_nimble_get_order_1114</text>
+                <next>11141</next>
+            </phrase>
+            <phrase id="111311">
+                <text>esc_2_12_stalker_nimble_get_order_111311</text>
+                <action>dialogs_escape.esc_2_12_refuse_item</action>
+                <disable_info>esc_2_12_order_in_process</disable_info>
+                <disable_info>esc_2_12_order_ready</disable_info>
+                <give_info>esc_2_12_order_refused</give_info>
+                <next>1113111</next>
+            </phrase>
+            <phrase id="1113">
+                <text>esc_2_12_stalker_nimble_get_order_1113</text>
+                <next>11131</next>
+            </phrase>
+            <phrase id="11131">
+                <text>esc_2_12_stalker_nimble_get_order_11131</text>
+                <next>111311</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="111">
+                <text>esc_2_12_stalker_nimble_get_order_111</text>
+                <dont_has_info>esc_2_12_told_about_item_1_1</dont_has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="112">
+                <text>esc_2_12_stalker_nimble_get_order_112</text>
+                <has_info>esc_2_12_told_about_item_1_1</has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="131">
+                <text>esc_2_12_stalker_nimble_get_order_131</text>
+                <dont_has_info>esc_2_12_told_about_item_1_3</dont_has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="211">
+                <text>esc_2_12_stalker_nimble_get_order_211</text>
+                <dont_has_info>esc_2_12_told_about_item_2_1</dont_has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="221">
+                <text>esc_2_12_stalker_nimble_get_order_221</text>
+                <dont_has_info>esc_2_12_told_about_item_2_2</dont_has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="231">
+                <text>esc_2_12_stalker_nimble_get_order_231</text>
+                <dont_has_info>esc_2_12_told_about_item_2_3</dont_has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="232">
+                <text>esc_2_12_stalker_nimble_get_order_232</text>
+                <has_info>esc_2_12_told_about_item_2_3</has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="311">
+                <text>esc_2_12_stalker_nimble_get_order_311</text>
+                <dont_has_info>esc_2_12_told_about_item_3_1</dont_has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="312">
+                <text>esc_2_12_stalker_nimble_get_order_312</text>
+                <has_info>esc_2_12_told_about_item_3_1</has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="321">
+                <text>esc_2_12_stalker_nimble_get_order_321</text>
+                <dont_has_info>esc_2_12_told_about_item_3_2</dont_has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="322">
+                <text>esc_2_12_stalker_nimble_get_order_322</text>
+                <has_info>esc_2_12_told_about_item_3_2</has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="331">
+                <text>esc_2_12_stalker_nimble_get_order_331</text>
+                <dont_has_info>esc_2_12_told_about_item_3_3</dont_has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="332">
+                <text>esc_2_12_stalker_nimble_get_order_332</text>
+                <has_info>esc_2_12_told_about_item_3_3</has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="411">
+                <text>esc_2_12_stalker_nimble_get_order_411</text>
+                <dont_has_info>esc_2_12_told_about_item_4_1</dont_has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="412">
+                <text>esc_2_12_stalker_nimble_get_order_412</text>
+                <has_info>esc_2_12_told_about_item_4_1</has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="421">
+                <text>esc_2_12_stalker_nimble_get_order_421</text>
+                <dont_has_info>esc_2_12_told_about_item_4_2</dont_has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="422">
+                <text>esc_2_12_stalker_nimble_get_order_422</text>
+                <has_info>esc_2_12_told_about_item_4_2</has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="431">
+                <text>esc_2_12_stalker_nimble_get_order_431</text>
+                <dont_has_info>esc_2_12_told_about_item_4_3</dont_has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="432">
+                <text>esc_2_12_stalker_nimble_get_order_432</text>
+                <has_info>esc_2_12_told_about_item_4_3</has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="511">
+                <text>esc_2_12_stalker_nimble_get_order_511</text>
+                <dont_has_info>esc_2_12_told_about_item_5_1</dont_has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="512">
+                <text>esc_2_12_stalker_nimble_get_order_512</text>
+                <has_info>esc_2_12_told_about_item_5_1</has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="611">
+                <text>esc_2_12_stalker_nimble_get_order_611</text>
+                <dont_has_info>esc_2_12_told_about_item_6_1</dont_has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="612">
+                <text>esc_2_12_stalker_nimble_get_order_612</text>
+                <has_info>esc_2_12_told_about_item_6_1</has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="711">
+                <text>esc_2_12_stalker_nimble_get_order_711</text>
+                <dont_has_info>esc_2_12_told_about_item_7_1</dont_has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+            <phrase id="712">
+                <text>esc_2_12_stalker_nimble_get_order_712</text>
+                <has_info>esc_2_12_told_about_item_7_1</has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+                <next>1114</next>
+            </phrase>
+        </phrase_list>
+    </dialog>
+    <dialog id="esc_2_12_stalker_nimble_place_order">
+        <dont_has_info>esc_2_12_order_unavailable</dont_has_info>
+        <dont_has_info>esc_2_12_order_in_process</dont_has_info>
+        <phrase_list>
+            <phrase id="14">
+                <text>esc_2_12_stalker_nimble_place_order_14</text>
+                <dont_has_info>esc_2_12_finished_category_4</dont_has_info>
+                <next>141</next>
+                <next>142</next>
+                <next>143</next>
+            </phrase>
+            <phrase id="15">
+                <text>esc_2_12_stalker_nimble_place_order_15</text>
+                <dont_has_info>esc_2_12_finished_category_5</dont_has_info>
+                <next>151</next>
+                <next>152</next>
+                <next>153</next>
+            </phrase>
+            <phrase id="0">
+                <text>esc_2_12_stalker_nimble_place_order_0</text>
+                <next>1</next>
+                <next>2</next>
+				<next>9999999</next>
+            </phrase>
+            <phrase id="1">
+				<precondition>dialogs_escape.nimble_cant_trade</precondition>
+                <text>esc_2_12_stalker_nimble_place_order_1</text>
+                <dont_has_info>esc_2_12_finished_categories_all</dont_has_info>
+                <next>11</next>
+                <next>12</next>
+                <next>13</next>
+                <next>14</next>
+                <next>15</next>
+                <next>16</next>
+                <next>17</next>
+                <next>18</next>
+            </phrase>
+			<phrase id="9999999">
+				<precondition>dialogs_escape.nimble_can_trade</precondition>
+				<text/>
+				<action>dialogs.npc_is_trader</action>
+			</phrase>
+            <phrase id="1112">
+                <text>esc_2_12_stalker_nimble_place_order_1112</text>
+                <precondition>dialogs_escape.esc_2_12_hasnt_prepay</precondition>
+                <disable_info>esc_2_12_processing_category_1</disable_info>
+                <disable_info>esc_2_12_processing_category_2</disable_info>
+                <disable_info>esc_2_12_processing_category_3</disable_info>
+                <disable_info>esc_2_12_processing_category_4</disable_info>
+                <disable_info>esc_2_12_processing_category_5</disable_info>
+                <disable_info>esc_2_12_processing_category_6</disable_info>
+                <disable_info>esc_2_12_processing_category_7</disable_info>
+                <next>11121</next>
+            </phrase>
+            <phrase id="11121">
+                <text>esc_2_12_stalker_nimble_place_order_11121</text>
+            </phrase>
+            <phrase id="1113">
+                <text>esc_2_12_stalker_nimble_place_order_1113</text>
+                <disable_info>esc_2_12_processing_category_1</disable_info>
+                <disable_info>esc_2_12_processing_category_2</disable_info>
+                <disable_info>esc_2_12_processing_category_3</disable_info>
+                <disable_info>esc_2_12_processing_category_4</disable_info>
+                <disable_info>esc_2_12_processing_category_5</disable_info>
+                <disable_info>esc_2_12_processing_category_6</disable_info>
+                <disable_info>esc_2_12_processing_category_7</disable_info>
+                <next>11131</next>
+            </phrase>
+            <phrase id="11111">
+                <text>esc_2_12_stalker_nimble_place_order_11111</text>
+            </phrase>
+            <phrase id="11">
+                <text>esc_2_12_stalker_nimble_place_order_11</text>
+                <dont_has_info>esc_2_12_finished_category_1</dont_has_info>
+                <next>111</next>
+                <next>112</next>
+                <next>113</next>
+            </phrase>
+            <phrase id="111">
+                <text>esc_2_12_stalker_nimble_place_order_111</text>
+                <dont_has_info>esc_2_12_finishing_category_1</dont_has_info>
+                <dont_has_info>esc_2_12_order_refused</dont_has_info>
+                <give_info>esc_2_12_processing_category_1</give_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+            </phrase>
+            <phrase id="112">
+                <text>esc_2_12_stalker_nimble_place_order_112</text>
+                <dont_has_info>esc_2_12_finishing_category_1</dont_has_info>
+                <give_info>esc_2_12_processing_category_1</give_info>
+                <has_info>esc_2_12_order_refused</has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+            </phrase>
+            <phrase id="113">
+                <text>esc_2_12_stalker_nimble_place_order_113</text>
+                <give_info>esc_2_12_finished_category_1</give_info>
+                <has_info>esc_2_12_finishing_category_1</has_info>
+            </phrase>
+            <phrase id="12">
+                <text>esc_2_12_stalker_nimble_place_order_12</text>
+                <dont_has_info>esc_2_12_finished_category_2</dont_has_info>
+                <next>121</next>
+                <next>122</next>
+                <next>123</next>
+            </phrase>
+            <phrase id="121">
+                <text>esc_2_12_stalker_nimble_place_order_121</text>
+                <dont_has_info>esc_2_12_finishing_category_2</dont_has_info>
+                <dont_has_info>esc_2_12_order_refused</dont_has_info>
+                <give_info>esc_2_12_processing_category_2</give_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+            </phrase>
+            <phrase id="122">
+                <text>esc_2_12_stalker_nimble_place_order_122</text>
+                <dont_has_info>esc_2_12_finishing_category_2</dont_has_info>
+                <give_info>esc_2_12_processing_category_2</give_info>
+                <has_info>esc_2_12_order_refused</has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+            </phrase>
+            <phrase id="123">
+                <text>esc_2_12_stalker_nimble_place_order_123</text>
+                <give_info>esc_2_12_finished_category_2</give_info>
+                <has_info>esc_2_12_finishing_category_2</has_info>
+            </phrase>
+            <phrase id="13">
+                <text>esc_2_12_stalker_nimble_place_order_13</text>
+                <dont_has_info>esc_2_12_finished_category_3</dont_has_info>
+                <next>131</next>
+                <next>132</next>
+                <next>133</next>
+            </phrase>
+            <phrase id="131">
+                <text>esc_2_12_stalker_nimble_place_order_131</text>
+                <dont_has_info>esc_2_12_finishing_category_3</dont_has_info>
+                <dont_has_info>esc_2_12_order_refused</dont_has_info>
+                <give_info>esc_2_12_processing_category_3</give_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+            </phrase>
+            <phrase id="132">
+                <text>esc_2_12_stalker_nimble_place_order_132</text>
+                <dont_has_info>esc_2_12_finishing_category_3</dont_has_info>
+                <give_info>esc_2_12_processing_category_3</give_info>
+                <has_info>esc_2_12_order_refused</has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+            </phrase>
+            <phrase id="133">
+                <text>esc_2_12_stalker_nimble_place_order_133</text>
+                <give_info>esc_2_12_finished_category_3</give_info>
+                <has_info>esc_2_12_finishing_category_3</has_info>
+            </phrase>
+            <phrase id="141">
+                <text>esc_2_12_stalker_nimble_place_order_141</text>
+                <dont_has_info>esc_2_12_finishing_category_4</dont_has_info>
+                <dont_has_info>esc_2_12_order_refused</dont_has_info>
+                <give_info>esc_2_12_processing_category_4</give_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+            </phrase>
+            <phrase id="142">
+                <text>esc_2_12_stalker_nimble_place_order_142</text>
+                <dont_has_info>esc_2_12_finishing_category_4</dont_has_info>
+                <give_info>esc_2_12_processing_category_4</give_info>
+                <has_info>esc_2_12_order_refused</has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+            </phrase>
+            <phrase id="143">
+                <text>esc_2_12_stalker_nimble_place_order_143</text>
+                <give_info>esc_2_12_finished_category_4</give_info>
+                <has_info>esc_2_12_finishing_category_4</has_info>
+            </phrase>
+            <phrase id="151">
+                <text>esc_2_12_stalker_nimble_place_order_151</text>
+                <dont_has_info>esc_2_12_finishing_category_5</dont_has_info>
+                <dont_has_info>esc_2_12_order_refused</dont_has_info>
+                <give_info>esc_2_12_processing_category_5</give_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+            </phrase>
+            <phrase id="1111">
+                <text>esc_2_12_stalker_nimble_place_order_1111</text>
+                <precondition>dialogs_escape.esc_2_12_has_prepay</precondition>
+                <action>dialogs_escape.esc_2_12_give_prepay</action>
+                <action>dialogs_escape.esc_2_12_randomize_item</action>
+                <give_info>esc_2_12_order_in_process</give_info>
+                <next>11111</next>
+            </phrase>
+            <phrase id="152">
+                <text>esc_2_12_stalker_nimble_place_order_152</text>
+                <dont_has_info>esc_2_12_finishing_category_5</dont_has_info>
+                <give_info>esc_2_12_processing_category_5</give_info>
+                <has_info>esc_2_12_order_refused</has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+            </phrase>
+            <phrase id="153">
+                <text>esc_2_12_stalker_nimble_place_order_153</text>
+                <give_info>esc_2_12_finished_category_5</give_info>
+                <has_info>esc_2_12_finishing_category_5</has_info>
+            </phrase>
+            <phrase id="16">
+                <text>esc_2_12_stalker_nimble_place_order_16</text>
+                <dont_has_info>esc_2_12_finished_category_6</dont_has_info>
+                <has_info>jup_a9_tech_way_info</has_info>
+                <has_info>jup_a9_tech_conservation_info</has_info>
+                <next>161</next>
+                <next>162</next>
+                <next>163</next>
+            </phrase>
+            <phrase id="162">
+                <text>esc_2_12_stalker_nimble_place_order_162</text>
+                <dont_has_info>esc_2_12_finishing_category_6</dont_has_info>
+                <give_info>esc_2_12_processing_category_6</give_info>
+                <has_info>esc_2_12_order_refused</has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+            </phrase>
+            <phrase id="161">
+                <text>esc_2_12_stalker_nimble_place_order_161</text>
+                <dont_has_info>esc_2_12_finishing_category_6</dont_has_info>
+                <dont_has_info>esc_2_12_order_refused</dont_has_info>
+                <give_info>esc_2_12_processing_category_6</give_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+            </phrase>
+            <phrase id="163">
+                <text>esc_2_12_stalker_nimble_place_order_163</text>
+                <give_info>esc_2_12_finished_category_6</give_info>
+                <has_info>esc_2_12_finishing_category_6</has_info>
+            </phrase>
+            <phrase id="17">
+                <text>esc_2_12_stalker_nimble_place_order_17</text>
+                <dont_has_info>esc_2_12_finished_category_7</dont_has_info>
+                <next>171</next>
+                <next>172</next>
+                <next>173</next>
+            </phrase>
+            <phrase id="171">
+                <text>esc_2_12_stalker_nimble_place_order_171</text>
+                <dont_has_info>esc_2_12_finishing_category_7</dont_has_info>
+                <dont_has_info>esc_2_12_order_refused</dont_has_info>
+                <give_info>esc_2_12_processing_category_7</give_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+            </phrase>
+            <phrase id="172">
+                <text>esc_2_12_stalker_nimble_place_order_172</text>
+                <dont_has_info>esc_2_12_finishing_category_7</dont_has_info>
+                <give_info>esc_2_12_processing_category_7</give_info>
+                <has_info>esc_2_12_order_refused</has_info>
+                <next>1111</next>
+                <next>1112</next>
+                <next>1113</next>
+            </phrase>
+            <phrase id="18">
+                <text>esc_2_12_stalker_nimble_place_order_18</text>
+            </phrase>
+            <phrase id="2">
+                <text>esc_2_12_stalker_nimble_place_order_2</text>
+                <give_info>esc_2_12_order_unavailable</give_info>
+                <has_info>esc_2_12_finished_categories_all</has_info>
+            </phrase>
+            <phrase id="11131">
+                <text>esc_2_12_stalker_nimble_place_order_11131</text>
+            </phrase>
+            <phrase id="173">
+                <text>esc_2_12_stalker_nimble_place_order_173</text>
+                <give_info>esc_2_12_finished_category_7</give_info>
+                <has_info>esc_2_12_finishing_category_7</has_info>
+            </phrase>
+        </phrase_list>
+    </dialog>
+    <dialog id="esc_2_12_stalker_nimble_start">
+        <phrase_list>
+            <phrase id="0">
+                <text />
+                <next>1</next>
+            </phrase>
+            <phrase id="1">
+                <text />
+                <next>11</next>
+                <next>12</next>
+                <next>13</next>
+                <next>14</next>
+                <next>15</next>
+            </phrase>
+            <phrase id="11">
+                <text>esc_2_12_stalker_nimble_start_11</text>
+                <dont_has_info>esc_2_12_nimble_intro</dont_has_info>
+                <give_info>esc_2_12_nimble_intro</give_info>
+            </phrase>
+            <phrase id="12">
+                <text>esc_2_12_stalker_nimble_start_12</text>
+                <dont_has_info>esc_2_12_finished_categories_all</dont_has_info>
+                <dont_has_info>esc_2_12_order_in_process</dont_has_info>
+                <has_info>esc_2_12_nimble_intro</has_info>
+            </phrase>
+            <phrase id="13">
+                <text>esc_2_12_stalker_nimble_start_13</text>
+                <dont_has_info>esc_2_12_order_in_process</dont_has_info>
+                <has_info>esc_2_12_nimble_intro</has_info>
+                <has_info>esc_2_12_finished_categories_all</has_info>
+            </phrase>
+            <phrase id="14">
+                <text>esc_2_12_stalker_nimble_start_14</text>
+                <dont_has_info>esc_2_12_order_ready</dont_has_info>
+                <has_info>esc_2_12_order_in_process</has_info>
+            </phrase>
+            <phrase id="15">
+                <text>esc_2_12_stalker_nimble_start_15</text>
+                <has_info>esc_2_12_order_in_process</has_info>
+                <has_info>esc_2_12_order_ready</has_info>
+            </phrase>
+        </phrase_list>
+    </dialog>
+	<dialog id="esc_2_12_stalker_nimble_about_quest">
+		<phrase_list>
+			<phrase id="0">	
+				<text>esc_2_12_stalker_nimble_mar_base_owl_stalker_trader_task_1_about</text>
+				<next>1</next>
+				<next>2</next>
+			</phrase> 
+		    <phrase id="1">
+				<precondition>dialogs_escape.actor_has_mar_base_owl_stalker_trader_task_1_pda</precondition>
+                <text>esc_2_12_stalker_nimble_mar_base_owl_stalker_trader_task_1</text>
+				<action>dialogs_escape.mar_base_owl_stalker_trader_task_1_give_reward</action>
+            </phrase>
+		    <phrase id="2">	
+				<precondition>dialogs_escape.actor_dont_has_mar_base_owl_stalker_trader_task_1_pda</precondition>
+                <text>esc_2_12_stalker_nimble_no</text>
+            </phrase>
+		</phrase_list>
+	</dialog>
+    <dialog id="esc_2_12_stalker_nimble_about">
+        <has_info>esc_2_12_nimble_intro</has_info>
+        <phrase_list>
+            <phrase id="111">
+                <text />
+                <next>1111</next>
+                <next>1114</next>
+                <next>1116</next>
+            </phrase>
+            <phrase id="0">
+                <text>esc_2_12_stalker_nimble_about_0</text>
+                <next>1</next>
+            </phrase>
+            <phrase id="11">
+                <text />
+                <next>111</next>
+            </phrase>
+            <phrase id="1">
+                <text>esc_2_12_stalker_nimble_about_1</text>
+                <next>11</next>
+            </phrase>
+            <phrase id="1111">
+                <text>esc_2_12_stalker_nimble_about_1111</text>
+                <next>11111</next>
+            </phrase>
+            <phrase id="11111">
+                <text>esc_2_12_stalker_nimble_about_11111</text>
+                <next>11</next>
+            </phrase>
+            <phrase id="1114">
+                <text>esc_2_12_stalker_nimble_about_1114</text>
+                <next>11141</next>
+            </phrase>
+            <phrase id="11141">
+                <text>esc_2_12_stalker_nimble_about_11141</text>
+                <next>11</next>
+            </phrase>
+            <phrase id="1116">
+                <text>esc_2_12_stalker_nimble_about_1116</text>
+                <next>11161</next>
+            </phrase>
+            <phrase id="11161">
+                <text>esc_2_12_stalker_nimble_about_11161</text>
+            </phrase>
+        </phrase_list>
+    </dialog>
+</game_dialogs>

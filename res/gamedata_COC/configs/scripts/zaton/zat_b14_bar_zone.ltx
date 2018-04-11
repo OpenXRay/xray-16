@@ -1,0 +1,8 @@
+[logic]
+active = nil ;sr_idle@start
+
+[sr_idle@start]
+on_info = {-zat_b14_cut_scene_1_start -zat_b14_stalker_death +zat_b14_give_item_stalker +zat_b14_stalker_cut_scene_ready !actor_has_item(af_quest_b14_twisted) =actor_in_zone(zat_b14_bar_zone)} sr_idle@end %+zat_b14_cut_scene_1_start%
+on_info2 = {+zat_b14_cut_scene_1_start} sr_idle@end
+
+[sr_idle@end]

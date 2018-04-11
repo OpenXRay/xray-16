@@ -1,0 +1,1162 @@
+[walker@def]
+wounded = wounded@no_wound
+def_state_standing = threat_na
+def_state_moving = assault
+def_state_campering = threat_na
+def_state_campering_fire = threat_fire
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+radius = 30
+;no_retreat = true
+
+[walker@ignore]:walker@def
+combat_ignore_cond = {=check_enemy_name(actor)} true, {=check_enemy_name(cutscene)} true, false
+in_restr = pri_a28_scene_end_zone
+
+[wounded@no_wound]
+hp_state = 0 | wounded_heavy@help_heavy
+hp_state_see = 0 | wounded_heavy@help_heavy
+hp_victim = 0 | nil
+hp_cover = 0 | false
+hp_fight = 0 | false
+
+
+
+[logic@pri_a28_heli_mono_def]
+suitable = {-pri_a28_cutscenes_end =target_squad_name(pri_a28_heli_mono_default) +pri_b305_fifth_cam_end} true
+prior = 200
+on_death = death@heli_mono
+
+[death@heli_mono]
+on_info = %=dec_counter(pri_a28_heli_mono_cnt)%
+
+
+
+[logic@pri_a28_mono_1_heli]:logic@pri_a28_heli_mono_def
+active = walker@pri_a28_mono_1_heli_jump
+
+[walker@pri_a28_mono_1_heli_jump]:walker@def
+path_walk = mono_1_1_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = walker@pri_a28_mono_1_heli_wait %=teleport_npc(pri_a28_heli_mono_1_1_walk)%
+
+[walker@pri_a28_mono_1_heli_wait]:walker@def
+path_walk = mono_1_1_walk
+path_look = mono_1_1_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_evac_squad_active} camper@pri_a28_mono_1_heli_go_out %+pri_a28_heli_mono_part_1_active%
+on_info2 = {+pri_a28_heli_mono_part_1_active} camper@pri_a28_mono_1_heli_go_out
+on_info3 = {=dist_to_actor_le(30)} camper@pri_a28_mono_1_heli_go_out %+pri_a28_heli_mono_part_1_active%
+
+[camper@pri_a28_mono_1_heli_go_out]:walker@def
+path_walk = mono_1_2_walk
+path_look = mono_1_2_look
+on_signal = path_end | camper@pri_a28_mono_1_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_1_heli_fake
+
+[camper@pri_a28_mono_1_heli_attack]:walker@def
+path_walk = mono_1_3_walk
+path_look = mono_1_3_look
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_1_heli_fake
+
+[remark@pri_a28_mono_1_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_1, 0
+anim = hide_fire
+
+
+
+[logic@pri_a28_mono_2_heli]:logic@pri_a28_heli_mono_def
+active = walker@pri_a28_mono_2_heli_jump
+
+[walker@pri_a28_mono_2_heli_jump]:walker@def
+path_walk = mono_2_1_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = walker@pri_a28_mono_2_heli_wait %=teleport_npc(pri_a28_heli_mono_2_1_walk)%
+
+[walker@pri_a28_mono_2_heli_wait]:walker@def
+path_walk = mono_2_1_walk
+path_look = mono_2_1_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_evac_squad_active} camper@pri_a28_mono_2_heli_go_out %+pri_a28_heli_mono_part_1_active%
+on_info2 = {+pri_a28_heli_mono_part_1_active} camper@pri_a28_mono_2_heli_go_out
+on_info3 = {=dist_to_actor_le(30)} camper@pri_a28_mono_2_heli_go_out %+pri_a28_heli_mono_part_1_active%
+
+[camper@pri_a28_mono_2_heli_go_out]:walker@def
+path_walk = mono_2_2_walk
+path_look = mono_2_2_look
+on_signal = path_end | camper@pri_a28_mono_2_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_2_heli_fake
+
+[camper@pri_a28_mono_2_heli_attack]:walker@def
+path_walk = mono_2_3_walk
+path_look = mono_2_3_look
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_2_heli_fake
+
+[remark@pri_a28_mono_2_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_4, 0
+anim = threat_fire
+
+
+
+[logic@pri_a28_mono_3_heli]:logic@pri_a28_heli_mono_def
+active = walker@pri_a28_mono_3_heli_jump
+
+[walker@pri_a28_mono_3_heli_jump]:walker@def
+path_walk = mono_3_1_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = walker@pri_a28_mono_3_heli_wait %=teleport_npc(pri_a28_heli_mono_3_1_walk)%
+
+[walker@pri_a28_mono_3_heli_wait]:walker@def
+path_walk = mono_3_1_walk
+path_look = mono_3_1_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_evac_squad_active} camper@pri_a28_mono_3_heli_go_out %+pri_a28_heli_mono_part_2_active%
+on_info2 = {+pri_a28_heli_mono_part_2_active} camper@pri_a28_mono_3_heli_go_out
+on_info3 = {=dist_to_actor_le(30)} camper@pri_a28_mono_3_heli_go_out %+pri_a28_heli_mono_part_2_active%
+
+[camper@pri_a28_mono_3_heli_go_out]:walker@def
+path_walk = mono_3_2_walk
+path_look = mono_3_2_look
+on_signal = path_end | camper@pri_a28_mono_3_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_3_heli_fake
+
+[camper@pri_a28_mono_3_heli_attack]:walker@def
+path_walk = mono_3_3_walk
+path_look = mono_3_3_look
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_3_heli_fake
+
+[remark@pri_a28_mono_3_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_2, 0
+anim = hide_fire
+
+
+
+[logic@pri_a28_mono_4_heli]:logic@pri_a28_heli_mono_def
+active = walker@pri_a28_mono_4_heli_jump
+
+[walker@pri_a28_mono_4_heli_jump]:walker@def
+path_walk = mono_4_1_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = walker@pri_a28_mono_4_heli_wait %=teleport_npc(pri_a28_heli_mono_4_1_walk)%
+
+[walker@pri_a28_mono_4_heli_wait]:walker@def
+path_walk = mono_4_1_walk
+path_look = mono_4_1_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_evac_squad_active} camper@pri_a28_mono_4_heli_go_out %+pri_a28_heli_mono_part_2_active%
+on_info2 = {+pri_a28_heli_mono_part_2_active} camper@pri_a28_mono_4_heli_go_out
+on_info3 = {=dist_to_actor_le(30)} camper@pri_a28_mono_4_heli_go_out %+pri_a28_heli_mono_part_2_active%
+
+[camper@pri_a28_mono_4_heli_go_out]:walker@def
+path_walk = mono_4_2_walk
+path_look = mono_4_2_look
+on_signal = path_end | camper@pri_a28_mono_4_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_4_heli_fake
+
+[camper@pri_a28_mono_4_heli_attack]:walker@def
+path_walk = mono_4_3_walk
+path_look = mono_4_3_look
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_4_heli_fake
+
+[remark@pri_a28_mono_4_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_1, 0
+anim = threat_fire
+
+
+
+[logic@pri_a28_mono_5_heli]:logic@pri_a28_heli_mono_def
+active = walker@pri_a28_mono_5_heli_jump
+
+[walker@pri_a28_mono_5_heli_jump]:walker@def
+path_walk = mono_5_1_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = walker@pri_a28_mono_5_heli_wait %=teleport_npc(pri_a28_heli_mono_5_1_walk)%
+
+[walker@pri_a28_mono_5_heli_wait]:walker@def
+path_walk = mono_5_1_walk
+path_look = mono_5_1_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_evac_squad_active} camper@pri_a28_mono_5_heli_go_out %+pri_a28_heli_mono_part_3_active%
+on_info2 = {+pri_a28_heli_mono_part_3_active} camper@pri_a28_mono_5_heli_go_out
+on_info3 = {=dist_to_actor_le(30)} camper@pri_a28_mono_5_heli_go_out %+pri_a28_heli_mono_part_3_active%
+
+[camper@pri_a28_mono_5_heli_go_out]:walker@def
+path_walk = mono_5_2_walk
+path_look = mono_5_2_look
+on_signal = path_end | camper@pri_a28_mono_5_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_5_heli_fake
+
+[camper@pri_a28_mono_5_heli_attack]:walker@def
+path_walk = mono_5_3_walk
+path_look = mono_5_3_look
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_5_heli_fake
+
+[remark@pri_a28_mono_5_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_2, 0
+anim = hide_fire
+
+
+
+[logic@pri_a28_mono_6_heli]:logic@pri_a28_heli_mono_def
+active = walker@pri_a28_mono_6_heli_jump
+
+[walker@pri_a28_mono_6_heli_jump]:walker@def
+path_walk = mono_6_1_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = walker@pri_a28_mono_6_heli_wait %=teleport_npc(pri_a28_heli_mono_6_1_walk)%
+
+[walker@pri_a28_mono_6_heli_wait]:walker@def
+path_walk = mono_6_1_walk
+path_look = mono_6_1_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_evac_squad_active} camper@pri_a28_mono_6_heli_go_out %+pri_a28_heli_mono_part_3_active%
+on_info2 = {+pri_a28_heli_mono_part_3_active} camper@pri_a28_mono_6_heli_go_out
+on_info3 = {=dist_to_actor_le(30)} camper@pri_a28_mono_6_heli_go_out %+pri_a28_heli_mono_part_3_active%
+
+[camper@pri_a28_mono_6_heli_go_out]:walker@def
+path_walk = mono_6_2_walk
+path_look = mono_6_2_look
+on_signal = path_end | camper@pri_a28_mono_6_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_6_heli_fake
+
+[camper@pri_a28_mono_6_heli_attack]:walker@def
+path_walk = mono_6_3_walk
+path_look = mono_6_3_look
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_6_heli_fake
+
+[remark@pri_a28_mono_6_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_3, 0
+anim = threat_fire
+
+
+
+[logic@pri_a28_mono_7_heli]:logic@pri_a28_heli_mono_def
+active = walker@pri_a28_mono_7_heli_jump
+
+[walker@pri_a28_mono_7_heli_jump]:walker@def
+path_walk = mono_7_1_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = walker@pri_a28_mono_7_heli_wait %=teleport_npc(pri_a28_heli_mono_7_1_walk)%
+
+[walker@pri_a28_mono_7_heli_wait]:walker@def
+path_walk = mono_7_1_walk
+path_look = mono_7_1_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_evac_squad_active} camper@pri_a28_mono_7_heli_go_out %+pri_a28_heli_mono_part_4_active%
+on_info2 = {+pri_a28_heli_mono_part_4_active} camper@pri_a28_mono_7_heli_go_out
+on_info3 = {=dist_to_actor_le(30)} camper@pri_a28_mono_7_heli_go_out %+pri_a28_heli_mono_part_4_active%
+
+[camper@pri_a28_mono_7_heli_go_out]:walker@def
+path_walk = mono_7_2_walk
+path_look = mono_7_2_look
+on_signal = path_end | camper@pri_a28_mono_7_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_7_heli_fake
+
+[camper@pri_a28_mono_7_heli_attack]:walker@def
+path_walk = mono_7_3_walk
+path_look = mono_7_3_look
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_7_heli_fake
+
+[remark@pri_a28_mono_7_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_4, 0
+anim = hide_fire
+
+
+
+[logic@pri_a28_mono_8_heli]:logic@pri_a28_heli_mono_def
+active = walker@pri_a28_mono_8_heli_jump
+
+[walker@pri_a28_mono_8_heli_jump]:walker@def
+path_walk = mono_8_1_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = walker@pri_a28_mono_8_heli_wait %=teleport_npc(pri_a28_heli_mono_8_1_walk)%
+
+[walker@pri_a28_mono_8_heli_wait]:walker@def
+path_walk = mono_8_1_walk
+path_look = mono_8_1_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_evac_squad_active} camper@pri_a28_mono_8_heli_go_out %+pri_a28_heli_mono_part_4_active%
+on_info2 = {+pri_a28_heli_mono_part_4_active} camper@pri_a28_mono_8_heli_go_out
+on_info3 = {=dist_to_actor_le(30)} camper@pri_a28_mono_8_heli_go_out %+pri_a28_heli_mono_part_4_active%
+
+[camper@pri_a28_mono_8_heli_go_out]:walker@def
+path_walk = mono_8_2_walk
+path_look = mono_8_2_look
+on_signal = path_end | camper@pri_a28_mono_8_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_8_heli_fake
+
+[camper@pri_a28_mono_8_heli_attack]:walker@def
+path_walk = mono_8_3_walk
+path_look = mono_8_3_look
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_8_heli_fake
+
+[remark@pri_a28_mono_8_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_2, 0
+anim = threat_fire
+
+
+
+[logic@pri_a28_mono_9_heli]:logic@pri_a28_heli_mono_def
+active = walker@pri_a28_mono_9_heli_jump
+
+[walker@pri_a28_mono_9_heli_jump]:walker@def
+path_walk = mono_9_1_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = walker@pri_a28_mono_9_heli_wait %=teleport_npc(pri_a28_heli_mono_9_1_walk)%
+
+[walker@pri_a28_mono_9_heli_wait]:walker@def
+path_walk = mono_9_1_walk
+path_look = mono_9_1_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_evac_squad_active} camper@pri_a28_mono_9_heli_go_out %+pri_a28_heli_mono_part_5_active%
+on_info2 = {+pri_a28_heli_mono_part_5_active} camper@pri_a28_mono_9_heli_go_out
+on_info3 = {=dist_to_actor_le(30)} camper@pri_a28_mono_9_heli_go_out %+pri_a28_heli_mono_part_5_active%
+
+[camper@pri_a28_mono_9_heli_go_out]:walker@def
+path_walk = mono_9_2_walk
+path_look = mono_9_2_look
+on_signal = path_end | camper@pri_a28_mono_9_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_9_heli_fake
+
+[camper@pri_a28_mono_9_heli_attack]:walker@def
+path_walk = mono_9_3_walk
+path_look = mono_9_3_look
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_9_heli_fake
+
+[remark@pri_a28_mono_9_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_2, 0
+anim = hide_fire
+
+
+
+[logic@pri_a28_mono_10_heli]:logic@pri_a28_heli_mono_def
+active = walker@pri_a28_mono_10_heli_jump
+
+[walker@pri_a28_mono_10_heli_jump]:walker@def
+path_walk = mono_10_1_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = walker@pri_a28_mono_10_heli_wait %=teleport_npc(pri_a28_heli_mono_10_1_walk)%
+
+[walker@pri_a28_mono_10_heli_wait]:walker@def
+path_walk = mono_10_1_walk
+path_look = mono_10_1_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_evac_squad_active} camper@pri_a28_mono_10_heli_go_out %+pri_a28_heli_mono_part_5_active%
+on_info2 = {+pri_a28_heli_mono_part_5_active} camper@pri_a28_mono_10_heli_go_out
+on_info3 = {=dist_to_actor_le(30)} camper@pri_a28_mono_10_heli_go_out %+pri_a28_heli_mono_part_5_active%
+
+[camper@pri_a28_mono_10_heli_go_out]:walker@def
+path_walk = mono_10_2_walk
+path_look = mono_10_2_look
+on_signal = path_end | camper@pri_a28_mono_10_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_10_heli_fake
+
+[camper@pri_a28_mono_10_heli_attack]:walker@def
+path_walk = mono_10_3_walk
+path_look = mono_10_3_look
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_10_heli_fake
+
+[remark@pri_a28_mono_10_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_3, 0
+anim = threat_fire
+
+
+
+[logic@pri_a28_mono_11_heli]:logic@pri_a28_heli_mono_def
+active = walker@pri_a28_mono_11_heli_jump
+
+[walker@pri_a28_mono_11_heli_jump]:walker@def
+path_walk = mono_11_1_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = walker@pri_a28_mono_11_heli_wait %=teleport_npc(pri_a28_heli_mono_11_1_walk)%
+
+[walker@pri_a28_mono_11_heli_wait]:walker@def
+path_walk = mono_11_1_walk
+path_look = mono_11_1_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_evac_squad_active} camper@pri_a28_mono_11_heli_go_out %+pri_a28_heli_mono_part_6_active%
+on_info2 = {+pri_a28_heli_mono_part_6_active} camper@pri_a28_mono_11_heli_go_out
+on_info3 = {=dist_to_actor_le(30)} camper@pri_a28_mono_11_heli_go_out %+pri_a28_heli_mono_part_6_active%
+
+[camper@pri_a28_mono_11_heli_go_out]:walker@def
+path_walk = mono_11_2_walk
+path_look = mono_11_2_look
+on_signal = path_end | camper@pri_a28_mono_11_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_11_heli_fake
+
+[camper@pri_a28_mono_11_heli_attack]:walker@def
+path_walk = mono_11_3_walk
+path_look = mono_11_3_look
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_11_heli_fake
+
+[remark@pri_a28_mono_11_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_4, 0
+anim = hide_fire
+
+
+
+[logic@pri_a28_mono_12_heli]:logic@pri_a28_heli_mono_def
+active = walker@pri_a28_mono_12_heli_jump
+
+[walker@pri_a28_mono_12_heli_jump]:walker@def
+path_walk = mono_12_1_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = walker@pri_a28_mono_12_heli_wait %=teleport_npc(pri_a28_heli_mono_12_1_walk)%
+
+[walker@pri_a28_mono_12_heli_wait]:walker@def
+path_walk = mono_12_1_walk
+path_look = mono_12_1_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+pri_a28_evac_squad_active} camper@pri_a28_mono_12_heli_go_out %+pri_a28_heli_mono_part_6_active%
+on_info2 = {+pri_a28_heli_mono_part_6_active} camper@pri_a28_mono_12_heli_go_out
+on_info3 = {=dist_to_actor_le(30)} camper@pri_a28_mono_12_heli_go_out %+pri_a28_heli_mono_part_6_active%
+
+[camper@pri_a28_mono_12_heli_go_out]:walker@def
+path_walk = mono_12_2_walk
+path_look = mono_12_2_look
+on_signal = path_end | camper@pri_a28_mono_12_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_12_heli_fake
+
+[camper@pri_a28_mono_12_heli_attack]:walker@def
+path_walk = mono_12_3_walk
+path_look = mono_12_3_look
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_12_heli_fake
+
+[remark@pri_a28_mono_12_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_2, 0
+anim = threat_fire
+
+
+
+[logic@pri_a28_heli_mono_sniper_def]
+suitable = {=target_squad_name(pri_a28_heli_mono_snipers) +pri_b305_fifth_cam_end} true
+prior = 200
+
+
+
+[logic@pri_a28_mono_sniper_1_heli]:logic@pri_a28_heli_mono_sniper_def
+active = walker@pri_a28_mono_sniper_1_heli_jump
+on_death = death@heli_mono_sniper_1
+
+[walker@pri_a28_mono_sniper_1_heli_jump]:walker@def
+path_walk = mono_sniper_1_wait
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+out_restr = pri_a28_sniper_1_in
+on_info = walker@pri_a28_mono_sniper_1_heli_wait %=teleport_npc(pri_a28_heli_mono_sniper_1_wait)%
+
+[walker@pri_a28_mono_sniper_1_heli_wait]:walker@def
+path_walk = mono_sniper_1_wait
+path_look = mono_sniper_1_look
+def_state_standing = hide_na
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+out_restr = pri_a28_sniper_1_in
+on_info = {+pri_a28_evac_leave +pri_a28_heli_mono_sniper_3_out} camper@pri_a28_mono_sniper_1_heli_attack %=inc_counter(pri_a28_heli_mono_cnt)%
+
+[camper@pri_a28_mono_sniper_1_heli_attack]:walker@def
+path_walk = mono_sniper_1_walk
+path_look = mono_sniper_1_look
+radius = 0
+no_retreat = true
+out_restr = pri_a28_sniper_1_in
+on_info = {-pri_a28_cutscenes_end +pri_a28_scene_end} remark@pri_a28_mono_sniper_1_heli_fake
+
+[remark@pri_a28_mono_sniper_1_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_3, 0
+anim = hide_fire
+out_restr = pri_a28_sniper_1_in
+on_info = {+pri_a28_cutscenes_end} camper@pri_a28_mono_sniper_1_heli_attack
+
+[death@heli_mono_sniper_1]
+on_info = {+pri_a28_evac_leave +pri_a28_heli_mono_sniper_3_out} %=dec_counter(pri_a28_heli_mono_cnt)%
+
+
+
+[logic@pri_a28_mono_sniper_2_heli]:logic@pri_a28_heli_mono_sniper_def
+active = walker@pri_a28_mono_sniper_2_heli_jump
+on_death = death@heli_mono_sniper_2
+
+[walker@pri_a28_mono_sniper_2_heli_jump]:walker@def
+path_walk = mono_sniper_2_wait
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+out_restr = pri_a28_sniper_2_in
+on_info = walker@pri_a28_mono_sniper_2_heli_wait %=teleport_npc(pri_a28_heli_mono_sniper_2_wait)%
+
+[walker@pri_a28_mono_sniper_2_heli_wait]:walker@def
+path_walk = mono_sniper_2_wait
+path_look = mono_sniper_2_look
+def_state_standing = hide_na
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+out_restr = pri_a28_sniper_2_in
+on_info = {+pri_a28_evac_leave +pri_a28_heli_mono_sniper_3_out} camper@pri_a28_mono_sniper_2_heli_attack %=inc_counter(pri_a28_heli_mono_cnt)%
+
+[camper@pri_a28_mono_sniper_2_heli_attack]:walker@def
+path_walk = mono_sniper_2_walk
+path_look = mono_sniper_2_look
+radius = 0
+no_retreat = true
+out_restr = pri_a28_sniper_2_in
+on_info = {-pri_a28_cutscenes_end +pri_a28_scene_end} remark@pri_a28_mono_sniper_2_heli_fake
+
+[remark@pri_a28_mono_sniper_2_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_3, 0
+anim = hide_fire
+out_restr = pri_a28_sniper_2_in
+on_info = {+pri_a28_cutscenes_end} camper@pri_a28_mono_sniper_2_heli_attack
+
+[death@heli_mono_sniper_2]
+on_info = {+pri_a28_evac_leave +pri_a28_heli_mono_sniper_3_out} %=dec_counter(pri_a28_heli_mono_cnt) +pri_a28_heli_mono_sniper_2_out%, %+pri_a28_heli_mono_sniper_2_out%
+
+
+
+[logic@pri_a28_mono_sniper_3_heli]:logic@pri_a28_heli_mono_sniper_def
+active = walker@pri_a28_mono_sniper_3_heli_jump
+on_death = death@heli_mono_sniper_3
+
+[walker@pri_a28_mono_sniper_3_heli_jump]:walker@def
+path_walk = mono_sniper_3_wait
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+out_restr = pri_a28_sniper_3_in
+on_info = walker@pri_a28_mono_sniper_3_heli_wait %=teleport_npc(pri_a28_heli_mono_sniper_3_wait)%
+
+[walker@pri_a28_mono_sniper_3_heli_wait]:walker@def
+path_walk = mono_sniper_3_wait
+path_look = mono_sniper_3_look
+def_state_standing = hide_na
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+out_restr = pri_a28_sniper_3_in
+on_info = {+pri_a28_evac_squad_active} camper@pri_a28_mono_sniper_3_heli_attack %=inc_counter(pri_a28_heli_mono_cnt)%
+
+[camper@pri_a28_mono_sniper_3_heli_attack]:walker@def
+path_walk = mono_sniper_3_walk
+path_look = mono_sniper_3_look
+radius = 0
+no_retreat = true
+out_restr = pri_a28_sniper_3_in
+on_info = {-pri_a28_cutscenes_end +pri_a28_scene_end} remark@pri_a28_mono_sniper_3_heli_fake
+
+[remark@pri_a28_mono_sniper_3_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_2, 0
+anim = hide_fire
+out_restr = pri_a28_sniper_3_in
+on_info = {+pri_a28_cutscenes_end} camper@pri_a28_mono_sniper_3_heli_attack
+
+[death@heli_mono_sniper_3]
+on_info = {+pri_a28_evac_squad_active} %=dec_counter(pri_a28_heli_mono_cnt) +pri_a28_heli_mono_sniper_3_out%, %+pri_a28_heli_mono_sniper_3_out%
+
+
+
+[logic@pri_a28_mono_sniper_4_heli]:logic@pri_a28_heli_mono_sniper_def
+active = walker@pri_a28_mono_sniper_4_heli_jump
+on_death = death@heli_mono_sniper_4
+
+[walker@pri_a28_mono_sniper_4_heli_jump]:walker@def
+path_walk = mono_sniper_4_wait
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+out_restr = pri_a28_sniper_3_in
+on_info = walker@pri_a28_mono_sniper_4_heli_wait %=teleport_npc(pri_a28_heli_mono_sniper_4_wait)%
+
+[walker@pri_a28_mono_sniper_4_heli_wait]:walker@def
+path_walk = mono_sniper_4_wait
+path_look = mono_sniper_4_look
+def_state_standing = hide_na
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+out_restr = pri_a28_sniper_3_in
+on_info = {+pri_a28_evac_com_to_helicopter +pri_a28_heli_mono_sniper_2_out} camper@pri_a28_mono_sniper_4_heli_attack %=inc_counter(pri_a28_heli_mono_cnt)%
+
+[camper@pri_a28_mono_sniper_4_heli_attack]:walker@def
+path_walk = mono_sniper_4_walk
+path_look = mono_sniper_4_look
+radius = 0
+no_retreat = true
+out_restr = pri_a28_sniper_3_in
+on_info = {-pri_a28_cutscenes_end +pri_a28_scene_end} remark@pri_a28_mono_sniper_4_heli_fake
+
+[remark@pri_a28_mono_sniper_4_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_2, 0
+anim = hide_fire
+out_restr = pri_a28_sniper_3_in
+on_info = {+pri_a28_cutscenes_end} camper@pri_a28_mono_sniper_4_heli_attack
+
+[death@heli_mono_sniper_4]
+on_info = {+pri_a28_evac_com_to_helicopter +pri_a28_heli_mono_sniper_2_out} %=dec_counter(pri_a28_heli_mono_cnt)%
+
+
+
+
+
+
+[logic@pri_a28_heli_mono_add_1_def]
+suitable = {-pri_a28_cutscenes_end =target_squad_name(pri_a28_heli_mono_add_1) +pri_b305_fifth_cam_end} true
+prior = 200
+on_death = death@heli_mono
+
+
+
+[logic@pri_a28_mono_add_1_1_heli]:logic@pri_a28_heli_mono_add_1_def
+active = walker@pri_a28_mono_add_1_1_heli_jump
+
+[walker@pri_a28_mono_add_1_1_heli_jump]:walker@def
+path_walk = mono_add_1_1_wait
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = camper@pri_a28_mono_add_1_1_heli_go_out %=teleport_npc(pri_a28_heli_mono_add_1_1_wait)%
+
+[camper@pri_a28_mono_add_1_1_heli_go_out]:walker@def
+path_walk = mono_add_1_1_walk
+path_look = fake_look_1
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = false
+on_signal = path_end | camper@pri_a28_mono_add_1_1_heli_attack
+on_game_timer = 150 | camper@pri_a28_mono_add_1_1_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_1_1_heli_fake
+
+[camper@pri_a28_mono_add_1_1_heli_attack]:walker@def
+path_walk = mono_add_1_1_walk
+path_look = fake_look_1
+radius = 50
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_1_1_heli_fake
+
+[remark@pri_a28_mono_add_1_1_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_1, 0
+anim = threat_fire
+
+
+
+[logic@pri_a28_mono_add_1_2_heli]:logic@pri_a28_heli_mono_add_1_def
+active = walker@pri_a28_mono_add_1_2_heli_jump
+
+[walker@pri_a28_mono_add_1_2_heli_jump]:walker@def
+path_walk = mono_add_1_2_wait
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = camper@pri_a28_mono_add_1_2_heli_go_out %=teleport_npc(pri_a28_heli_mono_add_1_2_wait)%
+
+[camper@pri_a28_mono_add_1_2_heli_go_out]:walker@def
+path_walk = mono_add_1_2_walk
+path_look = fake_look_1
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = false
+on_signal = path_end | camper@pri_a28_mono_add_1_2_heli_attack
+on_game_timer = 120 | camper@pri_a28_mono_add_1_2_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_1_2_heli_fake
+
+[camper@pri_a28_mono_add_1_2_heli_attack]:walker@def
+path_walk = mono_add_1_2_walk
+path_look = fake_look_1
+radius = 50
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_1_2_heli_fake
+
+[remark@pri_a28_mono_add_1_2_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_3, 0
+anim = threat_fire
+
+
+
+[logic@pri_a28_mono_add_1_3_heli]:logic@pri_a28_heli_mono_add_1_def
+active = walker@pri_a28_mono_add_1_3_heli_jump
+
+[walker@pri_a28_mono_add_1_3_heli_jump]:walker@def
+path_walk = mono_add_1_3_wait
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = camper@pri_a28_mono_add_1_3_heli_go_out %=teleport_npc(pri_a28_heli_mono_add_1_3_wait)%
+
+[camper@pri_a28_mono_add_1_3_heli_go_out]:walker@def
+path_walk = mono_add_1_3_walk
+path_look = fake_look_2
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = false
+on_signal = path_end | camper@pri_a28_mono_add_1_3_heli_attack
+on_game_timer = 100 | camper@pri_a28_mono_add_1_3_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_1_3_heli_fake
+
+[camper@pri_a28_mono_add_1_3_heli_attack]:walker@def
+path_walk = mono_add_1_3_walk
+path_look = fake_look_2
+radius = 50
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_1_3_heli_fake
+
+[remark@pri_a28_mono_add_1_3_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_2, 0
+anim = hide_fire
+
+
+
+[logic@pri_a28_mono_add_1_4_heli]:logic@pri_a28_heli_mono_add_1_def
+active = walker@pri_a28_mono_add_1_4_heli_jump
+
+[walker@pri_a28_mono_add_1_4_heli_jump]:walker@def
+path_walk = mono_add_1_4_wait
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = camper@pri_a28_mono_add_1_4_heli_go_out %=teleport_npc(pri_a28_heli_mono_add_1_4_wait)%
+
+[camper@pri_a28_mono_add_1_4_heli_go_out]:walker@def
+path_walk = mono_add_1_4_walk
+path_look = fake_look_2
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = false
+on_signal = path_end | camper@pri_a28_mono_add_1_4_heli_attack
+on_game_timer = 150 | camper@pri_a28_mono_add_1_4_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_1_4_heli_fake
+
+[camper@pri_a28_mono_add_1_4_heli_attack]:walker@def
+path_walk = mono_add_1_4_walk
+path_look = fake_look_2
+radius = 50
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_1_4_heli_fake
+
+[remark@pri_a28_mono_add_1_4_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_1, 0
+anim = threat_fire
+
+
+
+[logic@pri_a28_mono_add_1_5_heli]:logic@pri_a28_heli_mono_add_1_def
+active = walker@pri_a28_mono_add_1_5_heli_jump
+
+[walker@pri_a28_mono_add_1_5_heli_jump]:walker@def
+path_walk = mono_add_1_5_wait
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = camper@pri_a28_mono_add_1_5_heli_go_out %=teleport_npc(pri_a28_heli_mono_add_1_5_wait)%
+
+[camper@pri_a28_mono_add_1_5_heli_go_out]:walker@def
+path_walk = mono_add_1_5_walk
+path_look = fake_look_2
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = false
+on_signal = path_end | camper@pri_a28_mono_add_1_5_heli_attack
+on_game_timer = 120 | camper@pri_a28_mono_add_1_5_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_1_5_heli_fake
+
+[camper@pri_a28_mono_add_1_5_heli_attack]:walker@def
+path_walk = mono_add_1_5_walk
+path_look = fake_look_2
+radius = 50
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_1_5_heli_fake
+
+[remark@pri_a28_mono_add_1_5_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_3, 0
+anim = threat_fire
+
+
+
+[logic@pri_a28_mono_add_1_6_heli]:logic@pri_a28_heli_mono_add_1_def
+active = walker@pri_a28_mono_add_1_6_heli_jump
+
+[walker@pri_a28_mono_add_1_6_heli_jump]:walker@def
+path_walk = mono_add_1_6_wait
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = camper@pri_a28_mono_add_1_6_heli_go_out %=teleport_npc(pri_a28_heli_mono_add_1_6_wait)%
+
+[camper@pri_a28_mono_add_1_6_heli_go_out]:walker@def
+path_walk = mono_add_1_6_walk
+path_look = fake_look_2
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = false
+on_signal = path_end | camper@pri_a28_mono_add_1_6_heli_attack
+on_game_timer = 180 | camper@pri_a28_mono_add_1_6_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_1_6_heli_fake
+
+[camper@pri_a28_mono_add_1_6_heli_attack]:walker@def
+path_walk = mono_add_1_6_walk
+path_look = fake_look_2
+radius = 50
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_1_6_heli_fake
+
+[remark@pri_a28_mono_add_1_6_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_4, 0
+anim = hide_fire
+
+
+
+[logic@pri_a28_heli_mono_add_2_def]
+suitable = {-pri_a28_cutscenes_end =target_squad_name(pri_a28_heli_mono_add_2) +pri_b305_fifth_cam_end} true
+prior = 200
+on_death = death@heli_mono
+
+
+
+[logic@pri_a28_mono_add_2_1_heli]:logic@pri_a28_heli_mono_add_2_def
+active = walker@pri_a28_mono_add_2_1_heli_jump
+
+[walker@pri_a28_mono_add_2_1_heli_jump]:walker@def
+path_walk = mono_add_2_1_wait
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = camper@pri_a28_mono_add_2_1_heli_go_out %=teleport_npc(pri_a28_heli_mono_add_2_1_wait)%
+
+[camper@pri_a28_mono_add_2_1_heli_go_out]:walker@def
+path_walk = mono_add_2_1_walk
+path_look = fake_look_2
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = false
+on_signal = path_end | camper@pri_a28_mono_add_2_1_heli_attack
+on_game_timer = 150 | camper@pri_a28_mono_add_2_1_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_2_1_heli_fake
+
+[camper@pri_a28_mono_add_2_1_heli_attack]:walker@def
+path_walk = mono_add_2_1_walk
+path_look = fake_look_2
+radius = 50
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_2_1_heli_fake
+
+[remark@pri_a28_mono_add_2_1_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_2, 0
+anim = threat_fire
+
+
+
+[logic@pri_a28_mono_add_2_2_heli]:logic@pri_a28_heli_mono_add_2_def
+active = walker@pri_a28_mono_add_2_2_heli_jump
+
+[walker@pri_a28_mono_add_2_2_heli_jump]:walker@def
+path_walk = mono_add_2_2_wait
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = camper@pri_a28_mono_add_2_2_heli_go_out %=teleport_npc(pri_a28_heli_mono_add_2_2_wait)%
+
+[camper@pri_a28_mono_add_2_2_heli_go_out]:walker@def
+path_walk = mono_add_2_2_walk
+path_look = fake_look_2
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = false
+on_signal = path_end | camper@pri_a28_mono_add_2_2_heli_attack
+on_game_timer = 180 | camper@pri_a28_mono_add_2_2_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_2_2_heli_fake
+
+[camper@pri_a28_mono_add_2_2_heli_attack]:walker@def
+path_walk = mono_add_2_2_walk
+path_look = fake_look_2
+radius = 50
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_2_2_heli_fake
+
+[remark@pri_a28_mono_add_2_2_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_1, 0
+anim = threat_fire
+
+
+
+[logic@pri_a28_mono_add_2_3_heli]:logic@pri_a28_heli_mono_add_2_def
+active = walker@pri_a28_mono_add_2_3_heli_jump
+
+[walker@pri_a28_mono_add_2_3_heli_jump]:walker@def
+path_walk = mono_add_2_3_wait
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = camper@pri_a28_mono_add_2_3_heli_go_out %=teleport_npc(pri_a28_heli_mono_add_2_3_wait)%
+
+[camper@pri_a28_mono_add_2_3_heli_go_out]:walker@def
+path_walk = mono_add_2_3_walk
+path_look = fake_look_3
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = false
+on_signal = path_end | camper@pri_a28_mono_add_2_3_heli_attack
+on_game_timer = 210 | camper@pri_a28_mono_add_2_3_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_2_3_heli_fake
+
+[camper@pri_a28_mono_add_2_3_heli_attack]:walker@def
+path_walk = mono_add_2_3_walk
+path_look = fake_look_3
+radius = 50
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_2_3_heli_fake
+
+[remark@pri_a28_mono_add_2_3_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_2, 0
+anim = hide_fire
+
+
+
+[logic@pri_a28_mono_add_2_4_heli]:logic@pri_a28_heli_mono_add_2_def
+active = walker@pri_a28_mono_add_2_4_heli_jump
+
+[walker@pri_a28_mono_add_2_4_heli_jump]:walker@def
+path_walk = mono_add_2_4_wait
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = camper@pri_a28_mono_add_2_4_heli_go_out %=teleport_npc(pri_a28_heli_mono_add_2_4_wait)%
+
+[camper@pri_a28_mono_add_2_4_heli_go_out]:walker@def
+path_walk = mono_add_2_4_walk
+path_look = fake_look_3
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = false
+on_signal = path_end | camper@pri_a28_mono_add_2_4_heli_attack
+on_game_timer = 180 | camper@pri_a28_mono_add_2_4_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_2_4_heli_fake
+
+[camper@pri_a28_mono_add_2_4_heli_attack]:walker@def
+path_walk = mono_add_2_4_walk
+path_look = fake_look_3
+radius = 50
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_2_4_heli_fake
+
+[remark@pri_a28_mono_add_2_4_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_1, 0
+anim = threat_fire
+
+
+
+[logic@pri_a28_mono_add_2_5_heli]:logic@pri_a28_heli_mono_add_2_def
+active = walker@pri_a28_mono_add_2_5_heli_jump
+
+[walker@pri_a28_mono_add_2_5_heli_jump]:walker@def
+path_walk = mono_add_2_5_wait
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = camper@pri_a28_mono_add_2_5_heli_go_out %=teleport_npc(pri_a28_heli_mono_add_2_5_wait)%
+
+[camper@pri_a28_mono_add_2_5_heli_go_out]:walker@def
+path_walk = mono_add_2_5_walk
+path_look = fake_look_3
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = false
+on_signal = path_end | camper@pri_a28_mono_add_2_5_heli_attack
+on_game_timer = 150 | camper@pri_a28_mono_add_2_5_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_2_5_heli_fake
+
+[camper@pri_a28_mono_add_2_5_heli_attack]:walker@def
+path_walk = mono_add_2_5_walk
+path_look = fake_look_3
+radius = 50
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_2_5_heli_fake
+
+[remark@pri_a28_mono_add_2_5_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_2, 0
+anim = threat_fire
+
+
+
+[logic@pri_a28_mono_add_2_6_heli]:logic@pri_a28_heli_mono_add_2_def
+active = walker@pri_a28_mono_add_2_6_heli_jump
+
+[walker@pri_a28_mono_add_2_6_heli_jump]:walker@def
+path_walk = mono_add_2_6_wait
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = camper@pri_a28_mono_add_2_6_heli_go_out %=teleport_npc(pri_a28_heli_mono_add_2_6_wait)%
+
+[camper@pri_a28_mono_add_2_6_heli_go_out]:walker@def
+path_walk = mono_add_2_6_walk
+path_look = fake_look_4
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = false
+on_signal = path_end | camper@pri_a28_mono_add_2_6_heli_attack
+on_game_timer = 180 | camper@pri_a28_mono_add_2_6_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_2_6_heli_fake
+
+[camper@pri_a28_mono_add_2_6_heli_attack]:walker@def
+path_walk = mono_add_2_6_walk
+path_look = fake_look_4
+radius = 50
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_2_6_heli_fake
+
+[remark@pri_a28_mono_add_2_6_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_4, 0
+anim = hide_fire
+
+
+
+[logic@pri_a28_heli_mono_add_3_def]
+suitable = {-pri_a28_cutscenes_end =target_squad_name(pri_a28_heli_mono_add_3) +pri_b305_fifth_cam_end} true
+prior = 200
+on_death = death@heli_mono
+
+
+
+[logic@pri_a28_mono_add_3_1_heli]:logic@pri_a28_heli_mono_add_3_def
+active = walker@pri_a28_mono_add_3_1_heli_jump
+
+[walker@pri_a28_mono_add_3_1_heli_jump]:walker@def
+path_walk = mono_add_3_1_wait
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = camper@pri_a28_mono_add_3_1_heli_go_out %=teleport_npc(pri_a28_heli_mono_add_3_1_wait)%
+
+[camper@pri_a28_mono_add_3_1_heli_go_out]:walker@def
+path_walk = mono_add_3_1_walk
+path_look = fake_look_3
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = false
+on_signal = path_end | camper@pri_a28_mono_add_3_1_heli_attack
+on_game_timer = 150 | camper@pri_a28_mono_add_3_1_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_3_1_heli_fake
+
+[camper@pri_a28_mono_add_3_1_heli_attack]:walker@def
+path_walk = mono_add_3_1_walk
+path_look = fake_look_3
+radius = 50
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_3_1_heli_fake
+
+[remark@pri_a28_mono_add_3_1_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_3, 0
+anim = threat_fire
+
+
+
+[logic@pri_a28_mono_add_3_2_heli]:logic@pri_a28_heli_mono_add_3_def
+active = walker@pri_a28_mono_add_3_2_heli_jump
+
+[walker@pri_a28_mono_add_3_2_heli_jump]:walker@def
+path_walk = mono_add_3_2_wait
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = camper@pri_a28_mono_add_3_2_heli_go_out %=teleport_npc(pri_a28_heli_mono_add_3_2_wait)%
+
+[camper@pri_a28_mono_add_3_2_heli_go_out]:walker@def
+path_walk = mono_add_3_2_walk
+path_look = fake_look_3
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = false
+on_signal = path_end | camper@pri_a28_mono_add_3_2_heli_attack
+on_game_timer = 120 | camper@pri_a28_mono_add_3_2_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_3_2_heli_fake
+
+[camper@pri_a28_mono_add_3_2_heli_attack]:walker@def
+path_walk = mono_add_3_2_walk
+path_look = fake_look_3
+radius = 50
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_3_2_heli_fake
+
+[remark@pri_a28_mono_add_3_2_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_2, 0
+anim = threat_fire
+
+
+
+[logic@pri_a28_mono_add_3_3_heli]:logic@pri_a28_heli_mono_add_3_def
+active = walker@pri_a28_mono_add_3_3_heli_jump
+
+[walker@pri_a28_mono_add_3_3_heli_jump]:walker@def
+path_walk = mono_add_3_3_wait
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = camper@pri_a28_mono_add_3_3_heli_go_out %=teleport_npc(pri_a28_heli_mono_add_3_3_wait)%
+
+[camper@pri_a28_mono_add_3_3_heli_go_out]:walker@def
+path_walk = mono_add_3_3_walk
+path_look = fake_look_3
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = false
+on_signal = path_end | camper@pri_a28_mono_add_3_3_heli_attack
+on_game_timer = 180 | camper@pri_a28_mono_add_3_3_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_3_3_heli_fake
+
+[camper@pri_a28_mono_add_3_3_heli_attack]:walker@def
+path_walk = mono_add_3_3_walk
+path_look = fake_look_3
+radius = 50
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_3_3_heli_fake
+
+[remark@pri_a28_mono_add_3_3_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_1, 0
+anim = hide_fire
+
+
+
+[logic@pri_a28_mono_add_3_4_heli]:logic@pri_a28_heli_mono_add_3_def
+active = walker@pri_a28_mono_add_3_4_heli_jump
+
+[walker@pri_a28_mono_add_3_4_heli_jump]:walker@def
+path_walk = mono_add_3_4_wait
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = camper@pri_a28_mono_add_3_4_heli_go_out %=teleport_npc(pri_a28_heli_mono_add_3_4_wait)%
+
+[camper@pri_a28_mono_add_3_4_heli_go_out]:walker@def
+path_walk = mono_add_3_4_walk
+path_look = fake_look_4
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = false
+on_signal = path_end | camper@pri_a28_mono_add_3_4_heli_attack
+on_game_timer = 150 | camper@pri_a28_mono_add_3_4_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_3_4_heli_fake
+
+[camper@pri_a28_mono_add_3_4_heli_attack]:walker@def
+path_walk = mono_add_3_4_walk
+path_look = fake_look_4
+radius = 50
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_3_4_heli_fake
+
+[remark@pri_a28_mono_add_3_4_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_2, 0
+anim = threat_fire
+
+
+
+[logic@pri_a28_mono_add_3_5_heli]:logic@pri_a28_heli_mono_add_3_def
+active = walker@pri_a28_mono_add_3_5_heli_jump
+
+[walker@pri_a28_mono_add_3_5_heli_jump]:walker@def
+path_walk = mono_add_3_5_wait
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = camper@pri_a28_mono_add_3_5_heli_go_out %=teleport_npc(pri_a28_heli_mono_add_3_5_wait)%
+
+[camper@pri_a28_mono_add_3_5_heli_go_out]:walker@def
+path_walk = mono_add_3_5_walk
+path_look = fake_look_4
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = false
+on_signal = path_end | camper@pri_a28_mono_add_3_5_heli_attack
+on_game_timer = 120 | camper@pri_a28_mono_add_3_5_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_3_5_heli_fake
+
+[camper@pri_a28_mono_add_3_5_heli_attack]:walker@def
+path_walk = mono_add_3_5_walk
+path_look = fake_look_4
+radius = 50
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_3_5_heli_fake
+
+[remark@pri_a28_mono_add_3_5_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_1, 0
+anim = threat_fire
+
+
+
+[logic@pri_a28_mono_add_3_6_heli]:logic@pri_a28_heli_mono_add_3_def
+active = walker@pri_a28_mono_add_3_6_heli_jump
+
+[walker@pri_a28_mono_add_3_6_heli_jump]:walker@def
+path_walk = mono_add_3_6_wait
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = camper@pri_a28_mono_add_3_6_heli_go_out %=teleport_npc(pri_a28_heli_mono_add_3_6_wait)%
+
+[camper@pri_a28_mono_add_3_6_heli_go_out]:walker@def
+path_walk = mono_add_3_6_walk
+path_look = fake_look_4
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = false
+on_signal = path_end | camper@pri_a28_mono_add_3_6_heli_attack
+on_game_timer = 210 | camper@pri_a28_mono_add_3_6_heli_attack
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_3_6_heli_fake
+
+[camper@pri_a28_mono_add_3_6_heli_attack]:walker@def
+path_walk = mono_add_3_6_walk
+path_look = fake_look_4
+radius = 50
+in_restr = pri_a28_scene_end_zone
+on_info = {+pri_a28_scene_end} remark@pri_a28_mono_add_3_6_heli_fake
+
+[remark@pri_a28_mono_add_3_6_heli_fake]:walker@ignore
+target = path | pri_a28_heli_fake_look_4, 0
+anim = hide_fire

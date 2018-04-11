@@ -1,0 +1,15 @@
+[logic]
+active = sr_idle@waiting_intro
+
+[sr_idle@waiting_intro]
+on_info = {+esc_2_12_nimble_intro} sr_idle@no_scientific
+
+[sr_idle@no_scientific]
+on_info = {+jup_a9_tech_way_info +jup_a9_tech_conservation_info} sr_idle@waiting_category %-esc_2_12_finished_categories_all%, {+esc_2_12_finished_category_1 +esc_2_12_finished_category_2 +esc_2_12_finished_category_3 +esc_2_12_finished_category_4 +esc_2_12_finished_category_5 +esc_2_12_finished_category_7} sr_idle@need_scientific %+esc_2_12_finished_categories_all%
+
+[sr_idle@need_scientific]
+on_info = {+jup_a9_tech_way_info +jup_a9_tech_conservation_info} sr_idle@waiting_category %-esc_2_12_finished_categories_all%
+
+[sr_idle@waiting_category]
+on_info = {+esc_2_12_finished_category_1 +esc_2_12_finished_category_2 +esc_2_12_finished_category_3 +esc_2_12_finished_category_4 +esc_2_12_finished_category_5 +esc_2_12_finished_category_6 +esc_2_12_finished_category_7} nil %+esc_2_12_finished_categories_all%
+

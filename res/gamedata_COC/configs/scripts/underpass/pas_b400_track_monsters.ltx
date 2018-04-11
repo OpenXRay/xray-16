@@ -1,0 +1,56 @@
+[logic@pas_b400_snork_track_2_1]
+active = mob_walker@snork_track_2_1_wait
+suitable = {=is_monster_snork =target_squad_name(pas_b400_snork_track_2)} true
+prior = 200
+monster_job = true
+
+[mob_walker@snork_track_2_1_wait]
+path_walk = 2_1_snork_walk
+path_look = 2_1_snork_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+npc_friendly = true
+out_restr = pas_b400_sr_track_2
+on_info = {+pas_b400_track_2_snorks_attack} mob_jump@snork_track_2_1_jump
+on_info2 = {=actor_in_zone(pas_b400_sr_track_1)} mob_jump@snork_track_2_1_jump
+
+[mob_jump@snork_track_2_1_jump]
+path_jump = 2_1_snork_look
+ph_jump_factor = 1.2
+offset = 0,0,0
+on_signal = jumped | mob_home@snork_track_2_home
+
+[mob_home@snork_track_2_home]
+path_home = 2_snork_home
+home_min_radius = 20
+home_max_radius = 30
+aggressive = true
+
+
+[logic@pas_b400_snork_track_2_2]
+active = mob_walker@snork_track_2_2_wait
+suitable = {=is_monster_snork =target_squad_name(pas_b400_snork_track_2)} true
+prior = 200
+monster_job = true
+
+[mob_walker@snork_track_2_2_wait]
+path_walk = 2_2_snork_walk
+path_look = 2_2_snork_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+npc_friendly = true
+out_restr = pas_b400_sr_track_2
+on_info = {+pas_b400_track_2_snorks_attack} mob_walker@snork_track_2_2_wait_jump
+on_info2 = {=actor_in_zone(pas_b400_sr_track_1)} mob_walker@snork_track_2_2_wait_jump
+
+[mob_walker@snork_track_2_2_wait_jump]
+path_walk = 2_2_snork_walk
+path_look = 2_2_snork_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+npc_friendly = true
+out_restr = pas_b400_sr_track_2
+on_game_timer = 5 | mob_jump@snork_track_2_2_jump
+
+[mob_jump@snork_track_2_2_jump]
+path_jump = 2_2_snork_look
+ph_jump_factor = 1.4
+offset = 0,0,0
+on_signal = jumped | mob_home@snork_track_2_home

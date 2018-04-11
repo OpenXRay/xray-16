@@ -1,0 +1,69 @@
+[logic] 
+active = nil;sr_idle@teleport_to
+
+[sr_idle@teleport_to] ;переход к одной из зон через телепорт 
+on_info =  {+jup_b6_go_to_anom_1 -jup_b6_to_anom_1_teleported} sr_idle@teleportin %=run_postprocess(fade_in:8610) =disable_ui() +jup_b6_st_mission +jup_b6_to_anom_1_teleported +jup_b6_anom_1 -jup_b6_anom_2 -jup_b6_travel%
+on_info2 = {+jup_b6_go_to_anom_2 -jup_b6_to_anom_2_teleported} sr_idle@teleportin_2 %=run_postprocess(fade_in:8611) =disable_ui() +jup_b6_st_mission +jup_b6_to_anom_2_teleported +jup_b6_anom_2 -jup_b6_anom_1 -jup_b6_travel%
+on_info3 = {+jup_b6_go_to_home} sr_idle@teleportin_home %=run_postprocess(fade_in:8614) =disable_ui() -jup_b6_st_mission -jup_b6_anom_1 -jup_b6_anom_2%
+
+on_info4 = {+jup_b6_two_anomaly_learned +jup_b6_start +jup_b6_st_mission =squad_in_zone(jup_b1_stalker_squad:jup_b6_st_return_controller)} %-jup_b6_st_mission -jup_b6_start -jup_b6_travel%, {+jup_b6_start +jup_b6_st_mission =squad_in_zone(jup_b1_stalker_squad:jup_b6_st_return_controller)} %-jup_b6_st_mission -jup_b6_start%
+on_info5 = {+jup_b6_two_anomaly_learned +jup_b6_start +jup_b6_st_mission =squad_in_zone(jup_b6_stalker_freedom_squad:jup_b6_st_return_controller)} %-jup_b6_st_mission -jup_b6_start -jup_b6_travel%, {+jup_b6_start +jup_b6_st_mission =squad_in_zone(jup_b6_stalker_freedom_squad:jup_b6_st_return_controller)} %-jup_b6_st_mission -jup_b6_start%
+on_info6 = {+jup_b6_two_anomaly_learned +jup_b6_start +jup_b6_st_mission =squad_in_zone(jup_b6_stalker_duty_squad:jup_b6_st_return_controller)} %-jup_b6_st_mission -jup_b6_start -jup_b6_travel%, {+jup_b6_start +jup_b6_st_mission =squad_in_zone(jup_b6_stalker_duty_squad:jup_b6_st_return_controller)} %-jup_b6_st_mission -jup_b6_start%
+on_info7 = {+jup_b6_two_anomaly_learned +jup_b6_start +jup_b6_st_mission =squad_in_zone(jup_b6_stalker_gonta_squad:jup_b6_st_return_controller)} %-jup_b6_st_mission -jup_b6_start -jup_b6_travel%, {+jup_b6_start +jup_b6_st_mission =squad_in_zone(jup_b6_stalker_gonta_squad:jup_b6_st_return_controller)} %-jup_b6_st_mission -jup_b6_start%
+on_info8 = {+jup_b6_two_anomaly_learned +jup_b6_start +jup_b6_st_mission =squad_in_zone(jup_b6_stalker_exprisoner_squad:jup_b6_st_return_controller)} %-jup_b6_st_mission -jup_b6_start -jup_b6_travel%, {+jup_b6_start +jup_b6_st_mission =squad_in_zone(jup_b6_stalker_exprisoner_squad:jup_b6_st_return_controller)} %-jup_b6_st_mission -jup_b6_start%
+
+on_info9 = {+jup_b6_two_anomaly_learned +jup_b6_complete_end -jup_b6_st_mission} sr_idle@end, {+jup_b6_task_fail} sr_idle@end
+
+;--------------------------- телепорт к первой аномальной зоне
+
+[sr_idle@teleportin]
+on_info = {-jup_b6_fade_in_1} %=run_postprocess(black:8612:true) +jup_b6_fade_in_1%
+on_game_timer = 20 | %+jup_b6_teleport_1% 
+
+on_info =  {-jup_b1_squad_is_dead +jup_b6_teleport_1} sr_idle@teleport_post %=teleport_squad(jup_b1_stalker_squad:jup_b211_stalker_spawn) +jup_b6_start%
+on_info2 = {+jup_b6_freedom_employed +jup_b6_teleport_1} sr_idle@teleport_post %=teleport_squad(jup_b6_stalker_freedom_squad:jup_b211_stalker_spawn) +jup_b6_start%
+on_info3 = {+jup_b6_duty_employed +jup_b6_teleport_1} sr_idle@teleport_post %=teleport_squad(jup_b6_stalker_duty_squad:jup_b211_stalker_spawn) +jup_b6_start%
+on_info4 = {+jup_b6_gonta_employed +jup_b6_teleport_1} sr_idle@teleport_post %=teleport_squad(jup_b6_stalker_gonta_squad:jup_b211_stalker_spawn) +jup_b6_start%
+on_info5 = {+jup_b6_exprisoner_work_on_sci +jup_b6_teleport_1} sr_idle@teleport_post %=teleport_squad(jup_b6_stalker_exprisoner_squad:jup_b211_stalker_spawn) +jup_b6_start%
+
+[sr_idle@teleport_post]
+on_info = {-jup_b6_teleport_step_1 =squad_exist(jup_b6_swamp_hunters)} %=teleport_squad(jup_b6_swamp_hunters:jup_b211_mob_home_hunter_prime) =teleport_actor(jup_b211_actor_stay:jup_b211_actor_b6_look) +jup_b6_teleport_step_1%
+on_info2 = {-jup_b6_teleport_step_1 !squad_exist(jup_b6_swamp_hunters)} %=teleport_actor(jup_b211_actor_stay:jup_b211_actor_b6_look) +jup_b6_teleport_step_1%
+on_game_timer = 20 | sr_idle@teleport_end %=stop_postprocess(8610) =stop_postprocess(8612) =enable_ui()%
+
+[sr_idle@teleport_end]
+on_game_timer = 20 | sr_idle@teleport_to %+jup_b6_mutant_attack_start%
+
+;--------------------------- телепорт ко второй аномальной зоне
+
+[sr_idle@teleportin_2]
+on_info = {-jup_b6_fade_in_2} %=run_postprocess(black:8613:true) +jup_b6_fade_in_2 =clear_smart_terrain(jup_b6_anom_2:false)%
+on_game_timer = 20 | %+jup_b6_teleport_2%
+
+on_info2 = {-jup_b1_squad_is_dead +jup_b6_teleport_2} sr_idle@teleport_post_2 %=teleport_squad(jup_b1_stalker_squad:jup_b6_anom_2_stalker_spawn) +jup_b6_start%
+on_info3 = {+jup_b6_freedom_employed +jup_b6_teleport_2} sr_idle@teleport_post_2 %=teleport_squad(jup_b6_stalker_freedom_squad:jup_b6_anom_2_stalker_spawn) +jup_b6_start%
+on_info4 = {+jup_b6_duty_employed +jup_b6_teleport_2} sr_idle@teleport_post_2 %=teleport_squad(jup_b6_stalker_duty_squad:jup_b6_anom_2_stalker_spawn) +jup_b6_start%
+on_info5 = {+jup_b6_gonta_employed +jup_b6_teleport_2} sr_idle@teleport_post_2 %=teleport_squad(jup_b6_stalker_gonta_squad:jup_b6_anom_2_stalker_spawn) +jup_b6_start%
+on_info6 = {+jup_b6_exprisoner_work_on_sci +jup_b6_teleport_2} sr_idle@teleport_post_2 %=teleport_squad(jup_b6_stalker_exprisoner_squad:jup_b6_anom_2_stalker_spawn) +jup_b6_start%
+
+[sr_idle@teleport_post_2]
+on_info = {-jup_b6_teleport_step_2} %=teleport_actor(jup_b6_anom_2_at_stay:jup_b6_anom_2_at_look) +jup_b6_teleport_step_2%
+on_game_timer = 20 | sr_idle@teleport_end_2 %=stop_postprocess(8611) =stop_postprocess(8613) =enable_ui()%
+
+[sr_idle@teleport_end_2]
+on_game_timer = 40 | sr_idle@teleport_to %+jup_b6_zombied_attack_start%
+
+;--------------------------- телепорт обратно к бункеру
+
+[sr_idle@teleportin_home]
+on_game_timer = 20 | %=run_postprocess(black:8615:true) +jup_b6_teleport_step_3%
+on_info =  {+jup_b6_teleport_step_3 -jup_b1_squad_is_dead} sr_idle@teleport_home_post_2 %=teleport_actor(jup_b1_actor_telep_stay_2:jup_b1_actor_telep_look_2) =teleport_squad(jup_b1_stalker_squad:jup_b41_stalker_spawn)%
+on_info2 = {+jup_b6_teleport_step_3 +jup_b6_freedom_employed} sr_idle@teleport_home_post_2 %=teleport_actor(jup_b1_actor_telep_stay_2:jup_b1_actor_telep_look_2) =teleport_squad(jup_b6_stalker_freedom_squad:jup_b41_stalker_spawn)%
+on_info3 = {+jup_b6_teleport_step_3 +jup_b6_duty_employed} sr_idle@teleport_home_post_2 %=teleport_actor(jup_b1_actor_telep_stay_2:jup_b1_actor_telep_look_2) =teleport_squad(jup_b6_stalker_duty_squad:jup_b41_stalker_spawn)%
+on_info4 = {+jup_b6_teleport_step_3 +jup_b6_gonta_employed} sr_idle@teleport_home_post_2 %=teleport_actor(jup_b1_actor_telep_stay_2:jup_b1_actor_telep_look_2) =teleport_squad(jup_b6_stalker_gonta_squad:jup_b41_stalker_spawn)%
+on_info5 = {+jup_b6_teleport_step_3 +jup_b6_exprisoner_work_on_sci} sr_idle@teleport_home_post_2 %=teleport_actor(jup_b1_actor_telep_stay_2:jup_b1_actor_telep_look_2) =teleport_squad(jup_b6_stalker_exprisoner_squad:jup_b41_stalker_spawn)%
+
+[sr_idle@teleport_home_post_2]
+on_info = sr_idle@teleport_to %=stop_postprocess(8614) =stop_postprocess(8615) =enable_ui() -jup_b6_go_to_home%
+
+[sr_idle@end]

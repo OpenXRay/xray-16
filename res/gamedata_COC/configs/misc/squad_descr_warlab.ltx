@@ -1,0 +1,33 @@
+[warlab_pod_stalker_squad]:online_offline_group
+faction = ecolog
+npc = warlab_pod_1_stalker, warlab_pod_2_stalker, warlab_pod_3_stalker, warlab_pod_4_stalker, warlab_pod_5_stalker, warlab_pod_6_stalker, warlab_pod_7_stalker
+target_smart = warlab_common_consciousness_smart_terrain
+story_id = warlab_pod_stalker_squad
+always_arrived = true
+
+[warlab_main_polter_squad]:online_offline_group
+faction = monster
+npc = warlab_main_poltergeist_1, warlab_main_poltergeist_2
+target_smart = warlab_common_consciousness_smart_terrain
+spawn_point = warlab_main_polter_squad_spawn_point
+story_id = warlab_main_polter_squad
+always_arrived = true
+on_death = %+warlab_poltergeist_dead%
+
+[warlab_main_psysucker_squad]:online_offline_group
+faction = monster
+npc = warlab_main_psysucker
+target_smart = warlab_common_consciousness_smart_terrain
+spawn_point = warlab_common_consciousness_smart_terrain_psysucker_home
+story_id = warlab_main_psysucker_squad
+always_arrived = true
+on_death = %+warlab_psysucker_dead%
+
+[warlab_main_psycontroller_squad]:online_offline_group
+faction = monster
+npc = warlab_main_psycontroller
+target_smart = warlab_common_consciousness_smart_terrain
+spawn_point = warlab_common_consciousness_smart_terrain_psycontroller_home
+story_id = warlab_main_psycontroller_squad
+always_arrived = true
+on_death = %+warlab_main_polter_dead%

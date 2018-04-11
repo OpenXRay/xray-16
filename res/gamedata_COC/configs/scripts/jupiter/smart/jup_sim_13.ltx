@@ -1,0 +1,18 @@
+[smart_terrain]
+squad_id = 33
+max_population = 1
+respawn_params = respawn@jup_sim_13
+respawn_idle = 86400
+ 
+
+[respawn@jup_sim_13]
+spawn_dogs
+spawn_tushkano
+
+[spawn_tushkano]
+spawn_squads = simulation_tushkano
+spawn_num = 1
+
+[spawn_dogs]
+spawn_squads = simulation_dog, simulation_pseudodog, simulation_mix_dogs
+spawn_num = 1

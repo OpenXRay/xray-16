@@ -1,0 +1,164 @@
+﻿<?xml version='1.0' encoding="windows-1251"?>
+<xml>
+    <!-------------------------- SIDOROVICH  (esc_m_trader)------------------------>
+    <specific_character id="esc_2_12_stalker_trader" no_random = "1">
+    <name>escape_trader_name</name>
+    <icon>ui_inGame2_sid</icon>
+    <bio>escape_trader_bio</bio>
+    <class>trader</class>
+    <community>trader</community>
+    <map_icon x="1" y="0"/>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <visual>actors\stalker_trader\stalker_trader_1</visual>
+    <rank>35692</rank>
+    <reputation>2302</reputation>
+    <money min="1000000" max="1000000" infinitive="1"/>
+    <supplies>
+        [spawn] \n
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <start_dialog>esc_2_12_stalker_trader_start_dialog</start_dialog>
+    <actor_dialog>dm_ordered_task_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+	<actor_dialog>dm_broker_dialog</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <!-------------------------- NIMBLE TRADER ------------------------>
+    <specific_character id="esc_2_12_stalker_nimble" team_default="1">
+    <name>st_zat_a2_stalker_nimble_name</name>
+    <icon>ui_inGame2_nimble</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Îïûòíûé ñòàëêåð. Äåòàëüíàÿ èíôîðìàöèÿ îòñóòñòâóåò.</bio>
+    <class>esc_2_12_stalker_nimble</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <rank>32472</rank>
+    <reputation>2201</reputation>
+    <money min="1000000" max="1000000" infinitive="1" />
+    <visual>actors\stalker_neutral\stalker_nimble</visual>
+    <supplies>
+        [spawn] \n
+		wpn_binoc \n
+        device_torch \n
+		wpn_knife \n
+        wpn_ak74u \n
+        ammo_5.45x39_fmj = 1 \n
+        wpn_pm \n
+        ammo_9x18_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <start_dialog>esc_2_12_stalker_nimble_start</start_dialog>
+    <actor_dialog>esc_2_12_stalker_nimble_place_order</actor_dialog>
+    <actor_dialog>esc_2_12_stalker_nimble_get_order</actor_dialog>
+    <actor_dialog>esc_2_12_stalker_nimble_about</actor_dialog>
+    <actor_dialog>esc_2_12_stalker_nimble_about_quest</actor_dialog>
+    <actor_dialog>dm_ordered_task_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <!--------------------------------------- WOLF GUARD ----------------------------------------------------->
+    <specific_character id="esc_2_12_stalker_wolf" team_default = "1">
+    <name>esc_wolf_name</name>
+    <icon>ui_inGame2_wolf</icon>
+    <bio>esc_wolf_bio</bio>
+    <class>esc_2_12_stalker_wolf</class>
+    <community>stalker</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <map_icon x="1" y="0"/>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>33136</rank>
+    <reputation>2453</reputation>
+    <money min="600" max="2000" infinitive="0"/>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <crouch_type>-1</crouch_type>
+    <visual>actors\stalker_neutral\stalker_neytral_balon_1</visual>
+    <supplies>
+        [spawn] \n
+        wpn_pm \n
+        ammo_9x18_fmj = 2 \n
+        wpn_pkm \n
+        ammo_pkm_100 = 3 \n
+        device_torch \n
+        hand_radio \n
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <start_dialog>esc_2_12_stalker_wolf_start_dialog</start_dialog>
+    <actor_dialog>dm_ordered_task_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <!--------------------------------------- FANATIC GUARD ----------------------------------------------------->
+    <specific_character id="esc_2_12_stalker_fanat" team_default = "1">
+    <name>esc_fanat_name</name>
+    <icon>ui_inGame2_fanatic</icon>
+    <bio>esc_fanat_bio</bio>
+    <class>esc_2_12_stalker_fanat</class>
+    <community>stalker</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <map_icon x="1" y="0"/>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>16206</rank>
+    <reputation>1725</reputation>
+    <money min="600" max="2000" infinitive="0"/>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <crouch_type>-1</crouch_type>
+    <panic_treshold>0</panic_treshold>
+    <visual>actors\stalker_neutral\stalker_neytral_rukzak_3</visual>
+    <supplies>
+        [spawn] \n
+        wpn_binoc \n
+        wpn_pm \n
+        ammo_9x18_fmj = 3 \n
+        wpn_ak74u \n
+        ammo_5.45x39_fmj = 3 \n
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <start_dialog>esc_2_12_stalker_fanat_start_dialog</start_dialog>
+    <actor_dialog>esc_2_12_stalker_fanat_about_quest</actor_dialog>
+    <actor_dialog>dm_is_actor_companion_dialog</actor_dialog>
+    <actor_dialog>dm_companion_patrol</actor_dialog>
+    <actor_dialog>dm_companion_leave</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <!-------------------------- LONER MECHANIC ------------------------>
+    <specific_character id="esc_smart_terrain_5_7_loner_mechanic_stalker" team_default="1">
+    <name>esc_smart_terrain_5_7_loner_mechanic_stalker_name</name>
+    <icon>ui_inGame2_loner_tech</icon>
+    <bio>ќпытный сталкер. ƒетальна¤ информаци¤ отсутствует.</bio>
+    <class>esc_smart_terrain_5_7_loner_mechanic_stalker</class>
+    <community>stalker</community>
+    <map_icon x="1" y="0"/>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <mechanic_mode>1</mechanic_mode>
+    <rank>6278</rank>
+    <reputation>784</reputation>
+    <visual>actors\stalker_neutral\loner_mechanic_stalker</visual>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_toz34  \n
+        ammo_12x76_zhekan = 1 \n
+        wpn_fort \n
+        ammo_9x18_fmj = 1 \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <actor_dialog>dm_ordered_task_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    <actor_dialog>dm_tech_repair</actor_dialog>
+    </specific_character>
+    
+</xml>

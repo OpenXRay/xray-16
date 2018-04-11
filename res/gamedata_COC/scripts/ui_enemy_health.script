@@ -1,0 +1,106 @@
+--[[
+ui_enemy_health allows the ability to show health progress of last hit enemy if they have db.storage[id].show_health = true
+
+author: Alundaio
+--]]
+
+local progress = nil
+local last_id = nil
+
+function on_game_start()
+	RegisterScriptCallback("monster_on_hit_callback",on_hit)
+	RegisterScriptCallback("npc_on_hit_callback",on_hit)
+	RegisterScriptCallback("heli_on_hit_callback",on_hit)
+end 
+
+function on_hit(obj,power,dir,who,bi)
+	local st = db.storage[obj:id()]
+	if not (st) then 
+		return 
+	end 
+	
+	if not (st.show_health) then
+		-- show health progress for all objects hit by actor if option is enabled
+		if (axr_main.config:r_value("mm_options","enable_show_enemy_health",1,false) == false) then
+			return 
+		end
+	end
+	
+	-- in case object dies by something other than actor
+	if (last_id and last_id == obj:id()) then 
+		local cls = obj:clsid()
+		local is_heli = IsHelicopter(nil,cls)
+		local v = is_heli and obj:get_helicopter():GetfHealth() or obj.health or 0
+		if (v <= 0.005) then
+			cs_remove()
+		end
+	end
+	
+	if (who == nil or who:id() ~= 0) then 
+		return 
+	end
+	
+	local hud = get_hud()
+	if not (hud) then 
+		return 
+	end
+	
+	local cs = hud:GetCustomStatic("cs_enemy_health") 
+	if (cs == nil) then 
+		hud:AddCustomStatic("cs_enemy_health", true)
+		local xml = CScriptXmlInit()
+		xml:ParseFile("ui_enemy_health.xml")
+		cs = hud:GetCustomStatic("cs_enemy_health")
+		local w = cs:wnd()
+		progress = xml:InitProgressBar("enemy_health", w)
+	end
+	
+	if (bi == "from_death_callback") then
+		last_id = nil
+		progress = nil
+		hud:RemoveCustomStatic("cs_enemy_health")
+		return
+	end
+	
+	local cls = obj:clsid()
+	local is_heli = IsHelicopter(nil,cls)
+	local v = is_heli and obj:get_helicopter():GetfHealth() or obj.health or 0
+	if (v > 0.005) then 
+		progress:Show(true)
+		progress:SetProgressPos(v*100)
+		local text = ""
+		if (is_heli) then 
+			text = "Helicopter"
+		elseif (IsStalker(nil,cls)) then 
+			text = obj:character_name()
+		else 
+			local sid = get_object_story_id(obj:id())
+			if (sid) then 
+				text = game.translate_string(sid)
+			end
+		end
+		cs:wnd():TextControl():SetText(text)
+		
+		-- Auto-remove Custom Static after 30s unless hit again
+		RemoveTimeEvent("ui_enemy_health","cs_remove")
+		local function remove_me()
+			cs_remove()
+		end
+		CreateTimeEvent("ui_enemy_health","cs_remove",10,remove_me)
+		last_id = obj:id()
+	else
+		last_id = nil
+		progress = nil
+		hud:RemoveCustomStatic("cs_enemy_health")
+	end
+end
+
+function cs_remove()
+	last_id = nil
+	progress = nil
+	local hud = get_hud()
+	local cs = hud and hud:GetCustomStatic("cs_enemy_health") 
+	if (cs) then
+		hud:RemoveCustomStatic("cs_enemy_health")
+	end
+end

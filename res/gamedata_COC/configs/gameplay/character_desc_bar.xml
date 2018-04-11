@@ -1,0 +1,800 @@
+<?xml version='1.0' encoding="windows-1251"?>
+<xml>
+    <!-------------------------- BARMAN ------------------------>
+    <specific_character id="bar_visitors_barman_stalker_trader" team_default = "1">
+    <name>bar_barmen_name</name>
+    <icon>ui_inGame2_barman</icon>
+    <map_icon x="1" y="4"></map_icon>
+    <bio>bar_barmen_bio</bio>
+    <class>bar_visitors_barman_stalker_trader</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <money min="1000000" max="1000000" infinitive="1"></money>
+    <rank>28980</rank>
+    <reputation>2408</reputation>
+    <visual>actors\barman\barman</visual>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <crouch_type>-1</crouch_type>
+    <supplies></supplies>
+        <start_dialog>bar_visitors_barman_stalker_trader_start_dialog</start_dialog>
+		<actor_dialog>dm_broker_dialog</actor_dialog>
+        <actor_dialog>actor_break_dialog</actor_dialog>
+        </specific_character>
+        
+        <!-------------------------- GARIK ------------------------>
+        <specific_character id="bar_visitors_garik_stalker_guard" team_default = "1">
+        <name>bar_bar_guard_name</name>
+        <icon>ui_inGame2_garik_guard</icon>
+        <map_icon x="0" y="0"></map_icon>
+        <bio>bar_bar_guard_bio</bio>
+        <class>bar_visitors_garik_stalker_guard</class>
+        <community>stalker</community> <terrain_sect>stalker_terrain</terrain_sect>
+        <money min="200" max="600" infinitive="0"></money>
+        <rank>14654</rank>
+        <reputation>976</reputation>
+        <visual>actors\stalker_neutral\stalker_bar_security</visual>
+        <snd_config>characters_voice\human_01\stalker\</snd_config>
+        <crouch_type>-1</crouch_type>
+        <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_fmj \n
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <!-------------------------- ZHORIK ------------------------>
+    <specific_character id="bar_visitors_zhorik_stalker_guard2" team_default = "1">
+    <name>bar_bar_guard2_name</name>
+    <icon>ui_inGame2_zhorik_guard</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>bar_bar_guard2_bio</bio>
+    <class>bar_visitors_zhorik_stalker_guard2</class>
+    <community>stalker</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <money min="200" max="600" infinitive="0"></money>
+    <rank>13032</rank>
+    <reputation>817</reputation>
+    <visual>actors\stalker_neutral\stalker_bar_security</visual>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <crouch_type>-1</crouch_type>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_fmj \n
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <!---------------------------VORONIN---------------------->
+    <specific_character id="bar_dolg_leader" team_default = "1">
+    <name>bar_voronin_name</name>
+    <icon>ui_inGame2_voronin</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>bar_voronin_bio</bio>
+    <class>bar_dolg_leader</class>
+    <community>dolg</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <money min="5000" max="10000" infinitive="0"></money>
+    <rank>21092</rank>
+    <reputation>1215</reputation>
+    <visual>actors\stalker_dolg\stalker_do_komandir</visual>
+    <snd_config>characters_voice\human_01\dolg\</snd_config>
+    <crouch_type>0</crouch_type>
+    <supplies>
+        [spawn] \n
+        wpn_sig220 \n
+        ammo_11.43x23_hydro \n
+        wpn_val \n
+        ammo_9x39_pab9 = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <start_dialog>hello_dialog</start_dialog>
+	<actor_dialog>dm_broker_dialog</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <!-------------------------- KITSENKO ------------------------>
+    <specific_character id="bar_zastava_2_commander" team_default = "1">
+    <name>bar_kicenko_name</name>
+    <icon>ui_inGame2_kitsenko</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>sim_dolg_veteran_bio</bio>
+    <class>bar_zastava_2_commander</class>
+    <community>dolg</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <money min="600" max="2000" infinitive="0"></money>
+    <rank>16068</rank>
+    <reputation>524</reputation>
+    <visual>actors\dolg\stalker_do_balon_1</visual>
+    <snd_config>characters_voice\human_01\dolg\</snd_config>
+    <crouch_type>0</crouch_type>
+    <supplies>
+        [spawn] \n
+        wpn_walther \n
+        ammo_9x19_fmj \n
+        wpn_abakan \n
+        ammo_5.45x39_fmj \n
+        detector_advanced \n
+        device_torch \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <specific_character id="bar_duty_security_squad_leader" team_default = "1">
+    <name>st_bar_duty_security_squad_leader_name</name>
+    <icon>ui_inGame2_Dolg_4</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>bar_duty_security_squad_leader</class>
+    <community>dolg</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\dolg\</snd_config>
+    <rank>21336</rank>
+    <reputation>2303</reputation>
+    <money min="1500" max="3500" infinitive="0"/>
+    <visual>actors\stalker_dolg\stalker_dolg_4</visual>
+    <supplies>
+        [spawn] \n
+        wpn_groza = 1 \n
+        ammo_9x39_pab9 = 1 \n
+        wpn_usp \n
+        ammo_11.43x23_hydro = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs_no_guide.xml"
+    </specific_character>
+    
+    <!-------------------------- ZONEGUARD ------------------------>
+    <specific_character id="bar_dolg_general_zoneguard_stalker" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_Dolg_3</icon>
+    <map_icon x="4" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>bar_dolg_general_zoneguard_stalker</class>
+    <community>dolg</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <money min="200" max="600" infinitive="0"></money>
+    <rank>14168</rank>
+    <reputation>-2060</reputation>
+    <visual>actors\stalker_dolg\stalker_dolg_3</visual>
+    <snd_config>characters_voice\human_01\dolg\</snd_config>
+    <crouch_type>0</crouch_type>
+    <supplies>
+        [spawn] \n
+        wpn_walther \n
+        ammo_9x19_fmj \n
+        wpn_abakan \n
+        ammo_5.45x39_fmj \n
+        device_torch \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <!--------------------------- PETRENKO ---------------------->
+    <specific_character id="bar_dolg_general_petrenko_stalker" team_default = "1">
+    <name>bar_petrenko_name</name>
+    <icon>ui_inGame2_petrenko</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>bar_petrenko_bio</bio>
+    <class>bar_dolg_general_petrenko_stalker</class>
+    <community>dolg</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <money min="1000000" max="1000000" infinitive="1"></money>
+    <rank>15352</rank>
+    <reputation>270</reputation>
+    <visual>actors\stalker_dolg\stalker_do_balon_3</visual>
+    <snd_config>characters_voice\human_01\dolg\</snd_config>
+    <crouch_type>0</crouch_type>
+    <supplies>
+        [spawn] \n
+        wpn_walther \n
+        ammo_9x19_fmj \n
+        wpn_groza \n
+        ammo_9x39_ap \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <actor_dialog>dm_ordered_task_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+    <actor_dialog>dm_broker_dialog</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <!------------ bar_visitors_stalker_mechanic ---------------------------->
+    <specific_character id="bar_visitors_stalker_mechanic" team_default = "1">
+    <name>bar_visitors_stalker_mechanic_name</name>
+    <icon>ui_inGame2_dolg_tech</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>bar_visitors_stalker_mechanic</class>
+    <community>dolg</community> 
+	<terrain_sect>stalker_terrain</terrain_sect>
+    <mechanic_mode>1</mechanic_mode>
+    <snd_config>characters_voice\human_01\dolg\</snd_config>
+    <rank>3384</rank>
+    <reputation>376</reputation>
+    <money min="1500" max="3500" infinitive="0"/>
+    <visual>actors\stalker_dolg\stalker_dolg_mehanik</visual>
+    <supplies></supplies>
+#include "gameplay\character_criticals.xml"
+        <start_dialog>bar_visitors_stalker_mechanic_start</start_dialog>
+        <actor_dialog>dm_ordered_task_dialog</actor_dialog>
+        <actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+        <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+        <actor_dialog>dm_tech_repair</actor_dialog>
+        <actor_dialog>bar_visitors_stalker_mechanic_drink_1</actor_dialog>
+        <actor_dialog>bar_visitors_stalker_mechanic_drink_2</actor_dialog>
+        <actor_dialog>bar_visitors_stalker_mechanic_drink_3</actor_dialog>
+        <actor_dialog>actor_break_dialog</actor_dialog>
+        </specific_character>
+        
+        <!-- ******************* ARENA ********************** -->
+        <specific_character id="bar_arena_manager" team_default = "1">
+        <name>bar_arny_name</name>
+        <icon>ui_inGame2_arnie</icon>
+        <map_icon x="1" y="6"></map_icon>
+        <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+        <class>bar_arena_manager</class>
+        <community>stalker</community> <terrain_sect>stalker_terrain</terrain_sect>
+        <money min="600" max="2000" infinitive="0"></money>
+        <rank>6580</rank>
+        <reputation>265</reputation>
+        <visual>actors\neytral\stalker_neytral_balon_6</visual>
+        <snd_config>characters_voice\human_01\stalker\</snd_config>
+        <crouch_type>-1</crouch_type>
+        <supplies>
+        [spawn] \n
+        wpn_lr300 \n
+        ammo_5.56x45_ap = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <start_dialog>bar_arena_manager_start</start_dialog>
+    <actor_dialog>bar_arena_manager_rules</actor_dialog>
+    <actor_dialog>bar_arena_manager_info</actor_dialog>
+    <actor_dialog>bar_arena_man_job</actor_dialog>
+    <actor_dialog>bar_arena_manager_game</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <specific_character id="bar_arena_guard" team_default = "1">
+    <name>bar_lelik_name</name>
+    <icon>ui_inGame2_lelik_guard</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>bar_arena_guard</class>
+    <community>stalker</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <money min="200" max="600" infinitive="0"></money>
+    <rank>12850</rank>
+    <reputation>847</reputation>
+    <visual>actors\stalker_neutral\stalker_bar_security</visual>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <crouch_type>-1</crouch_type>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_fmj \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <!------------------------OLD ARENA----------------------------------->
+    <specific_character id="bar_arena_savage" team_default = "1">
+    <name>bar_beast_name</name>
+    <icon>ui_inGame2_Zombied_4</icon>
+    <map_icon x="2" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>bar_arena_savage</class>
+    <community>arena_enemy</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <money min="2000" max="5000" infinitive="0"></money>
+    <rank>27850</rank>
+    <reputation>-1269</reputation>
+    <visual>actors\stalker_zombied\stalker_zombied_4</visual>
+    <snd_config>characters_voice\human_03\zombied\</snd_config>
+    <crouch_type>0</crouch_type>
+    <supplies>
+        [spawn] \n
+        wpn_spas12 \n
+        ammo_12x70_buck \n
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <!------------------------NEW ARENA----------------------------------->
+    <!---------------------------STALKER 1---------------------->
+    <specific_character id="bar_arena_stalker_1" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_neutral_2_mask</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>bar_arena_stalker</bio>
+    <class>bar_arena_stalker_1</class>
+    <community>arena_enemy</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>3296</rank>
+    <reputation>2487</reputation>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <crouch_type>-1</crouch_type>
+    <visual>actors\stalker_neutral\stalker_neutral2a_mask</visual>
+    <supplies>
+        [spawn] \n
+        wpn_pm \n
+        ammo_9x18_fmj = 1 \n
+        device_torch \n
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-----------------STALKER 2---------------------------------->
+    <specific_character id="bar_arena_stalker_2" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_neutral_2_mask</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>bar_arena_stalker</bio>
+    <class>bar_arena_stalker_2</class>
+    <community>arena_enemy</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>3912</rank>
+    <reputation>2099</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral2g_mask</visual>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <crouch_type>-1</crouch_type>
+    <supplies>
+        [spawn] \n
+        wpn_mp5 \n
+        ammo_9x19_pbp = 1 \n
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!--------------------STALKER 3_1 and 3_2---------------------->
+    <specific_character id="bar_arena_stalker_3_1" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_neutral_2_mask</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>bar_arena_stalker</bio>
+    <class>bar_arena_stalker_3_1</class>
+    <community>arena_enemy</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>5034</rank>
+    <reputation>-253</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral_2_mas3</visual>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <crouch_type>-1</crouch_type>
+    <supplies>
+        [spawn] \n
+        wpn_toz34 \n
+        ammo_12x76_zhekan = 1 \n
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="bar_arena_stalker_3_2" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_neutral_2_mask</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>bar_arena_stalker</bio>
+    <class>bar_arena_stalker_3_2</class>
+    <community>arena_enemy</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>3936</rank>
+    <reputation>-1138</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral2g_mask</visual>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <crouch_type>-1</crouch_type>
+    <supplies>
+        [spawn] \n
+        wpn_toz34 \n
+        ammo_12x76_zhekan = 1 \n
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!---------------STALKER 4_1, 4_2, 4_3,4_4,4_5--------------->
+    <!---enemy--->
+    <specific_character id="bar_arena_stalker_4_1" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_neutral_2_mask</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>bar_arena_stalker</bio>
+    <class>bar_arena_stalker_4_1</class>
+    <community>arena_enemy</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>3748</rank>
+    <reputation>128</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral2g_mask</visual>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <crouch_type>-1</crouch_type>
+    <supplies>
+        [spawn] \n
+        wpn_spas12 \n
+        ammo_12x70_buck = 1 \n
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="bar_arena_stalker_4_2" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_neutral_2_mask</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>bar_arena_stalker</bio>
+    <class>bar_arena_stalker_4_2</class>
+    <community>arena_enemy</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>3810</rank>
+    <reputation>-377</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral_2_mas3</visual>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <crouch_type>-1</crouch_type>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 = 1, 0, 1, 0 \n
+        ammo_5.45x39_ap = 1 \n
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="bar_arena_stalker_4_3" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_neutral_nauchniy</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>bar_arena_stalker</bio>
+    <class>bar_arena_stalker_4_3</class>
+    <community>arena_enemy</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>14674</rank>
+    <reputation>-2143</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral_nauchniy</visual>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <crouch_type>-1</crouch_type>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 = 1, 0, 1, 0 \n
+        ammo_5.45x39_ap = 1 \n
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!----friends---->
+    <specific_character id="bar_arena_stalker_4_4" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_neutral_1</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>bar_arena_stalker</bio>
+    <class>bar_arena_stalker_4_4</class>
+    <community>stalker</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>24756</rank>
+    <reputation>-911</reputation>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <crouch_type>-1</crouch_type>
+    <visual>actors\stalker_neutral\stalker_neutral1a</visual>
+    <supplies>
+        [spawn] \n
+        wpn_bm16 \n
+        ammo_12x70_buck \n
+        device_torch \n
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="bar_arena_stalker_4_5" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_neutral_1</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>bar_arena_stalker</bio>
+    <class>bar_arena_stalker_4_5</class>
+    <community>stalker</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>19258</rank>
+    <reputation>2016</reputation>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <crouch_type>-1</crouch_type>
+    <visual>actors\stalker_neutral\stalker_neutral1b</visual>
+    <supplies>
+        [spawn] \n
+        wpn_ak74u \n
+        ammo_5.45x39_fmj \n
+        device_torch \n
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!------------STALKER 5_1,5_2------------------------->
+    <specific_character id="bar_arena_stalker_5_1" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_Soldier_4</icon>
+    <map_icon x="2" y="2"></map_icon>
+    <bio>bar_arena_stalker</bio>
+    <team>Soldier_military</team>
+    <class>bar_arena_stalker_5_1</class>
+    <community>arena_enemy</community>
+	<terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\military\</snd_config>
+    <crouch_type>-1</crouch_type>
+    <rank>11394</rank>
+    <reputation>324</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_4</visual>
+    <supplies>
+        [spawn] \n
+        wpn_val \n
+        ammo_9x39_pab9 = 1 \n
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="bar_arena_stalker_5_2" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_Soldier_4</icon>
+    <map_icon x="2" y="2"></map_icon>
+    <bio>bar_arena_stalker</bio>
+    <team>Soldier_military</team>
+    <class>bar_arena_stalker_5_2</class>
+    <community>arena_enemy</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\military\</snd_config>
+    <crouch_type>-1</crouch_type>
+    <rank>12948</rank>
+    <reputation>-23</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_4</visual>
+    <supplies>
+        [spawn] \n
+        wpn_groza \n
+        ammo_9x39_pab9 = 1 \n
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!---------------STALKER 6_1,6_2,6_3,6_4,6_5,6_6------------->
+    <specific_character id="bar_arena_stalker_6_1" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_bandit_3</icon>
+    <map_icon x="3" y="2"></map_icon>
+    <bio>sim_bandit_general_bio</bio>
+    <class>bar_arena_stalker_6_1</class>
+    <community>arena_enemy</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>4508</rank>
+    <reputation>340</reputation>
+    <visual>actors\stalker_bandit\stalker_bandit_3</visual>
+    <snd_config>characters_voice\human_02\bandit\</snd_config>
+    <crouch_type>-1</crouch_type>
+    <supplies>
+        [spawn] \n
+        wpn_bm16 \n
+        ammo_12x70_buck \n
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="bar_arena_stalker_6_2" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_bandit_4</icon>
+    <map_icon x="3" y="2"></map_icon>
+    <bio>sim_bandit_general_bio</bio>
+    <class>bar_arena_stalker_6_2</class>
+    <community>arena_enemy</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>2380</rank>
+    <reputation>601</reputation>
+    <visual>actors\stalker_bandit\stalker_bandit_4</visual>
+    <snd_config>characters_voice\human_02\bandit\</snd_config>
+    <crouch_type>-1</crouch_type>
+    <supplies>
+        [spawn] \n
+        wpn_toz34 \n
+        ammo_12x70_buck = 1 \n
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="bar_arena_stalker_6_3" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_bandit_4</icon>
+    <map_icon x="3" y="2"></map_icon>
+    <bio>sim_bandit_general_bio</bio>
+    <class>bar_arena_stalker_6_3</class>
+    <community>arena_enemy</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>2352</rank>
+    <reputation>-928</reputation>
+    <visual>actors\stalker_bandit\stalker_bandit_4</visual>
+    <snd_config>characters_voice\human_02\bandit\</snd_config>
+    <crouch_type>-1</crouch_type>
+    <supplies>
+        [spawn] \n
+        wpn_ak74u \n
+        ammo_5.45x39_fmj \n
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="bar_arena_stalker_6_4" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_bandit_5</icon>
+    <map_icon x="3" y="2"></map_icon>
+    <bio>sim_bandit_general_bio</bio>
+    <class>bar_arena_stalker_6_4</class>
+    <community>arena_enemy</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>1394</rank>
+    <reputation>2189</reputation>
+    <visual>actors\stalker_bandit\stalker_bandit5a</visual>
+    <snd_config>characters_voice\human_02\bandit\</snd_config>
+    <crouch_type>-1</crouch_type>
+    <supplies>
+        [spawn] \n
+        wpn_mp5 \n
+        ammo_9x19_pbp = 1 \n
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="bar_arena_stalker_6_5" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_bandit_exo</icon>
+    <map_icon x="3" y="2"></map_icon>
+    <bio>sim_bandit_general_bio</bio>
+    <class>bar_arena_stalker_6_5</class>
+    <community>arena_enemy</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>21894</rank>
+    <reputation>-918</reputation>
+    <visual>actors\stalker_bandit\stalker_bandit_exo</visual>
+    <snd_config>characters_voice\human_02\bandit\</snd_config>
+    <crouch_type>-1</crouch_type>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 = 1, 0, 1, 0 \n
+        ammo_5.45x39_ap = 1 \n
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="bar_arena_stalker_6_6" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_bandit_exo</icon>
+    <map_icon x="3" y="2"></map_icon>
+    <bio>sim_bandit_general_bio</bio>
+    <class>bar_arena_stalker_6_6</class>
+    <community>arena_enemy</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>21416</rank>
+    <reputation>2459</reputation>
+    <visual>actors\stalker_bandit\stalker_bandit_exo</visual>
+    <snd_config>characters_voice\human_02\bandit\</snd_config>
+    <crouch_type>-1</crouch_type>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 = 1, 0, 1, 0 \n
+        ammo_5.45x39_ap = 1 \n
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!------ STALKER 7 ------------------->
+    <specific_character id="bar_arena_stalker_7" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_neutral_4</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>sim_stalker_master_bio</bio>
+    <class>bar_arena_stalker_7</class>
+    <community>arena_enemy</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>23452</rank>
+    <reputation>1833</reputation>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <crouch_type>0</crouch_type>
+    <visual>actors\stalker_neutral\stalker_neutral_4</visual>
+    <supplies>
+        [spawn] \n
+        wpn_fn2000 \n
+        ammo_5.56x45_ap = 1 \n
+        device_torch \n
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-----------STALKER 8_1,8_2,8_3,8_4-------------------->
+    <specific_character id="bar_arena_stalker_8_1" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_neutral_4</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>sim_stalker_master_bio</bio>
+    <class>bar_arena_stalker_8_1</class>
+    <community>arena_enemy</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>25994</rank>
+    <reputation>1730</reputation>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <crouch_type>0</crouch_type>
+    <visual>actors\stalker_neutral\stalker_neutral_4</visual>
+    <supplies>
+        [spawn] \n
+        wpn_g36 \n
+        ammo_5.56x45_ss190 = 1 \n
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="bar_arena_stalker_8_2" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_neutral_4</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>sim_stalker_master_bio</bio>
+    <class>bar_arena_stalker_8_2</class>
+    <community>arena_enemy</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>23830</rank>
+    <reputation>-2205</reputation>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <crouch_type>0</crouch_type>
+    <visual>actors\stalker_neutral\stalker_neutral_4</visual>
+    <supplies>
+        [spawn] \n
+        wpn_g36 \n
+        ammo_5.56x45_ss190 = 1 \n
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="bar_arena_stalker_8_3" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_neutral_4</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>sim_stalker_master_bio</bio>
+    <class>bar_arena_stalker_8_3</class>
+    <community>arena_enemy</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>25054</rank>
+    <reputation>972</reputation>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <crouch_type>0</crouch_type>
+    <visual>actors\stalker_neutral\stalker_neutral_4</visual>
+    <supplies>
+        [spawn] \n
+        wpn_g36 \n
+        ammo_5.56x45_ss190 = 1 \n
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="bar_arena_stalker_8_4" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_neutral_4</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>sim_stalker_master_bio</bio>
+    <class>bar_arena_stalker_8_4</class>
+    <community>arena_enemy</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>24382</rank>
+    <reputation>-433</reputation>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <crouch_type>0</crouch_type>
+    <visual>actors\stalker_neutral\stalker_neutral_4</visual>
+    <supplies>
+        [spawn] \n
+        wpn_g36 \n
+        ammo_5.56x45_ss190 = 1 \n
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+</xml>

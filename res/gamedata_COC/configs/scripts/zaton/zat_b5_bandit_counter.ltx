@@ -1,0 +1,22 @@
+[logic]
+active = nil ;sr_idle@start
+
+[sr_idle@start]
+on_game_timer = 20 |  sr_idle@one %=set_counter(bandits_death) =set_counter(trader_death)%
+on_info = {+zat_b5_task_end} sr_idle@nil
+
+[sr_idle@one]
+on_info = {=counter_greater(bandits_death:4) -zat_b5_bandits_death} sr_idle@timer %+zat_b5_bandits_death%
+on_info2 = {=counter_greater(killer_death:2) -zat_b5_dealer_squad_death} sr_idle@timer %+zat_b5_dealer_squad_death%
+on_info3 = {+zat_b5_task_end} sr_idle@nil
+
+[sr_idle@timer]
+on_game_timer = 20 | sr_idle@two
+on_info = {+zat_b5_task_end}
+
+[sr_idle@two]
+on_info = {=counter_greater(bandits_death:4) -zat_b5_bandits_death} sr_idle@two %+zat_b5_bandits_death%
+on_info2 = {=counter_greater(killer_death:2) -zat_b5_dealer_squad_death} sr_idle@two %+zat_b5_dealer_squad_death%
+on_info3 = {+zat_b5_task_end} sr_idle@nil
+
+[sr_idle@nil]

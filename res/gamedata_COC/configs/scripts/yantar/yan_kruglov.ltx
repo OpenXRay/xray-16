@@ -1,0 +1,34 @@
+[logic@yan_kruglov]
+suitable = {=check_npc_name(yan_ecolog_kruglov)} true
+prior = 200
+active = animpoint@yan_kruglov_cover
+level_spot = mechanic
+
+[animpoint@yan_kruglov_cover]
+cover_name = yan_kruglov_cover
+avail_animations = animpoint_stay_ohrana
+use_camp = false
+meet = meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+reach_movement = run
+
+[meet]
+close_snd_hello = meet_hello
+close_snd_bye    = nil
+close_anim       = nil
+close_victim    = nil
+far_anim       = nil
+far_victim       = nil
+close_distance  = 0
+far_distance    = 0
+close_snd_distance = 3
+abuse           = false
+use = {=actor_enemy} false, true
+allow_break = false
+meet_on_talking = false
+

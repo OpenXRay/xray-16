@@ -1,0 +1,53 @@
+;[logic]
+;active = ph_door@locked
+
+;[ph_door@locked]
+;locked = true
+;closed = true
+;tip_open = tip_door_coded
+;on_info = {=actor_has_decoder} ph_door@coded
+
+;[ph_door@coded]
+;locked = true
+;closed = true
+;tip_open = tip_door_decode
+;on_info = {!actor_has_decoder} ph_door@locked
+;on_use = ph_door@decoding %+sar_access_decoding%
+
+;[ph_door@decoding]
+;locked = true
+;closed = true
+;tip_open = tip_door_decoding
+;on_info = {+sar_finish_decoding} ph_door@unlocked
+
+;[ph_door@unlocked]
+;locked = false
+;closed = false
+;show_tips = false
+
+[logic]
+active = ph_door@close
+
+[ph_door@close]
+locked = false
+closed = true
+snd_open_start = trader_door_open_start
+snd_close_start = trader_door_close_start
+snd_close_stop = trader_door_close_stop
+on_use = ph_door@open
+hit_on_bone = 1|ph_door@free|2|ph_door@free
+
+[ph_door@open]
+locked = false
+closed = false
+snd_open_start = trader_door_open_start
+snd_close_start = trader_door_close_start
+snd_close_stop = trader_door_close_stop
+on_use = ph_door@close
+hit_on_bone = 1|ph_door@free|2|ph_door@free
+
+[ph_door@free]
+locked = false
+closed = true
+no_force = true
+on_use = ph_door@open

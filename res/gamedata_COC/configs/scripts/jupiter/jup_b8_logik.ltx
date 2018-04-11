@@ -1,0 +1,38 @@
+[logic]
+active = nil;sr_idle
+
+[sr_idle]
+on_info = {+jup_b8_give_task} sr_idle@1
+
+[sr_idle@1]
+on_info = {+jup_b8_heli_4_searching -jup_b8_heli_4_searched} sr_idle@timer %=disable_ui =run_postprocess(fade_in:2215)%
+
+[sr_idle@timer]
+on_game_timer = 20 | sr_idle@fade_out %=run_postprocess(black:2216:true) =create_cutscene_actor_with_weapon(jup_b8_actor_visual_stalker:jup_b8_actor_visual_stalker_walk:0:140)%
+
+[sr_idle@fade_out]
+on_game_timer = 20 | sr_cutscene %=stop_postprocess(2215) =stop_postprocess(2216) +play_sound_heli_4%
+
+[sr_cutscene]
+point = jup_b8_actor_visual_stalker_walk
+look = jup_b8_actor_visual_stalker_look
+global_cameffect = true
+enable_ui_on_end = false
+outdoor = true
+cam_effector = scenario_cam\jupiter\jup_b8_heli_4_camera
+on_signal = cameff_end | sr_idle@end %=run_postprocess(black:2218:true)%
+on_signal2 = cam_effector_stop | sr_idle@end %=run_postprocess(black:2218:true)%
+on_info = {+jup_b8_heli_4_sound -jup_b8_heli_after_camera_fade} %+jup_b8_heli_after_camera_fade =run_postprocess(fade_in:2217)%
+on_info2 = {+zat_b101_jup_b8_camera_one_stop -zat_b101_heli_5_searching} %=stop_sr_cutscene%
+on_info3 = {+zat_b101_jup_b8_camera_both_stop} %=stop_sr_cutscene%
+on_info4 = {+jup_b8_actor_hit} %=stop_sr_cutscene%
+
+[sr_idle@end]
+on_game_timer = 10 | %+jup_b8_heli_4_searched%
+on_info = {+jup_b8_heli_4_searched} sr_idle@nil %=stop_postprocess(2217) =stop_postprocess(2218) =enable_ui =teleport_actor(jup_b8_actor_visual_stalker_walk:jup_b8_actor_visual_stalker_look)% 
+
+[sr_idle@nil]
+on_info = {-save_jup_b8_searched_heli_4} %+save_jup_b8_searched_heli_4 =scenario_autosave(st_save_jup_b8_searched_heli_4)%
+on_info2 = {+save_jup_b8_searched_heli_4} sr_idle@nil2
+
+[sr_idle@nil2]

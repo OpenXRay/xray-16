@@ -1,0 +1,209 @@
+;-------------------------------------------------------------------------------
+;----- УАЗ 452 «буханка» -------------------------------------------------------
+;-------------------------------------------------------------------------------
+
+[car_definition]
+
+;camera_pos			= -0.46, 1.94, 1.25	;смещение камеры в кабине влево-вправо, вверх-вниз, вперед-назад
+camera_pos				= -0.3, 1.8, 1.2
+
+driving_wheels			= front_left_wheel,front_right_wheel   ; ведущие колёса;back_left_wheel,back_right_wheel,
+steering_wheels			= front_left_wheel,front_right_wheel                                    ; рулевые колёса
+breaking_wheels			= front_left_wheel,front_right_wheel,back_left_wheel,back_right_wheel   ; тормозящие колёса
+doors				= left_door,right_door                                                  ; двери
+steer				= stearing_wheel                                                        ; руль
+driver_place			= seat_left                                                             ; место водителя
+exhausts			= exhausts                                                              ; выхлопная труба
+exhaust_particles		= vehiclefx\exhaust_1
+
+;------ Factory parameters of Engine -------------------------------------------
+
+fuel_tank			= 80		; L
+fuel_consumption		= 2.6		; L / (100k R); liters per 100 000 rotations
+engine_power			= 65 ;55		; horse_power (kW=hp*0.808) max power
+max_power_rpm			= 4000		; (nominal rpm ) on this rpm value engine power reaches maximum
+max_torque_rpm			= 3000		; on this rpm engine torque reaches maximum
+
+power_increment_factor	= 0.02
+power_decrement_factor	= 0.1
+rpm_increment_factor	= 0.08 ;0.1
+rpm_decrement_factor	= 0.4
+m_power_neutral_factor	= 0.25
+
+; additional engine parameters
+
+max_engine_rpm    	    = 4600			; rpm (5000) rpm will never be more
+idling_engine_rpm		= 850 ;1850       	; rpm (750) min rpm - starts from this rpm value
+
+;------ Adjustment a wheel -----------------------------------------------------
+
+reference_radius  		= 0.44 ;0.38		; Радиус колеса, используемый при просчёте двигателя
+axle_friction     		= 0.0001	; Ослабление скорости в нейтральной позиции. (N*m)
+steering_speed    		= 0.8       ; Время поворота рулевого колеса, в максимум. rps (1)
+steering_torque   		= 90000		; Сила гидроусилителя руля. (N*m)
+break_torque      		= 0.065      ; Сила тормозных колодок. (N*m)
+break_time        		= 1.0       ; время нарастания силы торможения до максимума, при подтормаживании (стрелка назад)
+hand_break_torque 	    = 0.055      ; сила торможения пробелом (по умолчанию = break_torque)
+
+;------ Gearbox ----------------------------------------------------------------
+
+main_gear_ratio    		= 17.3 ;7.3        	; Передаточное отношение
+auto_transmission  		= on            ; Автоматическая коробка (on/off)
+
+[transmission_gear_ratio]
+										; shift down/ shift up. (rpm, необходимое для переключения)
+R                  		= 4.9, 2500,4250	
+N1                 		= 4.73, 2500,4250
+N2                 		= 3.29, 2800,4250
+N3                 		= 2.39, 3200,4250
+N4                 		= 1.96, 4000,4250
+
+;------ Rest Adjustment --------------------------------------------------------
+
+[lights]
+headlights         		= f1,f2
+
+[f1]
+bone               		= left_light
+color              		= 1.0,1.0,1.0,1.0
+range              		= 25
+cone_angle         		= 60
+spot_texture       		= lights\lights_blamplight
+glow_texture       		= glow\glow_Yellow
+glow_radius        		= 1.5
+
+[f2]
+bone               		= right_light
+color              		= 2.0,1.0,1.0,1.0
+range              		= 25
+cone_angle         		= 60
+spot_texture       		= lights\lights_blamplight
+glow_texture       		= glow\glow_Yellow
+glow_radius        		= 1.5
+
+[car_sound]
+snd_volume         		= 1.0
+snd_name           		= car\veh_uaz\engine_run
+engine_sound_start_dellay	= 0.5
+engine_start			= car\veh_uaz\engine_start
+engine_stop		        = car\veh_uaz\engine_stop
+transmission_switch		= car\veh_uaz\gearchange
+explosion_sound    		= weapons\heli_explosion
+relative_pos       		= 0.0,0.5,1.5.
+
+;------ damage params ----------------------------------------------------------
+
+[damage_particles]
+
+explosion_particles	= explosions\expl_car
+car_damage_particles1	= explosions\expl_car_smoke_small
+car_damage_particles2	= explosions\expl_car_smoke_big
+wheels_damage_particles1	= vehiclefx\exhaust_1
+wheels_damage_particles2	= vehiclefx\exhaust_1
+
+particle_bones1		= root	;front_bamper
+particle_bones2		= root
+
+;------ particle bones ---------------------------------------------------------
+
+[particle_bones]
+root			= 0,-0.5,1
+;front_bamper	= 0,0,0
+
+;------ damage items -----------------------------------------------------------
+
+[damage_items]
+back_left_wheel   		= 5000
+back_right_wheel  		= 5000
+front_left_wheel  		= 5000
+front_right_wheel 		= 5000
+left_door         		= 2000
+right_door        		= 2000
+;kabina			        = 5000 ;only wheel and doors bones allowed for damage defs
+
+;------ collisiondamage --------------------------------------------------------
+
+[collision_damage]
+root			        = 0.0001
+;front_bamper	        = 0.001
+;kabina			        = 0.001
+;left_door		        = 0.0001
+;right_door		        = 0.0001
+;back_door		        = 0.0001
+back_left_wheel		    = 0.00001
+back_right_wheel	    = 0.00001
+front_left_wheel	    = 0.00001
+front_right_wheel	    = 0.00001
+
+;------ damage bones -----------------------------------------------------------
+
+[damage_bones]          ;аналогично секции в актере, но без анимаций
+;bone_name     			= <hit_scale>,<-1>,<wound_scale>
+;<hit_scale> 			- коэфф. изменения хита (уменьшения здоровья)
+;<wound_scale> 			- коэфф. изменения величины открытой раны - незадействован
+
+default       			= 1, -1, 0.1
+
+[immunities]
+;burn_immunity         	= 0.0       ;коэффициенты иммунитета
+;strike_immunity       	= 0.0
+;shock_immunity        	= 0.0
+;wound_immunity        	= 0.0
+;radiation_immunity    	= 0.0
+;telepatic_immunity    	= 0.0
+;chemical_burn_immunity 	= 0.0
+;explosion_immunity    	= 0.0
+;fire_wound_immunity   	= 0.0
+
+burn_immunity         	= 0.04       ;коэффициенты иммунитета
+strike_immunity       	= 0.004
+shock_immunity        	= 0.001
+wound_immunity        	= 0.0
+radiation_immunity    	= 0.0
+telepatic_immunity    	= 0.0
+chemical_burn_immunity 	= 0.0
+explosion_immunity    	= 0.2
+fire_wound_immunity   	= 0.04
+;----------------explosion params-----------------------------------------------
+
+[explosion]
+blast					= 20
+blast_r					= 5
+blast_impulse			= 500
+frags		        	= 15
+frags_r			        = 30
+frag_hit			    = 0.5
+frag_hit_impulse		= 350
+hit_type_blast		    = explosion
+hit_type_frag		    = fire_wound
+up_throw_factor		    = 0.25
+wm_size             	= 0.1
+explode_particles		= explosions\expl_vehichels
+light_color		        = 0.6,0.5,0.3
+light_range		        = 15.0
+light_time 		        = 0.5
+
+;трассы от осколков
+fragment_speed		    = 76
+fragment_tracer_max_length	= 3
+explode_duration    	= 50			;подолжительность взрыва (с)
+
+;звуки
+snd_explode 		    = weapons\heli_explosion
+;wallmarks
+wallmark_section		= explosion_marks
+
+[explode_effector]
+effect_sect_name		= effector_explode_hit
+
+;------ Others params ----------------------------------------------------------
+
+[collide]
+not_collide_parts		= 1
+
+;------ destroyed part ---------------------------------------------------------
+
+[autoremove_parts]
+time			        = 60
+
+;------ End params -------------------------------------------------------------

@@ -1,0 +1,49 @@
+[logic@esc_2_12_stalker_wolf]
+active = walker@guarder_1
+level_spot = quest_npc
+suitable = {=check_npc_name(esc_2_12_stalker_wolf)} true
+prior = 140
+
+[walker@def]
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+use_camp = false
+meet = meet@send_far
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet@send_far]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_snd_hello = nil
+close_snd_bye 	= nil
+use = {=actor_enemy} false, {=dist_to_actor_le(3)} true, false
+snd_on_use = {=is_wounded} nil, {=actor_enemy} nil, {=has_enemy} meet_use_no_fight, {=actor_has_weapon} meet_use_no_weapon, {!dist_to_actor_le(3)} nil, meet_use_no_talk_leader
+meet_on_talking = false
+trade_enable 	= false
+allow_break 	= false
+
+[walker@guarder_1]:walker@def
+path_walk = guarder_1_walk
+path_look = guarder_1_look
+on_info = {=surge_started} walker@hide_1
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+combat_ignore_cond = {!is_enemy_actor_or_companion !enemy_in_zone(esc_2_12_stalker_wolf_kill_zone)} true, false
+combat_ignore_keep_when_attacked = false
+
+[walker@hide_1]:walker@def
+path_walk = hide_1_walk
+path_look = hide_1_look
+on_info = {!surge_started} walker@guarder_1
+out_restr = esc_smart_terrain_2_12_surge_hide_a1
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+combat_ignore_cond = {!enemy_in_zone(esc_2_12_stalker_wolf_kill_zone)} true, false
+combat_ignore_keep_when_attacked = false

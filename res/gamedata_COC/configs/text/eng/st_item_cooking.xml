@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="st_charcoal">
+		<text>Charcoal</text>
+	</string>
+	<string id="st_charcoal_descr">
+		<text>A bag of easy to light charcoal briquets. Usable with a wood burning stove.</text>
+	</string>
+	<string id="st_wood_stove">
+		<text>Wood stove</text>
+	</string>
+	<string id="st_wood_stove_descr">
+		<text>This portable wood burning camp stove is light-weight and easy to use. Add fuel and it's ready to cook anything.</text>
+	</string>
+	<string id="st_matches">
+		<text>Matches</text>
+	</string>
+	<string id="st_matches_descr">
+		<text>A box of matches.</text>
+	</string>
+	
+	<string id="st_meat_tushkano">
+		<text>Rodent meat (cooked)</text>
+	</string>
+	<string id="st_meat_tushkano_descr">
+		<text>Cooked meat from a rodent.</text>
+	</string>
+	<string id="st_meat_dog">
+		<text>Dog meat (cooked)</text>
+	</string>
+	<string id="st_meat_dog_descr">
+		<text>Cooked meat from a dog.</text>
+	</string>
+	<string id="st_meat_pseudodog">
+		<text>Pseudodog meat (cooked)</text>
+	</string>
+	<string id="st_meat_pseudodog_descr">
+		<text>Cooked meat from a pseudodog.</text>
+	</string>
+	<string id="st_meat_flesh">
+		<text>Flesh meat (cooked)</text>
+	</string>
+	<string id="st_meat_flesh_descr">
+		<text>Cooked meat from a flesh.</text>
+	</string>
+	<string id="st_meat_boar">
+		<text>Boar chop (cooked)</text>
+	</string>
+	<string id="st_meat_boar_descr">
+		<text>Cooked loin chops from a boar.</text>
+	</string>
+	<string id="st_meat_bloodsucker">
+		<text>Bloodsucker meat (cooked)</text>
+	</string>
+	<string id="st_meat_bloodsucker_descr">
+		<text>Cooked meat from a bloodsucker.</text>
+	</string>
+	<string id="st_meat_chimera">
+		<text>Chimera meat (cooked)</text>
+	</string>
+	<string id="st_meat_chimera_descr">
+		<text>Cooked meat from a chimera.</text>
+	</string>
+	<string id="st_try_to_cook">
+		<text>cook</text>
+	</string>
+	<string id="st_add_cooking_fuel">
+		<text>add fuel</text>
+	</string>
+</string_table>

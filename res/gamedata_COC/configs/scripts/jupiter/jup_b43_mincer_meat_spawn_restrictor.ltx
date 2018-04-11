@@ -1,0 +1,10 @@
+[logic]
+active = nil;sr_idle@turn_off
+
+[sr_idle@turn_off]
+on_info = sr_idle@wait %=turn_off(jup_b43_mincer_meat_lamp)%
+
+[sr_idle@wait]
+on_info = {+jup_b43_contract_brought_first_artefact =dist_to_actor_ge(30)} sr_idle@nil %=spawn_object(jup_b43_af_mincer_meat:jup_b43_mincer_meat_spawn_point) =turn_on(jup_b43_mincer_meat_lamp)%
+
+[sr_idle@nil]

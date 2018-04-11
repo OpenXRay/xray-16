@@ -1,0 +1,17 @@
+[logic]
+active = sr_idle
+
+[sr_idle]
+on_info = {+dar_door3_free} sr_idle@_nil, {+dar_door3_closed} sr_idle@2
+
+[sr_idle@2]
+on_timer = 1500| sr_particle
+
+[sr_particle]
+name = damage_fx\burn_creatures00
+path = dar_particle_way3
+mode = 2				
+looped = true    
+on_info = {+dar_door3_free} sr_idle@_nil
+
+[sr_idle@_nil]

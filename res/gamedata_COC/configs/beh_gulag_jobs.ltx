@@ -1,0 +1,55 @@
+[beh@general]
+;sound_idle = state
+behavior_state = beh_move
+target = waypoint
+walk_dist = 100
+jog_dist = 220
+wait_anim = guard
+walk_anim = patrol
+jog_anim = patrol
+run_anim = rush
+delay_anim = guard
+
+; -------------------------- marsh
+[mar_smart_terrain_base_beh_trade_1]:beh@general
+pt1 = 20000,choose | pos:-134.97123718262,1.3455394506454,-277.36145019531 look:-132.71656799316,1.2974890470505,-276.94140625
+pt2 = 9000,zat_b14_give_artefact_act | pos:-134.97123718262,1.3455394506454,-277.36145019531 look:-132.71656799316,1.2974890470505,-276.94140625 sig:trade
+pt3 = 15000,guard | pos:-134.97123718262,1.3455394506454,-277.36145019531 look:-132.71656799316,1.2974890470505,-276.94140625
+on_signal = trade | %=trade_job_sell_items%
+path_end = loop
+
+[mar_smart_terrain_base_beh_trade_2]:beh@general
+pt1 = 10000,animpoint_stay_table | pos:-135.11582946777,1.3463815450668,-272.79696655273 animpoint:-134.73908996582,1.347621679306,-272.72882080078,1,0,0
+path_end = loop
+
+;[mar_smart_terrain_base_beh_1]:beh@general
+;pt1 = 88860000, play_guitar | pos:-158.74140930176,0.61138713359833,-312.51971435547 look:-156.08723449707,0.5962917804718,-309.91674804688
+
+;------------------------------- esc_smart_terrain_2_12
+
+[esc_smart_terrain_2_12_beh_trade_1]:beh@general
+pt1 = 20000,choose | pos:-246.48155212402,-24.80966758728,-133.93142700195 look:-243.1452331543,-24.805171966553,-133.85470581055
+pt2 = 9000,zat_b14_give_artefact_act | pos:-246.48155212402,-24.80966758728,-133.93142700195 look:-243.1452331543,-24.805171966553,-133.85470581055 sig:trade
+pt3 = 15000,guard | pos:-246.48155212402,-24.80966758728,-133.93142700195 look:-243.1452331543,-24.805171966553,-133.85470581055
+on_signal = trade | %=trade_job_sell_items%
+path_end = loop
+out_restr = esc_smart_terrain_2_12_surge_hid​​e_a1
+
+[esc_smart_terrain_2_12_beh_trade_2]:beh@general
+pt1 = 20000,guard | pos:-246.45753479004,-24.809846878052,-135.52528381348 look:-246.19879150391,-24.807954788208,-133.98274230957
+path_end = loop
+out_restr = esc_smart_terrain_2_12_surge_hid​​e_a1
+
+[val_smart_terrain_7_4_beh_trade_1]:beh@general
+pt1 = 20000,choose | pos:35.473415374756,3.5921447277069,-4.0112347602844 look:34.145179748535,3.5906414985657,-0.49882358312607
+pt2 = 9000,zat_b14_give_artefact_act | pos:35.473415374756,3.5921447277069,-4.0112347602844 look:34.145179748535,3.5906414985657,-0.49882358312607 sig:trade
+pt3 = 15000,guard | pos:35.473415374756,3.5921447277069,-4.0112347602844 look:34.145179748535,3.5906414985657,-0.49882358312607
+on_signal = trade | %=trade_job_sell_items%
+path_end = loop
+
+[zat_stalker_base_smart_beh_trade_1]:beh@general
+pt1 = 20000,choose | pos:125.94895935059,-7.3207497596741,178.76518249512 look:124.02377319336,-7.3234705924988,177.21917724609
+pt2 = 9000,zat_b14_give_artefact_act | pos:125.94895935059,-7.3207497596741,178.76518249512 look:124.02377319336,-7.3234705924988,177.21917724609 sig:trade
+pt3 = 15000,guard | pos:125.94895935059,-7.3207497596741,178.76518249512 look:124.02377319336,-7.3234705924988,177.21917724609
+on_signal = trade | %=trade_job_sell_items%
+path_end = loop

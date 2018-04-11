@@ -1,0 +1,109 @@
+<?xml version='1.0' encoding="windows-1251"?>
+
+<game_information_portions>
+<!-- sidrovich -->
+	<info_portion id="esc_trader_bye_played"></info_portion>
+	<info_portion id="esc_trader_hello_played"></info_portion>
+	<info_portion id="esc_actor_comes_2_trader"></info_portion>
+
+	<info_portion id="esc_trader_hello_first_played"></info_portion>
+	<info_portion id="esc_trader_hello_search_played"></info_portion>
+	<info_portion id="esc_trader_hello_return_played"></info_portion>
+	<info_portion id="esc_trader_bye_search_played"></info_portion>
+	<info_portion id="esc_trader_bye_first_search_played"></info_portion>
+	<info_portion id="esc_trader_bye_garbage_played"></info_portion>
+	<info_portion id="esc_player_sleeps"></info_portion>
+	<info_portion id="esc_skip_angry"></info_portion>
+
+
+	<info_portion id="esc_trader_talked"></info_portion>
+	<info_portion id="esc_actor_come_first"></info_portion>
+	<info_portion id="esc_actor_inside_traders_dung"></info_portion>
+	<info_portion id="esc_trader_angry"></info_portion>
+	<info_portion id="esc_reach_trader_complete"></info_portion>
+	<info_portion id="esc_actor_comes2door"></info_portion>
+
+<!-- esc_2_12 -->
+	<info_portion id="esc_2_12_nimble_intro"></info_portion>
+
+	<info_portion id="esc_2_12_order_in_process"></info_portion>
+	<info_portion id="esc_2_12_order_ready"></info_portion>
+	<info_portion id="esc_2_12_order_refused"></info_portion>
+	<info_portion id="esc_2_12_order_unavailable"></info_portion>
+
+	<info_portion id="esc_2_12_nimble_can_go"></info_portion>
+
+	<info_portion id="esc_2_12_processing_category_1"></info_portion>
+	<info_portion id="esc_2_12_processing_category_2"></info_portion>
+	<info_portion id="esc_2_12_processing_category_3"></info_portion>
+	<info_portion id="esc_2_12_processing_category_4"></info_portion>
+	<info_portion id="esc_2_12_processing_category_5"></info_portion>
+	<info_portion id="esc_2_12_processing_category_6"></info_portion>
+	<info_portion id="esc_2_12_processing_category_7"></info_portion>
+
+	<info_portion id="esc_2_12_finishing_category_1"></info_portion>
+	<info_portion id="esc_2_12_finishing_category_2"></info_portion>
+	<info_portion id="esc_2_12_finishing_category_3"></info_portion>
+	<info_portion id="esc_2_12_finishing_category_4"></info_portion>
+	<info_portion id="esc_2_12_finishing_category_5"></info_portion>
+	<info_portion id="esc_2_12_finishing_category_6"></info_portion>
+	<info_portion id="esc_2_12_finishing_category_7"></info_portion>
+
+	<info_portion id="esc_2_12_finished_category_1"></info_portion>
+	<info_portion id="esc_2_12_finished_category_2"></info_portion>
+	<info_portion id="esc_2_12_finished_category_3"></info_portion>
+	<info_portion id="esc_2_12_finished_category_4"></info_portion>
+	<info_portion id="esc_2_12_finished_category_5"></info_portion>
+	<info_portion id="esc_2_12_finished_category_6"></info_portion>
+	<info_portion id="esc_2_12_finished_category_7"></info_portion>
+
+	<info_portion id="esc_2_12_finished_categories_all"></info_portion>
+
+	<info_portion id="esc_2_12_ordered_item_1_1"></info_portion>
+	<info_portion id="esc_2_12_ordered_item_1_2"></info_portion>
+	<info_portion id="esc_2_12_ordered_item_1_3"></info_portion>
+	<info_portion id="esc_2_12_ordered_item_2_1"></info_portion>
+	<info_portion id="esc_2_12_ordered_item_2_2"></info_portion>
+	<info_portion id="esc_2_12_ordered_item_2_3"></info_portion>
+	<info_portion id="esc_2_12_ordered_item_3_1"></info_portion>
+	<info_portion id="esc_2_12_ordered_item_3_2"></info_portion>
+	<info_portion id="esc_2_12_ordered_item_3_3"></info_portion>
+	<info_portion id="esc_2_12_ordered_item_4_1"></info_portion>
+	<info_portion id="esc_2_12_ordered_item_4_2"></info_portion>
+	<info_portion id="esc_2_12_ordered_item_4_3"></info_portion>
+	<info_portion id="esc_2_12_ordered_item_5_1"></info_portion>
+	<info_portion id="esc_2_12_ordered_item_6_1"></info_portion>
+	<info_portion id="esc_2_12_ordered_item_7_1"></info_portion>
+
+	<info_portion id="esc_2_12_done_item_1_1"></info_portion>
+	<info_portion id="esc_2_12_done_item_1_2"></info_portion>
+	<info_portion id="esc_2_12_done_item_1_3"></info_portion>
+	<info_portion id="esc_2_12_done_item_2_1"></info_portion>
+	<info_portion id="esc_2_12_done_item_2_2"></info_portion>
+	<info_portion id="esc_2_12_done_item_2_3"></info_portion>
+	<info_portion id="esc_2_12_done_item_3_1"></info_portion>
+	<info_portion id="esc_2_12_done_item_3_2"></info_portion>
+	<info_portion id="esc_2_12_done_item_3_3"></info_portion>
+	<info_portion id="esc_2_12_done_item_4_1"></info_portion>
+	<info_portion id="esc_2_12_done_item_4_2"></info_portion>
+	<info_portion id="esc_2_12_done_item_4_3"></info_portion>
+	<info_portion id="esc_2_12_done_item_5_1"></info_portion>
+	<info_portion id="esc_2_12_done_item_6_1"></info_portion>
+	<info_portion id="esc_2_12_done_item_7_1"></info_portion>
+
+	<info_portion id="esc_2_12_told_about_item_1_1"></info_portion>
+	<info_portion id="esc_2_12_told_about_item_1_2"></info_portion>
+	<info_portion id="esc_2_12_told_about_item_1_3"></info_portion>
+	<info_portion id="esc_2_12_told_about_item_2_1"></info_portion>
+	<info_portion id="esc_2_12_told_about_item_2_2"></info_portion>
+	<info_portion id="esc_2_12_told_about_item_2_3"></info_portion>
+	<info_portion id="esc_2_12_told_about_item_3_1"></info_portion>
+	<info_portion id="esc_2_12_told_about_item_3_2"></info_portion>
+	<info_portion id="esc_2_12_told_about_item_3_3"></info_portion>
+	<info_portion id="esc_2_12_told_about_item_4_1"></info_portion>
+	<info_portion id="esc_2_12_told_about_item_4_2"></info_portion>
+	<info_portion id="esc_2_12_told_about_item_4_3"></info_portion>
+	<info_portion id="esc_2_12_told_about_item_5_1"></info_portion>
+	<info_portion id="esc_2_12_told_about_item_6_1"></info_portion>
+	<info_portion id="esc_2_12_told_about_item_7_1"></info_portion>
+</game_information_portions>

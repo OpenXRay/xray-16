@@ -1,0 +1,185 @@
+[device_pda]:identity_immunities
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "devices\pda"
+$prefetch                                = 16
+class                                    = D_PDA ;Change to S_PDA if you want to use se_item.se_explosive script binding!
+cform                                    = skeleton
+visual                                   = dynamics\devices\dev_pda\dev_pda.ogf
+description                              = st_pda_descr
+radius                                   = 68 ; 50               
+slot                                     = 7
+default_to_ruck                          = false
+sprint_allowed                           = true
+control_inertion_factor                  = 1
+script_binding                           = bind_physic_object.init
+
+inv_name                                 = st_pda_name
+inv_name_short                           = st_pda_name
+inv_weight                               = 0.1 ;0.2               
+
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 7
+inv_grid_y                               = 3
+cost                                     = 0
+attach_angle_offset                      = -1.303,0.107,-1.702 ;onoaiaaeeaaaony a ?aaeaiao Angle*PI/180
+attach_position_offset                   = 0.14,0.001,0.02
+attach_bone_name                         = bip01_l_hand
+auto_attach                              = false
+can_trade								 = false 
+
+[dev_flash_1]:identity_immunities
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "devices\dev_flash_1"
+$prefetch                                = 16
+class                                    = D_PDA
+cform                                    = skeleton
+visual                                   = dynamics\devices\dev_flash_1\dev_flash_1.ogf
+
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 8
+inv_grid_y                               = 3
+
+slot                                     = 7
+radius                                   = 50
+default_to_ruck                          = false
+inv_weight                               = 0.05
+
+inv_name                                 = st_pda_name
+inv_name_short                           = st_pda_name
+description                              = st_pda_descr
+cost                                     = 0
+can_trade                                = false
+
+[dev_flash_2]:identity_immunities
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "devices\dev_flash_2"
+$prefetch                                = 16
+class                                    = D_PDA
+cform                                    = skeleton
+visual                                   = dynamics\devices\dev_flash_2\dev_flash_2.ogf
+
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 9
+inv_grid_y                               = 3
+
+slot                                     = 7
+radius                                   = 50
+default_to_ruck                          = false
+inv_weight                               = 0.05
+
+inv_name                                 = st_pda_name
+inv_name_short                           = st_pda_name
+description                              = st_pda_descr
+cost                                     = 0
+can_trade                                = false
+
+[device_torch]:identity_immunities
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "devices\torch"
+$prefetch                                = 32
+class                                    = TORCH_S
+cform                                    = skeleton
+visual                                   = dynamics\devices\dev_torch_light\dev_torch_light.ogf
+description                              = st_device_torch_descr
+cost                                     = 0
+inv_name                                 = st_device_torch_name
+inv_name_short                           = st_device_torch_name
+inv_weight                               = 0.0
+inv_grid_width                           = 2
+inv_grid_height                          = 1
+inv_grid_x                               = 14
+inv_grid_y                               = 7
+
+;aauu? iaeucy oi?aiaaou
+can_trade                                = true
+
+position                                 = 0.35,0.25,0.0
+light_trace_bone                         = lights_bone
+
+attach_angle_offset                      = 3.062, 0.008, -1.532
+attach_position_offset                   = 0.134, -0.007, 0.09
+
+attach_bone_name                         = bip01_head
+auto_attach                              = false
+
+night_vision                             = on
+night_vision_texture                     = wpn\wpn_night
+night_vision_effector                    = postprocess_night
+
+snd_night_vision_on                      = weapons\nv_start
+snd_night_vision_off                     = weapons\nv_off
+snd_night_vision_idle                    = weapons\nv_loop
+snd_night_vision_broken                  = weapons\nv_off
+
+night_vision_recharge_time               = 6 ;(c) a?aiy ca?yaee aeeaioeyoi?a
+night_vision_recharge_time_min           = 2 ;(c) iei. a?aiy ca?yaee aeeaioeyoi?a, iinea eioi?iai ono-ai o?a ii?ao ?aaioaou
+night_vision_discharge_time              = 20 ;(c) a?aiy ?ac?yaee (?aaiou) ono?ienoaa iinea iieiie ca?yaee
+slot                                     = 9
+default_to_ruck                          = false
+sprint_allowed                           = true
+control_inertion_factor                  = 1
+disabled_maps                            = ai_test,ai_test2, andy_test_
+
+[device_flare]:identity_immunities
+class                                    = D_FLARE
+visual                                   = dynamics\devices\dev_flare\dev_flare
+description                              = enc_weapons1_wpn_flare
+
+inv_weight                               = 0.2
+inv_name                                 = device_flare
+inv_name_short                           = device_flare_short
+
+inv_grid_width                           = 2
+inv_grid_height                          = 1
+inv_grid_x                               = 12
+inv_grid_y                               = 7
+
+slot                                     = 11
+cost                                     = 50
+default_to_ruck                          = true
+sprint_allowed                           = true
+control_inertion_factor                  = 1.0
+work_time_sec                            = 10000
+hud                                      = device_flare_hud
+animation_slot                           = 7
+
+working_particles                        = weapons\dev_flare_flame
+
+[device_flare_hud]:hud_base
+hands_position                           = 0.361999,-0.164000,0.106000
+hands_orientation                        = 21.000044,-1.700000,0.000000
+hands_position_16x9                      = 0,0,0
+hands_orientation_16x9                   = 0,0,0
+
+aim_hud_offset_pos                       = 0,0,0
+aim_hud_offset_rot                       = 0,0,0
+
+gl_hud_offset_pos                        = 0,0,0
+gl_hud_offset_rot                        = 0,0,0
+
+lean_hud_offset_pos                      = 0,0,0
+lean_hud_offset_rot                      = 0,0,0
+
+item_position                            = -0.031455,0.017528,0.136259
+item_orientation                         = 62.783558,75.663406,-79.665085
+
+item_visual                              = dynamics\devices\dev_flare\dev_flare
+attach_place_idx                         = 1
+
+fire_point                               = 0.279000,-0.143000,-0.009000
+fire_bone                                = flare_point
+
+
+anm_show                                 = flare_draw
+anm_hide                                 = flare_holster
+anm_idle                                 = flare_idle
+anm_drop                                 = flare_holster
+
+

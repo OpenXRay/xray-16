@@ -1,0 +1,10 @@
+[logic]
+active = sr_idle
+
+[sr_idle]
+on_actor_inside = {-brain_snork_respawn_01} sr_idle@scare_actor %+brain_snork_respawn_01%
+
+[sr_idle@scare_actor]
+on_timer = 3000 | sr_idle@nil %=play_sound(red_bloodsucker_growl) =spawn_object(labx16_snork_4:brain_snork_jump_3:0)%
+
+[sr_idle@nil]

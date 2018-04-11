@@ -1,0 +1,132 @@
+[logic]
+active = sr_idle@1
+
+[sr_idle@1]
+on_info = {+bar_arena_fight_1} sr_idle@sound1
+
+[sr_idle@sound1]
+on_info = %=play_sound(bar_arena_fight_1)%
+on_signal = sound_end| sr_idle@sound1_end
+;on_timer = 10000 | sr_idle@sound1_end %=stop_sound%
+
+[sr_idle@sound1_end]
+on_info = {+bar_arena_fight_1_done} sr_idle@sound1_end1
+
+[sr_idle@sound1_end1]
+on_info = %=play_sound(bar_arena_fight_1_end)%
+on_signal = sound_end| sr_idle@2 %=bar_arena_teleport_2 -bar_arena_fight_1% 
+;on_timer = 3000 | sr_idle@2 %=stop_sound =bar_arena_teleport_2 -bar_arena_fight_1%
+
+[sr_idle@2]
+on_info = {+bar_arena_fight_2} sr_idle@sound2
+
+[sr_idle@sound2]
+on_info = %=play_sound(bar_arena_fight_2)%
+on_signal = sound_end| sr_idle@sound2_end
+;on_timer = 10000 | sr_idle@sound2_end %=stop_sound%
+
+[sr_idle@sound2_end]
+on_info = {+bar_arena_fight_2_done} sr_idle@sound2_end2
+
+[sr_idle@sound2_end2]
+on_info = %=play_sound(bar_arena_fight_2_end)%
+on_signal = sound_end| sr_idle@3 %=bar_arena_teleport_2 -bar_arena_fight_2% 
+;on_timer = 5000 | %=stop_sound =bar_arena_teleport_2 -bar_arena_fight_2%
+
+[sr_idle@3]
+on_info = {+bar_arena_fight_3} sr_idle@sound3
+
+[sr_idle@sound3]
+on_info = %=play_sound(bar_arena_fight_3)%
+on_signal = sound_end| sr_idle@sound3_end
+;on_timer = 9000 | sr_idle@sound3_end %=stop_sound%
+
+[sr_idle@sound3_end]
+on_info = {+bar_arena_fight_3_done} sr_idle@sound3_end3
+
+[sr_idle@sound3_end3]
+on_info = %=play_sound(bar_arena_fight_3_end)%
+on_signal = sound_end| sr_idle@4 %=bar_arena_teleport_2 -bar_arena_fight_3% 
+;on_timer = 3000 | sr_idle@4 %=stop_sound =bar_arena_teleport_2 -bar_arena_fight_3%
+
+[sr_idle@4]
+on_info = {+bar_arena_fight_4} sr_idle@sound4
+
+[sr_idle@sound4]
+on_info = %=play_sound(bar_arena_fight_4)%
+on_signal = sound_end| sr_idle@sound4_end
+;on_timer = 8000 | sr_idle@sound4_end %=stop_sound%
+
+[sr_idle@sound4_end]
+on_info = {+bar_arena_fight_4_done} sr_idle@sound4_end4
+
+[sr_idle@sound4_end4]
+on_info = %=play_sound(bar_arena_fight_4_end)%
+on_signal = sound_end| sr_idle@5 %=bar_arena_teleport_2 -bar_arena_fight_4% 
+;on_timer = 8000 | sr_idle@5 %=stop_sound =bar_arena_teleport_2 -bar_arena_fight_4% 
+
+[sr_idle@5]
+on_info = {+bar_arena_fight_5} sr_idle@sound5
+
+[sr_idle@sound5]
+on_info = %=play_sound(bar_arena_fight_5)%
+on_signal = sound_end| sr_idle@sound5_end
+;on_timer = 9000 | sr_idle@sound5_end %=stop_sound%
+
+[sr_idle@sound5_end]
+on_info = {+bar_arena_fight_5_done} sr_idle@sound5_end5
+
+[sr_idle@sound5_end5]
+on_info = %=play_sound(bar_arena_fight_5_end)%
+on_signal = sound_end| sr_idle@6 %=bar_arena_teleport_2 -bar_arena_fight_5% 
+;on_timer = 3000 | sr_idle@6 %=stop_sound =bar_arena_teleport_2 -bar_arena_fight_5%
+
+[sr_idle@6]
+on_info = {+bar_arena_fight_6} sr_idle@sound6
+
+[sr_idle@sound6]
+on_info = %=play_sound(bar_arena_fight_6)%
+on_signal = sound_end| sr_idle@sound6_end
+;on_timer = 12000 | sr_idle@sound6_end %=stop_sound%
+
+[sr_idle@sound6_end]
+on_info = {+bar_arena_fight_6_done} sr_idle@sound6_end6
+
+[sr_idle@sound6_end6]
+on_info = %=play_sound(bar_arena_fight_6_end)%
+on_signal = sound_end| sr_idle@7 %=bar_arena_teleport_2 -bar_arena_fight_6% 
+;on_timer = 5000 | sr_idle@7 %=stop_sound =bar_arena_teleport_2 -bar_arena_fight_6% 
+
+[sr_idle@7]
+on_info = {+bar_arena_fight_7} sr_idle@sound7
+
+[sr_idle@sound7]
+on_info = %=play_sound(bar_arena_fight_7)%
+on_signal = sound_end| sr_idle@sound7_end
+;on_timer = 16000 | sr_idle@sound7_end %=stop_sound%
+
+[sr_idle@sound7_end]
+on_info = {+bar_arena_fight_7_done} sr_idle@sound7_end7
+
+[sr_idle@sound7_end7]
+on_info = %=play_sound(bar_arena_fight_7_end)%
+on_signal = sound_end| sr_idle@8 %=bar_arena_teleport_2 -bar_arena_fight_7% 
+;on_timer = 7000 | sr_idle@8 %=stop_sound =bar_arena_teleport_2 -bar_arena_fight_7%
+
+[sr_idle@8]
+on_info = {+bar_arena_fight_8} sr_idle@sound8
+
+[sr_idle@sound8]
+on_info = %=play_sound(bar_arena_fight_8)%
+on_signal = sound_end| sr_idle@sound8_end
+;on_timer = 18000 | sr_idle@sound8_end %=stop_sound%
+
+[sr_idle@sound8_end]
+on_info = {+bar_arena_fight_8_done} sr_idle@sound8_end8
+
+[sr_idle@sound8_end8]
+on_info = %=play_sound(bar_arena_fight_8_end)%
+on_signal = sound_end| sr_idle@nil %=bar_arena_teleport_2 -bar_arena_fight_8%
+;on_timer = 7000 | sr_idle@nil %=stop_sound =bar_arena_teleport_2 -bar_arena_fight_8%
+
+[sr_idle@nil]

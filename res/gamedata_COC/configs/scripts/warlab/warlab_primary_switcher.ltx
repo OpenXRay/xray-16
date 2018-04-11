@@ -1,0 +1,12 @@
+[logic]
+active = ph_button@gen_on
+
+[ph_button@gen_on]
+anim_blend  = true
+anim        = lab_primary_switcher_idle
+tooltip     = tips_warlab_switcher_press
+on_press    = {+sar_monolith_off} ph_button@gen_off %+warlab_deactivate_generators_done%
+
+[ph_button@gen_off]
+anim_blend  = true
+anim        = lab_primary_switcher_off

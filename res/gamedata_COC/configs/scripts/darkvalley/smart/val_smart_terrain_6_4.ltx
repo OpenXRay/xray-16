@@ -1,0 +1,18 @@
+[smart_terrain]
+squad_id = 5
+max_population = 2
+respawn_params = respawn@val_smart_terrain_6_4
+respawn_idle = 86400
+
+
+[respawn@val_smart_terrain_6_4]
+spawn_pigs
+
+[spawn_pigs]
+spawn_squads = simulation_flesh, simulation_mix_boar_flesh, simulation_boar
+spawn_num = 1
+
+[exclusive]
+faction_base_defense_enemy1 = darkvalley\val_smart_terrain_6_4_smart_logic.ltx
+faction_base_defense_enemy2 = darkvalley\val_smart_terrain_6_4_smart_logic.ltx
+faction_base_defense_enemy3 = darkvalley\val_smart_terrain_6_4_smart_logic.ltx

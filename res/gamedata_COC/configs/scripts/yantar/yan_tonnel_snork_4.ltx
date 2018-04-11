@@ -1,0 +1,15 @@
+[logic]
+active = mob_home
+
+[mob_home]
+path_home = yan_snork_tun_home_1
+home_min_radius = 20
+home_max_radius = 100
+on_actor_dist_le_nvis = 15 | mob_home@2 %=hit_npc_from_actor%
+out_restr = yantar_tunnel_restrictor_4
+
+[mob_home@2]
+path_home = yan_snork_tun_home_1
+home_min_radius = 20
+home_max_radius = 100
+out_restr = yantar_tunnel_restrictor_4

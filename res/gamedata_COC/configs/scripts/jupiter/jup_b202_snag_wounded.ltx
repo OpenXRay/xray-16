@@ -1,0 +1,142 @@
+;general section
+
+[walker@jup_b202_gen]
+corpse_detection_enabled = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+meet = no_meet
+gather_items_enabled = false
+help_wounded_enabled = false
+
+[remark@jup_b202_stalker_snag_wounded_gen]
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+corpse_detection_enabled = false
+gather_items_enabled = false
+help_wounded_enabled = false
+
+[walker@jup_b202_stalker_bandit_gen]:walker@jup_b202_gen
+combat_ignore_cond = {-jup_b202_bandit_hited} true, false
+
+[remark@jup_b202_stalker_bandit_gen]:remark@jup_b202_stalker_snag_wounded_gen
+target =  story | jup_b202_stalker_snag
+combat_ignore_cond = {-jup_b202_bandit_hited} true, false
+meet = no_meet 
+on_info = {+jup_b202_bandit_hited +jup_b202_bandit_hited_by_actor} walker@jup_b202_stalker_bandit_end_no_talk
+
+[walker@jup_b202_stalker_bandit_leave_gen]:walker@jup_b202_stalker_bandit_gen
+path_walk = stalker_bandit_leave_walk
+on_signal = to_nill | %=spawn_object_in(wpn_wincheaster1300:jup_b202_bandit) =spawn_object_in(ammo_12x76_zhekan:jup_b202_bandit) =spawn_object_in(grenade_rgd5:jup_b202_bandit) +jup_b202_bandit_go_away%
+
+[logic@jup_b202_gen]
+prior = 200
+
+;snag work
+
+[logic@jup_b202_stalker_snag_wounded]:logic@jup_b202_gen
+suitable = {=check_npc_name(jup_b202_stalker_snag)}
+active = walker@jup_b202_wait_for_stol
+on_death = death@jup_b202_stalker_snag_wounded
+
+[death@jup_b202_stalker_snag_wounded]
+on_info = %+zat_b52_snag_is_dead%
+
+[walker@jup_b202_wait_for_stol]:walker@jup_b202_gen
+path_walk = snag_wait_walk
+path_look = snag_wait_look
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_surge_hide_b202
+on_info = {+jup_b202_actor_items_stolen} walker@jup_b202_polustanok %+jup_b202_snag_wounded_start =teleport_npc(jup_b202_snag_wounded_walk)%
+
+[walker@jup_b202_polustanok]:walker@jup_b202_gen
+path_walk = snag_wounded_walk
+path_look = snag_wounded_look
+on_info = {=squad_exist(jup_b202_bandit_squad)} remark@jup_b202_stalker_snag_wounded %=set_squad_goodwill_to_npc(jup_b202_bandit_squad:friend)%
+
+[remark@jup_b202_stalker_snag_wounded]:remark@jup_b202_stalker_snag_wounded_gen
+wounded = wounded@jup_b202_stalker_snag_wounded
+on_info = {+jup_b202_actor_items_returned} %=kill_npc%
+on_info2 = {+jup_b202_snag_healed} walker@jup_b202_stalker_snag_sit, {+jup_b202_actor_spare_snag !talking} walker@jup_b202_stalker_snag_sit
+
+[wounded@jup_b202_stalker_snag_wounded]
+hp_state = 101|wounded_heavy@help_heavy
+hp_state_see = 101|wounded_heavy@help_heavy
+hp_victim = 101|actor
+hp_cover = 101|false
+hp_fight = 101|false
+autoheal = false
+not_for_help = true
+enable_talk = true
+
+
+[walker@jup_b202_stalker_snag_sit]:walker@jup_b202_gen
+path_walk = snag_wounded_walk
+path_look = snag_wounded_look
+def_state_standing = sit
+meet = meet@jup_b202_stalker_snag_sit
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_game_timer = 600 | {=squad_exist(jup_b202_bandit_squad)} %+jup_b202_stalker_snag_go_base =set_squad_goodwill_to_npc(jup_b202_bandit_squad:enemy)%, %+jup_b202_stalker_snag_go_base%
+
+[meet@jup_b202_stalker_snag_sit]
+close_distance 	= 0
+close_anim 		= nil
+close_victim 	= nil
+far_distance 	= 0
+far_anim 		= nil
+far_victim 		= nil
+use = {!actor_enemy !actor_has_weapon} true, false
+abuse           = false
+trade_enable    = false
+
+; bandit work
+
+[logic@jup_b202_stalker_bandit]:logic@jup_b202_gen
+suitable = {=check_npc_name(jup_b202_bandit)}
+active = walker@jup_b202_stalker_bandit_teleport
+on_hit = hit@jup_b202_stalker_bandit
+
+[hit@jup_b202_stalker_bandit]
+on_info = {=hit_by_actor} %+jup_b202_bandit_hited +jup_b202_bandit_hited_by_actor%, %+jup_b202_bandit_hited%
+
+[walker@jup_b202_stalker_bandit_teleport]:walker@jup_b202_stalker_bandit_gen
+path_walk = snag_wounded_look 
+path_look = snag_wounded_walk
+def_state_standing = threat
+on_info = walker@jup_b202_stalker_bandit %=teleport_npc(jup_b202_snag_wounded_look)%
+
+[walker@jup_b202_stalker_bandit]:walker@jup_b202_stalker_bandit_gen
+path_walk = snag_wounded_look 
+path_look = snag_wounded_walk
+def_state_standing = threat
+on_actor_dist_le_nvis = 24 | {=counter_equal(jup_b202_sound_count:2)} remark@jup_b202_stalker_bandit_talk, remark@jup_b202_stalker_bandit_fire %=inc_counter(jup_b202_sound_count:1)%
+
+[remark@jup_b202_stalker_bandit_fire]:remark@jup_b202_stalker_bandit_gen
+anim = threat
+on_info2 = %=play_sound(jup_b202_bandit_shoot)%
+on_signal = sound_end | walker@jup_b202_stalker_bandit
+
+[remark@jup_b202_stalker_bandit_talk]:remark@jup_b202_stalker_bandit_gen
+anim = guard_na
+on_info2 = %=play_sound(jup_b202_bandit_to_snag)%
+on_signal = theme_end | walker@jup_b202_stalker_bandit_end
+ 
+[walker@jup_b202_stalker_bandit_end]:walker@jup_b202_stalker_bandit_leave_gen
+meet = meet@jup_b202_stalker_bandit
+on_actor_dist_le = 5 | %+jup_b202_bandit_meet_actor% 
+on_info = {+jup_b202_bandit_talked_with_actor} walker@jup_b202_stalker_bandit_end_no_talk
+
+[walker@jup_b202_stalker_bandit_end_no_talk]:walker@jup_b202_stalker_bandit_leave_gen
+
+[meet@jup_b202_stalker_bandit]
+close_distance  = 5
+close_anim      = threat
+close_snd_hello = nil
+close_snd_bye   = nil
+close_victim    = actor
+far_anim        = nil
+far_snd         = nil
+far_victim      = nil
+use             = {+jup_b202_bandit_meet_actor -jup_b202_bandit_talked_with_actor} self, false
+abuse           = false
+trade_enable    = false
+allow_break     = false
+meet_dialog		= jup_b202_bandit_meet_actor

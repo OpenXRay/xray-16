@@ -1,0 +1,81 @@
+;camping
+[logic@val_smart_terrain_7_3_camp_work_1]
+active = animpoint@val_smart_terrain_7_3_camp_work_1
+suitable = {=is_night} true
+prior = 45
+
+[logic@val_smart_terrain_7_3_camp_work_2]
+active = animpoint@val_smart_terrain_7_3_camp_work_2
+suitable = {=is_night} true
+prior = 45
+
+[logic@val_smart_terrain_7_3_camp_work_3]
+active = animpoint@val_smart_terrain_7_3_camp_work_3
+suitable = {=is_night} true
+prior = 45
+
+[logic@val_smart_terrain_7_3_camp_work_4]
+active = animpoint@val_smart_terrain_7_3_camp_work_4
+suitable = {=is_night} true
+prior = 45
+
+[logic@val_smart_terrain_7_3_camp_work_5]
+active = animpoint@val_smart_terrain_7_3_camp_work_5
+suitable = {=is_night} true
+prior = 45
+
+[animpoint@val_smart_terrain_7_3_camp_work_1]
+cover_name = val_smart_terrain_7_3_animpoint_kamp1
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@val_smart_terrain_7_3_camp_work_2]
+cover_name = val_smart_terrain_7_3_animpoint_kamp2
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@val_smart_terrain_7_3_camp_work_3]
+cover_name = val_smart_terrain_7_3_animpoint_kamp3
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@val_smart_terrain_7_3_camp_work_4]
+cover_name = val_smart_terrain_7_3_animpoint_kamp4
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@val_smart_terrain_7_3_camp_work_5]
+cover_name = val_smart_terrain_7_3_animpoint_kamp5
+use_camp = true
+turn_on_campfire = true
+
+;bandit mechanic
+[logic@val_smart_terrain_7_3_bandit_mechanic]
+suitable = {=check_npc_name(val_smart_terrain_7_3_bandit_mechanic_stalker)} true
+prior = 200
+active = animpoint@stand
+level_spot = mechanic
+can_select_weapon = false
+
+[animpoint@stand]
+cover_name = val_smart_terrain_7_3_bandit_mechanic_smart_cover
+avail_animations = jup_b41_novikov_stand
+use_camp = false
+meet = meet@mechanic
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+reach_distance = 10
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet@mechanic]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_distance = 3
+use = {=actor_enemy} false, true

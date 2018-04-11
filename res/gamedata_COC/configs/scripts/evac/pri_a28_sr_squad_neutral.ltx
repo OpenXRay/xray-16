@@ -1,0 +1,26 @@
+[logic]
+active = sr_idle@wait
+
+[sr_idle@wait]
+on_info = {+pri_a28_update_task_cover_strelok} sr_idle@squad_neutral
+
+[sr_idle@squad_neutral]
+on_info = {!squad_exist(pri_a16_military_squad)} sr_idle@timeout %+pri_a28_squad_dead +pri_a28_strelok_dead +pri_a28_koval_dead%
+on_info2 = {+pri_a28_actor_enemy} sr_idle@timeout %=set_squad_enemy_to_actor(pri_a16_military_squad) +pri_a28_strelok_dead +pri_a28_koval_dead%
+on_info3 = {=squad_exist(pri_a16_military_squad) =is_squad_enemy_to_actor(pri_a16_military_squad) !counter_greater(pri_a28_friendly_hit:7)} %=set_squad_friend_to_actor(pri_a16_military_squad)%
+on_info4 = {=squad_exist(pri_a28_evac_squad) =is_squad_enemy_to_actor(pri_a28_evac_squad)} %=set_squad_friend_to_actor(pri_a28_evac_squad)%
+on_info5 = {-pri_a28_strelok_dead !is_alive(pri_b305_strelok)} %+pri_a28_strelok_dead%
+on_info6 = {-pri_a28_koval_dead !is_alive(pri_a17_military_colonel_kovalski)} %+pri_a28_koval_dead%
+on_info7 = {=squad_exist(pri_a16_military_squad) =pri_a28_actor_is_far} %=kill_squad(pri_a16_military_squad)%
+on_info8 = {+pri_a28_scene_end} sr_idle@nil
+on_game_timer = 300 | {=squad_exist(pri_a16_military_squad)} sr_idle@heal_a_little_bit
+
+[sr_idle@heal_a_little_bit]
+on_info = {=squad_exist(pri_a16_military_squad)} %=set_squad_friend_to_actor(pri_a16_military_squad)%
+on_info2 = {=squad_exist(pri_a28_evac_squad)} %=set_squad_friend_to_actor(pri_a28_evac_squad)%
+on_info3 = sr_idle@squad_neutral %=heal_squad(pri_a16_military_squad)%
+
+[sr_idle@timeout]
+on_game_timer = 150 | sr_idle@nil %+pri_a28_actor_enemy_to_squad +pri_a28_squad_dead%
+
+[sr_idle@nil]

@@ -1,0 +1,45 @@
+[logic@jup_b4_monolith_squad_soldier_4_monolith_skin]
+suitable = {=check_npc_name(jup_b4_monolith_squad_soldier_4_monolith_skin)}
+active = animpoint@begin
+prior = 100
+on_hit = hit
+on_death = death
+
+[animpoint@begin]
+cover_name = jup_b4_animpoint_2
+use_camp = false
+reach_distance = 1.5
+combat_ignore_cond = {-jup_b4_monolith_squad_hit} true, false
+on_info = {+jup_b4_duty_go_to_monolit_squad} walker@begin_2
+meet = meet_speak_boos
+
+;--------------------------------------------------------------------------------
+;--------------------------------------------------------------------------------
+
+[walker@begin_2]
+use_camp = false
+path_walk = monolith_squad_soldier_4_monolith_skin_begin_2_walk
+path_look = monolith_squad_soldier_4_monolith_skin_begin_2_look
+combat_ignore_cond = {-jup_b4_monolith_squad_hit} true, false
+on_info = {+jup_b4_aling} walker@dolg_come
+meet = meet_speak_boos
+
+[walker@dolg_come]
+use_camp = false
+path_walk = monolith_squad_soldier_4_monolith_skin_1_walk
+path_look = monolith_squad_soldier_4_monolith_skin_1_look
+combat_ignore_cond = {-jup_b4_monolith_squad_hit} true, false
+on_signal = align4 | %+jup_b4_duty_aling4%
+on_info = {+jup_b4_duty_prisiaga -jup_b4_recruit_4_serve_duty_sound} %=play_sound(jup_b4_recruit_2_serve_duty) +jup_b4_recruit_4_serve_duty_sound%
+on_info2 = {+jup_b4_monolith_squad_out -jup_b4_ms4_stop_sound} %=stop_sound +jup_b4_ms4_stop_sound%
+meet = meet_speak_boos
+
+[hit]
+on_info = %+jup_b4_monolith_squad_hit%
+
+[death]
+on_info = %+jup_b4_soldier_4_death +jup_b4_duty_aling4 +jup_b4_recruit_4_serve_duty_sound%
+
+[meet_speak_boos]
+use				= false
+snd_on_use 		= jup_b4_monolith_talk_to_commander

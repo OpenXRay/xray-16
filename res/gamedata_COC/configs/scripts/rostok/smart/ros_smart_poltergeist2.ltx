@@ -1,0 +1,18 @@
+[smart_terrain]
+squad_id = 11
+max_population = 3
+respawn_params = respawn@ros_smart_poltergeist2
+respawn_idle = 86400
+   
+
+[respawn@ros_smart_poltergeist2]
+spawn_polter
+spawn_cat
+
+[spawn_cat]
+spawn_squads =  simulation_cat
+spawn_num = 1
+
+[spawn_polter]
+spawn_squads = simulation_poltergeist_tele
+spawn_num = 2

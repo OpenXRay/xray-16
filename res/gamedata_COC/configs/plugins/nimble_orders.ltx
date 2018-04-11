@@ -1,0 +1,65 @@
+; This plugin determines and configures how Nimble's order system works.
+; Available items are handled here if using the standard CoP-style system.
+; If acting as a trader, supplies can be modified in configs/misc/trade/trade_loner_nimble.ltx
+
+[settings]
+item_count = 7
+nimble_trade_instead = false
+
+[item_count]
+category_1 = 3
+category_2 = 3
+category_3 = 3
+category_4 = 3
+category_5 = 1
+category_6 = 1
+category_7 = 1
+
+; Usage: Prepay (Agreed), Prepay (Refused), Cost.
+[costs_table]
+category_1 = 700, 1400, 2800
+category_2 = 2000, 4000, 8000
+category_3 = 4000, 8000, 16000
+category_4 = 4000, 8000, 16000
+category_5 = 8000, 16000, 32000
+category_6 = 15000, 30000, 60000
+category_7 = 28750, 57500, 115000
+
+; Potential items which can be received depending on selection.
+; Multiple items can be given at once if you separate them with a comma.
+
+; Pistols.
+[buy_item_table_1]
+item1 = wpn_desert_eagle_nimble
+item2 = wpn_sig220_nimble
+item3 = wpn_usp_nimble
+
+; Sub-machine guns.
+[buy_item_table_2]
+item1 = wpn_mp5_nimble
+item2 = wpn_spas12_nimble
+item3 = wpn_protecta_nimble
+
+; Assault rifles.
+[buy_item_table_3]
+item1 = wpn_groza_nimble
+item2 = wpn_g36_nimble
+item3 = wpn_fn2000_nimble
+
+; Sniper rifles.
+[buy_item_table_4]
+item1 = wpn_vintorez_nimble
+item2 = wpn_svu_nimble
+item3 = wpn_svd_nimble
+
+; Headgear.
+[buy_item_table_5]
+item1 = helm_hardhat, cs_heavy_outfit
+
+; Scientific outfits.
+[buy_item_table_6]
+item1 = scientific_outfit
+
+; Exoskeleton outfits.
+[buy_item_table_7]
+item1 = exo_outfit

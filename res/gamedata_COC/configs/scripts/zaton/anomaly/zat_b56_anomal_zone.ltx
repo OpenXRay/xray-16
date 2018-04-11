@@ -1,0 +1,52 @@
+[anomal_zone]
+
+layers_count = 3
+respawn_tries = 2
+max_artefacts = 2
+
+;applying_force_xz = 200
+;applying_force_y = 400 
+
+start_artefact = ; af_drops
+
+artefacts = af_cristall, af_drops, af_fireball, af_dummy_glassbeads, af_eye, af_fire
+
+coeff = 3, 3, 2, 2, 1, 1
+
+artefact_ways = zat_b56_af_way, zat_b56_af_way_2, zat_b56_af_way_3
+
+;field_name = zaton_b56_zone_field_thermal_average
+
+[mines_core]
+zaton_b56_zone_mine_thermal_average_0000
+zaton_b56_zone_mine_thermal_average_0001
+zaton_b56_zone_mine_thermal_average_0002
+zaton_b56_zone_mine_thermal_average_0003
+zaton_b56_zone_mine_thermal_average_0004
+
+[layer_1]
+mines_section = mines_layer_1 
+
+[mines_layer_1]:mines_core
+zat_b56_zone_mine_thermal_weak
+zat_b56_zone_mine_thermal_weak_0002
+zat_b56_zone_mine_thermal_weak_0004
+zat_b56_zone_mine_thermal_weak_0007
+
+[layer_2]
+mines_section = mines_layer_2 
+
+[mines_layer_2]:mines_core
+zat_b56_zone_mine_thermal_weak_0000
+zat_b56_zone_mine_thermal_weak_0001
+zat_b56_zone_mine_thermal_weak_0008
+zat_b56_zone_mine_thermal_weak_0010
+
+[layer_3]
+mines_section = mines_layer_3 
+
+[mines_layer_3]:mines_core
+zat_b56_zone_mine_thermal_weak_0003
+zat_b56_zone_mine_thermal_weak_0005
+zat_b56_zone_mine_thermal_weak_0006
+zat_b56_zone_mine_thermal_weak_0009

@@ -1,0 +1,2972 @@
+<?xml version='1.0' encoding="windows-1251"?>
+<xml>
+	<!-- CoC Jup A6 -->
+	<specific_character id="jup_a6_freedom_trader_ashot" team_default = "1">
+		<name>jup_a6_freedom_trader_ashot_name</name>
+		<icon>ui_inGame2_ashot</icon>
+		<map_icon x="1" y="0"></map_icon>
+		<bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+		<class>jup_a6_freedom_trader_ashot</class>
+		<community>freedom</community> <terrain_sect>stalker_terrain</terrain_sect>
+		<snd_config>characters_voice\human_03\freedom\</snd_config>
+		<rank>18066</rank>
+		<reputation>2342</reputation>
+		<money min="1000000" max="1000000" infinitive="1"/>
+		<visual>actors\stalker_freedom\stalker_freedom_2_mask</visual>
+		<supplies></supplies>
+
+		<start_dialog>jup_a6_freedom_trader_ashot_start</start_dialog>
+		<actor_dialog>dm_ashot_and_yar_dialog</actor_dialog>
+		<actor_dialog>dm_ordered_task_dialog</actor_dialog>
+		<actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+		<actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+		<actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    <specific_character id="jup_b19_freedom_yar" team_default = "1">
+		<name>jup_b19_freedom_yar_name</name>
+		<icon>ui_inGame2_Dyadka_Yar</icon>
+		<map_icon x="1" y="0">
+		</map_icon>
+		<bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+		<class>jup_b19_freedom_yar</class>
+		<community>freedom</community>
+		<terrain_sect>stalker_terrain</terrain_sect>
+		<snd_config>characters_voice\human_02\freedom\</snd_config>
+		<rank>15310</rank>
+		<reputation>2485</reputation>
+		<money min="2500" max="5000" infinitive="0"/>
+		<visual>actors\stalker_freedom\stalker_freedom_2_face_2</visual>
+		<supplies>
+			[spawn] \n
+			wpn_svd = 1 \n
+			ammo_7.62x54_7h1 = 3 \n
+			wpn_beretta = 1 \n
+			ammo_9x19_pbp = 1 \n
+#include "gameplay\character_items_3.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_sci.xml"
+		</supplies>
+		<start_dialog>jup_b19_freedom_yar_start</start_dialog>
+		<actor_dialog>dm_ashot_and_yar_dialog</actor_dialog>
+		<actor_dialog>dm_ordered_task_dialog</actor_dialog>
+		<actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+		<actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+		<actor_dialog>dm_broker_dialog</actor_dialog>
+		<actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>	
+    <!-- Jupiter A12 -->
+    <specific_character id="jup_a12_stalker_assaulter" team_default = "1">
+    <name>st_jup_a12_stalker_assaulter</name>
+    <icon>ui_inGame2_neutral_3</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_a12_stalker_assaulter</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <rank>19646</rank>
+    <reputation>920</reputation>
+    <money min="1000"  max="5000"  infinitive="0"/>
+    <visual>actors\stalker_neutral\stalker_neutral_3</visual>
+    <supplies>
+        [spawn] \n
+        wpn_spas12  \n
+        ammo_12x76_zhekan = 1 \n
+        wpn_colt1911 \n
+        ammo_11.43x23_fmj = 1 \n
+#include "gameplay\character_items_2.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+    <actor_dialog>jup_b1_stalker_about_scrutiny</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_2</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_3</actor_dialog>
+    <actor_dialog>jup_a12_stalkers_choose_actor_ransom_dialog</actor_dialog>
+    <actor_dialog>jup_a12_stalkers_choose_actor_ransom_take_dialog</actor_dialog>
+    <actor_dialog>jup_a12_stalkers_choose_actor_power_dialog</actor_dialog>
+    <actor_dialog>jup_a12_stalkers_choose_actor_power_take_dialog</actor_dialog>
+    <actor_dialog>jup_a12_stalkers_choose_actor_wait_dialog</actor_dialog>
+    <actor_dialog>jup_a12_stalkers_choose_actor_self_dialog</actor_dialog>
+    <actor_dialog>jup_a12_stalker_assaulter_after_scene_actor_dialog</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="jup_a12_stalker_diplomat" team_default = "1">
+    <name>st_jup_a12_stalker_diplomat</name>
+    <icon>ui_inGame2_neutral_2_mask</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_a12_stalker_diplomat</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <rank>5998</rank>
+    <reputation>1676</reputation>
+    <money min="1000"  max="5000"  infinitive="0"/>
+    <visual>actors\stalker_neutral\stalker_neutral_2_mask</visual>
+    <supplies>
+        [spawn] \n
+        wpn_l85 \n
+        ammo_5.56x45_ap = 1 \n
+        wpn_sig220 = 1 \n
+        ammo_11.43x23_fmj = 1 \n
+#include "gameplay\character_items_2.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+    <actor_dialog>jup_b1_stalker_about_scrutiny</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_2</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_3</actor_dialog>
+    <actor_dialog>jup_a12_stalker_diplomat_after_scene_actor_dialog</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="jup_a12_stalker_prisoner" team_default = "1">
+    <name>st_jup_a12_stalker_prisoner</name>
+    <icon>ui_inGame2_neutral_2_mask</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_a12_stalker_prisoner</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <rank>4036</rank>
+    <reputation>1251</reputation>
+    <money min="0"  max="0"  infinitive="0"/>
+    <visual>actors\stalker_neutral\stalker_neutral_2_mask</visual>
+    <supplies>
+        [spawn] \n
+    </supplies>
+    <actor_dialog>jup_a12_stalker_prisoner_free_actor_dialog</actor_dialog>
+    <actor_dialog>jup_a12_stalker_prisoner_employ_stalkers</actor_dialog>
+    <actor_dialog>jup_a12_stalker_prisoner_come_with_me</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_2</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_3</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="jup_a12_bandit_chief" team_default = "1">
+    <name>st_jup_a12_bandit_chief</name>
+    <icon>ui_inGame2_bandit_3_mask</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_a12_bandit_chief</class>
+    <community>bandit</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\bandit\</snd_config>
+    <rank>5980</rank>
+    <reputation>211</reputation>
+    <money min="1000"  max="5000"  infinitive="0"/>
+    <visual>actors\stalker_bandit\stalker_bandit_3_mask</visual>
+    <supplies>
+        [spawn] \n
+        wpn_hpsa \n
+        ammo_9x19_pbp = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+    </supplies>
+    <start_dialog>jup_a12_bandit_chief_dialog</start_dialog>
+    <actor_dialog>jup_a12_bandit_chief_actor_self_dialog</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="jup_a12_bandit_guard" team_default = "1">
+    <name>GENERATE_NAME_bandit</name>
+    <icon>ui_inGame2_bandit_1</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_a12_bandit_guard</class>
+    <community>bandit</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\bandit\</snd_config>
+    <rank>576</rank>
+    <reputation>144</reputation>
+    <money min="1000"  max="5000"  infinitive="0"/>
+    <visual>actors\stalker_bandit\stalker_bandit_1</visual>
+    <supplies>
+        [spawn] \n
+        wpn_mp5 \n
+        ammo_9x19_fmj = 1 \n
+        wpn_pm \n
+        ammo_9x18_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="jup_a12_bandit_cashier" team_default = "1">
+    <name>st_jup_a12_bandit_cashier</name>
+    <icon>ui_inGame2_bandit_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_a12_bandit_cashier</class>
+    <community>bandit</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\bandit\</snd_config>
+    <rank>3194</rank>
+    <reputation>1114</reputation>
+    <money min="1000"  max="5000"  infinitive="0"/>
+    <visual>actors\stalker_bandit\stalker_bandit_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_wincheaster1300 \n
+        ammo_12x70_buck = 1 \n
+        wpn_fort \n
+        ammo_9x18_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="jup_a12_merc_cover" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_neutral_2_mask</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_a12_merc_cover</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <rank>5580</rank>
+    <reputation>846</reputation>
+    <money min="1000"  max="5000"  infinitive="0"/>
+    <visual>actors\stalker_neutral\stalker_neutral_2_mask</visual>
+    <supplies>
+        [spawn] \n
+        wpn_vintorez \n
+        ammo_9x39_ap = 1 \n
+        wpn_sig220 = 1, silencer \n
+        ammo_11.43x23_fmj = 1 \n
+#include "gameplay\character_items_2.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+    </supplies>
+    <start_dialog>jup_a12_stalker_give_art_dialog</start_dialog>
+    <start_dialog>jup_a12_merc_done_dialog</start_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- B207 -->
+    <specific_character id="jup_b207_merc_illicit_dealer" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_merc_4</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b207_merc_illicit_dealer</class>
+    <community>killer</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\killer\</snd_config>
+    <rank>27170</rank>
+    <reputation>1337</reputation>
+    <visual>actors\stalker_merc\stalker_merc_4</visual>
+    <supplies>
+        [spawn] \n
+        wpn_abakan = 1 \n
+        ammo_5.45x39_ap = 1 \n
+        wpn_sig220 \n
+        ammo_11.43x23_hydro = 1 \n
+#include "gameplay\character_items_3.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b207_merc_leader" team_default = "1">
+    <name>jup_b207_merc_leader_name</name>
+    <icon>ui_inGame2_merc_4</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b207_merc_leader</class>
+    <community>killer</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\killer\</snd_config>
+    <rank>26360</rank>
+    <reputation>-1211</reputation>
+    <visual>actors\stalker_merc\stalker_merc_4</visual>
+    <supplies>
+        [spawn] \n
+        wpn_abakan = 1 \n
+        ammo_5.45x39_ap = 1 \n
+        wpn_usp = 1 \n
+        ammo_11.43x23_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b207_duty_security_squad_leader" team_default = "1">
+    <name>st_jup_b207_duty_security_squad_leader_name</name>
+    <icon>ui_inGame2_Dolg_4</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b207_duty_security_squad_leader</class>
+    <community>dolg</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\dolg\</snd_config>
+    <rank>21764</rank>
+    <reputation>1065</reputation>
+    <money min="1500" max="3500" infinitive="0"/>
+    <visual>actors\stalker_dolg\stalker_dolg_4</visual>
+    <supplies>
+        [spawn] \n
+        wpn_groza = 1 \n
+        ammo_9x39_pab9 = 1 \n
+        wpn_usp \n
+        ammo_11.43x23_hydro = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs_no_guide.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b207_freedom_recon_squad_leader" team_default = "1">
+    <name>st_jup_b207_freedom_recon_squad_leader_name</name>
+    <icon>ui_inGame2_Freedom_3</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b207_freedom_recon_squad_leader</class>
+    <community>freedom</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\freedom\</snd_config>
+    <rank>10702</rank>
+    <reputation>-1060</reputation>
+    <money min="1500" max="2500" infinitive="0"/>
+    <visual>actors\stalker_freedom\stalker_freedom_3</visual>
+    <supplies>
+        [spawn] \n
+        wpn_l85 \n
+        ammo_5.56x45_ap = 1 \n
+        wpn_beretta \n
+        ammo_9x19_pbp = 1 \n
+#include "gameplay\character_items_3.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs_no_guide.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b207_freedom_assault_squad_leader" team_default = "1">
+    <name>st_jup_b207_freedom_assault_squad_leader_name</name>
+    <icon>ui_inGame2_Freedom_4</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b207_freedom_assault_squad_leader</class>
+    <community>freedom</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\freedom\</snd_config>
+    <rank>24464</rank>
+    <reputation>1564</reputation>
+    <money min="1500" max="2500" infinitive="0"/>
+    <visual>actors\stalker_freedom\stalker_freedom_4</visual>
+    <supplies>
+        [spawn] \n
+        wpn_g36 \n
+        ammo_5.56x45_ap = 1 \n
+        wpn_colt1911 \n
+        ammo_11.43x23_fmj = 1 \n
+#include "gameplay\character_items_3.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs_no_guide.xml"
+    </specific_character>
+    
+    <!-- Лидер бандитов  -->
+    <specific_character id="jup_a10_bandit_leader" team_default="1">
+    <name>jup_a10_bandit_leader_name</name>
+    <icon>ui_inGame2_bandit_3</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_a10_bandit_leader</class>
+    <community>bandit</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\bandit\</snd_config>
+    <rank>5236</rank>
+    <reputation>1965</reputation>
+    <money min="10000" max="10000" infinitive="0" />
+    <visual>actors\stalker_bandit\stalker_bandit_3</visual>
+    <supplies>
+        [spawn] \n
+        wpn_protecta \n
+        ammo_12x76_zhekan = 1 \n
+        wpn_desert_eagle \n
+        ammo_11.43x23_fmj  = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+    </supplies>
+    <start_dialog>jup_a10_stalkers_dialog</start_dialog>
+    <actor_dialog>jup_a10_stalkers_dialog_debt</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- Сталкер Вано   -->
+    <specific_character id="jup_a10_stalker_vano" team_default = "1">
+    <name>jup_a10_stalker_vano</name>
+    <icon>ui_inGame2_Vano</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_a10_stalker_vano</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <rank>11974</rank>
+    <reputation>797</reputation>
+    <money min="10000" max="10000" infinitive="0" />
+    <visual>actors\stalker_neutral\stalker_neutral_1_face_1</visual>
+    <supplies>
+        [spawn] \n
+        wpn_binoc \n
+        wpn_wincheaster1300 \n
+        ammo_12x70_buck \n
+        ammo_12x76_zhekan \n
+        wpn_beretta \n
+        ammo_9x19_fmj \n
+        detector_simple \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+    </supplies>
+    <start_dialog>jup_a10_vano_help_dialog</start_dialog>
+    <!-- <actor_dialog>jup_a10_vano_go_to_underground_dialog</actor_dialog> -->
+    <actor_dialog>jup_a10_stalker_vano_need_outfit</actor_dialog>
+    <actor_dialog>jup_a10_stalker_vano_outfit_money_yes</actor_dialog>
+    <actor_dialog>jup_a10_stalker_vano_pripyat_group</actor_dialog>
+    <actor_dialog>jup_a10_stalker_vano_goto_zulus</actor_dialog>
+    <actor_dialog>jup_a10_stalker_vano_pripyat_ready</actor_dialog>
+    <actor_dialog>jup_a10_vano_back_1</actor_dialog>
+    <actor_dialog>jup_a10_vano_back_2</actor_dialog>
+    <actor_dialog>jup_a10_vano_back_3</actor_dialog>
+    <actor_dialog>jup_a10_vano_back_4</actor_dialog>
+    <actor_dialog>jup_a10_vano_give_duty</actor_dialog>
+    <actor_dialog>jup_a10_stalker_vano_about_stolen_items</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b4_monolith_squad_leader_monolith_skin" team_default="1">
+    <name>jup_b4_monolith_squad_leader_name</name>
+    <icon>ui_inGame2_Brodyaga_monolit</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b4_monolith_squad_leader_monolith_skin</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <rank>13650</rank>
+    <reputation>359</reputation>
+    <money min="10000" max="10000" infinitive="0" />
+    <visual>actors\stalker_monolith\stalker_monolith_1_face_1</visual>
+    <supplies>
+        [spawn] \n
+        wpn_binoc \n
+        wpn_svu \n
+        ammo_7.62x54_7h1 \n
+        wpn_colt1911 \n
+        ammo_11.43x23_fmj \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b4_monolith_squad_leader_duty_skin" team_default="1">
+    <name>jup_b4_monolith_squad_leader_name</name>
+    <icon>ui_inGame2_Brodyaga_monolit</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b4_monolith_squad_leader_duty_skin</class>
+    <community>dolg</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <rank>12268</rank>
+    <reputation>69</reputation>
+    <money min="10000" max="10000" infinitive="0" />
+    <visual>actors\stalker_dolg\stalker_dolg_2_face_1</visual>
+    <supplies>
+        [spawn] \n
+        wpn_binoc \n
+        wpn_svu \n
+        ammo_7.62x54_7h1 \n
+        wpn_colt1911 \n
+        ammo_11.43x23_fmj \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+    </supplies>
+    <start_dialog>jup_b4_monolith_squad_leader_start</start_dialog>
+    <actor_dialog>jup_b4_monolith_squad_leader_wassup</actor_dialog>
+    <actor_dialog>jup_b4_monolith_squad_leader_pripyat_group</actor_dialog>
+    <actor_dialog>jup_b4_monolith_squad_leader_need_outfit</actor_dialog>
+    <actor_dialog>jup_b4_monolith_squad_leader_goto_zulus</actor_dialog>
+    <actor_dialog>jup_b4_duty_go_home</actor_dialog>
+    <actor_dialog>jup_b4_monolith_squad_leader_about_stolen_items</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b4_monolith_squad_leader_freedom_skin" team_default = "1">
+    <name>jup_b4_monolith_squad_leader_name</name>
+    <icon>ui_inGame2_Brodyaga_monolit</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b4_monolith_squad_leader_freedom_skin</class>
+    <community>freedom</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <rank>11686</rank>
+    <reputation>97</reputation>
+    <money min="1500" max="2500" infinitive="0"/>
+    <visual>actors\stalker_freedom\stalker_freedom_2_face_1</visual>
+    <supplies>
+        [spawn] \n
+        wpn_binoc \n
+        wpn_svu \n
+        ammo_7.62x54_7h1 \n
+        wpn_colt1911 \n
+        ammo_11.43x23_fmj \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+    </supplies>
+    <start_dialog>jup_b4_monolith_squad_leader_start</start_dialog>
+    <actor_dialog>jup_b4_monolith_squad_leader_wassup</actor_dialog>
+    <actor_dialog>jup_b4_monolith_squad_leader_pripyat_group</actor_dialog>
+    <actor_dialog>jup_b4_monolith_squad_leader_need_outfit</actor_dialog>
+    <actor_dialog>jup_b4_monolith_squad_leader_goto_zulus</actor_dialog>
+    <actor_dialog>jup_b4_freedom_go_home</actor_dialog>
+    <actor_dialog>jup_b4_monolith_squad_leader_about_stolen_items</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b4_monolith_squad_leader_duty_mon_skin" team_default="1">
+    <name>jup_b4_monolith_squad_leader_name</name>
+    <icon>ui_inGame2_Brodyaga_monolit</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b4_monolith_squad_leader_duty_mon_skin</class>
+    <community>dolg</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <rank>10122</rank>
+    <reputation>469</reputation>
+    <money min="10000" max="10000" infinitive="0" />
+    <visual>actors\stalker_monolith\stalker_monolith_1_face_1</visual>
+    <supplies>
+        [spawn] \n
+        wpn_binoc \n
+        wpn_svu \n
+        ammo_7.62x54_7h1 \n
+        wpn_colt1911 \n
+        ammo_11.43x23_fmj \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+    </supplies>
+    <start_dialog>jup_b4_monolith_squad_leader_start</start_dialog>
+    <actor_dialog>jup_b4_monolith_squad_leader_wassup</actor_dialog>
+    <actor_dialog>jup_b4_monolith_squad_leader_pripyat_group</actor_dialog>
+    <actor_dialog>jup_b4_monolith_squad_leader_need_outfit</actor_dialog>
+    <actor_dialog>jup_b4_monolith_squad_leader_goto_zulus</actor_dialog>
+    <actor_dialog>jup_b4_duty_go_home</actor_dialog>
+    <actor_dialog>jup_b4_monolith_squad_leader_about_stolen_items</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b4_monolith_squad_leader_freedom_mon_skin" team_default = "1">
+    <name>jup_b4_monolith_squad_leader_name</name>
+    <icon>ui_inGame2_Brodyaga_monolit</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b4_monolith_squad_leader_freedom_mon_skin</class>
+    <community>freedom</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <rank>13424</rank>
+    <reputation>337</reputation>
+    <money min="1500" max="2500" infinitive="0"/>
+    <visual>actors\stalker_monolith\stalker_monolith_1_face_1</visual>
+    <supplies>
+        [spawn] \n
+        wpn_binoc \n
+        wpn_svu \n
+        ammo_7.62x54_7h1 \n
+        wpn_colt1911 \n
+        ammo_11.43x23_fmj \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+    </supplies>
+    <start_dialog>jup_b4_monolith_squad_leader_start</start_dialog>
+    <actor_dialog>jup_b4_monolith_squad_leader_wassup</actor_dialog>
+    <actor_dialog>jup_b4_monolith_squad_leader_pripyat_group</actor_dialog>
+    <actor_dialog>jup_b4_monolith_squad_leader_need_outfit</actor_dialog>
+    <actor_dialog>jup_b4_monolith_squad_leader_goto_zulus</actor_dialog>
+    <actor_dialog>jup_b4_freedom_go_home</actor_dialog>
+    <actor_dialog>jup_b4_monolith_squad_leader_about_stolen_items</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b4_monolith_squad_soldier_1_monolith_skin" team_default="1">
+    <name>jup_b4_monolith_squad_soldier_1_name</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b4_monolith_squad_soldier_1_monolith_skin</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\monolith\</snd_config>
+    <rank>16274</rank>
+    <reputation>1102</reputation>
+    <money min="10000" max="10000" infinitive="0" />
+    <visual>actors\stalker_monolith\stalker_monolith_3</visual>
+    <supplies>
+        [spawn] \n
+        wpn_wincheaster1300 \n
+        ammo_12x76_zhekan = 1 \n
+        wpn_beretta \n
+        ammo_9x19_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b4_monolith_squad_soldier_1_duty_skin" team_default="1">
+    <name>jup_b4_monolith_squad_soldier_1_name</name>
+    <icon>ui_inGame2_Dolg_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b4_monolith_squad_soldier_1_duty_skin</class>
+    <community>dolg</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\dolg\</snd_config>
+    <rank>2886</rank>
+    <reputation>-321</reputation>
+    <money min="10000" max="10000" infinitive="0" />
+    <visual>actors\stalker_dolg\stalker_dolg_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_spas12 \n
+        ammo_12x70_buck = 1 \n
+        wpn_walther = 1 \n
+        ammo_9x19_fmj = 1 \n
+#include "gameplay\character_items_2.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+    <actor_dialog>jup_b4_duty_go_home</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b4_monolith_squad_soldier_1_freedom_skin" team_default = "1">
+    <name>jup_b4_monolith_squad_soldier_1_name</name>
+    <icon>ui_inGame2_Freedom_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b4_monolith_squad_soldier_1_freedom_skin</class>
+    <community>freedom</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\freedom\</snd_config>
+    <rank>1598</rank>
+    <reputation>200</reputation>
+    <money min="1500" max="2500" infinitive="0"/>
+    <visual>actors\stalker_freedom\stalker_freedom_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_wincheaster1300 \n
+        ammo_12x76_zhekan = 1 \n
+        wpn_colt1911 \n
+        ammo_11.43x23_fmj = 1 \n
+#include "gameplay\character_items_2.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+    <actor_dialog>jup_b4_freedom_go_home</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b4_monolith_squad_soldier_2_monolith_skin" team_default="1">
+    <name>jup_b4_monolith_squad_soldier_2_name</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b4_monolith_squad_soldier_2_monolith_skin</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\monolith\</snd_config>
+    <rank>20594</rank>
+    <reputation>-1776</reputation>
+    <money min="10000" max="10000" infinitive="0" />
+    <visual>actors\stalker_monolith\stalker_monolith_3</visual>
+    <supplies>
+        [spawn] \n
+        wpn_lr300 = 1  \n
+        ammo_5.56x45_ss190 = 1 \n
+        wpn_colt1911 \n
+        ammo_11.43x23_fmj  = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b4_monolith_squad_soldier_2_duty_skin" team_default="1">
+    <name>jup_b4_monolith_squad_soldier_2_name</name>
+    <icon>ui_inGame2_Dolg_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b4_monolith_squad_soldier_2_duty_skin</class>
+    <community>dolg</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\dolg\</snd_config>
+    <rank>1372</rank>
+    <reputation>240</reputation>
+    <money min="10000" max="10000" infinitive="0" />
+    <visual>actors\stalker_dolg\stalker_dolg_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_abakan \n
+        ammo_5.45x39_fmj = 1 \n
+        wpn_fort \n
+        ammo_9x18_fmj = 1 \n
+#include "gameplay\character_items_2.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+    <actor_dialog>jup_b4_duty_go_home</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b4_monolith_squad_soldier_2_freedom_skin" team_default = "1">
+    <name>jup_b4_monolith_squad_soldier_2_name</name>
+    <icon>ui_inGame2_Freedom_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b4_monolith_squad_soldier_2_freedom_skin</class>
+    <community>freedom</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\freedom\</snd_config>
+    <rank>1526</rank>
+    <reputation>1173</reputation>
+    <money min="1500" max="2500" infinitive="0"/>
+    <visual>actors\stalker_freedom\stalker_freedom_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_lr300 = 1, silencer  \n
+        ammo_5.56x45_ss190 = 1 \n
+        wpn_colt1911 \n
+        ammo_11.43x23_fmj  = 1 \n
+#include "gameplay\character_items_2.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+    <actor_dialog>jup_b4_freedom_go_home</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b4_monolith_squad_soldier_3_monolith_skin" team_default="1">
+    <name>jup_b4_monolith_squad_soldier_3_name</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b4_monolith_squad_soldier_3_monolith_skin</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>2678</rank>
+    <reputation>-1462</reputation>
+    <money min="10000" max="10000" infinitive="0" />
+    <visual>actors\stalker_monolith\stalker_monolith_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_fmj = 1 \n
+        wpn_pb \n
+        ammo_9x18_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b4_monolith_squad_soldier_3_duty_skin" team_default="1">
+    <name>jup_b4_monolith_squad_soldier_3_name</name>
+    <icon>ui_inGame2_Dolg_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b4_monolith_squad_soldier_3_duty_skin</class>
+    <community>dolg</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\dolg\</snd_config>
+    <rank>2354</rank>
+    <reputation>1762</reputation>
+    <money min="10000" max="10000" infinitive="0" />
+    <visual>actors\stalker_dolg\stalker_dolg_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_fmj = 1 \n
+        wpn_pb \n
+        ammo_9x18_fmj = 1 \n
+#include "gameplay\character_items_2.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+    <actor_dialog>jup_b4_duty_go_home</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b4_monolith_squad_soldier_3_freedom_skin" team_default = "1">
+    <name>jup_b4_monolith_squad_soldier_3_name</name>
+    <icon>ui_inGame2_Freedom_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b4_monolith_squad_soldier_3_freedom_skin</class>
+    <community>freedom</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\freedom\</snd_config>
+    <rank>2316</rank>
+    <reputation>1574</reputation>
+    <money min="1500" max="2500" infinitive="0"/>
+    <visual>actors\stalker_freedom\stalker_freedom_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_fmj = 1 \n
+        wpn_pb \n
+        ammo_9x18_fmj = 1 \n
+#include "gameplay\character_items_2.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+    <actor_dialog>jup_b4_freedom_go_home</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b4_monolith_squad_soldier_4_monolith_skin" team_default="1">
+    <name>jup_b4_monolith_squad_soldier_4_name</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b4_monolith_squad_soldier_4_monolith_skin</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>2258</rank>
+    <reputation>-2005</reputation>
+    <money min="10000" max="10000" infinitive="0" />
+    <visual>actors\stalker_monolith\stalker_monolith_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_mp5 \n
+        ammo_9x19_fmj = 1 \n
+        wpn_fort \n
+        ammo_9x18_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b4_monolith_squad_soldier_4_duty_skin" team_default="1">
+    <name>jup_b4_monolith_squad_soldier_4_name</name>
+    <icon>ui_inGame2_Dolg_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b4_monolith_squad_soldier_4_duty_skin</class>
+    <community>dolg</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\dolg\</snd_config>
+    <rank>2452</rank>
+    <reputation>-840</reputation>
+    <money min="10000" max="10000" infinitive="0" />
+    <visual>actors\stalker_dolg\stalker_dolg_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_fmj = 1 \n
+        wpn_fort \n
+        ammo_9x18_fmj = 1 \n
+#include "gameplay\character_items_2.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+    <actor_dialog>jup_b4_duty_go_home</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b4_monolith_squad_soldier_4_freedom_skin" team_default = "1">
+    <name>jup_b4_monolith_squad_soldier_4_name</name>
+    <icon>ui_inGame2_Freedom_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b4_monolith_squad_soldier_4_freedom_skin</class>
+    <community>freedom</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\freedom\</snd_config>
+    <rank>2072</rank>
+    <reputation>1288</reputation>
+    <money min="1500" max="2500" infinitive="0"/>
+    <visual>actors\stalker_freedom\stalker_freedom_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_mp5 = 1, silencer \n
+        ammo_9x19_fmj = 1 \n
+        wpn_hpsa \n
+#include "gameplay\character_items_2.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+    <actor_dialog>jup_b4_freedom_go_home</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b4_monolith_squad_soldier_5_monolith_skin" team_default="1">
+    <name>jup_b4_monolith_squad_soldier_5_name</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b4_monolith_squad_soldier_5_monolith_skin</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>2906</rank>
+    <reputation>2139</reputation>
+    <money min="10000" max="10000" infinitive="0" />
+    <visual>actors\stalker_monolith\stalker_monolith_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_fmj = 1 \n
+        wpn_hpsa \n
+        ammo_9x19_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b4_monolith_squad_soldier_5_duty_skin" team_default="1">
+    <name>jup_b4_monolith_squad_soldier_5_name</name>
+    <icon>ui_inGame2_Dolg_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b4_monolith_squad_soldier_5_duty_skin</class>
+    <community>dolg</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\dolg\</snd_config>
+    <rank>2550</rank>
+    <reputation>-48</reputation>
+    <money min="10000" max="10000" infinitive="0" />
+    <visual>actors\stalker_dolg\stalker_dolg_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_fmj = 1 \n
+        wpn_fort \n
+        ammo_9x18_pmm = 1 \n
+#include "gameplay\character_items_2.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+    <actor_dialog>jup_b4_duty_go_home</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b4_monolith_squad_soldier_5_freedom_skin" team_default = "1">
+    <name>jup_b4_monolith_squad_soldier_5_name</name>
+    <icon>ui_inGame2_Freedom_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b4_monolith_squad_soldier_5_freedom_skin</class>
+    <community>freedom</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\freedom\</snd_config>
+    <rank>1806</rank>
+    <reputation>596</reputation>
+    <money min="1500" max="2500" infinitive="0"/>
+    <visual>actors\stalker_freedom\stalker_freedom_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_fmj = 1 \n
+        wpn_hpsa \n
+        ammo_9x19_fmj = 1 \n
+#include "gameplay\character_items_2.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+    <actor_dialog>jup_b4_freedom_go_home</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b4_freedom_help" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_Freedom_2_mask</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b4_freedom_help</class>
+    <community>freedom</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\freedom\</snd_config>
+    <rank>4112</rank>
+    <reputation>-342</reputation>
+    <money min="1500" max="2500" infinitive="0"/>
+    <visual>actors\stalker_freedom\stalker_freedom_2_mask</visual>
+    <supplies>
+        [spawn] \n
+        wpn_l85 \n
+        ammo_5.56x45_ss190 = 1 \n
+        wpn_beretta \n
+        ammo_9x19_fmj = 1 \n
+#include "gameplay\character_items_2.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+    <actor_dialog>jup_b4_freedom_go_home</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b4_duty_help" team_default = "1">
+    <name>GENERATE_NAME_lieutenant</name>
+    <icon>ui_inGame2_Dolg_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b4_duty_help</class>
+    <community>dolg</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\dolg\</snd_config>
+    <rank>1016</rank>
+    <reputation>-1866</reputation>
+    <money min="1500" max="3500" infinitive="0"/>
+    <visual>actors\stalker_dolg\stalker_dolg_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_abakan \n
+        ammo_5.45x39_ap = 1 \n
+        wpn_pm = 1 \n
+        ammo_9x18_pmm = 1 \n
+#include "gameplay\character_items_2.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+    <actor_dialog>jup_b4_duty_go_home</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b4_freedom_leader" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_Freedom_3</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b4_freedom_leader</class>
+    <community>freedom</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\freedom\</snd_config>
+    <rank>13234</rank>
+    <reputation>2321</reputation>
+    <money min="2500" max="5000" infinitive="0"/>
+    <visual>actors\stalker_freedom\stalker_freedom_3</visual>
+    <supplies>
+        [spawn] \n
+        device_torch \n
+        wpn_lr300 = 1, scope, silencer \n
+        ammo_5.56x45_ap = 1 \n
+        wpn_beretta \n
+        ammo_9x19_pbp = 1 \n
+#include "gameplay\character_items_3.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+    <actor_dialog>jup_b4_freedom_go_home</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+
+    
+    <!-- Сталкер Биохимик   -->
+    <specific_character id="jup_b6_scientist_biochemist" team_default = "1">
+    <name>jup_b6_scientist_biochemist</name>
+    <icon>ui_inGame2_Ozerskiy</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b6_scientist_biochemist</class>
+    <community>ecolog</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <rank>3728</rank>
+    <reputation>300</reputation>
+    <money min="10000" max="10000" infinitive="0" />
+    <visual>actors\stalker_ucheniy\stalker_ucheniy_1_face_2</visual>
+    <supplies>
+        [spawn] \n
+    </supplies>
+    <start_dialog>jup_b16_biochemist_oasis_start</start_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- Сталкер Ядерный Физик   -->
+    <specific_character id="jup_b6_scientist_nuclear_physicist" team_default = "1">
+    <name>jup_b6_scientist_nuclear_physicist</name>
+    <icon>ui_inGame2_German</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b6_scientist_nuclear_physicist</class>
+    <community>ecolog</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <rank>7630</rank>
+    <reputation>431</reputation>
+    <money min="1000000" max="1000000" infinitive="1" />
+    <visual>actors\stalker_ucheniy\stalker_ucheniy_1_face_1</visual>
+    <supplies>
+        [spawn] \n
+    </supplies>
+    <start_dialog>jup_b6_scientist_nuclear_physicist_start</start_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b9_shliachin" team_default = "1">
+    <name>jup_b9_shliachin_name</name>
+    <icon>ui_inGame2_Soldier_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b9_shliachin</class>
+    <community>army</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\military\</snd_config>
+    <rank>6394</rank>
+    <reputation>-2069</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_ap = 1 \n
+        wpn_fort \n
+        ammo_9x18_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- Сенька Пьяница  -->
+    <specific_character id="jup_b10_stalker_drunk" team_default="1">
+    <name>jup_b10_stalker_drunk</name>
+    <icon>ui_inGame2_neutral_1</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b10_stalker_drunk</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\bandit\</snd_config>
+    <rank>748</rank>
+    <reputation>2239</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral_1</visual>
+    <supplies>
+        [spawn] \n
+        wpn_pm \n
+        ammo_9x18_fmj = 3 \n
+        vodka = 3 \n
+        conserva \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <!-- Мертвый Сенька Пьяница  -->
+    <specific_character id="jup_b10_stalker_drunk_dead" team_default="1">
+    <name>jup_b10_stalker_drunk</name>
+    <icon>ui_inGame2_neutral_1</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b10_stalker_drunk_dead</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\bandit\</snd_config>
+    <rank>356</rank>
+    <reputation>1497</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral_1</visual>
+    <supplies>
+        [spawn] \n
+    </supplies>
+    </specific_character>
+    
+    <!-- Техник Азот   -->
+    <specific_character id="jup_b217_stalker_tech" team_default = "1">
+    <name>jup_b217_stalker_tech</name>
+    <icon>ui_inGame2_Azot</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Техник Азот.</bio>
+    <class>jup_b217_stalker_tech</class>
+    <community>stalker</community>
+    <mechanic_mode>1</mechanic_mode>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\dolg\</snd_config>
+    <rank>6676</rank>
+    <reputation>1755</reputation>
+    <money min="10000" max="10000" infinitive="0" />
+    <visual>actors\stalker_neutral\stalker_neutral_nauchniy_face_3</visual>
+    <supplies>
+        [spawn] \n
+        wpn_fort \n
+        ammo_9x18_pmm = 1 \n
+#include "gameplay\character_items_2.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+    </supplies>
+    <actor_dialog>dm_ordered_task_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+    <actor_dialog>dm_tech_repair</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- Зверобой   -->
+    <specific_character id="jup_b220_trapper" team_default = "1">
+    <name>jup_b220_trapper</name>
+    <icon>ui_inGame2_Zveroboy</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Зверобой.</bio>
+    <class>jup_b220_trapper</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <rank>15942</rank>
+    <reputation>1304</reputation>
+    <money min="1000000" max="1000000" infinitive="1" />
+    <visual>actors\stalker_neutral\stalker_neutral_2_face_7</visual>
+    <supplies>
+        [spawn] \n
+        wpn_wincheaster1300_trapper \n
+        ammo_12x70_buck = 1 \n
+        wpn_colt1911 \n
+        ammo_11.43x23_fmj = 1 \n
+#include "gameplay\character_items_3.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <actor_dialog>dm_ordered_task_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+    <actor_dialog>jup_b220_trapper_about_mutants</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <!-- Техник Новиков   -->
+    <specific_character id="jup_b6_scientist_tech" team_default = "1">
+    <name>jup_b6_scientist_novikov</name>
+    <icon>ui_inGame2_eco_tech</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b6_scientist_tech</class>
+    <community>ecolog</community>
+    <mechanic_mode>1</mechanic_mode>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <rank>5120</rank>
+    <reputation>957</reputation>
+    <money min="10000" max="10000" infinitive="0" />
+    <visual>actors\stalker_ecologist\stalker_ecolog_tookarev</visual>
+    <supplies>
+        [spawn] \n
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <start_dialog>jup_b6_scientist_medic_start</start_dialog>
+    <actor_dialog>dm_ordered_task_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+    <actor_dialog>dm_tech_repair</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <!--Лидер Сталкеров   -->
+    <specific_character id="jup_b1_stalker_1" team_default = "1">
+    <name>jup_b1_stalker_1</name>
+    <icon>ui_inGame2_neutral_2_mask</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b1_stalker_1</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <rank>3960</rank>
+    <reputation>1039</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral_2_mask</visual>
+    <supplies>
+        [spawn] \n
+        anomaly_scaner \n
+        wpn_ak74 \n
+        ammo_5.45x39_fmj = 1 \n
+        wpn_pm = 1 \n
+        ammo_9x18_fmj = 1 \n
+        detector_simple \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- Сталкер 2 -->
+    <specific_character id="jup_b1_stalker_2" team_default = "1">
+    <name>jup_b1_stalker_2</name>
+    <icon>ui_inGame2_neutral_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b1_stalker_2</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <rank>4898</rank>
+    <reputation>299</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral_2</visual>
+    <supplies>
+        [spawn] \n
+        anomaly_scaner \n
+        wpn_wincheaster1300 \n
+        ammo_12x76_zhekan = 1 \n
+        wpn_beretta \n
+        ammo_9x19_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs_no_guide.xml"
+    </specific_character>
+    
+    <!-- Сталкер 3 -->
+    <specific_character id="jup_b1_stalker_3" team_default = "1">
+    <name>jup_b1_stalker_3</name>
+    <icon>ui_inGame2_neutral_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b1_stalker_3</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <rank>4924</rank>
+    <reputation>1723</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral_2</visual>
+    <supplies>
+        [spawn] \n
+        anomaly_scaner \n
+        wpn_ak74u \n
+        ammo_5.45x39_fmj = 1 \n
+        wpn_fort \n
+        ammo_9x18_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs_no_guide.xml"
+    </specific_character>
+    
+    <!-- Сталкер 4  -->
+    <specific_character id="jup_b1_stalker_4" team_default = "1">
+    <name>jup_b1_stalker_4</name>
+    <icon>ui_inGame2_neutral_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b1_stalker_4</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <rank>4350</rank>
+    <reputation>-1620</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral_2</visual>
+    <supplies>
+        [spawn] \n
+        anomaly_scaner \n
+        wpn_ak74u \n
+        ammo_5.45x39_fmj = 1 \n
+        wpn_fort \n
+        ammo_9x18_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs_no_guide.xml"
+    </specific_character>
+    
+    <!--Лидер Сталкеров Опытный -->
+    <specific_character id="jup_b1_pro_stalker_1" team_default = "1">
+    <name>jup_b1_stalker_1</name>
+    <icon>ui_inGame2_neutral_4</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b1_pro_stalker_1</class>
+    <community>ecolog</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <rank>21086</rank>
+    <reputation>821</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral_4</visual>
+    <supplies>
+        [spawn] \n
+        wpn_g36 \n
+        ammo_5.45x39_ap = 1 \n
+        wpn_usp \n
+        ammo_11.43x23_hydro = 1 \n
+        detector_scientific \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- Сталкер 2 Опытный -->
+    <specific_character id="jup_b1_pro_stalker_2" team_default = "1">
+    <name>jup_b1_stalker_2</name>
+    <icon>ui_inGame2_neutral_3</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b1_pro_stalker_2</class>
+    <community>ecolog</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <rank>19050</rank>
+    <reputation>753</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral_3</visual>
+    <supplies>
+        [spawn] \n
+        wpn_spas12 = 1 \n
+        ammo_12x76_zhekan = 1 \n
+        wpn_usp = 1 \n
+        ammo_11.43x23_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- Сталкер 3 Опытный -->
+    <specific_character id="jup_b1_pro_stalker_3" team_default = "1">
+    <name>jup_b1_stalker_3</name>
+    <icon>ui_inGame2_neutral_nauchniy</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b1_pro_stalker_3</class>
+    <community>ecolog</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <rank>13200</rank>
+    <reputation>951</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral_nauchniy</visual>
+    <supplies>
+        [spawn] \n
+        wpn_lr300 = 1, scope  \n
+        ammo_5.56x45_ap = 1 \n
+        wpn_beretta \n
+        ammo_9x19_pbp = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- Сталкер 4 Опытный-->
+    <specific_character id="jup_b1_pro_stalker_4" team_default = "1">
+    <name>jup_b1_stalker_4</name>
+    <icon>ui_inGame2_neutral_nauchniy</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b1_pro_stalker_4</class>
+    <community>ecolog</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <rank>14392</rank>
+    <reputation>-1444</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral_nauchniy</visual>
+    <supplies>
+        [spawn] \n
+        wpn_lr300  \n
+        ammo_5.56x45_ap = 1 \n
+        wpn_beretta \n
+        ammo_9x19_pbp = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- Наемные Сталкеры из Группировок для Б6-->
+    <specific_character id="jup_b6_stalker_assaulter" team_default = "1">
+    <name>st_jup_a12_stalker_assaulter</name>
+    <icon>ui_inGame2_neutral_3</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b6_stalker_assaulter</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <rank>15464</rank>
+    <reputation>1891</reputation>
+    <money min="1000"  max="5000"  infinitive="0"/>
+    <visual>actors\stalker_neutral\stalker_neutral_3</visual>
+    <supplies>
+        [spawn] \n
+        anomaly_scaner \n
+        wpn_spas12  \n
+        ammo_12x76_zhekan = 1 \n
+        wpn_colt1911 \n
+        ammo_11.43x23_fmj = 1 \n
+        detector_advanced \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+    <actor_dialog>jup_b1_stalker_about_scrutiny</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_2</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_3</actor_dialog>
+    <actor_dialog>jup_a12_stalker_assaulter_after_scene_actor_dialog</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs_no_guide.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b6_stalker_diplomat" team_default = "1">
+    <name>st_jup_a12_stalker_diplomat</name>
+    <icon>ui_inGame2_neutral_2_mask</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b6_stalker_diplomat</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <rank>3392</rank>
+    <reputation>2366</reputation>
+    <money min="1000"  max="5000"  infinitive="0"/>
+    <visual>actors\stalker_neutral\stalker_neutral_2_mask</visual>
+    <supplies>
+        [spawn] \n
+        anomaly_scaner \n
+        wpn_l85 \n
+        ammo_5.56x45_ap = 1 \n
+        wpn_sig220 = 1 \n
+        ammo_11.43x23_fmj = 1 \n
+        detector_advanced \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+    <actor_dialog>jup_b1_stalker_about_scrutiny</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_2</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_3</actor_dialog>
+    <actor_dialog>jup_a12_stalker_diplomat_after_scene_actor_dialog</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs_no_guide.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b6_stalker_prisoner" team_default = "1">
+    <name>st_jup_a12_stalker_prisoner</name>
+    <icon>ui_inGame2_neutral_2_mask</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b6_stalker_prisoner</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <rank>5906</rank>
+    <reputation>-1610</reputation>
+    <money min="0"  max="0"  infinitive="0"/>
+    <visual>actors\stalker_neutral\stalker_neutral_2_mask</visual>
+    <supplies>
+        [spawn] \n
+        anomaly_scaner \n
+        wpn_ak74 = 1 \n
+        ammo_5.45x39_fmj = 1 \n
+        wpn_pm \n
+        ammo_9x18_fmj = 1 \n
+        detector_simple \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+    <actor_dialog>jup_a12_stalker_prisoner_employ_stalkers</actor_dialog>
+    <actor_dialog>jup_a12_stalker_prisoner_come_with_me</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_2</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_3</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b6_stalker_gonta" team_default="1">
+    <name>st_zat_b106_stalker_gonta_name</name>
+    <icon>ui_inGame2_Gonta</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b6_stalker_gonta</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <rank>10802</rank>
+    <reputation>516</reputation>
+    <money min="1000" max="1000" infinitive="0" />
+    <visual>actors\stalker_neutral\stalker_neutral_2_face_6</visual>
+    <supplies>
+        [spawn] \n
+        anomaly_scaner \n
+        wpn_ak74 = 1 \n
+        ammo_5.45x39_fmj = 1 \n
+        wpn_walther \n
+        ammo_9x19_fmj = 1 \n
+        detector_simple \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+    <start_dialog>zat_b106_stalker_gonta_start</start_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_2</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_3</actor_dialog>
+    <actor_dialog>zat_b106_hunt_himera</actor_dialog>
+    <actor_dialog>zat_b106_stalker_gonta_info_about_soroka</actor_dialog>
+    <actor_dialog>zat_b106_stalker_gonta_info_about_soroka_gone</actor_dialog>
+    <actor_dialog>zat_b106_stalker_gonta_about_soroka_dialog</actor_dialog>
+    <actor_dialog>zat_b106_stalker_gonta_about_soroka_actor_task</actor_dialog>
+    <actor_dialog>zat_b106_stalker_gonta_trapper_send</actor_dialog>
+    <actor_dialog>zat_b106_stalker_gonta_about_himself</actor_dialog>
+    <actor_dialog>zat_b106_stalker_gonta_b22_about_stalker_vampire</actor_dialog>
+    <actor_dialog>zat_b106_stalker_gonta_employ_stalkers</actor_dialog>
+    <actor_dialog>zat_b106_stalker_gonta_come_with_me</actor_dialog>
+    <actor_dialog>zat_b106_stalker_gonta_b52_about_nimble</actor_dialog>
+    <actor_dialog>zat_b106_stalker_gonta_about_mutants</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b6_stalker_garmata" team_default="1">
+    <name>st_zat_b106_stalker_garmata_name</name>
+    <icon>ui_inGame2_neutral_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b6_stalker_garmata</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <rank>3410</rank>
+    <reputation>-1794</reputation>
+    <money min="1000" max="1000" infinitive="0" />
+    <visual>actors\stalker_neutral\stalker_neutral_2</visual>
+    <supplies>
+        [spawn] \n
+        anomaly_scaner \n
+        wpn_spas12 = 1 \n
+        ammo_12x70_buck = 1 \n
+        wpn_colt1911 \n
+        ammo_11.43x23_fmj = 1 \n
+        detector_advanced \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+    <actor_dialog>jup_b1_stalker_about_scrutiny</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_2</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_3</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs_no_guide.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b6_stalker_crab" team_default="1">
+    <name>st_zat_b106_stalker_crab_name</name>
+    <icon>ui_inGame2_neutral_2_mask</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b6_stalker_crab</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <rank>4224</rank>
+    <reputation>-158</reputation>
+    <money min="1000" max="1000" infinitive="0" />
+    <visual>actors\stalker_neutral\stalker_neutral_2_mask</visual>
+    <supplies>
+        [spawn] \n
+        anomaly_scaner \n
+        wpn_ak74 = 1 \n
+        ammo_5.45x39_fmj = 1 \n
+        wpn_pm \n
+        ammo_9x18_fmj = 1 \n
+        detector_advanced \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+    <actor_dialog>jup_b1_stalker_about_scrutiny</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_2</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_3</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs_no_guide.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b6_freedom_stalker_1" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_Freedom_2_mask</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b6_freedom_stalker_1</class>
+    <community>freedom</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\freedom\</snd_config>
+    <rank>4558</rank>
+    <reputation>-2350</reputation>
+    <money min="2500" max="5000" infinitive="0"/>
+    <visual>actors\stalker_freedom\stalker_freedom_2_mask</visual>
+    <supplies>
+        [spawn] \n
+        anomaly_scaner \n
+        wpn_sig550 \n
+        ammo_5.56x45_ap = 1 \n
+        wpn_desert_eagle = 1 \n
+        ammo_11.43x23_fmj = 1 \n
+        detector_simple \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_sci.xml"
+
+    </supplies>
+    <actor_dialog>jup_b1_stalker_about_scrutiny</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_2</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_3</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b6_freedom_stalker_2" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_Freedom_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b6_freedom_stalker_2</class>
+    <community>freedom</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\freedom\</snd_config>
+    <rank>2326</rank>
+    <reputation>-906</reputation>
+    <money min="1500" max="2500" infinitive="0"/>
+    <visual>actors\stalker_freedom\stalker_freedom_2</visual>
+    <supplies>
+        [spawn] \n
+        anomaly_scaner \n
+        wpn_lr300  \n
+        ammo_5.56x45_ss190 = 1 \n
+        wpn_colt1911 \n
+        ammo_11.43x23_fmj  = 1 \n
+        detector_advanced \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+
+    </supplies>
+    <actor_dialog>jup_b1_stalker_about_scrutiny</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_2</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_3</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs_no_guide.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b6_freedom_stalker_3" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_Freedom_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b6_freedom_stalker_3</class>
+    <community>freedom</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\freedom\</snd_config>
+    <rank>1822</rank>
+    <reputation>-2461</reputation>
+    <money min="1500" max="2500" infinitive="0"/>
+    <visual>actors\stalker_freedom\stalker_freedom_2</visual>
+    <supplies>
+        [spawn] \n
+        anomaly_scaner \n
+        wpn_l85 \n
+        ammo_5.56x45_ap = 1 \n
+        wpn_beretta \n
+        ammo_9x19_pbp = 1 \n
+        detector_advanced \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+
+    </supplies>
+    <actor_dialog>jup_b1_stalker_about_scrutiny</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_2</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_3</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs_no_guide.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b6_freedom_stalker_4" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_Freedom_1</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b6_freedom_stalker_4</class>
+    <community>freedom</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\freedom\</snd_config>
+    <rank>1424</rank>
+    <reputation>2456</reputation>
+    <money min="1000" max="2000" infinitive="0"/>
+    <visual>actors\stalker_freedom\stalker_freedom_1</visual>
+    <supplies>
+        [spawn] \n
+        anomaly_scaner \n
+        ammo_12x70_buck = 1 \n
+        wpn_wincheaster1300 \n
+        wpn_beretta \n
+        ammo_9x19_fmj = 1 \n
+        detector_advanced \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+    <actor_dialog>jup_b1_stalker_about_scrutiny</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_2</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_3</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs_no_guide.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b6_duty_stalker_1" team_default = "1">
+    <name>GENERATE_NAME_captain</name>
+    <icon>ui_inGame2_Dolg_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b6_duty_stalker_1</class>
+    <community>dolg</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\dolg\</snd_config>
+    <rank>1694</rank>
+    <reputation>1118</reputation>
+    <money min="2500" max="5000" infinitive="0"/>
+    <visual>actors\stalker_dolg\stalker_dolg_2</visual>
+    <supplies>
+        [spawn] \n
+        anomaly_scaner \n
+        wpn_groza  = 1 \n
+        ammo_9x39_pab9 = 1 \n
+        wpn_sig220 = 1 \n
+        ammo_11.43x23_fmj  = 1 \n
+        detector_simple \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_mil.xml"
+
+    </supplies>
+    <actor_dialog>jup_b1_stalker_about_scrutiny</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_2</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_3</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b6_duty_stalker_2" team_default = "1">
+    <name>GENERATE_NAME_lieutenant</name>
+    <icon>ui_inGame2_Dolg_1</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b6_duty_stalker_2</class>
+    <community>dolg</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\dolg\</snd_config>
+    <rank>11306</rank>
+    <reputation>-766</reputation>
+    <money min="1500" max="3500" infinitive="0"/>
+    <visual>actors\stalker_dolg\stalker_dolg_1</visual>
+    <supplies>
+        [spawn] \n
+        anomaly_scaner \n
+        wpn_abakan = 1 \n
+        ammo_5.45x39_fmj = 1 \n
+        wpn_pm = 1 \n
+        ammo_9x18_fmj = 1 \n
+        detector_advanced \n
+#include "gameplay\character_drugs_2.xml"
+
+    </supplies>
+    <actor_dialog>jup_b1_stalker_about_scrutiny</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_2</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_3</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs_no_guide.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b6_duty_stalker_3" team_default = "1">
+    <name>GENERATE_NAME_sergeant</name>
+    <icon>ui_inGame2_Dolg_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b6_duty_stalker_3</class>
+    <community>dolg</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\dolg\</snd_config>
+    <rank>2362</rank>
+    <reputation>-1439</reputation>
+    <money min="1500" max="3500" infinitive="0"/>
+    <visual>actors\stalker_dolg\stalker_dolg_2</visual>
+    <supplies>
+        [spawn] \n
+        anomaly_scaner \n
+        wpn_spas12 \n
+        ammo_12x70_buck = 1 \n
+        wpn_walther = 1 \n
+        ammo_9x19_fmj = 1 \n
+        detector_advanced \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+
+    </supplies>
+    <actor_dialog>jup_b1_stalker_about_scrutiny</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_2</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_3</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs_no_guide.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b6_duty_stalker_4" team_default = "1">
+    <name>GENERATE_NAME_lieutenant</name>
+    <icon>ui_inGame2_Dolg_1</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b6_duty_stalker_4</class>
+    <community>dolg</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\dolg\</snd_config>
+    <rank>10956</rank>
+    <reputation>-225</reputation>
+    <money min="1500" max="3500" infinitive="0"/>
+    <visual>actors\stalker_dolg\stalker_dolg_1</visual>
+    <supplies>
+        [spawn] \n
+        anomaly_scaner \n
+        wpn_abakan \n
+        ammo_5.45x39_fmj = 1 \n
+        wpn_pm = 1 \n
+        ammo_9x18_fmj = 1 \n
+        detector_advanced \n
+#include "gameplay\character_drugs_2.xml"
+
+    </supplies>
+    <actor_dialog>jup_b1_stalker_about_scrutiny</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_2</actor_dialog>
+    <actor_dialog>jup_b1_stalker_about_scrutiny_3</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs_no_guide.xml"
+    </specific_character>
+    
+    <!-- Сталкер "Сеня Щепка"   -->
+    <specific_character id="jup_b25_stalker_senya" team_default = "1">
+    <name>jup_b25_stalker_senya</name>
+    <icon>ui_inGame2_neutral_2_mask</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b25_stalker_senya</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <rank>4102</rank>
+    <reputation>2378</reputation>
+    <money min="10000" max="10000" infinitive="0" />
+    <visual>actors\stalker_neutral\stalker_neutral_2_mask</visual>
+    <supplies>
+        [spawn] \n
+        wpn_toz34 \n
+        ammo_12x70_buck = 1 \n
+        wpn_pm = 1 \n
+        ammo_9x18_fmj = 1 \n
+        detector_advanced \n
+#include "gameplay\character_food.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- Сталкер "Флинт"   -->
+    <specific_character id="jup_b25_freedom_flint" team_default = "1">
+    <name>jup_b25_freedom_flint</name>
+    <icon>ui_inGame2_Flint</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b25_freedom_flint</class>
+    <community>freedom</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <rank>4756</rank>
+    <reputation>-1489</reputation>
+    <money min="500" max="1000" infinitive="0"/>
+    <visual>actors\stalker_freedom\stalker_freedom_1_face_1</visual>
+    <supplies>
+        [spawn] \n
+        wpn_mp5 \n
+        ammo_9x19_pbp = 1 \n
+        wpn_beretta \n
+        ammo_9x19_fmj = 1 \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+    </supplies>
+    <start_dialog>jup_b25_flint_start</start_dialog>
+    <actor_dialog>jup_b25_flint_argue_oasis</actor_dialog>
+    <actor_dialog>jup_b25_flint_argue_bloodsucker</actor_dialog>
+    <actor_dialog>jup_b25_flint_argue_scientist</actor_dialog>
+    <actor_dialog>jup_b25_flint_argue_guide</actor_dialog>
+    <actor_dialog>jup_b25_flint_accuse</actor_dialog>
+    <actor_dialog>jup_b25_flint_about_controller</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- Сталкер медик "Костоправ"   -->
+    <specific_character id="jup_a6_stalker_medik" team_default = "1">
+    <name>jup_a6_stalker_medik</name>
+    <icon>ui_inGame2_Kostoprav</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_a6_stalker_medik</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <rank>5454</rank>
+    <money min="1000000" max="1000000" infinitive="1"/>
+    <reputation>598</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral_1_face_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_ak74u \n
+        ammo_5.45x39_fmj = 1 \n
+        wpn_beretta \n
+        ammo_9x19_fmj = 1 \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+    </supplies>
+    <start_dialog>jup_a6_stalker_medik_start_dialog</start_dialog>
+    <actor_dialog>jup_a6_stalker_medik_pripyat_group</actor_dialog>
+    <actor_dialog>jup_a6_stalker_medik_tech_b202_about_stole</actor_dialog>
+    <actor_dialog>jup_a6_stalker_medik_duty_founder_pda</actor_dialog>
+    <actor_dialog>jup_a6_stalker_medik_b4_monolith_squad_dialog</actor_dialog>
+    <actor_dialog>jup_a6_stalker_medik_jup_b217_pda_sell</actor_dialog>
+    <actor_dialog>jup_a6_stalker_medik_about_sci_guards</actor_dialog>
+    <actor_dialog>jup_a6_stalker_medik_about_sci_helpers</actor_dialog>
+    <actor_dialog>jup_a6_stalker_medik_need_health_care</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- Сталкер "Зулус"   -->
+    <specific_character id="jup_b15_zulus" team_default = "1">
+    <name>jup_b15_zulus</name>
+    <icon>ui_inGame2_Zulus</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b15_zulus</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\dolg\</snd_config>
+    <rank>19604</rank>
+    <reputation>214</reputation>
+    <visual>actors\stalker_dolg\stalker_dolg_1_face_1</visual>
+    <supplies>
+        [spawn] \n
+        device_torch \n
+        wpn_binoc \n
+        wpn_pkm_zulus \n
+        ammo_pkm_100 \n
+        wpn_usp \n
+        ammo_11.43x23_hydro \n
+        vodka = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+    <start_dialog>jup_b15_zulus_about_dialog</start_dialog>
+    <actor_dialog>jup_b15_zulus_go_to_pripyat</actor_dialog>
+    <actor_dialog>jup_b15_zulus_group_fighters</actor_dialog>
+    <actor_dialog>jup_b15_zulus_tech_b202_about_stole</actor_dialog>
+    <actor_dialog>jup_b15_zulus_tech_b202_about_testimony</actor_dialog>
+    <actor_dialog>jup_b15_zulus_group_stalker_about</actor_dialog>
+    <actor_dialog>jup_b15_zulus_group_soldier_about</actor_dialog>
+    <actor_dialog>jup_b15_zulus_group_monolith_about</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- Сталкер "Коряга" на Юпитере   -->
+    <specific_character id="jup_b202_stalker_snag" team_default = "1">
+    <name>zat_b33_stalker_snag</name>
+    <icon>ui_inGame2_neutral_1</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b202_stalker_snag</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <rank>0</rank>
+    <reputation>402</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral_1</visual>
+    <supplies>
+        [spawn] \n
+        wpn_bm16 \n
+        ammo_12x70_buck = 1 \n
+        wpn_pm = 1 \n
+        ammo_9x18_fmj = 1 \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+    <start_dialog>jup_b202_snag_b202_about_stole</start_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- Сталкер бармен "Гаваец"   -->
+    <specific_character id="jup_a6_stalker_barmen" team_default = "1">
+    <name>jup_a6_stalker_barmen</name>
+    <icon>ui_inGame2_Gavaets</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_a6_stalker_barmen</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <rank>15014</rank>
+    <money min="1000000" max="1000000" infinitive="1"/>
+    <reputation>1402</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral_2_face_3</visual>
+    <supplies>
+#include "gameplay\character_items_3.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+    </supplies>
+    <start_dialog>jup_a6_stalker_barmen_start_dialog</start_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- Бандит раневшый Корягу  -->
+    <specific_character id="jup_b202_bandit" team_default="1">
+    <name>GENERATE_NAME_bandit</name>
+    <icon>ui_inGame2_bandit_3</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b202_bandit</class>
+    <community>bandit</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\bandit\</snd_config>
+    <rank>3540</rank>
+    <reputation>-93</reputation>
+    <money min="500" max="1750" infinitive="0" />
+    <visual>actors\stalker_bandit\stalker_bandit_3</visual>
+    <supplies>
+        [spawn] \n
+        wpn_desert_eagle = 1 \n
+        ammo_11.43x23_hydro = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_dialogs_no_guide.xml"
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+
+    
+    <specific_character id="jup_b19_merc_1" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_merc_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b19_merc_1</class>
+    <community>killer</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\killer\</snd_config>
+    <rank>11570</rank>
+    <reputation>1212</reputation>
+    <visual>actors\stalker_merc\stalker_merc_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_lr300 = 1, silencer \n
+        ammo_5.56x45_ap = 1 \n
+        wpn_usp = 1 \n
+        ammo_11.43x23_hydro = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b19_merc_2" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_merc_4</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b19_merc_2</class>
+    <community>killer</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\killer\</snd_config>
+    <rank>26108</rank>
+    <reputation>-2179</reputation>
+    <visual>actors\stalker_merc\stalker_merc_4</visual>
+    <supplies>
+        [spawn] \n
+        wpn_lr300 = 1, scope, silencer \n
+        ammo_5.56x45_ap = 1 \n
+        wpn_usp = 1 \n
+        ammo_11.43x23_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b19_merc_3" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_merc_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b19_merc_3</class>
+    <community>killer</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\killer\</snd_config>
+    <rank>11328</rank>
+    <reputation>20</reputation>
+    <visual>actors\stalker_merc\stalker_merc_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_l85  \n
+        ammo_5.56x45_ap = 1 \n
+        wpn_usp = 1 \n
+        ammo_11.43x23_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b19_merc_4" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_merc_4</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b19_merc_4</class>
+    <community>killer</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\killer\</snd_config>
+    <rank>24198</rank>
+    <reputation>-1575</reputation>
+    <visual>actors\stalker_merc\stalker_merc_4</visual>
+    <supplies>
+        [spawn] \n
+        wpn_lr300 = 1, silencer \n
+        ammo_5.56x45_ap = 1 \n
+        wpn_usp = 1 \n
+        ammo_11.43x23_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b19_merc_5" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_merc_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b19_merc_5</class>
+    <community>killer</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\killer\</snd_config>
+    <rank>14110</rank>
+    <reputation>-1538</reputation>
+    <visual>actors\stalker_merc\stalker_merc_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_l85  \n
+        ammo_5.56x45_ap = 1 \n
+        wpn_usp = 1 \n
+        ammo_11.43x23_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <!-- Сталкер, проводник и добытчик артефактов для учёных. Впоследствии – проводник на Припяти.  -->
+    <specific_character id="jup_b43_stalker_assistant" team_default = "1">
+    <name>st_jup_b43_stalker_assistant</name>
+    <icon>ui_inGame2_Garik</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b43_stalker_assistant</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <rank>13982</rank>
+    <money min="5000" max="10000" infinitive="0"/>
+    <reputation>993</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral_nauchniy</visual>
+    <supplies>
+        [spawn] \n
+        wpn_vintorez \n
+        ammo_9x39_ap = 1 \n
+        wpn_sig220 = 1 \n
+        ammo_11.43x23_hydro = 1 \n
+        wpn_spas12 \n
+        ammo_12x76_zhekan = 1 \n
+        grenade_f1 = 4 \n
+#include "gameplay\character_items_3.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs_no_guide.xml"
+    </specific_character>
+    
+    <!-- Основатель "Долга" генерал Таченко -->
+    <specific_character id="jup_b46_duty_founder" team_default = "1">
+    <name>jup_b46_duty_founder_name</name>
+    <icon>ui_inGame2_Dolg_4</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b46_duty_founder</class>
+    <community>dolg</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\dolg\</snd_config>
+    <rank>25426</rank>
+    <reputation>1990</reputation>
+    <money min="1500" max="3500" infinitive="0"/>
+    <visual>actors\stalker_dolg\stalker_dolg_4</visual>
+    <supplies>
+        [spawn] \n
+    </supplies>
+    </specific_character>
+    
+    <!-- Отряд основателя "Долга" (4 человека) -->
+    <specific_character id="jup_b46_duty_founder_squad_01" team_default = "1">
+    <name>jup_b46_duty_founder_squad_01_name</name>
+    <icon>ui_inGame2_Dolg_3</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b46_duty_founder_squad_01</class>
+    <community>dolg</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\dolg\</snd_config>
+    <rank>14702</rank>
+    <reputation>909</reputation>
+    <money min="100" max="3000" infinitive="0"/>
+    <visual>actors\stalker_dolg\stalker_dolg_3</visual>
+    </specific_character>
+    
+    <specific_character id="jup_b46_duty_founder_squad_02" team_default = "1">
+    <name>jup_b46_duty_founder_squad_02_name</name>
+    <icon>ui_inGame2_Dolg_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b46_duty_founder_squad_02</class>
+    <community>dolg</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\dolg\</snd_config>
+    <rank>1232</rank>
+    <reputation>-1059</reputation>
+    <money min="100" max="3000" infinitive="0"/>
+    <visual>actors\stalker_dolg\stalker_dolg_2</visual>
+    </specific_character>
+    
+    <specific_character id="jup_b46_duty_founder_squad_03" team_default = "1">
+    <name>jup_b46_duty_founder_squad_03_name</name>
+    <icon>ui_inGame2_Dolg_3</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b46_duty_founder_squad_03</class>
+    <community>dolg</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\dolg\</snd_config>
+    <rank>10770</rank>
+    <reputation>1133</reputation>
+    <money min="100" max="3000" infinitive="0"/>
+    <visual>actors\stalker_dolg\stalker_dolg_3</visual>
+    </specific_character>
+    
+    <specific_character id="jup_b46_duty_founder_squad_04" team_default = "1">
+    <name>jup_b46_duty_founder_squad_04_name</name>
+    <icon>ui_inGame2_Dolg_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b46_duty_founder_squad_04</class>
+    <community>dolg</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\dolg\</snd_config>
+    <rank>2954</rank>
+    <reputation>-585</reputation>
+    <money min="100" max="3000" infinitive="0"/>
+    <visual>actors\stalker_dolg\stalker_dolg_2</visual>
+    </specific_character>
+    
+    <!-- Лидер "Свободы" Локи-->
+    <specific_character id="jup_a6_freedom_leader" team_default = "1">
+    <name>jup_a6_freedom_leader</name>
+    <icon>ui_inGame2_Loki</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_a6_freedom_leader</class>
+    <community>freedom</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\freedom\</snd_config>
+    <rank>21778</rank>
+    <reputation>1944</reputation>
+    <money min="1000000" max="1000000" infinitive="1"/>
+    <visual>actors\stalker_freedom\stalker_freedom_3_face_1</visual>
+    <supplies>
+        [spawn] \n
+        hand_radio \n
+        wpn_colt1911 \n
+        ammo_11.43x23_hydro = 1 \n
+#include "gameplay\character_items_3.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <start_dialog>jup_a6_freedom_leader_start_dialog</start_dialog>
+    <actor_dialog>jup_a6_freedom_leader_duty_founder_pda</actor_dialog>
+    <actor_dialog>jup_a6_freedom_leader_duty_sell_founder_pda</actor_dialog>
+    <actor_dialog>jup_a6_freedom_leader_pripyat_group</actor_dialog>
+    <actor_dialog>jup_a6_freedom_leader_b4_monolith_squad_dialog</actor_dialog>
+    <actor_dialog>jup_a6_freedom_leader_b4_monolith_squad_dialog_redy_to_go</actor_dialog>
+    <actor_dialog>jup_a6_freedom_leader_b207_hiding_place</actor_dialog>
+    <actor_dialog>jup_a6_freedom_leader_employ_stalkers</actor_dialog>
+    <actor_dialog>jup_a6_freedom_leader_b106_info_about_soroka</actor_dialog>
+    <actor_dialog>jup_a6_freedom_leader_about_stolen_items</actor_dialog>
+    <actor_dialog>jup_a6_freedom_leader_a9_sell_info</actor_dialog>
+    <actor_dialog>jup_a6_freedom_leader_about_you</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <!-- Лидер "Долга" Шульга-->
+    <specific_character id="jup_a6_duty_leader" team_default = "1">
+    <name>jup_a6_duty_leader</name>
+    <icon>ui_inGame2_Shulga</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_a6_duty_leader</class>
+    <community>dolg</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\dolg\</snd_config>
+    <rank>22718</rank>
+    <reputation>1765</reputation>
+    <money min="100" max="3000" infinitive="0"/>
+    <visual>actors\stalker_dolg\stalker_dolg_3_face_1</visual>
+    <supplies>
+        [spawn] \n
+        hand_radio \n
+        wpn_sig220  \n
+        ammo_11.43x23_fmj = 1 \n
+#include "gameplay\character_items_3.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <start_dialog>jup_a6_duty_leader_start_dialog</start_dialog>
+    <actor_dialog>jup_a6_duty_leader_duty_founder_pda</actor_dialog>
+    <actor_dialog>jup_a6_duty_leader_duty_founder_sell_pda</actor_dialog>
+    <actor_dialog>jup_a6_duty_leader_pripyat_group</actor_dialog>
+    <actor_dialog>jup_a6_duty_leader_b4_monolith_squad_dialog</actor_dialog>
+    <actor_dialog>jup_a6_duty_leader_b4_monolith_squad_dialog_redy_to_go</actor_dialog>
+    <actor_dialog>jup_a6_duty_leader_b207_hiding_place</actor_dialog>
+    <actor_dialog>jup_a6_duty_leader_employ_stalkers</actor_dialog>
+    <actor_dialog>jup_a6_duty_leader_b106_info_about_soroka</actor_dialog>
+    <actor_dialog>jup_a6_duty_leader_about_stolen_items</actor_dialog>
+    <actor_dialog>jup_a6_duty_leader_a9_sell_info</actor_dialog>
+    <actor_dialog>jup_a6_duty_leader_about_you</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <!-- jup_b218_vano_in_suit -->
+    <specific_character id="jup_b218_vano_in_suit" team_default = "1">
+    <name>jup_a10_stalker_vano</name>
+    <icon>ui_inGame2_Vano_nauchniy</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b218_vano_in_suit</class>
+    <community>stalker</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <rank>13150</rank>
+    <reputation>891</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral_nauchniy_face_1</visual>
+    <supplies>
+        [spawn] \n
+        wpn_wincheaster1300 \n
+        ammo_12x70_buck \n
+        ammo_12x76_zhekan \n
+        wpn_beretta \n
+        ammo_9x19_fmj \n
+        detector_simple \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <start_dialog>jup_a10_vano_help_dialog</start_dialog>
+    <actor_dialog>jup_a10_stalker_vano_pripyat_ready</actor_dialog>
+    <actor_dialog>jup_a10_stalker_vano_pripyat_how_are_you</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <!-- Jupiter b47 -->
+    <specific_character id="jup_b47_merc_07" team_default = "1">
+    <name>jup_b47_merc_07</name>
+    <icon>ui_inGame2_merc_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b47_merc_07</class>
+    <community>killer</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\killer\</snd_config>
+    <rank>10326</rank>
+    <reputation>626</reputation>
+    <visual>actors\stalker_merc\stalker_merc_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_lr300 = 1, scope, silencer \n
+        ammo_5.56x45_ss190 = 1 \n
+        wpn_sig220 \n
+        ammo_11.43x23_fmj  = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+    <start_dialog>jup_b47_merc_guards_start</start_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs_no_guide.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b47_merc_06" team_default = "1">
+    <name>jup_b47_merc_06</name>
+    <icon>ui_inGame2_merc_4</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b47_merc_06</class>
+    <community>killer</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\killer\</snd_config>
+    <rank>26528</rank>
+    <reputation>261</reputation>
+    <visual>actors\stalker_merc\stalker_merc_4</visual>
+    <supplies>
+        [spawn] \n
+        wpn_spas12  \n
+        ammo_12x76_zhekan = 1 \n
+        wpn_walther \n
+        ammo_9x19_pbp = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+    <start_dialog>jup_b47_merc_guards_start</start_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs_no_guide.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b47_merc_05" team_default = "1">
+    <name>jup_b47_merc_05</name>
+    <icon>ui_inGame2_merc_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b47_merc_05</class>
+    <community>killer</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\killer\</snd_config>
+    <rank>14670</rank>
+    <reputation>-1077</reputation>
+    <visual>actors\stalker_merc\stalker_merc_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_lr300 = 1, silencer \n
+        ammo_5.56x45_ss190 = 1 \n
+        wpn_walther \n
+        ammo_9x19_pbp = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+    <start_dialog>jup_b47_merc_guards_start</start_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs_no_guide.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b47_merc_04" team_default = "1">
+    <name>jup_b47_merc_04</name>
+    <icon>ui_inGame2_merc_4</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b47_merc_04</class>
+    <community>killer</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\killer\</snd_config>
+    <rank>21928</rank>
+    <reputation>1432</reputation>
+    <visual>actors\stalker_merc\stalker_merc_4</visual>
+    <supplies>
+        [spawn] \n
+        wpn_spas12  \n
+        ammo_12x76_zhekan = 1 \n
+        wpn_walther \n
+        ammo_9x19_pbp = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+    <start_dialog>jup_b47_merc_guards_start</start_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs_no_guide.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b47_merc_03" team_default = "1">
+    <name>jup_b47_merc_03</name>
+    <icon>ui_inGame2_merc_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b47_merc_03</class>
+    <community>killer</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\killer\</snd_config>
+    <rank>14714</rank>
+    <reputation>-2312</reputation>
+    <visual>actors\stalker_merc\stalker_merc_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_l85 \n
+        ammo_5.56x45_ap  = 1 \n
+        wpn_sig220 \n
+        ammo_11.43x23_fmj  = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+    <start_dialog>jup_b47_merc_guards_start</start_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs_no_guide.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b47_merc_02" team_default = "1">
+    <name>jup_b47_merc_02</name>
+    <icon>ui_inGame2_merc_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b47_merc_02</class>
+    <community>killer</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\killer\</snd_config>
+    <rank>13262</rank>
+    <reputation>1480</reputation>
+    <visual>actors\stalker_merc\stalker_merc_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_l85 \n
+        ammo_5.56x45_ap  = 1 \n
+        wpn_sig220 \n
+        ammo_11.43x23_fmj  = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+    <start_dialog>jup_b47_merc_guards_start</start_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs_no_guide.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b47_merc_01" team_default = "1">
+    <name>jup_b47_merc_01</name>
+    <icon>ui_inGame2_merc_4</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b47_merc_01</class>
+    <community>killer</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\killer\</snd_config>
+    <rank>22572</rank>
+    <reputation>1973</reputation>
+    <visual>actors\stalker_merc\stalker_merc_4</visual>
+    <supplies>
+        [spawn] \n
+        wpn_g36 \n
+        ammo_5.56x45_ap = 1 \n
+        wpn_usp = 1 \n
+        ammo_11.43x23_fmj = 1 \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+    <start_dialog>jup_b47_merc_guards_start</start_dialog>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs_no_guide.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b219_stalker_tech" team_default = "1">
+    <name>jup_b217_stalker_tech</name>
+    <icon>ui_inGame2_Azot</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Техник Азот.</bio>
+    <class>jup_b219_stalker_tech</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <rank>9590</rank>
+    <reputation>1844</reputation>
+    <money min="10000" max="10000" infinitive="0" />
+    <visual>actors\stalker_neutral\stalker_neutral_nauchniy_face_3</visual>
+    <supplies>
+        [spawn] \n
+        wpn_ak74u \n
+        ammo_5.45x39_ap = 1 \n
+        wpn_fort \n
+        ammo_9x18_pmm = 1 \n
+#include "gameplay\character_items_2.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <specific_character id="jup_b219_monolith_squad_leader_freedom_skin" team_default = "1">
+    <name>jup_b4_monolith_squad_leader_name</name>
+    <icon>ui_inGame2_Brodyaga_monolit</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b219_monolith_squad_leader_freedom_skin</class>
+    <community>stalker</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <rank>14658</rank>
+    <reputation>482</reputation>
+    <money min="1500" max="2500" infinitive="0"/>
+    <visual>actors\stalker_monolith\stalker_monolith_1</visual>
+    <supplies>
+        [spawn] \n
+        wpn_svu \n
+        ammo_7.62x54_7h1 \n
+        wpn_colt1911 \n
+        ammo_11.43x23_fmj \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="jup_b219_vano" team_default = "1">
+    <name>jup_a10_stalker_vano</name>
+    <icon>ui_inGame2_Vano_nauchniy</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b219_vano</class>
+    <community>stalker</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <rank>14452</rank>
+    <reputation>606</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral_nauchniy</visual>
+    <supplies>
+        [spawn] \n
+        wpn_wincheaster1300 \n
+        ammo_12x70_buck \n
+        ammo_12x76_zhekan \n
+        wpn_beretta \n
+        ammo_9x19_fmj \n
+        detector_simple \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <actor_dialog>jup_a10_stalker_vano_pripyat_ready</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <specific_character id="jup_b219_soldier" team_default = "1">
+    <name>pri_a15_sokolov_name</name>
+    <icon>ui_inGame2_Sokolov_ecolog</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b219_soldier</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <rank>7806</rank>
+    <reputation>415</reputation>
+    <visual>actors\stalker_ecologist\stalker_ecolog_military</visual>
+    <supplies>
+        [spawn] \n
+        wpn_ak74u \n
+        ammo_5.45x39_fmj \n
+        wpn_fort \n
+        ammo_9x18_pmm \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <specific_character id="jup_b219_zulus" team_default = "1">
+    <name>jup_b15_zulus</name>
+    <icon>ui_inGame2_Zulus</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>jup_b219_zulus</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <rank>17772</rank>
+    <reputation>107</reputation>
+    <visual>actors\stalker_dolg\stalker_dolg_1</visual>
+    <supplies>
+        [spawn] \n
+        wpn_pkm_zulus \n
+        ammo_pkm_100 \n
+        wpn_usp \n
+        ammo_11.43x23_hydro \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+</xml>

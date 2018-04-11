@@ -1,0 +1,15 @@
+[logic]
+active = nil ;sr_idle@give
+
+[sr_idle@give]
+on_info = {+zat_b14_recon_place -zat_b14_learn_about_strange_occurrence_give_task} sr_idle@reward %+zat_b14_learn_about_strange_occurrence_give_task =give_task(zat_b14_learn_about_strange_occurrence)%
+on_info2 = {-zat_b14_recon_place +zat_b14_take_item -zat_b14_learn_about_strange_occurrence_by_stalkers_give_task =actor_has_item(af_quest_b14_twisted)} sr_idle@task_re %+zat_b14_learn_about_strange_occurrence_by_stalkers_give_task =give_task(zat_b14_learn_about_strange_occurrence_by_stalkers)%
+
+[sr_idle@task_re]
+on_info = {+zat_b14_give_item_stalker +zat_b14_stalker_killed_by_actor =actor_has_item(af_quest_b14_twisted) -zat_a2_linker_b14_quest_strange_item_done} sr_idle@end %=give_task(zat_b14_learn_about_strange_occurrence_by_stalkers) +zat_b14_reversed_first_time%
+on_info2 = {+zat_b14_give_item_linker} sr_idle@end %=give_treasure(zat_hiding_place_44)%
+
+[sr_idle@reward]
+on_info = {+zat_b14_give_item_linker} sr_idle@end %=give_treasure(zat_hiding_place_44)%
+
+[sr_idle@end]

@@ -1,0 +1,23 @@
+;--------------------------------------------------------------------------------------------------
+; FIND WARLAB TASK-
+
+[sar_warlab]
+icon = ui_iconsTotal_sar_secret_lab
+prior = 104
+storyline = true
+title = sar_perception
+target = {+warlab_password_info -warlab_door_closed} gen_space_restrictor_to_warlab, {+warlab_door_closed -gen_actor_found_warlab} warlab_codedoor_key, {+gen_actor_found_warlab -warlab_pod_room_door_find} warlab_pods_codedoor, {+warlab_pod_room_door_find -warlab_access_decoding} warlab_pods_codedoor, {+warlab_access_decoding -warlab_door_opened} warlab_monolith_guards_id
+descr = {+warlab_password_info -warlab_door_closed} sar_perception_2, {+warlab_door_closed -gen_actor_found_warlab} sar_perception_5, {+gen_actor_found_warlab -warlab_pod_room_door_find} sar_perception_1, {+warlab_pod_room_door_find -warlab_access_decoding} sar_perception_3, {+warlab_access_decoding -warlab_door_opened} sar_perception_4
+condlist_0 = {+warlab_door_opened} complete
+
+;--------------------------------------------------------------------------------------------------
+; KILL CRAZY WARLAB ENTITY TASK-
+
+[warlab_kill_crazy_entity]
+icon = ui_inGame2_D_gonets_pravosudiya
+prior = 120
+storyline = true
+title = warlab_kill_crazy_entity_title
+target = {+warlab_kill_crazy_entity_task_started -warlab_main_polter_scene_start} warlab_invisible_stalker, {+warlab_main_polter_scene_start -warlab_poltergeist_dead} warlab_main_poltergeist_1, {+warlab_poltergeist_dead -warlab_main_polter_dead} warlab_main_polter_door
+descr = {+warlab_kill_crazy_entity_task_started -warlab_main_polter_scene_start} warlab_kill_crazy_entity_1, {+warlab_main_polter_scene_start -warlab_poltergeist_dead} warlab_kill_crazy_entity_2
+condlist_0 = {+warlab_main_polter_dead} complete

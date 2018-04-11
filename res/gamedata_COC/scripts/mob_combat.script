@@ -1,0 +1,47 @@
+----------------------------------------------------------------------------------------------------
+-- Mob combat
+----------------------------------------------------------------------------------------------------
+-- Разработчик: Andrey Fidrya (Zmey) af@svitonline.com
+----------------------------------------------------------------------------------------------------
+
+class "mob_combat"
+
+function mob_combat:__init(obj, storage)
+	self.object = obj
+	self.st = storage
+end
+
+function mob_combat:combat_callback()
+	--printf("_bp: mob_combat:combat_callback()")
+	if self.st.enabled and self.object:get_enemy() then
+		if db.storage[self.object:id()].active_scheme then
+			if xr_logic.try_switch_to_another_section(self.object, self.st, db.actor) then
+				return
+			end
+		end
+	end
+end
+
+---------------------------------------------------------------------------------------------------------------------
+function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
+	local combat_section = ini:r_string_ex(section,"on_combat")
+	if (combat_section) then
+		local st = xr_logic.assign_storage_and_bind(npc,ini,"mob_combat",combat_section,temp)
+		st.logic = xr_logic.cfg_get_switch_conditions(ini,combat_section,npc)
+		st.enabled = true
+	end
+end
+
+function add_to_binder(npc,ini,scheme,section,st,temp)
+	--printf("DEBUG: add_to_binder: npc:name()='%s', scheme='%s', section='%s'", npc:name(), scheme, section)
+	st.action = mob_combat(npc,st)
+	xr_logic.subscribe_action_for_events(npc,st,st.action)
+end
+
+function disable_generic_scheme(npc,scheme,stype)
+	local st = db.storage[npc:id()][scheme]
+	if st then
+		st.enabled = false
+	end
+end
+

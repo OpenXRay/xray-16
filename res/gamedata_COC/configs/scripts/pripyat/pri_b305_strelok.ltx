@@ -1,0 +1,80 @@
+[walker@def]
+out_restr = pri_a16_sr_noweap
+meet = no_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+on_info66 = {+pri_b305_forth_cam_end -pri_b305_strelok_last_tp} remark@deal_talk %+pri_b305_strelok_last_tp =teleport_npc(pri_a16_pri_b305_kirillov_walk)%
+use_camp = false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[remark@def]
+out_restr = pri_a16_sr_noweap
+meet = no_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = false
+;*******************************************
+
+[logic@pri_b305_strelok]
+suitable = {-pri_b305_fifth_cam_end =check_npc_name(pri_b305_strelok)} true
+prior = 200
+active = walker@wait
+
+[walker@wait]:walker@def
+path_walk = pri_b305_strelok_spawn
+path_look = pri_b305_strelok_operation_look
+def_state_moving1 = walk
+def_state_standing = wait_na
+on_info = {+pri_b305_kovalskiy_who_are_you_done_end} walker@introduse
+
+[walker@introduse]:walker@def
+path_walk = pri_b305_strelok_operation_walk
+path_look = pri_b305_strelok_operation_look
+def_state_moving1 = walk
+def_state_standing = wait_na
+on_signal = pri_b305_strelok_at_position | remark@introduse
+
+[remark@introduse]:remark@def
+anim = wait_na
+target = story | pri_b305_army_aim
+on_info = {-pri_b305_strelok_introduse_done} %=play_sound(pri_b305_strelok_introduse) +pri_b305_strelok_introduse_done%
+on_signal = sound_end | remark@dialog %+pri_b305_strelok_introduse_done_end%
+on_info66 = {+pri_b305_forth_cam_end} remark@deal_talk %=teleport_npc(pri_a16_pri_b305_kirillov_walk)%
+
+[remark@dialog]:remark@def
+anim = wait_na
+target = story | pri_b305_army_aim
+on_info = {+pri_b305_actor_ask_about_burning_antenn_done_end -pri_b305_strelok_about_zone_destroying_done} %=play_sound(pri_b305_strelok_about_zone_destroying) +pri_b305_strelok_about_zone_destroying_done%
+on_signal = sound_end | remark@wait %+pri_b305_strelok_about_zone_destroying_done_end%
+on_info66 = {+pri_b305_forth_cam_end} remark@deal_talk %=teleport_npc(pri_a16_pri_b305_kirillov_walk)%
+
+[remark@wait]:remark@def
+anim = wait_na
+target = story | pri_b305_army_aim
+on_info66 = {+pri_b305_forth_cam_end} remark@deal_talk %=teleport_npc(pri_a16_pri_b305_kirillov_walk)%
+
+[remark@deal_talk]:remark@def
+anim = wait_na
+target = story | pri_a17_military_colonel_kovalski
+on_info = {+pri_b305_kovalskiy_about_deal_done_end -pri_b305_strelok_about_heli_done} %=play_sound(pri_b305_strelok_about_heli) +pri_b305_strelok_about_heli_done%
+on_signal = sound_end | remark@phrase_5 %+pri_b305_strelok_about_heli_done_end%
+
+[remark@phrase_5]:remark@def
+anim = wait_na
+target = story | pri_b305_actor_visual_5
+on_info = {+pri_b305_kovalskiy_about_anomaly_map_done_end -pri_b305_strelok_about_anomaly_randomize_done} %=play_sound(pri_b305_strelok_about_anomaly_randomize) +pri_b305_strelok_about_anomaly_randomize_done%
+on_signal = sound_end | remark@phrase_8 %+pri_b305_strelok_about_anomaly_randomize_done_end%
+
+[remark@phrase_8]:remark@def
+anim = wait_na
+target = story | pri_a17_military_colonel_kovalski
+on_info = {+pri_b305_kovalskiy_wondered_done_end -pri_b305_strelok_how_to_get_away_done} %=play_sound(pri_b305_strelok_how_to_get_away) +pri_b305_strelok_how_to_get_away_done%
+on_signal = sound_end | {-pri_b305_strelok_how_to_get_away_done_end} %+pri_b305_strelok_how_to_get_away_done_end%
+ 

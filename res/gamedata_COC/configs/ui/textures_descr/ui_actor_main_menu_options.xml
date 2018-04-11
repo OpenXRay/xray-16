@@ -1,0 +1,36 @@
+<w>
+    <file name="ui\ui_actor_hint_wnd">
+	    <texture id="ui_inGame2_opt_main_window" x="508" y="462" width="487" height="462" />
+	    <texture id="ui_inGame2_opt_buttons_frame" x="17" y="772" width="461" height="38" />
+
+	    <texture id="ui_inGame2_opt_slider_bar_b" x="38" y="739" width="1" height="16" />
+	    <texture id="ui_inGame2_opt_slider_bar_back" x="39" y="739" width="235" height="16" />
+	    <texture id="ui_inGame2_opt_slider_bar_e" x="274" y="739" width="1" height="16" />
+
+	    <texture id="ui_inGame2_opt_slider_box_e" x="296" y="739" width="21" height="16" />
+	    <texture id="ui_inGame2_opt_slider_box_h" x="296" y="739" width="21" height="16" />
+	    <texture id="ui_inGame2_opt_slider_box_t" x="296" y="739" width="21" height="16" />
+	    <texture id="ui_inGame2_opt_slider_box_d" x="296" y="739" width="21" height="16" />
+
+	    <texture id="ui_inGame2_opt_button_1_e" x="6" y="817" width="9" height="9" />
+	    <texture id="ui_inGame2_opt_button_1_h" x="6" y="844" width="131" height="25" />
+	    <texture id="ui_inGame2_opt_button_1_t" x="6" y="817" width="131" height="25" />
+	    <texture id="ui_inGame2_opt_button_1_d" x="6" y="817" width="131" height="25" />
+
+	    <texture id="ui_inGame2_opt_button_2_e" x="6" y="817" width="9" height="9" />
+	    <texture id="ui_inGame2_opt_button_2_h" x="145" y="844" width="129" height="25" />
+	    <texture id="ui_inGame2_opt_button_2_t" x="145" y="817" width="129" height="25" />
+	    <texture id="ui_inGame2_opt_button_2_d" x="145" y="817" width="129" height="25" />
+
+	    <texture id="ui_inGame2_empty_frameline_15_b" x="0" y="780" width="1" height="15" />
+	    <texture id="ui_inGame2_empty_frameline_15_back" x="0" y="780" width="1" height="15" />
+	    <texture id="ui_inGame2_empty_frameline_15_e" x="0" y="780" width="1" height="15" />
+	</file>
+	<file name="ui\ui_actor_options_background">
+		<texture id="ui_inGame2_opt_background" x="0" y="0" width="1024" height="768" />
+	</file>
+	<file name="ui\ui_actor_widescreen_sidepanels">
+		<texture id="ui_inGame2_opt_left_widepanel" x="768" y="0" width="128" height="768" />
+		<texture id="ui_inGame2_opt_right_widepanel" x="896" y="0" width="128" height="768" />
+	</file>
+</w>

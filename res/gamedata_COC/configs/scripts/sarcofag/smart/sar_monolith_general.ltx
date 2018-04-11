@@ -1,0 +1,26 @@
+[smart_terrain]
+squad_id = 1
+max_population = 4
+respawn_params = respawn@sar_monolith_general
+respawn_idle = 86400
+respawn_radius = 300
+
+[respawn@sar_monolith_general]
+spawn_tushkanos
+
+[spawn_tushkanos]
+spawn_squads = simulation_tushkano
+spawn_num = {+sar_secret_door_find} 4, 0
+
+[exclusive]
+sar_monolith_general_post1_1 = sarcofag\sar_monolith_general_logic.ltx
+sar_monolith_general_post1_2 = sarcofag\sar_monolith_general_logic.ltx
+sar_monolith_general_post2_1 = sarcofag\sar_monolith_general_logic.ltx
+sar_monolith_general_post2_2 = sarcofag\sar_monolith_general_logic.ltx
+sar_monolith_general_patrol = sarcofag\sar_monolith_general_logic.ltx
+sar_monolith_general_patrol_follower1 = sarcofag\sar_monolith_general_logic.ltx
+sar_monolith_general_patrol_room = sarcofag\sar_monolith_general_logic.ltx
+sar_monolith_general_kamp1 = sarcofag\sar_monolith_general_logic.ltx
+sar_monolith_general_kamp2 = sarcofag\sar_monolith_general_logic.ltx
+sar_monolith_general_kamp3 = sarcofag\sar_monolith_general_logic.ltx
+sar_monolith_general_kamp4 = sarcofag\sar_monolith_general_logic.ltx

@@ -1,0 +1,18 @@
+[smart_terrain];zat_sim_21
+squad_id = 14
+max_population = 1
+respawn_params = respawn@zat_sim_21
+respawn_idle = 86400
+
+
+[respawn@zat_sim_21]
+spawn_monster
+spawn_rat
+
+[spawn_rat]
+spawn_squads = simulation_rat
+spawn_num = 1
+
+[spawn_monster]
+spawn_squads = simulation_cat, simulation_tushkano, simulation_boar
+spawn_num = 1

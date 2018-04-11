@@ -1,0 +1,20 @@
+[logic]
+active = animpoint@zat_b28_heli_search
+on_hit = hit
+
+[animpoint@zat_b28_heli_search]
+avail_animations = zat_b28_heli3_serch
+cover_name = zat_b28_heli_3_serch_aminpoint
+on_info = {+zat_b28_heli_3_searched} %=destroy_object%
+reach_distance = 10
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[hit]
+on_info = %+zat_b28_actor_hit =destroy_object%

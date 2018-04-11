@@ -1,0 +1,33 @@
+[logic]
+active = nil;sr_idle@set_counters
+
+[sr_idle@set_counters]
+on_info = {-jup_b4_b46_b207_b106_counters_start -jup_b4_b46_b207_b106_counters_end} sr_idle@b4_b46_b207_b106_counters %=set_counter(jup_a6_actor_help_stalkers:0) =set_counter(jup_a6_actor_help_duty:0) =set_counter(jup_a6_actor_help_freedom:0) +jup_b4_b46_b207_b106_counters_start%
+on_info2 = {+jup_b4_b46_b207_b106_counters_start -jup_b4_b46_b207_b106_counters_end} sr_idle@b4_b46_b207_b106_counters
+on_info3 = {+jup_b4_b46_b207_b106_counters_start +jup_b4_b46_b207_b106_counters_end} sr_idle@end
+
+[sr_idle@b4_b46_b207_b106_counters]
+;------------- b46 ---------------;
+on_info1 =  {+jup_b46_duty_founder_pda_to_stalkers -jup_b46_counted} %=inc_counter(jup_a6_actor_help_stalkers:1) +jup_b46_counted%
+on_info2 =  {+jup_b46_duty_founder_pda_to_duty -jup_b46_counted} %=inc_counter(jup_a6_actor_help_duty:1) =inc_faction_goodwill_to_actor(dolg:500) =dec_faction_goodwill_to_actor(freedom:250) +jup_b46_counted%
+on_info3 =  {+jup_b46_duty_founder_pda_to_freedom -jup_b46_counted} %=inc_counter(jup_a6_actor_help_freedom:1) =inc_faction_goodwill_to_actor(freedom:500) =dec_faction_goodwill_to_actor(dolg:250) +jup_b46_counted%
+;------------- b106 --------------;
+on_info4 =  {+zat_b106_found_soroka_done -zat_b106_counted} %=inc_counter(jup_a6_actor_help_stalkers:1) +zat_b106_counted%
+on_info5 =  {+jup_b25_flint_blame_done_to_duty -zat_b106_counted} %=inc_counter(jup_a6_actor_help_duty:1) =inc_faction_goodwill_to_actor(dolg:500) =dec_faction_goodwill_to_actor(freedom:250) +zat_b106_counted%
+on_info6 =  {+jup_b25_flint_blame_done_to_freedom -zat_b106_counted} %=inc_counter(jup_a6_actor_help_freedom:1) =inc_faction_goodwill_to_actor(freedom:500) =dec_faction_goodwill_to_actor(dolg:250) +zat_b106_counted%
+;-------------- b4 ---------------;
+on_info7 =  {+jup_b4_monolith_squad_in_duty -jup_b4_counted} %=inc_counter(jup_a6_actor_help_duty:1) =inc_faction_goodwill_to_actor(dolg:500) =dec_faction_goodwill_to_actor(freedom:250) +jup_b4_counted%
+on_info8 =  {+jup_b4_recruit_2_cool_freedom_sound -jup_b4_counted} %=inc_counter(jup_a6_actor_help_freedom:1) =inc_faction_goodwill_to_actor(freedom:500) =dec_faction_goodwill_to_actor(dolg:250) +jup_b4_counted%
+;------------- b207 --------------;
+on_info9 =  {+jup_b207_dealers_pda_sold_owl -jup_b207_counted} %=inc_counter(jup_a6_actor_help_stalkers:1) +jup_b207_counted%
+on_info10 = {+jup_b207_sell_dealers_pda_duty -jup_b207_counted} %=inc_counter(jup_a6_actor_help_duty:1) =inc_faction_goodwill_to_actor(dolg:500) =dec_faction_goodwill_to_actor(freedom:250) +jup_b207_counted%
+on_info11 = {+jup_b207_sell_dealers_pda_freedom -jup_b207_counted} %=inc_counter(jup_a6_actor_help_freedom:1) =inc_faction_goodwill_to_actor(freedom:500) =dec_faction_goodwill_to_actor(dolg:250) +jup_b207_counted%
+;------------- reward ------------;
+on_info12 = {=jup_b202_actor_treasure_not_in_steal =distance_to_obj_ge(jup_b202_actor_treasure:100) =counter_greater(jup_a6_actor_help_duty:1) -jup_a6_duty_leader_give_first_reward} %=spawn_object_in(dolg_outfit:jup_b202_actor_treasure) =send_tip(st_duty_first_reward_news:got_duty_light_armor) +jup_a6_duty_leader_give_first_reward%
+on_info13 = {=jup_b202_actor_treasure_not_in_steal =distance_to_obj_ge(jup_b202_actor_treasure:100) =counter_greater(jup_a6_actor_help_freedom:1) -jup_a6_freedom_leader_give_first_reward} %=spawn_object_in(svoboda_light_outfit:jup_b202_actor_treasure) =send_tip(st_freedom_first_reward_news:got_freedom_light_armor) +jup_a6_freedom_leader_give_first_reward%
+on_info14 = {=jup_b202_actor_treasure_not_in_steal =distance_to_obj_ge(jup_b202_actor_treasure:100) =counter_greater(jup_a6_actor_help_duty:3) -jup_a6_duty_leader_give_second_reward} %=spawn_object_in(dolg_heavy_outfit:jup_b202_actor_treasure) =send_tip(st_duty_second_reward_news:got_duty_heavy_armor) +jup_a6_duty_leader_give_second_reward%
+on_info15 = {=jup_b202_actor_treasure_not_in_steal =distance_to_obj_ge(jup_b202_actor_treasure:100) =counter_greater(jup_a6_actor_help_freedom:3) -jup_a6_freedom_leader_give_second_reward} %=spawn_object_in(svoboda_heavy_outfit:jup_b202_actor_treasure) =send_tip(st_freedom_second_reward_news:got_freedom_heavy_armor) +jup_a6_freedom_leader_give_second_reward%
+;-------------- end --------------;
+on_info16 = {+jup_b46_counted +zat_b106_counted +jup_b4_counted +jup_b207_counted =distance_to_obj_ge(jup_b202_actor_treasure:200) =jup_b202_actor_treasure_not_in_steal} sr_idle@end %+jup_b4_b46_b207_b106_counters_end%
+
+[sr_idle@end]

@@ -1,0 +1,7 @@
+[logic]
+active = nil;sr_idle
+
+[sr_idle]
+on_info = {+pri_a19_lab_x8_investigated +pri_a22_scene_done} sr_idle@nil %=play_sound(pri_a22_base_to_actor_has_rfi_coordinates)%
+
+[sr_idle@nil]

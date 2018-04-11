@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+
+	<string id="zat_a2_stalker_barmen_actor_info_0">
+		<text>Tell me what life is like here.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_1">
+		<text>That's a broad topic. Try asking some specific questions and I'll do my best to answer them.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_1111">
+		<text>What do stalkers do here?</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_11111">
+		<text>Ask yourself that, pal. They step ashore from Skadovsk to explore the terrain and search for artefacts, shooting back at everything and everyone who comes rushing at them. They come back on Skadovsk to get drunk and talk trash... enjoy some R&R before the next raid. Though when an emission hits, it's quite a different scene. That's when we all sit tight and remember those who didn't make it to a cover in time...</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_1112">
+		<text>What drove stalkers to the center of the Zone?</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_11121">
+		<text>A funny question. Some were out to discover the next artefact goldmine. Some were driven here by the Oasis rumours. Others sought the Wish Granter. And then there are the base human desires - greed and curiosity... Everyone's got their reasons. I'm sure you have yours, too.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_1113">
+		<text>How did you end up here?</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_11131">
+		<text>I came here with Grouse after the Scorcher was disabled. But I'm sure that's not what you really wanna know, am I right? I deal mainly in artefacts. The outside is full of trinkets already, so valuable customers want the rare stuff. That's why I decided to set up a stalker camp, where real high-value articles can still be found. I mean, when a stalker comes back with his loot, what does he really need? A cold one in his hand and good ol' human contact, that's what. And that's what Skadovsk is all about.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_1114">
+		<text>What do you think about bandits?</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_11141">
+		<text>Well, it's like this. I got nothing against 'em on board the Skadovsk, so long as they act decent. After all, you don't meet total douche bags all that often. Some of them are actually former stalkers. Who knows, one of them poor bastards might actually decide to give up the crook business before he catches a bullet... Life is full of surprises.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_1115">
+		<text>Nah, that's okay. Fuhgetaboutit.</text>
+	</string>
+	<string id="zat_a2_stalker_barmen_actor_info_11151">
+		<text>If you say so.</text>
+	</string>
+	
+	<string id="zat_b7_stalkers_victims_dialog_11"> 
+		<text>Howdy, stalker. I'm busy right now. Let's talk later, okay?</text> 
+	</string> 
+	
+	<string id="zat_b22_stalker_medic_start_1">
+		<text>What brings you here?</text>
+	</string>
+	<string id="zat_b22_stalker_medic_need_health_care_0">
+		<text>I need medical assistance.</text>
+	</string>
+	<string id="zat_b22_stalker_medic_need_health_care_1">
+		<text>I'll see what I can do.</text>
+	</string>
+	<string id="zat_b22_stalker_medic_need_health_care_2">
+		<text>I'll take a look... Hmmm... You look fine to me. You don't have any wounds or show signs of radiation sickness. You should be good to go.</text>
+	</string>
+	<string id="zat_b22_stalker_medic_need_health_care_11">
+		<text>[continue...]</text>
+	</string>
+	<string id="zat_b22_stalker_medic_need_health_care_111">
+		<text>How you feeling now, buddy?</text>
+	</string>
+	
+	<string id="zat_b18_noah_start_11">
+		<text>Who are you?</text>
+	</string>
+	<string id="zat_b18_noah_start_111">
+		<text>A stalker. We've met before.</text>
+	</string>
+	<string id="zat_b18_noah_start_1111">
+		<text>I don't recall... Anyway, what do you need?</text>
+	</string>
+	<string id="zat_b18_noah_start_112">
+		<text>A stalker. Just a stalker.</text>
+	</string>
+	<string id="zat_b18_noah_start_1121">
+		<text>I see. Looking for refuge in the Ark? Feel yourself at home.</text>
+	</string>
+	<string id="zat_b18_noah_start_113">
+		<text>None of your business.</text>
+	</string>
+	<string id="zat_b18_noah_start_21">
+		<text>Ah, it's you. What do you want?</text>
+	</string>
+	
+	
+	<string id="zat_b3_stalker_tech_start_15">
+		<text>A wise choice, my friend. Gotta keep your gun in mint condition... And if you got a bottle or two on you, I can make it upgrade galore in here. Want a parachute sewn to your shotgun? I can do that, hehe.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_drink_1_0">
+		<text>Got some booze. Want a shot?</text>
+	</string>
+	<string id="zat_b3_stalker_tech_drink_1_2">
+		<text>Nah, I'm off the bottle, man. When I saw item 62, I thought "That's it, I'm having the jumps"... See, booze just screws you up. Not a part of a healthy diet. And if I'm gone, who's gonna hammer out ammo for your Gauss rifle?</text>
+	</string>
+	<string id="zat_b3_stalker_tech_drink_2_0">
+		<text>Here's another bottle for you.</text>
+	</string>
+	<string id="zat_b3_stalker_tech_drink_3_0">
+		<text>I've got a third one, if you need more.</text>
+	</string>
+	
+</string_table>

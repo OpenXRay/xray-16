@@ -1,0 +1,7 @@
+[logic]
+active = sr_idle
+
+[sr_idle]
+on_actor_inside ={-story_mode_disabled +yantar_tunnel_start -yantar_tunnel_finish} sr_idle@nil %+yantar_tunnel_finish =yan_saharov_message(3)%
+
+[sr_idle@nil]

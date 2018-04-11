@@ -1,0 +1,21 @@
+[logic]
+active = ph_idle@wait
+
+[ph_idle@wait]
+on_info = {=actor_in_zone(agr_army_base_zone)} ph_idle@start_humor
+on_info2 = {=check_smart_alarm_status(agr_smart_terrain_1_6_near_1)} ph_idle@alarm
+on_info3 = {=check_smart_alarm_status(agr_smart_terrain_1_6)} ph_idle@alarm
+on_info4 = {=check_smart_alarm_status(agr_smart_terrain_1_6_near_2)} ph_idle@alarm
+ 
+[ph_idle@start_humor]
+on_info = %=play_sound(agr_army_comandir_megafon) +agr_military_colonel_kovalski_talk%
+on_info2 = {=check_smart_alarm_status(agr_smart_terrain_1_6_near_1)} ph_idle@alarm
+on_info3 = {=check_smart_alarm_status(agr_smart_terrain_1_6)} ph_idle@alarm
+on_info4 = {=check_smart_alarm_status(agr_smart_terrain_1_6_near_2)} ph_idle@alarm
+
+[ph_idle@alarm]
+on_info = %=play_sound(agr_army_alarm) -agr_military_colonel_kovalski_talk%
+on_timer = 33000 | ph_idle@wait
+on_info2 = {!check_smart_alarm_status(agr_smart_terrain_1_6_near_1)} ph_idle@wait
+on_info3 = {!check_smart_alarm_status(agr_smart_terrain_1_6)} ph_idle@wait
+on_info4 = {!check_smart_alarm_status(agr_smart_terrain_1_6_near_2)} ph_idle@wait

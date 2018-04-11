@@ -1,0 +1,8 @@
+[logic]
+active = sr_idle
+
+[sr_idle]
+;on_actor_inside = {+agr_u_bloodsucker_start} nil, nil %+agr_u_bloodsucker_start =play_snd_from_obj(396:monsters\bloodsucker\bloodsucker_script_attack_0)%
+on_actor_inside = sr_idle@nil %=create_squad(agr_u_bloodsucker_1_squad:agr_u_bloodsucker)%
+
+[sr_idle@nil]

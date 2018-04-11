@@ -1,0 +1,86 @@
+----------------------------------------------------------------------------------------------------
+-- Code Pad
+----------------------------------------------------------------------------------------------------
+-- Author: Jim
+-- Доработка: 2006 @ Oleg Kreptul (Haron) okreptul@yahoo.com
+----------------------------------------------------------------------------------------------------
+function printf() end
+
+
+class "codepad"
+
+function codepad:__init(obj, storage)
+    self.object = obj
+    self.st     = storage
+end
+
+function codepad:reset_scheme()
+    self.object:set_nonscript_usable(false)
+    --self.object:set_callback(callback.use_object, self.use_callback, self)
+end
+
+function codepad:update(delta)
+end
+
+function codepad:use_callback(obj, who)
+    local numpad = ui_numpad.numpad(self)
+    numpad:ShowDialog(true)
+end
+
+function codepad:OnNumberReceive(text)
+    if self.st.code then
+        if tonumber(text) == self.st.code then
+            if self.st.on_code then
+                printf("ph_code <OnNumberReceive>: on_code [%s]", text)
+                xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.on_code.condlist)
+            end
+        end
+    else
+        local condlist = self.st.on_check_code[text]
+        if condlist then
+            printf("ph_code <OnNumberReceive>: on_check_code [%s]", text)
+            xr_logic.pick_section_from_condlist(db.actor, self.object, condlist)
+        end
+    end
+end
+function codepad:deactivate()
+	self.object:set_tip_text("")
+end
+
+---------------------------------------------------------------------------------------------------------------------
+function add_to_binder(npc, ini, scheme, section, storage)
+    local new_action = codepad(npc, storage)
+
+    -- Зарегистрировать все actions, в которых должен быть вызван метод reset_scheme при изменении настроек схемы:
+    xr_logic.subscribe_action_for_events(npc, storage, new_action)
+end
+
+function set_scheme(npc, ini, scheme, section, gulag_name)
+    --printf("ph_code <set_scheme>: START [%s]", npc:name())
+
+    local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
+    st.logic = xr_logic.cfg_get_switch_conditions(ini, section, npc)
+
+	st.tips  = ini:r_string_ex(section,"tips") or "st_codelock"
+    npc:set_tip_text(st.tips)
+    
+    st.code = ini:r_float_ex(section,"code")   
+    if st.code then
+        st.on_code = xr_logic.cfg_get_condlist(ini, section, "on_code", npc)
+        --printf("ph_code <set_scheme>: on_code [%d]", st.code)
+    else
+        st.on_check_code = {}
+
+        local i = 1
+        local cc = xr_logic.cfg_get_string_and_condlist(ini, section, "on_check_code" .. i, npc)
+
+        while cc do
+            st.on_check_code[cc.v1] = cc.condlist
+            --printf("ph_code <set_scheme>: on_check_code [%s]", cc.v1)
+            i = i + 1
+            cc = xr_logic.cfg_get_string_and_condlist(ini, section, "on_check_code" .. i, npc)
+        end
+    end
+
+    --printf("ph_code <set_scheme>: END [%s]", npc:name())
+end

@@ -1,0 +1,134 @@
+<?xml version='1.0' encoding="windows-1251"?>
+
+<game_information_portions>
+   
+		<!--A17-->	
+
+	<info_portion id="pri_a17_give_task_get_gauss_rifle"></info_portion>
+	<info_portion id="pri_a17_military_base_commander_task_dialog_end"></info_portion>
+	<info_portion id="pri_a17_military_recon_squad_ambush_dialog_end"></info_portion>
+	<info_portion id="pri_a17_squad_go_1"></info_portion>
+	<info_portion id="pri_a17_pod_in_cover_1"></info_portion>
+	<info_portion id="pri_a17_val_in_cover_1"></info_portion>
+	<info_portion id="pri_a17_recon_go"></info_portion>
+	<info_portion id="pri_a17_tar_sound1_end"></info_portion>
+	<info_portion id="pri_a17_pod_at_position"></info_portion>
+	<info_portion id="pri_a17_spawn_monolith"></info_portion>
+	<info_portion id="pri_a17_val_at_position"></info_portion>
+	<info_portion id="pri_a17_mon_pat_1"></info_portion>
+	<info_portion id="pri_a17_mon_pat_sound1"></info_portion>
+	<info_portion id="pri_a17_mon_pat_2"></info_portion>
+	<info_portion id="pri_a17_mon_pat_sound2"></info_portion>
+	<info_portion id="pri_a17_mon_pat_3"></info_portion>
+	<info_portion id="pri_a17_mon_pat_sound3"></info_portion>
+	<info_portion id="pri_a17_mon_pat_4"></info_portion>
+	<info_portion id="pri_a17_mon_pat_sound4"></info_portion>
+	<info_portion id="pri_a17_mon_atk"></info_portion>
+	<info_portion id="pri_a17_mon_pat_sound5"></info_portion>
+	<info_portion id="pri_a17_good_shot"></info_portion>
+	<info_portion id="pri_a17_atk_mon_pat"></info_portion>
+	<info_portion id="pri_a17_actor_attack_well"></info_portion>
+	<info_portion id="pri_a17_actor_attack_bad"></info_portion>
+	<info_portion id="pri_a17_nice_tar_end"></info_portion>
+	<info_portion id="pri_a17_mon_ambush_start"></info_portion>
+	<info_portion id="pri_a17_patrol_dead"></info_portion>
+	<info_portion id="pri_a17_squad_move"></info_portion>
+	<info_portion id="pri_a17_spawn_1_ended"></info_portion>
+	<info_portion id="pri_a17_spawn_2_ended"></info_portion>
+	<info_portion id="pri_a17_ice_is_fucked"></info_portion>
+	<info_portion id="pri_a17_ice_dead"></info_portion>
+	<info_portion id="pri_a17_get_in_cover"></info_portion>
+	<info_portion id="pri_a17_die_at_last"></info_portion>
+	<info_portion id="pri_a17_mon_preacher_dead"></info_portion>
+	<info_portion id="pri_a17_stage_1_ended"></info_portion>
+	<info_portion id="pri_a17_stage_2_ended"></info_portion>
+	<info_portion id="pri_a17_stage_3_ended"></info_portion>
+	<info_portion id="pri_a17_taras_dead"></info_portion>
+	<info_portion id="pri_a17_val_dead"></info_portion>
+	<info_portion id="pri_a17_pod_dead"></info_portion>
+	<info_portion id="pri_a17_actor_has_gauss_rifle"></info_portion>
+	<info_portion id="pri_a17_recon_squad_dead"></info_portion>
+	<info_portion id="pri_a17_reward_well"></info_portion>
+	<info_portion id="pri_a17_reward_norm"></info_portion>
+	<info_portion id="pri_a17_reward_bad"></info_portion>
+	<info_portion id="pri_a17_actor_attack_military_antibug"></info_portion>
+	<info_portion id="pri_a17_actor_attack_military"></info_portion>
+	<info_portion id="pri_a17_at_home"></info_portion>
+	<info_portion id="pri_a17_taras_final_talk"></info_portion>
+	<info_portion id="pri_a17_val_final_talk"></info_portion>
+	<info_portion id="pri_a17_mon_ambush_killed"></info_portion>
+	<info_portion id="pri_a17_actor_bring_gauss_rifle"></info_portion>
+	<info_portion id="pri_a17_ord_tar_end"></info_portion>
+	<info_portion id="pri_a17_go_home"></info_portion>
+	<info_portion id="pri_a17_told_about_operation"></info_portion>
+
+
+		<!--B301-->	
+
+	<!-- counter -->
+	<info_portion id="pri_b301_set_default_counter"></info_portion>
+	<info_portion id="pri_b301_end_counter"></info_portion>
+
+	<!-- dialogs -->
+	<info_portion id="jup_b15_zulus_b301_after_fight_done"></info_portion>
+	<info_portion id="jup_b43_stalker_assistant_b301_about_zulus_done"></info_portion>
+	<info_portion id="pri_b301_reward_dialog_unable"></info_portion>
+	<info_portion id="jup_b15_zulus_b301_reward_dialog_done"></info_portion>
+
+	<!-- monsters -->
+	<info_portion id="pri_b301_monster_death"></info_portion>
+
+	<!-- tasks -->
+	<info_portion id="pri_b301_save_zulus_complete"></info_portion>
+
+	<!-- other -->
+	<info_portion id="pri_b301_teleport"></info_portion>
+	<info_portion id="pri_b301_zulus_go_back"></info_portion>
+	<info_portion id="pri_b301_zulus_spawn"></info_portion>
+	<info_portion id="pri_b301_zulus_spawn_again"></info_portion>
+	<info_portion id="pri_b301_zulus_destroy"></info_portion>
+	<info_portion id="pri_b301_zulus_full_destroy"></info_portion>
+	<info_portion id="pri_b301_bye_zulus"></info_portion>
+	<info_portion id="pri_b301_go_on_base"></info_portion>
+	<info_portion id="pri_b301_fade"></info_portion>
+
+		<!--B35-->	
+
+	<info_portion id="pri_b35_task_start"></info_portion>
+	<info_portion id="pri_b35_task_continue"></info_portion>
+	<info_portion id="pri_b35_task_running"></info_portion>
+	<info_portion id="pri_b35_task_refuse"></info_portion>
+	<info_portion id="pri_b35_actor_know_about_mercenaries"></info_portion>
+	<info_portion id="pri_b35_kovalski_knows_about_mercs"></info_portion>
+	<info_portion id="pri_b35_assistant_start_dialog_done"></info_portion>
+	<info_portion id="pri_b35_target_envoy"></info_portion>
+	<info_portion id="pri_b35_target_merc"></info_portion>
+	<info_portion id="pri_b35_actor_is_guided"></info_portion>
+	<info_portion id="pri_b35_ui"></info_portion>
+	<info_portion id="pri_b35_actor_rest"></info_portion>
+	<info_portion id="pri_b35_merc_leader_sighted"></info_portion>
+	<info_portion id="pri_b35_envoy_sighted"></info_portion>
+	<info_portion id="pri_b35_rendevous_in_process"></info_portion>
+	<info_portion id="pri_b35_rendevous_done"></info_portion>
+	<info_portion id="pri_b35_envoy_out"></info_portion>
+	<info_portion id="pri_b35_merc_leader_out"></info_portion>
+	<info_portion id="pri_b35_envoy_escape"></info_portion>
+	<info_portion id="pri_b35_merc_leader_escape"></info_portion>
+	<info_portion id="pri_b35_attack_started"></info_portion>
+	<info_portion id="pri_b35_about_mercs_dialog"></info_portion>
+	<info_portion id="pri_b35_primary"></info_portion>
+	<info_portion id="pri_b35_secondary"></info_portion>
+	<info_portion id="pri_b35_reward_given"></info_portion>
+
+		<!--B35-->	
+
+	<info_portion id="pri_b306_lift_used"></info_portion>
+	<info_portion id="pri_b306_lift_generator_started"></info_portion>
+	<info_portion id="pri_b306_task_start"></info_portion>
+	<info_portion id="pri_b306_task_end"></info_portion>
+
+		<!--B36-->	
+
+	<info_portion id="pri_b36_ahtung"></info_portion>
+
+</game_information_portions>

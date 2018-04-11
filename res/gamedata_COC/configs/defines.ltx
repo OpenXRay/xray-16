@@ -1,0 +1,209 @@
+[hud_base]
+aim_hud_offset_pos				= 0,0,0
+aim_hud_offset_rot				= 0,0,0
+
+aim_hud_offset_pos_16x9			= 0,0,0
+aim_hud_offset_rot_16x9			= 0,0,0
+
+gl_hud_offset_pos_16x9			= 0,0,0
+gl_hud_offset_rot_16x9			= 0,0,0
+
+gl_hud_offset_pos				= 0,0,0
+gl_hud_offset_rot				= 0,0,0
+
+lean_hud_offset_pos				= 0,0,0
+lean_hud_offset_rot				= 0,0,0
+
+; This does work
+;hud_ui_xml_tag_name 			= test
+;hud_ui_attach_bone 			= wpn_body
+;hud_ui_pos 					= -0.03, 0.1, -0.06
+;hud_ui_rot 					= 0, 0, 0
+;hud_ui_size					= 0.0576, 0.029
+
+[sect_identity_immunities]
+burn_immunity			= 1.0
+strike_immunity			= 1.0
+shock_immunity			= 1.0
+wound_immunity			= 1.0
+wound_2_immunity		= 1.0
+radiation_immunity		= 1.0
+telepatic_immunity		= 1.0
+chemical_burn_immunity	= 1.0
+explosion_immunity		= 1.0
+fire_wound_immunity		= 1.0
+
+[sect_helm_immunities]
+burn_immunity			= 1.0
+strike_immunity			= 0.0
+shock_immunity			= 1.0
+wound_immunity			= 0.0
+wound_2_immunity		= 0.0
+radiation_immunity		= 0.0
+telepatic_immunity		= 0.0
+chemical_burn_immunity	= 1.0
+explosion_immunity		= 1.0
+fire_wound_immunity		= 1.0
+
+[sect_zero_immunities]
+burn_immunity			= 0.0
+strike_immunity			= 0.0
+shock_immunity			= 0.0
+wound_immunity			= 0.0
+wound_2_immunity		= 0.0
+radiation_immunity		= 0.0
+telepatic_immunity		= 0.0
+chemical_burn_immunity	= 0.0
+explosion_immunity		= 0.0
+fire_wound_immunity		= 0.0
+
+
+[identity_immunities]
+immunities_sect				= sect_identity_immunities
+slot 						= -1
+description					= no_description
+default_to_ruck             = false
+sprint_allowed              = true
+control_inertion_factor     = 1.0
+zoom_rotate_time            = 0.25
+
+
+[booster]:identity_immunities
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$prefetch                                = 8
+class                                    = II_FOOD			; Change to S_FOOD to use se_item.eatable_item script binding!
+cform                                    = skeleton
+visual                                   = dynamics\devices\dev_aptechka\dev_aptechka_low.ogf
+description                              = default
+inv_name                                 = default
+inv_name_short                           = default
+inv_weight                               = 0.01
+
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 3
+inv_grid_y                               = 18
+cost                                     = 1
+
+; eatable item
+eat_health                               = 0
+eat_satiety                              = 0
+eat_power                                = 0
+eat_max_power                            = 0
+eat_radiation                            = 0
+eat_alcohol                              = 0
+wounds_heal_perc                         = 0
+
+boost_time                               = 0.0
+boost_max_weight                         = 0.0
+boost_health_restore                     = 0.0
+boost_power_restore                      = 0.0
+boost_radiation_restore                  = 0.0
+boost_bleeding_restore                   = 0.0
+
+boost_radiation_protection               = 0.0
+boost_telepat_protection                 = 0.0
+boost_chemburn_protection                = 0.0
+
+boost_burn_immunity                      = 0.0
+boost_shock_immunity                     = 0.0
+boost_radiation_immunity                 = 0.0
+boost_telepat_immunity                   = 0.0
+boost_chemburn_immunity                  = 0.0
+boost_strike_immunity                    = 0.0
+boost_wound_immunity                     = 0.0
+boost_explosion_immunity                 = 0.0
+boost_fire_wound_immunity                = 0.0
+
+;New fields
+use_condition                            = false
+max_uses                                 = 1
+remove_after_use                         = true
+empty_weight                             = 0.1
+allow_repair                             = false
+dont_stack								 = false
+
+;USE THIS IF YOU WANT ITEM TO HAVE STORY ID and save condition
+[booster_script]:booster
+class									 = S_FOOD
+script_binding 							 = bind_item.bind
+
+[zero_immunities]:identity_immunities
+immunities_sect				= sect_zero_immunities
+
+[weapon_probability]
+hit_probability_gd_novice	= 0.20
+hit_probability_gd_stalker	= 0.30
+hit_probability_gd_veteran	= 0.40
+hit_probability_gd_master	= 0.50
+
+[weapon_probability_2]
+hit_probability_gd_novice	= 0.50
+hit_probability_gd_stalker	= 0.60
+hit_probability_gd_veteran	= 0.70
+hit_probability_gd_master	= 0.80
+
+[default_weapon_params]:identity_immunities
+use_aim_bullet				= false
+use_first_bullet			= false
+k_hit_critical				= 0
+frag_hit_critical			= 0
+hit_power					= 0.50, 0.50, 0.50, 0.50
+hit_power_critical			= 1.00, 1.00, 1.00, 1.00
+silencer_hit_power			= 0.45, 0.45, 0.45, 0.45
+hit_impulse					= 10						; size of physic impulse by bullet
+silencer_hit_impulse	 	= 9
+slot 						= -1
+description					= no_description
+;-----------
+default_to_ruck             = false
+sprint_allowed              = true
+control_inertion_factor     = 1.0
+zoom_rotate_time            = 0.25
+script_binding				= bind_item.bind_weapon ;To keep track of special scope
+ironsight_zoom_factor		= 1.1		;Really only used for Grenade Launcher Attachments
+
+[common_ph_friction_params_on_npc_death] ; Parameters for setting change of friction at the time of the death of a character
+
+ph_skeleton_airr_lin_factor   = 2.0 ;550.0 (Precisely because of the fact that the multiplication factor of 0.002 removed from the code)
+ph_skeleton_airr_ang_factor   = 0.0 ;0.0 (Precisely because of the fact that removed the multiplication by a factor of 0.3 from the code (0.0 * 0.3 = 0.0))
+ph_skeleton_hinger_factor1    = 1.0 ;1.0 (Because of the fact that the multiplication factor removed from the code 5.0)
+ph_skeleton_ddelay	     	  = 15.0 ;Time changes in friction values ??in the joint since the inception of the shell, s
+
+ph_skel_fatal_impulse_factor  = 6.0
+ph_after_death_velocity_factor= 0.75
+ph_skel_shot_up_factor        = 0.25
+
+
+
+ph_skeleton_skin_friction_start	= 0.0   ; The starting value for the shell friction
+ph_skeleton_skin_friction_end	= 2.0   ; The final value for the shell friction
+ph_skeleton_skin_ddelay			= 6.0		; Time changes in friction values since the inception of the shell, s.
+ph_skeleton_skin_ddelay_after_wound = 2.0 ; Changes in the friction values time since the creation of shell, s (for the character after injury).
+ph_pelvis_factor_low_pose_detect =0.3	; Length of the beam in the collision with the ground from the center pelvisa
+										; If the collision, the character is in the lower position (or hurt) (in this case zadayutsya other options for him
+										; Friction and no pulse multiplication for the first hit)
+ph_character_have_wounded_state = false; имеет ли персонаж состояние раненый
+
+[monster_base]:common_ph_friction_params_on_npc_death
+actor_hit_effect 	= effector_monster_hit
+custom_data			= default_custom_data.ltx		; option for Level Editor
+
+feel_enemy_who_made_sound_max_distance = 30
+feel_enemy_who_just_hit_max_distance = 200
+feel_enemy_max_distance = 50
+
+[wpn_vodka_hud]:identity_immunities,hud_base
+fire_point                               = 0.0, 0.0, 0.06
+fire_bone                                = bip01_head
+orientation                              = 0, 0, 0
+position                                 = 0, 0, 0
+visual                                   = dynamics\devices\dev_vodka\dev_vodka.ogf
+
+anim_idle                                = vodka_2
+anim_show                                = vodka_1
+anim_hide                                = vodka_4
+anim_play                                = vodka_5
+anim_prepare                             = vodka_5
+anim_eat                                 = vodka_3

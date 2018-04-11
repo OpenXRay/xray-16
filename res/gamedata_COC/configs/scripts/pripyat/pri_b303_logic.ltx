@@ -1,0 +1,9 @@
+[logic]
+active = nil;sr_idle@pri_b303_toolkit_3
+
+[sr_idle@pri_b303_toolkit_3]
+on_info = {-pri_b303_actor_take_toolkit +pri_b303_actor_take_noone =actor_has_item(toolkit_3)} %+pri_b303_actor_take_toolkit%, {-pri_b303_actor_take_toolkit +pri_b303_actor_take_one =actor_has_item_count(toolkit_3:2)} %+pri_b303_actor_take_toolkit%
+on_info2 = {=actor_in_zone(pri_b303_burer_out_rest) -pri_b303_actor_take_one =actor_has_item(toolkit_3)} %+pri_b303_actor_take_one%, {=actor_in_zone(pri_b303_burer_out_rest) -pri_b303_actor_take_noone !actor_has_item(toolkit_3)} %+pri_b303_actor_take_noone%
+on_info3 = {+pri_b303_actor_take_toolkit} sr_idle@pri_b303_end 
+
+[sr_idle@pri_b303_end]

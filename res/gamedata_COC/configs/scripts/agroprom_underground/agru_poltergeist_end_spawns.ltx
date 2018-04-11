@@ -1,0 +1,9 @@
+[logic]
+active = sr_idle@line_0
+
+[sr_idle@line_0]
+;on_info = {=actor_in_zone(agru_poltergeist_end_spawns)} sr_idle@line_1 %=spawn_object(agru_end_poltergeist_1:agru_poltergeist_end_1_walk:0) =spawn_object(agru_end_poltergeist_2:agru_poltergeist_end_2_walk:0) =spawn_object(agru_end_poltergeist_3:agru_poltergeist_end_3_walk:0) =spawn_object(agru_end_poltergeist_4:agru_poltergeist_end_4_walk:0)%
+on_info = {+agr_u_soldiers_squad_soldier_1_is_dead +agr_u_soldiers_squad_soldier_2_is_dead +agr_u_soldiers_squad_soldier_3_is_dead +agr_u_soldiers_squad_soldier_4_is_dead +agr_u_soldiers_squad_soldier_5_is_dead +agr_u_soldiers_squad_soldier_6_is_dead +agr_u_soldiers_squad_soldier_7_is_dead +agr_u_soldiers_squad_soldier_8_is_dead} %+agr_u_soldiers_dead%
+on_info2 = {=actor_in_zone(agru_poltergeist_end_spawns) +agr_u_soldiers_dead} sr_idle@line_1 %=create_squad(agru_end_poltergeist_squad:agr_u_soldiers)%
+
+[sr_idle@line_1]

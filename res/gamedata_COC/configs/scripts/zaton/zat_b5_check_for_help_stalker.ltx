@@ -1,0 +1,16 @@
+[logic]
+active = nil ;sr_idle
+
+[sr_idle]
+on_info = {+zat_b5_actor_with_stalkers} sr_idle@start_stalkers, {+zat_b5_actor_with_bandits} sr_idle@start_bandits, {+zat_b5_actor_with_dealer} sr_idle@nil
+
+[sr_idle@start_stalkers]
+on_info = {+zat_b5_bandits_death +zat_b5_dealer_squad_death} sr_idle@nil %+zat_b5_destroy_enemy% 
+
+[sr_idle@start_bandits]
+on_info = {+zat_b5_witness_dead -zat_b5_dolg_enemy -zat_b5_stalker_hit} sr_idle@nil, {+zat_b5_witness_dead} sr_idle@nil %+zat_b5_bandit_in_fight%
+;on_info2 = {+zat_b5_witness_dead +zat_b5_dolg_enemy -zat_b5_stalker_hit} sr_idle@nil %+zat_b5_bandit_in_fight%
+;on_info3 = {+zat_b5_witness_dead -zat_b5_dolg_enemy +zat_b5_stalker_hit} sr_idle@nil %+zat_b5_bandit_in_fight%
+;on_info4 = {+zat_b5_witness_dead +zat_b5_dolg_enemy +zat_b5_stalker_hit} sr_idle@nil %+zat_b5_bandit_in_fight%
+
+[sr_idle@nil]

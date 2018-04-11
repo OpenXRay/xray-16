@@ -1,0 +1,282 @@
+;--------------------------------------------------------------------------------------------------
+; DELIVER PDA FOR SPORE TASK-
+
+[mar_base_owl_stalker_trader_task_1]
+icon = ui_inGame2_PD_Torgovets_informatsiey
+prior = 2
+storyline = false
+title = mar_base_owl_stalker_trader_task_1_name
+descr = mar_base_owl_stalker_trader_task_1_text
+job_descr = mar_base_owl_stalker_trader_task_1_about
+target_functor = mar_base_owl_stalker_trader_task_target
+precondition = {-mar_base_owl_stalker_trader_task_1_complete} true, false
+on_complete = %+mar_base_owl_stalker_trader_task_1_complete%
+on_init = %=give_actor(mar_base_owl_stalker_trader_task_1_pda)%
+can_cancel = false
+
+
+;--------------------------------------------------------------------------------------------------
+; DESTROY HELICOPTER FOR SPORE TASK-
+
+[mar_base_owl_stalker_trader_task_2]
+icon = ui_inGame2_Evakuatsiya
+prior = 2
+storyline = false
+title = mar_base_owl_stalker_trader_task_2_name
+descr = mar_base_owl_stalker_trader_task_2_text
+job_descr = mar_base_owl_stalker_trader_task_2_about
+target_functor = mar_base_owl_stalker_trader_task_target
+; precondition = {+mar_base_owl_stalker_trader_task_1_complete -mar_base_owl_stalker_trader_discount_1} true, false
+precondition = {-mar_base_owl_stalker_trader_discount_1} true, false
+on_complete = %+mar_base_owl_stalker_trader_discount_1%
+can_cancel = false
+
+;--------------------------------------------------------------------------------------------------
+; ESCORT SCIENTISTS FOR CLEAR SKY TASK-
+
+[mar_base_owl_stalker_trader_task_3]
+icon = ui_inGame2_PD_Opitniy_stalker
+prior = 2
+storyline = false
+title = mar_base_owl_stalker_trader_task_3_name
+descr = mar_base_owl_stalker_trader_task_3_text
+job_descr = mar_base_owl_stalker_trader_task_3_about
+target_functor = mar_base_owl_stalker_trader_task_target
+task_complete_descr = mar_base_owl_stalker_trader_task_3_finish
+on_init = %=setup_companion_task(ecolog_companion_task_1:mar_smart_terrain_base) =setup_task_target_anomaly -ecolog_companion_task_1_started -ecolog_companion_task_1_force_started%
+precondition = {!squad_exist(ecolog_companion_task_1)} true, false
+repeat_timeout = 172800
+on_complete = %=complete_task_inc_goodwill(50:ecolog:csky) =remove_special_task_squad(ecolog_companion_task_1) =reward_stash(true) =reset_task_target_anomaly =reward_random_item(af_ameba_slug:af_dummy_glassbeads:af_fireball:af_soul:af_rusty_kristall:af_dummy_battery:detector_advanced)%
+on_fail = %=fail_task_dec_goodwill(25:ecolog:csky) =remove_special_task_squad(ecolog_companion_task_1) =reset_task_target_anomaly%
+on_cancel = %=remove_special_task_squad(ecolog_companion_task_1) =reset_task_target_anomaly%
+condlist_0 = {!squad_exist(ecolog_companion_task_1)} fail
+
+;--------------------------------------------------------------------------------------------------
+; HUNT MUTANTS FOR CLEAR SKY TASK-
+
+[mar_base_stalker_barmen_task_1]
+icon = ui_inGame2_Nochnaya_ohota
+prior = 30
+storyline = false
+title = mar_base_stalker_barmen_task_1_name
+descr = mar_base_stalker_barmen_task_1_text
+job_descr = mar_base_stalker_barmen_task_1_about
+task_complete_descr = mar_base_stalker_barmen_task_1_finish
+target_functor = general_under_faction_control
+status_functor = check_smart_under_faction_control_staged
+status_functor_params = monster
+on_init = %=find_smart_under_faction_control(mar_base_stalker_barmen_task_1_id:monster)%
+precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction(1:nil:false:monster)} true, false
+repeat_timeout = 86400
+stage_complete = 1
+on_complete = %=reward_random_money(4000:4500) =reward_stash(true) =inc_task_stage(mar_base_stalker_barmen_task_1) =complete_task_inc_goodwill(50:csky) =pstor_reset(mar_base_stalker_barmen_task_1_id) =pstor_reset(mar_base_stalker_barmen_task_1_target_id)%
+on_fail = %=pstor_reset(mar_base_stalker_barmen_task_1_id) =pstor_reset(mar_base_stalker_barmen_task_1_target_id) =fail_task_dec_goodwill(25:csky)%
+on_cancel = %=pstor_reset(mar_base_stalker_barmen_task_1_id) =pstor_reset(mar_base_stalker_barmen_task_1_target_id)%
+
+
+;--------------------------------------------------------------------------------------------------
+; ASSAULT BANDIT CAMP FOR CLEAR SKY TASK-
+
+[mar_base_stalker_barmen_task_2]
+icon = ui_inGame2_Odin_vistrel
+prior = 10
+storyline = false
+title = mar_base_stalker_barmen_task_2_name
+descr = mar_base_stalker_barmen_task_2_text
+job_descr = mar_base_stalker_barmen_task_2_about
+task_complete_descr = mar_base_stalker_barmen_task_2_finish
+repeat_timeout = 86400
+target_functor = general_under_faction_control
+status_functor = check_smart_under_faction_control_staged
+status_functor_params = bandit
+on_init = %=find_smart_under_faction_control(mar_base_stalker_barmen_task_2_id:bandit)%
+precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction(1:nil:false:bandit)} true, false
+stage_complete = 1
+on_complete = %=reward_random_money(4000:5000) =reward_stash(true) =inc_task_stage(mar_base_stalker_barmen_task_2) =complete_task_inc_goodwill(50:csky) =pstor_reset(mar_base_stalker_barmen_task_2_id) =pstor_reset(mar_base_stalker_barmen_task_2_target_id)%
+on_fail = %=pstor_reset(mar_base_stalker_barmen_task_2_id) =pstor_reset(mar_base_stalker_barmen_task_2_target_id) =fail_task_dec_goodwill(25:csky)%
+on_cancel = %=pstor_reset(mar_base_stalker_barmen_task_2_id) =pstor_reset(mar_base_stalker_barmen_task_2_target_id)%
+
+;--------------------------------------------------------------------------------------------------
+; FIND MUTANT MEAT FOR CLEAR SKY TASK-
+
+[mar_base_stalker_barmen_task_3]
+icon = ui_inGame2_Nochnaya_ohota
+prior = 40
+storyline = false
+title = mar_base_stalker_barmen_task_3_name
+title_functor = general_fetch_task
+descr = mar_base_stalker_barmen_task_3_text
+descr_functor = general_fetch_task
+job_descr = mar_base_stalker_barmen_task_3_about
+fetch_descr = mar_base_stalker_barmen_task_3_fetch_about
+fetch_func = %=setup_generic_fetch_task(mar_base_stalker_barmen_task_3_fetch:6:mutant_part_boar_chop:mutant_part_dog_meat:mutant_part_flesh_meat:mutant_part_psevdodog_meat)%
+stage_complete = 1
+; precondition = true
+repeat_timeout = 43200
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = mar_base_stalker_barmen_task_3_fetch_finish
+on_complete = %=complete_task_inc_goodwill(50:csky) =reward_stash(true) =reward_item_cost_mult_and_remove(mar_base_stalker_barmen_task_3_fetch:5) =inc_task_stage(mar_base_stalker_barmen_task_3)%
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND LEVEL 1 TOOLS FOR NOVIKOV TASK-
+
+[mar_base_stalker_tech_task_1]
+icon = ui_inGame2_Instrumenti
+prior = 10
+storyline = false
+title = mar_base_stalker_tech_task_1_name
+title_functor = general_fetch_task
+descr = mar_base_stalker_tech_task_1_text
+descr_functor = general_fetch_task
+job_descr = mar_base_stalker_tech_task_1_about
+fetch_descr = mar_base_stalker_tech_task_1_fetch_about
+fetch_func = %=setup_generic_fetch_task(mar_base_stalker_tech_task_1_fetch:1:itm_repairkit_tier_1)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = mar_base_stalker_tech_task_1_fetch_finish
+on_complete = %+mar_base_stalker_tech_upgrade_tier_1 =complete_task_inc_goodwill(50:csky) =reward_item_cost_mult_and_remove(mar_base_stalker_tech_task_1_fetch:1.0) =inc_task_stage(mar_base_stalker_tech_task_1)%
+precondition = {-mar_base_stalker_tech_upgrade_tier_1} true, false
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND LEVEL 2 TOOLS FOR NOVIKOV TASK-
+
+[mar_base_stalker_tech_task_2]
+icon = ui_inGame2_Instrumenti
+prior = 10
+storyline = false
+title = mar_base_stalker_tech_task_2_name
+title_functor = general_fetch_task
+descr = mar_base_stalker_tech_task_2_text
+descr_functor = general_fetch_task
+job_descr = mar_base_stalker_tech_task_2_about
+fetch_descr = mar_base_stalker_tech_task_2_fetch_about
+fetch_func = %=setup_generic_fetch_task(mar_base_stalker_tech_task_2_fetch:1:itm_repairkit_tier_2)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = mar_base_stalker_tech_task_2_fetch_finish
+on_complete = %+mar_base_stalker_tech_upgrade_tier_2 =complete_task_inc_goodwill(50:csky) =reward_item_cost_mult_and_remove(mar_base_stalker_tech_task_2_fetch:1.0) =inc_task_stage(mar_base_stalker_tech_task_2)%
+precondition = {+mar_base_stalker_tech_upgrade_tier_1 -mar_base_stalker_tech_upgrade_tier_2} true, false
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND LEVEL 3 TOOLS FOR NOVIKOV TASK-
+
+[mar_base_stalker_tech_task_3]
+icon = ui_inGame2_Instrumenti
+prior = 10
+storyline = false
+title = mar_base_stalker_tech_task_3_name
+title_functor = general_fetch_task
+descr = mar_base_stalker_tech_task_3_text
+descr_functor = general_fetch_task
+job_descr = mar_base_stalker_tech_task_3_about
+fetch_descr = mar_base_stalker_tech_task_3_fetch_about
+fetch_func = %=setup_generic_fetch_task(mar_base_stalker_tech_task_3_fetch:1:itm_repairkit_tier_3)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = mar_base_stalker_tech_task_3_fetch_finish
+on_complete = %+mar_base_stalker_tech_upgrade_tier_3 =complete_task_inc_goodwill(50:csky) =reward_item_cost_mult_and_remove(mar_base_stalker_tech_task_3_fetch:1.0) =inc_task_stage(mar_base_stalker_tech_task_3)%
+precondition = {+mar_base_stalker_tech_upgrade_tier_2 -mar_base_stalker_tech_upgrade_tier_3} true, false
+
+;--------------------------------------------------------------------------------------------------
+; FIND DOCTOR TASK-
+
+[mar_find_doctor_task]
+icon = ui_iconsNpc_doctor
+prior = 109
+storyline = true
+title = mar_doctor_task
+target = nil
+descr = mar_doctor_task_0
+condlist_0 = {+mar_doctor_found} complete
+
+;--------------------------------------------------------------------------------------------------
+; DOCTOR PRIPYAT TASK-
+
+[cit_doctor_task]
+icon = ui_iconsNpc_strelok
+prior = 102
+storyline = true
+title = cit_doctor_task
+target = {+cit_jail_doctor_pryp_task -pri_actor_in_hotel} pri_hotel_zone, {+pri_actor_in_hotel -pri_actor_in_hiding_place} pri_decoder_room_door, {+pri_actor_in_hiding_place} pri_decoder_room_door
+descr = {+cit_jail_doctor_pryp_task -pri_actor_in_hotel} cit_doctor_task_1, {+pri_actor_in_hotel -pri_actor_in_hiding_place} cit_doctor_task_2, {+pri_actor_in_hiding_place -pri_monolith_decoder_got} cit_doctor_task_3
+condlist_0 = {+pri_monolith_decoder_got} complete
+
+;--------------------------------------------------------------------------------------------------
+; DOCTOR LAB TASKS-
+
+[main_1_search_agr_ug]
+icon = ui_inGame2_Laboratoriya_X8
+prior = 108
+storyline = true
+title = st_main_1_search_agr_ug_name
+descr = st_main_1_search_agr_ug_text
+target = agr_space_restrictor_to_agr_ug_1
+condlist_0 = {=actor_has_item(main_story_1_quest_case)} complete
+on_complete = %+main_1_search_agr_ug_task_done%, {+main_1_search_agr_ug_task_done +main_2_search_labx18_task_done +main_3_search_labx16_task_done +main_4_search_labx10_task_done +main_5_search_labx8_task_done +main_6_search_jup_ug_task_done +main_7_search_mon_con_task_done} %+warlab_password_info =give_task(sar_warlab) =give_task(sar_monolith_destroy)%
+
+[main_2_search_labx18]
+icon = ui_inGame2_Laboratoriya_X8
+prior = 107
+storyline = true
+title = st_main_2_search_labx18_name
+descr = st_main_2_search_labx18_text
+target = val_space_restrictor_to_labx18
+condlist_0 = {=actor_has_item(main_story_2_lab_x18_documents)} complete
+on_complete = %+main_2_search_labx18_task_done%, {+main_1_search_agr_ug_task_done +main_2_search_labx18_task_done +main_3_search_labx16_task_done +main_4_search_labx10_task_done +main_5_search_labx8_task_done +main_6_search_jup_ug_task_done +main_7_search_mon_con_task_done} %+warlab_password_info =give_task(sar_warlab) =give_task(sar_monolith_destroy)%
+
+[main_3_search_labx16]
+icon = ui_inGame2_Laboratoriya_X8
+prior = 106
+storyline = true
+title = st_main_3_search_labx16_name
+descr = st_main_3_search_labx16_text
+target = yan_space_restrictor_to_x16
+condlist_0 = {=actor_has_item(main_story_3_lab_x16_documents)} complete
+on_complete = %+main_3_search_labx16_task_done%, {+main_1_search_agr_ug_task_done +main_2_search_labx18_task_done +main_3_search_labx16_task_done +main_4_search_labx10_task_done +main_5_search_labx8_task_done +main_6_search_jup_ug_task_done +main_7_search_mon_con_task_done +pri_monolith_decoder_got +pri_documents_warlab_task} %+warlab_password_info =give_task(sar_warlab) =give_task(sar_monolith_destroy)%
+
+[main_4_search_labx10]
+icon = ui_inGame2_Laboratoriya_X8
+prior = 105
+storyline = true
+title = st_main_4_search_labx10_name
+descr = st_main_4_search_labx10_text
+target = rad_space_restrictor_to_bunker
+condlist_0 = {=actor_has_item(main_story_4_lab_x10_documents)} complete
+on_complete = %+main_4_search_labx10_task_done%, {+main_1_search_agr_ug_task_done +main_2_search_labx18_task_done +main_3_search_labx16_task_done +main_4_search_labx10_task_done +main_5_search_labx8_task_done +main_6_search_jup_ug_task_done +main_7_search_mon_con_task_done +pri_monolith_decoder_got +pri_documents_warlab_task} %+warlab_password_info =give_task(sar_warlab) =give_task(sar_monolith_destroy)%
+
+[main_5_search_labx8]
+icon = ui_inGame2_Laboratoriya_X8
+prior = 104
+storyline = true
+title = st_main_5_search_labx8_name
+descr = st_main_5_search_labx8_text
+target = pri_space_restrictor_to_labx8
+condlist_0 = {=actor_has_item(main_story_5_lab_x8_documents)} complete
+on_complete = %+main_5_search_labx8_task_done%, {+main_1_search_agr_ug_task_done +main_2_search_labx18_task_done +main_3_search_labx16_task_done +main_4_search_labx10_task_done +main_5_search_labx8_task_done +main_6_search_jup_ug_task_done +main_7_search_mon_con_task_done +pri_monolith_decoder_got +pri_documents_warlab_task} %+warlab_password_info =give_task(sar_warlab) =give_task(sar_monolith_destroy)%
+
+[main_6_search_jup_ug]
+icon = ui_inGame2_Laboratoriya_X8
+prior = 103
+storyline = true
+title = st_main_6_search_jup_ug_name
+descr = st_main_6_search_jup_ug_text
+target = jupiter_space_restrictor_to_jupiter_ug
+condlist_0 = {=actor_has_item(main_story_6_jup_ug_documents)} complete
+on_complete = %+main_6_search_jup_ug_task_done%, {+main_1_search_agr_ug_task_done +main_2_search_labx18_task_done +main_3_search_labx16_task_done +main_4_search_labx10_task_done +main_5_search_labx8_task_done +main_6_search_jup_ug_task_done +main_7_search_mon_con_task_done +pri_monolith_decoder_got +pri_documents_warlab_task} %+warlab_password_info =give_task(sar_warlab) =give_task(sar_monolith_destroy)%
+
+[main_7_search_mon_con]
+icon = ui_inGame2_Laboratoriya_X8
+prior = 101
+storyline = true
+title = st_main_7_search_mon_con_name
+descr = st_main_7_search_mon_con_text
+target = aes2_space_restrictor_to_secret_lab
+condlist_0 = {=actor_has_item(main_story_7_mon_con_documents)} complete
+on_complete = %+main_7_search_mon_con_task_done%, {+main_1_search_agr_ug_task_done +main_2_search_labx18_task_done +main_3_search_labx16_task_done +main_4_search_labx10_task_done +main_5_search_labx8_task_done +main_6_search_jup_ug_task_done +main_7_search_mon_con_task_done +pri_monolith_decoder_got +pri_documents_warlab_task} %+warlab_password_info =give_task(sar_warlab) =give_task(sar_monolith_destroy)%

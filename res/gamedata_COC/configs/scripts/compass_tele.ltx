@@ -1,0 +1,8 @@
+[logic]
+active = sr_idle@wait
+
+[sr_idle@wait]
+on_actor_inside = sr_idle@run %=sr_teleport(true:af_compass)%
+
+[sr_idle@run]
+on_actor_outside = sr_idle@wait

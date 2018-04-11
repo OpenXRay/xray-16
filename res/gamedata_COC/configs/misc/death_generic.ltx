@@ -1,0 +1,148 @@
+#include "death_items_by_communities.ltx"
+
+[item_count]
+;јртефакты
+af_cristall				= 0,1
+af_fireball				= 0,1
+af_dummy_glassbeads		= 0,1
+af_eye					= 0,1
+af_fire					= 0,1
+af_medusa				= 0,1
+af_cristall_flower		= 0,1
+af_night_star			= 0,1
+af_vyvert				= 0,1
+af_gravi				= 0,1
+af_gold_fish			= 0,1
+af_blood				= 0,1
+af_mincer_meat			= 0,1
+af_soul					= 0,1
+af_fuzz_kolobok			= 0,1
+af_baloon				= 0,1
+af_glass				= 0,1
+af_electra_sparkler		= 0,1
+af_electra_flash		= 0,1
+af_electra_moonlight	= 0,1
+af_dummy_battery		= 0,1
+af_dummy_dummy			= 0,1
+af_ice					= 0,1
+
+;јммуници¤
+ammo_9x18_fmj			= 0, 15
+ammo_9x18_pmm			= 0, 15
+ammo_9x19_pbp			= 0, 15
+ammo_9x19_fmj			= 0, 15
+ammo_11.43x23_hydro		= 0, 15
+ammo_11.43x23_fmj		= 0, 15
+ammo_12x70_buck			= 0, 5
+ammo_12x76_zhekan		= 0, 5
+ammo_5.45x39_ap			= 0, 15
+ammo_5.45x39_fmj		= 0, 15
+ammo_9x39_ap			= 0, 15
+ammo_9x39_pab9			= 0, 15
+ammo_5.56x45_ss190		= 0, 15
+ammo_5.56x45_ap			= 0, 15
+ammo_7.62x54_7h14		= 0, 10
+ammo_7.62x54_7h1		= 0, 10
+ammo_7.62x54_ap			= 0, 10
+ammo_og-7b				= 0, 3
+ammo_vog-25				= 0, 1
+grenade_f1				= 0, 1
+grenade_rgd5			= 0, 1
+ammo_m209				= 0, 1
+ammo_gauss				= 0, 10
+ammo_pkm_100			= 0, 25
+
+;ћедикаменты
+bandage					= 0, 1
+medkit					= 0, 1
+medkit_scientic			= 0, 1
+medkit_army				= 0, 1
+antirad					= 0, 1
+
+;Ѕустеры
+drug_booster			= 0, 1
+drug_coagulant			= 0, 1
+drug_psy_blockade		= 0, 1
+drug_antidot			= 0, 1
+drug_radioprotector		= 0, 1
+drug_anabiotic			= 0, 1
+
+;≈да
+bread					= 0, 1
+kolbasa					= 0, 1
+conserva				= 0, 1
+vodka					= 0, 1
+energy_drink			= 0, 1
+
+;misc
+equ_backpack				= 0, 1
+equ_military_pack			= 0, 1
+equ_small_pack				= 0, 1
+itm_sleepbag				= 0, 1
+itm_gunsmith_toolkit		= 0, 1
+itm_outfit_toolkit   		= 0, 1
+itm_pda_common				= 0, 1
+itm_pda_uncommon			= 0, 1
+itm_pda_rare				= 0, 1
+itm_guide_usb_1				= 0, 1
+itm_guide_usb_2				= 0, 1
+wpn_mine					= 0, 3
+
+stalker_patch 				= 1, 1
+bandit_patch 				= 1, 1
+merc_patch 					= 1, 1
+csky_patch 					= 1, 1
+duty_patch 					= 1, 1
+freedom_patch 				= 1, 1
+ecolog_patch 				= 1, 1
+army_patch 					= 1, 1
+monolith_patch 				= 1, 1
+
+[keep_items]
+af_compass = true 
+af_quest_b14_twisted = true
+af_quest_b14_twisted = true
+bad_psy_helmet = true
+cit_doctors_key = true
+cit_doctors_pda = true
+detector_scientific = true
+device_flash_snag = true
+device_pda_port_bandit_leader = true
+device_pda_zat_b5_dealer = true
+good_psy_helmet = true
+helm_hardhat_snag = true
+helm_respirator_joker = true
+jup_b202_bandit_pda = true
+jup_b207_merc_pda_with_contract = true
+jup_b46_duty_founder_pda = true
+jup_b47_merc_pda = true
+main_story_1_quest_case = true
+main_story_2_lab_x18_documents = true
+main_story_3_lab_x16_documents = true
+main_story_4_lab_x10_documents = true
+main_story_5_lab_x8_documents = true
+main_story_6_jup_ug_documents = true
+main_story_7_mon_con_documents = true
+pri_a17_gauss_rifle = true
+pri_a25_explosive_charge_item = true
+pri_b306_envoy_pda = true
+pri_b35_lab_x8_key = true
+pri_b36_monolith_hiding_place_pda = true
+stalker_outfit_barge = true
+zat_b12_key_1 = true
+zat_b12_key_2 = true
+zat_b14_device_pda_stalker_find_artefact = true
+zat_b20_noah_pda = true
+zat_b22_medic_pda = true
+zat_b40_pda_1 = true
+zat_b40_pda_2 = true
+zat_b44_barge_pda = true
+		
+[spawn_by_story_id]			; story_id = section  (can be a condlist) spawned at 100% chance
+; example_npc1 = {=some_cond} af_compass, {!some_cond} wpn_pm
+yan_ecolog_semenov = {!actor_has_item(good_psy_helmet) !actor_has_item(bad_psy_helmet)} good_psy_helmet
+yan_ecolog_kruglov = {!actor_has_item(good_psy_helmet) !actor_has_item(bad_psy_helmet)} good_psy_helmet
+yan_ecolog_vasilyev = {!actor_has_item(good_psy_helmet) !actor_has_item(bad_psy_helmet)} good_psy_helmet
+mar_smart_terrain_doc_doctor = cit_doctors_key
+mar_smart_terrain_doc_doctor = cit_doctors_pda
+yan_ghost = main_story_3_lab_x16_documents

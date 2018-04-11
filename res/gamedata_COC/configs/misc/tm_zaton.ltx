@@ -1,0 +1,151 @@
+;--------------------------------------------------------------------------------------------------
+; ELIMINATE MUTANTS FOR BEARD TASK-
+
+[zat_a2_stalker_barmen_task_1]
+icon = ui_inGame2_Nochnaya_ohota
+prior = 20
+storyline = false
+title = zat_a2_stalker_barmen_task_1_name
+descr = zat_a2_stalker_barmen_task_1_text
+job_descr = zat_a2_stalker_barmen_task_1_about
+task_complete_descr = zat_a2_stalker_barmen_task_1_finish
+target_functor = general_under_faction_control
+status_functor = check_smart_under_faction_control_staged
+status_functor_params = monster
+stage_complete = 1
+on_init = %=find_smart_under_faction_control(zat_a2_stalker_barmen_task_1_id:monster)%
+precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction(1:nil:false:monster)} true, false
+repeat_timeout = 86400
+on_complete = %=complete_task_inc_goodwill(50:stalker) =inc_task_stage(zat_a2_stalker_barmen_task_1) =reward_random_money(4500:5500) =reward_stash(true) =pstor_reset(zat_a2_stalker_barmen_task_1_id) =pstor_reset(zat_a2_stalker_barmen_task_1_target_id)%
+on_fail = %=fail_task_dec_goodwill(25:stalker) =pstor_reset(zat_a2_stalker_barmen_task_1_id) =pstor_reset(zat_a2_stalker_barmen_task_1_target_id)%
+on_cancel = %=pstor_reset(zat_a2_stalker_barmen_task_1_id) =pstor_reset(zat_a2_stalker_barmen_task_1_target_id)%
+reward_item = vodka
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND ARTEFACT FOR BEARD TASK-
+
+[zat_a2_stalker_barmen_task_2]
+icon = ui_inGame2_Kontrakt_s_uchenimi
+prior = 30
+storyline = false
+title = zat_a2_stalker_barmen_task_2_name
+title_functor = general_fetch_task
+descr = zat_a2_stalker_barmen_task_2_text
+descr_functor = general_fetch_task
+job_descr = zat_a2_stalker_barmen_task_2_about
+fetch_descr = zat_a2_stalker_barmen_task_2_fetch_about
+fetch_func = %=setup_artefact_fetch_task(zat_a2_stalker_barmen_task_2_fetch)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = zat_a2_stalker_barmen_task_2_fetch_finish
+; precondition = true
+repeat_timeout = 86400
+on_complete = %=complete_task_inc_goodwill(50:stalker) =reward_stash(true) =reward_item_cost_mult_and_remove(zat_a2_stalker_barmen_task_2_fetch:0.75) =inc_task_stage(zat_a2_stalker_barmen_task_2)%
+reward_item = vodka
+
+
+;--------------------------------------------------------------------------------------------------
+; ASSASSINATION FOR BEARD TASK-
+
+[zat_a2_stalker_barmen_task_3]
+icon = ui_inGame2_Odin_vistrel
+prior = 40
+storyline = false
+title = zat_a2_stalker_barmen_task_3_name
+descr = zat_a2_stalker_barmen_task_3_text
+job_descr = zat_a2_stalker_barmen_task_3_about
+task_complete_descr = zat_a2_stalker_barmen_task_3_finish
+repeat_timeout = 172800
+status_functor = bounty_task
+target_functor = general_bounty_task
+stage_complete = 1
+on_job_descr = %=on_init_bounty_hunt(zat_a2_stalker_barmen_task_3:bandit:killer)%
+on_complete = %=complete_task_inc_goodwill(50:stalker) =reward_random_money(9000:11000) =reward_stash(true) =inc_task_stage(zat_a2_stalker_barmen_task_3)%
+precondition = true
+
+;--------------------------------------------------------------------------------------------------
+; ASSASSIATION FOR BANDITS TASK-
+
+[zat_b7_bandit_boss_sultan_task_1]
+icon = ui_inGame2_Odin_vistrel
+prior = 35
+storyline = false
+title = zat_b7_bandit_boss_sultan_task_1_name
+descr = zat_b7_bandit_boss_sultan_task_1_text
+job_descr = zat_b7_bandit_boss_sultan_task_1_about
+task_complete_descr = zat_b7_bandit_boss_sultan_task_1_finish
+precondition = true
+repeat_timeout = 172800
+status_functor = bounty_task
+target_functor = general_bounty_task
+stage_complete = 1
+on_job_descr = %=on_init_bounty_hunt(zat_b7_bandit_boss_sultan_task_1:stalker:killer:army)%
+on_complete = %=reward_random_money(9500:11500) =reward_stash(true) =inc_task_stage(zat_b7_bandit_boss_sultan_task_1) =complete_task_inc_goodwill(50:bandit)%
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND LEVEL 1 TOOLKIT FOR CARDAN TASK-
+
+[zat_a2_stalker_mechanic_task_1]
+icon = ui_inGame2_Instrumenti
+prior = 35
+storyline = false
+title = zat_a2_stalker_mechanic_task_1_name
+title_functor = general_fetch_task
+descr = zat_a2_stalker_mechanic_task_1_text
+descr_functor = general_fetch_task
+job_descr = zat_a2_stalker_mechanic_task_1_about
+fetch_descr = zat_a2_stalker_mechanic_task_1_fetch_about
+fetch_func = %=setup_generic_fetch_task(zat_a2_stalker_mechanic_task_1_fetch:1:itm_repairkit_tier_1)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = zat_a2_stalker_mechanic_task_1_fetch_finish
+on_complete = %+zat_a2_stalker_mechanic_upgrade_tier_1 =complete_task_inc_goodwill(50:stalker) =reward_item_cost_mult_and_remove(zat_a2_stalker_mechanic_task_1_fetch:1.0) =inc_task_stage(zat_a2_stalker_mechanic_task_1)%
+precondition = {-zat_a2_stalker_mechanic_upgrade_tier_1} true, false
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND LEVEL 2 TOOLKIT FOR CARDAN TASK-
+
+[zat_a2_stalker_mechanic_task_2]
+icon = ui_inGame2_Instrumenti
+prior = 35
+storyline = false
+title = zat_a2_stalker_mechanic_task_2_name
+title_functor = general_fetch_task
+descr = zat_a2_stalker_mechanic_task_2_text
+descr_functor = general_fetch_task
+job_descr = zat_a2_stalker_mechanic_task_2_about
+fetch_descr = zat_a2_stalker_mechanic_task_2_fetch_about
+fetch_func = %=setup_generic_fetch_task(zat_a2_stalker_mechanic_task_2_fetch:1:itm_repairkit_tier_2)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = zat_a2_stalker_mechanic_task_2_fetch_finish
+on_complete = %+zat_a2_stalker_mechanic_upgrade_tier_2 =complete_task_inc_goodwill(50:stalker) =reward_item_cost_mult_and_remove(zat_a2_stalker_mechanic_task_2_fetch:1.0) =inc_task_stage(zat_a2_stalker_mechanic_task_2)%
+precondition = {+zat_a2_stalker_mechanic_upgrade_tier_1 -zat_a2_stalker_mechanic_upgrade_tier_2} true, false
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND LEVEL 3 TOOLKIT FOR CARDAN TASK-
+
+[zat_a2_stalker_mechanic_task_3]
+icon = ui_inGame2_Instrumenti
+prior = 35
+storyline = false
+title = zat_a2_stalker_mechanic_task_3_name
+title_functor = general_fetch_task
+descr = zat_a2_stalker_mechanic_task_3_text
+descr_functor = general_fetch_task
+job_descr = zat_a2_stalker_mechanic_task_3_about
+fetch_descr = zat_a2_stalker_mechanic_task_3_fetch_about
+fetch_func = %=setup_generic_fetch_task(zat_a2_stalker_mechanic_task_3_fetch:1:itm_repairkit_tier_3)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = zat_a2_stalker_mechanic_task_3_fetch_finish
+on_complete = %+zat_a2_stalker_mechanic_upgrade_tier_3 =complete_task_inc_goodwill(50:stalker) =reward_item_cost_mult_and_remove(zat_a2_stalker_mechanic_task_3_fetch:1.0) =inc_task_stage(zat_a2_stalker_mechanic_task_3)%
+precondition = {+zat_a2_stalker_mechanic_upgrade_tier_2 -zat_a2_stalker_mechanic_upgrade_tier_3} true, false

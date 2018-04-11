@@ -1,0 +1,93 @@
+[logic@jup_b219_vano]
+suitable = {=check_npc_name(jup_b219_vano)}
+active = walker@sig
+prior = 150
+
+[walker@sig]
+path_walk = vano_walk
+path_look = vano_look
+on_signal = vano | walker %+jup_b219_vano_on_pos%
+def_state_standing = guard_na
+meet = no_meet
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_factory_default_in_restrictor
+combat_ignore_keep_when_attacked = true 
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+danger = danger
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+
+[walker]
+path_walk = vano_walk
+path_look = vano_look
+def_state_standing = guard_na
+on_info = {+jup_b219_start_one_vano} remark@start_one_vano
+on_info2 = {+jup_b219_start_all} remark@start_all
+on_info3 = {+jup_b219_start_soldier_vano} remark@start_soldier_vano
+on_info4 = {+jup_b219_start_vano_monolith} 		remark@start_vano_monolith
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true 
+invulnerable = {!actor_enemy} true, false
+danger = danger
+out_restr = jup_factory_default_in_restrictor
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[remark@start_one_vano]
+anim = jup_b219_vano_one
+target = path | jup_b219_vano_look,0
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true 
+invulnerable = {!actor_enemy} true, false
+danger = danger
+out_restr = jup_factory_default_in_restrictor
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[remark@start_all]
+anim = jup_b219_vano_all
+target = path | jup_b219_vano_look,0
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true 
+invulnerable = {!actor_enemy} true, false
+danger = danger
+out_restr = jup_factory_default_in_restrictor
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[remark@start_soldier_vano]
+anim = jup_b219_vano_soldier_vano
+target = path | jup_b219_vano_look,0
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true 
+invulnerable = {!actor_enemy} true, false
+danger = danger
+out_restr = jup_factory_default_in_restrictor
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[remark@start_vano_monolith]
+anim = jup_b219_vano_vano_monolith
+target = path | jup_b219_vano_look,0
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true 
+invulnerable = {!actor_enemy} true, false
+danger = danger
+out_restr = jup_factory_default_in_restrictor
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[danger]
+ignore_distance = 0
+danger_inertion_time_grenade = 0
+danger_inertion_time_hit = 0
+danger_inertion_time_sound = 0
+danger_inertion_time_ricochet = 0
+

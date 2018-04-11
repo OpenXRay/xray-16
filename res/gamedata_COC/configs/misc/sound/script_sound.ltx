@@ -1,0 +1,648 @@
+#include "script_sound_agroprom.ltx"
+#include "script_sound_axr.ltx"
+#include "script_sound_darkvalley.ltx"
+#include "script_sound_escape.ltx"
+#include "script_sound_jupiter.ltx"
+#include "script_sound_l05_bar.ltx"
+#include "script_sound_marsh.ltx"
+#include "script_sound_military.ltx"
+#include "script_sound_pripyat.ltx"
+#include "script_sound_story_and_music.ltx"
+#include "script_sound_yantar.ltx"
+#include "script_sound_zaton.ltx"
+#include "script_sound_x16.ltx"
+#include "script_sound_x18.ltx"
+#include "script_sound_warlab.ltx"
+
+; A new feature has been added to help alleviate an issue with all sounds being loaded, even unused ones. Restricting sounds by level and story id is this solution.
+; 'levels' is a new optional field. It's what levels to load the sound on, otherwise sound is not loaded. The absense of a levels field means the sound is loaded on all levels.
+; 'story_ids' is a new optional field. It's a list of story_ids that can load the sound, otherwise sound is not loaded. The absense of a story_ids field means the sound can be loaded by all npc.
+
+[brain_scorcher_rumble]
+type = 3d
+path = ambient\earthquake
+levels = l13u_warlab, l10u_bunker
+
+[radar_drone]
+type = looped
+path = ambient\radar_1
+levels = l10_radar
+
+[radar_thunder]
+type = looped
+path = ambient\radar_2
+levels = l10_radar
+
+[gen_noos_tunnel]
+type = looped
+path = ambient\noos_tunnel_1
+levels = l13_generators
+
+[warlab_pod_noise]
+type = looped
+path = ambient\warlab_pod_noise
+levels = l13u_warlab
+
+[red_bloodsucker_growl]
+type = 3d
+path = monsters\bloodsucker\distant_growl_
+shuffle = rnd
+idle = 10,20,100
+levels = l08u_brainlab, l03u_agr_underground
+
+[controller_script_attack]
+type = 3d
+path = monsters\controller\controller_script_attack_
+shuffle = rnd
+idle = 10,20,100
+levels = l08u_brainlab, l03u_agr_underground
+
+[rad_hat_1]
+type = actor
+actor_stereo = true
+npc_prefix = false
+path = characters_voice\scenario\radar\rad_hat_1
+shuffle = seq
+idle = 1,1,100
+levels = l10_radar, l10u_bunker, l08u_brainlab
+
+[rad_hat_2]
+type = actor
+actor_stereo = true
+npc_prefix = false
+path = characters_voice\scenario\radar\rad_hat_2
+shuffle = seq
+idle = 1,1,100
+levels = l10_radar, l10u_bunker, l08u_brainlab
+
+[radar_meh_on]
+type = looped
+path = ambient\cooling_run
+levels = l10u_bunker, l04u_labx18
+
+[radar_meh_off]
+type = 3d
+path = ambient\cooling_stop
+levels = l10u_bunker, l04u_labx18
+
+[psy_blackout]
+type = actor
+actor_stereo = true
+npc_prefix = false
+path = affects\psy_blackout
+shuffle = seq
+idle = 1,1,100
+levels = l10u_bunker, l13u_warlab
+
+[bun_patrol_prikaz]
+type = actor
+actor_stereo = true
+npc_prefix = false
+path = characters_voice\scenario\bun\patrol_prikaz
+shuffle = seq
+idle = 1,1,100
+levels = l10u_bunker
+
+[val_patrol_prikaz]
+type = actor
+actor_stereo = true
+npc_prefix = false
+path = characters_voice\scenario\val\patrol_prikaz
+shuffle = seq
+idle = 1,1,100
+levels = l04u_labx18
+
+[bun_monolith_call_1]
+type = actor
+actor_stereo = true
+npc_prefix = false
+path = characters_voice\scenario\sarcofag\monolith_call_1
+shuffle = seq
+idle = 1,1,100
+levels = l10u_bunker
+
+[sar_monolith_call]
+type = actor
+actor_stereo = true
+npc_prefix = false
+path = characters_voice\scenario\sarcofag\monolith_call_
+shuffle = rnd
+idle = 10,15,100
+levels = l12u_sarcofag
+
+[sar2_monolith_call]
+type = actor
+actor_stereo = true
+npc_prefix = false
+path = characters_voice\scenario\sarcofag\monolith_call_1
+shuffle = rnd
+idle = 30,60,100
+levels = l12u_sarcofag
+
+[mon_ambient]
+type = looped
+path = ambient\monolith_1
+levels = l12u_sarcofag
+
+[mon_organic_moan]
+type = 3d
+path = ambient\organic_moan1
+levels = l12u_sarcofag
+
+[mon_explosion]
+type = 3d
+path = ambient\mon_explosion
+levels = l12u_sarcofag, l13u_warlab
+
+[warlab_decoder]
+type = looped
+path = device\decoder
+levels = l13u_warlab
+
+[warlab_oso]
+type = looped
+path = ambient\os_1
+levels = l13u_warlab
+
+[mon_monolith_damaged]
+type = 3d
+path = characters_voice\scenario\sarcofag\monolith_damaged
+shuffle = rnd
+idle = 0,0,100
+levels = l13u_warlab
+
+[mon_monolith_heavy_damaged]
+type = 3d
+path = characters_voice\scenario\sarcofag\monolith_heavy_damaged
+shuffle = rnd
+idle = 0,0,100
+levels = l13u_warlab
+
+[mon_monolith_alarm]
+type = 3d
+path = characters_voice\scenario\sarcofag\monolith_alarm
+shuffle = rnd
+idle = 0,0,100
+levels = l13u_warlab
+
+
+[surge_earthquake_sound_looped]
+type = looped
+path = ambient\earthquake
+
+[surge_earthquake_sound]
+type = 3d
+path = ambient\earthquake
+
+[blowout_begin]
+type = 3d
+path = ambient\blowout\blowout_begin
+
+[blowout_rumble]
+type = looped
+path = ambient\blowout\blowout_rumble
+
+[blowout_hit_1]
+type = 3d
+path = ambient\blowout\blowout_impact
+
+[blowout_hit_2]
+type = 3d
+path = ambient\blowout\blowout_impact_02
+
+[blowout_hit_3]
+type = 3d
+path = ambient\blowout\blowout_outro
+
+[blowout_wave_1]
+type = 3d
+path = ambient\blowout\blowout_wave_01
+
+[blowout_wave_2]
+type = 3d
+path = ambient\blowout\blowout_wave_04
+
+[blowout_wave_3]
+type = 3d
+path = ambient\blowout_wave_3
+
+[blowout_particle_wave_looped]
+type = looped
+path = ambient\blowout\blowout_particle_wave
+
+[fallout_acid_rain]
+type = looped
+path = anomaly\acid_rain
+
+[state]
+type = npc
+npc_prefix = true
+avail_communities = bandit, csky, dolg, ecolog, freedom, killer, army, monolith, stalker
+path = states\idle\idle_
+shuffle = rnd
+idle = 7,13,100
+group_snd = true
+
+[state_1]
+type = npc|actor|3d
+actor_stereo = true|false
+npc_prefix = true|false
+path = states\idle\idle_
+shuffle = rnd
+idle = 3,5,100
+
+;************************************************************
+;Универсальная озвучка встречи
+;************************************************************
+[wait]
+type = npc
+avail_communities = bandit, csky, dolg, ecolog, freedom, killer, army, monolith, stalker
+npc_prefix = true
+path = states\idle\idle_
+shuffle = rnd
+idle = 7,10,100
+
+
+;************************************************************
+; Alife
+;************************************************************
+
+[patrol_sneak]
+type = npc
+actor_stereo = false
+npc_prefix = true
+group_snd = true
+path = alife\patrol\sneak_
+avail_communities = bandit, csky, dolg, freedom, army, stalker
+shuffle = rnd
+idle = 1,1,100
+
+[patrol_run]
+type = npc
+actor_stereo = false
+npc_prefix = true
+group_snd = true
+path = alife\patrol\run_
+avail_communities = bandit, csky, dolg, freedom, army, stalker
+shuffle = rnd
+idle = 1,1,100
+
+[patrol_walk]
+type = npc
+actor_stereo = false
+npc_prefix = true
+group_snd = true
+path = alife\patrol\walk_
+avail_communities = bandit, csky, dolg, freedom, army, stalker
+shuffle = rnd
+idle = 1,1,100
+
+[fight_attack]
+type = npc
+actor_stereo = false
+npc_prefix = true
+path = fight\attack\script_attack_
+avail_communities = bandit, csky, dolg, freedom, army, stalker, monolith, killer
+shuffle = rnd
+idle = 1,1,100
+is_combat_sound = true
+
+[post_combat_wait]
+type = npc
+actor_stereo = false
+npc_prefix = true
+group_snd = true
+path = fight\post_combat_wait\wait_
+avail_communities = bandit, csky, dolg, freedom, army, stalker
+shuffle = rnd
+idle = 3,5,100
+
+[post_combat_wait_long]
+type = npc
+actor_stereo = false
+npc_prefix = true
+group_snd = true
+path = fight\post_combat_wait\wait_
+avail_communities = bandit, csky, dolg, freedom, army, stalker
+shuffle = rnd
+idle = 7,10,100
+
+[post_combat_relax]
+type = npc
+actor_stereo = false
+npc_prefix = true
+group_snd = true
+path = fight\post_combat_wait\relax_
+avail_communities = bandit, csky, dolg, freedom, army, stalker
+shuffle = rnd
+idle = 1,1,100
+
+
+;***************************************************************
+; Звуки дверей
+;***************************************************************
+[trader_door_open_start]
+type = 3d
+path = device\door_start
+shuffle = rnd
+idle = 1,1,100
+
+[trader_door_close_start]
+type = 3d
+path = device\door_closing
+shuffle = rnd
+idle = 1,1,100
+
+[trader_door_close_stop]
+type = 3d
+path = device\door_stop
+shuffle = rnd
+idle = 1,1,100
+
+[trader_door_locked]
+type = 3d
+path = device\door_locked
+shuffle = rnd
+idle = 1,1,100
+
+[trader_door_unlock]
+type = 3d
+path = device\door_servomotor
+shuffle = rnd
+idle = 1,1,100
+
+[wood_small_open]
+type = 3d
+path = device\wood_small_open
+shuffle = rnd
+idle = 1,1,100
+
+[wood_small_close_start]
+type = 3d
+path = device\wood_small_close_start
+shuffle = rnd
+idle = 1,1,100
+
+[wood_small_close_stop]
+type = 3d
+path = device\wood_small_close_stop
+shuffle = rnd
+idle = 1,1,100
+
+[wood_large_open]
+type = 3d
+path = device\wood_large_open
+shuffle = rnd
+idle = 1,1,100
+
+[wood_large_close_start]
+type = 3d
+path = device\wood_large_close_start
+shuffle = rnd
+idle = 1,1,100
+
+[wood_large_close_stop]
+type = 3d
+path = device\wood_large_close_stop
+shuffle = rnd
+idle = 1,1,100
+
+[metal_small_open]
+type = 3d
+path = device\metal_small_open
+shuffle = rnd
+idle = 1,1,100
+
+[metal_small_close_start]
+type = 3d
+path = device\metal_small_close_start
+shuffle = rnd
+idle = 1,1,100
+
+[metal_small_close_stop]
+type = 3d
+path = device\metal_small_close_stop
+shuffle = rnd
+idle = 1,1,100
+
+[power_switch]
+type = 3d
+path = device\power_switch
+shuffle = rnd
+idle = 1,1,100
+
+;***************************************************************
+; звуки настольной рации
+;***************************************************************
+[radio_call]
+type = 3d
+path = device\radio_call
+shuffle = rnd
+idle = 0,0,100
+
+
+;***************************************************************
+; Озвучка ПДА
+;***************************************************************
+[pda_alarm]
+type = actor
+npc_prefix = false
+path = device\pda\pda_alarm
+shuffle = rnd
+idle = 0,0,100
+
+[pda_news]
+type = actor
+npc_prefix = false
+path = device\pda\pda_news
+shuffle = rnd
+idle = 1,1,100
+
+[pda_tips]
+type = actor
+npc_prefix = false
+path = device\pda\pda_tip
+shuffle = rnd
+idle = 1,1,100
+
+[pda_task]
+type = actor
+npc_prefix = false
+path = device\pda\pda_objective
+shuffle = rnd
+idle = 1,1,100
+
+;***************************************************************
+; Озвучка Вертиберда
+;***************************************************************
+[heli_damaged]
+type = actor
+npc_prefix = false
+path = vehicles\helicopter\damage_
+shuffle = rnd
+idle = 1,1,100
+
+[heli_down]
+type = actor
+npc_prefix = false
+path = vehicles\helicopter\death_
+shuffle = rnd
+idle = 1,1,100
+
+[heli_hit]
+type = actor
+npc_prefix = false
+path = vehicles\helicopter\hit_
+shuffle = rnd
+idle = 3,4,40
+
+
+
+;***************************************************************
+; ОСНОВНЫЕ ТЕМЫ
+;***************************************************************
+[alarm]
+type = 3d
+path = ambient\siren1
+shuffle = loop
+idle = 0,0,100
+
+[meet_hello]
+type = npc
+avail_communities = bandit, csky, dolg, ecolog, freedom, killer, army, stalker, monolith
+npc_prefix = true
+path = states\meet\meet_hello_
+shuffle = rnd
+idle = 7,10,100
+
+[meet_wait]
+type = npc
+avail_communities = bandit, csky, dolg, freedom, killer, stalker
+npc_prefix = true
+path = states\meet\meet_wait_
+shuffle = seq
+delay_sound = 15000
+idle = 15,20,100
+
+[meet_stop]
+type = npc
+avail_communities = bandit, csky, dolg, freedom, stalker
+npc_prefix = true
+path = states\meet\meet_stop_
+shuffle = rnd
+idle = 2,2,100
+
+[meet_hide_weapon]
+type = npc
+avail_communities = bandit, csky, dolg, ecolog, freedom, army, stalker, killer
+npc_prefix = true
+path = states\meet\meet_hide_weapon_
+shuffle = rnd
+idle = 7,10,100
+
+[meet_use_no_default]
+type = npc
+avail_communities = bandit, csky, dolg, ecolog, freedom, army, stalker
+npc_prefix = true
+path = states\meet\meet_use_no_default_
+shuffle = rnd
+idle = 1,1,100
+
+[meet_use_no_fight]
+type = npc
+avail_communities = bandit, csky, dolg, ecolog, freedom, army, stalker, killer, monolith
+npc_prefix = true
+path = states\meet\meet_use_no_fight_
+shuffle = rnd
+idle = 2,2,100
+
+[meet_use_no_weapon]
+type = npc
+avail_communities = bandit, csky, dolg, ecolog, freedom, army, stalker
+npc_prefix = true
+path = states\meet\meet_use_no_weapon_
+shuffle = rnd
+idle = 5,7,100
+
+[meet_use_no_talk_leader]
+type = npc
+avail_communities = bandit, csky, dolg, ecolog, freedom, army, stalker, killer, monolith
+npc_prefix = true
+path = states\meet\meet_use_no_talk_leader_
+shuffle = rnd
+idle = 5,7,100
+
+
+[corpse_loot_begin]
+type = npc
+avail_communities = bandit, csky, dolg, freedom, killer, army, monolith, stalker
+npc_prefix = true
+path = states\loot\loot_begin_
+shuffle = rnd
+idle = 10,11,100
+
+[corpse_loot_good]
+type = npc
+avail_communities = bandit, csky, dolg, freedom, killer, army, monolith, stalker
+npc_prefix = true
+path = states\loot\loot_good_
+shuffle = rnd
+idle = 10,11,100
+
+[corpse_loot_bad]
+type = npc
+avail_communities = bandit, csky, dolg, freedom, killer, army, monolith, stalker
+npc_prefix = true
+path = states\loot\loot_bad_
+shuffle = rnd
+idle = 10,11,100
+
+[help_heavy]
+type = npc
+avail_communities = bandit, csky, dolg, ecolog, freedom, killer, army, monolith, stalker
+npc_prefix = true
+path = help\wounded_heavy\help_
+shuffle = rnd
+idle = 4,8,100
+
+[help_thanks]
+type = npc
+avail_communities = bandit, csky, dolg, ecolog, freedom, killer, army, stalker
+npc_prefix = true
+path = help\wounded_thanx\thanx_
+shuffle = rnd
+idle = 1,1,100
+
+[wounded_medkit]
+type = npc
+avail_communities = army, stalker, bandit, dolg, freedom, killer, csky
+npc_prefix = true
+path = help\wounded\medkit_
+shuffle = rnd
+idle = 1,1,100
+
+[wounded_psy]
+type = npc
+avail_communities = bandit, csky, dolg, ecolog, freedom, killer, army, monolith, stalker
+npc_prefix = true
+path = help\wounded_psy\psy_
+shuffle = rnd
+idle = 4,8,100
+
+[wounded_psy_shoot]
+type = npc
+avail_communities = bandit, csky, dolg, ecolog, freedom, killer, army, monolith, stalker
+npc_prefix = true
+path = help\wounded_psy\suicide_
+shuffle = rnd
+idle = 4,8,100
+;***************************************************************
+; ТЕМЫ ДЛЯ ТИРА
+;***************************************************************
+[steam_blowout]
+type = 3d
+path = anomaly\steam_blowout
+shuffle = rnd
+idle = 0,0,100
+
+

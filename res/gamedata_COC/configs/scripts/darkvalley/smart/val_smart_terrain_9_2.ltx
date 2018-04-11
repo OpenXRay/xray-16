@@ -1,0 +1,18 @@
+[smart_terrain]
+squad_id = 15
+max_population = 1
+respawn_params = respawn@val_smart_terrain_9_2
+respawn_idle = 86400
+
+
+[respawn@val_smart_terrain_9_2]
+spawn_dogs
+
+[spawn_dogs]
+spawn_squads =  simulation_pseudodog, simulation_dog, simulation_mix_dogs
+spawn_num = 1
+
+[exclusive]
+faction_base_defense_enemy1 = darkvalley\val_smart_terrain_9_2_smart_logic.ltx
+faction_base_defense_enemy2 = darkvalley\val_smart_terrain_9_2_smart_logic.ltx
+faction_base_defense_enemy3 = darkvalley\val_smart_terrain_9_2_smart_logic.ltx

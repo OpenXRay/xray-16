@@ -1,0 +1,391 @@
+;Raider Leader
+[logic@zat_b7_stalker_raider_leader]
+active = walker@leader_start_first
+prior = 200
+suitable = {=check_npc_name(zat_b7_stalker_raider_leader) -zat_b7_stalkers_raiders_attack} true
+post_combat_time = 0, 0
+
+[walker@leader_start_first]
+path_walk = zat_b7_raider_leader_start_walk
+path_look = zat_b7_raider_leader_start_look
+meet = meet@leader_start
+def_state_standing = wait_na
+on_info = {-zat_b7_bandit_boss_sultan_intro =see_actor} walker@leader_start_hello
+on_info2 = {+zat_b7_task_fail} walker@leader_start
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = zat_a2_sr_noweap
+use_camp = false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[walker@leader_start]
+path_walk = zat_b7_raider_leader_start_walk
+path_look = zat_b7_raider_leader_start_look
+meet = meet@leader_start
+def_state_standing = wait_na
+on_game_timer = 250 | {-zat_b7_task_fail -zat_b7_bandit_boss_sultan_intro =dist_to_actor_le(6) =dist_to_actor_ge(3) =see_actor} walker@leader_start_hello
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = zat_a2_sr_noweap
+use_camp = false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[walker@leader_start_hello]
+path_walk = zat_b7_raider_leader_start_walk
+path_look = zat_b7_raider_leader_start_look
+def_state_standing = wait_na
+meet = meet@leader_start_hello
+on_game_timer = 50 | walker@leader_start
+on_info = {+zat_b7_task_fail} walker@leader_start
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = zat_a2_sr_noweap
+use_camp = false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet@leader_start]
+close_distance = 0
+close_anim = nil
+close_snd_hello = nil
+close_snd_bye = nil
+close_victim = nil
+far_distance = 0
+trade_enable = false
+use = {-zat_b7_raider_plan} false, {!actor_enemy} true
+snd_on_use = {-zat_b7_raider_plan} meet_use_no_talk_leader
+abuse = false
+
+[meet@leader_start_hello]
+close_anim = nil
+close_snd_hello = nil
+close_snd_bye = nil
+close_victim = actor
+far_distance = 10
+far_anim = hello
+far_victim = actor
+far_snd = zat_b7_raiders_to_boss
+trade_enable = false
+use = {-zat_b7_raider_plan} false, {!actor_enemy} true
+snd_on_use = {-zat_b7_raider_plan} meet_use_no_talk_leader
+abuse = false
+
+
+
+[logic@zat_b7_stalker_raider_leader_attack]
+active = walker@leader_attack
+prior = 200
+suitable = {=is_alive(zat_b7_stalker_raider_leader) =check_npc_name(zat_b7_stalker_raider_leader) +zat_b7_stalkers_raiders_attack} true, {!is_alive(zat_b7_stalker_raider_leader) =target_squad_name(zat_b7_stalkers_raiders) +zat_b7_stalkers_raiders_attack =is_squad_commander} true
+post_combat_time = 0, 0
+
+[walker@leader_attack]
+path_walk = leader_attack_start_walk
+path_look = leader_attack_start_look
+on_signal = path_end | %+zat_b7_stalkers_raiders_meet%
+on_actor_dist_ge = 75 | {+zat_b7_actor_with_bandits +zat_b7_stalkers_raiders_meet} %=play_sound(zat_b7_raiders_ready_to_go)%
+def_state_standing = guard_na
+meet = meet@leader_start_attack
+on_info = {=is_squad_enemy_to_actor(zat_b7_stalkers_victims_1) +zat_b7_stalkers_raiders_meet} camper@leader_attack %+zat_b7_stalkers_raiders_attack_started%, {+zat_b7_stalkers_raiders_attack_started +zat_b7_stalkers_raiders_meet} walker@leader_walk_to_position
+on_info2 = {!squad_exist(zat_b7_stalkers_victims_1) -zat_b7_victims_disappeared -zat_b7_actor_killed_victims_self -zat_b7_stalkers_raiders_meet} %+zat_b7_actor_killed_victims_self +zat_b7_attack_started%
+on_info3 = {-zat_b7_stalkers_raiders_meet =squad_in_zone(zat_b7_stalkers_raiders:zat_b7_sr_stalkers_raiders_attack)} %+zat_b7_stalkers_raiders_meet%
+def_state_moving = assault
+gather_items_enabled = false
+corpse_detection_enabled = false
+
+[meet@leader_start_attack]
+close_anim = nil
+close_snd_hello = nil
+close_snd_bye = nil
+close_victim = actor
+trade_enable = false
+close_distance 	= 0
+far_distance 	= 0
+snd_on_use = {=is_wounded} nil, {=actor_enemy} nil, {=has_enemy} meet_use_no_fight
+use = {=is_wounded} false, {=actor_enemy} false, {=has_enemy} false, {-zat_b7_stalkers_raiders_attack_started} true, {+zat_b7_stalkers_raiders_attack_started} false
+meet_dialog = zat_b7_stalkers_raiders_dialog
+
+[walker@leader_walk_to_position]
+path_walk = leader_to_position_walk
+path_look = leader_to_position_look
+on_signal = position | {!actor_enemy} %+zat_b7_stalker_raider_leader_on_position =play_sound(zat_b7_raiders_attack)%
+on_info =  {+zat_b7_stalker_raider_leader_on_position} camper@leader_attack
+on_info2 = {+zat_b7_attack_started -zat_b7_victims_disappeared -zat_b7_actor_killed_victims_self} camper@leader_attack
+on_info3 = {=is_squad_enemy_to_actor(zat_b7_stalkers_victims_1)} camper@leader_attack
+on_info4 = {=squad_in_zone_all(zat_b7_stalkers_raiders:zat_b7_prepared_for_attack) !actor_enemy} %+zat_b7_stalker_raider_leader_on_position =play_sound(zat_b7_raiders_attack)%
+team = zat_b7_stalkers_raiders
+meet = no_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+def_state_moving = sneak_run
+gather_items_enabled = false
+corpse_detection_enabled = false
+
+[camper@leader_attack]
+path_walk = leader_attack_walk
+path_look = leader_attack_look
+no_retreat = true
+on_info = {-zat_b7_attack_started} %+zat_b7_attack_started =set_squads_enemies(zat_b7_stalkers_raiders:zat_b7_stalkers_victims_1)%
+on_info2 = {+zat_b7_attack_started +zat_b7_stalkers_victims_prepare -zat_b7_victims_disappeared} walker@leader_attack_2
+on_signal = path_end | {+zat_b7_victims_disappeared} remark@leader_confuse, {-zat_b7_victims_disappeared} walker@leader_attack_2
+meet = no_meet
+def_state_moving = sneak_run
+def_state_moving_fire = sneak_fire
+radius = 0
+;danger = danger@no_danger
+gather_items_enabled = false
+corpse_detection_enabled = false
+
+[walker@leader_attack_2]
+path_walk = leader_attack_walk
+path_look = leader_attack_look
+on_info = {+zat_b7_actor_killed_victims_self -zat_b7_actor_help_bandits} %+zat_b7_actor_help_bandits%
+meet = no_meet
+def_state_standing = hide_na
+def_state_moving = assault
+use_camp = false
+gather_items_enabled = false
+corpse_detection_enabled = false
+
+[remark@leader_confuse]
+on_info = %=play_sound(zat_b7_raiders_sneak_confuse)%
+anim = threat
+target = story | actor
+on_signal = sound_end | walker@leader_rob_actor
+
+[walker@leader_rob_actor]
+path_walk = leader_attack_walk
+path_look = leader_attack_look
+def_state_moving = assault
+def_state_standing = threat
+on_actor_dist_ge_nvis = 50 | %+zat_b7_actor_refused_to_be_robbed%  
+meet = meet@leader_rob_actor
+use_camp = false
+gather_items_enabled = false
+corpse_detection_enabled = false
+
+[meet@leader_rob_actor]
+close_distance = 25
+close_victim = actor
+close_anim = threat
+use = {!actor_enemy -zat_b7_actor_robbed =dist_to_actor_le(25) =see_actor} self, {+zat_b7_actor_robbed} false, false
+trade_enable = false
+allow_break = false
+meet_dialog = zat_b7_stalkers_raiders_dialog
+
+
+
+[logic@zat_b7_stalker_raider_leader_after]
+active = walker@leader_after
+prior = 200
+suitable = {=is_alive(zat_b7_stalker_raider_leader) =check_npc_name(zat_b7_stalker_raider_leader)} true, {!is_alive(zat_b7_stalker_raider_leader) =target_squad_name(zat_b7_stalkers_raiders) =is_squad_commander} true
+post_combat_time = 0, 0
+
+[walker@leader_after]
+path_walk = stalker_victim_leader_walk
+path_look = stalker_victim_leader_look
+meet = meet@leader_after
+on_actor_dist_le = 10 | {+zat_b7_actor_help_bandits +zat_b7_actor_really_helped_bandits -zat_b7_sound_play} %+zat_b7_sound_play =play_sound(zat_b7_raider_after_ok)%, {+zat_b7_actor_help_bandits -zat_b7_actor_really_helped_bandits -zat_b7_sound_play} %+zat_b7_sound_play =play_sound(zat_b7_raider_after_bad)%
+def_state_moving = assault
+corpse_detection_enabled = false
+wounded = wounded@no_wound
+use_camp = false
+gather_items_enabled = false
+corpse_detection_enabled = false
+
+[wounded@no_wound]
+hp_state = 0 | wounded_heavy@help_heavy
+hp_state_see = 0 | wounded_heavy@help_heavy
+hp_victim = 0 | nil
+hp_cover = 0 | false
+hp_fight = 0 | false
+
+[meet@leader_after]
+close_distance = 5
+close_anim = nil
+close_snd_hello = nil
+close_snd_bye = nil
+close_victim = nil
+far_distance = 10
+trade_enable = false
+close_victim = actor
+use = {=is_wounded} false, {=actor_enemy} false, {=has_enemy} false, {+zat_b7_actor_robbed} false, true 
+meet_dialog = zat_b7_stalkers_raiders_dialog
+snd_on_use = nil
+
+
+
+;Raider 1
+[logic@zat_b7_stalker_raider_1_attack]
+active = walker@attack_1
+prior = 100
+suitable = {=target_squad_name(zat_b7_stalkers_raiders) !check_npc_name(zat_b7_stalker_raider_leader) +zat_b7_stalkers_raiders_attack !is_squad_commander} true
+post_combat_time = 0, 0
+
+[walker@attack_1]
+path_walk = 1_wait_walk
+path_look = 1_wait_look
+on_info = {=is_squad_enemy_to_actor(zat_b7_stalkers_victims) +zat_b7_stalkers_raiders_meet} camper@attack_1, {+zat_b7_stalkers_raiders_attack_started +zat_b7_stalkers_raiders_meet} walker@walk_to_position_1
+def_state_standing = hide_na
+def_state_moving = assault
+meet = no_meet
+gather_items_enabled = false
+corpse_detection_enabled = false
+
+[walker@walk_to_position_1]
+path_walk = 1_to_position_walk
+path_look = 1_to_position_look
+on_info = {+zat_b7_stalker_raider_leader_on_position} camper@attack_1 %=play_sound(zat_b7_raiders_attack)%
+on_info2 = {+zat_b7_attack_started -zat_b7_victims_disappeared -zat_b7_actor_killed_victims_self} camper@attack_1
+on_info3 = {=is_squad_enemy_to_actor(zat_b7_stalkers_victims_1)} camper@attack_1
+on_info4 = {!actor_enemy} %=play_sound(zat_b7_raider_sneak_comments_1)%
+team = zat_b7_stalkers_raiders
+meet = no_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+def_state_moving = sneak_run
+gather_items_enabled = false
+corpse_detection_enabled = false
+
+[camper@attack_1]
+path_walk = 2_attack_walk
+path_look = 2_attack_look
+no_retreat = true
+radius = 0
+meet = no_meet
+def_state_moving = sneak_run
+def_state_moving_fire = sneak_fire
+on_signal = path_end | walker@attack_1_2
+on_info = {+zat_b7_attack_started +zat_b7_stalkers_victims_prepare} walker@attack_1_2
+;danger = danger@no_danger
+gather_items_enabled = false
+corpse_detection_enabled = false
+
+[walker@attack_1_2]
+path_walk = 2_attack_walk
+path_look = 2_attack_look
+meet = no_meet
+def_state_standing = hide_na
+def_state_moving = assault
+use_camp = false
+gather_items_enabled = false
+corpse_detection_enabled = false
+
+
+
+;Raider 2
+[logic@zat_b7_stalker_raider_2_attack]
+active = walker@attack_2
+prior = 100
+suitable = {=target_squad_name(zat_b7_stalkers_raiders) !check_npc_name(zat_b7_stalker_raider_leader) +zat_b7_stalkers_raiders_attack !is_squad_commander} true
+post_combat_time = 0, 0
+
+[walker@attack_2]
+path_walk = 2_wait_walk
+path_look = 2_wait_look
+def_state_standing = hide_na
+on_info = {=is_squad_enemy_to_actor(zat_b7_stalkers_victims) +zat_b7_stalkers_raiders_meet} camper@attack_2, {+zat_b7_stalkers_raiders_attack_started +zat_b7_stalkers_raiders_meet} walker@walk_to_position_2
+def_state_moving = assault
+meet = no_meet
+gather_items_enabled = false
+corpse_detection_enabled = false
+
+[walker@walk_to_position_2]
+path_walk = 2_to_position_walk
+path_look = 2_to_position_look
+on_info = {+zat_b7_stalker_raider_leader_on_position} camper@attack_2 %=play_sound(zat_b7_raiders_attack)%
+on_info2 = {+zat_b7_attack_started -zat_b7_victims_disappeared -zat_b7_actor_killed_victims_self} camper@attack_2
+on_info3 = {=is_squad_enemy_to_actor(zat_b7_stalkers_victims_1)} camper@attack_2
+on_game_timer = 15 | {!actor_enemy} %=play_sound(zat_b7_raider_sneak_comments_2)%
+team = zat_b7_stalkers_raiders
+meet = no_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+def_state_moving = sneak_run
+gather_items_enabled = false
+corpse_detection_enabled = false
+
+[camper@attack_2]
+path_walk = 1_attack_walk
+path_look = 1_attack_look
+no_retreat = true
+meet = no_meet
+radius = 0
+def_state_moving = sneak_run
+def_state_moving_fire = sneak_fire
+on_signal = path_end | walker@attack_2_2
+on_info = {+zat_b7_attack_started +zat_b7_stalkers_victims_prepare} walker@attack_2_2
+;danger = danger@no_danger
+gather_items_enabled = false
+corpse_detection_enabled = false
+
+[walker@attack_2_2]
+path_walk = 1_attack_walk
+path_look = 1_attack_look
+meet = no_meet
+def_state_standing = hide_na
+def_state_moving = assault
+use_camp = false
+gather_items_enabled = false
+corpse_detection_enabled = false
+
+
+
+;Raider 3
+[logic@zat_b7_stalker_raider_3_attack]
+active = walker@attack_3
+prior = 100
+suitable = {=target_squad_name(zat_b7_stalkers_raiders) !check_npc_name(zat_b7_stalker_raider_leader) +zat_b7_stalkers_raiders_attack !is_squad_commander} true
+post_combat_time = 0, 0
+
+[walker@attack_3]
+path_walk = 3_wait_walk
+path_look = 3_wait_look
+def_state_standing = hide_na
+on_info = {=is_squad_enemy_to_actor(zat_b7_stalkers_victims) +zat_b7_stalkers_raiders_meet} camper@attack_3, {+zat_b7_stalkers_raiders_attack_started +zat_b7_stalkers_raiders_meet} walker@walk_to_position_3
+def_state_moving = assault
+meet = no_meet
+gather_items_enabled = false
+corpse_detection_enabled = false
+
+[walker@walk_to_position_3]
+path_walk = 3_to_position_walk
+path_look = 3_to_position_look
+on_info = {+zat_b7_stalker_raider_leader_on_position} camper@attack_3 %=play_sound(zat_b7_raiders_attack)%
+on_info2 = {+zat_b7_attack_started -zat_b7_victims_disappeared -zat_b7_actor_killed_victims_self} camper@attack_3
+on_info3 = {=is_squad_enemy_to_actor(zat_b7_stalkers_victims_1)} camper@attack_3
+on_game_timer = 35 | {!actor_enemy} %=play_sound(zat_b7_raider_sneak_comments_3)%
+team = zat_b7_stalkers_raiders
+meet = no_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+def_state_moving = sneak_run
+gather_items_enabled = false
+corpse_detection_enabled = false
+
+[camper@attack_3]
+path_walk = 3_attack_walk
+path_look = 3_attack_look
+no_retreat = true
+meet = no_meet
+radius = 0
+def_state_moving = sneak_run
+def_state_moving_fire = sneak_fire
+on_signal = path_end | walker@attack_3_2
+on_info = {+zat_b7_attack_started +zat_b7_stalkers_victims_prepare} walker@attack_3_2
+;danger = danger@no_danger
+gather_items_enabled = false
+corpse_detection_enabled = false
+
+[walker@attack_3_2]
+path_walk = 3_attack_walk
+path_look = 3_attack_look
+meet = no_meet
+def_state_standing = hide_na
+def_state_moving = assault
+use_camp = false
+gather_items_enabled = false
+corpse_detection_enabled = false

@@ -1,0 +1,43 @@
+[logic]
+active = nil;sr_idle@task
+
+[sr_idle@task]
+on_info = {-jup_a12_task_given +jup_a12_actor_choose_self -jup_a12_stalker_prisoner_dead} sr_idle@wait %+jup_a12_actor_choose_self_or_ransom +jup_a12_task_given =give_task(jup_a12_free_prisoner)%
+on_info2 = {-jup_a12_task_given +jup_a12_actor_choose_power -jup_a12_stalker_prisoner_dead} sr_idle@wait %+jup_a12_task_given =give_task(jup_a12_free_prisoner)%
+on_info3 = {-jup_a12_task_given +jup_a12_actor_choose_ransom -jup_a12_stalker_prisoner_dead} sr_idle@wait %+jup_a12_actor_choose_self_or_ransom +jup_a12_task_given =give_task(jup_a12_free_prisoner)%
+on_info4 = {-jup_a12_task_given +pri_a12_stalker_prisoner_free -jup_a12_stalker_prisoner_dead} sr_idle@wait %+jup_a12_task_given =give_task(jup_a12_free_prisoner)%
+on_info5 = {+jup_a12_stalker_prisoner_dead} sr_idle@remove_prisoner %+jup_a12_stalker_prisoner_dead +pri_a12_stalker_prisoner_free +jup_a12_stalker_prisoner_free%
+on_game_timer = 172800 | {-pri_a12_stalker_prisoner_free} sr_idle@remove_prisoner %+jup_a12_stalker_prisoner_dead +pri_a12_stalker_prisoner_free +jup_a12_stalker_prisoner_free%
+
+[sr_idle@wait]
+on_info = {+jup_a12_actor_guided_base} sr_idle@start %-jup_a12_ui%
+on_info2 = {+jup_a12_stalker_prisoner_cheats_to_base -jup_a12_stalkers_on_base} sr_idle@start
+on_info3 = {+jup_a12_stalkers_on_base} sr_idle@clean_up
+on_game_timer = 172800 | {-pri_a12_stalker_prisoner_free} sr_idle@remove_prisoner %+jup_a12_stalker_prisoner_dead%
+
+[sr_idle@start]
+on_info = {+jup_a12_actor_guided_base} sr_idle@teleport %=run_postprocess(fade_in) =disable_ui%
+on_info2 = {-jup_a12_actor_guided_base} sr_idle@teleport
+
+[sr_idle@teleport]
+on_game_timer = 20 | {+jup_a12_actor_guided_base} sr_idle@switch %=run_postprocess(black:8510:true) =teleport_squad(jup_a12_prisoner:jup_a6_spawn_point)%, {-jup_a12_actor_guided_base} sr_idle@switch %=teleport_squad(jup_a12_prisoner:jup_a6_spawn_point)% 
+
+[sr_idle@switch]
+on_info = {+jup_a12_actor_guided_base} sr_idle@out %=teleport_actor(jup_actor_arrive_walk:jup_actor_arrive_look) =forward_game_time(2)%
+on_info2 = {-jup_a12_actor_guided_base} sr_idle@out
+
+[sr_idle@out]
+on_game_timer = 30 | %+jup_a12_ui%
+on_info = {+jup_a12_ui +jup_a12_actor_guided_base} sr_idle@clean_up %=stop_postprocess(8510) =enable_ui%
+on_info2 = {+jup_a12_stalker_prisoner_cheats_to_base -jup_a12_actor_guided_base} sr_idle@clean_up
+
+[sr_idle@clean_up]
+on_info = {+jup_b6_prisoner_employed =dist_to_story_obj_ge(jup_a12_stalker_squad:35)} sr_idle@nil %=remove_squad(jup_b6_stalker_exprisoner_squad) =remove_squad(jup_a12_prisoner) +jup_b6_exprisoner_work_on_sci%
+
+[sr_idle@remove_prisoner]
+on_info = {=squad_exist(jup_a12_prisoner)} sr_idle@nil %=remove_squad(jup_a12_prisoner) +jup_a12_task_done%, sr_idle@nil %+jup_a12_task_done%
+
+[sr_idle@nil]
+on_info = {+jup_a12_actor_enemy_to_bandits} sr_idle@zero %=set_squad_enemy_to_actor(jup_a12_bandit_guard_squad) =set_squad_enemy_to_actor(jup_a12_bandit_chief_squad) =set_squad_enemy_to_actor(jup_a12_bandit_cashier_squad) =set_squad_enemy_to_actor(jup_a12_bandit_sim_squad)%
+
+[sr_idle@zero]

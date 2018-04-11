@@ -1,0 +1,49 @@
+[logic@esc_2_12_stalker_nimble]
+active = animpoint@base
+level_spot = trader
+suitable = {=check_npc_name(esc_2_12_stalker_nimble)} true
+prior = 200
+trade = misc\trade\trade_loner_nimble.ltx
+
+[animpoint@base]
+cover_name = esc_2_12_stalker_nimble_cover
+reach_movement = walk_noweap
+avail_animations = animpoint_sit_ass
+use_camp = false
+;reach_distance = 1.5
+meet = meet@base
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+on_info = {-esc_2_12_nimble_can_go !npc_talking} %+esc_2_12_nimble_can_go%, {+esc_2_12_nimble_can_go =npc_talking} %-esc_2_12_nimble_can_go%
+on_info2 = {=is_dark_night} sleeper@sleeper_1
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+turn_on_campfire = true
+
+[meet@base]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_distance = 3
+use 			= {=actor_enemy} false, true
+close_snd_hello = {+esc_2_12_order_in_process +esc_2_12_order_ready} esc_nimble_greeting_order_ready, {+esc_2_12_order_in_process -esc_2_12_order_ready} esc_nimble_greeting_order_not_ready, {+esc_2_12_nimble_intro -esc_2_12_finished_categories_all} esc_nimble_greeting, nil
+trade_enable    = false
+allow_break 	= false
+meet_on_talking = false
+
+[sleeper@sleeper_1]
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+invulnerable = {!actor_enemy} true, false
+path_main = nimble_sleeper
+meet = no_meet
+on_info = {!is_dark_night} animpoint@base
+on_info2 = {-esc_2_12_nimble_can_go !npc_talking} %+esc_2_12_nimble_can_go%, {+esc_2_12_nimble_can_go =npc_talking} %-esc_2_12_nimble_can_go%

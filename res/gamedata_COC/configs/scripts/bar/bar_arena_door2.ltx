@@ -1,0 +1,18 @@
+[logic]
+active = ph_door@locked
+
+[ph_door@locked]
+locked = true
+closed = true
+snd_open_start = trader_door_open_start
+snd_close_start = trader_door_close_start
+snd_close_stop = trader_door_close_stop
+on_info = {+bar_arena_door_2_open} ph_door@unlocked
+
+[ph_door@unlocked]
+locked = false
+closed = false
+snd_open_start = trader_door_open_start
+snd_close_start = trader_door_close_start
+snd_close_stop = trader_door_close_stop
+on_info = {-bar_arena_door_2_open} ph_door@locked

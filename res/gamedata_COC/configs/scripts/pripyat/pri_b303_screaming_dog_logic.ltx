@@ -1,0 +1,17 @@
+[logic]
+active = nil;ph_idle@wait
+
+[ph_idle@wait]
+on_info =  {+pri_b303_kill_pseudodog} ph_idle@end %+pri_b303_screaming_played%
+on_info2 = {=actor_in_zone(pri_b303_burer_out_rest)} ph_idle@end %+pri_b303_screaming_played +pri_b303_screaming_played =destroy_object%
+on_info3 = {=actor_in_zone(pri_b303_kill_dog_rest)} ph_idle@shoot %+pri_b303_kill_pseudodog%
+
+[ph_idle@shoot]
+on_info =  ph_idle@end %=hit_obj(pri_b303_screaming_dog:bip01_spine2:3:1000:pri_b303_screeming_dog_spawn) =hit_obj(pri_b303_screaming_dog:bip01_spine2:3:3000:pri_b303_screaming_dog_look)%
+
+
+[ph_idle@end]
+on_info = {-pri_b303_screaming_played} %+pri_b303_screaming_played =play_sound(pri_b303_dog_screaming)%
+on_signal = theme_end | {+pri_b303_screaming_played} ph_idle@nil
+
+[ph_idle@nil]

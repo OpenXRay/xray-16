@@ -1,0 +1,47 @@
+[smart_terrain]
+squad_id = 5
+max_population = 3
+;;arrive_dist = 100000
+respawn_params = respawn@pas_b400_hall
+respawn_idle = 86400
+
+
+[respawn@pas_b400_hall]
+spawn_chimera
+
+[spawn_chimera]
+spawn_squads = simulation_chimera
+spawn_num = {+actor_pass_jupiter_exit_find +actor_pass_pripyat_exit_find} 3, 0
+
+[exclusive]
+;tushkano jobs
+pas_b400_hall_tushkano_1 = underpass\pas_b400_hall_monsters.ltx
+pas_b400_hall_tushkano_2 = underpass\pas_b400_hall_monsters.ltx
+pas_b400_hall_tushkano_3 = underpass\pas_b400_hall_monsters.ltx
+pas_b400_hall_tushkano_4 = underpass\pas_b400_hall_monsters.ltx
+pas_b400_hall_tushkano_5 = underpass\pas_b400_hall_monsters.ltx
+pas_b400_hall_tushkano_6 = underpass\pas_b400_hall_monsters.ltx
+;monolith attackers
+pas_b400_hall_monolith_1 = underpass\pas_b400_hall_monolith.ltx
+pas_b400_hall_monolith_2 = underpass\pas_b400_hall_monolith.ltx
+pas_b400_hall_monolith_3 = underpass\pas_b400_hall_monolith.ltx
+pas_b400_hall_monolith_4 = underpass\pas_b400_hall_monolith.ltx
+pas_b400_hall_monolith_5 = underpass\pas_b400_hall_monolith.ltx
+pas_b400_hall_monolith_6 = underpass\pas_b400_hall_monolith.ltx
+pas_b400_hall_monolith_7 = underpass\pas_b400_hall_monolith.ltx
+pas_b400_hall_monolith_8 = underpass\pas_b400_hall_monolith.ltx
+pas_b400_hall_sniper_1 = underpass\pas_b400_hall_monolith.ltx
+pas_b400_hall_sniper_2 = underpass\pas_b400_hall_monolith.ltx
+pas_b400_hall_sniper_3 = underpass\pas_b400_hall_monolith.ltx
+;not_used
+pas_b400_hall_sniper_4 = underpass\pas_b400_hall_monolith.ltx
+;after attack
+pas_b400_hall_monolith_10 = underpass\pas_b400_hall_monolith.ltx
+pas_b400_hall_monolith_11 = underpass\pas_b400_hall_monolith.ltx
+pas_b400_hall_monolith_12 = underpass\pas_b400_hall_monolith.ltx
+pas_b400_hall_monolith_13 = underpass\pas_b400_hall_monolith.ltx
+;core npc
+pas_b400_zulus_hall = underpass\pas_b400_hall.ltx
+pas_b400_vano_hall = underpass\pas_b400_hall.ltx
+pas_b400_sokolov_hall = underpass\pas_b400_hall.ltx
+pas_b400_wanderer_hall = underpass\pas_b400_hall.ltx

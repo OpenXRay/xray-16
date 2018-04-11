@@ -1,0 +1,8 @@
+[animated_object]
+tip = {-pas_b400_tunnel_button_pressed} tip_gate_locked, none
+on_start = true %=turn_off(pas_b400_lamp_tunnel_red:pas_b400_lamp_tunnel_red_1) =turn_on(pas_b400_lamp_tunnel_flash:pas_b400_lamp_tunnel_flash_1)%
+on_stop = true %+pas_b400_tunnel_gates_opened =turn_off(pas_b400_lamp_tunnel_flash:pas_b400_lamp_tunnel_flash_1) =turn_on(pas_b400_lamp_tunnel_green:pas_b400_lamp_tunnel_green_1)%
+idle_snd = device\airtight_gates_idle
+start_snd = device\airtight_gates_start
+stop_snd = ambient\underpass\pas_b400_gates_wreck
+idle_delay = 6500

@@ -1,0 +1,25 @@
+[logic]
+active = nil;ph_idle@jup_b202_wait_stol
+
+[ph_idle@jup_b202_free]
+nonscript_usable = true
+tips = actor_inventory_box_use
+
+[ph_idle@jup_b202_wait_stol]:ph_idle@jup_b202_free
+on_info1 = {+jup_b52_actor_items_can_be_stolen +zat_b52_nimble_clear} ph_idle@jup_b202_item_stolen
+on_info2 = {=distance_to_obj_ge(jup_b202_actor_treasure:200) =distance_to_obj_ge(jup_b202_snag_treasure:200) !jup_b202_inventory_box_empty -jup_b52_actor_items_can_be_stolen +zat_b52_nimble_clear} ph_idle@jup_b202_item_stolen %+jup_b52_actor_items_can_be_stolen =jup_b202_inventory_box_relocate =zat_b202_spawn_random_loot%
+on_info3 = {+zat_b215_guide_to_zaton !jup_b202_inventory_box_empty -jup_b52_actor_items_can_be_stolen +zat_b52_nimble_clear} ph_idle@jup_b202_item_stolen %+jup_b52_actor_items_can_be_stolen =jup_b202_inventory_box_relocate =zat_b202_spawn_random_loot%
+on_info4 = {=actor_in_zone(jup_a6_sr_sleep)} ph_idle@jup_b202_sleep
+
+[ph_idle@jup_b202_item_stolen]:ph_idle@jup_b202_free
+on_use = {+jup_b52_actor_items_can_be_stolen -jup_b202_actor_items_stolen -jup_b202_actor_items_returned +zat_b52_nimble_clear} ph_idle@jup_b202_free %+jup_b202_actor_items_stolen =give_task(jup_b202_actor_items_stolen)%
+on_info1 = {+jup_b202_actor_items_returned} ph_idle@jup_b202_free
+on_info2 = {=actor_in_zone(jup_a6_sr_sleep)} ph_idle@jup_b202_sleep
+
+[ph_idle@jup_b202_sleep]
+nonscript_usable = false
+on_info1 = {!actor_in_zone(jup_a6_sr_sleep) -jup_b52_actor_items_can_be_stolen} ph_idle@jup_b202_wait_stol
+on_info2 = {!actor_in_zone(jup_a6_sr_sleep) +jup_b52_actor_items_can_be_stolen -jup_b202_actor_items_stolen -jup_b202_actor_items_returned} ph_idle@jup_b202_item_stolen
+on_info3 = {!actor_in_zone(jup_a6_sr_sleep) +jup_b202_actor_items_returned} ph_idle@jup_b202_free
+on_info4 = {!actor_in_zone(jup_a6_sr_sleep) +jup_b202_actor_items_stolen} ph_idle@jup_b202_free
+on_info5 = {+actor_is_sleeping !jup_b202_inventory_box_empty -jup_b52_actor_items_can_be_stolen +zat_b52_nimble_clear} %+jup_b52_actor_items_can_be_stolen =jup_b202_inventory_box_relocate =zat_b202_spawn_random_loot%

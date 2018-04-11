@@ -1,0 +1,23 @@
+[logic]
+active = nil;sr_idle@1
+
+[sr_idle@1]
+on_actor_in_zone = jup_b4_space_restrictor | sr_idle@2
+
+[sr_idle@2]
+on_timer1 = 2000 | %+jup_b4_monolith_talking_1%
+on_timer2 = 6000 | %+jup_b4_monolith_talking_4%
+on_timer3 = 9000 | %+jup_b4_monolith_talking_5%
+on_actor_not_in_zone  = jup_b4_space_restrictor | sr_idle@1 %-jup_b4_monolith_talking_1 -jup_b4_monolith_talking_4 -jup_b4_monolith_talking_5%
+on_info = {+jup_b4_monolith_squad_in_duty} sr_idle@duty
+on_info2 = {+jup_b4_monolith_squad_in_freedom} sr_idle@freedom
+on_info3 = {+jup_b4_monolith_squad_out} sr_idle@nill
+
+[sr_idle@duty]
+on_npc_in_zone = jup_b4_monolith_squad_leader_duty_skin |jup_surge_hide_a6 | sr_idle@nill %+jup_b4_monolith_squad_on_base =set_squad_goodwill(jup_b4_squad_duty_leader:1000)%
+
+[sr_idle@freedom]
+on_npc_in_zone = jup_b4_monolith_squad_leader_freedom_skin |jup_surge_hide_a6 | sr_idle@nill %+jup_b4_monolith_squad_on_base =set_squad_goodwill(jup_b4_squad_freedom_leader:1000)%
+
+[sr_idle@nill]
+

@@ -1,0 +1,128 @@
+[wounded@no_wound]
+hp_state = 0 | wounded_heavy@help_heavy
+hp_state_see = 0 | wounded_heavy@help_heavy
+hp_victim = 0 | nil
+hp_cover = 0 | false
+hp_fight = 0 | false
+
+
+
+[logic@pri_b35_envoy]
+active = walker@leader_start
+suitable = {-pri_b35_rendevous_done =check_npc_name(pri_b35_envoy)} true
+prior = 200
+on_death = death
+on_combat = combat
+
+[walker@leader_start]
+path_walk = envoy_start_walk
+on_info = walker@rendevous
+
+[walker@rendevous]
+path_walk = envoy_rendevous_walk
+path_look = envoy_rendevous_look
+def_state_moving1 = walk
+def_state_standing = wait_na
+on_info = {+pri_b35_rendevous_in_process} remark@rendevous
+on_info2 = {-pri_b35_envoy_sighted =see_npc(pri_b35_merc_leader)} %+pri_b35_envoy_sighted%
+on_info3 = {-pri_b35_envoy_sighted =npc_in_zone(pri_b35_sr_mercs)} %+pri_b35_envoy_sighted%
+on_info4 = {-pri_b35_envoy_sighted =actor_see_npc} %+pri_b35_envoy_sighted%
+on_info5 = {+pri_b35_attack_started} %+pri_b35_rendevous_done +pri_b35_rendevous_in_process%
+on_info6 = {-pri_b35_attack_started =has_actor_enemy} %+pri_b35_attack_started% 
+on_signal = path_end | %+pri_b35_rendevous_in_process%
+
+[remark@rendevous]
+anim = wait_na
+on_game_timer = 100 | %+pri_b35_rendevous_done%
+on_info = {+pri_b35_attack_started} %+pri_b35_rendevous_done%
+on_info2 = {-pri_b35_attack_started =has_actor_enemy} %+pri_b35_attack_started% 
+target = story | pri_b35_merc_leader
+
+[death]
+on_info = %+pri_b35_envoy_out +pri_b35_rendevous_done +pri_b35_rendevous_in_process +pri_b35_attack_started%
+
+[combat]
+on_info = {-pri_b35_attack_started =has_actor_enemy} %+pri_b35_attack_started%
+
+
+
+[logic@pri_b35_envoy_after]
+active = walker@envoy_after
+suitable = {+pri_b35_rendevous_done =check_npc_name(pri_b35_envoy)} true
+prior = 200
+on_death = death
+
+[walker@envoy_after]
+path_walk = envoy_after_walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+out_restr = pri_b35_sr_envoy_escape
+def_state_moving = rush
+wounded = wounded@no_wound
+on_info = {=npc_in_zone(pri_b35_sr_envoy_escape)} %=destroy_object +pri_b35_envoy_escape%
+
+
+[logic@pri_b35_envoy_squad_1]
+active = walker@envoy_squad_after_no_attack
+suitable = {+pri_b35_rendevous_done !check_npc_name(pri_b35_envoy) =target_squad_name(pri_b35_envoy_squad)} true
+prior = 200
+on_combat = combat
+
+[logic@pri_b35_envoy_squad_2]
+active = walker@envoy_squad_after_no_attack
+suitable = {+pri_b35_rendevous_done !check_npc_name(pri_b35_envoy) =target_squad_name(pri_b35_envoy_squad)} true
+prior = 200
+on_combat = combat
+
+[walker@envoy_squad_after]
+path_walk = envoy_after_walk
+out_restr = pri_b35_sr_envoy_escape
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+def_state_moving = rush
+wounded = wounded@no_wound
+on_info = {=npc_in_zone(pri_b35_sr_envoy_escape)} %=destroy_object%
+on_info2 = {!actor_in_zone(pri_b35_sr_actor_position)} %=destroy_object%
+
+[walker@envoy_squad_after_no_attack]
+path_walk = envoy_after_walk
+out_restr = pri_b35_sr_envoy_escape
+on_info = {+pri_b35_attack_started} walker@envoy_squad_after
+on_info2 = {=npc_in_zone(pri_b35_sr_envoy_escape)} %=destroy_object%
+on_info3 = {!actor_in_zone(pri_b35_sr_actor_position)} %=destroy_object%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+def_state_moving = patrol
+wounded = wounded@no_wound
+
+
+[logic@pri_b35_envoy_1]
+active = walker@envoy_1_start
+suitable = {-pri_b35_rendevous_done !check_npc_name(pri_b35_envoy) =target_squad_name(pri_b35_envoy_squad)} true
+prior = 200
+on_combat = combat
+
+[walker@envoy_1_start]
+path_walk = envoy_start_walk
+on_info = walker@envoy_1
+
+[walker@envoy_1]
+path_walk = envoy_1_walk
+path_look = envoy_1_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+
+
+[logic@pri_b35_envoy_2]
+active = walker@envoy_2_start
+suitable = {-pri_b35_rendevous_done !check_npc_name(pri_b35_envoy) =target_squad_name(pri_b35_envoy_squad)} true
+prior = 200
+on_combat = combat
+
+[walker@envoy_2_start]
+path_walk = envoy_start_walk
+on_info = walker@envoy_2
+
+[walker@envoy_2]
+path_walk = envoy_2_walk
+path_look = envoy_2_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	
+	<string id="yan_tonnel_snork_1">
+		<text>Подопытный №1</text>
+	</string>
+	<string id="yan_tonnel_snork_2">
+		<text>Подопытный №2</text>
+	</string>
+	<string id="yan_tonnel_snork_3">
+		<text>Подопытный №3</text>
+	</string>
+	<string id="yan_tonnel_snork_4">
+		<text>Подопытный №4</text>
+	</string>
+	<string id="yan_tonnel_snork_5">
+		<text>Подопытный №5</text>
+	</string>
+	<string id="yan_tonnel_snork_6">
+		<text>Подопытный №6</text>
+	</string>
+	<string id="yan_tonnel_gigant">
+		<text>Образец №8с</text>
+	</string>
+
+	<string id="bar_arena_savage">
+		<text>Зомбированный</text>
+	</string>
+	<string id="bar_arena_bloodsucker">
+		<text>Кровосос</text>
+	</string>
+	<string id="bar_arena_burer">
+		<text>Бюрер</text>
+	</string>
+	<string id="bar_arena_pseudodog">
+		<text>Псевдопёс</text>
+	</string>
+	<string id="bar_arena_snork">
+		<text>Снорк</text>
+	</string>
+
+</string_table>

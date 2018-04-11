@@ -1,0 +1,13 @@
+[logic]
+active = nil;
+
+[sr_idle@start]
+on_info = {+jup_b19_check_to_actor_dist} sr_idle@check
+
+[sr_idle@check]
+on_info = {!dist_to_actor_le(170)} sr_idle@nil %+jup_b19_yar_enemy_or_dead =create_squad(jup_b19_merc_squad:jup_b19)%
+on_info2 = {-jup_b19_check_to_actor_dist} sr_idle@start
+on_info3 = {-jup_b19_ready_actor_dist} %+jup_b19_ready_actor_dist%
+
+
+[sr_idle@nil]

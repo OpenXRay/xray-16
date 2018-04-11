@@ -1,0 +1,153 @@
+[capturetheartefact_gamedata]
+spawn_cost			= -1500;-2500;-10000
+not_free_ammo 		= mp_ammo_vog-25, mp_ammo_m209, mp_ammo_og-7b
+
+[capturetheartefact_base_cost]:deathmatch_base_cost
+
+[capturetheartefact_team1]
+artefact			=	mp_af_cta_green
+artefact_spawn_effect		= anomaly2\electra2_blast
+
+team_idx		= 0
+
+pistols			= mp_wpn_pm, mp_wpn_fort, mp_wpn_walther, mp_wpn_beretta, mp_wpn_sig220, mp_wpn_usp, mp_wpn_desert_eagle
+
+shotgun			= mp_wpn_bm16, mp_wpn_toz34, mp_wpn_wincheaster1300, mp_wpn_spas12, mp_wpn_protecta
+assault			= mp_wpn_ak74u, mp_wpn_ak74, mp_wpn_abakan, mp_wpn_groza, mp_wpn_val, mp_wpn_pkm, mp_wpn_fn2000;
+sniper_rifles	= mp_wpn_vintorez, mp_wpn_svd, mp_wpn_gauss
+heavy_weapons	= mp_wpn_rpg7, mp_wpn_rg-6
+
+granades		= mp_grenade_rgd5,mp_grenade_f1, mp_grenade_gd-05, mp_ammo_vog-25, mp_ammo_m209, mp_ammo_og-7b, mp_ammo_9x18_fmj,mp_ammo_9x18_pmm, mp_ammo_9x19_fmj,mp_ammo_9x19_pbp,  mp_ammo_9x19_fmj_4mp5, mp_ammo_9x19_pbp_4mp5, mp_ammo_5.45x39_fmj,mp_ammo_5.45x39_ap,mp_ammo_5.56x45_ss190,mp_ammo_5.56x45_ap,mp_ammo_7.62x54_7h1,mp_ammo_9x39_pab9,mp_ammo_9x39_ap,mp_ammo_11.43x23_fmj,mp_ammo_11.43x23_hydro,mp_ammo_12x70_buck,mp_ammo_12x76_zhekan,mp_ammo_gauss, mp_ammo_pkm_100;
+outfits			= mp_scientific_outfit, mp_military_stalker_outfit, mp_exo_outfit 
+equipment		= mp_medkit, mp_energy_drink, mp_bandage, mp_antirad, mp_drug_coagulant, mp_drug_radioprotector, mp_wpn_addon_silencer, mp_wpn_addon_scope, mp_wpn_addon_scope_susat, mp_wpn_addon_silencer, mp_wpn_addon_grenade_launcher, mp_wpn_addon_grenade_launcher_m203;
+
+
+skins = mp_team_green_1, mp_team_green_2, mp_team_green_3, mp_team_green_4, mp_team_green_addon_fr, mp_team_green_addon_uk
+
+
+default_items	= mp_wpn_knife, mp_wpn_pm;, mp_device_torch
+
+;//соответствие иконок обоорудованию
+mp_exo_outfit			= mp_team_green_armor_exo
+mp_scientific_outfit		= mp_team_green_armor_sci
+mp_military_stalker_outfit	= mp_team_green_armor_military
+
+;//money amounts
+money_start		= 450
+money_min		= 0
+
+kill_rival		= 300;400
+kill_self		= -100
+kill_team		= -250
+
+target_rival	= 750
+target_team		= -500
+target_succeed		= 1000;850;750;1000
+target_succeed_all	= 750;500;
+target_failed		= 300;250;100;
+
+round_win		= 200
+round_loose		= 100
+round_draw		= 0
+
+round_loose_minor		= 100
+round_win_minor		= 150
+clear_run_bonus				= 350;200;150
+
+kill_while_invincible = 0.5
+
+mp_wpn_pb_cost		= 0
+
+;//---- indicator data --------
+indicator_r1 = 0.2
+indicator_r2 = 0.2
+
+indicator_x = 0.0
+indicator_y = 0.4
+indicator_z = 0.0
+
+indicator_shader = friendly_indicator
+indicator_texture = ui\ui_greenteam
+
+invincible_shader = friendly_indicator
+invincible_texture = ui\ui_skull
+
+[capturetheartefact_team2]
+team_idx		= 1
+
+artefact			= mp_af_cta_blue
+artefact_spawn_effect		= anomaly2\electra2_blast
+
+pistols			= mp_wpn_pb, mp_wpn_hpsa, mp_wpn_colt1911, mp_wpn_beretta, mp_wpn_sig220, mp_wpn_usp, mp_wpn_desert_eagle
+
+shotgun			= mp_wpn_bm16, mp_wpn_toz34, mp_wpn_wincheaster1300, mp_wpn_spas12, mp_wpn_protecta
+assault			= mp_wpn_mp5, mp_wpn_l85, mp_wpn_lr300, mp_wpn_sig550, mp_wpn_g36, mp_wpn_pkm, mp_wpn_fn2000;
+sniper_rifles	= mp_wpn_vintorez, mp_wpn_svu, mp_wpn_gauss
+heavy_weapons	= mp_wpn_rpg7, mp_wpn_rg-6
+
+granades		= mp_grenade_rgd5,mp_grenade_f1, mp_grenade_gd-05, mp_ammo_vog-25, mp_ammo_m209, mp_ammo_og-7b, mp_ammo_9x18_fmj,mp_ammo_9x18_pmm, mp_ammo_9x19_fmj,mp_ammo_9x19_pbp, mp_ammo_9x19_fmj_4mp5, mp_ammo_9x19_pbp_4mp5, mp_ammo_5.45x39_fmj,mp_ammo_5.45x39_ap,mp_ammo_5.56x45_ss190,mp_ammo_5.56x45_ap,mp_ammo_7.62x54_7h1,mp_ammo_9x39_pab9,mp_ammo_9x39_ap,mp_ammo_11.43x23_fmj,mp_ammo_11.43x23_hydro,mp_ammo_12x70_buck,mp_ammo_12x76_zhekan,mp_ammo_gauss, mp_ammo_pkm_100;
+outfits			= mp_scientific_outfit, mp_military_stalker_outfit, mp_exo_outfit 
+equipment		= mp_medkit, mp_energy_drink, mp_bandage, mp_antirad, mp_drug_coagulant, mp_drug_radioprotector, mp_wpn_addon_silencer, mp_wpn_addon_scope, mp_wpn_addon_scope_susat, mp_wpn_addon_silencer, mp_wpn_addon_grenade_launcher, mp_wpn_addon_grenade_launcher_m203;
+
+
+skins = mp_team_blue_1, mp_team_blue_2, mp_team_blue_3, mp_team_blue_4, mp_team_blue_addon_de, mp_team_blue_addon_us
+
+default_items	= mp_wpn_knife, mp_wpn_pb;, mp_device_torch
+
+;//соответствие иконок обоорудованию
+mp_exo_outfit				= mp_team_blue_armor_exo
+mp_military_stalker_outfit		= mp_team_blue_armor_military
+mp_scientific_outfit			= mp_team_blue_armor_sci
+
+;//money amounts
+money_start		= 450
+money_min		= 0
+
+kill_rival		= 300;400
+kill_self		= -100
+kill_team		= -250
+
+target_rival	= 750
+target_team		= -500
+target_succeed		= 1000;850;750;1000
+target_succeed_all	= 750;500;
+target_failed		= 300;250;100;
+
+round_win		= 200
+round_loose		= 100
+round_draw		= 0
+
+round_loose_minor		= 100
+round_win_minor		= 150
+clear_run_bonus				= 350;200;150
+
+kill_while_invincible = 0.5
+
+mp_wpn_pm_cost		= 0
+
+;//---- indicator data --------
+indicator_r1 = 0.2
+indicator_r2 = 0.2
+
+indicator_x = 0.0
+indicator_y = 0.5
+indicator_z = 0.0
+
+indicator_shader = friendly_indicator
+indicator_texture = ui\ui_blueteam
+
+invincible_shader = friendly_indicator
+invincible_texture = ui\ui_skull
+
+;-------------------------------------------------------------------------------
+[capturetheartefact_messages_menu]
+sounds_path = characters_voice\multiplayer\ 
+team_prefix = team_
+
+menu_0 = cta_menu_0
+menu_1 = cta_menu_1
+
+[cta_menu_0]:ahunt_menu_0
+phrase_7 = speech_returntheartefact, return_
+
+[cta_menu_1]:ahunt_menu_1

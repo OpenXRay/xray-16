@@ -1,0 +1,59 @@
+; general section
+
+[remark@jup_b25_stalker_senya_wounded_gen]
+on_info1 = {+jup_b25_found_senya -jup_b25_senya_task_gived} %+jup_b25_senya_task_gived =give_task(jup_b25_revenge_senya)% 
+on_info2 = {+jup_b25_first_blame +jup_b25_second_blame +jup_b25_third_blame +jup_b25_blame_story_end} %=destroy_object +jup_b25_senya_dead%
+on_info3 = {+jup_b25_actor_refused_senya !actor_see_npc} remark@jup_b25_stalker_senya_wounded_refused, {+jup_b25_actor_refused_senya =distance_to_obj_ge(jup_b25_stalker_senya:3)} remark@jup_b25_stalker_senya_wounded_refused
+on_info4 = {+jup_b25_found_senya !actor_see_npc} remark@jup_b25_stalker_senya_wounded_acepted, {+jup_b25_found_senya =distance_to_obj_ge(jup_b25_stalker_senya:3)} remark@jup_b25_stalker_senya_wounded_acepted
+on_actor_dist_le_nvis = 50 | {-jup_b25_stop_sound} %=play_sound(jup_b25_senya_in_anomaly)%
+corpse_detection_enabled = false
+
+[remark@jup_b25_stalker_senya_wounded_die_gen]
+on_signal = sound_end | %=kill_npc +jup_b25_senya_dead%
+wounded = wounded@jup_b25_stalker_senya_wounded_silent
+meet = no_meet
+corpse_detection_enabled = false
+
+[wounded@jup_b25_stalker_senya_wounded_gen]
+hp_state = 101|wounded_heavy@nil
+hp_state_see = 101|wounded_heavy@nil
+hp_victim = 101|actor
+hp_cover = 101|false
+hp_fight = 101|false
+autoheal = false
+help_start_dialog = jup_b25_senya_start
+not_for_help = true
+
+; senya work
+
+[logic@jup_b25_stalker_senya_wounded]
+suitable = {=check_npc_name(jup_b25_stalker_senya)} true
+prior = 200
+active = walker@jup_b25_stalker_senya_wounded
+
+[walker@jup_b25_stalker_senya_wounded]
+path_walk = way
+path_look = look
+on_info = {=counter_greater(jup_b25_frase:1)} remark@jup_b25_stalker_senya_wounded_silent %=teleport_npc(jup_b25_way)%, {+jup_b25_found_senya} remark@jup_b25_stalker_senya_wounded_silent %=teleport_npc(jup_b25_way)%, remark@jup_b25_stalker_senya_wounded %=teleport_npc(jup_b25_way)%
+corpse_detection_enabled = false
+
+[remark@jup_b25_stalker_senya_wounded]:remark@jup_b25_stalker_senya_wounded_gen
+on_info5 = {=counter_greater(jup_b25_frase:1)} remark@jup_b25_stalker_senya_wounded_silent, {+jup_b25_found_senya} remark@jup_b25_stalker_senya_wounded_silent
+wounded = wounded@jup_b25_stalker_senya_wounded
+
+[remark@jup_b25_stalker_senya_wounded_silent]:remark@jup_b25_stalker_senya_wounded_gen
+on_game_timer = 200 | {+jup_b25_actor_refused_senya} remark@jup_b25_stalker_senya_wounded_refused, {+jup_b25_found_senya} remark@jup_b25_stalker_senya_wounded_acepted
+wounded = wounded@jup_b25_stalker_senya_wounded_silent
+meet = no_meet
+
+[remark@jup_b25_stalker_senya_wounded_refused]:remark@jup_b25_stalker_senya_wounded_die_gen
+on_info = %=play_sound(jup_b25_revage_senya)%
+
+[remark@jup_b25_stalker_senya_wounded_acepted]:remark@jup_b25_stalker_senya_wounded_die_gen
+on_info = %=play_sound(jup_b25_senya_die)%
+
+[wounded@jup_b25_stalker_senya_wounded]:wounded@jup_b25_stalker_senya_wounded_gen
+enable_talk = true
+
+[wounded@jup_b25_stalker_senya_wounded_silent]:wounded@jup_b25_stalker_senya_wounded_gen
+enable_talk = false

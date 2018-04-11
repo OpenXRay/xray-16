@@ -1,0 +1,87 @@
+[logic]
+active = sr_idle
+
+[sr_idle]
+on_info = {+sar2_spawn_1} sr_particle@1 %+sar2_monolith_rock%
+on_info2 = {+sar2_spawn_7} sr_particle@7 %+sar2_monolith_rock%
+on_info3 = {+sar2_spawn_13} sr_particle@13 %+sar2_monolith_rock%
+on_info4 = {+sar2_spawn_19} sr_particle@19 %+sar2_monolith_rock%
+on_info5 = {+sar2_spawn_25} sr_particle@25 %+sar2_monolith_rock%
+on_info6 = {+sar2_spawn_31} sr_particle@31 %+sar2_monolith_rock%
+on_info7 = {+sar2_spawn_37} sr_particle@37 %+sar2_monolith_rock%
+on_info8 = {+sar2_spawn_43} sr_particle@43 %+sar2_monolith_rock%
+on_info9 = {+sar2_spawn_49} sr_particle@49 %+sar2_monolith_rock%
+on_info10 = {+sar2_spawn_55} sr_particle@55 %+sar2_monolith_rock%
+on_info11 = {+sar2_monolith_end} sr_idle@nil
+
+[sr_particle@1]
+name = anomaly2\teleport_out_00
+mode = 2
+path = sar2_teleport_way_1
+looped = true
+on_timer = 2000| sr_idle %-sar2_spawn_1 -sar2_monolith_rock%
+
+[sr_particle@7]
+name = anomaly2\teleport_out_00
+mode = 2
+path = sar2_teleport_way_1
+looped = true
+on_timer = 2000| sr_idle %-sar2_spawn_7 -sar2_monolith_rock%
+
+[sr_particle@13]
+name = anomaly2\teleport_out_00
+mode = 2
+path = sar2_teleport_way_1
+looped = true
+on_timer = 2000| sr_idle %-sar2_spawn_13 -sar2_monolith_rock%
+
+[sr_particle@19]
+name = anomaly2\teleport_out_00
+mode = 2
+path = sar2_teleport_way_1
+looped = true
+on_timer = 2000| sr_idle %-sar2_spawn_19 -sar2_monolith_rock%
+
+[sr_particle@25]
+name = anomaly2\teleport_out_00
+mode = 2
+path = sar2_teleport_way_1
+looped = true
+on_timer = 2000| sr_idle %-sar2_spawn_25 -sar2_monolith_rock%
+
+[sr_particle@31]
+name = anomaly2\teleport_out_00
+mode = 2
+path = sar2_teleport_way_1
+looped = true
+on_timer = 2000| sr_idle %-sar2_spawn_31 -sar2_monolith_rock%
+
+[sr_particle@37]
+name = anomaly2\teleport_out_00
+mode = 2
+path = sar2_teleport_way_1
+looped = true
+on_timer = 2000| sr_idle %-sar2_spawn_37 -sar2_monolith_rock%
+
+[sr_particle@43]
+name = anomaly2\teleport_out_00
+mode = 2
+path = sar2_teleport_way_1
+looped = true
+on_timer = 2000| sr_idle %-sar2_spawn_43 -sar2_monolith_rock%
+
+[sr_particle@49]
+name = anomaly2\teleport_out_00
+mode = 2
+path = sar2_teleport_way_1
+looped = true
+on_timer = 2000| sr_idle %-sar2_spawn_49 -sar2_monolith_rock%
+
+[sr_particle@55]
+name = anomaly2\teleport_out_00
+mode = 2
+path = sar2_teleport_way_1
+looped = true
+on_timer = 2000| sr_idle %-sar2_spawn_55 -sar2_monolith_rock%
+
+[sr_idle@nil]

@@ -1,0 +1,10 @@
+[logic]
+active = nil;sr_idle@wait
+
+[sr_idle@wait]
+on_info = {+jup_b219_opening} sr_idle@and 
+            
+[sr_idle@and]
+on_timer = 1000 | sr_idle@nil %=play_sound(jup_b219_underpass_opening)%
+
+[sr_idle@nil]

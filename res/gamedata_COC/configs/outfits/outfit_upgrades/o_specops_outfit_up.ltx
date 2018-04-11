@@ -1,0 +1,355 @@
+[up_sect_firsta_specops_outfit]
+cost 		= 600
+value		= -10
+
+hit_fraction_actor				= -0.05
+strike_protection 				= 0.05
+explosion_protection 			= 0.05
+wound_protection				= 0.04
+
+[up_sect_firstc_specops_outfit]
+cost 		= 1200
+value		= -5
+
+inv_weight 						= -4
+power_loss						= -0.02
+
+[up_sect_firstd_specops_outfit]
+cost 		= 1200
+value		= +15
+
+immunities_sect_add				= sect_specops_outfit_immunities_add
+
+[up_sect_firste_specops_outfit]
+cost 		= 2400
+value		= +30
+
+fire_wound_protection  			= 0.1
+bones_koeff_protection_add 		= actor_armor_add_4
+inv_weight						= +0.30
+power_loss						= +0.015
+
+[up_sect_firstf_specops_outfit]
+cost 		= 2400
+value		= -10
+
+hit_fraction_actor				= -0.08
+strike_protection 				= 0.07
+explosion_protection 			= 0.07
+wound_protection				= 0.06
+
+[up_sect_secona_specops_outfit]
+cost 		= 750
+value		= +10
+
+immunities_sect_add 			= sect_specops_outfit_immunities_add
+
+[up_sect_seconc_specops_outfit]
+cost 		= 1500
+value		= +2
+
+power_restore_speed				= 0.0014
+power_loss						= -0.02
+
+[up_sect_second_specops_outfit]
+cost 		= 1200
+value       = +20 
+
+burn_protection      			= 0.01
+shock_protection     			= 0.1
+
+[up_sect_secone_specops_outfit]
+cost 		= 2400
+value		= +30
+
+chemical_burn_protection 		= 0.01
+radiation_protection 			= 0.003
+
+[up_sect_thirda_specops_outfit]
+cost 		= 750
+value		= +2
+
+bleeding_restore_speed			= 0.002
+
+[up_sect_thirdc_specops_outfit]
+cost 		= 1500
+value		= +10
+
+additional_inventory_weight		= 10
+additional_inventory_weight2	= 10
+power_loss						= -0.05
+
+[up_sect_thirde_specops_outfit]
+cost 		= 3000
+value  		= +2
+
+artefact_count					= 2
+
+
+[up_firsta_specops_outfit]
+scheme_index            = 0, 0
+known                   = 1
+effects                 = up_gr_firstcd_specops_outfit
+section                 = up_sect_firsta_specops_outfit
+property                = prop_damage, prop_wound, prop_strike, prop_explo
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_arm_b3_name
+description             = st_up_arm_b3_descr
+icon                    = ui_inGame2_upgrade_specops_outfit_1
+
+[up_firstc_specops_outfit]
+scheme_index            = 1, 0
+known                   = 1
+effects                 = up_gr_firstef_specops_outfit
+section                 = up_sect_firstc_specops_outfit
+property                = prop_weightoutfit
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_arm_b8_name
+description             = st_up_arm_b8_descr
+icon                    = ui_inGame2_upgrade_specops_outfit_2
+
+[up_firstd_specops_outfit]
+scheme_index            = 1, 1
+known                   = 1
+effects                 = up_gr_firstef_specops_outfit
+section                 = up_sect_firstd_specops_outfit
+property                = prop_durability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_arm_b4_name
+description             = st_up_arm_b4_descr
+icon                    = ui_inGame2_upgrade_specops_outfit_4
+
+[up_firste_specops_outfit]
+scheme_index            = 2, 0
+known                   = 1
+effects                 = 
+section                 = up_sect_firste_specops_outfit
+property                = prop_armor, prop_weightoutfit
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_arm_b1_name
+description             = st_up_arm_b1_descr
+icon                    = ui_inGame2_upgrade_specops_outfit_3
+
+[up_firstf_specops_outfit]
+scheme_index            = 2, 1
+known                   = 1
+effects                 = 
+section                 = up_sect_firstf_specops_outfit
+property                = prop_damage, prop_wound, prop_strike, prop_explo
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_arm_c5_name
+description             = st_up_arm_c5_descr
+icon                    = ui_inGame2_upgrade_specops_outfit_5
+
+[up_secona_specops_outfit]
+scheme_index            = 0, 1
+known                   = 1
+effects                 = up_gr_seconcd_specops_outfit
+section                 = up_sect_secona_specops_outfit
+property                = prop_durability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_kom_a6_name
+description             = st_up_kom_a6_descr
+icon                    = ui_inGame2_upgrade_specops_outfit_6
+
+[up_seconc_specops_outfit]
+scheme_index            = 1, 2
+known                   = 1
+effects                 = up_gr_seconef_specops_outfit
+section                 = up_sect_seconc_specops_outfit
+property                = prop_power
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_kom_b10_name
+description             = st_up_kom_b10_descr
+icon                    = ui_inGame2_upgrade_specops_outfit_7
+
+[up_second_specops_outfit]
+scheme_index            = 1, 3
+known                   = 1
+effects                 = up_gr_seconef_specops_outfit
+section                 = up_sect_second_specops_outfit
+property                = prop_thermo, prop_electro
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_kom_b11_name
+description             = st_up_kom_b11_descr
+icon                    = ui_inGame2_upgrade_specops_outfit_9
+
+[up_secone_specops_outfit]
+scheme_index            = 2, 2
+known                   = 1
+effects                 = 
+section                 = up_sect_secone_specops_outfit
+property                = prop_radio, prop_chem
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_arm_c13_name
+description             = st_up_arm_c13_descr
+icon                    = ui_inGame2_upgrade_specops_outfit_8
+
+
+[up_thirda_specops_outfit]
+scheme_index            = 0, 2
+known                   = 1
+effects                 = up_gr_thirdcd_specops_outfit
+section                 = up_sect_thirda_specops_outfit
+property                = prop_restore_bleeding
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_uti_a2_name
+description             = st_up_uti_a2_descr
+icon                    = ui_inGame2_upgrade_specops_outfit_10
+
+[up_thirdc_specops_outfit]
+scheme_index            = 1, 4
+known                   = 1
+effects                 = up_gr_thirdef_specops_outfit
+section                 = up_sect_thirdc_specops_outfit
+property                = prop_tonnage
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_uti_b2_name	
+description             = st_up_uti_b2_descr
+icon                    = ui_inGame2_upgrade_specops_outfit_11
+
+[up_thirde_specops_outfit]
+scheme_index            = 2, 3
+known                   = 1
+effects                 = 
+section                 = up_sect_thirde_specops_outfit
+property                = prop_artefact
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_uti_c1_name
+description             = st_up_uti_c1_descr
+icon                    = ui_inGame2_upgrade_specops_outfit_12
+
+[up_gr_firstab_specops_outfit]
+elements                = up_firsta_specops_outfit
+
+[up_gr_firstcd_specops_outfit]
+elements                = up_firstc_specops_outfit, up_firstd_specops_outfit
+
+[up_gr_firstef_specops_outfit]
+elements                = up_firste_specops_outfit, up_firstf_specops_outfit
+
+[up_gr_seconab_specops_outfit]
+elements                = up_secona_specops_outfit
+
+[up_gr_seconcd_specops_outfit]
+elements                = up_seconc_specops_outfit, up_second_specops_outfit
+
+[up_gr_seconef_specops_outfit]
+elements                = up_secone_specops_outfit
+
+[up_gr_thirdab_specops_outfit]
+elements                = up_thirda_specops_outfit
+
+[up_gr_thirdcd_specops_outfit]
+elements                = up_thirdc_specops_outfit
+
+[up_gr_thirdef_specops_outfit]
+elements                = up_thirde_specops_outfit

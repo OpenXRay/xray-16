@@ -1,0 +1,119 @@
+;bandit trader
+[logic@val_smart_terrain_7_4_bandit_trader]
+suitable = {=check_npc_name(val_smart_terrain_7_4_bandit_trader_stalker)} true
+prior = 200
+active = animpoint@trade
+level_spot = trader
+trade = misc\trade\trade_bandit_olivius.ltx
+can_select_weapon = false
+dont_keep_items = true
+
+[animpoint@trade]
+cover_name = val_smart_terrain_7_4_bandit_trader_smart_cover
+reach_movement = walk_noweap
+avail_animations = animpoint_sit_normal
+reach_distance = 3
+;on_info = {!npc_in_zone(val_gunnery_zone)} %=teleport_npc(val_smart_terrain_trader_walker_2_walk)%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+invulnerable = {!actor_enemy} true, false
+meet = meet@trade
+on_info1 = {=obj_on_job(val_smart_terrain_7_4:val_smart_terrain_7_4_beh_trade_1) =job_on_point(val_smart_terrain_7_4:val_smart_terrain_7_4_beh_trade_1:1:2:false)} %=trade_job_give_id(val_smart_terrain_7_4:val_smart_terrain_7_4_beh_trade_1)%
+
+[meet@trade]
+close_snd_hello = val_bandit_trader_meet
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_distance = 3
+use = {=actor_enemy} false, true
+meet_on_talking = false
+allow_break = false
+
+;------------------------------
+;------- Mutant swarm ----------
+;------------------------------
+
+[logic@faction_base_defense_enemy1]
+active = mob_home@faction_base_defense_enemy1
+suitable = {=target_squad_name(faction_base_defense_flesh_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy1]
+path_home = home_attackers
+home_min_radius = 1
+home_max_radius = 30
+aggressive = true
+panic = 0
+
+[logic@faction_base_defense_enemy2]
+active = mob_home@faction_base_defense_enemy2
+suitable = {=target_squad_name(faction_base_defense_boar_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy2]
+path_home = home_attackers
+aggressive = true
+home_min_radius = 1
+home_max_radius = 30
+panic = 0
+
+[logic@faction_base_defense_enemy3]
+active = mob_home@faction_base_defense_enemy3
+suitable = {=target_squad_name(faction_base_defense_dog_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy3]
+path_home = home_attackers
+home_min_radius = 1
+home_max_radius = 30
+aggressive = true
+panic = 0
+
+[logic@faction_base_defense_enemy4]
+active = mob_home@faction_base_defense_enemy4
+suitable = {=target_squad_name(faction_base_defense_flesh_second_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy4]
+path_home = home_attackers_2
+home_min_radius = 1
+home_max_radius = 30
+aggressive = true
+panic = 0
+
+[logic@faction_base_defense_enemy5]
+active = mob_home@faction_base_defense_enemy5
+suitable = {=target_squad_name(faction_base_defense_boar_second_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy5]
+path_home = home_attackers_2
+aggressive = true
+home_min_radius = 1
+home_max_radius = 30
+panic = 0
+
+[logic@faction_base_defense_enemy6]
+active = mob_home@faction_base_defense_enemy6
+suitable = {=target_squad_name(faction_base_defense_dog_second_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy6]
+path_home = home_attackers_2
+home_min_radius = 1
+home_max_radius = 30
+aggressive = true
+panic = 0

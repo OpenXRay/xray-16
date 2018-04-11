@@ -1,0 +1,63 @@
+[logic@pri_a25_base_medic]
+suitable = {=check_npc_name(pri_a25_base_medic)} true
+prior = 200
+active = walker@teleport
+
+[walker@teleport]
+corpse_detection_enabled = false
+meet = no_meet
+path_walk = medic_walk
+path_look = medic_look
+def_state_standing = wait_na
+on_info = walker@refrigerator %=teleport_npc(pri_a25_smart_terrain_medic_walk)%  
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+
+[walker@refrigerator]
+corpse_detection_enabled = false
+meet = no_meet
+path_walk = medic_walk
+path_look = medic_look
+def_state_standing = wait_na
+on_info = {+pri_a25_antenna_destroyed} %=play_sound(pri_a25_freezer_knock)%
+on_info2 = {+pri_a25_freezer_can_talk} remark@a25_timer %=stop_sound%
+on_info3 = {=actor_enemy} %=actor_neutral%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+
+[remark@a25_timer]
+corpse_detection_enabled = false
+meet = no_meet
+on_info = {=actor_enemy} %=actor_neutral%
+target = story | actor
+anim = wait_na
+on_game_timer = 10 | remark@a25_dialog
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+
+[remark@a25_dialog]
+corpse_detection_enabled = false
+meet = meet@pri_25
+target = story | actor
+anim = wait_na
+on_info = {=actor_enemy} %=actor_neutral%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+
+[meet@pri_25]
+meet_dialog = pri_a25_army_medic_freezer
+use = self
+allow_break = false
+trade_enable = false
+close_anim = wait_na
+close_distance = 0
+far_distance = 0
+close_snd_hello = nil
+close_snd_bye 	= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil

@@ -1,0 +1,10 @@
+[logic]
+active = nil;sr_idle
+
+[sr_idle]
+on_info = {+jup_b219_opening} sr_idle@close %=anim_obj_forward(jup_b219_lift_big_1) =jup_b219_save_pos%
+
+[sr_idle@close] 
+on_info = {+jup_b219_destroy_actor} sr_idle@nil %=anim_obj_backward(jup_b219_lift_big_1) =jup_b219_restore_gate%
+
+[sr_idle@nil]

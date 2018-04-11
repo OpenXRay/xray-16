@@ -1,0 +1,28 @@
+[logic]
+active = nil;sr_idle@control
+
+[sr_idle@control]
+on_info = {+zat_b215_guide_to_jupiter} sr_idle@zat_to_jup %=disable_ui =run_postprocess(fade_in)%
+on_info2 = {+zat_b215_guide_to_zaton} sr_idle@jup_to_zat %=disable_ui =run_postprocess(fade_in)%
+on_info3 = {+jup_b43_teleport_actor_from_jupiter_to_pripyat} sr_idle@jup_to_pri %=disable_ui =run_postprocess(fade_in)%
+on_info4 = {+jup_b43_teleport_actor_from_pripyat_to_jupiter} sr_idle@pri_to_jup %=disable_ui =run_postprocess(fade_in)%
+
+;С Затона на Юпитер
+[sr_idle@zat_to_jup]
+on_info = {=actor_on_level(jupiter) +jup_b43_jupiter_out_base_teleport} %=teleport_actor(jup_actor_arrive_walk:jup_actor_arrive_look) -jup_b43_jupiter_out_base_teleport%
+on_game_timer = 5 | sr_idle@control %-zat_b215_guide_to_jupiter =teleport_actor(zat_b215_jupiter_temp_walk:zat_b215_jupiter_temp_look) +jup_b43_jupiter_out_base_teleport%
+
+;С Юпитера на Затон
+[sr_idle@jup_to_zat]
+on_info = {=actor_on_level(zaton) +jup_b43_zaton_out_base_teleport} %=teleport_actor(zat_actor_arrive_walk:zat_actor_arrive_look) -jup_b43_zaton_out_base_teleport%
+on_game_timer = 5 | sr_idle@control %-zat_b215_guide_to_zaton =teleport_actor(jup_goto_zaton_walk:jup_goto_zaton_look) +jup_b43_zaton_out_base_teleport%
+
+;С Юпитера на Припять
+[sr_idle@jup_to_pri]
+on_info = {=actor_on_level(pripyat) +jup_b43_pripyat_out_base_teleport} %=teleport_actor(pri_actor_arrive_walk:pri_actor_arrive_look) -jup_b43_pripyat_out_base_teleport%
+on_game_timer = 5 | sr_idle@control %-jup_b43_teleport_actor_from_jupiter_to_pripyat =teleport_actor(jup_teleport_actor_from_jupiter_to_pripyat_walk:jup_teleport_actor_from_jupiter_to_pripyat_look) +jup_b43_pripyat_out_base_teleport%
+
+;С Припяти на Юпитер
+[sr_idle@pri_to_jup]
+on_info = {=actor_on_level(jupiter) +jup_b43_jupiter_out_base_teleport} %=teleport_actor(jup_actor_arrive_walk:jup_actor_arrive_look) -jup_b43_jupiter_out_base_teleport%
+on_game_timer = 5 | sr_idle@control %-jup_b43_teleport_actor_from_pripyat_to_jupiter =teleport_actor(pri_teleport_actor_from_pripyat_to_jupiter_walk:pri_teleport_actor_from_pripyat_to_jupiter_look) +jup_b43_jupiter_out_base_teleport%

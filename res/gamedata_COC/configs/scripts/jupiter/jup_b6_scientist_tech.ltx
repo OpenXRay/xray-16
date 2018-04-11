@@ -1,0 +1,47 @@
+[logic@jup_b6_scientist_tech]
+suitable = {=check_npc_name(jup_b6_scientist_tech)} true
+prior = 200
+active = animpoint@stand
+level_spot = mechanic
+
+[walker@firstmeet]
+path_walk = med_walk
+path_look = med_look
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+meet = meet
+out_restr = jup_b41_sr_light
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@stand]
+cover_name = jup_b41_animp_novikov
+avail_animations = jup_b41_novikov_stand
+use_camp = false
+meet = meet
+on_info = {!npc_in_zone(jup_b41_sr_light)} %=teleport_npc(jup_b41_med_walk)%
+on_info2 = {!talking} %-jup_b6_about_new_up_hide%
+out_restr = jup_b41_sr_light
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+reach_distance = 2
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet]
+close_snd_hello = jup_b6_scientist_medic_greeting
+close_snd_bye = jup_b6_scientist_medic_farewell
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_distance = 3
+use = {=actor_enemy} false, true
+allow_break = false
+meet_on_talking = false

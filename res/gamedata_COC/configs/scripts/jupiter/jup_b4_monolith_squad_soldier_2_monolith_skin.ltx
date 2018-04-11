@@ -1,0 +1,66 @@
+[logic@jup_b4_monolith_squad_soldier_2_monolith_skin]
+suitable = {=check_npc_name(jup_b4_monolith_squad_soldier_2_monolith_skin)}
+active = walker@begin
+prior = 100
+on_hit = hit
+on_death = death
+
+[walker@begin]
+use_camp = false
+path_walk = monolith_squad_soldier_2_monolith_skin_begin_walk
+path_look = monolith_squad_soldier_2_monolith_skin_begin_look
+combat_ignore_cond = {-jup_b4_monolith_squad_hit} true, false
+on_info = {+jup_b4_aling} walker@dolg_come
+on_info2 = {+jup_b4_freedom_squad_leader_lets_talk_sound} walker@freedom
+meet = meet_speak_boos
+
+;--------------------------------------------------------------------------------
+;--------------------------------------------------------------------------------
+
+[walker@dolg_come]
+use_camp = false
+path_walk = monolith_squad_soldier_2_monolith_skin_1_walk
+path_look = monolith_squad_soldier_2_monolith_skin_1_look
+combat_ignore_cond = {-jup_b4_monolith_squad_hit} true, false
+on_signal = align2 | %+jup_b4_duty_aling2%
+on_info = {+jup_b4_duty_prisiaga} walker@dolg_come2
+meet = meet_speak_boos
+
+[walker@dolg_come2]
+use_camp = false
+path_walk = monolith_squad_soldier_2_monolith_skin_1_walk
+path_look = monolith_squad_soldier_2_monolith_skin_1_look
+combat_ignore_cond = {-jup_b4_monolith_squad_hit} true, false
+meet = meet_speak_boos
+on_timer = 400 | walker@dolg_come3
+
+[walker@dolg_come3]
+use_camp = false
+path_walk = monolith_squad_soldier_2_monolith_skin_1_walk
+path_look = monolith_squad_soldier_2_monolith_skin_1_look
+combat_ignore_cond = {-jup_b4_monolith_squad_hit} true, false
+meet = meet_speak_boos
+on_info = {+jup_b4_duty_prisiaga -jup_b4_recruit_2_serve_duty_sound} %=play_sound(jup_b4_recruit_2_serve_duty) +jup_b4_recruit_2_serve_duty_sound%
+on_info2 = {+jup_b4_monolith_squad_out -jup_b4_ms2_stop_sound} %=stop_sound +jup_b4_ms2_stop_sound%
+
+;--------------------------------------------------------------------------------
+;--------------------------------------------------------------------------------
+
+[walker@freedom]
+use_camp = false
+path_walk = monolith_squad_soldier_2_monolith_skin_near_fire_walk
+path_look = monolith_squad_soldier_2_monolith_skin_near_fire_look
+combat_ignore_cond = {-jup_b4_monolith_squad_hit} true, false
+on_signal = soldier_2_near_fire | %+jup_b4_freedom_monolit_soldier_2_near_fire%
+meet = meet_speak_boos
+
+[hit]
+on_info = %+jup_b4_monolith_squad_hit%
+
+[death]
+on_info = %+jup_b4_soldier_2_death +jup_b4_duty_aling2 +jup_b4_recruit_2_serve_duty_sound +jup_b4_freedom_monolit_soldier_2_near_fire%
+
+[meet_speak_boos]
+use				= false
+snd_on_use 		= jup_b4_monolith_talk_to_commander
+

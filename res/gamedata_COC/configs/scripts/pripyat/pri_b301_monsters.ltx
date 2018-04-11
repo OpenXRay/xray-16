@@ -1,0 +1,385 @@
+[logic@snork_normal_1]
+suitable = {=target_squad_name(pri_b301_snork_1) -pri_b301_zulus_dead} true
+active = mob_home@spawn_1
+on_death = death@snork_normal_1
+monster_job = true
+
+[mob_home@spawn_1]
+path_home = home_spawn
+home_min_radius = 2
+home_max_radius = 5
+on_info = {-pri_b301_snork_1_teleport_home +pri_b301_snork_1_teleport_first} %=teleport_npc(pri_b301_home_spawn) +pri_b301_snork_1_teleport_home%, {-pri_b301_snork_1_teleport_first}%=teleport_npc(pri_b301_home_1) +pri_b301_snork_1_teleport_first%
+on_info2 = {=actor_in_zone(pri_b301_zulus_def_restr)} mob_walker@snork_normal_1
+on_info3 = {!actor_in_zone(pri_b301_zulus_def_restr)} mob_home@attack0_snork_normal_1
+
+[mob_walker@snork_normal_1]
+path_walk = snork_normal_1_walk
+path_look = snork_normal_1_jump
+on_signal = snork_normal_1 | mob_jump@snork_normal_1
+out_restr = pri_a28_school_in_restrictor
+on_info = %-pri_b301_snork_1_teleport_home%
+on_info2 = {!npc_in_zone(pri_b301_zatichka_spawn_snork)} %=teleport_npc(pri_b301_spawn_point_1a)%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[mob_jump@snork_normal_1]
+path_jump = snork_normal_1_jump
+ph_jump_factor = 0.9
+offset = 0,0,0
+on_signal = jumped | mob_home@attack0_snork_normal_1
+out_restr = pri_a28_school_in_restrictor
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[death@snork_normal_1]
+on_info = {=killed_by_actor} %+pri_b301_monster_death +pri_b301_monster_death_1%, %+pri_b301_monster_death_1%
+
+[mob_home@attack0_snork_normal_1]
+path_home = home_1
+home_min_radius = 2
+home_max_radius = 5
+on_info = {=hit_by_actor} mob_home@attack1_snork_normal_1 %+pri_b301_snork_attack_1%, {=dist_to_actor_le(30) =actor_see_npc} mob_home@attack1_snork_normal_1 %+pri_b301_snork_attack_1%
+on_info2 = {+pri_b301_snork_attack_1} mob_home@attack1_snork_normal_1
+on_info3 = %-pri_b301_snork_1_teleport_home%
+on_game_timer = 20 | {=npc_in_zone(pri_a28_school_in_restrictor)} mob_walker@snork_normal_1
+out_restr = pri_b301_monster_out_restr
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+
+[mob_home@attack1_snork_normal_1]
+path_home = home_1
+home_min_radius = 7
+home_max_radius = 10
+on_info = {+pri_b301_snork_attack_2} mob_home@attack2_snork_normal_1
+on_game_timer = 1200 | mob_home@attack3_snork_normal_1 %+pri_b301_snork_attack_3%
+on_info2 = {+pri_b301_snork_attack_2} mob_home@attack2_snork_normal_1
+on_info3 = {+pri_b301_snork_attack_3} mob_home@attack3_snork_normal_1
+on_game_timer2 = 20 | {=npc_in_zone(pri_a28_school_in_restrictor)} mob_walker@snork_normal_1
+out_restr = pri_b301_monster_out_restr
+
+[mob_home@attack2_snork_normal_1]
+path_home = home_2
+home_min_radius = 10
+home_max_radius = 12
+aggressive = true
+on_game_timer = 50 | mob_home@attack1_snork_normal_1 %-pri_b301_snork_attack_2%
+on_info = {+pri_b301_snork_attack_3} mob_home@attack3_snork_normal_1
+on_game_timer2 = 20 | {=npc_in_zone(pri_a28_school_in_restrictor)} mob_walker@snork_normal_1
+out_restr = pri_b301_monster_out_restr
+
+[mob_home@attack3_snork_normal_1]
+path_home = home_2
+aggressive = true
+home_min_radius = 10
+home_max_radius = 12
+out_restr = pri_b301_monster_out_restr
+on_info = {=npc_in_zone(pri_a28_school_in_restrictor)} mob_walker@snork_normal_1
+
+;*********************************************
+;*********************************************
+
+[logic@snork_normal_2]
+suitable = {=target_squad_name(pri_b301_snork_2) -pri_b301_zulus_dead} true
+active = mob_home@spawn_2
+on_death = death@snork_normal_2
+monster_job = true
+
+[death@snork_normal_2]
+on_info = {=killed_by_actor} %+pri_b301_monster_death +pri_b301_monster_death_2%, %+pri_b301_monster_death_2%
+
+[mob_home@spawn_2]
+path_home = home_spawn
+home_min_radius = 2
+home_max_radius = 5
+on_info = {-pri_b301_snork_2_teleport_home +pri_b301_snork_2_teleport_first} %=teleport_npc(pri_b301_home_spawn) +pri_b301_snork_2_teleport_home%, {-pri_b301_snork_2_teleport_first}%=teleport_npc(pri_b301_home_1) +pri_b301_snork_2_teleport_first%
+on_info2 = {=actor_in_zone(pri_b301_zulus_def_restr)} mob_walker@snork_normal_2
+on_info3 = {!actor_in_zone(pri_b301_zulus_def_restr)} mob_home@attack0_snork_normal_2
+
+[mob_walker@snork_normal_2]
+path_walk = snork_normal_2_walk
+path_look = snork_normal_2_jump
+on_signal = snork_normal_2 | mob_jump@snork_normal_2
+out_restr = pri_a28_school_in_restrictor
+on_info = %-pri_b301_snork_2_teleport_home%
+on_info2 = {!npc_in_zone(pri_b301_zatichka_spawn_snork)} %=teleport_npc(pri_b301_spawn_point_1a)%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[mob_jump@snork_normal_2]
+path_jump = snork_normal_2_jump
+ph_jump_factor = 0.9
+offset = 0,0,0
+on_signal = jumped | mob_home@attack0_snork_normal_2
+out_restr = pri_a28_school_in_restrictor
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[mob_home@attack0_snork_normal_2]
+path_home = home_1
+home_min_radius = 2
+home_max_radius = 5
+on_info = {=hit_by_actor} mob_home@attack1_snork_normal_2 %+pri_b301_snork_attack_1%, {=dist_to_actor_le(30) =actor_see_npc} mob_home@attack1_snork_normal_2 %+pri_b301_snork_attack_1%
+on_info2 = {+pri_b301_snork_attack_1} mob_home@attack1_snork_normal_2
+on_info3 = %-pri_b301_snork_2_teleport_home%
+on_game_timer = 20 | {=npc_in_zone(pri_a28_school_in_restrictor)} mob_walker@snork_normal_2
+out_restr = pri_b301_monster_out_restr
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+
+[mob_home@attack1_snork_normal_2]
+path_home = home_1
+home_min_radius = 7
+home_max_radius = 10
+on_info = {+pri_b301_snork_attack_2} mob_home@attack2_snork_normal_2
+on_game_timer = 1200 | mob_home@attack3_snork_normal_2 %+pri_b301_snork_attack_3%
+on_info2 = {+pri_b301_snork_attack_2} mob_home@attack2_snork_normal_2
+on_info3 = {+pri_b301_snork_attack_3} mob_home@attack3_snork_normal_2
+on_game_timer2 = 20 | {=npc_in_zone(pri_a28_school_in_restrictor)} mob_walker@snork_normal_2
+out_restr = pri_b301_monster_out_restr
+
+[mob_home@attack2_snork_normal_2]
+path_home = home_2
+home_min_radius = 10
+home_max_radius = 12
+aggressive = true
+on_game_timer = 50 | mob_home@attack1_snork_normal_2 %-pri_b301_snork_attack_2%
+on_info = {+pri_b301_snork_attack_3} mob_home@attack3_snork_normal_2
+on_game_timer2 = 20 | {=npc_in_zone(pri_a28_school_in_restrictor)} mob_walker@snork_normal_2
+out_restr = pri_b301_monster_out_restr
+
+[mob_home@attack3_snork_normal_2]
+path_home = home_2
+aggressive = true
+home_min_radius = 10
+home_max_radius = 12
+on_info = {=npc_in_zone(pri_a28_school_in_restrictor)} mob_walker@snork_normal_2
+
+;*********************************************
+;*********************************************
+
+[logic@snork_normal_3]
+suitable = {=target_squad_name(pri_b301_snork_3) -pri_b301_zulus_dead} true
+active = mob_home@spawn_3
+on_death = death@snork_normal_3
+monster_job = true
+
+[death@snork_normal_3]
+on_info = {=killed_by_actor} %+pri_b301_monster_death +pri_b301_monster_death_3%, %+pri_b301_monster_death_3%
+
+[mob_home@spawn_3]
+path_home = home_spawn
+home_min_radius = 2
+home_max_radius = 5
+on_info = {-pri_b301_snork_3_teleport_home +pri_b301_snork_3_teleport_first} %=teleport_npc(pri_b301_home_spawn) +pri_b301_snork_3_teleport_home%, {-pri_b301_snork_3_teleport_first}%=teleport_npc(pri_b301_home_1) +pri_b301_snork_3_teleport_first%
+on_info2 = {=actor_in_zone(pri_b301_zulus_def_restr)} mob_walker@snork_normal_3
+on_info3 = {!actor_in_zone(pri_b301_zulus_def_restr)} mob_home@attack0_snork_normal_3
+
+[mob_walker@snork_normal_3]
+path_walk = snork_normal_3_walk
+path_look = snork_normal_3_jump
+on_signal = snork_normal_3 | mob_jump@snork_normal_3
+out_restr = pri_a28_school_in_restrictor
+on_info = %-pri_b301_snork_3_teleport_home%
+on_info2 = {!npc_in_zone(pri_b301_zatichka_spawn_snork)} %=teleport_npc(pri_b301_spawn_point_1a)%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[mob_jump@snork_normal_3]
+path_jump = snork_normal_3_jump
+ph_jump_factor = 0.9
+offset = 0,0,0
+on_signal = jumped | mob_home@attack0_snork_normal_3
+out_restr = pri_a28_school_in_restrictor
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[mob_home@attack0_snork_normal_3]
+path_home = home_1
+home_min_radius = 2
+home_max_radius = 5
+on_info = {=hit_by_actor} mob_home@attack1_snork_normal_3 %+pri_b301_snork_attack_1%, {=dist_to_actor_le(30) =actor_see_npc} mob_home@attack1_snork_normal_3 %+pri_b301_snork_attack_1%
+on_info2 = {+pri_b301_snork_attack_1} mob_home@attack1_snork_normal_3
+on_info3 = %-pri_b301_snork_3_teleport_home%
+on_game_timer = 20 | {=npc_in_zone(pri_a28_school_in_restrictor)} mob_walker@snork_normal_3
+out_restr = pri_b301_monster_out_restr
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+
+[mob_home@attack1_snork_normal_3]
+path_home = home_1
+home_min_radius = 7
+home_max_radius = 10
+on_info = {+pri_b301_snork_attack_2} mob_home@attack2_snork_normal_3
+on_game_timer = 1200 | mob_home@attack3_snork_normal_3 %+pri_b301_snork_attack_3%
+on_info2 = {+pri_b301_snork_attack_2} mob_home@attack2_snork_normal_3
+on_info3 = {+pri_b301_snork_attack_3} mob_home@attack3_snork_normal_3
+on_game_timer2 = 20 | {=npc_in_zone(pri_a28_school_in_restrictor)} mob_walker@snork_normal_3
+out_restr = pri_b301_monster_out_restr
+
+[mob_home@attack2_snork_normal_3]
+path_home = home_2
+home_min_radius = 10
+home_max_radius = 12
+aggressive = true
+on_game_timer = 50 | mob_home@attack1_snork_normal_3 %-pri_b301_snork_attack_2%
+on_info = {+pri_b301_snork_attack_3} mob_home@attack3_snork_normal_3
+on_game_timer2 = 20 | {=npc_in_zone(pri_a28_school_in_restrictor)} mob_walker@snork_normal_3
+out_restr = pri_b301_monster_out_restr
+
+[mob_home@attack3_snork_normal_3]
+path_home = home_2
+aggressive = true
+home_min_radius = 10
+home_max_radius = 12
+out_restr = pri_b301_monster_out_restr
+on_game_timer = 20 | {=npc_in_zone(pri_a28_school_in_restrictor)} mob_walker@snork_normal_3
+
+;*********************************************
+;*********************************************
+
+[logic@snork_normal_4]
+suitable = {=target_squad_name(pri_b301_snork_4) -pri_b301_zulus_dead} true
+active = mob_home@spawn_4
+on_death = death@snork_normal_4
+monster_job = true
+
+[death@snork_normal_4]
+on_info = {=killed_by_actor} %+pri_b301_monster_death +pri_b301_monster_death_4%, %+pri_b301_monster_death_4%
+
+[mob_home@spawn_4]
+path_home = home_spawn
+home_min_radius = 2
+home_max_radius = 5
+on_info = {-pri_b301_snork_4_teleport_home +pri_b301_snork_4_teleport_first} %=teleport_npc(pri_b301_home_spawn) +pri_b301_snork_4_teleport_home%, {-pri_b301_snork_4_teleport_first}%=teleport_npc(pri_b301_home_1) +pri_b301_snork_4_teleport_first%
+on_info2 = {=actor_in_zone(pri_b301_zulus_def_restr)} mob_walker@snork_normal_4
+on_info3 = {!actor_in_zone(pri_b301_zulus_def_restr)} mob_home@attack0_snork_normal_4
+
+[mob_walker@snork_normal_4]
+path_walk = snork_normal_4_walk
+path_look = snork_normal_4_jump
+on_signal = snork_normal_4 | mob_jump@snork_normal_4
+out_restr = pri_a28_school_in_restrictor
+on_info = %-pri_b301_snork_4_teleport_home%
+on_info2 = {!npc_in_zone(pri_b301_zatichka_spawn_snork)} %=teleport_npc(pri_b301_spawn_point_1a)%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[mob_jump@snork_normal_4]
+path_jump = snork_normal_4_jump
+ph_jump_factor = 0.9
+offset = 0,0,0
+on_signal = jumped | mob_home@attack0_snork_normal_4
+out_restr = pri_a28_school_in_restrictor
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[mob_home@attack0_snork_normal_4]
+path_home = home_1
+home_min_radius = 2
+home_max_radius = 5
+on_info = {=hit_by_actor} mob_home@attack1_snork_normal_4 %+pri_b301_snork_attack_1%, {=dist_to_actor_le(30) =actor_see_npc} mob_home@attack1_snork_normal_4 %+pri_b301_snork_attack_1%
+on_info2 = {+pri_b301_snork_attack_1} mob_home@attack1_snork_normal_4
+on_info3 = %-pri_b301_snork_4_teleport_home%
+on_game_timer = 20 | {=npc_in_zone(pri_a28_school_in_restrictor)} mob_walker@snork_normal_4
+out_restr = pri_b301_monster_out_restr
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+
+[mob_home@attack1_snork_normal_4]
+path_home = home_1
+home_min_radius = 7
+home_max_radius = 10
+on_info = {+pri_b301_snork_attack_2} mob_home@attack2_snork_normal_4
+on_game_timer = 1200 | mob_home@attack3_snork_normal_4 %+pri_b301_snork_attack_3%
+on_info2 = {+pri_b301_snork_attack_2} mob_home@attack2_snork_normal_4
+on_info3 = {+pri_b301_snork_attack_3} mob_home@attack3_snork_normal_4
+on_game_timer2 = 20 | {=npc_in_zone(pri_a28_school_in_restrictor)} mob_walker@snork_normal_4
+out_restr = pri_b301_monster_out_restr
+
+[mob_home@attack2_snork_normal_4]
+path_home = home_2
+home_min_radius = 10
+home_max_radius = 12
+aggressive = true
+on_game_timer = 50 | mob_home@attack1_snork_normal_4 %-pri_b301_snork_attack_2%
+on_info = {+pri_b301_snork_attack_3} mob_home@attack3_snork_normal_4
+on_game_timer2 = 20 | {=npc_in_zone(pri_a28_school_in_restrictor)} mob_walker@snork_normal_4
+out_restr = pri_b301_monster_out_restr
+
+[mob_home@attack3_snork_normal_4]
+path_home = home_2
+aggressive = true
+home_min_radius = 10
+home_max_radius = 12
+out_restr = pri_b301_monster_out_restr
+on_info = {=npc_in_zone(pri_a28_school_in_restrictor)} mob_walker@snork_normal_4
+
+;*********************************************
+;*********************************************
+
+[logic@snork_normal_5]
+suitable = {=target_squad_name(pri_b301_snork_5) -pri_b301_zulus_dead} true
+active = mob_home@spawn_5
+on_death = death@snork_normal_5
+monster_job = true
+
+[death@snork_normal_5]
+on_info = {=killed_by_actor} %+pri_b301_monster_death +pri_b301_monster_death_5%, %+pri_b301_monster_death_5%
+
+[mob_home@spawn_5]
+path_home = home_spawn
+home_min_radius = 2
+home_max_radius = 5
+on_info = {-pri_b301_snork_5_teleport_home +pri_b301_snork_5_teleport_first} %=teleport_npc(pri_b301_home_spawn) +pri_b301_snork_5_teleport_home%, {-pri_b301_snork_5_teleport_first} %=teleport_npc(pri_b301_home_1) +pri_b301_snork_5_teleport_first%
+on_info2 = {=actor_in_zone(pri_b301_zulus_def_restr)} mob_walker@snork_normal_5
+on_info3 = {!actor_in_zone(pri_b301_zulus_def_restr)} mob_home@attack0_snork_normal_5
+
+[mob_walker@snork_normal_5]
+path_walk = snork_normal_5_walk
+path_look = snork_normal_5_jump
+on_signal = snork_normal_5 | mob_jump@snork_normal_5
+out_restr = pri_a28_school_in_restrictor
+on_info = %-pri_b301_snork_5_teleport_home%
+on_info2 = {!npc_in_zone(pri_b301_zatichka_spawn_snork)} %=teleport_npc(pri_b301_spawn_point_1a)%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[mob_jump@snork_normal_5]
+path_jump = snork_normal_5_jump
+ph_jump_factor = 0.9
+offset = 0,0,0
+on_signal = jumped | mob_home@attack0_snork_normal_5
+out_restr = pri_a28_school_in_restrictor
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[mob_home@attack0_snork_normal_5]
+path_home = home_1
+home_min_radius = 2
+home_max_radius = 5
+on_info = {=hit_by_actor} mob_home@attack1_snork_normal_5 %+pri_b301_snork_attack_1%, {=dist_to_actor_le(30) =actor_see_npc} mob_home@attack1_snork_normal_5 %+pri_b301_snork_attack_1%
+on_info2 = {+pri_b301_snork_attack_1} mob_home@attack1_snork_normal_5
+on_info3 = %-pri_b301_snork_5_teleport_home%
+on_game_timer = 20 | {=npc_in_zone(pri_a28_school_in_restrictor)} mob_walker@snork_normal_5
+out_restr = pri_b301_monster_out_restr
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+
+[mob_home@attack1_snork_normal_5]
+path_home = home_1
+home_min_radius = 7
+home_max_radius = 10
+on_info = {+pri_b301_snork_attack_2} mob_home@attack2_snork_normal_5
+on_game_timer = 1200 | mob_home@attack3_snork_normal_5 %+pri_b301_snork_attack_3%
+on_info2 = {+pri_b301_snork_attack_2} mob_home@attack2_snork_normal_5
+on_info3 = {+pri_b301_snork_attack_3} mob_home@attack3_snork_normal_5
+on_game_timer2 = 20 | {=npc_in_zone(pri_a28_school_in_restrictor)} mob_walker@snork_normal_5
+out_restr = pri_b301_monster_out_restr
+
+[mob_home@attack2_snork_normal_5]
+path_home = home_2
+home_min_radius = 10
+home_max_radius = 12
+aggressive = true
+on_game_timer = 50 | mob_home@attack1_snork_normal_5 %-pri_b301_snork_attack_2%
+on_info = {+pri_b301_snork_attack_3} mob_home@attack3_snork_normal_5
+on_game_timer2 = 20 | {=npc_in_zone(pri_a28_school_in_restrictor)} mob_walker@snork_normal_5
+out_restr = pri_b301_monster_out_restr
+
+[mob_home@attack3_snork_normal_5]
+path_home = home_2
+aggressive = true
+home_min_radius = 10
+home_max_radius = 12
+out_restr = pri_b301_monster_out_restr
+on_game_timer = 20 | {=npc_in_zone(pri_a28_school_in_restrictor)} mob_walker@snork_normal_5

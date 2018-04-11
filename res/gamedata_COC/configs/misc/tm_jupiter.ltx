@@ -1,0 +1,233 @@
+; Yar Jup A6
+[jup_b19_freedom_yar_task_1]
+icon = ui_inGame2_PD_Torgovets_informatsiey
+prior = 50
+storyline = false
+title = jup_b19_freedom_yar_task_1_name
+descr = jup_b19_freedom_yar_task_1_text
+job_descr = jup_b19_freedom_yar_task_1_about
+abandoned_reply = jup_b19_freedom_yar_task_1_finish
+target_functor = jup_b19_freedom_yar_task_target
+task_complete_descr = st_none
+precondition = {-yar_ashot_cancelled} true, false
+on_cancel = %+yar_ashot_cancelled%
+
+;--------------------------------------------------------------------------------------------------
+; ESCORT ECOLOGS TASK-
+
+[jup_b6_scientist_tech_task_1]
+icon = ui_inGame2_PD_Opitniy_stalker
+prior = 2
+storyline = false
+title = jup_b6_scientist_tech_task_1_name
+descr = jup_b6_scientist_tech_task_1_text
+job_descr = jup_b6_scientist_tech_task_1_about
+target_functor = jup_b6_scientist_tech_task_target
+task_complete_descr = jup_b6_scientist_tech_task_finish
+on_init = %=setup_companion_task(ecolog_companion_task_2:jup_b41) =setup_task_target_anomaly -ecolog_companion_task_2_started -ecolog_companion_task_2_force_started%
+precondition = {!squad_exist(ecolog_companion_task_1) !squad_exist(ecolog_companion_task_2)} true, false
+repeat_timeout = 172800
+on_complete = %=complete_task_inc_goodwill(50:ecolog:csky) =remove_special_task_squad(ecolog_companion_task_2) =reward_stash(true) =reset_task_target_anomaly =reward_random_item(af_ameba_slug:af_dummy_glassbeads:af_fireball:af_soul:af_rusty_kristall:af_dummy_battery:detector_elite:detector_advanced)%
+on_fail = %=fail_task_dec_goodwill(25:ecolog:csky) =remove_special_task_squad(ecolog_companion_task_2) =reset_task_target_anomaly%
+on_cancel = %=remove_special_task_squad(ecolog_companion_task_2) =reset_task_target_anomaly%
+condlist_0 = {!squad_exist(ecolog_companion_task_2)} fail
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND ARTEFACT FOR ECOLOGS TASK-
+
+[jup_b6_scientist_tech_task_2]
+icon = ui_inGame2_Kontrakt_s_uchenimi
+prior = 5
+storyline = false
+title = jup_b6_scientist_tech_task_2_name
+title_functor = general_fetch_task
+descr = jup_b6_scientist_tech_task_2_text
+descr_functor = general_fetch_task
+job_descr = jup_b6_scientist_tech_task_2_about
+fetch_descr = jup_b6_scientist_tech_task_2_fetch_about
+fetch_func = %=setup_artefact_fetch_task(jup_b6_scientist_tech_task_2_fetch)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = jup_b6_scientist_tech_task_2_fetch_finish
+; precondition = true
+repeat_timeout = 172800
+on_complete = %=complete_task_inc_goodwill(50:ecolog:csky) =reward_item_cost_mult_and_remove(jup_b6_scientist_tech_task_2_fetch:0.8) =inc_task_stage(jup_b6_scientist_tech_task_2)%
+on_fail = %=fail_task_dec_goodwill(25:ecolog:csky)%
+
+;--------------------------------------------------------------------------------------------------
+; ELIMINATE MUTANTS FOR TRAPPER TASK-
+
+[jup_b220_trapper_task_1]
+icon = ui_inGame2_Nochnaya_ohota
+prior = 20
+storyline = false
+title = jup_b220_trapper_task_1_name
+descr = jup_b220_trapper_task_1_text
+job_descr = jup_b220_trapper_task_1_about
+task_complete_descr = jup_b220_trapper_task_1_finish
+target_functor = general_under_faction_control
+status_functor = check_smart_under_faction_control_staged
+status_functor_params = monster
+stage_complete = 1
+on_init = %=find_smart_under_faction_control(jup_b220_trapper_task_1_id:monster)%
+precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction(1:nil:false:monster)} true, false
+repeat_timeout = 86400
+on_complete = %=inc_task_stage(jup_b220_trapper_task_1) =complete_task_inc_goodwill(50:stalker) =reward_random_money(4500:5500) =reward_stash(true) =pstor_reset(jup_b220_trapper_task_1_id) =pstor_reset(jup_b220_trapper_task_1_target_id)%
+on_fail = %=fail_task_dec_goodwill(25:stalker) =pstor_reset(jup_b220_trapper_task_1_id) =pstor_reset(jup_b220_trapper_task_1_target_id)%
+on_cancel = %=pstor_reset(jup_b220_trapper_task_1_id) =pstor_reset(jup_b220_trapper_task_1_target_id)%
+
+;--------------------------------------------------------------------------------------------------
+; ASSASSINATION FOR TRAPPER TASK-
+
+[jup_b220_trapper_task_2]
+icon = ui_inGame2_Odin_vistrel
+prior = 10
+storyline = false
+title = jup_b220_trapper_task_2_name
+descr = jup_b220_trapper_task_2_text
+job_descr = jup_b220_trapper_task_2_about
+task_complete_descr = jup_b220_trapper_task_2_finish
+precondition = true
+repeat_timeout = 172800
+status_functor = bounty_task
+target_functor = general_bounty_task
+stage_complete = 1
+on_job_descr = %=on_init_bounty_hunt(jup_b220_trapper_task_2:bandit:killer:army)%
+on_complete = %=reward_random_money(9000:11000) =reward_stash(true) =inc_task_stage(jup_b220_trapper_task_2) =complete_task_inc_goodwill(50:stalker)%
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND WEAPON FOR TRAPPER TASK-
+
+[jup_b220_trapper_task_3]
+icon = ui_inGame2_Osobiy_zakaz
+prior = 35
+storyline = false
+title = jup_b220_trapper_task_3_name
+title_functor = general_fetch_task
+descr = jup_b220_trapper_task_3_text
+descr_functor = general_fetch_task
+job_descr = jup_b220_trapper_task_3_about
+fetch_descr = jup_b220_trapper_task_3_fetch_about
+fetch_func = %=setup_weapon_fetch_task(jup_b220_trapper_task_3_fetch)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = jup_b220_trapper_task_3_fetch_finish
+; precondition = {=random_chance(60)} true, false
+repeat_timeout = 172800
+on_complete = %=complete_task_inc_goodwill(50:stalker) =reward_stash(true) =reward_item_cost_mult_and_remove(jup_b220_trapper_task_3_fetch:1.2) =inc_task_stage(jup_b220_trapper_task_3)%
+on_fail = %=fail_task_dec_goodwill(25:stalker)%
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND MUTANT PARTS FOR TRAPPER TASK-
+
+[jup_b220_trapper_task_4]
+icon = ui_inGame2_Nochnaya_ohota
+prior = 50
+storyline = false
+title = jup_b220_trapper_task_4_name
+title_functor = general_fetch_task
+descr = jup_b220_trapper_task_4_text
+descr_functor = general_fetch_task
+job_descr = jup_b220_trapper_task_4_about
+fetch_descr = jup_b220_trapper_task_4_fetch_about
+fetch_func = %=setup_rare_mutant_fetch_task(jup_b220_trapper_task_4_fetch)%
+stage_complete = 1
+; precondition = true
+repeat_timeout = 86400
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = jup_b220_trapper_task_4_fetch_finish
+on_complete = %=complete_task_inc_goodwill(50:stalker) =reward_stash(true) =reward_item_cost_mult_and_remove(jup_b220_trapper_task_4_fetch:4) =inc_task_stage(jup_b220_trapper_task_4)%
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND MUTANT PARTS FOR TRAPPER TASK2-
+
+[jup_b220_trapper_task_5]
+icon = ui_inGame2_Nochnaya_ohota
+prior = 50
+storyline = false
+title = jup_b220_trapper_task_4_name
+title_functor = general_fetch_task
+descr = jup_b220_trapper_task_4_text
+descr_functor = general_fetch_task
+job_descr = jup_b220_trapper_task_4_about
+fetch_descr = jup_b220_trapper_task_4_fetch_about
+fetch_func = %=setup_rare_mutant_fetch_task(jup_b220_trapper_task_5_fetch)%
+stage_complete = 1
+; precondition = true
+repeat_timeout = 86400
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = jup_b220_trapper_task_4_fetch_finish
+on_complete = %=complete_task_inc_goodwill(50:stalker) =reward_stash(true) =reward_item_cost_mult_and_remove(jup_b220_trapper_task_5_fetch:4) =inc_task_stage(jup_b220_trapper_task_5)%
+
+;--------------------------------------------------------------------------------------------------
+; FIND LEVEL 1 TOOLKIT FOR NITRO TASK-
+
+[jup_b217_stalker_tech_task_1]
+icon = ui_inGame2_Instrumenti
+prior = 10
+storyline = false
+title = jup_b217_stalker_tech_task_1_name
+title_functor = general_fetch_task
+descr = jup_b217_stalker_tech_task_1_text
+descr_functor = general_fetch_task
+job_descr = jup_b217_stalker_tech_task_1_about
+fetch_descr = jup_b217_stalker_tech_task_1_fetch_about
+fetch_func = %=setup_generic_fetch_task(jup_b217_stalker_tech_task_1_fetch:1:itm_repairkit_tier_1)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = jup_b217_stalker_tech_task_1_fetch_finish
+on_complete = %+jup_b217_stalker_tech_upgrade_tier_1 =complete_task_inc_goodwill(50:stalker) =reward_item_cost_mult_and_remove(jup_b217_stalker_tech_task_1_fetch:1.0) =inc_task_stage(jup_b217_stalker_tech_task_1)%
+precondition = {-jup_b217_stalker_tech_upgrade_tier_1} true, false
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND LEVEL 2 TOOLKIT FOR NITRO TASK-
+
+[jup_b217_stalker_tech_task_2]
+icon = ui_inGame2_Instrumenti
+prior = 10
+storyline = false
+title = jup_b217_stalker_tech_task_2_name
+title_functor = general_fetch_task
+descr = jup_b217_stalker_tech_task_2_text
+descr_functor = general_fetch_task
+job_descr = jup_b217_stalker_tech_task_2_about
+fetch_descr = jup_b217_stalker_tech_task_2_fetch_about
+fetch_func = %=setup_generic_fetch_task(jup_b217_stalker_tech_task_2_fetch:1:itm_repairkit_tier_2)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = jup_b217_stalker_tech_task_2_fetch_finish
+on_complete = %+jup_b217_stalker_tech_upgrade_tier_2 =complete_task_inc_goodwill(50:stalker) =reward_item_cost_mult_and_remove(jup_b217_stalker_tech_task_2_fetch:1.0) =inc_task_stage(jup_b217_stalker_tech_task_2)%
+precondition = {+jup_b217_stalker_tech_upgrade_tier_1 -jup_b217_stalker_tech_upgrade_tier_2} true, false
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND LEVEL 3 TOOLKIT FOR NITRO TASK-
+
+[jup_b217_stalker_tech_task_3]
+icon = ui_inGame2_Instrumenti
+prior = 10
+storyline = false
+title = jup_b217_stalker_tech_task_3_name
+title_functor = general_fetch_task
+descr = jup_b217_stalker_tech_task_3_text
+descr_functor = general_fetch_task
+job_descr = jup_b217_stalker_tech_task_3_about
+fetch_descr = jup_b217_stalker_tech_task_3_fetch_about
+fetch_func = %=setup_generic_fetch_task(jup_b217_stalker_tech_task_3_fetch:1:itm_repairkit_tier_3)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = jup_b217_stalker_tech_task_3_fetch_finish
+on_complete = %+jup_b217_stalker_tech_upgrade_tier_3 =complete_task_inc_goodwill(50:stalker) =reward_item_cost_mult_and_remove(jup_b217_stalker_tech_task_3_fetch:1.0) =inc_task_stage(jup_b217_stalker_tech_task_3)%
+precondition = {+jup_b217_stalker_tech_upgrade_tier_2 -jup_b217_stalker_tech_upgrade_tier_3} true, false

@@ -1,0 +1,8 @@
+[logic]
+active = nil ;sr_idle@start
+
+[sr_idle@start]
+on_info = {+zat_b106_search_soroka} sr_idle@search %=give_task(zat_b106_search_soroka)%
+
+[sr_idle@search]
+on_info = {+zat_b106_found_soroka_done} nil

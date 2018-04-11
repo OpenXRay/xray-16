@@ -1,0 +1,83 @@
+[logic@jup_b4_freedom_leader]
+suitable = {=check_npc_name(jup_b4_freedom_leader)}
+active = walker@1
+prior = 100
+on_hit = hit
+on_death = death
+
+[walker@1]
+use_camp = false
+path_walk = freedom_leader_1_walk
+path_look = freedom_leader_1_look
+combat_ignore_cond = {-jup_b4_monolith_squad_out} true
+on_timer = 3000 |walker@2
+meet = no_meet
+
+[walker@2]
+use_camp = false
+path_walk = freedom_leader_2_walk
+path_look = freedom_leader_2_look
+combat_ignore_cond = {-jup_b4_monolith_squad_out} true
+on_signal = jup_b4_freedom_lets_talk | {-jup_b4_freedom_squad_leader_lets_talk_sound} %=play_sound(jup_b4_freedom_squad_leader_lets_talk) +jup_b4_freedom_squad_leader_lets_talk_sound%
+on_signal2 = sound_end | walker@3
+on_info = {+jup_b4_monolith_squad_out -jup_b4_freedom_leader_stop_sound} %=stop_sound +jup_b4_freedom_leader_stop_sound%
+meet = no_meet
+
+[walker@3]
+use_camp = false
+path_walk = freedom_leader_2_walk
+path_look = freedom_leader_2_look
+combat_ignore_cond = {-jup_b4_monolith_squad_out} true
+on_info = {+jup_b4_freedom_monolit_soldier_2_near_fire +jup_b4_freedom_monolit_soldier_3_near_fire +jup_b4_freedom_monolit_leader_near_fire -jup_b4_freedom_squad_leader_speech_sound} %=play_sound(jup_b4_freedom_squad_leader_speech)%
+on_info2 = {+jup_b4_monolith_squad_out -jup_b4_freedom_leader_stop_sound} %=stop_sound +jup_b4_freedom_leader_stop_sound%
+on_signal = sound_end | walker@4 %+jup_b4_freedom_squad_leader_speech_sound%
+meet = no_meet
+
+[walker@4]
+use_camp = false
+path_walk = freedom_leader_2_walk
+path_look = freedom_leader_2_look
+combat_ignore_cond = {-jup_b4_monolith_squad_out} true
+on_info = {-jup_b4_soldier_1_death +jup_b4_monolith_1_ask_to_freedom_sound -jup_b4_freedom_squad_leader_reply_sound} %=play_sound(jup_b4_freedom_squad_leader_reply)%
+on_info2 = {+jup_b4_monolith_squad_out -jup_b4_freedom_leader_stop_sound} %=stop_sound +jup_b4_freedom_leader_stop_sound%
+on_info3 = {+jup_b4_soldier_1_death} walker@5
+on_signal = sound_end | walker@5 %+jup_b4_freedom_squad_leader_reply_sound%
+meet = no_meet
+
+[walker@5]
+use_camp = false
+path_walk = freedom_leader_2_walk
+path_look = freedom_leader_2_look
+combat_ignore_cond = {-jup_b4_monolith_squad_out} true
+on_timer = 1000 | {-jup_b4_freedom_squad_leader_any_questions_sound} %=play_sound(jup_b4_freedom_squad_leader_any_questions)%
+on_info = {+jup_b4_monolith_squad_out -jup_b4_freedom_leader_stop_sound} %=stop_sound +jup_b4_freedom_leader_stop_sound%
+on_signal = sound_end | walker@6 %+jup_b4_freedom_squad_leader_any_questions_sound%
+meet = no_meet
+
+[walker@6]
+use_camp = false
+path_walk = freedom_leader_2_walk
+path_look = freedom_leader_2_look
+combat_ignore_cond = {-jup_b4_monolith_squad_out} true
+on_timer = 5000 | {-jup_b4_freedom_squad_leader_welcome_to_freedom_sound} %=play_sound(jup_b4_freedom_squad_leader_welcome_to_freedom)%
+on_signal = sound_end | %+jup_b4_freedom_squad_leader_welcome_to_freedom_sound%
+on_info = {+jup_b4_monolith_squad_in_freedom} walker@7
+on_info2 = {+jup_b4_monolith_squad_out -jup_b4_freedom_leader_stop_sound} %=stop_sound +jup_b4_freedom_leader_stop_sound%
+meet = no_meet
+
+[walker@7]
+use_camp = false
+path_walk = freedom_leader_1_walk
+path_look = freedom_leader_1_look
+on_info = {+jup_b4_monolith_squad_out -jup_b4_freedom_leader_stop_sound} %=stop_sound +jup_b4_freedom_leader_stop_sound%
+combat_ignore_cond = {-jup_b4_monolith_squad_out} true
+meet = meet
+
+[meet]
+meet_dialog = jup_b4_freedom_squad_start_dialog
+
+[hit]
+on_info = {-jup_b4_monolith_squad_in_freedom =hitted_by(actor)} %+jup_b4_monolith_squad_out%
+
+[death]
+on_info = {-jup_b4_monolith_squad_in_freedom} %+jup_b4_monolith_squad_out%

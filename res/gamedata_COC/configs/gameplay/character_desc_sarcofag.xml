@@ -1,0 +1,1235 @@
+<?xml version='1.0' encoding="windows-1251"?>
+<xml>
+    <specific_character id="sar_monolith_commander" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_1</icon>
+    <map_icon x="3" y="0"></map_icon>
+    <bio>ќпытный сталкер. ƒетальна¤ информаци¤ отсутствует.</bio>
+    <class>sar_monolith_commander</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>10820</rank>
+    <reputation>300</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_1</visual>
+    <snd_config>characters_voice\human_03\monolith\</snd_config>
+    <crouch_type>0</crouch_type>
+    <supplies>
+        [spawn] \n
+        wpn_usp \n
+        ammo_11.43x23_hydro = 1 \n
+        wpn_gauss \n
+        ammo_gauss = 1 \n
+#include "gameplay\character_drugs.xml"
+#include "gameplay\character_items.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <!------------ Characters of Sarcofag 2 -------------->
+    <specific_character id="sar2_wolf" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_1</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_wolf</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>13370</rank>
+    <reputation>2334</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_1</visual>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_ak74u \n
+        ammo_5.45x39_fmj \n
+        medkit \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_fanat" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_fanat</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>1088</rank>
+    <reputation>-2359</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_2</visual>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_fmj \n
+        medkit \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_fox" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_fox</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>19932</rank>
+    <reputation>2132</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_3</visual>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_ak74u \n
+        ammo_5.45x39_fmj \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_tutorial_wounded" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_4</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_tutorial_wounded</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>25702</rank>
+    <reputation>49</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_4</visual>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_pb \n
+        ammo_9x18_fmj = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_ranger" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_1</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_ranger</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>14260</rank>
+    <reputation>-543</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_1</visual>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_pm \n
+        ammo_9x18_fmj = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_esc_soldier_commander" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="2" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_esc_soldier_commander</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>1476</rank>
+    <reputation>2337</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_2</visual>
+    <snd_config>characters_voice\human_02\military\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_fmj = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_seriy" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_seriy</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>17958</rank>
+    <reputation>294</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_3</visual>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_ak74u \n
+        ammo_5.45x39_fmj \n
+        medkit = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_dram_novice" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_4</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_dram_novice</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>24078</rank>
+    <reputation>2126</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_4</visual>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_pb \n
+        ammo_9x18_fmj = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_hellcar" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_1</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_hellcar</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>12156</rank>
+    <reputation>1380</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_1</visual>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_fmj \n
+        medkit = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_bandit_leader" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_bandit_leader</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>1186</rank>
+    <reputation>1311</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_2</visual>
+    <snd_config>characters_voice\human_02\bandit\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_mp5 \n
+        ammo_9x19_pbp = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_gar_dolg_blokpost_commander" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="4" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_gar_dolg_blokpost_commander</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>16322</rank>
+    <reputation>203</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_3</visual>
+    <snd_config>characters_voice\human_02\dolg\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_spas12 \n
+        ammo_12x76_dart \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_krot" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_4</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_krot</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>25554</rank>
+    <reputation>1027</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_4</visual>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 = 1, scope\n
+        ammo_5.45x39_ap \n
+        medkit = 2 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_ratcatcher" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_1</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_ratcatcher</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>13326</rank>
+    <reputation>-2154</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_1</visual>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_ak74u \n
+        ammo_5.45x39_fmj = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_bandit_borov" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_bandit_borov</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>1594</rank>
+    <reputation>1432</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_2</visual>
+    <snd_config>characters_voice\human_02\bandit\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_l85 = 1, 0, 1, 0 \n
+        ammo_5.56x45_ap = 2 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_stalker_explorer" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_stalker_explorer</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>15296</rank>
+    <reputation>538</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_3</visual>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_fmj \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_psih" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_4</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_psih</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>27234</rank>
+    <reputation>952</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_4</visual>
+    <snd_config>characters_voice\human_01\zombied\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_beretta \n
+        ammo_9x19_pbp \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_arena_manager" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_1</icon>
+    <map_icon x="1" y="6"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_arena_manager</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>10598</rank>
+    <reputation>-685</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_1</visual>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_spas12 \n
+        ammo_12x70_buck = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_arena_savage" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="2" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_arena_savage</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>1844</rank>
+    <reputation>-2097</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_2</visual>
+    <snd_config>characters_voice\human_01\zombied\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_spas12 \n
+        ammo_12x70_buck \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_dolg_leader" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_dolg_leader</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>15746</rank>
+    <reputation>1499</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_3</visual>
+    <snd_config>characters_voice\human_01\dolg\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_groza \n
+        ammo_9x39_ap \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_dolg_petrenko" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_4</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_dolg_petrenko</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>24458</rank>
+    <reputation>1993</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_4</visual>
+    <snd_config>characters_voice\human_03\dolg\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_groza \n
+        ammo_9x39_ap \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_dolg_ivancov" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_1</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_dolg_ivancov</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>13540</rank>
+    <reputation>2158</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_1</visual>
+    <snd_config>characters_voice\human_01\dolg\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_groza \n
+        ammo_9x39_ap \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_dolg_guard_commander" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_dolg_guard_commander</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>1062</rank>
+    <reputation>2002</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_2</visual>
+    <snd_config>characters_voice\human_01\dolg\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_groza \n
+        ammo_9x39_ap \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_zastava_commander_1" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_zastava_commander_1</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>19482</rank>
+    <reputation>-918</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_3</visual>
+    <snd_config>characters_voice\human_01\dolg\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_spas12 \n
+        ammo_12x70_buck = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_ecolog_professor" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_4</icon>
+    <map_icon x="1" y="6"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_ecolog_professor</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>25574</rank>
+    <reputation>115</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_4</visual>
+    <snd_config>characters_voice\human_01\ecolog\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_beretta \n
+        ammo_9x19_pbp = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_svoboda_attack_commander" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_1</icon>
+    <map_icon x="5" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_svoboda_attack_commander</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>11336</rank>
+    <reputation>1419</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_1</visual>
+    <snd_config>characters_voice\human_01\freedom\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_lr300 \n
+        ammo_5.56x45_ss190 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_killer_ambush_tiran" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="5" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_killer_ambush_tiran</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>1360</rank>
+    <reputation>-2189</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_2</visual>
+    <snd_config>characters_voice\human_01\killer\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_fn2000 \n
+        ammo_5.56x45_ap = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_crazy_veterans_lucky" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="5" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_crazy_veterans_lucky</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>16944</rank>
+    <reputation>176</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_3</visual>
+    <snd_config>characters_voice\human_01\bandit\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_groza \n
+        ammo_9x39_ap \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_stalker_freeman" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_4</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_stalker_freeman</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>25570</rank>
+    <reputation>-254</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_4</visual>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_desert_eagle \n
+        ammo_11.43x23_fmj \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_svoboda_engineer" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_1</icon>
+    <map_icon x="5" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_svoboda_engineer</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>13146</rank>
+    <reputation>1988</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_1</visual>
+    <snd_config>characters_voice\human_01\freedom\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_lr300 \n
+        ammo_5.56x45_ap = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_svoboda_stukach" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="2" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_svoboda_stukach</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>2814</rank>
+    <reputation>-2440</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_2</visual>
+    <snd_config>characters_voice\human_03\freedom\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_wincheaster1300 \n
+        ammo_12x76_zhekan = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_svoboda_bodyguard" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="5" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_svoboda_bodyguard</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>19844</rank>
+    <reputation>2134</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_3</visual>
+    <snd_config>characters_voice\human_01\freedom\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_wincheaster1300 \n
+        ammo_12x76_zhekan = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_svoboda_leader" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_4</icon>
+    <map_icon x="5" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_svoboda_leader</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>22440</rank>
+    <reputation>990</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_4</visual>
+    <snd_config>characters_voice\human_02\freedom\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_sig550 \n
+        ammo_5.56x45_ap = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_svoboda_trader" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_1</icon>
+    <map_icon x="5" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_svoboda_trader</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>10494</rank>
+    <reputation>1621</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_1</visual>
+    <snd_config>characters_voice\human_02\freedom\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_sig550 \n
+        ammo_5.56x45_ap = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_svoboda_master_max" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="5" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_svoboda_master_max</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>2446</rank>
+    <reputation>716</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_2</visual>
+    <snd_config>characters_voice\human_02\freedom\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_sig550 \n
+        ammo_5.56x45_ap = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_svoboda_cook" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="5" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_svoboda_cook</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>20450</rank>
+    <reputation>694</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_3</visual>
+    <snd_config>characters_voice\human_02\freedom\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_wincheaster1300 \n
+        ammo_12x76_zhekan = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_svoboda_blockpost_leader" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_4</icon>
+    <map_icon x="2" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_svoboda_blockpost_leader</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>23808</rank>
+    <reputation>988</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_4</visual>
+    <snd_config>characters_voice\human_02\freedom\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_sig550 \n
+        ammo_5.56x45_ap = 4 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_svoboda_master_ugrumiy" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_1</icon>
+    <map_icon x="5" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_svoboda_master_ugrumiy</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>14824</rank>
+    <reputation>-868</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_1</visual>
+    <snd_config>characters_voice\human_03\freedom\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_sig550 \n
+        ammo_5.56x45_ap \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_dolg_specnaz_cherep" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="4" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_dolg_specnaz_cherep</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>2336</rank>
+    <reputation>-1346</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_2</visual>
+    <snd_config>characters_voice\human_03\dolg\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_abakan \n
+        ammo_5.45x39_ap = 2 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_killer_informator" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="2" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_killer_informator</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>20444</rank>
+    <reputation>-1363</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_3</visual>
+    <snd_config>characters_voice\human_02\killer\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_abakan \n
+        ammo_5.45x39_ap = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_svoboda_zombi_stalker" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_4</icon>
+    <map_icon x="5" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_svoboda_zombi_stalker</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>26794</rank>
+    <reputation>1976</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_4</visual>
+    <snd_config>characters_voice\human_02\zombied\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_ap = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_doctor" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_1</icon>
+    <map_icon x="3" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_doctor</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>14764</rank>
+    <reputation>-1029</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_1</visual>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_ap = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_monolith_leader" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="3" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_monolith_leader</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>1422</rank>
+    <reputation>171</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_2</visual>
+    <snd_config>characters_voice\human_03\monolith\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_vintorez \n
+        ammo_9x39_ap = 3 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_bandit_novice" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_bandit_novice</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>20642</rank>
+    <reputation>-454</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_3</visual>
+    <snd_config>characters_voice\human_01\bandit\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_fort \n
+        ammo_9x18_fmj = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_bandit_general" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_4</icon>
+    <map_icon x="3" y="2"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_bandit_general</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>24776</rank>
+    <reputation>-55</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_4</visual>
+    <snd_config>characters_voice\human_02\bandit\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_mp5 \n
+        ammo_9x19_fmj = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_bandit_veteran" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_1</icon>
+    <map_icon x="3" y="2"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_bandit_veteran</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>12808</rank>
+    <reputation>-914</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_1</visual>
+    <snd_config>characters_voice\human_02\bandit\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_ap = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_soldier_regular" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="1" y="2"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_soldier_regular</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>2620</rank>
+    <reputation>2337</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_2</visual>
+    <snd_config>characters_voice\human_01\military\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_ak74u \n
+        ammo_5.45x39_fmj = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_soldier_specnaz" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="2" y="2"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_soldier_specnaz</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>20276</rank>
+    <reputation>2257</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_3</visual>
+    <snd_config>characters_voice\human_02\military\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_abakan \n
+        ammo_5.45x39_ap = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_soldier_stalker" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_4</icon>
+    <map_icon x="2" y="2"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_soldier_stalker</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>25570</rank>
+    <reputation>2299</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_4</visual>
+    <snd_config>characters_voice\human_03\military\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_g36 = 1 \n
+        ammo_5.56x45_ss190 = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_killer_regular" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_1</icon>
+    <map_icon x="2" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_killer_regular</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>12404</rank>
+    <reputation>-2178</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_1</visual>
+    <snd_config>characters_voice\human_01\killer\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_fmj \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_killer_specnaz" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="2" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_killer_specnaz</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>2768</rank>
+    <reputation>1684</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_2</visual>
+    <snd_config>characters_voice\human_01\killer\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_fmj = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_killer_exo" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="2" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_killer_exo</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>19406</rank>
+    <reputation>129</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_3</visual>
+    <snd_config>characters_voice\human_03\killer\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_g36 = 1 \n
+        ammo_5.56x45_ss190 = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_zombied_novice" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_4</icon>
+    <map_icon x="7" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_zombied_novice</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>24498</rank>
+    <reputation>1876</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_4</visual>
+    <snd_config>characters_voice\human_01\zombied\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_spas12 \n
+        ammo_12x76_zhekan = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_zombied_stalker" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_1</icon>
+    <map_icon x="7" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_zombied_stalker</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>13848</rank>
+    <reputation>1588</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_1</visual>
+    <snd_config>characters_voice\human_01\zombied\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_ap = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_zombied_exo" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="7" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_zombied_exo</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>1268</rank>
+    <reputation>1872</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_2</visual>
+    <snd_config>characters_voice\human_03\zombied\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_wincheaster1300 \n
+        ammo_12x76_zhekan = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_monolith_regular" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="3" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_monolith_regular</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>15960</rank>
+    <reputation>-1181</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_3</visual>
+    <snd_config>characters_voice\human_03\monolith\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_ap = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_monolith_regular2" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_4</icon>
+    <map_icon x="3" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_monolith_regular2</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>26144</rank>
+    <reputation>2434</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_4</visual>
+    <snd_config>characters_voice\human_03\monolith\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_ap = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_monolith_specnaz" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_1</icon>
+    <map_icon x="3" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_monolith_specnaz</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>12640</rank>
+    <reputation>-311</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_1</visual>
+    <snd_config>characters_voice\human_03\monolith\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_fn2000 \n
+        ammo_5.56x45_ap = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_monolith_specnaz2" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="3" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_monolith_specnaz2</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>1628</rank>
+    <reputation>-1248</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_2</visual>
+    <snd_config>characters_voice\human_03\monolith\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_fn2000 \n
+        ammo_5.56x45_ap = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_monolith_exo" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="3" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_monolith_exo</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>15846</rank>
+    <reputation>2390</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_3</visual>
+    <snd_config>characters_voice\human_03\monolith\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_g36 \n
+        ammo_5.56x45_ap = 1 \n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="sar2_monolith_exo2" team_default = "1">
+    <name>sar2_clone_name</name>
+    <icon>ui_inGame2_monolit_4</icon>
+    <map_icon x="3" y="0"></map_icon>
+    <bio>sar2_bio</bio>
+    <class>sar2_monolith_exo2</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>23680</rank>
+    <reputation>-1757</reputation>
+    <visual>actors\stalker_osoznanie\stalker_osoznanie_4</visual>
+    <snd_config>characters_voice\human_03\monolith\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_gauss \n
+        ammo_gauss = 1\n
+    </supplies>
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+</xml>

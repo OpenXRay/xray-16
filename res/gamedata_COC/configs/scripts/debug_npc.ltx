@@ -1,0 +1,51 @@
+[logic]
+active = beh@base
+post_combat_time = 0,0
+
+;======================
+; default logic
+;======================
+[beh@general]
+combat_ignore_keep_when_attacked = true
+combat_ignore_cond = true
+meet = meet
+help_wounded_enabled = false
+gather_items_enabled = false
+corpse_detection_enabled = false
+behavior_state = beh_wait
+target = 
+walk_dist = 80
+jog_dist = 90
+run_dist = 100
+keep_distance = near
+near_desired_dist = 3
+far_desired_dist = 1
+wait_anim = guard
+walk_anim = patrol
+jog_anim = rush
+run_anim = assault
+sprint_anim = sprint
+invulnerable = true
+
+[meet]
+abuse = false
+snd_on_use 				= nil
+close_distance          = {=is_wounded} 1, 2
+close_anim              = nil
+close_snd_hello         = nil
+close_snd_bye           = nil
+close_victim			= {=is_wounded} nil, actor
+far_distance			= 0
+far_anim				= nil
+far_snd					= nil
+far_victim				= nil
+use 					= {=is_wounded} true, {=dist_to_actor_le(4)} true, false
+allow_break				= true
+use_text				= nil
+trade_enable 			= {=is_wounded} false, true
+meet_dialog				= nil
+
+;===============================================
+;            		 active sections
+;===============================================
+[beh@base]:beh@general

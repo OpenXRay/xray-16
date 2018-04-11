@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding="windows-1251"?>
+
+<game_information_portions>
+
+	<info_portion id="info_up_ac_mp5"></info_portion>
+	<info_portion id="info_up_bd_mp5"></info_portion>
+	<info_portion id="info_up_a_novice_outfit"></info_portion>
+	
+	<info_portion id="info_up_ac_wincheaster1300"></info_portion>
+	<info_portion id="info_up_bd_wincheaster1300"></info_portion>
+	<info_portion id="info_up_ac_ak74u"></info_portion>
+	
+	<info_portion id="info_up_fh_scientific_outfit"></info_portion>
+	<info_portion id="info_up_bdfh_scientific_outfit"></info_portion>
+	<info_portion id="info_up_aceg_scientific_outfit"></info_portion>
+	
+	<info_portion id="info_up_ab_svu"></info_portion>
+	<info_portion id="info_up_cd_svu"></info_portion>
+	<info_portion id="info_up_abcd_svu"></info_portion>
+	
+	<info_portion id="info_up_ab_pkm"></info_portion>
+	<info_portion id="info_up_cd_pkm"></info_portion>
+	<info_portion id="info_up_abcd_pkm"></info_portion>
+	
+	<info_portion id="info_up_ac_desert_eagle"></info_portion>
+	<info_portion id="info_up_bd_desert_eagle"></info_portion>
+	<info_portion id="info_up_ac_spas12"></info_portion>
+
+
+
+</game_information_portions>

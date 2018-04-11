@@ -1,0 +1,11 @@
+[logic]
+active = sr_idle@line_0
+
+[sr_idle@line_0]
+;on_actor_in_zone = kat_space_restrictor_0006 | sr_idle@line_1 %=spawn_object(agru_controller_1:agru_controller_1_walk:0) =spawn_object(agru_poltergeist_1:agru_poltergeist_1_walk:0) =spawn_object(agru_poltergeist_2:agru_poltergeist_2_walk:0)  =spawn_object(agru_poltergeist_3:agru_poltergeist_3_walk:0) =spawn_object(agru_poltergeist_4:agru_poltergeist_4_walk:0) =play_sound(agru_sound_polter)%
+;on_actor_in_zone2 = kat_space_restrictor_0010 | sr_idle@line_1 %=spawn_object(agru_controller_1:agru_controller_1_walk:0) =spawn_object(agru_poltergeist_1:agru_poltergeist_1_walk:0) =spawn_object(agru_poltergeist_2:agru_poltergeist_2_walk:0)  =spawn_object(agru_poltergeist_3:agru_poltergeist_3_walk:0) =spawn_object(agru_poltergeist_4:agru_poltergeist_4_walk:0) =play_sound(agru_sound_polter)%
+;on_actor_in_zone3 = agru_poltergeist_out_restr | sr_idle@line_1
+on_game_timer = 20 | sr_idle@line_1 %=create_squad(agru_controller_1_squad:agr_u_monsters) =create_squad(agru_poltergeist_squad:agr_u_monsters)%
+
+[sr_idle@line_1]
+

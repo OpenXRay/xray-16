@@ -1,0 +1,82 @@
+[logic]
+active = nil;sr_idle@wait_for_start
+
+
+
+[sr_idle@wait_for_start]
+on_info = {+jup_b218_gather_squad_complete} sr_idle@destroy %=create_cutscene_actor_with_weapon(jup_b219_actor:jup_b219_spawn_spown:0:0:3) =run_postprocess(fade_in) =disable_ui%  ;=run_postprocess(fade_in) =disable_ui 
+
+[sr_idle@destroy]
+on_game_timer = 30 | sr_idle@surge %=teleport_actor(jup_b219_actor_dark_walk:jup_b219_actor_dark_look)  =run_postprocess(black:22219:true)% ;=run_postprocess(black:22219:true)  =forward_game_time(3)
+
+[sr_idle@surge]
+on_info = {!surge_started} sr_idle@timer, sr_idle@timer %=stop_surge%
+
+[sr_idle@timer]
+on_info = sr_idle@spawn %=remove_squad(jup_b15_zulus_squad)% 
+
+[sr_idle@spawn]
+on_info = sr_idle@spawn_soldier %=create_squad(jup_b219_squad:jup_b219) =create_squad(jup_b219_stalker_tech_squad:jup_b219) %
+
+[sr_idle@spawn_soldier]
+on_info = {+jup_b218_soldier_hired} sr_idle@spawn_stalker %=create_squad_member(jup_b219_soldier:jup_b219_squad:jup_b219_soldier_walk)%
+on_info2 = {-jup_b218_soldier_hired} sr_idle@spawn_stalker
+
+[sr_idle@spawn_stalker]
+on_info = {+jup_a10_vano_agree_go_und} sr_idle@spawn_monolith %=create_squad_member(jup_b219_vano:jup_b219_squad:jup_b219_vano_walk)%
+on_info2 = {-jup_a10_vano_agree_go_und} sr_idle@spawn_monolith
+
+[sr_idle@spawn_monolith]
+on_info = {+jup_b218_monolith_hired} sr_idle@cheak %=create_squad_member(jup_b219_monolith_squad_leader_freedom_skin:jup_b219_squad:jup_b219_monolith_walk)% 
+on_info2 = {-jup_b218_monolith_hired} sr_idle@cheak 
+
+  
+[sr_idle@cheak]
+on_info = {-jup_b218_soldier_hired -jup_a10_vano_agree_go_und -jup_b218_monolith_hired}  sr_idle@wait_squad_one             	
+on_info2 = {-jup_b218_soldier_hired +jup_a10_vano_agree_go_und -jup_b218_monolith_hired} sr_idle@wait_squad_one_vano   			
+on_info3 = {-jup_b218_soldier_hired -jup_a10_vano_agree_go_und +jup_b218_monolith_hired} sr_idle@wait_squad_one_monolith   		
+on_info4 = {+jup_b218_soldier_hired -jup_a10_vano_agree_go_und -jup_b218_monolith_hired} sr_idle@wait_squad_one_soldier   		
+on_info5 = {+jup_b218_soldier_hired +jup_a10_vano_agree_go_und +jup_b218_monolith_hired} sr_idle@wait_squad_all   				
+on_info6 = {+jup_b218_soldier_hired +jup_a10_vano_agree_go_und -jup_b218_monolith_hired} sr_idle@wait_squad_soldier_vano   		
+on_info7 = {+jup_b218_soldier_hired -jup_a10_vano_agree_go_und +jup_b218_monolith_hired} sr_idle@wait_squad_soldier_monolith   	  
+on_info8 = {-jup_b218_soldier_hired +jup_a10_vano_agree_go_und +jup_b218_monolith_hired} sr_idle@wait_squad_vano_monolith   	   
+   
+  
+[sr_idle@wait_squad_one]   
+on_info = {+jup_b219_azot_on_pos +jup_b219_zulus_on_pos +jup_b219_actor_on_pos}  sr_cutscene@start %+jup_b219_start_one +jup_b219_start_sound =stop_postprocess(22219)%
+  
+[sr_idle@wait_squad_one_vano]   
+on_info = {+jup_b219_azot_on_pos +jup_b219_zulus_on_pos +jup_b219_actor_on_pos +jup_b219_vano_on_pos}  sr_cutscene@start %+jup_b219_start_one_vano +jup_b219_start_sound =stop_postprocess(22219)%
+
+[sr_idle@wait_squad_one_monolith]   
+on_info = {+jup_b219_azot_on_pos +jup_b219_zulus_on_pos +jup_b219_actor_on_pos +jup_b219_monolith_on_pos}  sr_cutscene@start %+jup_b219_start_one_monolith +jup_b219_start_sound =stop_postprocess(22219)%
+
+[sr_idle@wait_squad_one_soldier]   
+on_info = {+jup_b219_azot_on_pos +jup_b219_zulus_on_pos +jup_b219_actor_on_pos +jup_b219_soldier_on_pos}  sr_cutscene@start %+jup_b219_start_one_soldier +jup_b219_start_sound =stop_postprocess(22219)%
+
+[sr_idle@wait_squad_all]   
+on_info = {+jup_b219_azot_on_pos +jup_b219_zulus_on_pos +jup_b219_actor_on_pos +jup_b219_soldier_on_pos +jup_b219_monolith_on_pos +jup_b219_vano_on_pos}  sr_cutscene@start %+jup_b219_start_all +jup_b219_start_sound =stop_postprocess(22219)%
+   
+[sr_idle@wait_squad_soldier_vano]   
+on_info = {+jup_b219_azot_on_pos +jup_b219_zulus_on_pos +jup_b219_actor_on_pos +jup_b219_soldier_on_pos +jup_b219_vano_on_pos}  sr_cutscene@start %+jup_b219_start_soldier_vano +jup_b219_start_sound =stop_postprocess(22219)%   
+   
+[sr_idle@wait_squad_soldier_monolith]   
+on_info = {+jup_b219_azot_on_pos +jup_b219_zulus_on_pos +jup_b219_actor_on_pos +jup_b219_soldier_on_pos +jup_b219_monolith_on_pos}  sr_cutscene@start %+jup_b219_start_soldier_monolith +jup_b219_start_sound =stop_postprocess(22219)%    
+   
+[sr_idle@wait_squad_vano_monolith]   
+on_info = {+jup_b219_azot_on_pos +jup_b219_zulus_on_pos +jup_b219_actor_on_pos +jup_b219_vano_on_pos +jup_b219_monolith_on_pos}  sr_cutscene@start %+jup_b219_start_vano_monolith +jup_b219_start_sound =stop_postprocess(22219)%    
+   
+[sr_cutscene@start]
+point = jup_b219_actor_start_walk
+look = jup_b219_actor_start_look
+cam_effector = jup_b219_descent_camera
+on_signal = cameff_end |  sr_idle@go_to_lc %+jup_b219_fade_in =run_postprocess(black:22219:true)% 
+enable_ui_on_end = false   
+on_info = {+jup_b219_entering_underpass} %=run_postprocess(fade_in)%
+   
+
+[sr_idle@go_to_lc]
+on_info =  {-jup_b219_fade_in} %+jup_b219_fade_in =run_postprocess(black:22219:true)%
+on_game_timer = 30 | sr_idle@nil %+jup_b219_destroy_actor =teleport_actor(jup_b219_actor_levelchanger_walk:jup_b219_actor_levelchanger_look) =enable_ui =remove_squad(jup_b219_squad) =remove_squad(jup_b219_stalker_tech_squad)% 
+
+[sr_idle@nil]

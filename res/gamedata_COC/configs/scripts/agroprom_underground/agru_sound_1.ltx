@@ -1,0 +1,12 @@
+[logic]
+active = sr_idle@line_0
+
+[sr_idle@line_0]
+on_actor_inside = sr_idle@line_1
+
+[sr_idle@line_1]
+on_info = %=play_sound(agru_sound)% sr_idle@line_2
+
+[sr_idle@line_2]
+
+

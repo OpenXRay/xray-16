@@ -1,0 +1,88 @@
+[logic@bar_visitors_cardan_tech]
+suitable = {=check_npc_name(bar_visitors_stalker_mechanic)} true
+prior = 100
+active = animpoint@base
+can_select_weapon = false
+level_spot = mechanic
+
+[animpoint@base]
+cover_name = bar_visitors_cardan_tech
+reach_distance = 2
+avail_animations = zat_b3_tech_idle
+use_camp = false
+meet = meet
+on_info = {+bar_visitors_tech_out =dist_to_actor_ge(20)} animpoint@sleep, {+bar_visitors_tech_drinking +bar_visitors_tech_out} animpoint@drinking %-bar_visitors_tech_drinked_out%, {+bar_visitors_tech_drinking +bar_visitors_tech_have_couple_dose} animpoint@drinking %-bar_visitors_tech_drinked_out%, {+bar_visitors_tech_drinking +bar_visitors_tech_have_one_dose} animpoint@drinking %-bar_visitors_tech_drinked_out%
+;on_info2 = {=dist_to_actor_ge(75)} %-bar_visitors_tech_greetings%, {=see_actor =dist_to_actor_le(3) -zat_b3_mech_greetings}  %=play_sound(zat_b3_tech_realy_drunk) +bar_visitors_tech_greetings%
+on_info3 = {=dist_to_actor_ge(20)} %+bar_visitors_tech_waked_up +bar_visitors_tech_drinked_out%
+on_game_timer = 100 | %+bar_visitors_tech_waked_up +bar_visitors_tech_drinked_out% 
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+on_info5 = {=npc_talking} animpoint@short_idle
+
+[animpoint@short_idle]:animpoint@base
+avail_animations = zat_b3_tech_idle_short
+on_actor_dist_ge_nvis = 10 | animpoint@base
+
+[meet]
+close_snd_hello = nil
+close_snd_bye   = nil
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+;use = {+bar_visitors_tech_waked_up +bar_visitors_tech_drinked_out} true, false
+use = true
+allow_break = false
+;meet_dialog	= {+bar_visitors_tech_see_produce_62 -zat_a23_actor_has_access_card_to_testing_workshop} zat_b3_stalker_tech_produce_62_start
+meet_on_talking = false
+
+[animpoint@drinking]
+cover_name = bar_visitors_cardan_tech
+reach_distance = 2
+avail_animations = zat_b3_tech_drink
+use_camp = false
+on_game_timer = 37 | {-bar_visitors_tech_take_dose +bar_visitors_tech_out} %=play_sound(zat_b3_tech_take_third_dose) +bar_visitors_tech_take_dose%
+on_game_timer2 = 42 | {+bar_visitors_tech_out} animpoint@sleep %-bar_visitors_tech_drinking -bar_visitors_tech_take_dose -bar_visitors_tech_waked_up%, animpoint@base %-bar_visitors_tech_drinking -bar_visitors_tech_take_dose%
+meet = no_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@sleep]
+cover_name = bar_visitors_cardan_tech
+reach_distance = 2
+avail_animations = zat_b3_tech_drunk
+use_camp = false
+on_game_timer = 220 | %+zat_a2_mech_sleep_sound%
+on_info = {-bar_visitors_tech_out} animpoint@base  %-zat_a2_mech_sleep_sound%
+on_info2 = {=dist_to_actor_ge(20)} %-bar_visitors_tech_sleeping%, {=see_actor =dist_to_actor_le(4) -bar_visitors_tech_sleeping +zat_a2_mech_sleep_sound} %=play_sound(zat_b3_tech_sleep_) +bar_visitors_tech_sleeping -bar_visitors_tech_out -bar_visitors_tech_have_couple_dose -bar_visitors_tech_have_one_dose%
+meet = meet@sleep
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet@sleep]
+close_snd_hello = nil
+close_snd_bye   = nil
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+snd_on_use = zat_b3_tech_no_sleep_
+abuse = false
+use	= false
+meet_on_talking = false

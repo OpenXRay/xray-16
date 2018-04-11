@@ -1,0 +1,9 @@
+<w>
+    <file name="ui\ui_atmosfear_options">
+	    <texture id="ui_inGame2_atmosfear_background" x="0" y="0" width="1024" height="768" />
+   </file>
+	<file name="ui\ui_atmosfear_options_16">
+	    <texture id="ui_inGame2_atmosfear_left_widepanel" x="0" y="0" width="128" height="768" />
+	    <texture id="ui_inGame2_atmosfear_right_widepanel" x="128" y="0" width="128" height="768" />
+   </file>
+</w>

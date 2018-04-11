@@ -1,0 +1,29 @@
+[logic]
+active = sr_idle@waiting_order
+
+[sr_idle@waiting_order]
+on_info = {+esc_2_12_order_in_process} sr_idle@safe_distance %=give_task(esc_2_12_nimble_items)%
+
+[sr_idle@safe_distance]
+on_info = {+esc_2_12_nimble_can_go =dist_to_actor_ge(50)} sr_idle@random, {+esc_2_12_nimble_can_go +actor_is_sleeping} sr_idle@random
+
+[sr_idle@random]
+on_info = {~20} sr_idle@12hours, {~50} sr_idle@18hours, sr_idle@24hours
+
+[sr_idle@12hours]
+on_game_timer = 43200 | sr_idle@order_ready
+;on_timer = 2000 | sr_idle@order_ready
+
+[sr_idle@18hours]
+on_game_timer = 64800 | sr_idle@order_ready
+;on_timer = 2000 | sr_idle@order_ready
+
+[sr_idle@24hours]
+on_game_timer = 86400 | sr_idle@order_ready
+;on_timer = 2000 | sr_idle@order_ready
+
+[sr_idle@order_ready]
+on_info = {-actor_is_sleeping =dist_to_actor_ge(10)} sr_idle@final %+esc_2_12_order_ready_task +esc_2_12_order_ready =play_sound(esc_nimble_order_ready)%
+
+[sr_idle@final]
+on_info =| {-esc_2_12_order_in_process} sr_idle@waiting_order %-esc_2_12_order_ready_task%

@@ -1,0 +1,52 @@
+[walker@def]
+;combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+;combat_ignore_keep_when_attacked = true
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+invulnerable = {!actor_enemy} true, false
+
+[logic@yan_semenov]
+active = walker@yan_semenov
+suitable = {=check_npc_name(yan_ecolog_semenov)} true
+
+[walker@yan_semenov]:walker@def
+path_walk = collector_2_walk
+path_look = collector_2_look
+on_info = {=surge_started} walker@hide_2
+
+[walker@hide_2]:walker@def
+path_walk = hide_2_walk
+path_look = hide_2_look
+on_info = {=surge_complete} walker@yan_semenov
+
+[logic@yan_vasiliev]
+active = walker@yan_vasiliev
+suitable = {=check_npc_name(yan_ecolog_vasilyev)} true
+
+[walker@yan_vasiliev]:walker@def
+path_walk = collector_3_walk
+path_look = collector_3_look
+on_info = {=surge_started} walker@hide_3
+
+[walker@hide_3]:walker@def
+path_walk = hide_3_walk
+path_look = hide_3_look
+on_info = {=surge_complete} walker@yan_vasiliev
+
+[logic@yan_bunker_guards]
+active = patrol@base
+suitable = {=target_squad_name(yan_bunker_guards_squad)} true
+
+[patrol@base]:walker@def
+path_walk = patrol_base
+;commander = true
+formation = line
+meet = no_meet
+def_state_moving = patrol
+on_info = {=surge_started} walker@hide_4
+
+[walker@hide_4]:walker@def
+path_walk = hide_4_walk
+on_info = {=surge_complete} patrol@base
+

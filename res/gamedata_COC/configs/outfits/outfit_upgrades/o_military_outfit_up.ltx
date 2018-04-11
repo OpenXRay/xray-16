@@ -1,0 +1,492 @@
+[up_sect_firsta_military_outfit]
+cost 		= 1500
+value		= -5
+
+inv_weight  					= -5
+power_loss						= -0.03
+
+[up_sect_firstc_military_outfit]
+cost 		= 2500
+value		= +25
+
+immunities_sect_add				= sect_military_outfit_immunities_add
+
+[up_sect_firstd_military_outfit]
+cost 		= 2500
+value		= +20
+
+fire_wound_protection  			= 0.06
+bones_koeff_protection_add  	= actor_armor_add_2
+
+[up_sect_firste_military_outfit]
+cost 		= 4500
+value		= -30
+
+hit_fraction_actor				= -0.07
+strike_protection 				= 0.06
+explosion_protection 			= 0.06
+wound_protection				= 0.05
+
+[up_sect_firstf_military_outfit]
+cost 		= 4500
+inv_weight	= +0.25
+value		= +30
+
+fire_wound_protection  			= 0.1
+bones_koeff_protection_add  	= actor_armor_add_4
+
+[up_sect_secona_military_outfit]
+cost 		= 1000
+value		= -10
+
+hit_fraction_actor				= -0.05
+strike_protection 				= 0.04
+explosion_protection 			= 0.04
+wound_protection				= 0.03
+
+[up_sect_seconc_military_outfit]
+cost 		= 2000
+value		= +20
+
+shock_protection           	 	= 0.1
+
+[up_sect_second_military_outfit]
+cost 		= 2000
+value		= +20
+
+burn_protection 				= 0.01
+
+[up_sect_secone_military_outfit]
+cost 		= 3000
+value		= +30
+
+burn_protection 				= 0.0075
+chemical_burn_protection 		= 0.0075
+
+[up_sect_seconf_military_outfit]
+cost 		= 3000
+value		= +30
+
+radiation_protection 			= 0.003
+shock_protection            	= 0.12
+
+[up_sect_thirda_military_outfit]
+cost 		= 1500
+value		= +2
+
+bleeding_restore_speed			= 0.002
+
+[up_sect_thirdc_military_outfit]
+cost 		= 2000
+value		= +20
+
+chemical_burn_protection 		= 0.01
+
+[up_sect_thirdd_military_outfit]
+cost 		= 2000
+value		= +10
+
+additional_inventory_weight		= 10
+additional_inventory_weight2	= 10
+power_loss						= -0.05
+
+[up_sect_thirde_military_outfit]
+cost 		= 4000
+value       = +2
+
+artefact_count				= 2
+
+[up_sect_fourta_military_outfit]
+cost 		= 1500
+value		= +1
+
+power_restore_speed				= 0.001
+
+[up_sect_fourtc_military_outfit]
+cost 		= 2500
+value		= +4
+
+bleeding_restore_speed			= 0.004
+
+[up_sect_fourte_military_outfit]
+cost 		= 4000
+value		= +4
+
+health_restore_speed			= 0.0006
+
+[up_firsta_military_outfit]
+scheme_index            = 0, 0
+known                   = 1
+effects                 = up_gr_firstcd_military_outfit
+section                 = up_sect_firsta_military_outfit
+property                = prop_weightoutfit
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_arm_a5_name
+description             = st_up_arm_a5_descr
+icon                    = ui_inGame2_upgrade_military_outfit_1
+
+[up_firstc_military_outfit]
+scheme_index            = 1, 0
+known                   = 1
+effects                 = up_gr_firstef_military_outfit
+section                 = up_sect_firstc_military_outfit
+property                = prop_durability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_arm_a1_name
+description             = st_up_arm_a1_descr
+icon                    = ui_inGame2_upgrade_military_outfit_2
+
+[up_firstd_military_outfit]
+scheme_index            = 1, 1
+known                   = 1
+effects                 = up_gr_firstef_military_outfit
+section                 = up_sect_firstd_military_outfit
+property                = prop_armor
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_arm_b5_name
+description             = st_up_arm_b5_descr
+icon                    = ui_inGame2_upgrade_military_outfit_4
+
+[up_firste_military_outfit]
+scheme_index            = 2, 0
+known                   = 1
+effects                 = 
+section                 = up_sect_firste_military_outfit
+property                = prop_damage, prop_wound, prop_strike, prop_explo
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_arm_c8_name
+description             = st_up_arm_c8_descr
+icon                    = ui_inGame2_upgrade_military_outfit_3
+
+[up_firstf_military_outfit]
+scheme_index            = 2, 1
+known                   = 1
+effects                 = 
+section                 = up_sect_firstf_military_outfit
+property                = prop_armor, prop_weightoutfit
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_arm_c9_name
+description             = st_up_arm_c9_descr
+icon                    = ui_inGame2_upgrade_military_outfit_5
+
+[up_secona_military_outfit]
+scheme_index            = 0, 1
+known                   = 1
+effects                 = up_gr_seconcd_military_outfit
+section                 = up_sect_secona_military_outfit
+property                = prop_damage, prop_wound, prop_strike, prop_explo
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_kom_a2_name
+description             = st_up_kom_a2_descr
+icon                    = ui_inGame2_upgrade_military_outfit_6
+
+[up_seconc_military_outfit]
+scheme_index            = 1, 2
+known                   = 1
+effects                 = up_gr_seconef_military_outfit
+section                 = up_sect_seconc_military_outfit
+property                = prop_electro
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_kom_b8_name
+description             = st_up_kom_b8_descr
+icon                    = ui_inGame2_upgrade_military_outfit_7
+
+[up_second_military_outfit]
+scheme_index            = 1, 3
+known                   = 1
+effects                 = up_gr_seconef_military_outfit
+section                 = up_sect_second_military_outfit
+property                = prop_thermo
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_kom_b9_name
+description             = st_up_kom_b9_descr
+icon                    = ui_inGame2_upgrade_military_outfit_9
+
+[up_secone_military_outfit]
+scheme_index            = 2, 2
+known                   = 1
+effects                 = 
+section                 = up_sect_secone_military_outfit
+property                = prop_thermo, prop_chem
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_kom_c7_name
+description             = st_up_kom_c7_descr
+icon                    = ui_inGame2_upgrade_military_outfit_8
+
+[up_seconf_military_outfit]
+scheme_index            = 2, 3
+known                   = 1
+effects                 = 
+section                 = up_sect_seconf_military_outfit
+property                = prop_electro, prop_radio
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_kom_c8_name
+description             = st_up_kom_c8_descr
+icon                    = ui_inGame2_upgrade_military_outfit_10
+
+[up_thirda_military_outfit]
+scheme_index            = 0, 2
+known                   = 1
+effects                 = up_gr_thirdcd_military_outfit
+section                 = up_sect_thirda_military_outfit
+property                = prop_restore_bleeding
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_uti_a2_name
+description             = st_up_uti_a2_descr
+icon                    = ui_inGame2_upgrade_military_outfit_11
+
+[up_thirdc_military_outfit]
+scheme_index            = 1, 4
+known                   = 1
+effects                 = up_gr_thirdef_military_outfit
+section                 = up_sect_thirdc_military_outfit
+property                = prop_chem
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_uti_b8_name
+description             = st_up_uti_b8_descr
+icon                    = ui_inGame2_upgrade_military_outfit_12
+
+[up_thirdd_military_outfit]
+scheme_index            = 1, 5
+known                   = 1
+effects                 = up_gr_thirdef_military_outfit
+section                 = up_sect_thirdd_military_outfit
+property                = prop_tonnage
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_uti_b3_name
+description             = st_up_uti_b3_descr
+icon                    = ui_inGame2_upgrade_military_outfit_14
+
+
+[up_thirde_military_outfit]
+scheme_index            = 2, 4
+known                   = 1
+effects                 = 
+section                 = up_sect_thirde_military_outfit
+property                = prop_artefact
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_uti_c1_name
+description             = st_up_uti_c1_descr
+icon                    = ui_inGame2_upgrade_military_outfit_13
+
+[up_fourta_military_outfit]
+scheme_index            = 0, 3
+known                   = 1
+effects                 = up_gr_fourtcd_military_outfit
+section                 = up_sect_fourta_military_outfit
+property                = prop_power
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_tch_a1_name
+description             = st_up_tch_a1_descr
+icon                    = ui_inGame2_upgrade_military_outfit_15
+
+[up_fourtc_military_outfit]
+scheme_index            = 1, 6
+known                   = 1
+effects                 = up_gr_fourtef_military_outfit
+section                 = up_sect_fourtc_military_outfit
+property                = prop_restore_bleeding
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_tch_b1_name
+description             = st_up_tch_b1_descr
+icon                    = ui_inGame2_upgrade_military_outfit_16
+
+[up_fourte_military_outfit]
+scheme_index            = 2, 5
+known                   = 1
+effects                 = 
+section                 = up_sect_fourte_military_outfit
+property                = prop_restore_health
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_tch_c1_name
+description             = st_up_tch_c1_descr
+icon                    = ui_inGame2_upgrade_military_outfit_17
+
+[up_gr_firstab_military_outfit]
+elements                = up_firsta_military_outfit
+
+[up_gr_firstcd_military_outfit]
+elements                = up_firstc_military_outfit, up_firstd_military_outfit
+
+[up_gr_firstef_military_outfit]
+elements                = up_firste_military_outfit, up_firstf_military_outfit
+
+[up_gr_seconab_military_outfit]
+elements                = up_secona_military_outfit
+
+[up_gr_seconcd_military_outfit]
+elements                = up_seconc_military_outfit, up_second_military_outfit
+
+[up_gr_seconef_military_outfit]
+elements                = up_secone_military_outfit, up_seconf_military_outfit
+
+[up_gr_thirdab_military_outfit]
+elements                = up_thirda_military_outfit
+
+[up_gr_thirdcd_military_outfit]
+elements                = up_thirdc_military_outfit, up_thirdd_military_outfit
+
+[up_gr_thirdef_military_outfit]
+elements                = up_thirde_military_outfit
+
+[up_gr_fourtab_military_outfit]
+elements                = up_fourta_military_outfit
+
+[up_gr_fourtcd_military_outfit]
+elements                = up_fourtc_military_outfit
+
+[up_gr_fourtef_military_outfit]
+elements                = up_fourte_military_outfit

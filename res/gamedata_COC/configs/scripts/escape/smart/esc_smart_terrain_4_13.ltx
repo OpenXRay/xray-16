@@ -1,0 +1,24 @@
+[smart_terrain];esc_smart_terrain_4_13
+squad_id = 8
+max_population = 3
+respawn_params = respawn@esc_smart_terrain_4_13
+respawn_idle = 86400
+
+[respawn@esc_smart_terrain_4_13]
+spawn_heli_strong
+spawn_heli_weak
+
+[spawn_heli_strong]
+spawn_helicopter = simulation_helicopter_strong
+spawn_num = {-achieved_down_to_earth !heli_exist_on_level} 1, 0
+
+[spawn_heli_weak]
+spawn_helicopter = simulation_helicopter_weak
+spawn_num = {+achieved_down_to_earth !heli_exist_on_level} 1, 0
+
+;[respawn@esc_smart_terrain_4_13]
+;spawn_boar
+
+;[spawn_boar]
+;spawn_squads =  simulation_flesh, simulation_mix_boar_flesh, simulation_boar
+;spawn_num = 3

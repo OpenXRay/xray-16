@@ -1,0 +1,170 @@
+----------------------------------------------------------------------------------------------------
+-- Mob trade
+----------------------------------------------------------------------------------------------------
+-- Разработчик: Andrey Fidrya (Zmey) af@svitonline.com
+----------------------------------------------------------------------------------------------------
+--'Идея команды SP
+
+function on_game_start()
+	RegisterScriptCallback("TrdWndOpened",OnTrdWndOpened)
+	RegisterScriptCallback("TrdWndClosed",OnTrdWndClosed)
+end
+
+--]] ------------------------------------------------------------------------------------------------
+--/											Callback`s
+--]] ------------------------------------------------------------------------------------------------
+function GetTalkingNpc()
+	--log("~GetTalkingNpc:->:tData.oNpc:clsid() == clsid.script_trader")
+	for k,v in pairs(db.storage) do
+		local oNpc = v.object
+		if oNpc ~= nil then
+			if oNpc:is_talking() and oNpc:id() ~= db.actor:id() then
+				return oNpc
+			end
+		end
+	end
+end
+
+function OnTrdWndOpened()
+	--log("1~OnTrdWndOpened:->:npc:clsid() == clsid.script_trader")
+	local npc = GetTalkingNpc()
+	--printf("OnTrdWndOpened npc=%s", npc:name())
+	if npc then
+		if npc:clsid() == clsid.script_trader then
+			--log("2~OnTrdWndOpened:->:npc:clsid() == clsid.script_trader")
+			db.storage[npc:id()]["mob_trade"].all_money = 0
+			db.storage[npc:id()]["mob_trade"].trading = true
+			db.storage[npc:id()]["mob_trade"].exchanged = false
+			
+			if xr_logic.try_switch_to_another_section(npc, db.storage[npc:id()]["mob_trade"], db.actor) then
+				return
+			end
+		end
+	end	
+end
+
+function OnTrdWndClosed()
+	--log("1~OnTrdWndClosed:->:npc:clsid() == clsid.script_trader")
+	local npc = GetTalkingNpc()
+	--printf("OnTrdWndClosed npc=%s", npc:name())
+	if npc then
+		if npc:clsid() == clsid.script_trader then
+			--log("2~OnTrdWndClosed:->:npc:clsid() == clsid.script_trader")
+			db.storage[npc:id()]["mob_trade"].trading = false
+		
+			if xr_logic.try_switch_to_another_section(npc, db.storage[npc:id()]["mob_trade"], db.actor) then
+				return
+			end
+		end
+	end	
+end
+
+class "mob_trade"
+
+function mob_trade:__init(obj, storage)
+	self.object = obj
+	self.st = storage
+end
+
+function mob_trade:reset_scheme()
+
+end
+
+function mob_trade:update(delta)
+end
+--[[
+function mob_trade:storage_trade_section()
+	local trade = db.storage[self.object:id()].trade
+	if not trade then
+		trade = {}
+		db.storage[self.object:id()].trade = trade
+	end
+	return trade
+end
+
+function mob_trade:start_trade(zone, obj)
+	--printf("_bp: mob_trade: start_trade")
+
+--	local trade = self:storage_trade_section()
+	self.st.trading = true
+	self.st.exchanged = false
+
+	if db.actor then
+		if self.st.info then
+			xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.info)
+		end
+
+		if self.st.info2 then
+			xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.info2)
+		end
+		if self.st.info3 then
+			xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.info3)
+		end
+	end
+end
+
+function mob_trade:end_trade()
+	--printf("_bp: mob_trade: end_trade")
+
+--	local trade = self:storage_trade_section()
+	self.st.trading = false
+
+	if db.actor then
+		if self.st.info then
+			xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.info)
+		end
+
+		if self.st.info2 then
+			xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.info2)
+		end
+		if self.st.info3 then
+			xr_logic.pick_section_from_condlist(db.actor, self.object, self.st.info3)
+		end
+	end
+end
+--]]
+function mob_trade:on_trade(buy_coast, sell_coast)
+	--printf("_bp: mob_trade: on_trade buy_coast=%s sell_coast=%s",buy_coast, sell_coast)
+
+--	local trade = self:storage_trade_section()
+	self.st.buy_coast  = buy_coast
+	--printf("1 st_buy_coast=%s", self.st.buy_coast)
+	self.st.sell_coast = sell_coast
+	--printf("2 st_sell_coast=%s", self.st.sell_coast)
+	self.st.all_money  = self.st.all_money + buy_coast + sell_coast
+	--printf("3 st_all_monet=%s", self.st.all_money)
+	self.st.exchanged = true
+	--printf("4 st_exchanged=%s", self.st.exchanged)
+
+	--print_table(self.st)
+	if xr_logic.try_switch_to_another_section(self.object, self.st, db.actor) then
+		--printf("5")
+		return
+	end
+	--printf("6")
+end
+
+---------------------------------------------------------------------------------------------------------------------
+function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
+	local trade_section = ini:r_string_ex(section,"on_trade")
+	if not (trade_section) then 
+		return
+	end
+
+	local st = xr_logic.assign_storage_and_bind(npc,ini,"mob_trade",trade_section,temp)
+	st.logic = xr_logic.cfg_get_switch_conditions(ini,trade_section,npc)
+	
+--	npc:set_callback(callback.trade_start, st.action.start_trade, st.action)
+--	npc:set_callback(callback.trade_stop, st.action.end_trade, st.action)
+	npc:set_callback(callback.trade_perform_operation, st.action.on_trade, st.action)
+end
+
+function add_to_binder(npc,ini,scheme,section,st,temp)
+	st.action = mob_trade(npc,st)
+end
+
+function disable_generic_scheme(npc,scheme,stype)
+--	npc:set_callback(callback.trade_start, nil)
+--	npc:set_callback(callback.trade_stop, nil)
+	npc:set_callback(callback.trade_perform_operation, nil)
+end

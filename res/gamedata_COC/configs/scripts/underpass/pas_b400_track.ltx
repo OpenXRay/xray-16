@@ -1,0 +1,242 @@
+#include "pas_b400_general.ltx"
+
+[logic@pas_b400_zulus_track]
+active = walker@zulus_track_1 
+suitable = {=check_npc_name(pas_b400_zulus) -pas_b400_track_done} true
+prior = 200
+on_hit = hit@zulus
+on_death = death@zulus
+post_combat_time = 0,0
+
+[walker@zulus_track_1]:walker@zulus_def
+path_walk = zulus_1_walk
+path_look = zulus_1_look
+out_restr = pas_b400_sr_track_1
+on_info = {=actor_in_zone(pas_b400_sr_track_2)} walker@zulus_track_2
+on_info2 = {+pas_b400_sr_elevator_5_passed -pas_b400_zulus_about_outfits_1} %+pas_b400_zulus_about_outfits_1 =play_sound(pas_b400_zulus_about_outfits_1)%
+
+[walker@zulus_track_2]:walker@zulus_def
+path_walk = zulus_2_walk
+path_look = zulus_2_look
+out_restr = pas_b400_sr_track_2
+on_info = {=actor_in_zone(pas_b400_sr_track_3) !is_alive(pas_b400_vano)} walker@zulus_track_3
+on_info2 = {=actor_in_zone(pas_b400_sr_track_3_actor) !is_alive(pas_b400_vano)} walker@zulus_track_3
+on_info3 = {+pas_b400_track_anomaly_done} walker@zulus_track_3
+
+[walker@zulus_track_3]:walker@zulus_def
+path_walk = zulus_3_walk
+path_look = zulus_3_look
+out_restr = pas_b400_sr_track_3_1
+on_info = {=actor_in_zone(pas_b400_sr_track_3) =squad_in_zone_all(pas_b400_stalkers_squad:pas_b400_sr_track_3)} walker@zulus_track_4
+on_info2 = {=actor_in_zone(pas_b400_sr_track_4) =squad_in_zone_all(pas_b400_stalkers_squad:pas_b400_sr_track_3)} walker@zulus_track_4
+
+[walker@zulus_track_4]:walker@zulus_def
+path_walk = zulus_4_walk
+path_look = zulus_4_look
+out_restr = pas_b400_sr_track_3
+on_info = {=actor_in_zone(pas_b400_sr_track_4)} walker@zulus_track_5
+
+[walker@zulus_track_5]:walker@zulus_def
+path_walk = zulus_5_walk
+path_look = zulus_5_look
+out_restr = pas_b400_sr_track_4
+def_state_standing = guard_na
+on_signal = path_end | remark@zulus_track_5
+combat_ignore_cond = {-pas_b400_track_door_opened =check_enemy_smart(pas_b400_downstairs)} true, false
+
+[remark@zulus_track_5]:walker@vano_def
+target = path | pas_b400_track_zulus_5_look, 0
+anim = guard_na
+out_restr = pas_b400_sr_track_4
+on_info = %=play_sound(pas_b400_zulus_about_obstacle_1)%
+on_signal = sound_end | walker@zulus_track_5_1
+combat_ignore_cond = {-pas_b400_track_door_opened =check_enemy_smart(pas_b400_downstairs)} true, false
+
+[walker@zulus_track_5_1]:walker@zulus_def
+path_walk = zulus_5_1_walk
+path_look = zulus_5_1_look
+out_restr = pas_b400_sr_track_4
+on_signal = path_end | {-pas_b400_zulus_about_obstacle_2} %=play_sound(pas_b400_zulus_about_obstacle_2) +pas_b400_zulus_about_obstacle_2%
+combat_ignore_cond = {-pas_b400_track_door_opened =check_enemy_smart(pas_b400_downstairs)} true, false
+
+
+
+[logic@pas_b400_vano_track]
+active = walker@vano_track_1 
+suitable = {=check_npc_name(pas_b400_vano) -pas_b400_track_done} true
+prior = 200
+on_hit = hit@vano
+on_death = death@vano
+post_combat_time = 0,0
+
+[walker@vano_track_1]:walker@vano_def
+path_walk = vano_1_walk
+path_look = vano_1_look
+out_restr = pas_b400_sr_track_1
+on_info = {=actor_in_zone(pas_b400_sr_track_2)} walker@vano_track_2
+
+[walker@vano_track_2]:walker@vano_def
+path_walk = vano_2_walk
+path_look = vano_2_look
+out_restr = pas_b400_sr_track_2
+on_signal = path_end | walker@vano_track_3_1 %=play_sound(pas_b400_vano_about_anomaly_first_1)%
+
+[walker@vano_track_3_1]:walker@vano_def
+path_walk = vano_3_1_walk
+path_look = vano_3_1_look
+out_restr = pas_b400_sr_track_3_1
+on_signal = path_end | remark@vano_track_3_1
+
+[remark@vano_track_3_1]:walker@vano_def
+target = path | pas_b400_track_vano_3_1_look, 0
+anim = pas_b400_vano_probe
+out_restr = pas_b400_sr_track_3_1
+on_signal = anim_end | walker@vano_track_3_2
+on_info = %=play_sound(pas_b400_vano_about_anomaly_first_2)%
+
+[walker@vano_track_3_2]:walker@vano_def
+path_walk = vano_3_2_walk
+path_look = vano_3_2_look
+out_restr = pas_b400_sr_track_3_1
+on_signal = path_end | remark@vano_track_3_2
+
+[remark@vano_track_3_2]:walker@vano_def
+target = path | pas_b400_track_vano_3_2_look, 0
+anim = pas_b400_vano_probe
+out_restr = pas_b400_sr_track_3_1
+on_game_timer = 25 | %=play_sound(pas_b400_vano_about_anomaly_first_3)% 
+on_signal = anim_end | walker@vano_track_3_3 %+pas_b400_track_anomaly_done%
+
+[walker@vano_track_3_3]:walker@vano_def
+path_walk = vano_3_3_walk
+out_restr = pas_b400_sr_track_3_1
+on_signal = path_end | walker@vano_track_3
+
+[walker@vano_track_3]:walker@vano_def
+path_walk = vano_3_walk
+path_look = vano_3_look
+out_restr = pas_b400_sr_track_3_1
+on_info = {=actor_in_zone(pas_b400_sr_track_3) =squad_in_zone_all(pas_b400_stalkers_squad:pas_b400_sr_track_3)} walker@vano_track_4
+on_info2 = {=actor_in_zone(pas_b400_sr_track_4) =squad_in_zone_all(pas_b400_stalkers_squad:pas_b400_sr_track_3)} walker@vano_track_4
+
+[walker@vano_track_4]:walker@vano_def
+path_walk = vano_4_walk
+path_look = vano_4_look
+out_restr = pas_b400_sr_track_3
+on_info = {=actor_in_zone(pas_b400_sr_track_4)} walker@vano_track_5
+
+[walker@vano_track_5]:walker@vano_def
+path_walk = vano_5_walk
+path_look = vano_5_look
+out_restr = pas_b400_sr_track_4
+combat_ignore_cond = {-pas_b400_track_door_opened =check_enemy_smart(pas_b400_downstairs)} true, false
+on_info = {+pas_b400_zulus_about_obstacle_2} walker@vano_track_5_1
+on_info2 = {+pas_b400_sr_track_4 !is_alive(pas_b400_zulus)} walker@vano_track_5_1
+
+[walker@vano_track_5_1]:walker@vano_def
+path_walk = vano_5_1_walk
+path_look = vano_5_1_look
+out_restr = pas_b400_sr_track_4
+combat_ignore_cond = {-pas_b400_track_door_opened =check_enemy_smart(pas_b400_downstairs)} true, false
+
+
+
+[logic@pas_b400_sokolov_track]
+active = walker@sokolov_track_1 
+suitable = {=check_npc_name(pas_b400_sokolov) -pas_b400_track_done} true
+prior = 200
+on_hit = hit@sokolov
+on_death = death@sokolov
+post_combat_time = 0,0
+
+[walker@sokolov_track_1]:walker@sokolov_def
+path_walk = sokolov_1_walk
+path_look = sokolov_1_look
+out_restr = pas_b400_sr_track_1
+on_info = {=actor_in_zone(pas_b400_sr_track_2)} walker@sokolov_track_2
+
+[walker@sokolov_track_2]:walker@sokolov_def
+path_walk = sokolov_2_walk
+path_look = sokolov_2_look
+out_restr = pas_b400_sr_track_2
+on_info = {=actor_in_zone(pas_b400_sr_track_3) !is_alive(pas_b400_vano)} walker@sokolov_track_3
+on_info2 = {=actor_in_zone(pas_b400_sr_track_3_actor) !is_alive(pas_b400_vano)} walker@sokolov_track_3
+on_info3 = {+pas_b400_track_anomaly_done} walker@sokolov_track_3
+
+[walker@sokolov_track_3]:walker@sokolov_def
+path_walk = sokolov_3_walk
+path_look = sokolov_3_look
+out_restr = pas_b400_sr_track_3_1
+on_info = {=actor_in_zone(pas_b400_sr_track_3) =squad_in_zone_all(pas_b400_stalkers_squad:pas_b400_sr_track_3)} walker@sokolov_track_4
+on_info2 = {=actor_in_zone(pas_b400_sr_track_4) =squad_in_zone_all(pas_b400_stalkers_squad:pas_b400_sr_track_3)} walker@sokolov_track_4
+
+[walker@sokolov_track_4]:walker@sokolov_def
+path_walk = sokolov_4_walk
+path_look = sokolov_4_look
+out_restr = pas_b400_sr_track_3
+on_info = {=actor_in_zone(pas_b400_sr_track_4)} walker@sokolov_track_5
+
+[walker@sokolov_track_5]:walker@sokolov_def
+path_walk = sokolov_5_walk
+path_look = sokolov_5_look
+out_restr = pas_b400_sr_track_4
+combat_ignore_cond = {-pas_b400_track_door_opened =check_enemy_smart(pas_b400_downstairs)} true, false
+on_info = {+pas_b400_zulus_about_obstacle_2} walker@sokolov_track_5_1
+on_info2 = {+pas_b400_sr_track_4 !is_alive(pas_b400_zulus)} walker@sokolov_track_5_1
+
+[walker@sokolov_track_5_1]:walker@sokolov_def
+path_walk = sokolov_5_1_walk
+path_look = sokolov_5_1_look
+out_restr = pas_b400_sr_track_4
+combat_ignore_cond = {-pas_b400_track_door_opened =check_enemy_smart(pas_b400_downstairs)} true, false
+
+
+
+[logic@pas_b400_wanderer_track]
+active = walker@wanderer_track_1 
+suitable = {=check_npc_name(pas_b400_wanderer) -pas_b400_track_done} true
+prior = 200
+on_hit = hit@wanderer
+on_death = death@wanderer
+post_combat_time = 0,0
+
+[walker@wanderer_track_1]:walker@wanderer_def
+path_walk = wanderer_1_walk
+path_look = wanderer_1_look
+out_restr = pas_b400_sr_track_1
+on_info = {=actor_in_zone(pas_b400_sr_track_2)} walker@wanderer_track_2
+
+[walker@wanderer_track_2]:walker@wanderer_def
+path_walk = wanderer_2_walk
+path_look = wanderer_2_look
+out_restr = pas_b400_sr_track_2
+on_info = {=actor_in_zone(pas_b400_sr_track_3) !is_alive(pas_b400_vano)} walker@wanderer_track_3
+on_info2 = {=actor_in_zone(pas_b400_sr_track_3_actor) !is_alive(pas_b400_vano)} walker@wanderer_track_3
+on_info3 = {+pas_b400_track_anomaly_done} walker@wanderer_track_3
+
+[walker@wanderer_track_3]:walker@wanderer_def
+path_walk = wanderer_3_walk
+path_look = wanderer_3_look
+out_restr = pas_b400_sr_track_3_1
+on_info = {=actor_in_zone(pas_b400_sr_track_3) =squad_in_zone_all(pas_b400_stalkers_squad:pas_b400_sr_track_3)} walker@wanderer_track_4
+on_info2 = {=actor_in_zone(pas_b400_sr_track_4) =squad_in_zone_all(pas_b400_stalkers_squad:pas_b400_sr_track_3)} walker@wanderer_track_4
+
+[walker@wanderer_track_4]:walker@wanderer_def
+path_walk = wanderer_4_walk
+path_look = wanderer_4_look
+out_restr = pas_b400_sr_track_3
+on_info = {=actor_in_zone(pas_b400_sr_track_4)} walker@wanderer_track_5
+
+[walker@wanderer_track_5]:walker@wanderer_def
+path_walk = wanderer_5_walk
+path_look = wanderer_5_look
+out_restr = pas_b400_sr_track_4
+combat_ignore_cond = {-pas_b400_track_door_opened =check_enemy_smart(pas_b400_downstairs)} true, false
+on_info = {+pas_b400_zulus_about_obstacle_2} walker@wanderer_track_5_1
+on_info2 = {+pas_b400_sr_track_4 !is_alive(pas_b400_zulus)} walker@wanderer_track_5_1
+
+[walker@wanderer_track_5_1]:walker@wanderer_def
+path_walk = wanderer_5_1_walk
+path_look = wanderer_5_1_look
+out_restr = pas_b400_sr_track_4
+combat_ignore_cond = {-pas_b400_track_door_opened =check_enemy_smart(pas_b400_downstairs)} true, false

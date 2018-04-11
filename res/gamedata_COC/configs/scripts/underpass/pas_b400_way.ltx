@@ -1,0 +1,113 @@
+#include "pas_b400_general.ltx"
+
+[logic@pas_b400_zulus_way]
+active = walker@zulus_way_1 
+suitable = {=check_npc_name(pas_b400_zulus) -pas_b400_way_done} true
+prior = 200
+on_hit = hit@zulus
+on_death = death@zulus
+post_combat_time = 0,0
+
+[walker@zulus_way_1]:walker@zulus_def
+path_walk = zulus_1_walk
+path_look = zulus_1_look
+out_restr = pas_b400_sr_way_1
+on_info = {=actor_in_zone(pas_b400_sr_way_2)} walker@zulus_way_2
+on_info2 = {+pas_b400_way_anomaly_done} walker@zulus_way_2
+
+[walker@zulus_way_2]:walker@zulus_def
+path_walk = zulus_2_walk
+path_look = zulus_2_look
+out_restr = pas_b400_sr_way_1, pas_b400_sr_way_2
+combat_ignore_cond = {-pas_b400_way_door_opened} true, false
+
+
+
+[logic@pas_b400_vano_way]
+active = walker@vano_way_1 
+suitable = {=check_npc_name(pas_b400_vano) -pas_b400_way_done} true
+prior = 200
+on_hit = hit@vano
+on_death = death@vano
+post_combat_time = 0,0
+
+[walker@vano_way_1]:walker@vano_def
+path_walk = vano_1_walk
+path_look = vano_1_look
+out_restr = pas_b400_sr_way_1
+on_signal = path_end | remark@vano_way_1_1
+on_info = {+pas_b400_way_anomaly_done} walker@vano_way_2
+on_info2 = {=actor_in_zone(pas_b400_sr_way_2)} walker@vano_way_2 %+pas_b400_way_anomaly_done%
+
+[remark@vano_way_1_1]:walker@vano_def
+target = path | pas_b400_way_vano_1_look, 0
+anim = pas_b400_vano_probe
+out_restr = pas_b400_sr_way_1
+on_signal = anim_end | walker@vano_way_1_1
+on_info = %=play_sound(pas_b400_vano_about_anomaly_third_1)%
+
+[walker@vano_way_1_1]:walker@vano_def
+path_walk = vano_1_1_walk
+path_look = vano_1_1_look
+out_restr = pas_b400_sr_way_1
+on_signal = path_end | remark@vano_way_1_2
+on_info = {=actor_in_zone(pas_b400_sr_way_2)} walker@vano_way_2 %+pas_b400_way_anomaly_done%
+
+[remark@vano_way_1_2]:walker@vano_def
+target = path | pas_b400_way_vano_1_1_look, 0
+anim = pas_b400_vano_probe
+out_restr = pas_b400_sr_way_1
+on_signal = anim_end | walker@vano_way_2 %+pas_b400_way_anomaly_done%
+
+[walker@vano_way_2]:walker@vano_def
+path_walk = vano_2_walk
+path_look = vano_2_look
+out_restr = pas_b400_sr_way_1, pas_b400_sr_way_2
+combat_ignore_cond = {-pas_b400_way_door_opened} true, false
+
+
+
+[logic@pas_b400_sokolov_way]
+active = walker@sokolov_way_1 
+suitable = {=check_npc_name(pas_b400_sokolov) -pas_b400_way_done} true
+prior = 200
+on_hit = hit@sokolov
+on_death = death@sokolov
+post_combat_time = 0,0
+
+[walker@sokolov_way_1]:walker@sokolov_def
+path_walk = sokolov_1_walk
+path_look = sokolov_1_look
+out_restr = pas_b400_sr_way_1
+on_info = {=actor_in_zone(pas_b400_sr_way_2)} walker@sokolov_way_2
+on_info2 = {+pas_b400_way_anomaly_done} walker@sokolov_way_2
+
+[walker@sokolov_way_2]:walker@sokolov_def
+path_walk = sokolov_2_walk
+path_look = sokolov_2_look
+out_restr = pas_b400_sr_way_1, pas_b400_sr_way_2
+on_info = {+pas_b400_way_door_opened} %=play_sound(pas_b400_sokolov_about_tushkano_1)%
+combat_ignore_cond = {-pas_b400_way_door_opened} true, false
+
+
+
+[logic@pas_b400_wanderer_way]
+active = walker@wanderer_way_1 
+suitable = {=check_npc_name(pas_b400_wanderer) -pas_b400_way_done} true
+prior = 200
+on_hit = hit@wanderer
+on_death = death@wanderer
+post_combat_time = 0,0
+
+[walker@wanderer_way_1]:walker@wanderer_def
+path_walk = wanderer_1_walk
+path_look = wanderer_1_look
+out_restr = pas_b400_sr_way_1
+on_info = {=actor_in_zone(pas_b400_sr_way_2)} walker@wanderer_way_2
+on_info2 = {+pas_b400_way_anomaly_done} walker@wanderer_way_2
+
+[walker@wanderer_way_2]:walker@wanderer_def
+path_walk = wanderer_2_walk
+path_look = wanderer_2_look
+out_restr = pas_b400_sr_way_1, pas_b400_sr_way_2
+combat_ignore_cond = {-pas_b400_way_door_opened} true, false

@@ -1,0 +1,15 @@
+[logic]
+active = mob_walker
+
+[mob_walker]
+path_walk = x18_snork_walk
+path_look = x18_snork_look
+on_info = {=actor_in_zone(x18_sound_restrictor_0005)} mob_walker@1
+on_info2 = {=actor_in_zone(x18_sound_restrictor_0006)} mob_walker@2
+braindead = true
+
+[mob_walker@1]
+path_walk = x18_snork_walk_3
+
+[mob_walker@2]
+path_walk = x18_snork_walk_2

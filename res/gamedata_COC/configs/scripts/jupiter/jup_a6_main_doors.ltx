@@ -1,0 +1,35 @@
+[logic]
+active = ph_door@closed
+
+[ph_door@closed]
+closed = true
+locked = false
+on_use = ph_door@open
+snd_open_start = trader_door_open_start
+snd_close_start = trader_door_close_start
+snd_close_stop = trader_door_close_stop
+
+[ph_door@open]
+closed = false
+locked = false
+on_use = ph_door@closed
+on_game_timer = 35 | ph_door@closed
+snd_open_start = trader_door_open_start
+snd_close_start = trader_door_close_start
+snd_close_stop = trader_door_close_stop
+
+[ph_door@locked]
+closed = true
+locked = true
+;on_info = {=check_smart_alarm_status(jup_a6:normal)} ph_door@closed
+;on_info2 = {=check_smart_alarm_status(jup_a6:alarm)} ph_door@locked_alarm
+snd_open_start = trader_door_locked
+tip_open = tip_door_closed_hide_weapon
+
+[ph_door@locked_alarm]
+closed = true
+locked = true
+;on_info = {=check_smart_alarm_status(jup_a6:normal)} ph_door@closed
+;on_info2 = {=check_smart_alarm_status(jup_a6:danger)} ph_door@locked
+snd_open_start = trader_door_locked
+tip_open = tip_door_closed_base_alarm

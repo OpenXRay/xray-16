@@ -1,0 +1,17 @@
+[logic]
+active = ph_door@open
+
+[ph_door@open]
+locked = false
+closed = false
+tip_close = tip_door_close
+on_use = {-pri_b303_door_must_be_opened} ph_door@closed
+on_info = {+pri_b303_door_closed} %-pri_b303_door_closed%
+
+[ph_door@closed]
+locked = false
+closed = true
+tip_close = tip_door_open
+on_use = ph_door@open
+on_info = {+pri_b303_door_must_be_opened} ph_door@open
+on_info2 = {-pri_b303_door_closed} %+pri_b303_door_closed%

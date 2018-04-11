@@ -1,0 +1,17 @@
+[logic]
+active = nil ;sr_idle@greet
+
+[sr_idle@greet]
+on_info = {+zat_b3_start_gauss_search -pri_a17_actor_bring_gauss_rifle} %=give_task(pri_a17_task_find_gauss_rifle) +pri_a17_actor_bring_gauss_rifle%
+on_info2 = {+zat_a23_produce_62_bring_documentation -zat_a23_stalker_tech_can_make_battery} sr_idle@time_to_learn
+; выдаю глабальное задание Кардана на три сундучка (redstain)
+on_info3 = {+zat_a2_mechanic_toolkit_search -zat_a2_mechanic_toolkit_search_given} %=give_task(zat_b3_tech_instruments) +zat_a2_mechanic_toolkit_search_given%
+
+[sr_idle@time_to_learn]
+on_game_timer = 7200 | sr_idle@task %+zat_a23_stalker_tech_can_make_battery%
+
+[sr_idle@task]
+on_info = {+zat_a2_mechanic_toolkit_search -zat_a2_mechanic_toolkit_search_given} sr_idle@nil %=give_task(zat_b3_tech_instruments) +zat_a2_mechanic_toolkit_search_given%
+on_info = {+zat_b3_all_instruments_brought} sr_idle@nil
+
+[sr_idle@nil]

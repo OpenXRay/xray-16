@@ -1,0 +1,22 @@
+[logic]
+active = mob_walker@bar_arena_monstr_bloodsucker
+on_death = mob_death@bar_arena_monstr_bloodsucker
+
+[mob_walker@bar_arena_monstr_bloodsucker]
+path_walk = bar_arena_monstr_walk_2
+path_look = bar_arena_monstr_look
+braindead = true
+on_info = {+bar_arena_state_1} mob_walker@bar_arena_monstr_bloodsucker_2
+
+[mob_walker@bar_arena_monstr_bloodsucker_2]
+friendly = true
+path_walk = bar_arena_monstr_walk
+path_look = bar_arena_monstr_look
+on_signal = arrived | mob_walker@bar_arena_monstr_bloodsucker_3 %+bar_arena_monstr_ready =bar_arena_hit%
+
+[mob_walker@bar_arena_monstr_bloodsucker_3]
+path_walk = bar_arena_monstr_walk
+path_look = bar_arena_monstr_look
+
+[mob_death@bar_arena_monstr_bloodsucker]
+on_info = %+bar_arena_bloodsucker_defeated +bar_arena_monstr_dead%

@@ -1,0 +1,181 @@
+local scenes_table = {
+					}
+gOldVer = CUIListItemEx~=nil
+if(gOldVer) then
+	class "scene_item" (CUIListItemEx)
+else
+	class "scene_item" (CUIListBoxItem)
+end
+
+function scene_item:__init(height) super(height)
+	if(gOldVer) then
+		self:SetWndRect		(Frect():set(0,0,300,22))
+
+		local ca = 255
+		local cr = 216
+		local cg = 186
+		local cb = 140
+
+		self.text					= CUIStatic	()
+		self.text:SetAutoDelete		(true)
+		self:AttachChild			(self.text)
+		self.text:SetWndRect		(Frect():set(0,0,300,22))
+		self.text:TextControl():SetText			("filename")
+		self.text:TextControl():SetFont			(GetFontLetterica18Russian())
+		self.text:TextControl():SetTextColor		(ca,cr,cg,cb)
+	else
+		self.text	= self:GetTextItem()
+		self.text:SetWndRect		(Frect():set(0,0,300,22))
+		self:SetTextColor(GetARGB(255, 216, 186, 140))
+		self.text:SetFont(GetFontLetterica18Russian())
+		self.text:SetEllipsis(true)
+	end
+end
+
+
+class "scenes_item_dialog" (CUIScriptWnd)
+
+function scenes_item_dialog:__init() super()
+	 self:InitControls()
+	 self:InitCallBacks()
+	 self:FillList()
+end
+
+function scenes_item_dialog:__finalize()
+end
+
+function scenes_item_dialog:FillList()
+	local scenes_ini = ini_file("scripts\\scenes.ltx")
+	local level_name = level.name()
+	if not scenes_ini:section_exist(level_name) then
+		return
+	end
+	local line_count = scenes_ini:line_count(level_name)
+
+	for line_number = 0, line_count - 1 do
+		local result, id, value  = scenes_ini:r_line(level_name,line_number,"","")
+		local parsed_value = utils.parse_params(value)
+		scenes_table[id] = parsed_value
+		self:AddItemToList(id)
+	end
+end
+
+function scenes_item_dialog:InitControls()
+	local xml				= CScriptXmlInit()
+	local ctrl
+	xml:ParseFile			("ui_scenes_dlg.xml")
+
+	ctrl					= xml:InitStatic("background",self)
+
+	self.wnd_size			= vector2():set(ctrl:GetWidth(),ctrl:GetHeight())
+	self:SetWndPos			(vector2():set(100,100))
+	self:SetWndSize			(self.wnd_size)
+	ctrl:SetWndPos			(vector2():set(0,0))
+
+if(gOldVer) then
+	self.list = xml:InitList	("list",self)
+else
+	self.list = xml:InitListBox	("list",self)
+end
+	self.list:ShowSelectedItem	(true)
+	self:Register				(self.list, "list_window")
+
+	self.check_teleport			= xml:InitCheck("check_teleport_actor",self)
+	self.check_spawn_items		= xml:InitCheck("check_spawn_items",self)
+	self.check_teleport:SetCheck(true)
+	self.check_spawn_items:SetCheck(true)
+	ctrl						= xml:Init3tButton("btn_create",self)
+	self:Register				(ctrl, "btn_create")
+
+
+	ctrl = xml:Init3tButton		("btn_close",self)
+	self:Register				(ctrl, "btn_close")
+end
+
+function scenes_item_dialog:InitCallBacks()
+	self:AddCallback("btn_create",		ui_events.BUTTON_CLICKED,             self.OnButton_create_clicked,	self)
+	self:AddCallback("btn_close",		ui_events.BUTTON_CLICKED,             self.OnButton_close_clicked,	self)
+	self:AddCallback("list_window",		ui_events.WINDOW_LBUTTON_DB_CLICK,	  self.OnButton_create_clicked,	self)
+end
+
+
+
+function scenes_item_dialog:OnButton_create_clicked()
+	if self.list:GetSize()==0 then
+		return
+	end
+
+	local item
+	if(gOldVer) then
+		local index = self.list:GetSelectedItem()
+		if index == -1 then
+			return
+		end
+		item			= self.list:GetItem(index)
+	else
+		item			= self.list:GetSelectedItem()
+	end
+	if item == nil then
+		return
+	end
+	local itmname		= item.text:GetText()
+	if scenes_table[itmname][1] ~= nil then
+		db.actor:give_info_portion(scenes_table[itmname][1])
+	end
+	if self.check_teleport:GetCheck() then
+		local point
+		if scenes_table[itmname][2] ~= nil then
+			point = patrol(scenes_table[itmname][2])
+			db.actor:set_actor_position(point:point(0))
+		end
+		if scenes_table[itmname][3] ~= nil then
+			local look = patrol(scenes_table[itmname][3])
+			local dir = -look:point(0):sub(point:point(0)):getH()
+			db.actor:set_actor_direction(dir)
+		end
+	end
+	if self.check_spawn_items:GetCheck() then
+		if scenes_table[itmname][4] ~= nil then
+			local spawn_items = utils.parse_names(scenes_table[itmname][4])
+			for k,v in pairs (spawn_items) do
+				alife():create(v, db.actor:position(), 0, 0, db.actor:id())
+			end
+		end
+	end
+	self:HideDialog()
+	_G.scenes_dlg = nil
+end
+
+function scenes_item_dialog:OnButton_close_clicked()
+	self:HideDialog()
+	_G.scenes_dlg = nil
+end
+
+function scenes_item_dialog:OnKeyboard(dik, keyboard_action)
+	local bind = dik_to_bind(dik)
+	if bind == key_bindings.kQUIT then
+		self:OnButton_close_clicked()
+	else
+	if dik==28 then
+		self:OnButton_create_clicked()
+	end
+	end
+
+	return true
+end
+
+function scenes_item_dialog:AddItemToList(item_name)
+	local _itm				= scene_item(self.wnd_size.y)
+	_itm.text:SetText		(item_name)
+
+	self.list:AddExistingItem		(_itm)
+end
+
+
+
+function main()
+	if _G.scenes_dlg==nil then
+		_G.scenes_dlg = scenes_item_dialog()
+	end
+	_G.scenes_dlg:ShowDialog(true)
+end

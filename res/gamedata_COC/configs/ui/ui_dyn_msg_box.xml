@@ -1,0 +1,36 @@
+<w>
+	<multi_choice>
+		<file_item>
+			<main width="490" height="18"/>
+			<fn width="352" height="18"/>
+			<fd width="50" height="18"/>
+		</file_item>
+		<form x="358" y="240" width="377" height="400" stretch="1">
+			<list_frame x="0" y="0" width="377" height="400">
+				<texture>ui_inGame2_hint_wnd_main_window</texture>
+			</list_frame>
+			<list x="25" y="25" width="352" height="375" item_height="25" can_select="1" always_show_scroll="0">
+				<font font="letterica16"/>
+			</list>
+			<btn_ok x="109" y="430" width="80" height="26">
+				<texture>ui_button_main01</texture>
+				<text font="letterica18">OK</text>
+			</btn_ok>
+		</form>
+	</multi_choice>
+	<context_menu>
+		<file_item>
+			<main width="130" height="18"/>
+			<fn width="130" height="18"/>
+			<fd width="50" height="18"/>
+		</file_item>
+		<form x="0" y="0" width="130" height="200" stretch="1">
+			<list_frame x="0" y="0" width="130" height="200">
+				<texture>ui_icons_PDA_tooltips</texture>
+			</list_frame>
+			<list x="10" y="10" width="105" height="200" item_height="22" can_select="1" always_show_scroll="0">
+				<font font="letterica16"/>
+			</list>
+		</form>
+	</context_menu>
+</w>

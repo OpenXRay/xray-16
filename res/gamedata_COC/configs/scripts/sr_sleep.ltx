@@ -1,0 +1,10 @@
+[logic]
+active = sr_idle@wait
+
+[sr_idle@wait]
+on_actor_inside = sr_idle@run %=run_tutorial(tutorial_sleep)%
+
+[sr_idle@run]
+on_info = {+tutorial_sleep} %-tutorial_sleep =run_tutorial(tutorial_sleep)%
+on_actor_outside = {+tutorial_sleep} sr_idle@wait, sr_idle@wait %=stop_tutorial%
+on_info2 = {!has_active_tutorial -sleep_active} sr_idle@wait

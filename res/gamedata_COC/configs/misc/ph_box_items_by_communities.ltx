@@ -1,0 +1,330 @@
+; Communities ящиков:
+; def_box			- из неё ничего не выпадает.
+; small_box_generic	- любые патроны и стандартные медикаменты
+; small_box_ussr	- отечественные патроны и стандартные медикаменты. Рекомендую ставить у Долга.
+; small_box_nato	- НАТОвские патроны и стандартные медикаменты. Рекомендую ставить у наёмников, Свободы.
+; small_box_army	- то же, что и small_box_ussr, но аптечки - только армейские. Рекомендую ставить у военных.
+; small_box_science	- то же, что и small_box_ussr, но аптечки - только научные. Рекомендую ставить у учёных.
+; big_box_generic	- артефакты, гранаты обычные и подствольные, броня.
+; big_box_dungeons	- то же, что и big_box_generic, плюс оружие и больший шанс на хороший артефакт.
+;					  Рекомендую ставить там, где людей нет (заброшенные либо труднодоступные места).
+; big_box_arsenal	- гранаты обычные и подствольные, броня, больший шанс получить оружие.
+;					  Рекомендую ставить в местах скопления Монолитовцев (последние уровни).
+
+
+[def_box]
+;Артефакты
+af_medusa				= 0
+af_cristall_flower		= 0
+af_night_star			= 0
+af_vyvert				= 0
+af_gravi				= 0
+af_gold_fish			= 0
+af_blood				= 0
+af_mincer_meat			= 0
+af_soul					= 0
+af_electra_sparkler		= 0
+af_electra_flash		= 0
+af_electra_moonlight	= 0
+af_rusty_thorn			= 0
+af_rusty_kristall		= 0
+af_rusty_sea		= 0
+af_ameba_slime			= 0
+af_ameba_slug			= 0
+af_ameba_mica			= 0
+af_drops				= 0
+af_fireball				= 0
+af_cristall				= 0
+af_dummy_glassbeads		= 0
+af_dummy_pellicle		= 0
+af_dummy_battery		= 0
+af_dummy_dummy			= 0
+af_dummy_spring			= 0
+af_fuzz_kolobok			= 0
+
+;Аммуниция
+ammo_9x18_fmj			= 0
+ammo_9x18_pmm			= 0
+ammo_9x19_pbp			= 0
+ammo_9x19_fmj			= 0
+ammo_11.43x23_hydro		= 0
+ammo_11.43x23_fmj		= 0
+ammo_12x70_buck			= 0
+ammo_12x76_zhekan		= 0
+ammo_5.45x39_ap			= 0
+ammo_5.45x39_fmj		= 0
+ammo_9x39_ap			= 0
+ammo_9x39_pab9			= 0
+ammo_5.56x45_ss190		= 0
+ammo_5.56x45_ap			= 0
+ammo_7.62x54_7h1		= 0
+ammo_og-7b				= 0
+ammo_vog-25				= 0
+grenade_f1				= 0
+grenade_rgd5			= 0
+ammo_m209				= 0
+ammo_gauss				= 0
+
+;Оружие
+wpn_fort				= 0
+wpn_walther				= 0
+wpn_sig220				= 0
+wpn_colt1911			= 0
+wpn_usp					= 0
+wpn_desert_eagle		= 0
+wpn_bm16				= 0
+wpn_wincheaster1300		= 0
+wpn_spas12				= 0
+wpn_ak74u				= 0
+wpn_mp5					= 0
+wpn_ak74				= 0
+wpn_abakan				= 0
+wpn_l85					= 0
+wpn_lr300				= 0
+wpn_sig550				= 0
+wpn_groza				= 0
+wpn_val					= 0
+wpn_vintorez			= 0
+wpn_svu					= 0
+wpn_svd					= 0
+wpn_g36					= 0
+wpn_fn2000				= 0
+
+;Броники
+novice_outfit			= 0
+specops_outfit			= 0
+stalker_outfit			= 0
+svoboda_light_outfit	= 0
+svoboda_heavy_outfit	= 0
+dolg_outfit				= 0
+
+;Шлемы
+helm_respirator			= 0
+helm_hardhat			= 0
+helm_protective			= 0
+helm_tactic				= 0
+helm_battle				= 0
+
+;Медикаменты
+bandage					= 0
+medkit					= 0
+medkit_army				= 0
+medkit_scientic			= 0
+antirad					= 0
+
+;Бустеры
+drug_booster			= 0
+drug_coagulant			= 0
+drug_psy_blockade		= 0
+drug_antidot			= 0
+drug_radioprotector		= 0
+drug_anabiotic			= 0
+
+;Еда
+bread					= 0
+kolbasa					= 0
+conserva				= 0
+vodka					= 0
+energy_drink			= 0
+
+[med_box_low]:def_box
+;Медикаменты
+bandage					= 0.5
+medkit					= 0.25
+medkit_army				= 0
+medkit_scientic			= 0
+antirad					= 0
+
+[med_box_advanced]:def_box
+;Медикаменты
+bandage					= 0.5
+medkit					= 0
+medkit_army				= 0.25
+medkit_scientic			= 0
+antirad					= 0.25
+
+
+[med_box_high]:def_box
+;Медикаменты
+bandage					= 1
+medkit					= 0.25
+medkit_army				= 0
+medkit_scientic			= 0.25
+antirad					= 0.25
+
+
+[small_box_generic]:def_box ;У бандитов, нейтралов, Монолита
+;Аммуниция
+ammo_9x18_fmj			= 0.1
+ammo_9x19_fmj			= 0.1
+ammo_12x70_buck			= 0.1
+ammo_12x76_zhekan		= 0.1
+
+ammo_9x18_pmm			= 0.05
+ammo_9x19_pbp			= 0.05
+
+ammo_11.43x23_hydro		= 0.05
+ammo_11.43x23_fmj		= 0.1
+
+ammo_5.45x39_ap			= 0.05
+ammo_5.45x39_fmj		= 0.1
+ammo_9x39_ap			= 0.03
+ammo_9x39_pab9			= 0.05
+ammo_5.56x45_ss190		= 0.1
+ammo_5.56x45_ap			= 0.05
+ammo_7.62x54_7h1		= 0.01
+
+;Медикаменты
+bandage					= 0.2
+medkit					= 0.1
+
+antirad					= 0.05
+
+
+[small_box_ussr]:small_box_generic ;У Долга
+;Аммуниция
+ammo_9x19_pbp			= 0
+ammo_9x19_fmj			= 0
+ammo_12x70_buck			= 0
+ammo_12x76_zhekan		= 0
+ammo_11.43x23_hydro		= 0
+ammo_11.43x23_fmj		= 0
+ammo_12x76_zhekan		= 0
+ammo_5.56x45_ss190		= 0
+ammo_5.56x45_ap			= 0
+
+;Медикаменты
+bandage					= 0.1
+medkit					= 0.05
+antirad					= 0.05
+medkit_army				= 0.05
+
+[small_box_nato]:small_box_generic ;У наёмников, Свободы
+;Аммуниция
+ammo_9x18_fmj			= 0
+ammo_9x18_pmm			= 0
+ammo_12x70_buck			= 0
+ammo_12x76_zhekan		= 0
+ammo_5.45x39_ap			= 0
+ammo_5.45x39_fmj		= 0
+ammo_9x39_ap			= 0
+ammo_9x39_pab9			= 0
+ammo_7.62x54_7h1		= 0
+
+[small_box_army]:small_box_ussr ;У военных
+medkit					= 0
+medkit_army				= 0.05
+
+
+[small_box_science]:small_box_ussr ;У учёных
+medkit					= 0
+medkit_scientic			= 0.5
+bandage					= 0.25
+antirad					= 0.15
+
+
+[big_box_generic]:def_box ;Там, где присутствуют люди
+;Аммуниция
+ammo_vog-25				= 0.1
+grenade_f1				= 0.1
+grenade_rgd5			= 0.1
+ammo_m209				= 0.1
+
+[big_box_dungeons]:big_box_generic ; Там, где людей нет
+;Артефакты
+af_medusa				= 0.03
+af_cristall_flower		= 0.018
+af_night_star			= 0.012
+af_vyvert				= 0.03
+af_gravi				= 0.018
+af_gold_fish			= 0.012
+af_blood				= 0.03
+af_mincer_meat			= 0.018
+af_soul					= 0.012
+af_electra_sparkler		= 0.03
+af_electra_flash		= 0.018
+af_electra_moonlight	= 0.012
+af_rusty_thorn			= 0.03
+af_rusty_kristall		= 0.018
+af_rusty_sea			= 0.012
+af_ameba_slime			= 0.03
+af_ameba_slug			= 0.018
+af_ameba_mica			= 0.012
+af_drops				= 0.03
+af_fireball				= 0.018
+af_cristall				= 0.012
+
+;Оружие
+wpn_fort				= 0.003
+wpn_walther				= 0.003
+wpn_sig220				= 0.003
+wpn_colt1911			= 0.003
+wpn_usp					= 0.003
+wpn_desert_eagle		= 0.003
+wpn_bm16				= 0.003
+wpn_wincheaster1300		= 0.003
+wpn_spas12				= 0.003
+wpn_ak74u				= 0.003
+wpn_mp5					= 0.003
+wpn_ak74				= 0.003
+wpn_abakan				= 0.003
+wpn_l85					= 0.003
+wpn_lr300				= 0.003
+wpn_sig550				= 0.003
+wpn_groza				= 0.003
+wpn_val					= 0.003
+wpn_vintorez			= 0.003
+wpn_svu					= 0.003
+wpn_svd					= 0.003
+wpn_g36					= 0.003
+wpn_fn2000				= 0.003
+
+
+[big_box_arsenal]:big_box_dungeons ; У Монолитовцев
+;Артефакты
+af_medusa				= 0
+af_cristall_flower		= 0
+af_night_star			= 0
+af_vyvert				= 0
+af_gravi				= 0
+af_gold_fish			= 0
+af_blood				= 0
+af_mincer_meat			= 0
+af_soul					= 0
+af_electra_sparkler		= 0
+af_electra_flash		= 0
+af_electra_moonlight	= 0
+af_rusty_thorn			= 0
+af_rusty_kristall		= 0
+af_rusty_sea		= 0
+af_ameba_slime			= 0
+af_ameba_slug			= 0
+af_ameba_mica			= 0
+af_drops				= 0
+af_fireball				= 0
+af_cristall				= 0
+
+;Оружие
+wpn_fort				= 0.01
+wpn_walther				= 0.01
+wpn_sig220				= 0.01
+wpn_colt1911			= 0.01
+wpn_usp					= 0.01
+wpn_desert_eagle		= 0.01
+wpn_bm16				= 0.01
+wpn_wincheaster1300		= 0.01
+wpn_spas12				= 0.01
+wpn_ak74u				= 0.01
+wpn_mp5					= 0.01
+wpn_ak74				= 0.01
+wpn_abakan				= 0.01
+wpn_l85					= 0.01
+wpn_lr300				= 0.01
+wpn_sig550				= 0.01
+wpn_groza				= 0.01
+wpn_val					= 0.01
+wpn_vintorez			= 0.01
+wpn_svu					= 0.01
+wpn_svd					= 0.01
+wpn_g36					= 0.01
+wpn_fn2000				= 0.01

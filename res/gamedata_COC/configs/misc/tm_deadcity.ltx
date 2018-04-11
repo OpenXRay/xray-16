@@ -1,0 +1,107 @@
+;--------------------------------------------------------------------------------------------------
+; ASSASSINATION FOR MERCS TASK-
+
+[cit_killers_merc_trader_stalker_task_1]
+icon = ui_inGame2_Odin_vistrel
+prior = 35
+storyline = false
+title = cit_killers_merc_trader_stalker_task_1_name
+descr = cit_killers_merc_trader_stalker_task_1_text
+job_descr = cit_killers_merc_trader_stalker_task_1_about
+task_complete_descr = cit_killers_merc_trader_stalker_task_1_finish
+repeat_timeout = 129600
+status_functor = bounty_task
+target_functor = general_bounty_task
+stage_complete = 1
+on_job_descr = %=on_init_bounty_hunt(cit_killers_merc_trader_stalker_task_1:stalker:bandit:dolg:army)%
+on_complete = %=reward_random_money(9000:11000) =reward_stash(true) =inc_task_stage(cit_killers_merc_trader_stalker_task_1) =complete_task_inc_goodwill(50:killer)%
+precondition = true
+
+
+;--------------------------------------------------------------------------------------------------
+; ASSAULT TERRITORY FOR MERCS TASK-
+
+[cit_killers_merc_trader_stalker_task_2]
+icon = ui_inGame2_Odin_vistrel
+prior = 2
+storyline = false
+title = cit_killers_merc_trader_stalker_task_2_name
+descr = cit_killers_merc_trader_stalker_task_2_text
+job_descr = cit_killers_merc_trader_stalker_task_2_about
+task_complete_descr = cit_killers_merc_trader_stalker_task_2_finish
+repeat_timeout = 86400
+target_functor = general_under_faction_control
+status_functor = check_smart_under_faction_control_staged
+status_functor_params = stalker,bandit,dolg,army
+stage_complete = 1
+on_init = %=find_smart_under_faction_control_ex(cit_killers_merc_trader_stalker_task_2_id:stalker:bandit:dolg:army)%
+precondition = {=all_avail_smart_stayed_squad_count_ge_by_faction_ex(1:nil:false:stalker:bandit:dolg:army)} true, false
+on_complete = %=complete_task_inc_goodwill(50:killer) =reward_random_money(7000:8500) =reward_stash(true) =inc_task_stage(cit_killers_merc_trader_stalker_task_2) =pstor_reset(cit_killers_merc_trader_stalker_task_2_id) =pstor_reset(cit_killers_merc_trader_stalker_task_2_target_id)%
+on_fail = %=fail_task_dec_goodwill(25:killer) =pstor_reset(cit_killers_merc_trader_stalker_task_2_id) =pstor_reset(cit_killers_merc_trader_stalker_task_2_target_id)%
+on_cancel = %=pstor_reset(cit_killers_merc_trader_stalker_task_2_id) =pstor_reset(cit_killers_merc_trader_stalker_task_2_target_id)%
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND LEVEL 1 TOOLS FOR HOG TASK-
+
+[cit_killers_merc_mechanic_stalker_task_1]
+icon = ui_inGame2_Instrumenti
+prior = 10
+storyline = false
+title = cit_killers_merc_mechanic_stalker_task_1_name
+title_functor = general_fetch_task
+descr = cit_killers_merc_mechanic_stalker_task_1_text
+descr_functor = general_fetch_task
+job_descr = cit_killers_merc_mechanic_stalker_task_1_about
+fetch_descr = cit_killers_merc_mechanic_stalker_task_1_fetch_about
+fetch_func = %=setup_generic_fetch_task(cit_killers_merc_mechanic_stalker_task_1_fetch:1:itm_repairkit_tier_1)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = cit_killers_merc_mechanic_stalker_task_1_fetch_finish
+on_complete = %+cit_killers_merc_mechanic_stalker_upgrade_tier_1 =complete_task_inc_goodwill(50:killer) =reward_item_cost_mult_and_remove(cit_killers_merc_mechanic_stalker_task_1_fetch:1.0) =inc_task_stage(cit_killers_merc_mechanic_stalker_task_1)%
+precondition = {-cit_killers_merc_mechanic_stalker_upgrade_tier_1} true, false
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND LEVEL 2 TOOLS FOR HOG TASK-
+
+[cit_killers_merc_mechanic_stalker_task_2]
+icon = ui_inGame2_Instrumenti
+prior = 10
+storyline = false
+title = cit_killers_merc_mechanic_stalker_task_2_name
+title_functor = general_fetch_task
+descr = cit_killers_merc_mechanic_stalker_task_2_text
+descr_functor = general_fetch_task
+job_descr = cit_killers_merc_mechanic_stalker_task_2_about
+fetch_descr = cit_killers_merc_mechanic_stalker_task_2_fetch_about
+fetch_func = %=setup_generic_fetch_task(cit_killers_merc_mechanic_stalker_task_2_fetch:1:itm_repairkit_tier_2)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = cit_killers_merc_mechanic_stalker_task_2_fetch_finish
+on_complete = %+cit_killers_merc_mechanic_stalker_upgrade_tier_2 =complete_task_inc_goodwill(50:killer) =reward_item_cost_mult_and_remove(cit_killers_merc_mechanic_stalker_task_2_fetch:1.0) =inc_task_stage(cit_killers_merc_mechanic_stalker_task_2)%
+precondition = {+cit_killers_merc_mechanic_stalker_upgrade_tier_1 -cit_killers_merc_mechanic_stalker_upgrade_tier_2} true, false
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND LEVEL 3 TOOLS FOR HOG TASK-
+
+[cit_killers_merc_mechanic_stalker_task_3]
+icon = ui_inGame2_Instrumenti
+prior = 10
+storyline = false
+title = cit_killers_merc_mechanic_stalker_task_3_name
+title_functor = general_fetch_task
+descr = cit_killers_merc_mechanic_stalker_task_3_text
+descr_functor = general_fetch_task
+job_descr = cit_killers_merc_mechanic_stalker_task_3_about
+fetch_descr = cit_killers_merc_mechanic_stalker_task_3_fetch_about
+fetch_func = %=setup_generic_fetch_task(cit_killers_merc_mechanic_stalker_task_3_fetch:1:itm_repairkit_tier_3)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = cit_killers_merc_mechanic_stalker_task_3_fetch_finish
+on_complete = %+cit_killers_merc_mechanic_stalker_upgrade_tier_3 =complete_task_inc_goodwill(50:killer) =reward_item_cost_mult_and_remove(cit_killers_merc_mechanic_stalker_task_3_fetch:1.0) =inc_task_stage(cit_killers_merc_mechanic_stalker_task_3)%
+precondition = {+cit_killers_merc_mechanic_stalker_upgrade_tier_2 -cit_killers_merc_mechanic_stalker_upgrade_tier_3} true, false

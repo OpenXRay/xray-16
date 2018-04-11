@@ -1,0 +1,28 @@
+[logic@zat_a2_stalker_mechanic]
+suitable = {=check_npc_name(zat_a2_stalker_mechanic)}
+active = animpoint@leader
+prior = 200
+level_spot = mechanic
+
+[animpoint@leader]
+cover_name = kardan_smart_cover
+avail_animations = animpoint_sit_normal
+out_restr = jup_a6_sr_noweap
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+meet = meet
+use_camp = false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_distance = 3
+allow_break 	= false
+meet_on_talking = false

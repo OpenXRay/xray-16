@@ -1,0 +1,13 @@
+[logic]
+active = mob_home
+
+[mob_home]
+path_home = sar_poltergeist_home
+on_info = mob_home@1 %=hit_npc_from_actor%
+out_restr = mon_guard_offline_restr
+
+[mob_home@1]
+path_home = sar_poltergeist_home
+home_max_radius = 25
+home_min_radius = 20
+out_restr = mon_guard_offline_restr

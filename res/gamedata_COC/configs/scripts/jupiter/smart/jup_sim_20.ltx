@@ -1,0 +1,24 @@
+[smart_terrain]
+squad_id = 40
+max_population = 1
+;respawn_only_smart = true
+respawn_params = respawn@jup_sim_20
+respawn_idle = 86400
+
+
+[respawn@jup_sim_20]
+spawn_bloodsucker
+spawn_hostile_killer
+spawn_zombied
+
+[spawn_zombied]
+spawn_squads = zombied_sim_squad_novice, zombied_sim_squad_advanced, zombied_sim_squad_veteran
+spawn_num = {-bar_deactivate_radar_done} 2, 0
+
+[spawn_bloodsucker]
+spawn_squads = simulation_bloodsucker
+spawn_num = 1
+
+[spawn_hostile_killer]
+spawn_squads = merc_sim_squad_veteran
+spawn_num = {+bar_deactivate_radar_done} 2, 0

@@ -1,0 +1,58 @@
+[logic@jup_a6_important_npc_1]
+suitable = {=check_npc_name(jup_a6_freedom_trader_ashot)} true
+prior = 200
+active = walker@ashot
+trade = misc\trade\trade_freedom_ashot.ltx
+dont_keep_items = true
+level_spot = trader
+
+[animpoint@ashot]
+cover_name = jup_a6_animpint_duty_leader
+avail_animations = animpoint_sit_normal_no_rnd
+use_camp = false
+meet = meet@stand_base
+on_game_timer = 900 | walker@ashot
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_a6_sr_noweap
+corpse_detection_enabled = false
+gather_items_enabled = false
+help_wounded_enabled = false
+
+[walker@ashot]
+path_walk = duty_leader_walk
+path_look = duty_leader_look
+def_state_standing = wait_na
+def_state_moving = walk_noweap
+meet = meet@walker
+;on_game_timer = 900 | animpoint@ashot
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_a6_sr_noweap
+corpse_detection_enabled = false
+gather_items_enabled = false
+help_wounded_enabled = false
+use_camp = false
+
+
+[meet@stand_base]
+close_snd_hello = meet_hello 	;jup_a6_duty_leader_greeting
+close_snd_bye 	= nil 			;jup_a6_duty_leader_farewell
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_distance = 3
+use = {=actor_enemy} false, true
+allow_break = false
+trade_enable = true
+meet_on_talking = false
+
+[meet@walker]:meet@stand_base
+close_anim 		= wait_na
+close_victim 	= actor
+close_distance  = 3

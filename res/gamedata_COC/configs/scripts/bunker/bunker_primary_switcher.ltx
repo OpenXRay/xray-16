@@ -1,0 +1,12 @@
+[logic]
+active = ph_button@rad_on
+
+[ph_button@rad_on]
+anim_blend  = true
+anim        = lab_primary_switcher_idle
+tooltip     = tips_rad_switcher_press
+on_press    = ph_button@rad_off % +bar_deactivate_radar_done%
+
+[ph_button@rad_off]
+anim_blend  = true
+anim        = lab_primary_switcher_off

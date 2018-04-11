@@ -1,0 +1,20 @@
+[logic@jup_b1_controller]
+active = mob_walker
+suitable = {=check_npc_name(jup_b1_controller)} true
+prior = 70
+on_death = mob_death
+monster_job = true
+
+[mob_walker]
+path_walk = controller_walk
+npc_friendly = true
+on_game_timer = 165 | mob_home
+
+[mob_home]
+path_home = controller_walk
+npc_friendly = true
+home_min_radius = 15
+home_max_radius = 20
+
+[mob_death]
+on_info = %+jup_b1_controller_is_dead%

@@ -1,0 +1,235 @@
+[up_sect_firsta_helm_battle]
+cost 		= 800
+value		= +10
+
+chemical_burn_protection        = 0.01
+radiation_protection            = 0.002
+immunities_sect_add 			= sect_helm_burn_immunity_add
+
+[up_sect_firstc_helm_battle]
+cost 		= 1600
+value 		= +20
+
+telepatic_protection  			= 0.008
+
+[up_sect_firstd_helm_battle]
+cost 		= 1600
+value		= +20
+
+chemical_burn_protection         = 0.01
+immunities_sect_add 			= sect_helm_chem_immunity_add
+
+[up_sect_firste_helm_battle]
+cost 		= 3200
+value		= +20
+
+chemical_burn_protection        = 0.02
+radiation_protection            = 0.0045
+immunities_sect_add 			= sect_helm_chem_immunity_add
+
+[up_sect_secona_helm_battle]
+cost 		= 1750
+value		= +1
+
+power_restore_speed				= 0.001
+power_loss						= -0.02
+
+[up_sect_seconc_helm_battle]
+cost 		= 2000
+value 		= +20
+
+telepatic_protection  			= 0.012
+
+[up_sect_second_helm_battle]
+cost 		= 5000
+value		= +2
+
+nightvision_sect				 = effector_nightvision_2
+
+[up_sect_secone_helm_battle]
+cost 		= 8000
+value		= +3
+
+nightvision_sect 				= effector_nightvision_3
+
+[up_firsta_helm_battle]
+scheme_index            = 0, 0
+known                   = 1
+effects                 = up_gr_firstcd_helm_battle
+section                 = up_sect_firsta_helm_battle
+property                = prop_radio, prop_chem
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_res_a1_name
+description             = st_up_res_a1_descr
+icon                    = ui_inGame2_upgrade_helm_battle_1
+
+
+[up_firstc_helm_battle]
+scheme_index            = 1, 0
+known                   = 1
+effects                 = up_gr_firstef_helm_battle
+section                 = up_sect_firstc_helm_battle
+property                = prop_psy
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_res_b1_name
+description             = st_up_res_b1_descr
+icon                    = ui_inGame2_upgrade_helm_battle_2
+
+[up_firstd_helm_battle]
+scheme_index            = 1, 1
+known                   = 1
+effects                 = up_gr_firstef_helm_battle
+section                 = up_sect_firstd_helm_battle
+property                = prop_chem
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_res_b5_name
+description             = st_up_res_b5_descr
+icon                    = ui_inGame2_upgrade_helm_battle_4
+
+
+[up_firste_helm_battle]
+scheme_index            = 2, 0
+known                   = 1
+effects                 =
+section                 = up_sect_firste_helm_battle
+property                = prop_radio, prop_chem
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_res_c7_name
+description             = st_up_res_c7_descr
+icon                    = ui_inGame2_upgrade_helm_battle_3
+
+[up_secona_helm_battle]
+scheme_index            = 0, 1
+known                   = 1
+effects                 = up_gr_seconcd_helm_battle
+section                 = up_sect_secona_helm_battle
+property                = prop_power
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_resp_a3_name
+description             = st_up_res_a3_descr
+icon                    = ui_inGame2_upgrade_helm_battle_5
+
+
+[up_seconc_helm_battle]
+scheme_index            = 1, 2
+known                   = 1
+effects                 = up_gr_seconef_helm_battle
+section                 = up_sect_seconc_helm_battle
+property                = prop_psy
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_resp_c4_name
+description             = st_up_resp_c4_descr
+icon                    = ui_inGame2_upgrade_helm_battle_6
+
+[up_second_helm_battle]
+scheme_index            = 1, 3
+known                   = 1
+effects                 = up_gr_seconef_helm_battle
+section                 = up_sect_second_helm_battle
+property                = prop_night_vision
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_resp_b1_name
+description             = st_up_resp_b1_descr
+icon                    = ui_inGame2_upgrade_helm_battle_8
+
+[up_secone_helm_battle]
+scheme_index            = 2, 1
+known                   = 1
+effects                 =
+section                 = up_sect_secone_helm_battle
+property                = prop_night_vision
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_resp_c1_name
+description             = st_up_resp_c1_descr
+icon                    = ui_inGame2_upgrade_helm_battle_9
+
+
+[up_gr_firstab_helm_battle]
+elements                = up_firsta_helm_battle
+
+[up_gr_firstcd_helm_battle]
+elements                = up_firstc_helm_battle, up_firstd_helm_battle
+
+[up_gr_firstef_helm_battle]
+elements                = up_firste_helm_battle
+
+[up_gr_seconab_helm_battle]
+elements                = up_secona_helm_battle
+
+[up_gr_seconcd_helm_battle]
+elements                = up_seconc_helm_battle, up_second_helm_battle
+
+[up_gr_seconef_helm_battle]
+elements                = up_secone_helm_battle

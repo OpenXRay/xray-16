@@ -1,0 +1,27 @@
+<w>
+    <file name="ui\ui_mm_faction_patches">
+		<texture id="ui_mm_faction_stalker" x="0" y="0" 		width="64" height="64" />
+		<texture id="ui_mm_faction_bandit" 	x="64" y="0" 		width="64" height="64" />
+		<texture id="ui_mm_faction_csky" 	x="128" y="0" 		width="64" height="64" />
+		
+		<texture id="ui_mm_faction_dolg" 	x="0" y="64" 		width="64" height="64" />
+		<texture id="ui_mm_faction_freedom" x="64" y="64" 		width="64" height="64" />
+		<texture id="ui_mm_faction_killer" 	x="128" y="64" 		width="64" height="64" />
+		
+		<texture id="ui_mm_faction_army" 	x="0" y="128" 		width="64" height="64" />
+		<texture id="ui_mm_faction_ecolog" 	x="64" y="128" 		width="64" height="64" />
+		<texture id="ui_mm_faction_monolith"x="128" y="128" 	width="64" height="64" />
+		
+		<texture id="ui_mm_faction_stalker_inactive" 	x="192" y="0" 		width="64" height="64" />
+		<texture id="ui_mm_faction_bandit_inactive" 	x="256" y="0" 		width="64" height="64" />
+		<texture id="ui_mm_faction_csky_inactive" 		x="320" y="0" 		width="64" height="64" />
+		
+		<texture id="ui_mm_faction_dolg_inactive" 		x="192" y="64" 		width="64" height="64" />
+		<texture id="ui_mm_faction_freedom_inactive" 	x="256" y="64" 		width="64" height="64" />
+		<texture id="ui_mm_faction_killer_inactive" 	x="320" y="64" 		width="64" height="64" />
+		
+		<texture id="ui_mm_faction_army_inactive" 		x="192" y="128" 	width="64" height="64" />
+		<texture id="ui_mm_faction_ecolog_inactive" 	x="256" y="128" 	width="64" height="64" />
+		<texture id="ui_mm_faction_monolith_inactive"	x="320" y="128" 	width="64" height="64" />
+    </file>
+</w>

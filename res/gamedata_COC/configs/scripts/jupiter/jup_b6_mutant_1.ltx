@@ -1,0 +1,15 @@
+[logic]
+active = nil;sr_idle
+
+[sr_idle]
+on_info = {+jup_b6_anom_1} sr_idle@step
+
+[sr_idle@step]
+on_timer = 1500 | {=npc_in_actor_frustum =dist_to_actor_le(30)} sr_idle@step2 %+jup_b6_mut_1_false%
+on_timer2 = 1500 | {!npc_in_actor_frustum} sr_idle@step2 %-jup_b6_mut_1_false%
+on_info = {+jup_b6_anom_1_count_end} sr_idle@end
+
+[sr_idle@step2]
+on_timer = 1000 |  sr_idle@step 
+
+[sr_idle@end]

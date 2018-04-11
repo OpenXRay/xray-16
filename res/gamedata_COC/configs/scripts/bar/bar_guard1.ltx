@@ -1,0 +1,46 @@
+[logic@bar_guard1]
+active = walker@guard_door
+suitable = {=check_npc_name(bar_visitors_garik_stalker_guard)} true
+prior = 100
+
+[walker@guard_door]
+path_walk = guard_door_walk
+path_look = guard_door_look
+def_state_standing = guard
+def_state_moving1 = walk
+def_state_moving2 = walk
+def_state_moving3 = walk
+;on_info = {+bar_barman_need_room} walker@guard_nodoor
+;soundgroup = bar_visitors1
+danger = danger_ignore
+;on_actor_in_zone = bar_bar_room_area | walker@guard_nodoor
+meet = meet@1
+corpse_detection_enabled = false
+gather_items_enabled = false
+help_wounded_enabled = false
+
+[meet@1]
+close_distance = 2
+close_victim = actor
+close_anim = guard
+close_snd_hello = bar_guard_stop
+close_snd_distance = 2
+use			    = false
+use_wpn		    = false
+abuse           = false
+
+
+[danger_ignore]
+ignore_distance = 0
+
+[walker@guard_nodoor]
+path_walk = guard_nodoor_walk
+path_look = guard_nodoor_look
+def_state_standing = ward
+def_state_moving1 = walk
+def_state_moving2 = walk
+def_state_moving3 = walk
+on_actor_not_in_zone = bar_bar_room_area |  {-bar_barman_need_room} walker@guard_door
+;soundgroup = bar_visitors1
+danger = danger_ignore
+meet = meet@1

@@ -1,0 +1,31 @@
+    <?xml version='1.0' encoding="windows-1251"?>
+    <xml>
+        <!-------------------------- FORESTER ------------------------>
+        <specific_character id="red_forester_tech" team_default="1">
+        <name>red_forester_name</name>
+        <icon>ui_inGame2_forester</icon>
+        <bio>red_forester_name</bio>
+        <class>red_forester</class>
+        <community>trader</community>
+        <map_icon x="1" y="0"/>
+        <terrain_sect>stalker_terrain</terrain_sect>
+        <rank>28902</rank>
+        <reputation>2425</reputation>
+        <money min="5000" max="20000" infinitive="0"/>
+        <visual>actors\stalker_lesnik\stalker_lesnik_1</visual>
+        <supplies>
+        [spawn] \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+    <mechanic_mode>1</mechanic_mode>
+    <start_dialog>red_forester_hello_dialog</start_dialog>
+    <actor_dialog>red_forester_who_are_you</actor_dialog>
+    <actor_dialog>red_forester_about_zone</actor_dialog>
+    <actor_dialog>red_forester_about_forest</actor_dialog>
+    <actor_dialog>dm_tech_repair</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+</xml>

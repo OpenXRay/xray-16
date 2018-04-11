@@ -1,0 +1,44 @@
+[logic@jup_b6_scientist_nuclear_physicist]
+suitable = {=check_npc_name(jup_b6_scientist_nuclear_physicist)} true
+trade = misc\trade\trade_ecolog_hermann.ltx
+prior = 200
+active = walker@meet
+level_spot = trader
+
+[meet@default]
+close_snd_hello = jup_b6_scientist_nuclear_physicist_greeting
+close_snd_bye = jup_b6_scientist_nuclear_physicist_farewell
+close_anim 		= nil
+close_victim = actor
+far_anim 		= nil
+far_victim = actor
+close_distance = 2
+far_distance = 3
+close_snd_distance = 3
+allow_break = false
+meet_on_talking = true
+use = {=actor_enemy} false, true
+trade_enable = true
+
+[walker@generic]
+meet = meet@default
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_b41_sr_light
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+on_info1 = {!npc_in_zone(jup_b41_sr_light)} %=teleport_npc(jup_b41_nuc_walk)%
+
+[walker@meet]:walker@generic
+path_walk = nuc_walk
+path_look  = nuc_look
+def_state_standing = wait_trade
+def_state_moving = walk_noweap
+on_actor_dist_le_nvis = 5 | remark@stand_still
+
+[remark@stand_still]:walker@generic
+target = story | actor
+anim = wait_trade
+on_actor_dist_ge_nvis = 6 | walker@meet

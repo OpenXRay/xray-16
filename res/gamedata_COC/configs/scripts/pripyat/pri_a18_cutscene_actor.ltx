@@ -1,0 +1,21 @@
+[logic]
+active = animpoint@pri_a18_start
+on_hit = hit
+
+[animpoint@pri_a18_start]
+cover_name = pri_a18_sc_cutscene_actor
+avail_animations = pri_a18_inspert_monolit_actor
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+on_signal = sound_end | %+pri_a18_koval_go_on%
+on_info = {+pri_a18_radio_start} %=play_sound(pri_a18_actor_report)%
+on_info2 = {+pri_a18_cutscene_actor_destr} %=destroy_object%
+
+[hit]
+on_info = %+pri_a18_cut_actor_hit =destroy_object%

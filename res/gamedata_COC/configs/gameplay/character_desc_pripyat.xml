@@ -1,0 +1,1224 @@
+<?xml version='1.0' encoding="windows-1251"?>
+<xml>
+    <!-- pri_a17_military_captain_tarasov -->
+    <specific_character id="pri_a17_military_captain_tarasov" team_default = "1">
+    <name>pri_a17_military_captain_tarasov</name>
+    <icon>ui_inGame2_Soldier_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a17_military_captain_tarasov</class>
+    <community>army</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\military\</snd_config>
+    <rank>6352</rank>
+    <reputation>-2366</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_val = 1, scope \n
+        ammo_9x39_ap = 1 \n
+        wpn_pb \n
+        ammo_9x18_pmm = 1 \n
+        wpn_binoc = 1 \n
+#include "gameplay\character_food_army.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+    <actor_dialog>pri_a17_military_recon_squad_ambush_actor_ready</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- pri_a17_military_prapor_valentyr -->
+    <specific_character id="pri_a17_military_prapor_valentyr" team_default = "1">
+    <name>pri_a17_military_prapor_valentyr</name>
+    <icon>ui_inGame2_Soldier_3</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a17_military_prapor_valentyr</class>
+    <community>army</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\military\</snd_config>
+    <rank>10722</rank>
+    <reputation>-1254</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_3</visual>
+    <supplies>
+        [spawn] \n
+        wpn_abakan = 1 \n
+        ammo_5.45x39_ap = 1 \n
+        wpn_pb \n
+        ammo_9x18_pmm = 1 \n
+        wpn_binoc = 1 \n
+#include "gameplay\character_food_army.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- pri_a17_military_sergeant_morozov -->
+    <specific_character id="pri_a17_military_sergeant_morozov" team_default = "1">
+    <name>pri_a17_military_sergeant_morozov</name>
+    <icon>ui_inGame2_Soldier_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a17_military_sergeant_morozov</class>
+    <community>army</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\military\</snd_config>
+    <rank>6720</rank>
+    <reputation>-353</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_svu \n
+        ammo_7.62x54_7h1 = 1 \n
+        wpn_pb \n
+        ammo_9x18_pmm = 1 \n
+        wpn_binoc = 1 \n
+#include "gameplay\character_food_army.xml"
+#include "gameplay\character_drugs_2.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- pri_a17_military_lieutenant_podorojniy -->
+    <specific_character id="pri_a17_military_lieutenant_podorojniy" team_default = "1">
+    <name>pri_a17_military_lieutenant_podorojniy</name>
+    <icon>ui_inGame2_Soldier_3</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a17_military_lieutenant_podorojniy</class>
+    <community>army</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\military\</snd_config>
+    <rank>11346</rank>
+    <reputation>-1117</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_3</visual>
+    <supplies>
+        [spawn] \n
+        wpn_abakan = 1 \n
+        ammo_5.45x39_ap = 1 \n
+        wpn_pb \n
+        ammo_9x18_pmm = 1 \n
+        wpn_binoc = 1 \n
+#include "gameplay\character_food_army.xml"
+#include "gameplay\character_drugs_2.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- pri_a17_military_colonel_kovalski -->
+    <specific_character id="pri_a17_military_colonel_kovalski" team_default = "1">
+    <name>pri_a17_military_colonel_kovalski_name</name>
+    <icon>ui_inGame2_Kovalskiy</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a17_military_colonel_kovalski</class>
+    <community>army</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\military\</snd_config>
+    <rank>13728</rank>
+    <reputation>451</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_3_face_1</visual>
+    <supplies>
+        [spawn] \n
+        wpn_fort \n
+        wpn_groza \n
+        ammo_9x18_pmm = 1 \n
+        ammo_9x39_ap = 1 \n
+        hand_radio \n
+        wpn_binoc = 1 \n
+#include "gameplay\character_food_army.xml"
+#include "gameplay\character_drugs_2.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <start_dialog>pri_a17_military_base_commander_start</start_dialog>
+    <actor_dialog>pri_a17_military_base_commander_actor_dialog_1</actor_dialog>
+    <actor_dialog>pri_a17_military_base_commander_actor_questions_dialog</actor_dialog>
+    <actor_dialog>pri_a17_military_colonel_kovalski_a23_about_gauss_labx8</actor_dialog>
+    <actor_dialog>pri_a16_colonel_a21_about_sentry_dialog</actor_dialog>
+    <actor_dialog>pri_a16_colonel_a21_about_sentry_pass_task_dialog</actor_dialog>
+    <actor_dialog>pri_a17_military_colonel_kovalski_b35_about_merc_start</actor_dialog>
+    <actor_dialog>pri_a17_military_colonel_kovalski_b35_actor_know_about_merc</actor_dialog>
+    <actor_dialog>pri_a17_military_colonel_kovalski_b35_reward</actor_dialog>
+    <actor_dialog>pri_a17_military_colonel_kovalski_evacuation_ready</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <!-- pri_a17_monolith_preacher -->
+    <specific_character id="pri_a17_monolith_preacher" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a17_monolith_preacher</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <rank>16332</rank>
+    <reputation>-561</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_3</visual>
+    <supplies>
+        [spawn] \n
+        wpn_gauss = 1 \n
+        wpn_colt1911 = 1 \n
+        ammo_gauss = 1 \n
+        ammo_11.43x23_fmj = 1 \n
+#include "gameplay\character_food_army.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- pri_a15_sokolov -->
+    <specific_character id="pri_a15_sokolov" team_default = "1">
+    <name>pri_a15_sokolov_name</name>
+    <icon>ui_inGame2_Sokolov</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a15_sokolov</class>
+    <community>army</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\military\</snd_config>
+    <rank>6430</rank>
+    <reputation>69</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_1_face_1</visual>
+    <supplies>
+        [spawn] \n
+        wpn_ak74u \n
+        ammo_5.45x39_fmj = 1 \n
+        wpn_fort \n
+        ammo_9x18_pmm = 1 \n
+        wpn_binoc = 1 \n
+#include "gameplay\character_food_army.xml"
+#include "gameplay\character_drugs_2.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <start_dialog>pri_a15_sokolov_start_dialog</start_dialog>
+    <actor_dialog>pri_a15_sokolov_where_from</actor_dialog>
+    <actor_dialog>pri_a15_sokolov_jupiter</actor_dialog>
+    <actor_dialog>pri_a15_sokolov_evacuation_point</actor_dialog>
+    <actor_dialog>pri_a15_sokolov_evacuation_note</actor_dialog>
+    <actor_dialog>pri_a15_sokolov_occupation</actor_dialog>
+    <actor_dialog>pri_a15_sokolov_pripyat_group</actor_dialog>
+    <actor_dialog>pri_a15_sokolov_need_outfit</actor_dialog>
+    <actor_dialog>pri_a15_sokolov_arranged_outfit</actor_dialog>
+    <actor_dialog>pri_a15_sokolov_goto_zulus</actor_dialog>
+    <actor_dialog>pri_a15_sokolov_acquaintance_after_jorney</actor_dialog>
+    <actor_dialog>pri_a15_sokolov_about_journey</actor_dialog>
+    <actor_dialog>pri_a15_sokolov_helicopter</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <!-- Соколов в костюме с куполом pri_a15_sokolov_sci -->
+    <specific_character id="pri_a15_sokolov_sci" team_default = "1">
+    <name>pri_a15_sokolov_name</name>
+    <icon>ui_inGame2_Sokolov_ecolog</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a15_sokolov_sci</class>
+    <community>army</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\military\</snd_config>
+    <rank>8428</rank>
+    <reputation>159</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_ecolog_face_1</visual>
+    <supplies>
+        [spawn] \n
+        wpn_ak74u \n
+        ammo_5.45x39_fmj = 1 \n
+        wpn_fort \n
+        ammo_9x18_pmm = 1 \n
+#include "gameplay\character_food_army.xml"
+#include "gameplay\character_drugs_2.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <start_dialog>pri_a15_sokolov_start_dialog</start_dialog>
+    <actor_dialog>pri_a15_sokolov_pripyat_ready</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <specific_character id="pri_a15_sokolov_sci_head" team_default = "1">
+    <name>pri_a15_sokolov_name</name>
+    <icon>ui_inGame2_Sokolov</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a15_sokolov_sci_head</class>
+    <community>army</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\military\</snd_config>
+    <rank>8586</rank>
+    <reputation>447</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_1_face_1</visual>
+    <supplies>
+        [spawn] \n
+        wpn_abakan \n
+        ammo_5.45x39_ap = 1 \n
+        wpn_fort \n
+        ammo_9x18_pmm = 1 \n
+        wpn_binoc = 1 \n
+#include "gameplay\character_food_army.xml"
+#include "gameplay\character_drugs_2.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <start_dialog>pri_a15_sokolov_start_dialog</start_dialog>
+    <actor_dialog>pri_a15_sokolov_pripyat_ready</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <specific_character id="pri_a22_military_merkulov" team_default = "1">
+    <name>pri_a18_vano_in_suit_reserve_name</name>
+    <icon>ui_inGame2_Soldier_4</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a22_military_merkulov</class>
+    <community>army</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\military\</snd_config>
+    <rank>14854</rank>
+    <reputation>-840</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_4</visual>
+    <supplies>
+        [spawn] \n
+        wpn_val \n
+        ammo_9x39_ap = 1 \n
+        wpn_fort \n
+        ammo_9x18_pmm = 1 \n
+        wpn_binoc = 1 \n
+#include "gameplay\character_food_army.xml"
+#include "gameplay\character_drugs_2.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="pri_a22_military_skelja" team_default = "1">
+    <name>pri_a18_skorlupko_in_suit_name</name>
+    <icon>ui_inGame2_Soldier_4</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a22_military_skelja</class>
+    <community>army</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\military\</snd_config>
+    <rank>13284</rank>
+    <reputation>-1692</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_4</visual>
+    <supplies>
+        [spawn] \n
+        wpn_abakan = 1 \n
+        ammo_5.45x39_ap = 1 \n
+        wpn_fort \n
+        ammo_9x18_pmm = 1 \n
+        wpn_binoc = 1 \n
+#include "gameplay\character_food_army.xml"
+#include "gameplay\character_drugs_2.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="pri_a22_military_yarmoshuk" team_default = "1">
+    <name>pri_a22_military_yarmoshuk_name</name>
+    <icon>ui_inGame2_Soldier_3</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a22_military_yarmoshuk</class>
+    <community>army</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\military\</snd_config>
+    <rank>12756</rank>
+    <reputation>1646</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_3</visual>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_fmj = 1 \n
+        wpn_fort \n
+        ammo_9x18_fmj = 1 \n
+        wpn_binoc = 1 \n
+#include "gameplay\character_food_army.xml"
+#include "gameplay\character_drugs.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- pri_a15_military_recon_leader -->
+    <specific_character id="pri_a15_military_recon_leader" team_default = "1">
+    <name>pri_a15_military_recon_leader_name</name>
+    <icon>ui_inGame2_Soldier_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a15_military_recon_leader</class>
+    <community>army</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\military\</snd_config>
+    <rank>8654</rank>
+    <reputation>-366</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_abakan = 1 \n
+        ammo_5.45x39_fmj = 1 \n
+        wpn_fort \n
+        ammo_9x18_pmm = 1 \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food_army.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- pri_a15_military_recon_1 -->
+    <specific_character id="pri_a15_military_recon_1" team_default = "1">
+    <name>pri_a15_military_recon_1_name</name>
+    <icon>ui_inGame2_Soldier_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a15_military_recon_1</class>
+    <community>army</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\military\</snd_config>
+    <rank>8494</rank>
+    <reputation>-1067</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 = 1, launcher \n
+        ammo_5.45x39_fmj = 1 \n
+        wpn_fort \n
+        ammo_9x18_pmm = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- pri_a15_military_recon_2 -->
+    <specific_character id="pri_a15_military_recon_2" team_default = "1">
+    <name>pri_a15_military_recon_2_name</name>
+    <icon>ui_inGame2_Soldier_4</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a15_military_recon_2</class>
+    <community>army</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\military\</snd_config>
+    <rank>14264</rank>
+    <reputation>1814</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_4</visual>
+    <supplies>
+        [spawn] \n
+        wpn_val \n
+        ammo_9x39_pab9 = 1 \n
+        wpn_fort \n
+        ammo_9x18_pmm = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- pri_a15_military_recon_3 -->
+    <specific_character id="pri_a15_military_recon_3" team_default = "1">
+    <name>pri_a15_military_recon_3_name</name>
+    <icon>ui_inGame2_Soldier_4</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a15_military_recon_3</class>
+    <community>army</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\military\</snd_config>
+    <rank>12650</rank>
+    <reputation>-2284</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_4</visual>
+    <supplies>
+        [spawn] \n
+        wpn_vintorez \n
+        ammo_9x39_ap = 1 \n
+        wpn_fort \n
+        ammo_9x18_pmm = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="pri_a21_sentry_lieutenant_stecenko" team_default = "1">
+    <name>pri_a21_sentry_lieutenant_stecenko_name</name>
+    <icon>ui_inGame2_Soldier_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a21_sentry_lieutenant_stecenko</class>
+    <community>army</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\military\</snd_config>
+    <rank>7102</rank>
+    <reputation>-505</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_ak74u = 1 \n
+        ammo_5.45x39_fmj = 1 \n
+        wpn_binoc = 1 \n
+        device_torch = 1
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="pri_a25_army_medic" team_default = "1">
+    <name>pri_a25_army_medic_name</name>
+    <icon>ui_inGame2_Rogovets</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a25_army_medic</class>
+    <community>army</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\military\</snd_config>
+    <rank>9686</rank>
+    <reputation>270</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_2_face_1</visual>
+    <supplies>
+        [spawn] \n
+        wpn_abakan = 1 \n
+        ammo_5.45x39_ap = 1 \n
+        wpn_fort \n
+        ammo_9x18_fmj = 1 \n
+        wpn_binoc = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_mil.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <start_dialog>pri_a25_army_medic_start_dialog</start_dialog>
+    <actor_dialog>pri_a25_army_medic_rescued</actor_dialog>
+    <actor_dialog>pri_a25_army_medic_supply_medicine</actor_dialog>
+    <actor_dialog>pri_a25_army_medic_need_health_care</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <!-- Pripyat B306 -->
+    <!-- Durad Vidic -->
+    <specific_character id="pri_b306_envoy" team_default = "1">
+    <name>pri_b306_envoy_name</name>
+    <icon>ui_inGame2_merc_durad</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_b306_envoy</class>
+    <community>killer</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <rank>28322</rank>
+    <reputation>2160</reputation>
+    <visual>actors\stalker_merc\stalker_merc_2_face_1</visual>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <!-- Pripyat A15 -->
+    <specific_character id="pri_a15_actor" team_default = "1">
+    <name>st_actor_name</name>
+    <icon>ui_inGame2_Hero</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a15_actor</class>
+    <community>stalker</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <rank>494</rank>
+    <reputation>147</reputation>
+    <visual>actors\stalker_hero\stalker_hero_1</visual>
+    <supplies>
+        [spawn] \n
+        device_torch \n
+        pri_a15_wpn_ak74 \n
+        pri_a15_documents \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="pri_a15_vano" team_default = "1">
+    <name>jup_a10_stalker_vano</name>
+    <icon>ui_inGame2_Vano_nauchniy</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a15_vano</class>
+    <community>stalker</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\stalker\</snd_config>
+    <rank>11416</rank>
+    <reputation>629</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral_nauchniy_face_1</visual>
+    <supplies>
+        [spawn] \n
+        device_torch \n
+        pri_a15_wpn_wincheaster1300 \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="pri_a15_sokolov_scene" team_default = "1">
+    <name>pri_a15_sokolov_name</name>
+    <icon>ui_inGame2_Sokolov_ecolog</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a15_sokolov_scene</class>
+    <community>army</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\military\</snd_config>
+    <rank>8992</rank>
+    <reputation>123</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_ecolog_face_1</visual>
+    <supplies>
+        [spawn] \n
+        device_torch \n
+        pri_a15_wpn_ak74u \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="pri_a15_zulus" team_default = "1">
+    <name>jup_b15_zulus</name>
+    <icon>ui_inGame2_Zulus</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a15_zulus</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\dolg\</snd_config>
+    <rank>17766</rank>
+    <reputation>104</reputation>
+    <visual>actors\stalker_dolg\stalker_dolg_1_face_1</visual>
+    <supplies>
+        [spawn] \n
+        device_torch \n
+        wpn_pkm_zulus = 1 \n
+        ammo_pkm_100 = 1 \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="pri_a15_wanderer" team_default="1">
+    <name>jup_b4_monolith_squad_leader_name</name>
+    <icon>ui_inGame2_Brodyaga_monolit</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a15_wanderer</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <rank>10324</rank>
+    <reputation>430</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_1_face_1</visual>
+    <supplies>
+        [spawn] \n
+        device_torch \n
+        pri_a15_wpn_svu \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="pri_a15_military_tarasov" team_default = "1">
+    <name>pri_a17_military_captain_tarasov</name>
+    <icon>ui_inGame2_Soldier_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a15_military_tarasov</class>
+    <community>army</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\military\</snd_config>
+    <rank>6812</rank>
+    <reputation>1213</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_fmj = 1 \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="pri_a15_military_2" team_default = "1">
+    <name>pri_a17_military_prapor_valentyr</name>
+    <icon>ui_inGame2_Soldier_4</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a15_military_2</class>
+    <community>army</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\military\</snd_config>
+    <rank>10294</rank>
+    <reputation>1535</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_4</visual>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_fmj = 1 \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="pri_a15_military_3" team_default = "1">
+    <name>pri_a17_military_sergeant_morozov</name>
+    <icon>ui_inGame2_Soldier_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a15_military_3</class>
+    <community>army</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\military\</snd_config>
+    <rank>7440</rank>
+    <reputation>-1470</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_fmj = 1 \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="pri_a15_military_4" team_default = "1">
+    <name>pri_a17_military_lieutenant_podorojniy</name>
+    <icon>ui_inGame2_Soldier_3</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a15_military_4</class>
+    <community>army</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\military\</snd_config>
+    <rank>14348</rank>
+    <reputation>2440</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_3</visual>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_fmj = 1 \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- Pripyat B35 -->
+    <specific_character id="pri_a22_army_signaller" team_default = "1">
+    <name>st_pri_a22_army_signaller</name>
+    <icon>ui_inGame2_Soldier_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a22_army_signaller</class>
+    <community>stalker</community>
+    <mechanic_mode>1</mechanic_mode>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_01\military\</snd_config>
+    <rank>7654</rank>
+    <reputation>1745</reputation>
+    <money min="1000"  max="5000"  infinitive="0"/>
+    <visual>actors\stalker_soldier\stalker_soldier_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_groza \n
+        ammo_9x39_ap = 1 \n
+        wpn_fort \n
+        ammo_9x18_pmm = 1 \n
+        hand_radio \n
+        wpn_binoc = 1 \n
+#include "gameplay\character_food_army.xml"
+#include "gameplay\character_drugs_2.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <start_dialog>pri_a22_army_signaller_start_dialog</start_dialog>
+    <actor_dialog>pri_a22_army_signaller_about_rfi_source</actor_dialog>
+    <actor_dialog>pri_a22_army_signaller_about_signal</actor_dialog>
+    <actor_dialog>pri_a22_army_signaller_supply_outfit</actor_dialog>
+    <actor_dialog>pri_a22_army_signaller_supply_ammo</actor_dialog>
+    <actor_dialog>pri_a22_army_signaller_supply_grenade</actor_dialog>
+    <actor_dialog>dm_tech_repair</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <specific_character id="pri_b35_merc_leader" team_default = "1">
+    <name>st_pri_b35_merc_leader</name>
+    <icon>ui_inGame2_merc_4</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_b35_merc_leader</class>
+    <community>killer</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\killer\</snd_config>
+    <rank>27596</rank>
+    <reputation>953</reputation>
+    <visual>actors\stalker_merc\stalker_merc_4</visual>
+    <supplies>
+        [spawn] \n
+        wpn_g36 \n
+        ammo_5.56x45_ap = 1 \n
+        wpn_usp \n
+        ammo_11.43x23_hydro = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <specific_character id="pri_b35_merc_grenade_launcher_1" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_merc_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_b35_merc_grenade_launcher_1</class>
+    <community>killer</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\killer\</snd_config>
+    <rank>14964</rank>
+    <reputation>848</reputation>
+    <visual>actors\stalker_merc\stalker_merc_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_rpg7 \n
+        wpn_usp = 1 \n
+        ammo_11.43x23_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <specific_character id="pri_b35_merc_grenade_launcher_2" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_merc_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_b35_merc_grenade_launcher_2</class>
+    <community>killer</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\killer\</snd_config>
+    <rank>10862</rank>
+    <reputation>2300</reputation>
+    <visual>actors\stalker_merc\stalker_merc_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_rpg7 \n
+        wpn_usp = 1 \n
+        ammo_11.43x23_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <specific_character id="pri_b35_envoy" team_default = "1">
+    <name>st_pri_b35_envoy</name>
+    <icon>ui_inGame2_ecolog_green</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_b35_envoy</class>
+    <community>killer</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <rank>4342</rank>
+    <reputation>-1463</reputation>
+    <visual>actors\stalker_ecologist\stalker_ecolog_military</visual>
+    <supplies>
+        [spawn] \n
+        wpn_usp = 1 \n
+        ammo_11.43x23_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <specific_character id="pri_b35_guard_envoy_1" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_ecolog_green</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_b35_guard_envoy_1</class>
+    <community>killer</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <rank>5314</rank>
+    <reputation>828</reputation>
+    <visual>actors\stalker_ecologist\stalker_ecolog_military</visual>
+    <supplies>
+        [spawn] \n
+        wpn_lr300 = 1, scope \n
+        ammo_5.56x45_ap = 1 \n
+        wpn_usp = 1 \n
+        ammo_11.43x23_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <specific_character id="pri_b35_guard_envoy_2" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_ecolog_green</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_b35_guard_envoy_2</class>
+    <community>killer</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <rank>3948</rank>
+    <reputation>14</reputation>
+    <visual>actors\stalker_ecologist\stalker_ecolog_military</visual>
+    <supplies>
+        [spawn] \n
+        wpn_lr300 = 1, scope \n
+        ammo_5.56x45_ap = 1 \n
+        wpn_usp = 1 \n
+        ammo_11.43x23_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <!-- b36 -->
+    <specific_character id="pri_b36_monolith_sniper" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_b36_monolith_sniper</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\monolith\</snd_config>
+    <rank>2228</rank>
+    <reputation>1153</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_svd = 1 \n
+        ammo_7.62x54_7h1 = 3 \n
+        wpn_colt1911 = 1 \n
+        ammo_11.43x23_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <specific_character id="pri_b36_monolith_master_hiding_place" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_b36_monolith_master_hiding_place</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\monolith\</snd_config>
+    <rank>18288</rank>
+    <reputation>-471</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_3</visual>
+    <supplies>
+        [spawn] \n
+        wpn_protecta = 1 \n
+        ammo_12x76_zhekan = 1 \n
+        wpn_desert_eagle = 1 \n
+        ammo_11.43x23_hydro = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <specific_character id="pri_b36_monolith_marine_sniper" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_b36_monolith_marine_sniper</class>
+    <community>monolith</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\monolith\</snd_config>
+    <rank>17692</rank>
+    <reputation>-1033</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_3</visual>
+    <supplies>
+        [spawn] \n
+        wpn_vintorez = 1 \n
+        ammo_9x39_ap = 3 \n
+        wpn_colt1911 = 1 \n
+        ammo_11.43x23_hydro = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+    <specific_character id="pri_b305_strelok" team_default = "1">
+    <name>pri_b305_strelok_name</name>
+    <icon>ui_inGame2_Strelok</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_b305_strelok</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\stalker\</snd_config>
+    <rank>976</rank>
+    <reputation>136</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral_nauchniy_face_2</visual>
+    <supplies>
+        [spawn] \n
+        device_torch \n
+        detector_simple \n
+        wpn_binoc \n
+        wpn_colt1911 = 1 \n
+        ammo_11.43x23_fmj = 1 \n
+        wpn_ak74u = 1 \n
+        ammo_5.45x39_ap = 3 \n
+#include "gameplay\character_food_army.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <start_dialog>pri_b305_strelok_dialog</start_dialog>
+    <actor_dialog>pri_b305_strelok_about_information</actor_dialog>
+    <actor_dialog>pri_b305_strelok_about_station</actor_dialog>
+    <actor_dialog>pri_b305_strelok_about_base</actor_dialog>
+    <actor_dialog>pri_b305_strelok_note</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <specific_character id="pri_a28_evac_com" team_default = "1">
+    <name>pri_a28_evac_com_name</name>
+    <icon>ui_inGame2_Soldier_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_a28_evac_com</class>
+    <community>army</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\military\</snd_config>
+    <rank>6172</rank>
+    <reputation>-1762</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_abakan = 1 \n
+        ammo_5.45x39_ap = 1 \n
+        wpn_fort \n
+        ammo_9x18_pmm = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="sim_default_stalker_pri_a16" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_neutral_nauchniy</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>sim_default_stalker_pri_a16</class>
+    <community>stalker</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <rank>11882</rank>
+    <money min="5000" max="10000" infinitive="0"/>
+    <reputation>-1140</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral_nauchniy</visual>
+    <supplies>
+        [spawn] \n
+        wpn_vintorez \n
+        ammo_9x39_ap = 1 \n
+        wpn_sig220 = 1 \n
+        ammo_11.43x23_hydro = 1 \n
+        wpn_spas12 \n
+        ammo_12x76_zhekan = 1 \n
+        grenade_f1 = 4 \n
+#include "gameplay\character_items_3.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_sci.xml"
+
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs_no_guide.xml"
+    </specific_character>
+    
+    <specific_character id="pri_medic_stalker" team_default = "1">
+    <name>jup_b19_freedom_yar_name</name>
+    <icon>ui_inGame2_Dyadka_Yar</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_medic_stalker</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\freedom\</snd_config>
+    <rank>18778</rank>
+    <reputation>2309</reputation>
+    <money min="1000000" max="1000000" infinitive="1"/>
+    <visual>actors\stalker_freedom\stalker_freedom_2_face_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_svd = 1 \n
+        ammo_7.62x54_7h1 = 3 \n
+        wpn_beretta = 1 \n
+        ammo_9x19_pbp = 1 \n
+#include "gameplay\character_food_army.xml"
+#include "gameplay\character_drugs.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+    <actor_dialog>jup_b19_freedom_yar_pripyat_healing</actor_dialog>
+    <actor_dialog>jup_b19_freedom_yar_break_dialog</actor_dialog>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <!-- MONOLITH TRADER -->
+    <specific_character id="pri_monolith_monolith_trader_stalker" team_default="1">
+    <name>pri_monolith_monolith_trader_stalker_name</name>
+    <icon>ui_inGame2_monolith_trade</icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pri_monolith_monolith_trader_stalker</class>
+    <community>monolith</community>
+    <map_icon x="1" y="0"/>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>23692</rank>
+    <reputation>380</reputation>
+    <money min="1000000" max="1000000" infinitive="1"/>
+    <visual>actors\stalker_monolith\stalker_monolith_2_face_1</visual>
+    <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <supplies></supplies>
+#include "gameplay\character_criticals.xml"
+        <actor_dialog>dm_ordered_task_dialog</actor_dialog>
+        <actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+        <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+		<actor_dialog>dm_broker_dialog</actor_dialog>
+        <actor_dialog>actor_break_dialog</actor_dialog>
+        </specific_character>
+        
+        <!-- MONOLITH MECHANIC -->
+        <specific_character id="pri_monolith_monolith_mechanic_stalker" team_default="1">
+        <name>pri_monolith_monolith_mechanic_stalker_name</name>
+        <icon>ui_inGame2_monolith_tech</icon>
+        <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+        <class>pri_monolith_monolith_mechanic_stalker</class>
+        <community>monolith</community>
+        <map_icon x="1" y="0"/>
+        <terrain_sect>stalker_terrain</terrain_sect>
+        <mechanic_mode>1</mechanic_mode>
+        <rank>17396</rank>
+        <reputation>-900</reputation>
+        <visual>actors\stalker_monolith\stalker_monolith_2_face_2</visual>
+        <snd_config>characters_voice\human_01\monolith\</snd_config>
+    <supplies></supplies>
+#include "gameplay\character_criticals.xml"
+        <actor_dialog>dm_ordered_task_dialog</actor_dialog>
+        <actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+        <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+        <actor_dialog>dm_tech_repair</actor_dialog>
+        <actor_dialog>actor_break_dialog</actor_dialog>
+        </specific_character>
+        
+    </xml>

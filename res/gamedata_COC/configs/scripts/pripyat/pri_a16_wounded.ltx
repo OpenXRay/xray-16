@@ -1,0 +1,19 @@
+[logic@pri_a16_wounded]
+active = animpoint@base
+suitable = {=check_npc_name(pri_a21_sentry_lieutenant_stecenko)} true
+prior = 200
+
+[animpoint@base]
+cover_name = pri_a16_animp_wounded
+avail_animations = zat_b106_wounded_idle
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+on_info = {+zat_a23_actor_has_gauss_rifle_documentation} %=remove_squad(pri_a21_chasovoi)%
+meet = no_meet
+out_restr = pri_a16_sr_noweap
+reach_distance = 5
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = false

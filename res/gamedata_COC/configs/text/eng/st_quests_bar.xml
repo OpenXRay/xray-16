@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<!-- DEFEND TERRITORY FOR DUTY TASK -->
+	<string id="bar_dolg_general_petrenko_stalker_task_1_name">
+		<text>Defend territory for Duty</text>
+	</string>
+	<string id="bar_dolg_general_petrenko_stalker_task_1_text">
+		<text>Hostile forces are encroaching on Duty territory. General Petrenko has asked you to eliminate the threat.</text>
+	</string>
+	<string id="bar_dolg_general_petrenko_stalker_task_1_about">
+		<text>I have been informed that enemy forces are advancing on one of our camps. I need you to stop them before they get there.</text>
+	</string>
+	<string id="bar_dolg_general_petrenko_stalker_task_1_finish">
+		<text>Excellent work. You are a fine warrior.</text>
+	</string>
+	<!-- CAPTURE TERRITORY FOR DUTY TASK -->
+	<string id="bar_dolg_general_petrenko_stalker_task_2_name">
+		<text>Recapture territory for Duty</text>
+	</string>
+	<string id="bar_dolg_general_petrenko_stalker_task_2_text">
+		<text>You have been tasked to recapture territory for Duty. Report back to General Petrenko after the job is done.</text>
+	</string>
+	<string id="bar_dolg_general_petrenko_stalker_task_2_about">
+		<text>I have an important mission available. Freedom has taken over one of our camps and I need a specialist to reclaim it.</text>
+	</string>
+	<string id="bar_dolg_general_petrenko_stalker_task_2_finish">
+		<text>The task is done? Good job.</text>
+	</string>
+	<!-- ASSASSINATION FOR DUTY TASK -->
+	<string id="bar_dolg_general_petrenko_stalker_task_3_name">
+		<text>Assassinate VIP</text>
+	</string>
+	<string id="bar_dolg_general_petrenko_stalker_task_3_text">
+		<text>General Petrenko has ordered you to find and eliminate a target.</text>
+	</string>
+	<string id="bar_dolg_general_petrenko_stalker_task_3_about">
+		<text>I have a list of VIPs that need...taken care of. Some are informants, high-ranking Freedom members, squad leaders, tacticians or just plain scum. Extract information if you can, otherwise kill-on-sight.</text>
+	</string>
+	<string id="bar_dolg_general_petrenko_stalker_task_3_finish">
+		<text>Great! You do us proud. Here is what I promised.</text>
+	</string>
+	<!-- FIND LEVEL 1 TOOLKIT FOR MANGUN TASK -->
+	<string id="bar_visitors_stalker_mechanic_task_1_name">
+		<text>Find "%s"</text>
+	</string>
+	<string id="bar_visitors_stalker_mechanic_task_1_text">
+		<text>%s are required by Mangun to install basic equipment upgrades, you should bring them back to him if you find any.</text>
+	</string>
+	<string id="bar_visitors_stalker_mechanic_task_1_about">
+		<text>I can really use a good set of tools, stalker...and maybe some money. If you are interested in helping me out, I will tell you what I am looking for.</text>
+	</string>
+	<string id="bar_visitors_stalker_mechanic_task_1_fetch_about">
+		<text>I need a set of basic tools. It should contain what I need. If you can bring some back for me I will be grateful, I will even offer you a discount from here on out.</text>
+	</string>
+	<string id="bar_visitors_stalker_mechanic_task_1_fetch_finish">
+		<text>Cool dude...uh, sorry I can't pay you. I'll give you a good discount though, man!</text>
+	</string>
+	<!-- FIND LEVEL 2 TOOLKIT FOR MANGUN TASK -->
+	<string id="bar_visitors_stalker_mechanic_task_2_name">
+		<text>Find "%s"</text>
+	</string>
+	<string id="bar_visitors_stalker_mechanic_task_2_text">
+		<text>%s are required by Mangun to install advanced equipment upgrades, you should bring them back to him if you find any.</text>
+	</string>
+	<string id="bar_visitors_stalker_mechanic_task_2_about">
+		<text>Hey, dude, if you happen to find some more advanced tools I will give you a discount. Will you keep a lookout for me?</text>
+	</string>
+	<string id="bar_visitors_stalker_mechanic_task_2_fetch_about">
+		<text>I need a set of advanced tools. It should contain what I need. If you can bring some back for me I will be grateful, I will even offer you a discount from here on out.</text>
+	</string>
+	<string id="bar_visitors_stalker_mechanic_task_2_fetch_finish">
+		<text>Great...GREAT! Now maybe I can make some damn money. I'm gonna be BIG time, stalker...if I can just get my act together. I don't have much to offer you other then a discount. Sorry, bud.</text>
+	</string>
+	<!-- FIND LEVEL 3 TOOLKIT FOR MANGUN TASK -->
+	<string id="bar_visitors_stalker_mechanic_task_3_name">
+		<text>Find "%s"</text>
+	</string>
+	<string id="bar_visitors_stalker_mechanic_task_3_text">
+		<text>%s are required by Mangun to install expert equipment upgrades, you should bring them back to him if you find any.</text>
+	</string>
+	<string id="bar_visitors_stalker_mechanic_task_3_about">
+		<text>Hey, dude, if you happen to find some more advanced tools I will give you a discount. Will you keep a lookout for me?</text>
+	</string>
+	<string id="bar_visitors_stalker_mechanic_task_3_fetch_about">
+		<text>I need a set of expert tools. It should contain what I need. If you can bring some back for me I will be grateful, I will even offer you a discount from here on out.</text>
+	</string>
+	<string id="bar_visitors_stalker_mechanic_task_3_fetch_finish">
+		<text>Great...GREAT! Now maybe I can make some damn money. I'm gonna be BIG time, stalker...if I can just get my act together. I don't have much to offer you other then a discount. Sorry, bud.</text>
+	</string>
+</string_table>

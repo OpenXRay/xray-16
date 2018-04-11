@@ -1,0 +1,10 @@
+[logic]
+active = nil ;sr_idle@start
+
+[sr_idle@start]
+on_game_timer = 20 |  sr_idle@set %=set_counter(stalker_death)%
+
+[sr_idle@set]
+on_info = {=counter_greater(stalker_death:4)} sr_idle@nil %+zat_b5_stalker_death%
+
+[sr_idle@nil]

@@ -1,0 +1,20 @@
+[smart_terrain]
+squad_id = 1
+max_population = 3
+;;arrive_dist = 100000
+respawn_params = respawn@pas_b400_way
+respawn_idle = 86400
+
+
+[respawn@pas_b400_way]
+spawn_zombies
+
+[spawn_zombies]
+spawn_squads = zombied_sim_squad_advanced
+spawn_num = {+actor_pass_jupiter_exit_find +actor_pass_pripyat_exit_find} 6, 0
+
+[exclusive]
+pas_b400_zulus_way = underpass\pas_b400_way.ltx
+pas_b400_vano_way = underpass\pas_b400_way.ltx
+pas_b400_sokolov_way = underpass\pas_b400_way.ltx
+pas_b400_wanderer_way = underpass\pas_b400_way.ltx

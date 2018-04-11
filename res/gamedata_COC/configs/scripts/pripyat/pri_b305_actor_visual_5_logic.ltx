@@ -1,0 +1,66 @@
+[logic]
+active = walker@deal_talk
+
+; ************************* 5 *****************************
+[walker@deal_talk]
+path_walk = pri_a28_cutscene_actor_base_walk
+path_look = pri_a16_pri_b305_kirillov_walk
+out_restr = pri_a16_sr_noweap
+def_state_standing = wait_na
+on_game_timer = 50 | {-pri_b305_actor_we_have_problems_done} %=play_sound(pri_b305_actor_we_have_problems) +pri_b305_actor_we_have_problems_done%
+on_signal = sound_end | remark@phrase_6 %+pri_b305_actor_we_have_problems_done_end%
+on_info = {+pri_b305_fifth_cam_end} %=destroy_object -pri_b305_5_cam_actor%
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[remark@phrase_6]
+anim = wait_na
+target = story | pri_b305_strelok
+on_info = {+pri_b305_strelok_about_anomaly_randomize_done_end -pri_b305_actor_wondered_done} %=play_sound(pri_b305_actor_wondered) +pri_b305_actor_wondered_done%
+out_restr = pri_a16_sr_noweap
+on_signal = sound_end | remark@phrase_9 %+pri_b305_actor_wondered_done_end%
+on_info2 = {+pri_b305_fifth_cam_end} %=destroy_object -pri_b305_5_cam_actor%
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[remark@phrase_9]
+anim = wait_na
+target = story | pri_b305_strelok
+on_info = {+pri_b305_strelok_how_to_get_away_done_end -pri_b305_actor_need_center_to_know_done} %=play_sound(pri_b305_actor_need_center_to_know) +pri_b305_actor_need_center_to_know_done%
+out_restr = pri_a16_sr_noweap
+on_signal = sound_end | remark@wait_5 %+pri_b305_actor_need_center_to_know_done_end%
+on_info2 = {+pri_b305_fifth_cam_end} %=destroy_object -pri_b305_5_cam_actor%
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[remark@wait_5]
+anim = wait_na
+target = story | pri_b305_strelok
+on_info = {+pri_b305_fifth_cam_end} %=destroy_object -pri_b305_5_cam_actor%
+out_restr = pri_a16_sr_noweap
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false

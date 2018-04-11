@@ -1,0 +1,21 @@
+[logic]
+active = nil ;sr_idle@spawn
+
+[sr_idle@spawn]
+on_info = {-zat_b42_mayron_spawn} sr_idle %=spawn_corpse(zat_b42_mayron:zat_b42_mayron_walk) +zat_b42_mayron_spawn%
+
+[sr_idle]
+on_actor_in_zone = zat_b42_warning_space_restrictor | {-zat_b42_controller_warning_1_sound -zat_b42_controller_dead} %+zat_b42_controller_warning_1_sound =play_sound(zat_b42_controller_warning_1)%
+on_signal = sound_end | {-save_zat_b42_arrived_to_controler_lair} %+save_zat_b42_arrived_to_controler_lair =scenario_autosave(st_save_zat_b42_arrived_to_controler_lair)%
+on_info = {+save_zat_b42_arrived_to_controler_lair} sr_idle@3
+on_info2 = {+zat_b42_controller_dead} sr_idle@nill
+
+[sr_idle@3]
+on_actor_not_in_zone = zat_b42_warning_space_restrictor | sr_idle@4
+on_info = {+zat_b42_controller_dead} sr_idle@nill
+
+[sr_idle@4]
+on_actor_in_zone = zat_b42_warning_space_restrictor | sr_idle@nill %=play_sound(zat_b42_controller_warning_2)%
+on_info = {+zat_b42_controller_dead} sr_idle@nill
+
+[sr_idle@nill]

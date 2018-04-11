@@ -1,0 +1,127 @@
+<w>
+    <file name="ui\ui_npc_unique_2">
+
+    <texture id="ui_npc_u_soldier_bandana_6" x="0" y="0" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_neytral_rukzak_4" x="165" y="0" width="165" height="108" />
+    <texture id="ui_npc_u_soldier_beret" x="330" y="0" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_neytral_balon_6" x="495" y="0" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_bar_security" x="660" y="0" width="165" height="108" />
+    <texture id="ui_npc_u_barman" x="825" y="0" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_do_balon_1" x="0" y="108" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_do_balon_5" x="165" y="108" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_do_balon_3" x="330" y="108" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_do_komandir" x="495" y="108" width="165" height="108" />
+    <texture id="ui_npc_u_ucheniy_2" x="660" y="108" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_ki_head_5" x="825" y="108" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_bandit_borov" x="0" y="216" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_do_balon_7" x="165" y="216" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_do_balon_6" x="339" y="216" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_neytral_balon_4" x="495" y="216" width="165" height="108" />
+    <texture id="ui_npc_u_soldier_beret_1" x="660" y="216" width="165" height="108" />
+    <texture id="ui_npc_u_green_stalker_8" x="825" y="216" width="165" height="108" />
+    <texture id="ui_npc_u_green_stalker_1" x="0" y="324" width="165" height="108" />
+    <texture id="ui_npc_u_trader" x="165" y="324" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_neytral_balon_1" x="330" y="324" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_neytral_balon_5" x="495" y="324" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_do_balon_4" x="660" y="324" width="165" height="108" />
+    <texture id="ui_npc_u_green_stalker_11" x="825" y="324" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_neytral_hood_4" x="0" y="432" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_sv_balon_10" x="165" y="432" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_sv_leader" x="330" y="432" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_sv_max" x="495" y="432" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_sv_cook" x="660" y="432" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_sv_balon_1" x="825" y="432" width="165" height="108" />
+
+    <texture id="ui_npc_u_stalker_bandit_3" x="0" y="540" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_bandit_4" x="165" y="540" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_bandit_5" x="330" y="540" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_bandit_8" x="495" y="540" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_bandit_master" x="660" y="540" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_bandit_veteran" x="825" y="540" width="165" height="108" />
+
+    <texture id="ui_npc_u_stalker_do_antigas" x="0" y="648" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_do_balon_8" x="165" y="648" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_do_exoskeleton" x="330" y="648" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_do_mask_1" x="495" y="648" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_do_mask" x="660" y="648" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_do_nauchniy" x="825" y="648" width="165" height="108" />
+
+    <texture id="ui_npc_u_stalker_ecolog" x="0" y="756" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_ecolog_military" x="165" y="756" width="165" height="108" />
+
+    <texture id="ui_npc_u_stalker_ki_antigas" x="330" y="756" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_ki_exoskeleton" x="495" y="756" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_ki_mask" x="660" y="756" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_ki_nauchniy" x="825" y="756" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_ki_head_1" x="0" y="864" width="165" height="108" />
+
+    <texture id="ui_npc_u_stalker_militari_1" x="165" y="864" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_militari_2" x="330" y="864" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_militari_antigas_1" x="495" y="864" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_militari_antigas_2" x="660" y="864" width="165" height="108" />
+    <texture id="ui_npc_u_soldier_antigas" x="825" y="864" width="165" height="108" />
+    <texture id="ui_npc_u_soldier_bandana" x="0" y="972" width="165" height="108" />
+    <texture id="ui_npc_u_soldier_bandana_5" x="165" y="972" width="165" height="108" />
+    <texture id="ui_npc_u_soldier_mask" x="330" y="972" width="165" height="108" />
+    <texture id="ui_npc_u_soldier_obichniy" x="495" y="972" width="165" height="108" />
+    <texture id="ui_npc_u_soldier_spetsnaz" x="660" y="972" width="165" height="108" />
+
+    <texture id="ui_npc_u_stalker_mo_exo" x="825" y="972" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_mo_head_1" x="0" y="1080" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_mo_hood_9" x="165" y="1080" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_mo_mask" x="330" y="1080" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_mo_nauchniy" x="495" y="1080" width="165" height="108" />
+
+    <texture id="ui_npc_u_stalker_neytral_hood_uzor" x="660" y="1080" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_neytral_balon_8" x="825" y="1080" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_neytral_exoskeleton" x="0" y="1188" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_neytral_hood_2" x="165" y="1188" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_neytral_hood_8" x="330" y="1188" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_neytral_hood_9" x="495" y="1188" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_neytral_nauchniy" x="660" y="1188" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_neytral_rukzak_2" x="825" y="1188" width="165" height="108" />
+
+    <texture id="ui_npc_u_green_stalker_2" x="0" y="1296" width="165" height="108" />
+    <texture id="ui_npc_u_green_stalker_3" x="165" y="1296" width="165" height="108" />
+    <texture id="ui_npc_u_green_stalker_4" x="330" y="1296" width="165" height="108" />
+    <texture id="ui_npc_u_green_stalker_5" x="495" y="1296" width="165" height="108" />
+    <texture id="ui_npc_u_green_stalker_6" x="660" y="1296" width="165" height="108" />
+    <texture id="ui_npc_u_green_stalker_10" x="825" y="1296" width="165" height="108" />
+    <texture id="ui_npc_u_green_stalker_antigas" x="0" y="1404" width="165" height="108" />
+
+    <texture id="ui_npc_u_stalker_zombie1" x="165" y="1404" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_zombie2" x="330" y="1404" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_zombie3" x="495" y="1404" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_zombie4" x="660" y="1404" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_zombie5" x="825" y="1404" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_zombie6" x="0" y="1512" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_zombie7" x="165" y="1512" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_zombie8" x="330" y="1512" width="165" height="108" />
+    <texture id="ui_npc_u_zombie_exoskeleton" x="495" y="1512" width="165" height="108" />
+    <texture id="ui_npc_u_zombie_fresh_0" x="660" y="1512" width="165" height="108" />
+    <texture id="ui_npc_u_zombie_fresh_2" x="825" y="1512" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_zombie_specnaz" x="0" y="1620" width="165" height="108" />
+
+    <texture id="ui_npc_u_stalker_sv_exoskeleton" x="165" y="1620" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_sv_hood_9" x="330" y="1620" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_sv_hood_91" x="495" y="1620" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_sv_nauchniy" x="660" y="1620" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_sv_rukzak_1_1" x="825" y="1620" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_sv_rukzak_2" x="0" y="1728" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_sv_rukzak_3" x="165" y="1728" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_sv_rukzak_3_1" x="330" y="1728" width="165" height="108" />
+
+    <texture id="ui_npc_u_stalker_ki_informator" x="495" y="1728" width="165" height="108" />
+    <texture id="ui_npc_u_soldier_beret_2" x="660" y="1728" width="165" height="108" />
+    <texture id="ui_npc_u_soldier_beret_3" x="825" y="1728" width="165" height="108" />
+    <texture id="ui_npc_u_soldier_beret_5" x="0" y="1836" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_neytral_rukzak_1" x="165" y="1836" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_neytral_rukzak_3" x="330" y="1836" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_prizrak" x="495" y="1836" width="165" height="108" />
+    <texture id="ui_npc_u_green_stalker_7" x="660" y="1836" width="165" height="108" />
+    <texture id="ui_npc_u_stalker_sv_rukzak_1" x="825" y="1836" width="165" height="108" />
+
+    <texture id="ui_npc_u_ucheniy_1_strong" x="825" y="1836" width="165" height="108" />
+
+  </file>
+</w>

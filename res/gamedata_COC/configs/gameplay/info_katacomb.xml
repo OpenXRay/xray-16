@@ -1,0 +1,125 @@
+<?xml version='1.0' encoding="windows-1251"?>
+
+<game_information_portions>
+
+  <info_portion id="hospital_z1_action"/>
+	<info_portion id="sniper_fire_scene"/>
+  <info_portion id="kat_hosp_z1_minigun_fire"/>
+  <info_portion id="kat_hosp_z1_minigun_reload"/>
+	<info_portion id="sniper_fire_scene_end"/>
+	<info_portion id="hospital_z1_komander_speak"/>
+	<info_portion id="cover_fire"/>
+  <info_portion id="cover_fire_go"/>
+  <info_portion id="cover_fire_hide"/>
+  <info_portion id="cover_fire_end"/>
+	<info_portion id="pre_cover_fire"/>
+  <info_portion id="rush_1"/>
+  <info_portion id="rush_2"/>
+  <info_portion id="rush_3"/>
+  <info_portion id="rush_4"/>
+  <info_portion id="rush_5"/>
+  <info_portion id="rush_6"/>
+  <info_portion id="rush_7"/>
+  <info_portion id="hospital_actor_in_sniper_restr"/>
+  <info_portion id="sniper_off"/>
+  <info_portion id="door_blow_up"/>
+  <info_portion id="minigun_off"/>
+  <info_portion id="lim_z1_minigun_off_2"/>
+  <info_portion id="hospital_z1_enemy_1"/>
+  <info_portion id="hospital_z1_enemy_2"/>
+  <info_portion id="hospital_z1_enemy_3"/>
+  <info_portion id="hospital_z1_enemy_4"/>
+  <info_portion id="hospital_z1_enemy_5"/>
+  <info_portion id="hospital_first_wave_spawn"/>
+  <info_portion id="hospital_spawn_enemy_third_wave"/>
+  <info_portion id="hospital_last_wave_spawn"/>
+  
+  <info_portion id="hospital_z1_badly"/>
+  
+  <info_portion id="hospital_z1_spawn_off"/>
+  
+  <info_portion id="hospital_z2_enter"/>
+  
+  <info_portion id="hospital_heli_see_enemy"/>
+  <info_portion id="hospital_heli_start_attack"/>
+  <info_portion id="hospital_z2_rpg_fire"/>
+  <info_portion id="hospital_z2_rpg_run"/>
+  <info_portion id="hospital_z2_heli_fire"/>
+  <info_portion id="hospital_z2_heli_crash"/>
+  
+  <info_portion id="hospital_z2_enemy_1"/>
+  <info_portion id="hospital_z2_enemy_2"/>
+  <info_portion id="hospital_z2_enemy_3"/>
+  <info_portion id="hospital_z2_enemy_4"/>
+  <info_portion id="hospital_z2_enemy_5"/>
+  <info_portion id="hospital_z2_enemy_6"/>
+
+  <info_portion id="hospital_z2_actor_nw"/>
+  <info_portion id="hospital_z2_actor_ne"/>
+  <info_portion id="hospital_z2_actor_sw"/>
+  <info_portion id="hospital_z2_actor_se"/>
+  <info_portion id="hospital_z2_spawn_off"/>
+
+  <info_portion id="hospital_z2_exit"/>
+  
+  
+  <info_portion id="hospital_z3_fierce_attack"/>
+  <info_portion id="hospital_z3_attack"/>
+  
+  <info_portion id="hospital_z3_spawn_1_on"/>
+  <info_portion id="hospital_z3_spawn_2_on"/>
+  <info_portion id="hospital_z3_spawn_3_on"/>
+  <info_portion id="hospital_z3_spawn_4_on"/>
+  <info_portion id="hospital_z3_spawn_5_on"/>
+  <info_portion id="hospital_z3_spawn_6_on"/>
+  <info_portion id="hospital_z3_spawn_7_on"/>
+  <info_portion id="hospital_z3_spawn_8_on"/>
+  <info_portion id="hospital_z3_spawn_9_on"/>
+  <info_portion id="hospital_z3_spawn_10_on"/>
+ 
+  <info_portion id="hospital_z3_enemy_1"/>
+  <info_portion id="hospital_z3_enemy_2"/>
+  <info_portion id="hospital_z3_enemy_3"/>
+  <info_portion id="hospital_z3_enemy_4"/>
+  <info_portion id="hospital_z3_enemy_5"/>
+  <info_portion id="hospital_z3_enemy_6"/>
+  <info_portion id="hospital_z3_enemy_7"/>
+  <info_portion id="hospital_z3_enemy_8"/>
+  <info_portion id="hospital_z3_enemy_9"/>
+  <info_portion id="hospital_z3_enemy_10"/>
+
+  <info_portion id="hospital_cs_entrance"/>
+  <info_portion id="hospital_cs_victory"/>
+
+  <info_portion id="hospital_z3_cs_soldier1"/>
+  <info_portion id="hospital_z3_cs_soldier2"/>
+  <info_portion id="hospital_z3_cs_soldier3"/>
+  <info_portion id="hospital_z3_cs_soldier4"/>
+  
+  <info_portion id="hospital_z3_cs_fire_1"/>
+  <info_portion id="hospital_z3_cs_fire_2"/>
+  <info_portion id="hospital_z3_cs_fire_3"/>
+  <info_portion id="hospital_z3_sniper_fire"/>
+  <info_portion id="hospital_z3_minigun_on"/>
+  <info_portion id="hospital_z3_minigun_off"/>
+  <info_portion id="hospital_z3_last_door"/>
+  <info_portion id="hospital_z3_enemy_last_wave"/>
+  
+  <info_portion id="hospital_general_task"/>
+  <info_portion id="hospital_general_task_complete"/>
+
+  <info_portion id="hosp_task_sniper_back_rush_1_complete"/>
+  <info_portion id="hosp_task_sniper_back_rush_2_complete"/>
+  <info_portion id="hosp_task_sniper_back_rush_3_complete"/>
+  <info_portion id="hosp_task_sniper_back_rush_4_complete"/>
+  <info_portion id="hosp_task_z3_hold_out_complete"/>
+  
+  <info_portion id="hospital_task_general"/>
+  <info_portion id="katacomb_task_sniper_back"/>
+  <info_portion id="katacomb_task_kill_sniper"/>
+  <info_portion id="katacomb_task_helicopter"/>
+  <info_portion id="katacomb_task_z2_exit"/>
+  <info_portion id="katacomb_task_3"/>
+  <info_portion id="hosp_z3_csky_hide_radio"/>
+
+</game_information_portions>

@@ -1,0 +1,52 @@
+[dar_angar_gigant_squad]:online_offline_group
+faction = monster_predatory_day
+npc = gigant_normal
+target_smart = dar_angar
+spawn_point = dar_angar_home
+story_id = dar_angar_gigant_squad
+
+[dar_control_poltergeist_squad]:online_offline_group
+faction = monster
+npc = m_poltergeist_normal_flame
+target_smart = dar_control_poltergeist
+spawn_point = dar_control_poltergeist_home
+story_id = dar_control_poltergeist_squad
+on_death = %+dar_door3_free%
+
+[dar_military_scout_squad]:online_offline_group
+faction = army
+relationship = enemy
+sympathy = 0
+npc = sim_default_military_4, sim_default_military_3, sim_default_military_3, sim_default_military_4
+target_smart = dar_military_scout
+story_id = dar_military_scout_squad
+on_death = %+dar_military_scout_squad_killed%
+
+[dar_poltergeist_ring_squad_1]:online_offline_group
+faction = monster
+npc = m_poltergeist_normal_flame, m_poltergeist_normal_tele, m_poltergeist_normal_tele
+target_smart = dar_poltergeist_ring
+spawn_point = dar_poltergeist_ring_way
+story_id = dar_poltergeist_ring_squad_1
+on_death = %+dar_ring_spawn2%
+
+[dar_poltergeist_ring_squad_2]:online_offline_group
+faction = monster
+npc = m_poltergeist_normal_flame, m_poltergeist_normal_tele, m_poltergeist_normal_tele
+target_smart = dar_poltergeist_ring
+spawn_point = dar_poltergeist_ring_way
+story_id = dar_poltergeist_ring_squad_2
+
+[dar_poltergeist_tele_squad]:online_offline_group
+faction = monster
+npc = m_poltergeist_normal_tele
+target_smart = dar_poltergeist_tele
+spawn_point = dar_poltergeist_tele_home
+story_id = dar_poltergeist_tele_squad
+
+[dar_poltergeist_tele_round_squad]:online_offline_group
+faction = monster
+npc = m_poltergeist_normal_tele
+target_smart = dar_poltergeist_tele_round
+spawn_point = dar_poltergeist_tele_round_home
+story_id = dar_poltergeist_tele_round_squad

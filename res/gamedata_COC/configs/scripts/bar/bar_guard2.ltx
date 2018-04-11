@@ -1,0 +1,28 @@
+[logic@bar_guard2]
+active = walker
+suitable = {=check_npc_name(bar_visitors_zhorik_stalker_guard2)} true
+prior = 100
+
+[walker]
+path_walk = guard2_walk
+path_look = guard2_look
+meet = meet@bar_guard_2
+danger = danger_ignore
+corpse_detection_enabled = false
+gather_items_enabled = false
+help_wounded_enabled = false
+
+
+[meet@bar_guard_2]
+close_distance = 5
+close_victim = actor
+close_anim = guard
+close_snd_hello = bar_guard_prohodi
+close_snd_distance = 5
+use			    = false
+use_wpn		    = false
+abuse           = false
+
+
+[danger_ignore]
+ignore_distance = 0

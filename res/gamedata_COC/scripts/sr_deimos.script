@@ -1,0 +1,184 @@
+--------------------------------------------------------------------------------
+-- Fear zone -------------------------------------------------------------------
+-- Made by Peacemaker ----------------------------------------------------------
+-- 21.05.2009 ------------------------------------------------------------------
+--------------------------------------------------------------------------------
+local pp_effector_id = 5
+local cam_effector_id = 6
+local pp_effector2_id = 7
+class "CDeimos"
+function CDeimos:__init (obj, storage)
+	self.object         	= obj
+	self.st             	= storage
+	self.st.intensity		= 0
+	self.cam_effector_time 	= 0
+	self.phase				= 0
+end
+
+function CDeimos:update(delta)
+	if not(db.actor) or (device().precache_frame>1) then
+		return
+	end
+	if(db.actor.deimos_intensity) then
+        self.st.intensity = db.actor.deimos_intensity
+		db.actor.deimos_intensity = nil
+	    if(self.st.intensity>self.st.disable_bound) then
+            level.add_pp_effector(self.st.pp_effector..".ppe", pp_effector_id, true)
+            xr_sound.play_sound_looped(db.actor:id(), self.st.noise_sound)
+            self.phase = 1
+	    end
+	    if(self.st.intensity>self.st.switch_lower_bound) then
+            xr_sound.play_sound_looped(db.actor:id(), self.st.heartbeet_sound)
+            self.phase = 2
+		end
+	end
+    local vec = db.actor:get_movement_speed()
+    local cur_speed = math.sqrt(vec.x*vec.x+vec.y*vec.y+vec.z*vec.z)
+    local intensity_delta = (self.st.movement_speed-cur_speed)*0.005
+	if(intensity_delta>0) then
+	    intensity_delta = self.st.growing_koef*intensity_delta
+	else
+	    intensity_delta = self.st.lowering_koef*intensity_delta
+	end
+	self.st.intensity = self.st.intensity + intensity_delta
+	if(self.st.intensity>1) then
+		self.st.intensity = 1
+	elseif(self.st.intensity<0) then
+		self.st.intensity = 0
+	end
+
+	local pp_intensity = self.st.intensity
+	local noise_intensity = self.st.intensity
+	local heartbeet_intensity = self.st.intensity
+	if(self.phase>0) then
+        level.set_pp_effector_factor(pp_effector_id, pp_intensity)
+        xr_sound.set_volume_sound_looped(db.actor:id(), self.st.noise_sound, noise_intensity)
+		if(self.phase>1) then
+            xr_sound.set_volume_sound_looped(db.actor:id(), self.st.heartbeet_sound, heartbeet_intensity)
+		end
+	end
+	if(intensity_delta>0) then
+	    if(self.st.intensity>self.st.switch_upper_bound) then
+			local cur_time = time_global()
+			if(cur_time - self.cam_effector_time > self.st.cam_effector_repeating_time) then
+				self.cam_effector_time = time_global()
+	            level.add_cam_effector("camera_effects\\"..self.st.cam_effector..".anm", cam_effector_id, false, "")
+	            level.add_pp_effector(self.st.pp_effector2..".ppe", pp_effector2_id, false)
+                db.actor.health = -self.st.health_lost
+			end
+	    elseif(self.st.intensity>self.st.switch_lower_bound) then
+			if(self.phase<2) then
+	            xr_sound.play_sound_looped(db.actor:id(), self.st.heartbeet_sound)
+	            xr_sound.set_volume_sound_looped(db.actor:id(), self.st.heartbeet_sound, heartbeet_intensity)
+				self.phase = 2
+			end
+	    elseif(self.st.intensity>self.st.disable_bound) then
+			if(self.phase<1) then
+	            level.add_pp_effector(self.st.pp_effector..".ppe", pp_effector_id, true)
+	            level.set_pp_effector_factor(pp_effector_id, pp_intensity)
+	            xr_sound.play_sound_looped(db.actor:id(), self.st.noise_sound)
+	            xr_sound.set_volume_sound_looped(db.actor:id(), self.st.noise_sound, noise_intensity)
+				self.phase = 1
+			end
+	    end
+	else
+	    if(self.st.intensity<self.st.disable_bound) then
+			if(self.phase>0) then
+			    xr_sound.stop_sound_looped(db.actor:id(), self.st.noise_sound)
+	            level.remove_pp_effector(pp_effector_id)
+				self.phase = 0
+			end
+	    elseif(self.st.intensity<self.st.switch_lower_bound) then
+			if(self.phase>1) then
+			    xr_sound.stop_sound_looped(db.actor:id(), self.st.heartbeet_sound)
+				self.phase = 1
+			end
+	    elseif(self.st.intensity<self.st.switch_upper_bound) then
+            level.remove_cam_effector(cam_effector_id)
+            level.remove_pp_effector(pp_effector2_id)
+	    end
+	end
+	if xr_logic.try_switch_to_another_section (self.object, self.st, db.actor) then
+		if(self.phase>0) then
+			xr_sound.stop_sound_looped(db.actor:id(), self.st.noise_sound)
+			level.remove_pp_effector(pp_effector_id)
+			if(self.phase>1) then
+				xr_sound.stop_sound_looped(db.actor:id(), self.st.heartbeet_sound)
+				level.remove_cam_effector(cam_effector_id)
+				level.remove_pp_effector(pp_effector2_id)
+			end
+		end
+		return
+	end
+end
+
+
+
+---------------------------------------------------------------------------------------------------------------------
+function add_to_binder(npc, ini, scheme, section, storage)
+	-- Зарегистрировать все actions, в которых должен быть вызван метод reset_scheme при изменении настроек схемы:
+	xr_logic.subscribe_action_for_events(npc, storage, CDeimos(npc, storage))
+end
+
+function set_scheme(npc, ini, scheme, section, gulag_name)
+	local st = xr_logic.assign_storage_and_bind(npc, ini, scheme, section)
+	st.logic = xr_logic.cfg_get_switch_conditions(ini, section, npc)
+
+	st.movement_speed = ini:r_float_ex(section,"movement_speed") or 100
+	st.growing_koef = ini:r_float_ex(section,"growing_koef") or 0.1
+	st.lowering_koef = ini:r_float_ex(section,"lowering_koef") or st.growing_koef
+	st.pp_effector = ini:r_string_ex(section,"pp_effector") or ""
+	st.cam_effector = ini:r_string_ex(section,"cam_effector") or ""
+	st.pp_effector2 = ini:r_string_ex(section,"pp_effector2") or ""
+	st.cam_effector_repeating_time = (ini:r_float_ex(section,"cam_effector_repeating_time") or 10)*1000 -- per second
+	st.noise_sound = ini:r_string_ex(section,"noise_sound") or ""
+	st.heartbeet_sound = ini:r_string_ex(section,"heartbeet_sound") or ""
+	st.health_lost = ini:r_float_ex(section,"health_lost") or 0.01
+	st.disable_bound = ini:r_float_ex(section,"disable_bound") or 0.1
+	st.switch_lower_bound = ini:r_float_ex(section,"switch_lower_bound") or 0.5
+	st.switch_upper_bound = ini:r_float_ex(section,"switch_upper_bound") or 0.75
+end
+
+
+function check_intensity_delta(obj)
+	if(obj.active_scheme=="sr_deimos") then
+		local st = obj[obj.active_scheme]
+	    local vec = db.actor:get_movement_speed()
+	    local cur_speed = math.sqrt(vec.x*vec.x+vec.y*vec.y+vec.z*vec.z)
+	    local intensity_delta = st.growing_koef*(st.movement_speed-cur_speed)*0.005
+		if(intensity_delta<0) then
+			return true
+		end
+	end
+	return false
+end
+
+function check_disable_bound(obj)
+	if(obj.active_scheme=="sr_deimos") then
+		local st = obj[obj.active_scheme]
+		if(st.intensity<st.disable_bound) then
+			return true
+		end
+	end
+	return false
+end
+
+function check_lower_bound(obj)
+	if(obj.active_scheme=="sr_deimos") then
+		local st = obj[obj.active_scheme]
+		if(st.intensity<st.switch_lower_bound) then
+			return true
+		end
+	end
+	return false
+end
+
+function check_upper_bound(obj)
+	if(obj.active_scheme=="sr_deimos") then
+		local st = obj[obj.active_scheme]
+		if(st.intensity<st.switch_upper_bound) then
+			return true
+		end
+	end
+	return false
+end

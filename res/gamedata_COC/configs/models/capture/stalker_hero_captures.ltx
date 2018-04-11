@@ -1,0 +1,48 @@
+;-------------------------------------------------------------------------------
+;------ disable params ---------------------------------------------------------
+
+[disable]
+linear_factor		= 1.0
+angular_factor		= 1.0
+
+;-------------------------------------------------------------------------------
+;------ capture params ---------------------------------------------------------
+
+[capture]
+bone				= bip01_tail			; bone for capture
+distance			= 0.3					; distance - less this distance between bone and capture taget object is captured
+time_limit       	= 3			        	; max time for trying to capture object "sec"
+pull_force       	= 3000					; max force used to bring the taget to capture bone
+pull_distance   	= 1.5					; max distance taget can be puled
+velocity_scale   	= 0.05					; velocity scale for pulling 1- normal
+capture_force    	= 90000					; max force for holding taget
+
+[capture_used_bones]
+bones = bip01_r_calf, bip01_l_calf, bip01_r_forearm, bip01_l_forearm
+
+;-------------------------------------------------------------------------------
+;------ particle bones ---------------------------------------------------------
+
+[particle_bones]
+bip01_head 			= 0,0,0
+bip01_spine 		= 0,0,0
+; bip01_l_upperarm	= 0,0,0
+; bip01_r_upperarm	= 0,0,0
+bip01_l_forearm		= 0,0,0
+bip01_r_forearm 	= 0,0,0
+bip01_l_thigh 		= 0,0,0
+bip01_r_thigh 		= 0,0,0
+bip01_l_calf 		= 0,0,0
+bip01_r_calf 		= 0,0,0
+
+;-------------------------------------------------------------------------------
+;------ immunities section -----------------------------------------------------
+
+[immunities]
+immunities_sect = low_resistance
+
+[bone_protection]
+bones_protection_sect = gilet_mask_damage
+
+;-------------------------------------------------------------------------------
+;------ End params -------------------------------------------------------------

@@ -1,0 +1,49 @@
+[logic@toilet_burer]
+active = mob_walker@wait
+suitable = {=check_npc_name(lx8_toilet_burer)} true
+prior = 100
+monster_job = true
+on_death = mob_death
+
+[mob_walker@wait]
+path_walk = toilet_burer_1_walk 
+path_look = toilet_burer_1_look
+out_restr = lx8_sr_toilet_out_restr
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+lx8_toilet_door_open} mob_walker@anti_aim ;mob_home
+on_info2 = {+pri_a19_lab_x16_info} mob_home
+
+[mob_walker@anti_aim]
+path_walk = toilet_burer_1_walk 
+path_look = toilet_burer_1_look
+out_restr = lx8_sr_toilet_out_restr
+on_info = {=actor_see_npc =see_actor} mob_walker@timer_gravi_attack %=burer_force_anti_aim%
+
+
+[mob_walker@timer_gravi_attack]
+path_walk = toilet_burer_1_walk 
+path_look = toilet_burer_1_look
+out_restr = lx8_sr_toilet_out_restr
+on_timer = 2000 | mob_home@stay %+lx8_toilet_door_close =burer_force_gravi_attack%
+
+
+[mob_home@stay]
+;[mob_walker@stay]
+path_home = toilet_burer_1_walk 
+;path_look = toilet_burer_1_look
+out_restr = lx8_sr_toilet_burer_out_restr
+;combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+out_restr = lx8_sr_toilet_out_restr
+on_info = {+lx8_toilet_door_open_again} mob_home
+on_info2 = {+pri_a19_lab_x16_info} mob_home
+
+[mob_home]
+path_home = toilet_burer_home
+actor_friendly = false
+home_min_radius = 20
+home_max_radius = 30
+aggressive = true
+out_restr = lx8_sr_toilet_burer_out_restr
+
+[mob_death]
+on_info = %+lx8_toilet_burer_dead%

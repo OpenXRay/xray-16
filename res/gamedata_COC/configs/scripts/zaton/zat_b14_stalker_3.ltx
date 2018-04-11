@@ -1,0 +1,93 @@
+[logic@b14_stalker_3]
+suitable = {=check_npc_name(zat_b14_stalker_3) -zat_b14_stalkers_bandits_free} true
+prior = 100
+active = walker@stand
+on_hit = hit
+on_death = death
+post_combat_time = 0, 0
+
+[death]
+on_info = {=killed_by_actor =squad_exist(zat_b14_stalkers)} %+zat_b14_stalker_killed_by_actor =set_squad_enemy_to_actor(zat_b14_stalkers) =stop_sound%, %=stop_sound%
+
+[hit] ;Если игрок имеет артефакт, кричим, чтобы отдал
+on_info = {=hit_by_actor =actor_has_item(af_quest_b14_twisted) =is_alive} %=play_sound(zat_b14_robbery_kill_actor_snd) +zat_b14_actor_enemy%
+on_info2 = {=actor_enemy -zat_b14_stop_sound} walker@fight %+zat_b14_stop_sound =stop_sound%
+
+[walker@stand] ;Прячемся и ждем
+path_walk = zat_b14_stalker_2_walk_1
+path_look = zat_b14_stalker_2_look_1
+on_info = {+zat_b14_stalker_robbery_cutscene_start} walker@go_robbery
+in_restr = zat_b14_not_give_item_zone
+combat_ignore_cond = {!actor_enemy} true
+show_spot = {!actor_enemy} false, true
+meet = no_meet
+;group = 14
+
+[walker@go_robbery] ;Идем грабить
+def_state_moving1 = assault
+path_walk = zat_b14_stalker_2_walk_2
+path_look = zat_b14_stalker_2_look_2
+on_info = {+zat_b14_stalker_robbery_cutscene_end} remark@robbery
+in_restr = zat_b14_not_give_item_zone
+meet = no_meet
+
+[remark@robbery] ;Останавливаем игрока
+target = story | actor
+anim = threat_na
+snd_anim_sync = true
+on_signal = sound_end | remark@wait
+on_info = %=play_sound(zat_b14_robbery_stop_snd)%
+on_info2 = {!actor_in_zone(zat_b14_robbery_start)} walker@fight %=set_squad_enemy_to_actor(zat_b14_stalkers)%
+on_info3 = {=actor_enemy -zat_b14_stop_sound} walker@fight %+zat_b14_stop_sound =stop_sound%
+in_restr = zat_b14_not_give_item_zone
+meet = no_meet
+
+[remark@wait] ;Ждем пока уберет ствол
+target = story | actor
+anim = threat_na
+on_info = {=actor_nomove_nowpn()} %=play_sound(zat_b14_robbery_stand_still_snd)%
+on_info2 = {!actor_in_zone(zat_b14_robbery_start)} walker@fight %=set_squad_enemy_to_actor(zat_b14_stalkers)%
+on_info3 = {=actor_enemy -zat_b14_stop_sound} walker@fight %+zat_b14_stop_sound =stop_sound%
+snd_anim_sync = true
+on_signal = sound_end | remark@wait_again %+zat_b14_robbery_nowpn_actor%
+in_restr = zat_b14_not_give_item_zone
+meet = no_meet
+
+[remark@wait_again] ;Смотрим, как главный отбирает артефакт
+target = story | actor
+anim = threat_na
+snd_anim_sync = true
+on_info = {+zat_b14_robbery_give_artefact} remark@guard_backoff %=set_counter(zat_b14_reaction:0)%
+on_info2 = {!actor_in_zone(zat_b14_robbery_start)} walker@fight %=set_squad_enemy_to_actor(zat_b14_stalkers)%
+on_info3 = {!actor_nomove_nowpn()} walker@fight %=set_squad_enemy_to_actor(zat_b14_stalkers)%
+on_info4 = {=actor_enemy -zat_b14_stop_sound} walker@fight %+zat_b14_stop_sound =stop_sound%
+in_restr = zat_b14_not_give_item_zone
+meet = no_meet
+
+;Ограбили и посылаем игрока.
+
+[remark@guard_backoff] ;Ограбили, кричим на игрока
+target = story | actor
+anim = threat_na
+snd_anim_sync = true
+on_info = {=counter_equal(zat_b14_reaction:3)} walker@fight %=play_sound(zat_b14_robbery_kill_actor_snd) =set_squad_enemy_to_actor(zat_b14_stalkers)%, {=dist_to_actor_ge(120)} %+zat_b14_stalkers_bandits_free%, {=dist_to_actor_le(35)} %=play_sound(zat_b14_robbery_after_pay_snd)%
+on_info2 = {=actor_in_zone(zat_b14_robbery_attack) -zat_b14_cover_st_1} walker@fight %=play_sound(zat_b14_robbery_kill_actor_snd) =set_squad_enemy_to_actor(zat_b14_stalkers)%
+on_signal = sound_end | remark@guard_wait %+zat_b14_cover_st_1%
+in_restr = zat_b14_not_give_item_zone
+meet = no_meet
+
+[remark@guard_wait] ;Ограбили, ждем пока игрок покинет судно 
+target = story | actor
+anim = threat_na
+snd_anim_sync = true
+on_info = {=dist_to_actor_ge(100)} %+zat_b14_stalkers_bandits_free%
+on_game_timer = 20 | remark@guard_backoff %=inc_counter(zat_b14_reaction)%
+in_restr = zat_b14_not_give_item_zone
+meet = no_meet
+
+[walker@fight] ;В бой!
+path_walk = zat_b14_stalker_2_walk_1
+path_look = zat_b14_stalker_2_look_1
+in_restr = zat_b14_not_give_item_zone
+meet = no_meet
+out_restr = zat_b14_robbery_reaction

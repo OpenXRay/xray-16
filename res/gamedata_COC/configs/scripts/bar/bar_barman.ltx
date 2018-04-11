@@ -1,0 +1,59 @@
+[logic@bar_barman]
+active = walker@at_hole
+suitable = {=check_npc_name(bar_visitors_barman_stalker_trader)} true
+trade = misc\trade\trade_loner_barman.ltx
+prior = 200
+can_select_weapon = false
+level_spot = trader
+dont_keep_items = true
+
+[walker@general]
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+use_camp = false
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+def_state_standing = wait
+def_state_moving1 = walk
+def_state_moving2 = walk
+def_state_moving3 = walk
+meet = meet@at_hole
+danger = danger_condition@barman
+on_info = {=obj_on_job(bar_visitors:bar_visitors_beh_trade_job_1)} walker@zone_3, {=actor_in_zone(bar_barman_meet_zone_1)} walker@zone_1, {=actor_in_zone(bar_barman_meet_zone_2)} walker@zone_2,{=actor_in_zone(bar_barman_meet_zone_3)} walker@zone_3,{=actor_in_zone(bar_barman_meet_zone_4)} walker@zone_4, walker@at_hole
+on_info1 = {=obj_on_job(bar_visitors:bar_visitors_beh_trade_job_1) =job_on_point(bar_visitors:bar_visitors_beh_trade_job_1:1:2:false)} %=trade_job_give_id(bar_visitors:bar_visitors_beh_trade_job_1)%
+
+[walker@at_hole]:walker@general
+path_walk = barman_hole_walk
+path_look = barman_hole_look
+
+[walker@zone_1]:walker@general
+path_walk = barman_zone_1_walk
+path_look = barman_zone_1_look
+
+[walker@zone_2]:walker@general
+path_walk = barman_zone_2_walk
+path_look = barman_zone_2_look
+
+[walker@zone_3]:walker@general
+path_walk = barman_zone_3_walk
+path_look = barman_zone_3_look
+
+[walker@zone_4]:walker@general
+path_walk = barman_zone_4_walk
+path_look = barman_zone_4_look
+
+[meet@at_hole]
+close_snd_hello = bar_barman_greeting
+close_snd_bye = bar_barman_farewell
+close_victim = actor
+far_victim = actor
+use = {=actor_enemy} false, true
+allow_break = false
+meet_on_talking = false
+close_distance = 2
+far_distance = 3
+
+[danger_condition@barman]
+ignore_distance       = 0

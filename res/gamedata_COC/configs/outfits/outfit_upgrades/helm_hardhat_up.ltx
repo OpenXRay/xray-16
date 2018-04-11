@@ -1,0 +1,120 @@
+[up_sect_firsta_helm_hardhat]
+cost 		= 2000
+value		= +10
+
+burn_protection                          = 0.01
+radiation_protection                     = 0.002
+chemical_burn_protection                 = 0.01
+inv_weight								 = +0.5
+power_loss                               = +0.05
+
+immunities_sect_add 			= sect_helm_both_immunity_add
+
+[up_sect_firstc_helm_hardhat]
+cost 		= 800
+value 		= +20
+
+telepatic_protection  			= 0.02
+
+[up_sect_firstd_helm_hardhat]
+cost 		= 800
+value		= +20
+
+radiation_protection            = 0.003
+
+[up_sect_secona_helm_hardhat]
+value		= 1
+cost 		= 2500
+
+nightvision_sect 				= effector_nightvision_1
+
+[up_firsta_helm_hardhat]
+scheme_index            = 0, 0
+known                   = 1
+effects                 = up_gr_firstcd_helm_hardhat
+section                 = up_sect_firsta_helm_hardhat
+property                = prop_thermo, prop_radio, prop_chem, prop_weightoutfit
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_res_b5_name
+description             = st_up_res_b5_descr
+icon                    = ui_inGame2_upgrade_helm_hardhat_1
+
+
+[up_firstc_helm_hardhat]
+scheme_index            = 1, 0
+known                   = 1
+effects                 =
+section                 = up_sect_firstc_helm_hardhat
+property                = prop_psy
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_res_b1_name
+description             = st_up_res_b1_descr
+icon                    = ui_inGame2_upgrade_helm_hardhat_2
+
+[up_firstd_helm_hardhat]
+scheme_index            = 1, 1
+known                   = 1
+effects                 =
+section                 = up_sect_firstd_helm_hardhat
+property                = prop_radio
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_res_b4_name
+description             = st_up_res_b4_descr
+icon                    = ui_inGame2_upgrade_helm_hardhat_3
+
+[up_secona_helm_hardhat]
+scheme_index            = 0, 1
+known                   = 1
+effects                 =
+section                 = up_sect_secona_helm_hardhat
+property                = prop_night_vision
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_resp_a1_name
+description             = st_up_resp_a1_descr
+icon                    = ui_inGame2_upgrade_helm_hardhat_4
+
+
+[up_gr_firstab_helm_hardhat]
+elements                = up_firsta_helm_hardhat
+
+[up_gr_firstcd_helm_hardhat]
+elements                = up_firstc_helm_hardhat, up_firstd_helm_hardhat
+
+[up_gr_seconab_helm_hardhat]
+elements                = up_secona_helm_hardhat

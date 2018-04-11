@@ -1,0 +1,85 @@
+[smart_terrain]
+def_restr = jup_a6_sr_noweap
+safe_restr = jup_a6_sr_light
+squad_id = 4
+max_population = 6
+respawn_params = respawn@jup_a6   
+;arrive_dist = 75
+respawn_idle = 86400
+ignore_zone = jup_a6_sr_light
+alarm_start_sound = jup_a6_base_alarm
+alarm_stop_sound = jup_a6_base_relax
+
+[respawn@jup_a6]
+spawn_stalker@advanced
+spawn_stalker@master
+
+[spawn_stalker@advanced]
+spawn_squads = stalker_sim_squad_advanced, ecolog_sim_squad_advanced, freedom_sim_squad_advanced
+spawn_num = {+bar_deactivate_radar_done} 2, 0
+
+[spawn_stalker@master]
+spawn_squads = stalker_sim_squad_veteran, freedom_sim_squad_veteran
+spawn_num = {+bar_deactivate_radar_done} 2, 0
+
+[exclusive]
+; still exists in CoC
+jup_a6_freedom_leader = jupiter\jup_a6_freedom_leader.ltx
+jup_a6_important_npc_1 = jupiter\jup_a6_freedom_trader_ashot.ltx
+jup_b217_stalker_tech = jupiter\jup_b217_stalker_tech.ltx
+jup_b10_stalker_drunk = jupiter\jup_b10_stalker_drunk.ltx
+stalker_medik = jupiter\jup_b202_stalker_medic.ltx
+stalker_barmen = jupiter\jup_b202_stalker_barmen.ltx
+jup_b220_trapper = jupiter\jup_b220_trapper.ltx
+jup_b19_freedom_yar = jupiter\jup_b19_freedom_yar.ltx
+
+jup_a6_animp_01 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_02 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_03 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_04 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_09 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_10 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_11 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_15 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_16 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_17 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_18 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_91 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_92 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_93 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_05 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_06 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_07 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_08 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_12 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_13 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_14 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_19 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_20 = jupiter\jup_a6_logic.ltx
+jup_a6_animp_21 = jupiter\jup_a6_logic.ltx
+
+jup_a6_duty_guarder			= jupiter\jup_a6_logic.ltx
+jup_a6_duty_guard			= jupiter\jup_a6_logic.ltx
+jup_a6_freedom_guarder		= jupiter\jup_a6_logic.ltx
+jup_a6_animp_freedom_guard	= jupiter\jup_a6_logic.ltx
+
+;----unused
+;jup_a12_stalker_assaulter = jupiter\jup_a12_stalker_assaulter.ltx
+;jup_a12_stalker_diplomat = jupiter\jup_a12_stalker_diplomat.ltx
+;jup_a12_stalker_prisoner_base = jupiter\jup_a12_stalker_prisoner.ltx
+;zat_b7_duty_illicit_dealer = jupiter\jup_b207_zat_b7_duty_illicit_dealer.ltx
+;zat_b215_stalker_guide_jupiter = jupiter\zat_b215_stalker_guide_jupiter.ltx
+;jup_b43_stalker_assistant_yanov = jupiter\jup_b43_stalker_assistant.ltx
+
+
+;jup_b221_duty_01 = jupiter\jup_b221_duty.ltx
+;jup_b221_duty_02 = jupiter\jup_b221_duty.ltx
+;jup_b221_duty_03 = jupiter\jup_b221_duty.ltx
+
+;jup_b25_flint = jupiter\jup_b25_freedom_flint.ltx
+;jup_b25_listener_01 = jupiter\jup_b25_freedom_flint.ltx
+;jup_b25_listener_02 = jupiter\jup_b25_freedom_flint.ltx
+
+;jup_b221_freedom_01 = jupiter\jup_b221_freedom.ltx
+;jup_b221_freedom_02 = jupiter\jup_b221_freedom.ltx
+;jup_b221_freedom_03 = jupiter\jup_b221_freedom.ltx

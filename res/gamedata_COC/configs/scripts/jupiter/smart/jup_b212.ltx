@@ -1,0 +1,17 @@
+[smart_terrain]
+squad_id = 19
+max_population = 1
+respawn_params = respawn@jup_b212  
+respawn_idle = 86400
+ 
+
+[respawn@jup_b212]
+spawn_chimera
+
+[spawn_chimera]
+spawn_squads = simulation_chimera
+;spawn_num = {+jup_b212_jupiter_chimera_hunt_done} 1,  0
+spawn_num = 1
+
+[exclusive]
+night_hunter_chimera = jupiter\jup_b212_chimera_logic.ltx

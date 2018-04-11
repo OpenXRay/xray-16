@@ -1,0 +1,238 @@
+[logic@walker_1]
+active = walker@walker_1
+suitable = {!surge_started} true
+prior = 65
+
+[logic@walker_2]
+active = walker@walker_2
+suitable = {!surge_started} true
+prior = 65
+
+[logic@walker_3]
+active = walker@walker_3
+suitable = {!surge_started} true
+prior = 65
+
+[logic@walker_4]
+active = walker@walker_4
+suitable = {!surge_started} true
+prior = 65
+
+[logic@walker_5]
+active = walker@walker_5
+suitable = {!surge_started} true
+prior = 65
+
+[logic@walker_6]
+active = walker@walker_6
+suitable = {!surge_started} true
+prior = 65
+
+
+[logic@guard_1]
+active = camper@guard_1
+suitable = {!surge_started} true
+prior = 75
+
+[logic@guard_2]
+active = camper@guard_2
+suitable = {!surge_started} true
+prior = 75
+
+[logic@guard_3]
+active = camper@guard_3
+suitable = {!surge_started} true
+prior = 75
+
+[logic@guard_4]
+active = camper@guard_4
+suitable = {!surge_started} true
+prior = 75
+
+[logic@guard_5]
+active = camper@guard_5
+suitable = {!surge_started} true
+prior = 90
+
+[logic@guard_6]
+active = camper@guard_6
+suitable = {!surge_started} true
+prior = 90
+
+
+[walker@walker_1]
+path_walk = walker_1_walk
+;combat_ignore_cond = {=check_enemy_name(jup_a12_stalker_prisoner) -jup_a12_actor_enemy_to_bandits} true, {-jup_a12_merc_attack_started =check_enemy_smart(jup_a12_merc)} true, false
+
+[camper@walker_1_wait]
+path_walk = walker_1_camper
+path_look = stalker_prisoner_battle_look
+def_state_standing = hide_na
+radius = 0
+
+[walker@walker_2]
+path_walk = walker_2_walk
+;combat_ignore_cond = {=check_enemy_name(jup_a12_stalker_prisoner) -jup_a12_actor_enemy_to_bandits} true, {-jup_a12_merc_attack_started =check_enemy_smart(jup_a12_merc)} true, false
+
+[camper@walker_2_wait]
+path_walk = walker_2_camper
+path_look = stalker_prisoner_battle_look
+def_state_standing = hide_na
+radius = 0
+
+[walker@walker_3]
+path_walk = walker_3_walk
+
+[walker@walker_4]
+path_walk = walker_4_walk
+
+[walker@walker_5]
+path_walk = walker_5_walk
+
+[walker@walker_6]
+path_walk = walker_6_walk
+
+
+; THIS IS FOR THE IMMOBILE GUARDS IN CONTAINER YARD
+[meet@guard_base]
+use	= {!actor_enemy} true
+trade_enable = true
+
+[camper@guard_1]
+path_walk = guard_1_walk
+path_look = guard_1_look
+meet = meet@guard_base
+
+[camper@guard_2]
+path_walk = guard_2_walk
+path_look = guard_2_look
+meet = meet@guard_base
+
+[camper@guard_3]
+path_walk = guard_3_walk
+path_look = guard_3_look
+meet = meet@guard_base
+
+[camper@guard_4]
+path_walk = guard_4_walk
+path_look = guard_4_look
+meet = meet@guard_base
+
+[camper@guard_5]
+path_walk = guard_5_walk
+path_look = guard_5_look
+meet = meet@guard_base
+
+[camper@guard_6]
+path_walk = guard_6_walk
+path_look = guard_6_look
+meet = meet@guard_base
+
+[walker@jup_a12_surge_def]
+path_walk = surge_hide_1_walk
+path_look = surge_hide_1_look
+def_state_standing = sit
+def_state_moving = assault
+
+[logic@jup_a12_surge_def]
+active = walker@jup_a12_surge_work_1
+suitable = {=surge_started} true
+prior = 100
+
+[logic@jup_a12_surge_work_1]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_1
+
+[logic@jup_a12_surge_work_2]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_2
+
+[logic@jup_a12_surge_work_3]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_3
+
+[logic@jup_a12_surge_work_4]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_4
+
+[logic@jup_a12_surge_work_5]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_5
+
+[logic@jup_a12_surge_work_6]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_6
+
+[logic@jup_a12_surge_work_7]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_7
+
+[logic@jup_a12_surge_work_8]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_8
+
+[logic@jup_a12_surge_work_9]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_9
+
+[logic@jup_a12_surge_work_10]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_10
+
+[logic@jup_a12_surge_work_11]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_11
+
+[logic@jup_a12_surge_work_12]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_12
+
+[logic@jup_a12_surge_work_13]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_13
+
+[logic@jup_a12_surge_work_14]:logic@jup_a12_surge_def
+active = walker@jup_a12_surge_work_14
+
+[walker@jup_a12_surge_work_1]:walker@jup_a12_surge_def
+path_walk = surge_hide_1_walk
+path_look = surge_hide_1_look
+
+[walker@jup_a12_surge_work_2]:walker@jup_a12_surge_def
+path_walk = surge_hide_2_walk
+path_look = surge_hide_1_look
+
+[walker@jup_a12_surge_work_3]:walker@jup_a12_surge_def
+path_walk = surge_hide_3_walk
+path_look = surge_hide_1_look
+
+[walker@jup_a12_surge_work_4]:walker@jup_a12_surge_def
+path_walk = surge_hide_4_walk
+path_look = surge_hide_1_look
+
+[walker@jup_a12_surge_work_5]:walker@jup_a12_surge_def
+path_walk = surge_hide_5_walk
+path_look = surge_hide_5_look
+
+[walker@jup_a12_surge_work_6]:walker@jup_a12_surge_def
+path_walk = surge_hide_6_walk
+path_look = surge_hide_5_look
+
+[walker@jup_a12_surge_work_7]:walker@jup_a12_surge_def
+path_walk = surge_hide_7_walk
+path_look = surge_hide_5_look
+
+[walker@jup_a12_surge_work_8]:walker@jup_a12_surge_def
+path_walk = surge_hide_8_walk
+path_look = surge_hide_5_look
+
+[walker@jup_a12_surge_work_9]:walker@jup_a12_surge_def
+path_walk = surge_hide_9_walk
+path_look = surge_hide_9_look
+
+[walker@jup_a12_surge_work_10]:walker@jup_a12_surge_def
+path_walk = surge_hide_10_walk
+path_look = surge_hide_9_look
+
+[walker@jup_a12_surge_work_11]:walker@jup_a12_surge_def
+path_walk = surge_hide_11_walk
+path_look = surge_hide_9_look
+
+[walker@jup_a12_surge_work_12]:walker@jup_a12_surge_def
+path_walk = surge_hide_12_walk
+path_look = surge_hide_12_look
+
+[walker@jup_a12_surge_work_13]:walker@jup_a12_surge_def
+path_walk = surge_hide_13_walk
+path_look = surge_hide_13_look
+
+[walker@jup_a12_surge_work_14]:walker@jup_a12_surge_def
+path_walk = surge_hide_14_walk
+path_look = surge_hide_13_look

@@ -1,0 +1,90 @@
+[logic]
+active = nil ;sr_idle@switch
+
+[sr_idle@switch]
+on_info = {+zat_b7_raider_plan !zat_b7_is_night} sr_idle@attack %=give_task(zat_b7_stalkers_raiders)%
+on_info2 = {+zat_b7_raider_plan =zat_b7_is_night} sr_idle@wait_some_time %=give_task(zat_b7_stalkers_raiders)%
+on_info3 = {-zat_b7_no_stalkers_task =is_squad_enemy_to_actor(zat_b7_stalkers_victims_1)} %+zat_b7_no_stalkers_task%
+on_info4 = {!squad_exist(zat_b7_stalkers_victims_1)} sr_idle@destroy %+zat_b7_task_end +zat_b7_task_fail%
+;затычка
+on_info5 = {+zat_b5_actor_with_bandits} sr_idle@check_destroy %+zat_b7_task_end%
+on_info6 = {+zat_b5_actor_with_stalkers} sr_idle@check_destroy %+zat_b7_task_end%
+on_info7 = {+zat_b5_actor_with_dealer} sr_idle@check_destroy %+zat_b7_task_end%
+
+[sr_idle@wait_some_time]
+on_game_timer = 180 | sr_idle@attack %+zat_b7_late_start%
+on_info2 = {!zat_b7_is_night} sr_idle@attack
+on_info3 = {+zat_b7_stalkers_raiders_attack =is_squad_enemy_to_actor(zat_b7_stalkers_victims_1) +zat_b7_stalkers_raiders_meet} %+zat_b7_stalkers_raiders_attack_started%
+on_info4 = {=is_squad_enemy_to_actor(zat_b7_stalkers_raiders)} %+zat_b7_stalkers_raiders_attack_started +zat_b7_stalkers_raiders_attack%
+on_info5 = {+zat_b7_stalkers_raiders_attack_started} sr_idle@save
+on_info6 = {+zat_b7_stalkers_victims_know_about_raid -zat_b7_victims_disappeared -zat_b7_actor_with_stalkers +zat_b7_stalkers_raiders_attack =dist_to_story_obj_ge(zat_b7_stalkers_victims_1:75)} sr_idle@remove_squads %+zat_b7_victims_disappeared +zat_b7_actor_help_stalkers +zat_b7_actor_barmen_dialog +zat_b7_attack_started%
+on_info7 = {+zat_b7_stalkers_raiders_reward_given} sr_idle@destroy %+zat_b7_actor_help_bandits +zat_b7_task_end%
+on_info8 = {-zat_b7_stalkers_raiders_attack_started +zat_b7_stalkers_raiders_attack =surge_started} %+zat_b7_stalkers_raiders_attack_started%
+
+[sr_idle@attack]
+on_info = {=zat_b7_is_night -zat_b7_stalkers_raiders_attack} %+zat_b7_stalkers_raiders_attack%
+on_info2 = {-zat_b7_late_start !zat_b7_is_night +zat_b7_stalkers_raiders_attack -zat_b7_stalkers_raiders_attack_started} sr_idle@destroy %+zat_b7_stalkers_raiders_attack_started +zat_b7_timeout +zat_b7_task_fail =set_squads_enemies(zat_b7_stalkers_raiders:zat_b7_stalkers_victims_1)%
+on_info3 = {+zat_b7_late_start !zat_b7_is_late_attack_time +zat_b7_stalkers_raiders_attack -zat_b7_stalkers_raiders_attack_started} sr_idle@destroy %+zat_b7_stalkers_raiders_attack_started +zat_b7_timeout +zat_b7_task_fail =set_squads_enemies(zat_b7_stalkers_raiders:zat_b7_stalkers_victims_1)%
+on_info4 = {+zat_b7_stalkers_raiders_attack =is_squad_enemy_to_actor(zat_b7_stalkers_victims_1) +zat_b7_stalkers_raiders_meet} %+zat_b7_stalkers_raiders_attack_started%
+on_info5 = {=is_squad_enemy_to_actor(zat_b7_stalkers_raiders)} %+zat_b7_stalkers_raiders_attack_started +zat_b7_stalkers_raiders_attack%
+on_info6 = {+zat_b7_stalkers_raiders_attack_started} sr_idle@save
+on_info7 = {+zat_b7_stalkers_victims_know_about_raid -zat_b7_victims_disappeared -zat_b7_actor_with_stalkers +zat_b7_stalkers_raiders_attack =dist_to_story_obj_ge(zat_b7_stalkers_victims_1:75)} sr_idle@remove_squads %+zat_b7_victims_disappeared +zat_b7_actor_help_stalkers +zat_b7_actor_barmen_dialog +zat_b7_attack_started%
+on_info8 = {+zat_b7_stalkers_raiders_reward_given} sr_idle@destroy %+zat_b7_actor_help_bandits +zat_b7_task_end%
+on_info9 = {-zat_b7_stalkers_raiders_attack_started +zat_b7_stalkers_raiders_attack =surge_started} %+zat_b7_stalkers_raiders_attack_started%
+
+[sr_idle@remove_squads]
+on_info = {=squad_exist(zat_b7_stalkers_victims_1)} sr_idle@attack %=remove_squad(zat_b7_stalkers_victims_1)%, sr_idle@attack
+
+[sr_idle@save]
+on_info = {-zat_b7_met_with_robbers} %+zat_b7_met_with_robbers =scenario_autosave(st_save_zat_b7_met_with_robbers)%
+on_info2 = {+zat_b7_met_with_robbers} sr_idle@after_battle
+
+[sr_idle@after_battle]
+on_info = {!squad_exist(zat_b7_stalkers_raiders)} sr_idle@no_raiders
+on_info2 = {!squad_exist(zat_b7_stalkers_victims_1)} sr_idle@no_stalkers
+on_info3 = {=is_squad_enemy_to_actor(zat_b7_stalkers_raiders) =is_squad_enemy_to_actor(zat_b7_stalkers_victims_1)} sr_idle@destroy %+zat_b7_task_end%
+on_info4 = {=is_squad_enemy_to_actor(zat_b7_stalkers_raiders) -zat_b7_actor_really_helped_stalkers} %+zat_b7_actor_really_helped_stalkers =set_squads_enemies(zat_b7_stalkers_raiders:zat_b7_stalkers_victims_1) +zat_b7_attack_started%
+on_info5 = {=is_squad_enemy_to_actor(zat_b7_stalkers_victims_1) -zat_b7_actor_really_helped_bandits} %+zat_b7_actor_really_helped_bandits =set_squads_enemies(zat_b7_stalkers_raiders:zat_b7_stalkers_victims_1) +zat_b7_attack_started%
+on_info6 = {=dist_to_story_obj_ge(zat_b7_stalkers_victims_1:150) =dist_to_story_obj_ge(zat_b7_stalkers_raiders:150)} %=kill_squad(zat_b7_stalkers_victims_1)%
+
+[sr_idle@no_raiders]
+on_info = {+zat_b7_task_end} sr_idle@destroy
+on_info2 = {!is_squad_enemy_to_actor(zat_b7_stalkers_victims_1) -zat_b7_stalkers_victims_know_about_raid -zat_b7_actor_really_helped_stalkers} %+zat_b7_task_end%
+on_info3 = {!is_squad_enemy_to_actor(zat_b7_stalkers_victims_1) -zat_b7_stalkers_victims_know_about_raid +zat_b7_actor_really_helped_stalkers} %+zat_b7_actor_help_stalkers +zat_b7_actor_barmen_dialog%
+on_info4 = {!is_squad_enemy_to_actor(zat_b7_stalkers_victims_1) +zat_b7_stalkers_victims_know_about_raid} %+zat_b7_actor_help_stalkers +zat_b7_actor_barmen_dialog%
+on_info5 = {=is_squad_enemy_to_actor(zat_b7_stalkers_victims_1)} %+zat_b7_task_end%
+
+[sr_idle@no_stalkers]
+on_info = {+zat_b7_task_end} sr_idle@destroy
+on_info2 = {!squad_exist(zat_b7_stalkers_victims_1) !is_squad_enemy_to_actor(zat_b7_stalkers_raiders) -zat_b7_victims_disappeared +zat_b7_actor_with_bandits -zat_b7_actor_killed_victims_self} %+zat_b7_actor_help_bandits%
+on_info3 = {!squad_exist(zat_b7_stalkers_victims_1) =is_squad_enemy_to_actor(zat_b7_stalkers_raiders)} %+zat_b7_task_end%
+on_info4 = {!squad_exist(zat_b7_stalkers_victims_1) !is_squad_enemy_to_actor(zat_b7_stalkers_raiders) -zat_b7_victims_disappeared -zat_b7_actor_with_bandits} %+zat_b7_task_end%
+on_info5 = {-zat_b7_task_end +zat_b7_actor_refused_to_be_robbed} %=set_squad_enemy_to_actor(zat_b7_stalkers_raiders) +zat_b7_task_end%
+
+[sr_idle@destroy]
+on_info = {-zat_b30_trader_for_b5_info +zat_b7_task_fail} %+zat_b30_trader_for_b5_info%
+on_info2 = {+zat_b7_actor_help_stalkers} sr_idle@wait_for_destroy %=inc_faction_goodwill_to_actor(stalker:200) =dec_faction_goodwill_to_actor(bandit:250) =set_squad_enemy_to_actor(zat_b7_stalkers_raiders)%
+on_info3 = {+zat_b7_actor_help_bandits} sr_idle@wait_for_destroy %=inc_faction_goodwill_to_actor(bandit:500) =dec_faction_goodwill_to_actor(stalker:100)%
+on_info4 = {-zat_b7_actor_help_bandits -zat_b7_actor_help_stalkers} sr_idle@destroy_someone %+zat_b5_dialog_info +zat_b7_task_fail +zat_b30_trader_for_b5_info%
+
+[sr_idle@destroy_someone]
+on_info = {~50 =squad_exist(zat_b7_stalkers_victims_1)} %+zat_b7_destroy_raiders%, {=squad_exist(zat_b7_stalkers_raiders)} %+zat_b7_destroy_stalkers%
+on_info2 = {+zat_b7_destroy_raiders =squad_exist(zat_b7_stalkers_raiders) =dist_to_story_obj_ge(zat_b7_stalkers_raiders:150)} %=remove_squad(zat_b7_stalkers_raiders)%
+on_info3 = {+zat_b7_destroy_stalkers =squad_exist(zat_b7_stalkers_victims_1) =dist_to_story_obj_ge(zat_b7_stalkers_victims_1:150)} %=remove_squad(zat_b7_stalkers_victims_1)%
+on_info4 = sr_idle@wait_for_destroy
+
+[sr_idle@wait_for_destroy]
+on_info = {+zat_b5_actor_with_bandits} sr_idle@check_destroy
+on_info2 = {+zat_b5_actor_with_stalkers} sr_idle@check_destroy
+on_info3 = {+zat_b5_actor_with_dealer} sr_idle@check_destroy
+on_info4 = {-zat_b7_stalker_raider_leader_alive =is_alive(zat_b7_stalker_raider_leader)} %+zat_b7_stalker_raider_leader_alive%
+on_info5 = {+zat_b7_stalker_raider_leader_alive !is_alive(zat_b7_stalker_raider_leader)} %-zat_b7_stalker_raider_leader_alive%
+on_info6 = {-zat_b7_stalker_victim_leader_alive =is_alive(zat_b7_stalker_victim_1)} %+zat_b7_stalker_victim_leader_alive%
+on_info7 = {+zat_b7_stalker_victim_leader_alive !is_alive(zat_b7_stalker_victim_1)} %-zat_b7_stalker_victim_leader_alive +zat_b5_stalker_leader_dead%
+
+[sr_idle@check_destroy]
+on_info = {=squad_exist(zat_b7_stalkers_raiders)} %=remove_squad(zat_b7_stalkers_raiders)%
+on_info2 = {=squad_exist(zat_b7_stalkers_victims_1)} %=remove_squad(zat_b7_stalkers_victims_1)%
+on_info3 = {!squad_exist(zat_b7_stalkers_raiders) !squad_exist(zat_b7_stalkers_victims_1)} sr_idle@nil
+ 
+[sr_idle@nil]

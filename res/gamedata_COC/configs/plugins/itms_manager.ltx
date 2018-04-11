@@ -1,0 +1,154 @@
+; This plugin configures item mods loaded by the itms_manager script file.
+
+[backpack_stash]
+allow_in_base = true
+enable = true
+enable_news_tip = true
+enable_ui = true
+map_spot = treasure_player
+
+[sleeping_bag]
+dangerous_sleep = false ; Enable hostile squads to hunt actor if he sleeps in unsafe area. Disabled as there are no safe spots.
+enable = true
+have_at_start = false ; Self-explanatory, whether the player starts with a sleeping bag in inventory
+unsafe_radius = 10000 ; The distance in which hostile squads will be drawn to actor if he sleeps in unsafe area.
+use_placeable = true ; Whether the items is placed at the player's location instead of using the item directly.
+
+[sleeping_bag_sections]
+itm_sleepbag
+sleep_bag
+
+[sleeping_bag_ph_sections]
+ph_sleepbag = itm_sleepbag
+
+[actor_backpack_keep_items]
+af_baloon
+af_blood
+af_compass
+af_cristall
+af_cristall_flower
+af_dummy_battery
+af_dummy_dummy
+af_dummy_glassbeads
+af_electra_flash
+af_electra_moonlight
+af_electra_sparkler
+af_eye
+af_fire
+af_fireball
+af_fuzz_kolobok
+af_glass
+af_gold_fish
+af_gravi
+af_ice
+af_medusa
+af_mincer_meat
+af_night_star
+af_oasis_heart
+af_soul
+af_quest_b14_twisted
+af_vyvert
+bandage
+bolt
+device_flashlight
+device_pda
+device_torch
+device_torch_dummy
+drug_anabiotic
+drug_antidot
+drug_coagulant
+drug_psy_blockade
+drug_radioprotector
+jup_b1_half_artifact
+medkit
+medkit_army
+medkit_scientic
+
+[repair_mod]
+enable = true
+use_ui = false ; Determines whether the clunky interface is used instead of new drag-and-drop callbacks.
+
+[repair_mod_tools]
+itm_gunsmith_toolkit
+itm_outfit_toolkit
+
+[flashlight_mod]
+enable = false
+
+[flashlight_sections]
+device_flashlight
+
+[mutant_loot_mod]
+decay_time = 2700 ; Number of seconds (game time) after which a mutant corpse becomes too decayed to field dress.
+enable = true
+enable_ui = false ; Determines whether an interface is used to harvest mutant parts.
+
+; Mutant loot sections.
+; Usage: section, quantity, chance.
+; See itms_manager.loot_mutant for implementation.
+
+[rat]
+mutant_part_tushkano_meat, 1, 0.75
+
+[crow]
+mutant_part_crow_beak, 1, 0.50
+
+[bloodsucker]
+mutant_part_krovosos_jaw, 1, 0.66
+mutant_part_krovosos_meat, 2, 0.75
+
+[boar]
+mutant_part_boar_chop, 2, 0.66
+mutant_part_boar_leg, 4, 0.25
+
+[burer]
+mutant_part_burer_hand, 2, 0.75
+
+[chimera]
+mutant_part_chimera_claw, 8, 0.33
+mutant_part_chimera_kogot, 4, 0.55
+mutant_part_chimera_meat, 2, 0.80
+
+[controller]
+mutant_part_controller_glass, 1, 0.75
+mutant_part_controller_hand, 2, 0.66
+
+[dog]
+mutant_part_dog_meat, 2, 0.45
+mutant_part_dog_tail, 1, 0.33
+
+[flesh]
+mutant_part_flesh_eye, 2, 0.5
+mutant_part_flesh_meat, 3, 0.66
+
+[gigant]
+mutant_part_pseudogigant_eye, 2, 0.75
+mutant_part_pseudogigant_hand, 2, 0.75
+
+[psy_dog]
+mutant_part_psevdodog_meat, 2, 0.75
+mutant_part_psevdodog_tail, 1, 0.75
+
+[pseudodog]
+mutant_part_psevdodog_meat, 2, 0.66
+mutant_part_psevdodog_tail, 1, 0.5
+
+[snork]
+mutant_part_snork_hand, 2, 0.33
+mutant_part_snork_leg, 2, 0.45
+
+[tushkano]
+mutant_part_tushkano_head, 1, 0.5
+mutant_part_tushkano_meat, 1, 0.66
+
+[cat]
+mutant_part_cat_tail, 1, 0.66
+
+[fracture]
+mutant_part_fracture_hand, 2, 0.66
+
+[zombie]
+mutant_part_zombi_hand, 2, 0.5
+
+[karlik]
+mutant_part_karlik_ear, 2, 0.5

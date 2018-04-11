@@ -1,0 +1,510 @@
+;=========================================================================================
+; Base Definition
+;=========================================================================================
+[m_gigant_e]:monster_base
+GroupControlSection	= spawn_group
+SpaceRestrictionSection = space_restrictor,zone_mosquito_bald
+$spawn               = "monsters\old\gigant"		; option for Level Editor
+$npc			     = on						; option for Level Editor
+$prefetch 			 = 16
+Scheduled		     = on						; option for ALife Simulator
+Human		     	 = off						; option for ALife Simulator
+Health			     = 1000						; option for ALife Simulator
+MinSpeed		     = 1.0						; option for ALife Simulator
+MaxSpeed		     = 5.0						; option for ALife Simulator
+going_speed          = 3;4.5                      ; option for ALife Simulator
+current_level_going_speed		= 3;2					; option for ALife Simulator
+search_speed         = 1.5                       ; option for ALife Simulator
+visual				 = monsters\psevdogigant\psevdogigant
+corpse_visual	     = monsters\psevdogigant\psevdogigant_dead
+icon				 = ui_npc_monster_psevdogigant
+
+;spawn_phantom 		= m_phantom_gigant
+can_spawn_phantom 	= false
+
+smart_terrain_choose_interval	= 00:15:00
+
+ef_creature_type	= 19							; option for evaluation functions
+ef_weapon_type		= 2
+ef_detector_type			 = 1
+panic_threshold		= 0.1
+
+cform                = skeleton					; collision class
+class                = SM_GIANT					; AI class
+
+script_binding  	= bind_monster.bind
+
+bone_torso			 = spine 			; bone name
+bone_head			 = head				; bone name
+bone_fire			 = head				; bone name
+weapon_usage		 = 0				; boolean
+
+hit_fraction_monster = 0.2
+skin_armor = 0.65
+
+;------------------------------------------------------------------------
+; Influences
+;------------------------------------------------------------------------
+
+fire_max_distance			=	0
+fire_max_power				=	5
+fire_linear_factor			=	0
+fire_quadratic_factor		=	0.025
+
+psy_max_distance			=	0
+psy_max_power				=	5
+psy_linear_factor			=	0.05
+psy_quadratic_factor		=	0
+
+radiation_max_distance		=	5
+radiation_max_power			=	0.01
+radiation_linear_factor		=	1
+radiation_quadratic_factor	=	1
+radiation_pp_effector_name	= 	postprocess_rad
+radiation_pp_highest_at		= 	0.02
+
+;---------------------------------------------------------------------
+; Physics
+;---------------------------------------------------------------------
+ph_box0_center 		 = 0.0,  0.9,  0.0
+ph_box0_size 		 = 0.6, 0.9,  0.6
+ph_box1_center 		 = 0.0,  0.6,  0.0
+ph_box1_size 		 = 0.40, 0.6,  0.40
+ph_crash_speed_min			= 100
+ph_crash_speed_max			= 300
+ph_collision_damage_factor	= 0.1
+ph_mass 		     = 5000		;370
+
+destroyed_vis_name	 = dynamics\Dead_Body\skelet_crash
+
+;---------------------------------------------------------------------
+ph_skeleton_airr_lin_factor   = 2.0 ;550.0 (изменно из-за того, что убрано домножение коэффициент 0.002 из кода)
+ph_skeleton_airr_ang_factor   = 0.0 ;0.0 (изменно из-за того, что убрано домножение на коэффициент 0.3 из кода (0.0*0.3=0.0))
+ph_skeleton_hinger_factor1    = 1.0 ;1.0 (изменно из-за того, что убрано домножение на коэффициент 5.0 из кода)
+ph_skeleton_ddelay	     	  = 15.0 ;Время изменения значения трения в суставе с момента создания шелла, сек
+
+ph_skel_fatal_impulse_factor  = 12.0
+ph_after_death_velocity_factor= 0.75
+ph_skel_shot_up_factor        = 0.25
+;---------------------------------------------------------------------
+
+;----------------------------------------------------------------------------
+; Movement::Velocities & Acceleration
+;----------------------------------------------------------------------------
+; speed factors			linear | angular_real | angular_path | min |  max
+Velocity_Stand			= 0,		6.0,			6.0,		1,		1
+Velocity_WalkFwdNormal	= 4.2,		4.0,			4.0,		0.1,	2.5
+Velocity_RunFwdNormal	= 11.0,		4.0,			4.0,		0.2,	1	
+Velocity_WalkFwdDamaged	= 2.5,		3.0,			3.0,		0.5,	1.5	
+Velocity_RunFwdDamaged	= 6.0,  	4.0,			4.0,		0.2,	1
+Velocity_Drag			= 1.0,		3.0,			3.0,		1,		1
+Velocity_Steal			= 1.5,		3.0,			3.0,		1,		1
+Velocity_JumpPrepare	= 6.0,		1.0,			1.0,		1,		1
+Velocity_JumpGround		= 12.5,		2.0,			2.0,		0.16,	1	
+
+; acceleration
+Accel_Generic		= 1.5
+Accel_Calm			= 1.5
+Accel_Aggressive	= 15.5
+
+;--------------------------------------------------------------------------
+; Attack parameters
+;--------------------------------------------------------------------------
+MinAttackDist		= 1.5	;2.6	;0.5
+MaxAttackDist		= 2.6	;3.5	;3.8
+
+as_min_dist				= 1.5
+as_step					= 0.3
+
+;-----------------------------------------------------------------------
+; Run Attack 
+;-----------------------------------------------------------------------
+Run_Attack_Dist			= 4.5,		8.0
+Run_Attack_Delay		= 3000,		6000 
+
+;-----------------------------------------------------------------------
+
+DayTime_Begin		= 21			; 
+DayTime_End			= 5		; 
+Min_Satiety			= 0.00055		; 
+Max_Satiety			= 0.75		; 
+
+distance_to_corpse	= 1.3		; 
+
+selector_approach		= 20.0,1.0,1000.0,0.0,0.0, 1000.0,	10000.0,      
+
+terrain					= giant_terrain
+
+hit_type				= wound
+
+;----------------------------------------------------------------------------------------
+;Entity Condition
+;----------------------------------------------------------------------------------------
+satiety_v 			= 0.00001			;скорость уменьшения сытости со временем
+radiation_v 		= 0.00001 ;0.004	;скорость уменьшения радиации
+satiety_power_v 	= 0.001	;0.01		;увеличение силы при уменьшении сытости 
+satiety_health_v 	= 0.001				;увеличение здоровья при уменьшении сытости 
+satiety_critical 	= -1.0	;0.25		;критическое значения сытости (в процентах от 0..1) когда здоровье начианает уменьшаться
+radiation_health_v 	= 0.01	;0.006		;уменьшение здоровья при воздействии радиации
+morale_v			= 0.01				;скорость восстановления морали
+health_hit_part 	= 1	;0.8			;процент хита, уходящий на отнимание здоровья
+power_hit_part 		= 1	;0.9			;процент хита, уходящий на отнимание силы
+psy_health_v		= 0.1				;скорость восстановления psy-здоровья
+
+immunities_sect				= giant_immunities
+
+;открытые раны
+bleeding_v					= 0.01						;потеря крови при номинальной ране в секунду
+wound_incarnation_v			= 0.02				;крутизна кривой заживления (какой процент раны останется после заживления в игровую секунду)
+min_wound_size				= 0.01
+
+sleep_health 			= 1.0		;1.5	;коэффициенты скоростей изменения параметров во время сна
+sleep_power 			= 1.0		;1.5
+sleep_satiety 			= 1.0		;0.8
+sleep_radiation 		= 1.0	;1.1
+sleep_psy_health = 1.0
+
+
+satiety_threshold		= 0.5							; below this value monster fill hunger
+
+;----------------------------------------------------------------------------------------
+
+eat_freq			=	5.0		; частота укусов в сек
+eat_slice			=	0.001	; увеличение сытости при 1 укусе
+eat_slice_weight	=	10.0	; уменьшение еды у трупа
+
+;----------------------------------------------------------------------------------------
+
+; Morale
+Morale_Hit_Quant				= 0.001
+Morale_Attack_Success_Quant		= 0.1
+Morale_Take_Heart_Speed			= 0.1
+Morale_Despondent_Speed			= 0.1
+Morale_Stable_Speed				= 0.01
+Morale_Despondent_Threashold	= 0.5
+
+
+;----------------------------------------------------------------------------------------
+; Sounds
+;----------------------------------------------------------------------------------------
+sound_idle				= monsters\giant\giant_breath_   ; giant_idle_
+sound_eat				= monsters\boar\boar_eat_
+sound_aggressive		= monsters\giant\giant_aggressive_
+sound_attack_hit		= monsters\giant\giant_attack_
+sound_take_damage		= monsters\giant\giant_hurt_
+sound_die				= monsters\giant\giant_death_
+sound_bkgnd				= monsters\biting\def_
+sound_threaten			= monsters\giant\giant_threaten_   ; boar\threaten_
+sound_landing			= monsters\boar\landing_
+sound_steal				= monsters\biting\def_
+sound_panic				= monsters\biting\def_
+sound_growling			= monsters\biting\def_
+sound_die_in_anomaly	= monsters\giant\giant_death_
+
+sound_threaten_hit		= device\door_stop
+sound_threaten_start	= monsters\giant\giant_attack_0
+---------------------------------------------------------------------------
+SoundThreshold		 = 0.1             ; range [0..1]
+max_hear_dist		 = 50
+
+
+killer_clsids			= Z_MINCER,Z_GALANT,ZS_BFUZZ,ZS_MBALD,ZS_GALAN,ZS_MINCE
+
+
+idle_sound_delay		= 85000
+eat_sound_delay			= 3000
+attack_sound_delay		= 14000
+
+sound_distant_idle			= monsters\giant\giant_breath_
+distant_idle_sound_delay	= 80000
+distant_idle_sound_range	= 100.0	
+
+
+DamagedThreshold		= 0.2
+
+material				= creatures\large
+DynamicObjectsCount		= 32
+
+squad_attack_algorithm	= 1
+attack_effector			= m_giant_attack_effector
+
+attack_params			= m_gigant_attack_params
+step_params				= m_gigant_step_params
+damage					= m_giant_damage
+threaten_effector		= pseudogigant_threaten_effector
+
+
+LegsCount			= 2
+
+;species of monster
+species					= giant
+rank					= 21
+spec_rank				= normal
+community				= pseudo_gigant
+
+;-----------------------------
+; step effector
+;-----------------------------
+step_effector_time		=  0.5
+step_effector_amplitude		=  1.5
+step_effector_period_number	=  5.0
+
+;-----------------------------
+; jump parameters
+;-----------------------------
+jump_delay					= 30000 ;3000
+jump_factor					= 1.7
+jump_ground_trace_range		= 1.4
+jump_hit_trace_range		= 3.0
+jump_build_line_distance	= 5.0
+jump_min_distance			= 5.0 
+jump_max_distance			= 15.0
+jump_max_angle				= 0.3
+
+
+Anomaly_Detect_Radius			= 15.0
+Anomaly_Detect_Time_Remember	= 10000
+
+HugeKick_Damage				= 1.2
+HugeKick_Particles			= monsters\gigant_wave
+HugeKick_MinMaxDist			= 5,20	;10, 20
+HugeKick_MinMaxDelay		= 13000, 22000 ;10000, 30000
+HugeKick_Time_SlowDown		= 4000
+
+monster_type				= outdoor
+
+critical_wound_threshold		= -1
+critical_wound_decrease_quant	= 0.
+
+
+;-------------------------------------------------------------------------
+; Vision
+;-------------------------------------------------------------------------
+eye_fov				 = 100	;120
+eye_range			 = 95	;40	;80
+
+vision_free_section			= giant_vision_free
+vision_danger_section		= giant_vision_danger
+
+; ЗНАЧЕНИЯ visibility_threshold ДОЛЖНЫ БЫТЬ РАВНЫ для денжера и фри,
+; иначе возникают артефакты с потерей видимости при переходе от денжера во фри.
+
+[giant_vision_free]
+min_view_distance   		= 0.5				; коэффициент, который множится на eye_range, в зависимости от угла
+max_view_distance	 		= 1.0				; коэффициент, который множится на eye_range, в зависимости от угла
+visibility_threshold	 	= 100.0				; значение, при достижении суммой которого объект считается видимым
+always_visible_distance 	= 0.3
+time_quant					= 0.001
+decrease_value				= 0.01				; значение, на которое уменьшается вес, если объект попал в фрустум, но отсёкся по каким-то причинам
+velocity_factor		     	= 0.5
+luminocity_factor			= 0.5 				; фактор освещения (только для Актёра)
+transparency_threshold		= 0.25
+
+[giant_vision_danger]
+min_view_distance   		= 0.5				; коэффициент, который множится на eye_range, в зависимости от угла
+max_view_distance	 		= 1.0				; коэффициент, который множится на eye_range, в зависимости от угла
+visibility_threshold	 	= 100.0				; значение, при достижении суммой которого объект считается видимым
+always_visible_distance 	= 0.3
+time_quant					= 0.001
+decrease_value				= 0.01				; значение, на которое уменьшается вес, если объект попал в фрустум, но отсёкся по каким-то причинам
+velocity_factor		     	= 0.5
+luminocity_factor			= 0.5 				; фактор освещения (только для Актёра)
+transparency_threshold		= 0.25
+
+;=========================================================================================
+; Damage Params
+;=========================================================================================
+
+[m_giant_damage]
+;bone_name		 = <hit_scale>,-1,<wound_scale>
+;<hit_scale>	- коэфф. изменения хита (уменьшения здоровья) 
+;<wound_scale>	- коэфф. изменения величины открытой раны
+
+default				= 1, -1, 0.1
+tail				= 1, -1, 0.1
+spine 				= 1, -1, 0.1
+hip 				= 1, -1, 0.5
+head 				= 2, -1, 0.2, 10
+
+;=========================================================================================
+; Attack Animation Params
+;=========================================================================================
+[m_gigant_attack_params]
+;---------------------------------------------------------------------------------------------------------------------------------------------
+;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)   |	Field of hit_test  (left,right, top, bottom) |	Test Dist
+;---------------------------------------------------------------------------------------------------------------------------------------------
+;Bite
+stand_attack_0 =	  	0.25,		0.8,	    150,        0.5, 1.0, 0.5,		 -0.8, 0.8, -1.8, 1.8,					  2.6
+;Left leg Strike
+stand_attack_1 =	  	0.40,		0.9,	    200,        5.0, 2.5, 4.0,		 -0.6, 0.6, -1.8, 1.8,					  3.2
+;Bite2
+stand_attack_2 =	  	0.25,		0.8,	    150,        0.5, 1.0, 5.0,		 -0.8, 0.8, -1.8, 1.8,					  2.6
+stand_attack_run_0=     0.5,		1.0,	    350,        0.5, 1.0, 5.0,		 -0.6, 1.3, -1.8, 1.8,					  3.3
+jump_attack_1	=		0.1,		2.0,		1250,       0.5, 1.0, 5.0,		 -1.0, 1.3, -1.6, 1.6,					  5.5
+
+;=========================================================================================
+; Attack Effector
+;=========================================================================================
+[m_giant_attack_effector]
+duality_h		= 0.05;0.01
+duality_v		= 0.08;0.01
+blur			= 0.01
+gray			= 0.5
+noise_intensity = 0.0
+noise_grain		= 1
+noise_fps		= 30
+color_base		= 0.65,0.15,0.1
+color_gray		= 0.333,0.333,0.333
+color_add		= 0,0,0
+time			= 1.5
+time_attack		= 0.05		; fade in
+time_release	= 0.65		; fade out
+
+; camera effects
+ce_time				= 0.85 ;time 
+ce_amplitude		= 25.0;15.0 
+ce_period_number	= 3.0 
+ce_power			= 3.0 ;0.7 ; power 
+
+;=========================================================================================
+; Step Params
+;=========================================================================================
+[m_gigant_step_params]
+;------------------------------------------------------------------------
+;	anim			Cycles| time1 | power1 | time2 | power2 |
+;------------------------------------------------------------------------
+stand_walk_fwd_0	=	1,     0.5,     1,	   0.1,    0.7 
+stand_walk_fwd_dmg_0=  	1,	   0.2,     1,	   0.25,   0.7, 
+stand_steal_0		=	1,	   0.2,     1,	   0.5,   0.7,   
+
+
+;=========================================================================================
+; Threaten Effector
+;=========================================================================================
+[pseudogigant_threaten_effector]
+duality_h		= 0.1	;0.31
+duality_v		= 0.1	;0.31
+blur			= 0.01
+gray			= 0.3	;0.5
+noise_intensity = 1.0
+noise_grain		= 0.2
+noise_fps		= 30
+color_base		= 0.3,0.2,0.2	;0.1,0.15,0.4
+color_gray		= 0.333,0.333,0.333	;0.333,0.333,0.333
+color_add		= 0.0,0.0,0.0
+time			= 2.0		;1.5
+time_attack		= 0.1	;0.5		; fade in
+time_release	= 0.3		; fade out
+
+; camera effects
+ce_time				= 1.7	;1.5
+ce_amplitude		= 6.0
+ce_period_number	= 20.0
+ce_power			= 1.3 ;0.7
+
+;===========================================================================
+; TERRAIN
+;===========================================================================
+[giant_terrain]
+	255,000,255,255
+
+;===========================================================================
+; IMMUNITIES
+;===========================================================================
+[giant_immunities]
+burn_immunity 			= 0.1			;коэффициенты иммунитета 
+strike_immunity 		= 0.0
+shock_immunity 			= 0.01
+wound_immunity 			= 0.1
+radiation_immunity 		= 0.0
+telepatic_immunity 		= 0.0
+chemical_burn_immunity	= 0.1
+explosion_immunity 		= 0.1
+fire_wound_immunity  	= 0.07
+
+;---------------------------
+[gigant_normal]:m_gigant_e
+$spawn				= "monsters\gigants\gigant_normal"
+visual				= monsters\psevdogigant\psevdogigant
+corpse_visual	     = monsters\psevdogigant\psevdogigant_dead
+icon				= ui_npc_monster_psevdogigant
+rank				= 20
+spec_rank			= normal
+community			= pseudo_gigant
+MaxHealthValue		     = 1.0			; range [0..200]
+
+[gigant_strong]:m_gigant_e
+$spawn				= "monsters\gigants\gigant_strong"
+visual				= monsters\psevdogigant\psevdogigant_big
+corpse_visual	     = monsters\psevdogigant\psevdogigant_big_dead
+icon				= ui_npc_monster_psevdogigant
+rank				= 20
+spec_rank			= strong
+community			= pseudo_gigant
+MaxHealthValue		     = 1.25			; range [0..200]
+
+immunities_sect				= giant_immunities_strong
+attack_params			= m_gigant_attack_params_strong
+
+hit_fraction_monster = 0.18
+
+[giant_immunities_strong]
+burn_immunity 			= 0.08			;коэффициенты иммунитета 
+strike_immunity 		= 0.0
+shock_immunity 			= 0.008
+wound_immunity 			= 0.08
+radiation_immunity 		= 0.0
+telepatic_immunity 		= 0.0
+chemical_burn_immunity	= 0.08
+explosion_immunity 		= 0.08
+fire_wound_immunity  	= 0.05
+
+[m_gigant_attack_params_strong]
+;---------------------------------------------------------------------------------------------------------------------------------------------
+;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)   |	Field of hit_test  (left,right, top, bottom) |	Test Dist
+;---------------------------------------------------------------------------------------------------------------------------------------------
+;Bite
+stand_attack_0 =	  	0.25,		0.85,	    200,        0.5, 1.0, 0.5,		 -0.8, 0.8, -1.8, 1.8,					  2.6
+;Left leg Strike
+stand_attack_1 =	  	0.40,		0.95,	    250,        5.0, 2.5, 4.0,		 -0.6, 0.6, -1.8, 1.8,					  3.2
+;Bite2
+stand_attack_2 =	  	0.25,		0.85,	    200,        0.5, 1.0, 5.0,		 -0.8, 0.8, -1.8, 1.8,					  2.6
+stand_attack_run_0=     0.5,		1.1,	    450,        0.5, 1.0, 5.0,		 -0.6, 1.3, -1.8, 1.8,					  3.3
+jump_attack_1	=		0.1,		2.5,		1500,       0.5, 1.0, 5.0,		 -1.0, 1.3, -1.6, 1.6,					  5.5
+
+[gigant_weak]:m_gigant_e
+$spawn				= "monsters\gigants\gigant_weak"
+visual				= monsters\psevdogigant\mini_psevdogigant
+corpse_visual	     = monsters\psevdogigant\mini_psevdogigant_dead
+icon				= ui_npc_monster_psevdogigant
+rank				= 2
+spec_rank			= weak
+community			= pseudo_gigant
+MaxHealthValue		     = 0.75			; range [0..200]
+
+immunities_sect				= giant_immunities_weak
+attack_params			= m_gigant_attack_params_weak
+
+[giant_immunities_weak]
+burn_immunity 			= 0.8			;коэффициенты иммунитета 
+strike_immunity 		= 0.0
+shock_immunity 			= 0.8
+wound_immunity 			= 0.8		
+radiation_immunity 		= 0.0
+telepatic_immunity 		= 0.0
+chemical_burn_immunity	= 0.8
+explosion_immunity 		= 0.8
+fire_wound_immunity  	= 1
+
+[m_gigant_attack_params_weak]
+;---------------------------------------------------------------------------------------------------------------------------------------------
+;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)   |	Field of hit_test  (left,right, top, bottom) |	Test Dist
+;---------------------------------------------------------------------------------------------------------------------------------------------
+;Bite
+stand_attack_0 =	  	0.25,		0.35,	    40,        0.5, 1.0, 0.5,		 -0.8, 0.8, -1.8, 1.8,					  2.6
+;Left leg Strike
+stand_attack_1 =	  	0.40,		0.45,	    60,        5.0, 2.5, 4.0,		 -0.6, 0.6, -1.8, 1.8,					  3.2
+;Bite2
+stand_attack_2 =	  	0.25,		0.35,	    40,        0.5, 1.0, 5.0,		 -0.8, 0.8, -1.8, 1.8,					  2.6
+stand_attack_run_0=     0.5,		0.6,	    100,        0.5, 1.0, 5.0,		 -0.6, 1.3, -1.8, 1.8,					  3.3
+jump_attack_1	=		0.1,		1.0,		250,       0.5, 1.0, 5.0,		 -1.0, 1.3, -1.6, 1.6,					  5.5

@@ -1,0 +1,407 @@
+
+local priority_close = {
+	_G.IsShotgun,
+	_G.IsRifle,
+	_G.IsPistol,
+	_G.IsSniper,
+	_G.IsLauncher
+}
+
+local priority_medium = {
+	_G.IsRifle,
+	_G.IsPistol,
+	_G.IsSniper,
+	_G.IsShotgun,
+	_G.IsLauncher
+}
+
+local priority_far = {
+	_G.IsSniper,
+	_G.IsRifle,
+	_G.IsPistol,
+	_G.IsShotgun,
+	_G.IsLauncher
+}
+
+local priority_heli = {
+	_G.IsLauncher,
+	_G.IsSniper,
+	_G.IsRifle,
+	_G.IsPistol,
+	_G.IsShotgun
+}
+
+-- if return game_object then it ignores engine. If return nil, then engine tries to find item to kill
+-- called from engine!
+local weapon_list = {}
+function update_best_weapon(npc,cur_wpn)
+	local st = db.storage[npc:id()]
+	if not (st) then 
+		return
+	end
+	
+	--alun_utils.debug_nearest(npc,"cur_wpn=%s",cur_wpn:name())
+	-- we want to choose new best_weapon every n seconds unless we don't have one
+	local tg = time_global()
+	if (st._choose_bw_timer and tg < st._choose_bw_timer and cur_wpn and npc:active_item() and npc:active_item():id() == cur_wpn:id()) then
+		if (cur_wpn:cast_Weapon():can_kill() == false) then
+			--printf("not can kill!")
+			local ammos = system_ini():r_list(cur_wpn:section(),"ammo_class")
+			if (ammos[1]) then 
+				alife():create(ammos[1],npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id())
+			end
+			cur_wpn:set_ammo_elapsed(system_ini():r_float_ex(cur_wpn:section(),"ammo_mag_size",1))
+		end
+		return cur_wpn
+	end
+	st._choose_bw_timer = tg+10000
+	
+	-- set weapon priority
+	local prior
+	local be = npc:best_enemy()
+	if (be) then 
+		if (be:position():distance_to_sqr(npc:position()) > 2500) then 
+			prior = priority_far
+		elseif (be:position():distance_to_sqr(npc:position()) > 900) then 
+			prior = priority_medium
+		else
+			prior = priority_close
+		end
+	elseif (axr_npc_vs_heli.is_under_npc_vs_heli(npc)) then
+		prior = priority_heli
+	else
+		prior = priority_medium
+	end
+
+	weapon_list = iempty_table(weapon_list)
+	
+	local function itr(npc,wpn)
+		local cls = wpn:clsid()
+		if (IsWeapon(nil,cls)) then 
+			table.insert(weapon_list,wpn)
+		end
+		return false
+	end
+	
+	npc:iterate_inventory(itr,npc)
+	
+	if (#weapon_list == 0) then 
+		return 
+	end
+	
+	local cur_best_weapon
+	local ini = system_ini()
+	for i=1,#prior do
+		cur_best_weapon = nil
+		local highest_cost	
+		for n,wpn in ipairs(weapon_list) do
+			if (prior[i](wpn)) then
+				local cost = ini:r_float_ex(wpn:section(),"cost")
+				if (highest_cost == nil or cost > highest_cost) then 
+					--alun_utils.debug_nearest(npc,"cur_best_weapon=%s  now=%s",cur_best_weapon and cur_best_weapon:name(),wpn:name())
+					highest_cost = cost
+					cur_best_weapon = wpn
+				end
+			end
+		end
+		if (cur_best_weapon) then 
+			break
+		end
+	end
+	
+	if (cur_best_weapon) then
+		--alun_utils.debug_nearest(npc,"cur_wpn=%s bw=%s",cur_wpn and cur_wpn:name(),cur_best_weapon and cur_best_weapon:name())
+		return cur_best_weapon
+	end
+
+	return
+end
+
+-- called from engine
+-- return false to use Engine technique, return true to ignore engine technique
+function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
+	local sim = alife()
+	local create = sim.create
+	local sys_ini = system_ini()
+	local ini = create_ini_file(ini_string)
+	
+	local section = "spawn"
+	if (ini:section_exist(section)) then 
+		local result, spawn_sec, value = nil, nil, nil
+		local j = ini:line_count(section)-1
+		for i=0,j do
+			result, spawn_sec, value = ini:r_line(section,i,"","")
+			if (spawn_sec and spawn_sec ~= "" and sys_ini:section_exist(spawn_sec)) then 
+				local cond,prob,count,ammo_type = 1,1,1,0
+				local bLauncher, bScope, bSight, bSilencer
+				local sight, sights, variant_section
+				if (value and value ~= "") then
+					local _a,_b = string.find(value,",") 
+					if (_a) then 
+						count = tonumber(string.sub(value,1,_a-1)) or 1
+					end
+					if (string.find(value,"launcher")) then 
+						bLauncher = true
+					end
+					if (string.find(value,"scope")) then 
+						bScope = true
+					end 
+					if (string.find(value,"silencer")) then 
+						bSilencer = true
+					end
+					if (string.find(value,"sight")) then 
+						bSight = true
+					end
+					for a,b in string.gmatch(value,"([%w_%-%s%.]*)=([%w_%-%s%.]*)") do
+						if (a == "cond") then 
+							cond = tonumber(b) or 1
+						elseif (a == "prob") then 
+							prob = tonumber(b) or 1
+						elseif (a == "ammo_type") then
+							local ammos = alun_utils.parse_list(sys_ini,sec,"ammo_class")
+							if (b == "r") then 
+								ammo_type = ammos and math.random(0,#ammos-1) or 0
+							else
+								ammo_type = tonumber(b) or 0
+							end
+							if not (ammos and ammo_type >= 0 and ammo_type < #ammos) then
+								ammo_type = 0
+							end
+						elseif (a == "launcher") then
+							bLauncher = math.random() <= (tonumber(b) or 0)
+						elseif (a == "scope") then
+							bScope = math.random() <= (tonumber(b) or 0)
+						elseif (a == "silencer") then
+							bSilencer = math.random() <= (tonumber(b) or 0)
+						elseif (a == "sight") then
+							bSight = math.random() <= (tonumber(b) or 0)
+						elseif (a == "skins") then
+							-- Number of skins, not the % of spawning.
+							skins = math.random(0, (tonumber(b) or 0))
+						end
+					end
+				end
+				
+				-- Chernobyl Weapon Pack / Arsenal Overhaul 3
+				-- Switches the weapon to a reskinned variant if available.
+				if (skins and skins > 0) then
+					variant_section = create_section .. "_sk" .. skins
+					if (sys_ini:section_exist(variant_section)) then
+						create_section = variant_section
+					end
+				end
+				
+				-- Chernobyl Weapon Pack / Arsenal Overhaul 3
+				-- Switches the weapon to a sighted variant if available.
+				if (bSight) then
+					sights = alun_utils.parse_list(sys_ini, create_section, "sights")
+					if (#sights > 0) then
+						sight = sights[math.random(#sights)]
+						variant_section = create_section .. "_" .. sight
+						if (sys_ini:section_exist(variant_section)) then
+							create_section = variant_section
+						end
+					end
+				end
+				
+				for k=1,count do 
+					if (prob == 1 or math.random() <= prob) then 
+						local se_item = create(sim,spawn_sec,se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id,id)
+						if (se_item) then 
+							local cls = se_item:clsid()
+							if (IsWeapon(nil,cls) and cls ~= clsid.wpn_knife_s) then 
+								se_item.condition = cond
+								se_item.ammo_type = ammo_type
+								--printf("spawn wpn=%s ammo_type=%s",spawn_sec,ammo_type)
+								
+								local flags = se_item:get_addon_flags()
+								if (bScope and se_item.scope_status == cse_alife_item_weapon.eAddonAttachable) then 
+									flags:set(cse_alife_item_weapon.eWeaponAddonScope,true)
+								end
+
+								if (bLauncher and se_item.grenade_launcher_status == cse_alife_item_weapon.eAddonAttachable) then
+									flags:set(cse_alife_item_weapon.eWeaponAddonGrenadeLauncher,true)
+								end
+
+								if (bSilencer and se_item.silencer_status == cse_alife_item_weapon.eAddonAttachable) then
+									flags:set(cse_alife_item_weapon.eWeaponAddonSilencer,true)
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+	
+	-- Spawn randomly only a single section from spawn_loadout<n> sections
+	--[[
+		[spawn_loadout] \n
+		wpn_abakan = 2, scope, ammo_type=1, rank=500 \n
+		wpn_pm \n
+		wpn_toz \n
+		wpn_gauss, level=l11_pripyat \n
+		
+		In the example above only 1 item will be randomly selected from the 3 listed. 2 boxes of AP ammo will spawn for wpn_abakan, if selected and actor rank is above 500.
+		
+		Can have as many sections as needed:
+			[spawn_loadout]
+			
+			[spawn_loadout2]
+			
+			[spawn_loadout3]
+			
+			...
+	--]]
+	section = "spawn_loadout"
+	if (ini:section_exist(section)) then
+		local actor_rank = sim:actor():rank()
+		local itr_count = 1
+		local spawn_list = {}
+		while (ini:section_exist(section)) do
+			iempty_table(spawn_list)
+			local size_t = 0
+			local j = ini:line_count(section)-1
+			for i=0,j do
+				local result, spawn_sec, value = ini:r_line(section,i,"","")
+				if (spawn_sec and spawn_sec ~= "" and sys_ini:section_exist(spawn_sec)) then
+					if (value and value ~= "") then
+						-- If a rank parameter exists, then only allow item if actor rank is greater than equal
+						local rank = tonumber(string.match(value,"rank=([%w_%-%.]+)"))
+						if (rank == nil or rank <= actor_rank) then
+							local prob = tonumber(string.match(value,"prob=([%w_%-%.]+)")) or 1 
+							if (prob == 1 or math.random() <= prob) then
+								-- If a level parameter exists then only allow item for this level
+								-- if not (level_name) then 
+									-- level_name = sim:level_name(game_graph():vertex(se_obj.m_game_vertex_id):level_id())
+								-- end
+								-- local l_name = string.match(value,"level=([%w_%-.]+)")
+								-- if (l_name == nil or l_name == level_name) then
+									size_t = size_t + 1
+									spawn_list[size_t] = {spawn_sec,value}
+								-- end
+							end
+						end
+					else
+						size_t = size_t + 1
+						spawn_list[size_t] = {spawn_sec,value}
+					end 
+				end
+			end
+			if (size_t > 0) then
+				local selected = spawn_list[math.random(size_t)]
+				local create_section = selected[1]
+				local value = selected[2]
+				local cond,count,ammo_type = 1,1,0
+				local bLauncher, bScope, bSight, bSilencer
+				local sight, sights, skins, variant_section
+				if (value and value ~= "") then
+					-- parse params
+					local _a,_b = string.find(value,",") 
+					if (_a) then 
+						count = tonumber(string.sub(value,1,_a-1)) or 1
+					end
+					if (string.find(value,"launcher")) then 
+						bLauncher = true
+					end
+					if (string.find(value,"scope")) then 
+						bScope = true
+					end 
+					if (string.find(value,"silencer")) then 
+						bSilencer = true
+					end
+					if (string.find(value,"sight")) then 
+						bSight = true
+					end
+					for a,b in string.gmatch(value,"([%w_%-%s%.]+)=([%w_%-%s%.]+)") do
+						if (a == "cond") then 
+							cond = tonumber(b) or 1
+						elseif (a == "ammo_type") then 
+							local ammos = alun_utils.parse_list(sys_ini,create_section,"ammo_class")
+							if (b == "r") then
+								ammo_type = ammos and math.random(0,#ammos-1) or 0
+							else
+								ammo_type = tonumber(b) or 0
+							end
+							--printf("#ammos=%s  ammo_type=%s" ,#ammos,ammo_type)
+							if not (ammos and ammo_type >= 0 and ammo_type < #ammos) then
+								ammo_type = 0
+							end
+						elseif (a == "launcher") then
+							bLauncher = math.random() <= (tonumber(b) or 0)
+						elseif (a == "scope") then
+							bScope = math.random() <= (tonumber(b) or 0)
+						elseif (a == "silencer") then
+							bSilencer = math.random() <= (tonumber(b) or 0)
+						elseif (a == "sight") then
+							bSight = math.random() <= (tonumber(b) or 0)
+						elseif (a == "skins") then
+							-- Number of skins, not the % of spawning.
+							skins = math.random(0, (tonumber(b) or 0))
+						end
+					end
+				end
+				
+				-- Chernobyl Weapon Pack / Arsenal Overhaul 3
+				-- Switches the weapon to a reskinned variant if available.
+				if (skins and skins > 0) then
+					variant_section = create_section .. "_sk" .. skins
+					if (sys_ini:section_exist(variant_section)) then
+						create_section = variant_section
+					end
+				end
+				
+				
+				-- Chernobyl Weapon Pack / Arsenal Overhaul 3
+				-- Switches the weapon to a sighted variant if available.
+				if (bSight) then
+					sights = alun_utils.parse_list(sys_ini, create_section, "sights")
+					if (#sights > 0) then
+						sight = sights[math.random(#sights)]
+						variant_section = create_section .. "_" .. sight
+						if (sys_ini:section_exist(variant_section)) then
+							create_section = variant_section
+						end
+					end
+				end
+				
+				-- Create the item and set params
+				local se_item = create(sim,create_section,se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id,id)
+				if (se_item) then 
+					local cls = se_item:clsid()
+					if (IsWeapon(nil,cls) and cls ~= clsid.wpn_knife_s) then 
+						se_item.condition = cond
+
+						local flags = se_item:get_addon_flags()
+						if (bScope and se_item.scope_status == cse_alife_item_weapon.eAddonAttachable) then 
+							flags:set(cse_alife_item_weapon.eWeaponAddonScope,true)
+						end
+
+						if (bLauncher and se_item.grenade_launcher_status == cse_alife_item_weapon.eAddonAttachable) then
+							flags:set(cse_alife_item_weapon.eWeaponAddonGrenadeLauncher,true)
+						end
+
+						if (bSilencer and se_item.silencer_status == cse_alife_item_weapon.eAddonAttachable) then
+							flags:set(cse_alife_item_weapon.eWeaponAddonSilencer,true)
+						end
+						
+						-- Create the ammo 
+						se_item.ammo_type = ammo_type
+						--printf("spawn_loadout%s wpn=%s ammo_type=%s scope=%s launcher=%s silencer=%s",itr_count,create_section,ammo_type,bScope,bLauncher,bSilencer)
+
+						local ammos = alun_utils.parse_list(sys_ini,create_section,"ammo_class")
+						local ammo_section = ammos[ammo_type+1]
+						if (ammo_section and sys_ini:section_exist(ammo_section)) then 
+							for k=1, count do
+								sim:create(ammo_section,se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id,id)
+							end
+						end
+					end
+				end
+			end
+			itr_count = itr_count + 1
+			section = "spawn_loadout"..itr_count
+		end
+	end
+	return true
+end

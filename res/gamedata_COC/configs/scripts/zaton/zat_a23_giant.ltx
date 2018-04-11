@@ -1,0 +1,25 @@
+[logic@zat_a23_giant]
+suitable = {=target_squad_name(zat_a23_giant_squad)} true
+monster_job = true
+prior = 200
+active = mob_walker@zat_a23_giant
+on_hit = hit@zat_a23_giant
+
+[hit@zat_a23_giant]
+on_info = mob_home@zat_a23_giant
+
+[mob_walker@zat_a23_giant]
+path_walk = zat_a23_giant_walk
+path_look = zat_a23_giant_home
+out_restr = zat_a23_giant_restrictor
+combat_ignore_cond =  true
+on_info = {=actor_in_zone(zat_a23_giant_restrictor)} mob_home@zat_a23_giant
+
+[mob_home@zat_a23_giant]
+path_home = zat_a23_giant_home
+home_min_radius = 20
+home_max_radius = 50
+out_restr = zat_a23_giant_restrictor
+aggressive = true
+
+

@@ -1,0 +1,209 @@
+[up_sect_firsta_bandit_outfit]
+cost 		= 300
+value	    = +10
+
+fire_wound_protection  			= +0.04 
+bones_koeff_protection_add  	= actor_armor_add_1
+
+[up_sect_firstc_bandit_outfit]
+cost 		= 600
+value		= -20
+
+strike_protection 				= +0.05
+explosion_protection 			= +0.05
+wound_protection				= +0.04
+hit_fraction_actor				= -0.05
+
+[up_sect_firste_bandit_outfit]
+cost 		= 1500
+value		= +30
+
+fire_wound_protection  			= +0.06 
+bones_koeff_protection_add  	= actor_armor_add_3
+inv_weight						= +0.25
+power_loss						= +0.01
+
+[up_sect_secona_bandit_outfit]
+cost 		= 600
+value		= +20
+
+immunities_sect_add 				= sect_novice_outfit_immunities_add
+
+[up_sect_seconc_bandit_outfit]
+cost 		= 600
+value       = +20 
+
+chemical_burn_protection  		= +0.01
+shock_protection           		= +0.105
+
+[up_sect_second_bandit_outfit]
+cost 		= 600
+value		= +20
+
+artefact_count						= 1
+
+[up_sect_thirda_bandit_outfit]
+cost 		= 600
+value       = +5
+
+additional_inventory_weight 	= +5
+additional_inventory_weight2 	= +5
+power_loss	                    = -0.03
+
+[up_firsta_bandit_outfit]
+scheme_index            = 0, 0
+known                   = 1
+effects                 = up_gr_firstcd_bandit_outfit
+section                 = up_sect_firsta_bandit_outfit
+property                = prop_armor
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_arm_a9_name
+description             = st_up_arm_a9_descr
+icon                    = ui_inGame2_upgrade_bandit_outfit_1
+
+[up_firstc_bandit_outfit]
+scheme_index            = 1, 0
+known                   = 1
+effects                 = up_gr_firstef_bandit_outfit
+section                 = up_sect_firstc_bandit_outfit
+property                = prop_damage, prop_wound, prop_strike, prop_explo
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_arm_b9_name
+description             = st_up_arm_b9_descr
+icon                    = ui_inGame2_upgrade_bandit_outfit_2
+
+[up_firste_bandit_outfit]
+scheme_index            = 2, 0
+known                   = 1
+effects                 = 
+section                 = up_sect_firste_bandit_outfit
+property                = prop_armor
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_arm_c1_name
+description             = st_up_arm_c1_descr
+icon                    = ui_inGame2_upgrade_bandit_outfit_3
+
+[up_secona_bandit_outfit]
+scheme_index            = 0, 1
+known                   = 1
+effects                 = up_gr_seconcd_bandit_outfit
+section                 = up_sect_secona_bandit_outfit
+property                = prop_durability
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_kom_a5_name
+description             = st_up_kom_a5_descr
+icon                    = ui_inGame2_upgrade_bandit_outfit_4
+
+[up_seconc_bandit_outfit]
+scheme_index            = 1, 1
+known                   = 1
+effects                 = 
+section                 = up_sect_seconc_bandit_outfit
+property                = prop_electro, prop_chem
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_kom_b1_name
+description             = st_up_kom_b1_descr
+icon                    = ui_inGame2_upgrade_bandit_outfit_5
+
+[up_second_bandit_outfit]
+scheme_index            = 1, 2
+known                   = 1
+effects                 = 
+section                 = up_sect_second_bandit_outfit
+property                = prop_artefact
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_uti_b1_name
+description             = st_up_uti_b1_descr
+icon                    = ui_inGame2_upgrade_bandit_outfit_6
+
+[up_thirda_bandit_outfit]
+scheme_index            = 0, 2
+known                   = 1
+effects                 = 
+section                 = up_sect_thirda_bandit_outfit
+property                = prop_tonnage
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_uti_a4_name
+description             = st_up_uti_a4_descr
+icon                    = ui_inGame2_upgrade_bandit_outfit_7
+
+[up_gr_firstab_bandit_outfit]
+elements                = up_firsta_bandit_outfit
+
+[up_gr_firstcd_bandit_outfit]
+elements                = up_firstc_bandit_outfit
+
+[up_gr_firstef_bandit_outfit]
+elements                = up_firste_bandit_outfit
+
+[up_gr_seconab_bandit_outfit]
+elements                = up_secona_bandit_outfit
+
+[up_gr_seconcd_bandit_outfit]
+elements                = up_seconc_bandit_outfit, up_second_bandit_outfit
+
+[up_gr_thirdab_bandit_outfit]
+elements                = up_thirda_bandit_outfit

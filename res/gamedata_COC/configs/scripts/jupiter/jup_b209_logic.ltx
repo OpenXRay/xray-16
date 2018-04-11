@@ -1,0 +1,25 @@
+[logic]
+active = nil;sr_idle
+
+[sr_idle]
+on_info = {+jup_b209_hypotheses_started -jup_b209_give_task} sr_idle@2 %=give_task(jup_b209_hypotheses) +jup_b209_give_task%
+on_info2 = {+jup_b209_give_task} sr_idle@2
+
+[sr_idle@2]
+on_info = {=actor_in_zone(jup_b209_hypotheses) +jup_b209_hypotheses_started -jup_b209_scanner_placed} sr_idle@tut %=run_tutorial(jup_b209_monster_scanner_placed) +jup_b209_start_tutorial%
+
+[sr_idle@tut]
+on_info = {!actor_in_zone(jup_b209_hypotheses) +jup_b209_start_tutorial} sr_idle@2 %-jup_b209_start_tutorial =stop_tutorial%
+on_info2 = {+jup_b209_scanner_placed} sr_idle@3 
+on_info3 = {!has_active_tutorial} sr_idle@2
+
+[sr_idle@3]
+on_info = {+jup_b209_scanner_placed -jup_b209_create_snork_squad} %=create_squad(jup_b209_squad_snork_up : jup_b209) =create_squad(jup_b209_squad_snork_1 : jup_b209) =create_squad(jup_b209_squad_snork_2 : jup_b209) +jup_b209_create_snork_squad%
+on_info2 = {+jup_b209_snork_7_death +jup_b209_snork_6_death +jup_b209_snork_5_death +jup_b209_snork_4_death +jup_b209_snork_3_death +jup_b209_snork_2_death +jup_b209_snork_1_death} sr_idle@4 
+on_game_timer = 3000 | sr_idle@4
+
+[sr_idle@4]
+on_timer = 5000 | %+jup_b209_scanner_time_to_remove% 
+on_info = {+jup_b209_scanner_remove} sr_idle@5 %=give_actor(jup_b209_monster_scanner)%
+
+[sr_idle@5]

@@ -1,0 +1,53 @@
+[logic]
+active = nil;sr_idle
+
+[sr_idle]
+on_info  = {+jup_b6_anom_1 +jup_b6_mutant_attack_start -jup_b6_spawn_1} sr_idle@anom_1 %+jup_b6_spawn_1%
+on_info2 = {+jup_b6_anom_2 +jup_b6_zombied_attack_start -jup_b6_spawn_2} sr_idle@anom_2 %+jup_b6_spawn_2%
+on_info3 = {+jup_b6_two_anomaly_learned} sr_idle@end
+on_info4 = {+jup_b6_task_start} %+jup_b1_complete_end +jup_b1_controller_is_dead +jup_b32_task_end%
+
+;---------------------------------------------------- Спаун на первой аномальной зоне, дополнительно смотреть Б6 каунтер
+
+[sr_idle@anom_1]
+on_game_timer = 100 | sr_idle@anom_1_phase_1 
+
+[sr_idle@anom_1_phase_1]
+on_info  = {+jup_b6_mut_wave_2} sr_idle@anom_1_phase_2, {+jup_b6_mut_wave_3} sr_idle@anom_1_phase_2, {+jup_b6_mut_wave_4} sr_idle@anom_1_phase_2, {!squad_exist(jup_b6_flesh_horde) ~50} sr_idle@anom_1_phase_1_wait %=create_squad(jup_b6_flesh_horde:jup_b211)%, {!squad_exist(jup_b6_boar_horde)} sr_idle@anom_1_phase_1_wait %=create_squad(jup_b6_boar_horde:jup_b211)%
+on_info2 = {+jup_b6_anom_1_count_end} sr_idle, {+jup_b6_task_fail} sr_idle@end, {+jup_b6_mut_wave_2} sr_idle@anom_1_phase_2, {+jup_b6_mut_wave_3} sr_idle@anom_1_phase_2, {+jup_b6_mut_wave_4} sr_idle@anom_1_phase_2
+
+[sr_idle@anom_1_phase_1_wait]
+on_game_timer = 450 | sr_idle@anom_1_phase_1
+on_info  = {+jup_b6_anom_1_count_end} sr_idle, {+jup_b6_task_fail} sr_idle@end, {+jup_b6_mut_wave_2} sr_idle@anom_1_phase_2, {+jup_b6_mut_wave_3} sr_idle@anom_1_phase_2, {+jup_b6_mut_wave_4} sr_idle@anom_1_phase_2
+
+[sr_idle@anom_1_phase_2]
+on_info = {+jup_b6_anom_1_count_end} sr_idle, {+jup_b6_task_fail} sr_idle@end, {!squad_exist(jup_b6_flesh_horde) !squad_exist(jup_b6_flesh_horde_2) ~50} sr_idle@anom_1_phase_2_wait %=create_squad(jup_b6_flesh_horde_2:jup_b211)%, {!squad_exist(jup_b6_boar_horde) !squad_exist(jup_b6_boar_horde_2)} sr_idle@anom_1_phase_2_wait %=create_squad(jup_b6_boar_horde_2:jup_b211)%
+
+[sr_idle@anom_1_phase_2_wait]
+on_game_timer = 650 | sr_idle@anom_1_phase_2
+on_info  = {+jup_b6_anom_1_count_end} sr_idle, {+jup_b6_task_fail} sr_idle@end
+
+;--------------------------------------------------- Спаун на второй аномальной зоне, дополнительно смотреть Б6 каунтер
+
+[sr_idle@anom_2]
+on_game_timer = 100 | sr_idle@anom_2_phase_1 
+
+[sr_idle@anom_2_phase_1]
+on_info  = {+jup_b6_zom_wave_2} sr_idle@anom_2_phase_2, {+jup_b6_zom_wave_3} sr_idle@anom_2_phase_2, {+jup_b6_zom_wave_4} sr_idle@anom_2_phase_2, {!squad_exist(jup_b19_kopatci_zombied) !squad_exist(jup_b6_zombie_squad_1) ~50} sr_idle@anom_2_phase_1_wait %=create_squad(jup_b6_zombie_squad_1:jup_b19)%, {!squad_exist(jup_b6_zombie_squad_2) !squad_exist(jup_b19_kopatci_zombied)} sr_idle@anom_2_phase_1_wait %=create_squad(jup_b6_zombie_squad_2:jup_b19)%
+on_info2  = {+jup_b6_anom_2_count_end} sr_idle, {+jup_b6_task_fail} sr_idle@end, {+jup_b6_zom_wave_2} sr_idle@anom_2_phase_2, {+jup_b6_zom_wave_3} sr_idle@anom_2_phase_2, {+jup_b6_zom_wave_4} sr_idle@anom_2_phase_2
+
+[sr_idle@anom_2_phase_1_wait]
+on_game_timer = 500 | sr_idle@anom_2_phase_1
+on_info  = {+jup_b6_anom_2_count_end} sr_idle, {+jup_b6_task_fail} sr_idle@end, {+jup_b6_zom_wave_2} sr_idle@anom_2_phase_2, {+jup_b6_zom_wave_3} sr_idle@anom_2_phase_2, {+jup_b6_zom_wave_4} sr_idle@anom_2_phase_2
+
+[sr_idle@anom_2_phase_2]
+on_info  = {+jup_b6_anom_2_count_end} sr_idle, {+jup_b6_task_fail} sr_idle@end, {!squad_exist(jup_b19_kopatci_zombied) !squad_exist(jup_b6_zombie_squad_2) ~50} sr_idle@anom_2_phase_2_wait %=create_squad(jup_b6_zombie_squad_2:jup_b19)%, {!squad_exist(jup_b19_kopatci_zombied) !squad_exist(jup_b6_zombie_squad_1) !squad_exist(jup_b6_zombie_squad_3)} sr_idle@anom_2_phase_2_wait %=create_squad(jup_b6_zombie_squad_3:jup_b19)%
+
+[sr_idle@anom_2_phase_2_wait]
+on_info  = {!squad_exist(jup_b6_zombie_squad_4) +jup_b6_zom_wave_2 -jup_b6_first_bonus_zombie_spawned} %=create_squad(jup_b6_zombie_squad_4:jup_b19) +jup_b6_first_bonus_zombie_spawned%
+on_info2 = {!squad_exist(jup_b6_zombie_squad_4) +jup_b6_zom_wave_3 -jup_b6_second_bonus_zombie_spawned} %=create_squad(jup_b6_zombie_squad_4:jup_b19) +jup_b6_second_bonus_zombie_spawned%
+on_info3 = {!squad_exist(jup_b6_zombie_squad_4) +jup_b6_zom_wave_4 -jup_b6_third_bonus_zombie_spawned} %=create_squad(jup_b6_zombie_squad_5:jup_b19) +jup_b6_third_bonus_zombie_spawned%
+on_info4 = {+jup_b6_anom_2_count_end} sr_idle, {+jup_b6_task_fail} sr_idle@end
+on_game_timer = 430 | sr_idle@anom_2_phase_2
+
+[sr_idle@end]

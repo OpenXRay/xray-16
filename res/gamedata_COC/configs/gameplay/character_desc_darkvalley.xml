@@ -1,0 +1,139 @@
+﻿<?xml version='1.0' encoding="windows-1251"?>
+<xml>
+    <!-------------------------- BANDIT TRADER ------------------------>
+    <specific_character id="val_smart_terrain_7_4_bandit_trader_stalker" team_default="1">
+    <name>val_smart_terrain_7_4_bandit_trader_stalker_name</name>
+    <icon>ui_inGame2_bandit_trade</icon>
+    <bio>ќпытный сталкер. ƒетальна¤ информаци¤ отсутствует.</bio>
+    <class>val_smart_terrain_7_4_bandit_trader_stalker</class>
+    <community>bandit</community>
+    <map_icon x="1" y="0"/>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>13050</rank>
+    <reputation>1097</reputation>
+    <money min="1000000" max="1000000" infinitive="1"/>
+    <visual>actors\stalker_bandit\stalker_bandit_tr</visual>
+    <snd_config>characters_voice\human_01\bandit\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_ak74u \n
+        ammo_5.45x39_fmj  = 1 \n
+        wpn_hpsa  \n
+        ammo_9x19_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <start_dialog>val_smart_terrain_7_4_bandit_trader_stalker_start_dialog</start_dialog>
+    <actor_dialog>dm_ordered_task_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <!-------------------------- BANDIT MECHANIC ------------------------>
+    <specific_character id="val_smart_terrain_7_3_bandit_mechanic_stalker" team_default="1">
+    <name>val_smart_terrain_7_3_bandit_mechanic_stalker_name</name>
+    <icon>ui_inGame2_bandit_tech</icon>
+    <bio>ќпытный сталкер. ƒетальна¤ информаци¤ отсутствует.</bio>
+    <class>val_smart_terrain_7_3_bandit_mechanic_stalker</class>
+    <community>bandit</community>
+    <map_icon x="1" y="0"/>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <mechanic_mode>1</mechanic_mode>
+    <rank>7030</rank>
+    <reputation>733</reputation>
+    <visual>actors\stalker_bandit\stalker_bandit_mehan</visual>
+    <snd_config>characters_voice\human_02\bandit\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_ak74u \n
+        ammo_5.45x39_fmj  = 1 \n
+        wpn_hpsa  \n
+        ammo_9x19_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <start_dialog>val_smart_terrain_7_3_bandit_mechanic_stalker_start_dialog</start_dialog>
+    <actor_dialog>dm_ordered_task_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+    <actor_dialog>dm_tech_repair</actor_dialog>
+	<actor_dialog>dm_broker_dialog</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <!-------------------------- LAB X-18 CORPSES ------------------------>
+    <specific_character id="dar_corpse_1" team_default="1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_neutral_2_mask</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>ќпытный сталкер. ƒетальна¤ информаци¤ отсутствует.</bio>
+    <class>dar_corpse_1</class>
+    <community>stalker</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>4810</rank>
+    <reputation>1374</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral2a_mask</visual>
+    <supplies>
+        [spawn] \n
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="dar_corpse_2" team_default="1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_neutral_2_mask</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>ќпытный сталкер. ƒетальна¤ информаци¤ отсутствует.</bio>
+    <class>dar_corpse_2</class>
+    <community>stalker</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>3354</rank>
+    <reputation>1632</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral2a_mask</visual>
+    <supplies>
+        [spawn] \n
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="dar_corpse_kalugin" team_default="1">
+    <name>dar_kalugin_name</name>
+    <icon>ui_inGame2_ucheniy_3</icon>
+    <map_icon x="0" y="0"></map_icon>
+    <bio>ќпытный сталкер. ƒетальна¤ информаци¤ отсутствует.</bio>
+    <class>dar_corpse_kalugin</class>
+    <community>ecolog</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>4104</rank>
+    <reputation>593</reputation>
+    <visual>actors\ucheniy\ucheniy_3</visual>
+    <supplies>
+        [spawn] \n
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="dar_corpse_ecolog_guard" team_default = "1">
+    <name>dar_rockatansky_name</name>
+    <icon>ui_inGame2_ucheniy_4</icon>
+    <map_icon x="0" y="6"></map_icon>
+    <bio>ќпытный сталкер. ƒетальна¤ информаци¤ отсутствует.</bio>
+    <class>dar_corpse_ecolog_guard</class>
+    <community>ecolog</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <money min="2000" max="5000" infinitive="0"></money>
+    <rank>8116</rank>
+    <reputation>824</reputation>
+    <visual>actors\ucheniy\ucheniy_4</visual>
+    <snd_config>characters_voice\human_03\ecolog\</snd_config>
+    <crouch_type>1</crouch_type>
+    <supplies>
+        [spawn] \n
+        wpn_bm16 \n
+        ammo_12x70_buck = 1 \n
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+</xml>

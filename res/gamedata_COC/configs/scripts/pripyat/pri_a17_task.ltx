@@ -1,0 +1,16 @@
+[logic]
+active = nil;sr_idle@no_task
+
+[sr_idle@no_task]
+on_info = {+pri_a17_military_base_commander_task_dialog_end} sr_idle@progress %=give_task(pri_a17_task_find_gauss_rifle)%
+
+[sr_idle@progress]
+on_info = {=actor_has_item(pri_a17_gauss_rifle)} %+pri_a17_actor_has_gauss_rifle%
+on_info2 = {+pri_a17_taras_dead +pri_a17_val_dead +pri_a17_pod_dead} %+pri_a17_recon_squad_dead%, {+pri_a17_taras_dead} %+pri_a17_reacon_squad_casualties%, {+pri_a17_val_dead} %+pri_a17_reacon_squad_casualties%, {+pri_a17_pod_dead} %+pri_a17_reacon_squad_casualties%
+on_info3 = {-pri_a17_taras_dead +pri_a17_actor_has_gauss_rifle -pri_a17_taras_light_spawned} %=spawn_object_in(device_torch:pri_a17_military_captain_tarasov) +pri_a17_taras_light_spawned%
+on_info4 = {-pri_a17_val_dead +pri_a17_actor_has_gauss_rifle -pri_a17_taras_val_light_spawned} %=spawn_object_in(device_torch:pri_a17_military_prapor_valentyr) +pri_a17_taras_val_light_spawned%
+on_info5 = {-pri_a17_pod_dead +pri_a17_actor_has_gauss_rifle -pri_a17_pod_light_spawned} %=spawn_object_in(device_torch:pri_a17_military_lieutenant_podorojniy) +pri_a17_pod_light_spawned%
+on_info6 = {+pri_a17_actor_bring_gauss_rifle} sr_idle@end
+on_info7 = {-pri_a16_arrived_to_pri !talking} %+pri_a16_arrived_to_pri =scenario_autosave(st_save_pri_a16_arrived_to_pri)%
+
+[sr_idle@end]

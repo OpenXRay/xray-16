@@ -1,0 +1,36 @@
+[logic]
+;active = ph_door@no_key
+active = ph_door@open
+
+[ph_door@no_key]
+locked = false
+closed = true
+snd_open_start = trader_door_locked
+on_info = {=actor_has_item(pri_b35_lab_x8_key)} ph_door@closed
+tip_open = tip_no_access_card
+
+[ph_door@closed]
+locked = false
+closed = true
+snd_open_start = metal_small_open
+snd_close_start = metal_small_close_start
+snd_close_stop = metal_small_close_stop
+on_use = ph_door@open %=remove_item(pri_b35_lab_x8_key)%
+on_info = {!actor_has_item(pri_b35_lab_x8_key)} ph_door@no_key
+tip_open = tip_need_access_card
+
+[ph_door@open]
+locked = false
+closed = false
+snd_open_start = metal_small_open
+snd_close_start = metal_small_close_start
+snd_close_stop = metal_small_close_stop
+on_use = ph_door@closed_regular
+
+[ph_door@closed_regular]
+locked = false
+closed = true
+snd_open_start = metal_small_open
+snd_close_start = metal_small_close_start
+snd_close_stop = metal_small_close_stop
+on_use = ph_door@open

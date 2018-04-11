@@ -1,0 +1,18 @@
+[logic]
+active = nil;ph_idle@start
+
+[ph_idle@start]
+on_info = {+pri_a20_run_radio_snd -pri_a20_once_radio_call} %+pri_a20_once_radio_call =play_sound(radio_call)%
+on_signal = sound_end | ph_idle@kovalski_ofice_rac %+pri_a20_radio_call_snd_end%
+
+[ph_idle@kovalski_ofice_rac]
+on_info = {+pri_a20_radio_start} ph_idle@kovalski_ofice_rac_2
+
+[ph_idle@kovalski_ofice_rac_2]
+on_game_timer = 15 | %=play_sound(pri_a20_recon_squad_attacked)%
+on_signal = sound_end | ph_idle@kovalski_ofice_rac_3 
+
+[ph_idle@kovalski_ofice_rac_3]
+on_game_timer = 10 | ph_idle@nil %+pri_a20_colonel_talk_in_radio%
+
+[ph_idle@nil]

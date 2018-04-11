@@ -1,0 +1,50 @@
+[walker@generic]
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+turn_on_campfire = false
+
+
+[logic@sar_monolith_guard_camper_1]
+active = camper@sar_monolith_guard_camper_1
+suitable = {=target_squad_name(sar_monolith_guard_squad)} true
+prior = 200
+
+[camper@sar_monolith_guard_camper_1]:walker@generic
+path_walk = walk_4
+path_look = look_2
+radius = 7
+danger = danger@sar_monolith_guard
+def_state_moving = raid
+out_restr = mon_contorol_room_restr
+
+
+[logic@sar_monolith_guard_camper_2]
+active = camper@sar_monolith_guard_camper_2
+suitable = {=target_squad_name(sar_monolith_guard_squad)} true
+prior = 200
+
+[camper@sar_monolith_guard_camper_2]:walker@generic
+path_walk = walk_2
+path_look = look_1
+radius = 7
+danger = danger@sar_monolith_guard
+def_state_moving = raid
+out_restr = mon_contorol_room_restr
+
+
+[logic@sar_monolith_guard_camper_3]
+active = camper@sar_monolith_guard_camper_3
+suitable = {=target_squad_name(sar_monolith_guard_squad)} true
+prior = 200
+
+[camper@sar_monolith_guard_camper_3]:walker@generic
+path_walk = walk_3
+path_look = look_1
+radius = 7
+danger = danger@sar_monolith_guard
+def_state_moving = raid
+out_restr = mon_contorol_room_restr
+
+[danger@sar_monolith_guard]
+ignore_distance = 0

@@ -1,0 +1,394 @@
+; Karlik
+[m_karlik_e]:monster_base
+GroupControlSection				=	spawn_group
+SpaceRestrictionSection			=	space_restrictor, zone_mosquito_bald, zone_radioactive
+
+$npc							=	on
+$prefetch						=	16
+$spawn							=	"monsters\karlik\karlik"
+
+corpse_visual					=	monsters\karlik\karlik_green
+visual							=	monsters\karlik\karlik_green
+
+spawn_phantom 					=	m_phantom_karlik
+can_spawn_phantom 				=	true
+
+hit_fraction_monster = 0.25
+skin_armor = 0.25
+
+; Influences.
+fire_linear_factor				=	0
+fire_max_distance				=	0
+fire_max_power					=	5
+fire_quadratic_factor			=	0.025
+
+psy_linear_factor				=	1
+psy_max_distance				=	15
+psy_max_power					=	0.1
+psy_pp_effector_name			=	psy_antenna
+psy_pp_highest_at				=	0.1
+psy_quadratic_factor			=	0
+psy_sound						=	monsters\karlik\karlik_psi
+
+radiation_linear_factor			=	1
+radiation_max_distance			=	0
+radiation_max_power				=	0.01
+radiation_pp_effector_name		=	postprocess_rad
+radiation_pp_highest_at			=	0.02
+radiation_quadratic_factor		=	1
+
+; Offline A-Life.
+Scheduled						=	on
+Human							=	off
+Health							=	300
+MinSpeed						=	1.0
+MaxSpeed						=	5.0
+MaxHealthValue		 			=	1.0
+
+going_speed						=	3
+search_speed					=	1.5
+smart_terrain_choose_interval	=	00:15:00
+
+; Physics
+ph_box0_center					=	0.0,  0.7,  0.0
+ph_box0_size					=	0.35, 0.7,  0.35
+ph_box1_center					=	0.0,  0.6,  0.0
+ph_box1_size					=	0.35, 0.6,  0.35
+ph_collision_damage_factor		=	0.1
+ph_crash_speed_max				=	30
+ph_crash_speed_min				=	10
+ph_mass							=	30
+
+destroyed_vis_name				=	dynamics\Dead_Body\skelet_crash
+
+ph_skeleton_airr_ang_factor		=	0.0
+ph_skeleton_airr_lin_factor		=	1.1
+ph_skeleton_ddelay				=	5.0
+ph_skeleton_hinger_factor1		=	5.0
+
+ph_after_death_velocity_factor	=	0.75
+ph_skel_fatal_impulse_factor	=	8.0
+ph_skel_shot_up_factor			=	0.25
+
+; Speed factors						linear		angular_real	angular_path	min		max
+Velocity_Drag					=	1.0,		3.0,			3.0,			1,		1
+Velocity_RunFwdDamaged			=	2.0,  		3.0,			3.0,			0.2,	1
+Velocity_RunFwdNormal			=	2.25,		3.0,			3.0,			0.4,	2	
+Velocity_Stand					=	0,			1.4,			1.4,			1,		1
+Velocity_Steal					=	1.5,		3.0,			3.0,			1,		1
+Velocity_WalkFwdDamaged			=	1.0,		3.0,			0.8,			0.2,	2.0	
+Velocity_WalkFwdNormal			=	1.35,		0.6,			0.6,			0.02,	2.0	
+
+; Acceleration
+Accel_Aggressive				=	7.5
+Accel_Calm						=	2.5
+Accel_Generic					=	1.5
+
+; Attack parameters.
+MinAttackDist					=	1.0
+MaxAttackDist					=	2.3
+
+as_min_dist						=	1.4
+as_step							=	0.2
+
+attack_effector					=	m_karlik_attack_effector
+attack_params					=	m_karlik_attack_params
+step_params						=	m_karlik_step_params
+damage							=	m_karlik_damage
+
+Melee_Rotation_Factor			=	1.8
+
+; Entity conditions.
+health_hit_part					=	0.5
+morale_v						=	0.01
+power_hit_part					=	1.0
+psy_health_v					=	0.1
+radiation_health_v				=	0.01
+radiation_v						=	0.00001
+satiety_critical				=	-1.0
+satiety_health_v				=	0.00007
+satiety_power_v					=	0.001
+satiety_v						=	0.0001
+
+bleeding_v						=	0.05
+min_wound_size					=	0.01
+wound_incarnation_v				=	0.04
+
+sleep_health					=	1.0
+sleep_power						=	1.0
+sleep_satiety					=	1.0
+sleep_radiation					=	1.0
+sleep_psy_health				=	1.0
+
+eat_freq						=	5.0
+eat_slice						=	0.01
+eat_slice_weight				=	10.0
+
+DayTime_Begin					=	22
+DayTime_End						=	4
+
+Min_Satiety						=	0.4
+Max_Satiety						=	1.0
+
+satiety_threshold				=	0.5
+
+; Sounds
+sound_aggressive				=	monsters\karlik\karlik_attack_
+sound_attack_hit				=	monsters\karlik\karlik_attack_
+sound_die						=	monsters\karlik\karlik_die_
+sound_die_in_anomaly			=	monsters\karlik\karlik_die_
+sound_distant_idle				=	monsters\karlik\karlik_idle_
+sound_eat						=	monsters\karlik\karlik_eat_
+sound_growling					=	monsters\biting\def_
+sound_idle						=	monsters\karlik\karlik_idle_
+sound_landing					=	monsters\biting\def_
+sound_panic						=	monsters\karlik\karlik_idle_
+sound_steal						=	monsters\biting\def_
+sound_take_damage				=	monsters\karlik\karlik_hit_
+sound_threaten					=	monsters\karlik\karlik_eat_
+
+; Misc
+killer_clsids					=	Z_MINCER, Z_GALANT, ZS_BFUZZ, ZS_MBALD, ZS_GALAN, ZS_MINCE
+
+idle_sound_delay				=	20000
+eat_sound_delay					=	3000
+attack_sound_delay				=	24000
+
+distant_idle_sound_delay		=	80000
+distant_idle_sound_range		=	100.0
+
+SoundThreshold					=	0.06
+
+max_hear_dist					=	75
+
+; Morale
+Morale_Attack_Success_Quant		=	0.1
+Morale_Despondent_Speed			=	0.1
+Morale_Despondent_Threashold	=	0.1
+Morale_Hit_Quant				=	0.001
+Morale_Stable_Speed				=	0.01
+Morale_Take_Heart_Speed			=	0.1
+
+; "Other stuff"
+critical_wound_threshold		=	-1
+critical_wound_decrease_quant	=	0
+
+ef_creature_type				=	18
+ef_weapon_type					=	3
+ef_detector_type				=	1
+
+panic_threshold					=	0
+
+cform							=	skeleton
+class							=	SM_KAR
+
+script_binding  				=	bind_monster.bind
+
+bone_torso			 			=	bip01_spine1
+bone_head			 			=	bip01_head
+bone_fire			 			=	bip01_head
+
+weapon_usage					=	0
+distance_to_corpse				=	1.2
+terrain							=	zombie_terrain
+hit_type						=	shock
+material						=	creatures\medium
+
+DamagedThreshold				=	0.2
+LegsCount						=	2
+
+spec_rank						=	normal
+species							=	karlik
+
+rank							=	17
+community						=	karlik
+monster_type					=	indoor
+
+immunities_sect					=	karlik_immunities
+
+DynamicObjectsCount				=	32
+
+eye_fov				 			=	100
+eye_range			 			=	50
+
+vision_free_section				=	karlik_vision_free
+vision_danger_section			=	karlik_vision_danger
+
+; Shield ability
+shield_cooldown					=	3000
+shield_time						=	5000
+shield_keep_particle			=	anomaly2\burer_shield_01
+shield_keep_particle_period		=	300
+Particle_Shield					=	anomaly2\burer_shield_01
+
+; Anti-aim ability
+anti_aim_timeout				=	5 ;1.5 ; sec
+anti_aim_effectors				=	effector_monster_hit_1, effector_monster_hit_2, effector_monster_hit_3, effector_monster_hit_4
+anti_aim_animation				=	stand_stamina_attack_
+anti_aim_max_angle				=	0.5
+anti_aim_detection_gain_speed	=	10		; 2
+anti_aim_detection_loose_speed	=	0.1
+weapon_drop_velocity			=	8
+weapon_drop_stamina_k			=	0.7   ;IF player stamina < stamina_hit*inv_weight(weapon param)*weapon_drop_stamina_k THEN weapon is dropped
+weight_to_stamina_hit			=	0.27 ;0.25 ;kg to stamina %
+
+; Gravi ability
+Gravi_Cooldown					=	10000
+Gravi_MinDist					=	1
+Gravi_MaxDist					=	25
+Gravi_Speed						=	76
+Gravi_Step						=	2
+Gravi_Time_To_Hold				=	1200
+Gravi_Radius					=	3.0
+Gravi_Impulse_To_Objects		=	60.0
+Gravi_Impulse_To_Enemy			=	1500.0
+Gravi_Hit_Power					=	0.6
+
+sound_gravi_attack				=	monsters\karlik\karlik_attack_
+sound_gravi_wave				=	monsters\burer\burer_gravi_wave_0
+
+; Tele ability
+Tele_Max_Handled_Objects 		=	1;
+Tele_Max_Time			 		=	7000
+Tele_Time_To_Hold		 		=	600
+Tele_Object_Min_Mass	 		=	100
+Tele_Object_Max_Mass	 		=	1000.0
+Tele_Find_Radius		 		=	35.0
+Tele_Min_Distance		 		=	5
+Tele_Max_Distance		 		=	50
+Tele_Raise_Speed		 		=	8
+Tele_Fly_Velocity		 		=	80
+Tele_Object_Height		 		=	4
+
+sound_tele_attack				=	monsters\karlik\karlik_idle_
+sound_tele_hold					=	monsters\burer\burer_tele_hold
+sound_tele_throw				=	monsters\burer\burer_tele_throw
+
+; Scanner
+scan_critical_value				=	25.0
+scan_radius						=	50.0
+scan_velocity_threshold			=	4.0
+scan_decrease_value				=	0.3
+scan_trace_time_freq			=	2
+
+scan_sound						=	monsters\burer\burer_scan_affect_0
+scan_effector_section			=	m_burer_scan_effector
+
+; Particles
+Particle_Tele_Object			=	static\fire_distort
+Particle_Gravi_Wave				=	anomaly2\burer_wave
+Particle_Gravi_Prepare			=	anomaly2\burer_prepare
+
+[m_karlik_attack_effector]
+blur							=	0.01
+color_add						=	0, 0, 0
+color_base						=	0.65, 0.15, 0.1
+color_gray						=	0.333, 0.333, 0.333
+duality_h						=	0.01
+duality_v						=	0.01
+gray							=	0.5
+noise_fps						=	30
+noise_grain						=	1
+noise_intensity 				=	0.0
+time							=	0.3
+time_attack						=	0.05
+time_release	       			=	0.25
+
+; Camera effects
+ce_amplitude					=	-10.0 
+ce_period_number				=	2.0 
+ce_power						=	1.5
+ce_time							=	0.45
+
+[m_karlik_attack_params]
+; Animation							Time		hit_power		impulse		impulse_dir			hit_test				Test Dist
+stand_attack_0					=	0.4,		0.5,			100,        2.0, 1.0, 0.5,		-1.6, 1.6, -1.6, 1.6,	2.5
+stand_attack_1					=	0.4,		0.5,			100,        2.0, 1.0, 0.5,		-1.6, 1.6, -1.6, 1.6,	2.5
+stand_attack_2					=	0.4,		0.5,			100,        2.0, 1.0, 0.5,		-1.6, 1.6, -1.6, 1.6,	2.5
+
+[m_karlik_step_params]
+; Animation							Cycles	Time1	Power1	Time2	Power2
+stand_run_dmg_0	 				=	1,		0.01,	1,		0.25,	0.6
+stand_run_fwd_0	 				=	1,		0.01,	1,		0.25,	0.6
+stand_walk_dmg_0 				=	1,		0.01,	1,		0.25,	0.7
+stand_walk_fwd_0 				=	1,		0.01,	1,		0.25,	0.7
+
+[m_karlik_damage]
+; Bone name							hit_scale	-1	wound_scale
+default							=	1.0,		-1,		0.3
+bip01_head 						=	2.0,		-1,		0.5
+bip01_neck 						=	1.5,		-1,		1.5
+bip01_pelvis 					=	1.0,		-1,		0.5
+bip01_spine 					=	1.0,		-1,		0.5
+bip01_spine1 					=	1.0,		-1,		0.5
+
+; Default immunities.
+[karlik_immunities]
+burn_immunity					=	1.0				 
+strike_immunity					=	0.5
+shock_immunity					=	0.5
+wound_immunity					=	0.5
+radiation_immunity				=	0.0
+telepatic_immunity				=	0.0
+chemical_burn_immunity			=	0.5
+explosion_immunity				=	0.75
+fire_wound_immunity				=	0.75
+
+[karlik_vision_free]
+min_view_distance   			=	0.7
+max_view_distance	 			=	1.0
+visibility_threshold	 		=	100.0
+always_visible_distance 		=	0.3
+time_quant						=	0.001
+decrease_value					=	0.01
+velocity_factor		     		=	0.5
+luminocity_factor				=	0.5
+transparency_threshold			=	0.25
+
+[karlik_vision_danger]
+min_view_distance   			=	0.7
+max_view_distance	 			=	1.0
+visibility_threshold	 		=	100.0
+always_visible_distance 		=	0.3
+time_quant						=	0.001
+decrease_value					=	0.01
+velocity_factor		     		=	0.5
+luminocity_factor				=	0.5
+transparency_threshold			=	0.25
+
+; Karlik (Blue jacket)
+[karlik_blue]:m_karlik_e
+corpse_visual					=	monsters\karlik\karlik_blue
+visual							=	monsters\karlik\karlik_blue
+
+sound_gravi_wave				=	anomaly\electra_blast
+
+Particle_Tele_Object			=	anomaly2\electra_idle
+Particle_Gravi_Wave				=	anomaly2\electra2_blast
+Particle_Gravi_Prepare			=	artefact\af_electra_hide
+
+shield_keep_particle			=	anomaly2\heat_03_electra
+Particle_Shield					=	anomaly2\heat_03_electra
+
+
+; Karlik (Green jacket)
+[karlik_green]:m_karlik_e
+corpse_visual					=	monsters\karlik\karlik_green
+visual							=	monsters\karlik\karlik_green
+
+; Karlik (Grey jacket)
+[karlik_grey]:m_karlik_e
+corpse_visual					=	monsters\karlik\karlik_grey
+visual							=	monsters\karlik\karlik_grey
+
+; Karlik (Orange jacket)
+[karlik_orange]:m_karlik_e
+corpse_visual					=	monsters\karlik\karlik_orange
+visual							=	monsters\karlik\karlik_orange
+
+Particle_Tele_Object			=	weapons\flame_rocket
+Particle_Gravi_Wave				=	monsters\polter_flame_fire
+Particle_Gravi_Prepare			=	monsters\polter_hidden
+
+shield_keep_particle			=	artefact\af_thermal_hide
+Particle_Shield					=	artefact\af_thermal_hide

@@ -1,0 +1,16 @@
+[logic]
+active = ph_door@locked
+
+[ph_door@locked]
+locked = true
+closed = true
+on_info = {+dar_codelock1_unlock} ph_door@open %+dar_open_door1 =play_sound(trader_door_unlock)%
+tip_open = jup_b205_tip_door_closed
+tip_close = 
+on_use = %+dar_door1_closed%
+
+[ph_door@open]
+locked = false
+closed = false
+tip_open = 
+tip_close = 

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+
+	<string id="jup_a6_freedom_trader_ashot_start_dialog_0">
+		<text>What can I sell you today?</text>
+	</string>
+	<string id="jup_b19_freedom_yar_start_dialog_0">
+		<text>Hello stalker, what do you need?</text>
+	</string>
+	
+	<string id="jup_b220_trapper_start_11">
+		<text>I'm Trapper... There's no need to introduce yourself.</text>
+	</string>
+	<string id="jup_b220_trapper_start_12">
+		<text>What brings you here?</text>
+	</string>
+	
+	<string id="jup_a6_stalker_medik_start_dialog_0">
+		<text>You looking for medical supplies or just here for a chat?</text>
+	</string>
+	<string id="jup_a6_stalker_medik_need_health_care_0">
+		<text>I need medical assistance.</text>
+	</string>
+	<string id="jup_a6_stalker_medik_need_health_care_1">
+		<text>Let's have a look...</text>
+	</string>
+	<string id="jup_a6_stalker_medik_need_health_care_2">
+		<text>Let's have a look... Well, your liver is bigger than I'd expect, but that's an occupational hazard, right? Apart from that, you're as healthy as a burer.</text>
+	</string>
+	<string id="jup_a6_stalker_medik_need_health_care_11">
+		<text>[continue...]</text>
+	</string>
+	<string id="jup_a6_stalker_medik_need_health_care_111">
+		<text>That's better.</text>
+	</string>
+	
+	<string id="jup_a6_freedom_leader_start_dialog_11">
+		<text>So, what have you got to say?</text>
+	</string>
+	<string id="jup_a6_freedom_leader_start_dialog_12">
+		<text>What's your business here?</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_0">
+		<text>Tell me about Freedom.</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_1">
+		<text>It's a long story. What do you want to know?</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_1111">
+		<text>What is it that you do here?</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_11111">
+		<text>We're making sure that various officials don't conceal anything from the common folk. You know how it is: as soon as they find a new lab or some documents that shed light on the secrets of the Zone, they immediately organize a military operation and clean everything up better than a friggin' hoover. The only way of finding shit out is by getting there first.</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_1112">
+		<text>What brought you to the center of the Zone?</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_11121">
+		<text>Well, the boys felt like taking a stroll in a new place. Just kidding. It's an opportunity to find stuff that the world ain't seen before. Neither the army nor stalkers have been here before, so there's something new everywhere you look.</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_111211">
+		<text>Did you find anything?</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_1112111">
+		<text>A couple of locked doors and some weird new artefacts.</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_1113">
+		<text>How did you end up in Freedom?</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_11131">
+		<text>Well, I was friends with Freedom leaders back when there was no Zone. Mind you, in those days they weren't leaders, they were regular hippies. So when I made a move into the Zone in search of artefacts and ran into familiar faces, I figured I might as well go with what I know.</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_1114">
+		<text>What do you think about Duty?</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_11141">
+		<text>They're idiots, that's what I think. I mean, why the hell would they want to destroy the Zone? It's not consuming precious resources or getting bigger... or anything. They could just sit there and study it to their heart's content - just think of how many scientific discoveries could be made... I mean, in the history of man-kind, no one has never been able to understand anti-gravitation, right? And in the Zone you've got ready-made anti-gravitation devices lying all over the place. It wouldn't hurt to kick their asses out of here, but it's too much hassle. By the way, don't be confused by our relations here at Yanov. We are at war... it's just that Yanov has been made neutral territory, if you know what I mean.</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_1115">
+		<text>Okay, forget about it.</text>
+	</string>
+	<string id="jup_a6_freedom_leader_about_you_11151">
+		<text>No problem.</text>
+	</string>
+	
+	<string id="jup_a6_stalker_barmen_start_dialog_11">
+		<text>Welcome to my humble abode of pleasure and joy. You after joy, pleasure or both in equal measure?</text>
+	</string>
+	<string id="jup_a6_stalker_barmen_start_dialog_12">
+		<text>You come to chill? My drinks ain't nothing special but this is a welcoming and friendly place!</text>
+	</string>
+	<string id="jup_a6_stalker_barmen_start_dialog_13">
+		<text>I got all the shit you're ever gonna need. What are you after? You fancy some chow, a drink or feel like firing off a few rounds?</text>
+	</string>
+	
+	<string id="jup_b6_scientist_nuclear_physicist_start_11">
+		<text>What would you like to say to me?</text>
+	</string>
+	<string id="jup_b16_biochemist_oasis_start_11">
+		<text>What brings you here?</text>
+	</string>
+	
+	<string id="jup_b6_scientist_medic_start_11">
+		<text>What brings you here?</text>
+	</string>
+	
+	<!-- Ashot and Yar -->
+	<string id="st_jup_yar_reply_1">
+		<text>You go tell %s to get his fat ass over here.</text>
+	</string>
+	<string id="st_jup_yar_reply_2">
+		<text>Doesn't he know I'm busy? Tell him to come over here.</text>
+	</string>
+	<string id="st_jup_yar_reply_3">
+		<text>I don't get paid for walking. Tell him to come to me.</text>
+	</string>
+	<string id="st_jup_yar_reply_4">
+		<text>What? Does he want a wheelchair? Go fetch %s for me.</text>
+	</string>
+	<string id="st_jup_yar_reply_5">
+		<text>Where is %s? I can't fix it until he brings it here.</text>
+	</string>
+	
+	<string id="st_jup_ashot_reply_1">
+		<text>If %s wants it, tell him to come over here and take it from me.</text>
+	</string>
+	<string id="st_jup_ashot_reply_2">
+		<text>Come again? If he wants it, he comes and gets it. Okay?</text>
+	</string>
+	<string id="st_jup_ashot_reply_3">
+		<text>You tell that balding bastard to drag himself over here.</text>
+	</string>
+	<string id="st_jup_ashot_reply_4">
+		<text>I cannot leave my shop alone. He must come to me, 'eh?</text>
+	</string>
+	<string id="st_jup_ashot_reply_5">
+		<text>Do I look like an errand boy? Tell %s to get it himself.</text>
+	</string>
+</string_table>

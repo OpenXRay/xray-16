@@ -1,0 +1,12 @@
+[logic]
+active = nil ;sr_idle@wait
+
+[sr_idle@wait]
+on_info = {+zat_b7_stalkers_raiders_attack} sr_light
+on_info2 = {+zat_b7_task_end} sr_idle@nil
+ 
+[sr_light]
+light_on = false
+on_info = {+zat_b7_task_end} sr_idle@nil
+
+[sr_idle@nil]

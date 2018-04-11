@@ -1,0 +1,36 @@
+[logic@stalker_barmen]
+suitable = {=check_npc_name(jup_a6_stalker_barmen)} true
+trade = misc\trade\trade_loner_hawaiian.ltx
+prior = 200
+active = animpoint@barmen
+can_select_weapon = false
+level_spot = trader
+dont_keep_items = true
+
+[animpoint@barmen]
+cover_name = jup_a6_animpoint_barmen
+avail_animations = animpoint_stay_table
+use_camp = false
+meet = meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+;on_info = {!npc_in_zone(jup_a6_sr_barmen)} %=teleport_npc(jup_a6_barmen_spawn)%
+out_restr = jup_a6_sr_noweap
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet]
+close_snd_hello = jup_a6_stalker_barmen_greeting
+close_snd_bye 	= jup_a6_stalker_barmen_farewell
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_distance = 3
+use = {=actor_enemy} false, true
+allow_break = false
+meet_on_talking = false

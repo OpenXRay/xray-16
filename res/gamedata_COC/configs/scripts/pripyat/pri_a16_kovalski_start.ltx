@@ -1,0 +1,158 @@
+; presets
+[walker@presets]
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = pri_a16_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@presets]
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = pri_a16_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[remark@presets]
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = pri_a16_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+;***********************************
+[logic@pri_a16_kovalski_start]
+active = walker@stand_base
+suitable = {-pri_a25_rfi_source_eliminated =check_npc_name(pri_a17_military_colonel_kovalski)} true
+prior = 200
+
+[walker@stand_base]:walker@presets
+meet = meet@stand_base
+def_state_standing = wait_na
+def_state_moving = walk_noweap
+path_walk = military_colonel_kovalski_walk
+path_look = military_colonel_kovalski_look
+on_info = {+pri_a17_actor_bring_gauss_rifle -pri_a20_squad_attack_cam !npc_talking} walker@start_pri_a20 %+pri_a17_actor_has_gauss_rifle%
+on_info2 = {+zat_a23_actor_has_gauss_rifle_documentation +pri_a20_talk_with_colonel_complete -pri_a21_colonel_lets_talk -pri_a21_give_task_no_base} walker@pri_a21_start
+on_info3 = {-pri_b35_actor_rest +pri_b35_actor_is_guided} remark@b35_talk
+on_info4 = {-pri_a22_colonel_give_task +pri_a18_found_antenna +pri_a21_sentry_task_done +pri_a19_lab_x8_investigated} walker@pri_a22
+
+[meet@stand_base]
+meet_dialog	= {-pri_a17_military_base_commander_task_dialog_end} pri_a17_military_base_commander_task_dialog, {+pri_a17_military_recon_squad_ambush_dialog_end -pri_a17_actor_bring_gauss_rifle} pri_a17_got_gauss, {+pri_a20_squad_attack_cam -pri_a20_talk_with_colonel_complete} pri_a16_military_colonel_a20_find_recon_squd_dialog, {+zat_a23_actor_has_gauss_rifle_documentation -pri_a21_sentry_task_done} pri_a16_colonel_a21_about_sentry_start, {+pri_a19_lab_x8_investigated +pri_a22_scene_done -pri_a25_rfi_source_eliminated -pri_a25_kovaloski_base_1st_dialog} pri_a17_military_colonel_kovalski_a25_base_reminding_1, {+pri_a19_lab_x8_investigated +pri_a22_scene_done -pri_a25_rfi_source_eliminated -pri_a25_kovaloski_base_2st_dialog} pri_a17_military_colonel_kovalski_a25_base_reminding_2
+close_snd_hello = nil
+close_snd_bye 	= nil
+close_anim 		= nil
+close_victim 	= actor
+far_anim 		= nil
+far_victim 		= nil
+use = {!black_screen +pri_a16_kovalski_start -pri_a17_military_base_commander_task_dialog_end} self, {=actor_enemy} false, true
+trade_enable = false
+allow_break = false
+
+;--------------------------------
+[walker@start_pri_a20]:walker@presets
+meet = no_meet
+path_walk = military_colonel_kovalski_walk
+path_look = military_colonel_kovalski_look
+def_state_moving1 = walk
+def_state_standing = wait_na
+on_info = {-pri_a20_run_radio_snd} %+pri_a20_run_radio_snd%
+on_info2 = {+pri_a20_radio_call_snd_end} walker@a20_answer_radio
+
+[walker@a20_answer_radio]:walker@presets
+meet = no_meet
+path_walk = military_colonel_kovalski_walk
+path_look = military_colonel_kovalski_look
+def_state_moving1 = walk
+def_state_standing = wait_na
+on_signal = sound_end | animpoint@a20_table_look %+pri_a20_squad_attack_cam%
+on_info = {-pri_a20_cutscene_start} %=play_sound(pri_a20_communication_with_recon_squad) +pri_a20_cutscene_start%
+
+[animpoint@a20_table_look]:animpoint@presets
+meet = no_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+cover_name = pri_a20_sc_kovalski_radio_anim
+avail_animations = pri_a20_colonel_radio
+on_info = {=animpoint_reached -pri_a20_kovalski_reached_anim} %+pri_a20_kovalski_reached_anim%
+on_info2 = {+pri_a20_colonel_talk_in_radio} %=play_sound(pri_a20_colonel_talk_in_radio)%
+on_signal = sound_end | remark@ask_check_recon_squad 
+
+[remark@ask_check_recon_squad]:remark@presets
+meet = meet@stand_base
+target = path | pri_a16_cutscene_actor_walk, 0 
+anim = wait
+on_game_timer = 30 | %=play_sound(pri_a20_colonel_ask_check_recon_squad)%
+on_signal = sound_end | {-pri_a20_once_task_give} %+pri_a20_once_task_give =give_task(pri_a20_check_recon_squad_task)%
+on_info = {!actor_in_zone(pri_a21_meet_kovalski_restrictor) +pri_a20_task_gived} walker@stand_base
+
+;--------------------------------
+[walker@pri_a21_start]:walker@presets
+meet = no_meet
+path_walk = military_colonel_kovalski_walk
+path_look = military_colonel_kovalski_look
+def_state_standing = ward
+on_signal = sound_end | %+pri_a20_come_to_me_end%
+on_info = {+pri_a21_give_task_no_base} walker@stand_base
+on_info2 = {-pri_a21_sound_koval_base_about_task =actor_in_zone(pri_surge_hide_a16) -pri_a21_colonel_give_sentry_task} %=play_sound(pri_a21_colonel_base_about_sentry) +pri_a21_sound_koval_base_about_task%
+on_info3 = {=actor_in_zone(pri_a21_meet_kovalski_restrictor) +pri_a20_come_to_me_end} walker@sound_on_place
+on_info4 = {=actor_in_zone(pri_a21_meet_kovalski_restrictor)} %=stop_sound%
+
+[walker@sound_on_place]:walker@presets
+meet = no_meet
+path_walk = military_colonel_kovalski_walk
+path_look = military_colonel_kovalski_look
+def_state_standing = ward
+on_signal = sound_end | walker@stand_base
+on_info = {+pri_a21_give_task_no_base} walker@stand_base
+on_info2 = {-pri_a21_colonel_lets_talk} %=play_sound(pri_a21_colonel_lets_talk) +pri_a21_colonel_lets_talk%
+;---------------------------------
+[remark@b35_talk]:remark@presets
+anim = wait_rac
+target = story | actor
+on_signal = anim_end | %=play_sound(pri_b35_kovalski_calls_guide)%
+on_signal2 = sound_end | %+pri_b35_ui%
+on_info = {+pri_b35_actor_rest} walker@stand_base
+meet = no_meet
+
+;---------------------------------
+[walker@pri_a22]:walker@presets
+meet = no_meet
+def_state_standing = wait_na
+def_state_moving = walk
+path_walk = a22_kovalski_leave_walk
+path_look = a22_kovalski_leave_look
+on_info = {+pri_a22_kovalski_give_task_start} animpoint@a22_lean_on_table_in
+on_info2 = {-pri_a21_scene_end} %+pri_a21_scene_end%
+
+[animpoint@a22_lean_on_table_in]:animpoint@presets
+meet = no_meet
+cover_name = pri_a20_sc_kovalski_radio_anim_0000
+avail_animations = pri_a22_colonel_lean_on_table
+on_info = {+pri_a22_kovalski_speak} %=play_sound(pri_a22_colonel_about_situation)%
+on_signal = sound_end | remark@a22_side_look
+
+[remark@a22_side_look]:remark@presets
+target = story | pri_a22_cutscene_actor_give_task
+anim = ward_noweap
+on_game_timer = 15 | %=play_sound(pri_a22_colonel_about_rfi_and_lost_suad)%
+on_signal = sound_end | remark@a22_to_actor
+
+[remark@a22_to_actor]:remark@presets
+target = story | pri_a22_cutscene_actor_give_task
+anim = ward_noweap
+on_game_timer = 15 | %=play_sound(pri_a22_colonel_give_task)%
+on_signal = sound_end | remark@a22_wait_cam %=give_task(pri_a22_rfi_source) +pri_a22_colonel_give_task%
+
+[remark@a22_wait_cam]:remark@presets
+meet = meet@stand_base
+target = path | pri_a16_a22_cutscene_actor_walk, 0
+anim = ward_noweap
+on_game_timer = 15 | %+pri_a22_stop_cam%
+on_info = {!actor_in_zone(pri_a21_meet_kovalski_restrictor) +pri_a22_task_gived} walker@stand_base

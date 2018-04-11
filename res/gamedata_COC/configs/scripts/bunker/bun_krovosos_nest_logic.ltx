@@ -1,0 +1,64 @@
+[logic@bun_krovosos_nest_home1]
+active = mob_home@bun_krovosos_nest_home1
+suitable = {=target_squad_name(bun_krovosos_nest_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@bun_krovosos_nest_home1]
+path_home = h1
+home_min_radius = 5
+home_max_radius = 10
+on_info = {+bar_deactivate_radar_done} %=kill_npc%
+on_actor_dist_le_nvis = 25 | mob_home@bun_krovosos_nest_home1_1 %=hit_npc_from_actor%
+out_restr = bun_krovosos_border3
+
+[mob_home@bun_krovosos_nest_home1_1]
+path_home = h1
+home_min_radius = 30
+home_max_radius = 45
+on_info = {+bar_deactivate_radar_done} %=kill_npc%
+out_restr = bun_krovosos_border3
+
+
+[logic@bun_krovosos_nest_home2]
+active = mob_home@bun_krovosos_nest_home2
+suitable = {=target_squad_name(bun_krovosos_nest_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@bun_krovosos_nest_home2]
+path_home = h2
+home_min_radius = 5
+home_max_radius = 10
+on_info = {+bar_deactivate_radar_done} %=kill_npc%
+on_actor_dist_le_nvis = 25 | mob_home@bun_krovosos_nest_home2_1 %=hit_npc_from_actor%
+out_restr = bun_krovosos_border2
+
+[mob_home@bun_krovosos_nest_home2_1]
+path_home = h2
+home_min_radius = 30
+home_max_radius = 45
+on_info = {+bar_deactivate_radar_done} %=kill_npc%
+out_restr = bun_krovosos_border2
+
+
+[logic@bun_krovosos_nest_home3]
+active = mob_home@bun_krovosos_nest_home3
+suitable = {=target_squad_name(bun_krovosos_nest_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@bun_krovosos_nest_home3]
+path_home = h3
+home_min_radius = 5
+home_max_radius = 10
+on_info = {+bar_deactivate_radar_done} %=kill_npc%
+on_actor_dist_le_nvis = 25 | mob_home@bun_krovosos_nest_home3_1 %=hit_npc_from_actor%
+out_restr = bun_krovosos_border1
+
+[mob_home@bun_krovosos_nest_home3_1]
+path_home = h3
+home_min_radius = 30
+home_max_radius = 45
+on_info = {+bar_deactivate_radar_done} %=kill_npc%
+out_restr = bun_krovosos_border1

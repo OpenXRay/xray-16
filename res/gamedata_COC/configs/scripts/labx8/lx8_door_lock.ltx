@@ -1,0 +1,19 @@
+[logic]
+active = ph_button@has_card
+
+[ph_button@no_card]
+anim = idle
+tooltip = tip_no_access_card
+on_info = ph_button@has_card
+
+[ph_button@has_card]
+anim = idle
+tooltip = tip_need_access_card
+on_press = ph_button@unlocked
+
+[ph_button@unlocked]
+anim = idle
+tooltip = st_lx8_button_press_true
+on_game_timer = 20 | {-lx8_door_open} %+lx8_door_open =anim_obj_forward(lx8_physic_door)%  
+on_game_timer2 = 10 | {-lx8_green_on} %+lx8_green_on =turn_off(lx8_light_switch_1_red_id) =turn_on(lx8_light_switch_1_green_id)%
+on_press = ph_button@has_card %-lx8_door_open =anim_obj_backward(lx8_physic_door)%

@@ -1,0 +1,36 @@
+[logic]
+active = nil;sr_idle@set_counter
+
+[sr_idle@set_counter]
+on_info = sr_idle@give_task %=set_counter(jup_b10_ufo_counter:0)%
+
+[sr_idle@give_task]
+on_info = {+jup_b10_ufo_memory_started} sr_idle@start_repair %=give_task(jup_b10_ufo)%
+
+[sr_idle@start_repair]
+on_info = {+jup_b10_ufo_memory_repairing +jup_b10_ufo_memory_at_nitros} sr_idle@timer_nitro
+on_info2 = {+jup_b10_ufo_memory_repairing +jup_b10_ufo_memory_at_novikovs} sr_idle@timer_novikov
+
+[sr_idle@timer_nitro]
+on_game_timer = 10800 | sr_idle@where_is_actor
+
+[sr_idle@timer_novikov]
+on_game_timer = 3600 | sr_idle@spot %-jup_b10_ufo_memory_repairing%
+
+[sr_idle@where_is_actor]
+on_info = {!actor_in_zone(jup_a6_sr_noweap)} sr_idle@remove_drunk %=play_sound(jup_b10_ufo_memory_repaired_nitro) -jup_b10_ufo_memory_repairing%
+on_info2= {=actor_in_zone(jup_a6_sr_sleep)} sr_idle@remove_drunk %=play_sound(jup_b10_ufo_memory_repaired_nitro) -jup_b10_ufo_memory_repairing%
+
+[sr_idle@remove_drunk]
+on_info = {=squad_exist(jup_b10_stalker_drunk_squad)} sr_idle@spot %=remove_squad(jup_b10_stalker_drunk_squad)%, sr_idle@spot
+
+[sr_idle@spot]
+on_info = {+jup_b10_ufo_memory_repaired +jup_b10_ufo_memory_at_nitros} sr_idle@spawn_drunk_dead %=give_treasure(jup_b10_secret_03_mapspot:jup_b10_secret_02_mapspot:jup_b10_secret_01_mapspot)%
+on_info2 = {+jup_b10_ufo_memory_repaired +jup_b10_ufo_memory_at_novikovs} sr_idle@nil %=give_treasure(jup_b10_secret_03_mapspot:jup_b10_secret_02_mapspot:jup_b10_secret_01_mapspot)%
+
+[sr_idle@spawn_drunk_dead]
+on_info = {+info_b10_second_zone_visited +info_b10_third_zone_visited} sr_idle@nil %=spawn_object(jup_b10_stalker_drunk_dead:jup_b10_drunk_deadway_01)%
+on_info2 = {+info_b10_first_zone_visited +info_b10_third_zone_visited} sr_idle@nil %=spawn_object(jup_b10_stalker_drunk_dead:jup_b10_drunk_deadway_02)%
+on_info3 = {+info_b10_first_zone_visited +info_b10_second_zone_visited} sr_idle@nil %=spawn_object(jup_b10_stalker_drunk_dead:jup_b10_drunk_deadway_03)%
+
+[sr_idle@nil]

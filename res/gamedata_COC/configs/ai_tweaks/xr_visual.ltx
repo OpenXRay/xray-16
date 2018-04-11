@@ -1,0 +1,231 @@
+[main]
+enable 			= true
+use_player_id 	= false			;Use Behavior community instead
+use_death_drop 	= false			;Only equip armor from physically looted outfits [Config such as keep_items and drop_drop will have to be edited to allow this]
+
+[forbidden_npcs]
+zat_a2_stalker_nimble = true
+mechanic = true
+trader = true
+medic = true
+barmen = true
+guide = true
+zat_b7_bandit_boss_sultan = true
+zat_b106_stalker_crab = true
+tech = true
+jup_b10_stalker_drunk = true
+leader = true
+jup_b220_trapper = true
+jup_b15_zulus = true
+jup_b6_scientist_nuclear_physicist = true
+jup_b6_scientist_biochemist = true
+pri_a15_sokolov = true
+pri_a17_military_colonel_kovalski = true
+pri_a17_military_captain_tarasov = true
+pri_a17_military_prapor_valentyr = true
+pri_a17_military_sergeant_morozov = true
+pri_a17_military_lieutenant_podorojniy = true
+pri_a15_military_recon_leader = true
+pri_a15_sokolov = true
+pri_a21_chasovoi_target = true
+pri_a22_military_yarmoshuk = true
+pri_a22_military_skelja = true
+pri_a22_military_merkulov = true
+pri_a15_vano = true
+pri_a15_sokolov_scene = true
+pri_a15_zulus = true
+pri_a15_wanderer = true
+pri_a15_military_tarasov = true
+pri_a22_army_signaller = true
+pri_b35_merc_leader = true
+pri_b305_strelok = true
+pri_b305_signal_man = true
+
+[community_to_naked]
+stalker = actors\stalker_neutral\stalker_neutral_k
+bandit = actors\stalker_bandit\stalker_bandit_k
+freedom = actors\stalker_freedom\stalker_freedom_k
+dolg = actors\stalker_dolg\stalker_dolg_k
+killer = actors\stalker_merc\stalker_merc_k
+monolith = actors\stalker_monolith\stalker_monolith_k
+army = actors\stalker_soldier\stalker_soldier_k
+
+
+[outfit_rating]
+	;stalker
+novice_outfit 				= 0
+stalker_outfit 				= 4
+stalker_outfit_barge 		= 4
+exo_outfit 					= 12
+scientific_outfit 			= 6
+
+	;freedom
+svoboda_light_outfit 		= 2
+svoboda_heavy_outfit 		= 8
+
+	;dolg
+dolg_outfit 				= 7
+dolg_heavy_outfit 			= 10
+
+	;army
+specops_outfit 				= 9
+military_outfit 			= 10
+
+	;clearsky
+cs_heavy_outfit 			= 8
+
+[visual_to_outfit]
+	;stalker
+stalker_neutral_1 				= novice_outfit
+stalker_neutral_2				= stalker_outfit
+stalker_neutral_2_mask 			= stalker_outfit
+stalker_neutral_3				= stalker_outfit_barge
+stalker_neutral_4 				= exo_outfit
+stalker_neutral_nauchniy 		= scientific_outfit
+	;killer
+stalker_merc_4					= exo_outfit
+	;ecolog
+	;army
+stalker_soldier_2_face_1_mask	= specops_outfit
+stalker_soldier_2				= specops_outfit
+stalker_soldier_3				= specops_outfit
+stalker_soldier_4				= military_outfit
+stalker_ecolog_military			= scientific_outfit
+	;monolith
+stalker_monolith_4				= exo_outfit
+	;dolg
+stalker_dolg_1					= scientific_outfit
+stalker_dolg_2_mask				= dolg_outfit
+stalker_dolg_3					= dolg_heavy_outfit
+stalker_dolg_4					= exo_outfit
+	;freedom
+stalker_freedom_1				= svoboda_light_outfit
+stalker_freedom_2_mask			= svoboda_light_outfit
+stalker_freedom_3				= svoboda_heavy_outfit
+stalker_freedom_4				= exo_outfit
+stalker_freedom_5				= scientific_outfit
+	;clearsky
+;stalker_nebo_1					= cs_light_outfit
+stalker_nebo_2					= cs_heavy_outfit
+;stalker_nebo_3					= cs_outfit
+
+[stalker]
+	;stalker
+novice_outfit 				= actors\stalker_neutral\stalker_neutral_1
+stalker_outfit 				= actors\stalker_neutral\stalker_neutral_2_mask
+stalker_outfit_barge 		= actors\stalker_neutral\stalker_neutral_2_mask
+exo_outfit 					= actors\stalker_neutral\stalker_neutral_4
+scientific_outfit 			= actors\stalker_neutral\stalker_neutral_nauchniy
+
+	;freedom
+svoboda_light_outfit 		= actors\stalker_freedom\stalker_freedom_1
+svoboda_heavy_outfit 		= actors\stalker_freedom\stalker_freedom_3
+
+	;dolg
+dolg_outfit 				= actors\stalker_dolg\stalker_dolg_2_mask
+dolg_heavy_outfit 			= actors\stalker_dolg\stalker_dolg_3
+
+	;army
+specops_outfit 				= actors\stalker_soldier\stalker_soldier_3
+military_outfit 			= actors\stalker_soldier\stalker_soldier_4
+
+	;clearsky
+cs_heavy_outfit 			= actors\stalker_nebo\stalker_nebo_2
+
+[bandit]
+	;stalker
+novice_outfit 				= actors\stalker_neutral\stalker_neutral_1
+stalker_outfit 				= actors\stalker_neutral\stalker_neutral_2_mask
+stalker_outfit_barge 		= actors\stalker_neutral\stalker_neutral_2_mask
+neutral_assault_outfit 		= actors\stalker_neutral\stalker_neutral_3
+exo_outfit 					= actors\stalker_neutral\stalker_neutral_4
+scientific_outfit 			= actors\stalker_neutral\stalker_neutral_nauchniy
+
+	;freedom
+svoboda_light_outfit 		= actors\stalker_freedom\stalker_freedom_1
+svoboda_heavy_outfit 		= actors\stalker_freedom\stalker_freedom_3
+
+	;dolg
+dolg_outfit 				= actors\stalker_dolg\stalker_dolg_2_mask
+dolg_heavy_outfit 			= actors\stalker_dolg\stalker_dolg_3
+
+	;army
+specops_outfit 				= actors\stalker_soldier\stalker_soldier_3
+military_outfit 			= actors\stalker_soldier\stalker_soldier_4
+
+	;clearsky
+cs_heavy_outfit 			= actors\stalker_nebo\stalker_nebo_2
+
+[killer]
+	;stalker
+novice_outfit 				= actors\stalker_neutral\stalker_neutral_1
+stalker_outfit 				= actors\stalker_neutral\stalker_neutral_2_mask
+stalker_outfit_barge 		= actors\stalker_neutral\stalker_neutral_2_mask
+neutral_assault_outfit 		= actors\stalker_neutral\stalker_neutral_3
+exo_outfit 					= actors\stalker_neutral\stalker_neutral_4
+scientific_outfit 			= actors\stalker_neutral\stalker_neutral_nauchniy
+
+	;freedom
+svoboda_light_outfit 		= actors\stalker_freedom\stalker_freedom_1
+svoboda_heavy_outfit 		= actors\stalker_freedom\stalker_freedom_3
+
+	;dolg
+dolg_outfit 				= actors\stalker_dolg\stalker_dolg_2_mask
+dolg_heavy_outfit 			= actors\stalker_dolg\stalker_dolg_3
+
+	;army
+specops_outfit 				= actors\stalker_soldier\stalker_soldier_3
+military_outfit 			= actors\stalker_soldier\stalker_soldier_4
+
+	;clearsky
+cs_heavy_outfit 			= actors\stalker_nebo\stalker_nebo_2
+
+[ecolog]
+	;stalker
+exo_outfit 					= actors\stalker_neutral\stalker_neutral_4
+scientific_outfit 			= actors\stalker_neutral\stalker_neutral_nauchniy
+
+[army]
+	;army
+specops_outfit 				= actors\stalker_soldier\stalker_soldier_3
+military_outfit 			= actors\stalker_soldier\stalker_soldier_4
+
+[monolith]
+
+[dolg]
+	;stalker
+stalker_outfit 				= actors\stalker_dolg\stalker_dolg_2_mask
+stalker_outfit_barge 		= actors\stalker_neutral\stalker_neutral_2_mask
+exo_outfit 					= actors\stalker_dolg\stalker_dolg_4
+scientific_outfit 			= actors\stalker_dolg\stalker_dolg_1
+
+	;freedom
+svoboda_light_outfit 		= actors\stalker_dolg\stalker_dolg_2_mask
+svoboda_heavy_outfit 		= actors\stalker_dolg\stalker_dolg_3
+
+	;dolg
+dolg_outfit 				= actors\stalker_dolg\stalker_dolg_2_mask
+dolg_heavy_outfit 			= actors\stalker_dolg\stalker_dolg_3
+
+	;army
+specops_outfit 				= actors\stalker_dolg\stalker_dolg_3
+military_outfit 			= actors\stalker_dolg\stalker_dolg_3
+
+[freedom]
+	;stalker
+stalker_outfit 				= actors\stalker_freedom\stalker_freedom_2_mask
+stalker_outfit_barge 		= actors\stalker_neutral\stalker_neutral_2_mask
+exo_outfit 					= actors\stalker_freedom\stalker_freedom_4
+scientific_outfit 			= actors\stalker_freedom\stalker_freedom_5
+
+	;freedom
+svoboda_light_outfit 		= actors\stalker_freedom\stalker_freedom_1
+svoboda_heavy_outfit 		= actors\stalker_freedom\stalker_freedom_3
+
+	;dolg
+dolg_outfit 				= actors\stalker_freedom\stalker_freedom_2_mask
+dolg_heavy_outfit 			= actors\stalker_freedom\stalker_freedom_3
+
+	;army
+specops_outfit 				= actors\stalker_freedom\stalker_freedom_3
+military_outfit 			= actors\stalker_freedom\stalker_freedom_3

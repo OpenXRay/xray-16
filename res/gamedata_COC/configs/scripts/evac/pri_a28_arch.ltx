@@ -1,0 +1,252 @@
+#include "pri_a28_general.ltx"
+
+[logic@pri_a28_kovalski_arch]
+active = camper@kovalski_arch_1
+suitable = {-pri_a28_arch_done =check_npc_name(kovalski)} true
+prior = 200
+on_hit = hit@def
+on_death = death@def
+post_combat_time = 0,0
+
+[camper@kovalski_arch_1]:walker@kovalski_ignore
+path_walk = kovalski_1_walk
+path_look = kovalski_1_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_arch_1
+on_info = {=npc_in_zone(pri_a28_sr_arch_1) +pri_a28_strelok_go_over_anomaly} camper@kovalski_arch_1_wait
+
+[camper@kovalski_arch_1_wait]:walker@kovalski_ignore
+path_walk = kovalski_1_walk
+path_look = kovalski_1_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_arch_1
+on_game_timer = 40 | %=play_sound(pri_a28_colonel_ok_go_here)%
+on_signal = sound_end | camper@kovalski_arch_2 %+pri_a28_colonel_ok_go_here%
+on_info = {+pri_a28_colonel_ok_go_here} camper@kovalski_arch_2
+
+[camper@kovalski_arch_2]:walker@kovalski_ignore
+path_walk = kovalski_2_walk
+path_look = kovalski_2_look 
+out_restr = pri_a28_sr_arch_2
+on_signal = path_end | camper@kovalski_arch_2_wait
+
+[camper@kovalski_arch_2_wait]:walker@kovalski_ignore
+path_walk = kovalski_2_walk
+path_look = kovalski_2_look 
+out_restr = pri_a28_sr_arch_2
+on_info = {+pri_a28_evac_com_where_you} remark@kovalski_arch_2
+
+[remark@kovalski_arch_2]:walker@kovalski_ignore
+target = story | actor
+anim = wait_rac
+out_restr = pri_a28_sr_arch_2
+on_signal = anim_end | remark@kovalski_arch_2_answer
+
+[remark@kovalski_arch_2_answer]:walker@kovalski_ignore
+target = story | actor
+anim = wait_rac
+out_restr = pri_a28_sr_arch_2
+on_signal = sound_end | remark@kovalski_arch_2_1 %+pri_a28_colonel_we_close%
+on_info = %=play_sound(pri_a28_colonel_we_close)%
+
+[remark@kovalski_arch_2_1]:walker@kovalski_ignore
+target = story | actor
+anim = wait_rac
+out_restr = pri_a28_sr_arch_2
+on_signal = sound_end | {=dist_to_actor_le(15)} remark@kovalski_arch_2_talk, remark@kovalski_arch_2_wait
+on_info2 = {+pri_a28_evac_com_cant_wait} %=play_sound(pri_a28_colonel_will_time)%
+
+[remark@kovalski_arch_2_wait]:walker@kovalski_ignore
+target = story | actor
+anim = hide_na
+out_restr = pri_a28_sr_arch_2
+on_game_timer = 300 | {=dist_to_actor_ge(15) -pri_a28_strelok_dead} %=play_sound(pri_a28_colonel_wait_actor) +pri_a28_colonel_wait_actor%
+on_game_timer2 = 450 | {=dist_to_actor_ge(15)} %=play_sound(pri_a28_colonel_wait_actor_long) +pri_a28_colonel_wait_actor%
+on_game_timer3 = 600 | {=dist_to_actor_ge(15)} remark@kovalski_arch_2_talk %=play_sound(pri_a28_colonel_wait_actor_go)%
+on_info = {-pri_a28_actor_enemy_to_squad =dist_to_actor_le(15) +pri_a28_colonel_wait_actor} remark@kovalski_arch_2_talk %=play_sound(pri_a28_colonel_wait_actor_return)%
+on_info2 = {-pri_a28_actor_enemy_to_squad =dist_to_actor_le(15) -pri_a28_colonel_wait_actor} remark@kovalski_arch_2_talk
+on_info3 = {+pri_a28_actor_enemy_to_squad} remark@kovalski_arch_2_talk
+
+[remark@kovalski_arch_2_talk]:walker@kovalski_ignore
+target = story | actor
+anim = hide_na
+out_restr = pri_a28_sr_arch_2
+on_signal = sound_end | %+pri_a28_arch_done%
+on_game_timer = 10 | %=play_sound(pri_a28_colonel_ready_to_go)%
+
+
+
+[logic@pri_a28_strelok_arch]
+active = camper@strelok_arch_1
+suitable = {-pri_a28_arch_done =check_npc_name(strelok)} true
+prior = 200
+on_hit = hit@def
+on_death = death@def
+post_combat_time = 0,0
+
+[camper@strelok_arch_1]:walker@ignore
+path_walk = strelok_1_walk
+path_look = strelok_1_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_arch_1
+on_signal = path_end | {+pri_a28_strelok_go_over_anomaly} walker@strelok_arch_1_fight
+on_info = {-pri_a28_strelok_go_over_anomaly !npc_in_zone(pri_a28_sr_shop_3_small)} %+pri_a28_strelok_go_over_anomaly =play_sound(pri_a28_strelok_go_over_anomaly)%
+
+[walker@strelok_arch_1_fight]:walker@fight
+path_walk = strelok_1_walk
+path_look = strelok_1_look
+out_restr = pri_a28_sr_arch_1
+on_info = {+pri_a28_colonel_ok_go_here} camper@strelok_arch_2 %=disable_memory_object%
+
+[camper@strelok_arch_2]:walker@ignore
+path_walk = strelok_2_walk
+path_look = strelok_2_look 
+out_restr = pri_a28_sr_arch_2
+
+
+
+[logic@pri_a28_military_1_arch]
+active = camper@military_1_arch_1
+suitable = {-pri_a28_arch_done =target_squad_name(pri_a16_military_squad) !check_npc_name(strelok) !check_npc_name(kovalski)} true
+prior = 100
+on_hit = hit@def
+on_death = death@def
+post_combat_time = 0,0
+
+[camper@military_1_arch_1]:walker@ignore
+path_walk = military_1_1_walk
+path_look = military_1_1_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_arch_1
+on_signal = path_end | walker@military_1_arch_1_fight
+
+[walker@military_1_arch_1_fight]:walker@fight
+path_walk = military_1_1_walk
+path_look = military_1_1_look
+out_restr = pri_a28_sr_arch_1
+on_info = {+pri_a28_colonel_ok_go_here} camper@military_1_arch_2 %=disable_memory_object%
+
+[camper@military_1_arch_2]:walker@ignore
+path_walk = military_1_2_walk
+path_look = military_1_2_look 
+out_restr = pri_a28_sr_arch_2
+
+
+
+[logic@pri_a28_military_2_arch]
+active = camper@military_2_arch_1
+suitable = {-pri_a28_arch_done =target_squad_name(pri_a16_military_squad) !check_npc_name(strelok) !check_npc_name(kovalski)} true
+prior = 90
+on_hit = hit@def
+on_death = death@def
+post_combat_time = 0,0
+
+[camper@military_2_arch_1]:walker@ignore
+path_walk = military_2_1_walk
+path_look = military_2_1_look
+def_state_standing = hide_na
+out_restr = pri_a28_sr_arch_1
+on_signal = path_end | walker@military_2_arch_1_fight
+
+[walker@military_2_arch_1_fight]:walker@fight
+path_walk = military_2_1_walk
+path_look = military_2_1_look
+out_restr = pri_a28_sr_arch_1
+on_info = {+pri_a28_colonel_ok_go_here} camper@military_2_arch_2 %=disable_memory_object%
+
+[camper@military_2_arch_2]:walker@ignore
+path_walk = military_2_2_walk
+path_look = military_2_2_look 
+out_restr = pri_a28_sr_arch_2
+
+
+
+[logic@pri_a28_military_3_arch]
+active = camper@military_3_arch_1_fight
+suitable = {-pri_a28_arch_done =target_squad_name(pri_a16_military_squad) !check_npc_name(strelok) !check_npc_name(kovalski)} true
+prior = 110
+on_hit = hit@def
+on_death = death@def
+post_combat_time = 0,0
+
+[camper@military_3_arch_1_fight]:walker@fight
+path_walk = military_3_1_walk
+path_look = military_3_1_look
+no_retreat = false
+out_restr = pri_a28_sr_arch_1
+on_info = {+pri_a28_arch_leave} camper@military_3_arch_2
+
+[camper@military_3_arch_2]:walker@fight
+path_walk = military_3_2_walk
+path_look = military_3_2_look
+no_retreat = false
+out_restr = pri_a28_sr_arch_2
+
+
+
+[logic@pri_a28_military_4_arch]
+active = camper@military_4_arch_1_fight
+suitable = {-pri_a28_arch_done =target_squad_name(pri_a16_military_squad) !check_npc_name(strelok) !check_npc_name(kovalski)} true
+prior = 100
+on_hit = hit@def
+on_death = death@def
+post_combat_time = 0,0
+
+[camper@military_4_arch_1_fight]:walker@fight
+path_walk = military_4_1_walk
+path_look = military_4_1_look
+out_restr = pri_a28_sr_arch_1
+no_retreat = false
+on_info = {+pri_a28_arch_leave} camper@military_4_arch_2
+
+[camper@military_4_arch_2]:walker@fight
+path_walk = military_4_2_walk
+path_look = military_4_2_look
+no_retreat = false
+out_restr = pri_a28_sr_arch_2
+
+
+
+[logic@pri_a28_military_5_arch]
+active = camper@military_5_arch_1_fight
+suitable = {-pri_a28_arch_done =target_squad_name(pri_a16_military_squad) !check_npc_name(strelok) !check_npc_name(kovalski)} true
+prior = 110
+on_hit = hit@def
+on_death = death@def
+post_combat_time = 0,0
+
+[camper@military_5_arch_1_fight]:walker@fight
+path_walk = military_5_1_walk
+path_look = military_5_1_look
+out_restr = pri_a28_sr_arch_1
+no_retreat = false
+on_info = {+pri_a28_arch_leave} camper@military_5_arch_2
+
+[camper@military_5_arch_2]:walker@fight
+path_walk = military_5_2_walk
+path_look = military_5_2_look
+no_retreat = false
+out_restr = pri_a28_sr_arch_2
+
+
+
+[logic@pri_a28_military_6_arch]
+active = camper@military_6_arch_1_fight
+suitable = {-pri_a28_arch_done =target_squad_name(pri_a16_military_squad) !check_npc_name(strelok) !check_npc_name(kovalski)} true
+prior = 90
+on_hit = hit@def
+on_death = death@def
+post_combat_time = 0,0
+
+[camper@military_6_arch_1_fight]:walker@fight
+path_walk = military_6_1_walk
+path_look = military_6_1_look
+out_restr = pri_a28_sr_arch_1
+no_retreat = false
+on_info = {+pri_a28_arch_leave} camper@military_6_arch_2
+
+[camper@military_6_arch_2]:walker@fight
+path_walk = military_6_2_walk
+path_look = military_6_2_look
+no_retreat = false
+out_restr = pri_a28_sr_arch_2

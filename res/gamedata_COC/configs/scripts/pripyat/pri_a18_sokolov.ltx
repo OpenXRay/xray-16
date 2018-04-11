@@ -1,0 +1,279 @@
+[logic@pri_a18_sokolov]
+active = walker@wait_actor
+suitable = {-pri_a25_rfi_source_eliminated =check_npc_name(pri_a15_sokolov) -pri_a18_surge_started} true
+prior = 100
+post_combat_time = 0, 0
+on_death = death
+on_hit = hit
+
+[walker@def_go_base]
+on_info10 = {+pri_a18_reinf_go_base} patrol@base
+[remark@def_go_base]
+on_info10 = {+pri_a18_reinf_go_base} patrol@base
+[smartcover@def_go_base]
+on_info10 = {+pri_a18_reinf_go_base} patrol@base
+[camper@def_go_base]
+on_info10 = {+pri_a18_reinf_go_base} patrol@base
+
+;*****************************************************
+
+[walker@wait_actor]:walker@def_go_base
+def_state_moving = assault
+corpse_detection_enabled = false
+gather_items_enabled = false
+meet = no_meet
+combat_ignore_cond = {-pri_a18_actor_enemy} true
+use_camp = false 
+path_walk = pri_a18_reinforcement_1_go_post_walk_2_2
+on_signal = pri_a18_reinforcement_1_go_post_walk_2_2_sig | remark@hello_snd %+pri_a18_near_bus%
+on_info = {=health_le(0.99) !actor_enemy} %=restore_health%
+on_info2 = {=dist_to_actor_le(10)} remark@hello_snd
+on_info3 = {=surge_started} %+pri_a18_surge_started%
+on_info4 = {+pri_a18_actor_enemy} %=actor_enemy%
+on_info5 = {+pri_a18_post_guard_combat} walker@go_shop %+pri_a18_get_reinforcement_done%
+
+[remark@hello_snd]:remark@def_go_base
+corpse_detection_enabled = false
+gather_items_enabled = false
+use_camp = false 
+meet = no_meet
+anim = guard_na
+target = story | actor
+on_info = {=dist_to_actor_le(10) +pri_a18_vano_say_hello_done} remark@hello_snd_timer
+on_info2 = {=health_le(0.5) !actor_enemy} %=restore_health%
+on_info3 = {=surge_started} %+pri_a18_surge_started%
+on_info4 = {+pri_a18_actor_enemy} %=actor_enemy%
+on_info5 = {+pri_a18_post_guard_combat} walker@go_shop %+pri_a18_get_reinforcement_done%
+on_info6 = {-pri_a18_once_scenario_autosave} %+pri_a18_once_scenario_autosave =scenario_autosave(st_save_pri_a18_met_reinforcement)%
+
+[remark@hello_snd_timer]:remark@def_go_base
+corpse_detection_enabled = false
+gather_items_enabled = false
+use_camp = false 
+meet = no_meet
+anim = guard_na
+target = story | actor
+on_game_timer = 15 | %=play_sound(pri_a18_sokolov_hello)%
+on_signal = sound_end | %+pri_a18_sokolov_say_hello_done%
+on_info = {=actor_enemy} %=stop_sound%
+on_info2 = {=health_le(0.5) !actor_enemy} %=restore_health%
+on_info3 = {+pri_a18_sokolov_say_hello_done +pri_a18_vano_say_hello_done} walker@go_shop %+pri_a18_get_reinforcement_done%
+on_info4 = {+pri_a18_actor_enemy} %=actor_enemy%
+on_info5 = {+pri_a18_post_guard_combat} walker@go_shop %+pri_a18_get_reinforcement_done%
+
+[walker@go_shop]:walker@def_go_base
+def_state_moving = assault
+corpse_detection_enabled = false
+gather_items_enabled = false
+meet = no_meet
+combat_ignore_cond = {-pri_a18_actor_enemy} true
+use_camp = false 
+path_walk = pri_a18_reinforcement_1_go_post_walk_2_3
+in_restr = pri_a18_in_anom_in_restr
+on_signal = pri_a18_reinforcement_smartcover_2_1 | smartcover@near_shop_enter
+on_info = {=npc_in_zone(pri_a18_reinf_near_shop_sneak_run)} walker@go_shop_sneak_run
+on_info2 = {=health_le(0.5) !actor_enemy} %=restore_health%
+on_info4 = {+pri_a18_actor_enemy} %=actor_enemy%
+
+[walker@go_shop_sneak_run]:walker@def_go_base
+corpse_detection_enabled = false
+gather_items_enabled = false
+meet = no_meet
+use_camp = false 
+combat_ignore_cond = {-pri_a18_actor_enemy} true
+def_state_moving = sneak_run
+path_walk = pri_a18_reinforcement_1_go_post_walk_2_3
+on_signal = pri_a18_reinforcement_smartcover_2_1 | smartcover@near_shop_enter
+on_info = {=health_le(0.5) !actor_enemy} %=restore_health%
+on_info2 = {+pri_a18_actor_enemy} %=actor_enemy% 
+
+[smartcover@near_shop_enter]:smartcover@def_go_base
+combat_ignore_cond = {-pri_a18_actor_enemy} true
+corpse_detection_enabled = false
+gather_items_enabled = false
+meet = no_meet
+use_camp = false 
+cover_name = pri_a18_near_shop_enter_smart_cover_2_1
+loophole_name = crouch_front_right
+use_in_combat = true
+on_info = {=health_le(0.5) !actor_enemy} %=restore_health%
+on_info2 = {+pri_a18_post_guard_combat} walker@hall_smartcover
+on_info3 = {=surge_started} walker@hall_smartcover
+on_info4 = {=dist_to_actor_le(7)} %=play_sound(pri_a18_sokolov_on_place)%
+on_info5 = {+pri_a18_actor_enemy} %=actor_enemy%
+
+[walker@hall_smartcover]:walker@def_go_base
+def_state_moving = sneak_run
+corpse_detection_enabled = false
+gather_items_enabled = false
+use_camp = false 
+meet = no_meet
+combat_ignore_cond = {-pri_a18_actor_enemy} true
+path_walk = pri_a18_reinforcement_near_shop_enter_walk_2
+on_signal = pri_a18_near_shop_enter_smart_cover_2_2 | smartcover@hall_smartcover
+on_info = {=health_le(0.5) !actor_enemy} %=restore_health%
+on_info2 = {+pri_a18_actor_enemy} %=actor_enemy%
+
+[smartcover@hall_smartcover]:smartcover@def_go_base
+corpse_detection_enabled = false
+gather_items_enabled = false
+meet = no_meet
+cover_name = pri_a18_near_shop_enter_smart_cover_2_2
+loophole_name = stand_front_left
+use_in_combat = true
+on_info = {=health_le(0.5) !actor_enemy} %=restore_health%
+on_info2 = {!squad_exist(pri_a18_monolith_post_guard_squad)} walker@in_hall
+
+[walker@in_hall]:walker@def_go_base
+out_restr = pri_a18_post_quard_out_restrictor
+path_walk = pri_a18_reinforcement_in_hall_walk_1
+path_look = pri_a18_reinforcement_corridor_look
+corpse_detection_enabled = false
+use_camp = false 
+gather_items_enabled = false
+meet = no_meet
+def_state_moving = assault
+def_state_standing = threat_na
+combat_ignore_cond = {-pri_a18_actor_enemy =actor_in_zone(pri_a18_corridor_man_fire_zone) !is_alive(pri_a18_monolith_1st_corridor_npc)} true
+on_info = {=health_le(0.5) !actor_enemy} %=restore_health%
+on_info2 = {!squad_exist(pri_a18_monolith_corridor_squad) =actor_in_zone(pri_a18_corridor_man_fire_zone)} walker@go_corridor
+on_info3 = {=actor_in_zone(pri_a18_monolith_trance_restrictor) !squad_exist(pri_a18_monolith_2nd_corridor_squad)} camper@idol_room
+on_info4 = {+pri_a18_actor_enemy} %=actor_enemy%
+
+[walker@go_corridor]:walker@def_go_base
+out_restr = pri_surge_hide_a18_2
+combat_ignore_cond = {!is_alive(pri_a18_monolith_2nd_corridor_1)} true
+corpse_detection_enabled = false
+use_camp = false 
+gather_items_enabled = false
+meet = no_meet
+def_state_moving = assault
+path_walk = pri_a18_reinf_near_idol_room_2
+path_look = pri_a18_reinf_near_idol_room_2_look
+on_info = {=health_le(0.5) !actor_enemy} %=restore_health%
+on_info2 = {=actor_in_zone(pri_a18_bofore_idol_room_checkpoint_zone) !squad_exist(pri_a18_monolith_2nd_corridor_squad)} walker@idolroom_door
+on_info3 = {=actor_in_zone(pri_a18_monolith_trance_restrictor) !squad_exist(pri_a18_monolith_2nd_corridor_squad)} camper@idol_room
+on_info4 = {=npc_in_zone(pri_surge_hide_a18_2)} walker@go_corridor_2
+on_info5 = {+pri_a18_actor_enemy} %=actor_enemy%
+
+[walker@go_corridor_2]:walker@def_go_base
+out_restr = pri_surge_hide_a18_2
+combat_ignore_cond = {!is_alive(pri_a18_monolith_2nd_corridor_1)} true
+corpse_detection_enabled = false
+gather_items_enabled = false
+meet = no_meet
+use_camp = false 
+def_state_moving = sneak_run
+def_state_standing = hide
+path_walk = pri_a18_reinf_near_idol_room_2
+path_look = pri_a18_reinf_near_idol_room_2_look
+on_info = {=health_le(0.5) !actor_enemy} %=restore_health%
+on_info2 = {=actor_in_zone(pri_a18_bofore_idol_room_checkpoint_zone) !squad_exist(pri_a18_monolith_2nd_corridor_squad)} walker@idolroom_door
+on_info3 = {=actor_in_zone(pri_a18_monolith_trance_restrictor) !squad_exist(pri_a18_monolith_2nd_corridor_squad)} camper@idol_room
+on_info4 = {+pri_a18_actor_enemy} %=actor_enemy%
+
+[walker@idolroom_door]:walker@def_go_base
+combat_ignore_cond = {-pri_a18_actor_enemy} true
+corpse_detection_enabled = false
+use_camp = false 
+gather_items_enabled = false
+meet = no_meet
+def_state_moving = sneak_run
+def_state_standing = hide
+path_walk = pri_a18_reinforcement_idolroom_door_walk_2
+on_signal = pri_a18_reinforcement_idolroom_door_walk_2_sig | smartcover@idolroom_door
+on_info = {=health_le(0.5) !actor_enemy} %=restore_health%
+on_info2 = {=actor_in_zone(pri_a18_monolith_trance_restrictor) !squad_exist(pri_a18_monolith_2nd_corridor_squad)} camper@idol_room
+on_info3 = {+pri_a18_actor_enemy} %=actor_enemy%
+
+[smartcover@idolroom_door]:smartcover@def_go_base
+corpse_detection_enabled = false
+gather_items_enabled = false
+meet = no_meet
+cover_name = pri_a18_idolroom_door_smartcover_2
+loophole_name = crouch_front_left
+use_in_combat = true
+combat_ignore_cond = {-pri_a18_actor_enemy} true 
+on_info = {=health_le(0.5) !actor_enemy} %=restore_health%
+on_info2 = {=actor_in_zone(pri_a18_monolith_trance_restrictor) !squad_exist(pri_a18_monolith_2nd_corridor_squad)} camper@idol_room
+on_info3 = {+pri_a18_actor_enemy} %=actor_enemy%
+
+[camper@idol_room]:camper@def_go_base
+corpse_detection_enabled = false
+gather_items_enabled = false
+meet = no_meet
+def_state_moving = raid
+def_state_campering_fire = threat_fire
+radius = 0
+combat_ignore_cond = {-pri_a18_hit_pray_squad} true 
+path_walk = pri_a18_reinforcement_2_ready_kill_walk
+path_look = pri_a18_reinforcement_2_ready_kill_look
+on_signal = pri_a18_play_kill_snd_2 | {-pri_a18_hit_pray_squad} %=play_sound(pri_a18_sokolov_fight)%
+on_signal2 = sound_end | camper@before_fight %+pri_a18_sokolov_lets_kill_snd_done%
+on_info = {=health_le(0.5) !actor_enemy} %=restore_health%
+on_info2 = {!squad_exist(pri_a18_monolith_idol_squad)} camper@idolroom_guard
+
+[camper@before_fight]:camper@def_go_base
+corpse_detection_enabled = false
+gather_items_enabled = false
+meet = no_meet
+def_state_moving = raid
+def_state_campering_fire = threat_fire
+radius = 0
+combat_ignore_cond = {-pri_a18_hit_pray_squad} true 
+path_walk = pri_a18_reinforcement_2_ready_kill_walk
+path_look = pri_a18_reinforcement_2_ready_kill_look
+on_game_timer = 70 | {+pri_a18_vano_lets_kill_snd_done} %+pri_a18_hit_pray_squad%
+on_info = {=health_le(0.5) !actor_enemy} %=restore_health%
+on_info2 = {!squad_exist(pri_a18_monolith_idol_squad)} camper@idolroom_guard
+
+[camper@idolroom_guard]:camper@def_go_base
+corpse_detection_enabled = false
+gather_items_enabled = false
+meet = no_meet
+radius = 0
+combat_ignore_cond = {-pri_a18_actor_enemy} true 
+path_walk = pri_a18_reinforcement_2_ready_kill_walk
+path_look = pri_a18_reinf_guard_look
+on_info = {+pri_a18_task_end} walker@in_hall_after_idol_use
+on_info2 = {+pri_a18_actor_enemy} %=actor_enemy%
+
+[walker@in_hall_after_idol_use]
+meet = meet
+path_walk = pri_a18_in_hall_after_fighting_wait_walk_2
+path_look = pri_a18_in_hall_after_fighting_wait_look_2
+use_camp = false 
+corpse_detection_enabled = false
+gather_items_enabled = false
+on_info = {=health_le(0.5) !actor_enemy} %=restore_health%
+on_info2 = {+pri_a18_reinf_go_base} patrol@base
+on_info3 = {+pri_a18_actor_enemy} %=actor_enemy%
+
+[patrol@base]
+path_walk = pri_a18_reinforcement_go_base
+out_restr = pri_a16_sr_noweap
+formation = line
+corpse_detection_enabled = false
+gather_items_enabled = false
+meet = no_meet
+on_game_timer = 1200 | %+pri_a18_scene_end_change_smart%
+on_info = {=health_le(0.5) !actor_enemy} %=restore_health%
+on_info2 = {+pri_a18_actor_enemy} %=actor_enemy%
+on_info3 = {=surge_started} | %+pri_a18_scene_end_change_smart%
+
+[meet]
+meet_dialog = pri_a18_altar_destroyed_soldiers_start
+use = true
+abuse = false
+allow_break = false
+trade_enable = false
+close_anim = guard
+close_victim = actor
+close_distance = 0
+far_distance = 0
+
+[hit]
+on_info = {=hit_by_actor} %+pri_a18_actor_enemy%
+
+[death]
+on_info = %+pri_a18_sokolov_dead +pri_a18_sokolov_say_hello_done +pri_a18_sokolov_lets_kill_snd_done%

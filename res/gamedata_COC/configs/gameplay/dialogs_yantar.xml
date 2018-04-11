@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<game_dialogs>
+<!-- yan_stalker_sakharov -->
+   <dialog id="yan_stalker_sakharov_start">
+        <phrase_list>
+		    <phrase id="0">
+                <text/>
+				<next>1</next>
+            </phrase>
+		    <phrase id="1">
+                <text/>
+				<next>1111111</next>
+            </phrase>
+		    <phrase id="1111111">
+                <text>yan_stalker_sakharov_start_1</text>
+            </phrase>
+		</phrase_list>
+    </dialog>
+	
+   <dialog id="yan_stalker_sakharov_about_brain_scorcher">
+		<dont_has_info>yan_stalker_sakharov_actor_asked_brain_scorcher</dont_has_info>
+		<dont_has_info>bar_deactivate_radar_done</dont_has_info>
+        <phrase_list>
+            <phrase id="0">
+                <text>yan_stalker_sakharov_player_query_brain_scorcher</text>
+                <next>10</next>
+            </phrase>
+            <phrase id="10">
+                <text>yan_stalker_sakharov_npc_query_brain_scorcher</text>
+				<give_info>yan_stalker_sakharov_actor_asked_brain_scorcher</give_info>
+            </phrase>
+		</phrase_list>
+    </dialog>
+	
+	<dialog id="yan_stalker_sakharov_bad_psi_helmet">
+		<precondition>dialogs_yantar.actor_dont_has_psi_helmet</precondition>
+		<dont_has_info>bar_deactivate_radar_done</dont_has_info>
+		<dont_has_info>yan_stalker_sakharov_psi_helmet_upgrade</dont_has_info>
+		<has_info>yan_stalker_sakharov_actor_asked_brain_scorcher</has_info>
+		<phrase_list>
+            <phrase id="0">
+                <text>yan_stalker_sakharov_player_query_psi_helmet</text>
+                <next>10</next>
+				<next>1010</next>
+            </phrase>
+            <phrase id="10">
+				<dont_has_info>yan_stalker_sakharov_offer_free_upgrade</dont_has_info>
+                <text>yan_stalker_sakharov_npc_query_psi_helmet</text>
+                <next>11</next>
+				<next>12</next>
+				<next>13</next>
+            </phrase>
+            <phrase id="11">
+				<precondition>dialogs_yantar.actor_can_afford_bad_psi_helmet</precondition>
+                <text>yan_stalker_sakharov_player_psi_helmet_1_1</text>
+                <next>111</next>
+            </phrase>
+            <phrase id="111">
+                <text>yan_stalker_sakharov_npc_psi_helmet_1_1</text>
+				<next>112</next>
+                <next>13</next>
+            </phrase>
+            <phrase id="112">
+                <text>yan_stalker_sakharov_player_psi_helmet_1_2</text>
+				<action>dialogs_yantar.give_player_bad_psi_helmet</action>
+				<next>113</next>
+            </phrase>
+            <phrase id="113">
+                <text>yan_stalker_sakharov_npc_psi_helmet_1_2</text>
+            </phrase>
+            <phrase id="12">
+				<precondition>dialogs_yantar.actor_can_afford_good_psi_helmet</precondition>
+                <text>yan_stalker_sakharov_player_psi_helmet_2_1</text>
+                <next>121</next>
+            </phrase>
+            <phrase id="121">
+                <text>yan_stalker_sakharov_npc_psi_helmet_2_1</text>
+				<next>122</next>
+                <next>13</next>
+            </phrase>
+            <phrase id="122">
+                <text>yan_stalker_sakharov_player_psi_helmet_2_2</text>
+				<action>dialogs_yantar.take_money_good_psi_helmet</action>
+				<next>123</next>
+            </phrase>
+            <phrase id="123">
+                <text>yan_stalker_sakharov_npc_psi_helmet_2_2</text>
+            </phrase>
+            <phrase id="13">
+                <text>yan_stalker_sakharov_player_psi_helmet_3_1</text>
+				<next>131</next>
+            </phrase>
+			<phrase id="131">
+                <text>yan_stalker_sakharov_npc_psi_helmet_3_1</text>
+            </phrase>
+			
+			<phrase id="1010">
+				<has_info>yan_stalker_sakharov_offer_free_upgrade</has_info>
+                <text>yan_stalker_sakharov_npc_query_psi_helmet_free</text>
+				<next>1012</next>
+				<next>1013</next>
+            </phrase>
+            <phrase id="1012">
+                <text>yan_stalker_sakharov_player_psi_helmet_2_1</text>
+                <next>10121</next>
+            </phrase>
+            <phrase id="10121">
+                <text>yan_stalker_sakharov_npc_psi_helmet_2_1_free</text>
+				<next>10122</next>
+                <next>1013</next>
+            </phrase>
+            <phrase id="10122">
+                <text>yan_stalker_sakharov_player_psi_helmet_2_2</text>
+				<action>dialogs_yantar.take_money_good_psi_helmet</action>
+				<next>10123</next>
+            </phrase>
+            <phrase id="10123">
+                <text>yan_stalker_sakharov_npc_psi_helmet_2_2</text>
+            </phrase>
+            <phrase id="1013">
+                <text>yan_stalker_sakharov_player_psi_helmet_3_1</text>
+				<next>10131</next>
+            </phrase>
+			<phrase id="10131">
+                <text>yan_stalker_sakharov_npc_psi_helmet_3_1</text>
+            </phrase>
+        </phrase_list>
+	</dialog>
+	<dialog id="yan_stalker_sakharov_good_psi_helmet">
+		<dont_has_info>bar_deactivate_radar_done</dont_has_info>
+		<precondition>dialogs_yantar.actor_dont_has_psi_helmet</precondition>
+		<has_info>yan_stalker_sakharov_psi_helmet_upgrade</has_info>
+		<has_info>yan_stalker_sakharov_actor_asked_brain_scorcher</has_info>
+		<phrase_list>
+			<phrase id="0">
+                <text>yan_stalker_sakharov_player_psi_helmet_2_3</text>
+                <next>2221</next>
+				<next>2222</next>
+            </phrase>			
+			<phrase id="2221">
+				<precondition>dialogs_yantar.actor_has_good_psi_helmet_task_completed</precondition>
+                <text>yan_stalker_sakharov_npc_psi_helmet_2_3</text>
+				<action>dialogs_yantar.give_player_good_psi_helmet</action>
+            </phrase>
+			<phrase id="2222">
+				<precondition>dialogs_yantar.actor_dont_has_good_psi_helmet_task_completed</precondition>
+                <text>yan_stalker_sakharov_npc_psi_helmet_2_3_1</text>
+            </phrase>
+		</phrase_list>
+	</dialog>
+	<dialog id="yan_stalker_sakharov_upgrade_psi_helmet">
+		<precondition>dialogs_yantar.actor_has_bad_psi_helmet</precondition>
+		<has_info>yan_stalker_sakharov_actor_asked_brain_scorcher</has_info>
+		<phrase_list>
+            <phrase id="0">
+                <text>yan_stalker_sakharov_player_psi_helmet_1_3</text>
+                <next>1111</next>
+            </phrase>
+            <phrase id="1111">
+                <text>yan_stalker_sakharov_npc_psi_helmet_1_3</text>
+				<next>1112</next>
+				<next>1113</next>
+            </phrase>
+            <phrase id="1112">
+				<precondition>dialogs_yantar.actor_can_afford_bad_to_good_psi_helmet</precondition>
+                <text>yan_stalker_sakharov_player_psi_helmet_2_2</text>
+				<action>dialogs_yantar.upgrade_player_bad_psi_helmet</action>
+            </phrase>
+            <phrase id="1113">
+                <text>yan_stalker_sakharov_player_psi_helmet_3_1</text>
+				<next>1114</next>
+            </phrase>
+			<phrase id="1114">
+                <text>yan_stalker_sakharov_npc_psi_helmet_3_1</text>
+            </phrase>
+		</phrase_list>
+	</dialog>
+<!-- yan_ecolog_vasilyev -->
+   <dialog id="yan_ecolog_vasilyev_start_dialog">
+        <phrase_list>
+		    <phrase id="0">
+                <text/>
+				<next>1</next>
+            </phrase>
+		    <phrase id="1">
+                <text/>
+				<next>1111</next>
+            </phrase>
+		    <phrase id="1111">
+                <text>yan_ecolog_vasilyev_start_dialog_1</text>
+            </phrase>
+          </phrase_list>
+    </dialog>
+<!-- yan_ecolog_semenov -->
+   <dialog id="yan_ecolog_semenov_start_dialog">
+        <phrase_list>
+		    <phrase id="0">
+                <text/>
+				<next>1</next>
+            </phrase>
+		    <phrase id="1">
+                <text/>
+				<next>1111</next>
+				<next>1112</next>
+				<next>1113</next>
+            </phrase>
+		    <phrase id="1111">
+				<dont_has_info>yan_ecolog_semenov_task_1_started</dont_has_info>
+				<dont_has_info>yan_ecolog_semenov_task_1_completed</dont_has_info>
+                <text>yan_ecolog_semenov_start_dialog_1</text>
+            </phrase>
+			<phrase id="1112">
+				<has_info>yan_ecolog_semenov_task_1_started</has_info>
+				<dont_has_info>yan_ecolog_semenov_task_1_completed</dont_has_info>
+                <text>yan_ecolog_semenov_start_dialog_yan_ecolog_semenov_task_1</text>
+            </phrase>
+			<phrase id="1113">
+				<has_info>yan_ecolog_semenov_task_1_started</has_info>
+				<has_info>yan_ecolog_semenov_task_1_completed</has_info>
+                <text>yan_ecolog_semenov_start_dialog_1</text>
+            </phrase>
+          </phrase_list>
+    </dialog>
+<!-- yan_ecolog_kruglov -->
+   <dialog id="yan_ecolog_kruglov_start_dialog">
+        <phrase_list>
+		    <phrase id="0">
+                <text/>
+				<next>1</next>
+            </phrase>
+		    <phrase id="1">
+                <text/>
+				<next>1111</next>
+            </phrase>
+		    <phrase id="1111">
+                <text>yan_ecolog_kruglov_start_dialog_1</text>
+            </phrase>
+          </phrase_list>
+    </dialog>
+<!-- yan_merc_guards -->
+    <dialog id="yan_merc_guards_start">
+        <phrase_list>
+            <phrase id="0">
+                <text />
+                <next>1</next>
+            </phrase>
+            <phrase id="1">
+                <text />
+                <next>2</next>
+                <next>3</next>
+                <next>4</next>
+            </phrase>
+			<phrase id="2">
+                <text>yan_merc_guards_start_2</text>
+            </phrase>
+            <phrase id="3">
+                <text>yan_merc_guards_start_3</text>
+            </phrase>
+            <phrase id="4">
+                <text>yan_merc_guards_start_4</text>
+            </phrase>
+        </phrase_list>
+    </dialog>
+</game_dialogs>

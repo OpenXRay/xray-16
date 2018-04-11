@@ -1,0 +1,31 @@
+[smart_terrain];esc_smart_terrain_3_16
+squad_id = 4
+max_population = 4
+respawn_params = respawn@esc_smart_terrain_3_16
+respawn_idle = 86400
+
+
+[respawn@esc_smart_terrain_3_16]
+spawn_military@novice
+spawn_military@advanced
+spawn_military@sniper
+
+[spawn_military@novice]
+spawn_squads = army_sim_squad_novice
+spawn_num = 3
+
+[spawn_military@advanced]
+spawn_squads = army_sim_squad_novice, army_sim_squad_advanced
+spawn_num = 3
+
+[spawn_military@sniper]
+spawn_squads = army_sim_squad_sniper, army_sim_squad_advanced
+spawn_num = 3
+
+[exclusive]
+esc_smart_terrain_3_16_camp_work_1 = escape\esc_smart_terrain_3_16_smart_logic.ltx
+esc_smart_terrain_3_16_camp_work_2 = escape\esc_smart_terrain_3_16_smart_logic.ltx
+esc_smart_terrain_3_16_camp_work_3 = escape\esc_smart_terrain_3_16_smart_logic.ltx
+esc_smart_terrain_3_16_camp_work_4 = escape\esc_smart_terrain_3_16_smart_logic.ltx
+esc_smart_terrain_3_16_camp_work_5 = escape\esc_smart_terrain_3_16_smart_logic.ltx
+esc_smart_terrain_3_16_minigunner_excl = escape\esc_smart_terrain_3_16_smart_logic.ltx

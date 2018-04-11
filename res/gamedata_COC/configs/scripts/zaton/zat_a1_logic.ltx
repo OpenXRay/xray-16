@@ -1,0 +1,25 @@
+[logic]
+active = nil ;sr_idle@game_start
+
+[sr_idle@game_start]
+on_info = {=actor_on_level(zaton)} sr_idle@game_start_2 %=damage_actor_items_on_start%
+
+[sr_idle@game_start_2]
+on_info = sr_idle@timer %+zat_a1_game_start%
+
+[sr_idle@timer]
+on_game_timer = 3000 | sr_idle@free %+zat_a1_simulation_start%
+on_info = {+about_skadovsk_dialog_done -zat_a2_reach_base} %+zat_a2_reach_base =give_task(zat_a2_reach_base)%
+on_info2 = {-zat_a2_reach_base =actor_in_zone(zat_a2_sr_noweap)} %+about_skadovsk_dialog_done +zat_a2_reach_base%
+on_info3 = {-zat_a2_reached_skadovsk =actor_in_zone(zat_a2_sr_noweap)} %+zat_a2_reached_skadovsk =scenario_autosave(st_save_zat_a2_reached_skadovsk)%
+
+[sr_idle@free]
+on_info = {+about_skadovsk_dialog_done -zat_a2_reach_base} sr_idle@time %+zat_a2_reach_base =give_task(zat_a2_reach_base)%
+on_info2 = {+zat_a2_reach_base} sr_idle@time
+on_info3 = {-zat_a2_reach_base =actor_in_zone(zat_a2_sr_noweap)} %+about_skadovsk_dialog_done +zat_a2_reach_base%
+
+[sr_idle@time]
+on_game_timer = 43200 | sr_idle@nil %+zat_a1_trade_level_2%
+on_info = {-zat_a2_reached_skadovsk =actor_in_zone(zat_a2_sr_noweap)} %+about_skadovsk_dialog_done +zat_a2_reach_base +zat_a2_reached_skadovsk =scenario_autosave(st_save_zat_a2_reached_skadovsk)%
+
+[sr_idle@nil]

@@ -1,0 +1,20 @@
+[logic] 
+active = nil;sr_idle@wait
+
+[sr_idle@wait]
+on_info = {+jup_b6_anom_2} sr_idle@guard
+
+[sr_idle@guard]
+on_info = {=squad_in_zone(jup_b19_kopatci_zombied_squad:jup_b6_anom_2_guard_zone)} sr_idle@alarm %+jup_b6_anom_2_alarm%
+on_info2 = {=squad_in_zone(jup_b6_zombie_squad_1:jup_b6_anom_2_guard_zone)} sr_idle@alarm %+jup_b6_anom_2_alarm%
+on_info3 = {=squad_in_zone(jup_b6_zombie_squad_2:jup_b6_anom_2_guard_zone)} sr_idle@alarm %+jup_b6_anom_2_alarm%
+on_info4 = {=squad_in_zone(jup_b6_zombie_squad_3:jup_b6_anom_2_guard_zone)} sr_idle@alarm %+jup_b6_anom_2_alarm%
+on_info5 = {=squad_in_zone(jup_b6_zombie_squad_4:jup_b6_anom_2_guard_zone)} sr_idle@alarm %+jup_b6_anom_2_alarm%
+on_info6 = {=squad_in_zone(jup_b6_zombie_squad_5:jup_b6_anom_2_guard_zone)} sr_idle@alarm %+jup_b6_anom_2_alarm%
+on_info7 = {+jup_b6_anom_2_alarm} sr_idle@alarm
+on_info8 = {+jup_b6_anom_2_count_end} sr_idle@end
+
+[sr_idle@alarm]
+on_info = {!squad_in_zone(jup_b19_kopatci_zombied_squad:jup_b6_anom_2_guard_zone) !squad_in_zone(jup_b6_zombie_squad_1:jup_b6_anom_2_guard_zone) !squad_in_zone(jup_b6_zombie_squad_2:jup_b6_anom_2_guard_zone) !squad_in_zone(jup_b6_zombie_squad_3:jup_b6_anom_2_guard_zone) !squad_in_zone(jup_b6_zombie_squad_4:jup_b6_anom_2_guard_zone) !squad_in_zone(jup_b6_zombie_squad_5:jup_b6_anom_2_guard_zone)} sr_idle@guard %-jup_b6_anom_2_alarm%
+
+[sr_idle@end] 

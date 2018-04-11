@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+<!--------------------------- val_smart_terrain_7_4_bandit_trader_stalker -->
+	<string id="val_smart_terrain_7_4_bandit_trader_stalker_start_dialog_1">
+		<text>Hey, man! I have some stuff to sell you and maybe a couple jobs if you're interested. I'm the guy the boys around he come see when they line their pocket after a hit!</text>
+	</string>
+	<string id="val_smart_terrain_7_4_bandit_trader_stalker_start_dialog_2">
+		<text>Hey, man. What do you need? Looking for work?</text>
+	</string>
+<!---------------------------- val_smart_terrain_7_3_bandit_mechanic_stalker --->
+	<string id="val_smart_terrain_7_3_bandit_mechanic_stalker_start_dialog_1">
+		<text>What you need today, man? I'll fix your shit right up. Also, if you find any encrypted PDAs, I'll buy them from you.</text>
+	</string>
+	
+	<!-- Sultan, moved from Zaton to Dark Valley -->
+	
+	<string id="zat_b7_bandit_boss_sultan_intro_0">
+		<text>Remember. I'm Sultan. Everything that goes down here is either under my control or will be soon. If you want to live the good life, you gotta work for me. If you don't, you'll live the shitty life. That's how we roll, bro.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_about_0">
+		<text>Tell me about your life here.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_about_1">
+		<text>It ain't a walk in the park, that's for sure... What exactly do you want to know?</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_about_1111">
+		<text>What is it that you do here?</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_about_11111">
+		<text>We watch over stalkers. You have to admit that a good half of you are more like little kids than men. You come to the Zone with some silly dreams, or to play heroes, or just because life's treating you badly. You don't realize all that's waiting for you in here -  the grim reaper, mostly. That's the kind we look after. We find one at the Garbage, we take his gear and send 'im back to the Cordon. Some wise up and go back to the outside. Those with the stones to come back here, we put under our protection and we tax 'em. I'm tellin' ya, no one dares go on our territory - not the army, not the mercenaries, not even mutants.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_about_1112">
+		<text>What brought you to the center of the Zone?</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_about_11121">
+		<text>Our legs. We came here for stalkers, what else? Without us around to keep order it's sheer god-damn chaos. You loot it, you keep it, sure, but who's gonna pay your taxes? You know, the peace and security tax. Like if one of youse is milking an anomaly while we're on the lookout, keeping mutants at bay. If he comes out fine, we take a cut... for maintaining order, you understand.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_about_1113">
+		<text>How did you become boss?</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_about_11131">
+		<text>Where do I begin... I guess it goes back to high school. I had a good buddy, a best friend, if you will. We hung out together, smoking, drinking and whatnot. Only he wanted more and more thrills. He got into drugs: some weed at first, then smack and then coke, when he started getting some coin. I told him, "You gotta get off this shit, Tolyan, before it's too late." But he didn't listen. He scored some bad shit one day and that was that. I found his dealers and got even for my buddy... Got my picture took and all hell broke loose - the slammer, the gang fights, the shiv in the belly... Got out, started a business, got busted again... When I got out again, I left all that shit behind and set my sights on the Zone. Spent a couple months toughing it out, then got promoted. So now I'm in charge here, upholding the local law.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_about_1114">
+		<text>What do you think about stalkers?</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_about_11141">
+		<text>They're all different, like. Some are punks who don't last here a week, others are earners... and others still are okay guys that life has kicked around on both sides of the Cordon. We fleece the first kind, tax the second kind. As far as the last kind, well, we just try not to get in each other's way. Too bad you can't always tell them apart right away...</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_about_1115">
+		<text>Why are you sitting... There?</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_about_11151">
+		<text>Your whore of a mother's face had a month long waiting list. Want to ask any more stupid questions?</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_about_1116">
+		<text>Oh, never mind. Fuhgetaboutit.</text>
+	</string>
+	<string id="zat_b7_bandit_boss_sultan_about_11161">
+		<text>Suit yourself.</text>
+	</string>
+	
+</string_table>

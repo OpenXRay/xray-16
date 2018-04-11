@@ -1,0 +1,114 @@
+[logic@zombie_work_01]
+active = walker@zombie_passive_01
+suitable = {=check_npc_name(zombied)} true
+prior = 35
+
+[walker@zombie_passive_01]
+path_walk = zombie_01_1_walk
+path_look = zombie_01_1_look
+out_restr = jup_b205_zombie_zone_01 
+combat_ignore_cond = {=dist_to_actor_ge(15)} true
+combat_ignore_keep_when_attacked = false
+
+
+
+[logic@zombie_work_02]
+active = walker@zombie_passive_02
+suitable = {=check_npc_name(zombied)} true
+prior = 35
+
+[walker@zombie_passive_02]
+path_walk = zombie_02_1_walk
+out_restr = jup_b205_zombie_zone_01
+combat_ignore_cond = {=dist_to_actor_ge(15)} true
+combat_ignore_keep_when_attacked = false
+
+
+
+[logic@zombie_work_03]
+active = walker@zombie_03
+suitable = {=check_npc_name(zombied)} true
+prior = 35
+
+[walker@zombie_03]
+path_walk = zombie_03_1_walk
+combat_ignore_cond = {=dist_to_actor_ge(15)} true
+combat_ignore_keep_when_attacked = false
+
+
+
+[logic@zombie_work_04]
+active = walker@zombie_passive_04
+suitable = {=check_npc_name(zombied)} true
+prior = 35
+
+[walker@zombie_passive_04]
+path_walk = zombie_04_1_walk
+out_restr = jup_b205_zombie_zone_02
+combat_ignore_cond = {=dist_to_actor_ge(15)} true
+combat_ignore_keep_when_attacked = false
+
+
+
+[logic@zombie_work_05]
+active = walker@zombie_passive_05
+suitable = {=check_npc_name(zombied)} true
+prior = 35
+
+[walker@zombie_passive_05]
+path_walk = zombie_05_1_walk
+out_restr = jup_b205_zombie_zone_02
+combat_ignore_cond = {=dist_to_actor_ge(15)} true
+combat_ignore_keep_when_attacked = false
+
+
+
+[logic@zombie_work_06]
+active = walker@zombie_passive_06
+suitable = {=check_npc_name(zombied)} true
+prior = 35
+
+[walker@zombie_passive_06]
+path_walk = zombie_06_1_walk
+out_restr = jup_b205_zombie_zone_02
+combat_ignore_cond = {=dist_to_actor_ge(15)} true
+combat_ignore_keep_when_attacked = false
+
+
+
+[logic@zombie_work_07]
+active = walker@zombie_07
+suitable = {=check_npc_name(zombied)} true
+prior = 35
+
+[walker@zombie_07]
+path_walk = zombie_07_1_walk
+path_look = zombie_07_1_look
+combat_ignore_cond = {=dist_to_actor_ge(15)} true
+combat_ignore_keep_when_attacked = false
+
+
+
+[logic@zombie_work_08]
+active = walker@zombie_08
+suitable = {=check_npc_name(zombied)} true
+prior = 35
+
+[walker@zombie_08]
+path_walk = zombie_08_1_walk
+path_look = zombie_08_1_look
+combat_ignore_cond = {=dist_to_actor_ge(15)} true
+combat_ignore_keep_when_attacked = false
+
+
+
+[logic@zombie_work_09]
+active = walker@zombie_09
+suitable = {=check_npc_name(zombied)} true
+prior = 35
+
+[walker@zombie_09]
+path_walk = zombie_09_1_walk
+path_look = zombie_09_1_look
+combat_ignore_cond = {=dist_to_actor_ge(15)} true
+combat_ignore_keep_when_attacked = false

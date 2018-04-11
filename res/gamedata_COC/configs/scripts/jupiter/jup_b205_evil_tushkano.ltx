@@ -1,0 +1,311 @@
+;-----------------------evil_tushkano_01--------------------------------------
+[logic@tushkano_work_01]
+suitable = {=is_monster_tushkano}
+active = mob_walker@eat_01
+monster_job = true
+
+[mob_walker@eat_01]
+path_walk = evil_tushkano_01_walk
+path_look = evil_tushkano_look
+on_info = {=actor_in_zone(jup_b205_evil_tushkano_warnzone_01)} mob_walker@attack_stairs_01
+on_info2 = {=actor_in_zone(jup_b205_evil_tushkano_warnzone_02)} mob_walker@attack_gate_01
+;friendly = true
+aggressive = true
+out_restr = jup_b205_evil_tushkano_zone
+
+[mob_walker@attack_stairs_01]
+path_walk = evil_tushkano_01_stairs_walk
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_01)} mob_walker@eat_01
+on_actor_dist_le_nvis = 10 | mob_home@attack_stairs_01
+aggressive = true
+
+[mob_home@attack_stairs_01]
+path_home = evil_tushkano_01_stairs_walk
+home_min_radius = 20
+home_max_radius = 40
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_01)} mob_walker@eat_01
+aggressive = true
+out_restr = jup_b205_evil_tushkano_zone
+
+[mob_walker@attack_gate_01]
+path_walk = evil_tushkano_01_gate_walk
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_02)} mob_walker@eat_01
+on_actor_dist_le_nvis = 10 | mob_home@attack_gate_01
+aggressive = true
+
+[mob_home@attack_gate_01]
+path_home = evil_tushkano_01_gate_walk
+home_min_radius = 20
+home_max_radius = 40
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_02)} mob_walker@eat_01
+aggressive = true
+out_restr = jup_b205_evil_tushkano_zone
+;-----------------------evil_tushkano_02--------------------------------------
+[logic@tushkano_work_02]
+suitable = {=is_monster_tushkano}
+active = mob_walker@eat_02
+monster_job = true
+
+[mob_walker@eat_02]
+path_walk = evil_tushkano_02_walk
+path_look = evil_tushkano_look
+on_info = {=actor_in_zone(jup_b205_evil_tushkano_warnzone_01)} mob_walker@attack_stairs_02
+on_info2 = {=actor_in_zone(jup_b205_evil_tushkano_warnzone_02)} mob_walker@attack_gate_02
+out_restr = jup_b205_evil_tushkano_zone
+
+[mob_walker@attack_stairs_02]
+path_walk = evil_tushkano_02_stairs_walk
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_01)} mob_walker@eat_02
+on_actor_dist_le_nvis = 10 | mob_home@attack_stairs_02
+aggressive = true
+
+[mob_home@attack_stairs_02]
+path_home = evil_tushkano_02_stairs_walk
+home_min_radius = 20
+home_max_radius = 40
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_01)} mob_walker@eat_02
+aggressive = true
+
+[mob_walker@attack_gate_02]
+path_walk = evil_tushkano_01_gate_walk
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_02)} mob_walker@eat_02
+on_actor_dist_le_nvis = 10 | mob_home@attack_gate_02
+aggressive = true
+
+[mob_home@attack_gate_02]
+path_home = evil_tushkano_01_gate_walk
+home_min_radius = 20
+home_max_radius = 40
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_02)} mob_walker@eat_02
+aggressive = true
+;-----------------------evil_tushkano_03--------------------------------------
+[logic@tushkano_work_03]
+suitable = {=is_monster_tushkano}
+active = mob_walker@eat_03
+monster_job = true
+
+[mob_walker@eat_03]
+path_walk = evil_tushkano_03_walk
+path_look = evil_tushkano_look
+on_info = {=actor_in_zone(jup_b205_evil_tushkano_warnzone_01)} mob_walker@attack_stairs_03
+on_info2 = {=actor_in_zone(jup_b205_evil_tushkano_warnzone_02)} mob_walker@attack_gate_03
+out_restr = jup_b205_evil_tushkano_zone
+
+[mob_walker@attack_stairs_03]
+path_walk = evil_tushkano_03_stairs_walk
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_01)} mob_walker@eat_03
+on_actor_dist_le_nvis = 10 | mob_home@attack_stairs_03
+aggressive = true
+
+[mob_home@attack_stairs_03]
+path_home = evil_tushkano_03_stairs_walk
+home_min_radius = 20
+home_max_radius = 40
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_01)} mob_walker@eat_03
+aggressive = true
+
+[mob_walker@attack_gate_03]
+path_walk = evil_tushkano_01_gate_walk
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_02)} mob_walker@eat_03
+on_actor_dist_le_nvis = 10 | mob_home@attack_gate_03
+aggressive = true
+
+[mob_home@attack_gate_03]
+path_home = evil_tushkano_01_gate_walk
+home_min_radius = 20
+home_max_radius = 40
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_02)} mob_walker@eat_03
+aggressive = true
+;-----------------------evil_tushkano_04--------------------------------------
+[logic@tushkano_work_04]
+suitable = {=is_monster_tushkano}
+active = mob_walker@eat_04
+monster_job = true
+
+[mob_walker@eat_04]
+path_walk = evil_tushkano_04_walk
+path_look = evil_tushkano_look
+on_info = {=actor_in_zone(jup_b205_evil_tushkano_warnzone_01)} mob_walker@attack_stairs_04
+on_info2 = {=actor_in_zone(jup_b205_evil_tushkano_warnzone_02)} mob_walker@attack_gate_04
+out_restr = jup_b205_evil_tushkano_zone
+
+[mob_walker@attack_stairs_04]
+path_walk = evil_tushkano_04_stairs_walk
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_01)} mob_walker@eat_04
+on_actor_dist_le_nvis = 10 | mob_home@attack_stairs_04
+aggressive = true
+
+[mob_home@attack_stairs_04]
+path_home = evil_tushkano_04_stairs_walk
+home_min_radius = 20
+home_max_radius = 40
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_01)} mob_walker@eat_04
+aggressive = true
+
+[mob_walker@attack_gate_04]
+path_walk = evil_tushkano_02_gate_walk
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_02)} mob_walker@eat_04
+on_actor_dist_le_nvis = 10 | mob_home@attack_gate_04
+aggressive = true
+
+[mob_home@attack_gate_04]
+path_home = evil_tushkano_02_gate_walk
+home_min_radius = 20
+home_max_radius = 40
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_02)} mob_walker@eat_04
+aggressive = true
+;-----------------------evil_tushkano_05--------------------------------------
+[logic@tushkano_work_05]
+suitable = {=is_monster_tushkano}
+active = mob_walker@eat_05
+monster_job = true
+
+[mob_walker@eat_05]
+path_walk = evil_tushkano_05_walk
+path_look = evil_tushkano_look
+on_info = {=actor_in_zone(jup_b205_evil_tushkano_warnzone_01)} mob_walker@attack_stairs_05
+on_info2 = {=actor_in_zone(jup_b205_evil_tushkano_warnzone_02)} mob_walker@attack_gate_05
+out_restr = jup_b205_evil_tushkano_zone
+
+[mob_walker@attack_stairs_05]
+path_walk = evil_tushkano_04_stairs_walk
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_01)} mob_walker@eat_05
+on_actor_dist_le_nvis = 10 | mob_home@attack_stairs_05
+aggressive = true
+
+[mob_home@attack_stairs_05]
+path_home = evil_tushkano_05_stairs_walk
+home_min_radius = 20
+home_max_radius = 40
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_01)} mob_walker@eat_05
+aggressive = true
+
+[mob_walker@attack_gate_05]
+path_walk = evil_tushkano_02_gate_walk
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_02)} mob_walker@eat_05
+on_actor_dist_le_nvis = 10 | mob_home@attack_gate_05
+aggressive = true
+
+[mob_home@attack_gate_05]
+path_home = evil_tushkano_02_gate_walk
+home_min_radius = 20
+home_max_radius = 40
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_02)} mob_walker@eat_05
+aggressive = true
+;-----------------------evil_tushkano_06--------------------------------------
+[logic@tushkano_work_06]
+suitable = {=is_monster_tushkano}
+active = mob_walker@eat_06
+monster_job = true
+
+[mob_walker@eat_06]
+path_walk = evil_tushkano_06_walk
+path_look = evil_tushkano_look
+on_info = {=actor_in_zone(jup_b205_evil_tushkano_warnzone_01)} mob_walker@attack_stairs_06
+on_info2 = {=actor_in_zone(jup_b205_evil_tushkano_warnzone_02)} mob_walker@attack_gate_06
+out_restr = jup_b205_evil_tushkano_zone
+
+[mob_walker@attack_stairs_06]
+path_walk = evil_tushkano_06_stairs_walk
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_01)} mob_walker@eat_06
+on_actor_dist_le_nvis = 10 | mob_home@attack_stairs_06
+aggressive = true
+
+[mob_home@attack_stairs_06]
+path_home = evil_tushkano_06_stairs_walk
+home_min_radius = 20
+home_max_radius = 40
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_01)} mob_walker@eat_06
+aggressive = true
+
+[mob_walker@attack_gate_06]
+path_walk = evil_tushkano_02_gate_walk
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_02)} mob_walker@eat_06
+on_actor_dist_le_nvis = 10 | mob_home@attack_gate_06
+aggressive = true
+
+[mob_home@attack_gate_06]
+path_home = evil_tushkano_02_gate_walk
+home_min_radius = 20
+home_max_radius = 40
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_02)} mob_walker@eat_06
+aggressive = true
+
+;-----------------------evil_tushkano_07--------------------------------------
+[logic@tushkano_work_07]
+suitable = {=is_monster_tushkano}
+active = mob_walker@eat_07
+monster_job = true
+
+[mob_walker@eat_07]
+path_walk = evil_tushkano_06_walk
+path_look = evil_tushkano_look
+on_info = {=actor_in_zone(jup_b205_evil_tushkano_warnzone_01)} mob_walker@attack_stairs_07
+on_info2 = {=actor_in_zone(jup_b205_evil_tushkano_warnzone_02)} mob_walker@attack_gate_07
+out_restr = jup_b205_evil_tushkano_zone
+
+[mob_walker@attack_stairs_07]
+path_walk = evil_tushkano_06_stairs_walk
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_01)} mob_walker@eat_07
+on_actor_dist_le_nvis = 10 | mob_home@attack_stairs_07
+aggressive = true
+
+[mob_home@attack_stairs_07]
+path_home = evil_tushkano_06_stairs_walk
+home_min_radius = 20
+home_max_radius = 40
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_01)} mob_walker@eat_07
+aggressive = true
+
+[mob_walker@attack_gate_07]
+path_walk = evil_tushkano_02_gate_walk
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_02)} mob_walker@eat_07
+on_actor_dist_le_nvis = 10 | mob_home@attack_gate_07
+aggressive = true
+
+[mob_home@attack_gate_07]
+path_home = evil_tushkano_02_gate_walk
+home_min_radius = 20
+home_max_radius = 40
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_02)} mob_walker@eat_07
+aggressive = true
+
+;-----------------------evil_tushkano_08--------------------------------------
+[logic@tushkano_work_08]
+suitable = {=is_monster_tushkano}
+active = mob_walker@eat_08
+monster_job = true
+
+[mob_walker@eat_08]
+path_walk = evil_tushkano_05_walk
+path_look = evil_tushkano_look
+on_info = {=actor_in_zone(jup_b205_evil_tushkano_warnzone_01)} mob_walker@attack_stairs_08
+on_info2 = {=actor_in_zone(jup_b205_evil_tushkano_warnzone_02)} mob_walker@attack_gate_08
+out_restr = jup_b205_evil_tushkano_zone
+
+[mob_walker@attack_stairs_08]
+path_walk = evil_tushkano_05_stairs_walk
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_01)} mob_walker@eat_08
+on_actor_dist_le_nvis = 10 | mob_home@attack_stairs_08
+aggressive = true
+
+[mob_home@attack_stairs_08]
+path_home = evil_tushkano_05_stairs_walk
+home_min_radius = 20
+home_max_radius = 40
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_01)} mob_walker@eat_08
+aggressive = true
+
+[mob_walker@attack_gate_08]
+path_walk = evil_tushkano_01_gate_walk
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_02)} mob_walker@eat_08
+on_actor_dist_le_nvis = 10 | mob_home@attack_gate_08
+aggressive = true
+
+[mob_home@attack_gate_08]
+path_home = evil_tushkano_01_gate_walk
+home_min_radius = 20
+home_max_radius = 40
+on_info = {!actor_in_zone(jup_b205_evil_tushkano_warnzone_02)} mob_walker@eat_08
+aggressive = true
+

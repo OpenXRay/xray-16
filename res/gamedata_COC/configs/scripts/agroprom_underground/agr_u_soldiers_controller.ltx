@@ -1,0 +1,20 @@
+[logic@agr_u_soldiers_controller]
+active = mob_home@1
+suitable = {=target_squad_name(agr_u_soldiers_controller_squad)} true
+monster_job = true
+prior = 200
+on_death = death
+
+[mob_home@1]
+path_home = home1
+home_min_radius = 20
+home_max_radius = 75
+on_info = %=play_sound(controller_script_attack)% mob_home@2
+
+[mob_home@2]
+path_home = home2
+home_min_radius = 2
+home_max_radius = 2
+
+[death]
+on_info = %+agru_add_reward_2%

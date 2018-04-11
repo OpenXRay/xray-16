@@ -1,0 +1,8 @@
+[logic]
+active = nil;sr_idle@silence
+
+[sr_idle@silence]
+on_info = {=squad_in_zone(jup_b6_flesh_horde)} sr_idle@wait %=play_sound(jup_b6_swamp_noise)%, {=squad_in_zone(jup_b6_boar_horde)} sr_idle@wait %=play_sound(jup_b6_swamp_noise)%, {=squad_in_zone(jup_b6_flesh_horde_2)} sr_idle@wait %=play_sound(jup_b6_swamp_noise)%, {=squad_in_zone(jup_b6_boar_horde_2)} sr_idle@wait %=play_sound(jup_b6_swamp_noise)%, {=squad_in_zone(jup_b6_swamp_hunters)} sr_idle@wait %=play_sound(jup_b6_swamp_noise)%
+
+[sr_idle@wait]
+on_game_timer = 29 | sr_idle@silence

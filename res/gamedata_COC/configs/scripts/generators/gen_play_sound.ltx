@@ -1,0 +1,11 @@
+[logic]
+active = sr_idle@on
+
+[sr_idle@on]
+on_info = {-warlab_deactivate_generators_done} %=play_sound_looped(gen_noos_tunnel)%
+on_info2 = {+warlab_deactivate_generators_done} sr_idle@off
+
+[sr_idle@off]
+on_info = sr_idle@nil %=stop_sound_looped =disable_generator_zones =destroy_object(story:gen_zone_field_psychic_weak)%
+
+[sr_idle@nil]

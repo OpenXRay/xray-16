@@ -1,0 +1,42 @@
+[logic@snork_2_jump]
+active = mob_walker@jump
+suitable = {=check_npc_name(lx8_snork_2_jump)} true
+prior = 100
+monster_job = true
+
+[hit]
+on_info = mob_home@attack
+
+[mob_walker@jump]
+path_walk = snork_2_jump_1_walk 
+path_look = snork_2_jump_1_look
+combat_ignore_cond =  true
+on_info = {=actor_in_zone(lx8_sr_down_ladder)} mob_jump@01
+on_info2 = {=actor_in_zone(lx8_sr_close_combat)} mob_home@combat
+out_restr = lx8_sr_close_combat
+
+[mob_jump@01]
+path_jump = snork_2_jump
+ph_jump_factor = 1
+offset = 0,2,0
+on_signal = jumped | mob_home@attack
+;out_restr = lx8_sr_close_combat
+
+[mob_home@attack]
+path_home = snork_home
+home_min_radius = 20
+home_max_radius = 40
+braindead = false
+aggressive = true
+out_restr = lx8_sr_snork_out_restr
+combat_ignore_cond = {=check_enemy_name(lx8_controller)} true
+
+[mob_home@combat]
+path_home = snork_combat_home
+home_min_radius = 20
+home_max_radius = 40
+braindead = false
+aggressive = true
+out_restr = lx8_sr_close_combat
+on_info = {!actor_in_zone(lx8_sr_close_combat)} mob_walker@jump %+restore_health%
+combat_ignore_cond = {=check_enemy_name(lx8_controller)} true

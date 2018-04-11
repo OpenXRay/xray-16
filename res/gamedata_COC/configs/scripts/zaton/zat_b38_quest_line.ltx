@@ -1,0 +1,18 @@
+[logic]
+active = nil ;sr_idle@1
+
+[sr_idle@1]
+on_info  = {+zat_b38_disappearance_stalkers_find_to_be_missing_hunter_give -zat_b38_disappearance_stalkers_find_to_be_missing_hunter_give_task} %=give_task(zat_b38_disappearance_stalkers) +zat_b38_disappearance_stalkers_find_to_be_missing_hunter_give_task =set_counter(zat_b38_cop_abuse:0)%
+on_info2 = {+zat_b38_disappearance_stalkers_find_to_be_missing_hunter_give_task} sr_idle@2 %=clear_smart_terrain(zat_b38) =create_squad(zat_b38_bloodsucker_1_lair:zat_b38) =create_squad(zat_b38_bloodsucker_2_lair:zat_b38) =create_squad(zat_b38_bloodsuckers_sleepers:zat_b38u) =spawn_corpse(zat_b38_bloodsucker_corpse:zat_b38_stalker_wrong_dead_body_walk_and_look) =spawn_corpse(zat_b38_stalker_corpse_1:zat_b38_dead_body_1_spawn) =spawn_corpse(zat_b38_stalker_corpse_2:zat_b38_dead_body_2_spawn) =spawn_corpse(zat_b38_stalker_corpse_3:zat_b38_dead_body_3_spawn) =spawn_corpse(zat_b38_tasty_corpse:zat_b38_tasty_spawn)%
+
+[sr_idle@2]
+on_info6 = {-zat_b38_sleepers_incase_tp} %=teleport_squad(zat_b38_bloodsuckers_sleepers:zat_b38u_sleeper_bloodsuckers_spawn) +zat_b38_sleepers_incase_tp%
+;on_actor_in_zone = zat_b38_sleepers_territory | {-zat_b38_actor_saw_lair} %+zat_b38_actor_saw_lair%
+on_info  = {-zat_b38_corpses_hited} %+zat_b38_corpses_hited =hit_obj(zat_b38_stalker_corpse_1:bip01_spine1:3:1000:zat_b38_dead_body_1_spawn) =hit_obj(zat_b38_stalker_corpse_3:bip01_head:3:800:zat_b38_dead_body_3_spawn)%; =hit_obj(zat_b38_stalker_corpse_2:bip01_spine1:3:900:zat_b38_dead_body_2_spawn)%
+on_info2 = {=story_object_exist(zat_b38_tasty_corpse) -zat_b38_tastes_spawned_in} %=spawn_object_in(af_night_star:zat_b38_tasty_corpse) =spawn_object_in(drug_radioprotector:zat_b38_tasty_corpse) +zat_b38_tastes_spawned_in%
+on_info3 = {+zat_b38_den_of_the_bloodsucker_inform_stalkers_give -zat_b38_den_of_the_bloodsucker_inform_stalkers_give_task} %=give_task(zat_b38_den_of_the_bloodsucker_inform_stalkers) +zat_b38_den_of_the_bloodsucker_inform_stalkers_give_task%
+on_info4 = {+zat_b38_get_b57 +zat_b38_stalker_cop_death -zat_b38_den_of_the_bloodsucker_inform_stalkers_give_task} %=give_task(zat_b38_den_of_the_bloodsucker_inform_stalkers) +zat_b38_den_of_the_bloodsucker_inform_stalkers_give_task =set_counter(zat_b57_terminated:0)%
+on_info5 = {+zat_b38_den_of_the_bloodsucker_inform_stalkers_give_task !squad_exist(zat_b38_bloodsuckers_sleepers) =counter_equal(zat_b57_terminated:9) -zat_b57_den_of_the_bloodsucker_wait_destroy_give -zat_b57_den_of_the_bloodsucker_tell_stalkers_about_destroy_lair_give} sr_idle@nil %+zat_b57_den_of_the_bloodsucker_tell_stalkers_about_destroy_lair_give%
+
+[sr_idle@nil]
+

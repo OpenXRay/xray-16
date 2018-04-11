@@ -1,0 +1,10 @@
+[logic]
+active = sr_idle@check_story
+
+[sr_idle@check_story]
+on_info = {+story_mode_disabled} sr_idle@nil, sr_idle@spawns
+
+[sr_idle@spawns]
+on_actor_inside = sr_idle@nil %+sar_monolith_generator_find =spawn_object(mon_m_poltergeist_normal_flame_1:sar_poltergeist_1_way:0) =spawn_object(mon_m_poltergeist_normal_flame_2:sar_poltergeist_2_way:0) =spawn_object(mon_m_poltergeist_normal_flame_3:sar_poltergeist_3_way:0)%
+
+[sr_idle@nil]

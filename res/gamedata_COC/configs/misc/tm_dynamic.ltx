@@ -1,0 +1,469 @@
+; --------------------------------------------------------------------------------------------------
+; FIND SUPPLIES FOR STALKER, CLEAR SKY, OR ECOG TASK-
+
+[simulation_task_1]
+icon = ui_inGame2_PD_Opitniy_stalker
+prior = 90
+repeat_timeout = 86400
+storyline = false
+sim_communities = stalker, csky, ecolog
+title = simulation_task_1_name
+title_functor = general_fetch_task
+descr = simulation_task_1_text
+descr_functor = general_fetch_task
+job_descr = simulation_task_1_about
+fetch_descr = simulation_task_1_fetch_about
+fetch_func = %=setup_supplies_fetch_task(simulation_task_1_fetch:2:4)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = simulation_task_1_fetch_finish
+precondition = true
+on_complete = %=reward_random_item(ammo_5.56x45_ap:ammo_5.56x45_ap:ammo_12x70_buck:ammo_12x70_buck) =reward_item_cost_mult_and_remove(simulation_task_1_fetch:2) =reward_stash(true) =remove_fetch_item(simulation_task_1_fetch) =inc_task_stage(simulation_task_1) =pstor_reset(simulation_task_1_fetch)%
+on_fail = %=pstor_reset(simulation_task_1_fetch)%
+on_cancel = %=pstor_reset(simulation_task_1_fetch)%
+condlist_0 = {!task_giver_alive(simulation_task_1)} fail
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND SUPPLIES FOR FREEDOM OR MERC TASK-
+
+[simulation_task_2]
+icon = ui_inGame2_PD_Opitniy_stalker
+prior = 90
+repeat_timeout = 86400
+storyline = false
+sim_communities = freedom, killer
+title = simulation_task_2_name
+title_functor = general_fetch_task
+descr = simulation_task_2_text
+descr_functor = general_fetch_task
+job_descr = simulation_task_2_about
+fetch_descr = simulation_task_2_fetch_about
+fetch_func = %=setup_supplies_fetch_task(simulation_task_2_fetch:2:4)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = simulation_task_2_fetch_finish
+precondition = true
+on_complete = %=reward_item_cost_mult_and_remove(simulation_task_2_fetch:2) =reward_stash(true) =remove_fetch_item(simulation_task_2_fetch) =inc_task_stage(simulation_task_2) =pstor_reset(simulation_task_2_fetch)%
+on_fail = %=pstor_reset(simulation_task_2_fetch)%
+on_cancel = %=pstor_reset(simulation_task_2_fetch)%
+condlist_0 = {!task_giver_alive(simulation_task_2)} fail
+
+
+; --------------------------------------------------------------------------------------------------
+; FIND MUTANT MEAT FOR STALKER, CLEAR SKY, MERC, FREEDOM, OR BANDIT TASK-
+
+[simulation_task_3]
+icon = ui_inGame2_Nochnaya_ohota
+prior = 75
+sim_communities = stalker, csky, killer, freedom, bandit
+storyline = false
+title = simulation_task_3_name
+title_functor = general_fetch_task
+descr = simulation_task_3_text
+descr_functor = general_fetch_task
+job_descr = simulation_task_3_about
+fetch_descr = simulation_task_3_fetch_about
+fetch_func = %=setup_generic_fetch_task(simulation_task_3_fetch:6:mutant_part_boar_chop:mutant_part_dog_meat:mutant_part_flesh_meat:mutant_part_psevdodog_meat:mutant_part_tushkano_meat)%
+stage_complete = 1
+repeat_timeout = 86400
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = simulation_task_3_fetch_finish
+precondition = true
+on_complete = %=reward_random_item(ammo_9x39_ap:ammo_9x39_ap:ammo_9x39_ap:ammo_5.56x45_ap:ammo_5.56x45_ap) =reward_item_cost_mult_and_remove(simulation_task_3_fetch:5) =reward_stash(true) =inc_task_stage(simulation_task_3)%
+condlist_0 = {!task_giver_alive(simulation_task_3)} fail
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND ARTEFACT FOR STALKER TASK-
+
+[simulation_task_4]
+icon = ui_inGame2_Kontrakt_s_uchenimi
+prior = 65
+sim_communities = stalker
+storyline = false
+title = simulation_task_4_name
+title_functor = general_fetch_task
+descr = simulation_task_4_text
+descr_functor = general_fetch_task
+job_descr = simulation_task_4_about
+fetch_descr = simulation_task_4_fetch_about
+fetch_func = %=setup_artefact_fetch_task(simulation_task_4_fetch)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = simulation_task_4_fetch_finish
+precondition = true
+repeat_timeout = 86400
+on_complete = %=reward_random_item(wpn_val:wpn_abakan:wpn_groza:wpn_sig550) =complete_task_inc_goodwill(50:stalker) =remove_fetch_item(simulation_task_4_fetch) =reward_stash(true) =inc_task_stage(simulation_task_4)%
+on_fail = %=fail_task_dec_goodwill(25:stalker)%
+condlist_0 = {!task_giver_alive(simulation_task_4)} fail
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND WEAPON FOR STALKER TASK-
+
+[simulation_task_5]
+icon = ui_inGame2_Osobiy_zakaz
+prior = 60
+sim_communities = stalker
+storyline = false
+title = simulation_task_5_name
+title_functor = general_fetch_task
+descr = simulation_task_5_text
+descr_functor = general_fetch_task
+job_descr = simulation_task_5_about
+fetch_descr = simulation_task_5_fetch_about
+fetch_func = %=setup_weapon_fetch_task(simulation_task_5_fetch)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = simulation_task_5_fetch_finish
+precondition = true
+repeat_timeout = 86400
+on_complete = %=complete_task_inc_goodwill(50:stalker) =reward_item_cost_mult_and_remove(simulation_task_5_fetch:1) =reward_stash(true) =inc_task_stage(simulation_task_5)%
+on_fail = %=fail_task_dec_goodwill(25:stalker)%
+condlist_0 = {!task_giver_alive(simulation_task_5)} fail
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND WEAPON FOR DUTY, MERC, CLEAR SKY, OR MILITARY TASK-
+
+[simulation_task_6]
+icon = ui_inGame2_Osobiy_zakaz
+prior = 60
+sim_communities = dolg, killer, csky, army
+storyline = false
+title = simulation_task_6_name
+title_functor = general_fetch_task
+descr = simulation_task_6_text
+descr_functor = general_fetch_task
+job_descr = simulation_task_6_about
+fetch_descr = simulation_task_6_fetch_about
+fetch_func = %=setup_weapon_fetch_task(simulation_task_6_fetch)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = simulation_task_6_fetch_finish
+precondition = true
+repeat_timeout = 86400
+on_complete = %=reward_item_cost_mult_and_remove(simulation_task_6_fetch:1) =reward_stash(true) =inc_task_stage(simulation_task_6)%
+condlist_0 = {!task_giver_alive(simulation_task_6)} fail
+
+
+;--------------------------------------------------------------------------------------------------
+; HOSTAGE RESCUE FOR STALKER TASK-
+
+[simulation_task_7]
+icon = ui_inGame2_PD_Opitniy_stalker
+prior = 50
+sim_communities = stalker
+storyline = false
+title = simulation_task_7_name
+descr = simulation_task_7_text
+job_descr = simulation_task_7_about
+task_complete_descr = simulation_task_7_finish
+stage_complete = 1
+status_functor = hostage_task
+status_functor_params = hostage_companion_task_1
+target_functor = simulation_task_target
+on_init = %=find_smart_under_faction_control_ex(simulation_task_7_id:bandit) =setup_companion_task(hostage_companion_task_1_stalker:nil:simulation_task_7_id:true:true) +hostage_companion_task_1_started%
+precondition = {=random_chance =is_faction_enemy_to_actor(bandit) -hostage_companion_task_1_started -hostage_companion_task_1_hostage_rescued =all_avail_smart_stayed_squad_count_ge_by_faction_ex(1:nil:false:bandit) !squad_exist(hostage_companion_task_1)} true, false
+repeat_timeout = 86400
+on_complete = %=reward_random_money(13000:15000) =complete_task_inc_goodwill(50:stalker) =reward_stash(true) =remove_special_task_squad(hostage_companion_task_1) =pstor_reset(simulation_task_7_id) =pstor_reset(simulation_task_7_target_id) -hostage_companion_task_1_hostage_rescued -hostage_companion_task_1_started =inc_task_stage(simulation_task_7) =unlock_smart(simulation_task_7_id)%
+on_fail = %=unlock_smart(simulation_task_7_id) =fail_task_dec_goodwill(25:stalker) =remove_special_task_squad(hostage_companion_task_1) =pstor_reset(simulation_task_7_id) =pstor_reset(simulation_task_7_target_id) -hostage_companion_task_1_hostage_rescued -hostage_companion_task_1_started%
+on_cancel = %=unlock_smart(simulation_task_7_id) =remove_special_task_squad(hostage_companion_task_1) =pstor_reset(simulation_task_7_id) =pstor_reset(simulation_task_7_target_id) -hostage_companion_task_1_hostage_rescued -hostage_companion_task_1_started%
+condlist_0 = {!squad_exist(hostage_companion_task_1)} fail
+
+
+;--------------------------------------------------------------------------------------------------
+; HOSTAGE RESCUE FOR DUTY TASK-
+
+[simulation_task_8]
+icon = ui_inGame2_PD_Opitniy_stalker
+prior = 50
+sim_communities = dolg
+storyline = false
+title = simulation_task_8_name
+descr = simulation_task_8_text
+job_descr = simulation_task_8_about
+task_complete_descr = simulation_task_8_finish
+stage_complete = 1
+status_functor = hostage_task
+status_functor_params = hostage_companion_task_1
+target_functor = simulation_task_target
+on_init = %=find_smart_under_faction_control(simulation_task_8_id:freedom:bandit) =setup_companion_task(hostage_companion_task_1_dolg:nil:simulation_task_8_id:true:true) +hostage_companion_task_1_started%
+precondition = {=random_chance =is_faction_enemy_to_actor(bandit) =is_faction_enemy_to_actor(freedom) -hostage_companion_task_1_started -hostage_companion_task_1_hostage_rescued =all_avail_smart_stayed_squad_count_ge_by_faction(1:nil:false:freedom:bandit) !squad_exist(hostage_companion_task_1)} true, false
+repeat_timeout = 86400
+on_complete = %=reward_random_money(13000:15000) =unlock_smart(simulation_task_8_id) =reward_stash(true) =complete_task_inc_goodwill(50:dolg) =remove_special_task_squad(hostage_companion_task_1) =pstor_reset(simulation_task_8_id) =pstor_reset(simulation_task_8_target_id) -hostage_companion_task_1_hostage_rescued -hostage_companion_task_1_started =inc_task_stage(simulation_task_8)%
+on_fail = %=unlock_smart(simulation_task_8_id) =fail_task_dec_goodwill(25:dolg) =pstor_reset(simulation_task_8_id) =remove_special_task_squad(hostage_companion_task_1) =pstor_reset(simulation_task_8_target_id) -hostage_companion_task_1_hostage_rescued -hostage_companion_task_1_started%
+on_cancel = %=unlock_smart(simulation_task_8_id) =pstor_reset(simulation_task_8_id) =remove_special_task_squad(hostage_companion_task_1) =pstor_reset(simulation_task_8_target_id) -hostage_companion_task_1_hostage_rescued -hostage_companion_task_1_started%
+condlist_0 = {!squad_exist(hostage_companion_task_1)} fail
+
+
+;--------------------------------------------------------------------------------------------------
+; HOSTAGE RESCUE FOR FREEDOM TASK-
+
+[simulation_task_9]
+icon = ui_inGame2_PD_Opitniy_stalker
+prior = 50
+sim_communities = freedom
+storyline = false
+title = simulation_task_9_name
+descr = simulation_task_9_text
+job_descr = simulation_task_9_about
+task_complete_descr = simulation_task_9_finish
+stage_complete = 1
+status_functor = hostage_task
+status_functor_params = hostage_companion_task_1
+target_functor = simulation_task_target
+on_init = %=find_smart_under_faction_control(simulation_task_9_id:army:monolith) =setup_companion_task(hostage_companion_task_1_freedom:nil:simulation_task_9_id:true:true) +hostage_companion_task_1_started%
+precondition = {=random_chance =is_faction_enemy_to_actor(monolith) =is_faction_enemy_to_actor(army) -hostage_companion_task_1_started -hostage_companion_task_1_hostage_rescued =all_avail_smart_stayed_squad_count_ge_by_faction(1:nil:false:army:monolith) !squad_exist(hostage_companion_task_1)} true, false
+repeat_timeout = 86400
+on_complete = %=reward_random_money(13000:15000) =unlock_smart(simulation_task_9_id) =reward_stash(true) =complete_task_inc_goodwill(50:freedom) =remove_special_task_squad(hostage_companion_task_1) =pstor_reset(simulation_task_9_id) =pstor_reset(simulation_task_9_target_id) -hostage_companion_task_1_hostage_rescued -hostage_companion_task_1_started =inc_task_stage(simulation_task_9)%
+on_fail = %=unlock_smart(simulation_task_9_id) =fail_task_dec_goodwill(25:freedom) =pstor_reset(simulation_task_9_id) =remove_special_task_squad(hostage_companion_task_1) =pstor_reset(simulation_task_9_target_id) -hostage_companion_task_1_hostage_rescued -hostage_companion_task_1_started%
+on_cancel = %=unlock_smart(simulation_task_9_id) =pstor_reset(simulation_task_9_id) =remove_special_task_squad(hostage_companion_task_1) =pstor_reset(simulation_task_9_target_id) -hostage_companion_task_1_hostage_rescued -hostage_companion_task_1_started%
+condlist_0 = {!squad_exist(hostage_companion_task_1)} fail
+
+
+;--------------------------------------------------------------------------------------------------
+; HOSTAGE RESCUE FOR ECOG TASK-
+
+[simulation_task_10]
+icon = ui_inGame2_PD_Opitniy_stalker
+prior = 50
+sim_communities = ecolog
+storyline = false
+title = simulation_task_10_name
+descr = simulation_task_10_text
+job_descr = simulation_task_10_about
+task_complete_descr = simulation_task_10_finish
+stage_complete = 1
+status_functor = hostage_task
+status_functor_params = hostage_companion_task_1
+target_functor = simulation_task_target
+on_init = %=find_smart_under_faction_control_ex(simulation_task_10_id:bandit) =setup_companion_task(hostage_companion_task_1_ecolog:nil:simulation_task_10_id:true:true) +hostage_companion_task_1_started%
+precondition = {=random_chance =is_faction_enemy_to_actor(bandit) -hostage_companion_task_1_started -hostage_companion_task_1_hostage_rescued =all_avail_smart_stayed_squad_count_ge_by_faction_ex(1:nil:false:bandit) !squad_exist(hostage_companion_task_1)} true, false
+repeat_timeout = 86400
+on_complete = %=reward_random_item(af_soul:af_gravi:af_fuzz_kolobok:af_electra_moonlight:af_fireball:af_rusty_kristall:af_ameba_slug) =complete_task_inc_goodwill(50:ecolog) =remove_special_task_squad(hostage_companion_task_1) =pstor_reset(simulation_task_10_id) =pstor_reset(simulation_task_10_target_id) -hostage_companion_task_1_hostage_rescued -hostage_companion_task_1_started =inc_task_stage(simulation_task_10) =unlock_smart(simulation_task_10_id)%
+on_fail = %=unlock_smart(simulation_task_10_id) =fail_task_dec_goodwill(25:ecolog) =remove_special_task_squad(hostage_companion_task_1) =pstor_reset(simulation_task_10_id) =pstor_reset(simulation_task_10_target_id) -hostage_companion_task_1_hostage_rescued -hostage_companion_task_1_started%
+on_cancel = %=unlock_smart(simulation_task_10_id) =remove_special_task_squad(hostage_companion_task_1) =pstor_reset(simulation_task_10_id) =pstor_reset(simulation_task_10_target_id) -hostage_companion_task_1_hostage_rescued -hostage_companion_task_1_started%
+condlist_0 = {!squad_exist(hostage_companion_task_1)} fail
+
+
+;--------------------------------------------------------------------------------------------------
+; ASSASSINATION  FOR STALKER TASK-
+
+[simulation_task_11]
+icon = ui_inGame2_Odin_vistrel
+prior = 35
+sim_communities = stalker
+storyline = false
+title = simulation_task_11_name
+descr = simulation_task_11_text
+job_descr = simulation_task_11_about
+task_complete_descr = simulation_task_11_finish
+precondition = true
+repeat_timeout = 86400
+status_functor = bounty_task
+target_functor = general_bounty_task
+stage_complete = 1
+on_job_descr = %=on_init_bounty_hunt(simulation_task_11:killer:army:bandit)%
+on_complete = %=reward_random_money(9000:10000) =reward_stash(true) =inc_task_stage(simulation_task_11) =complete_task_inc_goodwill(50:stalker)%
+on_fail = %=fail_task_dec_goodwill(25:stalker)%
+condlist_0 = {!task_giver_alive(simulation_task_11)} fail
+
+
+;--------------------------------------------------------------------------------------------------
+; VENGEANCE FOR STALKER TASK-
+
+[simulation_task_12]
+icon = ui_inGame2_Odin_vistrel
+prior = 35
+sim_communities = stalker
+storyline = false
+title = simulation_task_12_name
+descr = simulation_task_12_text
+job_descr = simulation_task_12_about
+task_complete_descr = simulation_task_12_finish
+precondition = true
+repeat_timeout = 86400
+status_functor = bounty_task
+target_functor = general_bounty_task
+stage_complete = 1
+on_job_descr = %=on_init_bounty_hunt(simulation_task_12:bandit)%
+on_complete = %=reward_random_item(equ_backpack:ammo_9x39_ap:ammo_9x39_ap:ammo_9x39_ap:ammo_5.56x45_ap:ammo_5.56x45_ap:wpn_sig550:vodka) =inc_task_stage(simulation_task_12) =reward_stash(true) =complete_task_inc_goodwill(50:stalker)%
+on_fail = %=fail_task_dec_goodwill(25:stalker)%
+condlist_0 = {!task_giver_alive(simulation_task_12)} fail
+
+
+; --------------------------------------------------------------------------------------------------
+; FIND SUPPLIES FOR BANDIT TASK-
+
+[simulation_task_13]
+icon = ui_inGame2_PD_Opitniy_stalker
+prior = 90
+repeat_timeout = 86400
+storyline = false
+sim_communities = bandit
+title = simulation_task_13_name
+title_functor = general_fetch_task
+descr = simulation_task_13_text
+descr_functor = general_fetch_task
+job_descr = simulation_task_13_about
+fetch_descr = simulation_task_13_fetch_about
+fetch_func = %=setup_supplies_fetch_task(simulation_task_13_fetch:2:4)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = simulation_task_13_fetch_finish
+precondition = true
+on_complete = %=reward_random_item(equ_backpack:ammo_9x39_pab9:ammo_9x39_pab9:ammo_5.45x39_ap:ammo_vog-25) =reward_item_cost_mult_and_remove(simulation_task_13_fetch:1) =reward_stash(true) =remove_fetch_item(simulation_task_13_fetch) =inc_task_stage(simulation_task_13) =pstor_reset(simulation_task_13_fetch)%
+on_fail = %=pstor_reset(simulation_task_13_fetch)%
+on_cancel = %=pstor_reset(simulation_task_13_fetch)%
+condlist_0 = {!task_giver_alive(simulation_task_13)} fail
+
+
+; --------------------------------------------------------------------------------------------------
+; FIND SUPPLIES FOR MILITARY & DUTY TASK-
+
+[simulation_task_14]
+icon = ui_inGame2_PD_Opitniy_stalker
+prior = 90
+repeat_timeout = 86400
+storyline = false
+sim_communities = army, dolg
+title = simulation_task_14_name
+title_functor = general_fetch_task
+descr = simulation_task_14_text
+descr_functor = general_fetch_task
+job_descr = simulation_task_14_about
+fetch_descr = simulation_task_14_fetch_about
+fetch_func = %=setup_supplies_fetch_task(simulation_task_14_fetch:2:4)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = simulation_task_14_fetch_finish
+precondition = true
+on_complete = %=reward_random_item(equ_backpack:ammo_5.45x39_ap:ammo_5.45x39_fmj:ammo_5.45x39_fmj:ammo_9x19_pbp) =reward_item_cost_mult_and_remove(simulation_task_14_fetch:1) =reward_stash(true) =remove_fetch_item(simulation_task_14_fetch) =inc_task_stage(simulation_task_14) =pstor_reset(simulation_task_14_fetch)%
+on_fail = %=pstor_reset(simulation_task_14_fetch)%
+on_cancel = %=pstor_reset(simulation_task_14_fetch)%
+condlist_0 = {!task_giver_alive(simulation_task_14)} fail
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND ARTEFACT FOR MILITARY TASK-
+
+[simulation_task_15]
+icon = ui_inGame2_Kontrakt_s_uchenimi
+prior = 65
+sim_communities = army
+storyline = false
+title = simulation_task_15_name
+title_functor = general_fetch_task
+descr = simulation_task_15_text
+descr_functor = general_fetch_task
+job_descr = simulation_task_15_about
+fetch_descr = simulation_task_15_fetch_about
+fetch_func = %=setup_artefact_fetch_task(simulation_task_15_fetch)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = simulation_task_15_fetch_finish
+precondition = true
+repeat_timeout = 86400
+on_complete = %=reward_random_item(wpn_abakan:wpn_vintorez:wpn_val:wpn_groza) =complete_task_inc_goodwill(50:army) =remove_fetch_item(simulation_task_15_fetch) =reward_stash(true) =inc_task_stage(simulation_task_15)%
+on_fail = %=fail_task_dec_goodwill(25:army)%
+condlist_0 = {!task_giver_alive(simulation_task_15)} fail
+
+
+;--------------------------------------------------------------------------------------------------
+; FIND WEAPON FOR BANDIT TASK-
+
+[simulation_task_16]
+icon = ui_inGame2_Osobiy_zakaz
+prior = 60
+sim_communities = bandit
+storyline = false
+title = simulation_task_16_name
+title_functor = general_fetch_task
+descr = simulation_task_16_text
+descr_functor = general_fetch_task
+job_descr = simulation_task_16_about
+fetch_descr = simulation_task_16_fetch_about
+fetch_func = %=setup_weapon_fetch_task(simulation_task_16_fetch)%
+stage_complete = 1
+status_functor = actor_has_fetch_item
+target_functor = general_fetch_task
+task_complete_descr = simulation_task_16_fetch_finish
+precondition = true
+repeat_timeout = 86400
+on_complete = %=complete_task_inc_goodwill(50:bandit) =reward_item_cost_mult_and_remove(simulation_task_16_fetch:1) =reward_stash(true) =inc_task_stage(simulation_task_16)%
+on_fail = %=fail_task_dec_goodwill(25:bandit)%
+condlist_0 = {!task_giver_alive(simulation_task_16)} fail
+
+
+;--------------------------------------------------------------------------------------------------
+; ASSASSINATION FOR MILITARY TASK-
+
+[simulation_task_17]
+icon = ui_inGame2_Odin_vistrel
+prior = 35
+sim_communities = army
+storyline = false
+title = simulation_task_17_name
+descr = simulation_task_17_text
+job_descr = simulation_task_17_about
+task_complete_descr = simulation_task_17_finish
+precondition = true
+repeat_timeout = 86400
+status_functor = bounty_task
+target_functor = general_bounty_task
+stage_complete = 1
+on_job_descr = %=on_init_bounty_hunt(simulation_task_17:bandit:freedom:csky)%
+on_complete = %=reward_random_item(wpn_ak74:wpn_abakan:wpn_groza:wpn_val:wpn_vintorez) =inc_task_stage(simulation_task_17) =complete_task_inc_goodwill(50:army)%
+on_fail = %=fail_task_dec_goodwill(25:army)%
+condlist_0 = {!task_giver_alive(simulation_task_17)} fail
+
+
+;--------------------------------------------------------------------------------------------------
+; ASSASSINATION  FOR MERC OR BANDIT TASK-
+
+[simulation_task_18]
+icon = ui_inGame2_Odin_vistrel
+prior = 35
+sim_communities = killer, bandit
+storyline = false
+title = simulation_task_18_name
+descr = simulation_task_18_text
+job_descr = simulation_task_18_about
+task_complete_descr = simulation_task_18_finish
+precondition = true
+repeat_timeout = 86400
+status_functor = bounty_task
+target_functor = general_bounty_task
+stage_complete = 1
+on_job_descr = %=on_init_bounty_hunt(simulation_task_18:stalker:army:dolg)%
+on_complete = %=reward_random_money(9000:10000) =reward_stash(true) =inc_task_stage(simulation_task_18)%
+condlist_0 = {!task_giver_alive(simulation_task_18)} fail
+
+
+;--------------------------------------------------------------------------------------------------
+; FACTION BASE DEFENSE VS MUTANTS-
+[faction_base_defense]
+icon = ui_iconsTotal_defend_lager
+prior = 35
+storyline = false
+title = {-yantar_faction_base_defense_quest_started} faction_base_defense_name, {+yantar_faction_base_defense_quest_started} faction_base_defense_yantar_name
+descr = {-yantar_faction_base_defense_quest_started} faction_base_defense_text, {+yantar_faction_base_defense_quest_started} faction_base_defense_yantar_text
+target_functor = faction_base_defense_target
+condlist_0 = {+faction_base_defense_enemy_killed +faction_base_defense_2nd_enemy_killed} complete
+condlist_1 = {!base_defense_is_actor_on_level} fail
+on_init = %=setup_base_defense_fail_conditions%
+on_complete = %=actor_surge_immuned(false)%
+on_fail = %=actor_surge_immuned(false)%
+on_cancel = %=actor_surge_immuned(false)%
+

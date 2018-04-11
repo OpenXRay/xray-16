@@ -1,0 +1,13 @@
+[logic]
+active = nil ;sr_idle
+
+[sr_idle]
+on_info = {+zat_b5_actor_with_stalkers} sr_light
+on_info2 = {+zat_b5_task_end} sr_idle@nil
+
+[sr_light]
+light_on = false
+on_info = {+zat_b5_meat} sr_idle@nil
+on_info2 = {+zat_b5_task_end} sr_idle@nil
+
+[sr_idle@nil]

@@ -1,0 +1,17 @@
+[logic@jup_a12_bandit_cashier]
+active = walker@wait
+prior = 200
+suitable = {=check_npc_name(jup_a12_bandit_cashier) !surge_started} true
+
+[walker@wait]
+path_walk = bandit_cashier_wait_walk
+path_look = bandit_cashier_wait_look
+on_info = {=surge_started} walker@surge
+meet = no_meet
+
+
+[walker@surge]
+path_walk = bandit_cashier_wait_walk
+path_look  = bandit_cashier_wait_look
+on_info = {=surge_complete} walker@wait
+meet = no_meet

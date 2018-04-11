@@ -1,0 +1,2242 @@
+[default]
+base 			= 0
+territory		= 0
+resource 		= 0
+surge			= 0
+lair			= 0
+actor			= 0
+bandit 			= 0
+dolg			= 0
+ecolog			= 0
+freedom			= 0
+killer			= 0
+army 			= 0
+monolith		= 0
+stalker 		= 0
+csky			= 0
+zombied			= 0
+zoo_monster				= 0
+monster					= 0
+monster_predatory_day 	= 0
+monster_predatory_night = 0
+monster_vegetarian		= 0
+monster_zombied_day		= 0
+monster_zombied_night	= 0
+monster_special			= 0
+all				= 0
+army_heli		= 0
+monolith_heli 	= 0
+killer_heli		= 0
+
+[default_resource]:default
+resource 	= 1
+territory	= 1
+ecolog		= 1
+stalker 	= 1 
+csky		= 1
+
+[default_base]:default
+base 		= 1
+
+[default_lair]:default
+lair					= 1
+territory				= 1
+zoo_monster				= 1
+monster					= 1
+monster_predatory_day 	= 1
+monster_predatory_night = 1
+monster_vegetarian		= 1
+monster_zombied_day		= 1
+monster_zombied_night	= 1
+monster_special			= 1
+
+[default_territory]:default
+territory 	= 1
+all			= 1
+
+[actor]:default
+actor		= 1
+sim_avail 	= true
+all 		= 1
+
+;----------- << MARSH >> ------------
+;unique starting base
+[mar_smart_terrain_base]:default_base
+ecolog		= 1
+stalker		= 1
+csky 		= 2
+surge 		= 1
+sim_avail 	= true
+lair 		= 1
+
+[mar_smart_terrain_doc]:default_base
+sim_avail 	= false
+
+[mar_smart_terrain_doc_2]:default_base
+sim_avail 	= false
+
+;---------	SIMULATION	--------
+;sim smarties
+
+;NW fishing village, bandits
+[mar_smart_terrain_3_3]:default_base
+sim_avail 	= true
+bandit 		= 1
+freedom		= 1
+surge 		= 1
+
+[mar_smart_terrain_3_7]:default_lair
+sim_avail 	= true
+
+[mar_smart_terrain_3_10]:default_lair
+sim_avail 	= true
+
+;NW village, military
+[mar_smart_terrain_4_5]:default_base
+sim_avail 	= true
+army		= 1
+surge 		= 1
+army_heli	= 1
+
+[mar_smart_terrain_4_7]:default_lair
+sim_avail 	= true
+
+;Center, pumping station
+[mar_smart_terrain_5_8]:default_base
+sim_avail 	= true
+ecolog		= 1
+stalker		= 1
+bandit		= 1
+csky		= 1
+killer		= 1
+surge 		= 1
+
+;South, fishing village
+[mar_smart_terrain_5_12]:default_base
+sim_avail 	= {+faction_base_defense_active} false, true
+ecolog		= 1
+stalker		= 1
+bandit		= 1
+csky		= 1
+surge 		= 1
+lair 		= 1
+
+[mar_smart_terrain_6_4]:default_lair
+sim_avail 		= true
+
+[mar_smart_terrain_6_7]:default_lair
+sim_avail = true
+
+[mar_smart_terrain_6_8]:default_lair
+sim_avail = true
+
+[mar_smart_terrain_6_10]:default_lair
+sim_avail = true
+
+;South watchtower
+[mar_smart_terrain_6_11]:default_base
+sim_avail 	= true
+army		= 0
+ecolog		= 1
+stalker		= 1
+bandit		= 1
+csky		= 1
+
+[mar_smart_terrain_7_3]:default_lair
+sim_avail = true
+
+[mar_smart_terrain_7_7]:default_lair
+sim_avail = true
+
+[mar_smart_terrain_8_4]:default_lair
+sim_avail = true
+
+[mar_smart_terrain_8_8]:default_resource
+sim_avail 	= true
+lair 		= 1
+stalker		= 1
+ecolog		= 1 
+csky		= 1
+
+[mar_smart_terrain_8_9]:default_lair
+sim_avail = true
+
+;East temple
+[mar_smart_terrain_8_11]:default_base
+sim_avail = true
+ecolog		= 1
+stalker		= 1
+bandit		= 1
+csky		= 1
+killer		= 1
+surge 		= 1
+
+;NE car repair, military
+[mar_smart_terrain_10_5]:default_base
+sim_avail 	= true
+surge 		= 1
+army		= 1
+army_heli	= 1
+
+[mar_smart_terrain_10_7]:default_lair
+sim_avail = true
+
+[mar_smart_terrain_10_10]:default_resource
+sim_avail 	= true
+lair 		= 1
+
+[mar_smart_terrain_11_3]:default_resource
+sim_avail 	= true
+lair 		= 1
+
+;NE village, exit1 to Escape
+[mar_smart_terrain_11_11]:default_base
+sim_avail 	= true
+surge 		= 1
+stalker		= 1
+bandit		= 1 
+csky 		= 1
+ecolog		= 1 
+killer		= 1
+freedom		= 1
+dolg		= 1
+
+;NE village, exit2 to Escape
+[mar_smart_terrain_12_2]:default_resource
+sim_avail 	= true
+base        = 1
+surge 		= 1
+stalker		= 1
+csky 		= 1
+ecolog		= 1 
+dolg		= 1 
+freedom		= 1 
+bandit 		= 1
+
+;--------- <<  ESCAPE >> ----------------
+;---------	SIMULATION	--------
+;sim smarties
+;novice camp
+[esc_smart_terrain_2_12]:default_base
+sim_avail 	= true
+surge		= 1
+stalker		= 1 
+csky		= 1
+ecolog		= 1
+lair        = 1
+
+;military base
+[esc_smart_terrain_3_16]:default_base
+sim_avail 	= true
+surge		= 1
+army 		= 1
+army_heli	= 1
+
+;car repair
+[esc_smart_terrain_7_11]:default_base
+sim_avail 	= true
+surge		= 1
+bandit		= 1
+
+;farmhouse
+[esc_smart_terrain_4_9]:default_lair
+sim_avail 	= true
+surge 		= 1
+
+;cordon-garbage building
+[esc_smart_terrain_5_2]:default_base
+sim_avail 	= true
+surge 		= 1
+army 		= 1
+army_heli	= 1
+
+;farmhouse
+[esc_smart_terrain_5_7]:default_base
+sim_avail 	= true
+surge 		= 1
+stalker		= 1
+bandit		= 1
+
+;mill
+[esc_smart_terrain_5_9]:default_base
+sim_avail 	= true
+surge 		= 1
+bandit 		= 1
+freedom		= 1
+killer		= 1
+
+;fox house
+[esc_smart_terrain_6_6]:default_base
+sim_avail 	= true
+surge 		= 1
+ecolog 		= 1 
+csky 		= 1
+freedom 	= 1
+dolg		= 1
+killer 		= 1
+
+[esc_smart_terrain_1_11]:default_resource
+sim_avail = true
+
+[esc_smart_terrain_2_14]:default_lair
+sim_avail = true
+
+[esc_smart_terrain_3_7]:default_lair
+sim_avail = true
+
+[esc_smart_terrain_4_11]:default_lair
+sim_avail 	= {+faction_base_defense_active} false, true
+
+[esc_smart_terrain_4_13]:default_lair
+sim_avail = true
+
+[esc_smart_terrain_5_12]:default_lair
+sim_avail = true
+
+[esc_smart_terrain_5_4]:default_lair
+sim_avail = true
+
+[esc_smart_terrain_5_6]:default_lair
+sim_avail = true
+
+;ruined rail bridge, military checkpoint
+[esc_smart_terrain_6_8]:default_base
+sim_avail 	= true
+surge 		= 1
+all 		= 0
+stalker 	= 1
+army 		= 1
+bandit		= 1
+
+[esc_smart_terrain_8_10]:default_lair
+sim_avail = true
+
+[esc_smart_terrain_8_9]:default_lair
+sim_avail = true
+
+[esc_smart_terrain_9_7]:default_lair
+sim_avail = true
+
+;----------- << GARBAGE >> ------------
+;---------	SIMULATION	--------
+;sim smarties
+
+;exit to Agroprom1
+[gar_smart_terrain_1_5]:default_lair
+sim_avail 	= true
+surge 		= 1
+
+;exit to Agroprom2
+[gar_smart_terrain_1_7]:default_lair
+sim_avail 	= true
+
+;camp near tunnel
+[gar_smart_terrain_2_4]:default_lair
+sim_avail 	= true
+surge 		= 1
+
+;hangar
+[gar_smart_terrain_3_5]:default_base
+sim_avail 	= true
+surge 		= 1
+bandit		= 2
+
+[gar_smart_terrain_3_7]:default_resource
+sim_avail 	= true
+
+[gar_smart_terrain_4_2]:default_lair
+sim_avail = true
+
+[gar_smart_terrain_4_5]:default_lair
+sim_avail = true
+
+;outpost to Bar
+[gar_smart_terrain_5_2]:default_base
+sim_avail 	= true
+surge		= 2
+stalker		= 1
+dolg		= 2
+freedom		= 1
+ecolog		= 1
+csky		= 1
+killer		= 2
+bandit		= 2
+monolith 	= 1
+
+[gar_smart_terrain_5_4]:default_lair
+sim_avail = true
+
+[gar_smart_terrain_5_5]:default_lair
+sim_avail = true
+
+[gar_smart_terrain_5_6]:default_lair
+sim_avail = true
+
+[gar_smart_terrain_6_1]:default_lair
+sim_avail = true
+
+;ruined building
+[gar_smart_terrain_6_3]:default_territory
+sim_avail 	= true
+surge 		= 1
+
+[gar_smart_terrain_6_6]:default_lair
+sim_avail = true
+
+[gar_smart_terrain_6_7]:default_lair
+sim_avail = true
+
+[gar_smart_terrain_7_4]:default_lair
+sim_avail = true
+
+[gar_smart_terrain_8_5]:default_lair
+sim_avail = true
+
+;----------- << DARKSCAPE >> ------------
+;---------	SIMULATION	--------
+;sim smarties
+;farmhouse
+[ds2_domik_st]:default_base
+sim_avail 	= true
+surge		= 1
+stalker 	= 1 
+csky		= 1 
+ecolog		= 1
+dolg 		= 1 
+killer 		= 1
+
+;camp under rocks
+[ds2_lager_st]:default_base
+sim_avail 	= true
+surge		= 1
+bandit		= 1
+freedom		= 1
+
+[ds2_st_dogs]:default_lair
+sim_avail = true
+
+[ds2_st_hoofs]:default_lair
+sim_avail = true
+
+[ds_boars_nest]:default_lair
+sim_avail = true
+
+[ds_deb1]:default_lair
+sim_avail = true
+surge = 1
+
+[ds_grverfer2]:default_lair
+sim_avail = true
+surge = 1
+
+[ds_kem1]:default_lair
+sim_avail = true
+surge = 1
+
+;fuel station
+[ds_kem2]:default_base
+sim_avail 	= true
+surge 		= 1
+army		= 1 
+army_heli	= 1
+
+[ds_kem3]:default_territory
+sim_avail = true
+surge = 1
+
+[ds_ptr]:default_territory
+sim_avail = true
+surge = 1
+
+[ds_ptr2]:default_territory
+sim_avail = true
+surge = 1
+
+[ds_ptr3]:default_lair
+sim_avail = true
+surge = 1
+
+[ds_ptr4]:default_lair
+sim_avail = true
+surge = 1
+
+;----------- << AGROPROM >> ------------
+;---------	SIMULATION	--------
+;sim smarties
+;exit to Yantar
+[agr_smart_terrain_1_2]:default_lair
+sim_avail = true
+
+[agr_smart_terrain_1_3]:default_lair
+sim_avail 	= {+faction_base_defense_active} false, true
+
+;bigger base, courtyard
+[agr_smart_terrain_1_6]:default_base
+sim_avail 	= true
+surge		= 1
+army		= 1 
+lair 		= 1
+
+;bigger base, gate
+[agr_smart_terrain_1_6_near_1]:default_base
+sim_avail 	= true
+surge		= 1
+army		= 1
+army_heli	= 1
+
+;bigger base, inside building
+[agr_smart_terrain_1_6_near_2]:default_base
+sim_avail 	= true
+surge 		= 1
+army		= 1
+
+
+[agr_smart_terrain_2_2]:default_lair
+sim_avail = true
+
+;smaller base, inside building
+[agr_smart_terrain_4_4]:default_base
+sim_avail 	= true
+surge 		= 1
+stalker		= 1 
+csky		= 1 
+ecolog		= 1
+
+;smaller base, courtyard
+[agr_smart_terrain_4_4_near_1]:default_base
+sim_avail 	= true
+surge		= 1
+stalker		= 1 
+csky		= 1 
+ecolog		= 1
+bandit 		= 1
+freedom		= 1
+
+;smaller base, hole in the fence
+[agr_smart_terrain_4_4_near_2]:default_base
+surge = 1
+sim_avail = true
+stalker		= 1 
+csky		= 1 
+ecolog		= 1
+
+;smaller base, gate
+[agr_smart_terrain_4_4_near_3]:default_base
+surge = 1
+sim_avail = true
+stalker		= 1 
+csky		= 1 
+ecolog		= 1
+bandit		= 1
+freedom		= 1
+
+[agr_smart_terrain_4_6]:default_lair
+sim_avail 	= {+faction_base_defense_active} false, true
+
+[agr_smart_terrain_5_2]:default_lair
+sim_avail = true
+
+;camp near tunnel
+[agr_smart_terrain_5_3]:default_lair
+sim_avail = true
+
+[agr_smart_terrain_5_7]:default_lair
+sim_avail	= true
+territory	= 0
+
+;tunnel
+[agr_smart_terrain_6_4]:default_base
+sim_avail 	= true
+surge		= 1
+killer 		= 1
+
+[agr_smart_terrain_7_5]:default_lair
+sim_avail = true
+
+
+;----------- << AGROPROM UNDERGROUND >> ------------
+;---------	AGROPROM UNDERGROUND SMART TERRAINS	--------
+[agr_u_bandits]:default_territory
+sim_avail = {+agr_u_bandits_dead} true, false
+lair 		= 1
+stalker		= 1
+army		= 1
+bandit		= 1
+
+[agr_u_bloodsucker]:default_lair
+sim_avail = {+agru_add_reward} true, false
+
+[agr_u_bloodsucker_2]:default_lair
+sim_avail = {+agru_add_reward_1} true, false
+territory 	= 1
+stalker		= 1
+army		= 1
+
+[agr_u_monsters]:default_lair
+sim_avail = {+agru_controller_death} true, false
+
+[agr_u_soldiers]:default_territory
+sim_avail = {+agr_u_soldiers_dead +agru_end_poltergeist_squad_dead} true, false
+
+
+;----------- << DARK VALLEY >> ------------
+;---------	SIMULATION	--------
+;sim smarties
+;smaller base, x18 entrance building
+[val_smart_terrain_1_2]:default_base
+sim_avail 	= true
+surge		= 1
+army		= 1
+army_heli	= 1
+
+[val_smart_terrain_3_0]:default_lair
+sim_avail = true
+
+;pig farm
+[val_smart_terrain_4_0]:default_base
+sim_avail 	= true
+surge		= 1
+stalker 	= 1 
+ecolog		= 1 
+csky		= 1
+dolg		= 1
+
+[val_smart_terrain_5_10]:default_lair
+sim_avail = true
+
+[val_smart_terrain_6_4]:default_lair
+sim_avail 	= {+faction_base_defense_active} false, true
+
+[val_smart_terrain_6_5]:default_lair
+sim_avail = true
+
+;bigger base, SOC bandits, CS freedom, inside outer building
+[val_smart_terrain_7_3]:default_base
+sim_avail 	= true
+surge		= 1
+bandit		= 1
+
+;bigger base, SOC bandits, CS freedom, inside central building
+[val_smart_terrain_7_4]:default_base
+sim_avail 	= true
+surge		= 1
+bandit		= 1
+lair        = 1
+
+;bigger base, SOC bandits, CS freedom, courtyard
+[val_smart_terrain_7_5]:default_base
+sim_avail 	= true
+surge		= 1
+bandit		= 1
+
+[val_smart_terrain_7_8]:default_territory
+sim_avail   = true
+
+[val_smart_terrain_8_6]:default_territory
+sim_avail 	= true
+bandit		= 1
+stalker 	= 1 
+killer 		= 1 
+dolg 		= 1 
+freedom 	= 1
+zoo_monster				= 0
+monster					= 0
+monster_predatory_day 	= 0
+monster_predatory_night = 0
+monster_vegetarian		= 0
+monster_zombied_day		= 0
+monster_zombied_night	= 0
+monster_special			= 0
+
+[val_smart_terrain_8_7]:default_lair
+sim_avail = true
+
+[val_smart_terrain_8_9]:default_lair
+sim_avail = true
+
+[val_smart_terrain_9_10]:default_lair
+sim_avail = true
+
+[val_smart_terrain_9_2]:default_lair
+sim_avail 	= {+faction_base_defense_active} false, true
+
+[val_smart_terrain_9_4]:default_territory
+sim_avail 	= true
+surge		= 1
+bandit		= 1
+stalker 	= 1 
+killer 		= 1 
+dolg 		= 1 
+freedom 	= 1
+zoo_monster				= 0
+monster					= 0
+monster_predatory_day 	= 0
+monster_predatory_night = 0
+monster_vegetarian		= 0
+monster_zombied_day		= 0
+monster_zombied_night	= 0
+monster_special			= 0
+
+;camp near x-18 building
+[val_smart_terrain_9_6]:default_territory
+sim_avail 	= true
+surge		= 1
+bandit		= 1
+stalker 	= 1 
+killer 		= 1 
+dolg 		= 1 
+freedom 	= 1
+
+;---------	LAB X-18 SMART TERRAINS	--------
+[dar_angar]:default_lair
+sim_avail = {+dar_military_scout_squad_killed} true, false
+army		= 1
+ecolog		= 1
+stalker 	= 1 
+territory 	= 1
+monster_vegetarian = 0
+
+[dar_control_poltergeist]:default_lair
+sim_avail = {+dar_military_scout_squad_killed} true, false
+monster_vegetarian = 0
+
+[dar_military_scout]:default_territory
+sim_avail = false
+monster_vegetarian = 0
+
+[dar_poltergeist_ring]:default_lair
+sim_avail = false
+monster_vegetarian = 0
+
+[dar_poltergeist_tele]:default_lair
+sim_avail = false
+monster_vegetarian = 0
+
+[dar_poltergeist_tele_round]:default_lair
+sim_avail = false
+monster_vegetarian = 0
+
+[dar_smart_snork]:default_lair
+sim_avail = {+dar_military_scout_squad_killed} true, false
+army		= 1
+ecolog		= 1
+stalker 	= 1 
+territory 	= 1
+monster_vegetarian = 0
+
+;----------- << BAR >> ------------
+;---------	SIMULATION	--------
+;sim smarties
+[bar_zastava_dogs_lair]:default_lair
+sim_avail 	= {+faction_base_defense_active} false, true
+territory	= 0
+
+[bar_zastava_dogs_lair_2]:default_lair
+sim_avail 	= {+faction_base_defense_active} false, true
+territory	= 0
+
+[bar_dolg_bunker]:default_base
+sim_avail 	= true
+surge 		= 1
+dolg		= 1
+
+[bar_dolg_general]:default_base
+sim_avail 	= true
+surge 		= 1
+dolg		= 1
+
+[bar_visitors]:default_base
+sim_avail 	= true
+surge 		= 1
+stalker		= 1
+csky		= 1 
+ecolog		= 1 
+dolg		= 1
+
+;unique smarties, sim after guards die
+[bar_zastava]:default_base
+sim_avail = {+bar_zastava_minigunner_dead +bar_zastava_duty_guard1_dead +bar_zastava_duty_guard2_dead +bar_zastava_duty_guard3_dead +bar_zastava_duty_guard4_dead +bar_zastava_duty_guard5_dead +bar_zastava_duty_guard6_dead +bar_zastava_duty_guard7_dead +bar_zastava_duty_guard8_dead +bar_zastava_duty_guard9_dead} true, false
+surge = 1
+dolg = 1
+lair = 1
+
+[bar_zastava_2]:default_base
+sim_avail = {+bar_zastava_2_minigunner_dead +bar_zastava_2_duty2_guard1_dead +bar_zastava_2_duty2_guard2_dead +bar_zastava_2_duty2_guard3_dead +bar_zastava_2_duty2_guard4_dead +bar_zastava_2_duty2_guard5_dead} true, false
+surge = 1
+dolg = 1
+lair = 1
+
+;----------- << ROSTOK >> ------------
+;---------	SIMULATION	--------
+;sim smarties
+[ros_smart_killers1]:default_base
+sim_avail 	= true
+surge 		= 1
+killer		= 1
+
+[ros_smart_monster4]:default_lair
+sim_avail = true
+territory	= 0
+
+[ros_smart_monster5]:default_lair
+sim_avail 	= true
+territory	= 0
+
+[ros_smart_monster7]:default_lair
+sim_avail 	= true
+territory	= 0
+
+[ros_smart_poltergeist2]:default_lair
+sim_avail 	= true
+territory	= 0
+
+[ros_smart_snork1]:default_lair
+sim_avail 	= true
+territory	= 0
+
+[ros_smart_stalker_killers1]:default_base
+sim_avail 	= true
+surge 		= 1
+killer		= 1
+
+[ros_smart_stalker1]:default_base
+sim_avail 	= true
+stalker		= 1 
+ecolog		= 1 
+csky		= 1
+dolg		= 1
+
+;----------- << YANTAR >> ------------
+;---------	SIMULATION	--------
+;sim smarties
+[yan_smart_terrain_1_6]:default_lair
+sim_avail 	= true
+territory	= 0
+
+;x-16 entrance yard, building
+[yan_smart_terrain_2_4]:default_lair
+sim_avail 	= true
+surge		= 1
+territory 	= 1
+
+;x-16 entrance yard, gate
+[yan_smart_terrain_2_5]:default_lair
+sim_avail 	= true
+surge		= 1
+territory 	= 1
+
+;x-16 entrance yard
+[yan_smart_terrain_3_4]:default_lair
+sim_avail 	= true
+surge		= 1
+territory 	= 1
+
+;camp 2 near small tunnel
+[yan_smart_terrain_3_6]:default_base
+sim_avail 	= true
+surge 		= 1
+stalker		= 1 
+ecolog		= 1 
+csky		= 1
+
+[yan_smart_terrain_4_2]:default_lair
+sim_avail 	= true
+
+[yan_smart_terrain_4_4]:default_lair
+sim_avail 	= {+faction_base_defense_active} false, true
+territory	= 0
+zombied     = 1
+
+[yan_smart_terrain_4_5]:default_lair
+sim_avail 	= true
+
+[yan_smart_terrain_5_3]:default_lair
+sim_avail 	= true
+territory	= 0
+
+;camp near small tunnel
+[yan_smart_terrain_5_5]:default_base
+sim_avail 	= {+faction_base_defense_active} false, true
+surge		= 1
+stalker		= 1 
+ecolog		= 1 
+csky		= 1
+
+[yan_smart_terrain_6_2]:default_lair
+sim_avail 	= {+faction_base_defense_active} false, true
+territory = 0
+zombied   = 1
+
+;scientist base
+[yan_smart_terrain_6_4]:default_base
+sim_avail 	= true
+surge		= 1
+stalker		= 1 
+ecolog		= 1 
+csky		= 1
+
+;scientist base shelters
+[yan_smart_terrain_6_6]:default_base
+sim_avail =  true
+surge		= 1
+stalker		= 1 
+ecolog		= 1 
+csky		= 1
+
+[yan_smart_terrain_zombi_spawn]:default_lair
+sim_avail 	= true
+territory	= 1
+
+[yan_smart_terrain_snork_u]:default_lair
+sim_avail = {+yantar_tunnel_finish} true, false
+
+;----------- << LAB X-16 SMARTIES >> ------------
+[x162_st_burer]:default_lair
+sim_avail = {+yan_kill_brain_done} true, false
+monolith 	= 1 
+ecolog 		= 1
+stalker		= 1
+army 		= 1
+territory 	= 1
+monster_vegetarian = 0
+
+[x162_st_gigant]:default_lair
+sim_avail = {+yan_kill_brain_done} true, false
+monolith 	= 1 
+ecolog 		= 1
+stalker		= 1
+army 		= 1
+territory 	= 1
+monster_vegetarian = 0
+
+[x162_st_snork]:default_lair
+sim_avail = {+yan_kill_brain_done} true, false
+monster_vegetarian = 0
+
+[x162_st_poltergeist]:default_lair
+sim_avail = {+yan_kill_brain_done} true, false
+monster_vegetarian = 0
+
+;----------- << ARMY WAREHOUSES >> ------------
+;---------	SIMULATION	--------
+[mil_smart_terrain_2_1]:default_lair
+sim_avail = true
+
+;SOC bloodsuckers village, Freedom camp
+[mil_smart_terrain_2_10]:default_base
+sim_avail 	= true
+surge		= 1
+freedom		= 5
+dolg		= 5
+monolith 	= 1 
+bandit 		= 1
+
+;SOC merc outpost to Dead City
+[mil_smart_terrain_2_2]:default_base
+sim_avail 	= true
+killer		= 5
+stalker		= 1
+bandit		= 1 
+csky		= 1
+freedom		= 1 
+dolg		= 1 
+monolith	= 1
+
+;SOC empty farmhouse north
+[mil_smart_terrain_2_4]:default_base
+sim_avail 	= true
+surge 		= 1
+stalker		= 1
+ecolog		= 1
+csky		= 1
+freedom		= 5
+dolg		= 2
+killer 		= 1 
+bandit		= 1
+
+[mil_smart_terrain_2_6]:default_lair
+sim_avail = true
+
+;SOC Freedom outpost to Radar, barrier
+[mil_smart_terrain_3_8]:default_base
+sim_avail 	= true
+freedom		= 5
+dolg 		= 1
+monolith	= 2
+
+;SOC bloodsuckers village
+[mil_smart_terrain_4_2]:default_lair
+sim_avail 	= true
+surge		= 1
+
+;SOC bloodsuckers village, water tower
+[mil_smart_terrain_4_3]:default_lair
+sim_avail 	= true
+surge		= 1
+
+[mil_smart_terrain_4_5]:default_base
+sim_avail 	= true
+surge 		= 1
+stalker		= 1
+freedom		= 5
+dolg		= 2
+bandit		= 1
+monolith 	= 1
+
+[mil_smart_terrain_4_7]:default_lair
+sim_avail 	= {+faction_base_defense_active} false, true
+territory	= 1
+
+;SOC Freedom outpost to Radar, wagon
+[mil_smart_terrain_4_8]:default_base
+sim_avail 	= true
+surge 		= 1
+stalker		= 1
+freedom		= 1
+dolg		= 1
+bandit		= 1
+monolith 	= 1
+
+;SOC Freedom base, near kitchen
+[mil_smart_terrain_7_10]:default_base
+sim_avail 	= true
+surge 		= 1
+freedom		= 1
+
+;SOC Freedom base, near sleep barracks
+[mil_smart_terrain_7_12]:default_base
+sim_avail 	= true
+surge 		= 1
+freedom		= 1
+
+;SOC Duty farm
+[mil_smart_terrain_7_4]:default_base
+sim_avail 	= true
+surge 		= 1
+stalker		= 1
+freedom		= 1
+dolg		= 1
+bandit		= 1
+monolith 	= 1
+
+;SOC Freedom base, main
+[mil_smart_terrain_7_7]:default_base
+sim_avail 	= true
+surge 		= 1
+freedom		= 1
+lair 		= 1
+
+;SOC Freedom base, entrance
+[mil_smart_terrain_7_8]:default_base
+sim_avail 	= true
+surge 		= 1
+freedom		= 1
+
+[mil_smart_terrain_8_3]:default_lair
+sim_avail = true
+
+;----------- << RED FOREST >> ------------
+;---------	SIMULATION	--------
+;Stancia1 exit camp
+[red_smart_terrain_3_1]:default_base
+sim_avail = true
+
+;underground mine
+[red_smart_terrain_3_2]:default_resource
+sim_avail 	= true
+lair        = 1
+surge 		= 1
+
+[red_smart_terrain_3_3]:default_lair
+sim_avail = true
+
+;Camp near Forester's house - at red forest gate
+[red_smart_terrain_4_2]:default_base
+sim_avail 	= true
+surge 		= 1
+all			= 1 
+army_heli	= 1
+
+[red_smart_terrain_4_3]:default_lair
+sim_avail = true
+
+[red_smart_terrain_4_5]:default_lair
+sim_avail = true
+
+[red_smart_terrain_5_5]:default_lair
+sim_avail = true
+
+[red_smart_terrain_5_6]:default_lair
+sim_avail = true
+
+;deeper forest - anomaly field with weird rocks
+[red_smart_terrain_6_3]:default_lair
+sim_avail = true
+
+[red_smart_terrain_6_6]:default_lair
+sim_avail = true
+
+;bridge - forest side
+[red_smart_terrain_bridge]:default_base
+sim_avail 	= true
+surge 		= 1
+all			= 1
+
+;deeper forest - near T72 tank
+[red_smart_terrain_monsters]:default_lair
+sim_avail = true
+
+;tunnel to deeper forest - little mine
+[red_smart_terrain_monsters_2]:default_lair
+sim_avail = true
+
+[red_smart_terrain_monsters_3]:default_lair
+sim_avail = true
+
+;----------- << LIMANSK >> ------------
+;---------	SIMULATION	--------
+;tunnel near Limansk-Red Forest lc
+[lim_smart_terrain_1]:default_base
+sim_avail 	= true
+surge		= 1
+stalker 	= 1 
+csky		= 1 
+ecolog		= 1 
+
+[lim_smart_terrain_10]:default_base
+sim_avail 		= true
+surge 			= 1
+stalker 		= 1 
+csky			= 1 
+ecolog			= 1 
+monolith		= 1
+killer			= 1
+monolith_heli	= 1
+
+[lim_smart_terrain_3]:default_base
+sim_avail 	= true
+surge 		= 1
+stalker 	= 1 
+csky		= 1 
+ecolog		= 1 
+monolith	= 1
+killer		= 1
+
+[lim_smart_terrain_4]:default_base
+sim_avail 	= true
+surge 		= 1
+stalker 	= 1 
+csky		= 1 
+ecolog		= 1 
+monolith	= 1
+killer		= 1
+
+[lim_smart_terrain_5]:default_base
+sim_avail 	= true
+surge 		= 1
+stalker 	= 1 
+csky		= 1 
+ecolog		= 1 
+monolith	= 1
+killer		= 1
+
+[lim_smart_terrain_6]:default_base
+sim_avail 		= true
+surge 			= 1
+stalker 		= 1 
+csky			= 1 
+ecolog			= 1 
+monolith		= 1
+killer			= 1
+monolith_heli	= 1
+
+[lim_smart_terrain_7]:default_lair
+sim_avail = true
+
+[lim_smart_terrain_8]:default_lair
+sim_avail = true
+
+;construction site
+[lim_smart_terrain_9]:default_base
+sim_avail 		= true
+surge 			= 1
+monolith		= 1
+monolith_heli	= 1
+
+;----------- << HOSPITAL >> ------------
+;---------	SIMULATION	--------
+[katacomb_smart_terrain]:default_base
+sim_avail 		= true
+surge 			= 1
+monolith		= 1
+monolith_heli	= 1
+
+
+;----------- << DEAD CITY >> ------------
+;---------	SIMULATION	--------
+[cit_bandits]:default_base
+sim_avail 	= true
+surge 		= 1
+bandit		= 1
+army 		= 1 
+killer 		= 1 
+monolith 	= 1
+
+[cit_bandits_2]:default_lair
+sim_avail = true
+
+[cit_kanaliz1]:default_lair
+sim_avail = true
+
+[cit_kanaliz2]:default_lair
+sim_avail = true
+
+[cit_killers]:default_base
+sim_avail 	= true
+surge 		= 1
+killer		= 5
+lair        = 1
+
+[cit_killers_2]:default_lair
+sim_avail 	= {+faction_base_defense_active} false, true
+
+[cit_killers_vs_bandits]:default_base
+sim_avail 	= true
+surge 		= 1
+bandit		= 1
+army 		= 1 
+killer 		= 1 
+monolith 	= 1
+
+
+;----------- << RADAR >> ------------
+;---------	SIMULATION	--------
+[rad2_loner_0000]:default_lair
+sim_avail = true
+
+[rad2_loner_0001]:default_lair
+sim_avail = true
+surge = 1
+
+[rad2_loner_0002]:default_lair
+sim_avail = true
+
+[rad2_prip_teleport]:default_base
+sim_avail 	= true
+surge 		= 1
+stalker 	= 1 
+csky		= 1 
+ecolog		= 1 
+monolith	= 1
+killer		= 1
+
+[rad_after_valley]:default_lair
+sim_avail = true
+territory	= 1
+
+[rad_antenna_camper]:default_lair
+sim_avail = true
+surge = 1
+
+[rad_antenna_monolith]:default_base
+sim_avail 		= true
+surge 			= 1
+monolith		= 1
+monolith_heli	= 1
+
+[rad_antenna_patrol]:default_base
+sim_avail 	= true
+surge 		= 1
+monolith	= 1
+
+[rad_bloodsucker]:default_lair
+sim_avail = true
+
+[rad_entrance]:default_base
+sim_avail 	= true
+surge 		= 1
+monolith	= 1
+
+[rad_pseudodogs]:default_lair
+sim_avail 	= true
+territory	= 0
+
+[rad_snork1]:default_lair
+sim_avail 	= true
+territory	= 0
+
+[rad_snork2]:default_lair
+sim_avail 	= true
+territory	= 0
+
+[rad_valley]:default_lair
+sim_avail 	= true
+surge 		= 1
+
+[rad_valley_dogs]:default_lair
+sim_avail 	= true
+territory	= 0
+
+[rad_zombied1]:default_lair
+sim_avail 	= true
+territory	= 1
+
+[rad_zombied2]:default_lair
+sim_avail 	= true
+surge 		= 1
+territory	= 1
+
+;----------- << BUNKER-LAB X-19 SMARTIES >> ------------
+[bun_krovosos_nest]:default_lair
+sim_avail 	= false
+monster_vegetarian = 0
+
+[bun2_st_bloodsucker]:default_lair
+sim_avail 	= {+bar_deactivate_radar_done} true, false
+monolith 	= 1 
+ecolog 		= 1
+stalker		= 1
+army		= 1
+territory 	= 1
+monster_vegetarian = 0
+
+[bun2_tushkano_lair]:default_lair
+sim_avail 	= {+bar_deactivate_radar_done} true, false
+monolith 	= 1 
+ecolog 		= 1
+stalker		= 1
+army		= 1
+territory 	= 1
+monster_vegetarian = 0
+
+;----------- << PRIPYAT >> ------------
+;---------	SIMULATION	--------
+[pri_depot]:default_base
+sim_avail 		= true
+surge 			= 1
+monolith		= 1
+monolith_heli	= 1
+
+[pri_monolith]:default_base
+sim_avail = true
+surge = 1
+
+[pri_smart_bloodsucker_lair1]:default_lair
+sim_avail = true
+surge = 1
+territory	= 1
+
+[pri_smart_controler_lair1]:default_lair
+sim_avail 	= true
+surge 		= 1
+
+[pri_smart_controler_lair2]:default_lair
+sim_avail 	= true
+territory	= 0
+
+[pri_smart_giant_lair1]:default_lair
+sim_avail 	= true
+surge 		= 1
+
+[pri_smart_monolith_stalker2]:default_lair
+sim_avail = true
+
+[pri_smart_monolith_stalker3]:default_lair
+sim_avail 	= true
+
+[pri_smart_monolith_stalker4]:default_lair
+sim_avail = true
+
+[pri_smart_monolith_stalker6]:default_base
+sim_avail 		= true
+monolith		= 1
+monolith_heli 	= 1
+
+[pri_smart_monster_lair1]:default_lair
+sim_avail 	= true
+territory	= 0
+
+[pri_smart_neutral_stalker1]:default_base
+sim_avail 	= true
+stalker		= 1
+dolg		= 1 
+freedom		= 1 
+ecolog		= 1 
+csky		= 1
+
+[pri_smart_pseudodog_lair1]:default_lair
+sim_avail 	= true
+territory	= 0
+
+[pri_smart_snork_lair1]:default_lair
+sim_avail 	= true
+surge 		= 1
+
+[pri_smart_snork_lair2]:default_lair
+sim_avail 	= true
+territory	= 0
+
+[pri_smart_tushkano_lair1]:default_lair
+sim_avail = true
+surge = 1
+
+;----------- << STANCIA_1 >> ------------
+;---------	SIMULATION	--------
+[aes_smart_terrain_monolit_blockpost]:default_base
+sim_avail 		= true
+monolith		= 1
+monolith_heli	= 1
+
+[aes_smart_terrain_monolit_blockpost2]:default_lair
+sim_avail = true
+
+[aes_smart_terrain_monolit_blockpost4]:default_base
+sim_avail 		= true
+surge 			= 1
+monolith		= 1
+monolith_heli	= 1
+
+[aes_smart_terrain_monsters1]:default_lair
+sim_avail 	= true
+territory	= 0
+
+[aes_smart_terrain_monsters2]:default_lair
+sim_avail 	= true
+territory	= 0
+
+[aes_smart_terrain_monsters3]:default_lair
+sim_avail = true
+
+[aes_smart_terrain_monsters4]:default_lair
+sim_avail = true
+
+[aes_smart_terran_soldier]:default_base
+sim_avail 	= true
+army 		= 1
+army_heli	= 1
+
+
+[aes_smart_terran_soldier2]:default_lair
+sim_avail 	= true
+all			= 0
+army 		= 1
+
+;----------- << SARCOFAG >> ------------
+
+[sar_monolith_general]:default_territory
+sim_avail = {+sar_secret_door_find} true, false
+monolith 	= 1 
+stalker		= 1
+army		= 1
+ecolog		= 1
+lair 		= 1
+
+[sar_monolith_sklad]:default_territory
+sim_avail = {+sar_secret_door_find} true, false
+lair = 1
+
+[sar_monolith_poltergeists]:default_lair
+sim_avail = {+sar_secret_door_find} true, false
+
+[sar_monolith_bloodsuckers]:default_lair
+sim_avail = {+sar_secret_door_find} true, false
+monolith 	= 1 
+stalker		= 1
+army		= 1
+ecolog		= 1
+territory	= 1
+
+;----------- << MONOLITH CONTROL >> ------------
+[sar_monolith_guard]:default_territory
+sim_avail = {+sar_monolith_generator_find} true, false
+monolith 	= 1 
+stalker		= 1
+army		= 1
+ecolog		= 1
+lair 		= 1
+
+[sar_monolith_zombies]:default_lair
+sim_avail = {+sar_monolith_generator_find} true, false
+monolith 	= 1 
+stalker		= 1
+army		= 1
+ecolog		= 1
+territory 	= 1
+
+;----------- << STANCIA_2 >> ------------
+;---------	SIMULATION	--------
+[aes2_monolith_camp1]:default_base
+sim_avail 		= true
+monolith		= 1
+monolith_heli	= 1
+
+[aes2_monolith_camp2]:default_base
+sim_avail 		= true
+monolith		= 1
+monolith_heli	= 1
+
+[aes2_monolith_camp3]:default_base
+sim_avail 		= true
+monolith		= 1
+monolith_heli	= 1
+
+[aes2_monolith_camp4]:default_base
+sim_avail 		= true
+monolith		= 1
+monolith_heli	= 1
+
+[aes2_monolith_snipers_1]:default_lair
+sim_avail = true
+
+[aes2_monolith_snipers_2]:default_lair
+sim_avail = true
+
+[aes2_monolith_snipers_3]:default_lair
+sim_avail = true
+
+[aes2_monsters1]:default_lair
+sim_avail = true
+
+[aes2_monsters2]:default_lair
+sim_avail = true
+
+
+;----------- << GENERATORS >> ------------
+;---------	SIMULATION	--------
+[gen_smart_terrain_lab_entrance]:default_base
+sim_avail 		= true
+surge 			= 1
+monolith		= 1
+monolith_heli	= 1
+
+[gen_smart_terrain_cemetery]:default_lair
+sim_avail = true
+
+[gen_smart_terrain_forest]:default_lair
+sim_avail = true
+
+[gen_smart_terrain_junk]:default_lair
+sim_avail = true
+
+[gen_smart_terrain_lab_entrance_2]:default_lair
+sim_avail = true
+
+[gen_smart_terrain_military]:default_lair
+sim_avail = true
+
+[gen_smart_terrain_urod]:default_lair
+sim_avail = true
+
+;----------- << WARLAB >> ------------
+[warlab_common_consciousness_smart_terrain]:default_base
+sim_avail = false
+
+;--------------------------------------------------------------------------------
+;Zaton
+;base
+[zat_stalker_base_smart]:default_base
+sim_avail 	= true
+surge 		= 1
+stalker		= 1 
+csky		= 1 
+dolg 		= 1 
+
+;no sim
+[zat_medic_home_smart]:default_territory
+sim_avail = false
+
+[zat_b7_stalker_raider]:default_territory
+sim_avail = false
+
+;technical, but with sim available, surge too
+[zat_b33]:default_lair
+sim_avail =  false
+
+[zat_a23_smart_terrain]:default_territory
+sim_avail = false
+
+;surge
+[zat_b7]:default_territory
+surge = 1
+sim_avail = true
+;sim_avail = {+zat_b7_task_end} true, false
+
+[zat_b40_smart_terrain]:default_territory
+surge = 1
+sim_avail = true
+;sim_avail = {+zat_b40_actor_has_notebook} true, false 
+
+[zat_b28]:default_lair
+surge = 1
+sim_avail = false
+
+;!!!
+[zat_b42_smart_terrain]:default_territory
+surge = 1
+territory 	= 1
+sim_avail = true
+;sim_avail = {+zat_b42_controller_dead} true, false 
+
+[zat_b18]:default_territory
+surge = 1
+sim_avail = true
+;sim_avail = {+zat_b18_noah_dead} true, false
+
+[zat_b101]:default_resource
+surge = 1
+territory 	= 1
+sim_avail = true
+
+[zat_b38u]:default_territory
+sim_avail = false
+
+[zat_b38]:default_territory
+surge = 1
+sim_avail = true
+;sim_avail = {+zat_b57_bloodsucker_lair_clear} true, false
+
+;regular smarts
+[zat_b5_smart_terrain]:default_territory
+surge = 1
+sim_avail = true
+;sim_avail = {+zat_b5_task_start +zat_b5_task_end} true, {-zat_b5_task_start -zat_b5_task_end} true, false 
+
+[zat_b106_smart_terrain]:default_lair
+sim_avail = true
+;sim_avail = {+zat_b106_chimera_dead} true, {-zat_b106_gonta_accept_actor} true, false
+
+[zat_b52]:default_territory
+territory 	= 1
+sim_avail = true
+;sim_avail = {+zat_b52_actor_go_offline} true, {-zat_b52_port_bandits_spawn} true, false
+
+[zat_b103_merc_smart]:default_base
+surge = 1
+sim_avail = true
+;sim_avail = {+zat_b103_lost_merc_leader_bunker_guards_work} true, {+zat_b103_merc_fight} true, {+zat_b103_merc_gone} true, false
+killer = 1
+
+[zat_b104_zombied]:default_lair
+sim_avail = true
+;sim_avail = {+zat_b104_task_end} true, false
+
+[zat_b14_smart_terrain]:default_resource
+sim_avail = true
+;sim_avail = {+zat_b14_smart_terrain_open} true, false
+
+[zat_b20_smart_terrain]:default_resource
+territory 	= 1
+sim_avail = true
+;sim_avail = {+zat_b20_plateau_way_done} true, {-zat_b20_plateau_way_started} true, false
+
+[zat_b53]:default_resource
+territory 	= 1
+sim_avail = true
+;sim_avail = {+zat_b53_thanks_dialog} true, false 
+
+[zat_b12]:default_lair
+sim_avail = true
+
+[zat_b54]:default_resource
+territory 	= 1
+sim_avail = true
+
+[zat_b55]:default_resource
+territory 	= 1
+sim_avail = true
+
+[zat_b100]:default_resource
+surge		= 1
+sim_avail = true
+;sim_avail = {+zat_b100_heli_2_searched} true, false
+
+[zat_b39]:default_resource
+territory 	= 1
+lair		= 1
+sim_avail = true
+;sim_avail = {+zat_b39_tech_buddies_joker_found} true, false
+
+[zat_b56]:default_resource
+sim_avail = true
+
+[zat_a1]:default_territory
+territory 	= 1
+sim_avail = true
+;sim_avail = {+zat_a1_simulation_start} true, false
+
+;---------	SIMULATION	--------
+
+[zat_sim_1]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_2]:default_territory
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_3]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_4]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_5]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_6]:default_territory
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_7]:default_lair
+territory 	= 1
+sim_avail = true
+;sim_avail =  {+zat_b38_disappearance_stalkers_find_to_be_missing_hunter_give -zat_b38_cop_passed_away} false, true
+
+[zat_sim_8]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_9]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_10]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_11]:default_territory
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_12]:default_territory
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_13]:default_territory
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_14]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_15]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_16]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_17]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_18]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_19]:default_territory
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_20]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_21]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_22]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_23]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_24]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_25]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_26]:default_lair
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_27]:default_territory
+territory 	= 1
+sim_avail =  true
+
+[zat_sim_28]:default_territory
+sim_avail =  true
+
+[zat_sim_29]:default_territory
+sim_avail =  true
+
+[zat_sim_30]:default_territory
+sim_avail =  true
+
+;--------------------------------------------------------------------------------
+
+;Jupiter
+[jup_a10_smart_terrain]:default_base
+sim_avail 	= true
+surge		= 1
+stalker		= 1 
+bandit		= 1 
+csky		= 1 
+dolg 		= 1 
+freedom 	= 1
+
+[jup_a12]:default_territory
+sim_avail = true
+surge		= 1
+
+[jup_a6]:default_base
+sim_avail 	= true
+surge 		= 1
+stalker		= 1 
+freedom 	= 1
+
+[jup_b1]:default_territory
+sim_avail	= true
+surge		= 1
+
+[jup_b19]:default_base
+sim_avail 	= true
+zombied 	= 1
+
+[jup_b200]:default_base
+sim_avail	= true
+surge		= 1
+territory 	= 1
+stalker		= 1 
+bandit		= 1 
+dolg 		= 1 
+freedom 	= 1
+
+[jup_b202]:default_territory
+sim_avail =	true
+
+[jup_b203]:default_territory
+sim_avail = {+jup_b16_oasis_artifact_spawn} true, false
+surge		= 1
+
+[jup_b204]:default_territory
+sim_avail = true
+
+[jup_b205_smart_terrain]:default_lair
+sim_avail = true
+;sim_avail = {+jup_b205_evacuation_visited} true, false
+surge		= 1
+
+[jup_b206]:default_resource
+sim_avail = true
+;sim_avail = {+jup_b206_anomalous_grove_done} true, false
+
+[jup_b207]:default_territory
+sim_avail = true
+;sim_avail = {-jup_b207_morgan_gived_depot -jup_b207_freedom_knows_about_depot -jup_b207_duty_knows_about_depot} false, true
+;surge		= 1
+
+[jup_b208]:default_territory
+sim_avail 	= true
+surge		= 1
+
+[jup_b209]:default_resource
+sim_avail = true
+
+[jup_b211]:default_resource
+sim_avail = true
+
+[jup_b212]:default_territory
+sim_avail = true
+
+[jup_b25]:default_resource
+sim_avail = true
+
+[jup_b32]:default_resource
+;всегда в симул€ции
+sim_avail = true
+
+[jup_b4]:default_territory
+sim_avail = true
+
+[jup_b41]:default_base
+sim_avail 	= true
+surge		= 1
+stalker		= 1
+csky		= 1
+killer 		= 1
+
+[jup_b46]:default_territory
+sim_avail = true
+
+[jup_b47]:default_territory
+sim_avail = true
+
+[jup_b6_anom_2]:default_resource
+sim_avail = true
+
+;technical
+
+[jup_b200_tushkan_smart_terrain]:default_lair
+sim_avail = true
+
+[jup_b207_depot_attack]:default_territory
+sim_avail = false
+
+[jup_b219]:default_territory
+sim_avail = false
+
+[jup_b8_smart_terrain]:default_territory
+sim_avail = false
+
+[jup_b205_smart_terrain_tushkano]:default_territory
+sim_avail = false
+
+[jup_a12_merc]:default_territory
+sim_avail = false
+
+[jup_a9]:default_lair
+sim_avail =  false
+
+;---------	SIMULATION	--------
+
+[jup_sim_1]:default_lair
+sim_avail =  true
+
+[jup_sim_2]:default_lair
+sim_avail =  true
+
+[jup_sim_3]:default_lair
+sim_avail =  true
+
+[jup_sim_4]:default_lair
+sim_avail =  true
+
+[jup_sim_5]:default_lair
+sim_avail =  true
+
+[jup_sim_6]:default_territory
+sim_avail =  true
+
+[jup_sim_7]:default_lair
+sim_avail =  true
+
+[jup_sim_8]:default_lair
+sim_avail =  true
+
+[jup_sim_9]:default_lair
+sim_avail =  true
+
+[jup_sim_10]:default_lair
+sim_avail =  true
+
+[jup_sim_11]:default_lair
+sim_avail =  true
+
+[jup_sim_12]:default_lair
+sim_avail =  true
+
+[jup_sim_13]:default_lair
+sim_avail =  true
+
+[jup_sim_14]:default_lair
+sim_avail =  true
+
+[jup_sim_15]:default_lair
+sim_avail =  true
+
+[jup_sim_16]:default_lair
+sim_avail =  true
+
+[jup_sim_17]:default_lair
+sim_avail =  true
+resource 	= 2
+
+[jup_sim_18]:default_lair
+sim_avail =  true
+
+[jup_sim_19]:default_lair
+sim_avail =  true
+
+[jup_sim_20]:default_lair
+sim_avail =  true
+
+[jup_sim_21]:default_lair
+sim_avail =  true
+; ---------------------------  Pripyat  ------------------------------------
+; --------------------------------------------------------------------------
+
+[pri_a15]:default_territory
+sim_avail = true
+
+[pri_a16]:default_base
+sim_avail = true
+stalker		= 1 
+bandit		= 1 
+csky		= 1 
+dolg 		= 1 
+freedom 	= 1
+army		= 1
+
+[pri_a17]:default_territory
+sim_avail = true
+
+[pri_a18_smart_terrain]:default_territory
+sim_avail = true 
+surge = 1
+
+[pri_a21_smart_terrain]:default_territory
+sim_avail = true
+surge = 1
+
+[pri_a22_smart_terrain]:default_territory
+sim_avail = true
+
+[pri_a25_smart_terrain]:default_territory
+sim_avail = true
+
+[pri_b301]:default_resource
+sim_avail = true
+surge = 1
+
+[pri_b302]:default_resource
+sim_avail = true
+
+[pri_b303]:default_resource
+sim_avail = true
+;sim_avail = {+pri_b303_door_is_open} true, false
+surge = 1
+
+[pri_b304]:default_territory
+sim_avail = true
+surge = 1
+
+[pri_b306]:default_resource
+sim_avail = true
+surge = 1
+
+[pri_b307]:default_resource
+sim_avail = true
+
+[pri_b35_mercs]:default_territory
+sim_avail = true
+surge = 1
+
+[pri_b36_smart_terrain]:default_territory
+sim_avail 	= true
+surge 		= 1
+zombied 	= 1
+monolith	= 1 
+
+[pri_sim_1]:default_lair
+sim_avail = true
+surge = 1
+
+[pri_sim_2]:default_lair
+sim_avail = true
+
+[pri_sim_3]:default_lair
+sim_avail = true
+
+[pri_sim_4]:default_lair
+sim_avail = true
+
+[pri_sim_5]:default_lair
+sim_avail = true
+
+[pri_sim_6]:default_lair
+sim_avail = true
+
+[pri_sim_7]:default_lair
+sim_avail = true
+
+[pri_sim_8]:default_lair
+sim_avail = true
+
+[pri_sim_9]:default_lair
+sim_avail = true
+
+[pri_sim_10]:default_lair
+sim_avail = true
+
+[pri_sim_11]:default_lair
+sim_avail = true
+
+[pri_sim_12]:default_lair
+sim_avail = true
+
+[pri_b35_military]:default_territory
+sim_avail = true
+surge = 1
+
+[pri_b305_dogs]:default_territory
+sim_avail = false
+
+[pri_b304_monsters_smart_terrain]:default_territory
+sim_avail = true
+
+[pri_a20]:default_territory
+sim_avail = true
+
+[pri_a28_heli]:default_territory
+sim_avail = true
+
+[pri_a28_base]:default_territory
+sim_avail = true
+
+[pri_a28_shop]:default_territory
+sim_avail = true
+
+[pri_a28_arch]:default_territory
+sim_avail = true
+
+[pri_a28_school]:default_territory
+sim_avail = true
+
+[pri_a28_evac]:default_territory
+sim_avail = true
+
+;Lab X-8
+[lx8_smart_terrain]:default_territory
+sim_avail = {+lx8_actor_in_lab +actor_left_labx8} true, false
+all  = 1
+lair = 1
+monster_vegetarian = 0
+
+;underpass
+[pas_b400_elevator]:default_lair
+sim_avail = {+actor_pass_jupiter_exit_find +actor_pass_pripyat_exit_find} true, false
+monster_vegetarian = 0
+
+[pas_b400_track]:default_lair
+sim_avail = {+actor_pass_jupiter_exit_find +actor_pass_pripyat_exit_find} true, false
+all			= 1
+territory 	= 1
+monster_vegetarian = 0
+
+[pas_b400_downstairs]:default_lair
+sim_avail = {+actor_pass_jupiter_exit_find +actor_pass_pripyat_exit_find} true, false
+monster_vegetarian = 0
+
+[pas_b400_tunnel]:default_lair
+sim_avail = {+actor_pass_jupiter_exit_find +actor_pass_pripyat_exit_find} true, false
+monster_vegetarian = 0
+
+[pas_b400_hall]:default_lair
+sim_avail = {+actor_pass_jupiter_exit_find +actor_pass_pripyat_exit_find} true, false
+all			= 1
+territory 	= 1
+monster_vegetarian = 0
+
+[pas_b400_way]:default_lair
+sim_avail = {+actor_pass_jupiter_exit_find +actor_pass_pripyat_exit_find} true, false
+monster_vegetarian = 0
+
+[pas_b400_canalisation]:default_lair
+sim_avail = {+actor_pass_jupiter_exit_find +actor_pass_pripyat_exit_find} true, false
+monster_vegetarian = 0
+
+[pas_b400_fake]:default_lair
+sim_avail = {+actor_pass_jupiter_exit_find +actor_pass_pripyat_exit_find} true, false
+monster_vegetarian = 0
+
+;TRUCKS CEMETERY
+
+[trc_sim_1]:default_base
+sim_avail =  true
+stalker		= 1 
+bandit		= 1 
+dolg 		= 1 
+freedom 	= 1
+army		= 1
+
+[trc_sim_2]:default_base
+sim_avail =  true
+surge	  = 1
+stalker		= 1 
+bandit		= 1 
+dolg 		= 1 
+freedom 	= 1
+army		= 1
+
+[trc_sim_3]:default_lair
+sim_avail =  true
+
+[trc_sim_4]:default_lair
+sim_avail =  true
+
+[trc_sim_5]:default_lair
+sim_avail =  true
+
+[trc_sim_6]:default_territory
+sim_avail =  true
+surge	  = 1
+
+[trc_sim_7]:default_lair
+sim_avail =  true
+
+[trc_sim_8]:default_lair
+sim_avail =  true
+resource 	= 2
+
+[trc_sim_9]:default_lair
+sim_avail =  true
+
+[trc_sim_10]:default_lair
+sim_avail =  true
+
+[trc_sim_11]:default_lair
+sim_avail =  true
+
+[trc_sim_12]:default_lair
+sim_avail =  true
+
+[trc_sim_13]:default_lair
+sim_avail =  true
+
+[trc_sim_14]:default_lair
+sim_avail =  true
+
+[trc_sim_15]:default_lair
+sim_avail =  true
+
+[trc_sim_16]:default_lair
+sim_avail =  true
+
+[trc_sim_17]:default_lair
+sim_avail =  true
+resource 	= 2
+
+[trc_sim_18]:default_base
+sim_avail =  true
+stalker		= 1 
+bandit		= 1 
+dolg 		= 1 
+freedom 	= 1
+army		= 1
+
+[trc_sim_19]:default_lair
+sim_avail =  true
+
+[trc_sim_20]:default_base
+sim_avail 	= true
+surge		= 1
+stalker		= 1 
+bandit		= 1 
+dolg 		= 1 
+freedom 	= 1
+army		= 1
+
+[trc_sim_21]:default_lair
+sim_avail =  true

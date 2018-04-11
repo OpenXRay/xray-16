@@ -1,0 +1,179 @@
+--' Диденко Руслан (Stohe), Чугай Александр (Chugai)
+-- modified by Alundaio
+
+----------------------------------------------------------------------------------------------------------------------
+-- Функции, которые могут вызываться извне
+----------------------------------------------------------------------------------------------------------------------
+local alife = alife
+
+-- получить гулаг по имени смарта.
+-- работает только для смартов, которые в онлайне.
+function get_gulag_by_name(name)
+	local strn = SIMBOARD.smarts_by_names[name]
+	if strn then
+		return strn
+	else
+		printf("there is no gulag with name [%s] ",name)
+		return nil
+	end
+end
+
+-- получить гулаг по story id смарта
+-- работает всегда
+function get_gulag_by_sid(sid)
+	local id = get_story_object_id(sid)
+	return id and alife_object(id)
+end
+
+-- получить гулаг по имени или story id смарта
+function get_gulag( name_or_sid )
+	if type( name_or_sid ) == "number" then
+		return get_gulag_by_sid( name_or_sid )
+	else
+		return get_gulag_by_name( name_or_sid )
+	end
+end
+
+-- получить гулаг персонажа
+-- obj=game_object
+function get_npc_smart(obj)
+	if not (obj) then 
+		printf("get_npc_smart: obj is nil WHY GOD WHY!")
+		return	
+	end 
+	
+	local id = obj.id and (type(obj.id) == "function" and obj:id() or obj.id)
+	if not (id) then 
+		printf("get_npc_smart: invalid object")
+		return 
+	end 
+	
+	local sim = alife()
+	local se_obj = sim:object(id)
+	if not (se_obj and se_obj.m_smart_terrain_id) then 
+		return
+	end 
+	
+	local smart = se_obj.m_smart_terrain_id < 65535 and sim:object(se_obj.m_smart_terrain_id) or nil
+	return smart
+end
+
+
+
+-- установить отношение всех членов смарта к указанному объекту
+function setGulagRelation( name_or_sid, relation, target_obj )
+	local gulag = get_gulag( name_or_sid )
+
+	if gulag then
+		gulag:set_relation( relation, target_obj )
+	end
+end
+
+-- установить расположенине всех членов смарта к указанному объекту
+function setGulagGoodwill( name_or_sid, goodwill, target_obj )
+	local gulag = get_gulag( name_or_sid )
+
+	if gulag then
+		gulag:set_goodwill( goodwill, target_obj )
+	end
+end
+
+-- сделать указанного персонажа врагом всех персонажей смарта
+function setGulagEnemy( name_or_sid, target_obj )
+	setGulagRelation( name_or_sid, game_object.enemy, target_obj )
+end
+
+-- сделать указанного персонажа врагом всех персонажей смарта, которые в онлайне
+function setGulagNeutral( name_or_sid, target_obj )
+	setGulagRelation( name_or_sid, game_object.neutral, target_obj )
+end
+
+-- освободить персонажа от работы.
+-- obj=game_object
+function resetJob( obj )
+	printf( "gulag resetJob: obj=%s", obj:name() )
+
+	local gulag = get_npc_smart( obj )
+	if gulag then
+		gulag:free_obj_and_reinit( obj:id() )
+		gulag:update()
+	end
+end
+
+function free_object( obj )
+	printf( "gulag free_object: obj=%s", obj:name() )
+
+	local gulag = get_npc_smart( obj )
+	if gulag then
+		gulag:free_obj( obj:id() )
+		--gulag:update()
+	end
+end
+
+
+-- не находится ли источник информации вне информационного рестриктора?
+-- если вне, то информация будет запрещена
+-- функция кеширует game_object рестриктора
+function is_info_restricted( obj_id, info_pos )
+	local r = db.info_restr[obj_id]
+
+	if r == nil then
+		return false
+	end
+
+	if type(r) == "string" then
+		r = db.zone_by_name[r]
+
+		if r == nil then
+			return false
+		end
+
+		db.info_restr[obj_id] = r
+	end
+
+	return not r:inside( info_pos )
+end
+
+--' Найти замену сталкеру на работе GUARD по истечению времени работы.
+function find_stalker_for_job(obj, need_job)
+	local smart = get_npc_smart(obj)
+	for id, npc_info in pairs(smart.npc_info) do
+		if (npc_info.job and npc_info.job.reserve_job == true) then
+			smart.npc_info[id].need_job = need_job
+			return
+		end
+	end
+end
+
+function switch_to_desired_job(npc)
+	-- Переключает чувака на работу, которую он хочет (need_job). Работа выбирается отдельно.
+	local smart = get_npc_smart(npc)
+	smart:switch_to_desired_job(npc)
+end
+
+
+-----------------------------------------------------------------------------------------------------------------
+
+function job_in_restrictor(smart, restrictor_name, way_name)
+	--printf("SMART [%s] restr [%s]", smart:name(), tostring(restrictor_name))
+
+	if restrictor_name == nil then
+		return nil
+	end
+
+	local restrictor =  db.zone_by_name[restrictor_name]
+	-- Рестриктор еще не проспонился
+	if restrictor == nil then
+		return nil
+	end
+
+	local patrol = patrol(way_name)
+	local cnt = patrol:count()
+
+	for pt = 0, cnt - 1 do
+		if not restrictor:inside(patrol:point(pt)) then
+			return false
+		end
+	end
+	return true
+end

@@ -1,0 +1,103 @@
+function get_loophole_lead_forester_talk(id, position, fov_direction, enter_direction)
+	return {	id = id,
+				fov_position = position,
+				fov_direction = fov_direction,
+				enter_direction = enter_direction,
+				usable = true,
+				fov	= 45.0,
+				range = 70.0,
+				actions = {
+					idle = {
+						animations = {
+							idle = {
+								"sit",
+							},
+						},
+					},
+					lookout = {
+						animations = {
+							idle = {
+								"talk_1",
+							},
+						},
+					},
+					fire = {
+						animations = {
+							idle = {
+								"talk_2",
+							},
+							shoot = {
+								"talk_2",
+							},							
+						},
+					},
+					fire_no_lookout = {
+						animations = {
+							idle = {
+								"reaction",
+							},
+							shoot = {
+								"reaction",
+							},							
+						},
+					},
+					reload = {
+						animations = {
+							idle = {
+								"sit",
+							},
+						},
+					},
+				},
+				transitions = {
+					{
+						action_from = "idle",
+						action_to = "lookout",
+						weight = 1.2,
+						animations = {
+								"talk_1_in",
+							},
+					},
+					{
+						action_from = "lookout",
+						action_to = "idle",
+						weight = 1.2,
+						animations = {
+								"talk_1_out",
+							},
+					},
+					{
+						action_from = "idle",
+						action_to = "fire",
+						weight = 1.2,
+						animations = {
+								"talk_2_in",
+							},
+					},
+					{
+						action_from = "fire",
+						action_to = "idle",
+						weight = 1.2,
+						animations = {
+								"talk_2_out",
+							},
+					},
+					{
+						action_from = "idle",
+						action_to = "fire_no_lookout",
+						weight = 1.2,
+						animations = {
+								"reaction_in",
+							},
+					},
+					{
+						action_from = "fire_no_lookout",
+						action_to = "idle",
+						weight = 1.2,
+						animations = {
+								"reaction_out",
+							},
+					},
+				},
+			}
+end

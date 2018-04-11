@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="st_faction_stalker">
+		<text>Loner</text>
+	</string>
+	<string id="st_faction_stalker_desc">
+		<text>%c[0,245,245,220]Loners, or free stalkers, are unaligned with any of the factions that operate within the Zone.\n \nDespite being frequently harassed by mutants and other stalkers, small groups have managed to establish strong trading outposts throughout the Zone.</text>
+	</string>
+	<string id="st_faction_bandit">
+		<text>Bandit</text>
+	</string>
+	<string id="st_faction_bandit_desc">
+		<text>%c[0,245,245,220]Bandits are members of the criminal underworld who came to the Zone for different reasons; to make money by selling artefacts, to hide from the law or even to trade in weapons.</text>
+	</string>
+	<string id="st_faction_dolg">
+		<text>Duty</text>
+	</string>
+	<string id="st_faction_dolg_desc">
+		<text>%c[0,245,245,220]Duty is a paramilitary faction at odds with everyone seeking to exploit the Zone and, as Duty sees it, spread its corruption.\n \nThey have long been in fierce conflict with Freedom due to their conflicting ideals.</text>
+	</string>
+	<string id="st_faction_freedom">
+		<text>Freedom</text>
+	</string>
+	<string id="st_faction_freedom_desc">
+		<text>%c[0,245,245,220]Freedom are anarchists and daredevils who declare themselves to be fighting for free access to the Zone and consequently find themselves in constant conflict with Duty.</text>
+	</string>
+	<string id="st_faction_army">
+		<text>Military</text>
+	</string>
+	<string id="st_faction_army_desc">
+		<text>%c[0,245,245,220]The Ukrainian government, through its Ministry of Internal Affairs, maintains the Zone's perimeter with internal troops from the State Security Service.</text>
+	</string>
+	<string id="st_faction_ecolog">
+		<text>Ecologist</text>
+	</string>
+	<string id="st_faction_ecolog_desc">
+		<text>%c[0,245,245,220]The Ecologists are a government-funded body researching the Zone in order to properly harness its potential for the good of mankind.</text>
+	</string>
+	<string id="st_faction_killer">
+		<text>Mercenary</text>
+	</string>
+	<string id="st_faction_killer_desc">
+		<text>%c[0,245,245,220]Mercenaries are experienced fighters from all walks of life who offer their services as hired soldiers, it is unknown who their clients are or why they have interests in the Zone.</text>
+	</string>
+	<string id="st_faction_monolith">
+		<text>Monolith</text>
+	</string>
+	<string id="st_faction_monolith_desc">
+		<text>%c[0,245,245,220]Monolith are a fanatical religious cult hostile to all but their own.\n \nDespite the destruction of the C-Conciousness they have since re-emerged as a resurgent force, retaking many of their former territories.</text>
+	</string>
+	<string id="st_faction_csky">
+		<text>Clear Sky</text>
+	</string>
+	<string id="st_faction_csky_desc">
+		<text>%c[0,245,245,220]Clear Sky is an independent scientific and military organisation focused on researching and understanding the Zone.\n \nFacing almost complete collapse after a failed and costly assault on Chernobyl NPP, a handful of the few remaining survivors managed to rebuild the faction to its former stature.</text>
+	</string>
+	<string id="st_faction_zombied">
+		<text>Zombified</text>
+	</string>
+	<string id="st_faction_zombied_desc">
+		<text>%c[0,245,245,220]Braaaiiinnnsss!!!\n \nZombified stalkers are mindless husks of their previous selves reduced to their most basic animal-like instincts and will attack almost anything that gets too close.</text>
+	</string>
+	<string id="st_mm_faction_back">
+		<text>Back</text>
+	</string>
+	<string id="st_mm_faction_submit">
+		<text>Start</text>
+	</string>
+	<string id="st_mm_faction_rand">
+		<text>Randomize</text>
+	</string>
+	<string id="st_mm_faction_cap_character_name">
+		<text>Name:</text>
+	</string>
+	<string id="st_mm_faction_cap_faction">
+		<text>Faction:</text>
+	</string>
+	<string id="st_mm_ck_story_desc">
+		<text>
+			%c[0,245,245,220]Story mode starts the game with the 'Mysteries of the Zone' storyline, and with the goals to disable the Brain Scorcher and Miracle Machine.\n 
+			\nElements from previous storylines are borrowed and recreated, so this is not for players who feel that strict story continuity is essential.\n
+			\nOnly available to Loner, Duty, Freedom, Ecologist, Mercenary and Clear Sky factions.\n
+			\nNot compatible with Azazel mode.
+		</text>
+	</string>
+	<string id="st_mm_ck_hardcore_desc">
+		<text>
+			%c[0,245,245,220]Ironman mode is a feature that will remove your game saves upon death.\n
+			\nYou are free to make as many saves as you wish but dying will result in the removal of all saves made with this character.
+		</text>
+	</string>
+	<string id="st_mm_ck_hardcore_aim_desc">
+		<text>
+			%c[0,245,245,220]Hardcore AI Aim is a feature that maximizes AI aim predictability, making it more difficult for the player to dodge hits while moving.
+		</text>
+	</string>
+	<string id="st_mm_ck_survival_desc">
+		<text>
+			%c[0,245,245,220]Survival mode is a feature that replaces all spawns with Zombies.\n
+			\nThese hordes will make their way to your location - be prepared! See how long you can survive!
+		</text>
+	</string>
+	<string id="st_mm_ck_azazel_mode_desc">
+		<text>
+			%c[0,245,245,220]In Azazel mode, death is not the end.\n
+			\nLike the demon Azazel you will possess a new body when you die; taking over the form of another random stalker that really exists in the Zone.\n
+			\nIf you have companions, you will become one of them. This feature compliments Ironman and/or Survival mode very well.\n
+			\nNot compatible with Story mode.
+		</text>
+	</string>
+	<string id="st_mm_faction_random_location">
+		<text>Random Location</text>
+	</string>
+	
+	<string id="st_mm_faction_money">
+		<text>Money</text>
+	</string>
+	<string id="st_mm_faction_equipment">
+		<text>Equipment</text>
+	</string>
+	<string id="st_mm_faction_relations">
+		<text>Relations</text>
+	</string>
+</string_table>

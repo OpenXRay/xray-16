@@ -1,0 +1,18 @@
+[smart_terrain]
+squad_id = 3
+max_population = 1
+respawn_params = respawn@ds_deb1
+spawn_point = ds_deb1_spawn_point
+respawn_idle = 86400
+
+[respawn@ds_deb1]
+spawn_heli_strong
+spawn_heli_weak
+
+[spawn_heli_strong]
+spawn_helicopter = simulation_helicopter_strong
+spawn_num = {-achieved_down_to_earth !heli_exist_on_level} 1, 0
+
+[spawn_heli_weak]
+spawn_helicopter = simulation_helicopter_weak
+spawn_num = {+achieved_down_to_earth !heli_exist_on_level} 1, 0

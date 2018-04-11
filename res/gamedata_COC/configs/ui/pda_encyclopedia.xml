@@ -1,0 +1,55 @@
+<w>
+		
+	<frame1 x="35" y="41" width="955" height="90" stretch="1">
+		<texture>ui_inGame2_pda_buttons_background</texture>
+		<caption x="35" y="100" width="955" height="30">
+			<text font="letterica18" align="c" x="0" y="0" r="170" g="170" b="170">pda_btn_encyclopedia_title</text>
+		</caption>
+	</frame1>
+	
+	<frame2 x="35" y="137" width="955" height="571" stretch="1">
+		<texture>ui_inGame2_pda_buttons_background</texture>
+	</frame2>
+	
+	<border x="53" y="162" width="922" height="520" stretch="1">
+		<!-- Top -->
+		<auto_frameline x="0" y="0" width="922" height="1" vertical="0">
+			<texture>ui_inGame2_pda_line_horizontal</texture>
+		<!-- Bottom -->
+		</auto_frameline>
+		<auto_frameline x="0" y="520" width="922" height="1" vertical="0">
+			<texture>ui_inGame2_pda_line_horizontal</texture>
+		</auto_frameline>
+		<!-- Left -->
+		<auto_frameline x="0" y="1" width="1" height="519" vertical="1">
+			<texture>ui_inGame2_pda_line_vertical</texture>
+		</auto_frameline>
+		<!-- Right -->
+		<auto_frameline x="923" y="1" width="1" height="519" vertical="1">
+			<texture>ui_inGame2_pda_line_vertical</texture>
+		</auto_frameline>
+		<!-- Center-Left -->
+		<auto_frameline x="136" y="1" width="1" height="519" vertical="1">
+			<texture>ui_inGame2_pda_line_vertical</texture>
+		</auto_frameline>
+		<!-- Center-Right -->
+		<auto_frameline x="271" y="1" width="1" height="519" vertical="1">
+			<texture>ui_inGame2_pda_line_vertical</texture>
+		</auto_frameline>
+	</border>
+	
+	<article_list x="190" y="163" width="134" height="519" item_height="22" can_select="1" always_show_scroll="0">
+		<font font="letterica16" r="210" g="210" b="210"/>
+	</article_list>
+	
+	<category_list x="54" y="163" width="135" height="519" item_height="22" can_select="1" always_show_scroll="0">
+		<font font="letterica16" r="210" g="210" b="210"/>
+	</category_list>
+	
+	<description>
+		<scrollbar x="326" y="163" width="650" height="519" right_ident="0" left_ident="0" top_indent="0" bottom_indent="0" vert_interval="0" always_show_scroll="1"/>
+		<information width="628" height="1">
+			<text font="letterica16" color="ui_6" complex_mode="1" align="l" vert_align="t" x="5" y="5"/>
+		</information>
+	</description>
+</w>

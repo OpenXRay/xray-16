@@ -1,0 +1,148 @@
+<?xml version='1.0' encoding="windows-1251"?>
+<xml>
+    <specific_character id="kat_enemy_soldier_default1" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio></bio>
+    <class>kat_enemy_soldier</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\monolith\</snd_config>
+    <rank>1666</rank>
+    <reputation>-1048</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_ap \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="kat_enemy_soldier_default2" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio></bio>
+    <class>kat_enemy_soldier</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\monolith\</snd_config>
+    <rank>2798</rank>
+    <reputation>-428</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_ap \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="kat_enemy_soldier_default3" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_3</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio></bio>
+    <class>kat_enemy_soldier</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\monolith\</snd_config>
+    <rank>19324</rank>
+    <reputation>-2407</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_3</visual>
+    <supplies>
+        [spawn] \n
+        wpn_val \n
+        ammo_9x39_ap = 1 \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="kat_enemy_grenadier_default" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio></bio>
+    <class>kat_enemy_grenadier</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\monolith\</snd_config>
+    <rank>1100</rank>
+    <reputation>-616</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_ap \n
+        grenade_f1 = 10 \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="kat_enemy_sniper_default" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio></bio>
+    <class>kat_enemy_sniper</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\monolith\</snd_config>
+    <rank>2644</rank>
+    <reputation>-1377</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_2</visual>
+    <supplies>
+        [spawn] \n
+        wpn_abakan = 1 \n
+        ammo_5.45x39_ap \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+    <specific_character id="kat_enemy_sniper_strong" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_4</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio></bio>
+    <class>kat_enemy_sniper_strong</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\monolith\</snd_config>
+    <rank>22664</rank>
+    <reputation>1868</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_4</visual>
+    <supplies>
+        [spawn] \n
+        wpn_svu \n
+        ammo_7.62x54_7h1 \n
+#include "gameplay\character_items.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    <start_dialog>hello_dialog</start_dialog>
+    </specific_character>
+    
+</xml>

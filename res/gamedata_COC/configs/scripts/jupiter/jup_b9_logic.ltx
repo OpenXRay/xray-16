@@ -1,0 +1,47 @@
+[logic]
+active = nil;sr_idle@spawn
+
+[sr_idle@spawn]
+on_info = {-jup_b9_shliachin_spawn} sr_idle %=spawn_corpse (jup_b9_shliachin : jup_b9_shliachin_spawn_point : 0) +jup_b9_shliachin_spawn%
+
+[sr_idle]
+on_info = {+jup_b9_give_task} sr_idle@1
+
+[sr_idle@1]
+on_info = {+jup_b9_heli_1_searching -jup_b9_heli_1_searched} sr_idle@timer %=disable_ui =run_postprocess(fade_in:7710)%
+
+[sr_idle@timer]
+on_game_timer = 20 | sr_idle@timer_2 %=run_postprocess(black:7711:true) =create_cutscene_actor_with_weapon(jup_b9_actor_visual_stalker:jup_b9_actor_visual_stalker_walk:0:30)%
+
+[sr_idle@timer_2]
+on_game_timer = 40 | sr_cutscene %=stop_postprocess(7710) =stop_postprocess(7711) +jup_b9_heli_1_play_sound%
+
+[sr_cutscene]
+point = jup_b9_actor_visual_stalker_walk
+look = jup_b9_actor_visual_stalker_look
+global_cameffect = true
+enable_ui_on_end = false
+outdoor = true
+cam_effector = scenario_cam\jupiter\jup_b9_heli_1_camera
+on_signal = cameff_end | sr_idle@2 %=give_actor(jup_b9_blackbox) +jup_b9_heli_1_searched =run_postprocess(black:7713:true)%
+on_signal2 = cam_effector_stop | sr_idle@2 %=give_actor(jup_b9_blackbox) +jup_b9_heli_1_searched =run_postprocess(black:7713:true)%
+on_info = {+jup_b9_heli_1_sound -jup_b9_heli_after_camera_fade} %+jup_b9_heli_after_camera_fade =run_postprocess(fade_in:7712)%
+on_info2 = {+jup_b9_camera_stop} %=stop_sr_cutscene%
+on_info3 = {+jup_b9_actor_hit} %=stop_sr_cutscene%
+
+[sr_idle@2]
+on_game_timer = 10 | sr_idle@3 %=stop_postprocess(7712) =stop_postprocess(7713) +jup_b9_heli_1_searched =enable_ui =teleport_actor(jup_b9_actor_visual_stalker_walk :jup_b9_actor_visual_stalker_look)%
+
+[sr_idle@3]
+on_info = {+jup_b9_blackbox_decrypting} sr_idle@4
+on_info2 = {+jup_b9_heli_1_searched -save_jup_b9_searched_heli_1} %+save_jup_b9_searched_heli_1 =scenario_autosave(st_save_jup_b9_searched_heli_1)%
+
+[sr_idle@4]
+on_game_timer = 10800 | sr_idle@5 %+jup_b9_blackbox_decrypted_time%
+on_info = {+jup_b9_blackbox_decrypted_time} sr_idle@5
+
+[sr_idle@5]
+on_info = {+jup_b9_blackbox_records_go -jup_b9_blackbox_records_end} %=disable_ui_only =play_sound(jup_b9_blackbox_records)%
+on_signal = sound_end | sr_idle@6 % =enable_ui +jup_b9_blackbox_records_end %
+
+[sr_idle@6]

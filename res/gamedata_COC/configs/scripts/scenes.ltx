@@ -1,0 +1,184 @@
+;[имя_уровня_на котором_есть_данная_сцена]
+;имя сцены		= инфопоршн начала сцены|патрульный путь|патрульный путь|имена секций предметов которые нужно доспаунить игроку через запятую.
+;Пример:
+;[jupiter]
+;jup_b16_scene 	= info1|test_walk|test_look|wpn_gauss,wpn_pb,grenade_f1,grenade_f1
+
+[pripyat]
+pri_b301 = test_info12 | pri_b301_actor_walk | pri_b301_actor_look
+pri_b302 = nil | pri_b302_start_walk | pri_b302_start_look | detector_elite
+pri_a20 = pri_a17_actor_bring_gauss_rifle | pri_a15_actor_start_walk | pri_a16_military_colonel_kovalski_walk | pri_a17_gauss_rifle, wpn_ak74, wpn_fort, grenade_f1, grenade_f1, medkit, medkit, medkit, bandage, bandage, bandage
+pri_a17 = pri_a17_task_start | pri_a15_actor_start_walk|pri_a15_actor_start_look | wpn_ak74, wpn_fort, grenade_f1, grenade_f1, medkit, medkit, medkit, bandage, bandage, bandage
+pri_a18 = pri_a18_start | pri_a18_actor_walk | pri_a18_actor_look | wpn_ak74, wpn_fort, grenade_f1, grenade_f1, medkit, medkit, medkit, bandage, bandage, bandage
+pri_a21 = pri_a21_start | pri_a21_actor_walk | pri_a21_actor_look | wpn_ak74, wpn_fort, grenade_f1, grenade_f1, medkit, medkit, medkit, bandage, bandage, bandage
+pri_b304_scene = pri_b304_start | pri_b304_actor_walk | pri_b304_actor_look
+pri_a22 + pri_a25 = pri_a22_start | pri_a22_actor_walk | pri_a22_actor_look | wpn_ak74, wpn_wincheaster1300
+pri_b35 = pri_b35_task_start | pri_a16_pri_b305_kovalskiy_strelok_operation_walk | pri_a16_yarmoshuk_look
+pri_b35_continue = pri_b35_task_continue
+pri_b306_scene = pri_b306_task_start | pri_b306_actor_walk | pri_b306_actor_look | wpn_vintorez
+pri_b36_scene = pri_b36_fake | pri_b36_start_walk | pri_b36_start_look | wpn_vintorez
+pri_b305_scene_(continue_of_pri_b25) = pri_a25_rfi_source_eliminated
+pri_a15_vano_out = pri_a15_vano_out
+pri_a15_sokolov_out = pri_a15_sokolov_out
+pri_a15_zulus_out = pri_a15_zulus_out
+pri_a15_wanderer_out = pri_a15_wanderer_out
+pri_a28_evac = pri_a28_evacuation_start | pri_a16_pri_a20_garick_walk | pri_a16_pri_a20_garick_look | wpn_g36, wpn_svd, ammo_5.56x45_ap, ammo_5.56x45_ap, ammo_5.56x45_ap, ammo_5.56x45_ap, ammo_5.56x45_ap, ammo_7.62x54_7h1, ammo_7.62x54_7h1, ammo_7.62x54_7h1, ammo_7.62x54_7h1, ammo_7.62x54_7h1, medkit_scientic, medkit_scientic, medkit_scientic, medkit_army, medkit_army, medkit_army, jup_b10_notes_01, jup_b10_notes_02, jup_b10_notes_03
+pri_a28_skip = pri_a28_update_task_cover_strelok
+pri_a28_cutscene = pri_a28_cutscene_start
+
+[jupiter]
+;jup_b208_scene = jup_b211_swamp_bloodsuckers_hunt_done | jup_a9_actor_1_walk | jup_a9_actor_1_look
+jup_b208_scene_done = jup_b208_burers_dead | jup_b212_start_walk_2 | jup_b212_start_look_2
+;jup_b212_burers_killed_not_on_base = jup_b208_burers_hunt_done | jup_b212_start_walk | jup_b212_start_look
+;jup_b212_burers_killed_on_base = jup_b208_burers_hunt_done | jup_a6_actor_walk | jup_a6_actor_look
+;jup_b212_retire_told = jup_b220_trapper_about_retire_told | jup_a6_actor_walk | jup_a6_actor_look
+jup_b212_scene_start = jup_b212_jupiter_chimera_hunt_started  | jup_a6_actor_walk | jup_a6_actor_look  
+jup_b8_scene = info1 | jup_b8_start_walk | jup_b8_start_look | wpn_fn2000
+jup_b8_scene_zatichka = jup_b8_start_zatichka | jup_b8_start_walk | jup_b8_start_look | wpn_fn2000
+jup_b209_scene = jup_b6_bio_talk_about_mutant_end | jup_b209_start_walk | jup_b209_start_look
+jup_a12_scene = jup_a12_task_start | jup_a12_actor_base_walk | jup_a12_actor_base_look | wpn_ak74, wpn_fort, grenade_f1, grenade_f1, medkit, medkit, medkit, bandage, bandage, bandage
+jup_b32_scene = jup_b32_task_start_cheat | jup_b32_actor_base_walk | jup_b32_actor_base_look
+jup_b201_scene = nil | jup_b201_start_walk | jup_b201_start_look | detector_elite
+jup_b207_scene = zat_b5_actor_help_dealer | jup_a6_actor_walk | jup_a6_actor_look
+jup_b207_wo_morgan_scene = zat_b5_trader_death | jup_a6_actor_walk | jup_a6_actor_look | device_pda_zat_b5_dealer
+zat_b30_scene = zat_b30_actor_in_tempting_business | jup_b43_actor_walk | jup_b43_actor_look | detector_elite, detector_elite, detector_elite
+jup_b1_scene = jup_b1_task_start | jup_b1_actor_telep_stay_2 | jup_b1_actor_telep_look_2 | wpn_ak74, wpn_fort, scientific_outfit, grenade_f1, grenade_f1, medkit, medkit, medkit, bandage, bandage, bandage
+jup_b6_scene = jup_b6_task_start | jup_b1_actor_telep_stay_2 | jup_b1_actor_telep_look_2 | wpn_ak74, wpn_fort, scientific_outfit, grenade_f1, grenade_f1, medkit, medkit, medkit, bandage, bandage, bandage
+jup_b206_scene = jup_b218_soldier_need_outfit | jup_b1_actor_telep_stay_2 | jup_b1_actor_telep_look_2
+jup_b16_scene = info1 | jup_b1_actor_telep_stay_2 | jup_b1_actor_telep_look_2 | wpn_ak74, wpn_fort, grenade_f1, grenade_f1, medkit, medkit, medkit, bandage, bandage, bandage
+;jup_b200_scene = jup_b217_stalker_tech_met | jup_b200_start_walk | jup_b200_start_look | wpn_ak74, wpn_fort, grenade_f1, grenade_f1, medkit, medkit, medkit, bandage, bandage, bandage
+jup_a10_scene = jup_a10_run_quest
+jupiter_b9_scene = jup_b217_stalker_tech_met zat_a1_game_start | jup_b9_start_walk | jup_b9_start_look | wpn_ak74, wpn_fort, grenade_f1, grenade_f1, medkit, medkit, medkit, bandage, bandage, bandage
+jupiter_b9_scene = zat_a1_game_start | jup_b9_start_walk | jup_b9_start_look | wpn_ak74, wpn_fort, grenade_f1, grenade_f1, medkit, medkit, medkit, bandage, bandage, bandage
+;jupiter_b9_timer_scene = jup_b9_blackbox_decrypted_time | jup_b200_start_walk | jup_b200_start_look | wpn_ak74, wpn_fort, grenade_f1, grenade_f1, medkit, medkit, medkit, bandage, bandage, bandage
+jup_b10_UFO = jup_b10_start_way | jup_b10_start_look
+jup_b10_Azot = jup_a6_actor_walk | jup_a6_actor_look
+jup_b10_s01 = jup_b10_secret_01_way | jup_b10_secret_01_look
+jup_b10_s02 = jup_b10_secret_02_way | jup_b10_secret_02_look
+jup_b10_s03 = jup_b10_secret_03_way | jup_b10_secret_03_look
+jup_b4_scene = info1 | jup_b4_start_walk | jup_b4_start_look | wpn_ak74, wpn_fort, grenade_f1, grenade_f1, medkit, medkit, medkit, bandage, bandage, bandage, detector_elite
+jup_b43 = jup_b43_start | jup_b43_actor_walk | jup_b43_actor_look | wpn_ak74, wpn_fort, grenade_f1, grenade_f1, medkit, medkit, medkit, bandage, bandage, bandage, detector_elite
+zat_b215_on_jup_no_infos                    = zat_b215_start | jup_a6_actor_walk | jup_a6_actor_look
+zat_b215_on_jup_heli_2                      = zat_b100_heli_2_searched | jup_a6_actor_walk | jup_a6_actor_look
+zat_b215_on_jup_evac_way_to_pripyat_counter = zat_b107_evacuation_info_full_1 | jup_a6_actor_walk | jup_a6_actor_look
+zat_b215_on_jup_evac_way_gates_counter      = zat_b107_evacuation_info_full_2 | jup_a6_actor_walk | jup_a6_actor_look
+zat_b215_on_jup_a16_guide_met               = pri_a16_stalker_guide_met | jup_a6_actor_walk | jup_a6_actor_look
+jup_b19_scene = jup_b19_fake | jup_a6_actor_walk | jup_a6_actor_look
+jup_b15_scene = jup_a9_tech_way_info | jup_b15_actor_walk | jup_b15_actor_look
+jup_b220_scene 								=  info1| jup_b220_start_walk | jup_b220_start_look
+jup_b220_scene+zat_b57 						=  zat_b57_den_of_the_bloodsucker_tell_stalkers_about_destroy_lair_give
+jup_b220_scene+zat_b106 					=  zat_b106_chimera_dead
+jup_b220_scene+jup_b212 					=  jup_b212_jupiter_chimera_hunt_done
+jup_b46_scene = jup_b46_spatial_bubble_mentioned | jup_b1_actor_telep_stay_2 | jup_b1_actor_telep_look_2 | detector_scientific
+jup_b107_scene = zat_b107_start_jupiter | jup_zat_b107_start_walk | jup_zat_b107_start_look
+jup_b213_scene = jup_b213_fake | jup_b213_actor_spawn_walk | jup_b213_actor_spawn_look
+jup_b218_scene_vano = jup_b218_pripyat_group_gathering | jup_a6_jup_b202_snag_look | jup_a6_jup_b202_snag_walk
+jup_b218_scene_sokolov = jup_b218_pripyat_group_gathering | jup_b41_pri_a15_sokolov_look | jup_b41_pri_a15_sokolov_walk
+jup_b218_scene_monolith = jup_b218_pripyat_group_gathering | jup_b4_monolith_squad_leader_monolith_skin_begin_look | jup_b4_monolith_squad_leader_monolith_skin_begin_walk
+jup_b203_scene = jup_b203_fake | jup_b203_start_walk | jup_b203_start_look
+jup_b217_scene = jup_b217_task_start | jup_a6_actor_walk | jup_a6_actor_look | toolkit_1, toolkit_2, toolkit_3
+;zat_b33_tech_scene = zat_b33_find_package | jup_b200_start_walk | jup_b200_start_look | zat_b33_safe_container
+jup_b204_scene = jup_b204_start | jup_b204_start_way | jup_b204_start_look | wpn_vintorez
+jup_b214_scene = jup_b214_start | jup_b214_actor_walk | jup_b214_actor_look | wpn_vintorez
+jup_b205_scene = jup_b205_start | jup_b205_start_way | jup_b205_start_look
+jup_b211_scene = jup_b211_start | jup_a6_actor_walk | jup_a6_actor_look | wpn_vintorez
+jup_b219_monolith = jup_b218_monolith_hired | jup_b219_actor_dark_walk |jup_b219_actor_dark_look
+jup_b219_soldier = jup_b218_soldier_hired | jup_b219_actor_dark_walk |jup_b219_actor_dark_look
+jup_b219_vano = jup_a10_vano_agree_go_und | jup_b219_actor_dark_walk |jup_b219_actor_dark_look
+jup_b219_start =  jup_b218_gather_squad_complete | jup_b219_actor_dark_walk |jup_b219_actor_dark_look
+
+[zaton]
+zat_b14_scene = nil | zat_scene_actor_walk | zat_scene_actor_look
+zat_b38_scene = nil | zat_scene_actor_walk | zat_scene_actor_look
+zat_b42_scene = nil | zat_b42_start_walk | zat_b42_start_look
+zat_b55_scene = nil | zat_b55_start_walk | zat_b55_start_look | detector_elite
+;zat_b7_scene = nil | zat_b7_actor_base_walk | zat_b7_actor_base_look | wpn_ak74, grenade_f1, grenade_f1, medkit, medkit, medkit, bandage, bandage, bandage
+zat_b7_scene = nil | val_smart_terrain_7_5_actor_base_walk | val_smart_terrain_7_5_actor_base_look | wpn_ak74, grenade_f1, grenade_f1, medkit, medkit, medkit, bandage, bandage, bandage
+zat_b29_scene = zat_b29_task_start | zat_b29_actor_base_walk | zat_b29_actor_base_look | detector_elite, medkit, medkit, bandage, bandage
+zat_b29_exclusive_scene = zat_b29_exclusive_conditions
+zat_b30_scene = zat_b29_task_start | zat_b30_actor_base_walk | zat_b30_actor_base_look
+zat_b104_scene = test_info_1 | zat_b104_actor_walk | zat_b104_actor_look
+zat_b107_scene = zat_b107_start_zaton | zat_b107_start_walk | zat_b107_start_look
+jup_b207_scene = test_info_1 | jup_a6_actor_walk | jup_a6_actor_look | device_pda_zat_b5_dealer
+zat_b101_scene = zat_a1_game_start | zat_b101_heli_5_crash_start_walk | zat_b101_heli_5_crash_start_look | wpn_ak74 
+zat_b103_scene = nil | zat_stalker_base_smart_zat_a2_stalker_mechanic_look | zat_stalker_base_smart_zat_a2_stalker_mechanic_walk 
+zat_b103_scene_mercs = info1 | zat_b103_actor_walk | zat_b103_actor_look 
+zat_b22_scene = zat_b38_cop_passed_away
+zat_b5_scene_stalkers = zat_b5_actor_with_stalkers | zat_b5_teleport_actor_walk | zat_b5_teleport_actor_look
+zat_b5_scene_bandits = zat_b5_actor_with_bandits | zat_b5_teleport_actor_walk | zat_b5_teleport_actor_look
+zat_b5_scene_dealer = zat_b5_actor_with_dealer | zat_b5_teleport_actor_walk | zat_b5_teleport_actor_look
+zat_b57_scene = zat_b38_den_of_the_bloodsucker_inform_stalkers_give | zat_scene_actor_walk | zat_scene_actor_look | wpn_ak74, wpn_fort
+;zat_b57_scene_has_gas = zat_b38_den_of_the_bloodsucker_inform_stalkers_give | zat_scene_actor_walk | zat_scene_actor_look | zat_b57_gas, wpn_ak74, wpn_fort
+zat_b52_scene = nil | zat_b52_actor_walk | zat_b52_actor_look | wpn_groza_nimble, wpn_desert_eagle_nimble, wpn_fn2000_nimble, wpn_g36_nimble, wpn_protecta_nimble, wpn_mp5_nimble, wpn_sig220_nimble, wpn_spas12_nimble, wpn_usp_nimble, wpn_vintorez_nimble, wpn_svu_nimble, wpn_svd_nimble
+zat_b18_scene = zat_b30_need_artefact_from_noah | zat_b18_actor_teleport_walk | zat_b18_actor_teleport_look 
+zat_b51_scene = jup_a9_tech_conservation_info | zat_b106_actor_walk | zat_b106_actor_look
+zat_b215_scene = nil | zat_scene_actor_walk | zat_scene_actor_look
+;zat_b215_heli_2                       = zat_b100_heli_2_searched | zat_scene_actor_walk | zat_scene_actor_look
+;zat_b215_a16_guide_met                = pri_a16_stalker_guide_met |  zat_scene_actor_walk | zat_scene_actor_look
+;zat_b215_evac_way_to_pripyat_counter  = zat_b107_evacuation_info_full_1 | zat_scene_actor_walk | zat_scene_actor_look
+;zat_b215_evac_way_gates_counter       = zat_b107_evacuation_info_full_2 | zat_scene_actor_walk | zat_scene_actor_look
+zaton_b28_scene = zat_a1_game_start | zat_b28_start_walk | zat_b28_start_look | wpn_ak74, wpn_fort, grenade_f1, grenade_f1, medkit, medkit, medkit, bandage, bandage, bandage
+zat_b12_scene = zat_b12_task_start | zat_b12_actor_teleport_stay | zat_b12_actor_teleport_look | wpn_ak74, wpn_fort, grenade_f1, grenade_f1, medkit, medkit, medkit, bandage, bandage, bandage
+zat_b20_scene = zat_b30_need_artefact_from_noah | zat_b18_actor_teleport_walk | zat_b18_actor_teleport_look 
+;jup_b218_on_zaton = jup_b218_pripyat_group_gathering | zat_scene_actor_walk | zat_scene_actor_look
+;jup_b218_on_zaton_sokolov_agreed = jup_b218_soldier_agreed | zat_scene_actor_walk | zat_scene_actor_look
+zat_b40_scene = nil | zat_b30_actor_base_walk | zat_b30_actor_base_look 
+zat_b44_scene_anomaly = zat_b44_start | zat_b44_actor_walk | zat_b44_actor_look | detector_elite 
+zat_b44_scene = nil | zat_scene_actor_walk | zat_scene_actor_look | detector_elite 
+zat_b3_scene(teleport&vodka) 		= nil | zat_scene_actor_walk | zat_scene_actor_look | vodka, vodka, vodka, vodka, vodka, vodka, vodka, vodka, vodka, vodka, vodka, vodka, vodka, vodka, vodka, vodka, vodka, vodka, vodka, vodka
+zat_b3_scene(give_gauss) 	= zat_b3_start_gauss_search | zat_scene_actor_walk | zat_scene_actor_look | pri_a17_gauss_rifle
+zat_b3_scene(give_docs) 	= nil | zat_scene_actor_walk | zat_scene_actor_look | zat_a23_gauss_rifle_docs
+zat_b3_scene(give_tools) 	= nil | zat_scene_actor_walk | zat_scene_actor_look | toolkit_1, toolkit_2, toolkit_3
+zat_b39 = zat_b39_start | zat_b39_actor_walk | zat_b39_actor_look | wpn_ak74, wpn_fort, grenade_f1, grenade_f1, medkit, medkit, medkit, bandage, bandage, bandage, detector_elite
+zat_b56 = zat_b56_start | zat_b56_way_start | zat_b56_look_start | detector_elite
+zat_b53 = zat_b53_start | zat_b53_actor_walk | zat_b53_actor_look | detector_advanced
+zat_b54 = zat_b54_start | zat_b54_start_way | zat_b54_start_look | detector_elite
+zat_b106_scene 	= nil | zat_b106_actor_walk | zat_b106_actor_look
+zat_b106_scene(found_soroka) 	= zat_b106_found_soroka | zat_b106_actor_walk | zat_b106_actor_look
+zat_a1_gamestart = zat_a1_start
+
+[jupiter_b9]
+jupiter_b9_scene = jup_b217_stalker_tech_met zat_a1_game_start | jup_b9_start_walk | jup_b9_start_look | wpn_ak74, wpn_fort, grenade_f1, grenade_f1, medkit, medkit, medkit, bandage, bandage, bandage
+jupiter_b9_timer_scene = jup_b9_blackbox_decrypted_time | jup_b9_start_walk | jup_b9_start_look | wpn_ak74, wpn_fort, grenade_f1, grenade_f1, medkit, medkit, medkit, bandage, bandage, bandage
+
+[zaton_b28]
+zaton_b28_scene = zat_b28_start | zat_b28_start_walk | zat_b28_start_look | wpn_ak74, wpn_fort, grenade_f1, grenade_f1, medkit, medkit, medkit, bandage, bandage, bandage
+
+[jupiter_b219]
+jupiter_b219_monolith = jup_b218_monolith_hired | jup_b219_actor_levelchanger_walk |jup_b219_actor_levelchanger_look
+jupiter_b219_sokolov = jup_b218_soldier_hired | jup_b219_actor_levelchanger_walk |jup_b219_actor_levelchanger_look
+jupiter_b219_vano = jup_a10_vano_agree_go_und | jup_b219_actor_levelchanger_walk |jup_b219_actor_levelchanger_look
+jupiter_b219_start =  jup_b218_gather_squad_complete | jup_b219_actor_levelchanger_walk |jup_b219_actor_levelchanger_look
+
+[bes_selo_jup]
+jup_b219_monolith = jup_b218_monolith_hired | jup_b219_actor_dark_walk |jup_b219_actor_dark_look
+jup_b219_soldier = jup_b218_soldier_hired | jup_b219_actor_dark_walk |jup_b219_actor_dark_look
+jup_b219_vano = jup_a10_vano_agree_go_und | jup_b219_actor_dark_walk |jup_b219_actor_dark_look ;jup_a10_vano_agree_go_und
+jup_b219_start =  jup_b218_gather_squad_complete | jup_b219_actor_dark_walk |jup_b219_actor_dark_look
+
+[corr_snorks]
+zat_b12_scene = zat_b12_task_start | zat_b12_traveller_squad | zat_b12_actor_teleport_look | wpn_ak74, wpn_fort, grenade_f1, grenade_f1, medkit, medkit, medkit, bandage, bandage, bandage
+
+[corr_bloodsuckers]
+zat_b38_scene_1 = zat_b38_disappearance_stalkers_find_to_be_missing_hunter_give_task | zat_b106_actor_walk | zat_b106_actor_look
+zat_b38_scene_2 = zat_b38_lair_started | zat_b38_stalker_wrong_dead_body_walk_and_look
+zat_b38_scene_3 = zat_b38_stalker_cop_find_lair_pda_play
+zat_b38_scene_4 = zat_b38_disappearance_stalkers_meet_ment_give | zat_b38_traveller_actor | zat_b38_stalker_cop_lair_look
+
+[corr_controler]
+zat_b42_scene = nil | zat_b42_start_walk | zat_b42_start_look
+
+[corr_chimera]
+zat_b106_1_scene = zat_b106_start_hunt 
+;zat_b106_actor_look zat_stalker_base_smart_general_characters_spawn_point
+zat_b106_2_scene = zat_b106_gonta_accept_actor
+
+[corr_tushkano]
+pri_b304_scene = pri_b304_start | pri_b304_actor_walk | pri_b304_actor_look
+
+[corr_burer]
+jup_b205_scene = jup_b205_start | jup_b205_smart_terrain_zombie_10_1_walk | b205_actor_look
+
+[redstain_selo]
+all_good = all_good
+all_bad = all_bad

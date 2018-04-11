@@ -1,0 +1,60 @@
+;Meets default
+[meet@def]
+close_snd_hello = nil
+close_snd_bye = nil
+snd_on_use = nil
+close_distance = 0
+far_distance = 0
+close_victim = nil
+use = false
+abuse = false
+
+
+
+;Hits
+[hit@def]
+on_info = {!has_enemy =hit_by_actor =counter_greater(pri_a28_friendly_hit:7) =squad_exist(pri_a16_military_squad)} %=set_squad_enemy_to_actor(pri_a16_military_squad) +pri_a28_actor_enemy%
+on_info2 = {!has_enemy =hit_by_actor !counter_greater(pri_a28_friendly_hit:7) =squad_exist(pri_a16_military_squad)} %=inc_counter(pri_a28_friendly_hit)%
+
+;Death
+[death@def]
+on_info = %=stop_sound%
+on_info2 = {=has_enemy =killed_by_actor !counter_greater(pri_a28_friendly_hit:7)} %=inc_counter(pri_a28_friendly_hit)%, {=killed_by_actor =squad_exist(pri_a16_military_squad)} %=set_squad_enemy_to_actor(pri_a16_military_squad) +pri_a28_actor_enemy%
+
+
+
+;Sounds
+[walker@fight]
+meet = meet@def
+wounded = wounded@no_wound
+def_state_standing = threat_na
+def_state_moving = assault
+def_state_campering = hide_na
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+radius = 70
+no_retreat = true
+use_camp = false
+
+[walker@ignore]:walker@fight
+combat_ignore_cond = {+pri_a28_actor_enemy} false, true
+combat_ignore_keep_when_attacked = true
+radius = 15
+
+
+[walker@kovalski_fight]:walker@fight
+on_info99 = {-pri_a28_actor_enemy -pri_a28_colonel_strelok_out +pri_a28_strelok_dead} %+pri_a28_colonel_strelok_out =play_sound(pri_a28_colonel_strelok_out)%
+
+[walker@kovalski_ignore]:walker@ignore
+on_info99 = {-pri_a28_actor_enemy -pri_a28_colonel_strelok_out +pri_a28_strelok_dead} %+pri_a28_colonel_strelok_out =play_sound(pri_a28_colonel_strelok_out)%
+
+
+
+;Wounded - no wounds
+[wounded@no_wound]
+hp_state = 0 | wounded_heavy@help_heavy
+hp_state_see = 0 | wounded_heavy@help_heavy
+hp_victim = 0 | nil
+hp_cover = 0 | false
+hp_fight = 0 | false

@@ -1,0 +1,50 @@
+;***********ESCAPE**
+;********************
+[esc_mech_meet]
+type = npc
+actor_stereo = false
+npc_prefix = false
+path = scenario\escape\esc_mech_meet_
+shuffle = rnd
+idle = 1,10,100
+story_ids = esc_smart_terrain_5_7_loner_mechanic_stalker
+
+[esc_mech_meet_bye]
+type = npc
+actor_stereo = false
+npc_prefix = false
+path = scenario\escape\esc_mech_meet_bye_
+shuffle = rnd
+idle = 1,10,100
+story_ids = esc_smart_terrain_5_7_loner_mechanic_stalker
+
+[esc_nimble_order_ready]
+type                                     = actor
+path                                     = characters_voice\scenario\escape\esc_nimble_order
+shuffle                                  = rnd
+idle                                     = 3,5,100
+levels 									 = l01_escape
+
+[esc_nimble_greeting_order_ready]
+type                                     = npc
+npc_prefix                               = false
+path                                     = scenario\escape\esc_nimble_greeting_order_ready_
+shuffle                                  = loop
+idle                                     = 10,15,100
+story_ids = esc_2_12_stalker_nimble
+
+[esc_nimble_greeting_order_not_ready]
+type                                     = npc
+npc_prefix                               = false
+path                                     = scenario\escape\esc_nimble_greeting_order_not_ready_
+shuffle                                  = loop
+idle                                     = 10,15,100
+story_ids = esc_2_12_stalker_nimble
+
+[esc_nimble_greeting]
+type                                     = npc
+npc_prefix                               = false
+path                                     = scenario\escape\esc_nimble_greeting_
+shuffle                                  = loop
+idle                                     = 10,15,100
+story_ids = esc_2_12_stalker_nimble

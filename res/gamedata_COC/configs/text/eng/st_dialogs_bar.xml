@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+    <string id="bar_arena_man_job_0">
+        <text>Who do you have for me to fight?</text>
+    </string>
+    <string id="bar_arena_man_job_11">
+        <text>So, your first fight? Your opponent is a piece of meat just like you. He's here because of his debts and he only has two options: to come out and fight, or to land himself in the nearest anomaly. He's gonna fight like a cornered animal. Equipment for today... Lemme think... How about you two use basic pistols, two boxes of ammo should be plenty. Either kick his ass or we feed you to the dogs - not much of a choice. Go on now.</text>
+    </string>
+    <string id="bar_arena_man_job_111">
+        <text>I'm ready.</text>
+    </string>
+    <string id="bar_arena_man_job_112">
+        <text>I'm not ready.</text>
+    </string>
+    <string id="bar_arena_man_job_12">
+        <text>Your last fight didn't mean shit, you're still the same piece of meat you were before and no self-respecting person will bet a single mag on you. If you wanna earn some proper cash you're gonna have to make a few more appearances in the arena. Your new opponent also got through the first round, and his fight was a lot harder than yours. I don't like him, to be honest - he kills too quickly and the crowd doesn't like that. So, go and show us what you can do! The stakes will increase after this fight - all you gotta do is stay alive. Move it!</text>
+    </string>
+    <string id="bar_arena_man_job_121">
+        <text>I'm ready.</text>
+    </string>
+    <string id="bar_arena_man_job_122">
+        <text>I'm not ready.</text>
+    </string>
+    <string id="bar_arena_man_job_13">
+        <text>Well, well... You're not as much of a pussy as you first seemed. Now it's time to test you out in a real fight. You're up against two guys. The first one's called Swede and I don't remember the second one's name. They were paired up intentionally as they hate each other's guts so don't worry about them working as a team - they're more likely to shoot each other. Today is rifle day so don't let them get too close or we'll have to pick you up piece by piece. The odds are 10:1 so if you win you'll make a fair amount. Off you go!</text>
+    </string>
+    <string id="bar_arena_man_job_131">
+        <text>I'm ready.</text>
+    </string>
+    <string id="bar_arena_man_job_132">
+        <text>I'm not ready.</text>
+    </string>
+    <string id="bar_arena_man_job_14">
+        <text>Well, now I can safely say that you're a fighter, a real fighter. Now it's time for a team fight. You get to fight with two rookies - two brothers - on your side. They haven't fought yet but they're brothers, so I had to put them into a team fight. I wouldn't expect any real help from them if I were you. You're fighting an experienced team, they're contenders for the final this season. A dangerous lot. They use different weapons but one has an automatic shotgun - be very careful with him. Good luck, pal... You're gonna need it.</text>
+    </string>
+    <string id="bar_arena_man_job_141">
+        <text>I'm ready.</text>
+    </string>
+    <string id="bar_arena_man_job_142">
+        <text>I'm not ready.</text>
+    </string>
+    <string id="bar_arena_man_job_15">
+        <text>You've got a special fight today. Even the army has heard about you! Don't be surprised, they fight here too - there's even a general in the crowd. These guys are from the Spetsnaz or OMON. They're well armed and their armour is as good as you'd expect. Don't worry though, I ain't gonna leave you out in the rain, either. You'll get a vest used by Freedom - it's light so it won't slow you down. Go on, show them that stalkers ain't no whipping boys. Good luck!</text>
+    </string>
+    <string id="bar_arena_man_job_151">
+        <text>I'm ready.</text>
+    </string>
+    <string id="bar_arena_man_job_152">
+        <text>I'm not ready.</text>
+    </string>
+    <string id="bar_arena_man_job_16">
+        <text>Time for you to show what you can do. Duty captured a group of bandits that had been causing problems for stalkers near Rostok. Duty took 'em at night so most of the bandits were taken alive. They were all gonna be executed anyway so I convinced Duty to give them a chance. If any of them survive, they'll go in the can outside the Zone, which is better than dying here. They're not well-armed - probably just a few pistols and sawn-offs - but there's six of them so watch yourself. Go on now!</text>
+    </string>
+    <string id="bar_arena_man_job_161">
+        <text>I'm ready.</text>
+    </string>
+    <string id="bar_arena_man_job_162">
+        <text>I'm not ready.</text>
+    </string>
+    <string id="bar_arena_man_job_17">
+        <text>Well, you're almost in the final. Now you'll be fighting a real stalker. He's alone but he's got an assault rifle and he's inside an exoskeleton. Catch one burst and you're toast. There will be a surprise that I can't tell you about too... Here's my advice: be prepared, it's gonna be tough. The winner makes it through to the final. Fight to the death, go!</text>
+    </string>
+    <string id="bar_arena_man_job_171">
+        <text>I'm ready.</text>
+    </string>
+    <string id="bar_arena_man_job_172">
+        <text>I'm not ready.</text>
+    </string>
+    <string id="bar_arena_man_job_18">
+        <text>Congratulations, you're in the final! One more to go and this one is to the death, every man for himself. There will be 4 other stalkers in the arena: all real pros in exoskeletons but it's a fair deal this time - you'll get exactly what they have. The only thing is, you don't get medkits or bandages in a fight to the death. Ready? Go prove you're the best, GO!</text>
+    </string>
+    <string id="bar_arena_man_job_181">
+        <text>I'm ready.</text>
+    </string>
+    <string id="bar_arena_man_job_182">
+        <text>I'm not ready.</text>
+    </string>
+    <string id="bar_arena_man_start_111112">
+        <text>Yo! You paid me for a fight but you just walked away!</text>
+    </string>
+    <string id="bar_arena_man_start_11">
+        <text>Yo! I've got a new fight for you.</text>
+    </string>
+    <string id="bar_arena_man_start_21">
+        <text>Go have a drink or something. The Arena ain't ready yet.</text>
+    </string>
+    <string id="bar_arena_man_start_31">
+        <text>You've already become a pro!!!</text>
+    </string>
+    <string id="bar_arena_man_start_41">
+        <text>You won! Here's your reward.</text>
+    </string>
+    <string id="bar_arena_man_start_51">
+        <text>You're not experienced enough for this fight.</text>
+    </string>
+    <string id="bar_arena_manager_game_0">
+        <text>What challenge do you have for me?</text>
+    </string>
+    <string id="bar_arena_manager_game_1">
+        <text>There is nothing to fight, come again later when we have some more mutants.</text>
+    </string>
+    <string id="bar_arena_manager_game_100">
+        <text>There's a fee for participation. 1,000 RU.</text>
+    </string>
+    <string id="bar_arena_manager_game_101">
+        <text>Fine, here's your money.</text>
+    </string>
+    <string id="bar_arena_manager_game_105">
+        <text>I don't have enough money.</text>
+    </string>
+    <string id="bar_arena_manager_game_1051">
+        <text>Then get out of here, stalker.</text>
+    </string>
+    <string id="bar_arena_manager_game_110">
+        <text>You owe me 2,000 RU for participation.</text>
+    </string>
+    <string id="bar_arena_manager_game_111">
+        <text>Fine, here's your money.</text>
+    </string>
+    <string id="bar_arena_manager_game_11111112">
+        <text>I already paid you!</text>
+    </string>
+    <string id="bar_arena_manager_game_115">
+        <text>I don't have enough money.</text>
+    </string>
+    <string id="bar_arena_manager_game_1151">
+        <text>Then stop asking so many questions.</text>
+    </string>
+    <string id="bar_arena_manager_game_120">
+        <text>Pay 3,000 RU for participation and the bloodsucker is yours.</text>
+    </string>
+    <string id="bar_arena_manager_game_121">
+        <text>Fine. Here's your money.</text>
+    </string>
+    <string id="bar_arena_manager_game_125">
+        <text>I don't have enough.</text>
+    </string>
+    <string id="bar_arena_manager_game_1251">
+        <text>Don't waste my time, stalker.</text>
+    </string>
+    <string id="bar_arena_manager_game_130">
+        <text>Not so fast. The price for participation is 5,000 RU.</text>
+    </string>
+    <string id="bar_arena_manager_game_131">
+        <text>Fine. Here's the money.</text>
+    </string>
+    <string id="bar_arena_manager_game_135">
+        <text>I don't have enough money.</text>
+    </string>
+    <string id="bar_arena_manager_game_1351">
+        <text>Don't try pretending to be a beggar.</text>
+    </string>
+    <string id="bar_arena_manager_game_140">
+        <text>The price for participating is 5,000 RU.</text>
+    </string>
+    <string id="bar_arena_manager_game_141">
+        <text>Fine. Here's your money.</text>
+    </string>
+    <string id="bar_arena_manager_game_145">
+        <text>I don't have enough money.</text>
+    </string>
+    <string id="bar_arena_manager_game_1451">
+        <text>Let me guess. Someone stole your roubles?</text>
+    </string>
+    <string id="bar_arena_manager_game_2">
+        <text>There's a pseudodog. A large specimen, but quite beaten up. On the other hand it's a very fierce one, just like my mother-in-law.</text>
+    </string>
+    <string id="bar_arena_manager_game_200">
+        <text>Deal. Before you fight you should place a stake on the time you need to make the kill. If you manage to pull it off you'll make yourself a little extra spending money.</text>
+    </string>
+    <string id="bar_arena_manager_game_201">
+        <text>30 seconds, triple win.</text>
+    </string>
+    <string id="bar_arena_manager_game_202">
+        <text>One and a half minutes, double win.</text>
+    </string>
+    <string id="bar_arena_manager_game_203">
+        <text>Without a time limit. A half-stake win.</text>
+    </string>
+    <string id="bar_arena_manager_game_204">
+        <text>I changed my mind.</text>
+    </string>
+    <string id="bar_arena_manager_game_2041">
+        <text>Tough shit. You've already paid.</text>
+    </string>
+    <string id="bar_arena_manager_game_21">
+        <text>I can do that. I'll fight your dog.</text>
+    </string>
+    <string id="bar_arena_manager_game_22">
+        <text>A dog? Is that all you have?</text>
+    </string>
+    <string id="bar_arena_manager_game_221">
+        <text>Aw, is our girl afraid of a little doggie? Don't be upset.</text>
+    </string>
+    <string id="bar_arena_manager_game_3">
+        <text>There is a freak in a gas-mask, called a snork. Thin and feeble-looking but quite agile.</text>
+    </string>
+    <string id="bar_arena_manager_game_300">
+        <text>Great, we'll get everything ready. Enter the arena.</text>
+    </string>
+    <string id="bar_arena_manager_game_31">
+        <text>Bring it on. I'll fight your snork.</text>
+    </string>
+    <string id="bar_arena_manager_game_32">
+        <text>They make my stomach turn. Hell no.</text>
+    </string>
+    <string id="bar_arena_manager_game_321">
+        <text>Scared by a half-rotten gas-masked freak?</text>
+    </string>
+    <string id="bar_arena_manager_game_4">
+        <text>This time we've gotten truly lucky. We caught a young bloodsucker. Still dumb, but already with bad manners.</text>
+    </string>
+    <string id="bar_arena_manager_game_41">
+        <text>Go ahead, get the bloodsucker ready.</text>
+    </string>
+    <string id="bar_arena_manager_game_42">
+        <text>A bloodsucker? Fuck that!</text>
+    </string>
+    <string id="bar_arena_manager_game_421">
+        <text>What? You love bloodsuckers now? When did you join Freedom?</text>
+    </string>
+    <string id="bar_arena_manager_game_5">
+        <text>This time we've a fat little midget in a black cloak - the locals call it a burer.</text>
+    </string>
+    <string id="bar_arena_manager_game_51">
+        <text>Fat and short? Easy. I'll do it.</text>
+    </string>
+    <string id="bar_arena_manager_game_52">
+        <text>I've heard all about those things. I'll pass.</text>
+    </string>
+    <string id="bar_arena_manager_game_521">
+        <text>He hardly reaches your waist in height. And he scares you?</text>
+    </string>
+    <string id="bar_arena_manager_game_6">
+        <text>Today is a special day. I don't know where they found... Him... But he's a real beast.</text>
+    </string>
+    <string id="bar_arena_manager_game_61">
+        <text>Deal. I'll put him out of his misery.</text>
+    </string>
+    <string id="bar_arena_manager_game_62">
+        <text>I don't feel like dying, find someone else.</text>
+    </string>
+    <string id="bar_arena_manager_game_621">
+        <text>Well, frankly even I find the beast scary. But I'm not fighting in the arena, so who cares?</text>
+    </string>
+    <string id="bar_arena_manager_info_0">
+        <text>Got a couple of questions.</text>
+    </string>
+    <string id="bar_arena_manager_info_1">
+        <text>Shoot.</text>
+    </string>
+    <string id="bar_arena_manager_info_10">
+        <text>Never mind.</text>
+    </string>
+    <string id="bar_arena_manager_info_11">
+        <text>What is this establishment?</text>
+    </string>
+    <string id="bar_arena_manager_info_111">
+        <text>This is the arena, my little business. A place where stalkers can test their mettle and earn their fame by fighting against the horrors of the Zone.</text>
+    </string>
+    <string id="bar_arena_manager_info_12">
+        <text>How do you get the mutants here?</text>
+    </string>
+    <string id="bar_arena_manager_info_121">
+        <text>We made a deal with Duty, instead of killing all the mutants they find they bring the weaker ones here in exchange for cash. Duty gets paid, the mutants get killed, and then I get paid. Everybody wins.</text>
+    </string>
+    <string id="bar_arena_manager_info_13">
+        <text>Where are you from?</text>
+    </string>
+    <string id="bar_arena_manager_info_131">
+        <text>I am from many places. I heard about this little backwater and understood that I could earn a good little penny here. So here I am.</text>
+    </string>
+    <string id="bar_arena_manager_rules_0">
+        <text>What are the rules?</text>
+    </string>
+    <string id="bar_arena_manager_rules_1">
+        <text>Oh, the rules are pretty simple. I invented them myself. For challenges, there's a cage, and a mutant is let inside the cage. You pay money and tell me the time you need to kill the monster. If you make it - you win, if you don't - I win.\nBut for the main course, bandits and the Zone's other degenerates captured by Duty fight in the arena for their crimes. Some are just stalkers who fancy a fight, and not actually criminals, but whoever leaves the arena in the least amount of pieces gets a sizeable reward. If they keep on winning fights, then more stalkers will come to watch, and the combatants win larger rewards.</text>
+    </string>
+    <string id="bar_arena_manager_start_11">
+        <text>Good to see you stalker, welcome to the arena.</text>
+    </string>
+    <string id="bar_arena_manager_start_21">
+        <text>So, what are you waiting for? Get into the cage.</text>
+    </string>
+    <string id="bar_arena_manager_start_31">
+        <text>Sorry, there's nothing to fight against yet. Wait for a day or two until we can catch a new mutant.</text>
+    </string>
+    <string id="bar_arena_manager_start_41">
+        <text>There you are! Well done! Here's your win. If you desire another fight for money then just drop in whenever.</text>
+    </string>
+    <string id="bar_arena_manager_start_51">
+        <text>Sorry, bro, but you lose. Come again next time if you want.</text>
+    </string>
+    <string id="bar_visitors_barman_stalker_trader_start_dialog_11">
+        <text>Oh, hello. What's up?</text>
+    </string>
+    <string id="bar_visitors_barman_stalker_trader_start_dialog_12">
+        <text>What do you need, stalker?.</text>
+    </string>
+    <string id="bar_visitors_barman_stalker_trader_start_dialog_13">
+        <text>You here to buy some shit?</text>
+    </string>
+    <string id="bar_visitors_stalker_mechanic_start_dialog_1">
+        <text>Hey guy, how goes the Zone? So...I hope you have repair work that needs done... Heh, I need some cash bad.</text>
+    </string>
+</string_table>

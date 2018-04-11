@@ -1,0 +1,429 @@
+[m_rat_e]:monster_base
+GroupControlSection	= spawn_group
+SpaceRestrictionSection = space_restrictor,zone_mosquito_bald
+$spawn               = "monsters\old\rat"				; option for Level Editor
+$npc			     = on						; option for Level Editor
+$prefetch 			 = 16
+Scheduled		     = on						; option for ALife Simulator
+Human		     	 = off						; option for ALife Simulator
+Health			     = 1						; option for ALife Simulator
+MinSpeed		     = 1.0						; option for ALife Simulator
+MaxSpeed		     = 5.0						; option for ALife Simulator
+going_speed          = 3;4.5                      ; option for ALife Simulator
+current_level_going_speed		= 3;2					; option for ALife Simulator
+search_speed         = 1.5                       ; option for ALife Simulator
+visual				 = monsters\rat\rat_normal1
+corpse_visual		 = monsters\rat\rat_normal1
+icon				 = ui_npc_monster_rat
+MaxHealthValue		 = 1			; range [0..200]
+smart_terrain_choose_interval	= 00:15:00
+
+hit_fraction_monster = 1
+skin_armor = 0
+
+;------------------------------------------------------------------------
+; Influences
+;------------------------------------------------------------------------
+
+fire_max_distance			=	0
+fire_max_power				=	5
+fire_linear_factor			=	0
+fire_quadratic_factor		=	0.025
+
+psy_max_distance			=	0
+psy_max_power				=	5
+psy_linear_factor			=	0.05
+psy_quadratic_factor		=	0
+
+radiation_max_distance		=	0.5
+radiation_max_power			=	0.001
+radiation_linear_factor		=	1
+radiation_quadratic_factor	=	1
+radiation_pp_effector_name	= 	postprocess_rad
+radiation_pp_highest_at		= 	0.02
+
+;---EVALUATION FUNCTIONS----------------------------------------------
+ef_creature_type	 = 2							; option for evaluation functions
+ef_weapon_type		 = 2
+ef_detector_type	 = 1
+panic_threshold		= 0.1
+
+cform                = skeleton					; collision class
+class                = SM_RAT					; AI class
+
+bone_torso			 = bip01_spine1 			; bone name
+bone_head			 = bip01_head				; bone name
+bone_fire			 = bip01_head				; bone name
+weapon_usage		 = 0						; boolean
+
+ph_box0_center 		 = 0.0,  0.9,  0.0
+ph_box0_size 		 = 0.30, 0.9,  0.30
+ph_box1_center 		 = 0.0,  0.6,  0.0
+ph_box1_size 		 = 0.40, 0.6,  0.40
+ph_crash_speed_min			= 10
+ph_crash_speed_max			= 30
+ph_collision_damage_factor	= 0.1
+ph_mass 		     = 10
+
+destroyed_vis_name	 = dynamics\Dead_Body\skelet_crash
+
+script_binding  	 = bind_monster.bind
+
+;---------------------------------------------------------------------
+ph_skeleton_airr_lin_factor   = 2.0 ;550.0 (изменно из-за того, что убрано домножение коэффициент 0.002 из кода)
+ph_skeleton_airr_ang_factor   = 0.0 ;0.0 (изменно из-за того, что убрано домножение на коэффициент 0.3 из кода (0.0*0.3=0.0))
+ph_skeleton_hinger_factor1    = 1.0 ;1.0 (изменно из-за того, что убрано домножение на коэффициент 5.0 из кода)
+ph_skeleton_ddelay	     	  = 15.0 ;Время изменения значения трения в суставе с момента создания шелла, сек
+
+ph_skel_fatal_impulse_factor  = 6.0
+ph_after_death_velocity_factor= 0.75
+ph_skel_shot_up_factor        = 0.25
+;---------------------------------------------------------------------
+
+SoundThreshold		 = 0.1 ;0.06             ; range [0..1]
+
+eye_fov				 = 140;
+eye_range			 = 30 ;50	;30
+max_hear_dist		 = 30 ;50
+
+hit_power			 = 20.0;
+
+ImpulseMin			 = 20.0
+ImpulseMax			 = 35.0 
+
+; speed factors			linear | angular_real | angular_path | min |  max
+Velocity_Stand			= 0,		3.5,			3.5,		1,		1
+Velocity_WalkFwdNormal	= 1.0,		7.5,			7.5,		0.02,	1.8
+Velocity_RunFwdNormal	= 5.0,		6.5,			6.5,		0.3,	1
+Velocity_WalkFwdDamaged	= 1.0,		4.5,			4.5,		0.2,	1.8
+Velocity_RunFwdDamaged	= 3.0,  	3.0,			3.0,		0.5,	1
+Velocity_Drag			= 1.0,		3.0,			3.0,		1,		1
+Velocity_Steal			= 1.5,		3.0,			3.0,		1,		1
+
+
+; acceleration
+Accel_Generic			= 1.5
+Accel_Calm				= 2.5
+Accel_Aggressive		= 7.5
+
+;attack parameters
+MinAttackDist		= 0.5	;0.5
+MaxAttackDist		= 1.0	;3.8
+
+as_min_dist				= 0.9
+as_step					= 0.1
+
+DayTime_Begin		= 0			; эрўрыр фэ  фы  ьюэёЄЁр
+DayTime_End			= 21		; ъюэхЎ фэ  фы  ьюэёЄЁр
+Min_Satiety			= 0.4		; ьшэ. эюЁьр ёvЄюёЄш (ьхэ№°х - єцх уюыюфэvщ)
+Max_Satiety			= 1.0		; ьръё. эюЁьр ёvЄюёЄш (сюы№°х - юўхэ№ ёvЄvщ)
+
+distance_to_corpse	= 1.2		; фшёЄ. фю ЄЁєяр, яЁш ъюЄюЁющ юэ яхЁхїюфшЄ т ёюёЄю эшх хфv
+
+
+min_view_distance   		= 0.8				; коэффициент, который множится на eye_range, в зависимости от угла
+max_view_distance	 		= 1.0				; коэффициент, который множится на eye_range, в зависимости от угла
+visibility_threshold	 	= 100.0				; значение, при достижении суммой которого объект считается видимым
+always_visible_distance 	= 0.3
+time_quant					= 0.001
+decrease_value				= 0.01				; значение, на которое уменьшается вес, если объект попал в фрустум, но отсёкся по каким-то причинам
+velocity_factor		     	= 0.5
+luminocity_factor			= 0.5 				; фактор освещения (только для Актёра)
+transparency_threshold		= 0.25
+
+
+hit_type = wound
+
+;entity condition
+
+; entity condition
+satiety_v 		= 0.00001				;0.01			;скорость уменьшения сытости со временем
+radiation_v 		= 0.00001		;0.004			;скорость уменьшения радиации
+satiety_power_v 	= 0.005		;0.01			;увеличение силы при уменьшении сытости
+satiety_health_v 	= 0.0001	;0.03			;увеличение здоровья при уменьшении сытости
+satiety_critical 	= -1.0		;0.25			;критическое значения сытости (в процентах от 0..1) когда здоровье начианает уменьшаться
+radiation_health_v 	= 0.01	;0.006			;уменьшение здоровья при воздействии радиации
+morale_v		= 0.01					;скорость восстановления морали
+health_hit_part 	= 1.0		;0.8			;процент хита, уходящий на отнимание здоровья
+power_hit_part 		= 1.0		;0.9			;процент хита, уходящий на отнимание силы
+psy_health_v = 0.1						;скорость восстановления psy-здоровья
+
+;открытые раны
+bleeding_v					= 0.04					;потеря крови при номинальной ране в секунду
+wound_incarnation_v			= 0.05				;крутизна кривой заживления (какой процент раны останется после заживления в игровую секунду)
+min_wound_size				= 0.01
+
+sleep_health = 1.0		;1.5				;ъю¤ЇЇшЎшхэЄv ёъюЁюёЄхщ шчьхэхэш  ярЁрьхЄЁют тю тЁхь  ёэр
+sleep_power = 1.0		;1.5
+sleep_satiety = 1.0		;0.8
+sleep_radiation = 1.0	;1.1
+sleep_psy_health = 1.0
+
+eat_freq			=	5.0		; ўрёЄюЄр єъєёют т ёхъ
+eat_slice			=	0.01	; єтхышўхэшх ёvЄюёЄш яЁш 1 єъєёх
+eat_slice_weight	=	10.0	; єьхэ№°хэшх хфv є ЄЁєяр
+
+satiety_threshold	= 0.5							; below this value monster fill hunger
+
+
+; Morale
+Morale_Hit_Quant				= 0.1
+Morale_Attack_Success_Quant		= 0.1
+Morale_Take_Heart_Speed			= 0.1
+Morale_Despondent_Speed			= 0.1
+Morale_Stable_Speed				= 0.05
+Morale_Despondent_Threashold	= 0.5
+
+
+sound_idle				= monsters\rat\idle_
+sound_eat				= monsters\rat\eat_
+sound_aggressive		= monsters\rat\attack_
+sound_attack_hit		= monsters\rat\attack_
+sound_take_damage		= monsters\rat\hit_
+sound_die				= monsters\rat\death_
+sound_threaten			= monsters\rat\voice_
+sound_landing			= monsters\rat\hit_
+sound_steal				= monsters\rat\idle_
+sound_panic				= monsters\rat\voice_
+sound_growling			= monsters\rat\idle_
+sound_die_in_anomaly	= monsters\rat\death_
+
+killer_clsids			= Z_MINCER,Z_GALANT,ZS_BFUZZ,ZS_MBALD,ZS_GALAN,ZS_MINCE
+
+
+idle_sound_delay		= 80000
+eat_sound_delay			= 4000
+attack_sound_delay		= 8000
+
+sound_distant_idle			= monsters\rat\idle_
+distant_idle_sound_delay	= 80000
+distant_idle_sound_range	= 100.0
+
+DamagedThreshold		= 0.5
+critical_wound_threshold		= -1
+critical_wound_decrease_quant	= 0.
+
+
+material				= creatures\medium
+DynamicObjectsCount		= 32
+
+squad_attack_algorithm	= 1
+attack_effector			= small_monster_attack_effector
+
+LegsCount				= 2
+
+;species of monster
+species					= rat
+spec_rank				= normal
+community				= rat
+
+terrain				 	= rat_terrain
+damage					= rat_damage
+immunities_sect			= rat_immunities
+attack_params			= rat_attack_params
+step_params				= rat_step_params
+
+vision_free_section			= rat_vision_free
+vision_danger_section		= rat_vision_danger
+
+[rat_vision_free]
+min_view_distance   		= 0.4				; min range of cone based on eye_range
+max_view_distance	 		= 0.7				; max range of cone based on eye_range
+visibility_threshold	 	= 30				;Threshold in which object becomes visible based on factors
+always_visible_distance 	= 0					;Distance object is always considered visible (float)
+time_quant					= 0.005				;step increment to for sight calculations
+decrease_value				= 0.1 				;Decrease over time to overall threshold
+velocity_factor		     	= 0.6				;Higher value = greater bonus to detection speed when target is moving (depended on movement speed)
+luminocity_factor			= 0.8				;Low value = easier to see at night
+transparency_threshold	 	= 0.3 			    ;Low value = easier to see through objects
+still_visible_time          = 0 				;The time (milliseconds) that the object is still considered visible , even if it is not in the frustum (u32)
+
+[rat_vision_danger]
+min_view_distance   		= 0.4				; min range of cone based on eye_range
+max_view_distance	 		= 1.0				; max range of cone based on eye_range
+visibility_threshold	 	= 30				;Threshold in which object becomes visible based on factors
+always_visible_distance 	= 0					;Distance object is always considered visible (float)
+time_quant					= 0.0055			;step increment to for sight calculations
+decrease_value				= 0.1				;Decrease over time to overall threshold
+velocity_factor		     	= 1.0				;Higher value = greater bonus to detection speed when target is moving (depended on movement speed)
+luminocity_factor			= 0.8				;Low value = easier to see at night
+transparency_threshold	 	= 0.3				;Low value = easier to see through objects (if greater then 1 then enemies are blind)
+still_visible_time          = 0					;The time (milliseconds) that the object is still considered visible , even if it is not in the frustum (u32)
+
+[rat_terrain]
+	255,000,255,255
+
+[rat_damage]
+;bone_name		 = <hit_scale>,-1,<wound_scale>
+;<hit_scale>	- коэфф. изменения хита (уменьшения здоровья)
+;<wound_scale>	- коэфф. изменения величины открытой раны
+default				= 1.0, -1, 0.3
+bip01_pelvis 		= 1.0, -1, 0.5
+bip01_spine 		= 1.5, -1, 0.5
+bip01_spine1 		= 1.5, -1, 0.5
+bip01_neck 			= 2.0, -1, 1.5
+bip01_head 			= 2.5, -1, 0.5, 10
+
+[rat_immunities]
+burn_immunity			= 1			;коэффициенты иммунитета
+strike_immunity			= 1
+shock_immunity			= 1
+wound_immunity			= 1
+radiation_immunity		= 0.0
+telepatic_immunity		= 0
+chemical_burn_immunity	= 1
+explosion_immunity		= 1
+fire_wound_immunity		= 2
+
+[rat_attack_params]
+;---------------------------------------------------------------------------------------------------------------------------------------------
+;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, bottom, top ) |	Test Dist
+;---------------------------------------------------------------------------------------------------------------------------------------------
+stand_attack_0 =	  	0.25,		0.05,		    2,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.0
+stand_attack_1 =	  	0.25,		0.10,		    3,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.0
+stand_attack_2 =	  	0.25,		0.10,		    4,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.0
+
+[rat_step_params]
+;---------------------------------------------------------------------------
+;	anim			| Cycles | time1 | power1 | time2 | power2 |
+;---------------------------------------------------------------------------
+stand_walk_fwd_0 	=	1,	   0.2,     0.5,     0.7,    1,
+stand_run_0	 		=	1,	   0.25,     1,	    0.25,    1,
+
+
+[rat_weak]:m_rat_e
+$spawn				= "monsters\rats\rat_weak"
+visual				 = monsters\rat\rat_normal1
+corpse_visual		 = monsters\rat\rat_normal1
+rank = 1
+spec_rank			= weak
+community			= rat
+panic_threshold		= 0.5
+immunities_sect			= rat_immunities_weak
+attack_params			= rat_attack_params_weak
+
+
+[rat_immunities_weak]
+burn_immunity			= 1			;коэффициенты иммунитета
+strike_immunity			= 1
+shock_immunity			= 1
+wound_immunity			= 1
+radiation_immunity		= 0.0
+telepatic_immunity		= 0
+chemical_burn_immunity	= 1
+explosion_immunity		= 1
+fire_wound_immunity		= 3
+
+[rat_attack_params_weak]
+;---------------------------------------------------------------------------------------------------------------------------------------------
+;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, bottom, top ) |	Test Dist
+;---------------------------------------------------------------------------------------------------------------------------------------------
+stand_attack_0 =	  	0.25,		0.06,		    2,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.0
+stand_attack_1 =	  	0.25,		0.10,		    3,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.0
+stand_attack_2 =	  	0.25,		0.14,		    4,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.0
+
+
+[rat_normal]:m_rat_e
+$spawn				= "monsters\rats\rat_normal"
+visual				 = monsters\rat\rat_normal1
+corpse_visual		 = monsters\rat\rat_normal1
+rank = 1
+spec_rank			= normal
+community			= rat
+panic_threshold		= 0.1
+immunities_sect			= rat_immunities_normal
+attack_params			= rat_attack_params_normal
+
+
+[rat_immunities_normal]
+burn_immunity			= 1			;коэффициенты иммунитета
+strike_immunity			= 1
+shock_immunity			= 1
+wound_immunity			= 1
+radiation_immunity		= 0.0
+telepatic_immunity		= 0
+chemical_burn_immunity	= 1
+explosion_immunity		= 1
+fire_wound_immunity		= 2
+
+
+[rat_attack_params_normal]
+;---------------------------------------------------------------------------------------------------------------------------------------------
+;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, bottom, top ) |	Test Dist
+;---------------------------------------------------------------------------------------------------------------------------------------------
+stand_attack_0 =	  	0.25,		0.08,		    3,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.0
+stand_attack_1 =	  	0.25,		0.12,		    4,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.0
+stand_attack_2 =	  	0.25,		0.16,		    5,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.0
+
+
+[rat_strong]:m_rat_e
+$spawn				= "monsters\rats\rat_strong"
+visual				 = monsters\rat\rat_normal1
+corpse_visual		 = monsters\rat\rat_normal1
+rank = 1
+spec_rank			= strong
+community			= rat
+panic_threshold		= 0.05
+immunities_sect			= rat_immunities_strong
+attack_params			= rat_attack_params_strong
+
+
+[rat_immunities_strong]
+burn_immunity			= 1			;коэффициенты иммунитета
+strike_immunity			= 1
+shock_immunity			= 1
+wound_immunity			= 1
+radiation_immunity		= 0.0
+telepatic_immunity		= 0
+chemical_burn_immunity	= 1
+explosion_immunity		= 1
+fire_wound_immunity		= 1.5
+
+[rat_attack_params_strong]
+;---------------------------------------------------------------------------------------------------------------------------------------------
+;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, bottom, top ) |	Test Dist
+;---------------------------------------------------------------------------------------------------------------------------------------------
+stand_attack_0 =	  	0.25,		0.10,		    4,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.0
+stand_attack_1 =	  	0.25,		0.14,		    5,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.0
+stand_attack_2 =	  	0.25,		0.18,		    6,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.0
+
+
+[rat_wolf]:m_rat_e
+$spawn				= "monsters\rats\rat_wolf"
+visual				 = monsters\rat\rat_normal1
+corpse_visual		 = monsters\rat\rat_normal1
+rank = 1
+spec_rank			= strong
+community			= rat
+panic_threshold		= 0.01
+immunities_sect			= rat_immunities_wolf
+attack_params			= rat_attack_params_wolf
+
+Health			     = 33
+MaxHealthValue		 = 1.25			; range [0..200]
+
+radiation_max_distance		=	3
+radiation_max_power			=	0.005
+radiation_linear_factor		=	1
+radiation_quadratic_factor	=	1
+radiation_pp_effector_name	= 	postprocess_rad
+radiation_pp_highest_at		= 	0.001
+
+[rat_immunities_wolf]
+burn_immunity			= 0.9
+strike_immunity			= 0.9
+shock_immunity			= 0.9
+wound_immunity			= 0.9
+radiation_immunity		= 0.0
+telepatic_immunity		= 0
+chemical_burn_immunity	= 0.9
+explosion_immunity		= 0.9
+fire_wound_immunity		= 1
+
+[rat_attack_params_wolf]
+;---------------------------------------------------------------------------------------------------------------------------------------------
+;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, bottom, top ) |	Test Dist
+;---------------------------------------------------------------------------------------------------------------------------------------------
+stand_attack_0 =	  	0.25,		0.20,		    8,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.0
+stand_attack_1 =	  	0.25,		0.24,		    10,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.0
+stand_attack_2 =	  	0.25,		0.28,		    12,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.0

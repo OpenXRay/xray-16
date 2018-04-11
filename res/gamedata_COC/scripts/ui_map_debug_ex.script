@@ -1,0 +1,275 @@
+feature_is_active = nil
+local display_cnt, cnt, cnt2 = {10,20,50,100}, 2, nil
+local rank_spots
+local _tmr
+local gates, stashes, stashes_opened, anom_zone_show, artefact_show
+
+-- Callback on_key_press
+local function on_key_press(dik)
+	if (has_alife_info("ui_pda_hide")) then
+		return
+	end
+
+	if (dik == DIK_keys.DIK_LCONTROL) then
+		if gates then
+			unhide_fast_travel()
+		else
+			hide_fast_travel()
+		end
+	end
+	
+	if (dik == DIK_keys.DIK_LSHIFT) then
+		if stashes == nil then
+			show_stash()
+			stashes = true
+		elseif stashes_opened == nil then
+			hide_stash()
+			show_stash_opened()
+			stashes_opened = true
+		else
+			hide_stash_opened()
+			stashes = nil 
+			stashes_opened = nil
+		end
+	end
+
+	if (dik == DIK_keys.DIK_LMENU) then
+		if anom_zone_show == nil then
+			show_anom_zones()
+			anom_zone_show = true
+		elseif artefact_show == nil then
+			hide_anom_zones()
+			show_artefacts()
+			artefact_show = true
+		else
+			hide_artefacts()
+			anom_zone_show = nil
+			artefact_show = nil 
+		end
+	end
+
+	if (dik == DIK_keys.DIK_RCONTROL) then
+		if cnt == #display_cnt then
+			cnt = 1
+		else
+			cnt = cnt + 1
+		end
+		clear_rank_spots()
+		set_rank_spots()
+	elseif (dik == DIK_keys.DIK_RSHIFT) then
+		if cnt == 1 then
+			cnt = #display_cnt
+		else
+			cnt = cnt - 1
+		end
+		clear_rank_spots()
+		set_rank_spots()
+	end
+end
+
+local function actor_on_info_callback(actor,infop,obj)
+	if not (infop == "ui_pda_hide") then 
+		return
+	end
+	if (stashes) then 
+		hide_stash()
+		stashes = nil
+	end 
+	if (stashes_opened) then 
+		hide_stash_opened()
+		stashes_opened = nil
+	end 
+	if (anom_zone_show) then 
+		hide_anom_zones()
+		anom_zone_show = nil
+	end 
+	if (artefact_show) then 
+		hide_artefacts()
+		artefact_show = nil
+	end
+	if (gates) then 
+		unhide_fast_travel()
+		gates = nil
+	end
+end 
+
+function on_game_start()
+	if not (DEV_DEBUG) then 
+		return 
+	end
+	if (axr_main.config:r_value("mm_options","enable_debug_map_hud",1,false) == true) then
+		activate_feature()
+	end
+end
+
+function activate_feature()
+	if (feature_is_active) then
+		return 
+	end
+	feature_is_active = true
+	
+	RegisterScriptCallback("on_key_press",on_key_press)
+	RegisterScriptCallback("actor_on_info_callback",actor_on_info_callback)
+--	set_rank_spots()
+	
+end
+	
+function deactivate_feature()
+	if not (feature_is_active) then
+		return 
+	end
+	feature_is_active = false
+	if stashes then
+		hide_stash()
+	end
+	
+	gates = nil
+	rank_spots = nil
+	UnregisterScriptCallback("on_key_press",on_key_press)
+end
+
+function set_rank_spots()
+		
+	rank_spots = pda and pda.coc_ranking_list
+	if rank_spots == nil then return end
+	
+	local sim = alife()
+	for i=1,display_cnt[cnt] do
+		local se_obj = sim:object(rank_spots[i])
+		if rank_spots[i] ~= 0 and se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive() and (level.map_has_object_spot(rank_spots[i],"explo_location")==0) then
+			level.map_add_object_spot(rank_spots[i],"explo_location",se_obj:character_name().." ("..se_obj:community()..")")
+		end
+	end
+	cnt2 = cnt
+end
+
+function clear_rank_spots()
+	if cnt2 == nil then return end
+	for i=1,display_cnt[cnt2] do
+		if (level.map_has_object_spot(rank_spots[i],"explo_location")~=0) then
+			level.map_remove_object_spot(rank_spots[i], "explo_location")
+		end
+	end
+end
+
+function show_stash()
+		--show all filled caches
+	for id,v in pairs(coc_treasure_manager.caches) do
+		if (type(v) == "string") then
+			level.map_add_object_spot_ser(id, "treasure_all", v)
+		end
+	end
+end
+
+function hide_stash()
+		--hide all filled caches
+	for i=1,65534 do
+		if (level.map_has_object_spot(i, "treasure_all") ~= 0) then
+			level.map_remove_object_spot(i, "treasure_all")
+		end
+	end
+end
+
+function show_stash_opened()
+		--show all opened caches
+	local sim = alife()
+	local caches = coc_treasure_manager.caches
+	for i=1,65534 do
+		local se_obj = sim:object(i)
+		if (se_obj) then
+			local parent_id = se_obj.parent_id
+			if parent_id and caches[parent_id] == true then
+				if stashes_opened == nil then stashes_opened = {} end
+				if stashes_opened[parent_id] == nil then stashes_opened[parent_id] = "" end
+				stashes_opened[parent_id] = stashes_opened[parent_id] .. " " .. se_obj:section_name()
+			end
+		end
+	end
+	if stashes_opened then
+		--alun_utils.print_table(stashes_opened, "previously opened unlooted stashes")
+		for id, v in pairs(stashes_opened) do
+			if (level.map_has_object_spot(id, "treasure_all_opened") == 0) then
+				level.map_add_object_spot_ser(id, "treasure_all_opened", v)
+			end
+		end
+	else
+		printf("No opened stashes")
+	end
+end
+
+function hide_stash_opened()
+		--hide all opened caches
+	for i=1,65534 do
+		if (level.map_has_object_spot(i, "treasure_all_opened") ~= 0) then
+			level.map_remove_object_spot(i, "treasure_all_opened")
+		end
+	end
+end
+
+function hide_fast_travel()
+	local size = 0
+	gates = {}
+	for i=1,65534 do
+		if (level.map_has_object_spot(i, "fast_travel") ~= 0) then
+			size = size + 1
+			level.map_remove_object_spot(i, "fast_travel")
+			gates[size] = i
+		end
+	end
+end
+
+function unhide_fast_travel()
+	for i=1, #gates do
+		if (level.map_has_object_spot(gates[i], "fast_travel") == 0) then 
+			level.map_add_object_spot(gates[i], "fast_travel", "st_pda_fast_travel")
+		end
+	end
+	gates = nil
+end
+
+function show_anom_zones()
+	for name,binder in pairs(db.anomaly_by_name) do 
+		local obj = binder.object
+		if (obj and level.map_has_object_spot(obj:id(), "anom_zone") == 0) then
+			local props = strformat("%s | artefacts=%s of %s [tries=%s]",name,binder.spawned_count,binder.max_artefacts,binder.respawn_tries)
+			level.map_add_object_spot_ser(obj:id(), "anom_zone", props)
+		end
+	end
+end 
+
+function hide_anom_zones()
+	for i=1,65534 do
+		if (level.map_has_object_spot(i, "anom_zone") ~= 0) then
+			level.map_remove_object_spot(i, "anom_zone")
+		end
+	end
+end
+
+function show_artefacts()
+	local sim = alife()
+	for i=1,65534 do
+		local se_obj = sim:object(i)
+		if (se_obj and se_obj:clsid() == clsid.artefact_s) then
+			if (level.map_has_object_spot(i, "artefact") == 0) then
+				local props = se_obj:name()
+				
+				if (bind_anomaly_zone.artefact_ways_by_id[i]) then 
+					local anom_zone = bind_anomaly_zone.parent_zones_by_artefact_id[i]
+					if (anom_zone and anom_zone.object) then 
+						props = props .. " | parent=" .. anom_zone.object:name()
+					end 
+				end
+				
+				level.map_add_object_spot_ser(se_obj.id, "artefact", props)
+			end
+		end
+	end
+end 
+
+function hide_artefacts()
+	for i=1,65534 do
+		if (level.map_has_object_spot(i, "artefact") ~= 0) then
+			level.map_remove_object_spot(i, "artefact")
+		end
+	end
+end

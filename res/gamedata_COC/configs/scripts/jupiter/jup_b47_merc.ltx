@@ -1,0 +1,180 @@
+;generic section
+
+
+[hit@jup_b47_merc_attack_gen]
+on_info = %+jup_b47_mercs_attack%
+
+[walker@jup_b47_merc_regret]
+on_info = {+jup_b47_merc_leader_regret -jup_b47_merc_leader_regret_sad} %+jup_b47_merc_leader_regret_sad =play_sound(jup_b47_merc_leader_regret)%
+in_restr = zone_burning_fuzz_average_0004, zone_burning_fuzz_average_0003, zone_burning_fuzz_average_0005, jup_b47_zone_mine_acidic_strong_0000, jup_b47_zone_mine_acidic_strong_0002, zone_burning_fuzz_average
+
+[walker@jup_b47_attack_gen]:walker@jup_b47_merc_regret
+combat_ignore_cond = {-jup_b47_mercs_attack} true
+on_actor_dist_le_nvis = 10 | {-jup_b47_mercs_attack} %+jup_b47_mercs_attack%
+on_info2 = {=see_actor -jup_b47_mercs_attack} %+jup_b47_mercs_attack%
+
+[walker@jup_b47_attack_stair]:walker@jup_b47_merc_regret
+def_state_moving = sprint
+
+[walker@jup_b47_attack_hale]:walker@jup_b47_attack_stair
+out_restr = jup_b47_merc_4567_out_rest
+
+[walker@jup_b47_merc_surge_gen]:walker@jup_b47_merc_regret
+out_restr = jup_surge_hide_b47
+def_state_standing = sit_knee
+def_state_moving = sprint
+
+[logic@jup_b47_merc_gen]
+prior = 200
+
+;attack works
+
+;01
+
+[logic@jup_b47_merc_attack_01]:logic@jup_b47_merc_gen
+suitable = {=check_npc_name(jup_b47_merc_01)}
+active = walker@jup_b47_merc_attack_01
+on_hit = hit@jup_b47_merc_attack_gen
+known_info = known_info@jup_b47_merc_attack_01
+
+[known_info@jup_b47_merc_attack_01]
+jup_b47_merc_attack_01_serchd
+
+[walker@jup_b47_merc_attack_01]:walker@jup_b47_attack_gen
+path_look = merc_guard_attak_spown
+path_walk = merc_guard_attak_01_walk
+on_info3 = {-jup_b47_merc_pda_spawned} %+jup_b47_merc_pda_spawned =spawn_object_in(jup_b47_merc_pda:jup_b47_merc_01)%;=jup_b47_npc_online(jup_b47_merc_01)
+on_info4 = {=surge_started +jup_b47_merc_pda_spawned} walker@jup_b47_merc_surge_01
+
+;02
+
+[logic@jup_b47_merc_attack_02]:logic@jup_b47_merc_gen
+suitable = {=check_npc_name(jup_b47_merc_02)}
+active = walker@jup_b47_merc_attack_02
+on_hit = hit@jup_b47_merc_attack_gen
+
+[walker@jup_b47_merc_attack_02]:walker@jup_b47_attack_gen
+path_walk = merc_guard_attak_02_walk
+path_look = merc_guard_attak_02_look
+on_info3 = {=surge_started} walker@jup_b47_merc_surge_02
+
+;03
+
+[logic@jup_b47_merc_attack_03]:logic@jup_b47_merc_gen
+suitable = {=check_npc_name(jup_b47_merc_03)}
+active = walker@jup_b47_merc_attack_03
+on_hit = hit@jup_b47_merc_attack_gen
+
+[walker@jup_b47_merc_attack_03]:walker@jup_b47_attack_gen
+path_walk = merc_guard_attak_03_walk
+path_look = merc_guard_attak_03_look
+on_info3 = {=surge_started} walker@jup_b47_merc_surge_03
+
+;04
+
+[logic@jup_b47_merc_attack_04]:logic@jup_b47_merc_gen
+suitable = {=check_npc_name(jup_b47_merc_04)}
+active = walker@jup_b47_merc_attack_04
+
+[walker@jup_b47_merc_attack_04]:walker@jup_b47_attack_stair
+path_walk = merc_guard_attak_0405_walk
+path_look = merc_guard_attak_4567_look
+on_info2 = {=actor_in_zone(jup_b47_actor_go_down_rest_67)} walker@jup_b47_merc_defence_04, {=actor_in_zone(jup_b47_merc_4567_out_rest)} walker@jup_b47_merc_defence_04
+on_info3 = {=surge_started} walker@jup_b47_merc_surge_04
+
+[walker@jup_b47_merc_defence_04]:walker@jup_b47_attack_hale
+path_walk = merc_guard_attak_03_walk
+path_look = merc_guard_attak_03_look
+on_info2 = {!actor_in_zone(jup_b47_actor_go_down_rest_67) !actor_in_zone(jup_b47_merc_4567_out_rest)} walker@jup_b47_merc_attack_04
+on_info3 = {=surge_started} walker@jup_b47_merc_surge_04
+
+;05
+
+[logic@jup_b47_merc_attack_05]:logic@jup_b47_merc_gen
+suitable = {=check_npc_name(jup_b47_merc_05)}
+active = walker@jup_b47_merc_attack_05
+
+[walker@jup_b47_merc_attack_05]:walker@jup_b47_attack_stair
+path_walk = merc_guard_attak_0405_walk
+path_look = merc_guard_attak_4567_look
+on_info2 = {=actor_in_zone(jup_b47_actor_go_down_rest_67)} walker@jup_b47_merc_defence_05, {=actor_in_zone(jup_b47_merc_4567_out_rest)} walker@jup_b47_merc_defence_05
+on_info3 = {=surge_started} walker@jup_b47_merc_surge_05
+
+[walker@jup_b47_merc_defence_05]:walker@jup_b47_attack_hale
+path_walk = merc_guard_attak_03_walk
+path_look = merc_guard_attak_03_look
+on_info2 = {!actor_in_zone(jup_b47_actor_go_down_rest_67) !actor_in_zone(jup_b47_merc_4567_out_rest)} walker@jup_b47_merc_attack_05
+on_info3 = {=surge_started} walker@jup_b47_merc_surge_05
+
+;06
+
+[logic@jup_b47_merc_attack_06]:logic@jup_b47_merc_gen
+suitable = {=check_npc_name(jup_b47_merc_06)}
+active = walker@jup_b47_merc_attack_06
+
+[walker@jup_b47_merc_attack_06]:walker@jup_b47_attack_stair
+path_walk = merc_guard_attak_0607_walk
+path_look = merc_guard_attak_4567_look
+on_info2 = {=actor_in_zone(jup_b47_actor_go_down_rest_45)} walker@jup_b47_merc_defence_06, {=actor_in_zone(jup_b47_merc_4567_out_rest)} walker@jup_b47_merc_defence_06
+on_info3 = {=surge_started} walker@jup_b47_merc_surge_06
+
+[walker@jup_b47_merc_defence_06]:walker@jup_b47_attack_hale
+path_walk = merc_guard_attak_02_walk
+path_look = merc_guard_attak_02_look
+on_info2 = {!actor_in_zone(jup_b47_actor_go_down_rest_45) !actor_in_zone(jup_b47_merc_4567_out_rest)} walker@jup_b47_merc_attack_06
+on_info3 = {=surge_started} walker@jup_b47_merc_surge_06
+
+;07
+
+[logic@jup_b47_merc_attack_07]:logic@jup_b47_merc_gen
+suitable = {=check_npc_name(jup_b47_merc_07)}
+active = walker@jup_b47_merc_attack_07
+
+[walker@jup_b47_merc_attack_07]:walker@jup_b47_attack_stair
+path_walk = merc_guard_attak_0607_walk
+path_look = merc_guard_attak_4567_look
+on_info2 = {=actor_in_zone(jup_b47_actor_go_down_rest_45)} walker@jup_b47_merc_defence_07, {=actor_in_zone(jup_b47_merc_4567_out_rest)} walker@jup_b47_merc_defence_07
+on_info3 = {=surge_started} walker@jup_b47_merc_surge_07
+
+[walker@jup_b47_merc_defence_07]:walker@jup_b47_attack_hale
+path_walk = merc_guard_attak_02_walk
+path_look = merc_guard_attak_02_look
+on_info2 = {!actor_in_zone(jup_b47_actor_go_down_rest_45) !actor_in_zone(jup_b47_merc_4567_out_rest)} walker@jup_b47_merc_attack_07
+on_info3 = {=surge_started} walker@jup_b47_merc_surge_07
+
+; surge section
+
+[walker@jup_b47_merc_surge_01]:walker@jup_b47_merc_surge_gen
+path_look = surge_1_look
+path_walk = surge_1_walk
+on_info2 = {=surge_complete} walker@jup_b47_merc_attack_01
+
+[walker@jup_b47_merc_surge_02]:walker@jup_b47_merc_surge_gen
+path_look = surge_2_look
+path_walk = surge_2_walk
+on_info2 = {=surge_complete} walker@jup_b47_merc_attack_02
+
+[walker@jup_b47_merc_surge_03]:walker@jup_b47_merc_surge_gen
+path_look = surge_3_look
+path_walk = surge_3_walk
+on_info2 = {=surge_complete} walker@jup_b47_merc_attack_03
+
+[walker@jup_b47_merc_surge_04]:walker@jup_b47_merc_surge_gen
+path_look = surge_4_look
+path_walk = surge_4_walk
+on_info2 = {=surge_complete} walker@jup_b47_merc_attack_04
+
+[walker@jup_b47_merc_surge_05]:walker@jup_b47_merc_surge_gen
+path_look = surge_5_look
+path_walk = surge_5_walk
+on_info2 = {=surge_complete} walker@jup_b47_merc_attack_05
+
+[walker@jup_b47_merc_surge_06]:walker@jup_b47_merc_surge_gen
+path_look = surge_6_look
+path_walk = surge_6_walk
+on_info2 = {=surge_complete} walker@jup_b47_merc_attack_06
+
+[walker@jup_b47_merc_surge_07]:walker@jup_b47_merc_surge_gen
+path_look = surge_7_look
+path_walk = surge_7_walk
+on_info2 = {=surge_complete} walker@jup_b47_merc_attack_07

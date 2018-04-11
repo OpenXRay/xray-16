@@ -1,0 +1,13 @@
+[logic]
+active = sr_idle@spawn_envoy
+
+[sr_idle@spawn_envoy]
+on_info = sr_idle@wait %=spawn_corpse(pri_b306_envoy:pri_b306_spawn_envoy:0) =turn_off(pri_b306_lamp_1:pri_b306_lamp_2:pri_b306_lamp_3:pri_b306_lamp_4:pri_b306_lamp_5:pri_b306_lamp_6:pri_b306_lamp_7:pri_b306_lamp_8:pri_b306_lamp_9)%
+
+[sr_idle@wait]
+on_info = {+pri_b306_lift_generator_started} sr_idle@wait_for_generator
+
+[sr_idle@wait_for_generator]
+on_info = {+pri_b306_lift_generator_started} sr_idle@nil %=turn_on(pri_b306_lamp_1:pri_b306_lamp_2:pri_b306_lamp_3) =anim_obj_forward(pri_b306_door:pri_b306_door_0000:pri_b306_door_0001:pri_b306_door_0002)%
+
+[sr_idle@nil]

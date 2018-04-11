@@ -1,0 +1,100 @@
+[logic@mar_smart_terrain_8_11_surge_def]
+suitable = {=check_npc_name(stalker) =surge_started} true
+prior = 60
+
+
+[logic@mar_smart_terrain_8_11_surge_work_1]:logic@mar_smart_terrain_8_11_surge_def
+active = walker@mar_smart_terrain_8_11_surge_work_1
+
+[logic@mar_smart_terrain_8_11_surge_work_2]:logic@mar_smart_terrain_8_11_surge_def
+active = walker@mar_smart_terrain_8_11_surge_work_2
+
+[logic@mar_smart_terrain_8_11_surge_work_3]:logic@mar_smart_terrain_8_11_surge_def
+active = walker@mar_smart_terrain_8_11_surge_work_3
+
+[logic@mar_smart_terrain_8_11_surge_work_4]:logic@mar_smart_terrain_8_11_surge_def
+active = walker@mar_smart_terrain_8_11_surge_work_4
+
+[logic@mar_smart_terrain_8_11_surge_work_5]:logic@mar_smart_terrain_8_11_surge_def
+active = walker@mar_smart_terrain_8_11_surge_work_5
+
+[logic@mar_smart_terrain_8_11_surge_work_6]:logic@mar_smart_terrain_8_11_surge_def
+active = walker@mar_smart_terrain_8_11_surge_work_6
+
+[logic@mar_smart_terrain_8_11_surge_work_7]:logic@mar_smart_terrain_8_11_surge_def
+active = walker@mar_smart_terrain_8_11_surge_work_7
+
+
+[walker@mar_smart_terrain_8_11_surge_def]
+def_state_standing = sit
+def_state_moving = assault
+
+
+[walker@mar_smart_terrain_8_11_surge_work_1]:walker@mar_smart_terrain_8_11_surge_def
+path_walk = surge_1_walk
+out_restr = mar_smart_terrain_8_11_surge_hide_a1
+
+[walker@mar_smart_terrain_8_11_surge_work_2]:walker@mar_smart_terrain_8_11_surge_def
+path_walk = surge_2_walk
+out_restr = mar_smart_terrain_8_11_surge_hide_a1
+
+[walker@mar_smart_terrain_8_11_surge_work_3]:walker@mar_smart_terrain_8_11_surge_def
+path_walk = surge_3_walk
+out_restr = mar_smart_terrain_8_11_surge_hide_a1
+
+[walker@mar_smart_terrain_8_11_surge_work_4]:walker@mar_smart_terrain_8_11_surge_def
+path_walk = surge_4_walk
+out_restr = mar_smart_terrain_8_11_surge_hide_a1
+
+[walker@mar_smart_terrain_8_11_surge_work_5]:walker@mar_smart_terrain_8_11_surge_def
+path_walk = surge_5_walk
+out_restr = mar_smart_terrain_8_11_surge_hide_a1
+
+[walker@mar_smart_terrain_8_11_surge_work_6]:walker@mar_smart_terrain_8_11_surge_def
+path_walk = surge_6_walk
+out_restr = mar_smart_terrain_8_11_surge_hide_a1
+
+[walker@mar_smart_terrain_8_11_surge_work_7]:walker@mar_smart_terrain_8_11_surge_def
+path_walk = surge_7_walk
+out_restr = mar_smart_terrain_8_11_surge_hide_a1
+
+;camping
+[logic@mar_smart_terrain_8_11_camp_work_1]
+active = animpoint@mar_smart_terrain_8_11_camp_work_1
+suitable = {!surge_started} true
+prior = 45
+
+[logic@mar_smart_terrain_8_11_camp_work_2]
+active = animpoint@mar_smart_terrain_8_11_camp_work_2
+suitable = {!surge_started} true
+prior = 45
+
+[logic@mar_smart_terrain_8_11_camp_work_3]
+active = animpoint@mar_smart_terrain_8_11_camp_work_3
+suitable = {!surge_started} true
+prior = 45
+
+[logic@mar_smart_terrain_8_11_camp_work_4]
+active = animpoint@mar_smart_terrain_8_11_camp_work_4
+suitable = {!surge_started} true
+prior = 45
+
+[animpoint@mar_smart_terrain_8_11_camp_work_1]
+cover_name = mar_smart_terrain_8_11_animpoint_kamp1
+use_camp = true
+turn_on_campfire = true 
+
+[animpoint@mar_smart_terrain_8_11_camp_work_2]
+cover_name = mar_smart_terrain_8_11_animpoint_kamp2
+use_camp = true
+turn_on_campfire = true 
+
+[animpoint@mar_smart_terrain_8_11_camp_work_3]
+cover_name = mar_smart_terrain_8_11_animpoint_kamp3
+use_camp = true
+turn_on_campfire = true 
+
+[animpoint@mar_smart_terrain_8_11_camp_work_4]
+cover_name = mar_smart_terrain_8_11_animpoint_kamp4
+use_camp = true
+turn_on_campfire = true

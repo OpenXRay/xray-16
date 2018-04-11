@@ -1,0 +1,55 @@
+local	temp = {}
+if (move ~= nil) then
+	temp = move
+end
+move	= temp
+
+function get_smart_cover_cover_barricade_2()
+	return {
+			loopholes = {
+				smart_covers_loophole_barricade_2.get_barricade_2("br_2",	VEC_ZERO,	vector():set(-1,0,0),	vector():set(1,0,0))
+			},
+
+			transitions = {
+			--' Анимации входа в бойницы
+			{
+				vertex0 = "",
+				vertex1 = "br_2",
+				weight = 1.0,
+                actions =	{
+							{
+                                precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+                                actions =	{
+											{
+												animation = "",
+												position = VEC_ZERO,
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+                            }
+							}
+			},
+						
+			--' Анимации выхода из бойниц.
+			{
+				vertex0 = "br_2",
+				vertex1 = "",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+                                actions =	{
+											{
+												animation = "",
+												position = VEC_ZERO,
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			}
+		}
+	}
+end

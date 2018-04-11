@@ -1,0 +1,74 @@
+[vodka]:booster_script
+$spawn                                   = "food and drugs\vodka"
+cform                                    = skeleton
+visual                                   = dynamics\devices\dev_vodka\dev_vodka.ogf
+description                              = st_vodka_descr
+
+inv_name                                 = st_vodka
+inv_name_short                           = st_vodka
+inv_weight                               = 0.9
+
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 18
+inv_grid_y                               = 2
+cost                                     = 40
+
+attach_angle_offset                      = 0.000000, 0.000000, 0.000000
+attach_position_offset                   = 0.087266, -0.078540, 0.052360
+attach_bone_name                         = bip01_r_hand
+auto_attach                              = false
+
+bone_name                                = bip01_r_hand
+position_offset                          = 0.0,0.0,0.0
+angle_offset                             = 1.570790,1.570790,3.92699
+
+break_particles                          = destroy_fx\destroy_bottle
+break_sound                              = material\bottle\collide\bottle_break_1
+
+boost_time                               = 20.0
+boost_radiation_restore                  = 0.001
+eat_alcohol                              = 0.1
+eat_satiety                              = -0.2
+
+use_sound                                = interface\inv_vodka
+
+use_condition                            = true
+max_uses                                 = 3
+remove_after_use                         = true
+empty_weight                             = 0.4
+allow_repair                             = false
+
+[vodka_script]:vodka ; ia eniieuciaaou
+$spawn                                   = "food and drugs\vodka_script"
+inv_weight                               = 0
+
+[energy_drink]:vodka
+$spawn                                   = "food and drugs\energy_drink"
+inv_name                                 = st_energy_drink
+inv_name_short                           = st_energy_drink
+visual                                   = dynamics\devices\dev_drink_stalker\dev_drink_stalker
+description                              = st_energy_drink_descr
+cost                                     = 50
+
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 6 ;19 ;11            
+inv_grid_y                               = 2 ;7  ;0             
+inv_weight                               = 0.3
+
+attach_angle_offset                      = 0.000000, 0.000000, 0.000000
+attach_position_offset                   = 0.087266, -0.078540, 0.052360
+attach_bone_name                         = bip01_r_hand
+auto_attach                              = false
+
+boost_time                               = 90.0
+boost_radiation_restore                  = 0
+boost_power_restore                      = 0.004
+
+eat_alcohol                              = 0.0
+eat_satiety                              = 0.0
+
+use_sound                                = interface\inv_softdrink
+empty_weight                             = 0.01
+max_uses                                 = 2

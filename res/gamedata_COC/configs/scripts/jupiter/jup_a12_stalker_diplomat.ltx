@@ -1,0 +1,66 @@
+[logic@jup_a12_stalker_diplomat]
+active = animpoint@stand_start
+suitable = {=check_npc_name(jup_a12_stalker_diplomat)} true
+prior = 200
+
+[animpoint@argue]
+cover_name = jup_a6_animp_diplomat
+avail_animations = animpoint_stay_table
+use_camp = false
+on_signal = sound_end | animpoint@stand_start %-jup_a12_stalker_assaulter_argued +jup_a12_stalker_diplomat_argued%
+on_info = {+jup_a12_stalker_assaulter_1_argue} %=play_sound(jup_a12_stalker_diplomat_1_argue)%
+on_info2 = {+jup_a12_stalker_assaulter_2_argue} %=play_sound(jup_a12_stalker_diplomat_2_argue)%
+on_info3 = {+jup_a12_stalker_assaulter_3_argue} %=play_sound(jup_a12_stalker_diplomat_3_argue)%
+on_info4 = {!actor_in_zone(jup_a12_sr_stalkers_argue)} animpoint@stand_start %-jup_a12_stalker_assaulter_argued +jup_a12_stalker_diplomat_argued%
+on_info5 = {+jup_a12_stalker_assaulter_told_story} animpoint@stand_start
+meet = meet@stand_start_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@stand_start]
+cover_name = jup_a6_animp_diplomat
+avail_animations = animpoint_stay_table
+use_camp = false
+on_info = {-jup_a12_stalker_assaulter_told_story +jup_b217_welcome_tech_talked =actor_in_zone(jup_a12_sr_stalkers_argue) +jup_a12_stalker_assaulter_argued} animpoint@argue
+on_info2 = {+jup_a12_stalker_prisoner_free} animpoint@stand_after
+meet = meet@stand_start_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@stand_after]
+cover_name = jup_a6_animp_diplomat
+use_camp = false
+meet = meet@stand_start_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+out_restr = jup_a6_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+
+[meet@stand_start_meet]
+close_snd_hello = nil
+close_snd_bye 	= nil
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+allow_break = false
+trade_enable = false
+snd_on_use = {-jup_a12_stalkers_on_base} jup_a12_stalker_diplomat_no_talk
+use = {=actor_enemy} false, {+pri_a12_stalker_prisoner_free} true, {+jup_a12_stalkers_on_base} true, false
+meet_dialog = jup_a12_stalker_diplomat_after_scene_dialog
+meet_on_talking = false

@@ -1,0 +1,134 @@
+[logic@warlab_flame_polter]
+active = mob_home@hold1
+suitable = {=check_npc_name(warlab_main_poltergeist_1)} true
+prior = 100
+monster_job = true
+on_death = mob_death@1
+		
+[mob_home@hold1]
+path_home = main_polter_home
+home_min_radius = 1
+home_max_radius = 2
+aggressive = false
+braindead = true
+actor_friendly = true
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+on_info = %=polter_actor_ignore(true)%
+on_info2 = {+warlab_main_polter_scene_start} mob_home@teleport1 %=teleport_npc(warlab_common_consciousness_smart_terrain_main_polter_home_attack)%
+
+[mob_home@teleport1]
+path_home = main_polter_home_attack
+home_min_radius = 1
+home_max_radius = 2
+aggressive = false
+braindead = true
+actor_friendly = true
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+on_info = %=polter_actor_ignore(true)%
+on_info2 = {=npc_in_zone(warlab_entity_home_restrictor)} mob_home@attack1
+
+[mob_home@attack1]
+path_home = main_polter_home_attack
+home_min_radius = 1
+home_max_radius = 50
+aggressive = true
+braindead = false
+actor_friendly = false
+combat_ignore_cond = false
+combat_ignore_keep_when_attacked = false
+invulnerable = false
+on_info = %=polter_actor_ignore(false)%
+on_info2 = %=show_health(warlab_main_poltergeist_1:true)%
+on_info3 = {+warlab_poltergeist_dead} %=show_health(warlab_main_poltergeist_1:false)%
+
+[mob_death@1]
+on_info = %+warlab_poltergeist_dead =play_sound(warlab_entity_deaths_1)%
+
+
+[logic@warlab_tele_polter]
+active = mob_home@hold2
+suitable = {=check_npc_name(warlab_main_poltergeist_2)} true
+prior = 100
+monster_job = true
+
+[mob_home@hold2]
+path_home = main_polter_home
+home_min_radius = 1
+home_max_radius = 2
+aggressive = false
+braindead = true
+actor_friendly = true
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+on_info = %=polter_actor_ignore(true)%
+on_info2 = {+warlab_main_polter_scene_start} mob_home@teleport2 %=teleport_npc(warlab_common_consciousness_smart_terrain_main_polter_home_attack)%
+
+[mob_home@teleport2]
+path_home = main_polter_home_attack
+home_min_radius = 1
+home_max_radius = 2
+aggressive = false
+braindead = true
+actor_friendly = true
+combat_ignore_cond = true
+combat_ignore_keep_when_attacked = true
+invulnerable = true
+on_info = %=polter_actor_ignore(true)%
+on_info2 = {=npc_in_zone(warlab_entity_home_restrictor)} mob_home@attack1
+
+[mob_home@attack2]
+path_home = main_polter_home_attack
+home_min_radius = 1
+home_max_radius = 50
+aggressive = true
+braindead = false
+actor_friendly = false
+combat_ignore_cond = false
+combat_ignore_keep_when_attacked = false
+invulnerable = false
+on_info = %=polter_actor_ignore(false)%
+on_info2 = %=show_health(warlab_main_poltergeist_2:true)%
+on_info3 = {+warlab_poltergeist_dead} %=kill_npc =show_health(warlab_main_poltergeist_2:false)%
+
+
+[logic@warlab_psysucker]
+active = mob_home@warlab_psysucker
+suitable = {=check_npc_name(warlab_main_psysucker)} true
+prior = 100
+monster_job = true
+on_death = mob_death@2
+
+[mob_home@warlab_psysucker]
+path_home = psysucker_home
+actor_friendly = false
+home_min_radius = 1
+home_max_radius = 50
+aggressive = true
+on_info = %=show_health(warlab_main_psysucker:true)%
+
+[mob_death@2]
+on_info = %+warlab_psysucker_dead =show_health(warlab_main_psysucker:false) =play_sound(warlab_entity_deaths_2)%
+
+
+[logic@warlab_psycontroller]
+active = mob_home@warlab_psycontroller
+suitable = {=check_npc_name(warlab_main_psycontroller)} true
+prior = 100
+monster_job = true
+on_death = mob_death@3
+
+[mob_home@warlab_psycontroller]
+path_home = psycontroller_home
+actor_friendly = false
+home_min_radius = 1
+home_max_radius = 50
+aggressive = true
+on_info = %=show_health(warlab_main_psycontroller:true)%
+
+[mob_death@3]
+on_info = %+warlab_main_polter_dead =show_health(warlab_main_psycontroller:false) =play_sound(warlab_entity_deaths_3)%

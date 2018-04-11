@@ -1,0 +1,43 @@
+#include "base.ltx"
+#include "ammo.ltx"
+#include "artefacts.ltx"
+#include "devices.ltx"
+#include "discounts.ltx"
+#include "drugs.ltx"
+#include "food.ltx"
+#include "grenades.ltx"
+#include "helmets.ltx"
+#include "medical.ltx"
+#include "misc.ltx"
+#include "mutant_parts.ltx"
+#include "outfits.ltx"
+#include "weapon_addons.ltx"
+#include "weapons.ltx"
+
+; Profiles for buy_condition and sell_condition
+; Addon developers should not touch the base files included above.
+
+[buy_condition_equipment_base]:buy_weapons,buy_weapon_addons,buy_outfits,buy_helmets,buy_grenades,buy_ammo
+[sell_condition_equipment_base]:sell_weapons,sell_weapon_addons,sell_outfits,sell_helmets,sell_grenades,sell_ammo
+
+[buy_condition_food_drug_medical_base]:buy_food,buy_drugs,buy_medical
+[sell_condition_food_drug_medical_base]:sell_food,sell_drugs,sell_medical
+
+[buy_condition_medic]:buy_sell_base,buy_condition_food_drug_medical_base
+[sell_condition_medic]:buy_sell_base,sell_condition_food_drug_medical_base
+
+[buy_condition_medic_and_misc]:buy_sell_base,buy_condition_food_drug_medical_base,buy_devices,buy_misc
+[sell_condition_medic_and_misc]:buy_sell_base,sell_condition_food_drug_medical_base,sell_devices,sell_misc
+
+[buy_condition_generic]:buy_sell_base,buy_condition_equipment_base,buy_condition_food_drug_medical_base,buy_devices,buy_misc
+[sell_condition_generic]:buy_sell_base,sell_condition_equipment_base,sell_condition_food_drug_medical_base,sell_devices,sell_misc
+
+[buy_condition_scientist]:buy_sell_base,buy_artefacts,buy_devices,buy_medical,buy_mutant_parts
+[sell_condition_scientist]:buy_sell_base,sell_devices,sell_medical,sell_mutant_parts,sell_outfits,sell_helmets
+
+[buy_condition_generic_w_artefact]:buy_sell_base,buy_artefacts,buy_condition_equipment_base,buy_condition_food_drug_medical_base,buy_devices,buy_misc
+[buy_condition_beard]:buy_condition_medic_and_misc,buy_artefacts
+
+[buy_condition_librarian]:buy_condition_medic_and_misc,buy_mutant_parts
+
+#include "modded\profiles_modded.ltx"

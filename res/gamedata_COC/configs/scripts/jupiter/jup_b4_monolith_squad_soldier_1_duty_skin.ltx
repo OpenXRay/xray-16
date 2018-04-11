@@ -1,0 +1,13 @@
+[logic@jup_b4_monolith_squad_soldier_1_duty_skin]
+suitable = {=check_npc_name(jup_b4_monolith_squad_soldier_1_duty_skin)}
+active = walker@go_home
+prior = 100
+
+
+[walker@go_home]
+path_walk = go_home_1_walk
+path_look = go_home_1_look
+meet = meet
+
+[meet]
+meet_dialog		= jup_b4_duty_start_dialog

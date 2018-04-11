@@ -1,0 +1,29 @@
+[logic@jup_b4_freedom_help]
+suitable = {=check_npc_name(jup_b4_freedom_help)}
+active = walker@1
+prior = 100
+on_hit = hit
+on_death = death
+
+[walker@1]
+path_walk = freedom_help_1_walk
+path_look = freedom_help_1_look
+combat_ignore_cond = {-jup_b4_monolith_squad_out} true
+on_info = {=is_squad_enemy_to_actor(jup_b4_freedom_squad) -jup_b4_monolith_squad_in_freedom} %+jup_b4_monolith_squad_out%
+on_info2 = {+jup_b4_monolith_squad_in_freedom} walker@2
+meet = no_meet
+
+[walker@2]
+path_walk = freedom_help_1_walk
+path_look = freedom_help_1_look
+combat_ignore_cond = {-jup_b4_monolith_squad_out} true
+meet = meet
+
+[meet]
+meet_dialog = jup_b4_freedom_squad_start_dialog
+
+[hit]
+on_info = {-jup_b4_monolith_squad_in_freedom =hitted_by(actor)} %+jup_b4_monolith_squad_out%
+
+[death]
+on_info = {-jup_b4_monolith_squad_in_freedom} %+jup_b4_monolith_squad_out%

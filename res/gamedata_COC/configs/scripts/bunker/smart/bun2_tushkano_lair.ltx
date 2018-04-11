@@ -1,0 +1,13 @@
+[smart_terrain]
+squad_id = 3
+max_population = 5
+respawn_params = respawn@bun2_tushkano_lair
+respawn_idle = 86400
+respawn_radius = 300
+
+[respawn@bun2_tushkano_lair]
+spawn_tushkanos
+
+[spawn_tushkanos]
+spawn_squads = simulation_tushkano
+spawn_num = {+bar_deactivate_radar_done} 5, 0

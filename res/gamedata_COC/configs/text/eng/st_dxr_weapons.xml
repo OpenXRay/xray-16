@@ -1,0 +1,991 @@
+<string_table>
+	
+	<!-- --------------->
+	<!----- KNIVES ----->
+	<!------------------>
+	
+    <string id="st_dxr_knife_survival">
+        <text>Survival knife</text>
+    </string>
+    <string id="st_dxr_knife_survival_descr">
+        <text>A short non-folding survival knife. Easy to conceal due to its small size. A rubber gripped handle allows for improved handling.</text>
+    </string>
+	
+    <string id="st_dxr_knife_spetsnaz">
+        <text>NR-2</text>
+    </string>
+    <string id="st_dxr_knife_spetsnaz_descr">
+        <text>A military survival knife manufactured for the Spetsnaz during the Soviet era. The NR-2 is a variant of the NRS-2 but lacking the single-shot shooting mechanism.</text>
+    </string>
+	
+    <string id="st_dxr_knife_tanto">
+        <text>Tanto</text>
+    </string>
+    <string id="st_dxr_knife_tanto_descr">
+        <text>A modern tanto-style combat knife. Literally meaning "short knife", a tanto is a Japanese blade from the feudal era. The origin of this knife is unknown as it is unbranded.</text>
+    </string>
+	
+    <string id="st_dxr_knife_colt">
+        <text>Colt 62316</text>
+    </string>
+    <string id="st_dxr_knife_colt_descr">
+        <text>The Colt 62316 is an American military M7 bayonet intended to be fixed to the end of a rifle or shotgun. Introduced in 1964, it first saw service in the Vietnam War.</text>
+    </string>
+	
+    <string id="st_dxr_knife_extrema">
+        <text>Extrema Ratio MK 2.1</text>
+    </string>
+    <string id="st_dxr_knife_extrema_descr">
+        <text>The Extrema Ratio MK 2.1 is a steel knife based on the historic USMC Ka-Bar. Developed and produced for use by the Italian military and special forces.</text>
+    </string>
+	
+    <string id="st_dxr_knife_hunting">
+        <text>Hunting knife</text>
+    </string>
+    <string id="st_dxr_knife_hunting_descr">
+        <text>A modern hunting knife with a camouflage pattern. Roughly half a dozen barbs run along the top of the blade, making its removal from flesh very difficult.</text>
+    </string>
+	
+	<!-- ----------------->
+	<!----- GRENADES ----->
+	<!-------------------->
+	
+    <string id="st_dxr_grenade_f1">
+        <text>F1</text>
+    </string>
+    <string id="st_dxr_grenade_f1_descr">
+        <text>The F1 is a Soviet anti-personnel grenade based on a French grenade of the same name. Designed for defensive use, it relies more on its explosive damage than fragmentation. Due to its lemon-like shape it is nicknamed the "Limonka".</text>
+    </string>
+	
+    <string id="st_dxr_grenade_rgd5">
+        <text>RGD-5</text>
+    </string>
+    <string id="st_dxr_grenade_rgd5_descr">
+        <text>The RGD-5 was designed in the early 1950s and later accepted into service by the Soviet Union and its client states. Unlike the F1, the RGD-5 relies on massive fragmentation to kill, rather than its explosive ability.</text>
+    </string>
+	
+    <string id="st_dxr_grenade_gd-05">
+        <text>RDG-M</text>
+    </string>
+    <string id="st_dxr_grenade_gd-05_descr">
+        <text>The RDG-M is a smoke grenade which creates a small smoke screen for roughly 10 to 15 seconds. Useful for creating temporary cover, smoking enemies out of theirs, or to assist with flanking manoeuvres.</text>
+    </string>
+	
+	<!-- ---------------->
+	<!----- PISTOLS ----->
+	<!------------------->
+	
+    <string id="st_dxr_wpn_aps_name">
+        <text>Stechkin APS</text>
+    </string>
+    <string id="st_dxr_wpn_aps_descr">
+        <text>The Stechkin APS is a Soviet selective fire machine pistol. It was developed in the early 1950s by Igor Stechkin and has seen service in conflicts all over the world from Vietnam to eastern Ukraine.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_beretta_name">
+        <text>Beretta 92</text>
+    </string>
+    <string id="st_dxr_wpn_beretta_descr">
+        <text>The Beretta 92 is an Italian 9 mm pistol that was originally produced from 1976 to 1983. Many variants of the pistol are still produced and used by law enforcement and armed forces the world over even today.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_colt1911_name">
+        <text>Colt M1911A1</text>
+    </string>
+    <string id="st_dxr_wpn_colt1911_descr">
+        <text>The Colt M1911A1 is an iconic pistol from the early 20th century, and has since found itself involved in almost every major conflict including both World War I and World War II.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_colt_kimber_name">
+        <text>Kimber Desert Warrior</text>
+    </string>
+    <string id="st_dxr_wpn_colt_kimber_descr">
+        <text>The Kimber Desert Warrior is an M1911 style semi-automatic pistol based on a special version of the Kimber Custom. The pistol has a matte black KimPro finish and a standard Kimber Custom trigger.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_cz75_name">
+        <text>CZ 75</text>
+    </string>
+    <string id="st_dxr_wpn_cz75_descr">
+        <text>The CZ 75 is Czech pistol first introduced in 1975, it is one of the original "wonder nines" featuring a staggered-column magazine, all-steel construction, and a hammer forged barrel.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_desert_eagle_name">
+        <text>IMI Desert Eagle</text>
+    </string>
+    <string id="st_dxr_wpn_desert_eagle_descr">
+        <text>The IMI Desert Eagle, also known as the "Deagle", is an Israeli semi-automatic pistol. Whilst it is largely bulky and impractical in the real world, it has found popularity and fame on the big screen, being featured in over 500 motion pictures.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_desert_eagle_nimble_name">
+        <text>"Steppe Eagle"</text>
+    </string>
+    <string id="st_dxr_wpn_desert_eagle_nimble_descr">
+        <text>This modified IMI Desert Eagle features a silver finish and boasts slightly increased accuracy over the standard model. A DOCTER sight has been mounted to the top of pistol allowing for much greater accuracy at distance and in low-light conditions.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_gsh18_name">
+        <text>KBP GSh-18</text>
+    </string>
+    <string id="st_dxr_wpn_gsh18_descr">
+        <text>The GSh-18 is a 9 mm semi-automatic pistol developed by the KBP Instrument Design Bureau in Tula during the 1990s. Its name is derived from its designers, Gryazev and Shipunov, and the number 18 denotes the magazine capacity.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_fn57_name">
+        <text>FN Five-seveN</text>
+    </string>
+    <string id="st_dxr_wpn_fn57_descr">
+        <text>The FN Five-seveN is a semi-automatic pistol designed and manufactured by FN Herstal in Belgium. The pistol was developed in conjunction with the FN P90 and the FN 5.7x28 mm cartridge.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_glock_name">
+        <text>Glock 17</text>
+    </string>
+    <string id="st_dxr_wpn_glock_descr">
+        <text>The Glock series of pistols are unique in that they are largely made of plastic parts. Despite this unorthodox design decision they make up over 65% of the handgun market share for law enforcement agencies in the United States.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_fort_name">
+        <text>Fort-12</text>
+    </string>
+    <string id="st_dxr_wpn_fort_descr">
+        <text>The Fort-12 is a semi-automatic pistol which was designed in the late 1990s by Ukrainian firearms designer RPC Fort.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_fort_snag_name">
+        <text>Fort-17</text>
+    </string>
+    <string id="st_dxr_wpn_fort_snag_descr">
+        <text>The Fort-17 is a semi-automatic pistol which was designed in the late 1990s by Ukrainian firearms designer RPC Fort. This variant of the pistol has a magazine capacity of 17 rounds.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_fnp45_name">
+        <text>FN FNP-45</text>
+    </string>
+    <string id="st_dxr_wpn_fnp45_descr">
+        <text>The FN FNP-45 is from the FNP series of semi-automatic, polymer-framed pistols manufactured by FN America. As the name would imply, it is chambered to fire the .45 ACP round.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_fnx45_name">
+        <text>FN FNX-45 Tactical</text>
+    </string>
+    <string id="st_dxr_wpn_fnx45_descr">
+        <text>A heavily modified FN FNX-45, this pistol is affixed with a DOCTER sight and suppressor. The weapon and its attachments are covered in a tan paint-job, however the lack of sandy environments in the Zone brings into question its usefulness.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_hpsa_name">
+        <text>FN HP-35</text>
+    </string>
+    <string id="st_dxr_wpn_hpsa_descr">
+        <text>An American handgun based on designs by John Browning and more commonly known as the Browning Hi-Power. First brought into production in 1935, this particular model of the weapon is chambered to fire 9 mm cartridges.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_mp443_name">
+        <text>Izhmekh MP-443 "Grach"</text>
+    </string>
+    <string id="st_dxr_wpn_mp443_descr">
+        <text>The MP-443 is a Russian pistol developed in response to Russian military trials. It was later adopted as a standard side-arm for all branches of the Russian military and law enforcement.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_oc33_name">
+        <text>KBP OTs-33 "Pernach"</text>
+    </string>
+    <string id="st_dxr_wpn_oc33_descr">
+        <text>The OTs-33 "Pernach" is an automatic pistol designed to replace the Stechkin APS because of huge recoil when fired in fully automatic. It is currently used by units of the Russian police and the MVD.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_pb_name">
+        <text>PB</text>
+    </string>
+    <string id="st_dxr_wpn_pb_descr">
+        <text>The PB is a Soviet suppressed pistol based on the design of the Makarov PM and was issued into service in 1967. The pistol may be fired safely without the additional suppressor attachment.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_pm_name">
+        <text>Makarov PM</text>
+    </string>
+    <string id="st_dxr_wpn_pm_descr">
+        <text>The PM is a Russian semi-automatic pistol designed by Nikolay Makarov. It became the Soviet Union's standard military and police side-arm from 1951 to 1991 after replacing the Tokarev TT-33.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_pm_actor_name">
+        <text>Degtyarev's PM</text>
+    </string>
+    <string id="st_dxr_wpn_pm_actor_descr">
+        <text>A Makarov PM once awarded to Major Degtyarev as the engraving on the side would suggest. How it ended up in the Zone and how it fell out of his possession is unknown.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_pmm_name">
+        <text>Makarov PMM</text>
+    </string>
+    <string id="st_dxr_wpn_pmm_descr">
+        <text>The PMM is modernised version of the PM. The most notable difference is the greater magazine capacity, being able to hold four additional rounds.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_sig220_name">
+        <text>SIG Sauer P220</text>
+    </string>
+    <string id="st_dxr_wpn_sig220_descr">
+        <text>The SIG Sauer P220 is a semi-automatic pistol developed in 1975 for the Swiss Army as a replacement for the P210.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_tt33_name">
+        <text>Tokarev TT-33</text>
+    </string>
+    <string id="st_dxr_wpn_tt33_descr">
+        <text>The TT-33 is a Russian semi-automatic pistol developed in the early 1930s to replace the Nagant M1895 revolver. The design was simplified from the TT-30's to make it easier to manufacture.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_usp_name">
+        <text>H&amp;K USP .45</text>
+    </string>
+    <string id="st_dxr_wpn_usp_descr">
+        <text>The USP is a semi-automatic pistol developed by Heckler &amp; Koch as a replacement for the P7 series of handguns. One of the most significant features of the USP is the mechanical recoil reduction system.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_usp_nimble_name">
+        <text>H&amp;K USP Match</text>
+    </string>
+    <string id="st_dxr_wpn_usp_nimble_descr">
+        <text>The USP Match is specifically designed to appeal to target shooters. The Match distinguishes itself by its barrel weight, which provides counterbalance to the weapon's recoil, greatly improving follow up target tracking.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_walther_name">
+        <text>Walther P99</text>
+    </string>
+    <string id="st_dxr_wpn_walther_descr">
+        <text>The Walther P99 is a semi-automatic pistol developed for law enforcement, security forces and the civilian shooting market as a replacement for the Walther P5 and the P88.</text>
+    </string>
+	
+	<!-- --------------->
+	<!----- RIFLES ----->
+	<!------------------>
+	
+    <string id="st_dxr_wpn_9a91_name">
+        <text>KBP 9A-91</text>
+    </string>
+    <string id="st_dxr_wpn_9a91_descr">
+        <text>The 9A-91 is a carbine assault rifle designed in the early 1990s and used by Russian police forces. Firing the subsonic 9x39 mm round in combination with a suppressor attachment can make for a deadly and compact stealth weapon.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_abakan_name">
+        <text>Izhmash AN-94 "Abakan"</text>
+    </string>
+    <string id="st_dxr_wpn_abakan_descr">
+        <text>The AN-94 was built as a potential replacement to the AK-74M. Featuring a unique 2-round burst, the rifle is able to fire a second round before the recoil of the first is felt. Because of this the first two shots are often very accurate even at long-range.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_ace21_name">
+        <text>IWI ACE 21</text>
+    </string>
+    <string id="st_dxr_wpn_ace21_descr">
+        <text>The ACE family of assault rifles are based upon the mechanism of the IMI Galil, but using modernised designs and materials to increase accuracy and reduce weight. This model is chambered for 5.56x54 mm ammunition.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_aek971_name">
+        <text>KMZ AEK-971</text>
+    </string>
+    <string id="st_dxr_wpn_aek971_descr">
+        <text>The AEK-971 is a Soviet selective fire assault rifle that was developed at the Kovrov Mechanical Plant in the late 1970s and 80s. This model fires the 5.45x39 mm round used by many Kalashnikov-pattern weapons.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_aek972_name">
+        <text>KMZ AEK-972</text>
+    </string>
+    <string id="st_dxr_wpn_aek972_descr">
+        <text>The AEK-972 is a Soviet selective fire assault rifle that was developed at the Kovrov Mechanical Plant in the late 1970s and 80s. This model fires the 5.56x45 mm round used by many NATO weapons.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_aek973_name">
+        <text>KMZ AEK-973</text>
+    </string>
+    <string id="st_dxr_wpn_aek973_descr">
+        <text>The AEK-973 is a Soviet selective fire assault rifle that was developed at the Kovrov Mechanical Plant in the late 1970s and 80s. This model fires the 7.62x39 mm round used by many Kalashnikov-pattern weapons.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_ak101_name">
+        <text>Izhmash AK-101</text>
+    </string>
+    <string id="st_dxr_wpn_ak101_descr">
+        <text>The AK-101 is designed for the world export market and is marketed at those looking for a weapon that combines the familiarity of the 5.56x45 mm NATO round with the reliability of a Kalashnikov.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_ak102_name">
+        <text>Izhmash AK-102</text>
+    </string>
+    <string id="st_dxr_wpn_ak102_descr">
+        <text>The AK-102 is a shortened carbine version of the AK-101 and is marketed at those looking for a weapon that combines the familiarity of the 5.56x45 mm NATO round with the reliability of a Kalashnikov.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_ak103_name">
+        <text>Izhmash AK-103</text>
+    </string>
+    <string id="st_dxr_wpn_ak103_descr">
+        <text>The AK-103 is a derivative of the AK-74M, notably replacing wooden parts for plastic wherever possible. It is chambered for the 7.62x39 mm round similar to the AKM.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_ak104_name">
+        <text>Izhmash AK-104</text>
+    </string>
+    <string id="st_dxr_wpn_ak104_descr">
+        <text>The AK-104 is a shortened carbine version of the AK-103. It is chambered for the 7.62x39 mm round similar to the AKM.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_ak105_name">
+        <text>Izhmash AK-105</text>
+    </string>
+    <string id="st_dxr_wpn_ak105_descr">
+        <text>The AK-105 is a shortened carbine version of the AK-74M, which offers more versatility when compared to its predecessors.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_ak12_name">
+        <text>Izhmash AK-12</text>
+    </string>
+    <string id="st_dxr_wpn_ak12_descr">
+        <text>The AK-12 is the newest derivative of the Kalashnikov-pattern series of assault rifles and was proposed for possible general issue to the Russian Army. This model has been chambered to fire the 5.45x39 mm cartridge.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_ak15_name">
+        <text>Izhmash AK-15</text>
+    </string>
+    <string id="st_dxr_wpn_ak15_descr">
+        <text>The AK-15 is the newest derivative of the Kalashnikov-pattern series of assault rifles and was proposed for possible general issue to the Russian Army. This model has been chambered to fire the 7.62x39 mm cartridge.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_ak47_name">
+        <text>Izhmash AK-47</text>
+    </string>
+    <string id="st_dxr_wpn_ak47_descr">
+        <text>The AK-47 was first brought into production shortly after World War II, and by 1949 the rifle was adopted by the Soviet Union and most of the Warsaw Pact forces. Even after almost seven decades, the model and its variants remain the most popular and widely used assault rifles in the world.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_ak74_name">
+        <text>Izhmash AK-74</text>
+    </string>
+    <string id="st_dxr_wpn_ak74_descr">
+        <text>The AK-74 is an assault rifle developed in the early 1970s by Mikhail Kalashnikov as the replacement for the earlier AKM. It uses a smaller 5.45x39 mm cartridge, replacing the 7.62x39 mm chambering of earlier Kalashnikovs.</text>
+    </string>
+    <string id="st_dxr_wpn_ak74_descr2">
+        <text>The AK-74 is an assault rifle developed in the early 1970s by Mikhail Kalashnikov as the replacement for the earlier AKM. It uses a smaller 5.45x39 mm cartridge, replacing the 7.62x39 mm chambering of earlier Kalashnikovs.\n \n%c[255,255,255,0]This variant lacks a mount to attach optics.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_ak74_up_name">
+        <text>Vaska's AK-74</text>
+    </string>
+    <string id="st_dxr_wpn_ak74_up_descr">
+        <text>A modified AK-74 rifle found long ago on the corpse of Vaska Kuzin, a soldier stationed in the Cordon. It has an EOTech 512 optical sight fitted via an MTK-83 mount, a 45-round magazine taken from an RPK-74 and a suppressor.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_ak74_up2_name">
+        <text>Izhmash AK-74 Tactical</text>
+    </string>
+    <string id="st_dxr_wpn_ak74_up2_descr">
+        <text>The most notable difference with this AK-74 is that the upper hand-guard has been removed and an Aimpoint Micro T-1 optical sight fitted in its place. A darker paint-job covers the weapon components, perhaps to make it more difficult to spot after dark.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_ak74m_name">
+        <text>Izhmash AK-74M</text>
+    </string>
+    <string id="st_dxr_wpn_ak74m_descr">
+        <text>The AK-74M offers more versatility when compared to its predecessors. The rifle features a side-rail bracket for mounting optics, an improved muzzle device and a reinforced smooth dust cover.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_ak74m_nimble_name">
+        <text>Izhmash AK-74M Tactical</text>
+    </string>
+    <string id="st_dxr_wpn_ak74m_nimble_descr">
+        <text>A woodland camouflage pattern and a unique PK-A optical sight adorn this rifle. It is obvious that its original owner must have been a professional stalker, although there is little to no indication left as to who that was.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_ak74m_raifu_name">
+        <text>"Raifu"</text>
+    </string>
+    <string id="st_dxr_wpn_ak74m_raifu_descr">
+        <text>This particular rifle with an eccentric paint job was recovered from a laboratory hidden deep within the Zone. The expedition group found the rifle together with its previous owner, an overweight stalker, who held the rifle close to himself as he stared into a broken computer screen.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_ak74u_name">
+        <text>Izhmash AKS-74U</text>
+    </string>
+    <string id="st_dxr_wpn_ak74u_descr">
+        <text>The AKS-74U is a shortened carbine version of the AK-74, with its shorter length making it better for close quarters and indoor combat. The rifle was likely developed in response to the CAR-15 Commando which was used by the US in the Vietnam War.</text>
+    </string>
+    <string id="st_dxr_wpn_ak74u_descr2">
+        <text>The AKS-74U is a shortened carbine version of the AK-74, with its shorter length making it better for close quarters and indoor combat. The rifle was likely developed in response to the CAR-15 Commando which was used by the US in the Vietnam War.\n \n%c[255,255,255,0]This variant lacks a mount to attach optics.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_ak74u_snag_name">
+        <text>Izhmash AKS-74U Tactical</text>
+    </string>
+    <string id="st_dxr_wpn_ak74u_snag_descr">
+        <text>All wooden parts on this rifle have been replaced with plastic and other light composite materials. A Kobra optic and a PBS-4 suppressor have been fitted to the weapon, all of which have been painted black.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_aks47_name">
+        <text>Izhmash AKS-47</text>
+    </string>
+    <string id="st_dxr_wpn_aks47_descr">
+        <text>Designed for use in the restricted space of the BMP infantry combat vehicle, as well as by paratroopers, the AKS is a folding-stock variant of the AK-47 assault rifle which was developed in the late 1940s.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_aks74_name">
+        <text>Izhmash AKS-74</text>
+    </string>
+    <string id="st_dxr_wpn_aks74_descr">
+        <text>The AKS-74 is a variant of the AK-74 equipped with a side-folding metal shoulder stock, designed primarily for use with air assault infantry.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_aks74n_name">
+        <text>Izhmash AKS-74N</text>
+    </string>
+    <string id="st_dxr_wpn_aks74n_descr">
+        <text>The AKS-74N is a night-fighting variant of the AKS-74, equipped with a side-folding metal shoulder stock, designed primarily for use with air assault infantry.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_akm_name">
+        <text>Izhmash AKM</text>
+    </string>
+    <string id="st_dxr_wpn_akm_descr">
+        <text>The AKM is a modernised variant of the AK-47 assault rifle which was designed and brought into service in the late 1950s. It was one of the last Kalashnikov-pattern rifles designed to fire the 7.62x39 mm round.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_akms_name">
+        <text>Izhmash AKMS</text>
+    </string>
+    <string id="st_dxr_wpn_akms_descr">
+        <text>The AKMS is a side-folding metal stock variant of the AKM assault rifle designed for airborne military units, much like the AKS-47 and AKS-74.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_aug_name">
+        <text>Steyr AUG A1</text>
+    </string>
+    <string id="st_dxr_wpn_aug_descr">
+        <text>The Steyr AUG A1 is an Austrian bullpup assault rifle designed in the 1960s. In production since 1978, it is the standard small arm of the Austrian Bundesheer and various national police units.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_bizon_name">
+        <text>Izhmash PP-19 Bizon-2</text>
+    </string>
+    <string id="st_dxr_wpn_bizon_descr">
+        <text>The Bizon was developed for counter-terrorist and law enforcement units that usually need fast and accurate fire at close ranges. It uses an unusual 64-round helical-feed magazine that mounts under the handguard in line with the barrel making the weapon more compact and concealable.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_bizon201_name">
+        <text>Izhmash PP-19 Bizon-2-01</text>
+    </string>
+    <string id="st_dxr_wpn_bizon201_descr">
+        <text>The Bizon-2-01 variant is chambered for the 9x19 mm cartridge using a modified helical-feed magazine with a 53-round capacity. Like the standard model, the magazine mounts under the handguard in line with the barrel making the weapon more compact and concealable.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_bm16_name">
+        <text>TOZ-66 Obrez</text>
+    </string>
+    <string id="st_dxr_wpn_bm16_descr">
+        <text>The TOZ-66 is a break-action double-barrel shotgun produced between 1968 and 1974 and uses a side-by-side barrel configuration. This particular shotgun has had the majority of the barrel and stock sawed off.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_bm16_full_name">
+        <text>TOZ-66</text>
+    </string>
+    <string id="st_dxr_wpn_bm16_full_descr">
+        <text>The TOZ-66 is a break-action double-barrel shotgun produced between 1968 and 1974 and uses a side-by-side barrel configuration.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_famas_name">
+        <text>Nexter FAMAS F1</text>
+    </string>
+    <string id="st_dxr_wpn_famas_descr">
+        <text>The FAMAS is a bullpup-style assault rifle designed and manufactured in France between 1975 and 2000. Almost 40 years on from its initial production, the FAMAS F1 and G2 variants are still used by the French military.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_fort500_name">
+        <text>Fort-500</text>
+    </string>
+    <string id="st_dxr_wpn_fort500_descr">
+        <text>The Fort-500 is a 12-gauge pump-action shotgun patterned after the Remington 870. It was designed in the late 1990s by RPC Fort for police and security forces.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_fn2000_name">
+        <text>FN F2000</text>
+    </string>
+    <string id="st_dxr_wpn_fn2000_descr">
+        <text>The F2000 is a gas operated, fully automatic and ambidextrous bullpup rifle developed by FN Herstal. The weapon has a telescopic sight with a fixed 1.6x magnification contained within a plastic housing above the receiver.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_fnc_name">
+        <text>FN FNC</text>
+    </string>
+    <string id="st_dxr_wpn_fnc_descr">
+        <text>The FN FNC is an assault rifle developed by FN Herstal and introduced in the late 1970s. The rifle's design is based on the FNC 76 prototype, which itself originated from the commercially unsuccessful FN CAL rifle.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_g3_name">
+        <text>H&amp;K G3</text>
+    </string>
+    <string id="st_dxr_wpn_g3_descr">
+        <text>The G3 is a 7.62x51 mm chambered battle rifle developed by H&amp;K in collaboration with CETME. The origin of this rifle can be traced back to the final years of World War II when Mauser engineers designed the MKb Gerat 06</text>
+    </string>
+	
+    <string id="st_dxr_wpn_g36_name">
+        <text>H&amp;K G36K</text>
+    </string>
+    <string id="st_dxr_wpn_g36_descr">
+        <text>The G36K is a carbine variant of the G36 assault rifle, which was designed in the early 1990s by Heckler &amp; Koch in Germany as a replacement for the heavier G3 battle rifle.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_g36c_name">
+        <text>H&amp;K G36C</text>
+    </string>
+    <string id="st_dxr_wpn_g36c_descr">
+        <text>The G36C is a compact variant of the G36 assault rifle. It features a much shortened barrel, handguard and stock, and an integrated rail for optical sights.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_g3a3_name">
+        <text>H&amp;K G3A3</text>
+    </string>
+    <string id="st_dxr_wpn_g3a3_descr">
+        <text>The G3A3 is a selective-fire automatic battle rifle and most well-known variant of the G3. It features drum sights, a fixed plastic buttstock, and a plastic handguard that does not contact the barrel.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_g3sg1_name">
+        <text>H&amp;K G3SG1</text>
+    </string>
+    <string id="st_dxr_wpn_g3sg1_descr">
+        <text>Also known as the HSG1, this variant is a Luxemburg-produced marksman model of the battle rifle. Modifications to the handguard allow for a tripod to be attached for greater stability.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_galil_name">
+        <text>IMI Galil</text>
+    </string>
+    <string id="st_dxr_wpn_galil_descr">
+        <text>The Galil is an Israeli assault rifle designed by Yisrael Galili and Yaacov Lior in the late 1960s, and takes its name from the former. Many variants and adaptations of the weapon exist, such as the IWI ACE family of rifles.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_gauss_name">
+        <text>Gauss rifle</text>
+    </string>
+    <string id="st_dxr_wpn_gauss_descr">
+        <text>Officially "Item 62", this unusual weapon was created by researchers and weaponsmiths within the Zone. The current design is based on the EM1, which was captured from Clear Sky by the Monolith.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_groza_name">
+        <text>TsKIB SOO OTs-14-4A "Groza-4"</text>
+    </string>
+    <string id="st_dxr_wpn_groza_descr">
+        <text>The Groza-4 is a Russian selective fire bullpup assault rifle chambered for the 9x39 mm subsonic round. It was developed in the 1990s in Tula, Russia.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_groza1_name">
+        <text>TsKIB SOO OTs-14-1A "Groza-1"</text>
+    </string>
+    <string id="st_dxr_wpn_groza1_descr">
+        <text>The Groza-1 is a Russian selective fire bullpup assault rifle, the 1A/Groza-1 variant is chambered for the 5.45x39 mm round. It was developed in the 1990s in Tula, Russia.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_hk416_name">
+        <text>H&amp;K HK416</text>
+    </string>
+    <string id="st_dxr_wpn_hk416_descr">
+        <text>The HK416 is an assault rifle designed and manufactured by Heckler &amp; Koch based on the AR-15 platform. It is used by police forces, special forces and armed forces in many Western nations.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_l85_name">
+        <text>RSAF L85A2</text>
+    </string>
+    <string id="st_dxr_wpn_l85_descr">
+        <text>The L85A2 is a British selective fire, gas-operated assault rifle and member of the SA80 weapons family. Its bullpup design and mounted SUSAT sight keep the weapon compact without sacrificing accuracy.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_l96_name">
+        <text>Accuracy International L96A1</text>
+    </string>
+    <string id="st_dxr_wpn_l96_descr">
+        <text>The L96A1 is a bolt-action sniper rifle designed and manufactured by the British company Accuracy International. It has proved popular as a civilian, police, and military rifle since its introduction in the 1980s.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_lr300_name">
+        <text>Z-M LR-300 ML-N</text>
+    </string>
+    <string id="st_dxr_wpn_lr300_descr">
+        <text>Designed and manufactured by Z-M Weapons, the LR-300 is an American assault rifle and conversion kit. The ML-N variant has an 11.53-inch barrel, Nylatron forend with attachable Picatinny rails, and fires single shots or bursts</text>
+    </string>
+	
+    <string id="st_dxr_wpn_m16_name">
+        <text>M16</text>
+    </string>
+    <string id="st_dxr_wpn_m16_descr">
+        <text>One of the most iconic rifles ever produced, the M16 entered American military service in 1964 and the following year was deployed for jungle warfare operations during the Vietnam War. Since then around 8 million unit have been produced.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_m16a2_name">
+        <text>Colt M16A2</text>
+    </string>
+    <string id="st_dxr_wpn_m16a2_descr">
+        <text>Based on the M16, the M16A2 was adopted by the US Department of Defence in 1982 following combat experience in Vietnam. With new rifling, a thicker barrel and an adjustable rear sight - the M16A2 is a notable upgrade.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_m249_name">
+        <text>FN M249 SAW</text>
+    </string>
+    <string id="st_dxr_wpn_m249_descr">
+        <text>The M249 is the American adaptation of the Belgian FN Minimi, a light machine gun manufactured by the Belgian company FN Herstal.  The weapon was introduced in 1984 after being judged the most effective of a number of candidate weapons to address the lack of automatic firepower in small units.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_m4_name">
+        <text>Colt M4A1</text>
+    </string>
+    <string id="st_dxr_wpn_m4_descr">
+        <text>The M4A1 carbine is a shorter and lighter variant of the M16A2 assault rifle, it has a 370 mm barrel and a telescoping stock. Used extensively by the United States Armed Forces, the rifle is largely replacing the M16 as their primary infantry weapon</text>
+    </string>
+	
+    <string id="st_dxr_wpn_m4a1_name">
+        <text>Bushmaster XM-15-E2S</text>
+    </string>
+    <string id="st_dxr_wpn_m4a1_descr">
+        <text>Based on the AR-15 assault rifle, the XM-15-ES2 is an automatic M4-style carbine. It is infamous for being designed to avoid the Assault Weapons Ban brought into law during 1994 in the United States.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_m79_name">
+        <text>Springfield M79</text>
+    </string>
+    <string id="st_dxr_wpn_m79_descr">
+        <text>The M79 grenade launcher is a single-shot, shoulder-fired, break-action grenade launcher that fires a 40x46mm grenade, first used during the Vietnam War. It has earned the nicknames of "Thumper", "Thump-Gun", "Bloop Tube", "Blooper" and "Can Cannon"</text>
+    </string>
+	
+    <string id="st_dxr_wpn_m95_name">
+        <text>Barrett M95</text>
+    </string>
+    <string id="st_dxr_wpn_m95_descr">
+        <text>The Barrett M95 is an American bolt-action sniper rifle chambered for the 12.7x99 mm round, and is used for military and law enforcement applications by over 15 different countries around the world.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_m98b_name">
+        <text>Barrett M98B</text>
+    </string>
+    <string id="st_dxr_wpn_m98b_descr">
+        <text>Also known as the 98 Bravo, the Barrett Model 98 is a bolt-action sniper rifle chambered for the 8.6x70 mm round. In 1999 the M95 won the competition to become the M107 for the US Army, however the M82 was chosen instead.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_mosin_name">
+        <text>Mosin-Nagant M91/30</text>
+    </string>
+    <string id="st_dxr_wpn_mosin_descr">
+        <text>The M1891 is a five-shot rifle developed by the Imperial Russian Army. It is one of the most mass produced weapons in history, with over 37 million units built. This model features a hex receiver, and was likely built by either TOZ or Izhevsk.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_mp5_name">
+        <text>H&amp;K MP5A3</text>
+    </string>
+    <string id="st_dxr_wpn_mp5_descr">
+        <text>The MP5 is one of the most widely used submachine guns in the world, having been adopted by 40 nations and numerous military, law enforcement, intelligence, and security organizations during its 50 year existence.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_mp5sd_name">
+        <text>H&amp;K MP5SD3</text>
+    </string>
+    <string id="st_dxr_wpn_mp5sd_descr">
+        <text>In 1974 H&amp;K initiated design work on a sound-suppressed variant of the MP5, designated the MP5SD. The MP5SD3 model features an integral aluminium sound suppressor with a retractable buttstock.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_mp133_name">
+        <text>Izhmekh Baikal MP-133</text>
+    </string>
+    <string id="st_dxr_wpn_mp133_descr">
+        <text>The MP-133 is an evolution of the earlier IZh-81 pump action shotgun, and is intended primary for civilian and security markets. This model of the shotgun comes with an extended magazine capacity.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_mp153_name">
+        <text>Izhmekh Baikal MP-153</text>
+    </string>
+    <string id="st_dxr_wpn_mp153_descr">
+        <text>Manufactured by the Izhevsk Mechanical Plant in Russia, the MP-153 is a 12 gauge gas-operated semi-automatic shotgun. Over 500,000 units have been built since entering production in 2001.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_p90_name">
+        <text>FN P90</text>
+    </string>
+    <string id="st_dxr_wpn_p90_descr">
+        <text>Created in response to requests for a replacement for 9x19 mm firearms, the P90 was designed as a compact but powerful firearm and was developed in conjunction with the FN Five-SeveN and the FN 5.7x28 mm cartridge.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_pkm_name">
+        <text>KMZ PKM</text>
+    </string>
+    <string id="st_dxr_wpn_pkm_descr">
+        <text>The PKM is a modernised version of the PK machine gun originally produced in 1961 at the Kovrov Mechanical Plant. The PKM itself remains in use as a front-line infantry and vehicle-mounted weapon with many armed forces since its introduction in 1969.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_pkm_zulus_name">
+        <text>TsNIITM PKP "Pecheneg"</text>
+    </string>
+    <string id="st_dxr_wpn_pkm_zulus_descr">
+        <text>The Pecheneg is a general-purpose machine gun which can be considered a modernisation of the PKM. It has a heavy fixed barrel encased in a radial cooling sleeve that uses forced-air cooling, reducing recoil and allowing the weapon to be fired for longer.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_pp2000_name">
+        <text>KBP PP-2000</text>
+    </string>
+    <string id="st_dxr_wpn_pp2000_descr">
+        <text>The PP-2000 was designed as a close-quarter combat weapon, intended for riot police and special operations forces. In 2008, it was adopted as one of the two standard submachine guns of the Russian police along with the Vityaz-SN.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_ppsh41_name">
+        <text>PPSh-41</text>
+    </string>
+    <string id="st_dxr_wpn_ppsh41_descr">
+        <text>The PPSh-41 is a Soviet submachine gun designed by Georgi Shpagin as a cheap, reliable, and simplified alternative to the PPD-40. It typically comes with a box or drum magazine, and fires the 7.62x25 mm Tokarev pistol round.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_protecta_name">
+        <text>Armsel Protecta</text>
+    </string>
+    <string id="st_dxr_wpn_protecta_descr">
+        <text>The Armsel Protecta is a redesigned version of the Armsel Striker, a 12-gauge shotgun with a revolving cylinder that was designed for riot control and combat. Readying the weapon for firing was simplified and the weapon's reliability was greatly improved.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_protecta_nimble_name">
+        <text>Armsel Protecta Tactical</text>
+    </string>
+    <string id="st_dxr_wpn_protecta_nimble_descr">
+        <text>This variant of the shotgun is painted in a woodland camouflage pattern with an Aimpoint CompM2 optical sight installed for accuracy. Modifications have been made to the weapon to increase the cylindrical magazine's rotation and thus boost RPM.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_remington870_name">
+        <text>Remington M870</text>
+    </string>
+    <string id="st_dxr_wpn_remington870_descr">
+        <text>The Remington Model 870 is a pump-action shotgun widely used by the public for sport shooting, hunting, and self-defense and used by law enforcement and military organizations worldwide. As of 1983, the 870 held the record for best-selling shotgun in history with three million sold.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_remington870_express_name">
+        <text>Remington M870 "Express"</text>
+    </string>
+    <string id="st_dxr_wpn_remington870_express_descr">
+        <text>The Remington Model 870 "Express" shotgun is a a lower-cost and heavier alternative to the original Wingmaster line, featuring a matte black body with a laminated hardwood stock.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_rg-6_name">
+        <text>TsKIB SOO RG-6</text>
+    </string>
+    <string id="st_dxr_wpn_rg-6_descr">
+        <text>The RG-6 is a Russian 40 mm semi-automatic, six-shot revolver-type grenade launcher. It was developed between 1993 and 1994 to increase the firepower of infantry during urban combat, like was seen during the wars in Chechnya.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_rpd_name">
+        <text>RPD</text>
+    </string>
+    <string id="st_dxr_wpn_rpd_descr">
+        <text>The RPD is a 7.62x39 mm light machine gun developed in the Soviet Union by Vasily Degtyaryov. It was created as a replacement for the DP machine gun, a precursor of most squad automatic weapons. It was later succeeded and replaced in Soviet service by the RPK.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_rpg7_name">
+        <text>Bazalt RPG-7</text>
+    </string>
+    <string id="st_dxr_wpn_rpg7_descr">
+        <text>Almost as recognisable as any Kalashnikov rifle, the RPG-7 is a portable, reusable, unguided, shoulder-launched, anti-tank rocket-propelled grenade launcher which has been in solid continuous use for over half a century since it was first manufactured.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_rpk_name">
+        <text>Izhmash RPK</text>
+    </string>
+    <string id="st_dxr_wpn_rpk_descr">
+        <text>The RPK is a 7.62x39 mm light machine gun of Soviet design, it was developed by Mikhail Kalashnikov in the late 1950s in parallel with the AKM assault rifle.  It was created as part of a program designed to standardise the small arms inventory of the Red Army, where it replaced the RPD.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_rpk74_name">
+        <text>Izhmash RPK-74</text>
+    </string>
+    <string id="st_dxr_wpn_rpk74_descr">
+        <text>The RPK-74 was introduced in 1974 together with the AK-74 assault rifle and chambered for the new 5.45x39 mm high-velocity cartridge. It was derived from the AK-74 rifle, with modifications that mirror those made to the AKM to create the RPK.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_saiga_name">
+        <text>Izhmash Saiga-12</text>
+    </string>
+    <string id="st_dxr_wpn_saiga_descr">
+        <text>The Saiga-12 is a rotating bolt, gas-operated shotgun available in a wide range of configurations, patterned after the Kalashnikov series of rifles and is fed from a box magazine. Allowing for decreased reload times and increasing its effectiveness in combat.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_scar-h_name">
+        <text>FN SCAR-H</text>
+    </string>
+    <string id="st_dxr_wpn_scar-h_descr">
+        <text>The SCAR-H was developed by FN Herstal for the United States' SOCOM to satisfy the requirements of the "Special Operations Forces Combat Assault Rifle" competition. The "H", or "Heavy", designation indicates that this variant is chambered for the 7.62x51 mm round.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_sig550_name">
+        <text>SIG SG 550</text>
+    </string>
+    <string id="st_dxr_wpn_sig550_descr">
+        <text>This Swiss assault rifle is chambered for the 5.56x39 mm NATO cartridge, and is based on the earlier SG 540. Many variants of the rifle exist and are used by armed, special, and police forces across many Western nations.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_sig550_luckygun_name">
+        <text>SIG SG 550 Sniper</text>
+    </string>
+    <string id="st_dxr_wpn_sig550_luckygun_descr">
+        <text>This member of the SG 550 family is the SG 550 Sniper variant, which was designed specifically for Swiss security forces. This model is no longer in production and was never exported, as such it is a mystery as to how it found its way to the Zone.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_sig552_name">
+        <text>SIG SG 552 Commando</text>
+    </string>
+    <string id="st_dxr_wpn_sig552_descr">
+        <text>Also known as the 552-2P, this rifle is a carbine variant of the SG 550 released initially in 1998, however later discontinued in 2008 and replaced by the SG 553. Despite this vast quantities of surplus rifles are clearly still in use.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_sks_name">
+        <text>SKS-45</text>
+    </string>
+    <string id="st_dxr_wpn_sks_descr">
+        <text>The SKS is a Soviet semi-automatic clip-fed carbine rifle chambered for the 7.62x39 mm round. Design-wise, it relies on the AVS-36 to a point that some consider it a shortened variant, stripped of select-fire capability and then re-chambered.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_spas12_name">
+        <text>Franchi SPAS-12</text>
+    </string>
+    <string id="st_dxr_wpn_spas12_descr">
+        <text>The Franchi SPAS-12 is a combat shotgun manufactured by Italian firearms company Franchi from 1979 to 2000. The SPAS-12 was sold to military and police users worldwide, often being used to fire tear gas and beanbag rounds for riot control.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_sr25_name">
+        <text>KAC SR-25</text>
+    </string>
+    <string id="st_dxr_wpn_sr25_descr">
+        <text>The Stoner Rifle-25 is a designated marksman rifle designed by Eugene Stoner and manufactured by Knight's Armament Company. It is heavily designed on the AR-10 platform, with up to 60% of parts being interchangeable with the AR-15 and M16.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_sr3m_name">
+        <text>TsNIITM SR-3M</text>
+    </string>
+    <string id="st_dxr_wpn_sr3m_descr">
+        <text>The SR-3M is a modernised and greatly improved variant of the SR-3 "Vikhr", one of the most major differences is the new magazine - which has a 30 round capacity and provides a more reliable feeding system during fully automatic fire.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_sv98_name">
+        <text>Izhmash SV-98</text>
+    </string>
+    <string id="st_dxr_wpn_sv98_descr">
+        <text>The SV-98 is a Russian bolt-action sniper rifle designed by Vladimir Stronskiy, and is based on the Record 300m full bore sport shooting rifle series also made by Izhmash. As such, the rifle's accuracy is said to be as equal to the best sporting guns.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_svd_name">
+        <text>Izhmash SVD</text>
+    </string>
+    <string id="st_dxr_wpn_svd_descr">
+        <text>The SVD is a semi-automatic marksman rifle developed by the Soviet Union when long-range engagement ability was lost to ordinary troops. The rifle has since become the standard squad support weapon of several countries, including those of the former Warsaw Pact.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_svd_nimble_name">
+        <text>Izhmash SVDM</text>
+    </string>
+    <string id="st_dxr_wpn_svd_nimble_descr">
+        <text>The SVDM is a modernised version of the SVD, it features improved ergonomics, an adjustable side-folding shoulder stock and a thicker and heavier barrel which delivers much better accuracy than its predecessor.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_svt40_name">
+        <text>Tokarev SVT-40</text>
+    </string>
+    <string id="st_dxr_wpn_svt40_descr">
+        <text>The SVT-40 saw widespread service during and after World War II. Intended to be the new service rifle of the Red Army, production was disrupted by the German invasion in 1941. After the war new rifles were adopted by the Soviet Union instead, such as the SKS and the AK-47.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_svu_name">
+        <text>KBP OTs-03 SVU</text>
+    </string>
+    <string id="st_dxr_wpn_svu_descr">
+        <text>The SVU is a bullpup configuration of the SVD sniper rifle. The SVU was developed to meet the needs of the security forces of the Russian Ministry of Internal Affairs, such as OMON.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_svu_nimble_name">
+        <text>KBP OTs-03 SVU Tactical</text>
+    </string>
+    <string id="st_dxr_wpn_svu_nimble_descr">
+        <text>This modified variant of the SVU comes painted in a woodland camouflage pattern, and a permanently-attached optical sight. The muzzle break was also replaced; allowing for more recoil energy to be absorbed.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_toz194_name">
+        <text>TOZ-194</text>
+    </string>
+    <string id="st_dxr_wpn_toz194_descr">
+        <text>The TOZ-194 is a 12 Gauge, pump-action shotgun manufactured by the Tula Arms Plant. Designed during the later years of the Soviet Union, the production of this firearm started after the Soviet era in Russia, and has since gained a certain popularity within civilian shooters in Russia and Europe.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_toz34_name">
+        <text>TOZ-34</text>
+    </string>
+    <string id="st_dxr_wpn_toz34_descr">
+        <text>Designed in 1964 by Nikolai Korovyakov, like many other hunting shotguns the TOZ-34 features a typical over-and-under barrel configuration. In 1965 it was awarded a gold medal at the Leipzig Trade Fair and more than one million units have been produced since.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_toz34_nimble_name">
+        <text>TOZ-34 Tactical</text>
+    </string>
+    <string id="st_dxr_wpn_toz34_nimble_descr">
+        <text>This modified TOZ-34 has a long-range optical sight permanently affixed to the rails. Whilst the rifle itself doesn't perform all too differently, it will allow the user much improved accurate at longer ranges.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_toz34_obrez_name">
+        <text>TOZ-34 Obrez</text>
+    </string>
+    <string id="st_dxr_wpn_toz34_obrez_descr">
+        <text>Designed in 1964 by Nikolai Korovyakov, like many other hunting shotguns the TOZ-34 features a typical over-and-under barrel configuration. This particular shotgun has had the majority of the barrel and stock sawed off.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_val_name">
+        <text>TsNIITM AS "Val"</text>
+    </string>
+    <string id="st_dxr_wpn_val_descr">
+        <text>The AS "Val" is a special automatic rifle that was developed in 1987 by TsNIITochMash. Since 1987 it has been in the arsenal of the Red Army and the KGB, though due to it being both expensive and in limited quantity, it is very rarely deployed.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_vintorez_name">
+        <text>TsNIITM VSS "Vintorez"</text>
+    </string>
+    <string id="st_dxr_wpn_vintorez_descr">
+        <text>The VSS is a suppressed sniper rifle developed in the late 1980s by TsNIITochMash, and was issued primarily to Spetsnaz units for undercover or clandestine operations. For all intents and purposes in the Zone, it is a lighter and more economical AS "Val".</text>
+    </string>
+	
+    <string id="st_dxr_wpn_vintorez_nimble_name">
+        <text>TsNIITM VSS "Vintorez" Tactical</text>
+    </string>
+    <string id="st_dxr_wpn_vintorez_nimble_descr">
+        <text>A tactical variant of the VSS. Whilst it performs no differently to the standard model, it features synthetic parts in place of wood and a permanently attached PKS-07 optical sight.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_vityaz_name">
+        <text>Izhmash Vityaz-SN</text>
+    </string>
+    <string id="st_dxr_wpn_vityaz_descr">
+        <text>The Vityaz-SN is a 9x19 mm submachine gun developed in 2004 by Izhmash. It is based on the AK-74 rifle, so they naturally offer a high degree of part commonality. It is the standard submachine gun for all branches of the Russian military and police forces.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_vsk94_name">
+        <text>KBP VSK-94</text>
+    </string>
+    <string id="st_dxr_wpn_vsk94_descr">
+        <text>The VSK-94 is a suppressed sniper rifle designed In 1995 by Vasily Petrovich. The VSK fires 9x39 mm ammunition from a 20-round detachable box magazine much like the 9A-91, but deals slightly greater damage at the expense of a lower rate-of-fire.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_vssk_name">
+        <text>TsKIB SOO VSSK "Vykhlop"</text>
+    </string>
+    <string id="st_dxr_wpn_vssk_descr">
+        <text>Developed in around 2002 for the special forces units of FSB, the VSSK is a Russian bullpup, magazine-fed sniper rifle chambered for the 12.7x55 mm subsonic round. Its integral suppressor and chambering make it ideal for stealth.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_wincheaster1300_name">
+        <text>Mossberg M590A1</text>
+    </string>
+    <string id="st_dxr_wpn_wincheaster1300_descr">
+        <text>Intended for use in harsh and dirty conditions, the Model 500 series of shotguns and its variants are designed to be easy to clean and maintain. It is only natural to find such a shotgun here in the Zone for these very reasons.</text>
+    </string>
+	
+    <string id="st_dxr_wpn_wincheaster1300_trapper_name">
+        <text>Daewoo USAS-12</text>
+    </string>
+    <string id="st_dxr_wpn_wincheaster1300_trapper_descr">
+        <text>The USAS-12 is a gas-operated, selective fire weapon, designed to provide sustained firepower in close-combat scenarios, and was designed in South Korea by Daewoo Precision Industries during the 1980s. How such a weapon found its way here is anyone's guess.</text>
+    </string>
+	
+</string_table>

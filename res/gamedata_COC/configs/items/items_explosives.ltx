@@ -1,0 +1,177 @@
+[wpn_mine]:identity_immunities
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "devices\play"
+cform                                    = skeleton
+class                                    = S_FOOD
+visual                                   = dynamics\weapons\wpn_pfm1\wpn_pfm1.ogf
+inv_vol                                  = 1
+
+inv_name                                 = st_wpn_mine_name
+inv_name_short                           = st_wpn_mine_name
+description                              = st_wpn_mine_descr
+
+inv_weight                               = 0.751
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 0
+inv_grid_y                               = 3
+cost                                     = 1000
+
+attach_angle_offset                      = -1.5708,0.1919,3.1416 ;onoaiaaeeaaaons a ?aaeaiao Angle*PI/180
+attach_position_offset                   = 0.075, 0.066, 0.023
+attach_bone_name                         = bip01_l_hand
+auto_attach                              = false
+
+; eatable item
+eat_health                               = 0
+eat_satiety                              = 0
+eat_power                                = 0
+eat_radiation                            = 0
+eat_alcohol                              = 0
+
+wounds_heal_perc                         = 0
+
+; For actor only!
+[mine_actor]:explosive_barrel
+
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "sm\scripts\mina_blow"
+$prefetch                                = 16
+class                                    = II_EXPLO
+cform                                    = skeleton
+
+script_binding                           = m_mines.add_actor_mine
+
+visual                                   = dynamics\weapons\wpn_pfm1\wpn_pfm1.ogf
+
+inv_name                                 =
+inv_name_short                           =
+inv_weight                               = 0.751
+
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 25
+inv_grid_y                               = 2
+;aauu iaaicii?ii iiaia?aou
+can_take                                 = false
+
+cost                                     = 1500
+;-------------------------------------------------------------------------------
+blast                                    = 3.18
+blast_r                                  = 2.26
+blast_impulse                            = 66
+;delete
+blast_impulse_factor                     = 0.85
+
+
+frags                                    = 0
+frags_r                                  = 0
+frag_hit                                 = 0.04
+frag_hit_impulse                         = 8
+
+hit_type_blast                           = explosion
+hit_type_frag                            = fire_wound
+
+up_throw_factor                          = 0.3
+;-------------------------------------------------------------------------------
+wm_size                                  = 0.01
+
+explode_particles                        = explosions\explosion_01
+
+light_color                              = 1.9,1.4,0.5
+light_range                              = 25.0
+light_time                               = 0.85
+
+;o?annu io ineieeia
+fragment_speed                           = 170 ;nei?inou ineieeia (i/n)
+
+explode_duration                         = 0 ;iiaie?eoaeuiinou ac?uaa (n)
+time_to_explode                          = 0.f
+
+;caoee
+snd_explode                              = weapons\rgd5_explode
+immunities_sect                          = personnel_mine_immunities_sect
+;wallmarks
+wallmark_section                         = explosion_marks
+
+;
+;[mine_proximity]
+;script_binding		= m_mines.add_neutral_mine
+
+[mine_proximity]:explosive_barrel
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "devices\proximity mine"
+cform                                    = skeleton
+class                                    = II_EXPLO
+visual                                   = dynamics\weapons\wpn_mine\wpn_mine_2.ogf
+script_binding                           = m_mines.add_neutral_mine
+
+inv_name                                 =
+inv_name_short                           =
+inv_weight                               = 0.751
+
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 25
+inv_grid_y                               = 2
+;aauu iaaicii?ii iiaia?aou
+can_take                                 = false
+
+cost                                     = 1500
+;-------------------------------------------------------------------------------
+blast                                    = 3.18
+blast_r                                  = 2.26
+blast_impulse                            = 66
+;delete
+blast_impulse_factor                     = 0.85
+
+
+frags                                    = 0
+frags_r                                  = 0
+frag_hit                                 = 0.04
+frag_hit_impulse                         = 8
+
+hit_type_blast                           = explosion
+hit_type_frag                            = fire_wound
+
+up_throw_factor                          = 0.3
+;-------------------------------------------------------------------------------
+wm_size                                  = 0.01
+
+explode_particles                        = explosions\explosion_01
+
+light_color                              = 1.9,1.4,0.5
+light_range                              = 25.0
+light_time                               = 0.85
+
+;o?annu io ineieeia
+fragment_speed                           = 170 ;nei?inou ineieeia (i/n)
+
+explode_duration                         = 0 ;iiaie?eoaeuiinou ac?uaa (n)
+time_to_explode                          = 0.f
+
+;caoee
+snd_explode                              = weapons\rgd5_explode
+immunities_sect                          = personnel_mine_immunities_sect
+;wallmarks
+wallmark_section                         = explosion_marks
+
+[personnel_mine_immunities_sect]
+;eiyooeoeaiou aey iiiaaaiee ?acee?iuie oeiaie oeoia
+burn_immunity                            = 0.0
+strike_immunity                          = 0
+shock_immunity                           = 0
+wound_immunity                           = 0.35
+radiation_immunity                       = 0
+telepatic_immunity                       = 0
+chemical_burn_immunity                   = 0
+explosion_immunity                       = 0.85
+fire_wound_immunity                      = 0.95
+
+; food item
+animation_slot                           = 4
+;hud item
+hud                                      = wpn_vodka_hud

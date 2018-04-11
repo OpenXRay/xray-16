@@ -1,0 +1,166 @@
+<?xml version='1.0' encoding="windows-1251"?>
+<xml>
+    <specific_character id="pas_b400_vano" team_default = "1">
+    <name>jup_a10_stalker_vano</name>
+    <icon>ui_inGame2_neutral_nauchniy</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pas_b400_vano</class>
+    <community>stalker</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <rank>11384</rank>
+    <reputation>1495</reputation>
+    <visual>actors\stalker_neutral\stalker_neutral_nauchniy</visual>
+    <supplies>
+        [spawn] \n
+        device_torch \n
+        wpn_binoc \n
+        wpn_wincheaster1300 \n
+        ammo_12x70_buck \n
+        ammo_12x76_zhekan \n
+        wpn_beretta \n
+        ammo_9x19_fmj \n
+        detector_simple \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="pas_b400_sokolov" team_default = "1">
+    <name>pri_a15_sokolov_name</name>
+    <icon>ui_inGame2_ecolog_green</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pas_b400_sokolov</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <rank>5538</rank>
+    <reputation>442</reputation>
+    <visual>actors\stalker_ecologist\stalker_ecolog_military</visual>
+    <supplies>
+        [spawn] \n
+        device_torch \n
+        wpn_binoc \n
+        wpn_ak74u \n
+        ammo_5.45x39_fmj \n
+        wpn_fort \n
+        ammo_9x18_pmm \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="pas_b400_zulus" team_default = "1">
+    <name>jup_b15_zulus</name>
+    <icon>ui_inGame2_Dolg_1</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pas_b400_zulus</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <rank>11514</rank>
+    <reputation>1414</reputation>
+    <visual>actors\stalker_dolg\stalker_dolg_1</visual>
+    <supplies>
+        [spawn] \n
+        device_torch \n
+        wpn_binoc \n
+        wpn_pkm_zulus \n
+        ammo_pkm_100 \n
+        wpn_usp \n
+        ammo_11.43x23_hydro \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="pas_b400_wanderer" team_default="1">
+    <name>jup_b4_monolith_squad_leader_name</name>
+    <icon>ui_inGame2_monolit_1</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pas_b400_wanderer</class>
+    <community>stalker</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
+    <rank>13440</rank>
+    <reputation>1413</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_1</visual>
+    <supplies>
+        [spawn] \n
+        device_torch \n
+        wpn_binoc \n
+        wpn_svu \n
+        ammo_7.62x54_7h1 \n
+        wpn_colt1911 \n
+        ammo_11.43x23_fmj \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_4.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="pas_b400_monolith_sniper_0" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_2</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pas_b400_monolith_sniper</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\monolith\</snd_config>
+    <rank>1088</rank>
+    <reputation>-185</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_2</visual>
+    <supplies>
+        [spawn] \n
+        device_torch \n
+        wpn_svd = 1 \n
+        ammo_7.62x54_7h1 = 1 \n
+        wpn_usp = 1 \n
+        ammo_11.43x23_fmj = 1 \n
+        grenade_rgd5 = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_sci.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    </specific_character>
+    
+    <specific_character id="pas_b400_monolith_sniper_1" team_default = "1">
+    <name>GENERATE_NAME_stalker</name>
+    <icon>ui_inGame2_monolit_1</icon>
+    <map_icon x="1" y="0"></map_icon>
+    <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
+    <class>pas_b400_monolith_sniper</class>
+    <community>monolith</community> <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\monolith\</snd_config>
+    <rank>10282</rank>
+    <reputation>-378</reputation>
+    <visual>actors\stalker_monolith\stalker_monolith_1</visual>
+    <supplies>
+        [spawn] \n
+        wpn_svu \n
+        ammo_7.62x54_7h1 = 1 \n
+        wpn_sig220 = 1 \n
+        ammo_11.43x23_fmj = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_3.xml"
+#include "gameplay\character_drugs_sci.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+#include "gameplay\character_dialogs.xml"
+    </specific_character>
+    
+</xml>

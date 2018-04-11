@@ -1,0 +1,18 @@
+[smart_terrain]
+squad_id = 7
+max_population = 2
+respawn_params = respawn@aes_smart_terrain_monsters2
+respawn_idle = 86400
+
+
+[respawn@aes_smart_terrain_monsters2]
+spawn_giant
+spawn_controller
+
+[spawn_giant]
+spawn_squads = simulation_gigant
+spawn_num = 1
+
+[spawn_controller]
+spawn_squads = simulation_controller
+spawn_num = 1

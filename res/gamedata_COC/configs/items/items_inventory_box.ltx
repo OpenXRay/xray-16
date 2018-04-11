@@ -1,0 +1,17 @@
+[inventory_box]
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "devices\inventory box"
+class                                    = S_INVBOX
+cform                                    = skeleton
+visual                                   = dynamics\equipment_cache\equipment_box_01_case.ogf
+script_binding                           = bind_physic_object.init
+
+[hidden_box]:inventory_box
+
+[inv_backpack]:inventory_box
+visual                                   = dynamics\devices\dev_rukzak\dev_rukzak.ogf
+custom_data                              = scripts\treasure_inventory_box.ltx
+radius                                   = 1
+
+[inv_actor_backpack]:inv_backpack

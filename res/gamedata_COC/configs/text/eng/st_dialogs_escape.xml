@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+<!--------------------------- esc_2_12_stalker_trader ----------->
+	<string id="esc_2_12_stalker_trader_start_dialog_1">
+		<text>A fresh face... Or have I seen you around before, stalker? I'm the guy around here to see if you need to buy or sell equipment. If you are seeking a source of income, I'm always in need of someone willing to do dirty work.\nI look over this camp; all stalkers are welcome here to rest as long as they stay out of trouble. I warn you, do not mess with the military, I pay good money to keep them away from this place. Stalkers should be relatively safe as long as they don't leave camp.</text>
+	</string>
+	<string id="esc_2_12_stalker_trader_start_dialog_2">
+		<text>Hey, stalker! What do you need?</text>
+	</string>
+	<string id="esc_2_12_stalker_trader_start_dialog_esc_m_trader_task_1_complete">
+		<text>Business is taken care of? Good work, here is your payment.</text>
+	</string>
+	<string id="esc_2_12_stalker_trader_start_dialog_esc_m_trader_task_2_complete">
+		<text>You have a real talent, you know that? Here is your payment. This will be good for business.</text>
+	</string>
+<!--------------------------- esc_2_12_stalker_wolf_start ------>
+	<string id="esc_2_12_stalker_wolf_start_dialog_1">
+		<text>Hello, stalker. What brings you to the village, today?</text>
+	</string>
+<!--------------------------- esc_2_12_stalker_fanat ----------->
+	<string id="esc_2_12_stalker_fanat_start_dialog_1">
+		<text>Hello, stalker. How are you today?</text>
+	</string>
+	<string id="esc_2_12_stalker_fanat_start_dialog_esc_m_trader_task_2">
+		<text>Do you need something, stalker?</text>
+	</string>
+	<string id="esc_2_12_stalker_fanat_about_esc_m_trader_task_2_0">
+		<text>There are bandits that need taken care of at the car park. Sidorovich said you may want to assist me.</text>
+	</string>
+	<string id="esc_2_12_stalker_fanat_about_esc_m_trader_task_2_1">
+		<text>Yes, I'll help you. I don't want any more harm to come to any of the rookies.</text>
+	</string>
+<!--------------------------- esc_2_12_stalker_nimble ----------->
+	<!-- esc_2_12_stalker_trader_mar_base_owl_stalker_trader_task_1 -->
+	<string id="esc_2_12_stalker_nimble_mar_base_owl_stalker_trader_task_1">
+		<text>Something for me? I've been waiting for this. Spore helps me keep my contacts on the outside safe and anonymous through high-level encryption - heh, hacker shit. Believe it or not I used to be a Clear Sky member way back, a lot of bad shit happened but it seems that somehow they managed to pull together. Most either died or went their separate ways. I saw no point in sticking around but I still retain contact with Spore. Oh, sorry, I forgot. Here's your payment:</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_mar_base_owl_stalker_trader_task_1_about">
+		<text>I have something for you.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_no">
+		<text>I'm not sure you have the right person.</text>
+	</string>
+	
+	<string id="esc_2_12_stalker_nimble_about_0">
+		<text>Can you answer a couple of questions?</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_about_1">
+		<text>Sure.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_about_1111">
+		<text>How long till my order's ready?</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_about_11111">
+		<text>It depends on how complex it is. It usually takes me a day, sometimes less.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_about_1114">
+		<text>Tell me about yourself.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_about_11141">
+		<text>Nothing much to tell. I've had it good and I've had it bad, like most people. Stepped into a few anomalies, been a hostage to bandits... I came to the Zone a young lad, a long time ago. I was a gopher at first - anti-rads, armour-piercing ammo, that sort of thing. Then I worked for Sidorovich... Paying him back for saving my ass. As I pulled chestnuts out of the fire for him, I made some useful connections and branched out on my own as soon as I could to start delivering exclusive orders. So far I've been able to dodge everything life has thrown at me, but I've a feeling my luck is running out. At the same time, I've no desire to bust my ass for pennies any-more.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_about_1116">
+		<text>Thanks, I see.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_about_11161">
+		<text>Glad to help.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_0">
+		<text>I'm here to collect my order.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_111">
+		<text>Here's your Steppe Eagle. It turned out trickier than I thought. Some kind of pistol buff showed a lot of interest, but I barely snatched it in time. See for yourself - a hand-crafted gun, components are all adjusted with unmatched precision. Ever wonder what a perfect sniper pistol would look like? Well, this is it. You owe me 2,800 extra.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_1111">
+		<text>Okay, here you go.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_11111">
+		<text>There you go. Nice doing business with you.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_1112">
+		<text>I don't have that much on me.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_11121">
+		<text>Okay, I'll hold the gun for you a while. I hope you find the money soon.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_1113">
+		<text>I don't want to buy this.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_11131">
+		<text>If you refuse to collect the order, I won't be able to rely on you next time around. I'll have to include the risk estimate in the price and ask for a larger advance.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_111311">
+		<text>Still, I will not be collecting this order.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_1113111">
+		<text>All right, suit yourself.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_1114">
+		<text>I'll think about it.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_11141">
+		<text>Sure, that's up to you. I'll hold the gun for you a while.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_112">
+		<text>Here's your ultra-high-accuracy Steppe Eagle. You owe me 2,800 extra.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_121">
+		<text>Behold the Alpine - a real beauty. You can rest assured this pistol is one of a kind in the whole Zone. A unique model, very limited issue commissioned for a single special unit. It wasn't easy to obtain, I even had to involve one of my overseas associates. An expanded magazine, extra hard steel barrel, receiver made of extra strong polymers. Add the remaining 2,800 and this baby's yours.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_122">
+		<text>Here's your Alpine pistol with an expanded magazine. Add the remaining 2,800 and this baby's yours.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_131">
+		<text>Lookit, this is March. The pistol belonged to a mercenary called Wolfhound. A compact high-calibre shooter with short blowback and a lightened bolt. Wolfhound was one hundred percent scum, but he knew his weapons, gotta give him that. They say his favourite trick was to blow all four of his victims' limbs off and then his head - before it hit the ground. Anyway, that'll be 2,800.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_132">
+		<text>Here's your rapid-fire March pistol. You owe me 2,800 extra.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_211">
+		<text>Here you go - Cutter, a submachine gun. Let me say it right off, don't you mind the appearance. It's a brand new model, not in serial production yet. It's a prototype, fresh from the armoury. The designers aimed to make a new-generation close-range weapon: a combination of high calibre, rapid fire and accuracy. So that'll be 8,000 extra.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_212">
+		<text>Yes, here's Cutter, a rapid-fire submachine gun. That'll be 8,000 extra.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_221">
+		<text>Here's a fine specimen - Carabineer. A true army shotgun. Capable of automatic fire while providing good anti-recoil thanks to a balanced, shock-free system. Add 8,000 and it's yours.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_222">
+		<text>Here's Carabineer, an automatic shotgun. Add 8,000 and it's yours.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_231">
+		<text>I reckon this is just what you need. Eliminator, a latest development. The whole batch was supposed to be shipped to Central Africa, but I got a 'sample' as a special favour from friends. An automatic shotgun with a large magazine and an excellent rate of fire. Yours for only 8,000.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_232">
+		<text>Sure. Automatic shotgun Eliminator, with an extended magazine. For 8,000.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_311">
+		<text>Sure. Behold Storm, a submachine and grenade launcher in one. This prototype is a modified version of a conventional weapon designed for special units operating in the Zone. Technical innovation at its best from our Slavic brothers... Add 16,000 and it's yours.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_312">
+		<text>Sure. Here's Storm, a submachine and grenade launcher with an extended magazine, for an extra 16,000.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_321">
+		<text>Here it is - GP37, a new-generation assault rifle. Accurate, reliable, and convenient with a built-in optical scope. It was previously owned by a UN observer. Their group was sent to the Zone to investigate. However, the situation turned for the worse... 16,000 and the rifle is yours.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_322">
+		<text>Here it is - GP37, a new-generation assault rifle. The price is 16,000.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_331">
+		<text>Just a sec. Here's a modular FT-200M rifle, the brainchild of Belgian gunmakers. Accurate, all-purpose, handy for both righties and lefties, comes with an optical scope and a grenade launcher. I got it from some unlucky UN observers... That'll be 16,000 extra.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_332">
+		<text>Here's a modular FT-200M rifle. That'll be 16,000 extra.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_411">
+		<text>Here's Tide. Based on a silent sniper rifle, it was specifically designed for military units to fight zombies. Tide yields rate of fire in favour of stopping power, allowing the sniper to pick off zombies one by one without disclosing his location. However, it then became clear that stalkers alone will be enough to stop zombies at the Barrier, so the rifle never reached mass production. This baby's yours for an extra 16,000.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_412">
+		<text>Here's Tide, a silent sniper rifle with increased stopping power. Add an extra 16,000 and enjoy.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_421">
+		<text>Here. This is an SVU2-A, a short sniper rifle with an increased rate of fire. I bought it off Mac, the legendary Freedom guard. He swore there are no others like it in the whole Zone. It's an exclusive item, at least in these parts. It'll be 16,000 extra.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_422">
+		<text>Yeah. SVU2-A, a short sniper rifle with an increased rate of fire. It'll be 16,000 extra.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_431">
+		<text>Sure, just look at Lynx here.  Hand-crafted by a local expert. He's deceased now, so there won't be any copies. It looks just like any other rifle, but take it out for some target practice and you'll feel all the difference. It's got a perfect combination of accuracy and stopping power. Add the remaining 16,000 and this baby's yours.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_432">
+		<text>Yeah, Lynx - a sniper rifle with increased accuracy and power. Add 16,000 and it's yours.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_511">
+		<text>Look here. I managed to get everything off my list - a CS-3a with a helmet. The helmet is nothing special on its own, but it allows for installing a mobile tactical complex, which includes a high-quality night vision system and an active infrared sensor. Now, the CS-3a armour is a real beauty. Excellent protection from bullets and anomalies is a rare feature indeed in a suit as light and mobile as this one. The whole thing will cost you 32,000.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_512">
+		<text>Yeah. A set of CS-3a armour with a tactical helmet. 32,000 in all.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_611">
+		<text>Specially for you, a SEVA suit. Everything just like you ordered - a closed-cycle respiratory module, thermal resistant, protective electrical circuit, and outer-surface anti corrosion materials. Plus several built-in artefact containers as a bonus. A must-have suit for any stalker. Toss in 24,000 like we agreed and it's yours.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_612">
+		<text>Here. A SEVA suit. The price is 24,000, like we agreed.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_711">
+		<text>There it is, a combat exoskeleton as large as life. The best protection you can get in the Zone from bullets, claws or grenade fragments, with the exception of armoured vehicles. But it also takes after armoured vehicles in that it relieves your weight burden - within reason, of course. 48,000 and it's yours, warts and all... err... by that I mean batteries and servomotors.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_get_order_712">
+		<text>There it is, a combat exoskeleton as large as life. 48,000 and it's yours.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_0">
+		<text>I want to place an order.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_1">
+		<text>No problem. What do you need?</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_11">
+		<text>A pistol.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_111">
+		<text>Of course. It'll be 3,500, of which I will require an advance payment of 700.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_1111">
+		<text>Okay, here you go.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_11111">
+		<text>I'll get in touch with you as soon as the order is ready.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_1112">
+		<text>I don't have the money on me.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_11121">
+		<text>Well, please come back when you've got the cash.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_1113">
+		<text>You know, I've changed my mind.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_11131">
+		<text>Fine. If you finally decide to make an order, I'm always here.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_112">
+		<text>You're not a very reliable customer, so the pistol will cost you 4,200. And I will require an advance payment of 1,400.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_113">
+		<text>I'm afraid the best pistols have already sold out. If you want the regular stuff, Owl's the man to see.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_12">
+		<text>A close-range weapon.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_121">
+		<text>Sure thing. The price is 10,000, and I'll need 2,000 of that in advance.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_122">
+		<text>You refused to pick up your last order... So this one will cost you 12,000, and I'll need 4,000 of that in advance.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_123">
+		<text>Hrm... You know, I probably can't help you there. The demand is too high.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_13">
+		<text>An assault weapon.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_131">
+		<text>Something high-calibre and with rapid fire capability, okay... The regular price is 20,000, with a 4,000 advance payment. What do you say?</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_132">
+		<text>You're a tough customer. I'll have to charge you 24,000 and I need 8,000 paid in advance. Deal?</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_133">
+		<text>Right now is a bad time... the military are making things hot at the Cordon. Someone attacked their outpost the other day, which made them even more difficult to deal with.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_14">
+		<text>A sniper weapon.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_141">
+		<text>For you I can get the best for only 20,000, but you'll have to pay me 4,000 in advance.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_142">
+		<text>Working with you entails a certain amount of risk... I can try to arrange your order for 24,000, but you'll need to make a 8,000 down payment.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_143">
+		<text>Sorry, this type of weapon is hard to come by right now. My contact for sniper stuff is... let's say he's indisposed.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_15">
+		<text>An armoured suit.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_151">
+		<text>Yeah, I can think of something... suitable. It'll cost you 40,000, but you'll have to pay me 8,000 in advance.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_152">
+		<text>Yeah, I can think of something... suitable. You refused to collect your last order, so the price will be 48,000 and you'll have to pay me 16,000 in advance.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_153">
+		<text>I won't be able to do any better than the last suit I got for you. That one was both unique and top of the line.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_16">
+		<text>A suit with a closed-cycle respiratory module.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_161">
+		<text>That's a tall order... Won't be easy to obtain, not by a long shot. I can try to get one of these babies for 30,000, but I have to ask for a down payment of 6,000.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_162">
+		<text>You let me down on the last order, so I have to think twice this time. I can try to get one of these babies for 36,000, but I have to ask for a down payment of 12,000.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_163">
+		<text>I bent over backwards to get the last one. Don't think I'll be able to repeat that.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_17">
+		<text>An exoskeleton.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_171">
+		<text>You must have given this choice a lot of thought. I can get my hands on a combat version, but it'll cost you 60,000. Expensive, I know, but well worth it. Keep in mind I'll need 12,000 of that paid right now.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_172">
+		<text>You didn't treat me very nicely on the last order, so this one'll set you back 72,000. Keep in mind I'll need 24,000 of that paid right now.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_173">
+		<text>No way. Since they closed the manufacturing plant, vacant exoskeletons are typically found only on corpses... That's just not my method.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_18">
+		<text>Nothing right now.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_place_order_2">
+		<text>Sorry, my shop is closed at the moment. Temporary difficulties with order shipments...</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_start_11">
+		<text>Hello. I'm Nimble. People come to me for unique weapons. Rare models, prototypes, unique shooters - stuff like that. Plus elite equipment, the latest modifications of protective and combat suits. I check every item personally, so quality is guaranteed.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_start_12">
+		<text>Hello. Would you like to place an order?</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_start_13">
+		<text>Hello.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_start_14">
+		<text>Your order will be delivered very soon.</text>
+	</string>
+	<string id="esc_2_12_stalker_nimble_start_15">
+		<text>The order is finished. Please come to collect it.</text>
+	</string>
+</string_table>

@@ -1,0 +1,12 @@
+[logic]
+active = sr_idle@on
+
+[sr_idle@on]
+on_info = {-yan_labx16_switcher_2_off} %=play_sound_looped(x16_hum_2)%
+on_info2 = {+yan_labx16_switcher_2_off} sr_idle@off %=play_sound(x16_switch_1)%
+
+[sr_idle@off]
+on_game_timer = 5 | %=stop_sound_looped%
+on_game_timer2 = 100 | sr_idle@nil
+
+[sr_idle@nil]

@@ -1,0 +1,130 @@
+[logic@zat_b14_stalker]
+suitable = {=check_npc_name(zat_b14_stalker_1) -zat_b14_stalkers_go_sim} true
+prior = 200
+active = walker@item
+on_death = death
+post_combat_time = 0, 0
+
+[death]
+on_info = %+zat_b14_stalker_work_end%
+
+[walker@item]
+path_walk = zat_b14_stalker_1_walk_4
+path_look = zat_b14_stalker_1_look_4
+on_signal = cut_scene_ready | {-zat_b14_stalker_cut_scene_ready} %+zat_b14_stalker_cut_scene_ready%
+on_info = {+zat_b14_cut_scene_1_start} walker@give_art 
+on_info2 = {-zat_b14_ui_disable} %+zat_b14_ui_disable =enable_ui%
+on_info3 = {-zat_b14_st_neutral =npc_in_zone(zat_a2_sr_noweap)} %=set_squad_neutral_to_actor(zat_b14_stalkers) +zat_b14_st_neutral%
+in_restr = zat_b14_not_give_item_zone
+def_state_standing = zat_b14_give_artefact_idle
+def_state_moving = walk
+meet = no_meet
+wounded = wounded
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = false
+
+[walker@give_art]
+path_walk = zat_b14_stalker_1_walk_4
+path_look = zat_b14_stalker_1_look_4
+def_state_moving = walk
+def_state_standing = zat_b14_give_artefact_idle
+on_game_timer = 40 | remark@cut_give_item
+meet = no_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+use_camp = false
+
+[remark@cut_give_item]
+target = story | zat_a2_stalker_barmen
+anim = zat_b14_give_artefact_act
+on_info = %+zat_b14_cut_scene_stalker_transfer_artefact =play_sound(zat_b14_scene_1_give_item)%
+on_info2 = {-zat_b14_cut_scene_stalker_not_have_artefact} %+zat_b14_cut_scene_stalker_not_have_artefact =give_money_to_npc(3000)%
+snd_anim_sync = true
+on_signal = anim_end | remark@wait %+zat_b14_cut_scene_1_point_01 =destroy_object(story:zat_b14_artefact_id)%
+meet = no_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[remark@wait]
+target = story | zat_a2_stalker_barmen
+anim = wait_na
+on_info = {+zat_b14_cut_scene_1_point_02} remark@cut_stalker_bye
+meet = no_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[remark@cut_stalker_bye]
+target = story | zat_a2_stalker_barmen
+anim = wait_na
+on_info = %=play_sound(zat_b14_scene_1_stalker_bye)%
+snd_anim_sync = true
+on_signal = sound_end | remark@cut_teach_actor %+zat_b14_cut_scene_1_point_03%
+meet = no_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[remark@cut_teach_actor]
+target = story | actor
+anim = wait_na
+on_game_timer = 35 | {=dist_to_actor_le(12)} %=play_sound(zat_b14_scene_1_stalker_teach_actor)%
+snd_anim_sync = true
+on_game_timer2 = 85 | animpoint@wait_to_go %+zat_b14_cut_scene_end =set_squad_neutral_to_actor(zat_b14_stalkers)%
+meet = no_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@wait_to_go]
+cover_name = zat_a2_animpoint_10
+use_camp = true
+meet = meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+reach_movement = walk
+invulnerable = {!actor_enemy} true, false
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+on_info = {+zat_b14_stalker_at_bar_start_done !talking} %+zat_b14_stalkers_go_sim%
+
+[meet]
+close_anim 		= wait
+close_victim 	= actor
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 2
+far_distance 	= 0
+use = {=actor_enemy} false, true
+meet_on_talking = false
+

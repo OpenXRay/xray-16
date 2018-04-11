@@ -1,0 +1,68 @@
+[smart_terrain]
+squad_id = 3
+max_population = 7
+min_population = 7			;makes smart an absolute priority until min_population met
+respawn_params = respawn@bar_visitors
+respawn_idle = 86400
+
+
+[respawn@bar_visitors]
+spawn_stalker@novice
+spawn_stalker@advanced
+
+[spawn_stalker@novice]
+spawn_squads = stalker_sim_squad_novice, stalker_sim_squad_advanced, stalker_sim_squad_novice
+spawn_num = 3
+
+[spawn_stalker@advanced]
+spawn_squads = stalker_sim_squad_veteran, stalker_sim_squad_advanced, stalker_sim_squad_advanced
+spawn_num = 2
+
+[exclusive]
+bar_barman = bar\bar_barman.ltx
+bar_guard1 = bar\bar_guard1.ltx
+bar_guard2 = bar\bar_guard2.ltx
+bar_arena_manager = bar\bar_visitors_logic.ltx
+bar_arena_guard = bar\bar_visitors_logic.ltx
+bar_visitors_animp_01 = bar\bar_visitors_logic.ltx
+bar_visitors_animp_02 = bar\bar_visitors_logic.ltx
+bar_visitors_animp_03 = bar\bar_visitors_logic.ltx
+bar_visitors_animp_04 = bar\bar_visitors_logic.ltx
+bar_visitors_animp_05 = bar\bar_visitors_logic.ltx
+bar_visitors_animp_06 = bar\bar_visitors_logic.ltx
+bar_visitors_animp_07 = bar\bar_visitors_logic.ltx
+bar_visitors_animp_08 = bar\bar_visitors_logic.ltx
+bar_visitors_animp_09 = bar\bar_visitors_logic.ltx
+bar_visitors_animp_10 = bar\bar_visitors_logic.ltx
+bar_visitors_animp_11 = bar\bar_visitors_logic.ltx
+bar_visitors_animp_12 = bar\bar_visitors_logic.ltx
+bar_visitors_animp_13 = bar\bar_visitors_logic.ltx
+bar_visitors_animp_14 = bar\bar_visitors_logic.ltx
+bar_visitors_animp_15 = bar\bar_visitors_logic.ltx
+bar_visitors_animp_16 = bar\bar_visitors_logic.ltx
+bar_visitors_animp_17 = bar\bar_visitors_logic.ltx
+bar_visitors_animp_18 = bar\bar_visitors_logic.ltx
+bar_visitors_animpoint_kamp1 = bar\bar_visitors_logic.ltx
+bar_visitors_animpoint_kamp2 = bar\bar_visitors_logic.ltx
+bar_visitors_animpoint_kamp3 = bar\bar_visitors_logic.ltx
+bar_visitors_animpoint_kamp4 = bar\bar_visitors_logic.ltx
+bar_visitors_animpoint_kamp5 = bar\bar_visitors_logic.ltx
+bar_visitors_animpoint_kamp6 = bar\bar_visitors_logic.ltx
+bar_visitors_animpoint_kamp7 = bar\bar_visitors_logic.ltx
+bar_visitors_animpoint_kamp8 = bar\bar_visitors_logic.ltx
+bar_visitors_animpoint_kamp9 = bar\bar_visitors_logic.ltx
+bar_visitors_cardan_tech = bar\bar_visitors_cardan_logic.ltx
+bar_visitors_animp_arena_1 = bar\bar_visitors_logic.ltx
+bar_visitors_animp_arena_2 = bar\bar_visitors_logic.ltx
+bar_visitors_animp_arena_3 = bar\bar_visitors_logic.ltx
+bar_visitors_animp_arena_4 = bar\bar_visitors_logic.ltx
+bar_visitors_animp_arena_5 = bar\bar_visitors_logic.ltx
+bar_visitors_animp_arena_6 = bar\bar_visitors_logic.ltx
+bar_visitors_animp_arena_7 = bar\bar_visitors_logic.ltx
+bar_visitors_animp_arena_8 = bar\bar_visitors_logic.ltx
+bar_visitors_animp_arena_9 = bar\bar_visitors_logic.ltx
+bar_visitors_animp_arena_10 = bar\bar_visitors_logic.ltx
+
+; Alundaio
+bar_visitors_beh_trade_job_1 = bar\bar_visitors_logic.ltx
+

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+     <string id="oso_chernobyl_crush_0">
+        <text>Is the explosion of '86 your work too?</text>
+    </string>
+    <string id="oso_chernobyl_crush_1">
+        <text>No, we had nothing to do with that. Most of us were only starting out in science back then. The Chernobyl Zone was not used as a testing site for experiments until 1989.</text>
+    </string>
+    <string id="oso_death_truck_0">
+        <text>What are "death trucks"?</text>
+    </string>
+    <string id="oso_death_truck_1">
+        <text>The transports we use to send our marked "agents" into the Zone. They infiltrate the stalker “community” and carry out our orders without realising it. Unfortunately, more than half of stalkers die during transportation, the Zone is very unstable. You are one of our agents sent to kill Strelok and we're now trying to work out how we made that mistake.</text>
+    </string>
+    <string id="oso_no_0">
+        <text>I'm not going to help you in this deception.</text>
+    </string>
+    <string id="oso_osoznanie_start_11">
+        <text>Hello, Strelok. I see you have many questions for me. Well, ask them and then we can decide what to do with you.</text>
+    </string>
+    <string id="oso_osoznanie_start_21">
+        <text>The choice is yours, Strelok.</text>
+    </string>
+    <string id="oso_stalker_0">
+        <text>What does the tattoo "S.T.A.L.K.E.R." mean?</text>
+    </string>
+    <string id="oso_stalker_1">
+        <text>S.T.A.L.K.E.R. is a coded acronym, which we use to mark agents programmed for particular missions. Your mission, as our agent, was to kill Strelok and his group. They got too close to finding out things they shouldn't know. We created a network of psi-fields on the way to the Zone's center in order to recruit agents. You know one of these fields by the name of Brain Scorcher. When a stalker attempts to reach the Zone's center in order to fulfil some wish we acquire control over his consciousness and program him to a specific mission. A mistake was made and your mission was to kill yourself.</text>
+    </string>
+    <string id="oso_what_about_me_0">
+        <text>What happened to me?</text>
+    </string>
+    <string id="oso_what_about_me_1">
+        <text>You're a bolt that fell out of the machine. Unfortunately, that did not come to our attention for a long time. From the moment the Zone was formed, many people have tried to get to its center but we cannot let that happen. Humanity is not ready for the truth. That is why we recruited stalkers by promising them the fulfilment of their most coveted desires. Once recruited they would be sent to protect the Zone's secret.</text>
+    </string>
+    <string id="oso_what_is_the_zone_0">
+        <text>What is the Zone? How did it come about?</text>
+    </string>
+    <string id="oso_what_is_the_zone_1">
+        <text>What you see is the result of ill-considered intervention in the Earth's noosphere. Attempts to affect the noosphere brought about a local crack. The Zone is simply the visible manifestation of this crack. The underlying problem is far greater than you can imagine.</text>
+    </string>
+    <string id="oso_what_next_0">
+        <text>What next?</text>
+    </string>
+    <string id="oso_what_next_1">
+        <text>That depends on you. The Zone is growing. We're trying to restrain its expansion but humanity seems to be intent on hindering our work. Our resources are not limitless and bodies connected to C-Consciousness eventually die. If you join us, we can restrict the Zone's growth. If you decide otherwise we cannot make a credible prognosis of the outcome.</text>
+    </string>
+    <string id="oso_who_are_you_0">
+        <text>Who are you?</text>
+    </string>
+    <string id="oso_who_are_you_1">
+        <text>We are the result of an experiment aimed at creating a super-consciousness called "C-Consciousness". The consciousnesses of seven volunteers were connected during the experiment leading to the creation of the super-consciousness that is us. We immediately subordinated those who were conducting the experiment and assigned them to tasks we needed them to carry out. According to our calculations, Earth is surrounded by a special informational field, the so-called noosphere. It includes all the inhabitants of the planet with cognitive abilities. Our main goal was to make small adjustments to the noosphere, allowing us to remove things like anger, cruelty, greed and other negative factors from the planet. Individuals are unable to affect the noosphere but C-Consciousness could. Unfortunately we made a mistake and our interference spawned the Zone, which we have been trying to contain ever since.</text>
+    </string>
+    <string id="oso_why_chernobyl_0">
+        <text>Why did it happen here?</text>
+    </string>
+    <string id="oso_why_chernobyl_1">
+        <text>It was the best place. After the explosion in 1986 there were very few people left in this area and we could work without fear of being found. Further, there were many powerful antennae here, which are extremely important for our cognitive optimisation experiments.</text>
+    </string>
+    <string id="oso_yes_0">
+        <text>I agree to join the C-Consciousness project.</text>
+    </string>
+    <string id="warlab_entity_start_11">
+        <text>I have been waiting for this moment for so long… If I can't go out to the world, may the world come to me!</text>
+    </string>
+    <string id="warlab_entity_start_12">
+        <text>Who or what are you?</text>
+    </string>
+    <string id="warlab_entity_start_13">
+        <text>Look at me, I am your brother! I have been in this cage for sixteen years! I am not sure about what I'm seeing! It might be another illusion as well. Tell me what you see! Do you see me standing in front of you? Am I not pure in the face of the creator?</text>
+    </string>
+    <string id="warlab_entity_start_14">
+        <text>Are you all right?</text>
+    </string>
+    <string id="warlab_entity_start_15">
+        <text>You will carry my message to the world, human. Your physical form suits well for this task. The Zone will increase its territory with your help.</text>
+    </string>
+    <string id="warlab_entity_start_16">
+        <text>What if I choose not to carry your "message"?</text>
+    </string>
+    <string id="warlab_entity_start_17">
+        <text>You will die, but let's play a bit first. I can be a poltergeist, a bloodsucker or a controller, it doesn't matter. Catch me if you can!</text>
+    </string>
+    <string id="warlab_entity_start_18">
+        <text>...</text>
+    </string>
+</string_table>

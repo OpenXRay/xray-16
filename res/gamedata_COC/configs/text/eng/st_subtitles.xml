@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	<string id="zat_a1_cutscene_phrase_1">
+		<text>On the morning of April 26, 1986, the reactor of power block 4 of Chernobyl NPP is destroyed following a massive thermal explosion. The resulting radioactive dust carried by the wind descends on the USSR, also scattering pockets of radiation across Europe, and even reaching America.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_2">
+		<text>The ramifications of the disaster are so serious that the Government of the Soviet Union is forced to urgently evacuate the residents of nearby towns and villages.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_3">
+		<text>The contaminated areas within a 30-kilometer radius of the power plant are converted into a strictly guarded Exclusion Zone.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_4">
+		<text>Operation of the CNNP resumes following the erection of a reinforced concrete sarcophagus over the destroyed power block. The existence of a massive power source, coupled with the fact that the area is no longer inhabited, leads to the creation of a network of secret laboratories.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_5">
+		<text>June 10, 2006. The Zone lights up with a flash of blinding light. This explosion of light is followed by a moment of complete silence and clouds evaporating in the sky. A peal of thunder then shakes the ground.  Most of the soldiers guarding the perimeter are killed instantly.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_6">
+		<text>2007. Scientists are still unable to explain what happened. Rare expeditions into the Zone usually end in tragedy, with rare survivors telling stories of mutated animals with incredible abilities.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_7">
+		<text>2009. According to various estimates, the Zone is home to between one and three hundred unidentified individuals. These people call themselves stalkers and make their living by collecting anomalous formations known as artefacts, which can be sold for considerable sums of money.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_8">
+		<text>2010. Despite military cordons around the perimeter, the stalker phenomenon is growing in numbers. However, only the areas around the Zone's edges have been explored: attempts to penetrate deeper into the Zone have all ended in failure.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_9">
+		<text>2012. A stalker called Strelok solves the secret of the Brain Scorcher, a powerful emitter capable of destroying human minds, and deactivates it. After this, stalkers rush for the center of the Zone in large numbers: some in hopes of finding a treasure trove of artefacts, others in search of the legendary Wish Granter.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_10">
+		<text>In these changing circumstances, the National Security and Defence Council of Ukraine decides to launch an immediate special operation, known as Operation Fairway.  Dozens of military helicopters carrying troops head for the CNPP, using anomaly field maps drawn up in advance to navigate the skies. Despite meticulous preparation, the operation is a failure and none of the helicopters return from the mission.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_11">
+		<text>Major Degtyarev, a USS special agent and formerly experienced stalker, is sent into the Zone to investigate the failure of the operation.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_12">
+		<text>Equipped with an assault rifle, two weeks' worth of supplies and a radio to communicate with HQ, he begins his journey towards the center of the Zone.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_13">
+		<text>Talking to stalkers yields no results... Either they don't have the information or they don't want to share it...</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_14">
+		<text>The Zone takes every opportunity to remind the Major that it's no resort. Not a day passes without an attack by mutants or, worse yet, people.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_15">
+		<text>Communication with HQ is unhelpful at best: the only reliable information available consists of the coordinates of the five crashed helicopters.  Within several kilometers of the CNPP, the radio goes dead.</text>
+	</string>
+	<string id="zat_a1_cutscene_phrase_16">
+		<text>Degtyarev is alone.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_1">
+		<text>For successfully completing his investigation, Degtyarev was rewarded with an early promotion to Colonel. He declined an offer of a cushy office position and instead requested to be sent to the Zone as the Security Service's permanent observer.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_2">
+		<text>The information about psi-devices obtained by Degtyarev put his superiors on alert. All the information on X-designated laboratories was removed from military archives and filed as Top Secret. USS personnel working in the Zone were ordered to prevent the disclosure of information about the work done in these laboratories at any cost.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_3">
+		<text>Several experimental samples were made on the basis of technical documents for item 62. Following a series of tests, it was decided not to go ahead with large scale deployment of the weapon due to the high cost of ammunition. Nonetheless, there is evidence that further secret development of the Gauss rifle is ongoing.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_4_a">
+		<text>Sultan and his gang left the Skadovsk after their attempts to capture the ship failed. The ensuing feeling of relative safety among stalkers led to a massive increase in the number of artefacts sold to Beard, causing his business to boom, while the Skadovsk became almost as popular as the famous 100 Rads bar.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_4_b">
+		<text>Sultan's social order settled firmly into place on the Skadovsk, and the vessel became a bandit base. Unwilling to continue paying protection fees, Beard set off with a group of stalkers to explore the yet uncharted regions of the Zone.  Stalker attempts to regain control of the ship quickly ceased after a few unruly characters were made example of by being thrown off the vessel to die in emissions.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_4_c">
+		<text>Skadovsk remained home to all those lucky enough to reach it. Bandits tried to establish their so-called "order" on the ship, but stalkers kept them at bay.  A fragile peace broke out on the vessel.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_5_a">
+		<text>Unfortunately, it didn't last long. Bloodsuckers from the lair near the Skadovsk made their way to the ship. When bloodsucker attacks began to occur even in broad daylight, a mission was launched to deal with the problem. Unfortunately, the operation failed to clear the tunnels, and soon afterwards a wave of predators swept the ship's residents away into oblivion.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_5_b">
+		<text>Following the destruction of the bloodsucker lair, mutants were unable to significantly affect the state of affairs on the Skadovsk.  For a while, the old ship became a center of relative stability in the ever-changing world that is the Zone.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_6_a">
+		<text>Freedom managed to earn the trust of stalkers at Yanov station. Duty organised an assault in an attempt to regain lost ground, but Lieutenant Colonel Shulga was killed in the ensuing firefight. The Duty squad quickly fell apart after losing its commander.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_6_b">
+		<text>New recruits and growing popularity among stalkers allowed Duty to drive Freedom out of Yanov station.  Loki and his Freedom squad were killed after a fierce battle.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_6_c">
+		<text>A fragile balance was reached between Freedom and Duty squads at Yanov station. Tired of the pointless struggle, fighters of both factions started leaving their squads and joining the free stalkers. </text>
+	</string>
+	<string id="pri_a28_outro_phrase_7_a">
+		<text>The scientific research expedition organised by Professors Hermann and Ozersky was a success. The data they collected facilitated the development of several unique devices and drugs. In light of this, funding of research programs in the Zone was vastly increased.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_7_b">
+		<text>The scientific research expedition organised by Professors Hermann and Ozersky did not collect enough data and was withdrawn. On returning to the outside world, the two scientists proceeded to engage in unrelated work.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_8_a">
+		<text>Garry's stories about the army's struggle against the dangers of Pripyat interested many, and various groups soon began exploring the ghost town. Despite the constant Monolith attacks, stalkers managed to dig in at the former army camp, which they used as a base to launch raids deep into the city, making steady progress.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_8_b">
+		<text>Garry's story about the army's fate scared stalkers away from Pripyat. The few who dared to venture into the city ran into inexplicable and terrifying phenomena, which added further dark strokes to an already gloomy picture of the dead city.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_9">
+		<text>The Oasis was no longer the stuff of legends. The identity of those who managed to find a way to this secret anomaly became an increasingly regular topic of conversation among stalkers. The number of adventurers trying to follow suit remained high - something the bandits continue to take advantage of. Rookies are fooled by their offers to lead them to the Oasis, which usually end in muggings at a safe distance from other stalkers.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_10">
+		<text>Mercenary squads continue to be active in the Zone. Their interest in the secret laboratories has grown and attracted the intense attention of the USS. Despite this, attempts to establish the identity of the client behind the mercenaries proved unsuccessful.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_11_a">
+		<text>The area around Yanov station continues to attract growing numbers of stalkers. The lack of dangerous mutants and abundance of anomalous areas have led to the area being referred to by stalkers as a "treasure trove" with increasing regularity.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_11_b">
+		<text>The area around Yanov station gained the reputation of being one of the most dangerous places in the Zone. Fewer and fewer stalkers made it back from raids, many dying at the hands of mutants within view of the camp. One of those missing is Zveroboi, who set out to track down a chimera on what appears to have been his last hunt.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_12_a">
+		<text>Zulu returned to Duty's main base at the Rostok plant. Nobody knows what he discussed with the leader of Duty, General Voronin, but several days later he was spotted at the head of a large squad on its way to the center of the Zone.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_12_b">
+		<text>Rumours of Zulu's fate reached the leader of Duty, General Voronin. To everyone's great surprise, Voronin decided to posthumously award Zulu with the Silver Shield, Duty's highest decoration.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_13_a">
+		<text>Vano headed off to the Freedom-controlled military warehouses, where his cheerful personality and optimism quickly earned him the popularity they merited. Ultimately, he took charge of a small group of researchers involved in investigating anomalous areas.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_13_b">
+		<text>Stalkers at Yanov station still think of the cheerful Vano from time to time, recalling his light-heartedness and natural stalker skills. The consensus is that given his luck, Vano made a big mistake in deciding to look for a road to Pripyat.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_14_a">
+		<text>A new stalker group appeared in the Zone. They are well-trained but their objectives are not known. Unconfirmed rumours suggest that they used to be Monolith fighters, with the squad led by a man known as Strider.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_14_b">
+		<text>Few noticed the disappearance of Strider, the only man concerned with understanding what happened to those who fell under the Monolith's spell, and helping them.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_15_a">
+		<text>Senior Lieutenant Sokolov continued to fly over the Zone and was shot down by mercenaries over Limansk. Two weeks later he was picked up by a patrol near the Cordon, his survival being a minor miracle.  Sokolov left the air force soon after, joining a civil airline instead.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_15_b">
+		<text>The list of casualties suffered in the course of Operation Fairway was amended with yet another name: "Senior Lieutenant O.N. Sokolov. Died in the line of duty."</text>
+	</string>
+	<string id="pri_a28_outro_phrase_16">
+		<text>Owl established good contacts with clients outside the Zone. He trades in information, and if rumours are true, one of his major clients is the USS.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_17">
+		<text>A group of stalkers was forced to seek shelter on Noah's old barge during an especially powerful emission. The barge was attacked by a horde of snorks soon after, and the stalkers quickly realized that the barge was a small but formidable fortress.  Even more astonishing was a litter of pseudodog puppies that Noah himself led into battle against the snorks.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_18_a">
+		<text>On discovering his friends' fates, Cardan gave up dreams of a stalker career. Having overcome his alcoholism, he moved to Yanov, where he partnered up with Nitro to set up a full service repair shop. Both technicians gladly devote all their spare time to building a vehicle suitable for the Zone's unforgiving environment.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_18_b">
+		<text>Having overcome his alcoholism, Cardan left the Skadovsk. Stalkers said that he went to look for his missing friends. Several days later he returned, wounded and suffering from radiation poisoning. As soon as his wounds healed, he left the Zone forever.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_19_a">
+		<text>Strelok passed on the information he obtained at the Chernobyl NPP to the USS commanders. This prompted the Government to create a Scientific Institute for Research of the Chernobyl Anomalous Area. Strelok took up the position of Chief Scientific Consultant to the Institute.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_19_b">
+		<text>Strelok's knowledge was lost with him. The information he found at the Chernobyl NPP, which could have been used to solve the Zone's riddles, never reached the outside world. It seems the Zone knows how to keep its secrets.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_20_a">
+		<text>When Colonel Kovalsky, commander of the Stingray group, returned from the Zone, he reported to his commanders on the reasons for the failure of Operation Fairway. Following a dragged-out investigation and the brass' failed attempts to pin the blame on him, the Colonel was finally given an honourable discharge.</text>
+	</string>
+	<string id="pri_a28_outro_phrase_20_b">
+		<text>Colonel Kovalsky, commander of the Stingray group, found his resting place not far from the majority of his squad. Their bodies were taken in by the Zone, with nothing but old faded photographs in a specialized military museum left to remind the country of their sacrifice.</text>
+	</string>
+</string_table>

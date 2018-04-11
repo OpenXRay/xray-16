@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding="windows-1251"?>
+
+<game_information_portions>
+
+    <info_portion id="">mar_intro_scene_2_end</info_portion>
+	<info_portion id="">mar_intro_scene_2_cameff_end</info_portion>
+	<info_portion id="">red_forester_who_are_you</info_portion>
+	<info_portion id="">bar_deactivate_radar_done</info_portion>
+	<info_portion id="">yantar_attack_start</info_portion>
+	
+	<!-- Lab X16 scene -->
+	<info_portion id="">yan_find_laboratory_end</info_portion>
+	<info_portion id="">labx16_find</info_portion>
+	<info_portion id="">x16_zasada_2</info_portion>
+    <info_portion id="">x16_zasada_3</info_portion>
+    <info_portion id="">x16_zasada_4</info_portion>
+    <info_portion id="">yan_test_info</info_portion>
+    <info_portion id="">brain_snork_respawn_01</info_portion>
+    <info_portion id="">yan_controller_respawn_01</info_portion>
+	<info_portion id="">yan_labx16_switcher_1_off</info_portion>
+	<info_portion id="">yan_labx16_switcher_2_off</info_portion>
+	<info_portion id="">yan_labx16_switcher_3_off</info_portion>
+    <info_portion id="">yan_labx16_switcher_primary_off</info_portion>
+
+	<info_portion id="">yan_labx16_switcher_1_end</info_portion>
+	<info_portion id="">yan_labx16_switcher_2_end</info_portion>
+	<info_portion id="">yan_labx16_switcher_3_end</info_portion>
+	<info_portion id="">yan_labx16_switcher_primary_try</info_portion>
+	<info_portion id="">yantar_vasilyev_info</info_portion>
+	<info_portion id="">yantar_find_ghost_task_start</info_portion>
+
+
+
+	
+	<!-- Bar smarties -->
+	<info_portion id="">bar_zastava_minigunner_dead</info_portion>
+	<info_portion id="">bar_zastava_duty_guard1_dead</info_portion>
+	<info_portion id="">bar_zastava_duty_guard2_dead</info_portion>
+	<info_portion id="">bar_zastava_duty_guard3_dead</info_portion>
+	<info_portion id="">bar_zastava_duty_guard4_dead</info_portion>
+	<info_portion id="">bar_zastava_duty_guard5_dead</info_portion>
+	<info_portion id="">bar_zastava_duty_guard6_dead</info_portion>
+	<info_portion id="">bar_zastava_duty_guard7_dead</info_portion>
+	<info_portion id="">bar_zastava_duty_guard8_dead</info_portion>
+	<info_portion id="">bar_zastava_duty_guard9_dead</info_portion>
+	
+	<info_portion id="">bar_zastava_2_minigunner_dead</info_portion>
+	<info_portion id="">bar_zastava_2_duty2_guard1_dead</info_portion>
+	<info_portion id="">bar_zastava_2_duty2_guard2_dead</info_portion>
+	<info_portion id="">bar_zastava_2_duty2_guard3_dead</info_portion>
+	<info_portion id="">bar_zastava_2_duty2_guard4_dead</info_portion>
+	<info_portion id="">bar_zastava_2_duty2_guard5_dead</info_portion>
+	
+	<info_portion id="">yan_smart_terrain_6_4_outer_door_open</info_portion>
+	<info_portion id="">yan_smart_terrain_6_4_inner_door_open</info_portion>
+	<info_portion id="">yan_smart_terrain_6_4_forced_open</info_portion>
+	
+	<info_portion id="">agru_controller_death</info_portion>
+	<info_portion id="">agru_phisics_active_1</info_portion>
+	<info_portion id="">agru_add_reward</info_portion>
+	<info_portion id="">agru_add_reward_1</info_portion>
+	<info_portion id="">agru_add_reward_2</info_portion>
+	<info_portion id="">agr_u_soldiers_dead</info_portion>
+	<info_portion id="">agru_end_poltergeist_squad_dead</info_portion>	
+	<info_portion id="">agr_u_soldiers_squad_soldier_1_is_dead</info_portion>
+	<info_portion id="">agr_u_soldiers_squad_soldier_2_is_dead</info_portion>
+	<info_portion id="">agr_u_soldiers_squad_soldier_3_is_dead</info_portion>
+	<info_portion id="">agr_u_soldiers_squad_soldier_4_is_dead</info_portion>
+	<info_portion id="">agr_u_soldiers_squad_soldier_5_is_dead</info_portion>
+	<info_portion id="">agr_u_soldiers_squad_soldier_6_is_dead</info_portion>
+	<info_portion id="">agr_u_soldiers_squad_soldier_7_is_dead</info_portion>
+	<info_portion id="">agr_u_soldiers_squad_soldier_8_is_dead</info_portion>
+	
+	<info_portion id="">dar_ring_spawn1</info_portion>
+	<info_portion id="">dar_ring_spawn2_1</info_portion>
+	<info_portion id="">dar_ring_spawn2_2</info_portion>
+	<info_portion id="">dar_ring_spawn2</info_portion>
+	<info_portion id="">dar_password_info1</info_portion>
+	<info_portion id="">dar_password_info2</info_portion>
+	<info_portion id="">dar_codelock1_unlock</info_portion>
+	<info_portion id="">dar_codelock2_unlock</info_portion>
+	<info_portion id="">dar_door1_closed</info_portion>
+	<info_portion id="">dar_open_door1</info_portion>
+	<info_portion id="">dar_door2_closed</info_portion>
+	<info_portion id="">dar_open_door2</info_portion>
+	<info_portion id="">dar_door3_free</info_portion>
+	<info_portion id="">dar_door3_closed</info_portion>
+	<info_portion id="">dar_x18_dream</info_portion>
+	<info_portion id="">dar_military_scout_squad_killed</info_portion>
+	
+	<info_portion id="">yan_tonnel_snork_spawn_1</info_portion>
+	<info_portion id="">yan_tonnel_snork_spawn_2</info_portion>
+	<info_portion id="">yan_tonnel_snork_spawn_3</info_portion>
+	<info_portion id="">yan_tonnel_snork_spawn_4</info_portion>
+	<info_portion id="">yan_giant_spawner_01</info_portion>
+	<info_portion id="">yantar_tunnel_start</info_portion>
+	<info_portion id="">yan_kill_brain_done</info_portion>
+	<info_portion id="">yantar_tunnel_finish</info_portion>
+
+
+</game_information_portions>

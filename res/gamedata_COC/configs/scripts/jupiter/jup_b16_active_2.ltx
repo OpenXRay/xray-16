@@ -1,0 +1,9 @@
+[logic]
+active = sr_idle
+
+[sr_idle]
+on_actor_inside = {=jup_b16_is_zone_active -jup_b16_row_2_blok } sr_idle@2 %+jup_b16_row_complete_2 +jup_b16_row_2_blok%, {-jup_b16_row_2_blok} sr_idle@2 %+jup_b16_row_2_blok -jup_b16_row_complete_2%
+on_info = {+jup_b16_row_2_blok} sr_idle@2
+
+[sr_idle@2]
+on_actor_in_zone = jup_b16_teleport | sr_idle %-jup_b16_row_2_blok%

@@ -1,0 +1,2167 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<game_dialogs>
+    <dialog id="dm_traveler_dialog">
+		<precondition>dialogs_axr_companion.is_not_actor_companion</precondition>
+        <precondition>travel_manager.uni_traveler_precond</precondition>
+        <init_func>travel_manager.init_traveler_dialog</init_func>
+    </dialog>
+    <dialog id="dm_universal_dialog">
+		<precondition>dialogs_axr_companion.is_not_actor_companion</precondition>
+        <precondition>dialog_manager.uni_dialog_precond</precondition>
+        <init_func>dialog_manager.init_new_dialog</init_func>
+    </dialog>
+	<!-- hostage_companion_task_1 -->
+	<dialog id="hostage_companion_task_1_dialog">
+        <phrase_list>
+		    <phrase id="0">
+                <text />
+                <next>1</next>
+				<next>2</next>
+            </phrase>
+			<phrase id="1">
+				<text />
+				<next>111</next>
+			</phrase>
+			<phrase id="2">
+				<has_info>hostage_companion_task_1_hostage_rescued</has_info>
+				<text>hostage_companion_task_1_start_dialog_1</text>
+				<next>1111</next>
+			</phrase>
+		    <phrase id="111">
+				<dont_has_info>hostage_companion_task_1_hostage_rescued</dont_has_info>
+                <text>hostage_companion_task_1_start_dialog_1</text>
+				<next>1111</next>
+            </phrase>
+			<phrase id="1111">
+				<text>hostage_companion_task_1_actor_reply</text>
+				<give_info>hostage_companion_task_1_hostage_rescued</give_info>
+				<action>dialogs.rescue_hostage</action>
+			</phrase>
+        </phrase_list>
+    </dialog>
+	<dialog id="dm_add_trade">
+       <phrase_list>
+            <phrase id="0">
+                <action>dialogs.npc_is_trader</action>
+                <action>dialogs.break_dialog</action>
+                <text>dm_dialog_add_trade</text>
+            </phrase>
+        </phrase_list>
+    </dialog>
+    <dialog id="dm_add_repair">
+       <phrase_list>
+            <phrase id="0">
+                <action>dialogs.npc_is_tech</action>
+                <action>dialogs.break_dialog</action>
+                <text>dm_dialog_add_repair</text>
+            </phrase>
+        </phrase_list>
+    </dialog>
+	<!-- Alundaio -->
+	<dialog id="dm_ashot_and_yar_dialog">
+		<precondition>dialogs_jupiter.is_message_receiver</precondition>
+        <init_func>dialog_manager.dm_init_dynamic_ashot_and_yar_dialog</init_func>
+    </dialog>	
+	<dialog id="dm_ordered_task_dialog">
+		<precondition>dialogs_axr_companion.is_not_actor_companion</precondition>
+        <init_func>dialog_manager.dm_init_dynamic_task_dialog</init_func>
+    </dialog>	
+	<dialog id="dm_sim_ordered_task_dialog">
+		<precondition>dialogs_axr_companion.is_not_actor_companion</precondition>
+        <init_func>dialog_manager.dm_init_sim_dynamic_task_dialog</init_func>
+    </dialog>
+	<dialog id="dm_ordered_task_completed_dialog">
+		<precondition>dialogs.actor_has_finished_task</precondition>
+        <init_func>dialog_manager.dm_init_dynamic_task_completed_dialog</init_func>
+    </dialog>	
+	<dialog id="dm_sim_ordered_task_completed_dialog">
+		<precondition>dialogs.sim_actor_has_finished_task</precondition>
+        <init_func>dialog_manager.dm_init_sim_dynamic_task_completed_dialog</init_func>
+    </dialog>
+	<dialog id="dm_ordered_task_cancel_dialog">
+        <precondition>dialogs.actor_has_ongoing_task</precondition>
+        <init_func>dialog_manager.dm_init_dynamic_task_cancel_dialog</init_func>
+    </dialog>
+    <dialog id="dm_sim_ordered_task_cancel_dialog">
+        <precondition>dialogs.sim_actor_has_ongoing_task</precondition>
+        <init_func>dialog_manager.dm_init_sim_dynamic_task_cancel_dialog</init_func>
+    </dialog>
+	
+	<dialog id="dm_broker_dialog">
+        <init_func>dialog_manager.dm_init_dynamic_broker_dialog</init_func>
+    </dialog>
+	<dialog id="dm_tech_repair">
+		<precondition>inventory_upgrades.has_repair_info</precondition>
+        <init_func>dialog_manager.dm_init_dynamic_repair_dialog</init_func>
+    </dialog>
+	<dialog id="dm_surrender_dialog">
+		<precondition>dialogs.npc_is_surrendered</precondition>
+		<precondition>dialogs.victim_no_surrender</precondition>
+		<init_func>dialog_manager.dm_init_surrender_dialog</init_func>
+	</dialog>
+    <dialog id="dm_actor_become_guide_to_companion_dialog">
+		<precondition>dialogs_axr_companion.is_not_actor_companion</precondition>
+        <precondition>dialogs_axr_companion.dm_actor_become_companion_guide_precond</precondition>
+        <init_func>dialogs_axr_companion.dm_init_actor_become_guide_to_companion</init_func>
+    </dialog>
+	<dialog id="dm_companion_trade">
+        <precondition>dialogs_axr_companion.is_actor_companion</precondition>
+        <phrase_list>
+            <phrase id="0">
+				<action>dialogs.free_trade_with_npc</action>
+				<action>dialogs.break_dialog</action>
+                <text>axr_phrase_actor_give_command_trade</text>
+            </phrase>
+		</phrase_list>
+    </dialog>
+    <dialog id="dm_is_actor_companion_dialog">
+        <precondition>dialogs_axr_companion.is_actor_companion</precondition>
+        <init_func>dialogs_axr_companion.dm_init_is_actor_companion</init_func>
+    </dialog>
+    <dialog id="dm_companion_patrol">
+        <precondition>dialogs_axr_companion.is_actor_companion</precondition>
+        <init_func>dialogs_axr_companion.dm_init_companion_patrol</init_func>
+    </dialog>
+    <dialog id="dm_companion_leave">
+		<precondition>dialogs_axr_companion.can_dismiss_companion</precondition>
+        <precondition>dialogs_axr_companion.is_actor_companion</precondition>
+        <phrase_list>
+            <phrase id="0">
+                <text>axr_phrase_actor_give_command_leave</text>
+				<next>1</next>
+            </phrase>
+            <phrase id="1">
+                <text>axr_phrase_companion_are_you_sure</text>
+				<next>2</next>
+				<next>3</next>
+            </phrase>
+            <phrase id="2">
+                <text>axr_phrase_actor_give_command_leave</text>
+				<action>dialogs_axr_companion.remove_companions_from_squad</action>
+            </phrase>
+            <phrase id="3">
+                <text>axr_phrase_actor_give_command_nevermind</text>
+            </phrase>
+        </phrase_list>
+    </dialog>
+	<dialog id="friendly_companion_dialog">
+		<precondition>dialogs_axr_companion.is_non_story</precondition>
+		<precondition>dialogs_axr_companion.is_not_actor_companion</precondition>
+		<precondition>dialogs_axr_companion.is_actor_friend</precondition>
+		<precondition>dialogs_axr_companion.is_room_in_actor_squad</precondition>
+		<precondition>dialogs_axr_companion.is_not_hostage_task_giver</precondition>
+        <phrase_list>
+            <phrase id="0">
+                <text>axr_phrase_friend_companion_ask_join</text>
+                <next>1</next>
+            </phrase>
+            <phrase id="1">
+                <text>axr_phrase_friend_companion_answer_join</text>
+				<action>dialogs_axr_companion.become_actor_companion</action>
+            </phrase>
+        </phrase_list>
+    </dialog>
+	<!-- For occasion when npc gives player hostage rescue task and player asks them to join -->
+	<dialog id="friendly_companion_dialog_hostage_version">
+		<precondition>dialogs_axr_companion.is_not_actor_companion</precondition>
+		<precondition>dialogs_axr_companion.is_room_in_actor_squad</precondition>
+		<precondition>dialogs_axr_companion.is_hostage_task_giver</precondition>
+        <phrase_list>
+            <phrase id="0">
+                <text>axr_phrase_friend_companion_ask_join_hostage</text>
+                <next>1</next>
+            </phrase>
+            <phrase id="1">
+                <text>axr_phrase_friend_companion_answer_join_hostage</text>
+				<action>dialogs_axr_companion.become_actor_companion</action>
+            </phrase>
+        </phrase_list>
+    </dialog>
+	<dialog id="axr_companion_medkit">
+		<phrase_list>
+			<phrase id="0">
+				<text>axr_phrase_npc_start_wounded</text>
+				<next>1</next>
+				<next>2</next>
+			</phrase>
+			<phrase id="1">
+				<precondition>dialogs.actor_have_medkit</precondition>
+				<text>axr_phrase_actor_has_medkit</text>
+				<action>dialogs.transfer_medkit</action>
+				<action>dialogs.break_dialog</action>
+			</phrase>
+			<phrase id="2">
+				<precondition>dialogs.actor_hasnt_medkit</precondition>
+				<text>axr_phrase_actor_dont_has_medkit</text>
+				<action>dialogs.break_dialog</action>
+			</phrase>
+		</phrase_list>
+	</dialog>
+	<!-- End Alundaio -->
+    <!-- FINAL DIALOGS -->
+    <!-- ALIFE DIALOGS -->
+    <dialog id="actor_break_dialog" priority="-5">
+        <phrase_list>
+            <phrase id="0">
+                <text>actor_break_dialog_0</text>
+                <script_text>dialog_manager.create_bye_phrase</script_text>
+                <action>dialogs.break_dialog</action>
+                <is_final>1</is_final>
+            </phrase>
+        </phrase_list>
+    </dialog>
+    <dialog id="hello_dialog">
+        <init_func>dialog_manager.init_hello_dialogs</init_func>
+        <phrase id="0" />
+    </dialog>
+    <dialog id="about_skadovsk_dialog_stalkers">
+        <precondition>dialogs.npc_stalker</precondition>
+        <dont_has_info>about_skadovsk_dialog_done</dont_has_info>
+        <phrase_list>
+            <phrase id="0">
+                <text>about_skadovsk_dialog_stalkers_0</text>
+                <next>1</next>
+            </phrase>
+            <phrase id="1">
+                <give_info>about_skadovsk_dialog_done</give_info>
+                <text>about_skadovsk_dialog_stalkers_1</text>
+            </phrase>
+        </phrase_list>
+    </dialog>
+    <dialog id="about_skadovsk_dialog_bandit">
+        <precondition>dialogs.npc_bandit</precondition>
+        <dont_has_info>about_skadovsk_dialog_done</dont_has_info>
+        <phrase_list>
+            <phrase id="0">
+                <text>about_skadovsk_dialog_bandit_0</text>
+                <next>1</next>
+            </phrase>
+            <phrase id="1">
+                <text>about_skadovsk_dialog_bandit_1</text>
+                <give_info>about_skadovsk_dialog_done</give_info>
+            </phrase>
+        </phrase_list>
+    </dialog>
+    <dialog id="about_quests_dialog_stalkers">
+        <precondition>dialogs.npc_stalker</precondition>
+        <phrase_list>
+            <phrase id="43">
+                <text>about_quests_dialog_stalkers_43</text>
+                <dont_has_info>zat_b215_asked_about_way</dont_has_info>
+            </phrase>
+            <phrase id="32">
+                <text>about_quests_dialog_stalkers_32</text>
+                <precondition>dialogs.level_zaton</precondition>
+                <precondition>dialogs.squad_not_in_smart_b101</precondition>
+            </phrase>
+            <phrase id="33">
+                <text>about_quests_dialog_stalkers_33</text>
+                <precondition>dialogs.level_zaton</precondition>
+                <precondition>dialogs.squad_not_in_smart_b40</precondition>
+            </phrase>
+            <phrase id="34">
+                <text>about_quests_dialog_stalkers_34</text>
+                <precondition>dialogs.level_zaton</precondition>
+                <precondition>dialogs.squad_not_in_smart_b18</precondition>
+            </phrase>
+            <phrase id="35">
+                <text>about_quests_dialog_stalkers_35</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <dont_has_info>jup_b9_give_item</dont_has_info>
+            </phrase>
+            <phrase id="36">
+                <text>about_quests_dialog_stalkers_36</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <precondition>dialogs.squad_not_in_smart_b6</precondition>
+            </phrase>
+            <phrase id="37">
+                <text>about_quests_dialog_stalkers_37</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <precondition>dialogs.squad_not_in_smart_b205</precondition>
+            </phrase>
+            <phrase id="52">
+                <text>about_quests_dialog_stalkers_52</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <dont_has_info>jup_b218_soldier_hired</dont_has_info>
+            </phrase>
+            <phrase id="53">
+                <text>about_quests_dialog_stalkers_53</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <dont_has_info>jup_a10_vano_agree_go_und</dont_has_info>
+            </phrase>
+            <phrase id="54">
+                <text>about_quests_dialog_stalkers_54</text>
+                <precondition>dialogs.monolith_leader_is_alive</precondition>
+                <precondition>dialogs.level_jupiter</precondition>
+                <dont_has_info>jup_b4_monolith_squad_in_freedom</dont_has_info>
+                <dont_has_info>jup_b4_monolith_squad_in_duty</dont_has_info>
+            </phrase>
+            <phrase id="56">
+                <text>about_quests_dialog_stalkers_56</text>
+                <precondition>dialogs.monolith_leader_is_alive</precondition>
+                <precondition>dialogs.level_jupiter</precondition>
+                <dont_has_info>jup_b218_monolith_hired</dont_has_info>
+                <has_info>jup_b4_monolith_squad_in_duty</has_info>
+            </phrase>
+            <phrase id="55">
+                <text>about_quests_dialog_stalkers_55</text>
+                <precondition>dialogs.monolith_leader_is_alive</precondition>
+                <precondition>dialogs.level_jupiter</precondition>
+                <dont_has_info>jup_b218_monolith_hired</dont_has_info>
+                <has_info>jup_b4_monolith_squad_in_freedom</has_info>
+            </phrase>
+            <phrase id="41">
+                <text>about_quests_dialog_stalkers_41</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="42">
+                <text>about_quests_dialog_stalkers_42</text>
+                <precondition>dialogs.level_jupiter</precondition>
+            </phrase>
+            <phrase id="112">
+                <text>about_quests_dialog_stalkers_112</text>
+            </phrase>
+            <phrase id="113">
+                <text>about_quests_dialog_stalkers_113</text>
+            </phrase>
+            <phrase id="83">
+                <text>about_quests_dialog_stalkers_83</text>
+                <precondition>dialogs.level_zaton</precondition>
+                <give_info>zat_b14_actor_know_about_svyaznoy</give_info>
+            </phrase>
+            <phrase id="91">
+                <text>about_quests_dialog_stalkers_91</text>
+                <give_info>zat_b38_den_of_the_bloodsucker_tell_barman_about_all_give</give_info>
+            </phrase>
+            <phrase id="121">
+                <text>about_quests_dialog_stalkers_121</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="131">
+                <text>about_quests_dialog_stalkers_131</text>
+            </phrase>
+            <phrase id="181">
+                <text>about_quests_dialog_stalkers_181</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="182">
+                <text>about_quests_dialog_stalkers_182</text>
+                <precondition>dialogs.level_jupiter</precondition>
+            </phrase>
+            <phrase id="183">
+                <text>about_quests_dialog_stalkers_183</text>
+                <precondition>dialogs.level_pripyat</precondition>
+            </phrase>
+            <phrase id="152">
+                <text>about_quests_dialog_stalkers_152</text>
+                <precondition>dialogs.not_level_zaton</precondition>
+            </phrase>
+            <phrase id="3">
+                <text>about_quests_dialog_stalkers_3</text>
+                <precondition>dialogs.not_level_pripyat</precondition>
+                <precondition>dialogs.quest_dialog_military_precond</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>31</next>
+                <next>32</next>
+                <next>33</next>
+                <next>34</next>
+                <next>35</next>
+                <next>36</next>
+                <next>37</next>
+                <next>38</next>
+            </phrase>
+            <phrase id="4">
+                <text>about_quests_dialog_stalkers_4</text>
+                <precondition>dialogs.not_level_pripyat</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_a9_actor_found_main_documents</dont_has_info>
+                <has_info>jup_b9_blackbox_decrypted</has_info>
+                <has_info>zat_b28_heli_3_searched</has_info>
+                <next>41</next>
+                <next>42</next>
+                <next>43</next>
+                <next>44</next>
+            </phrase>
+            <phrase id="9">
+                <text>about_quests_dialog_stalkers_9</text>
+                <precondition>dialogs.level_zaton</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b57_bloodsucker_lair_clear</dont_has_info>
+                <dont_has_info>zat_b57_barmen_about_bloodsucker_lair_dialog_done</dont_has_info>
+                <has_info>zat_b38_den_of_the_bloodsucker_inform_stalkers_give_task</has_info>
+                <next>91</next>
+            </phrase>
+            <phrase id="122">
+                <text>about_quests_dialog_stalkers_122</text>
+                <precondition>dialogs.not_level_zaton</precondition>
+            </phrase>
+            <phrase id="141">
+                <text>about_quests_dialog_stalkers_141</text>
+                <precondition>dialogs.level_jupiter</precondition>
+            </phrase>
+            <phrase id="143">
+                <text>about_quests_dialog_stalkers_143</text>
+                <precondition>dialogs.not_level_jupiter</precondition>
+            </phrase>
+            <phrase id="151">
+                <text>about_quests_dialog_stalkers_151</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="193">
+                <text>about_quests_dialog_stalkers_193</text>
+                <precondition>dialogs.not_level_zaton</precondition>
+            </phrase>
+            <phrase id="191">
+                <text>about_quests_dialog_stalkers_191</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="171">
+                <text>about_quests_dialog_stalkers_171</text>
+                <precondition>dialogs.level_jupiter</precondition>
+            </phrase>
+            <phrase id="172">
+                <text>about_quests_dialog_stalkers_172</text>
+                <precondition>dialogs.not_level_jupiter</precondition>
+            </phrase>
+            <phrase id="302">
+                <text>about_quests_dialog_stalkers_302</text>
+                <precondition>dialogs.level_pripyat</precondition>
+            </phrase>
+            <phrase id="403">
+                <text>about_quests_dialog_stalkers_403</text>
+            </phrase>
+            <phrase id="73">
+                <text>about_quests_dialog_stalkers_73</text>
+            </phrase>
+            <phrase id="301">
+                <text>about_quests_dialog_stalkers_301</text>
+                <precondition>dialogs.not_level_pripyat</precondition>
+                <give_info>zat_b100_guide_need_maps</give_info>
+            </phrase>
+            <phrase id="201">
+                <text>about_quests_dialog_stalkers_201</text>
+            </phrase>
+            <phrase id="15">
+                <text>about_quests_dialog_stalkers_15</text>
+                <precondition>dialogs_jupiter.jup_b207_actor_has_dealers_pda</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>151</next>
+                <next>152</next>
+            </phrase>
+            <phrase id="16">
+                <text>about_quests_dialog_stalkers_16</text>
+                <precondition>dialogs_zaton.check_npc_name_mechanics</precondition>
+                <precondition>dialogs.quest_dialog_toolkits_precond</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>161</next>
+                <next>162</next>
+                <next>163</next>
+                <next>164</next>
+                <next>165</next>
+                <next>166</next>
+                <next>167</next>
+                <next>168</next>
+                <next>169</next>
+            </phrase>
+            <phrase id="162">
+                <text>about_quests_dialog_stalkers_162</text>
+                <precondition>dialogs.level_zaton</precondition>
+                <precondition>dialogs.squad_not_in_smart_b104</precondition>
+                <dont_has_info>zat_b104_task_end</dont_has_info>
+            </phrase>
+            <phrase id="163">
+                <text>about_quests_dialog_stalkers_163</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <precondition>dialogs.squad_not_in_smart_b214</precondition>
+                <dont_has_info>jup_b214_actor_has_toolkit_2</dont_has_info>
+            </phrase>
+            <phrase id="164">
+                <text>about_quests_dialog_stalkers_164</text>
+                <precondition>dialogs.level_pripyat</precondition>
+                <precondition>dialogs.squad_not_in_smart_b304</precondition>
+                <dont_has_info>pri_b304_actor_take_toolkit</dont_has_info>
+            </phrase>
+            <phrase id="165">
+                <text>about_quests_dialog_stalkers_165</text>
+            </phrase>
+            <phrase id="166">
+                <text>about_quests_dialog_stalkers_166</text>
+            </phrase>
+            <phrase id="167">
+                <text>about_quests_dialog_stalkers_167</text>
+            </phrase>
+            <phrase id="168">
+                <text>about_quests_dialog_stalkers_168</text>
+                <precondition>dialogs.level_pripyat</precondition>
+                <precondition>dialogs.squad_not_in_smart_b303</precondition>
+                <dont_has_info>pri_b303_actor_take_toolkit</dont_has_info>
+            </phrase>
+            <phrase id="169">
+                <text>about_quests_dialog_stalkers_169</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <precondition>dialogs.squad_not_in_smart_b213</precondition>
+                <dont_has_info>jup_b213_toolkit_1_on_board</dont_has_info>
+            </phrase>
+            <phrase id="98">
+                <text>about_quests_dialog_stalkers_98</text>
+            </phrase>
+            <phrase id="31">
+                <text>about_quests_dialog_stalkers_31</text>
+                <precondition>dialogs.level_zaton</precondition>
+                <dont_has_info>zat_b28_heli_3_searched</dont_has_info>
+            </phrase>
+            <phrase id="51">
+                <text>about_quests_dialog_stalkers_51</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="5">
+                <text>about_quests_dialog_stalkers_5</text>
+                <precondition>dialogs.not_level_pripyat</precondition>
+                <precondition>dialogs.quest_dialog_squad_precond</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b218_gather_squad_complete</dont_has_info>
+                <has_info>jup_b218_pripyat_group_gathering</has_info>
+                <next>51</next>
+                <next>52</next>
+                <next>53</next>
+                <next>54</next>
+                <next>55</next>
+                <next>56</next>
+                <next>57</next>
+            </phrase>
+            <phrase id="8">
+                <text>about_quests_dialog_stalkers_8</text>
+                <precondition>dialogs_zaton.actor_has_artefact</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b14_recon_place</dont_has_info>
+                <dont_has_info>zat_b14_give_item_linker</dont_has_info>
+                <has_info>zat_b14_take_item</has_info>
+                <next>81</next>
+                <next>83</next>
+            </phrase>
+            <phrase id="6">
+                <text>about_quests_dialog_stalkers_6</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b3_tech_see_produce_62</dont_has_info>
+                <has_info>pri_a17_actor_has_gauss_rifle</has_info>
+                <next>62</next>
+                <next>63</next>
+            </phrase>
+            <phrase id="18">
+                <text>about_quests_dialog_stalkers_18</text>
+                <precondition>dialogs_zaton.zat_b33_aractor_has_habar</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>181</next>
+                <next>182</next>
+                <next>183</next>
+            </phrase>
+            <phrase id="19">
+                <text>about_quests_dialog_stalkers_19</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b52_snag_port_cranes</dont_has_info>
+                <has_info>zat_b52_snag_no_place</has_info>
+                <next>191</next>
+                <next>193</next>
+            </phrase>
+            <phrase id="17">
+                <text>about_quests_dialog_stalkers_17</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <precondition>dialogs_jupiter.jup_b10_actor_has_ufo_memory</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>171</next>
+                <next>172</next>
+            </phrase>
+            <phrase id="20">
+                <text>about_quests_dialog_stalkers_20</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b46_duty_founder_pda_complete</dont_has_info>
+                <has_info>jup_b46_duty_founder_pda_start</has_info>
+                <next>201</next>
+            </phrase>
+            <phrase id="30">
+                <text>about_quests_dialog_stalkers_30</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b215_gave_maps</dont_has_info>
+                <has_info>zat_b100_heli_2_searched</has_info>
+                <next>301</next>
+                <next>302</next>
+            </phrase>
+            <phrase id="40">
+                <text>about_quests_dialog_stalkers_40</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b47_bunker_guards_done</dont_has_info>
+                <has_info>jup_b47_bunker_guards_started</has_info>
+                <next>401</next>
+                <next>402</next>
+                <next>403</next>
+            </phrase>
+            <phrase id="7">
+                <text>about_quests_dialog_stalkers_7</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b6_employed_stalker</dont_has_info>
+                <has_info>jup_b6_employ_stalker</has_info>
+                <next>71</next>
+                <next>72</next>
+                <next>73</next>
+            </phrase>
+            <phrase id="72">
+                <text>about_quests_dialog_stalkers_72</text>
+                <precondition>dialogs.mityay_is_alive</precondition>
+            </phrase>
+            <phrase id="71">
+                <text>about_quests_dialog_stalkers_71</text>
+                <precondition>dialogs.gonta_is_alive</precondition>
+            </phrase>
+            <phrase id="401">
+                <text>about_quests_dialog_stalkers_401</text>
+                <precondition>dialogs.spartak_is_alive</precondition>
+            </phrase>
+            <phrase id="402">
+                <text>about_quests_dialog_stalkers_402</text>
+                <precondition>dialogs.tesak_is_alive</precondition>
+            </phrase>
+            <phrase id="21">
+                <text>about_quests_dialog_stalkers_21</text>
+                <dont_has_info>zat_b20_first_dialog</dont_has_info>
+                <give_info>zat_b20_first_dialog</give_info>
+                <give_info>zat_b20_plateau_way_started</give_info>
+            </phrase>
+            <phrase id="23">
+                <text>about_quests_dialog_stalkers_23</text>
+                <precondition>dialogs.level_zaton</precondition>
+                <dont_has_info>zat_b100_heli_2_searched</dont_has_info>
+                <has_info>zat_b20_first_dialog</has_info>
+            </phrase>
+            <phrase id="24">
+                <text>about_quests_dialog_stalkers_24</text>
+                <precondition>dialogs.level_zaton</precondition>
+                <dont_has_info>zat_b28_heli_3_searched</dont_has_info>
+                <has_info>zat_b20_first_dialog</has_info>
+            </phrase>
+            <phrase id="25">
+                <text>about_quests_dialog_stalkers_25</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <dont_has_info>jup_b8_heli_4_searched</dont_has_info>
+                <has_info>zat_b20_first_dialog</has_info>
+            </phrase>
+            <phrase id="63">
+                <text>about_quests_dialog_stalkers_63</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="62">
+                <text>about_quests_dialog_stalkers_62</text>
+                <precondition>dialogs.not_level_zaton</precondition>
+            </phrase>
+            <phrase id="81">
+                <text>about_quests_dialog_stalkers_81</text>
+                <precondition>dialogs.not_level_zaton</precondition>
+            </phrase>
+            <phrase id="44">
+                <text>about_quests_dialog_stalkers_44</text>
+            </phrase>
+            <phrase id="38">
+                <text>about_quests_dialog_stalkers_38</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <precondition>dialogs.squad_not_in_smart_b47</precondition>
+            </phrase>
+            <phrase id="26">
+                <text>about_quests_dialog_stalkers_26</text>
+                <precondition>dialogs.level_zaton</precondition>
+                <dont_has_info>zat_b101_heli_5_searched</dont_has_info>
+                <has_info>zat_b20_first_dialog</has_info>
+            </phrase>
+            <phrase id="161">
+                <text>about_quests_dialog_stalkers_161</text>
+                <precondition>dialogs.level_zaton</precondition>
+                <precondition>dialogs.squad_not_in_smart_b103</precondition>
+                <dont_has_info>zat_b103_actor_take_toolkit</dont_has_info>
+                <give_info>zat_b103_toolkit_search</give_info>
+            </phrase>
+            <phrase id="22">
+                <text>about_quests_dialog_stalkers_22</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <dont_has_info>jup_b9_heli_1_searched</dont_has_info>
+                <has_info>zat_b20_first_dialog</has_info>
+            </phrase>
+            <phrase id="27">
+                <text>about_quests_dialog_stalkers_27</text>
+                <has_info>zat_b20_first_dialog</has_info>
+            </phrase>
+            <phrase id="28">
+                <text>about_quests_dialog_stalkers_28</text>
+                <has_info>zat_b20_first_dialog</has_info>
+            </phrase>
+            <phrase id="57">
+                <text>about_quests_dialog_stalkers_57</text>
+                <precondition>dialogs.not_level_pripyat</precondition>
+                <precondition>dialogs.monolith_leader_dead_or_hired</precondition>
+                <has_info>jup_b218_monolith_hired</has_info>
+                <has_info>jup_a10_vano_agree_go_und</has_info>
+            </phrase>
+            <phrase id="501">
+                <text>about_quests_dialog_stalkers_501</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="502">
+                <text>about_quests_dialog_stalkers_502</text>
+                <precondition>dialogs.level_jupiter</precondition>
+            </phrase>
+            <phrase id="503">
+                <text>about_quests_dialog_stalkers_503</text>
+            </phrase>
+            <phrase id="50">
+                <text>about_quests_dialog_stalkers_50</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b218_gather_squad_complete</dont_has_info>
+                <has_info>jup_b218_actor_outfit_task</has_info>
+                <next>501</next>
+                <next>502</next>
+                <next>503</next>
+            </phrase>
+            <phrase id="14">
+                <text>about_quests_dialog_stalkers_14</text>
+                <precondition>dialogs_jupiter.jup_b207_generic_decrypt_need_dialog_precond</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>141</next>
+                <next>143</next>
+            </phrase>
+            <phrase id="13">
+                <text>about_quests_dialog_stalkers_13</text>
+                <precondition>dialogs.squad_in_smart_jup_b25</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b202_actor_find_snag</dont_has_info>
+                <has_info>jup_b202_actor_items_stolen</has_info>
+                <next>131</next>
+            </phrase>
+            <phrase id="12">
+                <text>about_quests_dialog_stalkers_12</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b106_found_soroka</dont_has_info>
+                <has_info>zat_b106_search_soroka</has_info>
+                <next>121</next>
+                <next>122</next>
+            </phrase>
+            <phrase id="111">
+                <text>about_quests_dialog_stalkers_111</text>
+            </phrase>
+            <phrase id="11">
+                <text>about_quests_dialog_stalkers_11</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b16_oasis_found</dont_has_info>
+                <has_info>jup_b16_oasis_start</has_info>
+                <next>111</next>
+                <next>112</next>
+                <next>113</next>
+            </phrase>
+            <phrase id="10">
+                <text>about_quests_dialog_stalkers_10</text>
+                <precondition>dialogs.squad_in_smart_zat_base</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b52_snag_no_place</dont_has_info>
+                <has_info>zat_b52_nimble_clear</has_info>
+                <next>101</next>
+            </phrase>
+            <phrase id="101">
+                <text>about_quests_dialog_stalkers_101</text>
+            </phrase>
+            <phrase id="2">
+                <text>about_quests_dialog_stalkers_2</text>
+                <precondition>dialogs.not_level_pripyat</precondition>
+                <precondition>dialogs.quest_dialog_heli_precond</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>21</next>
+                <next>22</next>
+                <next>23</next>
+                <next>24</next>
+                <next>25</next>
+                <next>26</next>
+                <next>27</next>
+                <next>28</next>
+            </phrase>
+            <phrase id="0">
+                <text>about_quests_dialog_stalkers_0</text>
+                <next>1</next>
+            </phrase>
+            <phrase id="1">
+                <text>about_quests_dialog_stalkers_1</text>
+                <next>3</next>
+                <next>4</next>
+                <next>5</next>
+                <next>50</next>
+                <next>6</next>
+                <next>8</next>
+                <next>9</next>
+                <next>10</next>
+                <next>11</next>
+                <next>12</next>
+                <next>13</next>
+                <next>14</next>
+                <next>15</next>
+                <next>18</next>
+                <next>19</next>
+                <next>20</next>
+                <next>17</next>
+                <next>30</next>
+                <next>40</next>
+                <next>7</next>
+                <next>16</next>
+                <next>98</next>
+            </phrase>
+        </phrase_list>
+    </dialog>
+    <dialog id="about_quests_dialog_dolg">
+        <precondition>dialogs.npc_dolg</precondition>
+        <phrase_list>
+            <phrase id="112">
+                <text>about_quests_dialog_dolg_112</text>
+            </phrase>
+            <phrase id="113">
+                <text>about_quests_dialog_dolg_113</text>
+            </phrase>
+            <phrase id="91">
+                <text>about_quests_dialog_dolg_91</text>
+            </phrase>
+            <phrase id="101">
+                <text>about_quests_dialog_dolg_101</text>
+            </phrase>
+            <phrase id="111">
+                <text>about_quests_dialog_dolg_111</text>
+            </phrase>
+            <phrase id="121">
+                <text>about_quests_dialog_dolg_121</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="131">
+                <text>about_quests_dialog_dolg_131</text>
+            </phrase>
+            <phrase id="122">
+                <text>about_quests_dialog_dolg_122</text>
+                <precondition>dialogs.not_level_zaton</precondition>
+            </phrase>
+            <phrase id="141">
+                <text>about_quests_dialog_dolg_141</text>
+                <precondition>dialogs.level_jupiter</precondition>
+            </phrase>
+            <phrase id="143">
+                <text>about_quests_dialog_dolg_143</text>
+                <precondition>dialogs.not_level_jupiter</precondition>
+            </phrase>
+            <phrase id="402">
+                <text>about_quests_dialog_dolg_402</text>
+                <precondition>dialogs.dolg_can_not_work_for_sci</precondition>
+            </phrase>
+            <phrase id="401">
+                <text>about_quests_dialog_dolg_401</text>
+                <precondition>dialogs.dolg_can_work_for_sci</precondition>
+            </phrase>
+            <phrase id="201">
+                <text>about_quests_dialog_dolg_201</text>
+            </phrase>
+            <phrase id="71">
+                <text>about_quests_dialog_dolg_71</text>
+                <precondition>dialogs.dolg_can_work_for_sci</precondition>
+            </phrase>
+            <phrase id="72">
+                <text>about_quests_dialog_dolg_72</text>
+                <precondition>dialogs.dolg_can_not_work_for_sci</precondition>
+            </phrase>
+            <phrase id="98">
+                <text>about_quests_dialog_dolg_98</text>
+            </phrase>
+            <phrase id="81">
+                <text>about_quests_dialog_dolg_81</text>
+                <precondition>dialogs.not_level_zaton</precondition>
+            </phrase>
+            <phrase id="83">
+                <text>about_quests_dialog_dolg_83</text>
+                <precondition>dialogs.level_zaton</precondition>
+                <give_info>zat_b14_actor_know_about_svyaznoy</give_info>
+            </phrase>
+            <phrase id="36">
+                <text>about_quests_dialog_dolg_36</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <precondition>dialogs.squad_not_in_smart_b6</precondition>
+            </phrase>
+            <phrase id="35">
+                <text>about_quests_dialog_dolg_35</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <dont_has_info>jup_b9_give_item</dont_has_info>
+            </phrase>
+            <phrase id="37">
+                <text>about_quests_dialog_dolg_37</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <precondition>dialogs.squad_not_in_smart_b205</precondition>
+            </phrase>
+            <phrase id="31">
+                <text>about_quests_dialog_dolg_31</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="43">
+                <text>about_quests_dialog_dolg_43</text>
+                <dont_has_info>zat_b215_asked_about_way</dont_has_info>
+            </phrase>
+            <phrase id="42">
+                <text>about_quests_dialog_dolg_42</text>
+                <precondition>dialogs.level_jupiter</precondition>
+            </phrase>
+            <phrase id="51">
+                <text>about_quests_dialog_dolg_51</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="52">
+                <text>about_quests_dialog_dolg_52</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <dont_has_info>jup_b218_soldier_hired</dont_has_info>
+            </phrase>
+            <phrase id="53">
+                <text>about_quests_dialog_dolg_53</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <dont_has_info>jup_a10_vano_agree_go_und</dont_has_info>
+            </phrase>
+            <phrase id="44">
+                <text>about_quests_dialog_dolg_44</text>
+            </phrase>
+            <phrase id="56">
+                <text>about_quests_dialog_dolg_56</text>
+                <precondition>dialogs.monolith_leader_is_alive</precondition>
+                <precondition>dialogs.level_jupiter</precondition>
+                <dont_has_info>jup_b218_monolith_hired</dont_has_info>
+                <has_info>jup_b4_monolith_squad_in_duty</has_info>
+            </phrase>
+            <phrase id="57">
+                <text>about_quests_dialog_dolg_57</text>
+                <precondition>dialogs.not_level_pripyat</precondition>
+                <precondition>dialogs.monolith_leader_dead_or_dolg</precondition>
+                <has_info>jup_b218_soldier_hired</has_info>
+                <has_info>jup_a10_vano_agree_go_und</has_info>
+            </phrase>
+            <phrase id="54">
+                <text>about_quests_dialog_dolg_54</text>
+                <precondition>dialogs.monolith_leader_is_alive</precondition>
+                <precondition>dialogs.level_jupiter</precondition>
+                <dont_has_info>jup_b4_monolith_squad_in_freedom</dont_has_info>
+                <dont_has_info>jup_b4_monolith_squad_in_duty</dont_has_info>
+            </phrase>
+            <phrase id="62">
+                <text>about_quests_dialog_dolg_62</text>
+            </phrase>
+            <phrase id="38">
+                <text>about_quests_dialog_dolg_38</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <precondition>dialogs.squad_not_in_smart_b47</precondition>
+            </phrase>
+            <phrase id="23">
+                <text>about_quests_dialog_dolg_23</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="25">
+                <text>about_quests_dialog_dolg_25</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <dont_has_info>jup_b8_heli_4_searched</dont_has_info>
+            </phrase>
+            <phrase id="27">
+                <text>about_quests_dialog_dolg_27</text>
+                <precondition>dialogs.level_jupiter</precondition>
+            </phrase>
+            <phrase id="22">
+                <text>about_quests_dialog_dolg_22</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <dont_has_info>jup_b9_heli_1_searched</dont_has_info>
+            </phrase>
+            <phrase id="151">
+                <text>about_quests_dialog_dolg_151</text>
+            </phrase>
+            <phrase id="181">
+                <text>about_quests_dialog_dolg_181</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="182">
+                <text>about_quests_dialog_dolg_182</text>
+                <precondition>dialogs.not_level_zaton</precondition>
+            </phrase>
+            <phrase id="191">
+                <text>about_quests_dialog_dolg_191</text>
+            </phrase>
+            <phrase id="171">
+                <text>about_quests_dialog_dolg_171</text>
+                <precondition>dialogs.level_jupiter</precondition>
+            </phrase>
+            <phrase id="172">
+                <text>about_quests_dialog_dolg_172</text>
+                <precondition>dialogs.not_level_jupiter</precondition>
+            </phrase>
+            <phrase id="301">
+                <text>about_quests_dialog_dolg_301</text>
+                <give_info>zat_b100_guide_need_maps</give_info>
+            </phrase>
+            <phrase id="163">
+                <text>about_quests_dialog_dolg_163</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <precondition>dialogs.squad_not_in_smart_b214</precondition>
+                <dont_has_info>jup_b214_actor_has_toolkit_2</dont_has_info>
+            </phrase>
+            <phrase id="165">
+                <text>about_quests_dialog_dolg_165</text>
+            </phrase>
+            <phrase id="166">
+                <text>about_quests_dialog_dolg_166</text>
+            </phrase>
+            <phrase id="169">
+                <text>about_quests_dialog_dolg_169</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <precondition>dialogs.squad_not_in_smart_b213</precondition>
+                <dont_has_info>jup_b213_toolkit_1_on_board</dont_has_info>
+            </phrase>
+            <phrase id="8">
+                <text>about_quests_dialog_dolg_8</text>
+                <precondition>dialogs_zaton.actor_has_artefact</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b14_recon_place</dont_has_info>
+                <dont_has_info>zat_b14_give_item_linker</dont_has_info>
+                <has_info>zat_b14_take_item</has_info>
+                <next>81</next>
+                <next>83</next>
+            </phrase>
+            <phrase id="9">
+                <text>about_quests_dialog_dolg_9</text>
+                <precondition>dialogs.level_zaton</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b57_bloodsucker_lair_clear</dont_has_info>
+                <dont_has_info>zat_b57_barmen_about_bloodsucker_lair_dialog_done</dont_has_info>
+                <has_info>zat_b38_den_of_the_bloodsucker_inform_stalkers_give_task</has_info>
+                <next>91</next>
+            </phrase>
+            <phrase id="10">
+                <text>about_quests_dialog_dolg_10</text>
+                <precondition>dialogs.squad_in_smart_zat_base</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b52_snag_no_place</dont_has_info>
+                <has_info>zat_b52_nimble_clear</has_info>
+                <next>101</next>
+            </phrase>
+            <phrase id="11">
+                <text>about_quests_dialog_dolg_11</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b16_oasis_found</dont_has_info>
+                <has_info>jup_b16_oasis_start</has_info>
+                <next>111</next>
+                <next>112</next>
+                <next>113</next>
+            </phrase>
+            <phrase id="12">
+                <text>about_quests_dialog_dolg_12</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b106_found_soroka</dont_has_info>
+                <has_info>zat_b106_search_soroka</has_info>
+                <next>121</next>
+                <next>122</next>
+            </phrase>
+            <phrase id="13">
+                <text>about_quests_dialog_dolg_13</text>
+                <precondition>dialogs.squad_in_smart_jup_b25</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b202_actor_find_snag</dont_has_info>
+                <has_info>jup_b202_actor_items_stolen</has_info>
+                <next>131</next>
+            </phrase>
+            <phrase id="15">
+                <text>about_quests_dialog_dolg_15</text>
+                <precondition>dialogs_jupiter.jup_b207_actor_has_dealers_pda</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>151</next>
+            </phrase>
+            <phrase id="14">
+                <text>about_quests_dialog_dolg_14</text>
+                <precondition>dialogs_jupiter.jup_b207_generic_decrypt_need_dialog_precond</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>141</next>
+                <next>143</next>
+            </phrase>
+            <phrase id="18">
+                <text>about_quests_dialog_dolg_18</text>
+                <precondition>dialogs_zaton.zat_b33_aractor_has_habar</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>181</next>
+                <next>182</next>
+            </phrase>
+            <phrase id="19">
+                <text>about_quests_dialog_dolg_19</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b52_snag_port_cranes</dont_has_info>
+                <has_info>zat_b52_snag_no_place</has_info>
+                <next>191</next>
+            </phrase>
+            <phrase id="20">
+                <text>about_quests_dialog_dolg_20</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b46_duty_founder_pda_complete</dont_has_info>
+                <has_info>jup_b46_duty_founder_pda_start</has_info>
+                <next>201</next>
+            </phrase>
+            <phrase id="17">
+                <text>about_quests_dialog_dolg_17</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <precondition>dialogs_jupiter.jup_b10_actor_has_ufo_memory</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>171</next>
+                <next>172</next>
+            </phrase>
+            <phrase id="30">
+                <text>about_quests_dialog_dolg_30</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b215_gave_maps</dont_has_info>
+                <has_info>zat_b100_heli_2_searched</has_info>
+                <next>301</next>
+            </phrase>
+            <phrase id="7">
+                <text>about_quests_dialog_dolg_7</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b6_employed_stalker</dont_has_info>
+                <has_info>jup_b6_employ_stalker</has_info>
+                <next>71</next>
+                <next>72</next>
+            </phrase>
+            <phrase id="40">
+                <text>about_quests_dialog_dolg_40</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b47_bunker_guards_done</dont_has_info>
+                <has_info>jup_b47_bunker_guards_started</has_info>
+                <next>401</next>
+                <next>402</next>
+            </phrase>
+            <phrase id="16">
+                <text>about_quests_dialog_dolg_16</text>
+                <precondition>dialogs_zaton.check_npc_name_mechanics</precondition>
+                <precondition>dialogs.quest_dialog_toolkits_precond</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>163</next>
+                <next>165</next>
+                <next>166</next>
+                <next>169</next>
+            </phrase>
+            <phrase id="2">
+                <text>about_quests_dialog_dolg_2</text>
+                <precondition>dialogs.not_level_pripyat</precondition>
+                <precondition>dialogs.quest_dialog_heli_precond</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>22</next>
+                <next>23</next>
+                <next>25</next>
+                <next>27</next>
+            </phrase>
+            <phrase id="3">
+                <text>about_quests_dialog_dolg_3</text>
+                <precondition>dialogs.not_level_pripyat</precondition>
+                <precondition>dialogs.quest_dialog_military_precond</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>31</next>
+                <next>35</next>
+                <next>36</next>
+                <next>37</next>
+                <next>38</next>
+            </phrase>
+            <phrase id="4">
+                <text>about_quests_dialog_dolg_4</text>
+                <precondition>dialogs.not_level_pripyat</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_a9_actor_found_main_documents</dont_has_info>
+                <has_info>jup_b9_blackbox_decrypted</has_info>
+                <has_info>zat_b28_heli_3_searched</has_info>
+                <next>42</next>
+                <next>43</next>
+                <next>44</next>
+            </phrase>
+            <phrase id="5">
+                <text>about_quests_dialog_dolg_5</text>
+                <precondition>dialogs.not_level_pripyat</precondition>
+                <precondition>dialogs.quest_dialog_squad_precond</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b218_gather_squad_complete</dont_has_info>
+                <has_info>jup_b218_pripyat_group_gathering</has_info>
+                <next>51</next>
+                <next>52</next>
+                <next>53</next>
+                <next>54</next>
+                <next>56</next>
+                <next>57</next>
+            </phrase>
+            <phrase id="6">
+                <text>about_quests_dialog_dolg_6</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b3_tech_see_produce_62</dont_has_info>
+                <has_info>pri_a17_actor_has_gauss_rifle</has_info>
+                <next>62</next>
+            </phrase>
+            <phrase id="501">
+                <text>about_quests_dialog_dolg_501</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="502">
+                <text>about_quests_dialog_dolg_502</text>
+                <precondition>dialogs.level_jupiter</precondition>
+            </phrase>
+            <phrase id="503">
+                <text>about_quests_dialog_dolg_503</text>
+            </phrase>
+            <phrase id="50">
+                <text>about_quests_dialog_dolg_50</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b218_gather_squad_complete</dont_has_info>
+                <has_info>jup_b218_actor_outfit_task</has_info>
+                <next>501</next>
+                <next>502</next>
+                <next>503</next>
+            </phrase>
+            <phrase id="0">
+                <text>about_quests_dialog_dolg_0</text>
+                <next>1</next>
+            </phrase>
+            <phrase id="1">
+                <text>about_quests_dialog_dolg_1</text>
+                <next>3</next>
+                <next>4</next>
+                <next>5</next>
+                <next>50</next>
+                <next>6</next>
+                <next>8</next>
+                <next>9</next>
+                <next>10</next>
+                <next>11</next>
+                <next>12</next>
+                <next>13</next>
+                <next>14</next>
+                <next>15</next>
+                <next>18</next>
+                <next>19</next>
+                <next>20</next>
+                <next>17</next>
+                <next>30</next>
+                <next>40</next>
+                <next>7</next>
+                <next>16</next>
+                <next>98</next>
+            </phrase>
+        </phrase_list>
+    </dialog>
+    <dialog id="about_quests_dialog_freedom">
+        <precondition>dialogs.npc_freedom</precondition>
+        <phrase_list>
+            <phrase id="52">
+                <text>about_quests_dialog_freedom_52</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <dont_has_info>jup_b218_soldier_hired</dont_has_info>
+            </phrase>
+            <phrase id="53">
+                <text>about_quests_dialog_freedom_53</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <dont_has_info>jup_a10_vano_agree_go_und</dont_has_info>
+            </phrase>
+            <phrase id="112">
+                <text>about_quests_dialog_freedom_112</text>
+            </phrase>
+            <phrase id="113">
+                <text>about_quests_dialog_freedom_113</text>
+            </phrase>
+            <phrase id="83">
+                <text>about_quests_dialog_freedom_83</text>
+                <precondition>dialogs.level_zaton</precondition>
+                <give_info>zat_b14_actor_know_about_svyaznoy</give_info>
+            </phrase>
+            <phrase id="91">
+                <text>about_quests_dialog_freedom_91</text>
+                <give_info>zat_b38_den_of_the_bloodsucker_tell_barman_about_all_give</give_info>
+            </phrase>
+            <phrase id="111">
+                <text>about_quests_dialog_freedom_111</text>
+            </phrase>
+            <phrase id="131">
+                <text>about_quests_dialog_freedom_131</text>
+            </phrase>
+            <phrase id="143">
+                <text>about_quests_dialog_freedom_143</text>
+                <precondition>dialogs.not_level_jupiter</precondition>
+            </phrase>
+            <phrase id="11">
+                <text>about_quests_dialog_freedom_11</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b16_oasis_found</dont_has_info>
+                <has_info>jup_b16_oasis_start</has_info>
+                <next>111</next>
+                <next>112</next>
+                <next>113</next>
+            </phrase>
+            <phrase id="172">
+                <text>about_quests_dialog_freedom_172</text>
+                <precondition>dialogs.not_level_jupiter</precondition>
+            </phrase>
+            <phrase id="201">
+                <text>about_quests_dialog_freedom_201</text>
+            </phrase>
+            <phrase id="20">
+                <text>about_quests_dialog_freedom_20</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b46_duty_founder_pda_complete</dont_has_info>
+                <has_info>jup_b46_duty_founder_pda_start</has_info>
+                <next>201</next>
+            </phrase>
+            <phrase id="16">
+                <text>about_quests_dialog_freedom_16</text>
+                <precondition>dialogs_zaton.check_npc_name_mechanics</precondition>
+                <precondition>dialogs.quest_dialog_toolkits_precond</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>163</next>
+                <next>165</next>
+                <next>166</next>
+                <next>169</next>
+            </phrase>
+            <phrase id="98">
+                <text>about_quests_dialog_freedom_98</text>
+            </phrase>
+            <phrase id="23">
+                <text>about_quests_dialog_freedom_23</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="31">
+                <text>about_quests_dialog_freedom_31</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="36">
+                <text>about_quests_dialog_freedom_36</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <precondition>dialogs.squad_not_in_smart_b6</precondition>
+            </phrase>
+            <phrase id="37">
+                <text>about_quests_dialog_freedom_37</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <precondition>dialogs.squad_not_in_smart_b205</precondition>
+            </phrase>
+            <phrase id="35">
+                <text>about_quests_dialog_freedom_35</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <dont_has_info>jup_b9_give_item</dont_has_info>
+            </phrase>
+            <phrase id="51">
+                <text>about_quests_dialog_freedom_51</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="54">
+                <text>about_quests_dialog_freedom_54</text>
+                <precondition>dialogs.monolith_leader_is_alive</precondition>
+                <precondition>dialogs.level_jupiter</precondition>
+                <dont_has_info>jup_b4_monolith_squad_in_freedom</dont_has_info>
+                <dont_has_info>jup_b4_monolith_squad_out</dont_has_info>
+                <dont_has_info>jup_b4_monolith_squad_in_duty</dont_has_info>
+            </phrase>
+            <phrase id="55">
+                <text>about_quests_dialog_freedom_55</text>
+                <precondition>dialogs.monolith_leader_is_alive</precondition>
+                <precondition>dialogs.level_jupiter</precondition>
+                <dont_has_info>jup_b218_monolith_hired</dont_has_info>
+                <has_info>jup_b4_monolith_squad_in_freedom</has_info>
+            </phrase>
+            <phrase id="81">
+                <text>about_quests_dialog_freedom_81</text>
+                <precondition>dialogs.not_level_zaton</precondition>
+            </phrase>
+            <phrase id="25">
+                <text>about_quests_dialog_freedom_25</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <dont_has_info>jup_b8_heli_4_searched</dont_has_info>
+            </phrase>
+            <phrase id="38">
+                <text>about_quests_dialog_freedom_38</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <precondition>dialogs.squad_not_in_smart_b47</precondition>
+            </phrase>
+            <phrase id="42">
+                <text>about_quests_dialog_freedom_42</text>
+                <precondition>dialogs.level_jupiter</precondition>
+            </phrase>
+            <phrase id="43">
+                <text>about_quests_dialog_freedom_43</text>
+                <dont_has_info>zat_b215_asked_about_way</dont_has_info>
+            </phrase>
+            <phrase id="44">
+                <text>about_quests_dialog_freedom_44</text>
+            </phrase>
+            <phrase id="57">
+                <text>about_quests_dialog_freedom_57</text>
+                <precondition>dialogs.not_level_pripyat</precondition>
+                <precondition>dialogs.monolith_leader_dead_or_freedom</precondition>
+                <has_info>jup_b218_soldier_hired</has_info>
+                <has_info>jup_a10_vano_agree_go_und</has_info>
+            </phrase>
+            <phrase id="62">
+                <text>about_quests_dialog_freedom_62</text>
+            </phrase>
+            <phrase id="27">
+                <text>about_quests_dialog_freedom_27</text>
+                <precondition>dialogs.level_jupiter</precondition>
+            </phrase>
+            <phrase id="22">
+                <text>about_quests_dialog_freedom_22</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <dont_has_info>jup_b9_heli_1_searched</dont_has_info>
+            </phrase>
+            <phrase id="30">
+                <text>about_quests_dialog_freedom_30</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b215_gave_maps</dont_has_info>
+                <has_info>zat_b100_heli_2_searched</has_info>
+                <next>301</next>
+            </phrase>
+            <phrase id="171">
+                <text>about_quests_dialog_freedom_171</text>
+                <precondition>dialogs.level_jupiter</precondition>
+            </phrase>
+            <phrase id="17">
+                <text>about_quests_dialog_freedom_17</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <precondition>dialogs_jupiter.jup_b10_actor_has_ufo_memory</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>171</next>
+                <next>172</next>
+            </phrase>
+            <phrase id="12">
+                <text>about_quests_dialog_freedom_12</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b106_found_soroka</dont_has_info>
+                <has_info>zat_b106_search_soroka</has_info>
+                <next>121</next>
+                <next>122</next>
+            </phrase>
+            <phrase id="121">
+                <text>about_quests_dialog_freedom_121</text>
+                <precondition>dialogs.level_jupiter</precondition>
+            </phrase>
+            <phrase id="122">
+                <text>about_quests_dialog_freedom_122</text>
+                <precondition>dialogs.not_level_jupiter</precondition>
+            </phrase>
+            <phrase id="13">
+                <text>about_quests_dialog_freedom_13</text>
+                <precondition>dialogs.squad_in_smart_jup_b25</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b202_actor_find_snag</dont_has_info>
+                <has_info>jup_b202_actor_items_stolen</has_info>
+                <next>131</next>
+            </phrase>
+            <phrase id="14">
+                <text>about_quests_dialog_freedom_14</text>
+                <precondition>dialogs_jupiter.jup_b207_generic_decrypt_need_dialog_precond</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>141</next>
+                <next>143</next>
+            </phrase>
+            <phrase id="141">
+                <text>about_quests_dialog_freedom_141</text>
+                <precondition>dialogs.level_jupiter</precondition>
+            </phrase>
+            <phrase id="15">
+                <text>about_quests_dialog_freedom_15</text>
+                <precondition>dialogs_jupiter.jup_b207_actor_has_dealers_pda</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>151</next>
+            </phrase>
+            <phrase id="151">
+                <text>about_quests_dialog_freedom_151</text>
+            </phrase>
+            <phrase id="18">
+                <text>about_quests_dialog_freedom_18</text>
+                <precondition>dialogs_zaton.zat_b33_aractor_has_habar</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>181</next>
+                <next>182</next>
+            </phrase>
+            <phrase id="181">
+                <text>about_quests_dialog_freedom_181</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="182">
+                <text>about_quests_dialog_freedom_182</text>
+                <precondition>dialogs.not_level_zaton</precondition>
+            </phrase>
+            <phrase id="19">
+                <text>about_quests_dialog_freedom_19</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b52_snag_port_cranes</dont_has_info>
+                <has_info>zat_b52_snag_no_place</has_info>
+                <next>191</next>
+            </phrase>
+            <phrase id="191">
+                <text>about_quests_dialog_freedom_191</text>
+            </phrase>
+            <phrase id="301">
+                <text>about_quests_dialog_freedom_301</text>
+                <give_info>zat_b100_guide_need_maps</give_info>
+            </phrase>
+            <phrase id="401">
+                <text>about_quests_dialog_freedom_401</text>
+                <precondition>dialogs.freedom_can_work_for_sci</precondition>
+            </phrase>
+            <phrase id="402">
+                <text>about_quests_dialog_freedom_402</text>
+                <precondition>dialogs.freedom_can_not_work_for_sci</precondition>
+            </phrase>
+            <phrase id="40">
+                <text>about_quests_dialog_freedom_40</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b47_bunker_guards_done</dont_has_info>
+                <has_info>jup_b47_bunker_guards_started</has_info>
+                <next>401</next>
+                <next>402</next>
+            </phrase>
+            <phrase id="71">
+                <text>about_quests_dialog_freedom_71</text>
+                <precondition>dialogs.freedom_can_work_for_sci</precondition>
+            </phrase>
+            <phrase id="72">
+                <text>about_quests_dialog_freedom_72</text>
+                <precondition>dialogs.freedom_can_not_work_for_sci</precondition>
+            </phrase>
+            <phrase id="7">
+                <text>about_quests_dialog_freedom_7</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b6_employed_stalker</dont_has_info>
+                <has_info>jup_b6_employ_stalker</has_info>
+                <next>71</next>
+                <next>72</next>
+            </phrase>
+            <phrase id="163">
+                <text>about_quests_dialog_freedom_163</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <precondition>dialogs.squad_not_in_smart_b214</precondition>
+                <dont_has_info>jup_b214_actor_has_toolkit_2</dont_has_info>
+            </phrase>
+            <phrase id="165">
+                <text>about_quests_dialog_freedom_165</text>
+            </phrase>
+            <phrase id="166">
+                <text>about_quests_dialog_freedom_166</text>
+            </phrase>
+            <phrase id="169">
+                <text>about_quests_dialog_freedom_169</text>
+                <precondition>dialogs.level_jupiter</precondition>
+                <precondition>dialogs.squad_not_in_smart_b213</precondition>
+                <dont_has_info>jup_b213_toolkit_1_on_board</dont_has_info>
+            </phrase>
+            <phrase id="501">
+                <text>about_quests_dialog_freedom_501</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="502">
+                <text>about_quests_dialog_freedom_502</text>
+                <precondition>dialogs.level_jupiter</precondition>
+            </phrase>
+            <phrase id="503">
+                <text>about_quests_dialog_freedom_503</text>
+            </phrase>
+            <phrase id="2">
+                <text>about_quests_dialog_freedom_2</text>
+                <precondition>dialogs.not_level_pripyat</precondition>
+                <precondition>dialogs.quest_dialog_heli_precond</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>22</next>
+                <next>23</next>
+                <next>25</next>
+                <next>27</next>
+            </phrase>
+            <phrase id="3">
+                <text>about_quests_dialog_freedom_3</text>
+                <precondition>dialogs.not_level_pripyat</precondition>
+                <precondition>dialogs.quest_dialog_military_precond</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>31</next>
+                <next>35</next>
+                <next>36</next>
+                <next>37</next>
+                <next>38</next>
+            </phrase>
+            <phrase id="4">
+                <text>about_quests_dialog_freedom_4</text>
+                <precondition>dialogs.not_level_pripyat</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_a9_actor_found_main_documents</dont_has_info>
+                <has_info>jup_b9_blackbox_decrypted</has_info>
+                <has_info>zat_b28_heli_3_searched</has_info>
+                <next>42</next>
+                <next>43</next>
+                <next>44</next>
+            </phrase>
+            <phrase id="5">
+                <text>about_quests_dialog_freedom_5</text>
+                <precondition>dialogs.not_level_pripyat</precondition>
+                <precondition>dialogs.quest_dialog_squad_precond</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b218_gather_squad_complete</dont_has_info>
+                <has_info>jup_b218_pripyat_group_gathering</has_info>
+                <next>51</next>
+                <next>52</next>
+                <next>53</next>
+                <next>54</next>
+                <next>55</next>
+                <next>57</next>
+            </phrase>
+            <phrase id="50">
+                <text>about_quests_dialog_freedom_50</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b218_gather_squad_complete</dont_has_info>
+                <has_info>jup_b218_actor_outfit_task</has_info>
+                <next>501</next>
+                <next>502</next>
+                <next>503</next>
+            </phrase>
+            <phrase id="6">
+                <text>about_quests_dialog_freedom_6</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b3_tech_see_produce_62</dont_has_info>
+                <has_info>pri_a17_actor_has_gauss_rifle</has_info>
+                <next>62</next>
+            </phrase>
+            <phrase id="9">
+                <text>about_quests_dialog_freedom_9</text>
+                <precondition>dialogs.level_zaton</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b57_bloodsucker_lair_clear</dont_has_info>
+                <dont_has_info>zat_b57_barmen_about_bloodsucker_lair_dialog_done</dont_has_info>
+                <has_info>zat_b38_den_of_the_bloodsucker_inform_stalkers_give_task</has_info>
+                <next>91</next>
+            </phrase>
+            <phrase id="8">
+                <text>about_quests_dialog_freedom_8</text>
+                <precondition>dialogs_zaton.actor_has_artefact</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b14_recon_place</dont_has_info>
+                <dont_has_info>zat_b14_give_item_linker</dont_has_info>
+                <has_info>zat_b14_take_item</has_info>
+                <next>81</next>
+                <next>83</next>
+            </phrase>
+            <phrase id="10">
+                <text>about_quests_dialog_freedom_10</text>
+                <precondition>dialogs.squad_in_smart_zat_base</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b52_snag_no_place</dont_has_info>
+                <has_info>zat_b52_nimble_clear</has_info>
+                <next>101</next>
+            </phrase>
+            <phrase id="101">
+                <text>about_quests_dialog_freedom_101</text>
+            </phrase>
+            <phrase id="0">
+                <text>about_quests_dialog_freedom_0</text>
+                <next>1</next>
+            </phrase>
+            <phrase id="1">
+                <text>about_quests_dialog_freedom_1</text>
+                <next>3</next>
+                <next>4</next>
+                <next>5</next>
+                <next>50</next>
+                <next>6</next>
+                <next>8</next>
+                <next>9</next>
+                <next>10</next>
+                <next>11</next>
+                <next>12</next>
+                <next>13</next>
+                <next>14</next>
+                <next>15</next>
+                <next>18</next>
+                <next>19</next>
+                <next>20</next>
+                <next>17</next>
+                <next>30</next>
+                <next>40</next>
+                <next>7</next>
+                <next>16</next>
+                <next>98</next>
+            </phrase>
+        </phrase_list>
+    </dialog>
+    <dialog id="about_quests_dialog_bandit">
+        <precondition>dialogs.npc_bandit</precondition>
+        <phrase_list>
+            <phrase id="98">
+                <text>about_quests_dialog_bandit_98</text>
+            </phrase>
+            <phrase id="23">
+                <text>about_quests_dialog_bandit_23</text>
+                <precondition>dialogs.level_zaton</precondition>
+                <dont_has_info>zat_b100_heli_2_searched</dont_has_info>
+            </phrase>
+            <phrase id="33">
+                <text>about_quests_dialog_bandit_33</text>
+                <precondition>dialogs.level_zaton</precondition>
+                <precondition>dialogs.squad_not_in_smart_b40</precondition>
+            </phrase>
+            <phrase id="24">
+                <text>about_quests_dialog_bandit_24</text>
+                <precondition>dialogs.level_zaton</precondition>
+                <dont_has_info>zat_b28_heli_3_searched</dont_has_info>
+            </phrase>
+            <phrase id="26">
+                <text>about_quests_dialog_bandit_26</text>
+                <precondition>dialogs.level_zaton</precondition>
+                <dont_has_info>zat_b101_heli_5_searched</dont_has_info>
+            </phrase>
+            <phrase id="35">
+                <text>about_quests_dialog_bandit_35</text>
+                <precondition>dialogs.level_jupiter</precondition>
+            </phrase>
+            <phrase id="34">
+                <text>about_quests_dialog_bandit_34</text>
+                <precondition>dialogs.level_zaton</precondition>
+                <precondition>dialogs.squad_not_in_smart_b18</precondition>
+            </phrase>
+            <phrase id="62">
+                <text>about_quests_dialog_bandit_62</text>
+                <precondition>dialogs.not_level_zaton</precondition>
+            </phrase>
+            <phrase id="63">
+                <text>about_quests_dialog_bandit_63</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="8">
+                <text>about_quests_dialog_bandit_8</text>
+                <precondition>dialogs_zaton.actor_has_artefact</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b14_recon_place</dont_has_info>
+                <dont_has_info>zat_b14_give_item_linker</dont_has_info>
+                <has_info>zat_b14_take_item</has_info>
+                <next>81</next>
+                <next>83</next>
+            </phrase>
+            <phrase id="81">
+                <text>about_quests_dialog_bandit_81</text>
+                <precondition>dialogs.not_level_zaton</precondition>
+            </phrase>
+            <phrase id="83">
+                <text>about_quests_dialog_bandit_83</text>
+                <precondition>dialogs.level_zaton</precondition>
+                <give_info>zat_b14_actor_know_about_svyaznoy</give_info>
+            </phrase>
+            <phrase id="91">
+                <text>about_quests_dialog_bandit_91</text>
+            </phrase>
+            <phrase id="111">
+                <text>about_quests_dialog_bandit_111</text>
+            </phrase>
+            <phrase id="122">
+                <text>about_quests_dialog_bandit_122</text>
+                <precondition>dialogs.not_level_zaton</precondition>
+            </phrase>
+            <phrase id="113">
+                <text>about_quests_dialog_bandit_113</text>
+            </phrase>
+            <phrase id="112">
+                <text>about_quests_dialog_bandit_112</text>
+            </phrase>
+            <phrase id="12">
+                <text>about_quests_dialog_bandit_12</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b106_found_soroka</dont_has_info>
+                <has_info>zat_b106_search_soroka</has_info>
+                <next>121</next>
+                <next>122</next>
+            </phrase>
+            <phrase id="13">
+                <text>about_quests_dialog_bandit_13</text>
+                <precondition>dialogs.squad_in_smart_jup_b25</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b202_actor_find_snag</dont_has_info>
+                <has_info>jup_b202_actor_items_stolen</has_info>
+                <next>131</next>
+            </phrase>
+            <phrase id="121">
+                <text>about_quests_dialog_bandit_121</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="131">
+                <text>about_quests_dialog_bandit_131</text>
+            </phrase>
+            <phrase id="141">
+                <text>about_quests_dialog_bandit_141</text>
+                <precondition>dialogs.level_jupiter</precondition>
+            </phrase>
+            <phrase id="143">
+                <text>about_quests_dialog_bandit_143</text>
+                <precondition>dialogs.not_level_jupiter</precondition>
+            </phrase>
+            <phrase id="14">
+                <text>about_quests_dialog_bandit_14</text>
+                <precondition>dialogs_jupiter.jup_b207_generic_decrypt_need_dialog_precond</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>141</next>
+                <next>143</next>
+            </phrase>
+            <phrase id="18">
+                <text>about_quests_dialog_bandit_18</text>
+                <precondition>dialogs_zaton.zat_b33_aractor_has_habar</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>181</next>
+                <next>182</next>
+            </phrase>
+            <phrase id="19">
+                <text>about_quests_dialog_bandit_19</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b52_snag_port_cranes</dont_has_info>
+                <has_info>zat_b52_snag_no_place</has_info>
+                <next>191</next>
+                <next>193</next>
+            </phrase>
+            <phrase id="191">
+                <text>about_quests_dialog_bandit_191</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="193">
+                <text>about_quests_dialog_bandit_193</text>
+                <precondition>dialogs.not_level_zaton</precondition>
+            </phrase>
+            <phrase id="181">
+                <text>about_quests_dialog_bandit_181</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="182">
+                <text>about_quests_dialog_bandit_182</text>
+                <precondition>dialogs.not_level_zaton</precondition>
+            </phrase>
+            <phrase id="151">
+                <text>about_quests_dialog_bandit_151</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="15">
+                <text>about_quests_dialog_bandit_15</text>
+                <precondition>dialogs_jupiter.jup_b207_actor_has_dealers_pda</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>151</next>
+                <next>152</next>
+            </phrase>
+            <phrase id="152">
+                <text>about_quests_dialog_bandit_152</text>
+                <precondition>dialogs.not_level_zaton</precondition>
+            </phrase>
+            <phrase id="20">
+                <text>about_quests_dialog_bandit_20</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b46_duty_founder_pda_complete</dont_has_info>
+                <has_info>jup_b46_duty_founder_pda_start</has_info>
+                <next>201</next>
+            </phrase>
+            <phrase id="201">
+                <text>about_quests_dialog_bandit_201</text>
+            </phrase>
+            <phrase id="17">
+                <text>about_quests_dialog_bandit_17</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <precondition>dialogs_jupiter.jup_b10_actor_has_ufo_memory</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>171</next>
+                <next>172</next>
+            </phrase>
+            <phrase id="172">
+                <text>about_quests_dialog_bandit_172</text>
+                <precondition>dialogs.not_level_jupiter</precondition>
+            </phrase>
+            <phrase id="171">
+                <text>about_quests_dialog_bandit_171</text>
+                <precondition>dialogs.level_jupiter</precondition>
+            </phrase>
+            <phrase id="301">
+                <text>about_quests_dialog_bandit_301</text>
+                <give_info>zat_b100_guide_need_maps</give_info>
+            </phrase>
+            <phrase id="30">
+                <text>about_quests_dialog_bandit_30</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b215_gave_maps</dont_has_info>
+                <has_info>zat_b100_heli_2_searched</has_info>
+                <next>301</next>
+            </phrase>
+            <phrase id="40">
+                <text>about_quests_dialog_bandit_40</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b47_bunker_guards_done</dont_has_info>
+                <has_info>jup_b47_bunker_guards_started</has_info>
+                <next>403</next>
+            </phrase>
+            <phrase id="403">
+                <text>about_quests_dialog_bandit_403</text>
+            </phrase>
+            <phrase id="7">
+                <text>about_quests_dialog_bandit_7</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b6_employed_stalker</dont_has_info>
+                <has_info>jup_b6_employ_stalker</has_info>
+                <next>73</next>
+            </phrase>
+            <phrase id="73">
+                <text>about_quests_dialog_bandit_73</text>
+            </phrase>
+            <phrase id="16">
+                <text>about_quests_dialog_bandit_16</text>
+                <precondition>dialogs_zaton.check_npc_name_mechanics</precondition>
+                <precondition>dialogs.quest_dialog_toolkits_precond</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>165</next>
+                <next>166</next>
+            </phrase>
+            <phrase id="166">
+                <text>about_quests_dialog_bandit_166</text>
+            </phrase>
+            <phrase id="165">
+                <text>about_quests_dialog_bandit_165</text>
+            </phrase>
+            <phrase id="27">
+                <text>about_quests_dialog_bandit_27</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="22">
+                <text>about_quests_dialog_bandit_22</text>
+                <precondition>dialogs.level_jupiter</precondition>
+            </phrase>
+            <phrase id="6">
+                <text>about_quests_dialog_bandit_6</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b3_tech_see_produce_62</dont_has_info>
+                <has_info>pri_a17_actor_has_gauss_rifle</has_info>
+                <next>62</next>
+                <next>63</next>
+            </phrase>
+            <phrase id="3">
+                <text>about_quests_dialog_bandit_3</text>
+                <precondition>dialogs.not_level_pripyat</precondition>
+                <precondition>dialogs.quest_dialog_military_precond</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>31</next>
+                <next>32</next>
+                <next>33</next>
+                <next>34</next>
+                <next>35</next>
+            </phrase>
+            <phrase id="31">
+                <text>about_quests_dialog_bandit_31</text>
+                <precondition>dialogs.level_zaton</precondition>
+                <dont_has_info>zat_b28_heli_3_searched</dont_has_info>
+            </phrase>
+            <phrase id="32">
+                <text>about_quests_dialog_bandit_32</text>
+                <precondition>dialogs.level_zaton</precondition>
+                <precondition>dialogs.squad_not_in_smart_b101</precondition>
+            </phrase>
+            <phrase id="4">
+                <text>about_quests_dialog_bandit_4</text>
+                <precondition>dialogs.not_level_pripyat</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_a9_actor_found_main_documents</dont_has_info>
+                <has_info>jup_b9_blackbox_decrypted</has_info>
+                <has_info>zat_b28_heli_3_searched</has_info>
+                <next>41</next>
+                <next>43</next>
+                <next>44</next>
+            </phrase>
+            <phrase id="41">
+                <text>about_quests_dialog_bandit_41</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="43">
+                <text>about_quests_dialog_bandit_43</text>
+                <dont_has_info>zat_b215_asked_about_way</dont_has_info>
+            </phrase>
+            <phrase id="44">
+                <text>about_quests_dialog_bandit_44</text>
+            </phrase>
+            <phrase id="5">
+                <text>about_quests_dialog_bandit_5</text>
+                <precondition>dialogs.not_level_pripyat</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b218_gather_squad_complete</dont_has_info>
+                <has_info>jup_b218_pripyat_group_gathering</has_info>
+                <next>51</next>
+                <next>57</next>
+            </phrase>
+            <phrase id="51">
+                <text>about_quests_dialog_bandit_51</text>
+            </phrase>
+            <phrase id="57">
+                <text>about_quests_dialog_bandit_57</text>
+                <has_info>jup_b218_monolith_hired</has_info>
+                <has_info>jup_b218_soldier_hired</has_info>
+                <has_info>jup_a10_vano_agree_go_und</has_info>
+            </phrase>
+            <phrase id="501">
+                <text>about_quests_dialog_bandit_501</text>
+                <precondition>dialogs.level_zaton</precondition>
+            </phrase>
+            <phrase id="502">
+                <text>about_quests_dialog_bandit_502</text>
+                <precondition>dialogs.level_jupiter</precondition>
+            </phrase>
+            <phrase id="503">
+                <text>about_quests_dialog_bandit_503</text>
+            </phrase>
+            <phrase id="50">
+                <text>about_quests_dialog_bandit_50</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b218_gather_squad_complete</dont_has_info>
+                <has_info>jup_b218_actor_outfit_task</has_info>
+                <next>501</next>
+                <next>502</next>
+                <next>503</next>
+            </phrase>
+            <phrase id="11">
+                <text>about_quests_dialog_bandit_11</text>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>jup_b16_oasis_found</dont_has_info>
+                <has_info>jup_b16_oasis_start</has_info>
+                <next>111</next>
+                <next>112</next>
+                <next>113</next>
+            </phrase>
+            <phrase id="9">
+                <text>about_quests_dialog_bandit_9</text>
+                <precondition>dialogs.level_zaton</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b57_bloodsucker_lair_clear</dont_has_info>
+                <dont_has_info>zat_b57_barmen_about_bloodsucker_lair_dialog_done</dont_has_info>
+                <has_info>zat_b38_den_of_the_bloodsucker_inform_stalkers_give_task</has_info>
+                <next>91</next>
+            </phrase>
+            <phrase id="10">
+                <text>about_quests_dialog_bandit_10</text>
+                <precondition>dialogs.squad_in_smart_zat_base</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <dont_has_info>zat_b52_snag_no_place</dont_has_info>
+                <has_info>zat_b52_nimble_clear</has_info>
+                <next>101</next>
+            </phrase>
+            <phrase id="101">
+                <text>about_quests_dialog_bandit_101</text>
+            </phrase>
+            <phrase id="2">
+                <text>about_quests_dialog_bandit_2</text>
+                <precondition>dialogs.not_level_pripyat</precondition>
+                <precondition>dialogs.quest_dialog_heli_precond</precondition>
+                <precondition>dialog_manager.precondition_is_phrase_disabled</precondition>
+                <action>dialog_manager.action_disable_quest_phrase</action>
+                <next>22</next>
+                <next>23</next>
+                <next>24</next>
+                <next>26</next>
+                <next>27</next>
+            </phrase>
+            <phrase id="0">
+                <text>about_quests_dialog_bandit_0</text>
+                <next>1</next>
+            </phrase>
+            <phrase id="1">
+                <text>about_quests_dialog_bandit_1</text>
+                <next>3</next>
+                <next>4</next>
+                <next>5</next>
+                <next>50</next>
+                <next>6</next>
+                <next>8</next>
+                <next>9</next>
+                <next>10</next>
+                <next>11</next>
+                <next>12</next>
+                <next>13</next>
+                <next>14</next>
+                <next>15</next>
+                <next>18</next>
+                <next>19</next>
+                <next>20</next>
+                <next>17</next>
+                <next>30</next>
+                <next>40</next>
+                <next>7</next>
+                <next>16</next>
+                <next>98</next>
+            </phrase>
+        </phrase_list>
+    </dialog>
+</game_dialogs>

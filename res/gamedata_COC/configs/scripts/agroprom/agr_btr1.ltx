@@ -1,0 +1,14 @@
+[logic]
+active = ph_car@idle
+
+[ph_car@idle]
+path_walk 		= agr_btr1_walk
+on_info1		= {=is_faction_enemy_to_actor(army)} ph_car
+
+[ph_car]
+path_walk 		= agr_btr1_walk
+target 			= actor
+track_target    = true
+fire_repeat     = inf
+auto_fire       = true
+on_info1		= {!is_faction_enemy_to_actor(army)} ph_car@idle

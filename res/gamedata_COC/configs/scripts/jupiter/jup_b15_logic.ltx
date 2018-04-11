@@ -1,0 +1,44 @@
+[logic]
+active = nil;sr_idle@task
+
+[sr_idle@task]
+on_info = {+jup_a9_tech_way_info} sr_idle@drink_control %=give_task(jup_b218_pripyat_group) +jup_b218_gather_squad =spawn_object_in(vodka:jup_b15_zulus)%
+
+[sr_idle@drink_control]
+on_info = {+jup_b15_actor_drink +jup_b15_zulus_drink_anim_info} sr_idle@drink_effect
+
+[sr_idle@drink_effect]
+on_info = {+jup_b15_actor_drink -jup_b15_actor_drink_final} %=run_postprocess(fade_in_out) =give_item(vodka_script:actor) -jup_b15_actor_drink%
+on_info2 = {+jup_b15_actor_drink +jup_b15_actor_drink_final} %=run_postprocess(fade_in_out) =give_item(vodka_script:actor) -jup_b15_actor_drink%
+on_game_timer = 25 | {+jup_b15_actor_drink_final =actor_has_item(vodka_script)} sr_cutscene@sleep %=eat_vodka_script%, {-jup_b15_actor_drink_final =actor_has_item(vodka_script)} sr_idle@drink_control %=eat_vodka_script -jup_b15_zulus_drink_anim_info =enable_ui +jup_b15_can_talk%;, {!actor_has_item(vodka_script)} %=give_item(vodka_script:actor)%
+
+[sr_cutscene@sleep]
+point = jup_b15_cut_actor_walk
+look = jup_b15_cut_actor_look
+cam_effector = scenario_cam\Jupiter\jup_b15_sleep
+global_cameffect = false
+enable_ui_on_end = false
+on_signal = cameff_end | sr_cutscene@wake %=run_postprocess(fade_in_out) =set_game_time(06:00)%	
+
+[sr_cutscene@wake]
+point = jup_b15_cut_actor_walk
+look = jup_b15_cut_actor_look
+cam_effector = scenario_cam\Jupiter\jup_b15_wake_up
+global_cameffect = false
+on_info = {-jup_b15_alcohol} %+jup_b15_alcohol%	
+on_signal = cameff_end | sr_idle@b218 %+jup_b15_cameff_end =set_counter(jup_b218_squad_members_count:0)%
+
+[sr_idle@b218]
+on_info8 = {-jup_b15_drunk_with_zulu_saved} %+jup_b15_drunk_with_zulu_saved =scenario_autosave(st_save_jup_b15_drunk_with_zulu)%
+on_info  = {+jup_b218_vano_tp -jup_b218_zulus_met_vano} %+jup_b218_zulus_met_vano =inc_counter(jup_b218_squad_members_count) =scenario_autosave(st_save_jup_b218_vano_in_squad)%
+on_info2 = {+jup_b218_sokolov_tp -jup_b218_zulus_met_sokolov} %+jup_b218_zulus_met_sokolov =inc_counter(jup_b218_squad_members_count) =scenario_autosave(st_save_jup_b218_sokolov_in_squad)%
+on_info3 = {+jup_b218_monolith_fr_tp -jup_b218_zulus_met_monolith} %+jup_b218_zulus_met_monolith =inc_counter(jup_b218_squad_members_count) =scenario_autosave(st_save_jup_b218_strider_in_squad)%
+on_info4 = {+jup_b218_monolith_du_tp -jup_b218_zulus_met_monolith} %+jup_b218_zulus_met_monolith =inc_counter(jup_b218_squad_members_count) =scenario_autosave(st_save_jup_b218_strider_in_squad)%
+on_info5 = {+jup_b218_pause_meet} sr_idle@pause %-jup_b218_pause_meet -jup_b218_pause_done%
+;on_info6 = {+jup_b218_gather_squad_complete -jup_b218_travel_jup_to_pas_saved} %+jup_b218_travel_jup_to_pas_saved =scenario_autosave(st_save_jup_b218_travel_jup_to_pas)%
+on_info7 = {+jup_b218_gather_squad_complete} sr_idle@nil
+
+[sr_idle@pause]
+on_game_timer = 15 | sr_idle@b218 %+jup_b218_pause_done%
+
+[sr_idle@nil]

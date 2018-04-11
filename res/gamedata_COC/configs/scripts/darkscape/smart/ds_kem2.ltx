@@ -1,0 +1,17 @@
+[smart_terrain]
+squad_id = 7
+max_population = 3
+respawn_params = respawn@ds_kem2
+respawn_idle = 86400
+
+[respawn@ds_kem2]
+spawn_army@novice
+spawn_army@snipers
+
+[spawn_army@novice]
+spawn_squads = army_sim_squad_novice, army_sim_squad_advanced
+spawn_num = 2
+
+[spawn_army@snipers]
+spawn_squads = army_sim_squad_sniper
+spawn_num = 1

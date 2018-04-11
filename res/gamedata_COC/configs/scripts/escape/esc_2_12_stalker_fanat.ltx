@@ -1,0 +1,23 @@
+[logic@esc_2_12_stalker_fanat]
+suitable = {=check_npc_name(esc_2_12_stalker_fanat)} true
+level_spot = quest_npc
+prior = 140
+active = walker@esc_2_12_stalker_fanat
+
+[walker@esc_2_12_stalker_fanat]
+path_walk = guarder_2_walk
+path_look  = guarder_2_look
+on_info = {=surge_started} walker@surge
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+invulnerable = {!actor_enemy} true, false
+
+[walker@surge]
+path_walk = hide_2_walk
+path_look  = hide_2_look
+on_info = {!surge_started} walker@esc_2_12_stalker_fanat
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+invulnerable = {!actor_enemy} true, false

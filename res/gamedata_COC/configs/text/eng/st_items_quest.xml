@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<string_table>
+<string id="bad_psy_helmet_desc">
+		<text>Prototype developed by scientists to protect people from psi-emissions. Needs adjusting.</text>
+	</string>
+	<string id="bad_psy_helmet_name">
+		<text>Uncalibrated psi-helmet</text>
+	</string>
+	<string id="good_psy_helmet_desc">
+		<text>Prototype developed by scientists to protect people from psi-emissions.</text>
+	</string>
+	<string id="good_psy_helmet_name">
+		<text>Psi-helmet</text>
+	</string>
+	<string id="cit_doctors_key_short_desc">
+		<text>Doctor's key to a secret stash in Pripyat</text>
+	</string>
+	<string id="cit_doctors_key_name">
+		<text>Doctor's key</text>
+	</string>
+	<string id="cit_doctors_key_desc">
+		<text>A key with "Hotel Polissya - Room 26" engraved on side.</text>
+	</string>
+	<string id="item_docs_hiden_pri_desc">
+		<text>Worn manuscript in leather binding. Written by Strelok himself. \nJudging by the headings alone, it might explain some of the Zone's secrets.</text>
+	</string>
+	<string id="cit_doctors_pda_name">
+		<text>Doctor's notes</text>
+	</string>
+	<string id="cit_doctors_pda_desc">
+		<text>"Just some notes about old men's conspiracy theories". \nThere are rumours that the Agroprom Institute was used as a front for an unofficial lab in the years preceding the 2006 year accident. This lab hosted a number of very unusual experiments. The traders have dug up a lot of information about these laboratories. I met with the Barkeep, he says he sent Duty scouts to get into the underground vaults of Dark Valley, called X-18, but they disappeared. There are another rumours regarding a "Psi-Brain" mechanism. The whole neighbourhood in Yantar is under the influence of that piece of trash - it zombified everyone who came within range. There is another mechanism in Red Forest radar underground, called Lab X-19, and that's what is likely to be the Brain Scorcher. There is evidence to suggest that the presence of the Brain Scorcher intentionally blocks the road to the North, but no one knows exactly what it is. The Barkeep believes that the Brain Scorcher is man-made, and these mechanisms are not always operating at full strength. He thinks there are periods when their power is lowered to cool down the apparatus. It's time to visit all the underground laboratories in the Zone and find out what kind of secrets they are hiding. Too bad, that I'm too old for this shit. I wish Strelok would be still around, but damn, he disappeared years ago.</text>
+	</string>
+	<string id="item_docs_hiden_pri_name">
+		<text>Strelok's manuscript</text>
+	</string>
+	<string id="item_decoder_desc">
+		<text>A powerful electronic lock-pick. Strangely enough, it does not seem to be an all-purpose thieves' instrument. Rather, it seems to have been created with a specific electronic lock in mind and can't be used to override anything else.</text>
+	</string>
+	<string id="item_decoder_name">
+		<text>Decoder</text>
+	</string>
+	<string id="pri_decoder_docs_conclusion_txt">
+		<text>The manuscript contains a short report on how Fang and Strelok infiltrated a hidden laboratory and their journey there. It makes mention of large Monolith presence in and around the Chernobyl NPP. More specifically under the concrete sarcophagus, also suggesting it may be their base of operations but with the intent to hide something. Reading further it states that they discovered laboratory hidden further in the north under the generators, however they were unable to gain access at the time of writing as they required the use of a decoder.</text>
+	</string>
+	<string id="item_quest_case_02_desc">
+		<text>A fireproof briefcase containing military documents and reports on investigations performed near Agroprom. The reports talk in detail about how machinery and equipment has gone missing from the institute, and how the results of the investigations on their whereabouts were apparently falsified.</text>
+	</string>
+	<string id="item_quest_case_02_name">
+		<text>Military documents</text>
+	</string>
+	<string id="item_doc_x18_name">
+		<text>Biology research report</text>
+	</string>
+	<string id="item_doc_x18_desc">
+		<text>The report details the study of biological samples sent from Lab X-18. The samples were subjected to informational field effects of varying intensities. The report meticulously describes the mutation of living beings following exposure to emissions.</text>
+	</string>
+	<string id="item_doc_x16_desc">
+		<text>The documents refer to one of the side discoveries of bio-research, specifically the discovery that living creatures are able to generate directed psi-emissions. A biological field emitter, essentially a giant brain, was grown as part of the research conducted in Lab X-16.</text>
+	</string>
+	<string id="item_doc_x16_name">
+		<text>Psi research documents</text>
+	</string>
+		<string id="item_doc_x10_desc">
+		<text>The documents describe the technical characteristics of an antenna and how they deviate from their planned designs. There is a note on the reverse side which indicates that these documents were prepared in Lab X-19.</text>
+	</string>
+	<string id="item_doc_x10_name">
+		<text>Rainbow emitter documents</text>
+	</string>
+		<string id="item_doc_x8_desc">
+		<text>The document refers to the transfer of the research team and all materials to another laboratory far in the north, which will be used to research matters relating to the influence of the noosphere. To enter the lab, use the date of the accident as the code (ddmmyyyy).\n \nThe research team comprised: N.A. Lebedev, E.F. Kalancha and V.I. Suslov.</text>
+	</string>
+	<string id="item_doc_x8_name">
+		<text>Order of Transfer</text>
+	</string>
+	<string id="item_doc_jup_ug_desc">
+		<text>The notebook contains a detailed description of an experiment assessing a psi-field's effect on an object in another hemisphere. A group of scientists in the Caribbean received the signal, but it was distorted. The signal was altered in a strange way, as though corrected by someone. A possible explanation is that the noosphere theory is correct and the changes were made by the noosphere.</text>
+	</string>
+	<string id="item_doc_jup_ug_name">
+		<text>Experiment notebook</text>
+	</string>
+		<string id="item_doc_mon_con_name">
+		<text>Prototype weapon report</text>
+	</string>
+	<string id="item_doc_mon_con_name_desc">
+		<text>Documents which describe the operating mechanism and main technical characteristics of a more advanced electromagnetic device.\nThere is a note inside the documents which reads: "Documents must be returned to X-8, the central laboratory. I will be busy, so deliver them yourself. - N. Lebedev"</text>
+	</string>
+</string_table>

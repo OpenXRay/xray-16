@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+
+    <string id="bar_radar_deactivate_name">
+		<text>Отключить Выжигатель Мозгов</text>
+	</string>
+	<string id="bar_radar_deactivate_text">
+		<text>Возрождающийся «Монолит» вновь активировал Выжигатель Мозгов. Чтобы его отключить, понадобится хорошая пси-защита.</text>
+	</string>
+
+</string_table>

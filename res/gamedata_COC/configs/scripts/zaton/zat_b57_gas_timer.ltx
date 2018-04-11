@@ -1,0 +1,15 @@
+[logic]
+active = nil ;sr_idle@wait
+
+[sr_idle@wait]
+on_info = {+zat_b57_den_of_the_bloodsucker_wait_destroy_give} sr_timer@gas
+
+[sr_timer@gas]
+type = dec
+start_value = 45000
+on_value = 0 | sr_idle@end {!squad_exist(zat_b38_bloodsuckers_sleepers)} %+zat_b57_gas_running_stop +zat_b57_den_of_the_bloodsucker_tell_stalkers_about_destroy_lair_give%
+
+[sr_idle@end]
+
+;позиционной ценности не представляет
+

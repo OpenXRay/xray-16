@@ -1,0 +1,50 @@
+class "opt_gameplay" (CUIWindow)
+function opt_gameplay:__init() super()
+end
+
+function opt_gameplay:__finalize()
+end
+
+function opt_gameplay:InitControls(x, y, xml, handler)
+	self:SetWndPos(vector2():set(x,y))
+	self:SetWndSize(vector2():set(738,416))
+	self:SetAutoDelete(true)
+	
+	self.scroll_v = xml:InitScrollView("tab_gameplay:scroll_v", self)
+
+	handler.gameplay_options = {}
+	handler.gameplay_options["difficulty"] 			= {typ="list", tag="tab_gameplay:list_difficulty"}
+	handler.gameplay_options["ai_die_in_anomaly"]	= {typ="check", tag="tab_gameplay:check_ai_die_in_anomaly"}
+	handler.gameplay_options["important_save"]		= {typ="check", tag="tab_gameplay:check_important_save"}
+	handler.gameplay_options["crouch_toggle"]		= {typ="check", tag="tab_gameplay:check_crouch_toggle"}
+	handler.gameplay_options["show_tracers"]		= {typ="check", tag="tab_gameplay:check_show_tracers"}
+	handler.gameplay_options["cod_pickup_mode"]		= {typ="check", tag="tab_gameplay:check_cod_pickup_mode"}
+end
+
+class "opt_gameplay_ui" (CUIWindow)
+function opt_gameplay_ui:__init() super()
+end
+
+function opt_gameplay_ui:__finalize()
+end
+
+function opt_gameplay_ui:InitControls(x, y, xml, handler)
+	self:SetWndPos(vector2():set(x,y))
+	self:SetWndSize(vector2():set(738,416))
+	self:SetAutoDelete(true)
+	
+	if (db.actor_binder and db.actor_binder.character_icon) then
+		handler.char_icon = xml:InitStatic("tab_gameplay_ui:char_icon",self)
+		handler.char_icon:InitTexture(db.actor_binder.character_icon)
+	end
+	
+	self.scroll_v = xml:InitScrollView("tab_gameplay_ui:scroll_v", self)
+
+	handler.gameplay_ui_options = {}
+	handler.gameplay_ui_options["tips"] 				= {typ="check", tag="tab_gameplay_ui:check_tips"}
+	handler.gameplay_ui_options["show_crosshair"] 		= {typ="check", tag="tab_gameplay_ui:check_crosshair"}
+	handler.gameplay_ui_options["dyn_crosshair"] 		= {typ="check", tag="tab_gameplay_ui:check_dyn_crosshair"}
+	handler.gameplay_ui_options["show_weapon"]			= {typ="check", tag="tab_gameplay_ui:check_show_weapon"}
+	handler.gameplay_ui_options["crosshair_distance"]	= {typ="check", tag="tab_gameplay_ui:check_dist"}
+	handler.gameplay_ui_options["hud_draw"]			= {typ="check", tag="tab_gameplay_ui:check_hud_draw"}
+end

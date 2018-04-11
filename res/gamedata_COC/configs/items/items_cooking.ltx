@@ -1,0 +1,43 @@
+[charcoal]:booster_script
+$spawn 					= "cooking\charcoal"
+cost					= 1000
+description				= st_charcoal_descr
+empty_weight           	= 0.001
+inv_grid_height    		= 2
+inv_grid_width     		= 1
+inv_grid_x         		= 2
+inv_grid_y         		= 39
+inv_name				= st_charcoal
+inv_name_short			= st_charcoal
+inv_weight				= 2.04
+max_uses               	= 8
+remove_after_use       	= true
+use_condition           = true
+visual					= dynamics\cooking\charcoal.ogf
+
+[wood_stove]:booster_script
+$spawn					= "cooking\wood_stove"
+cost					= 2000
+description				= st_wood_stove_descr
+dont_stack				= true
+empty_weight			= 1.02
+inv_grid_height			= 1
+inv_grid_width			= 1
+inv_grid_x				= 3
+inv_grid_y				= 39
+inv_name				= st_wood_stove
+inv_name_short			= st_wood_stove
+inv_weight				= 1.66
+max_uses				= 1
+remove_after_use		= false
+script_binding			= bind_container.bind
+use1_functor			= itm_cooking.can_access_inventory
+use1_action_functor		= itm_cooking.access_inventory
+use2_functor			= itm_cooking.try_add_fuel
+use2_action_functor		= itm_cooking.add_fuel
+use3_functor			= itm_cooking.check_can_cook_functor
+use3_action_functor		= itm_cooking.try_to_cook
+use_condition			= true
+visual					= dynamics\cooking\wood_stove.ogf
+allow_take_list			= mutant_part_flesh_meat, mutant_part_boar_chop, mutant_part_dog_meat, mutant_part_psevdodog_meat, mutant_part_krovosos_meat, mutant_part_chimera_meat, mutant_part_tushkano_meat
+allow_take_count		= 3

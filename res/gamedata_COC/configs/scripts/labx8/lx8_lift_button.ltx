@@ -1,0 +1,26 @@
+[logic]
+active = ph_idle@in
+
+[ph_idle@locked]
+;on_info = {=actor_has_item(zat_a23_labx8_key)} ph_idle@closed 
+on_info = ph_idle@closed 
+tips = tip_no_access_card
+nonscript_usable = true
+
+[ph_idle@closed]
+;on_info = {!actor_has_item(zat_a23_labx8_key)} ph_idle@locked 
+on_use = ph_idle@teleport %=scenario_autosave(st_save_uni_labx8_to_pri) =disable_ui =run_postprocess(fade_in) +actor_left_labx8%
+tips = st_lx8_lift_button
+nonscript_usable = true
+
+[ph_idle@teleport]
+on_game_timer = 20 | ph_idle@in %=run_postprocess(black:3009:true) =teleport_actor(lx8_actor_walk:lx8_actor_look)%
+
+[ph_idle@in]
+on_info = {!actor_in_zone(labx8_sr_levelchanger)} ph_idle@wait %=run_postprocess(black:3009:true) =disable_ui%
+
+[ph_idle@wait]
+on_game_timer = 10 | ph_idle@out %=stop_postprocess(3009)%
+
+[ph_idle@out]
+on_game_timer = 10 | ph_idle@locked %=enable_ui%

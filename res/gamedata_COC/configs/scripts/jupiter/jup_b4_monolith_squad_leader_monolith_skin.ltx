@@ -1,0 +1,90 @@
+[logic@jup_b4_monolith_squad_leader_monolith_skin]
+suitable = {=check_npc_name(jup_b4_monolith_squad_leader_monolith_skin)}
+active = walker@begin
+prior = 100
+on_death = death
+on_hit = hit
+
+[walker@begin]
+use_camp = false
+path_walk = monolith_squad_leader_monolith_skin_begin_walk
+path_look = monolith_squad_leader_monolith_skin_begin_look
+combat_ignore_cond = {-jup_b4_monolith_squad_hit} true, false
+meet = meet
+on_info = {=is_squad_enemy_to_actor(jup_b4_squad)} walker@begin2 %+jup_b4_monolith_squad_out%
+on_info2 = {+jup_b4_teleport_to_monolit} walker@begin2
+
+[walker@begin2]
+use_camp = false
+path_walk = monolith_squad_leader_monolith_skin_begin_walk
+path_look = monolith_squad_leader_monolith_skin_begin_look
+combat_ignore_cond = {-jup_b4_monolith_squad_hit} true, false
+meet = no_meet
+on_info = {+jup_b4_aling} walker@1
+on_info2 = {+jup_b4_freedom_squad_leader_lets_talk_sound} walker@freedom
+on_info3 = {=is_squad_enemy_to_actor(jup_b4_squad)} %+jup_b4_monolith_squad_out%
+on_actor_dist_ge_nvis = 150 | {-jup_b4_actor_go_away} %+jup_b4_actor_go_away%
+;--------------------------------------------------------------------------------
+;--------------------------------------------------------------------------------
+
+[walker@1]
+use_camp = false
+path_walk = monolith_squad_leader_monolith_skin_1_walk
+path_look = monolith_squad_leader_monolith_skin_1_look
+combat_ignore_cond = {-jup_b4_monolith_squad_hit} true, false
+on_signal = align6 | %+jup_b4_duty_aling6%
+on_info = {+jup_b4_duty_prisiaga} walker@2
+on_info2 = {=is_squad_enemy_to_actor(jup_b4_squad)} %+jup_b4_monolith_squad_out%
+on_actor_dist_ge_nvis = 150 | {-jup_b4_actor_go_away} %+jup_b4_actor_go_away%
+meet = no_meet
+
+[walker@2]
+use_camp = false
+path_walk = monolith_squad_leader_monolith_skin_1_walk
+path_look = monolith_squad_leader_monolith_skin_1_look
+combat_ignore_cond = {-jup_b4_monolith_squad_hit} true, false
+on_actor_dist_ge_nvis = 150 | {-jup_b4_actor_go_away} %+jup_b4_actor_go_away%
+on_timer = 300 | walker@3
+meet = no_meet
+
+[walker@3]
+use_camp = false
+path_walk = monolith_squad_leader_monolith_skin_1_walk
+path_look = monolith_squad_leader_monolith_skin_1_look
+combat_ignore_cond = {-jup_b4_monolith_squad_hit} true, false
+on_info = {+jup_b4_duty_prisiaga -jup_b4_recruit_6_serve_duty_sound} %=play_sound(jup_b4_recruit_1_serve_duty) +jup_b4_recruit_6_serve_duty_sound%
+on_info2 = {+jup_b4_monolith_squad_out -jup_b4_ml_stop_sound} %=stop_sound +jup_b4_ml_stop_sound%
+on_actor_dist_ge_nvis = 150 | {-jup_b4_actor_go_away} %+jup_b4_actor_go_away%
+meet = no_meet
+
+[meet]
+use					= {+jup_b4_monolith_squad_out} false, true
+close_distance 		= 5
+far_distance		= 20
+close_victim		= actor
+close_anim 	        = {-jup_b4_monolith_squad_help}wait
+close_snd_hello	    = nil
+far_victim			= actor
+far_anim            = {-jup_b4_monolith_squad_help}hello_wpn
+far_snd				= {-jup_b4_monolith_squad_help =dist_to_actor_ge(5)} jup_b4_monolith_squad_leader_meet
+trade_enable		= false
+allow_break			= false
+
+;--------------------------------------------------------------------------------
+;--------------------------------------------------------------------------------
+
+[walker@freedom]
+use_camp = false
+path_walk = monolith_squad_leader_monolith_skin_near_fire_walk
+path_look = monolith_squad_leader_monolith_skin_near_fire_look
+combat_ignore_cond = {-jup_b4_monolith_squad_out} true, false
+on_signal = leader_near_fire | %+jup_b4_freedom_monolit_leader_near_fire%
+on_info = {=is_squad_enemy_to_actor(jup_b4_squad)} %+jup_b4_monolith_squad_out%
+on_actor_dist_ge_nvis = 150 | {-jup_b4_actor_go_away} %+jup_b4_actor_go_away%
+meet = no_meet
+
+[hit]
+on_info = %+jup_b4_monolith_squad_hit%
+
+[death]
+on_info = %+jup_b4_monolith_squad_out%

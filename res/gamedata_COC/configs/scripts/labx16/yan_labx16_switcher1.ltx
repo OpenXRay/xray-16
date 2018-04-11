@@ -1,0 +1,14 @@
+[logic]
+active = ph_button@active
+
+[ph_button@active]
+on_info = {+yan_labx16_switcher_1_off} ph_idle@nil
+anim = lab_primary_switcher_idle
+tooltip = pas_b400_tip_switcher
+on_press = ph_button@deactivate %=yan_gluk%
+
+[ph_button@deactivate]
+anim = lab_primary_switcher_off
+on_info = {-yan_labx16_switcher_1_off} ph_idle@nil %+yan_labx16_switcher_1_off =turn_off(yan_labx16switcher_lamp1) =turn_off(yan_labx16switcher_primary_1_red) =turn_on(yan_labx16switcher_primary_1_green) =play_sound(x16_switch_1) =spawn_object(labx16_zombie_9:x16_zombied_7_walk:0)%
+
+[ph_idle@nil]

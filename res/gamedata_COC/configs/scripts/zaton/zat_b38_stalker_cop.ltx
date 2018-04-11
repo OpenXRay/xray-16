@@ -1,0 +1,338 @@
+[logic@zat_b38_stalker_cop]
+suitable = {=check_npc_name(zat_b38_stalker_cop)} true
+prior = 200
+active = animpoint@base
+
+[meet]
+close_snd_hello = nil
+close_snd_bye 	= nil
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+use 			= {!actor_enemy} true
+trade_enable = false
+allow_break = false
+meet_on_talking = false
+
+[animpoint@base]
+cover_name = zat_a2_sc_zat_b38_stalker_cop
+;reach_distance = 1.5
+use_camp = false
+meet = meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = zat_a2_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+;*****************************************************************
+
+[logic@zat_b38_stalker_cop_in_lair]
+suitable = {+zat_b38_disappearance_stalkers_find_to_be_missing_hunter_give_task =check_npc_name(zat_b38_stalker_cop)} true
+prior = 200
+active = walker@wait_for_actor
+on_death = death@lair
+post_combat_time = 0, 0
+on_hit = hit
+
+[death@lair]
+on_info = {-zat_b38_stalker_cop_death} %+zat_b38_stalker_cop_death =stop_sound%
+on_info2 = {+zat_b38_lift_open} %+zat_b38_underground_door_open =stop_sound% 
+
+[hit]
+on_info  = {=hit_by_actor !deadly_hit =counter_equal(zat_b38_cop_abuse:0) -zat_b38_stalker_cop_death} %=play_sound(zat_b38_stalker_cop_hit_1) +zat_b38_cop_hit_1%
+on_info2 = {=hit_by_actor !deadly_hit =counter_equal(zat_b38_cop_abuse:1) -zat_b38_stalker_cop_death} %=play_sound(zat_b38_stalker_cop_hit_2) +zat_b38_cop_hit_2%
+on_info3 = {=hit_by_actor =counter_equal(zat_b38_cop_abuse:2)} %+zat_b38_quest_failed%
+
+[wounded]
+hp_state 		= 0|wounded_heavy@help_heavy
+hp_state_see 	= 0|wounded_heavy@help_heavy
+hp_victim 		= 0|nil
+hp_fight 		= 0|false
+hp_cover		= 0|false
+
+[walker]
+on_info66 = {+zat_b38_cop_hit_1 -zat_b38_cop_hit_1_done} %=inc_counter(zat_b38_cop_abuse) =actor_neutral +zat_b38_cop_hit_1_done%
+on_info77 = {+zat_b38_cop_hit_2 -zat_b38_cop_hit_2_done} %=inc_counter(zat_b38_cop_abuse) =actor_neutral +zat_b38_cop_hit_2_done%
+on_info88 = {=dist_to_actor_ge(150) !actor_enemy -zat_b38_stalker_cop_death} %+zat_b38_failed_getaway%, {=dist_to_actor_ge(150)} %=destroy_object +zat_b38_quest_failed%
+wounded = wounded
+use_camp = false
+corpse_detection_enabled = false
+gather_items_enabled = false
+help_wounded_enabled = false
+
+[remark]
+on_info66 = {+zat_b38_cop_hit_1 -zat_b38_cop_hit_1_done} %=inc_counter(zat_b38_cop_abuse) =actor_neutral +zat_b38_cop_hit_1_done%
+on_info77 = {+zat_b38_cop_hit_2 -zat_b38_cop_hit_2_done} %=inc_counter(zat_b38_cop_abuse) =actor_neutral +zat_b38_cop_hit_2_done%
+on_info88 = {=dist_to_actor_ge(150) !actor_enemy -zat_b38_stalker_cop_death} %+zat_b38_failed_getaway%, {=dist_to_actor_ge(150)} %=destroy_object +zat_b38_quest_failed%
+combat_ignore_cond = {-zat_b38_fight_started} true
+meet = no_meet
+wounded = wounded
+corpse_detection_enabled = false
+gather_items_enabled = false
+help_wounded_enabled = false
+
+[animpoint]
+on_info66 = {+zat_b38_cop_hit_1 -zat_b38_cop_hit_1_done} %=inc_counter(zat_b38_cop_abuse) =actor_neutral +zat_b38_cop_hit_1_done%
+on_info77 = {+zat_b38_cop_hit_2 -zat_b38_cop_hit_2_done} %=inc_counter(zat_b38_cop_abuse) =actor_neutral +zat_b38_cop_hit_2_done%
+on_info88 = {=dist_to_actor_ge(150) !actor_enemy -zat_b38_stalker_cop_death} %+zat_b38_failed_getaway%, {=dist_to_actor_ge(150)} %=destroy_object +zat_b38_quest_failed%
+meet = no_meet
+wounded = wounded
+use_camp = false
+corpse_detection_enabled = false
+gather_items_enabled = false
+help_wounded_enabled = false
+
+;***********************************************************
+
+[walker@wait_for_actor]
+path_walk = research_first_hall_walk
+path_look = research_first_hall_look
+def_state_standing = guard_na
+on_signal = vnz_first_point | remark@see
+on_info = {!npc_in_zone(zat_b38_quest_line) -zat_b38_cop_on_job} %=teleport_npc(zat_b38_research_first_hall_walk:1) +zat_b38_cop_on_job% 
+on_info66 = {+zat_b38_cop_hit_1 -zat_b38_cop_hit_1_done} %=inc_counter(zat_b38_cop_abuse) =actor_neutral +zat_b38_cop_hit_1_done%
+on_info77 = {+zat_b38_cop_hit_2 -zat_b38_cop_hit_2_done} %=inc_counter(zat_b38_cop_abuse) =actor_neutral +zat_b38_cop_hit_2_done%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+meet = no_meet
+corpse_detection_enabled = false
+wounded = wounded
+use_camp = false
+gather_items_enabled = false
+help_wounded_enabled = false
+on_game_timer = 86400 | {=dist_to_actor_ge(20) !actor_enemy -zat_b38_stalker_cop_death} %+zat_b38_failed_getaway%, {=actor_enemy =dist_to_actor_ge(50)} %=destroy_object +zat_b38_quest_failed%
+
+[remark@see]
+target = story | actor
+anim = guard_na
+on_actor_dist_le_nvis = 7 |  {-zat_b38_stalker_cop_about_lair_bloodsucker_done} %=play_sound(zat_b38_stalker_cop_about_lair_bloodsucker) +zat_b38_stalker_cop_about_lair_bloodsucker_done%
+on_signal = sound_end | {-zat_b38_disappearance_stalkers_clean_den_of_the_bloodsucker_give} %+zat_b38_disappearance_stalkers_clean_den_of_the_bloodsucker_give =play_sound(zat_b38_stalker_cop_notice)%
+on_info = {+zat_b38_disappearance_stalkers_clean_den_of_the_bloodsucker_give -zat_b38_met_with_grouse_saved} %+zat_b38_met_with_grouse_saved =scenario_autosave(st_save_zat_b38_met_with_grouse)%
+on_info2 = {+zat_b38_met_with_grouse_saved} walker@research_first_hall
+on_info3 = {+zat_b38_cop_hit_1 -zat_b38_cop_hit_1_done} %=inc_counter(zat_b38_cop_abuse) =actor_neutral +zat_b38_cop_hit_1_done%
+on_info4 = {+zat_b38_cop_hit_2 -zat_b38_cop_hit_2_done} %=inc_counter(zat_b38_cop_abuse) =actor_neutral +zat_b38_cop_hit_2_done%
+combat_ignore_cond = {-zat_b38_fight_started} true
+meet = no_meet
+wounded = wounded
+corpse_detection_enabled = false
+gather_items_enabled = false
+help_wounded_enabled = false
+on_game_timer = 86400 | {=dist_to_actor_ge(20) !actor_enemy -zat_b38_stalker_cop_death} %+zat_b38_failed_getaway%, {=actor_enemy =dist_to_actor_ge(50)} %=destroy_object +zat_b38_quest_failed%
+
+[walker@research_first_hall]:walker
+path_walk = research_first_hall_walk
+path_look = research_first_hall_look
+def_state_moving1 = sneak_run
+def_state_standing = guard_na
+out_restr = zat_b38_vnz_out_restr
+meet = no_meet
+combat_ignore_cond = {-zat_b38_fight_started} true
+on_signal = zat_b38_scary_sound | {-zat_b38_scary_sound} remark@illusion %+zat_b38_scary_sound +zat_b38_illusion%
+on_signal2 = zat_b38_monster_1 | {-zat_b38_monster_1} %+zat_b38_monster_1% 
+on_info2 = {+zat_b38_monster_1 -zat_b38_stalker_cop_see_bloodsucker_done -zat_b38_bloodscuker_1_death} remark@monster_1 %=play_sound(zat_b38_stalker_cop_see_bloodsucker) +zat_b38_stalker_cop_see_bloodsucker_done%
+on_info3 = {+zat_b38_bloodscuker_1_death -zat_b38_bloodscuker_2_death -zat_b38_stalker_cop_kill_1_done +zat_b38_we_fight_monster_1} %=play_sound(zat_b38_stalker_cop_kill_1) +zat_b38_stalker_cop_kill_1_done =clearAbuse%
+on_signal3 = zat_b38_monster_2 | {-zat_b38_monster_2} %+zat_b38_monster_2%
+on_info4 = {+zat_b38_monster_2 +zat_b38_bloodscuker_2_death =dist_to_actor_le(5)} animpoint@break_lift %+zat_b38_break_lift =play_sound(zat_b38_stalker_cop_come_here_1)%, {+zat_b38_monster_2 +zat_b38_bloodscuker_2_death} remark@wait_bf_lift
+on_info5 = {+zat_b38_monster_2 -zat_b38_bloodscuker_2_death} remark@monster_2 %+zat_b38_stalker_cop_see_bloodsucker_2 =play_sound(zat_b38_stalker_cop_another_one)%
+on_info6 = {+zat_b38_bloodscuker_2_death -zat_b38_stalker_cop_kill_2_done +zat_b38_we_fight_monster_2} %=play_sound(zat_b38_stalker_cop_kill_2) +zat_b38_stalker_cop_kill_2_done =clearAbuse%
+
+[remark@illusion]:remark
+anim = threat
+target = story | zat_b38_scream
+on_info = {+zat_b38_time_to_say_illusion -zat_b38_stalker_cop_appear -zat_b38_bloodscuker_1_death -zat_b38_bloodscuker_2_death} %=play_sound(zat_b38_stalker_cop_appear) +zat_b38_stalker_cop_appear%, {+zat_b38_bloodscuker_1_death} walker@research_first_hall, {+zat_b38_bloodscuker_2_death} walker@research_first_hall
+on_signal = sound_end | walker@research_first_hall
+
+[remark@monster_1]:remark
+out_restr = zat_b38_vnz_out_restr
+anim = hide_na
+target = story | zat_hiding_place_46
+on_info = {+zat_b38_bloodscuker_1_death} walker@research_first_hall
+on_info2 = {-zat_b38_we_fight_monster_1} %+zat_b38_we_fight_monster_1%
+combat_ignore_cond = false
+on_info4 = {+zat_b38_fight_started} remark@monster_1_aim 
+
+[remark@monster_1_aim]:remark
+out_restr = zat_b38_vnz_out_restr
+anim = hide_na
+target = story | zat_b38_bloodsucker_1
+on_info = {+zat_b38_bloodscuker_1_death} walker@research_first_hall
+on_info2 = {-zat_b38_we_fight_monster_1} %+zat_b38_we_fight_monster_1%
+combat_ignore_cond = false
+
+[remark@monster_2]:remark
+out_restr = zat_b38_vnz_out_restr
+anim = hide_na
+target = story | zat_b38_bloodsucker_2
+on_info = {+zat_b38_bloodscuker_2_death} walker@research_first_hall
+on_info2 = {-zat_b38_we_fight_monster_2} %+zat_b38_we_fight_monster_2%
+combat_ignore_cond = false
+
+[remark@wait_bf_lift]:remark
+out_restr = zat_b38_vnz_out_restr
+anim = guard_na
+target = story | actor
+on_info = {+zat_b38_monster_2 +zat_b38_bloodscuker_2_death =dist_to_actor_le(8)} animpoint@break_lift %+zat_b38_break_lift =play_sound(zat_b38_stalker_cop_come_here_1)%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[animpoint@break_lift]:animpoint
+out_restr = zat_b38_vnz_out_restr
+cover_name = zat_b38_sc_cop_break_lift
+reach_movement = patrol
+avail_animations = zat_b38_stalker_turn_on_lift
+on_info = {=npc_in_zone(zat_b38_lift_floor)} walker@research_basement 
+on_info2 = {+zat_b38_lift_opened -zat_b38_stalker_cop_jump_down_1_done} %=play_sound(zat_b38_stalker_cop_jump_down_1) +zat_b38_stalker_cop_jump_down_1_done%
+on_game_timer = 100 | {-zat_b38_cop_elevator_landing_done} %=play_sound(zat_b38_cop_elevator_landing) +zat_b38_cop_elevator_landing_done%
+meet = no_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[walker@research_basement]:walker
+path_walk = research_basement_walk
+out_restr = zat_b38_sleepers_territory
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+meet = no_meet
+wounded = wounded
+corpse_detection_enabled = false
+gather_items_enabled = false
+help_wounded_enabled = false
+on_signal = zat_b38_cop_jumped | remark@actor_cond
+on_signal2 = zat_b38_body_1 | {-zat_b38_stalker_cop_not_a_hunter1_done} remark@body_1
+on_signal3 = zat_b38_body_2 | {-zat_b38_stalker_cop_not_a_hunter2_done} remark@body_2
+on_signal4 = zat_b38_body_3 | {-zat_b38_stalker_cop_not_a_hunter3_done} remark@body_3
+on_signal5 = zat_b38_door | {-zat_b38_stalker_cop_try_done} animpoint@basement_door
+on_signal6 = zat_b38_lair_found | {-zat_b38_stalker_cop_bloodsuckers_sleep_done} animpoint@alert
+on_info = {-zat_b38_underground_door_open =dist_to_actor_ge(150) !actor_enemy} %+zat_b38_failed_getaway%, {=dist_to_actor_ge(150) =actor_enemy} %=destroy_object +zat_b38_quest_failed%
+on_actor_in_zone = zat_b38_lift_floor | {-zat_b38_actor_jumped_earlier} %+zat_b38_actor_jumped_earlier%
+
+[remark@actor_cond]:remark
+out_restr = zat_b38_sleepers_territory
+anim = wait_na
+on_actor_in_zone = zat_b38_lift_floor | {-zat_b38_stalker_cop_down_floor_done} walker@research_basement %=play_sound(zat_b38_stalker_cop_down_floor) +zat_b38_stalker_cop_down_floor_done +zat_b38_disappearance_stalkers_check_basement_give%
+on_actor_not_in_zone = zat_b38_lift_floor | {+zat_b38_actor_jumped_earlier} walker@research_basement
+on_game_timer = 7000 | remark@quest_failed
+
+[remark@quest_failed]:remark
+on_info = {!actor_enemy} %+zat_b38_failed_getaway%, {=dist_to_actor_ge(150) =actor_enemy} %=destroy_object +zat_b38_quest_failed%
+
+[remark@body_1]:remark
+out_restr = zat_b38_sleepers_territory
+target = story | zat_b38_stalker_corpse_1
+anim = search
+on_signal = sound_end | walker@research_basement
+on_game_timer = 15 | {-zat_b38_stalker_cop_not_a_hunter1_done} %=play_sound(zat_b38_stalker_cop_not_a_hunter_1) +zat_b38_stalker_cop_not_a_hunter1_done%
+
+[remark@body_2]:remark
+out_restr = zat_b38_sleepers_territory
+target = story | zat_b38_stalker_corpse_2
+anim = search
+on_signal = sound_end | walker@research_basement
+on_game_timer = 15 | {-zat_b38_stalker_cop_not_a_hunter2_done} %=play_sound(zat_b38_stalker_cop_not_a_hunter_2) +zat_b38_stalker_cop_not_a_hunter2_done%
+
+[remark@body_3]:remark
+out_restr = zat_b38_sleepers_territory
+target = story | zat_b38_stalker_corpse_3
+anim = search
+on_game_timer = 25 | {-zat_b38_stalker_cop_not_a_hunter3_done} %=play_sound(zat_b38_stalker_cop_not_a_hunter_3) +zat_b38_stalker_cop_not_a_hunter3_done%
+on_signal = sound_end | walker@research_basement
+
+[animpoint@basement_door]:animpoint
+cover_name = zat_b38_break_lock_animp
+avail_animations = zat_b38_stalker_break_lock
+out_restr = zat_b38_sleepers_territory
+on_info = {-zat_b38_stalker_cop_try_done} %=play_sound(zat_b38_stalker_cop_try) +zat_b38_stalker_cop_try_done%
+on_signal = sound_end | {-zat_b38_lock_sound_start} %+zat_b38_lock_sound_start%
+on_info2 = {+zat_b38_underground_door_open} remark@invite
+on_game_timer = 130 | {-zat_b38_underground_door_open} %+zat_b38_underground_door_open%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[remark@invite]:remark
+out_restr = zat_b38_sleepers_territory
+target = story | actor
+on_info = {=dist_to_actor_le(5)} walker@research_alert %=play_sound(zat_b38_stalker_cop_come_here_2)%
+on_info2 = {+zat_b38_bloodscukers_sleepers_stand_up} walker@runaway %=play_sound(zat_b38_stalker_cop_bloodsuckers_no_sleep)%
+
+[walker@research_alert]:walker
+out_restr = zat_b38_sleepers_territory
+path_walk = research_alert_walk
+on_signal = zat_b38_lair_found | {-zat_b38_stalker_cop_bloodsuckers_sleep_done} animpoint@alert ;remark@alert
+on_actor_not_in_zone = zat_b38_quest_line | {-zat_b38_underground_door_open} remark@quest_failed
+on_actor_in_zone = zat_b38_lift_floor | {-zat_b38_actor_jumped_earlier} %+zat_b38_actor_jumped_earlier%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+meet = no_meet
+corpse_detection_enabled = false
+on_info34 = {+zat_b38_bloodscukers_sleepers_stand_up} walker@runaway %=play_sound(zat_b38_stalker_cop_bloodsuckers_no_sleep)%
+
+[animpoint@alert]:animpoint
+cover_name = zat_b38_alert_animp
+avail_animations = zat_b38_stalker_alert
+out_restr = zat_b38_sleepers_territory
+on_game_timer = 40 | {-zat_b38_stalker_cop_bloodsuckers_sleep_done} %=play_sound(zat_b38_stalker_cop_bloodsuckers_sleep) +zat_b38_stalker_cop_bloodsuckers_sleep_done +zat_b38_disappearance_stalkers_get_out_from_den_of_the_bloodsucker_give%
+on_game_timer2 = 110 | walker@lair_sneak
+on_info = {+zat_b38_bloodscukers_sleepers_stand_up} walker@runaway %=play_sound(zat_b38_stalker_cop_bloodsuckers_no_sleep)%
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[walker@lair_sneak]:walker
+out_restr = zat_b38_sleepers_territory
+path_walk = lair_sneak_walk
+path_look = lair_sneak_look
+def_state_standing = wait_na
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+on_info = {+zat_b38_bloodscukers_sleepers_stand_up} walker@runaway %=play_sound(zat_b38_stalker_cop_bloodsuckers_no_sleep)%
+on_signal = zat_b38_no_danger | {-zat_b38_stalker_cop_fear_end_done} %=play_sound(zat_b38_stalker_cop_fear_end) +zat_b38_stalker_cop_fear_end_done%
+on_signal2 = zat_b38_jump_tonnel_calm | {=dist_to_actor_le(7)} animpoint@jump_tonnel, {+zat_b38_actor_jump_down} animpoint@jump_tonnel
+meet = no_meet
+corpse_detection_enabled = false
+
+[walker@runaway]:walker
+out_restr = zat_b38_sleepers_territory
+path_walk = runaway_walk
+path_look = runaway_look
+def_state_moving1 = run
+def_state_moving2 = sprint
+def_state_moving3 = sprint
+on_signal = zat_b38_jump_tonnel | animpoint@jump_tonnel
+meet = no_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+corpse_detection_enabled = false
+
+[animpoint@jump_tonnel]:animpoint
+cover_name = zat_b38_jump_tonnel
+avail_animations = zat_b38_stalker_jump_tonnel
+out_restr = zat_b38_sleepers_territory
+on_npc_in_zone = zat_cop_id | zat_b38_actor_jump_down | walker@get_out
+on_info = {-zat_b38_stalker_cop_jump_down_2_done -zat_b38_actor_jump_down} %=play_sound(zat_b38_stalker_cop_jump_down_2) +zat_b38_stalker_cop_jump_down_2_done%
+on_game_timer = 80 | {-zat_b38_cop_dirt_landing_done} %=play_sound(zat_b38_cop_dirt_landing) +zat_b38_cop_dirt_landing_done%
+on_info2 = {+zat_b38_jump_tonnel_info} walker@get_out
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+
+[walker@get_out]:walker
+path_walk = get_out_walk
+on_game_timer = 30 | {=dist_to_actor_le(5) -zat_b38_den_of_the_bloodsucker_inform_stalkers_give} %=play_sound(zat_b38_stalker_cop_tell_stalker_about_lair)%, %+zat_b38_den_of_the_bloodsucker_inform_stalkers_give%
+on_signal = sound_end | {-zat_b38_den_of_the_bloodsucker_inform_stalkers_give} %+zat_b38_den_of_the_bloodsucker_inform_stalkers_give%
+on_signal2 = zat_b38_goodbye | {+zat_b38_den_of_the_bloodsucker_inform_stalkers_give} remark@goodbye
+meet = no_meet
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+corpse_detection_enabled = false
+
+[remark@goodbye]:remark
+target = story | actor
+on_info = {-zat_b38_stalker_cop_tell_about_quest_done =dist_to_actor_le(5)} %=play_sound(zat_b38_stalker_cop_tell_about_quest) +zat_b38_stalker_cop_tell_about_quest_done%
+on_signal = sound_end | walker@return %+zat_b38_disappearance_stalkers_meet_cop_later_give%
+on_actor_dist_ge_nvis = 100 | %+zat_b38_cop_passed_away +zat_b38_disappearance_stalkers_meet_cop_later_give =destroy_object(story:zat_cop_id)%
+on_info2 = {+actor_is_sleeping} %+zat_b38_cop_passed_away +zat_b38_disappearance_stalkers_meet_cop_later_give =destroy_object(story:zat_cop_id)%
+on_info3 = {=surge_started -zat_b38_disappearance_stalkers_meet_cop_later_give} walker@return %=play_sound(zat_b38_stalker_cop_tell_about_quest)%
+
+[walker@return]:walker 
+path_walk = tp_walk
+path_look = tp_look
+out_restr = zat_b38_vnz_out_restr
+def_state_moving1 = run
+on_signal = sound_end | {-zat_b38_disappearance_stalkers_meet_cop_later_give} %+zat_b38_disappearance_stalkers_meet_cop_later_give%
+meet = no_meet
+on_actor_dist_ge_nvis = 100 | %+zat_b38_cop_passed_away +zat_b38_disappearance_stalkers_meet_cop_later_give =destroy_object(story:zat_cop_id)%
+on_info = {+actor_is_sleeping} %+zat_b38_cop_passed_away +zat_b38_disappearance_stalkers_meet_cop_later_give =destroy_object(story:zat_cop_id)%
+corpse_detection_enabled = false

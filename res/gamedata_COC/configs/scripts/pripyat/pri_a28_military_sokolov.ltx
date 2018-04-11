@@ -1,0 +1,58 @@
+; Reference animpoint
+[animpoint@a28_def]
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+cover_name = pri_a16_animp_sokolov
+use_camp = false
+meet = meet@a28
+out_restr = pri_a16_sr_noweap
+on_info = {+pri_a28_militarys_go_to_the_door} animpoint@a28_wait_near_door
+use_camp = false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet@a28]
+abuse = false
+use = {=actor_enemy} false, {=is_playing_sound} false, true
+close_snd_hello = nil
+close_snd_bye = nil
+allow_break = false
+trade_enable = false
+close_distance = 0
+close_anim = nil
+far_distance = 0
+
+;--------------------------------------
+
+[logic@pri_a28_military_sokolov] 
+suitable = {+pri_b305_fifth_cam_end -pri_a28_update_task_cover_strelok =check_npc_name(pri_a15_sokolov)} true
+prior = 300
+post_combat_time = 0, 0
+active = animpoint@a28_surge
+
+;--------------------------------------
+; Waiting for surge end
+[animpoint@a28_surge]:animpoint@a28_def
+on_info2 = {+pri_a28_colonel_to_center_3_sound_end} animpoint@a28_ready_for_news
+
+;--------------------------------------
+; Becoming ready for fast exit from animpoint
+[animpoint@a28_ready_for_news]:animpoint@a28_def
+avail_animations = animpoint_sit_high_no_rnd
+
+;--------------------------------------
+; Gathering group before evacuation
+[animpoint@a28_wait_near_door]
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+cover_name = pri_a16_animp_vano
+use_camp = false 
+meet = no_meet
+avail_animations = animpoint_stay_wall_no_rnd
+out_restr = pri_a16_sr_noweap
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false

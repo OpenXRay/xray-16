@@ -1,0 +1,12 @@
+[logic]
+active = sr_particle
+
+[sr_particle]
+name = static\zharka_static_steam
+path = zat_b53_particle_play_point_2
+mode = 2
+looped = false
+on_timer = 8000 | sr_idle@timer
+
+[sr_idle@timer]
+on_info = sr_particle

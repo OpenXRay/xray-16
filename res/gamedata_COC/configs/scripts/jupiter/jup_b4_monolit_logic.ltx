@@ -1,0 +1,59 @@
+[logic]
+active = nil;sr_idle@begin
+
+[sr_idle@begin]
+on_info = {+jup_b4_monolith_squad_help -task_jup_b4_monolith_squad_help -jup_b4_monolith_squad_out} sr_idle@1 %=give_task(jup_b4_monolith_squad_help) +task_jup_b4_monolith_squad_help%
+
+[sr_idle@1]
+on_info = {+jup_b4_duty_go_to_monolit_squad} sr_idle@dolg_teleport %=run_postprocess(fade_in_out) =disable_ui%
+on_info2 = {+jup_b4_freedom_go_to_monolit_squad} sr_idle@freedom_teleport %=run_postprocess(fade_in_out) =disable_ui%
+on_info3 = {+jup_b4_monolith_squad_out} sr_idle@nill
+
+[sr_idle@dolg_teleport]
+on_timer = 1000 | {-jup_b4_teleport_to_monolit} sr_idle@dolg %=forward_game_time(2) =teleport_actor(jup_b4_teleport_actor_walk:jup_b4_teleport_actor_look) =create_squad(jup_b4_duty_squad:jup_b4) +jup_b4_teleport_to_monolit =enable_ui%
+on_info = {+jup_b4_monolith_squad_out} sr_idle@nill
+
+[sr_idle@dolg]
+on_info = %+jup_b4_duty_start_speech%
+on_info2 = {+jup_b4_duty_squad_leader_final_sound_end} sr_idle@duty_skin %=run_postprocess(fade_in_out) =disable_ui% 
+on_info3 = {+jup_b4_monolith_squad_out} sr_idle@fade
+on_info4 = {+jup_b4_actor_go_away} sr_idle@nill
+
+[sr_idle@duty_skin]
+on_timer = 1000 | sr_idle@duty_go_home %+jup_b4_monolith_squad_in_duty =remove_squad(jup_b4_squad) =create_squad(jup_b4_squad_duty:jup_b4) =create_squad(jup_b4_squad_duty_leader:jup_b4) =enable_ui%
+on_info = {+jup_b4_monolith_squad_out} sr_idle@nill
+
+[sr_idle@duty_go_home]
+on_timer = 60000 | {-jup_b4_duty_go_home -jup_b4_duty_go_home_alone} sr_idle@nill %+jup_b4_duty_go_home_alone%
+on_info = {+jup_b4_duty_go_home} sr_idle@fade
+
+[sr_idle@freedom_teleport]
+on_timer = 1000 | {-jup_b4_teleport_to_monolit} sr_idle@freedom %=forward_game_time(2) =teleport_actor(jup_b4_teleport_actor_walk:jup_b4_teleport_actor_look) =create_squad(jup_b4_freedom_squad:jup_b4) +jup_b4_teleport_to_monolit =enable_ui%
+on_info = {+jup_b4_monolith_squad_out} sr_idle@nill
+
+[sr_idle@freedom]
+on_info = {+jup_b4_recruit_2_cool_freedom_sound} sr_idle@freedom_skin %=run_postprocess(fade_in_out) =disable_ui%
+on_info2 = {+jup_b4_monolith_squad_out} sr_idle@nill
+on_info3 = {+jup_b4_actor_go_away} sr_idle@nill
+
+[sr_idle@freedom_skin]
+on_timer = 1000 | sr_idle@freedom_go_home %+jup_b4_monolith_squad_in_freedom =remove_squad(jup_b4_squad) =create_squad(jup_b4_squad_freedom:jup_b4) =create_squad(jup_b4_squad_freedom_leader:jup_b4) =enable_ui%
+
+[sr_idle@freedom_go_home]
+on_timer = 60000 | {-jup_b4_freedom_go_home -jup_b4_freedom_go_home_alone} sr_idle@nill %+jup_b4_freedom_go_home_alone%
+on_info = {+jup_b4_freedom_go_home} sr_idle@fade
+
+[sr_idle@fade]
+on_info = {-jup_b4_fade +jup_b4_duty_go_home} sr_idle@teleport_duty %=run_postprocess(fade_in_out) =disable_ui +jup_b4_fade%
+on_info2 = {-jup_b4_fade +jup_b4_freedom_go_home} sr_idle@teleport_freedom %=run_postprocess(fade_in_out) =disable_ui +jup_b4_fade%
+
+[sr_idle@teleport_duty]
+on_game_timer = 30 | {-jup_b4_monolith_squad_on_base} sr_idle@on_base_a6 %+jup_b4_monolith_squad_on_base =forward_game_time(2) =teleport_actor(jup_actor_arrive_walk : jup_actor_arrive_look) =teleport_squad(jup_b4_squad_duty : jup_a6_actor_look) =teleport_squad(jup_b4_squad_duty_leader : jup_a6_actor_look) =teleport_squad(jup_b4_duty_squad : jup_a6_actor_look)%
+
+[sr_idle@teleport_freedom]
+on_game_timer = 30 | {-jup_b4_monolith_squad_on_base} sr_idle@on_base_a6 %+jup_b4_monolith_squad_on_base =forward_game_time(2) =teleport_actor(jup_actor_arrive_walk:jup_actor_arrive_look) =teleport_squad(jup_b4_squad_freedom:jup_a6_actor_look) =teleport_squad(jup_b4_squad_freedom_leader:jup_a6_actor_look) =teleport_squad(jup_b4_freedom_squad:jup_a6_actor_look)%
+
+[sr_idle@on_base_a6]
+on_game_timer = 30 | sr_idle@nill %=enable_ui%
+
+[sr_idle@nill]

@@ -1,0 +1,93 @@
+﻿<?xml version='1.0' encoding="windows-1251"?>
+<xml>
+    <!-- MAJOR KUZNETSOV -->
+    <specific_character id="agr_smart_terrain_1_6_near_2_military_colonel_kovalski" team_default = "1">
+    <name>agr_kuznetsov_name</name>
+    <icon>ui_inGame2_Kuznetsov</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>ќпытный сталкер. ƒетальна¤ информаци¤ отсутствует.</bio>
+    <class>agr_smart_terrain_1_6_near_2_military_colonel_kovalski</class>
+    <community>army</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>25982</rank>
+    <reputation>249</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_3_beret</visual>
+    <snd_config>characters_voice\human_01\military\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_fort \n
+        wpn_groza \n
+        ammo_9x18_pmm = 1 \n
+        ammo_9x39_ap = 1 \n
+        hand_radio \n
+        wpn_binoc = 1 \n
+#include "gameplay\character_food_army.xml"
+#include "gameplay\character_drugs_2.xml"
+#include "gameplay\character_drugs_mil.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <start_dialog>hello_dialog</start_dialog>
+	<actor_dialog>dm_broker_dialog</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <!-------------------------- ARMY TRADER ------------------------>
+    <specific_character id="agr_smart_terrain_1_6_army_trader_stalker" team_default="1">
+    <name>agr_smart_terrain_1_6_army_trader_stalker_name</name>
+    <icon>ui_inGame2_Spooner</icon>
+    <map_icon x="1" y="0"/>
+    <bio>ќпытный сталкер. ƒетальна¤ информаци¤ отсутствует.</bio>
+    <class>agr_smart_terrain_1_6_army_trader_stalker</class>
+    <community>army</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <rank>19180</rank>
+    <reputation>1172</reputation>
+    <money min="1000000" max="1000000" infinitive="1"/>
+    <visual>actors\stalker_soldier\stalker_soldier4a</visual>
+    <snd_config>characters_voice\human_01\military\</snd_config>
+    <supplies>
+        [spawn] \n
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <actor_dialog>dm_ordered_task_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+	<actor_dialog>dm_broker_dialog</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <!-------------------------- ARMY MECHANIC ------------------------>
+    <specific_character id="agr_smart_terrain_1_6_army_mechanic_stalker" team_default="1">
+    <name>agr_smart_terrain_1_6_army_mechanic_stalker_name</name>
+    <icon>ui_inGame2_Kirilov</icon>
+    <bio>ќпытный сталкер. ƒетальна¤ информаци¤ отсутствует.</bio>
+    <class>agr_smart_terrain_1_6_army_mechanic_stalker</class>
+    <community>army</community>
+    <map_icon x="1" y="0"/>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <mechanic_mode>1</mechanic_mode>
+    <rank>11974</rank>
+    <reputation>573</reputation>
+    <visual>actors\stalker_soldier\stalker_soldier_2</visual>
+    <snd_config>characters_voice\human_02\military\</snd_config>
+    <supplies>
+        [spawn] \n
+        wpn_ak74 \n
+        ammo_5.45x39_fmj = 1 \n
+        wpn_pm  \n
+        ammo_9x18_fmj = 1 \n
+        grenade_rgd5 = 1 \n
+#include "gameplay\character_items_2.xml"
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <actor_dialog>dm_ordered_task_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+    <actor_dialog>dm_tech_repair</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+</xml>

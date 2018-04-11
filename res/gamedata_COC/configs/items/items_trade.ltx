@@ -1,0 +1,37 @@
+; For information brokers.
+[itm_pda_common]:device_pda
+can_take = true 
+can_trade = false ; These are traded through dialog
+
+[itm_pda_uncommon]:device_pda
+can_take = true 
+can_trade = false
+
+[itm_pda_rare]:device_pda
+can_take = true 
+can_trade = false
+
+; For encyclopedia.
+[itm_guide_usb_1]:booster
+can_take                                 = true
+can_trade                                = false
+class                                    = II_ATTCH
+description                              = st_pda_descr
+inv_grid_x                               = 8
+inv_grid_y                               = 3
+inv_name                                 = st_memory_stick_name
+inv_name_short                           = st_memory_stick_name
+use1_action_functor                      = dxr_encyclopedia.context_action_functor
+use1_functor                             = dxr_encyclopedia.context_functor
+
+[itm_guide_usb_2]:booster
+can_take                                 = true
+can_trade                                = false
+class                                    = II_ATTCH
+description                              = st_pda_descr
+inv_grid_x                               = 9
+inv_grid_y                               = 3
+inv_name                                 = st_memory_stick_name
+inv_name_short                           = st_memory_stick_name
+use1_action_functor                      = dxr_encyclopedia.context_action_functor
+use1_functor                             = dxr_encyclopedia.context_functor

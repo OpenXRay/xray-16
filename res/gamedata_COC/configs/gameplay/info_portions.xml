@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding="windows-1251"?>
+
+<game_information_portions>
+
+  <info_portion id="global_dialogs">
+    <dialog>actor_break_dialog</dialog>
+<!--    <dialog>actor_help_wounded</dialog>   -->
+  </info_portion>
+
+  <info_portion id="level_changer_icons"/>
+
+  <!-- special info portion that sends to actor when it
+    use in-game UI (PDA, Inventory, etc)-->
+    
+    <info_portion id="ui_pda">
+		<disable>ui_pda_hide</disable>
+    </info_portion>
+    <info_portion id="ui_pda_hide">
+		<disable>ui_pda</disable>
+    </info_portion>
+
+   
+   <info_portion id="ui_inventory">
+		<disable>ui_inventory_hide</disable>
+   </info_portion>
+   <info_portion id="ui_inventory_hide">
+		<disable>ui_inventory</disable>
+   </info_portion>
+
+    <info_portion id="ui_talk">
+		<disable>ui_talk_hide</disable>
+    </info_portion>
+    <info_portion id="ui_talk_hide">
+		<disable>ui_talk</disable>
+    </info_portion>
+
+    <info_portion id="ui_trade">
+		<disable>ui_trade_hide</disable>
+    </info_portion>
+    <info_portion id="ui_trade_hide">
+		<disable>ui_trade</disable>
+    </info_portion>
+
+    <info_portion id="ui_car_body">
+		<disable>ui_car_body_hide</disable>
+    </info_portion>
+    <info_portion id="ui_car_body_hide">
+		<disable>ui_car_body</disable>
+    </info_portion>
+    
+    <info_portion id="arena_first_battle_begin"></info_portion>
+    <info_portion id="arena_camera_begin"></info_portion>
+    <info_portion id="arena_final_battle"></info_portion>
+    <info_portion id="arena_rupor_off"></info_portion>
+    <info_portion id="arena_fourth_battle"></info_portion>
+	
+ 	<info_portion id="a"></info_portion>
+</game_information_portions>

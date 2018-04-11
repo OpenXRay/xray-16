@@ -1,0 +1,9 @@
+[logic]
+active = ph_idle
+
+[ph_idle]
+on_info = {+bar_arena_fight} ph_idle@sound
+
+[ph_idle@sound]
+on_info = %=play_sound(bar_arena_public)%
+on_info2 = {-bar_arena_fight} ph_idle

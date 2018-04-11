@@ -1,0 +1,29 @@
+[walker@generic]
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+turn_on_campfire = false
+
+[logic@bar_dolg_leader]
+suitable = {=check_npc_name(bar_dolg_leader)} true
+prior = 200
+active = walker@bar_dolg_leader
+level_spot = quest_npc
+
+[walker@bar_dolg_leader]:walker@generic
+path_walk = bar_dolg_leader_walk
+path_look = bar_dolg_leader_look
+use_camp = false
+meet = meet@bar_dolg_leader
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+on_actor_in_zone = bar_bunker_online_restrictor | %=play_sound(bar_dolg_leader_idle)%
+
+[meet@bar_dolg_leader]
+close_snd_hello = bar_dolg_leader_hello
+close_anim = ward
+close_distance = 7
+close_victim = actor
+use = {=actor_enemy} false, true
+trade_enable = false

@@ -1,0 +1,61 @@
+[logic]
+active = sr_idle@introduce
+
+[sr_idle@introduce]
+on_info = {+bar_arena_start} sr_idle@idle
+
+[sr_idle@idle]
+on_info = {+bar_arena_monstr_ready} sr_idle@10 %=bar_arena_fight_begin +bar_arena_start_introduce%
+
+[sr_idle@10]
+on_timer = 10000 | sr_idle@20 %=bar_arena_fight_10 +bar_arena_fight_10%
+on_info = {+bar_arena_monstr_dead} sr_idle@reset %=bar_arena_after_fight +bar_arena_start_introduce%
+on_info2 = {+bar_arena_actor_dead} sr_idle@notiming
+
+[sr_idle@20]
+on_timer = 10000 | sr_idle@30 %=bar_arena_fight_20 +bar_arena_fight_20%
+on_info = {+bar_arena_monstr_dead} sr_idle@reset %=bar_arena_after_fight +bar_arena_start_introduce%
+on_info2 = {+bar_arena_actor_dead} sr_idle@notiming
+
+[sr_idle@30]
+on_timer = 10000 | sr_idle@40 %=bar_arena_fight_30 +bar_arena_fight_30 =bar_arena_check_lose%
+on_info = {+bar_arena_monstr_dead} sr_idle@reset %=bar_arena_after_fight +bar_arena_start_introduce%
+on_info2 = {+bar_arena_actor_lose} sr_idle@notiming, {+bar_arena_actor_dead} sr_idle@notiming
+
+[sr_idle@40]
+on_timer = 10000 | sr_idle@50 %=bar_arena_fight_40 +bar_arena_fight_40%
+on_info = {+bar_arena_monstr_dead} sr_idle@reset %=bar_arena_after_fight +bar_arena_start_introduce%
+on_info2 = {+bar_arena_actor_lose} sr_idle@notiming, {+bar_arena_actor_dead} sr_idle@notiming
+
+[sr_idle@50]
+on_timer = 10000 | sr_idle@60 %=bar_arena_fight_50 +bar_arena_fight_50%
+on_info = {+bar_arena_monstr_dead} sr_idle@reset %=bar_arena_after_fight +bar_arena_start_introduce%
+on_info2 = {+bar_arena_actor_lose} sr_idle@notiming, {+bar_arena_actor_dead} sr_idle@notiming
+
+[sr_idle@60]
+on_timer = 10000 | sr_idle@70 %=bar_arena_fight_60 +bar_arena_fight_60%
+on_info = {+bar_arena_monstr_dead} sr_idle@reset %=bar_arena_after_fight +bar_arena_start_introduce%
+on_info2 = {+bar_arena_actor_lose} sr_idle@notiming, {+bar_arena_actor_dead} sr_idle@notiming
+
+[sr_idle@70]
+on_timer = 10000 | sr_idle@80 %=bar_arena_fight_70 +bar_arena_fight_70%
+on_info = {+bar_arena_monstr_dead} sr_idle@reset %=bar_arena_after_fight +bar_arena_start_introduce%
+on_info2 = {+bar_arena_actor_lose} sr_idle@notiming, {+bar_arena_actor_dead} sr_idle@notiming
+
+[sr_idle@80]
+on_timer = 10000 | sr_idle@90 %=bar_arena_fight_80 +bar_arena_fight_80%
+on_info = {+bar_arena_monstr_dead} sr_idle@reset %=bar_arena_after_fight +bar_arena_start_introduce%
+on_info2 = {+bar_arena_actor_lose} sr_idle@notiming, {+bar_arena_actor_dead} sr_idle@notiming
+
+[sr_idle@90]
+on_timer = 10000 | sr_idle@nil %=bar_arena_fight_90 +bar_arena_fight_90 =bar_arena_check_lose%
+on_info = {+bar_arena_monstr_dead} sr_idle@reset %=bar_arena_after_fight +bar_arena_start_introduce%
+on_info2 = {+bar_arena_actor_lose} sr_idle@notiming, {+bar_arena_actor_dead} sr_idle@notiming
+
+[sr_idle@notiming]
+on_info = {+bar_arena_monstr_dead} sr_idle@reset %=bar_arena_after_fight +bar_arena_start_introduce%
+
+[sr_idle@reset]
+on_info = {+bar_old_arena_reset} sr_idle@introduce
+
+[sr_idle@nil]

@@ -1,0 +1,12 @@
+[logic]
+active = nil;sr_idle
+
+[sr_idle]
+on_info = sr_idle@2 %=disable_anomaly(pri_b302_electric_ball_2)%
+
+
+[sr_idle@2]
+on_actor_inside = sr_idle@3	%=enable_anomaly(pri_b302_electric_ball_2)%
+
+[sr_idle@3]
+on_timer = 15000 | sr_idle

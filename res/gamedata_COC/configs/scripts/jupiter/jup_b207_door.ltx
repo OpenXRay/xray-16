@@ -1,0 +1,18 @@
+[logic]
+active = ph_door@open
+
+[ph_door@close]
+locked = false
+closed = true
+snd_open_start = wood_large_open
+snd_close_start = wood_large_close_start
+snd_close_stop = wood_large_close_stop
+on_use = ph_door@open
+
+[ph_door@open]
+locked = false
+closed = false
+snd_open_start = wood_large_open
+snd_close_start = wood_large_close_start
+snd_close_stop = wood_large_close_stop
+on_use = ph_door@close

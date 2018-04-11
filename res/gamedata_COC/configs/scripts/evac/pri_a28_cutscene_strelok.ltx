@@ -1,0 +1,39 @@
+[walker@ignore]
+wounded = wounded@no_wound
+def_state_standing = threat_na
+def_state_moving = assault
+meet = no_meet
+use_camp = false
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+;Wounded - no wounds
+[wounded@no_wound]
+hp_state = 0 | wounded_heavy@help_heavy
+hp_state_see = 0 | wounded_heavy@help_heavy
+hp_victim = 0 | nil
+hp_cover = 0 | false
+hp_fight = 0 | false
+
+
+
+[logic]
+active = smartcover@strelok
+
+[smartcover@strelok]:walker@ignore
+cover_name = pri_a28_heli_cover_32
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+meet = no_meet
+on_info = {+pri_a28_team_heli_run} walker@strelok_run
+on_info2 = {+pri_a28_strelok_dead} %=destroy_object%
+
+[walker@strelok_run]:walker@ignore
+path_walk = pri_a28_cutscene_strelok_away
+def_state_moving = sneak_run
+meet = no_meet
+on_game_timer = 20 | {-pri_a28_actor_heli_run} %+pri_a28_actor_heli_run%
+on_info = {+pri_a28_show_freeplay_dialog} %=destroy_object%

@@ -1,0 +1,147 @@
+[guitar_a]:identity_immunities
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "food and drugs\guitar_a"
+cform                                    = skeleton
+class                                    = II_ATTCH
+visual                                   = dynamics\devices\dev_guitar\dev_guitar.ogf
+cost                                     = 35
+inv_name                                 = st_guitar_name
+inv_name_short                           = st_guitar_name
+description                              = st_guitar_descr
+inv_weight                               = 1.5
+inv_grid_width                           = 4
+inv_grid_height                          = 2
+inv_grid_x                               = 0
+inv_grid_y                               = 21
+attach_angle_offset 					 = -1.651084, -1.341824, 1.200789 
+attach_position_offset 					 = 0.077492, -0.030020 , 0.090059
+attach_bone_name                         = bip01_l_hand
+auto_attach                              = false
+can_trade                                = false
+
+; necessary for animpoint sit low and high
+[guitar_a2]:guitar_a
+attach_angle_offset                      = -0.415, -1.262, 0.808
+attach_position_offset                   = -0.014, 0.010, 0.020
+
+[harmonica_a]:identity_immunities
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "food and drugs\harmonica_a"
+cform                                    = skeleton
+class                                    = II_ATTCH
+visual                                   = dynamics\devices\dev_harmonica\dev_harmonica.ogf
+cost                                     = 35
+inv_name                                 = "harmonica"
+inv_name_short                           = "harmonica"
+inv_weight                               = 0.35
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 1
+inv_grid_y                               = 4
+attach_angle_offset                      = 0.000000, -1.204452, -1.262921
+attach_position_offset                   = 0.081856, -0.035081, 0.011694
+attach_bone_name                         = bip01_l_hand
+auto_attach                              = false
+can_trade                                = false
+
+;medikits new
+[medkit_script]:booster ;Do not use! Used in xr_wounded
+;$spawn 				= "food and drugs\medkit_script"
+visual                                   = dynamics\devices\dev_aptechka\dev_aptechka_low.ogf
+inv_name                                 = st_medkit
+inv_name_short                           = st_medkit
+description                              = st_medkit_descr
+inv_weight                               = 0.1
+
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+inv_grid_x                               = 8
+inv_grid_y                               = 2
+cost                                     = 300
+
+;eatable item
+eat_health                               = 0.5
+eat_max_power                            = 0.1
+eat_radiation                            = -0.05
+wounds_heal_perc                         = 0.1
+
+use_sound                                = interface\inv_medkit
+
+;AI Tweaks xr_help_wounded
+attach_angle_offset                      = -2.6,2.3,0
+attach_position_offset                   = 0.156, -0.035081, 0.05
+attach_bone_name                         = bip01_l_hand
+auto_attach                              = false
+can_trade                                = false
+
+[stick_bred]:identity_immunities
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "food and drugs\stick_bred"
+cform                                    = skeleton
+class                                    = II_ATTCH
+visual                                   = stick_bred.ogf
+cost                                     = 0
+inv_name                                 = "stick_bred"
+inv_name_short                           = "stick_bred"
+inv_weight                               = .5
+inv_grid_width                           = 2
+inv_grid_height                          = 1
+inv_grid_x                               = 11
+inv_grid_y                               = 9
+attach_angle_offset                      = 4.3,0.3,0
+attach_position_offset                   = -0.2,-0.32,0.235
+attach_bone_name                         = bip01_r_hand
+auto_attach                              = false
+bone_name                                = bip01_r_hand
+position_offset                          = 0.0,0.0,0.0
+angle_offset                             = 0,0,0
+can_trade                                = false
+[stick_kolbasa]:identity_immunities
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "food and drugs\stick_kolbasa"
+cform                                    = skeleton
+class                                    = II_ATTCH
+visual                                   = stick_kolbasa.ogf
+cost                                     = 0
+inv_name                                 = "stick_kolbasa"
+inv_name_short                           = "stick_kolbasa"
+inv_weight                               = .5
+inv_grid_width                           = 2
+inv_grid_height                          = 1
+inv_grid_x                               = 16
+inv_grid_y                               = 12
+attach_angle_offset                      = 4.3,0.3,0
+attach_position_offset                   = -0.2,-0.32,0.235
+attach_bone_name                         = bip01_r_hand
+auto_attach                              = false
+bone_name                                = bip01_r_hand
+position_offset                          = 0.0,0.0,0.0
+angle_offset                             = 0,0,0
+can_trade                                = false
+[stick_kolbasa_bred]:identity_immunities
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+$spawn                                   = "food and drugs\stick_kolbasa_bred"
+cform                                    = skeleton
+class                                    = II_ATTCH
+visual                                   = stick_kolbasa_bred.ogf
+cost                                     = 0
+inv_name                                 = "stick_kolbasa_bred"
+inv_name_short                           = "stick_kolbasa_bred"
+inv_weight                               = .5
+inv_grid_width                           = 2
+inv_grid_height                          = 1
+inv_grid_x                               = 11
+inv_grid_y                               = 9
+attach_angle_offset                      = 4.3,0.3,0
+attach_position_offset                   = -0.2,-0.32,0.235
+attach_bone_name                         = bip01_r_hand
+auto_attach                              = false
+bone_name                                = bip01_r_hand
+position_offset                          = 0.0,0.0,0.0
+angle_offset                             = 0,0,0
+can_trade                                = false

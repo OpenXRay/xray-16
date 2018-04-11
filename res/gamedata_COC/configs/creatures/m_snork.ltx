@@ -1,0 +1,607 @@
+[m_snork_e]:monster_base
+GroupControlSection		= spawn_group
+SpaceRestrictionSection = space_restrictor,zone_mosquito_bald
+;$spawn					= "monsters\snork"					 ; option for Level Editor
+$npc					= on								 ; option for Level Editor
+$prefetch 				= 16
+visual					= monsters\snork\snork
+corpse_visual			= monsters\snork\snork_dead
+icon					= ui_npc_monster_snork
+
+spawn_phantom 		= m_phantom_snork
+can_spawn_phantom 	= false
+
+hit_fraction_monster = 0.3
+skin_armor = 0.15
+
+;------------------------------------------------------------------------
+; Influences
+;------------------------------------------------------------------------
+
+fire_max_distance			=	0
+fire_max_power				=	5
+fire_linear_factor			=	0
+fire_quadratic_factor		=	0.025
+
+psy_max_distance			=	0
+psy_max_power				=	5
+psy_linear_factor			=	0.05
+psy_quadratic_factor		=	0
+
+radiation_max_distance		=	0
+radiation_max_power			=	0.01
+radiation_linear_factor		=	1
+radiation_quadratic_factor	=	1
+radiation_pp_effector_name	= 	postprocess_rad
+radiation_pp_highest_at		= 	0.02
+
+;---OFFLINE ALIFE------------------------------------------------------------------
+Scheduled						= on			; option for ALife Simulator
+Human		     				= off			; option for ALife Simulator
+Health							= 300			; option for ALife Simulator
+MinSpeed						= 1.0			; option for ALife Simulator
+MaxSpeed						= 5.0			; option for ALife Simulator
+going_speed						= 3;4.5			; option for ALife Simulator
+current_level_going_speed		= 3;2					; option for ALife Simulator
+search_speed					= 1.5			; option for ALife Simulator
+MaxHealthValue					= 300			; range [0..200]
+smart_terrain_choose_interval	= 00:15:00
+;-----------------------------------------------------------------------------------
+
+script_binding       = bind_monster.bind
+
+ef_creature_type		= 11						; option for evaluation functions
+ef_weapon_type			= 2
+ef_detector_type		= 1
+panic_threshold		= 0.1
+
+cform					 = skeleton					; collision class
+class					 = SM_SNORK					; AI class
+
+bone_torso				= bip01_spine1 			; bone name
+bone_head				= bip01_head				; bone name
+bone_fire				= bip01_head				; bone name
+weapon_usage			= 0						; boolean
+
+;---------------------------------------------------------------------
+; Physics
+;---------------------------------------------------------------------
+ph_box0_center 			= 0.0,  0.9,  0.0
+ph_box0_size 			= 0.35, 0.9,  0.35
+ph_box1_center 			= 0.0,  0.6,  0.0
+ph_box1_size 			= 0.40, 0.6,  0.40
+ph_crash_speed_min			= 100
+ph_crash_speed_max			= 300
+ph_collision_damage_factor	= 0.1
+ph_mass 				= 90
+
+destroyed_vis_name	 = dynamics\Dead_Body\skelet_crash
+
+;---------------------------------------------------------------------
+ph_skeleton_airr_lin_factor   = 2.0 ;550.0 (изменно из-за того, что убрано домножение коэффициент 0.002 из кода)
+ph_skeleton_airr_ang_factor   = 0.0 ;0.0 (изменно из-за того, что убрано домножение на коэффициент 0.3 из кода (0.0*0.3=0.0))
+ph_skeleton_hinger_factor1    = 1.0 ;1.0 (изменно из-за того, что убрано домножение на коэффициент 5.0 из кода)
+ph_skeleton_ddelay	     	  = 15.0 ;Время изменения значения трения в суставе с момента создания шелла, сек
+
+ph_skel_fatal_impulse_factor  = 6.0
+ph_after_death_velocity_factor= 0.75
+ph_skel_shot_up_factor        = 0.25
+;---------------------------------------------------------------------
+
+;----------------------------------------------------------------------------
+; Movement::Velocities & Acceleration
+;----------------------------------------------------------------------------
+; speed factors			linear | angular_real | angular_path | min	 |  max
+Velocity_Stand		    = 0,		5.5,			5.2,		1,		1
+Velocity_WalkFwdNormal	= 1.05,		3.5,			3.2,		0.02,	2.0
+Velocity_WalkFwdDamaged	= 0.9,		3.5,			3.2,		0.02,	2.0
+Velocity_RunFwdNormal	= 4.5,		3.5,			3.2,		0.4,	1
+Velocity_RunFwdDamaged	= 2.5,		3.5,			3.2,		0.2,	1
+Velocity_Drag			= 1.0,		1.0,			1.0,		1,		1
+Velocity_Steal			= 1.5,		3.0,			3.0,		1,		1
+Velocity_JumpGround		= 6.0,		3.0,			0.01,		0.4,	1
+Velocity_Jump_Stand     = 6.0,		3.0,			0.01,		0.4,	1
+
+; acceleration
+Accel_Generic			= 1.5
+Accel_Calm				= 2.5
+Accel_Aggressive		= 12.0
+
+;--------------------------------------------------------------------------
+; Attack parameters
+;--------------------------------------------------------------------------
+MinAttackDist			= 1.8	;0.5
+MaxAttackDist			= 3.0	;3.8
+as_min_dist				= 1.9
+as_step					= 0
+hit_type				= wound				; type of attack
+
+;------------------------------------------------------------------------
+; Attack On Move
+;------------------------------------------------------------------------
+aom_enabled						=	1
+aom_animation_left         				=	stand_run_attack_right_
+aom_animation_right       				=	stand_run_attack_left_ ; stand_attack_
+aom_far_radius						=	5 ;10 ;12
+aom_max_go_close_time					=	8
+aom_prepare_time					=	1 ;4
+aom_attack_radius					=	0.8
+aom_update_side_period					=	6
+aom_prediction_factor					=	0.8
+
+
+;--------------------------------------------------------------------------
+; Jump parameters
+;--------------------------------------------------------------------------
+jump_delay			= 2000
+jump_factor			= 2.0
+jump_ground_trace_range		= 1.5
+jump_hit_trace_range		= 2.0
+jump_build_line_distance	= 6.0
+jump_min_distance		= 2.0
+jump_max_distance		= 7.0
+jump_max_angle			= 0.6
+jump_max_height			= 13.5
+jump_auto_aim_factor		= 0.3
+
+
+;-------------------------------------------------------------------------
+; Entity Conditions
+;-------------------------------------------------------------------------
+satiety_v 				= 0.005			;скорость уменьшения сытости со временем
+radiation_v 			= 0.00001		;0.004				;скорость уменьшения радиации
+satiety_power_v 		= 0.005		;0.01					;увеличение силы при уменьшении сытости
+satiety_health_v 		= 0.0001	;0.03						;увеличение здоровья при уменьшении сытости
+satiety_critical 		= -1.0		;0.25						;критическое значения сытости (в процентах от 0..1) когда здоровье начианает уменьшаться
+radiation_health_v 		= 0.01	;0.006						;уменьшение здоровья при воздействии радиации
+morale_v				= 0.01								;скорость восстановления морали
+health_hit_part 		= 1		;0.8					;процент хита, уходящий на отнимание здоровья
+power_hit_part 			= 1		;0.9					;процент хита, уходящий на отнимание силы
+psy_health_v = 0.1						;скорость восстановления psy-здоровья
+
+;открытые раны
+bleeding_v					= 0.04						;потеря крови при номинальной ране в секунду
+wound_incarnation_v			= 0.05					;крутизна кривой заживления (какой процент раны останется после заживления в игровую секунду)
+min_wound_size				= 0.01
+
+
+;Health from which to play injured animation
+DamagedThreshold		= 0.2
+
+;Sleep Settings
+sleep_health			= 1.0		;1.5				;ъю¤ЇЇшЎшхэЄv ёъюЁюёЄхщ шчьхэхэш  ярЁрьхЄЁют тю тЁхь  ёэр
+sleep_power				= 1.0		;1.5
+sleep_satiety			= 1.0		;0.8
+sleep_radiation			= 1.0	;1.1
+sleep_psy_health = 1.0
+
+;Eat settings
+eat_freq				=	5.0							; ўрёЄюЄр єъєёют т ёхъ
+eat_slice				=	0.01						; єтхышўхэшх ёvЄюёЄш яЁш 1 єъєёх
+eat_slice_weight		=	10.0						; єьхэ№°хэшх хфv є ЄЁєяр
+
+satiety_threshold		= 0.5							; below this value monster fill hunger
+
+;-------------------------------------------------------------------------
+; Morale
+;-------------------------------------------------------------------------
+Morale_Hit_Quant				= 0.1
+Morale_Attack_Success_Quant		= 0.1
+Morale_Take_Heart_Speed			= 0.1
+Morale_Despondent_Speed			= 0.1
+Morale_Stable_Speed				= 0.01
+Morale_Despondent_Threashold	= 0.5
+
+
+;---------------------------------------------------------
+; Sounds and sound parameters
+;---------------------------------------------------------
+sound_idle				= monsters\snork\snork_idle_	; idle_
+sound_eat				= monsters\biting\def_			; eat_
+sound_aggressive		= monsters\snork\snork_attack_	; attack_
+sound_attack_hit		= monsters\snork\snork_attack_hit_
+sound_take_damage		= monsters\snork\snork_idle_	; hit_
+sound_die				= monsters\biting\def_			; die_
+sound_bkgnd				= monsters\biting\def_
+
+;sound_threaten			= monsters\biting\def_			; threaten_
+sound_threaten			= monsters\snork\snork_attack_
+
+
+sound_landing			= monsters\biting\def_
+sound_steal				= monsters\biting\def_
+sound_panic				= monsters\snork\snork_idle_	; hit_
+sound_growling			= monsters\biting\def_
+sound_die_in_anomaly	= monsters\biting\def_
+
+killer_clsids			= Z_MINCER,Z_GALANT,ZS_BFUZZ,ZS_MBALD,ZS_GALAN,ZS_MINCE
+
+
+;Frequency of sounds to be played
+idle_sound_delay		= 300000
+eat_sound_delay			= 3000
+attack_sound_delay		= 4000
+
+sound_distant_idle			= monsters\snork\snork_idle_
+distant_idle_sound_delay	= 80000
+distant_idle_sound_range	= 100.0
+
+SoundThreshold						= 0.02             ; range [0..1]
+max_hear_dist						= 60
+
+;-------------------------------------------------------------------------
+; Other Stuff (refactoring needed)
+;-------------------------------------------------------------------------
+material				= creatures\medium
+DynamicObjectsCount		= 32
+
+attack_effector			= m_snork_attack_effector
+
+critical_wound_threshold		= -1
+critical_wound_decrease_quant	= 0.
+
+LegsCount				= 2
+
+DayTime_Begin			= 0			; эрўрыр фэ  фы  ьюэёЄЁр
+DayTime_End				= 21		; ъюэхЎ фэ  фы  ьюэёЄЁр
+Min_Satiety				= 0.4		; ьшэ. эюЁьр ёvЄюёЄш (ьхэ№°х - єцх уюыюфэvщ)
+Max_Satiety				= 1.0		; ьръё. эюЁьр ёvЄюёЄш (сюы№°х - юўхэ№ ёvЄvщ)
+
+distance_to_corpse		= 1.2		; фшёЄ. фю ЄЁєяр, яЁш ъюЄюЁющ юэ яхЁхїюфшЄ т ёюёЄю эшх хфv
+
+;species of monster
+species						= snork
+community					= snork
+
+terrain					 	= snork_terrain
+step_params					= m_snork_step_params
+damage						= m_snork_damage
+immunities_sect				= snork_immunities
+
+;-------------------------------------------------------------------------
+; Vision
+;-------------------------------------------------------------------------
+eye_fov						= 110	;140
+eye_range					= 50	;50
+
+vision_free_section			= snork_vision_free
+vision_danger_section		= snork_vision_danger
+
+; ЗНАЧЕНИЯ visibility_threshold ДОЛЖНЫ БЫТЬ РАВНЫ для денжера и фри,
+; иначе возникают артефакты с потерей видимости при переходе от денжера во фри.
+
+[snork_vision_free]
+min_view_distance   		= 0.4				; min range of cone based on eye_range
+max_view_distance	 		= 0.7				; max range of cone based on eye_range
+visibility_threshold	 	= 25				;Threshold in which object becomes visible based on factors
+always_visible_distance 	= 0					;Distance object is always considered visible (float)
+time_quant					= 0.005				;step increment to for sight calculations
+decrease_value				= 0.1 				;Decrease over time to overall threshold
+velocity_factor		     	= 0.6				;Higher value = greater bonus to detection speed when target is moving (depended on movement speed)
+luminocity_factor			= 0.8				;Low value = easier to see at night
+transparency_threshold	 	= 0.3 			    ;Low value = easier to see through objects
+still_visible_time          = 0 				;The time (milliseconds) that the object is still considered visible , even if it is not in the frustum (u32)
+
+[snork_vision_danger]
+min_view_distance   		= 0.4				; min range of cone based on eye_range
+max_view_distance	 		= 1.0				; max range of cone based on eye_range
+visibility_threshold	 	= 25				;Threshold in which object becomes visible based on factors
+always_visible_distance 	= 0					;Distance object is always considered visible (float)
+time_quant					= 0.0055			;step increment to for sight calculations
+decrease_value				= 0.1				;Decrease over time to overall threshold
+velocity_factor		     	= 1.0				;Higher value = greater bonus to detection speed when target is moving (depended on movement speed)
+luminocity_factor			= 0.8				;Low value = easier to see at night
+transparency_threshold	 	= 0.3				;Low value = easier to see through objects (if greater then 1 then enemies are blind)
+still_visible_time          = 0					;The time (milliseconds) that the object is still considered visible , even if it is not in the frustum (u32)
+
+;=================================================================================
+; SNORK Damage
+;=================================================================================
+[m_Snork_damage]
+;bone_name		 = <hit_scale>,-1,<wound_scale>
+;<hit_scale>	- коэфф. изменения хита (уменьшения здоровья)
+;<wound_scale>	- коэфф. изменения величины открытой раны
+default				= 0.5,	-1,	0.1
+bip01_pelvis 		= 1.0, -1, 0.1
+bip01_spine 		= 1.0, -1, 0.1
+bip01_spine1 		= 1.0, -1, 0.1
+bip01_neck 			= 1.0, -1, 0.5
+bip01_head 			= 2.0, -1, 0.1, 10
+
+[m_snork_attack_effector]
+duality_h			= 0.05;0.01
+duality_v			= 0.02;0.01
+blur				= 0.01
+gray				= 0.5
+noise_intensity		= 0.0
+noise_grain			= 1
+noise_fps			= 30
+color_base			= 0.65,0.15,0.1
+color_gray			= 0.333,0.333,0.333
+color_add			= 0,0,0
+time				= 0.30
+time_attack			= 0.05				; fade in
+time_release	    = 0.15				; fade out
+
+; camera effects
+ce_time				= 0.35				; time
+ce_amplitude		= 10				; head shake after hit
+ce_period_number	= 2.0				; camera shake times
+ce_power			= 2.5; 2.0			; power
+
+;===========================================================================
+; Step Events
+;===========================================================================
+[m_snork_step_params]
+;-------------------------------------------------------------------------------------------------------------
+;	anim			| Cycles | time1 | power1 | time2 | power2 | time3 | power3 | time4 | power4 |
+;-------------------------------------------------------------------------------------------------------------
+stand_walk_fwd_0 	=	  1,    0.01,   1,		 0.5,     0.7,    0.15,   1.0,     0.5,   1.0
+stand_walk_damaged_0=  	  1,	0.2,    1,	     0.25,    0.7,    0.5,    1.0,     0.7,   1.0
+stand_run_0		 	=  	  1,	0.01,   1,	     0.05,    0.7,    0.2,    1.0,     0.2,   0.2
+stand_run_damaged_0	=	  1,	0.2,    1,	     0.25,    0.7,    0.7,    1.0,     0.7,   1.0
+stand_steal_0		=	  1,	0.2,    1,	     0.25,    0.7,    0.7,    1.0,     0.7,   1.0
+;stand_drag_0		=	  1,	0.2,    1,	     0.25,    0.7,    0.7,    1.0,     0.7,   1.0
+
+
+;===========================================================================
+; IMMUNITIES
+;===========================================================================
+[snork_immunities]
+burn_immunity			= 0.7
+strike_immunity			= 0;0.5
+shock_immunity			= 0.7
+wound_immunity			= 0.6
+radiation_immunity		= 0.0
+telepatic_immunity		= 0.0
+chemical_burn_immunity	= 0.7
+explosion_immunity		= 0.7
+fire_wound_immunity		= 0.7
+
+
+;*********************************************************************************
+; WEAK PROFILE
+;*********************************************************************************
+[snork_weak]:m_snork_e
+$spawn				= "monsters\snorks\snork_01_weak"
+visual				= monsters\snork\snork4
+corpse_visual			= monsters\snork\snorkdead4
+icon				= ui_npc_monster_snork
+panic_threshold		= 0.5
+rank				= 8
+immunities_sect		= snork_immunities_weak
+attack_params		= snork_attack_params_weak
+spec_rank			= weak
+community			= snork
+MaxHealthValue					= 0.8			; range [0..200]
+
+[snork_immunities_weak]
+burn_immunity			= 0.8
+strike_immunity			= 0;0.55
+shock_immunity			= 0.8
+wound_immunity			= 0.7
+radiation_immunity		= 0.0
+telepatic_immunity		= 0.0
+chemical_burn_immunity	= 0.8
+explosion_immunity		= 0.8
+fire_wound_immunity		= 0.9
+
+[snork_attack_params_weak]
+;---------------------------------------------------------------------------------------------------------------------------------------------
+;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, bottom, top ) |	Test Dist
+;---------------------------------------------------------------------------------------------------------------------------------------------
+stand_attack_0 =	  	0.30,		0.45,			35,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,		3.5
+stand_attack_2_1 =	  	0.30,		0.45,			35,        0.0, 1.0, 2.0,		-1.8, 1.8, -1.8, 1.8,		3.5
+
+
+stand_run_attack_left_0  =	  	0.40,		0.5,			45,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,		3.5
+stand_run_attack_right_0  =	  	0.40,		0.5,			45,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,		3.5
+
+;*********************************************************************************
+; WEAK PROFILE 2
+;*********************************************************************************
+[snork_weak2]:m_snork_e
+$spawn				= "monsters\snorks\snork_01_weak"
+visual				= monsters\snork\snork5
+corpse_visual			= monsters\snork\snorkdead5
+icon				= ui_npc_monster_snork
+panic_threshold		= 0.5
+rank				= 8
+immunities_sect		= snork_immunities_weak
+attack_params		= snork_attack_params_weak
+spec_rank			= weak
+community			= snork
+MaxHealthValue					= 0.8			; range [0..200]
+
+;*********************************************************************************
+; WEAK PROFILE 3
+;*********************************************************************************
+[snork_weak3]:m_snork_e
+$spawn				= "monsters\snorks\snork_01_weak"
+visual				= monsters\snork\snork6
+corpse_visual			= monsters\snork\snorkdead6
+icon				= ui_npc_monster_snork
+panic_threshold		= 0.5
+rank				= 8
+immunities_sect		= snork_immunities_weak
+attack_params		= snork_attack_params_weak
+spec_rank			= weak
+community			= snork
+MaxHealthValue					= 0.8			; range [0..200]
+
+;*********************************************************************************
+; NORMAL PROFILE
+;*********************************************************************************
+[snork_normal]:m_snork_e
+$spawn				= "monsters\snorks\snork_02_normal"
+visual				= monsters\snork\snork
+corpse_visual			= monsters\snork\snork_dead
+icon				= ui_npc_monster_snork
+panic_threshold		= 0.2
+rank				= 9
+immunities_sect		= snork_immunities_normal
+attack_params		= snork_attack_params_normal
+spec_rank			= normal
+community			= snork
+MaxHealthValue					= 1.0			; range [0..200]
+
+[snork_immunities_normal]
+burn_immunity			= 0.7
+strike_immunity			= 0;0.5
+shock_immunity			= 0.7
+wound_immunity			= 0.6
+radiation_immunity		= 0.0
+telepatic_immunity		= 0.0
+chemical_burn_immunity	= 0.7
+explosion_immunity		= 0.7
+fire_wound_immunity		= 0.8
+
+[snork_attack_params_normal]
+;---------------------------------------------------------------------------------------------------------------------------------------------
+;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, bottom, top ) |	Test Dist
+;---------------------------------------------------------------------------------------------------------------------------------------------
+stand_attack_0 =	  	0.30,		0.5,			40,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,				3.5
+stand_attack_2_1 =	  	0.30,		0.5,			40,        0.0, 1.0, 2.0,		-1.8, 1.8, -1.8, 1.8,				3.5
+
+stand_run_attack_left_0  =	  	0.40,		0.55,			50,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,		3.5
+stand_run_attack_right_0  =	  	0.40,		0.55,			50,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,		3.5
+
+;*********************************************************************************
+; NORMAL PROFILE 2
+;*********************************************************************************
+[snork_normal2]:m_snork_e
+$spawn				= "monsters\snorks\snork_02_normal"
+visual				= monsters\snork\snork2
+corpse_visual			= monsters\snork\snork_dead2
+icon				= ui_npc_monster_snork
+panic_threshold		= 0.2
+rank				= 9
+immunities_sect		= snork_immunities_normal
+attack_params		= snork_attack_params_normal
+spec_rank			= normal
+community			= snork
+MaxHealthValue					= 1.0			; range [0..200]
+
+;*********************************************************************************
+; NORMAL PROFILE 3
+;*********************************************************************************
+[snork_normal3]:m_snork_e
+$spawn				= "monsters\snorks\snork_02_normal"
+visual				= monsters\snork\snork3
+corpse_visual			= monsters\snork\snork_dead3
+icon				= ui_npc_monster_snork
+panic_threshold		= 0.2
+rank				= 9
+immunities_sect		= snork_immunities_normal
+attack_params		= snork_attack_params_normal
+spec_rank			= normal
+community			= snork
+MaxHealthValue					= 1.0			; range [0..200]
+
+;*********************************************************************************
+; STRONG PROFILE
+;*********************************************************************************
+[snork_strong]:m_snork_e
+$spawn				= "monsters\snorks\snork_03_strong"
+visual				= monsters\snork\snork3
+corpse_visual			= monsters\snork\snorkdead3
+icon				= ui_npc_monster_snork
+panic_threshold		= 0.05
+rank				= 10
+immunities_sect		= snork_immunities_strong
+attack_params		= snork_attack_params_strong
+spec_rank			= strong
+community			= snork
+MaxHealthValue					= 1.33			; range [0..200]
+
+[snork_immunities_strong]
+burn_immunity			= 0.6
+strike_immunity			= 0;0.45
+shock_immunity			= 0.6
+wound_immunity			= 0.5
+radiation_immunity		= 0.0
+telepatic_immunity		= 0.0
+chemical_burn_immunity	= 0.6
+explosion_immunity		= 0.6
+fire_wound_immunity		= 0.7
+
+[snork_attack_params_strong]
+;---------------------------------------------------------------------------------------------------------------------------------------------
+;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, bottom, top ) |	Test Dist
+;---------------------------------------------------------------------------------------------------------------------------------------------
+stand_attack_0 =	  	0.30,		0.55,			50,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,				3.5
+stand_attack_2_1 =	  	0.30,		0.55,			50,        0.0, 1.0, 2.0,		-1.8, 1.8, -1.8, 1.8,				3.5
+
+stand_run_attack_left_0  =	  	0.40,		0.6,			60,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,		3.5
+stand_run_attack_right_0  =	  	0.40,		0.6,			60,        0.0, 0.5, 0.5,		-1.8, 1.8, -1.8, 1.8,		3.5
+
+;*********************************************************************************
+; STRONG PROFILE 2
+;*********************************************************************************
+[snork_strong2]:m_snork_e
+$spawn				= "monsters\snorks\snork_03_strong"
+visual				= monsters\snork\snork
+corpse_visual			= monsters\snork\snorkdead
+icon				= ui_npc_monster_snork
+panic_threshold		= 0.05
+rank				= 10
+immunities_sect		= snork_immunities_strong
+attack_params		= snork_attack_params_strong
+spec_rank			= strong
+community			= snork
+MaxHealthValue					= 1.33			; range [0..200]
+
+;*********************************************************************************
+; STRONG PROFILE 3
+;*********************************************************************************
+[snork_strong3]:m_snork_e
+$spawn				= "monsters\snorks\snork_03_strong"
+visual				= monsters\snork\snork2
+corpse_visual			= monsters\snork\snorkdead2
+icon				= ui_npc_monster_snork
+panic_threshold		= 0.05
+rank				= 10
+immunities_sect		= snork_immunities_strong
+attack_params		= snork_attack_params_strong
+spec_rank			= strong
+community			= snork
+MaxHealthValue					= 1.33			; range [0..200]
+
+;=================================================================================
+; Terrain
+;=================================================================================
+[snork_terrain]
+	255,000,255,255
+
+
+;*********************************************************************************
+; CUSTOM PROFILES
+;*********************************************************************************
+[snork_indoor]:snork_weak
+$spawn			= "monsters\snorks\snork_indoor"
+monster_type	= indoor
+community		= snork
+MaxHealthValue					= 1.0			; range [0..200]
+
+[snork_outdoor]:snork_weak
+$spawn			= "monsters\snorks\snork_outdoor"
+monster_type	= outdoor
+community		= snork
+MaxHealthValue					= 1.0			; range [0..200]
+
+[snork_indoor_strong]:snork_strong
+$spawn			= "monsters\snorks\snork_indoor_strong"
+MaxHealthValue					= 1.33			; range [0..200]
+
+[snork_indoor_normal]:snork_normal
+$spawn			= "monsters\snorks\snork_indoor_normal"
+MaxHealthValue					= 1.0			; range [0..200]
+
+[snork_indoor_weak]:snork_weak
+$spawn			= "monsters\snorks\snork_indoor_weak"
+MaxHealthValue					= 0.8			; range [0..200]
+
+[snork_arena]:snork_strong
+$spawn				= "monsters\arena\snork_arena"
+panic_threshold		= 0.05
+species				= arena_monstr

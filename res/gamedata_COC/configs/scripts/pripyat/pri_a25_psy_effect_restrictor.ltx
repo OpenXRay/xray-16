@@ -1,0 +1,12 @@
+[logic]
+active = sr_psy_antenna@check_antena_destroy
+
+[sr_psy_antenna@check_antena_destroy]
+eff_intensity = 55
+hit_intensity = 0.6
+hit_freq = 100
+on_info = {+pri_a25_antenna_destroyed} sr_idle@nil
+postprocess = psi.ppe
+no_static = true
+
+[sr_idle@nil]

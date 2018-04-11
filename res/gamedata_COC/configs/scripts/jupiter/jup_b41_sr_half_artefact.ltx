@@ -1,0 +1,10 @@
+[logic]
+active = nil;sr_idle@turn_off
+
+[sr_idle@turn_off]
+on_info = sr_idle@wait %=turn_off(jup_b43_halfart_lamp)%
+
+[sr_idle@wait]
+on_info = {+jup_b1_complete_end =dist_to_actor_ge(30)} sr_idle@nil %=spawn_object(jup_b41_af_half_artifact:jup_b1_half_artefact_spawn_point) =turn_on(jup_b43_halfart_lamp)%
+
+[sr_idle@nil]

@@ -1,0 +1,21 @@
+[logic]
+active = ph_door@close
+
+[ph_door@close]
+locked = false
+closed = true
+snd_open_start = trader_door_open_start
+snd_close_start = trader_door_close_start
+snd_close_stop = trader_door_close_stop
+on_use = ph_door@open %+pri_a16_base_second_door_open%
+on_info = {+pri_a16_base_second_door_open !is_door_blocked_by_npc} ph_door@open
+
+[ph_door@open]
+locked = false
+closed = false
+snd_open_start = trader_door_open_start
+snd_close_start = trader_door_close_start
+snd_close_stop = trader_door_close_stop
+on_use = ph_door@close %-pri_a16_base_second_door_open%
+on_info = {-pri_a16_base_second_door_open !is_door_blocked_by_npc} ph_door@close
+on_game_timer = 50 | {!is_door_blocked_by_npc} ph_door@close %-pri_a16_base_second_door_open%

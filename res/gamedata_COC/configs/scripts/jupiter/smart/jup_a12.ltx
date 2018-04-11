@@ -1,0 +1,56 @@
+[smart_terrain]
+squad_id = 3
+max_population = 2
+respawn_params = respawn@jup_a12
+;arrive_dist = 75
+respawn_idle = 86400
+
+
+[respawn@jup_a12]
+spawn_bandit@advanced
+spawn_bandit@master
+
+[spawn_bandit@advanced]
+spawn_squads = bandit_sim_squad_novice, bandit_sim_squad_advanced
+spawn_num = {+bar_deactivate_radar_done} 1, 0
+
+[spawn_bandit@master]
+spawn_squads = bandit_sim_squad_advanced, bandit_sim_squad_advanced, bandit_sim_squad_veteran
+spawn_num = {+bar_deactivate_radar_done} 1, 0
+
+[exclusive]
+jup_a12_bandit_chief = jupiter\jup_a12_bandit_chief.ltx
+jup_a12_bandit_bodyguard_1 = jupiter\jup_a12_bandit_bodyguard_1.ltx
+jup_a12_bandit_bodyguard_2 = jupiter\jup_a12_bandit_bodyguard_2.ltx
+jup_a12_bandit_cashier = jupiter\jup_a12_bandit_cashier.ltx
+jup_a12_bandit_guard = jupiter\jup_a12_bandit_guard.ltx
+jup_a12_stalker_prisoner = jupiter\jup_a12_stalker_prisoner.ltx
+walker_1 = jupiter\jup_a12_smart_logic.ltx
+walker_2 = jupiter\jup_a12_smart_logic.ltx
+walker_3 = jupiter\jup_a12_smart_logic.ltx
+walker_4 = jupiter\jup_a12_smart_logic.ltx
+walker_5 = jupiter\jup_a12_smart_logic.ltx
+walker_6 = jupiter\jup_a12_smart_logic.ltx
+guard_1 = jupiter\jup_a12_smart_logic.ltx
+guard_2 = jupiter\jup_a12_smart_logic.ltx
+guard_3 = jupiter\jup_a12_smart_logic.ltx
+guard_4 = jupiter\jup_a12_smart_logic.ltx
+guard_5 = jupiter\jup_a12_smart_logic.ltx
+guard_6 = jupiter\jup_a12_smart_logic.ltx
+jup_a12_merc_right_attack = jupiter\jup_a12_merc.ltx
+jup_a12_merc_left_attack  = jupiter\jup_a12_merc.ltx
+jup_a12_merc_cover_attack = jupiter\jup_a12_merc.ltx
+jup_a12_surge_work_1 = jupiter\jup_a12_smart_logic.ltx
+jup_a12_surge_work_2 = jupiter\jup_a12_smart_logic.ltx
+jup_a12_surge_work_3 = jupiter\jup_a12_smart_logic.ltx
+jup_a12_surge_work_4 = jupiter\jup_a12_smart_logic.ltx
+jup_a12_surge_work_5 = jupiter\jup_a12_smart_logic.ltx
+jup_a12_surge_work_6 = jupiter\jup_a12_smart_logic.ltx
+jup_a12_surge_work_7 = jupiter\jup_a12_smart_logic.ltx
+jup_a12_surge_work_8 = jupiter\jup_a12_smart_logic.ltx
+jup_a12_surge_work_9 = jupiter\jup_a12_smart_logic.ltx
+jup_a12_surge_work_10 = jupiter\jup_a12_smart_logic.ltx
+jup_a12_surge_work_11 = jupiter\jup_a12_smart_logic.ltx
+jup_a12_surge_work_12 = jupiter\jup_a12_smart_logic.ltx
+jup_a12_surge_work_13 = jupiter\jup_a12_smart_logic.ltx
+jup_a12_surge_work_14 = jupiter\jup_a12_smart_logic.ltx

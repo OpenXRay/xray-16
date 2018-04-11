@@ -1,0 +1,14 @@
+[logic]
+active = sr_idle
+
+[sr_idle]
+on_actor_inside = {+cit_jail_doctor_pryp_task} sr_idle@task  %+pri_actor_in_hotel%
+
+[sr_idle@task]
+on_info = {=actor_has_item(decoder) =actor_has_item(pri_decoder_documents)} sr_idle@check_documents %+pri_monolith_decoder_got +pri_documents_warlab_task%
+
+[sr_idle@check_documents]
+on_info = {+main_1_search_agr_ug_task_done +main_2_search_labx18_task_done +main_3_search_labx16_task_done +main_4_search_labx10_task_done +main_5_search_labx8_task_done +main_6_search_jup_ug_task_done +main_7_search_mon_con_task_done +pri_monolith_decoder_got +pri_documents_warlab_task} sr_idle@nil %+warlab_password_info =give_task(sar_warlab) =give_task(sar_monolith_destroy)%
+on_info2 = {+warlab_open_door} sr_idle@nil
+
+[sr_idle@nil]

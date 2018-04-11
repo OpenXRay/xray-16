@@ -1,0 +1,32 @@
+[logic]
+active = nil;sr_idle@start
+
+[sr_idle@start]
+on_info = {+pri_a18_run_cam} sr_idle@wait %+pri_a18_use_idol_done +pri_a18_found_antenna =disable_ui =run_postprocess(fade_in:2023)%
+on_info2 = {-pri_a18_actor_enemy =is_squad_enemy_to_actor(pri_a16_sokolov_squad:pri_a16_vano_squad:pri_a22_military_merkulov_squad:pri_a22_military_skelja_squad)} %+pri_a18_actor_enemy +pri_a18_get_reinforcement_done%
+
+[sr_idle@wait]
+on_game_timer = 20 | sr_cutscene@start %=create_cutscene_actor_with_weapon(pri_a18_cutscene_actor:pri_a18_cutscene_actor_spawn:0:180) +pri_a18_task_end =run_postprocess(black:2057:true)% 
+
+[sr_cutscene@start]
+global_cameffect = true
+enable_ui_on_end = false
+outdoor = true
+point = pri_a18_actor_in_catscene_teleport
+look = pri_a18_actor_in_catscene_teleport
+cam_effector = scenario_cam\pripyat\pri_a18_inspect_monolith_cameff
+on_game_timer = 50 | {-pri_a18_pp_stop} %+pri_a18_pp_stop =stop_postprocess(2023) =stop_postprocess(2057)%
+on_signal = cameff_end | sr_idle@after %=run_postprocess(black:2021:true) +pri_a18_cutscene_actor_destr =teleport_actor(pri_b35_mercs_pri_a18_reinforcement_1_ready_kill_look:pri_a18_smart_terrain_pri_a18_monolith_2_look)%
+on_signal2 = cam_effector_stop | sr_idle@after %=run_postprocess(black:2021:true) +pri_a18_cutscene_actor_destr =teleport_actor(pri_b35_mercs_pri_a18_reinforcement_1_ready_kill_look:pri_a18_smart_terrain_pri_a18_monolith_2_look)%
+on_info = {+pri_a18_altar_stop_cam -pri_a18_fade_in} %=run_postprocess(fade_in:2022) +pri_a18_fade_in%
+on_info2 = {+pri_a18_cam_stop} %=stop_sr_cutscene%
+on_info3 = {+pri_a18_cut_actor_hit} %=stop_sr_cutscene +pri_a18_cam_stop +pri_a18_altar_stop_cam +pri_a18_fade_in +pri_a18_koval_go_on%
+
+[sr_idle@after]
+on_game_timer = 20 | sr_idle@check_when_reinfor_go_base %=stop_postprocess(2021) =stop_postprocess(2022) =stop_postprocess(2057) =enable_ui%
+
+[sr_idle@check_when_reinfor_go_base]
+on_info = {+pri_a18_once_autosave !actor_in_zone(pri_a18_task_end_zone)} sr_idle@nil %+pri_a18_reinf_go_base% 
+on_info2 = {-pri_a18_once_autosave} %+pri_a18_once_autosave =scenario_autosave(st_save_pri_a18_searched_antenna)%
+
+[sr_idle@nil]

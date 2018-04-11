@@ -1,0 +1,52 @@
+#include "profiles\profiles.ltx"
+
+[trader]
+buy_condition                                      = buy_condition_nimble
+buy_item_condition_factor                          = 0.7
+buy_supplies                                       = {=actor_goodwill_ge(stalker:1500)} supplies_special, supplies_generic
+discounts                                          = {=actor_goodwill_ge(stalker:2000)} discount_10, {=actor_goodwill_ge(stalker:1800)} discount_9, {=actor_goodwill_ge(stalker:1600)} discount_8, {=actor_goodwill_ge(stalker:1400)} discount_7, {=actor_goodwill_ge(stalker:1200)} discount_6, {=actor_goodwill_ge(stalker:1000)} discount_5, {=actor_goodwill_ge(stalker:800)} discount_4, {=actor_goodwill_ge(stalker:600)} discount_3, {=actor_goodwill_ge(stalker:400)} discount_2, {=actor_goodwill_ge(stalker:200)} discount_1, discount_0
+sell_condition                                     = sell_condition_nimble
+
+[buy_condition_nimble]:buy_sell_base
+wpn_desert_eagle_nimble                            = 0.3, 0.1
+wpn_fn2000_nimble                                  = 0.3, 0.1
+wpn_g36_nimble                                     = 0.3, 0.1
+wpn_groza_nimble                                   = 0.3, 0.1
+wpn_mp5_nimble                                     = 0.3, 0.1
+wpn_protecta_nimble                                = 0.3, 0.1
+wpn_sig220_nimble                                  = 0.3, 0.1
+wpn_spas12_nimble                                  = 0.3, 0.1
+wpn_svd_nimble                                     = 0.3, 0.1
+wpn_svu_nimble                                     = 0.3, 0.1
+wpn_usp_nimble                                     = 0.3, 0.1
+wpn_vintorez_nimble                                = 0.3, 0.1	
+
+[sell_condition_nimble]:buy_sell_base
+wpn_desert_eagle_nimble                            = 1, 2.2
+wpn_fn2000_nimble                                  = 1, 2.2
+wpn_g36_nimble                                     = 1, 2.2
+wpn_groza_nimble                                   = 1, 2.2
+wpn_mp5_nimble                                     = 1, 2.2
+wpn_protecta_nimble                                = 1, 2.2
+wpn_sig220_nimble                                  = 1, 2.2
+wpn_spas12_nimble                                  = 1, 2.2
+wpn_svd_nimble                                     = 1, 2.2
+wpn_svu_nimble                                     = 1, 2.2
+wpn_usp_nimble                                     = 1, 2.2
+wpn_vintorez_nimble                                = 1, 2.2	
+
+[supplies_generic]
+wpn_desert_eagle_nimble                            = 1, 1
+wpn_fn2000_nimble                                  = 1, 1
+wpn_g36_nimble                                     = 1, 1
+wpn_groza_nimble                                   = 1, 1
+wpn_mp5_nimble                                     = 1, 1
+wpn_protecta_nimble                                = 1, 1
+wpn_sig220_nimble                                  = 1, 1
+wpn_spas12_nimble                                  = 1, 1
+wpn_svd_nimble                                     = 1, 1
+wpn_svu_nimble                                     = 1, 1
+wpn_usp_nimble                                     = 1, 1
+wpn_vintorez_nimble                                = 1, 1
+
+[supplies_special]:supplies_generic

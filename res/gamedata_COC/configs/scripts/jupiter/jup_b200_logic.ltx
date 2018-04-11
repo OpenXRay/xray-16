@@ -1,0 +1,29 @@
+[logic]
+active = nil;sr_idle
+
+[sr_idle]
+on_info =  sr_idle@2 %=set_counter(jup_b200_tech_materials_found_counter:0)%
+
+[sr_idle@2]
+on_info = sr_idle@3 %=set_counter(jup_b200_tech_materials_brought_counter:0)%
+
+[sr_idle@3]
+on_info = {+jup_b200_tech_materials_started -jup_b200_give_task} sr_idle@4 % =give_task(jup_b200_tech_materials) +jup_b200_give_task%
+on_info2 = %=jup_b200_count_found%
+;on_info2 = {-jup_b200_actor_begin_search_matirial =actor_in_zone(jup_b200_mill_sr)} %+jup_b200_actor_begin_search_matirial%
+
+[sr_idle@4]
+on_info = {=counter_greater(jup_b200_tech_materials_found_counter:0) !counter_greater(jup_b200_tech_materials_found_counter:9)} %+jup_b200_counter_found_some%
+on_info2 = {=counter_equal(jup_b200_tech_materials_found_counter:9)} sr_idle@nil %+jup_b200_counter_found_all -jup_b200_counter_found_some +jup_b200_tech_materials_has%
+on_info3 = {-jup_b200_tech_materials_has =actor_has_item(jup_b200_tech_materials_wire)} %+jup_b200_tech_materials_has%, {-jup_b200_tech_materials_has =actor_has_item(jup_b200_tech_materials_acetone)} %+jup_b200_tech_materials_has%, {-jup_b200_tech_materials_has =actor_has_item(jup_b200_tech_materials_textolite)} %+jup_b200_tech_materials_has%, {-jup_b200_tech_materials_has =actor_has_item(jup_b200_tech_materials_transistor)} %+jup_b200_tech_materials_has%, {-jup_b200_tech_materials_has =actor_has_item(jup_b200_tech_materials_capacitor)} %+jup_b200_tech_materials_has%, {+jup_b200_tech_materials_has !actor_has_item(jup_b200_tech_materials_wire) !actor_has_item(jup_b200_tech_materials_acetone) !actor_has_item(jup_b200_tech_materials_textolite) !actor_has_item(jup_b200_tech_materials_transistor) !actor_has_item(jup_b200_tech_materials_capacitor)} %-jup_b200_tech_materials_has%
+on_info4 = {+jup_b200_counter_found_some} sr_idle@5
+on_info5 = {-jup_b200_actor_begin_search_matirial =actor_in_zone(jup_b200_mill_sr) } %+jup_b200_actor_begin_search_matirial%
+on_info6 = {+jup_b200_actor_begin_search_matirial !actor_in_zone(jup_b200_mill_sr_2) } %-jup_b200_actor_begin_search_matirial%
+on_info7 = %=jup_b200_count_found%
+
+[sr_idle@5]
+on_info = {=counter_equal(jup_b200_tech_materials_found_counter:9)} sr_idle@nil %+jup_b200_counter_found_all -jup_b200_counter_found_some%
+on_info2 = {-jup_b200_tech_materials_has =actor_has_item(jup_b200_tech_materials_wire)} %+jup_b200_tech_materials_has%, {-jup_b200_tech_materials_has =actor_has_item(jup_b200_tech_materials_acetone)} %+jup_b200_tech_materials_has%, {-jup_b200_tech_materials_has =actor_has_item(jup_b200_tech_materials_textolite)} %+jup_b200_tech_materials_has%, {-jup_b200_tech_materials_has =actor_has_item(jup_b200_tech_materials_transistor)} %+jup_b200_tech_materials_has%, {-jup_b200_tech_materials_has =actor_has_item(jup_b200_tech_materials_capacitor)} %+jup_b200_tech_materials_has%, {+jup_b200_tech_materials_has !actor_has_item(jup_b200_tech_materials_wire) !actor_has_item(jup_b200_tech_materials_acetone) !actor_has_item(jup_b200_tech_materials_textolite) !actor_has_item(jup_b200_tech_materials_transistor) !actor_has_item(jup_b200_tech_materials_capacitor)} %-jup_b200_tech_materials_has%
+on_info3 = %=jup_b200_count_found%
+
+[sr_idle@nil]

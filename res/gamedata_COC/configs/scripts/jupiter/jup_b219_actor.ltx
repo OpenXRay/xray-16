@@ -1,0 +1,89 @@
+[logic]
+active = walker@sig
+
+[walker@sig]
+path_walk = jup_b219_actor_start_walk
+path_look = jup_b219_actor_start_look
+on_signal = actor | animpoint@start %+jup_b219_actor_on_pos%
+def_state_standing = guard_na
+def_state_moving = assault
+meet = no_meet
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_factory_default_in_restrictor
+combat_ignore_keep_when_attacked = true 
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+danger = danger
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[animpoint@actor]
+cover_name = jup_b219_actor_smart_cover
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+use_camp = false
+reach_distance = 50
+meet = no_meet
+reach_movement = walk
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+out_restr = jup_factory_default_in_restrictor
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+
+[animpoint@start]:animpoint@actor
+avail_animations = pri_a15_idle_none
+on_info = {+jup_b219_start_one} 				animpoint@start_one
+on_info2 = {+jup_b219_start_one_vano} 			animpoint@start_one_vano
+on_info3 = {+jup_b219_start_one_monolith} 		animpoint@start_one_monolith
+on_info4 = {+jup_b219_start_one_soldier} 		animpoint@start_one_soldier
+on_info5 = {+jup_b219_start_all} 				animpoint@start_all
+on_info6 = {+jup_b219_start_soldier_vano} 		animpoint@start_soldier_vano
+on_info7 = {+jup_b219_start_soldier_monolith} 	animpoint@start_soldier_monolith
+on_info8 = {+jup_b219_start_vano_monolith} 		animpoint@start_vano_monolith
+on_info9  = {+jup_b219_destroy_actor} %=destroy_object% 
+
+ 
+[animpoint@start_one]:animpoint@actor
+avail_animations = jup_b219_actor_one
+on_info = {+jup_b219_destroy_actor} %=destroy_object% 
+
+[animpoint@start_one_vano]:animpoint@actor
+avail_animations = jup_b219_actor_one_vano
+on_info = {+jup_b219_destroy_actor} %=destroy_object% 
+
+[animpoint@start_one_monolith]:animpoint@actor
+avail_animations = jup_b219_actor_one_monolith
+on_info = {+jup_b219_destroy_actor} %=destroy_object% 
+
+[animpoint@start_one_soldier]:animpoint@actor
+avail_animations = jup_b219_actor_one_soldier
+on_info = {+jup_b219_destroy_actor} %=destroy_object% 
+
+[animpoint@start_all]:animpoint@actor
+avail_animations = jup_b219_actor_all
+on_info = {+jup_b219_destroy_actor} %=destroy_object% 
+
+[animpoint@start_soldier_vano]:animpoint@actor
+avail_animations = jup_b219_actor_soldier_vano
+on_info = {+jup_b219_destroy_actor} %=destroy_object% 
+
+[animpoint@start_soldier_monolith]:animpoint@actor
+avail_animations = jup_b219_actor_soldier_monolith
+on_info = {+jup_b219_destroy_actor} %=destroy_object% 
+
+[animpoint@start_vano_monolith]:animpoint@actor
+avail_animations = jup_b219_actor_vano_monolith
+on_info = {+jup_b219_destroy_actor} %=destroy_object% 
+
+
+[danger]
+ignore_distance = 0
+danger_inertion_time_grenade = 0
+danger_inertion_time_hit = 0
+danger_inertion_time_sound = 0
+danger_inertion_time_ricochet = 0
+
+

@@ -1,0 +1,69 @@
+[logic]
+active = nil ;sr_idle@start
+
+[sr_idle@start]
+on_info = {+zat_b20_plateau_way_started} sr_idle@play %=give_task(zat_b20_plateau_way)%
+on_info2 = {=actor_in_zone(zat_b20_sr_actor_cross_the_teleport)} sr_idle@wait_to_fallen %+zat_b20_plateau_way_done%
+on_info3 = {=dist_to_actor_le(65)} sr_idle@play %=give_task(zat_b20_plateau_way)%
+
+
+
+[sr_idle@play]
+on_info = {+zat_b20_plateau_way_go} sr_idle@timer ;%=disable_ui%
+on_info2 = {+zat_b20_plateau_way_done} sr_idle@nil
+on_info3 = {=actor_in_zone(zat_b20_sr_actor_cross_the_teleport)} sr_idle@wait_to_fallen %+zat_b20_plateau_way_done%
+
+[sr_idle@timer]
+on_game_timer = 10 | sr_idle@create %=run_postprocess(fade_in) =clear_smart_terrain(zat_b20_smart_terrain)% 
+on_info = {+zat_b18_noah_dead} sr_idle@nil  %=enable_ui%
+
+[sr_idle@create]
+on_game_timer = 20 | sr_idle@enable_ui %=run_postprocess(black:22219:true) =create_squad(zat_b20_noah_teleport_squad:zat_b20_smart_terrain) =create_cutscene_actor_with_weapon(zat_b20_actor:zat_b20_smart_terrain_actor_spawn_walk:0:0:3) =teleport_actor(zat_b20_smart_terrain_actor_spawn_walk:zat_b20_smart_terrain_actor_spawn_look)%
+on_info = {+zat_b18_noah_dead} sr_idle@nil  %=enable_ui =stop_postprocess(22219)%
+
+[sr_idle@enable_ui]
+on_info = {+zat_b20_stop_postprocess} sr_idle@info_timer 
+on_info2 = {+zat_b18_noah_dead} sr_idle@nil  %=enable_ui =stop_postprocess(22219)%
+
+[sr_idle@info_timer]
+on_game_timer = 30 | sr_cutscene@cam %=stop_postprocess(22219)%
+on_info = {+zat_b18_noah_dead} sr_idle@nil  %=enable_ui =stop_postprocess(22219)%
+               									
+[sr_cutscene@cam]
+point = zat_b20_smart_terrain_actor_spawn_walk
+look = zat_b20_smart_terrain_actor_spawn_look
+cam_effector = scenario_cam\Zaton\zat_b20_teleport_dive
+on_signal = cameff_end | sr_idle@hour %+zat_b20_plateau_way_known%
+on_signal2 = cam_effector_stop | sr_idle@hour %+zat_b20_plateau_way_known%
+global_cameffect = true
+outdoor = true
+;on_info = {+zat_b18_noah_dead} %=stop_sr_cutscene +zat_b20_plateau_way_known%               		
+on_info = {+zat_b20_actor_hit} %=stop_sr_cutscene%
+on_game_timer = 20 | {-zat_b20_noah_ready_to_jump}  %+zat_b20_noah_ready_to_jump%  
+enable_ui_on_end = true 
+
+[sr_idle@hour]
+on_game_timer = 3600 | sr_idle@hour_fail
+;on_info = {+zat_b20_plateau_way_done} sr_idle@play_snd
+on_info = {=actor_in_zone(zat_b20_sr_actor_cross_the_teleport)} sr_idle@play_snd %+zat_b20_plateau_way_done%
+on_info2 = {-zat_b20_autosave} %+zat_b20_autosave =scenario_autosave(st_save_zat_b18_noah_showed_teleport)%
+
+[sr_idle@hour_fail]
+on_info = {=actor_in_zone(zat_b20_sr_actor_cross_the_teleport)} sr_idle@wait_to_fallen %+zat_b20_plateau_way_done%
+
+[sr_idle@hour_two]
+on_info = {=actor_in_zone(zat_b20_sr_actor_cross_the_teleport)} sr_idle@wait_to_fallen %+zat_b20_cross_teleport%
+
+[sr_idle@play_snd]
+on_game_timer = 30 | {-zat_b18_noah_dead -zat_b20_noah_play_sound} sr_idle@wait_to_fallen %+zat_b20_noah_play_sound =play_sound(zat_b20_noah_jumped)%, sr_idle@wait_to_fallen
+
+[sr_idle@wait_to_fallen]
+on_info = {!actor_in_zone(zat_b20_actor_fallen_from_a_plateau)} sr_idle@wait_to_jump %-zat_b20_cross_teleport%
+on_info2 = {+zat_b28_heli_3_searched} sr_idle@nil
+
+[sr_idle@wait_to_jump]
+on_game_timer = 20 | %=give_task(zat_b20_cross_teleport)% sr_idle@hour_two
+
+
+[sr_idle@nil]
+

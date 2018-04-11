@@ -1,0 +1,18 @@
+[logic]
+active = camper
+;on_death = death
+
+[camper]
+path_walk = sar_monolith_guard_walk_4
+path_look = sar_monolith_guard_look_1
+radius = 8
+on_actor_in_zone = {-story_mode_disabled} mon_guard_restr | walker %=hit_npc_from_actor%
+out_restr = mon_contorol_room_restr
+
+[walker]
+path_walk = sar_monolith_guard_walk_4
+path_look = sar_monolith_guard_look_1
+out_restr = mon_contorol_room_restr
+
+;[death]
+;on_info = %=inc_counter(mon_clear_control_room)%

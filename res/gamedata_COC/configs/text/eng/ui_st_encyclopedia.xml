@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+
+	<!-- PDA -->
+	<string id="pda_btn_encyclopedia">
+		<text>Guide</text>
+	</string>
+	
+	<string id="pda_btn_encyclopedia_hint">
+		<text>Show the user guide</text>
+	</string>
+	
+	<string id="pda_btn_encyclopedia_title">
+		<text>Guide to the Zone</text>
+	</string>
+	
+	<string id="pda_btn_encyclopedia_notify">
+		<text>Guide article unlocked</text>
+	</string>
+	
+	<string id="pda_btn_encyclopedia_locked">
+		<text>
+			You have not yet unlocked this article.\n
+			\nArticles can be unlocked through the following:\n
+			\n• Finding and using memory sticks.
+		</text>
+	</string>
+	
+</string_table>

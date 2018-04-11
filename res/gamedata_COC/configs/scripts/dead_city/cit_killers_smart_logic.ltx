@@ -1,0 +1,292 @@
+;merc trader
+[logic@cit_killers_merc_trader]
+suitable = {=check_npc_name(cit_killers_merc_trader_stalker)} true
+prior = 200
+active = animpoint@stand
+level_spot = trader
+trade = misc\trade\trade_killer_dushman.ltx
+can_select_weapon = false
+dont_keep_items = true
+
+[animpoint@stand]
+cover_name = cit_killers_merc_trader_smart_cover
+reach_movement = walk_noweap
+avail_animations = jup_b41_novikov_stand
+use_camp = false
+meet = meet@trader
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+reach_distance = 10
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+on_info1 = {=actor_in_zone(cit_merc_trader_if_actor_steal)} animpoint@trader_stand_as_enemy  %=dec_faction_goodwill_to_actor(killer:500) =actor_enemy%
+
+[animpoint@trader_stand_as_enemy]
+cover_name = cit_killers_merc_trader_smart_cover
+reach_movement = walk_noweap
+avail_animations = jup_b41_novikov_stand
+use_camp = false
+meet = meet@trader
+reach_distance = 10
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet@trader]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_distance = 3
+use = {=actor_enemy} false, true
+
+;merc mechanic
+[logic@cit_killers_merc_mechanic]
+suitable = {=check_npc_name(cit_killers_merc_mechanic_stalker)} true
+prior = 200
+active = animpoint@stand2
+level_spot = mechanic
+can_select_weapon = false
+
+[animpoint@stand2]
+cover_name = cit_killers_merc_mechanic_smart_cover
+reach_movement = walk_noweap
+avail_animations = jup_b41_novikov_stand
+use_camp = false
+meet = meet@mechanic
+combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
+combat_ignore_keep_when_attacked = true
+invulnerable = {!actor_enemy} true, false
+reach_distance = 10
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+on_info1 = {=actor_in_zone(cit_merc_trader_if_actor_steal)} animpoint@mech_stand_as_enemy %=actor_enemy%
+
+[animpoint@mech_stand_as_enemy]
+cover_name = cit_killers_merc_mechanic_smart_cover
+reach_movement = walk_noweap
+avail_animations = jup_b41_novikov_stand
+use_camp = false
+meet = meet@mechanic
+reach_distance = 10
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+
+[meet@mechanic]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+close_snd_distance = 3
+use = {=actor_enemy} false, true
+
+;camping
+[logic@cit_killers_camp_work_1]
+active = animpoint@cit_killers_camp_work_1
+suitable = true
+prior = 41
+
+[logic@cit_killers_camp_work_2]
+active = animpoint@cit_killers_camp_work_2
+suitable = true
+prior = 41
+
+[logic@cit_killers_camp_work_3]
+active = animpoint@cit_killers_camp_work_3
+suitable = true
+prior = 41
+
+[logic@cit_killers_camp_work_4]
+active = animpoint@cit_killers_camp_work_4
+suitable = true
+prior = 41
+
+[logic@cit_killers_camp_work_5]
+active = animpoint@cit_killers_camp_work_5
+suitable = true
+prior = 41
+
+[logic@cit_killers_camp_work_6]
+active = animpoint@cit_killers_camp_work_6
+suitable = true
+prior = 41
+
+[logic@cit_killers_camp_work_7]
+active = animpoint@cit_killers_camp_work_7
+suitable = true
+prior = 41
+
+[logic@cit_killers_camp_work_8]
+active = animpoint@cit_killers_camp_work_8
+suitable = true
+prior = 41
+
+[logic@cit_killers_camp_work_9]
+active = animpoint@cit_killers_camp_work_9
+suitable = true
+prior = 41
+
+[logic@cit_killers_camp_work_10]
+active = animpoint@cit_killers_camp_work_10
+suitable = true
+prior = 41
+
+[logic@cit_killers_camp_work_11]
+active = animpoint@cit_killers_camp_work_11
+suitable = true
+prior = 41
+
+[logic@cit_killers_camp_work_12]
+active = animpoint@cit_killers_camp_work_12
+suitable = true
+prior = 41
+
+[animpoint@cit_killers_camp_work_1]
+cover_name = cit_killers_animpoint_camp1
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@cit_killers_camp_work_2]
+cover_name = cit_killers_animpoint_camp2
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@cit_killers_camp_work_3]
+cover_name = cit_killers_animpoint_camp3
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@cit_killers_camp_work_4]
+cover_name = cit_killers_animpoint_camp4
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@cit_killers_camp_work_5]
+cover_name = cit_killers_animpoint_camp5
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@cit_killers_camp_work_6]
+cover_name = cit_killers_animpoint_camp6
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@cit_killers_camp_work_7]
+cover_name = cit_killers_animpoint_camp7
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@cit_killers_camp_work_8]
+cover_name = cit_killers_animpoint_camp8
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@cit_killers_camp_work_9]
+cover_name = cit_killers_animpoint_camp9
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@cit_killers_camp_work_10]
+cover_name = cit_killers_animpoint_camp10
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@cit_killers_camp_work_11]
+cover_name = cit_killers_animpoint_camp11
+use_camp = true
+turn_on_campfire = true
+
+[animpoint@cit_killers_camp_work_12]
+cover_name = cit_killers_animpoint_camp12
+use_camp = true
+turn_on_campfire = true
+
+;------------------------------
+;------- Mutant swarm ----------
+;------------------------------
+
+[logic@faction_base_defense_enemy1]
+active = mob_home@faction_base_defense_enemy1
+suitable = {=target_squad_name(faction_base_defense_flesh_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy1]
+path_home = home_attackers
+home_min_radius = 1
+home_max_radius = 30
+aggressive = true
+panic = 0
+
+[logic@faction_base_defense_enemy2]
+active = mob_home@faction_base_defense_enemy2
+suitable = {=target_squad_name(faction_base_defense_boar_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy2]
+path_home = home_attackers
+aggressive = true
+home_min_radius = 1
+home_max_radius = 30
+panic = 0
+
+[logic@faction_base_defense_enemy3]
+active = mob_home@faction_base_defense_enemy3
+suitable = {=target_squad_name(faction_base_defense_dog_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy3]
+path_home = home_attackers
+home_min_radius = 1
+home_max_radius = 30
+aggressive = true
+panic = 0
+
+[logic@faction_base_defense_enemy4]
+active = mob_home@faction_base_defense_enemy4
+suitable = {=target_squad_name(faction_base_defense_flesh_second_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy4]
+path_home = home_attackers
+home_min_radius = 1
+home_max_radius = 30
+aggressive = true
+panic = 0
+
+[logic@faction_base_defense_enemy5]
+active = mob_home@faction_base_defense_enemy5
+suitable = {=target_squad_name(faction_base_defense_boar_second_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy5]
+path_home = home_attackers
+aggressive = true
+home_min_radius = 1
+home_max_radius = 30
+panic = 0
+
+[logic@faction_base_defense_enemy6]
+active = mob_home@faction_base_defense_enemy6
+suitable = {=target_squad_name(faction_base_defense_dog_second_squad)} true
+monster_job = true
+prior = 200
+
+[mob_home@faction_base_defense_enemy6]
+path_home = home_attackers
+home_min_radius = 1
+home_max_radius = 30
+aggressive = true
+panic = 0

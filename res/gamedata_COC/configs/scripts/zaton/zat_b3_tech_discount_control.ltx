@@ -1,0 +1,12 @@
+[logic]
+active = nil ;sr_idle
+
+[sr_idle]
+on_info = {+zat_b3_tech_drinking} sr_idle@discount_1 %+zat_b3_tech_discount_1%
+
+[sr_idle@discount_1]
+on_game_timer = 7200 | sr_idle %-zat_b3_tech_discount_1%
+on_info = {+zat_b3_tech_have_couple_dose +zat_b3_tech_discount_1 +zat_b3_tech_drinking} sr_idle@discount_2 %+zat_b3_tech_discount_2% 
+
+[sr_idle@discount_2]
+on_game_timer = 7200 | sr_idle %-zat_b3_tech_discount_1 -zat_b3_tech_discount_2%

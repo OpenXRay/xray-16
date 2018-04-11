@@ -1,0 +1,18 @@
+[smart_terrain]
+squad_id = 14
+max_population = 1
+respawn_idle = 86400
+respawn_params = respawn@pri_b307
+
+[respawn@pri_b307]
+spawn_stalker
+spawn_zombied
+
+[spawn_zombied]
+spawn_squads = zombied_sim_squad_novice, zombied_sim_squad_advanced, zombied_sim_squad_veteran
+spawn_num = {-bar_deactivate_radar_done} 4, 0
+
+[spawn_stalker]
+spawn_squads = stalker_sim_squad_advanced, stalker_sim_squad_advanced, stalker_sim_squad_veteran
+;spawn_num = {+pri_a28_actor_in_zone_stay} 4, {+pri_a17_actor_has_gauss_rifle} 2, 0
+spawn_num = {+bar_deactivate_radar_done} 4, 0

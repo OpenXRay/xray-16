@@ -1,0 +1,34 @@
+[logic@mar_smart_terrain_doc_doctor]
+suitable = {=check_npc_name(mar_smart_terrain_doc_doctor)} true
+prior = 200
+active = animpoint@base
+can_select_weapon = false
+known_info = known_info
+;level_spot = quest_npc
+
+[animpoint@base]
+cover_name = mar_smart_terrain_doc_animpoint_kamp
+use_camp = true
+meet = meet
+combat_ignore_cond = {=check_enemy_name(mar_smart_terrain_doc_dog)} true, false
+invulnerable = true
+;out_restr = 
+gather_items_enabled = false
+help_wounded_enabled = false
+corpse_detection_enabled = false
+turn_on_campfire = true
+
+[meet]
+close_anim 		= nil
+close_victim 	= nil
+far_anim 		= nil
+far_victim 		= nil
+close_distance  = 0
+far_distance 	= 0
+use = true
+allow_break 	= false
+meet_on_talking = false
+trade_enable = false
+
+[known_info]
+mar_doctor_found
