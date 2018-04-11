@@ -214,9 +214,6 @@ void CScriptEngine::print_stack(lua_State* L)
                     l_tDebugInfo.currentline, l_tDebugInfo.name);
             }
 
-            if (i < 2)
-                continue;
-
             // Giperion: verbose log
             Log("\nLua state dump:\n\tLocals: ");
             pcstr name = nullptr;
