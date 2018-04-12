@@ -6,5 +6,5 @@ CWeaponFORT::CWeaponFORT() {}
 CWeaponFORT::~CWeaponFORT() {}
 using namespace luabind;
 
-SCRIPT_EXPORT(CWeaponFORT, (CGameObject),
-    { module(luaState)[class_<CWeaponFORT, CGameObject>("CWeaponFORT").def(constructor<>())]; });
+SCRIPT_EXPORT(CWeaponFORT, (CWeaponMagazined),
+    { module(luaState)[class_<CWeaponFORT, CWeaponMagazined>("CWeaponFORT").def(constructor<>())]; });

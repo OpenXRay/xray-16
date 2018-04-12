@@ -6,5 +6,5 @@ CWeaponSVU::CWeaponSVU(void) {}
 CWeaponSVU::~CWeaponSVU(void) {}
 using namespace luabind;
 
-SCRIPT_EXPORT(CWeaponSVU, (CGameObject),
-    { module(luaState)[class_<CWeaponSVU, CGameObject>("CWeaponSVU").def(constructor<>())]; });
+SCRIPT_EXPORT(CWeaponSVU, (CWeaponMagazined),
+    { module(luaState)[class_<CWeaponSVU, CWeaponMagazined>("CWeaponSVU").def(constructor<>())]; });

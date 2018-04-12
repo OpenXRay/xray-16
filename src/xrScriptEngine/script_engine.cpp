@@ -18,6 +18,7 @@
 #include <stdarg.h>
 #include "Common/Noncopyable.hpp"
 #include "xrCore/ModuleLookup.hpp"
+#include "luabind/class_info.hpp"
 
 Flags32 g_LuaDebug;
 
@@ -343,7 +344,7 @@ int CScriptEngine::script_log(LuaMessageType message, LPCSTR caFormat, ...)
     int result = vscript_log(message, caFormat, marker);
     va_end(marker);
 
-#if defined(DEBUG) || defined(COC_EDITION)
+#if defined(DEBUG)
     if (message == LuaMessageType::Error)
         print_stack();
 #endif
@@ -647,7 +648,8 @@ bool CScriptEngine::print_output(lua_State* L, pcstr caScriptFileName, int error
     {
         if (!errorCode)
             scriptEngine->script_log(LuaMessageType::Info, "Output from %s", caScriptFileName);
-        scriptEngine->script_log(errorCode ? LuaMessageType::Error : LuaMessageType::Message, "%s", S);
+        // it's needed?
+        //scriptEngine->script_log(errorCode ? LuaMessageType::Error : LuaMessageType::Message, "%s", S);
 #if defined(USE_DEBUGGER) && !defined(USE_LUA_STUDIO)
         if (debugger() && debugger()->Active())
         {
@@ -668,22 +670,22 @@ void CScriptEngine::print_error(lua_State* L, int iErrorCode)
     switch (iErrorCode)
     {
     case LUA_ERRRUN:
-        scriptEngine->script_log(LuaMessageType::Error, "SCRIPT RUNTIME ERROR");
+        Log("SCRIPT RUNTIME ERROR");
         break;
     case LUA_ERRMEM:
-        scriptEngine->script_log(LuaMessageType::Error, "SCRIPT ERROR (memory allocation)");
+        Log("SCRIPT ERROR (memory allocation)");
         break;
     case LUA_ERRERR:
-        scriptEngine->script_log(LuaMessageType::Error, "SCRIPT ERROR (while running the error handler function)");
+        Log("SCRIPT ERROR (while running the error handler function)");
         break;
     case LUA_ERRFILE:
-        scriptEngine->script_log(LuaMessageType::Error, "SCRIPT ERROR (while running file)");
+        Log("SCRIPT ERROR (while running file)");
         break;
     case LUA_ERRSYNTAX:
-        scriptEngine->script_log(LuaMessageType::Error, "SCRIPT SYNTAX ERROR");
+        Log("SCRIPT SYNTAX ERROR");
         break;
     case LUA_YIELD:
-        scriptEngine->script_log(LuaMessageType::Info, "Thread is yielded");
+        Log("Thread is yielded");
         break;
     default: NODEFAULT;
     }
@@ -990,6 +992,7 @@ void CScriptEngine::init(ExporterFunc exporterFunc, bool loadGlobalNamespace)
     luabind::open(lua());
     // XXX: temporary workaround to preserve backwards compatibility with game scripts
     luabind::disable_super_deprecation();
+    luabind::bind_class_info(lua());
     setup_callbacks();
     if (exporterFunc)
         exporterFunc(lua());

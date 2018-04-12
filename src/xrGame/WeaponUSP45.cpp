@@ -6,5 +6,5 @@ CWeaponUSP45::CWeaponUSP45() {}
 CWeaponUSP45::~CWeaponUSP45() {}
 using namespace luabind;
 
-SCRIPT_EXPORT(CWeaponUSP45, (CGameObject),
-    { module(luaState)[class_<CWeaponUSP45, CGameObject>("CWeaponUSP45").def(constructor<>())]; });
+SCRIPT_EXPORT(CWeaponUSP45, (CWeaponMagazined),
+    { module(luaState)[class_<CWeaponUSP45, CWeaponMagazined>("CWeaponUSP45").def(constructor<>())]; });

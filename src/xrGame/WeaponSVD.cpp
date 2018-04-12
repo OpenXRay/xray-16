@@ -26,5 +26,5 @@ void CWeaponSVD::OnAnimationEnd(u32 state)
 
 using namespace luabind;
 
-SCRIPT_EXPORT(CWeaponSVD, (CGameObject),
-    { module(luaState)[class_<CWeaponSVD, CGameObject>("CWeaponSVD").def(constructor<>())]; });
+SCRIPT_EXPORT(CWeaponSVD, (CWeaponMagazined),
+    { module(luaState)[class_<CWeaponSVD, CWeaponMagazined>("CWeaponSVD").def(constructor<>())]; });

@@ -6,5 +6,5 @@ CWeaponVintorez::CWeaponVintorez(void) : CWeaponMagazined(SOUND_TYPE_WEAPON_SNIP
 CWeaponVintorez::~CWeaponVintorez(void) {}
 using namespace luabind;
 
-SCRIPT_EXPORT(CWeaponVintorez, (CGameObject),
-    { module(luaState)[class_<CWeaponVintorez, CGameObject>("CWeaponVintorez").def(constructor<>())]; });
+SCRIPT_EXPORT(CWeaponVintorez, (CWeaponMagazined),
+    { module(luaState)[class_<CWeaponVintorez, CWeaponMagazined>("CWeaponVintorez").def(constructor<>())]; });

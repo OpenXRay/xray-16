@@ -37,6 +37,23 @@
 using namespace luabind;
 using namespace luabind::policy;
 
+template <typename TClass>
+bool is(CScriptGameObject* script_obj)
+{
+    CGameObject* obj = &script_obj->object();
+    if (smart_cast<TClass*>(obj))
+        return true;
+
+    return false;
+}
+
+template <typename TClass>
+TClass* objectCast(CScriptGameObject* script_obj)
+{
+    CGameObject* obj = &script_obj->object();
+    return smart_cast<TClass*>(obj);
+}
+
 class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject>& instance)
 {
     instance
@@ -410,43 +427,45 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("phantom_set_enemy", &CScriptGameObject::PhantomSetEnemy)
         // Actor
         .def("set_character_icon", &CScriptGameObject::SetCharacterIcon)
+        // Checking objects
+        .def("is_GameObject", &is<CGameObject>)
+        .def("is_Car", &is<CCar>)
+        .def("is_Heli", &is<CHelicopter>)
+        .def("is_HolderCustom", &is<CHolderCustom>)
+        .def("is_EntityAlive", &is<CEntityAlive>)
+        .def("is_InventoryItem", &is<CInventoryItem>)
+        .def("is_InventoryOwner", &is<CInventoryOwner>)
+        .def("is_Actor", &is<CActor>)
+        .def("is_Weapon", &is<CWeapon>)
+        //.def("is_Medkit", &is<CMedkit>)
+        //.def("is_EatableItem", &is<CEatableItem>)
+        //.def("is_Antirad", &is<CAntirad>)
+        .def("is_CustomOutfit", &is<CCustomOutfit>)
+        .def("is_Scope", &is<CScope>)
+        .def("is_Silencer", &is<CSilencer>)
+        .def("is_GrenadeLauncher", &is<CGrenadeLauncher>)
+        .def("is_WeaponMagazined", &is<CWeaponMagazined>)
+        .def("is_SpaceRestrictor", &is<CSpaceRestrictor>)
+        .def("is_Stalker", &is<CAI_Stalker>)
+        .def("is_CustomZone", &is<CCustomZone>)
+        .def("is_Monster", &is<CCustomMonster>)
+        .def("is_Explosive", &is<CExplosive>)
+        .def("is_ScriptZone", &is<CScriptZone>)
+        //.def("is_Projector", &is<CProjector>)
+        .def("is_Trader", &is<CAI_Trader>)
+        //.def("is_HudItem", &is<CHudItem>)
+        //.def("is_FoodItem", &is<CFoodItem>)
+        .def("is_Artefact", &is<CArtefact>)
+        .def("is_Ammo", &is<CWeaponAmmo>)
+        //.def("is_Missile", &is<CMissile>)
+        .def("is_PhysicsShellHolder", &is<CPhysicsShellHolder>)
+        //.def("is_Grenade", &is<CGrenade>)
+        //.def("is_BottleItem", &is<CBottleItem>)
+        //.def("is_Torch", &is<CTorch>)
+        .def("is_WeaponMagazinedWGrenade", &is<CWeaponMagazinedWGrenade>)
+        .def("is_InventoryBox", &is<CInventoryBox>)
         //casting
-        .def("cast_GameObject", &CScriptGameObject::cast_GameObject)
-        .def("cast_Car", &CScriptGameObject::cast_Car)
-        .def("cast_Heli", &CScriptGameObject::cast_Heli)
-        .def("cast_HolderCustom", &CScriptGameObject::cast_HolderCustom)
-        .def("cast_EntityAlive", &CScriptGameObject::cast_EntityAlive)
-        .def("cast_InventoryItem", &CScriptGameObject::cast_InventoryItem)
-        .def("cast_InventoryOwner", &CScriptGameObject::cast_InventoryOwner)
-        .def("cast_Actor", &CScriptGameObject::cast_Actor)
-        .def("cast_Weapon", &CScriptGameObject::cast_Weapon)
-        .def("cast_Medkit", &CScriptGameObject::cast_Medkit)
-        .def("cast_EatableItem", &CScriptGameObject::cast_EatableItem)
-        .def("cast_Antirad", &CScriptGameObject::cast_Antirad)
-        .def("cast_CustomOutfit", &CScriptGameObject::cast_CustomOutfit)
-        .def("cast_Scope", &CScriptGameObject::cast_Scope)
-        .def("cast_Silencer", &CScriptGameObject::cast_Silencer)
-        .def("cast_GrenadeLauncher", &CScriptGameObject::cast_GrenadeLauncher)
-        .def("cast_WeaponMagazined", &CScriptGameObject::cast_WeaponMagazined)
-        .def("cast_SpaceRestrictor", &CScriptGameObject::cast_SpaceRestrictor)
-        .def("cast_Stalker", &CScriptGameObject::cast_Stalker)
-        .def("cast_CustomZone", &CScriptGameObject::cast_CustomZone)
-        .def("cast_Monster", &CScriptGameObject::cast_Monster)
-        .def("cast_Explosive", &CScriptGameObject::cast_Explosive)
-        .def("cast_ScriptZone", &CScriptGameObject::cast_ScriptZone)
-        //.def("cast_Projector", &CScriptGameObject::cast_Projector)
-        .def("cast_Trader", &CScriptGameObject::cast_Trader)
-        .def("cast_HudItem", &CScriptGameObject::cast_HudItem)
-        .def("cast_FoodItem", &CScriptGameObject::cast_FoodItem)
-        .def("cast_Artefact", &CScriptGameObject::cast_Artefact)
-        .def("cast_Ammo", &CScriptGameObject::cast_Ammo)
-        //.def("cast_Missile", &CScriptGameObject::cast_Missile)
-        .def("cast_PhysicsShellHolder", &CScriptGameObject::cast_PhysicsShellHolder)
-        //.def("cast_Grenade", &CScriptGameObject::cast_Grenade)
-        .def("cast_BottleItem", &CScriptGameObject::cast_BottleItem)
-        .def("cast_Torch", &CScriptGameObject::cast_Torch)
-        .def("cast_WeaponMagazinedWGrenade", &CScriptGameObject::cast_WeaponMagazinedWGrenade)
-        .def("cast_InventoryBox", &CScriptGameObject::cast_InventoryBox)
+        .def("cast_GameObject", &objectCast<CGameObject>)
 
         .def("is_on_belt", &CScriptGameObject::IsOnBelt)
         .def("item_on_belt", &CScriptGameObject::ItemOnBelt)

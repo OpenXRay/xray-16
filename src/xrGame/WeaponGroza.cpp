@@ -6,5 +6,5 @@ CWeaponGroza::CWeaponGroza() : CWeaponMagazinedWGrenade(SOUND_TYPE_WEAPON_SUBMAC
 CWeaponGroza::~CWeaponGroza() {}
 using namespace luabind;
 
-SCRIPT_EXPORT(CWeaponGroza, (CGameObject),
-    { module(luaState)[class_<CWeaponGroza, CGameObject>("CWeaponGroza").def(constructor<>())]; });
+SCRIPT_EXPORT(CWeaponGroza, (CWeaponMagazinedWGrenade),
+    { module(luaState)[class_<CWeaponGroza, CWeaponMagazinedWGrenade>("CWeaponGroza").def(constructor<>())]; });

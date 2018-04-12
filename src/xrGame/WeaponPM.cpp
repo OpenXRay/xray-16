@@ -7,4 +7,4 @@ CWeaponPM::~CWeaponPM() {}
 using namespace luabind;
 
 SCRIPT_EXPORT(
-    CWeaponPM, (CGameObject), { module(luaState)[class_<CWeaponPM, CGameObject>("CWeaponPM").def(constructor<>())]; });
+    CWeaponPM, (CWeaponMagazined), { module(luaState)[class_<CWeaponPM, CWeaponMagazined>("CWeaponPM").def(constructor<>())]; });

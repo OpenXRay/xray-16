@@ -816,43 +816,6 @@ public:
     bool is_weapon_going_to_be_strapped(CScriptGameObject const* object) const;
     
 #ifdef GAME_OBJECT_EXTENDED_EXPORTS
-    _DECLARE_FUNCTION14(cast_GameObject, CScriptGameObject);
-    _DECLARE_FUNCTION14(cast_Car, CCar);
-    _DECLARE_FUNCTION14(cast_Heli, CHelicopter);
-    _DECLARE_FUNCTION14(cast_HolderCustom, CHolderCustom);
-    _DECLARE_FUNCTION14(cast_EntityAlive, CEntityAlive);
-    _DECLARE_FUNCTION14(cast_InventoryItem, CInventoryItem);
-    _DECLARE_FUNCTION14(cast_InventoryOwner, CInventoryOwner);
-    _DECLARE_FUNCTION14(cast_Actor, CActor);
-    _DECLARE_FUNCTION14(cast_Weapon, CWeapon);
-    _DECLARE_FUNCTION14(cast_Medkit, CMedkit);
-    _DECLARE_FUNCTION14(cast_EatableItem, CEatableItem);
-    _DECLARE_FUNCTION14(cast_Antirad, CAntirad);
-    _DECLARE_FUNCTION14(cast_CustomOutfit, CCustomOutfit);
-    _DECLARE_FUNCTION14(cast_Scope, CScope);
-    _DECLARE_FUNCTION14(cast_Silencer, CSilencer);
-    _DECLARE_FUNCTION14(cast_GrenadeLauncher, CGrenadeLauncher);
-    _DECLARE_FUNCTION14(cast_WeaponMagazined, CWeaponMagazined);
-    _DECLARE_FUNCTION14(cast_SpaceRestrictor, CSpaceRestrictor);
-    _DECLARE_FUNCTION14(cast_Stalker, CAI_Stalker);
-    _DECLARE_FUNCTION14(cast_CustomZone, CCustomZone);
-    _DECLARE_FUNCTION14(cast_Monster, CCustomMonster);
-    _DECLARE_FUNCTION14(cast_Explosive, CExplosive);
-    _DECLARE_FUNCTION14(cast_ScriptZone, CScriptZone);
-    //_DECLARE_FUNCTION14(cast_Projector, CProjector);
-    _DECLARE_FUNCTION14(cast_Trader, CAI_Trader);
-    _DECLARE_FUNCTION14(cast_HudItem, CHudItem);
-    _DECLARE_FUNCTION14(cast_FoodItem, CFoodItem);
-    _DECLARE_FUNCTION14(cast_Artefact, CArtefact);
-    _DECLARE_FUNCTION14(cast_Ammo, CWeaponAmmo);
-    //_DECLARE_FUNCTION14(cast_Missile, CMissile);
-    _DECLARE_FUNCTION14(cast_PhysicsShellHolder, CPhysicsShellHolder);
-    //_DECLARE_FUNCTION14(cast_Grenade, CGrenade);
-    _DECLARE_FUNCTION14(cast_BottleItem, CBottleItem);
-    _DECLARE_FUNCTION14(cast_Torch, CTorch);
-    _DECLARE_FUNCTION14(cast_WeaponMagazinedWGrenade, CWeaponMagazinedWGrenade);
-    _DECLARE_FUNCTION14(cast_InventoryBox, CInventoryBox);
-
     u32 get_dest_level_vertex_id();
     u32 get_dest_game_vertex_id();
     void inactualize_level_path();

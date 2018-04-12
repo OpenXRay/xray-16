@@ -9,9 +9,6 @@ CWeaponAK74::CWeaponAK74(ESoundTypes eSoundType) : CWeaponMagazinedWGrenade(eSou
 CWeaponAK74::~CWeaponAK74() {}
 using namespace luabind;
 
-SCRIPT_EXPORT(CWeaponAK74, (CGameObject),
-    { module(luaState)[class_<CWeaponAK74, CGameObject>("CWeaponAK74").def(constructor<>())]; });
-
 SCRIPT_EXPORT(CWeapon, (CGameObject),
 {
     module(luaState)
@@ -22,8 +19,11 @@ SCRIPT_EXPORT(CWeapon, (CGameObject),
     ];
 });
 
-SCRIPT_EXPORT(CWeaponMagazined, (CGameObject),
-    { module(luaState)[class_<CWeaponMagazined, CGameObject>("CWeaponMagazined").def(constructor<>())]; });
+SCRIPT_EXPORT(CWeaponMagazined, (CWeapon),
+    { module(luaState)[class_<CWeaponMagazined, CWeapon>("CWeaponMagazined").def(constructor<>())]; });
 
-SCRIPT_EXPORT(CWeaponMagazinedWGrenade, (CGameObject),
-    { module(luaState)[class_<CWeaponMagazinedWGrenade, CGameObject>("CWeaponMagazinedWGrenade").def(constructor<>())]; });
+SCRIPT_EXPORT(CWeaponMagazinedWGrenade, (CWeaponMagazined),
+    { module(luaState)[class_<CWeaponMagazinedWGrenade, CWeaponMagazined>("CWeaponMagazinedWGrenade").def(constructor<>())]; });
+
+SCRIPT_EXPORT(CWeaponAK74, (CWeaponMagazinedWGrenade),
+    { module(luaState)[class_<CWeaponAK74, CWeaponMagazinedWGrenade>("CWeaponAK74").def(constructor<>())]; });

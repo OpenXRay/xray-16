@@ -6,4 +6,5 @@ CRGD5::CRGD5(void) {}
 CRGD5::~CRGD5(void) {}
 using namespace luabind;
 
-SCRIPT_EXPORT(CRGD5, (CGameObject), { module(luaState)[class_<CRGD5, CGameObject>("CRGD5").def(constructor<>())]; });
+SCRIPT_EXPORT(CRGD5, (CGameObject, CExplosive),
+    { module(luaState)[class_<CRGD5, bases<CGameObject, CExplosive>>("CRGD5").def(constructor<>())]; });
