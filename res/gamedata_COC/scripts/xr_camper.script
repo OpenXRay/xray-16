@@ -175,7 +175,7 @@ function action_patrol:execute()
 				--printf("result=%s",result.object and result.object:name())
 				if (result.object and result.object:id() ~= npc:id()) then 
 					-- tries avoid friendly fire
-					if (IsStalker(result.object) == false or result.object:cast_Stalker() == nil or npc:relation(result.object) == game_object.enemy) then
+					if (IsStalker(result.object) == false or result.object:is_Stalker() == false or npc:relation(result.object) == game_object.enemy) then
 						npc:set_item(object.fire1,bw,3,math.random(0,2000))
 						return
 					end

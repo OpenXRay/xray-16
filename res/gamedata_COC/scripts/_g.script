@@ -189,7 +189,7 @@ function SetSwitchDistance(dist)
 		local p = net_packet()
 		p:w_begin(18)
 		p:w_float(dist or 2.0)
-		level.send(p,true,true)
+		level.send(p,true,true,false,false)
 	end
 end
 
@@ -212,7 +212,7 @@ function ChangeLevel(pos,lvid,gvid,angle)
 	p:w_u32(lvid)
 	p:w_vec3(pos)
 	p:w_vec3(angle)
-	level.send(p,true)
+	level.send(p,true,true,false,false)
 end
 
 -- Wrapper for level.add_call 
@@ -1609,22 +1609,22 @@ if (USE_INI_MEMOIZE) then
 		end
 		
 		if (ini_cache[ini]) then
-			local key = s .. "&" .. k
+			local key = s .. "&" .. tostring(k)
 			if (ini_cache[ini][key]) then
 				return unpack(ini_cache[ini][key])
 			end
 		end
 		
-		local a,b,c = ini:r_line(s,k,"","")
+		local result,section,value = ini:r_line(s,k,"","")
 		
 		if (ini_cache[ini]) then
-			local key = s.."&"..k
+			local key = s.."&"..tostring(k)
 			if (ini_cache[ini][key]) then
-				ini_cache[ini][key] = {a,b,c}
+				ini_cache[ini][key] = {result,section,value}
 			end
 		end
 		
-		return a,b,c
+		return result,section,value
 	end
 else
 	function ini_file.r_string_ex(ini,s,k,def)

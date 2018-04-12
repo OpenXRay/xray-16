@@ -43,9 +43,17 @@ function update_best_weapon(npc,cur_wpn)
 	--alun_utils.debug_nearest(npc,"cur_wpn=%s",cur_wpn:name())
 	-- we want to choose new best_weapon every n seconds unless we don't have one
 	local tg = time_global()
-	if (st._choose_bw_timer and tg < st._choose_bw_timer and cur_wpn and npc:active_item() and npc:active_item():id() == cur_wpn:id()) then
-		if (cur_wpn:cast_Weapon():can_kill() == false) then
-			--printf("not can kill!")
+	if (st._choose_bw_timer and tg < st._choose_bw_timer and cur_wpn and cur_wpn:is_Weapon() and npc:active_item() and npc:active_item():id() == cur_wpn:id()) then
+		local wpn_cast = cur_wpn:cast_GameObject() -- cast_Weapon()
+		--local classInfo = class_info(wpn_go)
+		--printf("wpn_cast name = %s", classInfo.name)
+		
+		--for k, v in pairs(classInfo.methods) do
+		--	printf("name = %s, func = %s", k, v)
+		--end
+		---
+		if (wpn_cast:can_kill() == false) then
+			printf("not can kill!")
 			local ammos = system_ini():r_list(cur_wpn:section(),"ammo_class")
 			if (ammos[1]) then 
 				alife():create(ammos[1],npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id())
@@ -404,4 +412,11 @@ function CSE_ALifeObject_spawn_supplies(se_obj,id,ini_string)
 		end
 	end
 	return true
+end
+
+function evaluate_cover_point(obj, point)
+	if point then
+		return true
+	end
+	return false
 end

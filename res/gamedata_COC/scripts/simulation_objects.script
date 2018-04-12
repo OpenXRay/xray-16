@@ -114,7 +114,7 @@ function get_props(se_obj)
 	
 	local n = props_ini:line_count(props_section)
 	for j=0,n-1 do
-		local result, prop_name, prop_condlist = props_ini:r_line_ex(props_section,j,"","")
+		local result, prop_name, prop_condlist = props_ini:r_line_ex(props_section,j)
 		if prop_name == "sim_avail" then
 			se_obj.sim_avail = xr_logic.parse_condlist(nil, "simulation_object", "sim_avail", prop_condlist)
 		else

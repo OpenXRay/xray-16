@@ -802,7 +802,7 @@ function actor_inside_zone_hud_show(hud)
 		-- local itr = function(id)
 			-- local st = id and db.storage[id]
 			-- local o = st and st.object 
-			-- if (o and o:cast_SpaceRestrictor()) then
+			-- if (o and o:is_SpaceRestrictor()) then
 				-- hud:add_msg(o:name(),strformat("ID=%s Section=%s",id,st.active_section))
 			-- end
 		-- end
@@ -1052,7 +1052,7 @@ end
 function actor_condition_hud_show(hud)
 	hud:set_header("-[Actor Condition]-")
 	
-	local actor_condition = db.actor:cast_Actor():conditions()
+	local actor_condition = db.actor:cast_GameObject():conditions()
 	local properties = {
 		"m_fAccelK",
 		"m_fJumpPower",
@@ -1100,8 +1100,8 @@ function stalker_condition_hud_show(hud)
 	hud:set_header("-[Stalker Condition]-")
 	
 	local near = get_debug_npc()
-	if (near and near:alive()) then
-		local entity_condition = near:cast_Stalker():conditions()
+	if (near and near:is_Stalker() and near:alive()) then
+		local entity_condition = near:cast_GameObject():conditions()
 		local functors = {
 			"BleedingSpeed",
 			"GetEntityMorale",
@@ -1945,7 +1945,7 @@ axr_keybind.bind("DIK_NUMPADENTER",function(p)
 			local veh = db.actor:get_attached_vehicle()
 			if not (veh) then
 				db.actor:attach_vehicle(heli)
-			elseif (veh:cast_Heli()) then 
+			elseif (veh:is_Heli()) then 
 				db.actor:detach_vehicle()
 			else 
 				db.actor:detach_vehicle()
