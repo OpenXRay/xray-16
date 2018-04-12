@@ -108,6 +108,34 @@
         if (!ignoreAlways && err != GL_NO_ERROR)\
             xrDebug::Fail(ignoreAlways, DEBUG_INFO, #expr, (long)err);\
     } while (false)
+#elif defined(NON_FATAL_VERIFY)
+#define NODEFAULT XR_ASSUME(0)
+#define VERIFY(expr)\
+    do\
+    {\
+        if (!(expr))\
+            xrDebug::SoftFail(DEBUG_INFO, #expr);\
+    } while (false)
+#define VERIFY2(expr, desc)\
+    do\
+    {\
+        if (!(expr))\
+            xrDebug::SoftFail(DEBUG_INFO, #expr, desc);\
+    } while (false)
+#define VERIFY3(expr, desc, arg1)\
+    do\
+    {\
+        if (!(expr))\
+            xrDebug::SoftFail(DEBUG_INFO, #expr, desc, arg1);\
+    } while (false)
+#define VERIFY4(expr, desc, arg1, arg2)\
+    do\
+    {\
+        if (!(expr))\
+            xrDebug::SoftFail(DEBUG_INFO, #expr, desc, arg1, arg2);\
+    } while (false)
+#define CHK_DX(expr) expr
+#define CHK_GL(expr) expr
 #else // DEBUG
 #ifdef __BORLANDC__
 #define NODEFAULT

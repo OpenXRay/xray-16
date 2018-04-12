@@ -420,6 +420,40 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
     Fail(ignoreAlways, loc, expr, desc.c_str(), arg1, arg2);
 }
 
+// AVO
+void xrDebug::SoftFail(const ErrorLocation& loc, const char* expr, const char* desc, const char* arg1, const char* arg2)
+{
+    if (desc == nullptr)
+    {
+        Msg("! VERIFY_FAILED: %s[%d] {%s}  %s", loc.File, loc.Line, loc.Function, expr);
+        return;
+    }
+
+    std::string buffer = desc;
+    if (arg1 != nullptr)
+    {
+        buffer = buffer + std::string(" ") + arg1;
+        if (arg2 != nullptr)
+            buffer = buffer + std::string(" ") + arg2;
+    }
+
+    Msg("! VERIFY_FAILED: %s[%d] {%s}  %s %s", loc.File, loc.Line, loc.Function, expr, buffer.c_str());
+}
+
+void xrDebug::SoftFail(const ErrorLocation& loc, const char* expr, const std::string& desc, const char* arg1, const char* arg2)
+{
+    std::string buffer = desc;
+    if (arg1 != nullptr)
+    {
+        buffer = buffer + std::string(" ") + arg1;
+        if (arg2 != nullptr)
+            buffer = buffer + std::string(" ") + arg2;
+    }
+
+    Msg("! VERIFY_FAILED: %s[%d] {%s}  %s %s", loc.File, loc.Line, loc.Function, expr, buffer.c_str());
+}
+//-AVO
+
 void xrDebug::DoExit(const std::string& message)
 {
     FlushLog();

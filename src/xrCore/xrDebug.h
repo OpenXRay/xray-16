@@ -74,6 +74,11 @@ public:
                      const char* arg1 = nullptr, const char* arg2 = nullptr);
     static void DoExit(const std::string& message);
 
+    static void SoftFail(const ErrorLocation& loc, const char* expr, const char* desc = nullptr,
+                         const char* arg1 = nullptr, const char* arg2 = nullptr);
+    static void SoftFail(const ErrorLocation& loc, const char* expr, const std::string& desc, const char* arg1 = nullptr,
+                         const char* arg2 = nullptr);
+
     static void LogStackTrace(const char* header);
     static xr_vector<xr_string> BuildStackTrace(u16 maxFramesCount = 512);
 private:
