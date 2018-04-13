@@ -16,7 +16,9 @@ ScheduledBase::ScheduledBase()
 extern BOOL g_bSheduleInProgress;
 ScheduledBase::~ScheduledBase()
 {
+#ifdef DEBUG
     VERIFY2(!Engine.Sheduler.Registered(this), make_string("0x%08x : %s", this, *shedule_Name()));
+#endif
 
 // sad, but true
 // we need this to become MASTER_GOLD

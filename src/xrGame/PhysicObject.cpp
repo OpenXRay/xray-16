@@ -198,10 +198,12 @@ void CPhysicObject::RunStartupAnim(CSE_Abstract* D)
             R_ASSERT(visual);
             R_ASSERT2(*visual->startup_animation, "no startup animation");
 
+#ifdef DEBUG
             VERIFY2((!!PKinematicsAnimated->LL_MotionID(visual->startup_animation.c_str()).valid()),
                 (make_string(" animation %s not faund ", visual->startup_animation.c_str()) +
                     dbg_object_base_dump_string(this))
                     .c_str());
+#endif
             m_anim_blend = m_anim_script_callback.play_cycle(PKinematicsAnimated, visual->startup_animation);
         }
         smart_cast<IKinematics*>(Visual())->CalculateBones_Invalidate();

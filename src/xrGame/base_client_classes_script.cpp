@@ -61,6 +61,21 @@ SCRIPT_EXPORT(CGameObject, (IFactoryObject, ISheduled, ICollidable, IRenderable)
     ];
 });
 
+SCRIPT_EXPORT(CEntity, (CGameObject), {
+    module(luaState)
+    [
+        class_<CEntity, CGameObject>("CEntity")
+    ];
+});
+
+SCRIPT_EXPORT(CEntityAlive, (CEntity), {
+    module(luaState)
+    [
+        class_<CEntityAlive, CEntity>("CEntityAlive")
+        .def("condition", &CEntityAlive::conditions)
+    ];
+});
+
 SCRIPT_EXPORT(IRenderVisual, (), {
     module(luaState)
     [

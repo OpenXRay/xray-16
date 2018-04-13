@@ -261,7 +261,9 @@ bool CSheduler::Registered(ISheduled* object) const
 
 void CSheduler::Register(ISheduled* A, BOOL RT)
 {
+#ifdef DEBUG
     VERIFY(!Registered(A));
+#endif
 
     ItemReg R;
     R.OP = TRUE;
@@ -278,7 +280,9 @@ void CSheduler::Register(ISheduled* A, BOOL RT)
 
 void CSheduler::Unregister(ISheduled* A)
 {
+#ifdef DEBUG
     VERIFY(Registered(A));
+#endif
 
 #ifdef DEBUG_SCHEDULER
     Msg("SCHEDULER: unregister [%s][%x]", *A->shedule_Name(), A);

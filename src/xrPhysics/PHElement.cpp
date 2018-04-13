@@ -205,8 +205,10 @@ void CPHElement::Deactivate()
 
 void CPHElement::SetTransform(const Fmatrix& m0, motion_history_state history_state)
 {
+#ifdef DEBUG
     VERIFY2(_valid(m0), make_string("invalid_form_in_set_transform") + (PhysicsRefObject()->dump(full_capped)));
     VERIFY2(valid_pos(m0.c), dbg_valide_pos_string(m0.c, PhysicsRefObject(), "invalid_form_in_set_transform"));
+#endif
     Fvector mc;
     CPHGeometryOwner::get_mc_vs_transform(mc, m0);
     VERIFY_BOUNDARIES2(mc, phBoundaries, PhysicsRefObject(), "mass	center	in set transform");

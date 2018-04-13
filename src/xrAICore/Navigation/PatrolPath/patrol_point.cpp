@@ -134,10 +134,14 @@ const GameGraph::_GRAPH_ID& CPatrolPoint::game_vertex_id() const
     const CGameGraph& gameGraph = GEnv.AISpace->game_graph();
     const CLevelGraph& levelGraph = GEnv.AISpace->level_graph();
     const CGameGraph::CVertex* vertex = gameGraph.vertex(m_game_vertex_id);
+
+#ifdef DEBUG
     VERIFY2(vertex,
         make_string(
             "invalid game vertex id[%d] (level_vertex_id[%d]) for patrol point[%s] in path[%s] in position[%f][%f][%f]",
             m_game_vertex_id, m_level_vertex_id, m_name.c_str(), m_path->m_name.c_str(), VPUSH(m_position)));
+#endif
+
     if (vertex->level_id() == levelGraph.level_id())
         return game_vertex_id(&levelGraph, &gameGraph.cross_table(), &gameGraph);
     return m_game_vertex_id;

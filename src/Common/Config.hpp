@@ -49,7 +49,7 @@
 #   define COC_DISABLE_ANOMALY_AND_ITEMS_PLANNER // need editing xr_* scripts!
 #   define COC_SPRINT_FIX
 #   define COC_DEBUG_BEHAVIOUR // Enables CoC debug behaviour when the game crashes
-#   define NON_FATAL_VERIFY
+//#   define NON_FATAL_VERIFY
 #endif
 
 /* LAYERED_SND_SHOOT by Alundaio

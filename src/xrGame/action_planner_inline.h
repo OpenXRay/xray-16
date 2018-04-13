@@ -142,16 +142,20 @@ IC bool CPlanner::initialized() const { return m_initialized; }
 TEMPLATE_SPECIALIZATION
 IC void CPlanner::add_condition(_world_operator* action, _condition_type condition_id, _value_type condition_value)
 {
+#ifdef DEBUG
     VERIFY2(!m_solving, make_string("do not change preconditions during planner update, object %s, id[%d]",
                             object_name(), condition_id));
+#endif
     action->add_condition(CWorldProperty(condition_id, condition_value));
 }
 
 TEMPLATE_SPECIALIZATION
 IC void CPlanner::add_effect(_world_operator* action, _condition_type condition_id, _value_type condition_value)
 {
+#ifdef DEBUG
     VERIFY2(!m_solving,
         make_string("do not change effects during planner update, object %s, id[%d]", object_name(), condition_id));
+#endif
     action->add_effect(CWorldProperty(condition_id, condition_value));
 }
 
@@ -171,8 +175,10 @@ LPCSTR CPlanner::object_name() const { return (*m_object->cName()); }
 TEMPLATE_SPECIALIZATION
 IC void CPlanner::add_operator(const _edge_type& operator_id, _operator_ptr _operator)
 {
+#ifdef DEBUG
     VERIFY2(!m_solving,
         make_string("do not add operators during planner update, object %s, id[%d]", object_name(), operator_id));
+#endif
     inherited::add_operator(operator_id, _operator);
     _operator->setup(m_object, &m_storage);
 #ifdef LOG_ACTION
@@ -183,16 +189,20 @@ IC void CPlanner::add_operator(const _edge_type& operator_id, _operator_ptr _ope
 TEMPLATE_SPECIALIZATION
 IC void CPlanner::remove_operator(const _edge_type& operator_id)
 {
+#ifdef DEBUG
     VERIFY2(!m_solving,
         make_string("do not remove operators during planner update, object %s, id[%d]", object_name(), operator_id));
+#endif
     inherited::remove_operator(operator_id);
 }
 
 TEMPLATE_SPECIALIZATION
 IC void CPlanner::add_evaluator(const _condition_type& condition_id, _condition_evaluator_ptr evaluator)
 {
+#ifdef DEBUG
     VERIFY2(!m_solving,
         make_string("do not add evaluators during planner update, object %s, id[%d]", object_name(), condition_id));
+#endif
     inherited::add_evaluator(condition_id, evaluator);
     evaluator->setup(m_object, &m_storage);
 }
@@ -200,8 +210,10 @@ IC void CPlanner::add_evaluator(const _condition_type& condition_id, _condition_
 TEMPLATE_SPECIALIZATION
 IC void CPlanner::remove_evaluator(const _condition_type& condition_id)
 {
+#ifdef DEBUG
     VERIFY2(!m_solving,
         make_string("do not remove evaluators during planner update, object %s, id[%d]", object_name(), condition_id));
+#endif
     inherited::remove_evaluator(condition_id);
 }
 

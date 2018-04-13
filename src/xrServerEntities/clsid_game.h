@@ -200,7 +200,7 @@
 // Equipment
 #define CLSID_EQUIPMENT_STALKER MK_CLSID('E', 'Q', 'U', '_', 'S', 'T', 'L', 'K')
 #define CLSID_EQUIPMENT_HELMET MK_CLSID('E', 'Q', '_', 'H', 'L', 'M', 'E', 'T')
-#define CLSID_EQUIPMENT_BACKPACK MK_CLSID('E','Q','_','B','A','K','P','K')
+#define CLSID_EQUIPMENT_BACKPACK MK_CLSID('E', 'Q', '_', 'B', 'A', 'K', 'P', 'K')
 
 // Game types
 #define CLSID_SV_GAME_SINGLE MK_CLSID('S', 'V', '_', 'S', 'I', 'N', 'G', 'L')

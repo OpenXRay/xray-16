@@ -160,7 +160,9 @@ void CPoltergeist::StrangeSounds(const Fvector& position)
                 if (!mtl_pair->CollideSounds.empty())
                 {
                     // CLONE_MTL_SOUND(m_strange_sound, mtl_pair, CollideSounds);
+#ifdef DEBUG
                     VERIFY2(!mtl_pair->CollideSounds.empty(), mtl_pair->dbg_Name());
+#endif
                     ref_sound& randSound = mtl_pair->CollideSounds[Random.randI(mtl_pair->CollideSounds.size())];
                     m_strange_sound.clone(randSound, st_Effect, sg_SourceType);
                     Fvector pos;

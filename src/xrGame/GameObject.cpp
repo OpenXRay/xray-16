@@ -1035,8 +1035,10 @@ void CGameObject::setDestroy(BOOL _destroy)
         Msg("cl setDestroy [%d][%d]", ID(), Device.dwFrame);
 #endif //#ifdef MP_LOGGING
     }
+#ifdef DEBUG
     else
         VERIFY(!g_pGameLevel->Objects.registered_object_to_destroy(this));
+#endif
 }
 
 Fvector CGameObject::get_new_local_point_on_mesh(u16& bone_id) const
@@ -1313,6 +1315,7 @@ void CGameObject::create_anim_mov_ctrl(CBlend* b, Fmatrix* start_pose, bool loca
         if (m_anim_mov_ctrl)
             destroy_anim_mov_ctrl();
 
+#ifdef DEBUG
         VERIFY2(start_pose, make_string("start pose hasn't been specified for animation [%s][%s]",
                                 smart_cast<IKinematicsAnimated&>(*Visual()).LL_MotionDefName_dbg(b->motionID).first,
                                 smart_cast<IKinematicsAnimated&>(*Visual()).LL_MotionDefName_dbg(b->motionID).second));
@@ -1321,6 +1324,7 @@ void CGameObject::create_anim_mov_ctrl(CBlend* b, Fmatrix* start_pose, bool loca
             make_string("start pose hasn't been specified for animation [%s][%s]",
                 smart_cast<IKinematicsAnimated&>(*Visual()).LL_MotionDefName_dbg(b->motionID).first,
                 smart_cast<IKinematicsAnimated&>(*Visual()).LL_MotionDefName_dbg(b->motionID).second));
+#endif
 
         VERIFY(Visual());
         IKinematics* K = Visual()->dcast_PKinematics();

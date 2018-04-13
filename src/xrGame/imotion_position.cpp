@@ -146,8 +146,10 @@ void imotion_position::state_start()
 
     blend = get_blend.blend;
 
+#ifdef DEBUG
     VERIFY2(B.stop_at_end,
         make_string("can not use cyclic anim in death animth motion: %s", KA->LL_MotionDefName_dbg(B.motionID).first));
+#endif
     time_to_end = B.timeTotal - (SAMPLE_SPF + EPS) - B.timeCurrent;
     time_to_end /= B.speed;
     shell->add_ObjectContactCallback(get_depth);
