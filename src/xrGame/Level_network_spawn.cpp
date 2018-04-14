@@ -84,12 +84,6 @@ extern float debug_on_frame_gather_stats_frequency;
 
 void CLevel::g_sv_Spawn(CSE_Abstract* E)
 {
-//	CTimer		T(false);
-
-#ifdef DEBUG
-//	Msg					("* CLIENT: Spawn: %s, ID=%d", *E->s_name, E->ID);
-#endif
-
     // Optimization for single-player only	- minimize traffic between client and server
     if (GameID() == eGameIDSingle)
         psNET_Flags.set(NETFLAG_MINIMIZEUPDATES, TRUE);
@@ -97,87 +91,67 @@ void CLevel::g_sv_Spawn(CSE_Abstract* E)
         psNET_Flags.set(NETFLAG_MINIMIZEUPDATES, FALSE);
 
     // Client spawn
-    //	T.Start		();
     IGameObject* O = Objects.Create(*E->s_name);
-// Msg				("--spawn--CREATE: %f ms",1000.f*T.GetAsync());
-
-//	T.Start		();
-    if (O == 0)
+    if (!O)
     {
         Msg("! Failed to spawn entity '%s'", *E->s_name);
+        return;
     }
-    else if (!O->net_Spawn(E))
+
+    //Alundaio: Knowing last object to spawn can be very useful to debugging
+    if (Core.ParamFlags.test(Core.dbgdev))
+        Msg("Try Spawning object Name:[%s] Section:[%s] ID:[%d] ParentID:[%d]", E->name_replace(), *E->s_name, E->ID, E->ID_Parent);
+
+    if (!O->net_Spawn(E))
     {
         O->net_Destroy();
         if (!GEnv.isDedicatedServer)
             client_spawn_manager().clear(O->ID());
         Objects.Destroy(O);
         Msg("! Failed to spawn entity '%s'", *E->s_name);
+        return;
     }
-    else
-    {
-        if (!GEnv.isDedicatedServer)
-            client_spawn_manager().callback(O);
-        // Msg			("--spawn--SPAWN: %f ms",1000.f*T.GetAsync());
 
-        if ((E->s_flags.is(M_SPAWN_OBJECT_LOCAL)) && (E->s_flags.is(M_SPAWN_OBJECT_ASPLAYER)))
+    if (!GEnv.isDedicatedServer)
+        client_spawn_manager().callback(O);
+
+    if ((E->s_flags.is(M_SPAWN_OBJECT_LOCAL)) && (E->s_flags.is(M_SPAWN_OBJECT_ASPLAYER)))
+    {
+        if (IsDemoPlayStarted())
         {
-            if (IsDemoPlayStarted())
+            if (E->s_flags.is(M_SPAWN_OBJECT_PHANTOM))
             {
-                if (E->s_flags.is(M_SPAWN_OBJECT_PHANTOM))
-                {
-                    SetControlEntity(O);
-                    SetEntity(O); // do not switch !!!
-                    SetDemoSpectator(O);
-                }
-            }
-            else
-            {
-                if (CurrentEntity() != NULL)
-                {
-                    CGameObject* pGO = smart_cast<CGameObject*>(CurrentEntity());
-                    if (pGO)
-                        pGO->On_B_NotCurrentEntity();
-                }
                 SetControlEntity(O);
                 SetEntity(O); // do not switch !!!
+                SetDemoSpectator(O);
             }
         }
-
-        if (0xffff != E->ID_Parent)
+        else
         {
-            /*
-            // Generate ownership-event
-            NET_Packet			GEN;
-            GEN.w_begin			(M_EVENT);
-            GEN.w_u32			(E->m_dwSpawnTime);//-NET_Latency);
-            GEN.w_u16			(GE_OWNERSHIP_TAKE);
-            GEN.w_u16			(E->ID_Parent);
-            GEN.w_u16			(u16(O->ID()));
-            game_events->insert	(GEN);
-            /*/
-            NET_Packet GEN;
-            GEN.write_start();
-            GEN.read_start();
-            GEN.w_u16(u16(O->ID()));
-            cl_Process_Event(E->ID_Parent, GE_OWNERSHIP_TAKE, GEN);
-            //*/
+            if (CurrentEntity() != NULL)
+            {
+                CGameObject* pGO = smart_cast<CGameObject*>(CurrentEntity());
+                if (pGO)
+                    pGO->On_B_NotCurrentEntity();
+            }
+            SetControlEntity(O);
+            SetEntity(O); // do not switch !!!
         }
     }
 
-    /*if (E->s_flags.is(M_SPAWN_UPDATE)) {
-		NET_Packet				temp;
-		temp.B.count			= 0;
-		E->UPDATE_Write			(temp);
-		if (temp.B.count > 0)
-		{
-			temp.r_seek				(0);
-			O->net_Import			(temp);
-		}
-		}*/ //:(
+    if (0xffff != E->ID_Parent)
+    {
+        NET_Packet GEN;
+        GEN.write_start();
+        GEN.read_start();
+        GEN.w_u16(u16(O->ID()));
+        cl_Process_Event(E->ID_Parent, GE_OWNERSHIP_TAKE, GEN);
+    }
 
-    //---------------------------------------------------------
     Game().OnSpawn(O);
+
+    if (Core.ParamFlags.test(Core.dbgdev))
+        Msg("[%d] net_Spawn successful", E->ID);
 }
 
 CSE_Abstract* CLevel::spawn_item(

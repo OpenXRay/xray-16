@@ -325,7 +325,7 @@ bool CUIActorMenu::OnItemFocusReceive(CUICellItem* itm)
     itm->m_selected = true;
     set_highlight_item(itm);
 
-    luabind::functor<bool> funct1;
+    luabind::functor<void> funct1;
     if (GEnv.ScriptEngine->functor("actor_menu_inventory.CUIActorMenu_OnItemFocusReceive", funct1))
     {
         PIItem _iitem = static_cast<PIItem>(itm->m_pData);
@@ -347,7 +347,7 @@ bool CUIActorMenu::OnItemFocusLost(CUICellItem* itm)
     InfoCurItem(NULL);
     clear_highlight_lists();
 
-    luabind::functor<bool> funct1;
+    luabind::functor<void> funct1;
     if (GEnv.ScriptEngine->functor("actor_menu_inventory.CUIActorMenu_OnItemFocusLost", funct1))
     {
         PIItem _iitem = static_cast<PIItem>(itm->m_pData);
