@@ -237,7 +237,7 @@ function slot_hud:Update()
 end
 
 class "ui_companion_hud_row" (CUIListBoxItem)
-function ui_companion_hud_row:__init(owner,xml) super(owner,xml)
+function ui_companion_hud_row:__init(owner,xml) super(114)
 	self:GetTextItem():SetText("")
 
 	local is_widescreen = utils.is_widescreen()
