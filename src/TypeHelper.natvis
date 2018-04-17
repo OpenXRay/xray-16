@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+  <Type Name="shared_str">
+    <DisplayString Condition="p_ == 0">""</DisplayString>
+    <DisplayString>{p_->value, s}</DisplayString>
+    <StringView>p_->value, s</StringView>
+  </Type>
+
+  <Type Name="CInifile::Item">
+    <DisplayString>Key: {first, s} Value: {second, sb}</DisplayString>
+  </Type>
+
+  <Type Name="CInifile::Sect">
+    <DisplayString>{Name}</DisplayString>
+    <Expand>
+      <ExpandedItem>Data</ExpandedItem>
+    </Expand>
+  </Type>
+
+  <Type Name="CInifile">
+    <DisplayString>Ini: flags: SaveAtEnd: {!!(m_flags.flags &amp; eSaveAtEnd)} ReadOnly: {!!(m_flags.flags &amp; eReadOnly)} OverrideNames: {!!(m_flags.flags &amp; eOverrideNames)}</DisplayString>
+    <Expand>
+      <ExpandedItem>DATA</ExpandedItem>
+    </Expand>
+  </Type>
+
+  <Type Name="resptr_base&lt;*&gt;">
+    <DisplayString Condition="p_ == 0">""</DisplayString>
+    <DisplayString>{p_->name}</DisplayString>
+  </Type>
+
+  <Type Name="resptr_base&lt;CTexture&gt;">
+    <DisplayString Condition="p_ == 0">""</DisplayString>
+    <DisplayString>{p_->name}</DisplayString>
+  </Type>
+
+</AutoVisualizer>

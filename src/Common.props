@@ -38,6 +38,13 @@
     <xrBuildCxA>Rx86</xrBuildCxA>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- I don't want to touch every vcxproj file and $(SolutionDir) is not working here. This is a workaround. -->
+    <Natvis Include="TypeHelper.natvis" Condition="exists('TypeHelper.natvis')"/>
+    <Natvis Include="..\TypeHelper.natvis" Condition="exists('..\TypeHelper.natvis')"/>
+    <Natvis Include="..\..\TypeHelper.natvis" Condition="exists('..\..\TypeHelper.natvis')"/>
+  </ItemGroup>
+
   <PropertyGroup Label="UserMacros">
     <xrBinRootDir>$(SolutionDir)..\bin\</xrBinRootDir>
     <xrLibRootDir>$(SolutionDir)..\lib\</xrLibRootDir>
