@@ -35,4 +35,9 @@
     <DisplayString>{p_->name}</DisplayString>
   </Type>
 
+  <Type Name="CSheduler::Item">
+    <DisplayString>{scheduled_name}</DisplayString>
+    <StringView>scheduled_name</StringView>
+  </Type>
+
 </AutoVisualizer>
