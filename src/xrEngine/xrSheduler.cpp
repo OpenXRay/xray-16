@@ -325,18 +325,18 @@ void CSheduler::ProcessStep()
         const u32 delta_ms = dwTime - Top().dwTimeForExecute;
 
         // Update
-        Item T = Top();
+        Item item = Top();
 #ifdef DEBUG_SCHEDULER
-        Msg("SCHEDULER: process step [%s][%x][false]", T.scheduled_name.c_str(), T.Object);
+        Msg("SCHEDULER: process step [%s][%x][false]", item.scheduled_name.c_str(), item.Object);
 #endif
-        u32 Elapsed = dwTime - T.dwTimeOfLastExecute;
+        u32 Elapsed = dwTime - item.dwTimeOfLastExecute;
 
-        const bool condition = nullptr == T.Object || !T.Object->shedule_Needed();
+        const bool condition = nullptr == item.Object || !item.Object->shedule_Needed();
         if (condition)
         {
 // Erase element
 #ifdef DEBUG_SCHEDULER
-            Msg("SCHEDULER: process unregister [%s][%x][%s]", T.scheduled_name.c_str(), T.Object, "false");
+            Msg("SCHEDULER: process unregister [%s][%x][%s]", item.scheduled_name.c_str(), item.Object, "false");
 #endif
             // if (T.Object)
             // Msg ("0x%08x UNREGISTERS because shedule_Needed() returned false",T.Object);
@@ -352,26 +352,26 @@ void CSheduler::ProcessStep()
 // Real update call
 // Msg ("------- %d:",Device.dwFrame);
 #ifdef DEBUG
-        T.Object->GetSchedulerData().dbg_startframe = Device.dwFrame;
+        item.Object->GetSchedulerData().dbg_startframe = Device.dwFrame;
         eTimer.Start();
 // LPCSTR _obj_name = T.Object->shedule_Name().c_str();
 #endif // DEBUG
 
         // Calc next update interval
-        const u32 dwMin = _max(u32(30), T.Object->GetSchedulerData().t_min);
-        u32 dwMax = (1000 + T.Object->GetSchedulerData().t_max) / 2;
-        const float scale = T.Object->shedule_Scale();
+        const u32 dwMin = _max(u32(30), item.Object->GetSchedulerData().t_min);
+        u32 dwMax = (1000 + item.Object->GetSchedulerData().t_max) / 2;
+        const float scale = item.Object->shedule_Scale();
         u32 dwUpdate = dwMin + iFloor(float(dwMax - dwMin) * scale);
         clamp(dwUpdate, u32(_max(dwMin, u32(20))), dwMax);
 
-        m_current_step_obj = T.Object;
+        m_current_step_obj = item.Object;
         // try {
-        T.Object->shedule_Update(
-            clampr(Elapsed, u32(1), u32(_max(u32(T.Object->GetSchedulerData().t_max), u32(1000)))));
+        item.Object->shedule_Update(
+            clampr(Elapsed, u32(1), u32(_max(u32(item.Object->GetSchedulerData().t_max), u32(1000)))));
         if (!m_current_step_obj)
         {
 #ifdef DEBUG_SCHEDULER
-            Msg("SCHEDULER: process unregister (self unregistering) [%s][%x][%s]", T.scheduled_name.c_str(), T.Object,
+            Msg("SCHEDULER: process unregister (self unregistering) [%s][%x][%s]", item.scheduled_name.c_str(), item.Object,
                 "false");
 #endif
             continue;
@@ -392,8 +392,8 @@ void CSheduler::ProcessStep()
         Item TNext;
         TNext.dwTimeForExecute = dwTime + dwUpdate;
         TNext.dwTimeOfLastExecute = dwTime;
-        TNext.Object = T.Object;
-        TNext.scheduled_name = T.Object->shedule_Name();
+        TNext.Object = item.Object;
+        TNext.scheduled_name = item.Object->shedule_Name();
         ItemsProcessed.push_back(TNext);
 
 #ifdef DEBUG
