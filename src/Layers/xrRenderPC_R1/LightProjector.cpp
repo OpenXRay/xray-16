@@ -214,7 +214,9 @@ void CLightProjector::calculate()
         Fmatrix mProject;
         float p_R = R.O->GetRenderData().visual->getVisData().sphere.R * 1.1f;
         // VERIFY2       (p_R>EPS_L,"Object has no physical size");
+#ifdef DEBUG
         VERIFY3(p_R > EPS_L, "Object has no physical size", R.O->GetRenderData().visual->getDebugName().c_str());
+#endif
         float p_hat = p_R / P_cam_dist;
         float p_asp = 1.f;
         float p_near = P_cam_dist - EPS_L;

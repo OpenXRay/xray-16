@@ -25,6 +25,14 @@
       <Configuration>Mixed</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_COC|Win32">
+      <Configuration>Release_COC</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_COC|x64">
+      <Configuration>Release_COC</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
@@ -46,7 +54,19 @@
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_COC|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v141</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_COC|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
@@ -199,7 +219,38 @@
       <TreatOutputAsContent>true</TreatOutputAsContent>
     </CustomBuildStep>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_COC|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(xrExternals)OpenAutomate\inc;$(xrExternals)libogg\include;$(xrExternals)libtheora\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ENGINE_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ResourceCompile />
+    <Link>
+      <AdditionalDependencies>vfw32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CustomBuildStep>
+      <Command>if not exist "$(OutDir)amd_ags_$(PlatformShortName).dll" copy /y "$(xrExternals)AGS_SDK\ags_lib\lib\amd_ags_$(PlatformShortName).dll" "$(OutDir)amd_ags_$(PlatformShortName).dll"</Command>
+      <Outputs>$(OutDir)amd_ags_$(PlatformShortName).dll;%(Outputs)</Outputs>
+      <Inputs>$(xrExternals)AGS_SDK\ags_lib\lib\amd_ags_$(PlatformShortName).dll;%(Inputs)</Inputs>
+      <TreatOutputAsContent>true</TreatOutputAsContent>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(xrExternals)OpenAutomate\inc;$(xrExternals)libogg\include;$(xrExternals)libtheora\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ENGINE_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>vfw32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CustomBuildStep>
+      <Command>if not exist "$(OutDir)amd_ags_$(PlatformShortName).dll" copy /y "$(xrExternals)AGS_SDK\ags_lib\lib\amd_ags_$(PlatformShortName).dll" "$(OutDir)amd_ags_$(PlatformShortName).dll"</Command>
+      <Outputs>$(OutDir)amd_ags_$(PlatformShortName).dll;%(Outputs)</Outputs>
+      <Inputs>$(xrExternals)AGS_SDK\ags_lib\lib\amd_ags_$(PlatformShortName).dll;%(Inputs)</Inputs>
+      <TreatOutputAsContent>true</TreatOutputAsContent>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_COC|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(xrExternals)OpenAutomate\inc;$(xrExternals)libogg\include;$(xrExternals)libtheora\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>ENGINE_BUILD;%(PreprocessorDefinitions)</PreprocessorDefinitions>

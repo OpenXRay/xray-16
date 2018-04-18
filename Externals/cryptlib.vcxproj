@@ -9,6 +9,14 @@
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_COC|Win32">
+      <Configuration>Release_COC</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release_COC|x64">
+      <Configuration>Release_COC</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
@@ -72,7 +80,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <!-- Release Configurations -->
-  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release' Or '$(Configuration)'=='DLL-Import Release'" Label="Release Configuration">
+  <ItemDefinitionGroup Condition="'$(Configuration)'=='Release' Or '$(Configuration)'=='DLL-Import Release' Or '$(Configuration)'=='Release_COC'" Label="Release Configuration">
     <ClCompile>
       <PreprocessorDefinitions>NDEBUG;USE_PRECOMPILED_HEADERS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <OmitFramePointers>true</OmitFramePointers>
@@ -127,6 +135,16 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_COC|x64'">
+    <ClCompile>
+      <DebugInformationFormat>None</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release_COC|Win32'">
+    <ClCompile>
+      <DebugInformationFormat>None</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <!-- Original File with special treatment -->
   <!-- Source Files -->
   <!-- The order of the first three matters -->
@@ -147,8 +165,11 @@
     <ClCompile Include="cryptopp\bfinit.cpp" />
     <ClCompile Include="cryptopp\blake2.cpp">
       <Optimization Condition="'$(Configuration)'=='Release'">Disabled</Optimization>
+      <Optimization Condition="'$(Configuration)'=='Release_COC'">Disabled</Optimization>
       <InlineFunctionExpansion Condition="'$(Configuration)'=='Release'">Default</InlineFunctionExpansion>
+      <InlineFunctionExpansion Condition="'$(Configuration)'=='Release_COC'">Default</InlineFunctionExpansion>
       <OmitFramePointers Condition="'$(Configuration)'=='Release'">false</OmitFramePointers>
+      <OmitFramePointers Condition="'$(Configuration)'=='Release_COC'">false</OmitFramePointers>
     </ClCompile>
     <ClCompile Include="cryptopp\blowfish.cpp" />
     <ClCompile Include="cryptopp\blumshub.cpp" />
@@ -291,7 +312,7 @@
       <Command>ml64.exe /c /nologo /D_M_X64 /W3 /Cx /Zi /Fo"$(IntDir)rdrand-x64.obj" "%(FullPath)"</Command>
       <Outputs>$(IntDir)\rdrand-x64.obj</Outputs>
     </CustomBuild>
-    <CustomBuild Condition="'$(Platform)'=='x64' AND ('$(Configuration)'=='Debug' Or '$(Configuration)'=='Release')" Include="cryptopp\x64dll.asm">
+    <CustomBuild Condition="'$(Platform)'=='x64' AND ('$(Configuration)'=='Debug' Or '$(Configuration)'=='Release' Or '$(Configuration)'=='Release_COC')" Include="cryptopp\x64dll.asm">
       <Message>Building and assembling x64dll.asm</Message>
       <Command>ml64.exe /c /nologo /D_M_X64 /W3 /Zi /Fo"$(IntDir)x64dll.obj" "%(FullPath)"</Command>
       <Outputs>$(IntDir)x64dll.obj</Outputs>

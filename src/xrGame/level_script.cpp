@@ -704,6 +704,19 @@ void set_view_entity_script(CScriptGameObject* go)
         Level().SetViewEntity(o);
 }
 
+void qweasddMess1(NET_Packet& val1, bool val2 = false, bool val3 = true)
+{
+    u16 packetnum = 1;
+    val1.r_begin(packetnum);
+
+    shared_str packetstr;
+    val1.r_stringZ(packetstr);
+
+    LPCSTR str1 = val2 ? "Yes2" : "No2";
+    LPCSTR str2 = val3 ? "Yes3" : "No3";
+    Msg("qweasddMess1 -> packetstr = %s, val2 = %s, val3 = %s", packetstr, str1, str2);
+}
+
 // XXX nitrocaster: one can export enum like class, without defining dummy type
 template<typename T>
 struct EnumCallbackType {};
@@ -725,6 +738,9 @@ IC static void CLevel_Export(lua_State* luaState)
         def("send", (void(*)(NET_Packet&, bool, bool))&g_send),
         def("send", (void(*)(NET_Packet&, bool, bool, bool))&g_send),
         def("send", (void(*)(NET_Packet&, bool, bool, bool, bool))&g_send), //allow the ability to send netpacket to level
+        def("qweasddMess1", (void(*)(NET_Packet&))&qweasddMess1),
+        def("qweasddMess1", (void(*)(NET_Packet&, bool))&qweasddMess1),
+        def("qweasddMess1", (void(*)(NET_Packet&, bool, bool))&qweasddMess1),
         def("u_event_gen", &u_event_gen), //Send events via packet
         def("u_event_send", &u_event_send),
         def("get_target_obj", &g_get_target_obj), //intentionally named to what is in xray extensions
