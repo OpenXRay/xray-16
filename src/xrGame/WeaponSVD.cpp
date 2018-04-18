@@ -1,6 +1,5 @@
-#include "pch_script.h"
+#include "stdafx.h"
 #include "weaponsvd.h"
-#include "xrScriptEngine/ScriptExporter.hpp"
 
 CWeaponSVD::CWeaponSVD(void) {}
 CWeaponSVD::~CWeaponSVD(void) {}
@@ -23,8 +22,3 @@ void CWeaponSVD::OnAnimationEnd(u32 state)
     }
     inherited::OnAnimationEnd(state);
 }
-
-using namespace luabind;
-
-SCRIPT_EXPORT(CWeaponSVD, (CWeaponMagazined),
-    { module(luaState)[class_<CWeaponSVD, CWeaponMagazined>("CWeaponSVD").def(constructor<>())]; });
