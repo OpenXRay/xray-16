@@ -97,6 +97,10 @@ bool CUISequenceItem::Stop(bool bForce)
 CUISequencer::CUISequencer() { m_flags.zero(); }
 void CUISequencer::Start(LPCSTR tutor_name)
 {
+    // game_loaded - это надпись "нажмите кнопку, чтобы продолжить" во время загрузки. Ее блокировать не надо!
+    if (load_screen_renderer.IsActive() && xr_strcmp(tutor_name, "game_loaded"))
+        return;
+    
     VERIFY(m_sequencer_items.size() == 0);
     Device.seqFrame.Add(this, REG_PRIORITY_LOW - 10000);
 

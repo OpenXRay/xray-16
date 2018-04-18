@@ -29,6 +29,8 @@ void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pc
         if (!strstr(Params, "-weather"))
             CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
+        initParamFlags();
+
         string_path fn, dr, di;
 
         // application path

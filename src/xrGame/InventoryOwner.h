@@ -83,9 +83,6 @@ public:
     void EnableTrade() { m_bAllowTrade = true; }
     void DisableTrade() { m_bAllowTrade = false; }
     bool IsTradeEnabled() { return m_bAllowTrade; }
-    void EnableInvUpgrade() { m_bAllowInvUpgrade = true; }
-    void DisableInvUpgrade() { m_bAllowInvUpgrade = false; }
-    bool IsInvUpgradeEnabled() { return m_bAllowInvUpgrade; }
     CInventoryOwner* GetTalkPartner() { return m_pTalkPartner; }
     virtual void NewPdaContact(CInventoryOwner*);
     virtual void LostPdaContact(CInventoryOwner*);
@@ -107,7 +104,6 @@ protected:
 
     bool m_bAllowTalk;
     bool m_bAllowTrade;
-    bool m_bAllowInvUpgrade;
 
     u16 m_tmp_active_slot_num;
 
