@@ -189,7 +189,7 @@ function SetSwitchDistance(dist)
 		local p = net_packet()
 		p:w_begin(18)
 		p:w_float(dist or 2.0)
-		level.send(p,true,true,false,false)
+		level.send(p,true,true)
 	end
 end
 
@@ -212,7 +212,7 @@ function ChangeLevel(pos,lvid,gvid,angle)
 	p:w_u32(lvid)
 	p:w_vec3(pos)
 	p:w_vec3(angle)
-	level.send(p,true,true,false,false)
+	level.send(p,true)
 end
 
 -- Wrapper for level.add_call 
