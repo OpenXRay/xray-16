@@ -259,7 +259,7 @@ bool CUIComboBox::OnMouseAction(float x, float y, EUIMessages mouse_action)
         switch (m_eState)
         {
         case LIST_EXPANDED:
-            if (m_list_box.ScrollBar()->CursorOverWindow())
+            if (!m_list_box.ScrollBar()->CursorOverWindow())
             {
                 ShowList(false);
                 return true;
