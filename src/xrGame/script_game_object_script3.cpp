@@ -190,6 +190,9 @@ class_<CScriptGameObject>& script_register_game_object2(class_<CScriptGameObject
         .def("enable_trade", &CScriptGameObject::EnableTrade)
         .def("disable_trade", &CScriptGameObject::DisableTrade)
         .def("is_trade_enabled", &CScriptGameObject::IsTradeEnabled)
+        .def("enable_inv_upgrade", &CScriptGameObject::EnableInvUpgrade)
+        .def("disable_inv_upgrade", &CScriptGameObject::DisableInvUpgrade)
+        .def("is_inv_upgrade_enabled", &CScriptGameObject::IsInvUpgradeEnabled)
 
         .def("disable_show_hide_sounds", &CScriptGameObject::SetPlayShHdRldSounds)
         .def("inventory_for_each", &CScriptGameObject::ForEachInventoryItems)

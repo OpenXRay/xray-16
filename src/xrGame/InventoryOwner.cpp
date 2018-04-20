@@ -39,6 +39,7 @@ CInventoryOwner::CInventoryOwner()
 
     EnableTalk();
     EnableTrade();
+    EnableInvUpgrade();
     bDisableBreakDialog = false;
 
     m_known_info_registry = new CInfoPortionWrapper();
