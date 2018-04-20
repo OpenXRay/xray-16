@@ -26,6 +26,7 @@
 #include "IGame_Persistent.h"
 #include "xrScriptEngine/ScriptExporter.hpp"
 #include "xr_input.h"
+#include "splash.h"
 
 ENGINE_API CRenderDevice Device;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;
@@ -111,6 +112,39 @@ void CRenderDevice::End(void)
 
     if (load_finished && m_editor)
         m_editor->on_load_finished();
+}
+
+void CRenderDevice::RenderThreadProc(void* context)
+{
+    auto& device = *static_cast<CRenderDevice*>(context);
+    while (true)
+    {
+        device.renderProcessFrame.Wait();
+        if (device.mt_bMustExit)
+        {
+            device.renderThreadExit.Set();
+            return;
+        }
+
+        if (!GEnv.isDedicatedServer)
+        {
+            // all rendering is done here
+            CStatTimer renderTotalReal;
+            renderTotalReal.FrameStart();
+            renderTotalReal.Begin();
+            if (device.b_is_Active && device.Begin())
+            {
+                device.seqRender.Process(rp_Render);
+                device.CalcFrameStats();
+                device.Statistic->Show();
+                device.End(); // Present goes here
+            }
+            renderTotalReal.End();
+            renderTotalReal.FrameEnd();
+            device.stats.RenderTotal.accum = renderTotalReal.accum;
+        }
+        device.renderFrameDone.Set();
+    }
 }
 
 void CRenderDevice::SecondaryThreadProc(void* context)
@@ -204,12 +238,11 @@ void CRenderDevice::on_idle()
         dwLastFrameTime = dwCurrentTime;
     }
 
-    const auto FrameStartTime = TimerGlobal.GetElapsed_ms();
-
     if (psDeviceFlags.test(rsStatistic))
         g_bEnableStatGather = TRUE; // XXX: why not use either rsStatistic or g_bEnableStatGather?
     else
         g_bEnableStatGather = FALSE;
+
     if (g_loading_events.size())
     {
         if (g_loading_events.front()())
@@ -217,9 +250,14 @@ void CRenderDevice::on_idle()
         pApp->LoadDraw();
         return;
     }
+
+    const auto frameStartTime = TimerGlobal.GetElapsed_ms();
+
     if (!Device.dwPrecacheFrame && !g_SASH.IsBenchmarkRunning() && g_bLoaded)
         g_SASH.StartBenchmark();
+
     FrameMove();
+
     // Precache
     if (dwPrecacheFrame)
     {
@@ -235,36 +273,26 @@ void CRenderDevice::on_idle()
     mFullTransform.mul(mProject, mView);
     GEnv.Render->SetCacheXform(mView, mProject);
     mInvFullTransform.invert(mFullTransform);
-    vCameraPosition_saved = vCameraPosition;
-    mFullTransform_saved = mFullTransform;
-    mView_saved = mView;
-    mProject_saved = mProject;
+	
+    vCameraPositionSaved = vCameraPosition;
+    vCameraDirectionSaved = vCameraDirection;
+    vCameraTopSaved = vCameraTop;
+    vCameraRightSaved = vCameraRight;
+
+    mFullTransformSaved = mFullTransform;
+    mViewSaved = mView;
+    mProjectSaved = mProject;
+
+    renderProcessFrame.Set(); // allow render thread to do its job
     syncProcessFrame.Set(); // allow secondary thread to do its job
 
-    if (!GEnv.isDedicatedServer)
-    {
-        // all rendering is done here
-        CStatTimer renderTotalReal;
-        renderTotalReal.FrameStart();
-        renderTotalReal.Begin();
-        if (b_is_Active && Begin())
-        {
-            seqRender.Process(rp_Render);
-            CalcFrameStats();
-            Statistic->Show();
-            End(); // Present goes here
-        }
-        renderTotalReal.End();
-        renderTotalReal.FrameEnd();
-        stats.RenderTotal.accum = renderTotalReal.accum;
-    }
-
     syncFrameDone.Wait(); // wait until secondary thread finish its job
-
-    if (GEnv.isDedicatedServer)
+    renderFrameDone.Wait(); // wait until render thread finish its job
+	
+	if (GEnv.isDedicatedServer)
     {
         const auto FrameEndTime = TimerGlobal.GetElapsed_ms();
-        const auto FrameTime = (FrameEndTime - FrameStartTime);
+        const auto FrameTime = (FrameEndTime - frameStartTime);
         const auto DSUpdateDelta = 1000 / g_svDedicateServerUpdateReate;
         if (FrameTime < DSUpdateDelta)
             Sleep(DSUpdateDelta - FrameTime);
@@ -321,8 +349,8 @@ void CRenderDevice::Run()
     }
     // Start all threads
     mt_bMustExit = FALSE;
-    ShowWindow(m_hWnd, SW_SHOWNORMAL);
     thread_spawn(SecondaryThreadProc, "X-RAY Secondary thread", 0, this);
+	thread_spawn(RenderThreadProc, "X-RAY Render thread", 0, this);
 
     // Load FPS Lock
     if (Core.ParamFlags.test(Core.nofpslock))
@@ -335,16 +363,21 @@ void CRenderDevice::Run()
         g_dwFPSlimit = 145;
     else if (Core.ParamFlags.test(Core.fpslock240))
         g_dwFPSlimit = 241;
-
+	
     // Message cycle
     seqAppStart.Process(rp_AppStart);
     GEnv.Render->ClearTarget();
+    splash::hide();
+    ShowWindow(m_hWnd, SW_SHOWNORMAL);
     message_loop();
     seqAppEnd.Process(rp_AppEnd);
     // Stop Balance-Thread
     mt_bMustExit = TRUE;
+    renderProcessFrame.Set();
+    renderThreadExit.Wait();
     syncProcessFrame.Set();
     syncThreadExit.Wait();
+
     while (mt_bMustExit)
         Sleep(0);
 }

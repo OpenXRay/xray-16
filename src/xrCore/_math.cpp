@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #pragma hdrstop
 
+#include <intrin.h> // __rdtsc
 #include <process.h>
 #include <powerbase.h>
 
@@ -100,14 +101,10 @@ XRCORE_API u64 QPC() noexcept
     return _dest;
 }
 
-#ifdef M_BORLAND
-u64 __fastcall GetCLK(void)
+XRCORE_API u64 GetCLK()
 {
-    _asm db 0x0F;
-    _asm db 0x31;
+    return __rdtsc();
 }
-#endif
-
 } // namespace CPU
 
 bool g_initialize_cpu_called = false;

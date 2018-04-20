@@ -3,7 +3,6 @@
 
 class XRCORE_API Event
 {
-private:
     void* handle;
 
 public:

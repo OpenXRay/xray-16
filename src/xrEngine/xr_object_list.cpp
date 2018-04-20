@@ -54,7 +54,7 @@ CObjectList::~CObjectList()
 
 IGameObject* CObjectList::FindObjectByName(shared_str name)
 {
-    for (auto it : objects_active)
+    for (auto& it : objects_active)
         if (it->cName().equal(name))
             return it;
 

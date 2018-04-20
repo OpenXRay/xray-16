@@ -140,7 +140,10 @@ int psNET_DedicatedSleep = 5;
 void IGame_Level::OnRender()
 {
     if (GEnv.isDedicatedServer)
+    {
+        Sleep(psNET_DedicatedSleep);
         return;
+    }
 
     // if (_abs(Device.fTimeDelta)<EPS_S) return;
 
@@ -153,15 +156,8 @@ void IGame_Level::OnRender()
 #endif // _GPA_ENABLED
 
     // Level render, only when no client output required
-    if (!GEnv.isDedicatedServer)
-    {
-        GEnv.Render->Calculate();
-        GEnv.Render->Render();
-    }
-    else
-    {
-        Sleep(psNET_DedicatedSleep);
-    }
+    GEnv.Render->Calculate();
+    GEnv.Render->Render();
 
 #ifdef _GPA_ENABLED
     TAL_RetireID(rtID);

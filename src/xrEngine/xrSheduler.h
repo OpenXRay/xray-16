@@ -1,8 +1,5 @@
 #pragma once
-#ifndef XRSHEDULER_H_INCLUDED
-#define XRSHEDULER_H_INCLUDED
 
-//#include "ISheduled.h"
 #include "xrCore/xrstring.h"
 #include "xrCore/FTimer.h"
 
@@ -84,5 +81,3 @@ public:
         return stats.Update;
     }
 };
-
-#endif // XRSHEDULER_H_INCLUDED

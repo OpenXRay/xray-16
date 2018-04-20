@@ -6,7 +6,6 @@
 #include "dxUIShader.h"
 
 dxDebugRender DebugRenderImpl;
-dxDebugRender DebugRenderImpl_1;
 dxDebugRender::dxDebugRender()
 {
     m_line_indices.reserve(line_vertex_limit);
@@ -133,8 +132,6 @@ private:
     xr_vector<u16> _line_indices;
     xr_vector<FVF::L> _line_vertices;
 
-    //	Vertices		_line_vertices;
-    //	Indices			_line_indices;
 public:
     RDebugRender()
     {

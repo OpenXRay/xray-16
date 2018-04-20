@@ -457,7 +457,7 @@ void CRender::add_leafs_Static(dxRender_Visual* pVisual)
         for (auto &i : pV->children)
         {
             i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
-                                                                                   // [use shader data from parent model, rather than it childrens]
+                                                         // [use shader data from parent model, rather than it childrens]
             add_leafs_Static(i);
         }
     }
@@ -471,7 +471,7 @@ void CRender::add_leafs_Static(dxRender_Visual* pVisual)
         for (auto &i : pV->children)
         {
             i->vis.obj_data = pV->getVisData().obj_data; // Наследники используют шейдерные данные от родительского визуала
-                                                                                   // [use shader data from parent model, rather than it childrens]
+                                                         // [use shader data from parent model, rather than it childrens]
             add_leafs_Static(i);
         }
     }
