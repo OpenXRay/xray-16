@@ -1,6 +1,4 @@
-//---------------------------------------------------------------------------
-#ifndef ParticleGroupH
-#define ParticleGroupH
+#pragma once
 
 #include "Layers/xrRender/dxParticleCustom.h"
 
@@ -168,6 +166,3 @@ public:
 #define PGD_CHUNK_EFFECTS 0x0004 // obsolete
 #define PGD_CHUNK_TIME_LIMIT 0x0005
 #define PGD_CHUNK_EFFECTS2 0x0007
-
-//---------------------------------------------------------------------------
-#endif
