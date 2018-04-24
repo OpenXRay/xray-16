@@ -1,12 +1,16 @@
 #include "stdafx.h"
 #include "string_table.h"
-
+#include "xrEngine/xr_ioconsole.h"
 #include "ui/xrUIXmlParser.h"
 #include "xr_level_controller.h"
 #include "MainMenu.h"
 
 STRING_TABLE_DATA* CStringTable::pData = NULL;
 BOOL CStringTable::m_bWriteErrorsToLog = FALSE;
+#ifdef COC_EDITION
+u32 gLanguage = -1;
+xr_vector<xr_token> gLanguagesToken;
+#endif
 
 CStringTable::CStringTable() { Init(); }
 void CStringTable::Destroy() { xr_delete(pData); }
@@ -25,9 +29,46 @@ void CStringTable::Init()
 
     pData = new STRING_TABLE_DATA();
 
-    //имя языка, если не задано (NULL), то первый <text> в <string> в XML
-    pData->m_sLanguage = pSettings->r_string("string_table", "language");
+#ifdef COC_EDITION
+    if (gLanguagesToken.size() == 0)
+    {
+        u32 lineCount = pSettings->line_count("Languages");
+        LPCSTR lineName, lineVal;
+        if (lineCount == 0)
+            R_ASSERT2(false, "Section \"Languages\" is empty!");
 
+        for (u16 i = 0; i < lineCount; i++)
+        {
+            pSettings->r_line("Languages", i, &lineName, &lineVal);
+            gLanguagesToken.emplace_back(lineName, i);
+        }
+        gLanguagesToken.emplace_back(nullptr, -1);
+    }
+    
+    //имя языка, если не задано (NULL), то первый <text> в <string> в XML
+    if (gLanguage != -1)
+        pData->m_sLanguage = gLanguagesToken.at(gLanguage).name;
+    else
+    {
+        
+        pData->m_sLanguage = pSettings->r_string("string_table", "language");
+        for (const auto& it : gLanguagesToken)
+        {
+            if (it.name && it.name == pData->m_sLanguage)
+            {
+                string64 buf;
+                xr_strcpy(buf, "g_language ");
+                xr_strcat(buf, it.name);
+
+                Console->Execute(buf);
+                break;
+            }
+        }
+    }
+#else
+    pData->m_sLanguage = pSettings->r_string("string_table", "language");
+#endif
+    
     //---
     FS_FileSet fset;
     string_path files_mask;
@@ -97,8 +138,13 @@ void CStringTable::ReparseKeyBindings()
 
 void CStringTable::ReloadLanguage()
 {
-    if (0 == xr_strcmp(pSettings->r_string("string_table", "language"), *(pData->m_sLanguage)))
+#ifdef COC_EDITION
+    if (0 == xr_strcmp(gLanguagesToken.at(gLanguage).name, pData->m_sLanguage.c_str()))
         return;
+#else
+    if (0 == xr_strcmp(pSettings->r_string("string_table", "language"), pData->m_sLanguage.c_str()))
+        return;
+#endif
 
     xr_delete(pData);
 

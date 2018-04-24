@@ -108,6 +108,11 @@ extern BOOL g_invert_zoom;
 int g_inv_highlight_equipped = 0;
 //-Alundaio
 
+#ifdef COC_EDITION
+extern u32 gLanguage;
+extern xr_vector<xr_token> gLanguagesToken;
+#endif
+
 void register_mp_console_commands();
 //-----------------------------------------------------------
 
@@ -200,6 +205,21 @@ public:
     }
     virtual void Info(TInfo& I) { xr_strcpy(I, "game difficulty"); }
 };
+
+#ifdef COC_EDITION
+class CCC_GameLanguage : public CCC_Token
+{
+public:
+    CCC_GameLanguage(LPCSTR N) : CCC_Token(N, (u32*)&gLanguage, NULL) {};
+    virtual void Execute(LPCSTR args)
+    {
+        tokens = gLanguagesToken.data();
+
+        CCC_Token::Execute(args);
+        CStringTable().ReloadLanguage();
+    }
+};
+#endif
 
 #ifdef DEBUG
 class CCC_ALifePath : public IConsole_Command
@@ -1721,6 +1741,9 @@ void CCC_RegisterCommands()
     // game
     CMD3(CCC_Mask, "g_crouch_toggle", &psActorFlags, AF_CROUCH_TOGGLE);
     CMD1(CCC_GameDifficulty, "g_game_difficulty");
+#ifdef COC_EDITION
+    CMD1(CCC_GameLanguage, "g_language");
+#endif
 
     CMD3(CCC_Mask, "g_backrun", &psActorFlags, AF_RUN_BACKWARD);
 
@@ -1908,7 +1931,7 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "g_autopickup", &psActorFlags, AF_AUTOPICKUP);
     CMD3(CCC_Mask, "g_dynamic_music", &psActorFlags, AF_DYNAMIC_MUSIC);
     CMD3(CCC_Mask, "g_important_save", &psActorFlags, AF_IMPORTANT_SAVE);
-    CMD3(CCC_Integer, "g_inv_highlight_equipped", &g_inv_highlight_equipped, 0, 1);
+    CMD4(CCC_Integer, "g_inv_highlight_equipped", &g_inv_highlight_equipped, 0, 1);
 
 #ifdef DEBUG
     CMD1(CCC_ShowSmartCastStats, "show_smart_cast_stats");

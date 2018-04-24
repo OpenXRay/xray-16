@@ -10,10 +10,8 @@ using STRING_TABLE_MAP = xr_map<STRING_ID, STRING_VALUE>;
 
 struct STRING_TABLE_DATA
 {
-    shared_str m_sLanguage;
-
+    xr_string m_sLanguage;
     STRING_TABLE_MAP m_StringTable;
-
     STRING_TABLE_MAP m_string_key_binding;
 };
 
@@ -38,3 +36,8 @@ private:
     static STRING_VALUE ParseLine(LPCSTR str, LPCSTR key, bool bFirst);
     static STRING_TABLE_DATA* pData;
 };
+
+#ifdef COC_EDITION
+extern u32 gLanguage;
+extern xr_vector<xr_token> gLanguagesToken;
+#endif

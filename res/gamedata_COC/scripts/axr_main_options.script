@@ -17,7 +17,7 @@ function opt_menu_on_init(menu)
 	end}
 	
 	-- localization
-	local localization_list = {}
+	--[[local localization_list = {}
 	local flist = getFS():file_list_open("$game_text$",bit_or(FS.FS_ListFolders,FS.FS_RootOnly))
 	local f_cnt = flist:Size()
 	for	it=0, f_cnt-1 do
@@ -35,7 +35,7 @@ function opt_menu_on_init(menu)
 				game.reload_language()
 			end
 		end
-	end}
+	end}]]
 	-- debug_hud_map
 	menu.gameplay_ui_options["debug_map_hud"]			= {default=false, 	debug_only=true, 	typ="check",
 		on_accept=function(handler,optMgr,ctrl)
