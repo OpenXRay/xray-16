@@ -285,12 +285,6 @@ IC void FillSprite_fpu(FVF::LIT*& pv, const Fvector& T, const Fvector& R, const 
     pv++;
 }
 
-__forceinline void fsincos(const float angle, float& sine, float& cosine)
-{
-    sine = std::sinf(angle);
-    cosine = std::cosf(angle);
-}
-
 IC void FillSprite(FVF::LIT*& pv, const Fvector& T, const Fvector& R, const Fvector& pos, const Fvector2& lt,
     const Fvector2& rb, float r1, float r2, u32 clr, float sina, float cosa)
 {
@@ -466,8 +460,8 @@ void ParticleRenderStream(void* lpvParams)
         if (angle != *((DWORD*)&m.rot.x))
         {
             angle = *((DWORD*)&m.rot.x);
-            sina = std::sinf(angle);
-            cosa = std::cosf(angle);
+            sina = std::sinf(*(float*)&angle);
+            cosa = std::cosf(*(float*)&angle);
         }
 
         _mm_prefetch(64 + (char*)&particles[i + 1], _MM_HINT_NTA);
@@ -477,13 +471,13 @@ void ParticleRenderStream(void* lpvParams)
 
         float r_x = m.size.x * 0.5f;
         float r_y = m.size.y * 0.5f;
-        float speed;
-        BOOL speed_calculated = FALSE;
+        float speed = 0.f;
+        bool speed_calculated = false;
 
         if (pPE.m_Def->m_Flags.is(CPEDef::dfVelocityScale))
         {
             magnitude_sse(m.vel, speed);
-            speed_calculated = TRUE;
+            speed_calculated = true;
             r_x += speed * pPE.m_Def->m_VelocityScale.x;
             r_y += speed * pPE.m_Def->m_VelocityScale.y;
         }
