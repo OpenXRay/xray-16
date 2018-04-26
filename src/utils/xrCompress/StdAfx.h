@@ -10,14 +10,4 @@
 #include "lzo/lzo1z.h"
 #include <mmsystem.h>
 
-#pragma warning(push)
-#pragma warning	(disable:4995)
-#include <io.h>
-#include <direct.h>
-#include <fcntl.h>
-#include <sys/stat.h>
-#include <malloc.h>
-#pragma warning(pop)
-
-#pragma comment	(lib,"xrCore.lib")
-#pragma comment	(lib,"winmm")
+#pragma comment(lib, "winmm")
