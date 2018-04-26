@@ -350,7 +350,7 @@ void CRenderDevice::Run()
     // Start all threads
     mt_bMustExit = FALSE;
     thread_spawn(SecondaryThreadProc, "X-RAY Secondary thread", 0, this);
-	thread_spawn(RenderThreadProc, "X-RAY Render thread", 0, this);
+    thread_spawn(RenderThreadProc, "X-RAY Render thread", 0, this);
 
     // Load FPS Lock
     if (Core.ParamFlags.test(Core.nofpslock))
@@ -363,7 +363,7 @@ void CRenderDevice::Run()
         g_dwFPSlimit = 145;
     else if (Core.ParamFlags.test(Core.fpslock240))
         g_dwFPSlimit = 241;
-	
+    
     // Message cycle
     seqAppStart.Process(rp_AppStart);
     GEnv.Render->ClearTarget();
