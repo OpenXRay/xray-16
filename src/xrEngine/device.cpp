@@ -113,6 +113,7 @@ void CRenderDevice::End(void)
         m_editor->on_load_finished();
 }
 
+// XXX: make it work correct in all situations
 void CRenderDevice::RenderThreadProc(void* context)
 {
     auto& device = *static_cast<CRenderDevice*>(context);
@@ -270,11 +271,29 @@ void CRenderDevice::on_idle()
     mViewSaved = mView;
     mProjectSaved = mProject;
 
-    renderProcessFrame.Set(); // allow render thread to do its job
+    //renderProcessFrame.Set(); // allow render thread to do its job
     syncProcessFrame.Set(); // allow secondary thread to do its job
 
     const auto frameEndTime = TimerGlobal.GetElapsed_ms();
     const auto frameTime = frameEndTime - frameStartTime;
+
+    if (!GEnv.isDedicatedServer)
+    {
+        // all rendering is done here
+        CStatTimer renderTotalReal;
+        renderTotalReal.FrameStart();
+        renderTotalReal.Begin();
+        if (b_is_Active && Begin())
+        {
+            seqRender.Process(rp_Render);
+            CalcFrameStats();
+            Statistic->Show();
+            End(); // Present goes here
+        }
+        renderTotalReal.End();
+        renderTotalReal.FrameEnd();
+        stats.RenderTotal.accum = renderTotalReal.accum;
+    }
 
     // Eco render (by alpet)
     u32 updateDelta = 10;
@@ -285,7 +304,7 @@ void CRenderDevice::on_idle()
         Sleep(updateDelta - frameTime);
 
     syncFrameDone.Wait(); // wait until secondary thread finish its job
-    renderFrameDone.Wait(); // wait until render thread finish its job
+    //renderFrameDone.Wait(); // wait until render thread finish its job
 
     if (!b_is_Active)
         Sleep(1);
@@ -339,7 +358,7 @@ void CRenderDevice::Run()
     // Start all threads
     mt_bMustExit = FALSE;
     thread_spawn(SecondaryThreadProc, "X-RAY Secondary thread", 0, this);
-    thread_spawn(RenderThreadProc, "X-RAY Render thread", 0, this);
+    //thread_spawn(RenderThreadProc, "X-RAY Render thread", 0, this);
     // Message cycle
     seqAppStart.Process(rp_AppStart);
     GEnv.Render->ClearTarget();
@@ -349,8 +368,8 @@ void CRenderDevice::Run()
     seqAppEnd.Process(rp_AppEnd);
     // Stop Balance-Thread
     mt_bMustExit = TRUE;
-    renderProcessFrame.Set();
-    renderThreadExit.Wait();
+    //renderProcessFrame.Set();
+    //renderThreadExit.Wait();
     syncProcessFrame.Set();
     syncThreadExit.Wait();
 
