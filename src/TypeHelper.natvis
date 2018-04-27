@@ -40,4 +40,8 @@
     <StringView>scheduled_name</StringView>
   </Type>
 
+  <Type Name="CAI_Stalker">
+    <DisplayString>{NameObject.p_->value, s}, $(Type)</DisplayString>
+  </Type>
+
 </AutoVisualizer>
