@@ -210,7 +210,12 @@ public:
 class CCC_GameLanguage : public CCC_Token
 {
 public:
-    CCC_GameLanguage(LPCSTR N) : CCC_Token(N, (u32*)&gLanguage, NULL) {};
+    CCC_GameLanguage(LPCSTR N) : CCC_Token(N, (u32*)&gLanguage, NULL)
+    {
+        CStringTable();
+        tokens = gLanguagesToken.data();
+    };
+
     virtual void Execute(LPCSTR args)
     {
         tokens = gLanguagesToken.data();
@@ -1167,7 +1172,6 @@ public:
 */
 #endif
 
-#ifndef MASTER_GOLD
 #include "xrAICore/Navigation/game_graph.h"
 struct CCC_JumpToLevel : public IConsole_Command
 {
@@ -1286,8 +1290,6 @@ public:
         IConsole_Command::fill_tips(tips, mode);
     }
 };
-
-#endif // MASTER_GOLD
 
 class CCC_TimeFactor : public IConsole_Command
 {
@@ -1781,11 +1783,9 @@ void CCC_RegisterCommands()
     CMD3(CCC_Mask, "hud_crosshair", &psHUD_Flags, HUD_CROSSHAIR);
     CMD3(CCC_Mask, "hud_crosshair_dist", &psHUD_Flags, HUD_CROSSHAIR_DIST);
 
-#if !defined(MASTER_GOLD) || defined(DEBUG)
     CMD4(CCC_Float, "hud_fov", &psHUD_FOV, 0.1f, 1.0f);
     CMD4(CCC_Float, "fov", &g_fov, 5.0f, 180.0f);
     CMD4(CCC_Float, "scope_fov", &g_scope_fov, 5.0f, 180.0f);
-#endif // DEBUG
 
 // Demo
 #if 1 // ndef MASTER_GOLD
@@ -1913,17 +1913,14 @@ void CCC_RegisterCommands()
     CMD4(CCC_FloatBlock, "ph_tri_query_ex_aabb_rate", &ph_console::ph_tri_query_ex_aabb_rate, 1.01f, 3.f);
 #endif // DEBUG
 
-#ifndef MASTER_GOLD
-    CMD1(CCC_JumpToLevel, "jump_to_level");
-    CMD1(CCC_Script, "run_script");
-    CMD1(CCC_ScriptCommand, "run_string");
-#endif // MASTER_GOLD
-
     if (Core.ParamFlags.test(Core.dbg))
     {
+        CMD1(CCC_JumpToLevel, "jump_to_level");
         CMD3(CCC_Mask, "g_god", &psActorFlags, AF_GODMODE);
         CMD3(CCC_Mask, "g_unlimitedammo", &psActorFlags, AF_UNLIMITEDAMMO);
         CMD1(CCC_TimeFactor, "time_factor");
+        CMD1(CCC_Script, "run_script");
+        CMD1(CCC_ScriptCommand, "run_string");
         CMD3(CCC_Mask, "g_no_clip", &psActorFlags, AF_NO_CLIP);
     }
 

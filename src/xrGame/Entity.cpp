@@ -254,21 +254,19 @@ void CEntity::net_Destroy()
 
 void CEntity::KillEntity(u16 whoID, bool bypass_actor_check)
 {
-    if (IsGameTypeSingle() && this->ID() == Actor()->ID())
-    {
     //AVO: allow scripts to process actor condition and prevent actor's death or kill him if desired.
     //IMPORTANT: if you wish to kill actor you need to call db.actor:kill(level:object_by_id(whoID), true) in actor_before_death callback, to ensure all objects are properly destroyed
     // this will bypass below if block and go to normal KillEntity routine.
 #ifdef ACTOR_BEFORE_DEATH_CALLBACK
-        if (bypass_actor_check == false)
-        {
-            Actor()->callback(GameObject::eActorBeforeDeath)(whoID);
-            return;
-        }
+    if (IsGameTypeSingle() && this->ID() == Actor()->ID() && (bypass_actor_check != true))
+    {
+        Actor()->use_HolderEx(NULL, true);
+        Actor()->callback(GameObject::eActorBeforeDeath)(whoID);
+        return;
+    }
 #endif
     //-AVO
-        Actor()->use_HolderEx(NULL,true);
-    }
+
     if (whoID != ID())
     {
 #ifdef DEBUG
@@ -287,15 +285,7 @@ void CEntity::KillEntity(u16 whoID, bool bypass_actor_check)
         }
 #endif
     }
-#ifdef COC_EDITION
-    /* Alundaio: Should not matter who kills self. CScripGameObject::Kill sets self as killer if nil passed
-    else
-    {
-        if (m_killer_id != ALife::_OBJECT_ID(-1))
-            return;
-    }
-    */
-#else
+#ifndef ACTOR_BEFORE_DEATH_CALLBACK
     else
     {
         if (m_killer_id != ALife::_OBJECT_ID(-1))
@@ -317,12 +307,6 @@ void CEntity::KillEntity(u16 whoID, bool bypass_actor_check)
             u_EventSend(P, net_flags(TRUE, TRUE, FALSE, TRUE));
     }
 };
-
-// void CEntity::KillEntity(IGameObject* who)
-//{
-//	VERIFY			(who);
-//	if (who) KillEntity(who->ID());
-//}
 
 void CEntity::reinit() { inherited::reinit(); }
 void CEntity::reload(LPCSTR section)

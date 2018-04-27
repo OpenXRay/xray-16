@@ -22,7 +22,9 @@ extern bool shared_str_initialized;
 #pragma comment(lib, "EToolsB.lib")
 #define USE_BUG_TRAP
 #else
+#ifndef COC_DEBUG_BEHAVIOUR
 #define USE_BUG_TRAP
+#endif
 static BOOL bException = FALSE;
 #endif
 
@@ -364,8 +366,10 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
 #endif
     FlushLog();
 
+#ifdef COC_DEBUG_BEHAVIOUR
     while (ShowCursor(true) < 0);
     ShowWindow(GetActiveWindow(), SW_FORCEMINIMIZE);
+#endif
 
     if (Core.PluginMode)
         MessageBox(NULL, assertionInfo, "X-Ray error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
@@ -752,7 +756,9 @@ void xrDebug::Initialize(const bool& dedicated)
 {
     *BugReportFile = 0;
     OnThreadSpawn();
+#ifdef USE_BUG_TRAP
     SetupExceptionHandler(dedicated);
+#endif
     // exception handler to all "unhandled" exceptions
     PrevFilter = ::SetUnhandledExceptionFilter(UnhandledFilter);
 }

@@ -56,11 +56,13 @@ void CStringTable::Init()
         {
             if (it.name && it.name == pData->m_sLanguage)
             {
-                string64 buf;
+                /*string64 buf;
                 xr_strcpy(buf, "g_language ");
                 xr_strcat(buf, it.name);
 
-                Console->Execute(buf);
+                Console->Execute(buf);*/
+
+                gLanguage = it.id;
                 break;
             }
         }
