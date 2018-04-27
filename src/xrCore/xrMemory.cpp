@@ -25,6 +25,32 @@ void xrMemory::_destroy()
     xr_delete(g_pStringContainer);
 }
 
+void xrMemory::GetProcessMemInfo(SProcessMemInfo& minfo)
+{
+    std::memset(&minfo, 0, sizeof(SProcessMemInfo));
+
+    MEMORYSTATUSEX mem;
+    mem.dwLength = sizeof(mem);
+    GlobalMemoryStatusEx(&mem);
+
+    minfo.TotalPhysicalMemory = mem.ullTotalPhys;
+    minfo.FreePhysicalMemory = mem.ullAvailPhys;
+    minfo.TotalVirtualMemory = mem.ullTotalVirtual;
+    minfo.MemoryLoad = mem.dwMemoryLoad;
+
+    //--------------------------------------------------------------------
+    PROCESS_MEMORY_COUNTERS pc;
+    std::memset(&pc, 0, sizeof(PROCESS_MEMORY_COUNTERS));
+    pc.cb = sizeof(pc);
+    if (GetProcessMemoryInfo(GetCurrentProcess(), &pc, sizeof(pc)))
+    {
+        minfo.PeakWorkingSetSize = pc.PeakWorkingSetSize;
+        minfo.WorkingSetSize = pc.WorkingSetSize;
+        minfo.PagefileUsage = pc.PagefileUsage;
+        minfo.PeakPagefileUsage = pc.PeakPagefileUsage;
+    }
+}
+
 XRCORE_API void vminfo(size_t* _free, size_t* reserved, size_t* committed)
 {
     MEMORY_BASIC_INFORMATION memory_info;
@@ -46,7 +72,12 @@ XRCORE_API void log_vminfo()
 {
     size_t w_free, w_reserved, w_committed;
     vminfo(&w_free, &w_reserved, &w_committed);
-    Msg("* [win32]: free[%d K], reserved[%d K], committed[%d K]", w_free / 1024, w_reserved / 1024, w_committed / 1024);
+#ifdef _WIN64
+    Msg("* [win32]: free[%I64d MB], reserved[%u KB], committed[%u KB]", w_free / (1024 * 1024), w_reserved / 1024,
+        w_committed / 1024);
+#else
+    Msg("* [win32]: free[%I64d K], reserved[%d K], committed[%d K]", w_free / 1024, w_reserved / 1024, w_committed / 1024);
+#endif
 }
 
 size_t xrMemory::mem_usage()

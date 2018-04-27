@@ -23,6 +23,19 @@ public:
     u32 stat_calls;
 
 public:
+    struct SProcessMemInfo {
+        u64 PeakWorkingSetSize;
+        u64 WorkingSetSize;
+        u64 PagefileUsage;
+        u64 PeakPagefileUsage;
+
+        u64 TotalPhysicalMemory;
+        s64 FreePhysicalMemory;
+        u64 TotalVirtualMemory;
+        u32 MemoryLoad;
+    };
+
+    void GetProcessMemInfo(SProcessMemInfo& minfo);
     size_t mem_usage();
     void   mem_compact();
     inline void* mem_alloc             (size_t size) { stat_calls++; return scalable_malloc (     size); };
