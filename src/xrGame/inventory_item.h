@@ -96,6 +96,7 @@ public:
 
 public:
     virtual void Load(LPCSTR section);
+    void reloadNames();
 
     LPCSTR NameItem(); // remove <virtual> by sea
     LPCSTR NameShort();

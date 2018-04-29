@@ -152,11 +152,20 @@ void CStringTable::ReloadLanguage()
 
     Init();
 
-    //reload language in menu
-    if (MainMenu()->IsActive())
+    if (g_pGamePersistent && g_pGamePersistent->IsMainMenuActive())
+        MainMenu()->setLanguageChanged(true);
+
+    if (!g_pGameLevel)
+        return;
+
+    for (u16 id = 0; id < 0xffff; id++)
     {
-        MainMenu()->Activate(FALSE);
-        MainMenu()->Activate(TRUE);
+        CGameObject* pGameObject = smart_cast<CGameObject*>(Level().Objects.net_Find(id));
+        if (!pGameObject)
+            continue;
+
+        if (CInventoryItem* p = smart_cast<CInventoryItem*>(pGameObject))
+            p->reloadNames();
     }
 }
 

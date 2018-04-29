@@ -79,6 +79,8 @@ class CMainMenu : public IMainMenu,
     atlas_submit_queue* m_atlas_submit_queue;
 
     demo_info_loader* m_demo_info_loader;
+    
+    bool mLanguageChanged;
 
 public:
     enum EErrorDlg
@@ -138,6 +140,9 @@ public:
     virtual void Activate(bool bActive);
     virtual bool IsActive();
     virtual bool CanSkipSceneRendering();
+
+    virtual bool isLanguageChanged();
+    virtual void setLanguageChanged(bool status);
 
     virtual bool IgnorePause() { return true; }
     virtual void IR_OnMousePress(int btn);

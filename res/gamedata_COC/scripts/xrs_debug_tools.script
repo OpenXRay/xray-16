@@ -1185,7 +1185,7 @@ function position_hud_show(hud)
 	hud:add_msg("Valid",valid)
 	hud:add_msg("FOV",math.floor(device().fov))
 
-	local Y, M, D, h, m, s, ms
+	local Y, M, D, h, m, s, ms = 0, 0, 0, 0, 0, 0, 0
 	Y, M, D, h, m, s, ms = game.get_game_time():get( Y, M, D, h, m, s, ms )
 	hud:add_msg("GameTime",string.format("Y:%d M:%d D:%d h:%d m:%d s:%d ms:%d",Y, M, D, h, m, s, ms))
 

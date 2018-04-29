@@ -189,11 +189,11 @@ SCRIPT_EXPORT(CStalkerPlanner, (CScriptActionPlanner), {
                     luabind::value("sound_script", StalkerSpace::eStalkerSoundScript)]];
 });
 
-SCRIPT_EXPORT(CAI_Stalker, (CGameObject),
+SCRIPT_EXPORT(CAI_Stalker, (CEntityAlive),
 {
     module(luaState)
     [
-        class_<CAI_Stalker, CGameObject>("CAI_Stalker")
+        class_<CAI_Stalker, CEntityAlive>("CAI_Stalker")
             .def(constructor<>())
             .def("inside_anomaly", &CAI_Stalker::inside_anomaly)
             .def("GetWeaponAccuracy", &CAI_Stalker::GetWeaponAccuracy)

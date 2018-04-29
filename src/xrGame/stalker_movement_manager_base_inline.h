@@ -33,8 +33,10 @@ IC bool stalker_movement_manager_base::turn_in_place() const
 
 IC void stalker_movement_manager_base::set_body_state(EBodyState body_state)
 {
+#ifdef DEBUG
     THROW2((body_state != eBodyStateCrouch) || (m_target.m_mental_state != eMentalStateFree),
         make_string("object %s", object().cName().c_str()).c_str());
+#endif
     m_target.m_body_state = body_state;
 }
 

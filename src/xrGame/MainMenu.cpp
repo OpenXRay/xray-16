@@ -125,6 +125,7 @@ CMainMenu::CMainMenu()
     }
 
     Device.seqFrame.Add(this, REG_PRIORITY_LOW - 1000);
+    mLanguageChanged = false;
 }
 
 CMainMenu::~CMainMenu()
@@ -300,6 +301,10 @@ bool CMainMenu::ReloadUI()
 
 bool CMainMenu::IsActive() { return !!m_Flags.test(flActive); }
 bool CMainMenu::CanSkipSceneRendering() { return IsActive() && !m_Flags.test(flGameSaveScreenshot); }
+
+bool CMainMenu::isLanguageChanged() { return mLanguageChanged; }
+void CMainMenu::setLanguageChanged(bool status) { mLanguageChanged = status; }
+
 // IInputReceiver
 static int mouse_button_2_key[] = {MOUSE_1, MOUSE_2, MOUSE_3};
 void CMainMenu::IR_OnMousePress(int btn)
@@ -487,8 +492,9 @@ void CMainMenu::OnFrame()
     {
         CheckForErrorDlg();
         bool b_is_16_9 = (float)Device.dwWidth / (float)Device.dwHeight > (UI_BASE_WIDTH / UI_BASE_HEIGHT + 0.01f);
-        if (b_is_16_9 != m_activatedScreenRatio)
+        if (b_is_16_9 != m_activatedScreenRatio || mLanguageChanged)
         {
+            mLanguageChanged = false;
             ReloadUI();
             m_startDialog->SendMessage(m_startDialog, MAIN_MENU_RELOADED, NULL);
         }

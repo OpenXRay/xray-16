@@ -157,7 +157,9 @@ IC u32 IReaderBase<T>::find_chunk(u32 ID, BOOL* bCompressed)
         }
     }
 
+#ifdef DEBUG
     VERIFY((u32)impl().tell() + dwSize <= (u32)impl().length());
+#endif
     if (bCompressed)
         *bCompressed = dwType & CFS_CompressMark;
 

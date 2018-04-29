@@ -72,7 +72,7 @@ SCRIPT_EXPORT(CEntityAlive, (CEntity), {
     module(luaState)
     [
         class_<CEntityAlive, CEntity>("CEntityAlive")
-        .def("condition", &CEntityAlive::conditions)
+            .def("conditions", &CEntityAlive::conditions)
     ];
 });
 
