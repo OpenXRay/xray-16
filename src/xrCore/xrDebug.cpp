@@ -22,9 +22,7 @@ extern bool shared_str_initialized;
 #pragma comment(lib, "EToolsB.lib")
 #define USE_BUG_TRAP
 #else
-#ifndef COC_DEBUG_BEHAVIOUR
 #define USE_BUG_TRAP
-#endif
 static BOOL bException = FALSE;
 #endif
 
@@ -429,7 +427,8 @@ void xrDebug::SoftFail(const ErrorLocation& loc, const char* expr, const char* d
 {
     if (desc == nullptr)
     {
-        Msg("! VERIFY_FAILED: %s[%d] {%s}  %s", loc.File, loc.Line, loc.Function, expr);
+        //Msg("! VERIFY_FAILED: %s[%d] {%s}  %s", loc.File, loc.Line, loc.Function, expr);
+        Msg("! VERIFY_FAILED: %s[%d] %s", loc.File, loc.Line, expr);
         return;
     }
 
@@ -441,7 +440,8 @@ void xrDebug::SoftFail(const ErrorLocation& loc, const char* expr, const char* d
             buffer = buffer + std::string(" ") + arg2;
     }
 
-    Msg("! VERIFY_FAILED: %s[%d] {%s}  %s %s", loc.File, loc.Line, loc.Function, expr, buffer.c_str());
+    //Msg("! VERIFY_FAILED: %s[%d] {%s}  %s %s", loc.File, loc.Line, loc.Function, expr, buffer.c_str());
+    Msg("! VERIFY_FAILED: %s[%d] %s %s", loc.File, loc.Line, expr, buffer.c_str());
 }
 
 void xrDebug::SoftFail(const ErrorLocation& loc, const char* expr, const std::string& desc, const char* arg1, const char* arg2)

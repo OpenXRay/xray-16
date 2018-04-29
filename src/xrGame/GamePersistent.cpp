@@ -64,9 +64,9 @@ CGamePersistent::CGamePersistent(void)
 
     ZeroMemory(ambient_sound_next_time, sizeof(ambient_sound_next_time));
 
-    m_pUI_core = NULL;
-    m_pMainMenu = NULL;
-    m_intro = NULL;
+    m_pUI_core = nullptr;
+    m_pMainMenu = nullptr;
+    m_intro = nullptr;
     m_intro_event.bind(this, &CGamePersistent::start_logo_intro);
 #ifdef DEBUG
     m_frame_counter = 0;
