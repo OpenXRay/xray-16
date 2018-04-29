@@ -511,6 +511,12 @@ bool ignore_name(const char* _name)
         return true;
     if (ENDS_WITH(".sln"))
         return true;
+    if (ENDS_WITH(".pdb"))
+        return true;
+    if (ENDS_WITH(".ipdb"))
+        return true;
+    if (ENDS_WITH(".iobj"))
+        return true;
 #undef ENDS_WITH
     return false;
 }
