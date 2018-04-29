@@ -28,5 +28,14 @@
     <Image Include="stalker_cs.ico">
       <Filter>resources</Filter>
     </Image>
+    <Image Include="splash_xrcoc_en.bmp">
+      <Filter>resources</Filter>
+    </Image>
+    <Image Include="stalker_coc.ico">
+      <Filter>resources</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\TypeHelper.natvis" />
   </ItemGroup>
 </Project>
