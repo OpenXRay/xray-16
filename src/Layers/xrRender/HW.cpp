@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "Layers/xrRender/HW.h"
+#include "xrEngine/xr_input.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "xrCore/xr_token.h"
 
@@ -539,13 +540,8 @@ void CHW::updateWindowProps(HWND m_hWnd)
         SetWindowLong(m_hWnd, GWL_EXSTYLE, WS_EX_TOPMOST);
     }
 
-#ifndef _EDITOR
     if (!GEnv.isDedicatedServer)
-    {
-        ShowCursor(FALSE);
         SetForegroundWindow(m_hWnd);
-    }
-#endif
 }
 
 struct uniqueRenderingMode

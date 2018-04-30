@@ -5,6 +5,7 @@
 #pragma hdrstop
 
 #include "Layers/xrRender/HW.h"
+#include "xrEngine/xr_input.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "Include/xrAPI/xrAPI.h"
 #include "xrCore/xr_token.h"
@@ -242,7 +243,6 @@ void CHW::updateWindowProps(HWND m_hWnd)
         SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle = WS_POPUP | WS_VISIBLE);
     }
 
-    ShowCursor(FALSE);
     SetForegroundWindow(m_hWnd);
 }
 

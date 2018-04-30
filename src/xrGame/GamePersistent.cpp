@@ -745,17 +745,11 @@ void CGamePersistent::OnAppActivate()
     bIsMP &= !Device.Paused();
 
     if (!bIsMP)
-    {
         Device.Pause(FALSE, !bRestorePause, TRUE, "CGP::OnAppActivate");
-    }
     else
-    {
         Device.Pause(FALSE, TRUE, TRUE, "CGP::OnAppActivate MP");
-    }
 
     bEntryFlag = TRUE;
-    if (!GEnv.isDedicatedServer)
-        pInput->ClipCursor(GetUICursor().IsVisible());
 }
 
 void CGamePersistent::OnAppDeactivate()
@@ -777,7 +771,6 @@ void CGamePersistent::OnAppDeactivate()
         Device.Pause(TRUE, FALSE, TRUE, "CGP::OnAppDeactivate MP");
     }
     bEntryFlag = FALSE;
-    pInput->ClipCursor(false);
 }
 
 bool CGamePersistent::OnRenderPPUI_query()
