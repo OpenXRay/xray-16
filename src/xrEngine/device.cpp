@@ -296,9 +296,13 @@ void CRenderDevice::on_idle()
     }
 
     // Eco render (by alpet)
-    u32 updateDelta = 10;
+    u32 updateDelta = 0;
+
     if (GEnv.isDedicatedServer)
         updateDelta = 1000 / g_svDedicateServerUpdateReate;
+
+    else if (Device.Paused() || IGame_Persistent::IsMainMenuActive())
+        updateDelta = 10;
 
     if (frameTime < updateDelta)
         Sleep(updateDelta - frameTime);
