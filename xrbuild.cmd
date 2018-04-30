@@ -19,11 +19,12 @@ cd _build\bin\Win32\Debug
 copy *.dll ..\..\..\..\res\bins\ 
 copy *.exe ..\..\..\..\res\bins\ 
 cd ..\ 
-copy OpenXRay.exe .\res\ 
+copy OpenXRay.exe ..\..\..\res\ 
 cd ..\..\..\ 
 copy License.txt .\res\ 
 copy README.md .\res\ 
 cd res\ 
+rd /s /q gamedata_COC 
 7z a xdOpenXRay.Dx86.7z .\* 
 goto :END 
 
@@ -32,11 +33,12 @@ cd _build\bin\Win64\Debug
 copy *.dll ..\..\..\..\res\bins\ 
 copy *.exe ..\..\..\..\res\bins\ 
 cd ..\ 
-copy OpenXRay.exe .\res\ 
+copy OpenXRay.exe ..\..\..\res\ 
 cd ..\..\..\ 
 copy License.txt .\res\ 
 copy README.md .\res\ 
 cd res\ 
+rd /s /q gamedata_COC 
 7z a xdOpenXRay.Dx64.7z .\* 
 goto :END 
 
@@ -45,11 +47,12 @@ cd _build\bin\Win32\Mixed
 copy *.dll ..\..\..\..\res\bins\ 
 copy *.exe ..\..\..\..\res\bins\ 
 cd ..\ 
-copy OpenXRay.exe .\res\ 
+copy OpenXRay.exe ..\..\..\res\ 
 cd ..\..\..\ 
 copy License.txt .\res\ 
 copy README.md .\res\ 
 cd res\ 
+rd /s /q gamedata_COC 
 7z a xdOpenXRay.Mx86.7z .\* 
 goto :END 
 
@@ -58,11 +61,12 @@ cd _build\bin\Win64\Mixed
 copy *.dll ..\..\..\..\res\bins\ 
 copy *.exe ..\..\..\..\res\bins\ 
 cd ..\ 
-copy OpenXRay.exe .\res\ 
+copy OpenXRay.exe ..\..\..\res\ 
 cd ..\..\..\ 
 copy License.txt .\res\ 
 copy README.md .\res\ 
 cd res\ 
+rd /s /q gamedata_COC 
 7z a xdOpenXRay.Mx64.7z .\* 
 goto :END 
 
@@ -71,11 +75,13 @@ cd _build\bin\Win32\Mixed_COC
 copy *.dll ..\..\..\..\res\bins\ 
 copy *.exe ..\..\..\..\res\bins\ 
 cd ..\ 
-copy Stalker-CoC.exe .\res\ 
+copy Stalker-CoC.exe ..\..\..\res\ 
 cd ..\..\..\ 
 copy License.txt .\res\ 
 copy README.md .\res\ 
 cd res\ 
+rd /s /q gamedata 
+ren gamedata_COC gamedata 
 7z a xdOpenXRay.Mx_CoC86.7z .\* 
 goto :END 
 
@@ -84,11 +90,13 @@ cd _build\bin\Win64\Mixed_COC
 copy *.dll ..\..\..\..\res\bins\ 
 copy *.exe ..\..\..\..\res\bins\ 
 cd ..\ 
-copy Stalker-CoC.exe .\res\ 
+copy Stalker-CoC.exe ..\..\..\res\ 
 cd ..\..\..\ 
 copy License.txt .\res\ 
 copy README.md .\res\ 
 cd res\ 
+rd /s /q gamedata 
+ren gamedata_COC gamedata 
 7z a xdOpenXRay.Mx_CoC64.7z .\* 
 goto :END 
 
@@ -97,11 +105,12 @@ cd _build\bin\Win32\Release
 copy *.dll ..\..\..\..\res\bins\ 
 copy *.exe ..\..\..\..\res\bins\ 
 cd ..\ 
-copy OpenXRay.exe .\res\ 
+copy OpenXRay.exe ..\..\..\res\ 
 cd ..\..\..\ 
 copy License.txt .\res\ 
 copy README.md .\res\ 
 cd res\ 
+rd /s /q gamedata_COC 
 7z a xdOpenXRay.Rx86.7z .\* 
 goto :END 
 
@@ -110,11 +119,12 @@ cd _build\bin\Win64\Release
 copy *.dll ..\..\..\..\res\bins\ 
 copy *.exe ..\..\..\..\res\bins\ 
 cd ..\ 
-copy OpenXRay.exe .\res\ 
+copy OpenXRay.exe ..\..\..\res\ 
 cd ..\..\..\ 
 copy License.txt .\res\ 
 copy README.md .\res\ 
 cd res\ 
+rd /s /q gamedata_COC 
 7z a xdOpenXRay.Rx64.7z .\* 
 goto :END 
 
@@ -123,11 +133,13 @@ cd _build\bin\Win32\Release_COC
 copy *.dll ..\..\..\..\res\bins\ 
 copy *.exe ..\..\..\..\res\bins\ 
 cd ..\ 
-copy Stalker-CoC.exe .\res\ 
+copy Stalker-CoC.exe ..\..\..\res\ 
 cd ..\..\..\ 
 copy License.txt .\res\ 
 copy README.md .\res\ 
 cd res\ 
+rd /s /q gamedata 
+ren gamedata_COC gamedata 
 7z a xdOpenXRay.Rx_CoC86.7z .\* 
 goto :END 
 
@@ -136,11 +148,13 @@ cd _build\bin\Win64\Release_COC
 copy *.dll ..\..\..\..\res\bins\ 
 copy *.exe ..\..\..\..\res\bins\ 
 cd ..\ 
-copy Stalker-CoC.exe .\res\ 
+copy Stalker-CoC.exe ..\..\..\res\ 
 cd ..\..\..\ 
 copy License.txt .\res\ 
 copy README.md .\res\ 
 cd res\ 
+rd /s /q gamedata 
+ren gamedata_COC gamedata 
 7z a xdOpenXRay.Rx_CoC64.7z .\* 
 goto :END 
 
