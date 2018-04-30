@@ -32,7 +32,7 @@ float	calc_ssao( float3 P, float3 N, float2 tc, float2 tcJ )
 #endif
 #else	//	SSAO_QUALITY
 
-#if SSAO_QUALITY == 3
+#if SSAO_QUALITY == 3 || SSAO_QUALITY == 4
 #define RINGS 3
 #define DIRS 8
 static const float rads[4] =
