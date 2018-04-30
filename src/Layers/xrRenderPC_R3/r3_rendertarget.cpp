@@ -627,6 +627,10 @@ CRenderTarget::CRenderTarget()
         u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, NULL, NULL, HW.pBaseZB);
     }
 
+    //FXAA
+    s_fxaa.create(b_fxaa, "r3\\fxaa");
+    g_fxaa.create(FVF::F_V, RCache.Vertex.Buffer(), RCache.QuadIB);
+
     // HBAO
     if (RImplementation.o.ssao_opt_data)
     {
@@ -648,10 +652,6 @@ CRenderTarget::CRenderTarget()
 
         s_ssao.create(b_ssao, "r2\\ssao");
     }
-
-    //FXAA
-    s_fxaa.create(b_fxaa, "r3\\fxaa");
-    g_fxaa.create(FVF::F_V, RCache.Vertex.Buffer(), RCache.QuadIB);
 
     if (RImplementation.o.ssao_blur_on)
     {
