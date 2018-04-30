@@ -4,12 +4,12 @@ if %CONFIGURATION%==Debug if %PLATFORM%==x86 goto :DX86
 if %CONFIGURATION%==Debug if %PLATFORM%==x64 goto :DX64 
 if %CONFIGURATION%==Mixed if %PLATFORM%==x86 goto :MX86 
 if %CONFIGURATION%==Mixed if %PLATFORM%==x64 goto :MX64 
-if %CONFIGURATION%==Mixed_COC if %PLATFORM%==x86 goto :MX_COC86 
-if %CONFIGURATION%==Mixed_COC if %PLATFORM%==x64 goto :MX_COC64 
+if %CONFIGURATION%==Mixed_COC if %PLATFORM%==x86 goto :MX_CoC86 
+if %CONFIGURATION%==Mixed_COC if %PLATFORM%==x64 goto :MX_CoC64 
 if %CONFIGURATION%==Release if %PLATFORM%==x86 goto :RX86 
 if %CONFIGURATION%==Release if %PLATFORM%==x64 goto :RX64 
-if %CONFIGURATION%==Release_COC if %PLATFORM%==x86 goto :RX_COC86 
-if %CONFIGURATION%==Release_COC if %PLATFORM%==x64 goto :RX_COC64 
+if %CONFIGURATION%==Release_COC if %PLATFORM%==x86 goto :RX_CoC86 
+if %CONFIGURATION%==Release_COC if %PLATFORM%==x64 goto :RX_CoC64 
 
 echo FAIL
 goto :END 
@@ -66,7 +66,7 @@ cd res\
 7z a xdOpenXRay.Mx64.7z .\* 
 goto :END 
 
-:MX_COC86 
+:MX_CoC86 
 cd _build\bin\Win32\Mixed_COC 
 copy *.dll ..\..\..\..\res\bins\ 
 copy *.exe ..\..\..\..\res\bins\ 
@@ -79,7 +79,7 @@ cd res\
 7z a xdOpenXRay.Mx_CoC86.7z .\* 
 goto :END 
 
-:MX_COC64 
+:MX_CoC64 
 cd _build\bin\Win64\Mixed_COC 
 copy *.dll ..\..\..\..\res\bins\ 
 copy *.exe ..\..\..\..\res\bins\ 
@@ -118,7 +118,7 @@ cd res\
 7z a xdOpenXRay.Rx64.7z .\* 
 goto :END 
 
-:RX_COC86 
+:RX_CoC86 
 cd _build\bin\Win32\Release_COC 
 copy *.dll ..\..\..\..\res\bins\ 
 copy *.exe ..\..\..\..\res\bins\ 
@@ -131,7 +131,7 @@ cd res\
 7z a xdOpenXRay.Rx_CoC86.7z .\* 
 goto :END 
 
-:RX_COC64 
+:RX_CoC64 
 cd _build\bin\Win64\Release_COC 
 copy *.dll ..\..\..\..\res\bins\ 
 copy *.exe ..\..\..\..\res\bins\ 
