@@ -14,6 +14,7 @@
 #include "xr_object.h"
 #include "xr_object_list.h"
 
+ENGINE_API xr_vector<xr_token> AvailableVideoModes;
 xr_vector<xr_token> vid_quality_token;
 
 const xr_token vid_bpp_token[] = {{"16", 16}, {"32", 32}, {0, 0}};
@@ -389,7 +390,7 @@ public:
         }
     }
     virtual void Status(TStatus& S) { xr_sprintf(S, sizeof(S), "%dx%d", psCurrentVidMode[0], psCurrentVidMode[1]); }
-    const xr_token* GetToken() noexcept override { return GEnv.vid_mode_token; }
+    const xr_token* GetToken() noexcept override { return AvailableVideoModes.data(); }
     virtual void Info(TInfo& I) { xr_strcpy(I, sizeof(I), "change screen resolution WxH"); }
     virtual void fill_tips(vecTips& tips, u32 mode)
     {

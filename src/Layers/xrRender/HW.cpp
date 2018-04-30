@@ -4,18 +4,10 @@
 #include "xrEngine/XR_IOConsole.h"
 #include "xrCore/xr_token.h"
 
-#ifndef _EDITOR
+extern ENGINE_API xr_vector<xr_token> AvailableVideoModes;
+
 void fill_vid_mode_list(CHW* _hw);
 void free_vid_mode_list();
-
-void fill_render_mode_list();
-void free_render_mode_list();
-#else
-void fill_vid_mode_list(CHW* _hw) {}
-void free_vid_mode_list() {}
-void fill_render_mode_list() {}
-void free_render_mode_list() {}
-#endif
 
 CHW HW;
 
@@ -240,9 +232,7 @@ void CHW::DestroyDevice()
 
     DestroyD3D();
 
-#ifndef _EDITOR
     free_vid_mode_list();
-#endif
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -348,9 +338,9 @@ void CHW::selectResolution(u32& dwWidth, u32& dwHeight, BOOL bWindowed)
             string64 buff;
             xr_sprintf(buff, sizeof(buff), "%dx%d", psCurrentVidMode[0], psCurrentVidMode[1]);
 
-            if (_ParseItem(buff, GEnv.vid_mode_token) == u32(-1)) // not found
+            if (_ParseItem(buff, AvailableVideoModes.data()) == u32(-1)) // not found
             { // select safe
-                xr_sprintf(buff, sizeof(buff), "vid_mode %s", GEnv.vid_mode_token[0].name);
+                xr_sprintf(buff, sizeof(buff), "vid_mode %s", AvailableVideoModes[0].name);
                 Console->Execute(buff);
             }
 
@@ -558,73 +548,55 @@ void CHW::updateWindowProps(HWND m_hWnd)
 #endif
 }
 
-struct _uniq_mode
+struct uniqueRenderingMode
 {
-    _uniq_mode(LPCSTR v) : _val(v) {}
-    LPCSTR _val;
-    bool operator()(LPCSTR _other) { return !xr_stricmp(_val, _other); }
+    uniqueRenderingMode(pcstr v) : value(v) {}
+    pcstr value;
+    bool operator()(const xr_token other) const { return !xr_stricmp(value, other.name);}
 };
-
-#ifndef _EDITOR
 
 void free_vid_mode_list()
 {
-    for (int i = 0; GEnv.vid_mode_token[i].name; i++)
-    {
-        xr_free(GEnv.vid_mode_token[i].name);
-    }
-    xr_free(GEnv.vid_mode_token);
-    GEnv.vid_mode_token = nullptr;
+    for (auto& mode : AvailableVideoModes)
+        xr_free(mode.name);
+    AvailableVideoModes.clear();
 }
 
 void fill_vid_mode_list(CHW* _hw)
 {
-    if (GEnv.vid_mode_token != nullptr)
+    if (!AvailableVideoModes.empty())
         return;
-    xr_vector<LPCSTR> _tmp;
-    xr_vector<D3DDISPLAYMODE> modes;
+
+    xr_vector<D3DDISPLAYMODE> displayModes;
 
     // Get the number of display modes available
-    UINT cnt = _hw->pD3D->GetAdapterModeCount(_hw->DevAdapter, _hw->Caps.fTarget);
+    const auto cnt = _hw->pD3D->GetAdapterModeCount(_hw->DevAdapter, _hw->Caps.fTarget);
 
     // Get the list of display modes
-    modes.resize(cnt);
+    displayModes.resize(cnt);
     for (auto i = 0; i < cnt; ++i)
-        _hw->pD3D->EnumAdapterModes(_hw->DevAdapter, _hw->Caps.fTarget, i, &modes[i]);
+        _hw->pD3D->EnumAdapterModes(_hw->DevAdapter, _hw->Caps.fTarget, i, &displayModes[i]);
 
-    for (auto &i : modes)
+    int i = 0;
+    auto& AVM = AvailableVideoModes;
+    for (const auto& it : displayModes)
     {
         string32 str;
 
-        if (i.Width < 800)
+        if (it.Width < 800)
             continue;
 
-        xr_sprintf(str, sizeof(str), "%dx%d", i.Width, i.Height);
+        xr_sprintf(str, sizeof(str), "%dx%d", it.Width, it.Height);
 
-        if (_tmp.end() != std::find_if(_tmp.begin(), _tmp.end(), _uniq_mode(str)))
+        if (AVM.cend() != std::find_if(AVM.cbegin(), AVM.cend(), uniqueRenderingMode(str)))
             continue;
 
-        _tmp.push_back(nullptr);
-        _tmp.back() = xr_strdup(str);
+        AVM.emplace_back(xr_token(xr_strdup(str), i));
+        ++i;
     }
+    AVM.emplace_back(xr_token(nullptr, -1));
 
-    u32 _cnt = _tmp.size() + 1;
-
-    GEnv.vid_mode_token = xr_alloc<xr_token>(_cnt);
-
-    GEnv.vid_mode_token[_cnt - 1].id = -1;
-    GEnv.vid_mode_token[_cnt - 1].name = nullptr;
-
-#ifdef DEBUG
-    Msg("Available video modes[%d]:", _tmp.size());
-#endif // DEBUG
-    for (auto i = 0; i < _tmp.size(); ++i)
-    {
-        GEnv.vid_mode_token[i].id = i;
-        GEnv.vid_mode_token[i].name = _tmp[i];
-#ifdef DEBUG
-        Msg("[%s]", _tmp[i]);
-#endif // DEBUG
-    }
+    Msg("Available video modes[%d]:", AVM.size());
+    for (const auto& mode : AVM)
+        Msg("[%s]", mode.name);
 }
-#endif
