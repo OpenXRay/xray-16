@@ -662,34 +662,34 @@ CRenderTarget::CRenderTarget()
         s_ssao.create(b_ssao, "r2\\ssao");
     }
 
-
-    // XXX: Xottab_DUTY: find out why it's available on R3, but commented here
-    // if (RImplementation.o.ssao_blur_on)
-    //{
-    //	u32		w = Device.dwWidth, h = Device.dwHeight;
-    //	rt_ssao_temp.create			(r2_RT_ssao_temp, w, h, D3DFMT_G16R16F, SampleCount);
-    //	s_ssao.create				(b_ssao, "r2\\ssao");
-
-    //	if( RImplementation.o.dx10_msaa )
-    //	{
-    //		int bound = RImplementation.o.dx10_msaa_opt ? 1 : RImplementation.o.dx10_msaa_samples;
-
-    //		for( int i = 0; i < bound; ++i )
-    //		{
-    //			s_ssao_msaa[i].create( b_ssao_msaa[i], "null");
-    //		}
-    //	}
-    //}
-
     // HDAO
-    if (RImplementation.o.ssao_hdao && RImplementation.o.ssao_ultra)
+    const bool ssao_blur_on = RImplementation.o.ssao_blur_on;
+    const bool ssao_hdao_ultra = RImplementation.o.ssao_hdao && RImplementation.o.ssao_ultra;
+    if (ssao_blur_on || ssao_hdao_ultra)
     {
-        u32 w = Device.dwWidth, h = Device.dwHeight;
-        rt_ssao_temp.create(r2_RT_ssao_temp, w, h, D3DFMT_R16F, 1, true);
-        s_hdao_cs.create(b_hdao_cs, "r2\\ssao");
-        if (RImplementation.o.dx10_msaa)
+        const auto w = Device.dwWidth, h = Device.dwHeight;
+        rt_ssao_temp.create(r2_RT_ssao_temp, w, h, D3DFMT_G16R16F, SampleCount, true);
+
+        if (ssao_hdao_ultra)
         {
-            s_hdao_cs_msaa.create(b_hdao_msaa_cs, "r2\\ssao");
+            //rt_ssao_temp.create(r2_RT_ssao_temp, w, h, D3DFMT_R16F, 1, true); // original line; changed and moved upper
+            s_hdao_cs.create(b_hdao_cs, "r2\\ssao");
+            if (RImplementation.o.dx10_msaa)
+                s_hdao_cs_msaa.create(b_hdao_msaa_cs, "r2\\ssao");
+        }
+
+        else if (ssao_blur_on)
+        {
+            //rt_ssao_temp.create(r2_RT_ssao_temp, w, h, D3DFMT_G16R16F, SampleCount); // moved upper
+            s_ssao.create(b_ssao, "r2\\ssao");
+
+            if (RImplementation.o.dx10_msaa)
+            {
+                const int bound = RImplementation.o.dx10_msaa_opt ? 1 : RImplementation.o.dx10_msaa_samples;
+
+                for (int i = 0; i < bound; ++i)
+                    s_ssao_msaa[i].create(b_ssao_msaa[i], "null");
+            }
         }
     }
 
