@@ -13,6 +13,7 @@ public:
     CEngineAPI External;
     CEventAPI Event;
     CSheduler Sheduler;
+    XRay::Scheduler Scheduler;
 
     void Initialize();
     void Destroy();

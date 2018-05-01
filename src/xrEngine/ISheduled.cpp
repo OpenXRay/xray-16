@@ -41,3 +41,6 @@ void ScheduledBase::shedule_Update(u32 dt)
     shedule.dbg_update_shedule = shedule.dbg_startframe;
 #endif
 }
+
+void ScheduledBaseMT::shedule_register() { Engine.Scheduler.Register(this); }
+void ScheduledBaseMT::shedule_unregister() { Engine.Scheduler.Unregister(this); }
