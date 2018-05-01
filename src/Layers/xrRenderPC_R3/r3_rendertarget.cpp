@@ -659,15 +659,14 @@ CRenderTarget::CRenderTarget()
         rt_ssao_temp.create(r2_RT_ssao_temp, w, h, D3DFMT_G16R16F, SampleCount);
         s_ssao.create(b_ssao, "r2\\ssao");
 
+        /* Should be used in r3_rendertarget_phase_ssao.cpp but it's commented there.
         if (RImplementation.o.dx10_msaa)
         {
-            int bound = RImplementation.o.dx10_msaa_opt ? 1 : RImplementation.o.dx10_msaa_samples;
+            const int bound = RImplementation.o.dx10_msaa_opt ? 1 : RImplementation.o.dx10_msaa_samples;
 
             for (int i = 0; i < bound; ++i)
-            {
                 s_ssao_msaa[i].create(b_ssao_msaa[i], "null");
-            }
-        }
+        }*/
     }
 
     // COMBINE
