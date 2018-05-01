@@ -291,49 +291,45 @@ void CHW::selectResolution(u32& dwWidth, u32& dwHeight, BOOL bWindowed)
 DXGI_RATIONAL CHW::selectRefresh(u32 dwWidth, u32 dwHeight, DXGI_FORMAT fmt)
 {
     if (psDeviceFlags.is(rsRefresh60hz))
-    {
         return DXGI_RATIONAL({ 60, 1 });
-    }
-    else
+
+    xr_vector<DXGI_MODE_DESC> modes;
+
+    IDXGIOutput* pOutput;
+    m_pAdapter->EnumOutputs(0, &pOutput);
+    VERIFY(pOutput);
+
+    UINT num = 0;
+    DXGI_FORMAT format = fmt;
+    UINT flags = 0;
+
+    // Get the number of display modes available
+    pOutput->GetDisplayModeList(format, flags, &num, nullptr);
+
+    // Get the list of display modes
+    modes.resize(num);
+    pOutput->GetDisplayModeList(format, flags, &num, &modes.front());
+
+    _RELEASE(pOutput);
+
+    float CurrentFreq = 60.0f;
+    DXGI_RATIONAL res = { 60, 1 };
+
+    for (auto &i : modes)
     {
-        xr_vector<DXGI_MODE_DESC> modes;
-
-        IDXGIOutput* pOutput;
-        m_pAdapter->EnumOutputs(0, &pOutput);
-        VERIFY(pOutput);
-
-        UINT num = 0;
-        DXGI_FORMAT format = fmt;
-        UINT flags = 0;
-
-        // Get the number of display modes available
-        pOutput->GetDisplayModeList(format, flags, &num, nullptr);
-
-        // Get the list of display modes
-        modes.resize(num);
-        pOutput->GetDisplayModeList(format, flags, &num, &modes.front());
-
-        _RELEASE(pOutput);
-
-        float CurrentFreq = 60.0f;
-        DXGI_RATIONAL res = { 60, 1 };
-
-        for (auto &i : modes)
+        if ((i.Width == dwWidth) && (i.Height == dwHeight))
         {
-            if ((i.Width == dwWidth) && (i.Height == dwHeight))
+            VERIFY(i.RefreshRate.Denominator);
+            float TempFreq = float(i.RefreshRate.Numerator) / float(i.RefreshRate.Denominator);
+            if (TempFreq > CurrentFreq)
             {
-                VERIFY(i.RefreshRate.Denominator);
-                float TempFreq = float(i.RefreshRate.Numerator) / float(i.RefreshRate.Denominator);
-                if (TempFreq > CurrentFreq)
-                {
-                    CurrentFreq = TempFreq;
-                    res = i.RefreshRate;
-                }
+                CurrentFreq = TempFreq;
+                res = i.RefreshRate;
             }
         }
-
-        return res;
     }
+
+    return res;
 }
 
 BOOL CHW::support(D3DFORMAT fmt, DWORD type, DWORD usage)
