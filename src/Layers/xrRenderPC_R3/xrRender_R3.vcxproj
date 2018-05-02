@@ -422,6 +422,7 @@
     <ClInclude Include="..\xrRender\light_gi.h" />
     <ClInclude Include="..\xrRender\Light_Render_Direct.h" />
     <ClInclude Include="..\xrRender\light_smapvis.h" />
+    <ClInclude Include="blender_ss_sunshafts.h" />
     <ClInclude Include="r2_types.h" />
     <ClInclude Include="r3.h" />
     <ClInclude Include="r3_rendertarget.h" />
@@ -586,10 +587,12 @@
     <ClCompile Include="..\xrRender\Light_Render_Direct_ComputeXFS.cpp" />
     <ClCompile Include="..\xrRender\light_smapvis.cpp" />
     <ClCompile Include="..\xrRender\light_vis.cpp" />
+    <ClCompile Include="blender_ss_sunshafts.cpp" />
     <ClCompile Include="r2_blenders.cpp" />
     <ClCompile Include="r2_R_calculate.cpp" />
     <ClCompile Include="r2_R_lights.cpp" />
     <ClCompile Include="r3_rendertarget_phase_FXAA.cpp" />
+    <ClCompile Include="r3_rendertarget_phase_ss_sunshafts.cpp" />
     <ClCompile Include="r3_R_sun.cpp" />
     <ClCompile Include="r2_sector_detect.cpp" />
     <ClCompile Include="r2_test_hw.cpp" />

@@ -5,13 +5,39 @@
 #include "xrCore/xr_token.h"
 
 u32 ps_Preset = 2;
-const xr_token qpreset_token[] = {{"Minimum", 0}, {"Low", 1}, {"Default", 2}, {"High", 3}, {"Extreme", 4}, {nullptr, 0}};
+const xr_token qpreset_token[] = {
+    {"Minimum", 0},
+    {"Low", 1},
+    {"Default", 2},
+    {"High", 3},
+    {"Extreme", 4},
+    {nullptr, 0}
+};
 
 u32 ps_r_ssao_mode = 2;
-const xr_token qssao_mode_token[] = {{"disabled", 0}, {"default", 1}, {"hdao", 2}, {"hbao", 3}, {nullptr, 0}};
+const xr_token qssao_mode_token[] = {
+    {"disabled", 0},
+    {"default", 1},
+    {"hdao", 2},
+    {"hbao", 3},
+    {nullptr, 0}
+};
 
 u32 ps_r_sun_shafts = 2;
-const xr_token qsun_shafts_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st_opt_medium", 2}, {"st_opt_high", 3}, {nullptr, 0}};
+const xr_token qsun_shafts_token[] = {
+    {"st_opt_off", 0},
+    {"st_opt_low", 1},
+    {"st_opt_medium", 2},
+    {"st_opt_high", 3},
+    {nullptr, 0}
+};
+
+u32 ps_sunshafts_mode = 0;
+xr_token sunshafts_mode_token[] = {
+    { "volumetric", 0 },
+    { "screen_space", 1 },
+    { nullptr, 0 }
+};
 
 u32 ps_r_ssao = 3;
 const xr_token qssao_token[] = {{"st_opt_off", 0}, {"st_opt_low", 1}, {"st_opt_medium", 2}, {"st_opt_high", 3},
@@ -197,6 +223,9 @@ float ps_current_detail_scale = 1.f;
 xr_token ext_quality_token[] = {{"qt_off", 0}, {"qt_low", 1}, {"qt_medium", 2},
     {"qt_high", 3}, {"qt_extreme", 4}, {nullptr, 0}};
 //-AVO
+
+float ps_r2_ss_sunshafts_length = 1.f;
+float ps_r2_ss_sunshafts_radius = 1.f;
 
 Flags32 ps_actor_shadow_flags = { 0 };
 
@@ -849,6 +878,9 @@ void xrRender_initconsole()
     //float ps_r2_dof_near = 0.f; // 0.f
     //float ps_r2_dof_focus = 1.4f; // 1.4f
 
+    CMD3(CCC_Token, "r2_sunshafts_mode", &ps_sunshafts_mode, sunshafts_mode_token);
+    CMD4(CCC_Float, "r2_ss_sunshafts_length", &ps_r2_ss_sunshafts_length, .2f, 1.5f);
+    CMD4(CCC_Float, "r2_ss_sunshafts_radius", &ps_r2_ss_sunshafts_radius, .5f, 2.f);
     CMD3(CCC_Mask, "r2_volumetric_lights", &ps_r2_ls_flags, R2FLAG_VOLUMETRIC_LIGHTS);
     //CMD3(CCC_Mask, "r2_sun_shafts", &ps_r2_ls_flags, R2FLAG_SUN_SHAFTS);
     CMD3(CCC_Token, "r2_sun_shafts", &ps_r_sun_shafts, qsun_shafts_token);

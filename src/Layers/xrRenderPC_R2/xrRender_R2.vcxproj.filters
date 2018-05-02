@@ -621,6 +621,9 @@
     <ClInclude Include="..\xrRender\KinematicsAddBoneTransform.hpp">
       <Filter>Refactored\Execution &amp; 3D\Visuals\Skeleton</Filter>
     </ClInclude>
+    <ClInclude Include="blender_ss_sunshafts.h">
+      <Filter>Shading templates</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -1112,8 +1115,17 @@
     <ClCompile Include="blender_fxaa.cpp">
       <Filter>Shading templates</Filter>
     </ClCompile>
+    <ClCompile Include="blender_ss_sunshafts.cpp">
+      <Filter>Shading templates</Filter>
+    </ClCompile>
+    <ClCompile Include="r2_rendertarget_phase_ss_sunshafts.cpp">
+      <Filter>Core_Target</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="todo.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\TypeHelper.natvis" />
   </ItemGroup>
 </Project>

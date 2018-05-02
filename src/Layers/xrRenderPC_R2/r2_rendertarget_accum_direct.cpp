@@ -813,7 +813,7 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
     if ((sub_phase != SE_SUN_NEAR) && (sub_phase != SE_SUN_MIDDLE) && (sub_phase != SE_SUN_FAR))
         return;
 
-    if (!(RImplementation.o.advancedpp && ps_r_sun_shafts))
+    if (!(RImplementation.o.advancedpp && ps_r_sun_shafts && ps_sunshafts_mode == R2SS_VOLUMETRIC))
         return;
 
     {

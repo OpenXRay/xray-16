@@ -1,0 +1,68 @@
+#include "common.h"
+#include "ogse_config.h"
+#include "ogse_functions.h"
+
+uniform float4 c_sunshafts;		// x - exposure, y - density, z - sample size, w - radius
+uniform sampler2D s_sun_shafts; // current sunshafts texture
+uniform float4 screen_res;
+
+#ifndef SUNSHAFTS_QUALITY
+	#define num_iter int(1)
+#else
+	#if SUNSHAFTS_QUALITY==1
+		#define num_iter int(25)
+	#else
+		#if SUNSHAFTS_QUALITY==2
+			#define num_iter int(35)
+		#else
+			#if SUNSHAFTS_QUALITY==3
+				#define num_iter int(45)
+			#else
+				#define num_iter int(55)
+			#endif
+		#endif
+	#endif
+#endif
+float4 main(p_screen IN):COLOR0
+{
+	// prepare some constants
+	float _length = SS_LENGTH*0.2;
+	float NUM = num_iter * _length;
+
+	float2 tc = IN.tc0.xy;
+	// dist to the sun
+	float sun_dist = FARPLANE / (sqrt(1 - L_sun_dir_w.y * L_sun_dir_w.y));
+	// sun pos
+	float3 sun_pos_world = sun_dist*L_sun_dir_w + eye_position;
+	float4 sun_pos_projected = mul(m_VP, float4(sun_pos_world, 1));
+	float4 sun_pos_screen = proj_to_screen(sun_pos_projected)/sun_pos_projected.w;
+	// sun-pixel vector
+	float2 sun_vec_screen = sun_pos_screen.xy - tc;
+	// calculate filtering effect. sunshafts must appear only when looking in the sun dir
+	float angle_cos = dot(-eye_direction, normalize(L_sun_dir_w));
+	float fAspectRatio =  1.333 * screen_res.y / screen_res.x;
+//	float ray_fade = saturate(saturate(angle_cos)*(1 - saturate(dot(sun_vec_screen, sun_vec_screen)))*saturate(length(sun_vec_screen)));
+	float ray_fade = saturate(saturate(angle_cos)*saturate( 1 - saturate(length(sun_vec_screen * float2(1, fAspectRatio)) / (SS_LENGTH * c_sunshafts.w))));
+		
+	float4 depth = tex2D(s_sun_shafts, tc );
+	// adjust sampling
+	sun_vec_screen *= angle_cos * c_sunshafts.z * c_sunshafts.y * _length;
+	// sampling image along ray
+	float4 accum = depth;
+//	float depth_accum = 0;
+
+	for (int i = 1; i < NUM; i++)
+	{ 
+		tc += sun_vec_screen;
+		depth = tex2D(s_sun_shafts, tc);
+		accum.xyz += depth.xyz * (1 - i / NUM);
+//		depth_accum += saturate(depth.x);
+	}
+//	accum *= saturate(depth_accum);
+	accum /= NUM;
+
+	float4 Color = accum * 2  * float4(ray_fade.xxx, 1);
+	Color.w += (saturate(angle_cos*0.1 + 0.9) - 0.99999);
+	return Color;
+	//return float4(1.0, 0.0, 0.0, 1.0);
+}

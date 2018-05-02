@@ -49,6 +49,7 @@ public:
     IBlender* b_ssao;
     IBlender* b_ssao_msaa[8];
     IBlender* b_fxaa;
+    IBlender* b_sunshafts;
 
 #ifdef DEBUG
     struct dbg_line_t
@@ -74,6 +75,8 @@ public:
     //
     ref_rt rt_Accumulator; // 64bit		(r,g,b,specular)
     ref_rt rt_Accumulator_temp; // only for HW which doesn't feature fp16 blend
+    ref_rt rt_sunshafts_0;		// ss0
+    ref_rt rt_sunshafts_1;		// ss1
     ref_rt rt_Generic_0; // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
     ref_rt rt_Generic_1; // 32bit		(r,g,b,a)				// post-process, intermidiate results, etc.
 
@@ -118,6 +121,8 @@ private:
     // OCCq
 
     ref_shader s_occq;
+
+    ref_shader s_sunshafts;
 
     // SSAO
     ref_rt rt_ssao_temp;
@@ -186,6 +191,7 @@ private:
     float f_luminance_adapt;
 
     // Combine
+    ref_geom g_KD;
     ref_geom g_combine;
     ref_geom g_combine_VP; // xy=p,zw=tc
     ref_geom g_combine_2UV;
@@ -257,6 +263,7 @@ public:
     bool u_DBT_enable(float zMin, float zMax);
     void u_DBT_disable();
 
+    void phase_sunshafts();
     void phase_scene_prepare();
     void phase_scene_begin();
     void phase_scene_end();
