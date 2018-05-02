@@ -586,6 +586,16 @@ float CVisualMemoryManager::feel_vision_mtl_transp(IGameObject* O, u32 element)
     return vis;
 }
 
+void CVisualMemoryManager::remove(const MemorySpace::CVisibleObject *visible_object)
+{
+    VISIBLES::iterator I = std::find_if(m_objects->begin(), m_objects->end(), [&](const MemorySpace::CVisibleObject &object)
+    {
+        return visible_object == &object;
+    });
+    if (I != m_objects->end())
+        m_objects->erase(I);
+}
+
 struct CVisibleObjectPredicateEx
 {
     const IGameObject* m_object;

@@ -21,6 +21,7 @@ struct player_hud_motion
     shared_str m_base_name;
     shared_str m_additional_name;
     xr_vector<motion_descr> m_animations;
+    float m_anim_speed;
 };
 
 struct player_hud_motion_container
@@ -151,6 +152,10 @@ private:
     xr_vector<u16> m_ancors;
     attachable_hud_item* m_attached_items[2];
     xr_vector<attachable_hud_item*> m_pool;
+
+public:
+    static Fvector m_hud_offset_pos;
+    static Fvector m_hand_offset_pos;
 };
 
 extern player_hud* g_player_hud;

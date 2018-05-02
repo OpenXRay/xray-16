@@ -52,6 +52,8 @@
 #include "WeaponMagazinedWGrenade.h"
 #include "level_path_manager.h"
 #include "game_path_manager.h"
+#include "danger_manager.h"
+#include "danger_object.h"
 #endif
 //-Alundaio
 
@@ -490,7 +492,7 @@ u32 CScriptGameObject::get_dest_game_vertex_id()
         GEnv.ScriptEngine->script_log(LuaMessageType::Error, "CAI_Stalker : cannot access class member get_dest_level_vertex_id!");
     else
         return (stalker->movement().game_dest_vertex_id());
-    return (-1);
+    return u32(-1);
 }
 
 u32 CScriptGameObject::get_dest_level_vertex_id()
@@ -501,7 +503,7 @@ u32 CScriptGameObject::get_dest_level_vertex_id()
     else
         return stalker->movement().level_dest_vertex_id();
 
-    return (-1);
+    return u32(-1);
 }
 
 void CScriptGameObject::set_dest_level_vertex_id(u32 level_vertex_id)
@@ -1632,7 +1634,7 @@ u8 CScriptGameObject::GetRestrictionType()
     if (restr)
         return restr->m_space_restrictor_type;
 
-    return -1;
+    return u8(-1);
 }
 
 void CScriptGameObject::SetRestrictionType(u8 type)
@@ -1644,6 +1646,15 @@ void CScriptGameObject::SetRestrictionType(u8 type)
         if (type != RestrictionSpace::eRestrictorTypeNone)
             Level().space_restriction_manager().register_restrictor(restr, RestrictionSpace::ERestrictorTypes(type));
     }
+}
+
+void CScriptGameObject::RemoveDanger(const CDangerObject& dobject)
+{
+    CAI_Stalker* stalker = smart_cast<CAI_Stalker*>(&object());
+    if (!stalker)
+        return;
+    
+    stalker->memory().danger().remove(dobject);
 }
 #endif
 //-Alundaio

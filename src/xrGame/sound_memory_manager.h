@@ -90,6 +90,7 @@ public:
     virtual void feel_sound_new(
         IGameObject* who, int eType, CSound_UserDataPtr user_data, const Fvector& Position, float power);
     virtual void update();
+    void remove(const MemorySpace::CSoundObject *sound_object);
     void remove_links(IGameObject* object);
 
 public:

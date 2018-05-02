@@ -123,6 +123,9 @@ void xrCore::initParamFlags()
     if (strstr(Params, "-dbgact"))
         ParamFlags.set(ParamFlag::dbgact, TRUE);
 
+    if (strstr(Params, "-dbgbullet"))
+        ParamFlags.set(ParamFlag::dbgbullet, TRUE);
+
     if (strstr(Params, "-dbganim"))
         ParamFlags.set(ParamFlag::dbganim, TRUE);
 

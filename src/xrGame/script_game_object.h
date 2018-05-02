@@ -835,11 +835,17 @@ public:
     u8 GetRestrictionType();
     void SetRestrictionType(u8 type);
 
+    void RemoveDanger(const CDangerObject& dobject);
+    
+    void RemoveMemorySoundObject(const MemorySpace::CSoundObject &memory_object);
+    void RemoveMemoryHitObject(const MemorySpace::CHitObject &memory_object);
+    void RemoveMemoryVisibleObject(const MemorySpace::CVisibleObject &memory_object);
+
     //Weapon
     void Weapon_SetCurrentScope(u8 type);
     u8 Weapon_GetCurrentScope();
     void Weapon_AddonAttach(CScriptGameObject* item);
-    void Weapon_AddonDetach(pcstr item_section);
+    void Weapon_AddonDetach(pcstr item_section, bool b_spawn_item);
     bool HasAmmoType(u8 type);
     int GetAmmoCount(u8 type);
     void SetAmmoType(u8 type);

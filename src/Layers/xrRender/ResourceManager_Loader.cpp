@@ -96,6 +96,16 @@ void CResourceManager::OnDeviceCreate(IReader* F)
         {
             CBlender_DESC desc;
             chunk->r(&desc, sizeof(desc));
+
+#if RENDER != R_R1
+            if (desc.CLS == B_SHADOW_WORLD)
+            {
+                chunk->close();
+                chunk_id += 1;
+                continue;
+            }
+#endif
+
             IBlender* B = IBlender::Create(desc.CLS);
             if (nullptr == B)
             {

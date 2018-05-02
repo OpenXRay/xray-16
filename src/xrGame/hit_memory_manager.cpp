@@ -224,6 +224,16 @@ void CHitMemoryManager::enable(const IGameObject* object, bool enable)
     (*J).m_enabled = enable;
 }
 
+void CHitMemoryManager::remove(const MemorySpace::CHitObject *hit_object)
+{
+    HITS::iterator I = std::find_if(m_hits->begin(), m_hits->end(), [&](const MemorySpace::CHitObject &object)
+    {
+        return hit_object == &object;
+    });
+    if (I != m_hits->end())
+        m_hits->erase(I);
+}
+
 void CHitMemoryManager::remove_links(IGameObject* object)
 {
     if (m_last_hit_object_id == object->ID())

@@ -67,6 +67,22 @@ struct SSpecificCharacterData : CSharedResource
     //репутация
     CHARACTER_REPUTATION_VALUE m_Reputation;
 
+    //Alun
+    struct SRankDef
+    {
+        CHARACTER_RANK_VALUE min;
+        CHARACTER_RANK_VALUE max;
+    };
+    struct SReputationDef
+    {
+        CHARACTER_REPUTATION_VALUE min;
+        CHARACTER_REPUTATION_VALUE max;
+    };
+
+    SRankDef rank_def;
+    SReputationDef reputation_def;
+    //-Alun
+
     //классы персонажа (военные-ветераны, ученые и т.д.)
     //к которым он принадлежит
     xr_vector<CHARACTER_CLASS> m_Classes;
@@ -133,6 +149,8 @@ public:
     shared_str Bio() const;
     const CHARACTER_COMMUNITY& Community() const;
     SSpecificCharacterData::SMoneyDef& MoneyDef() { return data()->money_def; }
+    SSpecificCharacterData::SRankDef& RankDef() { return data()->rank_def; }
+    SSpecificCharacterData::SReputationDef& ReputationDef() { return data()->reputation_def; }
 #endif
 
     CHARACTER_RANK_VALUE Rank() const;

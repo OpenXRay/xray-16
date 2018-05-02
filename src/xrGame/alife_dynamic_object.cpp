@@ -43,10 +43,6 @@ void CSE_ALifeDynamicObject::on_before_register() {}
 
 void CSE_ALifeDynamicObject::on_unregister()
 {
-    luabind::functor<void> funct;
-    if (GEnv.ScriptEngine->functor("_G.CSE_ALifeDynamicObject_on_unregister", funct))
-        funct((u16)ID);
-
     Level().MapManager().OnObjectDestroyNotify(ID);
 }
 

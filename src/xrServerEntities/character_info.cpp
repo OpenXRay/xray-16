@@ -54,9 +54,25 @@ void CCharacterInfo::InitSpecificCharacter(shared_str new_id)
 
     m_SpecificCharacter.Load(m_SpecificCharacterId);
     if (Rank().value() == NO_RANK)
-        SetRank(m_SpecificCharacter.Rank());
+    {
+        if (m_SpecificCharacter.RankDef().min != m_SpecificCharacter.RankDef().max)
+        {
+            int rank = ::Random.randI(m_SpecificCharacter.RankDef().min, m_SpecificCharacter.RankDef().max);
+            SetRank(rank);
+        }
+        else
+            SetRank(m_SpecificCharacter.RankDef().max);
+    }
     if (Reputation().value() == NO_REPUTATION)
-        SetReputation(m_SpecificCharacter.Reputation());
+    {
+        if (m_SpecificCharacter.ReputationDef().min != m_SpecificCharacter.ReputationDef().max)
+        {
+            int rep = ::Random.randI(m_SpecificCharacter.ReputationDef().min, m_SpecificCharacter.ReputationDef().max);
+            SetReputation(rep);
+        }
+        else
+            SetReputation(m_SpecificCharacter.ReputationDef().max);
+    }
     if (Community().index() == NO_COMMUNITY_INDEX)
         SetCommunity(m_SpecificCharacter.Community().index());
     if (!m_StartDialog || !m_StartDialog.size())
@@ -94,8 +110,33 @@ void CCharacterInfo::load_shared(LPCSTR)
         else
             data()->m_Class = NO_CHARACTER_CLASS;
 
-        data()->m_Rank = pXML->ReadInt("rank", 0, NO_RANK);
-        data()->m_Reputation = pXML->ReadInt("reputation", 0, NO_REPUTATION);
+        int min_rank = pXML->ReadAttribInt("rank", 0, "min", NO_RANK);
+        int max_rank = pXML->ReadAttribInt("rank", 0, "max", NO_RANK);
+        if (min_rank != NO_RANK && max_rank != NO_RANK)
+        {
+            min_rank = _min(min_rank, max_rank);
+            max_rank = _max(max_rank, min_rank);
+            if (max_rank != min_rank)
+                data()->m_Rank = ::Random.randI(min_rank, max_rank);
+            else
+                data()->m_Rank = max_rank;
+        }
+        else
+            data()->m_Rank = pXML->ReadInt("rank", 0, NO_RANK);
+
+        int min_reputation = pXML->ReadAttribInt("reputation", 0, "min", NO_REPUTATION);
+        int max_reputation = pXML->ReadAttribInt("reputation", 0, "max", NO_REPUTATION);
+        if (min_reputation != NO_REPUTATION && max_reputation != NO_REPUTATION)
+        {
+            min_reputation = _min(min_reputation, max_reputation);
+            max_reputation = _max(max_reputation, min_reputation);
+            if (max_reputation != min_reputation)
+                data()->m_Reputation = ::Random.randI(min_reputation, max_reputation);
+            else
+                data()->m_Reputation = max_reputation;
+        }
+        else
+            data()->m_Reputation = pXML->ReadInt("reputation", 0, NO_REPUTATION);
     }
     else
         data()->m_CharacterId = spec_char;

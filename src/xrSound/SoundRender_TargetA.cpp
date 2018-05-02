@@ -105,6 +105,16 @@ void CSoundRender_TargetA::update()
     {
         while (processed)
         {
+            // kcat: If there's a long enough freeze and the sources underrun, they go to an AL_STOPPED state.
+            // That update function will correctly see this and remove/refill/requeue the buffers, but doesn't restart the source
+            // (that's in the separate else block that didn't run this time).Because the source remains AL_STOPPED,
+            // the next update will still see all the buffers marked as processed and remove / refill / requeue them again.
+            // It keeps doing this and never actually restarts the source after an underrun.
+            ALint state;
+            A_CHK(alGetSourcei(pSource, AL_SOURCE_STATE, &state));
+            if (state == AL_STOPPED)
+                A_CHK(alSourcePlay(pSource));
+            //
             ALuint BufferID;
             A_CHK(alSourceUnqueueBuffers(pSource, 1, &BufferID));
             fill_block(BufferID);
@@ -114,13 +124,12 @@ void CSoundRender_TargetA::update()
     }
     else
     {
-        // processed == 0
         // check play status -- if stopped then queue is not being filled fast enough
         ALint state;
         A_CHK(alGetSourcei(pSource, AL_SOURCE_STATE, &state));
         if (state != AL_PLAYING)
         {
-            //Log("Queuing underrun detected.");
+            Log("!![CSoundRender_TargetA::update()] Queuing underrun detected!");
             A_CHK(alSourcePlay(pSource));
         }
     }

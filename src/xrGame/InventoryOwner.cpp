@@ -37,9 +37,9 @@ CInventoryOwner::CInventoryOwner()
     m_inventory = new CInventory();
     m_pCharacterInfo = new CCharacterInfo();
 
-    EnableTalk();
-    EnableTrade();
-    EnableInvUpgrade();
+    m_bAllowTalk = true;
+    m_bAllowTrade = true;
+    m_bAllowInvUpgrade = false;
     bDisableBreakDialog = false;
 
     m_known_info_registry = new CInfoPortionWrapper();

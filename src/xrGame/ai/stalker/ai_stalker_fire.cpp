@@ -226,6 +226,9 @@ void CAI_Stalker::Hit(SHit* pHDS)
 
     float hit_power = HDS.power * m_fRankImmunity;
 
+    if (Core.ParamFlags.test(Core.dbgbullet))
+        Msg("CAI_Stalker::Hit hit_type=%d | hit_power(%f)*m_fRankImmunity(%f) = %f", (u32)HDS.hit_type, HDS.power, m_fRankImmunity, hit_power);
+
     if (m_boneHitProtection && HDS.hit_type == ALife::eHitTypeFireWound)
     {
         float BoneArmor = m_boneHitProtection->getBoneArmor(HDS.bone());
@@ -240,11 +243,17 @@ void CAI_Stalker::Hit(SHit* pHDS)
 
                 hit_power *= d_hit_power;
                 VERIFY(hit_power >= 0.0f);
+
+                if (Core.ParamFlags.test(Core.dbgbullet))
+                    Msg("CAI_Stalker::Hit AP(%f) > BoneArmor(%f) [HitFracNpc=%f] modified hit_power=%f", ap, BoneArmor, m_boneHitProtection->m_fHitFracNpc, hit_power);
             }
             else
             {
                 hit_power *= m_boneHitProtection->m_fHitFracNpc;
                 HDS.add_wound = false;
+
+                if (Core.ParamFlags.test(Core.dbgbullet))
+                    Msg("CAI_Stalker::Hit AP(%f) < BoneArmor(%f) [HitFracNpc=%f] modified hit_power=%f", ap, BoneArmor, m_boneHitProtection->m_fHitFracNpc, hit_power);
             }
         }
 
@@ -253,6 +262,7 @@ void CAI_Stalker::Hit(SHit* pHDS)
             hit_power = 1000.f;
         }
     }
+
     HDS.power = hit_power;
 
     if (g_Alive())

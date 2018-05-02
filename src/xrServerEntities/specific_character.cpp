@@ -19,6 +19,16 @@ SSpecificCharacterData::SSpecificCharacterData()
     m_Rank = NO_RANK;
     m_Reputation = NO_REPUTATION;
 
+    money_def.inf_money = false;
+    money_def.max_money = 0;
+    money_def.min_money = 0;
+
+    rank_def.min = NO_RANK;
+    rank_def.max = NO_RANK;
+
+    reputation_def.min = NO_REPUTATION;
+    reputation_def.max = NO_REPUTATION;
+
     m_bNoRandom = false;
     m_bDefaultForCommunity = false;
     m_fPanic_threshold = 0.0f;
@@ -163,11 +173,35 @@ void CSpecificCharacter::load_shared(LPCSTR)
     if (data()->m_Community.index() == NO_COMMUNITY_INDEX)
         xrDebug::Fatal(DEBUG_INFO, "wrong 'community' '%s' in specific character %s ", team, *m_OwnId);
 
-    data()->m_Rank = pXML->ReadInt("rank", 0, NO_RANK);
-    R_ASSERT3(data()->m_Rank != NO_RANK, "'rank' field not fulfiled for specific character", *m_OwnId);
-    data()->m_Reputation = pXML->ReadInt("reputation", 0, NO_REPUTATION);
-    R_ASSERT3(
-        data()->m_Reputation != NO_REPUTATION, "'reputation' field not fulfiled for specific character", *m_OwnId);
+    int min_rank = pXML->ReadAttribInt("rank", 0, "min", NO_RANK);
+    int max_rank = pXML->ReadAttribInt("rank", 0, "max", NO_RANK);
+    if (min_rank != NO_RANK && max_rank != NO_RANK)
+    {
+        RankDef().min = _min(min_rank, max_rank);
+        RankDef().max = _max(max_rank, min_rank);
+    }
+    else
+    {
+        int rank = pXML->ReadInt("rank", 0, NO_RANK);
+        R_ASSERT3(rank != NO_RANK, "'rank' field not fulfiled for specific character", *m_OwnId);
+        RankDef().min = rank;
+        RankDef().max = rank;
+    }
+    
+    int min_reputation = pXML->ReadAttribInt("reputation", 0, "min", NO_REPUTATION);
+    int max_reputation = pXML->ReadAttribInt("reputation", 0, "max", NO_REPUTATION);
+    if (min_reputation != NO_REPUTATION && max_reputation != NO_REPUTATION)
+    {
+        ReputationDef().min = _min(min_reputation, max_reputation);
+        ReputationDef().max = _max(max_reputation, min_reputation);
+    }
+    else
+    {
+        int rep = pXML->ReadInt("reputation", 0, NO_REPUTATION);
+        R_ASSERT3(rep != NO_REPUTATION, "'reputation' field not fulfiled for specific character", *m_OwnId);
+        ReputationDef().min = rep;
+        ReputationDef().max = rep;
+    }
 
     if (pXML->NavigateToNode(pXML->GetLocalRoot(), "money", 0))
     {

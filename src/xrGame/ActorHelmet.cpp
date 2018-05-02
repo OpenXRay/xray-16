@@ -212,6 +212,9 @@ void CHelmet::AddBonesProtection(LPCSTR bones_section)
 
 float CHelmet::HitThroughArmor(float hit_power, s16 element, float ap, bool& add_wound, ALife::EHitType hit_type)
 {
+    if (Core.ParamFlags.test(Core.dbgbullet))
+        Msg("CHelmet::HitThroughArmor hit_type=%d | unmodified hit_power=%f", (u32)hit_type, hit_power);
+
     float NewHitPower = hit_power;
     if (hit_type == ALife::eHitTypeFireWound)
     {
@@ -239,14 +242,19 @@ float CHelmet::HitThroughArmor(float hit_power, s16 element, float ap, bool& add
             if (d_hit_power < m_boneProtection->m_fHitFracActor)
                 d_hit_power = m_boneProtection->m_fHitFracActor;
 
-            hit_power *= d_hit_power;
+            NewHitPower *= d_hit_power;
         }
         else
         {
             //пуля НЕ пробила бронь
             NewHitPower *= m_boneProtection->m_fHitFracActor;
             //add_wound = false; //раны нет
+            if (Core.ParamFlags.test(Core.dbgbullet))
+                Msg("CHelmet::HitThroughArmor AP(%f) <= bone_armor(%f) [HitFracActor=%f] modified hit_power=%f", ap, BoneArmor, m_boneProtection->m_fHitFracActor, NewHitPower);
         }
+
+        if (Core.ParamFlags.test(Core.dbgbullet))
+            Msg("CHelmet::HitThroughArmor AP(%f) > bone_armor(%f) [HitFracActor=%f] modified hit_power=%f", ap, BoneArmor, m_boneProtection->m_fHitFracActor, NewHitPower);
     }
     else
     {
@@ -261,9 +269,19 @@ float CHelmet::HitThroughArmor(float hit_power, s16 element, float ap, bool& add
 
         if (NewHitPower < 0.f)
             NewHitPower = 0.f;
+
+        if (Core.ParamFlags.test(Core.dbgbullet))
+            Msg("CHelmet::HitThroughArmor hit_type=%d | After HitTypeProtection(%f) hit_power=%f", (u32)hit_type, protect*one, NewHitPower);
     }
+
+    if (Core.ParamFlags.test(Core.dbgbullet))
+        Msg("CHelmet::HitThroughArmor hit_type=%d | After HitFractionActor hit_power=%f", (u32)hit_type, NewHitPower);
+
     //увеличить изношенность шлема
     Hit(hit_power, hit_type);
+
+    if (Core.ParamFlags.test(Core.dbgbullet))
+        Msg("CCustomOutfit::HitThroughArmor hit_type=%d | After immunities hit_power=%f", (u32)hit_type, NewHitPower);
 
     return NewHitPower;
 }

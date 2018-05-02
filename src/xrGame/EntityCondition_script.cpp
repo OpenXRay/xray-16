@@ -29,10 +29,41 @@ IC static void CEntityCondition_Export(lua_State* luaState)
             .def("ChangeEntityMorale", &CEntityCondition::ChangeEntityMorale)
             .def("ChangeBleeding", &CEntityCondition::ChangeBleeding)
             .def("BleedingSpeed", &CEntityCondition::BleedingSpeed)
-            .def("ChangeBleeding", &CEntityCondition::ChangeBleeding)
-            .def("ChangeBleeding", &CEntityCondition::ChangeBleeding)
-            .def("ChangeBleeding", &CEntityCondition::ChangeBleeding)
+            .enum_("EBoostParams")
+            [
+                value("eBoostHpRestore", int(EBoostParams::eBoostHpRestore)),
+                value("eBoostPowerRestore", int(EBoostParams::eBoostPowerRestore)),
+                value("eBoostRadiationRestore", int(EBoostParams::eBoostRadiationRestore)),
+                value("eBoostBleedingRestore", int(EBoostParams::eBoostBleedingRestore)),
+                value("eBoostMaxWeight", int(EBoostParams::eBoostMaxWeight)),
+                value("eBoostRadiationProtection", int(EBoostParams::eBoostRadiationProtection)),
+                value("eBoostTelepaticProtection", int(EBoostParams::eBoostTelepaticProtection)),
+                value("eBoostChemicalBurnProtection", int(EBoostParams::eBoostChemicalBurnProtection)),
+                value("eBoostBurnImmunity", int(EBoostParams::eBoostBurnImmunity)),
+                value("eBoostShockImmunity", int(EBoostParams::eBoostShockImmunity)),
+                value("eBoostRadiationImmunity", int(EBoostParams::eBoostRadiationImmunity)),
+                value("eBoostTelepaticImmunity", int(EBoostParams::eBoostTelepaticImmunity)),
+                value("eBoostChemicalBurnImmunity", int(EBoostParams::eBoostChemicalBurnImmunity)),
+                value("eBoostExplImmunity", int(EBoostParams::eBoostExplImmunity)),
+                value("eBoostStrikeImmunity", int(EBoostParams::eBoostStrikeImmunity)),
+                value("eBoostFireWoundImmunity", int(EBoostParams::eBoostFireWoundImmunity)),
+                value("eBoostWoundImmunity", int(EBoostParams::eBoostWoundImmunity))
+            ]
     ];
+}
+
+////////////////////////////////
+
+void BoosterForEach(CActorCondition* conditions, const luabind::functor<bool> &funct)
+{
+    CEntityCondition::BOOSTER_MAP cur_booster_influences = conditions->GetCurBoosterInfluences();
+    CEntityCondition::BOOSTER_MAP::const_iterator it = cur_booster_influences.begin();
+    CEntityCondition::BOOSTER_MAP::const_iterator it_e = cur_booster_influences.end();
+    for (; it != it_e; ++it)
+    {
+        if (funct((*it).first, (*it).second.fBoostTime, (*it).second.fBoostValue) == true)
+            break;
+    }
 }
 
 IC static void CActorCondition_Export(lua_State* luaState)
@@ -41,6 +72,7 @@ IC static void CActorCondition_Export(lua_State* luaState)
     [
         class_<CActorCondition, CEntityCondition>("CActorCondition")
             //.def(constructor<>())
+            .def("BoosterForEach", &BoosterForEach)
             .def("BoostMaxWeight", &CActorCondition::BoostMaxWeight)
             .def("BoostHpRestore", &CActorCondition::BoostHpRestore)
             .def("BoostPowerRestore", &CActorCondition::BoostPowerRestore)

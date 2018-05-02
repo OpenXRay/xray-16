@@ -52,13 +52,8 @@ void CWeaponShotEffector::Shot(CWeapon* weapon)
 
     float angle = m_cam_recoil.Dispersion * weapon->cur_silencer_koef.cam_dispersion;
     angle += m_cam_recoil.DispersionInc * weapon->cur_silencer_koef.cam_disper_inc * (float)m_shot_numer;
-    Shot2(angle);
-}
-
-void CWeaponShotEffector::Shot2(float angle)
-{
-    m_angle_vert +=
-        angle * (m_cam_recoil.DispersionFrac + m_Random.randF(-1.0f, 1.0f) * (1.0f - m_cam_recoil.DispersionFrac));
+    
+    m_angle_vert += angle * m_cam_recoil.DispersionFrac;
 
     clamp(m_angle_vert, -m_cam_recoil.MaxAngleVert, m_cam_recoil.MaxAngleVert);
     if (fis_zero(m_angle_vert - m_cam_recoil.MaxAngleVert))
@@ -66,8 +61,40 @@ void CWeaponShotEffector::Shot2(float angle)
         m_angle_vert *= m_Random.randF(0.96f, 1.04f);
     }
 
-    float rdm = m_Random.randF(-1.0f, 1.0f);
-    m_angle_horz += (m_angle_vert / m_cam_recoil.MaxAngleVert) * rdm * m_cam_recoil.StepAngleHorz;
+    float vert = abs(m_angle_vert);
+    if (vert > abs(m_angle_horz))
+    {
+        static float fSub = 0.25f;
+        static float fAlt = 1.0f;
+
+        float val = (vert * 4 / m_cam_recoil.MaxAngleVert) * m_cam_recoil.StepAngleHorz;
+        clamp(val, -m_cam_recoil.StepAngleHorz, m_cam_recoil.StepAngleHorz);
+        m_angle_horz -= fAlt * val;
+
+        clamp(m_angle_horz, -m_cam_recoil.MaxAngleHorz, m_cam_recoil.MaxAngleHorz);
+
+        fAlt += fSub;
+        if (fAlt >= 1.0f || fAlt <= -0.5f)
+            fSub = -fSub;
+    }
+
+    m_first_shot = true;
+    m_actived = true;
+    m_shot_end = false;
+}
+
+void CWeaponShotEffector::Shot2(float angle)
+{
+    m_angle_vert += angle * m_cam_recoil.DispersionFrac;
+
+    clamp(m_angle_vert, -m_cam_recoil.MaxAngleVert, m_cam_recoil.MaxAngleVert);
+    if (fis_zero(m_angle_vert - m_cam_recoil.MaxAngleVert))
+    {
+        m_angle_vert *= m_Random.randF(0.96f, 1.04f);
+    }
+
+    if (m_Random.randF(0.f, 1.f) < 0.5f)
+        m_angle_horz -= m_cam_recoil.StepAngleHorz;
 
     clamp(m_angle_horz, -m_cam_recoil.MaxAngleHorz, m_cam_recoil.MaxAngleHorz);
 
@@ -114,14 +141,13 @@ void CWeaponShotEffector::Relax()
 
 void CWeaponShotEffector::Update()
 {
-    if (m_actived && m_cam_recoil.ReturnMode /*|| m_single_shot*/)
+    if (m_actived)
     {
-        Relax();
-    }
-
-    if (!m_cam_recoil.ReturnMode && m_shot_end && !m_single_shot)
-    {
-        m_actived = false;
+        if (m_shot_end && !m_single_shot)
+            m_actived = false;
+        
+        if (m_cam_recoil.ReturnMode)
+            Relax();
     }
 
     m_delta_vert = m_angle_vert - m_prev_angle_vert;
