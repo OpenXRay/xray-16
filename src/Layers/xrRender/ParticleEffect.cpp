@@ -438,7 +438,9 @@ void ParticleRenderStream(void* lpvParams)
 #endif // _GPA_ENABLED
 
     float sina = 0.0f, cosa = 0.0f;
-    DWORD angle = 0xFFFFFFFF;
+    // Xottab_DUTY: changed angle to be float instead of DWORD
+    // But it must be 0xFFFFFFFF or otherwise some particles won't play
+    float angle = 0xFFFFFFFF;
 
     PRS_PARAMS* pParams = (PRS_PARAMS*)lpvParams;
 
@@ -457,11 +459,11 @@ void ParticleRenderStream(void* lpvParams)
 
         _mm_prefetch((char*)&particles[i + 1], _MM_HINT_NTA);
 
-        if (angle != *((DWORD*)&m.rot.x))
+        if (angle != m.rot.x)
         {
-            angle = *((DWORD*)&m.rot.x);
-            sina = std::sinf(*(float*)&angle);
-            cosa = std::cosf(*(float*)&angle);
+            angle = m.rot.x;
+            sina = std::sinf(angle);
+            cosa = std::cosf(angle);
         }
 
         _mm_prefetch(64 + (char*)&particles[i + 1], _MM_HINT_NTA);
