@@ -276,9 +276,6 @@ void fill_vid_mode_list(CHW* /*_hw*/)
     {
         string32 str;
 
-        if (dmi.dmPelsWidth < 800)
-            continue;
-
         xr_sprintf(str, sizeof(str), "%dx%d", dmi.dmPelsWidth, dmi.dmPelsHeight);
 
         if (AVM.cend() != find_if(AVM.cbegin(), AVM.cend(), uniqueRenderingMode(str)))
