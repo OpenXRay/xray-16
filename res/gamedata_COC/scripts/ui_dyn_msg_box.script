@@ -328,7 +328,7 @@ function context_menu:InitCallBacks()
 end
 
 function context_menu:AddItemToList(index,str_id,func)
-	local _itm = context_item()
+	local _itm = context_item(self.file_item_main_sz.y)
 	_itm:SetWndSize(self.file_item_main_sz)
 	
 	_itm.textControl:SetWndPos(vector2():set(0,0))
@@ -359,7 +359,7 @@ end
 
 ----
 class "context_item" (CUIListBoxItem)
-function context_item:__init() super()
+function context_item:__init(height) super(height)
 	self:SetTextColor(GetARGB(255, 170, 170, 170))
 	self.textControl = self:GetTextItem()
 	self.textControl:SetFont(GetFontLetterica16Russian())

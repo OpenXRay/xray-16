@@ -257,7 +257,7 @@ end
 
 -- Row constructor.
 class "ui_contact_row" (CUIListBoxItem)
-function ui_contact_row:__init(parent, row, xml) super(parent, row, xml)
+function ui_contact_row:__init(parent, row, xml) super(140)
 	self:GetTextItem():SetText("")
 	self:SetWndSize(vector2():set(740, 140))
 

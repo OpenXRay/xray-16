@@ -846,7 +846,7 @@ function cfg_get_switch_conditions(ini, section, npc)
 	local line_count = ini:line_count(section)
 
 	for line_number = 0, line_count - 1 do
-		local result, id, value  = ini:r_line_ex(section,line_number,"","")
+		local result, id, value  = ini:r_line_ex(section,line_number)
 		local cond_name = id:gsub("%d*$","")
 		if (cond_name == "on_actor_dist_le") then
 			lst[#lst+1] = cfg_get_number_and_condlist(ini,section,id,npc,cond_name,value)

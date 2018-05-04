@@ -13,26 +13,6 @@ function opt_menu_on_init(menu)
 			end
 		end
 	end}
-	-- localization
-	local localization_list = {}
-	local flist = getFS():file_list_open("$game_text$",bit_or(FS.FS_ListFolders,FS.FS_RootOnly))
-	local f_cnt = flist:Size()
-	for	it=0, f_cnt-1 do
-		localization_list[#localization_list+1] = flist:GetAt(it):sub(1,-2)
-	end
-	menu.gameplay_options["localization"] = {default="eng", debug_only=false, typ="list", list=localization_list, on_accept=function(handler,optMgr,ctrl)
-		local language = localization_list[ctrl:GetCurrentIdx()+1] --ctrl:GetText()
-		if (language and language ~= "") then
-			local loc_ini = ini_file_ex("localization.ltx",true)
-			if (loc_ini:r_value("string_table","language") ~= language) then
-				loc_ini:w_value("string_table","language",language)
-				loc_ini:save()
-				--menu.b__require_restart = true
-				reload_system_ini()
-				game.reload_language()
-			end
-		end
-	end}
 	-- debug_hud_map
 	menu.gameplay_ui_options["debug_map_hud"]		= {default=false, 	debug_only=true, 	typ="check",on_accept=function(handler,optMgr,ctrl)
 			if (level.present() and ui_map_debug_ex) then

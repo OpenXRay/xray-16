@@ -1084,6 +1084,9 @@ function file_to_table(fname,parent,simple)
 		local a = string.find(str,"]")
 		return a and " " .. string.sub(str,a+2) or ""
 	end
+	local function file_exists(path)
+		return io.open(path) ~= nil
+	end
 
 	for line in io.lines(fname) do
 		line = trim(trim_comment(line))

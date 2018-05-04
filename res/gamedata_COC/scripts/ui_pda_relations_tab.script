@@ -724,7 +724,7 @@ end
 --
 ---------------------------------------------------------------------------------------------------
 class "ui_companion_row" (CUIListBoxItem)
-function ui_companion_row:__init(owner,row,xml) super(owner,row,xml)
+function ui_companion_row:__init(owner,row,xml) super(140)
 	self:GetTextItem():SetText("")
 	self:SetWndSize(vector2():set(740,140))
 

@@ -8,7 +8,6 @@ function motivator_binder:__init (obj) super(obj)
 	self.loaded = false
 	self.opened_doors = {}
 	self.first_update = false
-	self.object = obj
 end
 
 function motivator_binder:extrapolate_callback(cur_pt)

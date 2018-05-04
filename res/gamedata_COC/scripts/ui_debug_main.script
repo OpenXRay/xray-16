@@ -657,7 +657,7 @@ function debug_ui:OnQuit()
 		local console = get_console()
 		console:execute("main_menu off")
 	else 
-		self.owner:ShowDialog()
+		self.owner:ShowDialog(true)
 		self.owner:Show(true)
 	end
 end

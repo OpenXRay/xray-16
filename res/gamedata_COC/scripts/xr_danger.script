@@ -74,7 +74,7 @@ function CDangerManager__on_before_add(npc,mem_obj,pos,lvl_time,danger_type,perc
 		end
 		return false
 	elseif (danger_type == danger_object.entity_corpse) then 
-		if (who:cast_Stalker() and character_community(npc) == character_community(who) and danger_in_radius(npc,who,danger_type,perceive_type)) then
+		if (who:is_Stalker() and character_community(npc) == character_community(who) and danger_in_radius(npc,who,danger_type,perceive_type)) then
 			return true
 		end
 		return false
