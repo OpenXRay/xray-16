@@ -10,6 +10,8 @@
 #include "Common/object_broker.h"
 #include "Common/LevelGameDef.h"
 
+ENGINE_API float ccSunshaftsIntensity = 0.f;
+
 void CEnvModifier::load(IReader* fs, u32 version)
 {
     use_flags.one();
@@ -443,7 +445,11 @@ void CEnvDescriptorMixer::lerp(
     wind_velocity = fi * A.wind_velocity + f * B.wind_velocity;
     wind_direction = fi * A.wind_direction + f * B.wind_direction;
 
-    m_fSunShaftsIntensity = fi * A.m_fSunShaftsIntensity + f * B.m_fSunShaftsIntensity;
+    if (Core.ParamFlags.test(xrCore::dbgdev) && ccSunshaftsIntensity > 0.f)
+        m_fSunShaftsIntensity = ccSunshaftsIntensity;
+    else
+        m_fSunShaftsIntensity = fi * A.m_fSunShaftsIntensity + f * B.m_fSunShaftsIntensity;
+
     m_fWaterIntensity = fi * A.m_fWaterIntensity + f * B.m_fWaterIntensity;
 
 #ifdef TREE_WIND_EFFECT
