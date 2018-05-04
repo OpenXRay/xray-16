@@ -282,13 +282,13 @@ function action_npc_vs_heli:execute()
 			
 			if (see and can_fight) then
 				if (be) then
-					state_mgr.set_state(npc,new_state,nil,nil,{look_object = be},{fast_set = true})
+					state_mgr.set_state(npc,new_state,nil,nil,{look_object = be},state_mgr.fast_set_true)
 				else
 					local dir = ene_pos and vec_sub(ene_pos,alun_utils.safe_bone_pos(npc,"bip01_r_finger02")) or nil
-					state_mgr.set_state(npc,new_state,nil,nil,{look_object = enemy, look_dir = dir},{fast_set = true})
+					state_mgr.set_state(npc,new_state,nil,nil,{look_object = enemy, look_dir = dir},state_mgr.fast_set_true)
 				end
 			else 
-				state_mgr.set_state(npc,new_state,nil,nil,nil,{fast_set = true})
+				state_mgr.set_state(npc,new_state,nil,nil,nil,state_mgr.fast_set_true)
 			end
 	
 			self.st.__keep_point_until = self.st.__keep_point_until or tg + math.random(3000,8000)
@@ -321,13 +321,13 @@ function action_npc_vs_heli:execute()
 			
 			if (see and can_fight) then
 				if (be) then
-					state_mgr.set_state(npc,new_state,nil,nil,{look_object = be},{fast_set = true})
+					state_mgr.set_state(npc,new_state,nil,nil,{look_object = be},state_mgr.fast_set_true)
 				else 
 					local dir = ene_pos and vec_sub(ene_pos,alun_utils.safe_bone_pos(npc,"bip01_r_finger02")) or nil
-					state_mgr.set_state(npc,new_state,nil,nil,{look_object = enemy, look_dir = dir},{fast_set = true})
+					state_mgr.set_state(npc,new_state,nil,nil,{look_object = enemy, look_dir = dir},state_mgr.fast_set_true)
 				end
 			else 
-				state_mgr.set_state(npc,new_state,nil,nil,nil,{fast_set = true})
+				state_mgr.set_state(npc,new_state,nil,nil,nil,state_mgr.fast_set_true)
 			end
 
 			lmove(npc,self.st.vid,self.st)
@@ -397,6 +397,10 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 		temp.action:add_precondition(world_property(xrs_facer.evid_facer,false))
 		temp.action:add_precondition(world_property(xrs_facer.evid_steal_up_facer,false))
 	end
+	
+	if (_G.schemes["npc_vs_box"]) then 
+		temp.action:add_precondition(world_property(axr_npc_vs_box.evaid,false))
+	end
 
 	local manager = npc:motivation_action_manager()
 	local action
@@ -404,7 +408,7 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 				xr_danger.actid, 
 				stalker_ids.action_combat_planner, 
 				stalker_ids.action_danger_planner, 
-				--xr_actions_id.state_mgr + 1,
+				xr_actions_id.state_mgr + 1,
 				xr_actions_id.state_mgr + 2,
 				xr_actions_id.alife
 	}

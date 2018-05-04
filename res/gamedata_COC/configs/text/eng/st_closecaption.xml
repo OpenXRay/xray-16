@@ -662,36 +662,6 @@
 	<string id="zat_b5_sultan_kill_stalkers">
 		<text>Take them down, boys!</text>
 	</string>
-	<string id="zat_b51_stalker_nimble_greeting_1">
-		<text>Hello, stalker. Thinking of placing an order?</text>
-	</string>
-	<string id="zat_b51_stalker_nimble_greeting_2">
-		<text>What's up? Decided to order something?</text>
-	</string>
-	<string id="zat_b51_stalker_nimble_greeting_3">
-		<text>Hey! You need something?</text>
-	</string>
-	<string id="zat_b51_stalker_nimble_greeting_order_not_ready_1">
-		<text>Don't worry, you'll get the goods a bit later.</text>
-	</string>
-	<string id="zat_b51_stalker_nimble_greeting_order_not_ready_2">
-		<text>Come back later, I don't have the goods yet.</text>
-	</string>
-	<string id="zat_b51_stalker_nimble_greeting_order_not_ready_3">
-		<text>Drop by later. I'll have your order by then.</text>
-	</string>
-	<string id="zat_b51_stalker_nimble_greeting_order_ready_1">
-		<text>That's your order complete. Collect your goods.</text>
-	</string>
-	<string id="zat_b51_stalker_nimble_greeting_order_ready_2">
-		<text>I have the goods. Take them!</text>
-	</string>
-	<string id="zat_b51_stalker_nimble_greeting_order_ready_3">
-		<text>Take your goods, stalker! As you can see, I keep my word.</text>
-	</string>
-	<string id="zat_b51_stalker_nimble_order">
-		<text>The job's done. You can collect the goods.</text>
-	</string>
 	<string id="zat_b52_port_bandits_after_pay_snd_1">
 		<text>Good. Now get the hell out of here, before I change my mind!</text>
 	</string>
@@ -2581,5 +2551,170 @@
 	</string>
 	<string id="pri_b35_targets_lost_end">
 		<text>Both targets escaped. Abort mission and fall back!</text>
+	</string>
+	
+	<!-- CLOSED CAPTIONS FOR 'CALL OF CHERNOBYL' -->
+	
+	<string id="bar_barman_hello_1">
+		<text>Hey there!</text>
+	</string>
+	<string id="bar_barman_hello_2">
+		<text>What's up, man? How goes it?</text>
+	</string>
+	<string id="bar_barman_hello_3">
+		<text>Still alive? That's great.</text>
+	</string>
+	<string id="bar_barman_hello_4">
+		<text>How's it going?</text>
+	</string>
+	<string id="bar_barman_hello_5">
+		<text>What's up?</text>
+	</string>
+	<string id="bar_barman_wait_1">
+		<text>What's taking you so long, eh?</text>
+	</string>
+	<string id="bar_barman_wait_2">
+		<text>Come on already, get over here.</text>
+	</string>
+	<string id="bar_barman_wait_3">
+		<text>What are you standing around for? Come on, get over here.</text>
+	</string>
+	<string id="bar_barman_wait_4">
+		<text>Get over here, we haven't got much time.</text>
+	</string>
+	<string id="bar_guard_prohodi_1">
+		<text>I said come in, don't stand there.</text>
+	</string>
+	<string id="bar_guard_stop_1">
+		<text>You can't go there!</text>
+	</string>
+	<string id="bar_guard_stop_2">
+		<text>Talk to the Barkeep.</text>
+	</string>
+	<string id="bar_guard_stop_3">
+		<text>Stop! I can't let you in here right now.</text>
+	</string>
+	<string id="duty_hangar_1">
+		<text>Get out of here, stalker.</text>
+	</string>
+	<string id="esc_mech_meet_1">
+		<text>Well? What do you want?</text>
+	</string>
+	<string id="esc_mech_meet_2">
+		<text>What else?</text>
+	</string>
+	<string id="esc_mech_meet_3">
+		<text>Nobody lets me have some rest. Everyone keeps coming and going, like honey smeared all over.</text>
+	</string>
+	<string id="esc_mech_meet_bye_1">
+		<text>Right, bye.</text>
+	</string>
+	<string id="esc_mech_meet_bye_2">
+		<text>You're going? Finally.</text>
+	</string>
+	<string id="esc_mech_meet_bye_3">
+		<text>Finally you leave me alone. God, I'm happy.</text>
+	</string>
+	<string id="esc_nimble_greeting_1">
+		<text>Hello, stalker. Thinking of placing an order?</text>
+	</string>
+	<string id="esc_nimble_greeting_2">
+		<text>What's up? Decided to order something?</text>
+	</string>
+	<string id="esc_nimble_greeting_3">
+		<text>Hey! You need something?</text>
+	</string>
+	<string id="esc_nimble_greeting_order_not_ready_1">
+		<text>Don't worry, you'll get the goods a bit later.</text>
+	</string>
+	<string id="esc_nimble_greeting_order_not_ready_2">
+		<text>Come back later, I don't have the goods yet.</text>
+	</string>
+	<string id="esc_nimble_greeting_order_not_ready_3">
+		<text>Drop by later. I'll have your order by then.</text>
+	</string>
+	<string id="esc_nimble_greeting_order_ready_1">
+		<text>That's your order complete. Collect your goods.</text>
+	</string>
+	<string id="esc_nimble_greeting_order_ready_2">
+		<text>I have the goods. Take them!</text>
+	</string>
+	<string id="esc_nimble_greeting_order_ready_3">
+		<text>Take your goods, stalker! As you can see, I keep my word.</text>
+	</string>
+	<string id="esc_nimble_order">
+		<text>The job's done. You can collect the goods.</text>
+	</string>
+	<string id="esc_fanat_farewell_1">
+		<text>See you, then.</text>
+	</string>	
+	<string id="esc_fanat_farewell_2">
+		<text>Good luck.</text>
+	</string>	
+	<string id="esc_fanat_farewell_3">
+		<text>Nice talking to you.</text>
+	</string>	
+	<string id="esc_fanat_farewell_4">
+		<text>Farewell.</text>
+	</string>	
+	<string id="esc_fanat_farewell_5">
+		<text>Good hunting, stalker.</text>
+	</string>
+	<string id="esc_fanat_greeting_1">
+		<text>Hello.</text>
+	</string>
+	<string id="esc_fanat_greeting_2">
+		<text>What's up?</text>
+	</string>
+	<string id="esc_fanat_greeting_3">
+		<text>Hey there.</text>
+	</string>
+	<string id="esc_fanat_greeting_4">
+		<text>Hey.</text>
+	</string>
+	<string id="red_forester_hello_bye_0">
+		<text>Farewell, sonny.</text>
+	</string>
+	<string id="red_forester_hello_bye_1">
+		<text>Don't forget the old man.</text>
+	</string>
+	<string id="red_forester_hello_bye_2">
+		<text>Wish you a straight road, boy.</text>
+	</string>
+	<string id="red_forester_meet_hello_0">
+		<text>Greetings, living soul.</text>
+	</string>
+	<string id="red_forester_meet_hello_1">
+		<text>What is it, young one? What are you looking for here?</text>
+	</string>
+	<string id="red_forester_meet_hello_2">
+		<text>Have you stumbled upon this place by chance, or what?</text>
+	</string>
+	<string id="val_bandit_trader_meet_1">
+		<text>...</text>
+	</string>
+	<string id="val_bandit_trader_meet_2">
+		<text>...</text>
+	</string>
+	<string id="yan_sakharov_meet_1">
+		<text>Greetings, young man!</text>
+	</string>
+	<string id="yan_sakharov_meet_2">
+		<text>I welcome you to our scientific base!</text>
+	</string>
+	<string id="yan_sakharov_meet_3">
+		<text>What do you bring to my humble laboratory?</text>
+	</string>
+	<string id="yan_sakharov_meet_4">
+		<text>Yes-yes?</text>
+	</string>
+	<string id="yan_sakharov_meet_bye_1">
+		<text>All the best!</text>
+	</string>
+	<string id="yan_sakharov_meet_bye_2">
+		<text>Glad to have had a conversation.</text>
+	</string>
+	<string id="yan_sakharov_meet_bye_3">
+		<text>Come back if you need anything else!</text>
 	</string>
 </string_table>

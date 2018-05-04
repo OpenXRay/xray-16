@@ -514,6 +514,9 @@
     <texture id="ui_inGame2_upgrade_Protecta_13" x="0" y="968" width="90" height="44" />
     <texture id="ui_inGame2_upgrade_Protecta_14" x="90" y="968" width="90" height="44" />
 
+    <texture id="ui_inGame2_upgrade_Binoc_1" x="360" y="0" width="90" height="44" />
+    <texture id="ui_inGame2_upgrade_Binoc_3" x="450" y="44" width="90" height="44" />
+	
   </file>
 	<file name="ui\ui_actor_weapons">
 

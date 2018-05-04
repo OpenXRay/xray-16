@@ -16,9 +16,8 @@ function actor_binder:__init (obj) super(obj)
 	--self.last_level_name = "nil" -- Not used for anything
 	self.deimos_intensity = nil
 
-	self.last_detective_achievement_spawn_time 	= nil
-	self.last_mutant_hunter_achievement_spawn_time	= nil
-
+	sound_theme.load_sound()
+	
 	bind_stalker_ext.actor_on_init(self)
 	--alun_utils.debug_write("actor init end")
 end
@@ -302,12 +301,9 @@ function actor_binder:save(packet)
 
 	xr_sound.actor_save(packet)
 	--alun_utils.w_stpk(packet,"stringZ",self.last_level_name,"last level name")
-	xr_statistic.save(packet)
+	dxr_statistics.save(packet)
 	task_manager.get_task_manager():save(packet)
 	packet:w_u8(self.object:active_slot())
-
-	alun_utils.w_stpk(packet,"CTime",self.last_detective_achievement_spawn_time, "detective spawn time")
-	alun_utils.w_stpk(packet,"CTime",self.last_mutant_hunter_achievement_spawn_time, "hunter spawn time")
 
 	bind_stalker_ext.actor_on_save(self,packet)
 
@@ -315,8 +311,6 @@ function actor_binder:save(packet)
 end
 
 function actor_binder:load(reader)
-	sound_theme.load_sound()
-	
 	set_save_marker(reader, "load", false, "actor_binder")
 	object_binder.load(self, reader)
 	set_save_marker(reader, "load", true, "actor_binder")
@@ -354,19 +348,10 @@ function actor_binder:load(reader)
 		self.last_level_name = n
 	end
 	--]]
-	xr_statistic.load(reader)
+	dxr_statistics.load(reader)
 	task_manager.get_task_manager():load(reader)
 
 	self.loaded_active_slot = reader:r_u8()
-
-	local stored_achievement_time = reader:r_bool()
-	if stored_achievement_time == true then
-		self.last_detective_achievement_spawn_time = utils.r_CTime(reader,"bind_stalker")
-	end
-	stored_achievement_time = reader:r_bool()
-	if stored_achievement_time == true then
-		self.last_mutant_hunter_achievement_spawn_time = utils.r_CTime(reader,"bind_stalker")
-	end
 
 	--alun_utils.debug_write("actor_binder:load end")
 end
@@ -386,15 +371,13 @@ function actor_binder:save_state(m_data)
 	state.actor_binder.simulation_started = SIMBOARD.simulation_started
 	--state.actor_binder.last_level_name = self.last_level_name
 	state.actor_binder.active_slot = self.object:active_slot()
-	state.actor_binder.last_detective_achievement_spawn_time = self.last_detective_achievement_spawn_time
-	state.actor_binder.last_mutant_hunter_achievement_spawn_time = self.last_mutant_hunter_achievement_spawn_time
 	state.actor_binder.character_icon = self.character_icon
 	
 	if (sr_psy_antenna.psy_antenna and sr_psy_antenna.psy_antenna.global_state ~= 0 and not utils.level_changing()) then 
 		sr_psy_antenna.psy_antenna:save_state(m_data)
 	end
 	
-	xr_statistic.save_state(m_data)
+	dxr_statistics.save_state(m_data)
 	inventory_upgrades.save_state(m_data)
 	xr_sound.actor_save_state(state)
 	task_manager.save_state(m_data)
@@ -423,15 +406,13 @@ function actor_binder:load_state(m_data)
 	SIMBOARD.simulation_started = state.actor_binder.simulation_started
 	--self.last_level_name = state.actor_binder.last_level_name
 	self.loaded_active_slot = state.actor_binder.active_slot or 0
-	self.last_detective_achievement_spawn_time = state.actor_binder.last_detective_achievement_spawn_time
-	self.last_mutant_hunter_achievement_spawn_time = state.actor_binder.last_mutant_hunter_achievement_spawn_time
 	self.character_icon = state.actor_binder.character_icon
 	
 	if (sr_psy_antenna.psy_antenna) then 
 		sr_psy_antenna.psy_antenna:load_state(m_data)
 	end
 	
-	xr_statistic.load_state(m_data)
+	dxr_statistics.load_state(m_data)
 	inventory_upgrades.load_state(m_data)
 	xr_sound.actor_load_state(state)
 	task_manager.load_state(m_data)

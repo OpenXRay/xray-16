@@ -125,19 +125,19 @@ anm_activate                             = dev_artefact_use
 ;--------------------------------------------------------------------------------
 [af_medusa]:af_base
 $spawn                                   = "artefacts\gravitational_1_medusa"
-class                                    = SCRPTART	                                       ; ????? ????????????
+class                                    = SCRPTART
 visual                                   = dynamics\artefacts\af_medusa.ogf
 description                              = st_af_medusa_descr
 inv_name                                 = st_af_medusa_name
 inv_name_short                           = st_af_medusa_name
-inv_weight                               = 0.5
+inv_weight                               = 1
 
 inv_grid_x                               = 0
 inv_grid_y                               = 1
 
-cost                                     = 9000
+cost                                     = 8000
 
-jump_height                              = .5	                                       ; ?????? ??????
+jump_height                              = .5
 
 particles                                = artefact\af_gravi_idle
 det_show_particles                       = artefact\af_gravi_show
@@ -163,10 +163,10 @@ additional_inventory_weight2             = 0
 artefact_activation_seq                  = af_activation_bold
 
 [af_medusa_absorbation]
-burn_immunity                            = 0	                                       ;???????????? ??????????
+burn_immunity                            = 0
 strike_immunity                          = 0
 shock_immunity                           = 0
-wound_immunity                           = -0.032
+wound_immunity                           = -0.022
 radiation_immunity                       = 0
 telepatic_immunity                       = 0
 chemical_burn_immunity                   = 0
@@ -184,12 +184,12 @@ visual                                   = dynamics\artefacts\af_cristall_flower
 description                              = st_af_cristall_flower_descr
 inv_name                                 = st_af_cristall_flower_name
 inv_name_short                           =
-inv_weight                               = 0.5
+inv_weight                               = 1
 
 inv_grid_x                               = 6
 inv_grid_y                               = 0
 
-cost                                     = 8000
+cost                                     = 6000
 
 jump_height                              = .6
 
@@ -218,12 +218,12 @@ additional_inventory_weight2             = 0
 hit_absorbation_sect                     = af_cristall_flower_absorbation
 
 [af_cristall_flower_absorbation]
-burn_immunity                            = 0	                                       ;???????????? ??????????
+burn_immunity                            = 0
 strike_immunity                          = 0
 shock_immunity                           = 0
 wound_immunity                           = 0
 radiation_immunity                       = 0
-telepatic_immunity                       = 0.0125
+telepatic_immunity                       = 0.011
 chemical_burn_immunity                   = 0
 explosion_immunity                       = 0
 fire_wound_immunity                      = 0
@@ -239,12 +239,12 @@ visual                                   = dynamics\artefacts\af_night_star.ogf
 description                              = st_af_night_star_descr
 inv_name                                 = st_af_night_star_name
 inv_name_short                           = st_af_night_star_name
-inv_weight                               = 0.5
+inv_weight                               = 1
 
 inv_grid_x                               = 2
 inv_grid_y                               = 1
 
-cost                                     = 10000
+cost                                     = 11000
 
 jump_height                              = .7
 
@@ -252,11 +252,11 @@ particles                                = artefact\af_gravi_idle
 det_show_particles                       = artefact\af_gravi_show
 det_hide_particles                       = artefact\af_gravi_hide
 
-af_rank                                  = 2
+af_rank                                  = 1
 
 lights_enabled                           = true
 
-trail_light_color                        = 0.4,0.4,0	                                       ;0.6,0.7,0.5
+trail_light_color                        = 0.4,0.4,0	;0.6,0.7,0.5
 trail_light_range                        = 2.0
 
 
@@ -268,12 +268,12 @@ satiety_restore_speed                    = 0
 power_restore_speed                      = 0
 bleeding_restore_speed                   = 0
 
-additional_inventory_weight              = 5
+additional_inventory_weight              = 6
 
 hit_absorbation_sect                     = af_night_star_absorbation
 
 [af_night_star_absorbation]
-burn_immunity                            = 0	                                       ;???????????? ??????????
+burn_immunity                            = 0
 strike_immunity                          = 0
 shock_immunity                           = 0
 wound_immunity                           = 0
@@ -294,12 +294,12 @@ visual                                   = dynamics\artefacts\af_vyvert.ogf
 description                              = st_af_vyvert_descr
 inv_name                                 = st_af_vyvert_name
 inv_name_short                           = st_af_vyvert_name
-inv_weight                               = 0.5
+inv_weight                               = 1
 
 inv_grid_x                               = 7
 inv_grid_y                               = 1
 
-cost                                     = 14000
+cost                                     = 18000
 
 jump_height                              = .8
 
@@ -330,10 +330,10 @@ additional_inventory_weight2             = 0
 hit_absorbation_sect                     = af_vyvert_absorbation
 
 [af_vyvert_absorbation]
-burn_immunity                            = 0	                                       ;???????????? ??????????
+burn_immunity                            = 0
 strike_immunity                          = 0
 shock_immunity                           = 0
-wound_immunity                           = -0.043
+wound_immunity                           = -0.031
 radiation_immunity                       = 0
 telepatic_immunity                       = 0
 chemical_burn_immunity                   = 0
@@ -350,12 +350,12 @@ visual                                   = dynamics\artefacts\af_gravi.ogf
 description                              = st_af_gravi_descr
 inv_name                                 = st_af_gravi_name
 inv_name_short                           = st_af_gravi_name
-inv_weight                               = 0.5
+inv_weight                               = 1
 
 inv_grid_x                               = 18
 inv_grid_y                               = 0
 
-cost                                     = 15000
+cost                                     = 23000
 
 jump_height                              = .9
 
@@ -363,7 +363,7 @@ particles                                = artefact\af_gravi_idle
 det_show_particles                       = artefact\af_gravi_show
 det_hide_particles                       = artefact\af_gravi_hide
 
-af_rank                                  = 3
+af_rank                                  = 2
 
 lights_enabled                           = true
 
@@ -377,12 +377,12 @@ satiety_restore_speed                    = 0
 power_restore_speed                      = 0
 bleeding_restore_speed                   = 0
 
-additional_inventory_weight              = 8
+additional_inventory_weight              = 10
 
 hit_absorbation_sect                     = af_gravi_absorbation
 
 [af_gravi_absorbation]
-burn_immunity                            = 0	                                       ;???????????? ??????????
+burn_immunity                            = 0
 strike_immunity                          = 0
 shock_immunity                           = 0
 wound_immunity                           = 0
@@ -402,12 +402,12 @@ visual                                   = dynamics\artefacts\af_gold_fish.ogf
 description                              = st_af_gold_fish_descr
 inv_name                                 = st_af_gold_fish_name
 inv_name_short                           = st_af_gold_fish_name
-inv_weight                               = 0.5
+inv_weight                               = 1
 
 inv_grid_x                               = 17
 inv_grid_y                               = 0
 
-cost                                     = 25000
+cost                                     = 37000
 
 jump_height                              = 1
 
@@ -430,12 +430,12 @@ satiety_restore_speed                    = 0
 power_restore_speed                      = 0
 bleeding_restore_speed                   = 0
 
-additional_inventory_weight              = 15
+additional_inventory_weight              = 16
 
 hit_absorbation_sect                     = af_gold_fish_absorbation
 
 [af_gold_fish_absorbation]
-burn_immunity                            = 0	                                       ;???????????? ??????????
+burn_immunity                            = 0
 strike_immunity                          = 0
 shock_immunity                           = 0
 wound_immunity                           = 0
@@ -460,11 +460,11 @@ visual                                   = dynamics\artefacts\af_cristall.ogf
 description                              = st_af_cristall_descr
 inv_name                                 = st_af_cristall_name
 inv_name_short                           = st_af_cristall_name
-inv_weight                               = 0.5
+inv_weight                               = 0.8
 
 inv_grid_x                               = 5
 inv_grid_y                               = 0
-cost                                     = 7000
+cost                                     = 5000
 ;jump_height			= .01
 
 particles                                = artefact\af_thermal_idle
@@ -475,7 +475,7 @@ af_rank                                  = 1
 
 lights_enabled                           = true
 
-trail_light_color                        = 0.9,0.4,0.2	                                       ;0.9,0.5,0.5
+trail_light_color                        = 0.9,0.4,0.2	;0.9,0.5,0.5
 trail_light_range                        = 2.0
 
 artefact_activation_seq                  = af_activation_mincer
@@ -513,12 +513,12 @@ visual                                   = dynamics\artefacts\af_fireball.ogf
 description                              = st_af_fireball_descr
 inv_name                                 = st_af_fireball_name
 inv_name_short                           = st_af_fireball_name
-inv_weight                               = 0.5
+inv_weight                               = 0.8
 
 inv_grid_x                               = 15
 inv_grid_y                               = 0
 
-cost                                     = 9000
+cost                                     = 11000
 
 impulse_threshold                        = 10
 radius                                   = 10
@@ -528,7 +528,7 @@ particles                                = artefact\af_thermal_idle
 det_show_particles                       = artefact\af_thermal_show
 det_hide_particles                       = artefact\af_thermal_hide
 
-af_rank                                  = 1
+af_rank                                  = 2
 
 lights_enabled                           = true
 
@@ -569,12 +569,12 @@ visual                                   = dynamics\artefacts\af_dummy_glassbead
 description                              = st_af_dummy_glassbeads_descr
 inv_name                                 = st_af_dummy_glassbeads_name
 inv_name_short                           = st_af_dummy_glassbeads_name
-inv_weight                               = 0.5
+inv_weight                               = 0.8
 
 inv_grid_x                               = 10
 inv_grid_y                               = 0
 
-cost                                     = 11000	                                       ;200
+cost                                     = 12000
 
 jump_height                              = .0125
 
@@ -595,7 +595,7 @@ health_restore_speed                     = 0
 radiation_restore_speed                  = 0.00125
 satiety_restore_speed                    = 0
 power_restore_speed                      = 0
-bleeding_restore_speed                   = 0.0025
+bleeding_restore_speed                   = 0.0022
 
 additional_inventory_weight              = 0
 additional_inventory_weight2             = 0
@@ -603,7 +603,7 @@ additional_inventory_weight2             = 0
 hit_absorbation_sect                     = af_dummy_glassbeads_absorbation
 
 [af_dummy_glassbeads_absorbation]
-burn_immunity                            = 0	                                       ;???????????? ??????????
+burn_immunity                            = 0
 strike_immunity                          = 0
 shock_immunity                           = 0
 wound_immunity                           = 0
@@ -624,12 +624,12 @@ visual                                   = dynamics\artefacts\af_eye.ogf
 description                              = st_af_eye_descr
 inv_name                                 = st_af_eye_name
 inv_name_short                           = st_af_eye_name
-inv_weight                               = 0.5
+inv_weight                               = 0.8
 
 inv_grid_x                               = 13
 inv_grid_y                               = 0
 
-cost                                     = 17000
+cost                                     = 26000
 jump_height                              = .05
 
 particles                                = artefact\af_thermal_idle
@@ -648,7 +648,7 @@ health_restore_speed                     = 0
 radiation_restore_speed                  = 0.0025
 satiety_restore_speed                    = 0
 power_restore_speed                      = 0
-bleeding_restore_speed                   = 0.005
+bleeding_restore_speed                   = 0.0044
 
 additional_inventory_weight              = 0
 additional_inventory_weight2             = 0
@@ -656,7 +656,7 @@ additional_inventory_weight2             = 0
 hit_absorbation_sect                     = af_eye_absorbation
 
 [af_eye_absorbation]
-burn_immunity                            = 0	                                       ;???????????? ??????????
+burn_immunity                            = 0
 strike_immunity                          = 0
 shock_immunity                           = 0
 wound_immunity                           = 0
@@ -677,12 +677,12 @@ visual                                   = dynamics\artefacts\af_fire.ogf
 description                              = st_af_fire_descr
 inv_name                                 = st_af_fire_name
 inv_name_short                           = st_af_fire_name
-inv_weight                               = 0.5
+inv_weight                               = 0.8
 
 inv_grid_x                               = 14
 inv_grid_y                               = 0
 
-cost                                     = 23000
+cost                                     = 39000
 jump_height                              = .1
 
 particles                                = artefact\af_thermal_idle
@@ -701,7 +701,7 @@ health_restore_speed                     = 0
 radiation_restore_speed                  = 0.00375
 satiety_restore_speed                    = 0
 power_restore_speed                      = 0
-bleeding_restore_speed                   = 0.0033
+bleeding_restore_speed                   = 0.0066
 
 additional_inventory_weight              = 0
 additional_inventory_weight2             = 0
@@ -709,7 +709,7 @@ additional_inventory_weight2             = 0
 hit_absorbation_sect                     = af_fire_absorbation
 
 [af_fire_absorbation]
-burn_immunity                            = 0.04
+burn_immunity                            = 0
 strike_immunity                          = 0
 shock_immunity                           = 0
 wound_immunity                           = 0
@@ -739,7 +739,7 @@ inv_weight                               = 0.5
 inv_grid_x                               = 4
 inv_grid_y                               = 0
 
-cost                                     = 7000
+cost                                     = 5000
 
 jump_height                              = .01
 
@@ -767,7 +767,7 @@ additional_inventory_weight2             = 0
 hit_absorbation_sect                     = af_blood_absorbation
 
 [af_blood_absorbation]
-burn_immunity                            = 0	                                       ;???????????? ??????????
+burn_immunity                            = 0
 strike_immunity                          = 0
 shock_immunity                           = 0
 wound_immunity                           = 0
@@ -793,7 +793,7 @@ inv_weight                               = 0.5
 inv_grid_x                               = 1
 inv_grid_y                               = 1
 
-cost                                     = 9000
+cost                                     = 11000
 
 jump_height                              = .01
 
@@ -821,7 +821,7 @@ additional_inventory_weight2             = 0
 hit_absorbation_sect                     = af_mincer_meat_absorbation
 
 [af_mincer_meat_absorbation]
-burn_immunity                            = 0	                                       ;???????????? ??????????
+burn_immunity                            = 0
 strike_immunity                          = 0
 shock_immunity                           = 0
 wound_immunity                           = 0
@@ -847,7 +847,7 @@ inv_weight                               = 0.5
 inv_grid_x                               = 6
 inv_grid_y                               = 1
 
-cost                                     = 11000
+cost                                     = 12000
 
 jump_height                              = .01
 
@@ -865,7 +865,7 @@ trail_light_range                        = 2.0
 
 artefact_activation_seq                  = af_activation_mincer
 
-health_restore_speed                     = 0.000375
+health_restore_speed                     = 0.00033
 radiation_restore_speed                  = 0.0025
 satiety_restore_speed                    = 0
 power_restore_speed                      = 0
@@ -877,7 +877,7 @@ additional_inventory_weight2             = 0
 hit_absorbation_sect                     = af_soul_absorbation
 
 [af_soul_absorbation]
-burn_immunity                            = 0	                                       ;???????????? ??????????
+burn_immunity                            = 0
 strike_immunity                          = 0
 shock_immunity                           = 0
 wound_immunity                           = 0
@@ -902,7 +902,7 @@ inv_weight                               = 0.5
 
 inv_grid_x                               = 12
 inv_grid_y                               = 1
-cost                                     = 17000
+cost                                     = 26000
 jump_height                              = .5
 
 particles                                = artefact\af_acidic_idle
@@ -917,7 +917,7 @@ trail_light_color                        = 0.5,0.7,0.2
 trail_light_range                        = 2.0
 
 
-health_restore_speed                     = 0.00075
+health_restore_speed                     = 0.00066
 radiation_restore_speed                  = 0.0025
 satiety_restore_speed                    = 0
 power_restore_speed                      = 0
@@ -929,7 +929,7 @@ additional_inventory_weight2             = 0
 hit_absorbation_sect                     = af_fuzz_kolobok_absorbation
 
 [af_fuzz_kolobok_absorbation]
-burn_immunity                            = 0	                                       ;???????????? ??????????
+burn_immunity                            = 0
 strike_immunity                          = 0
 shock_immunity                           = 0
 wound_immunity                           = 0
@@ -954,7 +954,7 @@ inv_weight                               = 0.5
 
 inv_grid_x                               = 3
 inv_grid_y                               = 0
-cost                                     = 20000
+cost                                     = 28000
 jump_height                              = .01
 
 particles                                = artefact\af_acidic_idle
@@ -981,10 +981,10 @@ additional_inventory_weight2             = 0
 hit_absorbation_sect                     = af_baloon_absorbation
 
 [af_baloon_absorbation]
-burn_immunity                            = 0	                                       ;???????????? ??????????
+burn_immunity                            = 0
 strike_immunity                          = 0
 shock_immunity                           = 0
-wound_immunity                           = -0.054
+wound_immunity                           = -0.037
 radiation_immunity                       = 0
 telepatic_immunity                       = 0
 chemical_burn_immunity                   = 0
@@ -1006,7 +1006,7 @@ inv_weight                               = 0.5
 
 inv_grid_x                               = 16
 inv_grid_y                               = 0
-cost                                     = 23000
+cost                                     = 40000
 jump_height                              = .01
 
 particles                                = artefact\af_acidic_idle
@@ -1021,7 +1021,7 @@ trail_light_color                        = 0.5,0.7,0.2
 trail_light_range                        = 2.0
 
 
-health_restore_speed                     = 0.001125
+health_restore_speed                     = 0.001
 radiation_restore_speed                  = 0.00375
 satiety_restore_speed                    = 0
 power_restore_speed                      = 0
@@ -1033,7 +1033,7 @@ additional_inventory_weight2             = 0
 hit_absorbation_sect                     = af_glass_absorbation
 
 [af_glass_absorbation]
-burn_immunity                            = 0	                                       ;???????????? ??????????
+burn_immunity                            = 0
 strike_immunity                          = 0
 shock_immunity                           = 0
 wound_immunity                           = 0
@@ -1052,20 +1052,20 @@ fire_wound_immunity                      = 0
 ;--------------------------------------------------------------------------------
 [af_electra_sparkler]:af_base
 $spawn                                   = "artefacts\electric_1_electra_sparkler"
-class                                    = SCRPTART	                                       ; ??? ??????
+class                                    = SCRPTART
 
 visual                                   = dynamics\artefacts\af_electra_sparkler.ogf
 description                              = st_af_electra_sparkler_descr
 inv_name                                 = st_af_electra_sparkler_name
 inv_name_short                           = st_af_electra_sparkler_name
-inv_weight                               = 0.5
+inv_weight                               = 0.4
 
 inv_grid_x                               = 11
 inv_grid_y                               = 1
 
-cost                                     = 7000
+cost                                     = 5500
 
-jump_height                              = .5	                                       ; ???????????? ??? ???? SCRPTART
+jump_height                              = .5
 
 particles                                = artefact\af_electra_idle
 det_show_particles                       = artefact\af_electra_show
@@ -1091,9 +1091,9 @@ additional_inventory_weight2             = 0
 hit_absorbation_sect                     = af_electra_sparkler_absorbation
 
 [af_electra_sparkler_absorbation]
-burn_immunity                            = 0	                                       ;???????????? ??????????
+burn_immunity                            = 0
 strike_immunity                          = 0
-shock_immunity                           = 0.1
+shock_immunity                           = 0.05
 wound_immunity                           = 0
 radiation_immunity                       = 0
 telepatic_immunity                       = 0
@@ -1112,12 +1112,12 @@ visual                                   = dynamics\artefacts\af_electra_flash.o
 description                              = st_af_electra_flash_descr
 inv_name                                 = st_af_electra_flash_name
 inv_name_short                           = st_af_electra_flash_name
-inv_weight                               = 0.5
+inv_weight                               = 0.4
 
 inv_grid_x                               = 9
 inv_grid_y                               = 1
 
-cost                                     = 9000
+cost                                     = 11500
 
 jump_height                              = .1
 
@@ -1145,9 +1145,9 @@ additional_inventory_weight2             = 0
 hit_absorbation_sect                     = af_electra_flash_absorbation
 
 [af_electra_flash_absorbation]
-burn_immunity                            = 0	                                       ;???????????? ??????????
+burn_immunity                            = 0
 strike_immunity                          = 0
-shock_immunity                           = 0.2
+shock_immunity                           = 0.1
 wound_immunity                           = 0
 radiation_immunity                       = 0
 telepatic_immunity                       = 0
@@ -1166,12 +1166,12 @@ visual                                   = dynamics\artefacts\af_electra_moonlig
 description                              = st_af_electra_moonlight_descr
 inv_name                                 = st_af_electra_moonlight_name
 inv_name_short                           = st_af_electra_moonlight_name
-inv_weight                               = 0.5
+inv_weight                               = 0.4
 
 inv_grid_x                               = 10
 inv_grid_y                               = 1
 
-cost                                     = 11000
+cost                                     = 13000
 
 jump_height                              = .1
 
@@ -1200,12 +1200,12 @@ additional_inventory_weight2             = 0
 hit_absorbation_sect                     = af_electra_moonlight_absorbation
 
 [af_electra_moonlight_absorbation]
-burn_immunity                            = 0	                                       ;???????????? ??????????
+burn_immunity                            = 0
 strike_immunity                          = 0
 shock_immunity                           = 0
 wound_immunity                           = 0
 radiation_immunity                       = 0
-telepatic_immunity                       = 0.025
+telepatic_immunity                       = 0.022
 chemical_burn_immunity                   = 0
 explosion_immunity                       = 0
 fire_wound_immunity                      = 0
@@ -1221,13 +1221,13 @@ visual                                   = dynamics\artefacts\af_dummy_battery.o
 description                              = st_af_dummy_battery_descr
 inv_name                                 = st_af_dummy_battery_name
 inv_name_short                           = st_af_dummy_battery_name
-inv_weight                               = 0.5
+inv_weight                               = 0.4
 
 inv_grid_x                               = 8
 inv_grid_y                               = 0
 jump_height                              = .01
 
-cost                                     = 11000
+cost                                     = 12500
 
 particles                                = artefact\af_electra_idle
 det_show_particles                       = artefact\af_electra_show
@@ -1244,7 +1244,7 @@ trail_light_range                        = 2.0
 health_restore_speed                     = 0
 radiation_restore_speed                  = 0.00125
 satiety_restore_speed                    = 0
-power_restore_speed                      = 0.00125
+power_restore_speed                      = 0.0011
 bleeding_restore_speed                   = 0
 
 additional_inventory_weight              = 0
@@ -1253,7 +1253,7 @@ additional_inventory_weight2             = 0
 hit_absorbation_sect                     = af_dummy_battery_absorbation
 
 [af_dummy_battery_absorbation]
-burn_immunity                            = 0	                                       ;???????????? ??????????
+burn_immunity                            = 0
 strike_immunity                          = 0
 shock_immunity                           = 0
 wound_immunity                           = 0
@@ -1274,11 +1274,11 @@ visual                                   = dynamics\artefacts\af_dummy_dummy.ogf
 description                              = st_af_dummy_dummy_descr
 inv_name                                 = st_af_dummy_dummy_name
 inv_name_short                           = st_af_dummy_dummy_name
-inv_weight                               = 0.5
+inv_weight                               = 0.4
 
 inv_grid_x                               = 9
 inv_grid_y                               = 0
-cost                                     = 17000
+cost                                     = 27000
 jump_height                              = .0
 
 particles                                = artefact\af_electra_idle
@@ -1296,7 +1296,7 @@ trail_light_range                        = 2.0
 health_restore_speed                     = 0
 radiation_restore_speed                  = 0.0025
 satiety_restore_speed                    = 0
-power_restore_speed                      = 0.0025
+power_restore_speed                      = 0.0022
 bleeding_restore_speed                   = 0
 
 additional_inventory_weight              = 0
@@ -1305,7 +1305,7 @@ additional_inventory_weight2             = 0
 hit_absorbation_sect                     = af_dummy_dummy_absorbation
 
 [af_dummy_dummy_absorbation]
-burn_immunity                            = 0	                                       ;???????????? ??????????
+burn_immunity                            = 0
 strike_immunity                          = 0
 shock_immunity                           = 0
 wound_immunity                           = 0
@@ -1326,11 +1326,11 @@ visual                                   = dynamics\artefacts\af_ice.ogf
 description                              = st_af_ice_descr
 inv_name                                 = st_af_ice_name
 inv_name_short                           = st_af_ice_name
-inv_weight                               = 0.5
+inv_weight                               = 0.4
 
 inv_grid_x                               = 19
 inv_grid_y                               = 0
-cost                                     = 23000
+cost                                     = 42000
 jump_height                              = .0
 
 particles                                = artefact\af_electra_idle
@@ -1348,7 +1348,7 @@ trail_light_range                        = 2.0
 health_restore_speed                     = 0
 radiation_restore_speed                  = 0.00375
 satiety_restore_speed                    = 0
-power_restore_speed                      = 0.00375
+power_restore_speed                      = 0.0033
 bleeding_restore_speed                   = 0
 
 additional_inventory_weight              = 0
@@ -1357,7 +1357,7 @@ additional_inventory_weight2             = 0
 hit_absorbation_sect                     = af_ice_absorbation
 
 [af_ice_absorbation]
-burn_immunity                            = 0	                                       ;???????????? ??????????
+burn_immunity                            = 0
 strike_immunity                          = 0
 shock_immunity                           = 0
 wound_immunity                           = 0
@@ -1382,7 +1382,7 @@ visual                                   = dynamics\artefacts\af_compass.ogf
 description                              = st_compass_descr
 inv_name                                 = st_compass
 inv_name_short                           = st_compass
-inv_weight                               = 0.5
+inv_weight                               = 1
 
 inv_grid_x                               = 8
 inv_grid_y                               = 1
@@ -1398,22 +1398,22 @@ af_rank                                  = 0
 
 lights_enabled                           = true
 
-trail_light_color                        = 1.0,1.0,0.75	                                       ;1.0,0.9,0.5
+trail_light_color                        = 1.0,1.0,0.75	;1.0,0.9,0.5
 trail_light_range                        = 2.0
 
 
 health_restore_speed                     = 0
 radiation_restore_speed                  = 0.005
 satiety_restore_speed                    = 0
-power_restore_speed                      = 0.001
+power_restore_speed                      = 0.0011
 bleeding_restore_speed                   = 0
 hit_absorbation_sect                     = af_compass_absorbation
 degrade_rate 							 = 0	;Artefact Degradation
 
 [af_compass_absorbation]
-burn_immunity                            = 0.02	                                       ;???????????? ??????????
+burn_immunity                            = 0.02
 strike_immunity                          = 0
-shock_immunity                           = 0.06
+shock_immunity                           = 0.05
 wound_immunity                           = 0
 radiation_immunity                       = 0
 telepatic_immunity                       = 0.01
@@ -1433,13 +1433,13 @@ visual                                   = dynamics\artefacts\af_cristall_plant.
 description                              = st_oasis_heart_descr
 inv_name                                 = st_oasis_heart
 inv_name_short                           = st_oasis_heart
-inv_weight                               = 0.5
+inv_weight                               = 0.6
 
 inv_grid_x                               = 13
 inv_grid_y                               = 1
 jump_height                              = .2
 
-cost                                     = 200000
+cost                                     = 125000
 
 ;particles			= artefact\af_acidic_idle
 det_show_particles                       = artefact\af_acidic_show
@@ -1450,21 +1450,20 @@ af_rank                                  = 0
 
 lights_enabled                           = true
 
-trail_light_color                        = 1.0,1.0,0.75	                                       ;1.0,0.9,0.5
+trail_light_color                        = 1.0,1.0,0.75	;1.0,0.9,0.5
 trail_light_range                        = 2.0
 
 
-
-health_restore_speed                     = 0.0003
-radiation_restore_speed                  = 0.004
+health_restore_speed                     = 0.00033
+radiation_restore_speed                  = 0.00375
 satiety_restore_speed                    = 0
-power_restore_speed                      = 0.001
-bleeding_restore_speed                   = 0.002
+power_restore_speed                      = 0.0011
+bleeding_restore_speed                   = 0.0022
 hit_absorbation_sect                     = af_oasis_heart_absorbation
 degrade_rate							 = 0 ;Artefact Degradation
 
 [af_oasis_heart_absorbation]
-burn_immunity                            = 0	                                       ;???????????? ??????????
+burn_immunity                            = 0
 strike_immunity                          = 0
 shock_immunity                           = 0
 wound_immunity                           = 0
@@ -1521,7 +1520,7 @@ additional_inventory_weight2             = 0
 hit_absorbation_sect                     = jup_b1_half_artifact_absorbation
 
 [jup_b1_half_artifact_absorbation]
-burn_immunity                            = 0	                                       ;???????????? ??????????
+burn_immunity                            = 0
 strike_immunity                          = 0
 shock_immunity                           = 0
 wound_immunity                           = 0
@@ -1550,13 +1549,13 @@ det_hide_particles                       = artefact\af_acidic_hide
 
 af_rank                                  = 0
 lights_enabled                           = true
-trail_light_color                        = 0.4,0.6,1.0	                                       ;0.85,1.0,0.5
+trail_light_color                        = 0.4,0.6,1.0	;0.85,1.0,0.5
 trail_light_range                        = 7.5
 
 can_trade                                = false
 quest_item                               = true
 
-attach_angle_offset                      = 1.922,1.551,-0.740	                                       ;??????????????? ? ???????? Angle*PI/180
+attach_angle_offset                      = 1.922,1.551,-0.740	;Angle*PI/180
 attach_position_offset                   = 0.15,0.002,0.25
 attach_bone_name                         = bip01_r_hand
 auto_attach                              = false

@@ -66,12 +66,13 @@ end
 
 --' Возвращает расстояние между двумя точками графа с учетом разности уровней
 function graph_distance(vid1, vid2)
-	local p1 = game_graph():vertex(vid1):game_point()
-	local p2 = game_graph():vertex(vid2):game_point()
+	local gg = game_graph()
+	local p1 = gg:vertex(vid1):game_point()
+	local p2 = gg:vertex(vid2):game_point()
 
 	--printf("GRAPH DISTANCE [%s][%s][%s] : [%s][%s][%s]", p1.x, p1.y, p1.z, p2.x, p2.y, p2.z)
 
-	return game_graph():vertex(vid1):game_point():distance_to(game_graph():vertex(vid2):game_point())
+	return gg:vertex(vid1):game_point():distance_to(gg:vertex(vid2):game_point())
 end
 
 --' Сравнивает два вектора
@@ -843,9 +844,18 @@ end
 
 function se_obj_save_var(id,name,varname,val)
 	local m_data = alife_storage_manager.get_state()
-	if (m_data.se_object[id]) then
-		m_data.se_object[id][varname] = val 
+	if not (m_data.se_object[id]) then
+		if not (val) then
+			return -- already nil
+		end
+		local se_obj = alife_object(id)
+		if not (se_obj) then 
+			return
+		end
+		m_data.se_object[id] = {}
+		m_data.se_object[id].name = se_obj:name()
 	end
+	m_data.se_object[id][varname] = val
 end
 
 function se_obj_load_var(id,name,varname)
@@ -893,8 +903,7 @@ local lfs = require("lfs")
 lfs_ignore_exact_ext_match = false
 function file_for_each(node,ext,func,nonrecursive,...)
 	local stack = {}
-	local deepest
-	while not deepest do
+	while true do
 		if (node) then
 			for file in lfs.dir(node) do
 				if (file ~= ".." and file ~= ".") then
@@ -916,7 +925,7 @@ function file_for_each(node,ext,func,nonrecursive,...)
 			node = stack[#stack]
 			stack[#stack] = nil
 		else
-			deepest = true
+			break
 		end
 	end
 	if lfs_ignore_exact_ext_match then

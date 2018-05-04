@@ -85,7 +85,7 @@ function arena_give_reward(first_speaker, second_speaker)
 	dialogs.relocate_money_to_actor(first_speaker, second_speaker, m*p)
 	db.actor:give_info_portion("bar_old_arena_reset")
 	xr_zones.purge_arena_items("bar_old_arena")
-	xr_statistic.inc_counter("arena_battles")
+	dxr_statistics.increment_statistic("arena_battles")
 end
 
 function actor_has_1000(first_speaker, second_speaker)
@@ -152,7 +152,7 @@ function new_arena_give_reward(first_speaker, second_speaker)
 	end
 	dialogs.relocate_money_to_actor(first_speaker, second_speaker, m)
 	db.actor:give_info_portion("bar_arena_reset")	
-	xr_statistic.inc_counter("arena_battles")
+	dxr_statistics.increment_statistic("arena_battles")
 end
 
 function arena_has_reward (first_speaker, second_speaker)

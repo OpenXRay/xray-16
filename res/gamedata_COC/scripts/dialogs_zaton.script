@@ -903,42 +903,42 @@ function zat_b51_robbery(first_speaker, second_speaker)
 	if amount > db.actor:money() then
 		amount = db.actor:money()
 	end
-	local need_item = {}
+	-- local need_item = {}
 
-	need_item["wpn_usp"] = true
-	need_item["wpn_desert_eagle"] = true
-	need_item["wpn_protecta"] = true
-	need_item["wpn_sig550"] = true
-	need_item["wpn_fn2000"] = true
-	need_item["wpn_g36"] = true
-	need_item["wpn_val"] = true
-	need_item["wpn_vintorez"] = true
-	need_item["wpn_groza"] = true
-	need_item["wpn_svd"] = true
-	need_item["wpn_svu"] = true
-	need_item["wpn_pkm"] = true
-	need_item["wpn_sig550_luckygun"] = true
-	need_item["wpn_pkm_zulus"] = true
-	need_item["wpn_wincheaster1300_trapper"] = true
-	need_item["wpn_gauss"] = true
-	need_item["wpn_groza_nimble"] = true
-	need_item["wpn_desert_eagle_nimble"] = true
-	need_item["wpn_fn2000_nimble"] = true
-	need_item["wpn_g36_nimble"] = true
-	need_item["wpn_protecta_nimble"] = true
-	need_item["wpn_mp5_nimble"] = true
-	need_item["wpn_sig220_nimble"] = true
-	need_item["wpn_spas12_nimble"] = true
-	need_item["wpn_usp_nimble"] = true
-	need_item["wpn_vintorez_nimble"] = true
-	need_item["wpn_svu_nimble"] = true
-	need_item["wpn_svd_nimble"] = true
+	-- need_item["wpn_usp"] = true
+	-- need_item["wpn_desert_eagle"] = true
+	-- need_item["wpn_protecta"] = true
+	-- need_item["wpn_sig550"] = true
+	-- need_item["wpn_fn2000"] = true
+	-- need_item["wpn_g36"] = true
+	-- need_item["wpn_val"] = true
+	-- need_item["wpn_vintorez"] = true
+	-- need_item["wpn_groza"] = true
+	-- need_item["wpn_svd"] = true
+	-- need_item["wpn_svu"] = true
+	-- need_item["wpn_pkm"] = true
+	-- need_item["wpn_sig550_luckygun"] = true
+	-- need_item["wpn_pkm_zulus"] = true
+	-- need_item["wpn_wincheaster1300_trapper"] = true
+	-- need_item["wpn_gauss"] = true
+	-- need_item["wpn_groza_nimble"] = true
+	-- need_item["wpn_desert_eagle_nimble"] = true
+	-- need_item["wpn_fn2000_nimble"] = true
+	-- need_item["wpn_g36_nimble"] = true
+	-- need_item["wpn_protecta_nimble"] = true
+	-- need_item["wpn_mp5_nimble"] = true
+	-- need_item["wpn_sig220_nimble"] = true
+	-- need_item["wpn_spas12_nimble"] = true
+	-- need_item["wpn_usp_nimble"] = true
+	-- need_item["wpn_vintorez_nimble"] = true
+	-- need_item["wpn_svu_nimble"] = true
+	-- need_item["wpn_svd_nimble"] = true
 
-	for k,v in pairs(need_item) do
-		if db.actor:object(k) ~= nil then
-			dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, k, "all")
-		end
-	end
+	-- for k,v in pairs(need_item) do
+		-- if db.actor:object(k) ~= nil then
+			-- dialogs.relocate_item_section_from_actor(first_speaker, second_speaker, k, "all")
+		-- end
+	-- end
 	dialogs.relocate_money_from_actor(first_speaker, second_speaker, amount)
 end
 

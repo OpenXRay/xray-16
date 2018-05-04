@@ -1,5 +1,8 @@
 [logic]
-active = sr_idle
+active = sr_idle@check_story
+
+[sr_idle@check_story]
+on_info = {+story_mode_disabled} sr_idle@nil, sr_idle
 
 [sr_idle]
 on_info = {+warlab_access_decoding} sr_timer %+warlab_start_teleport%

@@ -21,7 +21,7 @@
     </specific_character>
 <specific_character id="sim_default_monolith_0_default_1" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_monolith1gas</icon>
+    <icon>ui_inGame2_monolit_0</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_monolith_0</class>
@@ -29,7 +29,7 @@
     <snd_config>characters_voice\human_01\monolith\</snd_config>
     <rank>1718</rank>
     <reputation>2443</reputation>
-    <visual>actors\stalker_monolith\stalker_monolith1</visual>
+    <visual>actors\stalker_monolith\stalker_monolith_0</visual>
     <supplies>
 #include "gameplay\loadouts\monolith_base.ltx"
 #include "gameplay\loadouts\monolith_tier_1.ltx"
@@ -42,7 +42,7 @@
     </specific_character>
 <specific_character id="sim_default_monolith_0_default_2" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_monolith1gas</icon>
+    <icon>ui_inGame2_monolit_0</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_monolith_0</class>
@@ -50,7 +50,7 @@
     <snd_config>characters_voice\human_01\monolith\</snd_config>
     <rank>2830</rank>
     <reputation>-346</reputation>
-    <visual>actors\stalker_monolith\stalker_monolith1b</visual>
+    <visual>actors\stalker_monolith\stalker_monolith0a</visual>
     <supplies>
 #include "gameplay\loadouts\monolith_base.ltx"
 #include "gameplay\loadouts\monolith_tier_1.ltx"
@@ -71,7 +71,7 @@
     <snd_config>characters_voice\human_01\monolith\</snd_config>
     <rank>1264</rank>
     <reputation>-210</reputation>
-    <visual>actors\stalker_monolith\stalker_monolith2</visual>
+    <visual>actors\stalker_monolith\stalker_monolith2a</visual>
     <supplies>
 #include "gameplay\loadouts\monolith_base.ltx"
 #include "gameplay\loadouts\monolith_tier_1.ltx"
@@ -84,7 +84,7 @@
     </specific_character>
 <specific_character id="sim_default_monolith_0_default_4" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mono_old</icon>
+    <icon>ui_inGame2_monolit_2_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_monolith_0</class>
@@ -105,7 +105,7 @@
     </specific_character>
 <specific_character id="sim_default_monolith_0_default_5" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mono_old</icon>
+    <icon>ui_inGame2_monolit_2_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_monolith_0</class>
@@ -126,7 +126,7 @@
     </specific_character>
 <specific_character id="sim_default_monolith_0_default_6" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mono_old</icon>
+    <icon>ui_inGame2_monolit_2_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_monolith_0</class>
@@ -134,7 +134,7 @@
     <snd_config>characters_voice\human_01\monolith\</snd_config>
     <rank>12182</rank>
     <reputation>2330</reputation>
-    <visual>actors\stalker_monolith\stalker_monolith2b_old</visual>
+    <visual>actors\stalker_monolith\stalker_monolith_2_old</visual>
     <supplies>
 #include "gameplay\loadouts\monolith_base.ltx"
 #include "gameplay\loadouts\monolith_tier_2.ltx"
@@ -147,7 +147,7 @@
     </specific_character>
 <specific_character id="sim_default_monolith_0_default_7" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_monolith2_gp5</icon>
+    <icon>ui_inGame2_monolit_2_gp5</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_monolith_0</class>
@@ -155,7 +155,7 @@
     <snd_config>characters_voice\human_01\monolith\</snd_config>
     <rank>7610</rank>
     <reputation>1146</reputation>
-    <visual>actors\stalker_monolith\stalker_monolith0_gp5</visual>
+    <visual>actors\stalker_monolith\stalker_monolith_2_gp5</visual>
     <supplies>
 #include "gameplay\loadouts\monolith_base.ltx"
 #include "gameplay\loadouts\monolith_tier_2.ltx"
@@ -168,7 +168,7 @@
     </specific_character>
 <specific_character id="sim_default_monolith_0_default_8" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_monolith2_gp5</icon>
+    <icon>ui_inGame2_monolit_2_gp5</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_monolith_0</class>
@@ -176,7 +176,7 @@
     <snd_config>characters_voice\human_01\monolith\</snd_config>
     <rank>9866</rank>
     <reputation>-1906</reputation>
-    <visual>actors\stalker_monolith\stalker_monolith1_gp5</visual>
+    <visual>actors\stalker_monolith\stalker_monolith2a_gp5</visual>
     <supplies>
 #include "gameplay\loadouts\monolith_base.ltx"
 #include "gameplay\loadouts\monolith_tier_2.ltx"
@@ -189,7 +189,7 @@
     </specific_character>
 <specific_character id="sim_default_monolith_0_default_9" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_monolith2_gp5</icon>
+    <icon>ui_inGame2_monolit_2_gp5</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_monolith_0</class>
@@ -197,7 +197,7 @@
     <snd_config>characters_voice\human_01\monolith\</snd_config>
     <rank>6068</rank>
     <reputation>-2381</reputation>
-    <visual>actors\stalker_monolith\stalker_monolith2_gp5</visual>
+    <visual>actors\stalker_monolith\stalker_monolith_2_gp5</visual>
     <supplies>
 #include "gameplay\loadouts\monolith_base.ltx"
 #include "gameplay\loadouts\monolith_tier_2.ltx"
@@ -210,7 +210,7 @@
     </specific_character>
 <specific_character id="sim_default_monolith_1_default_0" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_monolith1gas</icon>
+    <icon>ui_inGame2_monolit_0</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_monolith_1</class>
@@ -218,7 +218,7 @@
     <snd_config>characters_voice\human_01\monolith\</snd_config>
     <rank>1268</rank>
     <reputation>790</reputation>
-    <visual>actors\stalker_monolith\stalker_monolith1</visual>
+    <visual>actors\stalker_monolith\stalker_monolith_0</visual>
     <supplies>
 #include "gameplay\loadouts\monolith_base.ltx"
 #include "gameplay\loadouts\monolith_tier_1.ltx"
@@ -252,7 +252,7 @@
     </specific_character>
 <specific_character id="sim_default_monolith_1_default_2" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_monolith1gas</icon>
+    <icon>ui_inGame2_monolit_0</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_monolith_1</class>
@@ -260,7 +260,7 @@
     <snd_config>characters_voice\human_01\monolith\</snd_config>
     <rank>1082</rank>
     <reputation>-2319</reputation>
-    <visual>actors\stalker_monolith\stalker_monolith1b</visual>
+    <visual>actors\stalker_monolith\stalker_monolith0a</visual>
     <supplies>
 #include "gameplay\loadouts\monolith_base.ltx"
 #include "gameplay\loadouts\monolith_tier_1.ltx"
@@ -281,7 +281,7 @@
     <snd_config>characters_voice\human_01\monolith\</snd_config>
     <rank>1612</rank>
     <reputation>1103</reputation>
-    <visual>actors\stalker_monolith\stalker_monolith2</visual>
+    <visual>actors\stalker_monolith\stalker_monolith2a</visual>
     <supplies>
 #include "gameplay\loadouts\monolith_base.ltx"
 #include "gameplay\loadouts\monolith_tier_1.ltx"
@@ -294,7 +294,7 @@
     </specific_character>
 <specific_character id="sim_default_monolith_1_default_4" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mono_old</icon>
+    <icon>ui_inGame2_monolit_2_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_monolith_1</class>
@@ -315,7 +315,7 @@
     </specific_character>
 <specific_character id="sim_default_monolith_1_default_5" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mono_old</icon>
+    <icon>ui_inGame2_monolit_2_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_monolith_1</class>
@@ -336,7 +336,7 @@
     </specific_character>
 <specific_character id="sim_default_monolith_1_default_6" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mono_old</icon>
+    <icon>ui_inGame2_monolit_2_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_monolith_1</class>
@@ -344,7 +344,7 @@
     <snd_config>characters_voice\human_01\monolith\</snd_config>
     <rank>14500</rank>
     <reputation>1292</reputation>
-    <visual>actors\stalker_monolith\stalker_monolith2b_old</visual>
+    <visual>actors\stalker_monolith\stalker_monolith2a_old</visual>
     <supplies>
 #include "gameplay\loadouts\monolith_base.ltx"
 #include "gameplay\loadouts\monolith_tier_3.ltx"
@@ -357,7 +357,7 @@
     </specific_character>
 <specific_character id="sim_default_monolith_1_default_7" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_monolith2_gp5</icon>
+    <icon>ui_inGame2_monolit_2_gp5</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_monolith_1</class>
@@ -365,7 +365,7 @@
     <snd_config>characters_voice\human_01\monolith\</snd_config>
     <rank>8082</rank>
     <reputation>415</reputation>
-    <visual>actors\stalker_monolith\stalker_monolith0_gp5</visual>
+    <visual>actors\stalker_monolith\stalker_monolith_2_gp5</visual>
     <supplies>
 #include "gameplay\loadouts\monolith_base.ltx"
 #include "gameplay\loadouts\monolith_tier_2.ltx"
@@ -378,7 +378,7 @@
     </specific_character>
 <specific_character id="sim_default_monolith_1_default_8" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_monolith2_gp5</icon>
+    <icon>ui_inGame2_monolit_2_gp5</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_monolith_1</class>
@@ -386,7 +386,7 @@
     <snd_config>characters_voice\human_01\monolith\</snd_config>
     <rank>9988</rank>
     <reputation>-435</reputation>
-    <visual>actors\stalker_monolith\stalker_monolith1_gp5</visual>
+    <visual>actors\stalker_monolith\stalker_monolith2a_gp5</visual>
     <supplies>
 #include "gameplay\loadouts\monolith_base.ltx"
 #include "gameplay\loadouts\monolith_tier_2.ltx"
@@ -399,7 +399,7 @@
     </specific_character>
 <specific_character id="sim_default_monolith_1_default_9" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_monolith2_gp5</icon>
+    <icon>ui_inGame2_monolit_2_gp5</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_monolith_1</class>
@@ -407,7 +407,7 @@
     <snd_config>characters_voice\human_01\monolith\</snd_config>
     <rank>8774</rank>
     <reputation>2043</reputation>
-    <visual>actors\stalker_monolith\stalker_monolith2_gp5</visual>
+    <visual>actors\stalker_monolith\stalker_monolith2a_gp5</visual>
     <supplies>
 #include "gameplay\loadouts\monolith_base.ltx"
 #include "gameplay\loadouts\monolith_tier_2.ltx"
@@ -420,7 +420,7 @@
     </specific_character>
 <specific_character id="sim_default_monolith_2_default_0" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_monolith1gas</icon>
+    <icon>ui_inGame2_monolit_0</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_monolith_2</class>
@@ -428,7 +428,7 @@
     <snd_config>characters_voice\human_01\monolith\</snd_config>
     <rank>2634</rank>
     <reputation>2284</reputation>
-    <visual>actors\stalker_monolith\stalker_monolith1b</visual>
+    <visual>actors\stalker_monolith\stalker_monolith0a</visual>
     <supplies>
 #include "gameplay\loadouts\monolith_base.ltx"
 #include "gameplay\loadouts\monolith_tier_1.ltx"
@@ -462,7 +462,7 @@
     </specific_character>
 <specific_character id="sim_default_monolith_2_default_10" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mono_old</icon>
+    <icon>ui_inGame2_monolit_2_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_monolith_2</class>
@@ -483,7 +483,7 @@
     </specific_character>
 <specific_character id="sim_default_monolith_2_default_11" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mono_old</icon>
+    <icon>ui_inGame2_monolit_2_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_monolith_2</class>
@@ -491,7 +491,7 @@
     <snd_config>characters_voice\human_01\monolith\</snd_config>
     <rank>10748</rank>
     <reputation>-633</reputation>
-    <visual>actors\stalker_monolith\stalker_monolith2b_old</visual>
+    <visual>actors\stalker_monolith\stalker_monolith_2_old</visual>
     <supplies>
 #include "gameplay\loadouts\monolith_base.ltx"
 #include "gameplay\loadouts\monolith_tier_3.ltx"
@@ -504,7 +504,7 @@
     </specific_character>
 <specific_character id="sim_default_monolith_2_default_12" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_monolith2_gp5</icon>
+    <icon>ui_inGame2_monolit_2_gp5</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_monolith_2</class>
@@ -512,7 +512,7 @@
     <snd_config>characters_voice\human_01\monolith\</snd_config>
     <rank>7534</rank>
     <reputation>-2218</reputation>
-    <visual>actors\stalker_monolith\stalker_monolith0_gp5</visual>
+    <visual>actors\stalker_monolith\stalker_monolith_2_gp5</visual>
     <supplies>
 #include "gameplay\loadouts\monolith_base.ltx"
 #include "gameplay\loadouts\monolith_tier_2.ltx"
@@ -525,7 +525,7 @@
     </specific_character>
 <specific_character id="sim_default_monolith_2_default_13" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_monolith2_gp5</icon>
+    <icon>ui_inGame2_monolit_2_gp5</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_monolith_2</class>
@@ -533,7 +533,7 @@
     <snd_config>characters_voice\human_01\monolith\</snd_config>
     <rank>9738</rank>
     <reputation>80</reputation>
-    <visual>actors\stalker_monolith\stalker_monolith1_gp5</visual>
+    <visual>actors\stalker_monolith\stalker_monolith2a_gp5</visual>
     <supplies>
 #include "gameplay\loadouts\monolith_base.ltx"
 #include "gameplay\loadouts\monolith_tier_2.ltx"
@@ -546,7 +546,7 @@
     </specific_character>
 <specific_character id="sim_default_monolith_2_default_14" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_monolith2_gp5</icon>
+    <icon>ui_inGame2_monolit_2_gp5</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_monolith_2</class>
@@ -554,7 +554,7 @@
     <snd_config>characters_voice\human_01\monolith\</snd_config>
     <rank>7800</rank>
     <reputation>-367</reputation>
-    <visual>actors\stalker_monolith\stalker_monolith2_gp5</visual>
+    <visual>actors\stalker_monolith\stalker_monolith2a_gp5</visual>
     <supplies>
 #include "gameplay\loadouts\monolith_base.ltx"
 #include "gameplay\loadouts\monolith_tier_2.ltx"
@@ -617,7 +617,7 @@
     <snd_config>characters_voice\human_01\monolith\</snd_config>
     <rank>1512</rank>
     <reputation>-169</reputation>
-    <visual>actors\stalker_monolith\stalker_monolith2</visual>
+    <visual>actors\stalker_monolith\stalker_monolith2a</visual>
     <supplies>
 #include "gameplay\loadouts\monolith_base.ltx"
 #include "gameplay\loadouts\monolith_tier_1.ltx"
@@ -630,7 +630,7 @@
     </specific_character>
 <specific_character id="sim_default_monolith_2_default_5" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_monolith1gas</icon>
+    <icon>ui_inGame2_monolit_0</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_monolith_2</class>
@@ -638,7 +638,7 @@
     <snd_config>characters_voice\human_01\monolith\</snd_config>
     <rank>2528</rank>
     <reputation>85</reputation>
-    <visual>actors\stalker_monolith\stalker_monolith1</visual>
+    <visual>actors\stalker_monolith\stalker_monolith_0</visual>
     <supplies>
 #include "gameplay\loadouts\monolith_base.ltx"
 #include "gameplay\loadouts\monolith_tier_1.ltx"
@@ -680,7 +680,7 @@
     <snd_config>characters_voice\human_01\monolith\</snd_config>
     <rank>2028</rank>
     <reputation>1993</reputation>
-    <visual>actors\stalker_monolith\stalker_monolith2</visual>
+    <visual>actors\stalker_monolith\stalker_monolith2a</visual>
     <supplies>
 #include "gameplay\loadouts\monolith_base.ltx"
 #include "gameplay\loadouts\monolith_tier_1.ltx"
@@ -693,7 +693,7 @@
     </specific_character>
 <specific_character id="sim_default_monolith_2_default_8" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_monolith1gas</icon>
+    <icon>ui_inGame2_monolit_0</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_monolith_2</class>
@@ -701,7 +701,7 @@
     <snd_config>characters_voice\human_01\monolith\</snd_config>
     <rank>2896</rank>
     <reputation>-2233</reputation>
-    <visual>actors\stalker_monolith\stalker_monolith1</visual>
+    <visual>actors\stalker_monolith\stalker_monolith_0</visual>
     <supplies>
 #include "gameplay\loadouts\monolith_base.ltx"
 #include "gameplay\loadouts\monolith_tier_1.ltx"
@@ -714,7 +714,7 @@
     </specific_character>
 <specific_character id="sim_default_monolith_2_default_9" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mono_old</icon>
+    <icon>ui_inGame2_monolit_2_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_monolith_2</class>
@@ -758,7 +758,7 @@
     </specific_character>
 <specific_character id="sim_default_monolith_3_default_1" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mono_old</icon>
+    <icon>ui_inGame2_monolit_2_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_monolith_3</class>
@@ -1047,7 +1047,7 @@
     <visual>actors\stalker_monolith\stalker_monolith_2</visual>
     <supplies>
 #include "gameplay\loadouts\monolith_base.ltx"
-#include "gameplay\loadouts\monolith_tier_1.ltx"
+#include "gameplay\loadouts\monolith_sniper.ltx"
         [spawn] \n
     </supplies>
 #include "gameplay\character_criticals.xml"
@@ -1068,7 +1068,7 @@
     <visual>actors\stalker_monolith\stalker_monolith_2</visual>
     <supplies>
 #include "gameplay\loadouts\monolith_base.ltx"
-#include "gameplay\loadouts\monolith_tier_1.ltx"
+#include "gameplay\loadouts\monolith_sniper.ltx"
         [spawn] \n
     </supplies>
 #include "gameplay\character_criticals.xml"

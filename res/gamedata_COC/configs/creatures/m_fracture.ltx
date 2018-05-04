@@ -15,8 +15,8 @@ visual				 = monsters\izlom\izlom
 corpse_visual		 = monsters\izlom\izlom
 icon = ui_npc_monster_fracture
 
-hit_fraction_monster = 0.8
-skin_armor = 0.1
+hit_fraction_monster = 0.7
+skin_armor = 0.01
 
 MaxHealthValue         = 1.0              ; range [0..200]
 
@@ -34,7 +34,6 @@ jump_max_height = 1.0
 
 cform                = skeleton					; collision class
 class                = SM_IZLOM					; AI class
-rank = 7
 script_binding  = bind_monster.bind
 
 bone_torso			 = bip01_spine1 			; bone name
@@ -97,12 +96,12 @@ as_min_dist				= 0.5
 as_step					= 0.5
 feel_enemy_who_just_hit_max_distance = 20  ;дистанция на которой монстр почувствует стрельнувшего игрока даже спиной
 
-DayTime_Begin		= 0			; эрўрыр фэ  фы  ьюэёЄЁр
-DayTime_End			= 21		; ъюэхЎ фэ  фы  ьюэёЄЁр
-Min_Satiety			= 0.4		; ьшэ. эюЁьр ёvЄюёЄш (ьхэ№°х - єцх уюыюфэvщ)
-Max_Satiety			= 1.0		; ьръё. эюЁьр ёvЄюёЄш (сюы№°х - юўхэ№ ёvЄvщ)
+DayTime_Begin		= 0
+DayTime_End			= 21
+Min_Satiety			= 0.4
+Max_Satiety			= 1.0
 
-distance_to_corpse	= 0.9		; фшёЄ. фю ЄЁєяр, яЁш ъюЄюЁющ юэ яхЁхїюфшЄ т ёюёЄю эшх хфv
+distance_to_corpse	= 0.9
 
 min_view_distance   		= 0.8				; коэффициент, который множится на eye_range, в зависимости от угла
 max_view_distance	 		= 1.0				; коэффициент, который множится на eye_range, в зависимости от угла
@@ -137,19 +136,19 @@ psy_health_v = 0.1						;скорость восстановления psy-здоровья
 immunities_sect				= fracture_normal_immunities
 
 ;открытые раны
-bleeding_v					= 0.4						;потеря крови при номинальной ране в секунду
-wound_incarnation_v			= 0.01				;крутизна кривой заживления (какой процент раны останется после заживления в игровую секунду)
+bleeding_v					= 0.04						;потеря крови при номинальной ране в секунду
+wound_incarnation_v			= 0.05				;крутизна кривой заживления (какой процент раны останется после заживления в игровую секунду)
 min_wound_size				= 0.01
 
-sleep_health = 1.0		;1.5				;ъю¤ЇЇшЎшхэЄv ёъюЁюёЄхщ шчьхэхэш  ярЁрьхЄЁют тю тЁхь  ёэр
+sleep_health = 1.0		;1.5
 sleep_power = 1.0		;1.5
 sleep_satiety = 1.0		;0.8
 sleep_radiation = 1.0	;1.1
 sleep_psy_health = 1.0
 
-eat_freq			=	5.0		; ўрёЄюЄр єъєёют т ёхъ
-eat_slice			=	0.01	; єтхышўхэшх ёvЄюёЄш яЁш 1 єъєёх
-eat_slice_weight	=	10.0	; єьхэ№°хэшх хфv є ЄЁєяр
+eat_freq			=	5.0
+eat_slice			=	0.01
+eat_slice_weight	=	10.0
 
 
 ;-------------------------------------------------------------------------
@@ -230,9 +229,9 @@ bip01_head 			= 3, -1, 0.1
 ;---------------------------------------------------------------------------------------------------------------------------------------------
 ;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, bottom, top ) |	Test Dist
 ;---------------------------------------------------------------------------------------------------------------------------------------------
-stand_attack_0 =	  	0.45,		0.45,		    75,        0.0, 1.0, 0.0,		 -1.6, 1.6, -1.6, 1.6,							  3.5
-stand_attack_1 =	  	0.45,		0.45,		    75,        0.0, 1.0, 0.0,		 -1.6, 1.6, -1.6, 1.6,							  3.5
-stand_attack_2 =	  	0.45,		0.45,		    75,        0.0, 1.0, 0.0,		 -1.6, 1.6, -1.6, 1.6,							  3.5
+stand_attack_0 =	  	0.45,		0.55,		    75,        0.0, 1.0, 0.0,		 -1.6, 1.6, -1.6, 1.6,							  3.5
+stand_attack_1 =	  	0.45,		0.55,		    75,        0.0, 1.0, 0.0,		 -1.6, 1.6, -1.6, 1.6,							  3.5
+stand_attack_2 =	  	0.45,		0.55,		    75,        0.0, 1.0, 0.0,		 -1.6, 1.6, -1.6, 1.6,							  3.5
 
 [fracture_normal_attack_effector]
 
@@ -305,36 +304,33 @@ velocity_factor		     	= 1.0				;Higher value = greater bonus to detection speed
 luminocity_factor			= 0.8				;Low value = easier to see at night
 transparency_threshold	 	= 0.3				;Low value = easier to see through objects (if greater then 1 then enemies are blind)
 still_visible_time          = 0					;The time (milliseconds) that the object is still considered visible , even if it is not in the frustum (u32)
+
 [fracture_weak]:fracture_normal
 visual				 = monsters\izlom\izlam
-MaxHealthValue		 = 0.75			; range [0..200]
 
-rank = 1 
+rank = 2
 spec_rank = weak
 
 hit_fraction_monster = 0.6
 
 [fracture_strong]:fracture_normal
 visual				 = monsters\izlom\izlim
-MaxHealthValue		 = 1.5			; range [0..200]
 
-rank = 6 
+rank = 3
 spec_rank = strong
 
 hit_fraction_monster = 0.4
 
 [fracture_2]:fracture_normal
 visual				 = monsters\izlom\izlum
-MaxHealthValue		 = 1.0			; range [0..200]
 
-rank = 3 
+rank = 3
 spec_rank = normal
 
 [fracture_3]:fracture_normal
 visual				 = monsters\izlom\izlem
-MaxHealthValue		 = 1.25			; range [0..200]
 
-rank = 3 
+rank = 3
 spec_rank = normal
 
-hit_fraction_monster = 0.45
+hit_fraction_monster = 0.5

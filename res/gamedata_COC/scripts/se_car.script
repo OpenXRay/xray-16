@@ -5,13 +5,10 @@ function se_car:__init (section) super (section)
 end
 function se_car:on_register()
 	cse_alife_car.on_register(self)
-	story_objects.check_spawn_ini_for_story_id(self)
-	--if (level.map_has_object_spot(self.id,"treasure") == 0) then
-	--	level.map_add_object_spot_ser(self.id, "treasure", self:name())
-	--end
+	SendScriptCallback("server_entity_on_register",self,"se_car")
 end
 function se_car:on_unregister()
-	story_objects.unregister(self.id)
+	SendScriptCallback("server_entity_on_unregister",self,"se_car")
 	cse_alife_car.on_unregister(self)
 end 
 function se_car:can_switch_offline ()

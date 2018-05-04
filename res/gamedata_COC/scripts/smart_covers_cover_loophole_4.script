@@ -1,0 +1,55 @@
+local	temp = {}
+if (move ~= nil) then
+	temp = move
+end
+move	= temp
+
+function get_smart_cover_cover_loophole_4()
+	return {
+			loopholes = {
+				smart_covers_loophole_4.get_loophole_4("lh_4",	vector():set(-0.9,0,-0.4))
+			},
+
+			transitions = {
+			--' Анимации входа в бойницы
+			{
+				vertex0 = "",
+				vertex1 = "lh_4",
+				weight = 1.0,
+                actions =	{
+							{
+                                precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+                                actions =	{
+											{
+												animation = "loophole_4_in_front_0",
+												position = VEC_ZERO,
+												body_state = move.standing, movement_type = move.run,
+											},
+											},
+                            }
+							}
+			},
+						
+			--' Анимации выхода из бойниц.
+			{
+				vertex0 = "lh_4",
+				vertex1 = "",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+                                actions =	{
+											{
+												animation = "",
+												position = VEC_ZERO,
+												body_state = move.standing, movement_type = move.run,
+											},
+											},
+							}
+							}
+			}
+		}
+	}
+end

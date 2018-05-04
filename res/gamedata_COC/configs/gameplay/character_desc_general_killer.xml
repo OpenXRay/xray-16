@@ -44,7 +44,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_0_default_10" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_merc_sun1_merc</icon>
+    <icon>ui_inGame2_merc_s_merc</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_0</class>
@@ -53,7 +53,7 @@
     <rank>14294</rank>
     <money min="250" max="1750" infinitive="0"/>
     <reputation>1927</reputation>
-    <visual>actors\stalker_merc\stalker_merc_sun1_merc</visual>
+    <visual>actors\stalker_merc\stalker_merc_s_merc</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_1.ltx"
@@ -110,7 +110,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_0_default_4" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mercen_2_mask</icon>
+    <icon>ui_inGame2_merc_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_0</class>
@@ -119,7 +119,7 @@
     <rank>5366</rank>
     <money min="250" max="1750" infinitive="0"/>
     <reputation>-839</reputation>
-    <visual>actors\stalker_merc\stalker_mercen_2_mask</visual>
+    <visual>actors\stalker_merc\stalker_merc_2_bala</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_2.ltx"
@@ -132,7 +132,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_0_default_5" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mercen_2_mask</icon>
+    <icon>ui_inGame2_merc_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_0</class>
@@ -141,7 +141,7 @@
     <rank>5078</rank>
     <money min="250" max="1750" infinitive="0"/>
     <reputation>74</reputation>
-    <visual>actors\stalker_merc\stalker_mercen2a_mask</visual>
+    <visual>actors\stalker_merc\stalker_merc2a_bala</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_2.ltx"
@@ -154,7 +154,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_0_default_6" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mercen_2_mask</icon>
+    <icon>ui_inGame2_merc_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_0</class>
@@ -163,7 +163,7 @@
     <rank>3932</rank>
     <money min="250" max="1750" infinitive="0"/>
     <reputation>-1056</reputation>
-    <visual>actors\stalker_merc\stalker_mercen2b_mask</visual>
+    <visual>actors\stalker_merc\stalker_merc2b_bala</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_2.ltx"
@@ -176,7 +176,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_0_default_7" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mercen_2_mask</icon>
+    <icon>ui_inGame2_merc_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_0</class>
@@ -185,7 +185,7 @@
     <rank>4292</rank>
     <money min="250" max="1750" infinitive="0"/>
     <reputation>1400</reputation>
-    <visual>actors\stalker_merc\stalker_mercen2c_mask</visual>
+    <visual>actors\stalker_merc\stalker_merc2c_bala</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_2.ltx"
@@ -198,7 +198,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_0_default_8" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_merc_sun1</icon>
+    <icon>ui_inGame2_merc_s</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_0</class>
@@ -207,7 +207,7 @@
     <rank>1840</rank>
     <money min="250" max="1750" infinitive="0"/>
     <reputation>623</reputation>
-    <visual>actors\stalker_merc\stalker_merc_sun1</visual>
+    <visual>actors\stalker_merc\stalker_merc_s</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_1.ltx"
@@ -220,7 +220,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_0_default_9" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mercsun_old</icon>
+    <icon>ui_inGame2_merc_s_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_0</class>
@@ -229,7 +229,7 @@
     <rank>10390</rank>
     <money min="250" max="1750" infinitive="0"/>
     <reputation>2462</reputation>
-    <visual>actors\stalker_merc\stalker_merc_sun1_old</visual>
+    <visual>actors\stalker_merc\stalker_merc_s_old</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_2.ltx"
@@ -286,7 +286,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_1_default_10" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_merc_sun1_merc</icon>
+    <icon>ui_inGame2_merc_s_merc</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_1</class>
@@ -295,7 +295,7 @@
     <rank>14416</rank>
     <money min="500" max="1750" infinitive="0"/>
     <reputation>-1785</reputation>
-    <visual>actors\stalker_merc\stalker_merc_sun1_merc</visual>
+    <visual>actors\stalker_merc\stalker_merc_s_merc</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_3.ltx"
@@ -352,7 +352,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_1_default_4" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mercen_2_mask</icon>
+    <icon>ui_inGame2_merc_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_1</class>
@@ -361,7 +361,7 @@
     <rank>5516</rank>
     <money min="500" max="1750" infinitive="0"/>
     <reputation>-568</reputation>
-    <visual>actors\stalker_merc\stalker_mercen_2_mask</visual>
+    <visual>actors\stalker_merc\stalker_merc_2_bala</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_2.ltx"
@@ -374,7 +374,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_1_default_5" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mercen_2_mask</icon>
+    <icon>ui_inGame2_merc_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_1</class>
@@ -383,7 +383,7 @@
     <rank>5176</rank>
     <money min="500" max="1750" infinitive="0"/>
     <reputation>-2470</reputation>
-    <visual>actors\stalker_merc\stalker_mercen2a_mask</visual>
+    <visual>actors\stalker_merc\stalker_merc2a_bala</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_2.ltx"
@@ -396,7 +396,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_1_default_6" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mercen_2_mask</icon>
+    <icon>ui_inGame2_merc_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_1</class>
@@ -405,7 +405,7 @@
     <rank>5738</rank>
     <money min="500" max="1750" infinitive="0"/>
     <reputation>-2294</reputation>
-    <visual>actors\stalker_merc\stalker_mercen2b_mask</visual>
+    <visual>actors\stalker_merc\stalker_merc2b_bala</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_2.ltx"
@@ -418,7 +418,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_1_default_7" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mercen_2_mask</icon>
+    <icon>ui_inGame2_merc_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_1</class>
@@ -427,7 +427,7 @@
     <rank>3296</rank>
     <money min="500" max="1750" infinitive="0"/>
     <reputation>-974</reputation>
-    <visual>actors\stalker_merc\stalker_mercen2c_mask</visual>
+    <visual>actors\stalker_merc\stalker_merc2c_bala</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_2.ltx"
@@ -440,7 +440,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_1_default_8" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_merc_sun1</icon>
+    <icon>ui_inGame2_merc_s</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_1</class>
@@ -449,7 +449,7 @@
     <rank>1508</rank>
     <money min="500" max="1750" infinitive="0"/>
     <reputation>1594</reputation>
-    <visual>actors\stalker_merc\stalker_merc_sun1</visual>
+    <visual>actors\stalker_merc\stalker_merc_s</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_1.ltx"
@@ -462,7 +462,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_1_default_9" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mercsun_old</icon>
+    <icon>ui_inGame2_merc_s_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_1</class>
@@ -471,7 +471,7 @@
     <rank>11270</rank>
     <money min="500" max="1750" infinitive="0"/>
     <reputation>2380</reputation>
-    <visual>actors\stalker_merc\stalker_merc_sun1_old</visual>
+    <visual>actors\stalker_merc\stalker_merc_s_old</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_3.ltx"
@@ -528,7 +528,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_2_default_10" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_merc_sun1_merc</icon>
+    <icon>ui_inGame2_merc_s_merc</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_2</class>
@@ -537,7 +537,7 @@
     <rank>11364</rank>
     <money min="1500" max="2500" infinitive="0"/>
     <reputation>-2404</reputation>
-    <visual>actors\stalker_merc\stalker_merc_sun1_merc</visual>
+    <visual>actors\stalker_merc\stalker_merc_s_merc</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_3.ltx"
@@ -594,7 +594,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_2_default_4" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mercen_2_mask</icon>
+    <icon>ui_inGame2_merc_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_2</class>
@@ -603,7 +603,7 @@
     <rank>5090</rank>
     <money min="1500" max="2500" infinitive="0"/>
     <reputation>471</reputation>
-    <visual>actors\stalker_merc\stalker_mercen_2_mask</visual>
+    <visual>actors\stalker_merc\stalker_merc_2_bala</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_2.ltx"
@@ -616,7 +616,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_2_default_5" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mercen_2_mask</icon>
+    <icon>ui_inGame2_merc_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_2</class>
@@ -625,7 +625,7 @@
     <rank>4926</rank>
     <money min="1500" max="2500" infinitive="0"/>
     <reputation>1128</reputation>
-    <visual>actors\stalker_merc\stalker_mercen2a_mask</visual>
+    <visual>actors\stalker_merc\stalker_merc2a_bala</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_2.ltx"
@@ -638,7 +638,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_2_default_6" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mercen_2_mask</icon>
+    <icon>ui_inGame2_merc_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_2</class>
@@ -647,7 +647,7 @@
     <rank>5496</rank>
     <money min="1500" max="2500" infinitive="0"/>
     <reputation>1985</reputation>
-    <visual>actors\stalker_merc\stalker_mercen2b_mask</visual>
+    <visual>actors\stalker_merc\stalker_merc2b_bala</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_2.ltx"
@@ -660,7 +660,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_2_default_7" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mercen_2_mask</icon>
+    <icon>ui_inGame2_merc_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_2</class>
@@ -669,7 +669,7 @@
     <rank>3770</rank>
     <money min="1500" max="2500" infinitive="0"/>
     <reputation>-1704</reputation>
-    <visual>actors\stalker_merc\stalker_mercen2c_mask</visual>
+    <visual>actors\stalker_merc\stalker_merc2c_bala</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_2.ltx"
@@ -682,7 +682,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_2_default_8" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_merc_sun1</icon>
+    <icon>ui_inGame2_merc_s</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_2</class>
@@ -691,7 +691,7 @@
     <rank>2494</rank>
     <money min="1500" max="2500" infinitive="0"/>
     <reputation>21</reputation>
-    <visual>actors\stalker_merc\stalker_merc_sun1</visual>
+    <visual>actors\stalker_merc\stalker_merc_s</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_1.ltx"
@@ -704,7 +704,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_2_default_9" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mercsun_old</icon>
+    <icon>ui_inGame2_merc_s_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_2</class>
@@ -713,7 +713,7 @@
     <rank>11632</rank>
     <money min="1500" max="2500" infinitive="0"/>
     <reputation>849</reputation>
-    <visual>actors\stalker_merc\stalker_merc_sun1_old</visual>
+    <visual>actors\stalker_merc\stalker_merc_s_old</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_3.ltx"
@@ -726,7 +726,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_3_default_0" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mercenary3</icon>
+    <icon>ui_inGame2_merc_1</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_3</class>
@@ -735,7 +735,7 @@
     <rank>12266</rank>
     <money min="2500" max="5000" infinitive="0"/>
     <reputation>1108</reputation>
-    <visual>actors\stalker_merc\stalker_mercenary3</visual>
+    <visual>actors\stalker_merc\stalker_merc_1</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_3.ltx"
@@ -750,7 +750,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_3_default_1" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mercenary3</icon>
+    <icon>ui_inGame2_merc_1</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_3</class>
@@ -759,7 +759,7 @@
     <rank>13506</rank>
     <money min="2500" max="5000" infinitive="0"/>
     <reputation>-163</reputation>
-    <visual>actors\stalker_merc\stalker_mercenary4</visual>
+    <visual>actors\stalker_merc\stalker_merc1a</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_3.ltx"
@@ -774,7 +774,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_3_default_2" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mercenary3</icon>
+    <icon>ui_inGame2_merc_1</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_3</class>
@@ -783,7 +783,7 @@
     <rank>12624</rank>
     <money min="2500" max="5000" infinitive="0"/>
     <reputation>1441</reputation>
-    <visual>actors\stalker_merc\stalker_mercenary3</visual>
+    <visual>actors\stalker_merc\stalker_merc_1</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_3.ltx"
@@ -798,7 +798,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_3_default_3" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_mercenary3</icon>
+    <icon>ui_inGame2_merc_1</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_3</class>
@@ -807,7 +807,7 @@
     <rank>12930</rank>
     <money min="2500" max="5000" infinitive="0"/>
     <reputation>527</reputation>
-    <visual>actors\stalker_merc\stalker_mercenary4</visual>
+    <visual>actors\stalker_merc\stalker_merc1a</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_3.ltx"
@@ -870,7 +870,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_4_default_2" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_merc_4a</icon>
+    <icon>ui_inGame2_merc_3</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_4</class>
@@ -879,7 +879,7 @@
     <rank>17622</rank>
     <money min="5000" max="10000" infinitive="0"/>
     <reputation>743</reputation>
-    <visual>actors\stalker_merc\stalker_mercexo_4</visual>
+    <visual>actors\stalker_merc\stalker_merc_3</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_3.ltx"
@@ -894,7 +894,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_4_default_3" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_merc_4a</icon>
+    <icon>ui_inGame2_merc_3</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_4</class>
@@ -903,7 +903,7 @@
     <rank>20874</rank>
     <money min="5000" max="10000" infinitive="0"/>
     <reputation>-635</reputation>
-    <visual>actors\stalker_merc\stalker_mercexo4a</visual>
+    <visual>actors\stalker_merc\stalker_merc3a</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_3.ltx"
@@ -966,7 +966,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_4_default_6" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_merc_4a</icon>
+    <icon>ui_inGame2_merc_3</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_3</class>
@@ -975,7 +975,7 @@
     <rank>15410</rank>
     <money min="2500" max="5000" infinitive="0"/>
     <reputation>2071</reputation>
-    <visual>actors\stalker_merc\stalker_mercexo_4</visual>
+    <visual>actors\stalker_merc\stalker_merc_3</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_3.ltx"
@@ -990,7 +990,7 @@
     </specific_character>
 <specific_character id="sim_default_killer_4_default_7" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_merc_4a</icon>
+    <icon>ui_inGame2_merc_3</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_killer_3</class>
@@ -999,7 +999,7 @@
     <rank>18248</rank>
     <money min="2500" max="5000" infinitive="0"/>
     <reputation>147</reputation>
-    <visual>actors\stalker_merc\stalker_mercexo4a</visual>
+    <visual>actors\stalker_merc\stalker_merc3a</visual>
     <supplies>
 #include "gameplay\loadouts\killer_base.ltx"
 #include "gameplay\loadouts\killer_tier_3.ltx"

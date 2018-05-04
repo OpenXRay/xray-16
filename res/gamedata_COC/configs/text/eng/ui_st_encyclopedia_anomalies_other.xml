@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	
+	<string id="encyclopedia_anomalies_other">
+		<text>Anomalies (Other)</text>
+	</string>
+	
+	<string id="encyclopedia_anomalies_other_emission">
+		<text>Emission</text>
+	</string>
+	<string id="encyclopedia_anomalies_other_emission_text">
+		<text>
+			%c[guide_blue]Emissions%c[default], also known as %c[guide_blue]Blowouts%c[default], are sudden releases of massive amounts of radiation.\n
+			\n%c[guide_green]Information%c[default]
+			\nStrong winds, storm clouds and a scarlet red sky all appear with the onset of an emission, followed by numerous eruptions of thunder and a deep rumbling underfoot.\n
+			\nThese events begin with a sharp surge in radioactive, abnormal and psionic activity - and end with destroying most life in their wake as waves of radiation cover the Zone.\n
+			\nDespite being extremely deadly, it is still quite easy to survive an emission by taking cover within buildings or underground tunnels until the event has run its course.\n
+			\nMuch in the same way as a psi-storm, the massive amount of energy released by an emission appears to "recharge" many anomalies, allowing stalkers to farm new artefacts from them.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_anomalies_other_phantom">
+		<text>Phantom</text>
+	</string>
+	<string id="encyclopedia_anomalies_other_phantom_text">
+		<text>
+			%c[guide_blue]Phantoms%c[default] are illusory beings that exist within the mind, rather than physically.\n
+			\n%c[guide_green]Information%c[default]
+			\nWhilst difficult to classify as either an anomaly or a mutant, a phantom is an involuntary mental projection of a mutant currently found somewhere within the Zone.\n
+			\nThese projections are always accompanied by a audible "howling" noise and appear glowing and transparent, gradually floating toward the victim through walls and across the air.\n
+			\nIt is unknown why they only take the form of mutants, including those of which a stalker has never encountered, and as to why they never take the appearance of those that are now extinct, such as the tark.\n
+			\nA leading theory about this phenomenon suggests that the Zone's living mutants are in some way strongly connected to the noosphere, and that through this a psi-field unintentionally imprints their visual appearance and hostile nature into the minds of its victims.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_anomalies_other_psistorm">
+		<text>Psi-storm</text>
+	</string>
+	<string id="encyclopedia_anomalies_other_psistorm_text">
+		<text>
+			%c[guide_blue]Psi-storms%c[default] consist of multiple psi-vortices, which release lethal amounts of psionic energy.\n
+			\n%c[guide_green]Information%c[default]
+			\nThese unusual weather anomalies are a very recent arrival to the Zone, and there is much speculation as to what causes their occurrence.\n
+			\nBeginning with a purple/pink haze and large formations of storm clouds, it takes very little time for a psi-storm to form and start wreaking havoc upon the Zone.\n
+			\nIf a stalker's equipment gives the wearer great protection against psionic damage, or makes use of drugs to provide a similar effect, it is possible to survival the discharge of individual psi-vortices during the storm without taking cover.\n
+			\nThis is provided that they immediately medicate themselves afterwards, as even the most prepared stalkers will still find themselves in a very delicate situation after such exposure.\n
+			\nSimilar to emissions, the massive amount of energy dispersed by a psi-storm appears to "recharge" many anomalies, allowing stalkers to farm new artefacts from them.
+		</text>
+	</string>
+	
+</string_table>

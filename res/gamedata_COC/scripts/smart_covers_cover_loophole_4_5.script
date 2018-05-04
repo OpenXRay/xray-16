@@ -1,0 +1,148 @@
+local	temp = {}
+if (move ~= nil) then
+	temp = move
+end
+move	= temp
+
+function get_smart_cover_cover_loophole_4_5()
+	return {
+			loopholes = {
+				smart_covers_loophole_4.get_loophole_4("lh_4",	vector():set(-0.9,0,-0.4)),
+				smart_covers_loophole_5.get_loophole_5("lh_5",	vector():set(-0.9,0,0.4))
+			},
+
+	
+			transitions = {
+			--' Анимации входа в бойницы
+			{
+				vertex0 = "",
+				vertex1 = "lh_4",
+				weight = 1.0,
+                actions =	{
+							{
+                                precondition_functor = "smart_covers.script_functor_true",
+                                precondition_params = "",
+                                actions =	{
+											{
+												animation = "loophole_4_in_front_0",
+												position = VEC_ZERO,
+												body_state = move.standing, movement_type = move.run,
+											},
+											},
+                            }
+							}
+			},
+			{
+				vertex0 = "",
+				vertex1 = "lh_5",
+				weight = 1.0,
+                actions =	{
+							{
+                                precondition_functor = "smart_covers.script_functor_true",
+                                precondition_params = "",
+                                actions =	{
+											{
+												animation = "loophole_5_in_front_0",
+												position = VEC_ZERO,
+												body_state = move.standing, movement_type = move.run,
+											},
+											},
+                            }
+							}
+			},
+
+			--' Анимации перехода между бойницами
+			{
+				vertex0 = "lh_4",
+				vertex1 = "lh_5",
+				weight = 1.0,
+                actions =	{
+							{
+                                precondition_functor = "smart_covers.script_functor_true",
+                                precondition_params = "",
+                                actions =	{
+											{
+												animation = "loophole_5_idle_0",
+												position = VEC_ZERO,
+												body_state = move.standing, movement_type = move.run,
+											},
+											},
+                            }
+							}				
+			},
+			{
+				vertex0 = "lh_5",
+				vertex1 = "lh_4",
+				weight = 1.1,
+                actions =	{
+							{
+                                precondition_functor = "smart_covers.script_functor_true",
+                                precondition_params = "",
+                                actions =	{
+											{
+												animation = "loophole_4_idle_0",
+												position = VEC_ZERO,
+												body_state = move.standing, movement_type = move.run,
+											},
+											},
+                            }
+							}				
+			},
+
+			--' Анимации выхода из бойниц.
+			{
+				vertex0 = "lh_4",
+				vertex1 = "",
+				weight = 1.1,
+				actions =	{
+--[[							{
+									animation = "loophole_1_exit_jump_0",
+									position = vector():set(0,0,2),
+									precondition_functor = "smart_covers_cover_5.exit_random",
+									precondition_params = "50"
+							},]]--
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+                                precondition_params = "",
+                                actions =	{
+											{
+												animation = "",
+												position = VEC_ZERO,
+												body_state = move.standing, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+			{
+				vertex0 = "lh_5",
+				vertex1 = "",
+				weight = 1.1,
+				actions =	{
+							--{
+									--animation = "loophole_2_jump_0",
+									--position = vector():set(-2,0,0),
+									--precondition_functor = "smart_covers_cover_5.exit_random",
+									--precondition_params = "50"
+							--},
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+                                precondition_params = "",
+                                actions =	{
+											{
+												animation = "",
+												position = VEC_ZERO,
+												body_state = move.standing, movement_type = move.run,
+											},
+											},
+							}
+							}
+			}
+		}
+	}
+end
+
+
+function exit_random(p)
+	return math.random(100) <= tonumber(p)
+end

@@ -15,6 +15,7 @@ local SKIP_FACTION_SELECTION = false -- TRUE to disable faction selection menu a
 class "main_menu" (CUIScriptWnd)
 function main_menu:__init() super()
 	math.randomseed(os.time())
+	math.random()
 	self.mbox_mode = 0
     self:InitControls()
     self:InitCallBacks()
@@ -349,7 +350,6 @@ function main_menu:OnKeyboard(dik, keyboard_action)  --virtual function
 		elseif (dik == DIK_keys.DIK_NUMPAD0) then
 			if (reload_system_ini) then
 				reload_system_ini()
-				clear_ini_cache(system_ini())
 				printf("system_ini_reload = success!")
 			end
 		end

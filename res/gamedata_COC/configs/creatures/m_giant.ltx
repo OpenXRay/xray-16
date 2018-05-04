@@ -18,6 +18,7 @@ search_speed         = 1.5                       ; option for ALife Simulator
 visual				 = monsters\psevdogigant\psevdogigant
 corpse_visual	     = monsters\psevdogigant\psevdogigant_dead
 icon				 = ui_npc_monster_psevdogigant
+MaxHealthValue		     = 200
 
 ;spawn_phantom 		= m_phantom_gigant
 can_spawn_phantom 	= false
@@ -56,12 +57,12 @@ psy_max_power				=	5
 psy_linear_factor			=	0.05
 psy_quadratic_factor		=	0
 
-radiation_max_distance		=	5
-radiation_max_power			=	0.01
+radiation_max_distance		=	7
+radiation_max_power			=	0.03
 radiation_linear_factor		=	1
 radiation_quadratic_factor	=	1
 radiation_pp_effector_name	= 	postprocess_rad
-radiation_pp_highest_at		= 	0.02
+radiation_pp_highest_at		= 	0.05
 
 ;---------------------------------------------------------------------
 ; Physics
@@ -165,7 +166,7 @@ sleep_radiation 		= 1.0	;1.1
 sleep_psy_health = 1.0
 
 
-satiety_threshold		= 0.5							; below this value monster fill hunger
+satiety_threshold		= 0.5							; below this value monster feels hunger
 
 ;----------------------------------------------------------------------------------------
 
@@ -238,7 +239,7 @@ LegsCount			= 2
 
 ;species of monster
 species					= giant
-rank					= 21
+rank					= 20
 spec_rank				= normal
 community				= pseudo_gigant
 
@@ -290,26 +291,28 @@ vision_danger_section		= giant_vision_danger
 ; иначе возникают артефакты с потерей видимости при переходе от денжера во фри.
 
 [giant_vision_free]
-min_view_distance   		= 0.5				; коэффициент, который множится на eye_range, в зависимости от угла
-max_view_distance	 		= 1.0				; коэффициент, который множится на eye_range, в зависимости от угла
-visibility_threshold	 	= 100.0				; значение, при достижении суммой которого объект считается видимым
-always_visible_distance 	= 0.3
-time_quant					= 0.001
-decrease_value				= 0.01				; значение, на которое уменьшается вес, если объект попал в фрустум, но отсёкся по каким-то причинам
-velocity_factor		     	= 0.5
-luminocity_factor			= 0.5 				; фактор освещения (только для Актёра)
-transparency_threshold		= 0.25
+min_view_distance   		= 0.1				; min range of cone based on eye_range
+max_view_distance	 		= 0.6				; max range of cone based on eye_range
+visibility_threshold	 	= 80				;Threshold in which object becomes visible based on factors
+always_visible_distance 	= 0					;Distance object is always considered visible (float)
+time_quant					= 0.005				;step increment to for sight calculations
+decrease_value				= 0.1 				;Decrease over time to overall threshold
+velocity_factor		     	= 1.1				;Higher value = greater bonus to detection speed when target is moving (depended on movement speed)
+luminocity_factor			= 0.8				;Low value = easier to see at night
+transparency_threshold	 	= 0.7 			    ;Low value = easier to see through objects
+still_visible_time          = 0 				;The time (milliseconds) that the object is still considered visible , even if it is not in the frustum (u32)
 
 [giant_vision_danger]
-min_view_distance   		= 0.5				; коэффициент, который множится на eye_range, в зависимости от угла
-max_view_distance	 		= 1.0				; коэффициент, который множится на eye_range, в зависимости от угла
-visibility_threshold	 	= 100.0				; значение, при достижении суммой которого объект считается видимым
-always_visible_distance 	= 0.3
-time_quant					= 0.001
-decrease_value				= 0.01				; значение, на которое уменьшается вес, если объект попал в фрустум, но отсёкся по каким-то причинам
-velocity_factor		     	= 0.5
-luminocity_factor			= 0.5 				; фактор освещения (только для Актёра)
-transparency_threshold		= 0.25
+min_view_distance   		= 0.1				; min range of cone based on eye_range
+max_view_distance	 		= 1.0				; max range of cone based on eye_range
+visibility_threshold	 	= 80				;Threshold in which object becomes visible based on factors
+always_visible_distance 	= 0					;Distance object is always considered visible (float)
+time_quant					= 0.005				;step increment to for sight calculations
+decrease_value				= 0.1 				;Decrease over time to overall threshold
+velocity_factor		     	= 1.1				;Higher value = greater bonus to detection speed when target is moving (depended on movement speed)
+luminocity_factor			= 0.8				;Low value = easier to see at night
+transparency_threshold	 	= 0.6 			    ;Low value = easier to see through objects
+still_visible_time          = 0 				;The time (milliseconds) that the object is still considered visible , even if it is not in the frustum (u32)
 
 ;=========================================================================================
 ; Damage Params
@@ -334,12 +337,12 @@ head 				= 2, -1, 0.2, 10
 ;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)   |	Field of hit_test  (left,right, top, bottom) |	Test Dist
 ;---------------------------------------------------------------------------------------------------------------------------------------------
 ;Bite
-stand_attack_0 =	  	0.25,		0.8,	    150,        0.5, 1.0, 0.5,		 -0.8, 0.8, -1.8, 1.8,					  2.6
+stand_attack_0 =	  	0.25,		0.9,	    100,        0.5, 1.0, 0.5,		 -0.8, 0.8, -1.8, 1.8,					  2.6
 ;Left leg Strike
-stand_attack_1 =	  	0.40,		0.9,	    200,        5.0, 2.5, 4.0,		 -0.6, 0.6, -1.8, 1.8,					  3.2
+stand_attack_1 =	  	0.40,		0.95,	    150,        5.0, 2.5, 4.0,		 -0.6, 0.6, -1.8, 1.8,					  3.2
 ;Bite2
-stand_attack_2 =	  	0.25,		0.8,	    150,        0.5, 1.0, 5.0,		 -0.8, 0.8, -1.8, 1.8,					  2.6
-stand_attack_run_0=     0.5,		1.0,	    350,        0.5, 1.0, 5.0,		 -0.6, 1.3, -1.8, 1.8,					  3.3
+stand_attack_2 =	  	0.25,		0.9,	    100,        0.5, 1.0, 5.0,		 -0.8, 0.8, -1.8, 1.8,					  2.6
+stand_attack_run_0=     0.5,		1.0,	    200,        0.5, 1.0, 5.0,		 -0.6, 1.3, -1.8, 1.8,					  3.3
 jump_attack_1	=		0.1,		2.0,		1250,       0.5, 1.0, 5.0,		 -1.0, 1.3, -1.6, 1.6,					  5.5
 
 ;=========================================================================================
@@ -415,12 +418,12 @@ ce_power			= 1.3 ;0.7
 burn_immunity 			= 0.1			;коэффициенты иммунитета 
 strike_immunity 		= 0.0
 shock_immunity 			= 0.01
-wound_immunity 			= 0.1
+wound_immunity 			= 0.06
 radiation_immunity 		= 0.0
 telepatic_immunity 		= 0.0
 chemical_burn_immunity	= 0.1
-explosion_immunity 		= 0.1
-fire_wound_immunity  	= 0.07
+explosion_immunity 		= 0.06
+fire_wound_immunity  	= 0.06
 
 ;---------------------------
 [gigant_normal]:m_gigant_e
@@ -430,18 +433,14 @@ corpse_visual	     = monsters\psevdogigant\psevdogigant_dead
 icon				= ui_npc_monster_psevdogigant
 rank				= 20
 spec_rank			= normal
-community			= pseudo_gigant
-MaxHealthValue		     = 1.0			; range [0..200]
 
 [gigant_strong]:m_gigant_e
 $spawn				= "monsters\gigants\gigant_strong"
 visual				= monsters\psevdogigant\psevdogigant_big
 corpse_visual	     = monsters\psevdogigant\psevdogigant_big_dead
 icon				= ui_npc_monster_psevdogigant
-rank				= 20
+rank				= 22
 spec_rank			= strong
-community			= pseudo_gigant
-MaxHealthValue		     = 1.25			; range [0..200]
 
 immunities_sect				= giant_immunities_strong
 attack_params			= m_gigant_attack_params_strong
@@ -452,24 +451,24 @@ hit_fraction_monster = 0.18
 burn_immunity 			= 0.08			;коэффициенты иммунитета 
 strike_immunity 		= 0.0
 shock_immunity 			= 0.008
-wound_immunity 			= 0.08
+wound_immunity 			= 0.04
 radiation_immunity 		= 0.0
 telepatic_immunity 		= 0.0
 chemical_burn_immunity	= 0.08
-explosion_immunity 		= 0.08
-fire_wound_immunity  	= 0.05
+explosion_immunity 		= 0.04
+fire_wound_immunity  	= 0.04
 
 [m_gigant_attack_params_strong]
 ;---------------------------------------------------------------------------------------------------------------------------------------------
 ;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)   |	Field of hit_test  (left,right, top, bottom) |	Test Dist
 ;---------------------------------------------------------------------------------------------------------------------------------------------
 ;Bite
-stand_attack_0 =	  	0.25,		0.85,	    200,        0.5, 1.0, 0.5,		 -0.8, 0.8, -1.8, 1.8,					  2.6
+stand_attack_0 =	  	0.25,		1.0,	    125,        0.5, 1.0, 0.5,		 -0.8, 0.8, -1.8, 1.8,					  2.6
 ;Left leg Strike
-stand_attack_1 =	  	0.40,		0.95,	    250,        5.0, 2.5, 4.0,		 -0.6, 0.6, -1.8, 1.8,					  3.2
+stand_attack_1 =	  	0.40,		1.05,	    180,        5.0, 2.5, 4.0,		 -0.6, 0.6, -1.8, 1.8,					  3.2
 ;Bite2
-stand_attack_2 =	  	0.25,		0.85,	    200,        0.5, 1.0, 5.0,		 -0.8, 0.8, -1.8, 1.8,					  2.6
-stand_attack_run_0=     0.5,		1.1,	    450,        0.5, 1.0, 5.0,		 -0.6, 1.3, -1.8, 1.8,					  3.3
+stand_attack_2 =	  	0.25,		1.0,	    125,        0.5, 1.0, 5.0,		 -0.8, 0.8, -1.8, 1.8,					  2.6
+stand_attack_run_0=     0.5,		1.1,	    250,        0.5, 1.0, 5.0,		 -0.6, 1.3, -1.8, 1.8,					  3.3
 jump_attack_1	=		0.1,		2.5,		1500,       0.5, 1.0, 5.0,		 -1.0, 1.3, -1.6, 1.6,					  5.5
 
 [gigant_weak]:m_gigant_e
@@ -477,10 +476,8 @@ $spawn				= "monsters\gigants\gigant_weak"
 visual				= monsters\psevdogigant\mini_psevdogigant
 corpse_visual	     = monsters\psevdogigant\mini_psevdogigant_dead
 icon				= ui_npc_monster_psevdogigant
-rank				= 2
+rank				= 3
 spec_rank			= weak
-community			= pseudo_gigant
-MaxHealthValue		     = 0.75			; range [0..200]
 
 immunities_sect				= giant_immunities_weak
 attack_params			= m_gigant_attack_params_weak
@@ -489,7 +486,7 @@ attack_params			= m_gigant_attack_params_weak
 burn_immunity 			= 0.8			;коэффициенты иммунитета 
 strike_immunity 		= 0.0
 shock_immunity 			= 0.8
-wound_immunity 			= 0.8		
+wound_immunity 			= 0.8
 radiation_immunity 		= 0.0
 telepatic_immunity 		= 0.0
 chemical_burn_immunity	= 0.8

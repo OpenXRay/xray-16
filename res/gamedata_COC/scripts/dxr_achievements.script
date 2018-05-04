@@ -1,6 +1,6 @@
----------------------------------
------ Written by Darryl123 ------
----------------------------------
+--------------------------------
+----- Written by Darryl123 -----
+--------------------------------
 
 -------------------------
 ----- Miscellaneous -----
@@ -11,21 +11,63 @@ function can_unlock()
 	return (db.actor and db.actor.afterFirstUpdate)
 end
 
--- Returns how many achievements are available.
-function get_achievements_available()
-	local available = 14
-	
-	-- 'Duga Free' and 'Wishful Thinking'.
-	if (has_alife_info("story_mode_disabled")) then
-		available = available - 2
+-- Counts how many achievements exist.
+local achievements_count = nil
+function get_achievements_count()
+	-- Check if a count has already been made.
+	if (achievements_count) then
+		return achievements_count
 	end
-	
-	return available
+	-- Scan the achievements section for achievements.
+	achievements_count = 0
+	local ini = system_ini()
+	local line_count = ini:line_count("achievements") or 0
+	for i = 0, line_count - 1 do
+		-- Check whether the achievement requires story mode.
+		local junk1, section, junk2 = ini:r_line("achievements", i, "", "")
+		local story = ini:r_bool_ex(section, "story", false)
+		if (not story or (story and not has_alife_info("story_mode_disabled"))) then
+			achievements_count = achievements_count + 1
+		end
+	end
+	return achievements_count
+end
+
+-- Counts how many achievements are locked.
+function get_achievements_locked_count()
+	return get_achievements_count() - get_achievements_unlocked_count()
+end
+
+-- Counts how many achievements are unlocked.
+function get_achievements_unlocked_count()
+	return dxr_statistics.get_actor_achievements_count()
+end
+
+-- Checks whether an achievement is unlocked.
+function has_achievement(achievement)
+	return dxr_statistics.has_actor_achievement(achievement)
 end
 
 --------------------
 ----- Functors -----
 --------------------
+
+-- Bookworm Food
+function bookworm_food_functor()
+	-- Check if it can be unlocked.
+	if (not can_unlock()) then
+		return false
+	end
+	-- Check if it is already unlocked.
+	if (has_achievement("bookworm_food")) then
+		return true
+	end
+	-- Unlock the achievement.
+	if (bookworm_food_requirements()) then
+		bookworm_food_rewards()
+		return true
+	end
+end
 
 -- Completionist.
 function completionist_functor()
@@ -34,7 +76,7 @@ function completionist_functor()
 		return false
 	end
 	-- Check if it is already unlocked.
-	if (has_alife_info("achieved_completionist")) then
+	if (has_achievement("completionist")) then
 		return true
 	end
 	-- Unlock the achievement.
@@ -42,7 +84,6 @@ function completionist_functor()
 		completionist_rewards()
 		return true
 	end
-	return false
 end
 
 -- Down to Earth.
@@ -52,7 +93,7 @@ function down_to_earth_functor()
 		return false
 	end
 	-- Check if it is already unlocked.
-	if (has_alife_info("achieved_down_to_earth")) then
+	if (has_achievement("down_to_earth")) then
 		return true
 	end
 	-- Unlock the achievement.
@@ -60,7 +101,6 @@ function down_to_earth_functor()
 		down_to_earth_rewards()
 		return true
 	end
-	return false
 end
 
 -- Duga Free.
@@ -70,7 +110,7 @@ function duga_free_functor()
 		return false
 	end
 	-- Check if it is already unlocked.
-	if (has_alife_info("achieved_duga_free")) then
+	if (has_achievement("duga_free")) then
 		return true
 	end
 	-- Unlock the achievement.
@@ -78,7 +118,6 @@ function duga_free_functor()
 		duga_free_rewards()
 		return true
 	end
-	return false
 end
 
 -- Geologist.
@@ -88,7 +127,7 @@ function geologist_functor()
 		return false
 	end
 	-- Check if it is already unlocked.
-	if (has_alife_info("achieved_geologist")) then
+	if (has_achievement("geologist")) then
 		return true
 	end
 	-- Unlock the achievement.
@@ -96,7 +135,6 @@ function geologist_functor()
 		geologist_rewards()
 		return true
 	end
-	return false
 end
 
 -- Heavy Pockets.
@@ -106,7 +144,7 @@ function heavy_pockets_functor()
 		return false
 	end
 	-- Check if it is already unlocked.
-	if (has_alife_info("achieved_heavy_pockets")) then
+	if (has_achievement("heavy_pockets")) then
 		return true
 	end
 	-- Unlock the achievement.
@@ -114,7 +152,6 @@ function heavy_pockets_functor()
 		heavy_pockets_rewards()
 		return true
 	end
-	return false
 end
 
 -- Infopreneur.
@@ -124,7 +161,7 @@ function infopreneur_functor()
 		return false
 	end
 	-- Check if it is already unlocked.
-	if (has_alife_info("achieved_infopreneur")) then
+	if (has_achievement("infopreneur")) then
 		return true
 	end
 	-- Unlock the achievement.
@@ -132,7 +169,6 @@ function infopreneur_functor()
 		infopreneur_rewards()
 		return true
 	end
-	return false
 end
 
 -- Mechanized Warfare.
@@ -142,7 +178,7 @@ function mechanized_warfare_functor()
 		return false
 	end
 	-- Check if it is already unlocked.
-	if (has_alife_info("achieved_mechanized_warfare")) then
+	if (has_achievement("mechanized_warfare")) then
 		return true
 	end
 	-- Unlock the achievement.
@@ -150,7 +186,6 @@ function mechanized_warfare_functor()
 		mechanized_warfare_rewards()
 		return true
 	end
-	return false
 end
 
 -- Patriarch.
@@ -160,7 +195,7 @@ function patriarch_functor()
 		return false
 	end
 	-- Check if it is already unlocked.
-	if (has_alife_info("achieved_patriarch")) then
+	if (has_achievement("patriarch")) then
 		return true
 	end
 	-- Unlock the achievement.
@@ -168,7 +203,6 @@ function patriarch_functor()
 		patriarch_rewards()
 		return true
 	end
-	return false
 end
 
 -- Radiotherapy.
@@ -178,7 +212,7 @@ function radiotherapy_functor()
 		return false
 	end
 	-- Check if it is already unlocked.
-	if (has_alife_info("achieved_radiotherapy")) then
+	if (has_achievement("radiotherapy")) then
 		return true
 	end
 	-- Unlock the achievement.
@@ -186,7 +220,6 @@ function radiotherapy_functor()
 		radiotherapy_rewards()
 		return true
 	end
-	return false
 end
 
 -- Rag and Bone.
@@ -196,7 +229,7 @@ function rag_and_bone_functor()
 		return false
 	end
 	-- Check if it is already unlocked.
-	if (has_alife_info("achieved_rag_and_bone")) then
+	if (has_achievement("rag_and_bone")) then
 		return true
 	end
 	-- Unlock the achievement.
@@ -204,7 +237,6 @@ function rag_and_bone_functor()
 		rag_and_bone_rewards()
 		return true
 	end
-	return false
 end
 
 -- Silver or Lead.
@@ -214,7 +246,7 @@ function silver_or_lead_functor()
 		return false
 	end
 	-- Check if it is already unlocked.
-	if (has_alife_info("achieved_silver_or_lead")) then
+	if (has_achievement("silver_or_lead")) then
 		return true
 	end
 	-- Unlock the achievement.
@@ -222,7 +254,6 @@ function silver_or_lead_functor()
 		silver_or_lead_rewards()
 		return true
 	end
-	return false
 end
 
 -- Tourist.
@@ -232,21 +263,20 @@ function tourist_functor()
 		return false
 	end
 	-- Check if it is already unlocked.
-	if (has_alife_info("achieved_tourist")) then
+	if (has_achievement("tourist")) then
 		return true
 	end
 	-- Unlock the achievement.
-	if (has_alife_info("achieved_tourist_delay")) then
+	if (has_alife_info("tourist_achievement_delay")) then
 		tourist_rewards()
 		return true
 	end
-	-- A second infoportion delays the achievement.
+	-- An infoportion delays the achievement.
 	-- Without this it often unlocks during level transition.
 	if (tourist_requirements()) then
-		db.actor:give_info_portion("achieved_tourist_delay")
-		return true
+		db.actor:give_info_portion("tourist_achievement_delay")
+		return false
 	end
-	return false
 end
 
 -- Well Dressed.
@@ -256,7 +286,7 @@ function well_dressed_functor()
 		return false
 	end
 	-- Check if it is already unlocked.
-	if (has_alife_info("achieved_well_dressed")) then
+	if (has_achievement("well_dressed")) then
 		return true
 	end
 	-- Unlock the achievement.
@@ -264,7 +294,6 @@ function well_dressed_functor()
 		well_dressed_rewards()
 		return true
 	end
-	return false
 end
 
 -- Wishful Thinking.
@@ -274,7 +303,7 @@ function wishful_thinking_functor()
 		return false
 	end
 	-- Check if it is already unlocked.
-	if (has_alife_info("achieved_wishful_thinking")) then
+	if (has_achievement("wishful_thinking")) then
 		return true
 	end
 	-- Unlock the achievement.
@@ -282,32 +311,26 @@ function wishful_thinking_functor()
 		wishful_thinking_rewards()
 		return true
 	end
-	return false
 end
 
 ------------------------
 ----- Requirements -----
 ------------------------
 
+-- Bookworm Food
+-- Requires all encyclopedia articles be unlocked.
+function bookworm_food_requirements()
+	return (
+				(dxr_encyclopedia.get_articles_locked_count() == 0)
+		)
+end
+
+
 -- Completionist.
--- Requires all other achievements to be unlocked.
--- Exception to 'Duga Free' if story mode is disabled.
--- Exception to 'Wishful Thinking' if story mode is disabled.
+-- Requires all available achievements to be unlocked.
 function completionist_requirements()
 	return (
-				(has_alife_info("achieved_duga_free") or has_alife_info("story_mode_disabled"))
-			and (has_alife_info("achieved_down_to_earth"))
-			and (has_alife_info("achieved_geologist"))
-			and (has_alife_info("achieved_heavy_pockets"))
-			and (has_alife_info("achieved_infopreneur"))
-			and (has_alife_info("achieved_mechanized_warfare"))
-			and (has_alife_info("achieved_patriarch"))
-			and (has_alife_info("achieved_radiotherapy"))
-			and (has_alife_info("achieved_rag_and_bone"))
-			and (has_alife_info("achieved_silver_or_lead"))
-			and (has_alife_info("achieved_tourist"))
-			and (has_alife_info("achieved_well_dressed"))
-			and (has_alife_info("achieved_wishful_thinking") or has_alife_info("story_mode_disabled"))
+				(get_achievements_locked_count() <= 1)
 		)
 end
 
@@ -315,8 +338,8 @@ end
 -- Requires 3 helicopters killed, or just one with an RPG-7.
 function down_to_earth_requirements()
 	return (
-				(xr_statistic.actor_statistic.heli_kills >= 3)
-			 or (xr_statistic.actor_statistic.heli_rocket_kills >= 1)
+				(dxr_statistics.get_statistic_count("helicopters_downed") >= 3)
+			 or (dxr_statistics.get_statistic_count("helicopters_downed2") >= 1)
 		)
 end
 
@@ -334,15 +357,15 @@ end
 -- Requires 50 artefacts be detected by the player.
 function geologist_requirements()
 	return (
-				(xr_statistic.actor_statistic.artefacts_detected >= 50)
+				(dxr_statistics.get_statistic_count("artefacts_detected") >= 50)
 		)
 end
 
 -- Heavy Pockets.
--- Requires player to possess 500,000 RU.
+-- Requires player to possess 1,000,000 RU.
 function heavy_pockets_requirements()
 	return (
-				(db.actor:money() >= 500000)
+				(db.actor:money() >= 1000000)
 		)	
 end
 
@@ -350,7 +373,7 @@ end
 -- Requires player to deliver 50 PDAs.
 function infopreneur_requirements()
 	return (
-				(xr_statistic.actor_statistic.pdas_delivered >= 50)
+				(dxr_statistics.get_statistic_count("pdas_delivered") >= 50)
 		)
 end
 
@@ -384,8 +407,8 @@ end
 -- Requires 25 emissions and 25 psi-storms to be survived.
 function radiotherapy_requirements()
 	return (
-				(xr_statistic.actor_statistic.surges >= 25)
-			and (xr_statistic.actor_statistic.storms >= 25)
+				(dxr_statistics.get_statistic_count("emissions") >= 25)
+			and (dxr_statistics.get_statistic_count("psi_storms") >= 25)
 		)
 end
 
@@ -393,7 +416,7 @@ end
 -- Requires 100 stashes be found and looted.
 function rag_and_bone_requirements()
 	return (
-				(xr_statistic.actor_statistic.stashes_found >= 100)
+				(dxr_statistics.get_statistic_count("stashes_found") >= 100)
 		)
 end
 
@@ -401,8 +424,8 @@ end
 -- Requires player to kill 500 stalkers or have 50 surrender to you.
 function silver_or_lead_requirements()
 	return (
-				(xr_statistic.actor_statistic.killed_stalkers >= 500)
-			 or (xr_statistic.actor_statistic.enemies_surrendered >= 50)
+				(dxr_statistics.get_statistic_count("killed_stalkers") >= 500)
+			 or (dxr_statistics.get_statistic_count("enemies_surrendered") >= 50)
 		)
 end
 
@@ -410,7 +433,7 @@ end
 -- Requires player to visit all levels.
 function tourist_requirements()
 	return (
-				(xr_statistic.actor_visited_all_levels())
+				(dxr_statistics.has_actor_visitied_all_levels())
 		)
 end
 
@@ -418,8 +441,8 @@ end
 -- Requires player to kill 500 mutants or field dress 250 mutant parts.
 function well_dressed_requirements()
 	return (
-				(xr_statistic.actor_statistic.killed_monsters >= 500)
-			 or (xr_statistic.actor_statistic.field_dressings >= 250)
+				(dxr_statistics.get_statistic_count("killed_monsters") >= 500)
+			 or (dxr_statistics.get_statistic_count("field_dressings") >= 250)
 		)
 end
 
@@ -436,12 +459,16 @@ end
 ----- Rewards -----
 -------------------
 
+-- Bookworm Food.
+-- Future memory sticks become rare PDAs.
+-- Reputation and rank point increase.
+function bookworm_food_rewards()
+	SendScriptCallback("on_achievement_earned","bookworm_food","st_achievement_15_unlock")
+end
+
 -- Completionist.
 -- Reputation and rank point increase.
 function completionist_rewards()
-	db.actor:give_info_portion("achieved_completionist")
-	news_manager.send_tip(db.actor, "st_achievement_10_unlock", nil, "completionist", nil, nil)
-	xr_statistic.inc_achievement("completionist")
 	SendScriptCallback("on_achievement_earned","completionist","st_achievement_10_unlock")
 end
 
@@ -449,9 +476,6 @@ end
 -- Weaker helicopters are respawned.
 -- Reputation and rank point increase.
 function down_to_earth_rewards()
-	db.actor:give_info_portion("achieved_down_to_earth")
-	news_manager.send_tip(db.actor, "st_achievement_12_unlock", nil, "down_to_earth", nil, nil)
-	xr_statistic.inc_achievement("down_to_earth")
 	SendScriptCallback("on_achievement_earned","down_to_earth","st_achievement_12_unlock")
 end
 
@@ -459,9 +483,6 @@ end
 -- Yantar & Radar psi-fields disabled.
 -- Reputation and rank point increase.
 function duga_free_rewards()
-	db.actor:give_info_portion("achieved_duga_free")
-	news_manager.send_tip(db.actor, "st_achievement_4_unlock", nil, "duga_free", nil, nil)
-	xr_statistic.inc_achievement("duga_free")
 	SendScriptCallback("on_achievement_earned","duga_free","st_achievement_4_unlock")
 end
 
@@ -469,9 +490,6 @@ end
 -- Increased spawn chance of artefacts.
 -- Reputation and rank point increase.
 function geologist_rewards()
-	db.actor:give_info_portion("achieved_geologist")
-	news_manager.send_tip(db.actor, "st_achievement_13_unlock", nil, "geologist", nil, nil)
-	xr_statistic.inc_achievement("geologist")
 	SendScriptCallback("on_achievement_earned","geologist","st_achievement_13_unlock")
 end
 
@@ -479,9 +497,6 @@ end
 -- Traders sell cheaper and rarer goods.
 -- Reputation and rank point increase.
 function heavy_pockets_rewards()
-	db.actor:give_info_portion("achieved_heavy_pockets")
-	news_manager.send_tip(db.actor, "st_achievement_1_unlock", nil, "heavy_pockets", nil, nil)
-	xr_statistic.inc_achievement("heavy_pockets")
 	SendScriptCallback("on_achievement_earned","heavy_pockets","st_achievement_1_unlock")
 end
 
@@ -489,9 +504,6 @@ end
 -- Money received for delivering PDAs increased.
 -- Reputation and rank point increase.
 function infopreneur_rewards()
-	db.actor:give_info_portion("achieved_infopreneur")
-	news_manager.send_tip(db.actor, "st_achievement_3_unlock", nil, "infopreneur", nil, nil)
-	xr_statistic.inc_achievement("infopreneur")
 	SendScriptCallback("on_achievement_earned","infopreneur","st_achievement_3_unlock")
 end
 
@@ -499,9 +511,6 @@ end
 -- A mechanic can now fully upgrade equipment.
 -- Reputation and rank point increase.
 function mechanized_warfare_rewards()
-	db.actor:give_info_portion("achieved_mechanized_warfare")
-	news_manager.send_tip(db.actor, "st_achievement_7_unlock", nil, "mechanized_warfare", nil, nil)
-	xr_statistic.inc_achievement("mechanized_warfare")
 	SendScriptCallback("on_achievement_earned","mechanized_warfare","st_achievement_7_unlock")
 end
 
@@ -509,9 +518,6 @@ end
 -- Larger sized squads can be recruited.
 -- Reputation and rank point increase.
 function patriarch_rewards()
-	db.actor:give_info_portion("achieved_patriarch")
-	news_manager.send_tip(db.actor, "st_achievement_14_unlock", nil, "patriarch", nil, nil)
-	xr_statistic.inc_achievement("patriarch")
 	SendScriptCallback("on_achievement_earned","patriarch","st_achievement_14_unlock")
 end
 
@@ -519,9 +525,6 @@ end
 -- 25% chance of surviving emissions and psi-vortices.
 -- Reputation and rank point increase.
 function radiotherapy_rewards()
-	db.actor:give_info_portion("achieved_radiotherapy")
-	news_manager.send_tip(db.actor, "st_achievement_2_unlock", nil, "radiotherapy", nil, nil)
-	xr_statistic.inc_achievement("radiotherapy")
 	SendScriptCallback("on_achievement_earned","radiotherapy","st_achievement_2_unlock")
 end
 
@@ -529,9 +532,6 @@ end
 -- Random chance of better loot in task reward stashes.
 -- Reputation and rank point increase.
 function rag_and_bone_rewards()
-	db.actor:give_info_portion("achieved_rag_and_bone")
-	news_manager.send_tip(db.actor, "st_achievement_9_unlock", nil, "rag_and_bone", nil, nil)
-	xr_statistic.inc_achievement("rag_and_bone")
 	SendScriptCallback("on_achievement_earned","rag_and_bone","st_achievement_9_unlock")
 end
 
@@ -539,23 +539,18 @@ end
 -- 33% chance of a second stash from surrendering stalkers.
 -- Reputation and rank point increase.
 function silver_or_lead_rewards()
-	db.actor:give_info_portion("achieved_silver_or_lead")
-	news_manager.send_tip(db.actor, "st_achievement_6_unlock", nil, "silver_or_lead", nil, nil)
-	xr_statistic.inc_achievement("silver_or_lead")
 	SendScriptCallback("on_achievement_earned","silver_or_lead","st_achievement_6_unlock")
 end
 
 -- Tourist.
--- 3 "Curious stashes" are revealed.
+-- 3 "Tourist's stashes" are revealed.
 -- Reputation and rank point increase.
 function tourist_rewards()
+	local hint = game.translate_string("st_ui_pda_secret_tourist")
 	for i=1,3 do
-		coc_treasure_manager.create_random_stash(nil, "Curious stash", nil, "treasure_unique")
+		coc_treasure_manager.create_random_stash(nil, hint, nil, "treasure_unique")
 	end
-	db.actor:disable_info_portion("achieved_tourist_delay")
-	db.actor:give_info_portion("achieved_tourist")
-	news_manager.send_tip(db.actor, "st_achievement_8_unlock", nil, "tourist", nil, nil)
-	xr_statistic.inc_achievement("tourist")
+	db.actor:disable_info_portion("tourist_achievement_delay")
 	SendScriptCallback("on_achievement_earned","tourist","st_achievement_8_unlock")
 end
 
@@ -563,19 +558,14 @@ end
 -- 20% chance of extra parts when field dressing mutants.
 -- Reputation and rank point increase.
 function well_dressed_rewards()
-	db.actor:give_info_portion("achieved_well_dressed")
-	news_manager.send_tip(db.actor, "st_achievement_5_unlock", nil, "well_dressed", nil, nil)
-	xr_statistic.inc_achievement("well_dressed")
 	SendScriptCallback("on_achievement_earned","well_dressed","st_achievement_5_unlock")
 end
 
 -- Wishful Thinking.
+-- Bonus reputation and rank point increase.
 -- Reputation and rank point increase.
 function wishful_thinking_rewards()
-	xr_statistic.inc_actor_rank(1000)
-	xr_statistic.inc_actor_reputation(500)
-	db.actor:give_info_portion("achieved_wishful_thinking")
-	news_manager.send_tip(db.actor, "st_achievement_11_unlock", nil, "wishful_thinking", nil, nil)
-	xr_statistic.inc_achievement("wishful_thinking")
+	dxr_statistics.increment_rank(1000)
+	dxr_statistics.increment_reputation(500)
 	SendScriptCallback("on_achievement_earned","wishful_thinking","st_achievement_11_unlock")
 end

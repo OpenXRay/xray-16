@@ -179,21 +179,27 @@
 		<text>A regular water resistant backpack. It has high popularity among stalkers who travel around the Zone.</text>
 	</string>
 	<string id="st_equ_smallpack_name">
-		<text>Small Backpack</text>
+		<text>Small backpack</text>
 	</string>
 	<string id="st_equ_smallpack_desc">
-		<text>Small backpack usually worn by rookies. The inside has been modified to keep water out. Not a pretty solution, but works.</text>
+		<text>Small backpack usually worn by rookies. The inside has been modified to keep water out. Not a pretty solution, but it works.</text>
+	</string>
+	<string id="st_equ_smilpack_name">
+		<text>Duffel bag</text>
+	</string>
+	<string id="st_equ_smilpack_desc">
+		<text>A cylindrical bag made from canvas, used by the military for well over a hundred years.</text>
 	</string>
 	<string id="st_equ_milpack_name">
-		<text>Combat Backpack</text>
+		<text>Combat backpack</text>
 	</string>
 	<string id="st_equ_milpack_desc">
-		<text>Backpack used by the military on longer assaults.</text>
+		<text>A combat backpack used by the military, often to store additional munitions and medical supplies.</text>
 	</string>
 	<string id="st_equ_touristpack_name">
-		<text>Tourist Backpack</text>
+		<text>Tourist backpack</text>
 	</string>
 	<string id="st_equ_touristpack_desc">
-		<text>A tourist backpack with a lot of storage space. Not very popular due to it's size.</text>
+		<text>A tourist's backpack with a lot of storage space. Not very popular due to its cumbersome size.</text>
 	</string>
 </string_table>

@@ -41,18 +41,6 @@ function evaluator_wound:evaluate ()
 	return true
 end
 
-class "evaluator_can_fight" (property_evaluator)
-function evaluator_can_fight:__init(name, storage) super(nil, name)
-		self.a = storage
-end
-function evaluator_can_fight:evaluate ()
-	if self.object:critically_wounded() == true then
-		return true
-	end
-
-	return utils.load_var(self.object, "wounded_fight") ~= "false"
-end
-
 ----------------------------------------------------------------------------------------------------------------------
 --Actions
 ----------------------------------------------------------------------------------------------------------------------
@@ -62,7 +50,6 @@ function action_wounded:__init(name, storage) super(nil, name)
 end
 function action_wounded:initialize()
 	action_base.initialize (self)
-	state_mgr.set_state(self.object,"idle")
 	self.object:set_desired_position()
 	self.object:set_desired_direction()
 	if self.a.help_start_dialog then
@@ -84,16 +71,14 @@ function action_wounded:execute()
 			local current_time = time_global()
 			if begin_wounded == nil then
 				utils.save_var(self.object, "begin_wounded", current_time)
-			elseif current_time - begin_wounded > 90000 then
-				--local sim = alife()
-				--sim:create("medkit_script",npc:position(),npc:level_vertex_id(),npc:game_vertex_id(),npc:id())
+			elseif current_time - begin_wounded > 120000 then
 				wound_manager:unlock_medkit()
 			end
 		end
 	end
 
 	local wound_manager_state = tostring(utils.load_var(npc, "wounded_state"))
-	if wound_manager_state == "nil" then
+	if wound_manager_state == "" or wound_manager_state == "nil" then
 		printf("wrong wounded animation %s", self.object:name())
 		return
 	elseif wound_manager_state == "true" then
@@ -114,7 +99,7 @@ function action_wounded:execute()
 	if (po and not utils.load_var(npc,"victim_surrender") and npc.psy_health > 0.15) then
 		local cur_state = state_mgr.get_state(npc)
 		if (cur_state ~= "prisoner") then
-			state_mgr.set_state(npc,"prisoner",nil,nil,nil,{fast_set = true})
+			state_mgr.set_state(npc,"prisoner",nil,nil,nil,state_mgr.fast_set_true)
 		end
 		return
 	end
@@ -130,7 +115,7 @@ function action_wounded:execute()
 
 	local cur_state = state_mgr.get_state(npc)
 	if (cur_state ~= wound_manager_state) then
-		state_mgr.set_state(npc,wound_manager_state,nil,nil,nil,{fast_set = true})
+		state_mgr.set_state(npc,wound_manager_state,nil,nil,nil,state_mgr.fast_set_true)
 	end
 	
 	if (self.a.use_medkit) then
@@ -161,8 +146,8 @@ function Cwound_manager:update()
 --		self.npc.health = 1
 --	end
 
-	hp	= 100*self.npc.health
-	psy	= 100*self.npc.psy_health
+	local hp	= 100*self.npc.health
+	local psy	= 100*self.npc.psy_health
 
 	--printf("PSY [%s] HP [%s]", psy, hp)
 
@@ -193,42 +178,35 @@ function Cwound_manager:unlock_medkit()
 	self.can_use_medkit = true
 end
 function Cwound_manager:eat_medkit()
-	--printf("EAT MEDKIT %s", self.npc:name())
-	if self.can_use_medkit == true then
-		--[[
-		if self.npc:object("medkit_script") ~= nil then
-			self.npc:eat(self.npc:object("medkit_script"))
-		end
-		--]]
-		
-		self.npc:set_health_ex(1)
-		
-		if self.npc:object("medkit_script") ~= nil then
-			alife():release(alife_object(self.npc:object("medkit_script"):id()), true)
-		elseif self.npc:object("medkit") ~= nil then
-			alife():release(alife_object(self.npc:object("medkit"):id()), true)
-		elseif self.npc:object("medkit_army") ~= nil then
-			alife():release(alife_object(self.npc:object("medkit_army"):id()), true)
-		elseif self.npc:object("medkit_scientic") ~= nil then
-			alife():release(alife_object(self.npc:object("medkit_scientic"):id()), true)
-		end
-
-		local begin_wounded = utils.load_var(self.npc, "begin_wounded")
-		local current_time = time_global()
-		if begin_wounded ~= nil and current_time - begin_wounded <= 60000 then
-			xr_sound.set_sound_play(self.npc:id(), "help_thanks")
-		end
-
-		utils.save_var(self.npc, "begin_wounded", nil)
-
-		self.can_use_medkit = false
-		db.storage[self.npc:id()].wounded_already_selected = nil
-		--self:update()
-		
-		state_mgr.set_state(self.npc,"hide_no_wpn",nil,nil,nil,{fast_set = true})
-		return true
+	if (self.can_use_medkit ~= true) then 
+		return
 	end
-	return false
+	
+	self.npc:set_health_ex(1)
+	
+	if self.npc:object("medkit_script") ~= nil then
+		alife():release(alife_object(self.npc:object("medkit_script"):id()), true)
+	elseif self.npc:object("medkit") ~= nil then
+		alife():release(alife_object(self.npc:object("medkit"):id()), true)
+	elseif self.npc:object("medkit_army") ~= nil then
+		alife():release(alife_object(self.npc:object("medkit_army"):id()), true)
+	elseif self.npc:object("medkit_scientic") ~= nil then
+		alife():release(alife_object(self.npc:object("medkit_scientic"):id()), true)
+	end
+
+	local begin_wounded = utils.load_var(self.npc, "begin_wounded")
+	local current_time = time_global()
+	if begin_wounded ~= nil and current_time - begin_wounded <= 60000 then
+		xr_sound.set_sound_play(self.npc:id(), "help_thanks")
+	end
+
+	utils.save_var(self.npc, "begin_wounded", nil)
+
+	self.can_use_medkit = false
+	db.storage[self.npc:id()].wounded_already_selected = nil
+	--self:update()
+	
+	state_mgr.set_state(self.npc,"hide_no_wpn",nil,nil,nil,state_mgr.fast_set_true)
 end
 function Cwound_manager:process_fight(hp)
 	local key
@@ -324,7 +302,6 @@ end
 function add_to_binder(npc,ini,scheme,section,st,temp)
 	local manager = npc:motivation_action_manager ()
 	manager:add_evaluator(xr_evaluators_id.sidor_wounded_base, evaluator_wound("wounded", st))
-	manager:add_evaluator(xr_evaluators_id.sidor_wounded_base + 1, evaluator_can_fight("can_fight", st))
 
 	temp.action = action_wounded("wounded_action", st)
 
@@ -333,7 +310,6 @@ function add_to_binder(npc,ini,scheme,section,st,temp)
 	
 	temp.action:add_effect(world_property(xr_evaluators_id.sidor_wounded_base,false))
 	temp.action:add_effect(world_property(stalker_ids.property_enemy,false))
-	temp.action:add_effect(world_property(xr_evaluators_id.sidor_wounded_base + 1,true))
 	
 	manager:add_action(xr_actions_id.sidor_act_wounded_base,temp.action)
 end
@@ -350,10 +326,10 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
 	
 	action = manager:action(stalker_ids.action_combat_planner)
-	action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base + 1,true))
+	action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
 
 	action = manager:action(stalker_ids.action_danger_planner)
-	action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base + 1,true))
+	action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
 end
 
 function reset_generic_scheme(npc,scheme,section,stype,st)

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+
+<!-- ORDERS -->
+	<string id="st_dm_orders_pickup_start">
+		<text>The order is finished. Please collect your %s.</text>
+	</string>
+	<string id="st_dm_orders_query">
+		<text>Do you have anything to trade?</text>
+	</string>
+	<string id="st_dm_orders_query_pickup">
+		<text>I'm here to pick up an order.</text>
+	</string>
+	<string id="st_dm_orders_reply_1">
+		<text>Funny you should ask. I have contact with someone who can get their hands on some special gear. Are you interested?</text>
+	</string>
+	<string id="st_dm_orders_reply_2">
+		<text>I have some unique items. Rare models, prototypes, unique shooters - stuff like that. Plus elite equipment, the latest modifications of protective and combat suits. I check every item personally, so quality is guaranteed.</text>
+	</string>
+	<string id="st_dm_orders_none">
+		<text>I'm not interested at the moment.</text>
+	</string>
+	<string id="st_dm_orders_goodbye">
+		<text>Goodbye.</text>
+	</string>
+	<string id="st_dm_orders_place_price_accept">
+		<text>I want to place an order for the %s.</text>
+	</string>
+	<string id="st_dm_orders_place_no_money">
+		<text>I don't have the money on me.</text>
+	</string>
+	<string id="st_dm_orders_place_no_money_reply">
+		<text>Well, please come back when you've got the cash.</text>
+	</string>
+	<string id="st_dm_orders_place_change">
+		<text>You know, I've changed my mind.</text>
+	</string>
+	<string id="st_dm_orders_cancel">
+		<text>You know, I've decided to cancel my order.</text>
+	</string>
+	<string id="st_dm_orders_cancel_reply">
+		<text>That's fine but you understand your deposit is forfeit? I'll also tell everyone what a lousy customer you are, it'll probably hurt your reputation.</text>
+	</string>
+	<string id="st_dm_orders_cancel_reply_yes">
+		<text>Yes, cancel the order.</text>
+	</string>
+	<string id="st_dm_orders_cancel_reply_yes_done">
+		<text>Done.</text>
+	</string>
+	<string id="st_dm_orders_cancel_reply_no">
+		<text>I'll keep the order.</text>
+	</string>
+	<string id="st_dm_orders_cancel_reply_no_done">
+		<text>Fine.</text>
+	</string>
+	<string id="st_dm_orders_place_change_reply">
+		<text>Fine. If you finally decide to make an order, I'm always here.</text>
+	</string>
+	<string id="st_dm_orders_place_pay">
+		<text>Okay, here you go.</text>
+	</string>
+	<string id="st_dm_orders_place_pay_reply">
+		<text>I'll get in touch with you as soon as the %s order is ready.</text>
+	</string>
+	<string id="st_dm_orders_order_processing">
+		<text>You've already made an order. The %s will be ready soon.</text>
+	</string>
+	<string id="st_dm_orders_place_finish">
+		<text>Great. I'll be back later.</text>
+	</string>
+
+	<string id="st_dm_orders_time_query">
+		<text>How long till my order's ready?</text>
+	</string>
+	<string id="st_dm_orders_time_query_reply">
+		<text>It depends on how complex it is. It usually takes me from half a day to a full day.</text>
+	</string>
+	<string id="st_dm_orders_time_query_goodbye">
+		<text>Okay.</text>
+	</string>
+	
+	<string id="st_dm_orders_pickup_existing">
+		<text>So you finally decided to collect your order for the %s.</text>
+	</string>
+	<string id="st_dm_orders_pickup_existing_yes">
+		<text>Yes, here is your money.</text>
+	</string>
+	<string id="st_dm_orders_pickup_existing_no">
+		<text>No, Cancel the order.</text>
+	</string>
+	
+	<string id="st_dm_orders_pickup_ponder">
+		<text>Excuse me, I need to think about this.</text>
+	</string>
+	<string id="st_dm_orders_pickup_ponder_reply">
+		<text>Don't sweat it, come back when you are ready.</text>
+	</string>
+	
+	<string id="st_dm_orders_pickup_price_accept">
+		<text>Okay, here you go.</text>
+	</string>
+	<string id="st_dm_orders_pickup_finish">
+		<text>There you go. Nice doing business with you. Make sure to stop by some other time, I may have more to offer.</text>
+	</string>
+	<string id="st_dm_orders_no_money">
+		<text>Well, I don't have that much on me.</text>
+	</string>
+	<string id="st_dm_orders_pickup_hold">
+		<text>Okay, I'll hold the order for you. I hope you find the money soon.</text>
+	</string>
+	<string id="st_dm_orders_pickup_refuse_warning">
+		<text>You'll lose your deposit are you sure?</text>
+	</string>
+	<string id="st_dm_orders_pickup_refuse_penalty">
+		<text>Still, I will not be collecting this order.</text>
+	</string>
+	<string id="st_dm_orders_pickup_refuse_penalty_reply">
+		<text>All right, suit yourself.</text>
+	</string>
+	<string id="st_dm_orders_pickup_refuse_wait">
+		<text>I'll think about it.</text>
+	</string>
+	<string id="st_dm_orders_pickup_refuse_wait_rely">
+		<text>Sure, that's up to you. I'll hold on to the order.</text>
+	</string>
+	<string id="st_dm_orders_pickup">
+		<text>The %s order is ready. That'll be %s RU.</text>
+	</string>
+	<string id="st_dm_orders_pickup_ready">
+		<text>Your order is ready. Come pick it up. </text>
+	</string>
+	<string id="st_dm_orders_category_selected">
+		<text>Of course. It'll be %s RU, of which I will require an advance payment of %s RU.</text>
+	</string>
+
+	<!-- Nimble -->
+	<string id="st_esc_2_12_stalker_nimble_category_1_title">
+		<text>Pistol</text>
+	</string>
+	<string id="st_esc_2_12_stalker_nimble_category_2_title">
+		<text>Close-range weapon</text>
+	</string>
+	<string id="st_esc_2_12_stalker_nimble_category_3_title">
+		<text>Assault weapon</text>
+	</string>
+	<string id="st_esc_2_12_stalker_nimble_category_4_title">
+		<text>Sniper weapon</text>
+	</string>
+	<string id="st_esc_2_12_stalker_nimble_category_5_title">
+		<text>Armored outfit</text>
+	</string>
+	<string id="st_esc_2_12_stalker_nimble_category_6_title">
+		<text>Scientific outfit</text>
+	</string>
+	<string id="st_esc_2_12_stalker_nimble_category_7_title">
+		<text>Exoskeleton</text>
+	</string>
+	<string id="st_esc_2_12_stalker_nimble_category_8_title">
+		<text>Armored military outfit</text>
+	</string>
+</string_table>

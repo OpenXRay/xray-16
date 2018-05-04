@@ -70,7 +70,7 @@ function on_hit(obj,power,dir,who,bi)
 		progress:SetProgressPos(v*100)
 		local text = ""
 		if (is_heli) then 
-			text = "Helicopter"
+			text = game.translate_string("ui_st_heli_health")
 		elseif (IsStalker(nil,cls)) then 
 			text = obj:character_name()
 		else 

@@ -1,5 +1,8 @@
-local tip_count = 24
+local tip_count = 50
 local tip = 1
+
+math.randomseed(os.time())
+math.random()
 
 function get_tip_header(level_name)
 	return game.translate_string("ls_header")

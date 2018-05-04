@@ -85,14 +85,14 @@
 	</string>
 	
 	<string id="mutant_dog_tail">
-		<text>Dog tail</text>
+		<text>Blind dog tail</text>
 	</string>
 	<string id="mutant_dog_tail_description">
 		<text>A long, hairless tail formerly attached to the rear of a blind dog. With no real practical use, they are the cheapest of all mutant body parts found in the Zone.</text>
 	</string>
 	
 	<string id="mutant_psevdodog_tail">
-		<text>Psuedodog tail</text>
+		<text>Pseudodog tail</text>
 	</string>
 	<string id="mutant_psevdodog_tail_description">
 		<text>The fur covering the tail of a pseudodog is a great insulator, and is often sewn into clothing and armoured suits when nearing the colder parts of the year.</text>

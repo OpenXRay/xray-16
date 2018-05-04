@@ -9,6 +9,7 @@
 #include "gameplay\character_desc_general_freedom.xml"
 #include "gameplay\character_desc_general_killer.xml"
 #include "gameplay\character_desc_general_monolith.xml"
+#include "gameplay\character_desc_general_renegade.xml"
 #include "gameplay\character_desc_general_stalker.xml"
 #include "gameplay\character_desc_general_zombied.xml"
 </xml>

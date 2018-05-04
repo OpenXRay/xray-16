@@ -281,7 +281,7 @@ function container_binder:save(stpk)
 	object_binder.save(self, stpk)
 	local se_obj = alife_object(self.object:id())
 	if (se_obj) then
-		local m_data = alife_storage_manager.get_se_obj_state(se_obj)
+		local m_data = alife_storage_manager.get_se_obj_state(se_obj,true)
 		if (m_data and bind_container.containers[se_obj.id]) then 
 			m_data.container_id = bind_container.containers[se_obj.id].id
 		end

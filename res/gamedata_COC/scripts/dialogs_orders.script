@@ -1,0 +1,244 @@
+-- special orders
+local trade_instead, wait_time, lt
+local buy_item_table = nil
+local costs_table = nil
+orders_max_items = 0
+item_count_by_category = nil
+local current_cnt = 0
+orders_data = {}
+local broker = nil
+local broker_name = nil
+
+function on_game_start()
+	if (USE_MARSHAL) then
+		RegisterScriptCallback("save_state",save_state)
+		RegisterScriptCallback("load_state",load_state)
+	end
+	RegisterScriptCallback("actor_on_update",actor_on_update)
+end
+
+--/ ====================   Marshal Storage  ====================
+function save_state(m_data)
+	m_data.orders_data = orders_data
+end
+
+function load_state(m_data)
+	orders_data = m_data.orders_data or {}
+end
+
+function actor_on_update(binder,delta)
+	for broker, t in pairs(orders_data) do 
+		if (t.delivery_timer and game.get_game_time():diffSec(t.delivery_timer) > t.wait_time) then 
+			t.ready = true
+			t.delivery_timer = nil
+			local se_obj = t.id and alife():object(t.id)
+			if (se_obj and se_obj:section_name() == broker and se_obj:alive()) then
+				local msg = strformat("%c[255,160,160,160]%s, %s.\\n%c[default]%s",se_obj:character_name(),se_obj:community(),game.translate_string("st_dm_orders_pickup_ready"))
+				news_manager.send_tip(db.actor,msg,nil,se_obj)
+			else
+				orders_data[broker] = nil
+			end
+		end
+	end
+end
+
+function has_orders(a,b)
+	local npc = dialogs.who_is_npc(a,b)
+	local sec = npc and npc:section()
+	if not (sec) then
+		return false
+	end
+	if (getFS():exist("$game_config$","plugins\\".. sec .. "_orders.ltx")) then
+		init_orders(npc)
+		return true
+	end
+	return false
+end
+
+-- silly workaround for dynamic dialog
+functor_always_false = function() return false end
+for i=1,10 do
+	this["has_category_"..i] = functor_always_false
+	local cnt = i
+	this["set_category_"..i] = function() current_cnt = cnt end
+	this["text_category_title_"..i] = function() return game.translate_string(costs_table[cnt].title) end
+end
+
+function init_orders(npc)
+	if (broker and broker == npc:section()) then 
+		return -- already inited for this npc
+	end
+	
+	broker = npc and npc:section()
+	broker_name = npc:character_name()
+	--printf("INIT ORDERS %s",broker)
+	
+	local ini = ini_file("plugins\\".. broker .. "_orders.ltx")
+	
+	costs_table = {}
+	item_count_by_category = {}
+	buy_item_table = {}
+	
+	-- reset
+	for i=1,10 do
+		this["has_category_"..i] = functor_always_false
+	end
+	
+	local s_time = level.get_start_time()
+	local days_from_start = game.get_game_time():diffSec(s_time)/86400
+		
+	local i_cnt = 1
+	local sec = "category_"..i_cnt
+	current_cnt = 0
+	while ini:section_exist(sec) do
+		local day_req = ini:r_float_ex(sec,"days_from_start") or 0
+		local rank_req = ini:r_float_ex(sec,"rank") or 0
+		local rep_req = ini:r_float_ex(sec,"reputation") or 0
+		this["has_category_"..i_cnt] = function()
+			return db.actor:character_reputation() >= rep_req and db.actor:character_rank() >= rank_req and days_from_start >= day_req
+		end
+
+		costs_table[i_cnt] = {}
+		costs_table[i_cnt].title = ini:r_string_ex(sec,"title") or "Error"
+		costs_table[i_cnt].wait_time = ini:r_float_ex(sec,"wait_time") or 86400
+		costs_table[i_cnt].cost = ini:r_float_ex(sec,"cost") or ini:r_string_ex(sec,"item1") and i_cnt^2 * 2000 or 0
+		costs_table[i_cnt].prepay_agreed = costs_table[i_cnt].cost * 0.2
+		
+		local t = {}
+		local n = 1
+		while ini:line_exist(sec,"item"..n) do
+			local value = ini:r_string_ex(sec,"item"..n)
+			if (value) then
+				local item_list = value ~= "" and alun_utils.str_explode(value,",") or {}
+				t[#t+1] = item_list
+			end
+			n = n + 1
+		end
+		
+		buy_item_table[i_cnt] = t or {}
+		item_count_by_category[i_cnt] = #t
+		
+		i_cnt = i_cnt + 1
+		sec = "category_"..i_cnt
+	end
+	orders_max_items = i_cnt - 1
+	-- alun_utils.print_table(orders_data[broker],"ORDERS DATA")
+	-- alun_utils.print_table(costs_table,"ORDERS COSTS")
+	-- alun_utils.print_table(buy_item_table,"nimble")
+end 
+
+function processing_item(a,b)
+	return strformat(game.translate_string("st_dm_orders_order_processing"),game.translate_string(costs_table[orders_data[broker].active_cat].title):lower())
+end
+
+function text_offer_item(a,b)
+	return strformat(game.translate_string("st_dm_orders_category_selected"),costs_table[current_cnt].cost,costs_table[current_cnt].prepay_agreed)
+end
+
+function text_accept_offer_item(a,b)
+	return strformat(game.translate_string("st_dm_orders_place_price_accept"),game.translate_string(costs_table[current_cnt].title):lower())
+end
+
+function text_confirm_offer_item(a,b)
+	return strformat(game.translate_string("st_dm_orders_place_pay_reply"),game.translate_string(costs_table[current_cnt].title):lower())
+end
+
+function give_prepay(a,b)
+	if not (orders_data[broker]) then 
+		orders_data[broker] = {}
+	end
+	
+	local npc = dialogs.who_is_npc(a,b)
+	orders_data[broker].active_cat = current_cnt
+	orders_data[broker].delivery_timer = game.get_game_time()
+	orders_data[broker].id = npc:id()
+	orders_data[broker].wait_time = costs_table[current_cnt].wait_time
+	
+	dialogs.relocate_money_from_actor(a,b,costs_table[current_cnt].prepay_agreed)
+end
+
+function has_prepay(first_speaker, second_speaker)
+	return db.actor:money() >= costs_table[current_cnt].prepay_agreed
+end
+
+function hasnt_prepay(first_speaker, second_speaker)
+	return not has_prepay(first_speaker, second_speaker)
+end
+
+------------// after prepay //--------------
+
+function randomize_item(a,b)
+	orders_data[broker].done_item = math.random(1,item_count_by_category[orders_data[broker].active_cat])
+end
+
+function text_orders_query(a,b)
+	return strformat(game.translate_string("st_dm_orders_reply_"..math.random(1,2)),broker_name) or strformat(game.translate_string("st_dm_orders_reply_1"), broker_name)
+end
+
+function purchase_cancel()
+	orders_data[broker] = nil
+	dxr_statistics.increment_reputation(-50)
+end
+
+function orders_item_pickup_existing(a,b)
+	local items = buy_item_table[orders_data[broker].active_cat][orders_data[broker].done_item]
+	local val = #items > 0 and "" or game.translate_string(costs_table[orders_data[broker].active_cat].title):lower()
+	while #items > 1 do
+		val = game.translate_string(system_ini():r_string_ex(table.remove(items),"inv_name_short")).." and "
+	end
+	val = val .. game.translate_string(system_ini():r_string_ex(items[1],"inv_name_short"))
+	return strformat(game.translate_string("st_dm_orders_pickup_existing"),val)
+end
+
+function orders_item_pickup(a,b)
+	return strformat(game.translate_string("st_dm_orders_pickup"),game.translate_string(costs_table[orders_data[broker].active_cat].title):lower(),costs_table[orders_data[broker].active_cat].cost - costs_table[orders_data[broker].active_cat].prepay_agreed)
+end
+
+function buy_item(first_speaker, second_speaker)
+	local items = buy_item_table[orders_data[broker].active_cat][orders_data[broker].done_item]
+	for k,v in pairs (items) do
+		dialogs.relocate_item_section_to_actor(first_speaker, second_speaker,v)
+	end
+	dialogs.relocate_money_from_actor(first_speaker, second_speaker, costs_table[orders_data[broker].active_cat].cost - costs_table[orders_data[broker].active_cat].prepay_agreed)
+	orders_data[broker] = nil
+end
+
+function has_item_cost(first_speaker, second_speaker)
+	return db.actor:money() >= (costs_table[orders_data[broker].active_cat].cost - costs_table[orders_data[broker].active_cat].prepay_agreed)
+end
+
+function hasnt_item_cost(first_speaker, second_speaker)
+	return not has_item_cost(first_speaker, second_speaker)
+end
+
+function has_order_cond(a,b)
+	return orders_data[broker] ~= nil
+end
+
+function dont_has_order_cond(a,b)
+	return orders_data[broker] == nil
+end
+
+function has_ready_item(a,b)
+	return orders_data[broker] and orders_data[broker].ready or false
+end
+
+function hasnt_ready_item(a,b)
+	return not has_ready_item()
+end
+
+function has_done_item(a,b)
+	return orders_data[broker] and orders_data[broker].done_item or false
+end
+
+function hasnt_done_item(a,b)
+	return not has_done_item()
+end
+
+function has_processing_cond(a,b)
+	return hasnt_done_item() and hasnt_ready_item()
+end
+
+function has_pickup_cond(a,b)
+	return hasnt_done_item() and has_ready_item()
+end

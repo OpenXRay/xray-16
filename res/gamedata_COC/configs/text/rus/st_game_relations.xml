@@ -69,6 +69,9 @@
 	<string id="monolith">
 		<text>«Монолит»</text>
 	</string>
+	<string id="renegade">
+		<text>«Ренегаты»</text>
+	</string>
 	<string id="stalker">
 		<text>«Одиночки»</text>
 	</string>
@@ -79,7 +82,7 @@
     		<text>Торговец</text>
 	</string>
 	<string id="zombied">
-		<text>Зомбированный</text>
+		<text>«Зомбированные»</text>
 	</string>
 
 	<!-- Goodwill -->

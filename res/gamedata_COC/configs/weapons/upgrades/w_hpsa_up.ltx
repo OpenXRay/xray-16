@@ -1,181 +1,135 @@
 [up_sect_firsta_hpsa]
-;—корострельность(1)10%
-;----------------------
 cost		      		= 300
 value					= +10
 
-rpm						= +35
+rpm						= +30
 
 [up_sect_firstc_hpsa]
-;Ќастильность(2)20%
-;------------------
 cost		      		= 600
 value					= +20
 
 bullet_speed		 	= +50
-fire_dispersion_base	= -0.02
+fire_dispersion_base	= -0.01
 
 [up_sect_firstd_hpsa]
-;ќтдача(2)-20%
-;------------
 cost		      		= 600
 value					= -20
 
 cam_dispersion          = -0.12
-cam_dispersion_inc		= -0.12
-cam_step_angle_horz		= -0.18
+cam_step_angle_horz		= -0.12
 
 [up_sect_firste_hpsa]
-;ќтдача(3)-30%
-;------------
 cost		      		= 1200
 value					= -30
 
 cam_dispersion          = -0.18
-cam_dispersion_inc		= -0.18
-cam_step_angle_horz		= -0.27
+cam_step_angle_horz		= -0.18
 
 [up_sect_secona_hpsa]
-;Ќастильность(1)10%
-;------------------
 cost		      		= 300
 value					= +10
 
 bullet_speed		 	= +30
-fire_dispersion_base    = -0.01
+fire_dispersion_base    = -0.005
 
 [up_sect_seconc_hpsa]
-;Ќадежность(2)15%
-;---------------
 cost		      		= 600
 value					= +15
 
-;увеличение дисперсии в процентах при максимальном износе
-fire_dispersion_condition_factor    = -1 ;15
-;увеличение изношености при выстреле очередью
-condition_queue_shot_dec	= -0.0002 ;0.0013
-;увеличение изношености при одиночном выстреле
-condition_shot_dec      	= -0.0002 ;0.0011
-;шанс осечки при изношености больше чем misfireStartCondition
-misfire_start_prob	     	= -0.002
-;шанс осечки при изношености больше чем misfireEndCondition
-misfire_end_prob	     	= -0.02 ;0.03
+fire_dispersion_condition_factor    = -1
+condition_queue_shot_dec	= -0.0001
+condition_shot_dec      	= -0.0001
+misfire_start_prob	     	= -0.001
+misfire_end_prob	     	= -0.01
 
 [up_sect_secone_hpsa]
-;—корострельность(3)25%
-;----------------------
 cost		      		= 1200
 value					= +25
 
-rpm						= +75
+rpm						= +60
 
 [up_sect_seconf_hpsa]
-;Ќастильность(1)10%
-;------------------
 cost		      		= 1200
 value					= +30
 
-bullet_speed		 	= +30
-fire_dispersion_base    = -0.01
+bullet_speed		 	= +80
+fire_dispersion_base    = -0.015
 
 [up_sect_thirda_hpsa]
-;¬ес
-;------------------
 cost		      		= 300
-value					= -0.35
+value					= -0.2
 
-inv_weight              = -0.35
+inv_weight              = -0.2
 
-crosshair_inertion			= -0.3
+crosshair_inertion			= -0.15
 
-PDM_disp_base 				= -0.05
 PDM_disp_vel_factor 		= -0.11
 PDM_disp_accel_factor 		= -0.11
 
 [up_sect_thirdc_hpsa]
-;”добство(2)15%
-;--------------
 cost		      		= 600
 value					= +15
 
-crosshair_inertion			= -0.6
+crosshair_inertion			= -0.3
 
-PDM_disp_base 				= -0.1
-PDM_disp_vel_factor 		= -0.25
-PDM_disp_accel_factor 		= -0.25
+PDM_disp_vel_factor 		= -0.22
+PDM_disp_accel_factor 		= -0.22
 
 [up_sect_thirdd_hpsa]
-;ќтдача(2)-20%
-;------------
 cost		      		= 600
 value					= -20
 
 cam_dispersion          = -0.12
-cam_dispersion_inc		= -0.12
-cam_step_angle_horz		= -0.09
+cam_step_angle_horz		= -0.12
 
 [up_sect_fourta_hpsa]
-;“очность(1)10%
-;---------------
 cost		      		= 300
 value					= +10
 
 fire_dispersion_base	= -0.04
 
 [up_sect_fourtc_hpsa]
-;Ќадежность(2)15%
-;---------------
 cost		      		= 600
 value					= +15
 
-;увеличение дисперсии в процентах при максимальном износе
-fire_dispersion_condition_factor    = -1 ;15
-;увеличение изношености при выстреле очередью
-condition_queue_shot_dec	= -0.0002 ;0.0013
-;увеличение изношености при одиночном выстреле
-condition_shot_dec      	= -0.0002 ;0.0011
-;шанс осечки при изношености больше чем misfireStartCondition
-misfire_start_prob	     	= -0.002
-;шанс осечки при изношености больше чем misfireEndCondition
-misfire_end_prob	     	= -0.02 ;0.03
+fire_dispersion_condition_factor    = -1
+condition_queue_shot_dec	= -0.0001
+condition_shot_dec      	= -0.0001
+misfire_start_prob	     	= -0.001
+misfire_end_prob	     	= -0.01
 
 [up_sect_fourte_hpsa]
-;”добство(3)25%
-;--------------
 cost		      		= 1200
 value					= +25
 
-crosshair_inertion			= -0.9
+crosshair_inertion			= -0.45
 
-PDM_disp_base 				= -0.15
 PDM_disp_vel_factor 		= -0.35
 PDM_disp_accel_factor 		= -0.35
 
 [up_sect_fiftha_hpsa]
-;”величенный объем магазина
-;---------------
-cost		      		= 1200
+cost		      		= 1000
 value					= +4
 
 ammo_mag_size		 	= +4
 
 [up_sect_fifthc_hpsa]
-;—мена калибра на 9х18
-;---------------
-cost		      		= 1500
+cost		      		= 1000
 value					= "9x18"
 
 ammo_class		 		= ammo_9x18_fmj, ammo_9x18_pmm
 
-;увеличение изношености при выстреле очередью
-condition_queue_shot_dec	= 0.0001 ;0.0013
-;увеличение изношености при одиночном выстреле
-condition_shot_dec      	= 0.0001 ;0.0011
-;шанс осечки при изношености больше чем misfireStartCondition
-misfire_start_prob	     	= 0.0008
-;шанс осечки при изношености больше чем misfireEndCondition
-misfire_end_prob	     	= 0.008 ;0.03
-fire_dispersion_condition_factor    = -0.5
+bullet_speed		 	= -50
+cam_dispersion         		= -0.2
+cam_step_angle_horz			= -0.15
+fire_dispersion_base		= +0.02
+hit_power					= -0.02
+
+condition_queue_shot_dec	= 0.0001
+condition_shot_dec      	= 0.0001
+misfire_start_prob	     	= 0.00005
+misfire_end_prob	     	= 0.0005
+
 
 [up_firsta_hpsa]
 scheme_index            = 0, 0
@@ -497,7 +451,7 @@ scheme_index            = 1, 6
 known                   = 1
 effects                 =
 section                 = up_sect_fifthc_hpsa
-property                = prop_calibre
+property                = prop_calibre, prop_bullet_speed
 
 
 precondition_functor    = inventory_upgrades.precondition_functor_a

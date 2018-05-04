@@ -1,5 +1,5 @@
 <w>
-	<main_frame x="10" y="300" width="256" height="170" delay="810"/>
+	<main_frame x="10" y="300" width="256" height="170" delay="500"/>
 	<background_frame x="0" y="0" width="256" height="170">
 		<texture>ui_inGame2_hint_wnd_main_window</texture>
 	</background_frame>

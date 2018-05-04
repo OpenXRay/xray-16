@@ -296,7 +296,7 @@
 		<text>I wish I had known the Zone that I've heard about, the one that was like a no man's land. How can we be rich now? Now that after any emission, a bunch of stalkers rush on every anomaly field to pick up their flowers.</text>
 	</string>
 	<string id="dm_anomalies_32">
-		<text>Why should I give you any advice? More so when it comes to the business which many of us use for making money? Well, get a good detector and help yourself. The scientists will probably see you what you're looking for.</text>
+		<text>Why should I give you any advice? More so when it comes to the business which many of us use for making money? Well, get a good detector and help yourself. The scientists will probably sell you what you're looking for.</text>
 	</string>
 	<string id="dm_anomalies_33">
 		<text>Many newcomers dream about "the artefact that makes you rich". Even if the Zone can be fruitful, it often take a long time and a serious amount of money to get the gear that lets you go inside the most dangerous and productive areas. Of course, you can be lucky, but knowing this place I wouldn't count so much on that.</text>
@@ -529,7 +529,7 @@
 		<text>A couple of years ago we were led by Lebedev. Those were dog days, until a merc came along and helped us get our footing in the Great Swamp. But then the whole Strelok thing got out of hand. Most of Clear Sky followed Lebedev and the merc north to sort it all out. Well, you know how that went. Anyway, we keep hearing about the death trucks in the Cordon, bringing back old friends. On the rare occasion there's some signs of life, but it's like they've had a massive stroke or something.</text>
 	</string>
 	<string id="dm_information_48">
-		<text>New in the zone? Listen to yourself, you almost sound like one of those bastards out there. Information huh, ever heard of Major Kuznetsov? He was a real piece, after he replaced Major Khaletskiy for the trouble he was causing, Kuznetsov goes and does the same thing! It's always the high ranking officers that are corrupted, they get a little taste of power and control and then start trying to make extra on the side through the criminals here in the Zone! I heard he met with a terrible fate when he crossed paths with that one guy... I can't recall his name but they picked him up in Pripyat I heard because he had some real important information.</text>
+		<text>New in the Zone? Listen to yourself, you almost sound like one of those bastards out there. Information huh, ever heard of Major Kuznetsov? He was a real piece, after he replaced Major Khaletskiy for the trouble he was causing, Kuznetsov goes and does the same thing! It's always the high ranking officers that are corrupted, they get a little taste of power and control and then start trying to make extra on the side through the criminals here in the Zone! I heard he met with a terrible fate when he crossed paths with that one guy... I can't recall his name but they picked him up in Pripyat I heard because he had some real important information.</text>
 	</string>
 	<string id="dm_information_49">
 		<text>We've got more guys getting dropped in later in the month. Just waiting for the Zone to give us some quiet time, so the pilots can make it in and out. Rumour has it there's some French, Finnish and British operatives coming in this time, should be interesting.</text>
@@ -648,10 +648,10 @@
 		<text>You ain't gonna be able to hit shit if you're running while shooting. Find some cover to hide behind and lean out to shoot; you'll be far more accurate.</text>
 	</string>	
 	<string id="dm_tips_7">
-		<text>Keep your gear in good condition. You gun will jam and your suit will be full of holes if you don't see a mechanic every now and then.</text>
+		<text>Keep your gear in good condition. You gun will jam and your suit will be full of holes if you don't see a technician every now and then.</text>
 	</string>	
 	<string id="dm_tips_8">
-		<text>Last time I went to see a mechanic he couldn't upgrade half my shit, asked me to go out and fetch tools for him. What, am I his errand boy now?</text>
+		<text>Last time I went to see a technician he couldn't upgrade half my shit, asked me to go out and fetch tools for him. What, am I his errand boy now?</text>
 	</string>	
 	<string id="dm_tips_9">
 		<text>Ever met a guy who stood outside during an emission? Of course you haven't! Hide your ass whenever one hits unless you feel like having your brain boiled.</text>
@@ -687,7 +687,7 @@
 		<text>Make sure to pack energy drinks with you, they'll come in handy if you keep tiring out when carrying loot back to camp.</text>
 	</string>
 	<string id="dm_tips_20">
-		<text>If your helmet has night vision make sure to upgrade it. You'll be able to see further and clearer if you let a mechanic screw around with it for some cash.</text>
+		<text>If your helmet has night vision make sure to upgrade it. You'll be able to see further and clearer if you let a technician screw around with it for some cash.</text>
 	</string>	
 	<string id="dm_tips_21">
 		<text>You aren't defenceless if you're out artefact hunting. So what if you're carrying your detector? You can still hold a pistol in the other hand.</text>
@@ -726,7 +726,7 @@
 		<text>Crouch and sneak about if you don't wanna get seen or heard. Not ever battle is worth fighting, or maybe you just want to get the jump on someone?</text>
 	</string>	
 	<string id="dm_tips_33">
-		<text>You can attach scopes and launchers to your shooter y'know? There's just some things a mechanic just can't do. But you'll have to find the parts yourself...</text>
+		<text>You can attach scopes and launchers to your shooter y'know? There's just some things a technician just can't do. But you'll have to find the parts yourself...</text>
 	</string>	
 	<string id="dm_tips_34">
 		<text>There's different ways to take down different types of mutants, they all have their own weak spots. You can kick tushkanos and rats too y'know?</text>
@@ -867,7 +867,7 @@
 	</string>
 
 
-<!-------- Mechanic --->
+<!-------- Technician --->
 	<string id="st_mechanic_query_items">
 		<text>Is any of my equipment ready for pick-up?</text>
 	</string>
@@ -994,7 +994,7 @@
 		<text>I'll be the judge of that, what do you have?</text>
 	</string>
 	<string id="st_broker_npc_start_2">
-		<text>You better hope it is, because you are wasting my god damn time.</text>
+		<text>You better hope so, because you are wasting my god damn time.</text>
 	</string>
 	<string id="st_broker_npc_start_3">
 		<text>This better be worth my time, what do you have?</text>

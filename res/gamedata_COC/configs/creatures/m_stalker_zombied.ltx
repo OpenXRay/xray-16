@@ -48,9 +48,9 @@ feel_enemy_who_just_hit_max_distance = 200
 
 
 ;открытые раны
-bleeding_v					= 0						;потеря крови при номинальной ране в секунду
-wound_incarnation_v			= 0.0					;крутизна кривой заживления (какой процент раны останется после заживления в игровую секунду)
-min_wound_size				= 0.01
+bleeding_v					= 0.001					;потеря крови при номинальной ране в секунду
+wound_incarnation_v			= 0.003					;крутизна кривой заживления (какой процент раны останется после заживления в игровую секунду)
+min_wound_size				= 0.0256
 
 [stalker_zombied_immunities]:stalker_immunities
 telepatic_immunity 			= 0.0
@@ -61,7 +61,7 @@ wound_immunity				= 0.0
 radiation_immunity 			= 0.0
 chemical_burn_immunity 		= 0.0
 explosion_immunity 			= 0.0
-fire_wound_immunity  		= 1.5 
+fire_wound_immunity  		= 1.0
 wound_2_immunity  			= 0.0
 
 [stalker_zombied_movement_speeds]
@@ -127,7 +127,7 @@ sound_hit						= fight\hit\hit_
 sound_humming					= states\idle\idle_
 
 sound_backup					= ;fight\attack\attack_ ;fight\backup\stalker\backup_
-sound_detour					= ;fight\enemy\enemy_ ;fight\detour\stalker\detour_
+sound_detour					= fight\enemy\enemy_ ;fight\detour\stalker\detour_
 sound_search					= ;fight\attack\attack_ ;fight\searching_enemy\stalker\search_
 sound_friendly_fire				= ;fight\friendly_fire\stalker\friendly_fire_
 sound_panic_human				= ;states\panic_human\stalker\panic_
@@ -144,8 +144,8 @@ sound_enemy_critically_wounded	= ;fight\enemy_hit\enemy_hit_
 sound_enemy_killed_or_wounded	= ;fight\enemy_down\enemy_down_
 
 sound_attack_no_allies				= ;fight\fire\fire_,fight\threat\threat_distant_
-sound_attack_allies_single_enemy	= ;fight\attack\attack_,fight\attack\attack_one_,fight\fire\fire_
-sound_attack_allies_several_enemies	= ;fight\attack\attack_,fight\attack\attack_many_,fight\fire\fire_
+sound_attack_allies_single_enemy	= fight\attack\attack_;fight\attack\attack_one_,fight\fire\fire_
+sound_attack_allies_several_enemies	= fight\attack\attack_;fight\attack\attack_many_,fight\fire\fire_
 sound_search1_no_allies				= ;fight\threat\threat_distant_
 sound_search1_with_allies			= ;fight\searching_enemy\search_,fight\searching_enemy\enemy_lost_
 sound_throw_grenade					= ;fight\grenade\grenade_ready_

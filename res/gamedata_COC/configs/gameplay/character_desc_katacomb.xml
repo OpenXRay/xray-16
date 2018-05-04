@@ -109,9 +109,9 @@
     <reputation>-1377</reputation>
     <visual>actors\stalker_monolith\stalker_monolith_2</visual>
     <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_sniper.ltx"
         [spawn] \n
-        wpn_abakan = 1 \n
-        ammo_5.45x39_ap \n
 #include "gameplay\character_items.xml"
 #include "gameplay\character_food.xml"
 #include "gameplay\character_drugs.xml"
@@ -133,9 +133,9 @@
     <reputation>1868</reputation>
     <visual>actors\stalker_monolith\stalker_monolith_4</visual>
     <supplies>
+#include "gameplay\loadouts\monolith_base.ltx"
+#include "gameplay\loadouts\monolith_sniper.ltx"
         [spawn] \n
-        wpn_svu \n
-        ammo_7.62x54_7h1 \n
 #include "gameplay\character_items.xml"
 #include "gameplay\character_food.xml"
 #include "gameplay\character_drugs.xml"

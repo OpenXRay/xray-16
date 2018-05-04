@@ -197,7 +197,14 @@
 				<max_color r="107" g="207" b="119"/>
 			</slot_progress>
 		</slot>
-		<slot><!--13 Backpack -->
+		<slot><!--13 Faction Patch  -->
+            <slot_dragdrop x="494" y="107" width="38" height="45" cell_width="33" cell_height="41"  rows_num="1" cols_num="1"
+            custom_placement="0" a="0" virtual_cells="1" vc_vert_align="c" vc_horiz_align="c"/>
+            <slot_highlight x="496" y="111" width="33" height="41" stretch="1">
+                <texture>ui_inGame2_artefakt_highlighter</texture>
+            </slot_highlight>
+        </slot>
+		<slot><!--14 Backpack -->
 			<slot_dragdrop x="469" y="299" width="85" height="85" cell_width="33" cell_height="41" rows_num="2" cols_num="2"
 			custom_placement="0" a="0" virtual_cells="1" vc_vert_align="c" vc_horiz_align="c"/>
 			<slot_highlight x="472" y="300" width="78" height="85" stretch="1">

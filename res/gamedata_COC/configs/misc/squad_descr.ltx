@@ -211,7 +211,7 @@ npc_in_squad = 1, 3
 
 [monolith_sim_squad_sniper]:online_offline_group
 faction = monolith
-npc_random = sim_monolith_specnaz_rg6, sim_monolith_sniper, sim_monolith_sniper_gauss
+npc_random = sim_monolith_sniper, sim_monolith_sniper
 npc_in_squad = 1, 3
 
 ;--------------- zombied simulation squads -----------------------
@@ -289,24 +289,24 @@ npc_random = m_poltergeist_normal_tele, m_poltergeist_normal_black, m_poltergeis
 npc_in_squad = 1, 1
 
 [simulation_chimera]:online_offline_group
-faction = monster_predatory_night
+faction = monster_special_night
 npc_random = chimera_normal, chimera_weak, chimera_strong, chimera_normal2, chimera_normal3, chimera_strong2, chimera_strong3, chimera_strong4
 npc_in_squad = 1, 1
 
 [simulation_chimera_zaton]:online_offline_group
-faction = monster_predatory_night
+faction = monster_special_night
 npc_random = chimera_normal
 npc_in_squad = 1, 1
 target_smart = {=is_dark_night} nil, {~50} zat_sim_5, {~50} zat_sim_3, {~50} zat_sim_1, {~50} zat_sim_18, {~50} zat_sim_10, {~50} zat_sim_7, zat_sim_26
 
 [simulation_chimera_pripyat]:online_offline_group
-faction = monster_predatory_night
+faction = monster_special_night
 npc_random = chimera_normal
 npc_in_squad = 1, 1
 target_smart = {=is_dark_night} nil, pri_a17
  
 [simulation_chimera_jupiter]:online_offline_group
-faction = monster_predatory_night
+faction = monster_special_night
 npc_random = chimera_normal
 npc_in_squad = 1, 1 
 
@@ -321,7 +321,7 @@ npc_random = tushkano_normal, tushkano_normal_a, tushkano_normal_b, tushkano_nor
 npc_in_squad = 2, 3
 
 [simulation_gigant]:online_offline_group
-faction = monster_predatory_day
+faction = monster_special_day
 npc_random = gigant_normal, gigant_strong
 npc_in_squad = 1, 1
 
@@ -333,21 +333,21 @@ npc_in_squad = 1, 3
 
 [simulation_zombie]:online_offline_group
 faction = monster_predatory_night
-npc_random = zombie_weak, zombie_normal, zombie_strong
+npc_random = zombie_weak, zombie_normal, zombie_normal2, zombie_normal3, zombie_strong, zombie_strong2
 npc_in_squad = 2, 3
 
 [simulation_rat]:online_offline_group
-faction = monster_predatory_day
+faction = monster_predatory_night
 npc_random = rat_weak, rat_normal, rat_strong
 npc_in_squad = 3, 4
 
 [simulation_fracture]:online_offline_group
-faction = monster_predatory_day
+faction = monster_zombied_day
 npc_random = fracture_normal, fracture_weak, fracture_strong, fracture_2, fracture_3
 npc_in_squad = 1, 2
 
 [simulation_karlik]:online_offline_group
-faction = monster_zombied_night 
+faction = monster_zombied_night
 npc_random = karlik_blue, karlik_green, karlik_grey, karlik_orange
 npc_in_squad = 1
 

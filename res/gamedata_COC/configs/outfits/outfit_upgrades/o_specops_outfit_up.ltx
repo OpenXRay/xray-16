@@ -1,39 +1,40 @@
 [up_sect_firsta_specops_outfit]
-cost 		= 600
+cost 		= 650
 value		= -10
 
-hit_fraction_actor				= -0.05
-strike_protection 				= 0.05
-explosion_protection 			= 0.05
-wound_protection				= 0.04
+hit_fraction_actor				= -0.03
+strike_protection 				= 0.03
+explosion_protection 			= 0.03
+wound_protection				= 0.025
 
 [up_sect_firstc_specops_outfit]
-cost 		= 1200
+cost 		= 1300
 value		= -5
 
-inv_weight 						= -4
+inv_weight 						= -3.5
 power_loss						= -0.02
 
 [up_sect_firstd_specops_outfit]
-cost 		= 1200
+cost 		= 1300
 value		= +15
 
 immunities_sect_add				= sect_specops_outfit_immunities_add
 
 [up_sect_firste_specops_outfit]
-cost 		= 2400
+cost 		= 2600
 value		= +30
 
 fire_wound_protection  			= 0.1
-bones_koeff_protection_add 		= actor_armor_add_4
+bones_koeff_protection_add 		= actor_armor_add_010
+hit_fraction_actor				= -0.05
 inv_weight						= +0.30
-power_loss						= +0.015
+power_loss						= +0.01
 
 [up_sect_firstf_specops_outfit]
-cost 		= 2400
+cost 		= 2600
 value		= -10
 
-hit_fraction_actor				= -0.08
+hit_fraction_actor				= -0.07
 strike_protection 				= 0.07
 explosion_protection 			= 0.07
 wound_protection				= 0.06
@@ -52,18 +53,18 @@ power_restore_speed				= 0.0014
 power_loss						= -0.02
 
 [up_sect_second_specops_outfit]
-cost 		= 1200
+cost 		= 1500
 value       = +20 
 
 burn_protection      			= 0.01
 shock_protection     			= 0.1
 
 [up_sect_secone_specops_outfit]
-cost 		= 2400
+cost 		= 3000
 value		= +30
 
-chemical_burn_protection 		= 0.01
-radiation_protection 			= 0.003
+chemical_burn_protection 		= 0.006
+radiation_protection 			= 0.001
 
 [up_sect_thirda_specops_outfit]
 cost 		= 750
@@ -151,7 +152,7 @@ scheme_index            = 2, 0
 known                   = 1
 effects                 = 
 section                 = up_sect_firste_specops_outfit
-property                = prop_armor, prop_weightoutfit
+property                = prop_armor, prop_damage, prop_weightoutfit
 
 precondition_functor    = inventory_upgrades.precondition_functor_a
 precondition_parameter  = a & b

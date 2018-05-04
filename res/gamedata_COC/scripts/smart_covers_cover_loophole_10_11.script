@@ -1,0 +1,135 @@
+local	temp = {}
+if (move ~= nil) then
+	temp = move
+end
+move	= temp
+
+function get_smart_cover_cover_loophole_10_11()
+	return {
+			loopholes = {
+				smart_covers_loophole_10.get_loophole_10("lh_10",	vector():set(-0.9,0,-0.4)),
+				smart_covers_loophole_11.get_loophole_11("lh_11",	vector():set(-0.9,0,0.4)),
+			},
+	
+			transitions = {
+			--' Анимации входа в бойницы
+			{
+				vertex0 = "",
+				vertex1 = "lh_10",
+				weight = 1.0,
+                actions =	{
+							{
+                                precondition_functor = "smart_covers.script_functor_true",
+                                precondition_params = "",
+                                actions =	{
+											{
+												animation = "loophole_8_in_front_0",
+												position = vector():set(0,0,-1),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+                            }
+							}
+			},
+			{
+				vertex0 = "",
+				vertex1 = "lh_11",
+				weight = 1.0,
+                actions =	{
+							{
+                                precondition_functor = "smart_covers.script_functor_true",
+                                precondition_params = "",
+                                actions =	{
+											{
+												animation = "loophole_8_in_front_0",
+												position = vector():set(0,0,1),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+                            }
+							}
+			},
+			
+			--' Анимации перехода между бойницами
+			{
+				vertex0 = "lh_10",
+				vertex1 = "lh_11",
+				weight = 1.0,
+                actions =	{
+							{
+                                precondition_functor = "smart_covers.script_functor_true",
+                                precondition_params = "",
+                                actions =	{
+											{
+												animation = "loophole_8_idle_0",
+												position = vector():set(0,0,1),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+                            }
+							}				
+			},
+			{
+				vertex0 = "lh_11",
+				vertex1 = "lh_10",
+				weight = 1.1,
+                actions =	{
+							{
+                                precondition_functor = "smart_covers.script_functor_true",
+                                precondition_params = "",
+                                actions =	{
+											{
+												animation = "loophole_8_idle_0",
+												position = vector():set(0,0,-1),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+                            }
+							}				
+			},
+
+			--' Анимации выхода из бойниц.
+			{
+				vertex0 = "lh_10",
+				vertex1 = "",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+                                precondition_params = "",
+                                actions =	{
+											{
+												animation = "loophole_8_jump_1",
+												position = VEC_ZERO,
+												body_state = move.standing, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+			{
+				vertex0 = "lh_11",
+				vertex1 = "",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+                                precondition_params = "",
+                                actions =	{
+											{
+												animation = "loophole_8_jump_1",
+												position = VEC_ZERO,
+												body_state = move.standing, movement_type = move.run,
+											},
+											},
+							}
+							}
+			}
+		}
+	}
+end
+
+
+function exit_random(p)
+	return math.random(100) <= tonumber(p)
+end

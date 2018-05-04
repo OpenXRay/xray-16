@@ -3,7 +3,7 @@ cost 		= 500
 value		= +10
 
 fire_wound_protection  			= 0.04
-bones_koeff_protection_add 		= actor_armor_add_1
+bones_koeff_protection_add 		= actor_armor_add_004
 
 [up_sect_firstc_monolith_outfit]
 cost 		= 1500
@@ -24,8 +24,9 @@ immunities_sect_add				= sect_stalker_outfit_immunities_add
 cost 		= 2500
 value		= +30
 
-fire_wound_protection  			= 0.08
-bones_koeff_protection_add  	= actor_armor_add_3
+fire_wound_protection  			= 0.06
+bones_koeff_protection_add  	= actor_armor_add_006
+hit_fraction_actor				= -0.05
 inv_weight						= +0.25
 power_loss						= +0.01
 
@@ -33,8 +34,8 @@ power_loss						= +0.01
 cost 		= 750
 value		= -3.5
 
-inv_weight 						 = -3.5
-power_loss	                     = -0.02
+inv_weight 						 = -2.5
+power_loss	                     = -0.01
 
 [up_sect_seconc_monolith_outfit]
 cost 		= 1000
@@ -46,27 +47,27 @@ burn_protection    				 = 0.01
 cost 		= 1000
 value       = +20
 
-chemical_burn_protection  		 = 0.005
+chemical_burn_protection  		 = 0.004
 shock_protection          		 = 0.1
 
 [up_sect_secone_monolith_outfit]
 cost 		= 2000
 value		= +30
 
-chemical_burn_protection 		= 0.015
+chemical_burn_protection 		= 0.008
 
 [up_sect_seconf_monolith_outfit]
 cost 		= 2000
 value		= +30
 
-radiation_protection 			= 0.003
+radiation_protection 			= 0.001
 
 [up_sect_thirda_monolith_outfit]
 cost 		= 500
 value		= +10
 
-radiation_protection 			= 0.0005
-chemical_burn_protection 		= 0.005
+radiation_protection 			= 0.0003
+chemical_burn_protection 		= 0.002
 
 [up_sect_thirdc_monolith_outfit]
 cost 		= 2000
@@ -87,7 +88,7 @@ cost 		= 3000
 value       = +2
 
 artefact_count					= 2
-   
+
 
 [up_firsta_monolith_outfit]
 scheme_index            = 0, 0
@@ -154,7 +155,7 @@ scheme_index            = 2, 0
 known                   = 1
 effects                 =
 section                 = up_sect_firste_monolith_outfit
-property                = prop_armor, prop_weightoutfit
+property                = prop_armor, prop_damage, prop_weightoutfit
 
 precondition_functor    = inventory_upgrades.precondition_functor_a
 precondition_parameter  = a & b

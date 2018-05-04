@@ -1,133 +1,206 @@
 --[[
-************************************************************
-					xr_eat_medkit
-by Alundaio original by Rulix
-************************************************************
+	scheme_type: generic
+	author: Alundaio
 --]]
-local eating = {}
-
-function on_game_start()
-	local ini = ini_file("ai_tweaks\\xr_eat_medkit.ltx")
-	local enabled = ini:r_bool_ex("plugin","enable",false)
-	if not (enabled) then ini = nil return end
-	RegisterScriptCallback("npc_on_update",npc_update)
-
-	local sect = "plugin"
-	--eating.exc_comms = alun_utils.parse_list(ini,sect,"excluded_communities",true)
-	eating.ic = ini:r_bool_ex(sect,"in_combat",false)
-	eating.oc = ini:r_bool_ex(sect,"out_combat",false)
-	eating.max_h = (ini:r_float_ex(sect,"medkit_health") or 50)/100
-	eating.min_b = ini:r_float_ex(sect,"bandage_bleeding") or 0.2
-	eating.medkits = alun_utils.parse_list(ini,sect,"medkits")
-	eating.bandages = alun_utils.parse_list(ini,sect,"bandages")
-	eating.medkit_delay = {}
-	eating.bandage_delay = {}
-	local ranks = alun_utils.get_rank_list()
-	for i=1,#ranks do 
-		local rn = ranks[i]
-		eating.medkit_delay[rn] = alun_utils.parse_list(ini,rn,"medkit_delay")
-		eating.bandage_delay[rn] = alun_utils.parse_list(ini,rn,"bandage_delay")
+--------------------------------------
+actid = 188121
+evaid = 188121
+--------------------------------------
+function end_animation(npc)
+	local st = db.storage[npc:id()]
+	if (st and st.eat_medkit) then 
+		st.eat_medkit.animate = nil
 	end
-	ini = nil
+end
+-----------------------------------------------------------------------------------------
+--								EVALUATOR NPC vs BOX
+-----------------------------------------------------------------------------------------
+class "evaluator_eat_medkit" (property_evaluator)
+function evaluator_eat_medkit:__init(npc,name,storage) super (nil, name)
+	self.st = storage
 end
 
-function npc_update(npc,st)
-	if not (enabled) then
-		return
+function evaluator_eat_medkit:evaluate()
+	--alun_utils.debug_write("eva_eat_medkit")
+	local npc = self.object
+	
+	if not (npc:alive()) then 
+		return false 
 	end
+	
+	if (IsWounded(npc)) then 
+		return false
+	end
+	
+	local st = self.st
 
-	if not  (npc:alive()) then 
-		return 
+	if (st.boost_health_restore and st.boost_health_restore > 0) then
+		if (st.eat_medkit_timer and time_global() <= st.eat_medkit_timer) then
+			local hp = npc.health + st.boost_health_restore
+			if (hp > 1) then 
+				hp = 1
+			end
+			npc:set_health_ex(hp)
+		else
+			st.boost_health_restore = nil
+			st.animate = nil
+		end
+	end
+	
+	if (st.animate) then
+		return true
+	end
+	
+	if (npc.health <= 0.9) then
+		if (st.eat_medkit_timer == nil or time_global() > st.eat_medkit_timer) then
+			local item = npc:object("medkit") or npc:object("medkit_army") or npc:object("medkit_scientic")
+			if (item) then
+				
+				local eat_me = false
+				local be = npc:best_enemy()
+				if (be and IsStalker(be) and be:see(npc)) then
+					local manager = npc:motivation_action_manager()
+					if (manager:initialized()) then
+						local combat_action = manager:action(stalker_ids.action_combat_planner)
+						local combat_action_planner = cast_planner(combat_action)
+						if (combat_action_planner:initialized()) then
+							if (combat_action_planner:evaluator(stalker_ids.property_in_cover):evaluate() and combat_action_planner:evaluator(stalker_ids.property_ready_to_kill):evaluate()) then
+								eat_me = true
+								local active_item = npc:active_item()
+								if (active_item and IsWeapon(active_item) and active_item:get_ammo_in_magazine() > 0) then 
+									npc:set_item(object.aim1,active_item)
+								end
+							end
+						end
+					end
+				else 
+					eat_me = true
+				end
+			
+				if (eat_me) then
+					npc:eat(item)
+					local tm = (system_ini():r_float_ex(item:section(),"boost_time",0)*1000)
+					st.eat_medkit_timer = time_global() + tm
+
+					npc.bleeding = 0
+					st.boost_health_restore = system_ini():r_float_ex(item:section(),"boost_health_restore",0)
+					st.animate = true
+					return true -- animation
+				end
+			end
+		end
+	elseif (npc.bleeding > 0) then
+		if (st.eat_bandage_timer == nil or time_global() > st.eat_bandage_timer) then
+			local item = npc:object("bandage")
+			if (item) then 
+				npc:eat(item)
+				local tm = (system_ini():r_float_ex(item:section(),"boost_time",0)*1000)
+				st.eat_bandage_timer = time_global() + tm
+				
+				npc.bleeding = 0
+			end
+		end
+	end
+	
+	return false
+end
+-----------------------------------------------------------------------------------------
+--								ACTION Eat Medkit
+-----------------------------------------------------------------------------------------
+class "action_eat_medkit" (action_base)
+function action_eat_medkit:__init (npc,name,storage) super (nil,name)
+	self.st = storage
+end
+function action_eat_medkit:initialize()
+	action_base.initialize(self)
+	local npc = self.object
+	npc:set_desired_position()
+	npc:set_desired_direction()
+	state_mgr.set_state(npc,"eat_medkit",nil,nil,{look_object = npc:best_enemy()})
+end
+
+function action_eat_medkit:execute()
+	action_base.execute(self)
+end
+
+function action_eat_medkit:finalize()
+    action_base.finalize(self)
+	self.st.animate = nil
+end
+
+---------------------------------------------------------
+---------------------- binder ---------------------------
+function setup_generic_scheme(npc,ini,scheme,section,stype,temp)
+	local st = xr_logic.assign_storage_and_bind(npc,ini,"eat_medkit",section,temp)
+end
+
+function add_to_binder(npc,ini,scheme,section,storage,temp)
+	local manager = npc:motivation_action_manager()
+	
+	if (not npc:alive()) or (npc:character_community() == "zombied" or npc:section() == "actor_visual_stalker") then
+		manager:add_evaluator(evaid,property_evaluator_const(false))
+		--temp.needs_configured = false
+	else
+		manager:add_evaluator(evaid,evaluator_eat_medkit(npc,"eva_eat_medkit",storage))
 	end 
 	
-	if not (st.eat_medkit) then
-		st.eat_medkit = eat_medkit(npc,st)
-	else
-		local comm = npc:character_community()
-		if (comm == "trader" or comm == "zombied") then
-			return
-		end
+	temp.action = action_eat_medkit(npc,"act_eat_medkit",storage)
+	
+	temp.action:add_precondition(world_property(stalker_ids.property_alive,true))
+	temp.action:add_precondition(world_property(stalker_ids.property_danger, false))
+	temp.action:add_precondition(world_property(evaid,true))
+	
+	temp.action:add_effect(world_property(evaid,false))
+	
+	manager:add_action(actid,temp.action)
+end
 
-		st.eat_medkit:update(npc)
+function configure_actions(npc,ini,scheme,section,stype,temp)
+	--temp.action:add_precondition(world_property(xr_evaluators_id.state_mgr + 1,true))
+	temp.action:add_precondition(world_property(xr_evaluators_id.sidor_wounded_base,false))
+
+	--[[
+	if (_G.schemes["rx_ff"]) then 
+		temp.action:add_precondition(world_property(rx_ff.evaid,false))
 	end
-end
+	--]]
+	
+	if (_G.schemes["gl"]) then
+		temp.action:add_precondition(world_property(rx_gl.evid_gl_reload,false))
+	end
+	
+	--[[
+	if (_G.schemes["facer"]) then
+		temp.action:add_precondition(world_property(xrs_facer.evid_facer,false))
+		temp.action:add_precondition(world_property(xrs_facer.evid_steal_up_facer,false))
+	end
+	--]]
 
+	local manager = npc:motivation_action_manager()
+	local action	
+	local p = {
+				stalker_ids.action_combat_planner,
+				stalker_ids.action_danger_planner,
+				--xr_actions_id.state_mgr + 1,
+				xr_actions_id.state_mgr + 2,
+				xr_actions_id.alife
+	}
 
-class "eat_medkit"
-function eat_medkit:__init(object,storage)
-	self.st = storage
-	self.rank = ranks.get_obj_rank_name(object)
-end
-
-function eat_medkit:update(npc)
-	local stage = self.stage or 0
-
-	if (stage == 0) then
-		if (IsWounded(npc)) then 
-			self.item = nil
-			self.timer = nil
-			return
-		end 
-		
-		local enemy = npc:best_enemy()
-		if (eating.oc and not eating.ic and enemy) or (eating.ic and not eating.oc and not enemy) then
-			self.item = nil
-			self.timer = nil
-			return
-		end
-
-		if (npc.health < eating.max_h and not IsWounded(npc)) then
-			for i=1,#eating.medkits do
-				local medkit = npc:object(eating.medkits[i])
-				if (medkit) then
-					local d_min = eating.medkit_delay[self.rank][1] or 10000
-					local d_max = eating.medkit_delay[self.rank][2] or 15000
-					self.timer = time_global()+math.random(d_min,d_max)
-					self.item = eating.medkits[i]
-					self.stage = 1
-					return
-				end
-			end
-		end
-		if (npc.bleeding > eating.min_b) then
-			for i=1, #eating.bandages do
-				local bandage = npc:object(eating.bandages[i])
-				if (bandage) then
-					local d_min = eating.bandage_delay[self.rank][1] or 10000
-					local d_max = eating.bandage_delay[self.rank][2] or 15000
-					self.timer = time_global()+math.random(d_min,d_max)
-					self.item = eating.bandages[i]
-					self.stage = 1
-					return
-				end
-			end
-		end
-	elseif (stage == 1) then
-		if (self.timer and time_global() > self.timer) then
-			if (self.item) then
-				local med = npc:object(self.item)
-				if med then
-					consume_medkit(npc,med)
-					--printf("%s[%s]: Used medical supplies",npc:name(),npc:character_name())
-				end
-				self.item = nil
-			end
-			self.stage = 0
+	for i=1,#p do
+		action = manager:action(p[i])
+		if (action) then
+			action:add_precondition(world_property(evaid,false))
 		end
 	end
 end
+	
+function disable_generic_scheme(npc,scheme,stype)
+	local st = db.storage[npc:id()][scheme]
+	if st then
+		st.enabled = false
+	end
+end
 
-function consume_medkit(npc,medkit)
-	local ms = medkit:section()
-	npc:eat(medkit)
-	local ini = system_ini()
-	local time = ini:r_float_ex(ms,"boost_time") or 1
-	local health_restore = ini:r_float_ex(ms,"boost_health_restore") or 0
-	local bleeding_restore = ini:r_float_ex(ms,"boost_bleeding_restore") or 0
-	if (health_restore) then
-		npc.health = health_restore*time*10
-	end
-	if (bleeding_restore) then
-		npc.bleeding = bleeding_restore*time*10
-	end
+function npc_add_precondition(action)
+	action:add_precondition(world_property(evaid,false))
 end

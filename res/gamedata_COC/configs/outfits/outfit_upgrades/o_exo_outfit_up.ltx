@@ -3,14 +3,14 @@ cost 		= 1500
 value		= +10
 
 fire_wound_protection  			= 0.04
-bones_koeff_protection_add  	= actor_armor_add_1
+bones_koeff_protection_add  	= actor_armor_add_004
 
 [up_sect_firstc_exo_outfit]
 cost 		= 3000
 value		= +20
 
 fire_wound_protection  			= 0.06
-bones_koeff_protection_add  	= actor_armor_add_2
+bones_koeff_protection_add  	= actor_armor_add_006
 
 [up_sect_firstd_exo_outfit]
 cost 		= 3000
@@ -23,13 +23,14 @@ cost 		= 6000
 value		= +30
 
 fire_wound_protection  			= 0.08
-bones_koeff_protection_add 		= actor_armor_add_3
+bones_koeff_protection_add 		= actor_armor_add_008
+hit_fraction_actor				= -0.025
 
 [up_sect_firstf_exo_outfit]
 cost 		= 6000
 value		= -30
 
-hit_fraction_actor				= -0.06
+hit_fraction_actor				= -0.05
 strike_protection 				= 0.06
 explosion_protection 			= 0.06
 wound_protection				= 0.05
@@ -38,10 +39,10 @@ wound_protection				= 0.05
 cost 		= 1500
 value		= -10
 
-hit_fraction_actor				= -0.04
-strike_protection 				= 0.04
-explosion_protection 			= 0.04
-wound_protection				= 0.03
+hit_fraction_actor				= -0.025
+strike_protection 				= 0.03
+explosion_protection 			= 0.03
+wound_protection				= 0.025
 
 [up_sect_seconc_exo_outfit]
 cost 		= 3000
@@ -53,28 +54,28 @@ shock_protection                = 0.1
 cost 		= 3000
 value		= +20
 
-burn_protection 				= 0.01
+burn_protection 				= 0.008
 
 [up_sect_secone_exo_outfit]
 cost 		= 6000
 value		= +30
 
-burn_protection 				= 0.0075
-chemical_burn_protection	    = 0.0075
+burn_protection 				= 0.008
+chemical_burn_protection	    = 0.008
 
 [up_sect_seconf_exo_outfit]
 cost 		= 6000
 value		= +30
 
-chemical_burn_protection 	    = 0.0075
-radiation_protection 		 	= 0.003
+chemical_burn_protection 	    = 0.008
+radiation_protection 		 	= 0.001
 
 [up_sect_thirda_exo_outfit]
 cost 		= 2000
 value		= +2
 
-power_restore_speed				= 0.0011
-power_loss						= -0.03
+power_restore_speed				= 0.0012
+power_loss						= -0.02
 
 [up_sect_thirdc_exo_outfit]
 cost 		= 3500
@@ -115,21 +116,20 @@ immunities_sect_add 			= sect_exo_outfit_immunities_add
 cost 		= 8000
 value		= +3
 
-power_restore_speed				= 0.0026
+power_restore_speed				= 0.003
 power_loss						= -0.1
 
 [up_sect_fourtf_exo_outfit]
 cost 		= 8000
 
 sprint_allowed      			= true
-power_loss						= -0.03
 
 [up_sect_fiftha_exo_outfit]
 cost 		= 1500
 value		= +10
 
 chemical_burn_protection        = 0.005
-radiation_protection 			= 0.0015
+radiation_protection 			= 0.0003
 
 [up_sect_fifthc_exo_outfit]
 cost 		= 3000
@@ -147,7 +147,7 @@ nightvision_sect				= effector_nightvision_2
 cost 		= 6000
 value 		= +30
 
-telepatic_protection  			= 0.02
+telepatic_protection  			= 0.015
 
 
 [up_firsta_exo_outfit]
@@ -215,7 +215,7 @@ scheme_index            = 2, 0
 known                   = 1
 effects                 =
 section                 = up_sect_firste_exo_outfit
-property                = prop_armor
+property                = prop_armor, prop_damage
 
 precondition_functor    = inventory_upgrades.precondition_functor_a
 precondition_parameter  = a & b

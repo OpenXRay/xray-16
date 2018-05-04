@@ -1,34 +1,24 @@
 [up_sect_firsta_colt1911]
-;Скорострельность(1)10%
-;----------------------
 cost		      		= 300
 value					= +10
 
 rpm						= 30
 
 [up_sect_firstc_colt1911]
-;Настильность(2)20%
-;------------------
 cost		      		= 600
 value					= +20
 
 bullet_speed		 	= 50
-fire_dispersion_base	= -0.02 
+fire_dispersion_base	= -0.01
 
 [up_sect_firstd_colt1911]
-;Отдача(2)-20%
-;------------
 cost		      		= 600
 value					= -20
 
-cam_dispersion          = -0.45		;1.2
-cam_dispersion_inc		= -0.45		;1.2
-cam_step_angle_horz		= -0.3		;1.2
-
+cam_dispersion          = -0.25
+cam_step_angle_horz		= -0.12
 
 [up_sect_firste_colt1911]
-;Точность(3)30%
-;---------------
 cost		      		= 1200
 value					= +30
 
@@ -36,89 +26,57 @@ fire_dispersion_base	= -0.09
 fire_dispersion_condition_factor    = -0.5
 
 [up_sect_secona_colt1911]
-;Скорострельность(3)25%
-;----------------------
 cost		      		= 300
 value					= +10
 
 rpm						= 30
 
 [up_sect_seconc_colt1911]
-;Отдача(2)-20%
-;------------
 cost		      		= 600
 value					= -20
 
-cam_dispersion          = -0.45		;1.2
-cam_dispersion_inc		= -0.45		;1.2
-cam_step_angle_horz		= -0.3		;1.2
-
+cam_dispersion          = -0.25
+cam_step_angle_horz		= -0.12
 
 [up_sect_second_colt1911]
-;Надежность(2)15%
-;---------------
 cost		      		= 600
 value					= +15
 
-;увеличение дисперсии в процентах при максимальном износе
-fire_dispersion_condition_factor    = -0.5 ;15
-;увеличение изношености при выстреле очередью
-condition_queue_shot_dec	= -0.0002 ;0.0013
-;увеличение изношености при одиночном выстреле
-condition_shot_dec      	= -0.0002 ;0.0011
-;шанс осечки при изношености больше чем misfireStartCondition
-misfire_start_prob	     	= -0.0015
-;шанс осечки при изношености больше чем misfireEndCondition
-misfire_end_prob	     	= -0.015 ;0.03
+fire_dispersion_condition_factor    = -0.5
+condition_queue_shot_dec	= -0.0001
+condition_shot_dec      	= -0.0001
+misfire_start_prob	     	= -0.001
+misfire_end_prob	     	= -0.01
 
 [up_sect_secone_colt1911]
-;Скорострельность(3)25%
-;----------------------
 cost		      		= 1200
 value					= +25
 
 rpm						= 60
 
 [up_sect_thirda_colt1911]
-;Вес
-;------------------
 cost		      		= 300
-value					= -0.4
+value					= -0.3
 
-inv_weight              = -0.4
-
-crosshair_inertion			= -0.3
-
-PDM_disp_base 				= -0.05
-PDM_disp_vel_factor 		= -0.15
-PDM_disp_accel_factor 		= -0.15
+inv_weight              = -0.3
 
 [up_sect_thirdc_colt1911]
-;Удобство(2)15%
-;--------------
 cost		      		= 600
 value					= +15
 
 crosshair_inertion			= -0.7
 
-PDM_disp_base 				= -0.15
-PDM_disp_vel_factor 		= -0.35
-PDM_disp_accel_factor 		= -0.35
+PDM_disp_vel_factor 		= -0.3
+PDM_disp_accel_factor 		= -0.3
 
 [up_sect_thirdd_colt1911]
-;Отдача(2)-20%
-;------------
 cost		      		= 600
 value					= -20
 
-cam_dispersion          = -0.45		;1.2
-cam_dispersion_inc		= -0.45		;1.2
-cam_step_angle_horz		= -0.3		;1.2
-
+cam_dispersion          = -0.25
+cam_step_angle_horz		= -0.12
 
 [up_sect_fourta_colt1911]
-;Точность(1)10%
-;---------------
 cost		      		= 300
 value					= +10
 
@@ -126,26 +84,17 @@ fire_dispersion_base	= -0.04
 fire_dispersion_condition_factor    = -0.25
 
 [up_sect_fourtc_colt1911]
-;Надежность(2)15%
-;---------------
 cost		      		= 600
 value					= +15
 
-;увеличение дисперсии в процентах при максимальном износе
-fire_dispersion_condition_factor    = -0.5 ;15
-;увеличение изношености при выстреле очередью
-condition_queue_shot_dec	= -0.0002 ;0.0013
-;увеличение изношености при одиночном выстреле
-condition_shot_dec      	= -0.0002 ;0.0011
-;шанс осечки при изношености больше чем misfireStartCondition
+fire_dispersion_condition_factor    = -0.5
+condition_queue_shot_dec	= -0.0001
+condition_shot_dec      	= -0.0001
 misfire_start_prob	     	= -0.001
-;шанс осечки при изношености больше чем misfireEndCondition
-misfire_end_prob	     	= -0.01 ;0.03
+misfire_end_prob	     	= -0.01
 
 [up_sect_fiftha_colt1911]
-;Увеличенный объем магазина
-;---------------
-cost		      		= 1500
+cost		      		= 1000
 value					= +4
 
 ammo_mag_size		 	= +3

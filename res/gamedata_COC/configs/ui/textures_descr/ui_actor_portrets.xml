@@ -81,43 +81,43 @@
 	<texture id="ui_inGame2_zhorik_guard" x="369" y="1392" width="123" height="87"/>
 	
 	<!-- Duty -->
-	<texture id="ui_inGame2_Dolg_0" x="1599" y="174" width="123" height="87"/>
+	<texture id="ui_inGame2_Dolg_0" x="738" y="870" width="123" height="87"/>
 	<texture id="ui_inGame2_Dolg_1" x="369" y="435" width="123" height="87"/>
 	<texture id="ui_inGame2_Dolg_1_mask" x="369" y="609" width="123" height="87"/>
 	<texture id="ui_inGame2_Dolg_2" x="369" y="522" width="123" height="87"/>
+	<texture id="ui_inGame2_Dolg_2_bala" x="1230" y="0" width="123" height="87"/>
+	<texture id="ui_inGame2_Dolg_2_old" x="861" y="522" width="123" height="87"/>
 	<texture id="ui_inGame2_Dolg_3" x="369" y="696" width="123" height="87"/>
 	<texture id="ui_inGame2_Dolg_4" x="369" y="783" width="123" height="87"/>
-	<texture id="ui_inGame2_Dolg_4e" x="1599" y="87" width="123" height="87"/>
-	<texture id="ui_inGame2_duty_2_old" x="861" y="522" width="123" height="87"/>
-	<texture id="ui_inGame2_duty_bala" x="1230" y="0" width="123" height="87"/>
-	<texture id="ui_inGame2_dutygas_2" x="738" y="870" width="123" height="87"/>
+	<texture id="ui_inGame2_Dolg_4a" x="1599" y="87" width="123" height="87"/>
+	<texture id="ui_inGame2_Dolg_r" x="1599" y="174" width="123" height="87"/>
 
 	<!-- Freedom -->
+	<texture id="ui_inGame2_Freedom_0" x="738" y="783" width="123" height="87"/>
+	<texture id="ui_inGame2_Freedom_0a" x="1599" y="261" width="123" height="87"/>
 	<texture id="ui_inGame2_Freedom_1" x="492" y="0" width="123" height="87"/>
 	<texture id="ui_inGame2_Freedom_2" x="492" y="87" width="123" height="87"/>
+	<texture id="ui_inGame2_Freedom_2_bala" x="1230" y="87" width="123" height="87"/>
 	<texture id="ui_inGame2_Freedom_2_mask" x="492" y="174" width="123" height="87"/>
+	<texture id="ui_inGame2_Freedom_2_old" x="861" y="609" width="123" height="87"/>
 	<texture id="ui_inGame2_Freedom_3" x="492" y="261" width="123" height="87"/>
 	<texture id="ui_inGame2_Freedom_4" x="492" y="348" width="123" height="87"/>
-	<texture id="ui_inGame2_Freedom_4_alt" x="1599" y="609" width="123" height="87"/>
+	<texture id="ui_inGame2_Freedom_4a" x="1599" y="609" width="123" height="87"/>
 	<texture id="ui_inGame2_Freedom_5" x="1599" y="522" width="123" height="87"/>
-	<texture id="ui_inGame2_Freedom_5_alt" x="1599" y="435" width="123" height="87"/>
-	<texture id="ui_inGame2_freedom_0" x="738" y="783" width="123" height="87"/>
-	<texture id="ui_inGame2_freedom_0g" x="1599" y="261" width="123" height="87"/>
-	<texture id="ui_inGame2_freedom_2_old" x="861" y="609" width="123" height="87"/>
-	<texture id="ui_inGame2_freedom_bala" x="1230" y="87" width="123" height="87"/>
-	<texture id="ui_inGame2_freedom_nov" x="1599" y="348" width="123" height="87"/>
+	<texture id="ui_inGame2_Freedom_5a" x="1599" y="435" width="123" height="87"/>
+	<texture id="ui_inGame2_Freedom_r" x="1599" y="348" width="123" height="87"/>
 	
 	<!-- Army -->
 	<texture id="ui_inGame2_Soldier_1" x="615" y="522" width="123" height="87"/>
+	<texture id="ui_inGame2_Soldier_1_camo" x="1722" y="174" width="123" height="87"/>
+	<texture id="ui_inGame2_Soldier_1_camo_paint" x="1722" y="87" width="123" height="87"/>
 	<texture id="ui_inGame2_Soldier_2" x="615" y="609" width="123" height="87"/>
 	<texture id="ui_inGame2_Soldier_3" x="615" y="696" width="123" height="87"/>
+	<texture id="ui_inGame2_Soldier_3_beret" x="1107" y="435" width="123" height="87"/>
+	<texture id="ui_inGame2_Soldier_3_beret_blue" x="1722" y="435" width="123" height="87"/>
+	<texture id="ui_inGame2_Soldier_3_beret_blue_camo" x="1722" y="348" width="123" height="87"/>
+	<texture id="ui_inGame2_Soldier_3_beret_camo" x="1722" y="261" width="123" height="87"/>
 	<texture id="ui_inGame2_Soldier_4" x="615" y="783" width="123" height="87"/>
-	<texture id="ui_inGame2_soldier_1_camo" x="1722" y="174" width="123" height="87"/>
-	<texture id="ui_inGame2_soldier_1_camo_paint" x="1722" y="87" width="123" height="87"/>
-	<texture id="ui_inGame2_soldier_3_beret" x="1107" y="435" width="123" height="87"/>
-	<texture id="ui_inGame2_soldier_3_beret_blue" x="1722" y="435" width="123" height="87"/>
-	<texture id="ui_inGame2_soldier_3_beret_blue_camo" x="1722" y="348" width="123" height="87"/>
-	<texture id="ui_inGame2_soldier_3_beret_camo" x="1722" y="261" width="123" height="87"/>
 	<texture id="ui_inGame2_soldier_5" x="1107" y="261" width="123" height="87"/>
 	<texture id="ui_inGame2_soldier_exo" x="1722" y="0" width="123" height="87"/>
 	<texture id="ui_inGame2_soldier_sk9m" x="1845" y="522" width="123" height="87"/>
@@ -128,9 +128,13 @@
 	<texture id="ui_inGame2_Zombied_1w" x="1845" y="348" width="123" height="87"/>
 	<texture id="ui_inGame2_Zombied_1w2" x="1845" y="435" width="123" height="87"/>
 	<texture id="ui_inGame2_Zombied_2" x="738" y="0" width="123" height="87"/>
+	<texture id="ui_inGame2_Zombied_2_bandit" x="1107" y="783" width="123" height="87"/>
+	<texture id="ui_inGame2_Zombied_2_bandit2" x="1845" y="174" width="123" height="87"/>
 	<texture id="ui_inGame2_Zombied_2_duty" x="984" y="783" width="123" height="87"/>
 	<texture id="ui_inGame2_Zombied_2_freedom" x="984" y="696" width="123" height="87"/>
 	<texture id="ui_inGame2_Zombied_2_loner" x="1845" y="0" width="123" height="87"/>
+	<texture id="ui_inGame2_Zombied_2_merc" x="1107" y="870" width="123" height="87"/>
+	<texture id="ui_inGame2_Zombied_2_merc2" x="1845" y="261" width="123" height="87"/>
 	<texture id="ui_inGame2_Zombied_3" x="738" y="87" width="123" height="87"/>
 	<texture id="ui_inGame2_Zombied_3_Mask" x="1845" y="87" width="123" height="87"/>
 	<texture id="ui_inGame2_Zombied_3_freedom" x="984" y="870" width="123" height="87"/>
@@ -138,14 +142,8 @@
 	<texture id="ui_inGame2_Zombied_4_duty" x="1107" y="0" width="123" height="87"/>
 	<texture id="ui_inGame2_Zombied_4_freedom" x="1107" y="87" width="123" height="87"/>
 	<texture id="ui_inGame2_Zombied_4_merc" x="1107" y="348" width="123" height="87"/>
-	<texture id="ui_inGame2_Zombied_5_bandit" x="1107" y="783" width="123" height="87"/>
-	<texture id="ui_inGame2_Zombied_5_bandit2" x="1845" y="174" width="123" height="87"/>
-	<texture id="ui_inGame2_Zombied_5_merc" x="1107" y="870" width="123" height="87"/>
-	<texture id="ui_inGame2_Zombied_5_merc2" x="1845" y="261" width="123" height="87"/>
 	
 	<!-- Bandit -->
-	<texture id="ui_inGame2_band_2_mask" x="738" y="609" width="123" height="87"/>
-	<texture id="ui_inGame2_bandit2a_old" x="861" y="696" width="123" height="87"/>
 	<texture id="ui_inGame2_bandit_1" x="369" y="0" width="123" height="87"/>
 	<texture id="ui_inGame2_bandit_1_gas" x="1107" y="609" width="123" height="87"/>
 	<texture id="ui_inGame2_bandit_1_mask" x="861" y="174" width="123" height="87"/>
@@ -154,40 +152,41 @@
 	<texture id="ui_inGame2_bandit_1b_gas" x="1476" y="783" width="123" height="87"/>
 	<texture id="ui_inGame2_bandit_2" x="369" y="87" width="123" height="87"/>
 	<texture id="ui_inGame2_bandit_2_mask" x="861" y="0" width="123" height="87"/>
-	<texture id="ui_inGame2_bandit_2a" x="861" y="348" width="123" height="87"/>
-	<texture id="ui_inGame2_bandit_2a_gp5" x="984" y="522" width="123" height="87"/>
-	<texture id="ui_inGame2_bandit_2a_merc" x="984" y="261" width="123" height="87"/>
+	<texture id="ui_inGame2_bandit_2_merc" x="738" y="609" width="123" height="87"/>
+	<texture id="ui_inGame2_bandit_2s" x="861" y="348" width="123" height="87"/>
+	<texture id="ui_inGame2_bandit_2s_gp5" x="984" y="522" width="123" height="87"/>
+	<texture id="ui_inGame2_bandit_2s_merc" x="984" y="261" width="123" height="87"/>
+	<texture id="ui_inGame2_bandit_2s_old" x="861" y="696" width="123" height="87"/>
 	<texture id="ui_inGame2_bandit_3" x="369" y="174" width="123" height="87"/>
 	<texture id="ui_inGame2_bandit_3_mask" x="369" y="261" width="123" height="87"/>
 	<texture id="ui_inGame2_bandit_4" x="369" y="348" width="123" height="87"/>
 	<texture id="ui_inGame2_bandit_4abc" x="1599" y="0" width="123" height="87"/>
-	<texture id="ui_inGame2_bandit_5" x="738" y="522" width="123" height="87"/>
 	<texture id="ui_inGame2_bandit_5" x="738" y="522" width="123" height="87"/>
 	<texture id="ui_inGame2_bandit_6d" x="1353" y="870" width="123" height="87"/>
 	<texture id="ui_inGame2_bandit_6l" x="1230" y="870" width="123" height="87"/>
 	<texture id="ui_inGame2_bandit_a" x="984" y="87" width="123" height="87"/>
 	<texture id="ui_inGame2_bandit_a2" x="1476" y="870" width="123" height="87"/>
 	<texture id="ui_inGame2_bandit_exo" x="1476" y="522" width="123" height="87"/>
-	<texture id="ui_inGame2_bandit_spec" x="1845" y="609" width="123" height="87"/>
+	<texture id="ui_inGame2_bandit_mil" x="1845" y="609" width="123" height="87"/>
 	
 	<!-- Clear Sky -->
-	<texture id="ui_inGame2_csky_1" x="1230" y="696" width="123" height="87"/>
-	<texture id="ui_inGame2_csky_1_1" x="1476" y="348" width="123" height="87"/>
-	<texture id="ui_inGame2_csky_1_2" x="1476" y="0" width="123" height="87"/>
-	<texture id="ui_inGame2_csky_1_gas" x="1353" y="0" width="123" height="87"/>
-	<texture id="ui_inGame2_csky_2" x="1353" y="87" width="123" height="87"/>
-	<texture id="ui_inGame2_csky_2_gas" x="1476" y="435" width="123" height="87"/>
+	<texture id="ui_inGame2_csky_1" x="1476" y="348" width="123" height="87"/>
+	<texture id="ui_inGame2_csky_1a" x="1476" y="0" width="123" height="87"/>
+	<texture id="ui_inGame2_csky_2" x="1353" y="522" width="123" height="87"/>
+	<texture id="ui_inGame2_csky_2a" x="1476" y="87" width="123" height="87"/>
 	<texture id="ui_inGame2_csky_3" x="1353" y="174" width="123" height="87"/>
-	<texture id="ui_inGame2_csky_4" x="1353" y="348" width="123" height="87"/>
-	<texture id="ui_inGame2_csky_5" x="1353" y="522" width="123" height="87"/>
-	<texture id="ui_inGame2_csky_5_2" x="1476" y="87" width="123" height="87"/>
 	<texture id="ui_inGame2_csky_exo" x="1353" y="696" width="123" height="87"/>
-	<texture id="ui_inGame2_csky_gp5" x="1353" y="435" width="123" height="87"/>
-	<texture id="ui_inGame2_csky_mask" x="1476" y="261" width="123" height="87"/>
-	<texture id="ui_inGame2_csky_merc" x="1353" y="609" width="123" height="87"/>
 	<texture id="ui_inGame2_csky_nauchniy" x="1353" y="261" width="123" height="87"/>
-	<texture id="ui_inGame2_csky_oldgas" x="1353" y="783" width="123" height="87"/>
-	<texture id="ui_inGame2_csky_sun" x="1476" y="174" width="123" height="87"/>
+	<texture id="ui_inGame2_csky_r" x="1230" y="696" width="123" height="87"/>
+	<texture id="ui_inGame2_csky_r_gas" x="1353" y="0" width="123" height="87"/>
+	<texture id="ui_inGame2_csky_r_mask" x="1353" y="87" width="123" height="87"/>
+	<texture id="ui_inGame2_csky_r2" x="1353" y="348" width="123" height="87"/>
+	<texture id="ui_inGame2_csky_s" x="1476" y="435" width="123" height="87"/>
+	<texture id="ui_inGame2_csky_s_bala" x="1476" y="261" width="123" height="87"/>
+	<texture id="ui_inGame2_csky_s_gp5" x="1353" y="435" width="123" height="87"/>
+	<texture id="ui_inGame2_csky_s_mask" x="1476" y="174" width="123" height="87"/>
+	<texture id="ui_inGame2_csky_s_merc" x="1353" y="609" width="123" height="87"/>
+	<texture id="ui_inGame2_csky_s_old" x="1353" y="783" width="123" height="87"/>
 	
 	<!-- Ecologist -->
 	<texture id="ui_inGame2_ecolog_blue" x="1230" y="348" width="123" height="87"/>
@@ -200,25 +199,25 @@
 	<texture id="ui_inGame2_ecolog_yellow" x="1230" y="609" width="123" height="87"/>
 	
 	<!-- Mercenary -->
+   	<texture id="ui_inGame2_merc_1" x="738" y="348" width="123" height="87"/>
 	<texture id="ui_inGame2_merc_2" x="492" y="435" width="123" height="87"/>
+	<texture id="ui_inGame2_merc_2_bala" x="861" y="87" width="123" height="87"/>
+	<texture id="ui_inGame2_merc_3" x="1599" y="696" width="123" height="87"/>
 	<texture id="ui_inGame2_merc_4" x="492" y="522" width="123" height="87"/>
-	<texture id="ui_inGame2_merc_4a" x="1599" y="696" width="123" height="87"/>
-	<texture id="ui_inGame2_merc_sun1" x="861" y="261" width="123" height="87"/>
-	<texture id="ui_inGame2_merc_sun1_merc" x="984" y="348" width="123" height="87"/>
-	<texture id="ui_inGame2_mercen_2_mask" x="861" y="87" width="123" height="87"/>
-	<texture id="ui_inGame2_mercsun_old" x="861" y="870" width="123" height="87"/>
-   	<texture id="ui_inGame2_mercenary3" x="738" y="348" width="123" height="87"/>
+	<texture id="ui_inGame2_merc_s" x="861" y="261" width="123" height="87"/>
+	<texture id="ui_inGame2_merc_s_merc" x="984" y="348" width="123" height="87"/>
+	<texture id="ui_inGame2_merc_s_old" x="861" y="870" width="123" height="87"/>
 	
 	<!-- Monolith -->
-	<texture id="ui_inGame2_mono_old" x="861" y="783" width="123" height="87"/>
+	<texture id="ui_inGame2_monolit_0" x="1107" y="174" width="123" height="87"/>
 	<texture id="ui_inGame2_monolit_1" x="492" y="609" width="123" height="87"/>
 	<texture id="ui_inGame2_monolit_2" x="492" y="696" width="123" height="87"/>
+	<texture id="ui_inGame2_monolit_2_gp5" x="984" y="609" width="123" height="87"/>
+	<texture id="ui_inGame2_monolit_2_old" x="861" y="783" width="123" height="87"/>
 	<texture id="ui_inGame2_monolit_3" x="492" y="783" width="123" height="87"/>
-	<texture id="ui_inGame2_monolit_4" x="492" y="870" width="123" height="87"/>
-	<texture id="ui_inGame2_monolith1gas" x="1107" y="174" width="123" height="87"/>
-	<texture id="ui_inGame2_monolith2_gp5" x="984" y="609" width="123" height="87"/>
-	<texture id="ui_inGame2_monolit_4a" x="1599" y="783" width="123" height="87"/>
 	<texture id="ui_inGame2_monolit_3a" x="1599" y="870" width="123" height="87"/>
+	<texture id="ui_inGame2_monolit_4" x="492" y="870" width="123" height="87"/>
+	<texture id="ui_inGame2_monolit_4a" x="1599" y="783" width="123" height="87"/>
 	
 	<!-- Loner -->
 	<texture id="ui_inGame2_neutral_0" x="738" y="261" width="123" height="87"/>
@@ -229,12 +228,12 @@
 	<texture id="ui_inGame2_neutral_1w_gas" x="1722" y="609" width="123" height="87"/>
 	<texture id="ui_inGame2_neutral_1w_mask" x="1722" y="696" width="123" height="87"/>
 	<texture id="ui_inGame2_neutral_2" x="615" y="87" width="123" height="87"/>
+	<texture id="ui_inGame2_neutral_2_bala" x="738" y="435" width="123" height="87"/>
 	<texture id="ui_inGame2_neutral_2_gp5" x="984" y="435" width="123" height="87"/>
 	<texture id="ui_inGame2_neutral_2_mask" x="615" y="174" width="123" height="87"/>
 	<texture id="ui_inGame2_neutral_2_merc" x="984" y="174" width="123" height="87"/>
 	<texture id="ui_inGame2_neutral_2_old" x="861" y="435" width="123" height="87"/>
 	<texture id="ui_inGame2_neutral_2_vest" x="1107" y="696" width="123" height="87"/>
-	<texture id="ui_inGame2_neutral_2mask1" x="738" y="435" width="123" height="87"/>
 	<texture id="ui_inGame2_neutral_3" x="615" y="261" width="123" height="87"/>
 	<texture id="ui_inGame2_neutral_4" x="615" y="348" width="123" height="87"/>
 	<texture id="ui_inGame2_neutral_a" x="984" y="0" width="123" height="87"/>

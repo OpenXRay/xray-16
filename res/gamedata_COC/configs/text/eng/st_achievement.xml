@@ -18,7 +18,7 @@
 		<text>Radiotherapy</text>
 	</string>
 	<string id="st_achievement_2_hint">
-		<text>You have a chance of surviving emissions and psi-vortexes.</text>
+		<text>You have a chance of surviving emissions and psi-vortices.</text>
 	</string>
 	<string id="st_achievement_2_descr">
 		<text>Strangely, you no longer feel haunted by the groans of an approaching emission. You believe there to be a chance they may be more forgiving towards you.</text>
@@ -31,7 +31,7 @@
 		<text>Infopreneur</text>
 	</string>
 	<string id="st_achievement_3_hint">
-		<text>Traders will now pay you a small additional bonus for each PDA delivered to them.</text>
+		<text>Brokers will now pay you a small additional bonus for future PDA delivered to them.</text>
 	</string>
 	<string id="st_achievement_3_descr">
 		<text>Whether selling or buying, to many people information is just as valuable as artefacts. Word has spread that you are a reliable source of such a commodity.</text>
@@ -83,10 +83,10 @@
 		<text>Mechanized Warfare</text>
 	</string>
 	<string id="st_achievement_7_hint">
-		<text>You are able to fully upgrade equipment at a technician other than Forester.</text>
+		<text>Gunsmith and sewing kits are more effective.</text>
 	</string>
 	<string id="st_achievement_7_descr">
-		<text>Forester's services have never been cheap, but at least now he has some competition. That mechanic should make good use of those tools you brought him.</text>
+		<text>Forester's services have never been cheap, but at least now he has some competition. That technician should make good use of those tools you brought him.</text>
 	</string>
 	<string id="st_achievement_7_unlock">
 		<text>You have unlocked the "Mechanized Warfare" achievement.</text>
@@ -125,7 +125,7 @@
 		<text>All available achievements have been unlocked.</text>
 	</string>
 	<string id="st_achievement_10_descr">
-		<text>All there is to achieve has been achieved. You know the Zone better than the Zone knows itself. And despite all odds being stacked against you and every threat you've faced - you still remain undefeated.</text>
+		<text>All there is to achieve has been achieved. You know the Zone better than the Zone knows itself. And despite all odds being stacked against you, and every threat you've faced - you still remain undefeated.</text>
 	</string>
 	<string id="st_achievement_10_unlock">
 		<text>You have unlocked the "Completionist" achievement.</text>
@@ -148,7 +148,7 @@
 		<text>Down to Earth</text>
 	</string>
 	<string id="st_achievement_12_hint">
-		<text>Mi-2 helicopters will replace destroyed Mi-24s.</text>
+		<text>Mi-2 helicopters will appear in place of Mi-24s.</text>
 	</string>
 	<string id="st_achievement_12_descr">
 		<text>The higher they fly the harder they fall. Not willing to waste any more expensive equipment, the Zone's helicopters now seem to be of a much weaker variety. But are no less tempting to destroy.</text>
@@ -187,10 +187,10 @@
 		<text>Bookworm Food</text>
 	</string>
 	<string id="st_achievement_15_hint">
-		<text>Add text to this later - I'm unsure what the reward should be.</text>
+		<text>Memory sticks will be replaced by rare PDAs when spawned.</text>
 	</string>
 	<string id="st_achievement_15_descr">
-		<text>Add text to this later - achievement is unlocked for unlocking all encyclopedia articles.</text>
+		<text>Through your own endeavours or by reading about those of others, you have come to learn a lot about the Zone and its many inhabitants. Perhaps you should consider sharing some of this knowledge?</text>
 	</string>
 	<string id="st_achievement_15_unlock">
 		<text>You have unlocked the "Bookworm Food" achievement.</text>

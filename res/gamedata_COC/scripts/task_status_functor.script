@@ -11,6 +11,97 @@ function check_smart_under_faction_control(tsk,task_id)
 	if not (db.actor) then 
 		return 
 	end
+	
+	local smart_id = utils.load_var(db.actor,task_id.."_id")
+	if not (smart_id) then -- error
+		printf("check_smart_under_faction_control no smart id for task %s",task_id)
+		return "fail"
+	end 
+	
+	local smrt = SIMBOARD.smarts[smart_id]
+	local smart = smrt and smrt.smrt
+	if not (smart) then
+		return
+	end
+	
+	--in case sim_avail is set true during the player's tsk
+	-- with simulation_objects.available_by_id[smart.id] nil means unprocess, false is absolutely not avail
+	if (simulation_objects.available_by_id[smart.id] == nil) then 
+		return -- still needs processing
+	elseif (simulation_objects.available_by_id[smart.id] == false) then
+		printf("check_smart_under_faction_control task failed because smart no longer available",task_id)
+		return "fail"
+	end
+	
+	local tg = time_global()
+	if (tsk.__check_smart_time and tg < tsk.__check_smart_time) then 
+		return
+	end
+	tsk.__check_smart_time = tg+2000
+	
+	local faction_list = alun_utils.parse_list(task_manager.task_ini,task_id,"status_functor_params")
+	
+	utils.save_var(db.actor,task_id.."_target_id",nil)
+	
+	for id,v in pairs(SIMBOARD.squads) do
+		local squad = alife_object(id)
+		if (squad) and simulation_objects.is_on_the_same_level(squad, smart) then
+			if not (squad.first_update) then 
+				return -- not all squads are loaded yet!
+			end
+			if not (squad:get_script_target()) and (squad.current_target_id and squad.current_target_id == smart.id and squad.current_action == 1) then
+				for i=1,#faction_list do
+					if (faction_list[i] == "monster" and is_squad_monster[squad.player_id]) or (squad.player_id == faction_list[i]) then
+						utils.save_var(db.actor,task_id.."_target_id",squad.id)
+						squad.stay_time = game.get_game_time() -- reset gametime so they don't leave
+						squad.task_target_id = smart.id -- stay forever for task
+						squad.force_online = true
+						
+						if (is_squad_monster[squad.player_id]) then
+							for k in squad:squad_members() do 
+								local obj = db.storage[k.id] and db.storage[k.id].object
+								if (obj) then
+									local old_rank = utils.load_var(db.actor,task_id.."_target_id_rank",0)
+									local rank = obj:character_rank()
+									if (rank > old_rank) then 
+										utils.save_var(db.actor,task_id.."_target_id_rank",rank)
+									end
+								end
+							end
+						end
+						
+						--printf("task_id = %s squad_id = %s",task_id,squad.id)
+						return
+					end
+				end
+			end
+		end
+	end
+	
+	--if not (smart.online) then 
+	--	return "fail"
+	--end
+
+	--[[
+	local last_target_id = utils.load_var(db.actor,task_id.."_target_id")
+	if (last_target_id and axr_task_manager.actor_tagged_squad_by_id[last_target_id] ~= true) then
+		return "fail"
+	end
+	--]]
+	
+	if (smart.faction_controlled) then
+		smart.faction = character_community(db.actor):sub(7)
+	end
+	
+	return "complete"	
+end
+
+-- checks smart from pstor variable
+function check_smart_under_faction_control_enemy(tsk,task_id)
+	--printf("task_id = %s",task_id)
+	if not (db.actor) then 
+		return 
+	end
 	local smart_id = utils.load_var(db.actor,task_id.."_id")
 	if not (smart_id) then 
 		return "fail"
@@ -32,13 +123,20 @@ function check_smart_under_faction_control(tsk,task_id)
 		return "fail"
 	end
 	
-	local faction_list = alun_utils.parse_list(task_manager.task_ini,task_id,"status_functor_params")
-	
 	local tg = time_global()
 	if (tsk.__check_smart_time and tg < tsk.__check_smart_time) then 
 		return
 	end
 	tsk.__check_smart_time = tg+3000
+	
+	local my_faction = task_manager.task_ini:r_string_ex(task_id,"status_functor_params") or "stalker"
+	
+	local com_list = alun_utils.get_communities_list(true)
+	for comm,v in pairs(com_list) do
+		if not (game_relations.is_factions_enemies(my_faction,comm)) then
+			com_list[comm] = nil
+		end
+	end
 	
 	utils.save_var(db.actor,task_id.."_target_id",nil)
 	
@@ -49,10 +147,11 @@ function check_smart_under_faction_control(tsk,task_id)
 				return -- not all squads are loaded yet!
 			end
 			if not (squad:get_script_target()) and (squad.current_target_id and squad.current_target_id == smart.id and squad.current_action == 1) then
-				for i=1,#faction_list do
-					if (faction_list[i] == "monster" and is_squad_monster[squad.player_id]) or (squad.player_id == faction_list[i]) then
+				for comm,vv in pairs(com_list) do
+					if (comm ~= "monster" and squad.player_id == comm) then
 						utils.save_var(db.actor,task_id.."_target_id",squad.id)
 						squad.stay_time = game.get_game_time() -- reset gametime so they don't leave
+						squad.task_target_id = smart.id -- stay forever for task
 						squad.force_online = true
 						--printf("task_id = %s squad_id = %s",task_id,squad.id)
 						return
@@ -120,6 +219,7 @@ function specific_check_smart_under_faction_control(tsk,task_id)
 					if (p[i] == "monster" and is_squad_monster[squad.player_id]) or (squad.player_id == p[i]) then
 						utils.save_var(db.actor,task_id.."_target_id",squad.id)
 						squad.stay_time = game.get_game_time() -- reset gametime so they don't leave
+						squad.task_target_id = smart.id -- stay forever for task
 						squad.force_online = true
 						--printf("task_id = %s squad_id = %s",task_id,squad.id)
 						return
@@ -173,6 +273,21 @@ function check_smart_under_faction_control_staged(tsk,task_id)
 	end
 end
 
+function check_smart_under_faction_control_staged_enemy(tsk,task_id)
+	if not (db.actor) then 
+		return 
+	end
+	if (tsk.stage == 1) then -- already completed
+		return 
+	end
+	local status = check_smart_under_faction_control_enemy(tsk,task_id)
+	if (status == "fail") then 
+		return "fail"
+	elseif (status == "complete" and tsk.stage == 0) then
+		tsk.stage = 1
+	end
+end
+
 function check_specific_smart_under_faction_control_staged(tsk,task_id)
 	if not (db.actor) then 
 		return 
@@ -205,15 +320,17 @@ function hostage_task(tsk,task_id)
 			tsk.stage = 1
 		end
 	elseif (tsk.stage == 1) then
-		if not (axr_task_manager.is_task_giver_valid(tsk) and db.actor:is_talking()) then -- is_talking necessary or crash
-			local hud = get_hud()
-			if (hud) then
-				hud:HideActorMenu()
+		if not (axr_task_manager.is_task_giver_valid(tsk)) then 
+			if not (db.actor:is_talking()) then -- is_talking necessary or crash
+				local hud = get_hud()
+				if (hud) then
+					hud:HideActorMenu()
+				end
+				return "complete" -- complete task even though giver is dead/missing/deleted
 			end
-			return "complete" -- complete task even though giver is dead/missing/deleted
 		end
 	end
-end 
+end
 
 function bounty_task(tsk,task_id)
 	if not (axr_task_manager.is_task_giver_valid(tsk)) then 

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+
+<!-- ORDERS -->
+	<string id="st_dm_orders_pickup_start">
+		<text>Заказ выполнен. %s у меня, можно забирать.</text>
+	</string>
+	<string id="st_dm_orders_query">
+		<text>Есть что-нибудь на продажу?</text>
+	</string>
+	<string id="st_dm_orders_query_pickup">
+		<text>Хочу забрать заказ.</text>
+	</string>
+	<string id="st_dm_orders_reply_1">
+		<text>Смешной вопрос. У меня есть связи, через которые я могу достать кое-что поистине уникальное. Интересует?</text>
+	</string>
+	<string id="st_dm_orders_reply_2">
+		<text>Есть уникальные изделия: редкие модели, прототипы, сделанные на заказ образцы... Плюс элитное снаряжение - последние модификации защитных и боевых костюмов. Каждый товар я проверяю лично, так что качество гарантировано.</text>
+	</string>
+	<string id="st_dm_orders_none">
+		<text>Сейчас это мне не интересно.</text>
+	</string>
+	<string id="st_dm_orders_goodbye">
+		<text>Пока.</text>
+	</string>
+	<string id="st_dm_orders_place_price_accept">
+		<text>Я хочу сделать заказ. %s.</text>
+	</string>
+	<string id="st_dm_orders_place_no_money">
+		<text>У меня нет денег.</text>
+	</string>
+	<string id="st_dm_orders_place_no_money_reply">
+		<text>Заходи, как разбогатеешь.</text>
+	</string>
+	<string id="st_dm_orders_place_change">
+		<text>Я изменил свое решение.</text>
+	</string>
+	<string id="st_dm_orders_cancel">
+		<text>Я решил отменить свой заказ.</text>
+	</string>
+	<string id="st_dm_orders_cancel_reply">
+		<text>Это всё прекрасно, но предоплата останется у меня, это понятно? Я также скажу, что отказ, вероятно, повредит твоей репутации.</text>
+	</string>
+	<string id="st_dm_orders_cancel_reply_yes">
+		<text>Всё равно, отменяю заказ.</text>
+	</string>
+	<string id="st_dm_orders_cancel_reply_yes_done">
+		<text>Готово.</text>
+	</string>
+	<string id="st_dm_orders_cancel_reply_no">
+		<text>Я, пожалуй, не буду отменять заказ.</text>
+	</string>
+	<string id="st_dm_orders_cancel_reply_no_done">
+		<text>Отлично.</text>
+	</string>
+	<string id="st_dm_orders_place_change_reply">
+		<text>Хорошо. Если решишь сделать заказ, я всегда здесь.</text>
+	</string>
+	<string id="st_dm_orders_place_pay">
+		<text>Хорошо.</text>
+	</string>
+	<string id="st_dm_orders_place_pay_reply">
+		<text>Я сообщу, как только %s будет у меня.</text>
+	</string>
+	<string id="st_dm_orders_order_processing">
+		<text>Ты уже делал заказ. %s будет здесь в ближайшее время.</text>
+	</string>
+	<string id="st_dm_orders_place_finish">
+		<text>Отлично. Я зайду позже.</text>
+	</string>
+
+	<string id="st_dm_orders_time_query">
+		<text>Как долго ждать заказ?</text>
+	</string>
+	<string id="st_dm_orders_time_query_reply">
+		<text>Зависит от сложности. Обычно это занимает от половины дня до суток.</text>
+	</string>
+	<string id="st_dm_orders_time_query_goodbye">
+		<text>Ладно.</text>
+	</string>
+	
+	<string id="st_dm_orders_pickup_existing">
+		<text>%s здесь. Итак, ты решил забрать?</text>
+	</string>
+	<string id="st_dm_orders_pickup_existing_yes">
+		<text>Да, вот деньги.</text>
+	</string>
+	<string id="st_dm_orders_pickup_existing_no">
+		<text>Нет, отменяю заказ.</text>
+	</string>
+	
+	<string id="st_dm_orders_pickup_ponder">
+		<text>Извини, мне нужно подумать.</text>
+	</string>
+	<string id="st_dm_orders_pickup_ponder_reply">
+		<text>Возвращайся, когда будешь готов.</text>
+	</string>
+	
+	<string id="st_dm_orders_pickup_price_accept">
+		<text>Хорошо.</text>
+	</string>
+	<string id="st_dm_orders_pickup_finish">
+		<text>С тобой приятно иметь дело. Заглядывай ещё, у меня есть, что предложить.</text>
+	</string>
+	<string id="st_dm_orders_no_money">
+		<text>У меня не хватает денег.</text>
+	</string>
+	<string id="st_dm_orders_pickup_hold">
+		<text>Хорошо, я придержу заказ. Надеюсь, ты сумеешь достать деньги.</text>
+	</string>
+	<string id="st_dm_orders_pickup_refuse_warning">
+		<text>Уверен? Ведь в этом случае, предоплата останется у меня.</text>
+	</string>
+	<string id="st_dm_orders_pickup_refuse_penalty">
+		<text>Тем не менее, я не буду забирать заказ.</text>
+	</string>
+	<string id="st_dm_orders_pickup_refuse_penalty_reply">
+		<text>Тебе виднее.</text>
+	</string>
+	<string id="st_dm_orders_pickup_refuse_wait">
+		<text>Я подумаю.</text>
+	</string>
+	<string id="st_dm_orders_pickup_refuse_wait_rely">
+		<text>Как хочешь, конечно. Товар я пока придержу.</text>
+	</string>
+	<string id="st_dm_orders_pickup">
+		<text>Готово. %s у меня. С тебя - %s рублей.</text>
+	</string>
+	<string id="st_dm_orders_pickup_ready">
+		<text>Заказ готов. Можно забирать товар.</text>
+	</string>
+	<string id="st_dm_orders_category_selected">
+		<text>Конечно. Это будет стоить %s рублей, из которых %s я возьму в качестве задатка.</text>
+	</string>
+
+	<!-- Nimble -->
+	<string id="st_esc_2_12_stalker_nimble_category_1_title">
+		<text>Пистолет</text>
+	</string>
+	<string id="st_esc_2_12_stalker_nimble_category_2_title">
+		<text>Оружие ближнего боя</text>
+	</string>
+	<string id="st_esc_2_12_stalker_nimble_category_3_title">
+		<text>Штурмовое оружие</text>
+	</string>
+	<string id="st_esc_2_12_stalker_nimble_category_4_title">
+		<text>Снайперское оружие</text>
+	</string>
+	<string id="st_esc_2_12_stalker_nimble_category_5_title">
+		<text>Бронезащита</text>
+	</string>
+	<string id="st_esc_2_12_stalker_nimble_category_6_title">
+		<text>Научный костюм</text>
+	</string>
+	<string id="st_esc_2_12_stalker_nimble_category_7_title">
+		<text>Экзоскелет</text>
+	</string>
+	<string id="st_esc_2_12_stalker_nimble_category_8_title">
+		<text>Военный бронекостюм</text>
+	</string>
+</string_table>

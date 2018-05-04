@@ -420,7 +420,7 @@ function action_stalker_panic:execute()
 				end
 			end
 			
-			state_mgr.set_state(npc,new_state,nil,nil,{look_position = ene_pos},{fast_set = true})
+			state_mgr.set_state(npc,new_state,nil,nil,{look_position = ene_pos},state_mgr.fast_set_true)
 	
 			self.st.__keep_point_until = self.st.__keep_point_until or tg + math.random(3000,8000)
 			if (self.st.__keep_point_until and tg < self.st.__keep_point_until) then
@@ -441,7 +441,7 @@ function action_stalker_panic:execute()
 				end
 			end
 			
-			state_mgr.set_state(npc,new_state,nil,nil,{look_position = ene_pos},{fast_set = true})
+			state_mgr.set_state(npc,new_state,nil,nil,{look_position = ene_pos},state_mgr.fast_set_true)
 
 			lmove(npc,self.st.vid,self.st)
 			return
@@ -510,7 +510,7 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 
 	local manager = npc:motivation_action_manager()
 	local action
-	local p = {xr_danger.actid, stalker_ids.action_combat_planner, stalker_ids.action_danger_planner, xr_actions_id.state_mgr + 2, xr_actions_id.alife}
+	local p = {xr_danger.actid, stalker_ids.action_combat_planner, stalker_ids.action_danger_planner, xr_actions_id.state_mgr + 1, xr_actions_id.state_mgr + 2, xr_actions_id.alife}
 	
 	for i=1,#p do
 		action = manager:action(p[i])

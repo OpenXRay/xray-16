@@ -4795,4 +4795,78 @@
             </phrase>
         </phrase_list>
     </dialog>
+	
+	<!-- robbery -->
+    <dialog id="zat_b52_robbery_port_bandits_1">
+        <phrase_list>
+            <phrase id="1">
+                <text>zat_b52_robbery_port_bandits_1_1</text>
+                <next>11</next>
+            </phrase>
+            <phrase id="11">
+                <text>zat_b52_robbery_port_bandits_1_11</text>
+                <next>111</next>
+            </phrase>
+            <phrase id="1111111">
+                <text>zat_b52_robbery_port_bandits_1_1111111</text>
+                <action>dialogs.break_dialog</action>
+                <is_final>1</is_final>
+                <give_info>zat_b52_robbery_done</give_info>
+                <give_info>zat_b52_snag_jupiter</give_info>
+            </phrase>
+            <phrase id="0">
+                <text>zat_b52_robbery_port_bandits_1_0</text>
+                <give_info>zat_b52_meet_port_bandits</give_info>
+                <next>1</next>
+                <next>2</next>
+            </phrase>
+            <phrase id="2">
+                <text>zat_b52_robbery_port_bandits_1_2</text>
+                <next>21</next>
+            </phrase>
+            <phrase id="21">
+                <text>zat_b52_robbery_port_bandits_1_21</text>
+                <next>11111</next>
+                <next>11112</next>
+            </phrase>
+            <phrase id="1111211">
+                <text>zat_b52_robbery_port_bandits_1_1111211</text>
+                <action>dialogs.break_dialog</action>
+                <give_info>zat_b52_robbery_no</give_info>
+            </phrase>
+            <phrase id="1111212">
+                <text>zat_b52_robbery_port_bandits_1_1111212</text>
+                <action>dialogs_zaton.zat_b51_robbery</action>
+                <give_info>zat_b52_robbery_done</give_info>
+                <give_info>zat_b52_snag_jupiter</give_info>
+            </phrase>
+            <phrase id="111121">
+                <text>zat_b52_robbery_port_bandits_1_111121</text>
+                <next>1111212</next>
+                <next>1111211</next>
+            </phrase>
+            <phrase id="111">
+                <text>zat_b52_robbery_port_bandits_1_111</text>
+                <next>1111</next>
+            </phrase>
+            <phrase id="1111">
+                <text>zat_b52_robbery_port_bandits_1_1111</text>
+                <next>11111</next>
+                <next>11112</next>
+            </phrase>
+            <phrase id="11111">
+                <text>zat_b52_robbery_port_bandits_1_11111</text>
+                <action>dialogs_zaton.zat_b51_robbery</action>
+                <next>111111</next>
+            </phrase>
+            <phrase id="111111">
+                <text>zat_b52_robbery_port_bandits_1_111111</text>
+                <next>1111111</next>
+            </phrase>
+            <phrase id="11112">
+                <text>zat_b52_robbery_port_bandits_1_11112</text>
+                <next>111121</next>
+            </phrase>
+        </phrase_list>
+    </dialog>
 </game_dialogs>

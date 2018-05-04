@@ -13,7 +13,7 @@
 			</auto_static>
 		</dialog>
 
-		<cap_character_name x="35" y="40" width="32" height="29">
+		<cap_character_name x="33" y="40" width="32" height="29">
 			<text r="190" g="190" b="190" font="letterica18" align="l" vert_align="c">st_mm_faction_cap_character_name</text>
 		</cap_character_name>
 		<input_character_name x="67" y="40" width="175" height="29">
@@ -27,7 +27,7 @@
 			<text x="0" y="0" r="245" g="245" b="245" vert_align="c" align="l" font="letterica18" />
 		</disp_faction_name>	
 		
-		<list_factions x="35" y="117" width="135" height="18">
+		<list_factions x="30" y="117" width="135" height="18">
             <list_font r="190" g="190" b="190" font="letterica18"/>
             <text_color>
 	            <e r="170" g="170" b="170"/>
@@ -35,7 +35,18 @@
             </text_color>
         </list_factions>
 		
-		<list_starts x="195" y="355" width="240" height="29">
+		<cap_economy x="35" y="348" width="40" height="20">
+			<text r="245" g="245" b="245" font="letterica18" align="l" vert_align="c">ui_mm_set_economy</text>
+		</cap_economy>
+		<list_economy x="105" y="348" width="70" height="29">
+            <list_font r="245" g="245" b="245" font="letterica16"/>
+            <text_color>
+	            <e r="245" g="245" b="245"/>
+	            <d r="70" g="70" b="70"/>
+            </text_color>
+        </list_economy>
+		
+		<list_starts x="185" y="350" width="250" height="29">
             <list_font r="170" g="170" b="170" font="letterica16"/>
             <text_color>
 	            <e r="170" g="170" b="170"/>
@@ -43,7 +54,7 @@
             </text_color>
         </list_starts>
 		
-		<list_icon x="195" y="333" width="240" height="29">
+		<list_icon x="185" y="328" width="250" height="29">
             <list_font r="170" g="170" b="170" font="letterica16"/>
             <text_color>
 	            <e r="170" g="170" b="170"/>
@@ -52,98 +63,98 @@
         </list_icon>
 		
 		<!-- patch icons -->
-		<faction_stalker x="35" y="105" width="48" height="48">
+		<faction_stalker x="30" y="85" width="48" height="48">
 			<auto_static x="0" y="0" width="48" height="48" stretch="1">
 				<texture>ui_mm_faction_stalker</texture>
 			</auto_static>
 		</faction_stalker>
-		<faction_bandit x="83" y="105" width="48" height="48">
+		<faction_bandit x="78" y="85" width="48" height="48">
 			<auto_static x="0" y="0" width="48" height="48" stretch="1">
 				<texture>ui_mm_faction_bandit</texture>
 			</auto_static>
 		</faction_bandit>
-		<faction_csky x="131" y="105" width="48" height="48">
+		<faction_csky x="126" y="85" width="48" height="48">
 			<auto_static x="0" y="0" width="48" height="48" stretch="1">
 				<texture>ui_mm_faction_csky</texture>
 			</auto_static>
 		</faction_csky>
 		
-		<faction_dolg x="35" y="153" width="48" height="48">
+		<faction_dolg x="30" y="133" width="48" height="48">
 			<auto_static x="0" y="0" width="48" height="48" stretch="1">
 				<texture>ui_mm_faction_dolg</texture>
 			</auto_static>
 		</faction_dolg>
-		<faction_freedom x="83" y="153" width="48" height="48">
+		<faction_freedom x="78" y="133" width="48" height="48">
 			<auto_static x="0" y="0" width="48" height="48" stretch="1">
 				<texture>ui_mm_faction_freedom</texture>
 			</auto_static>
 		</faction_freedom>
-		<faction_killer x="131" y="153" width="48" height="48">
+		<faction_killer x="126" y="133" width="48" height="48">
 			<auto_static x="0" y="0" width="48" height="48" stretch="1">
 				<texture>ui_mm_faction_killer</texture>
 			</auto_static>
 		</faction_killer>
 
-		<faction_army x="35" y="201" width="48" height="48">
+		<faction_army x="30" y="181" width="48" height="48">
 			<auto_static x="0" y="0" width="48" height="48" stretch="1">
 				<texture>ui_mm_faction_army</texture>
 			</auto_static>
 		</faction_army>
-		<faction_ecolog x="83" y="201" width="48" height="48">
+		<faction_ecolog x="78" y="181" width="48" height="48">
 			<auto_static x="0" y="0" width="48" height="48" stretch="1">
 				<texture>ui_mm_faction_ecolog</texture>
 			</auto_static>
 		</faction_ecolog>
-		<faction_monolith x="131" y="201" width="48" height="48">
+		<faction_monolith x="126" y="181" width="48" height="48">
 			<auto_static x="0" y="0" width="48" height="48" stretch="1">
 				<texture>ui_mm_faction_monolith</texture>
 			</auto_static>
 		</faction_monolith>
 			
 		<!-- patches inactive -->
-		<faction_stalker_inactive x="35" y="105" width="48" height="48">
+		<faction_stalker_inactive x="30" y="85" width="48" height="48">
 			<auto_static x="0" y="0" width="48" height="48" stretch="1">
 				<texture>ui_mm_faction_stalker_inactive</texture>
 			</auto_static>
 		</faction_stalker_inactive>
-		<faction_bandit_inactive x="83" y="105" width="48" height="48">
+		<faction_bandit_inactive x="78" y="85" width="48" height="48">
 			<auto_static x="0" y="0" width="48" height="48" stretch="1">
 				<texture>ui_mm_faction_bandit_inactive</texture>
 			</auto_static>
 		</faction_bandit_inactive>
-		<faction_csky_inactive x="131" y="105" width="48" height="48">
+		<faction_csky_inactive x="126" y="85" width="48" height="48">
 			<auto_static x="0" y="0" width="48" height="48" stretch="1">
 				<texture>ui_mm_faction_csky_inactive</texture>
 			</auto_static>
 		</faction_csky_inactive>
 		
-		<faction_dolg_inactive x="35" y="153" width="48" height="48">
+		<faction_dolg_inactive x="30" y="133" width="48" height="48">
 			<auto_static x="0" y="0" width="48" height="48" stretch="1">
 				<texture>ui_mm_faction_dolg_inactive</texture>
 			</auto_static>
 		</faction_dolg_inactive>
-		<faction_freedom_inactive x="83" y="153" width="48" height="48">
+		<faction_freedom_inactive x="78" y="133" width="48" height="48">
 			<auto_static x="0" y="0" width="48" height="48" stretch="1">
 				<texture>ui_mm_faction_freedom_inactive</texture>
 			</auto_static>
 		</faction_freedom_inactive>
-		<faction_killer_inactive x="131" y="153" width="48" height="48">
+		<faction_killer_inactive x="126" y="133" width="48" height="48">
 			<auto_static x="0" y="0" width="48" height="48" stretch="1">
 				<texture>ui_mm_faction_killer_inactive</texture>
 			</auto_static>
 		</faction_killer_inactive>
 
-		<faction_army_inactive x="35" y="201" width="48" height="48">
+		<faction_army_inactive x="30" y="181" width="48" height="48">
 			<auto_static x="0" y="0" width="48" height="48" stretch="1">
 				<texture>ui_mm_faction_army_inactive</texture>
 			</auto_static>
 		</faction_army_inactive>
-		<faction_ecolog_inactive x="83" y="201" width="48" height="48">
+		<faction_ecolog_inactive x="78" y="181" width="48" height="48">
 			<auto_static x="0" y="0" width="48" height="48" stretch="1">
 				<texture>ui_mm_faction_ecolog_inactive</texture>
 			</auto_static>
 		</faction_ecolog_inactive>
-		<faction_monolith_inactive x="131" y="201" width="48" height="48">
+		<faction_monolith_inactive x="126" y="181" width="48" height="48">
 			<auto_static x="0" y="0" width="48" height="48" stretch="1">
 				<texture>ui_mm_faction_monolith_inactive</texture>
 			</auto_static>
@@ -152,7 +163,7 @@
 		<!-- description window -->
 		<description>
 			<background>
-				<auto_static x="195" y="105" width="240" height="225" stretch="1">
+				<auto_static x="185" y="84" width="250" height="242" stretch="1">
 					<texture a="200">ui_inGame2_pda_favorite_weapon_background</texture>
 				</auto_static>
 			</background>
@@ -162,7 +173,7 @@
 			
 			<templ_item width="220" height="108"/>
 			
-			<list_frame x="195" y="105" width="240" height="225" stretch="1">
+			<list_frame x="185" y="84" width="250" height="242" stretch="1">
 				<texture>ui_inGame2_servers_list_frame</texture>
 			</list_frame>
 			
@@ -170,7 +181,7 @@
 				<text complex_mode="1" x="10" y="10" r="200" g="200" b="200" align="l" font="letterica16" />
 			</desc_win>
 		<!--- actual text and scroll bar -->
-			<scroll_v x="195" y="105" width="240" height="220" right_ident="0" left_ident="0" top_indent="0" bottom_indent="0" vert_interval="0" always_show_scroll="0"/>
+			<scroll_v x="185" y="84" width="250" height="237" right_ident="0" left_ident="0" top_indent="0" bottom_indent="0" vert_interval="0" always_show_scroll="0"/>
 		</description>
 	
 		<btn_back x="101" y="382" width="86" height="24" stretch="1">
@@ -188,35 +199,34 @@
 			<texture>ui_inGame2_button</texture>
 		</btn_submit>
 		
-		<cap_check_story x="68" y="270" width="40" height="20" stretch="1">
+		<cap_check_story x="60" y="245" width="40" height="20" stretch="1">
             <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">st_cap_check_story</text>
         </cap_check_story>		
-        <check_story x="40" y="265" width="35" height="29" stretch="1">
+        <check_story x="30" y="240" width="30" height="29" stretch="1">
 	        <texture>ui_inGame2_checkbox</texture>
         </check_story>
 		
-        <cap_check_hardcore x="68" y="295" width="40" height="20" stretch="1">
+        <cap_check_hardcore x="60" y="270" width="40" height="20" stretch="1">
             <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">st_cap_check_hardcore</text>
         </cap_check_hardcore>		
-        <check_hardcore x="40" y="290" width="35" height="29" stretch="1">
+        <check_hardcore x="30" y="265" width="30" height="29" stretch="1">
 	        <texture>ui_inGame2_checkbox</texture>
         </check_hardcore>
 		
-		<cap_check_survival x="68" y="320" width="40" height="20" stretch="1">
+		<cap_check_survival x="60" y="295" width="40" height="20" stretch="1">
             <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">st_cap_check_survival</text>
         </cap_check_survival>		
-        <check_survival x="40" y="315" width="35" height="29" stretch="1">
+        <check_survival x="30" y="290" width="30" height="29" stretch="1">
 	        <texture>ui_inGame2_checkbox</texture>
         </check_survival>
 		
-		<cap_check_azazel_mode x="68" y="345" width="40" height="20" stretch="1">
+		<cap_check_azazel_mode x="60" y="320" width="40" height="20" stretch="1">
             <text r="170" g="170" b="170" font="letterica16" align="l" vert_align="c">st_cap_check_azazel_mode</text>
         </cap_check_azazel_mode>		
-        <check_azazel_mode x="40" y="340" width="35" height="29" stretch="1">
+        <check_azazel_mode x="30" y="315" width="30" height="29" stretch="1">
 	        <texture>ui_inGame2_checkbox</texture>
         </check_azazel_mode>
 	</main_dialog>
-	
 	
 	<hint_wnd x="0" y="0" width="215" height="100">
 	    <background x="0" y="0" width="215" height="100">

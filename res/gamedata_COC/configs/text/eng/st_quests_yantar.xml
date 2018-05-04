@@ -29,6 +29,10 @@
 	<string id="yan_stalker_sakharov_task_1_fetch_finish">
 		<text>Thank you, sir. This will help immensely in my research.</text>
 	</string>
+	<!-- FIND ARTEFACT FOR SAKHAROV TASK -->
+	<string id="yan_stalker_sakharov_task_2_text">
+		<text>You have been asked to retrieve the %s artefact. Bring it back to Sakharov if you happen to get your hands on one.</text>
+	</string>
 	<!-- WAIT FOR PSI HELMET CALIBRATION TASK -->
 	<string id="yan_stalker_sakharov_psi_helmet_upgrade_name">
 		<text>Collect the psi-helmet</text>

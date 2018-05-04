@@ -12,7 +12,7 @@
     <rank>13050</rank>
     <reputation>1097</reputation>
     <money min="1000000" max="1000000" infinitive="1"/>
-    <visual>actors\stalker_bandit\stalker_bandit_tr</visual>
+    <visual>actors\stalker_unique\stalker_bandit_trade</visual>
     <snd_config>characters_voice\human_01\bandit\</snd_config>
     <supplies>
         [spawn] \n
@@ -43,7 +43,7 @@
     <mechanic_mode>1</mechanic_mode>
     <rank>7030</rank>
     <reputation>733</reputation>
-    <visual>actors\stalker_bandit\stalker_bandit_mehan</visual>
+    <visual>actors\stalker_unique\stalker_bandit_tech</visual>
     <snd_config>characters_voice\human_02\bandit\</snd_config>
     <supplies>
         [spawn] \n
@@ -61,6 +61,37 @@
     <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
     <actor_dialog>dm_tech_repair</actor_dialog>
 	<actor_dialog>dm_broker_dialog</actor_dialog>
+    <actor_dialog>actor_break_dialog</actor_dialog>
+    </specific_character>
+    
+    <!-------------------------- SULTAN ------------------------>
+    <specific_character id="zat_b7_bandit_boss_sultan" team_default="1">
+    <name>st_zat_b7_bandit_boss_sultan_name</name>
+    <icon>ui_inGame2_Sultan</icon>
+    <map_icon x="1" y="0">
+    </map_icon>
+    <bio>ќпытный сталкер. ƒетальна¤ информаци¤ отсутствует.</bio>
+    <class>zat_b7_bandit_boss_sultan</class>
+    <community>bandit</community>
+    <terrain_sect>stalker_terrain</terrain_sect>
+    <snd_config>characters_voice\human_02\bandit\</snd_config>
+    <rank>23014</rank>
+    <reputation>-2192</reputation>
+    <visual>actors\stalker_unique\stalker_bandit_sultan</visual>
+    <supplies>
+        [spawn] \n
+        wpn_desert_eagle = 1 \n
+        ammo_11.43x23_hydro = 1 \n
+#include "gameplay\character_food.xml"
+#include "gameplay\character_drugs_2.xml"
+    </supplies>
+#include "gameplay\character_criticals.xml"
+    <start_dialog>zat_b7_bandit_boss_sultan_intro</start_dialog>
+	<actor_dialog>zat_b7_bandit_boss_sultan_about</actor_dialog>
+    <actor_dialog>dm_ordered_task_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_completed_dialog</actor_dialog>
+    <actor_dialog>dm_ordered_task_cancel_dialog</actor_dialog>
+    <actor_dialog>zat_b7_bandit_boss_sultan_about</actor_dialog>
     <actor_dialog>actor_break_dialog</actor_dialog>
     </specific_character>
     
@@ -107,7 +138,7 @@
     <community>ecolog</community> <terrain_sect>stalker_terrain</terrain_sect>
     <rank>4104</rank>
     <reputation>593</reputation>
-    <visual>actors\ucheniy\ucheniy_3</visual>
+    <visual>actors\stalker_unique\stalker_ecolog_corp_1</visual>
     <supplies>
         [spawn] \n
     </supplies>
@@ -124,7 +155,7 @@
     <money min="2000" max="5000" infinitive="0"></money>
     <rank>8116</rank>
     <reputation>824</reputation>
-    <visual>actors\ucheniy\ucheniy_4</visual>
+    <visual>actors\stalker_unique\stalker_ecolog_corp_2</visual>
     <snd_config>characters_voice\human_03\ecolog\</snd_config>
     <crouch_type>1</crouch_type>
     <supplies>

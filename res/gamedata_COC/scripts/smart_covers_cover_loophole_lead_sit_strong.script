@@ -1,0 +1,62 @@
+local	temp = {}
+if (move ~= nil) then
+	temp = move
+end
+move	= temp
+
+function get_smart_cover_cover_loophole_lead_sit_strong()
+	return {
+			loopholes = {
+				smart_covers_loophole_lead_sit_strong.get_loophole_lead_sit_strong("lead_sit_strong",	vector():set(0,0,0), vector():set(1,0,0),	vector():set(1,0,0))
+			},
+
+	
+			transitions = {
+			--' Анимации входа в бойницы
+			{
+				vertex0 = "",
+				vertex1 = "lead_sit_strong",
+				weight = 1.0,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+                                actions =	{
+											{
+												animation = "lead_2_sit_down_0",
+												position = VEC_ZERO,
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+
+
+			--' Анимации выхода из бойниц.
+			{
+				vertex0 = "lead_sit_strong",
+				vertex1 = "",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+                                actions =	{
+											{
+												animation = "lead_2_stand_up_0",
+												position = VEC_ZERO,
+												body_state = move.standing, movement_type = move.run,
+											},
+											},
+							}
+							}
+			}
+			}
+	}
+end
+
+
+function exit_random(p)
+	return math.random(100) <= tonumber(p)
+end

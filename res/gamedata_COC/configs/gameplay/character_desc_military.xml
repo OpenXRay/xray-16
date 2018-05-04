@@ -12,7 +12,7 @@
     <rank>15996</rank>
     <reputation>1793</reputation>
     <money min="1000000" max="1000000" infinitive="1"/>
-    <visual>actors\stalker_freedom\stalker_sv_balon_1</visual>
+    <visual>actors\stalker_unique\stalker_freedom_skinflint</visual>
     <snd_config>characters_voice\human_02\freedom\</snd_config>
     <supplies></supplies>
 #include "gameplay\character_criticals.xml"
@@ -34,7 +34,7 @@
         <mechanic_mode>1</mechanic_mode>
         <rank>12966</rank>
         <reputation>1338</reputation>
-        <visual>actors\stalker_freedom\stalker_freedom_4_face_1</visual>
+        <visual>actors\stalker_unique\stalker_freedom_tech</visual>
         <snd_config>characters_voice\human_01\freedom\</snd_config>
     <supplies></supplies>
 #include "gameplay\character_criticals.xml"
@@ -114,7 +114,7 @@
     <terrain_sect>stalker_terrain</terrain_sect>
     <rank>26740</rank>
     <reputation>2285</reputation>
-    <visual>actors\stalker_freedom\stalker_sv_leader</visual>
+    <visual>actors\stalker_unique\stalker_freedom_lukash</visual>
     <supplies>
         [spawn] \n
         wpn_usp  \n

@@ -87,6 +87,9 @@
 	<string id="kb_jump">
 		<text>Jump</text>
 	</string>
+	<string id="kb_kick">
+		<text>Kick</text>
+	</string>
 	<string id="kb_left">
 		<text>Left</text>
 	</string>

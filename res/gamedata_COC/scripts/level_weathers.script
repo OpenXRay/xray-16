@@ -189,7 +189,7 @@ function WeatherManager:reset()
 	else
 		self.distant_storm_on = false
 	end
-    self:select_weather(true)
+	self:select_weather(true)
 end
 
 -- CC Functions

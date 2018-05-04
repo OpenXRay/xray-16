@@ -1,0 +1,112 @@
+local sysini
+local _tmr
+local add_charge
+feature_is_active = nil
+local function main_loop()
+	
+	if add_charge then
+		local item = level.object_by_id(add_charge)
+		item:set_remaining_uses(item:get_max_uses())
+		add_charge = nil
+	end
+	
+    local tg = time_global()
+    if (_tmr and tg < _tmr) then
+        return false
+    end
+    _tmr = tg + 2000    -- if you change this value timed artefact multipliers will need changes
+
+    if not (db.actor) then
+        return false
+    end
+
+	local detector = db.actor:active_detector()
+	local item = db.actor:item_in_slot(9)
+	if (item and detector) then
+		local charge = item:condition()
+		if (charge > 0) then
+			item:set_condition(charge - (sysini:r_float_ex(item:section(),"discharge_rate") or 0.00025))
+			--news_manager.send_tip(db.actor, "detector condition:" .. item:condition(), nil, nil, nil, 20000)
+		else
+			--db.actor:transfer_item(item, db.actor)
+			detector:switch_state(2)
+		end
+	end
+	
+    return false
+end
+
+function activate_feature()
+	if (feature_is_active) then
+		return 
+	end
+	feature_is_active = true
+	sysini = system_ini()
+	RegisterScriptCallback("CUIActorMenu_OnItemDropped",drag_item)
+	RegisterScriptCallback("actor_on_item_use", on_use)
+	AddUniqueCall(main_loop)
+end 
+
+function deactivate_feature()
+	if not (feature_is_active) then
+		return 
+	end
+	feature_is_active = false
+	_tmr = nil
+	sysini = nil
+	add_charge = nil
+	UnregisterScriptCallback("CUIActorMenu_OnItemDropped",drag_item)
+	UnregisterScriptCallback("actor_on_item_use", on_use)
+	RemoveUniqueCall(main_loop)
+end
+
+function on_game_start()
+	if (axr_main.config:r_value("mm_options","enable_detector_charge",1,false) == true) then
+		activate_feature()
+	end
+end
+
+function IsBattery(battery)
+	return battery and battery:section():find("itm_battery_")
+end
+
+function IsDetector(o,c)
+	if not (c) then
+		c = o and o:clsid()
+	end
+
+	local detector_classes = {
+				[clsid.detector_scientific_s] 		= true,
+				[clsid.detector_elite_s] 			= true,
+				[clsid.detector_advanced_s] 		= true,
+				[clsid.detector_simple_s]			= true
+		}
+		
+	return c and detector_classes[c] or false
+end
+
+function on_use(item)
+	if IsBattery(item) then
+		local r = item:get_remaining_uses()
+		if r == item:get_max_uses() then
+			add_charge = item:id()
+		else
+			item:set_remaining_uses(r+1)
+		end
+	end
+end
+
+function drag_item(battery,detector,from_slot,to_slot)
+	if (to_slot == EDDListType.iActorBag and to_slot == EDDListType.iActorBag) and IsBattery(battery) and IsDetector(detector) then
+		local cond = detector:condition()
+		if cond < 0.25 then
+			local r = battery:get_remaining_uses()
+			if r > 1 then
+				battery:set_remaining_uses(r-1)
+			else
+				alife():release(alife_object(battery:id()), true)
+			end
+			detector:set_condition(1)
+		end
+	end
+end

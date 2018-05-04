@@ -131,10 +131,11 @@ function generic_object_binder:update(delta)
 	end 
 	
 	local cls = self.object:clsid()
-	if (cls == clsid.tushkano_s or cls == clsid.rat_s) then
-		self.object:set_callback(callback.use_object, self.use_kick, self)
-		self.object:set_tip_text("st_screen_kick")
-	end
+	-- depreciated. Can now kick any mutant with ph_mass less than 20 with the bindable kick key
+	-- if (cls == clsid.tushkano_s or cls == clsid.rat_s) then
+		-- self.object:set_callback(callback.use_object, self.use_kick, self)
+		-- self.object:set_tip_text("st_screen_kick")
+	-- end
 
 	if self.st ~= nil and self.st.active_scheme ~= nil then
 		xr_logic.try_switch_to_another_section(self.object, self.st[self.st.active_scheme], db.actor)
@@ -154,6 +155,7 @@ function generic_object_binder:update(delta)
 	local tg = time_global()
 	if (enemy) or (self.post_combat_idle_timer and tg < self.post_combat_idle_timer) then
 		xr_logic.mob_release(self.object)
+		self.object:remove_home()
 		self.post_combat_idle_timer = time_global() + math.random(15000,30000) -- This allows mob released to use engine stuff like corpse eating and dragging after combat
 		return
 	end
@@ -178,6 +180,7 @@ function generic_object_binder:update(delta)
 		end
 		
 		xr_logic.mob_capture(self.object, true)
+		self.object:remove_home()
 
 		local commander = db.storage[squad:commander_id()] and db.storage[squad:commander_id()].object
 		if (commander == nil or commander:id() == id) then
@@ -256,13 +259,13 @@ function generic_object_binder:death_callback(victim, who)
 
 	if (who) then
 		if (who:id() == db.actor:id()) then
-			xr_statistic.inc_counter("killed_monsters")
+			dxr_statistics.increment_statistic("killed_monsters")
 		elseif (IsStalker(who) and who:alive()) then
 			local se_who = alife_object(who:id())
 			-- npc_statistic
 			if (se_who) then
 				who:set_character_rank(who:character_rank()+math.random(5,15))
-				local m_data = alife_storage_manager.get_se_obj_state(se_who)
+				local m_data = alife_storage_manager.get_se_obj_state(se_who,true)
 				if (m_data) then
 					m_data.mutants_killed = m_data.mutants_killed and m_data.mutants_killed + 1 or 1
 				end
@@ -302,10 +305,6 @@ function generic_object_binder:hit_callback(obj, amount, local_direction, who, b
 	--alun_utils.debug_write(strformat("generic_object_binder %s",obj and obj:name()))
 	if (amount <= 0) then
 		return
-	end
-
-	if(who:id()==db.actor:id()) then
-		xr_statistic.set_best_weapon(amount)
 	end
 
 	if self.st.hit then
@@ -502,7 +501,7 @@ end
 function generic_object_binder:load_state()
 
 	local state = alife_storage_manager.get_game_object_state(self.object)
-	if not (state and state.xr_logic) then
+	if not (state) then
 		return
 	end
 	
@@ -511,13 +510,15 @@ function generic_object_binder:load_state()
 	local st = db.storage[id]	
 	--alun_utils.debug_write(strformat("generic_object_binder:load_state %s BEFORE",self.object:name()))
 
-	st.loaded_ini_filename = state.xr_logic.ini_filename
-	st.loaded_section_logic = state.xr_logic.section_logic
-	st.loaded_active_section = state.xr_logic.active_section
-	st.loaded_gulag_name = state.xr_logic.gulag_name or ""
-	st.activation_time = time_global() + (state.xr_logic.activation_time or 0)
-	st.activation_game_time = state.xr_logic.activation_game_time or game.get_game_time()
-	state.xr_logic = nil
+	if (state.xr_logic) then
+		st.loaded_ini_filename = state.xr_logic.ini_filename
+		st.loaded_section_logic = state.xr_logic.section_logic
+		st.loaded_active_section = state.xr_logic.active_section
+		st.loaded_gulag_name = state.xr_logic.gulag_name or ""
+		st.activation_time = time_global() + (state.xr_logic.activation_time or 0)
+		st.activation_game_time = state.xr_logic.activation_game_time or game.get_game_time()
+		state.xr_logic = nil
+	end
 	
 	if (state.pstor_all) then
 		db.storage[id].pstor = state.pstor_all

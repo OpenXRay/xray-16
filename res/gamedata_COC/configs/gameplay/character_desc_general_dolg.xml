@@ -46,7 +46,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_0_default_10" team_default = "1">
     <name>GENERATE_NAME_private</name>
-    <icon>ui_inGame2_duty_bala</icon>
+    <icon>ui_inGame2_Dolg_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_0</class>
@@ -55,7 +55,7 @@
     <rank>4510</rank>
     <reputation>1072</reputation>
     <money min="500" max="1500" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolg_2_mas4</visual>
+    <visual>actors\stalker_dolg\stalker_dolg_2_bala</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_2.ltx"
@@ -69,7 +69,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_0_default_11" team_default = "1">
     <name>GENERATE_NAME_private</name>
-    <icon>ui_inGame2_duty_bala</icon>
+    <icon>ui_inGame2_Dolg_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_0</class>
@@ -78,7 +78,7 @@
     <rank>4500</rank>
     <reputation>-593</reputation>
     <money min="500" max="1500" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolg2a_mas4</visual>
+    <visual>actors\stalker_dolg\stalker_dolg2a_bala</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_2.ltx"
@@ -92,7 +92,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_0_default_2" team_default = "1">
     <name>GENERATE_NAME_private</name>
-    <icon>ui_inGame2_dutygas_2</icon>
+    <icon>ui_inGame2_Dolg_0</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_0</class>
@@ -101,7 +101,7 @@
     <rank>2946</rank>
     <reputation>665</reputation>
     <money min="500" max="1500" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolggas_2</visual>
+    <visual>actors\stalker_dolg\stalker_dolg_0</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_1.ltx"
@@ -115,7 +115,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_0_default_3" team_default = "1">
     <name>GENERATE_NAME_private</name>
-    <icon>ui_inGame2_dutygas_2</icon>
+    <icon>ui_inGame2_Dolg_0</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_0</class>
@@ -124,7 +124,7 @@
     <rank>2858</rank>
     <reputation>468</reputation>
     <money min="500" max="1500" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolggas2a</visual>
+    <visual>actors\stalker_dolg\stalker_dolg0a</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_1.ltx"
@@ -147,7 +147,7 @@
     <rank>4082</rank>
     <reputation>-1182</reputation>
     <money min="500" max="1500" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolg_2_mas2</visual>
+    <visual>actors\stalker_dolg\stalker_dolg_2_mask</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_2.ltx"
@@ -184,7 +184,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_0_default_6" team_default = "1">
     <name>GENERATE_NAME_private</name>
-    <icon>ui_inGame2_duty_2_old</icon>
+    <icon>ui_inGame2_Dolg_2_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_0</class>
@@ -207,7 +207,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_0_default_7" team_default = "1">
     <name>GENERATE_NAME_private</name>
-    <icon>ui_inGame2_duty_2_old</icon>
+    <icon>ui_inGame2_Dolg_2_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_0</class>
@@ -239,7 +239,7 @@
     <rank>3980</rank>
     <reputation>-386</reputation>
     <money min="500" max="1500" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolg_2_mas2</visual>
+    <visual>actors\stalker_dolg\stalker_dolg_2_mask</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_2.ltx"
@@ -262,7 +262,7 @@
     <rank>3866</rank>
     <reputation>-2493</reputation>
     <money min="500" max="1500" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolg2a_mas2</visual>
+    <visual>actors\stalker_dolg\stalker_dolg2a_mask</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_2.ltx"
@@ -331,7 +331,7 @@
     <rank>5784</rank>
     <reputation>-283</reputation>
     <money min="1000" max="3000" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolg2a_mas2</visual>
+    <visual>actors\stalker_dolg\stalker_dolg2a_mask</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_2.ltx"
@@ -354,7 +354,7 @@
     <rank>4492</rank>
     <reputation>-448</reputation>
     <money min="1000" max="3000" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolg2a_mas3</visual>
+    <visual>actors\stalker_dolg\stalker_dolg_2_mask</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_2.ltx"
@@ -368,7 +368,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_1_default_12" team_default = "1">
     <name>GENERATE_NAME_sergeant</name>
-    <icon>ui_inGame2_duty_bala</icon>
+    <icon>ui_inGame2_Dolg_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_1</class>
@@ -377,7 +377,7 @@
     <rank>3934</rank>
     <reputation>-1660</reputation>
     <money min="1000" max="3000" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolg_2_mas4</visual>
+    <visual>actors\stalker_dolg\stalker_dolg_2_bala</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_2.ltx"
@@ -391,7 +391,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_1_default_13" team_default = "1">
     <name>GENERATE_NAME_sergeant</name>
-    <icon>ui_inGame2_duty_bala</icon>
+    <icon>ui_inGame2_Dolg_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_1</class>
@@ -400,7 +400,7 @@
     <rank>5702</rank>
     <reputation>1523</reputation>
     <money min="1000" max="3000" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolg2a_mas4</visual>
+    <visual>actors\stalker_dolg\stalker_dolg2a_bala</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_2.ltx"
@@ -423,7 +423,7 @@
     <rank>3414</rank>
     <reputation>-1114</reputation>
     <money min="1000" max="3000" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolg_2_mas2</visual>
+    <visual>actors\stalker_dolg\stalker_dolg_2_mask</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_2.ltx"
@@ -460,7 +460,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_1_default_4" team_default = "1">
     <name>GENERATE_NAME_sergeant</name>
-    <icon>ui_inGame2_dutygas_2</icon>
+    <icon>ui_inGame2_Dolg_0</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_1</class>
@@ -469,7 +469,7 @@
     <rank>1730</rank>
     <reputation>-1782</reputation>
     <money min="1000" max="3000" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolggas_2</visual>
+    <visual>actors\stalker_dolg\stalker_dolg_0</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_1.ltx"
@@ -483,7 +483,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_1_default_5" team_default = "1">
     <name>GENERATE_NAME_sergeant</name>
-    <icon>ui_inGame2_dutygas_2</icon>
+    <icon>ui_inGame2_Dolg_0</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_1</class>
@@ -492,7 +492,7 @@
     <rank>2510</rank>
     <reputation>358</reputation>
     <money min="1000" max="3000" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolggas2a</visual>
+    <visual>actors\stalker_dolg\stalker_dolg0a</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_1.ltx"
@@ -506,7 +506,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_1_default_6" team_default = "1">
     <name>GENERATE_NAME_sergeant</name>
-    <icon>ui_inGame2_duty_2_old</icon>
+    <icon>ui_inGame2_Dolg_2_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_1</class>
@@ -529,7 +529,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_1_default_7" team_default = "1">
     <name>GENERATE_NAME_sergeant</name>
-    <icon>ui_inGame2_duty_2_old</icon>
+    <icon>ui_inGame2_Dolg_2_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_1</class>
@@ -561,7 +561,7 @@
     <rank>3488</rank>
     <reputation>1337</reputation>
     <money min="1000" max="3000" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolg_2_mas2</visual>
+    <visual>actors\stalker_dolg\stalker_dolg_2_mask</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_2.ltx"
@@ -575,7 +575,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_1_default_9" team_default = "1">
     <name>GENERATE_NAME_sergeant</name>
-    <icon>ui_inGame2_Dolg_0</icon>
+    <icon>ui_inGame2_Dolg_r</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_1</class>
@@ -584,7 +584,7 @@
     <rank>774</rank>
     <reputation>-291</reputation>
     <money min="1000" max="3000" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolg_0</visual>
+    <visual>actors\stalker_dolg\stalker_dolg_r</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_1.ltx"
@@ -645,7 +645,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_2_default_10" team_default = "1">
     <name>GENERATE_NAME_sergeant</name>
-    <icon>ui_inGame2_duty_2_old</icon>
+    <icon>ui_inGame2_Dolg_2_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_2</class>
@@ -668,7 +668,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_2_default_11" team_default = "1">
     <name>GENERATE_NAME_sergeant</name>
-    <icon>ui_inGame2_duty_2_old</icon>
+    <icon>ui_inGame2_Dolg_2_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_2</class>
@@ -716,7 +716,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_2_default_13" team_default = "1">
     <name>GENERATE_NAME_sergeant</name>
-    <icon>ui_inGame2_Dolg_0</icon>
+    <icon>ui_inGame2_Dolg_r</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_2</class>
@@ -725,7 +725,7 @@
     <rank>30</rank>
     <reputation>-1980</reputation>
     <money min="1500" max="3500" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolg_0</visual>
+    <visual>actors\stalker_dolg\stalker_dolg_r</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_1.ltx"
@@ -749,7 +749,7 @@
     <rank>4704</rank>
     <reputation>1253</reputation>
     <money min="1500" max="3500" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolg2a_mas3</visual>
+    <visual>actors\stalker_dolg\stalker_dolg2a_mask</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_2.ltx"
@@ -764,7 +764,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_2_default_15" team_default = "1">
     <name>GENERATE_NAME_sergeant</name>
-    <icon>ui_inGame2_duty_bala</icon>
+    <icon>ui_inGame2_Dolg_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_2</class>
@@ -773,7 +773,7 @@
     <rank>4010</rank>
     <reputation>-1970</reputation>
     <money min="1500" max="3500" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolg_2_mas4</visual>
+    <visual>actors\stalker_dolg\stalker_dolg_2_bala</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_2.ltx"
@@ -788,7 +788,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_2_default_16" team_default = "1">
     <name>GENERATE_NAME_sergeant</name>
-    <icon>ui_inGame2_duty_bala</icon>
+    <icon>ui_inGame2_Dolg_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_2</class>
@@ -797,7 +797,7 @@
     <rank>3530</rank>
     <reputation>2133</reputation>
     <money min="1500" max="3500" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolg2a_mas4</visual>
+    <visual>actors\stalker_dolg\stalker_dolg2a_bala</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_2.ltx"
@@ -821,7 +821,7 @@
     <rank>4378</rank>
     <reputation>1896</reputation>
     <money min="1500" max="3500" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolg_2_mas2</visual>
+    <visual>actors\stalker_dolg\stalker_dolg_2_mask</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_2.ltx"
@@ -860,7 +860,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_2_default_4" team_default = "1">
     <name>GENERATE_NAME_sergeant</name>
-    <icon>ui_inGame2_dutygas_2</icon>
+    <icon>ui_inGame2_Dolg_0</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_2</class>
@@ -869,7 +869,7 @@
     <rank>2104</rank>
     <reputation>1841</reputation>
     <money min="1500" max="3500" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolggas_2</visual>
+    <visual>actors\stalker_dolg\stalker_dolg_0</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_1.ltx"
@@ -883,7 +883,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_2_default_5" team_default = "1">
     <name>GENERATE_NAME_sergeant</name>
-    <icon>ui_inGame2_dutygas_2</icon>
+    <icon>ui_inGame2_Dolg_0</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_2</class>
@@ -892,7 +892,7 @@
     <rank>1360</rank>
     <reputation>-2057</reputation>
     <money min="1500" max="3500" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolggas2a</visual>
+    <visual>actors\stalker_dolg\stalker_dolg0a</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_1.ltx"
@@ -1153,7 +1153,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_3_default_6" team_default = "1">
     <name>GENERATE_NAME_captain</name>
-    <icon>ui_inGame2_Dolg_4e</icon>
+    <icon>ui_inGame2_Dolg_4a</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_3</class>
@@ -1162,7 +1162,7 @@
     <rank>16634</rank>
     <reputation>-393</reputation>
     <money min="2500" max="5000" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolgexo_4</visual>
+    <visual>actors\stalker_dolg\stalker_dolg_5</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_3.ltx"
@@ -1178,7 +1178,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_3_default_7" team_default = "1">
     <name>GENERATE_NAME_captain</name>
-    <icon>ui_inGame2_Dolg_4e</icon>
+    <icon>ui_inGame2_Dolg_4a</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_3</class>
@@ -1187,7 +1187,7 @@
     <rank>19078</rank>
     <reputation>-513</reputation>
     <money min="2500" max="5000" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolgexo4a</visual>
+    <visual>actors\stalker_dolg\stalker_dolg5a</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_3.ltx"
@@ -1203,7 +1203,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_3_default_8" team_default = "1">
     <name>GENERATE_NAME_captain</name>
-    <icon>ui_inGame2_Dolg_4e</icon>
+    <icon>ui_inGame2_Dolg_4a</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_3</class>
@@ -1212,7 +1212,7 @@
     <rank>19082</rank>
     <reputation>1121</reputation>
     <money min="2500" max="5000" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolgexo4b</visual>
+    <visual>actors\stalker_dolg\stalker_dolg5b</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_3.ltx"
@@ -1228,7 +1228,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_3_default_9" team_default = "1">
     <name>GENERATE_NAME_captain</name>
-    <icon>ui_inGame2_Dolg_4e</icon>
+    <icon>ui_inGame2_Dolg_4a</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_3</class>
@@ -1237,7 +1237,7 @@
     <rank>20850</rank>
     <reputation>-1249</reputation>
     <money min="2500" max="5000" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolgexo4c</visual>
+    <visual>actors\stalker_dolg\stalker_dolg5c</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_3.ltx"
@@ -1353,7 +1353,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_4_default_4" team_default = "1">
     <name>GENERATE_NAME_captain</name>
-    <icon>ui_inGame2_Dolg_4e</icon>
+    <icon>ui_inGame2_Dolg_4a</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_4</class>
@@ -1362,7 +1362,7 @@
     <rank>20474</rank>
     <reputation>-805</reputation>
     <money min="5000" max="10000" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolgexo_4</visual>
+    <visual>actors\stalker_dolg\stalker_dolg_5</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_3.ltx"
@@ -1378,7 +1378,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_4_default_5" team_default = "1">
     <name>GENERATE_NAME_captain</name>
-    <icon>ui_inGame2_Dolg_4e</icon>
+    <icon>ui_inGame2_Dolg_4a</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_4</class>
@@ -1387,7 +1387,7 @@
     <rank>17264</rank>
     <reputation>-1119</reputation>
     <money min="5000" max="10000" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolgexo4a</visual>
+    <visual>actors\stalker_dolg\stalker_dolg5a</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_3.ltx"
@@ -1403,7 +1403,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_4_default_6" team_default = "1">
     <name>GENERATE_NAME_captain</name>
-    <icon>ui_inGame2_Dolg_4e</icon>
+    <icon>ui_inGame2_Dolg_4a</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_4</class>
@@ -1412,7 +1412,7 @@
     <rank>18830</rank>
     <reputation>1075</reputation>
     <money min="5000" max="10000" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolgexo4b</visual>
+    <visual>actors\stalker_dolg\stalker_dolg5b</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_3.ltx"
@@ -1428,7 +1428,7 @@
     </specific_character>
 <specific_character id="sim_default_duty_4_default_7" team_default = "1">
     <name>GENERATE_NAME_captain</name>
-    <icon>ui_inGame2_Dolg_4e</icon>
+    <icon>ui_inGame2_Dolg_4a</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_duty_4</class>
@@ -1437,7 +1437,7 @@
     <rank>19952</rank>
     <reputation>1156</reputation>
     <money min="5000" max="10000" infinitive="0"/>
-    <visual>actors\stalker_dolg\stalker_dolgexo4c</visual>
+    <visual>actors\stalker_dolg\stalker_dolg5c</visual>
     <supplies>
 #include "gameplay\loadouts\dolg_base.ltx"
 #include "gameplay\loadouts\dolg_tier_3.ltx"

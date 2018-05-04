@@ -43,7 +43,7 @@ meet_on_talking = false
 
 [logic@pri_a16_stalker_1]
 active = walker@guarder_1_reach
-suitable = {+pri_a28_actor_in_zone_stay =npc_in_zone(pri_a16_sr_noweap)} true
+suitable = true
 prior = 190
 
 [walker@guarder_1_reach]:walker@reach
@@ -65,7 +65,7 @@ on_info = {=surge_complete} walker@guarder_1
 
 [logic@pri_a16_stalker_2]
 active = walker@guarder_2_reach 
-suitable = {+pri_a28_actor_in_zone_stay =npc_in_zone(pri_a16_sr_noweap)} true
+suitable = true
 prior = 150
 
 [walker@guarder_2_reach]:walker@reach
@@ -87,52 +87,52 @@ on_info = {=surge_complete} walker@guarder_2
 
 [logic@pri_a16_stalker_3]
 active = animpoint@pri_a16_stalker_3 
-suitable = {+pri_a28_actor_in_zone_stay =npc_in_zone(pri_a16_sr_noweap)} true
+suitable = true
 prior = 150
 
 [logic@pri_a16_stalker_4]
 active = animpoint@pri_a16_stalker_4
-suitable = {+pri_a28_actor_in_zone_stay =npc_in_zone(pri_a16_sr_noweap)} true
+suitable = true
 prior = 150
 
 [logic@pri_a16_stalker_5]
 active = animpoint@pri_a16_stalker_5
-suitable = {+pri_a28_actor_in_zone_stay =npc_in_zone(pri_a16_sr_noweap)} true
+suitable = true
 prior = 150
 
 [logic@pri_a16_stalker_6]
 active = animpoint@pri_a16_stalker_6
-suitable = {+pri_a28_actor_in_zone_stay =npc_in_zone(pri_a16_sr_noweap)} true
+suitable = true
 prior = 150
 
 [logic@pri_a16_stalker_7]
 active = animpoint@pri_a16_stalker_7
-suitable = {+pri_a28_actor_in_zone_stay =npc_in_zone(pri_a16_sr_noweap)} true
+suitable = true
 prior = 150
 
 [logic@pri_a16_stalker_8]
 active = animpoint@pri_a16_stalker_8
-suitable = {+pri_a28_actor_in_zone_stay =npc_in_zone(pri_a16_sr_noweap)} true
+suitable = true
 prior = 150
 
 [logic@pri_a16_stalker_9]
 active = animpoint@pri_a16_stalker_9
-suitable = {+pri_a28_actor_in_zone_stay =npc_in_zone(pri_a16_sr_noweap)} true
+suitable = true
 prior = 150
 
 [logic@pri_a16_stalker_10]
 active = animpoint@pri_a16_stalker_10
-suitable = {+pri_a28_actor_in_zone_stay =npc_in_zone(pri_a16_sr_noweap)} true
+suitable = true
 prior = 150
 
 [logic@pri_a16_stalker_11]
 active = animpoint@pri_a16_stalker_11
-suitable = {+pri_a28_actor_in_zone_stay =npc_in_zone(pri_a16_sr_noweap)} true
+suitable = true
 prior = 140
 
 [logic@pri_a16_stalker_12]
 active = animpoint@pri_a16_stalker_12
-suitable = {+pri_a28_actor_in_zone_stay =npc_in_zone(pri_a16_sr_noweap)} true
+suitable = true
 prior = 120
 
 [animpoint@pri_a16_stalker_3]:animpoint@reach
@@ -217,11 +217,11 @@ cover_name = pri_a16_animp_sokolov
 
 
 [logic@pri_a16_yar]
-suitable = {+pri_a28_actor_in_zone_stay =check_npc_name(jup_b19_freedom_yar)} true
-prior = 200
+suitable = true
+prior = 90
 active = animpoint@base
 
-[animpoint@base]
+[animpoint@base]:animpoint@def
 cover_name = pri_a16_animp_medic
 combat_ignore_cond = {=is_enemy_actor_or_companion} false, true
 combat_ignore_keep_when_attacked = true
@@ -232,15 +232,3 @@ gather_items_enabled = false
 help_wounded_enabled = false
 corpse_detection_enabled = false
 use_camp = false
-
-[meet]
-close_anim 		= nil
-close_victim 	= nil
-far_anim 		= nil
-far_victim 		= nil
-close_distance 	= 0
-far_distance	= 0
-use 			= {=actor_enemy} false, true
-trade_enable 	= true
-allow_break 	= false
-meet_dialog		= jup_b19_freedom_yar_pripyat_start

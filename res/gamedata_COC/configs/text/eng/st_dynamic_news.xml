@@ -54,7 +54,7 @@
 		<text>We got attacked by flesh</text>
 	</string>
 	<string id="st_dyn_news_flesh_6">
-		<text>A pound of fleshd</text>
+		<text>a pound of flesh</text>
 	</string>
 
 	<string id="st_dyn_news_pseudodog_1">
@@ -130,7 +130,7 @@
 		<text>We ran into some burers</text>
 	</string>
 	<string id="st_dyn_news_burer_6">
-		<text>A bunch of burers</text>
+		<text>a bunch of burers</text>
 	</string>
 
 	<string id="st_dyn_news_chimera_1">
@@ -168,7 +168,7 @@
 		<text>We ran into a school of controllers</text>
 	</string>
 	<string id="st_dyn_news_controller_6">
-		<text>A school of controllers</text>
+		<text>a school of controllers</text>
 	</string>
 
 	<string id="st_dyn_news_poltergeist_1">
@@ -187,7 +187,7 @@
 		<text>We ran into poltergeists</text>
 	</string>
 	<string id="st_dyn_news_poltergeist_6">
-		<text>A couple poltergeists</text>
+		<text>a couple poltergeists</text>
 	</string>
 
 	<string id="st_dyn_news_gigant_1">
@@ -206,7 +206,7 @@
 		<text>We were attacked by pseudogiants</text>
 	</string>
 	<string id="st_dyn_news_gigant_6">
-		<text>A couple pseudogiants</text>
+		<text>a couple pseudogiants</text>
 	</string>
 	
 	<string id="st_dyn_news_karlik_1">
@@ -225,7 +225,7 @@
 		<text>We were attacked by karliks</text>
 	</string>
 	<string id="st_dyn_news_karlik_6">
-		<text>A couple midgets</text>
+		<text>a couple midgets</text>
 	</string>
 
 	<string id="st_dyn_news_tushkano_1">
@@ -248,41 +248,41 @@
 	</string>
 
 	<string id="st_dyn_news_psy_dog_1">
-		<text>a psy dog</text>
+		<text>a psy-dog</text>
 	</string>
 	<string id="st_dyn_news_psy_dog_2">
-		<text>We got attacked by a psy dog</text>
+		<text>We got attacked by a psy-dog</text>
 	</string>
 	<string id="st_dyn_news_psy_dog_3">
-		<text>We got ambushed by a psy dog</text>
+		<text>We got ambushed by a psy-dog</text>
 	</string>
 	<string id="st_dyn_news_psy_dog_4">
-		<text>We ran into a pack of psy dogs</text>
+		<text>We ran into a pack of psy-dogs</text>
 	</string>
 	<string id="st_dyn_news_psy_dog_5">
-		<text>We got attacked by psy dogs</text>
+		<text>We got attacked by psy-dogs</text>
 	</string>
 	<string id="st_dyn_news_psy_dog_6">
-		<text>a pack of psy dogs</text>
+		<text>a pack of psy-dogs</text>
 	</string>
 
 	<string id="st_dyn_news_psy_dog_phantom_1">
 		<text>a phantom</text>
 	</string>
 	<string id="st_dyn_news_psy_dog_phantom_2">
-		<text>We got attacked by a psy dog</text>
+		<text>We got attacked by a psy-dog</text>
 	</string>
 	<string id="st_dyn_news_psy_dog_phantom_3">
-		<text>We ran into a psy dog</text>
+		<text>We ran into a psy-dog</text>
 	</string>
 	<string id="st_dyn_news_psy_dog_phantom_4">
-		<text>We got ambushed by psy dogs</text>
+		<text>We got ambushed by psy-dogs</text>
 	</string>
 	<string id="st_dyn_news_psy_dog_phantom_5">
-		<text>We ran into a pack of psy dogs</text>
+		<text>We ran into a pack of psy-dogs</text>
 	</string>
 	<string id="st_dyn_news_psy_dog_phantom_6">
-		<text>a pack of psy dogs</text>
+		<text>a pack of psy-dogs</text>
 	</string>
 
 	<string id="st_dyn_news_zombied_1">
@@ -301,7 +301,7 @@
 		<text>We ran into a bunch of zombies</text>
 	</string>
 	<string id="st_dyn_news_zombied_6">
-		<text>A squad of zombies</text>
+		<text>a squad of zombies</text>
 	</string>
 
 	<string id="st_dyn_news_cat_1">
@@ -320,7 +320,7 @@
 		<text>We got jumped by some fucking cats</text>
 	</string>
 	<string id="st_dyn_news_cat_6">
-		<text>A group of cats</text>
+		<text>a group of cats</text>
 	</string>
 
 	<string id="st_dyn_news_fracture_1">
@@ -339,7 +339,7 @@
 		<text>Fractures attacked us</text>
 	</string>
 	<string id="st_dyn_news_fracture_6">
-		<text>A group of fractures</text>
+		<text>a group of fractures</text>
 	</string>
 
 	<string id="st_dyn_news_zombie_1">
@@ -358,7 +358,7 @@
 		<text>We ran into some zombies</text>
 	</string>
 	<string id="st_dyn_news_zombie_6">
-		<text>A bunch of zombies</text>
+		<text>a bunch of zombies</text>
 	</string>
 
 	<string id="st_dyn_news_rat_1">
@@ -377,7 +377,7 @@
 		<text>We got attacked by a bunch of rats</text>
 	</string>
 	<string id="st_dyn_news_rat_6">
-		<text>A bunch of rats</text>
+		<text>a bunch of rats</text>
 	</string>
 
 	
@@ -1118,6 +1118,9 @@
 	</string>
 	<string id="st_dyn_news_l10_red_forest">
 		<text>in Red Forest,</text>
+	</string>
+	<string id="st_dyn_news_l11_hospital">
+		<text>in Deserted Hospital</text>
 	</string>
 	<string id="st_dyn_news_l11_pripyat">
 		<text>in Pripyat,</text>

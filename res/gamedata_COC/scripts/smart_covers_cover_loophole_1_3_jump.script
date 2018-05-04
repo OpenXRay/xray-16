@@ -1,0 +1,157 @@
+local	temp = {}
+if (move ~= nil) then
+	temp = move
+end
+move	= temp
+
+function get_smart_cover_cover_loophole_1_3_jump()
+	return {
+			loopholes = {
+				smart_covers_loophole_1.get_loophole_1("lh_1",	vector():set(-0.9,0,-0.4), vector():set(0.3,0,-1)),
+				smart_covers_loophole_3.get_loophole_3("lh_3",	vector():set(-0.9,0,0.4), vector():set(0.3,0,1)),
+			},
+	
+			transitions = {
+			--' Анимации входа в бойницы
+			{
+				vertex0 = "",
+				vertex1 = "lh_1",
+				weight = 1.0,
+                actions =	{
+							{
+                                precondition_functor = "smart_covers.script_functor_true",
+                                precondition_params = "",
+                                actions =	{
+											{
+												animation = "loophole_1_in_front_0",
+												position = vector():set(0,0,-1),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+                            }
+							}
+			},
+			{
+				vertex0 = "",
+				vertex1 = "lh_3",
+				weight = 1.0,
+                actions =	{
+							{
+                                precondition_functor = "smart_covers.script_functor_true",
+                                precondition_params = "",
+                                actions =	{
+											{
+												animation = "loophole_3_in_front_0",
+												position = vector():set(0,0,1),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+                            }
+							}
+			},
+			
+			--' Анимации перехода между бойницами
+			{
+				vertex0 = "lh_1",
+				vertex1 = "lh_3",
+				weight = 1.0,
+                actions =	{
+							{
+                                precondition_functor = "smart_covers.script_functor_true",
+                                precondition_params = "",
+                                actions =	{
+											{
+												animation = "loophole_transition_1_to_3",
+												position = vector():set(0,0,1),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+                            }
+							}				
+			},
+			{
+				vertex0 = "lh_3",
+				vertex1 = "lh_1",
+				weight = 1.1,
+                actions =	{
+							{
+                                precondition_functor = "smart_covers.script_functor_true",
+                                precondition_params = "",
+                                actions =	{
+											{
+												animation = "loophole_transition_3_to_1",
+												position = vector():set(0,0,-1),
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+                            }
+							}				
+			},
+
+			--' Анимации выхода из бойниц.
+			{
+				vertex0 = "lh_1",
+				vertex1 = "",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_jump",
+								precondition_params = "",
+                                actions =	{
+											{
+												animation = "loophole_1_jump_0",
+												position = vector():set(-3,0,0),
+												body_state = move.standing, movement_type = move.run,
+											},
+											},
+							},
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+                                precondition_params = "",
+                                actions =	{
+											{
+												animation = "",
+												position = VEC_ZERO,
+												body_state = move.standing, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+			{
+				vertex0 = "lh_3",
+				vertex1 = "",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_jump",
+								precondition_params = "",
+                                actions =	{
+											{
+												animation = "loophole_3_jump_0",
+												position = vector():set(-3,0,0),
+												body_state = move.standing, movement_type = move.run,
+											},
+											},
+							},
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+                                precondition_params = "",
+                                actions =	{
+											{
+												animation = "",
+												position = VEC_ZERO,
+												body_state = move.standing, movement_type = move.run,
+											},
+											},
+							}
+							}
+			}
+		}
+	}
+end
+
+
+function exit_random(p)
+	return math.random(100) <= tonumber(p)
+end

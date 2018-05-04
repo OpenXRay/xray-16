@@ -1045,7 +1045,7 @@
 		<text>Let's travel together. What do you say?</text>
 	</string>
 	<string id="dm_dialog_companion_can_we_come_with_2">
-		<text>My friends and I need a little help getting through the zone. Would you mind if we join you?</text>
+		<text>My friends and I need a little help getting through the Zone. Would you mind if we join you?</text>
 	</string>
 	<string id="dm_dialog_companion_can_i_come_with_2">
 		<text>Let's continue together as a team. What do you say?</text>
@@ -1198,7 +1198,7 @@
 		<text>Ignore the dead.</text>
 	</string>
 	<string id="axr_phrase_friend_companion_ask_join">
-		<text>Hey, let's explore as a team. We could help each other through the zone.</text>
+		<text>Hey, let's explore as a team. We could help each other through the Zone.</text>
 	</string>
 	<string id="axr_phrase_friend_companion_answer_join">
 		<text>Sure, sounds like a great idea! Lead the way.</text>

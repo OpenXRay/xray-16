@@ -72,516 +72,6 @@
 		<text>Holster that shooter or get lost!</text>
 	</string>
 	
-	<!-- Duty -->
-	
-	<string id="cc_generic-dolg-meet_hello_1">
-		<text>What's new?</text>
-	</string>
-	<string id="cc_generic-dolg-meet_hello_2">
-		<text>Hail and well met!</text>
-	</string>
-	<string id="cc_generic-dolg-meet_hello_3">
-		<text>Time's money. Get talking!</text>
-	</string>
-	
-	<string id="cc_generic-dolg-meet_hide_weapon_1">
-		<text>Holster that weapon, friend.</text>
-	</string>
-	<string id="cc_generic-dolg-meet_hide_weapon_2">
-		<text>Holster your weapon.</text>
-	</string>
-	<string id="cc_generic-dolg-meet_hide_weapon_3">
-		<text>Put that weapon away, chief.</text>
-	</string>
-	<string id="cc_generic-dolg-meet_hide_weapon_7">
-		<text>Get that weapon holstered man.</text>
-	</string>
-	<string id="cc_generic-dolg-meet_hide_weapon_8">
-		<text>Put that gun away now!</text>
-	</string>
-	<string id="cc_generic-dolg-meet_hide_weapon_9">
-		<text>Put that weapon away, man!</text>
-	</string>
-	<string id="cc_generic-dolg-meet_hide_weapon_10">
-		<text>Do you need any help getting rid of that weapon?</text>
-	</string>
-	<string id="cc_generic-dolg-meet_hide_weapon_11">
-		<text>Dude... Put that shooter away.</text>
-	</string>
-	
-	<string id="cc_generic-dolg-meet_use_no_default_1">
-		<text>Nah, I don't feel like talking.</text>
-	</string>
-	<string id="cc_generic-dolg-meet_use_no_default_2">
-		<text>Sorry, but I'm not in the mood to chat.</text>
-	</string>
-	<string id="cc_generic-dolg-meet_use_no_default_3">
-		<text>I can't talk right now.</text>
-	</string>
-	
-	<string id="cc_generic-dolg-meet_use_no_fight_1">
-		<text>We'll talk another time.</text>
-	</string>
-	<string id="cc_generic-dolg-meet_use_no_fight_2">
-		<text>Later. We'll talk later.</text>
-	</string>
-	<string id="cc_generic-dolg-meet_use_no_fight_3">
-		<text>This is a bad time to yap.</text>
-	</string>
-	
-	<string id="cc_generic-dolg-meet_use_no_talk_leader_1">
-		<text>Speak to the squad commander if you want something.</text>
-	</string>
-	<string id="cc_generic-dolg-meet_use_no_talk_leader_2">
-		<text>Stalker, direct your questions to the commander.</text>
-	</string>
-	<string id="cc_generic-dolg-meet_use_no_talk_leader_3">
-		<text>Go see the commander.</text>
-	</string>
-	
-	<string id="cc_generic-dolg-meet_use_no_weapon_1">
-		<text>We can chat when that weapon is not in my face.</text>
-	</string>
-	<string id="cc_generic-dolg-meet_use_no_weapon_2">
-		<text>Either put that shooter away, or just go away!</text>
-	</string>
-	<string id="cc_generic-dolg-meet_use_no_weapon_3">
-		<text>We'll talk when you holster your weapon.</text>
-	</string>
-	<string id="cc_generic-dolg-meet_use_no_weapon_6">
-		<text>Did you forget how to holster a weapon?</text>
-	</string>
-	<string id="cc_generic-dolg-meet_use_no_weapon_7">
-		<text>We ain't gonna have a conversation like this.</text>
-	</string>
-	<string id="cc_generic-dolg-meet_use_no_weapon_8">
-		<text>If you don't holster your weapon, it will be the only thing you can talk to!</text>
-	</string>
-	
-	<!-- Freedom -->
-	
-	<string id="cc_generic-freedom-meet_hello_1">
-		<text>Well, spill it!</text>
-	</string>
-	<string id="cc_generic-freedom-meet_hello_2">
-		<text>I'm listening, man.</text>
-	</string>
-	<string id="cc_generic-freedom-meet_hello_3">
-		<text>What's up, bro?</text>
-	</string>
-	
-	<string id="cc_generic-freedom-meet_hide_weapon_1">
-		<text>Don't play the hero. Keep that shooter holstered.</text>
-	</string>
-	<string id="cc_generic-freedom-meet_hide_weapon_2">
-		<text>Holster your shooter, damn it!</text>
-	</string>
-	<string id="cc_generic-freedom-meet_hide_weapon_3">
-		<text>Peace out, man! Holster that cannon of yours.</text>
-	</string>
-	<string id="cc_generic-freedom-meet_hide_weapon_9">
-		<text>Don't you pull anything. And hide that shooter, will ya?</text>
-	</string>
-	<string id="cc_generic-freedom-meet_hide_weapon_10">
-		<text>That's enough! Stop waving that piece around.</text>
-	</string>
-	<string id="cc_generic-freedom-meet_hide_weapon_11">
-		<text>Hide your toy now!</text>
-	</string>
-	<string id="cc_generic-freedom-meet_hide_weapon_12">
-		<text>Holster that friggin' shooter.</text>
-	</string>
-	
-	<string id="cc_generic-freedom-meet_use_no_default_1">
-		<text>Scram!</text>
-	</string>
-	<string id="cc_generic-freedom-meet_use_no_default_2">
-		<text>This conversation ain't happening, and that's the end of it!</text>
-	</string>
-	<string id="cc_generic-freedom-meet_use_no_default_3">
-		<text>I can't be bothered to chat now.</text>
-	</string>
-	
-	<string id="cc_generic-freedom-meet_use_no_fight_1">
-		<text>Dude, you're crazy!</text>
-	</string>
-	<string id="cc_generic-freedom-meet_use_no_fight_2">
-		<text>There's like, shooting and stuff, you know?</text>
-	</string>
-	<string id="cc_generic-freedom-meet_use_no_fight_3">
-		<text>It's hardly the time to talk.</text>
-	</string>
-	
-	<string id="cc_generic-freedom-meet_use_no_talk_leader_1">
-		<text>Go, talk to the boss, man!</text>
-	</string>
-	<string id="cc_generic-freedom-meet_use_no_talk_leader_2">
-		<text>I doubt I can tell you anything useful. Go, see the chief.</text>
-	</string>
-	<string id="cc_generic-freedom-meet_use_no_talk_leader_3">
-		<text>Leave me alone, man. Speak to the boss, he's over there.</text>
-	</string>
-	
-	<string id="cc_generic-freedom-meet_use_no_weapon_1">
-		<text>You planning to shoot or talk? Holster that weapon!</text>
-	</string>
-	<string id="cc_generic-freedom-meet_use_no_weapon_2">
-		<text>I ain't keen on talking to people who are pointing a gun at me.</text>
-	</string>
-	<string id="cc_generic-freedom-meet_use_no_weapon_3">
-		<text>We'll talk once that shooter is holstered.</text>
-	</string>
-	<string id="cc_generic-freedom-meet_use_no_weapon_6">
-		<text>Are you here to shoot - or to talk?</text>
-	</string>
-	<string id="cc_generic-freedom-meet_use_no_weapon_7">
-		<text>Dude. Your metal persuasion, it's gotta go!</text>
-	</string>
-	<string id="cc_generic-freedom-meet_use_no_weapon_8">
-		<text>Are you using that big toy to compensate for something?</text>
-	</string>
-	
-	<!-- Mercenaries -->
-	
-	<string id="cc_generic-killer-meet_hello_1">
-		<text>Come here. I won't bite.</text>
-	</string>
-	<string id="cc_generic-killer-meet_hello_2">
-		<text>Hey, bro!</text>
-	</string>
-	<string id="cc_generic-killer-meet_hello_3">
-		<text>Who are you?</text>
-	</string>
-	
-	<string id="cc_generic-killer-meet_hide_weapon_1">
-		<text>You hide that gun!</text>
-	</string>
-	<string id="cc_generic-killer-meet_hide_weapon_2">
-		<text>If you want to talk, lower that gun and come up slowly!</text>
-	</string>
-	<string id="cc_generic-killer-meet_hide_weapon_3">
-		<text>If you want to talk, lower that gun and come up slowly!</text>
-	</string>
-	<string id="cc_generic-killer-meet_hide_weapon_4">
-		<text>You hide that gun!</text>
-	</string>
-	<string id="cc_generic-killer-meet_hide_weapon_5">
-		<text>If you want to talk, lower that gun and come up slowly!</text>
-	</string>
-	<string id="cc_generic-killer-meet_hide_weapon_6">
-		<text>You hide that gun!</text>
-	</string>
-	
-	<string id="cc_generic-killer-meet_use_no_default_1">
-		<text>I'm not talking to you.</text>
-	</string>
-	<string id="cc_generic-killer-meet_use_no_default_2">
-		<text>I don't feel like chatting with you.</text>
-	</string>
-	<string id="cc_generic-killer-meet_use_no_default_3">
-		<text>I ain't in the mood for gum beating.</text>
-	</string>
-	
-	<string id="cc_generic-killer-meet_use_no_fight_1">
-		<text>Not now!</text>
-	</string>
-	<string id="cc_generic-killer-meet_use_no_fight_2">
-		<text>Are you crazy? Not now!</text>
-	</string>
-	<string id="cc_generic-killer-meet_use_no_fight_3">
-		<text>Can't you see we're in battle?</text>
-	</string>
-	
-	<string id="cc_generic-killer-meet_use_no_talk_leader_1">
-		<text>I don't feel like chattering. Go talk to the commander.</text>
-	</string>
-	<string id="cc_generic-killer-meet_use_no_talk_leader_2">
-		<text>If you need anything, go to the commander. Talk to him.</text>
-	</string>
-	<string id="cc_generic-killer-meet_use_no_talk_leader_3">
-		<text>I don't feel like chattering. Go talk to the commander.</text>
-	</string>
-	
-	<string id="cc_generic-killer-meet_use_no_weapon_1">
-		<text>I ain't talking to you when you got that thing in my face!</text>
-	</string>
-	<string id="cc_generic-killer-meet_use_no_weapon_2">
-		<text>Put that shooter away, then we'll talk.</text>
-	</string>
-	<string id="cc_generic-killer-meet_use_no_weapon_3">
-		<text>Holster that shooter or get lost!</text>
-	</string>
-	
-	<!-- Military -->
-	
-	<string id="cc_generic-military-meet_hello_1">
-		<text>Howdy?</text>
-	</string>
-	<string id="cc_generic-military-meet_hello_2">
-		<text>What do you want?</text>
-	</string>
-	<string id="cc_generic-military-meet_hello_3">
-		<text>Well? I'm listening...</text>
-	</string>
-	
-	<string id="cc_generic-military-meet_hide_weapon_1">
-		<text>Lower your weapon.</text>
-	</string>
-	<string id="cc_generic-military-meet_hide_weapon_2">
-		<text>Put your weapon away!</text>
-	</string>
-	<string id="cc_generic-military-meet_hide_weapon_3">
-		<text>Holster your weapon.</text>
-	</string>
-	
-	<string id="cc_generic-military-meet_use_no_default_1">
-		<text>I ain't got the time to talk.</text>
-	</string>
-	<string id="cc_generic-military-meet_use_no_default_2">
-		<text>I can't help you.</text>
-	</string>
-	<string id="cc_generic-military-meet_use_no_default_3">
-		<text>Leave me alone, major.</text>
-	</string>
-	
-	<string id="cc_generic-military-meet_use_no_fight_1">
-		<text>We'll talk when the fight is over.</text>
-	</string>
-	<string id="cc_generic-military-meet_use_no_fight_2">
-		<text>Quit this chatter and focus!</text>
-	</string>
-	<string id="cc_generic-military-meet_use_no_fight_3">
-		<text>Not a good time to talk, man.</text>
-	</string>
-	
-	<string id="cc_generic-military-meet_use_no_talk_leader_1">
-		<text>Go, see the commander.</text>
-	</string>
-	<string id="cc_generic-military-meet_use_no_talk_leader_2">
-		<text>The commander can answer your questions.</text>
-	</string>
-	<string id="cc_generic-military-meet_use_no_talk_leader_3">
-		<text>I do shooting. The commander does Q&amp;A sessions.</text>
-	</string>
-	
-	<string id="cc_generic-military-meet_use_no_weapon_1">
-		<text>If you want to talk, holster your weapon.</text>
-	</string>
-	<string id="cc_generic-military-meet_use_no_weapon_2">
-		<text>I ain't talking with you pointing that thing at me.</text>
-	</string>
-	<string id="cc_generic-military-meet_use_no_weapon_3">
-		<text>Holster your weapon if you want to talk.</text>
-	</string>
-	
-	<!-- Loner -->
-	
-	<string id="cc_generic-stalker-meet_hello_1">
-		<text>Howdy-ho?</text>
-	</string>
-	<string id="cc_generic-stalker-meet_hello_2">
-		<text>Hey, bro!</text>
-	</string>
-	<string id="cc_generic-stalker-meet_hello_3">
-		<text>I'm listening...</text>
-	</string>
-	
-	<string id="cc_generic-stalker-meet_hide_weapon_1">
-		<text>Put your weapon away, man.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_hide_weapon_2">
-		<text>Quit screwing around! Holster your weapon!</text>
-	</string>
-	<string id="cc_generic-stalker-meet_hide_weapon_3">
-		<text>Come on, man, put that weapon away!</text>
-	</string>
-	<string id="cc_generic-stalker-meet_hide_weapon_7">
-		<text>Hide your gun now!</text>
-	</string>
-	<string id="cc_generic-stalker-meet_hide_weapon_6">
-		<text>Quit waving that pop gun at me!</text>
-	</string>
-	<string id="cc_generic-stalker-meet_hide_weapon_8">
-		<text>What's with the shooter?</text>
-	</string>
-	
-	<string id="cc_generic-stalker-meet_use_no_default_1">
-		<text>I'm not talking to you.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_use_no_default_2">
-		<text>I don't feel like chatting with you.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_use_no_default_3">
-		<text>I ain't in the mood for gum beating.</text>
-	</string>
-	
-	<string id="cc_generic-stalker-meet_use_no_fight_1">
-		<text>This ain't the time to yap, man.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_use_no_fight_2">
-		<text>Are you crazy? We'll talk after!</text>
-	</string>
-	<string id="cc_generic-stalker-meet_use_no_fight_3">
-		<text>Sure you want to chit-chat with all this shit going on?</text>
-	</string>
-	
-	<string id="cc_generic-stalker-meet_use_no_talk_leader_1">
-		<text>Talk to the boss if you need something...</text>
-	</string>
-	<string id="cc_generic-stalker-meet_use_no_talk_leader_2">
-		<text>Speak to the boss.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_use_no_talk_leader_3">
-		<text>The boss is over there. Go, talk to him.</text>
-	</string>
-	
-	<string id="cc_generic-stalker-meet_use_no_weapon_1">
-		<text>Put that shooter away and then we'll talk.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_use_no_weapon_2">
-		<text>I'm not really talkative when there's a gun being waved in my face. Shocking, eh?</text>
-	</string>
-	<string id="cc_generic-stalker-meet_use_no_weapon_3">
-		<text>I don't feel like talking when you've got me in your sights.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_use_no_weapon_9">
-		<text>Come on man! Put that weapon away.</text>
-	</string>
-	
-	<string id="cc_generic-stalker-meet_weapon_start_1">
-		<text>Don't be a jerk, holster your weapon.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_weapon_start_2">
-		<text>Stop waving that gun, you've got my attention.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_weapon_start_3">
-		<text>We might have a conversation if you hide that weapon.</text>
-	</string>
-
-	<string id="cc_generic-stalker-meet_weapon_wait_1">
-		<text>Why are you holding onto that weapon?</text>
-	</string>
-	<string id="cc_generic-stalker-meet_weapon_wait_2">
-		<text>What's with the shooter?</text>
-	</string>
-	<string id="cc_generic-stalker-meet_weapon_wait_3">
-		<text>There's no talking with guns!</text>
-	</string>
-	<string id="cc_generic-stalker-meet_weapon_wait_4">
-		<text>Quit waving that pop gun at me!</text>
-	</string>
-	<string id="cc_generic-stalker-meet_weapon_wait_5">
-		<text>Hide your gun now!</text>
-	</string>
-	
-	<string id="cc_generic-stalker-meet_wait_1">
-		<text>I'm listening.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_wait_2">
-		<text>Come on, spill the beans.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_wait_3">
-		<text>Can't you see I'm busy? get to the point.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_wait_4">
-		<text>Are you shy or something? come on, talk to me.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_wait_5">
-		<text>Come on don't be shy, speak up.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_wait_6">
-		<text>If you're here to talk business, do it.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_wait_7">
-		<text>Good, enough quiet already, speak up!</text>
-	</string>
-	<string id="cc_generic-stalker-meet_wait_8">
-		<text>Wake up and smell the coffee.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_wait_9">
-		<text>Come on, speak up already.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_wait_10">
-		<text>Come on, start sharing.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_wait_11">
-		<text>Well, do you want something or don't you?</text>
-	</string>
-	<string id="cc_generic-stalker-meet_wait_12">
-		<text>Do I have to speak for both of us here?</text>
-	</string>
-	
-	<string id="cc_generic-stalker-meet_stop_1">
-		<text>Talking to a mute is a moot point.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_stop_2">
-		<text>Come back when you learn how to talk.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_stop_3">
-		<text>I'm thoroughly enjoying this conversation. Not.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_stop_4">
-		<text>Huh. Nice chat that was.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_stop_5">
-		<text>Is this a silence contest? Okay, you win.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_stop_6">
-		<text>Damned if I know what you want from me.</text>
-	</string>
-	
-	<string id="cc_generic-stalker-meet_general_wait_1">
-		<text>Wake up and smell the coffee!</text>
-	</string>
-	<string id="cc_generic-stalker-meet_general_wait_2">
-		<text>Come on, speak up already.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_general_wait_3">
-		<text>Come on, start sharing.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_general_wait_4">
-		<text>Well, do you want something or don't you?</text>
-	</string>
-	<string id="cc_generic-stalker-meet_general_wait_5">
-		<text>Do I have to speak for both of us here?</text>
-	</string>
-	
-	<string id="cc_generic-stalker-meet_general_stop_1">
-		<text>Nice chat that was.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_general_stop_2">
-		<text>Is this a silence contest? Okay, you win.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_general_stop_3">
-		<text>Damned if I know what you want from me.</text>
-	</string>
-	
-	<string id="cc_generic-stalker-meet_general_start_1">
-		<text>If you've got something to say, say it.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_general_start_2">
-		<text>I'm all ears.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_general_start_3">
-		<text>I'm listening.</text>
-	</string>
-	
-	<string id="cc_generic-stalker-meet_comander_wait_1">
-		<text>Can't you see I'm busy? Get to the point.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_comander_wait_2">
-		<text>Are you shy or something? Come on, talk to me!</text>
-	</string>
-	<string id="cc_generic-stalker-meet_comander_wait_3">
-		<text>Come on, don't be shy, speak up.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_comander_wait_4">
-		<text>If you're here to talk business, do it.</text>
-	</string>
-	<string id="cc_generic-stalker-meet_comander_wait_5">
-		<text>Dude, enough quite already, speak up!</text>
-	</string>
-		
 	<!-- Clear Sky -->
 	
 	<string id="cc_generic-csky-meet_hello_1">
@@ -730,6 +220,607 @@
 	</string>
 	<string id="cc_generic-csky-meet_comander_start_3">
 		<text>Whatcha' need?</text>
+	</string>
+	
+	<!-- Duty -->
+	
+	<string id="cc_generic-dolg-meet_hello_1">
+		<text>What's new?</text>
+	</string>
+	<string id="cc_generic-dolg-meet_hello_2">
+		<text>Hail and well met!</text>
+	</string>
+	<string id="cc_generic-dolg-meet_hello_3">
+		<text>Time's money. Get talking!</text>
+	</string>
+	
+	<string id="cc_generic-dolg-meet_hide_weapon_1">
+		<text>Holster that weapon, friend.</text>
+	</string>
+	<string id="cc_generic-dolg-meet_hide_weapon_2">
+		<text>Holster your weapon.</text>
+	</string>
+	<string id="cc_generic-dolg-meet_hide_weapon_3">
+		<text>Put that weapon away, chief.</text>
+	</string>
+	<string id="cc_generic-dolg-meet_hide_weapon_7">
+		<text>Get that weapon holstered man.</text>
+	</string>
+	<string id="cc_generic-dolg-meet_hide_weapon_8">
+		<text>Put that gun away now!</text>
+	</string>
+	<string id="cc_generic-dolg-meet_hide_weapon_9">
+		<text>Put that weapon away, man!</text>
+	</string>
+	<string id="cc_generic-dolg-meet_hide_weapon_10">
+		<text>Do you need any help getting rid of that weapon?</text>
+	</string>
+	<string id="cc_generic-dolg-meet_hide_weapon_11">
+		<text>Dude... Put that shooter away.</text>
+	</string>
+	
+	<string id="cc_generic-dolg-meet_use_no_default_1">
+		<text>Nah, I don't feel like talking.</text>
+	</string>
+	<string id="cc_generic-dolg-meet_use_no_default_2">
+		<text>Sorry, but I'm not in the mood to chat.</text>
+	</string>
+	<string id="cc_generic-dolg-meet_use_no_default_3">
+		<text>I can't talk right now.</text>
+	</string>
+	
+	<string id="cc_generic-dolg-meet_use_no_fight_1">
+		<text>We'll talk another time.</text>
+	</string>
+	<string id="cc_generic-dolg-meet_use_no_fight_2">
+		<text>Later. We'll talk later.</text>
+	</string>
+	<string id="cc_generic-dolg-meet_use_no_fight_3">
+		<text>This is a bad time to yap.</text>
+	</string>
+	
+	<string id="cc_generic-dolg-meet_use_no_talk_leader_1">
+		<text>Speak to the squad commander if you want something.</text>
+	</string>
+	<string id="cc_generic-dolg-meet_use_no_talk_leader_2">
+		<text>Stalker, direct your questions to the commander.</text>
+	</string>
+	<string id="cc_generic-dolg-meet_use_no_talk_leader_3">
+		<text>Go see the commander.</text>
+	</string>
+	
+	<string id="cc_generic-dolg-meet_use_no_weapon_1">
+		<text>We can chat when that weapon is not in my face.</text>
+	</string>
+	<string id="cc_generic-dolg-meet_use_no_weapon_2">
+		<text>Either put that shooter away, or just go away!</text>
+	</string>
+	<string id="cc_generic-dolg-meet_use_no_weapon_3">
+		<text>We'll talk when you holster your weapon.</text>
+	</string>
+	<string id="cc_generic-dolg-meet_use_no_weapon_6">
+		<text>Did you forget how to holster a weapon?</text>
+	</string>
+	<string id="cc_generic-dolg-meet_use_no_weapon_7">
+		<text>We ain't gonna have a conversation like this.</text>
+	</string>
+	<string id="cc_generic-dolg-meet_use_no_weapon_8">
+		<text>If you don't holster your weapon, it will be the only thing you can talk to!</text>
+	</string>
+	
+	<!-- Ecologists -->
+	
+	<string id="cc_generic-ecolog-meet_hello_1">
+		<text>What do you say?</text>
+	</string>
+	<string id="cc_generic-ecolog-meet_hello_2">
+		<text>I'm listening.</text>
+	</string>
+	<string id="cc_generic-ecolog-meet_hello_3">
+		<text>Good day.</text>
+	</string>
+	
+	<string id="cc_generic-ecolog-meet_hide_weapon_1">
+		<text>Hey, now, that won't do. Let's not point any guns.</text>
+	</string>
+	<string id="cc_generic-ecolog-meet_hide_weapon_2">
+		<text>You can holster that weapon first.</text>
+	</string>
+	<string id="cc_generic-ecolog-meet_hide_weapon_3">
+		<text>Put away your gun first, man.</text>
+	</string>
+	
+	<string id="cc_generic-ecolog-meet_use_no_default_1">
+		<text>I don't have anything to talk about right now, alright?</text>
+	</string>
+	<string id="cc_generic-ecolog-meet_use_no_default_2">
+		<text>Sorry, I'd rather not speak right now.</text>
+	</string>
+	<string id="cc_generic-ecolog-meet_use_no_default_3">
+		<text>Don't bother me with any chit-chat, please.</text>
+	</string>
+	
+	<string id="cc_generic-ecolog-meet_use_no_fight_1">
+		<text>You seriously want to talk? Get down, idiot!</text>
+	</string>
+	<string id="cc_generic-ecolog-meet_use_no_fight_2">
+		<text>Later! We'll talk later!</text>
+	</string>
+	<string id="cc_generic-ecolog-meet_use_no_fight_3">
+		<text>Have you got a head on your shoulders? Not now!</text>
+	</string>
+	
+	<string id="cc_generic-ecolog-meet_use_no_talk_leader_1">
+		<text>I don't have anything to talk about right now, alright?</text>
+	</string>
+	
+	<string id="cc_generic-ecolog-meet_use_no_weapon_1">
+		<text>If you wanna talk, put down that weapon.</text>
+	</string>
+	<string id="cc_generic-ecolog-meet_use_no_weapon_2">
+		<text>Hide that shooter, man. Otherwise, I have no business with you.</text>
+	</string>
+	<string id="cc_generic-ecolog-meet_use_no_weapon_3">
+		<text>Hey, now, that won't do. Let's not point any guns.</text>
+	</string>
+	
+	<!-- Freedom -->
+	
+	<string id="cc_generic-freedom-meet_hello_1">
+		<text>Well, spill it!</text>
+	</string>
+	<string id="cc_generic-freedom-meet_hello_2">
+		<text>I'm listening, man.</text>
+	</string>
+	<string id="cc_generic-freedom-meet_hello_3">
+		<text>What's up, bro?</text>
+	</string>
+	
+	<string id="cc_generic-freedom-meet_hide_weapon_1">
+		<text>Don't play the hero. Keep that shooter holstered.</text>
+	</string>
+	<string id="cc_generic-freedom-meet_hide_weapon_2">
+		<text>Holster your shooter, damn it!</text>
+	</string>
+	<string id="cc_generic-freedom-meet_hide_weapon_3">
+		<text>Peace out, man! Holster that cannon of yours.</text>
+	</string>
+	<string id="cc_generic-freedom-meet_hide_weapon_9">
+		<text>Don't you pull anything. And hide that shooter, will ya?</text>
+	</string>
+	<string id="cc_generic-freedom-meet_hide_weapon_10">
+		<text>That's enough! Stop waving that piece around.</text>
+	</string>
+	<string id="cc_generic-freedom-meet_hide_weapon_11">
+		<text>Hide your toy now!</text>
+	</string>
+	<string id="cc_generic-freedom-meet_hide_weapon_12">
+		<text>Holster that friggin' shooter.</text>
+	</string>
+	
+	<string id="cc_generic-freedom-meet_use_no_default_1">
+		<text>Scram!</text>
+	</string>
+	<string id="cc_generic-freedom-meet_use_no_default_2">
+		<text>This conversation ain't happening, and that's the end of it!</text>
+	</string>
+	<string id="cc_generic-freedom-meet_use_no_default_3">
+		<text>I can't be bothered to chat now.</text>
+	</string>
+	
+	<string id="cc_generic-freedom-meet_use_no_fight_1">
+		<text>Dude, you're crazy!</text>
+	</string>
+	<string id="cc_generic-freedom-meet_use_no_fight_2">
+		<text>There's like, shooting and stuff, you know?</text>
+	</string>
+	<string id="cc_generic-freedom-meet_use_no_fight_3">
+		<text>It's hardly the time to talk.</text>
+	</string>
+	
+	<string id="cc_generic-freedom-meet_use_no_talk_leader_1">
+		<text>Go, talk to the boss, man!</text>
+	</string>
+	<string id="cc_generic-freedom-meet_use_no_talk_leader_2">
+		<text>I doubt I can tell you anything useful. Go, see the chief.</text>
+	</string>
+	<string id="cc_generic-freedom-meet_use_no_talk_leader_3">
+		<text>Leave me alone, man. Speak to the boss, he's over there.</text>
+	</string>
+	
+	<string id="cc_generic-freedom-meet_use_no_weapon_1">
+		<text>You planning to shoot or talk? Holster that weapon!</text>
+	</string>
+	<string id="cc_generic-freedom-meet_use_no_weapon_2">
+		<text>I ain't keen on talking to people who are pointing a gun at me.</text>
+	</string>
+	<string id="cc_generic-freedom-meet_use_no_weapon_3">
+		<text>We'll talk once that shooter is holstered.</text>
+	</string>
+	<string id="cc_generic-freedom-meet_use_no_weapon_6">
+		<text>Are you here to shoot - or to talk?</text>
+	</string>
+	<string id="cc_generic-freedom-meet_use_no_weapon_7">
+		<text>Dude. Your metal persuasion, it's gotta go!</text>
+	</string>
+	<string id="cc_generic-freedom-meet_use_no_weapon_8">
+		<text>Are you using that big toy to compensate for something?</text>
+	</string>
+	
+	<!-- Loners -->
+	
+	<string id="cc_generic-stalker-meet_hello_1">
+		<text>Howdy-ho?</text>
+	</string>
+	<string id="cc_generic-stalker-meet_hello_2">
+		<text>Hey, bro!</text>
+	</string>
+	<string id="cc_generic-stalker-meet_hello_3">
+		<text>I'm listening...</text>
+	</string>
+	
+	<string id="cc_generic-stalker-meet_hide_weapon_1">
+		<text>Put your weapon away, man.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_hide_weapon_2">
+		<text>Quit screwing around! Holster your weapon!</text>
+	</string>
+	<string id="cc_generic-stalker-meet_hide_weapon_3">
+		<text>Come on, man, put that weapon away!</text>
+	</string>
+	<string id="cc_generic-stalker-meet_hide_weapon_7">
+		<text>Hide your gun now!</text>
+	</string>
+	<string id="cc_generic-stalker-meet_hide_weapon_6">
+		<text>Quit waving that pop gun at me!</text>
+	</string>
+	<string id="cc_generic-stalker-meet_hide_weapon_8">
+		<text>What's with the shooter?</text>
+	</string>
+	
+	<string id="cc_generic-stalker-meet_use_no_default_1">
+		<text>I'm not talking to you.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_use_no_default_2">
+		<text>I don't feel like chatting with you.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_use_no_default_3">
+		<text>I ain't in the mood for gum beating.</text>
+	</string>
+	
+	<string id="cc_generic-stalker-meet_use_no_fight_1">
+		<text>This ain't the time to yap, man.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_use_no_fight_2">
+		<text>Are you crazy? We'll talk after!</text>
+	</string>
+	<string id="cc_generic-stalker-meet_use_no_fight_3">
+		<text>Sure you want to chit-chat with all this shit going on?</text>
+	</string>
+	
+	<string id="cc_generic-stalker-meet_use_no_talk_leader_1">
+		<text>Talk to the boss if you need something...</text>
+	</string>
+	<string id="cc_generic-stalker-meet_use_no_talk_leader_2">
+		<text>Speak to the boss.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_use_no_talk_leader_3">
+		<text>The boss is over there. Go, talk to him.</text>
+	</string>
+	
+	<string id="cc_generic-stalker-meet_use_no_weapon_1">
+		<text>Put that shooter away and then we'll talk.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_use_no_weapon_2">
+		<text>I'm not really talkative when there's a gun being waved in my face. Shocking, eh?</text>
+	</string>
+	<string id="cc_generic-stalker-meet_use_no_weapon_3">
+		<text>I don't feel like talking when you've got me in your sights.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_use_no_weapon_9">
+		<text>Come on man! Put that weapon away.</text>
+	</string>
+	
+	<string id="cc_generic-stalker-meet_weapon_start_1">
+		<text>Don't be a jerk, holster your weapon.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_weapon_start_2">
+		<text>Stop waving that gun, you've got my attention.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_weapon_start_3">
+		<text>We might have a conversation if you hide that weapon.</text>
+	</string>
+
+	<string id="cc_generic-stalker-meet_weapon_wait_1">
+		<text>Why are you holding onto that weapon?</text>
+	</string>
+	<string id="cc_generic-stalker-meet_weapon_wait_2">
+		<text>What's with the shooter?</text>
+	</string>
+	<string id="cc_generic-stalker-meet_weapon_wait_3">
+		<text>There's no talking with guns!</text>
+	</string>
+	<string id="cc_generic-stalker-meet_weapon_wait_4">
+		<text>Quit waving that pop gun at me!</text>
+	</string>
+	<string id="cc_generic-stalker-meet_weapon_wait_5">
+		<text>Hide your gun now!</text>
+	</string>
+	
+	<string id="cc_generic-stalker-meet_wait_1">
+		<text>I'm listening.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_wait_2">
+		<text>Come on, spill the beans.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_wait_3">
+		<text>Can't you see I'm busy? Get to the point.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_wait_4">
+		<text>Are you shy or something? Come on, talk to me.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_wait_5">
+		<text>Come on don't be shy, speak up.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_wait_6">
+		<text>If you're here to talk business, do it.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_wait_7">
+		<text>Good, enough quiet already, speak up!</text>
+	</string>
+	<string id="cc_generic-stalker-meet_wait_8">
+		<text>Wake up and smell the coffee.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_wait_9">
+		<text>Come on, speak up already.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_wait_10">
+		<text>Come on, start sharing.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_wait_11">
+		<text>Well, do you want something or don't you?</text>
+	</string>
+	<string id="cc_generic-stalker-meet_wait_12">
+		<text>Do I have to speak for both of us here?</text>
+	</string>
+	
+	<string id="cc_generic-stalker-meet_stop_1">
+		<text>Talking to a mute is a moot point.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_stop_2">
+		<text>Come back when you learn how to talk.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_stop_3">
+		<text>I'm thoroughly enjoying this conversation. Not.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_stop_4">
+		<text>Huh. Nice chat that was.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_stop_5">
+		<text>Is this a silence contest? Okay, you win.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_stop_6">
+		<text>Damned if I know what you want from me.</text>
+	</string>
+	
+	<string id="cc_generic-stalker-meet_general_wait_1">
+		<text>Wake up and smell the coffee!</text>
+	</string>
+	<string id="cc_generic-stalker-meet_general_wait_2">
+		<text>Come on, speak up already.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_general_wait_3">
+		<text>Come on, start sharing.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_general_wait_4">
+		<text>Well, do you want something or don't you?</text>
+	</string>
+	<string id="cc_generic-stalker-meet_general_wait_5">
+		<text>Do I have to speak for both of us here?</text>
+	</string>
+	
+	<string id="cc_generic-stalker-meet_general_stop_1">
+		<text>Nice chat that was.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_general_stop_2">
+		<text>Is this a silence contest? Okay, you win.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_general_stop_3">
+		<text>Damned if I know what you want from me.</text>
+	</string>
+	
+	<string id="cc_generic-stalker-meet_general_start_1">
+		<text>If you've got something to say, say it.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_general_start_2">
+		<text>I'm all ears.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_general_start_3">
+		<text>I'm listening.</text>
+	</string>
+	
+	<string id="cc_generic-stalker-meet_comander_wait_1">
+		<text>Can't you see I'm busy? Get to the point.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_comander_wait_2">
+		<text>Are you shy or something? Come on, talk to me!</text>
+	</string>
+	<string id="cc_generic-stalker-meet_comander_wait_3">
+		<text>Come on, don't be shy, speak up.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_comander_wait_4">
+		<text>If you're here to talk business, do it.</text>
+	</string>
+	<string id="cc_generic-stalker-meet_comander_wait_5">
+		<text>Dude, enough quite already, speak up!</text>
+	</string>
+	
+	<!-- Mercenaries -->
+	
+	<string id="cc_generic-killer-meet_hello_1">
+		<text>Come here. I won't bite.</text>
+	</string>
+	<string id="cc_generic-killer-meet_hello_2">
+		<text>Hey, bro!</text>
+	</string>
+	<string id="cc_generic-killer-meet_hello_3">
+		<text>Who are you?</text>
+	</string>
+	
+	<string id="cc_generic-killer-meet_hide_weapon_1">
+		<text>You hide that gun!</text>
+	</string>
+	<string id="cc_generic-killer-meet_hide_weapon_2">
+		<text>If you want to talk, lower that gun and come up slowly!</text>
+	</string>
+	<string id="cc_generic-killer-meet_hide_weapon_3">
+		<text>If you want to talk, lower that gun and come up slowly!</text>
+	</string>
+	<string id="cc_generic-killer-meet_hide_weapon_4">
+		<text>You hide that gun!</text>
+	</string>
+	<string id="cc_generic-killer-meet_hide_weapon_5">
+		<text>If you want to talk, lower that gun and come up slowly!</text>
+	</string>
+	<string id="cc_generic-killer-meet_hide_weapon_6">
+		<text>You hide that gun!</text>
+	</string>
+	
+	<string id="cc_generic-killer-meet_use_no_default_1">
+		<text>I'm not talking to you.</text>
+	</string>
+	<string id="cc_generic-killer-meet_use_no_default_2">
+		<text>I don't feel like chatting with you.</text>
+	</string>
+	<string id="cc_generic-killer-meet_use_no_default_3">
+		<text>I ain't in the mood for gum beating.</text>
+	</string>
+	
+	<string id="cc_generic-killer-meet_use_no_fight_1">
+		<text>Not now!</text>
+	</string>
+	<string id="cc_generic-killer-meet_use_no_fight_2">
+		<text>Are you crazy? Not now!</text>
+	</string>
+	<string id="cc_generic-killer-meet_use_no_fight_3">
+		<text>Can't you see we're in battle?</text>
+	</string>
+	
+	<string id="cc_generic-killer-meet_use_no_talk_leader_1">
+		<text>I don't feel like chattering. Go talk to the commander.</text>
+	</string>
+	<string id="cc_generic-killer-meet_use_no_talk_leader_2">
+		<text>If you need anything, go to the commander. Talk to him.</text>
+	</string>
+	<string id="cc_generic-killer-meet_use_no_talk_leader_3">
+		<text>I don't feel like chattering. Go talk to the commander.</text>
+	</string>
+	
+	<string id="cc_generic-killer-meet_use_no_weapon_1">
+		<text>I ain't talking to you when you got that thing in my face!</text>
+	</string>
+	<string id="cc_generic-killer-meet_use_no_weapon_2">
+		<text>Put that shooter away, then we'll talk.</text>
+	</string>
+	<string id="cc_generic-killer-meet_use_no_weapon_3">
+		<text>Holster that shooter or get lost!</text>
+	</string>
+	
+	<!-- Military -->
+	
+	<string id="cc_generic-military-meet_hello_1">
+		<text>Howdy?</text>
+	</string>
+	<string id="cc_generic-military-meet_hello_2">
+		<text>What do you want?</text>
+	</string>
+	<string id="cc_generic-military-meet_hello_3">
+		<text>Well? I'm listening...</text>
+	</string>
+	
+	<string id="cc_generic-military-meet_hide_weapon_1">
+		<text>Lower your weapon.</text>
+	</string>
+	<string id="cc_generic-military-meet_hide_weapon_2">
+		<text>Put your weapon away!</text>
+	</string>
+	<string id="cc_generic-military-meet_hide_weapon_3">
+		<text>Holster your weapon.</text>
+	</string>
+	
+	<string id="cc_generic-military-meet_use_no_default_1">
+		<text>I ain't got the time to talk.</text>
+	</string>
+	<string id="cc_generic-military-meet_use_no_default_2">
+		<text>I can't help you.</text>
+	</string>
+	<string id="cc_generic-military-meet_use_no_default_3">
+		<text>Leave me alone, major.</text>
+	</string>
+	
+	<string id="cc_generic-military-meet_use_no_fight_1">
+		<text>We'll talk when the fight is over.</text>
+	</string>
+	<string id="cc_generic-military-meet_use_no_fight_2">
+		<text>Quit this chatter and focus!</text>
+	</string>
+	<string id="cc_generic-military-meet_use_no_fight_3">
+		<text>Not a good time to talk, man.</text>
+	</string>
+	
+	<string id="cc_generic-military-meet_use_no_talk_leader_1">
+		<text>Go, see the commander.</text>
+	</string>
+	<string id="cc_generic-military-meet_use_no_talk_leader_2">
+		<text>The commander can answer your questions.</text>
+	</string>
+	<string id="cc_generic-military-meet_use_no_talk_leader_3">
+		<text>I do shooting. The commander does Q&amp;A sessions.</text>
+	</string>
+	
+	<string id="cc_generic-military-meet_use_no_weapon_1">
+		<text>If you want to talk, holster your weapon.</text>
+	</string>
+	<string id="cc_generic-military-meet_use_no_weapon_2">
+		<text>I ain't talking with you pointing that thing at me.</text>
+	</string>
+	<string id="cc_generic-military-meet_use_no_weapon_3">
+		<text>Holster your weapon if you want to talk.</text>
+	</string>
+	
+	<!-- Monolith -->
+	
+	<string id="cc_generic-monolith-meet_hello_1">
+		<text>Trust no one other than the Monolith and your fellow brothers. No one.</text>
+	</string>
+	<string id="cc_generic-monolith-meet_hello_2">
+		<text>It's too quiet here.</text>
+	</string>
+	<string id="cc_generic-monolith-meet_hello_3">
+		<text>I believe I've been here before at some point. I cannot remember.</text>
+	</string>
+	<string id="cc_generic-monolith-meet_hello_4">
+		<text>Strange... Everything here is strange.</text>
+	</string>
+	
+	<string id="cc_generic-monolith-meet_use_no_fight_1">
+		<text>Monolith... Great Monolith.</text>
+	</string>
+	<string id="cc_generic-monolith-meet_use_no_fight_2">
+		<text>The enemies are near... Such is the will of the Monolith.</text>
+	</string>
+	<string id="cc_generic-monolith-meet_use_no_fight_3">
+		<text>Monolith... I am your faithful servant.</text>
+	</string>
+	
+	<string id="cc_generic-monolith-meet_use_no_talk_leader_1">
+		<text>Let's keep to ourselves.</text>
+	</string>
+	<string id="cc_generic-monolith-meet_use_no_talk_leader_2">
+		<text>It is not worth it to speak in vain.</text>
+	</string>
+	<string id="cc_generic-monolith-meet_use_no_talk_leader_3">
+		<text>I do not want to speak right now.</text>
 	</string>
 	
 </string_table>

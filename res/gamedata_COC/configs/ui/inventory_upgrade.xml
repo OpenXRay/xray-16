@@ -510,6 +510,14 @@
 	            <cell x="200" y="126" point_x="135" point_y="180"/>
 	        </column>
 	    </template>
+	    <template name="upgrade_scheme_binoc">
+	        <column>
+	            <cell x="0" y="24" point_x="140" point_y="225"/>
+	        </column>
+	        <column>
+	            <cell x="100" y="24" point_x="150" point_y="185"/>
+	        </column>
+	    </template>
 	    <template name="upgrade_scheme_bm16">
 	        <column>
 	            <cell x="0" y="24" point_x="270" point_y="210"/>
@@ -910,6 +918,30 @@
 	            <cell x="0" y="228" point_x="172" point_y="194"/>
 	            <cell x="0" y="330" point_x="96" point_y="194"/>
 	            <cell x="0" y="409" point_x="115" point_y="223"/>
+	        </column>
+	        <column>
+	            <cell x="100" y="0" point_x="121" point_y="184"/>
+	            <cell x="100" y="49" point_x="89" point_y="183"/>
+	            <cell x="100" y="126" point_x="114" point_y="194"/>
+	            <cell x="100" y="204" point_x="151" point_y="192"/>
+	            <cell x="100" y="253" point_x="191" point_y="196"/>
+	            <cell x="100" y="330" point_x="114" point_y="194"/>
+	        </column>
+	        <column>
+	            <cell x="200" y="24" point_x="102" point_y="183"/>
+	            <cell x="200" y="102" point_x="89" point_y="183"/>
+	            <cell x="200" y="151" point_x="103" point_y="183"/>
+	            <cell x="200" y="228" point_x="266" point_y="203"/>
+	            <cell x="200" y="306" point_x="75" point_y="214"/>
+	            <cell x="200" y="355" point_x="103" point_y="183"/>
+	        </column>
+	    </template>
+	    <template name="upgrade_scheme_sig550_">
+	        <column>
+	            <cell x="0" y="24" point_x="85" point_y="201"/>
+	            <cell x="0" y="126" point_x="74" point_y="186"/>
+	            <cell x="0" y="228" point_x="172" point_y="194"/>
+	            <cell x="0" y="330" point_x="96" point_y="194"/>
 	        </column>
 	        <column>
 	            <cell x="100" y="0" point_x="121" point_y="184"/>

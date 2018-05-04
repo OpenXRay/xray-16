@@ -1,18 +1,6 @@
----------------------------------
------ Written by Darryl123 ------
----------------------------------
-
--------------------------
------ Miscellaneous -----
--------------------------
-
--- Initialises (if necessary) and returns the encyclopedia interface.
--- Used by pda.script and dxr_encyclopedia.script.
-local SINGLETON = nil
-function get_ui()
-	SINGLETON = SINGLETON or pda_encyclopedia_tab()
-	return SINGLETON
-end
+--------------------------------
+----- Written by Darryl123 -----
+--------------------------------
 
 ------------------------
 ----- Constructors -----
@@ -21,19 +9,27 @@ end
 -- Encyclopedia interface.
 class "pda_encyclopedia_tab" (CUIScriptWnd)
 function pda_encyclopedia_tab:__init() super()
+	-- Counters.
+	self.articles_count = 0
+	self.articles_locked_count = 0
+	self.articles_unlocked_count = 0
+
+	-- Tables.
 	self.categories = {}
-	self.locked = {}
-	self.plugin = "plugins\\encyclopedia.ltx"
-	self.section = "encyclopedia"
+	self.interactivity = {}
+	self.locked_articles = {}
+	
+	-- Tiering.
+	self.highest_tier = 0
+	
+	-- Plugin init.
 	self:InitPlugin()
+	self:InitPlugin2()
+	
+	-- Interface init.
 	self:InitControls()
 	self:InitCallbacks()
 	self:InitCategories()
-end
-
--- Finalize.
-function pda_encyclopedia_tab:__finalize()
-	SINGLETON = nil 
 end
 
 -- Article and category items.
@@ -47,44 +43,110 @@ function pda_encyclopedia_entry:__init() super(22)
 	self.sect:SetEllipsis(true)
 end
 
+-------------------------
+----- Miscellaneous -----
+-------------------------
+
+-- Initialises the encyclopedia interface.
+local SINGLETON = nil
+function get_ui()
+	SINGLETON = SINGLETON or pda_encyclopedia_tab()
+	return SINGLETON
+end
+
+-- Finalizes the encyclopedia interface.
+function pda_encyclopedia_tab:__finalize()
+	SINGLETON = nil 
+end
+
 ---------------------
 ----- Callbacks -----
 ---------------------
 
+-- Called when the "images above text" checkbox is clicked.
+function pda_encyclopedia_tab:SaveCheckBoxSettings()
+	-- Write the updated value to axr_options so it is remembered.
+	axr_main.config:w_value("pda_encyclopedia", "images_above_text",  self.image_checkbox:GetCheck())
+	axr_main.config:w_value("pda_encyclopedia", "display_messages",  self.message_checkbox:GetCheck())
+	axr_main.config:save()
+end
+
 -- Called when an article is selected.
-function pda_encyclopedia_tab:SelectArticle(index1, index2)
+function pda_encyclopedia_tab:SelectArticle(index_a)
 	-- GetSelectedIndex() starts counting at 0.
-	index1 = index1 or (self.category_list:GetSelectedIndex() + 1)
-	index2 = index2 or (self.article_list:GetSelectedIndex() + 1)
-	
-	-- Calls to this method may require a forced index change.
-	self.category_list:SetSelectedIndex(index1 - 1)
-	self.article_list:SetSelectedIndex(index2 - 1)
+	index_a = index_a or (self.article_list:GetSelectedIndex() + 1)
+	index_c = (self.category_list:GetSelectedIndex() + 1)
 	
 	-- Establish the section of the article selected.
-	local category = self.categories[index1]
-	local section = category and category.articles[index2] or nil
+	local category = self.categories[index_c]
+	local section = category and category.articles[index_a] or nil
 	if not (section) then return end
 	
-	-- Set the text of the article.
-	self.information:SetText(game.translate_string(section .. "_text"))
+	-- Calls to this method may require a forced index change.
+	-- This is only to update the selection visually after an unlock.
+	self.article_list:SetSelectedIndex(index_a - 1)
+	self.category_list:SetSelectedIndex(index_c - 1)
 	
-	-- Lock the required articles if the guide wasn't cheated.
-	if not has_alife_info("unlocked_guide") then
-		for k, v in pairs (self.locked) do
-			if (section == v) then
-				self.information:SetText(game.translate_string("pda_btn_encyclopedia_locked"))
-				break
-			end
-		end
+	-- Load the article text and image if it is unlocked.
+	local locked = (self.locked_articles[section] ~= nil)
+	local images_above_text = self.image_checkbox:GetCheck()
+	if (not locked) then
+		-- Set the article's text.
+		self.information:SetText(game.translate_string(section .. "_text"))
+	
+		-- Set the article's image.
+		-- A bit hacky, but to allow for dynamic width/height we have to initialise the texture twice.
+		-- We load the texture, grab its dimensions, set the window size then reinitialise it a second time.
+		-- If we don't do this then for whatever weird and wonderful reason the image refuses to draw on the UI.
+		self.image:InitTexture(section .. "_image")
+		
+		-- Grab the dimensions of the image to resize the container.
+		local image_width = self.image:GetTextureRect().x2 - self.image:GetTextureRect().x1
+		local image_height = self.image:GetTextureRect().y2 - self.image:GetTextureRect().y1
+		
+		-- Offset is used to add "padding" around the image when text is present.
+		-- If images appear above text and there is no height to the image, then use no offset.
+		local image_offset = images_above_text and (image_height > 0 and 7 or 0) or (image_height > 0 and 15 or 0)
+		
+		-- Resize the image and container, and then reinitialise the texture so it gets drawn.
+		-- The x_coefficient variable is used to fix image stretchiness when using widescreen resolutions.
+		local x_coefficient = (device().height / device().width) / (768 / 1024)
+		self.image_container:SetWndSize(vector2():set(image_width, image_height + image_offset))
+		self.image:SetWndSize(vector2():set(image_width * x_coefficient, image_height))
+		self.image:SetStretchTexture(true)
+		self.image:InitTexture(section .. "_image")
+	else
+		self.information:SetText(game.translate_string("pda_encyclopedia_locked_text"))
 	end
 	
-	-- Set the information window and adjust the scrollbar as appropriate.
+	-- Same reasoning as the offset for the image height.
+	-- Creates a "better-looking" padding between the text and the image.
+	local information_offset = images_above_text and 10 or 3
+	
+	-- Adjust the text component size.
 	self.information:AdjustHeightToText()
-	self.information:SetWndSize(vector2():set(self.information:GetWidth(), self.information:GetHeight() + 7))
+	self.information:SetWndSize(vector2():set(self.information:GetWidth(), self.information:GetHeight() + information_offset))
+	
+	-- Clear the scrollbar.
 	self.scrollbar:Clear()
+	
+	-- Add the image above text depending on checkbox.
+	if (not locked and images_above_text) then
+		self.scrollbar:AddWindow(self.image_container, true)
+		self.image_container:SetAutoDelete(false)
+		self.image:SetAutoDelete(false)
+	end
+	
+	-- Add the text to the article window.
 	self.scrollbar:AddWindow(self.information, true)
 	self.information:SetAutoDelete(false)
+	
+	-- Add the image below text depending on checkbox.
+	if not (locked or images_above_text) then
+		self.scrollbar:AddWindow(self.image_container, true)
+		self.image_container:SetAutoDelete(false)
+		self.image:SetAutoDelete(false)
+	end
 end
 
 -- Called when a category is selected.
@@ -96,6 +158,7 @@ function pda_encyclopedia_tab:SelectCategory(index)
 	-- Initialise the category's articles.
 	local category = self.categories[index]
 	self:InitArticles(category)
+	self.scrollbar:Clear()
 end
 
 --------------------------
@@ -112,13 +175,19 @@ function pda_encyclopedia_tab:InitArticles(category)
 	local articles = category and category.articles or nil
 	if not (articles) then return end
 	
+	-- Create each article item and add it to the category.
 	local item = nil
 	local section = nil
 	for i = 1, #articles do
 		item = pda_encyclopedia_entry()
 		section = articles[i]
 		if (section) then
-			item.sect:SetText(game.translate_string(section))
+			-- Hide the article's title if it isn't unlocked.
+			if (self.locked_articles[section]) then
+				item.sect:SetText(game.translate_string("pda_encyclopedia_locked"))
+			else
+				item.sect:SetText(game.translate_string(section))
+			end
 			self.article_list:AddExistingItem(item)
 		end
 	end
@@ -126,8 +195,10 @@ end
 
 -- Add the callbacks for the article and category lists.
 function pda_encyclopedia_tab:InitCallbacks()
-	self:AddCallback("article_list", ui_events.WINDOW_LBUTTON_DB_CLICK, self.SelectArticle, self)
-	self:AddCallback("category_list", ui_events.WINDOW_LBUTTON_DB_CLICK, self.SelectCategory, self)
+	self:AddCallback("images_above_text", ui_events.BUTTON_CLICKED, self.SaveCheckBoxSettings, self)
+	self:AddCallback("display_messages", ui_events.BUTTON_CLICKED, self.SaveCheckBoxSettings, self)
+	self:AddCallback("article_list", ui_events.LIST_ITEM_SELECT, self.SelectArticle, self)
+	self:AddCallback("category_list", ui_events.LIST_ITEM_SELECT, self.SelectCategory, self)
 end
 
 -- Add all of the required categories to a list box.
@@ -157,60 +228,167 @@ function pda_encyclopedia_tab:InitControls()
 	xml:InitFrame("border", self)
 	xml:InitStatic("frame1:caption", self)
 	
+	-- "Images on top" checkbox.
+	self.image_checkbox = xml:InitCheck("image_checkbox", self)
+	self.image_checkbox:SetCheck(axr_main.config:r_value("pda_encyclopedia", "images_above_text", 1, true))
+	self:Register(self.image_checkbox, "images_above_text")
+	
+	-- "Show messages" checkbox.
+	self.message_checkbox = xml:InitCheck("message_checkbox", self)
+	self.message_checkbox:SetCheck(axr_main.config:r_value("pda_encyclopedia", "display_messages", 1, true))
+	self:Register(self.message_checkbox, "display_messages")
+	
 	-- Article and category lists.
 	self.article_list = xml:InitListBox("article_list", self)
 	self:Register(self.article_list, "article_list")
 	self.category_list = xml:InitListBox("category_list", self)
 	self:Register(self.category_list, "category_list")
 	
-	-- Information window and its scrollbar.
+	-- Text information, footer image (and container), and the scrollbar.
 	self.information = xml:InitTextWnd("description:information", nil)
+	self.image_container = xml:InitStatic("description:image_container", nil)
+	self.image = xml:InitStatic("description:image_container:image", self.image_container)
 	self.scrollbar = xml:InitScrollView("description:scrollbar", self)
+	
+	-- Add components to the scrollbar.
 	self.scrollbar:AddWindow(self.information, true)
+	self.scrollbar:AddWindow(self.image_container, true)
+	
+	-- Prevent components being deleted while used.
 	self.information:SetAutoDelete(false)
+	self.image_container:SetAutoDelete(false)
+	self.image:SetAutoDelete(false)
 end
 
--- Load the encyclopedia categories and articles.
+-- Load the encyclopedia content plugin.
 function pda_encyclopedia_tab:InitPlugin()
-	local line_count = 0
-	local ini = ini_file(self.plugin)
-	
 	-- Return if the encyclopedia plugin does not exist.
-	if not (ini:section_exist(self.section)) then
-		printf("Encyclopedia section \"" .. self.section .. "\" does not exist.")
+	local ini = ini_file("plugins\\encyclopedia.ltx")
+	local plugin_section = "encyclopedia"
+	if not (ini:section_exist(plugin_section)) then
+		printf("Encyclopedia section \"" .. plugin_section .. "\" does not exist.")
 		return
 	end
 	
 	-- Create a table for each encyclopedia category.
-	line_count = ini:line_count(self.section) or 0
+	local line_count = ini:line_count(plugin_section) or 0
 	for i = 0, line_count - 1 do
-		local junk1, section, junk2 = ini:r_line(self.section, i, "", "")
+		local junk1, section, junk2 = ini:r_line(plugin_section, i, "", "")
 		self.categories[i + 1] = { section = section }
 	end
 	
-	-- Fill each of the tables with their articles.
-	local unlocked_articles = xr_statistic.actor_statistic.guide_articles
+	-- Handles each individual article.
+	local unlocked_articles = dxr_statistics.actor_articles
+	local function handle_article(section, value)
+		-- Information about the article.
+		local disabled = nil
+		local tier = 0
+		local unlocked = nil
+		
+		-- Game mode toggles.
+		local modes = {
+			["azazel"] = IsAzazelMode(),
+			["debug"] = DEV_DEBUG,
+			["dev_debug"] = DEV_DEBUG_DEV,
+			["ironman"] = IsHardcoreMode(),
+			["story"] = IsStoryMode(),
+			["survival"] = IsSurvivalMode(),
+		}
+		
+		-- Check each value attached to the article.
+		if (value) then
+			for k, v in string.gmatch(value, "([%w_%-%s%.]+)=([%w_%-%s%.]+)") do
+				-- Value read from article flag.
+				local v_bool = ((tonumber(v) or 0) ~= 0)
+				local v_numb = (tonumber(v) or 0)
+				-- Unlocks the article by default.
+				if (k == "unlocked") then
+					unlocked = v_bool
+				-- Tiers the article.
+				elseif (k == "tier") then
+					tier = v_numb > 0 and v_numb or 0
+				-- Enables/disables article based on game mode.
+				elseif (not disabled) then
+					for k2, v2 in pairs(modes) do
+						if (k == k2) then
+							if (v2 and not v_bool) or (v_bool and not v2) then
+								disabled = true
+								break
+							end
+						end
+					end
+				end
+			end
+		end
+		
+		-- Prevents the article being added.
+		if (disabled) then
+			return false
+		end
+		
+		-- Update the tiering information.
+		self.highest_tier = tier > self.highest_tier and tier or self.highest_tier
+		
+		-- Lock or unlock the appropriate articles.
+		if (unlocked or unlocked_articles[section]) then
+			unlocked_articles[section] = true
+		else
+			self.locked_articles[section] = tier
+			self.articles_locked_count = self.articles_locked_count + 1
+		end
+		
+		-- Article can be added.
+		return true
+	end
+	
+	-- Fill the categories with their articles.
 	for i = 1, #self.categories do
 		if (ini:section_exist(self.categories[i].section)) then
 			line_count = ini:line_count(self.categories[i].section) or 0
 			self.categories[i].articles = {}
-			for k = 0, line_count - 1 do
-				local junk1, section, value = ini:r_line(self.categories[i].section, k, "", "")
-				-- Unlocked articles table must exist, and must not contain this article.
-				if (unlocked_articles and not unlocked_articles[section]) then
-					-- Guide cheat infoportion must not exist, and article must not have "unlocked" tag.
-					if (not has_alife_info("unlocked_guide") and not (value == "unlocked")) then
-						table.insert(self.locked, section)
-					end
-				end
-				table.insert(self.categories[i].articles, section)
-				
-				-- Keep any unlocked articles permanently unlocked.
-				-- When a counter is added to the interface this will make things simpler.
-				if (has_alife_info("unlocked_guide") or value == "unlocked") then
-					unlocked_articles[section] = true
+			for j = 0, line_count - 1 do
+				local junk1, section, value = ini:r_line(self.categories[i].section, j, "", "")
+				if (handle_article(section, value) == true) then
+					table.insert(self.categories[i].articles, section)
+					self.articles_count = self.articles_count + 1
 				end
 			end
 		else printf("Encyclopedia category \"" .. self.categories[i].section .. "\" does not exist.") end
+	end
+	
+	-- Calculate how many articles must logically be unlocked.
+	self.articles_unlocked_count = (self.articles_count - self.articles_locked_count)
+end
+
+-- Load the encyclopedia interactivity plugin.
+function pda_encyclopedia_tab:InitPlugin2()
+	-- Return if the encyclopedia interactivity plugin does not exist.
+	local ini = ini_file("plugins\\encyclopedia_interactivity.ltx")
+	local plugin_section = "encyclopedia_interactivity"
+	if not (ini:section_exist(plugin_section)) then
+		printf("Encyclopedia interactivity section \"" .. plugin_section .. "\" does not exist.")
+		return
+	end
+	
+	-- Create a match-list of each key with a section.
+	local plugin_sections = {}
+	local line_count = ini:line_count(plugin_section) or 0
+	for i = 0, line_count - 1 do
+		local junk1, section, value = ini:r_line(plugin_section, i, "", "")
+		plugin_sections[section] = value
+	end
+	
+	-- Create a table for each key, and fill it with its contents.
+	for match_key, match_section in pairs (plugin_sections) do
+		self.interactivity[match_key] = {}
+		line_count = ini:line_count(match_section) or 0
+		for i = 0, line_count - 1 do
+			local junk1, section, value = ini:r_line(match_section, i, "", "")
+			local values = alun_utils.str_explode(value, ",")
+			self.interactivity[match_key][section] = {}
+			for j = 1, #values do
+				table.insert(self.interactivity[match_key][section], values[j])
+			end
+		end
 	end
 end

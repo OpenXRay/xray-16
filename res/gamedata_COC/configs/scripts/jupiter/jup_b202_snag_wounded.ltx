@@ -32,7 +32,7 @@ prior = 200
 ;snag work
 
 [logic@jup_b202_stalker_snag_wounded]:logic@jup_b202_gen
-suitable = {=check_npc_name(jup_b202_stalker_snag)}
+suitable = {=check_npc_name(jup_b202_stalker_snag)} true
 active = walker@jup_b202_wait_for_stol
 on_death = death@jup_b202_stalker_snag_wounded
 
@@ -90,7 +90,7 @@ trade_enable    = false
 ; bandit work
 
 [logic@jup_b202_stalker_bandit]:logic@jup_b202_gen
-suitable = {=check_npc_name(jup_b202_bandit)}
+suitable = {=check_npc_name(jup_b202_bandit)} true
 active = walker@jup_b202_stalker_bandit_teleport
 on_hit = hit@jup_b202_stalker_bandit
 

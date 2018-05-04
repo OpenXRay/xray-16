@@ -1,6 +1,6 @@
 <specific_character id="sim_default_freedom_0_default_0" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_freedom_nov</icon>
+    <icon>ui_inGame2_Freedom_r</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_0</class>
@@ -9,7 +9,7 @@
     <rank>232</rank>
     <reputation>2213</reputation>
     <money min="500" max="1000" infinitive="0"/>
-    <visual>actors\stalker_freedom\stalker_freedom_0</visual>
+    <visual>actors\stalker_freedom\stalker_freedom_r</visual>
     <supplies>
 #include "gameplay\loadouts\freedom_base.ltx"
 #include "gameplay\loadouts\freedom_tier_1.ltx"
@@ -46,7 +46,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_0_default_10" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_freedom_bala</icon>
+    <icon>ui_inGame2_Freedom_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_0</class>
@@ -55,7 +55,7 @@
     <rank>5918</rank>
     <reputation>-939</reputation>
     <money min="500" max="1000" infinitive="0"/>
-    <visual>actors\stalker_freedom\stalker_freedom_2_mas4</visual>
+    <visual>actors\stalker_freedom\stalker_freedom_2_bala</visual>
     <supplies>
 #include "gameplay\loadouts\freedom_base.ltx"
 #include "gameplay\loadouts\freedom_tier_2.ltx"
@@ -69,7 +69,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_0_default_11" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_freedom_bala</icon>
+    <icon>ui_inGame2_Freedom_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_0</class>
@@ -78,7 +78,7 @@
     <rank>4296</rank>
     <reputation>1822</reputation>
     <money min="500" max="1000" infinitive="0"/>
-    <visual>actors\stalker_freedom\stalker_freedom2a_mas4</visual>
+    <visual>actors\stalker_freedom\stalker_freedom2a_bala</visual>
     <supplies>
 #include "gameplay\loadouts\freedom_base.ltx"
 #include "gameplay\loadouts\freedom_tier_2.ltx"
@@ -92,7 +92,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_0_default_12" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_freedom_bala</icon>
+    <icon>ui_inGame2_Freedom_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_0</class>
@@ -101,7 +101,7 @@
     <rank>5354</rank>
     <reputation>1689</reputation>
     <money min="500" max="1000" infinitive="0"/>
-    <visual>actors\stalker_freedom\stalker_freedom2b_mas4</visual>
+    <visual>actors\stalker_freedom\stalker_freedom2b_bala</visual>
     <supplies>
 #include "gameplay\loadouts\freedom_base.ltx"
 #include "gameplay\loadouts\freedom_tier_2.ltx"
@@ -239,7 +239,7 @@
     <rank>4570</rank>
     <reputation>871</reputation>
     <money min="500" max="1000" infinitive="0"/>
-    <visual>actors\stalker_freedom\stalker_freedom_2_mas2</visual>
+    <visual>actors\stalker_freedom\stalker_freedom_2_mask</visual>
     <supplies>
 #include "gameplay\loadouts\freedom_base.ltx"
 #include "gameplay\loadouts\freedom_tier_2.ltx"
@@ -262,7 +262,7 @@
     <rank>5506</rank>
     <reputation>-329</reputation>
     <money min="500" max="1000" infinitive="0"/>
-    <visual>actors\stalker_freedom\stalker_freedom2a_mas2</visual>
+    <visual>actors\stalker_freedom\stalker_freedom2a_mask</visual>
     <supplies>
 #include "gameplay\loadouts\freedom_base.ltx"
 #include "gameplay\loadouts\freedom_tier_2.ltx"
@@ -345,7 +345,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_1_default_10" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_freedom_2_old</icon>
+    <icon>ui_inGame2_Freedom_2_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_1</class>
@@ -377,7 +377,7 @@
     <rank>3998</rank>
     <reputation>50</reputation>
     <money min="1000" max="2000" infinitive="0"/>
-    <visual>actors\stalker_freedom\stalker_freedom_2_mas2</visual>
+    <visual>actors\stalker_freedom\stalker_freedom_2_mask</visual>
     <supplies>
 #include "gameplay\loadouts\freedom_base.ltx"
 #include "gameplay\loadouts\freedom_tier_2.ltx"
@@ -400,7 +400,7 @@
     <rank>4384</rank>
     <reputation>2204</reputation>
     <money min="1000" max="2000" infinitive="0"/>
-    <visual>actors\stalker_freedom\stalker_freedom_2_mas3</visual>
+    <visual>actors\stalker_freedom\stalker_freedom_2_mask</visual>
     <supplies>
 #include "gameplay\loadouts\freedom_base.ltx"
 #include "gameplay\loadouts\freedom_tier_2.ltx"
@@ -423,7 +423,7 @@
     <rank>5530</rank>
     <reputation>-1030</reputation>
     <money min="1000" max="2000" infinitive="0"/>
-    <visual>actors\stalker_freedom\stalker_freedom2a_mas2</visual>
+    <visual>actors\stalker_freedom\stalker_freedom2a_mask</visual>
     <supplies>
 #include "gameplay\loadouts\freedom_base.ltx"
 #include "gameplay\loadouts\freedom_tier_2.ltx"
@@ -446,7 +446,7 @@
     <rank>4896</rank>
     <reputation>-549</reputation>
     <money min="1000" max="2000" infinitive="0"/>
-    <visual>actors\stalker_freedom\stalker_freedom2a_mas3</visual>
+    <visual>actors\stalker_freedom\stalker_freedom2a_mask</visual>
     <supplies>
 #include "gameplay\loadouts\freedom_base.ltx"
 #include "gameplay\loadouts\freedom_tier_2.ltx"
@@ -506,7 +506,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_1_default_17" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_freedom_bala</icon>
+    <icon>ui_inGame2_Freedom_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_1</class>
@@ -515,7 +515,7 @@
     <rank>4926</rank>
     <reputation>957</reputation>
     <money min="1000" max="2000" infinitive="0"/>
-    <visual>actors\stalker_freedom\stalker_freedom2a_mas4</visual>
+    <visual>actors\stalker_freedom\stalker_freedom2a_bala</visual>
     <supplies>
 #include "gameplay\loadouts\freedom_base.ltx"
 #include "gameplay\loadouts\freedom_tier_2.ltx"
@@ -529,7 +529,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_1_default_18" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_freedom_bala</icon>
+    <icon>ui_inGame2_Freedom_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_1</class>
@@ -538,7 +538,7 @@
     <rank>5612</rank>
     <reputation>429</reputation>
     <money min="1000" max="2000" infinitive="0"/>
-    <visual>actors\stalker_freedom\stalker_freedom2b_mas4</visual>
+    <visual>actors\stalker_freedom\stalker_freedom2b_bala</visual>
     <supplies>
 #include "gameplay\loadouts\freedom_base.ltx"
 #include "gameplay\loadouts\freedom_tier_2.ltx"
@@ -552,7 +552,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_1_default_19" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_freedom_bala</icon>
+    <icon>ui_inGame2_Freedom_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_1</class>
@@ -561,7 +561,7 @@
     <rank>3196</rank>
     <reputation>2000</reputation>
     <money min="1000" max="2000" infinitive="0"/>
-    <visual>actors\stalker_freedom\stalker_freedom_2_mas4</visual>
+    <visual>actors\stalker_freedom\stalker_freedom_2_bala</visual>
     <supplies>
 #include "gameplay\loadouts\freedom_base.ltx"
 #include "gameplay\loadouts\freedom_tier_2.ltx"
@@ -713,7 +713,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_1_default_8" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_freedom_2_old</icon>
+    <icon>ui_inGame2_Freedom_2_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_1</class>
@@ -736,7 +736,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_1_default_9" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_freedom_2_old</icon>
+    <icon>ui_inGame2_Freedom_2_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_1</class>
@@ -815,7 +815,7 @@
     <rank>5896</rank>
     <reputation>1747</reputation>
     <money min="1500" max="2500" infinitive="0"/>
-    <visual>actors\stalker_freedom\stalker_freedom_2_mas3</visual>
+    <visual>actors\stalker_freedom\stalker_freedom_2_mask</visual>
     <supplies>
 #include "gameplay\loadouts\freedom_base.ltx"
 #include "gameplay\loadouts\freedom_tier_2.ltx"
@@ -838,7 +838,7 @@
     <rank>3448</rank>
     <reputation>567</reputation>
     <money min="1500" max="2500" infinitive="0"/>
-    <visual>actors\stalker_freedom\stalker_freedom2a_mas3</visual>
+    <visual>actors\stalker_freedom\stalker_freedom2a_mask</visual>
     <supplies>
 #include "gameplay\loadouts\freedom_base.ltx"
 #include "gameplay\loadouts\freedom_tier_2.ltx"
@@ -877,7 +877,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_2_default_13" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_freedom_bala</icon>
+    <icon>ui_inGame2_Freedom_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_2</class>
@@ -886,7 +886,7 @@
     <rank>3852</rank>
     <reputation>-1171</reputation>
     <money min="1500" max="2500" infinitive="0"/>
-    <visual>actors\stalker_freedom\stalker_freedom_2_mas4</visual>
+    <visual>actors\stalker_freedom\stalker_freedom_2_bala</visual>
     <supplies>
 #include "gameplay\loadouts\freedom_base.ltx"
 #include "gameplay\loadouts\freedom_tier_2.ltx"
@@ -900,7 +900,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_2_default_14" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_freedom_bala</icon>
+    <icon>ui_inGame2_Freedom_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_2</class>
@@ -909,7 +909,7 @@
     <rank>3484</rank>
     <reputation>291</reputation>
     <money min="1500" max="2500" infinitive="0"/>
-    <visual>actors\stalker_freedom\stalker_freedom2a_mas4</visual>
+    <visual>actors\stalker_freedom\stalker_freedom2a_bala</visual>
     <supplies>
 #include "gameplay\loadouts\freedom_base.ltx"
 #include "gameplay\loadouts\freedom_tier_2.ltx"
@@ -924,7 +924,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_2_default_15" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_freedom_bala</icon>
+    <icon>ui_inGame2_Freedom_2_bala</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_2</class>
@@ -933,7 +933,7 @@
     <rank>3422</rank>
     <reputation>20</reputation>
     <money min="1500" max="2500" infinitive="0"/>
-    <visual>actors\stalker_freedom\stalker_freedom2b_mas4</visual>
+    <visual>actors\stalker_freedom\stalker_freedom2b_bala</visual>
     <supplies>
 #include "gameplay\loadouts\freedom_base.ltx"
 #include "gameplay\loadouts\freedom_tier_2.ltx"
@@ -1018,7 +1018,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_2_default_5" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_freedom_0</icon>
+    <icon>ui_inGame2_Freedom_0</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_2</class>
@@ -1027,7 +1027,7 @@
     <rank>12958</rank>
     <reputation>426</reputation>
     <money min="1500" max="2500" infinitive="0"/>
-    <visual>actors\stalker_freedom\stalker_free_0</visual>
+    <visual>actors\stalker_freedom\stalker_freedom_0</visual>
     <supplies>
 #include "gameplay\loadouts\freedom_base.ltx"
 #include "gameplay\loadouts\freedom_tier_3.ltx"
@@ -1041,7 +1041,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_2_default_6" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_freedom_0g</icon>
+    <icon>ui_inGame2_Freedom_0a</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_2</class>
@@ -1050,7 +1050,7 @@
     <rank>12458</rank>
     <reputation>-1705</reputation>
     <money min="1500" max="2500" infinitive="0"/>
-    <visual>actors\stalker_freedom\stalker_free0a</visual>
+    <visual>actors\stalker_freedom\stalker_freedom0a</visual>
     <supplies>
 #include "gameplay\loadouts\freedom_base.ltx"
 #include "gameplay\loadouts\freedom_tier_3.ltx"
@@ -1064,7 +1064,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_2_default_7" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_freedom_2_old</icon>
+    <icon>ui_inGame2_Freedom_2_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_2</class>
@@ -1088,7 +1088,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_2_default_8" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_freedom_2_old</icon>
+    <icon>ui_inGame2_Freedom_2_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_2</class>
@@ -1111,7 +1111,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_2_default_9" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_freedom_2_old</icon>
+    <icon>ui_inGame2_Freedom_2_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_2</class>
@@ -1160,7 +1160,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_3_default_1" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_Freedom_5_alt</icon>
+    <icon>ui_inGame2_Freedom_5a</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_3</class>
@@ -1235,7 +1235,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_3_default_4" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_freedom_0</icon>
+    <icon>ui_inGame2_Freedom_0</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_3</class>
@@ -1244,7 +1244,7 @@
     <rank>11106</rank>
     <reputation>1166</reputation>
     <money min="2500" max="5000" infinitive="0"/>
-    <visual>actors\stalker_freedom\stalker_free_0</visual>
+    <visual>actors\stalker_freedom\stalker_freedom_0</visual>
     <supplies>
 #include "gameplay\loadouts\freedom_base.ltx"
 #include "gameplay\loadouts\freedom_tier_3.ltx"
@@ -1260,7 +1260,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_3_default_5" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_Freedom_5_alt</icon>
+    <icon>ui_inGame2_Freedom_5a</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_3</class>
@@ -1285,7 +1285,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_3_default_6" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_freedom_0g</icon>
+    <icon>ui_inGame2_Freedom_0a</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_3</class>
@@ -1294,7 +1294,7 @@
     <rank>13928</rank>
     <reputation>421</reputation>
     <money min="2500" max="5000" infinitive="0"/>
-    <visual>actors\stalker_freedom\stalker_free0a</visual>
+    <visual>actors\stalker_freedom\stalker_freedom0a</visual>
     <supplies>
 #include "gameplay\loadouts\freedom_base.ltx"
 #include "gameplay\loadouts\freedom_tier_3.ltx"
@@ -1335,7 +1335,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_4_default_1" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_freedom_0</icon>
+    <icon>ui_inGame2_Freedom_0</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_4</class>
@@ -1344,7 +1344,7 @@
     <rank>10738</rank>
     <reputation>1011</reputation>
     <money min="5000" max="10000" infinitive="0"/>
-    <visual>actors\stalker_freedom\stalker_free_0</visual>
+    <visual>actors\stalker_freedom\stalker_freedom_0</visual>
     <supplies>
 #include "gameplay\loadouts\freedom_base.ltx"
 #include "gameplay\loadouts\freedom_tier_3.ltx"
@@ -1385,7 +1385,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_4_default_3" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_Freedom_4_alt</icon>
+    <icon>ui_inGame2_Freedom_4a</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_4</class>
@@ -1410,7 +1410,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_4_default_4" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_Freedom_4_alt</icon>
+    <icon>ui_inGame2_Freedom_4a</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_4</class>
@@ -1460,7 +1460,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_4_default_6" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_freedom_0g</icon>
+    <icon>ui_inGame2_Freedom_0a</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_4</class>
@@ -1469,7 +1469,7 @@
     <rank>13650</rank>
     <reputation>-1242</reputation>
     <money min="5000" max="10000" infinitive="0"/>
-    <visual>actors\stalker_freedom\stalker_free0a</visual>
+    <visual>actors\stalker_freedom\stalker_freedom0a</visual>
     <supplies>
 #include "gameplay\loadouts\freedom_base.ltx"
 #include "gameplay\loadouts\freedom_tier_3.ltx"
@@ -1485,7 +1485,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_4_default_7" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_Freedom_5_alt</icon>
+    <icon>ui_inGame2_Freedom_5a</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_4</class>
@@ -1510,7 +1510,7 @@
     </specific_character>
 <specific_character id="sim_default_freedom_4_default_8" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_Freedom_5_alt</icon>
+    <icon>ui_inGame2_Freedom_5a</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_freedom_4</class>

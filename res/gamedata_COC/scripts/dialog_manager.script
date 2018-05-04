@@ -92,6 +92,74 @@ function add_script_dialog(p_id,id,phrase_id,cond,act)
 end
 
 -----------------------------------------------------
+-- Dynamic order Dialog
+-----------------------------------------------------
+function dm_init_dynamic_orders_dialog(dialog)
+    saved_dialog = dialog
+    local base_id = 1
+   
+    add_dialog("",0,"st_dm_orders_query")																															-- ACTOR start order dialog
+		-- place order
+		add_script_dialog(0,1,"dialogs_orders.text_orders_query")                                            														-- NPC	introduce list
+			for i=1,10 do
+                add_script_dialog(1,base_id+1,"dialogs_orders.text_category_title_"..i,"dialogs_orders.has_category_"..i,"dialogs_orders.set_category_"..i)				-- ACTOR show list
+					add_script_dialog(base_id+1,base_id+2,"dialogs_orders.text_offer_item")																			-- NPC
+						add_script_dialog(base_id+2,base_id+3,"dialogs_orders.text_accept_offer_item", "dialogs_orders.has_prepay", "dialogs_orders.give_prepay")	-- ACTOR
+							add_script_dialog(base_id+3,base_id+4,"dialogs_orders.text_confirm_offer_item")															-- NPC
+								add_dialog(base_id+4,base_id+5,"st_dm_orders_place_finish",nil,"dialogs.break_dialog")                              				-- ACTOR
+                        add_dialog(base_id+2,base_id+6,"st_dm_orders_no_money", "dialogs_orders.hasnt_prepay", "dialogs.break_dialog")            					-- ACTOR
+                        add_dialog(base_id+2,base_id+7,"st_dm_orders_none",nil,"dialogs.break_dialog")                                            					-- ACTOR
+                base_id = base_id + 10
+            end
+				add_dialog(1,9999,"st_dm_orders_none",nil,"dialogs.break_dialog")	
+end
+function dm_init_dynamic_orders_processing_dialog(dialog)
+    saved_dialog = dialog
+    local base_id = 1
+
+	add_dialog("",0,"st_dm_orders_query_pickup")																									-- ACTOR start processing order dialog
+		-- complete purchase existing
+		add_script_dialog(0,3000,"dialogs_orders.orders_item_pickup_existing","dialogs_orders.has_done_item")										-- NPC existing Order Pickup
+			add_dialog(3000,3001,"st_dm_orders_pickup_existing_yes","dialogs_orders.has_item_cost")														-- ACTOR
+				add_dialog(3001,3002,"st_dm_orders_pickup_finish",nil,"dialogs_orders.buy_item")														-- NPC
+					add_dialog(3002,3003,"st_dm_orders_goodbye",nil,"dialogs.break_dialog")																-- ACTOR
+			add_dialog(3000,3010,"st_dm_orders_pickup_existing_no")																						-- ACTOR
+				add_dialog(3010,3011,"st_dm_orders_pickup_refuse_warning")																				-- NPC
+					add_dialog(3011,3012,"st_dm_orders_pickup_refuse_penalty")																			-- ACTOR
+						add_dialog(3012,3013,"st_dm_orders_pickup_refuse_penalty_reply",nil,"dialogs_orders.purchase_cancel")							-- NPC
+							add_dialog(3013,3014,"st_dm_orders_goodbye",nil,"dialogs.break_dialog")														-- ACTOR
+					add_dialog(3011,3015,"st_dm_orders_pickup_refuse_wait")																				-- ACTOR
+						add_dialog(3015,3016,"st_dm_orders_pickup_refuse_wait_rely")																	-- NPC
+							add_dialog(3016,3017,"st_dm_orders_goodbye",nil,"dialogs.break_dialog")														-- ACTOR
+			add_dialog(3000,3020,"st_dm_orders_no_money","dialogs_orders.hasnt_item_cost")																-- ACTOR
+				add_dialog(3020,3021,"st_dm_orders_pickup_hold")																						-- NPC
+					add_dialog(3021,3022,"st_dm_orders_goodbye",nil,"dialogs.break_dialog")																-- ACTOR
+		-- complete purchase
+		add_script_dialog(0,2000,"dialogs_orders.orders_item_pickup","dialogs_orders.has_pickup_cond","dialogs_orders.randomize_item")					-- NPC Order Pickup
+			add_dialog(2000,2001,"st_dm_orders_pickup_price_accept","dialogs_orders.has_item_cost")														-- ACTOR
+				add_dialog(2001,2003,"st_dm_orders_pickup_finish",nil,"dialogs_orders.buy_item")														-- NPC
+					add_dialog(2003,2004,"st_dm_orders_goodbye",nil,"dialogs.break_dialog")																-- ACTOR
+			add_dialog(2000,2020,"st_dm_orders_no_money","dialogs_orders.hasnt_item_cost")																-- ACTOR
+				add_dialog(2020,2021,"st_dm_orders_pickup_hold")																						-- NPC
+					add_dialog(2021,2022,"st_dm_orders_goodbye",nil,"dialogs.break_dialog")																-- ACTOR
+			add_dialog(2000,2030,"st_dm_orders_pickup_ponder","dialogs_orders.has_item_cost")															-- ACTOR
+				add_dialog(2030,2031,"st_dm_orders_pickup_ponder_reply")																				-- NPC
+					add_dialog(2031,2032,"st_dm_orders_time_query_goodbye",nil,"dialogs.break_dialog")													-- ACTOR
+        -- check and cancel ongoing order--
+		add_script_dialog(0,1000,"dialogs_orders.processing_item","dialogs_orders.has_processing_cond")													-- NPC  order processing
+			add_dialog(1000,1001,"st_dm_orders_time_query")																								-- ACTOR
+				add_dialog(1001,1002,"st_dm_orders_time_query_reply")																					-- NPC
+					add_dialog(1002,1003,"st_dm_orders_time_query_goodbye")																				-- ACTOR
+			add_dialog(1000,1010,"st_dm_orders_cancel")																									-- ACTOR
+				add_dialog(1010,1011,"st_dm_orders_cancel_reply")																						-- NPC
+					add_dialog(1011,1012,"st_dm_orders_cancel_reply_yes")																				-- ACTOR
+						add_dialog(1012,1013,"st_dm_orders_cancel_reply_yes_done",nil,"dialogs_orders.purchase_cancel")									-- NPC
+							add_dialog(1013,1014,"st_dm_orders_goodbye",nil,"dialogs.break_dialog")														-- ACTOR
+					add_dialog(1011,1015,"st_dm_orders_cancel_reply_no")																				-- ACTOR
+						add_dialog(1015,1016,"st_dm_orders_cancel_reply_no_done")																		-- NPC
+							add_dialog(1016,1017,"st_dm_orders_goodbye",nil,"dialogs.break_dialog")														-- ACTOR
+end
+-----------------------------------------------------
 -- Dynamic Ashot and Yar Dialog
 -----------------------------------------------------
 function dm_ashot_and_yar(a,b)
@@ -254,22 +322,22 @@ function dm_init_surrender_dialog(dialog)
 
 	add_dialog(0,1,"st_surrender_query_victim_4","dialogs.victim_is_bounty")
 		add_script_dialog(1,9,"dialogs.surrender_victim_answers_bounty")
-			add_dialog(9,20,"st_surrender_actor_2",nil,{"dialogs.set_victim_surrendered","dialogs.break_dialog"})
-			add_dialog(9,21,"st_surrender_actor_3",nil,{"dialogs.set_victim_surrendered","dialogs.break_dialog"})
+			add_dialog(9,20,"st_surrender_actor_2",nil,"dialogs.break_dialog")
+			add_dialog(9,21,"st_surrender_actor_3",nil,"dialogs.break_dialog")
 			
 	add_dialog(0,2,"st_surrender_query_victim_1")
 		add_script_dialog(2,10,"dialogs.surrender_victim_answers_1")
-			add_dialog(10,20,"st_surrender_actor_2",nil,{"dialogs.set_victim_surrendered","dialogs.break_dialog"})
-			add_dialog(10,21,"st_surrender_actor_3",nil,{"dialogs.set_victim_surrendered","dialogs.break_dialog"})
+			add_dialog(10,20,"st_surrender_actor_2",nil,"dialogs.break_dialog")
+			add_dialog(10,21,"st_surrender_actor_3",nil,"dialogs.break_dialog")
 
 	add_dialog(0,3,"st_surrender_query_victim_2")
 		add_script_dialog(3,11,"dialogs.surrender_victim_answers_1")
-			add_dialog(11,20,"st_surrender_actor_2",nil,{"dialogs.set_victim_surrendered","dialogs.break_dialog"})
-			add_dialog(11,21,"st_surrender_actor_3",nil,{"dialogs.set_victim_surrendered","dialogs.break_dialog"})
+			add_dialog(11,20,"st_surrender_actor_2",nil,"dialogs.break_dialog")
+			add_dialog(11,21,"st_surrender_actor_3",nil,"dialogs.break_dialog")
 
 	add_dialog(0,4,"st_surrender_query_victim_3")
 		add_script_dialog(4,12,"dialogs.surrender_victim_answers_2")
-			add_dialog(12,20,"st_surrender_actor_1",nil,{"dialogs.set_victim_surrendered","dialogs.break_dialog"})
+			add_dialog(12,20,"st_surrender_actor_1",nil,"dialogs.break_dialog")
 end
 
 

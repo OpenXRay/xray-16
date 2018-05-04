@@ -154,13 +154,13 @@
 		<text>был отключён защитой BattlEye:</text>
 	</string>
 	<string id="ui_st_kicked_by_server">
-		<text>Отключён. Причина - </text>
+		<text>Отключён. Причина -</text>
 	</string>
 	<string id="ui_st_leave">
 		<text>Уйти</text>
 	</string>
 	<string id="ui_st_load_game_confirm">
-		<text>Загрузка игры приведёт к потере несохраненных данных. Желаете продолжить?</text>
+		<text>Загрузка игры приведёт к потере несохранённых данных. Желаете продолжить?</text>
 	</string>
 	<string id="ui_st_mins">
 		<text>мин.</text>
@@ -482,7 +482,7 @@
 		<text>Держите, затем отпустите</text>
 	</string>
 		<string id="st_enable_looting">
-		<text>Разрешёно брать трофеи с тел</text>
+		<text>Разрешено брать трофеи с тел</text>
 	</string>
 	<string id="st_disable_looting">
 		<text>Мародёрство запрещено</text>
@@ -519,7 +519,7 @@
 		<text>Вас убили. Вы уже не проснётесь.</text>
 	</string>
 	<string id="st_sleep_event">
-		<text>Это не возможно во время катаклизма</text>
+		<text>Это невозможно во время катаклизма</text>
 	</string>
 	<string id="st_sleep_exhausted">
 		<text>Вы устали и должны отдохнуть</text>

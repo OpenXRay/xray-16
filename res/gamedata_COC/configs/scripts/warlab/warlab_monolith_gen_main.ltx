@@ -1,5 +1,8 @@
 [logic]
-active = sr_idle@wait
+active = sr_idle@check_story
+
+[sr_idle@check_story]
+on_info = {+story_mode_disabled} sr_idle@nil, sr_idle@wait
 
 [sr_idle@wait]
 on_info = {+warlab_actor_second_arrive =counter_greater(mon_destroy_generator:1)} sr_idle@sound1 %+warlab_mon_poltergeist_1_spawn =spawn_object(warlab_poltergeist_1:warlab_poltergeist_home:0)%

@@ -1,92 +1,62 @@
 [up_sect_firsta_svu]
-;“очность(1)10%
-;---------------
 cost		      		= 1500
 value					= +10
 
 fire_dispersion_base    = -0.03
 
 [up_sect_firstc_svu]
-;Ќадежность(2)15%
-;---------------
 cost		      		= 3000
 value					= +15
 
-;увеличение дисперсии в процентах при максимальном износе
-fire_dispersion_condition_factor    = -0.5 ;15
-;увеличение изношености при выстреле очередью
-condition_queue_shot_dec	= -0.00015 ;0.0013
-;увеличение изношености при одиночном выстреле
-condition_shot_dec      	= -0.00015 ;0.0011
-;шанс осечки при изношености больше чем misfireStartCondition
+fire_dispersion_condition_factor    = -0.5
+condition_queue_shot_dec	= -0.0002
+condition_shot_dec      	= -0.0002
 misfire_start_prob	     	= -0.001
-;шанс осечки при изношености больше чем misfireEndCondition
-misfire_end_prob	     	= -0.01 ;0.03
+misfire_end_prob	     	= -0.01
 
 [up_sect_firste_svu]
-;Ќастильность(3)30%
-;------------------ 
-cost		      		= 6000
+cost		      		= 5000
 value					= +30
+
 bullet_speed			= +100
-fire_dispersion_base    = -0.02 
+fire_dispersion_base    = -0.01
 
 [up_sect_firstf_svu]
-;“очность(3)30%
-;---------------
-cost		      		= 6000
+cost		      		= 5000
 value					= +30
+
 fire_dispersion_base    = -0.07
 fire_dispersion_condition_factor    = -0.35
 
 [up_sect_secona_svu]
-;Ќадежность(1)10%
-;---------------
 cost		      		= 1500
 value					= +10
 
-;увеличение дисперсии в процентах при максимальном износе
-fire_dispersion_condition_factor    = -0.5 ;15
-;увеличение изношености при выстреле очередью
-condition_queue_shot_dec	= -0.0001 ;0.0013
-;увеличение изношености при одиночном выстреле
-condition_shot_dec      	= -0.0001 ;0.0011
-;шанс осечки при изношености больше чем misfireStartCondition
+fire_dispersion_condition_factor    = -0.5
+condition_queue_shot_dec	= -0.0001
+condition_shot_dec      	= -0.0001
 misfire_start_prob	     	= -0.0005
-;шанс осечки при изношености больше чем misfireEndCondition
-misfire_end_prob	     	= -0.005 ;0.03
+misfire_end_prob	     	= -0.005
 
 [up_sect_seconc_svu]
-;ќтдача(2)20%
-;---------------
 cost		      		= 3000
 value					= -20
 
-zoom_cam_dispersion         = -0.28
-zoom_cam_dispersion_inc     = -0.28
-zoom_cam_step_angle_horz    = -0.44
+cam_dispersion         = -0.3
+cam_step_angle_horz    = -0.15
 
 [up_sect_second_svu]
-;Ќадежность(2)15%
-;---------------
 cost		      		= 3000
 value					= +15
 
-;увеличение дисперсии в процентах при максимальном износе
-fire_dispersion_condition_factor    = -0.5 ;15
-;увеличение изношености при выстреле очередью
-condition_queue_shot_dec	= -0.00015 ;0.0013
-;увеличение изношености при одиночном выстреле
-condition_shot_dec      	= -0.00015 ;0.0011
-;шанс осечки при изношености больше чем misfireStartCondition
+fire_dispersion_condition_factor    = -0.5
+condition_queue_shot_dec	= -0.0002
+condition_shot_dec      	= -0.0002
 misfire_start_prob	     	= -0.001
-;шанс осечки при изношености больше чем misfireEndCondition
-misfire_end_prob	     	= -0.01 ;0.03
+misfire_end_prob	     	= -0.01
 
 [up_sect_secone_svu]
-;»нтегрированный глушитель
-;---------------
-cost		      		= 6000
+cost		      		= 5000
 value					= +1
 
 silencer_status				= 1
@@ -97,59 +67,43 @@ snd_silncer_shot        = weapons\w_ak74_shot1
 silencer_smoke_particles   = weapons\generic_shoot_00
 
 [up_sect_seconf_svu]
-;—корострельность(3)25%
-;----------------------
-cost		      		= 6000
+cost		      		= 5000
 value					= +25
-rpm 					= +45
+rpm 					= +35
 
 [up_sect_thirda_svu]
-;ќтдача(1)-10%
-;------------
 cost		      		= 1500
 value					= -10
 
-zoom_cam_dispersion         = -0.14
-zoom_cam_dispersion_inc     = -0.14
-zoom_cam_step_angle_horz    = -0.22
+cam_dispersion         = -0.15
+cam_step_angle_horz    = -0.075
 
 [up_sect_thirdc_svu]
-;”добство(2)20%
-;--------------
 cost		      		= 3300
 value					= +20
 
 crosshair_inertion			= -2
 
-PDM_disp_base 				= -0.25
 PDM_disp_vel_factor 		= -1
 PDM_disp_accel_factor 		= -1
 
 [up_sect_fourta_svu]
-;5x прицел.
-;------------
-cost		      		= 3500
+cost		      		= 3000
 
 scope_zoom_factor       = +2
 
 [up_sect_fourtc_svu]
-; онтрастный прицел
-;------------
-cost		      		= 4500
+cost		      		= 4000
 
 scope_nightvision = scope_contrast
 
 [up_sect_fourte_svu]
-;ѕЌ¬
-;------------
-cost		      		= 9000
+cost		      		= 6000
 
 scope_nightvision = scope_nightvision
 
 [up_sect_fourtf_svu]
-;–егулируемый прицел
-;------------
-cost		      		= 7500
+cost		      		= 6000
 
 scope_dynamic_zoom = on
 

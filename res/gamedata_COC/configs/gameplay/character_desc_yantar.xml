@@ -12,7 +12,7 @@
     <rank>21486</rank>
     <reputation>1874</reputation>
     <money min="1000000" max="1000000" infinitive="1"/>
-    <visual>actors\stalker_ucheniy\stalker_ucheniy_1</visual>
+    <visual>actors\stalker_unique\stalker_ecolog_sakharov</visual>
     <crouch_type>0</crouch_type>
     <supplies>
         [spawn] \n
@@ -99,9 +99,10 @@
     <actor_dialog>actor_break_dialog</actor_dialog>
     </specific_character>
     
-    <!-- VASILYEV -->
+    <!-- CHERENKOV -->
+	<!-- TECHNICALLY VASILYEV IN ALL CONFIGS, BUT HE'S DEAD IN LORE SO IS RENAMED-->
     <specific_character id="yan_ecolog_vasilyev" team_default = "1">
-    <name>yan_vasilyev_name</name>
+    <name>yan_cherenkov_name</name>
     <icon>ui_inGame2_ecolog_orange</icon>
     <map_icon x="0" y="6"></map_icon>
     <bio>yan_vasilyev_bio</bio>
@@ -135,10 +136,10 @@
     <class>yan_merc_01</class>
     <community>ecolog</community>
     <terrain_sect>stalker_terrain</terrain_sect>
-    <snd_config>characters_voice\human_03\killer\</snd_config>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
     <rank>23300</rank>
     <reputation>1373</reputation>
-    <visual>actors\stalker_merc\stalker_merc_4</visual>
+    <visual>actors\stalker_ecologist\stalker_ecolog_guard</visual>
     <supplies>
         [spawn] \n
         wpn_g36 \n
@@ -163,10 +164,10 @@
     <class>yan_merc_02</class>
     <community>ecolog</community>
     <terrain_sect>stalker_terrain</terrain_sect>
-    <snd_config>characters_voice\human_03\killer\</snd_config>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
     <rank>12084</rank>
     <reputation>39</reputation>
-    <visual>actors\stalker_merc\stalker_merc_2</visual>
+    <visual>actors\stalker_ecologist\stalker_ecolog_guard</visual>
     <supplies>
         [spawn] \n
         wpn_l85 \n
@@ -191,10 +192,10 @@
     <class>yan_merc_03</class>
     <community>ecolog</community>
     <terrain_sect>stalker_terrain</terrain_sect>
-    <snd_config>characters_voice\human_03\killer\</snd_config>
+    <snd_config>characters_voice\human_03\stalker\</snd_config>
     <rank>10288</rank>
     <reputation>837</reputation>
-    <visual>actors\stalker_merc\stalker_merc_2</visual>
+    <visual>actors\stalker_ecologist\stalker_ecolog_guard</visual>
     <supplies>
         [spawn] \n
         wpn_l85 \n
@@ -220,7 +221,7 @@
     <terrain_sect>stalker_terrain</terrain_sect>
     <rank>33988</rank>
     <reputation>2239</reputation>
-    <visual>actors\stalker_neutral\stalker_prizrak</visual>
+    <visual>actors\stalker_unique\stalker_neutral_prizrak</visual>
     <snd_config>characters_voice\human_01\stalker\</snd_config>
     <crouch_type>1</crouch_type>
     <supplies>

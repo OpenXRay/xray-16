@@ -1,7 +1,9 @@
 [logic@jup_b220_trapper]
 suitable = {=check_npc_name(jup_b220_trapper)} true
+trade = misc\trade\trade_loner_trapper.ltx
 active = animpoint@default
 prior = 200
+dont_keep_items = true
 
 [animpoint@default]
 cover_name = jup_a6_animpoint_trapper
@@ -30,6 +32,5 @@ far_distance 	= 0
 close_snd_distance = 3
 use = {=actor_enemy} false, true
 allow_break = false
-trade_enable = false
 meet_dialog	= jup_b220_trapper_start
 meet_on_talking = false

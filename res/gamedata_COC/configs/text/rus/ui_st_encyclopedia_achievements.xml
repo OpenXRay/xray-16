@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	
+	<string id="encyclopedia_achievements">
+		<text>Достижения</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_bookworm_food">
+		<text>Книжник</text>
+	</string>
+	<string id="encyclopedia_achievements_bookworm_food_text">
+		<text>
+			Достижение %c[guide_blue]«Книжник»%c[default] даётся после разблокирования всех статей руководства.\n
+			\n%c[guide_green]Информация%c[default]
+			\nСтатьи можно разблокировать множеством способов: например, поговорив с важными персонажами или загрузив данные с карт памяти.\n
+			\n%c[guide_green]Награда%c[default]
+			\nВсе карты памяти, найденные на телах погибших сталкеров, будут заменены на редкие КПК.\n
+			\nЕсли после разблокировки этого достижения добавить дополнительные статьи, например, с помощью патча или мода - данный эффект будет временно отключён и карты памяти нужно будет заполучить снова.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_completionist">
+		<text>Опытный сталкер</text>
+	</string>
+	<string id="encyclopedia_achievements_completionist_text">
+		<text>
+			Достижение %c[guide_blue]«Опытный сталкер»%c[default] даётся после получения всех доступных достижений в игре.\n
+			\n%c[guide_green]Награда%c[default]
+			\nУдвоение очков ранга.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_down_to_earth">
+		<text>Чистое небо</text>
+	</string>
+	<string id="encyclopedia_achievements_down_to_earth_text">
+		<text>
+			Достижение %c[guide_blue]«Чистое небо»%c[default] выдаётся после уничтожения 3-х вертолётов из стрелкового оружия или одного из гранатомёта РПГ или РГ-6.\n
+			\n%c[guide_green]Награда%c[default]
+			\nВертолёты Ми-24 заменяются на Ми-2.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_duga_free">
+		<text>Первопроходец</text>
+	</string>
+	<string id="encyclopedia_achievements_duga_free_text">
+		<text>
+			Достижение %c[guide_blue]«Первопроходец»%c[default] - чтобы получить это достижение, нужно отключить пси-установки на Янтаре и Радаре.\n
+			\n%c[guide_green]Награда%c[default]
+			\nПути через Янтарь и Радар теперь, после отключения пси-установок, открыты.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_geologist">
+		<text>Первооткрыватель</text>
+	</string>
+	<string id="encyclopedia_achievements_geologist_text">
+		<text>
+			Чтобы получить достижение %c[guide_blue]«Первооткрыватель»%c[default], необходимо найти не менее 50-ти артефактов.\n
+			\n%c[guide_green]Информация%c[default]
+			\nДля поиска артефактов нужны специальные детекторы.\nВключив такой прибор вблизи аномалии, Вы получите шанс обнаружить артефакт.\n
+			\n%c[guide_green]Награда%c[default]
+			\nУвеличен шанс появления артефактов в аномалиях.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_heavy_pockets">
+		<text>Состоятельный клиент</text>
+	</string>
+	<string id="encyclopedia_achievements_heavy_pockets_text">
+		<text>
+			Чтобы получить достижение %c[guide_blue]«Состоятельный клиент»%c[default], необходимо накопить не менее 1 000 000 рублей.\n
+			\n%c[guide_green]Награда%c[default]
+			\nМногие торговцы начнут предлагать Вам специальные товары, которые обычно доступны только при хороших отношениях с их группировкой.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_infopreneur">
+		<text>Торговец информацией</text>
+	</string>
+	<string id="encyclopedia_achievements_infopreneur_text">
+		<text>
+			Достижение %c[guide_blue]«Торговец информацией»%c[default] выдаётся после продажи торговцам как минимум 50 КПК с ценной информацией.\n
+			\n%c[guide_green]Информация%c[default]
+			\nКПК можно найти на телах погибших сталкеров и обменять на информацию в разговоре с торговцами.\n
+			\n%c[guide_green]Награда%c[default]
+			\nТорговцы несколько увеличили вознаграждение за приносимые КПК.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_mechanized_warfare">
+		<text>Мастер высоких технологий</text>
+	</string>
+	<string id="encyclopedia_achievements_mechanized_warfare_text">
+		<text>
+			Чтобы получить достижение %c[guide_blue]«Мастер высоких технологий»%c[default], необходимо доставить все три набора инструментов одному технику.\n
+			\n%c[guide_green]Информация%c[default]
+			\nИнструменты для грубой работы, для тонкой работы и для калибровки можно найти в тайниках. Также инструменты иногда появляются в продаже у некоторых торговцев.\n
+			\n%c[guide_green]Награда%c[default]
+			\nЭффективность применения ремонтных и швейных наборов существенно увеличилась.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_patriarch">
+		<text>Лидер</text>
+	</string>
+	<string id="encyclopedia_achievements_patriarch_text">
+		<text>
+			Чтобы получить Достижение %c[guide_blue]«Лидер»%c[default], необходимо достичь максимально возможного ранга.\n
+			\n%c[guide_green]Информация%c[default]
+			\nРанг можно заработать почти любым действием в Зоне.\nПодробнее о ранге можно прочитать в разделе «Особенности игры».\n
+			\n%c[guide_green]Награда%c[default]
+			\nВы сможете брать двух дополнительных напарников.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_radiotherapy">
+		<text>Отмеченный Зоной</text>
+	</string>
+	<string id="encyclopedia_achievements_radiotherapy_text">
+		<text>
+			Достижение %c[guide_blue]«Отмеченный Зоной»%c[default] можно получить, пережив 25 выбросов и 25 пси-штормов.\n
+			\n%c[guide_green]Информация%c[default]
+			\nВыбросы и пси-штормы происходят через случайные интервалы времени, которые можно изменить через опции погоды в главном меню.\n
+			\nОбе эти функции можно отключить в любой момент, но, чтобы заработать это достижение, необходимо их включить.\n
+			\n%c[guide_green]Награда%c[default]
+			\nСуществует вероятность того, что Вы сможете пережить выброс или пси-шторм вне укрытия.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_rag_and_bone">
+		<text>Сыщик</text>
+	</string>
+	<string id="encyclopedia_achievements_rag_and_bone_text">
+		<text>
+			Чтобы получить достижение %c[guide_blue]«Сыщик»%c[default], нужно найти не менее 100 тайников.\n
+			\n%c[guide_green]Информация%c[default]
+			\nТайники можно найти практически в любом месте Зоны. Также можно получить их координаты после завершения заданий.\n
+			\n%c[guide_green]Награда%c[default]
+			\nМаксимальная общая стоимость предметов, найденных в новых тайниках, будет немного увеличена.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_silver_or_lead">
+		<text>Авторитет</text>
+	</string>
+	<string id="encyclopedia_achievements_silver_or_lead_text">
+		<text>
+			Достижение %c[guide_blue]«Авторитет»%c[default] выдаётся после уничтожения 500 сталкеров, либо после захвата в плен 50 человек.\n
+			\n%c[guide_green]Информация%c[default]
+			\nТребования, предъявляемые к этому достижению, вероятно, можно выполнить при нормальной игре. Но, если Вы намеренно пытаетесь разблокировать его - будьте осторожны и не убивайте нейтральных или дружественных сталкеров. Если, конечно, цените свою репутацию.\n
+			\n%c[guide_green]Награда%c[default]
+			\nСдавшиеся сталкеры иногда могут дать Вам координаты дополнительного тайника.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_tourist">
+		<text>Искатель</text>
+	</string>
+	<string id="encyclopedia_achievements_tourist_text">
+		<text>
+			Достижение %c[guide_blue]«Искатель»%c[default] выдаётся после посещения всех 32 локаций Зоны.\n
+			\n%c[guide_green]Награда%c[default]
+			\nВы получите координаты 3 уникальных тайников.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_well_dressed">
+		<text>Охотник на мутантов</text>
+	</string>
+	<string id="encyclopedia_achievements_well_dressed_text">
+		<text>
+			Чтобы получить достижение %c[guide_blue]«Охотник на мутантов»%c[default], нужно либо убить 500 мутантов, либо добыть 250 охотничьих трофеев.\n
+			\n%c[guide_green]Награда%c[default]
+			\nПри добыче трофеев Вы сможете получить дополнительные части мутантов.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_achievements_wishful_thinking">
+		<text>Исполнитель Желаний</text>
+	</string>
+	<string id="encyclopedia_achievements_wishful_thinking_text">
+		<text>
+			Достижение %c[guide_blue]«Исполнитель Желаний»%c[default] доступно только после победы над десятью волнами голопроекций Исполнителя Желаний.\n
+			\n%c[guide_green]Награда%c[default]
+			\nЗначительное увеличение Вашего ранга и репутации.
+		</text>
+	</string>
+	
+</string_table>

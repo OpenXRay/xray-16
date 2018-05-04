@@ -29,7 +29,7 @@
     <text>Мёртвый Город</text>
   </string>
   <string id="l11_hospital">
-    <text>Заброшенный госпиталь</text>
+    <text>Заброшенный Госпиталь</text>
   </string>
    <string id="fake_start">
     <text>Фальстарт</text>
@@ -56,7 +56,7 @@
     <text>Лаборатория Х-18</text>
   </string>
   <string id="l10u_bunker">
-    <text>Лаборатория Х-19(X-10)</text>
+    <text>Лаборатория Х-19 «Х-10»</text>
 	</string>
   <string id="labx8">
     <text>Лаборатория Х-8</text>
@@ -89,7 +89,7 @@
     <text>Саркофаг</text>
   </string>
    <string id="k02_trucks_cemetery">
-    <text>Кладбище техники</text>
+    <text>Кладбище Техники</text>
   </string>
   <string id="l06_rostok">
     <text>Дикая Территория</text>
@@ -151,10 +151,10 @@
     <text>В лабораторию Х-18</text>
   </string>
   <string id="space_restrictor_to_labx10_desc">
-    <text>В лабораторию Х-19(X-10)</text>
+    <text>В лабораторию Х-19 «Х-10»</text>
   </string>
   <string id="space_restrictor_to_labx8_desc">
-    <text>В лабораторию Х8</text>
+    <text>В лабораторию Х-8</text>
   </string>
   <string id="space_restrictor_to_limansk_desc">
     <text>В Лиманск</text>
@@ -178,7 +178,7 @@
     <text>В Рыжий Лес</text>
   </string>
   <string id="space_restrictor_to_bar_desc">
-    <text>В Бар</text>
+    <text>На Росток</text>
   </string>
   <string id="space_restrictor_to_sarcophagus_desc">
     <text>В Саркофаг</text>

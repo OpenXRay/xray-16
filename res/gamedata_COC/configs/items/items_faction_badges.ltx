@@ -1,3 +1,32 @@
+[equ_patch]:zero_immunities ; base section for faction patch slot
+GroupControlSection                      = spawn_group
+discovery_dependency                     =
+;$prefetch 				= 32
+class                                    = EQ_PATCH
+cform                                    = skeleton
+inv_weight                               = 0.01
+inv_grid_width                           = 1
+inv_grid_height                          = 1
+cost                                     = 50
+highlight_equipped 						 = true
+slot                                     = 12
+additional_inventory_weight				 = 0
+additional_inventory_weight2			 = 0
+use_condition							 = false
+can_stack 								 = true
+default_to_ruck                          = true
+
+burn_protection                          = 0
+shock_protection                         = 0
+radiation_protection                     = 0
+chemical_burn_protection                 = 0
+telepatic_protection                     = 0
+strike_protection                        = 0
+explosion_protection                     = 0
+wound_protection                         = 0
+
+hit_fraction_actor                       = 0.99
+
 [csky_patch]:identity_immunities
 GroupControlSection                      = spawn_group
 discovery_dependency                     =
@@ -20,6 +49,7 @@ cost                                     = 50
 auto_attach                              = false
 
 [freedom_patch]:csky_patch
+$spawn                                   = "equipments\freedom_patch"
 visual                                   = dynamics\tfw_badges\tfw_badge_freedom.ogf
 inv_name                                 = freedom_patch
 inv_name_short                           = freedom_patch
@@ -28,6 +58,7 @@ inv_grid_x                               = 0
 inv_grid_y                               = 4
 
 [stalker_patch]:csky_patch
+$spawn                                   = "equipments\stalker_patch"
 visual                                   = dynamics\tfw_badges\tfw_badge_defiance.ogf
 inv_name                                 = stalker_patch
 inv_name_short                           = stalker_patch
@@ -36,6 +67,7 @@ inv_grid_x                               = 1
 inv_grid_y                               = 5
 
 [ecolog_patch]:csky_patch
+$spawn                                   = "equipments\ecolog_patch"
 visual                                   = dynamics\tfw_badges\tfw_badge_ecolog.ogf
 inv_name                                 = ecolog_patch
 inv_name_short                           = ecolog_patch
@@ -44,6 +76,7 @@ inv_grid_x                               = 19
 inv_grid_y                               = 3
 
 [bandit_patch]:csky_patch
+$spawn                                   = "equipments\bandit_patch"
 visual                                   = dynamics\tfw_badges\tfw_badge_bandit.ogf
 inv_name                                 = bandit_patch
 inv_name_short                           = bandit_patch
@@ -52,6 +85,7 @@ inv_grid_x                               = 16
 inv_grid_y                               = 3
 
 [duty_patch]:csky_patch
+$spawn                                   = "equipments\duty_patch"
 visual                                   = dynamics\tfw_badges\tfw_badge_dolg.ogf
 inv_name                                 = duty_patch
 inv_name_short                           = duty_patch
@@ -60,6 +94,7 @@ inv_grid_x                               = 18
 inv_grid_y                               = 3
 
 [monolith_patch]:csky_patch
+$spawn                                   = "equipments\monolith_patch"
 visual                                   = dynamics\tfw_badges\tfw_badge_monolith.ogf
 inv_name                                 = monolith_patch
 inv_name_short                           = monolith_patch
@@ -68,6 +103,7 @@ inv_grid_x                               = 3
 inv_grid_y                               = 4
 
 [army_patch]:csky_patch
+$spawn                                   = "equipments\army_patch"
 visual                                   = dynamics\tfw_badges\tfw_badge_military.ogf
 inv_name                                 = army_patch
 inv_name_short                           = army_patch
@@ -76,6 +112,7 @@ inv_grid_x                               = 14
 inv_grid_y                               = 3
 
 [merc_patch]:csky_patch
+$spawn                                   = "equipments\merc_patch"
 visual                                   = dynamics\tfw_badges\tfw_badge_merc.ogf
 inv_name                                 = merc_patch
 inv_name_short                           = merc_patch

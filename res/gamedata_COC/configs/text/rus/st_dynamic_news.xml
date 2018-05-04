@@ -914,7 +914,7 @@
 		<text>из автомата</text>
 	</string>
 	<string id="st_dyn_news_wpn_cls_1_4">
-		<text>пристрелил</text>
+		<text>прикончил</text>
 	</string>
 	<string id="st_dyn_news_wpn_cls_1_5">
 		<text>убил</text>
@@ -938,7 +938,7 @@
 		<text>из автомата</text>
 	</string>
 	<string id="st_dyn_news_wpn_cls_2_4">
-		<text>пристрелил</text>
+		<text>прикончил</text>
 	</string>
 	<string id="st_dyn_news_wpn_cls_2_5">
 		<text>убил</text>
@@ -962,7 +962,7 @@
 		<text>из пистолета</text>
 	</string>
 	<string id="st_dyn_news_wpn_cls_3_4">
-		<text>пристрелил</text>
+		<text>прикончил</text>
 	</string>
 	<string id="st_dyn_news_wpn_cls_3_5">
 		<text>убил</text>
@@ -986,7 +986,7 @@
 		<text>из винтовки</text>
 	</string>
 	<string id="st_dyn_news_wpn_cls_4_4">
-		<text>пристрелил</text>
+		<text>прикончил</text>
 	</string>
 	<string id="st_dyn_news_wpn_cls_4_5">
 		<text>убил</text>
@@ -1010,7 +1010,7 @@
 		<text>из дробовика</text>
 	</string>
 	<string id="st_dyn_news_wpn_cls_5_4">
-		<text>пристрелил</text>
+		<text>прикончил</text>
 	</string>
 	<string id="st_dyn_news_wpn_cls_5_5">
 		<text>убил</text>
@@ -1052,13 +1052,13 @@
 		<text>Взрывная волна</text>
 	</string>
 	<string id="st_dyn_news_wpn_cls_7_2">
-		<text>взрыв снаряда</text>
+		<text>взрывы</text>
 	</string>
 	<string id="st_dyn_news_wpn_cls_7_3">
 		<text>из гранатомета</text>
 	</string>
 	<string id="st_dyn_news_wpn_cls_7_4">
-		<text>пристрелил</text>
+		<text>прикончил</text>
 	</string>
 	<string id="st_dyn_news_wpn_cls_7_5">
 		<text>убил</text>
@@ -1129,7 +1129,7 @@
 	</string>
 	<!-- level description -->
 	<string id="st_dyn_news_jupiter">
-		<text>в окрестностях Юпитера,</text>
+		<text>в окрестностях «Юпитера»,</text>
 	</string>
 	<string id="st_dyn_news_jupiter_underground">
 		<text>в Путепроводе,</text>
@@ -1179,11 +1179,14 @@
 	<string id="st_dyn_news_l10_red_forest">
 		<text>в Рыжем Лесу,</text>
 	</string>
+	<string id="st_dyn_news_l11_hospital">
+		<text>в Заброшенном Госпитале.</text>
+	</string>
 	<string id="st_dyn_news_l11_pripyat">
 		<text>в центральной Припяти,</text>
 	</string>
 	<string id="st_dyn_news_labx8">
-		<text>в лаборатории X-8,</text>
+		<text>в X-8,</text>
 	</string>
 	<string id="st_dyn_news_pripyat">
 		<text>на Окраинах Припяти,</text>
@@ -1192,13 +1195,13 @@
 		<text>на Затоне,</text>
 	</string>
 	<string id="st_dyn_news_l12_stancia">
-		<text>на юге ЧАЭС</text>
+		<text>на юге ЧАЭС.</text>
 	</string>
 	<string id="st_dyn_news_l12_stancia_2">
-		<text>на севере ЧАЭС</text>
+		<text>на севере ЧАЭС.</text>
 	</string>
 	<string id="st_dyn_news_l13_generators">
-		<text>на Генераторах</text>
+		<text>на Генераторах.</text>
 	</string>
 	<!-- Daleko -->
 	<string id="st_dyn_l09_deadcity_daleko_1">
@@ -1217,43 +1220,43 @@
 		<text>в тоннеле</text>
 	</string>
 	<string id="st_dyn_zaton_daleko_1">
-		<text>аномалии Коготь</text>
+		<text>аномалии «Коготь»</text>
 	</string>
 	<string id="st_dyn_zaton_daleko_2">
-		<text>аномалии Железный Лес</text>
+		<text>аномалии «Железный лес»</text>
 	</string>
 	<string id="st_dyn_zaton_daleko_3">
 		<text>лесопилки</text>
 	</string>
 	<string id="st_dyn_zaton_daleko_4">
-		<text>ВНЗ Круг</text>
+		<text>ВНЗ «Круг»</text>
 	</string>
 	<string id="st_dyn_zaton_daleko_5">
 		<text>станции переработки отходов</text>
 	</string>
 	<string id="st_dyn_zaton_daleko_6">
-		<text>аномалии Цирк</text>
+		<text>аномалии «Цирк»</text>
 	</string>
 	<string id="st_dyn_zaton_daleko_7">
 		<text>лесничества</text>
 	</string>
 	<string id="st_dyn_zaton_daleko_8">
-		<text>Скадовска</text>
+		<text>«Скадовска»</text>
 	</string>
 	<string id="st_dyn_zaton_daleko_9">
 		<text>сгоревшего хутора</text>
 	</string>
 	<string id="st_dyn_zaton_daleko_10">
-		<text>аномалии Котёл</text>
+		<text>аномалии «Котёл»</text>
 	</string>
 	<string id="st_dyn_zaton_daleko_11">
-		<text>аномалии Топь</text>
+		<text>аномалии «Топь»</text>
 	</string>
 	<string id="st_dyn_zaton_daleko_12">
-		<text>Изумрудного</text>
+		<text>«Изумрудного»</text>
 	</string>
 	<string id="st_dyn_zaton_daleko_13">
-		<text>Шевченко</text>
+		<text>«Шевченко»</text>
 	</string>
 	<string id="st_dyn_zaton_daleko_14">
 		<text>земснаряда</text>
@@ -1262,7 +1265,7 @@
 		<text>портовых кранов</text>
 	</string>
 	<string id="st_dyn_zaton_daleko_16">
-		<text>аномалии Соснодуб</text>
+		<text>аномалии «Соснодуб»</text>
 	</string>
 	<string id="st_dyn_zaton_daleko_17">
 		<text>заправки</text>
@@ -1271,7 +1274,7 @@
 		<text>старой баржи</text>
 	</string>
 	<string id="st_dyn_zaton_daleko_19">
-		<text>аномалии Рубец</text>
+		<text>аномалии «Рубец»</text>
 	</string>
 	<string id="st_dyn_zaton_daleko_20">
 		<text>моста им. Преображенского</text>
@@ -1283,7 +1286,7 @@
 		<text>цехов подстанции</text>
 	</string>
 	<string id="st_dyn_jupiter_daleko_1">
-		<text>аномалии Пепелище</text>
+		<text>аномалии «Пепелище»</text>
 	</string>
 	<string id="st_dyn_jupiter_daleko_2">
 		<text>градирни</text>
@@ -1292,7 +1295,7 @@
 		<text>полустанка</text>
 	</string>
 	<string id="st_dyn_jupiter_daleko_4">
-		<text>аномалии Плавни</text>
+		<text>аномалии «Плавни»</text>
 	</string>
 	<string id="st_dyn_jupiter_daleko_5">
 		<text>цементного завода</text>
@@ -1301,7 +1304,7 @@
 		<text>Копачей</text>
 	</string>
 	<string id="st_dyn_jupiter_daleko_7">
-		<text>Янова</text>
+		<text>«Янова»</text>
 	</string>
 	<string id="st_dyn_jupiter_daleko_8">
 		<text>карьера</text>
@@ -1310,7 +1313,7 @@
 		<text>бункера учёных</text>
 	</string>
 	<string id="st_dyn_jupiter_daleko_10">
-		<text>ЗРК Волхов</text>
+		<text>ЗРК «Волхов»</text>
 	</string>
 	<string id="st_dyn_jupiter_daleko_11">
 		<text>аномальной рощи</text>
@@ -1322,7 +1325,7 @@
 		<text>КПП</text>
 	</string>
 	<string id="st_dyn_jupiter_daleko_14">
-		<text>аномалии Битум</text>
+		<text>аномалии «Битум»</text>
 	</string>
 	<string id="st_dyn_jupiter_daleko_15">
 		<text>восточного туннеля</text>
@@ -1337,10 +1340,10 @@
 		<text>вертолётных площадок</text>
 	</string>
 	<string id="st_dyn_jupiter_daleko_19">
-		<text>аномалии Бетонная ванна</text>
+		<text>аномалии «Бетонная ванна»</text>
 	</string>
 	<string id="st_dyn_jupiter_daleko_20">
-		<text>завода Юпитер</text>
+		<text>завода «Юпитер»</text>
 	</string>
 	<string id="st_dyn_l05_bar_daleko_1">
 		<text>западного блокпоста</text>
@@ -1352,28 +1355,28 @@
 		<text>базы Долга</text>
 	</string>
 	<string id="st_dyn_l05_bar_daleko_4">
-		<text>прохода на Военные склады</text>
+		<text>прохода на Военные Склады</text>
 	</string>
 	<string id="st_dyn_l07_military_daleko_1">
-		<text>аномалии Пекло</text>
+		<text>аномалии «Пекло»</text>
 	</string>
 	<string id="st_dyn_l07_military_daleko_2">
-		<text>аномалий Карусель</text>
+		<text>аномалий «Карусель»</text>
 	</string>
 	<string id="st_dyn_l07_military_daleko_3">
 		<text>входа на базу</text>
 	</string>
 	<string id="st_dyn_l07_military_daleko_4">
-		<text>Кислотного болота</text>
+		<text>«Кислотного болота»</text>
 	</string>
 	<string id="st_dyn_l07_military_daleko_5">
 		<text>заброшенной деревни</text>
 	</string>
 	<string id="st_dyn_l07_military_daleko_6">
-		<text>аномалии Гравитационный пучок</text>
+		<text>аномалии «Гравитационный пучок»</text>
 	</string>
 	<string id="st_dyn_l07_military_daleko_7">
-		<text>аномалии Ментальный огонь</text>
+		<text>аномалии «Ментальный огонь»</text>
 	</string>
 	<string id="st_dyn_l01_escape_daleko_1">
 		<text>южного блокпоста</text>
@@ -1382,7 +1385,7 @@
 		<text>деревни новичков</text>
 	</string>
 	<string id="st_dyn_l01_escape_daleko_3">
-		<text>аномалий Мясорубка</text>
+		<text>аномалий «Мясорубка»</text>
 	</string>
 	<string id="st_dyn_l01_escape_daleko_4">
 		<text>АТП</text>
@@ -1394,16 +1397,16 @@
 		<text>старой фермы</text>
 	</string>
 	<string id="st_dyn_l01_escape_daleko_7">
-		<text>аномалии Костянка</text>
+		<text>аномалии «Костянка»</text>
 	</string>
 	<string id="st_dyn_l01_escape_daleko_8">
-		<text>аномалии Дробилка</text>
+		<text>аномалии «Дробилка»</text>
 	</string>
 	<string id="st_dyn_l01_escape_daleko_9">
 		<text>северного блокпоста</text>
 	</string>
 	<string id="st_dyn_k00_marsh_daleko_1">
-		<text>базы Чистого Неба</text>
+		<text>базы «Чистого Неба»</text>
 	</string>
 	<string id="st_dyn_k00_marsh_daleko_2">
 		<text>рыбацкого хутора</text>
@@ -1412,7 +1415,7 @@
 		<text>насосной станции</text>
 	</string>
 	<string id="st_dyn_k00_marsh_daleko_4">
-		<text>Западной Топи</text>
+		<text>аномалии «Злая топь»</text>
 	</string>
 	<string id="st_dyn_k00_marsh_daleko_5">
 		<text>перехода на Агропром</text>
@@ -1421,7 +1424,7 @@
 		<text>машинного двора</text>
 	</string>
 	<string id="st_dyn_k00_marsh_daleko_7">
-		<text>Нижнего Пепелища</text>
+		<text>аномалии «Медленный огонь»</text>
 	</string>
 	<string id="st_dyn_k00_marsh_daleko_8">
 		<text>южного хутора</text>
@@ -1430,7 +1433,7 @@
 		<text>старой церкви</text>
 	</string>
 	<string id="st_dyn_l10_limansk_daleko_1">
-		<text>прохода в Мертвый Город</text>
+		<text>прохода в Мёртвый Город</text>
 	</string>
 	<string id="st_dyn_l10_limansk_daleko_2">
 		<text>тоннеля в Рыжий Лес</text>
@@ -1439,16 +1442,16 @@
 		<text>заброшенной фермы</text>
 	</string>
 	<string id="st_dyn_l04_darkvalley_daleko_2">
-		<text>аномалии Темный Разлом</text>
+		<text>аномалии «Тёмный разлом»</text>
 	</string>
 	<string id="st_dyn_l04_darkvalley_daleko_3">
-		<text>аномалий Трамплин</text>
+		<text>аномалий «Трамплин»</text>
 	</string>
 	<string id="st_dyn_l04_darkvalley_daleko_4">
-		<text>аномалии Комета</text>
+		<text>аномалии «Комета»</text>
 	</string>
 	<string id="st_dyn_l04_darkvalley_daleko_5">
-		<text>аномалии Смертельное облако</text>
+		<text>аномалии «Смертельное облако»</text>
 	</string>
 	<string id="st_dyn_l04_darkvalley_daleko_6">
 		<text>Северной фабрики</text>
@@ -1475,7 +1478,7 @@
 		<text>холма в лесу</text>
 	</string>
 	<string id="st_dyn_k02_trucks_cemetery_daleko_7">
-		<text>оврага</text>
+		<text>аномального оврага</text>
 	</string>
 	<string id="st_dyn_k02_trucks_cemetery_daleko_8">
 		<text>стоянки у контейнеров</text>
@@ -1487,7 +1490,7 @@
 		<text>прохода на Радар</text>
 	</string>
 	<string id="st_dyn_l11_pripyat_daleko_2">
-		<text>ДК Энергетик</text>
+		<text>ДК «Энергетик»</text>
 	</string>
 	<string id="st_dyn_l10_radar_daleko_1">
 		<text>антенн</text>
@@ -1499,19 +1502,19 @@
 		<text>моста</text>
 	</string>
 	<string id="st_dyn_l10_red_forest_daleko_2">
-		<text>аномалий Электра</text>
+		<text>аномалии «Сверхпроводник»</text>
 	</string>
 	<string id="st_dyn_l10_red_forest_daleko_3">
-		<text>аномалии Симбионт</text>
+		<text>аномалии «Симбионт»</text>
 	</string>
 	<string id="st_dyn_l10_red_forest_daleko_4">
-		<text>Поляны Трупов</text>
+		<text>аномалии «Вертушка»</text>
 	</string>
 	<string id="st_dyn_l10_red_forest_daleko_5">
 		<text>шахты</text>
 	</string>
 	<string id="st_dyn_l10_red_forest_daleko_6">
-		<text>аномалии Подземная Гроза</text>
+		<text>аномалии «Подземная гроза»</text>
 	</string>
 	<string id="st_dyn_k01_darkscape_daleko_1">
 		<text>перехода на Кордон</text>
@@ -1529,19 +1532,19 @@
 		<text>перехода в Тёмную Долину</text>
 	</string>
 	<string id="st_dyn_l08_yantar_daleko_1">
-		<text>Отравленного озера</text>
+		<text>«Отравленного озера»</text>
 	</string>
 	<string id="st_dyn_l08_yantar_daleko_2">
 		<text>лагеря учёных</text>
 	</string>
 	<string id="st_dyn_l08_yantar_daleko_3">
-		<text>аномалии Загребущие руки</text>
+		<text>аномалии «Загребущие руки»</text>
 	</string>
 	<string id="st_dyn_l08_yantar_daleko_4">
 		<text>входа на завод</text>
 	</string>
 	<string id="st_dyn_l08_yantar_daleko_5">
-		<text>перехода в Мертвый Город</text>
+		<text>перехода в Мёртвый Город</text>
 	</string>
 	<string id="st_dyn_labx8_daleko_1">
 		<text>в лаборатории</text>
@@ -1562,25 +1565,25 @@
 		<text>прохода в Бар</text>
 	</string>
 	<string id="st_dyn_l03_agroprom_daleko_1">
-		<text>аномалии Птичья карусель</text>
+		<text>аномалии «Птичья карусель»</text>
 	</string>
 	<string id="st_dyn_l03_agroprom_daleko_2">
-		<text>аномалии Зона ЭМИ</text>
+		<text>аномалии «Зона ЭМИ»</text>
 	</string>
 	<string id="st_dyn_l03_agroprom_daleko_3">
-		<text>аномалии Аномальная Лощина</text>
+		<text>аномалии «Опасный склон»</text>
 	</string>
 	<string id="st_dyn_l03_agroprom_daleko_4">
 		<text>НИИ</text>
 	</string>
 	<string id="st_dyn_l03_agroprom_daleko_5">
-		<text>аномалии Старые когти</text>
+		<text>аномалии «Старые когти»</text>
 	</string>
 	<string id="st_dyn_l03_agroprom_daleko_6">
-		<text>Болота</text>
+		<text>токсичного болота</text>
 	</string>
 	<string id="st_dyn_pripyat_daleko_1">
-		<text>кинотеатра Прометей</text>
+		<text>кинотеатра «Прометей»</text>
 	</string>
 	<string id="st_dyn_pripyat_daleko_2">
 		<text>речного порта</text>
@@ -1595,7 +1598,7 @@
 		<text>госпиталя</text>
 	</string>
 	<string id="st_dyn_pripyat_daleko_6">
-		<text>КБО Юбилейный</text>
+		<text>КБО «Юбилейный»</text>
 	</string>
 	<string id="st_dyn_pripyat_daleko_7">
 		<text>прачечной</text>
@@ -1613,19 +1616,19 @@
 		<text>универмага</text>
 	</string>
 	<string id="st_dyn_pripyat_daleko_12">
-		<text>магазина Книги</text>
+		<text>магазина «Книги»</text>
 	</string>
 	<string id="st_dyn_pripyat_daleko_13">
-		<text>аномалии Вулкан</text>
+		<text>аномалии «Вулкан»</text>
 	</string>
 	<string id="st_dyn_pripyat_daleko_14">
-		<text>аномалии Лоза</text>
+		<text>аномалии «Лоза»</text>
 	</string>
 	<string id="st_dyn_l02_garbage_daleko_1">
 		<text>блокпоста на дороге в Бар</text>
 	</string>
 	<string id="st_dyn_l02_garbage_daleko_2">
-		<text>аномалии Ведьмин круг</text>
+		<text>аномалии «Ведьмин круг»</text>
 	</string>
 	<string id="st_dyn_l02_garbage_daleko_3">
 		<text>депо</text>
@@ -1634,10 +1637,10 @@
 		<text>стоянки брошенной техники</text>
 	</string>
 	<string id="st_dyn_l02_garbage_daleko_5">
-		<text>аномалии Газировка</text>
+		<text>аномалии «Газировка»</text>
 	</string>
 	<string id="st_dyn_l02_garbage_daleko_6">
-		<text>аномалии Изнанка</text>
+		<text>аномалии «Изнанка»</text>
 	</string>
 	<string id="st_dyn_l02_garbage_daleko_7">
 		<text>перехода на Кордон</text>
@@ -1660,43 +1663,43 @@
 		<text>в тоннеле</text>
 	</string>
 	<string id="st_dyn_zaton_blizko_1">
-		<text>аномалии Коготь</text>
+		<text>аномалии «Коготь»</text>
 	</string>
 	<string id="st_dyn_zaton_blizko_2">
-		<text>у аномалии Железный Лес</text>
+		<text>у аномалии «Железный лес»</text>
 	</string>
 	<string id="st_dyn_zaton_blizko_3">
 		<text>на лесопилке</text>
 	</string>
 	<string id="st_dyn_zaton_blizko_4">
-		<text>на ВНЗ Круг</text>
+		<text>на ВНЗ «Круг»</text>
 	</string>
 	<string id="st_dyn_zaton_blizko_5">
 		<text>на станции переработки отходов</text>
 	</string>
 	<string id="st_dyn_zaton_blizko_6">
-		<text>в аномалии Цирк</text>
+		<text>в аномалии «Цирк»</text>
 	</string>
 	<string id="st_dyn_zaton_blizko_7">
 		<text>в лесничестве</text>
 	</string>
 	<string id="st_dyn_zaton_blizko_8">
-		<text>на Скадовске</text>
+		<text>на «Скадовске»</text>
 	</string>
 	<string id="st_dyn_zaton_blizko_9">
 		<text>на сгоревшем хуторе</text>
 	</string>
 	<string id="st_dyn_zaton_blizko_10">
-		<text>в аномалии Котёл</text>
+		<text>в аномалии «Котёл»</text>
 	</string>
 	<string id="st_dyn_zaton_blizko_11">
-		<text>в аномалии Топь</text>
+		<text>в аномалии «Топь»</text>
 	</string>
 	<string id="st_dyn_zaton_blizko_12">
-		<text>в Изумрудном</text>
+		<text>в «Изумрудном»</text>
 	</string>
 	<string id="st_dyn_zaton_blizko_13">
-		<text>на Шевченко</text>
+		<text>на «Шевченко»</text>
 	</string>
 	<string id="st_dyn_zaton_blizko_14">
 		<text>на земснаряде</text>
@@ -1705,7 +1708,7 @@
 		<text>на портовых кранах</text>
 	</string>
 	<string id="st_dyn_zaton_blizko_16">
-		<text>возле аномалии Соснодуб</text>
+		<text>возле аномалии «Соснодуб»</text>
 	</string>
 	<string id="st_dyn_zaton_blizko_17">
 		<text>на заправки</text>
@@ -1714,10 +1717,10 @@
 		<text>7на старой барже</text>
 	</string>
 	<string id="st_dyn_zaton_blizko_19">
-		<text>у аномалии Рубец</text>
+		<text>у аномалии «Рубец»</text>
 	</string>
 	<string id="st_dyn_zaton_blizko_20">
-		<text>на моста Преображенского</text>
+		<text>на мосту им. Преображенского</text>
 	</string>
 	<string id="st_dyn_zaton_blizko_21">
 		<text>на южном плато</text>
@@ -1726,7 +1729,7 @@
 		<text>в цехах подстанции</text>
 	</string>
 	<string id="st_dyn_jupiter_blizko_1">
-		<text>у аномалии Пепелище</text>
+		<text>у аномалии «Пепелище»</text>
 	</string>
 	<string id="st_dyn_jupiter_blizko_2">
 		<text>на градирне</text>
@@ -1735,7 +1738,7 @@
 		<text>на полустанке</text>
 	</string>
 	<string id="st_dyn_jupiter_blizko_4">
-		<text>в аномалии Плавни</text>
+		<text>в аномалии «Плавни»</text>
 	</string>
 	<string id="st_dyn_jupiter_blizko_5">
 		<text>на цементном заводе</text>
@@ -1744,7 +1747,7 @@
 		<text>в Копачах</text>
 	</string>
 	<string id="st_dyn_jupiter_blizko_7">
-		<text>на Янове</text>
+		<text>на «Янове»</text>
 	</string>
 	<string id="st_dyn_jupiter_blizko_8">
 		<text>в карьере</text>
@@ -1753,7 +1756,7 @@
 		<text>в бункере учёных</text>
 	</string>
 	<string id="st_dyn_jupiter_blizko_10">
-		<text>на ЗРК Волхов</text>
+		<text>на ЗРК «Волхов»</text>
 	</string>
 	<string id="st_dyn_jupiter_blizko_11">
 		<text>в аномальной роще</text>
@@ -1765,7 +1768,7 @@
 		<text>на КПП</text>
 	</string>
 	<string id="st_dyn_jupiter_blizko_14">
-		<text>в аномалии Битум</text>
+		<text>в аномалии «Битум»</text>
 	</string>
 	<string id="st_dyn_jupiter_blizko_15">
 		<text>в восточном туннеле</text>
@@ -1774,16 +1777,16 @@
 		<text>на складе контейнеров</text>
 	</string>
 	<string id="st_dyn_jupiter_blizko_17">
-		<text>в вентиляционном комплекса</text>
+		<text>в вентиляционном комплексе</text>
 	</string>
 	<string id="st_dyn_jupiter_blizko_18">
 		<text>на вертолётных площадках</text>
 	</string>
 	<string id="st_dyn_jupiter_blizko_19">
-		<text>в аномалии Бетонная ванна</text>
+		<text>в аномалии «Бетонная ванна»</text>
 	</string>
 	<string id="st_dyn_jupiter_blizko_20">
-		<text>на заводе Юпитер</text>
+		<text>на заводе «Юпитер»</text>
 	</string>
 	<string id="st_dyn_l05_bar_blizko_1">
 		<text>у западного блокпоста</text>
@@ -1795,28 +1798,28 @@
 		<text>на базе Долга</text>
 	</string>
 	<string id="st_dyn_l05_bar_blizko_4">
-		<text>у прохода на Военные склады</text>
+		<text>у прохода на Военные Склады</text>
 	</string>
 	<string id="st_dyn_l07_military_blizko_1">
-		<text>в аномалии Пекло</text>
+		<text>в аномалии «Пекло»</text>
 	</string>
 	<string id="st_dyn_l07_military_blizko_2">
-		<text>у аномалий Карусель</text>
+		<text>у аномалий «Карусель»</text>
 	</string>
 	<string id="st_dyn_l07_military_blizko_3">
 		<text>на территории базы</text>
 	</string>
 	<string id="st_dyn_l07_military_blizko_4">
-		<text>в Кислотном болоте</text>
+		<text>в «Кислотном болоте»</text>
 	</string>
 	<string id="st_dyn_l07_military_blizko_5">
 		<text>в заброшенной деревне</text>
 	</string>
 	<string id="st_dyn_l07_military_blizko_6">
-		<text>в аномалии Гравитационный пучок</text>
+		<text>в аномалии «Гравитационный пучок»</text>
 	</string>
 	<string id="st_dyn_l07_military_blizko_7">
-		<text>в аномалии Ментальный огонь</text>
+		<text>в аномалии «Ментальный огонь»</text>
 	</string>
 	<string id="st_dyn_l01_escape_blizko_1">
 		<text>у южного блокпоста</text>
@@ -1825,7 +1828,7 @@
 		<text>в деревне новичков</text>
 	</string>
 	<string id="st_dyn_l01_escape_blizko_3">
-		<text>у аномалий Мясорубка</text>
+		<text>в аномалиях «Мясорубка»</text>
 	</string>
 	<string id="st_dyn_l01_escape_blizko_4">
 		<text>на АТП</text>
@@ -1837,16 +1840,16 @@
 		<text>на старой ферме</text>
 	</string>
 	<string id="st_dyn_l01_escape_blizko_7">
-		<text>в аномалии Костянка</text>
+		<text>в аномалии «Костянка»</text>
 	</string>
 	<string id="st_dyn_l01_escape_blizko_8">
-		<text>в аномалии Дробилка</text>
+		<text>в аномалии «Дробилка»</text>
 	</string>
 	<string id="st_dyn_l01_escape_blizko_9">
 		<text>у северного блокпоста</text>
 	</string>
 	<string id="st_dyn_k00_marsh_blizko_1">
-		<text>на базе Чистого Неба</text>
+		<text>на базе «Чистого Неба»</text>
 	</string>
 	<string id="st_dyn_k00_marsh_blizko_2">
 		<text>на рыбацком хуторе</text>
@@ -1855,7 +1858,7 @@
 		<text>на насосной станции</text>
 	</string>
 	<string id="st_dyn_k00_marsh_blizko_4">
-		<text>в Западной Топи</text>
+		<text>в аномалии «Злая топь»</text>
 	</string>
 	<string id="st_dyn_k00_marsh_blizko_5">
 		<text>у перехода на Агропром</text>
@@ -1864,7 +1867,7 @@
 		<text>на машинном дворе</text>
 	</string>
 	<string id="st_dyn_k00_marsh_blizko_7">
-		<text>в Нижнем Пепелище</text>
+		<text>в аномалии «Медленный огонь»</text>
 	</string>
 	<string id="st_dyn_k00_marsh_blizko_8">
 		<text>на южном хуторе</text>
@@ -1873,7 +1876,7 @@
 		<text>в старой церкви</text>
 	</string>
 	<string id="st_dyn_l10_limansk_blizko_1">
-		<text>у прохода в Мертвый Город</text>
+		<text>у прохода в Мёртвый Город</text>
 	</string>
 	<string id="st_dyn_l10_limansk_blizko_2">
 		<text>у тоннеля в Рыжий Лес</text>
@@ -1882,16 +1885,16 @@
 		<text>на заброшенной ферме</text>
 	</string>
 	<string id="st_dyn_l04_darkvalley_blizko_2">
-		<text>в аномалии Темный Разлом</text>
+		<text>в аномалии «Тёмный разлом»</text>
 	</string>
 	<string id="st_dyn_l04_darkvalley_blizko_3">
-		<text>возле аномалий Трамплин</text>
+		<text>возле аномалий «Трамплин»</text>
 	</string>
 	<string id="st_dyn_l04_darkvalley_blizko_4">
-		<text>у аномалии Комета</text>
+		<text>у аномалии «Комета»</text>
 	</string>
 	<string id="st_dyn_l04_darkvalley_blizko_5">
-		<text>у аномалии Смертельное облако</text>
+		<text>у аномалии «Смертельное облако»</text>
 	</string>
 	<string id="st_dyn_l04_darkvalley_blizko_6">
 		<text>на Северной фабрике</text>
@@ -1918,7 +1921,7 @@
 		<text>на холме в лесу</text>
 	</string>
 	<string id="st_dyn_k02_trucks_cemetery_blizko_7">
-		<text>в овраге</text>
+		<text>в аномальном овраге</text>
 	</string>
 	<string id="st_dyn_k02_trucks_cemetery_blizko_8">
 		<text>на стоянке у контейнеров</text>
@@ -1930,7 +1933,7 @@
 		<text>у прохода на Радар</text>
 	</string>
 	<string id="st_dyn_l11_pripyat_blizko_2">
-		<text>возле ДК Энергетик</text>
+		<text>возле ДК «Энергетик»</text>
 	</string>
 	<string id="st_dyn_l10_radar_blizko_1">
 		<text>около антенн</text>
@@ -1942,19 +1945,19 @@
 		<text>у моста</text>
 	</string>
 	<string id="st_dyn_l10_red_forest_blizko_2">
-		<text>у аномалий Электра</text>
+		<text>у аномалии «Сверхпроводник»</text>
 	</string>
 	<string id="st_dyn_l10_red_forest_blizko_3">
-		<text>у аномалии Симбионт</text>
+		<text>у аномалии «Симбионт»</text>
 	</string>
 	<string id="st_dyn_l10_red_forest_blizko_4">
-		<text>на Поляне Трупов</text>
+		<text>в аномалии «Вертушка»</text>
 	</string>
 	<string id="st_dyn_l10_red_forest_blizko_5">
 		<text>у шахты</text>
 	</string>
 	<string id="st_dyn_l10_red_forest_blizko_6">
-		<text>у аномалии Подземная Гроза</text>
+		<text>у аномалии «Подземная гроза»</text>
 	</string>
 	<string id="st_dyn_k01_darkscape_blizko_1">
 		<text>у перехода на Кордон</text>
@@ -1972,19 +1975,19 @@
 		<text>у перехода в Тёмную Долину</text>
 	</string>
 	<string id="st_dyn_l08_yantar_blizko_1">
-		<text>в Отравленном озере</text>
+		<text>в «Отравленном озере»</text>
 	</string>
 	<string id="st_dyn_l08_yantar_blizko_2">
 		<text>в лагере учёных</text>
 	</string>
 	<string id="st_dyn_l08_yantar_blizko_3">
-		<text>в аномалии Загребущие руки</text>
+		<text>в аномалии «Загребущие руки»</text>
 	</string>
 	<string id="st_dyn_l08_yantar_blizko_4">
 		<text>у входа на завод</text>
 	</string>
 	<string id="st_dyn_l08_yantar_blizko_5">
-		<text>у перехода в Мертвый Город</text>
+		<text>у перехода в Мёртвый Город</text>
 	</string>
 	<string id="st_dyn_labx8_blizko_1">
 		<text>в лаборатории</text>
@@ -2005,25 +2008,25 @@
 		<text>у прохода в Бар</text>
 	</string>
 	<string id="st_dyn_l03_agroprom_blizko_1">
-		<text>в аномалии Птичья карусель</text>
+		<text>в аномалии «Птичья карусель»</text>
 	</string>
 	<string id="st_dyn_l03_agroprom_blizko_2">
-		<text>в аномалии Зона ЭМИ</text>
+		<text>в аномалии «Зона ЭМИ»</text>
 	</string>
 	<string id="st_dyn_l03_agroprom_blizko_3">
-		<text>в Аномальной Лощине</text>
+		<text>в аномалии «Опасный склон»</text>
 	</string>
 	<string id="st_dyn_l03_agroprom_blizko_4">
 		<text>около НИИ</text>
 	</string>
 	<string id="st_dyn_l03_agroprom_blizko_5">
-		<text>у аномалии Старые когти</text>
+		<text>у аномалии «Старые когти»</text>
 	</string>
 	<string id="st_dyn_l03_agroprom_blizko_6">
-		<text>в Болоте</text>
+		<text>в токсичном болоте</text>
 	</string>
 	<string id="st_dyn_pripyat_blizko_1">
-		<text>у кинотеатра Прометей</text>
+		<text>у кинотеатра «Прометей»</text>
 	</string>
 	<string id="st_dyn_pripyat_blizko_2">
 		<text>в речном порту</text>
@@ -2038,7 +2041,7 @@
 		<text>в госпитале</text>
 	</string>
 	<string id="st_dyn_pripyat_blizko_6">
-		<text>у КБО Юбилейный</text>
+		<text>у КБО «Юбилейный»</text>
 	</string>
 	<string id="st_dyn_pripyat_blizko_7">
 		<text>в прачечной</text>
@@ -2056,19 +2059,19 @@
 		<text>в универмаге</text>
 	</string>
 	<string id="st_dyn_pripyat_blizko_12">
-		<text>у магазина Книги</text>
+		<text>у магазина «Книги»</text>
 	</string>
 	<string id="st_dyn_pripyat_blizko_13">
-		<text>в аномалии Вулкан</text>
+		<text>в аномалии «Вулкан»</text>
 	</string>
 	<string id="st_dyn_pripyat_blizko_14">
-		<text>в аномалии Лоза</text>
+		<text>в аномалии «Лоза»</text>
 	</string>
 	<string id="st_dyn_l02_garbage_blizko_1">
 		<text>у блокпоста на дороге в Бар</text>
 	</string>
 	<string id="st_dyn_l02_garbage_blizko_2">
-		<text>в аномалии Ведьмин круг</text>
+		<text>в аномалии «Ведьмин круг»</text>
 	</string>
 	<string id="st_dyn_l02_garbage_blizko_3">
 		<text>в депо</text>
@@ -2077,10 +2080,10 @@
 		<text>на стоянке брошенной техники</text>
 	</string>
 	<string id="st_dyn_l02_garbage_blizko_5">
-		<text>в аномалии Газировка</text>
+		<text>в аномалии «Газировка»</text>
 	</string>
 	<string id="st_dyn_l02_garbage_blizko_6">
-		<text>в аномалии Изнанка</text>
+		<text>в аномалии «Изнанка»</text>
 	</string>
 	<string id="st_dyn_l02_garbage_blizko_7">
 		<text>у перехода на Кордон</text>
@@ -2093,7 +2096,7 @@
 		<text>%s сам не свой в последнее время. Обычно он торчит %s. Похоже, скрывается от кого-то.</text>
 	</string>
 	<string id="st_dyn_news_gossip_bounty_3">
-		<text>%s. Я его только что видел %s. Слышал, Сидорович его ищет"</text>
+		<text>%s. Я его только что видел %s. Слышал, Сидорович его ищет.</text>
 	</string>
 	<string id="st_dyn_news_gossip_bounty_4">
 		<text>%s кому-то дорогу перешёл. За его голову кругленькую сумму обещают.</text>
@@ -2103,7 +2106,7 @@
 		<text>Удачный день! Нашёл артефакт %s.</text>
 	</string>
 	<string id="st_dyn_news_gossip_arte_2">
-		<text>Кто-нибудь знает где можно найти артефакт %s?</text>
+		<text>Кто-нибудь знает, где можно найти артефакт %s?</text>
 	</string>
 	<string id="st_dyn_news_gossip_arte_3">
 		<text>О! %s! Теперь можно и домой!</text>
@@ -2141,7 +2144,7 @@
 		<text>Когда %s обновит ассортимент товаров? %s есть хотя бы у других торговцев?</text>
 	</string>
 	<string id="st_dyn_news_gossip_buy_1_3">
-		<text>Если кто не в курсе - %s сегодня неплохо торгует. %s по вполне приемлемой цене.</text>
+		<text>Если кто не в курсе - %s сегодня в хорошем настроении. %s по вполне приемлемой цене.</text>
 	</string>
 	<string id="st_dyn_news_gossip_buy_1_4">
 		<text>Я разорюсь, если %s поднимет цены.</text>
@@ -2160,7 +2163,7 @@
 	</string>
 	<!-- kill wounded -->
 	<string id="st_dyn_news_gossip_kill_wounded_1">
-		<text>Один ещё живой. Это не надолго!</text>
+		<text>Один ещё живой. Это ненадолго!</text>
 	</string>
 	<string id="st_dyn_news_gossip_kill_wounded_2">
 		<text>Быстро! Один, вроде, ещё живой.</text>
@@ -2203,7 +2206,7 @@
 		<text>Он в наших руках. Рассмотрим предложения о выкупе!</text>
 	</string>
 	<string id="st_dyn_news_gossip_hostage_6">
-		<text>Давайте посмотрим, сможем ли мы извлечь информацию из этого подонка.</text>
+		<text>Давайте посмотрим, сможем ли мы получить какую-нибудь информацию от этого подонка.</text>
 	</string>
 	<!-- Task -->
 	<string id="st_dyn_news_gossip_task_1">

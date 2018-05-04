@@ -22,7 +22,7 @@ spawn_phantom 		= m_phantom_tushkano
 can_spawn_phantom 	= false
 
 hit_fraction_monster = 1
-skin_armor = 0.01
+skin_armor = 0.0
 
 ;------------------------------------------------------------------------
 ; Influences
@@ -97,11 +97,11 @@ ImpulseMax			 = 35.0
 ; speed factors			linear | angular_real | angular_path | min |  max
 Velocity_Stand			= 0,		3.5,			3.5,		1,		1
 Velocity_WalkFwdNormal	= 1.0,		7.5,			7.5,		0.02,	1.8	
-Velocity_RunFwdNormal	= 5.5,		6.5,			6.5,		0.3,	1	
+Velocity_RunFwdNormal	= 5.0,		6.5,			6.5,		0.3,	1	
 Velocity_WalkFwdDamaged	= 1.0,		4.5,			4.5,		0.2,	1.8	
-Velocity_RunFwdDamaged	= 3.5,  	3.0,			3.0,		0.5,	1
+Velocity_RunFwdDamaged	= 3.0,  	3.0,			3.0,		0.5,	1
 Velocity_Drag			= 1.0,		3.0,			3.0,		1,		1
-Velocity_Steal			= 1.75,		3.0,			3.0,		1,		1
+Velocity_Steal			= 1.5,		3.0,			3.0,		1,		1
 
 
 ; acceleration
@@ -110,8 +110,8 @@ Accel_Calm				= 2.5
 Accel_Aggressive		= 7.5
 
 ;attack parameters
-MinAttackDist		= 1.0	;0.5
-MaxAttackDist		= 1.5	;3.8
+MinAttackDist		= 1.0
+MaxAttackDist		= 1.6
 
 as_min_dist				= 0.9
 as_step					= 0.1
@@ -122,18 +122,6 @@ Min_Satiety			= 0.4		; ьшэ. эюЁьр ёvЄюёЄш (ьхэ№°х - єцх уюыюфэvщ)
 Max_Satiety			= 1.0		; ьръё. эюЁьр ёvЄюёЄш (сюы№°х - юўхэ№ ёvЄvщ)
 
 distance_to_corpse	= 1.2		; фшёЄ. фю ЄЁєяр, яЁш ъюЄюЁющ юэ яхЁхїюфшЄ т ёюёЄю эшх хфv
-
-
-min_view_distance   		= 0.8				; коэффициент, который множится на eye_range, в зависимости от угла
-max_view_distance	 		= 1.0				; коэффициент, который множится на eye_range, в зависимости от угла
-visibility_threshold	 	= 100.0				; значение, при достижении суммой которого объект считается видимым
-always_visible_distance 	= 0.3
-time_quant					= 0.001
-decrease_value				= 0.01				; значение, на которое уменьшается вес, если объект попал в фрустум, но отсёкся по каким-то причинам
-velocity_factor		     	= 0.5
-luminocity_factor			= 0.5 				; фактор освещения (только для Актёра)
-transparency_threshold		= 0.25
-
 
 hit_type = wound
 
@@ -166,7 +154,7 @@ eat_freq			=	5.0		; ўрёЄюЄр єъєёют т ёхъ
 eat_slice			=	0.01	; єтхышўхэшх ёvЄюёЄш яЁш 1 єъєёх
 eat_slice_weight	=	10.0	; єьхэ№°хэшх хфv є ЄЁєяр
 
-satiety_threshold	= 0.5							; below this value monster fill hunger
+satiety_threshold	= 0.5							; below this value monster feels hunger
 
 
 ; Morale
@@ -268,23 +256,23 @@ bip01_neck 			= 1.0, -1, 1.5
 bip01_head 			= 2.0, -1, 0.5, 10
 
 [tushkano_immunities]
-burn_immunity			= 1
-strike_immunity			= 1
-shock_immunity			= 1
-wound_immunity			= 0.8
-radiation_immunity		= 0
-telepatic_immunity		= 0
-chemical_burn_immunity	= 1
-explosion_immunity		= 1
-fire_wound_immunity		= 2
+burn_immunity			= 1.0
+strike_immunity			= 1.0
+shock_immunity			= 1.0
+wound_immunity			= 2.0
+radiation_immunity		= 0.0
+telepatic_immunity		= 0.0
+chemical_burn_immunity	= 1.0
+explosion_immunity		= 1.0
+fire_wound_immunity		= 2.5
 
 [m_tushkano_attack_params]
 ;---------------------------------------------------------------------------------------------------------------------------------------------
 ;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, bottom, top ) |	Test Dist
 ;---------------------------------------------------------------------------------------------------------------------------------------------
-stand_attack_0 =	  	0.25,		0.3,		    20,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.5
-stand_attack_1 =	  	0.25,		0.3,		    20,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.5
-stand_attack_2 =	  	0.25,		0.3,		    20,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.5
+stand_attack_0 =	  	0.25,		0.3,		    20,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.2
+stand_attack_1 =	  	0.25,		0.3,		    20,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.2
+stand_attack_2 =	  	0.25,		0.3,		    20,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.2
 
 [m_tushkano_step_params]
 ;---------------------------------------------------------------------------
@@ -298,8 +286,7 @@ stand_run_0	 		=	1,	   0.25,     1,	    0.25,    1,
 $spawn				= "monsters\tushkanos\tushkano_normal"
 rank = 1
 spec_rank			= normal
-community			= tushkano
-panic_threshold		= 0.05
+panic_threshold		= 0.2
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;Tushkano population - Borovos 2013;;;;;;;;;;;;;;;;;
@@ -335,30 +322,30 @@ corpse_visual		 = monsters\tushkano\tushkano4_dead
 $spawn				= "monsters\tushkanos\tushkano_weak"
 visual				 = monsters\tushkano\tushkano_small
 corpse_visual		 = monsters\tushkano\tushkano_small_dead
-panic_threshold		= 0.1
+panic_threshold		= 0.25
 
 immunities_sect			= tushkano_weak_immunities
 attack_params			= m_tushkano_weak_attack_params
 
 [tushkano_weak_immunities]
-burn_immunity			= 1
-strike_immunity			= 1
-shock_immunity			= 1
-wound_immunity			= 1
-radiation_immunity		= 0
-telepatic_immunity		= 0
-chemical_burn_immunity	= 1
-explosion_immunity		= 1
-fire_wound_immunity		= 2.5
+burn_immunity			= 1.0
+strike_immunity			= 1.0
+shock_immunity			= 1.0
+wound_immunity			= 2.3
+radiation_immunity		= 0.0
+telepatic_immunity		= 0.0
+chemical_burn_immunity	= 1.0
+explosion_immunity		= 1.0
+fire_wound_immunity		= 3.0
 
 
 [m_tushkano_weak_attack_params]
 ;---------------------------------------------------------------------------------------------------------------------------------------------
 ;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, bottom, top ) |	Test Dist
 ;---------------------------------------------------------------------------------------------------------------------------------------------
-stand_attack_0 =	  	0.25,		0.25,		    15,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.5
-stand_attack_1 =	  	0.25,		0.25,		    15,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.5
-stand_attack_2 =	  	0.25,		0.25,		    15,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.5
+stand_attack_0 =	  	0.25,		0.25,		    15,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.2
+stand_attack_1 =	  	0.25,		0.25,		    15,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.2
+stand_attack_2 =	  	0.25,		0.25,		    15,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.2
 
 [tushkano_weak_a]:tushkano_weak
 $spawn				= "monsters\tushkanos\tushkano_weak_a"
@@ -385,29 +372,29 @@ corpse_visual		 = monsters\tushkano\tushkano_small4_dead
 $spawn				= "monsters\tushkanos\tushkano_strong"
 visual				 = monsters\tushkano\tushkano_big
 corpse_visual		 = monsters\tushkano\tushkano_big_dead
-panic_threshold		= 0.01
+panic_threshold		= 0.15
 
 immunities_sect			= tushkano_strong_immunities
 attack_params			= m_tushkano_strong_attack_params
 
 [tushkano_strong_immunities]
-burn_immunity			= 1
-strike_immunity			= 1
-shock_immunity			= 1
-wound_immunity			= 0.7
-radiation_immunity		= 0
-telepatic_immunity		= 0
-chemical_burn_immunity	= 1
-explosion_immunity		= 1
-fire_wound_immunity		= 1.5
+burn_immunity			= 1.0
+strike_immunity			= 1.0
+shock_immunity			= 1.0
+wound_immunity			= 1.5
+radiation_immunity		= 0.0
+telepatic_immunity		= 0.0
+chemical_burn_immunity	= 1.0
+explosion_immunity		= 1.0
+fire_wound_immunity		= 2.0
 
 [m_tushkano_strong_attack_params]
 ;---------------------------------------------------------------------------------------------------------------------------------------------
 ;	anim			| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, bottom, top ) |	Test Dist
 ;---------------------------------------------------------------------------------------------------------------------------------------------
-stand_attack_0 =	  	0.25,		0.35,		    25,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.5
-stand_attack_1 =	  	0.25,		0.35,		    25,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.5
-stand_attack_2 =	  	0.25,		0.35,		    25,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.5
+stand_attack_0 =	  	0.25,		0.35,		    25,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.2
+stand_attack_1 =	  	0.25,		0.35,		    25,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.2
+stand_attack_2 =	  	0.25,		0.35,		    25,        0.0, 1.0, 0.0,		 -1.2, 1.2, -1.6, 1.6,							  1.2
 
 [tushkano_strong_a]:tushkano_strong
 $spawn				= "monsters\tushkanos\tushkano_strong_a"

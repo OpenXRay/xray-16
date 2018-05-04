@@ -1,0 +1,62 @@
+local	temp = {}
+if (move ~= nil) then
+	temp = move
+end
+move	= temp
+
+function get_smart_cover_cover_loophole_lead_sit_sleep_mechanic()
+	return {
+			loopholes = {
+				smart_covers_loophole_lead_sit_sleep_mechanic.get_loophole_lead_sit_sleep_mechanic("lead_sit_sleep_mechanic",	vector():set(0,0,0), vector():set(1,0,0),	vector():set(1,0,0))
+			},
+
+	
+			transitions = {
+			--' Анимации входа в бойницы
+			{
+				vertex0 = "",
+				vertex1 = "lead_sit_sleep_mechanic",
+				weight = 1.0,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+                                actions =	{
+											{
+												animation = "lead_0_sit_down_0",
+												position = VEC_ZERO,
+												body_state = move.crouch, movement_type = move.run,
+											},
+											},
+							}
+							}
+			},
+
+
+			--' Анимации выхода из бойниц.
+			{
+				vertex0 = "lead_sit_sleep_mechanic",
+				vertex1 = "",
+				weight = 1.1,
+				actions =	{
+							{
+								precondition_functor = "smart_covers.script_functor_true",
+								precondition_params = "",
+                                actions =	{
+											{
+												animation = "lead_0_stand_up_0",
+												position = VEC_ZERO,
+												body_state = move.standing, movement_type = move.run,
+											},
+											},
+							}
+							}
+			}
+			}
+	}
+end
+
+
+function exit_random(p)
+	return math.random(100) <= tonumber(p)
+end

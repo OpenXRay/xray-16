@@ -56,12 +56,8 @@ end
 function se_monster:on_register()
 	--alun_utils.debug_write("\nse_monster:on_register "..self:name().." START")
 	cse_alife_monster_base.on_register( self )
-	
-	-- persistent storage
-	alife_storage_manager.get_se_obj_state(self,true)
+	SendScriptCallback("server_entity_on_register",self,"se_monster")
 
-	-- Проверяем кастомдату обьекта на наличие стори айди.
-	story_objects.check_spawn_ini_for_story_id(self)
 	if db.offline_objects[self.id] == nil then
 		db.offline_objects[self.id] = {}
 	end
@@ -90,17 +86,8 @@ function se_monster:on_unregister()
 			smart:unregister_npc(self)
 		end
 	end
-	
-	local m_data = alife_storage_manager.get_state()
-	if (m_data.se_object) then 
-		m_data.se_object[self.id] = nil
-	end
-	if (m_data.game_object) then 
-		m_data.game_object[self.id] = nil
-	end
-	
 	db.offline_objects[self.id] = nil
-	story_objects.unregister(self.id)
+	SendScriptCallback("server_entity_on_unregister",self,"se_monster")
 	cse_alife_monster_base.on_unregister(self)
 end
 --------------------

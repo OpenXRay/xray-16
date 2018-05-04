@@ -1,0 +1,59 @@
+[up_sect_firsta_binoc]
+cost		      		= 1500
+value					= 0
+
+scope_zoom_factor		= +2.5
+
+[up_sect_firstc_binoc]
+cost		      		= 7500
+value					= 0
+
+scope_alive_detector	= scope_detector
+
+[up_firsta_binoc]
+scheme_index            = 0, 0
+known                   = 1
+effects                 = up_gr_firstcd_binoc
+section                 = up_sect_firsta_binoc
+property                = prop_binoc_7.5x
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = on_weapon_upgrade_something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           =
+name                    = st_up_binoc_a1_name
+description             = st_up_binoc_a1_desc
+icon                    = ui_inGame2_upgrade_Binoc_1
+
+[up_firstc_binoc]
+scheme_index            = 1, 0
+known                   = 1
+effects                 = 
+section                 = up_sect_firstc_binoc
+property                = prop_autolockscope
+
+precondition_functor    = inventory_upgrades.precondition_functor_a
+precondition_parameter  = a & b
+
+effect_functor          = inventory_upgrades.effect_functor_a
+effect_parameter        = something_here
+
+; ui
+prereq_functor          = inventory_upgrades.prereq_functor_a
+prereq_tooltip_functor  = inventory_upgrades.prereq_tooltip_functor_a
+prereq_params           = 
+name                    = st_up_opt_c1_name
+description             = st_up_opt_c1_descr
+icon                    = ui_inGame2_upgrade_Binoc_3
+
+[up_gr_firstab_binoc]
+elements                = up_firsta_binoc
+
+[up_gr_firstcd_binoc]
+elements                = up_firstc_binoc

@@ -82,13 +82,15 @@ function CPsiStormManager:start(manual)
 		return
 	end
 	
-	-- Deserted Hospital has nowhere to hide (almost all the map is inside anyway).
-	if (level_name == "l11_hospital" or has_alife_info("bar_arena_fight")) then
+	-- Generators is psi-storm source and Deserted Hospital has nowhere to hide (almost all the map is inside anyway).
+	if (level_name == "l13_generators" or level_name == "l11_hospital" or has_alife_info("bar_arena_fight")) then
+		self.skip_message = true
 		self:skip_psi_storm()
 		return
 	end
 	
 	if(diff_sec+6>self.psi_storm_duration) then
+		self.skip_message = true
 		self:skip_psi_storm()
 	else
 		self.started = true
@@ -132,9 +134,6 @@ function CPsiStormManager:new_psi_storm_time()
 end
 
 function CPsiStormManager:skip_psi_storm()
-	if (self.started) then 
-		xr_statistic.inc_counter("storms")
-	end
 	if not (self.inited_time) then 
 		self.inited_time = game.get_game_time()
 	end
@@ -154,13 +153,23 @@ function CPsiStormManager:skip_psi_storm()
 	self.psi_storm_task_sect 	= ""
 	self.task_given 		= nil
 	prev_sec				= 0
-
+	
+	--dxr_statistics.increment_statistic("psi_storms")
+	if (self.skip_message and atmosfear_options.config:r_value("atmosfear_current_parameters","opt_enable_psi_storm",2,1) == 1) then
+		news_manager.send_tip(db.actor, "st_storm_while_asleep", nil, "recent_surge", nil, nil)
+		dxr_encyclopedia.detect_anomaly_interaction("psi_storms")
+		dxr_statistics.increment_statistic("psi_storms")
+		self.skip_message = nil
+		--release_body_manager.get_release_body_manager():clear(true)
+	end
+	
 	level.set_time_factor(self.game_time_factor)
 end
 
 function CPsiStormManager:finish(manual)
 	if (self.started) then 
-		xr_statistic.inc_counter("storms")
+		dxr_encyclopedia.detect_anomaly_interaction("psi_storms")
+		dxr_statistics.increment_statistic("psi_storms")
 		surge_manager.get_surge_manager():respawn_artefacts_and_replace_anomaly_zone()
 		surge_manager.get_surge_manager():toggle_level_artefact_respawns()	
 	end
@@ -419,20 +428,9 @@ function CPsiStormManager:kill_obj_at_pos(pos)
 	end
 	local board = SIMBOARD
 	local sim,gg = alife(),game_graph()
-	local immuned_to_surge_squads = {
-		["monolith"] 				= true,
-		["monster_predatory_day"] 	= true,
-		["monster_predatory_night"] = true,
-		["monster_vegetarian"] 		= true,
-		["monster_zombied_day"] 	= true,
-		["monster_zombied_night"] 	= true,
-		["monster_special"] 		= true,
-		["monster"]					= true,
-		["zombied"]					= true
-	}
 	for k,v in pairs(board.squads) do
 		local squad = alife_object(k)
-		if (squad:clsid() == clsid.online_offline_group_s and surge_manager.can_destroy_squad(squad,immuned_to_surge_squads,sim,gg)) then
+		if (squad:clsid() == clsid.online_offline_group_s and surge_manager.can_destroy_squad(squad,sim,gg)) then
 			local squad_npcs = surge_manager.get_squad_members(squad.id)
 			local fate = atmosfear_options.config:r_value("atmosfear_current_parameters","opt_psi_storm_fate",0,"kill")
 			for kk,vv in pairs(squad_npcs) do
@@ -445,7 +443,7 @@ function CPsiStormManager:kill_obj_at_pos(pos)
 								self.humanParticles[k.."_"..kk]=particles_object("crommcruac\\electrocute_human")
 								self.humanParticles[k.."_"..kk]:play_at_pos(cl_obj:position())
 								if fate=="turntozombie" then
-									self:turn_to_zombie(obj,squad)
+									surge_manager.get_surge_manager():turn_to_zombie(obj,squad)
 								else
 									cl_obj:kill(cl_obj)
 								end
@@ -455,7 +453,7 @@ function CPsiStormManager:kill_obj_at_pos(pos)
 								self.humanParticles[k.."_"..kk]=particles_object("crommcruac\\electrocute_human")
 								self.humanParticles[k.."_"..kk]:play_at_pos(obj:position())
 								if fate=="turntozombie" then
-									self:turn_to_zombie(obj,squad)
+									surge_manager.get_surge_manager():turn_to_zombie(obj,squad)
 								else
 									obj:kill()
 								end
@@ -469,7 +467,7 @@ function CPsiStormManager:kill_obj_at_pos(pos)
 									self.humanParticles[k.."_"..kk]=particles_object("crommcruac\\electrocute_human")
 									self.humanParticles[k.."_"..kk]:play_at_pos(cl_obj:position())
 									if fate=="turntozombie" then
-										self:turn_to_zombie(obj,squad)
+										surge_manager.get_surge_manager():turn_to_zombie(obj,squad)
 									else
 										cl_obj:kill(cl_obj)
 									end
@@ -479,7 +477,7 @@ function CPsiStormManager:kill_obj_at_pos(pos)
 									self.humanParticles[k.."_"..kk]=particles_object("crommcruac\\electrocute_human")
 									self.humanParticles[k.."_"..kk]:play_at_pos(obj:position())
 									if fate=="turntozombie" then
-										self:turn_to_zombie(obj,squad)
+										surge_manager.get_surge_manager():turn_to_zombie(obj,squad)
 									else
 										obj:kill()
 									end
@@ -492,34 +490,6 @@ function CPsiStormManager:kill_obj_at_pos(pos)
 		end
 	end
 	--self.debugMessages[10]:SetText("obj to kill:"..tostring(#self.objects_to_kill))
-end
-
-function CPsiStormManager:turn_to_zombie(se_obj,squad)
-	if not (squad) then
-		se_obj:kill()
-		return 
-	end
-	
-	self.zombie_count = self.zombie_count and self.zombie_count + 1 or 0
-	if (self.zombie_count > 12) then
-		se_obj:kill()
-		return
-	end
-	
-	local zombie_type
-	local section_number = string.sub(se_obj:section_name(), -1)
-	if section_number=="4" then
-		zombie_type="sim_default_zombied_4"
-	elseif section_number=="3" then
-		zombie_type="sim_default_zombied_3"
-	elseif section_number=="2" or section_number=="1" then
-		zombie_type="sim_default_zombied_2"
-	else
-		zombie_type="sim_default_zombied_1"
-	end
-	
-	squad:remove_npc(se_obj.id)
-	alife():create(zombie_type,se_obj.position,se_obj.m_level_vertex_id,se_obj.m_game_vertex_id)
 end
 
 function CPsiStormManager:kill_crows_at_pos(pos)
@@ -718,6 +688,10 @@ end
 
 -- Cleaner way to bunch together survival conditions.
 function is_actor_immune()
+	-- Invulnerability after game load.
+	if (bind_stalker_ext.invulnerable_time and time_global() < bind_stalker_ext.invulnerable_time) then 
+		return true 
+	end
 	-- God mode console command enabled.
 	if (get_console():get_bool("g_god")) then
 		return true
@@ -734,7 +708,7 @@ function is_actor_immune()
 		return true
 	end
 	-- 'Radiotherapy' achievement has been unlocked.
-	if (has_alife_info("achieved_radiotherapy")) then
+	if (dxr_achievements.has_achievement("radiotherapy")) then
 		if (math.random(1,100) < 25) then
 			return true
 		end

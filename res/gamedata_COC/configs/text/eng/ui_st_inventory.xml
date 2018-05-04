@@ -28,7 +28,7 @@
 		<text>attach scope to</text>
 	</string>
 	<string id="st_attach_silencer_to_pistol">
-		<text>attach silencer to</text>
+		<text>attach suppressor to</text>
 	</string>
 	<string id="st_base_cost">
 		<text>Price</text>
@@ -46,7 +46,7 @@
 		<text>detach scope</text>
 	</string>
 	<string id="st_detach_silencer">
-		<text>detach silencer</text>
+		<text>detach suppressor</text>
 	</string>
 	<string id="st_use_iron">
 		<text>use iron sights</text>
@@ -253,10 +253,10 @@
 		<text>Rifles</text>
 	</string>
 	<string id="ui_inv_silencer_pistol">
-		<text>Buy silencer for pistol (A)</text>
+		<text>Buy suppressor for pistol (A)</text>
 	</string>
 	<string id="ui_inv_silencer_rifle">
-		<text>Buy silencer for rifle (F)</text>
+		<text>Buy suppressor for rifle (F)</text>
 	</string>
 	<string id="ui_inv_sniper_rifles">
 		<text>Sniper</text>
@@ -336,7 +336,10 @@
 	<string id="ui_st_repairable_equipment">
 		<text>Repairable</text>
 	</string>
+	<string id="ui_st_disassemble">
+		<text>Disassemble</text>
+	</string>
 	<string id="ui_st_create_stash">
-		<text>Create stash</text>
+		<text>create stash</text>
 	</string>
 </string_table>

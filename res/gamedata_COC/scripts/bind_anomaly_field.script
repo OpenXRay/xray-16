@@ -40,7 +40,7 @@ function anomaly_field_binder:net_destroy()
 	db.storage[self.object:id()] = nil
 	fields_by_names[self.object:name()] = nil
 	local id = self.object:id()
-	for i=#fields_all,1 do 
+	for i=#fields_all,1,-1 do 
 		if (fields_all[i]:id() == id) then 
 			table.remove(fields_all,i)
 			break

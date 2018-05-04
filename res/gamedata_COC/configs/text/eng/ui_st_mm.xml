@@ -31,13 +31,13 @@
 		<text>GAME TYPE</text>
 	</string>
 	<string id="gd_master">
-		<text>Master</text>
+		<text>Realistic</text>
 	</string>
 	<string id="gd_novice">
-		<text>Rookie</text>
+		<text>Easy</text>
 	</string>
 	<string id="gd_veteran">
-		<text>Veteran</text>
+		<text>Hard</text>
 	</string>
 	<string id="icon">
 		<text>ICONS</text>
@@ -58,10 +58,10 @@
 		<text>DirectX 9 (Enhanced)</text>
 	</string>
 	<string id="renderer_r3">
-		<text>DirectX 10 (Enhanced)</text>
+		<text>DirectX 10 (Unstable)</text>
 	</string>
 	<string id="renderer_r4">
-		<text>DirectX 11 (Enhanced)</text>
+		<text>DirectX 11 (Unfinished)</text>
 	</string>
 	<string id="st_opt_high">
 		<text>High</text>
@@ -196,7 +196,7 @@
 		<text>Quit profile</text>
 	</string>
 	<string id="ui_mm_master">
-		<text>Master</text>
+		<text>Realistic</text>
 	</string>
 	<string id="ui_mm_master_volume">
 		<text>SFX volume</text>
@@ -206,6 +206,12 @@
 	</string>
 	<string id="ui_mm_msaa_alphatest">
 		<text>Smooth A-test objects</text>
+	</string>
+	<string id="st_opt_atest_msaa_dx10_0">
+		<text>DX10.0 style [Standard]</text>
+	</string>
+	<string id="st_opt_atest_msaa_dx10_1">
+		<text>DX10.1 style [Higher quality]</text>
 	</string>
 	<string id="ui_mm_msaa_opt">
 		<text>Optimize smoothing</text>
@@ -229,7 +235,7 @@
 		<text>New game</text>
 	</string>
 	<string id="ui_mm_novice">
-		<text>Rookie</text>
+		<text>Easy</text>
 	</string>
 	<string id="ui_mm_npc_torch">
 		<text>NPC flashlights</text>
@@ -274,7 +280,7 @@
 		<text>Grass shadow</text>
 	</string>
     <string id="ui_mm_r__actor_shadow">
-    <text>Actor shadow</text>
+		<text>Actor shadow</text>
     </string>
 	<string id="ui_mm_r2_sun_quality">
 		<text>Sun quality</text>
@@ -337,7 +343,7 @@
 		<text>Sound quality</text>
 	</string>
 	<string id="ui_mm_stalker">
-		<text>Stalker</text>
+		<text>Normal</text>
 	</string>
 	<string id="ui_mm_sun_quality">
 		<text>Shadow quality</text>
@@ -358,7 +364,7 @@
 		<text>NPC identification</text>
 	</string>
 	<string id="ui_mm_veteran">
-		<text>Veteran</text>
+		<text>Hard</text>
 	</string>
 	<string id="ui_mm_video">
 		<text>Video</text>
@@ -412,12 +418,11 @@
 		<text>Show interface</text>
 	</string>
 	<string id="gd_stalker">
-		<text>Stalker</text>
+		<text>Normal</text>
 	</string>
 	<string id="st_opt_extreme">
 		<text>Extreme</text>
 	</string>
-
 	<string id="st_opt_ultra">
 		<text>Very high</text>
 	</string>
@@ -443,7 +448,7 @@
 		<text>Debug HUD</text>
 	</string>
 	<string id="ui_mm_debug_map_hud">
-		<text>Debug HUD Mapspots</text>
+		<text>Debug HUD mapspots</text>
 	</string>
 	<string id="ui_mm_radio_mod">
 		<text>Radio music</text>
@@ -461,7 +466,7 @@
 		<text>Helicopter patrols</text>
 	</string>
 	<string id="ui_mm_ai_die_in_anomaly">
-		<text>AI die in anomalies</text>
+		<text>AI die to anomalies</text>
 	</string>
 	<string id="ui_mm_dynamic_news">
 		<text>Dynamic news</text>
@@ -488,7 +493,7 @@
 		<text>Quicksave count</text>
 	</string>
 	<string id="ui_mm_actor_hud">
-		<text>Mask Overlay</text>
+		<text>Mask overlay</text>
 	</string>
 	<string id="ui_mm_alife_mutant_pop">
 		<text>Population factor (mutants)</text>
@@ -515,12 +520,69 @@
 		<text>Hardcore AI aim</text>
 	</string>
 	<string id="ui_mm_localization">
-		<text>Localization</text>
+		<text>Localisation</text>
 	</string>
 	<string id="ui_mm_r__enable_grass_shadow">
 		<text>Grass shadow</text>
 	</string>
 	<string id="ui_mm_cod_pickup_mode">
 		<text>AoE pickup mode</text>
+	</string>
+	<string id="ui_mm_invert_zoom">
+		<text>Invert zoom</text>
+	</string>
+	<string id="ui_mm_detail_scale">
+		<text>Grass scale</text>
+	</string>
+	<string id="ui_mm_enhanced_recoil">
+		<text>Enhanced recoil</text>
+	</string>
+	<string id="ui_mm_weapon_hide">
+		<text>Holster when using items</text>
+	</string>
+	<string id="ui_mm_multi_wpn_conditions">
+		<text>Factor (guns condition)</text>
+	</string>
+	<string id="ui_mm_multi_rewards_money">
+		<text>Factor (money reward)</text>
+	</string>
+	<string id="ui_mm_multi_rewards_goodwill">
+		<text>Factor (goodwill reward)</text>
+	</string>
+	<string id="ui_mm_multi_loot">
+		<text>Factor (loot scale)</text>
+	</string>
+	<string id="ui_mm_r2_sun_shafts_mode">
+		<text>Sun rays mode</text>
+	</string>
+	<string id="volumetric">
+		<text>Volumetric</text>
+	</string>
+	<string id="screen_space">
+		<text>Screen Space</text>
+	</string>
+	<string id="ui_mm_fxaa">
+		<text>FXAA</text>
+	</string>
+	<string id="ui_mm_set_economy">
+		<text>Progression</text>
+	</string>
+	<string id="st_econ_1">
+		<text>Fast</text>
+	</string>
+	<string id="st_econ_2">
+		<text>Normal</text>
+	</string>
+	<string id="st_econ_3">
+		<text>Slow</text>
+	</string>
+	<string id="st_econ_4">
+		<text>Sluggish</text>
+	</string>
+	<string id="ui_mm_detector_charge">
+		<text>Detector charge</text>
+	</string>
+	<string id="ui_mm_faction_select">
+		<text>Faction Select</text>
 	</string>
 </string_table>

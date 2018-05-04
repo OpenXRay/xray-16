@@ -1,0 +1,70 @@
+feature_is_active = nil
+
+function activate_feature()
+	if (feature_is_active) then
+		return 
+	end
+	feature_is_active = true
+	RegisterScriptCallback("load_state",load_state)
+	RegisterScriptCallback("save_state",save_state)
+	RegisterScriptCallback("actor_on_item_use",actor_on_item_use)
+end
+
+function deactivate_feature()
+	if not (feature_is_active) then
+		return 
+	end
+	feature_is_active = false
+	if ReturnTimeEventTime(0, "hide_wpn") then
+		db.actor:restore_weapon()
+	end
+	UnregisterScriptCallback("actor_on_item_use",actor_on_item_use)
+	UnregisterScriptCallback("load_state",load_state)
+	UnregisterScriptCallback("save_state",save_state)
+end
+
+function on_game_start()
+	if (axr_main.config:r_value("mm_options","enable_weapon_hide",1,false) == true) then
+		activate_feature()
+	end
+end
+
+function save_state(m_data)
+	m_data.wpn_hide = ReturnTimeEventTime(0, "hide_wpn")
+end
+
+function load_state(m_data)
+	if m_data.wpn_hide then
+		CreateTimeEvent(0, "hide_wpn", m_data.wpn_hide, end_timer)
+		m_data.wpn_hide = nil
+	end
+end
+--local detector
+function actor_on_item_use(item, sect)
+    local hide_time = system_ini():r_float_ex(sect,"hide_time_wpn")
+    if hide_time then
+        local active_time = ReturnTimeEventTime(0, "hide_wpn")
+        if active_time then
+            active_time = active_time + hide_time
+            ResetTimeEvent(0, "hide_wpn", active_time)
+        else
+            db.actor:allow_sprint(false)
+            db.actor:hide_weapon()
+            --detector = db.actor:active_detector()
+            --if detector then
+            --    detector:switch_state(2)
+            --end
+            CreateTimeEvent(0, "hide_wpn", hide_time, end_timer)
+        end
+    end
+end
+ 
+function end_timer(timer)
+    db.actor:allow_sprint(true)
+    db.actor:restore_weapon()
+    --if detector then
+    --    detector:switch_state(1)
+    --    detector = nil
+    --end
+    return true
+end

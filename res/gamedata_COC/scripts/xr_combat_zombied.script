@@ -58,7 +58,7 @@ function action_zombie_shoot:set_state( state, be, pos )
 	else
 		self.t.look_position = pos
 	end
-	state_mgr.set_state( self.object, state, nil, nil, self.t, {fast_set = true } )
+	state_mgr.set_state( self.object, state, nil, nil, self.t, state_mgr.fast_set_true )
 end
 
 function action_zombie_shoot:execute()
@@ -191,7 +191,7 @@ end
 function action_zombie_go_to_danger:set_state( state, be, pos )
 	self.t.look_object   = be
 	self.t.look_position = pos
-	state_mgr.set_state( self.object, state, nil, nil, self.t, {fast_set = true })
+	state_mgr.set_state( self.object, state, nil, nil, self.t, state_mgr.fast_set_true)
 end
 
 function action_zombie_go_to_danger:execute()

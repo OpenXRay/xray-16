@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<string_table>
+	
+	<string id="encyclopedia_options_other">
+		<text>Options (Other)</text>
+	</string>
+	
+	<string id="encyclopedia_options_other_azazel_mode">
+		<text>Azazel mode</text>
+	</string>
+	<string id="encyclopedia_options_other_azazel_mode_text">
+		<text>
+			%c[guide_blue]Azazel mode%c[default] allows you to continue playing as another character after death.\n
+			\n%c[guide_green]Information%c[default]
+			\nIn Azazel mode death is not the end - upon the demise of your character you will posses the body of a random stalker who was previously controlled by the AI.\n
+			\nShould you have companions at the time of your death, they will be given priority and you will continue playing as one of them instead.\n
+			\nThis mode can only be enabled from the character creation screen.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_options_other_ironman_mode">
+		<text>Ironman mode</text>
+	</string>
+	<string id="encyclopedia_options_other_ironman_mode_text">
+		<text>
+			%c[guide_blue]Ironman mode%c[default] adds an indirect layer of difficulty to gameplay, whereby all of your saved games for a character are deleted upon their death.\n
+			\n%c[guide_green]Information%c[default]
+			\nShould Azazel mode be enabled at the same time you will be allowed to continue playing as whoever you switched to, but saves made as your deceased character will be deleted as per usual.\n
+			\nWhen playing with this mode enabled all of the saves you make will be uniquely tagged as an ironman by the way, as such it is impossible for unrelated saves to be deleted by mistake.\n
+			\nThis mode can only be enabled from the character creation screen.
+		</text>
+	</string>
+	
+	<string id="encyclopedia_options_other_story_mode">
+		<text>Story mode</text>
+	</string>
+	<string id="encyclopedia_options_other_story_mode_text">
+		<text>
+			%c[guide_blue]Story mode%c[default] enables a non-linear story based on the events of S.T.A.L.K.E.R. Shadow of Chernobyl.\n
+			\n%c[guide_green]Information%c[default]
+			\nWith this mode enabled you start the game with the 'Mysteries of the Zone' storyline, and the tasks of disabling both the Brain Scorcher and the Miracle Machine.\n
+			\nTo begin the story you will need to find an important individual hiding somewhere within the Zone, who after a brief dialogue will provide you with multiple tasks which can be completed in any order.\n
+			\nThis mode can only be enabled from the character creation screen.\n
+			\n%c[guide_green]Availability%c[default]
+			\n• Clear Sky\n• Duty\n• Ecologist\n• Freedom\n• Loner\n• Mercenary
+		</text>
+	</string>
+	
+	<string id="encyclopedia_options_other_survival_mode">
+		<text>Survival mode</text>
+	</string>
+	<string id="encyclopedia_options_other_survival_mode_text">
+		<text>
+			%c[guide_blue]Survival mode%c[default] turns the Zone into a hunting ground - where you are the prey.\n
+			\n%c[guide_green]Information%c[default]
+			\nWith this mode enabled all spawns are replaced with zombified stalkers and mutants, who will slowly stumble towards your location in an attempt to kill you.\n
+			\nFeaturing a more prominent role are zombies themselves, the last devolution of zombified stalkers who have lost the ability to operate mechanical devices such as firearms.\n
+			\nOnly a few traders and stalker squads can be found, meaning you will have to survive off of what you can scavenge in the world.\n
+			\nThis mode can only be enabled from the character creation screen.
+		</text>
+	</string>
+	
+</string_table>

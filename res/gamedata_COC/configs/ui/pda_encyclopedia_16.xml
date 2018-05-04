@@ -3,7 +3,7 @@
 	<frame1 x="28" y="41" width="764" height="90" stretch="1">
 		<texture>ui_inGame2_pda_buttons_background</texture>
 		<caption x="35" y="100" width="754" height="30">
-			<text font="letterica18" align="c" x="0" y="0" r="170" g="170" b="170">pda_btn_encyclopedia_title</text>
+			<text font="letterica18" align="c" x="0" y="0" r="170" g="170" b="170">pda_encyclopedia_title</text>
 		</caption>
 	</frame1>
 	
@@ -37,6 +37,16 @@
 			<texture>ui_inGame2_pda_line_vertical</texture>
 		</auto_frameline>
 	</border>
+
+	<image_checkbox x="60" y="100" width="30" height="30" stretch="1">
+		<texture>ui_inGame2_checkbox</texture>
+		<text x="-15" y="2" font="letterica16" r="170" g="170" b="170">pda_encyclopedia_image_checkbox</text>
+	</image_checkbox>
+
+	<message_checkbox x="660" y="100" width="30" height="30" stretch="1">
+		<texture>ui_inGame2_checkbox</texture>
+		<text x="-15" y="2" font="letterica16" r="170" g="170" b="170">pda_encyclopedia_message_checkbox</text>
+	</message_checkbox>
 	
 	<article_list x="190" y="163" width="134" height="519" item_height="22" can_select="1" always_show_scroll="0">
 		<font font="letterica16" r="210" g="210" b="210"/>
@@ -49,7 +59,10 @@
 	<description>
 		<scrollbar x="326" y="163" width="440" height="519" right_ident="0" left_ident="0" top_indent="0" bottom_indent="0" vert_interval="0" always_show_scroll="0"/>
 		<information width="422" height="1">
-			<text font="letterica16" color="ui_6" complex_mode="1" align="l" vert_align="t" x="5" y="5"/>
+			<text font="letterica16" color="ui_6" complex_mode="1" align="l" vert_align="t" x="5" y="6"/>
 		</information>
+		<image_container>
+			<image x="5" y="8" width="0" height="0"></image>
+		</image_container>
 	</description>
 </w>

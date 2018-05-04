@@ -42,6 +42,7 @@ function anomaly_zone_binder:__init(obj) super(obj)
 	self.max_artefacts_table = {}
 	self.forces_table = {}
 	self.spawned_count = 0
+	self.s_chance = 1
 
 	self.respawn_artefacts = math.random() <= 0.10
 	self.forced_spawn = false
@@ -196,6 +197,10 @@ function anomaly_zone_binder:disable_anomaly_fields()
 end
 
 function anomaly_zone_binder:respawn_artefacts_and_replace_anomaly_zone()
+	local surge, storm = 1.4, 0.6
+	local s_mgr, p_mgr = surge_manager.get_surge_manager(), psi_storm_manager.get_psi_storm_manager()
+	self.s_chance = (s_mgr.started and surge) or (p_mgr.started and storm) or 1
+	
 	local anom_fields = bind_anomaly_field.fields_by_names
 	self.respawn_artefacts = true
 	if(self.custom_placement) then
@@ -232,7 +237,6 @@ end
 function anomaly_zone_binder:spawn_artefact_randomly()
 	local layer = self.cur_layer
 	local rnd_artefact
-
 	if self.forced_spawn_override then
 		rnd_artefact = self.forced_artefact
 		self.forced_spawn_override = false
@@ -240,35 +244,41 @@ function anomaly_zone_binder:spawn_artefact_randomly()
 		rnd_artefact = self.start_artefacts_table[layer][#self.start_artefacts_table[layer]]
 		self.forced_spawn = false
 	else
-		local spawn_chance = has_alife_info("achieved_geologist") and 20 or 15
-		if (spawn_chance > math.random(1,100)) then
+		local spawn_chance = dxr_achievements.has_achievement("geologist") and 20 or 15
+		spawn_chance = self.s_chance * spawn_chance
+--		printf("storm arty chance %s", spawn_chance)
+		if math.random(1,100) > spawn_chance then
 			return
 		end
 
+		local t_layer = self.artefacts_table[layer]
+		utils.shuffle(t_layer)
+		local size = #t_layer
+		
 		local coeff_total = 0
 		for k, v in pairs(self.artefacts_coeff_table[layer]) do
 			coeff_total = coeff_total + v
 		end
 		if coeff_total == 0 then
-			for i = 1, #self.artefacts_table[layer] do
+			for i = 1, size do
 				self.artefacts_coeff_table[layer][i] = 1
 				coeff_total = coeff_total + 1
 			end
 		end
 
 		local rnd = math.random(1, coeff_total)
-		for i = 1, #self.artefacts_table[layer] do
+		for i = 1, size do
 			local chance = self.artefacts_coeff_table[layer][i]
 			if rnd <= chance then
-				rnd_artefact = self.artefacts_table[layer][i]
+				rnd_artefact = t_layer[i]
 				break
 			end
 			rnd = rnd - chance
 		end
 	end
 	
-	if not (rnd_artefact) then 
-		return 
+	if not (rnd_artefact) then
+		return
 	end
 
 	local rnd_path_name			= self:get_artefact_path()

@@ -1,0 +1,479 @@
+--------------------------------
+----- Written by Darryl123 -----
+--------------------------------
+
+------------------
+----- Tables -----
+------------------
+
+-- Achievements unlocked.
+actor_achievements = {
+	["bookworm_food"]		=	{	unlocked = false,	rank = 25,	rept = 0	},
+	["completionist"]		=	{	unlocked = false,	rank = 50,	rept = 0	},
+	["down_to_earth"]		=	{	unlocked = false,	rank = 25,	rept = 0	},
+	["duga_free"]			=	{	unlocked = false,	rank = 25,	rept = 0	},
+	["geologist"]			=	{	unlocked = false,	rank = 25,	rept = 0	},
+	["heavy_pockets"]		=	{	unlocked = false,	rank = 25,	rept = 0	},
+	["infopreneur"]			=	{	unlocked = false,	rank = 25,	rept = 0	},
+	["mechanized_warfare"]	=	{	unlocked = false,	rank = 25,	rept = 0	},
+	["patriarch"]			=	{	unlocked = false,	rank = 25,	rept = 0	},
+	["radiotherapy"]		=	{	unlocked = false,	rank = 25,	rept = 0	},
+	["rag_and_bone"]		=	{	unlocked = false,	rank = 25,	rept = 0	},
+	["silver_or_lead"]		=	{	unlocked = false,	rank = 25,	rept = 0	},
+	["tourist"]				=	{	unlocked = false,	rank = 25,	rept = 0	},
+	["well_dressed"]		=	{	unlocked = false,	rank = 25,	rept = 0	},
+	["wishful_thinking"]	=	{	unlocked = false,	rank = 25,	rept = 0	},
+}
+
+-- Artefacts found and detected.
+-- Should be empty by default.
+actor_artefacts = {
+}
+
+-- Guide articles unlocked.
+-- Should be empty by default.
+actor_articles = {
+}
+
+-- Miscellaneous data that requires recording.
+actor_miscellaneous = {
+	["actual_rank"] = 0,
+	["actual_rept"] = 0,
+}
+
+-- Tracked statistics and their rank and reputation rewards.
+actor_statistics = {
+	["arena_battles"]		=	{	count = 0,		rank = 25,		rept = 10	},
+	["artefacts_detected"]	=	{	count = 0,		rank = 5,		rept = 0	},
+	["artefacts_found"]		=	{	count = 0,		rank = 5,		rept = 0	},
+	["articles"]			=	{	count = 0,		rank = 5,		rept = 0	},		-- Counter is incremented but isn't used.
+	["boxes_smashed"]		=	{	count = 0,		rank = 1,		rept = 0	},
+	["deaths"]				=	{	count = 0,		rank = 0,		rept = 0	},
+	["donations"]			=	{	count = 0,		rank = 0,		rept = 20	},		-- Actual points given depends on item condition.
+	["emissions"]			=	{	count = 0,		rank = 5,		rept = 0	},
+	["enemies_surrendered"]	=	{	count = 0,		rank = 10,		rept = 0	},
+	["field_dressings"]		=	{	count = 0,		rank = 1,		rept = 0	},
+	["helicopters_downed"]	=	{	count = 0,		rank = 50,		rept = 25	},
+	["helicopters_downed2"]	=	{	count = 0,		rank = 25,		rept = 0	},		-- Bonus points for using explosives.
+	["killed_companions"]	=	{	count = 0,		rank = 0,		rept = -75	},
+	["killed_monsters"]		=	{	count = 0,		rank = 5,		rept = 0	},
+	["killed_prisoners"]	=	{	count = 0,		rank = 0,		rept = -25	},
+	["killed_stalkers"]		=	{	count = 0,		rank = 0,		rept = 0	},		-- Unused; see below and the "rank_kill_points" config section.
+	["killed_stalkers_e"]	=	{	count = 0,		rank = 0,		rept = 10	},			-- Enemy relations.
+	["killed_stalkers_f"]	=	{	count = 0,		rank = 0,		rept = -100	},			-- Friendly relations.
+	["killed_stalkers_n"]	=	{	count = 0,		rank = 0,		rept = -75	},			-- Neutral relations.
+	["level_changes"]		=	{	count = 0,		rank = 0,		rept = 0	},
+	["pdas_delivered"]		=	{	count = 0,		rank = 10,		rept = 10	},
+	["psi_storms"]			=	{	count = 0,		rank = 5,		rept = 0	},
+	["stashes_found"]		=	{	count = 0,		rank = 10,		rept = 0	},
+	["tasks_cancelled"]		=	{	count = 0,		rank = 0,		rept = -25	},
+	["tasks_completed"]		=	{	count = 0,		rank = 50,		rept = 25	},
+	["tasks_failed"]		=	{	count = 0,		rank = 0,		rept = -25	},
+	["wounded_helped"]		=	{	count = 0,		rank = 10,		rept = 10	},
+}
+
+-- Levels visited.
+actor_visited_levels = {
+	["jupiter"]					= false,
+	["jupiter_underground"]		= false,
+	["k00_marsh"]				= false,
+	["k01_darkscape"]			= false,
+	["k02_trucks_cemetery"]		= false,
+	["l01_escape"]				= false,
+	["l02_garbage"]				= false,
+	["l03_agroprom"]			= false,
+	["l03u_agr_underground"]	= false,
+	["l04_darkvalley"]			= false,
+	["l04u_labx18"]				= false,
+	["l05_bar"]					= false,
+	["l06_rostok"]				= false,
+	["l07_military"]			= false,
+	["l08_yantar"]				= false,
+	["l08u_brainlab"]			= false,
+	["l09_deadcity"]			= false,
+	["l10_limansk"]				= false,
+	["l10_radar"]				= false,
+	["l10_red_forest"]			= false,
+	["l10u_bunker"]				= false,
+	["l11_hospital"]			= false,
+	["l11_pripyat"]				= false,
+	["l12_stancia"]				= false,
+	["l12_stancia_2"]			= false,
+	["l12u_control_monolith"]	= false,
+	["l12u_sarcofag"]			= false,
+	["l13_generators"]			= false,
+	["l13u_warlab"]				= false,
+	["labx8"]					= false,
+	["pripyat"]					= false,
+	["zaton"]					= false,
+}
+
+-- Smart terrains visited.
+-- Should be empty by default.
+actor_visited_smarts = {
+}
+
+---------------------
+----- Callbacks -----
+---------------------
+
+-- Called when actor takes an item.
+function actor_on_item_take(item)
+	if not (item and IsArtefact(item)) then return end
+	local artefact = item:get_artefact()
+	local anomaly = bind_anomaly_zone.parent_zones_by_artefact_id[item:id()]
+	-- Artefacts found counter incrementation.
+	-- Checks to make sure artefact id hasn't already been logged.
+	if (artefact) then
+		artefact:FollowByPath("NULL", 0, vector():set(500,500,500))
+		if not (actor_artefacts[item:id()]) then
+			actor_artefacts[item:id()] = true
+			increment_statistic("artefacts_found")
+		else
+			return
+		end
+	end
+	-- Artefacts detected counter incrementation.
+	-- Requires the artefact be associated with an anomaly.
+	if (artefact and anomaly) then
+		anomaly:on_artefact_take(item)
+		increment_statistic("artefacts_detected")
+	else
+		bind_anomaly_zone.artefact_ways_by_id[item:id()] = nil
+	end
+end
+
+-- Called when an NPC is killed.
+function npc_on_death_callback(victim, killer)
+	-- Return if the actor is not the killer.
+	if not (killer and victim) then return end
+	if not (killer:id() == db.actor:id()) then return end
+	-- Increment statistics based on faction relations.
+	increment_statistic("killed_stalkers")
+	local killer_faction = character_community(killer)
+	local victim_faction = character_community(victim)
+	if (xr_conditions.is_factions_friends(nil, nil, { killer_faction, victim_faction })) then
+		increment_statistic("killed_stalkers_f")
+	elseif (xr_conditions.is_factions_enemies(nil, nil, { killer_faction, victim_faction })) then
+		increment_statistic("killed_stalkers_e")
+	else
+		increment_statistic("killed_stalkers_n")
+	end
+end
+
+-- Called when an achievement is earned.
+function on_achievement_earned(achievement, message)
+	if (achievement and message) then
+		news_manager.send_tip(db.actor, message, nil, achievement, nil, nil)
+		actor_achievements[achievement].unlocked = true
+	end
+end
+
+-- Called when the game is loaded.
+function on_game_load()
+	if (level.name() ~= "fake_start") then
+		actor_visited_levels[level.name()] = true
+	end
+end
+
+-- Called when the game starts.
+function on_game_start()
+	RegisterScriptCallback("actor_on_item_take", actor_on_item_take)
+	RegisterScriptCallback("npc_on_death_callback", npc_on_death_callback)
+	RegisterScriptCallback("on_achievement_earned", on_achievement_earned)
+	RegisterScriptCallback("on_game_load", on_game_load)
+	RegisterScriptCallback("on_level_changing", on_level_changing)
+	create_relations_tables()
+end
+
+-- Called when changing levels.
+function on_level_changing()
+	if (level.name() ~= "fake_start") then
+		increment_statistic("level_changes")
+	end
+end
+
+-----------------------
+----- Incrementors ----
+-----------------------
+
+-- Increments actor rank value.
+-- Impose restrictions at double the minimum and maximum ranks' values.
+function increment_rank(value)
+	db.actor:change_character_rank(value or 0)
+	if (db.actor:character_rank() < 0) then db.actor:set_character_rank(0) end
+	if (db.actor:character_rank() > 56000) then db.actor:set_character_rank(56000) end
+	check_for_rank_change()
+end
+
+-- Increments actor reputation value.
+-- Impose restrictions at double the minimum and maximum reputations' values.
+function increment_reputation(value)
+	db.actor:change_character_reputation(value or 0)
+	if (db.actor:character_reputation() < -4000) then db.actor:set_character_reputation(-4000) end
+	if (db.actor:character_reputation() > 4000) then db.actor:set_character_reputation(4000) end
+	check_for_reputation_change()
+end
+
+-- Increments a statistic counter.
+-- Also updates actor rank and reputation values.
+function increment_statistic(value, custom_rank, custom_rept)
+	local statistic = value and actor_statistics[value] or nil
+	if (statistic and statistic.count and statistic.rank and statistic.rept) then
+		statistic.count = statistic.count + 1
+		increment_rank(custom_rank or statistic.rank)
+		increment_reputation(custom_rept or statistic.rept)
+	end
+end
+
+-------------------------
+----- Miscellaneous -----
+-------------------------
+
+-- Gets the count for unlocked achievements.
+function get_actor_achievements_count()
+	local count = 0
+	for k, v in pairs(actor_achievements) do
+		if (v.unlocked == true) then
+			count = count + 1
+		end
+	end
+	return count
+end
+
+-- Gets the count for visited levels.
+function get_actor_visited_levels_count()
+	local count = 0
+	for k, v in pairs(actor_visited_levels) do
+		if (v == true) then
+			count = count + 1
+		end
+	end
+	return count
+end
+
+-- Gets the count for visited smarts.
+function get_actor_visited_smarts_count()
+	local count = 0
+	for k, v in pairs(actor_visited_smarts) do
+		if (v == true) then
+			count = count + 1
+		end
+	end
+	return count
+end
+
+-- Gets the count value for a statistic.
+function get_statistic_count(value)
+	local statistic = value and actor_statistics[value] or nil
+	return (statistic and statistic.count) and statistic.count or 0
+end
+
+-- Gets whether the actor has an achievement unlocked.
+function has_actor_achievement(value)
+	local achievement = value and actor_achievements[value]
+	return achievement and achievement.unlocked or false
+end
+
+-- Gets whether the actor has visited all levels.
+function has_actor_visitied_all_levels()
+	for k, v in pairs (actor_visited_levels) do 
+		if (v == false) then 
+			return false 
+		end
+	end
+	return true
+end
+
+-- Gets whether the actor has visited a specific level.
+function has_actor_visited_level(value)
+	return value and actor_visited_levels[level] or false
+end
+
+-- Gets whether the actor has visited a specific smart.
+function has_actor_visited_smart(value)
+	return value and actor_visited_smarts[value] or false
+end
+
+-- Called when a smart terrain is visited.
+function on_smart_terrain_visited(smart)
+	if not (smart and smart:name()) then return end
+	actor_visited_smarts[smart:name()] = true
+	if (fast_travel.quick_travel_smarts and fast_travel.quick_travel_smarts[smart:name()]) then
+		if (level.map_has_object_spot(smart.id, "fast_travel") == 0) then
+			level.map_add_object_spot(smart.id, "fast_travel", "st_pda_fast_travel")
+		end
+	end
+end
+
+-----------------------------
+----- Rank & Reputation -----
+-----------------------------
+
+-- Creates the rank and reputation tables.
+local rank_table, rept_table
+function create_relations_tables()
+	-- Check if the rank and reputation tables are initialised.
+	if not (rank_table and rept_table) then
+		-- Matches each rank and reputation to a value.
+		local function parse_string(value)
+			local result = {}
+			for name in string.gmatch(value, "([%w_%-.\\]+)[%,%s]*") do
+				result[#result + 1] = name
+			end
+			return result
+		end
+		-- Retrieve the rank and reputation values from configs.
+		local ini = ini_file("creatures\\game_relations.ltx")
+		local rank_table_temp = parse_string(ini:r_string_ex("game_relations", "rating"))
+		local rept_table_temp = parse_string(ini:r_string_ex("game_relations", "reputation"))
+		-- Fill the contents of the rank table.
+		rank_table = {}
+		for index = 2, #rank_table_temp, 2 do
+			rank_table[#rank_table + 1] = tonumber(rank_table_temp[index])
+		end
+		-- Fill the contents of the reputation table.
+		rept_table = {}
+		for index = 2, #rept_table_temp, 2 do
+			rept_table[#rept_table + 1] = tonumber(rept_table_temp[index])
+		end
+	end
+end
+
+-- Checks for changes the actor's rank.
+function check_for_rank_change(suppress)
+	local current_rank = db.actor:character_rank()
+	local new_rank, old_rank = 0, 0
+	for index = 1, #rank_table do
+		if (current_rank <= rank_table[index]) then
+			break
+		end
+		new_rank = new_rank + 1
+	end
+	for index = 1, #rank_table do
+		if (actor_miscellaneous.actual_rank <= rank_table[index]) then
+			break
+		end
+		old_rank = old_rank + 1
+	end
+	if (not suppress) then
+		if (old_rank > new_rank) then
+			news_manager.send_tip(db.actor, "st_rank_decreased", nil, "rank_change", nil, nil)
+		elseif (new_rank > old_rank) then
+			news_manager.send_tip(db.actor, "st_rank_increased", nil, "rank_change", nil, nil)
+		end
+	end
+	actor_miscellaneous.actual_rank = current_rank
+end
+
+-- Checks for changes to the actor's reputation.
+function check_for_reputation_change(suppress)
+	local current_rept = db.actor:character_reputation()
+	local new_rept, old_rept = 0, 0
+	for index = 1, #rept_table do
+		if (current_rept <= rept_table[index]) then
+			break
+		end
+		new_rept = new_rept + 1
+	end
+	for index = 1, #rept_table do
+		if (actor_miscellaneous.actual_rept <= rept_table[index]) then
+			break
+		end
+		old_rept = old_rept + 1
+	end
+	if (not suppress) then
+		if (old_rept > new_rept) then
+			news_manager.send_tip(db.actor, "st_reputation_decreased", nil, "rep_change", nil, nil)
+		elseif (new_rept > old_rept) then
+			news_manager.send_tip(db.actor, "st_reputation_increased", nil, "rep_change", nil, nil)
+		end
+	end
+	actor_miscellaneous.actual_rept = current_rept
+end
+
+----------------------------
+----- Saving & Loading -----
+----------------------------
+
+-- Loads the contents of the tables the regular way.
+-- Unimplemented as Call of Chernobyl doesn't use this.
+function load(packet)
+	if (USE_MARSHAL) then
+		return
+	end
+end
+
+
+-- Loads the contents of the tables using MARSHAL.
+function load_state(data)
+	-- If no saved data exists then return.
+	if not (data.dxr_statistics) then
+		return
+	end
+	
+	-- See the comments in the save_state method as to how this works.
+
+	actor_artefacts = data.dxr_statistics.actor_artefacts or actor_artefacts
+	actor_articles = data.dxr_statistics.actor_articles or actor_articles
+	actor_miscellaneous = data.dxr_statistics.actor_miscellaneous or actor_miscellaneous
+	actor_visited_levels = data.dxr_statistics.actor_visited_levels or actor_visited_levels
+	actor_visited_smarts = data.dxr_statistics.actor_visited_smarts or actor_visited_smarts
+	
+	if (data.dxr_statistics.actor_achievements) then
+		for k, v in pairs(data.dxr_statistics.actor_achievements) do
+			if (actor_achievements[k]) then
+				actor_achievements[k].unlocked = v
+			end
+		end
+	end
+	
+	if (data.dxr_statistics.actor_statistics) then
+		for k, v in pairs(data.dxr_statistics.actor_statistics) do
+			if (actor_statistics[k]) then
+				actor_statistics[k].count = v
+			end
+		end
+	end
+	
+	-- We no-longer need this data after loading.
+	data.dxr_statistics = nil
+end
+
+-- Saves the contents of the tables the regular way.
+-- Unimplemented as Call of Chernobyl doesn't use this.
+function save(packet)
+	if (USE_MARSHAL) then
+		return
+	end
+end
+
+-- Saves the contents of the tables using MARSHAL.
+function save_state(data)
+	-- Create a table to store saved data.
+	if (not data.dxr_statistics) then
+		data.dxr_statistics = {}
+	end
+
+	-- Save tables as they are if they only record true/false values.
+	data.dxr_statistics.actor_artefacts = actor_artefacts
+	data.dxr_statistics.actor_articles = actor_articles
+	data.dxr_statistics.actor_miscellaneous = actor_miscellaneous
+	data.dxr_statistics.actor_visited_levels = actor_visited_levels
+	data.dxr_statistics.actor_visited_smarts = actor_visited_smarts
+	
+	-- Couple of things to be noted here.
+	-- Rank and reputation values are stored in these tables as well, and we really don't want to save those.
+	-- If we did, it would mean any changes to their values in this script file would be ignored by existing saves.
+	-- However, saving the data this way also prevents any potential nil value crashes if new statistics and such are added.
+	
+	data.dxr_statistics.actor_achievements = {}
+	for k, v in pairs(actor_achievements) do
+		data.dxr_statistics.actor_achievements[k] = v.unlocked
+	end
+
+	data.dxr_statistics.actor_statistics = {}
+	for k, v in pairs(actor_statistics) do
+		data.dxr_statistics.actor_statistics[k] = v.count
+	end
+end

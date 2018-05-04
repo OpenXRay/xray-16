@@ -233,7 +233,7 @@ function is_non_story(actor,npc)
 end 
 
 function is_room_in_actor_squad(actor,npc)
-	local max_size = axr_companions.max_actor_squad_size + (has_alife_info("achieved_patriarch") and 2 or 0)
+	local max_size = axr_companions.max_actor_squad_size + (dxr_achievements.has_achievement("patriarch") and 2 or 0)
 	if (axr_companions.get_companion_count() + alun_utils.get_squad_count(npc) <= max_size) then
 		return true
 	end
@@ -332,7 +332,7 @@ function is_hostage_task_giver(a,b)
 	local tsk
 	for k,task_id in pairs(t) do
 		tsk = task_info[task_id]
-		if (tsk) and (tsk.task_giver_id == se_obj.group_id or tsk.task_giver_id == id) then
+		if (tsk and tsk.stage == 0) and (tsk.task_giver_id == se_obj.group_id or tsk.task_giver_id == id) then
 			return true
 		end
 	end

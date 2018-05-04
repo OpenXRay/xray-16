@@ -1,5 +1,8 @@
 [logic]
-active = ph_door@horror_knock
+active = ph_door@check_story
+
+[ph_door@check_story]
+on_info = {+story_mode_disabled} ph_door@close, ph_door@horror_knock
 
 [ph_door@horror_knock]
 locked = true
@@ -30,5 +33,13 @@ tip_close =
 [ph_door@open]
 locked = false
 closed = false
-tip_open = 
-tip_close = 
+tip_open = tip_door_open
+tip_close = tip_door_close
+on_use = ph_door@close
+
+[ph_door@close]
+locked = false
+closed = true
+tip_open = tip_door_open
+tip_close = tip_door_close
+on_use = ph_door@open

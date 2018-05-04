@@ -2,8 +2,8 @@
 cost 		= 750
 value		= +10
 
-fire_wound_protection  				= 0.04
-bones_koeff_protection_add  		= actor_armor_add_1
+fire_wound_protection  				= 0.02
+bones_koeff_protection_add  		= actor_armor_add_002
 
 [up_sect_firstc_ecolog_light_2_outfit]
 cost 		= 1500
@@ -25,7 +25,8 @@ cost 		= 3000
 value		= +10
 
 fire_wound_protection  				= 0.08
-bones_koeff_protection_add  		= actor_armor_add_3
+bones_koeff_protection_add  		= actor_armor_add_008
+hit_fraction_actor					= -0.05
 inv_weight							= +0.30
 power_loss							= +0.01
 
@@ -46,19 +47,19 @@ immunities_sect_add 				= sect_ecolog_orn_outfit_immunities_add
 cost 		= 1200
 value		= +20
 
-shock_protection           			 = 0.075
+shock_protection           			 = 0.05
 
 [up_sect_second_ecolog_light_2_outfit]
 cost 		= 1200
 value		= +20
 
-burn_protection 					= 0.0075
+burn_protection 					= 0.008
 
 [up_sect_secone_ecolog_light_2_outfit]
 cost 		= 2400
 value		= +20
 
-chemical_burn_protection    		= 0.0075
+chemical_burn_protection    		= 0.008
 
 [up_sect_thirda_ecolog_light_2_outfit]
 cost 		= 750
@@ -90,7 +91,7 @@ artefact_count						= 2
 cost 		= 600
 value		= +10
 
-radiation_protection 				= 0.0015
+radiation_protection 				= 0.0003
 chemical_burn_protection            = 0.005
 
 [up_sect_fourtc_ecolog_light_2_outfit]
@@ -103,8 +104,7 @@ nightvision_sect				= effector_nightvision_2
 cost 		= 3300
 value 		= +4
 
-bleeding_restore_speed				= 0.004
-health_restore_speed				= 0.0004
+health_restore_speed			= 0.00045
 
 
 [up_firsta_ecolog_light_2_outfit]
@@ -172,7 +172,7 @@ scheme_index            = 2, 0
 known                   = 1
 effects                 = 
 section                 = up_sect_firste_ecolog_light_2_outfit
-property                = prop_armor
+property                = prop_armor, prop_damage, prop_weightoutfit
 
 precondition_functor    = inventory_upgrades.precondition_functor_a
 precondition_parameter  = a & b

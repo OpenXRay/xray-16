@@ -1,14 +1,10 @@
 [up_sect_firsta_fort]
-;—корострельность(1)10%
-;----------------------
 cost		      		= 250
 value					= +10
 
 rpm						= +30
 
 [up_sect_firstc_fort]
-;Ќастильность(2)20%
-;------------------
 cost		      		= 500
 value					= +20
 
@@ -16,141 +12,101 @@ bullet_speed		 	= +50
 fire_dispersion_base	= -0.01 
 
 [up_sect_firstd_fort]
-;ќтдача(2)-20%
-;------------
 cost		      		= 500
 value					= -20
 
-cam_dispersion          = -0.3		;0.6
-cam_dispersion_inc		= -0.3		;0.6
-cam_step_angle_horz		= -0.35		;1.0
+cam_dispersion          = -0.3
+cam_step_angle_horz		= -0.3
 
 [up_sect_firste_fort]
-;“очность(3)30%
-;---------------
 cost		      		= 1000
 value					= +30
 
 fire_dispersion_base	= -0.08
 
 [up_sect_secona_fort]
-;Ќастильность(1)10%
-;---------------
 cost		      		= 250
 value					= +10
 
 bullet_speed		 	= +30
-fire_dispersion_base    = -0.01
+fire_dispersion_base    = -0.005
 
 [up_sect_seconc_fort]
-;—корострельность(2)15%
-;----------------------
 cost		      		= 500
 value					= +15
 
-rpm						= +50
+rpm						= +45
 
 [up_sect_second_fort]
-;Ќадежность(2)15%
-;---------------
 cost		      		= 500
 value					= +15
 
-;увеличение дисперсии в процентах при максимальном износе
-fire_dispersion_condition_factor = -1 ;15
-;увеличение изношености при выстреле очередью
-condition_queue_shot_dec	= -0.001 ;0.0013
-;увеличение изношености при одиночном выстреле
-condition_shot_dec      	= -0.001 ;0.0011
-;шанс осечки при изношености больше чем misfireStartCondition
-misfire_start_prob	     	= -0.002
-;шанс осечки при изношености больше чем misfireEndCondition
-misfire_end_prob	     	= -0.02 ;0.03
-
+fire_dispersion_condition_factor = -1
+condition_queue_shot_dec	= -0.0001
+condition_shot_dec      	= -0.0001
+misfire_start_prob	     	= -0.001
+misfire_end_prob	     	= -0.01
 
 [up_sect_thirda_fort]
-;¬ес
-;------------------
 cost		      		= 250
-value					= -0.33
+value					= -0.2
 
-inv_weight             = -0.33
-
-crosshair_inertion			= -0.3
-
-PDM_disp_base 				= -0.05
-PDM_disp_vel_factor 		= -0.15
-PDM_disp_accel_factor 		= -0.15
+inv_weight             = -0.2
 
 [up_sect_thirdc_fort]
-;”добство(2)15%
-;--------------
 cost		      		= 500
 value					= +15
 
 crosshair_inertion			= -0.6
 
-PDM_disp_base 				= -0.15
-PDM_disp_vel_factor 		= -0.35
-PDM_disp_accel_factor 		= -0.35
+PDM_disp_vel_factor 		= -0.3
+PDM_disp_accel_factor 		= -0.3
 
 [up_sect_thirdd_fort]
-;Ќадежность(2)15%
-;---------------
 cost		      		= 500
 value					= +15
 
-;увеличение дисперсии в процентах при максимальном износе
-fire_dispersion_condition_factor  = -1 ;15
-;увеличение изношености при выстреле очередью
-condition_queue_shot_dec	= -0.001 ;0.0013
-;увеличение изношености при одиночном выстреле
-condition_shot_dec      	= -0.001 ;0.0011
-;шанс осечки при изношености больше чем misfireStartCondition
-misfire_start_prob	     	= -0.002
-;шанс осечки при изношености больше чем misfireEndCondition
-misfire_end_prob	     	= -0.02 ;0.03
+fire_dispersion_condition_factor  = -1
+condition_queue_shot_dec	= -0.0001
+condition_shot_dec      	= -0.0001
+misfire_start_prob	     	= -0.001
+misfire_end_prob	     	= -0.01
 
 [up_sect_fourta_fort]
-;“очность(1)10%
-;---------------
 cost		      		= 250
 value					= +10
 
 fire_dispersion_base	= -0.03
 
 [up_sect_fourtc_fort]
-;“очность(2)20%
-;---------------
 cost		      		= 500
 value					= +20
 
 fire_dispersion_base	= -0.05
 
 [up_sect_fiftha_fort]
-;”величенный объем магазина
-;---------------
 cost		      		= 1000
 value					= +4
 
 ammo_mag_size		 	= +4
 
 [up_sect_fifthc_fort]
-;—мена калибра на 9х19
-;---------------
-cost		      		= 1500
+cost		      		= 1000
 value					= "9x19"
 
 ammo_class		 		= ammo_9x19_fmj, ammo_9x19_pbp
 
-;увеличение изношености при выстреле очередью
-condition_queue_shot_dec	= 0.0001 ;0.0013
-;увеличение изношености при одиночном выстреле
-condition_shot_dec      	= 0.0001 ;0.0011
-;шанс осечки при изношености больше чем misfireStartCondition
-misfire_start_prob	     	= 0.0008
-;шанс осечки при изношености больше чем misfireEndCondition
-misfire_end_prob	     	= 0.008 ;0.03
+bullet_speed		 	= +50
+cam_dispersion         		= +0.2
+cam_step_angle_horz			= +0.15
+fire_dispersion_base		= -0.02
+hit_power					= +0.02
+
+condition_queue_shot_dec	= 0.0001
+condition_shot_dec      	= 0.0001
+misfire_start_prob	     	= 0.0005
+misfire_end_prob	     	= 0.005
+
 
 [up_firsta_fort]
 scheme_index            = 0, 0
@@ -431,7 +387,7 @@ scheme_index            = 1, 7
 known                   = 1
 effects                 =
 section                 = up_sect_fifthc_fort
-property                = prop_calibre
+property                = prop_calibre, prop_bullet_speed
 
 
 precondition_functor    = inventory_upgrades.precondition_functor_a

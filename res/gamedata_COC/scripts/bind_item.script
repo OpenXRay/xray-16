@@ -57,7 +57,7 @@ function item_binder:save(stpk)
 	object_binder.save(self, stpk)
 	local se_obj = alife_object(self.object:id())
 	if (se_obj) then
-		local m_data = alife_storage_manager.get_se_obj_state(se_obj)
+		local m_data = alife_storage_manager.get_se_obj_state(se_obj,true)
 		if (m_data) then 
 			m_data.offline_condition = self.object:condition()
 		end
@@ -90,9 +90,6 @@ function weapon_binder:update(delta)
 					self.object:weapon_set_scope(tonumber(m_data.offline_scope_type) or 0)
 					m_data.offline_scope_type = nil
 				end 
-				if (m_data.offline_ammo_type) then 
-					self.object:set_ammo_type(tonumber(m_data.offline_ammo_type) or 0)
-				end
 			end
 		end
 	end
@@ -124,16 +121,11 @@ function weapon_binder:save(stpk)
 	--printf("weapon_binder save %s  [scope=%s]",self.object:name(),self.object:weapon_get_scope())
 	local se_obj = alife_object(self.object:id())
 	if (se_obj) then
-		local m_data = alife_storage_manager.get_se_obj_state(se_obj)
-		if (m_data) then 
-			local typ = self.object:weapon_get_scope()
-			--printf("weapon_binder %s  typ=%s",self.object:name(),typ)
-			if (typ ~= 255) then
+		local typ = self.object:weapon_get_scope()
+		if (typ ~= 0 and typ ~= 255) then
+			local m_data = alife_storage_manager.get_se_obj_state(se_obj,true)
+			if (m_data) then 
 				m_data.offline_scope_type = typ
-			end
-			typ = self.object:get_ammo_type()
-			if (typ ~= 0) then 
-				m_data.offline_ammo_type = typ
 			end
 		end
 	end

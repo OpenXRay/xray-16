@@ -13,10 +13,12 @@ inv_grid_y                               = 2
 cost                                     = 1000
 
 boost_time                               = 300.0
-boost_max_weight                         = 20.0
+boost_max_weight                         = 10.0
 
 use_sound                                = interface\inv_softdrink
 inv_weight                               = 0.1
+
+hide_time_wpn = 3
 
 [drug_coagulant]:booster_script
 $spawn                                   = "food and drugs\drug_coagulant"
@@ -42,6 +44,8 @@ max_uses                                 = 2
 remove_after_use                         = true
 empty_weight                             = 0.01
 
+hide_time_wpn = 3
+
 [drug_psy_blockade]:booster_script
 $spawn                                   = "food and drugs\drug_psy_blockade"
 visual                                   = dynamics\equipments\medical\drug_psy_blockade.ogf
@@ -53,9 +57,9 @@ inv_grid_width                           = 1
 inv_grid_height                          = 1
 inv_grid_x                               = 4
 inv_grid_y                               = 2
-cost                                     = 2000
+cost                                     = 4000
 
-boost_time                               = 30.0
+boost_time                               = 240.0
 ;boost_telepat_immunity	= 0.05
 boost_telepat_protection                 = 0.05
 
@@ -65,6 +69,8 @@ use_condition                            = true
 max_uses                                 = 5
 remove_after_use                         = true
 empty_weight                             = 0.01
+
+hide_time_wpn = 3
 
 [drug_antidot]:booster_script
 $spawn                                   = "food and drugs\drug_antidot"
@@ -77,11 +83,11 @@ inv_grid_width                           = 1
 inv_grid_height                          = 1
 inv_grid_x                               = 1
 inv_grid_y                               = 2
-cost                                     = 1200
+cost                                     = 1500
 
-boost_time                               = 60.0
+boost_time                               = 120.0
 ;boost_chemburn_immunity	= 0.1
-boost_chemburn_protection                = 0.1
+boost_chemburn_protection                = 0.05
 
 use_sound                                = interface\inv_pills
 
@@ -89,6 +95,8 @@ use_condition                            = true
 max_uses                                 = 3
 remove_after_use                         = true
 empty_weight                             = 0.01
+
+hide_time_wpn = 3
 
 [drug_radioprotector]:booster_script
 $spawn                                   = "food and drugs\drug_radioprotector"
@@ -101,9 +109,9 @@ inv_grid_width                           = 1
 inv_grid_height                          = 1
 inv_grid_x                               = 5
 inv_grid_y                               = 2
-cost                                     = 1200
+cost                                     = 1000
 
-boost_time                               = 90.0
+boost_time                               = 240.0
 ;boost_radiation_immunity	= 0.015
 boost_radiation_protection               = 0.015
 
@@ -113,6 +121,8 @@ use_condition                            = true
 max_uses                                 = 2
 remove_after_use                         = true
 empty_weight                             = 0.01
+
+hide_time_wpn = 3
 
 [drug_anabiotic]:booster_script
 $spawn                                   = "food and drugs\drug_anabiotic"
@@ -125,6 +135,10 @@ inv_grid_width                           = 1
 inv_grid_height                          = 1
 inv_grid_x                               = 0
 inv_grid_y                               = 2
-cost                                     = 3000
+cost                                     = 2500
+
+eat_health                               = -0.1
 
 use_sound                                = interface\inv_pills
+
+hide_time_wpn = 3

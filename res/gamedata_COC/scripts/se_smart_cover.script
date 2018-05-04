@@ -37,15 +37,13 @@ function se_smart_cover:STATE_Read (packet, size)
 		local existing_loopholes = {}
 		if smart_cover_description ~= nil then
 			--printf("name %s descr %s", self:name(), tostring(smart_cover_description))
-			if smart_covers == nil then
-				printf("smartcovers is nil")
-			end
-			if smart_covers.descriptions[smart_cover_description] == nil then
+			if (smart_covers.descriptions[smart_cover_description]) then
+				local loopholes = smart_covers.descriptions[smart_cover_description].loopholes
+				for k,v in pairs (loopholes) do
+					existing_loopholes[v.id] = true
+				end
+			else 
 				printf("smartcover [%s] has wrong description [%s]!!!", self:name(), tostring(smart_cover_description))
-			end
-			local loopholes = smart_covers.descriptions[smart_cover_description].loopholes
-			for k,v in pairs (loopholes) do
-				existing_loopholes[v.id] = true
 			end
 		end
 
@@ -59,7 +57,7 @@ function se_smart_cover:STATE_Read (packet, size)
 		end
 	else
 		local smart_cover_description = self:description()
-		if smart_cover_description ~= nil then
+		if smart_cover_description and smart_covers.descriptions[smart_cover_description] then
 			local loopholes = smart_covers.descriptions[smart_cover_description].loopholes
 			for k,v in pairs (loopholes) do
 				self.loopholes[v.id] = true
@@ -75,7 +73,7 @@ function se_smart_cover:on_before_register()
 end
 function se_smart_cover:on_register()
 	cse_smart_cover.on_register( self )
-	story_objects.check_spawn_ini_for_story_id(self)
+	SendScriptCallback("server_entity_on_register",self,"se_smart_cover")
 	local level_id = game_graph():vertex(self.m_game_vertex_id):level_id()
 	if registered_smartcovers_by_lv_id[level_id] == nil then
 		registered_smartcovers_by_lv_id[level_id] = {}
@@ -88,7 +86,7 @@ function se_smart_cover:on_register()
 --	printf("smart_cover [%s] is registered lvlid [%s] lvid[%s]", self:name(), tostring(level_id), tostring(self.m_level_vertex_id))
 end
 function se_smart_cover:on_unregister()
-	story_objects.unregister(self.id)
+	SendScriptCallback("server_entity_on_unregister",self,"se_smart_cover")
 	local name = self.dynamic_name or self:name()
 	registered_smartcovers[name] = nil
 	local level_id = game_graph():vertex(self.m_game_vertex_id):level_id()

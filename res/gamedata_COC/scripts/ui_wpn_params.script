@@ -3,7 +3,7 @@ function normalize(val, min, max)
 	if d < 0 then
 		return 0
 	end
-	return d
+	return utils.clamp(d,0,100)
 end
 
 function normalizeMP(val)
@@ -31,7 +31,7 @@ function read_float(wpn_section, upgr_sections, param)
 	
 	local class = ltx:r_string_ex(wpn_section,"class")
 	if (class == "WP_RG6") then 
-		local ammo_section = parse_names(ltx:r_string_ex(wpn_section,"ammo_class") or "")[1] or ""
+		local ammo_section = ltx:r_list(wpn_section,"ammo_class","")[1] or ""
 		local fake_grenade_name = ltx:r_string_ex(ammo_section,"fake_grenade_name")
 		return fake_grenade_name and ltx:r_float_ex(fake_grenade_name,"blast") or 0
 	elseif (class == "WP_RPG7") then 
@@ -40,10 +40,10 @@ function read_float(wpn_section, upgr_sections, param)
 	end
 	
 	if (param == "hit_power") then
-		local t = parse_names(ltx:r_string_ex(wpn_section,"hit_power") or "")
+		local t = ltx:r_list(wpn_section,"hit_power","")
 		local gd = level.get_game_difficulty()+1
 		res = tonumber(t[gd] or t[1]) or 0
-	else 
+	else
 		res = ltx:r_float_ex(wpn_section, param) or param == "control_inertion_factor" and 1 or 0
 	end 
 	
@@ -51,7 +51,8 @@ function read_float(wpn_section, upgr_sections, param)
 		local upgrades = parse_names(upgr_sections)
 		for i, sect in ipairs(upgrades) do
 			if param == "hit_power" then
-				local t = parse_names(ltx:r_string_ex(sect,param) or "")
+				local t = ltx:r_list(sect,param,"")
+				local gd = level.get_game_difficulty()+1
 				res = res + (tonumber(t[gd] or t[1]) or 0)
 			else
 				res = res + (ltx:r_float_ex(sect,param) or 0)
@@ -59,85 +60,128 @@ function read_float(wpn_section, upgr_sections, param)
 		end 
 	end
 	
-	if (param == "hit_power") then
-		local ammo_section = parse_names(ltx:r_string_ex(wpn_section,"ammo_class") or "")[1] or ""
-		local k_hit = ltx:r_float_ex(ammo_section,"k_hit",0.5)
-		res = (res * k_hit) * ltx:r_float_ex(ammo_section,"buck_shot",1)
-	end 
+	--if (param == "hit_power") then
+		-- local ammos = ltx:r_list(wpn_section,"ammo_class","")
+		-- local ammo_section = ammos[1] or ""
+		-- if (class == "WP_BM16" or class == "WP_ASHTG") then
+			-- ammo_section = ammos[#ammos] or ""
+		-- end
+		-- local k_hit = ltx:r_float_ex(ammo_section,"k_hit",0.5)
+		-- res = (res * k_hit) * ltx:r_float_ex(ammo_section,"buck_shot",1)
+	--elseif (param == "fire_dispersion_base") then
+		-- local ammos = ltx:r_list(wpn_section,"ammo_class","")
+		-- local ammo_section = ammos[1] or ""
+		-- if (class == "WP_BM16" or class == "WP_ASHTG") then
+			-- ammo_section = ammos[#ammos] or ""
+		-- end
+		--local k_disp = ltx:r_float_ex(ammo_section,"k_disp",1)
+		--res = res * k_disp
+		
+		--local disp_base = ltx:r_float_ex("actor","disp_base",1)
+		--local PDM_disp_base = ltx:r_float_ex(wpn_section,"PDM_disp_base",1)
+		
+		--res = res + (disp_base * PDM_disp_base)
+	--elseif (param == "cam_step_angle_horz") then
+		--res = res + ltx:r_float_ex(wpn_section,"zoom_cam_step_angle_horz",0)
+	--end
 	
     return res
 end
 
-function GetRPM(wpn_section, upgr_sections) --' скорострельность
-	local rpm = read_float(wpn_section, upgr_sections, "rpm")
-	return normalize(rpm, 0, 1000)
-end
+local max_hit_power_value,max_rpm_value, max_fire_dispersion_base_value, max_control_inertion_factor_value, max_PDM_disp_accel_factor_value, max_crosshair_inertion_value
 
-local max_hit_power_value
-function GetDamage(wpn_section, upgr_sections) --' повреждение
-	local hit_power = read_float(wpn_section, upgr_sections, "hit_power")
-   
+function GetRPM(wpn_section, upgr_sections)
 	if not (max_hit_power_value) then 
 		calculate_max_hit_power_value()
 	end
-	--printf("hit_power=%s max_hit_power_value=%s",hit_power,max_hit_power_value)
+	
+	local rpm = read_float(wpn_section, upgr_sections, "rpm")
+	return normalize(rpm, 0, max_rpm_value)
+end
+
+function GetDamage(wpn_section, upgr_sections)
+	if not (max_hit_power_value) then 
+		calculate_max_hit_power_value()
+	end
+	
+	local hit_power = read_float(wpn_section, upgr_sections, "hit_power")
 	return normalize(hit_power, 0, max_hit_power_value)
 end
 
-function GetDamageMP(wpn_section, upgr_sections) -- ??? (повреждениеMP)
+function GetDamageMP(wpn_section, upgr_sections)
 	local hit_power = read_float(wpn_section, upgr_sections, "hit_power")
 	hit_power = hit_power * 100	
-	-- if val < 1.05 then
-		-- val = val*100-30
-	-- else
-		-- val = 75 + math.pow(val/4,2)*25
-	-- end	
-	return normalizeMP(hit_power)	
+	return normalizeMP(hit_power)
 end
 
-function GetHandling(wpn_section, upgr_sections) --' удобность
-	local PDM_disp_base = read_float(wpn_section, upgr_sections, "PDM_disp_base")
+function GetHandling(wpn_section, upgr_sections)
+	if not (max_hit_power_value) then
+		calculate_max_hit_power_value()
+	end
+	
+	local PDM_disp_accel_factor = read_float(wpn_section,upgr_sections, "PDM_disp_accel_factor")
 	local control_inertion_factor = read_float(wpn_section, upgr_sections, "control_inertion_factor")
-	return (normalize(PDM_disp_base, 2.1, 0) + normalize(control_inertion_factor, 3, 1))/2
+	local crosshair_inertion = read_float(wpn_section,upgr_sections, "crosshair_inertion")
+	return (normalize(PDM_disp_accel_factor, max_PDM_disp_accel_factor_value, 0) + normalize(control_inertion_factor, max_control_inertion_factor_value, 1) + normalize(crosshair_inertion, max_crosshair_inertion_value, 0))/3
 end
 
-function GetAccuracy(wpn_section, upgr_sections) --' точность
-    local fire_dispersion_base	= read_float(wpn_section, upgr_sections, "fire_dispersion_base")
-	return normalize(fire_dispersion_base, 1.5, 0)
+function GetAccuracy(wpn_section, upgr_sections)
+	if not (max_hit_power_value) then 
+		calculate_max_hit_power_value()
+	end
+    local accuracy	= read_float(wpn_section, upgr_sections, "fire_dispersion_base")
+	return normalize(accuracy, max_fire_dispersion_base_value, 0)
 end
 
 function calculate_max_hit_power_value()
-	local sections_by_hit_power_value = DEV_DEBUG_DEV and {} or nil
+	
 	max_hit_power_value = 0
-	local gd = level.get_game_difficulty()+1
+	max_rpm_value = 0
+	max_fire_dispersion_base_value = 0
+	max_PDM_disp_accel_factor_value = 0
+	max_control_inertion_factor_value = 0
+	max_crosshair_inertion_value = 0
+	
+	local sections_by_hit_power_value = DEV_DEBUG_DEV and {} or nil
 	local ini = system_ini()
 	ini:section_for_each(function(section)
 		if (ini:line_exist(section,"hit_power") and ini:line_exist(section,"ammo_class") and ini:line_exist(section,"hud")) then
 			local class = ini:r_string_ex(section,"class")
 			if (class ~= "WP_RPG7" and class ~= "WP_RG6" and class ~= "W_MOUNTD" and class ~= "W_STMGUN" and class ~= "WP_BINOC" and class ~= "WP_KNIFE") then
 				local t = parse_names(ini:r_string_ex(section,"hit_power") or "")
-				local hit_power = tonumber(t[gd] or t[1]) or 0
-				local ammo_section = parse_names(ini:r_string_ex(section,"ammo_class") or "")[1] or ""
-				local k_hit = ini:r_float_ex(ammo_section,"k_hit",0.5)
-				
-				local upgrade_list = ini:r_list(section,"upgrades")
-				if (upgrade_list) then 
-					for i,sect in ipairs(upgrade_list) do 
-						local hit_power_list = ini:r_list(sect,"hit_power")
-						if (hit_power_list) then 
-							hit_power = hit_power + (tonumber(hit_power_list[gd] or hit_power_list[1]) or 0)
-						end
-					end				
+
+				local hit_power = GetMaxPotential(section,"hit_power")
+				if (hit_power > max_hit_power_value) then 
+					max_hit_power_value = hit_power
 				end
-		
-				hit_power = (hit_power * k_hit) * ini:r_float_ex(ammo_section,"buck_shot",1)
+				
+				local rpm = GetMaxPotential(section,"rpm")
+				if (rpm > max_rpm_value) then 
+					max_rpm_value = rpm
+				end
+	
+				local fire_dispersion_base = GetMaxPotential(section,"fire_dispersion_base")
+				if (fire_dispersion_base > max_fire_dispersion_base_value) then 
+					max_fire_dispersion_base_value = fire_dispersion_base
+				end
+
+				local PDM_disp_accel_factor = GetMaxPotential(section,"PDM_disp_accel_factor")
+				if (PDM_disp_accel_factor > max_PDM_disp_accel_factor_value) then 
+					max_PDM_disp_accel_factor_value = PDM_disp_accel_factor
+				end
+
+				local control_inertion_factor = GetMaxPotential(section,"control_inertion_factor")
+				if (control_inertion_factor > max_control_inertion_factor_value) then 
+					max_control_inertion_factor_value = control_inertion_factor
+				end
+				
+				local crosshair_inertion = GetMaxPotential(section,"crosshair_inertion")
+				if (crosshair_inertion > max_crosshair_inertion_value) then 
+					max_crosshair_inertion_value = crosshair_inertion
+				end
 				
 				if (DEV_DEBUG_DEV) then
 					sections_by_hit_power_value[section] = hit_power
-				end
-				
-				if (hit_power > max_hit_power_value) then 
-					max_hit_power_value = hit_power
 				end
 			end
 		end
@@ -163,4 +207,54 @@ function calculate_max_hit_power_value()
 			printf("successfully created weapons_hit_power.ltx")
 		end
 	end
+end
+
+local upgrade_sect_cache = {}
+function get_all_upgrade_sections(wpn_section)
+	if (upgrade_sect_cache[wpn_section]) then 
+		return upgrade_sect_cache[wpn_section]
+	end 
+	
+	local ini = system_ini()
+	local stack = ini:r_list(wpn_section,"upgrades")
+	if not (stack) then
+		upgrade_sect_cache[wpn_section] = ""
+		return ""
+	end 
+	
+	local node
+	local t = {}
+	while true do
+		if (node) then
+			local elements = ini:r_list(node,"elements")
+			if (elements) then 
+				for i,element in ipairs(elements) do 
+					local upgr_sect = ini:r_string_ex(element,"section","")
+					if (upgr_sect ~= "") then 
+						table.insert(t,upgr_sect)
+					end
+					local next_sect = ini:r_string_ex(element,"effects","")
+					if (next_sect ~= "") then 
+						table.insert(stack,next_sect)
+					end
+				end
+			end
+		end
+		if (#stack > 0) then
+			node = stack[#stack]
+			stack[#stack] = nil
+		else
+			break
+		end
+	end
+	
+	local str = table.concat(t,",")
+	upgrade_sect_cache[wpn_section] = str
+	return str
+end 
+
+function GetMaxPotential(wpn_section,prop)
+	local upgr_sections = get_all_upgrade_sections(wpn_section)
+	local total = read_float(wpn_section, upgr_sections, prop)
+	return total
 end

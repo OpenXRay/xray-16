@@ -9,23 +9,31 @@ evaid = 188113
 actid = 188113
 --------------------
 --------------------
-local alife, math_random, tonumber = alife, math.random, tonumber
+local math_random = math.random
 --------------------
 
-local ini = ini_file("ai_tweaks\\xr_danger.ltx")
-DangerInertion = alun_utils.collect_section(ini,"danger_inertion",true)
-DangerIgnore = alun_utils.collect_section(ini,"danger_object",true)
-ini = nil
+local DangerInertion = {
+	[danger_object.grenade] 		= 6000,
+	[danger_object.entity_corpse] 	= 25000,
+	[danger_object.entity_attacked] = 30000,
+	[danger_object.attacked] 		= 60000,
+	[danger_object.bullet_ricochet] = 15000,
+	[danger_object.enemy_sound] 	= 30000,
+	[danger_object.attack_sound] 	= 30000,
+	[danger_object.entity_death] 	= 30000
+}
 
+local DangerIgnore = {
+	[danger_object.grenade] 		= 400,
+	[danger_object.entity_corpse] 	= 900,
+	[danger_object.entity_attacked] = 2500,
+	[danger_object.attacked] 		= 90000,
+	[danger_object.bullet_ricochet] = 90000,
+	[danger_object.enemy_sound] 	= 625,
+	[danger_object.attack_sound] 	= 2500,
+	[danger_object.entity_death] 	= 900
+}
 
---[[
-danger:perceive_type()
-	[danger_object.hit]				= "hit",
-	[danger_object.sound]			= "sound",
-	[danger_object.visual]			= "visual"
---]]
-
-local script_danger = {}
 local bd_types = {
 	[danger_object.grenade] 		= "grenade",
 	[danger_object.entity_corpse] 	= "entity_corpse",
@@ -39,18 +47,6 @@ local bd_types = {
 -----------------------------------------------------------------------------
 -- 																PUBLIC
 -----------------------------------------------------------------------------
-function set_script_danger(npc,time,who_id,pos)
-	local id = npc:id()
-	if not (script_danger[id]) then
-		script_danger[id] = {danger_time = time_global(), danger_inertion = time, id = who_id, position = pos}
-	else
-		script_danger[id].danger_time = time_global()
-		script_danger[id].danger_inertion = time
-		script_danger[id].id = who_id
-		script_danger[id].position = pos
-	end
-end
-
 function has_danger(npc)
 	local id = npc:id()
 	local st = db.storage[id]
@@ -59,6 +55,44 @@ end
 -----------------------------------------------------------------------------
 -- 																PRIVATE
 -----------------------------------------------------------------------------
+local function remove_memory_object(npc,obj,perceive_type)
+	if (perceive_type == danger_object.hit) then 
+		npc:remove_memory_hit_object(obj)
+	elseif (perceive_type == danger_object.visual) then 
+		npc:remove_memory_visible_object(obj)
+	elseif (perceive_type == danger_object.sound) then 
+		npc:remove_memory_sound_object(obj)
+	end
+end
+
+-- Called from Engine!!
+function CDangerManager__on_before_add(npc,mem_obj,pos,lvl_time,danger_type,perceive_type)
+	local who = mem_obj:object()
+	if (danger_type == danger_object.grenade) then
+		if (character_community(npc) ~= "zombied" and danger_in_radius(npc,who,danger_type,perceive_type)) then 
+			return true
+		end
+		return false
+	elseif (danger_type == danger_object.entity_corpse) then 
+		if (who:cast_Stalker() and character_community(npc) == character_community(who) and danger_in_radius(npc,who,danger_type,perceive_type)) then
+			return true
+		end
+		return false
+	elseif (danger_type == danger_object.entity_death) then
+		-- 'who' would be the person that died
+	elseif (IsStalker(who) and npc:relation(who) ~= game_object.enemy) then
+		remove_memory_object(npc,mem_obj,perceive_type)
+		return false
+	end
+	
+	if not (danger_in_radius(npc,who,danger_type,perceive_type)) then 
+		remove_memory_object(npc,mem_obj,perceive_type)
+		return false
+	end
+	
+	return true
+end
+
 local function get_danger_name(best_danger)
 	local best_danger_object = best_danger:object()
 	local bd_type = best_danger:type()
@@ -71,15 +105,6 @@ local function get_danger_name(best_danger)
 		return "none"
 	end
 	return best_danger_object:name()
-end
-
-function get_danger_time(danger,npc)
-	if (danger:type() == danger_object.entity_corpse) then
-		local corpse_object = danger:object()
-		return corpse_object and IsStalker(corpse_object) and corpse_object:death_time() or 0
-	end
-
-	return danger:time()
 end
 
 local function npc_on_death_callback(npc,who)
@@ -98,122 +123,85 @@ local function get_rand_vertex(npc,vo)
 	return vo:vertex_in_direction(vo:level_vertex_id(),dir,math_random(MinDistance,MaxDistance))
 end
 
-function danger_in_radius(npc,best_danger,bd_type)
-	local src = DangerIgnore[ bd_types[bd_type] ]
-	local condlist = xr_logic.parse_condlist(npc,"danger_object",bd_types[bd_type],src)
-	local ignore_distance = condlist and tonumber(xr_logic.pick_section_from_condlist(db.actor,npc,condlist) or 0) or 0
-
-	if (ignore_distance == 0) then
+function danger_in_radius(npc,best_danger,bd_type,perceive_type)
+	local coeff = 1
+	if (perceive_type == danger_object.sound) then
+		if (level.rain_factor() > 0) then
+			coeff = coeff - level.rain_factor()/3
+		end
+		if (level.get_time_hours() < 3 or level.get_time_hours() > 22) then 
+			coeff = coeff - 0.30
+		end
+		local state = state_mgr.get_state(npc)
+		if (state == "sleep") then 
+			coeff = coeff - 0.30
+		end
+	end
+	
+	local st = db.storage[npc:id()]
+	if (st.danger and st.danger.disabled) then 
+		return false
+	end
+	
+	local ignore_distance = (st.danger and st.danger[bd_type] and st.danger[bd_type][1] or DangerIgnore[bd_type] or 0) * coeff
+	if (ignore_distance <= 0) then
 		return false
 	end
 
-	if (best_danger:position():distance_to_sqr(npc:position()) < ignore_distance) then
-		return true
-	end
-
-	return false
+	return best_danger:position():distance_to_sqr(npc:position()) < ignore_distance
 end
 
 local function is_danger(npc,best_danger,script)
-	if xr_wounded.is_heavy_wounded_by_id(npc:id()) then
+	if (IsWounded(npc)) then
 		return false
 	end
 
-	if (xrs_kill_wounded and axr_task_manager.hostages_by_id[npc:id()]) then 
+	if (axr_task_manager.hostages_by_id[npc:id()]) then 
 		return false 
-	end 
+	end
 	
 	local best_danger_object = best_danger:object()
 	local bd_type = best_danger:type()
 
-	--if (bd_type == danger_object.entity_corpse) then
-		--return false
-	--end
-
 	if (bd_type == danger_object.grenade) then
-		if not (best_danger:dependent_object() and character_community(npc) ~= "zombied") then
+		return best_danger:dependent_object() ~= nil
+	end
+
+	-- only react to grenade and attacked for story, companion and safe zoned npcs
+	if (bd_type ~= danger_object.attacked) and (npc:has_info("npcx_is_companion") or story_objects.story_id_by_object_id[npc:id()] or xr_combat_ignore.npc_in_safe_zone(npc)) then 
+		return false
+	end
+	
+	if (bd_type == danger_object.entity_corpse) then
+		local corpse_st = db.storage[best_danger_object:id()]
+		if not (corpse_st and corpse_st.death_time and corpse_st.death_by_id) then
 			return false
 		end
 
-		return danger_in_radius(npc,best_danger,bd_type)
-	end
-	
-	if (xr_combat_ignore.npc_in_safe_zone(npc) or npc:has_info("npcx_is_companion")) then 
-		return false 
-	end
-
-	if (bd_type == danger_object.entity_corpse) then
-		if (best_danger_object and IsStalker(best_danger_object) and character_community(best_danger_object) == character_community(npc)) then
-			local corpse_st = db.storage[best_danger_object:id()]
-			if not (corpse_st and corpse_st.death_time and corpse_st.death_by_id) then
-				return false
-			end
-
-			local killer = db.storage[corpse_st.death_by_id] and db.storage[corpse_st.death_by_id].object
-			if not (killer and (IsMonster(killer) or IsStalker(killer)) and killer:alive() and npc:relation(killer) >= game_object.enemy and character_community(killer) ~= character_community(npc)) then
-				return false
-			end
-			
-			if (xr_combat_ignore.ignore_enemy_by_overrides(npc,killer)) then 
-				return false 
-			end
-
-			if (game.get_game_time():diffSec(corpse_st.death_time) > 12000) then
-				return false
-			end
-			return danger_in_radius(npc,best_danger,bd_type)
+		if (game.get_game_time():diffSec(corpse_st.death_time) > 12000) then
+			return false
 		end
+		
+		local killer = db.storage[corpse_st.death_by_id] and db.storage[corpse_st.death_by_id].object
+		if not (killer and (IsMonster(killer) or IsStalker(killer)) and killer:alive() and npc:relation(killer) >= game_object.enemy and character_community(killer) ~= character_community(npc)) then
+			return false
+		end
+		
+		if (xr_combat_ignore.ignore_enemy_by_overrides(npc,killer)) then 
+			return false 
+		end
+
+ 		return true
+	elseif (bd_type == danger_object.entity_death) then 
+		return true
+	end
+
+	best_danger_object = best_danger:dependent_object() or best_danger_object
+	if not (best_danger_object and best_danger_object:alive()) then 
 		return false
 	end
 
-	--if (db.storage[npc:id()].active_scheme == "camper") then
-		--return false
-	--end
-
-	if (best_danger:dependent_object()) then
-		best_danger_object = best_danger:dependent_object()
-	end
-
-	if (best_danger_object) then
-		local cls = best_danger_object:clsid()
-		if (IsStalker(nil,cls)) then
-			if not (npc:relation(best_danger_object) == game_object.enemy) then 
-				return false
-			end
-		elseif (IsMonster(nil,cls)) then
-			-- always enemy no relation check
-		else 
-			return false
-		end
-		if not (best_danger_object:alive()) then
-			return false
-		end
-		if (best_danger:perceive_type() == danger_object.hit) then -- bypass combat ignore radius for attacked, entity_attacked, ricochet
-			return danger_in_radius(npc,best_danger,bd_type)
-		end
-		if not (xr_combat_ignore.is_enemy(npc, best_danger_object,true)) then 
-			return false 
-		end
-	end
-
-	-- if (xr_corpse_detection.is_under_corpse_detection(npc) or xr_help_wounded.is_under_help_wounded(npc)) then
-		-- return false
-	-- elseif (xrs_kill_wounded and xrs_kill_wounded.is_under_kill_wounded(npc)) then
-		-- return false
-	-- end
-
-	return danger_in_radius(npc,best_danger,bd_type)
-end
-
-local function check_script_danger(id)
-	if (script_danger[id]) then
-		if (time_global() < script_danger[id].danger_time + script_danger[id].danger_inertion) then
-			return true
-		else
-			script_danger[id] = nil
-		end
-	end
-	return false
+	return xr_combat_ignore.is_enemy(npc, best_danger_object,true,true)
 end
 
 -----------------------------------------------------------------------------
@@ -244,20 +232,19 @@ local function eval_danger(self)
 	
 	if (self.a.inertion) then
 		if (self.a.type == bd_type) then 
-			if (tg < self.a.danger_time + self.a.inertion) then
+			if (tg < self.a.danger_time) then
 				return true
 			end
+			self.a.danger_time = nil
+			self.a.type = nil
+			return false
 		end
+		self.a.danger_time = nil
+		self.a.type = nil
 	end
-	
-	self.a.inertion = nil
 
-	local src = DangerInertion[ bd_types[bd_type] ]
-	local condlist = xr_logic.parse_condlist(npc,"danger_inertion",bd_types[bd_type],src)
-	local inertion = condlist and tonumber(xr_logic.pick_section_from_condlist(db.actor,npc,condlist) or 0) or 0
-
-	local new_danger_time = get_danger_time(danger,npc)
-	if (tg >= new_danger_time + inertion) then
+	local new_danger_time = (bd_type == danger_object.entity_corpse and danger:object():death_time() or danger:time()) + (self.a[bd_type] and self.a[bd_type][2] or DangerInertion[bd_type])
+	if (tg >= new_danger_time) then
 		return false
 	end
 	
@@ -265,17 +252,7 @@ local function eval_danger(self)
 		return false 
 	end
 
-	-- combat only is enough I think
-	-- local se_obj = alife_object(npc:id())
-	-- if (se_obj and se_obj.m_smart_terrain_id ~= 65535) then
-		-- local smart = alife_object(se_obj.m_smart_terrain_id)
-		-- if (smart) then 
-			-- smart:set_alarm()
-		-- end
-	-- end
-
 	self.a.danger_time = new_danger_time
-	self.a.inertion = inertion
 	self.a.type = bd_type
 
 	return true
@@ -285,6 +262,14 @@ function evaluator_danger:evaluate()
 	--alun_utils.debug_write("eva_danger")
 	local danger = eval_danger(self) or false
 	db.storage[self.object:id()].danger_flag = danger
+	
+	if (danger == false) then
+		local bd = self.object:best_danger()
+		if (bd) then 
+			self.object:remove_danger(bd)
+		end
+	end
+	
 	return danger
 end
 
@@ -300,105 +285,6 @@ function action_danger:initialize()
 	self.a.stage = 1
 	self.object:set_desired_direction()
 	self.a.last_state = state_mgr.get_state(self.object)
-end
-
-local function script_action_danger_scripted(npc,st)
-	--alun_utils.debug_write("script_action_danger_scripted")
-	local id = npc:id()
-	local bdo = script_danger[id].id and db.storage[script_danger[id].id] and db.storage[script_danger[id].id].object
-
-	local bdo_pos = script_danger[id].position
-	local dist = bdo_pos and npc:position():distance_to_sqr(bdo_pos)
-	local tg = time_global()
-
-
-	local who_dist = bdo and bdo:position():distance_to_sqr(bdo_pos)
-
-	--[[
-	if (dist and dist >= 70) then
-		if (bdo and npc:relation(bdo) > 0 and npc:see(bdo)) then
-			state_mgr.set_state(npc,"hide_na",nil,nil,{look_object = bdo})
-			if (not alun_utils.squad_in_los(npc,bdo)) then
-				local wpn = npc:best_weapon()
-				if (wpn) then
-					local relation = npc:relation(bdo)
-					local look_pos = vector():set(bdo:position())
-
-					look_pos.y = relation >= 2 and look_pos.y + 1 or look_pos.y - (math_random(25,35)/100)
-					npc:set_sight(look.fire_point,look_pos)
-
-					if (npc:target_body_state() == move.crouch) then
-						st.__warning_shot_tmr = not st.__warning_shot_tmr and tg+500 or st.__warning_shot_tmr
-						if (tg < st.__warning_shot_tmr) then
-							npc:set_item(object.fire1,wpn,1,1)
-							xr_sound.set_sound_play(npc:id(),"tolls")
-						end
-					end
-				end
-			end
-			st.lvid = utils.send_to_nearest_accessible_vertex(npc,npc:level_vertex_id())
-		end
-	end
-	--]]
-
-	if not (st.lvid) then 
-		st.stage = 1
-	end
-	
-	if (st.stage == 1) then
-		local new_vid = random_choice(alun_utils.try_to_strafe(npc),alun_utils.try_go_backward(npc,6),alun_utils.try_go_cover(npc,bdo and bdo:position() or bdo_pos or npc:position()))
-		
-		st.lvid = nil
-
-		if (new_vid and (not st.lvid or (new_vid ~= st.lvid and new_vid ~= npc:level_vertex_id())))then
-			st.lvid = new_vid
-		end
-
-		if not (new_vid) then
-			local dir = bdo_pos and vector():set(npc:position()):sub(bdo_pos) or npc:direction()
-			dir = vector_rotate_y(dir,math_random(-20,20))
-		
-			local node = position_node(5)
-			node = node:select_best_vertex_id(npc,dir,npc:level_vertex_id(),20,35)
-
-			if (node and node.vertex_id and node.vertex_id ~= npc:level_vertex_id()) then
-				st.lvid = node.vertex_id
-			end
-		end
-
-		if (st.lvid and st.lvid ~= npc:level_vertex_id()) then
-			st.lvid = utils.send_to_nearest_accessible_vertex(npc,st.lvid)
-			st.stage = 2
-			
-			local sm = db.storage[npc:id()].state_mgr
-			if (sm and sm.target_state ~= "assault") then
-				npc:clear_animations()
-				sm:set_state("assault",nil,nil,{look_position = who_dist and who_dist < 22500 and bdo and bdo:position() or bdo_pos}, {fast_set = true})
-				sm.animation:set_state(nil, true)
-				sm.animation:set_control()
-				sm.animstate:set_state(nil,true)
-				sm.animstate:set_control()
-			end	
-		
-			return
-		end
-
-		state_mgr.set_state(npc,"hide_na",nil,nil,{look_position = who_dist and who_dist < 22500 and bdo and bdo:position() or bdo_pos})
-	elseif (st.stage == 2) then
-		if (npc:level_vertex_id() == st.lvid) then
-			local tg = time_global()
-			if (st.__dtimer and tg > st.__dtimer) then
-				st.__dtimer = nil
-				st.stage = 1
-				return
-			end
-			st.__dtimer = tg + math_random(5000,15000)
-			state_mgr.set_state(npc,"threat_danger",nil,nil,{look_position = who_dist and who_dist < 22500 and bdo and bdo:position() or bdo_pos})
-			return
-		end
-		state_mgr.set_state(npc,"assault",nil,nil,{look_position = who_dist and who_dist < 22500 and bdo and bdo:position() or bdo_pos})
-		utils.send_to_nearest_accessible_vertex(npc,st.lvid)
-	end
 end
 
 local function script_action_danger_grenade(npc,st,bd,best_danger_object,dependent_object,bd_type)
@@ -444,7 +330,7 @@ local function script_action_danger_grenade(npc,st,bd,best_danger_object,depende
 		local sm = db.storage[npc:id()].state_mgr
 		if (sm and sm.target_state ~= "threat_danger") then
 			npc:clear_animations()
-			sm:set_state("threat_danger",nil,nil,{look_position = bdo_pos}, {fast_set = true})
+			sm:set_state("threat_danger",nil,nil,{look_position = bdo_pos}, state_mgr.fast_set_true)
 			sm.animation:set_state(nil, true)
 			sm.animation:set_control()
 			sm.animstate:set_state(nil,true)
@@ -485,7 +371,7 @@ local function script_action_danger_grenade(npc,st,bd,best_danger_object,depende
 			local sm = db.storage[npc:id()].state_mgr
 			if (sm) then
 				npc:clear_animations()
-				sm:set_state("assault",nil,nil,{look_object = dist <= 100 and nil or bdo}, {fast_set = true})
+				sm:set_state("assault",nil,nil,{look_object = dist <= 100 and nil or bdo}, state_mgr.fast_set_true)
 				sm.animation:set_state(nil, true)
 				sm.animation:set_control()
 				sm.animstate:set_state(nil,true)
@@ -495,7 +381,7 @@ local function script_action_danger_grenade(npc,st,bd,best_danger_object,depende
 			return
 		end
 
-		state_mgr.set_state(npc,"hide_na",nil,nil,{look_object = be and npc:see(be) and be or bdo},{fast_set = true})
+		state_mgr.set_state(npc,"hide_na",nil,nil,{look_object = be and npc:see(be) and be or bdo},state_mgr.fast_set_true)
 	elseif (st.stage == 2) then
 		if (npc:level_vertex_id() == st.lvid) then
 			st.stage = 1
@@ -631,55 +517,8 @@ local function script_action_danger_corpse(npc,st,bd,best_danger_object,dependen
 	end
 end
 
-local function script_action_danger_attacked(npc,st,bd,best_danger_object,dependent_object,bd_type)
-	--alun_utils.debug_write("script_action_danger_attacked")
-	local bdo = dependent_object or best_danger_object
-	local tg = time_global()
-
-	if not (st.lvid) then 
-		st.stage = 1
-	end
-	
-	--printf("stage = %s",st.stage)
-	if (st.stage == 1) then
-
-		if not (st.last_pos) then
-			st.last_pos = bdo and vector():set(bdo:position())
-		end
-
-		local dir = st.last_pos and vector():set(st.last_pos):sub(npc:position()) or vector():set(npc:direction())
-		local dist_to_bdo = st.last_pos and npc:position():distance_to_sqr(st.last_pos) or 30
-
-		local target_vertex_id = random_choice(alun_utils.try_to_strafe(npc),alun_utils.try_go_backward(npc,6),alun_utils.try_go_cover(npc,st.last_pos or npc:position()))
-
-		if (target_vertex_id) then
-			st.lvid = utils.send_to_nearest_accessible_vertex(npc,target_vertex_id)
-			state_mgr.set_state(npc,"assault",nil,nil,{look_position = st.last_pos})
-			st.stage = 2
-			return
-		end
-
-		st.dtimer = tg + math_random(5000,6000)
-		st.stage = 3
-		return
-	elseif (st.stage == 2) then
-		if (npc:level_vertex_id() == st.lvid) then
-			st.dtimer = tg + math_random(5000,7000)
-			st.stage = 3
-			return
-		end
-		st.lvid = utils.send_to_nearest_accessible_vertex(npc,st.lvid)
-	elseif (st.stage == 3) then
-		if (st.dtimer and tg < st.dtimer) then
-			state_mgr.set_state(npc,"threat_danger",nil,nil,{look_position = st.last_pos})
-			return
-		end
-		st.stage = 1
-	end
-end
-
 local function script_action_react_to_alarm(npc,st,smart)
-	printf("[%s] script_action_react_to_alarm %s",smart:name(),npc:name())
+	--printf("[%s] script_action_react_to_alarm %s",smart:name(),npc:name())
 	local tg = time_global()
 
 	if not (st.lvid) then 
@@ -756,16 +595,8 @@ function action_danger:execute()
 	elseif (bd_type == danger_object.entity_corpse) then
 		script_action_danger_corpse(npc,self.a,best_danger,best_danger_object,dependent_object,bd_type)
 		return
-	elseif (bd_type == danger_object.attacked) then
-		script_action_danger_attacked(npc,self.a,best_danger,best_danger_object,dependent_object,bd_type)
-		return
 	end
 
-	if (check_script_danger(npc:id())) then
-		script_action_danger_scripted(npc,self.a)
-		return
-	end
-	
 	local se_obj = alife_object(npc:id())
 	if (se_obj and se_obj.m_smart_terrain_id ~= 65535) then
 		local smart = alife_object(se_obj.m_smart_terrain_id)
@@ -832,7 +663,7 @@ function evaluator_check_danger:evaluate()
 	end
 	
 	local id = self.object:id()
-	if not (db.storage[id].danger_flag) then 
+	if not (db.storage[id].danger_flag) then
 		return false 
 	end
 	
@@ -841,12 +672,8 @@ function evaluator_check_danger:evaluate()
 		return false
 	end 
 	
-	if (bd_type == danger_object.attacked or bd_type == danger_object.entity_corpse or bd_type == danger_object.grenade) then
+	if (bd_type == danger_object.entity_corpse or bd_type == danger_object.grenade) then
 		return true
-	end
-
-	if (check_script_danger(id)) then
-		return true 
 	end
 	
 	local se_obj = alife_object(id)
@@ -945,7 +772,7 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 	local action
 	local p = {
 				xr_actions_id.alife,
-				--xr_actions_id.state_mgr + 1,
+				xr_actions_id.state_mgr + 1,
 				xr_actions_id.state_mgr + 2
 	}
 	
@@ -960,6 +787,22 @@ function configure_actions(npc,ini,scheme,section,stype,temp)
 end 
 
 function reset_generic_scheme(npc,scheme,section,stype,st)
-
+	if (st.danger) then
+		local danger_section = st.ini:r_string_ex(section,"danger") or ""
+		if (danger_section ~= "") then
+			local val = st.ini:r_float_ex(danger_section,"ignore_distance") -- compatibility with existing logics and ignore_distance = 0
+			if (val and val == 0) then 
+				st.danger.disabled = true
+			else
+				for bd_type,v in pairs(bd_types) do
+					if (st.ini:line_exist(danger_section,v)) then
+						st.danger[bd_type] = {st.ini:r_mult(danger_section,v,DangerIgnore[bd_type],DangerInertion[bd_type])}
+						st.danger[bd_type][1] = tonumber(st.danger[bd_type][1])
+						st.danger[bd_type][2] = tonumber(st.danger[bd_type][2])
+					end
+				end
+			end
+		end
+	end
 end
 

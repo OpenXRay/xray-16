@@ -9,8 +9,7 @@ $npc					= on						; option for Level Editor
 $prefetch 				= 16
 visual					= monsters\burer\burer
 corpse_visual			= monsters\burer\burer_dead
-
-MaxHealthValue		    = 1.0
+MaxHealthValue		    = 100
 
 hit_fraction_monster = 0.4
 skin_armor = 0.25
@@ -24,10 +23,13 @@ fire_max_power				=	5
 fire_linear_factor			=	0
 fire_quadratic_factor		=	0.025
 
-psy_max_distance			=	0
-psy_max_power				=	5
-psy_linear_factor			=	0.05
+psy_max_distance			=	12
+psy_max_power				=	0.2
+psy_linear_factor			=	0.5
 psy_quadratic_factor		=	0
+psy_sound				=	monsters\burer\burer_psi
+psy_pp_effector_name	= 	psy_antenna
+psy_pp_highest_at		= 	0.1
 
 radiation_max_distance		=	0
 radiation_max_power			=	0.01
@@ -144,7 +146,7 @@ DayTime_End				= 4		; конец дня для монстра
 Min_Satiety				= 0.00055		; мин. норма сытости (меньше - уже голодный)
 Max_Satiety				= 0.9		; макс. норма сытости (больше - очень сытый)
 
-satiety_threshold		= 0.5							; below this value monster fill hunger
+satiety_threshold		= 0.5							; below this value monster feels hunger
 ;---------------------------------------------------------
 ; Sounds and sound parameters
 ;---------------------------------------------------------
@@ -183,7 +185,7 @@ max_hear_dist			= 60
 ;-------------------------------------------------------------------------
 ; Morale
 ;-------------------------------------------------------------------------
-Morale_Hit_Quant				= 0.001
+Morale_Hit_Quant				= 0.05
 Morale_Attack_Success_Quant		= 0.1
 Morale_Take_Heart_Speed			= 0.1
 Morale_Despondent_Speed			= 0.1
@@ -194,7 +196,7 @@ Morale_Despondent_Threashold	= 0.5
 ; Shield Ability
 ;-------------------------------------------------------------------------
 shield_cooldown					=	3000
-shield_time						=	5000
+shield_time						=	3000
 shield_keep_particle			=   anomaly2\burer_shield_01
 shield_keep_particle_period		=	300
 Particle_Shield					= 	anomaly2\burer_shield_01
@@ -223,8 +225,8 @@ Gravi_Step					= 2		; meter
 Gravi_Time_To_Hold			= 1200	; milisec
 Gravi_Radius				= 3.0
 Gravi_Impulse_To_Objects	= 60.0
-Gravi_Impulse_To_Enemy		= 1500.0
-Gravi_Hit_Power				= 1.0
+Gravi_Impulse_To_Enemy		= 150.0
+Gravi_Hit_Power				= 0.9
 
 ;-------------------------------------------------------------------------
 ; Tele Ability
@@ -232,7 +234,7 @@ Gravi_Hit_Power				= 1.0
 Tele_Max_Handled_Objects = 4;
 Tele_Max_Time			 = 7000;  // (s) max time to be in telekinesis
 Tele_Time_To_Hold		 = 400
-Tele_Object_Min_Mass	 = 100
+Tele_Object_Min_Mass	 = 50
 Tele_Object_Max_Mass	 = 1000.0
 Tele_Find_Radius		 = 20.0
 Tele_Min_Distance		 = 5
@@ -265,7 +267,7 @@ Particle_Gravi_Wave		= anomaly2\burer_wave
 Particle_Gravi_Prepare	= anomaly2\burer_prepare
 
 ;-------------------------------------------------------------------------
-; Other Stuff (refactoring needed)
+; Other Stuff
 ;-------------------------------------------------------------------------
 critical_wound_threshold		= -1
 critical_wound_decrease_quant	= 0.
@@ -301,7 +303,7 @@ damage					= m_burer_damage
 
 ;species of monster
 species					= burer
-rank					= 19
+rank					= 16
 spec_rank				= weak
 community				= burer
 monster_type			= indoor
@@ -362,8 +364,8 @@ transparency_threshold		= 0.66
 ;	anim					| time[0..1] | hit_power | impulse | impulse_dir (x,y,z)  |	Field of hit_test  (left,right, bottom, top ) |	Test Dist
 ;---------------------------------------------------------------------------------------------------------------------------------------------
 ;Left hand Strike
-stand_attack_0			 =	  	0.4,		  0.7,	     1000,        2.0, 0.4, 0.5,		 -1.6, 1.6, -1.6, 1.6,				  2.5
-stand_stamina_attack_0 	 =	  	0.4,		  0.0,	     0,          2.0, 0.4, 0.5,		 -1.6, 1.6, -1.6, 1.6,				  2.5
+stand_attack_0			 =	  	0.4,		  0.45,	     100,        2.0, 0.4, 0.5,		 -1.6, 1.6, -1.6, 1.6,				  2.5
+stand_stamina_attack_0 	 =	  	0.4,		  0.45,	     100,          2.0, 0.4, 0.5,		 -1.6, 1.6, -1.6, 1.6,				  2.5
 
 ;=================================================================================
 ; Burer Attack Effector
@@ -458,10 +460,8 @@ $spawn				= "monsters\burer\burer_normal"
 visual				= monsters\burer\burer
 corpse_visual			= monsters\burer\burer_dead
 icon				= ui_npc_monster_burer
-rank				= 19
+rank				= 16
 spec_rank			= normal
-
-MaxHealthValue		    = 1.0						; range [0..200]
 
 ;*********************************************************************************
 ; NORMAL PROFILE 2
@@ -472,10 +472,8 @@ $spawn				= "monsters\burer\burer_normal"
 visual				= monsters\burer\burer2
 corpse_visual			= monsters\burer\burer2_dead
 icon				= ui_npc_monster_burer
-rank				= 19
+rank				= 16
 spec_rank			= normal
-
-MaxHealthValue		    = 1.0						; range [0..200]
 
 ;*********************************************************************************
 ; WEAK PROFILE
@@ -486,10 +484,9 @@ $spawn				= "monsters\burer\burer_weak"
 visual				= monsters\burer\burer3
 corpse_visual			= monsters\burer\burer3_dead
 icon				= ui_npc_monster_burer
-rank				= 18
+rank				= 16
 spec_rank			= weak
 immunities_sect		= burer_immunities_weak
-MaxHealthValue		    = 0.75						; range [0..200]
 
 [burer_immunities_weak]
 burn_immunity			= 0.9
@@ -511,11 +508,9 @@ $spawn				= "monsters\burer\burer_weak"
 visual				= monsters\burer\burer4
 corpse_visual			= monsters\burer\burer4_dead
 icon				= ui_npc_monster_burer
-rank				= 18
+rank				= 16
 spec_rank			= weak
 immunities_sect		= burer_immunities_weak
-
-MaxHealthValue		    = 0.75						; range [0..200]
 
 ;----------------------------------------------------------------------------
 ;--------------------------Borovos -  May 2014 - Fire Burer -----------------
@@ -569,20 +564,11 @@ visual				= monsters\burer\burer
 panic_threshold		= 0.05
 species				= arena_monstr
 spec_rank			= weak
-rank				= 0
+rank				= 16
 community			= burer
 
-explosion_immunity		= 0.2
-fire_wound_immunity		= 0.1
-
-; Gravi Strike
-Gravi_Speed					= 76	; meter/sec	
-Gravi_Step					= 2		; meter
-Gravi_Time_To_Hold			= 1200	; milisec
-Gravi_Radius				= 3.0
-Gravi_Impulse_To_Objects	= 60.0
-Gravi_Impulse_To_Enemy		= 1000.0
-Gravi_Hit_Power				= 0.5
+explosion_immunity		= 0.4
+fire_wound_immunity		= 0.4
 
 ; Tele Strike
 Tele_Max_Handled_Objects = 3	;1;3	

@@ -279,20 +279,8 @@ function is_enemy_actor(enemy, npc)
 end
 
 function is_enemy_actor_or_companion(enemy,npc)
-	if (IsMonster(enemy)) then 
-		return false 
-	end
-	if not (npc:relation(enemy) >= game_object.enemy) then
-		return false
-	end
 	local id = enemy:id()
-	if (id == 0) then 
-		return true 
-	end 
-	if (alife():has_info(id,"npcx_is_companion")) then
-		return true 
-	end
-	return false
+	return id == 0 or alife():has_info(id,"npcx_is_companion")
 end
 
 -- current enemy at a distance greater than or equal to the specified Distance
@@ -776,25 +764,16 @@ end
 --       не успели проспавниться.
 function is_alive(actor, npc, p)
 	local id
-	if npc == nil or (p and p[1]) then
-		id = get_story_object_id(p[1])
-	elseif (type(npc.id) == "number") then
-		id = npc.id
+	if (p and p[1]) then
+		id = p and p[1] and story_objects.object_id_by_story_id[ p[1] ]
 	else
-		id = npc:id()
+		id = npc and type(npc.id) == "number" and npc.id or npc:id()
 	end
-
-	if npc1 == nil then
+	if not (id) then 
 		return false
 	end
-
-	local se_obj = id and alife_object(id)
-
-	if se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive() then
-		return true
-	end
-
-	return false
+	local se_obj = alife_object(id)
+	return se_obj and IsStalker(nil,se_obj:clsid()) and se_obj:alive()
 end
 
 -- проверка (по story_id) все ли проверяемые сталкеры мертвы
@@ -836,9 +815,8 @@ end
 -- TODO: исправить ситуацию, когда выдается неправильный результат для обьектов, которые
 --       не успели проспавниться.
 function is_dead(actor, npc, p)
-	local npc1
-	npc1 = get_story_object(p[1])
-	return not npc1 or not npc1:alive()
+	local npc1 = get_story_object(p[1])
+	return not (npc1 and npc1:alive())
 end
 
 -- Проверяет , существует ли обьект с заданным стори айди.
@@ -1070,6 +1048,15 @@ end
 
 function is_squad_neutral_to_actor(actor, npc, p)
 	return not(is_squad_enemy_to_actor(actor, npc, p) or is_squad_friend_to_actor(actor, npc, p))
+end
+
+-- check if actor is enemy to a specific faction (p[1]]
+function is_actor_enemy_to_faction(actor,npc,p)
+	if(p[1]~=nil) then
+		return game_relations.is_factions_enemies(character_community(db.actor), p[1])
+	else
+		return false
+	end
 end
 
 -- текущий враг актёр?
@@ -1588,6 +1575,12 @@ function dist_to_story_obj_ge(actor, npc, p)
 	local id = db.actor and p and get_story_object_id(p[1])
 	local se_obj = id and alife_object(id)
 	return se_obj and se_obj.position:distance_to(db.actor:position()) > tonumber(p[2]) or false
+end
+
+function dist_to_story_obj_le(actor, npc, p)
+	local id = db.actor and p and get_story_object_id(p[1])
+	local se_obj = id and alife_object(id)
+	return se_obj and se_obj.position:distance_to(db.actor:position()) < tonumber(p[2]) or false
 end
 
 function actor_has_nimble_weapon(actor, npc)
@@ -2577,9 +2570,13 @@ function all_avail_smart_stayed_squad_count_ge_by_faction_ex(actor,npc,p)
 	
 		local sim = alife()
 		local gg = game_graph()
-		local actor_level = sim:level_name(gg:vertex(sim:actor().m_game_vertex_id):level_id())
-
-		for name,v in pairs(SIMBOARD.smarts_by_names) do
+		local actor_gvid = sim:actor().m_game_vertex_id
+		
+		local function check_dist(t,a,b)
+			return utils.graph_distance(actor_gvid,t[a].m_game_vertex_id) < utils.graph_distance(actor_gvid,t[b].m_game_vertex_id)
+		end
+	
+		for name,v in spairs(SIMBOARD.smarts_by_names,check_dist) do
 			if (simulation_objects.available_by_id[v.id] == true) then
 				if (smart_stayed_squad_count_ge_by_faction(actor,npc,{name,unpack(p)}) == true) then 
 					return true 
@@ -2589,6 +2586,39 @@ function all_avail_smart_stayed_squad_count_ge_by_faction_ex(actor,npc,p)
 	end
 	return false
 end
+
+-- same as above but checks all enemy factions compared to p[4]
+function all_avail_smart_stayed_squad_count_ge_by_faction_enemy(actor,npc,p)
+	if (#p >= 4) then
+	
+		local sim = alife()
+		local gg = game_graph()
+		local actor_gvid = sim:actor().m_game_vertex_id
+		
+		local function check_dist(t,a,b)
+			return utils.graph_distance(actor_gvid,t[a].m_game_vertex_id) < utils.graph_distance(actor_gvid,t[b].m_game_vertex_id)
+		end
+
+		local t = {}
+		local com_list = alun_utils.get_communities_list()
+		for comm,v in pairs(com_list) do
+			if (comm ~= "monster" and game_relations.is_factions_enemies(p[4],comm)) then
+				table.insert(t,comm)
+			end
+		end
+	
+		for name,v in spairs(SIMBOARD.smarts_by_names,check_dist) do
+			if (simulation_objects.available_by_id[v.id] == true) then
+				if (smart_stayed_squad_count_ge_by_faction(actor,npc,{name,p[1],p[2],p[3],unpack(t)}) == true) then 
+					return true 
+				end
+			end
+		end
+	end
+	return false
+end
+
+
 
 -- Returns true if squads by behavior faction (player_id) of a given count exist at smart out of entire population; including arriving
 -- param1 - smart_name 
@@ -2748,6 +2778,13 @@ function actor_community(actor,npc,p)
 	return false
 end
 
+function economy_type(actor,npc,p) -- called from ltx trader profiles, controls which weapons buy condition must be chosen depending on economy
+	if (p[1] == axr_main.config:r_value("mm_options","set_economy",0,"st_econ_2")) then
+		return true
+	end
+	return false
+end
+
 function actor_goodwill_ge(actor,npc,p)
 	if (p[1] and p[2]) then
 		return db.actor and relation_registry.community_goodwill(p[1], db.actor:id()) >= tonumber(p[2])
@@ -2811,6 +2848,7 @@ function smart_under_faction_control(actor,npc,p)
 		local f = {
 			["stalker"] = "stalker",
 			["bandit"] = "bandit",
+			["renegade"] = "renegade",
 			["killer"] = "merc",
 			["dolg"] = "duty",
 			["freedom"] = "freedom",
@@ -2859,8 +2897,12 @@ function heli_dist_to_max_bounding_le(actor,npc,p)
 	return dist and dist <= d or false
 end
 
+function down_to_earth_functor(actor,npc,p)
+	return dxr_achievements.has_achievement("down_to_earth")
+end
+
 function heavy_pockets_functor(actor,npc,p)
-	return has_alife_info("achieved_heavy_pockets")
+	return dxr_achievements.has_achievement("heavy_pockets")
 end
 
 ------------------------------------------------------------------------------------

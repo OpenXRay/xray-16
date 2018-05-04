@@ -56,7 +56,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>760</rank>
     <reputation>-1631</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied1j</visual>
+    <visual>actors\stalker_zombied\stalker_zombied1c_bandit</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -248,7 +248,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>896</rank>
     <reputation>22</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied1g_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_1_bandit_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -272,7 +272,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>834</rank>
     <reputation>1141</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied1h_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied1a_bandit_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -320,7 +320,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>238</rank>
     <reputation>-1934</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied1i_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied1b_bandit_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -344,7 +344,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>576</rank>
     <reputation>2133</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied1j_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied1c_bandit_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -536,7 +536,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>810</rank>
     <reputation>-1330</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied1g_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_1_bandit_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -584,7 +584,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>914</rank>
     <reputation>-106</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied1h_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied1a_bandit_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -608,7 +608,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>298</rank>
     <reputation>-286</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied1i_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied1b_bandit_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -632,7 +632,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>914</rank>
     <reputation>-1189</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied1j_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied1c_bandit_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -728,7 +728,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>934</rank>
     <reputation>-588</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied1g</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_1_bandit</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -752,7 +752,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>294</rank>
     <reputation>2258</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied1h</visual>
+    <visual>actors\stalker_zombied\stalker_zombied1a_bandit</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -776,7 +776,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>808</rank>
     <reputation>-1271</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied1i</visual>
+    <visual>actors\stalker_zombied\stalker_zombied1b_bandit</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -848,7 +848,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>3216</rank>
     <reputation>-1333</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied2j</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2c_freedom</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -992,7 +992,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>5802</rank>
     <reputation>304</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied2e_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_2_dolg_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1016,7 +1016,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>4044</rank>
     <reputation>2101</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied2f_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2a_dolg_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1040,7 +1040,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>5840</rank>
     <reputation>-2054</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied2g_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_2_freedom_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1064,7 +1064,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>4084</rank>
     <reputation>-148</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied2h_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2a_freedom_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1112,7 +1112,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>3682</rank>
     <reputation>813</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied2i_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2b_freedom_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1136,7 +1136,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>5704</rank>
     <reputation>-92</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied2j_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2c_freedom_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1280,7 +1280,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>3916</rank>
     <reputation>-2072</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied2e_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_2_dolg_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1304,7 +1304,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>5446</rank>
     <reputation>2472</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied2f_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2a_dolg_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1328,7 +1328,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>4604</rank>
     <reputation>447</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied2g_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_2_freedom_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1376,7 +1376,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>5966</rank>
     <reputation>-2084</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied2h_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2a_freedom_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1400,7 +1400,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>4450</rank>
     <reputation>969</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied2i_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2b_freedom_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1424,7 +1424,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>3386</rank>
     <reputation>-2121</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied2j_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2c_freedom_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1448,7 +1448,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>5272</rank>
     <reputation>-789</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied2k</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2e</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1472,7 +1472,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>3776</rank>
     <reputation>-2055</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied2k_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2e_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1496,7 +1496,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>3212</rank>
     <reputation>1211</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied2k_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2e_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1520,7 +1520,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>5734</rank>
     <reputation>-960</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied2l</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2f</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1544,7 +1544,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>3176</rank>
     <reputation>-832</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied2l_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2f_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1568,7 +1568,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>3356</rank>
     <reputation>410</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied2l_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2f_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1584,7 +1584,7 @@
     </specific_character>
 <specific_character id="sim_default_zombied_2_default_39" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_Zombied_5_merc</icon>
+    <icon>ui_inGame2_Zombied_2_merc</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio></bio>
     <class>sim_default_zombied_2</class>
@@ -1592,7 +1592,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>9846</rank>
     <reputation>483</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied_merecenary_2_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_2_merc_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1632,7 +1632,7 @@
     </specific_character>
 <specific_character id="sim_default_zombied_2_default_40" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_Zombied_5_merc2</icon>
+    <icon>ui_inGame2_Zombied_2_merc2</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio></bio>
     <class>sim_default_zombied_2</class>
@@ -1640,7 +1640,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>7698</rank>
     <reputation>2001</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied_merecenary_2_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_2_merc_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1656,7 +1656,7 @@
     </specific_character>
 <specific_character id="sim_default_zombied_2_default_41" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_Zombied_5_merc2</icon>
+    <icon>ui_inGame2_Zombied_2_merc</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio></bio>
     <class>sim_default_zombied_5_merc</class>
@@ -1664,7 +1664,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>6552</rank>
     <reputation>-459</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied_merecenary_2_face3</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_2_merc</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1680,7 +1680,7 @@
     </specific_character>
 <specific_character id="sim_default_zombied_2_default_42" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_Zombied_5_merc</icon>
+    <icon>ui_inGame2_Zombied_2_merc</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio></bio>
     <class>sim_default_zombied_2</class>
@@ -1688,7 +1688,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>6852</rank>
     <reputation>-2015</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied_merecenary2a_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2a_merc_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1704,7 +1704,7 @@
     </specific_character>
 <specific_character id="sim_default_zombied_2_default_43" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_Zombied_5_merc2</icon>
+    <icon>ui_inGame2_Zombied_2_merc2</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio></bio>
     <class>sim_default_zombied_2</class>
@@ -1712,7 +1712,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>8220</rank>
     <reputation>-356</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied_merecenary2a_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2a_merc_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1728,7 +1728,7 @@
     </specific_character>
 <specific_character id="sim_default_zombied_2_default_44" team_default = "1">
     <name>GENERATE_NAME_private</name>
-    <icon>ui_inGame2_Zombied_5_merc2</icon>
+    <icon>ui_inGame2_Zombied_2_merc</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio></bio>
     <class>sim_default_zombied_2</class>
@@ -1736,7 +1736,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>9216</rank>
     <reputation>1103</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied_merecenary2a_face3</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2a_merc</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1752,7 +1752,7 @@
     </specific_character>
 <specific_character id="sim_default_zombied_2_default_45" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_Zombied_5_merc</icon>
+    <icon>ui_inGame2_Zombied_2_merc</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio></bio>
     <class>sim_default_zombied_2</class>
@@ -1760,7 +1760,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>7130</rank>
     <reputation>-752</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied_merecenary2b_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2b_merc_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1776,7 +1776,7 @@
     </specific_character>
 <specific_character id="sim_default_zombied_2_default_46" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_Zombied_5_merc2</icon>
+    <icon>ui_inGame2_Zombied_2_merc2</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio></bio>
     <class>sim_default_zombied_2</class>
@@ -1784,7 +1784,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>7272</rank>
     <reputation>-376</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied_merecenary2b_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2b_merc_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1800,7 +1800,7 @@
     </specific_character>
 <specific_character id="sim_default_zombied_2_default_47" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_Zombied_5_merc2</icon>
+    <icon>ui_inGame2_Zombied_2_merc</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio></bio>
     <class>sim_default_zombied_2</class>
@@ -1808,7 +1808,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>6762</rank>
     <reputation>1965</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied_merecenary2b_face3</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2b_merc</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1824,7 +1824,7 @@
     </specific_character>
 <specific_character id="sim_default_zombied_2_default_48" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_Zombied_5_merc</icon>
+    <icon>ui_inGame2_Zombied_2_merc</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio></bio>
     <class>sim_default_zombied_2</class>
@@ -1832,7 +1832,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>7448</rank>
     <reputation>391</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied_merecenary2c_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2c_merc_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1848,7 +1848,7 @@
     </specific_character>
 <specific_character id="sim_default_zombied_2_default_49" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_Zombied_5_merc2</icon>
+    <icon>ui_inGame2_Zombied_2_merc2</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio></bio>
     <class>sim_default_zombied_2</class>
@@ -1856,7 +1856,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>6182</rank>
     <reputation>-521</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied_merecenary2c_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2c_merc_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1880,7 +1880,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>5250</rank>
     <reputation>710</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied2e</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_2_dolg</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1896,7 +1896,7 @@
     </specific_character>
 <specific_character id="sim_default_zombied_2_default_50" team_default = "1">
     <name>GENERATE_NAME_stalker</name>
-    <icon>ui_inGame2_Zombied_5_merc2</icon>
+    <icon>ui_inGame2_Zombied_2_merc</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio></bio>
     <class>sim_default_zombied_2</class>
@@ -1904,7 +1904,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>8234</rank>
     <reputation>524</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied_merecenary2c_face3</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2c_merc</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1920,7 +1920,7 @@
     </specific_character>
 <specific_character id="sim_default_zombied_2_default_51" team_default = "1">
     <name>GENERATE_NAME_bandit</name>
-    <icon>ui_inGame2_Zombied_5_bandit2</icon>
+    <icon>ui_inGame2_Zombied_2_bandit</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio></bio>
     <class>sim_default_zombied_2</class>
@@ -1928,7 +1928,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>8810</rank>
     <reputation>-1311</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied_bandit_2_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_2_bandit_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1944,7 +1944,7 @@
     </specific_character>
 <specific_character id="sim_default_zombied_2_default_52" team_default = "1">
     <name>GENERATE_NAME_bandit</name>
-    <icon>ui_inGame2_Zombied_5_bandit</icon>
+    <icon>ui_inGame2_Zombied_2_bandit2</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio></bio>
     <class>sim_default_zombied_2</class>
@@ -1952,7 +1952,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>6724</rank>
     <reputation>-1952</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied_bandit_2_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_2_bandit_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1968,7 +1968,7 @@
     </specific_character>
 <specific_character id="sim_default_zombied_2_default_53" team_default = "1">
     <name>GENERATE_NAME_bandit</name>
-    <icon>ui_inGame2_Zombied_5_bandit</icon>
+    <icon>ui_inGame2_Zombied_2_bandit2</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio></bio>
     <class>sim_default_zombied_2</class>
@@ -1976,7 +1976,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>7478</rank>
     <reputation>1882</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied_bandit_2_face3</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_2_bandit</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -1992,7 +1992,7 @@
     </specific_character>
 <specific_character id="sim_default_zombied_2_default_54" team_default = "1">
     <name>GENERATE_NAME_bandit</name>
-    <icon>ui_inGame2_Zombied_5_bandit2</icon>
+    <icon>ui_inGame2_Zombied_2_bandit</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio></bio>
     <class>sim_default_zombied_2</class>
@@ -2000,7 +2000,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>7532</rank>
     <reputation>1973</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied_bandit2a_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2a_bandit_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -2016,7 +2016,7 @@
     </specific_character>
 <specific_character id="sim_default_zombied_2_default_55" team_default = "1">
     <name>GENERATE_NAME_bandit</name>
-    <icon>ui_inGame2_Zombied_5_bandit</icon>
+    <icon>ui_inGame2_Zombied_2_bandit2</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio></bio>
     <class>sim_default_zombied_2</class>
@@ -2024,7 +2024,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>8542</rank>
     <reputation>633</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied_bandit2a_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2a_bandit_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -2040,7 +2040,7 @@
     </specific_character>
 <specific_character id="sim_default_zombied_2_default_56" team_default = "1">
     <name>GENERATE_NAME_bandit</name>
-    <icon>ui_inGame2_Zombied_5_bandit</icon>
+    <icon>ui_inGame2_Zombied_2_bandit2</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio></bio>
     <class>sim_default_zombied_2</class>
@@ -2048,7 +2048,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>9574</rank>
     <reputation>839</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied_bandit2a_face3</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2a_bandit</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -2072,7 +2072,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>5794</rank>
     <reputation>2168</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied2f</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2a_dolg</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -2096,7 +2096,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>4036</rank>
     <reputation>265</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied2g</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_2_freedom</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -2120,7 +2120,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>4150</rank>
     <reputation>1776</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied2h</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2a_freedom</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -2144,7 +2144,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>3328</rank>
     <reputation>-1547</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied2i</visual>
+    <visual>actors\stalker_zombied\stalker_zombied2b_freedom</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -2192,7 +2192,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>12786</rank>
     <reputation>964</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied3a</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_3_freedom</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -2264,7 +2264,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>12836</rank>
     <reputation>2067</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied3a_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_3_freedom_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -2384,7 +2384,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>11640</rank>
     <reputation>-869</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied3a</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_3_freedom</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -2480,7 +2480,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>13116</rank>
     <reputation>-1072</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied3a_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_3_freedom_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -2577,7 +2577,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>26870</rank>
     <reputation>1283</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4a</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_4_merc</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -2602,7 +2602,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>22002</rank>
     <reputation>1381</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4b_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied4a_merc_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -2627,7 +2627,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>27670</rank>
     <reputation>-611</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4c_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_4_dolg_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -2652,7 +2652,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>23854</rank>
     <reputation>1121</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4d_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied4a_dolg_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -2677,7 +2677,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>25594</rank>
     <reputation>839</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4e_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied4b_dolg_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -2702,7 +2702,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>24110</rank>
     <reputation>-1806</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4f_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_4_freedom_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -2727,7 +2727,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>21318</rank>
     <reputation>-442</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4g_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied4a_freedom_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -2777,7 +2777,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>26990</rank>
     <reputation>25</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4a_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_4_merc_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -2802,7 +2802,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>27182</rank>
     <reputation>710</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4b_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied4a_merc_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -2827,7 +2827,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>26600</rank>
     <reputation>1129</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4c_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_4_dolg_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -2852,7 +2852,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>22368</rank>
     <reputation>-2089</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4b</visual>
+    <visual>actors\stalker_zombied\stalker_zombied4a_merc</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -2877,7 +2877,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>26130</rank>
     <reputation>1782</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4d_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied4a_dolg_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -2902,7 +2902,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>22012</rank>
     <reputation>-1931</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4e_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied4b_dolg_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -2927,7 +2927,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>26088</rank>
     <reputation>-1891</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4f_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_4_freedom_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -2952,7 +2952,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>21832</rank>
     <reputation>-226</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4g_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied4a_freedom_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -2977,7 +2977,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>24154</rank>
     <reputation>68</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4h</visual>
+    <visual>actors\stalker_zombied\stalker_zombied4c_dolg</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -3002,7 +3002,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>21714</rank>
     <reputation>-41</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4h_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied4c_dolg_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -3027,7 +3027,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>27532</rank>
     <reputation>-1818</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4h_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied4c_dolg_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -3052,7 +3052,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>24600</rank>
     <reputation>1213</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4i</visual>
+    <visual>actors\stalker_zombied\stalker_zombied4b_freedom</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -3077,7 +3077,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>26038</rank>
     <reputation>-2329</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4i_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied4b_freedom_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -3102,7 +3102,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>23302</rank>
     <reputation>-85</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4i_face2</visual>
+    <visual>actors\stalker_zombied\stalker_zombied4b_freedom_face2</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -3127,7 +3127,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>27282</rank>
     <reputation>358</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4c</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_4_dolg</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -3152,7 +3152,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>27644</rank>
     <reputation>-2365</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4d</visual>
+    <visual>actors\stalker_zombied\stalker_zombied4a_dolg</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -3177,7 +3177,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>27312</rank>
     <reputation>-989</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4e</visual>
+    <visual>actors\stalker_zombied\stalker_zombied4b_dolg</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -3202,7 +3202,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>21490</rank>
     <reputation>-2129</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4f</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_4_freedom</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -3227,7 +3227,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>25116</rank>
     <reputation>-2045</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4g</visual>
+    <visual>actors\stalker_zombied\stalker_zombied4a_freedom</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"
@@ -3277,7 +3277,7 @@
     <snd_config>characters_voice\human_01\zombied\</snd_config>
     <rank>25048</rank>
     <reputation>-595</reputation>
-    <visual>actors\stalker_zombied\stalker_zombied4a_face1</visual>
+    <visual>actors\stalker_zombied\stalker_zombied_4_merc_face1</visual>
     <crouch_type>0</crouch_type>
     <supplies>
 #include "gameplay\loadouts\zombied_base.ltx"

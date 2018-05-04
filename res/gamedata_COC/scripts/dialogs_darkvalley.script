@@ -21,7 +21,7 @@ function bandit_companion_task_1_complete(a,b)
 		end
 	end
 	
-	if (total_loot_count >= 9) then 
+	if (total_loot_count >= 5) then 
 		return true
 	end
 	

@@ -1,161 +1,109 @@
 [up_sect_firsta_g36]
-;Надежность(1)10%
-;--------------
 cost		      		= 1200
 value					= +10
 
-;увеличение дисперсии в процентах при максимальном износе
-fire_dispersion_condition_factor    = -0.5 ;15
-;увеличение изношености при выстреле очередью
-condition_queue_shot_dec	= -0.0001 ;0.0013
-;увеличение изношености при одиночном выстреле
-condition_shot_dec      	= -0.0001 ;0.0011
-;шанс осечки при изношености больше чем misfireStartCondition
-misfire_start_prob	     	= -0.0015
-;шанс осечки при изношености больше чем misfireEndCondition
-misfire_end_prob	     	= -0.025 ;0.03
+fire_dispersion_condition_factor    = -0.5
+condition_queue_shot_dec	= -0.0001
+condition_shot_dec      	= -0.0001
+misfire_start_prob	     	= -0.001
+misfire_end_prob	     	= -0.01
 
 [up_sect_firstc_g36]
-;Точность(2)20%
-;--------------
 cost		      		= 2400
 value					= +20
 
-fire_dispersion_base	= -0.03 ;0.7
-fire_dispersion_condition_factor    = -0.25 ;15
+fire_dispersion_base	= -0.03
+fire_dispersion_condition_factor    = -0.25
 
 [up_sect_firste_g36]
-;Удобство(3)25%
-;--------------
-cost		      		= 4800
+cost		      		= 4000
 value					= +25
 
-crosshair_inertion			= -1.5
+crosshair_inertion			= -1.08
 
-PDM_disp_base 				= -0.25
-PDM_disp_vel_factor 		= -0.75
-PDM_disp_accel_factor 		= -0.75
+PDM_disp_vel_factor 		= -0.65
+PDM_disp_accel_factor 		= -0.65
 
 [up_sect_firstf_g36]
-;Точность(3)30%
-;--------------
-cost		      		= 4800
+cost		      		= 4000
 value					= +30
 
-fire_dispersion_base	= -0.05 ;0.7
-fire_dispersion_condition_factor    = -0.5 ;15
+fire_dispersion_base	= -0.05
+fire_dispersion_condition_factor    = -0.5
 
 [up_sect_secona_g36]
-;Отдача(1)-10%
-;------------
 cost		      		= 1200
 value					= -10
 
 cam_dispersion              = -0.055
-cam_dispersion_inc         	= -0.028
-cam_step_angle_horz        	= -0.09
-
-zoom_cam_dispersion          = -0.055
-zoom_cam_dispersion_inc      = -0.028
-zoom_cam_step_angle_horz     = -0.08
+cam_step_angle_horz        	= -0.055
 
 [up_sect_seconc_g36]
-;Удобство(2)15%
-;--------------
 cost		      		= 2400
 value					= +15
 
-crosshair_inertion			= -1
+crosshair_inertion			= -0.72
 
-PDM_disp_base 				= -0.15
 PDM_disp_vel_factor 		= -0.4
 PDM_disp_accel_factor 		= -0.4
 
 [up_sect_second_g36]
-;Отдача(2)-15%
 cost		      		= 2400
 value					= -15
 
 cam_dispersion              = -0.11
-cam_dispersion_inc         	= -0.056
-cam_step_angle_horz        	= -0.18
-
-zoom_cam_dispersion          = -0.11
-zoom_cam_dispersion_inc      = -0.056
-zoom_cam_step_angle_horz     = -0.17
+cam_step_angle_horz        	= -0.11
 
 [up_sect_secone_g36]
-;Настильность(3)30%
-;------------------
-cost		      		= 4800
+cost		      		= 4000
 value					= +20
 
-bullet_speed            = +100
-fire_dispersion_base    = -0.02
+bullet_speed            = +90
+fire_dispersion_base    = -0.01
 
 [up_sect_thirda_g36]
-;Точность(1)10%
-;--------------
 cost		      		= 1200
 value					= +10
 
-fire_dispersion_base	= -0.03 ;0.7
+fire_dispersion_base	= -0.015
 
 [up_sect_thirdc_g36]
-;Отдача(2)-15%
 cost		      		= 2400
 value					= -10
 
 cam_dispersion              = -0.11
-cam_dispersion_inc         	= -0.056
-cam_step_angle_horz        	= -0.18
-
-zoom_cam_dispersion          = -0.11
-zoom_cam_dispersion_inc      = -0.056
-zoom_cam_step_angle_horz     = -0.17
+cam_step_angle_horz        	= -0.11
 
 [up_sect_thirde_g36]
-;Настильность(3)30%
-;------------------
-cost		      		= 4800
+cost		      		= 4000
 value					= +20
 
-bullet_speed            = +100
-fire_dispersion_base    = -0.02
+bullet_speed            = +90
+fire_dispersion_base    = -0.01
 
 [up_sect_thirdf_g36]
-;Точность(3)30%
-;--------------
-cost		      		= 4800
+cost		      		= 4000
 value					= +30
 
-fire_dispersion_base	= -0.05 ;0.7
-fire_dispersion_condition_factor    = -0.5 ;15
+fire_dispersion_base	= -0.05
+fire_dispersion_condition_factor    = -0.5
 
 [up_sect_fourta_g36]
-;Оптика 1.5икс
-;------------------
 cost		      		= 3000
 
 scope_zoom_factor       = +2.5
 
 [up_sect_fourtc_g36]
-;Контрастный прицел
-;------------------
 cost		      		= 3500
 
 scope_nightvision = scope_contrast
 
 [up_sect_fourte_g36]
-;ПНВ
-;------------------
-cost		      		= 7500
+cost		      		= 5000
 
 scope_nightvision = scope_nightvision
 
 [up_sect_fourtf_g36]
-;Динамический прицел
-;------------------
 cost		      		= 5000
 
 scope_dynamic_zoom = on

@@ -14,7 +14,7 @@ function PsyAntenna:__init				()
 -- ----------------------------------------------------------------------------------------
 -- phantom gen
 -- ----------------------------------------------------------------------------------------
-	self.phantom_max 					= 4 --10	-- max phantoms
+	self.phantom_max 					= 3 --10	-- max phantoms
 	self.phantom_spawn_probability		= 0.5	-- spawn probability (0..1)
 	self.phantom_spawn_radius			= 30.0	-- average radius 30.0m +-15m
 	self.phantom_spawn_height			= 2.5 --3	-- average height from actor pos +-1.5m
@@ -130,15 +130,13 @@ function PsyAntenna:generate_phantoms()
 	if time_global() - self.phantom_time > self.phantom_idle then
 		self.phantom_time = time_global()
 		self.phantom_idle = math.random(5000,10000)
-		if (math.random(1,100)/100) < self.phantom_spawn_probability then
-			if phantom_manager:phantom_count() < self.phantom_max then
-				local radius = self.phantom_spawn_radius * ( math.random()/2.0+0.5 )
-				local ang    = self.phantom_fov * math.random() - self.phantom_fov * 0.5
-				local dir    = vector_rotate_y( db.actor:direction(), ang )
+		if (phantom_manager:phantom_count() < self.phantom_max and (math.random(1,100)/100) < self.phantom_spawn_probability) then
+			local radius = self.phantom_spawn_radius * ( math.random()/2.0+0.5 )
+			local ang    = self.phantom_fov * math.random() - self.phantom_fov * 0.5
+			local dir    = vector_rotate_y( db.actor:direction(), ang )
 
-				--printf("spawn_phantom")
-				phantom_manager.spawn_phantom( db.actor:position():add( dir:mul(radius) ) )
-			end
+			--printf("spawn_phantom")
+			phantom_manager.spawn_phantom( db.actor:position():add( dir:mul(radius) ) )
 		end
 	end
 end

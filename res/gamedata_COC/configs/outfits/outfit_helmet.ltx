@@ -31,7 +31,7 @@ telepatic_protection                     = 0.0
 strike_protection                        = 0.0
 explosion_protection                     = 0.0
 wound_protection                         = 0.0
-hit_fraction_actor                       = 1.0
+hit_fraction_actor                       = 0.99
 
 immunities_sect                          = sect_helm_immunities
 
@@ -90,7 +90,7 @@ upgr_icon_y                              = 619
 upgr_icon_width                          = 106
 upgr_icon_height                         = 149
 
-cost                                     = 8000
+cost                                     = 5000
 
 immunities_sect                          = sect_helm_respirator_immunities
 bones_koeff_protection                   = actor_helm_respirator
@@ -98,28 +98,27 @@ bones_koeff_protection                   = actor_helm_respirator
 power_loss                               = 0.08 ;NEW FORMULA BELOW
 ; power restore (0.0 base) * (0.5 + outfit power loss + helmet power loss + backpack power loss)
 
-burn_protection                          = 0.02
-shock_protection                         = 0.1
-radiation_protection                     = 0.004
-chemical_burn_protection                 = 0.02
+radiation_protection                     = 0.002
+chemical_burn_protection                 = 0.04
+telepatic_protection                     = 0.01
 
 upgrades                                 = up_gr_firstab_helm_respirator
 upgrade_scheme                           = upgrade_scheme_helm_respirator
 mask_hud                                 = helm_respirator
+
 [sect_helm_respirator_immunities]
 burn_immunity                            = 0.08
 strike_immunity                          = 0.0
-shock_immunity                           = 0.0
-wound_immunity                           = 0.08
-wound_2_immunity                         = 0.08
+shock_immunity                           = 0.04
+wound_immunity                           = 0.0
 radiation_immunity                       = 0.0
 telepatic_immunity                       = 0.0
 chemical_burn_immunity                   = 0.08
-explosion_immunity                       = 0.15
+explosion_immunity                       = 0.1
 fire_wound_immunity                      = 0.1
 
 ;---------------------------------------------------------------------------------------------
-;		—“¿À‹ÕŒ… ÿÀ≈Ã
+;		Steel helmet
 ;---------------------------------------------------------------------------------------------
 [helm_hardhat]:helmet_base
 $spawn                                   = "outfit\helm_hardhat"
@@ -138,12 +137,14 @@ upgr_icon_y                              = 619
 upgr_icon_width                          = 149
 upgr_icon_height                         = 143
 
-cost                                     = 3500
+cost                                     = 2500
 
 immunities_sect                          = sect_helm_hardhat_immunities
 bones_koeff_protection                   = actor_helm_hardhat
 
-power_loss                               = 0.01
+power_loss                               = 0.025
+
+telepatic_protection                     = 0.02
 
 upgrades                                 = up_gr_firstab_helm_hardhat, up_gr_seconab_helm_hardhat
 upgrade_scheme                           = upgrade_scheme_helm_hardhat
@@ -154,17 +155,16 @@ mask_hud_no_respi                        = true
 [sect_helm_hardhat_immunities]
 burn_immunity                            = 0.08
 strike_immunity                          = 0.0
-shock_immunity                           = 0.0
-wound_immunity                           = 0.05
-wound_2_immunity                         = 0.05
+shock_immunity                           = 0.04
+wound_immunity                           = 0.0
 radiation_immunity                       = 0.0
 telepatic_immunity                       = 0.0
 chemical_burn_immunity                   = 0.08
-explosion_immunity                       = 0.1
+explosion_immunity                       = 0.075
 fire_wound_immunity                      = 0.075
 
 ;---------------------------------------------------------------------------------------------
-;		ÿÀ≈Ã "«¿—ÀŒÕ"
+;		Screen helmet "Zaslon"
 ;---------------------------------------------------------------------------------------------
 [helm_protective]:helmet_base
 $spawn                                   = "outfit\helm_protective"
@@ -190,10 +190,8 @@ bones_koeff_protection                   = actor_helm_screen
 
 power_loss                               = 0.1
 
-burn_protection                          = 0.04
-shock_protection                         = 0.2
-radiation_protection                     = 0.007
-chemical_burn_protection                 = 0.04
+radiation_protection                     = 0.004
+chemical_burn_protection                 = 0.05
 telepatic_protection                     = 0.055
 
 upgrades                                 = up_gr_firstab_helm_protective, up_gr_seconab_helm_protective
@@ -201,19 +199,18 @@ upgrade_scheme                           = upgrade_scheme_helm_protective
 mask_hud                                 = helm_scientific
 
 [sect_helm_protective_immunities]
-burn_immunity                            = 0.04
+burn_immunity                            = 0.06
 strike_immunity                          = 0.0
-shock_immunity                           = 0.005
-wound_immunity                           = 0.05
-wound_2_immunity                         = 0.05
+shock_immunity                           = 0.03
+wound_immunity                           = 0.0
 radiation_immunity                       = 0.0
 telepatic_immunity                       = 0.0
-chemical_burn_immunity                   = 0.04
+chemical_burn_immunity                   = 0.06
 explosion_immunity                       = 0.075
-fire_wound_immunity                      = 0.05
+fire_wound_immunity                      = 0.075
 
 ;---------------------------------------------------------------------------------------------
-;		“¿ “»◊≈— »… ÿÀ≈Ã
+;		Tactical helmet
 ;---------------------------------------------------------------------------------------------
 [helm_tactic]:helmet_base
 $spawn                                   = "outfit\helm_tactic"
@@ -232,7 +229,7 @@ upgr_icon_y                              = 619
 upgr_icon_width                          = 136
 upgr_icon_height                         = 143
 
-cost                                     = 18750
+cost                                     = 20000
 
 nightvision_sect                         = effector_nightvision_1
 
@@ -241,29 +238,27 @@ bones_koeff_protection                   = actor_helm_tactic
 
 power_loss                               = 0.11
 
-burn_protection                          = 0.01
-shock_protection                         = 0.05
-radiation_protection                     = 0.003
-chemical_burn_protection                 = 0.01
+radiation_protection                     = 0.001
+chemical_burn_protection                 = 0.015
 telepatic_protection                     = 0.03
 
 upgrades                                 = up_gr_firstab_helm_tactic, up_gr_seconab_helm_tactic
 upgrade_scheme                           = upgrade_scheme_helm_tactic
 mask_hud                                 = helm_tactic
+
 [sect_helm_tactic_immunities]
 burn_immunity                            = 0.08
 strike_immunity                          = 0.0
-shock_immunity                           = 0.0
-wound_immunity                           = 0.04
-wound_2_immunity                         = 0.04
+shock_immunity                           = 0.04
+wound_immunity                           = 0.0
 radiation_immunity                       = 0.0
 telepatic_immunity                       = 0.0
 chemical_burn_immunity                   = 0.08
-explosion_immunity                       = 0.065
-fire_wound_immunity                      = 0.04
+explosion_immunity                       = 0.05
+fire_wound_immunity                      = 0.05
 
 ;---------------------------------------------------------------------------------------------
-;		ÿÀ≈Ã "—‘≈–¿ Ã12"
+;		Sphere M12 helmet
 ;---------------------------------------------------------------------------------------------
 [helm_battle]:helmet_base
 $spawn                                   = "outfit\helm_battle"
@@ -282,7 +277,7 @@ upgr_icon_y                              = 619
 upgr_icon_width                          = 162
 upgr_icon_height                         = 143
 
-cost                                     = 23250
+cost                                     = 25000
 
 nightvision_sect                         = effector_nightvision_1
 
@@ -291,11 +286,9 @@ bones_koeff_protection                   = actor_helm_battle
 
 power_loss                               = 0.11
 
-burn_protection                          = 0.015
-shock_protection                         = 0.075
-radiation_protection                     = 0.004
-chemical_burn_protection                 = 0.015
-telepatic_protection                     = 0.03
+radiation_protection                     = 0.002
+chemical_burn_protection                 = 0.02
+telepatic_protection                     = 0.035
 
 upgrades                                 = up_gr_firstab_helm_battle, up_gr_seconab_helm_battle
 upgrade_scheme                           = upgrade_scheme_helm_battle
@@ -304,17 +297,16 @@ mask_hud                                 = helm_battle
 [sect_helm_battle_immunities]
 burn_immunity                            = 0.07
 strike_immunity                          = 0.0
-shock_immunity                           = 0.0
-wound_immunity                           = 0.04
-wound_2_immunity                         = 0.04
+shock_immunity                           = 0.035
+wound_immunity                           = 0.0
 radiation_immunity                       = 0.0
 telepatic_immunity                       = 0.0
 chemical_burn_immunity                   = 0.07
-explosion_immunity                       = 0.06
-fire_wound_immunity                      = 0.04
+explosion_immunity                       = 0.05
+fire_wound_immunity                      = 0.05
 
 ;---------------------------------------------------------------------------------------------
-;		M40 "Merc Mask" by –ËÍÓ¯Â“
+;		M40 "Merc Mask"
 ;---------------------------------------------------------------------------------------------
 [helm_m40]:helmet_base
 $spawn                                   = "outfit\helm_m40"
@@ -335,33 +327,31 @@ upgr_icon_y                              = 771
 upgr_icon_width                          = 158
 upgr_icon_height                         = 149
 
-cost                                     = 11250
+cost                                     = 10000
 
 bones_koeff_protection                   = actor_helm_m40
 immunities_sect                          = sect_helm_m40_immunities
 
 power_loss                               = 0.09
 
-burn_protection                          = 0.015
-shock_protection                         = 0.075
-radiation_protection                     = 0.0035
-chemical_burn_protection                 = 0.015
+radiation_protection                     = 0.002
+chemical_burn_protection                 = 0.02
 telepatic_protection                     = 0.01
 
 upgrades                                 = up_gr_firstab_helm_m40
 upgrade_scheme                           = upgrade_scheme_helm_respirator
 mask_hud                                 = helm_protective
+
 [sect_helm_m40_immunities]
 burn_immunity                            = 0.08
 strike_immunity                          = 0.0
-shock_immunity                           = 0.0
-wound_immunity                           = 0.06
-wound_2_immunity                         = 0.06
+shock_immunity                           = 0.04
+wound_immunity                           = 0.0
 radiation_immunity                       = 0.0
 telepatic_immunity                       = 0.0
 chemical_burn_immunity                   = 0.08
-explosion_immunity                       = 0.1
-fire_wound_immunity                      = 0.075
+explosion_immunity                       = 0.08
+fire_wound_immunity                      = 0.08
 
 ;---------------------------------------------------------------------------------------------
 ;		Tactical M12 helmet
@@ -383,7 +373,7 @@ upgr_icon_y                              = 950
 upgr_icon_width                          = 135
 upgr_icon_height                         = 142
 
-cost                                     = 26250
+cost                                     = 35000
 
 nightvision_sect                         = effector_nightvision_1
 
@@ -392,32 +382,29 @@ bones_koeff_protection                   = actor_helm_tacticm12
 
 power_loss                               = 0.11
 
-burn_protection                          = 0.013
-shock_protection                         = 0.065
-radiation_protection                     = 0.004
-chemical_burn_protection                 = 0.013
-telepatic_protection                     = 0.03
+radiation_protection                     = 0.0015
+chemical_burn_protection                 = 0.015
+telepatic_protection                     = 0.035
 
 upgrades                                 = up_gr_firstab_helm_battle, up_gr_seconab_helm_battle
 upgrade_scheme                           = upgrade_scheme_helm_battle
 mask_hud                                 = helm_tactic
 
 [sect_helm_tactic_2_immunities]
-burn_immunity                            = 0.07
+burn_immunity                            = 0.075
 strike_immunity                          = 0.0
-shock_immunity                           = 0.0
-wound_immunity                           = 0.04
-wound_2_immunity                         = 0.04
+shock_immunity                           = 0.035
+wound_immunity                           = 0.0
 radiation_immunity                       = 0.0
 telepatic_immunity                       = 0.0
-chemical_burn_immunity                   = 0.07
+chemical_burn_immunity                   = 0.075
 explosion_immunity                       = 0.05
-fire_wound_immunity                      = 0.035
+fire_wound_immunity                      = 0.04
 
 ;---------------------------------------------------------------------------------------------
 ;		Gas Mask Old
 ;---------------------------------------------------------------------------------------------
-[helm_respirator_2]:helmet_base
+[helm_respirator_2]:helm_respirator
 $spawn                                   = "outfit\helm_respirator_2"
 visual                                   = dynamics\outfit\helm_respirator_2
 inv_name                                 = st_helm_respirator
@@ -434,36 +421,12 @@ upgr_icon_y                              = 1129
 upgr_icon_width                          = 104
 upgr_icon_height                         = 141
 
-cost                                     = 6000
-
-immunities_sect                          = sect_helm_respirator_2_immunities
-bones_koeff_protection                   = actor_helm_respirator
+cost                                     = 4000
 
 power_loss                               = 0.09
 
-burn_protection                          = 0.018
-shock_protection                         = 0.09
-radiation_protection                     = 0.0035
-chemical_burn_protection                 = 0.018
-
-upgrades                                 = up_gr_firstab_helm_respirator
-upgrade_scheme                           = upgrade_scheme_helm_respirator
-mask_hud                                 = helm_respirator
-
-[sect_helm_respirator_2_immunities]
-burn_immunity                            = 0.085
-strike_immunity                          = 0.0
-shock_immunity                           = 0.0
-wound_immunity                           = 0.085
-wound_2_immunity                         = 0.085
-radiation_immunity                       = 0.0
-telepatic_immunity                       = 0.0
-chemical_burn_immunity                   = 0.085
-explosion_immunity                       = 0.16
-fire_wound_immunity                      = 0.11
-
 ;---------------------------------------------------------------------------------------------
-;		Mask
+;		Cloth mask
 ;---------------------------------------------------------------------------------------------
 [helm_facemask]:helmet_base
 $spawn                                   = "outfit\helm_facemask"
@@ -489,17 +452,14 @@ bones_koeff_protection                   = actor_helm_mask
 
 power_loss                               = 0.01
 
-burn_protection                          = 0.005
-shock_protection                         = 0.025
-radiation_protection                     = 0.001
+radiation_protection                     = 0.0003
 chemical_burn_protection                 = 0.005
 
 [sect_helm_facemask_immunities]
 burn_immunity                            = 0.15
 strike_immunity                          = 0.0
 shock_immunity                           = 0.0
-wound_immunity                           = 0.1
-wound_2_immunity                         = 0.1
+wound_immunity                           = 0.0
 radiation_immunity                       = 0.0
 telepatic_immunity                       = 0.0
 chemical_burn_immunity                   = 0.15
@@ -526,33 +486,31 @@ upgr_icon_y                              = 1129
 upgr_icon_width                          = 107
 upgr_icon_height                         = 141
 
-cost                                     = 5000
+cost                                     = 2500
 
 immunities_sect                          = sect_helm_respirator_half_immunities
 bones_koeff_protection                   = actor_helm_mask
 
 power_loss                               = 0.05
 
-burn_protection                          = 0.01
-radiation_protection                     = 0.002
-chemical_burn_protection                 = 0.01
+radiation_protection                     = 0.001
+chemical_burn_protection                 = 0.02
 
 mask_hud                                 = helm_invisible
 
 [sect_helm_respirator_half_immunities]
-burn_immunity                            = 0.07
+burn_immunity                            = 0.08
 strike_immunity                          = 0.0
-shock_immunity                           = 0.0
-wound_immunity                           = 0.06
-wound_2_immunity                         = 0.06
+shock_immunity                           = 0.04
+wound_immunity                           = 0.0
 radiation_immunity                       = 0.0
 telepatic_immunity                       = 0.0
-chemical_burn_immunity                   = 0.07
+chemical_burn_immunity                   = 0.08
 explosion_immunity                       = 0.1
-fire_wound_immunity                      = 0.075
+fire_wound_immunity                      = 0.1
 
 ;---------------------------------------------------------------------------------------------
-;		GP-5
+;		GP-5 gas mask
 ;---------------------------------------------------------------------------------------------
 [helm_respirator_gp5]:helmet_base
 $spawn                                   = "outfit\helm_respirator_gp5"
@@ -569,17 +527,16 @@ upgr_icon_y                              = 1123
 upgr_icon_width                          = 85
 upgr_icon_height                         = 162
 
-cost                                     = 9000
+cost                                     = 6000
 
 immunities_sect                          = sect_helm_respirator_gp5_immunities
 bones_koeff_protection                   = actor_helm_respirator
 
 power_loss                               = 0.08
 
-burn_protection                          = 0.022
-shock_protection                         = 0.11
-radiation_protection                     = 0.0045
-chemical_burn_protection                 = 0.022
+radiation_protection                     = 0.0022
+chemical_burn_protection                 = 0.044
+telepatic_protection                     = 0.01
 
 upgrades                                 = up_gr_firstab_helm_respirator
 upgrade_scheme                           = upgrade_scheme_helm_respirator
@@ -588,11 +545,152 @@ mask_hud                                 = helm_respirator
 [sect_helm_respirator_gp5_immunities]
 burn_immunity                            = 0.075
 strike_immunity                          = 0.0
-shock_immunity                           = 0.0
-wound_immunity                           = 0.075
-wound_2_immunity                         = 0.075
+shock_immunity                           = 0.035
+wound_immunity                           = 0.0
 radiation_immunity                       = 0.0
 telepatic_immunity                       = 0.0
 chemical_burn_immunity                   = 0.075
-explosion_immunity                       = 0.13
+explosion_immunity                       = 0.09
+fire_wound_immunity                      = 0.09
+
+;---------------------------------------------------------------------------------------------
+;		CS-H1 basic helmet
+;---------------------------------------------------------------------------------------------
+[helm_cs_1]:helmet_base
+$spawn                                   = "outfit\helm_cs_1"
+visual                                   = dynamics\outfit\helm_cs_1
+inv_name                                 = st_helm_cs_1
+inv_name_short                           = st_helm_cs_1
+description                              = st_helm_cs_1_descr
+
+inv_weight                               = 3
+
+inv_grid_x                               = 19
+inv_grid_y                               = 31
+
+upgr_icon_x                              = 132
+upgr_icon_y                              = 1125
+upgr_icon_width                          = 115
+upgr_icon_height                         = 155
+
+cost                                     = 10000
+
+immunities_sect                          = sect_helm_cs_1_immunities
+bones_koeff_protection                   = actor_helm_cs_1
+
+power_loss                               = 0.1
+
+radiation_protection                     = 0.002
+chemical_burn_protection                 = 0.03
+telepatic_protection                     = 0.02
+
+upgrades                                 = up_gr_firstab_helm_cs_1, up_gr_seconab_helm_cs_1
+upgrade_scheme                           = upgrade_scheme_helm_hardhat
+mask_hud                                 = helm_hardhat
+
+[sect_helm_cs_1_immunities]
+burn_immunity                            = 0.075
+strike_immunity                          = 0.0
+shock_immunity                           = 0.04
+wound_immunity                           = 0.0
+radiation_immunity                       = 0.0
+telepatic_immunity                       = 0.0
+chemical_burn_immunity                   = 0.07
+explosion_immunity                       = 0.08
 fire_wound_immunity                      = 0.08
+
+;---------------------------------------------------------------------------------------------
+;		CS-H2 protective helmet
+;---------------------------------------------------------------------------------------------
+[helm_cs_2]:helmet_base
+$spawn                                   = "outfit\helm_cs_2"
+visual                                   = dynamics\outfit\helm_cs_2
+inv_name                                 = st_helm_cs_2
+inv_name_short                           = st_helm_cs_2
+description                              = st_helm_cs_2_descr
+
+inv_weight                               = 3.5
+
+inv_grid_x                               = 21
+inv_grid_y                               = 31
+
+upgr_icon_x                              = 1
+upgr_icon_y                              = 1294
+upgr_icon_width                          = 146
+upgr_icon_height                         = 159
+
+cost                                     = 17500
+
+nightvision_sect                         = effector_nightvision_1
+
+immunities_sect                          = sect_helm_cs_2_immunities
+bones_koeff_protection                   = actor_helm_cs_2
+
+power_loss                               = 0.11
+
+radiation_protection                     = 0.003
+chemical_burn_protection                 = 0.046
+telepatic_protection                     = 0.03
+
+upgrades                                 = up_gr_firstab_helm_cs_2, up_gr_seconab_helm_cs_2
+upgrade_scheme                           = upgrade_scheme_helm_hardhat
+mask_hud                                 = helm_hardhat
+
+[sect_helm_cs_2_immunities]
+burn_immunity                            = 0.065
+strike_immunity                          = 0.0
+shock_immunity                           = 0.033
+wound_immunity                           = 0.0
+radiation_immunity                       = 0.0
+telepatic_immunity                       = 0.0
+chemical_burn_immunity                   = 0.06
+explosion_immunity                       = 0.075
+fire_wound_immunity                      = 0.075
+
+;---------------------------------------------------------------------------------------------
+;		CS-H3 battle helmet
+;---------------------------------------------------------------------------------------------
+[helm_cs_3]:helmet_base
+$spawn                                   = "outfit\helm_cs_3"
+visual                                   = dynamics\outfit\helm_cs_3
+inv_name                                 = st_helm_cs_3
+inv_name_short                           = st_helm_cs_3
+description                              = st_helm_cs_3_descr
+
+inv_weight                               = 3.5
+
+inv_grid_x                               = 23
+inv_grid_y                               = 31
+
+upgr_icon_x                              = 165
+upgr_icon_y                              = 1292
+upgr_icon_width                          = 128
+upgr_icon_height                         = 162
+
+cost                                     = 25000
+
+nightvision_sect                         = effector_nightvision_1
+
+immunities_sect                          = sect_helm_cs_3_immunities
+bones_koeff_protection                   = actor_helm_cs_3
+
+power_loss                               = 0.11
+
+radiation_protection                     = 0.0027
+chemical_burn_protection                 = 0.042
+telepatic_protection                     = 0.035
+
+upgrades                                 = up_gr_firstab_helm_cs_2, up_gr_seconab_helm_cs_2
+upgrade_scheme                           = upgrade_scheme_helm_hardhat
+mask_hud                                 = helm_hardhat
+
+[sect_helm_cs_3_immunities]
+burn_immunity                            = 0.07
+strike_immunity                          = 0.0
+shock_immunity                           = 0.035
+wound_immunity                           = 0.0
+radiation_immunity                       = 0.0
+telepatic_immunity                       = 0.0
+chemical_burn_immunity                   = 0.065
+explosion_immunity                       = 0.07
+fire_wound_immunity                      = 0.07

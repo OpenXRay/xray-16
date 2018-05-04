@@ -79,7 +79,7 @@ function msg_box_ui:OnMsgOk()
 	local p = pos and alun_utils.str_explode(pos,",")
 	pos = p and vector():set(tonumber(p[1]),tonumber(p[2]),tonumber(p[3]))
 
-	local allow_car = ini:r_bool_ex(self.name,"allow_vehicle",true)
+	local allow_car = ini:r_bool_ex(self.name,"allow_vehicle",false)
 	if (allow_car) then
 		-- allow vehicles to teleport too
 		local car = db.actor:get_attached_vehicle()

@@ -63,7 +63,7 @@ nimble_trade_instead = false
 esc_2_12_buy_item_table = nil
 item_count_by_category = nil
 esc_2_12_costs_table = nil
-local nimble_max_items = 0
+nimble_max_items = 0
 function init_nimble_tables()
 	if (esc_2_12_buy_item_table) then 
 		return

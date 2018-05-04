@@ -3,80 +3,35 @@
 -- Edited by Alundaio
 --'******************************************************
 -------------------
-local level,alife,game_graph,math,pairs,tostring,tonumber,tsort,tinsert = level,alife,game_graph,math,pairs,tostring,tonumber,table.sort,table.insert
+local tsort,tinsert = table.sort,table.insert
 -------------------
 -----------------------------------------------------------------------------------
 --						Public
 -----------------------------------------------------------------------------------
 function general_squad_precondition(squad,target)
-	-- duty and freedom target eachother
-	--[[
-	if (squad.player_id == "dolg") then 
-		if (target.player_id == "freedom" or is_squad_monster[target.player_id]) then 
-			return in_time_interval(8,19)
-		end
-	elseif (squad.player_id == "freedom") then 
-		if (target.player_id == "dolg") then 
-			return in_time_interval(8,19)
-		end 
-	end
-	--]]
-	
-	-- if target squad is not monster
-	if (is_squad_monster[target.player_id] ~= true) then 
-		if (squad.player_id == "monster_predatory_day") then 
-			return in_time_interval(6,19)
-		elseif (squad.player_id == "monster_predatory_night") then 
-			return in_time_interval(19,6)
-		elseif (squad.player_id == "monster_zombied_day") then 
-			return in_time_interval(6,19)
-		elseif (squad.player_id == "monster_zombied_night") then 
-			return in_time_interval(19,6)
-		end
-	end 
 	return false
 end
 
 function general_base_precondition(squad,target)
-	local need_squads = target.min_population or 0
+	if (target.faction == nil or target.faction == squad.player_id) then 
+		return true
+	end
 	
-	if (need_squads == 0) then
-		if (squad.player_id == "dolg") then 
-			if (target.faction == "freedom") then
-				need_squads = 1
-			end
-		elseif (squad.player_id == "freedom") then 
-			if (target.faction == "dolg") then
-				need_squads = 1
-			end	
-		elseif (squad.player_id == "army") then 
-			need_squads = 3
-		elseif (squad.player_id == "monolith") then 
-			need_squads = 1
-		elseif (squad.player_id == "stalker" or squad.player_id == "csky") then 
-			need_squads = 2
-		elseif (squad.player_id == "bandit") then
-			if (target.faction_controlled and target.faction ~= "bandit") then 
-				need_squads = 2
-			end
+	if (game_relations.is_valid(squad.player_id) and game_relations.is_valid(target.faction)) then
+		if (game_relations.is_factions_enemies(squad.player_id,target.faction)) then
+			return in_time_interval(3,6)
+		else
+			return true
 		end
 	end
 	
-	if need_squads > target.max_population then
-		need_squads = target.max_population
-	end
-	
-	if (SIMBOARD.smarts[target.id]) and (SIMBOARD.smarts[target.id].squads[squad.id] or SIMBOARD.smarts[target.id].population < target.max_population and SIMBOARD.smarts[target.id].population < need_squads) then
-		return true
-	end
-
-	return in_time_interval(6,10)
+	return false
 end
 
 function general_territory_precondition(squad,target)
-	if (squad.player_id == "monster_predatory_day") then 
+	if (squad.player_id == "monster_predatory_day" or squad.player_id == "monster_special_day") then 
 		return in_time_interval(6,19)
-	elseif (squad.player_id == "monster_predatory_night") then 
+	elseif (squad.player_id == "monster_predatory_night" or squad.player_id == "monster_special_night") then 
 		return in_time_interval(19,6)
 	elseif (squad.player_id == "monster_zombied_day") then 
 		return in_time_interval(6,19)
@@ -85,7 +40,20 @@ function general_territory_precondition(squad,target)
 	elseif (squad.player_id == "monster_vegetarian" or squad.player_id == "zombied") then 
 		return true
 	end
-	return in_time_interval(10,6)
+	
+	if (target.faction == nil or target.faction == squad.player_id) then 
+		return true
+	end 
+	
+	if (game_relations.is_valid(squad.player_id) and game_relations.is_valid(target.faction)) then
+		if (game_relations.is_factions_enemies(squad.player_id,target.faction)) then
+			return false --in_time_interval(3,6)
+		else
+			return true
+		end
+	end
+	
+	return false
 end
 
 function general_resource_precondition(squad,target)
@@ -93,21 +61,7 @@ function general_resource_precondition(squad,target)
 end
 
 function general_lair_precondition(squad,target)
-	--[[
-	if (squad.player_id == "monster_predatory_day") then 
-		return in_time_interval(19,6)
-	elseif (squad.player_id == "monster_predatory_night") then 
-		return in_time_interval(6,19)
-	elseif (squad.player_id == "monster_zombied_day") then 
-		return in_time_interval(19,6)
-	elseif (squad.player_id == "monster_zombied_night") then 
-		return in_time_interval(6,19)
-	elseif (squad.player_id == "monster_vegetarian" or squad.player_id == "zombied") then 
-		return true
-	end 
-	return in_time_interval(19,6)
-	--]]
-	return true -- Will fill up all the lairs first, by monster squads
+	return true
 end
 
 --------------------------------------------------------------------------------------------------------

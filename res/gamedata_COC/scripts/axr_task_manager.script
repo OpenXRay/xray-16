@@ -25,10 +25,10 @@ local function npc_on_death_callback(npc,who)
 					tsk.stage = 1
 					
 					-- refund goodwill
-					local comm = npc:character_community()
-					if not (game_relations.is_factions_enemies(comm, db.actor:character_community():sub(7))) then
-						game_relations.change_factions_community_num(comm,0,1000)
-					end
+					-- local comm = npc:character_community()
+					-- if not (game_relations.is_factions_enemies(comm, db.actor:character_community():sub(7))) then
+						-- game_relations.change_factions_community_num(comm,0,1000)
+					-- end
 				end
 			else 
 				local tm = task_manager.get_task_manager()

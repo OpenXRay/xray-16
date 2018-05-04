@@ -12,12 +12,12 @@
 	
 	<auto_check x="835" y="100" width="30" height="30" stretch="1">
 		<texture>ui_inGame2_checkbox</texture>
-		<text x="0" font="letterica16" r="170" g="170" b="170">pda_companions_auto</text>
+		<text x="-10" y="0" font="letterica16" r="170" g="170" b="170">pda_companions_auto</text>
 	</auto_check>
 	
 	<filter x="67" y="100" width="30" height="30" stretch="1">
 		<texture>ui_inGame2_checkbox</texture>
-		<text x="0" font="letterica16" r="170" g="170" b="170">pda_show_known_contacts</text>
+		<text x="-10" y="0" font="letterica16" r="170" g="170" b="170">pda_show_known_contacts</text>
 	</filter>
 	
 	<hint_wnd x="0" y="0" width="210" height="100">

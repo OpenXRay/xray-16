@@ -163,7 +163,6 @@ function CSurgeManager:start(manual)
 	
 	local level_name = level.name()
 	if (level_weathers.valid_levels[level_name] ~= true or atmosfear_options.config:r_value("atmosfear_current_parameters","opt_enable_blowout",2,1)==0) then
-		self.skip_message = true
 		self:skip_surge()
 		return
 	end
@@ -177,6 +176,7 @@ function CSurgeManager:start(manual)
 	
 	local diff_sec = math.ceil(game.get_game_time():diffSec(self.inited_time)/level.get_time_factor())
 	if(diff_sec+6>self.surge_time)then
+		self.skip_message = true
 		self:skip_surge()
 	else
 	
@@ -225,9 +225,6 @@ function CSurgeManager:new_surge_time(reset)
 end
 
 function CSurgeManager:skip_surge()
-	if (self.started) then 
-		xr_statistic.inc_counter("surges")
-	end
 	if not (self.inited_time) then 
 		self.inited_time = game.get_game_time()
 	end
@@ -264,11 +261,14 @@ function CSurgeManager:skip_surge()
 	self:toggle_level_artefact_respawns()
 	self:respawn_artefacts_and_replace_anomaly_zone()
 	
-	if not (self.skip_message) and (atmosfear_options.config:r_value("atmosfear_current_parameters","opt_enable_blowout",2,1)==1) then
+	if (self.skip_message and atmosfear_options.config:r_value("atmosfear_current_parameters","opt_enable_blowout",2,1) == 1) then
 		news_manager.send_tip(db.actor, "st_surge_while_asleep", nil, "recent_surge", nil, nil)
-		self.skip_message = true
+		dxr_encyclopedia.detect_anomaly_interaction("emissions")
+		dxr_statistics.increment_statistic("emissions")
+		self.skip_message = nil
 		--release_body_manager.get_release_body_manager():clear(true)
 	end
+	
 	-- hide indicators
 	self:displayIndicators(0)
 
@@ -278,7 +278,8 @@ end
 function CSurgeManager:end_surge(manual)
 
 	if (self.started == true) then 
-		xr_statistic.inc_counter("surges")
+		dxr_encyclopedia.detect_anomaly_interaction("emissions")
+		dxr_statistics.increment_statistic("emissions")
 		self:kill_all_unhided()
 		self:respawn_artefacts_and_replace_anomaly_zone()
 		self:toggle_level_artefact_respawns()
@@ -1197,20 +1198,9 @@ function CSurgeManager:kill_obj_at_pos(pos)
 	end
 	local board = SIMBOARD
 	local sim, gg = alife(),game_graph()
-	local immuned_to_surge_squads = {
-					["monolith"] = true,
-					["monster_predatory_day"] 	= true,
-					["monster_predatory_night"] = true,
-					["monster_vegetarian"] 		= true,
-					["monster_zombied_day"] 	= true,
-					["monster_zombied_night"] 	= true,
-					["monster_special"] 		= true,
-					["monster"]					= true,
-					["zombied"]					= true
-	}
 	for k,v in pairs(board.squads) do
 		local squad = alife_object(k)
-		if (squad and squad:clsid() == clsid.online_offline_group_s and can_destroy_squad(squad,immuned_to_surge_squads,sim,gg)) then 
+		if (squad and squad:clsid() == clsid.online_offline_group_s and can_destroy_squad(squad,sim,gg)) then 
 			local squad_npcs = get_squad_members(squad.id)
 			for kk,vv in pairs(squad_npcs) do
 				local obj = sim:object(kk)
@@ -1247,21 +1237,10 @@ function CSurgeManager:get_objects_to_kill()
 		return 
 	end
 	local board = SIMBOARD
-	local immuned_to_surge_squads = {
-				["monolith"] = true,
-				["monster_predatory_day"] 	= true,
-				["monster_predatory_night"] = true,
-				["monster_vegetarian"] 		= true,
-				["monster_zombied_day"] 	= true,
-				["monster_zombied_night"] 	= true,
-				["monster_special"] 		= true,
-				["monster"]					= true,
-				["zombied"]					= true
-	}
 	local sim,gg = alife(),game_graph()
 	for k,v in pairs(board.squads) do
 		local squad = alife_object(k)
-		if (squad:clsid() == clsid.online_offline_group_s and can_destroy_squad(squad,immuned_to_surge_squads,sim,gg)) then 
+		if (squad:clsid() == clsid.online_offline_group_s and can_destroy_squad(squad,sim,gg)) then 
 			local squad_npcs = get_squad_members(squad.id)
 			for kk,vv in pairs(squad_npcs) do
 				local obj = sim:object(kk)
@@ -1398,21 +1377,10 @@ function CSurgeManager:kill_all_unhided()
 	end
 	local board = SIMBOARD
 	local sim,gg = alife(),game_graph()
-	local immuned_to_surge_squads = {
-				["monolith"] = true,
-				["monster_predatory_day"] 	= true,
-				["monster_predatory_night"] = true,
-				["monster_vegetarian"] 		= true,
-				["monster_zombied_day"] 	= true,
-				["monster_zombied_night"] 	= true,
-				["monster_special"] 		= true,
-				["monster"]					= true,
-				["zombied"]					= true
-	}
 	local can_skip
 	for k,v in pairs(board.squads) do
 		local squad = alife_object(k)
-		if (squad:clsid() == online_offline_group_s and  can_destroy_squad(squad,immuned_to_surge_squads,sim,gg)) then
+		if (squad:clsid() == online_offline_group_s and  can_destroy_squad(squad,sim,gg)) then
 			local squad_npcs = get_squad_members(squad.id)
 			for kk,vv in pairs(squad_npcs) do
 				local obj = sim:object(kk)
@@ -1484,21 +1452,10 @@ function CSurgeManager:kill_all_unhided_after_actor_death()
 		return 
 	end
 	local board = SIMBOARD
-	local immuned_to_surge_squads = {
-					["monolith"] = true,
-					["monster_predatory_day"] 	= true,
-					["monster_predatory_night"] = true,
-					["monster_vegetarian"] 		= true,
-					["monster_zombied_day"] 	= true,
-					["monster_zombied_night"] 	= true,
-					["monster_special"] 		= true,
-					["monster"]					= true,
-					["zombied"]					= true
-	}
 	local sim,gg = alife(),game_graph()
 	for k,v in pairs(board.squads) do
 		local squad = alife_object(k)
-		if (squad:clsid() == clsid.online_offline_group_s and can_destroy_squad(squad,immuned_to_surge_squads,sim,gg)) then
+		if (squad:clsid() == clsid.online_offline_group_s and can_destroy_squad(squad,sim,gg)) then
 			local squad_npcs = get_squad_members(squad.id)
 			for kk,vv in pairs(squad_npcs) do
 				local obj = sim:object(kk)
@@ -1748,21 +1705,20 @@ function is_loaded()
 	return get_surge_manager()._state_loaded == true
 end
 
-function resurrect_skip_message()
-	get_surge_manager().skip_message = false
-end
-
 function sound_started()
 	return get_surge_manager().started and get_surge_manager().blowout_sound
 end
 
-function can_destroy_squad(squad,immuned_to_surge_squads,sim,gg)
+function can_destroy_squad(squad,sim,gg)
 	if not (squad.online) then 
 		return false
 	end
-	if(immuned_to_surge_squads[squad.player_id]) then
+	if (is_squad_monster[squad.player_id]) then
 		return false
 	end
+	if (squad.player_id == "zombied" or squad.player_id == "monolith") then 
+		return false
+	end 
 	if not (simulation_objects.is_on_the_same_level(sim:actor(), squad)) then 
 		return false 
 	end
@@ -1783,7 +1739,7 @@ end
 
 -- Cleaner way to bunch together survival conditions.
 function is_actor_immune()
-	-- invulnerability after game load
+	-- Invulnerability after game load.
 	if (bind_stalker_ext.invulnerable_time and time_global() < bind_stalker_ext.invulnerable_time) then 
 		return true 
 	end
@@ -1803,8 +1759,9 @@ function is_actor_immune()
 	or (character_community(db.actor) == "actor_zombied") then
 		return true
 	end
+	
 	-- 'Radiotherapy' achievement has been unlocked.
-	if (has_alife_info("achieved_radiotherapy")) then
+	if (dxr_achievements.has_achievement("radiotherapy")) then
 		if (math.random(1,100) < 25) then
 			return true
 		end

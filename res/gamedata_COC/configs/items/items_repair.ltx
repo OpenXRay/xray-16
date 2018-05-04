@@ -1,25 +1,25 @@
 [itm_gunsmith_toolkit]:booster_script
-$spawn                                   = "devices\repair_kit_10"
+$spawn                                   = "repair\gunsmith_toolkit"
 description                              = st_itm_gunsmith_toolkit_descr
 inv_name                                 = st_itm_gunsmith_toolkit
 inv_name_short                           = st_itm_gunsmith_toolkit
 can_trade                                = true
 quest_item                               = false
-cost                                     = 2400
-inv_weight                               = 3.65
+cost                                     = 6000
+inv_weight                               = 3.5
 visual                                   = dynamics\devices\dev_instrument_1\dev_instrument_1.ogf
 inv_grid_width                           = 2
 inv_grid_height                          = 2
 inv_grid_x                               = 14
 inv_grid_y                               = 10
 
-repair_min_condition                     = 0.00 ;Min required condition to use
-repair_max_condition                     = 0.75 ;Max required condition to use
-repair_add_condition                     = 0.25 ;Amount of condition added to repaired item
-repair_part_bonus                        = 0.10 ;Amount bonus to add_condition if parts are used
+repair_min_condition                     = 0.30 ;Min required condition to use
+repair_max_condition                     = 0.80 ;Max required condition to use
+repair_add_condition                     = 0.20 ;Amount of condition added to repaired item
+repair_part_bonus                        = 0.15 ;Amount bonus to add_condition if parts are used
 repair_use_parts                         = true ;Allows the use of lesser conditioned weapons to be used for parts to add overall bonus to repair
 repair_type                              = weapon ;weapon or outfit  
-repair_refuse                            = wpn_gauss;Add sections separated by commas that cannot be repaired by this item
+repair_refuse                            = wpn_gauss ;Add sections separated by commas that cannot be repaired by this item
 repair_only                              = ;Add sections separated by commas that exclude all sections but these
 repair_parts_include                     = ;Add sections of items to include to be considered repair parts
 repair_parts_exclude                     = ;Add sections of items to exclude from being considered repair parts
@@ -27,13 +27,16 @@ repair_parts_exclude                     = ;Add sections of items to exclude fro
 use_condition                            = true
 max_uses                                 = 3
 remove_after_use                         = false
-empty_weight                             = 1.65
+empty_weight                             = 2.0
+
+hide_time_wpn = 10
 
 [itm_outfit_toolkit]:itm_gunsmith_toolkit
+$spawn                                   = "repair\outfit_toolkit"
 description                              = st_itm_outfit_toolkit_descr
 inv_name                                 = st_itm_outfit_toolkit
 inv_name_short                           = st_itm_outfit_toolkit
-inv_weight                               = 2.5
+inv_weight                               = 2.0
 visual                                   = dynamics\equipments\item_sewingkit.ogf
 
 inv_grid_height                          = 1
@@ -41,11 +44,13 @@ inv_grid_x                               = 18
 inv_grid_y                               = 23
 
 repair_type                              = outfit ;weapon or outfit  
+repair_refuse                            = helm_respirator,helm_hardhat,helm_protective,helm_tactic,helm_battle,helm_m40,helm_tactic_2,helm_respirator_2,helm_respirator_half,helm_respirator_gp5,helm_cs_1,helm_cs_2,helm_cs_3
 
 max_uses                                 = 3
-empty_weight                             = 1
+empty_weight                             = 0.5
 
 [itm_repairkit_tier_1]:itm_gunsmith_toolkit
+$spawn                                   = "repair\repairkit_1"
 inv_grid_x                               = 6
 inv_grid_y                               = 7
 inv_grid_width                           = 2
@@ -63,6 +68,7 @@ inv_name_short                           = st_itm_repairkit_tier_1_name
 use_condition                            = false
 
 [itm_repairkit_tier_2]:itm_repairkit_tier_1
+$spawn                                   = "repair\repairkit_2"
 inv_grid_x                               = 8
 inv_grid_y                               = 7
 inv_grid_width                           = 2
@@ -77,6 +83,7 @@ inv_name                                 = st_itm_repairkit_tier_2_name
 inv_name_short                           = st_itm_repairkit_tier_2_name
 
 [itm_repairkit_tier_3]:itm_repairkit_tier_2
+$spawn                                   = "repair\repairkit_3"
 inv_grid_x                               = 10
 inv_grid_y                               = 7
 inv_grid_width                           = 2

@@ -37,7 +37,7 @@ function evaluator_reach_animpoint:evaluate()
 	if (xr_danger.has_danger(self.object)) then
 		return false
 	end
-	return self.st.animpoint:position_riched() == true
+	return self.st.am_i_reached == true
 end
 --------------------------------------------------------------------------------
 class "action_reach_animpoint" (action_base)
@@ -56,8 +56,6 @@ function action_reach_animpoint:execute()
 		return
 	end
 
-	self.object:set_dest_level_vertex_id(self.st.animpoint.position_vertex)
-
 	--self.object:set_desired_direction(self.st.animpoint.smart_direction)
 	self.object:set_path_type(game_object.level_path)
 
@@ -74,15 +72,22 @@ function action_reach_animpoint:execute()
 			new_state = reach_movement
 		end
 	end
-	if (self.object:position():distance_to_sqr(self.st.animpoint.vertex_position) <= self.st.reach_distance) then
-		state_mgr.set_state(self.object, new_state, nil, nil, {look_position = self.st.animpoint.look_position}  )
+	local dist = self.object:position():distance_to_sqr(self.st.animpoint.vertex_position)
+	if (dist <= self.st.reach_distance) then
+		local cur_state = state_mgr.get_state(self.object)
+		if (cur_state ~= "wait_na") then
+			local function turn_end_callback()
+				self.st.am_i_reached = true
+			end
+			state_mgr.set_state(self.object, "wait_na", { turn_end_func = turn_end_callback } , nil, {look_dir = self.st.animpoint.smart_direction}  )
+		end
 	else
 		state_mgr.set_state(self.object, new_state)
+		self.object:set_dest_level_vertex_id(self.st.animpoint.position_vertex)
 	end
 end
 function action_reach_animpoint:finalize()
 	action_base.finalize(self)
-	self.st.am_i_reached = false
 end
 --------------------------------------------------------------------------------
 class "action_animpoint" (action_base)
@@ -91,14 +96,15 @@ function action_animpoint:__init (npc, action_name, storage) super(nil, action_n
 end
 function action_animpoint:initialize()
 	action_base.initialize(self)
-	state_mgr.set_state(self.object,"idle")
-	self.st.animpoint:start()
+	if not (self.st.animpoint.started) then
+		self.st.animpoint:start() -- zatychka
+	end
 end
 function action_animpoint:execute()
 	action_base.execute(self)
 		--alun_utils.debug_write("action_animpoint:execute")
 
-	if not(self.st.animpoint.started) then
+	if not (self.st.animpoint.started) then
 		self.st.animpoint:start() -- zatychka
 	end
 
@@ -108,7 +114,10 @@ function action_animpoint:execute()
 	if (self.object:character_community() == "zombied") then
 		state_mgr.set_state(self.object,"guard")
 	else
-		state_mgr.set_state(self.object, self.st.animpoint:get_action(), nil, nil, {look_position = self.st.animpoint.look_position},{animation_position = self.st.animpoint.position, animation_direction = self.st.animpoint.smart_direction} )
+		local cur_state = state_mgr.get_state(self.object)
+		if (cur_state ~= self.st.animpoint:get_action()) then
+			state_mgr.set_state(self.object, self.st.animpoint:get_action(), nil, nil, {look_position = self.st.animpoint.look_position},{animation_position = self.st.animpoint.position, animation_direction = self.st.animpoint.smart_direction} )
+		end
 	end
 end
 function action_animpoint:net_destroy(npc)
@@ -117,6 +126,7 @@ end
 function action_animpoint:finalize()
 	self.st.animpoint:stop()
 	action_base.finalize(self)
+	self.st.am_i_reached = false
 end
 --------------------------------------------------------------------------------
 -- Класс отыгрывания разных ништяков на точке
@@ -209,39 +219,7 @@ function animpoint:calculate_position()
 	self.avail_actions = xr_animpoint_predicates.associations[description_name]
 	self.st.approved_actions = {}
 end
---' Возвращает достиг ли персонаж точки начала работы схемы
-function animpoint:position_riched()
-	local npc = db.storage[self.npc_id] and db.storage[self.npc_id].object
-	if not (npc) then
-		return false
-	end
-	if not (self.position) then
-		return false
-	end
-	local dist = npc:position():distance_to_sqr(self.position)
-	if (self.current_action and dist <= self.st.reach_distance) then
-		return true
-	end
-	if (dist <= self.st.reach_distance) then
-		local dir1 = vector():set(self.smart_direction)
-		--local dir2 = vector():set(npc:direction())
-		--npc:set_desired_direction()
-		--npc:set_sight(look.direction, dir1:normalize(), true)
-		state_mgr.set_state(npc, "animpoint_reach", {turn_end_func=function() self.st.am_i_reached = true return end}, nil, {look_dir = dir1})
-		--[[
-		local v1 = -math.deg(math.atan2(dir1.x, dir1.z))
-		local v2 = -math.deg(math.atan2(dir2.x, dir2.z))
-		local rot_y = math.abs(math.min(math.abs(v1-v2), 360-math.abs(v1)-math.abs(v2)))
-		if (rot_y <= 30) then
-			return true
-		end
-		--]]
-		return self.st.am_i_reached
-	else 
-		self.st.am_i_reached = false
-	end
-	return false
-end
+
 function animpoint:fill_approved_actions()
 	local is_in_camp = self.camp ~= nil
 
@@ -475,6 +453,9 @@ function set_scheme(npc, ini, scheme, section, gulag_name)
 	st.cover_name		= ini:r_string_ex(section,"cover_name") or "$script_id$_cover"
 	st.use_camp 		= ini:r_bool_ex(section,"use_camp",true)
 	st.reach_distance	= ini:r_float_ex(section,"reach_distance") or 0.8
+	if (st.reach_distance < 0.8) then 
+		st.reach_distance = 0.8
+	end
 	st.reach_movement 	= ini:r_string_to_condlist(section,"reach_movement")
 	st.reach_distance 	= st.reach_distance*st.reach_distance
 

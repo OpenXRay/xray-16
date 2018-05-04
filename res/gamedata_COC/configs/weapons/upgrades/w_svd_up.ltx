@@ -1,155 +1,114 @@
 [up_sect_firsta_svd]
-;Удобство(1)10%
-;--------------
-cost		      		= 1600
+cost		      		= 1750
 value					= +10
 
-crosshair_inertion			= -1
+crosshair_inertion			= -0.6
 
-PDM_disp_base 				= -0.1
 PDM_disp_vel_factor 		= -0.3
 PDM_disp_accel_factor 		= -0.3
 
 [up_sect_firstc_svd]
-;Точность(2)20%
-;---------------
-cost		      		= 3200
+cost		      		= 3500
 value					= +20
 
 fire_dispersion_base    = -0.035
 fire_dispersion_condition_factor    = -0.33
 
 [up_sect_firstd_svd]
-;Удобство(2)15%
-;--------------
-cost		      		= 3200
+cost		      		= 3500
 value					= +20
 
-crosshair_inertion			= -1.5
+crosshair_inertion			= -1.2
 
-PDM_disp_base 				= -0.2
-PDM_disp_vel_factor 		= -0.5
-PDM_disp_accel_factor 		= -0.5
-
+PDM_disp_vel_factor 		= -0.6
+PDM_disp_accel_factor 		= -0.6
 
 [up_sect_firste_svd]
-;Настильность(3)30%
-;------------------ 
-cost		      		= 6400
+cost		      		= 5500
 value					= +30
 
 bullet_speed			= +100
-fire_dispersion_base    = -0.01  	;0.15
+fire_dispersion_base    = -0.01
 
 [up_sect_firstf_svd]
-;Скорострельность(3)25%
-;----------------------
-cost		      		= 6400
+cost		      		= 5500
 value					= +25
 
-rpm						= +35
+rpm						= +30
 
 [up_sect_secona_svd]
-;Надежность(1)10%
-;---------------
-cost		      		= 1600
+cost		      		= 1750
 value					= +15
 
-;увеличение дисперсии в процентах при максимальном износе
-fire_dispersion_condition_factor    = -0.5 ;15
-;увеличение изношености при выстреле очередью
-condition_queue_shot_dec	= -0.0002 ;0.0013
-;увеличение изношености при одиночном выстреле
-condition_shot_dec      	= -0.0002 ;0.0011
-;шанс осечки при изношености больше чем misfireStartCondition
-misfire_start_prob	     	= -0.0007
-;шанс осечки при изношености больше чем misfireEndCondition
-misfire_end_prob	     	= -0.007 ;0.03
+fire_dispersion_condition_factor    = -0.5
+condition_queue_shot_dec	= -0.0002
+condition_shot_dec      	= -0.0002
+misfire_start_prob	     	= -0.0015
+misfire_end_prob	     	= -0.015
 
 [up_sect_seconc_svd]
-;Отдача(2)-20%
-;------------
-cost		      		= 3200
+cost		      		= 3500
 value					= -20
 
-zoom_cam_dispersion         = -0.4
-zoom_cam_dispersion_inc     = -0.4
-zoom_cam_step_angle_horz    = -0.1
+cam_dispersion         = -0.4
+cam_step_angle_horz    = -0.13
 
 zoom_cam_relax_speed = 0.2
 
 [up_sect_second_svd]
-;Точность(2)20%
-;---------------
-cost		      		= 3200
+cost		      		= 3500
 value					= +20
+
 fire_dispersion_base    = -0.035
 fire_dispersion_condition_factor    = -0.33
 
 [up_sect_thirda_svd]
-;Отдача(1)-10%
-;------------
-cost		      		= 1600
+cost		      		= 1750
 value					= -10
 
-zoom_cam_dispersion         = -0.2
-zoom_cam_dispersion_inc     = -0.2
-zoom_cam_step_angle_horz    = -0.05
+cam_dispersion         = -0.2
+cam_step_angle_horz    = -0.065
 
 zoom_cam_relax_speed = 0.1
 
 [up_sect_thirdc_svd]
-;Удобство(2)15%
-;--------------
-cost		      		= 3200
+cost		      		= 3500
 value					= +15
 
-crosshair_inertion			= -1.5
+crosshair_inertion			= -1.2
 
-PDM_disp_base 				= -0.2
-PDM_disp_vel_factor 		= -0.5
-PDM_disp_accel_factor 		= -0.5
-
+PDM_disp_vel_factor 		= -0.6
+PDM_disp_accel_factor 		= -0.6
 
 [up_sect_thirde_svd]
-;Отдача(3)-30%
-;------------
-cost		      		= 6400
+cost		      		= 5500
 value					= -30
 
-zoom_cam_dispersion         = -0.6
-zoom_cam_dispersion_inc     = -0.6
-zoom_cam_step_angle_horz    = -0.15
+cam_dispersion         = -0.6
+cam_step_angle_horz    = -0.2
 
 zoom_cam_relax_speed = 0.3
 
 [up_sect_fourta_svd]
-;6икс прицел.
-;------------
-cost		      		= 3500
+cost		      		= 3000
 
 scope_zoom_factor       = +2 
 
 [up_sect_fourtc_svd]
-;Контрастный прицел
-;------------
-cost		      		= 4500
+cost		      		= 4000
 
 scope_nightvision = scope_contrast
 
 [up_sect_fourte_svd]
-;ПНВ
-;------------
-cost		      		= 9000
+cost		      		= 6000
 
 scope_nightvision = scope_nightvision
 
 [up_sect_fourtf_svd]
-;Тепловизор
-;------------
-cost		      		= 15000
+cost		      		= 12500
 
 scope_alive_detector = scope_detector
+
 
 [up_firsta_svd]
 scheme_index            = 0, 0

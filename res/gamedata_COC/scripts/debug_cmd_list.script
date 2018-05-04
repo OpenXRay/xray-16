@@ -246,6 +246,7 @@ end
 function cmd.relations(me,txt,owner,p)
 	owner:SendOutput("Stalker = %s",relation_registry.community_goodwill("stalker", 0))
 	owner:SendOutput("Bandit = %s",relation_registry.community_goodwill("bandit", 0))
+	owner:SendOutput("Renegade = %s",relation_registry.community_goodwill("renegade", 0))
 	owner:SendOutput("Mercenary = %s",relation_registry.community_goodwill("killer", 0))
 	owner:SendOutput("CSky = %s",relation_registry.community_goodwill("csky", 0))
 	owner:SendOutput("Freedom = %s",relation_registry.community_goodwill("freedom", 0))
@@ -295,10 +296,10 @@ function cmd.community(me,txt,owner,p)
 	if not (wrd) then return end
 	
 	local comm_list = alun_utils.get_communities_list()
-	for i=1,#comm_list do 
-		if (wrd == comm_list[i]) then 
+	for comm,v in pairs(comm_list) do 
+		if (wrd == comm) then 
 			db.actor:set_character_community(wrd, 0, 0)
-			return "community:= actor community successfully changed to "..wrd
+			return "community:= actor community changed to "..wrd
 		end
 	end
 	return "community:= invalid community"
@@ -316,6 +317,56 @@ function cmd.name(me,txt,owner,p)
 	end
 	
 	return "name:= invalid name"
+end
+
+-- Rank
+function cmd.rank(me,txt,owner,p)
+	local wrd = check_and_set_help(me,txt,owner,"<amount>")
+	if not (wrd) then return end
+	local amt = tonumber(wrd) or 0
+	dxr_statistics.increment_rank(amt)
+	return "rank:= gave actor "..amt.." rank points."
+end
+
+-- Reputation
+function cmd.reputation(me,txt,owner,p)
+	local wrd = check_and_set_help(me,txt,owner,"<amount>")
+	if not (wrd) then return end
+	local amt = tonumber(wrd) or 0
+	dxr_statistics.increment_reputation(amt)
+	return "reputation:= gave actor "..amt.." reputation points."
+end
+
+-- Statistic
+function cmd.statistic(me,txt,owner,p)
+	local wrd, rest = check_and_set_help(me,txt,owner,"<name> <amount>")
+	if not (wrd and rest) then return end
+	local amt = tonumber(rest) or 0
+	for i = 1, amt do
+		dxr_statistics.increment_statistic(wrd)
+	end
+	return "statistic:= incremented "..wrd.." by " .. amt .. "."
+end
+
+-- Guide
+function cmd.guide(me,txt,owner,p)
+	local wrd, rest = check_and_set_help(me,txt,owner,"[unlockall | unlock <article>]")
+	-- unlock all articles
+	if (wrd and wrd == "unlockall") then
+		local count = dxr_encyclopedia.get_articles_locked_count()
+		for i=1, count do
+			dxr_encyclopedia.unlock_article()
+		end
+		return "guide:= unlocked all articles"
+	end
+	-- unlock a specific article
+	if (wrd and wrd == "unlock") then
+		if (rest) then
+			dxr_encyclopedia.unlock_article(rest)
+			return "guide:= unlocked " .. rest
+		end
+	end
+	return
 end
 
 -- SPAWN
@@ -481,6 +532,8 @@ function cmd.attach(me,txt,owner,p)
 					"wpn_addon_scope_susat_dusk",
 					"wpn_addon_scope_susat_night",
 					"wpn_addon_silencer",
+					"wpn_addon_pistol_suppressor",
+					"wpn_addon_rifle_suppressor",
 					"wpn_addon_grenade_launcher",
 					"wpn_addon_grenade_launcher_m203"
 					}
@@ -522,6 +575,8 @@ function cmd.detach(me,txt,owner,p)
 				"wpn_addon_scope_susat_dusk",
 				"wpn_addon_scope_susat_night",
 				"wpn_addon_silencer",
+				"wpn_addon_pistol_suppressor",
+				"wpn_addon_rifle_suppressor",
 				"wpn_addon_grenade_launcher",
 				"wpn_addon_grenade_launcher_m203"
 				}
@@ -628,8 +683,7 @@ function cmd.waypoint(me,txt,owner,p)
 	local gg = game_graph()
 	
 	local t = {}
-	for id=1,65534 do
-		smart = sim:object(id)
+	for id, smart in sim:objects() do
 		if (smart and smart:clsid() == clsid.smart_terrain) then
 			gname = smart:name()
 			if (wrd == "checkindex") then
@@ -863,7 +917,7 @@ end
 
 -- Squad
 function cmd.squad(me,txt,owner,p)
-	local wrd = check_and_set_help(me,txt,owner,"{assign}")
+	local wrd = check_and_set_help(me,txt,owner,"[teleport <id:number target:number> | assign <id:number target:number> | remove_sim")
 	if not (wrd) then return end
 
 	if (string.find(wrd,"teleport")) then 
@@ -922,6 +976,16 @@ function cmd.squad(me,txt,owner,p)
 			alun_utils.assign_squad_to_smart(squad.id,target.id)
 			return "squad := %s assigned to %s.",squad:name(),target:name()
 		end
+	elseif (wrd == "remove_sim") then
+		local sim = alife()
+		for id, squad in sim:objects() do
+			if (story_objects.story_id_by_object_id[id] == nil) then
+				if (squad:clsid() == clsid.online_offline_group_s) then 
+					squad:remove_squad()
+				end
+			end
+		end
+		return "squad:= removed all simulation squads"
 	end
 
 	return "squad:= squad assign id:<id> target:<id>"
@@ -1248,11 +1312,8 @@ function cmd.object(me,txt,owner,p)
 	if (wrd == "count") then
 		local count = 0
 		local a = alife()
-		for i=1, 65534 do 
-			local se_obj = a:object(i)
-			if (se_obj) then 
-				count = count + 1
-			end
+		for id, se_obj in a:objects() do 
+			count = count + 1
 		end
 		return "object:= there are %s ids in use.",count
 	end
@@ -1434,7 +1495,7 @@ end
 -- weather
 local weather_list
 function cmd.weather(me,txt,owner,p)
-	local wrd,rest = check_and_set_help(me,txt,owner,"[list <page> | <weather_name> ]")
+	local wrd,rest = check_and_set_help(me,txt,owner,"[list <page> | set <weather_name>]")
 	if not (wrd) then return end
 
 	if (wrd == "list") then
@@ -1806,9 +1867,8 @@ function cmd.game_graph(me,txt,owner,p)
 		local gg = game_graph()
 		local vertex
 		local sim = alife()
-		for i=1,65534 do
-			local se_obj = sim:object(i)
-			if (se_obj) and not (gg:valid_vertex_id(se_obj.m_game_vertex_id)) then
+		for id, se_obj in sim:objects() do
+			if not (gg:valid_vertex_id(se_obj.m_game_vertex_id)) then
 				issues[#issues+1] = se_obj:name()
 			end
 		end
@@ -1887,7 +1947,7 @@ end
 
 -- info
 function cmd.info(me,txt,owner,p)
-	local wrd,rest = check_and_set_help(me,txt,owner,"[list <page> | give | take | pas_b400 ]")
+	local wrd,rest = check_and_set_help(me,txt,owner,"[list <page> | clear | give | take | save <filename> | load <filename> ]")
 	if not (wrd) then return end
 
 	if (wrd == "give") then
@@ -1896,52 +1956,25 @@ function cmd.info(me,txt,owner,p)
 	elseif (wrd == "take") then
 		disable_info(rest)
 		return "info:= disabled"
-	elseif (wrd == "clear") then 
+	elseif (wrd == "clear") then
+		local info_list = {}
 		local function itr(id,info)
-			disable_info(info)
+			table.insert(info_list,info)
 		end
 		alife():iterate_info(0,itr)
-		return "info:= all info portions removed from actor"
-	elseif (wrd == "pas_b400") then
-		give_info("pas_b400_task_given")
-		give_info("pas_b400_underpass_start")
-		give_info("pas_b400_sr_elevator_1_passed")
-		give_info("pas_b400_canalisation_done")
-		give_info("pas_b400_done")
-		give_info("jup_b218_monolith_hired")
-		give_info("pas_b400_elevator_done")
-		give_info("pas_b400_sr_elevator_5")
-		give_info("pas_b400_track_done")
-		give_info("pas_b400_sr_track_4")
-		give_info("pas_b400_downstairs_done")
-		give_info("pas_b400_sr_downstairs_2")
-		give_info("pas_b400_tunnel_done")
-		give_info("pas_b400_snork_tunnel_4_attack")
-		give_info("pas_b400_snork_tunnel_2_jumped")
-		give_info("pas_b400_snork_tunnel_3_jumped")
-		give_info("pas_b400_sr_tunnel_5_in")
-		give_info("pas_b400_hall_done")
-		give_info("pas_b400_hall_monolith_squad_dead")
-		give_info("pas_b400_hall_monolith_snipers_dead")
-		give_info("pas_b400_way_done")
-		give_info("pas_b400_sr_way_2")
-		give_info("pas_b400_canalisation_snork_rl_spawned")
-		give_info("pas_b400_disabled_ui")
-		give_info("jup_a10_vano_agree_go_und")
-		give_info("leader_achievement_gained")
-		give_info("jup_b218_soldier_hired")
-
-		if (xr_conditions.squad_exist(db.actor,db.actor,{"jup_b15_zulus_squad"})) then
-			xr_effects.create_squad_member(db.actor,db.actor,{"jup_b218_vano_in_suit","jup_b15_zulus_squad","jup_a6_jup_b218_squad_member_arrive_walk"})
-			xr_effects.create_squad_member(db.actor,db.actor,{"pri_a15_sokolov_sci","jup_b15_zulus_squad","jup_a6_jup_b218_squad_member_arrive_walk"})
-			xr_effects.create_squad_member(db.actor,db.actor,{"jup_b4_monolith_squad_leader_freedom_mon_skin","jup_b15_zulus_squad","jup_a6_jup_b218_squad_member_arrive_walk"})
+		for i,info in ipairs(info_list) do 
+			disable_info(info)
 		end
-		return "info:= jupiter underpass info given to actor"
-	end
-
-
-	if (wrd == "list") then
-		if not (xrs_debug_tools.actor_info) then
+		return "info:= all info portions removed from actor"
+	elseif (wrd == "list") then
+		local info_list = {}
+		local function itr(id,info)
+			table.insert(info_list,info)
+		end
+		alife():iterate_info(0,itr)
+		
+		local list_sz = #info_list
+		if (list_sz == 0) then 
 			return "info:= actor_info empty"
 		end
 
@@ -1958,11 +1991,6 @@ function cmd.info(me,txt,owner,p)
 
 		if not (sz) or (sz == 0) then return "info:= error" end
 
-		local list_sz = 0
-		for k,v in pairs(xrs_debug_tools.actor_info) do
-			list_sz = list_sz + 1
-		end
-
 		local page_count = math.ceil(list_sz/sz)
 		if (page > page_count) then
 			return list_sz > 0 and "info: nothing in list" or "info:= Invaild page"
@@ -1970,17 +1998,53 @@ function cmd.info(me,txt,owner,p)
 
 		owner:SendOutput("info:= Infoportions [%s of %s]",page,page_count)
 
-		local a = {}
-		for n in pairs(xrs_debug_tools.actor_info) do table.insert(a, n) end
-		table.sort(a)
+		table.sort(info_list)
 
 		local ind, out, k
 		for i=1,sz do
 			ind = (page*sz - sz) + i
-			k = ind > 0 and a[ind]
+			k = ind > 0 and info_list[ind]
 			owner:SendOutput(k or " ")
 		end
 		return
+	elseif (wrd == "save") then
+		if (rest == nil or rest == "") then 
+			return "info:= save command must have a filename! ex. info save my_list"
+		end 
+		
+		local info_list = {}
+		local function itr(id,info)
+			table.insert(info_list,info)
+		end
+		alife():iterate_info(0,itr)
+		table.sort(info_list)
+		
+		str = "[info]\n"
+		for i,info in ipairs(info_list) do 
+			str = str .. info .. "\n"
+		end
+		
+		local cfg = io.open(rest .. ".ltx","w+")
+		cfg:write(str)
+		cfg:close()
+	
+		return "info:= save was a success!"	
+	elseif (wrd == "load") then
+		if (rest == nil or rest == "") then 
+			return "info:= load command must have a filename! ex. info load my_list"
+		end
+		
+		local info_ini = alun_utils.cfg_file(rest..".ltx",true)
+		if not (info_ini) then 
+			return "info:= failed to load " .. rest
+		end
+		
+		-- give all infos
+		for field,value in pairs(info_ini.root["info"]) do 
+			give_info(field) 
+		end
+
+		return "info:= load was a success!"
 	end
 	return "info:= type info help for a list of subcommands"
 end
@@ -2004,9 +2068,8 @@ function cmd.inventory_owner(me,txt,owner,p)
 		
 		local sim = alife()
 		local count = 0
-		for i=1,65534 do 
-			local se_obj = sim:object(i)
-			if (se_obj and se_obj.parent_id == id) then 
+		for id, se_obj in sim:objects() do
+			if (se_obj.parent_id == id) then 
 				sim:release(se_obj,true)
 				count = count + 1
 			end
@@ -2177,4 +2240,19 @@ function cmd.debug_visuals(me,txt,owner,p)
 		return "debug_visuals:= done!"
 	end
 	return "debug_visuals:= type debug_visuals help for a list of subcommands."
+end
+
+function cmd.gulag(me,txt,owner,p)
+	local wrd,rest = check_and_set_help(me,txt,owner,"[export]")
+	if (wrd) then
+		if (wrd  == "export") then 
+			local sim = alife()
+			for id, se_obj in sim:objects() do
+				if (se_obj:clsid() == clsid.smart_terrain) then 
+					gulag_general.load_job(se_obj,true)
+				end
+			end
+		end
+	end
+	return "gulag:= type gulag help for a list of subcommands."
 end

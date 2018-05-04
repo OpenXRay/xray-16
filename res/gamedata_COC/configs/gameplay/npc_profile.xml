@@ -245,6 +245,18 @@
 		<class>sim_default_csky_4</class>
 	</character>
 
+	<!-- sim renegade -->
+
+	<character id="sim_default_renegade_0">
+		<class>sim_default_renegade_0</class>
+	</character>
+	<character id="sim_default_renegade_1">
+		<class>sim_default_renegade_1</class>
+	</character>
+	<character id="sim_default_renegade_2">
+		<class>sim_default_renegade_2</class>
+	</character>
+
 <!-- Marsh -->
 
 	<character id="mar_smart_terrain_base_doctor">

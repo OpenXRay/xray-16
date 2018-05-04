@@ -190,12 +190,12 @@ function task_callback(tsk, state)
 		rtask.status = "fail"
 		
 		if (rtask.cancelled_by_actor) then
-			xr_statistic.inc_counter("tasks_cancelled")
+			dxr_statistics.increment_statistic("tasks_cancelled")
 			if (rtask.on_cancel) then
 				xr_logic.pick_section_from_condlist(db.actor, db.actor, rtask.on_cancel)
 			end
 		else
-			xr_statistic.inc_counter("tasks_failed")
+			dxr_statistics.increment_statistic("tasks_failed")
 			if (rtask.on_fail) then
 				xr_logic.pick_section_from_condlist(db.actor, db.actor, rtask.on_fail)
 			end
@@ -216,7 +216,7 @@ function task_callback(tsk, state)
 		end
 		rtask:give_reward()
 		rtask.status = "completed"
-		xr_statistic.inc_counter("tasks_completed")
+		dxr_statistics.increment_statistic("tasks_completed")
 		
 		if (rtask.repeat_timeout) then
 			rtask.cancelled_by_actor = nil

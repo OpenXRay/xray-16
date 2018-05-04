@@ -1,5 +1,8 @@
 [logic]
-active = sr_idle@teleport
+active = sr_idle@check_story
+
+[sr_idle@check_story]
+on_info = {+story_mode_disabled} sr_idle@nil, sr_idle@teleport
 
 [sr_idle@teleport]
 ;on_timer = 7000 | sr_cutscene@osoznanie_cam %=teleport_actor(oso_actor_walk:oso_actor_look)%

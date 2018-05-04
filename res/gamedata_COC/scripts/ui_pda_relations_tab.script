@@ -9,13 +9,13 @@ class "pda_relations_tab" (CUIScriptWnd)
 function pda_relations_tab:__init() super()
 	self.list = {
 		"stalker",
+		"bandit",
 		"dolg",
 		"freedom",
 		"csky",
-		"ecolog",
 		"killer",
+		"ecolog",
 		"army",
-		"bandit",
 		"monolith"
 	}
 	
@@ -724,7 +724,7 @@ end
 --
 ---------------------------------------------------------------------------------------------------
 class "ui_companion_row" (CUIListBoxItem)
-function ui_companion_row:__init(owner,row,xml) super(140)
+function ui_companion_row:__init(owner,row,xml) super(owner,row,xml)
 	self:GetTextItem():SetText("")
 	self:SetWndSize(vector2():set(740,140))
 

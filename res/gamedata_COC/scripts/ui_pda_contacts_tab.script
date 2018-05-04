@@ -1,6 +1,6 @@
----------------------------------
------ Written by Darryl123 ------
----------------------------------
+--------------------------------
+----- Written by Darryl123 -----
+--------------------------------
 
 local SINGLETON = nil
 function get_ui()
@@ -119,7 +119,6 @@ function pda_contacts_tab:Reset()
 	
 	-- Loop through all currently online stalkers.
 	local display_list = {}
-	local m_data = alife_storage_manager.get_state()
 	for i=1, #db.OnlineStalkers do
 		local npc = db.storage[db.OnlineStalkers[i]]
 		npc = npc and npc.object or level.object_by_id(db.OnlineStalkers[i])
@@ -129,8 +128,12 @@ function pda_contacts_tab:Reset()
 			if (distance <= radius) then
 				if npc:relation(db.actor) ~= game_object.enemy then
 					if self.filter:GetCheck() then
-						if (m_data.actor_contacts and m_data.actor_contacts[db.OnlineStalkers[i]]) then
-							table.insert(display_list, npc)
+						local se_obj = alife_object(db.OnlineStalkers[i])
+						if (se_obj) then
+							local m_data = alife_storage_manager.get_se_obj_state(se_obj)
+							if (m_data and m_data.is_actor_contact) then
+								table.insert(display_list, npc)
+							end
 						end
 					else
 						table.insert(display_list, npc)
@@ -140,15 +143,19 @@ function pda_contacts_tab:Reset()
 		end
 	end
 	
-	-- Special case for Sidorovich and Forester.
+	-- Special cases for Sidorovich and Forester.
 	local function add_by_sid(sid)
 		local id = story_objects.object_id_by_story_id[sid]
 		if (id) then 
 			local npc = db.storage[id] and db.storage[id].object 
 			if (npc and db.actor:position():distance_to_sqr(npc:position()) <= radius) then 
 				if self.filter:GetCheck() then
-					if (m_data.actor_contacts and m_data.actor_contacts[id]) then
-						table.insert(display_list, npc)
+					local se_obj = alife_object(db.OnlineStalkers[i])
+					if (se_obj) then
+						local m_data = alife_storage_manager.get_se_obj_state(se_obj)
+						if (m_data and m_data.is_actor_contact) then
+							table.insert(display_list, npc)
+						end
 					end
 				else
 					table.insert(display_list, npc)
@@ -250,7 +257,7 @@ end
 
 -- Row constructor.
 class "ui_contact_row" (CUIListBoxItem)
-function ui_contact_row:__init(parent, row, xml) super(140)
+function ui_contact_row:__init(parent, row, xml) super(parent, row, xml)
 	self:GetTextItem():SetText("")
 	self:SetWndSize(vector2():set(740, 140))
 

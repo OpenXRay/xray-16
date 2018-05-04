@@ -660,7 +660,7 @@
     </specific_character>
 <specific_character id="sim_default_bandit_2_default_10" team_default = "1">
     <name>GENERATE_NAME_bandit</name>
-    <icon>ui_inGame2_bandit_2a</icon>
+    <icon>ui_inGame2_bandit_2s</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_bandit_2</class>
@@ -669,7 +669,7 @@
     <rank>2886</rank>
     <reputation>-25</reputation>
     <money min="500" max="1750" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit_2a</visual>
+    <visual>actors\stalker_bandit\stalker_bandit_2s</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_1.ltx"
@@ -682,7 +682,7 @@
     </specific_character>
 <specific_character id="sim_default_bandit_2_default_11" team_default = "1">
     <name>GENERATE_NAME_bandit</name>
-    <icon>ui_inGame2_bandit_2a</icon>
+    <icon>ui_inGame2_bandit_2s</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_bandit_2</class>
@@ -691,7 +691,7 @@
     <rank>2278</rank>
     <reputation>-353</reputation>
     <money min="500" max="1750" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit_2a</visual>
+    <visual>actors\stalker_bandit\stalker_bandit_2s</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_1.ltx"
@@ -713,7 +713,7 @@
     <rank>2032</rank>
     <reputation>-524</reputation>
     <money min="500" max="1750" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit5a</visual>
+    <visual>actors\stalker_bandit\stalker_bandit_5</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_1.ltx"
@@ -735,7 +735,7 @@
     <rank>2150</rank>
     <reputation>169</reputation>
     <money min="500" max="1750" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit5b</visual>
+    <visual>actors\stalker_bandit\stalker_bandit5a</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_1.ltx"
@@ -757,7 +757,7 @@
     <rank>1960</rank>
     <reputation>-357</reputation>
     <money min="500" max="1750" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit5c</visual>
+    <visual>actors\stalker_bandit\stalker_bandit5b</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_1.ltx"
@@ -779,7 +779,7 @@
     <rank>1068</rank>
     <reputation>2196</reputation>
     <money min="500" max="1750" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit5d</visual>
+    <visual>actors\stalker_bandit\stalker_bandit5c</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_1.ltx"
@@ -792,7 +792,7 @@
     </specific_character>
 <specific_character id="sim_default_bandit_2_default_16" team_default = "1">
     <name>GENERATE_NAME_bandit</name>
-    <icon>ui_inGame2_bandit2a_old</icon>
+    <icon>ui_inGame2_bandit_2s_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_bandit_2</class>
@@ -801,7 +801,7 @@
     <rank>12610</rank>
     <reputation>646</reputation>
     <money min="500" max="1750" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit2a_old</visual>
+    <visual>actors\stalker_bandit\stalker_bandit_2s_old</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -814,7 +814,7 @@
     </specific_character>
 <specific_character id="sim_default_bandit_2_default_17" team_default = "1">
     <name>GENERATE_NAME_bandit</name>
-    <icon>ui_inGame2_bandit_2a_merc</icon>
+    <icon>ui_inGame2_bandit_2s_merc</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_bandit_2</class>
@@ -823,7 +823,7 @@
     <rank>11402</rank>
     <reputation>-213</reputation>
     <money min="500" max="1750" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit_2a_merc</visual>
+    <visual>actors\stalker_bandit\stalker_bandit_2s_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -836,7 +836,7 @@
     </specific_character>
 <specific_character id="sim_default_bandit_2_default_18" team_default = "1">
     <name>GENERATE_NAME_bandit</name>
-    <icon>ui_inGame2_bandit_2a_gp5</icon>
+    <icon>ui_inGame2_bandit_2s_gp5</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_bandit_2</class>
@@ -845,7 +845,7 @@
     <rank>7900</rank>
     <reputation>2191</reputation>
     <money min="500" max="1750" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit_2a_gp5</visual>
+    <visual>actors\stalker_bandit\stalker_bandit_2s_gp5</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_2.ltx"
@@ -867,7 +867,7 @@
     <rank>11650</rank>
     <reputation>1349</reputation>
     <money min="500" max="1750" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit6a</visual>
+    <visual>actors\stalker_bandit\stalker_bandit_5_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -911,7 +911,7 @@
     <rank>14756</rank>
     <reputation>-2037</reputation>
     <money min="500" max="1750" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit6b</visual>
+    <visual>actors\stalker_bandit\stalker_bandit5a_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -933,7 +933,7 @@
     <rank>13058</rank>
     <reputation>203</reputation>
     <money min="500" max="1750" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit6c</visual>
+    <visual>actors\stalker_bandit\stalker_bandit5b_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -955,7 +955,7 @@
     <rank>13612</rank>
     <reputation>774</reputation>
     <money min="500" max="1750" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit6d</visual>
+    <visual>actors\stalker_bandit\stalker_bandit5c_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -977,7 +977,7 @@
     <rank>13154</rank>
     <reputation>-1887</reputation>
     <money min="500" max="1750" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit6e</visual>
+    <visual>actors\stalker_bandit\stalker_bandit_4_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -999,7 +999,7 @@
     <rank>10222</rank>
     <reputation>1515</reputation>
     <money min="500" max="1750" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit6f</visual>
+    <visual>actors\stalker_bandit\stalker_bandit4a_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -1021,7 +1021,7 @@
     <rank>12648</rank>
     <reputation>-1710</reputation>
     <money min="500" max="1750" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit6g</visual>
+    <visual>actors\stalker_bandit\stalker_bandit4b_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -1043,7 +1043,7 @@
     <rank>12592</rank>
     <reputation>1879</reputation>
     <money min="500" max="1750" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit6h</visual>
+    <visual>actors\stalker_bandit\stalker_bandit4c_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -1078,7 +1078,7 @@
     </specific_character>
 <specific_character id="sim_default_bandit_2_default_4" team_default = "1">
     <name>GENERATE_NAME_bandit</name>
-    <icon>ui_inGame2_band_2_mask</icon>
+    <icon>ui_inGame2_bandit_2_merc</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_bandit_2</class>
@@ -1087,7 +1087,7 @@
     <rank>13208</rank>
     <reputation>-2</reputation>
     <money min="500" max="1750" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_band_2_mask</visual>
+    <visual>actors\stalker_bandit\stalker_bandit_2_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -1100,7 +1100,7 @@
     </specific_character>
 <specific_character id="sim_default_bandit_2_default_5" team_default = "1">
     <name>GENERATE_NAME_bandit</name>
-    <icon>ui_inGame2_band_2_mask</icon>
+    <icon>ui_inGame2_bandit_2_merc</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_bandit_2</class>
@@ -1109,7 +1109,7 @@
     <rank>13528</rank>
     <reputation>1826</reputation>
     <money min="500" max="1750" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_band2a_mask</visual>
+    <visual>actors\stalker_bandit\stalker_bandit2a_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -1265,7 +1265,7 @@
     <rank>1294</rank>
     <reputation>277</reputation>
     <money min="3000" max="4000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit5a</visual>
+    <visual>actors\stalker_bandit\stalker_bandit_5</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_2.ltx"
@@ -1288,7 +1288,7 @@
     <rank>2212</rank>
     <reputation>1228</reputation>
     <money min="3000" max="4000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit5b</visual>
+    <visual>actors\stalker_bandit\stalker_bandit5a</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_2.ltx"
@@ -1311,7 +1311,7 @@
     <rank>1318</rank>
     <reputation>-2481</reputation>
     <money min="3000" max="4000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit5c</visual>
+    <visual>actors\stalker_bandit\stalker_bandit5b</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_2.ltx"
@@ -1334,7 +1334,7 @@
     <rank>2328</rank>
     <reputation>433</reputation>
     <money min="3000" max="4000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit5d</visual>
+    <visual>actors\stalker_bandit\stalker_bandit5c</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_2.ltx"
@@ -1348,7 +1348,7 @@
     </specific_character>
 <specific_character id="sim_default_bandit_3_default_14" team_default = "1">
     <name>GENERATE_NAME_bandit</name>
-    <icon>ui_inGame2_bandit2a_old</icon>
+    <icon>ui_inGame2_bandit_2s_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_bandit_3</class>
@@ -1357,7 +1357,7 @@
     <rank>11226</rank>
     <reputation>-545</reputation>
     <money min="3000" max="4000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit2a_old</visual>
+    <visual>actors\stalker_bandit\stalker_bandit_2s_old</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -1371,7 +1371,7 @@
     </specific_character>
 <specific_character id="sim_default_bandit_3_default_15" team_default = "1">
     <name>GENERATE_NAME_bandit</name>
-    <icon>ui_inGame2_bandit_2a_merc</icon>
+    <icon>ui_inGame2_bandit_2s_merc</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_bandit_3</class>
@@ -1380,7 +1380,7 @@
     <rank>14942</rank>
     <reputation>-2209</reputation>
     <money min="3000" max="4000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit_2a_merc</visual>
+    <visual>actors\stalker_bandit\stalker_bandit_2s_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -1394,7 +1394,7 @@
     </specific_character>
 <specific_character id="sim_default_bandit_3_default_16" team_default = "1">
     <name>GENERATE_NAME_bandit</name>
-    <icon>ui_inGame2_bandit_2a_gp5</icon>
+    <icon>ui_inGame2_bandit_2s_gp5</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_bandit_3</class>
@@ -1403,7 +1403,7 @@
     <rank>6814</rank>
     <reputation>2448</reputation>
     <money min="3000" max="4000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit_2a_gp5</visual>
+    <visual>actors\stalker_bandit\stalker_bandit_2s_gp5</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_2.ltx"
@@ -1426,7 +1426,7 @@
     <rank>14662</rank>
     <reputation>-300</reputation>
     <money min="3000" max="4000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit6a</visual>
+    <visual>actors\stalker_bandit\stalker_bandit_5_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -1449,7 +1449,7 @@
     <rank>10302</rank>
     <reputation>-574</reputation>
     <money min="3000" max="4000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit6b</visual>
+    <visual>actors\stalker_bandit\stalker_bandit5a_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -1472,7 +1472,7 @@
     <rank>12994</rank>
     <reputation>1385</reputation>
     <money min="3000" max="4000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit6c</visual>
+    <visual>actors\stalker_bandit\stalker_bandit5b_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -1518,7 +1518,7 @@
     <rank>12740</rank>
     <reputation>457</reputation>
     <money min="3000" max="4000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit6d</visual>
+    <visual>actors\stalker_bandit\stalker_bandit5c_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -1541,7 +1541,7 @@
     <rank>14974</rank>
     <reputation>1334</reputation>
     <money min="3000" max="4000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit6e</visual>
+    <visual>actors\stalker_bandit\stalker_bandit_4_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -1564,7 +1564,7 @@
     <rank>13090</rank>
     <reputation>938</reputation>
     <money min="3000" max="4000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit6f</visual>
+    <visual>actors\stalker_bandit\stalker_bandit4a_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -1587,7 +1587,7 @@
     <rank>14132</rank>
     <reputation>931</reputation>
     <money min="3000" max="4000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit6g</visual>
+    <visual>actors\stalker_bandit\stalker_bandit4b_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -1610,7 +1610,7 @@
     <rank>11352</rank>
     <reputation>1852</reputation>
     <money min="3000" max="4000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit6h</visual>
+    <visual>actors\stalker_bandit\stalker_bandit4c_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -1739,7 +1739,7 @@
     </specific_character>
 <specific_character id="sim_default_bandit_3_default_8" team_default = "1">
     <name>GENERATE_NAME_bandit</name>
-    <icon>ui_inGame2_bandit_2a</icon>
+    <icon>ui_inGame2_bandit_2s</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_bandit_3</class>
@@ -1748,7 +1748,7 @@
     <rank>2414</rank>
     <reputation>1916</reputation>
     <money min="3000" max="4000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit_2a</visual>
+    <visual>actors\stalker_bandit\stalker_bandit_2s</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_2.ltx"
@@ -1762,7 +1762,7 @@
     </specific_character>
 <specific_character id="sim_default_bandit_3_default_9" team_default = "1">
     <name>GENERATE_NAME_bandit</name>
-    <icon>ui_inGame2_bandit_2a</icon>
+    <icon>ui_inGame2_bandit_2s</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_bandit_3</class>
@@ -1771,7 +1771,7 @@
     <rank>2088</rank>
     <reputation>-262</reputation>
     <money min="3000" max="4000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit_2a</visual>
+    <visual>actors\stalker_bandit\stalker_bandit_2s</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_2.ltx"
@@ -1840,7 +1840,7 @@
     <rank>11338</rank>
     <reputation>1682</reputation>
     <money min="4000" max="8000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit6a</visual>
+    <visual>actors\stalker_bandit\stalker_bandit_5_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -1863,7 +1863,7 @@
     <rank>12634</rank>
     <reputation>1905</reputation>
     <money min="4000" max="8000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit6b</visual>
+    <visual>actors\stalker_bandit\stalker_bandit5a_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -1886,7 +1886,7 @@
     <rank>10216</rank>
     <reputation>-2155</reputation>
     <money min="4000" max="8000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit6c</visual>
+    <visual>actors\stalker_bandit\stalker_bandit5b_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -1909,7 +1909,7 @@
     <rank>10718</rank>
     <reputation>431</reputation>
     <money min="4000" max="8000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit6d</visual>
+    <visual>actors\stalker_bandit\stalker_bandit5c_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -1969,7 +1969,7 @@
     </specific_character>
 <specific_character id="sim_default_bandit_4_default_4" team_default = "1">
     <name>GENERATE_NAME_bandit</name>
-    <icon>ui_inGame2_band_2_mask</icon>
+    <icon>ui_inGame2_bandit_2_merc</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_bandit_4</class>
@@ -1978,7 +1978,7 @@
     <rank>10688</rank>
     <reputation>917</reputation>
     <money min="4000" max="8000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_band2a_mask</visual>
+    <visual>actors\stalker_bandit\stalker_bandit2a_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -1992,7 +1992,7 @@
     </specific_character>
 <specific_character id="sim_default_bandit_4_default_5" team_default = "1">
     <name>GENERATE_NAME_bandit</name>
-    <icon>ui_inGame2_band_2_mask</icon>
+    <icon>ui_inGame2_bandit_2_merc</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_bandit_4</class>
@@ -2001,7 +2001,7 @@
     <rank>10770</rank>
     <reputation>-996</reputation>
     <money min="4000" max="8000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_band_2_mask</visual>
+    <visual>actors\stalker_bandit\stalker_bandit_2_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -2015,7 +2015,7 @@
     </specific_character>
 <specific_character id="sim_default_bandit_4_default_6" team_default = "1">
     <name>GENERATE_NAME_bandit</name>
-    <icon>ui_inGame2_bandit_2a</icon>
+    <icon>ui_inGame2_bandit_2s</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_bandit_4</class>
@@ -2024,7 +2024,7 @@
     <rank>1846</rank>
     <reputation>-1306</reputation>
     <money min="4000" max="8000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit_2a</visual>
+    <visual>actors\stalker_bandit\stalker_bandit_2s</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_2.ltx"
@@ -2038,7 +2038,7 @@
     </specific_character>
 <specific_character id="sim_default_bandit_4_default_7" team_default = "1">
     <name>GENERATE_NAME_bandit</name>
-    <icon>ui_inGame2_bandit2a_old</icon>
+    <icon>ui_inGame2_bandit_2s_old</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_bandit_4</class>
@@ -2047,7 +2047,7 @@
     <rank>10920</rank>
     <reputation>-1108</reputation>
     <money min="4000" max="8000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit2a_old</visual>
+    <visual>actors\stalker_bandit\stalker_bandit_2s_old</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -2061,7 +2061,7 @@
     </specific_character>
 <specific_character id="sim_default_bandit_4_default_8" team_default = "1">
     <name>GENERATE_NAME_bandit</name>
-    <icon>ui_inGame2_bandit_2a_merc</icon>
+    <icon>ui_inGame2_bandit_2s_merc</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_bandit_4</class>
@@ -2070,7 +2070,7 @@
     <rank>10320</rank>
     <reputation>-12</reputation>
     <money min="4000" max="8000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit_2a_merc</visual>
+    <visual>actors\stalker_bandit\stalker_bandit_2s_merc</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_3.ltx"
@@ -2084,7 +2084,7 @@
     </specific_character>
 <specific_character id="sim_default_bandit_4_default_9" team_default = "1">
     <name>GENERATE_NAME_bandit</name>
-    <icon>ui_inGame2_bandit_2a_gp5</icon>
+    <icon>ui_inGame2_bandit_2s_gp5</icon>
     <map_icon x="1" y="0"></map_icon>
     <bio>Опытный сталкер. Детальная информация отсутствует.</bio>
     <class>sim_default_bandit_4</class>
@@ -2093,7 +2093,7 @@
     <rank>8244</rank>
     <reputation>-875</reputation>
     <money min="4000" max="8000" infinitive="0"/>
-    <visual>actors\stalker_bandit\stalker_bandit_2a_gp5</visual>
+    <visual>actors\stalker_bandit\stalker_bandit_2s_gp5</visual>
     <supplies>
 #include "gameplay\loadouts\bandit_base.ltx"
 #include "gameplay\loadouts\bandit_tier_2.ltx"

@@ -12,7 +12,10 @@ on_info = {=get_start_time_elapsed_ge(172800) =is_day -actor_is_sleeping !is_fac
 on_actor_outside = sr_idle@wait_for_actor
 
 [sr_idle@decide]
-on_info = {~50} sr_idle@timer, sr_idle@spawn1 %=give_task(faction_base_defense) =start_surge +yantar_faction_base_defense_quest_started%
+on_info = {~50} sr_idle@timer, sr_idle@wait_for_sakharov %=give_task(faction_base_defense) =start_surge +yantar_faction_base_defense_quest_started%
+
+[sr_idle@wait_for_sakharov]
+on_timer = 5000 | sr_idle@spawn1 %=yan_saharov_message(about_storm)%
 
 [sr_idle@spawn1]
 on_info = {!is_actor_surge_immuned} %=actor_surge_immuned(true)%
