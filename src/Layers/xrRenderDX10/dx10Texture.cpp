@@ -20,6 +20,9 @@ void fix_texture_name(LPSTR fn)
 
 int get_texture_load_lod(LPCSTR fn)
 {
+    if (strstr(fn, "act_mutant_boar_u"))
+        return 0;
+
     CInifile::Sect& sect = pSettings->r_section("reduce_lod_texture_list");
     auto it_ = sect.Data.cbegin();
     auto it_e_ = sect.Data.cend();
