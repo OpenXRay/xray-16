@@ -363,6 +363,11 @@ void CRenderTarget::phase_combine()
        */
     RCache.set_Stencil(FALSE);
 
+    if (!_menu_pp)
+    {
+        if (ps_r_sun_shafts > 0 && ps_sunshafts_mode == R2SS_SCREEN_SPACE)
+            phase_sunshafts();
+    }
     //FXAA
     if (ps_r2_fxaa)
     {

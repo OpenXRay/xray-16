@@ -72,7 +72,7 @@ XRCORE_API void log_vminfo()
 {
     size_t w_free, w_reserved, w_committed;
     vminfo(&w_free, &w_reserved, &w_committed);
-#ifdef _WIN64
+#ifdef XR_X64
     Msg("* [win32]: free[%I64d MB], reserved[%u KB], committed[%u KB]", w_free / (1024 * 1024), w_reserved / 1024,
         w_committed / 1024);
 #else

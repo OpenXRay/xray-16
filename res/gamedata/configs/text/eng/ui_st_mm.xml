@@ -936,4 +936,16 @@
 	<string id="ui_mm_confirm_changes">
 		<text>Apply changes? All changes will be reverted in</text>
 	</string>
+	<string id="ui_mm_r2_sun_shafts_mode">
+		<text>Sunshafts mode</text>
+	</string>
+	<string id="volumetric">
+		<text>Volumetric</text>
+	</string>
+	<string id="screen_space">
+		<text>Screen Space</text>
+	</string>
+	<string id="manowar_ssss">
+		<text>Mrmnwar SS</text>
+	</string>
 </string_table>

@@ -936,4 +936,16 @@
 	<string id="ui_mm_confirm_changes">
 		<text>Применить сделанные изменения? Все изменения будут отменены через</text>
 	</string>
+	<string id="ui_mm_r2_sun_shafts_mode">
+		<text>Тип лучей</text>
+	</string>
+	<string id="volumetric">
+		<text>Volumetric</text>
+	</string>
+	<string id="screen_space">
+		<text>Screen Space</text>
+	</string>
+	<string id="manowar_ssss">
+		<text>Mrmnwar SS</text>
+	</string>
 </string_table>

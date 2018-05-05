@@ -9,6 +9,8 @@ Texture2D jitter1;
 Texture2D s_noise;
 Texture2D s_sun_shafts; // current sunshafts texture
 uniform float4 screen_res;
+uniform float3 L_sun_dir_e;
+sampler smp_jitter;
 
 float3 blendSoftLight(float3 a, float3 b)
 {
@@ -37,7 +39,7 @@ float4 main(v2p_ssss I) : SV_Target
 	cSunShafts += s_sun_shafts.Sample(smp_rtlinear, I.tc0.xy - sun_vec_screen.yx * screen_res.zw) * 0.25h;
 #	endif
 #endif
-	float3 img = tex2D(s_image, I.tc0.xy).xyz;
+	float3 img = s_image.Sample(smp_rtlinear, I.tc0.xy).xyz;
 
 	float dust_size = 8/SS_DUST_SIZE;
 	float3 jit;
