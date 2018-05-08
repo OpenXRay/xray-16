@@ -2302,6 +2302,9 @@
     <Filter Include="Core\Client\Objects\items &amp; weapons\Weapons\WeaponScript">
       <UniqueIdentifier>{245227f7-4bb6-4358-956a-5be1e1850c9c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ScriptClasses\ScriptMap">
+      <UniqueIdentifier>{e1570b96-3a99-41b6-961e-e897402b732c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -10187,6 +10190,9 @@
     </ClCompile>
     <ClCompile Include="WeaponScript.cpp">
       <Filter>Core\Client\Objects\items &amp; weapons\Weapons\WeaponScript</Filter>
+    </ClCompile>
+    <ClCompile Include="map_script.cpp">
+      <Filter>ScriptClasses\ScriptMap</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
