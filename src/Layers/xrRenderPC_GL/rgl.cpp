@@ -1371,12 +1371,15 @@ HRESULT CRender::shader_compile(
             Log(shaderSrc);
             Log("Shader source end.");
         }
+        xr_free(shaderSrc);
 #endif
 
+        xr_free(_pErrorMsgs);
         CHK_GL(glDeleteShader(shader));
         return E_FAIL;
     }
 
+    xr_free(_pErrorMsgs);
     CHK_GL(glDeleteShader(shader));
     return S_OK;
 }
