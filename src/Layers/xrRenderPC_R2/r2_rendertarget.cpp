@@ -363,6 +363,11 @@ CRenderTarget::CRenderTarget()
         f_bloom_factor = 0.5f;
     }
 
+    //FXAA
+    s_fxaa.create(b_fxaa, "r3\\fxaa");
+    g_fxaa.create(FVF::F_V, RCache.Vertex.Buffer(), RCache.QuadIB);
+
+
     // HBAO
     if (RImplementation.o.ssao_opt_data)
     {
@@ -383,10 +388,6 @@ CRenderTarget::CRenderTarget()
         rt_half_depth.create(r2_RT_half_depth, w, h, fmt);
         s_ssao.create(b_ssao, "r2\\ssao");
     }
-
-    //FXAA
-    s_fxaa.create(b_fxaa, "r3\\fxaa");
-    g_fxaa.create(FVF::F_V, RCache.Vertex.Buffer(), RCache.QuadIB);
 
     // SSAO
     if (RImplementation.o.ssao_blur_on)

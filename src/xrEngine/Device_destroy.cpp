@@ -3,13 +3,14 @@
 #include "Render.h"
 #include "IGame_Persistent.h"
 #include "xr_IOConsole.h"
+#include "xr_input.h"
 
 void CRenderDevice::Destroy()
 {
     if (!b_is_Ready)
         return;
     Log("Destroying Direct3D...");
-    ShowCursor(true);
+    pInput->ClipCursor(false);
     GEnv.Render->ValidateHW();
     GEnv.DU->OnDeviceDestroy();
     b_is_Ready = false;
@@ -36,27 +37,33 @@ extern BOOL bNeed_re_create_env;
 
 void CRenderDevice::Reset(bool precache)
 {
-    u32 dwWidth_before = dwWidth;
-    u32 dwHeight_before = dwHeight;
+    const auto dwWidth_before = dwWidth;
+    const auto dwHeight_before = dwHeight;
+    pInput->ClipCursor(false);
+
+    const auto tm_start = TimerAsync();
+
+    GEnv.Render->Reset(m_hWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);
     GetWindowRect(m_hWnd, &m_rcWindowBounds);
     GetClientRect(m_hWnd, &m_rcWindowClient);
-    ShowCursor(true);
-    u32 tm_start = TimerAsync();
-    GEnv.Render->Reset(m_hWnd, dwWidth, dwHeight, fWidth_2, fHeight_2);
+
     if (g_pGamePersistent)
         g_pGamePersistent->Environment().bNeed_re_create_env = true;
     _SetupStates();
+
     if (precache)
         PreCache(20, true, false);
-    u32 tm_end = TimerAsync();
+
+    const auto tm_end = TimerAsync();
     Msg("*** RESET [%d ms]", tm_end - tm_start);
+
     // TODO: Remove this! It may hide crash
     Memory.mem_compact();
-
-    if (!GEnv.isDedicatedServer)
-        ShowCursor(false);
 
     seqDeviceReset.Process(rp_DeviceReset);
     if (dwWidth_before != dwWidth || dwHeight_before != dwHeight)
         seqResolutionChanged.Process(rp_ScreenResolutionChanged);
+
+    if (!GEnv.isDedicatedServer)
+        pInput->ClipCursor(true);
 }

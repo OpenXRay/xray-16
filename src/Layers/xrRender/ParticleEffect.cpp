@@ -437,8 +437,10 @@ void ParticleRenderStream(void* lpvParams)
     TAL_AddRelationThis(TAL_RELATION_IS_CHILD_OF, rtID);
 #endif // _GPA_ENABLED
 
-    float sina = 0.f, cosa = 1.f;
-    float angle = 0.f;
+    float sina = 0.0f, cosa = 0.0f;
+    // Xottab_DUTY: changed angle to be float instead of DWORD
+    // But it must be 0xFFFFFFFF or otherwise some particles won't play
+    float angle = 0xFFFFFFFF;
 
     PRS_PARAMS* pParams = (PRS_PARAMS*)lpvParams;
 
@@ -455,21 +457,14 @@ void ParticleRenderStream(void* lpvParams)
         lt.set(0.f, 0.f);
         rb.set(1.f, 1.f);
 
-        bool isNan = false;
-        if (std::isnan(m.rot.x))
-            isNan = true;
-
         _mm_prefetch((char*)&particles[i + 1], _MM_HINT_NTA);
 
-        if (/*!std::isnan(m.rot.x) &&*/ angle != m.rot.x)
+        if (angle != m.rot.x)
         {
             angle = m.rot.x;
             sina = std::sinf(angle);
             cosa = std::cosf(angle);
         }
-
-        if (isNan)
-            VERIFY("ParticleRenderStream -> IS NAN!");
 
         _mm_prefetch(64 + (char*)&particles[i + 1], _MM_HINT_NTA);
 
@@ -495,8 +490,6 @@ void ParticleRenderStream(void* lpvParams)
                 magnitude_sse(m.vel, speed);
             if ((speed < EPS_S) && pPE.m_Def->m_Flags.is(CPEDef::dfWorldAlign))
             {
-                if (isNan && IsDebuggerPresent())
-                    __debugbreak();
                 Fmatrix M;
                 M.setXYZ(pPE.m_Def->m_APDefaultRotation);
                 if (pPE.m_RT_Flags.is(CParticleEffect::flRT_XFORM))
@@ -510,8 +503,6 @@ void ParticleRenderStream(void* lpvParams)
                 {
                     FillSprite(pv, M.k, M.i, m.pos, lt, rb, r_x, r_y, m.color, sina, cosa);
                 }
-                if (isNan)
-                    VERIFY("ParticleRenderStream -> FillSprite exited!");
             }
             else if ((speed >= EPS_S) && pPE.m_Def->m_Flags.is(CPEDef::dfFaceAlign))
             {

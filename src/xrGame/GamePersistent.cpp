@@ -637,7 +637,10 @@ void CGamePersistent::OnFrame()
     super::OnFrame();
 
     if (!Device.Paused())
+    {
         Engine.Sheduler.Update();
+        Engine.Scheduler.ProcessStep();
+    }
 
     // update weathers ambient
     if (!Device.Paused())
@@ -745,18 +748,12 @@ void CGamePersistent::OnAppActivate()
     bIsMP &= !Device.Paused();
 
     if (!bIsMP)
-    {
         Device.Pause(FALSE, !bRestorePause, TRUE, "CGP::OnAppActivate");
-    }
     else
-    {
         Device.Pause(FALSE, TRUE, TRUE, "CGP::OnAppActivate MP");
-    }
 
     bEntryFlag = TRUE;
-    if (!GEnv.isDedicatedServer)
-        pInput->ClipCursor(GetUICursor().IsVisible());
-
+	
     while (ShowCursor(false) > 0);
 }
 
@@ -779,7 +776,6 @@ void CGamePersistent::OnAppDeactivate()
         Device.Pause(TRUE, FALSE, TRUE, "CGP::OnAppDeactivate MP");
     }
     bEntryFlag = FALSE;
-    pInput->ClipCursor(false);
 }
 
 bool CGamePersistent::OnRenderPPUI_query()

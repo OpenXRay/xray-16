@@ -304,7 +304,7 @@ void CRenderDevice::on_idle()
         renderTotalReal.FrameEnd();
         stats.RenderTotal.accum = renderTotalReal.accum;
     }
-    
+	
     syncFrameDone.Wait(); // wait until secondary thread finish its job
     //renderFrameDone.Wait(); // wait until render thread finish its job
     
@@ -388,6 +388,7 @@ void CRenderDevice::Run()
     GEnv.Render->ClearTarget();
     splash::hide();
     ShowWindow(m_hWnd, SW_SHOWNORMAL);
+    pInput->ClipCursor(true);
     message_loop();
     seqAppEnd.Process(rp_AppEnd);
     // Stop Balance-Thread
@@ -513,15 +514,9 @@ void CRenderDevice::OnWM_Activate(WPARAM wParam, LPARAM /*lParam*/)
 
     const BOOL isWndActive = (fActive != WA_INACTIVE && !fMinimized) ? TRUE : FALSE;
     if (!editor() && !GEnv.isDedicatedServer && isWndActive)
-    {
         pInput->ClipCursor(true);
-        ShowCursor(FALSE);
-    }
     else
-    {
         pInput->ClipCursor(false);
-        ShowCursor(TRUE);
-    }
 
     extern int ps_always_active;
     const BOOL isGameActive = ps_always_active || isWndActive;

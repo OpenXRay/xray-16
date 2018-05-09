@@ -5,22 +5,15 @@
 #pragma hdrstop
 
 #include "Layers/xrRender/HW.h"
+#include "xrEngine/xr_input.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "Include/xrAPI/xrAPI.h"
 #include "xrCore/xr_token.h"
 
-#ifndef _EDITOR
+extern ENGINE_API xr_vector<xr_token> AvailableVideoModes;
+
 void fill_vid_mode_list(CHW* _hw);
 void free_vid_mode_list();
-
-void fill_render_mode_list();
-void free_render_mode_list();
-#else
-void	fill_vid_mode_list			(CHW* _hw)	{}
-void	free_vid_mode_list			()			{}
-void	fill_render_mode_list		()			{}
-void	free_render_mode_list		()			{}
-#endif
 
 CHW HW;
 
@@ -165,9 +158,7 @@ void CHW::DestroyDevice()
         m_hDC = nullptr;
     }
 
-#ifndef _EDITOR
     free_vid_mode_list();
-#endif
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -258,73 +249,52 @@ void CHW::updateWindowProps(HWND m_hWnd)
         SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle = WS_POPUP | WS_VISIBLE);
     }
 
-    ShowCursor(FALSE);
     SetForegroundWindow(m_hWnd);
 }
 
-struct _uniq_mode
+struct uniqueRenderingMode
 {
-    _uniq_mode(LPCSTR v): _val(v) {}
-    LPCSTR _val;
-    bool operator()(LPCSTR _other) { return !xr_stricmp(_val, _other); }
+    uniqueRenderingMode(pcstr v) : value(v) {}
+    pcstr value;
+    bool operator()(const xr_token other) const { return !xr_stricmp(value, other.name); }
 };
-
-#ifndef _EDITOR
 
 void free_vid_mode_list()
 {
-    for (int i = 0; GEnv.vid_mode_token[i].name; i++)
-    {
-        xr_free(GEnv.vid_mode_token[i].name);
-    }
-    xr_free(GEnv.vid_mode_token);
-    GEnv.vid_mode_token = nullptr;
+    for (auto& mode : AvailableVideoModes)
+        xr_free(mode.name);
+    AvailableVideoModes.clear();
 }
 
 void fill_vid_mode_list(CHW* /*_hw*/)
 {
-    if (GEnv.vid_mode_token != nullptr) return;
-    xr_vector<LPCSTR> _tmp;
+    if (!AvailableVideoModes.empty())
+        return;
 
     DWORD iModeNum = 0;
     DEVMODE dmi;
     ZeroMemory(&dmi, sizeof dmi);
     dmi.dmSize = sizeof dmi;
 
+    int i = 0;
+    auto& AVM = AvailableVideoModes;
     while (EnumDisplaySettings(nullptr, iModeNum++, &dmi) != 0)
     {
         string32 str;
 
-        if (dmi.dmPelsWidth < 800)
+        xr_sprintf(str, sizeof(str), "%dx%d", dmi.dmPelsWidth, dmi.dmPelsHeight);
+
+        if (AVM.cend() != find_if(AVM.cbegin(), AVM.cend(), uniqueRenderingMode(str)))
             continue;
 
-        sprintf_s(str, sizeof str, "%dx%d", dmi.dmPelsWidth, dmi.dmPelsHeight);
-
-        if (_tmp.end() != find_if(_tmp.begin(), _tmp.end(), _uniq_mode(str)))
-            continue;
-
-        _tmp.push_back(nullptr);
-        _tmp.back() = xr_strdup(str);
+        AVM.emplace_back(xr_token(xr_strdup(str), i));
+        ++i;
     }
+    AVM.emplace_back(xr_token(nullptr, -1));
 
-    u32 _cnt = _tmp.size() + 1;
-
-    GEnv.vid_mode_token = xr_alloc<xr_token>(_cnt);
-
-    GEnv.vid_mode_token[_cnt - 1].id = -1;
-    GEnv.vid_mode_token[_cnt - 1].name = nullptr;
-
-#ifdef DEBUG
-	Msg("Available video modes[%d]:", _tmp.size());
-#endif // DEBUG
-    for (u32 i = 0; i < _tmp.size(); ++i)
-    {
-        GEnv.vid_mode_token[i].id = i;
-        GEnv.vid_mode_token[i].name = _tmp[i];
-#ifdef DEBUG
-		Msg("[%s]", _tmp[i]);
-#endif // DEBUG
-    }
+    Msg("Available video modes[%d]:", AVM.size());
+    for (const auto& mode : AVM)
+        Msg("[%s]", mode.name);
 }
 
 
@@ -498,4 +468,3 @@ HRESULT CHW::Present(UINT /*SyncInterval*/, UINT /*Flags*/)
     RImplementation.Target->phase_flip();
     return SwapBuffers(m_hDC) ? S_OK : E_FAIL;
 }
-#endif

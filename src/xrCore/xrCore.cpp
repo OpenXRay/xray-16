@@ -18,10 +18,10 @@ static u32 init_counter = 0;
 
 void xrCore::Initialize(pcstr _ApplicationName, LogCallback cb, bool init_fs, pcstr fs_fname, bool plugin)
 {
-    CalculateBuildId();
     xr_strcpy(ApplicationName, _ApplicationName);
     if (0 == init_counter)
     {
+        CalculateBuildId();
         PluginMode = plugin;
         // Init COM so we can use CoCreateInstance
         // HRESULT co_res =

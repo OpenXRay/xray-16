@@ -635,6 +635,10 @@ CRenderTarget::CRenderTarget()
         u_setrt(Device.dwWidth, Device.dwHeight, HW.pBaseRT, NULL, NULL, HW.pBaseZB);
     }
 
+    //FXAA
+    s_fxaa.create(b_fxaa, "r3\\fxaa");
+    g_fxaa.create(FVF::F_V, RCache.Vertex.Buffer(), RCache.QuadIB);
+
     // HBAO
     if (RImplementation.o.ssao_opt_data)
     {
@@ -657,25 +661,20 @@ CRenderTarget::CRenderTarget()
         s_ssao.create(b_ssao, "r2\\ssao");
     }
 
-    //FXAA
-    s_fxaa.create(b_fxaa, "r3\\fxaa");
-    g_fxaa.create(FVF::F_V, RCache.Vertex.Buffer(), RCache.QuadIB);
-
     if (RImplementation.o.ssao_blur_on)
     {
         u32 w = Device.dwWidth, h = Device.dwHeight;
         rt_ssao_temp.create(r2_RT_ssao_temp, w, h, D3DFMT_G16R16F, SampleCount);
         s_ssao.create(b_ssao, "r2\\ssao");
 
+        /* Should be used in r3_rendertarget_phase_ssao.cpp but it's commented there.
         if (RImplementation.o.dx10_msaa)
         {
-            int bound = RImplementation.o.dx10_msaa_opt ? 1 : RImplementation.o.dx10_msaa_samples;
+            const int bound = RImplementation.o.dx10_msaa_opt ? 1 : RImplementation.o.dx10_msaa_samples;
 
             for (int i = 0; i < bound; ++i)
-            {
                 s_ssao_msaa[i].create(b_ssao_msaa[i], "null");
-            }
-        }
+        }*/
     }
 
     // COMBINE

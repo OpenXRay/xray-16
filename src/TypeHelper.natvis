@@ -44,4 +44,15 @@
     <DisplayString>{NameObject.p_->value, s}, $(Type)</DisplayString>
   </Type>
 
+  <Type Name="CLocatorAPI::file">
+    <DisplayString>{name, s}</DisplayString>
+  </Type>
+  
+  <Type Name="CLocatorAPI::archive">
+    <DisplayString>{path, s}</DisplayString>
+  </Type>
+  
+  <Type Name="FS_Path">
+    <DisplayString>{m_Path, s}</DisplayString>
+  </Type>
 </AutoVisualizer>

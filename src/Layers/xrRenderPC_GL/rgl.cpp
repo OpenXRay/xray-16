@@ -34,15 +34,6 @@ public:
     void set_color(float /*r*/, float /*g*/, float /*b*/) override { }
 };
 
-bool CRender::is_sun()
-{
-    if (o.sunstatic)
-        return FALSE;
-
-    Fcolor sun_color = ((light*)Lights.sun_adapted._get())->color;
-    return (ps_r2_ls_flags.test(R2FLAG_SUN) && (u_diffuse2s(sun_color.r, sun_color.g, sun_color.b)>EPS));
-}
-
 float r_dtex_range = 50.f;
 //////////////////////////////////////////////////////////////////////////
 ShaderElement* CRender::rimp_select_sh_dynamic(dxRender_Visual* pVisual, float cdist_sq)
@@ -139,7 +130,7 @@ void CRender::create()
     m_MSAASample = -1;
 
     // hardware
-    o.smapsize = 1536;
+    o.smapsize = 2048;
     o.mrt = HW.Caps.raster.dwMRT_count >= 3;
     o.mrtmixdepth = HW.Caps.raster.b_MRT_mixdepth;
 
@@ -234,10 +225,7 @@ void CRender::create()
     o.nvdbt = false;
     if (o.nvdbt) Msg("* NV-DBT supported and used");
 
-    // options (smap-pool-size)
-    if (strstr(Core.Params, "-smap256")) o.smapsize = 256;
-    if (strstr(Core.Params, "-smap512")) o.smapsize = 512;
-    if (strstr(Core.Params, "-smap1024")) o.smapsize = 1024;
+    // options (smap-pool-size) // skyloader: if you want to resize smaps, then do not forget to change them in shaders too (common_defines.h)
     if (strstr(Core.Params, "-smap1536")) o.smapsize = 1536;
     if (strstr(Core.Params, "-smap2048")) o.smapsize = 2048;
     if (strstr(Core.Params, "-smap2560")) o.smapsize = 2560;
@@ -810,13 +798,22 @@ HRESULT CRender::shader_compile(
     u32 len = 0;
     // options
     {
-        xr_sprintf(c_smapsize, "%04d", u32(o.smapsize));
-        defines[def_it].Name = "SMAP_size";
-        defines[def_it].Definition = c_smapsize;
+		// skyloader: smap size changed to smap quality because something wrong happens with the conversion of defines to float data on amd videocards
+		u8 uSmapQuality = 2;
+		switch (o.smapsize)
+		{
+			case 1536: uSmapQuality = 1; break;
+			case 2048: uSmapQuality = 2; break;
+			case 2560: uSmapQuality = 3; break;
+			case 3072: uSmapQuality = 4; break;
+			case 4096: uSmapQuality = 5; break;
+		}
+        xr_sprintf						(c_smapsize, "%d", uSmapQuality);
+        defines[def_it].Name			= "SMAP_QUALITY";
+        defines[def_it].Definition		= c_smapsize;
         def_it++;
-        VERIFY(xr_strlen(c_smapsize) == 4);
-        xr_strcat(sh_name, c_smapsize);
-        len += 4;
+        xr_strcat						(sh_name, c_smapsize);
+        ++len;
     }
 
     if (o.fp16_filter)
@@ -1374,12 +1371,15 @@ HRESULT CRender::shader_compile(
             Log(shaderSrc);
             Log("Shader source end.");
         }
+        xr_free(shaderSrc);
 #endif
 
+        xr_free(_pErrorMsgs);
         CHK_GL(glDeleteShader(shader));
         return E_FAIL;
     }
 
+    xr_free(_pErrorMsgs);
     CHK_GL(glDeleteShader(shader));
     return S_OK;
 }

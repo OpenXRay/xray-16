@@ -1,24 +1,17 @@
 #include "stdafx.h"
 
 #include "Layers/xrRender/HW.h"
+#include "xrEngine/xr_input.h"
 #include "xrEngine/XR_IOConsole.h"
 #include "xrCore/xr_token.h"
 
 #include "StateManager/dx10SamplerStateCache.h"
 #include "StateManager/dx10StateCache.h"
 
-#ifndef _EDITOR
+extern ENGINE_API xr_vector<xr_token> AvailableVideoModes;
+
 void fill_vid_mode_list(CHW* _hw);
 void free_vid_mode_list();
-
-void fill_render_mode_list();
-void free_render_mode_list();
-#else
-void fill_vid_mode_list(CHW* _hw) {}
-void free_vid_mode_list() {}
-void fill_render_mode_list() {}
-void free_render_mode_list() {}
-#endif
 
 CHW HW;
 
@@ -189,7 +182,7 @@ void CHW::CreateDevice(HWND m_hWnd, bool move_window)
     //  Create render target and depth-stencil views here
     UpdateViews();
 
-    size_t memory = Desc.DedicatedVideoMemory;
+    const auto memory = Desc.DedicatedVideoMemory;
     Msg("*   Texture memory: %d M", memory / (1024 * 1024));
     //Msg("*        DDI-level: %2.1f", float(D3DXGetDriverLevel(pDevice)) / 100.f);
 #ifndef _EDITOR
@@ -231,9 +224,7 @@ void CHW::DestroyDevice()
 
     DestroyD3D();
 
-#ifndef _EDITOR
     free_vid_mode_list();
-#endif
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -293,9 +284,9 @@ void CHW::selectResolution(u32& dwWidth, u32& dwHeight, BOOL bWindowed)
         string64 buff;
         xr_sprintf(buff, sizeof(buff), "%dx%d", psCurrentVidMode[0], psCurrentVidMode[1]);
 
-        if (_ParseItem(buff, GEnv.vid_mode_token) == u32(-1)) // not found
+        if (_ParseItem(buff, AvailableVideoModes.data()) == u32(-1)) // not found
         { // select safe
-            xr_sprintf(buff, sizeof(buff), "vid_mode %s", GEnv.vid_mode_token[0].name);
+            xr_sprintf(buff, sizeof(buff), "vid_mode %s", AvailableVideoModes[0].name);
             Console->Execute(buff);
         }
 
@@ -307,49 +298,45 @@ void CHW::selectResolution(u32& dwWidth, u32& dwHeight, BOOL bWindowed)
 DXGI_RATIONAL CHW::selectRefresh(u32 dwWidth, u32 dwHeight, DXGI_FORMAT fmt)
 {
     if (psDeviceFlags.is(rsRefresh60hz))
-    {
         return DXGI_RATIONAL({ 60, 1 });
-    }
-    else
+
+    xr_vector<DXGI_MODE_DESC> modes;
+
+    IDXGIOutput* pOutput;
+    m_pAdapter->EnumOutputs(0, &pOutput);
+    VERIFY(pOutput);
+
+    UINT num = 0;
+    DXGI_FORMAT format = fmt;
+    UINT flags = 0;
+
+    // Get the number of display modes available
+    pOutput->GetDisplayModeList(format, flags, &num, nullptr);
+
+    // Get the list of display modes
+    modes.resize(num);
+    pOutput->GetDisplayModeList(format, flags, &num, &modes.front());
+
+    _RELEASE(pOutput);
+
+    float CurrentFreq = 60.0f;
+    DXGI_RATIONAL res = { 60, 1 };
+
+    for (auto &i : modes)
     {
-        xr_vector<DXGI_MODE_DESC> modes;
-
-        IDXGIOutput* pOutput;
-        m_pAdapter->EnumOutputs(0, &pOutput);
-        VERIFY(pOutput);
-
-        UINT num = 0;
-        DXGI_FORMAT format = fmt;
-        UINT flags = 0;
-
-        // Get the number of display modes available
-        pOutput->GetDisplayModeList(format, flags, &num, nullptr);
-
-        // Get the list of display modes
-        modes.resize(num);
-        pOutput->GetDisplayModeList(format, flags, &num, &modes.front());
-
-        _RELEASE(pOutput);
-
-        float CurrentFreq = 60.0f;
-        DXGI_RATIONAL res = { 60, 1 };
-
-        for (auto &i : modes)
+        if ((i.Width == dwWidth) && (i.Height == dwHeight))
         {
-            if ((i.Width == dwWidth) && (i.Height == dwHeight))
+            VERIFY(i.RefreshRate.Denominator);
+            float TempFreq = float(i.RefreshRate.Numerator) / float(i.RefreshRate.Denominator);
+            if (TempFreq > CurrentFreq)
             {
-                VERIFY(i.RefreshRate.Denominator);
-                float TempFreq = float(i.RefreshRate.Numerator) / float(i.RefreshRate.Denominator);
-                if (TempFreq > CurrentFreq)
-                {
-                    CurrentFreq = TempFreq;
-                    res = i.RefreshRate;
-                }
+                CurrentFreq = TempFreq;
+                res = i.RefreshRate;
             }
         }
-
-        return res;
     }
+
+    return res;
 }
 
 BOOL CHW::support(D3DFORMAT fmt, DWORD type, DWORD usage)
@@ -424,35 +411,29 @@ void CHW::updateWindowProps(HWND m_hWnd)
         SetWindowLong(m_hWnd, GWL_STYLE, dwWindowStyle = WS_POPUP | WS_VISIBLE);
     }
 
-    ShowCursor(FALSE);
     SetForegroundWindow(m_hWnd);
 }
 
-struct _uniq_mode
+struct uniqueRenderingMode
 {
-    _uniq_mode(LPCSTR v) : _val(v) {}
-    LPCSTR _val;
-    bool operator()(LPCSTR _other) { return !xr_stricmp(_val, _other); }
+    uniqueRenderingMode(pcstr v) : value(v) {}
+    pcstr value;
+    bool operator()(const xr_token other) const { return !xr_stricmp(value, other.name); }
 };
-
-#ifndef _EDITOR
 
 void free_vid_mode_list()
 {
-    for (int i = 0; GEnv.vid_mode_token[i].name; i++)
-    {
-        xr_free(GEnv.vid_mode_token[i].name);
-    }
-    xr_free(GEnv.vid_mode_token);
-    GEnv.vid_mode_token = nullptr;
+    for (auto& mode : AvailableVideoModes)
+        xr_free(mode.name);
+    AvailableVideoModes.clear();
 }
 
 void fill_vid_mode_list(CHW* _hw)
 {
-    if (GEnv.vid_mode_token != nullptr)
+    if (!AvailableVideoModes.empty())
         return;
-    xr_vector<LPCSTR> _tmp;
-    xr_vector<DXGI_MODE_DESC> modes;
+
+    xr_vector<DXGI_MODE_DESC> displayModes;
 
     IDXGIOutput* pOutput;
     //_hw->m_pSwapChain->GetContainingOutput(&pOutput);
@@ -467,45 +448,30 @@ void fill_vid_mode_list(CHW* _hw)
     pOutput->GetDisplayModeList(format, flags, &cnt, nullptr);
 
     // Get the list of display modes
-    modes.resize(cnt);
-    pOutput->GetDisplayModeList(format, flags, &cnt, &modes.front());
+    displayModes.resize(cnt);
+    pOutput->GetDisplayModeList(format, flags, &cnt, displayModes.data());
 
     _RELEASE(pOutput);
 
-    for (auto &i : modes)
+    int i = 0;
+    auto& AVM = AvailableVideoModes;
+    for (const auto& it : displayModes)
     {
         string32 str;
 
-        if (i.Width < 800)
+        xr_sprintf(str, sizeof(str), "%dx%d", it.Width, it.Height);
+
+        if (AVM.cend() != std::find_if(AVM.cbegin(), AVM.cend(), uniqueRenderingMode(str)))
             continue;
 
-        xr_sprintf(str, sizeof(str), "%dx%d", i.Width, i.Height);
-
-        if (_tmp.end() != std::find_if(_tmp.begin(), _tmp.end(), _uniq_mode(str)))
-            continue;
-
-        _tmp.push_back(nullptr);
-        _tmp.back() = xr_strdup(str);
+        AVM.emplace_back(xr_token(xr_strdup(str), i));
+        ++i;
     }
+    AVM.emplace_back(xr_token(nullptr, -1));
 
-    u32 _cnt = _tmp.size() + 1;
-
-    GEnv.vid_mode_token = xr_alloc<xr_token>(_cnt);
-
-    GEnv.vid_mode_token[_cnt - 1].id = -1;
-    GEnv.vid_mode_token[_cnt - 1].name = nullptr;
-
-#ifdef DEBUG
-    Msg("Available video modes[%d]:", _tmp.size());
-#endif // DEBUG
-    for (auto i = 0; i < _tmp.size(); ++i)
-    {
-        GEnv.vid_mode_token[i].id = i;
-        GEnv.vid_mode_token[i].name = _tmp[i];
-#ifdef DEBUG
-        Msg("[%s]", _tmp[i]);
-#endif // DEBUG
-    }
+    Msg("Available video modes[%d]:", AVM.size());
+    for (const auto& mode : AVM)
+        Msg("[%s]", mode.name);
 }
 
 void CHW::UpdateViews()
@@ -550,4 +516,3 @@ void CHW::UpdateViews()
 
     _RELEASE(pDepthStencil);
 }
-#endif

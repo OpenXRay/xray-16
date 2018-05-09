@@ -53,10 +53,10 @@ private:
     mutable bool m_smart_covers_actual;
 
 protected:
-    IC bool edge_vertex(u32 index);
-    IC bool cover(LevelGraph::CVertex* v, u32 index0, u32 index1);
-    IC bool critical_point(LevelGraph::CVertex* v, u32 index, u32 index0, u32 index1);
-    IC bool critical_cover(u32 index);
+    IC bool edge_vertex(u32 index) const;
+    IC bool cover(LevelGraph::CVertex* v, u32 index0, u32 index1) const;
+    IC bool critical_point(LevelGraph::CVertex* v, u32 index, u32 index0, u32 index1) const;
+    IC bool critical_cover(u32 index) const;
 
 private:
     template <typename _evaluator_type, typename _restrictor_type>

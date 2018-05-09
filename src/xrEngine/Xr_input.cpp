@@ -345,19 +345,15 @@ BOOL CInput::iGetAsyncKeyState(int dik)
 BOOL CInput::iGetAsyncBtnState(int btn) { return !!mouseState[btn]; }
 void CInput::ClipCursor(bool clip)
 {
-    HWND hwnd = Device.m_hWnd;
-    if (hwnd)
+    if (clip)
     {
-        if (clip)
-        {
-            RECT clientRect;
-            ::GetClientRect(hwnd, &clientRect);
-            ::ClientToScreen(hwnd, (LPPOINT)&clientRect.left);
-            ::ClientToScreen(hwnd, (LPPOINT)&clientRect.right);
-            ::ClipCursor(&clientRect);
-        }
-        else
-            ::ClipCursor(nullptr);
+        ::ClipCursor(&Device.m_rcWindowClient);
+        while (ShowCursor(FALSE) >= 0) {}
+    }
+    else
+    {
+        ::ClipCursor(nullptr);
+        while (ShowCursor(TRUE) <= 0) {}
     }
 }
 
