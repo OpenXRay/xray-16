@@ -13,6 +13,7 @@ find_package(Theora REQUIRED)
 find_package(OGG REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(LZO REQUIRED)
+find_package(JPEG REQUIRED)
 
 include_directories(${LUA_INCLUDE_DIR})
 include_directories(${CMAKE_SOURCE_DIR} {CMAKE_SOURCE_DIR}/Common ${CMAKE_SOURCE_DIR}/Externals ${CMAKE_SOURCE_DIR}/Externals/gli/external/glm ${CMAKE_SOURCE_DIR}/../sdk/include/loki)
