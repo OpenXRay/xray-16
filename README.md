@@ -9,7 +9,22 @@ and work on the source code.
 
 Changelist is available in [wiki](https://github.com/OpenXRay/xray-16/wiki/Changes).
 
-Build instructions: [doc/howto/build.txt](doc/howto/build.txt)
+Build instructions (Windows): [doc/howto/build.txt](doc/howto/build.txt)
+
+Build instructions (Linux):
+Dependencies (Ubuntu 18.04): sudo apt install git cmake lua5.1-dev libssl-dev libtheora-dev libogg-dev liblzo2-dev libjpeg-dev
+Init: git submodule update --init --recursive
+Building: mkdir bin && cd bin && cmake ../src
+
+Current status (Linux):
+Build Failed:
+[ 70%] Building CXX object Externals/NVTT/src/nvimage/CMakeFiles/nvimage.dir/ImageIO.cpp.o
+In function ‘nv::FloatImage* nv::ImageIO::loadFloat(const char*)’:
+xray-16/src/Externals/NVTT/src/nvimage/ImageIO.cpp:138:10: error: cannot convert ‘bool’ to ‘nv::FloatImage*’ in return
+   return false;
+          ^~~~~
+
+
 
 If you find a bug or have an enhancement request, file an [Issue](https://github.com/openxray/xray-16/issues).
 
