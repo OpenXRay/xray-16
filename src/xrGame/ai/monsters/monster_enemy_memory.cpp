@@ -86,14 +86,13 @@ void CMonsterEnemyMemory::update()
 
     float const feel_enemy_max_distance = monster->get_feel_enemy_max_distance();
 
-    for (auto I = objects.cbegin(); I != objects.cend(); ++I)
+    for (const auto& enemy : objects)
     {
-        const CEntityAlive* enemy = *I;
         const bool feel_enemy =
             monster->Position().distance_to(enemy->Position()) < feel_enemy_max_distance;
 
-        if (feel_enemy || monster->memory().visual().visible_now(*I))
-            add_enemy(*I);
+        if (feel_enemy || monster->memory().visual().visible_now(enemy))
+            add_enemy(enemy);
     }
 
     if (g_actor)
@@ -112,11 +111,13 @@ void CMonsterEnemyMemory::update()
     remove_non_actual();
 
     // обновить опасность
-    for (ENEMIES_MAP_IT it = m_objects.begin(); it != m_objects.end(); it++)
+    // XXX: review with below example
+    // for (auto& [entity, memory] : m_objects)
+    for (auto& it : m_objects)
     {
-        u8 relation_value = u8(monster->tfGetRelationType(it->first));
-        float dist = monster->Position().distance_to(it->second.position);
-        it->second.danger = (1 + relation_value * relation_value * relation_value) / (1 + dist);
+        const u8 relation_value = u8(monster->tfGetRelationType(it.first));
+        const float dist = monster->Position().distance_to(it.second.position);
+        it.second.danger = (1 + relation_value * relation_value * relation_value) / (1 + dist);
     }
 }
 
