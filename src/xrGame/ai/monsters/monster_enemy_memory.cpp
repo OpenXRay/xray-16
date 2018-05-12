@@ -55,6 +55,9 @@ void CMonsterEnemyMemory::update()
         }
     }
 
+    // XXX: monster doesn't react to sounds when Actor doesn't see him
+    // Probably this was made for optimization
+    // But this conflicts with the ALife idea
     if (monster->SoundMemory.IsRememberSound() && g_actor
         && g_actor->memory().visual().visible_now(monster))
     {
