@@ -18,12 +18,10 @@ Building: mkdir bin && cd bin && cmake ../src
 
 Current status (Linux):
 Build Failed:
-[ 70%] Building CXX object Externals/NVTT/src/nvimage/CMakeFiles/nvimage.dir/ImageIO.cpp.o
-In function ‘nv::FloatImage* nv::ImageIO::loadFloat(const char*)’:
-xray-16/src/Externals/NVTT/src/nvimage/ImageIO.cpp:138:10: error: cannot convert ‘bool’ to ‘nv::FloatImage*’ in return
-   return false;
-          ^~~~~
-
+[ 82%] Building CXX object xrCore/CMakeFiles/xrCore.dir/clsid.cpp.o
+xray-16/src/xrCore/_types.h:14:24: error: expected initializer before ?s64?
+ typedef signed __int64 s64;
+                        ^~~
 
 
 If you find a bug or have an enhancement request, file an [Issue](https://github.com/openxray/xray-16/issues).
@@ -34,5 +32,5 @@ Pull requests appreciated! However, the following things should be taken into co
 * Major changes should be discussed before implementation
 * Follow the [procedures](doc/procedure)
 
-Be advised that this project is not sanctioned by GSC Game World in any way – and they remain the copyright holders
+Be advised that this project is not sanctioned by GSC Game World in any way ? and they remain the copyright holders
 of all the original source code.
