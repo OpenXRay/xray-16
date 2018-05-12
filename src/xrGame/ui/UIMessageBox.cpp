@@ -390,7 +390,7 @@ LPCSTR CUIMessageBox::GetHost()
     {
         m_ret_val.clear();
         xr_string tmp = m_UIEditHost->GetText();
-        xr_string::size_type pos = tmp.find(":");
+        xr_string::size_type pos = tmp.find(':');
 
         if (xr_string::npos != pos)
         {

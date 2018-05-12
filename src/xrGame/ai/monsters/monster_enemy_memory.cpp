@@ -32,10 +32,8 @@ void CMonsterEnemyMemory::update()
     VERIFY(monster->g_Alive());
 
     CMonsterHitMemory& monster_hit_memory = monster->HitMemory;
-
-    typedef CObjectManager<const CEntityAlive>::OBJECTS objects_list;
-
-    objects_list const& objects = monster->memory().enemy().objects();
+    
+    auto const& objects = monster->memory().enemy().objects();
 
     if (monster_hit_memory.is_hit() && time() < monster_hit_memory.get_last_hit_time() + 1000)
     {
@@ -86,17 +84,18 @@ void CMonsterEnemyMemory::update()
         }
     }
 
-    for (objects_list::const_iterator I = objects.begin(); I != objects.end(); ++I)
+    float const feel_enemy_max_distance = monster->get_feel_enemy_max_distance();
+
+    for (auto I = objects.cbegin(); I != objects.cend(); ++I)
     {
         const CEntityAlive* enemy = *I;
         const bool feel_enemy =
-            monster->Position().distance_to(enemy->Position()) < monster->get_feel_enemy_max_distance();
+            monster->Position().distance_to(enemy->Position()) < feel_enemy_max_distance;
 
         if (feel_enemy || monster->memory().visual().visible_now(*I))
             add_enemy(*I);
     }
 
-    float const feel_enemy_max_distance = monster->get_feel_enemy_max_distance();
     if (g_actor)
     {
         float const xz_dist = monster->Position().distance_to_xz(g_actor->Position());
@@ -129,6 +128,7 @@ void CMonsterEnemyMemory::add_enemy(const CEntityAlive* enemy)
     enemy_info.time = Device.dwTimeGlobal;
     enemy_info.danger = 0.f;
 
+    // XXX: review
     ENEMIES_MAP_IT it = m_objects.find(enemy);
     if (it != m_objects.end())
     {
@@ -185,10 +185,10 @@ void CMonsterEnemyMemory::remove_non_actual()
 
 const CEntityAlive* CMonsterEnemyMemory::get_enemy()
 {
-    ENEMIES_MAP_IT it = find_best_enemy();
+    const auto it = find_best_enemy();
     if (it != m_objects.end())
         return it->first;
-    return (0);
+    return nullptr;
 }
 
 SMonsterEnemy CMonsterEnemyMemory::get_enemy_info()
@@ -196,7 +196,7 @@ SMonsterEnemy CMonsterEnemyMemory::get_enemy_info()
     SMonsterEnemy ret_val;
     ret_val.time = 0;
 
-    ENEMIES_MAP_IT it = find_best_enemy();
+    const auto it = find_best_enemy();
     if (it != m_objects.end())
         ret_val = it->second;
 
@@ -241,9 +241,7 @@ ENEMIES_MAP_IT CMonsterEnemyMemory::find_best_enemy()
 void CMonsterEnemyMemory::remove_links(IGameObject* O)
 {
     if (monster)
-    {
         monster->EnemyMan.remove_links(O);
-    }
 
     for (ENEMIES_MAP_IT I = m_objects.begin(); I != m_objects.end(); ++I)
     {
