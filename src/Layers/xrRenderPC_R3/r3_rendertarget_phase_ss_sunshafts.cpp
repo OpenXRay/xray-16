@@ -3,7 +3,7 @@
 void CRenderTarget::phase_sunshafts()
 {
     CEnvDescriptor &env = *g_pGamePersistent->Environment().CurrentEnv;
-    //if (env.m_fSunShaftsIntensity <= 0.001) return;
+    if (env.m_fSunShaftsIntensity <= 0.001) return;
 
     u32 Offset;
     Fvector2 p0, p1;

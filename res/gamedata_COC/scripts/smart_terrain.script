@@ -174,7 +174,8 @@ function se_smart_terrain:read_params()
 	self.alarm_stop_sound 	= ini:r_string_to_condlist(smart_sect,"alarm_stop_sound")
 	self.alarm_length = ini:r_float_ex(smart_sect,"alarm_length") or 30000
 	
-	if (self.faction_controlled) then
+	self.disable_faction_controlled = xr_logic.pick_section_from_condlist(get_story_object("actor"), nil, ini:r_string_to_condlist(smart_sect,"disable_faction_controlled"))
+	if (self.faction_controlled and self.disable_faction_controlled ~= "true") then
 		local spawn_num_condlist = ini:r_string_to_condlist(smart_sect,"faction_respawn_num")
 		if (spawn_num_condlist) then
 			self.respawn_params 	= self.respawn_params or {}

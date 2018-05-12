@@ -1059,7 +1059,7 @@ function is_actor_enemy_to_faction(actor,npc,p)
 	end
 end
 
--- текущий враг актёр?
+-- actor is current enemy?
 function fighting_actor(actor, npc)
 	local enemy_id = db.storage[npc:id()].enemy_id
 	local enemy = db.storage[enemy_id] and db.storage[enemy_id].object

@@ -61,7 +61,7 @@ void XMLDocument::Load(pcstr path, pcstr xml_filename)
     // Load and parse xml file
 
     IReader* F = FS.r_open(path, xml_filename);
-    R_ASSERT2(F, xml_filename);
+    R_ASSERT3(F, "XML ERROR! File doesn't exist: ", xml_filename);
 
     CMemoryWriter W;
     ParseFile(path, W, F, this);

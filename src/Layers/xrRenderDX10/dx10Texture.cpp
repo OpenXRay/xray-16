@@ -20,9 +20,6 @@ void fix_texture_name(LPSTR fn)
 
 int get_texture_load_lod(LPCSTR fn)
 {
-    if (strstr(fn, "act_mutant_boar_u"))
-        return 0;
-
     CInifile::Sect& sect = pSettings->r_section("reduce_lod_texture_list");
     auto it_ = sect.Data.cbegin();
     auto it_e_ = sect.Data.cend();
@@ -142,167 +139,7 @@ void TW_Save(ID3DTexture2D* T, LPCSTR name, LPCSTR prefix, LPCSTR postfix)
     R_CHK(D3DX10SaveTextureToFile(T, D3DX10_IFF_DDS, fn2));
 #endif
 }
-/*
-ID3DTexture2D*  TW_LoadTextureFromTexture
-(
- ID3DTexture2D*     t_from,
- D3DFORMAT&             t_dest_fmt,
- int                        levels_2_skip,
- u32&                   w,
- u32&                   h
- )
-{
-    // Calculate levels & dimensions
-    ID3DTexture2D*      t_dest          = NULL;
-    D3DSURFACE_DESC         t_from_desc0    ;
-    R_CHK                   (t_from->GetLevelDesc   (0,&t_from_desc0));
-    int levels_exist        = t_from->GetLevelCount();
-    int top_width           = t_from_desc0.Width;
-    int top_height          = t_from_desc0.Height;
-    Reduce                  (top_width,top_height,levels_exist,levels_2_skip);
 
-    // Create HW-surface
-    if (D3DX_DEFAULT==t_dest_fmt)   t_dest_fmt = t_from_desc0.Format;
-    R_CHK                   (D3DXCreateTexture(
-        HW.pDevice,
-        top_width,top_height,
-        levels_exist,0,t_dest_fmt,
-        D3DPOOL_MANAGED,&t_dest
-        ));
-
-    // Copy surfaces & destroy temporary
-    ID3DTexture2D* T_src= t_from;
-    ID3DTexture2D* T_dst= t_dest;
-
-    int     L_src           = T_src->GetLevelCount  ()-1;
-    int     L_dst           = T_dst->GetLevelCount  ()-1;
-    for (; L_dst>=0; L_src--,L_dst--)
-    {
-        // Get surfaces
-        IDirect3DSurface9       *S_src, *S_dst;
-        R_CHK   (T_src->GetSurfaceLevel (L_src,&S_src));
-        R_CHK   (T_dst->GetSurfaceLevel (L_dst,&S_dst));
-
-        // Copy
-        R_CHK   (D3DXLoadSurfaceFromSurface(S_dst,NULL,NULL,S_src,NULL,NULL,D3DX_FILTER_NONE,0));
-
-        // Release surfaces
-        _RELEASE                (S_src);
-        _RELEASE                (S_dst);
-    }
-
-    // OK
-    w                       = top_width;
-    h                       = top_height;
-    return                  t_dest;
-}
-
-template    <class _It>
-IC  void    TW_Iterate_1OP
-(
- ID3DTexture2D*     t_dst,
- ID3DTexture2D*     t_src,
- const _It              pred
- )
-{
-    DWORD mips                          = t_dst->GetLevelCount();
-    R_ASSERT                            (mips == t_src->GetLevelCount());
-    for (DWORD i = 0; i < mips; i++)    {
-        D3DLOCKED_RECT              Rsrc,Rdst;
-        D3DSURFACE_DESC             desc,descS;
-
-        t_dst->GetLevelDesc         (i, &desc);
-        t_src->GetLevelDesc         (i, &descS);
-        VERIFY                      (desc.Format==descS.Format);
-        VERIFY                      (desc.Format==D3DFMT_A8R8G8B8);
-        t_src->LockRect             (i,&Rsrc,0,0);
-        t_dst->LockRect             (i,&Rdst,0,0);
-        for (u32 y = 0; y < desc.Height; y++)   {
-            for (u32 x = 0; x < desc.Width; x++)    {
-                DWORD&  pSrc    = *(((DWORD*)((BYTE*)Rsrc.pBits + (y * Rsrc.Pitch)))+x);
-                DWORD&  pDst    = *(((DWORD*)((BYTE*)Rdst.pBits + (y * Rdst.Pitch)))+x);
-                pDst            = pred(pDst,pSrc);
-            }
-        }
-        t_dst->UnlockRect           (i);
-        t_src->UnlockRect           (i);
-    }
-}
-template    <class _It>
-IC  void    TW_Iterate_2OP
-(
- ID3DTexture2D*     t_dst,
- ID3DTexture2D*     t_src0,
- ID3DTexture2D*     t_src1,
- const _It              pred
- )
-{
-    DWORD mips                          = t_dst->GetLevelCount();
-    R_ASSERT                            (mips == t_src0->GetLevelCount());
-    R_ASSERT                            (mips == t_src1->GetLevelCount());
-    for (DWORD i = 0; i < mips; i++)    {
-        D3DLOCKED_RECT              Rsrc0,Rsrc1,Rdst;
-        D3DSURFACE_DESC             desc,descS0,descS1;
-
-        t_dst->GetLevelDesc         (i, &desc);
-        t_src0->GetLevelDesc        (i, &descS0);
-        t_src1->GetLevelDesc        (i, &descS1);
-        VERIFY                      (desc.Format==descS0.Format);
-        VERIFY                      (desc.Format==descS1.Format);
-        VERIFY                      (desc.Format==D3DFMT_A8R8G8B8);
-        t_src0->LockRect            (i,&Rsrc0,  0,0);
-        t_src1->LockRect            (i,&Rsrc1,  0,0);
-        t_dst->LockRect             (i,&Rdst,   0,0);
-        for (u32 y = 0; y < desc.Height; y++)   {
-            for (u32 x = 0; x < desc.Width; x++)    {
-                DWORD&  pSrc0   = *(((DWORD*)((BYTE*)Rsrc0.pBits + (y * Rsrc0.Pitch)))+x);
-                DWORD&  pSrc1   = *(((DWORD*)((BYTE*)Rsrc1.pBits + (y * Rsrc1.Pitch)))+x);
-                DWORD&  pDst    = *(((DWORD*)((BYTE*)Rdst.pBits  + (y * Rdst.Pitch)))+x);
-                pDst            = pred(pDst,pSrc0,pSrc1);
-            }
-        }
-        t_dst->UnlockRect           (i);
-        t_src0->UnlockRect          (i);
-        t_src1->UnlockRect          (i);
-    }
-}
-
-IC u32 it_gloss_rev     (u32 d, u32 s)  {   return  color_rgba  (
-    color_get_A(s),     // gloss
-    color_get_B(d),
-    color_get_G(d),
-    color_get_R(d)      );
-}
-IC u32 it_gloss_rev_base(u32 d, u32 s)  {
-    u32     occ     = color_get_A(d)/3;
-    u32     def     = 8;
-    u32     gloss   = (occ*1+def*3)/4;
-    return  color_rgba  (
-        gloss,          // gloss
-        color_get_B(d),
-        color_get_G(d),
-        color_get_R(d)
-        );
-}
-IC u32 it_difference    (u32 d, u32 orig, u32 ucomp)    {   return  color_rgba(
-    128+(int(color_get_R(orig))-int(color_get_R(ucomp)))*2,     // R-error
-    128+(int(color_get_G(orig))-int(color_get_G(ucomp)))*2,     // G-error
-    128+(int(color_get_B(orig))-int(color_get_B(ucomp)))*2,     // B-error
-    128+(int(color_get_A(orig))-int(color_get_A(ucomp)))*2  );  // A-error
-}
-IC u32 it_height_rev    (u32 d, u32 s)  {   return  color_rgba  (
-    color_get_A(d),                 // diff x
-    color_get_B(d),                 // diff y
-    color_get_G(d),                 // diff z
-    color_get_R(s)  );              // height
-}
-IC u32 it_height_rev_base(u32 d, u32 s) {   return  color_rgba  (
-    color_get_A(d),                 // diff x
-    color_get_B(d),                 // diff y
-    color_get_G(d),                 // diff z
-    (color_get_R(s)+color_get_G(s)+color_get_B(s))/3    );  // height
-}
-*/
 ID3DBaseTexture* CRender::texture_load(LPCSTR fRName, u32& ret_msize, bool bStaging)
 {
 //  Moved here just to avoid warning
@@ -455,14 +292,9 @@ _DDS_2D:
 #else
     D3DX10_IMAGE_LOAD_INFO LoadInfo;
 #endif
-    // LoadInfo.FirstMipLevel = img_loaded_lod;
+    LoadInfo.FirstMipLevel = img_loaded_lod;
     LoadInfo.Width = IMG.Width;
     LoadInfo.Height = IMG.Height;
-
-    if (img_loaded_lod)
-    {
-        Reduce(LoadInfo.Width, LoadInfo.Height, IMG.MipLevels, img_loaded_lod);
-    }
 
     // LoadInfo.Usage = D3D_USAGE_IMMUTABLE;
     if (bStaging)

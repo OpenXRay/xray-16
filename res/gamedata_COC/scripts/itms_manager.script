@@ -75,7 +75,7 @@ function on_item_focus(itm)
 			return false
 		end 
 		
-		ActorMenu.get_actor_menu():highlight_for_each_in_slot(itr, 2, 0)
+		ActorMenu.get_actor_menu():highlight_for_each_in_slot(itr)
 	end 
 end 
 

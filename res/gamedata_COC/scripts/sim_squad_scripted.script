@@ -15,9 +15,8 @@ do -- to localize below
 	local locations_ini	= ini_file("misc\\smart_terrain_masks.ltx")
 	
 	local function itr(section)
-		local a,key,val = locations_ini:r_line_ex(section,0)
+		local a,key,val = locations_ini:r_line_ex(section,0,"","")
 		location_types[key] = key
-		return false
 	end 
 	
 	locations_ini:section_for_each(itr)

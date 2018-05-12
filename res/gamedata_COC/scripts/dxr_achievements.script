@@ -67,7 +67,6 @@ function bookworm_food_functor()
 		bookworm_food_rewards()
 		return true
 	end
-	return false
 end
 
 -- Completionist.
@@ -85,7 +84,6 @@ function completionist_functor()
 		completionist_rewards()
 		return true
 	end
-	return false
 end
 
 -- Down to Earth.
@@ -103,7 +101,6 @@ function down_to_earth_functor()
 		down_to_earth_rewards()
 		return true
 	end
-	return false
 end
 
 -- Duga Free.
@@ -121,7 +118,6 @@ function duga_free_functor()
 		duga_free_rewards()
 		return true
 	end
-	return false
 end
 
 -- Geologist.
@@ -139,7 +135,6 @@ function geologist_functor()
 		geologist_rewards()
 		return true
 	end
-	return false
 end
 
 -- Heavy Pockets.
@@ -157,7 +152,6 @@ function heavy_pockets_functor()
 		heavy_pockets_rewards()
 		return true
 	end
-	return false
 end
 
 -- Infopreneur.
@@ -175,7 +169,6 @@ function infopreneur_functor()
 		infopreneur_rewards()
 		return true
 	end
-	return false
 end
 
 -- Mechanized Warfare.
@@ -193,7 +186,6 @@ function mechanized_warfare_functor()
 		mechanized_warfare_rewards()
 		return true
 	end
-	return false
 end
 
 -- Patriarch.
@@ -211,7 +203,6 @@ function patriarch_functor()
 		patriarch_rewards()
 		return true
 	end
-	return false
 end
 
 -- Radiotherapy.
@@ -229,7 +220,6 @@ function radiotherapy_functor()
 		radiotherapy_rewards()
 		return true
 	end
-	return false
 end
 
 -- Rag and Bone.
@@ -247,7 +237,6 @@ function rag_and_bone_functor()
 		rag_and_bone_rewards()
 		return true
 	end
-	return false
 end
 
 -- Silver or Lead.
@@ -265,7 +254,6 @@ function silver_or_lead_functor()
 		silver_or_lead_rewards()
 		return true
 	end
-	return false
 end
 
 -- Tourist.
@@ -289,7 +277,6 @@ function tourist_functor()
 		db.actor:give_info_portion("tourist_achievement_delay")
 		return false
 	end
-	return false
 end
 
 -- Well Dressed.
@@ -307,7 +294,6 @@ function well_dressed_functor()
 		well_dressed_rewards()
 		return true
 	end
-	return false
 end
 
 -- Wishful Thinking.
@@ -325,7 +311,6 @@ function wishful_thinking_functor()
 		wishful_thinking_rewards()
 		return true
 	end
-	return false
 end
 
 ------------------------

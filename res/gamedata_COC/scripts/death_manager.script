@@ -22,7 +22,7 @@ function init_drop_settings()
 			local n = death_ini:line_count(v)
 			local id, value = "", ""
 			for i=0,n-1 do
-				result, id, value	= death_ini:r_line_ex(v,i)
+				result, id, value	= death_ini:r_line_ex(v,i,"","")
 				local temp = not (death_ini:line_exist("exclude_from_multi",id)) and diff_multi or 1
 				item_by_community[v][id] = value and tonumber(value) * temp or 0
 				--printf("item by community difficulty multi %s : %s",temp,item_by_community[v][id])
@@ -33,7 +33,7 @@ function init_drop_settings()
 	local n = death_ini:line_count("item_count")
 	local id, value = "", ""
 	for i=0,n-1 do
-		local result, id, value	= death_ini:r_line_ex("item_count",i)
+		local result, id, value	= death_ini:r_line_ex("item_count",i,"","")
 		local p = alun_utils.str_explode(value,",")
 		if (p) then
 			p[1] = tonumber(p[1]) or 0
@@ -46,7 +46,7 @@ function init_drop_settings()
  	-- Create a list of item sections that npc must keep
 	local n = death_ini:line_count("keep_items")
 	for i=0,n-1 do
-		local result, id, value	= death_ini:r_line_ex("keep_items",i)
+		local result, id, value	= death_ini:r_line_ex("keep_items",i,"","")
 		if value == "true" then
 			always_keep_item[id] = true
 		end
@@ -58,7 +58,7 @@ function init_drop_settings()
 		if not (item_by_story_id) then 
 			item_by_story_id = {}
 		end
-		local result, id, value	= death_ini:r_line_ex("spawn_by_story_id",i)
+		local result, id, value	= death_ini:r_line_ex("spawn_by_story_id",i,"","")
 		item_by_story_id[id] = value
 	end
 end

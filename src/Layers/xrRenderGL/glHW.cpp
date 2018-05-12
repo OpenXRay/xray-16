@@ -166,7 +166,7 @@ void CHW::DestroyDevice()
 //////////////////////////////////////////////////////////////////////
 void CHW::Reset(HWND hwnd)
 {
-    if (strstr(Core.Params, "-wnd_mode"))
+    if (IsDebuggerPresent())
         psDeviceFlags.set(rsFullscreen, false);
 
     BOOL bWindowed = !psDeviceFlags.is(rsFullscreen);
@@ -186,7 +186,7 @@ void CHW::Reset(HWND hwnd)
 
 void CHW::updateWindowProps(HWND m_hWnd)
 {
-    if (strstr(Core.Params, "-wnd_mode"))
+    if (IsDebuggerPresent())
         psDeviceFlags.set(rsFullscreen, false);
 
     const bool bWindowed = !psDeviceFlags.is(rsFullscreen);

@@ -670,22 +670,22 @@ void CScriptEngine::print_error(lua_State* L, int iErrorCode)
     switch (iErrorCode)
     {
     case LUA_ERRRUN:
-        Log("SCRIPT RUNTIME ERROR");
+        Log("\n\nSCRIPT RUNTIME ERROR");
         break;
     case LUA_ERRMEM:
-        Log("SCRIPT ERROR (memory allocation)");
+        Log("\n\nSCRIPT ERROR (memory allocation)");
         break;
     case LUA_ERRERR:
-        Log("SCRIPT ERROR (while running the error handler function)");
+        Log("\n\nSCRIPT ERROR (while running the error handler function)");
         break;
     case LUA_ERRFILE:
-        Log("SCRIPT ERROR (while running file)");
+        Log("\n\nSCRIPT ERROR (while running file)");
         break;
     case LUA_ERRSYNTAX:
-        Log("SCRIPT SYNTAX ERROR");
+        Log("\n\nSCRIPT SYNTAX ERROR");
         break;
     case LUA_YIELD:
-        Log("Thread is yielded");
+        Log("\n\nThread is yielded");
         break;
     default: NODEFAULT;
     }

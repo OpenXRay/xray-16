@@ -585,4 +585,10 @@
 	<string id="ui_mm_faction_select">
 		<text>Faction Select</text>
 	</string>
+	<string id="eng">
+		<text>English</text>
+	</string>
+	<string id="rus">
+		<text>Русский</text>
+	</string>
 </string_table>

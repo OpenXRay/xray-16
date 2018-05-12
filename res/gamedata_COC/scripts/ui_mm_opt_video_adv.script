@@ -34,10 +34,6 @@ function mode_ge_25(render_id)
 	return render_id>=3
 end
 
-function mode_25_only(render_id)
-	return render_id==3
-end
-
 function mode_less_3(render_id)
 	return render_id<4
 end
@@ -165,7 +161,7 @@ function opt_video_adv:InitControls(x, y, xml, handler)
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	xml:InitStatic("video_adv:cap_r2_sun_shafts_mode", _st)
 	ctl = xml:InitComboBox("video_adv:list_r2_sun_shafts_mode", _st)
-	table.insert(handler.m_preconditions, {func=mode_25_only, control=_st})
+	table.insert(handler.m_preconditions, {func=mode_ge_25, control=_st})
 
 	_st = xml:InitStatic("video_adv:templ_item", nil)
 	_st:SetWndSize(vector2():set(_st:GetWidth(), 106))

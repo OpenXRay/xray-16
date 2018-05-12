@@ -36,6 +36,7 @@ local intercepts = {
 	CUIActorMenu_OnItemDropped		= {},
 	CUIActorMenu_OnItemFocusReceive = {},
 	CUIActorMenu_OnItemFocusLost 	= {},
+	CUIActorMenu_CanMoveToPartner	= {},
 	
 	-- ui_main_menu.script
 	main_menu_on_keyboard		= {},

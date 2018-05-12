@@ -1656,8 +1656,8 @@ function ini_file_ex:collect_section(section)
 	local n = self.ini:section_exist(section) and self.ini:line_count(section) or 0
 	if (n > 0) then
 		for i = 0,n-1 do
-			local res,sect,val = self.ini:r_line(section,i,"","")
-			_t[sect] = val
+			local res,id,val = self.ini:r_line(section,i,"","")
+			_t[id] = val
 		end
 	end
 

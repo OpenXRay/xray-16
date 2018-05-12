@@ -16,13 +16,15 @@
 extern bool shared_str_initialized;
 
 #ifdef __BORLANDC__
-#include "d3d9.h"
-#include "d3dx9.h"
-#include "D3DX_Wrapper.h"
-#pragma comment(lib, "EToolsB.lib")
-#define USE_BUG_TRAP
+#   include "d3d9.h"
+#   include "d3dx9.h"
+#   include "D3DX_Wrapper.h"
+#   pragma comment(lib, "EToolsB.lib")
+#   define USE_BUG_TRAP
 #else
-#define USE_BUG_TRAP
+#   ifndef COC_EDITION
+#       define USE_BUG_TRAP
+#   endif
 static BOOL bException = FALSE;
 #endif
 
@@ -296,7 +298,7 @@ void xrDebug::GatherInfo(char* assertionInfo, const ErrorLocation& loc, const ch
         FlushLog();
     }
     buffer = assertionInfo;
-    if (IsDebuggerPresent() || !strstr(GetCommandLine(), "-no_call_stack_assert"))
+    if (IsDebuggerPresent() || strstr(GetCommandLine(), "-no_call_stack_assert"))
         return;
     if (shared_str_initialized)
         Log("stack trace:\n");
@@ -386,8 +388,8 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
         case IDCANCEL:
 #ifdef USE_BUG_TRAP
             BT_SetUserMessage(assertionInfo);
-#endif
             DEBUG_BREAK;
+#endif
             needTerminate = true;
             break;
         case IDTRYAGAIN: ErrorAfterDialog = false;
@@ -396,7 +398,11 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
             ErrorAfterDialog = false;
             ignoreAlways = true;
             break;
-        default: DEBUG_BREAK;
+        default:
+#ifndef COC_EDITION
+            DEBUG_BREAK;
+#endif
+            break;
         }
 #else // !USE_OWN_ERROR_MESSAGE_WINDOW
 #ifdef USE_BUG_TRAP
@@ -408,12 +414,14 @@ void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* exp
 #ifndef COC_DEBUG_BEHAVIOUR
     if (OnDialog)
         OnDialog(false);
-#else
-    if (needTerminate)
-        TerminateProcess(GetCurrentProcess(), 1);
 #endif
 
     lock.Leave();
+
+#ifdef COC_EDITION
+    if (needTerminate)
+        TerminateProcess(GetCurrentProcess(), 1);
+#endif
 }
 
 void xrDebug::Fail(bool& ignoreAlways, const ErrorLocation& loc, const char* expr, const std::string& desc,

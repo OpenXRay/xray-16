@@ -69,6 +69,7 @@ function CInventory_ItemAvailableToTrade(npc,item)
 	return false
 end
 
+local flags = { ret_value = true }
 -- called from engine
 function CUIActorMenu_CanMoveToPartner(obj,itm,actor_weight,partner_weight,item_weight,partner_total_weight,partner_max_carry_weight)
 	--printf("%s [%s actor_weight=%s partner_weight=%s item_weight=%s partner_total_weight=%s partner_max_carry_weight=%s]",obj:name(),itm:name(),actor_weight,partner_weight,item_weight,partner_total_weight,partner_max_carry_weight)
@@ -77,7 +78,10 @@ function CUIActorMenu_CanMoveToPartner(obj,itm,actor_weight,partner_weight,item_
 		return false
 	end
 	
-	return true
+	flags.ret_value = true
+	SendScriptCallback("CUIActorMenu_CanMoveToPartner",obj,itm,actor_weight,partner_weight,item_weight,partner_total_weight,partner_max_carry_weight,flags)
+	
+	return flags.ret_value
 end
 
 -- called from engine during donation. return false to refuse or return true to donate
